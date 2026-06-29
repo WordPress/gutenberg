@@ -836,4 +836,468 @@ function parseGridImage(
 	};
 }
 
+/*
+ * HEIC/HEIF image sequence (msf1 / Live Photo / burst) demuxing.
+ */
+
+/** A single temporal frame (HEVC access unit) of an image sequence. */
+export interface HeicSequenceSample {
+	/** Raw HEVC bitstream for this frame (length-prefixed NAL units). */
+	data: Uint8Array;
+	/** Whether this frame is a sync sample (IDR/keyframe). */
+	isSync: boolean;
+	/** Presentation timestamp in microseconds. */
+	timestampUs: number;
+	/** Frame duration in microseconds. */
+	durationUs: number;
+}
+
+export interface HeicSequenceData {
+	/** HEVC codec string for VideoDecoder (e.g. 'hvc1.1.6.L93.B0'). */
+	codecString: string;
+	/** Raw HEVCDecoderConfigurationRecord bytes for VideoDecoder description. */
+	description: Uint8Array;
+	/** Coded frame width in pixels. */
+	codedWidth: number;
+	/** Coded frame height in pixels. */
+	codedHeight: number;
+	/** Display rotation in degrees clockwise (0, 90, 180, 270). */
+	rotation: number;
+	/** Temporal frames in decode order. */
+	samples: HeicSequenceSample[];
+}
+
+/**
+ * Read a track handler type (e.g. 'pict', 'vide') from an hdlr box.
+ *
+ * @param r   Binary reader.
+ * @param box BoxInfo for the hdlr box.
+ */
+function parseHdlrType( r: Reader, box: BoxInfo ): string {
+	// FullBox (4) + pre_defined (4), then handler_type (4 chars).
+	r.pos = box.offset + box.headerSize + 8;
+	return r.str( 4 );
+}
+
+/**
+ * Read the media timescale (ticks per second) from an mdhd box.
+ *
+ * @param r   Binary reader.
+ * @param box BoxInfo for the mdhd box.
+ */
+function parseMdhdTimescale( r: Reader, box: BoxInfo ): number {
+	r.pos = box.offset + box.headerSize;
+	const version = r.u8();
+	r.pos += 3; // flags
+	if ( version === 1 ) {
+		r.pos += 16; // creation_time (8) + modification_time (8)
+	} else {
+		r.pos += 8; // creation_time (4) + modification_time (4)
+	}
+	return r.u32();
+}
+
+/**
+ * Derive display rotation (degrees clockwise) from a tkhd transformation
+ * matrix. Only the common right-angle rotations are recognised.
+ *
+ * @param r   Binary reader.
+ * @param box BoxInfo for the tkhd box.
+ */
+function parseTkhdRotation( r: Reader, box: BoxInfo ): number {
+	r.pos = box.offset + box.headerSize;
+	const version = r.u8();
+	r.pos += 3; // flags
+	if ( version === 1 ) {
+		r.pos += 32; // creation(8)+modification(8)+track_id(4)+reserved(4)+duration(8)
+	} else {
+		r.pos += 20; // creation(4)+modification(4)+track_id(4)+reserved(4)+duration(4)
+	}
+	r.pos += 8; // reserved[2]
+	r.pos += 8; // layer(2)+alternate_group(2)+volume(2)+reserved(2)
+	// 3x3 matrix in 16.16 fixed point; a = [0], b = [1].
+	const a = r.view.getInt32( r.pos ) / 65536;
+	const b = r.view.getInt32( r.pos + 4 ) / 65536;
+	let deg = Math.round( ( Math.atan2( b, a ) * 180 ) / Math.PI );
+	deg = ( ( deg % 360 ) + 360 ) % 360;
+	// Snap to the nearest right angle.
+	return ( Math.round( deg / 90 ) * 90 ) % 360;
+}
+
+/**
+ * Parse a Decoding/Composition Time-to-Sample box into per-sample deltas.
+ *
+ * @param r   Binary reader.
+ * @param box BoxInfo for the stts box.
+ */
+function parseStts( r: Reader, box: BoxInfo ): number[] {
+	r.pos = box.offset + box.headerSize + 4; // version + flags
+	const entryCount = r.u32();
+	const deltas: number[] = [];
+	for ( let i = 0; i < entryCount; i++ ) {
+		const count = r.u32();
+		const delta = r.u32();
+		for ( let j = 0; j < count; j++ ) {
+			deltas.push( delta );
+		}
+	}
+	return deltas;
+}
+
+/**
+ * Parse a Sample Size box into per-sample byte sizes.
+ *
+ * @param r   Binary reader.
+ * @param box BoxInfo for the stsz box.
+ */
+function parseStsz( r: Reader, box: BoxInfo ): number[] {
+	r.pos = box.offset + box.headerSize + 4; // version + flags
+	const sampleSize = r.u32();
+	const sampleCount = r.u32();
+	const sizes: number[] = [];
+	if ( sampleSize !== 0 ) {
+		for ( let i = 0; i < sampleCount; i++ ) {
+			sizes.push( sampleSize );
+		}
+	} else {
+		for ( let i = 0; i < sampleCount; i++ ) {
+			sizes.push( r.u32() );
+		}
+	}
+	return sizes;
+}
+
+/**
+ * Parse a Chunk Offset box (stco = 32-bit, co64 = 64-bit) into file offsets.
+ *
+ * @param r     Binary reader.
+ * @param box   BoxInfo for the stco/co64 box.
+ * @param large Whether offsets are 64-bit (co64).
+ */
+function parseStco( r: Reader, box: BoxInfo, large: boolean ): number[] {
+	r.pos = box.offset + box.headerSize + 4; // version + flags
+	const entryCount = r.u32();
+	const offsets: number[] = [];
+	for ( let i = 0; i < entryCount; i++ ) {
+		offsets.push( large ? r.u64() : r.u32() );
+	}
+	return offsets;
+}
+
+interface StscEntry {
+	firstChunk: number;
+	samplesPerChunk: number;
+}
+
+/**
+ * Parse a Sample-to-Chunk box.
+ *
+ * @param r   Binary reader.
+ * @param box BoxInfo for the stsc box.
+ */
+function parseStsc( r: Reader, box: BoxInfo ): StscEntry[] {
+	r.pos = box.offset + box.headerSize + 4; // version + flags
+	const entryCount = r.u32();
+	const entries: StscEntry[] = [];
+	for ( let i = 0; i < entryCount; i++ ) {
+		const firstChunk = r.u32();
+		const samplesPerChunk = r.u32();
+		r.u32(); // sample_description_index
+		entries.push( { firstChunk, samplesPerChunk } );
+	}
+	return entries;
+}
+
+/**
+ * Parse a Sync Sample box into a set of 0-based sample indices.
+ *
+ * @param r   Binary reader.
+ * @param box BoxInfo for the stss box.
+ */
+function parseStss( r: Reader, box: BoxInfo ): Set< number > {
+	r.pos = box.offset + box.headerSize + 4; // version + flags
+	const entryCount = r.u32();
+	const sync = new Set< number >();
+	for ( let i = 0; i < entryCount; i++ ) {
+		sync.add( r.u32() - 1 ); // stored 1-based.
+	}
+	return sync;
+}
+
+/**
+ * Map every sample to its absolute byte offset in the file by combining the
+ * sample-to-chunk table, chunk offsets, and sample sizes.
+ *
+ * @param stsc         Parsed stsc entries.
+ * @param chunkOffsets Parsed chunk offsets.
+ * @param sizes        Per-sample byte sizes.
+ */
+function buildSampleOffsets(
+	stsc: StscEntry[],
+	chunkOffsets: number[],
+	sizes: number[]
+): number[] {
+	const offsets: number[] = [];
+	let sampleIndex = 0;
+
+	for ( let chunk = 0; chunk < chunkOffsets.length; chunk++ ) {
+		/*
+		 * samples_per_chunk is taken from the last stsc run whose first_chunk
+		 * (1-based) is <= this chunk.
+		 */
+		let samplesPerChunk = stsc.length ? stsc[ 0 ].samplesPerChunk : 0;
+		for ( const entry of stsc ) {
+			if ( entry.firstChunk <= chunk + 1 ) {
+				samplesPerChunk = entry.samplesPerChunk;
+			} else {
+				break;
+			}
+		}
+
+		let offset = chunkOffsets[ chunk ];
+		for ( let i = 0; i < samplesPerChunk; i++ ) {
+			if ( sampleIndex >= sizes.length ) {
+				return offsets;
+			}
+			offsets.push( offset );
+			offset += sizes[ sampleIndex ];
+			sampleIndex++;
+		}
+	}
+
+	return offsets;
+}
+
+/**
+ * Find the primary visual track's sample table (stbl) and media timescale.
+ *
+ * Prefers a 'pict' handler (HEIF image sequence) and falls back to 'vide'.
+ *
+ * @param r       Binary reader.
+ * @param moovBox BoxInfo for the moov box.
+ */
+function findSequenceStbl(
+	r: Reader,
+	moovBox: BoxInfo
+): { stbl: BoxInfo; timescale: number; rotation: number } | undefined {
+	const moovEnd = moovBox.offset + moovBox.size;
+	const traks = findBoxes(
+		r,
+		moovBox.offset + moovBox.headerSize,
+		moovEnd
+	).filter( ( b ) => b.type === 'trak' );
+
+	for ( const trak of traks ) {
+		const trakEnd = trak.offset + trak.size;
+		const mdia = findBox(
+			r,
+			trak.offset + trak.headerSize,
+			trakEnd,
+			'mdia'
+		);
+		if ( ! mdia ) {
+			continue;
+		}
+		const mdiaEnd = mdia.offset + mdia.size;
+		const hdlr = findBox(
+			r,
+			mdia.offset + mdia.headerSize,
+			mdiaEnd,
+			'hdlr'
+		);
+		const handler = hdlr ? parseHdlrType( r, hdlr ) : '';
+		if ( handler !== 'pict' && handler !== 'vide' ) {
+			continue;
+		}
+
+		const mdhd = findBox(
+			r,
+			mdia.offset + mdia.headerSize,
+			mdiaEnd,
+			'mdhd'
+		);
+		const timescale = mdhd ? parseMdhdTimescale( r, mdhd ) : 0;
+
+		const tkhd = findBox(
+			r,
+			trak.offset + trak.headerSize,
+			trakEnd,
+			'tkhd'
+		);
+		const rotation = tkhd ? parseTkhdRotation( r, tkhd ) : 0;
+
+		const minf = findBox(
+			r,
+			mdia.offset + mdia.headerSize,
+			mdiaEnd,
+			'minf'
+		);
+		if ( ! minf ) {
+			continue;
+		}
+		const stbl = findBox(
+			r,
+			minf.offset + minf.headerSize,
+			minf.offset + minf.size,
+			'stbl'
+		);
+		if ( stbl ) {
+			return { stbl, timescale, rotation };
+		}
+	}
+
+	return undefined;
+}
+
+/**
+ * Locate the hvcC configuration box and coded dimensions inside an HEVC
+ * visual sample entry (hvc1/hev1) within the stsd box.
+ *
+ * @param r       Binary reader.
+ * @param stsdBox BoxInfo for the stsd box.
+ */
+function findHvcCInStsd(
+	r: Reader,
+	stsdBox: BoxInfo
+): { hvcCBox: BoxInfo; codedWidth: number; codedHeight: number } {
+	// FullBox (4) + entry_count (4), then the first sample entry box.
+	const entryBox = readBoxAt( r, stsdBox.offset + stsdBox.headerSize + 8 );
+	if (
+		! entryBox ||
+		( entryBox.type !== 'hvc1' && entryBox.type !== 'hev1' )
+	) {
+		throw new Error( 'Image sequence is not HEVC-encoded' );
+	}
+
+	/*
+	 * VisualSampleEntry: 78 bytes precede the child boxes; width/height live
+	 * at byte offsets 24/26 of the entry payload.
+	 */
+	const payloadStart = entryBox.offset + 8;
+	const codedWidth = r.view.getUint16( payloadStart + 24 );
+	const codedHeight = r.view.getUint16( payloadStart + 26 );
+
+	const hvcCBox = findBox(
+		r,
+		payloadStart + 78,
+		entryBox.offset + entryBox.size,
+		'hvcC'
+	);
+	if ( ! hvcCBox ) {
+		throw new Error( 'No HEVC configuration (hvcC) in image sequence' );
+	}
+
+	return { hvcCBox, codedWidth, codedHeight };
+}
+
+/**
+ * Read a single box at an absolute offset.
+ *
+ * @param r      Binary reader.
+ * @param offset Absolute byte offset of the box.
+ */
+function readBoxAt( r: Reader, offset: number ): BoxInfo | null {
+	r.pos = offset;
+	return readBox( r );
+}
+
+/**
+ * Parse a HEIC/HEIF image sequence (msf1 brand — Apple Live Photo HEVC
+ * sequences, Android bursts) and extract the temporal HEVC frames.
+ *
+ * Unlike still HEIC files (which store a single image in the `meta` box), an
+ * image sequence stores its frames as samples of a video-like track in the
+ * `moov`/`mdat` boxes. This demuxes that track into individual HEVC access
+ * units that can be decoded with the WebCodecs VideoDecoder and re-encoded to
+ * a web-safe video.
+ *
+ * @param buffer Raw HEIC/HEIF sequence file contents.
+ * @return Parsed sequence data including codec config and per-frame samples.
+ * @throws If the file is not a valid HEVC image sequence.
+ */
+export function parseHeicSequence( buffer: ArrayBuffer ): HeicSequenceData {
+	const r = new Reader( buffer );
+	const fileEnd = buffer.byteLength;
+
+	const moovBox = findBox( r, 0, fileEnd, 'moov' );
+	if ( ! moovBox ) {
+		throw new Error( 'No moov box found in image sequence' );
+	}
+
+	const track = findSequenceStbl( r, moovBox );
+	if ( ! track ) {
+		throw new Error( 'No image/video track found in sequence' );
+	}
+	const { stbl, timescale, rotation } = track;
+	if ( ! timescale ) {
+		throw new Error( 'Missing media timescale in image sequence' );
+	}
+
+	const stblStart = stbl.offset + stbl.headerSize;
+	const stblEnd = stbl.offset + stbl.size;
+
+	const stsdBox = findBox( r, stblStart, stblEnd, 'stsd' );
+	const stszBox = findBox( r, stblStart, stblEnd, 'stsz' );
+	const stscBox = findBox( r, stblStart, stblEnd, 'stsc' );
+	const sttsBox = findBox( r, stblStart, stblEnd, 'stts' );
+	let stcoBox = findBox( r, stblStart, stblEnd, 'stco' );
+	let co64 = false;
+	if ( ! stcoBox ) {
+		stcoBox = findBox( r, stblStart, stblEnd, 'co64' );
+		co64 = true;
+	}
+	const stssBox = findBox( r, stblStart, stblEnd, 'stss' );
+
+	if ( ! stsdBox || ! stszBox || ! stscBox || ! sttsBox || ! stcoBox ) {
+		throw new Error( 'Image sequence is missing required sample tables' );
+	}
+
+	const { hvcCBox, codedWidth, codedHeight } = findHvcCInStsd( r, stsdBox );
+	const hvcCDataStart = hvcCBox.offset + hvcCBox.headerSize;
+	const hvcCDataSize = hvcCBox.size - hvcCBox.headerSize;
+	const description = new Uint8Array(
+		buffer.slice( hvcCDataStart, hvcCDataStart + hvcCDataSize )
+	);
+	const codecString = buildCodecString( r, hvcCDataStart );
+
+	const sizes = parseStsz( r, stszBox );
+	const deltas = parseStts( r, sttsBox );
+	const stsc = parseStsc( r, stscBox );
+	const chunkOffsets = parseStco( r, stcoBox, co64 );
+	const syncSet = stssBox ? parseStss( r, stssBox ) : undefined;
+	const sampleOffsets = buildSampleOffsets( stsc, chunkOffsets, sizes );
+
+	const sampleCount = Math.min( sizes.length, sampleOffsets.length );
+	if ( sampleCount === 0 ) {
+		throw new Error( 'Image sequence contains no frames' );
+	}
+
+	const samples: HeicSequenceSample[] = [];
+	let timestampTicks = 0;
+	for ( let i = 0; i < sampleCount; i++ ) {
+		const start = sampleOffsets[ i ];
+		const size = sizes[ i ];
+		const deltaTicks = deltas[ i ] ?? deltas[ deltas.length - 1 ] ?? 0;
+		samples.push( {
+			data: new Uint8Array( buffer.slice( start, start + size ) ),
+			// With no stss every sample is a sync sample (all-intra sequence).
+			isSync: syncSet ? syncSet.has( i ) : true,
+			timestampUs: Math.round(
+				( timestampTicks / timescale ) * 1_000_000
+			),
+			durationUs: Math.round( ( deltaTicks / timescale ) * 1_000_000 ),
+		} );
+		timestampTicks += deltaTicks;
+	}
+
+	return {
+		codecString,
+		description,
+		codedWidth,
+		codedHeight,
+		rotation,
+		samples,
+	};
+}
+
 /* eslint-enable no-bitwise */

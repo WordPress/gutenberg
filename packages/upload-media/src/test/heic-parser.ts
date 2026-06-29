@@ -1,9 +1,15 @@
 /* eslint-disable no-bitwise, jsdoc/require-param */
 
 /**
+ * External dependencies
+ */
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
+/**
  * Internal dependencies
  */
-import { parseHeic, reverseBits32 } from '../heic-parser';
+import { parseHeic, parseHeicSequence, reverseBits32 } from '../heic-parser';
 
 // ---------------------------------------------------------------------------
 // Helpers for constructing synthetic ISOBMFF structures
@@ -727,6 +733,65 @@ describe( 'heic-parser', () => {
 				'No property associations'
 			);
 		} );
+	} );
+} );
+
+describe( 'parseHeicSequence', () => {
+	/*
+	 * Real HEIF image sequence (msf1 brand): a 256x144, 25fps, 120-frame HEVC
+	 * sequence with a single sync sample followed by 119 delta frames.
+	 */
+	const buffer = readFileSync(
+		join( __dirname, 'fixtures', 'msf1.heic' )
+	).buffer;
+
+	it( 'demuxes all temporal frames from the track', () => {
+		const seq = parseHeicSequence( buffer );
+
+		expect( seq.samples ).toHaveLength( 120 );
+		expect( seq.codedWidth ).toBe( 256 );
+		expect( seq.codedHeight ).toBe( 144 );
+		expect( seq.codecString ).toMatch( /^hvc1\./ );
+		expect( seq.description.length ).toBeGreaterThan( 0 );
+	} );
+
+	it( 'marks only sync samples as keyframes', () => {
+		const seq = parseHeicSequence( buffer );
+
+		/*
+		 * stss lists a single sync sample (the first frame); the rest are
+		 * delta frames that depend on it.
+		 */
+		expect( seq.samples[ 0 ].isSync ).toBe( true );
+		expect( seq.samples[ 1 ].isSync ).toBe( false );
+		expect( seq.samples.filter( ( s ) => s.isSync ) ).toHaveLength( 1 );
+	} );
+
+	it( 'derives per-frame timing from the media timescale', () => {
+		const seq = parseHeicSequence( buffer );
+
+		// timescale 90000, delta 3600 ticks => 40000us (25fps).
+		expect( seq.samples[ 0 ].timestampUs ).toBe( 0 );
+		expect( seq.samples[ 0 ].durationUs ).toBe( 40_000 );
+		expect( seq.samples[ 1 ].timestampUs ).toBe( 40_000 );
+	} );
+
+	it( 'extracts non-empty sample data for every frame', () => {
+		const seq = parseHeicSequence( buffer );
+
+		for ( const sample of seq.samples ) {
+			expect( sample.data.length ).toBeGreaterThan( 0 );
+		}
+	} );
+
+	it( 'throws on a still HEIC with no movie track', () => {
+		const hdlr = buildHdlr();
+		const pitm = buildPitm( 1 );
+		const iloc = buildIloc( [ [ 1, [ [ 0, 4 ] ] ] ] );
+		const meta = buildFullBox( 'meta', 0, 0, concat( hdlr, pitm, iloc ) );
+		expect( () => parseHeicSequence( meta.buffer ) ).toThrow(
+			'No moov box'
+		);
 	} );
 } );
 
