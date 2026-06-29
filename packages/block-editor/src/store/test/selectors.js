@@ -3657,6 +3657,36 @@ describe( 'selectors', () => {
 			} );
 		} );
 
+		it( 'surfaces innerContent on a block variation inserter item', () => {
+			registerBlockType( 'core/html', {
+				apiVersion: 3,
+				save: () => null,
+				category: 'widgets',
+				title: 'Custom HTML',
+				variations: [
+					{
+						name: 'card',
+						title: 'Card',
+						innerContent: [ '<div class="card">', null, '</div>' ],
+						innerBlocks: [ [ 'core/test-block-a' ] ],
+					},
+				],
+			} );
+
+			const items = select( store ).getInserterItems();
+			const variationItem = items.find(
+				( item ) => item.id === 'core/html/card'
+			);
+
+			expect( variationItem.innerContent ).toEqual( [
+				'<div class="card">',
+				null,
+				'</div>',
+			] );
+
+			unregisterBlockType( 'core/html' );
+		} );
+
 		it( 'should correctly cache the return values', async () => {
 			await dispatch( store ).updateSettings( {
 				__experimentalReusableBlocks: [

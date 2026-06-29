@@ -2215,6 +2215,7 @@ const getItemFromVariation = ( state, item ) => ( variation ) => {
 			...variation.attributes,
 		},
 		innerBlocks: variation.innerBlocks,
+		innerContent: variation.innerContent,
 		keywords: variation.keywords || item.keywords,
 		frecency: calculateFrecency( time, count ),
 		// Pass through search-only flag for block-scope variations.
