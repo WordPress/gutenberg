@@ -8,7 +8,7 @@
     -   `BorderBoxControl` ([#79420](https://github.com/WordPress/gutenberg/pull/79420))
     -   `BorderControl` ([#79418](https://github.com/WordPress/gutenberg/pull/79418))
     -   `FontSizePicker` ([#79481](https://github.com/WordPress/gutenberg/pull/79481))
-    -   `FormFileUpload` ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER))
+    -   `FormFileUpload` ([#79655](https://github.com/WordPress/gutenberg/pull/79655))
     -   `RangeControl` ([#79590](https://github.com/WordPress/gutenberg/pull/79590))
     -   `TreeSelect` ([#79550](https://github.com/WordPress/gutenberg/pull/79550))
 
