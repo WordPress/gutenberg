@@ -71,20 +71,6 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 				<WPButton __next40pxDefaultSize />
 			`,
 		},
-		// FormFileUpload with render prop (special case)
-		{
-			code: `
-				import { FormFileUpload } from '@wordpress/components';
-				<FormFileUpload render={({ open }) => <button onClick={open}>Upload</button>} />
-			`,
-		},
-		// FormFileUpload with __next40pxDefaultSize
-		{
-			code: `
-				import { FormFileUpload } from '@wordpress/components';
-				<FormFileUpload __next40pxDefaultSize />
-			`,
-		},
 		// Component with dynamic size prop (assumes it could be non-default)
 		{
 			code: `
@@ -202,18 +188,6 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 				},
 			],
 		},
-		// FormFileUpload without __next40pxDefaultSize or render
-		{
-			code: `
-				import { FormFileUpload } from '@wordpress/components';
-				<FormFileUpload onChange={handleChange} />
-			`,
-			errors: [
-				{
-					messageId: 'missingPropFormFileUpload',
-				},
-			],
-		},
 		// Multiple components, some invalid
 		{
 			code: `
@@ -324,14 +298,6 @@ ruleTester.run(
 				import InputControl from '../input-control';
 				<InputControl />
 			`,
-			},
-			// FormFileUpload relative import with render prop
-			{
-				code: `
-				import { FormFileUpload } from '../form-file-upload';
-				<FormFileUpload render={({ open }) => <button onClick={open}>Upload</button>} />
-			`,
-				options: [ { checkLocalImports: true } ],
 			},
 		],
 		invalid: [],

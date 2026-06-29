@@ -182,6 +182,7 @@ const restrictedSyntax = [
 		'FocalPointPicker',
 		'FontFamilyControl',
 		'FontSizePicker',
+		'FormFileUpload',
 		'LetterSpacingControl',
 		'LineHeightControl',
 		'QueryControls',
