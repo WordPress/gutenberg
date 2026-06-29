@@ -33,30 +33,25 @@ const getFontAppearanceLabel = ( hasFontStyles, hasFontWeights ) => {
 /**
  * Control to display font style and weight options of the active font.
  *
- * @param {Object}   props                         Component props.
- * @param {boolean}  [props.__next40pxDefaultSize] Start opting into the larger default height that will become the default size in a future version.
- * @param {Function} props.onChange                Handles change in font appearance selection.
- * @param {boolean}  [props.hasFontStyles]         Whether font styles are enabled and present.
- * @param {boolean}  [props.hasFontWeights]        Whether font weights are enabled and present.
- * @param {Array}    props.fontFamilyFaces         Font family faces for the active font.
- * @param {Object}   props.value                   Currently selected font style and weight.
- * @param {string}   props.value.fontStyle         Currently selected font style.
- * @param {string}   props.value.fontWeight        Currently selected font weight.
- * @param {Array}    [props.options]               Options override.
+ * @param {Object} props Component props.
  *
  * @return {Element} Font appearance control.
  */
-export default function FontAppearanceControl( {
-	/** @deprecated Default behavior since WordPress 7.1. Prop can be safely removed. */
-	__next40pxDefaultSize: _next40pxDefaultSize,
-	onChange,
-	hasFontStyles = true,
-	hasFontWeights = true,
-	fontFamilyFaces,
-	value: { fontStyle, fontWeight },
-	options,
-	...otherProps
-} ) {
+export default function FontAppearanceControl( props ) {
+	const {
+		/**
+		 * Start opting into the larger default height that will become the default size in a future version.
+		 *
+		 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
+		 */
+		__next40pxDefaultSize: _next40pxDefaultSize,
+		onChange,
+		hasFontStyles = true,
+		hasFontWeights = true,
+		fontFamilyFaces,
+		value: { fontStyle, fontWeight },
+		...otherProps
+	} = props;
 	const hasStylesOrWeights = hasFontStyles || hasFontWeights;
 	const label = getFontAppearanceLabel( hasFontStyles, hasFontWeights );
 	const defaultOption = {
@@ -111,7 +106,12 @@ export default function FontAppearanceControl( {
 
 		// Display only font style options or font weight options.
 		return hasFontStyles ? styleOptions() : weightOptions();
-	}, [ options, fontStyles, fontWeights, combinedStyleAndWeightOptions ] );
+	}, [
+		props.options,
+		fontStyles,
+		fontWeights,
+		combinedStyleAndWeightOptions,
+	] );
 
 	// Find current selection by comparing font style & weight against options,
 	// and fall back to the Default option if there is no matching option.
