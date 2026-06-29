@@ -773,7 +773,6 @@ export default function GalleryEdit( props ) {
 									} )
 								}
 								isBlock
-								__next40pxDefaultSize
 								help={ __(
 									'Adjust the appearance of buttons in the lightbox.'
 								) }

@@ -167,7 +167,6 @@ export function TimeInput( {
 				</TimeWrapper>
 				{ is12Hour && (
 					<ToggleGroupControl
-						__next40pxDefaultSize
 						isBlock
 						label={ __( 'Select AM or PM' ) }
 						hideLabelFromVision

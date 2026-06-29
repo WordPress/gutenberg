@@ -10,7 +10,6 @@ import { __ } from '@wordpress/i18n';
 export default function InheritControl( { value, onChange, label } ) {
 	return (
 		<ToggleGroupControl
-			__next40pxDefaultSize
 			label={ label }
 			isBlock
 			onChange={ ( newValue ) => {

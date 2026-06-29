@@ -184,7 +184,6 @@ export default function Edit( {
 							}
 						>
 							<ToggleGroupControl
-								__next40pxDefaultSize
 								isBlock
 								label={ __( 'Icon Position' ) }
 								value={ iconPosition }

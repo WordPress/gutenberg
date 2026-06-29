@@ -410,7 +410,6 @@ function Controls( { attributes, setAttributes } ) {
 						>
 							<ToggleGroupControl
 								className="editor-latest-posts-image-alignment-control"
-								__next40pxDefaultSize
 								label={ __( 'Image alignment' ) }
 								value={ featuredImageAlign || 'none' }
 								onChange={ ( value ) =>

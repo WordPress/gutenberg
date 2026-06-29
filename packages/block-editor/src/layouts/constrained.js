@@ -195,7 +195,6 @@ export default {
 						panelId={ clientId }
 					>
 						<ToggleGroupControl
-							__next40pxDefaultSize
 							label={ __( 'Justification' ) }
 							value={ justifyContent }
 							onChange={ onJustificationChange }

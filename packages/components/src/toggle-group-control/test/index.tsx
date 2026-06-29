@@ -15,7 +15,7 @@ import { formatLowercase, formatUppercase } from '@wordpress/icons';
  */
 import Button from '../../button';
 import {
-	ToggleGroupControl as _ToggleGroupControl,
+	ToggleGroupControl,
 	ToggleGroupControlOption,
 	ToggleGroupControlOptionIcon,
 } from '../index';
@@ -25,10 +25,6 @@ import type { ToggleGroupControlProps } from '../types';
 const hoverOutside = async () => {
 	await hover( document.body );
 	await hover( document.body, { clientX: 10, clientY: 10 } );
-};
-
-const ToggleGroupControl = ( props: ToggleGroupControlProps ) => {
-	return <_ToggleGroupControl { ...props } __next40pxDefaultSize />;
 };
 
 const ControlledToggleGroupControl = ( {

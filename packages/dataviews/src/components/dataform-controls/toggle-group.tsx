@@ -55,7 +55,6 @@ export default function ToggleGroup< Item >( {
 			required={ !! field.isValid?.required }
 			markWhenOptional={ markWhenOptional }
 			customValidity={ getCustomValidity( isValid, validity ) }
-			__next40pxDefaultSize
 			isBlock
 			label={ field.label }
 			help={ selectedOption?.description || field.description }

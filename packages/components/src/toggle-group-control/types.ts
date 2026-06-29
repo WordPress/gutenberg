@@ -123,9 +123,8 @@ export type ToggleGroupControlProps = Pick<
 	 */
 	size?: 'default' | '__unstable-large';
 	/**
-	 * Start opting into the larger default height that will become the default size in a future version.
-	 *
-	 * @default false
+	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
+	 * @ignore
 	 */
 	__next40pxDefaultSize?: boolean;
 	/**

@@ -595,7 +595,6 @@ export default {
 function LayoutTypeSwitcher( { type, onChange } ) {
 	return (
 		<ToggleGroupControl
-			__next40pxDefaultSize
 			isBlock
 			label={ __( 'Layout type' ) }
 			hideLabelFromVision

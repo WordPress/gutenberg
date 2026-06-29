@@ -40,7 +40,6 @@ export default function OverlayMenuPreviewControls( {
 				checked={ hasIcon }
 			/>
 			<ToggleGroupControl
-				__next40pxDefaultSize
 				className="wp-block-navigation__overlay-menu-icon-toggle-group"
 				label={ __( 'Icon' ) }
 				value={ icon }
