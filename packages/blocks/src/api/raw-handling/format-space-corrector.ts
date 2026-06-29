@@ -18,6 +18,59 @@ function isFormattingSpace( character: string ): boolean {
 }
 
 /**
+ * Moves a space from one edge of an element out to the surrounding text.
+ *
+ * @param node      The element to be processed.
+ * @param doc       The document of the node.
+ * @param isLeading Whether to process the leading (`true`) or trailing edge.
+ */
+function moveEdgeSpace( node: Node, doc: Document, isLeading: boolean ): void {
+	const child = isLeading ? node.firstChild : node.lastChild;
+
+	if ( ! child || child.nodeType !== node.TEXT_NODE ) {
+		return;
+	}
+
+	const text = child as Text;
+	const edgeChar = isLeading
+		? text.data[ 0 ]
+		: text.data[ text.data.length - 1 ];
+
+	if ( ! isFormattingSpace( edgeChar ) ) {
+		return;
+	}
+
+	// Strip the edge whitespace from inside the element.
+	text.data = isLeading
+		? text.data.replace( /^[ \r\n\t]+/, '' )
+		: text.data.replace( /[ \r\n\t]+$/, '' );
+
+	if ( ! text.data ) {
+		node.removeChild( text );
+	}
+
+	// Re-insert a single space outside the element, unless a block edge, a line
+	// break, or an adjacent space already separates the content.
+	const sibling = getSibling( node, isLeading ? 'previous' : 'next' );
+
+	if ( ! sibling || sibling.nodeName === 'BR' ) {
+		return;
+	}
+
+	const siblingText = sibling.textContent!;
+	const adjacentChar = isLeading ? siblingText.slice( -1 ) : siblingText[ 0 ];
+
+	if ( isFormattingSpace( adjacentChar ) ) {
+		return;
+	}
+
+	node.parentNode!.insertBefore(
+		doc.createTextNode( ' ' ),
+		isLeading ? node : node.nextSibling
+	);
+}
+
+/**
  * Moves leading and trailing spaces out of inline formatting elements, so that
  * the formatting (a link, bold, italic…) wraps only its meaningful content.
  *
@@ -40,63 +93,6 @@ export default function formatSpaceCorrector(
 		return;
 	}
 
-	// Move a leading space out before the element.
-	const firstChild = node.firstChild;
-	if (
-		firstChild &&
-		firstChild.nodeType === node.TEXT_NODE &&
-		isFormattingSpace( ( firstChild as Text ).data[ 0 ] )
-	) {
-		const text = firstChild as Text;
-		text.data = text.data.replace( /^[ \r\n\t]+/, '' );
-
-		if ( ! text.data ) {
-			node.removeChild( text );
-		}
-
-		// Only re-insert a space if there's preceding content that doesn't
-		// already end with one (and isn't a line break).
-		const previousSibling = getSibling( node, 'previous' );
-		if (
-			previousSibling &&
-			previousSibling.nodeName !== 'BR' &&
-			previousSibling.textContent!.slice( -1 ) !== ' '
-		) {
-			node.parentNode!.insertBefore( doc.createTextNode( ' ' ), node );
-		}
-	}
-
-	// Move a trailing space out after the element.
-	const lastChild = node.lastChild;
-	if (
-		lastChild &&
-		lastChild.nodeType === node.TEXT_NODE &&
-		isFormattingSpace(
-			( lastChild as Text ).data[ ( lastChild as Text ).data.length - 1 ]
-		)
-	) {
-		const text = lastChild as Text;
-		text.data = text.data.replace( /[ \r\n\t]+$/, '' );
-
-		if ( ! text.data ) {
-			node.removeChild( text );
-		}
-
-		// Only re-insert a space if there's following content that doesn't
-		// already start with one (and isn't a line break).
-		const nextSibling = getSibling( node, 'next' );
-		if (
-			nextSibling &&
-			nextSibling.nodeName !== 'BR' &&
-			! (
-				nextSibling.nodeType === node.TEXT_NODE &&
-				isFormattingSpace( nextSibling.textContent![ 0 ] )
-			)
-		) {
-			node.parentNode!.insertBefore(
-				doc.createTextNode( ' ' ),
-				node.nextSibling
-			);
-		}
-	}
+	moveEdgeSpace( node, doc, true );
+	moveEdgeSpace( node, doc, false );
 }
