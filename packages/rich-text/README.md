@@ -376,6 +376,10 @@ document.querySelector( 'p' ) )`.
 -   Create one from a rich text value: `new RichTextData( { text: '...',
 formats: [ ... ] } )`.
 
+### RichTextFormat
+
+An object which represents a formatted string. See main `@wordpress/rich-text` documentation for more information.
+
 ### RichTextValue
 
 An object which represents a formatted string. See main `@wordpress/rich-text` documentation for more information.

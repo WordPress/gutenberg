@@ -35,7 +35,7 @@ export function __experimentalRichText() {}
  * An object which represents a formatted string. See main `@wordpress/rich-text`
  * documentation for more information.
  */
-export type { RichTextValue } from './types';
+export type { RichTextValue, RichTextFormat } from './types';
 
 /**
  * The callback-Set refs the private event-listener helpers dispatch from.

@@ -14,19 +14,30 @@ import { Stack, VisuallyHidden } from '@wordpress/ui';
  * is shown when the toggle is enabled or when there is already a value. When
  * toggled off and a value exists, it resets the value to an empty string.
  *
- * @param {Object}   props          - Component props.
- * @param {Object}   props.setting  - Setting configuration object.
- * @param {Object}   props.value    - Current link value object.
- * @param {Function} props.onChange - Callback when value changes.
+ * @param props                  - Component props.
+ * @param props.setting          - Setting configuration object.
+ * @param props.value            - Current link value object.
+ * @param props.onChange         - Callback when value changes.
+ * @param props.setting.id
+ * @param props.setting.title
+ * @param props.value.cssClasses
  */
-const CSSClassesSettingComponent = ( { setting, value, onChange } ) => {
-	const hasValue = value ? value?.cssClasses?.length > 0 : false;
+const CSSClassesSettingComponent = ( {
+	setting,
+	value,
+	onChange,
+}: {
+	setting: { id: string; title: string };
+	value: { cssClasses?: string };
+	onChange: ( newValue: { cssClasses?: string } ) => void;
+} ) => {
+	const hasValue = value ? !! ( value?.cssClasses?.length ?? 0 ) : false;
 	const [ isSettingActive, setIsSettingActive ] = useState( hasValue );
 	const instanceId = useInstanceId( CSSClassesSettingComponent );
 	const controlledRegionId = `css-classes-setting-${ instanceId }`;
 
 	// Sanitize user input: replace commas with spaces, collapse repeated spaces, and trim
-	const handleSettingChange = ( newValue ) => {
+	const handleSettingChange = ( newValue: string | undefined ) => {
 		const sanitizedValue =
 			typeof newValue === 'string'
 				? newValue.replace( /,/g, ' ' ).replace( /\s+/g, ' ' ).trim()

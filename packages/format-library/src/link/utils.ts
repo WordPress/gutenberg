@@ -10,15 +10,16 @@ import {
 	getFragment,
 	isValidFragment,
 } from '@wordpress/url';
+import type { RichTextValue, RichTextFormat } from '@wordpress/rich-text';
 
 /**
  * Check for issues with the provided href.
  *
- * @param {string} href The href.
+ * @param href The href.
  *
- * @return {boolean} Is the href invalid?
+ * @return Is the href invalid?
  */
-export function isValidHref( href ) {
+export function isValidHref( href: string ): boolean {
 	if ( ! href ) {
 		return false;
 	}
@@ -32,7 +33,7 @@ export function isValidHref( href ) {
 	// Does the href start with something that looks like a URL protocol?
 	if ( /^\S+:/.test( trimmedHref ) ) {
 		const protocol = getProtocol( trimmedHref );
-		if ( ! isValidProtocol( protocol ) ) {
+		if ( ! protocol || ! isValidProtocol( protocol ) ) {
 			return false;
 		}
 
@@ -46,7 +47,7 @@ export function isValidHref( href ) {
 		}
 
 		const authority = getAuthority( trimmedHref );
-		if ( ! isValidAuthority( authority ) ) {
+		if ( ! authority || ! isValidAuthority( authority ) ) {
 			return false;
 		}
 
@@ -86,6 +87,29 @@ export function isValidHref( href ) {
  * @param {string}  options.cssClasses       The CSS classes to apply to the link.
  * @return {Object} The final format object.
  */
+
+interface LinkFormatOptions {
+	url: string;
+	type?: string;
+	id?: string;
+	opensInNewWindow?: boolean;
+	nofollow?: boolean;
+	cssClasses?: string;
+}
+
+interface LinkFormatAttributes {
+	url: string;
+	type?: string;
+	id?: string;
+	target?: string;
+	rel?: string;
+	class?: string;
+}
+
+interface LinkFormat {
+	type: 'core/link';
+	attributes: LinkFormatAttributes;
+}
 export function createLinkFormat( {
 	url,
 	type,
@@ -93,8 +117,8 @@ export function createLinkFormat( {
 	opensInNewWindow,
 	nofollow,
 	cssClasses,
-} ) {
-	const format = {
+}: LinkFormatOptions ): LinkFormat {
+	const format: LinkFormat = {
 		type: 'core/link',
 		attributes: {
 			url,
@@ -131,22 +155,24 @@ export function createLinkFormat( {
 }
 
 /**
- * @typedef {import('@wordpress/rich-text').RichTextValue} RichTextValue
  *
  * Get the start and end boundaries of a given format from a rich text value.
  *
- * @param {RichTextValue} value      the rich text value to interrogate.
- * @param {string}        format     the identifier for the target format (e.g. `core/link`, `core/bold`).
- * @param {number?}       startIndex optional startIndex to seek from.
- * @param {number?}       endIndex   optional endIndex to seek from.
- * @return {Object}	object containing start and end values for the given format.
+ * @param value      the rich text value to interrogate.
+ * @param format     the identifier for the target format (e.g. `core/link`, `core/bold`).
+ * @param startIndex optional startIndex to seek from.
+ * @param endIndex   optional endIndex to seek from.
+ * @return object containing start and end values for the given format.
  */
 export function getFormatBoundary(
-	value,
-	format,
-	startIndex = value.start,
-	endIndex = value.end
-) {
+	value: RichTextValue,
+	format: RichTextFormat,
+	startIndex: number = value.start,
+	endIndex: number = value.end
+): {
+	start: number | undefined;
+	end: number | undefined;
+} {
 	const EMPTY_BOUNDARIES = {
 		start: undefined,
 		end: undefined,
@@ -221,19 +247,19 @@ export function getFormatBoundary(
  * Walks forwards/backwards towards the boundary of a given format within an
  * array of format objects. Returns the index of the boundary.
  *
- * @param {Array}  formats         the formats to search for the given format type.
- * @param {number} initialIndex    the starting index from which to walk.
- * @param {Object} targetFormatRef a reference to the format type object being sought.
- * @param {number} formatIndex     the index at which we expect the target format object to be.
- * @param {string} direction       either 'forwards' or 'backwards' to indicate the direction.
- * @return {number} the index of the boundary of the given format.
+ * @param formats         the formats to search for the given format type.
+ * @param initialIndex    the starting index from which to walk.
+ * @param targetFormatRef a reference to the format type object being sought.
+ * @param formatIndex     the index at which we expect the target format object to be.
+ * @param direction       either 'forwards' or 'backwards' to indicate the direction.
+ * @return  the index of the boundary of the given format.
  */
 function walkToBoundary(
-	formats,
-	initialIndex,
-	targetFormatRef,
-	formatIndex,
-	direction
+	formats: RichTextFormat[][],
+	initialIndex: number,
+	targetFormatRef: RichTextFormat,
+	formatIndex: number,
+	direction: 'forwards' | 'backwards'
 ) {
 	let index = initialIndex;
 
@@ -260,11 +286,14 @@ function walkToBoundary(
 	return index;
 }
 
+type WalkFn = (
+	...args: Parameters< typeof walkToBoundary >
+) => ReturnType< typeof walkToBoundary >;
+
 const partialRight =
-	( fn, ...partialArgs ) =>
-	( ...args ) =>
+	( fn: ( ...args: any[] ) => any, ...partialArgs: any[] ) =>
+	( ...args: any[] ) =>
 		fn( ...args, ...partialArgs );
 
-const walkToStart = partialRight( walkToBoundary, 'backwards' );
-
-const walkToEnd = partialRight( walkToBoundary, 'forwards' );
+const walkToStart: WalkFn = partialRight( walkToBoundary, 'backwards' );
+const walkToEnd: WalkFn = partialRight( walkToBoundary, 'forwards' );

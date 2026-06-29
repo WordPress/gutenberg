@@ -20,6 +20,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
+import type { RichTextValue } from '@wordpress/rich-text';
 import { createLinkFormat, isValidHref, getFormatBoundary } from './utils';
 import { link as settings } from './index';
 import CSSClassesSettingComponent from './css-classes-setting';
@@ -33,18 +34,48 @@ const LINK_SETTINGS = [
 	{
 		id: 'cssClasses',
 		title: __( 'Additional CSS class(es)' ),
-		render: ( setting, value, onChange ) => {
-			return (
-				<CSSClassesSettingComponent
-					setting={ setting }
-					value={ value }
-					onChange={ onChange }
-				/>
-			);
-		},
+		render: (
+			setting: { id: string; title: string },
+			value: { cssClasses?: string },
+			onChange: ( newValue: { cssClasses?: string } ) => void
+		) => (
+			<CSSClassesSettingComponent
+				setting={ setting }
+				value={ value }
+				onChange={ onChange }
+			/>
+		),
 	},
 ];
 
+interface LinkValue {
+	url?: string;
+	type?: string;
+	id?: string | number;
+	opensInNewTab?: boolean;
+	nofollow?: boolean;
+	title?: string;
+	cssClasses?: string;
+}
+
+interface InlineLinkUIProps {
+	isActive: boolean;
+	activeAttributes: {
+		url: string;
+		type?: string;
+		id?: string;
+		target?: string;
+		rel?: string;
+
+		class?: string;
+	};
+	value: RichTextValue;
+	onChange: ( newValue: RichTextValue ) => void;
+	onFocusOutside: () => void;
+	stopAddingLink: () => void;
+	contentRef: React.RefObject< HTMLElement >;
+	focusOnMount?: boolean;
+}
 function InlineLinkUI( {
 	isActive,
 	activeAttributes,
@@ -54,7 +85,7 @@ function InlineLinkUI( {
 	stopAddingLink,
 	contentRef,
 	focusOnMount,
-} ) {
+}: InlineLinkUIProps ) {
 	const richLinkTextValue = getRichTextValueFromSelection( value, isActive );
 
 	// Get the text content minus any HTML tags.
@@ -105,7 +136,7 @@ function InlineLinkUI( {
 		speak( __( 'Link removed.' ), 'assertive' );
 	}
 
-	function onChangeLink( nextValue ) {
+	function onChangeLink( nextValue: LinkValue ) {
 		const hasLink = linkValue?.url;
 		const isNewLink = ! hasLink;
 
@@ -115,7 +146,7 @@ function InlineLinkUI( {
 			...nextValue,
 		};
 
-		const newUrl = prependHTTPS( nextValue.url );
+		const newUrl = prependHTTPS( nextValue?.url ?? '' );
 		const linkFormat = createLinkFormat( {
 			url: newUrl,
 			type: nextValue.type,
@@ -131,14 +162,14 @@ function InlineLinkUI( {
 		const newText = nextValue.title || newUrl;
 
 		// Scenario: we have any active text selection or an active format.
-		let newValue;
+		let newValue: RichTextValue;
 		if ( isCollapsed( value ) && ! isActive ) {
 			// Scenario: we don't have any actively selected text or formats.
 			const inserted = insert( value, newText );
 
 			newValue = applyFormat(
 				inserted,
-				linkFormat,
+				linkFormat as any,
 				value.start,
 				value.start + newText.length
 			);
@@ -166,7 +197,7 @@ function InlineLinkUI( {
 			} );
 			newValue = applyFormat(
 				value,
-				linkFormat,
+				linkFormat as any,
 				boundary.start,
 				boundary.end
 			);
@@ -177,7 +208,12 @@ function InlineLinkUI( {
 			// can apply formats to it.
 			newValue = create( { text: newText } );
 			// Apply the new Link format to this new text value.
-			newValue = applyFormat( newValue, linkFormat, 0, newText.length );
+			newValue = applyFormat(
+				newValue,
+				linkFormat as any,
+				0,
+				newText.length
+			);
 
 			// Get the boundaries of the active link format.
 			const boundary = getFormatBoundary( value, {
@@ -189,11 +225,9 @@ function InlineLinkUI( {
 			// the second half of the split value is split at the format's
 			// start boundary and avoids relying on the value's "end" property
 			// which may not correspond correctly.
-			const [ valBefore, valAfter ] = split(
-				value,
-				boundary.start,
-				boundary.start
-			);
+			const splitValue =
+				split( value, boundary.start ?? 0, boundary.start ?? 0 ) ?? [];
+			const [ valBefore, valAfter ] = splitValue;
 
 			// Update the original (full) RichTextValue replacing the
 			// target text with the *new* RichTextValue containing:
@@ -207,7 +241,11 @@ function InlineLinkUI( {
 			// Note original formats will be lost when applying this change.
 			// That is expected behaviour.
 			// See: https://github.com/WordPress/gutenberg/pull/33849#issuecomment-936134179.
-			const newValAfter = replace( valAfter, richTextText, newValue );
+			const newValAfter = replace(
+				valAfter,
+				richTextText,
+				() => newValue
+			);
 
 			newValue = concat( valBefore, newValAfter );
 		}
@@ -237,14 +275,12 @@ function InlineLinkUI( {
 	}
 
 	const popoverAnchor = useAnchor( {
-		editableContentElement: contentRef.current,
-		settings: {
-			...settings,
-			isActive,
-		},
+		// eslint-disable-next-line react-hooks/refs
+		editableContentElement: contentRef.current as HTMLElement | null,
+		settings: { ...settings, isActive } as any,
 	} );
 
-	async function handleCreate( pageTitle ) {
+	async function handleCreate( pageTitle: string ) {
 		const page = await createPageEntity( {
 			title: pageTitle,
 			status: 'draft',
@@ -259,7 +295,7 @@ function InlineLinkUI( {
 		};
 	}
 
-	function createButtonText( searchTerm ) {
+	function createButtonText( searchTerm: string ) {
 		return createInterpolateElement(
 			sprintf(
 				/* translators: %s: search term. */
@@ -284,14 +320,14 @@ function InlineLinkUI( {
 		>
 			<LinkControl
 				value={ linkValue }
-				onChange={ onChangeLink }
+				onChange={ onChangeLink as any }
 				onRemove={ removeLink }
 				hasRichPreviews
 				createSuggestion={ createPageEntity && handleCreate }
 				withCreateSuggestion={ userCanCreatePages }
 				createSuggestionButtonText={ createButtonText }
 				hasTextControl
-				settings={ LINK_SETTINGS }
+				settings={ LINK_SETTINGS as any }
 				showInitialSuggestions
 				suggestionsQuery={ {
 					// always show Pages as initial suggestions
@@ -306,7 +342,10 @@ function InlineLinkUI( {
 	);
 }
 
-function getRichTextValueFromSelection( value, isActive ) {
+function getRichTextValueFromSelection(
+	value: RichTextValue,
+	isActive: boolean
+): RichTextValue {
 	// Default to the selection ranges on the RichTextValue object.
 	let textStart = value.start;
 	let textEnd = value.end;
@@ -319,8 +358,8 @@ function getRichTextValueFromSelection( value, isActive ) {
 			type: 'core/link',
 		} );
 
-		textStart = boundary.start;
-		textEnd = boundary.end;
+		textStart = boundary.start ?? value.start;
+		textEnd = boundary.end ?? value.end;
 	}
 
 	// Get a RichTextValue containing the selected text content.
