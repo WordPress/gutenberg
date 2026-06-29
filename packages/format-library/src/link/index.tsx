@@ -17,11 +17,34 @@ import {
 import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon } from '@wordpress/icons';
 import { speak } from '@wordpress/a11y';
+import type { RichTextValue } from '@wordpress/rich-text';
 import InlineLinkUI from './inline';
 import { isValidHref } from './utils';
 
 const name = 'core/link';
 const title = __( 'Link' );
+
+interface EditProps {
+	isActive: boolean;
+	activeAttributes: {
+		url: string;
+		type?: string;
+		id?: string;
+		target?: string;
+		rel?: string;
+		class?: string;
+	};
+	value: RichTextValue;
+	onChange: ( newValue: RichTextValue ) => void;
+	onFocus: () => void;
+	contentRef: React.RefObject< HTMLElement >;
+	isVisible?: boolean;
+}
+
+interface OpenedBy {
+	el: HTMLElement;
+	action: 'click' | null;
+}
 
 function Edit( {
 	isActive,
@@ -31,11 +54,11 @@ function Edit( {
 	onFocus,
 	contentRef,
 	isVisible = true,
-} ) {
+}: EditProps ) {
 	const [ addingLink, setAddingLink ] = useState( false );
 
 	// We only need to store the button element that opened the popover. We can ignore the other states, as they will be handled by the onFocus prop to return to the rich text field.
-	const [ openedBy, setOpenedBy ] = useState( null );
+	const [ openedBy, setOpenedBy ] = useState< OpenedBy | null >( null );
 
 	useEffect( () => {
 		// When the link becomes inactive (i.e. isActive is false), reset the editingLink state
@@ -52,14 +75,16 @@ function Edit( {
 			return;
 		}
 
-		function handleClick( event ) {
+		function handleClick( event: MouseEvent ) {
 			// There is a situation whereby there is an existing link in the rich text
 			// and the user clicks on the leftmost edge of that link and fails to activate
 			// the link format, but the click event still fires on the `<a>` element.
 			// This causes the `editingLink` state to be set to `true` and the link UI
 			// to be rendered in "creating" mode. We need to check isActive to see if
 			// we have an active link format.
-			const link = event.target.closest( '[contenteditable] a' );
+			const link = ( event.target as HTMLElement ).closest(
+				'[contenteditable] a'
+			);
 			if (
 				! link || // other formats (e.g. bold) may be nested within the link.
 				! isActive
@@ -69,7 +94,7 @@ function Edit( {
 
 			setAddingLink( true );
 			setOpenedBy( {
-				el: link,
+				el: link as HTMLElement,
 				action: 'click',
 			} );
 		}
@@ -81,7 +106,7 @@ function Edit( {
 		};
 	}, [ contentRef, isActive ] );
 
-	function addLink( target ) {
+	function addLink( target?: HTMLElement ) {
 		const text = getTextContent( slice( value ) );
 
 		if ( ! isActive && text && isURL( text ) && isValidHref( text ) ) {
@@ -108,7 +133,7 @@ function Edit( {
 		} else {
 			if ( target ) {
 				setOpenedBy( {
-					el: target,
+					el: target as HTMLElement,
 					action: null, // We don't need to distinguish between click or keyboard here
 				} );
 			}
@@ -185,8 +210,8 @@ function Edit( {
 					name="link"
 					icon={ linkIcon }
 					title={ isActive ? __( 'Link' ) : title }
-					onClick={ ( event ) => {
-						addLink( event.currentTarget );
+					onClick={ ( event: MouseEvent ) => {
+						addLink( event.currentTarget as HTMLElement );
 					} }
 					isActive={ isActive || addingLink }
 					shortcutType="primary"
@@ -225,7 +250,10 @@ export const link = {
 		rel: 'rel',
 		class: 'class',
 	},
-	__unstablePasteRule( value, { html, plainText } ) {
+	__unstablePasteRule(
+		value: RichTextValue,
+		{ html, plainText }: { html?: string; plainText: string }
+	) {
 		const pastedText = ( html || plainText )
 			.replace( /<[^>]+>/g, '' )
 			.trim();

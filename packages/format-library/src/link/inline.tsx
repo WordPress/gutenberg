@@ -74,7 +74,7 @@ interface InlineLinkUIProps {
 	onFocusOutside: () => void;
 	stopAddingLink: () => void;
 	contentRef: React.RefObject< HTMLElement >;
-	focusOnMount?: boolean;
+	focusOnMount?: 'firstElement' | 'container' | false;
 }
 function InlineLinkUI( {
 	isActive,
