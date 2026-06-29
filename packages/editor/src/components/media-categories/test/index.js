@@ -54,7 +54,10 @@ describe( 'getInserterMediaCategories', () => {
 		] );
 		resolveSelect.mockReturnValue( { getEntityRecords } );
 
-		const [ attachedImagesCategory ] = getInserterMediaCategories( 42 );
+		const [ attachedImagesCategory ] = getInserterMediaCategories(
+			42,
+			'Post'
+		);
 		const results = await attachedImagesCategory.fetch( { per_page: 20 } );
 
 		expect( getEntityRecords ).toHaveBeenCalledWith(
@@ -82,7 +85,10 @@ describe( 'getInserterMediaCategories', () => {
 		const saveEntityRecord = jest.fn().mockResolvedValue( {} );
 		dispatch.mockReturnValue( { saveEntityRecord } );
 
-		const [ attachedImagesCategory ] = getInserterMediaCategories( 42 );
+		const [ attachedImagesCategory ] = getInserterMediaCategories(
+			42,
+			'Post'
+		);
 		const attachedCount = await attachedImagesCategory.attach( [
 			{ id: 10 },
 			{ id: 11 },
@@ -117,5 +123,31 @@ describe( 'getInserterMediaCategories', () => {
 			}
 		);
 		expect( saveEntityRecord ).toHaveBeenCalledTimes( 3 );
+	} );
+
+	it( 'words the description and empty state from the post type label', () => {
+		const [ attachedImagesCategory ] = getInserterMediaCategories(
+			42,
+			'Page'
+		);
+
+		expect( attachedImagesCategory.description ).toBe(
+			'Images attached to the current Page.'
+		);
+		expect( attachedImagesCategory.emptyMessage ).toBe(
+			'No images attached to this Page.'
+		);
+	} );
+
+	it( 'excludes attached images when there is no viewable post type label', () => {
+		// The label is empty for non-viewable post types (synced patterns,
+		// navigation, templates) and before the record resolves.
+		const categories = getInserterMediaCategories( 42, undefined );
+
+		expect(
+			categories.some(
+				( category ) => category.name === 'attached-images'
+			)
+		).toBe( false );
 	} );
 } );

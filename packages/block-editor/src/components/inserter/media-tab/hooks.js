@@ -145,7 +145,9 @@ export function useMediaCategories( rootClientId ) {
 			);
 			// We need to filter out categories that don't have any media items or
 			// whose corresponding block type is not allowed to be inserted, based
-			// on the category's `mediaType`.
+			// on the category's `mediaType`. A category that provides an
+			// `emptyMessage` stays in the list even when empty, so it can show
+			// that message (e.g. Attachments, to expose its "Attach" action).
 			const canInsertMediaType = {
 				image: canInsertImage,
 				video: canInsertVideo,
@@ -155,7 +157,7 @@ export function useMediaCategories( rootClientId ) {
 				if (
 					canInsertMediaType[ category.mediaType ] &&
 					( categoriesHaveMedia.get( category.name ) ||
-						category.showIfEmpty )
+						category.emptyMessage )
 				) {
 					_categories.push( category );
 				}

@@ -174,21 +174,15 @@ const getAttachmentIds = ( mediaItems ) => [
 
 const invalidateAttachedImagesQueries = ( postId, query = {} ) => {
 	const { invalidateResolution } = dispatch( coreStore );
-	// Invalidate the query backing the visible grid as well as the
-	// `per_page: 1` probe `useMediaCategories` uses to decide whether the
-	// source appears in the tab list (e.g. attaching the first image, or
-	// detaching the last one).
-	const queries = [ query, { per_page: 1 } ];
-
-	for ( const attachedImagesQuery of queries ) {
-		invalidateResolution( 'getEntityRecords', [
-			'postType',
-			'attachment',
-			getCoreMediaQuery(
-				getAttachedImagesQuery( postId, attachedImagesQuery )
-			),
-		] );
-	}
+	// Invalidate the resolution backing the visible grid so it refetches after
+	// an attach/detach and reflects the updated set of attached images. The tab
+	// is always shown (via `emptyMessage`), so there's no separate visibility
+	// probe to invalidate.
+	invalidateResolution( 'getEntityRecords', [
+		'postType',
+		'attachment',
+		getCoreMediaQuery( getAttachedImagesQuery( postId, query ) ),
+	] );
 };
 
 /**
@@ -199,10 +193,12 @@ const invalidateAttachedImagesQueries = ( postId, query = {} ) => {
  * picks up to offer an "Attach images" button and a per-item "Detach from post"
  * action in the same dropdown Openverse uses for "Report image".
  *
- * @param {number} postId The current post id.
+ * @param {number}      postId      The current post id.
+ * @param {string|null} [typeLabel] The post type's singular label to use in copy (e.g. "Page"),
+ *                                  or null to fall back to the generic "post".
  * @return {InserterMediaCategory} The Attachments media category.
  */
-const getAttachedImagesCategory = ( postId ) => ( {
+const getAttachedImagesCategory = ( postId, typeLabel ) => ( {
 	name: 'attached-images',
 	labels: {
 		name: __( 'Attached images' ),
@@ -211,10 +207,23 @@ const getAttachedImagesCategory = ( postId ) => ( {
 	mediaType: 'image',
 	// Helper text shown beneath the search field to clarify what this source is,
 	// since the label alone can read as ambiguous next to "Images".
-	description: __( 'Images attached to the current post.' ),
-	// Always show the source in the tab list, like Openverse, so it remains
-	// discoverable and the first image can be attached even with none yet.
-	showIfEmpty: true,
+	description: typeLabel
+		? sprintf(
+				// translators: %s: Name of the post type e.g: "Page".
+				__( 'Images attached to the current %s.' ),
+				typeLabel
+		  )
+		: __( 'Images attached to the current post.' ),
+	// Empty-state message. Providing this also keeps the source in the tab list
+	// when it has no items, so it stays discoverable and the first image can be
+	// attached even with none yet.
+	emptyMessage: typeLabel
+		? sprintf(
+				// translators: %s: Name of the post type e.g: "Page".
+				__( 'No images attached to this %s.' ),
+				typeLabel
+		  )
+		: __( 'No images attached to this post.' ),
 	async fetch( query = {} ) {
 		return coreMediaFetch( getAttachedImagesQuery( postId, query ) );
 	},
@@ -323,22 +332,31 @@ const inserterMediaCategories = [
 
 /**
  * Returns the inserter media categories for a given post. The "Attachments"
- * category is prepended only when editing a real post (a numeric id), so it is
- * omitted in contexts such as template editing where there is no post to attach
- * media to.
+ * category is prepended only when editing real, front-end-rendered content
+ * (posts, pages, public custom post types). It is omitted for synced patterns,
+ * navigation menus and templates, which aren't the entity that actually gets
+ * rendered, so attaching media to them is meaningless.
  *
- * @param {number|string} postId The current post id.
+ * @param {number|string} postId                  The current post id.
+ * @param {string}        [viewablePostTypeLabel] Singular label of the post type, set only when it is front-end viewable (post, page, public CPT).
  * @return {InserterMediaCategory[]} The inserter media categories.
  */
-export default function getInserterMediaCategories( postId ) {
+export default function getInserterMediaCategories(
+	postId,
+	viewablePostTypeLabel
+) {
 	const currentPostId = normalizePostId( postId );
 
-	if ( ! currentPostId ) {
+	// A falsy label means either a non-viewable post type (synced pattern,
+	// navigation, template) or that the record hasn't resolved yet — in both
+	// cases the category is omitted. A numeric id is also required since it
+	// backs the attachment `parent` query.
+	if ( ! currentPostId || ! viewablePostTypeLabel ) {
 		return inserterMediaCategories;
 	}
 
 	return [
-		getAttachedImagesCategory( currentPostId ),
+		getAttachedImagesCategory( currentPostId, viewablePostTypeLabel ),
 		...inserterMediaCategories,
 	];
 }

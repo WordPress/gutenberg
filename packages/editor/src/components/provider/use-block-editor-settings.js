@@ -152,6 +152,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		deviceType,
 		isNavigationOverlayContext,
 		isRevisionsMode,
+		viewablePostTypeLabel,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -159,6 +160,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				getRawEntityRecord,
 				getEntityRecord,
 				getBlockPatternCategories,
+				getPostType,
 			} = select( coreStore );
 			const { get } = select( preferencesStore );
 			const { getBlockTypes } = select( blocksStore );
@@ -176,6 +178,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 
 			// Fetch image sizes from REST API index for client-side media processing.
 			const baseData = getEntityRecord( 'root', '__unstableBase' );
+
+			// Read from the already-cached post type record (no extra request).
+			const postTypeObject = getPostType( postType );
 
 			function getSectionRootBlock() {
 				if ( renderingMode === 'template-locked' ) {
@@ -220,6 +225,13 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				} ),
 				pageOnFront: siteSettings?.page_on_front,
 				pageForPosts: siteSettings?.page_for_posts,
+				// The post type's singular name, but only for real, front-end
+				// rendered content (`viewable`). Empty for synced patterns,
+				// navigation and templates, which gates the attached-images
+				// category off for them and words its copy for everything else.
+				viewablePostTypeLabel: postTypeObject?.viewable
+					? postTypeObject?.labels?.singular_name
+					: undefined,
 				restBlockPatternCategories: getBlockPatternCategories(),
 				sectionRootClientId: getSectionRootBlock(),
 				deviceType: getDeviceType(),
@@ -321,11 +333,12 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 
 	const forceDisableFocusMode = settings.focusMode === false;
 
-	// The "Attachments" media category depends on the current post, so the
-	// categories are derived from `postId` rather than being a static list.
+	// The "Attachments" media category depends on the current post and its post
+	// type label (which gates whether it's offered and words its copy), so the
+	// categories are derived rather than being a static list.
 	const inserterMediaCategories = useMemo(
-		() => getInserterMediaCategories( postId ),
-		[ postId ]
+		() => getInserterMediaCategories( postId, viewablePostTypeLabel ),
+		[ postId, viewablePostTypeLabel ]
 	);
 
 	return useMemo( () => {

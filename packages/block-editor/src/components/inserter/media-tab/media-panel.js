@@ -181,11 +181,12 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 			) }
 			{ ! isLoading && ! mediaList?.length && (
 				<InserterNoResults>
-					{ category.attach && ! debouncedSearch
-						? // For an attach-capable source with no active search, an
-						  // empty result means nothing is attached yet — clearer
-						  // than the generic "no results found".
-						  __( 'No images attached to this post.' )
+					{ category.emptyMessage && ! debouncedSearch
+						? // For a source with a custom empty message (e.g.
+						  // Attachments) and no active search, an empty result
+						  // means nothing is attached yet — clearer than the
+						  // generic "no results found".
+						  category.emptyMessage
 						: __( 'No results found.' ) }
 				</InserterNoResults>
 			) }
