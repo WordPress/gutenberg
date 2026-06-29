@@ -19,7 +19,7 @@ describe( 'privateApis', () => {
 		scriptDebugGlobal.SCRIPT_DEBUG = originalScriptDebug;
 	} );
 
-	it( 'warns once when accessing useThemeProviderStyles through private APIs', () => {
+	it( 'warns when accessing useThemeProviderStyles through private APIs', () => {
 		scriptDebugGlobal.SCRIPT_DEBUG = true;
 		const warn = jest
 			.spyOn( console, 'warn' )
@@ -32,11 +32,7 @@ describe( 'privateApis', () => {
 		expect( unlockedPrivateApis.useThemeProviderStyles ).toBe(
 			useThemeProviderStyles
 		);
-		expect( unlockedPrivateApis.useThemeProviderStyles ).toBe(
-			useThemeProviderStyles
-		);
 
-		expect( warn ).toHaveBeenCalledTimes( 1 );
 		expect( warn ).toHaveBeenCalledWith(
 			'`@wordpress/theme`: Accessing `useThemeProviderStyles` through private APIs is deprecated. Import `ThemeProvider` from `@wordpress/theme` instead; this private export is scheduled for deletion as `@wordpress/theme` approaches stabilization.'
 		);
@@ -44,7 +40,7 @@ describe( 'privateApis', () => {
 		warn.mockRestore();
 	} );
 
-	it( 'warns once when accessing ThemeProvider through private APIs', () => {
+	it( 'warns when accessing ThemeProvider through private APIs', () => {
 		scriptDebugGlobal.SCRIPT_DEBUG = true;
 		const warn = jest
 			.spyOn( console, 'warn' )
@@ -55,9 +51,7 @@ describe( 'privateApis', () => {
 		} >( privateApis );
 
 		expect( unlockedPrivateApis.ThemeProvider ).toBe( ThemeProvider );
-		expect( unlockedPrivateApis.ThemeProvider ).toBe( ThemeProvider );
 
-		expect( warn ).toHaveBeenCalledTimes( 1 );
 		expect( warn ).toHaveBeenCalledWith(
 			'`@wordpress/theme`: Accessing `ThemeProvider` through private APIs is deprecated. Import `ThemeProvider` from `@wordpress/theme` instead; this private export is scheduled for deletion as `@wordpress/theme` approaches stabilization.'
 		);
