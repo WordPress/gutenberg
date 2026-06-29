@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove `ThemeProvider` from the public package exports and restore access through `privateApis` ([#79594](https://github.com/WordPress/gutenberg/pull/79594)).
+
+### New Features
+
+-   Export `@wordpress/theme/utils` with a generated `var()` Sass function for compile-time design token fallback injection ([#79470](https://github.com/WordPress/gutenberg/pull/79470)).
+
+### Bug Fixes
+
+-   Mark the published `design-tokens.css` file as side-effectful so downstream bundlers preserve the documented CSS import ([#79551](https://github.com/WordPress/gutenberg/pull/79551)).
+
 ## 0.16.0 (2026-06-24)
 
 ### Breaking Changes
