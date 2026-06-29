@@ -1,6 +1,6 @@
 import { useRender, mergeProps } from '@base-ui/react';
 import { forwardRef } from '@wordpress/element';
-import type { GapSize } from '../../../theme/src/prebuilt/ts/token-types';
+import type { GapSize } from '@wordpress/theme';
 import { type StackProps } from './types';
 import styles from './style.module.css';
 

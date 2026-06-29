@@ -1,4 +1,4 @@
-import type { GapSize } from '../../../theme/src/prebuilt/ts/token-types';
+import type { GapSize } from '@wordpress/theme';
 import { type ComponentProps } from '../utils/types';
 
 export interface StackProps extends ComponentProps< 'div' > {
