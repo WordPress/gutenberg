@@ -2,7 +2,7 @@
  * External dependencies
  */
 const { basename, dirname, relative, resolve, sep } = require( 'path' );
-const { realpathSync } = require( 'fs' );
+const { existsSync, readFileSync, realpathSync } = require( 'fs' );
 const { exec } = require( 'child_process' );
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
@@ -363,6 +363,41 @@ const scriptConfig = {
 									}
 								}
 							} );
+
+							// Inline SVG icon files referenced via file: prefix.
+							const resolveIconPath = ( iconPath ) => {
+								if (
+									typeof iconPath === 'string' &&
+									iconPath.startsWith( 'file:' )
+								) {
+									const resolved = resolve(
+										dirname( absoluteFrom ),
+										iconPath.replace( 'file:', '' )
+									);
+									if ( existsSync( resolved ) ) {
+										return readFileSync( resolved, 'utf8' );
+									}
+								}
+								return iconPath;
+							};
+
+							if ( blockJson.icon ) {
+								if ( typeof blockJson.icon === 'string' ) {
+									blockJson.icon = resolveIconPath(
+										blockJson.icon
+									);
+								} else if (
+									typeof blockJson.icon === 'object' &&
+									blockJson.icon.src
+								) {
+									blockJson.icon = {
+										...blockJson.icon,
+										src: resolveIconPath(
+											blockJson.icon.src
+										),
+									};
+								}
+							}
 
 							if ( hasReactFastRefresh ) {
 								// Prepends the file reference to the shared runtime chunk to every script type defined for the block.

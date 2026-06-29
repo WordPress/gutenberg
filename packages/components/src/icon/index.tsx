@@ -70,6 +70,20 @@ function Icon( {
 	...additionalProps
 }: Props ) {
 	if ( 'string' === typeof icon ) {
+		// Render SVG markup strings directly.
+		if ( icon.startsWith( '<svg' ) || icon.startsWith( '<?xml' ) ) {
+			const svg = icon.replace(
+				/<svg\s/i,
+				`<svg width="${ size }" height="${ size }" `
+			);
+			return (
+				<span
+					dangerouslySetInnerHTML={ { __html: svg } }
+					{ ...( additionalProps as HTMLProps< HTMLSpanElement > ) }
+				/>
+			);
+		}
+
 		return (
 			<Dashicon
 				icon={ icon }

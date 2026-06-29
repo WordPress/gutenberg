@@ -1,0 +1,13 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "my-plugin/icon-object",
+	"title": "Icon Object",
+	"category": "text",
+	"icon": {
+		"src": "star",
+		"background": "#ff0000",
+		"foreground": "#ffffff"
+	},
+	"textdomain": "my-plugin"
+}

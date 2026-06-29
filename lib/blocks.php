@@ -386,3 +386,52 @@ function _gutenberg_footnotes_force_filtered_html_on_import_filter( $arg ) {
 add_action( 'init', '_gutenberg_footnotes_kses_init' );
 add_action( 'set_current_user', '_gutenberg_footnotes_kses_init' );
 add_filter( 'force_filtered_html_on_import', '_gutenberg_footnotes_force_filtered_html_on_import_filter', 999 );
+
+/**
+ * Resolves file: prefix for the icon in block.json metadata.
+ *
+ * Allows block authors to use a file path (e.g., "file:./assets/icon.svg")
+ * instead of an inline SVG or Dashicon slug for the block icon.
+ *
+ * @since 7.2.0
+ *
+ * @param array $metadata Block metadata loaded from block.json.
+ * @return array Filtered metadata with resolved icon.
+ */
+function gutenberg_resolve_block_icon_path( $metadata ) {
+	if ( ! isset( $metadata['icon'] ) || ! isset( $metadata['file'] ) ) {
+		return $metadata;
+	}
+
+	$resolve_svg_path = function ( $path ) use ( $metadata ) {
+		$resolved_path = remove_block_asset_path_prefix( $path );
+		if ( $resolved_path === $path ) {
+			return $path;
+		}
+		$full_path = wp_normalize_path(
+			realpath( dirname( $metadata['file'] ) . '/' . $resolved_path )
+		);
+		if ( ! $full_path || ! file_exists( $full_path ) ) {
+			_doing_it_wrong(
+				__FUNCTION__,
+				sprintf(
+					/* translators: %s: path to the icon file */
+					__( 'Icon file not found: %s', 'gutenberg' ),
+					$resolved_path
+				),
+				'7.2.0'
+			);
+			return $path;
+		}
+		return file_get_contents( $full_path );
+	};
+
+	if ( is_string( $metadata['icon'] ) ) {
+		$metadata['icon'] = $resolve_svg_path( $metadata['icon'] );
+	} elseif ( is_array( $metadata['icon'] ) && isset( $metadata['icon']['src'] ) ) {
+		$metadata['icon']['src'] = $resolve_svg_path( $metadata['icon']['src'] );
+	}
+
+	return $metadata;
+}
+add_filter( 'block_type_metadata', 'gutenberg_resolve_block_icon_path' );

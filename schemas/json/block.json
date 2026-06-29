@@ -81,8 +81,37 @@
 			}
 		},
 		"icon": {
-			"description": "An icon property should be specified to make it easier to identify a block. These can be any of WordPress’ Dashicons (slug serving also as a fallback in non-js contexts).",
-			"type": "string"
+			"description": "An icon property should be specified to make it easier to identify a block. These can be any of WordPress' Dashicons (slug serving also as a fallback in non-js contexts), a file path (file:./icon.svg) for custom SVG icons, or an object with src, background, and foreground properties.",
+			"oneOf": [
+				{
+					"type": "string"
+				},
+				{
+					"type": "object",
+					"properties": {
+						"src": {
+							"description": "The icon source. Can be a Dashicon slug, a file path prefixed with file:, or inline SVG markup.",
+							"type": "string"
+						},
+						"background": {
+							"description": "The background color for the icon.",
+							"type": "string"
+						},
+						"foreground": {
+							"description": "The foreground color for the icon.",
+							"type": "string"
+						},
+						"shadowColor": {
+							"description": "The shadow color for the icon.",
+							"type": "string"
+						}
+					},
+					"required": [
+						"src"
+					],
+					"additionalProperties": false
+				}
+			]
 		},
 		"description": {
 			"description": "This is a short description for your block, which can be translated with our translation functions. This will be shown in the block inspector.",
@@ -1028,7 +1057,7 @@
 							},
 							"icon": {
 								"description": "An icon helping to visualize the variation. It can have the same shape as the block type.",
-								"type": "string"
+								"$ref": "#/properties/icon"
 							},
 							"isDefault": {
 								"description": "Indicates whether the current variation is the default one.",
