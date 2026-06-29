@@ -3,6 +3,25 @@
 // Waveform player dimensions.
 $waveform-player-height: 100px;
 
+// The native range input overlaying the waveform is fully transparent; its
+// track and thumb pseudo-elements are reset per vendor. They can't share a
+// selector list — an unrecognized vendor pseudo-element invalidates the whole
+// rule in that browser — so the declarations are shared via mixins instead.
+@mixin waveform-seek-track {
+	appearance: none;
+	width: 100%;
+	height: 100%;
+	background: transparent;
+	border: 0;
+}
+
+@mixin waveform-seek-thumb {
+	appearance: none;
+	width: 1px;
+	height: 100%;
+	background: transparent;
+}
+
 .wp-block-playlist {
 	// Main waveform player container.
 	.wp-block-playlist__waveform-player {
@@ -54,31 +73,19 @@ $waveform-player-height: 100px;
 	}
 
 	.waveform-seek-control::-webkit-slider-runnable-track {
-		appearance: none;
-		width: 100%;
-		height: 100%;
-		background: transparent;
-	}
-
-	.waveform-seek-control::-webkit-slider-thumb {
-		appearance: none;
-		width: 1px;
-		height: 100%;
-		background: transparent;
+		@include waveform-seek-track;
 	}
 
 	.waveform-seek-control::-moz-range-track {
-		width: 100%;
-		height: 100%;
-		background: transparent;
-		border: 0;
+		@include waveform-seek-track;
+	}
+
+	.waveform-seek-control::-webkit-slider-thumb {
+		@include waveform-seek-thumb;
 	}
 
 	.waveform-seek-control::-moz-range-thumb {
-		width: 1px;
-		height: 100%;
-		border: 0;
-		background: transparent;
+		@include waveform-seek-thumb;
 	}
 
 	// Vertical position indicators overlaid on the waveform. The playhead marks
@@ -97,6 +104,7 @@ $waveform-player-height: 100px;
 		&::before {
 			content: "";
 			position: absolute;
+			background: currentColor;
 			inset-block: 0;
 			inset-inline-start: 0;
 			width: 2px;
@@ -104,13 +112,8 @@ $waveform-player-height: 100px;
 		}
 	}
 
-	.waveform-seek-playhead::before {
-		background: currentColor;
-	}
-
 	// Darken the spot a click would seek to.
 	.waveform-seek-hover::before {
-		background: currentColor;
 		opacity: 0.25;
 	}
 
