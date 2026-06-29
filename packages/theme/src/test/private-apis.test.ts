@@ -18,7 +18,7 @@ describe( 'privateApis', () => {
 		);
 
 		expect( warn ).toHaveBeenCalledWith(
-			'`privateApis.useThemeProviderStyles` from `@wordpress/theme` is deprecated since version 7.1 and will be removed in version 7.3. Please use `ThemeProvider` from `@wordpress/theme` instead.'
+			'`privateApis.useThemeProviderStyles` from `@wordpress/theme` is deprecated since version 7.1 and will be removed in version 7.3. Please use `ThemeProvider` from `@wordpress/theme` for supported theming use cases instead. Note: `useThemeProviderStyles` has no public replacement.'
 		);
 
 		warn.mockRestore();
