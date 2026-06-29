@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Added [`no-private-theme-provider`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-private-theme-provider.md) rule to disallow accessing `ThemeProvider` through `@wordpress/theme` private APIs ([#79620](https://github.com/WordPress/gutenberg/pull/79620)).
+
 ## 25.5.0 (2026-06-24)
 
 ## 25.4.1 (2026-06-16)
