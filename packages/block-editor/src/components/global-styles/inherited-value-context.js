@@ -27,26 +27,15 @@ import { getVariationNameFromClass } from '../../hooks/block-style-variation';
 export const InheritedValueContext = createContext( null );
 
 /**
- * Provider component. Reads the Global Styles payload once via
- * `useSelect` and propagates it alongside the selected block's
- * `blockName` and `ownVariation` to every descendant panel.
+ * Internal hook that reads the Global Styles payload and the block's
+ * registered styles, and returns the wrapped `{ styles }` shape the builder
+ * and ref-resolver helpers expect, plus the block styles. Shared by
+ * `InheritedValueProvider` (inspector) and `useInheritedStyleValue` (canvas).
  *
- * The settings value is the bare merged styles tree, so the Provider wraps it
- * as `{ styles: rawGlobalStylesData }` before passing it to the builder and
- * ref-resolver helpers.
- *
- * @param {Object}  props
- * @param {?string} props.blockName       Selected block name (e.g. `core/heading`).
- * @param {?string} [props.ownVariation]  Detected variation slug (see `getVariationNameFromClass`).
- * @param {?Object} [props.selectedState] Selected block style state (`{ viewport, pseudo }`), or null for the default state.
- * @param {*}       props.children
+ * @param {?string} blockName Selected block name (e.g. `core/heading`).
+ * @return {{ globalStyles: ?Object, blockStyles: Array }} Wrapped Global Styles payload and block styles.
  */
-export function InheritedValueProvider( {
-	blockName,
-	ownVariation = null,
-	selectedState = null,
-	children,
-} ) {
+function useRawGlobalStyles( blockName ) {
 	const { rawGlobalStylesData, blockStyles } = useSelect(
 		( select ) => {
 			const settings = select( blockEditorStore ).getSettings();
@@ -65,6 +54,31 @@ export function InheritedValueProvider( {
 		() => ( rawGlobalStylesData ? { styles: rawGlobalStylesData } : null ),
 		[ rawGlobalStylesData ]
 	);
+	return { globalStyles, blockStyles };
+}
+
+/**
+ * Provider component. Reads the Global Styles payload and passes it down,
+ * along with the selected block's `blockName` and `ownVariation`, to every
+ * panel below it.
+ *
+ * The settings value is the bare merged styles tree, so the Provider wraps it
+ * as `{ styles: rawGlobalStylesData }` before passing it to the builder and
+ * ref-resolver helpers.
+ *
+ * @param {Object}  props
+ * @param {?string} props.blockName       Selected block name (e.g. `core/heading`).
+ * @param {?string} [props.ownVariation]  Detected variation slug (see `getVariationNameFromClass`).
+ * @param {?Object} [props.selectedState] Selected block style state (`{ viewport, pseudo }`), or null for the default state.
+ * @param {*}       props.children
+ */
+export function InheritedValueProvider( {
+	blockName,
+	ownVariation = null,
+	selectedState = null,
+	children,
+} ) {
+	const { globalStyles, blockStyles } = useRawGlobalStyles( blockName );
 
 	const contextValue = useMemo(
 		() => ( {
@@ -123,24 +137,7 @@ export function useInheritedStyleValue( {
 	ownVariation = null,
 	selectedState = null,
 } ) {
-	const { rawGlobalStylesData, blockStyles } = useSelect(
-		( select ) => {
-			const settings = select( blockEditorStore ).getSettings();
-			const blockStylesSelector = select( blocksStore ).getBlockStyles;
-			return {
-				rawGlobalStylesData: settings[ globalStylesDataKey ] ?? null,
-				blockStyles:
-					blockName && blockStylesSelector
-						? blockStylesSelector( blockName )
-						: [],
-			};
-		},
-		[ blockName ]
-	);
-	const globalStyles = useMemo(
-		() => ( rawGlobalStylesData ? { styles: rawGlobalStylesData } : null ),
-		[ rawGlobalStylesData ]
-	);
+	const { globalStyles, blockStyles } = useRawGlobalStyles( blockName );
 
 	return useMemo( () => {
 		if ( ! blockName ) {
