@@ -394,13 +394,14 @@ const BlockInspectorSingleBlock = ( {
 	selectedBlockStyleState,
 	showStateOnCanvas,
 	isResponsiveEditing,
-	isBlockStyleStateSelected,
 } ) => {
 	const listViewRef = useRef( null );
 	const hasMultipleTabs = availableTabs?.length > 1;
 	const hasPseudoState = hasPseudoBlockStyleState( selectedBlockStyleState );
 	const isEditingStyleState =
-		isBlockStyleStateSelected || isResponsiveEditing;
+		( hasViewportBlockStyleState( selectedBlockStyleState ) &&
+			isResponsiveEditing ) ||
+		hasPseudoBlockStyleState( selectedBlockStyleState );
 	const hasParentChildBlockCards =
 		editedContentOnlySection &&
 		editedContentOnlySection !== renderedBlockClientId;
