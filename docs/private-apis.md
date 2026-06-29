@@ -8,7 +8,7 @@ The purpose of this document is to present a picture of how many private APIs we
 
 Some `@wordpress/*` packages are **bundled** into the consumer's build output, while others are **externalized** and provided at runtime by WordPress or the Gutenberg plugin. See the [@wordpress/dependency-extraction-webpack-plugin README](/packages/dependency-extraction-webpack-plugin/README.md) for details.
 
-Bundled packages may rely on private APIs from externalized packages, but the two package types version independently at runtime. Any use of a private API must be backwards compatible when the API is introduced, promoted to public, or deprecated.
+Bundled packages may rely on private APIs from externalized packages, but the two package types version independently at runtime. Any use of a private API must be backward compatible when the API is introduced, promoted to public, or deprecated.
 
 This section is about coordination between `@wordpress/*` packages, not third-party plugin or theme authors. Most consumers are not calling `unlock()` on externalized private APIs themselves; they pick up the dependency indirectly when their build bundles an `@wordpress/*` package that unlocks a private API from an externalized one.
 
@@ -57,7 +57,7 @@ function getThemeProvider() {
 const ThemeProvider = getThemeProvider();
 ```
 
-Use this pattern to help consumers to support both a WordPress release that only has the private export and a newer release with the public export.
+Use this pattern to help consumers support both a WordPress release that only has the private export and a newer release with the public export.
 
 #### 2. Bump the bundled package version and document the change
 
