@@ -1225,6 +1225,122 @@ single `RichText` field. RichText in the `edit` function _must_ have an
 `identifier` prop that matches the attribute key of the text, so that it updates
 the selection correctly and we know where to split.
 
+## Inherited Global Styles values in inspector panels
+
+_**Note:** Since WordPress 6.10._
+
+When a block uses any of the visual-style block supports (`background`,
+`border`, `color`, `dimensions`, `filter`, `spacing`, `typography`), every
+control in the corresponding inspector panel reflects the value the user is
+inheriting from Global Styles whenever the block has no local override at
+that path. The control still works exactly as before — interacting with it
+commits a local override; resetting it via the panel's Reset menu strips the
+local override and the inherited value reappears at-rest. Block authors do
+not have to opt in: any block using the standard support panels gets this
+behaviour automatically, and `theme.json` authoring is unchanged.
+
+### What the user sees
+
+For each control in the six standard panels (Typography, Dimensions, Border,
+Color, Background, Filters) the at-rest state surfaces the inheritance
+through two complementary cues:
+
+-   **Label-level cue.** When a control is showing its inherited Global
+    Styles value (no local override set), the control's label is rendered
+    in the synced-purple accent colour. The label carries a tooltip
+    explaining "Inherited from Global Styles". When the user sets a local
+    override on top of an inherited value, the label returns to the default
+    colour and a small synced-purple dot appears next to it to mark the
+    presence of a local override over an inherited value.
+-   **Native value cue (where the underlying control supports it).** Inputs
+    (`UnitControl`, `NumberControl`, etc.) additionally render the inherited
+    value as the input's native `placeholder` text so the user sees both
+    that a value is inherited and what that value is. Toggle-group, swatch,
+    select, popover-trigger, and picker controls do not paint any
+    additional in-control cue beyond the label-level cue, so the
+    information density of those controls is unchanged.
+
+The label-level cue is implemented via two CSS class hooks applied to the
+wrapping `ToolsPanelItem`:
+
+-   `is-inherited-from-global-styles` — local unset, inherited present.
+-   `has-local-override-from-global-styles` — local set, inherited present.
+
+These hooks are mutually exclusive on a given control. When neither
+condition is met (no inherited value is in play), the control renders
+exactly as it does today.
+
+### Rendering inherited values without committing
+
+Rendering an at-rest inherited value does not mutate the block's local
+attributes. Mounting, focusing, hovering, or tabbing onto an at-rest control
+does not call `setAttributes`. The local attribute is set only when the user
+explicitly activates the control:
+
+-   Click / Space / Enter on the at-rest preselected option (toggle group,
+    swatch, preset card, popover preset) commits the inherited value to
+    local. This is the user's "accept this inherited value" affordance; the
+    at-rest cue clears on the next render to confirm the commit.
+-   Activating any other option commits that other value as the local
+    override, identical to how the control behaves today when no inherited
+    value is in play.
+-   Typing a character + blur in an input commits the typed value.
+
+### Reset
+
+Resetting any individual control via the panel's Reset menu (or "Reset all")
+strips the local attribute (sets it to `undefined`) and the inherited value
+reappears as the at-rest placeholder. Reset does not copy the inherited
+value into the local attribute — the local path stays absent across the
+entire see → consider → reset cycle, regardless of what is inherited.
+
+### Visual-treatment tokens
+
+The synced-purple cue uses the existing `--wp-block-synced-color` CSS custom
+property defined in `packages/base-styles/_default-custom-properties.scss`
+(default `#7a00df`). The token is honoured by the editor's light + dark
+colour schemes; theme authors do not customise it.
+
+### Implementation notes
+
+The block editor uses a private helper in
+`packages/block-editor/src/components/global-styles/inheritance/`. The
+helper returns `{ className, title }` to spread onto the wrapping
+`ToolsPanelItem` (or another wrapping element). The class hook drives the
+label-level visual treatment described above; the `title` attribute carries
+the i18n string `__( 'Inherited from Global Styles' )` for native browser
+tooltips and screen-reader announcement. The helper is not exported from
+the public `@wordpress/block-editor` package surface and is used internally
+by the six panels.
+
+### Known limitations
+
+The following sources of inherited style are NOT reflected in the inspector
+in this initial release:
+
+-   **Source attribution.** The placeholder shows the merged inherited
+    value, not the layer it originated from (root vs. element vs.
+    block-default vs. own-variation).
+-   **Ancestor Section Styles.** Styles applied to a Section variation on
+    an ancestor block visually affect descendants but are not reflected in
+    the descendant block's inspector.
+-   **CSS-property inheritance.** Computed values flowing from a parent
+    block via standard CSS inheritance (e.g. `color`) are not reflected.
+    The panel reads the merged Global Styles tree, not `getComputedStyle`.
+-   **Plugin-injected styles.** Styles enqueued by plugins (raw stylesheets,
+    inline styles) are not inspected.
+-   **`css` escape hatches in `theme.json`.** The `css` property's CSS
+    fragments are not parsed back into block-supports values.
+-   **Server-rendered dynamic blocks** (Navigation, Template Part, Query
+    Loop): the inspector placeholder works as expected; the iframe preview
+    may lag behind live Global Styles edits until a re-render tick.
+-   **Multi-block selection.** Inspector controls hide when the selected
+    blocks have differing values; this hide-on-mismatch behaviour is
+    unchanged and the placeholder is not shown in that state.
+-   **Legacy non-`ToolsPanelItem` controls.** Block-supports panels that
+    have not migrated to `ToolsPanelItem` (rare; mostly third-party blocks
+    with custom panels) do not surface inherited values.
+
 ## visibility
 
 _**Note:** Since WordPress 6.9._

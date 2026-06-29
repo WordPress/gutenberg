@@ -215,7 +215,7 @@ export function getVariationStylesWithRefValues(
 							value.ref
 						);
 
-						if ( refValue ) {
+						if ( refValue !== undefined && refValue !== null ) {
 							variationStyles[ key ] = refValue;
 						} else {
 							delete variationStyles[ key ];

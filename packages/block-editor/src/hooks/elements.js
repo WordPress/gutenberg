@@ -14,6 +14,11 @@ import {
 	useHasColorPanel,
 	default as StylesColorPanel,
 } from '../components/global-styles/color-panel';
+import {
+	InheritedValueProvider,
+	useInheritedValue,
+	useOwnVariation,
+} from '../components/global-styles/inherited-value-context';
 import { cleanEmptyObject } from './utils';
 import { store as blockEditorStore } from '../store';
 import { COLOR_SUPPORT_KEY } from './color';
@@ -59,17 +64,22 @@ export function ElementsEdit( {
 	const selectedState = useBlockStyleState();
 	const isEnabled = useHasColorPanel( settings );
 
-	const style = useSelect(
+	const { style, className } = useSelect(
 		( select ) => {
 			if ( ! isEnabled ) {
-				return undefined;
+				return {};
 			}
 			const attributes =
 				select( blockEditorStore ).getBlockAttributes( clientId );
-			return attributes?.style;
+			return {
+				style: attributes?.style,
+				className: attributes?.className,
+			};
 		},
 		[ clientId, isEnabled ]
 	);
+
+	const ownVariation = useOwnVariation( name, className );
 
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 
@@ -126,15 +136,41 @@ export function ElementsEdit( {
 	const Wrapper = asWrapper || ElementsInspectorControl;
 
 	return (
+		<InheritedValueProvider
+			blockName={ name }
+			ownVariation={ ownVariation }
+			selectedState={ selectedState }
+		>
+			<ElementsPanelWithInheritedValue
+				as={ Wrapper }
+				panelId={ clientId }
+				settings={ settings }
+				value={ value }
+				onChange={ onChange }
+				defaultControls={ defaultControls }
+				label={ label }
+				contrastWarning={ contrastWarning }
+			/>
+		</InheritedValueProvider>
+	);
+}
+
+/**
+ * Internal bridge: consumes `InheritedValueContext` and threads the
+ * merged placeholder payload into the shared global-styles color panel.
+ * Kept as a sibling component so the hook call sits strictly below the
+ * Provider, as required by React's context rules.
+ *
+ * @param {Object} props Passthrough props for `StylesColorPanel`.
+ */
+function ElementsPanelWithInheritedValue( props ) {
+	const { value: inheritedValue, sources: inheritedSources } =
+		useInheritedValue();
+	return (
 		<StylesColorPanel
-			as={ Wrapper }
-			panelId={ clientId }
-			settings={ settings }
-			value={ value }
-			onChange={ onChange }
-			defaultControls={ defaultControls }
-			label={ label }
-			contrastWarning={ contrastWarning }
+			{ ...props }
+			inheritedValue={ inheritedValue }
+			inheritedSources={ inheritedSources }
 		/>
 	);
 }
