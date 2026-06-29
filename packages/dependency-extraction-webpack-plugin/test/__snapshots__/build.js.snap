@@ -41,7 +41,7 @@ exports[`DependencyExtractionWebpackPlugin modules Webpack \`cyclic-dependency-g
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`cyclic-dynamic-dependency-graph\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array(), 'version' => 'decbc01a27e4dbb98c28', 'type' => 'module');
+"<?php return array('dependencies' => array(array('id' => '@wordpress/interactivity', 'import' => 'dynamic')), 'version' => 'decbc01a27e4dbb98c28', 'type' => 'module');
 "
 `;
 
@@ -335,7 +335,7 @@ exports[`DependencyExtractionWebpackPlugin modules Webpack \`wordpress\` should 
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`wordpress-interactivity\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('lodash'), 'version' => '19d196fe140333588868', 'type' => 'module');
+"<?php return array('dependencies' => array('lodash', array('id' => '@wordpress/interactivity', 'import' => 'dynamic')), 'version' => '19d196fe140333588868', 'type' => 'module');
 "
 `;
 
