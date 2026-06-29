@@ -9,7 +9,7 @@
     -   `BorderControl` ([#79418](https://github.com/WordPress/gutenberg/pull/79418))
     -   `FontSizePicker` ([#79481](https://github.com/WordPress/gutenberg/pull/79481))
     -   `RangeControl` ([#79590](https://github.com/WordPress/gutenberg/pull/79590))
-    -   `Radio` ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD))
+    -   `Radio` ([#79657](https://github.com/WordPress/gutenberg/pull/79657))
     -   `TreeSelect` ([#79550](https://github.com/WordPress/gutenberg/pull/79550))
 
 ### Documentation
