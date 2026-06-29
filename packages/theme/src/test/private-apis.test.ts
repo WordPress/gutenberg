@@ -38,7 +38,7 @@ describe( 'privateApis', () => {
 
 		expect( warn ).toHaveBeenCalledTimes( 1 );
 		expect( warn ).toHaveBeenCalledWith(
-			'ThemeProvider: Accessing `useThemeProviderStyles` through `@wordpress/theme` private APIs is deprecated. This private export is scheduled for deletion as `@wordpress/theme` approaches stabilization.'
+			'ThemeProvider: Accessing `useThemeProviderStyles` through `@wordpress/theme` private APIs is deprecated. Import `ThemeProvider` from `@wordpress/theme` instead; this private export is scheduled for deletion as `@wordpress/theme` approaches stabilization.'
 		);
 
 		warn.mockRestore();
