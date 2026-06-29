@@ -14,6 +14,10 @@ import { useState, useCallback, useId, useRef } from '@wordpress/element';
  */
 import { ValidatedInputControl, ValidatedRangeControl } from '../components';
 
+jest.mock( '@wordpress/a11y', () => ( {
+	speak: jest.fn(),
+} ) );
+
 describe( 'ControlWithError', () => {
 	describe( 'Async Validation', () => {
 		beforeEach( () => {
