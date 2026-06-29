@@ -18,7 +18,7 @@ describe( 'privateApis', () => {
 		);
 
 		expect( warn ).toHaveBeenCalledWith(
-			'`@wordpress/theme`: Accessing `useThemeProviderStyles` through private APIs is deprecated. Import `ThemeProvider` from `@wordpress/theme` instead; this private export is scheduled for deletion as `@wordpress/theme` approaches stabilization.'
+			'`privateApis.useThemeProviderStyles` from `@wordpress/theme` is deprecated since version 7.1 and will be removed in version 7.2. Please use `ThemeProvider` from `@wordpress/theme` instead.'
 		);
 
 		warn.mockRestore();
@@ -36,7 +36,7 @@ describe( 'privateApis', () => {
 		expect( unlockedPrivateApis.ThemeProvider ).toBe( ThemeProvider );
 
 		expect( warn ).toHaveBeenCalledWith(
-			'`@wordpress/theme`: Accessing `ThemeProvider` through private APIs is deprecated. Import `ThemeProvider` from `@wordpress/theme` instead; this private export is scheduled for deletion as `@wordpress/theme` approaches stabilization.'
+			'`privateApis.ThemeProvider` from `@wordpress/theme` is deprecated since version 7.1 and will be removed in version 7.2. Please use `ThemeProvider` from `@wordpress/theme` instead.'
 		);
 
 		warn.mockRestore();

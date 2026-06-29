@@ -1,12 +1,14 @@
-import warning from '@wordpress/warning';
+import deprecated from '@wordpress/deprecated';
 import { lock } from './lock-unlock';
 import { ThemeProvider } from './theme-provider';
 import { useThemeProviderStyles } from './use-theme-provider-styles';
 
 function warnPrivateApi( apiName: string ) {
-	warning(
-		`\`@wordpress/theme\`: Accessing \`${ apiName }\` through private APIs is deprecated. Import \`ThemeProvider\` from \`@wordpress/theme\` instead; this private export is scheduled for deletion as \`@wordpress/theme\` approaches stabilization.`
-	);
+	deprecated( `\`privateApis.${ apiName }\` from \`@wordpress/theme\``, {
+		since: '7.1',
+		version: '7.2',
+		alternative: '`ThemeProvider` from `@wordpress/theme`',
+	} );
 }
 
 /**
