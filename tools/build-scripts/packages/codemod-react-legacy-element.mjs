@@ -21,6 +21,12 @@
  * coerces any string `inert` value to `true` in the `case 'inert'` of the
  * attribute-setting switch.
  *
+ * Both patches also emit a one-time `console.warn` (prefixed
+ * `[wordpress-react-19]`) when their compatibility path is exercised at runtime:
+ * once when a legacy element is encountered, and once when an empty-string
+ * `inert` value is coerced. A small compatibility-warning helper is prepended to
+ * every patched bundle to back these warnings.
+ *
  * Edits are applied to the original source with `magic-string`, so the output
  * is byte-for-byte identical except at the patched locations (handy for
  * diffing against the unpatched `-orig` files).
@@ -39,6 +45,114 @@ const traverse = _traverse.default ?? _traverse;
 const TRANSITIONAL_SYMBOL = 'react.transitional.element';
 const LEGACY_SYMBOL = 'react.element';
 const DEFAULT_LEGACY_NAME = 'REACT_LEGACY_ELEMENT_TYPE';
+
+// Name of the compatibility-warning helper injected into patched bundles. The
+// patches call it to surface compatibility behaviour (legacy elements, string
+// `inert`) at runtime, warning at most once per `key`.
+const WARN_HELPER_NAME = '__wpWarnCompat';
+
+// Warning ids. Each id warns at most once; call sites pass only the id and the
+// message is looked up from the table embedded in the injected helper.
+const LEGACY_ELEMENT_WARNING = 'legacy-element';
+const INERT_WARNING = 'inert';
+
+// Warning messages keyed by id. Embedded once into the patched bundle by the
+// injected helper, so call sites never repeat the message text. The
+// `[wordpress-react-19]` prefix is added by the helper at runtime.
+const WARNING_MESSAGES = {
+	[ LEGACY_ELEMENT_WARNING ]:
+		'A React element created by an older React runtime (React 17/18) was detected and is handled by a compatibility patch. This usually means a bundled package ships its own React; align it with React 19.',
+	[ INERT_WARNING ]:
+		'An empty-string `inert` attribute was used. React 19 treats `inert` as a boolean, so the value was coerced to `true` by a compatibility patch. Pass `inert={true}` instead.',
+};
+
+/**
+ * Source for the compatibility-warning helper that {@link injectWarnHelper}
+ * inserts into every patched bundle. It is a plain function declaration so it
+ * hoists to the top of the enclosing scope and is reachable from the patched
+ * call sites via closure. Call sites pass only a warning id; the message table
+ * is embedded here once. Warnings are deduplicated per id and prefixed with
+ * `[wordpress-react-19]`.
+ *
+ * @return {string} Helper source code.
+ */
+function warnHelperSource() {
+	return (
+		`function ${ WARN_HELPER_NAME }(key) {` +
+		`var w = ${ WARN_HELPER_NAME }.warned || (${ WARN_HELPER_NAME }.warned = {});` +
+		`if (w[key]) return;` +
+		`w[key] = true;` +
+		`var messages = ${ JSON.stringify( WARNING_MESSAGES ) };` +
+		`if (typeof console !== "undefined" && console.warn) {` +
+		`console.warn("[wordpress-react-19] " + messages[key]);` +
+		`}` +
+		`}\n`
+	);
+}
+
+/**
+ * Extracts the immediately-invoked function expression (IIFE) from a top-level
+ * statement, if it is one. Handles esbuild's `var Global = (() => { … })();`
+ * output as well as bare `(function () { … })();` expression statements.
+ *
+ * @param {Object} statement AST statement node.
+ * @return {Object|undefined} The IIFE function node (arrow/function expression).
+ */
+function getIifeFunction( statement ) {
+	let expression;
+	if (
+		statement.type === 'VariableDeclaration' &&
+		statement.declarations.length === 1
+	) {
+		expression = statement.declarations[ 0 ].init;
+	} else if ( statement.type === 'ExpressionStatement' ) {
+		expression = statement.expression;
+		// `!function(){}()` and similar minifier wrappers.
+		if ( expression.type === 'UnaryExpression' ) {
+			expression = expression.argument;
+		}
+	}
+
+	if ( ! expression || expression.type !== 'CallExpression' ) {
+		return undefined;
+	}
+
+	const callee = expression.callee;
+	if (
+		( callee.type === 'ArrowFunctionExpression' ||
+			callee.type === 'FunctionExpression' ) &&
+		callee.body.type === 'BlockStatement'
+	) {
+		return callee;
+	}
+
+	return undefined;
+}
+
+/**
+ * Inserts the compatibility-warning helper at the start of the bundle's IIFE
+ * body, so it stays scoped to the bundle instead of leaking a global (these
+ * bundles run as classic scripts). The helper is reachable from the patched
+ * call sites deeper in the same IIFE via closure.
+ *
+ * Falls back to prepending at the top of the file when no top-level IIFE is
+ * found, which keeps the helper available regardless of the bundle shape.
+ *
+ * @param {Object}      ast Parsed AST (File node).
+ * @param {MagicString} ms  Magic string for the source being edited.
+ */
+function injectWarnHelper( ast, ms ) {
+	for ( const statement of ast.program.body ) {
+		const iife = getIifeFunction( statement );
+		if ( iife ) {
+			// `body.start` is the opening `{`; insert right after it.
+			ms.appendRight( iife.body.start + 1, `\n${ warnHelperSource() }` );
+			return;
+		}
+	}
+
+	ms.prepend( warnHelperSource() );
+}
 
 /**
  * Whether a node is a `Symbol.for( '<value>' )` call.
@@ -147,13 +261,20 @@ function patchReference( refPath, legacyName, ms, filename ) {
 		return;
 	}
 
-	// `case TRANSITIONAL:` -> add a fall-through `case LEGACY:` before it.
+	// `case TRANSITIONAL:` -> add a fall-through `case LEGACY:` before it, with a
+	// warning that runs only when a legacy element actually reaches this case
+	// (the warning sits between the two labels, so the transitional case skips
+	// it and falls straight into the original body).
 	if ( parent.type === 'SwitchCase' && parent.test === node ) {
-		ms.appendLeft( parent.start, `case ${ legacyName }: ` );
+		ms.appendLeft(
+			parent.start,
+			`case ${ legacyName }: ${ WARN_HELPER_NAME }("${ LEGACY_ELEMENT_WARNING }"); `
+		);
 		return;
 	}
 
-	// `a === TRANSITIONAL` -> `( a === TRANSITIONAL || a === LEGACY )`.
+	// `a === TRANSITIONAL` -> `( a === TRANSITIONAL || ( a === LEGACY && warn ) )`.
+	// The warning only fires when the legacy branch matches.
 	if (
 		parent.type === 'BinaryExpression' &&
 		parent.operator === '===' &&
@@ -165,7 +286,7 @@ function patchReference( refPath, legacyName, ms, filename ) {
 		ms.overwrite(
 			parent.start,
 			parent.end,
-			`(${ original } || ${ otherText } === ${ legacyName })`
+			`(${ original } || (${ otherText } === ${ legacyName } && (${ WARN_HELPER_NAME }("${ LEGACY_ELEMENT_WARNING }"), true)))`
 		);
 		return;
 	}
@@ -424,10 +545,16 @@ function patchInertAttribute( ast, ms, filename ) {
 	}
 
 	const { inertCase, valueName } = matches[ 0 ];
-	// Append as the last statement of the `inert` case body (right before the
-	// fall-through), so the preceding empty-string warning still sees the
-	// original value. `SwitchCase.end` is the end of the last consequent
-	// statement, or just after the `case 'inert':` label when the body is empty.
+	// Append at the end of the `inert` case body (right before the fall-through).
+	// `SwitchCase.end` is the end of the last consequent statement, or just after
+	// the `case 'inert':` label when the body is empty.
+	//
+	// The empty-string warning is appended first so it still sees the original
+	// value, then the coercion of any string `inert` value to `true`.
+	ms.appendLeft(
+		inertCase.end,
+		` if ( "" === ${ valueName } ) ${ WARN_HELPER_NAME }("${ INERT_WARNING }"); `
+	);
 	ms.appendLeft(
 		inertCase.end,
 		` if ( "string" === typeof ${ valueName } ) ${ valueName } = true; `
@@ -459,6 +586,11 @@ export function createPatcher( ...passes ) {
 		for ( const pass of passes ) {
 			pass( ast, ms, filename );
 		}
+
+		// Inject the compatibility-warning helper that the patches call at
+		// runtime. It is a hoisted function declaration, so it is reachable from
+		// the patched call sites (inside the bundle's IIFE) via closure.
+		injectWarnHelper( ast, ms );
 
 		return ms.toString();
 	};

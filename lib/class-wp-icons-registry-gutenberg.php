@@ -54,10 +54,10 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			return false;
 		}
 
-		if ( ! preg_match( '/^[a-z][a-z0-9-]*$/', $unqualified_name ) ) {
+		if ( ! preg_match( '/^[a-z0-9]([a-z0-9_-]*[a-z0-9])?$/', $unqualified_name ) ) {
 			_doing_it_wrong(
 				__METHOD__,
-				__( 'Icon names must start with a lowercase letter and contain only lowercase letters, digits, and hyphens.', 'gutenberg' ),
+				__( 'Icon names must start and end with a lowercase letter or digit and contain only lowercase letters, digits, hyphens, and underscores.', 'gutenberg' ),
 				'7.1.0'
 			);
 			return false;

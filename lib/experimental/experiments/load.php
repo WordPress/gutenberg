@@ -113,7 +113,7 @@ function gutenberg_initialize_experiments_settings() {
 				array(
 					'id'          => 'gutenberg-guidelines',
 					'label'       => __( 'Guidelines', 'gutenberg' ),
-					'description' => __( 'Enables guidelines feature for managing editorial voice and tone guidelines under Settings.', 'gutenberg' ),
+					'description' => __( 'Enables the Guidelines page under Settings and the experimental knowledge storage (wp_knowledge).', 'gutenberg' ),
 				),
 				array(
 					'id'          => 'gutenberg-content-types',

@@ -1,6 +1,6 @@
 <?php
 /**
- * Guidelines REST API Controller.
+ * Knowledge REST API Controller.
  *
  * @package gutenberg
  */
@@ -10,15 +10,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * REST API controller for guideline posts.
+ * REST API controller for knowledge posts.
  */
-class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
+class Gutenberg_Knowledge_REST_Controller extends WP_REST_Posts_Controller {
 
 	/**
-	 * Gate the guidelines collection on the post-type read capability.
+	 * Gate the knowledge collection on the post-type read capability.
 	 *
 	 * The default `WP_REST_Posts_Controller` allows unauthenticated reads of
-	 * `publish` posts; guidelines store private data and require an
+	 * `publish` posts; knowledge posts store private data and require an
 	 * authenticated user with read access.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
@@ -28,8 +28,8 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 		$post_type = get_post_type_object( $this->post_type );
 		if ( ! current_user_can( $post_type->cap->read ) ) {
 			return new WP_Error(
-				'rest_forbidden',
-				__( 'Sorry, you are not allowed to view guidelines.', 'gutenberg' ),
+				'rest_cannot_read',
+				__( 'Sorry, you are not allowed to view knowledge.', 'gutenberg' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
@@ -60,8 +60,8 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	 * Gate per-item reads on the user-specific read capability.
 	 *
 	 * The default treats every `publish` post as universally readable;
-	 * guidelines reach the parent's checks only after `read_post` passes,
-	 * which factors in ownership and status.
+	 * knowledge posts reach the parent's checks only after `read_post`
+	 * passes, which factors in ownership and status.
 	 *
 	 * @param WP_Post $post Post object.
 	 * @return bool Whether the post can be read.
@@ -87,7 +87,7 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 			if ( 'private' !== $post_status ) {
 				return new WP_Error(
 					'rest_cannot_publish',
-					__( 'Sorry, you are only allowed to set status to private for guidelines.', 'gutenberg' ),
+					__( 'Sorry, you are only allowed to set knowledge to a private status.', 'gutenberg' ),
 					array( 'status' => rest_authorization_required_code() )
 				);
 			}
@@ -102,8 +102,10 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	 * (the parent would fall back to `draft`). Updates pass through so a
 	 * partial PATCH preserves the existing status.
 	 *
-	 * `wp_guideline_type` is optional on create. When omitted, the post
-	 * falls back to the default guideline taxonomy term `artifact`.
+	 * `wp_knowledge_type` is optional on create. When omitted, the post
+	 * falls back to the default knowledge taxonomy term `note`. That fallback
+	 * is applied by `wp_knowledge_ensure_default_type_term()` on the
+	 * `save_post_wp_knowledge` hook (see knowledge.php), not here.
 	 *
 	 * @param WP_REST_Request $request Request object.
 	 * @return stdClass|WP_Error Prepared post object or error.

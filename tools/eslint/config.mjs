@@ -126,6 +126,12 @@ const restrictedImports = [
 		message:
 			'Avoid using Base UI directly. Consider a new `@wordpress/ui` component instead.',
 	},
+	{
+		name: '@wordpress/theme',
+		importNames: [ 'privateApis' ],
+		message:
+			'Do not import private or unstable APIs from `@wordpress/theme`; these exports will be removed in WordPress 7.3.',
+	},
 ];
 
 const useIsomorphicLayoutEffectRestrictedImport = {

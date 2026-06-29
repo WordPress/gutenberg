@@ -217,8 +217,8 @@ require __DIR__ . '/overlay-patterns.php';
 
 // Guidelines (only load when experiment is enabled).
 if ( gutenberg_is_experiment_enabled( 'gutenberg-guidelines' ) ) {
-	require __DIR__ . '/experimental/guidelines/load.php';
-	require __DIR__ . '/experimental/guidelines/index.php';
+	require __DIR__ . '/experimental/knowledge/load.php';
+	require __DIR__ . '/experimental/knowledge/index.php';
 }
 
 // Content types (only load when experiment is enabled).

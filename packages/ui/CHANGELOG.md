@@ -8,7 +8,7 @@
 
 ### Internal
 
--   Restore private API access for `@wordpress/theme`'s `ThemeProvider` ([#79594](https://github.com/WordPress/gutenberg/pull/79594)).
+-   Add a temporary `@wordpress/theme` `ThemeProvider` compatibility fallback for older WordPress runtimes ([#79620](https://github.com/WordPress/gutenberg/pull/79620)).
 -   Enforce CSS Module class selector naming for component-library packages ([#79504](https://github.com/WordPress/gutenberg/pull/79504)).
 -   Update `@base-ui/react` from `1.5.0` to [`1.6.0`](https://github.com/mui/base-ui/releases/tag/v1.6.0) ([#79408](https://github.com/WordPress/gutenberg/pull/79408)).
 

@@ -1920,11 +1920,6 @@
 			"count": 2
 		}
 	},
-	"routes/guidelines/components/revision-history.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
 	"routes/guidelines/stage.tsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 1
