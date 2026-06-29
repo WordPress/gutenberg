@@ -175,7 +175,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 							role="menuitemcheckbox"
 							onClick={ handleResponsiveEditingChange }
 							info={ __(
-								'Edits apply only to the current state.'
+								'Style changes apply only to the current viewport.'
 							) }
 						>
 							{ __( 'Responsive editing' ) }
