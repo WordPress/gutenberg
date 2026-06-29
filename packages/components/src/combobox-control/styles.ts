@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import styled from '@emotion/styled';
-
-/**
- * Internal dependencies
- */
 import { Flex } from '../flex';
 import { space } from '../utils/space';
 
