@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Breadcrumbs, Page } from '@wordpress/admin-ui';
 import { useState } from '@wordpress/element';
 import { wordpress } from '@wordpress/icons';
-import { ThemeProvider, type CornerRadiusPreset } from '@wordpress/theme';
+import { ThemeProvider } from '@wordpress/theme';
 import {
 	Badge,
 	Button,
@@ -16,6 +16,7 @@ import {
 	Tabs,
 	Text,
 } from '@wordpress/ui';
+import type { CornerRadiusPreset } from '../../../packages/theme/src/types';
 
 import { withRouter } from '../../decorators/with-router';
 

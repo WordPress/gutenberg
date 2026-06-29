@@ -9,7 +9,7 @@
 
 ### Deprecations
 
--   Deprecate accessing `ThemeProvider` through `privateApis`; import `ThemeProvider` from `@wordpress/theme` instead ([#79620](https://github.com/WordPress/gutenberg/pull/79620)).
+-   Deprecate `@wordpress/theme` private APIs and root token/configuration type exports that are scheduled for deletion as the package approaches stabilization ([#79620](https://github.com/WordPress/gutenberg/pull/79620)).
 
 ### Bug Fixes
 

@@ -5,10 +5,15 @@ import { useThemeProviderStyles } from './use-theme-provider-styles';
 
 function warnThemeProviderPrivateApi() {
 	warning(
-		'ThemeProvider: Accessing `ThemeProvider` through `@wordpress/theme` private APIs is deprecated. Import `ThemeProvider` from `@wordpress/theme` instead.'
+		'ThemeProvider: Accessing `ThemeProvider` through `@wordpress/theme` private APIs is deprecated. Import `ThemeProvider` from `@wordpress/theme` instead; this private export is scheduled for deletion as `@wordpress/theme` approaches stabilization.'
 	);
 }
 
+/**
+ * @deprecated Private `@wordpress/theme` APIs are scheduled for deletion as the
+ * package approaches stabilization. Import public APIs from `@wordpress/theme`
+ * instead.
+ */
 export const privateApis = {};
 lock( privateApis, {
 	get ThemeProvider() {
