@@ -176,14 +176,14 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
                     data-wp-component="VStack"
                   >
                     <span
-                      class="components-truncate components-color-palette__custom-color-name emotion-14 emotion-5"
+                      class="style-truncate components-truncate components-color-palette__custom-color-name emotion-14 emotion-5"
                       data-wp-c16t="true"
                       data-wp-component="Truncate"
                     >
                       red
                     </span>
                     <span
-                      class="components-truncate components-color-palette__custom-color-value components-color-palette__custom-color-value--is-hex emotion-14 emotion-5"
+                      class="style-truncate components-truncate components-color-palette__custom-color-value components-color-palette__custom-color-value--is-hex emotion-14 emotion-5"
                       data-wp-c16t="true"
                       data-wp-component="Truncate"
                     >

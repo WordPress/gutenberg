@@ -487,4 +487,76 @@ describe( 'block parser', () => {
 			expect( parsed[ 0 ].attributes.content ).toBe( content );
 		} );
 	} );
+
+	describe( 'Custom HTML block static inner content', () => {
+		const htmlBlockSettings = {
+			apiVersion: 3,
+			category: 'text',
+			title: 'Custom HTML',
+			save: () => null,
+		};
+
+		const innerBlockSettings = {
+			apiVersion: 3,
+			category: 'text',
+			title: 'inner block',
+			attributes: {
+				content: {
+					type: 'string',
+					source: 'html',
+				},
+			},
+			save: ( { attributes } ) => attributes.content || null,
+		};
+
+		it( 'should retain innerContent and mark the block valid', () => {
+			registerBlockType( 'core/html', htmlBlockSettings );
+			registerBlockType( 'core/inner', innerBlockSettings );
+
+			const [ block ] = parse(
+				'<!-- wp:html -->\n' +
+					'<div><!-- wp:inner -->\nBananas\n<!-- /wp:inner --></div>\n' +
+					'<!-- /wp:html -->'
+			);
+
+			expect( block.name ).toBe( 'core/html' );
+			expect( block.isValid ).toBe( true );
+			expect( block.innerContent ).toEqual( [
+				'\n<div>',
+				null,
+				'</div>\n',
+			] );
+			expect( block.innerBlocks ).toHaveLength( 1 );
+			expect( block.innerBlocks[ 0 ].name ).toBe( 'core/inner' );
+			expect( block.innerBlocks[ 0 ].attributes.content ).toBe(
+				'Bananas'
+			);
+		} );
+
+		it( 'should serialize parsed static HTML interleaved with inner blocks back to identical markup', () => {
+			registerBlockType( 'core/html', htmlBlockSettings );
+			registerBlockType( 'core/inner', innerBlockSettings );
+
+			const content =
+				'<!-- wp:html -->\n' +
+				'<div class="banner"><h1>Static</h1><!-- wp:inner -->\n' +
+				'Editable\n' +
+				'<!-- /wp:inner --><footer>Footer</footer></div>\n' +
+				'<!-- /wp:html -->';
+
+			expect( serialize( parse( content ) ) ).toBe( content );
+		} );
+
+		it( 'should serialize parsed static HTML without inner blocks back to identical markup', () => {
+			registerBlockType( 'core/html', htmlBlockSettings );
+
+			const content =
+				'<!-- wp:html -->\n' +
+				'<h1>Some HTML code</h1>\n' +
+				'<div>This is a div</div>\n' +
+				'<!-- /wp:html -->';
+
+			expect( serialize( parse( content ) ) ).toBe( content );
+		} );
+	} );
 } );
