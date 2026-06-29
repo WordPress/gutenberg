@@ -195,6 +195,10 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 				$data['presentation'] = $widget_type->presentation;
 			}
 
+			if ( rest_is_field_included( 'category', $fields ) ) {
+				$data['category'] = $widget_type->category;
+			}
+
 			$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
 			$data    = $this->add_additional_fields_to_object( $data, $request );
 			$data    = $this->filter_response_by_context( $data, $context );
@@ -242,6 +246,13 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 						'description' => __( 'Authoring intent about how the widget wants to render.', 'gutenberg' ),
 						'type'        => array( 'string', 'null' ),
 						'enum'        => array_merge( WP_Widget_Type::PRESENTATION_VALUES, array( null ) ),
+						'context'     => array( 'view', 'edit', 'embed' ),
+						'readonly'    => true,
+					),
+
+					'category'      => array(
+						'description' => __( 'Grouping category for the widget type.', 'gutenberg' ),
+						'type'        => array( 'string', 'null' ),
 						'context'     => array( 'view', 'edit', 'embed' ),
 						'readonly'    => true,
 					),
