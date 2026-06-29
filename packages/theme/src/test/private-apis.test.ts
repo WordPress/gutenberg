@@ -3,24 +3,8 @@ import { privateApis } from '../private-apis';
 import { ThemeProvider } from '../theme-provider';
 import { useThemeProviderStyles } from '../use-theme-provider-styles';
 
-// eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair
-/* eslint-disable @wordpress/wp-global-usage */
-
-type ScriptDebugGlobal = typeof globalThis & {
-	SCRIPT_DEBUG?: boolean;
-};
-
-const scriptDebugGlobal = globalThis as ScriptDebugGlobal;
-
 describe( 'privateApis', () => {
-	const originalScriptDebug = scriptDebugGlobal.SCRIPT_DEBUG;
-
-	afterEach( () => {
-		scriptDebugGlobal.SCRIPT_DEBUG = originalScriptDebug;
-	} );
-
 	it( 'warns when accessing useThemeProviderStyles through private APIs', () => {
-		scriptDebugGlobal.SCRIPT_DEBUG = true;
 		const warn = jest
 			.spyOn( console, 'warn' )
 			.mockImplementation( () => {} );
@@ -41,7 +25,6 @@ describe( 'privateApis', () => {
 	} );
 
 	it( 'warns when accessing ThemeProvider through private APIs', () => {
-		scriptDebugGlobal.SCRIPT_DEBUG = true;
 		const warn = jest
 			.spyOn( console, 'warn' )
 			.mockImplementation( () => {} );
