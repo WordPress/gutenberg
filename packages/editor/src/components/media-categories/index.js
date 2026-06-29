@@ -159,10 +159,18 @@ const normalizePostId = ( postId ) => {
 };
 
 const saveAttachmentParent = ( attachmentId, postId ) =>
-	dispatch( coreStore ).saveEntityRecord( 'postType', 'attachment', {
-		id: attachmentId,
-		post: postId,
-	} );
+	// `throwOnError` so a failed REST write rejects (rather than being silently
+	// swallowed), letting the attach/detach handlers surface an error notice
+	// instead of a false success.
+	dispatch( coreStore ).saveEntityRecord(
+		'postType',
+		'attachment',
+		{
+			id: attachmentId,
+			post: postId,
+		},
+		{ throwOnError: true }
+	);
 
 const getAttachmentIds = ( mediaItems ) => [
 	...new Set(

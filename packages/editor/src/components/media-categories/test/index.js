@@ -104,7 +104,8 @@ describe( 'getInserterMediaCategories', () => {
 			{
 				id: 10,
 				post: 42,
-			}
+			},
+			{ throwOnError: true }
 		);
 		expect( saveEntityRecord ).toHaveBeenCalledWith(
 			'postType',
@@ -112,7 +113,8 @@ describe( 'getInserterMediaCategories', () => {
 			{
 				id: 11,
 				post: 42,
-			}
+			},
+			{ throwOnError: true }
 		);
 		expect( saveEntityRecord ).toHaveBeenCalledWith(
 			'postType',
@@ -120,7 +122,8 @@ describe( 'getInserterMediaCategories', () => {
 			{
 				id: 11,
 				post: 0,
-			}
+			},
+			{ throwOnError: true }
 		);
 		expect( saveEntityRecord ).toHaveBeenCalledTimes( 3 );
 	} );
