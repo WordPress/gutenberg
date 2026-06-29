@@ -10,9 +10,12 @@ A _host_ is any context that renders widgets: a dashboard, a sidebar, a plugin p
 
 ## What it exposes
 
-**Contract types** describe what a widget is: `WidgetType`, `WidgetName`, `WidgetIcon`, `WidgetRenderProps`, `ResolveWidgetModule`, `WidgetModuleRecord`. They are the shapes a host reads to discover and render a widget, defined here and re-exported nowhere else. How a widget is authored (its folder, `widget.json`, `widget.ts`, `render.tsx`) is covered by **System Architecture**.
+**Contract types** describe what a widget is: `WidgetType`, `WidgetName`, `WidgetIcon`, `WidgetRenderProps`, `ResolveWidgetModule`, `WidgetModuleRecord`. They are the shapes a host reads to discover and render a widget, defined here and re-exported nowhere else.
+One further export, `WidgetAttributeField< Item >`, is an authoring helper rather than a host-read shape: it narrows a DataViews `Field.id` to the keys of the widget's attribute object, so a typo'd field `id` is caught while authoring. How a widget is authored (its folder, `widget.json`, `widget.ts`, `render.tsx`) is covered by **System Architecture**.
 
-**Discovery** is `useWidgetTypes( records )`. It takes host-supplied widget-module records, imports each record's metadata module, and returns a `[ WidgetType[], isResolving ]` tuple, where `isResolving` is `true` while the records are still being imported. The hook reaches for no store or endpoint: the host fetches the records however it wants and passes them in.
+**Discovery** is `useWidgetTypes( records )`. It takes host-supplied widget-module records, imports each record's metadata module, and returns a `[ WidgetType[], isResolvingWidgetTypes ]` tuple, where `isResolvingWidgetTypes` is `true` before records are supplied (`null` or `undefined`) and while their metadata modules are still being imported.
+
+The hook reaches for no store or endpoint: the host fetches the records however it wants and passes them in.
 
 **Rendering** is `<WidgetRender />`. It resolves a `WidgetType.renderModule` through a host-provided `ResolveWidgetModule` and mounts the component with the `attributes` / `setAttributes` contract. Error handling and chrome stay with the host, and because the module is mounted lazily, the host must wrap it in a Suspense boundary.
 

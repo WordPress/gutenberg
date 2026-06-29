@@ -1681,11 +1681,6 @@
 			"count": 1
 		}
 	},
-	"packages/global-styles-ui/src/screen-color-palette.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/global-styles-ui/src/screen-colors.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -1923,11 +1918,6 @@
 		},
 		"react-hooks/refs": {
 			"count": 2
-		}
-	},
-	"routes/guidelines/components/revision-history.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
 		}
 	},
 	"routes/guidelines/stage.tsx": {
