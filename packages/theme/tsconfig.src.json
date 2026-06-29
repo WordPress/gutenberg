@@ -12,7 +12,6 @@
 		{ "path": "../deprecated" },
 		{ "path": "../element" },
 		{ "path": "../private-apis" },
-		{ "path": "../style-runtime" },
-		{ "path": "../warning" }
+		{ "path": "../style-runtime" }
 	]
 }
