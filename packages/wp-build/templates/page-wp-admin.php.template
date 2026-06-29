@@ -268,7 +268,7 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_render_page() {
 
 		#wpwrap {
 			overflow-y: auto;
-			background: #fff;
+			background: var(--wpds-color-background-surface-neutral-strong);
 		}
 		body {
 			/*
