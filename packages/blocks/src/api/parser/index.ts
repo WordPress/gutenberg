@@ -215,6 +215,19 @@ export function parseRawBlock(
 	);
 	parsedBlock.originalContent = normalizedBlock.innerHTML;
 
+	// The Custom HTML block keeps the interleaved static HTML fragments as
+	// the canonical source of its own markup, so the `save`-based validation
+	// and deprecation flows don't apply: serializing the parsed content
+	// reproduces the input by construction.
+	if ( blockType.name === 'core/html' ) {
+		parsedBlock.innerContent = normalizedBlock.innerContent ?? [
+			normalizedBlock.innerHTML,
+		];
+		parsedBlock.isValid = true;
+		parsedBlock.validationIssues = [];
+		return parsedBlock;
+	}
+
 	const validatedBlock = applyBlockValidation( parsedBlock, blockType );
 	const { validationIssues } = validatedBlock;
 

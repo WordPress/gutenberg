@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 15.22.0 (2026-06-24)
+
+### Internal
+
+- Replace `showdown` with `marked` for Markdown paste handling. Smaller bundle, modern maintenance, native types.
+
+## 15.21.1 (2026-06-16)
+
+## 15.21.0 (2026-06-10)
+
 ### Code Quality
 
 -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
@@ -15,6 +25,7 @@
 ### Bug Fix
 
 - Fix `mergeSchemas` in `getBlockContentSchemaFromTransforms` to preserve array values (e.g. `classes`) instead of converting them to objects with numeric string keys when merging schemas ([#70615](https://github.com/WordPress/gutenberg/pull/70615)).
+- Paste: Move leading and trailing spaces out of inline formatting elements (such as links) so the formatting wraps only its meaningful content. This corrects markup from editors like Google Docs that place the separating space inside the link.
 
 ## 15.19.0 (2026-05-14)
 

@@ -185,6 +185,33 @@ addFilter(
 );
 ```
 
+### `editor.CollaborationNotificationPreferenceDefaults`
+
+Use this filter to change the default real-time collaboration notification
+preferences. These defaults initialize the user preferences store, so saved
+user preferences take precedence.
+
+```js
+import { addFilter } from '@wordpress/hooks';
+
+addFilter(
+	'editor.CollaborationNotificationPreferenceDefaults',
+	'my-plugin/collaboration-notification-defaults',
+	( defaults, editor ) => {
+		if ( editor !== 'core/edit-post' ) {
+			return defaults;
+		}
+
+		return {
+			...defaults,
+			showCollaborationJoinNotifications: false,
+			showCollaborationLeaveNotifications: false,
+			showCollaborationPostSaveNotifications: false,
+		};
+	}
+);
+```
+
 ### `media.crossOrigin`
 
 This filter is used to set or modify the `crossOrigin` attribute for foreign-origin media elements (i.e., `<audio>`, `<img>`, `<link>`, `<script>`, `<video>`). See this [article](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/crossorigin) for more information on the `crossOrigin` attribute, its values, and how it applies to each element.

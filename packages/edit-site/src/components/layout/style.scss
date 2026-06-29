@@ -4,19 +4,20 @@
 
 .edit-site-layout {
 	height: 100%;
-	background: var(--wpds-color-bg-surface-neutral-weak);
-	color: var(--wpds-color-fg-content-neutral);
+	background: var(--wpds-color-background-surface-neutral-weak);
+	color: var(--wpds-color-foreground-content-neutral);
 	display: flex;
 	flex-direction: column;
 
 	// Show a dark background in "frame" mode to avoid edge artifacts.
 	&:not(.is-full-canvas) .editor-visual-editor {
-		background: var(--wpds-color-bg-surface-neutral-weak);
+		background: var(--wpds-color-background-surface-neutral-weak);
 	}
 }
 
 .edit-site-layout__content {
 	height: 100%;
+	min-height: 0;
 	flex-grow: 1;
 	display: flex;
 }
@@ -33,15 +34,16 @@
 	// This is only necessary for the exit animation
 	.edit-site-layout.is-full-canvas & {
 		position: fixed !important;
-		height: 100vh;
+		height: calc(100vh - var(--wp-admin--admin-bar--height, 0));
 		left: 0;
-		top: 0;
+		top: var(--wp-admin--admin-bar--height, 0);
 	}
 
 	.edit-site-layout__sidebar {
 		display: flex;
 		flex-direction: column;
 		height: 100%;
+		min-height: 0;
 	}
 
 	.resizable-editor__drag-handle {
@@ -84,7 +86,14 @@
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
-	background: var(--wpds-color-bg-surface-neutral);
+}
+
+// On mobile, the content surface lives on the scroll wrapper
+// (not the inner content element) so it also covers the wrapper's
+// reserved scrollbar gutter, preventing the theme background color from
+// bleeding through.
+.edit-site-sidebar__screen-wrapper:has(.edit-site-layout__mobile-content) {
+	background: var(--wpds-color-background-surface-neutral);
 }
 
 .edit-site-layout__canvas-container {
@@ -110,7 +119,7 @@
 	}
 
 	.edit-site-resizable-frame__inner {
-		color: var(--wpds-color-fg-content-neutral);
+		color: var(--wpds-color-foreground-content-neutral);
 	}
 
 	@include break-medium {
@@ -128,7 +137,7 @@
 			}
 
 			.edit-site-layout:not(.is-full-canvas) & {
-				border-radius: $radius-large;
+				border-radius: var(--wpds-border-radius-xl);
 			}
 
 			&:hover {
@@ -179,7 +188,7 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	view-transition-name: toggle;
 	/* stylelint-enable  */
 	position: relative;
-	color: var(--wpds-color-fg-interactive-neutral);
+	color: var(--wpds-color-foreground-interactive-neutral);
 	height: $header-height;
 	width: $header-height;
 	overflow: hidden;
@@ -187,12 +196,12 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background: var(--wpds-color-bg-surface-neutral-weak);
+	background: var(--wpds-color-background-surface-neutral-weak);
 	border-radius: 0;
 
 	&:hover,
 	&:active {
-		color: var(--wpds-color-fg-interactive-neutral-active);
+		color: var(--wpds-color-foreground-interactive-neutral-active);
 	}
 
 	&:focus-visible,
@@ -235,8 +244,8 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	left: auto;
 	right: 0;
 	width: $sidebar-width;
-	color: var(--wpds-color-fg-content-neutral);
-	background: var(--wpds-color-bg-surface-neutral-strong);
+	color: var(--wpds-color-foreground-content-neutral);
+	background: var(--wpds-color-background-surface-neutral-strong);
 
 	&:focus,
 	&:focus-within {
@@ -247,7 +256,7 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	&.is-entity-save-view-open {
 		&:focus,
 		&:focus-within {
-			top: 0;
+			top: var(--wp-admin--admin-bar--height, 0);
 		}
 	}
 
@@ -264,7 +273,7 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	overflow: hidden;
 	box-shadow: $elevation-x-small;
 	@include break-medium() {
-		border-radius: 8px;
+		border-radius: var(--wpds-border-radius-xl);
 		margin: $canvas-padding $canvas-padding $canvas-padding 0;
 	}
 }

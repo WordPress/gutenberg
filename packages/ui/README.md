@@ -46,7 +46,7 @@ import '@wordpress/theme/design-tokens.css';
 
 This stylesheet is universal and does not have a separate RTL version.
 
-Also, to ensure that portaled popovers appear correctly, add these isolation styles to your application's layout root element:
+To ensure that portaled popovers appear correctly, add these isolation styles to your application's layout root element:
 
 ```css
 .root {
@@ -54,12 +54,20 @@ Also, to ensure that portaled popovers appear correctly, add these isolation sty
 }
 ```
 
-Finally, in order to support overlay elements such as backdrops to correctly cover the whole browser viewport even when scrolled, add the following style to your global styles:
+In order to support overlay elements such as backdrops to correctly cover the whole browser viewport even when scrolled, add the following style to your global styles:
 
 ```css
 body {
 	position: relative;
 }
+```
+
+Components in this package use [CSS cascade layers](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Cascade_layers) when defining their styles, which can conflict in some applications which apply styles on bare element selectors (for example, `input { border-color: #aaa; }`). You should avoid these kinds of bare element selector styling if you can, preferring CSS classes instead where possible.
+
+If you need to customize the cascade layer order relative to your own CSS cascade layers, the component styles are scoped under the `wp-ui` layer, which you can use when defining your own layer order:
+
+```css
+@layer wp-ui, example-app;
 ```
 
 #### Mixing with `@wordpress/components`

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 14.49.0 (2026-06-24)
+
+## 14.48.1 (2026-06-16)
+
+## 14.48.0 (2026-06-10)
+
 ### New Features
 
 -   Added `UploadProgressSnackbar` component that shows a persistent snackbar with upload progress while media uploads are in progress. The snackbar shows a spinner during uploads and a checkmark briefly when all uploads complete.

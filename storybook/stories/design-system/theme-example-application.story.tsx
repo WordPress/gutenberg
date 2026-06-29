@@ -2,15 +2,16 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Breadcrumbs, Page } from '@wordpress/admin-ui';
 import { useState } from '@wordpress/element';
 import { wordpress } from '@wordpress/icons';
-import { privateApis as themeApis } from '@wordpress/theme';
-import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
+import { ThemeProvider } from '@wordpress/theme';
 import {
 	Badge,
 	Button,
 	Card,
 	Icon,
+	InputControl,
 	Link,
 	Notice,
+	SelectControl,
 	Stack,
 	Tabs,
 	Text,
@@ -18,12 +19,10 @@ import {
 
 import { withRouter } from '../../decorators/with-router';
 
-const { unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
-	'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
-	'@wordpress/theme'
-);
-
-const { ThemeProvider } = unlock( themeApis );
+type ThemeProviderCornerRadius = React.ComponentProps<
+	typeof ThemeProvider
+>[ 'cornerRadius' ];
+type CornerRadiusPreset = NonNullable< ThemeProviderCornerRadius >;
 
 const sidebarNavItems = [
 	'Dashboard',
@@ -32,6 +31,14 @@ const sidebarNavItems = [
 	'Comments',
 	'Appearance',
 	'Settings',
+];
+
+const siteLanguageOptions = [
+	{ value: 'en-US', label: 'English (United States)' },
+	{ value: 'en-GB', label: 'English (United Kingdom)' },
+	{ value: 'fr-FR', label: 'Français' },
+	{ value: 'de-DE', label: 'Deutsch' },
+	{ value: 'ja', label: '日本語' },
 ];
 
 const meta: Meta< typeof ThemeProvider > = {
@@ -47,13 +54,15 @@ export default meta;
 /**
  * A mock application page demonstrating how `ThemeProvider` affects
  * `@wordpress/ui` and `@wordpress/admin-ui` components in concert. Use the inline controls to adjust
- * the `primary` and `background` seed colors, and observe how every surface, text
+ * the `primary` and `background` seed colors, the corner radius preset, and observe how every surface, text
  * element, and interactive control adapts accordingly.
  */
 export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 	render: () => {
 		const [ primary, setPrimary ] = useState< string | undefined >();
 		const [ background, setBackground ] = useState< string | undefined >();
+		const [ cornerRadiusPreset, setCornerRadiusPreset ] =
+			useState< CornerRadiusPreset >( 'subtle' );
 
 		return (
 			<div>
@@ -101,16 +110,42 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 							}
 						/>
 					</label>
+					<label
+						style={ {
+							display: 'inline-flex',
+							alignItems: 'center',
+							gap: '6px',
+						} }
+					>
+						Corner radius
+						<select
+							value={ cornerRadiusPreset }
+							onChange={ ( e ) =>
+								setCornerRadiusPreset(
+									e.target.value as CornerRadiusPreset
+								)
+							}
+						>
+							<option value="none">None</option>
+							<option value="subtle">Subtle</option>
+							<option value="moderate">Moderate</option>
+							<option value="pronounced">Pronounced</option>
+						</select>
+					</label>
 					{ /* eslint-enable jsx-a11y/label-has-associated-control */ }
 				</div>
-				<ThemeProvider color={ { primary, background } } isRoot>
+				<ThemeProvider
+					color={ { primary, background } }
+					cornerRadius={ cornerRadiusPreset }
+					isRoot
+				>
 					<div
 						style={ {
 							display: 'grid',
 							gridTemplateColumns: '200px 1fr',
 							minHeight: '500px',
-							color: 'var(--wpds-color-fg-content-neutral)',
-							borderRadius: 'var(--wpds-border-radius-lg)',
+							color: 'var(--wpds-color-foreground-content-neutral)',
+							borderRadius: 'var(--wpds-border-radius-xl)',
 							border: 'var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak)',
 							overflow: 'hidden',
 						} }
@@ -119,7 +154,7 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 						<div
 							style={ {
 								backgroundColor:
-									'var(--wpds-color-bg-surface-neutral-weak)',
+									'var(--wpds-color-background-surface-neutral-weak)',
 								padding:
 									'var(--wpds-dimension-padding-xl) var(--wpds-dimension-padding-lg)',
 								borderInlineEnd:
@@ -190,6 +225,7 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 								direction="column"
 								gap="lg"
 								style={ {
+									width: '100%',
 									maxWidth: '640px',
 									marginInline: 'auto',
 								} }
@@ -213,22 +249,43 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 										<Stack direction="column" gap="md">
 											<Text>
 												Configure the basic settings for
-												your site. You can update your{ ' ' }
-												<Link href="#">site title</Link>
-												, tagline, and{ ' ' }
-												<Link href="#">
-													admin email address
-												</Link>{ ' ' }
-												at any time.
+												your site. The fields below
+												adopt the corner radius preset
+												alongside cards, buttons, and
+												other surfaces.
 											</Text>
-											<Text>
-												For more advanced options, visit
-												the{ ' ' }
-												<Link href="#">
-													developer documentation
-												</Link>
-												.
-											</Text>
+											<InputControl
+												label="Site title"
+												placeholder="My WordPress site"
+												defaultValue="My WordPress site"
+											/>
+											<InputControl
+												label="Tagline"
+												description="A short phrase shown below the site title."
+												placeholder="Just another WordPress site"
+											/>
+											<InputControl
+												label="Admin email address"
+												type="email"
+												placeholder="you@example.com"
+												defaultValue="admin@example.com"
+											/>
+											<SelectControl
+												label="Site language"
+												description="The default language for the site interface."
+												items={ siteLanguageOptions }
+												defaultValue={
+													siteLanguageOptions[ 0 ]
+												}
+											/>
+											<Stack
+												direction="row"
+												style={ {
+													justifyContent: 'flex-end',
+												} }
+											>
+												<Button>Save</Button>
+											</Stack>
 										</Stack>
 									</Card.Content>
 								</Card.Root>

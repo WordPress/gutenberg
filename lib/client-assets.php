@@ -143,12 +143,27 @@ function gutenberg_register_packages_styles( $styles ) {
 	// wp-customize-widgets: add wp-edit-blocks (custom handle not auto-inferred)
 	$styles->query( 'wp-customize-widgets', 'registered' )->deps[] = 'wp-edit-blocks';
 
+	// Register wp-theme (Design System tokens from @wordpress/theme) as a
+	// dependency of wp-base-styles so its `:root` token block loads
+	// everywhere wp-base-styles does, including the editor iframe via
+	// $wp_edit_blocks_dependencies below.
+	gutenberg_override_style(
+		$styles,
+		'wp-theme',
+		gutenberg_url( 'build/styles/theme/design-tokens' . $suffix . '.css' ),
+		array(),
+		$version
+	);
+	$styles->add_data( 'wp-theme', 'rtl', 'replace' );
+	$styles->add_data( 'wp-theme', 'suffix', $suffix );
+	$styles->add_data( 'wp-theme', 'path', gutenberg_dir_path() . 'build/styles/theme/design-tokens' . $suffix . '.css' );
+
 	// Register wp-base-styles and add it to the already registered wp-admin stylesheet
 	gutenberg_override_style(
 		$styles,
 		'wp-base-styles',
 		gutenberg_url( 'build/styles/base-styles/admin-schemes' . $suffix . '.css' ),
-		array(),
+		array( 'wp-theme' ),
 		$version
 	);
 	$styles->add_data( 'wp-base-styles', 'rtl', 'replace' );
@@ -180,6 +195,10 @@ function gutenberg_register_packages_styles( $styles ) {
 
 	// Only add CONTENT styles here that should be enqueued in the iframe!
 	$wp_edit_blocks_dependencies = array(
+		// Design System tokens load first so the `:root` CSS custom
+		// properties are defined before any consuming stylesheet reads
+		// them inside the editor iframe.
+		'wp-theme',
 		'wp-components',
 		// This need to be added before the block library styles,
 		// The block library styles override the "reset" styles.
@@ -361,10 +380,15 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 	$extension   = SCRIPT_DEBUG ? '.js' : '.min.js';
 	$vendors_dir = gutenberg_dir_path() . 'build/scripts/vendors/';
 
+	// When the React 19 experiment is enabled, register React 19 vendor
+	// scripts under the `react`, `react-dom`, and `react-jsx-runtime` handles.
+	$use_react_19 = gutenberg_is_experiment_enabled( 'gutenberg-react-19' );
+
 	$vendor_handles = array( 'react', 'react-dom', 'react-jsx-runtime' );
 
 	foreach ( $vendor_handles as $handle ) {
-		$asset_file   = $vendors_dir . $handle . '.min.asset.php';
+		$source       = $use_react_19 ? $handle . '-19' : $handle;
+		$asset_file   = $vendors_dir . $source . '.min.asset.php';
 		$asset        = file_exists( $asset_file ) ? require $asset_file : array();
 		$dependencies = $asset['dependencies'] ?? array();
 		$version      = $asset['version'] ?? '0';
@@ -372,7 +396,7 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 		gutenberg_override_script(
 			$scripts,
 			$handle,
-			gutenberg_url( 'build/scripts/vendors/' . $handle . $extension ),
+			gutenberg_url( 'build/scripts/vendors/' . $source . $extension ),
 			$dependencies,
 			$version
 		);

@@ -500,7 +500,7 @@ export const StyleBookPreview = ( {
 			return { examples: examplesForSinglePageUse };
 		}
 
-		if ( blockVariation ) {
+		if ( blockVariation && filteredExamples?.examples?.length ) {
 			return {
 				examples: applyBlockVariationsToExamples(
 					filteredExamples.examples,
