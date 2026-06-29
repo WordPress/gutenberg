@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import { getFileBasename } from '../../utils';
+import { parseHeicSequence } from '../../heic-parser';
 import type { QueueItemId } from '../types';
 
 /**
@@ -99,6 +100,42 @@ export async function convertGifToVideo(
 	// Pass the File straight through: the worker reads its bytes once, off
 	// the main thread, instead of materializing an ArrayBuffer here.
 	const buffer = await convert( id, file, outputMimeType, maxDimensions );
+
+	const ext = outputMimeType === 'video/webm' ? 'webm' : 'mp4';
+	const fileName = `${ getFileBasename( file.name ) }.${ ext }`;
+	return new File(
+		[ new Blob( [ buffer as ArrayBuffer ], { type: outputMimeType } ) ],
+		fileName,
+		{ type: outputMimeType }
+	);
+}
+
+/**
+ * Converts a HEIC/HEIF image sequence (Live Photo / burst) to a video file.
+ *
+ * The sequence is demuxed here on the main thread (keeping the heic-parser
+ * within the upload-media package), then its HEVC frames are decoded and
+ * re-encoded to a web-safe video in the worker. Throws an
+ * "Unsupported"-prefixed error (see `isUnsupportedConversionError`) when
+ * WebCodecs or the codecs are unavailable.
+ *
+ * @param id             Queue item ID.
+ * @param file           HEIC/HEIF sequence file object.
+ * @param outputMimeType Output MIME type ('video/mp4' or 'video/webm').
+ * @param maxDimensions  Optional maximum dimension for downscaling.
+ * @return Converted video file.
+ */
+export async function convertHeicSequenceToVideo(
+	id: QueueItemId,
+	file: File,
+	outputMimeType: string,
+	maxDimensions?: number
+) {
+	const sequence = parseHeicSequence( await file.arrayBuffer() );
+
+	const { convertHeicSequenceToVideo: convert } =
+		await loadVideoConversionModule();
+	const buffer = await convert( id, sequence, outputMimeType, maxDimensions );
 
 	const ext = outputMimeType === 'video/webm' ? 'webm' : 'mp4';
 	const fileName = `${ getFileBasename( file.name ) }.${ ext }`;

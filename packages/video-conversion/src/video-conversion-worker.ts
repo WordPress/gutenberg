@@ -6,7 +6,7 @@ import { wrap, terminate, type Remote } from '@wordpress/worker-threads';
 /**
  * Internal dependencies
  */
-import type { ItemId } from './types';
+import type { HeicSequenceInput, ItemId } from './types';
 import type { WorkerAPI } from './worker';
 import { workerCode } from './worker-code';
 
@@ -68,6 +68,31 @@ export async function convertGifToVideo(
 	return api.convertGifToVideo(
 		id,
 		gifSource,
+		outputMimeType,
+		maxDimensions
+	);
+}
+
+/**
+ * Converts a demuxed HEIC/HEIF image sequence to a video file using the
+ * worker pipeline.
+ *
+ * @param id             Item ID.
+ * @param sequence       Demuxed sequence (codec config + samples).
+ * @param outputMimeType Output MIME type ('video/mp4' or 'video/webm').
+ * @param maxDimensions  Optional maximum dimension for downscaling.
+ * @return Video file buffer.
+ */
+export async function convertHeicSequenceToVideo(
+	id: ItemId,
+	sequence: HeicSequenceInput,
+	outputMimeType: string,
+	maxDimensions?: number
+): Promise< ArrayBuffer > {
+	const api = getWorkerAPI();
+	return api.convertHeicSequenceToVideo(
+		id,
+		sequence,
 		outputMimeType,
 		maxDimensions
 	);

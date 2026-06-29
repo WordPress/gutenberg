@@ -14,7 +14,11 @@ import { expose } from '@wordpress/worker-threads';
 /**
  * Internal dependencies
  */
-import { cancelOperations, convertGifToVideo } from './index';
+import {
+	cancelOperations,
+	convertGifToVideo,
+	convertHeicSequenceToVideo,
+} from './index';
 
 /**
  * The API object that exposes the video conversion functions to the main thread.
@@ -22,6 +26,7 @@ import { cancelOperations, convertGifToVideo } from './index';
 const api = {
 	cancelOperations,
 	convertGifToVideo,
+	convertHeicSequenceToVideo,
 };
 
 expose( api );

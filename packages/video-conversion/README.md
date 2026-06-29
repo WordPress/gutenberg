@@ -54,6 +54,23 @@ _Returns_
 
 -   `Promise< ArrayBuffer >`: Encoded video buffer.
 
+### convertHeicSequenceToVideo
+
+Converts a demuxed HEIC/HEIF image sequence to a video file (MP4 or WebM).
+
+The sequence is demuxed on the main thread (so the heic-parser stays within the upload-media package); this worker decodes its HEVC frames and re-encodes them with mediabunny, exactly like the GIF path but sourced from a VideoDecoder instead of an ImageDecoder.
+
+_Parameters_
+
+-   _id_ `ItemId`: Item ID.
+-   _sequence_ `HeicSequenceInput`: Demuxed sequence (codec config + samples).
+-   _outputMimeType_ `string`: Output MIME type ('video/mp4' or 'video/webm').
+-   _maxDimensions_ `number`: Optional maximum dimension for downscaling.
+
+_Returns_
+
+-   `Promise< ArrayBuffer >`: Encoded video buffer.
+
 ### UNSUPPORTED_ERROR_PREFIX
 
 Message prefix for "unsupported but graceful" outcomes (no WebCodecs, unsupported codec). Consumers detect this prefix and fall back to uploading the original GIF instead of surfacing a hard error.

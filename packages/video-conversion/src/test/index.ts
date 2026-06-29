@@ -3,9 +3,11 @@
  */
 import {
 	convertGifToVideo,
+	convertHeicSequenceToVideo,
 	cancelOperations,
 	UNSUPPORTED_ERROR_PREFIX,
 } from '../index';
+import type { HeicSequenceInput } from '../types';
 
 // Configurable decoded-frame dimensions; the default (10x10) is even so the
 // canvas/resize path is skipped. Tests set odd values to exercise it.
@@ -52,6 +54,70 @@ class FakeImageDecoder {
 		return { image };
 	}
 	close() {}
+}
+
+/*
+ * Chunks fed to the FakeVideoDecoder (HEIC sequence path), so tests can
+ * assert key/delta typing and feed order.
+ */
+let mockEncodedChunks: Array< {
+	type: string;
+	timestamp: number;
+	duration: number;
+} > = [];
+// Whether the fake HEVC decoder reports the config as supported.
+let mockHevcSupported = true;
+
+class FakeEncodedVideoChunk {
+	type: string;
+	timestamp: number;
+	duration: number;
+	data: Uint8Array;
+	constructor( init: {
+		type: string;
+		timestamp: number;
+		duration: number;
+		data: Uint8Array;
+	} ) {
+		this.type = init.type;
+		this.timestamp = init.timestamp;
+		this.duration = init.duration;
+		this.data = init.data;
+		mockEncodedChunks.push( init );
+	}
+}
+
+/*
+ * Simulates a 1:1 all-intra HEVC decoder: each decoded chunk emits one frame
+ * (in feed order) whose timestamp mirrors the chunk's, so the generator can
+ * match it back to the source duration.
+ */
+class FakeVideoDecoder {
+	output: ( frame: FakeVideoFrame ) => void;
+	state = 'unconfigured';
+	decodeQueueSize = 0;
+	constructor( init: {
+		output: ( frame: FakeVideoFrame ) => void;
+		error: ( e: unknown ) => void;
+	} ) {
+		this.output = init.output;
+	}
+	static async isConfigSupported() {
+		return { supported: mockHevcSupported };
+	}
+	configure() {
+		this.state = 'configured';
+	}
+	decode( chunk: FakeEncodedVideoChunk ) {
+		const frame = new FakeVideoFrame();
+		frame.timestamp = chunk.timestamp;
+		mockDecodedFrames.push( frame );
+		this.output( frame );
+	}
+	async flush() {}
+	close() {
+		this.state = 'closed';
+	}
 }
 
 // Canvases/replacement frames created by the even-dimension resize path.
@@ -157,6 +223,8 @@ beforeEach( () => {
 	mockCanvases = [];
 	mockReplacementFrames = [];
 	mockVideoSamples = [];
+	mockEncodedChunks = [];
+	mockHevcSupported = true;
 	encodeGateResolve = undefined;
 	mockCanEncodeVideo.mockResolvedValue( true );
 	mockSourceAdd.mockReset();
@@ -169,7 +237,36 @@ beforeEach( () => {
 		FakeOffscreenCanvas;
 	( globalThis as Record< string, unknown > ).VideoFrame =
 		FakeReplacementVideoFrame;
+	( globalThis as Record< string, unknown > ).VideoDecoder = FakeVideoDecoder;
+	( globalThis as Record< string, unknown > ).EncodedVideoChunk =
+		FakeEncodedVideoChunk;
 } );
+
+/**
+ * Builds a demuxed sequence with `count` frames at 25fps (40000us each),
+ * a single sync sample followed by delta frames.
+ *
+ * @param count Number of frames.
+ */
+function buildSequence( count: number ): HeicSequenceInput {
+	const samples = [];
+	for ( let i = 0; i < count; i++ ) {
+		samples.push( {
+			data: new Uint8Array( [ i ] ),
+			isSync: i === 0,
+			timestampUs: i * 40000,
+			durationUs: 40000,
+		} );
+	}
+	return {
+		codecString: 'hvc1.1.6.L93.B0',
+		description: new Uint8Array( [ 1, 2, 3, 4 ] ),
+		codedWidth: 10,
+		codedHeight: 10,
+		rotation: 0,
+		samples,
+	};
+}
 
 const GIF_BUFFER = new Uint8Array( [ 0x47, 0x49, 0x46, 0x38 ] ).buffer;
 
@@ -334,5 +431,98 @@ describe( 'convertGifToVideo', () => {
 
 		expect( mockVideoSamples ).toHaveLength( 1 );
 		expect( mockVideoSamples[ 0 ].closed ).toBe( true );
+	} );
+} );
+
+describe( 'convertHeicSequenceToVideo', () => {
+	it( 'decodes every sequence frame and returns an ArrayBuffer', async () => {
+		const result = await convertHeicSequenceToVideo(
+			'seq-1',
+			buildSequence( 5 ),
+			'video/mp4'
+		);
+		expect( result ).toBeInstanceOf( ArrayBuffer );
+		expect( mockAddedSamples ).toHaveLength( 5 );
+	} );
+
+	it( 'feeds the first frame as a keyframe and the rest as delta', async () => {
+		await convertHeicSequenceToVideo(
+			'seq-key',
+			buildSequence( 3 ),
+			'video/mp4'
+		);
+
+		expect( mockEncodedChunks.map( ( c ) => c.type ) ).toEqual( [
+			'key',
+			'delta',
+			'delta',
+		] );
+	} );
+
+	it( 'carries each frame duration through to the encoder (seconds)', async () => {
+		await convertHeicSequenceToVideo(
+			'seq-ts',
+			buildSequence( 3 ),
+			'video/mp4'
+		);
+
+		// 40000us => 0.04s per frame; timestamps accumulate in seconds.
+		expect( mockAddedSamples[ 0 ].init.duration ).toBeCloseTo( 0.04, 6 );
+		expect( mockAddedSamples[ 0 ].init.timestamp ).toBeCloseTo( 0, 6 );
+		expect( mockAddedSamples[ 1 ].init.timestamp ).toBeCloseTo( 0.04, 6 );
+		expect( mockAddedSamples[ 2 ].init.timestamp ).toBeCloseTo( 0.08, 6 );
+	} );
+
+	it( 'rejects with Unsupported when the HEVC decoder is unavailable', async () => {
+		( globalThis as Record< string, unknown > ).VideoDecoder = undefined;
+		await expect(
+			convertHeicSequenceToVideo(
+				'seq-nodec',
+				buildSequence( 2 ),
+				'video/mp4'
+			)
+		).rejects.toThrow( new RegExp( `^${ UNSUPPORTED_ERROR_PREFIX }:` ) );
+	} );
+
+	it( 'rejects with Unsupported when the codec config is not supported', async () => {
+		mockHevcSupported = false;
+		await expect(
+			convertHeicSequenceToVideo(
+				'seq-unsupported',
+				buildSequence( 2 ),
+				'video/mp4'
+			)
+		).rejects.toThrow( new RegExp( `^${ UNSUPPORTED_ERROR_PREFIX }:` ) );
+	} );
+
+	it( 'rejects when cancelled before encoding completes', async () => {
+		mockCanEncodeVideo.mockImplementation(
+			() =>
+				new Promise< boolean >( ( resolve ) => {
+					encodeGateResolve = resolve;
+				} )
+		);
+		const promise = convertHeicSequenceToVideo(
+			'seq-cancel',
+			buildSequence( 4 ),
+			'video/mp4'
+		);
+		await new Promise( ( r ) => setTimeout( r, 0 ) );
+		await cancelOperations( 'seq-cancel' );
+		encodeGateResolve?.( true );
+		await expect( promise ).rejects.toThrow( /cancel/i );
+	} );
+
+	it( 'closes every VideoSample after adding it (no GC leak)', async () => {
+		await convertHeicSequenceToVideo(
+			'seq-close',
+			buildSequence( 4 ),
+			'video/mp4'
+		);
+
+		expect( mockVideoSamples ).toHaveLength( 4 );
+		for ( const sample of mockVideoSamples ) {
+			expect( sample.closed ).toBe( true );
+		}
 	} );
 } );
