@@ -155,6 +155,76 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 		$this->assertSame( $content, $autosave->post_content );
 	}
 
+	public function test_draft_autosave_does_not_create_revision_when_content_is_unchanged() {
+		$title   = 'Unchanged RTC draft title';
+		$content = '<!-- wp:paragraph --><p>Unchanged RTC draft content</p><!-- /wp:paragraph -->';
+		$post_id = $this->create_draft( $title, $content );
+
+		// Autosave with the exact same title and content as the saved post, while
+		// still sending meta as the editor does (the CRDT document changes on
+		// every autosave). The unchanged revisioned fields must win: a no-op
+		// autosave should not leave behind a revision that would later be flagged
+		// as "a more recent autosave" purely by its timestamp.
+		$response = $this->dispatch_autosave(
+			$post_id,
+			$title,
+			$content,
+			array(
+				self::CRDT_DOC_META_KEY => 'changed-crdt-doc',
+			)
+		);
+
+		$this->assertSame( 200, $response->get_status() );
+
+		$autosave = wp_get_post_autosave( $post_id, self::$author_id );
+		$this->assertFalse( $autosave, 'Expected no autosave revision for an unchanged autosave.' );
+	}
+
+	public function test_draft_autosave_creates_revision_when_revisioned_meta_changes() {
+		// `footnotes` is the real-world example of a revisioned meta key, but a
+		// dedicated key is registered here so the test does not depend on whether
+		// footnotes happens to be registered in the test bootstrap.
+		$meta_key = 'test_revisioned_meta';
+		register_post_meta(
+			'post',
+			$meta_key,
+			array(
+				'single'            => true,
+				'type'              => 'string',
+				'show_in_rest'      => true,
+				'revisions_enabled' => true,
+			)
+		);
+
+		$title   = 'RTC draft title with revisioned meta';
+		$content = '<!-- wp:paragraph --><p>RTC draft content with revisioned meta</p><!-- /wp:paragraph -->';
+		$post_id = $this->create_draft( $title, $content );
+		update_post_meta( $post_id, $meta_key, 'original meta value' );
+
+		// Autosave with identical title and content but a changed revisioned meta
+		// value. Because the meta is revisioned, the change is recoverable and must
+		// be stored as a revision rather than skipped as a no-op.
+		$response = $this->dispatch_autosave(
+			$post_id,
+			$title,
+			$content,
+			array(
+				$meta_key => 'updated meta value',
+			)
+		);
+
+		unregister_post_meta( 'post', $meta_key );
+
+		$this->assertSame( 200, $response->get_status() );
+
+		$autosave = wp_get_post_autosave( $post_id, self::$author_id );
+		$this->assertInstanceOf( WP_Post::class, $autosave );
+		$this->assertSame(
+			'updated meta value',
+			get_post_meta( $autosave->ID, $meta_key, true )
+		);
+	}
+
 	public function test_draft_autosave_does_not_store_crdt_doc_meta_on_revision() {
 		$original_title   = 'Original RTC draft title with CRDT meta';
 		$original_content = '<!-- wp:paragraph --><p>Original RTC draft content with CRDT meta</p><!-- /wp:paragraph -->';

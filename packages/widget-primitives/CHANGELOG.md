@@ -4,6 +4,13 @@
 
 ### New Features
 
+-   `WidgetAttributeField< Item >`: authoring helper narrowing a DataViews
+    `Field.id` to the widget's attribute keys.
+
+## 0.1.0 (2026-06-24)
+
+### New Features
+
 -   Initial experimental release.
 -   `<WidgetRender>`: host entry point that resolves a widget's render
     module and mounts it with the `attributes` / `setAttributes` render

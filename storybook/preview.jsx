@@ -116,6 +116,8 @@ export const parameters = {
 				],
 				'Icons',
 				'Design System',
+				'Widget Primitives',
+				[ 'Introduction', 'Anatomy', 'System Architecture' ],
 			];
 			const PRIORITIZED_MDX_DOCS = [ 'Introduction', 'Overview' ];
 

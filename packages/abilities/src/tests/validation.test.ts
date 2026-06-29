@@ -249,6 +249,16 @@ describe( 'validateValueFromSchema', () => {
 				' is not a valid hostname.'
 			);
 		} );
+
+		it( 'should validate URI format', () => {
+			const schema = { type: 'string', format: 'uri' };
+			expect(
+				validateValueFromSchema( 'https://example.com/path', schema )
+			).toBe( true );
+			expect( validateValueFromSchema( 'not a uri', schema ) ).toBe(
+				' is not a valid URI.'
+			);
+		} );
 	} );
 
 	describe( 'pattern validation', () => {

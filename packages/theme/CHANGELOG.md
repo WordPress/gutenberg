@@ -4,6 +4,20 @@
 
 ### Breaking Changes
 
+-   Remove `ThemeProvider` from the public package exports and restore access through `privateApis` ([#79594](https://github.com/WordPress/gutenberg/pull/79594)).
+
+### New Features
+
+-   Export `@wordpress/theme/utils` with a generated `var()` Sass function for compile-time design token fallback injection ([#79470](https://github.com/WordPress/gutenberg/pull/79470)).
+
+### Bug Fixes
+
+-   Mark the published `design-tokens.css` file as side-effectful so downstream bundlers preserve the documented CSS import ([#79551](https://github.com/WordPress/gutenberg/pull/79551)).
+
+## 0.16.0 (2026-06-24)
+
+### Breaking Changes
+
 -   Rename the `bg` and `fg` design token groups to `background` and `foreground`. All `--wpds-color-bg-*` custom properties are now `--wpds-color-background-*`, and all `--wpds-color-fg-*` custom properties are now `--wpds-color-foreground-*` ([#79098](https://github.com/WordPress/gutenberg/pull/79098)).
 -   Remove the `--wpds-dimension-base` design token. It was a primitive (the `4px` base unit) and is no longer exposed publicly ([#79254](https://github.com/WordPress/gutenberg/pull/79254)).
 -   Remove `privateApis` from the package exports due to API stabilization described in "New Features" ([#78958](https://github.com/WordPress/gutenberg/pull/78958)).

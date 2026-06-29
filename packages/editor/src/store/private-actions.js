@@ -17,34 +17,12 @@ import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
  */
 import isTemplateRevertable from './utils/is-template-revertable';
 import { buildRevisionsPageQuery } from './private-selectors';
+import {
+	getDeviceTypeByCanvasWidth,
+	VIEWPORT_STATE_BY_DEVICE_TYPE,
+} from '../utils/device-type';
 import { unlock } from '../lock-unlock';
 export * from '../dataviews/store/private-actions';
-
-const DEVICE_TYPE_BY_VIEWPORT_STATE = {
-	'@mobile': 'Mobile',
-	'@tablet': 'Tablet',
-};
-
-/**
- * Updates the editor preview device in response to a block-editor viewport
- * state signal.
- *
- * @param {Object}  options                   Viewport state change options.
- * @param {string}  options.viewport          Selected viewport state.
- * @param {boolean} options.showStateOnCanvas Whether canvas preview is enabled.
- */
-export const updateDeviceTypeForViewportState =
-	( { viewport = 'default', showStateOnCanvas = true } = {} ) =>
-	( { dispatch, registry } ) => {
-		if ( ! showStateOnCanvas ) {
-			return;
-		}
-
-		dispatch.setDeviceType(
-			DEVICE_TYPE_BY_VIEWPORT_STATE[ viewport ] ?? 'Desktop'
-		);
-		unlock( registry.dispatch( blockEditorStore ) ).resetZoomLevel();
-	};
 
 /**
  * Returns an action object used to set which template is currently being used/edited.
@@ -600,6 +578,34 @@ export function setShowStylebook( show ) {
 export function resetStylesNavigation() {
 	return {
 		type: 'RESET_STYLES_NAVIGATION',
+	};
+}
+
+/**
+ * Set the width of the canvas.
+ *
+ * @param {number} width The width of the canvas in pixels.
+ */
+export function setCanvasWidth( width ) {
+	return ( { dispatch, registry } ) => {
+		dispatch( {
+			type: 'SET_CANVAS_WIDTH',
+			width,
+		} );
+
+		// While Responsive editing is enabled, the canvas width also drives the
+		// viewport style state, whether changed via the device preview or by
+		// manually resizing the canvas.
+		if (
+			unlock( registry.select( blockEditorStore ) ).isResponsiveEditing()
+		) {
+			const deviceType = getDeviceTypeByCanvasWidth( width );
+			unlock(
+				registry.dispatch( blockEditorStore )
+			).setStyleStateViewport(
+				VIEWPORT_STATE_BY_DEVICE_TYPE[ deviceType ] ?? 'default'
+			);
+		}
 	};
 }
 
