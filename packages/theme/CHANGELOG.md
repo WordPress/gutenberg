@@ -4,12 +4,11 @@
 
 ### New Features
 
--   Restore `ThemeProvider` as a public package export while keeping temporary private API compatibility ([#79620](https://github.com/WordPress/gutenberg/pull/79620)).
 -   Export `@wordpress/theme/utils` with a generated `var()` Sass function for compile-time design token fallback injection ([#79470](https://github.com/WordPress/gutenberg/pull/79470)).
 
 ### Deprecations
 
--   Deprecate `@wordpress/theme` private APIs and root configuration type exports that are scheduled for deletion as the package approaches stabilization ([#79620](https://github.com/WordPress/gutenberg/pull/79620)).
+-   Temporarily restore previously removed private APIs to allow for an easier consumer migration. These private APIs are deprecated and scheduled for deletion as `@wordpress/theme` approaches stabilization ([#79594](https://github.com/WordPress/gutenberg/pull/79594), [#79620](https://github.com/WordPress/gutenberg/pull/79620)).
 
 ### Bug Fixes
 
