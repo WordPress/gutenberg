@@ -179,18 +179,16 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 					<Spinner />
 				</div>
 			) }
-			{ ! isLoading &&
-				! mediaList?.length &&
-				( category.attach && ! debouncedSearch ? (
-					// For an attach-capable source with no active search, an empty
-					// result means nothing is attached yet — clearer than the
-					// generic "no results found".
-					<div className="block-editor-inserter__no-results">
-						<p>{ __( 'No images attached to this post.' ) }</p>
-					</div>
-				) : (
-					<InserterNoResults />
-				) ) }
+			{ ! isLoading && ! mediaList?.length && (
+				<InserterNoResults>
+					{ category.attach && ! debouncedSearch
+						? // For an attach-capable source with no active search, an
+						  // empty result means nothing is attached yet — clearer
+						  // than the generic "no results found".
+						  __( 'No images attached to this post.' )
+						: __( 'No results found.' ) }
+				</InserterNoResults>
+			) }
 			{ !! mediaList?.length && (
 				// Keep the existing items visible while a refetch is in flight,
 				// dimming (and gently pulsing) them rather than clearing the grid,
