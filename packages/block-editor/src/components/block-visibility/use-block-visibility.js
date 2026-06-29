@@ -32,10 +32,10 @@ export default function useBlockVisibility( options = {} ) {
 		`(width <= ${ viewportBreakpoints.mobile })`,
 		view
 	);
-	const isTabletViewport = useMediaQuery(
-		`(${ viewportBreakpoints.mobile } < width <= ${ viewportBreakpoints.tablet })`,
-		view
-	);
+	const tabletMediaQuery = viewportBreakpoints.tablet
+		? `(${ viewportBreakpoints.mobile } < width <= ${ viewportBreakpoints.tablet })`
+		: '(width < 0px)';
+	const isTabletViewport = useMediaQuery( tabletMediaQuery, view );
 
 	/*
 	 * Priority:
@@ -45,11 +45,14 @@ export default function useBlockVisibility( options = {} ) {
 	let currentViewport;
 	if ( deviceType === BLOCK_VISIBILITY_VIEWPORTS.mobile.key ) {
 		currentViewport = BLOCK_VISIBILITY_VIEWPORTS.mobile.key;
-	} else if ( deviceType === BLOCK_VISIBILITY_VIEWPORTS.tablet.key ) {
+	} else if (
+		deviceType === BLOCK_VISIBILITY_VIEWPORTS.tablet.key &&
+		viewportBreakpoints.tablet
+	) {
 		currentViewport = BLOCK_VISIBILITY_VIEWPORTS.tablet.key;
 	} else if ( isMobileViewport ) {
 		currentViewport = BLOCK_VISIBILITY_VIEWPORTS.mobile.key;
-	} else if ( isTabletViewport ) {
+	} else if ( isTabletViewport && viewportBreakpoints.tablet ) {
 		currentViewport = BLOCK_VISIBILITY_VIEWPORTS.tablet.key;
 	} else {
 		currentViewport = BLOCK_VISIBILITY_VIEWPORTS.desktop.key;

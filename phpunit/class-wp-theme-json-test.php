@@ -1025,18 +1025,54 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_get_responsive_media_queries_merges_sanitized_settings_with_defaults_and_can_include_desktop() {
+	public function test_get_responsive_media_queries_uses_valid_custom_breakpoint_without_merging_defaults() {
 		$this->assertSame(
 			array(
 				'mobile'  => '@media (width <= 640px)',
-				'tablet'  => '@media (640px < width <= 782px)',
-				'desktop' => '@media (width > 782px)',
+				'desktop' => '@media (width > 640px)',
 			),
 			WP_Theme_JSON_Gutenberg::get_responsive_media_queries(
 				array(
 					'mobile'  => ' 640px ',
 					'tablet'  => 'calc(100% - 1rem)',
 					'desktop' => '1200px',
+				),
+				array(
+					'include_desktop' => true,
+				)
+			)
+		);
+	}
+
+	public function test_get_responsive_media_queries_uses_defaults_when_no_custom_breakpoints_are_valid() {
+		$this->assertSame(
+			array(
+				'mobile'  => '@media (width <= 480px)',
+				'tablet'  => '@media (480px < width <= 782px)',
+				'desktop' => '@media (width > 782px)',
+			),
+			WP_Theme_JSON_Gutenberg::get_responsive_media_queries(
+				array(
+					'mobile' => '100%',
+					'tablet' => 'auto',
+				),
+				array(
+					'include_desktop' => true,
+				)
+			)
+		);
+	}
+
+	public function test_get_responsive_media_queries_omits_tablet_when_its_breakpoint_is_not_larger_than_mobile() {
+		$this->assertSame(
+			array(
+				'mobile'  => '@media (width <= 64rem)',
+				'desktop' => '@media (width > 64rem)',
+			),
+			WP_Theme_JSON_Gutenberg::get_responsive_media_queries(
+				array(
+					'mobile' => '64rem',
+					'tablet' => '40rem',
 				),
 				array(
 					'include_desktop' => true,
@@ -1086,7 +1122,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_get_stylesheet_uses_custom_viewport_breakpoints_without_enforcing_order() {
+	public function test_get_stylesheet_omits_tablet_styles_when_its_breakpoint_is_not_larger_than_mobile() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -1099,12 +1135,12 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'styles'   => array(
 					'blocks' => array(
 						'core/group' => array(
-							'mobile' => array(
+							'@mobile' => array(
 								'color' => array(
 									'text' => 'red',
 								),
 							),
-							'tablet' => array(
+							'@tablet' => array(
 								'color' => array(
 									'text' => 'blue',
 								),
@@ -1128,8 +1164,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'@media (width <= 960px){:root :where(.wp-block-group){color: red;}}',
 			$stylesheet
 		);
-		$this->assertStringContainsString(
-			'@media (960px < width <= 640px){:root :where(.wp-block-group){color: blue;}}',
+		$this->assertStringNotContainsString(
+			'color: blue',
 			$stylesheet
 		);
 	}

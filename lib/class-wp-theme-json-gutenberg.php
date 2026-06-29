@@ -651,22 +651,69 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return array Responsive media queries.
 	 */
 	public static function get_responsive_media_queries( $viewport_settings = null, $options = array() ) {
-		$breakpoints = array_merge(
-			static::DEFAULT_VIEWPORT_BREAKPOINTS,
-			static::sanitize_viewport_settings( $viewport_settings )
+		if ( null === $viewport_settings ) {
+			$breakpoints = static::DEFAULT_VIEWPORT_BREAKPOINTS;
+		} else {
+			$breakpoints = static::sanitize_viewport_settings( $viewport_settings );
+
+			if ( empty( $breakpoints ) ) {
+				$breakpoints = static::DEFAULT_VIEWPORT_BREAKPOINTS;
+			} elseif ( empty( $breakpoints['mobile'] ) ) {
+				$breakpoints = array(
+					'mobile' => $breakpoints['tablet'],
+				);
+			}
+		}
+
+		$mobile_breakpoint = static::get_viewport_breakpoint_value_in_pixels(
+			$breakpoints['mobile']
 		);
+		$tablet_breakpoint = isset( $breakpoints['tablet'] )
+			? static::get_viewport_breakpoint_value_in_pixels(
+				$breakpoints['tablet']
+			)
+			: null;
+
+		if (
+			null === $mobile_breakpoint ||
+			null === $tablet_breakpoint ||
+			$mobile_breakpoint >= $tablet_breakpoint
+		) {
+			unset( $breakpoints['tablet'] );
+		}
 
 		$responsive_media_queries = array(
 			'@mobile' => "@media (width <= {$breakpoints['mobile']})",
-			'@tablet' => "@media ({$breakpoints['mobile']} < width <= {$breakpoints['tablet']})",
 		);
 
-		if ( ! empty( $options['include_desktop'] ) ) {
-			$responsive_media_queries = array(
-				'mobile'  => $responsive_media_queries['@mobile'],
-				'tablet'  => $responsive_media_queries['@tablet'],
-				'desktop' => "@media (width > {$breakpoints['tablet']})",
+		if ( isset( $breakpoints['tablet'] ) ) {
+			$responsive_media_queries['@tablet'] = sprintf(
+				'@media (%s < width <= %s)',
+				$breakpoints['mobile'],
+				$breakpoints['tablet']
 			);
+		}
+
+		if ( ! empty( $options['include_desktop'] ) ) {
+			$desktop_breakpoint = $breakpoints['mobile'];
+			if ( isset( $breakpoints['tablet'] ) ) {
+				$desktop_breakpoint = $breakpoints['tablet'];
+			}
+
+			$responsive_media_queries = array(
+				'mobile' => $responsive_media_queries['@mobile'],
+			);
+
+			if ( isset( $breakpoints['tablet'] ) ) {
+				$responsive_media_queries['tablet'] = sprintf(
+					'@media (%s < width <= %s)',
+					$breakpoints['mobile'],
+					$breakpoints['tablet']
+				);
+			}
+
+			$responsive_media_queries['desktop'] =
+				"@media (width > {$desktop_breakpoint})";
 		}
 
 		return $responsive_media_queries;
@@ -691,6 +738,36 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		return 1 === preg_match( '/^(?:\d+|\d*\.\d+)(?:px|em|rem)$/', $value );
+	}
+
+	/**
+	 * Converts a viewport breakpoint size to a pixel value for comparison.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param string $value Viewport breakpoint size.
+	 * @return float|null Viewport breakpoint size in pixels, or null when invalid.
+	 */
+	private static function get_viewport_breakpoint_value_in_pixels( $value ) {
+		if ( ! is_string( $value ) ) {
+			return null;
+		}
+
+		$value = trim( $value );
+		if (
+			! preg_match(
+				'/^(\d+|\d*\.\d+)(px|em|rem)$/',
+				$value,
+				$matches
+			)
+		) {
+			return null;
+		}
+
+		$number = (float) $matches[1];
+		$unit   = $matches[2];
+
+		return 'px' === $unit ? $number : $number * 16;
 	}
 
 	/**

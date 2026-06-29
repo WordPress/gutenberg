@@ -1882,6 +1882,42 @@ describe( 'private selectors', () => {
 			expect( isBlockHiddenAnywhere( state, 'block-1' ) ).toBe( false );
 		} );
 
+		it( 'should ignore viewport visibility for unavailable breakpoints', () => {
+			const state = {
+				settings: {
+					__experimentalFeatures: {
+						viewport: {
+							mobile: '480px',
+						},
+					},
+				},
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-with-visibility' },
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'block-1',
+							{
+								metadata: {
+									blockVisibility: {
+										viewport: {
+											tablet: false,
+										},
+									},
+								},
+							},
+						],
+					] ),
+				},
+			};
+
+			expect( isBlockHiddenAnywhere( state, 'block-1' ) ).toBe( false );
+		} );
+
 		it( 'should handle non-existent block gracefully', () => {
 			const state = {
 				blocks: {
@@ -1972,6 +2008,44 @@ describe( 'private selectors', () => {
 			expect(
 				isBlockHiddenAtViewport( state, 'block-1', 'Mobile' )
 			).toBe( true );
+			expect(
+				isBlockHiddenAtViewport( state, 'block-1', 'Tablet' )
+			).toBe( false );
+		} );
+
+		it( 'ignores viewport visibility for unavailable breakpoints', () => {
+			const state = {
+				settings: {
+					__experimentalFeatures: {
+						viewport: {
+							mobile: '480px',
+						},
+					},
+				},
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-with-visibility' },
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'block-1',
+							{
+								metadata: {
+									blockVisibility: {
+										viewport: {
+											tablet: false,
+										},
+									},
+								},
+							},
+						],
+					] ),
+				},
+			};
+
 			expect(
 				isBlockHiddenAtViewport( state, 'block-1', 'Tablet' )
 			).toBe( false );

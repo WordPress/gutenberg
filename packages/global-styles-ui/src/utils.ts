@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { areGlobalStylesEqual } from '@wordpress/global-styles-engine';
+import {
+	areGlobalStylesEqual,
+	getViewportBreakpoints,
+} from '@wordpress/global-styles-engine';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import { __ } from '@wordpress/i18n';
 
@@ -83,10 +86,20 @@ export function getValidPseudoStates( name: string ): StateDefinition[] {
 /**
  * Get the valid viewport state definitions.
  *
+ * @param viewportSettings
  * @return Array of valid viewport state definitions.
  */
-export function getValidViewportStates(): StateDefinition[] {
-	return RESPONSIVE_STATES;
+export function getValidViewportStates(
+	viewportSettings?: NonNullable<
+		GlobalStylesConfig[ 'settings' ]
+	>[ 'viewport' ]
+): StateDefinition[] {
+	const breakpoints = getViewportBreakpoints( viewportSettings );
+
+	return RESPONSIVE_STATES.filter(
+		( state ) =>
+			state.value !== '@tablet' || breakpoints.tablet !== undefined
+	);
 }
 
 /**

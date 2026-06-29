@@ -1126,7 +1126,7 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
-		it( 'uses custom viewport breakpoints without enforcing order', () => {
+		it( 'omits tablet responsive styles when the tablet breakpoint is not larger than mobile', () => {
 			const tree = {
 				settings: {
 					viewport: {
@@ -1137,12 +1137,12 @@ describe( 'global styles renderer', () => {
 				styles: {
 					blocks: {
 						'core/button': {
-							mobile: {
+							'@mobile': {
 								color: {
 									text: 'blue',
 								},
 							},
-							tablet: {
+							'@tablet': {
 								color: {
 									text: 'green',
 								},
@@ -1169,7 +1169,7 @@ describe( 'global styles renderer', () => {
 			);
 
 			expect( result ).toEqual(
-				'@media (width <= 960px){:root :where(.wp-block-button){color: blue;}}@media (960px < width <= 640px){:root :where(.wp-block-button){color: green;}}'
+				'@media (width <= 960px){:root :where(.wp-block-button){color: blue;}}'
 			);
 		} );
 

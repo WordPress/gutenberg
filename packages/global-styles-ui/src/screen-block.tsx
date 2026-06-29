@@ -4,7 +4,7 @@
 import { getBlockType } from '@wordpress/blocks';
 // @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { useContext, useMemo, useState } from '@wordpress/element';
+import { useContext, useEffect, useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
@@ -117,7 +117,21 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 		useState< string >( 'default' );
 	const [ selectedPseudoState, setSelectedPseudoState ] =
 		useState< string >( 'default' );
-	const validViewportStates = useMemo( () => getValidViewportStates(), [] );
+	const viewportSettings = mergedConfig.settings?.viewport;
+	const validViewportStates = useMemo(
+		() => getValidViewportStates( viewportSettings ),
+		[ viewportSettings ]
+	);
+	useEffect( () => {
+		if (
+			selectedViewport !== 'default' &&
+			! validViewportStates.some(
+				( state ) => state.value === selectedViewport
+			)
+		) {
+			setSelectedViewport( 'default' );
+		}
+	}, [ selectedViewport, validViewportStates ] );
 	const validPseudoStates = useMemo(
 		() => getValidPseudoStates( name ),
 		[ name ]
@@ -358,7 +372,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 				selectedViewport={ selectedViewport }
 				selectedState={ hasSelectedState ? stateParam : 'default' }
 				stateStyles={ hasSelectedState ? inheritedStyle : undefined }
-				viewportSettings={ mergedConfig.settings?.viewport }
+				viewportSettings={ viewportSettings }
 			/>
 			{ hasVariationsPanel && (
 				<div className="global-styles-ui-screen-variations">

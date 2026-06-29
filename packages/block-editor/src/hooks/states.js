@@ -1,6 +1,8 @@
 /**
  * WordPress dependencies
  */
+import { useSelect } from '@wordpress/data';
+import { getViewportBreakpoints } from '@wordpress/global-styles-engine';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -9,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 import StateControl from '../components/global-styles/state-control';
 import StateControlBadges from '../components/global-styles/state-control-badges';
 import { useToolsPanelDropdownMenuProps } from '../components/global-styles/utils';
+import { store as blockEditorStore } from '../store';
 
 export const PSEUDO_STATE_LABELS = {
 	':hover': __( 'Hover' ),
@@ -22,12 +25,20 @@ export const RESPONSIVE_STATE_LABELS = {
 	'@mobile': __( 'Mobile' ),
 };
 
-const DEVICE_STATE_OPTIONS = Object.entries( RESPONSIVE_STATE_LABELS ).map(
-	( [ value, label ] ) => ( {
-		value,
-		label,
-	} )
-);
+// Viewport states are selected globally via the editor's device preview.
+function getDeviceStateOptions( viewportSettings ) {
+	const breakpoints = getViewportBreakpoints( viewportSettings );
+
+	return Object.entries( RESPONSIVE_STATE_LABELS )
+		.filter(
+			( [ value ] ) =>
+				value !== '@tablet' || breakpoints.tablet !== undefined
+		)
+		.map( ( [ value, label ] ) => ( {
+			value,
+			label,
+		} ) );
+}
 
 // Keep in sync with WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS
 // and packages/global-styles-engine/src/core/render.tsx.
@@ -91,6 +102,13 @@ export function BlockStatesControl( { name, value, onChange } ) {
  */
 export function BlockStateBadges( { name, value, isResponsiveEditing } ) {
 	const pseudoStateOptions = getPseudoStateOptions( name );
+	const deviceStateOptions = useSelect( ( select ) => {
+		const settings = select( blockEditorStore ).getSettings();
+
+		return getDeviceStateOptions(
+			settings.__experimentalFeatures?.viewport
+		);
+	}, [] );
 
 	if ( ! pseudoStateOptions.length && ! isResponsiveEditing ) {
 		return null;
@@ -98,7 +116,7 @@ export function BlockStateBadges( { name, value, isResponsiveEditing } ) {
 
 	return (
 		<StateControlBadges
-			viewportStates={ isResponsiveEditing ? DEVICE_STATE_OPTIONS : [] }
+			viewportStates={ isResponsiveEditing ? deviceStateOptions : [] }
 			pseudoStates={ pseudoStateOptions }
 			viewportValue={ value?.viewport ?? DEFAULT_STATE_VALUE }
 			pseudoStateValue={ value?.pseudo ?? DEFAULT_STATE_VALUE }

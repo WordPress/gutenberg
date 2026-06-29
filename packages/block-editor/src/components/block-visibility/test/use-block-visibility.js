@@ -249,6 +249,37 @@ describe( 'useBlockVisibility', () => {
 			expect( result.current.currentViewport ).toBe( 'tablet' );
 			expect( result.current.isBlockCurrentlyHidden ).toBe( true );
 		} );
+
+		it( 'should not use tablet viewport detection when the tablet breakpoint is not larger than mobile', () => {
+			setupViewport( {
+				isMobileViewport: false,
+				isTabletViewport: true,
+			} );
+
+			const { result } = renderHook( () =>
+				useBlockVisibility( {
+					blockVisibility: { viewport: { tablet: false } },
+					deviceType: 'desktop',
+					viewportSettings: {
+						mobile: '960px',
+						tablet: '640px',
+					},
+				} )
+			);
+
+			expect( useMediaQuery ).toHaveBeenNthCalledWith(
+				1,
+				'(width <= 960px)',
+				window
+			);
+			expect( useMediaQuery ).toHaveBeenNthCalledWith(
+				2,
+				'(width < 0px)',
+				window
+			);
+			expect( result.current.currentViewport ).toBe( 'desktop' );
+			expect( result.current.isBlockCurrentlyHidden ).toBe( false );
+		} );
 	} );
 
 	describe( 'Block visibility (hidden everywhere)', () => {

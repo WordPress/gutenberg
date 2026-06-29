@@ -163,6 +163,30 @@ describe( 'Post actions', () => {
 				'Tablet'
 			);
 		} );
+
+		it( 'does not set a tablet canvas width when the tablet breakpoint is not larger than mobile', () => {
+			const registry = createRegistryWithStores();
+
+			registry.dispatch( blockEditorStore ).updateSettings( {
+				__experimentalFeatures: {
+					viewport: {
+						mobile: '64rem',
+						tablet: '40rem',
+					},
+				},
+			} );
+
+			unlock( registry.dispatch( editorStore ) ).setDeviceType(
+				'Tablet'
+			);
+
+			expect(
+				unlock( registry.select( editorStore ) ).getCanvasWidth()
+			).toBe( undefined );
+			expect( registry.select( editorStore ).getDeviceType() ).toBe(
+				'Desktop'
+			);
+		} );
 	} );
 
 	describe( 'savePost()', () => {
