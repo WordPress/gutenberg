@@ -506,6 +506,8 @@ $block-inserter-tabs-height: 44px;
 
 	.block-editor-inserter__media-panel-attach {
 		justify-content: center;
+		// Keep full height; as a flex child it would otherwise shrink to its content.
+		flex-shrink: 0;
 		margin-bottom: $grid-unit-20;
 		@include break-medium() {
 			margin: 0 $grid-unit-30 $grid-unit-20;

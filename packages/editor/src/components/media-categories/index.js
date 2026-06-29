@@ -205,12 +205,12 @@ const invalidateAttachedImagesQueries = ( postId, query = {} ) => {
 const getAttachedImagesCategory = ( postId ) => ( {
 	name: 'attached-images',
 	labels: {
-		name: __( 'Attachments' ),
+		name: __( 'Attached images' ),
 		search_items: __( 'Search attachments' ),
 	},
 	mediaType: 'image',
 	// Helper text shown beneath the search field to clarify what this source is,
-	// since "Attachments" alone can read as ambiguous next to "Images".
+	// since the label alone can read as ambiguous next to "Images".
 	description: __( 'Images attached to the current post.' ),
 	// Always show the source in the tab list, like Openverse, so it remains
 	// discoverable and the first image can be attached even with none yet.

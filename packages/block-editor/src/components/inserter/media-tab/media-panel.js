@@ -12,7 +12,6 @@ import { useCallback, useMemo, useState } from '@wordpress/element';
 import { useDebouncedInput } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-import { plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -52,7 +51,6 @@ function AttachImagesButton( { mediaType, onSelect } ) {
 						__next40pxDefaultSize
 						className="block-editor-inserter__media-panel-attach"
 						data-unstable-ignore-focus-outside-for-relatedtarget=".media-modal"
-						icon={ plus }
 						onClick={ ( event ) => {
 							event.target.focus();
 							open();
