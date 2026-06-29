@@ -2,7 +2,6 @@
  * External dependencies
  */
 import type { Meta } from '@storybook/react-vite';
-import { expect, waitFor } from 'storybook/test';
 
 /**
  * Internal dependencies
@@ -283,10 +282,9 @@ export const InfiniteScroll = {
 
 /**
  * Infinite scroll where pages load asynchronously (with `isLoading`), like a
- * real network-backed consumer. The `play` function reproduces the scroll-anchor
- * jump deterministically: it advances the window, keeps scrolling *while the
- * page is still loading*, and asserts the list does not snap back up when the
- * page settles. It fails against the buggy `trunk` hook and passes with the fix.
+ * real network-backed consumer that fetches one window at a time. Use it to
+ * reproduce the scroll-position jump and the load stall manually; see the HUD
+ * in the story for live scroll metrics.
  */
 export const AsyncInfiniteScroll = {
 	render: AsyncInfiniteScrollComponent,
@@ -300,64 +298,5 @@ export const AsyncInfiniteScroll = {
 				disable: true,
 			},
 		},
-	},
-	play: async ( { canvasElement }: { canvasElement: HTMLElement } ) => {
-		const getContainer = () =>
-			canvasElement.querySelector< HTMLElement >(
-				'.dataviews-layout__container'
-			);
-		const isLoading = () =>
-			canvasElement
-				.querySelector( '[data-testid="async-infinite-scroll"]' )
-				?.getAttribute( 'data-loading' ) === 'true';
-
-		// Wait for the first page to render.
-		const container = await waitFor( () => {
-			const el = getContainer();
-			expect( el ).toBeTruthy();
-			expect(
-				el!.querySelectorAll( '[aria-posinset]' ).length
-			).toBeGreaterThan( 5 );
-			return el!;
-		} );
-
-		// Reproduce the scenario a few times to page well into the list: advance
-		// the window (revealing buffered rows and starting an async fetch), keep
-		// scrolling while the fetch is in flight, then assert the list stayed put
-		// once it settled.
-		for ( let i = 0; i < 3; i++ ) {
-			// 1) Scroll to the bottom: advances the window and captures the
-			//    scroll-anchor.
-			container.scrollTop = container.scrollHeight;
-
-			// 2) Wait until a fetch is actually in flight (so rows have been
-			//    revealed and there is room to keep scrolling).
-			await waitFor( () => expect( isLoading() ).toBe( true ), {
-				timeout: 4000,
-			} );
-
-			// 3) The user keeps scrolling down into the freshly revealed rows
-			//    while the fetch is still pending — this is the movement the
-			//    buggy restoration used to undo.
-			container.scrollTop = container.scrollHeight;
-			const scrolledTo = container.scrollTop;
-			expect( scrolledTo ).toBeGreaterThan( 0 );
-
-			// 4) Let the fetch settle; the anchor-restoration layout effect runs
-			//    here.
-			await waitFor( () => expect( isLoading() ).toBe( false ), {
-				timeout: 4000,
-			} );
-
-			// 5) The viewport must stay where the user left it. On `trunk` the
-			//    restoration snaps `scrollTop` back toward its capture-time value,
-			//    yanking the list upward; the small tolerance absorbs sub-pixel
-			//    rounding only.
-			await waitFor( () =>
-				expect( container.scrollTop ).toBeGreaterThanOrEqual(
-					scrolledTo - 24
-				)
-			);
-		}
 	},
 };

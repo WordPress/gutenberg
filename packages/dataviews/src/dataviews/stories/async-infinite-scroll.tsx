@@ -26,27 +26,18 @@ const data = Array.from( { length: 8 }, ( _, batch ) =>
 ).flat();
 
 const PAGE = 20;
-// Simulated per-page network latency. The jump only reproduces while the user
-// keeps scrolling *during* this window, so it is deliberately long enough to
-// scroll within — both by hand and from the `play` function.
-const LOAD_DELAY_MS = 1000;
+// Simulated per-page network latency.
+const LOAD_DELAY_MS = 800;
 
 /**
- * Reproduces a real-world infinite-scroll consumer (e.g. a notifications list)
- * that the static `InfiniteScroll` story does not: pages are revealed one at a
- * time *asynchronously* and `isLoading` toggles for each page.
+ * A realistic network-backed infinite-scroll consumer (e.g. the experimental
+ * media modal): there is no prefetch buffer. The hook drives pagination by
+ * advancing `view.startPosition`; the consumer fetches exactly the window it was
+ * asked for, toggling `isLoading` while that request is in flight, and reports
+ * the *true* server total so the hook knows more remains.
  *
- * The bug: the scroll handler captures a scroll-anchor the instant it advances
- * the window, but the anchor is only restored on a later render gated on
- * `isLoading`. When pages load over the network the user keeps scrolling in that
- * gap, and the restoration can't tell that user-driven movement from a
- * content-driven shift — so it "corrects" it, snapping the list back to where
- * the anchor sat at capture time and undoing the scrolling done while loading.
- *
- * Scroll down continuously (the HUD shows the live `scrollTop`): on `trunk` the
- * number jerks back upward as each page settles; with the fix it keeps climbing.
- * The `play` function in `index.story.tsx` reproduces and asserts this without
- * relying on hand-timed scrolling.
+ * Use the HUD (top-right) to watch `scrollTop` / `scrollHeight` / `isLoading`
+ * while reproducing.
  */
 const AsyncInfiniteScroll = () => {
 	const [ view, setView ] = useState< View >( {
@@ -62,13 +53,27 @@ const AsyncInfiniteScroll = () => {
 		infiniteScrollEnabled: true,
 	} );
 
-	// A "server" that reveals rows one page at a time, asynchronously, keeping
-	// two pages buffered ahead of the scroll window. The buffer is what gives the
-	// user rows to scroll into while the next page is still loading — i.e. the
-	// async gap the anchor restoration mishandles.
+	// The "server": how many rows have been delivered so far, and whether a
+	// request for the current window is in flight.
 	const [ loadedCount, setLoadedCount ] = useState( PAGE );
 	const [ isLoading, setIsLoading ] = useState( false );
-	const loadingRef = useRef( false );
+
+	const startPosition = view.startPosition ?? 1;
+	const perPage = view.perPage ?? PAGE;
+	// Rows required to fill the window the hook is currently asking for.
+	const needed = Math.min( startPosition - 1 + perPage, data.length );
+
+	useEffect( () => {
+		if ( needed <= loadedCount ) {
+			return undefined;
+		}
+		setIsLoading( true );
+		const timer = setTimeout( () => {
+			setLoadedCount( needed );
+			setIsLoading( false );
+		}, LOAD_DELAY_MS );
+		return () => clearTimeout( timer );
+	}, [ needed, loadedCount ] );
 
 	const loadedData = useMemo(
 		() => data.slice( 0, loadedCount ),
@@ -78,34 +83,22 @@ const AsyncInfiniteScroll = () => {
 		() => filterSortAndPaginate( loadedData, view, fields ),
 		[ loadedData, view ]
 	);
+	// Report the true server total (not just what's loaded) so infinite scroll
+	// keeps requesting until the dataset is exhausted.
+	const serverPaginationInfo = useMemo(
+		() => ( { ...paginationInfo, totalItems: data.length } ),
+		[ paginationInfo ]
+	);
 
-	const startPosition = view.startPosition ?? 1;
-	useEffect( () => {
-		if (
-			startPosition + PAGE * 2 <= loadedCount ||
-			loadingRef.current ||
-			loadedCount >= data.length
-		) {
-			return undefined;
-		}
-		loadingRef.current = true;
-		setIsLoading( true );
-		const timer = setTimeout( () => {
-			setLoadedCount( ( count ) =>
-				Math.min( count + PAGE, data.length )
-			);
-			setIsLoading( false );
-			loadingRef.current = false;
-		}, LOAD_DELAY_MS );
-		return () => clearTimeout( timer );
-	}, [ startPosition, loadedCount ] );
-
-	// Live scroll-position read-out so the jump is observable as a number, not
-	// just a flicker. The scrollable element is the internal
+	// Live scroll-position read-out. The scrollable element is the internal
 	// `.dataviews-layout__container`; scroll events don't bubble but do fire in
 	// the capture phase, so we can observe it from the wrapper.
 	const wrapperRef = useRef< HTMLDivElement >( null );
-	const [ scrollTop, setScrollTop ] = useState( 0 );
+	const [ metrics, setMetrics ] = useState( {
+		scrollTop: 0,
+		scrollHeight: 0,
+		clientHeight: 0,
+	} );
 	useEffect( () => {
 		const wrapper = wrapperRef.current;
 		if ( ! wrapper ) {
@@ -116,12 +109,19 @@ const AsyncInfiniteScroll = () => {
 			if (
 				target?.classList?.contains( 'dataviews-layout__container' )
 			) {
-				setScrollTop( Math.round( target.scrollTop ) );
+				setMetrics( {
+					scrollTop: Math.round( target.scrollTop ),
+					scrollHeight: Math.round( target.scrollHeight ),
+					clientHeight: Math.round( target.clientHeight ),
+				} );
 			}
 		};
 		wrapper.addEventListener( 'scroll', onScroll, true );
 		return () => wrapper.removeEventListener( 'scroll', onScroll, true );
 	}, [] );
+
+	const distanceToBottom =
+		metrics.scrollHeight - metrics.clientHeight - metrics.scrollTop;
 
 	return (
 		<div
@@ -153,13 +153,19 @@ const AsyncInfiniteScroll = () => {
 					pointerEvents: 'none',
 				} }
 			>
-				{ `scrollTop: ${ scrollTop }px\n${
-					isLoading ? 'loading next page…' : 'idle'
-				}\nloaded: ${ loadedCount } / ${ data.length }` }
+				{ `${
+					isLoading ? 'loading…' : 'idle'
+				}\nloaded: ${ loadedCount } / ${
+					data.length
+				}\nstartPosition: ${ startPosition }\nscrollTop: ${
+					metrics.scrollTop
+				}\nscrollHeight: ${
+					metrics.scrollHeight
+				}\nto bottom: ${ distanceToBottom }px` }
 			</div>
 			<DataViews
 				getItemId={ ( item ) => item.id.toString() }
-				paginationInfo={ paginationInfo }
+				paginationInfo={ serverPaginationInfo }
 				data={ shownData }
 				view={ view }
 				fields={ fields }

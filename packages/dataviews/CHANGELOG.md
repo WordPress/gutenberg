@@ -8,7 +8,7 @@
 
 ### Bug Fix
 
-- DataViews: Stop infinite-scroll anchor restoration from undoing the user's scrolling while a page loads asynchronously, which made the list jump upward as each page settled.
+- DataViews: Fix infinite scroll when pages load asynchronously: the list no longer jumps while a page loads, no longer stalls at the bottom, and the scroll position no longer bounces as the loading spinner appears and disappears.
 - DataForm panel layout: use `overflow: clip` on field controls so focus rings of inner elements are no longer clipped. [#79275](https://github.com/WordPress/gutenberg/pull/79275)
 
 ### Code Quality
