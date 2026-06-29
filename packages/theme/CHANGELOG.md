@@ -6,10 +6,6 @@
 
 -   Export `@wordpress/theme/utils` with a generated `var()` Sass function for compile-time design token fallback injection ([#79470](https://github.com/WordPress/gutenberg/pull/79470)).
 
-### Deprecations
-
--   Deprecate the root `CornerRadiusPreset` type export. Derive it from `ThemeProvider`'s `cornerRadius` prop instead. This type export will be removed in WordPress 7.3 ([#79620](https://github.com/WordPress/gutenberg/pull/79620)).
-
 ### Bug Fixes
 
 -   Mark the published `design-tokens.css` file as side-effectful so downstream bundlers preserve the documented CSS import ([#79551](https://github.com/WordPress/gutenberg/pull/79551)).
