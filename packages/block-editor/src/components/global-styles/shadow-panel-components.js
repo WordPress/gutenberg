@@ -119,7 +119,12 @@ export function ShadowIndicator( { type, label, isActive, onSelect, shadow } ) {
 	);
 }
 
-export function ShadowPopover( { shadow, onShadowChange, settings } ) {
+export function ShadowPopover( {
+	shadow,
+	onShadowChange,
+	settings,
+	className,
+} ) {
 	const popoverProps = {
 		placement: 'left-start',
 		offset: 36,
@@ -129,7 +134,10 @@ export function ShadowPopover( { shadow, onShadowChange, settings } ) {
 	return (
 		<Dropdown
 			popoverProps={ popoverProps }
-			className="block-editor-global-styles__shadow-dropdown"
+			className={ clsx(
+				'block-editor-global-styles__shadow-dropdown',
+				className
+			) }
 			renderToggle={ renderShadowToggle( shadow, onShadowChange ) }
 			renderContent={ () => (
 				<DropdownContentWrapper paddingSize="medium">

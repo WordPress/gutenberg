@@ -1,0 +1,131 @@
+// Inherited Global Styles values — visual treatment for inspector
+// control labels.
+//
+// `.is-inherited-from-global-styles` marks controls that are displaying
+// inherited values. `.has-local-override-from-global-styles` marks controls
+// that locally override inherited values. The states are mutually exclusive.
+
+.is-inherited-from-global-styles {
+	.components-base-control__label,
+	.block-editor-panel-color-gradient-settings__color-name,
+	.block-editor-global-styles-background-panel__inspector-media-replace-title {
+		position: relative;
+	}
+
+	.components-base-control__label,
+	.block-editor-global-styles-background-panel__inspector-media-replace-title {
+		text-decoration-line: underline;
+		text-decoration-style: dotted;
+		text-decoration-thickness: 1px;
+		text-underline-offset: 0.2em;
+	}
+
+	.block-editor-panel-color-gradient-settings__color-name {
+		border-bottom: 1px dotted currentColor;
+	}
+}
+
+// The tooltip target overlays the visible label text only. This keeps
+// the inherited-value tooltip scoped to labels without wrapping the
+// full control or intercepting nested control tooltips.
+.global-styles-inheritance-tooltip-anchor {
+	display: inline-block;
+	position: absolute;
+	inset: 0;
+}
+
+.global-styles-inheritance-tooltip-anchor__text {
+	visibility: hidden;
+}
+
+.global-styles-inheritance-tooltip-content__line {
+	display: block;
+}
+
+// Local-override reset button — portaled into the label DOM node so the
+// trigger sits inline with the label text. At rest it shows the blue dot
+// signalling a local override; on hover/focus the dot is swapped for the
+// `reset` (dash) icon and a "Reset to inherited value" tooltip.
+.has-local-override-from-global-styles__reset {
+	display: inline-flex !important;
+	align-items: center;
+	justify-content: center;
+	vertical-align: middle;
+	position: relative;
+	margin-inline-start: 6px;
+
+	// Override the default IconButton chrome so the trigger appears as a
+	// tight inline circle that never shifts the sibling label text.
+	min-width: 14px !important;
+	width: 14px !important;
+	height: 14px !important;
+	padding: 0 !important;
+	border-radius: 50% !important;
+	background: transparent !important;
+	box-shadow: none !important;
+	overflow: hidden;
+
+	// `<Button>` does not preserve text-transform overrides from its parent
+	// label. Belt-and-braces: ensure the trigger never inherits an uppercase
+	// transform from a label that happens to use one.
+	text-transform: none;
+	letter-spacing: normal;
+
+	// Some `<label>` rules style descendant text/buttons (legacy
+	// pre-existing CSS). Reset to the design-system pointer token.
+	cursor: var(--wpds-cursor-control);
+
+	&:hover,
+	&:focus {
+		background: transparent !important;
+
+		.has-local-override-from-global-styles__dot {
+			display: none;
+		}
+
+		.has-local-override-from-global-styles__reset-icon {
+			display: block;
+		}
+	}
+
+	&:focus-visible {
+		// Inset focus ring so it doesn't push other text around.
+		outline: 1.5px solid var(--wp-admin-theme-color, #007cba);
+		outline-offset: 1px;
+	}
+
+	// Color/gradient control context: the button is positioned by
+	// `block-editor-panel-color-gradient-settings__reset` (absolute,
+	// hover-revealed). The local override must stay visible and centered
+	// in that slot. The shared rule above sets `position: relative` for the
+	// inline label context, so re-assert `position: absolute` here (this
+	// compound selector wins on specificity) to sit in the reset slot.
+	&.block-editor-panel-color-gradient-settings__reset {
+		position: absolute;
+		justify-content: center;
+		top: 50%;
+		transform: translateY(-50%);
+		margin-block: 0;
+		margin-inline-start: 0;
+		opacity: 1;
+	}
+}
+
+.has-local-override-from-global-styles__dot {
+	display: block;
+	width: 8px;
+	height: 8px;
+	background-color: var(--wp-admin-theme-color, #007cba);
+	border-radius: 50%;
+}
+
+// The dash icon revealed on hover/focus, centered over the dot's slot and
+// clipped to the circular button bounds so the box size stays stable.
+.has-local-override-from-global-styles__reset-icon {
+	display: none;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	color: var(--wp-admin-theme-color, #007cba);
+}
