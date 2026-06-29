@@ -1,0 +1,49 @@
+/*
+ * Shared tile header row, rendered as a `Card.Header` so it keeps the card's
+ * padding and its header/content spacing. Identity (icon + title) leads, the
+ * toolbar trails, centered on one row. `min-height` keys off the control size
+ * so the base (identity) and the overlay (toolbar) stay on the same line.
+ */
+.widgetHeader {
+	display: flex;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-sm);
+	min-height: var(--wpds-dimension-size-lg);
+}
+
+/* Let a long title shrink and ellipsize instead of pushing the toolbar out. */
+.identity {
+	min-width: 0;
+	height: 40px;
+
+}
+
+.icon {
+	display: inline-flex;
+	color: var(--wpds-color-foreground-content-neutral);
+}
+
+/* Toolbar trails on the inline-end edge whether or not identity is present. */
+.toolbar {
+	margin-inline-start: auto;
+}
+
+/*
+ * Overlay variant: a `Card.Header` floated on the tile's top band (the grid
+ * item is the positioned ancestor) over the base header or the bleeding body,
+ * taking no layout. Re-declares the card padding var since it sits outside
+ * `Card.Root`. Click-through except for the toolbar, so it never covers the
+ * body's actionable surface in full-bleed.
+ */
+.overlay {
+	position: absolute;
+	inset-block-start: 0;
+	inset-inline: 0;
+	z-index: 1;
+	pointer-events: none;
+	--wp-ui-card-padding: var(--wpds-dimension-padding-2xl);
+}
+
+.overlay .toolbar {
+	pointer-events: auto;
+}
