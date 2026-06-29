@@ -4,21 +4,18 @@
 import { isPhrasingContent } from '@wordpress/dom';
 
 /**
- * Internal dependencies
- */
-import { getSibling } from './utils';
-
-function isFormattingSpace( character: string ): boolean {
-	return (
-		character === ' ' ||
-		character === '\r' ||
-		character === '\n' ||
-		character === '\t'
-	);
-}
-
-/**
  * Moves a space from one edge of an element out to the surrounding text.
+ *
+ * This runs alongside `htmlFormattingRemover`, which already strips an edge
+ * space whenever the outside is separated (a block edge, a line break, or a
+ * neighbour that ends/starts with a space). So an edge space only survives to
+ * here when it abuts real content with no separator, in which case it always
+ * needs hoisting out — no further checks required.
+ *
+ * `htmlFormattingRemover` also runs first, collapsing every run of `[ \r\n\t]`
+ * to a single regular space, so the edge can only be a lone `' '` by now. A
+ * non-breaking space (`&nbsp;`) is intentionally left untouched by both filters,
+ * hence the strict `=== ' '` check rather than a general whitespace test.
  *
  * @param node      The element to be processed.
  * @param doc       The document of the node.
@@ -32,38 +29,20 @@ function moveEdgeSpace( node: Node, doc: Document, isLeading: boolean ): void {
 	}
 
 	const text = child as Text;
-	const edgeChar = isLeading
-		? text.data[ 0 ]
-		: text.data[ text.data.length - 1 ];
+	const edgeIndex = isLeading ? 0 : text.data.length - 1;
 
-	if ( ! isFormattingSpace( edgeChar ) ) {
+	if ( text.data[ edgeIndex ] !== ' ' ) {
 		return;
 	}
 
-	// Strip the edge whitespace from inside the element.
-	text.data = isLeading
-		? text.data.replace( /^[ \r\n\t]+/, '' )
-		: text.data.replace( /[ \r\n\t]+$/, '' );
+	// Strip the edge space from inside the element…
+	text.data = isLeading ? text.data.slice( 1 ) : text.data.slice( 0, -1 );
 
 	if ( ! text.data ) {
 		node.removeChild( text );
 	}
 
-	// Re-insert a single space outside the element, unless a block edge, a line
-	// break, or an adjacent space already separates the content.
-	const sibling = getSibling( node, isLeading ? 'previous' : 'next' );
-
-	if ( ! sibling || sibling.nodeName === 'BR' ) {
-		return;
-	}
-
-	const siblingText = sibling.textContent!;
-	const adjacentChar = isLeading ? siblingText.slice( -1 ) : siblingText[ 0 ];
-
-	if ( isFormattingSpace( adjacentChar ) ) {
-		return;
-	}
-
+	// …and re-insert a single space just outside it.
 	node.parentNode!.insertBefore(
 		doc.createTextNode( ' ' ),
 		isLeading ? node : node.nextSibling
@@ -78,9 +57,7 @@ function moveEdgeSpace( node: Node, doc: Document, isLeading: boolean ): void {
  * an adjacent link *inside* the formatting element (e.g.
  * `before<a> text</a>after`). That leading/trailing space is purely
  * presentational and ends up underlined/linked, so it is hoisted to the
- * surrounding text instead (`before <a>text</a>after`). Whitespace that would
- * land at the start or end of a block, or that is already provided by an
- * adjacent node, is dropped to avoid doubling up.
+ * surrounding text instead (`before <a>text</a>after`).
  *
  * @param node The node to be processed.
  * @param doc  The document of the node.
