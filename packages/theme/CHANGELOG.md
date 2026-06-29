@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove the root `CornerRadiusPreset` type export. Derive it from `ThemeProvider`'s `cornerRadius` prop instead ([#79620](https://github.com/WordPress/gutenberg/pull/79620)).
+
 ### New Features
 
 -   Export `@wordpress/theme/utils` with a generated `var()` Sass function for compile-time design token fallback injection ([#79470](https://github.com/WordPress/gutenberg/pull/79470)).
