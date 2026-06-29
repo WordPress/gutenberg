@@ -16,9 +16,12 @@ import {
 	Tabs,
 	Text,
 } from '@wordpress/ui';
-import type { CornerRadiusPreset } from '../../../packages/theme/src/types';
 
 import { withRouter } from '../../decorators/with-router';
+
+type CornerRadiusPreset = React.ComponentProps<
+	typeof ThemeProvider
+>[ 'cornerRadius' ];
 
 const sidebarNavItems = [
 	'Dashboard',

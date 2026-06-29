@@ -1,7 +1,10 @@
 import { ThemeProvider } from '@wordpress/theme';
 import type { StoryContext } from 'storybook/internal/types';
-import type { CornerRadiusPreset } from '../../packages/theme/src/types';
 import { storyIdMatchesDesignSystemTheme } from './utils/design-system-theme-story-matchers';
+
+type CornerRadiusPreset = React.ComponentProps<
+	typeof ThemeProvider
+>[ 'cornerRadius' ];
 
 /**
  * Decorator that applies Design System theme based on toolbar selections.
