@@ -4,7 +4,7 @@
 
 ### Bug Fix
 
-- DataViews: Stop infinite-scroll anchor restoration from undoing the user's scrolling while a page loads asynchronously, which made the list jump upward as each page settled. [#79546](https://github.com/WordPress/gutenberg/pull/79546)
+- DataViews: Fix infinite scroll when pages load asynchronously: the list no longer jumps while a page loads, no longer stalls at the bottom, and the scroll position no longer bounces as the loading spinner appears and disappears. [#79546](https://github.com/WordPress/gutenberg/pull/79546)
 
 ## 17.1.0 (2026-07-01)
 

@@ -394,6 +394,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	} = props;
 	const baseId = useInstanceId( ViewList, 'view-list' );
 	const isDelayedLoading = useDelayedLoading( !! isLoading );
+	const { paginationInfo } = useContext( DataViewsContext );
 
 	const selectedItem = data?.findLast( ( item ) =>
 		selection.includes( getItemId( item ) )
@@ -535,6 +536,11 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	const dataByGroup =
 		hasData && groupField ? getDataByGroup( data, groupField ) : null;
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
+	// Whether the server still has rows beyond the current window.
+	const hasMoreToLoad =
+		isInfiniteScroll &&
+		( view.startPosition ?? 1 ) + ( view.perPage ?? 0 ) <
+			paginationInfo.totalItems;
 	if ( ! hasData ) {
 		return (
 			<div
@@ -663,8 +669,14 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 					);
 				} ) }
 			</Composite>
-			{ isInfiniteScroll && isLoading && (
-				<p className="dataviews-loading-more">
+			{ ( hasMoreToLoad || ( isInfiniteScroll && isLoading ) ) && (
+				// Keep the spinner mounted until everything is loaded so its
+				// height stays reserved and the scroll position doesn't bounce as
+				// loading starts/stops. Hidden (and silent to a11y) while idle.
+				<p
+					className="dataviews-loading-more"
+					aria-hidden={ ! isLoading }
+				>
 					<Spinner />
 				</p>
 			) }
