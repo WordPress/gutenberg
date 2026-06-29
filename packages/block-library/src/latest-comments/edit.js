@@ -139,7 +139,6 @@ export default function LatestComments( { attributes, setAttributes, name } ) {
 						isShownByDefault
 					>
 						<RangeControl
-							__next40pxDefaultSize
 							label={ __( 'Number of comments' ) }
 							value={ commentsToShow }
 							onChange={ ( value ) =>

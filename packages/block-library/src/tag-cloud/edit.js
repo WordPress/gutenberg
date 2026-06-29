@@ -203,7 +203,6 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 					isShownByDefault
 				>
 					<RangeControl
-						__next40pxDefaultSize
 						label={ __( 'Number of tags' ) }
 						value={ numberOfTags }
 						onChange={ ( value ) =>

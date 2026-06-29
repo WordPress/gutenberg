@@ -624,9 +624,17 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 			name: 'core/embed',
 			attributes: { caption: 'Embed A' },
 		} );
-		await editor.insertBlock( {
-			name: 'core/html',
-			attributes: { content: '<p>Hello HTML</p>' },
+		// The HTML block stores its markup as inner content, which
+		// `insertBlock` (attributes/innerBlocks only) can't express, so insert
+		// it directly via the data API.
+		await editor.page.evaluate( () => {
+			const block = window.wp.blocks.createBlock(
+				'core/html',
+				{},
+				[],
+				[ '<p>Hello HTML</p>' ]
+			);
+			window.wp.data.dispatch( 'core/block-editor' ).insertBlock( block );
 		} );
 		await editor.insertBlock( {
 			name: 'core/shortcode',
@@ -757,7 +765,7 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 				} );
 		} );
 
-		// HTML: edit via data API
+		// HTML: edit the static markup (stored as inner content) via data API.
 		await page2.evaluate( () => {
 			const blocks = window.wp.data
 				.select( 'core/block-editor' )
@@ -770,8 +778,8 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 			}
 			window.wp.data
 				.dispatch( 'core/block-editor' )
-				.updateBlockAttributes( html.clientId, {
-					content: '<div>Edited HTML</div>',
+				.updateBlock( html.clientId, {
+					innerContent: [ '<div>Edited HTML</div>' ],
 				} );
 		} );
 
@@ -832,8 +840,10 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 					attributes: { caption: 'Embed edited by B' },
 				},
 				{
+					// The HTML block's markup lives in inner content, which the
+					// default `getBlocks()` doesn't surface; it's asserted
+					// separately below.
 					name: 'core/html',
-					attributes: { content: '<div>Edited HTML</div>' },
 				},
 				{
 					name: 'core/shortcode',
@@ -848,6 +858,22 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 					attributes: { customText: 'Read more B' },
 				},
 			] );
+
+		// The HTML block's edited markup is stored as inner content (not an
+		// attribute), so assert it synced to both users via the full blocks.
+		const getHtmlInnerContent = async ( ed: typeof editor ) => {
+			const blocks = ( await ed.getBlocks( { full: true } ) ) as Array< {
+				name: string;
+				innerContent?: Array< string | null >;
+			} >;
+			return blocks.find( ( b ) => b.name === 'core/html' )?.innerContent;
+		};
+		await expect
+			.poll( () => getHtmlInnerContent( editor ), { timeout: 10_000 } )
+			.toEqual( [ '<div>Edited HTML</div>' ] );
+		await expect
+			.poll( () => getHtmlInnerContent( editor2 ), { timeout: 10_000 } )
+			.toEqual( [ '<div>Edited HTML</div>' ] );
 
 		// Verify both users have identical final block state.
 		const blocksA = await editor.getBlocks();

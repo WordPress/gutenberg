@@ -223,8 +223,6 @@ export default function BoxInputControl( {
 					</Tooltip>
 
 					<FlexedRangeControl
-						__next40pxDefaultSize
-						__shouldNotWarnDeprecated36pxSize
 						aria-controls={ inputId }
 						label={ LABELS[ side ] }
 						hideLabelFromVision
@@ -252,7 +250,6 @@ export default function BoxInputControl( {
 
 			{ hasPresets && ! showCustomValueControl && (
 				<FlexedRangeControl
-					__next40pxDefaultSize
 					className="spacing-sizes-control__range-control"
 					value={ presetIndex !== undefined ? presetIndex + 1 : 0 }
 					onChange={ ( newIndex ) => {

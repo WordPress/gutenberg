@@ -98,17 +98,37 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should accept valid icon names.
+	 * Provides valid namespaced icon names.
+	 *
+	 * @return array<string, array{0: string}>
 	 */
-	public function test_register_icon() {
+	public function data_valid_icon_names() {
+		return array(
+			'simple name'            => array( 'test-collection/myicon' ),
+			'digit at the start'     => array( 'test-collection/1-icon' ),
+			'digit in the name'      => array( 'test-collection/my-1-icon' ),
+			'digit at the end'       => array( 'test-collection/icon1' ),
+			'underscore in the name' => array( 'test-collection/my_icon' ),
+			'hyphen in the name'     => array( 'test-collection/my-icon' ),
+		);
+	}
+
+	/**
+	 * Should accept valid icon names.
+	 *
+	 * @dataProvider data_valid_icon_names
+	 *
+	 * @param string $name Valid icon name candidate.
+	 */
+	public function test_register_icon( $name ) {
 		$settings = array(
 			'label'   => 'My Icon',
 			'content' => '<svg></svg>',
 		);
 
-		$result = $this->register( 'test-collection/my-icon', $settings );
+		$result = $this->register( $name, $settings );
 		$this->assertTrue( $result );
-		$this->assertTrue( $this->registry->is_registered( 'test-collection/my-icon' ) );
+		$this->assertTrue( $this->registry->is_registered( $name ) );
 	}
 
 	/**
@@ -118,10 +138,18 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	 */
 	public function data_invalid_icon_names() {
 		return array(
-			'non-string name'      => array( 1 ),
-			'empty name'           => array( 'test-collection/' ),
-			'uppercase characters' => array( 'test-collection/Plus' ),
-			'invalid characters'   => array( 'test-collection/_doing_it_wrong' ),
+			'integer name'            => array( 1 ),
+			'null name'               => array( null ),
+			'boolean name'            => array( true ),
+			'array name'              => array( array() ),
+			'empty name'              => array( 'test-collection/' ),
+			'uppercase at the start'  => array( 'test-collection/Icon' ),
+			'uppercase in the name'   => array( 'test-collection/my-Icon' ),
+			'uppercase at the end'    => array( 'test-collection/my-iconX' ),
+			'underscore at the start' => array( 'test-collection/_my-icon' ),
+			'underscore at the end'   => array( 'test-collection/my-icon_' ),
+			'hyphen at the start'     => array( 'test-collection/-my-icon' ),
+			'hyphen at the end'       => array( 'test-collection/my-icon-' ),
 		);
 	}
 

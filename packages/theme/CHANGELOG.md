@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   Remove `ThemeProvider` from the public package exports and restore access through `privateApis` ([#79594](https://github.com/WordPress/gutenberg/pull/79594)).
+-   Remove the root `CornerRadiusPreset` type export. Derive it from `ThemeProvider`'s `cornerRadius` prop instead ([#79620](https://github.com/WordPress/gutenberg/pull/79620)).
 
 ### New Features
 
@@ -13,6 +13,10 @@
 ### Bug Fixes
 
 -   Mark the published `design-tokens.css` file as side-effectful so downstream bundlers preserve the documented CSS import ([#79551](https://github.com/WordPress/gutenberg/pull/79551)).
+
+### Internal
+
+-   Temporarily restore previously removed private APIs to allow for an easier consumer migration before they are removed in WordPress 7.3 ([#79594](https://github.com/WordPress/gutenberg/pull/79594), [#79620](https://github.com/WordPress/gutenberg/pull/79620)).
 
 ## 0.16.0 (2026-06-24)
 
