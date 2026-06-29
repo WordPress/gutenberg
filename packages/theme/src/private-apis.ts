@@ -3,9 +3,15 @@ import { lock } from './lock-unlock';
 import { ThemeProvider } from './theme-provider';
 import { useThemeProviderStyles } from './use-theme-provider-styles';
 
-function warnThemeProviderPrivateApi() {
+function warnPrivateApi( apiName: string, replacement?: string ) {
+	const deletionMessage = replacement
+		? 'this private export is scheduled for deletion'
+		: 'This private export is scheduled for deletion';
+
 	warning(
-		'ThemeProvider: Accessing `ThemeProvider` through `@wordpress/theme` private APIs is deprecated. Import `ThemeProvider` from `@wordpress/theme` instead; this private export is scheduled for deletion as `@wordpress/theme` approaches stabilization.'
+		`ThemeProvider: Accessing \`${ apiName }\` through \`@wordpress/theme\` private APIs is deprecated. ${
+			replacement ? `${ replacement } ` : ''
+		}${ deletionMessage } as \`@wordpress/theme\` approaches stabilization.`
 	);
 }
 
@@ -17,8 +23,14 @@ function warnThemeProviderPrivateApi() {
 export const privateApis = {};
 lock( privateApis, {
 	get ThemeProvider() {
-		warnThemeProviderPrivateApi();
+		warnPrivateApi(
+			'ThemeProvider',
+			'Import `ThemeProvider` from `@wordpress/theme` instead;'
+		);
 		return ThemeProvider;
 	},
-	useThemeProviderStyles,
+	get useThemeProviderStyles() {
+		warnPrivateApi( 'useThemeProviderStyles' );
+		return useThemeProviderStyles;
+	},
 } );

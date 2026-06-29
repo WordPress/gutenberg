@@ -19,19 +19,27 @@ describe( 'privateApis', () => {
 		scriptDebugGlobal.SCRIPT_DEBUG = originalScriptDebug;
 	} );
 
-	it( 'does not warn when accessing private APIs that remain private', () => {
+	it( 'warns once when accessing useThemeProviderStyles through private APIs', () => {
 		scriptDebugGlobal.SCRIPT_DEBUG = true;
 		const warn = jest
 			.spyOn( console, 'warn' )
 			.mockImplementation( () => {} );
 
-		expect(
-			unlock< {
-				useThemeProviderStyles: typeof useThemeProviderStyles;
-			} >( privateApis ).useThemeProviderStyles
-		).toBe( useThemeProviderStyles );
+		const unlockedPrivateApis = unlock< {
+			useThemeProviderStyles: typeof useThemeProviderStyles;
+		} >( privateApis );
 
-		expect( warn ).not.toHaveBeenCalled();
+		expect( unlockedPrivateApis.useThemeProviderStyles ).toBe(
+			useThemeProviderStyles
+		);
+		expect( unlockedPrivateApis.useThemeProviderStyles ).toBe(
+			useThemeProviderStyles
+		);
+
+		expect( warn ).toHaveBeenCalledTimes( 1 );
+		expect( warn ).toHaveBeenCalledWith(
+			'ThemeProvider: Accessing `useThemeProviderStyles` through `@wordpress/theme` private APIs is deprecated. This private export is scheduled for deletion as `@wordpress/theme` approaches stabilization.'
+		);
 
 		warn.mockRestore();
 	} );
