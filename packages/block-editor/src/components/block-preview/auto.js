@@ -108,7 +108,10 @@ function ScaledBlockPreview( {
 			>
 				<EditorStyles styles={ editorStyles } />
 				{ contentResizeListener }
-				<MemoizedBlockList renderAppender={ false } />
+				<MemoizedBlockList
+					renderAppender={ false }
+					className="wp-site-blocks"
+				/>
 			</Iframe>
 		</Disabled>
 	);
