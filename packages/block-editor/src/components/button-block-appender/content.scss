@@ -30,15 +30,13 @@
 	}
 }
 
-
 // When the appender shows up in empty container blocks, such as Group and Columns, add an extra click state.
 .block-list-appender:only-child {
-	// One level of nesting
 	.is-layout-constrained.block-editor-block-list__block:not(.is-selected) > &,
 	.is-layout-flow.block-editor-block-list__block:not(.is-selected) > &,
-	// Legacy groups have an inner container so need to be targeted separately
-	.block-editor-block-list__block:not(.is-selected) > .is-layout-constrained.wp-block-group__inner-container > &,
-	.block-editor-block-list__block:not(.is-selected) > .is-layout-flow.wp-block-group__inner-container > & {
+	// Blocks with inner containers
+	.block-editor-block-list__block:not(.is-selected, .block-editor-block-list__layout) > .is-layout-constrained.block-editor-block-list__layout > &,
+	.block-editor-block-list__block:not(.is-selected, .block-editor-block-list__layout) > .is-layout-flow.block-editor-block-list__layout > & {
 		pointer-events: none;
 
 		&::after {
@@ -52,7 +50,7 @@
 			border: $border-width dashed currentColor;
 		}
 
-		.block-editor-inserter {
+		> .block-editor-inserter {
 			opacity: 0;
 
 			&:focus-within {
@@ -66,15 +64,9 @@
 			}
 
 			.block-editor-inserter {
-				visibility: visible;
+				opacity: 1;
 			}
 		}
-	}
-
-	// Hide the dashed outline in 2-level nested cases, so for example the dashed
-	// empty column is only shown when the columns block is selected.
-	.block-editor-block-list__block:not(.is-selected) > .block-editor-block-list__block > &::after {
-		border: none;
 	}
 
 	// Drop zone.
@@ -84,6 +76,61 @@
 		color: $light-gray-placeholder;
 		@media not ( prefers-reduced-motion ) {
 			transition: background-color 0.2s ease-in-out;
+		}
+	}
+}
+
+.block-editor-block-list__layout.is-layout-flex {
+	&:not(.is-vertical) > .block-list-appender:only-child {
+		flex: 1;
+		align-self: stretch;
+	}
+
+	&.is-vertical > .block-list-appender:only-child {
+		flex: 1;
+		width: 100%;
+	}
+
+	// Cap inserter button and dashed outline widths to indicate how the layout will distribute space/content. Exempt stretched vertical layouts.
+	&:not(.is-vertical.is-content-justification-stretch) > .block-list-appender:only-child {
+		> .block-editor-inserter,
+		&::after {
+			width: 200px;
+		}
+	}
+
+	&:not(.is-vertical).is-vertical-alignment-stretch > .block-list-appender:only-child
+	.block-editor-button-block-appender {
+		height: auto;
+	}
+
+	> .block-list-appender:only-child {
+		gap: inherit;
+		align-items: inherit;
+		justify-content: inherit;
+		flex-direction: inherit;
+
+		&,
+		.block-editor-inserter {
+			display: inherit;
+		}
+
+		&::after {
+			content: "";
+			display: inherit;
+			//flex: 1 0 $button-size-next-default-40px;
+			pointer-events: none;
+			min-height:
+				$button-size-next-default-40px - $border-width -
+				$border-width;
+			border: $border-width dashed currentColor;
+		}
+
+		// Let the parent be selectable in the placeholder area.
+		pointer-events: none;
+		.block-editor-inserter,
+		.block-editor-button-block-appender {
+			pointer-events: all;
 		}
 	}
 }
