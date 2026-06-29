@@ -173,6 +173,7 @@ const restrictedSyntax = [
 		'BorderBoxControl',
 		'BorderControl',
 		'BoxControl',
+		'ComboboxControl',
 		'FocalPointPicker',
 		'FontFamilyControl',
 		'FontSizePicker',
