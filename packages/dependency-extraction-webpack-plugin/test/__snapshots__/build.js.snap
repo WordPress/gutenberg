@@ -154,6 +154,21 @@ exports[`DependencyExtractionWebpackPlugin modules Webpack \`module-renames\` sh
 ]
 `;
 
+exports[`DependencyExtractionWebpackPlugin modules Webpack \`nested-dynamic-import\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array(array('id' => '@wordpress/interactivity', 'import' => 'dynamic')), 'version' => '545e35ddcaa625ec66be', 'type' => 'module');
+"
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules Webpack \`nested-dynamic-import\` should produce expected output: External modules should match snapshot 1`] = `
+[
+  {
+    "externalType": "module",
+    "request": "@wordpress/interactivity",
+    "userRequest": "@wordpress/interactivity",
+  },
+]
+`;
+
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`no-default\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
 "<?php return array('dependencies' => array(), 'version' => '1e17a24e97ed7776722f', 'type' => 'module');
 "
@@ -551,6 +566,24 @@ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`module-renames\` sh
       "renamed--other-module",
     ],
     "userRequest": "other-module",
+  },
+]
+`;
+
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`nested-dynamic-import\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array('wp-interactivity'), 'version' => 'f106056c2c97892f532b');
+"
+`;
+
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`nested-dynamic-import\` should produce expected output: External modules should match snapshot 1`] = `
+[
+  {
+    "externalType": "window",
+    "request": [
+      "wp",
+      "interactivity",
+    ],
+    "userRequest": "@wordpress/interactivity",
   },
 ]
 `;
