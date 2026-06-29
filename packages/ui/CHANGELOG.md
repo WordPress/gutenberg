@@ -4,7 +4,7 @@
 
 ### Internal
 
--   Restore private API access for `@wordpress/theme`'s `ThemeProvider` ([#79594](https://github.com/WordPress/gutenberg/pull/79594)).
+-   Add a temporary `@wordpress/theme` `ThemeProvider` compatibility fallback for older WordPress runtimes ([#79620](https://github.com/WordPress/gutenberg/pull/79620)).
 
 ## 0.16.0 (2026-06-24)
 
