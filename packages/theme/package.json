@@ -80,6 +80,7 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@wordpress/compose": "file:../compose",
+		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/element": "file:../element",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/style-runtime": "file:../style-runtime",
