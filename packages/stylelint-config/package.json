@@ -48,7 +48,7 @@
 	},
 	"devDependencies": {
 		"@wordpress/npm-package-json-lint-config": "file:../npm-package-json-lint-config",
-		"stylelint": "^16.8.2",
+		"stylelint": "^16.26.1",
 		"stylelint-scss": "^6.4.0"
 	},
 	"peerDependencies": {

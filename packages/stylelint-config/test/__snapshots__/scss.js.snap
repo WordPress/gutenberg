@@ -40,8 +40,8 @@ exports[`flags warnings with invalid scss snapshot matches warnings 1`] = `
   },
   {
     "column": 2,
-    "endColumn": 3,
-    "endLine": 12,
+    "endColumn": 1,
+    "endLine": 13,
     "line": 12,
     "rule": "scss/at-if-closing-brace-newline-after",
     "severity": "error",
@@ -49,8 +49,8 @@ exports[`flags warnings with invalid scss snapshot matches warnings 1`] = `
   },
   {
     "column": 2,
-    "endColumn": 3,
-    "endLine": 12,
+    "endColumn": 1,
+    "endLine": 13,
     "line": 12,
     "rule": "scss/at-if-closing-brace-space-after",
     "severity": "error",

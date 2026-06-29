@@ -30,7 +30,11 @@ const generateStylelintCommand = ( filename ) =>
 
 module.exports = {
 	getStylelintResult: ( filename ) =>
-		execute( generateStylelintCommand( filename ) )
+		// `NODE_NO_WARNINGS` keeps deprecation warnings (e.g. plugins using a
+		// deprecated `utils.report()` signature) out of the JSON-on-stderr output.
+		execute( generateStylelintCommand( filename ), {
+			env: { ...process.env, NODE_NO_WARNINGS: '1' },
+		} )
 			.then( ( { stderr } ) => {
 				return {
 					errored: false,

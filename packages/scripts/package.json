@@ -86,7 +86,7 @@
 		"sass-loader": "^16.0.3",
 		"schema-utils": "^4.2.0",
 		"source-map-loader": "^3.0.0",
-		"stylelint": "^16.8.2",
+		"stylelint": "^16.26.1",
 		"terser-webpack-plugin": "^5.3.10",
 		"url-loader": "^4.1.1",
 		"webpack": "^5.108.1",

@@ -107,7 +107,7 @@
 		"esbuild-esm-loader": "^0.3.3",
 		"prettier": "npm:wp-prettier@^3.0.3",
 		"storybook": "^10.4.3",
-		"stylelint": "^16.8.2"
+		"stylelint": "^16.26.1"
 	},
 	"peerDependencies": {
 		"@types/react": "^18.3.27",
