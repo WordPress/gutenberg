@@ -1,0 +1,131 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 70cbfe0f976af8..d1c44834aed528 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Internal
+ 
++-   `CustomSelectControlV2`: prevent keyboard event propagation in legacy wrapper. ([#62907](https://github.com/WordPress/gutenberg/pull/62907))
+ -   `CustomSelectControlV2`: add root element wrapper. ([#62803](https://github.com/WordPress/gutenberg/pull/62803))
+ -   `CustomSelectControlV2`: fix popover styles. ([#62821](https://github.com/WordPress/gutenberg/pull/62821))
+ -   `CustomSelectControlV2`: fix trigger text alignment in RTL languages ([#62869](https://github.com/WordPress/gutenberg/pull/62869)).
+diff --git a/packages/components/src/custom-select-control-v2/custom-select.tsx b/packages/components/src/custom-select-control-v2/custom-select.tsx
+index d76fa8c0330516..c03e047c882e45 100644
+--- a/packages/components/src/custom-select-control-v2/custom-select.tsx
++++ b/packages/components/src/custom-select-control-v2/custom-select.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { createContext, useMemo } from '@wordpress/element';
++import { createContext, useCallback, useMemo } from '@wordpress/element';
+ import { __, sprintf } from '@wordpress/i18n';
+ 
+ /**
+@@ -14,6 +14,7 @@ import type {
+ 	CustomSelectStore,
+ 	CustomSelectButtonProps,
+ 	CustomSelectButtonSize,
++	_CustomSelectInternalProps,
+ 	_CustomSelectProps,
+ } from './types';
+ import type { WordPressComponentProps } from '../context';
+@@ -80,7 +81,10 @@ const CustomSelectButton = ( {
+ };
+ 
+ function _CustomSelect(
+-	props: _CustomSelectProps & CustomSelectStore & CustomSelectButtonSize
++	props: _CustomSelectInternalProps &
++		_CustomSelectProps &
++		CustomSelectStore &
++		CustomSelectButtonSize
+ ) {
+ 	const {
+ 		children,
+@@ -89,9 +93,20 @@ function _CustomSelect(
+ 		size,
+ 		store,
+ 		className,
++		isLegacy = false,
+ 		...restProps
+ 	} = props;
+ 
++	const onSelectPopoverKeyDown: React.KeyboardEventHandler< HTMLDivElement > =
++		useCallback(
++			( e ) => {
++				if ( isLegacy ) {
++					e.stopPropagation();
++				}
++			},
++			[ isLegacy ]
++		);
++
+ 	return (
+ 		// Where should `restProps` be forwarded to?
+ 		<div className={ className }>
+@@ -117,6 +132,7 @@ function _CustomSelect(
+ 					store={ store }
+ 					sameWidth
+ 					slide={ false }
++					onKeyDown={ onSelectPopoverKeyDown }
+ 				>
+ 					<CustomSelectContext.Provider value={ { store } }>
+ 						{ children }
+diff --git a/packages/components/src/custom-select-control-v2/legacy-component/index.tsx b/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
+index 209483775db9e4..242c264eafc67b 100644
+--- a/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
++++ b/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
+@@ -128,6 +128,7 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ 				'components-custom-select-control',
+ 				classNameProp
+ 			) }
++			isLegacy
+ 			{ ...restProps }
+ 		>
+ 			{ children }
+diff --git a/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx b/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx
+index f0b699617cd03c..532b14d7bda526 100644
+--- a/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx
++++ b/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx
+@@ -454,8 +454,7 @@ describe.each( [
+ 	} );
+ 
+ 	describe( 'Keyboard behavior and accessibility', () => {
+-		// skip reason: legacy v2 doesn't currently implement this behavior
+-		it.skip( 'Captures the keypress event and does not let it propagate', async () => {
++		it( 'Captures the keypress event and does not let it propagate', async () => {
+ 			const onKeyDown = jest.fn();
+ 
+ 			render(
+diff --git a/packages/components/src/custom-select-control-v2/types.ts b/packages/components/src/custom-select-control-v2/types.ts
+index 3c192cfa56711f..c37db0690c5bc1 100644
+--- a/packages/components/src/custom-select-control-v2/types.ts
++++ b/packages/components/src/custom-select-control-v2/types.ts
+@@ -49,6 +49,15 @@ export type CustomSelectButtonProps = {
+ 	value?: string | string[];
+ };
+ 
++// Props only exposed on the internal implementation
++export type _CustomSelectInternalProps = {
++	/**
++	 * True if the consumer is emulating the legacy component behavior and look
++	 */
++	isLegacy?: boolean;
++};
++
++// Props that are exposed in exported components
+ export type _CustomSelectProps = CustomSelectButtonProps & {
+ 	/**
+ 	 * Additional className added to the root wrapper element.
+@@ -70,9 +79,7 @@ export type _CustomSelectProps = CustomSelectButtonProps & {
+ 	label: string;
+ };
+ 
+-export type CustomSelectProps = _CustomSelectProps &
+-	CustomSelectButtonProps &
+-	CustomSelectSize;
++export type CustomSelectProps = _CustomSelectProps & CustomSelectSize;
+ 
+ /**
+  * The legacy object structure for the options array.

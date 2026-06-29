@@ -1,0 +1,682 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index f06b35bdae3aab..d20e92200c2b02 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -284,7 +284,6 @@ module.exports = {
+ 						'SearchControl',
+ 						'SelectControl',
+ 						'ToggleControl',
+-						'ToggleGroupControl',
+ 						'TreeSelect',
+ 					].map( ( componentName ) => ( {
+ 						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__nextHasNoMarginBottom"]))`,
+diff --git a/packages/block-editor/src/components/background-image-control/index.js b/packages/block-editor/src/components/background-image-control/index.js
+index f73419442721db..9ad4177a251c92 100644
+--- a/packages/block-editor/src/components/background-image-control/index.js
++++ b/packages/block-editor/src/components/background-image-control/index.js
+@@ -592,7 +592,6 @@ function BackgroundSizeControls( {
+ 				onChange={ toggleScrollWithPage }
+ 			/>
+ 			<ToggleGroupControl
+-				__nextHasNoMarginBottom
+ 				size="__unstable-large"
+ 				label={ __( 'Size' ) }
+ 				value={ currentValueForToggle }
+diff --git a/packages/block-editor/src/components/block-variation-transforms/index.js b/packages/block-editor/src/components/block-variation-transforms/index.js
+index 0519a9b1f98c26..11237a1cafa539 100644
+--- a/packages/block-editor/src/components/block-variation-transforms/index.js
++++ b/packages/block-editor/src/components/block-variation-transforms/index.js
+@@ -120,7 +120,6 @@ function VariationsToggleGroupControl( {
+ 				hideLabelFromVision
+ 				onChange={ onSelectVariation }
+ 				__next40pxDefaultSize
+-				__nextHasNoMarginBottom
+ 			>
+ 				{ variations.map( ( variation ) => (
+ 					<ToggleGroupControlOptionIcon
+diff --git a/packages/block-editor/src/components/child-layout-control/index.js b/packages/block-editor/src/components/child-layout-control/index.js
+index 27a9bbfd1e9617..3d5cb5a1a1bda6 100644
+--- a/packages/block-editor/src/components/child-layout-control/index.js
++++ b/packages/block-editor/src/components/child-layout-control/index.js
+@@ -137,7 +137,6 @@ function FlexControls( {
+ 			panelId={ panelId }
+ 		>
+ 			<ToggleGroupControl
+-				__nextHasNoMarginBottom
+ 				size="__unstable-large"
+ 				label={ childLayoutOrientation( parentLayout ) }
+ 				value={ selfStretch || 'fit' }
+diff --git a/packages/block-editor/src/components/dimensions-tool/scale-tool.js b/packages/block-editor/src/components/dimensions-tool/scale-tool.js
+index a23fad586d4705..05a7d2f4d251a7 100644
+--- a/packages/block-editor/src/components/dimensions-tool/scale-tool.js
++++ b/packages/block-editor/src/components/dimensions-tool/scale-tool.js
+@@ -105,7 +105,6 @@ export default function ScaleTool( {
+ 			panelId={ panelId }
+ 		>
+ 			<ToggleGroupControl
+-				__nextHasNoMarginBottom
+ 				label={ __( 'Scale' ) }
+ 				isBlock
+ 				help={ scaleHelp[ displayValue ] }
+diff --git a/packages/block-editor/src/components/image-size-control/index.js b/packages/block-editor/src/components/image-size-control/index.js
+index b1ea92c82aab87..4ec36cb413d87a 100644
+--- a/packages/block-editor/src/components/image-size-control/index.js
++++ b/packages/block-editor/src/components/image-size-control/index.js
+@@ -129,7 +129,6 @@ export default function ImageSizeControl( {
+ 						value={ selectedValue }
+ 						isBlock
+ 						__next40pxDefaultSize
+-						__nextHasNoMarginBottom
+ 					>
+ 						{ IMAGE_SIZE_PRESETS.map( ( scale ) => {
+ 							return (
+diff --git a/packages/block-editor/src/components/text-alignment-control/index.js b/packages/block-editor/src/components/text-alignment-control/index.js
+index 6eeaad784db0f0..26b406d7bb378f 100644
+--- a/packages/block-editor/src/components/text-alignment-control/index.js
++++ b/packages/block-editor/src/components/text-alignment-control/index.js
+@@ -76,7 +76,6 @@ export default function TextAlignmentControl( {
+ 	return (
+ 		<ToggleGroupControl
+ 			isDeselectable
+-			__nextHasNoMarginBottom
+ 			__next40pxDefaultSize
+ 			label={ __( 'Text alignment' ) }
+ 			className={ clsx(
+diff --git a/packages/block-editor/src/components/text-decoration-control/index.js b/packages/block-editor/src/components/text-decoration-control/index.js
+index 720f3d2d9558eb..f0f4525491ecb0 100644
+--- a/packages/block-editor/src/components/text-decoration-control/index.js
++++ b/packages/block-editor/src/components/text-decoration-control/index.js
+@@ -49,7 +49,6 @@ export default function TextDecorationControl( {
+ 	return (
+ 		<ToggleGroupControl
+ 			isDeselectable
+-			__nextHasNoMarginBottom
+ 			__next40pxDefaultSize
+ 			label={ __( 'Decoration' ) }
+ 			className={ clsx(
+diff --git a/packages/block-editor/src/components/text-transform-control/index.js b/packages/block-editor/src/components/text-transform-control/index.js
+index a3183e630c328a..ac40df45096f5d 100644
+--- a/packages/block-editor/src/components/text-transform-control/index.js
++++ b/packages/block-editor/src/components/text-transform-control/index.js
+@@ -55,7 +55,6 @@ export default function TextTransformControl( { className, value, onChange } ) {
+ 	return (
+ 		<ToggleGroupControl
+ 			isDeselectable
+-			__nextHasNoMarginBottom
+ 			__next40pxDefaultSize
+ 			label={ __( 'Letter case' ) }
+ 			className={ clsx(
+diff --git a/packages/block-editor/src/components/writing-mode-control/index.js b/packages/block-editor/src/components/writing-mode-control/index.js
+index bffccfd579c6b0..ec0d759ba8226a 100644
+--- a/packages/block-editor/src/components/writing-mode-control/index.js
++++ b/packages/block-editor/src/components/writing-mode-control/index.js
+@@ -40,7 +40,6 @@ export default function WritingModeControl( { className, value, onChange } ) {
+ 	return (
+ 		<ToggleGroupControl
+ 			isDeselectable
+-			__nextHasNoMarginBottom
+ 			__next40pxDefaultSize
+ 			label={ __( 'Orientation' ) }
+ 			className={ clsx( 'block-editor-writing-mode-control', className ) }
+diff --git a/packages/block-editor/src/hooks/layout.js b/packages/block-editor/src/hooks/layout.js
+index 772b86b334eee4..cf109dec31b30f 100644
+--- a/packages/block-editor/src/hooks/layout.js
++++ b/packages/block-editor/src/hooks/layout.js
+@@ -323,7 +323,6 @@ function LayoutTypeSwitcher( { type, onChange } ) {
+ 			__next40pxDefaultSize
+ 			isBlock
+ 			label={ __( 'Layout type' ) }
+-			__nextHasNoMarginBottom
+ 			hideLabelFromVision
+ 			isAdaptiveWidth
+ 			value={ type }
+diff --git a/packages/block-editor/src/layouts/constrained.js b/packages/block-editor/src/layouts/constrained.js
+index c151d9e88b62ac..305cfc07b2b622 100644
+--- a/packages/block-editor/src/layouts/constrained.js
++++ b/packages/block-editor/src/layouts/constrained.js
+@@ -137,7 +137,6 @@ export default {
+ 				{ allowJustification && (
+ 					<ToggleGroupControl
+ 						__next40pxDefaultSize
+-						__nextHasNoMarginBottom
+ 						label={ __( 'Justification' ) }
+ 						value={ justifyContent }
+ 						onChange={ onJustificationChange }
+diff --git a/packages/block-editor/src/layouts/flex.js b/packages/block-editor/src/layouts/flex.js
+index b1d6a92bdbf5f9..2c3f2f67121b0f 100644
+--- a/packages/block-editor/src/layouts/flex.js
++++ b/packages/block-editor/src/layouts/flex.js
+@@ -298,7 +298,6 @@ function FlexLayoutJustifyContentControl( {
+ 	return (
+ 		<ToggleGroupControl
+ 			__next40pxDefaultSize
+-			__nextHasNoMarginBottom
+ 			label={ __( 'Justification' ) }
+ 			value={ justifyContent }
+ 			onChange={ onJustificationChange }
+@@ -344,7 +343,6 @@ function OrientationControl( { layout, onChange } ) {
+ 	return (
+ 		<ToggleGroupControl
+ 			__next40pxDefaultSize
+-			__nextHasNoMarginBottom
+ 			className="block-editor-hooks__flex-layout-orientation-controls"
+ 			label={ __( 'Orientation' ) }
+ 			value={ orientation }
+diff --git a/packages/block-editor/src/layouts/grid.js b/packages/block-editor/src/layouts/grid.js
+index e981a7c30f1717..713491b7d37e9a 100644
+--- a/packages/block-editor/src/layouts/grid.js
++++ b/packages/block-editor/src/layouts/grid.js
+@@ -429,7 +429,6 @@ function GridLayoutTypeControl( { layout, onChange } ) {
+ 	return (
+ 		<ToggleGroupControl
+ 			__next40pxDefaultSize
+-			__nextHasNoMarginBottom
+ 			label={ __( 'Grid item position' ) }
+ 			value={ gridPlacement }
+ 			onChange={ onChangeType }
+diff --git a/packages/block-library/src/accordion/edit.js b/packages/block-library/src/accordion/edit.js
+index 0749e3a1f1aea9..972073134496bb 100644
+--- a/packages/block-library/src/accordion/edit.js
++++ b/packages/block-library/src/accordion/edit.js
+@@ -188,7 +188,6 @@ export default function Edit( {
+ 							}
+ 						>
+ 							<ToggleGroupControl
+-								__nextHasNoMarginBottom
+ 								__next40pxDefaultSize
+ 								isBlock
+ 								label={ __( 'Icon Position' ) }
+diff --git a/packages/block-library/src/button/edit.js b/packages/block-library/src/button/edit.js
+index fd2745579e8e4b..13a1bc7d4ce668 100644
+--- a/packages/block-library/src/button/edit.js
++++ b/packages/block-library/src/button/edit.js
+@@ -152,7 +152,6 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
+ 					}
+ 					isBlock
+ 					__next40pxDefaultSize
+-					__nextHasNoMarginBottom
+ 				>
+ 					{ [ 25, 50, 75, 100 ].map( ( widthValue ) => {
+ 						return (
+diff --git a/packages/block-library/src/comments-pagination/comments-pagination-arrow-controls.js b/packages/block-library/src/comments-pagination/comments-pagination-arrow-controls.js
+index c3a2d1dae648a5..33393db590ef0e 100644
+--- a/packages/block-library/src/comments-pagination/comments-pagination-arrow-controls.js
++++ b/packages/block-library/src/comments-pagination/comments-pagination-arrow-controls.js
+@@ -11,7 +11,6 @@ export function CommentsPaginationArrowControls( { value, onChange } ) {
+ 	return (
+ 		<ToggleGroupControl
+ 			__next40pxDefaultSize
+-			__nextHasNoMarginBottom
+ 			label={ __( 'Arrow' ) }
+ 			value={ value }
+ 			onChange={ onChange }
+diff --git a/packages/block-library/src/latest-posts/edit.js b/packages/block-library/src/latest-posts/edit.js
+index d3eb9997aaafff..29050cdc4a0cc0 100644
+--- a/packages/block-library/src/latest-posts/edit.js
++++ b/packages/block-library/src/latest-posts/edit.js
+@@ -419,7 +419,6 @@ function Controls( { attributes, setAttributes, postCount } ) {
+ 						>
+ 							<ToggleGroupControl
+ 								className="editor-latest-posts-image-alignment-control"
+-								__nextHasNoMarginBottom
+ 								__next40pxDefaultSize
+ 								label={ __( 'Image alignment' ) }
+ 								value={ featuredImageAlign || 'none' }
+diff --git a/packages/block-library/src/navigation-overlay-close/edit.js b/packages/block-library/src/navigation-overlay-close/edit.js
+index f133f9905388e4..446a2df5a706db 100644
+--- a/packages/block-library/src/navigation-overlay-close/edit.js
++++ b/packages/block-library/src/navigation-overlay-close/edit.js
+@@ -58,7 +58,6 @@ export default function NavigationOverlayCloseEdit( {
+ 							}
+ 							isBlock
+ 							__next40pxDefaultSize
+-							__nextHasNoMarginBottom
+ 						>
+ 							<ToggleGroupControlOption
+ 								value="icon"
+diff --git a/packages/block-library/src/navigation/edit/overlay-menu-preview-controls.js b/packages/block-library/src/navigation/edit/overlay-menu-preview-controls.js
+index 61b91da4a0fade..015dcad86ff81b 100644
+--- a/packages/block-library/src/navigation/edit/overlay-menu-preview-controls.js
++++ b/packages/block-library/src/navigation/edit/overlay-menu-preview-controls.js
+@@ -42,7 +42,6 @@ export default function OverlayMenuPreviewControls( {
+ 			/>
+ 			<ToggleGroupControl
+ 				__next40pxDefaultSize
+-				__nextHasNoMarginBottom
+ 				className="wp-block-navigation__overlay-menu-icon-toggle-group"
+ 				label={ __( 'Icon' ) }
+ 				value={ icon }
+diff --git a/packages/block-library/src/navigation/edit/overlay-menu-preview.js b/packages/block-library/src/navigation/edit/overlay-menu-preview.js
+index c73ba71c1afcbc..2adaa6e6c11d89 100644
+--- a/packages/block-library/src/navigation/edit/overlay-menu-preview.js
++++ b/packages/block-library/src/navigation/edit/overlay-menu-preview.js
+@@ -44,7 +44,6 @@ export default function OverlayMenuPreview( { setAttributes, hasIcon, icon } ) {
+ 			>
+ 				<ToggleGroupControl
+ 					__next40pxDefaultSize
+-					__nextHasNoMarginBottom
+ 					className="wp-block-navigation__overlay-menu-icon-toggle-group"
+ 					label={ __( 'Icon' ) }
+ 					value={ icon }
+diff --git a/packages/block-library/src/navigation/edit/overlay-visibility-control.js b/packages/block-library/src/navigation/edit/overlay-visibility-control.js
+index cc6a4dd5ac97fd..1567ce0219af34 100644
+--- a/packages/block-library/src/navigation/edit/overlay-visibility-control.js
++++ b/packages/block-library/src/navigation/edit/overlay-visibility-control.js
+@@ -22,7 +22,6 @@ export default function OverlayVisibilityControl( {
+ 	return (
+ 		<ToggleGroupControl
+ 			__next40pxDefaultSize
+-			__nextHasNoMarginBottom
+ 			label={ __( 'Overlay Visibility' ) }
+ 			aria-label={ __( 'Configure overlay visibility' ) }
+ 			value={ overlayMenu }
+diff --git a/packages/block-library/src/post-featured-image/dimension-controls.js b/packages/block-library/src/post-featured-image/dimension-controls.js
+index 4bc343635f2f93..36783cc0d1c0f1 100644
+--- a/packages/block-library/src/post-featured-image/dimension-controls.js
++++ b/packages/block-library/src/post-featured-image/dimension-controls.js
+@@ -189,7 +189,6 @@ const DimensionControls = ( {
+ 				>
+ 					<ToggleGroupControl
+ 						__next40pxDefaultSize
+-						__nextHasNoMarginBottom
+ 						label={ scaleLabel }
+ 						value={ scale }
+ 						help={ scaleHelp[ scale ] }
+diff --git a/packages/block-library/src/post-navigation-link/edit.js b/packages/block-library/src/post-navigation-link/edit.js
+index d3c30ab1f43b5c..1052c02ff71c73 100644
+--- a/packages/block-library/src/post-navigation-link/edit.js
++++ b/packages/block-library/src/post-navigation-link/edit.js
+@@ -171,7 +171,6 @@ export default function PostNavigationLinkEdit( {
+ 					>
+ 						<ToggleGroupControl
+ 							__next40pxDefaultSize
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Arrow' ) }
+ 							value={ arrow }
+ 							onChange={ ( value ) => {
+diff --git a/packages/block-library/src/query-pagination/query-pagination-arrow-controls.js b/packages/block-library/src/query-pagination/query-pagination-arrow-controls.js
+index 0f2e9c1788bf7b..a1232b5abe9436 100644
+--- a/packages/block-library/src/query-pagination/query-pagination-arrow-controls.js
++++ b/packages/block-library/src/query-pagination/query-pagination-arrow-controls.js
+@@ -11,7 +11,6 @@ export function QueryPaginationArrowControls( { value, onChange } ) {
+ 	return (
+ 		<ToggleGroupControl
+ 			__next40pxDefaultSize
+-			__nextHasNoMarginBottom
+ 			label={ __( 'Arrow' ) }
+ 			value={ value }
+ 			onChange={ onChange }
+diff --git a/packages/block-library/src/query/edit/inspector-controls/index.js b/packages/block-library/src/query/edit/inspector-controls/index.js
+index f1e0a9b98d1d85..e24f5755e300d0 100644
+--- a/packages/block-library/src/query/edit/inspector-controls/index.js
++++ b/packages/block-library/src/query/edit/inspector-controls/index.js
+@@ -205,7 +205,6 @@ export default function QueryInspectorControls( props ) {
+ 							<VStack spacing={ 4 }>
+ 								<ToggleGroupControl
+ 									__next40pxDefaultSize
+-									__nextHasNoMarginBottom
+ 									label={ __( 'Query type' ) }
+ 									isBlock
+ 									onChange={ ( value ) => {
+@@ -266,7 +265,6 @@ export default function QueryInspectorControls( props ) {
+ 								/>
+ 							) : (
+ 								<ToggleGroupControl
+-									__nextHasNoMarginBottom
+ 									__next40pxDefaultSize
+ 									isBlock
+ 									value={ postType }
+diff --git a/packages/block-library/src/terms-query/edit/inspector-controls/inherit-control.js b/packages/block-library/src/terms-query/edit/inspector-controls/inherit-control.js
+index 53704d9b226b74..385947dde6cb96 100644
+--- a/packages/block-library/src/terms-query/edit/inspector-controls/inherit-control.js
++++ b/packages/block-library/src/terms-query/edit/inspector-controls/inherit-control.js
+@@ -11,7 +11,6 @@ export default function InheritControl( { value, onChange, label } ) {
+ 	return (
+ 		<ToggleGroupControl
+ 			__next40pxDefaultSize
+-			__nextHasNoMarginBottom
+ 			label={ label }
+ 			isBlock
+ 			onChange={ ( newValue ) => {
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 125c096d6b4cb8..fb4f0901d58d6b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ -   `CheckboxControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#73916](https://github.com/WordPress/gutenberg/pull/73916)).
+ -   `TextControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#73920](https://github.com/WordPress/gutenberg/pull/73920)).
+ -   `TextareaControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#73970](https://github.com/WordPress/gutenberg/pull/73970)).
++-   `ToggleGroupControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#74004](https://github.com/WordPress/gutenberg/pull/74004)).
+ -   `DimensionControl`: Completely remove deprecated component ([#73944](https://github.com/WordPress/gutenberg/pull/73944)).
+ 
+ ### Enhancements
+diff --git a/packages/components/src/border-control/border-control-style-picker/component.tsx b/packages/components/src/border-control/border-control-style-picker/component.tsx
+index c0a0fe82111cec..f6ffb47e410c44 100644
+--- a/packages/components/src/border-control/border-control-style-picker/component.tsx
++++ b/packages/components/src/border-control/border-control-style-picker/component.tsx
+@@ -26,7 +26,6 @@ function UnconnectedBorderControlStylePicker(
+ ) {
+ 	return (
+ 		<ToggleGroupControl
+-			__nextHasNoMarginBottom
+ 			__next40pxDefaultSize
+ 			ref={ forwardedRef }
+ 			isDeselectable
+diff --git a/packages/components/src/date-time/time/time-input/index.tsx b/packages/components/src/date-time/time/time-input/index.tsx
+index e2628fdb7a2b46..7139365c70ad46 100644
+--- a/packages/components/src/date-time/time/time-input/index.tsx
++++ b/packages/components/src/date-time/time/time-input/index.tsx
+@@ -168,7 +168,6 @@ export function TimeInput( {
+ 				{ is12Hour && (
+ 					<ToggleGroupControl
+ 						__next40pxDefaultSize
+-						__nextHasNoMarginBottom
+ 						isBlock
+ 						label={ __( 'Select AM or PM' ) }
+ 						hideLabelFromVision
+diff --git a/packages/components/src/font-size-picker/font-size-picker-toggle-group.tsx b/packages/components/src/font-size-picker/font-size-picker-toggle-group.tsx
+index 783dcb919c3d35..a9e516440fe040 100644
+--- a/packages/components/src/font-size-picker/font-size-picker-toggle-group.tsx
++++ b/packages/components/src/font-size-picker/font-size-picker-toggle-group.tsx
+@@ -56,7 +56,6 @@ const FontSizePickerToggleGroup = ( props: FontSizePickerToggleGroupProps ) => {
+ 
+ 	return (
+ 		<ToggleGroupControl
+-			__nextHasNoMarginBottom
+ 			__next40pxDefaultSize={ __next40pxDefaultSize }
+ 			__shouldNotWarnDeprecated36pxSize
+ 			label={ __( 'Font size' ) }
+diff --git a/packages/components/src/toggle-group-control/stories/index.story.tsx b/packages/components/src/toggle-group-control/stories/index.story.tsx
+index 4d7269c30704ec..975d6e192eb2d0 100644
+--- a/packages/components/src/toggle-group-control/stories/index.story.tsx
++++ b/packages/components/src/toggle-group-control/stories/index.story.tsx
+@@ -51,7 +51,6 @@ const Template: StoryFn< typeof ToggleGroupControl > = ( {
+ 
+ 	return (
+ 		<ToggleGroupControl
+-			__nextHasNoMarginBottom
+ 			__next40pxDefaultSize
+ 			{ ...props }
+ 			onChange={ ( ...changeArgs ) => {
+diff --git a/packages/components/src/toggle-group-control/test/index.tsx b/packages/components/src/toggle-group-control/test/index.tsx
+index 28928a9735a378..b93502546feb9b 100644
+--- a/packages/components/src/toggle-group-control/test/index.tsx
++++ b/packages/components/src/toggle-group-control/test/index.tsx
+@@ -28,13 +28,7 @@ const hoverOutside = async () => {
+ };
+ 
+ const ToggleGroupControl = ( props: ToggleGroupControlProps ) => {
+-	return (
+-		<_ToggleGroupControl
+-			{ ...props }
+-			__nextHasNoMarginBottom
+-			__next40pxDefaultSize
+-		/>
+-	);
++	return <_ToggleGroupControl { ...props } __next40pxDefaultSize />;
+ };
+ 
+ const ControlledToggleGroupControl = ( {
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md
+index 1ee82b26a91998..605b59ce536f5a 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md
+@@ -17,7 +17,7 @@ import { formatLowercase, formatUppercase } from '@wordpress/icons';
+ 
+ function Example() {
+ 	return (
+-		<ToggleGroupControl __nextHasNoMarginBottom __next40pxDefaultSize>
++		<ToggleGroupControl __next40pxDefaultSize>
+ 			<ToggleGroupControlOptionIcon
+ 				value="uppercase"
+ 				icon={ formatUppercase }
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
+index d1840cba5595d9..2f80e66b2bbf9a 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
+@@ -52,7 +52,7 @@ function UnforwardedToggleGroupControlOptionIcon(
+  *
+  * function Example() {
+  *  return (
+- *    <ToggleGroupControl __nextHasNoMarginBottom __next40pxDefaultSize>
++ *    <ToggleGroupControl __next40pxDefaultSize>
+  *      <ToggleGroupControlOptionIcon
+  *        value="uppercase"
+  *        label="Uppercase"
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option/README.md b/packages/components/src/toggle-group-control/toggle-group-control-option/README.md
+index 411857d260a311..f34ced5241cb12 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option/README.md
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option/README.md
+@@ -20,7 +20,6 @@ function Example() {
+ 			label="my label"
+ 			value="vertical"
+ 			isBlock
+-			__nextHasNoMarginBottom
+ 			__next40pxDefaultSize
+ 		>
+ 			<ToggleGroupControlOption
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
+index 8632d92fc00578..cb1535f943b48e 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
+@@ -52,7 +52,6 @@ function UnforwardedToggleGroupControlOption(
+  *       label="my label"
+  *       value="vertical"
+  *       isBlock
+- *       __nextHasNoMarginBottom
+  *       __next40pxDefaultSize
+  *     >
+  *       <ToggleGroupControlOption value="horizontal" label="Horizontal" />
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/README.md b/packages/components/src/toggle-group-control/toggle-group-control/README.md
+index 841d474c148d45..832686519054aa 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/README.md
++++ b/packages/components/src/toggle-group-control/toggle-group-control/README.md
+@@ -24,7 +24,6 @@ function Example() {
+ 			label="my label"
+ 			value="vertical"
+ 			isBlock
+-			__nextHasNoMarginBottom
+ 			__next40pxDefaultSize
+ 		>
+ 			<ToggleGroupControlOption value="horizontal" label="Horizontal" />
+@@ -95,10 +94,3 @@ Start opting into the larger default height that will become the default size in
+ 
+ -   Required: No
+ -   Default: `false`
+-
+-### `__nextHasNoMarginBottom`: `boolean`
+-
+-Start opting into the new margin-free styles that will become the default in a future version.
+-
+--   Required: No
+--   Default: `false`
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index 3391c929fffbe1..9e71b9cad59c09 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -7,6 +7,7 @@ import type { ForwardedRef } from 'react';
+  * WordPress dependencies
+  */
+ import { useMemo, useState } from '@wordpress/element';
++import { useMergeRefs } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+@@ -21,7 +22,6 @@ import * as styles from './styles';
+ import { ToggleGroupControlAsRadioGroup } from './as-radio-group';
+ import { ToggleGroupControlAsButtonGroup } from './as-button-group';
+ import { useTrackElementOffsetRect } from '../../utils/element-rect';
+-import { useMergeRefs } from '@wordpress/compose';
+ import { useAnimatedOffsetRect } from '../../utils/hooks/use-animated-offset-rect';
+ import { maybeWarnDeprecated36pxSize } from '../../utils/deprecated-36px-size';
+ 
+@@ -30,7 +30,7 @@ function UnconnectedToggleGroupControl(
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const {
+-		__nextHasNoMarginBottom = false,
++		__nextHasNoMarginBottom: _, // Prevent passing this to the internal component
+ 		__next40pxDefaultSize = false,
+ 		__shouldNotWarnDeprecated36pxSize,
+ 		className,
+@@ -91,11 +91,7 @@ function UnconnectedToggleGroupControl(
+ 	} );
+ 
+ 	return (
+-		<BaseControl
+-			help={ help }
+-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+-			__associatedWPComponentName="ToggleGroupControl"
+-		>
++		<BaseControl help={ help } __nextHasNoMarginBottom>
+ 			{ ! hideLabelFromVision && (
+ 				<VisualLabelWrapper>
+ 					<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel>
+@@ -143,7 +139,6 @@ function UnconnectedToggleGroupControl(
+  *       label="my label"
+  *       value="vertical"
+  *       isBlock
+- *       __nextHasNoMarginBottom
+  *       __next40pxDefaultSize
+  *     >
+  *       <ToggleGroupControlOption value="horizontal" label="Horizontal" />
+diff --git a/packages/components/src/toggle-group-control/types.ts b/packages/components/src/toggle-group-control/types.ts
+index cfa9d00080467c..cf166d30a63eed 100644
+--- a/packages/components/src/toggle-group-control/types.ts
++++ b/packages/components/src/toggle-group-control/types.ts
+@@ -70,10 +70,14 @@ export type WithToolTipProps = {
+ 	showTooltip?: boolean;
+ };
+ 
+-export type ToggleGroupControlProps = Pick<
+-	BaseControlProps,
+-	'help' | '__nextHasNoMarginBottom'
+-> & {
++export type ToggleGroupControlProps = Pick< BaseControlProps, 'help' > & {
++	/**
++	 * Start opting into the new margin-free styles that will become the default in a future version.
++	 *
++	 * @deprecated Default behavior since WordPress 7.0. Prop can be safely removed.
++	 * @ignore
++	 */
++	__nextHasNoMarginBottom?: boolean;
+ 	/**
+ 	 * Label for the control.
+ 	 */
+diff --git a/packages/components/src/tools-panel/stories/index.story.tsx b/packages/components/src/tools-panel/stories/index.story.tsx
+index d4adf8c3786c90..63be9c6d9a8a0f 100644
+--- a/packages/components/src/tools-panel/stories/index.story.tsx
++++ b/packages/components/src/tools-panel/stories/index.story.tsx
+@@ -116,7 +116,6 @@ export const Default: StoryFn< typeof ToolsPanel > = ( {
+ 						onDeselect={ () => setScale( undefined ) }
+ 					>
+ 						<ToggleGroupControl
+-							__nextHasNoMarginBottom
+ 							__next40pxDefaultSize
+ 							label="Scale"
+ 							value={ scale }
+@@ -472,7 +471,6 @@ export const WithConditionalDefaultControl: StoryFn< typeof ToolsPanel > = ( {
+ 					isShownByDefault={ !! height }
+ 				>
+ 					<ToggleGroupControl
+-						__nextHasNoMarginBottom
+ 						__next40pxDefaultSize
+ 						label="Scale"
+ 						value={ scale }
+@@ -576,7 +574,6 @@ export const WithConditionallyRenderedControl: StoryFn<
+ 						isShownByDefault
+ 					>
+ 						<ToggleGroupControl
+-							__nextHasNoMarginBottom
+ 							__next40pxDefaultSize
+ 							label="Scale"
+ 							value={ scale }
+diff --git a/packages/components/src/validated-form-controls/components/toggle-group-control.tsx b/packages/components/src/validated-form-controls/components/toggle-group-control.tsx
+index 0f4b7c382a1773..291ec7e9896b38 100644
+--- a/packages/components/src/validated-form-controls/components/toggle-group-control.tsx
++++ b/packages/components/src/validated-form-controls/components/toggle-group-control.tsx
+@@ -18,7 +18,7 @@ const UnforwardedValidatedToggleGroupControl = (
+ 		...restProps
+ 	}: Omit<
+ 		React.ComponentProps< typeof ToggleGroupControl >,
+-		'__next40pxDefaultSize' | '__nextHasNoMarginBottom'
++		'__next40pxDefaultSize'
+ 	> &
+ 		ValidatedControlProps,
+ 	forwardedRef: React.ForwardedRef< HTMLInputElement >
+@@ -36,7 +36,6 @@ const UnforwardedValidatedToggleGroupControl = (
+ 				getValidityTarget={ () => validityTargetRef.current }
+ 			>
+ 				<ToggleGroupControl
+-					__nextHasNoMarginBottom
+ 					__next40pxDefaultSize
+ 					ref={ forwardedRef }
+ 					{ ...restProps }
+diff --git a/packages/dataviews/src/components/dataviews-view-config/index.tsx b/packages/dataviews/src/components/dataviews-view-config/index.tsx
+index 26ded9625d23ff..55304010b43dea 100644
+--- a/packages/dataviews/src/components/dataviews-view-config/index.tsx
++++ b/packages/dataviews/src/components/dataviews-view-config/index.tsx
+@@ -164,7 +164,6 @@ function SortDirectionControl() {
+ 	return (
+ 		<ToggleGroupControl
+ 			className="dataviews-view-config__sort-direction"
+-			__nextHasNoMarginBottom
+ 			__next40pxDefaultSize
+ 			isBlock
+ 			label={ __( 'Order' ) }
+@@ -219,7 +218,6 @@ function ItemsPerPageControl() {
+ 
+ 	return (
+ 		<ToggleGroupControl
+-			__nextHasNoMarginBottom
+ 			__next40pxDefaultSize
+ 			isBlock
+ 			label={ __( 'Items per page' ) }
+diff --git a/packages/dataviews/src/dataform-controls/toggle-group.tsx b/packages/dataviews/src/dataform-controls/toggle-group.tsx
+index b63bc92aafe476..e6390943984d68 100644
+--- a/packages/dataviews/src/dataform-controls/toggle-group.tsx
++++ b/packages/dataviews/src/dataform-controls/toggle-group.tsx
+@@ -53,7 +53,6 @@ export default function ToggleGroup< Item >( {
+ 			required={ !! field.isValid?.required }
+ 			customValidity={ getCustomValidity( isValid, validity ) }
+ 			__next40pxDefaultSize
+-			__nextHasNoMarginBottom
+ 			isBlock
+ 			label={ field.label }
+ 			help={ selectedOption?.description || field.description }
+diff --git a/packages/dataviews/src/dataviews-layouts/table/density-picker.tsx b/packages/dataviews/src/dataviews-layouts/table/density-picker.tsx
+index 6d3d31aeb7345e..4f381209724823 100644
+--- a/packages/dataviews/src/dataviews-layouts/table/density-picker.tsx
++++ b/packages/dataviews/src/dataviews-layouts/table/density-picker.tsx
+@@ -19,7 +19,6 @@ export default function DensityPicker() {
+ 	const view = context.view as ViewTable;
+ 	return (
+ 		<ToggleGroupControl
+-			__nextHasNoMarginBottom
+ 			size="__unstable-large"
+ 			label={ __( 'Density' ) }
+ 			value={ view.layout?.density || 'balanced' }
+diff --git a/packages/global-styles-ui/src/screen-typography-element.tsx b/packages/global-styles-ui/src/screen-typography-element.tsx
+index 8d60f9d7a0f5c4..b2c830eef1d4a1 100644
+--- a/packages/global-styles-ui/src/screen-typography-element.tsx
++++ b/packages/global-styles-ui/src/screen-typography-element.tsx
+@@ -69,7 +69,6 @@ function ScreenTypographyElement( { element }: ScreenTypographyElementProps ) {
+ 						}
+ 						isBlock
+ 						size="__unstable-large"
+-						__nextHasNoMarginBottom
+ 					>
+ 						<ToggleGroupControlOption
+ 							value="heading"
+diff --git a/packages/global-styles-ui/src/shadows-edit-panel.tsx b/packages/global-styles-ui/src/shadows-edit-panel.tsx
+index 6b6e21c182553e..ec13ec912c95fa 100644
+--- a/packages/global-styles-ui/src/shadows-edit-panel.tsx
++++ b/packages/global-styles-ui/src/shadows-edit-panel.tsx
+@@ -488,7 +488,6 @@ function ShadowPopover( { shadowObj, onChange }: ShadowPopoverProps ) {
+ 			/>
+ 			<ToggleGroupControl
+ 				label={ __( 'Shadow Type' ) }
+-				__nextHasNoMarginBottom
+ 				value={ shadowObj.inset ? 'inset' : 'outset' }
+ 				isBlock
+ 				onChange={ ( value ) =>

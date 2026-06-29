@@ -1,0 +1,3243 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 764fc24904ca75..b8656d795e0da6 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -1133,12 +1133,6 @@
+ 		"markdown_source": "../packages/components/src/navigable-container/README.md",
+ 		"parent": "components"
+ 	},
+-	{
+-		"title": "Navigation",
+-		"slug": "navigation",
+-		"markdown_source": "../packages/components/src/navigation/README.md",
+-		"parent": "components"
+-	},
+ 	{
+ 		"title": "Navigator",
+ 		"slug": "navigator",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 21f7978e458276..5a269d01c24ebc 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Breaking Changes
+ 
++-   `Navigation`: Completely remove deprecated component ([#78529](https://github.com/WordPress/gutenberg/pull/78529)).
+ -   `Notice`: Rework internal DOM structure and class names ([#78231](https://github.com/WordPress/gutenberg/pull/78231)). Consumers relying on those implementation details should update their projects accordingly:
+     -   Removed the `is-dismissible` class name on the root wrapper.
+     -   Moved the `.components-notice__actions` wrapper as a sibling of `.components-notice__content` (it was previously nested inside it).
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index 07b1a6b7125c01..4c99df49684693 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -118,11 +118,6 @@ export { default as MenuItemsChoice } from './menu-items-choice';
+ export { default as Modal } from './modal';
+ export { default as ScrollLock } from './scroll-lock';
+ export { NavigableMenu, TabbableContainer } from './navigable-container';
+-export { default as __experimentalNavigation } from './navigation';
+-export { default as __experimentalNavigationBackButton } from './navigation/back-button';
+-export { default as __experimentalNavigationGroup } from './navigation/group';
+-export { default as __experimentalNavigationItem } from './navigation/item';
+-export { default as __experimentalNavigationMenu } from './navigation/menu';
+ export {
+ 	/** @deprecated Import `Navigator` instead. */
+ 	NavigatorProvider as __experimentalNavigatorProvider,
+diff --git a/packages/components/src/navigation/README.md b/packages/components/src/navigation/README.md
+deleted file mode 100644
+index 45af7dac6fb016..00000000000000
+--- a/packages/components/src/navigation/README.md
++++ /dev/null
+@@ -1,267 +0,0 @@
+-# Navigation
+-
+-<div class="callout callout-alert">
+-This component is deprecated. Consider using `Navigator` instead.
+-</div>
+-
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+-Render a navigation list with optional groupings and hierarchy.
+-
+-## Usage
+-
+-```jsx
+-import {
+-	__experimentalNavigation as Navigation,
+-	__experimentalNavigationGroup as NavigationGroup,
+-	__experimentalNavigationItem as NavigationItem,
+-	__experimentalNavigationMenu as NavigationMenu,
+-} from '@wordpress/components';
+-
+-const MyNavigation = () => (
+-	<Navigation>
+-		<NavigationMenu title="Home">
+-			<NavigationGroup title="Group 1">
+-				<NavigationItem item="item-1" title="Item 1" />
+-				<NavigationItem item="item-2" title="Item 2" />
+-			</NavigationGroup>
+-			<NavigationGroup title="Group 2">
+-				<NavigationItem
+-					item="item-3"
+-					navigateToMenu="category"
+-					title="Category"
+-				/>
+-			</NavigationGroup>
+-		</NavigationMenu>
+-
+-		<NavigationMenu
+-			backButtonLabel="Home"
+-			menu="category"
+-			parentMenu="root"
+-			title="Category"
+-		>
+-			<NavigationItem badge="1" item="child-1" title="Child 1" />
+-			<NavigationItem item="child-2" title="Child 2" />
+-		</NavigationMenu>
+-	</Navigation>
+-);
+-```
+-
+-## Navigation Props
+-
+-`Navigation` supports the following props.
+-
+-### `activeItem`
+-
+--   Type: `string`
+--   Required: No
+-
+-The active item slug.
+-
+-### `activeMenu`
+-
+--   Type: `string`
+--   Required: No
+--   Default: "root"
+-
+-The active menu slug.
+-
+-### className
+-
+--   Type: `string`
+--   Required: No
+-
+-Optional className for the `Navigation` component.
+-
+-### `onActivateMenu`
+-
+--   Type: `function`
+--   Required: No
+-
+-Sync the active menu between the external state and the Navigation's internal state.
+-
+-## Navigation Menu Props
+-
+-`NavigationMenu` supports the following props.
+-
+-### `backButtonLabel`
+-
+--   Type: `string`
+--   Required: No
+--   Default: parent menu's title or "Back"
+-
+-The back button label used in nested menus. If not provided, the label will be inferred from the parent menu's title.
+-If for some reason the parent menu's title is not available then it will default to "Back".
+-
+-### `onBackButtonClick`
+-
+--   Type: `function`
+--   Required: No
+-
+-A callback to handle clicking on the back button. If this prop is provided then the back button will be shown.
+-
+-### className
+-
+--   Type: `string`
+--   Required: No
+-
+-Optional className for the `NavigationMenu` component.
+-
+-### hasSearch
+-
+--   Type: `boolean`
+--   Required: No
+-
+-Enable the search feature on the menu title.
+-
+-### `menu`
+-
+--   Type: `string`
+--   Required: No
+--   Default: "root"
+-
+-The unique identifier of the menu. The root menu can omit this, and it will default to "root"; all other menus need to specify it.
+-
+-### onSearch
+-
+--   Type: `( searchString: string ) => void;`
+--   Required: No
+-
+-When `hasSearch` is active, this function handles the search input's `onChange` event, making it controlled from the outside. It requires setting the `search` prop as well.
+-
+-### isSearchDebouncing
+-
+--   Type: `boolean`
+--   Required: No
+-
+-Indicates whether the search is debouncing or not. In case of `true` the "No results found." text is omitted. Used to prevent showing "No results found." text between debounced searches.
+-
+-### `parentMenu`
+-
+--   Type: `string`
+--   Required: No
+-
+-The parent menu slug; used by nested menus to indicate their parent menu.
+-
+-### search
+-
+--   Type: `string`
+--   Required: No
+-
+-When `hasSearch` is active and `onSearch` is provided, this controls the value of the search input. Required when the `onSearch` prop is provided.
+-
+-### `isEmpty`
+-
+--   Type: `boolean`
+--   Required: No
+-
+-Indicates whether the menu is empty or not. Used together with the `hideIfTargetMenuEmpty` prop of Navigation Item.
+-
+-### `title`
+-
+--   Type: `string`
+--   Required: No
+-
+-The menu title. It's also the field used by the menu search function.
+-
+-### `titleAction`
+-
+--   Type: `React.ReactNode`
+--   Required: No
+-
+-Use this prop to render additional actions in the menu title.
+-
+-## Navigation Group Props
+-
+-`NavigationGroup` supports the following props.
+-
+-### className
+-
+--   Type: `string`
+--   Required: No
+-
+-Optional className for the `NavigationGroup` component.
+-
+-### `title`
+-
+--   Type: `string`
+--   Required: No
+-
+-The group title.
+-
+-## Navigation Item Props
+-
+-`NavigationItem` supports the following props.
+-
+-### `badge`
+-
+--   Type: `string|Number`
+--   Required: No
+-
+-The item badge content.
+-
+-### className
+-
+--   Type: `string`
+--   Required: No
+-
+-Optional className for the `NavigationItem` component.
+-
+-### `href`
+-
+--   Type: `string`
+--   Required: No
+-
+-If provided, renders `a` instead of `button`.
+-
+-### `icon`
+-
+--   Type: `React.JSX.Element`
+--   Required: No
+-
+-If no `children` are passed, this prop allows to specify a custom icon for the menu item.
+-
+-### `item`
+-
+--   Type: `string`
+--   Required: No
+-
+-The unique identifier of the item.
+-
+-### `navigateToMenu`
+-
+--   Type: `string`
+--   Required: No
+-
+-The child menu slug. If provided, clicking on the item will navigate to the target menu.
+-
+-### `hideIfTargetMenuEmpty`
+-
+--   Type: `boolean`
+--   Required: No
+-
+-Indicates whether this item should be hidden if the menu specified in `navigateToMenu` is marked as empty in the `isEmpty` prop. Used together with the `isEmpty` prop of Navigation Menu.
+-
+-### `onClick`
+-
+--   Type: `React.MouseEventHandler`
+--   Required: No
+-
+-A callback to handle clicking on a menu item.
+-
+-### `isText`
+-
+--   Type: `boolean`
+--   Required: No
+--   Default: false
+-
+-If set to true then the menu item will only act as a text-only item rather than a button.
+-
+-### `title`
+-
+--   Type: `string`
+--   Required: No
+-
+-The item title.
+diff --git a/packages/components/src/navigation/back-button/index.tsx b/packages/components/src/navigation/back-button/index.tsx
+deleted file mode 100644
+index f3593382f537c0..00000000000000
+--- a/packages/components/src/navigation/back-button/index.tsx
++++ /dev/null
+@@ -1,73 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import clsx from 'clsx';
+-/**
+- * WordPress dependencies
+- */
+-import { forwardRef } from '@wordpress/element';
+-import { __, isRTL } from '@wordpress/i18n';
+-import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
+-
+-/**
+- * Internal dependencies
+- */
+-import { useNavigationContext } from '../context';
+-import { MenuBackButtonUI } from '../styles/navigation-styles';
+-
+-import type { NavigationBackButtonProps } from '../types';
+-
+-function UnforwardedNavigationBackButton(
+-	{
+-		backButtonLabel,
+-		className,
+-		href,
+-		onClick,
+-		parentMenu,
+-	}: NavigationBackButtonProps,
+-	ref: React.ForwardedRef< HTMLAnchorElement | HTMLButtonElement >
+-) {
+-	const { setActiveMenu, navigationTree } = useNavigationContext();
+-
+-	const classes = clsx( 'components-navigation__back-button', className );
+-
+-	const parentMenuTitle =
+-		parentMenu !== undefined
+-			? navigationTree.getMenu( parentMenu )?.title
+-			: undefined;
+-
+-	const handleOnClick: React.MouseEventHandler< HTMLElement > = ( event ) => {
+-		if ( typeof onClick === 'function' ) {
+-			onClick( event );
+-		}
+-
+-		const animationDirection = isRTL() ? 'left' : 'right';
+-		if ( parentMenu && ! event.defaultPrevented ) {
+-			setActiveMenu( parentMenu, animationDirection );
+-		}
+-	};
+-	const icon = isRTL() ? chevronRight : chevronLeft;
+-	return (
+-		<MenuBackButtonUI
+-			__next40pxDefaultSize
+-			className={ classes }
+-			href={ href }
+-			variant="tertiary"
+-			ref={ ref }
+-			onClick={ handleOnClick }
+-		>
+-			<Icon icon={ icon } />
+-			{ backButtonLabel || parentMenuTitle || __( 'Back' ) }
+-		</MenuBackButtonUI>
+-	);
+-}
+-
+-/**
+- * @deprecated Use `Navigator` instead.
+- */
+-export const NavigationBackButton = forwardRef(
+-	UnforwardedNavigationBackButton
+-);
+-NavigationBackButton.displayName = 'NavigationBackButton';
+-
+-export default NavigationBackButton;
+diff --git a/packages/components/src/navigation/constants.tsx b/packages/components/src/navigation/constants.tsx
+deleted file mode 100644
+index b3b619e11a1591..00000000000000
+--- a/packages/components/src/navigation/constants.tsx
++++ /dev/null
+@@ -1,2 +0,0 @@
+-export const ROOT_MENU = 'root';
+-export const SEARCH_FOCUS_DELAY = 100;
+diff --git a/packages/components/src/navigation/context.tsx b/packages/components/src/navigation/context.tsx
+deleted file mode 100644
+index 342b2d0c22b5a5..00000000000000
+--- a/packages/components/src/navigation/context.tsx
++++ /dev/null
+@@ -1,40 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { createContext, useContext } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { ROOT_MENU } from './constants';
+-
+-import type { NavigationContext as NavigationContextType } from './types';
+-
+-const noop = () => {};
+-const defaultIsEmpty = () => false;
+-const defaultGetter = () => undefined;
+-
+-export const NavigationContext = createContext< NavigationContextType >( {
+-	activeItem: undefined,
+-	activeMenu: ROOT_MENU,
+-	setActiveMenu: noop,
+-
+-	navigationTree: {
+-		items: {},
+-		getItem: defaultGetter,
+-		addItem: noop,
+-		removeItem: noop,
+-
+-		menus: {},
+-		getMenu: defaultGetter,
+-		addMenu: noop,
+-		removeMenu: noop,
+-		childMenu: {},
+-		traverseMenu: noop,
+-		isMenuEmpty: defaultIsEmpty,
+-	},
+-} );
+-
+-NavigationContext.displayName = 'NavigationContext';
+-
+-export const useNavigationContext = () => useContext( NavigationContext );
+diff --git a/packages/components/src/navigation/group/context.tsx b/packages/components/src/navigation/group/context.tsx
+deleted file mode 100644
+index 920bf31988f06a..00000000000000
+--- a/packages/components/src/navigation/group/context.tsx
++++ /dev/null
+@@ -1,16 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { createContext, useContext } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import type { NavigationGroupContext as NavigationGroupContextType } from '../types';
+-
+-export const NavigationGroupContext =
+-	createContext< NavigationGroupContextType >( { group: undefined } );
+-NavigationGroupContext.displayName = 'NavigationGroupContext';
+-
+-export const useNavigationGroupContext = () =>
+-	useContext( NavigationGroupContext );
+diff --git a/packages/components/src/navigation/group/index.tsx b/packages/components/src/navigation/group/index.tsx
+deleted file mode 100644
+index f1871f67cace35..00000000000000
+--- a/packages/components/src/navigation/group/index.tsx
++++ /dev/null
+@@ -1,73 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import clsx from 'clsx';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { NavigationGroupContext } from './context';
+-import { GroupTitleUI } from '../styles/navigation-styles';
+-import { useNavigationContext } from '../context';
+-
+-import type { NavigationGroupProps } from '../types';
+-
+-let uniqueId = 0;
+-
+-/**
+- * @deprecated Use `Navigator` instead.
+- */
+-export function NavigationGroup( {
+-	children,
+-	className,
+-	title,
+-}: NavigationGroupProps ) {
+-	const [ groupId ] = useState( `group-${ ++uniqueId }` );
+-	const {
+-		navigationTree: { items },
+-	} = useNavigationContext();
+-
+-	const context = { group: groupId };
+-
+-	// Keep the children rendered to make sure invisible items are included in the navigation tree.
+-	if (
+-		! Object.values( items ).some(
+-			( item ) => item.group === groupId && item._isVisible
+-		)
+-	) {
+-		return (
+-			<NavigationGroupContext.Provider value={ context }>
+-				{ children }
+-			</NavigationGroupContext.Provider>
+-		);
+-	}
+-
+-	const groupTitleId = `components-navigation__group-title-${ groupId }`;
+-	const classes = clsx( 'components-navigation__group', className );
+-
+-	return (
+-		<NavigationGroupContext.Provider value={ context }>
+-			<li className={ classes }>
+-				{ title && (
+-					<GroupTitleUI
+-						className="components-navigation__group-title"
+-						id={ groupTitleId }
+-						level={ 3 }
+-					>
+-						{ title }
+-					</GroupTitleUI>
+-				) }
+-				<ul aria-labelledby={ groupTitleId } role="group">
+-					{ children }
+-				</ul>
+-			</li>
+-		</NavigationGroupContext.Provider>
+-	);
+-}
+-
+-export default NavigationGroup;
+diff --git a/packages/components/src/navigation/index.tsx b/packages/components/src/navigation/index.tsx
+deleted file mode 100644
+index ef37caf2f52140..00000000000000
+--- a/packages/components/src/navigation/index.tsx
++++ /dev/null
+@@ -1,152 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import clsx from 'clsx';
+-
+-/**
+- * WordPress dependencies
+- */
+-import deprecated from '@wordpress/deprecated';
+-import { useEffect, useRef, useState } from '@wordpress/element';
+-import { isRTL } from '@wordpress/i18n';
+-
+-/**
+- * Internal dependencies
+- */
+-import { getAnimateClassName } from '../animate';
+-import { ROOT_MENU } from './constants';
+-import { NavigationContext } from './context';
+-import { NavigationUI } from './styles/navigation-styles';
+-import { useCreateNavigationTree } from './use-create-navigation-tree';
+-
+-import type {
+-	NavigationProps,
+-	NavigationContext as NavigationContextType,
+-} from './types';
+-
+-const noop = () => {};
+-
+-/**
+- * Render a navigation list with optional groupings and hierarchy.
+- *
+- * @deprecated Use `Navigator` instead.
+- *
+- * ```jsx
+- * import {
+- *   __experimentalNavigation as Navigation,
+- *   __experimentalNavigationGroup as NavigationGroup,
+- *   __experimentalNavigationItem as NavigationItem,
+- *   __experimentalNavigationMenu as NavigationMenu,
+- * } from '@wordpress/components';
+- *
+- * const MyNavigation = () => (
+- *   <Navigation>
+- *     <NavigationMenu title="Home">
+- *       <NavigationGroup title="Group 1">
+- *         <NavigationItem item="item-1" title="Item 1" />
+- *         <NavigationItem item="item-2" title="Item 2" />
+- *       </NavigationGroup>
+- *       <NavigationGroup title="Group 2">
+- *         <NavigationItem
+- *           item="item-3"
+- *           navigateToMenu="category"
+- *           title="Category"
+- *         />
+- *       </NavigationGroup>
+- *     </NavigationMenu>
+- *
+- *     <NavigationMenu
+- *       backButtonLabel="Home"
+- *       menu="category"
+- *       parentMenu="root"
+- *       title="Category"
+- *     >
+- *       <NavigationItem badge="1" item="child-1" title="Child 1" />
+- *       <NavigationItem item="child-2" title="Child 2" />
+- *     </NavigationMenu>
+- *   </Navigation>
+- * );
+- * ```
+- */
+-export function Navigation( {
+-	activeItem,
+-	activeMenu = ROOT_MENU,
+-	children,
+-	className,
+-	onActivateMenu = noop,
+-}: NavigationProps ) {
+-	const [ menu, setMenu ] = useState( activeMenu );
+-	const [ slideOrigin, setSlideOrigin ] = useState< 'left' | 'right' >();
+-	const navigationTree = useCreateNavigationTree();
+-	const defaultSlideOrigin = isRTL() ? 'right' : 'left';
+-
+-	deprecated( 'wp.components.Navigation (and all subcomponents)', {
+-		since: '6.8',
+-		version: '7.1',
+-		alternative: 'wp.components.Navigator',
+-	} );
+-
+-	const setActiveMenu: NavigationContextType[ 'setActiveMenu' ] = (
+-		menuId,
+-		slideInOrigin = defaultSlideOrigin
+-	) => {
+-		if ( ! navigationTree.getMenu( menuId ) ) {
+-			return;
+-		}
+-
+-		setSlideOrigin( slideInOrigin );
+-		setMenu( menuId );
+-		onActivateMenu( menuId );
+-	};
+-
+-	// Used to prevent the sliding animation on mount
+-	const isMountedRef = useRef( false );
+-	useEffect( () => {
+-		if ( ! isMountedRef.current ) {
+-			isMountedRef.current = true;
+-		}
+-	}, [] );
+-
+-	useEffect( () => {
+-		if ( activeMenu !== menu ) {
+-			setActiveMenu( activeMenu );
+-		}
+-		// Not adding deps for now, as it would require either a larger refactor or some questionable workarounds.
+-		// See https://github.com/WordPress/gutenberg/pull/41612 for context.
+-	}, [ activeMenu ] );
+-
+-	const context = {
+-		activeItem,
+-		activeMenu: menu,
+-		setActiveMenu,
+-		navigationTree,
+-	};
+-
+-	const classes = clsx( 'components-navigation', className );
+-	const animateClassName = getAnimateClassName( {
+-		type: 'slide-in',
+-		origin: slideOrigin,
+-	} );
+-
+-	return (
+-		<NavigationUI className={ classes }>
+-			<div
+-				key={ menu }
+-				className={
+-					animateClassName
+-						? clsx( {
+-								[ animateClassName ]:
+-									isMountedRef.current && slideOrigin,
+-						  } )
+-						: undefined
+-				}
+-			>
+-				<NavigationContext.Provider value={ context }>
+-					{ children }
+-				</NavigationContext.Provider>
+-			</div>
+-		</NavigationUI>
+-	);
+-}
+-
+-export default Navigation;
+diff --git a/packages/components/src/navigation/item/base-content.tsx b/packages/components/src/navigation/item/base-content.tsx
+deleted file mode 100644
+index 3bda9a71251698..00000000000000
+--- a/packages/components/src/navigation/item/base-content.tsx
++++ /dev/null
+@@ -1,31 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { ItemBadgeUI, ItemTitleUI } from '../styles/navigation-styles';
+-
+-import type { NavigationItemBaseContentProps } from '../types';
+-
+-export default function NavigationItemBaseContent(
+-	props: NavigationItemBaseContentProps
+-) {
+-	const { badge, title } = props;
+-
+-	return (
+-		<>
+-			{ title && (
+-				<ItemTitleUI
+-					className="components-navigation__item-title"
+-					as="span"
+-				>
+-					{ title }
+-				</ItemTitleUI>
+-			) }
+-
+-			{ badge && (
+-				<ItemBadgeUI className="components-navigation__item-badge">
+-					{ badge }
+-				</ItemBadgeUI>
+-			) }
+-		</>
+-	);
+-}
+diff --git a/packages/components/src/navigation/item/base.tsx b/packages/components/src/navigation/item/base.tsx
+deleted file mode 100644
+index de4dfaba88c1a3..00000000000000
+--- a/packages/components/src/navigation/item/base.tsx
++++ /dev/null
+@@ -1,42 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import clsx from 'clsx';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { useNavigationContext } from '../context';
+-import { useNavigationTreeItem } from './use-navigation-tree-item';
+-import { ItemBaseUI } from '../styles/navigation-styles';
+-
+-import type { NavigationItemBaseProps } from '../types';
+-
+-let uniqueId = 0;
+-
+-export default function NavigationItemBase( props: NavigationItemBaseProps ) {
+-	// Also avoid to pass the `title` and `href` props to the ItemBaseUI styled component.
+-	const { children, className, title, href, ...restProps } = props;
+-
+-	const [ itemId ] = useState( `item-${ ++uniqueId }` );
+-
+-	useNavigationTreeItem( itemId, props );
+-	const { navigationTree } = useNavigationContext();
+-
+-	if ( ! navigationTree.getItem( itemId )?._isVisible ) {
+-		return null;
+-	}
+-
+-	const classes = clsx( 'components-navigation__item', className );
+-
+-	return (
+-		<ItemBaseUI className={ classes } { ...restProps }>
+-			{ children }
+-		</ItemBaseUI>
+-	);
+-}
+diff --git a/packages/components/src/navigation/item/index.tsx b/packages/components/src/navigation/item/index.tsx
+deleted file mode 100644
+index 160ed36ac63680..00000000000000
+--- a/packages/components/src/navigation/item/index.tsx
++++ /dev/null
+@@ -1,112 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import clsx from 'clsx';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
+-import { isRTL } from '@wordpress/i18n';
+-
+-/**
+- * Internal dependencies
+- */
+-import Button from '../../button';
+-import { useNavigationContext } from '../context';
+-import { ItemUI, ItemIconUI } from '../styles/navigation-styles';
+-import NavigationItemBaseContent from './base-content';
+-import NavigationItemBase from './base';
+-
+-import type { NavigationItemProps } from '../types';
+-
+-const noop = () => {};
+-
+-/**
+- * @deprecated Use `Navigator` instead.
+- */
+-export function NavigationItem( props: NavigationItemProps ) {
+-	const {
+-		badge,
+-		children,
+-		className,
+-		href,
+-		item,
+-		navigateToMenu,
+-		onClick = noop,
+-		title,
+-		icon,
+-		hideIfTargetMenuEmpty,
+-		isText,
+-		...restProps
+-	} = props;
+-
+-	const {
+-		activeItem,
+-		setActiveMenu,
+-		navigationTree: { isMenuEmpty },
+-	} = useNavigationContext();
+-
+-	// If hideIfTargetMenuEmpty prop is true
+-	// And the menu we are supposed to navigate to
+-	// Is marked as empty, then we skip rendering the item.
+-	if (
+-		hideIfTargetMenuEmpty &&
+-		navigateToMenu &&
+-		isMenuEmpty( navigateToMenu )
+-	) {
+-		return null;
+-	}
+-
+-	const isActive = item && activeItem === item;
+-
+-	const classes = clsx( className, {
+-		'is-active': isActive,
+-	} );
+-
+-	const onItemClick: React.MouseEventHandler<
+-		HTMLButtonElement | HTMLAnchorElement
+-	> = ( event ) => {
+-		if ( navigateToMenu ) {
+-			setActiveMenu( navigateToMenu );
+-		}
+-
+-		onClick( event );
+-	};
+-	const navigationIcon = isRTL() ? chevronLeft : chevronRight;
+-	const baseProps = children ? props : { ...props, onClick: undefined };
+-	const itemProps = isText
+-		? restProps
+-		: {
+-				as: Button,
+-				__next40pxDefaultSize:
+-					'as' in restProps ? restProps.as === undefined : true,
+-				href,
+-				onClick: onItemClick,
+-				'aria-current': isActive ? 'page' : undefined,
+-				...restProps,
+-		  };
+-
+-	return (
+-		<NavigationItemBase { ...baseProps } className={ classes }>
+-			{ children || (
+-				<ItemUI { ...itemProps }>
+-					{ icon && (
+-						<ItemIconUI>
+-							<Icon icon={ icon } />
+-						</ItemIconUI>
+-					) }
+-
+-					<NavigationItemBaseContent
+-						title={ title }
+-						badge={ badge }
+-					/>
+-
+-					{ navigateToMenu && <Icon icon={ navigationIcon } /> }
+-				</ItemUI>
+-			) }
+-		</NavigationItemBase>
+-	);
+-}
+-
+-export default NavigationItem;
+diff --git a/packages/components/src/navigation/item/use-navigation-tree-item.tsx b/packages/components/src/navigation/item/use-navigation-tree-item.tsx
+deleted file mode 100644
+index 335e55f2401bf4..00000000000000
+--- a/packages/components/src/navigation/item/use-navigation-tree-item.tsx
++++ /dev/null
+@@ -1,47 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useEffect } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { useNavigationContext } from '../context';
+-import { useNavigationGroupContext } from '../group/context';
+-import { useNavigationMenuContext } from '../menu/context';
+-import { normalizedSearch } from '../utils';
+-
+-import type { NavigationItemProps } from '../types';
+-
+-export const useNavigationTreeItem = (
+-	itemId: string,
+-	props: NavigationItemProps
+-) => {
+-	const {
+-		activeMenu,
+-		navigationTree: { addItem, removeItem },
+-	} = useNavigationContext();
+-	const { group } = useNavigationGroupContext();
+-	const { menu, search } = useNavigationMenuContext();
+-
+-	useEffect( () => {
+-		const isMenuActive = activeMenu === menu;
+-		const isItemVisible =
+-			! search ||
+-			( props.title !== undefined &&
+-				normalizedSearch( props.title, search ) );
+-
+-		addItem( itemId, {
+-			...props,
+-			group,
+-			menu,
+-			_isVisible: isMenuActive && isItemVisible,
+-		} );
+-
+-		return () => {
+-			removeItem( itemId );
+-		};
+-		// Not adding deps for now, as it would require either a larger refactor.
+-		// See https://github.com/WordPress/gutenberg/pull/41639
+-	}, [ activeMenu, search ] );
+-};
+diff --git a/packages/components/src/navigation/menu/context.tsx b/packages/components/src/navigation/menu/context.tsx
+deleted file mode 100644
+index c21a70da2e16f1..00000000000000
+--- a/packages/components/src/navigation/menu/context.tsx
++++ /dev/null
+@@ -1,20 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { createContext, useContext } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import type { NavigationMenuContext as NavigationMenuContextType } from '../types';
+-
+-export const NavigationMenuContext = createContext< NavigationMenuContextType >(
+-	{
+-		menu: undefined,
+-		search: '',
+-	}
+-);
+-NavigationMenuContext.displayName = 'NavigationMenuContext';
+-
+-export const useNavigationMenuContext = () =>
+-	useContext( NavigationMenuContext );
+diff --git a/packages/components/src/navigation/menu/index.tsx b/packages/components/src/navigation/menu/index.tsx
+deleted file mode 100644
+index 2a2cb20da0e9c9..00000000000000
+--- a/packages/components/src/navigation/menu/index.tsx
++++ /dev/null
+@@ -1,105 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import clsx from 'clsx';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { ROOT_MENU } from '../constants';
+-import { NavigationMenuContext } from './context';
+-import { useNavigationContext } from '../context';
+-import { useNavigationTreeMenu } from './use-navigation-tree-menu';
+-import NavigationBackButton from '../back-button';
+-import NavigationMenuTitle from './menu-title';
+-import NavigationSearchNoResultsFound from './search-no-results-found';
+-import { NavigableMenu } from '../../navigable-container';
+-import { MenuUI } from '../styles/navigation-styles';
+-
+-import type { NavigationMenuProps } from '../types';
+-
+-/**
+- * @deprecated Use `Navigator` instead.
+- */
+-export function NavigationMenu( props: NavigationMenuProps ) {
+-	const {
+-		backButtonLabel,
+-		children,
+-		className,
+-		hasSearch,
+-		menu = ROOT_MENU,
+-		onBackButtonClick,
+-		onSearch: setControlledSearch,
+-		parentMenu,
+-		search: controlledSearch,
+-		isSearchDebouncing,
+-		title,
+-		titleAction,
+-	} = props;
+-	const [ uncontrolledSearch, setUncontrolledSearch ] = useState( '' );
+-	useNavigationTreeMenu( props );
+-	const { activeMenu } = useNavigationContext();
+-
+-	const context = {
+-		menu,
+-		search: uncontrolledSearch,
+-	};
+-
+-	// Keep the children rendered to make sure invisible items are included in the navigation tree.
+-	if ( activeMenu !== menu ) {
+-		return (
+-			<NavigationMenuContext.Provider value={ context }>
+-				{ children }
+-			</NavigationMenuContext.Provider>
+-		);
+-	}
+-
+-	const isControlledSearch = !! setControlledSearch;
+-	const search = isControlledSearch ? controlledSearch : uncontrolledSearch;
+-	const onSearch = isControlledSearch
+-		? setControlledSearch
+-		: setUncontrolledSearch;
+-
+-	const menuTitleId = `components-navigation__menu-title-${ menu }`;
+-	const classes = clsx( 'components-navigation__menu', className );
+-
+-	return (
+-		<NavigationMenuContext.Provider value={ context }>
+-			<MenuUI className={ classes }>
+-				{ ( parentMenu || onBackButtonClick ) && (
+-					<NavigationBackButton
+-						backButtonLabel={ backButtonLabel }
+-						parentMenu={ parentMenu }
+-						onClick={ onBackButtonClick }
+-					/>
+-				) }
+-
+-				{ title && (
+-					<NavigationMenuTitle
+-						hasSearch={ hasSearch }
+-						onSearch={ onSearch }
+-						search={ search }
+-						title={ title }
+-						titleAction={ titleAction }
+-					/>
+-				) }
+-
+-				<NavigableMenu>
+-					<ul aria-labelledby={ menuTitleId }>
+-						{ children }
+-						{ search && ! isSearchDebouncing && (
+-							<NavigationSearchNoResultsFound search={ search } />
+-						) }
+-					</ul>
+-				</NavigableMenu>
+-			</MenuUI>
+-		</NavigationMenuContext.Provider>
+-	);
+-}
+-
+-export default NavigationMenu;
+diff --git a/packages/components/src/navigation/menu/menu-title-search.tsx b/packages/components/src/navigation/menu/menu-title-search.tsx
+deleted file mode 100644
+index ddd7d9b2e621cc..00000000000000
+--- a/packages/components/src/navigation/menu/menu-title-search.tsx
++++ /dev/null
+@@ -1,99 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useEffect, useRef } from '@wordpress/element';
+-import { __, _n, sprintf } from '@wordpress/i18n';
+-
+-/**
+- * Internal dependencies
+- */
+-import withSpokenMessages from '../../higher-order/with-spoken-messages';
+-import { useNavigationMenuContext } from './context';
+-import { useNavigationContext } from '../context';
+-import { SEARCH_FOCUS_DELAY } from '../constants';
+-
+-import type { NavigationMenuTitleSearchProps } from '../types';
+-import SearchControl from '../../search-control';
+-import { MenuTitleSearchControlWrapper } from '../styles/navigation-styles';
+-
+-function MenuTitleSearch( {
+-	debouncedSpeak,
+-	onCloseSearch,
+-	onSearch,
+-	search,
+-	title,
+-}: NavigationMenuTitleSearchProps ) {
+-	const {
+-		navigationTree: { items },
+-	} = useNavigationContext();
+-	const { menu } = useNavigationMenuContext();
+-	const inputRef = useRef< HTMLInputElement >( null );
+-
+-	// Wait for the slide-in animation to complete before autofocusing the input.
+-	// This prevents scrolling to the input during the animation.
+-	useEffect( () => {
+-		const delayedFocus = setTimeout( () => {
+-			inputRef.current?.focus();
+-		}, SEARCH_FOCUS_DELAY );
+-
+-		return () => {
+-			clearTimeout( delayedFocus );
+-		};
+-	}, [] );
+-
+-	useEffect( () => {
+-		if ( ! search ) {
+-			return;
+-		}
+-
+-		const count = Object.values( items ).filter(
+-			( item ) => item._isVisible
+-		).length;
+-		const resultsFoundMessage = sprintf(
+-			/* translators: %d: number of results. */
+-			_n( '%d result found.', '%d results found.', count ),
+-			count
+-		);
+-		debouncedSpeak( resultsFoundMessage );
+-		// Not adding deps for now, as it would require either a larger refactor.
+-		// See https://github.com/WordPress/gutenberg/pull/44090
+-	}, [ items, search ] );
+-
+-	const onClose = () => {
+-		onSearch?.( '' );
+-		onCloseSearch();
+-	};
+-
+-	const onKeyDown: React.KeyboardEventHandler< HTMLInputElement > = (
+-		event
+-	) => {
+-		if ( event.code === 'Escape' && ! event.defaultPrevented ) {
+-			event.preventDefault();
+-			onClose();
+-		}
+-	};
+-
+-	const inputId = `components-navigation__menu-title-search-${ menu }`;
+-	const placeholder = sprintf(
+-		/* translators: placeholder for menu search box. %s: menu title */
+-		__( 'Search %s' ),
+-		title?.toLowerCase() || ''
+-	).trim();
+-
+-	return (
+-		<MenuTitleSearchControlWrapper>
+-			<SearchControl
+-				className="components-navigation__menu-search-input"
+-				id={ inputId }
+-				onChange={ ( value ) => onSearch?.( value ) }
+-				onKeyDown={ onKeyDown }
+-				placeholder={ placeholder }
+-				onClose={ onClose }
+-				ref={ inputRef }
+-				value={ search }
+-			/>
+-		</MenuTitleSearchControlWrapper>
+-	);
+-}
+-
+-export default withSpokenMessages( MenuTitleSearch );
+diff --git a/packages/components/src/navigation/menu/menu-title.tsx b/packages/components/src/navigation/menu/menu-title.tsx
+deleted file mode 100644
+index 43ae0bd45cfb2b..00000000000000
+--- a/packages/components/src/navigation/menu/menu-title.tsx
++++ /dev/null
+@@ -1,100 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useRef, useState } from '@wordpress/element';
+-import { __, sprintf } from '@wordpress/i18n';
+-import { Icon, search as searchIcon } from '@wordpress/icons';
+-
+-/**
+- * Internal dependencies
+- */
+-import { getAnimateClassName } from '../../animate';
+-import Button from '../../button';
+-import MenuTitleSearch from './menu-title-search';
+-import {
+-	GroupTitleUI,
+-	MenuTitleActionsUI,
+-	MenuTitleUI,
+-} from '../styles/navigation-styles';
+-import { useNavigationMenuContext } from './context';
+-import { SEARCH_FOCUS_DELAY } from '../constants';
+-
+-import type { NavigationMenuTitleProps } from '../types';
+-
+-export default function NavigationMenuTitle( {
+-	hasSearch,
+-	onSearch,
+-	search,
+-	title,
+-	titleAction,
+-}: NavigationMenuTitleProps ) {
+-	const [ isSearching, setIsSearching ] = useState( false );
+-	const { menu } = useNavigationMenuContext();
+-	const searchButtonRef = useRef< HTMLElement >( null );
+-
+-	if ( ! title ) {
+-		return null;
+-	}
+-
+-	const onCloseSearch = () => {
+-		setIsSearching( false );
+-
+-		// Wait for the slide-in animation to complete before focusing the search button.
+-		// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
+-		setTimeout( () => {
+-			searchButtonRef.current?.focus();
+-		}, SEARCH_FOCUS_DELAY );
+-	};
+-
+-	const menuTitleId = `components-navigation__menu-title-${ menu }`;
+-	/* translators: search button label for menu search box. %s: menu title */
+-	const searchButtonLabel = sprintf( __( 'Search in %s' ), title );
+-
+-	return (
+-		<MenuTitleUI className="components-navigation__menu-title">
+-			{ ! isSearching && (
+-				<GroupTitleUI
+-					as="h2"
+-					className="components-navigation__menu-title-heading"
+-					level={ 3 }
+-				>
+-					<span id={ menuTitleId }>{ title }</span>
+-
+-					{ ( hasSearch || titleAction ) && (
+-						<MenuTitleActionsUI>
+-							{ titleAction }
+-
+-							{ hasSearch && (
+-								<Button
+-									size="small"
+-									variant="tertiary"
+-									label={ searchButtonLabel }
+-									onClick={ () => setIsSearching( true ) }
+-									ref={ searchButtonRef }
+-								>
+-									<Icon icon={ searchIcon } />
+-								</Button>
+-							) }
+-						</MenuTitleActionsUI>
+-					) }
+-				</GroupTitleUI>
+-			) }
+-
+-			{ isSearching && (
+-				<div
+-					className={ getAnimateClassName( {
+-						type: 'slide-in',
+-						origin: 'left',
+-					} ) }
+-				>
+-					<MenuTitleSearch
+-						onCloseSearch={ onCloseSearch }
+-						onSearch={ onSearch }
+-						search={ search }
+-						title={ title }
+-					/>
+-				</div>
+-			) }
+-		</MenuTitleUI>
+-	);
+-}
+diff --git a/packages/components/src/navigation/menu/search-no-results-found.tsx b/packages/components/src/navigation/menu/search-no-results-found.tsx
+deleted file mode 100644
+index c239f74ce8173a..00000000000000
+--- a/packages/components/src/navigation/menu/search-no-results-found.tsx
++++ /dev/null
+@@ -1,34 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { __ } from '@wordpress/i18n';
+-
+-/**
+- * Internal dependencies
+- */
+-import { useNavigationContext } from '../context';
+-import { ItemBaseUI, ItemUI } from '../styles/navigation-styles';
+-
+-import type { NavigationSearchNoResultsFoundProps } from '../types';
+-
+-export default function NavigationSearchNoResultsFound( {
+-	search,
+-}: NavigationSearchNoResultsFoundProps ) {
+-	const {
+-		navigationTree: { items },
+-	} = useNavigationContext();
+-
+-	const resultsCount = Object.values( items ).filter(
+-		( item ) => item._isVisible
+-	).length;
+-
+-	if ( ! search || !! resultsCount ) {
+-		return null;
+-	}
+-
+-	return (
+-		<ItemBaseUI>
+-			<ItemUI>{ __( 'No results found.' ) } </ItemUI>
+-		</ItemBaseUI>
+-	);
+-}
+diff --git a/packages/components/src/navigation/menu/use-navigation-tree-menu.tsx b/packages/components/src/navigation/menu/use-navigation-tree-menu.tsx
+deleted file mode 100644
+index 8631812445cd7d..00000000000000
+--- a/packages/components/src/navigation/menu/use-navigation-tree-menu.tsx
++++ /dev/null
+@@ -1,29 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useEffect } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { useNavigationContext } from '../context';
+-import { ROOT_MENU } from '../constants';
+-
+-import type { NavigationMenuProps } from '../types';
+-
+-export const useNavigationTreeMenu = ( props: NavigationMenuProps ) => {
+-	const {
+-		navigationTree: { addMenu, removeMenu },
+-	} = useNavigationContext();
+-
+-	const key = props.menu || ROOT_MENU;
+-	useEffect( () => {
+-		addMenu( key, { ...props, menu: key } );
+-
+-		return () => {
+-			removeMenu( key );
+-		};
+-		// Not adding deps for now, as it would require either a larger refactor
+-		// See https://github.com/WordPress/gutenberg/pull/44090
+-	}, [] );
+-};
+diff --git a/packages/components/src/navigation/stories/index.story.tsx b/packages/components/src/navigation/stories/index.story.tsx
+deleted file mode 100644
+index dc56e68b14e377..00000000000000
+--- a/packages/components/src/navigation/stories/index.story.tsx
++++ /dev/null
+@@ -1,62 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import type { Meta } from '@storybook/react-vite';
+-import { fn } from 'storybook/test';
+-
+-/**
+- * Internal dependencies
+- */
+-import { Navigation } from '..';
+-import { NavigationBackButton } from '../back-button';
+-import { NavigationGroup } from '../group';
+-import { NavigationItem } from '../item';
+-import { NavigationMenu } from '../menu';
+-import { DefaultStory } from './utils/default';
+-import { GroupStory } from './utils/group';
+-import { ControlledStateStory } from './utils/controlled-state';
+-import { SearchStory } from './utils/search';
+-import { MoreExamplesStory } from './utils/more-examples';
+-import { HideIfEmptyStory } from './utils/hide-if-empty';
+-import './style.css';
+-
+-/**
+- * Render a navigation list with optional groupings and hierarchy.
+- *
+- * This component is deprecated. Consider using `Navigator` instead.
+- */
+-const meta: Meta< typeof Navigation > = {
+-	title: 'Components/Deprecated/Navigation',
+-	id: 'components-navigation',
+-	component: Navigation,
+-	subcomponents: {
+-		NavigationBackButton,
+-		NavigationGroup,
+-		NavigationItem,
+-		NavigationMenu,
+-	},
+-	argTypes: {
+-		activeItem: { control: false },
+-		activeMenu: { control: false },
+-		children: { control: false },
+-		onActivateMenu: { control: false },
+-	},
+-	args: {
+-		onActivateMenu: fn(),
+-	},
+-	parameters: {
+-		controls: {
+-			expanded: true,
+-		},
+-		docs: { canvas: { sourceState: 'shown' } },
+-	},
+-};
+-
+-export default meta;
+-
+-export const _default = DefaultStory.bind( {} );
+-export const ControlledState = ControlledStateStory.bind( {} );
+-export const Groups = GroupStory.bind( {} );
+-export const Search = SearchStory.bind( {} );
+-export const MoreExamples = MoreExamplesStory.bind( {} );
+-export const HideIfEmpty = HideIfEmptyStory.bind( {} );
+diff --git a/packages/components/src/navigation/stories/style.css b/packages/components/src/navigation/stories/style.css
+deleted file mode 100644
+index bcb4e0cbf1fc19..00000000000000
+--- a/packages/components/src/navigation/stories/style.css
++++ /dev/null
+@@ -1,25 +0,0 @@
+-.navigation-story {
+-	max-width: 300px;
+-}
+-
+-.navigation-story__aside {
+-	margin: 48px 0 0 24px;
+-}
+-
+-.navigation-story__wordpress-icon {
+-	align-items: center;
+-	display: inline-flex;
+-}
+-.navigation-story__wordpress-icon svg {
+-	fill: #949494;
+-	margin-right: 8px;
+-}
+-
+-:root[dir="rtl"] .navigation-story__wordpress-icon svg {
+-	fill: #949494;
+-	margin-right: 0;
+-	margin-left: 8px;
+-}
+-.navigation-story__wordpress-icon:hover svg {
+-	fill: #ddd;
+-}
+diff --git a/packages/components/src/navigation/stories/utils/controlled-state.tsx b/packages/components/src/navigation/stories/utils/controlled-state.tsx
+deleted file mode 100644
+index f97a34c079c52a..00000000000000
+--- a/packages/components/src/navigation/stories/utils/controlled-state.tsx
++++ /dev/null
+@@ -1,149 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import type { StoryFn } from '@storybook/react-vite';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import Button from '../../../button';
+-import { Navigation } from '../..';
+-import { NavigationItem } from '../../item';
+-import { NavigationMenu } from '../../menu';
+-
+-export const ControlledStateStory: StoryFn< typeof Navigation > = ( {
+-	className,
+-	...props
+-} ) => {
+-	const [ activeItem, setActiveItem ] = useState( 'item-1' );
+-	const [ activeMenu, setActiveMenu ] = useState( 'root' );
+-
+-	// Mock navigation link.
+-	const MockLink = ( {
+-		href,
+-		children,
+-	}: {
+-		href: string;
+-		children: React.ReactNode;
+-	} ) => (
+-		<Button
+-			__next40pxDefaultSize
+-			href={ href }
+-			// Since we're not actually navigating pages, simulate it with onClick.
+-			onClick={
+-				( ( event ) => {
+-					event.preventDefault();
+-					const item = href.replace( 'https://example.com/', '' );
+-					setActiveItem( item );
+-				} ) as React.MouseEventHandler< HTMLAnchorElement >
+-			}
+-		>
+-			{ children }
+-		</Button>
+-	);
+-
+-	return (
+-		<>
+-			<Navigation
+-				{ ...props }
+-				activeItem={ activeItem }
+-				activeMenu={ activeMenu }
+-				className={ [ 'navigation-story', className ]
+-					.filter( Boolean )
+-					.join( ' ' ) }
+-				onActivateMenu={ setActiveMenu }
+-			>
+-				<NavigationMenu title="Home">
+-					<NavigationItem item="item-1" title="Item 1">
+-						<MockLink href="https://example.com/item-1">
+-							Item 1
+-						</MockLink>
+-					</NavigationItem>
+-					<NavigationItem item="item-2">
+-						<MockLink href="https://example.com/item-2">
+-							Item 2
+-						</MockLink>
+-					</NavigationItem>
+-					<NavigationItem
+-						item="item-sub-menu"
+-						navigateToMenu="sub-menu"
+-						title="Sub-Menu"
+-					/>
+-				</NavigationMenu>
+-				<NavigationMenu
+-					menu="sub-menu"
+-					parentMenu="root"
+-					title="Sub-Menu"
+-				>
+-					<NavigationItem
+-						item="child-1"
+-						onClick={ () => setActiveItem( 'child-1' ) }
+-						title="Child 1"
+-					/>
+-					<NavigationItem
+-						item="child-2"
+-						onClick={ () => setActiveItem( 'child-2' ) }
+-						title="Child 2"
+-					/>
+-					<NavigationItem
+-						item="child-nested-sub-menu"
+-						navigateToMenu="nested-sub-menu"
+-						title="Nested Sub-Menu"
+-					/>
+-				</NavigationMenu>
+-				<NavigationMenu
+-					menu="nested-sub-menu"
+-					parentMenu="sub-menu"
+-					title="Nested Sub-Menu"
+-				>
+-					<NavigationItem
+-						item="sub-child-1"
+-						onClick={ () => setActiveItem( 'sub-child-1' ) }
+-						title="Sub-Child 1"
+-					/>
+-					<NavigationItem
+-						item="sub-child-2"
+-						onClick={ () => setActiveItem( 'sub-child-2' ) }
+-						title="Sub-Child 2"
+-					/>
+-				</NavigationMenu>
+-			</Navigation>
+-
+-			<div className="navigation-story__aside">
+-				<p>
+-					Menu <code>{ activeMenu }</code> is active.
+-					<br />
+-					Item <code>{ activeItem }</code> is active.
+-				</p>
+-				<p>
+-					<Button
+-						__next40pxDefaultSize
+-						variant="secondary"
+-						onClick={ () => {
+-							setActiveMenu( 'nested-sub-menu' );
+-						} }
+-					>
+-						Open the Nested Sub-Menu menu
+-					</Button>
+-				</p>
+-				<p>
+-					<Button
+-						__next40pxDefaultSize
+-						variant="secondary"
+-						onClick={ () => {
+-							setActiveItem( 'child-2' );
+-							setActiveMenu( 'sub-menu' );
+-						} }
+-					>
+-						Navigate to Child 2 item
+-					</Button>
+-				</p>
+-			</div>
+-		</>
+-	);
+-};
+diff --git a/packages/components/src/navigation/stories/utils/default.tsx b/packages/components/src/navigation/stories/utils/default.tsx
+deleted file mode 100644
+index 5f07dccd2f33c9..00000000000000
+--- a/packages/components/src/navigation/stories/utils/default.tsx
++++ /dev/null
+@@ -1,92 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import type { StoryFn } from '@storybook/react-vite';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { Navigation } from '../..';
+-import { NavigationItem } from '../../item';
+-import { NavigationMenu } from '../../menu';
+-
+-export const DefaultStory: StoryFn< typeof Navigation > = ( {
+-	className,
+-	...props
+-} ) => {
+-	const [ activeItem, setActiveItem ] = useState( 'item-1' );
+-
+-	return (
+-		<Navigation
+-			{ ...props }
+-			activeItem={ activeItem }
+-			className={ [ 'navigation-story', className ]
+-				.filter( Boolean )
+-				.join( ' ' ) }
+-		>
+-			<NavigationMenu title="Home">
+-				<NavigationItem
+-					item="item-1"
+-					onClick={ () => setActiveItem( 'item-1' ) }
+-					title="Item 1"
+-				/>
+-				<NavigationItem
+-					item="item-2"
+-					onClick={ () => setActiveItem( 'item-2' ) }
+-					title="Item 2"
+-				/>
+-				<NavigationItem>
+-					<a
+-						className="components-button"
+-						href="http://www.example.com"
+-					>
+-						External Link
+-					</a>
+-				</NavigationItem>
+-				<NavigationItem
+-					item="item-sub-menu"
+-					navigateToMenu="sub-menu"
+-					title="Sub-Menu"
+-				/>
+-			</NavigationMenu>
+-			<NavigationMenu menu="sub-menu" parentMenu="root" title="Sub-Menu">
+-				<NavigationItem
+-					item="child-1"
+-					onClick={ () => setActiveItem( 'child-1' ) }
+-					title="Child 1"
+-				/>
+-				<NavigationItem
+-					item="child-2"
+-					onClick={ () => setActiveItem( 'child-2' ) }
+-					title="Child 2"
+-				/>
+-				<NavigationItem
+-					item="child-nested-sub-menu"
+-					navigateToMenu="nested-sub-menu"
+-					title="Nested Sub-Menu"
+-				/>
+-			</NavigationMenu>
+-			<NavigationMenu
+-				menu="nested-sub-menu"
+-				parentMenu="sub-menu"
+-				title="Nested Sub-Menu"
+-			>
+-				<NavigationItem
+-					item="sub-child-1"
+-					onClick={ () => setActiveItem( 'sub-child-1' ) }
+-					title="Sub-Child 1"
+-				/>
+-				<NavigationItem
+-					item="sub-child-2"
+-					onClick={ () => setActiveItem( 'sub-child-2' ) }
+-					title="Sub-Child 2"
+-				/>
+-			</NavigationMenu>
+-		</Navigation>
+-	);
+-};
+diff --git a/packages/components/src/navigation/stories/utils/group.tsx b/packages/components/src/navigation/stories/utils/group.tsx
+deleted file mode 100644
+index 371cfb1c233543..00000000000000
+--- a/packages/components/src/navigation/stories/utils/group.tsx
++++ /dev/null
+@@ -1,61 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import type { StoryFn } from '@storybook/react-vite';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { Navigation } from '../..';
+-import { NavigationItem } from '../../item';
+-import { NavigationMenu } from '../../menu';
+-import { NavigationGroup } from '../../group';
+-
+-export const GroupStory: StoryFn< typeof Navigation > = ( {
+-	className,
+-	...props
+-} ) => {
+-	const [ activeItem, setActiveItem ] = useState( 'item-1' );
+-
+-	return (
+-		<Navigation
+-			{ ...props }
+-			activeItem={ activeItem }
+-			className={ [ 'navigation-story', className ]
+-				.filter( Boolean )
+-				.join( ' ' ) }
+-		>
+-			<NavigationMenu title="Home">
+-				<NavigationGroup title="Group 1">
+-					<NavigationItem
+-						item="item-1"
+-						onClick={ () => setActiveItem( 'item-1' ) }
+-						title="Item 1"
+-					/>
+-					<NavigationItem
+-						item="item-2"
+-						onClick={ () => setActiveItem( 'item-2' ) }
+-						title="Item 2"
+-					/>
+-				</NavigationGroup>
+-				<NavigationGroup title="Group 2">
+-					<NavigationItem
+-						item="item-3"
+-						onClick={ () => setActiveItem( 'item-3' ) }
+-						title="Item 3"
+-					/>
+-					<NavigationItem
+-						item="item-4"
+-						onClick={ () => setActiveItem( 'item-4' ) }
+-						title="Item 4"
+-					/>
+-				</NavigationGroup>
+-			</NavigationMenu>
+-		</Navigation>
+-	);
+-};
+diff --git a/packages/components/src/navigation/stories/utils/hide-if-empty.tsx b/packages/components/src/navigation/stories/utils/hide-if-empty.tsx
+deleted file mode 100644
+index c0c84e383b49b7..00000000000000
+--- a/packages/components/src/navigation/stories/utils/hide-if-empty.tsx
++++ /dev/null
+@@ -1,66 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import type { StoryFn } from '@storybook/react-vite';
+-
+-/**
+- * Internal dependencies
+- */
+-import { Navigation } from '../..';
+-import { NavigationItem } from '../../item';
+-import { NavigationMenu } from '../../menu';
+-
+-export const HideIfEmptyStory: StoryFn< typeof Navigation > = ( {
+-	className,
+-	...props
+-} ) => {
+-	return (
+-		<>
+-			<Navigation
+-				{ ...props }
+-				className={ [ 'navigation-story', className ]
+-					.filter( Boolean )
+-					.join( ' ' ) }
+-			>
+-				<NavigationMenu title="Home" menu="root" isEmpty={ false }>
+-					<NavigationItem
+-						navigateToMenu="root-sub-1"
+-						title="To sub 1 (hidden)"
+-						hideIfTargetMenuEmpty
+-					/>
+-
+-					<NavigationItem
+-						navigateToMenu="root-sub-2"
+-						title="To sub 2 (visible)"
+-						hideIfTargetMenuEmpty
+-					/>
+-
+-					<NavigationItem
+-						navigateToMenu="root-sub-1-sub-1"
+-						title="To sub 1-1 (hidden)"
+-						hideIfTargetMenuEmpty
+-					/>
+-				</NavigationMenu>
+-
+-				<NavigationMenu menu="root-sub-1" parentMenu="root" isEmpty />
+-				<NavigationMenu
+-					menu="root-sub-2"
+-					parentMenu="root"
+-					isEmpty={ false }
+-				>
+-					<NavigationItem title="This menu is visible" />
+-				</NavigationMenu>
+-				<NavigationMenu
+-					menu="root-sub-1-sub-1"
+-					parentMenu="root-sub-1"
+-					isEmpty
+-				/>
+-			</Navigation>
+-
+-			<p>
+-				This story contains 3 navigation items and 4 menus. You should
+-				only see one item: <strong>To sub 2 (visible)</strong>
+-			</p>
+-		</>
+-	);
+-};
+diff --git a/packages/components/src/navigation/stories/utils/more-examples.tsx b/packages/components/src/navigation/stories/utils/more-examples.tsx
+deleted file mode 100644
+index 3ad4801c4bd095..00000000000000
+--- a/packages/components/src/navigation/stories/utils/more-examples.tsx
++++ /dev/null
+@@ -1,162 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import type { StoryFn } from '@storybook/react-vite';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useEffect, useState } from '@wordpress/element';
+-import { Icon, wordpress, home } from '@wordpress/icons';
+-
+-/**
+- * Internal dependencies
+- */
+-import { Navigation } from '../..';
+-import { NavigationGroup } from '../../group';
+-import { NavigationItem } from '../../item';
+-import { NavigationMenu } from '../../menu';
+-
+-export const MoreExamplesStory: StoryFn< typeof Navigation > = ( {
+-	className,
+-	...props
+-} ) => {
+-	const [ activeItem, setActiveItem ] = useState( 'child-1' );
+-	const [ delayedBadge, setDelayedBadge ] = useState< number | undefined >();
+-	useEffect( () => {
+-		const timeout = setTimeout( () => setDelayedBadge( 2 ), 1500 );
+-		return () => clearTimeout( timeout );
+-	} );
+-	const [ backButtonBadge, setBackButtonBadge ] = useState( 1 );
+-	const [ backButtonPreventedBadge, setBackButtonPreventedBadge ] =
+-		useState( 1 );
+-
+-	return (
+-		<Navigation
+-			{ ...props }
+-			activeItem={ activeItem }
+-			className={ [ 'navigation-story', className ]
+-				.filter( Boolean )
+-				.join( ' ' ) }
+-		>
+-			<NavigationMenu title="Home">
+-				<NavigationGroup title="Items without Active State">
+-					<NavigationItem item="item-1" title="Item 1" />
+-					<NavigationItem item="item-2" title="Item 2" />
+-				</NavigationGroup>
+-				<NavigationGroup title="Items with Unusual Features">
+-					<NavigationItem
+-						icon={ home }
+-						item="item-sub-menu"
+-						navigateToMenu="sub-menu"
+-						title="Sub-Menu with Custom Back Label"
+-					/>
+-					<NavigationItem
+-						item="item-custom-back-click-handler"
+-						navigateToMenu="custom-back-click-handler-menu"
+-						title="Custom Back Click Handler"
+-						badge={ backButtonBadge }
+-					/>
+-					<NavigationItem
+-						item="item-custom-back-click-handler-prevented"
+-						navigateToMenu="custom-back-click-handler-prevented-menu"
+-						title="Prevent back navigation"
+-					/>
+-					<NavigationItem
+-						item="item-nonexistent-menu"
+-						navigateToMenu="nonexistent-menu"
+-						title="Navigate to Nonexistent Menu"
+-					/>
+-					<NavigationItem
+-						badge={ delayedBadge }
+-						item="item-delayed-badge"
+-						onClick={ () => setActiveItem( 'item-delayed-badge' ) }
+-						title="Item with a Delayed Badge"
+-					/>
+-				</NavigationGroup>
+-				<NavigationGroup title="External Links">
+-					<NavigationItem
+-						href="https://wordpress.org/"
+-						item="item-4"
+-						target="_blank"
+-						title="WordPress.org"
+-					/>
+-					<NavigationItem item="item-5">
+-						{ /* eslint-disable-next-line react/jsx-no-target-blank */ }
+-						<a
+-							className="navigation-story__wordpress-icon"
+-							href="https://wordpress.org/"
+-							target="_blank"
+-							rel="noopener"
+-						>
+-							<Icon icon={ wordpress } />
+-							<em>Custom Content</em>
+-						</a>
+-					</NavigationItem>
+-				</NavigationGroup>
+-				<NavigationGroup title="Text only items">
+-					<NavigationItem
+-						item="item-text-only"
+-						title="This is just text, doesn't have any functionality"
+-						isText
+-					/>
+-					<NavigationItem
+-						item="item-text-only-with-badge"
+-						title="Text with badge"
+-						badge="2"
+-						isText
+-					/>
+-				</NavigationGroup>
+-			</NavigationMenu>
+-
+-			<NavigationMenu
+-				backButtonLabel="Custom Back Button Label"
+-				menu="sub-menu"
+-				parentMenu="root"
+-				title="Sub-Menu with Custom Back Label"
+-			>
+-				<NavigationItem
+-					item="child-1"
+-					onClick={ () => setActiveItem( 'child-1' ) }
+-					title="Child 1"
+-				/>
+-				<NavigationItem
+-					item="child-2"
+-					onClick={ () => setActiveItem( 'child-2' ) }
+-					title="Child 2"
+-				/>
+-			</NavigationMenu>
+-
+-			<NavigationMenu
+-				menu="custom-back-click-handler-menu"
+-				title="Custom back button click handler"
+-				parentMenu="root"
+-				onBackButtonClick={ () =>
+-					setBackButtonBadge( backButtonBadge + 1 )
+-				}
+-				backButtonLabel="Increment badge and go back"
+-			/>
+-
+-			<NavigationMenu
+-				menu="custom-back-click-handler-prevented-menu"
+-				title="Custom back button click handler prevented"
+-				parentMenu="root"
+-				onBackButtonClick={
+-					( ( event ) => {
+-						event.preventDefault();
+-						setBackButtonPreventedBadge(
+-							backButtonPreventedBadge + 1
+-						);
+-					} ) as React.MouseEventHandler
+-				}
+-				backButtonLabel="Increment badge"
+-			>
+-				<NavigationItem
+-					item="custom-back-click-prevented-child-1"
+-					title="You can't go back from here"
+-					badge={ backButtonPreventedBadge }
+-				/>
+-			</NavigationMenu>
+-		</Navigation>
+-	);
+-};
+diff --git a/packages/components/src/navigation/stories/utils/search.tsx b/packages/components/src/navigation/stories/utils/search.tsx
+deleted file mode 100644
+index 82ec235157e1e5..00000000000000
+--- a/packages/components/src/navigation/stories/utils/search.tsx
++++ /dev/null
+@@ -1,91 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import type { StoryFn } from '@storybook/react-vite';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { Navigation } from '../..';
+-import { NavigationGroup } from '../../group';
+-import { NavigationItem } from '../../item';
+-import { NavigationMenu } from '../../menu';
+-import { normalizedSearch } from '../../utils';
+-
+-const searchItems = [
+-	{ item: 'foo', title: 'Foo' },
+-	{ item: 'bar', title: 'Bar' },
+-	{ item: 'baz', title: 'Baz' },
+-	{ item: 'qux', title: 'Qux' },
+-	{ item: 'quux', title: 'Quux' },
+-	{ item: 'corge', title: 'Corge' },
+-	{ item: 'grault', title: 'Grault' },
+-	{ item: 'garply', title: 'Garply' },
+-	{ item: 'waldo', title: 'Waldo' },
+-];
+-
+-export const SearchStory: StoryFn< typeof Navigation > = ( {
+-	className,
+-	...props
+-} ) => {
+-	const [ activeItem, setActiveItem ] = useState( 'item-1' );
+-	const [ search, setSearch ] = useState( '' );
+-
+-	return (
+-		<Navigation
+-			{ ...props }
+-			activeItem={ activeItem }
+-			className={ [ 'navigation-story', className ]
+-				.filter( Boolean )
+-				.join( ' ' ) }
+-		>
+-			<NavigationMenu hasSearch title="Home">
+-				<NavigationGroup title="Items">
+-					{ searchItems.map( ( { item, title } ) => (
+-						<NavigationItem
+-							item={ `item-${ item }` }
+-							key={ `item-${ item }` }
+-							onClick={ () => setActiveItem( `item-${ item }` ) }
+-							title={ title }
+-						/>
+-					) ) }
+-				</NavigationGroup>
+-
+-				<NavigationGroup title="More Examples">
+-					<NavigationItem
+-						item="item-controlled-search"
+-						navigateToMenu="controlled-search"
+-						title="Controlled Search"
+-					/>
+-				</NavigationGroup>
+-			</NavigationMenu>
+-
+-			<NavigationMenu
+-				hasSearch
+-				menu="controlled-search"
+-				onSearch={ ( value ) => setSearch( value ) }
+-				parentMenu="root"
+-				search={ search }
+-				title="Controlled Search"
+-			>
+-				{ searchItems
+-					.filter( ( { title } ) =>
+-						normalizedSearch( title, search )
+-					)
+-					.map( ( { item, title } ) => (
+-						<NavigationItem
+-							item={ `child-${ item }` }
+-							key={ `child-${ item }` }
+-							onClick={ () => setActiveItem( `child-${ item }` ) }
+-							title={ title }
+-						/>
+-					) ) }
+-			</NavigationMenu>
+-		</Navigation>
+-	);
+-};
+diff --git a/packages/components/src/navigation/styles/navigation-styles.tsx b/packages/components/src/navigation/styles/navigation-styles.tsx
+deleted file mode 100644
+index aa0976a9a0f277..00000000000000
+--- a/packages/components/src/navigation/styles/navigation-styles.tsx
++++ /dev/null
+@@ -1,197 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import styled from '@emotion/styled';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { isRTL } from '@wordpress/i18n';
+-
+-/**
+- * Internal dependencies
+- */
+-import { COLORS } from '../../utils/colors-values';
+-import Button from '../../button';
+-import { Text } from '../../text';
+-import { Heading } from '../../heading';
+-import { rtl, CONFIG } from '../../utils';
+-import { space } from '../../utils/space';
+-
+-export const NavigationUI = styled.div`
+-	width: 100%;
+-	box-sizing: border-box;
+-	padding: 0 ${ space( 4 ) };
+-	overflow: hidden;
+-`;
+-
+-export const MenuUI = styled.div`
+-	margin-top: ${ space( 6 ) };
+-	margin-bottom: ${ space( 6 ) };
+-	display: flex;
+-	flex-direction: column;
+-	ul {
+-		padding: 0;
+-		margin: 0;
+-		list-style: none;
+-	}
+-	.components-navigation__back-button {
+-		margin-bottom: ${ space( 6 ) };
+-	}
+-
+-	.components-navigation__group + .components-navigation__group {
+-		margin-top: ${ space( 6 ) };
+-	}
+-`;
+-
+-export const MenuBackButtonUI = styled( Button )`
+-	&.is-tertiary {
+-		color: inherit;
+-		opacity: 0.7;
+-
+-		&:hover:not( :disabled ) {
+-			opacity: 1;
+-			box-shadow: none;
+-			color: inherit;
+-		}
+-
+-		&:active:not( :disabled ) {
+-			background: transparent;
+-			opacity: 1;
+-			color: inherit;
+-		}
+-	}
+-`;
+-
+-export const MenuTitleUI = styled.div`
+-	overflow: hidden;
+-	width: 100%;
+-`;
+-
+-export const MenuTitleSearchControlWrapper = styled.div`
+-	margin: 11px 0; // non-ideal hardcoding to maintain same height as Heading, could be improved
+-	padding: 1px; // so the focus border doesn't get cut off by the overflow hidden on MenuTitleUI
+-`;
+-
+-export const MenuTitleActionsUI = styled.span`
+-	height: ${ space( 6 ) }; // 24px, same height as the buttons inside
+-
+-	.components-button.is-small {
+-		color: inherit;
+-		opacity: 0.7;
+-		margin-right: ${ space( 1 ) }; // Avoid hiding the focus outline
+-		padding: 0;
+-
+-		&:active:not( :disabled ) {
+-			background: none;
+-			opacity: 1;
+-			color: inherit;
+-		}
+-		&:hover:not( :disabled ) {
+-			box-shadow: none;
+-			opacity: 1;
+-			color: inherit;
+-		}
+-	}
+-`;
+-
+-export const GroupTitleUI = styled( Heading )`
+-	min-height: ${ space( 12 ) };
+-	align-items: center;
+-	color: inherit;
+-	display: flex;
+-	justify-content: space-between;
+-	margin-bottom: ${ space( 2 ) };
+-	padding: ${ () =>
+-		isRTL()
+-			? `${ space( 1 ) } ${ space( 4 ) } ${ space( 1 ) } ${ space( 2 ) }`
+-			: `${ space( 1 ) } ${ space( 2 ) } ${ space( 1 ) } ${ space(
+-					4
+-			  ) }` };
+-`;
+-
+-export const ItemBaseUI = styled.li`
+-	border-radius: ${ CONFIG.radiusSmall };
+-	color: inherit;
+-	margin-bottom: 0;
+-
+-	> button,
+-	> a.components-button,
+-	> a {
+-		width: 100%;
+-		color: inherit;
+-		opacity: 0.7;
+-		padding: ${ space( 2 ) } ${ space( 4 ) }; /* 8px 16px */
+-		${ rtl( { textAlign: 'left' }, { textAlign: 'right' } ) }
+-
+-		&:hover,
+-		&:focus:not( [aria-disabled='true'] ):active,
+-		&:active:not( [aria-disabled='true'] ):active {
+-			color: inherit;
+-			opacity: 1;
+-		}
+-	}
+-
+-	&.is-active {
+-		background-color: ${ COLORS.theme.accent };
+-		color: ${ COLORS.theme.accentInverted };
+-
+-		> button,
+-		.components-button:hover,
+-		> a {
+-			color: ${ COLORS.theme.accentInverted };
+-			opacity: 1;
+-		}
+-	}
+-
+-	> svg path {
+-		color: ${ COLORS.gray[ 600 ] };
+-	}
+-`;
+-
+-export const ItemUI = styled.div`
+-	display: flex;
+-	align-items: center;
+-	height: auto;
+-	min-height: 40px;
+-	margin: 0;
+-	padding: ${ space( 1.5 ) } ${ space( 4 ) };
+-	font-weight: 400;
+-	line-height: 20px;
+-	width: 100%;
+-	color: inherit;
+-	opacity: 0.7;
+-`;
+-
+-export const ItemIconUI = styled.span`
+-	display: flex;
+-	margin-right: ${ space( 2 ) };
+-`;
+-
+-export const ItemBadgeUI = styled.span`
+-	margin-left: ${ () => ( isRTL() ? '0' : space( 2 ) ) };
+-	margin-right: ${ () => ( isRTL() ? space( 2 ) : '0' ) };
+-	display: inline-flex;
+-	padding: ${ space( 1 ) } ${ space( 3 ) };
+-	border-radius: ${ CONFIG.radiusSmall };
+-
+-	@keyframes fade-in {
+-		from {
+-			opacity: 0;
+-		}
+-		to {
+-			opacity: 1;
+-		}
+-	}
+-
+-	@media not ( prefers-reduced-motion ) {
+-		animation: fade-in 250ms ease-out;
+-	}
+-`;
+-
+-export const ItemTitleUI = styled( Text )`
+-	${ () => ( isRTL() ? 'margin-left: auto;' : 'margin-right: auto;' ) }
+-	font-size: 14px;
+-	line-height: 20px;
+-	color: inherit;
+-`;
+diff --git a/packages/components/src/navigation/test/index.tsx b/packages/components/src/navigation/test/index.tsx
+deleted file mode 100644
+index fed939068c0bfd..00000000000000
+--- a/packages/components/src/navigation/test/index.tsx
++++ /dev/null
+@@ -1,347 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { render, screen } from '@testing-library/react';
+-import userEvent from '@testing-library/user-event';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import Navigation from '..';
+-import NavigationItem from '../item';
+-import NavigationMenu from '../menu';
+-
+-const TestNavigation = ( {
+-	activeItem,
+-	rootTitle,
+-	showBadge,
+-}: {
+-	activeItem?: string;
+-	rootTitle?: string;
+-	showBadge?: boolean;
+-} ) => (
+-	<Navigation activeItem={ activeItem }>
+-		<NavigationMenu title={ rootTitle }>
+-			<NavigationItem
+-				badge={ showBadge ? 21 : undefined }
+-				item="item-1"
+-				title="Item 1"
+-			/>
+-			<NavigationItem
+-				href="http://example.com"
+-				item="item-2"
+-				target="_blank"
+-				title="Item 2"
+-			/>
+-			<NavigationItem
+-				navigateToMenu="category"
+-				item="category"
+-				title="Category"
+-			/>
+-			<NavigationItem item="item-3">
+-				<span>customize me</span>
+-			</NavigationItem>
+-		</NavigationMenu>
+-		<NavigationMenu
+-			backButtonLabel="Home"
+-			menu="category"
+-			parentMenu="root"
+-			title="Category"
+-		>
+-			<NavigationItem item="child-1" title="Child 1" />
+-			<NavigationItem item="child-2" title="Child 2" />
+-		</NavigationMenu>
+-	</Navigation>
+-);
+-
+-const TestNavigationControlled = () => {
+-	const [ activeItem, setActiveItem ] = useState( 'item-1' );
+-	const [ activeMenu, setActiveMenu ] = useState( 'root' );
+-
+-	const onMockLinkClick: React.MouseEventHandler< HTMLAnchorElement > = (
+-		event
+-	) => {
+-		event.preventDefault();
+-		const item = ( event.target as HTMLAnchorElement ).href.replace(
+-			'https://example.com/',
+-			''
+-		);
+-		setActiveItem( item );
+-	};
+-
+-	return (
+-		<>
+-			<Navigation
+-				activeItem={ activeItem }
+-				activeMenu={ activeMenu }
+-				className="navigation-story"
+-				onActivateMenu={ setActiveMenu }
+-			>
+-				<NavigationMenu title="Home">
+-					<NavigationItem
+-						item="item-1"
+-						title="Item 1"
+-						href="https://example.com/item-1"
+-						onClick={ onMockLinkClick }
+-					/>
+-					<NavigationItem
+-						item="item-2"
+-						title="Item 2"
+-						href="https://example.com/item-2"
+-						onClick={ onMockLinkClick }
+-					/>
+-					<NavigationItem
+-						item="item-sub-menu"
+-						navigateToMenu="sub-menu"
+-						title="Sub-Menu"
+-					/>
+-				</NavigationMenu>
+-				<NavigationMenu
+-					menu="sub-menu"
+-					parentMenu="root"
+-					title="Sub-Menu"
+-				>
+-					<NavigationItem
+-						item="child-1"
+-						onClick={ () => setActiveItem( 'child-1' ) }
+-						title="Child 1"
+-					/>
+-					<NavigationItem
+-						item="child-2"
+-						onClick={ () => setActiveItem( 'child-2' ) }
+-						title="Child 2"
+-					/>
+-					<NavigationItem
+-						item="child-nested-sub-menu"
+-						navigateToMenu="nested-sub-menu"
+-						title="Nested Sub-Menu"
+-					/>
+-				</NavigationMenu>
+-				<NavigationMenu
+-					menu="nested-sub-menu"
+-					parentMenu="sub-menu"
+-					title="Nested Sub-Menu"
+-				>
+-					<NavigationItem
+-						item="sub-child-1"
+-						onClick={ () => setActiveItem( 'sub-child-1' ) }
+-						title="Sub-Child 1"
+-					/>
+-					<NavigationItem
+-						item="sub-child-2"
+-						onClick={ () => setActiveItem( 'sub-child-2' ) }
+-						title="Sub-Child 2"
+-					/>
+-				</NavigationMenu>
+-			</Navigation>
+-
+-			<div className="navigation-story__aside">
+-				<p>
+-					Menu <code>{ activeMenu }</code> is active.
+-					<br />
+-					Item <code>{ activeItem }</code> is active.
+-				</p>
+-				<p>
+-					<button
+-						onClick={ () => {
+-							setActiveMenu( 'nested-sub-menu' );
+-						} }
+-					>
+-						Open the Nested Sub-Menu menu
+-					</button>
+-				</p>
+-				<p>
+-					<button
+-						onClick={ () => {
+-							setActiveItem( 'child-2' );
+-							setActiveMenu( 'sub-menu' );
+-						} }
+-					>
+-						Navigate to Child 2 item
+-					</button>
+-				</p>
+-			</div>
+-		</>
+-	);
+-};
+-
+-describe( 'Navigation', () => {
+-	it( 'should render the panes and active item', async () => {
+-		render( <TestNavigation activeItem="item-2" /> );
+-
+-		const menuItems = screen.getAllByRole( 'listitem' );
+-
+-		expect( console ).toHaveWarnedWith(
+-			'wp.components.Navigation (and all subcomponents) is deprecated since version 6.8 and will be removed in version 7.1. Please use wp.components.Navigator instead.'
+-		);
+-
+-		expect( menuItems ).toHaveLength( 4 );
+-		expect( menuItems[ 0 ] ).toHaveTextContent( 'Item 1' );
+-		expect( menuItems[ 1 ] ).toHaveTextContent( 'Item 2' );
+-		expect( menuItems[ 2 ] ).toHaveTextContent( 'Category' );
+-		expect( menuItems[ 3 ] ).toHaveTextContent( 'customize me' );
+-
+-		expect(
+-			screen.getByRole( 'link', { current: 'page' } )
+-		).toHaveTextContent( 'Item 2' );
+-	} );
+-
+-	it( 'should render anchor links when menu item supplies an href', () => {
+-		render( <TestNavigation /> );
+-
+-		const linkItem = screen.getByRole( 'link', { name: 'Item 2' } );
+-
+-		expect( linkItem ).toBeInTheDocument();
+-		expect( linkItem ).toHaveAttribute( 'target', '_blank' );
+-	} );
+-
+-	it( 'should render a custom component when menu item supplies one', () => {
+-		render( <TestNavigation /> );
+-
+-		expect( screen.getByText( 'customize me' ) ).toBeInTheDocument();
+-	} );
+-
+-	it( 'should set an active category on click', async () => {
+-		const user = userEvent.setup();
+-
+-		render( <TestNavigation /> );
+-
+-		await user.click( screen.getByRole( 'button', { name: 'Category' } ) );
+-
+-		expect( screen.getByRole( 'heading' ) ).toHaveTextContent( 'Category' );
+-		const menuItems = screen.getAllByRole( 'listitem' );
+-		expect( menuItems ).toHaveLength( 2 );
+-		expect( menuItems[ 0 ] ).toHaveTextContent( 'Child 1' );
+-		expect( menuItems[ 1 ] ).toHaveTextContent( 'Child 2' );
+-	} );
+-
+-	it( 'should render the root title', () => {
+-		const { rerender } = render( <TestNavigation /> );
+-
+-		expect( screen.queryByRole( 'heading' ) ).not.toBeInTheDocument();
+-
+-		rerender( <TestNavigation rootTitle="Home" /> );
+-
+-		expect( screen.getByRole( 'heading' ) ).toBeInTheDocument();
+-		expect( screen.getByRole( 'heading' ) ).toHaveTextContent( 'Home' );
+-	} );
+-
+-	it( 'should render badges', () => {
+-		render( <TestNavigation showBadge /> );
+-
+-		const menuItem = screen.getAllByRole( 'listitem' );
+-		expect( menuItem[ 0 ] ).toHaveTextContent( 'Item 1' + '21' );
+-	} );
+-
+-	it( 'should render menu titles when items exist', () => {
+-		const { rerender } = render( <Navigation></Navigation> );
+-
+-		expect( screen.queryByText( 'Menu title' ) ).not.toBeInTheDocument();
+-
+-		rerender( <TestNavigation rootTitle="Menu title" /> );
+-
+-		expect( screen.getByText( 'Menu title' ) ).toBeInTheDocument();
+-	} );
+-
+-	it( 'should navigate up a level when clicking the back button', async () => {
+-		const user = userEvent.setup();
+-
+-		render( <TestNavigation rootTitle="Home" /> );
+-
+-		await user.click( screen.getByRole( 'button', { name: 'Category' } ) );
+-
+-		expect( screen.getByRole( 'heading' ) ).toHaveTextContent( 'Category' );
+-
+-		await user.click( screen.getByRole( 'button', { name: 'Home' } ) );
+-
+-		expect( screen.getByRole( 'heading' ) ).toHaveTextContent( 'Home' );
+-	} );
+-
+-	it( 'should navigate correctly when controlled', async () => {
+-		const user = userEvent.setup();
+-
+-		render( <TestNavigationControlled /> );
+-
+-		// check root menu is shown and item 1 is selected
+-		expect(
+-			screen.getByRole( 'heading', { name: 'Home' } )
+-		).toBeInTheDocument();
+-		expect(
+-			screen.getByRole( 'link', { current: 'page' } )
+-		).toHaveTextContent( 'Item 1' );
+-
+-		// click Item 2, check it's selected
+-		await user.click( screen.getByRole( 'link', { name: 'Item 2' } ) );
+-		expect(
+-			screen.getByRole( 'link', { current: 'page' } )
+-		).toHaveTextContent( 'Item 2' );
+-
+-		// click sub-menu, check new menu is shown
+-		await user.click( screen.getByRole( 'button', { name: 'Sub-Menu' } ) );
+-		expect(
+-			screen.getByRole( 'heading', { name: 'Sub-Menu' } )
+-		).toBeInTheDocument();
+-
+-		// click Child 1, check it's selected
+-		await user.click( screen.getByRole( 'button', { name: 'Child 1' } ) );
+-		expect(
+-			screen.getByRole( 'button', { current: 'page' } )
+-		).toHaveTextContent( 'Child 1' );
+-
+-		// click nested sub-menu, check nested sub-menu is shown
+-		await user.click(
+-			screen.getByRole( 'button', { name: 'Nested Sub-Menu' } )
+-		);
+-		expect(
+-			screen.getByRole( 'heading', { name: 'Nested Sub-Menu' } )
+-		).toBeInTheDocument();
+-
+-		// click Sub Child 2, check it's selected
+-		await user.click(
+-			screen.getByRole( 'button', { name: 'Sub-Child 2' } )
+-		);
+-		expect(
+-			screen.getByRole( 'button', { current: 'page' } )
+-		).toHaveTextContent( 'Sub-Child 2' );
+-
+-		// click back, check sub-menu is shown
+-		await user.click( screen.getByRole( 'button', { name: 'Sub-Menu' } ) );
+-		expect(
+-			screen.getByRole( 'heading', { name: 'Sub-Menu' } )
+-		).toBeInTheDocument();
+-
+-		// click back, check root menu is shown
+-		await user.click( screen.getByRole( 'button', { name: 'Home' } ) );
+-		expect(
+-			screen.getByRole( 'heading', { name: 'Home' } )
+-		).toBeInTheDocument();
+-
+-		// click the programmatic nested sub-menu button, check nested sub menu is shown
+-		await user.click(
+-			screen.getByRole( 'button', {
+-				name: 'Open the Nested Sub-Menu menu',
+-			} )
+-		);
+-		expect(
+-			screen.getByRole( 'heading', { name: 'Nested Sub-Menu' } )
+-		).toBeInTheDocument();
+-
+-		// click navigate to child2 item button, check the correct menu is shown and the item is selected
+-		await user.click(
+-			screen.getByRole( 'button', {
+-				name: 'Navigate to Child 2 item',
+-			} )
+-		);
+-		expect(
+-			screen.getByRole( 'heading', { name: 'Sub-Menu' } )
+-		).toBeInTheDocument();
+-		expect(
+-			screen.getByRole( 'button', { current: 'page' } )
+-		).toHaveTextContent( 'Child 2' );
+-	} );
+-} );
+diff --git a/packages/components/src/navigation/types.ts b/packages/components/src/navigation/types.ts
+deleted file mode 100644
+index e1dc4ca28f8ea1..00000000000000
+--- a/packages/components/src/navigation/types.ts
++++ /dev/null
+@@ -1,325 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import type { ButtonProps } from '../button/types';
+-
+-type IfDiscriminantDefinedBothRequired< TDiscriminant, TOther > =
+-	// When props in TDiscriminant are specified,
+-	// then props from TOther are required too
+-	| {
+-			[ K in keyof ( TDiscriminant & TOther ) ]: NonNullable<
+-				( TDiscriminant & TOther )[ K ]
+-			>;
+-	  }
+-	// When props in TDiscriminant are not specified,
+-	// then props from TOther are optional
+-	| ( {
+-			[ K in keyof TDiscriminant ]?: never;
+-	  } & {
+-			[ K in keyof TOther ]?: TOther[ K ];
+-	  } );
+-
+-// React Components
+-
+-export type NavigationProps = {
+-	/**
+-	 * The active item slug.
+-	 */
+-	activeItem?: string;
+-	/**
+-	 * The active menu slug.
+-	 *
+-	 * @default 'root'
+-	 */
+-	activeMenu?: string;
+-	/**
+-	 * The children components.
+-	 */
+-	children?: React.ReactNode;
+-	/**
+-	 * Optional classname for the component.
+-	 */
+-	className?: string;
+-	/**
+-	 * Callback used to sync the active menu between the external state
+-	 * and the Navigation's internal state.
+-	 */
+-	onActivateMenu?: ( activeMenuSlug: string ) => void;
+-};
+-
+-// When `onSearch` is specified, `search` should be specified too
+-type _NavigationMenuSearchProps = IfDiscriminantDefinedBothRequired<
+-	{
+-		/**
+-		 * When the `hasSearch` prop is `true`, this callback handles the search
+-		 * input's `onChange` event, making it controlled from the outside.
+-		 * When using this prop, the `search` prop should be also set.
+-		 */
+-		onSearch: ( searchString: string ) => void;
+-	},
+-	{
+-		/**
+-		 * When the `hasSearch` is `true` and the `onSearch` prop is provided, this
+-		 * prop controls the value of the search input.
+-		 * Required when the `onSearch` prop is provided.
+-		 */
+-		search: string;
+-	}
+->;
+-
+-export type NavigationMenuProps = _NavigationMenuSearchProps & {
+-	/**
+-	 * The back button label used in nested menus.
+-	 * If not provided, the label will be inferred from the parent menu's title.
+-	 * If the parent menu's title is not available then it will default to "Back".
+-	 *
+-	 * @default parentMenuTitle ?? 'Back'
+-	 */
+-	backButtonLabel?: string;
+-	/**
+-	 * A callback to handle clicking on the back button.
+-	 * If this prop is provided then the back button will be shown.
+-	 */
+-	onBackButtonClick?: React.MouseEventHandler< HTMLElement >;
+-	/**
+-	 * The children components.
+-	 */
+-	children?: React.ReactNode;
+-	/**
+-	 * Optional classname for the component.
+-	 */
+-	className?: string;
+-	/**
+-	 * When `true`, enables the search feature on the menu title.
+-	 */
+-	hasSearch?: boolean;
+-	/**
+-	 * Indicates whether the menu is empty or not. Used together with the
+-	 * `hideIfTargetMenuEmpty` prop of `NavigationItem`.
+-	 */
+-	isEmpty?: boolean;
+-	/**
+-	 * Indicates whether the search is debouncing or not. In case of `true`, the
+-	 * "No results found." text is omitted. Used to prevent showing the
+-	 * "No results found." text between debounced searches.
+-	 */
+-	isSearchDebouncing?: boolean;
+-	/**
+-	 * The unique identifier of the menu.
+-	 * The root menu can omit this prop, and it will default to "root".
+-	 * All other menus need to specify it.
+-	 *
+-	 * @default 'root'
+-	 */
+-	menu?: string;
+-	/**
+-	 * The parent menu slug; used by nested menus to indicate their parent menu.
+-	 */
+-	parentMenu?: string;
+-	/**
+-	 * The menu title. It's also the field used by the menu search function.
+-	 */
+-	title?: string;
+-	/**
+-	 * Use this prop to render additional actions in the menu title.
+-	 */
+-	titleAction?: React.ReactNode;
+-};
+-
+-export type NavigationGroupProps = {
+-	/**
+-	 * Optional classname for the component.
+-	 */
+-	className?: string;
+-	/**
+-	 * The group title.
+-	 */
+-	title?: string;
+-	/**
+-	 * The children components.
+-	 */
+-	children: React.ReactNode;
+-};
+-
+-type _NavigationItemButtonProps =
+-	| ( ButtonProps & {
+-			/**
+-			 * If set to `true` the menu item will only act as a text-only item,
+-			 * rather than a `<button />` or `<a />` element.
+-			 */
+-			isText?: false;
+-	  } )
+-	| {
+-			/**
+-			 * If set to `true` the menu item will only act as a text-only item,
+-			 * rather than a `<button />` or `<a />` element.
+-			 */
+-			isText: true;
+-	  };
+-
+-export type NavigationItemBaseProps = {
+-	/**
+-	 * The item badge content.
+-	 */
+-	badge?: string | number;
+-	/**
+-	 * The children components. When not specified, the item will render the
+-	 * default item UI.
+-	 */
+-	children?: React.ReactNode;
+-	/**
+-	 * Optional classname for the component.
+-	 */
+-	className?: string;
+-	/**
+-	 * If provided, causes the component to render an `<a />` element
+-	 * instead of a `<button />` element.
+-	 */
+-	href?: string;
+-	/**
+-	 * If no `children` are passed, this prop allows to specify a custom icon for
+-	 * the menu item.
+-	 */
+-	icon?: React.JSX.Element;
+-	/**
+-	 * The unique identifier of the item.
+-	 */
+-	item?: string;
+-	/**
+-	 * The child menu slug. If provided, clicking on the item will navigate
+-	 * to the target menu.
+-	 */
+-	navigateToMenu?: string;
+-	/**
+-	 * Indicates whether this item should be hidden if the menu specified in
+-	 * `navigateToMenu` is marked as empty in the `isEmpty` prop.
+-	 * Used together with the `isEmpty` prop of `NavigationMenu`.
+-	 */
+-	hideIfTargetMenuEmpty?: boolean;
+-	/**
+-	 * A callback to handle clicking on a menu item.
+-	 *
+-	 * @default noop
+-	 */
+-	onClick?: React.MouseEventHandler;
+-	/**
+-	 * The item title.
+-	 */
+-	title?: string;
+-};
+-
+-export type NavigationItemProps = _NavigationItemButtonProps &
+-	NavigationItemBaseProps;
+-
+-export type NavigationItemBaseContentProps = Pick<
+-	NavigationItemProps,
+-	'badge' | 'title'
+->;
+-
+-export type NavigationBackButtonProps = {
+-	/**
+-	 * The text displayed for the button
+-	 */
+-	backButtonLabel?: string;
+-	/**
+-	 * Optional classname for the component.
+-	 */
+-	className?: string;
+-	/**
+-	 * If provided, causes the component to render an `<a />` element
+-	 * instead of a `<button />` element.
+-	 */
+-	href?: string;
+-	/**
+-	 * Callback function called when the button is clicked.
+-	 */
+-	onClick?: React.MouseEventHandler;
+-	/**
+-	 * Id of the parent menu
+-	 */
+-	parentMenu?: string;
+-};
+-
+-export type NavigationMenuTitleSearchProps = Pick<
+-	NavigationMenuProps,
+-	'onSearch' | 'search' | 'title'
+-> & {
+-	// @see `speak` function from `@wordpress/a11y`
+-	debouncedSpeak: (
+-		message: string,
+-		ariaLive?: 'off' | 'polite' | 'assertive'
+-	) => void;
+-	onCloseSearch: () => void;
+-};
+-
+-export type NavigationMenuTitleProps = Pick<
+-	NavigationMenuProps,
+-	'hasSearch' | 'onSearch' | 'search' | 'title' | 'titleAction'
+->;
+-
+-export type NavigationSearchNoResultsFoundProps = Pick<
+-	NavigationMenuProps,
+-	'search'
+->;
+-
+-// Data objects & context
+-
+-export type Item = Omit< NavigationItemBaseProps, 'children' > & {
+-	/**
+-	 * The group id
+-	 */
+-	group?: string;
+-	/**
+-	 * The menu id
+-	 */
+-	menu?: string;
+-	/**
+-	 * True is the item is currently visible (ie. the item is part
+-	 * of the active menu, and — if there is a search query — its title
+-	 * matches the search query).
+-	 */
+-	_isVisible: boolean;
+-};
+-
+-export type Menu = Omit< NavigationMenuProps, 'children' > & {
+-	menu: string;
+-};
+-
+-export type NavigationGroupContext = {
+-	/**
+-	 * The unique id of the group
+-	 */
+-	group?: string;
+-};
+-
+-export type NavigationMenuContext = {
+-	menu?: string;
+-	search?: string;
+-};
+-
+-export type NavigationContext = {
+-	activeItem?: string;
+-	activeMenu: string;
+-	setActiveMenu: (
+-		parentMenu: string,
+-		animationDirection?: 'left' | 'right'
+-	) => void;
+-
+-	navigationTree: {
+-		items: Record< string, Item >;
+-		getItem: ( itemId: string ) => Item | undefined;
+-		addItem: ( itemId: string, itemProps: Item ) => void;
+-		removeItem: ( itemId: string ) => void;
+-
+-		menus: Record< string, Menu >;
+-		getMenu: ( menuId: string ) => Menu | undefined;
+-		addMenu: ( menuId: string, menuProps: Menu ) => void;
+-		removeMenu: ( menuId: string ) => void;
+-		childMenu: Record< string, string[] >;
+-		traverseMenu: (
+-			startMenu: string,
+-			callback: ( menuObject: Menu ) => boolean | undefined
+-		) => void;
+-		isMenuEmpty: ( menuId: string ) => boolean;
+-	};
+-};
+diff --git a/packages/components/src/navigation/use-create-navigation-tree.tsx b/packages/components/src/navigation/use-create-navigation-tree.tsx
+deleted file mode 100644
+index 7133ec08e4b4aa..00000000000000
+--- a/packages/components/src/navigation/use-create-navigation-tree.tsx
++++ /dev/null
+@@ -1,110 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { useNavigationTreeNodes } from './use-navigation-tree-nodes';
+-
+-import type { NavigationContext, Item, Menu } from './types';
+-
+-export const useCreateNavigationTree = () => {
+-	const {
+-		nodes: items,
+-		getNode: getItem,
+-		addNode: addItem,
+-		removeNode: removeItem,
+-	} = useNavigationTreeNodes< Item >();
+-
+-	const {
+-		nodes: menus,
+-		getNode: getMenu,
+-		addNode: addMenu,
+-		removeNode: removeMenu,
+-	} = useNavigationTreeNodes< Menu >();
+-
+-	/**
+-	 * Stores direct nested menus of menus
+-	 * This makes it easy to traverse menu tree
+-	 *
+-	 * Key is the menu prop of the menu
+-	 * Value is an array of menu keys
+-	 */
+-	const [ childMenu, setChildMenu ] = useState< Record< string, string[] > >(
+-		{}
+-	);
+-	const getChildMenu = ( menu: string ) => childMenu[ menu ] || [];
+-
+-	const traverseMenu: NavigationContext[ 'navigationTree' ][ 'traverseMenu' ] =
+-		( startMenu, callback ) => {
+-			const visited: string[] = [];
+-			let queue = [ startMenu ];
+-			let current: Menu;
+-
+-			while ( queue.length > 0 ) {
+-				// Type cast to string is safe because of the `length > 0` check above.
+-				current = getMenu( queue.shift() as string );
+-
+-				if ( ! current || visited.includes( current.menu ) ) {
+-					continue;
+-				}
+-
+-				visited.push( current.menu );
+-				queue = [ ...queue, ...getChildMenu( current.menu ) ];
+-
+-				if ( callback( current ) === false ) {
+-					break;
+-				}
+-			}
+-		};
+-
+-	const isMenuEmpty = ( menuToCheck: string ) => {
+-		let isEmpty = true;
+-
+-		traverseMenu( menuToCheck, ( current: Menu ) => {
+-			if ( ! current.isEmpty ) {
+-				isEmpty = false;
+-				return false;
+-			}
+-
+-			return undefined;
+-		} );
+-
+-		return isEmpty;
+-	};
+-
+-	return {
+-		items,
+-		getItem,
+-		addItem,
+-		removeItem,
+-
+-		menus,
+-		getMenu,
+-		addMenu: ( key: string, value: Menu ) => {
+-			setChildMenu( ( state ) => {
+-				const newState = { ...state };
+-
+-				if ( ! value.parentMenu ) {
+-					return newState;
+-				}
+-
+-				if ( ! newState[ value.parentMenu ] ) {
+-					newState[ value.parentMenu ] = [];
+-				}
+-
+-				newState[ value.parentMenu ].push( key );
+-
+-				return newState;
+-			} );
+-
+-			addMenu( key, value );
+-		},
+-		removeMenu,
+-		childMenu,
+-		traverseMenu,
+-		isMenuEmpty,
+-	};
+-};
+diff --git a/packages/components/src/navigation/use-navigation-tree-nodes.tsx b/packages/components/src/navigation/use-navigation-tree-nodes.tsx
+deleted file mode 100644
+index 45ed86e0262309..00000000000000
+--- a/packages/components/src/navigation/use-navigation-tree-nodes.tsx
++++ /dev/null
+@@ -1,31 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+-export function useNavigationTreeNodes<
+-	TNode extends { children?: React.ReactNode; [ key: string ]: unknown },
+->() {
+-	const [ nodes, setNodes ] = useState<
+-		Record< string, Omit< TNode, 'children' > >
+-	>( {} );
+-
+-	const getNode = ( key: string ) => nodes[ key ];
+-
+-	const addNode = ( key: string, value: TNode ) => {
+-		const { children, ...newNode } = value;
+-		return setNodes( ( original ) => ( {
+-			...original,
+-			[ key ]: newNode,
+-		} ) );
+-	};
+-
+-	const removeNode = ( key: keyof typeof nodes ) => {
+-		return setNodes( ( original ) => {
+-			const { [ key ]: removedNode, ...remainingNodes } = original;
+-			return remainingNodes;
+-		} );
+-	};
+-
+-	return { nodes, getNode, addNode, removeNode };
+-}
+diff --git a/packages/components/src/navigation/utils.tsx b/packages/components/src/navigation/utils.tsx
+deleted file mode 100644
+index 47ef5f12cafcdb..00000000000000
+--- a/packages/components/src/navigation/utils.tsx
++++ /dev/null
+@@ -1,11 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import removeAccents from 'remove-accents';
+-
+-// @see packages/block-editor/src/components/inserter/search-items.js
+-export const normalizeInput = ( input: string ) =>
+-	removeAccents( input ).replace( /^\//, '' ).toLowerCase();
+-
+-export const normalizedSearch = ( title: string, search: string ) =>
+-	-1 !== normalizeInput( title ).indexOf( normalizeInput( search ) );
+diff --git a/packages/editor/src/components/global-styles-sidebar/style.scss b/packages/editor/src/components/global-styles-sidebar/style.scss
+index 7653fd70180f1a..74741ad546a395 100644
+--- a/packages/editor/src/components/global-styles-sidebar/style.scss
++++ b/packages/editor/src/components/global-styles-sidebar/style.scss
+@@ -19,15 +19,6 @@
+ 	flex: 1;
+ }
+ 
+-.editor-global-styles-sidebar .components-navigation__menu-title-heading {
+-	font-size: $default-font-size * 1.2;
+-	font-weight: $font-weight-medium;
+-}
+-
+-.editor-global-styles-sidebar .components-navigation__item > button span {
+-	font-weight: $font-weight-medium;
+-}
+-
+ .editor-global-styles-sidebar .block-editor-panel-color-gradient-settings {
+ 	border: 0;
+ }
+diff --git a/tools/eslint/suppressions.json b/tools/eslint/suppressions.json
+index dfa0c99987403f..3e735adefc01f7 100644
+--- a/tools/eslint/suppressions.json
++++ b/tools/eslint/suppressions.json
+@@ -662,16 +662,6 @@
+ 			"count": 2
+ 		}
+ 	},
+-	"packages/components/src/navigation/index.tsx": {
+-		"react-hooks/refs": {
+-			"count": 3
+-		}
+-	},
+-	"packages/components/src/navigation/stories/index.story.tsx": {
+-		"@wordpress/no-non-module-stylesheet-imports": {
+-			"count": 1
+-		}
+-	},
+ 	"packages/components/src/number-control/index.tsx": {
+ 		"react-hooks/refs": {
+ 			"count": 2

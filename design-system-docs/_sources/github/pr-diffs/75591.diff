@@ -1,0 +1,1111 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 88d46470b10c0a..6a8231d9c1db1c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -17,6 +17,7 @@
+ 
+ ### Internal
+ 
++-   `Avatar`, `AvatarGroup`: Add new private components ([#75591](https://github.com/WordPress/gutenberg/pull/75591)).
+ -   Remove `Picker` from private APIs ([#75394](https://github.com/WordPress/gutenberg/pull/75394)).
+ -   Expose `useDrag` from `@use-gesture/react` package via private API's ([#66735](https://github.com/WordPress/gutenberg/pull/66735)).
+ -   `Disabled`, `Modal`, `Popover`, `Tooltip`: Move context code to separate files to help docgen prop extraction ([#75316](https://github.com/WordPress/gutenberg/pull/75316)).
+diff --git a/packages/components/src/avatar-group/component.tsx b/packages/components/src/avatar-group/component.tsx
+new file mode 100644
+index 00000000000000..68ee994327bf32
+--- /dev/null
++++ b/packages/components/src/avatar-group/component.tsx
+@@ -0,0 +1,46 @@
++/**
++ * External dependencies
++ */
++import clsx from 'clsx';
++
++/**
++ * WordPress dependencies
++ */
++import { Children } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import type { AvatarGroupProps } from './types';
++import type { WordPressComponentProps } from '../context';
++
++function AvatarGroup( {
++	className,
++	max = 3,
++	children,
++	...props
++}: WordPressComponentProps< AvatarGroupProps, 'div', false > ) {
++	const childArray = Children.toArray( children );
++	const visible = childArray.slice( 0, max );
++	const overflowCount = childArray.length - max;
++
++	return (
++		<div
++			role="group"
++			className={ clsx( 'components-avatar-group', className ) }
++			{ ...props }
++		>
++			{ visible }
++			{ overflowCount > 0 && (
++				<span
++					className="components-avatar-group__overflow"
++					aria-label={ `${ overflowCount } more` }
++				>
++					{ `+${ overflowCount }` }
++				</span>
++			) }
++		</div>
++	);
++}
++
++export default AvatarGroup;
+diff --git a/packages/components/src/avatar-group/index.ts b/packages/components/src/avatar-group/index.ts
+new file mode 100644
+index 00000000000000..4626aea25a388e
+--- /dev/null
++++ b/packages/components/src/avatar-group/index.ts
+@@ -0,0 +1,2 @@
++export { default } from './component';
++export type { AvatarGroupProps } from './types';
+diff --git a/packages/components/src/avatar-group/stories/index.story.tsx b/packages/components/src/avatar-group/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..151568f17ccdd6
+--- /dev/null
++++ b/packages/components/src/avatar-group/stories/index.story.tsx
+@@ -0,0 +1,131 @@
++/**
++ * External dependencies
++ */
++import type { Meta, StoryObj } from '@storybook/react-vite';
++
++/**
++ * Internal dependencies
++ */
++import AvatarGroup from '..';
++import Avatar from '../../avatar';
++
++const meta: Meta< typeof AvatarGroup > = {
++	component: AvatarGroup,
++	title: 'Design System/Components/AvatarGroup',
++	id: 'components-avatar-group',
++	tags: [ 'status-private' ],
++	parameters: {
++		componentStatus: {
++			status: 'use-with-caution',
++			whereUsed: 'global',
++			notes: 'Private API. Only available for internal WordPress core usage.',
++		},
++	},
++};
++
++export default meta;
++
++type Story = StoryObj< typeof meta >;
++
++const avatarUrl = ( seed: string ) =>
++	`https://gravatar.com/avatar/${ seed }?s=96&d=identicon`;
++
++export const Default: Story = {
++	render: ( args ) => (
++		<AvatarGroup { ...args }>
++			<Avatar src={ avatarUrl( 'aaa' ) } name="Alice" />
++			<Avatar src={ avatarUrl( 'bbb' ) } name="Bob" />
++			<Avatar src={ avatarUrl( 'ccc' ) } name="Charlie" />
++		</AvatarGroup>
++	),
++};
++
++export const Overflow: Story = {
++	args: {
++		max: 3,
++	},
++	render: ( args ) => (
++		<AvatarGroup { ...args }>
++			<Avatar src={ avatarUrl( 'aaa' ) } name="Alice" />
++			<Avatar src={ avatarUrl( 'bbb' ) } name="Bob" />
++			<Avatar src={ avatarUrl( 'ccc' ) } name="Charlie" />
++			<Avatar src={ avatarUrl( 'ddd' ) } name="Diana" />
++			<Avatar src={ avatarUrl( 'eee' ) } name="Eve" />
++			<Avatar src={ avatarUrl( 'fff' ) } name="Frank" />
++		</AvatarGroup>
++	),
++};
++
++export const WithBadges: Story = {
++	render: ( args ) => (
++		<AvatarGroup { ...args }>
++			<Avatar
++				src={ avatarUrl( 'aaa' ) }
++				name="Alice"
++				borderColor="#3858e9"
++				variant="badge"
++			/>
++			<Avatar
++				src={ avatarUrl( 'bbb' ) }
++				name="Bob"
++				borderColor="#e93858"
++				variant="badge"
++			/>
++			<Avatar
++				src={ avatarUrl( 'ccc' ) }
++				name="Charlie"
++				borderColor="#58e938"
++				variant="badge"
++			/>
++		</AvatarGroup>
++	),
++	parameters: {
++		docs: {
++			description: {
++				story: 'Avatars with `badge` variant expand on hover to reveal the name, pushing siblings aside.',
++			},
++		},
++	},
++};
++
++export const MixedBadgeAndTooltip: Story = {
++	render: ( args ) => (
++		<AvatarGroup { ...args }>
++			<Avatar
++				src={ avatarUrl( 'aaa' ) }
++				name="Alice"
++				borderColor="#3858e9"
++				variant="badge"
++			/>
++			<Avatar src={ avatarUrl( 'bbb' ) } name="Bob" />
++			<Avatar
++				src={ avatarUrl( 'ccc' ) }
++				name="Charlie"
++				borderColor="#58e938"
++				variant="badge"
++				label="You"
++			/>
++		</AvatarGroup>
++	),
++	parameters: {
++		docs: {
++			description: {
++				story: 'Mixing badge avatars with tooltip-only avatars. The third avatar uses `label` to show "You" in the badge while preserving the full name in the tooltip.',
++			},
++		},
++	},
++};
++
++export const CustomMax: Story = {
++	args: {
++		max: 2,
++	},
++	render: ( args ) => (
++		<AvatarGroup { ...args }>
++			<Avatar src={ avatarUrl( 'aaa' ) } name="Alice" />
++			<Avatar src={ avatarUrl( 'bbb' ) } name="Bob" />
++			<Avatar src={ avatarUrl( 'ccc' ) } name="Charlie" />
++			<Avatar src={ avatarUrl( 'ddd' ) } name="Diana" />
++		</AvatarGroup>
++	),
++};
+diff --git a/packages/components/src/avatar-group/styles.scss b/packages/components/src/avatar-group/styles.scss
+new file mode 100644
+index 00000000000000..a63b438ee89216
+--- /dev/null
++++ b/packages/components/src/avatar-group/styles.scss
+@@ -0,0 +1,36 @@
++@use "@wordpress/base-styles/colors" as *;
++@use "@wordpress/base-styles/variables" as *;
++
++.components-avatar-group {
++	display: flex;
++	align-items: center;
++
++	// Overlap subsequent avatars.
++	> .components-avatar + .components-avatar {
++		margin-inline-start: -$grid-unit-10;
++	}
++
++	// Stack earlier avatars on top of later ones so the overlap
++	// is visually correct, and elevate on hover for badge expansion.
++	> .components-avatar {
++		position: relative;
++
++		@for $i from 1 through 10 {
++			&:nth-child(#{$i}) {
++				z-index: #{11 - $i};
++			}
++		}
++
++		&:hover {
++			z-index: 100;
++		}
++	}
++}
++
++.components-avatar-group__overflow {
++	margin-inline-start: $grid-unit-05;
++	font-size: $font-size-small;
++	line-height: $font-line-height-small;
++	color: $gray-900;
++	white-space: nowrap;
++}
+diff --git a/packages/components/src/avatar-group/test/index.tsx b/packages/components/src/avatar-group/test/index.tsx
+new file mode 100644
+index 00000000000000..ae6fe0b8581b24
+--- /dev/null
++++ b/packages/components/src/avatar-group/test/index.tsx
+@@ -0,0 +1,104 @@
++/**
++ * External dependencies
++ */
++import { render, screen } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import AvatarGroup from '..';
++import Avatar from '../../avatar';
++
++describe( 'AvatarGroup', () => {
++	it( 'should render all children when count is within max', () => {
++		render(
++			<AvatarGroup>
++				<Avatar name="Alice" />
++				<Avatar name="Bob" />
++			</AvatarGroup>
++		);
++		expect(
++			screen.getByRole( 'img', { name: 'Alice' } )
++		).toBeInTheDocument();
++		expect(
++			screen.getByRole( 'img', { name: 'Bob' } )
++		).toBeInTheDocument();
++		expect( screen.queryByText( /^\+/ ) ).not.toBeInTheDocument();
++	} );
++
++	it( 'should show overflow indicator when children exceed max', () => {
++		render(
++			<AvatarGroup max={ 2 }>
++				<Avatar name="Alice" />
++				<Avatar name="Bob" />
++				<Avatar name="Charlie" />
++				<Avatar name="Diana" />
++			</AvatarGroup>
++		);
++		expect(
++			screen.getByRole( 'img', { name: 'Alice' } )
++		).toBeInTheDocument();
++		expect(
++			screen.getByRole( 'img', { name: 'Bob' } )
++		).toBeInTheDocument();
++		expect(
++			screen.queryByRole( 'img', { name: 'Charlie' } )
++		).not.toBeInTheDocument();
++		const overflow = screen.getByText( '+2' );
++		expect( overflow ).toBeInTheDocument();
++		expect( overflow ).toHaveAttribute( 'aria-label', '2 more' );
++	} );
++
++	it( 'should default max to 3', () => {
++		render(
++			<AvatarGroup>
++				<Avatar name="A" />
++				<Avatar name="B" />
++				<Avatar name="C" />
++				<Avatar name="D" />
++				<Avatar name="E" />
++			</AvatarGroup>
++		);
++		expect( screen.getByRole( 'img', { name: 'A' } ) ).toBeInTheDocument();
++		expect( screen.getByRole( 'img', { name: 'B' } ) ).toBeInTheDocument();
++		expect( screen.getByRole( 'img', { name: 'C' } ) ).toBeInTheDocument();
++		expect(
++			screen.queryByRole( 'img', { name: 'D' } )
++		).not.toBeInTheDocument();
++		expect( screen.getByText( '+2' ) ).toBeInTheDocument();
++	} );
++
++	it( 'should not show overflow when children equal max', () => {
++		render(
++			<AvatarGroup max={ 3 }>
++				<Avatar name="A" />
++				<Avatar name="B" />
++				<Avatar name="C" />
++			</AvatarGroup>
++		);
++		expect( screen.queryByText( /^\+/ ) ).not.toBeInTheDocument();
++	} );
++
++	it( 'should combine custom className with default class', () => {
++		render(
++			<AvatarGroup data-testid="group" className="custom">
++				<Avatar name="A" />
++			</AvatarGroup>
++		);
++		const group = screen.getByTestId( 'group' );
++		expect( group ).toHaveClass( 'components-avatar-group' );
++		expect( group ).toHaveClass( 'custom' );
++	} );
++
++	it( 'should have group role and support aria-label', () => {
++		render(
++			<AvatarGroup aria-label="Collaborators">
++				<Avatar name="A" />
++			</AvatarGroup>
++		);
++		const group = screen.getByRole( 'group', {
++			name: 'Collaborators',
++		} );
++		expect( group ).toBeInTheDocument();
++	} );
++} );
+diff --git a/packages/components/src/avatar-group/types.ts b/packages/components/src/avatar-group/types.ts
+new file mode 100644
+index 00000000000000..0bc028ee1a15be
+--- /dev/null
++++ b/packages/components/src/avatar-group/types.ts
+@@ -0,0 +1,13 @@
++export type AvatarGroupProps = {
++	/**
++	 * Maximum number of avatars to display before showing an
++	 * overflow indicator.
++	 *
++	 * @default 3
++	 */
++	max?: number;
++	/**
++	 * Avatar elements to display in the group.
++	 */
++	children: React.ReactNode;
++};
+diff --git a/packages/components/src/avatar/component.tsx b/packages/components/src/avatar/component.tsx
+new file mode 100644
+index 00000000000000..6b4d1cd8f79b3c
+--- /dev/null
++++ b/packages/components/src/avatar/component.tsx
+@@ -0,0 +1,95 @@
++/**
++ * External dependencies
++ */
++import clsx from 'clsx';
++import { colord, extend } from 'colord';
++import a11yPlugin from 'colord/plugins/a11y';
++
++extend( [ a11yPlugin ] );
++
++/**
++ * Internal dependencies
++ */
++import Icon from '../icon';
++import Tooltip from '../tooltip';
++import type { AvatarProps } from './types';
++import type { WordPressComponentProps } from '../context';
++
++function Avatar( {
++	className,
++	src,
++	name,
++	label,
++	variant,
++	size = 'default',
++	borderColor,
++	dimmed = false,
++	statusIndicator,
++	style,
++	...props
++}: WordPressComponentProps< AvatarProps, 'div', false > ) {
++	const showBadge = variant === 'badge' && !! name;
++	const initials = name
++		? name
++				.split( /\s+/ )
++				.slice( 0, 2 )
++				.map( ( word ) => word[ 0 ] )
++				.join( '' )
++				.toUpperCase()
++		: undefined;
++	const customProperties = {
++		...style,
++		...( src ? { '--components-avatar-url': `url(${ src })` } : {} ),
++		...( borderColor
++			? {
++					'--components-avatar-outline-color': borderColor,
++					'--components-avatar-name-color': colord(
++						borderColor
++					).isReadable( '#000', {
++						level: 'AA',
++						size: 'normal',
++					} )
++						? '#000'
++						: '#fff',
++			  }
++			: {} ),
++	} as React.CSSProperties;
++
++	const avatar = (
++		<div
++			className={ clsx( 'components-avatar', className, {
++				'has-avatar-border-color': !! borderColor,
++				'has-src': !! src,
++				'is-badge': showBadge,
++				'is-small': size === 'small',
++				'is-dimmed': dimmed,
++			} ) }
++			style={ customProperties }
++			role="img"
++			aria-label={ name }
++			{ ...props }
++		>
++			<span className="components-avatar__image">
++				{ ! src && initials }
++			</span>
++			{ dimmed && !! statusIndicator && (
++				<span className="components-avatar__status-indicator">
++					<Icon icon={ statusIndicator } />
++				</span>
++			) }
++			{ showBadge && (
++				<span className="components-avatar__name">
++					{ label || name }
++				</span>
++			) }
++		</div>
++	);
++
++	if ( name && ( ! showBadge || label ) ) {
++		return <Tooltip text={ name }>{ avatar }</Tooltip>;
++	}
++
++	return avatar;
++}
++
++export default Avatar;
+diff --git a/packages/components/src/avatar/index.ts b/packages/components/src/avatar/index.ts
+new file mode 100644
+index 00000000000000..4d8da065cccb43
+--- /dev/null
++++ b/packages/components/src/avatar/index.ts
+@@ -0,0 +1,2 @@
++export { default } from './component';
++export type { AvatarProps } from './types';
+diff --git a/packages/components/src/avatar/stories/index.story.tsx b/packages/components/src/avatar/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..72334088b1b8a1
+--- /dev/null
++++ b/packages/components/src/avatar/stories/index.story.tsx
+@@ -0,0 +1,139 @@
++/**
++ * External dependencies
++ */
++import type { Meta, StoryObj } from '@storybook/react-vite';
++
++/**
++ * WordPress dependencies
++ */
++import { moreHorizontal } from '@wordpress/icons';
++
++/**
++ * Internal dependencies
++ */
++import Avatar from '..';
++
++const meta: Meta< typeof Avatar > = {
++	component: Avatar,
++	title: 'Design System/Components/Avatar',
++	id: 'components-avatar',
++	tags: [ 'status-private' ],
++	parameters: {
++		componentStatus: {
++			status: 'use-with-caution',
++			whereUsed: 'global',
++			notes: 'Private API. Only available for internal WordPress core usage.',
++		},
++	},
++};
++
++export default meta;
++
++type Story = StoryObj< typeof meta >;
++
++const SAMPLE_AVATAR =
++	'https://gravatar.com/avatar/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa?s=96&d=identicon';
++
++export const Default: Story = {
++	args: {
++		src: SAMPLE_AVATAR,
++		name: 'Jane Doe',
++	},
++};
++
++export const WithBorderColor: Story = {
++	args: {
++		...Default.args,
++		borderColor: '#3858e9',
++	},
++};
++
++export const Small: Story = {
++	args: {
++		...Default.args,
++		size: 'small',
++	},
++};
++
++export const Initials: Story = {
++	args: {
++		name: 'Tanner Robinson',
++	},
++};
++
++export const Badge: Story = {
++	args: {
++		...WithBorderColor.args,
++		variant: 'badge',
++	},
++	parameters: {
++		docs: {
++			description: {
++				story: 'The `badge` variant displays a hover-expand pill that reveals the name. Use the `label` prop to override the visible text.',
++			},
++		},
++	},
++};
++
++export const WithLabel: Story = {
++	args: {
++		...WithBorderColor.args,
++		variant: 'badge',
++		label: 'You',
++	},
++};
++
++export const BadgeContrastText: Story = {
++	render: () => (
++		<div style={ { display: 'flex', gap: '16px' } }>
++			<Avatar
++				src={ SAMPLE_AVATAR }
++				name="Dark background"
++				borderColor="#1D35B4"
++				variant="badge"
++			/>
++			<Avatar
++				src={ SAMPLE_AVATAR }
++				name="Light background"
++				borderColor="#FFF972"
++				variant="badge"
++			/>
++		</div>
++	),
++	parameters: {
++		docs: {
++			description: {
++				story: 'Badge text color adapts automatically based on the `borderColor` lightness to maintain WCAG AA contrast.',
++			},
++		},
++	},
++};
++
++export const Dimmed: Story = {
++	args: {
++		...Default.args,
++		dimmed: true,
++	},
++	parameters: {
++		docs: {
++			description: {
++				story: 'When `dimmed` is true, the avatar is desaturated and faded to indicate an inactive state.',
++			},
++		},
++	},
++};
++
++export const DimmedWithIndicator: Story = {
++	args: {
++		...Default.args,
++		dimmed: true,
++		statusIndicator: moreHorizontal,
++	},
++	parameters: {
++		docs: {
++			description: {
++				story: 'When `dimmed` is true and a `statusIndicator` is provided, the icon is rendered as an overlay.',
++			},
++		},
++	},
++};
+diff --git a/packages/components/src/avatar/styles.scss b/packages/components/src/avatar/styles.scss
+new file mode 100644
+index 00000000000000..d1fa01a7c233cb
+--- /dev/null
++++ b/packages/components/src/avatar/styles.scss
+@@ -0,0 +1,165 @@
++@use "@wordpress/base-styles/colors" as *;
++@use "@wordpress/base-styles/variables" as *;
++@use "../utils/theme-variables" as *;
++
++.components-avatar {
++	position: relative;
++	display: inline-flex;
++	align-items: center;
++	border-radius: $radius-full;
++	overflow: clip;
++	flex-shrink: 0;
++	box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $white, $elevation-x-small;
++}
++
++.components-avatar__image {
++	box-sizing: border-box;
++	position: relative;
++	width: $button-size-compact;
++	height: $button-size-compact;
++	border-radius: $radius-full;
++	border: 0;
++	background-color: $components-color-accent;
++	overflow: clip;
++	flex-shrink: 0;
++	font-size: 0;
++	color: $white;
++
++	.is-small > & {
++		width: $button-size-small;
++		height: $button-size-small;
++	}
++
++	.has-src > & {
++		background-image: var(--components-avatar-url);
++		background-size: cover;
++		background-position: center;
++	}
++
++	.has-avatar-border-color > & {
++		border: var(--wp-admin-border-width-focus) solid var(--components-avatar-outline-color);
++		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $white;
++		background-clip: padding-box;
++	}
++}
++
++// Initials fallback: show name characters when no image.
++.components-avatar:not(.has-src) > .components-avatar__image {
++	display: flex;
++	align-items: center;
++	justify-content: center;
++	font-size: $font-size-x-small;
++	font-weight: $font-weight-medium;
++	border: 0;
++	box-shadow: none;
++	background-clip: border-box;
++}
++
++.components-avatar:not(.has-src).has-avatar-border-color > .components-avatar__image {
++	background-color: var(--components-avatar-outline-color);
++}
++
++.components-avatar__name {
++	font-size: $font-size-medium;
++	font-weight: $font-weight-medium;
++	line-height: $font-line-height-small;
++	color: var(--components-avatar-name-color, $white);
++	min-width: 0;
++	padding-bottom: calc($grid-unit-05 / 2);
++	overflow: hidden;
++	opacity: 0;
++	white-space: nowrap;
++	transition: opacity 0.15s cubic-bezier(0.15, 0, 0.15, 1);
++}
++
++// Badge mode: use grid so the name column animates from 0 to natural width.
++// Spacing is on the container (column-gap + padding-inline-end) so it
++// transitions alongside grid-template-columns instead of causing a bump.
++.components-avatar.is-badge {
++	display: inline-grid;
++	grid-template-columns: min-content 0fr;
++	column-gap: 0;
++	padding-inline-end: 0;
++	background-color: $components-color-accent;
++	transition:
++		grid-template-columns 0.3s cubic-bezier(0.15, 0, 0.15, 1),
++		column-gap 0.3s cubic-bezier(0.15, 0, 0.15, 1),
++		padding-inline-end 0.3s cubic-bezier(0.15, 0, 0.15, 1);
++
++	&:hover {
++		grid-template-columns: min-content 1fr;
++		column-gap: $grid-unit-05;
++		padding-inline-end: $grid-unit-10;
++		transition-timing-function: cubic-bezier(0.85, 0, 0.85, 1);
++	}
++
++	&:hover .components-avatar__name {
++		opacity: 1;
++		transition-timing-function: cubic-bezier(0.85, 0, 0.85, 1);
++	}
++}
++
++.components-avatar.is-badge.has-avatar-border-color {
++	background-color: var(--components-avatar-outline-color);
++}
++
++// Dimmed: neutral gray background at 50% opacity. The status indicator is a
++// sibling (outside __image) so it stays at full opacity.
++.components-avatar.is-dimmed > .components-avatar__image {
++	opacity: 0.5;
++	background-color: $gray-700;
++}
++
++.components-avatar.is-dimmed.has-avatar-border-color > .components-avatar__image {
++	border-color: $gray-700;
++}
++
++// Images: desaturate via luminosity blend at full opacity. The parent
++// element's opacity: 0.5 handles the overall fade.
++.components-avatar.is-dimmed.has-src > .components-avatar__image {
++	background-image: none;
++
++	&::before {
++		content: "";
++		position: absolute;
++		inset: 0;
++		border-radius: inherit;
++		background-image: var(--components-avatar-url);
++		background-size: cover;
++		background-position: center;
++		mix-blend-mode: luminosity;
++	}
++}
++
++// Status indicator: positioned over the image area, outside __image so it
++// is unaffected by the dimmed opacity.
++.components-avatar__status-indicator {
++	position: absolute;
++	top: 0;
++	left: 0;
++	width: $button-size-compact;
++	height: $button-size-compact;
++	display: flex;
++	align-items: center;
++	justify-content: center;
++	z-index: 1;
++	color: $black;
++	fill: $black;
++
++	.is-small > & {
++		width: $button-size-small;
++		height: $button-size-small;
++	}
++
++	svg {
++		width: 75%;
++		height: 75%;
++	}
++}
++
++@media (prefers-reduced-motion: reduce) {
++	.components-avatar.is-badge,
++	.components-avatar__name {
++		transition: none;
++	}
++}
+diff --git a/packages/components/src/avatar/test/index.tsx b/packages/components/src/avatar/test/index.tsx
+new file mode 100644
+index 00000000000000..37dba2f916c126
+--- /dev/null
++++ b/packages/components/src/avatar/test/index.tsx
+@@ -0,0 +1,193 @@
++/**
++ * External dependencies
++ */
++import { render, screen } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import Avatar from '..';
++
++describe( 'Avatar', () => {
++	it( 'should render with default props', () => {
++		render( <Avatar data-testid="avatar" /> );
++		const avatar = screen.getByTestId( 'avatar' );
++		expect( avatar ).toBeInTheDocument();
++		expect( avatar.tagName ).toBe( 'DIV' );
++		expect( avatar ).toHaveClass( 'components-avatar' );
++	} );
++
++	it( 'should set the accessible name from the name prop', () => {
++		render( <Avatar name="Jane Doe" /> );
++		const avatar = screen.getByRole( 'img', { name: 'Jane Doe' } );
++		expect( avatar ).toBeInTheDocument();
++	} );
++
++	it( 'should apply the avatar image via CSS custom property', () => {
++		render(
++			<Avatar data-testid="avatar" src="https://example.com/avatar.jpg" />
++		);
++		const avatar = screen.getByTestId( 'avatar' );
++		expect( avatar ).toHaveClass( 'has-src' );
++		expect(
++			avatar.style.getPropertyValue( '--components-avatar-url' )
++		).toBe( 'url(https://example.com/avatar.jpg)' );
++	} );
++
++	it( 'should apply is-small class for small size', () => {
++		render( <Avatar data-testid="avatar" size="small" /> );
++		const avatar = screen.getByTestId( 'avatar' );
++		expect( avatar ).toHaveClass( 'is-small' );
++	} );
++
++	it( 'should not apply is-small class for default size', () => {
++		render( <Avatar data-testid="avatar" /> );
++		const avatar = screen.getByTestId( 'avatar' );
++		expect( avatar ).not.toHaveClass( 'is-small' );
++	} );
++
++	it( 'should apply border color when provided', () => {
++		render( <Avatar data-testid="avatar" borderColor="#3858e9" /> );
++		const avatar = screen.getByTestId( 'avatar' );
++		expect( avatar ).toHaveClass( 'has-avatar-border-color' );
++		expect(
++			avatar.style.getPropertyValue( '--components-avatar-outline-color' )
++		).toBe( '#3858e9' );
++	} );
++
++	it( 'should not have has-src class when src is not provided', () => {
++		render( <Avatar data-testid="avatar" /> );
++		const avatar = screen.getByTestId( 'avatar' );
++		expect( avatar ).not.toHaveClass( 'has-src' );
++	} );
++
++	it( 'should combine custom className with default class', () => {
++		render( <Avatar data-testid="avatar" className="custom" /> );
++		const avatar = screen.getByTestId( 'avatar' );
++		expect( avatar ).toHaveClass( 'components-avatar' );
++		expect( avatar ).toHaveClass( 'custom' );
++	} );
++
++	describe( 'badge', () => {
++		it( 'should not show badge by default', () => {
++			render( <Avatar data-testid="avatar" name="Zoraya" /> );
++			const avatar = screen.getByTestId( 'avatar' );
++			expect( avatar ).not.toHaveClass( 'is-badge' );
++			expect( screen.queryByText( 'Zoraya' ) ).not.toBeInTheDocument();
++		} );
++
++		it( 'should render name span when variant is badge', () => {
++			render(
++				<Avatar data-testid="avatar" name="Zoraya" variant="badge" />
++			);
++			const avatar = screen.getByTestId( 'avatar' );
++			expect( avatar ).toHaveClass( 'is-badge' );
++			expect( screen.getByText( 'Zoraya' ) ).toBeInTheDocument();
++		} );
++
++		it( 'should render name span with borderColor too', () => {
++			render(
++				<Avatar
++					data-testid="avatar"
++					name="Zoraya"
++					borderColor="#3d5eef"
++					variant="badge"
++				/>
++			);
++			const avatar = screen.getByTestId( 'avatar' );
++			expect( avatar ).toHaveClass( 'is-badge' );
++			expect( screen.getByText( 'Zoraya' ) ).toBeInTheDocument();
++		} );
++
++		it( 'should not show badge when variant is badge but name is missing', () => {
++			render( <Avatar data-testid="avatar" variant="badge" /> );
++			const avatar = screen.getByTestId( 'avatar' );
++			expect( avatar ).not.toHaveClass( 'is-badge' );
++		} );
++
++		it( 'should still set aria-label even when badge is visible', () => {
++			render( <Avatar name="Zoraya" variant="badge" /> );
++			const avatar = screen.getByRole( 'img', { name: 'Zoraya' } );
++			expect( avatar ).toBeInTheDocument();
++		} );
++	} );
++
++	describe( 'label', () => {
++		it( 'should show label text instead of name in the badge', () => {
++			render( <Avatar name="Jane Doe" label="You" variant="badge" /> );
++			expect( screen.getByText( 'You' ) ).toBeInTheDocument();
++			expect( screen.queryByText( 'Jane Doe' ) ).not.toBeInTheDocument();
++		} );
++
++		it( 'should keep aria-label as name when label is provided', () => {
++			render( <Avatar name="Jane Doe" label="You" variant="badge" /> );
++			const avatar = screen.getByRole( 'img', { name: 'Jane Doe' } );
++			expect( avatar ).toBeInTheDocument();
++		} );
++
++		it( 'should wrap in tooltip when label differs from name', () => {
++			render( <Avatar name="Jane Doe" label="You" variant="badge" /> );
++			const avatar = screen.getByRole( 'img', { name: 'Jane Doe' } );
++			// The Tooltip's Ariakit.TooltipAnchor makes the element
++			// focusable so the tooltip can be triggered via keyboard.
++			expect( avatar ).toHaveAttribute( 'tabindex', '0' );
++		} );
++	} );
++
++	describe( 'dimmed', () => {
++		it( 'should apply is-dimmed class when dimmed is true', () => {
++			render( <Avatar data-testid="avatar" dimmed /> );
++			const avatar = screen.getByTestId( 'avatar' );
++			expect( avatar ).toHaveClass( 'is-dimmed' );
++		} );
++
++		it( 'should not apply is-dimmed class when dimmed is false', () => {
++			render( <Avatar data-testid="avatar" /> );
++			const avatar = screen.getByTestId( 'avatar' );
++			expect( avatar ).not.toHaveClass( 'is-dimmed' );
++		} );
++
++		it( 'should render statusIndicator when dimmed is true', () => {
++			render(
++				<Avatar
++					data-testid="avatar"
++					dimmed
++					statusIndicator={ <span>icon</span> }
++				/>
++			);
++			expect( screen.getByText( 'icon' ) ).toBeInTheDocument();
++		} );
++
++		it( 'should not render statusIndicator when dimmed is false', () => {
++			render(
++				<Avatar
++					data-testid="avatar"
++					statusIndicator={ <span>icon</span> }
++				/>
++			);
++			expect( screen.queryByText( 'icon' ) ).not.toBeInTheDocument();
++		} );
++	} );
++
++	describe( 'initials', () => {
++		it( 'should show initials when no src is provided', () => {
++			render( <Avatar name="Tanner Robinson" /> );
++			expect( screen.getByText( 'TR' ) ).toBeInTheDocument();
++		} );
++
++		it( 'should show single initial for single-word name', () => {
++			render( <Avatar name="Zoraya" /> );
++			expect( screen.getByText( 'Z' ) ).toBeInTheDocument();
++		} );
++
++		it( 'should not show initials when src is provided', () => {
++			render(
++				<Avatar
++					name="Tanner Robinson"
++					src="https://example.com/avatar.jpg"
++				/>
++			);
++			expect( screen.queryByText( 'TR' ) ).not.toBeInTheDocument();
++		} );
++	} );
++} );
+diff --git a/packages/components/src/avatar/types.ts b/packages/components/src/avatar/types.ts
+new file mode 100644
+index 00000000000000..32ab357e4255c5
+--- /dev/null
++++ b/packages/components/src/avatar/types.ts
+@@ -0,0 +1,66 @@
++import type { IconType } from '../icon';
++
++export type AvatarProps = {
++	/**
++	 * URL of the avatar image.
++	 *
++	 * When not provided, initials derived from `name` are shown.
++	 */
++	src?: string;
++	/**
++	 * Name of the user. Used as an accessible label and to generate
++	 * initials when no image is provided.
++	 */
++	name?: string;
++	/**
++	 * Visible text shown in the hover badge. When not provided, `name`
++	 * is used instead. Use this to provide contextual labels like "You"
++	 * without affecting the accessible name or initials.
++	 */
++	label?: string;
++	/**
++	 * Specifies the avatar's visual style treatment.
++	 *
++	 * - `'badge'`: Displays a hover-expand pill that reveals the user's
++	 *   name (or `label`) on hover. Requires `name` to be set.
++	 *
++	 * Leave undefined for the default circular avatar.
++	 */
++	variant?: 'badge';
++	/**
++	 * Size of the avatar.
++	 *
++	 * - `'default'`: For standalone avatars and list items where the
++	 *   avatar is a primary visual element (e.g. collaborator lists,
++	 *   user profiles).
++	 * - `'small'`: For inline or compact contexts where space is
++	 *   limited (e.g. cursor labels, toolbars, badges alongside text).
++	 *
++	 * @default 'default'
++	 */
++	size?: 'default' | 'small';
++	/**
++	 * CSS color value for an accent border ring around the avatar.
++	 *
++	 * When not provided, no border is rendered and the hover badge
++	 * uses the admin theme color as its background.
++	 */
++	borderColor?: string;
++	/**
++	 * Whether to dim the avatar to indicate an inactive or away state.
++	 * When true, images are desaturated and faded, and initials are
++	 * reduced in opacity.
++	 *
++	 * @default false
++	 */
++	dimmed?: boolean;
++	/**
++	 * An icon or custom component rendered as a centered overlay on the
++	 * avatar image. Only visible when `dimmed` is true.
++	 *
++	 * Accepts any value supported by the `Icon` component: an icon from
++	 * `@wordpress/icons`, a Dashicon name string, a component, or a
++	 * JSX element.
++	 */
++	statusIndicator?: IconType | null;
++};
+diff --git a/packages/components/src/private-apis.ts b/packages/components/src/private-apis.ts
+index 43d85db9365f7a..fc5c1f7eb1fa97 100644
+--- a/packages/components/src/private-apis.ts
++++ b/packages/components/src/private-apis.ts
+@@ -14,6 +14,8 @@ import { Tabs } from './tabs';
+ import { kebabCase, normalizeTextString } from './utils/strings';
+ import { withIgnoreIMEEvents } from './utils/with-ignore-ime-events';
+ import { lock } from './lock-unlock';
++import Avatar from './avatar';
++import AvatarGroup from './avatar-group';
+ import Badge from './badge';
+ 
+ import { DateCalendar, DateRangeCalendar, TZDate } from './calendar';
+@@ -34,6 +36,8 @@ import { ValidatedFormTokenField } from './validated-form-controls/components/fo
+ export const privateApis = {};
+ lock( privateApis, {
+ 	__experimentalPopoverLegacyPositionToPlacement,
++	Avatar,
++	AvatarGroup,
+ 	ComponentsContext,
+ 	Tabs,
+ 	Theme,
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index d316d1716f2e90..c72222871efb3d 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -1,6 +1,8 @@
+ @use "@wordpress/base-styles/mixins" as *;
+ @use "./animate/style.scss" as *;
+ @use "./autocomplete/style.scss" as *;
++@use "./avatar/styles.scss" as *;
++@use "./avatar-group/styles.scss" as *;
+ @use "./badge/styles.scss" as *;
+ @use "./button-group/style.scss" as *;
+ @use "./button/style.scss" as *;

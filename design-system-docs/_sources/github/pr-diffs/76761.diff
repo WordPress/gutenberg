@@ -1,0 +1,129 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 776cfbea54afce..ed338436b900de 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `ComboboxControl`: Fix accessible association of `help` text with the combobox input ([#76761](https://github.com/WordPress/gutenberg/pull/76761)).
+ -   `RadioControl`: Add `role="radiogroup"` to the wrapping `fieldset` element ([#76745](https://github.com/WordPress/gutenberg/pull/76745)).
+ -   `ControlWithError`: Connect validation error messages to controls via `aria-describedby` ([#76742](https://github.com/WordPress/gutenberg/pull/76742)).
+ -   `CustomGradientPicker`: Add state persistence when switching between Linear and Radial Gradient ([#76595](https://github.com/WordPress/gutenberg/pull/76595)).
+diff --git a/packages/components/src/combobox-control/index.tsx b/packages/components/src/combobox-control/index.tsx
+index 88cbf5979c270f..bd53b03002331b 100644
+--- a/packages/components/src/combobox-control/index.tsx
++++ b/packages/components/src/combobox-control/index.tsx
+@@ -358,6 +358,12 @@ function ComboboxControl( props: ComboboxControlProps ) {
+ 									matchingSuggestions
+ 								) }
+ 								onChange={ onInputChange }
++								aria-describedby={
++									help
++										? // TODO: Refactor `TokenInput` to not use hardcoded IDs.
++										  `components-form-token-input-${ instanceId }__help`
++										: undefined
++								}
+ 							/>
+ 						</FlexBlock>
+ 						{ isLoading && <Spinner /> }
+diff --git a/packages/components/src/combobox-control/stories/index.story.tsx b/packages/components/src/combobox-control/stories/index.story.tsx
+index d3c8b0eebc5a5a..e67a8cc6534802 100644
+--- a/packages/components/src/combobox-control/stories/index.story.tsx
++++ b/packages/components/src/combobox-control/stories/index.story.tsx
+@@ -88,8 +88,9 @@ const Template: StoryFn< typeof ComboboxControl > = ( {
+ export const Default = Template.bind( {} );
+ Default.args = {
+ 	__next40pxDefaultSize: true,
+-	label: 'Select a country',
++	label: 'Country',
+ 	options: countryOptions,
++	help: 'Help text to describe the control.',
+ };
+ 
+ /**
+@@ -100,7 +101,7 @@ Default.args = {
+ export const WithCustomRenderItem = Template.bind( {} );
+ WithCustomRenderItem.args = {
+ 	...Default.args,
+-	label: 'Select an author',
++	label: 'Author',
+ 	options: [
+ 		{
+ 			value: 'parsley',
+diff --git a/packages/components/src/combobox-control/test/index.tsx b/packages/components/src/combobox-control/test/index.tsx
+index b20688c62887b0..af581928557327 100644
+--- a/packages/components/src/combobox-control/test/index.tsx
++++ b/packages/components/src/combobox-control/test/index.tsx
+@@ -92,8 +92,8 @@ describe.each( [
+ 		render(
+ 			<Component options={ timezones } label={ defaultLabelText } />
+ 		);
+-		const label = getLabel( defaultLabelText );
+-		expect( label ).toBeVisible();
++		expect( getLabel( defaultLabelText ) ).toBeVisible();
++		expect( getInput( defaultLabelText ) ).toBeVisible();
+ 	} );
+ 
+ 	it( 'should render with hidden label', () => {
+@@ -104,13 +104,7 @@ describe.each( [
+ 				hideLabelFromVision
+ 			/>
+ 		);
+-		const label = getLabel( defaultLabelText );
+-
+-		expect( label ).toBeInTheDocument();
+-		expect( label ).toHaveAttribute(
+-			'data-wp-component',
+-			'VisuallyHidden'
+-		);
++		expect( getInput( defaultLabelText ) ).toBeVisible();
+ 	} );
+ 
+ 	it( 'should render with the correct options', async () => {
+@@ -451,6 +445,19 @@ describe.each( [
+ 		expect( input ).toHaveFocus();
+ 	} );
+ 
++	it( 'should associate the `help` text with the combobox accessibly', () => {
++		render(
++			<Component
++				options={ timezones }
++				label={ defaultLabelText }
++				help="Help text"
++			/>
++		);
++		expect( getInput( defaultLabelText ) ).toHaveAccessibleDescription(
++			'Help text'
++		);
++	} );
++
+ 	it( 'should reset input when pressing the Reset button with the Spacebar key', async () => {
+ 		const user = await userEvent.setup();
+ 		const targetOption = timezones[ 13 ];
+diff --git a/packages/components/src/form-token-field/token-input.tsx b/packages/components/src/form-token-field/token-input.tsx
+index f57cddffad089c..6a4b4565f829d0 100644
+--- a/packages/components/src/form-token-field/token-input.tsx
++++ b/packages/components/src/form-token-field/token-input.tsx
+@@ -28,6 +28,7 @@ export function UnForwardedTokenInput(
+ 		onChange,
+ 		onFocus,
+ 		onBlur,
++		'aria-describedby': ariaDescribedBy,
+ 		...restProps
+ 	} = props;
+ 
+@@ -86,7 +87,12 @@ export function UnForwardedTokenInput(
+ 					? `components-form-token-suggestions-${ instanceId }-${ selectedSuggestionIndex }`
+ 					: undefined
+ 			}
+-			aria-describedby={ `components-form-token-suggestions-howto-${ instanceId }` }
++			aria-describedby={ [
++				`components-form-token-suggestions-howto-${ instanceId }`,
++				ariaDescribedBy,
++			]
++				.filter( Boolean )
++				.join( ' ' ) }
+ 		/>
+ 	);
+ }

@@ -1,0 +1,297 @@
+diff --git a/packages/theme/src/color-ramps/test/__snapshots__/index.test.ts.snap b/packages/theme/src/color-ramps/test/__snapshots__/index.test.ts.snap
+index 2b60ce136ca9d4..fd1fb90cd8befc 100644
+--- a/packages/theme/src/color-ramps/test/__snapshots__/index.test.ts.snap
++++ b/packages/theme/src/color-ramps/test/__snapshots__/index.test.ts.snap
+@@ -6527,9 +6527,9 @@ exports[`buildRamps background ramp snapshots 1`] = `
+   },
+   {
+     "input": {
+-      "seedComputed": "#e6e5e6",
++      "seedComputed": "#e6e6e6",
+       "seedOriginal": "#e6e6e6",
+-      "seedUnchanged": false,
++      "seedUnchanged": true,
+     },
+     "output": {
+       "direction": "darker",
+@@ -6551,7 +6551,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
+         "stroke3": "#7d7d7d",
+         "stroke4": "#616161",
+         "surface1": "#ddd",
+-        "surface2": "#e6e5e6",
++        "surface2": "#e6e6e6",
+         "surface3": "#eee",
+         "surface4": "#d7d7d7",
+         "surface5": "#d1d1d1",
+@@ -6562,9 +6562,9 @@ exports[`buildRamps background ramp snapshots 1`] = `
+   },
+   {
+     "input": {
+-      "seedComputed": "#e6e5e6",
++      "seedComputed": "#e6e6e6",
+       "seedOriginal": "#e6e6e6",
+-      "seedUnchanged": false,
++      "seedUnchanged": true,
+     },
+     "output": {
+       "direction": "darker",
+@@ -6586,7 +6586,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
+         "stroke3": "#7d7d7d",
+         "stroke4": "#616161",
+         "surface1": "#ddd",
+-        "surface2": "#e6e5e6",
++        "surface2": "#e6e6e6",
+         "surface3": "#eee",
+         "surface4": "#d7d7d7",
+         "surface5": "#d1d1d1",
+@@ -6597,9 +6597,9 @@ exports[`buildRamps background ramp snapshots 1`] = `
+   },
+   {
+     "input": {
+-      "seedComputed": "#e6e5e6",
++      "seedComputed": "#e6e6e6",
+       "seedOriginal": "#e6e6e6",
+-      "seedUnchanged": false,
++      "seedUnchanged": true,
+     },
+     "output": {
+       "direction": "darker",
+@@ -6621,7 +6621,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
+         "stroke3": "#7d7d7d",
+         "stroke4": "#616161",
+         "surface1": "#ddd",
+-        "surface2": "#e6e5e6",
++        "surface2": "#e6e6e6",
+         "surface3": "#eee",
+         "surface4": "#d7d7d7",
+         "surface5": "#d1d1d1",
+@@ -6632,9 +6632,9 @@ exports[`buildRamps background ramp snapshots 1`] = `
+   },
+   {
+     "input": {
+-      "seedComputed": "#e6e5e6",
++      "seedComputed": "#e6e6e6",
+       "seedOriginal": "#e6e6e6",
+-      "seedUnchanged": false,
++      "seedUnchanged": true,
+     },
+     "output": {
+       "direction": "darker",
+@@ -6656,7 +6656,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
+         "stroke3": "#7d7d7d",
+         "stroke4": "#616161",
+         "surface1": "#ddd",
+-        "surface2": "#e6e5e6",
++        "surface2": "#e6e6e6",
+         "surface3": "#eee",
+         "surface4": "#d7d7d7",
+         "surface5": "#d1d1d1",
+@@ -6667,9 +6667,9 @@ exports[`buildRamps background ramp snapshots 1`] = `
+   },
+   {
+     "input": {
+-      "seedComputed": "#e6e5e6",
++      "seedComputed": "#e6e6e6",
+       "seedOriginal": "#e6e6e6",
+-      "seedUnchanged": false,
++      "seedUnchanged": true,
+     },
+     "output": {
+       "direction": "darker",
+@@ -6691,7 +6691,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
+         "stroke3": "#7d7d7d",
+         "stroke4": "#616161",
+         "surface1": "#ddd",
+-        "surface2": "#e6e5e6",
++        "surface2": "#e6e6e6",
+         "surface3": "#eee",
+         "surface4": "#d7d7d7",
+         "surface5": "#d1d1d1",
+@@ -6702,9 +6702,9 @@ exports[`buildRamps background ramp snapshots 1`] = `
+   },
+   {
+     "input": {
+-      "seedComputed": "#e6e5e6",
++      "seedComputed": "#e6e6e6",
+       "seedOriginal": "#e6e6e6",
+-      "seedUnchanged": false,
++      "seedUnchanged": true,
+     },
+     "output": {
+       "direction": "darker",
+@@ -6726,7 +6726,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
+         "stroke3": "#7d7d7d",
+         "stroke4": "#616161",
+         "surface1": "#ddd",
+-        "surface2": "#e6e5e6",
++        "surface2": "#e6e6e6",
+         "surface3": "#eee",
+         "surface4": "#d7d7d7",
+         "surface5": "#d1d1d1",
+@@ -9066,9 +9066,9 @@ exports[`buildRamps background ramp snapshots 1`] = `
+   },
+   {
+     "input": {
+-      "seedComputed": "#b3b2b3",
++      "seedComputed": "#b3b3b3",
+       "seedOriginal": "#b3b3b3",
+-      "seedUnchanged": false,
++      "seedUnchanged": true,
+     },
+     "output": {
+       "direction": "darker",
+@@ -9090,7 +9090,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
+         "stroke3": "#5a5a5a",
+         "stroke4": "#3f3f3f",
+         "surface1": "#acacac",
+-        "surface2": "#b3b2b3",
++        "surface2": "#b3b3b3",
+         "surface3": "#b9b9b9",
+         "surface4": "#a7a7a7",
+         "surface5": "#a1a1a1",
+@@ -9101,9 +9101,9 @@ exports[`buildRamps background ramp snapshots 1`] = `
+   },
+   {
+     "input": {
+-      "seedComputed": "#b3b2b3",
++      "seedComputed": "#b3b3b3",
+       "seedOriginal": "#b3b3b3",
+-      "seedUnchanged": false,
++      "seedUnchanged": true,
+     },
+     "output": {
+       "direction": "darker",
+@@ -9125,7 +9125,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
+         "stroke3": "#5a5a5a",
+         "stroke4": "#3f3f3f",
+         "surface1": "#acacac",
+-        "surface2": "#b3b2b3",
++        "surface2": "#b3b3b3",
+         "surface3": "#b9b9b9",
+         "surface4": "#a7a7a7",
+         "surface5": "#a1a1a1",
+@@ -9136,9 +9136,9 @@ exports[`buildRamps background ramp snapshots 1`] = `
+   },
+   {
+     "input": {
+-      "seedComputed": "#b3b2b3",
++      "seedComputed": "#b3b3b3",
+       "seedOriginal": "#b3b3b3",
+-      "seedUnchanged": false,
++      "seedUnchanged": true,
+     },
+     "output": {
+       "direction": "darker",
+@@ -9160,7 +9160,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
+         "stroke3": "#5a5a5a",
+         "stroke4": "#3f3f3f",
+         "surface1": "#acacac",
+-        "surface2": "#b3b2b3",
++        "surface2": "#b3b3b3",
+         "surface3": "#b9b9b9",
+         "surface4": "#a7a7a7",
+         "surface5": "#a1a1a1",
+@@ -9171,9 +9171,9 @@ exports[`buildRamps background ramp snapshots 1`] = `
+   },
+   {
+     "input": {
+-      "seedComputed": "#b3b2b3",
++      "seedComputed": "#b3b3b3",
+       "seedOriginal": "#b3b3b3",
+-      "seedUnchanged": false,
++      "seedUnchanged": true,
+     },
+     "output": {
+       "direction": "darker",
+@@ -9195,7 +9195,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
+         "stroke3": "#5a5a5a",
+         "stroke4": "#3f3f3f",
+         "surface1": "#acacac",
+-        "surface2": "#b3b2b3",
++        "surface2": "#b3b3b3",
+         "surface3": "#b9b9b9",
+         "surface4": "#a7a7a7",
+         "surface5": "#a1a1a1",
+@@ -9206,9 +9206,9 @@ exports[`buildRamps background ramp snapshots 1`] = `
+   },
+   {
+     "input": {
+-      "seedComputed": "#b3b2b3",
++      "seedComputed": "#b3b3b3",
+       "seedOriginal": "#b3b3b3",
+-      "seedUnchanged": false,
++      "seedUnchanged": true,
+     },
+     "output": {
+       "direction": "darker",
+@@ -9230,7 +9230,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
+         "stroke3": "#5a5a5a",
+         "stroke4": "#3f3f3f",
+         "surface1": "#acacac",
+-        "surface2": "#b3b2b3",
++        "surface2": "#b3b3b3",
+         "surface3": "#b9b9b9",
+         "surface4": "#a7a7a7",
+         "surface5": "#a1a1a1",
+@@ -9241,9 +9241,9 @@ exports[`buildRamps background ramp snapshots 1`] = `
+   },
+   {
+     "input": {
+-      "seedComputed": "#b3b2b3",
++      "seedComputed": "#b3b3b3",
+       "seedOriginal": "#b3b3b3",
+-      "seedUnchanged": false,
++      "seedUnchanged": true,
+     },
+     "output": {
+       "direction": "darker",
+@@ -9265,7 +9265,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
+         "stroke3": "#5a5a5a",
+         "stroke4": "#3f3f3f",
+         "surface1": "#acacac",
+-        "surface2": "#b3b2b3",
++        "surface2": "#b3b3b3",
+         "surface3": "#b9b9b9",
+         "surface4": "#a7a7a7",
+         "surface5": "#a1a1a1",
+@@ -11362,9 +11362,9 @@ exports[`buildRamps background ramp snapshots 1`] = `
+   },
+   {
+     "input": {
+-      "seedComputed": "#4cb3b3",
++      "seedComputed": "#4db3b3",
+       "seedOriginal": "#4db3b3",
+-      "seedUnchanged": false,
++      "seedUnchanged": true,
+     },
+     "output": {
+       "direction": "darker",
+@@ -11386,7 +11386,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
+         "stroke3": "#3a5353",
+         "stroke4": "#263737",
+         "surface1": "#5ea9a9",
+-        "surface2": "#4cb3b3",
++        "surface2": "#4db3b3",
+         "surface3": "#69b7b6",
+         "surface4": "#63a3a3",
+         "surface5": "#5e9e9d",
+diff --git a/packages/theme/src/color-ramps/test/index.test.ts b/packages/theme/src/color-ramps/test/index.test.ts
+index f09fdab59017d7..0288e22f374db6 100644
+--- a/packages/theme/src/color-ramps/test/index.test.ts
++++ b/packages/theme/src/color-ramps/test/index.test.ts
+@@ -15,7 +15,14 @@ const lStops = [ 100, 90, 80, 70, 60, 50, 40, 30, 20, 10 ];
+ const sStops = [ 100, 80, 60, 40, 20, 0 ];
+ const hstops = [ 0, 60, 120, 180, 240, 300 ];
+ 
+-describe.skip( 'buildRamps', () => {
++const nodeMajorVersion = Number( process.versions.node.split( '.' )[ 0 ] );
++const describeIfNode24Plus = nodeMajorVersion >= 24 ? describe : describe.skip;
++
++// Node.js 24+ produces subtly different color values compared to earlier versions,
++// likely due to changes in floating-point rounding behavior. Since the snapshots
++// in this file were generated using Node.js 24, we skip these tests on older
++// versions to avoid false negatives from inconsequential numerical differences.
++describeIfNode24Plus( 'buildRamps (skipped on Node.js 23 or earlier)', () => {
+ 	it( 'background ramp snapshots', () => {
+ 		const allBgColors = lStops.flatMap( ( l ) =>
+ 			sStops.flatMap( ( s ) =>

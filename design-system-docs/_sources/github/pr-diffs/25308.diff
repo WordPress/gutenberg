@@ -1,0 +1,625 @@
+diff --git a/packages/block-editor/src/components/responsive-block-control/test/__snapshots__/index.js.snap b/packages/block-editor/src/components/responsive-block-control/test/__snapshots__/index.js.snap
+index f59725173e5e06..7dd76a3e3594c2 100644
+--- a/packages/block-editor/src/components/responsive-block-control/test/__snapshots__/index.js.snap
++++ b/packages/block-editor/src/components/responsive-block-control/test/__snapshots__/index.js.snap
+@@ -1,3 +1,3 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`Basic rendering should render with required props 1`] = `"<fieldset class=\\"block-editor-responsive-block-control\\"><legend class=\\"block-editor-responsive-block-control__title\\">Padding</legend><div class=\\"block-editor-responsive-block-control__inner\\"><div class=\\"components-base-control components-toggle-control block-editor-responsive-block-control__toggle\\"><div class=\\"components-base-control__field\\"><span class=\\"components-form-toggle is-checked\\"><input class=\\"components-form-toggle__input\\" id=\\"inspector-toggle-control-0\\" type=\\"checkbox\\" aria-describedby=\\"inspector-toggle-control-0__help\\" checked=\\"\\"><span class=\\"components-form-toggle__track\\"></span><span class=\\"components-form-toggle__thumb\\"></span></span><label for=\\"inspector-toggle-control-0\\" class=\\"components-toggle-control__label\\">Use the same padding on all screensizes.</label></div><p id=\\"inspector-toggle-control-0__help\\" class=\\"components-base-control__help\\">Toggle between using the same value for all screen sizes or using a unique value per screen size.</p></div><div class=\\"block-editor-responsive-block-control__group\\"><div class=\\"components-base-control\\"><div class=\\"components-base-control__field\\"><div class=\\"components-flex components-select-control e1cr7zh10 css-sbt0p2-Flex-Root eboqfv50\\"><div class=\\"components-flex__item e1cr7zh14 css-d373l0-Item-LabelWrapper eboqfv51\\"><label for=\\"inspector-select-control-0\\" class=\\"components-input-control__label css-7tv4lf-Text-BaseLabel e1cr7zh13\\"><span aria-describedby=\\"rbc-desc-0\\">All</span><span class=\\"components-visually-hidden\\" id=\\"rbc-desc-0\\">Controls the padding property for All viewports.</span></label></div><div class=\\"components-input-control__container css-99mm9s-Container e1cr7zh11\\"><select class=\\"components-select-control__input css-hwcz8s-Select e12x0a390\\" id=\\"inspector-select-control-0\\"><option value=\\"\\">Please select</option><option value=\\"small\\">Small</option><option value=\\"medium\\">Medium</option><option value=\\"large\\">Large</option></select><span class=\\"components-input-control__suffix css-1lym30p-Suffix e1cr7zh19\\"><div class=\\"css-s55r1c-DownArrowWrapper e12x0a391\\"><svg viewBox=\\"0 0 24 24\\" xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"18\\" height=\\"18\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M17.5 11.6L12 16l-5.5-4.4.9-1.2L12 14l4.5-3.6 1 1.2z\\"></path></svg></div></span><fieldset aria-hidden=\\"true\\" class=\\"components-input-control__backdrop css-15qcvxb-Fieldset e1cr7zh15\\"></fieldset></div></div></div></div><p id=\\"all\\">All is used here for testing purposes to ensure we have access to details about the device.</p></div></div></fieldset>"`;
++exports[`Basic rendering should render with required props 1`] = `"<fieldset class=\\"block-editor-responsive-block-control\\"><legend class=\\"block-editor-responsive-block-control__title\\">Padding</legend><div class=\\"block-editor-responsive-block-control__inner\\"><div class=\\"components-base-control components-toggle-control block-editor-responsive-block-control__toggle\\"><div class=\\"components-base-control__field\\"><span class=\\"components-form-toggle is-checked\\"><input class=\\"components-form-toggle__input\\" id=\\"inspector-toggle-control-0\\" type=\\"checkbox\\" aria-describedby=\\"inspector-toggle-control-0__help\\" checked=\\"\\"><span class=\\"components-form-toggle__track\\"></span><span class=\\"components-form-toggle__thumb\\"></span></span><label for=\\"inspector-toggle-control-0\\" class=\\"components-toggle-control__label\\">Use the same padding on all screensizes.</label></div><p id=\\"inspector-toggle-control-0__help\\" class=\\"components-base-control__help\\">Toggle between using the same value for all screen sizes or using a unique value per screen size.</p></div><div class=\\"block-editor-responsive-block-control__group\\"><div class=\\"components-base-control\\"><div class=\\"components-base-control__field\\"><div class=\\"components-flex components-select-control e1cr7zh10 css-4hkoc6-Flex-Root eboqfv50\\"><div class=\\"components-flex__item e1cr7zh14 css-d373l0-Item-LabelWrapper eboqfv51\\"><label for=\\"inspector-select-control-0\\" class=\\"components-input-control__label css-h505uc-Text-BaseLabel e1cr7zh13\\"><span aria-describedby=\\"rbc-desc-0\\">All</span><span class=\\"components-visually-hidden\\" id=\\"rbc-desc-0\\">Controls the padding property for All viewports.</span></label></div><div class=\\"components-input-control__container css-c1s9gk-Container e1cr7zh11\\"><select class=\\"components-select-control__input css-hwcz8s-Select e12x0a390\\" id=\\"inspector-select-control-0\\"><option value=\\"\\">Please select</option><option value=\\"small\\">Small</option><option value=\\"medium\\">Medium</option><option value=\\"large\\">Large</option></select><span class=\\"components-input-control__suffix css-1lym30p-Suffix e1cr7zh17\\"><div class=\\"css-s55r1c-DownArrowWrapper e12x0a391\\"><svg viewBox=\\"0 0 24 24\\" xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"18\\" height=\\"18\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M17.5 11.6L12 16l-5.5-4.4.9-1.2L12 14l4.5-3.6 1 1.2z\\"></path></svg></div></span><div aria-hidden=\\"true\\" class=\\"components-input-control__backdrop css-2u723s-BackdropUI e1cr7zh15\\"></div></div></div></div></div><p id=\\"all\\">All is used here for testing purposes to ensure we have access to details about the device.</p></div></div></fieldset>"`;
+diff --git a/packages/components/src/box-control/unit-control.js b/packages/components/src/box-control/unit-control.js
+index c0dd9dd833d4d4..a8b4deaab65ca1 100644
+--- a/packages/components/src/box-control/unit-control.js
++++ b/packages/components/src/box-control/unit-control.js
+@@ -38,7 +38,6 @@ export default function BoxUnitControl( {
+ 					isLast={ isLast }
+ 					isOnly={ isOnly }
+ 					isPressEnterToChange
+-					isFloatingLabel
+ 					isResetValueOnUnitChange={ false }
+ 					value={ value }
+ 					{ ...props }
+diff --git a/packages/components/src/input-control/README.md b/packages/components/src/input-control/README.md
+index 91d8df2b812da1..b24b21cc90a397 100644
+--- a/packages/components/src/input-control/README.md
++++ b/packages/components/src/input-control/README.md
+@@ -38,13 +38,6 @@ If true, the `ENTER` key press is required in order to trigger an `onChange`. If
+ -   Required: No
+ -   Default: `false`
+ 
+-### isFloatingLabel
+-
+-If true, the `label` will render with a floating interaction.
+-
+--   Type: `Boolean`
+--   Required: No
+-
+ ### hideLabelFromVision
+ 
+ If true, the label will only be visible to screen readers.
+diff --git a/packages/components/src/input-control/backdrop.js b/packages/components/src/input-control/backdrop.js
+index e376170ee7bfca..c85efad03a8052 100644
+--- a/packages/components/src/input-control/backdrop.js
++++ b/packages/components/src/input-control/backdrop.js
+@@ -5,37 +5,16 @@ import { memo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { Fieldset, Legend, LegendText } from './styles/input-control-styles';
++import { BackdropUI } from './styles/input-control-styles';
+ 
+-function Backdrop( {
+-	disabled = false,
+-	isFloating = false,
+-	isFloatingLabel = false,
+-	isFocused = false,
+-	label,
+-	size = 'default',
+-} ) {
++function Backdrop( { disabled = false, isFocused = false } ) {
+ 	return (
+-		<Fieldset
++		<BackdropUI
+ 			aria-hidden="true"
+ 			className="components-input-control__backdrop"
+ 			disabled={ disabled }
+-			isFloatingLabel={ isFloatingLabel }
+ 			isFocused={ isFocused }
+-		>
+-			{ isFloatingLabel && (
+-				<Legend
+-					aria-hidden="true"
+-					className="components-input-control__backdrop-label"
+-					isFloating={ isFloating }
+-					size={ size }
+-				>
+-					<LegendText className="components-input-control__backdrop-text">
+-						{ label }
+-					</LegendText>
+-				</Legend>
+-			) }
+-		</Fieldset>
++		/>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/input-control/index.js b/packages/components/src/input-control/index.js
+index 3a054c28b84de1..bd6cb82d8be982 100644
+--- a/packages/components/src/input-control/index.js
++++ b/packages/components/src/input-control/index.js
+@@ -15,7 +15,6 @@ import { useState, forwardRef } from '@wordpress/element';
+  */
+ import InputBase from './input-base';
+ import InputField from './input-field';
+-import { isValueEmpty } from '../utils/values';
+ 
+ function useUniqueId( idProp ) {
+ 	const instanceId = useInstanceId( InputControl );
+@@ -32,7 +31,6 @@ export function InputControl(
+ 		hideLabelFromVision = false,
+ 		id: idProp,
+ 		isPressEnterToChange = false,
+-		isFloatingLabel = false,
+ 		label,
+ 		labelPosition = 'top',
+ 		onBlur = noop,
+@@ -49,7 +47,6 @@ export function InputControl(
+ 	ref
+ ) {
+ 	const [ isFocused, setIsFocused ] = useState( false );
+-	const [ isFilled, setIsFilled ] = useState( ! isValueEmpty( value ) );
+ 
+ 	const id = useUniqueId( idProp );
+ 	const classes = classNames( 'components-input-control', className );
+@@ -64,12 +61,6 @@ export function InputControl(
+ 		setIsFocused( true );
+ 	};
+ 
+-	const isInputFilled = isFilled || ! isValueEmpty( value );
+-
+-	const isFloating = isFloatingLabel ? isInputFilled || isFocused : false;
+-	const isFloatingLabelSet =
+-		! hideLabelFromVision && isFloatingLabel && label;
+-
+ 	return (
+ 		<InputBase
+ 			className={ classes }
+@@ -77,8 +68,6 @@ export function InputControl(
+ 			gap={ 3 }
+ 			hideLabelFromVision={ hideLabelFromVision }
+ 			id={ id }
+-			isFilled={ isInputFilled }
+-			isFloatingLabel={ isFloatingLabel }
+ 			isFocused={ isFocused }
+ 			justify="left"
+ 			label={ label }
+@@ -92,14 +81,11 @@ export function InputControl(
+ 				className="components-input-control__input"
+ 				disabled={ disabled }
+ 				id={ id }
+-				isFloating={ isFloating }
+-				isFloatingLabelSet={ isFloatingLabelSet }
+ 				isPressEnterToChange={ isPressEnterToChange }
+ 				onBlur={ handleOnBlur }
+ 				onChange={ onChange }
+ 				onFocus={ handleOnFocus }
+ 				onKeyDown={ onKeyDown }
+-				onUpdateValue={ setIsFilled }
+ 				onValidate={ onValidate }
+ 				ref={ ref }
+ 				setIsFocused={ setIsFocused }
+diff --git a/packages/components/src/input-control/input-base.js b/packages/components/src/input-control/input-base.js
+index b946175b2b043b..1ac2000dc753f6 100644
+--- a/packages/components/src/input-control/input-base.js
++++ b/packages/components/src/input-control/input-base.js
+@@ -31,8 +31,6 @@ export function InputBase(
+ 		disabled = false,
+ 		hideLabelFromVision = false,
+ 		id: idProp,
+-		isFloatingLabel = false,
+-		isFilled = false,
+ 		isFocused = false,
+ 		label,
+ 		prefix,
+@@ -44,15 +42,10 @@ export function InputBase(
+ ) {
+ 	const id = useUniqueId( idProp );
+ 
+-	const isFloating = isFloatingLabel ? isFilled || isFocused : false;
+-	const isFloatingLabelSet =
+-		! hideLabelFromVision && isFloatingLabel && label;
+-
+ 	return (
+ 		<Root
+ 			{ ...props }
+ 			className={ className }
+-			isFloatingLabel={ isFloatingLabelSet }
+ 			isFocused={ isFocused }
+ 			ref={ ref }
+ 		>
+@@ -61,9 +54,6 @@ export function InputBase(
+ 					className="components-input-control__label"
+ 					hideLabelFromVision={ hideLabelFromVision }
+ 					htmlFor={ id }
+-					isFilled={ isFilled }
+-					isFloating={ isFloating }
+-					isFloatingLabel={ isFloatingLabel }
+ 					size={ size }
+ 				>
+ 					{ label }
+@@ -88,8 +78,6 @@ export function InputBase(
+ 				<Backdrop
+ 					aria-hidden="true"
+ 					disabled={ disabled }
+-					isFloating={ isFloating }
+-					isFloatingLabel={ isFloatingLabelSet }
+ 					isFocused={ isFocused }
+ 					label={ label }
+ 					size={ size }
+diff --git a/packages/components/src/input-control/input-field.js b/packages/components/src/input-control/input-field.js
+index 783e7d031fe17a..d6c183afced3cc 100644
+--- a/packages/components/src/input-control/input-field.js
++++ b/packages/components/src/input-control/input-field.js
+@@ -24,8 +24,6 @@ function InputField(
+ 		dragThreshold = 10,
+ 		id,
+ 		isDragEnabled = false,
+-		isFloating = false,
+-		isFloatingLabelSet = false,
+ 		isPressEnterToChange = false,
+ 		onBlur = noop,
+ 		onChange = noop,
+@@ -34,7 +32,6 @@ function InputField(
+ 		onDragStart = noop,
+ 		onFocus = noop,
+ 		onKeyDown = noop,
+-		onUpdateValue,
+ 		onValidate = noop,
+ 		size = 'default',
+ 		stateReducer = ( state ) => state,
+@@ -88,7 +85,6 @@ function InputField(
+ 		 */
+ 		if ( value !== valueRef.current && ! isDirty ) {
+ 			onChange( value, { event: _event } );
+-			onUpdateValue( ! isValueEmpty( value ) );
+ 
+ 			valueRef.current = value;
+ 		}
+@@ -195,8 +191,6 @@ function InputField(
+ 			dragCursor={ dragCursor }
+ 			isDragging={ isDragging }
+ 			id={ id }
+-			isFloating={ isFloating }
+-			isFloatingLabel={ isFloatingLabelSet }
+ 			onBlur={ handleOnBlur }
+ 			onChange={ handleOnChange }
+ 			onFocus={ handleOnFocus }
+diff --git a/packages/components/src/input-control/stories/index.js b/packages/components/src/input-control/stories/index.js
+index 27f148fdfdae97..4e170267dea5ba 100644
+--- a/packages/components/src/input-control/stories/index.js
++++ b/packages/components/src/input-control/stories/index.js
+@@ -24,7 +24,6 @@ function Example() {
+ 	const props = {
+ 		disabled: boolean( 'disabled', false ),
+ 		hideLabelFromVision: boolean( 'hideLabelFromVision', false ),
+-		isFloatingLabel: boolean( 'isFloatingLabel', false ),
+ 		isPressEnterToChange: boolean( 'isPressEnterToChange', false ),
+ 		label: text( 'label', 'Value' ),
+ 		labelPosition: select(
+diff --git a/packages/components/src/input-control/styles/input-control-styles.js b/packages/components/src/input-control/styles/input-control-styles.js
+index 4ac83a36645ef8..cd57f1ef4ca308 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.js
++++ b/packages/components/src/input-control/styles/input-control-styles.js
+@@ -9,13 +9,10 @@ import styled from '@emotion/styled';
+  */
+ import Flex, { FlexItem } from '../../flex';
+ import Text from '../../text';
+-import { color, rtl, reduceMotion } from '../../utils/style-mixins';
++import { color, rtl } from '../../utils/style-mixins';
+ 
+-const FLOATING_LABEL_TRANSITION_SPEED = '60ms';
+-
+-const rootFloatLabelStyles = ( { isFloatingLabel } ) => {
+-	const paddingTop = isFloatingLabel ? 5 : 0;
+-	return css( { paddingTop } );
++const rootFloatLabelStyles = () => {
++	return css( { paddingTop: 0 } );
+ };
+ 
+ const rootFocusedStyles = ( { isFocused } ) => {
+@@ -125,20 +122,8 @@ const sizeStyles = ( { size } ) => {
+ 	return css( style );
+ };
+ 
+-const placeholderStyles = ( { isFilled, isFloating, isFloatingLabel } ) => {
+-	let opacity = 1;
+-
+-	if ( isFloatingLabel ) {
+-		if ( ! isFilled && ! isFloating ) {
+-			opacity = 0;
+-		}
+-	}
+-
++const placeholderStyles = () => {
+ 	return css`
+-		&::placeholder {
+-			opacity: ${ opacity };
+-		}
+-
+ 		&::-webkit-input-placeholder {
+ 			line-height: normal;
+ 		}
+@@ -202,72 +187,7 @@ export const Input = styled.input`
+ 	}
+ `;
+ 
+-const laberColor = ( { isFloatingLabel, isFilled, isFloating } ) => {
+-	const isPlaceholder = isFloatingLabel && ! isFilled;
+-	const textColor =
+-		isPlaceholder || isFloating
+-			? color( 'ui.textDisabled' )
+-			: 'currentColor';
+-
+-	return css( { color: textColor } );
+-};
+-
+-const labelFontSize = ( { isFloatingLabel, size } ) => {
+-	const sizes = {
+-		default: '13px',
+-		small: '11px',
+-	};
+-	const fontSize = sizes[ size ];
+-	const lineHeight = isFloatingLabel ? 1.2 : null;
+-
+-	return css( { fontSize, lineHeight } );
+-};
+-
+-const labelPosition = ( { isFloatingLabel, isFloating, size } ) => {
+-	const paddingBottom = isFloatingLabel ? 0 : 4;
+-	const position = isFloatingLabel ? 'absolute' : null;
+-	const pointerEvents = isFloating ? null : 'none';
+-
+-	const isSmall = size === 'small';
+-
+-	const offsetTop = isSmall ? 1 : 2;
+-	const offset = isSmall ? '-1px' : '-3px';
+-
+-	const marginTop = isFloating ? 0 : offsetTop;
+-	const marginLeft = isFloatingLabel ? 8 : 0;
+-
+-	let transform = isFloating
+-		? `translate( 0, calc(-100% + ${ offset }) ) scale( 0.75 )`
+-		: 'translate( 0, -50%) scale(1)';
+-
+-	if ( ! isFloatingLabel ) {
+-		transform = null;
+-	}
+-
+-	const transition = isFloatingLabel
+-		? `transform ${ FLOATING_LABEL_TRANSITION_SPEED } linear`
+-		: null;
+-
+-	return css(
+-		{
+-			marginTop,
+-			paddingBottom,
+-			position,
+-			pointerEvents,
+-			transition,
+-			transform,
+-		},
+-		rtl( { marginLeft } )(),
+-		rtl(
+-			{ transformOrigin: 'top left' },
+-			{ transformOrigin: 'top right' }
+-		)()
+-	);
+-};
+-
+-const labelTruncation = ( { isFloating } ) => {
+-	if ( isFloating ) return '';
+-
++const labelTruncation = () => {
+ 	return css`
+ 		overflow: hidden;
+ 		text-overflow: ellipsis;
+@@ -278,24 +198,15 @@ const labelTruncation = ( { isFloating } ) => {
+ const BaseLabel = styled( Text )`
+ 	&&& {
+ 		box-sizing: border-box;
++		color: currentColor;
+ 		display: block;
+ 		margin: 0;
+ 		max-width: 100%;
+-		padding-bottom: 0;
++		padding-bottom: 4px;
+ 		padding-top: 0;
+-		pointer-events: none;
+-		top: 50%;
+-		transition: transform ${ FLOATING_LABEL_TRANSITION_SPEED } linear,
+-			max-width ${ FLOATING_LABEL_TRANSITION_SPEED } linear;
+ 		z-index: 1;
+ 
+-		${ laberColor };
+-		${ labelFontSize };
+-		${ labelPosition };
+ 		${ labelTruncation };
+-		${ reduceMotion( 'transition' ) };
+-
+-		${ rtl( { left: 0 } ) }
+ 	}
+ `;
+ 
+@@ -305,27 +216,30 @@ export const LabelWrapper = styled( FlexItem )`
+ 	max-width: calc( 100% - 10px );
+ `;
+ 
+-const fieldsetTopStyles = ( { isFloatingLabel } ) => {
+-	const top = isFloatingLabel ? -5 : 0;
+-	return css( { top } );
+-};
+-
+-const fieldsetFocusedStyles = ( { disabled, isFocused } ) => {
++const backdropFocusedStyles = ( { disabled, isFocused } ) => {
+ 	let borderColor = isFocused
+ 		? color( 'ui.borderFocus' )
+ 		: color( 'ui.border' );
+ 
+-	if ( disabled ) {
+-		borderColor = 'ui.borderDisabled';
++	let boxShadow = null;
++
++	if ( isFocused ) {
++		boxShadow = `0 0 0 1px ${ color( 'ui.borderFocus' ) } inset`;
+ 	}
+ 
+-	const borderWidth = isFocused ? 2 : 1;
+-	const borderStyle = 'solid';
++	if ( disabled ) {
++		borderColor = color( 'ui.borderDisabled' );
++	}
+ 
+-	return css( { borderColor, borderStyle, borderWidth } );
++	return css( {
++		boxShadow,
++		borderColor,
++		borderStyle: 'solid',
++		borderWidth: 1,
++	} );
+ };
+ 
+-export const Fieldset = styled.fieldset`
++export const BackdropUI = styled.div`
+ 	&&& {
+ 		box-sizing: border-box;
+ 		border-radius: inherit;
+@@ -336,55 +250,13 @@ export const Fieldset = styled.fieldset`
+ 		pointer-events: none;
+ 		position: absolute;
+ 		right: 0;
++		top: 0;
+ 
+-		${ fieldsetFocusedStyles };
+-		${ fieldsetTopStyles };
++		${ backdropFocusedStyles };
+ 		${ rtl( { paddingLeft: 2 } ) }
+ 	}
+ `;
+ 
+-const legendSize = ( { isFloating, size } ) => {
+-	const maxWidth = isFloating ? 1000 : 0.01;
+-	const sizes = {
+-		default: 9.75,
+-		small: 8.25,
+-	};
+-
+-	const fontSize = sizes[ size ];
+-
+-	return css( {
+-		fontSize,
+-		maxWidth,
+-	} );
+-};
+-
+-export const Legend = styled.legend`
+-	&&& {
+-		box-sizing: border-box;
+-		display: block;
+-		height: 11px;
+-		line-height: 11px;
+-		margin: 0;
+-		padding: 0;
+-		transition: max-width ${ FLOATING_LABEL_TRANSITION_SPEED } linear;
+-		visibility: hidden;
+-		width: auto;
+-
+-		${ legendSize };
+-		${ reduceMotion( 'transition' ) };
+-	}
+-`;
+-
+-const BaseLegendText = styled( Text )`
+-	box-sizing: border-box;
+-	display: inline-block;
+-	${ rtl( { paddingLeft: 4, paddingRight: 5 } ) }
+-`;
+-
+-export const LegendText = ( props ) => (
+-	<BaseLegendText { ...props } as="span" />
+-);
+-
+ export const Prefix = styled.span`
+ 	box-sizing: border-box;
+ 	display: block;
+diff --git a/packages/components/src/input-control/test/index.js b/packages/components/src/input-control/test/index.js
+index 61972949068b61..86615318497fc6 100644
+--- a/packages/components/src/input-control/test/index.js
++++ b/packages/components/src/input-control/test/index.js
+@@ -41,16 +41,6 @@ describe( 'InputControl', () => {
+ 
+ 			expect( input ).toBeTruthy();
+ 		} );
+-
+-		it( 'should render label, if floating', () => {
+-			render(
+-				<InputControl isFloatingLabel label="Hello" value="There" />
+-			);
+-
+-			const input = screen.getAllByText( 'Hello' );
+-
+-			expect( input ).toBeTruthy();
+-		} );
+ 	} );
+ 
+ 	describe( 'Value', () => {
+diff --git a/packages/components/src/number-control/stories/index.js b/packages/components/src/number-control/stories/index.js
+index adc84a3933d35c..1a5d8ea333c581 100644
+--- a/packages/components/src/number-control/stories/index.js
++++ b/packages/components/src/number-control/stories/index.js
+@@ -24,7 +24,6 @@ function Example() {
+ 	const props = {
+ 		disabled: boolean( 'disabled', false ),
+ 		hideLabelFromVision: boolean( 'hideLabelFromVision', false ),
+-		isFloatingLabel: boolean( 'isFloatingLabel', false ),
+ 		isPressEnterToChange: boolean( 'isPressEnterToChange', false ),
+ 		isShiftStepEnabled: boolean( 'isShiftStepEnabled', true ),
+ 		label: text( 'label', 'Number' ),
+diff --git a/packages/components/src/select-control/index.js b/packages/components/src/select-control/index.js
+index 55c507753eda4b..ee3b238d75e283 100644
+--- a/packages/components/src/select-control/index.js
++++ b/packages/components/src/select-control/index.js
+@@ -32,7 +32,6 @@ function SelectControl(
+ 		help,
+ 		hideLabelFromVision,
+ 		id: idProp,
+-		isFloatingLabel = false,
+ 		label,
+ 		multiple = false,
+ 		onBlur = noop,
+@@ -76,11 +75,6 @@ function SelectControl(
+ 		onChange( event.target.value, { event } );
+ 	};
+ 
+-	const isFilled = true;
+-	const isFloating = isFloatingLabel ? isFilled || isFocused : false;
+-	const isFloatingLabelSet =
+-		! hideLabelFromVision && isFloatingLabel && label;
+-
+ 	const classes = classNames( 'components-select-control', className );
+ 
+ 	/* eslint-disable jsx-a11y/no-onchange */
+@@ -91,8 +85,6 @@ function SelectControl(
+ 				disabled={ disabled }
+ 				hideLabelFromVision={ hideLabelFromVision }
+ 				id={ id }
+-				isFilled={ isFilled }
+-				isFloatingLabel={ isFloatingLabel }
+ 				isFocused={ isFocused }
+ 				label={ label }
+ 				size={ size }
+@@ -109,8 +101,6 @@ function SelectControl(
+ 					className="components-select-control__input"
+ 					disabled={ disabled }
+ 					id={ id }
+-					isFloating={ isFloating }
+-					isFloatingLabelSet={ isFloatingLabelSet }
+ 					multiple={ multiple }
+ 					onBlur={ handleOnBlur }
+ 					onChange={ handleOnChange }
+diff --git a/packages/components/src/select-control/stories/index.js b/packages/components/src/select-control/stories/index.js
+index f72e5af0165857..80a71605df1c3a 100644
+--- a/packages/components/src/select-control/stories/index.js
++++ b/packages/components/src/select-control/stories/index.js
+@@ -35,7 +35,6 @@ export const _default = () => {
+ 		disabled: boolean( 'disabled', false ),
+ 		help: text( 'help', 'Help text to explain the select control.' ),
+ 		hideLabelFromVision: boolean( 'hideLabelFromVision', false ),
+-		isFloatingLabel: boolean( 'isFloatingLabel', false ),
+ 		label: text( 'label', 'Value' ),
+ 		multiple: boolean( 'multiple', false ),
+ 		options: object( 'Options', [
+diff --git a/packages/components/src/unit-control/stories/index.js b/packages/components/src/unit-control/stories/index.js
+index ce6b05776064ee..947978b2e8083c 100644
+--- a/packages/components/src/unit-control/stories/index.js
++++ b/packages/components/src/unit-control/stories/index.js
+@@ -25,7 +25,6 @@ function Example() {
+ 	const props = {
+ 		disableUnits: boolean( 'disableUnits', false ),
+ 		hideLabelFromVision: boolean( 'hideLabelFromVision', false ),
+-		isFloatingLabel: boolean( 'isFloatingLabel', false ),
+ 		isPressEnterToChange: boolean( 'isPressEnterToChange', true ),
+ 		isShiftStepEnabled: boolean( 'isShiftStepEnabled', true ),
+ 		isUnitSelectTabbable: boolean( 'isUnitSelectTabbable', true ),
+diff --git a/packages/components/src/utils/colors-values.js b/packages/components/src/utils/colors-values.js
+index 863033bb545f3d..ced6f9efed7d73 100644
+--- a/packages/components/src/utils/colors-values.js
++++ b/packages/components/src/utils/colors-values.js
+@@ -26,6 +26,14 @@ export const G2 = {
+ 			focusDark: '#fff',
+ 		},
+ 	},
++	gray: {
++		900: '#1e1e1e',
++		700: '#757575', // Meets 4.6:1 text contrast against white.
++		600: '#949494', // Meets 3:1 UI or large text contrast against white.
++		400: '#ccc',
++		200: '#ddd', // Used for most borders.
++		100: '#f0f0f0',
++	},
+ 	darkGray: {
+ 		primary: '#1e1e1e',
+ 	},
+@@ -143,10 +151,10 @@ export const UI = {
+ 	theme: ADMIN.theme,
+ 	background: BASE.white,
+ 	backgroundDisabled: LIGHT_GRAY[ 200 ],
+-	border: G2.darkGray.primary,
++	border: G2.gray[ 700 ],
+ 	borderFocus: ADMIN.themeDark10,
+-	borderDisabled: DARK_GRAY[ 700 ],
+-	borderLight: LIGHT_GRAY[ 600 ],
++	borderDisabled: G2.gray[ 400 ],
++	borderLight: G2.gray[ 200 ],
+ 	label: DARK_GRAY[ 500 ],
+ 	textDisabled: DARK_GRAY[ 150 ],
+ 	textDark: BASE.white,

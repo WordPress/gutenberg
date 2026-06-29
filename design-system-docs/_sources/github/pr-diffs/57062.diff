@@ -1,0 +1,99 @@
+diff --git a/packages/components/src/popover/index.tsx b/packages/components/src/popover/index.tsx
+index 709d4b9884b5ec..20eadacfbe108f 100644
+--- a/packages/components/src/popover/index.tsx
++++ b/packages/components/src/popover/index.tsx
+@@ -10,6 +10,7 @@ import {
+ 	limitShift,
+ 	autoUpdate,
+ 	arrow,
++	hide,
+ 	offset as offsetMiddleware,
+ 	size,
+ } from '@floating-ui/react-dom';
+@@ -245,6 +246,7 @@ const UnconnectedPopover = (
+ 				padding: 1, // Necessary to avoid flickering at the edge of the viewport.
+ 			} ),
+ 		arrow( { element: arrowRef } ),
++		hide(),
+ 	];
+ 	const slotName = useContext( slotNameContext ) || __unstableSlotName;
+ 	const slot = useSlot( slotName );
+@@ -280,7 +282,7 @@ const UnconnectedPopover = (
+ 		strategy,
+ 		update,
+ 		placement: computedPlacement,
+-		middlewareData: { arrow: arrowData },
++		middlewareData: { arrow: arrowData, hide: hideData },
+ 	} = useFloating( {
+ 		placement:
+ 			normalizedPlacementFromProps === 'overlay'
+@@ -425,6 +427,7 @@ const UnconnectedPopover = (
+ 				className={ classnames( 'components-popover', className, {
+ 					'is-expanded': isExpanded,
+ 					'is-positioned': isPositioned,
++					'is-reference-hidden': hideData?.referenceHidden,
+ 					// Use the 'alternate' classname for 'toolbar' variant for back compat.
+ 					[ `is-${
+ 						computedVariant === 'toolbar'
+diff --git a/packages/components/src/popover/stories/index.story.tsx b/packages/components/src/popover/stories/index.story.tsx
+index 7f06045ac9b057..d68e6702091ba2 100644
+--- a/packages/components/src/popover/stories/index.story.tsx
++++ b/packages/components/src/popover/stories/index.story.tsx
+@@ -97,21 +97,30 @@ const Template: StoryFn< typeof Popover > = ( args ) => {
+ 	return (
+ 		<div
+ 			style={ {
+-				width: '300vw',
+-				height: '300vh',
+-				display: 'flex',
+-				alignItems: 'center',
+-				justifyContent: 'center',
++				height: 300,
++				width: '100%',
++				border: '1px solid red',
++				overflow: 'auto',
+ 			} }
+ 		>
+-			<Button
+-				variant="secondary"
+-				onClick={ toggleVisible }
+-				ref={ buttonRef }
++			<div
++				style={ {
++					width: '300vw',
++					height: '300vh',
++					display: 'flex',
++					alignItems: 'center',
++					justifyContent: 'center',
++				} }
+ 			>
+-				Toggle Popover
+-				{ isVisible && <Popover { ...args } /> }
+-			</Button>
++				<Button
++					variant="secondary"
++					onClick={ toggleVisible }
++					ref={ buttonRef }
++				>
++					Toggle Popover
++					{ isVisible && <Popover { ...args } /> }
++				</Button>
++			</div>
+ 		</div>
+ 	);
+ };
+diff --git a/packages/components/src/popover/style.scss b/packages/components/src/popover/style.scss
+index 2e8a766829f3a6..2c9a05f8b36e0a 100644
+--- a/packages/components/src/popover/style.scss
++++ b/packages/components/src/popover/style.scss
+@@ -17,6 +17,10 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
+ 		bottom: 0;
+ 		z-index: z-index(".components-popover") !important;
+ 	}
++
++	&.is-reference-hidden {
++		display: none;
++	}
+ }
+ 
+ .components-popover__content {

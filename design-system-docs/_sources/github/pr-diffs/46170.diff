@@ -1,0 +1,317 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index cee4723a7e792e..ab3f0877ee0016 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### New Feature
+ 
+ -   `TabPanel`: support manual tab activation ([#46004](https://github.com/WordPress/gutenberg/pull/46004)).
++-   `BaseControl`: Add `useBaseControlProps` hook to help generate id-releated props ([#46170](https://github.com/WordPress/gutenberg/pull/46170)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/base-control/README.md b/packages/components/src/base-control/README.md
+index d940a7bc2fdc24..c2f3dc3e0108fd 100644
+--- a/packages/components/src/base-control/README.md
++++ b/packages/components/src/base-control/README.md
+@@ -4,16 +4,23 @@
+ 
+ ## Usage
+ 
+-Render a `BaseControl` for a textarea input:
+-
+ ```jsx
+-import { BaseControl } from '@wordpress/components';
+-
+-// The `id` prop is necessary to accessibly associate the label with the textarea
+-const MyBaseControl = () => (
+-	<BaseControl id="textarea-1" label="Text" help="Enter some text" __nextHasNoMarginBottom={ true }>
+-		<textarea id="textarea-1" />
+-	</BaseControl>
++import { BaseControl, useBaseControlProps } from '@wordpress/components';
++
++// Render a `BaseControl` for a textarea input
++const MyCustomTextareaControl = ({ children, ...baseProps }) => (
++	// `useBaseControlProps` is a convenience hook to get the props for the `BaseControl`
++	// and the inner control itself. Namely, it takes care of generating a unique `id`,
++	// properly associating it with the `label` and `help` elements.
++	const { baseControlProps, controlProps } = useBaseControlProps( baseProps );
++
++	return (
++		<BaseControl { ...baseControlProps } __nextHasNoMarginBottom={ true }>
++			<textarea { ...controlProps }>
++			  { children }
++			</textarea>
++		</BaseControl>
++	);
+ );
+ ```
+ 
+@@ -23,7 +30,9 @@ The component accepts the following props:
+ 
+ ### id
+ 
+-The HTML `id` of the element (passed in as a child to `BaseControl`) to which labels and help text are being generated. This is necessary to accessibly associate the label with that element.
++The HTML `id` of the control element (passed in as a child to `BaseControl`) to which labels and help text are being generated. This is necessary to accessibly associate the label with that element.
++
++The recommended way is to use the `useBaseControlProps` hook, which takes care of generating a unique `id` for you. Otherwise, if you choose to pass an explicit `id` to this prop, you are responsible for ensuring the uniqueness of the `id`.
+ 
+ -   Type: `String`
+ -   Required: No
+@@ -44,9 +53,9 @@ If true, the label will only be visible to screen readers.
+ 
+ ### help
+ 
+-If this property is added, a help text will be generated using help property as the content.
++Additional description for the control. It is preferable to use plain text for `help`, as it can be accessibly associated with the control using `aria-describedby`. When the `help` contains links, or otherwise non-plain text content, it will be associated with the control using `aria-details`.
+ 
+--   Type: `String|WPElement`
++-   Type: `ReactNode`
+ -   Required: No
+ 
+ ### className
+diff --git a/packages/components/src/base-control/hooks.ts b/packages/components/src/base-control/hooks.ts
+new file mode 100644
+index 00000000000000..400b15834fead5
+--- /dev/null
++++ b/packages/components/src/base-control/hooks.ts
+@@ -0,0 +1,45 @@
++/**
++ * WordPress dependencies
++ */
++import { useInstanceId } from '@wordpress/compose';
++
++/**
++ * Internal dependencies
++ */
++import BaseControl from '.';
++import type { BaseControlProps } from './types';
++
++/**
++ * Generate props for the `BaseControl` and the inner control itself.
++ *
++ * Namely, it takes care of generating a unique `id`, properly associating it with the `label` and `help` elements.
++ *
++ * @param  props
++ */
++export function useBaseControlProps(
++	props: Omit< BaseControlProps, 'children' >
++) {
++	const { help, id: preferredId, ...restProps } = props;
++
++	const uniqueId = useInstanceId(
++		BaseControl,
++		'wp-components-base-control',
++		preferredId
++	);
++
++	// ARIA descriptions can only contain plain text, so fall back to aria-details if not.
++	const helpPropName =
++		typeof help === 'string' ? 'aria-describedby' : 'aria-details';
++
++	return {
++		baseControlProps: {
++			id: uniqueId,
++			help,
++			...restProps,
++		},
++		controlProps: {
++			id: uniqueId,
++			...( !! help ? { [ helpPropName ]: `${ uniqueId }__help` } : {} ),
++		},
++	};
++}
+diff --git a/packages/components/src/base-control/index.tsx b/packages/components/src/base-control/index.tsx
+index 122577fdeba62c..fa2df39bddd458 100644
+--- a/packages/components/src/base-control/index.tsx
++++ b/packages/components/src/base-control/index.tsx
+@@ -17,19 +17,30 @@ import {
+ } from './styles/base-control-styles';
+ import type { WordPressComponentProps } from '../ui/context';
+ 
++export { useBaseControlProps } from './hooks';
++
+ /**
+  * `BaseControl` is a component used to generate labels and help text for components handling user inputs.
+  *
+- * @example
++ * ```jsx
++ * import { BaseControl, useBaseControlProps } from '@wordpress/components';
++ *
+  * // Render a `BaseControl` for a textarea input
+- * import { BaseControl } from '@wordpress/components';
++ * const MyCustomTextareaControl = ({ children, ...baseProps }) => (
++ * 	// `useBaseControlProps` is a convenience hook to get the props for the `BaseControl`
++ * 	// and the inner control itself. Namely, it takes care of generating a unique `id`,
++ * 	// properly associating it with the `label` and `help` elements.
++ * 	const { baseControlProps, controlProps } = useBaseControlProps( baseProps );
+  *
+- * // The `id` prop is necessary to accessibly associate the label with the textarea
+- * const MyBaseControl = () => (
+- *   <BaseControl id="textarea-1" label="Text" help="Enter some text" __nextHasNoMarginBottom={ true }>
+- *     <textarea id="textarea-1" />
+- *   </BaseControl>
++ * 	return (
++ * 		<BaseControl { ...baseControlProps } __nextHasNoMarginBottom={ true }>
++ * 			<textarea { ...controlProps }>
++ * 			  { children }
++ * 			</textarea>
++ * 		</BaseControl>
++ * 	);
+  * );
++ * ```
+  */
+ export const BaseControl = ( {
+ 	__nextHasNoMarginBottom = false,
+diff --git a/packages/components/src/base-control/stories/index.tsx b/packages/components/src/base-control/stories/index.tsx
+index edc850f760745f..b1b64caec0c3b0 100644
+--- a/packages/components/src/base-control/stories/index.tsx
++++ b/packages/components/src/base-control/stories/index.tsx
+@@ -6,7 +6,7 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
+ /**
+  * Internal dependencies
+  */
+-import BaseControl from '..';
++import BaseControl, { useBaseControlProps } from '..';
+ import Button from '../../button';
+ 
+ const meta: ComponentMeta< typeof BaseControl > = {
+@@ -24,13 +24,14 @@ const meta: ComponentMeta< typeof BaseControl > = {
+ };
+ export default meta;
+ 
+-const BaseControlWithTextarea: ComponentStory< typeof BaseControl > = ( {
+-	id,
+-	...props
+-} ) => {
++const BaseControlWithTextarea: ComponentStory< typeof BaseControl > = (
++	props
++) => {
++	const { baseControlProps, controlProps } = useBaseControlProps( props );
++
+ 	return (
+-		<BaseControl id={ id } { ...props }>
+-			<textarea style={ { display: 'block' } } id={ id } />
++		<BaseControl { ...baseControlProps }>
++			<textarea style={ { display: 'block' } } { ...controlProps } />
+ 		</BaseControl>
+ 	);
+ };
+@@ -39,14 +40,12 @@ export const Default: ComponentStory< typeof BaseControl > =
+ 	BaseControlWithTextarea.bind( {} );
+ Default.args = {
+ 	__nextHasNoMarginBottom: true,
+-	id: 'textarea-default-1',
+ 	label: 'Label text',
+ };
+ 
+ export const WithHelpText = BaseControlWithTextarea.bind( {} );
+ WithHelpText.args = {
+ 	...Default.args,
+-	id: 'textarea-with-help-text-1',
+ 	help: 'Help text adds more explanation.',
+ };
+ 
+@@ -75,6 +74,5 @@ export const WithVisualLabel: ComponentStory< typeof BaseControl > = (
+ WithVisualLabel.args = {
+ 	...Default.args,
+ 	help: 'This button is already accessibly labeled.',
+-	id: undefined,
+ 	label: undefined,
+ };
+diff --git a/packages/components/src/base-control/test/index.tsx b/packages/components/src/base-control/test/index.tsx
+new file mode 100644
+index 00000000000000..2ca8f4e92e1c43
+--- /dev/null
++++ b/packages/components/src/base-control/test/index.tsx
+@@ -0,0 +1,52 @@
++/**
++ * External dependencies
++ */
++import { render, screen } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import BaseControl from '..';
++import { useBaseControlProps } from '../hooks';
++import type { BaseControlProps } from '../types';
++
++const MyBaseControl = ( props: Omit< BaseControlProps, 'children' > ) => {
++	const { baseControlProps, controlProps } = useBaseControlProps( props );
++
++	return (
++		<BaseControl { ...baseControlProps } __nextHasNoMarginBottom={ true }>
++			<textarea { ...controlProps } />
++		</BaseControl>
++	);
++};
++
++describe( 'BaseControl', () => {
++	it( 'should render help text as description', () => {
++		render( <MyBaseControl label="Text" help="My help text" /> );
++
++		expect(
++			screen.getByRole( 'textbox', {
++				description: 'My help text',
++			} )
++		).toBeInTheDocument();
++	} );
++
++	it( 'should render help as aria-details when not plain text', () => {
++		render(
++			<MyBaseControl
++				label="Text"
++				help={ <a href="/foo">My help text</a> }
++			/>
++		);
++
++		const textarea = screen.getByRole( 'textbox' );
++		const help = screen.getByRole( 'link', {
++			name: 'My help text',
++		} );
++
++		expect( textarea ).toHaveAttribute( 'aria-details' );
++		expect(
++			help.closest( `#${ textarea.getAttribute( 'aria-details' ) }` )
++		).toBeVisible();
++	} );
++} );
+diff --git a/packages/components/src/base-control/types.ts b/packages/components/src/base-control/types.ts
+index 490163d92e889c..36306e9a24b0b2 100644
+--- a/packages/components/src/base-control/types.ts
++++ b/packages/components/src/base-control/types.ts
+@@ -11,12 +11,18 @@ export type BaseControlProps = {
+ 	 */
+ 	__nextHasNoMarginBottom?: boolean;
+ 	/**
+-	 * The HTML `id` of the element (passed in as a child to `BaseControl`) to which labels and help text are being generated.
++	 * The HTML `id` of the control element (passed in as a child to `BaseControl`) to which labels and help text are being generated.
+ 	 * This is necessary to accessibly associate the label with that element.
++	 *
++	 * The recommended way is to use the `useBaseControlProps` hook, which takes care of generating a unique `id` for you.
++	 * Otherwise, if you choose to pass an explicit `id` to this prop, you are responsible for ensuring the uniqueness of the `id`.
+ 	 */
+ 	id?: string;
+ 	/**
+-	 * If this property is added, a help text will be generated using help property as the content.
++	 * Additional description for the control.
++	 *
++	 * It is preferable to use plain text for `help`, as it can be accessibly associated with the control using `aria-describedby`.
++	 * When the `help` contains links, or otherwise non-plain text content, it will be associated with the control using `aria-details`.
+ 	 */
+ 	help?: ReactNode;
+ 	/**
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 114884690e4821..c98aeb61683008 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -23,7 +23,7 @@ export {
+ 	default as Autocomplete,
+ 	useAutocompleteProps as __unstableUseAutocompleteProps,
+ } from './autocomplete';
+-export { default as BaseControl } from './base-control';
++export { default as BaseControl, useBaseControlProps } from './base-control';
+ export {
+ 	BorderBoxControl as __experimentalBorderBoxControl,
+ 	hasSplitBorders as __experimentalHasSplitBorders,

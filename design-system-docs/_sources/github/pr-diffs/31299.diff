@@ -1,0 +1,303 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 5cc7e1e41570a3..73995624c75e1c 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -839,6 +839,12 @@
+ 		"markdown_source": "../packages/components/src/guide/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "Heading",
++		"slug": "heading",
++		"markdown_source": "../packages/components/src/heading/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "NavigateRegions",
+ 		"slug": "navigate-regions",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a1697efc6f1b7c..ef83be58ff5671 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.
+ -   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at https://nodejs.org/en/about/releases/.
++-   The experimental `Text` component has been completely re-written and enhanced with truncation support and separate variant, size, and weight props to allow for greater control. The previous `variant` prop has been completely removed.
+ 
+ ### Deprecation
+ 
+diff --git a/packages/components/src/flex/flex-block/README.md b/packages/components/src/flex/flex-block/README.md
+index 2bcba188338249..b5cbe861f6d669 100644
+--- a/packages/components/src/flex/flex-block/README.md
++++ b/packages/components/src/flex/flex-block/README.md
+@@ -1,4 +1,6 @@
+-# FlexBlock (Experimental)
++# FlexBlock
++
++> **Experimental!**
+ 
+ A layout component to contain items of a fixed width within `Flex`.
+ 
+diff --git a/packages/components/src/flex/flex-item/README.md b/packages/components/src/flex/flex-item/README.md
+index 5b8aa14a7edd80..6a6fc038263270 100644
+--- a/packages/components/src/flex/flex-item/README.md
++++ b/packages/components/src/flex/flex-item/README.md
+@@ -1,4 +1,6 @@
+-# FlexItem (Experimental)
++# FlexItem
++
++> **Experimental!**
+ 
+ A layout component to contain items of a fixed width within `Flex`.
+ 
+diff --git a/packages/components/src/flex/flex/README.md b/packages/components/src/flex/flex/README.md
+index 46319661ebe242..2ca42bb44baa58 100644
+--- a/packages/components/src/flex/flex/README.md
++++ b/packages/components/src/flex/flex/README.md
+@@ -1,4 +1,6 @@
+-# Flex (Experimental)
++# Flex
++
++> **Experimental!**
+ 
+ `Flex` is a primitive layout component that adaptively aligns child content horizontally or vertically. `Flex` powers components like `HStack` and `VStack`.
+ 
+@@ -11,7 +13,7 @@ import {
+ 	__experimentalFlex as Flex,
+ 	__experimentalFlexBlock as FlexBlock,
+ 	__experimentalFlexItem as FlexItem,
+-	__experimentalText as Text
++	__experimentalText as Text,
+ } from '@wordpress/components';
+ 
+ function Example() {
+diff --git a/packages/components/src/ui/heading/README.md b/packages/components/src/heading/README.md
+similarity index 73%
+rename from packages/components/src/ui/heading/README.md
+rename to packages/components/src/heading/README.md
+index d88325168b4fed..c686ccf49b9715 100644
+--- a/packages/components/src/ui/heading/README.md
++++ b/packages/components/src/heading/README.md
+@@ -1,11 +1,13 @@
+ # Heading
+ 
++> **Experimental!**
++
+ `Heading` renders headings and titles using the library's typography system.
+ 
+ ## Usage
+ 
+ ```jsx
+-import { Heading } from '@wordpress/components/ui';
++import { __experimentalHeading as Heading } from '@wordpress/components';
+ 
+ function Example() {
+ 	return <Heading>Code is Poetry</Heading>;
+@@ -14,7 +16,7 @@ function Example() {
+ 
+ ## Props
+ 
+-`Heading` uses `Text` underneath, so we have access to all of `Text`'s props except for `size` which is replaced by `level`. For a complete list of those props, check out [`Text`](../text/#props).
++`Heading` uses `Text` underneath, so we have access to all of `Text`'s props except for `size` which is replaced by `level`. For a complete list of those props, check out [`Text`](/packages/components/src/text/README.md#props).
+ 
+ ##### level
+ 
+diff --git a/packages/components/src/ui/heading/component.ts b/packages/components/src/heading/component.ts
+similarity index 90%
+rename from packages/components/src/ui/heading/component.ts
+rename to packages/components/src/heading/component.ts
+index c6705325cdcaea..70a572171c4e6d 100644
+--- a/packages/components/src/ui/heading/component.ts
++++ b/packages/components/src/heading/component.ts
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { createComponent } from '../utils';
++import { createComponent } from '../ui/utils';
+ import { useHeading } from './hook';
+ 
+ /**
+diff --git a/packages/components/src/ui/heading/hook.ts b/packages/components/src/heading/hook.ts
+similarity index 84%
+rename from packages/components/src/ui/heading/hook.ts
+rename to packages/components/src/heading/hook.ts
+index 44ba244611dcf8..0e22ef94a79e8b 100644
+--- a/packages/components/src/ui/heading/hook.ts
++++ b/packages/components/src/heading/hook.ts
+@@ -1,13 +1,13 @@
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem } from '../context';
++import { useContextSystem } from '../ui/context';
+ // eslint-disable-next-line no-duplicate-imports
+-import type { ViewOwnProps } from '../context';
+-import type { Props as TextProps } from '../../text/types';
+-import { useText } from '../../text';
+-import { getHeadingFontSize } from '../utils/font-size';
+-import { CONFIG, COLORS } from '../../utils';
++import type { ViewOwnProps } from '../ui/context';
++import type { Props as TextProps } from '../text/types';
++import { useText } from '../text';
++import { getHeadingFontSize } from '../ui/utils/font-size';
++import { CONFIG, COLORS } from '../utils';
+ 
+ export type HeadingSize =
+ 	| 1
+diff --git a/packages/components/src/heading/index.ts b/packages/components/src/heading/index.ts
+new file mode 100644
+index 00000000000000..1371331423bdd6
+--- /dev/null
++++ b/packages/components/src/heading/index.ts
+@@ -0,0 +1,2 @@
++export { default as Heading } from './component';
++export { useHeading } from './hook';
+diff --git a/packages/components/src/ui/heading/stories/index.js b/packages/components/src/heading/stories/index.js
+similarity index 92%
+rename from packages/components/src/ui/heading/stories/index.js
+rename to packages/components/src/heading/stories/index.js
+index ab4a1154f5797f..0025005a772d69 100644
+--- a/packages/components/src/ui/heading/stories/index.js
++++ b/packages/components/src/heading/stories/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { Heading } from '../index';
++import { Heading } from '../';
+ 
+ export default {
+ 	component: Heading,
+diff --git a/packages/components/src/ui/heading/test/__snapshots__/index.js.snap b/packages/components/src/heading/test/__snapshots__/index.js.snap
+similarity index 100%
+rename from packages/components/src/ui/heading/test/__snapshots__/index.js.snap
+rename to packages/components/src/heading/test/__snapshots__/index.js.snap
+diff --git a/packages/components/src/ui/heading/test/index.js b/packages/components/src/heading/test/index.js
+similarity index 97%
+rename from packages/components/src/ui/heading/test/index.js
+rename to packages/components/src/heading/test/index.js
+index 454a50a393c0e0..edf9b0dbc7e717 100644
+--- a/packages/components/src/ui/heading/test/index.js
++++ b/packages/components/src/heading/test/index.js
+@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import { Heading } from '../index';
++import { Heading } from '../';
+ 
+ describe( 'props', () => {
+ 	let base;
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index bed734fbd31bfb..c37301e3a0206c 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -65,6 +65,7 @@ export { default as __experimentalGradientPicker } from './gradient-picker';
+ export { default as __experimentalCustomGradientPicker } from './custom-gradient-picker';
+ export { default as Guide } from './guide';
+ export { default as GuidePage } from './guide/page';
++export { Heading as __experimentalHeading } from './heading';
+ export { default as Icon } from './icon';
+ export { default as IconButton } from './button/deprecated';
+ export { default as __experimentalInputControl } from './input-control';
+diff --git a/packages/components/src/text/README.md b/packages/components/src/text/README.md
+index 51ecdbd1d465a4..72a1831a251914 100644
+--- a/packages/components/src/text/README.md
++++ b/packages/components/src/text/README.md
+@@ -1,4 +1,6 @@
+-# Text (Experimental)
++# Text
++
++> **Experimental!**
+ 
+ `Text` is a core component that renders text in the library, using the library's typography system.
+ 
+diff --git a/packages/components/src/truncate/README.md b/packages/components/src/truncate/README.md
+index 663f04b1119f6b..494c99dd9720cf 100644
+--- a/packages/components/src/truncate/README.md
++++ b/packages/components/src/truncate/README.md
+@@ -1,4 +1,6 @@
+-# Truncate (Experimental)
++# Truncate
++
++> **Experimental!**
+ 
+ `Truncate` is a typography primitive that trims text content. For almost all cases, it is recommended that `Text`, `Heading`, or `Subheading` is used to render text content. However, `Truncate` is available for custom implementations.
+ 
+diff --git a/packages/components/src/ui/__storybook-utils/page.js b/packages/components/src/ui/__storybook-utils/page.js
+index 58864a194ecbd5..130b5fdb3044d3 100644
+--- a/packages/components/src/ui/__storybook-utils/page.js
++++ b/packages/components/src/ui/__storybook-utils/page.js
+@@ -3,7 +3,7 @@
+  */
+ import { VStack } from '../v-stack';
+ import { View } from '../view';
+-import { Heading } from '../heading';
++import { Heading } from '../../heading';
+ import { Divider } from '../divider';
+ 
+ function Page( { title = 'Component', children } ) {
+diff --git a/packages/components/src/ui/card/README.md b/packages/components/src/ui/card/README.md
+index 52d9c68ee8db5a..447a2b10bfcc42 100644
+--- a/packages/components/src/ui/card/README.md
++++ b/packages/components/src/ui/card/README.md
+@@ -13,7 +13,8 @@ import {
+ 	CardBody,
+ 	CardFooter,
+ 	Text,
+-} from '@wordpress/components/ui';
++	Heading,
++} from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+diff --git a/packages/components/src/ui/card/component.js b/packages/components/src/ui/card/component.js
+index 9c0771f951a80e..4fc8a50770a493 100644
+--- a/packages/components/src/ui/card/component.js
++++ b/packages/components/src/ui/card/component.js
+@@ -63,7 +63,8 @@ function Card( props, forwardedRef ) {
+  *   CardBody,
+  *   CardFooter,
+  *   Text,
+- * } from `@wordpress/components/ui`;
++ *   Heading,
++ * } from `@wordpress/components`;
+  *
+  * function Example() {
+  *   return (
+diff --git a/packages/components/src/ui/card/stories/index.js b/packages/components/src/ui/card/stories/index.js
+index dff054f89ffb90..fa6a90bad4afe2 100644
+--- a/packages/components/src/ui/card/stories/index.js
++++ b/packages/components/src/ui/card/stories/index.js
+@@ -6,7 +6,7 @@ import { Text } from '../../../text';
+ import { VStack } from '../../v-stack';
+ import { Card, CardBody, CardFooter } from '../index';
+ import { Divider } from '../../divider';
+-import { Heading } from '../../heading';
++import { Heading } from '../../../heading';
+ import Button from '../../../button';
+ 
+ export default {
+diff --git a/packages/components/src/ui/heading/index.ts b/packages/components/src/ui/heading/index.ts
+deleted file mode 100644
+index aec7615839ad93..00000000000000
+--- a/packages/components/src/ui/heading/index.ts
++++ /dev/null
+@@ -1,3 +0,0 @@
+-export { default as Heading } from './component';
+-export * from './component';
+-export * from './hook';
+diff --git a/packages/components/src/ui/index.js b/packages/components/src/ui/index.js
+index 43318054a97bfd..fb4ceeeba33a6f 100644
+--- a/packages/components/src/ui/index.js
++++ b/packages/components/src/ui/index.js
+@@ -6,7 +6,6 @@ export * from './elevation';
+ export * from './form-group';
+ export * from './grid';
+ export * from './h-stack';
+-export * from './heading';
+ export * from './shortcut';
+ export * from './spinner';
+ export * from './v-stack';

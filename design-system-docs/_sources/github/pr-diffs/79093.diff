@@ -1,0 +1,756 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index fe66bb6eca9958..cfbd65714f7322 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,10 @@
+ 
+ -   `SandBox`: Fix the viewport-unit (`vh`, `vw`, etc.) stripping so user-supplied HTML using these units in `width`/`height` no longer triggers a runaway resize loop in the preview ([#78677](https://github.com/WordPress/gutenberg/pull/78677)).
+ 
++### Internal
++
++-   Adopt `--wpds-dimension-size-*` design tokens [#79093](https://github.com/WordPress/gutenberg/pull/79093).
++
+ ### Code Quality
+ 
+ -   Move `@types/react` from `dependencies` to an optional peer dependency so consumers' React type version is used [#79095](https://github.com/WordPress/gutenberg/pull/79095).
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index b93b3689442124..302f36f68cccce 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -321,14 +321,14 @@
+ 	}
+ 
+ 	&.is-small {
+-		height: $button-size-small;
++		height: var(--wpds-dimension-size-sm);
+ 		line-height: 22px;
+ 		padding: 0 8px;
+ 		font-size: 11px;
+ 
+ 		&.has-icon:not(.has-text) {
+ 			padding: 0;
+-			min-width: $button-size-small;
++			min-width: var(--wpds-dimension-size-sm);
+ 		}
+ 	}
+ 
+diff --git a/packages/components/src/notice/style.scss b/packages/components/src/notice/style.scss
+index cc488751004544..a5bea1676abb1b 100644
+--- a/packages/components/src/notice/style.scss
++++ b/packages/components/src/notice/style.scss
+@@ -46,9 +46,7 @@
+ 	// consistent across variants, matching `@wordpress/ui` Notice (`.title` /
+ 	// `.description` always use `--text-vertical-padding` whether or not `CloseIcon`
+ 	// is rendered).
+-	// TODO: Replace `$button-size-small` with a WPDS size token once size tokens
+-	// land in `@wordpress/theme`.
+-	padding-block: calc((#{$button-size-small} - 1lh) / 2);
++	padding-block: calc((var(--wpds-dimension-size-sm) - 1lh) / 2);
+ }
+ 
+ .components-notice__actions {
+diff --git a/packages/components/src/toolbar/toolbar-group/style.scss b/packages/components/src/toolbar/toolbar-group/style.scss
+index ef32998abdaf15..67212fedac35a7 100644
+--- a/packages/components/src/toolbar/toolbar-group/style.scss
++++ b/packages/components/src/toolbar/toolbar-group/style.scss
+@@ -30,7 +30,7 @@
+ 		padding-right: $grid-unit-15 * 0.5;
+ 
+ 		svg {
+-			min-width: $button-size-small; // This is the optimal icon size, and we size the whole button after this.
++			min-width: var(--wpds-dimension-size-sm); // This is the optimal icon size, and we size the whole button after this.
+ 		}
+ 
+ 		&::before {
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index 84f26a375250fe..811f3194ec6a07 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -10,6 +10,10 @@
+ 
+ - Move `@types/react` from `dependencies` to an optional peer dependency so consumers' React type version is used [#79095](https://github.com/WordPress/gutenberg/pull/79095).
+ 
++### Internal
++
++- Adopt `--wpds-dimension-size-*` design tokens [#79093](https://github.com/WordPress/gutenberg/pull/79093).
++
+ ## 16.0.1 (2026-06-16)
+ 
+ ## 16.0.0 (2026-06-10)
+diff --git a/packages/dataviews/src/components/dataform-layouts/details/style.scss b/packages/dataviews/src/components/dataform-layouts/details/style.scss
+index a70370d60a5d63..64ed9f93275425 100644
+--- a/packages/dataviews/src/components/dataform-layouts/details/style.scss
++++ b/packages/dataviews/src/components/dataform-layouts/details/style.scss
+@@ -1,6 +1,6 @@
+ .dataforms-layouts-details__summary-content {
+ 	display: inline-flex;
+-	min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
++	min-height: var(--wpds-dimension-size-sm);
+ }
+ 
+ .dataforms-layouts-details__content {
+diff --git a/packages/dataviews/src/components/dataform-layouts/panel/style.scss b/packages/dataviews/src/components/dataform-layouts/panel/style.scss
+index d795293cc20076..60142172f247b6 100644
+--- a/packages/dataviews/src/components/dataform-layouts/panel/style.scss
++++ b/packages/dataviews/src/components/dataform-layouts/panel/style.scss
+@@ -6,7 +6,7 @@
+ 	color: inherit;
+ 	display: flex;
+ 	width: 100%;
+-	min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
++	min-height: var(--wpds-dimension-size-sm);
+ 	cursor: var(--wpds-cursor-control);
+ 	align-items: flex-start;
+ 	border-radius: var(--wpds-border-radius-sm);
+@@ -85,7 +85,7 @@
+ .dataforms-layouts-panel__field-label {
+ 	width: 38%;
+ 	flex-shrink: 0;
+-	min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
++	min-height: var(--wpds-dimension-size-sm);
+ 	display: flex;
+ 	align-items: center;
+ 	line-height: var(--wpds-typography-line-height-sm);
+@@ -120,7 +120,7 @@
+ .dataforms-layouts-panel__field-control {
+ 	flex-grow: 1;
+ 	min-width: 0;
+-	min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
++	min-height: var(--wpds-dimension-size-sm);
+ 	line-height: var(--wpds-typography-line-height-md);
+ 	display: flex;
+ 	align-items: center;
+diff --git a/packages/dataviews/src/components/dataform-layouts/regular/style.scss b/packages/dataviews/src/components/dataform-layouts/regular/style.scss
+index 296248db13542f..b322828401afe0 100644
+--- a/packages/dataviews/src/components/dataform-layouts/regular/style.scss
++++ b/packages/dataviews/src/components/dataform-layouts/regular/style.scss
+@@ -1,6 +1,6 @@
+ .dataforms-layouts-regular__field {
+ 	width: 100%;
+-	min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
++	min-height: var(--wpds-dimension-size-md);
+ 	justify-content: flex-start !important;
+ 	align-items: flex-start !important;
+ 
+@@ -14,7 +14,7 @@
+ .dataforms-layouts-regular__field-label {
+ 	width: 38%;
+ 	flex-shrink: 0;
+-	min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
++	min-height: var(--wpds-dimension-size-md);
+ 	display: flex;
+ 	align-items: center;
+ 	line-height: var(--wpds-typography-line-height-sm);
+@@ -31,7 +31,7 @@
+ 
+ .dataforms-layouts-regular__field-control {
+ 	flex-grow: 1;
+-	min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
++	min-height: var(--wpds-dimension-size-md);
+ 	display: flex;
+ 	align-items: center;
+ }
+diff --git a/packages/dataviews/src/components/dataviews-bulk-actions/style.scss b/packages/dataviews/src/components/dataviews-bulk-actions/style.scss
+index 6dbebd3d8ac317..aabcbb7f0ee863 100644
+--- a/packages/dataviews/src/components/dataviews-bulk-actions/style.scss
++++ b/packages/dataviews/src/components/dataviews-bulk-actions/style.scss
+@@ -4,5 +4,5 @@
+ 
+ .dataviews-bulk-actions-footer__container {
+ 	margin-right: auto;
+-	min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
++	min-height: var(--wpds-dimension-size-md);
+ }
+diff --git a/packages/dataviews/src/components/dataviews-filters/style.scss b/packages/dataviews/src/components/dataviews-filters/style.scss
+index 56082230a3b8cc..b32a88916eb527 100644
+--- a/packages/dataviews/src/components/dataviews-filters/style.scss
++++ b/packages/dataviews/src/components/dataviews-filters/style.scss
+@@ -76,7 +76,7 @@
+ 		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-interactive-neutral);
+ 		cursor: var(--wpds-cursor-control);
+ 		padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-md);
+-		min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
++		min-height: var(--wpds-dimension-size-md);
+ 		color: var(--wpds-color-foreground-interactive-neutral);
+ 		position: relative;
+ 		display: flex;
+@@ -88,7 +88,7 @@
+ 		}
+ 
+ 		&.has-reset {
+-			padding-inline-end: calc(#{vars.$icon-size} + var(--wpds-dimension-padding-xs));
++			padding-inline-end: calc(var(--wpds-dimension-size-sm) + var(--wpds-dimension-padding-xs));
+ 		}
+ 
+ 		&:hover:not(&.is-not-clickable),
+@@ -125,9 +125,8 @@
+ 	}
+ 
+ 	.dataviews-filters__summary-chip-remove {
+-		// TODO: use size token when available.
+-		width: vars.$icon-size;
+-		height: vars.$icon-size;
++		width: var(--wpds-dimension-size-sm);
++		height: var(--wpds-dimension-size-sm);
+ 		border-radius: var(--wpds-border-radius-md);
+ 		border: 0;
+ 		padding: 0;
+@@ -197,7 +196,7 @@
+ 	box-sizing: border-box;
+ 	padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-md);
+ 	cursor: default;
+-	min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
++	min-height: var(--wpds-dimension-size-md);
+ 	@include body-medium();
+ 
+ 	&:last-child {
+@@ -329,9 +328,9 @@
+ 	.dataviews-filters__search-widget-filter-combobox__input {
+ 		@include input-control;
+ 		display: block;
+-		padding: 0 var(--wpds-dimension-padding-sm) 0 calc(var(--wpds-dimension-base) * 8);
++		padding: 0 var(--wpds-dimension-padding-sm) 0 var(--wpds-dimension-size-md);
+ 		width: 100%;
+-		height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
++		height: var(--wpds-dimension-size-md);
+ 
+ 		// Unset inherited values.
+ 		margin-left: 0;
+@@ -370,7 +369,7 @@
+ 		display: flex;
+ 		align-items: center;
+ 		justify-content: center;
+-		width: vars.$icon-size;
++		width: var(--wpds-dimension-size-sm);
+ 
+ 		&:dir(ltr) {
+ 			transform: scaleX(-1);
+@@ -389,8 +388,8 @@
+ 	right: 0;
+ 	transform: translate(50%, -50%);
+ 	background: var(--wpds-color-background-interactive-brand-strong);
+-	height: calc(var(--wpds-dimension-base) * 4); // TODO: use size token when available
+-	min-width: calc(var(--wpds-dimension-base) * 4); // TODO: use size token when available
++	height: var(--wpds-dimension-size-2xs);
++	min-width: var(--wpds-dimension-size-2xs);
+ 	line-height: var(--wpds-typography-line-height-xs);
+ 	padding: 0 var(--wpds-dimension-padding-xs);
+ 	text-align: center;
+diff --git a/packages/dataviews/src/components/dataviews-layouts/activity/style.scss b/packages/dataviews/src/components/dataviews-layouts/activity/style.scss
+index 322b7ea9d9d02f..c3a3eb9826c0e5 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/activity/style.scss
++++ b/packages/dataviews/src/components/dataviews-layouts/activity/style.scss
+@@ -13,7 +13,7 @@
+ 	}
+ 
+ 	.dataviews-view-activity__item-actions {
+-		min-width: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
++		min-width: var(--wpds-dimension-size-sm);
+ 	}
+ 
+ 	.dataviews-view-activity__item-content {
+@@ -22,7 +22,7 @@
+ 		.dataviews-view-activity__item-title,
+ 		.dataviews-view-activity__item-description,
+ 		.dataviews-view-activity__item-fields {
+-			min-height: calc(var(--wpds-dimension-base) * 4); // TODO: use size token when available
++			min-height: var(--wpds-dimension-size-2xs);
+ 		}
+ 
+ 		.dataviews-view-activity__item-title {
+@@ -105,7 +105,7 @@
+ 				width: var(--wpds-dimension-padding-md);
+ 
+ 				&::before {
+-					height: calc(var(--wpds-dimension-base) * 3);
++					height: var(--wpds-dimension-size-3xs);
+ 				}
+ 			}
+ 			.dataviews-view-activity__item-type-icon {
+@@ -119,10 +119,10 @@
+ 
+ 		&.is-balanced {
+ 			.dataviews-view-activity__item-type {
+-				width: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
++				width: var(--wpds-dimension-size-sm);
+ 
+ 				&::before {
+-					height: calc(var(--wpds-dimension-base) * 3);
++					height: var(--wpds-dimension-size-3xs);
+ 				}
+ 			}
+ 			.dataviews-view-activity__item-type-icon {
+@@ -137,10 +137,10 @@
+ 
+ 		&.is-comfortable {
+ 			.dataviews-view-activity__item-type {
+-				width: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
++				width: var(--wpds-dimension-size-md);
+ 
+ 				&::before {
+-					height: calc(var(--wpds-dimension-base) * 2);
++					height: var(--wpds-dimension-size-4xs);
+ 				}
+ 			}
+ 			.dataviews-view-activity__item-type-icon {
+diff --git a/packages/dataviews/src/components/dataviews-layouts/grid/style.scss b/packages/dataviews/src/components/dataviews-layouts/grid/style.scss
+index fc5d004e9d4795..22886262536057 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/grid/style.scss
++++ b/packages/dataviews/src/components/dataviews-layouts/grid/style.scss
+@@ -69,7 +69,7 @@
+ 		}
+ 
+ 		.dataviews-view-grid__title-field {
+-			min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available. Preserve layout when there is no ellipsis button
++			min-height: var(--wpds-dimension-size-sm); // TODO: Preserve layout when there is no ellipsis button
+ 			overflow: hidden;
+ 			align-content: center;
+ 			text-align: start;
+@@ -145,13 +145,13 @@
+ 		}
+ 
+ 		.dataviews-view-grid__field-value:not(:empty) {
+-			min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
++			min-height: var(--wpds-dimension-size-sm);
+ 			line-height: var(--wpds-typography-line-height-sm);
+ 			padding-top: calc(var(--wpds-dimension-base) / 2);
+ 		}
+ 
+ 		.dataviews-view-grid__field {
+-			min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
++			min-height: var(--wpds-dimension-size-sm);
+ 			align-items: center;
+ 
+ 			.dataviews-view-grid__field-name {
+diff --git a/packages/dataviews/src/components/dataviews-layouts/list/style.scss b/packages/dataviews/src/components/dataviews-layouts/list/style.scss
+index 341731189e20d8..96e34a88cc533e 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/list/style.scss
++++ b/packages/dataviews/src/components/dataviews-layouts/list/style.scss
+@@ -1,4 +1,3 @@
+-@use "@wordpress/base-styles/variables" as vars;
+ @use "../../../dataviews/style" as *;
+ 
+ div.dataviews-view-list {
+@@ -32,7 +31,7 @@ div.dataviews-view-list {
+ 			}
+ 
+ 			> div {
+-				height: vars.$button-size-small;
++				height: var(--wpds-dimension-size-sm);
+ 			}
+ 
+ 			> :not(:last-child) {
+@@ -126,7 +125,7 @@ div.dataviews-view-list {
+ 	}
+ 	.dataviews-view-list__title-field {
+ 		flex: 1;
+-		min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
++		min-height: var(--wpds-dimension-size-sm);
+ 		line-height: var(--wpds-typography-line-height-md);
+ 		overflow: hidden;
+ 		// The field should be in front of the main button in case it has a link/button.
+@@ -190,7 +189,7 @@ div.dataviews-view-list {
+ 		}
+ 
+ 		.dataviews-view-list__field-value {
+-			min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
++			min-height: var(--wpds-dimension-size-sm);
+ 			line-height: var(--wpds-typography-line-height-sm);
+ 			display: flex;
+ 			align-items: center;
+@@ -209,17 +208,17 @@ div.dataviews-view-list {
+ 			}
+ 
+ 			.dataviews-view-list__title-field {
+-				min-height: calc(var(--wpds-dimension-base) * 4); // TODO: use size token when available
++				min-height: var(--wpds-dimension-size-2xs);
+ 				line-height: var(--wpds-typography-line-height-xs);
+ 			}
+ 
+ 			.dataviews-view-list__media-wrapper {
+-				width: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
+-				height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
++				width: var(--wpds-dimension-size-md);
++				height: var(--wpds-dimension-size-md);
+ 			}
+ 
+ 			.dataviews-view-list__field-wrapper {
+-				min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
++				min-height: var(--wpds-dimension-size-md);
+ 			}
+ 
+ 			.dataviews-view-list__fields {
+@@ -227,7 +226,7 @@ div.dataviews-view-list {
+ 				row-gap: var(--wpds-dimension-gap-xs);
+ 
+ 				.dataviews-view-list__field-value {
+-					min-height: calc(var(--wpds-dimension-base) * 4); // TODO: use size token when available
++					min-height: var(--wpds-dimension-size-2xs);
+ 					line-height: var(--wpds-typography-line-height-xs);
+ 				}
+ 			}
+@@ -241,7 +240,7 @@ div.dataviews-view-list {
+ 			}
+ 
+ 			.dataviews-view-list__title-field {
+-				min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
++				min-height: var(--wpds-dimension-size-md);
+ 				line-height: var(--wpds-typography-line-height-xl);
+ 			}
+ 
+@@ -259,7 +258,7 @@ div.dataviews-view-list {
+ 				row-gap: var(--wpds-dimension-gap-sm);
+ 
+ 				.dataviews-view-list__field-value {
+-					min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
++					min-height: var(--wpds-dimension-size-md);
+ 					line-height: var(--wpds-typography-line-height-md);
+ 				}
+ 			}
+diff --git a/packages/dataviews/src/components/dataviews-layouts/picker-activity/style.scss b/packages/dataviews/src/components/dataviews-layouts/picker-activity/style.scss
+index 5d5e857c1d489d..8d8ac72cd509e1 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/picker-activity/style.scss
++++ b/packages/dataviews/src/components/dataviews-layouts/picker-activity/style.scss
+@@ -40,7 +40,7 @@
+ 				width: var(--wpds-dimension-padding-md);
+ 
+ 				&::before {
+-					height: calc(var(--wpds-dimension-base) * 3);
++					height: var(--wpds-dimension-size-3xs);
+ 				}
+ 			}
+ 			.dataviews-view-picker-activity__item-type-icon {
+@@ -54,10 +54,10 @@
+ 
+ 		&.is-balanced {
+ 			.dataviews-view-picker-activity__item-type {
+-				width: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
++				width: var(--wpds-dimension-size-sm);
+ 
+ 				&::before {
+-					height: calc(var(--wpds-dimension-base) * 3);
++					height: var(--wpds-dimension-size-3xs);
+ 				}
+ 			}
+ 			.dataviews-view-picker-activity__item-type-icon {
+@@ -72,10 +72,10 @@
+ 
+ 		&.is-comfortable {
+ 			.dataviews-view-picker-activity__item-type {
+-				width: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
++				width: var(--wpds-dimension-size-md);
+ 
+ 				&::before {
+-					height: calc(var(--wpds-dimension-base) * 2);
++					height: var(--wpds-dimension-size-4xs);
+ 				}
+ 			}
+ 			.dataviews-view-picker-activity__item-type-icon {
+@@ -106,7 +106,7 @@
+ 		.dataviews-view-picker-activity__item-title,
+ 		.dataviews-view-picker-activity__item-description,
+ 		.dataviews-view-picker-activity__item-fields {
+-			min-height: calc(var(--wpds-dimension-base) * 4); // TODO: use size token when available
++			min-height: var(--wpds-dimension-size-2xs);
+ 		}
+ 
+ 		.dataviews-view-picker-activity__item-title {
+diff --git a/packages/dataviews/src/components/dataviews-layouts/picker-grid/style.scss b/packages/dataviews/src/components/dataviews-layouts/picker-grid/style.scss
+index 5c816d6cab6672..80cec8a5a47bab 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/picker-grid/style.scss
++++ b/packages/dataviews/src/components/dataviews-layouts/picker-grid/style.scss
+@@ -22,7 +22,7 @@
+ 		}
+ 
+ 		.dataviews-view-picker-grid__title-field {
+-			min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available. Preserve layout when there is no ellipsis button
++			min-height: var(--wpds-dimension-size-sm); // TODO: Preserve layout when there is no ellipsis button
+ 			overflow: hidden;
+ 			align-content: center;
+ 			text-align: start;
+@@ -108,13 +108,13 @@
+ 		}
+ 
+ 		.dataviews-view-picker-grid__field-value:not(:empty) {
+-			min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
++			min-height: var(--wpds-dimension-size-sm);
+ 			line-height: var(--wpds-typography-line-height-sm);
+ 			padding-top: calc(var(--wpds-dimension-base) / 2);
+ 		}
+ 
+ 		.dataviews-view-picker-grid__field {
+-			min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
++			min-height: var(--wpds-dimension-size-sm);
+ 			align-items: center;
+ 
+ 			.dataviews-view-picker-grid__field-name {
+diff --git a/packages/dataviews/src/components/dataviews-layouts/table/style.scss b/packages/dataviews/src/components/dataviews-layouts/table/style.scss
+index aa5190cb087318..be6277aa0c1b4f 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/table/style.scss
++++ b/packages/dataviews/src/components/dataviews-layouts/table/style.scss
+@@ -181,7 +181,7 @@
+ 			vertical-align: top;
+ 		}
+ 		.dataviews-view-table__cell-content-wrapper {
+-			min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
++			min-height: var(--wpds-dimension-size-md);
+ 			display: flex;
+ 			align-items: center;
+ 			white-space: nowrap;
+@@ -276,8 +276,8 @@
+ 
+ .dataviews-column-primary__media {
+ 	max-width: 60px;
+-	min-width: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
+-	min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
++	min-width: var(--wpds-dimension-size-md);
++	min-height: var(--wpds-dimension-size-md);
+ 	overflow: hidden;
+ 	position: relative;
+ 	flex-shrink: 0;
+@@ -285,8 +285,8 @@
+ 	border-radius: var(--wpds-border-radius-md);
+ 
+ 	img {
+-		width: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
+-		height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
++		width: var(--wpds-dimension-size-md);
++		height: var(--wpds-dimension-size-md);
+ 		object-fit: cover;
+ 	}
+ 
+diff --git a/packages/dataviews/src/components/dataviews-picker-footer/style.scss b/packages/dataviews/src/components/dataviews-picker-footer/style.scss
+index 8854dcd333065c..e82178bab82a3c 100644
+--- a/packages/dataviews/src/components/dataviews-picker-footer/style.scss
++++ b/packages/dataviews/src/components/dataviews-picker-footer/style.scss
+@@ -3,7 +3,7 @@
+ // - align footer actions to the right.
+ .dataviews-picker-footer__bulk-selection {
+ 	align-self: flex-start;
+-	height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
++	height: var(--wpds-dimension-size-md);
+ }
+ .dataviews-picker-footer__actions {
+ 	align-self: flex-end;
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index d1b4286c2d3089..23b1569bc7f826 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -12,6 +12,10 @@
+ -   Move `@types/react` from `dependencies` to an optional peer dependency so consumers' React type version is used ([#79095](https://github.com/WordPress/gutenberg/pull/79095)).
+ -   `Button` and `AlertDialog`: Reference the tone-specific `brand`/`error` disabled color tokens for disabled states instead of the `neutral` ones, to match each element's tone. Disabled `Select`/`Autocomplete`/`Combobox` list items also adopt the `brand` disabled background token. No visual change ([#79124](https://github.com/WordPress/gutenberg/pull/79124)).
+ 
++### Internal
++
++-   Adopt `--wpds-dimension-size-*` design tokens [#79093](https://github.com/WordPress/gutenberg/pull/79093).
++
+ ## 0.15.1 (2026-06-16)
+ 
+ ## 0.15.0 (2026-06-10)
+diff --git a/packages/ui/src/button/style.module.css b/packages/ui/src/button/style.module.css
+index a6c89dac947f9f..4b750d8c815fad 100644
+--- a/packages/ui/src/button/style.module.css
++++ b/packages/ui/src/button/style.module.css
+@@ -20,13 +20,12 @@
+ 			--wp-ui-button-foreground-color-disabled: var(--wpds-color-foreground-interactive-brand-strong-disabled);
+ 			--wp-ui-button-padding-block: var(--wpds-dimension-padding-xs);
+ 			--wp-ui-button-padding-inline: var(--wpds-dimension-padding-md);
+-			--wp-ui-button-height: 40px;
++			--wp-ui-button-height: var(--wpds-dimension-size-lg);
+ 			--wp-ui-button-aspect-ratio: auto; /* Useful for overrides such as icon buttons */
+ 			--wp-ui-button-font-size: var(--wpds-typography-font-size-md);
+ 			--wp-ui-button-min-width: calc(4ch + 2 * var(--wp-ui-button-padding-inline));
+ 			/* Icons are rendered as 24px but need to occupy a 16px footprint */
+-			/* TODO: replace hardcoded values with DS size tokens once available */
+-			--wp-ui-button-icon-margin: calc((16px - 24px) / 2);
++			--wp-ui-button-icon-margin: calc((var(--wpds-dimension-size-2xs) - var(--wpds-dimension-size-sm)) / 2);
+ 
+ 			/* by default, borders have the same color as the background */
+ 			--wp-ui-button-border-color: var(--wp-ui-button-background-color);
+@@ -143,7 +142,7 @@
+ 		.is-small {
+ 			--wp-ui-button-padding-block: 0;
+ 			--wp-ui-button-padding-inline: var(--wpds-dimension-padding-sm);
+-			--wp-ui-button-height: 24px;
++			--wp-ui-button-height: var(--wpds-dimension-size-sm);
+ 		}
+ 
+ 		.icon {
+@@ -223,7 +222,7 @@
+ 		}
+ 
+ 		.is-compact {
+-			--wp-ui-button-height: 32px;
++			--wp-ui-button-height: var(--wpds-dimension-size-md);
+ 		}
+ 
+ 		.is-loading {
+diff --git a/packages/ui/src/form/primitives/combobox/style.module.css b/packages/ui/src/form/primitives/combobox/style.module.css
+index 379a45f88ff928..a14cd3ebdf2881 100644
+--- a/packages/ui/src/form/primitives/combobox/style.module.css
++++ b/packages/ui/src/form/primitives/combobox/style.module.css
+@@ -12,7 +12,7 @@
+ 			overflow: hidden;
+ 			display: flex;
+ 			align-items: center;
+-			min-height: 24px;
++			min-height: var(--wpds-dimension-size-sm);
+ 			border: 1px solid var(--wpds-color-stroke-interactive-neutral);
+ 			border-radius: 12px;
+ 			background-color: var(--wpds-color-background-interactive-neutral-weak);
+@@ -53,8 +53,8 @@
+ 			justify-content: center;
+ 			align-items: center;
+ 			margin-inline-start: 1px;
+-			width: 20px;
+-			height: 20px;
++			width: var(--wpds-dimension-size-xs);
++			height: var(--wpds-dimension-size-xs);
+ 			border-radius: 50%;
+ 			overflow: hidden;
+ 			flex-shrink: 0;
+diff --git a/packages/ui/src/form/primitives/input-layout/style.module.css b/packages/ui/src/form/primitives/input-layout/style.module.css
+index e0b4921557bbe6..48076f6e477eb9 100644
+--- a/packages/ui/src/form/primitives/input-layout/style.module.css
++++ b/packages/ui/src/form/primitives/input-layout/style.module.css
+@@ -6,7 +6,7 @@
+ 			--wp-ui-input-layout-padding-inline: var(--wpds-dimension-padding-md);
+ 
+ 			display: flex;
+-			height: 40px;
++			height: var(--wpds-dimension-size-lg);
+ 			background-color: var(--wpds-color-background-interactive-neutral-weak);
+ 			border-width: var(--wpds-border-width-xs);
+ 			border-style: solid;
+@@ -23,12 +23,12 @@
+ 
+ 			&.is-size-compact {
+ 				--wp-ui-input-layout-padding-inline: var(--wpds-dimension-padding-sm);
+-				height: 32px;
++				height: var(--wpds-dimension-size-md);
+ 			}
+ 
+ 			&.is-size-small {
+ 				--wp-ui-input-layout-padding-inline: var(--wpds-dimension-padding-sm);
+-				height: 24px;
++				height: var(--wpds-dimension-size-sm);
+ 			}
+ 
+ 			&.is-disabled,
+diff --git a/packages/ui/src/form/primitives/textarea/style.module.css b/packages/ui/src/form/primitives/textarea/style.module.css
+index 3f9cb743b564f3..85397b9b83e689 100644
+--- a/packages/ui/src/form/primitives/textarea/style.module.css
++++ b/packages/ui/src/form/primitives/textarea/style.module.css
+@@ -3,7 +3,7 @@
+ 
+ 	@layer components {
+ 		.wrapper {
+-			--wp-ui-textarea-min-height: 40px;
++			--wp-ui-textarea-min-height: var(--wpds-dimension-size-lg);
+ 		}
+ 
+ 		.textarea {
+diff --git a/packages/ui/src/notice/style.module.css b/packages/ui/src/notice/style.module.css
+index 01098e0d14fbcf..e9e446414e2fd8 100644
+--- a/packages/ui/src/notice/style.module.css
++++ b/packages/ui/src/notice/style.module.css
+@@ -3,7 +3,7 @@
+ 
+ 	@layer components {
+ 		.notice {
+-			--icon-height: 24px;
++			--icon-height: var(--wpds-dimension-size-sm);
+ 			--text-vertical-padding: calc((var(--icon-height) - var(--wpds-typography-line-height-sm)) / 2);
+ 
+ 			--wp-ui-notice-background-color: var(--wpds-color-background-surface-neutral-weak);
+diff --git a/packages/ui/src/tabs/style.module.css b/packages/ui/src/tabs/style.module.css
+index 2adcfe7209f5bd..967514c59b1ba3 100644
+--- a/packages/ui/src/tabs/style.module.css
++++ b/packages/ui/src/tabs/style.module.css
+@@ -196,7 +196,7 @@
+ 
+ 			[data-orientation="vertical"] & {
+ 				padding: var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-md);
+-				min-height: 40px;  /* TODO: use semantic size/height tokens when available */
++				min-height: var(--wpds-dimension-size-lg);
+ 			}
+ 
+ 			[data-orientation="vertical"][data-select-on-move="false"] &::after {
+diff --git a/packages/ui/src/utils/css/overlay-chrome.module.css b/packages/ui/src/utils/css/overlay-chrome.module.css
+index 9fe0f792bcaa4d..56e63f4fd3b840 100644
+--- a/packages/ui/src/utils/css/overlay-chrome.module.css
++++ b/packages/ui/src/utils/css/overlay-chrome.module.css
+@@ -41,8 +41,7 @@
+ 			gap: var(--wpds-dimension-gap-sm);
+ 			padding-block: var(--wpds-dimension-padding-2xl) var(--wpds-dimension-gap-lg);
+ 			padding-inline: var(--wpds-dimension-padding-2xl);
+-			/* TODO: refactor to a DS element size token when available. */
+-			min-height: 32px;
++			min-height: var(--wpds-dimension-size-md);
+ 		}
+ 
+ 		.footer {
+diff --git a/routes/dashboard/widget-dashboard/components/actions/actions.module.css b/routes/dashboard/widget-dashboard/components/actions/actions.module.css
+index a5add76c2e9433..a85d44a87e0c22 100644
+--- a/routes/dashboard/widget-dashboard/components/actions/actions.module.css
++++ b/routes/dashboard/widget-dashboard/components/actions/actions.module.css
+@@ -10,8 +10,7 @@
+ 	flex-shrink: 0;
+ 	align-self: center;
+ 	width: 1px;
+-	/* TODO: Replace `$button-size-small` with a WPDS size token once size tokens land in `@wordpress/theme`. */
+-	height: calc(4 * var(--wpds-dimension-base));
++	height: var(--wpds-dimension-size-2xs);
+ 	background-color: var(--wpds-color-stroke-surface-neutral);
+ }
+ 
+diff --git a/routes/dashboard/widget-dashboard/components/widgets/widget-resize-handle.module.css b/routes/dashboard/widget-dashboard/components/widgets/widget-resize-handle.module.css
+index 5ccae037b77777..d161cbe3c52f4b 100644
+--- a/routes/dashboard/widget-dashboard/components/widgets/widget-resize-handle.module.css
++++ b/routes/dashboard/widget-dashboard/components/widgets/widget-resize-handle.module.css
+@@ -27,9 +27,8 @@
+  * logical borders so RTL needs no mirroring).
+  */
+ .handleCorner {
+-	/* @TODO: Replace with a `size` token once that category exists in the theme package. */
+-	width: calc(var(--wpds-dimension-base) * 6);
+-	height: calc(var(--wpds-dimension-base) * 6);
++	width: var(--wpds-dimension-size-sm);
++	height: var(--wpds-dimension-size-sm);
+ 	cursor: nwse-resize;
+ }
+ 
+@@ -38,9 +37,8 @@
+ 	position: absolute;
+ 	bottom: var(--widget-resize-handle-visual-inset);
+ 	inset-inline-end: var(--widget-resize-handle-visual-inset);
+-	/* @TODO: Replace with a `size` token once that category exists in the theme package. */
+-	width: calc(var(--wpds-dimension-base) * 2);
+-	height: calc(var(--wpds-dimension-base) * 2);
++	width: var(--wpds-dimension-size-4xs);
++	height: var(--wpds-dimension-size-4xs);
+ 	box-sizing: border-box;
+ 	border-block-end:
+ 		var(--wpds-border-width-sm) solid
+@@ -76,9 +74,8 @@
+ 	display: flex;
+ 	align-items: center;
+ 	justify-content: center;
+-	/* @TODO: Replace with a `size` token once that category exists in the theme package. */
+-	width: calc(var(--wpds-dimension-base) * 6);
+-	height: calc(var(--wpds-dimension-base) * 10);
++	width: var(--wpds-dimension-size-sm);
++	height: var(--wpds-dimension-size-lg);
+ 	padding-inline-end: var(--widget-resize-handle-visual-inset);
+ 	cursor: ew-resize;
+ 	border: none;
+@@ -107,8 +104,7 @@
+ .handleHorizontal::after {
+ 	content: "";
+ 	width: var(--wpds-border-width-sm);
+-	/* @TODO: Replace with a `size` token once that category exists in the theme package. */
+-	height: calc(var(--wpds-dimension-base) * 3);
++	height: var(--wpds-dimension-size-3xs);
+ 	background-color: var(--wpds-color-foreground-interactive-brand);
+ 	transform: scale(1);
+ 	transform-origin: 50% 100%;

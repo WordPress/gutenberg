@@ -1,0 +1,35 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 93b191bff269d6..5e60e71667f97d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `Radio`: Deprecate 36px default size ([#66572](https://github.com/WordPress/gutenberg/pull/66572)).
+ 
++### Bug Fixes
++
++-   `Popover`: Fix missing label of the headerTitle Close button ([#66813](https://github.com/WordPress/gutenberg/pull/66813)).
++
+ ### Enhancements
+ 
+ -   `MenuItem`: Add 40px size prop on Button ([#66596](https://github.com/WordPress/gutenberg/pull/66596)).
+diff --git a/packages/components/src/popover/index.tsx b/packages/components/src/popover/index.tsx
+index 1b7fb31539c6d0..7db476db6b1db1 100644
+--- a/packages/components/src/popover/index.tsx
++++ b/packages/components/src/popover/index.tsx
+@@ -39,6 +39,7 @@ import {
+ import { close } from '@wordpress/icons';
+ import deprecated from '@wordpress/deprecated';
+ import { Path, SVG } from '@wordpress/primitives';
++import { __ } from '@wordpress/i18n';
+ 
+ /**
+  * Internal dependencies
+@@ -422,6 +423,7 @@ const UnforwardedPopover = (
+ 						size="small"
+ 						icon={ close }
+ 						onClick={ onClose }
++						label={ __( 'Close' ) }
+ 					/>
+ 				</div>
+ 			) }

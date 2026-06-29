@@ -1,0 +1,114 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c487b0a17a288d..a36773a8e16d66 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++-   `ComboboxControl`: Add an `isLoading` prop to show a loading spinner ([#68990](https://github.com/WordPress/gutenberg/pull/68990))
++
+ ## 29.3.0 (2025-01-29)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/combobox-control/README.md b/packages/components/src/combobox-control/README.md
+index 4089cf9c56e9b5..7a11c8b95fe2e9 100644
+--- a/packages/components/src/combobox-control/README.md
++++ b/packages/components/src/combobox-control/README.md
+@@ -39,6 +39,7 @@ function MyComboboxControl() {
+ 			label="Font Size"
+ 			value={ fontSize }
+ 			onChange={ setFontSize }
++			isLoading={ isLoading }
+ 			options={ filteredOptions }
+ 			onFilterValueChange={ ( inputValue ) =>
+ 				setFilteredOptions(
+@@ -112,13 +113,20 @@ If the control is clicked, the dropdown will expand regardless of this prop.
+ -   Required: No
+ -   Default: `true`
+ 
+-### placeholder
++#### placeholder
+ 
+ If passed, the combobox input will show a placeholder string if no values are present.
+ 
+ -   Type: `string`
+ -   Required: No
+ 
++#### isLoading
++
++Show a spinner (and hide the suggestions dropdown) while data about the matching suggestions (ie the `options` prop) is loading
++
++-   Type: `Boolean`
++-   Required: No
++
+ #### __experimentalRenderItem
+ 
+ Custom renderer invoked for each option in the suggestion list. The render prop receives as its argument an object containing, under the `item` key, the single option's data (directly from the array of data passed to the `options` prop).
+diff --git a/packages/components/src/combobox-control/index.tsx b/packages/components/src/combobox-control/index.tsx
+index 28510c8653d02e..9c6bd2a4d75dd2 100644
+--- a/packages/components/src/combobox-control/index.tsx
++++ b/packages/components/src/combobox-control/index.tsx
+@@ -35,6 +35,7 @@ import type { TokenInputProps } from '../form-token-field/types';
+ import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+ import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
+ import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
++import Spinner from '../spinner';
+ 
+ const noop = () => {};
+ 
+@@ -126,6 +127,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
+ 		help,
+ 		allowReset = true,
+ 		className,
++		isLoading = false,
+ 		messages = {
+ 			selected: __( 'Item selected.' ),
+ 		},
+@@ -362,6 +364,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
+ 								onChange={ onInputChange }
+ 							/>
+ 						</FlexBlock>
++						{ isLoading && <Spinner /> }
+ 						{ allowReset && (
+ 							<Button
+ 								size="small"
+@@ -375,7 +378,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
+ 							/>
+ 						) }
+ 					</InputWrapperFlex>
+-					{ isExpanded && (
++					{ isExpanded && ! isLoading && (
+ 						<SuggestionsList
+ 							instanceId={ instanceId }
+ 							// The empty string for `value` here is not actually used, but is
+diff --git a/packages/components/src/combobox-control/style.scss b/packages/components/src/combobox-control/style.scss
+index c8fd8a168c0fb7..558475f6bd522e 100644
+--- a/packages/components/src/combobox-control/style.scss
++++ b/packages/components/src/combobox-control/style.scss
+@@ -36,5 +36,8 @@ input.components-combobox-control__input[type="text"] {
+ 	&:focus-within {
+ 		@include input-style__focus();
+ 	}
+-}
+ 
++	.components-spinner {
++		margin: 0;
++	}
++}
+diff --git a/packages/components/src/combobox-control/types.ts b/packages/components/src/combobox-control/types.ts
+index 470b38c35e2c8a..3398e9ee9a760e 100644
+--- a/packages/components/src/combobox-control/types.ts
++++ b/packages/components/src/combobox-control/types.ts
+@@ -86,4 +86,11 @@ export type ComboboxControlProps = Pick<
+ 	 * If passed, the combobox input will show a placeholder string if no values are present.
+ 	 */
+ 	placeholder?: string;
++	/**
++	 * Show a spinner (and hide the suggestions dropdown) while data
++	 * about the matching suggestions (ie the `options` prop) is loading
++	 *
++	 * @default false
++	 */
++	isLoading?: boolean;
+ };

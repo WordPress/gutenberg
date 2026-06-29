@@ -1,0 +1,923 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index eb8b7a0d62dc01..93175042b78fb5 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -1277,12 +1277,24 @@
+ 		"markdown_source": "../packages/components/src/tree-select/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "Truncate",
++		"slug": "truncate",
++		"markdown_source": "../packages/components/src/truncate/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "UnitControl",
+ 		"slug": "unit-control",
+ 		"markdown_source": "../packages/components/src/unit-control/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "View",
++		"slug": "view",
++		"markdown_source": "../packages/components/src/view/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "VisuallyHidden",
+ 		"slug": "visually-hidden",
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 6ac5f7cdc4df0e..16133a197d007d 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -129,6 +129,7 @@ export {
+ 	TreeGridItem as __experimentalTreeGridItem,
+ } from './tree-grid';
+ export { default as TreeSelect } from './tree-select';
++export { default as __experimentalTruncate } from './truncate';
+ export { default as __experimentalUnitControl } from './unit-control';
+ export { default as VisuallyHidden } from './visually-hidden';
+ export { default as IsolatedEventContainer } from './isolated-event-container';
+diff --git a/packages/components/src/truncate/README.md b/packages/components/src/truncate/README.md
+new file mode 100644
+index 00000000000000..695fae86d35a27
+--- /dev/null
++++ b/packages/components/src/truncate/README.md
+@@ -0,0 +1,66 @@
++# Truncate
++
++`Truncate` is a typography primitive that trims text content. For almost all cases, it is recommended that `Text`, `Heading`, or `Subheading` is used to render text content. However, `Truncate` is available for custom implementations.
++
++## Usage
++
++```jsx live
++import { Truncate } from '@wp-g2/components';
++
++function Example() {
++	return (
++		<Truncate>
++			Where the north wind meets the sea, there's a river full of memory.
++			Sleep, my darling, safe and sound, for in this river all is found.
++			In her waters, deep and true, lay the answers and a path for you.
++			Dive down deep into her sound, but not too far or you'll be drowned
++		</Truncate>
++	);
++}
++```
++
++## Props
++
++##### ellipsis
++
++**Type**: `string`
++
++The ellipsis string when `truncate` is set.
++
++##### ellipsizeMode
++
++**Type**: `"auto"`,`"head"`,`"tail"`,`"middle"`
++
++Determines where to truncate. For example, we can truncate text right in the middle. To do this, we need to set `ellipsizeMode` to `middle` and a text `limit`.
++
++-   `auto`: Trims content at the end automatically without a `limit`.
++-   `head`: Trims content at the beginning. Requires a `limit`.
++-   `middle`: Trims content in the middle. Requires a `limit`.
++-   `tail`: Trims content at the end. Requires a `limit`.
++
++##### limit
++
++**Type**: `number`
++
++Determines the max characters when `truncate` is set.
++
++##### numberOfLines
++
++**Type**: `number`
++
++Clamps the text content to the specifiec `numberOfLines`, adding the `ellipsis` at the end.
++
++```jsx live
++import { Truncate } from '@wp-g2/components';
++
++function Example() {
++	return (
++		<Truncate numberOfLines={2}>
++			Where the north wind meets the sea, there's a river full of memory.
++			Sleep, my darling, safe and sound, for in this river all is found.
++			In her waters, deep and true, lay the answers and a path for you.
++			Dive down deep into her sound, but not too far or you'll be drowned
++		</Truncate>
++	);
++}
++```
+diff --git a/packages/components/src/truncate/index.js b/packages/components/src/truncate/index.js
+new file mode 100644
+index 00000000000000..6196b8a39f899e
+--- /dev/null
++++ b/packages/components/src/truncate/index.js
+@@ -0,0 +1,3 @@
++export { default as Truncate } from './truncate';
++
++export * from './use-truncate';
+diff --git a/packages/components/src/truncate/stories/index.js b/packages/components/src/truncate/stories/index.js
+new file mode 100644
+index 00000000000000..f09e4eb321206b
+--- /dev/null
++++ b/packages/components/src/truncate/stories/index.js
+@@ -0,0 +1,29 @@
++/**
++ * Internal dependencies
++ */
++import { Truncate } from '../index';
++
++export default {
++	component: Truncate,
++	title: 'Components/Truncate',
++};
++
++export const _default = () => {
++	return (
++		<Truncate numberOfLines={ 2 }>
++			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
++			facilisis dictum tortor, eu tincidunt justo scelerisque tincidunt.
++			Duis semper dui id augue malesuada, ut feugiat nisi aliquam.
++			Vestibulum venenatis diam sem, finibus dictum massa semper in. Nulla
++			facilisi. Nunc vulputate faucibus diam, in lobortis arcu ornare vel.
++			In dignissim nunc sed facilisis finibus. Etiam imperdiet mattis
++			arcu, sed rutrum sapien blandit gravida. Aenean sollicitudin neque
++			eget enim blandit, sit amet rutrum leo vehicula. Nunc malesuada
++			ultricies eros ut faucibus. Aliquam erat volutpat. Nulla nec feugiat
++			risus. Vivamus iaculis dui aliquet ante ultricies feugiat.
++			Vestibulum ante ipsum primis in faucibus orci luctus et ultrices
++			posuere cubilia curae; Vivamus nec pretium velit, sit amet
++			consectetur ante. Praesent porttitor ex eget fermentum mattis.
++		</Truncate>
++	);
++};
+diff --git a/packages/components/src/truncate/test/truncate.js b/packages/components/src/truncate/test/truncate.js
+new file mode 100644
+index 00000000000000..cec52ae2568cf7
+--- /dev/null
++++ b/packages/components/src/truncate/test/truncate.js
+@@ -0,0 +1,47 @@
++/**
++ * External dependencies
++ */
++import { render } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { Truncate } from '../index';
++
++describe( 'props', () => {
++	test( 'should render correctly', () => {
++		const { container } = render(
++			<Truncate>Some people are worth melting for.</Truncate>
++		);
++		expect( container.firstChild.textContent ).toEqual(
++			'Some people are worth melting for.'
++		);
++	} );
++
++	test( 'should render limit', () => {
++		const { container } = render(
++			<Truncate limit={ 1 } ellipsizeMode="tail">
++				Some
++			</Truncate>
++		);
++		expect( container.firstChild.textContent ).toEqual( 'S…' );
++	} );
++
++	test( 'should render custom ellipsis', () => {
++		const { container } = render(
++			<Truncate ellipsis="!!!" limit={ 5 } ellipsizeMode="tail">
++				Some people are worth melting for.
++			</Truncate>
++		);
++		expect( container.firstChild.textContent ).toEqual( 'Some !!!' );
++	} );
++
++	test( 'should render custom ellipsizeMode', () => {
++		const { container } = render(
++			<Truncate ellipsis="!!!" ellipsizeMode="middle" limit={ 5 }>
++				Some people are worth melting for.
++			</Truncate>
++		);
++		expect( container.firstChild.textContent ).toEqual( 'So!!!r.' );
++	} );
++} );
+diff --git a/packages/components/src/truncate/truncate-styles.js b/packages/components/src/truncate/truncate-styles.js
+new file mode 100644
+index 00000000000000..3ce8d106d6c1fb
+--- /dev/null
++++ b/packages/components/src/truncate/truncate-styles.js
+@@ -0,0 +1,11 @@
++/**
++ * External dependencies
++ */
++import { css } from '@wp-g2/styles';
++
++export const Truncate = css`
++	display: block;
++	overflow: hidden;
++	text-overflow: ellipsis;
++	white-space: nowrap;
++`;
+diff --git a/packages/components/src/truncate/truncate-utils.js b/packages/components/src/truncate/truncate-utils.js
+new file mode 100644
+index 00000000000000..8ac7e5a11935da
+--- /dev/null
++++ b/packages/components/src/truncate/truncate-utils.js
+@@ -0,0 +1,96 @@
++/**
++ * External dependencies
++ */
++import { isNil } from 'lodash';
++
++export const TRUNCATE_ELLIPSIS = '…';
++export const TRUNCATE_TYPE = {
++	auto: 'auto',
++	head: 'head',
++	middle: 'middle',
++	tail: 'tail',
++	none: 'none',
++};
++
++export const TRUNCATE_DEFAULT_PROPS = {
++	ellipsis: TRUNCATE_ELLIPSIS,
++	ellipsizeMode: TRUNCATE_TYPE.auto,
++	limit: 0,
++	numberOfLines: 0,
++};
++
++// Source
++// https://github.com/kahwee/truncate-middle
++/**
++ * @param {string} word
++ * @param {number} headLength
++ * @param {number} tailLength
++ * @param {string} ellipsis
++ */
++export function truncateMiddle( word, headLength, tailLength, ellipsis ) {
++	if ( typeof word !== 'string' ) {
++		return '';
++	}
++	const wordLength = word.length;
++	// Setting default values
++	// eslint-disable-next-line no-bitwise
++	const frontLength = ~~headLength; // will cast to integer
++	// eslint-disable-next-line no-bitwise
++	const backLength = ~~tailLength;
++	/* istanbul ignore next */
++	const truncateStr = ! isNil( ellipsis ) ? ellipsis : TRUNCATE_ELLIPSIS;
++
++	if (
++		( frontLength === 0 && backLength === 0 ) ||
++		frontLength >= wordLength ||
++		backLength >= wordLength ||
++		frontLength + backLength >= wordLength
++	) {
++		return word;
++	} else if ( backLength === 0 ) {
++		return word.slice( 0, frontLength ) + truncateStr;
++	}
++	return (
++		word.slice( 0, frontLength ) +
++		truncateStr +
++		word.slice( wordLength - backLength )
++	);
++}
++
++/**
++ *
++ * @param {string} words
++ * @param {typeof TRUNCATE_DEFAULT_PROPS} props
++ */
++export function truncateContent( words = '', props ) {
++	const mergedProps = { ...TRUNCATE_DEFAULT_PROPS, ...props };
++	const { ellipsis, ellipsizeMode, limit } = mergedProps;
++
++	if ( ellipsizeMode === TRUNCATE_TYPE.none ) {
++		return words;
++	}
++
++	let truncateHead;
++	let truncateTail;
++
++	switch ( ellipsizeMode ) {
++		case TRUNCATE_TYPE.head:
++			truncateHead = 0;
++			truncateTail = limit;
++			break;
++		case TRUNCATE_TYPE.middle:
++			truncateHead = Math.floor( limit / 2 );
++			truncateTail = Math.floor( limit / 2 );
++			break;
++		default:
++			truncateHead = limit;
++			truncateTail = 0;
++	}
++
++	const truncatedContent =
++		ellipsizeMode !== TRUNCATE_TYPE.auto
++			? truncateMiddle( words, truncateHead, truncateTail, ellipsis )
++			: words;
++
++	return truncatedContent;
++}
+diff --git a/packages/components/src/truncate/truncate.js b/packages/components/src/truncate/truncate.js
+new file mode 100644
+index 00000000000000..c8facc65d25530
+--- /dev/null
++++ b/packages/components/src/truncate/truncate.js
+@@ -0,0 +1,11 @@
++/**
++ * Internal dependencies
++ */
++import { createComponent } from '../utils';
++import { useTruncate } from './use-truncate';
++
++export default createComponent( {
++	as: 'span',
++	useHook: useTruncate,
++	name: 'Truncate',
++} );
+diff --git a/packages/components/src/truncate/use-truncate.js b/packages/components/src/truncate/use-truncate.js
+new file mode 100644
+index 00000000000000..82a28d05835351
+--- /dev/null
++++ b/packages/components/src/truncate/use-truncate.js
+@@ -0,0 +1,74 @@
++/**
++ * External dependencies
++ */
++import { useContextSystem } from '@wp-g2/context';
++import { css, cx } from '@wp-g2/styles';
++
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import * as styles from './truncate-styles';
++import {
++	TRUNCATE_ELLIPSIS,
++	TRUNCATE_TYPE,
++	truncateContent,
++} from './truncate-utils';
++
++/**
++ * @typedef Props
++ * @property {string} [ellipsis='...'] String to use to truncate the string with.
++ * @property {'auto' | 'head' | 'tail' | 'middle' | 'none'} [ellipsizeMode='auto'] Mode to follow.
++ * @property {number} [limit=0] Limit.
++ * @property {number} [numberOfLines=0] Number of lines.
++ */
++
++/**
++ * @param {import('@wp-g2/create-styles').ViewOwnProps<Props, 'span'>} props
++ */
++export function useTruncate( props ) {
++	const {
++		className,
++		children,
++		ellipsis = TRUNCATE_ELLIPSIS,
++		ellipsizeMode = TRUNCATE_TYPE.auto,
++		limit = 0,
++		numberOfLines = 0,
++		...otherProps
++	} = useContextSystem( props, 'Truncate' );
++
++	const truncatedContent = truncateContent(
++		typeof children === 'string' ? /** @type {string} */ ( children ) : '',
++		{
++			ellipsis,
++			ellipsizeMode,
++			limit,
++			numberOfLines,
++		}
++	);
++
++	const shouldTruncate = ellipsizeMode === TRUNCATE_TYPE.auto;
++
++	const classes = useMemo( () => {
++		const sx = {};
++
++		sx.numberOfLines = css`
++			-webkit-box-orient: vertical;
++			-webkit-line-clamp: ${ numberOfLines };
++			display: -webkit-box;
++			overflow: hidden;
++		`;
++
++		return cx(
++			shouldTruncate && ! numberOfLines && styles.Truncate,
++			shouldTruncate && !! numberOfLines && sx.numberOfLines,
++			className
++		);
++	}, [ className, numberOfLines, shouldTruncate ] );
++
++	return { ...otherProps, className: classes, children: truncatedContent };
++}
+diff --git a/packages/components/src/utils/create-component.js b/packages/components/src/utils/create-component.js
+new file mode 100644
+index 00000000000000..9b3b435f23318a
+--- /dev/null
++++ b/packages/components/src/utils/create-component.js
+@@ -0,0 +1,44 @@
++/**
++ * External dependencies
++ */
++import { contextConnect } from '@wp-g2/context';
++import { identity } from 'lodash';
++
++/**
++ * Internal dependencies
++ */
++import { View } from '../view';
++
++/* eslint-disable jsdoc/require-returns-description */
++/**
++ * @template {import('reakit-utils/types').As} T
++ * @template {import('@wp-g2/create-styles').ViewOwnProps<{}, T>} P
++ * @param {import('./types').Options<T, P>} options
++ * @return {import('@wp-g2/create-styles').PolymorphicComponent<T, import('@wp-g2/create-styles').PropsFromViewOwnProps<P>>}
++ */
++/* eslint-enable jsdoc/require-returns-description */
++/* eslint-disable jsdoc/no-undefined-types */
++export const createComponent = ( {
++	as,
++	name = 'Component',
++	useHook = identity,
++	memo = true,
++} ) => {
++	/**
++	 * @param {P} props
++	 * @param {import('react').Ref<T>} forwardedRef
++	 */
++	function Component( props, forwardedRef ) {
++		const otherProps = useHook( props );
++
++		return (
++			<View as={ as || 'div' } { ...otherProps } ref={ forwardedRef } />
++		);
++	}
++
++	Component.displayName = name;
++
++	// @ts-ignore
++	return contextConnect( Component, name, { memo } );
++};
++/* eslint-enable jsdoc/no-undefined-types */
+diff --git a/packages/components/src/utils/index.js b/packages/components/src/utils/index.js
+index 94d8a67cc04607..da2f1a2dcdc722 100644
+--- a/packages/components/src/utils/index.js
++++ b/packages/components/src/utils/index.js
+@@ -1,2 +1,3 @@
+ export * from './hooks';
+ export * from './style-mixins';
++export { createComponent } from './create-component';
+diff --git a/packages/components/src/utils/types.ts b/packages/components/src/utils/types.ts
+new file mode 100644
+index 00000000000000..f661f45a1d8024
+--- /dev/null
++++ b/packages/components/src/utils/types.ts
+@@ -0,0 +1,63 @@
++import { As } from 'reakit-utils/types';
++import { ViewOwnProps } from '@wp-g2/create-styles';
++
++export type Options<T extends As, P extends ViewOwnProps<{}, T>> = {
++	as: T;
++	name: string;
++	useHook: (props: P) => any;
++	memo?: boolean;
++};
++
++export type ResponsiveCSSValue<T> = Array<T | undefined> | T;
++
++export type SizeRangeDefault =
++	| 'xLarge'
++	| 'large'
++	| 'medium'
++	| 'small'
++	| 'xSmall';
++
++export type SizeRangeReduced = 'large' | 'medium' | 'small';
++
++export type FormElementProps<V> = {
++	/**
++	 * The default (initial) state to use if `value` is undefined.
++	 */
++	defaultValue?: V;
++	/**
++	 * Determines if element is disabled.
++	 */
++	disabled?: boolean;
++	/**
++	 * Label for the form element.
++	 */
++	label?: string;
++};
++
++export type PopperPlacement =
++	| 'auto'
++	| 'auto-start'
++	| 'auto-end'
++	| 'top'
++	| 'top-start'
++	| 'top-end'
++	| 'right'
++	| 'right-start'
++	| 'right-end'
++	| 'bottom'
++	| 'bottom-start'
++	| 'bottom-end'
++	| 'left'
++	| 'left-start'
++	| 'left-end';
++
++export type PopperProps = {
++	/**
++	 * Position of the popover element.
++	 *
++	 * @default 'auto'
++	 *
++	 * @see https://popper.js.org/docs/v1/#popperplacements--codeenumcode
++	 */
++	placement?: PopperPlacement;
++};
+diff --git a/packages/components/src/view/README.md b/packages/components/src/view/README.md
+new file mode 100644
+index 00000000000000..ec265056ca4081
+--- /dev/null
++++ b/packages/components/src/view/README.md
+@@ -0,0 +1,62 @@
++# View
++
++`View` is a core component that renders everything in the library. It is the principle component in the entire library. Note that `View` is not exported from components, it's fully internal.
++
++**Everything** is a `View`, and a `View` is **everything**.
++
++## Usage
++
++```jsx live
++import { Text, View } from '@wp-g2/components';
++
++function Example() {
++	return (
++		<View>
++			<Text>Into The Unknown</Text>
++		</View>
++	);
++}
++```
++
++## Props
++
++##### as
++
++**Type**: `string`,`E`
++
++Render the component as another React Component or HTML Element.
++
++##### css
++
++**Type**: `InterpolatedCSS`
++
++Render custom CSS using the style system.
++
++## Styling
++
++### Presets
++
++The Style system provides a bunch of style presets, which come from `@wp-g2/styles`. These presets are namespaced under `ui`.
++
++Presets can style a `View` by passing an `Array` of them into the `css` prop.
++
++```jsx live
++import { Text, View } from '@wp-g2/components';
++import { ui } from '@wp-g2/styles';
++
++function Example() {
++	return (
++		<View
++			css={[
++				ui.padding(5),
++				ui.background.blue,
++				ui.hover(ui.background.red, ui.scale(1.02)),
++				ui.active(ui.background.yellow, ui.scale(0.8)),
++				ui.animation.bounce,
++			]}
++		>
++			<Text>Into The Unknown</Text>
++		</View>
++	);
++}
++```
+diff --git a/packages/components/src/view/index.js b/packages/components/src/view/index.js
+new file mode 100644
+index 00000000000000..64c032291ab979
+--- /dev/null
++++ b/packages/components/src/view/index.js
+@@ -0,0 +1 @@
++export { default as View } from './view';
+diff --git a/packages/components/src/view/test/__snapshots__/view.js.snap b/packages/components/src/view/test/__snapshots__/view.js.snap
+new file mode 100644
+index 00000000000000..273ac93c27caa0
+--- /dev/null
++++ b/packages/components/src/view/test/__snapshots__/view.js.snap
+@@ -0,0 +1,180 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`props should render as another element 1`] = `
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++<p
++  class="emotion-0"
++>
++  <span>
++    Some people are worth melting for.
++  </span>
++</p>
++`;
++
++exports[`props should render correctly 1`] = `
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++<div
++  class="emotion-0"
++>
++  <span>
++    Some people are worth melting for.
++  </span>
++</div>
++`;
++
++exports[`props should render with custom styles (Array) 1`] = `
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  background: pink;
++  font-weight: bold;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++<p
++  class="emotion-0"
++>
++  <span>
++    Some people are worth melting for.
++  </span>
++</p>
++`;
++
++exports[`props should render with custom styles (object) 1`] = `
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  background: pink;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++<p
++  class="emotion-0"
++>
++  <span>
++    Some people are worth melting for.
++  </span>
++</p>
++`;
++
++exports[`props should render with custom styles (string) 1`] = `
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  background: pink;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++<p
++  class="emotion-0"
++>
++  <span>
++    Some people are worth melting for.
++  </span>
++</p>
++`;
+diff --git a/packages/components/src/view/test/view.js b/packages/components/src/view/test/view.js
+new file mode 100644
+index 00000000000000..a9524e88101871
+--- /dev/null
++++ b/packages/components/src/view/test/view.js
+@@ -0,0 +1,74 @@
++/**
++ * External dependencies
++ */
++import { render } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { View } from '../index';
++
++describe( 'props', () => {
++	test( 'should render correctly', () => {
++		const { container } = render(
++			<View>
++				<span>Some people are worth melting for.</span>
++			</View>
++		);
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render as another element', () => {
++		const { container } = render(
++			<View as="p">
++				<span>Some people are worth melting for.</span>
++			</View>
++		);
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render with custom styles (string)', () => {
++		const { container } = render(
++			<View
++				as="p"
++				css={ `
++					background: pink;
++				` }
++			>
++				<span>Some people are worth melting for.</span>
++			</View>
++		);
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render with custom styles (object)', () => {
++		const { container } = render(
++			<View
++				as="p"
++				css={ {
++					background: 'pink',
++				} }
++			>
++				<span>Some people are worth melting for.</span>
++			</View>
++		);
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render with custom styles (Array)', () => {
++		const { container } = render(
++			<View
++				as="p"
++				css={ [
++					{
++						background: 'pink',
++					},
++					`font-weight: bold;`,
++				] }
++			>
++				<span>Some people are worth melting for.</span>
++			</View>
++		);
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++} );
+diff --git a/packages/components/src/view/view.js b/packages/components/src/view/view.js
+new file mode 100644
+index 00000000000000..968b0ad42c225d
+--- /dev/null
++++ b/packages/components/src/view/view.js
+@@ -0,0 +1,9 @@
++/**
++ * External dependencies
++ */
++import { BaseView } from '@wp-g2/styles';
++
++const View = BaseView;
++View.displayName = 'View';
++
++export default View;
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index c697cb71d98c17..7d6a733e557940 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -15,7 +15,9 @@
+ 		"src/base-control/**/*",
+ 		"src/dashicon/**/*",
+ 		"src/tip/**/*",
++		"src/truncate/**/*",
+ 		"src/utils/**/*",
++		"src/view/**/*",
+ 		"src/visually-hidden/**/*"
+ 	],
+ 	"exclude": [

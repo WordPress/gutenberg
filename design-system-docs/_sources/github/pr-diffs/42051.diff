@@ -1,0 +1,25 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5eb01848efc9bb..692454cc7f8a96 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -23,6 +23,7 @@
+ -   `NavigableContainer`: use `code` instead of `keyCode` for keyboard events, rewrite tests using RTL and `user-event` ([#43606](https://github.com/WordPress/gutenberg/pull/43606/)).
+ -   `ComboboxControl`: updated to satisfy `react/exhuastive-deps` eslint rule ([#41417](https://github.com/WordPress/gutenberg/pull/41417))
+ -   `FormTokenField`: Refactor away from Lodash ([#43744](https://github.com/WordPress/gutenberg/pull/43744/)).
++-   `NavigatorButton`: updated to satisfy `react/exhaustive-deps` eslint rule ([#42051](https://github.com/WordPress/gutenberg/pull/42051))
+ 
+ ## 20.0.0 (2022-08-24)
+ 
+diff --git a/packages/components/src/navigator/navigator-button/hook.ts b/packages/components/src/navigator/navigator-button/hook.ts
+index a892ab9456c8b7..15d52d269b60a2 100644
+--- a/packages/components/src/navigator/navigator-button/hook.ts
++++ b/packages/components/src/navigator/navigator-button/hook.ts
+@@ -41,7 +41,7 @@ export function useNavigatorButton(
+ 				} );
+ 				onClick?.( e );
+ 			},
+-			[ goTo, onClick ]
++			[ goTo, onClick, attributeName, escapedPath ]
+ 		);
+ 
+ 	return {

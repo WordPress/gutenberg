@@ -1,0 +1,248 @@
+diff --git a/package-lock.json b/package-lock.json
+index cf92071bf6142e..0c419639e00721 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -11694,7 +11694,6 @@
+ 				"react-autosize-textarea": "^7.1.0",
+ 				"react-merge-refs": "^1.0.0",
+ 				"react-spring": "^8.0.19",
+-				"reakit": "1.3.4",
+ 				"redux-multi": "^0.1.12",
+ 				"rememo": "^3.0.0",
+ 				"tinycolor2": "^1.4.1",
+@@ -11739,7 +11738,6 @@
+ 				"memize": "^1.1.0",
+ 				"moment": "^2.22.1",
+ 				"react-easy-crop": "^3.0.0",
+-				"reakit": "1.3.4",
+ 				"tinycolor2": "^1.4.1"
+ 			}
+ 		},
+diff --git a/packages/block-editor/package.json b/packages/block-editor/package.json
+index 4df1e348d459df..05841cb049ec54 100644
+--- a/packages/block-editor/package.json
++++ b/packages/block-editor/package.json
+@@ -62,7 +62,6 @@
+ 		"react-autosize-textarea": "^7.1.0",
+ 		"react-merge-refs": "^1.0.0",
+ 		"react-spring": "^8.0.19",
+-		"reakit": "1.3.4",
+ 		"redux-multi": "^0.1.12",
+ 		"rememo": "^3.0.0",
+ 		"tinycolor2": "^1.4.1",
+diff --git a/packages/block-editor/src/components/block-types-list/index.js b/packages/block-editor/src/components/block-types-list/index.js
+index a569a8c13d4bde..ca54df0d24b78f 100644
+--- a/packages/block-editor/src/components/block-types-list/index.js
++++ b/packages/block-editor/src/components/block-types-list/index.js
+@@ -1,12 +1,11 @@
+-/**
+- * External dependencies
+- */
+-import { Composite, useCompositeState } from 'reakit';
+-
+ /**
+  * WordPress dependencies
+  */
+ import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
++import {
++	__unstableComposite as Composite,
++	__unstableUseCompositeState as useCompositeState,
++} from '@wordpress/components';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/block-editor/src/components/inserter-list-item/index.js b/packages/block-editor/src/components/inserter-list-item/index.js
+index 5620c31aa0b628..47e48ce8ddf29c 100644
+--- a/packages/block-editor/src/components/inserter-list-item/index.js
++++ b/packages/block-editor/src/components/inserter-list-item/index.js
+@@ -2,13 +2,15 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { CompositeItem } from 'reakit';
+ 
+ /**
+  * WordPress dependencies
+  */
+ import { useMemo, useRef, memo } from '@wordpress/element';
+-import { Button } from '@wordpress/components';
++import {
++	Button,
++	__unstableCompositeItem as CompositeItem,
++} from '@wordpress/components';
+ import {
+ 	createBlock,
+ 	createBlocksFromInnerBlocksTemplate,
+diff --git a/packages/block-library/package.json b/packages/block-library/package.json
+index b3cb76e28c8610..ebe3030f55ce58 100644
+--- a/packages/block-library/package.json
++++ b/packages/block-library/package.json
+@@ -61,7 +61,6 @@
+ 		"memize": "^1.1.0",
+ 		"moment": "^2.22.1",
+ 		"react-easy-crop": "^3.0.0",
+-		"reakit": "1.3.4",
+ 		"tinycolor2": "^1.4.1"
+ 	},
+ 	"publishConfig": {
+diff --git a/packages/block-library/src/template-part/edit/selection/template-part-previews.js b/packages/block-library/src/template-part/edit/selection/template-part-previews.js
+index 812ed35907e857..e3b7b3e669926a 100644
+--- a/packages/block-library/src/template-part/edit/selection/template-part-previews.js
++++ b/packages/block-library/src/template-part/edit/selection/template-part-previews.js
+@@ -1,3 +1,8 @@
++/**
++ * External dependencies
++ */
++import { groupBy, deburr } from 'lodash';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -7,16 +12,15 @@ import { useMemo, useCallback } from '@wordpress/element';
+ import { ENTER, SPACE } from '@wordpress/keycodes';
+ import { __, sprintf } from '@wordpress/i18n';
+ import { BlockPreview } from '@wordpress/block-editor';
+-import { Icon } from '@wordpress/components';
++import {
++	__unstableComposite as Composite,
++	__unstableCompositeItem as CompositeItem,
++	Icon,
++	__unstableUseCompositeState as useCompositeState,
++} from '@wordpress/components';
+ import { useAsyncList } from '@wordpress/compose';
+ import { store as noticesStore } from '@wordpress/notices';
+ 
+-/**
+- * External dependencies
+- */
+-import { groupBy, deburr } from 'lodash';
+-import { Composite, useCompositeState, CompositeItem } from 'reakit';
+-
+ function PreviewPlaceholder() {
+ 	return (
+ 		<div
+diff --git a/packages/components/src/alignment-matrix-control/cell.js b/packages/components/src/alignment-matrix-control/cell.js
+index 627d98aff2f9d8..48dd339ebfc5a0 100644
+--- a/packages/components/src/alignment-matrix-control/cell.js
++++ b/packages/components/src/alignment-matrix-control/cell.js
+@@ -1,11 +1,7 @@
+-/**
+- * External dependencies
+- */
+-import { CompositeItem } from 'reakit/Composite';
+-
+ /**
+  * Internal dependencies
+  */
++import { CompositeItem } from '../composite';
+ import Tooltip from '../tooltip';
+ import VisuallyHidden from '../visually-hidden';
+ 
+diff --git a/packages/components/src/alignment-matrix-control/index.js b/packages/components/src/alignment-matrix-control/index.js
+index b0c56b09e819c5..d9665eb5d446dc 100644
+--- a/packages/components/src/alignment-matrix-control/index.js
++++ b/packages/components/src/alignment-matrix-control/index.js
+@@ -3,7 +3,6 @@
+  */
+ import { noop } from 'lodash';
+ import classnames from 'classnames';
+-import { useCompositeState, Composite, CompositeGroup } from 'reakit';
+ 
+ /**
+  * WordPress dependencies
+@@ -16,6 +15,7 @@ import { useState, useEffect } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import Cell from './cell';
++import { Composite, CompositeGroup, useCompositeState } from '../composite';
+ import { Root, Row } from './styles/alignment-matrix-control-styles';
+ import AlignmentMatrixControlIcon from './icon';
+ import { GRID, getItemId } from './utils';
+diff --git a/packages/components/src/composite/index.js b/packages/components/src/composite/index.js
+new file mode 100644
+index 00000000000000..f1101a2c852e0e
+--- /dev/null
++++ b/packages/components/src/composite/index.js
+@@ -0,0 +1,18 @@
++/**
++ * Composite is a component that may contain navigable items represented by
++ * CompositeItem. It's inspired by the WAI-ARIA Composite Role and implements
++ * all the keyboard navigation mechanisms to ensure that there's only one
++ * tab stop for the whole Composite element. This means that it can behave as
++ * a roving tabindex or aria-activedescendant container.
++ *
++ * @see https://reakit.io/docs/composite/
++ *
++ * The plan is to build own API that accounts for future breaking changes
++ * in Reakit (https://github.com/WordPress/gutenberg/pull/28085).
++ */
++export {
++	Composite,
++	CompositeGroup,
++	CompositeItem,
++	useCompositeState,
++} from 'reakit';
+diff --git a/packages/components/src/disclosure/index.js b/packages/components/src/disclosure/index.js
+new file mode 100644
+index 00000000000000..2789ab6d307ef7
+--- /dev/null
++++ b/packages/components/src/disclosure/index.js
+@@ -0,0 +1,10 @@
++/**
++ * Accessible Disclosure component that controls visibility of a section of
++ * content. It follows the WAI-ARIA Disclosure Pattern.
++ *
++ * @see https://reakit.io/docs/disclosure/
++ *
++ * The plan is to build own API that accounts for future breaking changes
++ * in Reakit (https://github.com/WordPress/gutenberg/pull/28085).
++ */
++export { DisclosureContent } from 'reakit';
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index aaf2620e259237..9911aa6faa887f 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -35,11 +35,18 @@ export { default as ColorIndicator } from './color-indicator';
+ export { default as ColorPalette } from './color-palette';
+ export { default as ColorPicker } from './color-picker';
+ export { default as ComboboxControl } from './combobox-control';
++export {
++	Composite as __unstableComposite,
++	CompositeGroup as __unstableCompositeGroup,
++	CompositeItem as __unstableCompositeItem,
++	useCompositeState as __unstableUseCompositeState,
++} from './composite';
+ export { default as CustomSelectControl } from './custom-select-control';
+ export { default as Dashicon } from './dashicon';
+ export { default as DateTimePicker, DatePicker, TimePicker } from './date-time';
+ export { default as __experimentalDimensionControl } from './dimension-control';
+ export { default as Disabled } from './disabled';
++export { DisclosureContent as __unstableDisclosureContent } from './disclosure';
+ export { default as Draggable } from './draggable';
+ export {
+ 	default as DropZone,
+diff --git a/packages/edit-widgets/src/blocks/widget-area/edit/index.js b/packages/edit-widgets/src/blocks/widget-area/edit/index.js
+index 1b7383cbae0734..adc9a11ddb7941 100644
+--- a/packages/edit-widgets/src/blocks/widget-area/edit/index.js
++++ b/packages/edit-widgets/src/blocks/widget-area/edit/index.js
+@@ -1,15 +1,14 @@
+-/**
+- * External dependencies
+- */
+-import { DisclosureContent } from 'reakit/Disclosure';
+-
+ /**
+  * WordPress dependencies
+  */
+ import { useEffect, useState, useCallback, useRef } from '@wordpress/element';
+ import { useSelect, useDispatch } from '@wordpress/data';
+ import { EntityProvider } from '@wordpress/core-data';
+-import { Panel, PanelBody } from '@wordpress/components';
++import {
++	__unstableDisclosureContent as DisclosureContent,
++	Panel,
++	PanelBody,
++} from '@wordpress/components';
+ 
+ /**
+  * Internal dependencies

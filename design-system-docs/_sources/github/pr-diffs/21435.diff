@@ -1,0 +1,307 @@
+diff --git a/packages/block-editor/src/components/responsive-block-control/test/__snapshots__/index.js.snap b/packages/block-editor/src/components/responsive-block-control/test/__snapshots__/index.js.snap
+index a5e0beb316a347..93358821def548 100644
+--- a/packages/block-editor/src/components/responsive-block-control/test/__snapshots__/index.js.snap
++++ b/packages/block-editor/src/components/responsive-block-control/test/__snapshots__/index.js.snap
+@@ -1,3 +1,3 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`Basic rendering should render with required props 1`] = `"<fieldset class=\\"block-editor-responsive-block-control\\"><legend class=\\"block-editor-responsive-block-control__title\\">Padding</legend><div class=\\"block-editor-responsive-block-control__inner\\"><div class=\\"components-base-control components-toggle-control block-editor-responsive-block-control__toggle\\"><div class=\\"components-base-control__field\\"><span class=\\"components-form-toggle is-checked\\"><input class=\\"components-form-toggle__input\\" id=\\"inspector-toggle-control-0\\" type=\\"checkbox\\" aria-describedby=\\"inspector-toggle-control-0__help\\" checked=\\"\\"><span class=\\"components-form-toggle__track\\"></span><span class=\\"components-form-toggle__thumb\\"></span><svg width=\\"2\\" height=\\"6\\" xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 2 6\\" class=\\"components-form-toggle__on\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M0 0h2v6H0z\\"></path></svg></span><label for=\\"inspector-toggle-control-0\\" class=\\"components-toggle-control__label\\">Use the same padding on all screensizes.</label></div><p id=\\"inspector-toggle-control-0__help\\" class=\\"components-base-control__help\\">Toggle between using the same value for all screen sizes or using a unique value per screen size.</p></div><div class=\\"block-editor-responsive-block-control__group\\"><div class=\\"components-base-control\\"><div class=\\"components-base-control__field\\"><label class=\\"components-base-control__label\\" for=\\"inspector-select-control-0\\"><span aria-describedby=\\"rbc-desc-0\\">All</span><span class=\\"components-visually-hidden\\" id=\\"rbc-desc-0\\">Controls the padding property for All viewports.</span></label><select id=\\"inspector-select-control-0\\" class=\\"components-select-control__input\\"><option value=\\"\\">Please select</option><option value=\\"small\\">Small</option><option value=\\"medium\\">Medium</option><option value=\\"large\\">Large</option></select></div></div><p id=\\"all\\">All is used here for testing purposes to ensure we have access to details about the device.</p></div></div></fieldset>"`;
++exports[`Basic rendering should render with required props 1`] = `"<fieldset class=\\"block-editor-responsive-block-control\\"><legend class=\\"block-editor-responsive-block-control__title\\">Padding</legend><div class=\\"block-editor-responsive-block-control__inner\\"><div class=\\"components-base-control components-toggle-control block-editor-responsive-block-control__toggle\\"><div class=\\"components-base-control__field\\"><span class=\\"components-form-toggle is-checked\\"><input class=\\"components-form-toggle__input\\" id=\\"inspector-toggle-control-0\\" type=\\"checkbox\\" aria-describedby=\\"inspector-toggle-control-0__help\\" checked=\\"\\"><span class=\\"components-form-toggle__track\\"></span><span class=\\"components-form-toggle__thumb\\"></span><svg width=\\"2\\" height=\\"6\\" xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 2 6\\" class=\\"components-form-toggle__on\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M0 0h2v6H0z\\"></path></svg></span><label for=\\"inspector-toggle-control-0\\" class=\\"components-toggle-control__label\\">Use the same padding on all screensizes.</label></div><p id=\\"inspector-toggle-control-0__help\\" class=\\"components-base-control__help\\">Toggle between using the same value for all screen sizes or using a unique value per screen size.</p></div><div class=\\"block-editor-responsive-block-control__group\\"><div class=\\"components-base-control\\"><div class=\\"components-base-control__field\\"><label class=\\"components-base-control__label\\" for=\\"inspector-select-control-0\\"><span aria-describedby=\\"rbc-desc-0\\">All</span><span class=\\"components-visually-hidden\\" id=\\"rbc-desc-0\\">Controls the padding property for All viewports.</span></label><select aria-busy=\\"false\\" id=\\"inspector-select-control-0\\" class=\\"components-select-control__input\\"><option value=\\"\\">Please select</option><option value=\\"small\\">Small</option><option value=\\"medium\\">Medium</option><option value=\\"large\\">Large</option></select></div></div><p id=\\"all\\">All is used here for testing purposes to ensure we have access to details about the device.</p></div></div></fieldset>"`;
+diff --git a/packages/components/src/select-control/README.md b/packages/components/src/select-control/README.md
+index 83073594c1dced..bbbf1cd2372da0 100644
+--- a/packages/components/src/select-control/README.md
++++ b/packages/components/src/select-control/README.md
+@@ -143,6 +143,12 @@ If this property is added, a help text will be generated using help property as
+ - Type: `String|WPElement`
+ - Required: No
+ 
++#### isLoading
++
++If set, the placeholder of `Loading…` will render and the `select` will be disabled.
++- Type: `boolean`
++- Required: No
++
+ #### multiple
+ 
+ If this property is added, multiple values can be selected. The value passed should be an array.
+diff --git a/packages/components/src/select-control/index.js b/packages/components/src/select-control/index.js
+index 8ad65f890e7acb..8873e6f64d85c2 100644
+--- a/packages/components/src/select-control/index.js
++++ b/packages/components/src/select-control/index.js
+@@ -1,11 +1,12 @@
+ /**
+  * External dependencies
+  */
+-import { isEmpty } from 'lodash';
++import { isEmpty, noop } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+  */
++import { __ } from '@wordpress/i18n';
+ import { useInstanceId } from '@wordpress/compose';
+ 
+ /**
+@@ -13,18 +14,29 @@ import { useInstanceId } from '@wordpress/compose';
+  */
+ import BaseControl from '../base-control';
+ 
++/**
++ * Used to render the <select /> Loading... placeholder when the isLoading
++ * state is set.
++ */
++const loadingValue = '__loading__';
++
+ export default function SelectControl( {
++	disabled,
+ 	help,
++	isLoading = false,
+ 	label,
+ 	multiple = false,
+-	onChange,
++	onChange = noop,
+ 	options = [],
+ 	className,
+ 	hideLabelFromVision,
++	value: valueProp,
+ 	...props
+ } ) {
+ 	const instanceId = useInstanceId( SelectControl );
+ 	const id = `inspector-select-control-${ instanceId }`;
++	const isDisabled = disabled || isLoading;
++
+ 	const onChangeValue = ( event ) => {
+ 		if ( multiple ) {
+ 			const selectedOptions = [ ...event.target.options ].filter(
+@@ -37,38 +49,57 @@ export default function SelectControl( {
+ 		onChange( event.target.value );
+ 	};
+ 
+-	// Disable reason: A select with an onchange throws a warning
++	if ( isEmpty( options ) ) {
++		return null;
++	}
+ 
++	const value = isLoading ? loadingValue : valueProp;
++
++	// Disable reason: A select with an onchange throws a warning
+ 	/* eslint-disable jsx-a11y/no-onchange */
+ 	return (
+-		! isEmpty( options ) && (
+-			<BaseControl
+-				label={ label }
+-				hideLabelFromVision={ hideLabelFromVision }
++		<BaseControl
++			label={ label }
++			hideLabelFromVision={ hideLabelFromVision }
++			isLoading={ isLoading }
++			id={ id }
++			help={ help }
++			className={ className }
++		>
++			<select
++				aria-busy={ isLoading }
+ 				id={ id }
+-				help={ help }
+-				className={ className }
++				className="components-select-control__input"
++				disabled={ isDisabled }
++				onChange={ onChangeValue }
++				aria-describedby={ !! help ? `${ id }__help` : undefined }
++				multiple={ multiple }
++				value={ value }
++				{ ...props }
+ 			>
+-				<select
+-					id={ id }
+-					className="components-select-control__input"
+-					onChange={ onChangeValue }
+-					aria-describedby={ !! help ? `${ id }__help` : undefined }
+-					multiple={ multiple }
+-					{ ...props }
+-				>
+-					{ options.map( ( option, index ) => (
+-						<option
+-							key={ `${ option.label }-${ option.value }-${ index }` }
+-							value={ option.value }
+-							disabled={ option.disabled }
+-						>
+-							{ option.label }
+-						</option>
+-					) ) }
+-				</select>
+-			</BaseControl>
+-		)
++				<SelectOptions isLoading={ isLoading } options={ options } />
++			</select>
++		</BaseControl>
+ 	);
+ 	/* eslint-enable jsx-a11y/no-onchange */
+ }
++
++function SelectOptions( { isLoading, options } ) {
++	if ( isLoading ) {
++		return (
++			<option disabled value={ loadingValue }>
++				{ __( 'Loading…' ) }
++			</option>
++		);
++	}
++
++	return options.map( ( option, index ) => (
++		<option
++			key={ `${ option.label }-${ option.value }-${ index }` }
++			value={ option.value }
++			disabled={ option.disabled }
++		>
++			{ option.label }
++		</option>
++	) );
++}
+diff --git a/packages/components/src/select-control/stories/index.js b/packages/components/src/select-control/stories/index.js
+index dec6d48405e5a4..23d83ad666805c 100644
+--- a/packages/components/src/select-control/stories/index.js
++++ b/packages/components/src/select-control/stories/index.js
+@@ -37,6 +37,7 @@ export const _default = () => {
+ 		'Help Text',
+ 		'Help text to explain the select control.'
+ 	);
++	const isLoading = boolean( 'isLoading', false );
+ 	const multiple = boolean( 'Allow Multiple Selection', false );
+ 	const options = object( 'Options', [
+ 		{ value: null, label: 'Select an Option', disabled: true },
+@@ -51,6 +52,7 @@ export const _default = () => {
+ 			label={ label }
+ 			hideLabelFromVision={ hideLabelFromVision }
+ 			help={ help }
++			isLoading={ isLoading }
+ 			multiple={ multiple }
+ 			options={ options }
+ 			className={ className }
+diff --git a/packages/components/src/select-control/test/index.js b/packages/components/src/select-control/test/index.js
+new file mode 100644
+index 00000000000000..450e70648c9650
+--- /dev/null
++++ b/packages/components/src/select-control/test/index.js
+@@ -0,0 +1,84 @@
++/**
++ * External dependencies
++ */
++import { render, screen } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import SelectControl from '../';
++
++describe( 'SelectControl', () => {
++	describe( 'Basic rendering', () => {
++		it( 'should render', () => {
++			const optionsProp = [
++				{ label: 'One', value: 1 },
++				{ label: 'Two', value: 2 },
++				{ label: 'Three', value: 3 },
++			];
++
++			const { container } = render(
++				<SelectControl options={ optionsProp } />
++			);
++
++			const select = container.querySelector( 'select' );
++
++			expect( select ).toBeTruthy();
++		} );
++
++		it( 'should not render if options are empty render', () => {
++			const optionsProp = [];
++
++			const { container } = render(
++				<SelectControl options={ optionsProp } />
++			);
++
++			const select = container.querySelector( 'select' );
++
++			expect( select ).toBeFalsy();
++		} );
++	} );
++
++	describe( 'Options', () => {
++		it( 'should render with selected options', () => {
++			const optionsProp = [
++				{ label: 'One', value: 1 },
++				{ label: 'Two', value: 2 },
++				{ label: 'Three', value: 3 },
++			];
++
++			render( <SelectControl options={ optionsProp } value={ 3 } /> );
++
++			const select = screen.getByDisplayValue( 'Three' );
++
++			expect( select ).toBeTruthy();
++		} );
++	} );
++
++	describe( 'Loading', () => {
++		it( 'should render with loading placeholder and busy, if isLoading', () => {
++			const optionsProp = [
++				{ label: 'One', value: 1 },
++				{ label: 'Two', value: 2 },
++				{ label: 'Three', value: 3 },
++			];
++
++			const { container, rerender } = render(
++				<SelectControl options={ optionsProp } isLoading={ true } />
++			);
++
++			expect( screen.getByText( /Loading/ ) ).toBeTruthy();
++			expect(
++				container.querySelector( '[aria-busy="true"]' )
++			).toBeTruthy();
++
++			rerender(
++				<SelectControl options={ optionsProp } isLoading={ false } />
++			);
++
++			expect(
++				container.querySelector( '[aria-busy="true"]' )
++			).toBeFalsy();
++		} );
++	} );
++} );
+diff --git a/packages/components/src/tree-select/README.md b/packages/components/src/tree-select/README.md
+index 3924a239d3b933..5ab2f254795196 100644
+--- a/packages/components/src/tree-select/README.md
++++ b/packages/components/src/tree-select/README.md
+@@ -60,6 +60,12 @@ If this property is added, a label will be generated using label property as the
+ - Type: `String`
+ - Required: No
+ 
++### isLoading
++
++If set, the placeholder of `Loading…` will render and the `select` will be disabled.
++- Type: `boolean`
++- Required: No
++
+ ### noOptionLabel
+ 
+ If this property is added, an option will be added with this label to represent empty selection.
+diff --git a/packages/components/src/tree-select/stories/index.js b/packages/components/src/tree-select/stories/index.js
+index c4f299bde2b4cf..841b74b9a2a706 100644
+--- a/packages/components/src/tree-select/stories/index.js
++++ b/packages/components/src/tree-select/stories/index.js
+@@ -38,6 +38,7 @@ export const _default = () => {
+ 		'Help Text',
+ 		'Help text to explain the select control.'
+ 	);
++	const isLoading = boolean( 'isLoading', false );
+ 	const tree = object( 'Tree', [
+ 		{
+ 			name: 'Page 1',
+@@ -71,6 +72,7 @@ export const _default = () => {
+ 			noOptionLabel={ noOptionLabel }
+ 			hideLabelFromVision={ hideLabelFromVision }
+ 			help={ help }
++			isLoading={ isLoading }
+ 			tree={ tree }
+ 		/>
+ 	);

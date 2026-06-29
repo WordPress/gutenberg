@@ -1,0 +1,94 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index eb4fb727c2a208..81f0860243345a 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -19,6 +19,7 @@
+ -   `Popover`: anchor correctly to parent node when no explicit anchor is passed ([#42971](https://github.com/WordPress/gutenberg/pull/42971)).
+ -   `ColorPalette`: forward correctly `popoverProps` in the `CustomColorPickerDropdown` component [#42989](https://github.com/WordPress/gutenberg/pull/42989)).
+ -   `ColorPalette`, `CustomGradientBar`: restore correct color picker popover position [#42989](https://github.com/WordPress/gutenberg/pull/42989)).
++-   `Popover`: fix iframe offset not updating when iframe resizes ([#42971](https://github.com/WordPress/gutenberg/pull/43172)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/popover/index.js b/packages/components/src/popover/index.js
+index 0dac37685281d9..bd6cdb6021d2f0 100644
+--- a/packages/components/src/popover/index.js
++++ b/packages/components/src/popover/index.js
+@@ -187,23 +187,16 @@ const Popover = (
+ 
+ 	/**
+ 	 * Offsets the position of the popover when the anchor is inside an iframe.
++	 *
++	 * Store the offset in a ref, due to constraints with floating-ui:
++	 * https://floating-ui.com/docs/react-dom#variables-inside-middleware-functions.
+ 	 */
+-	const frameOffset = useMemo( () => {
+-		const { defaultView } = ownerDocument;
+-		const { frameElement } = defaultView;
+-
+-		if ( ! frameElement || ownerDocument === document ) {
+-			return undefined;
+-		}
+-
+-		const iframeRect = frameElement.getBoundingClientRect();
+-		return { x: iframeRect.left, y: iframeRect.top };
+-	}, [ ownerDocument ] );
++	const frameOffset = useRef();
+ 
+ 	const middleware = [
+-		frameOffset || offset
++		frameOffset.current || offset
+ 			? offsetMiddleware( ( { placement: currentPlacement } ) => {
+-					if ( ! frameOffset ) {
++					if ( ! frameOffset.current ) {
+ 						return offset;
+ 					}
+ 
+@@ -228,8 +221,8 @@ const Popover = (
+ 					return {
+ 						mainAxis:
+ 							normalizedOffset +
+-							frameOffset[ mainAxis ] * mainAxisModifier,
+-						crossAxis: frameOffset[ crossAxis ],
++							frameOffset.current[ mainAxis ] * mainAxisModifier,
++						crossAxis: frameOffset.current[ crossAxis ],
+ 					};
+ 			  } )
+ 			: undefined,
+@@ -388,14 +381,34 @@ const Popover = (
+ 
+ 	// If the reference element is in a different ownerDocument (e.g. iFrame),
+ 	// we need to manually update the floating's position as the reference's owner
+-	// document scrolls.
++	// document scrolls. Also update the frame offset if the view resizes.
+ 	useLayoutEffect( () => {
+ 		if ( ownerDocument === document ) {
+ 			return;
+ 		}
+ 
++		const { defaultView } = ownerDocument;
++		const { frameElement } = defaultView;
++
+ 		ownerDocument.addEventListener( 'scroll', update );
+-		return () => ownerDocument.removeEventListener( 'scroll', update );
++
++		let updateFrameOffset;
++		if ( frameElement ) {
++			updateFrameOffset = () => {
++				const iframeRect = frameElement.getBoundingClientRect();
++				frameOffset.current = { x: iframeRect.left, y: iframeRect.top };
++			};
++			updateFrameOffset();
++			defaultView.addEventListener( 'resize', updateFrameOffset );
++		}
++
++		return () => {
++			ownerDocument.removeEventListener( 'scroll', update );
++
++			if ( updateFrameOffset ) {
++				defaultView.removeEventListener( 'resize', updateFrameOffset );
++			}
++		};
+ 	}, [ ownerDocument ] );
+ 
+ 	/** @type {false | string} */

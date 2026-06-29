@@ -1,0 +1,27 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9677144c3bc5d5..01e8c21385cb67 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -38,7 +38,9 @@
+ -   `BoxControl`: Update unit tests to use `@testing-library/user-event` ([#41422](https://github.com/WordPress/gutenberg/pull/41422)).
+ -   `Surface`: Convert to TypeScript ([#41212](https://github.com/WordPress/gutenberg/pull/41212)).
+ -   `Autocomplete` updated to satisfy `react/exhuastive-deps` eslint rule ([#41382](https://github.com/WordPress/gutenberg/pull/41382))
++-   `Dropdown` updated to satisfy `react/exhuastive-deps` eslint rule ([#41505](https://github.com/WordPress/gutenberg/pull/41505))
+ -   `DateDayPicker` updated to satisfy `react/exhuastive-deps` eslint rule ([#41470](https://github.com/WordPress/gutenberg/pull/41470)).
++
+ ### Experimental
+ 
+ -   `Spacer`: Add RTL support. ([#41172](https://github.com/WordPress/gutenberg/pull/41172))
+diff --git a/packages/components/src/dropdown/index.js b/packages/components/src/dropdown/index.js
+index 72a394ef043e62..df70e3689eee45 100644
+--- a/packages/components/src/dropdown/index.js
++++ b/packages/components/src/dropdown/index.js
+@@ -50,7 +50,7 @@ export default function Dropdown( props ) {
+ 				onToggle( false );
+ 			}
+ 		},
+-		[]
++		[ onToggle ]
+ 	);
+ 
+ 	function toggle() {

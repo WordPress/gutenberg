@@ -1,0 +1,3154 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index e7293389ef83cc..40c10d70dbe3ab 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -869,6 +869,12 @@
+ 		"markdown_source": "../packages/components/src/icon/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "InputControl",
++		"slug": "input-control",
++		"markdown_source": "../packages/components/src/input-control/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "IsolatedEventContainer",
+ 		"slug": "isolated-event-container",
+diff --git a/package-lock.json b/package-lock.json
+index 42809a4fe369aa..1e26a35c0291e4 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -9957,6 +9957,7 @@
+ 				"re-resizable": "^6.0.0",
+ 				"react-dates": "^17.1.1",
+ 				"react-spring": "^8.0.20",
++				"react-use-gesture": "^7.0.15",
+ 				"reakit": "^1.0.2",
+ 				"rememo": "^3.0.0",
+ 				"tinycolor2": "^1.4.1",
+@@ -36861,6 +36862,11 @@
+ 				"react-lifecycles-compat": "^3.0.4"
+ 			}
+ 		},
++		"react-use-gesture": {
++			"version": "7.0.15",
++			"resolved": "https://registry.npmjs.org/react-use-gesture/-/react-use-gesture-7.0.15.tgz",
++			"integrity": "sha512-vHQkaa7oUbSDTAcFk9huQXa7E8KPrZH91erPuOMoqZT513qvtbb/SzTQ33lHc71/kOoJkMbzOkc4uoA4sT7Ogg=="
++		},
+ 		"react-with-direction": {
+ 			"version": "1.3.0",
+ 			"resolved": "https://registry.npmjs.org/react-with-direction/-/react-with-direction-1.3.0.tgz",
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 3c2fc6bdb81927..b614d8b0415ad2 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -52,6 +52,7 @@
+ 		"re-resizable": "^6.0.0",
+ 		"react-dates": "^17.1.1",
+ 		"react-spring": "^8.0.20",
++		"react-use-gesture": "^7.0.15",
+ 		"reakit": "^1.0.2",
+ 		"rememo": "^3.0.0",
+ 		"tinycolor2": "^1.4.1",
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 9b80e7f1867cac..51208ec3582232 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -55,6 +55,7 @@ export { default as Guide } from './guide';
+ export { default as GuidePage } from './guide/page';
+ export { default as Icon } from './icon';
+ export { default as IconButton } from './button/deprecated';
++export { default as __experimentalInputControl } from './input-control';
+ export { default as KeyboardShortcuts } from './keyboard-shortcuts';
+ export { default as MenuGroup } from './menu-group';
+ export { default as MenuItem } from './menu-item';
+diff --git a/packages/components/src/input-control/README.md b/packages/components/src/input-control/README.md
+new file mode 100644
+index 00000000000000..d184fd1e2ce2f1
+--- /dev/null
++++ b/packages/components/src/input-control/README.md
+@@ -0,0 +1,98 @@
++# InputControl
++
++InputControl components let users enter and edit text. This is an experimental component intended to (in time) merge with or replace [TextControl](../text-control).
++
++## Usage
++
++```js
++import { __experimentalInputControl as InputControl } from '@wordpress/components';
++import { useState } from '@wordpress/compose';
++
++const Example = () => {
++	const [ value, setValue ] = useState( '' );
++
++	return (
++		<InputControl
++			value={ value }
++			onChange={ ( nextValue ) => setValue( nextValue ) }
++		/>
++	);
++};
++```
++
++## Props
++
++### disabled
++
++If true, the `input` will be disabled.
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `false`
++
++### isPressEnterToChange
++
++If true, the `ENTER` key press is required in order to trigger an `onChange`. If enabled, a change is also triggered when tabbing away (`onBlur`).
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `false`
++
++### isFloatingLabel
++
++If true, the `label` will render with a floating interaction.
++
++-   Type: `Boolean`
++-   Required: No
++
++### hideLabelFromVision
++
++If true, the label will only be visible to screen readers.
++
++-   Type: `Boolean`
++-   Required: No
++
++### label
++
++If this property is added, a label will be generated using label property as the content.
++
++-   Type: `String`
++-   Required: No
++
++### onChange
++
++A function that receives the value of the input.
++
++-   Type: `Function`
++-   Required: Yes
++
++### size
++
++Adjusts the size of the input.
++Sizes include: `default`, `small`
++
++-   Type: `String`
++-   Required: No
++-   Default: `default`
++
++### suffix
++
++Renders an element on the right side of the input.
++
++-   Type: `React.ReactNode`
++-   Required: No
++
++### type
++
++Type of the input element to render. Defaults to "text".
++
++-   Type: `String`
++-   Required: No
++-   Default: "text"
++
++### value
++
++The current value of the input.
++
++-   Type: `String | Number`
++-   Required: Yes
+diff --git a/packages/components/src/input-control/backdrop.js b/packages/components/src/input-control/backdrop.js
+new file mode 100644
+index 00000000000000..e376170ee7bfca
+--- /dev/null
++++ b/packages/components/src/input-control/backdrop.js
+@@ -0,0 +1,44 @@
++/**
++ * WordPress dependencies
++ */
++import { memo } from '@wordpress/element';
++/**
++ * Internal dependencies
++ */
++import { Fieldset, Legend, LegendText } from './styles/input-control-styles';
++
++function Backdrop( {
++	disabled = false,
++	isFloating = false,
++	isFloatingLabel = false,
++	isFocused = false,
++	label,
++	size = 'default',
++} ) {
++	return (
++		<Fieldset
++			aria-hidden="true"
++			className="components-input-control__backdrop"
++			disabled={ disabled }
++			isFloatingLabel={ isFloatingLabel }
++			isFocused={ isFocused }
++		>
++			{ isFloatingLabel && (
++				<Legend
++					aria-hidden="true"
++					className="components-input-control__backdrop-label"
++					isFloating={ isFloating }
++					size={ size }
++				>
++					<LegendText className="components-input-control__backdrop-text">
++						{ label }
++					</LegendText>
++				</Legend>
++			) }
++		</Fieldset>
++	);
++}
++
++const MemoizedBackdrop = memo( Backdrop );
++
++export default MemoizedBackdrop;
+diff --git a/packages/components/src/input-control/index.js b/packages/components/src/input-control/index.js
+new file mode 100644
+index 00000000000000..e15128c4c99e70
+--- /dev/null
++++ b/packages/components/src/input-control/index.js
+@@ -0,0 +1,136 @@
++/**
++ * External dependencies
++ */
++import { noop } from 'lodash';
++import classNames from 'classnames';
++
++/**
++ * WordPress dependencies
++ */
++import { useInstanceId } from '@wordpress/compose';
++import { useState, forwardRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import Backdrop from './backdrop';
++import InputField from './input-field';
++import Label from './label';
++import { Container, Root, Suffix } from './styles/input-control-styles';
++import { isValueEmpty } from './utils';
++
++function useUniqueId( idProp ) {
++	const instanceId = useInstanceId( InputControl );
++	const id = `inspector-input-control-${ instanceId }`;
++
++	return idProp || id;
++}
++
++export function InputControl(
++	{
++		__unstableStateReducer: stateReducer = ( state ) => state,
++		children,
++		className,
++		disabled = false,
++		hideLabelFromVision = false,
++		id: idProp,
++		isPressEnterToChange = false,
++		isFloatingLabel = false,
++		label,
++		onBlur = noop,
++		onChange = noop,
++		onFocus = noop,
++		onValidate = noop,
++		onKeyDown = noop,
++		size = 'default',
++		suffix,
++		value,
++		...props
++	},
++	ref
++) {
++	const [ isFocused, setIsFocused ] = useState( false );
++	const [ isFilled, setIsFilled ] = useState( ! isValueEmpty( value ) );
++
++	const id = useUniqueId( idProp );
++	const classes = classNames( 'components-input-control', className );
++
++	const handleOnBlur = ( event ) => {
++		onBlur( event );
++		setIsFocused( false );
++	};
++
++	const handleOnFocus = ( event ) => {
++		onFocus( event );
++		setIsFocused( true );
++	};
++
++	const isInputFilled = isFilled || ! isValueEmpty( value );
++
++	const isFloating = isFloatingLabel ? isInputFilled || isFocused : false;
++	const isFloatingLabelSet =
++		! hideLabelFromVision && isFloatingLabel && label;
++
++	return (
++		<Root
++			className={ classes }
++			isFloatingLabel={ isFloatingLabelSet }
++			isFocused={ isFocused }
++		>
++			<Label
++				className="components-input-control__label"
++				hideLabelFromVision={ hideLabelFromVision }
++				htmlFor={ id }
++				isFilled={ isFilled }
++				isFloating={ isFloating }
++				isFloatingLabel={ isFloatingLabel }
++				size={ size }
++			>
++				{ label }
++			</Label>
++			<Container
++				className="components-input-control__container"
++				disabled={ disabled }
++				isFocused={ isFocused }
++			>
++				<InputField
++					{ ...props }
++					className="components-input-control__input"
++					disabled={ disabled }
++					id={ id }
++					isFloating={ isFloating }
++					isFloatingLabelSet={ isFloatingLabelSet }
++					isPressEnterToChange={ isPressEnterToChange }
++					onBlur={ handleOnBlur }
++					onChange={ onChange }
++					onFocus={ handleOnFocus }
++					onKeyDown={ onKeyDown }
++					onUpdateValue={ setIsFilled }
++					onValidate={ onValidate }
++					ref={ ref }
++					setIsFocused={ setIsFocused }
++					size={ size }
++					stateReducer={ stateReducer }
++					value={ value }
++				/>
++				{ suffix && (
++					<Suffix className="components-input-control__suffix">
++						{ suffix }
++					</Suffix>
++				) }
++				<Backdrop
++					aria-hidden="true"
++					disabled={ disabled }
++					isFloating={ isFloating }
++					isFloatingLabel={ isFloatingLabelSet }
++					isFocused={ isFocused }
++					label={ label }
++					size={ size }
++				/>
++				{ children }
++			</Container>
++		</Root>
++	);
++}
++
++export default forwardRef( InputControl );
+diff --git a/packages/components/src/input-control/input-field.js b/packages/components/src/input-control/input-field.js
+new file mode 100644
+index 00000000000000..f7bbf4f5fa51e6
+--- /dev/null
++++ b/packages/components/src/input-control/input-field.js
+@@ -0,0 +1,212 @@
++/**
++ * External dependencies
++ */
++import { noop } from 'lodash';
++import { useDrag } from 'react-use-gesture';
++
++/**
++ * WordPress dependencies
++ */
++import { useEffect, useRef, forwardRef } from '@wordpress/element';
++import { UP, DOWN, ENTER } from '@wordpress/keycodes';
++/**
++ * Internal dependencies
++ */
++import { useDragCursor, isValueEmpty } from './utils';
++import { Input } from './styles/input-control-styles';
++import { useInputControlStateReducer } from './state';
++
++function InputField(
++	{
++		disabled = false,
++		dragDirection = 'n',
++		dragThreshold = 10,
++		id,
++		isDragEnabled = false,
++		isFloating = false,
++		isFloatingLabelSet = false,
++		isPressEnterToChange = false,
++		onBlur = noop,
++		onChange = noop,
++		onDrag = noop,
++		onDragEnd = noop,
++		onDragStart = noop,
++		onFocus = noop,
++		onKeyDown = noop,
++		onUpdateValue,
++		onValidate = noop,
++		size = 'default',
++		stateReducer = ( state ) => state,
++		value: valueProp,
++		...props
++	},
++	ref
++) {
++	const {
++		// State
++		state,
++		// Actions
++		change,
++		commit,
++		drag,
++		dragEnd,
++		dragStart,
++		invalidate,
++		pressDown,
++		pressEnter,
++		pressUp,
++		reset,
++		update,
++	} = useInputControlStateReducer( stateReducer, {
++		isDragEnabled,
++		value: valueProp,
++		isPressEnterToChange,
++	} );
++
++	const { _event, value, isDragging, isDirty } = state;
++
++	const valueRef = useRef( value );
++	const dragCursor = useDragCursor( isDragging, dragDirection );
++
++	useEffect( () => {
++		/**
++		 * Handles syncing incoming value changes with internal state.
++		 * This effectively enables a "controlled" state.
++		 * https://reactjs.org/docs/forms.html#controlled-components
++		 */
++		if ( valueProp !== valueRef.current ) {
++			update( valueProp );
++			valueRef.current = valueProp;
++
++			// Quick return to avoid firing the onChange callback
++			return;
++		}
++
++		/**
++		 * Fires the onChange callback when internal state value changes.
++		 */
++		if ( value !== valueRef.current && ! isDirty ) {
++			onChange( value, { event: _event } );
++			onUpdateValue( ! isValueEmpty( value ) );
++
++			valueRef.current = value;
++		}
++	}, [ value, isDirty, valueProp ] );
++
++	const handleOnBlur = ( event ) => {
++		onBlur( event );
++
++		/**
++		 * If isPressEnterToChange is set, this commits the value to
++		 * the onChange callback.
++		 */
++		if ( isPressEnterToChange && isDirty ) {
++			if ( ! isValueEmpty( value ) ) {
++				handleOnCommit( { target: { value } }, event );
++			} else {
++				reset( valueProp );
++			}
++		}
++	};
++
++	const handleOnFocus = ( event ) => {
++		onFocus( event );
++	};
++
++	const handleOnChange = ( event ) => {
++		const nextValue = event.target.value;
++		change( nextValue, event );
++	};
++
++	const handleOnCommit = ( event ) => {
++		const nextValue = event.target.value;
++
++		try {
++			onValidate( nextValue, { event } );
++			commit( nextValue, event );
++		} catch ( err ) {
++			invalidate( err, { event } );
++		}
++	};
++
++	const handleOnKeyDown = ( event ) => {
++		const { keyCode } = event;
++		onKeyDown( event );
++
++		switch ( keyCode ) {
++			case UP:
++				pressUp( event );
++				break;
++
++			case DOWN:
++				pressDown( event );
++				break;
++
++			case ENTER:
++				pressEnter( event );
++
++				if ( isPressEnterToChange ) {
++					event.preventDefault();
++					handleOnCommit( event );
++				}
++				break;
++		}
++	};
++
++	const dragGestureProps = useDrag(
++		( dragProps ) => {
++			const { distance, dragging, event } = dragProps;
++
++			if ( ! isDragEnabled ) return;
++			if ( ! distance ) return;
++			event.stopPropagation();
++
++			/**
++			 * Quick return if no longer dragging.
++			 * This prevents unnecessary value calculations.
++			 */
++			if ( ! dragging ) {
++				onDragEnd( dragProps );
++				dragEnd( dragProps );
++				return;
++			}
++
++			onDrag( dragProps );
++			drag( dragProps );
++
++			if ( ! isDragging ) {
++				onDragStart( dragProps );
++				dragStart( dragProps );
++			}
++		},
++		{
++			threshold: dragThreshold,
++			enabled: isDragEnabled,
++		}
++	);
++
++	return (
++		<Input
++			{ ...props }
++			{ ...dragGestureProps() }
++			className="components-input-control__input"
++			disabled={ disabled }
++			dragCursor={ dragCursor }
++			isDragging={ isDragging }
++			id={ id }
++			isFloating={ isFloating }
++			isFloatingLabel={ isFloatingLabelSet }
++			onBlur={ handleOnBlur }
++			onChange={ handleOnChange }
++			onFocus={ handleOnFocus }
++			onKeyDown={ handleOnKeyDown }
++			ref={ ref }
++			size={ size }
++			value={ value }
++		/>
++	);
++}
++
++const ForwardedComponent = forwardRef( InputField );
++
++export default ForwardedComponent;
+diff --git a/packages/components/src/input-control/label.js b/packages/components/src/input-control/label.js
+new file mode 100644
+index 00000000000000..c02dd57f9f770f
+--- /dev/null
++++ b/packages/components/src/input-control/label.js
+@@ -0,0 +1,28 @@
++/**
++ * Internal dependencies
++ */
++import VisuallyHidden from '../visually-hidden';
++import { Label as BaseLabel } from './styles/input-control-styles';
++
++export default function Label( {
++	children,
++	hideLabelFromVision,
++	htmlFor,
++	...props
++} ) {
++	if ( ! children ) return null;
++
++	if ( hideLabelFromVision ) {
++		return (
++			<VisuallyHidden as="label" htmlFor={ htmlFor }>
++				{ children }
++			</VisuallyHidden>
++		);
++	}
++
++	return (
++		<BaseLabel htmlFor={ htmlFor } { ...props }>
++			{ children }
++		</BaseLabel>
++	);
++}
+diff --git a/packages/components/src/input-control/state.js b/packages/components/src/input-control/state.js
+new file mode 100644
+index 00000000000000..b2cd3cc5225d26
+--- /dev/null
++++ b/packages/components/src/input-control/state.js
+@@ -0,0 +1,249 @@
++/**
++ * External dependencies
++ */
++import { isEmpty } from 'lodash';
++/**
++ * WordPress dependencies
++ */
++import { useReducer } from '@wordpress/element';
++
++const initialStateReducer = ( state ) => state;
++
++const initialInputControlState = {
++	_event: {},
++	error: null,
++	initialValue: '',
++	isDirty: false,
++	isDragEnabled: false,
++	isDragging: false,
++	isPressEnterToChange: false,
++	value: '',
++};
++
++const actionTypes = {
++	CHANGE: 'CHANGE',
++	COMMIT: 'COMMIT',
++	DRAG_END: 'DRAG_END',
++	DRAG_START: 'DRAG_START',
++	DRAG: 'DRAG',
++	INVALIDATE: 'INVALIDATE',
++	PRESS_DOWN: 'PRESS_DOWN',
++	PRESS_ENTER: 'PRESS_ENTER',
++	PRESS_UP: 'PRESS_UP',
++	RESET: 'RESET',
++	UPDATE: 'UPDATE',
++};
++
++export const inputControlActionTypes = actionTypes;
++
++/**
++ * Prepares initialState for the reducer.
++ *
++ * @param {Object} initialState The initial state.
++ * @return {Object} Prepared initialState for the reducer
++ */
++function mergeInitialState( initialState = initialInputControlState ) {
++	const { value } = initialState;
++
++	return {
++		...initialInputControlState,
++		...initialState,
++		initialValue: value,
++	};
++}
++
++/**
++ * Composes multiple stateReducers into a single stateReducer, building
++ * the pipeline to control the flow for state and actions.
++ *
++ * @param  {...Function} fns State reducers.
++ * @return {Function} The single composed stateReducer.
++ */
++export const composeStateReducers = ( ...fns ) => {
++	return ( ...args ) => {
++		return fns.reduceRight( ( state, fn ) => {
++			const fnState = fn( ...args );
++			return isEmpty( fnState ) ? state : { ...state, ...fnState };
++		}, {} );
++	};
++};
++
++/**
++ * Creates a reducer that opens the channel for external state subscription
++ * and modification.
++ *
++ * This technique uses the "stateReducer" design pattern:
++ * https://kentcdodds.com/blog/the-state-reducer-pattern/
++ *
++ * @param {Function} composedStateReducers A custom reducer that can subscribe and modify state.
++ * @return {Function} The reducer.
++ */
++function inputControlStateReducer( composedStateReducers ) {
++	return ( state, action ) => {
++		const nextState = { ...state };
++		const { type, payload } = action;
++
++		switch ( type ) {
++			/**
++			 * Keyboard events
++			 */
++			case actionTypes.PRESS_UP:
++				nextState.isDirty = false;
++				break;
++
++			case actionTypes.PRESS_DOWN:
++				nextState.isDirty = false;
++				break;
++
++			/**
++			 * Drag events
++			 */
++			case actionTypes.DRAG_START:
++				nextState.isDragging = true;
++				break;
++
++			case actionTypes.DRAG_END:
++				nextState.isDragging = false;
++				break;
++
++			/**
++			 * Input events
++			 */
++			case actionTypes.CHANGE:
++				nextState.error = null;
++				nextState.value = payload.value;
++
++				if ( state.isPressEnterToChange ) {
++					nextState.isDirty = true;
++				}
++
++				break;
++
++			case actionTypes.COMMIT:
++				nextState.value = payload.value;
++				nextState.isDirty = false;
++				break;
++
++			case actionTypes.RESET:
++				nextState.error = null;
++				nextState.isDirty = false;
++				nextState.value = payload.value || state.initialValue;
++				break;
++
++			case actionTypes.UPDATE:
++				if ( payload.value !== state.value ) {
++					nextState.value = payload.value;
++					nextState.isDirty = false;
++				}
++				break;
++
++			/**
++			 * Validation
++			 */
++			case actionTypes.INVALIDATE:
++				nextState.error = payload.error;
++				break;
++		}
++
++		if ( payload.event ) {
++			nextState._event = payload.event;
++		}
++
++		/**
++		 * Send the nextState + action to the composedReducers via
++		 * this "bridge" mechanism. This allows external stateReducers
++		 * to hook into actions, and modify state if needed.
++		 */
++		return composedStateReducers( nextState, action );
++	};
++}
++
++/**
++ * A custom hook that connects and external stateReducer with an internal
++ * reducer. This hook manages the internal state of InputControl.
++ * However, by connecting an external stateReducer function, other
++ * components can react to actions as well as modify state before it is
++ * applied.
++ *
++ * This technique uses the "stateReducer" design pattern:
++ * https://kentcdodds.com/blog/the-state-reducer-pattern/
++ *
++ * @param {Function} stateReducer An external state reducer.
++ * @param {Object} initialState The initial state for the reducer.
++ * @return {Object} State, dispatch, and a collection of actions.
++ */
++export function useInputControlStateReducer(
++	stateReducer = initialStateReducer,
++	initialState = initialInputControlState
++) {
++	const [ state, dispatch ] = useReducer(
++		inputControlStateReducer( stateReducer ),
++		mergeInitialState( initialState )
++	);
++
++	const createChangeEvent = ( type ) => ( nextValue, event ) => {
++		/**
++		 * Persist allows for the (Synthetic) event to be used outside of
++		 * this function call.
++		 * https://reactjs.org/docs/events.html#event-pooling
++		 */
++		if ( event && event.persist ) {
++			event.persist();
++		}
++
++		dispatch( {
++			type,
++			payload: { value: nextValue, event },
++		} );
++	};
++
++	const createKeyEvent = ( type ) => ( event ) => {
++		/**
++		 * Persist allows for the (Synthetic) event to be used outside of
++		 * this function call.
++		 * https://reactjs.org/docs/events.html#event-pooling
++		 */
++		if ( event && event.persist ) {
++			event.persist();
++		}
++
++		dispatch( { type, payload: { event } } );
++	};
++
++	const createDragEvent = ( type ) => ( dragProps ) => {
++		dispatch( { type, payload: dragProps } );
++	};
++
++	/**
++	 * Actions for the reducer
++	 */
++	const change = createChangeEvent( actionTypes.CHANGE );
++	const inValidate = createChangeEvent( actionTypes.INVALIDATE );
++	const reset = createChangeEvent( actionTypes.RESET );
++	const commit = createChangeEvent( actionTypes.COMMIT );
++	const update = createChangeEvent( actionTypes.UPDATE );
++
++	const dragStart = createDragEvent( actionTypes.DRAG_START );
++	const drag = createDragEvent( actionTypes.DRAG );
++	const dragEnd = createDragEvent( actionTypes.DRAG_END );
++
++	const pressUp = createKeyEvent( actionTypes.PRESS_UP );
++	const pressDown = createKeyEvent( actionTypes.PRESS_DOWN );
++	const pressEnter = createKeyEvent( actionTypes.PRESS_ENTER );
++
++	return {
++		change,
++		commit,
++		dispatch,
++		drag,
++		dragEnd,
++		dragStart,
++		inValidate,
++		pressDown,
++		pressEnter,
++		pressUp,
++		reset,
++		state,
++		update,
++	};
++}
+diff --git a/packages/components/src/input-control/stories/index.js b/packages/components/src/input-control/stories/index.js
+new file mode 100644
+index 00000000000000..7a3ebd5f4ab432
+--- /dev/null
++++ b/packages/components/src/input-control/stories/index.js
+@@ -0,0 +1,56 @@
++/**
++ * External dependencies
++ */
++import { boolean, select, text } from '@storybook/addon-knobs';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import InputControl from '../';
++
++export default {
++	title: 'Components/InputControl',
++	component: InputControl,
++};
++
++function Example() {
++	const [ value, setValue ] = useState( '' );
++
++	const props = {
++		disabled: boolean( 'disabled', false ),
++		hideLabelFromVision: boolean( 'hideLabelFromVision', false ),
++		isFloatingLabel: boolean( 'isFloatingLabel', false ),
++		isPressEnterToChange: boolean( 'isPressEnterToChange', false ),
++		label: text( 'label', 'Value' ),
++		placeholder: text( 'placeholder', 'Placeholder' ),
++		size: select(
++			'size',
++			{
++				default: 'default',
++				small: 'small',
++			},
++			'default'
++		),
++		suffix: text( 'suffix', '' ),
++	};
++
++	const suffixMarkup = props.suffix ? <div>{ props.suffix }</div> : null;
++
++	return (
++		<InputControl
++			{ ...props }
++			onChange={ ( v ) => setValue( v ) }
++			suffix={ suffixMarkup }
++			value={ value }
++		/>
++	);
++}
++
++export const _default = () => {
++	return <Example />;
++};
+diff --git a/packages/components/src/input-control/styles/input-control-styles.js b/packages/components/src/input-control/styles/input-control-styles.js
+new file mode 100644
+index 00000000000000..ca7c95ebbdd90c
+--- /dev/null
++++ b/packages/components/src/input-control/styles/input-control-styles.js
+@@ -0,0 +1,358 @@
++/**
++ * External dependencies
++ */
++import { css } from '@emotion/core';
++import styled from '@emotion/styled';
++
++/**
++ * Internal dependencies
++ */
++import Text from '../../text';
++import { color, rtl, reduceMotion } from '../../utils/style-mixins';
++
++const FLOATING_LABEL_TRANSITION_SPEED = '60ms';
++
++const rootFloatLabelStyles = ( { isFloatingLabel } ) => {
++	const paddingTop = isFloatingLabel ? 5 : 0;
++	return css( { paddingTop } );
++};
++
++const rootFocusedStyles = ( { isFocused } ) => {
++	if ( ! isFocused ) return '';
++
++	return css( { zIndex: 1 } );
++};
++
++export const Root = styled.div`
++	box-sizing: border-box;
++	position: relative;
++	border-radius: 2px;
++
++	${rootFloatLabelStyles};
++	${rootFocusedStyles};
++`;
++
++const containerDisabledStyle = ( { disabled } ) => {
++	const backgroundColor = disabled
++		? color( 'ui.backgroundDisabled' )
++		: color( 'ui.background' );
++
++	return css( { backgroundColor } );
++};
++
++export const Container = styled.div`
++	align-items: center;
++	box-sizing: border-box;
++	border-radius: inherit;
++	display: flex;
++	position: relative;
++
++	${containerDisabledStyle};
++`;
++
++const disabledStyles = ( { disabled } ) => {
++	if ( ! disabled ) return '';
++
++	return css( {
++		color: color( 'ui.textDisabled' ),
++	} );
++};
++
++const fontSizeStyles = ( { size } ) => {
++	const sizes = {
++		default: '13px',
++		small: '11px',
++	};
++
++	const fontSize = sizes[ size ];
++	const fontSizeMobile = '16px';
++
++	if ( ! fontSize ) return '';
++
++	return css`
++		font-size: ${fontSizeMobile};
++
++		@media ( min-width: 600px ) {
++			font-size: ${fontSize};
++		}
++	`;
++};
++
++const sizeStyles = ( { size } ) => {
++	const sizes = {
++		default: {
++			height: 30,
++			lineHeight: 1,
++			minHeight: 30,
++		},
++		small: {
++			height: 24,
++			lineHeight: 1,
++			minHeight: 24,
++		},
++	};
++
++	const style = sizes[ size ] || sizes.default;
++
++	return css( style );
++};
++
++const placeholderStyles = ( { isFilled, isFloating, isFloatingLabel } ) => {
++	let opacity = 1;
++
++	if ( isFloatingLabel ) {
++		if ( ! isFilled && ! isFloating ) {
++			opacity = 0;
++		}
++	}
++
++	return css`
++		&::placeholder {
++			opacity: ${opacity};
++		}
++
++		&::-webkit-input-placeholder {
++			line-height: normal;
++		}
++	`;
++};
++
++const dragStyles = ( { isDragging, dragCursor } ) => {
++	let defaultArrowStyles = '';
++	let activeDragCursorStyles = '';
++
++	if ( isDragging ) {
++		defaultArrowStyles = css`
++			cursor: ${dragCursor};
++			user-select: none;
++
++			&::-webkit-outer-spin-button,
++			&::-webkit-inner-spin-button {
++				-webkit-appearance: none !important;
++				margin: 0 !important;
++			}
++		`;
++	}
++
++	if ( isDragging && dragCursor ) {
++		activeDragCursorStyles = css`
++			&:active {
++				cursor: ${dragCursor};
++			}
++		`;
++	}
++
++	return css`
++		${defaultArrowStyles};
++		${activeDragCursorStyles};
++	`;
++};
++
++// TODO: Resolve need to use &&& to increase specificity
++// https://github.com/WordPress/gutenberg/issues/18483
++
++export const Input = styled.input`
++	&&& {
++		background-color: transparent;
++		box-sizing: border-box;
++		border: none;
++		box-shadow: none !important;
++		color: ${color( 'black' )};
++		display: block;
++		outline: none;
++		padding-left: 8px;
++		padding-right: 8px;
++		width: 100%;
++
++		${dragStyles};
++		${disabledStyles};
++		${fontSizeStyles};
++		${sizeStyles};
++
++		${placeholderStyles};
++	}
++`;
++
++const laberColor = ( { isFloatingLabel, isFilled, isFloating } ) => {
++	const isPlaceholder = isFloatingLabel && ! isFilled;
++	const textColor =
++		isPlaceholder || isFloating
++			? color( 'ui.textDisabled' )
++			: 'currentColor';
++
++	return css( { color: textColor } );
++};
++
++const labelFontSize = ( { isFloatingLabel, size } ) => {
++	const sizes = {
++		default: '13px',
++		small: '11px',
++	};
++	const fontSize = sizes[ size ];
++	const lineHeight = isFloatingLabel ? 1.2 : null;
++
++	return css( { fontSize, lineHeight } );
++};
++
++const labelPosition = ( { isFloatingLabel, isFloating, size } ) => {
++	const paddingBottom = isFloatingLabel ? 0 : 4;
++	const position = isFloatingLabel ? 'absolute' : null;
++	const pointerEvents = isFloating ? null : 'none';
++
++	const isSmall = size === 'small';
++
++	const offsetTop = isSmall ? 1 : 2;
++	const offset = isSmall ? '-1px' : '-3px';
++
++	const marginTop = isFloating ? 0 : offsetTop;
++	const marginLeft = isFloatingLabel ? 8 : 0;
++
++	let transform = isFloating
++		? `translate( 0, calc(-100% + ${ offset }) ) scale( 0.75 )`
++		: 'translate( 0, -50%) scale(1)';
++
++	if ( ! isFloatingLabel ) {
++		transform = null;
++	}
++
++	const transition = isFloatingLabel
++		? `transform ${ FLOATING_LABEL_TRANSITION_SPEED } linear`
++		: null;
++
++	return css(
++		{
++			marginTop,
++			paddingBottom,
++			position,
++			pointerEvents,
++			transition,
++			transform,
++		},
++		rtl( { marginLeft } )(),
++		rtl(
++			{ transformOrigin: 'top left' },
++			{ transformOrigin: 'top right' }
++		)()
++	);
++};
++
++const labelTruncation = ( { isFloating } ) => {
++	if ( isFloating ) return '';
++
++	return css`
++		max-width: calc( 100% - 10px );
++		overflow: hidden;
++		text-overflow: ellipsis;
++		white-space: nowrap;
++	`;
++};
++
++const BaseLabel = styled( Text )`
++	&&& {
++		box-sizing: border-box;
++		display: block;
++		margin: 0;
++		max-width: 100%;
++		padding: 0;
++		pointer-events: none;
++		top: 50%;
++		transition: transform ${FLOATING_LABEL_TRANSITION_SPEED} linear,
++			max-width ${FLOATING_LABEL_TRANSITION_SPEED} linear;
++		z-index: 1;
++
++		${laberColor};
++		${labelFontSize};
++		${labelPosition};
++		${labelTruncation};
++		${reduceMotion( 'transition' )};
++
++		${rtl( { left: 0 } )}
++	}
++`;
++
++export const Label = ( props ) => <BaseLabel { ...props } as="label" />;
++
++const fieldsetTopStyles = ( { isFloatingLabel } ) => {
++	const top = isFloatingLabel ? -5 : 0;
++	return css( { top } );
++};
++
++const fieldsetFocusedStyles = ( { disabled, isFocused } ) => {
++	let borderColor = isFocused
++		? color( 'ui.borderFocus' )
++		: color( 'ui.border' );
++
++	if ( disabled ) {
++		borderColor = 'ui.borderDisabled';
++	}
++
++	const borderWidth = isFocused ? 2 : 1;
++	const borderStyle = 'solid';
++
++	return css( { borderColor, borderStyle, borderWidth } );
++};
++
++export const Fieldset = styled.fieldset`
++	&&& {
++		box-sizing: border-box;
++		border-radius: inherit;
++		bottom: 0;
++		left: 0;
++		margin: 0;
++		padding: 0;
++		pointer-events: none;
++		position: absolute;
++		right: 0;
++
++		${fieldsetFocusedStyles};
++		${fieldsetTopStyles};
++		${rtl( { paddingLeft: 2 } )}
++	}
++`;
++
++const legendSize = ( { isFloating, size } ) => {
++	const maxWidth = isFloating ? 1000 : 0.01;
++	const sizes = {
++		default: 9.75,
++		small: 8.25,
++	};
++
++	const fontSize = sizes[ size ];
++
++	return css( {
++		fontSize,
++		maxWidth,
++	} );
++};
++
++export const Legend = styled.legend`
++	&&& {
++		box-sizing: border-box;
++		display: block;
++		height: 11px;
++		line-height: 11px;
++		margin: 0;
++		padding: 0;
++		transition: max-width ${FLOATING_LABEL_TRANSITION_SPEED} linear;
++		visibility: hidden;
++		width: auto;
++
++		${legendSize};
++		${reduceMotion( 'transition' )};
++	}
++`;
++
++const BaseLegendText = styled( Text )`
++	box-sizing: border-box;
++	display: inline-block;
++	${rtl( { paddingLeft: 4, paddingRight: 5 } )}
++`;
++
++export const LegendText = ( props ) => (
++	<BaseLegendText { ...props } as="span" />
++);
++
++export const Suffix = styled.span`
++	box-sizing: border-box;
++	display: block;
++`;
+diff --git a/packages/components/src/input-control/test/index.js b/packages/components/src/input-control/test/index.js
+new file mode 100644
+index 00000000000000..61972949068b61
+--- /dev/null
++++ b/packages/components/src/input-control/test/index.js
+@@ -0,0 +1,116 @@
++/**
++ * External dependencies
++ */
++import { render, screen, fireEvent } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import BaseInputControl from '../';
++
++const getInput = () => screen.getByTestId( 'input' );
++
++describe( 'InputControl', () => {
++	const InputControl = ( props ) => (
++		<BaseInputControl { ...props } data-testid="input" />
++	);
++
++	describe( 'Basic rendering', () => {
++		it( 'should render', () => {
++			render( <InputControl /> );
++
++			const input = getInput();
++
++			expect( input ).toBeTruthy();
++		} );
++
++		it( 'should render with specified type', () => {
++			render( <InputControl type="number" /> );
++
++			const input = getInput();
++
++			expect( input.getAttribute( 'type' ) ).toBe( 'number' );
++		} );
++	} );
++
++	describe( 'Label', () => {
++		it( 'should render label', () => {
++			render( <InputControl label="Hello" value="There" /> );
++
++			const input = screen.getByText( 'Hello' );
++
++			expect( input ).toBeTruthy();
++		} );
++
++		it( 'should render label, if floating', () => {
++			render(
++				<InputControl isFloatingLabel label="Hello" value="There" />
++			);
++
++			const input = screen.getAllByText( 'Hello' );
++
++			expect( input ).toBeTruthy();
++		} );
++	} );
++
++	describe( 'Value', () => {
++		it( 'should update value onChange', () => {
++			const spy = jest.fn();
++			render( <InputControl value="Hello" onChange={ spy } /> );
++
++			const input = getInput();
++
++			fireEvent.change( input, { target: { value: 'There' } } );
++
++			expect( input.value ).toBe( 'There' );
++			expect( spy ).toHaveBeenCalledTimes( 1 );
++		} );
++
++		it( 'should work as a controlled component', () => {
++			const spy = jest.fn();
++			const { rerender } = render(
++				<InputControl value="Original" onChange={ spy } />
++			);
++
++			const input = getInput();
++
++			fireEvent.change( input, { target: { value: 'State' } } );
++
++			// Assuming <InputControl /> is controlled...
++
++			// Updating the value
++			rerender( <InputControl value="New" onChange={ spy } /> );
++
++			expect( input.value ).toBe( 'New' );
++
++			/**
++			 * onChange called only once. onChange is not called when a
++			 * parent component explicitly passed a (new value) change down to
++			 * the <InputControl />.
++			 */
++			expect( spy ).toHaveBeenCalledTimes( 1 );
++		} );
++
++		it( 'should change back to initial value prop, if controlled', () => {
++			const spy = jest.fn();
++			const { rerender } = render(
++				<InputControl value="Original" onChange={ spy } />
++			);
++
++			const input = getInput();
++
++			// Assuming <InputControl /> is controlled...
++
++			// Updating the value
++			rerender( <InputControl value="New" onChange={ spy } /> );
++
++			expect( input.value ).toBe( 'New' );
++
++			// Change it back to the original value
++			rerender( <InputControl value="Original" onChange={ spy } /> );
++
++			expect( input.value ).toBe( 'Original' );
++			expect( spy ).toHaveBeenCalledTimes( 0 );
++		} );
++	} );
++} );
+diff --git a/packages/components/src/input-control/utils.js b/packages/components/src/input-control/utils.js
+new file mode 100644
+index 00000000000000..ee2c897580e9bf
+--- /dev/null
++++ b/packages/components/src/input-control/utils.js
+@@ -0,0 +1,74 @@
++/**
++ * WordPress dependencies
++ */
++import { useEffect } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { getRTL } from '../utils/style-mixins';
++
++/**
++ * Gets a CSS cursor value based on a drag direction.
++ *
++ * @param {string} dragDirection The drag direction.
++ * @return {string} The CSS cursor value.
++ */
++export function getDragCursor( dragDirection ) {
++	const isRtl = getRTL();
++	let dragCursor = 'n-resize';
++
++	switch ( dragDirection ) {
++		case 'n':
++			dragCursor = 'n-resize';
++			break;
++		case 'e':
++			dragCursor = isRtl ? 'w-resize' : 'e-resize';
++			break;
++		case 's':
++			dragCursor = 's-resize';
++			break;
++		case 'w':
++			dragCursor = isRtl ? 'e-resize' : 'w-resize';
++			break;
++	}
++
++	return dragCursor;
++}
++
++/**
++ * Custom hook that renders a drag cursor when dragging.
++ *
++ * @param {boolean} isDragging The dragging state.
++ * @param {string} dragDirection The drag direction.
++ *
++ * @return {string} The CSS cursor value.
++ */
++export function useDragCursor( isDragging, dragDirection ) {
++	const dragCursor = getDragCursor( dragDirection );
++
++	useEffect( () => {
++		if ( isDragging ) {
++			document.documentElement.style.cursor = dragCursor;
++			document.documentElement.style.pointerEvents = 'none';
++		} else {
++			document.documentElement.style.cursor = null;
++			document.documentElement.style.pointerEvents = null;
++		}
++	}, [ isDragging ] );
++
++	return dragCursor;
++}
++
++/**
++ * Determines if a value is empty, null, or undefined.
++ *
++ * @param {any} value The value to check.
++ * @return {boolean} Whether value is empty.
++ */
++export function isValueEmpty( value ) {
++	const isNullish = typeof value === 'undefined' || value === null;
++	const isEmptyString = value === '';
++
++	return isNullish || isEmptyString;
++}
+diff --git a/packages/components/src/number-control/README.md b/packages/components/src/number-control/README.md
+index 218ae241a63888..744e69ea12e230 100644
+--- a/packages/components/src/number-control/README.md
++++ b/packages/components/src/number-control/README.md
+@@ -8,7 +8,7 @@ NumberControl is an enhanced HTML [`input[type="number]`](https://developer.mozi
+ import { __experimentalNumberControl as NumberControl } from '@wordpress/components';
+ 
+ const Example = () => {
+-	const [value, setValue] = useState(10);
++	const [ value, setValue ] = useState( 10 );
+ 
+ 	return (
+ 		<NumberControl
+@@ -17,13 +17,64 @@ const Example = () => {
+ 			shiftStep={ 10 }
+ 			value={ value }
+ 		/>
+-	)
++	);
+ };
+ ```
+ 
+ ## Props
+ 
+-Name | Type | Default | Description
+---- | --- | --- | ---
+-`isShiftStepEnabled` | `boolean` | `true` | Determines if the unit `<select>` is tabbable.
+-`shiftStep` | `number` | `10` | Amount to increment by when the `shift` key is held down.
+\ No newline at end of file
++### dragDirection
++
++Determines the drag axis to increment/decrement the value.
++Directions: `n` | `e` | `s` | `w`
++
++-   Type: `String`
++-   Required: No
++-   Default: `n`
++
++### dragThreshold
++
++If `isDragEnabled` is true, this controls the amount of `px` to have been dragged before the value changes.
++
++-   Type: `Number`
++-   Required: No
++-   Default: `10`
++
++### hideHTMLArrows
++
++If true, the default `input` HTML arrows will be hidden.
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `false`
++
++### isDragEnabled
++
++If true, enables mouse drag gesture to increment/decrement the number value. Holding `SHIFT` while dragging will increase the value by the `shiftStep`.
++
++-   Type: `Boolean`
++-   Required: No
++
++### isShiftStepEnabled
++
++If true, pressing `UP` or `DOWN` along with the `SHIFT` key will increment the value by the `shiftStep` value.
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `true`
++
++### shiftStep
++
++Amount to increment by when the `SHIFT` key is held down.
++
++-   Type: `Number`
++-   Required: No
++-   Default: `10`
++
++### step
++
++Amount to increment by when incrementing/decrementing.
++
++-   Type: `Number`
++-   Required: No
++-   Default: `1`
+diff --git a/packages/components/src/number-control/index.js b/packages/components/src/number-control/index.js
+index 33914140975b06..8efdc52c7ce63a 100644
+--- a/packages/components/src/number-control/index.js
++++ b/packages/components/src/number-control/index.js
+@@ -1,79 +1,182 @@
+ /**
+  * External dependencies
+  */
+-import { clamp, noop } from 'lodash';
++import { clamp } from 'lodash';
+ import classNames from 'classnames';
+ 
+ /**
+  * WordPress dependencies
+  */
+-import { UP, DOWN } from '@wordpress/keycodes';
+-
+-export default function NumberControl( {
+-	className,
+-	isShiftStepEnabled = true,
+-	max = Infinity,
+-	min = -Infinity,
+-	onChange = noop,
+-	onKeyDown = noop,
+-	shiftStep = 10,
+-	step = 1,
+-	...props
+-} ) {
+-	const baseValue = clamp( 0, min, max );
+-
+-	const handleOnKeyDown = ( event ) => {
+-		onKeyDown( event );
+-		const { value } = event.target;
+-
+-		const isEmpty = value === '';
+-		const enableShift = event.shiftKey && isShiftStepEnabled;
+-
+-		const incrementalValue = enableShift
+-			? parseFloat( shiftStep )
+-			: parseFloat( step );
+-		let nextValue = isEmpty ? baseValue : value;
++import { forwardRef } from '@wordpress/element';
+ 
+-		// Convert to a number to use math
+-		nextValue = parseFloat( nextValue );
+-
+-		switch ( event.keyCode ) {
+-			case UP:
++/**
++ * Internal dependencies
++ */
++import { Input } from './styles/number-control-styles';
++import { add, getValue, roundClamp, subtract } from './utils';
++import { isValueEmpty } from '../input-control/utils';
++import {
++	inputControlActionTypes,
++	composeStateReducers,
++} from '../input-control/state';
++import { useRTL } from '../utils/style-mixins';
++
++export function NumberControl(
++	{
++		__unstableStateReducer: stateReducer = ( state ) => state,
++		className,
++		dragDirection = 'n',
++		hideHTMLArrows = false,
++		isDragEnabled = true,
++		isShiftStepEnabled = true,
++		label,
++		max = Infinity,
++		min = -Infinity,
++		shiftStep = 10,
++		step = 1,
++		type: typeProp = 'number',
++		value: valueProp,
++		...props
++	},
++	ref
++) {
++	const initialValue = getValue( valueProp, min, max );
++	const baseValue = clamp( 0, min, max );
++	const isRtl = useRTL();
++
++	const autoComplete = typeProp === 'number' ? 'off' : null;
++	const classes = classNames( 'components-number-control', className );
++
++	/**
++	 * "Middleware" function that intercepts updates from InputControl.
++	 * This allows us to tap into actions to transform the (next) state for
++	 * InputControl.
++	 *
++	 * @param {Object} state State from InputControl
++	 * @param {Object} action Action triggering state change
++	 * @return {Object} The updated state to apply to InputControl
++	 */
++	const numberControlStateReducer = ( state, action ) => {
++		const { type, payload } = action;
++		const event = payload?.event;
++
++		const currentValue = state.value;
++
++		/**
++		 * Handles custom UP and DOWN Keyboard events
++		 */
++		if (
++			type === inputControlActionTypes.PRESS_UP ||
++			type === inputControlActionTypes.PRESS_DOWN
++		) {
++			const enableShift = event.shiftKey && isShiftStepEnabled;
++
++			const incrementalValue = enableShift
++				? parseFloat( shiftStep )
++				: parseFloat( step );
++			let nextValue = isValueEmpty( currentValue )
++				? baseValue
++				: currentValue;
++
++			if ( event?.preventDefault ) {
+ 				event.preventDefault();
++			}
+ 
+-				nextValue = nextValue + incrementalValue;
+-				nextValue = clamp( nextValue, min, max );
++			if ( type === inputControlActionTypes.PRESS_UP ) {
++				nextValue = add( nextValue, incrementalValue );
++			}
+ 
+-				onChange( nextValue.toString(), { event } );
++			if ( type === inputControlActionTypes.PRESS_DOWN ) {
++				nextValue = subtract( nextValue, incrementalValue );
++			}
+ 
+-				break;
++			nextValue = roundClamp( nextValue, min, max, incrementalValue );
+ 
+-			case DOWN:
+-				event.preventDefault();
+-
+-				nextValue = nextValue - incrementalValue;
+-				nextValue = clamp( nextValue, min, max );
++			state.value = nextValue;
++		}
+ 
+-				onChange( nextValue.toString(), { event } );
++		/**
++		 * Handles drag to update events
++		 */
++		if ( type === inputControlActionTypes.DRAG && isDragEnabled ) {
++			const { delta, shiftKey } = payload;
++			const [ x, y ] = delta;
++			const modifier = shiftKey ? shiftStep : 1;
++
++			let directionModifier;
++			let directionBaseValue;
++
++			switch ( dragDirection ) {
++				case 'n':
++					directionBaseValue = y;
++					directionModifier = -1;
++					break;
++
++				case 'e':
++					directionBaseValue = x;
++					directionModifier = isRtl ? -1 : 1;
++					break;
++
++				case 's':
++					directionBaseValue = y;
++					directionModifier = 1;
++					break;
++
++				case 'w':
++					directionBaseValue = x;
++					directionModifier = isRtl ? 1 : -1;
++					break;
++			}
++
++			const distance = directionBaseValue * modifier * directionModifier;
++			let nextValue;
++
++			if ( distance !== 0 ) {
++				nextValue = roundClamp(
++					add( currentValue, distance ),
++					min,
++					max,
++					modifier
++				);
++
++				state.value = nextValue;
++			}
++		}
+ 
+-				break;
++		/**
++		 * Handles ENTER key press and submit
++		 */
++		if (
++			type === inputControlActionTypes.PRESS_ENTER ||
++			type === inputControlActionTypes.SUBMIT
++		) {
++			state.value = roundClamp( currentValue, min, max );
+ 		}
+-	};
+ 
+-	const handleOnChange = ( event ) => {
+-		onChange( event.target.value, { event } );
++		return state;
+ 	};
+ 
+-	const classes = classNames( 'component-number-control', className );
+-
+ 	return (
+-		<input
++		<Input
++			autoComplete={ autoComplete }
+ 			inputMode="numeric"
+ 			{ ...props }
+ 			className={ classes }
+-			type="number"
+-			onChange={ handleOnChange }
+-			onKeyDown={ handleOnKeyDown }
++			dragDirection={ dragDirection }
++			hideHTMLArrows={ hideHTMLArrows }
++			isDragEnabled={ isDragEnabled }
++			label={ label }
++			max={ max }
++			min={ min }
++			ref={ ref }
++			type={ typeProp }
++			value={ initialValue }
++			__unstableStateReducer={ composeStateReducers(
++				numberControlStateReducer,
++				stateReducer
++			) }
+ 		/>
+ 	);
+ }
++
++export default forwardRef( NumberControl );
+diff --git a/packages/components/src/number-control/stories/index.js b/packages/components/src/number-control/stories/index.js
+index b35af6a74eb11f..adc84a3933d35c 100644
+--- a/packages/components/src/number-control/stories/index.js
++++ b/packages/components/src/number-control/stories/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { boolean, number } from '@storybook/addon-knobs';
++import { boolean, number, text } from '@storybook/addon-knobs';
+ 
+ /**
+  * WordPress dependencies
+@@ -19,15 +19,29 @@ export default {
+ };
+ 
+ function Example() {
+-	const [ value, setValue ] = useState( '' );
++	const [ value, setValue ] = useState( '0' );
+ 
+ 	const props = {
++		disabled: boolean( 'disabled', false ),
++		hideLabelFromVision: boolean( 'hideLabelFromVision', false ),
++		isFloatingLabel: boolean( 'isFloatingLabel', false ),
++		isPressEnterToChange: boolean( 'isPressEnterToChange', false ),
+ 		isShiftStepEnabled: boolean( 'isShiftStepEnabled', true ),
++		label: text( 'label', 'Number' ),
++		min: number( 'min', 0 ),
++		max: number( 'max', 100 ),
++		placeholder: text( 'placeholder', 0 ),
+ 		shiftStep: number( 'shiftStep', 10 ),
+ 		step: number( 'step', 1 ),
+ 	};
+ 
+-	return <NumberControl { ...props } value={ value } onChange={ setValue } />;
++	return (
++		<NumberControl
++			{ ...props }
++			value={ value }
++			onChange={ ( v ) => setValue( v ) }
++		/>
++	);
+ }
+ 
+ export const _default = () => {
+diff --git a/packages/components/src/number-control/styles/number-control-styles.js b/packages/components/src/number-control/styles/number-control-styles.js
+new file mode 100644
+index 00000000000000..fe85c4bb902221
+--- /dev/null
++++ b/packages/components/src/number-control/styles/number-control-styles.js
+@@ -0,0 +1,25 @@
++/**
++ * External dependencies
++ */
++import { css } from '@emotion/core';
++import styled from '@emotion/styled';
++/**
++ * Internal dependencies
++ */
++import InputControl from '../../input-control';
++
++const htmlArrowStyles = ( { hideHTMLArrows } ) => {
++	if ( ! hideHTMLArrows ) return ``;
++
++	return css`
++		&::-webkit-outer-spin-button,
++		&::-webkit-inner-spin-button {
++			-webkit-appearance: none !important;
++			margin: 0 !important;
++		}
++	`;
++};
++
++export const Input = styled( InputControl )`
++	${htmlArrowStyles};
++`;
+diff --git a/packages/components/src/number-control/test/index.js b/packages/components/src/number-control/test/index.js
+index c946ba12aeb048..8c006647bd2ff3 100644
+--- a/packages/components/src/number-control/test/index.js
++++ b/packages/components/src/number-control/test/index.js
+@@ -8,7 +8,7 @@ import { act, Simulate } from 'react-dom/test-utils';
+  * WordPress dependencies
+  */
+ import { useState } from '@wordpress/element';
+-import { UP, DOWN } from '@wordpress/keycodes';
++import { UP, DOWN, ENTER } from '@wordpress/keycodes';
+ 
+ /**
+  * Internal dependencies
+@@ -62,14 +62,14 @@ describe( 'NumberControl', () => {
+ 				render( <NumberControl className="hello" />, container );
+ 			} );
+ 
+-			const input = getInput();
++			const input = container.querySelector( '.hello' );
+ 
+-			expect( input.classList.contains( 'hello' ) ).toBe( true );
++			expect( input ).toBeTruthy();
+ 		} );
+ 	} );
+ 
+ 	describe( 'onChange handling', () => {
+-		it( 'should provide onChange callback with string value', () => {
++		it( 'should provide onChange callback with number value', () => {
+ 			const spy = jest.fn();
+ 			act( () => {
+ 				render(
+@@ -81,9 +81,55 @@ describe( 'NumberControl', () => {
+ 			const input = getInput();
+ 
+ 			input.value = 10;
+-			Simulate.change( input );
+ 
+-			expect( spy.mock.calls[ 0 ][ 0 ] ).toBe( '10' );
++			act( () => {
++				Simulate.change( input );
++			} );
++
++			const changeValue = spy.mock.calls[ 0 ][ 0 ];
++
++			expect( changeValue ).toBe( '10' );
++		} );
++	} );
++
++	describe( 'Validation', () => {
++		it( 'should clamp value within range on ENTER keypress', () => {
++			act( () => {
++				render(
++					<NumberControl value={ 5 } min={ 0 } max={ 10 } />,
++					container
++				);
++			} );
++
++			const input = getInput();
++			input.value = -100;
++
++			act( () => {
++				Simulate.change( input );
++				Simulate.keyDown( input, { keyCode: ENTER } );
++			} );
++
++			/**
++			 * This is zero because the value has been adjusted to
++			 * respect the min/max range of the input.
++			 */
++			expect( input.value ).toBe( '0' );
++		} );
++
++		it( 'should parse to number value on ENTER keypress', () => {
++			act( () => {
++				render( <NumberControl value={ 5 } />, container );
++			} );
++
++			const input = getInput();
++			input.value = '10 abc';
++
++			act( () => {
++				Simulate.change( input );
++				Simulate.keyDown( input, { keyCode: ENTER } );
++			} );
++
++			expect( input.value ).toBe( '0' );
+ 		} );
+ 	} );
+ 
+@@ -99,7 +145,9 @@ describe( 'NumberControl', () => {
+ 
+ 			const input = getInput();
+ 
+-			Simulate.keyDown( input, { keyCode: UP } );
++			act( () => {
++				Simulate.keyDown( input, { keyCode: UP } );
++			} );
+ 
+ 			expect( spy ).toHaveBeenCalled();
+ 		} );
+@@ -111,7 +159,9 @@ describe( 'NumberControl', () => {
+ 
+ 			const input = getInput();
+ 
+-			Simulate.keyDown( input, { keyCode: UP } );
++			act( () => {
++				Simulate.keyDown( input, { keyCode: UP } );
++			} );
+ 
+ 			expect( input.value ).toBe( '6' );
+ 		} );
+@@ -123,21 +173,28 @@ describe( 'NumberControl', () => {
+ 
+ 			const input = getInput();
+ 
+-			Simulate.keyDown( input, { keyCode: UP } );
++			act( () => {
++				Simulate.keyDown( input, { keyCode: UP } );
++			} );
+ 
+ 			expect( input.value ).toBe( '-4' );
+ 		} );
+ 
+ 		it( 'should increment by shiftStep on key UP + shift press', () => {
+ 			act( () => {
+-				render( <StatefulNumberControl value={ 5 } />, container );
++				render(
++					<StatefulNumberControl value={ 5 } shiftStep={ 10 } />,
++					container
++				);
+ 			} );
+ 
+ 			const input = getInput();
+ 
+-			Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
++			act( () => {
++				Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
++			} );
+ 
+-			expect( input.value ).toBe( '15' );
++			expect( input.value ).toBe( '20' );
+ 		} );
+ 
+ 		it( 'should increment by custom shiftStep on key UP + shift press', () => {
+@@ -150,9 +207,11 @@ describe( 'NumberControl', () => {
+ 
+ 			const input = getInput();
+ 
+-			Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
++			act( () => {
++				Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
++			} );
+ 
+-			expect( input.value ).toBe( '105' );
++			expect( input.value ).toBe( '100' );
+ 		} );
+ 
+ 		it( 'should increment but be limited by max on shiftStep', () => {
+@@ -169,7 +228,9 @@ describe( 'NumberControl', () => {
+ 
+ 			const input = getInput();
+ 
+-			Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
++			act( () => {
++				Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
++			} );
+ 
+ 			expect( input.value ).toBe( '99' );
+ 		} );
+@@ -188,7 +249,9 @@ describe( 'NumberControl', () => {
+ 
+ 			const input = getInput();
+ 
+-			Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
++			act( () => {
++				Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
++			} );
+ 
+ 			expect( input.value ).toBe( '6' );
+ 		} );
+@@ -206,7 +269,9 @@ describe( 'NumberControl', () => {
+ 
+ 			const input = getInput();
+ 
+-			Simulate.keyDown( input, { keyCode: DOWN } );
++			act( () => {
++				Simulate.keyDown( input, { keyCode: DOWN } );
++			} );
+ 
+ 			expect( spy ).toHaveBeenCalled();
+ 		} );
+@@ -218,7 +283,9 @@ describe( 'NumberControl', () => {
+ 
+ 			const input = getInput();
+ 
+-			Simulate.keyDown( input, { keyCode: DOWN } );
++			act( () => {
++				Simulate.keyDown( input, { keyCode: DOWN } );
++			} );
+ 
+ 			expect( input.value ).toBe( '4' );
+ 		} );
+@@ -230,7 +297,9 @@ describe( 'NumberControl', () => {
+ 
+ 			const input = getInput();
+ 
+-			Simulate.keyDown( input, { keyCode: DOWN } );
++			act( () => {
++				Simulate.keyDown( input, { keyCode: DOWN } );
++			} );
+ 
+ 			expect( input.value ).toBe( '-6' );
+ 		} );
+@@ -242,9 +311,11 @@ describe( 'NumberControl', () => {
+ 
+ 			const input = getInput();
+ 
+-			Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
++			act( () => {
++				Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
++			} );
+ 
+-			expect( input.value ).toBe( '-5' );
++			expect( input.value ).toBe( '0' );
+ 		} );
+ 
+ 		it( 'should decrement by custom shiftStep on key DOWN + shift press', () => {
+@@ -257,9 +328,11 @@ describe( 'NumberControl', () => {
+ 
+ 			const input = getInput();
+ 
+-			Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
++			act( () => {
++				Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
++			} );
+ 
+-			expect( input.value ).toBe( '-95' );
++			expect( input.value ).toBe( '-100' );
+ 		} );
+ 
+ 		it( 'should decrement but be limited by min on shiftStep', () => {
+@@ -276,7 +349,9 @@ describe( 'NumberControl', () => {
+ 
+ 			const input = getInput();
+ 
+-			Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
++			act( () => {
++				Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
++			} );
+ 
+ 			expect( input.value ).toBe( '4' );
+ 		} );
+@@ -295,7 +370,9 @@ describe( 'NumberControl', () => {
+ 
+ 			const input = getInput();
+ 
+-			Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
++			act( () => {
++				Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
++			} );
+ 
+ 			expect( input.value ).toBe( '4' );
+ 		} );
+diff --git a/packages/components/src/number-control/utils.js b/packages/components/src/number-control/utils.js
+new file mode 100644
+index 00000000000000..5c736ea37ca03b
+--- /dev/null
++++ b/packages/components/src/number-control/utils.js
+@@ -0,0 +1,88 @@
++/**
++ * External dependencies
++ */
++import { clamp } from 'lodash';
++
++/**
++ * Parses and retrieves a number value.
++ *
++ * @param {any} value The incoming value.
++ * @return {number} The parsed number value.
++ */
++function getNumberValue( value ) {
++	const number = Number( value );
++
++	return isNaN( number ) ? 0 : number;
++}
++
++/**
++ * Parses a value to safely store value state.
++ *
++ * @param {any} value The incoming value.
++ * @return {number} The parsed number value.
++ */
++export function getValue( value ) {
++	const parsedValue = parseFloat( value );
++
++	return isNaN( parsedValue ) ? value : parsedValue;
++}
++
++/**
++ * Safely adds 2 values.
++ *
++ * @param {any} a First value.
++ * @param {any} b Second value.
++ * @return {number} The sum of the 2 values.
++ */
++export function add( a, b ) {
++	return getNumberValue( a ) + getNumberValue( b );
++}
++
++/**
++ * Safely subtracts 2 values.
++ *
++ * @param {any} a First value.
++ * @param {any} b Second value.
++ * @return {number} The difference of the 2 values.
++ */
++export function subtract( a, b ) {
++	return getNumberValue( a ) - getNumberValue( b );
++}
++
++/**
++ * Clamps a value based on a min/max range with rounding
++ *
++ * @param {number} value The value.
++ * @param {number} min The minimum range.
++ * @param {number} max The maximum range.
++ * @param {number} step A multiplier for the value.
++ * @return {number} The rounded and clamped value.
++ */
++export function roundClamp(
++	value = 0,
++	min = Infinity,
++	max = Infinity,
++	step = 1
++) {
++	const baseValue = getNumberValue( value );
++	const stepValue = getNumberValue( step );
++	const rounded = Math.round( baseValue / stepValue ) * stepValue;
++	const clampedValue = clamp( rounded, min, max );
++
++	return clampedValue;
++}
++
++/**
++ * Clamps a value based on a min/max range with rounding.
++ * Returns a string.
++ *
++ * @param {any} args Arguments for roundClamp().
++ * @property {number} value The value.
++ * @property {number} min The minimum range.
++ * @property {number} max The maximum range.
++ * @property {number} step A multiplier for the value.
++ * @return {string} The rounded and clamped value.
++ */
++export function roundClampString( ...args ) {
++	return roundClamp( ...args ).toString();
++}
+diff --git a/packages/components/src/unit-control/README.md b/packages/components/src/unit-control/README.md
+index 79100d9cfe4fcb..b442a5ef25139f 100644
+--- a/packages/components/src/unit-control/README.md
++++ b/packages/components/src/unit-control/README.md
+@@ -9,29 +9,85 @@ import { __experimentalUnitControl as UnitControl } from '@wordpress/components'
+ import { useState } from '@wordpress/element';
+ 
+ const Example = () => {
+-	const [value, setValue] = useState(10);
+-	const [unit, setUnit] = useState('px');
+-
+-	return (
+-		<UnitControl
+-			onChange={ setValue }
+-			onUnitChange={ setUnit }
+-			unit={ unit }
+-			value={ value}
+-		/>
+-	)
++	const [ value, setValue ] = useState( '10px' );
++
++	return <UnitControl onChange={ setValue } value={ value } />;
+ };
+ ```
+ 
+ ## Props
+ 
+-Name | Type | Default | Description
+---- | --- | --- | ---
+-`isUnitSelectTabbable` | `boolean` | `true` | Determines if the unit `<select>` is tabbable.
+-`label` | `string` | | Aria label for the control.
+-`onChange` | `Function` | `noop` | Callback when the `value` changes.
+-`onUnitChange` | `Function` | `noop` | Callback when the `unit` changes.
+-`size` | `string` | `default` | Determines the height of the control.
+-`unit` | `string` | `px` | Current unit value.
+-`units` | `Array<string>` | | Collection of available units.
+-`value` | `number` |  | Current number value.
+\ No newline at end of file
++### disabledUnits
++
++If true, the unit `<select>` is hidden.
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `false`
++
++### isUnitSelectTabbable
++
++Determines if the unit `<select>` is tabbable.
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `true`
++
++### onChange
++
++Callback when the `value` changes.
++
++-   Type: `Function`
++-   Required: No
++-   Default: `noop`
++
++### onUnitChange
++
++Callback when the `unit` changes.
++
++-   Type: `Function`
++-   Required: No
++-   Default: `noop`
++
++### size
++
++Adjusts the size of the input.
++Sizes include: `default`, `small`
++
++-   Type: `String`
++-   Required: No
++-   Default: `default`
++
++### unit
++
++Deprecated: Current unit value.
++Instead, provide a unit with a value through the `value` prop.
++
++Example:
++
++```jsx
++<UnitControl value="50%" />
++```
++
++-   Type: `String`
++-   Required: No
++
++### units
++
++Collection of available units.
++
++-   Type: `Array<Object>`
++-   Required: No
++
++### value
++
++Current value. To set a unit, provide a unit with a value through the `value` prop.
++
++Example:
++
++```jsx
++<UnitControl value="50%" />
++```
++
++-   Type: `Number`|`String`
++-   Required: No
+diff --git a/packages/components/src/unit-control/index.js b/packages/components/src/unit-control/index.js
+index 7276b10141a55f..39137c6c132a7a 100644
+--- a/packages/components/src/unit-control/index.js
++++ b/packages/components/src/unit-control/index.js
+@@ -1,61 +1,161 @@
+ /**
+  * External dependencies
+  */
+-import { isUndefined, noop } from 'lodash';
++import { noop } from 'lodash';
+ import classnames from 'classnames';
++
++/**
++ * WordPress dependencies
++ */
++import { useState, forwardRef } from '@wordpress/element';
++
+ /**
+  * Internal dependencies
+  */
++import {
++	inputControlActionTypes,
++	composeStateReducers,
++} from '../input-control/state';
+ import { Root, ValueInput } from './styles/unit-control-styles';
+ import UnitSelectControl from './unit-select-control';
+-import { CSS_UNITS } from './utils';
+-
+-export default function UnitControl( {
+-	className,
+-	isUnitSelectTabbable = true,
+-	isResetValueOnUnitChange = true,
+-	label,
+-	onChange = noop,
+-	onUnitChange = noop,
+-	size = 'default',
+-	style,
+-	unit = 'px',
+-	units = CSS_UNITS,
+-	value,
+-	...props
+-} ) {
+-	const handleOnUnitChange = ( unitValue, changeProps ) => {
++import { CSS_UNITS, getParsedValue, getValidParsedUnit } from './utils';
++
++function UnitControl(
++	{
++		__unstableStateReducer: stateReducer = ( state ) => state,
++		autoComplete = 'off',
++		className,
++		disabled = false,
++		disableUnits = false,
++		isPressEnterToChange = false,
++		isResetValueOnUnitChange = false,
++		isUnitSelectTabbable = false,
++		label,
++		onChange = noop,
++		onUnitChange = noop,
++		size = 'default',
++		style,
++		unit: unitProp,
++		units = CSS_UNITS,
++		value: valueProp,
++		...props
++	},
++	ref
++) {
++	const [ value, initialUnit ] = getParsedValue( valueProp, unitProp, units );
++	const [ unit, setUnit ] = useState( initialUnit );
++
++	const classes = classnames( 'components-unit-control', className );
++
++	const handleOnChange = ( next, changeProps ) => {
++		/**
++		 * Customizing the onChange callback.
++		 * This allows as to broadcast a combined value+unit to onChange.
++		 */
++		const [ parsedValue, parsedUnit ] = getValidParsedUnit(
++			next,
++			units,
++			value,
++			unit
++		);
++		const nextValue = `${ parsedValue }${ parsedUnit }`;
++
++		onChange( nextValue, changeProps );
++	};
++
++	const handleOnUnitChange = ( next, changeProps ) => {
+ 		const { data } = changeProps;
+-		onUnitChange( unitValue, changeProps );
+ 
+-		if ( isResetValueOnUnitChange && ! isUndefined( data.default ) ) {
+-			onChange( data.default, changeProps );
++		let nextValue = `${ value }${ next }`;
++
++		if ( isResetValueOnUnitChange && data?.default !== undefined ) {
++			nextValue = `${ data.default }${ next }`;
++		}
++
++		onChange( nextValue, changeProps );
++		onUnitChange( next, changeProps );
++
++		setUnit( next );
++	};
++
++	/**
++	 * "Middleware" function that intercepts updates from InputControl.
++	 * This allows us to tap into actions to transform the (next) state for
++	 * InputControl.
++	 *
++	 * @param {Object} state State from InputControl
++	 * @param {Object} action Action triggering state change
++	 * @return {Object} The updated state to apply to InputControl
++	 */
++	const unitControlStateReducer = ( state, action ) => {
++		const { type, payload } = action;
++		const event = payload?.event;
++
++		/**
++		 * Customizes the commit interaction.
++		 *
++		 * This occurs when pressing ENTER to fire a change.
++		 * By intercepting the state change, we can parse the incoming
++		 * value to determine if the unit needs to be updated.
++		 */
++		if ( type === inputControlActionTypes.COMMIT ) {
++			const valueToParse = event?.target?.value;
++
++			const [ parsedValue, parsedUnit ] = getValidParsedUnit(
++				valueToParse,
++				units,
++				value,
++				unit
++			);
++
++			state.value = parsedValue;
++
++			// Update unit if the incoming parsed unit is different.
++			if ( unit !== parsedUnit ) {
++				handleOnUnitChange( parsedUnit, { event } );
++			}
+ 		}
++
++		return state;
+ 	};
+ 
+-	const classes = classnames( 'component-unit-control', className );
++	const inputSuffix = ! disableUnits ? (
++		<UnitSelectControl
++			disabled={ disabled }
++			isTabbable={ isUnitSelectTabbable }
++			options={ units }
++			onChange={ handleOnUnitChange }
++			size={ size }
++			value={ unit }
++		/>
++	) : null;
+ 
+ 	return (
+-		<Root className={ classes } style={ style }>
++		<Root className="components-unit-control-wrapper" style={ style }>
+ 			<ValueInput
+ 				aria-label={ label }
++				type={ isPressEnterToChange ? 'text' : 'number' }
+ 				{ ...props }
+-				className="component-unit-control__input"
+-				value={ value }
+-				onChange={ onChange }
+-				size={ size }
+-				type="number"
+-			/>
+-			<UnitSelectControl
+-				className="component-unit-control__select"
+-				isTabbable={ isUnitSelectTabbable }
+-				options={ units }
+-				onChange={ handleOnUnitChange }
++				autoComplete={ autoComplete }
++				className={ classes }
++				disabled={ disabled }
++				disableUnits={ disableUnits }
++				isPressEnterToChange={ isPressEnterToChange }
++				label={ label }
++				onChange={ handleOnChange }
++				ref={ ref }
+ 				size={ size }
+-				value={ unit }
++				suffix={ inputSuffix }
++				value={ value }
++				__unstableStateReducer={ composeStateReducers(
++					unitControlStateReducer,
++					stateReducer
++				) }
+ 			/>
+ 		</Root>
+ 	);
+ }
+ 
+-UnitControl.__defaultUnits = CSS_UNITS;
++const ForwardedUnitControl = forwardRef( UnitControl );
++
++export default ForwardedUnitControl;
+diff --git a/packages/components/src/unit-control/stories/index.js b/packages/components/src/unit-control/stories/index.js
+index bf5680c6ae630f..ce6b05776064ee 100644
+--- a/packages/components/src/unit-control/stories/index.js
++++ b/packages/components/src/unit-control/stories/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { boolean, number, select } from '@storybook/addon-knobs';
++import { boolean, number, select, text } from '@storybook/addon-knobs';
+ import styled from '@emotion/styled';
+ 
+ /**
+@@ -20,12 +20,18 @@ export default {
+ };
+ 
+ function Example() {
+-	const [ value, setValue ] = useState( '' );
+-	const [ unit, setUnit ] = useState( 'px' );
++	const [ value, setValue ] = useState( '10px' );
+ 
+ 	const props = {
++		disableUnits: boolean( 'disableUnits', false ),
++		hideLabelFromVision: boolean( 'hideLabelFromVision', false ),
++		isFloatingLabel: boolean( 'isFloatingLabel', false ),
++		isPressEnterToChange: boolean( 'isPressEnterToChange', true ),
+ 		isShiftStepEnabled: boolean( 'isShiftStepEnabled', true ),
+ 		isUnitSelectTabbable: boolean( 'isUnitSelectTabbable', true ),
++		label: text( 'label', 'Value' ),
++		min: number( 'min', 0 ),
++		max: number( 'max', 100 ),
+ 		shiftStep: number( 'shiftStep', 10 ),
+ 		size: select(
+ 			'size',
+@@ -43,9 +49,7 @@ function Example() {
+ 			<UnitControl
+ 				{ ...props }
+ 				value={ value }
+-				onChange={ setValue }
+-				unit={ unit }
+-				onUnitChange={ setUnit }
++				onChange={ ( v ) => setValue( v ) }
+ 			/>
+ 		</ControlWrapperView>
+ 	);
+diff --git a/packages/components/src/unit-control/styles/unit-control-styles.js b/packages/components/src/unit-control/styles/unit-control-styles.js
+index eb17bdf1d87fb8..642cdb9793edb4 100644
+--- a/packages/components/src/unit-control/styles/unit-control-styles.js
++++ b/packages/components/src/unit-control/styles/unit-control-styles.js
+@@ -14,40 +14,24 @@ export const Root = styled.div`
+ 	position: relative;
+ `;
+ 
+-const fontSizeStyles = ( { size } ) => {
+-	const sizes = {
+-		default: null,
+-		small: '11px',
+-	};
+-
+-	const fontSize = sizes[ size ];
+-
+-	if ( ! fontSize ) return '';
++const paddingStyles = ( { disableUnits } ) => {
++	const value = disableUnits ? 3 : 24;
+ 
+ 	return css`
+-		@media ( min-width: 600px ) {
+-			font-size: ${fontSize};
+-		}
++		${rtl( { paddingRight: value } )()};
+ 	`;
+ };
+ 
+-const sizeStyles = ( { size } ) => {
+-	const sizes = {
+-		default: {
+-			height: 30,
+-			lineHeight: 30,
+-			minHeight: 30,
+-		},
+-		small: {
+-			height: 24,
+-			lineHeight: 24,
+-			minHeight: 24,
+-		},
+-	};
++const arrowStyles = ( { disableUnits } ) => {
++	if ( disableUnits ) return '';
+ 
+-	const style = sizes[ size ] || sizes.default;
+-
+-	return css( style );
++	return css`
++		&::-webkit-outer-spin-button,
++		&::-webkit-inner-spin-button {
++			-webkit-appearance: none;
++			margin: 0;
++		}
++	`;
+ };
+ 
+ // TODO: Resolve need to use &&& to increase specificity
+@@ -55,38 +39,29 @@ const sizeStyles = ( { size } ) => {
+ 
+ export const ValueInput = styled( NumberControl )`
+ 	&&& {
+-		appearance: none;
+-		-moz-appearance: textfield;
+-		box-sizing: border-box;
+-		border: 1px solid ${color( 'ui.border' )};
+-		border-radius: 2px;
+-		padding: 3px 8px;
+-		display: block;
+-		width: 100%;
+-
+-		&::-webkit-outer-spin-button,
+-		&::-webkit-inner-spin-button {
+-			-webkit-appearance: none;
+-			margin: 0;
++		input {
++			appearance: none;
++			-moz-appearance: textfield;
++			display: block;
++			width: 100%;
++
++			${arrowStyles};
++			${paddingStyles};
+ 		}
+-
+-		${rtl( { paddingRight: 20 } )}
+-		${fontSizeStyles};
+-		${sizeStyles};
+ 	}
+ `;
+ 
+ const unitSizeStyles = ( { size } ) => {
+ 	const sizes = {
+ 		default: {
+-			top: 5,
+-			height: 20,
+-			minHeight: 20,
++			top: 1,
++			height: 28,
++			minHeight: 28,
+ 		},
+ 		small: {
+-			top: 4,
+-			height: 16,
+-			minHeight: 16,
++			top: 1,
++			height: 22,
++			minHeight: 22,
+ 		},
+ 	};
+ 
+@@ -96,25 +71,25 @@ const unitSizeStyles = ( { size } ) => {
+ const baseUnitLabelStyles = ( props ) => {
+ 	return css`
+ 		appearance: none;
+-		background: ${color( 'ui.background' )};
++		background: transparent;
+ 		border-radius: 2px;
+ 		border: none;
+ 		box-sizing: border-box;
+-		color: ${color( 'darkGray.500' )};
++		color: ${ color( 'darkGray.500' ) };
+ 		display: block;
+ 		font-size: 8px;
+ 		line-height: 1;
+ 		letter-spacing: -0.5px;
+ 		outline: none;
+-		padding: 2px 2px;
++		padding: 2px 1px;
+ 		position: absolute;
+ 		text-align-last: center;
+ 		text-transform: uppercase;
+-		width: 22px;
+-		z-index: 1;
++		width: 20px;
+ 
+-		${rtl( { right: 4 } )()}
+-		${unitSizeStyles( props )}
++		${ rtl( { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } )() }
++		${ rtl( { right: 0 } )() }
++		${ unitSizeStyles( props ) }
+ 	`;
+ };
+ 
+@@ -129,6 +104,8 @@ const unitLabelPaddingStyles = ( { size } ) => {
+ 
+ export const UnitLabel = styled.div`
+ 	&&& {
++		pointer-events: none;
++
+ 		${baseUnitLabelStyles};
+ 		${unitLabelPaddingStyles};
+ 	}
+@@ -149,5 +126,13 @@ export const UnitSelect = styled.select`
+ 			outline: 2px solid transparent;
+ 			outline-offset: 0;
+ 		}
++
++		&:disabled {
++			cursor: initial;
++
++			&:hover {
++				background-color: transparent;
++			}
++		}
+ 	}
+ `;
+diff --git a/packages/components/src/unit-control/test/index.js b/packages/components/src/unit-control/test/index.js
+index 32bad94884076d..c6b0431c968474 100644
+--- a/packages/components/src/unit-control/test/index.js
++++ b/packages/components/src/unit-control/test/index.js
+@@ -27,11 +27,12 @@ afterEach( () => {
+ 	container = null;
+ } );
+ 
+-const getComponent = () => container.querySelector( '.component-unit-control' );
++const getComponent = () =>
++	container.querySelector( '.components-unit-control' );
+ const getInput = () =>
+-	container.querySelector( '.component-unit-control__input' );
++	container.querySelector( '.components-unit-control input' );
+ const getSelect = () =>
+-	container.querySelector( '.component-unit-control__select' );
++	container.querySelector( '.components-unit-control select' );
+ 
+ describe( 'UnitControl', () => {
+ 	describe( 'Basic rendering', () => {
+@@ -86,7 +87,7 @@ describe( 'UnitControl', () => {
+ 				Simulate.change( input, { target: { value: 62 } } );
+ 			} );
+ 
+-			expect( state ).toBe( 62 );
++			expect( state ).toBe( '62px' );
+ 		} );
+ 
+ 		it( 'should increment value on UP press', () => {
+@@ -106,7 +107,7 @@ describe( 'UnitControl', () => {
+ 				Simulate.keyDown( input, { keyCode: UP } );
+ 			} );
+ 
+-			expect( state ).toBe( '51' );
++			expect( state ).toBe( '51px' );
+ 		} );
+ 
+ 		it( 'should increment value on UP + SHIFT press, with step', () => {
+@@ -126,7 +127,7 @@ describe( 'UnitControl', () => {
+ 				Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
+ 			} );
+ 
+-			expect( state ).toBe( '60' );
++			expect( state ).toBe( '60px' );
+ 		} );
+ 
+ 		it( 'should decrement value on DOWN press', () => {
+@@ -146,7 +147,7 @@ describe( 'UnitControl', () => {
+ 				Simulate.keyDown( input, { keyCode: DOWN } );
+ 			} );
+ 
+-			expect( state ).toBe( '49' );
++			expect( state ).toBe( '49px' );
+ 		} );
+ 
+ 		it( 'should decrement value on DOWN + SHIFT press, with step', () => {
+@@ -166,7 +167,7 @@ describe( 'UnitControl', () => {
+ 				Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
+ 			} );
+ 
+-			expect( state ).toBe( '40' );
++			expect( state ).toBe( '40px' );
+ 		} );
+ 	} );
+ 
+@@ -222,6 +223,7 @@ describe( 'UnitControl', () => {
+ 			act( () => {
+ 				render(
+ 					<UnitControl
++						isResetValueOnUnitChange
+ 						units={ units }
+ 						onChange={ setState }
+ 						value={ state }
+@@ -236,13 +238,13 @@ describe( 'UnitControl', () => {
+ 				Simulate.change( select, { target: { value: 'vmax' } } );
+ 			} );
+ 
+-			expect( state ).toBe( 75 );
++			expect( state ).toBe( '75vmax' );
+ 
+ 			act( () => {
+ 				Simulate.change( select, { target: { value: 'pt' } } );
+ 			} );
+ 
+-			expect( state ).toBe( 25 );
++			expect( state ).toBe( '25pt' );
+ 		} );
+ 
+ 		it( 'should not reset value on unit change, if disabled', () => {
+@@ -271,13 +273,104 @@ describe( 'UnitControl', () => {
+ 				Simulate.change( select, { target: { value: 'vmax' } } );
+ 			} );
+ 
+-			expect( state ).toBe( 50 );
++			expect( state ).toBe( '50vmax' );
+ 
+ 			act( () => {
+ 				Simulate.change( select, { target: { value: 'pt' } } );
+ 			} );
+ 
+-			expect( state ).toBe( 50 );
++			expect( state ).toBe( '50pt' );
++		} );
++	} );
++	describe( 'Unit Parser', () => {
++		let state = '10px';
++		const setState = ( nextState ) => ( state = nextState );
++
++		it( 'should parse unit from input', () => {
++			act( () => {
++				render(
++					<UnitControl value={ state } onChange={ setState } />,
++					container
++				);
++			} );
++
++			const input = getInput();
++
++			act( () => {
++				Simulate.change( input, { target: { value: '55 em' } } );
++			} );
++
++			expect( state ).toBe( '55em' );
++		} );
++
++		it( 'should parse PX unit from input', () => {
++			act( () => {
++				render(
++					<UnitControl value={ state } onChange={ setState } />,
++					container
++				);
++			} );
++
++			const input = getInput();
++
++			act( () => {
++				Simulate.change( input, { target: { value: '61   PX' } } );
++			} );
++
++			expect( state ).toBe( '61px' );
++		} );
++
++		it( 'should parse EM unit from input', () => {
++			act( () => {
++				render(
++					<UnitControl value={ state } onChange={ setState } />,
++					container
++				);
++			} );
++
++			const input = getInput();
++
++			act( () => {
++				Simulate.change( input, { target: { value: '55 em' } } );
++			} );
++
++			expect( state ).toBe( '55em' );
++		} );
++
++		it( 'should parse % unit from input', () => {
++			act( () => {
++				render(
++					<UnitControl value={ state } onChange={ setState } />,
++					container
++				);
++			} );
++
++			const input = getInput();
++
++			act( () => {
++				Simulate.change( input, { target: { value: '-10  %' } } );
++			} );
++
++			expect( state ).toBe( '-10%' );
++		} );
++
++		it( 'should parse REM unit from input', () => {
++			act( () => {
++				render(
++					<UnitControl value={ state } onChange={ setState } />,
++					container
++				);
++			} );
++
++			const input = getInput();
++
++			act( () => {
++				Simulate.change( input, {
++					target: { value: '123       rEm  ' },
++				} );
++			} );
++
++			expect( state ).toBe( '123rem' );
+ 		} );
+ 	} );
+ } );
+diff --git a/packages/components/src/unit-control/unit-select-control.js b/packages/components/src/unit-control/unit-select-control.js
+index 6844b5c959963a..a0dc2211e53c78 100644
+--- a/packages/components/src/unit-control/unit-select-control.js
++++ b/packages/components/src/unit-control/unit-select-control.js
+@@ -1,14 +1,14 @@
+ /**
+  * External dependencies
+  */
+-import { noop, isEmpty } from 'lodash';
++import { noop } from 'lodash';
+ import classnames from 'classnames';
+ 
+ /**
+  * Internal dependencies
+  */
+ import { UnitSelect, UnitLabel } from './styles/unit-control-styles';
+-import { CSS_UNITS } from './utils';
++import { CSS_UNITS, hasUnits } from './utils';
+ 
+ /**
+  * Renders a `select` if there are multiple units.
+@@ -23,8 +23,15 @@ export default function UnitSelectControl( {
+ 	value = 'px',
+ 	...props
+ } ) {
+-	if ( isEmpty( options ) || options.length === 1 || options === false ) {
+-		return <UnitLabel size={ size }>{ value }</UnitLabel>;
++	if ( ! hasUnits( options ) ) {
++		return (
++			<UnitLabel
++				className="components-unit-control__unit-label"
++				size={ size }
++			>
++				{ value }
++			</UnitLabel>
++		);
+ 	}
+ 
+ 	const handleOnChange = ( event ) => {
+@@ -34,7 +41,7 @@ export default function UnitSelectControl( {
+ 		onChange( unitValue, { event, data } );
+ 	};
+ 
+-	const classes = classnames( 'component-unit-control__select', className );
++	const classes = classnames( 'components-unit-control__select', className );
+ 
+ 	return (
+ 		<UnitSelect
+diff --git a/packages/components/src/unit-control/utils.js b/packages/components/src/unit-control/utils.js
+index aa886479f27d2a..afe41d9bc39bf4 100644
+--- a/packages/components/src/unit-control/utils.js
++++ b/packages/components/src/unit-control/utils.js
+@@ -1,3 +1,8 @@
++/**
++ * External dependencies
++ */
++import { isEmpty } from 'lodash';
++
+ export const CSS_UNITS = [
+ 	{ value: 'px', label: 'px', default: 0 },
+ 	{ value: '%', label: '%', default: 10 },
+@@ -6,3 +11,91 @@ export const CSS_UNITS = [
+ 	{ value: 'vw', label: 'vw', default: 10 },
+ 	{ value: 'vh', label: 'vh', default: 10 },
+ ];
++
++export const DEFAULT_UNIT = CSS_UNITS[ 0 ];
++
++/**
++ * Handles legacy value + unit handling.
++ * This component use to manage both incoming value and units separately.
++ *
++ * Moving forward, ideally the value should be a string that contains both
++ * the value and unit, example: '10px'
++ *
++ * @param {number|string} value Value
++ * @param {string} unit Unit value
++ * @param {Array<Object>} units Units to derive from.
++ * @return {Array<number, string>} The extracted number and unit.
++ */
++export function getParsedValue( value, unit, units ) {
++	const initialValue = unit ? `${ value }${ unit }` : value;
++
++	return parseUnit( initialValue, units );
++}
++
++/**
++ * Checks if units are defined.
++ *
++ * @param {any} units Units to check.
++ * @return {boolean} Whether units are defined.
++ */
++export function hasUnits( units ) {
++	return ! isEmpty( units ) && units.length > 1 && units !== false;
++}
++
++/**
++ * Parses a number and unit from a value.
++ *
++ * @param {string} initialValue Value to parse
++ * @param {Array<Object>} units Units to derive from.
++ * @return {Array<number, string>} The extracted number and unit.
++ */
++export function parseUnit( initialValue, units = CSS_UNITS ) {
++	const value = String( initialValue ).trim();
++
++	let num = parseFloat( value, 10 );
++	num = isNaN( num ) ? '' : num;
++
++	const unitMatch = value.match( /[\d.\-\+]*\s*(.*)/ )[ 1 ];
++
++	let unit = unitMatch !== undefined ? unitMatch : '';
++	unit = unit.toLowerCase();
++
++	if ( hasUnits( units ) ) {
++		const match = units.find( ( item ) => item.value === unit );
++		unit = match?.value;
++	}
++
++	return [ num, unit ];
++}
++
++/**
++ * Parses a number and unit from a value. Validates parsed value, using fallback
++ * value if invalid.
++ *
++ * @param {number|string} next The next value.
++ * @param {Array<Object>} units Units to derive from.
++ * @param {number|string} fallbackValue The fallback value.
++ * @param {string} fallbackUnit The fallback value.
++ * @return {Array<number, string>} The extracted number and unit.
++ */
++export function getValidParsedUnit( next, units, fallbackValue, fallbackUnit ) {
++	const [ parsedValue, parsedUnit ] = parseUnit( next, units );
++	let baseValue = parsedValue;
++	let baseUnit;
++
++	if ( isNaN( parsedValue ) || parsedValue === '' ) {
++		baseValue = fallbackValue;
++	}
++
++	baseUnit = parsedUnit || fallbackUnit;
++
++	/**
++	 * If no unit is found, attempt to use the first value from the collection
++	 * of units as a default fallback.
++	 */
++	if ( hasUnits( units ) && ! baseUnit ) {
++		baseUnit = units[ 0 ]?.value;
++	}
++
++	return [ baseValue, baseUnit ];
++}
+diff --git a/packages/components/src/utils/colors-values.js b/packages/components/src/utils/colors-values.js
+index 7e152a4263cc8f..f765d119bbfe03 100644
+--- a/packages/components/src/utils/colors-values.js
++++ b/packages/components/src/utils/colors-values.js
+@@ -136,8 +136,14 @@ export const ALERT = {
+ // Namespaced values for raw colors hex codes
+ export const UI = {
+ 	background: BASE.white,
++	backgroundDisabled: LIGHT_GRAY[ 200 ],
++	brand: BLUE.wordpress[ 700 ],
+ 	border: BASE.black,
+ 	borderFocus: BLUE.medium.focus,
++	borderDisabled: DARK_GRAY[ 700 ],
++	borderLight: LIGHT_GRAY[ 600 ],
++	label: DARK_GRAY[ 500 ],
++	textDisabled: DARK_GRAY[ 150 ],
+ };
+ 
+ export const COLORS = {
+diff --git a/packages/components/src/utils/style-mixins.js b/packages/components/src/utils/style-mixins.js
+index 26344df68a9d95..9480d6fa878f63 100644
+--- a/packages/components/src/utils/style-mixins.js
++++ b/packages/components/src/utils/style-mixins.js
+@@ -1,3 +1,3 @@
+ export { color, rgba } from './colors';
+ export { reduceMotion } from './reduce-motion';
+-export { rtl } from './rtl';
++export { rtl, getRTL, useRTL } from './rtl';

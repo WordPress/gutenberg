@@ -1,0 +1,856 @@
+diff --git a/packages/components/src/custom-gradient-picker/constants.js b/packages/components/src/custom-gradient-picker/constants.js
+index 4a2c509753b363..bb5f826f5ccd44 100644
+--- a/packages/components/src/custom-gradient-picker/constants.js
++++ b/packages/components/src/custom-gradient-picker/constants.js
+@@ -11,3 +11,8 @@ export const COLOR_POPOVER_PROPS = {
+ 	className: 'components-custom-gradient-picker__color-picker-popover',
+ 	position: 'top',
+ };
++export const DEFAULT_LINEAR_GRADIENT_ANGLE = 180;
++export const HORIZONTAL_GRADIENT_ORIENTATION = {
++	type: 'angular',
++	value: 90,
++};
+diff --git a/packages/components/src/custom-gradient-picker/custom-gradient-bar.js b/packages/components/src/custom-gradient-picker/custom-gradient-bar.js
+new file mode 100644
+index 00000000000000..9b7a1a6527ada0
+--- /dev/null
++++ b/packages/components/src/custom-gradient-picker/custom-gradient-bar.js
+@@ -0,0 +1,258 @@
++/**
++ * External dependencies
++ */
++
++import { some } from 'lodash';
++import classnames from 'classnames';
++
++/**
++ * WordPress dependencies
++ */
++import { useRef, useReducer, useState } from '@wordpress/element';
++import { plusCircle } from '@wordpress/icons';
++
++/**
++ * Internal dependencies
++ */
++import Button from '../button';
++import ColorPicker from '../color-picker';
++import Dropdown from '../dropdown';
++import ControlPoints from './control-points';
++import {
++	INSERT_POINT_WIDTH,
++	COLOR_POPOVER_PROPS,
++	MINIMUM_DISTANCE_BETWEEN_POINTS,
++} from './constants';
++import { serializeGradient } from './serializer';
++import {
++	getGradientWithColorAtPositionChanged,
++	getGradientWithColorStopAdded,
++	getHorizontalRelativeGradientPosition,
++	getMarkerPoints,
++	getGradientParsed,
++	getLinearGradientRepresentationOfARadial,
++} from './utils';
++
++function InsertPoint( {
++	onChange,
++	gradientAST,
++	onOpenInserter,
++	onCloseInserter,
++	insertPosition,
++} ) {
++	const [ alreadyInsertedPoint, setAlreadyInsertedPoint ] = useState( false );
++	return (
++		<Dropdown
++			className="components-custom-gradient-picker__inserter"
++			onClose={ () => {
++				onCloseInserter();
++			} }
++			renderToggle={ ( { isOpen, onToggle } ) => (
++				<Button
++					aria-expanded={ isOpen }
++					onClick={ () => {
++						setAlreadyInsertedPoint( false );
++						onOpenInserter();
++						onToggle();
++					} }
++					className="components-custom-gradient-picker__insert-point"
++					icon={ plusCircle }
++					style={ {
++						left:
++							insertPosition !== null
++								? `${ insertPosition }%`
++								: undefined,
++					} }
++				/>
++			) }
++			renderContent={ () => (
++				<ColorPicker
++					onChangeComplete={ ( { rgb } ) => {
++						let newGradient;
++						if ( alreadyInsertedPoint ) {
++							newGradient = getGradientWithColorAtPositionChanged(
++								gradientAST,
++								insertPosition,
++								rgb
++							);
++						} else {
++							newGradient = getGradientWithColorStopAdded(
++								gradientAST,
++								insertPosition,
++								rgb
++							);
++							setAlreadyInsertedPoint( true );
++						}
++						onChange( newGradient );
++					} }
++				/>
++			) }
++			popoverProps={ COLOR_POPOVER_PROPS }
++		/>
++	);
++}
++
++function customGradientBarReducer( state, action ) {
++	switch ( action.type ) {
++		case 'MOVE_INSERTER':
++			if ( state.id === 'IDLE' || state.id === 'MOVING_INSERTER' ) {
++				return {
++					id: 'MOVING_INSERTER',
++					insertPosition: action.insertPosition,
++				};
++			}
++			break;
++		case 'STOP_INSERTER_MOVE':
++			if ( state.id === 'MOVING_INSERTER' ) {
++				return {
++					id: 'IDLE',
++				};
++			}
++			break;
++		case 'OPEN_INSERTER':
++			if ( state.id === 'MOVING_INSERTER' ) {
++				return {
++					id: 'INSERTING_CONTROL_POINT',
++					insertPosition: state.insertPosition,
++				};
++			}
++			break;
++		case 'CLOSE_INSERTER':
++			if ( state.id === 'INSERTING_CONTROL_POINT' ) {
++				return {
++					id: 'IDLE',
++				};
++			}
++			break;
++		case 'START_CONTROL_CHANGE':
++			if ( state.id === 'IDLE' ) {
++				return {
++					id: 'MOVING_CONTROL_POINT',
++				};
++			}
++			break;
++		case 'STOP_CONTROL_CHANGE':
++			if ( state.id === 'MOVING_CONTROL_POINT' ) {
++				return {
++					id: 'IDLE',
++				};
++			}
++			break;
++	}
++	return state;
++}
++const customGradientBarReducerInitialState = { id: 'IDLE' };
++
++export default function CustomGradientBar( { value, onChange } ) {
++	const { gradientAST, gradientValue, hasGradient } = getGradientParsed(
++		value
++	);
++
++	const onGradientStructureChange = ( newGradientStructure ) => {
++		onChange( serializeGradient( newGradientStructure ) );
++	};
++
++	const gradientPickerDomRef = useRef();
++	const markerPoints = getMarkerPoints( gradientAST );
++
++	const [ gradientBarState, gradientBarStateDispatch ] = useReducer(
++		customGradientBarReducer,
++		customGradientBarReducerInitialState
++	);
++	const onMouseEnterAndMove = ( event ) => {
++		const insertPosition = getHorizontalRelativeGradientPosition(
++			event.clientX,
++			gradientPickerDomRef.current,
++			INSERT_POINT_WIDTH
++		);
++
++		// If the insert point is close to an existing control point don't show it.
++		if (
++			some( markerPoints, ( { positionValue } ) => {
++				return (
++					Math.abs( insertPosition - positionValue ) <
++					MINIMUM_DISTANCE_BETWEEN_POINTS
++				);
++			} )
++		) {
++			if ( gradientBarState.id === 'MOVING_INSERTER' ) {
++				gradientBarStateDispatch( { type: 'STOP_INSERTER_MOVE' } );
++			}
++			return;
++		}
++
++		gradientBarStateDispatch( { type: 'MOVE_INSERTER', insertPosition } );
++	};
++
++	const onMouseLeave = () => {
++		gradientBarStateDispatch( { type: 'STOP_INSERTER_MOVE' } );
++	};
++
++	const isMovingInserter = gradientBarState.id === 'MOVING_INSERTER';
++	const isInsertingControlPoint =
++		gradientBarState.id === 'INSERTING_CONTROL_POINT';
++
++	return (
++		<div
++			ref={ gradientPickerDomRef }
++			className={ classnames(
++				'components-custom-gradient-picker__gradient-bar',
++				{ 'has-gradient': hasGradient }
++			) }
++			onMouseEnter={ onMouseEnterAndMove }
++			onMouseMove={ onMouseEnterAndMove }
++			// On radial gradients the bar should display a linear gradient.
++			// On radial gradients the bar represents a slice of the gradient from the center until the outside.
++			style={ {
++				background:
++					gradientAST.type === 'radial-gradient'
++						? getLinearGradientRepresentationOfARadial(
++								gradientAST
++						  )
++						: gradientValue,
++			} }
++			onMouseLeave={ onMouseLeave }
++		>
++			<div className="components-custom-gradient-picker__markers-container">
++				{ ( isMovingInserter || isInsertingControlPoint ) && (
++					<InsertPoint
++						insertPosition={ gradientBarState.insertPosition }
++						onChange={ onGradientStructureChange }
++						gradientAST={ gradientAST }
++						onOpenInserter={ () => {
++							gradientBarStateDispatch( {
++								type: 'OPEN_INSERTER',
++							} );
++						} }
++						onCloseInserter={ () => {
++							gradientBarStateDispatch( {
++								type: 'CLOSE_INSERTER',
++							} );
++						} }
++					/>
++				) }
++				<ControlPoints
++					gradientPickerDomRef={ gradientPickerDomRef }
++					ignoreMarkerPosition={
++						isInsertingControlPoint
++							? gradientBarState.insertPosition
++							: undefined
++					}
++					markerPoints={ markerPoints }
++					onChange={ onGradientStructureChange }
++					gradientAST={ gradientAST }
++					onStartControlPointChange={ () => {
++						gradientBarStateDispatch( {
++							type: 'START_CONTROL_CHANGE',
++						} );
++					} }
++					onStopControlPointChange={ () => {
++						gradientBarStateDispatch( {
++							type: 'STOP_CONTROL_CHANGE',
++						} );
++					} }
++				/>
++			</div>
++		</div>
++	);
++}
+diff --git a/packages/components/src/custom-gradient-picker/icons.js b/packages/components/src/custom-gradient-picker/icons.js
+new file mode 100644
+index 00000000000000..c0d2d4f700370e
+--- /dev/null
++++ b/packages/components/src/custom-gradient-picker/icons.js
+@@ -0,0 +1,73 @@
++/**
++ * WordPress dependencies
++ */
++import { withInstanceId } from '@wordpress/compose';
++import {
++	SVG,
++	G,
++	Rect,
++	Defs,
++	RadialGradient,
++	LinearGradient,
++	Stop,
++} from '@wordpress/primitives';
++
++/**
++ * Internal dependencies
++ */
++export const LinearGradientIcon = withInstanceId( ( { instanceId } ) => {
++	const linerGradientId = `linear-gradient-${ instanceId }`;
++	return (
++		<SVG width="20" height="20" xmlns="http://www.w3.org/2000/svg">
++			<Defs>
++				<LinearGradient
++					y2="0"
++					x2="0.5"
++					y1="1"
++					x1="0.5"
++					id={ linerGradientId }
++				>
++					<Stop offset="0" stopColor="#000000" />
++					<Stop offset="1" stopColor="#fff" />
++				</LinearGradient>
++			</Defs>
++			<G>
++				<Rect
++					fill={ `url(#${ linerGradientId })` }
++					height="20"
++					width="20"
++					y="-1"
++					x="-1"
++				/>
++			</G>
++		</SVG>
++	);
++} );
++
++export const RadialGradientIcon = withInstanceId( ( { instanceId } ) => {
++	const radialGradientId = `radial-gradient-${ instanceId }`;
++	return (
++		<SVG width="20" height="20" xmlns="http://www.w3.org/2000/svg">
++			<Defs>
++				<RadialGradient
++					cy="0.5"
++					cx="0.5"
++					spreadMethod="pad"
++					id={ radialGradientId }
++				>
++					<Stop offset="0" stopColor="#fff" />
++					<Stop offset="1" stopColor="#000000" />
++				</RadialGradient>
++			</Defs>
++			<G>
++				<Rect
++					fill={ `url(#${ radialGradientId })` }
++					height="20"
++					width="20"
++					y="-1"
++					x="-1"
++				/>
++			</G>
++		</SVG>
++	);
++} );
+diff --git a/packages/components/src/custom-gradient-picker/index.js b/packages/components/src/custom-gradient-picker/index.js
+index 9fb32453807e0f..03c5756193ca33 100644
+--- a/packages/components/src/custom-gradient-picker/index.js
++++ b/packages/components/src/custom-gradient-picker/index.js
+@@ -1,258 +1,118 @@
+ /**
+  * External dependencies
+  */
+-import gradientParser from 'gradient-parser';
+-import { some } from 'lodash';
+-import classnames from 'classnames';
++import { get, omit } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+  */
+-import { useRef, useReducer, useState } from '@wordpress/element';
+-import { plusCircle } from '@wordpress/icons';
++import { __ } from '@wordpress/i18n';
+ 
+ /**
+  * Internal dependencies
+  */
+-import Button from '../button';
+-import ColorPicker from '../color-picker';
+-import Dropdown from '../dropdown';
+-import ControlPoints from './control-points';
+-import {
+-	DEFAULT_GRADIENT,
+-	INSERT_POINT_WIDTH,
+-	COLOR_POPOVER_PROPS,
+-	MINIMUM_DISTANCE_BETWEEN_POINTS,
+-} from './constants';
++import AnglePicker from '../angle-picker';
++import { LinearGradientIcon, RadialGradientIcon } from './icons';
++import CustomGradientBar from './custom-gradient-bar';
++import BaseControl from '../base-control';
++import { getGradientParsed } from './utils';
+ import { serializeGradient } from './serializer';
++import ToolbarGroup from '../toolbar-group';
+ import {
+-	getGradientWithColorAtPositionChanged,
+-	getGradientWithColorStopAdded,
+-	getHorizontalRelativeGradientPosition,
+-	getMarkerPoints,
+-} from './utils';
++	DEFAULT_LINEAR_GRADIENT_ANGLE,
++	HORIZONTAL_GRADIENT_ORIENTATION,
++} from './constants';
+ 
+-function InsertPoint( {
+-	onChange,
+-	gradientAST,
+-	onOpenInserter,
+-	onCloseInserter,
+-	insertPosition,
+-} ) {
+-	const [ alreadyInsertedPoint, setAlreadyInsertedPoint ] = useState( false );
+-	return (
+-		<Dropdown
+-			className="components-custom-gradient-picker__inserter"
+-			onClose={ () => {
+-				onCloseInserter();
+-			} }
+-			renderToggle={ ( { isOpen, onToggle } ) => (
+-				<Button
+-					aria-expanded={ isOpen }
+-					onClick={ () => {
+-						setAlreadyInsertedPoint( false );
+-						onOpenInserter();
+-						onToggle();
+-					} }
+-					className="components-custom-gradient-picker__insert-point"
+-					icon={ plusCircle }
+-					style={ {
+-						left:
+-							insertPosition !== null
+-								? `${ insertPosition }%`
+-								: undefined,
+-					} }
+-				/>
+-			) }
+-			renderContent={ () => (
+-				<ColorPicker
+-					onChangeComplete={ ( { rgb } ) => {
+-						let newGradient;
+-						if ( alreadyInsertedPoint ) {
+-							newGradient = getGradientWithColorAtPositionChanged(
+-								gradientAST,
+-								insertPosition,
+-								rgb
+-							);
+-						} else {
+-							newGradient = getGradientWithColorStopAdded(
+-								gradientAST,
+-								insertPosition,
+-								rgb
+-							);
+-							setAlreadyInsertedPoint( true );
+-						}
+-						onChange( newGradient );
+-					} }
+-				/>
+-			) }
+-			popoverProps={ COLOR_POPOVER_PROPS }
+-		/>
++const GradientAnglePicker = ( { gradientAST, hasGradient, onChange } ) => {
++	const angle = get(
++		gradientAST,
++		[ 'orientation', 'value' ],
++		DEFAULT_LINEAR_GRADIENT_ANGLE
+ 	);
+-}
+-
+-function customGradientBarReducer( state, action ) {
+-	switch ( action.type ) {
+-		case 'MOVE_INSERTER':
+-			if ( state.id === 'IDLE' || state.id === 'MOVING_INSERTER' ) {
+-				return {
+-					id: 'MOVING_INSERTER',
+-					insertPosition: action.insertPosition,
+-				};
+-			}
+-			break;
+-		case 'STOP_INSERTER_MOVE':
+-			if ( state.id === 'MOVING_INSERTER' ) {
+-				return {
+-					id: 'IDLE',
+-				};
+-			}
+-			break;
+-		case 'OPEN_INSERTER':
+-			if ( state.id === 'MOVING_INSERTER' ) {
+-				return {
+-					id: 'INSERTING_CONTROL_POINT',
+-					insertPosition: state.insertPosition,
+-				};
+-			}
+-			break;
+-		case 'CLOSE_INSERTER':
+-			if ( state.id === 'INSERTING_CONTROL_POINT' ) {
+-				return {
+-					id: 'IDLE',
+-				};
+-			}
+-			break;
+-		case 'START_CONTROL_CHANGE':
+-			if ( state.id === 'IDLE' ) {
+-				return {
+-					id: 'MOVING_CONTROL_POINT',
+-				};
+-			}
+-			break;
+-		case 'STOP_CONTROL_CHANGE':
+-			if ( state.id === 'MOVING_CONTROL_POINT' ) {
+-				return {
+-					id: 'IDLE',
+-				};
+-			}
+-			break;
+-	}
+-	return state;
+-}
+-const customGradientBarReducerInitialState = { id: 'IDLE' };
+-
+-export default function CustomGradientPicker( { value, onChange } ) {
+-	let hasGradient = !! value;
+-	// gradientAST will contain the gradient AST as parsed by gradient-parser npm module.
+-	// More information of its structure available at.
+-	let gradientAST;
+-	let gradientValueUsed;
+-	try {
+-		gradientAST = gradientParser.parse( value || DEFAULT_GRADIENT )[ 0 ];
+-		gradientValueUsed = value || DEFAULT_GRADIENT;
+-	} catch ( error ) {
+-		hasGradient = false;
+-		gradientAST = gradientParser.parse( DEFAULT_GRADIENT )[ 0 ];
+-		gradientValueUsed = DEFAULT_GRADIENT;
+-	}
+-
+-	const onGradientStructureChange = ( newGradientStructure ) => {
+-		onChange( serializeGradient( newGradientStructure ) );
++	const onAngleChange = ( newAngle ) => {
++		onChange(
++			serializeGradient( {
++				...gradientAST,
++				orientation: {
++					type: 'angular',
++					value: newAngle,
++				},
++			} )
++		);
+ 	};
+-
+-	const gradientPickerDomRef = useRef();
+-	const markerPoints = getMarkerPoints( gradientAST );
+-
+-	const [ gradientBarState, gradientBarStateDispatch ] = useReducer(
+-		customGradientBarReducer,
+-		customGradientBarReducerInitialState
++	return (
++		<AnglePicker
++			value={ hasGradient ? angle : '' }
++			onChange={ onAngleChange }
++		/>
+ 	);
+-	const onMouseEnterAndMove = ( event ) => {
+-		const insertPosition = getHorizontalRelativeGradientPosition(
+-			event.clientX,
+-			gradientPickerDomRef.current,
+-			INSERT_POINT_WIDTH
+-		);
++};
+ 
+-		// If the insert point is close to an existing control point don't show it.
+-		if (
+-			some( markerPoints, ( { positionValue } ) => {
+-				return (
+-					Math.abs( insertPosition - positionValue ) <
+-					MINIMUM_DISTANCE_BETWEEN_POINTS
+-				);
++const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
++	const { type } = gradientAST;
++	const onSetLinearGradient = () => {
++		onChange(
++			serializeGradient( {
++				...gradientAST,
++				...( gradientAST.orientation
++					? {}
++					: { orientation: HORIZONTAL_GRADIENT_ORIENTATION } ),
++				type: 'linear-gradient',
+ 			} )
+-		) {
+-			if ( gradientBarState.id === 'MOVING_INSERTER' ) {
+-				gradientBarStateDispatch( { type: 'STOP_INSERTER_MOVE' } );
+-			}
+-			return;
+-		}
+-
+-		gradientBarStateDispatch( { type: 'MOVE_INSERTER', insertPosition } );
++		);
+ 	};
+ 
+-	const onMouseLeave = () => {
+-		gradientBarStateDispatch( { type: 'STOP_INSERTER_MOVE' } );
++	const onSetRadialGradient = () => {
++		onChange(
++			serializeGradient( {
++				...omit( gradientAST, [ 'orientation' ] ),
++				type: 'radial-gradient',
++			} )
++		);
+ 	};
+ 
+-	const isMovingInserter = gradientBarState.id === 'MOVING_INSERTER';
+-	const isInsertingControlPoint =
+-		gradientBarState.id === 'INSERTING_CONTROL_POINT';
++	return (
++		<BaseControl className="components-custom-gradient-picker__type-picker">
++			<BaseControl.VisualLabel>{ __( 'Type' ) }</BaseControl.VisualLabel>
++			<ToolbarGroup
++				controls={ [
++					{
++						icon: <LinearGradientIcon />,
++						title: 'Linear Gradient',
++						isActive: hasGradient && type === 'linear-gradient',
++						onClick: onSetLinearGradient,
++					},
++					{
++						icon: <RadialGradientIcon />,
++						title: 'Radial Gradient',
++						isActive: hasGradient && type === 'radial-gradient',
++						onClick: onSetRadialGradient,
++					},
++				] }
++			/>
++		</BaseControl>
++	);
++};
+ 
++export default function CustomGradientPicker( { value, onChange } ) {
++	const { gradientAST, hasGradient } = getGradientParsed( value );
++	const { type } = gradientAST;
+ 	return (
+-		<div
+-			ref={ gradientPickerDomRef }
+-			className={ classnames( 'components-custom-gradient-picker', {
+-				'has-gradient': hasGradient,
+-			} ) }
+-			onMouseEnter={ onMouseEnterAndMove }
+-			onMouseMove={ onMouseEnterAndMove }
+-			style={ {
+-				background: gradientValueUsed,
+-			} }
+-			onMouseLeave={ onMouseLeave }
+-		>
+-			<div className="components-custom-gradient-picker__markers-container">
+-				{ ( isMovingInserter || isInsertingControlPoint ) && (
+-					<InsertPoint
+-						insertPosition={ gradientBarState.insertPosition }
+-						onChange={ onGradientStructureChange }
++		<div className="components-custom-gradient-picker">
++			<CustomGradientBar value={ value } onChange={ onChange } />
++			<div className="components-custom-gradient-picker__ui-line">
++				<GradientTypePicker
++					gradientAST={ gradientAST }
++					hasGradient={ hasGradient }
++					onChange={ onChange }
++				/>
++				{ type === 'linear-gradient' && (
++					<GradientAnglePicker
+ 						gradientAST={ gradientAST }
+-						onOpenInserter={ () => {
+-							gradientBarStateDispatch( {
+-								type: 'OPEN_INSERTER',
+-							} );
+-						} }
+-						onCloseInserter={ () => {
+-							gradientBarStateDispatch( {
+-								type: 'CLOSE_INSERTER',
+-							} );
+-						} }
++						hasGradient={ hasGradient }
++						onChange={ onChange }
+ 					/>
+ 				) }
+-				<ControlPoints
+-					gradientPickerDomRef={ gradientPickerDomRef }
+-					ignoreMarkerPosition={
+-						isInsertingControlPoint
+-							? gradientBarState.insertPosition
+-							: undefined
+-					}
+-					markerPoints={ markerPoints }
+-					onChange={ onGradientStructureChange }
+-					gradientAST={ gradientAST }
+-					onStartControlPointChange={ () => {
+-						gradientBarStateDispatch( {
+-							type: 'START_CONTROL_CHANGE',
+-						} );
+-					} }
+-					onStopControlPointChange={ () => {
+-						gradientBarStateDispatch( {
+-							type: 'STOP_CONTROL_CHANGE',
+-						} );
+-					} }
+-				/>
+ 			</div>
+ 		</div>
+ 	);
+diff --git a/packages/components/src/custom-gradient-picker/style.scss b/packages/components/src/custom-gradient-picker/style.scss
+index 1590a8a6c07375..b150dca8134e49 100644
+--- a/packages/components/src/custom-gradient-picker/style.scss
++++ b/packages/components/src/custom-gradient-picker/style.scss
+@@ -1,10 +1,10 @@
+ $components-custom-gradient-picker__padding: 3px; // 24px container, 18px handles inside, that leaves 6px padding, half of which is 3.
+ 
+-.components-custom-gradient-picker:not(.has-gradient) {
++.components-custom-gradient-picker__gradient-bar:not(.has-gradient) {
+ 	opacity: 0.4;
+ }
+ 
+-.components-custom-gradient-picker {
++.components-custom-gradient-picker__gradient-bar {
+ 	width: 100%;
+ 	height: $icon-button-size-small;
+ 	border-radius: $icon-button-size-small;
+@@ -55,3 +55,31 @@ $components-custom-gradient-picker__padding: 3px; // 24px container, 18px handle
+ .components-custom-gradient-picker__inserter {
+ 	width: 100%;
+ }
++
++.components-custom-gradient-picker__liner-gradient-indicator {
++	display: inline-block;
++	flex: 0 auto;
++	width: 20px;
++	height: 20px;
++}
++
++.components-custom-gradient-picker__ui-line {
++	display: flex;
++	justify-content: space-between;
++}
++
++.components-custom-gradient-picker .components-custom-gradient-picker__ui-line {
++	.components-base-control.components-custom-gradient-picker__angle-picker,
++	.components-base-control.components-custom-gradient-picker__type-picker {
++		margin-bottom: 0;
++	}
++}
++
++.components-custom-gradient-picker__angle-picker-field {
++	display: block;
++	width: 100%;
++}
++
++.components-custom-gradient-picker__angle-picker {
++	width: 50%;
++}
+diff --git a/packages/components/src/custom-gradient-picker/utils.js b/packages/components/src/custom-gradient-picker/utils.js
+index cc2e7d087c7fce..23ac5dd1248859 100644
+--- a/packages/components/src/custom-gradient-picker/utils.js
++++ b/packages/components/src/custom-gradient-picker/utils.js
+@@ -2,18 +2,22 @@
+  * External dependencies
+  */
+ import { findIndex, map, some } from 'lodash';
++import gradientParser from 'gradient-parser';
+ 
+ /**
+  * Internal dependencies
+  */
+ import {
++	DEFAULT_GRADIENT,
+ 	INSERT_POINT_WIDTH,
+ 	MINIMUM_ABSOLUTE_LEFT_POSITION,
+ 	MINIMUM_DISTANCE_BETWEEN_POINTS,
++	HORIZONTAL_GRADIENT_ORIENTATION,
+ } from './constants';
+ import {
+ 	serializeGradientColor,
+ 	serializeGradientPosition,
++	serializeGradient,
+ } from './serializer';
+ 
+ function tinyColorRgbToGradientColorStop( { r, g, b, a } ) {
+@@ -227,3 +231,33 @@ export function getMarkerPoints( gradientAST ) {
+ 		};
+ 	} );
+ }
++
++export function getLinearGradientRepresentationOfARadial( gradientAST ) {
++	return serializeGradient( {
++		type: 'linear-gradient',
++		orientation: HORIZONTAL_GRADIENT_ORIENTATION,
++		colorStops: gradientAST.colorStops,
++	} );
++}
++
++export function getGradientParsed( value ) {
++	let hasGradient = !! value;
++	// gradientAST will contain the gradient AST as parsed by gradient-parser npm module.
++	// More information of its structure available at https://www.npmjs.com/package/gradient-parser#ast.
++	let gradientAST;
++	let gradientValue;
++	try {
++		gradientAST = gradientParser.parse( value || DEFAULT_GRADIENT )[ 0 ];
++		gradientValue = value || DEFAULT_GRADIENT;
++	} catch ( error ) {
++		hasGradient = false;
++		gradientAST = gradientParser.parse( DEFAULT_GRADIENT )[ 0 ];
++		gradientValue = DEFAULT_GRADIENT;
++	}
++
++	return {
++		hasGradient,
++		gradientAST,
++		gradientValue,
++	};
++}
+diff --git a/packages/primitives/src/svg/index.js b/packages/primitives/src/svg/index.js
+index 33307deac052ff..470ee1af88b86a 100644
+--- a/packages/primitives/src/svg/index.js
++++ b/packages/primitives/src/svg/index.js
+@@ -13,6 +13,12 @@ export const G = ( props ) => createElement( 'g', props );
+ export const Path = ( props ) => createElement( 'path', props );
+ export const Polygon = ( props ) => createElement( 'polygon', props );
+ export const Rect = ( props ) => createElement( 'rect', props );
++export const Defs = ( props ) => createElement( 'defs', props );
++export const RadialGradient = ( props ) =>
++	createElement( 'radialGradient', props );
++export const LinearGradient = ( props ) =>
++	createElement( 'linearGradient', props );
++export const Stop = ( props ) => createElement( 'stop', props );
+ 
+ export const SVG = ( { className, isPressed, ...props } ) => {
+ 	const appliedProps = {
+diff --git a/packages/primitives/src/svg/index.native.js b/packages/primitives/src/svg/index.native.js
+index 82f79f2899f10e..30b44cb83833d4 100644
+--- a/packages/primitives/src/svg/index.native.js
++++ b/packages/primitives/src/svg/index.native.js
+@@ -8,7 +8,17 @@ import { Svg } from 'react-native-svg';
+  */
+ import styles from './style.scss';
+ 
+-export { Circle, G, Path, Polygon, Rect } from 'react-native-svg';
++export {
++	Circle,
++	G,
++	Path,
++	Polygon,
++	Rect,
++	Defs,
++	RadialGradient,
++	LinearGradient,
++	Stop,
++} from 'react-native-svg';
+ 
+ export const SVG = ( { className = '', isPressed, ...props } ) => {
+ 	const colorScheme = props.colorScheme || 'light';

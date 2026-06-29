@@ -1,0 +1,97 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5a269d01c24ebc..f34ca0aa08a6cb 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,7 +4,8 @@
+ 
+ ### Breaking Changes
+ 
+--   `Navigation`: Completely remove deprecated component ([#78529](https://github.com/WordPress/gutenberg/pull/78529)).
++-   `BoxControl`: Remove deprecated `__experimentalApplyValueToSides` export ([#78528](https://github.com/WordPress/gutenberg/pull/78528)).
++-   `Navigation`: Completely remove deprecated component family ([#78529](https://github.com/WordPress/gutenberg/pull/78529)).
+ -   `Notice`: Rework internal DOM structure and class names ([#78231](https://github.com/WordPress/gutenberg/pull/78231)). Consumers relying on those implementation details should update their projects accordingly:
+     -   Removed the `is-dismissible` class name on the root wrapper.
+     -   Moved the `.components-notice__actions` wrapper as a sibling of `.components-notice__content` (it was previously nested inside it).
+diff --git a/packages/components/src/box-control/index.tsx b/packages/components/src/box-control/index.tsx
+index 74c19cc7344ab8..461c7dc897d993 100644
+--- a/packages/components/src/box-control/index.tsx
++++ b/packages/components/src/box-control/index.tsx
+@@ -221,5 +221,4 @@ function BoxControl( {
+ 	);
+ }
+ 
+-export { applyValueToSides } from './utils';
+ export default BoxControl;
+diff --git a/packages/components/src/box-control/utils.ts b/packages/components/src/box-control/utils.ts
+index be5c4ae0042c38..681dcff9c2d463 100644
+--- a/packages/components/src/box-control/utils.ts
++++ b/packages/components/src/box-control/utils.ts
+@@ -1,7 +1,6 @@
+ /**
+  * WordPress dependencies
+  */
+-import deprecated from '@wordpress/deprecated';
+ import { __ } from '@wordpress/i18n';
+ 
+ /**
+@@ -188,48 +187,6 @@ export function normalizeSides( sides: BoxControlProps[ 'sides' ] ) {
+ 	return filteredSides;
+ }
+ 
+-/**
+- * Applies a value to an object representing top, right, bottom and left sides
+- * while taking into account any custom side configuration.
+- *
+- * @deprecated
+- *
+- * @param currentValues The current values for each side.
+- * @param newValue      The value to apply to the sides object.
+- * @param sides         Array defining valid sides.
+- *
+- * @return Object containing the updated values for each side.
+- */
+-export function applyValueToSides(
+-	currentValues: BoxControlValue,
+-	newValue?: string,
+-	sides?: BoxControlProps[ 'sides' ]
+-): BoxControlValue {
+-	deprecated( 'applyValueToSides', {
+-		since: '6.8',
+-		version: '7.0',
+-	} );
+-	const newValues = { ...currentValues };
+-
+-	if ( sides?.length ) {
+-		sides.forEach( ( side ) => {
+-			if ( side === 'vertical' ) {
+-				newValues.top = newValue;
+-				newValues.bottom = newValue;
+-			} else if ( side === 'horizontal' ) {
+-				newValues.left = newValue;
+-				newValues.right = newValue;
+-			} else {
+-				newValues[ side ] = newValue;
+-			}
+-		} );
+-	} else {
+-		ALL_SIDES.forEach( ( side ) => ( newValues[ side ] = newValue ) );
+-	}
+-
+-	return newValues;
+-}
+-
+ /**
+  * Return the allowed sides based on the sides configuration.
+  *
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index 4c99df49684693..facd7aa7f4e6a4 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -45,7 +45,6 @@ export {
+ 	/** @deprecated Import `BoxControl` instead. */
+ 	default as __experimentalBoxControl,
+ 	default as BoxControl,
+-	applyValueToSides as __experimentalApplyValueToSides,
+ } from './box-control';
+ export { default as Button } from './button';
+ export { default as ButtonGroup } from './button-group';

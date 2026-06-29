@@ -1,0 +1,101 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1abf63e762f50a..356a0f1e13cbd8 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,10 @@
+ -   `FormTokenField`: Hide label when not defined ([#61336](https://github.com/WordPress/gutenberg/pull/61336)).
+ -   Upgraded the @types/react and @types/react-dom packages ([#60796](https://github.com/WordPress/gutenberg/pull/60796)).
+ 
++### Bug Fix
++
++-   `ToolsPanel`: Fix sticking “Reset” option ([#60621](https://github.com/WordPress/gutenberg/pull/60621)).
++
+ ## 27.5.0 (2024-05-02)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/tools-panel/tools-panel-item/hook.ts b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+index fe415b8723a88f..1e33e7c6740ded 100644
+--- a/packages/components/src/tools-panel/tools-panel-item/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+@@ -125,17 +125,21 @@ export function useToolsPanelItem(
+ 	const isRegistered = menuItems?.[ menuGroup ]?.[ label ] !== undefined;
+ 
+ 	const isValueSet = hasValue();
+-	const wasValueSet = usePrevious( isValueSet );
+-	const newValueSet = isValueSet && ! wasValueSet;
+-
+-	// Notify the panel when an item's value has been set.
++	// Notify the panel when an item's value has changed except for optional
++	// items without value because the item should not cause itself to hide.
+ 	useEffect( () => {
+-		if ( ! newValueSet ) {
++		if ( ! isShownByDefault && ! isValueSet ) {
+ 			return;
+ 		}
+ 
+-		flagItemCustomization( label, menuGroup );
+-	}, [ newValueSet, menuGroup, label, flagItemCustomization ] );
++		flagItemCustomization( isValueSet, label, menuGroup );
++	}, [
++		isValueSet,
++		menuGroup,
++		label,
++		flagItemCustomization,
++		isShownByDefault,
++	] );
+ 
+ 	// Determine if the panel item's corresponding menu is being toggled and
+ 	// trigger appropriate callback if it is.
+@@ -151,7 +155,7 @@ export function useToolsPanelItem(
+ 			onSelect?.();
+ 		}
+ 
+-		if ( ! isMenuItemChecked && wasMenuItemChecked ) {
++		if ( ! isMenuItemChecked && isValueSet && wasMenuItemChecked ) {
+ 			onDeselect?.();
+ 		}
+ 	}, [
+diff --git a/packages/components/src/tools-panel/tools-panel/hook.ts b/packages/components/src/tools-panel/tools-panel/hook.ts
+index 8a38a15084b33c..8742f1c494ce1b 100644
+--- a/packages/components/src/tools-panel/tools-panel/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel/hook.ts
+@@ -205,18 +205,21 @@ export function useToolsPanel(
+ 		} );
+ 	}, [ panelItems, setMenuItems, menuItemOrder ] );
+ 
+-	// Force a menu item to be checked.
+-	// This is intended for use with default panel items. They are displayed
+-	// separately to optional items and have different display states,
+-	// we need to update that when their value is customized.
++	// Updates the status of the panel’s menu items. For default items the
++	// value represents whether it differs from the default and for optional
++	// items whether the item is shown.
+ 	const flagItemCustomization = useCallback(
+-		( label: string, group: ToolsPanelMenuItemKey = 'default' ) => {
++		(
++			value: boolean,
++			label: string,
++			group: ToolsPanelMenuItemKey = 'default'
++		) => {
+ 			setMenuItems( ( items ) => {
+ 				const newState = {
+ 					...items,
+ 					[ group ]: {
+ 						...items[ group ],
+-						[ label ]: true,
++						[ label ]: value,
+ 					},
+ 				};
+ 				return newState;
+diff --git a/packages/components/src/tools-panel/types.ts b/packages/components/src/tools-panel/types.ts
+index 9f4fc78bea46a4..e8e2f950de9a30 100644
+--- a/packages/components/src/tools-panel/types.ts
++++ b/packages/components/src/tools-panel/types.ts
+@@ -176,6 +176,7 @@ export type ToolsPanelContext = {
+ 	registerResetAllFilter: ( filter: ResetAllFilter ) => void;
+ 	deregisterResetAllFilter: ( filter: ResetAllFilter ) => void;
+ 	flagItemCustomization: (
++		value: boolean,
+ 		label: string,
+ 		group?: ToolsPanelMenuItemKey
+ 	) => void;

@@ -1,0 +1,206 @@
+diff --git a/packages/commands/src/components/command-menu.js b/packages/commands/src/components/command-menu.js
+index 11f3415cf42d7a..fd68761ebd3373 100644
+--- a/packages/commands/src/components/command-menu.js
++++ b/packages/commands/src/components/command-menu.js
+@@ -271,12 +271,12 @@ export function CommandMenu() {
+ 			<div className="commands-command-menu__container">
+ 				<Command label={ inputLabel } onKeyDown={ onKeyDown }>
+ 					<div className="commands-command-menu__header">
++						<Icon icon={ inputIcon } />
+ 						<CommandInput
+ 							search={ search }
+ 							setSearch={ setSearch }
+ 							isOpen={ isOpen }
+ 						/>
+-						<Icon icon={ inputIcon } />
+ 					</div>
+ 					<Command.List label={ __( 'Command suggestions' ) }>
+ 						{ search && ! isLoading && (
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b8f83ce90d9303..7177ada2bfa693 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `SearchControl`: Move search icon to prefix position ([#71984](https://github.com/WordPress/gutenberg/pull/71984)).
++
+ ## 30.5.0 (2025-10-01)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/search-control/index.tsx b/packages/components/src/search-control/index.tsx
+index 54ef5f3eb9ca56..3fac6cf0646e6f 100644
+--- a/packages/components/src/search-control/index.tsx
++++ b/packages/components/src/search-control/index.tsx
+@@ -2,6 +2,7 @@
+  * External dependencies
+  */
+ import clsx from 'clsx';
++import type { ForwardedRef } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -16,11 +17,12 @@ import deprecated from '@wordpress/deprecated';
+  * Internal dependencies
+  */
+ import Button from '../button';
++import { InputControlPrefixWrapper } from '../input-control/input-prefix-wrapper';
++import { InputControlSuffixWrapper } from '../input-control/input-suffix-wrapper';
+ import type { WordPressComponentProps } from '../context/wordpress-component';
+ import type { SearchControlProps, SuffixItemProps } from './types';
+-import type { ForwardedRef } from 'react';
+ import { ContextSystemProvider } from '../context';
+-import { StyledInputControl, SuffixItemWrapper } from './styles';
++import { StyledInputControl } from './styles';
+ 
+ function SuffixItem( {
+ 	searchRef,
+@@ -29,7 +31,7 @@ function SuffixItem( {
+ 	onClose,
+ }: SuffixItemProps ) {
+ 	if ( ! onClose && ! value ) {
+-		return <Icon icon={ search } />;
++		return null;
+ 	}
+ 
+ 	if ( onClose ) {
+@@ -44,12 +46,14 @@ function SuffixItem( {
+ 	};
+ 
+ 	return (
+-		<Button
+-			size="small"
+-			icon={ closeSmall }
+-			label={ onClose ? __( 'Close search' ) : __( 'Reset search' ) }
+-			onClick={ onClose ?? onReset }
+-		/>
++		<InputControlSuffixWrapper variant="control">
++			<Button
++				size="small"
++				icon={ closeSmall }
++				label={ onClose ? __( 'Close search' ) : __( 'Reset search' ) }
++				onClick={ onClose ?? onReset }
++			/>
++		</InputControlSuffixWrapper>
+ 	);
+ }
+ 
+@@ -114,15 +118,18 @@ function UnforwardedSearchControl(
+ 				autoComplete="off"
+ 				placeholder={ placeholder }
+ 				value={ value ?? '' }
++				prefix={
++					<InputControlPrefixWrapper variant="icon">
++						<Icon icon={ search } fill="currentColor" />
++					</InputControlPrefixWrapper>
++				}
+ 				suffix={
+-					<SuffixItemWrapper size={ size }>
+-						<SuffixItem
+-							searchRef={ searchRef }
+-							value={ value }
+-							onChange={ onChange }
+-							onClose={ onClose }
+-						/>
+-					</SuffixItemWrapper>
++					<SuffixItem
++						searchRef={ searchRef }
++						value={ value }
++						onChange={ onChange }
++						onClose={ onClose }
++					/>
+ 				}
+ 				{ ...filteredRestProps }
+ 			/>
+diff --git a/packages/components/src/search-control/styles.ts b/packages/components/src/search-control/styles.ts
+index 183c7a26e172e9..83c09a06c696c5 100644
+--- a/packages/components/src/search-control/styles.ts
++++ b/packages/components/src/search-control/styles.ts
+@@ -6,25 +6,8 @@ import styled from '@emotion/styled';
+ /**
+  * Internal dependencies
+  */
+-import { space } from '../utils/space';
+ import InputControl from '../input-control';
+ import { COLORS } from '../utils';
+-import type { SearchControlProps } from './types';
+-
+-const inlinePadding = ( {
+-	size,
+-}: Required< Pick< SearchControlProps, 'size' > > ) => {
+-	return space( size === 'compact' ? 1 : 2 );
+-};
+-
+-export const SuffixItemWrapper = styled.div`
+-	display: flex;
+-	padding-inline-end: ${ inlinePadding };
+-
+-	svg {
+-		fill: currentColor;
+-	}
+-`;
+ 
+ export const StyledInputControl = styled( InputControl )`
+ 	input[type='search'] {
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index 1a76b0f566eb9e..2d760ed1eed886 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++- Move search icon in search fields to prefix position ([#71984](https://github.com/WordPress/gutenberg/pull/71984)).
++
+ ### Breaking changes
+ 
+ - DataForm: Add summary field support for both card and panel layouts. The `summary` property has been moved from the field level to the layout level, and so fields using `summary` at the field level must now configure it within the `layout` object. Additionally, the first children will only be used as summary for the panel if 1) there is no `layout.summary` and 2) the form field ID doesn't match any existing field. See README for details. [#71576](https://github.com/WordPress/gutenberg/pull/71576)
+diff --git a/packages/dataviews/src/components/dataviews-filters/style.scss b/packages/dataviews/src/components/dataviews-filters/style.scss
+index 8f01e6e9142552..121e416ec7965e 100644
+--- a/packages/dataviews/src/components/dataviews-filters/style.scss
++++ b/packages/dataviews/src/components/dataviews-filters/style.scss
+@@ -317,7 +317,7 @@
+ 	.dataviews-filters__search-widget-filter-combobox__input {
+ 		@include input-control;
+ 		display: block;
+-		padding: 0 $grid-unit-40 0 $grid-unit-10;
++		padding: 0 $grid-unit-10 0 $grid-unit-40;
+ 		background: $gray-100;
+ 		border: none;
+ 		width: 100%;
+@@ -354,7 +354,7 @@
+ 
+ 	.dataviews-filters__search-widget-filter-combobox__icon {
+ 		position: absolute;
+-		right: $grid-unit-15;
++		inset-inline-start: $grid-unit-15;
+ 		top: 50%;
+ 		transform: translateY(-50%);
+ 		display: flex;
+diff --git a/packages/dataviews/src/stories/dataviews.fixtures.tsx b/packages/dataviews/src/stories/dataviews.fixtures.tsx
+index c8fb42369b045b..ebd192d5b62f7a 100644
+--- a/packages/dataviews/src/stories/dataviews.fixtures.tsx
++++ b/packages/dataviews/src/stories/dataviews.fixtures.tsx
+@@ -844,6 +844,17 @@ export const fields: Field< SpaceObject >[] = [
+ 			{ value: 'Ice giant', label: 'Ice giant' },
+ 			{ value: 'Terrestrial', label: 'Terrestrial' },
+ 			{ value: 'Gas giant', label: 'Gas giant' },
++			{ value: 'Dwarf planet', label: 'Dwarf planet' },
++			{ value: 'Asteroid', label: 'Asteroid' },
++			{ value: 'Comet', label: 'Comet' },
++			{ value: 'Kuiper belt object', label: 'Kuiper belt object' },
++			{ value: 'Protoplanet', label: 'Protoplanet' },
++			{ value: 'Planetesimal', label: 'Planetesimal' },
++			{ value: 'Minor planet', label: 'Minor planet' },
++			{
++				value: 'Trans-Neptunian object',
++				label: 'Trans-Neptunian object',
++			},
+ 		],
+ 		filterBy: {
+ 			operators: [ 'is', 'isNot' ],

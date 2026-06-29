@@ -1,0 +1,181 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d575fc96f83fc4..a17f1b323e0bf5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ ### Internal
+ 
+ -   `SnackbarList`, `Snackbar`: add unit tests ([#59157](https://github.com/WordPress/gutenberg/pull/59157)).
++-   Remove unused `useLatestRef()` hook ([#59471](https://github.com/WordPress/gutenberg/pull/59471)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/utils/hooks/index.js b/packages/components/src/utils/hooks/index.js
+index beacf31b7562cd..896f691cdc5427 100644
+--- a/packages/components/src/utils/hooks/index.js
++++ b/packages/components/src/utils/hooks/index.js
+@@ -2,4 +2,3 @@ export { default as useControlledState } from './use-controlled-state';
+ export { default as useUpdateEffect } from './use-update-effect';
+ export { useControlledValue } from './use-controlled-value';
+ export { useCx } from './use-cx';
+-export { useLatestRef } from './use-latest-ref';
+diff --git a/packages/components/src/utils/hooks/test/use-latest-ref.js b/packages/components/src/utils/hooks/test/use-latest-ref.js
+deleted file mode 100644
+index 0c424a62390332..00000000000000
+--- a/packages/components/src/utils/hooks/test/use-latest-ref.js
++++ /dev/null
+@@ -1,119 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { useLatestRef } from '..';
+-
+-function debounce( callback, timeout = 0 ) {
+-	let timeoutId = 0;
+-	return ( ...args ) => {
+-		window.clearTimeout( timeoutId );
+-		timeoutId = window.setTimeout( () => callback( ...args ), timeout );
+-	};
+-}
+-
+-function useDebounce( callback, timeout = 0 ) {
+-	const callbackRef = useLatestRef( callback );
+-	return debounce( ( ...args ) => callbackRef.current( ...args ), timeout );
+-}
+-
+-function Example() {
+-	const [ count, setCount ] = useState( 0 );
+-	const increment = () => setCount( count + 1 );
+-	const incrementDebounced = debounce( increment, 50 );
+-	const incrementDebouncedWithLatestRef = useDebounce( increment, 50 );
+-
+-	return (
+-		<>
+-			<div>Count: { count }</div>
+-			<button onClick={ incrementDebounced }>Increment debounced</button>
+-			<button onClick={ increment }>Increment immediately</button>
+-			<br />
+-			<button onClick={ incrementDebouncedWithLatestRef }>
+-				Increment debounced with latest ref
+-			</button>
+-		</>
+-	);
+-}
+-
+-function getCount() {
+-	return screen.getByText( /Count:/ ).innerHTML;
+-}
+-
+-function incrementCount() {
+-	fireEvent.click( screen.getByText( 'Increment immediately' ) );
+-}
+-
+-function incrementCountDebounced() {
+-	fireEvent.click( screen.getByText( 'Increment debounced' ) );
+-}
+-
+-function incrementCountDebouncedRef() {
+-	fireEvent.click(
+-		screen.getByText( 'Increment debounced with latest ref' )
+-	);
+-}
+-
+-describe( 'useLatestRef', () => {
+-	describe( 'Example', () => {
+-		// Prove the example works as expected.
+-		it( 'should start at 0', () => {
+-			render( <Example /> );
+-
+-			expect( getCount() ).toEqual( 'Count: 0' );
+-		} );
+-
+-		it( 'should increment immediately', () => {
+-			render( <Example /> );
+-
+-			incrementCount();
+-
+-			expect( getCount() ).toEqual( 'Count: 1' );
+-		} );
+-
+-		it( 'should increment after debouncing', async () => {
+-			render( <Example /> );
+-
+-			incrementCountDebounced();
+-
+-			expect( getCount() ).toEqual( 'Count: 0' );
+-			await waitFor( () => expect( getCount() ).toEqual( 'Count: 1' ) );
+-		} );
+-
+-		it( 'should increment after debouncing with latest ref', async () => {
+-			render( <Example /> );
+-
+-			incrementCountDebouncedRef();
+-
+-			expect( getCount() ).toEqual( 'Count: 0' );
+-			await waitFor( () => expect( getCount() ).toEqual( 'Count: 1' ) );
+-		} );
+-	} );
+-
+-	it( 'should increment to one', async () => {
+-		render( <Example /> );
+-
+-		incrementCountDebounced();
+-		incrementCount();
+-
+-		await waitFor( () => expect( getCount() ).toEqual( 'Count: 1' ) );
+-	} );
+-
+-	it( 'should increment to two', async () => {
+-		render( <Example /> );
+-
+-		incrementCountDebouncedRef();
+-		incrementCount();
+-
+-		await waitFor( () => expect( getCount() ).toEqual( 'Count: 2' ) );
+-	} );
+-} );
+diff --git a/packages/components/src/utils/hooks/use-latest-ref.ts b/packages/components/src/utils/hooks/use-latest-ref.ts
+deleted file mode 100644
+index 5db9591b9e073c..00000000000000
+--- a/packages/components/src/utils/hooks/use-latest-ref.ts
++++ /dev/null
+@@ -1,29 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import type { RefObject } from 'react';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useRef } from '@wordpress/element';
+-import { useIsomorphicLayoutEffect } from '@wordpress/compose';
+-
+-/**
+- * Creates a reference for a prop. This is useful for preserving dependency
+- * memoization for hooks like useCallback.
+- *
+- * @see https://codesandbox.io/s/uselatestref-mlj3i?file=/src/App.tsx
+- *
+- * @param value The value to reference
+- * @return The prop reference.
+- */
+-export function useLatestRef< T >( value: T ): RefObject< T > {
+-	const ref = useRef( value );
+-
+-	useIsomorphicLayoutEffect( () => {
+-		ref.current = value;
+-	} );
+-
+-	return ref;
+-}

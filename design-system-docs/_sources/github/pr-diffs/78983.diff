@@ -1,0 +1,53 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 21ea42af77d56b..fe8436ee66fa70 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,10 @@
+ 
+ -   Fix documentation typos and grammar ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
+ 
++### Enhancements
++
++-   `Tooltip`: Use `--wpds-border-radius-md` for portaled popup surfaces, aligning with menus and popovers ([#78983](https://github.com/WordPress/gutenberg/pull/78983)).
++
+ ## 34.0.0 (2026-05-27)
+ 
+ ### Breaking Changes
+diff --git a/packages/components/src/tooltip/style.scss b/packages/components/src/tooltip/style.scss
+index eff6a71568123e..f5b0d041468003 100644
+--- a/packages/components/src/tooltip/style.scss
++++ b/packages/components/src/tooltip/style.scss
+@@ -5,7 +5,7 @@
+ .components-tooltip {
+ 	background: $black;
+ 	font-family: $default-font;
+-	border-radius: $radius-small;
++	border-radius: var(--wpds-border-radius-md);
+ 	color: $gray-100;
+ 	text-align: center;
+ 	line-height: 1.4;
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index c45b456e269206..f33df6f2aefe61 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ 
+ ### Enhancements
+ 
++-   `Tooltip`: Use `--wpds-border-radius-md` for portaled popup surfaces, aligning with menus and popovers ([#78983](https://github.com/WordPress/gutenberg/pull/78983)).
+ -   `Tooltip.Provider`: Widen the types to accept all props of the equivalent `Tooltip.Provider` from `@base-ui/react` (types-only change) ([#78642](https://github.com/WordPress/gutenberg/pull/78642)).
+ 
+ ## 0.14.0 (2026-05-27)
+diff --git a/packages/ui/src/tooltip/style.module.css b/packages/ui/src/tooltip/style.module.css
+index 8c3927ea78681d..71e6f04f0b595f 100644
+--- a/packages/ui/src/tooltip/style.module.css
++++ b/packages/ui/src/tooltip/style.module.css
+@@ -10,7 +10,7 @@
+ 		padding:
+ 			var(--wpds-dimension-padding-xs)
+ 			var(--wpds-dimension-padding-sm);
+-		border-radius: var(--wpds-border-radius-sm);
++		border-radius: var(--wpds-border-radius-md);
+ 		font-family: var(--wpds-typography-font-family-body);
+ 		font-size: var(--wpds-typography-font-size-sm);
+ 		line-height: 1.4; /* TODO: use DS token for line height */

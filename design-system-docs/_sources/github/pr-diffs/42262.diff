@@ -1,0 +1,158 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e49491f2c0b2ec..db469fdbaaf63b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ 
+ -   `Grid`: Convert to TypeScript ([#41923](https://github.com/WordPress/gutenberg/pull/41923)).
+ -   `TextHighlight`: Convert to TypeScript ([#41698](https://github.com/WordPress/gutenberg/pull/41698)).
++-   `Tip`: Convert to TypeScript ([#42262](https://github.com/WordPress/gutenberg/pull/42262)).
+ -   `Scrollable`: Convert to TypeScript ([#42016](https://github.com/WordPress/gutenberg/pull/42016)).
+ -   `Spacer`: Complete TypeScript migration ([#42013](https://github.com/WordPress/gutenberg/pull/42013)).
+ -   `TreeSelect`: Refactor away from `_.repeat()` ([#42070](https://github.com/WordPress/gutenberg/pull/42070/)).
+diff --git a/packages/components/src/tip/index.js b/packages/components/src/tip/index.js
+deleted file mode 100644
+index fd562195e1b1b6..00000000000000
+--- a/packages/components/src/tip/index.js
++++ /dev/null
+@@ -1,24 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { Icon, tip } from '@wordpress/icons';
+-
+-/**
+- * @typedef Props
+- * @property {import('react').ReactNode} children Children to render in the tip.
+- */
+-
+-/**
+- * @param {Props} props
+- * @return {JSX.Element} Element
+- */
+-function Tip( props ) {
+-	return (
+-		<div className="components-tip">
+-			<Icon icon={ tip } />
+-			<p>{ props.children }</p>
+-		</div>
+-	);
+-}
+-
+-export default Tip;
+diff --git a/packages/components/src/tip/index.tsx b/packages/components/src/tip/index.tsx
+new file mode 100644
+index 00000000000000..b3918cd94d1432
+--- /dev/null
++++ b/packages/components/src/tip/index.tsx
+@@ -0,0 +1,22 @@
++/**
++ * WordPress dependencies
++ */
++import { Icon, tip } from '@wordpress/icons';
++
++/**
++ * Internal dependencies
++ */
++import type { TipProps } from './types';
++
++export function Tip( props: TipProps ) {
++	const { children } = props;
++
++	return (
++		<div className="components-tip">
++			<Icon icon={ tip } />
++			<p>{ children }</p>
++		</div>
++	);
++}
++
++export default Tip;
+diff --git a/packages/components/src/tip/stories/index.js b/packages/components/src/tip/stories/index.js
+deleted file mode 100644
+index e472e52463605c..00000000000000
+--- a/packages/components/src/tip/stories/index.js
++++ /dev/null
+@@ -1,26 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { text } from '@storybook/addon-knobs';
+-
+-/**
+- * Internal dependencies
+- */
+-import Tip from '../';
+-
+-export default {
+-	title: 'Components/Tip',
+-	component: Tip,
+-	parameters: {
+-		knobs: { disable: false },
+-	},
+-};
+-
+-export const _default = () => {
+-	const tipText = text( 'Text', 'An example tip' );
+-	return (
+-		<Tip>
+-			<p>{ tipText }</p>
+-		</Tip>
+-	);
+-};
+diff --git a/packages/components/src/tip/stories/index.tsx b/packages/components/src/tip/stories/index.tsx
+new file mode 100644
+index 00000000000000..4a251a34b20465
+--- /dev/null
++++ b/packages/components/src/tip/stories/index.tsx
+@@ -0,0 +1,33 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import Tip from '..';
++
++const meta: ComponentMeta< typeof Tip > = {
++	component: Tip,
++	title: 'Components/Tip',
++	argTypes: {
++		children: { control: { type: 'text' } },
++	},
++	parameters: {
++		controls: {
++			expanded: true,
++		},
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof Tip > = ( args ) => {
++	return <Tip { ...args } />;
++};
++
++export const Default: ComponentStory< typeof Tip > = Template.bind( {} );
++Default.args = {
++	children: 'An example tip',
++};
+diff --git a/packages/components/src/tip/types.ts b/packages/components/src/tip/types.ts
+new file mode 100644
+index 00000000000000..d42654345d11a1
+--- /dev/null
++++ b/packages/components/src/tip/types.ts
+@@ -0,0 +1,11 @@
++/**
++ * External dependencies
++ */
++import type { ReactNode } from 'react';
++
++export type TipProps = {
++	/**
++	 * Children to render in the tip.
++	 */
++	children: ReactNode;
++};

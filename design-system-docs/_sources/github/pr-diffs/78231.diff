@@ -1,0 +1,1140 @@
+diff --git a/docs/contributors/code/coding-guidelines.md b/docs/contributors/code/coding-guidelines.md
+index 316d8ddba34ee3..ea88af9cf56055 100644
+--- a/docs/contributors/code/coding-guidelines.md
++++ b/docs/contributors/code/coding-guidelines.md
+@@ -20,13 +20,18 @@ The root element is considered to be the highest ancestor element returned by th
+ Consider the following component located at `packages/components/src/notice/index.js`:
+ 
+ ```jsx
+-export default function Notice( { children, onRemove } ) {
++export default function Notice( { children, onRemove, actions = [] } ) {
+ 	return (
+ 		<div className="components-notice">
+ 			<div className="components-notice__content">{ children }</div>
++			{ actions.length > 0 && (
++				<div className="components-notice__actions">
++					{ /* action buttons */ }
++				</div>
++			) }
+ 			<Button
+ 				className="components-notice__dismiss"
+-				icon={ check }
++				icon={ closeSmall }
+ 				label={ __( 'Dismiss this notice' ) }
+ 				onClick={ onRemove }
+ 			/>
+@@ -35,18 +40,20 @@ export default function Notice( { children, onRemove } ) {
+ }
+ ```
+ 
++Optional regions exposed via props should use additional `__descriptor` classes on direct descendants of the root, following the same pattern as the other child elements in the example above.
++
+ Components may be assigned with class names that indicate states (for example, an "active" tab or an "opened" panel). These modifiers should be applied as a separate class name, prefixed as an adjective expression by `is-` (`is-active` or `is-opened`). In rare cases, you may encounter variations of the modifier prefix, usually to improve readability (`has-warning`). Because a modifier class name is not contextualized to a specific component, it should always be written in stylesheets as accompanying the component being modified (`.components-panel.is-opened`).
+ 
+ **Example:**
+ 
+-Consider again the Notices example. We may want to apply specific styling for dismissible notices. The [`clsx` package](https://www.npmjs.com/package/clsx) can be a helpful utility for conditionally applying modifier class names.
++Consider a panel that can be expanded. The [`clsx` package](https://www.npmjs.com/package/clsx) can be a helpful utility for conditionally applying modifier class names.
+ 
+ ```jsx
+ import clsx from 'clsx';
+ 
+-export default function Notice( { children, onRemove, isDismissible } ) {
+-	const classes = clsx( 'components-notice', {
+-		'is-dismissible': isDismissible,
++export default function Panel( { children, isExpanded } ) {
++	const classes = clsx( 'components-panel', {
++		'is-expanded': isExpanded,
+ 	} );
+ 
+ 	return <div className={ classes }>{ /* ... */ }</div>;
+diff --git a/packages/block-editor/CHANGELOG.md b/packages/block-editor/CHANGELOG.md
+index 686ebb5abea214..576b0fbe61596e 100644
+--- a/packages/block-editor/CHANGELOG.md
++++ b/packages/block-editor/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `ColorPanel`: Theme CSS custom-property gradients are now decoded to their preset slug and persisted as a `gradient` block attribute rather than as a raw `style.color.gradient` value ([#78328](https://github.com/WordPress/gutenberg/pull/78328)).
+ 
++### Internal
++
++-   Remove legacy `Notice` overrides in block placeholder notices and media replace flow error UI ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
++
+ ## 15.19.0 (2026-05-14)
+ 
+ ### Enhancements
+diff --git a/packages/block-editor/src/components/block-list/content.scss b/packages/block-editor/src/components/block-list/content.scss
+index 27ff20f00bfb9c..b2ffa5710123e6 100644
+--- a/packages/block-editor/src/components/block-list/content.scss
++++ b/packages/block-editor/src/components/block-list/content.scss
+@@ -163,12 +163,6 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
+ 	.components-with-notices-ui {
+ 		margin: 0 0 12px 0;
+ 		width: 100%;
+-
+-		.components-notice {
+-			.components-notice__content {
+-				font-size: $default-font-size;
+-			}
+-		}
+ 	}
+ 
+ 	// Warnings
+diff --git a/packages/block-editor/src/components/media-replace-flow/style.scss b/packages/block-editor/src/components/media-replace-flow/style.scss
+index bd19221a821d46..e1e156ceec9b64 100644
+--- a/packages/block-editor/src/components/media-replace-flow/style.scss
++++ b/packages/block-editor/src/components/media-replace-flow/style.scss
+@@ -65,21 +65,3 @@
+ 		}
+ 	}
+ }
+-
+-.block-editor-media-flow__error {
+-	padding: 0 20px 20px 20px;
+-	max-width: 255px;
+-
+-	.components-with-notices-ui {
+-		max-width: 255px;
+-
+-		.components-notice__content {
+-			overflow: hidden;
+-			word-wrap: break-word;
+-		}
+-		.components-notice__dismiss {
+-			position: absolute;
+-			right: 10px;
+-		}
+-	}
+-}
+diff --git a/packages/block-library/CHANGELOG.md b/packages/block-library/CHANGELOG.md
+index 4b980623eac0be..523bde800e04c8 100644
+--- a/packages/block-library/CHANGELOG.md
++++ b/packages/block-library/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   Gallery editor: remove `Notice` positioning overrides that conflicted with the updated `Notice` layout ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
++
+ ## 9.46.0 (2026-05-14)
+ 
+ ## 9.45.0 (2026-04-29)
+diff --git a/packages/block-library/src/gallery/editor.scss b/packages/block-library/src/gallery/editor.scss
+index bfd29f1f2315ca..0fe44b9462342e 100644
+--- a/packages/block-library/src/gallery/editor.scss
++++ b/packages/block-library/src/gallery/editor.scss
+@@ -21,20 +21,6 @@
+ 		flex-basis: 100%;
+ 	}
+ 
+-	.wp-block-image {
+-		.components-notice.is-error {
+-			display: block;
+-		}
+-		.components-notice__content {
+-			margin: 4px 0;
+-		}
+-		.components-notice__dismiss {
+-			position: absolute;
+-			top: 0;
+-			right: 5px;
+-		}
+-	}
+-
+ 	// @todo this deserves a refactor, by being moved to the toolbar.
+ 	.block-editor-media-placeholder.is-appender {
+ 		.components-placeholder__label {
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b32f7513bbbcc7..6e9074fd9a7584 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,9 +2,16 @@
+ 
+ ## Unreleased
+ 
++### Breaking Changes
++
++-   `Notice`: Rework internal DOM structure and class names ([#78231](https://github.com/WordPress/gutenberg/pull/78231)). Consumers relying on those implementation details should update their projects accordingly:
++    -   Removed the `is-dismissible` class name on the root wrapper.
++    -   Moved the `.components-notice__actions` wrapper as a sibling of `.components-notice__content` (it was previously nested inside it).
++
+ ### Enhancements
+ 
+ -   `Tabs`, `TabPanel`: Align selected tab colors and indicators with `@wordpress/ui` `Tabs` ([#78418](https://github.com/WordPress/gutenberg/pull/78418)).
++-   `NoticeList`: Add vertical spacing between notices in a list.
+ -   `Draggable`: Render the drag clone inside the `@wordpress/ui` compat overlay slot so it shares stacking with `@wordpress/ui` overlays opened mid-drag. Auto-enabled in WordPress environments; other hosts can opt in via `useEnableWpCompatOverlaySlot()` ([#78183](https://github.com/WordPress/gutenberg/pull/78183), [#78354](https://github.com/WordPress/gutenberg/pull/78354)).
+ 
+ ### Bug Fixes
+@@ -19,6 +26,7 @@
+ -   `Button`: Align `link` variant underline (offset and thickness) with `ExternalLink` and `Link` from `@wordpress/ui` ([#77842](https://github.com/WordPress/gutenberg/pull/77842)).
+ -   `Modal`: render as a bottom sheet on mobile so the height adapts to the content and CTAs stay within thumb reach ([#77956](https://github.com/WordPress/gutenberg/pull/77956)).
+ -   `Text`: Use a theme-aware gray token for the muted variant ([#77999](https://github.com/WordPress/gutenberg/pull/77999)).
++-   `Notice`: Align appearance with `Notice` from `@wordpress/ui` (full border, rounded corners, tinted intent surfaces, design-token-driven colors and spacing, `closeSmall` dismiss icon, compact action buttons, and grid layout that places actions in their own row for symmetric padding) ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/src/notice/README.md b/packages/components/src/notice/README.md
+index 486a90c4c0c2d0..e388cf714b125e 100644
+--- a/packages/components/src/notice/README.md
++++ b/packages/components/src/notice/README.md
+@@ -17,7 +17,6 @@ Notices display at the top of the screen, below any toolbars anchored to the top
+ Notices are color-coded to indicate the type of message being communicated:
+ 
+ - **Informational** notices are **blue** by default.
+-- If there is a parent `Theme` component with an `accent` color prop, informational notices will take on that color instead.
+ - **Success** notices are **green.**
+ - **Warning** notices are **yellow.**
+ - **Error** notices are **red.**
+@@ -101,7 +100,7 @@ Used to provide a custom spoken message in place of the `children` default.
+ 
+ #### `status`: `'warning' | 'success' | 'error' | 'info'`
+ 
+-Determines the color of the notice: `warning` (yellow), `success` (green), `error` (red), or `'info'`. By default `'info'` will be blue, but if there is a parent Theme component with an accent color prop, the notice will take on that color instead.
++Determines the color of the notice: `warning` (yellow), `success` (green), `error` (red), or `'info'`. By default `'info'` will be blue.
+ 
+ - Required: No
+ - Default: `info`
+diff --git a/packages/components/src/notice/index.tsx b/packages/components/src/notice/index.tsx
+index fedddc4314b0f6..c01bab4de9ab1e 100644
+--- a/packages/components/src/notice/index.tsx
++++ b/packages/components/src/notice/index.tsx
+@@ -9,7 +9,7 @@ import clsx from 'clsx';
+ import { __ } from '@wordpress/i18n';
+ import { RawHTML, useEffect, renderToString } from '@wordpress/element';
+ import { speak } from '@wordpress/a11y';
+-import { close } from '@wordpress/icons';
++import { closeSmall } from '@wordpress/icons';
+ 
+ /**
+  * Internal dependencies
+@@ -93,9 +93,9 @@ function Notice( {
+ }: NoticeProps ) {
+ 	useSpokenMessage( spokenMessage, politeness );
+ 
+-	const classes = clsx( className, 'components-notice', 'is-' + status, {
+-		'is-dismissible': isDismissible,
+-	} );
++	// Dismissibility is not a wrapper modifier; target `.components-notice__dismiss`
++	// or `.components-notice:has(.components-notice__dismiss)` from outside CSS.
++	const classes = clsx( className, 'components-notice', 'is-' + status );
+ 
+ 	if ( __unstableHTML && typeof children === 'string' ) {
+ 		children = <RawHTML>{ children }</RawHTML>;
+@@ -109,71 +109,64 @@ function Notice( {
+ 	return (
+ 		<div className={ classes }>
+ 			<VisuallyHidden>{ getStatusLabel( status ) }</VisuallyHidden>
+-			<div className="components-notice__content">
+-				{ children }
+-				{ actions.length > 0 && (
+-					<div className="components-notice__actions">
+-						{ actions.map(
+-							(
+-								{
+-									className: buttonCustomClasses,
+-									label,
+-									isPrimary,
+-									variant,
+-									noDefaultClasses = false,
+-									onClick,
+-									url,
+-									disabled,
+-								}: NoticeAction &
+-									// `isPrimary` is a legacy prop included for
+-									// backcompat, but `variant` should be used
+-									// instead.
+-									Pick< DeprecatedButtonProps, 'isPrimary' >,
+-								index
+-							) => {
+-								let computedVariant = variant;
+-								if (
+-									variant !== 'primary' &&
+-									! noDefaultClasses
+-								) {
+-									computedVariant = ! url
+-										? 'secondary'
+-										: 'link';
+-								}
+-								if (
+-									typeof computedVariant === 'undefined' &&
+-									isPrimary
+-								) {
+-									computedVariant = 'primary';
+-								}
+-
+-								return (
+-									<Button
+-										__next40pxDefaultSize
+-										key={ index }
+-										href={ url }
+-										variant={ computedVariant }
+-										onClick={ onClick }
+-										disabled={ disabled }
+-										accessibleWhenDisabled
+-										className={ clsx(
+-											'components-notice__action',
+-											buttonCustomClasses
+-										) }
+-									>
+-										{ label }
+-									</Button>
+-								);
++			<div className="components-notice__content">{ children }</div>
++			{ actions.length > 0 && (
++				<div className="components-notice__actions">
++					{ actions.map(
++						(
++							{
++								className: buttonCustomClasses,
++								label,
++								isPrimary,
++								variant,
++								noDefaultClasses = false,
++								onClick,
++								url,
++								disabled,
++							}: NoticeAction &
++								// `isPrimary` is a legacy prop included for
++								// backcompat, but `variant` should be used
++								// instead.
++								Pick< DeprecatedButtonProps, 'isPrimary' >,
++							index
++						) => {
++							let computedVariant = variant;
++							if ( variant !== 'primary' && ! noDefaultClasses ) {
++								computedVariant = ! url ? 'secondary' : 'link';
++							}
++							if (
++								typeof computedVariant === 'undefined' &&
++								isPrimary
++							) {
++								computedVariant = 'primary';
+ 							}
+-						) }
+-					</div>
+-				) }
+-			</div>
++
++							return (
++								<Button
++									size="compact"
++									key={ index }
++									href={ url }
++									variant={ computedVariant }
++									onClick={ onClick }
++									disabled={ disabled }
++									accessibleWhenDisabled
++									className={ clsx(
++										'components-notice__action',
++										buttonCustomClasses
++									) }
++								>
++									{ label }
++								</Button>
++							);
++						}
++					) }
++				</div>
++			) }
+ 			{ isDismissible && (
+ 				<Button
+ 					size="small"
+ 					className="components-notice__dismiss"
+-					icon={ close }
++					icon={ closeSmall }
+ 					label={ __( 'Close' ) }
+ 					onClick={ onDismissNotice }
+ 				/>
+diff --git a/packages/components/src/notice/style.scss b/packages/components/src/notice/style.scss
+index 29b8eb460037fd..fdf2234371d974 100644
+--- a/packages/components/src/notice/style.scss
++++ b/packages/components/src/notice/style.scss
+@@ -1,67 +1,77 @@
+-@use "sass:color";
+-@use "@wordpress/base-styles/colors" as *;
+ @use "@wordpress/base-styles/variables" as *;
+-@use "../utils/theme-variables" as *;
+ 
+ .components-notice {
+-	display: flex;
+-	font-family: $default-font;
+-	font-size: $default-font-size;
+-	background-color: $white;
+-	border-left: 4px solid $components-color-accent;
+-	padding: 8px 12px;
+-	align-items: center;
+-	color: $gray-900;
+-
+-	&.is-dismissible {
+-		position: relative;
++	--wp-components-notice-background-color: var(--wpds-color-bg-surface-info-weak);
++	--wp-components-notice-border-color: var(--wpds-color-stroke-surface-info);
++	--wp-components-notice-text-color: var(--wpds-color-fg-content-info);
+ 
+-		.components-notice__content {
+-			margin-right: #{ $button-size-small + $border-width };
+-		}
+-	}
++	box-sizing: border-box;
++	display: grid;
++	grid-template-columns: 1fr auto;
++	align-items: start;
++	padding: var(--wpds-dimension-padding-md);
++	border: var(--wpds-border-width-xs) solid var(--wp-components-notice-border-color);
++	border-radius: var(--wpds-border-radius-lg);
++	background-color: var(--wp-components-notice-background-color);
++	color: var(--wp-components-notice-text-color);
++	font-family: var(--wpds-typography-font-family-body);
++	font-size: var(--wpds-typography-font-size-md);
++	line-height: var(--wpds-typography-line-height-sm);
+ 
+ 	&.is-success {
+-		border-left-color: $alert-green;
+-		background-color: color.adjust($alert-green, $lightness: +45%);
++		--wp-components-notice-background-color: var(--wpds-color-bg-surface-success-weak);
++		--wp-components-notice-border-color: var(--wpds-color-stroke-surface-success);
++		--wp-components-notice-text-color: var(--wpds-color-fg-content-success);
+ 	}
+ 
+ 	&.is-warning {
+-		border-left-color: $alert-yellow;
+-		background-color: color.adjust($alert-yellow, $lightness: +35%);
++		--wp-components-notice-background-color: var(--wpds-color-bg-surface-warning-weak);
++		--wp-components-notice-border-color: var(--wpds-color-stroke-surface-warning);
++		--wp-components-notice-text-color: var(--wpds-color-fg-content-warning);
+ 	}
+ 
+ 	&.is-error {
+-		border-left-color: $alert-red;
+-		background-color: color.adjust($alert-red, $lightness: +35%);
++		--wp-components-notice-background-color: var(--wpds-color-bg-surface-error-weak);
++		--wp-components-notice-border-color: var(--wpds-color-stroke-surface-error);
++		--wp-components-notice-text-color: var(--wpds-color-fg-content-error);
+ 	}
+ }
+ 
+ .components-notice__content {
+-	flex-grow: 1;
+-	margin-top: $grid-unit-05;
+-	margin-bottom: $grid-unit-05;
++	grid-column: 1;
++	grid-row: 1;
++
++	// Centers single-line copy with the dismiss row when it is present. The same
++	// padding is kept when the notice is not dismissible so block height stays
++	// consistent across variants, matching `@wordpress/ui` Notice (`.title` /
++	// `.description` always use `--text-vertical-padding` whether or not `CloseIcon`
++	// is rendered).
++	// TODO: Replace `$button-size-small` with a WPDS size token once size tokens
++	// land in `@wordpress/theme`.
++	padding-block: calc((#{$button-size-small} - 1lh) / 2);
+ }
+ 
+ .components-notice__actions {
++	grid-column: 1;
++	grid-row: 2;
++
+ 	display: flex;
+ 	flex-wrap: wrap;
+ 	align-items: center;
+-	gap: $grid-unit-15;
+-	margin-top: $grid-unit-15;
++	gap: var(--wpds-dimension-gap-md);
++	margin-top: var(--wpds-dimension-gap-sm);
+ }
+ 
+ .components-notice__dismiss {
+-	color: $gray-700;
+-
+-	// Place the dismiss button at the top of the container, even when text wraps onto two lines.
+-	align-self: flex-start;
+-	flex-shrink: 0;
++	grid-column: 2;
++	grid-row: 1;
++	color: var(--wpds-color-fg-interactive-neutral);
++	margin-inline-start: var(--wpds-dimension-gap-xs);
+ 
+ 	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover,
+ 	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active,
+ 	&:not(:disabled):not([aria-disabled="true"]):focus {
+-		color: $gray-900;
++		color: var(--wpds-color-fg-interactive-neutral-active);
+ 		background-color: transparent;
+ 	}
+ 
+@@ -71,13 +81,11 @@
+ }
+ 
+ .components-notice-list {
++	display: flex;
++	flex-direction: column;
++	gap: var(--wpds-dimension-gap-md);
++
+ 	// The notice should never be wider than the viewport, or the close button might be hidden. Especially relevant at high zoom levels. Related to https://core.trac.wordpress.org/ticket/47603#ticket.
+ 	max-width: 100vw;
+ 	box-sizing: border-box;
+-
+-	.components-notice__content {
+-		margin-top: $grid-unit-15;
+-		margin-bottom: $grid-unit-15;
+-		line-height: 2;
+-	}
+ }
+diff --git a/packages/components/src/notice/test/__snapshots__/index.tsx.snap b/packages/components/src/notice/test/__snapshots__/index.tsx.snap
+index 9703cc3fb045b2..ea3e85145735c8 100644
+--- a/packages/components/src/notice/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/notice/test/__snapshots__/index.tsx.snap
+@@ -3,7 +3,7 @@
+ exports[`Notice should match snapshot 1`] = `
+ <div>
+   <div
+-    class="components-notice is-success is-dismissible"
++    class="components-notice is-success"
+   >
+     <div
+       class="components-visually-hidden css-1ragr82-PolymorphicDiv emotion-0"
+@@ -18,28 +18,28 @@ exports[`Notice should match snapshot 1`] = `
+       class="components-notice__content"
+     >
+       Example
+-      <div
+-        class="components-notice__actions"
++    </div>
++    <div
++      class="components-notice__actions"
++    >
++      <a
++        class="components-button components-notice__action is-compact is-link"
++        href="https://example.com"
++      >
++        More information
++      </a>
++      <button
++        class="components-button components-notice__action is-secondary is-compact"
++        type="button"
++      >
++        Cancel
++      </button>
++      <button
++        class="components-button components-notice__action is-primary is-compact"
++        type="button"
+       >
+-        <a
+-          class="components-button components-notice__action is-next-40px-default-size is-link"
+-          href="https://example.com"
+-        >
+-          More information
+-        </a>
+-        <button
+-          class="components-button components-notice__action is-next-40px-default-size is-secondary"
+-          type="button"
+-        >
+-          Cancel
+-        </button>
+-        <button
+-          class="components-button components-notice__action is-next-40px-default-size is-primary"
+-          type="button"
+-        >
+-          Submit
+-        </button>
+-      </div>
++        Submit
++      </button>
+     </div>
+     <button
+       aria-label="Close"
+@@ -55,7 +55,7 @@ exports[`Notice should match snapshot 1`] = `
+         xmlns="http://www.w3.org/2000/svg"
+       >
+         <path
+-          d="m13.06 12 6.47-6.47-1.06-1.06L12 10.94 5.53 4.47 4.47 5.53 10.94 12l-6.47 6.47 1.06 1.06L12 13.06l6.47 6.47 1.06-1.06L13.06 12Z"
++          d="M12 13.06l3.712 3.713 1.061-1.06L13.061 12l3.712-3.712-1.06-1.06L12 10.938 8.288 7.227l-1.061 1.06L10.939 12l-3.712 3.712 1.06 1.061L12 13.061z"
+         />
+       </svg>
+     </button>
+diff --git a/packages/components/src/notice/test/index.tsx b/packages/components/src/notice/test/index.tsx
+index b4fb01a361fcac..d0c8d44e2261bb 100644
+--- a/packages/components/src/notice/test/index.tsx
++++ b/packages/components/src/notice/test/index.tsx
+@@ -43,14 +43,14 @@ describe( 'Notice', () => {
+ 		expect( container ).toMatchSnapshot();
+ 	} );
+ 
+-	it( 'should not have is-dismissible class when isDismissible prop is false', () => {
+-		const { container } = render(
++	it( 'should not render a dismiss control when isDismissible prop is false', () => {
++		render(
+ 			<Notice isDismissible={ false }>I cannot be dismissed!</Notice>
+ 		);
+-		const wrapper = getNoticeWrapper( container );
+ 
+-		expect( wrapper ).toHaveClass( 'components-notice' );
+-		expect( wrapper ).not.toHaveClass( 'is-dismissible' );
++		expect(
++			screen.queryByRole( 'button', { name: 'Close' } )
++		).not.toBeInTheDocument();
+ 	} );
+ 
+ 	it( 'should default to info status', () => {
+diff --git a/packages/components/src/notice/types.ts b/packages/components/src/notice/types.ts
+index d0264e6265d934..6772b63cdeacab 100644
+--- a/packages/components/src/notice/types.ts
++++ b/packages/components/src/notice/types.ts
+@@ -53,8 +53,7 @@ export type NoticeProps = {
+ 	/**
+ 	 * Determines the color of the notice: `warning` (yellow),
+ 	 * `success` (green), `error` (red), or `'info'`.
+-	 * By default `'info'` will be blue, but if there is a parent Theme component
+-	 * with an accent color prop, the notice will take on that color instead.
++	 * By default `'info'` will be blue.
+ 	 *
+ 	 * @default 'info'
+ 	 */
+diff --git a/packages/edit-post/src/components/layout/index.js b/packages/edit-post/src/components/layout/index.js
+index de10203dca251c..90323367d4cde0 100644
+--- a/packages/edit-post/src/components/layout/index.js
++++ b/packages/edit-post/src/components/layout/index.js
+@@ -162,8 +162,8 @@ function MetaBoxesMain( { isLegacy } ) {
+ 		if ( ! container ) {
+ 			return;
+ 		}
+-		const noticeLists = container.querySelectorAll(
+-			':scope > .components-notice-list'
++		const noticeContainer = container.querySelector(
++			':scope > .notices-inline-notices-wrapper'
+ 		);
+ 		const resizeHandle = container.querySelector(
+ 			'.edit-post-meta-boxes-main__presenter'
+@@ -171,16 +171,16 @@ function MetaBoxesMain( { isLegacy } ) {
+ 		const deriveConstraints = () => {
+ 			const fullHeight = container.offsetHeight;
+ 			let nextMax = fullHeight;
+-			for ( const element of noticeLists ) {
+-				nextMax -= element.offsetHeight;
++			if ( noticeContainer ) {
++				nextMax -= noticeContainer.offsetHeight;
+ 			}
+-			const nextMin = resizeHandle.offsetHeight;
++			const nextMin = resizeHandle?.offsetHeight ?? 0;
+ 			setHeightConstraints( { min: nextMin, max: nextMax } );
+ 		};
+ 		const observer = new window.ResizeObserver( deriveConstraints );
+ 		observer.observe( container );
+-		for ( const element of noticeLists ) {
+-			observer.observe( element );
++		if ( noticeContainer ) {
++			observer.observe( noticeContainer );
+ 		}
+ 		return () => observer.disconnect();
+ 	}, [] );
+diff --git a/packages/editor/CHANGELOG.md b/packages/editor/CHANGELOG.md
+index 311a127ea1755b..444db48bdd0b63 100644
+--- a/packages/editor/CHANGELOG.md
++++ b/packages/editor/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   Editor: Add padding around inline notices in the editor content area and distraction-free header.
++
+ ### Bug Fixes
+ 
+ -   `mediaFinalize` now returns the post-finalize attachment (transformed from the REST response), so the upload-media queue can refresh the in-flight attachment URL. Required for the front-end `srcset` to render on client-side-media uploads that exceeded the big-image threshold.
+diff --git a/packages/editor/src/components/editor-interface/index.js b/packages/editor/src/components/editor-interface/index.js
+index 3af5e88294071e..d90b72212100d3 100644
+--- a/packages/editor/src/components/editor-interface/index.js
++++ b/packages/editor/src/components/editor-interface/index.js
+@@ -10,7 +10,11 @@ import { InterfaceSkeleton, ComplementaryArea } from '@wordpress/interface';
+ import { useSelect, useDispatch } from '@wordpress/data';
+ import { __ } from '@wordpress/i18n';
+ import { store as preferencesStore } from '@wordpress/preferences';
+-import { BlockBreadcrumb, BlockToolbar } from '@wordpress/block-editor';
++import {
++	BlockBreadcrumb,
++	BlockToolbar,
++	store as blockEditorStore,
++} from '@wordpress/block-editor';
+ import { useViewportMatch } from '@wordpress/compose';
+ import { useState, useCallback } from '@wordpress/element';
+ import { decodeEntities } from '@wordpress/html-entities';
+@@ -47,14 +51,21 @@ const interfaceLabels = {
+ 	footer: __( 'Editor footer' ),
+ };
+ 
+-const Notices = () => (
+-	<InlineNotices
+-		pinnedNoticesClassName="editor-notices__pinned"
+-		dismissibleNoticesClassName="editor-notices__dismissible"
+-	>
+-		<TemplateValidationNotice />
+-	</InlineNotices>
+-);
++function Notices() {
++	const isValidTemplate = useSelect( ( select ) => {
++		return select( blockEditorStore ).isValidTemplate();
++	}, [] );
++
++	return (
++		<InlineNotices
++			className="editor-notices"
++			pinnedNoticesClassName="editor-notices__pinned"
++			dismissibleNoticesClassName="editor-notices__dismissible"
++		>
++			{ ! isValidTemplate && <TemplateValidationNotice /> }
++		</InlineNotices>
++	);
++}
+ 
+ export default function EditorInterface( {
+ 	className,
+diff --git a/packages/editor/src/components/editor-interface/style.scss b/packages/editor/src/components/editor-interface/style.scss
+index 24adc11aa4fb80..c34715f3ce4b73 100644
+--- a/packages/editor/src/components/editor-interface/style.scss
++++ b/packages/editor/src/components/editor-interface/style.scss
+@@ -9,6 +9,10 @@
+ 	isolation: isolate;
+ }
+ 
++.editor-editor-interface .editor-notices {
++	padding: var(--wpds-dimension-padding-md);
++}
++
+ .editor-visual-editor {
+ 	flex: 1 0 auto;
+ }
+diff --git a/packages/editor/src/components/editor-notices/index.js b/packages/editor/src/components/editor-notices/index.js
+index 8517fc109494a2..6f43563154c3f9 100644
+--- a/packages/editor/src/components/editor-notices/index.js
++++ b/packages/editor/src/components/editor-notices/index.js
+@@ -2,6 +2,8 @@
+  * WordPress dependencies
+  */
+ import deprecated from '@wordpress/deprecated';
++import { useSelect } from '@wordpress/data';
++import { store as blockEditorStore } from '@wordpress/block-editor';
+ import { InlineNotices } from '@wordpress/notices';
+ 
+ /**
+@@ -19,12 +21,16 @@ export function EditorNotices() {
+ 		alternative: 'wp.notices.InlineNotices',
+ 	} );
+ 
++	const isValidTemplate = useSelect( ( select ) => {
++		return select( blockEditorStore ).isValidTemplate();
++	}, [] );
++
+ 	return (
+ 		<InlineNotices
+ 			pinnedNoticesClassName="components-editor-notices__pinned"
+ 			dismissibleNoticesClassName="components-editor-notices__dismissible"
+ 		>
+-			<TemplateValidationNotice />
++			{ ! isValidTemplate && <TemplateValidationNotice /> }
+ 		</InlineNotices>
+ 	);
+ }
+diff --git a/packages/list-reusable-blocks/CHANGELOG.md b/packages/list-reusable-blocks/CHANGELOG.md
+index fade0bde751645..a3e73a46ef18b6 100644
+--- a/packages/list-reusable-blocks/CHANGELOG.md
++++ b/packages/list-reusable-blocks/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   Import form: remove `Notice` margin and padding overrides ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
++
+ ## 5.46.0 (2026-05-14)
+ 
+ ## 5.45.0 (2026-04-29)
+diff --git a/packages/list-reusable-blocks/src/components/import-form/style.scss b/packages/list-reusable-blocks/src/components/import-form/style.scss
+index e72d63fd2a4903..86d673ee6d888f 100644
+--- a/packages/list-reusable-blocks/src/components/import-form/style.scss
++++ b/packages/list-reusable-blocks/src/components/import-form/style.scss
+@@ -7,14 +7,3 @@
+ 	margin-top: 10px;
+ 	float: right;
+ }
+-
+-.list-reusable-blocks-import-form {
+-	.components-notice__content {
+-		margin: 0;
+-	}
+-
+-	.components-notice.is-dismissible {
+-		padding-right: 0;
+-		margin: 5px 0;
+-	}
+-}
+diff --git a/packages/notices/CHANGELOG.md b/packages/notices/CHANGELOG.md
+index 0adff50d880a10..5c1cdb2a92c5c3 100644
+--- a/packages/notices/CHANGELOG.md
++++ b/packages/notices/CHANGELOG.md
+@@ -2,6 +2,14 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `InlineNotices`: Wrap pinned and dismissible lists in a `notices-inline-notices-wrapper` container with spacing between lists. Add optional `className` prop for the wrapper.
++
++### Internal
++
++-   `InlineNotices`: Remove package-level `Notice` style overrides; `Notice` from `@wordpress/components` owns layout and chrome ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
++
+ ## 5.46.0 (2026-05-14)
+ 
+ ## 5.45.0 (2026-04-29)
+diff --git a/packages/notices/README.md b/packages/notices/README.md
+index ed991be531855f..15bd402b27785c 100644
+--- a/packages/notices/README.md
++++ b/packages/notices/README.md
+@@ -36,6 +36,7 @@ Renders notice lists for notices with type `default`:
+ _Props_
+ 
+ -   `children: ReactNode` (optional): Additional content rendered in the dismissible notice list.
++-   `className: string` (optional): Extra class name added to the inline notices wrapper.
+ -   `pinnedNoticesClassName: string` (optional): Extra class name added to the pinned list.
+ -   `dismissibleNoticesClassName: string` (optional): Extra class name added to the dismissible list.
+ -   `context: string` (optional): Notice context to read and remove notices from. Defaults to `default`.
+diff --git a/packages/notices/package.json b/packages/notices/package.json
+index 99efbe912ab424..456b434c7e61fd 100644
+--- a/packages/notices/package.json
++++ b/packages/notices/package.json
+@@ -26,6 +26,7 @@
+ 		"src",
+ 		"build",
+ 		"build-module",
++		"build-style",
+ 		"build-types",
+ 		"*.md"
+ 	],
+@@ -37,11 +38,16 @@
+ 			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+-		"./package.json": "./package.json"
++		"./package.json": "./package.json",
++		"./build-style/": "./build-style/"
+ 	},
+ 	"react-native": "src/index",
+ 	"wpScript": true,
+ 	"types": "build-types",
++	"sideEffects": [
++		"build-style/**",
++		"src/**/*.scss"
++	],
+ 	"dependencies": {
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/components": "file:../components",
+diff --git a/packages/notices/src/components/inline-notices/index.tsx b/packages/notices/src/components/inline-notices/index.tsx
+index 0c6392fdbf913a..f45fc3cf3614e5 100644
+--- a/packages/notices/src/components/inline-notices/index.tsx
++++ b/packages/notices/src/components/inline-notices/index.tsx
+@@ -14,17 +14,27 @@ import { useDispatch, useSelect } from '@wordpress/data';
+  * Internal dependencies
+  */
+ import { store as noticesStore } from '../../store';
+-import './style.scss';
+ 
+ type InlineNoticesProps = {
+ 	children?: ReactNode;
++	className?: string;
+ 	pinnedNoticesClassName?: string;
+ 	dismissibleNoticesClassName?: string;
+ 	context?: string;
+ };
+ 
++function hasRenderableChildren( children: ReactNode ): boolean {
++	return (
++		children !== null &&
++		children !== undefined &&
++		children !== false &&
++		children !== ''
++	);
++}
++
+ export default function InlineNotices( {
+ 	children,
++	className,
+ 	pinnedNoticesClassName,
+ 	dismissibleNoticesClassName,
+ 	context,
+@@ -41,25 +51,37 @@ export default function InlineNotices( {
+ 		( { isDismissible, type } ) => ! isDismissible && type === 'default'
+ 	);
+ 
++	const hasPinnedNotices = nonDismissibleNotices.length > 0;
++	const hasDismissibleNotices =
++		dismissibleNotices.length > 0 || hasRenderableChildren( children );
++
++	if ( ! hasPinnedNotices && ! hasDismissibleNotices ) {
++		return null;
++	}
++
+ 	return (
+-		<>
+-			<NoticeList
+-				notices={ nonDismissibleNotices }
+-				className={ clsx(
+-					'components-notices__pinned',
+-					pinnedNoticesClassName
+-				) }
+-			/>
+-			<NoticeList
+-				notices={ dismissibleNotices }
+-				className={ clsx(
+-					'components-notices__dismissible',
+-					dismissibleNoticesClassName
+-				) }
+-				onRemove={ ( id ) => removeNotice( id, context ) }
+-			>
+-				{ children }
+-			</NoticeList>
+-		</>
++		<div className={ clsx( 'notices-inline-notices-wrapper', className ) }>
++			{ hasPinnedNotices && (
++				<NoticeList
++					notices={ nonDismissibleNotices }
++					className={ clsx(
++						'components-notices__pinned',
++						pinnedNoticesClassName
++					) }
++				/>
++			) }
++			{ hasDismissibleNotices && (
++				<NoticeList
++					notices={ dismissibleNotices }
++					className={ clsx(
++						'components-notices__dismissible',
++						dismissibleNoticesClassName
++					) }
++					onRemove={ ( id ) => removeNotice( id, context ) }
++				>
++					{ children }
++				</NoticeList>
++			) }
++		</div>
+ 	);
+ }
+diff --git a/packages/notices/src/components/inline-notices/style.scss b/packages/notices/src/components/inline-notices/style.scss
+index 58a11ac4d1e30d..c83094aa79010e 100644
+--- a/packages/notices/src/components/inline-notices/style.scss
++++ b/packages/notices/src/components/inline-notices/style.scss
+@@ -1,21 +1,5 @@
+-@use "@wordpress/base-styles/variables" as *;
+-@use "@wordpress/base-styles/colors" as *;
+-
+-.components-notices__dismissible,
+-.components-notices__pinned {
+-	color: $gray-900;
+-
+-	.components-notice {
+-		box-sizing: border-box;
+-		border-bottom: $border-width solid rgba(0, 0, 0, 0.2);
+-		padding: 0 $grid-unit-15;
+-
+-		// Min-height matches the height of a single-line notice with an action button.
+-		min-height: $header-height;
+-
+-		// Margins ensure that the dismiss button aligns to the center of the first line of text.
+-		.components-notice__dismiss {
+-			margin-top: $grid-unit-15;
+-		}
+-	}
++.notices-inline-notices-wrapper {
++	display: flex;
++	flex-direction: column;
++	gap: var(--wpds-dimension-gap-md);
+ }
+diff --git a/packages/notices/src/components/inline-notices/test/index.test.tsx b/packages/notices/src/components/inline-notices/test/index.test.tsx
+new file mode 100644
+index 00000000000000..3a11e2f638c48c
+--- /dev/null
++++ b/packages/notices/src/components/inline-notices/test/index.test.tsx
+@@ -0,0 +1,157 @@
++/**
++ * External dependencies
++ */
++import { render, screen, within } from '@testing-library/react';
++
++/**
++ * WordPress dependencies
++ */
++import { createRegistry, RegistryProvider } from '@wordpress/data';
++
++/**
++ * Internal dependencies
++ */
++import InlineNotices from '../index';
++import { store as noticesStore } from '../../../store';
++
++function getInlineNoticesWrapper( container: HTMLElement ) {
++	return container.firstChild as HTMLElement;
++}
++
++function renderInlineNotices( props = {} ) {
++	const registry = createRegistry();
++	registry.register( noticesStore );
++
++	const view = render(
++		<RegistryProvider value={ registry }>
++			<InlineNotices { ...props } />
++		</RegistryProvider>
++	);
++
++	return { registry, ...view };
++}
++
++describe( 'InlineNotices', () => {
++	it( 'should return null when there are no notices and no children', () => {
++		const { container } = renderInlineNotices();
++
++		expect( container ).toBeEmptyDOMElement();
++	} );
++
++	it( 'should return null when children is false and there are no notices', () => {
++		const { container } = renderInlineNotices( {
++			children: false,
++		} );
++
++		expect( container ).toBeEmptyDOMElement();
++	} );
++
++	it( 'should render the inline notices wrapper with a custom class name', () => {
++		const { container } = renderInlineNotices( {
++			className: 'my-inline-notices',
++			children: <div>Extra notice</div>,
++		} );
++
++		expect( getInlineNoticesWrapper( container ) ).toHaveClass(
++			'notices-inline-notices-wrapper',
++			'my-inline-notices'
++		);
++	} );
++
++	it( 'renders pinned notices without a close button', () => {
++		const registry = createRegistry();
++		registry.register( noticesStore );
++		registry
++			.dispatch( noticesStore )
++			.createNotice( 'warning', 'Pinned notice', {
++				isDismissible: false,
++			} );
++
++		const { container } = render(
++			<RegistryProvider value={ registry }>
++				<InlineNotices />
++			</RegistryProvider>
++		);
++
++		expect(
++			within( getInlineNoticesWrapper( container ) ).getByText(
++				'Pinned notice'
++			)
++		).toBeInTheDocument();
++		expect(
++			screen.queryByRole( 'button', { name: 'Close' } )
++		).not.toBeInTheDocument();
++	} );
++
++	it( 'renders dismissible notices with a close button', () => {
++		const registry = createRegistry();
++		registry.register( noticesStore );
++		registry
++			.dispatch( noticesStore )
++			.createNotice( 'warning', 'Dismissible notice' );
++
++		render(
++			<RegistryProvider value={ registry }>
++				<InlineNotices />
++			</RegistryProvider>
++		);
++
++		expect(
++			screen.getByRole( 'button', { name: 'Close' } )
++		).toBeInTheDocument();
++	} );
++
++	it( 'partitions pinned and dismissible notices into separate lists', () => {
++		const registry = createRegistry();
++		registry.register( noticesStore );
++		registry
++			.dispatch( noticesStore )
++			.createNotice( 'warning', 'Pinned notice', {
++				isDismissible: false,
++			} );
++		registry
++			.dispatch( noticesStore )
++			.createNotice( 'success', 'Dismissible notice' );
++
++		const { container } = render(
++			<RegistryProvider value={ registry }>
++				<InlineNotices
++					pinnedNoticesClassName="test-pinned"
++					dismissibleNoticesClassName="test-dismissible"
++				/>
++			</RegistryProvider>
++		);
++
++		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access -- partition via public className props.
++		const pinned = container.querySelector( '.test-pinned' )!;
++		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access -- partition via public className props.
++		const dismissible = container.querySelector( '.test-dismissible' )!;
++
++		expect(
++			within( pinned ).getByText( 'Pinned notice' )
++		).toBeInTheDocument();
++		expect(
++			within( pinned ).queryByText( 'Dismissible notice' )
++		).not.toBeInTheDocument();
++		expect(
++			within( dismissible ).getByText( 'Dismissible notice' )
++		).toBeInTheDocument();
++		expect(
++			within( dismissible ).queryByText( 'Pinned notice' )
++		).not.toBeInTheDocument();
++	} );
++
++	it( 'renders children in the dismissible list', () => {
++		const { container } = renderInlineNotices( {
++			children: <div>Extra notice</div>,
++			dismissibleNoticesClassName: 'test-dismissible',
++		} );
++
++		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access -- partition via public className props.
++		const dismissible = container.querySelector( '.test-dismissible' )!;
++
++		expect(
++			within( dismissible ).getByText( 'Extra notice' )
++		).toBeInTheDocument();
++	} );
++} );
+diff --git a/packages/notices/src/style.scss b/packages/notices/src/style.scss
+new file mode 100644
+index 00000000000000..9f3b2b20ec3b4a
+--- /dev/null
++++ b/packages/notices/src/style.scss
+@@ -0,0 +1 @@
++@use "./components/inline-notices/style.scss" as *;
+diff --git a/tools/eslint/suppressions.json b/tools/eslint/suppressions.json
+index ab353949ec3e7e..c68057e728d6c4 100644
+--- a/tools/eslint/suppressions.json
++++ b/tools/eslint/suppressions.json
+@@ -1513,11 +1513,6 @@
+ 			"count": 1
+ 		}
+ 	},
+-	"packages/notices/src/components/inline-notices/index.tsx": {
+-		"@wordpress/no-non-module-stylesheet-imports": {
+-			"count": 1
+-		}
+-	},
+ 	"packages/patterns/src/components/allow-overrides-modal.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 3

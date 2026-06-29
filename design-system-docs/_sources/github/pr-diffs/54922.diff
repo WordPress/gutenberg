@@ -1,0 +1,946 @@
+diff --git a/docs/tool/manifest.js b/docs/tool/manifest.js
+index b061fa5149c698..ced8866edd5a4e 100644
+--- a/docs/tool/manifest.js
++++ b/docs/tool/manifest.js
+@@ -11,7 +11,6 @@ const componentPaths = glob( 'packages/components/src/*/**/README.md', {
+ 	// Don't expose documentation for mobile only and G2 components just yet.
+ 	ignore: [
+ 		'**/src/mobile/**/README.md',
+-		'**/src/ui/**/README.md',
+ 		'packages/components/src/theme/README.md',
+ 		'packages/components/src/view/README.md',
+ 		'packages/components/src/dropdown-menu-v2/README.md',
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 986c7fa19b9ea2..abd31247775973 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -24,7 +24,7 @@
+ -   Update `uuid` package to 9.0.1 ([#54725](https://github.com/WordPress/gutenberg/pull/54725)).
+ -   `ContextSystemProvider`: Move out of `ui/` ([#54847](https://github.com/WordPress/gutenberg/pull/54847)).
+ -   `SlotFill`: Migrate to TypeScript and Convert to Functional Component `<Slot bubblesVirtually />`. ([#51350](https://github.com/WordPress/gutenberg/pull/51350)).
+-
++-   `Components`: move `ui/utils` to `utils` and remove `ui/` folder ([#54922](https://github.com/WordPress/gutenberg/pull/54922)).
+ 
+ ## 25.8.0 (2023-09-20)
+ 
+diff --git a/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.tsx b/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.tsx
+index 65ac5b77d0da6c..08a907b21e0c99 100644
+--- a/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.tsx
++++ b/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.tsx
+@@ -9,7 +9,7 @@ import styled from '@emotion/styled';
+  */
+ import { Flex } from '../../flex';
+ import { COLORS } from '../../utils';
+-import { space } from '../../ui/utils/space';
++import { space } from '../../utils/space';
+ import { Text } from '../../text';
+ import CONFIG from '../../utils/config-values';
+ 
+diff --git a/packages/components/src/base-control/styles/base-control-styles.ts b/packages/components/src/base-control/styles/base-control-styles.ts
+index abd2f3affc45ae..6ddfe10229fdbb 100644
+--- a/packages/components/src/base-control/styles/base-control-styles.ts
++++ b/packages/components/src/base-control/styles/base-control-styles.ts
+@@ -8,7 +8,7 @@ import { css } from '@emotion/react';
+  * Internal dependencies
+  */
+ import { baseLabelTypography, boxSizingReset, font, COLORS } from '../../utils';
+-import { space } from '../../ui/utils/space';
++import { space } from '../../utils/space';
+ 
+ export const Wrapper = styled.div`
+ 	font-family: ${ font( 'default.fontFamily' ) };
+diff --git a/packages/components/src/border-control/styles.ts b/packages/components/src/border-control/styles.ts
+index c828536e199f9a..322e9563d58a4d 100644
+--- a/packages/components/src/border-control/styles.ts
++++ b/packages/components/src/border-control/styles.ts
+@@ -7,7 +7,7 @@ import { css } from '@emotion/react';
+  * Internal dependencies
+  */
+ import { COLORS, CONFIG, boxSizingReset, rtl } from '../utils';
+-import { space } from '../ui/utils/space';
++import { space } from '../utils/space';
+ import { StyledLabel } from '../base-control/styles/base-control-styles';
+ import {
+ 	ValueInput as UnitControlWrapper,
+diff --git a/packages/components/src/card/card/README.md b/packages/components/src/card/card/README.md
+index ffad1e2ec36e53..c7b70c8c6c907a 100644
+--- a/packages/components/src/card/card/README.md
++++ b/packages/components/src/card/card/README.md
+@@ -66,7 +66,7 @@ Determines the amount of padding within the component.
+ 
+ ### Inherited props
+ 
+-`Card` also inherits all of the [`Surface` props](/packages/components/src/ui/surface/README.md#props).
++`Card` also inherits all of the [`Surface` props](/packages/components/src/surface/README.md#props).
+ 
+ ## Sub-Components
+ 
+diff --git a/packages/components/src/color-picker/hex-input.tsx b/packages/components/src/color-picker/hex-input.tsx
+index edbb5350ef1d59..6001892ff8afa5 100644
+--- a/packages/components/src/color-picker/hex-input.tsx
++++ b/packages/components/src/color-picker/hex-input.tsx
+@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
+ import { InputControl } from '../input-control';
+ import { Text } from '../text';
+ import { Spacer } from '../spacer';
+-import { space } from '../ui/utils/space';
++import { space } from '../utils/space';
+ import { COLORS } from '../utils/colors-values';
+ import type { StateReducer } from '../input-control/reducer/state';
+ import type { HexInputProps } from './types';
+diff --git a/packages/components/src/color-picker/input-with-slider.tsx b/packages/components/src/color-picker/input-with-slider.tsx
+index cb346bff8fd86e..b51db75c1f4513 100644
+--- a/packages/components/src/color-picker/input-with-slider.tsx
++++ b/packages/components/src/color-picker/input-with-slider.tsx
+@@ -4,7 +4,7 @@
+ import { HStack } from '../h-stack';
+ import { Text } from '../text';
+ import { Spacer } from '../spacer';
+-import { space } from '../ui/utils/space';
++import { space } from '../utils/space';
+ import { RangeControl, NumberControlWrapper } from './styles';
+ import { COLORS } from '../utils/colors-values';
+ import type { InputWithSliderProps } from './types';
+diff --git a/packages/components/src/color-picker/styles.ts b/packages/components/src/color-picker/styles.ts
+index f78db13a8fd73f..eee163d047ff06 100644
+--- a/packages/components/src/color-picker/styles.ts
++++ b/packages/components/src/color-picker/styles.ts
+@@ -9,7 +9,7 @@ import styled from '@emotion/styled';
+ import NumberControl from '../number-control';
+ import InnerSelectControl from '../select-control';
+ import InnerRangeControl from '../range-control';
+-import { space } from '../ui/utils/space';
++import { space } from '../utils/space';
+ import { boxSizingReset } from '../utils';
+ import Button from '../button';
+ import { Flex } from '../flex';
+diff --git a/packages/components/src/combobox-control/styles.ts b/packages/components/src/combobox-control/styles.ts
+index de1ed2fb76677c..676c70f9e8f572 100644
+--- a/packages/components/src/combobox-control/styles.ts
++++ b/packages/components/src/combobox-control/styles.ts
+@@ -8,7 +8,7 @@ import { css } from '@emotion/react';
+  * Internal dependencies
+  */
+ import { Flex } from '../flex';
+-import { space } from '../ui/utils/space';
++import { space } from '../utils/space';
+ import type { ComboboxControlProps } from './types';
+ 
+ const deprecatedDefaultSize = ( {
+diff --git a/packages/components/src/date-time/date/styles.ts b/packages/components/src/date-time/date/styles.ts
+index 0e7a3881d821c6..5500206abd40a2 100644
+--- a/packages/components/src/date-time/date/styles.ts
++++ b/packages/components/src/date-time/date/styles.ts
+@@ -10,7 +10,7 @@ import Button from '../../button';
+ import { COLORS, CONFIG } from '../../utils';
+ import { HStack } from '../../h-stack';
+ import { Heading } from '../../heading';
+-import { space } from '../../ui/utils/space';
++import { space } from '../../utils/space';
+ 
+ export const Wrapper = styled.div`
+ 	box-sizing: border-box;
+diff --git a/packages/components/src/date-time/time/styles.ts b/packages/components/src/date-time/time/styles.ts
+index bc579a6731ee98..2ae51c5ea26ff2 100644
+--- a/packages/components/src/date-time/time/styles.ts
++++ b/packages/components/src/date-time/time/styles.ts
+@@ -8,7 +8,7 @@ import { css } from '@emotion/react';
+  * Internal dependencies
+  */
+ import { COLORS, CONFIG } from '../../utils';
+-import { space } from '../../ui/utils/space';
++import { space } from '../../utils/space';
+ import {
+ 	Input,
+ 	BackdropUI,
+diff --git a/packages/components/src/divider/styles.ts b/packages/components/src/divider/styles.ts
+index ad13e357c53b08..189f0a0223041e 100644
+--- a/packages/components/src/divider/styles.ts
++++ b/packages/components/src/divider/styles.ts
+@@ -7,7 +7,7 @@ import { css } from '@emotion/react';
+ /**
+  * Internal dependencies
+  */
+-import { space } from '../ui/utils/space';
++import { space } from '../utils/space';
+ import { rtl } from '../utils';
+ import type { DividerProps } from './types';
+ 
+diff --git a/packages/components/src/divider/types.ts b/packages/components/src/divider/types.ts
+index feaa0b4f4c19b0..03caedb6a5b3e7 100644
+--- a/packages/components/src/divider/types.ts
++++ b/packages/components/src/divider/types.ts
+@@ -7,7 +7,7 @@ import type { SeparatorProps } from 'reakit';
+ /**
+  * Internal dependencies
+  */
+-import type { SpaceInput } from '../ui/utils/space';
++import type { SpaceInput } from '../utils/space';
+ 
+ export type DividerProps = Omit<
+ 	SeparatorProps,
+diff --git a/packages/components/src/dropdown-menu-v2/styles.ts b/packages/components/src/dropdown-menu-v2/styles.ts
+index f1ba603797a7ff..cdeeed077b5f3a 100644
+--- a/packages/components/src/dropdown-menu-v2/styles.ts
++++ b/packages/components/src/dropdown-menu-v2/styles.ts
+@@ -9,7 +9,7 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+  * Internal dependencies
+  */
+ import { COLORS, font, rtl, CONFIG } from '../utils';
+-import { space } from '../ui/utils/space';
++import { space } from '../utils/space';
+ import Icon from '../icon';
+ import type { DropdownMenuInternalContext } from './types';
+ 
+diff --git a/packages/components/src/dropdown/styles.ts b/packages/components/src/dropdown/styles.ts
+index f64e886e8be264..6d5412f9a81213 100644
+--- a/packages/components/src/dropdown/styles.ts
++++ b/packages/components/src/dropdown/styles.ts
+@@ -7,7 +7,7 @@ import styled from '@emotion/styled';
+ /**
+  * Internal dependencies
+  */
+-import { space } from '../ui/utils/space';
++import { space } from '../utils/space';
+ import type { DropdownContentWrapperProps } from './types';
+ 
+ const padding = ( { paddingSize = 'small' }: DropdownContentWrapperProps ) => {
+diff --git a/packages/components/src/flex/flex/hook.ts b/packages/components/src/flex/flex/hook.ts
+index 9b670d8a8ec017..df53667915999c 100644
+--- a/packages/components/src/flex/flex/hook.ts
++++ b/packages/components/src/flex/flex/hook.ts
+@@ -14,8 +14,8 @@ import deprecated from '@wordpress/deprecated';
+  */
+ import type { WordPressComponentProps } from '../../context';
+ import { useContextSystem } from '../../context';
+-import { useResponsiveValue } from '../../ui/utils/use-responsive-value';
+-import { space } from '../../ui/utils/space';
++import { useResponsiveValue } from '../../utils/use-responsive-value';
++import { space } from '../../utils/space';
+ import * as styles from '../styles';
+ import { useCx } from '../../utils';
+ import type { FlexProps } from '../types';
+diff --git a/packages/components/src/flex/types.ts b/packages/components/src/flex/types.ts
+index e36a906392b8d9..cc5553a660a831 100644
+--- a/packages/components/src/flex/types.ts
++++ b/packages/components/src/flex/types.ts
+@@ -6,8 +6,8 @@ import type { CSSProperties, ReactNode } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { ResponsiveCSSValue } from '../ui/utils/types';
+-import type { SpaceInput } from '../ui/utils/space';
++import type { ResponsiveCSSValue } from '../utils/types';
++import type { SpaceInput } from '../utils/space';
+ 
+ export type FlexDirection = ResponsiveCSSValue<
+ 	CSSProperties[ 'flexDirection' ]
+diff --git a/packages/components/src/font-size-picker/styles.ts b/packages/components/src/font-size-picker/styles.ts
+index 8ba0ce661c5eb7..ef8ec8ebb30cb2 100644
+--- a/packages/components/src/font-size-picker/styles.ts
++++ b/packages/components/src/font-size-picker/styles.ts
+@@ -9,7 +9,7 @@ import styled from '@emotion/styled';
+ import BaseControl from '../base-control';
+ import Button from '../button';
+ import { HStack } from '../h-stack';
+-import { space } from '../ui/utils/space';
++import { space } from '../utils/space';
+ import { COLORS } from '../utils';
+ 
+ export const Container = styled.fieldset`
+diff --git a/packages/components/src/form-token-field/styles.ts b/packages/components/src/form-token-field/styles.ts
+index ee67f44a5f3244..e4d41ad90c472c 100644
+--- a/packages/components/src/form-token-field/styles.ts
++++ b/packages/components/src/form-token-field/styles.ts
+@@ -8,7 +8,7 @@ import { css } from '@emotion/react';
+  * Internal dependencies
+  */
+ import { Flex } from '../flex';
+-import { space } from '../ui/utils/space';
++import { space } from '../utils/space';
+ import { boxSizingReset } from '../utils';
+ 
+ type TokensAndInputWrapperProps = {
+diff --git a/packages/components/src/grid/hook.ts b/packages/components/src/grid/hook.ts
+index 26f1eb1ae95647..621438c96df7b3 100644
+--- a/packages/components/src/grid/hook.ts
++++ b/packages/components/src/grid/hook.ts
+@@ -14,7 +14,7 @@ import { useMemo } from '@wordpress/element';
+ import type { WordPressComponentProps } from '../context';
+ import { useContextSystem } from '../context';
+ import { getAlignmentProps } from './utils';
+-import { useResponsiveValue } from '../ui/utils/use-responsive-value';
++import { useResponsiveValue } from '../utils/use-responsive-value';
+ import CONFIG from '../utils/config-values';
+ import { useCx } from '../utils/hooks/use-cx';
+ import type { GridProps } from './types';
+diff --git a/packages/components/src/grid/types.ts b/packages/components/src/grid/types.ts
+index 878e23f8ff5317..44258064e46a69 100644
+--- a/packages/components/src/grid/types.ts
++++ b/packages/components/src/grid/types.ts
+@@ -6,7 +6,7 @@ import type { CSSProperties, ReactNode } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { ResponsiveCSSValue } from '../ui/utils/types';
++import type { ResponsiveCSSValue } from '../utils/types';
+ 
+ type GridAlignment =
+ 	| 'bottom'
+diff --git a/packages/components/src/h-stack/hook.tsx b/packages/components/src/h-stack/hook.tsx
+index be30502a57b13e..b7b8cf92954a1d 100644
+--- a/packages/components/src/h-stack/hook.tsx
++++ b/packages/components/src/h-stack/hook.tsx
+@@ -10,7 +10,7 @@ import type { WordPressComponentProps } from '../context';
+ import { hasConnectNamespace, useContextSystem } from '../context';
+ import { FlexItem, useFlex } from '../flex';
+ import { getAlignmentProps } from './utils';
+-import { getValidChildren } from '../ui/utils/get-valid-children';
++import { getValidChildren } from '../utils/get-valid-children';
+ import type { Props } from './types';
+ 
+ export function useHStack( props: WordPressComponentProps< Props, 'div' > ) {
+diff --git a/packages/components/src/heading/hook.ts b/packages/components/src/heading/hook.ts
+index 81cb95fa34a621..e493343967cba8 100644
+--- a/packages/components/src/heading/hook.ts
++++ b/packages/components/src/heading/hook.ts
+@@ -4,7 +4,7 @@
+ import type { WordPressComponentProps } from '../context';
+ import { useContextSystem } from '../context';
+ import { useText } from '../text';
+-import { getHeadingFontSize } from '../ui/utils/font-size';
++import { getHeadingFontSize } from '../utils/font-size';
+ import { CONFIG, COLORS } from '../utils';
+ import type { HeadingProps } from './types';
+ 
+diff --git a/packages/components/src/input-control/index.tsx b/packages/components/src/input-control/index.tsx
+index b1586995caa54e..a9e1ee5e991019 100644
+--- a/packages/components/src/input-control/index.tsx
++++ b/packages/components/src/input-control/index.tsx
+@@ -16,7 +16,7 @@ import { useState, forwardRef } from '@wordpress/element';
+ import InputBase from './input-base';
+ import InputField from './input-field';
+ import type { InputControlProps } from './types';
+-import { space } from '../ui/utils/space';
++import { space } from '../utils/space';
+ import { useDraft } from './utils';
+ import BaseControl from '../base-control';
+ 
+diff --git a/packages/components/src/input-control/styles/input-control-styles.tsx b/packages/components/src/input-control/styles/input-control-styles.tsx
+index 1f3e16f9dde406..b3e9e7d0bc937e 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.tsx
++++ b/packages/components/src/input-control/styles/input-control-styles.tsx
+@@ -14,7 +14,7 @@ import { Flex, FlexItem } from '../../flex';
+ import { Text } from '../../text';
+ import { baseLabelTypography, COLORS, CONFIG, rtl } from '../../utils';
+ import type { LabelPosition, Size } from '../types';
+-import { space } from '../../ui/utils/space';
++import { space } from '../../utils/space';
+ 
+ type ContainerProps = {
+ 	disabled?: boolean;
+diff --git a/packages/components/src/navigation/styles/navigation-styles.tsx b/packages/components/src/navigation/styles/navigation-styles.tsx
+index 7c3ea34f99899d..27c508b98f26dc 100644
+--- a/packages/components/src/navigation/styles/navigation-styles.tsx
++++ b/packages/components/src/navigation/styles/navigation-styles.tsx
+@@ -16,7 +16,7 @@ import Button from '../../button';
+ import { Text } from '../../text';
+ import { Heading } from '../../heading';
+ import { reduceMotion, rtl } from '../../utils';
+-import { space } from '../../ui/utils/space';
++import { space } from '../../utils/space';
+ import SearchControl from '../../search-control';
+ 
+ export const NavigationUI = styled.div`
+diff --git a/packages/components/src/number-control/styles/number-control-styles.ts b/packages/components/src/number-control/styles/number-control-styles.ts
+index 6cbb18b565c25d..2fa1be970090bf 100644
+--- a/packages/components/src/number-control/styles/number-control-styles.ts
++++ b/packages/components/src/number-control/styles/number-control-styles.ts
+@@ -10,7 +10,7 @@ import styled from '@emotion/styled';
+ import InputControl from '../../input-control';
+ import { COLORS } from '../../utils';
+ import Button from '../../button';
+-import { space } from '../../ui/utils/space';
++import { space } from '../../utils/space';
+ 
+ const htmlArrowStyles = ( { hideHTMLArrows }: { hideHTMLArrows: boolean } ) => {
+ 	if ( ! hideHTMLArrows ) {
+diff --git a/packages/components/src/palette-edit/styles.js b/packages/components/src/palette-edit/styles.js
+index 0c72493f465647..4beeb6e7c2213d 100644
+--- a/packages/components/src/palette-edit/styles.js
++++ b/packages/components/src/palette-edit/styles.js
+@@ -9,7 +9,7 @@ import styled from '@emotion/styled';
+ import Button from '../button';
+ import { Heading } from '../heading';
+ import { HStack } from '../h-stack';
+-import { space } from '../ui/utils/space';
++import { space } from '../utils/space';
+ import { COLORS, CONFIG } from '../utils';
+ import { View } from '../view';
+ import InputControl from '../input-control';
+diff --git a/packages/components/src/range-control/index.tsx b/packages/components/src/range-control/index.tsx
+index 534ae36af67ca4..05b162a492e849 100644
+--- a/packages/components/src/range-control/index.tsx
++++ b/packages/components/src/range-control/index.tsx
+@@ -37,7 +37,7 @@ import {
+ 
+ import type { RangeControlProps } from './types';
+ import type { WordPressComponentProps } from '../context';
+-import { space } from '../ui/utils/space';
++import { space } from '../utils/space';
+ 
+ const noop = () => {};
+ 
+diff --git a/packages/components/src/range-control/styles/range-control-styles.ts b/packages/components/src/range-control/styles/range-control-styles.ts
+index 1e4aa96bba03ba..07b744356d4f9b 100644
+--- a/packages/components/src/range-control/styles/range-control-styles.ts
++++ b/packages/components/src/range-control/styles/range-control-styles.ts
+@@ -9,7 +9,7 @@ import styled from '@emotion/styled';
+  */
+ import NumberControl from '../../number-control';
+ import { COLORS, reduceMotion, rtl } from '../../utils';
+-import { space } from '../../ui/utils/space';
++import { space } from '../../utils/space';
+ 
+ import type {
+ 	RangeMarkProps,
+@@ -301,7 +301,7 @@ export const Tooltip = styled.span< TooltipProps >`
+ `;
+ 
+ // @todo: Refactor RangeControl with latest HStack configuration
+-// @wordpress/components/ui/hstack.
++// @see: packages/components/src/h-stack
+ export const InputNumber = styled( NumberControl )`
+ 	display: inline-block;
+ 	font-size: 13px;
+diff --git a/packages/components/src/select-control/styles/select-control-styles.ts b/packages/components/src/select-control/styles/select-control-styles.ts
+index 2374015d747faf..494a864d44b6f3 100644
+--- a/packages/components/src/select-control/styles/select-control-styles.ts
++++ b/packages/components/src/select-control/styles/select-control-styles.ts
+@@ -8,7 +8,7 @@ import styled from '@emotion/styled';
+  * Internal dependencies
+  */
+ import { COLORS, rtl } from '../../utils';
+-import { space } from '../../ui/utils/space';
++import { space } from '../../utils/space';
+ import type { SelectControlProps } from '../types';
+ import InputControlSuffixWrapper from '../../input-control/input-suffix-wrapper';
+ 
+diff --git a/packages/components/src/spacer/hook.ts b/packages/components/src/spacer/hook.ts
+index 715089455f4fa9..82d36baa5e202f 100644
+--- a/packages/components/src/spacer/hook.ts
++++ b/packages/components/src/spacer/hook.ts
+@@ -8,7 +8,7 @@ import { css } from '@emotion/react';
+  */
+ import type { WordPressComponentProps } from '../context';
+ import { useContextSystem } from '../context';
+-import { space } from '../ui/utils/space';
++import { space } from '../utils/space';
+ import { rtl, useCx } from '../utils';
+ import type { SpacerProps } from './types';
+ 
+diff --git a/packages/components/src/spacer/types.ts b/packages/components/src/spacer/types.ts
+index c50801e2a3492b..52310c4f58bf28 100644
+--- a/packages/components/src/spacer/types.ts
++++ b/packages/components/src/spacer/types.ts
+@@ -6,7 +6,7 @@ import type { ReactNode } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { SpaceInput } from '../ui/utils/space';
++import type { SpaceInput } from '../utils/space';
+ 
+ export type SpacerProps = {
+ 	/**
+diff --git a/packages/components/src/spinner/stories/index.story.tsx b/packages/components/src/spinner/stories/index.story.tsx
+index dfd6fb26f25ae9..1062c6406bfb4e 100644
+--- a/packages/components/src/spinner/stories/index.story.tsx
++++ b/packages/components/src/spinner/stories/index.story.tsx
+@@ -7,7 +7,7 @@ import type { StoryFn, Meta } from '@storybook/react';
+  * Internal dependencies
+  */
+ import Spinner from '../';
+-import { space } from '../../ui/utils/space';
++import { space } from '../../utils/space';
+ 
+ const meta: Meta< typeof Spinner > = {
+ 	title: 'Components/Spinner',
+diff --git a/packages/components/src/text/get-line-height.ts b/packages/components/src/text/get-line-height.ts
+index 88bf9d1558e6f5..906bd0eabfab9d 100644
+--- a/packages/components/src/text/get-line-height.ts
++++ b/packages/components/src/text/get-line-height.ts
+@@ -7,7 +7,7 @@ import type { CSSProperties } from 'react';
+  * Internal dependencies
+  */
+ import type { Props } from './types';
+-import { space } from '../ui/utils/space';
++import { space } from '../utils/space';
+ import { CONFIG } from '../utils';
+ 
+ export function getLineHeight(
+diff --git a/packages/components/src/text/hook.js b/packages/components/src/text/hook.js
+index 4cfeaa7943b314..5198845c1dae78 100644
+--- a/packages/components/src/text/hook.js
++++ b/packages/components/src/text/hook.js
+@@ -13,10 +13,10 @@ import { useMemo, Children, cloneElement } from '@wordpress/element';
+  */
+ import { hasConnectNamespace, useContextSystem } from '../context';
+ import { useTruncate } from '../truncate';
+-import { getOptimalTextShade } from '../ui/utils';
++import { getOptimalTextShade } from '../utils/colors';
+ import * as styles from './styles';
+ import { createHighlighterText } from './utils';
+-import { getFontSize } from '../ui/utils/font-size';
++import { getFontSize } from '../utils/font-size';
+ import { CONFIG, COLORS } from '../utils';
+ import { getLineHeight } from './get-line-height';
+ import { useCx } from '../utils/hooks/use-cx';
+diff --git a/packages/components/src/text/test/index.tsx b/packages/components/src/text/test/index.tsx
+index 7147c887970cdc..5fad5582f4d46e 100644
+--- a/packages/components/src/text/test/index.tsx
++++ b/packages/components/src/text/test/index.tsx
+@@ -6,7 +6,7 @@ import { render, screen } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import { getFontSize } from '../../ui/utils/font-size';
++import { getFontSize } from '../../utils/font-size';
+ import { COLORS } from '../../utils';
+ import { Text } from '../';
+ 
+diff --git a/packages/components/src/toggle-control/index.tsx b/packages/components/src/toggle-control/index.tsx
+index f5a76c55a7bb96..c991953d53e4bf 100644
+--- a/packages/components/src/toggle-control/index.tsx
++++ b/packages/components/src/toggle-control/index.tsx
+@@ -19,7 +19,7 @@ import type { WordPressComponentProps } from '../context/wordpress-component';
+ import type { ToggleControlProps } from './types';
+ import { HStack } from '../h-stack';
+ import { useCx } from '../utils';
+-import { space } from '../ui/utils/space';
++import { space } from '../utils/space';
+ 
+ /**
+  * ToggleControl is used to generate a toggle user interface.
+diff --git a/packages/components/src/tools-panel/styles.ts b/packages/components/src/tools-panel/styles.ts
+index f3c5d77fe27cc4..1da1003c0462e3 100644
+--- a/packages/components/src/tools-panel/styles.ts
++++ b/packages/components/src/tools-panel/styles.ts
+@@ -14,7 +14,7 @@ import {
+ } from '../base-control/styles/base-control-styles';
+ import { LabelWrapper } from '../input-control/styles/input-control-styles';
+ import { COLORS, CONFIG, rtl } from '../utils';
+-import { space } from '../ui/utils/space';
++import { space } from '../utils/space';
+ 
+ const toolsPanelGrid = {
+ 	columns: ( columns: number ) => css`
+diff --git a/packages/components/src/ui/README.md b/packages/components/src/ui/README.md
+deleted file mode 100644
+index 6099fe0032851f..00000000000000
+--- a/packages/components/src/ui/README.md
++++ /dev/null
+@@ -1,5 +0,0 @@
+-# TODO
+-
+-We want to get rid of this folder. Don't add anything new here.
+-
+-What is left of this folder should either be deleted (if unused elsewhere), or be moved into the root `packages/components/src` and `packages/components/src/utils` folders. 
+\ No newline at end of file
+diff --git a/packages/components/src/ui/utils/colors.js b/packages/components/src/ui/utils/colors.js
+deleted file mode 100644
+index 32d0d21aef47ec..00000000000000
+--- a/packages/components/src/ui/utils/colors.js
++++ /dev/null
+@@ -1,98 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import memoize from 'memize';
+-import { colord, extend } from 'colord';
+-import namesPlugin from 'colord/plugins/names';
+-
+-/** @type {HTMLDivElement} */
+-let colorComputationNode;
+-
+-extend( [ namesPlugin ] );
+-
+-/**
+- * @return {HTMLDivElement | undefined} The HTML element for color computation.
+- */
+-function getColorComputationNode() {
+-	if ( typeof document === 'undefined' ) return;
+-
+-	if ( ! colorComputationNode ) {
+-		// Create a temporary element for style computation.
+-		const el = document.createElement( 'div' );
+-		el.setAttribute( 'data-g2-color-computation-node', '' );
+-		// Inject for window computed style.
+-		document.body.appendChild( el );
+-		colorComputationNode = el;
+-	}
+-
+-	return colorComputationNode;
+-}
+-
+-/**
+- * @param {string | unknown} value
+- *
+- * @return {boolean} Whether the value is a valid color.
+- */
+-function isColor( value ) {
+-	if ( typeof value !== 'string' ) return false;
+-	const test = colord( value );
+-
+-	return test.isValid();
+-}
+-
+-/**
+- * Retrieves the computed background color. This is useful for getting the
+- * value of a CSS variable color.
+- *
+- * @param {string | unknown} backgroundColor The background color to compute.
+- *
+- * @return {string} The computed background color.
+- */
+-function _getComputedBackgroundColor( backgroundColor ) {
+-	if ( typeof backgroundColor !== 'string' ) return '';
+-
+-	if ( isColor( backgroundColor ) ) return backgroundColor;
+-
+-	if ( ! backgroundColor.includes( 'var(' ) ) return '';
+-	if ( typeof document === 'undefined' ) return '';
+-
+-	// Attempts to gracefully handle CSS variables color values.
+-	const el = getColorComputationNode();
+-	if ( ! el ) return '';
+-
+-	el.style.background = backgroundColor;
+-	// Grab the style.
+-	const computedColor = window?.getComputedStyle( el ).background;
+-	// Reset.
+-	el.style.background = '';
+-
+-	return computedColor || '';
+-}
+-
+-const getComputedBackgroundColor = memoize( _getComputedBackgroundColor );
+-
+-/**
+- * Get the text shade optimized for readability, based on a background color.
+- *
+- * @param {string | unknown} backgroundColor The background color.
+- *
+- * @return {string} The optimized text color (black or white).
+- */
+-export function getOptimalTextColor( backgroundColor ) {
+-	const background = getComputedBackgroundColor( backgroundColor );
+-
+-	return colord( background ).isLight() ? '#000000' : '#ffffff';
+-}
+-
+-/**
+- * Get the text shade optimized for readability, based on a background color.
+- *
+- * @param {string | unknown} backgroundColor The background color.
+- *
+- * @return {string} The optimized text shade (dark or light).
+- */
+-export function getOptimalTextShade( backgroundColor ) {
+-	const result = getOptimalTextColor( backgroundColor );
+-
+-	return result === '#000000' ? 'dark' : 'light';
+-}
+diff --git a/packages/components/src/ui/utils/index.js b/packages/components/src/ui/utils/index.js
+deleted file mode 100644
+index c6f4adde96a523..00000000000000
+--- a/packages/components/src/ui/utils/index.js
++++ /dev/null
+@@ -1 +0,0 @@
+-export { getOptimalTextShade } from './colors';
+diff --git a/packages/components/src/ui/utils/test/colors.js b/packages/components/src/ui/utils/test/colors.js
+deleted file mode 100644
+index eb52b5dbb223bf..00000000000000
+--- a/packages/components/src/ui/utils/test/colors.js
++++ /dev/null
+@@ -1,42 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { getOptimalTextColor, getOptimalTextShade } from '../colors';
+-
+-describe( 'getOptimalTextColor', () => {
+-	test( 'should be white for dark backgrounds', () => {
+-		expect( getOptimalTextColor( 'black' ) ).toBe( '#ffffff' );
+-		expect( getOptimalTextColor( '#000' ) ).toBe( '#ffffff' );
+-		expect( getOptimalTextColor( '#111' ) ).toBe( '#ffffff' );
+-		expect( getOptimalTextColor( '#123' ) ).toBe( '#ffffff' );
+-		expect( getOptimalTextColor( '#555' ) ).toBe( '#ffffff' );
+-		expect( getOptimalTextColor( '#05f' ) ).toBe( '#ffffff' );
+-	} );
+-
+-	test( 'should be black for light backgrounds', () => {
+-		expect( getOptimalTextColor( 'white' ) ).toBe( '#000000' );
+-		expect( getOptimalTextColor( '#fff' ) ).toBe( '#000000' );
+-		expect( getOptimalTextColor( '#def' ) ).toBe( '#000000' );
+-		expect( getOptimalTextColor( '#c3c3c3' ) ).toBe( '#000000' );
+-		expect( getOptimalTextColor( '#0ff' ) ).toBe( '#000000' );
+-	} );
+-} );
+-
+-describe( 'getOptimalTextShade', () => {
+-	test( 'should be "light" for dark backgrounds', () => {
+-		expect( getOptimalTextShade( 'black' ) ).toBe( 'light' );
+-		expect( getOptimalTextShade( '#000' ) ).toBe( 'light' );
+-		expect( getOptimalTextShade( '#111' ) ).toBe( 'light' );
+-		expect( getOptimalTextShade( '#123' ) ).toBe( 'light' );
+-		expect( getOptimalTextShade( '#555' ) ).toBe( 'light' );
+-		expect( getOptimalTextShade( '#05f' ) ).toBe( 'light' );
+-	} );
+-
+-	test( 'should be "dark" for light backgrounds', () => {
+-		expect( getOptimalTextShade( 'white' ) ).toBe( 'dark' );
+-		expect( getOptimalTextShade( '#fff' ) ).toBe( 'dark' );
+-		expect( getOptimalTextShade( '#def' ) ).toBe( 'dark' );
+-		expect( getOptimalTextShade( '#c3c3c3' ) ).toBe( 'dark' );
+-		expect( getOptimalTextShade( '#0ff' ) ).toBe( 'dark' );
+-	} );
+-} );
+diff --git a/packages/components/src/unit-control/styles/unit-control-styles.ts b/packages/components/src/unit-control/styles/unit-control-styles.ts
+index 92b1f5f2fd8b4e..372c8000cde3f3 100644
+--- a/packages/components/src/unit-control/styles/unit-control-styles.ts
++++ b/packages/components/src/unit-control/styles/unit-control-styles.ts
+@@ -10,7 +10,7 @@ import { COLORS, CONFIG, rtl } from '../../utils';
+ import NumberControl from '../../number-control';
+ import { BackdropUI } from '../../input-control/styles/input-control-styles';
+ import type { SelectSize } from '../types';
+-import { space } from '../../ui/utils/space';
++import { space } from '../../utils/space';
+ 
+ // Using `selectSize` instead of `size` to avoid a type conflict with the
+ // `size` HTML attribute of the `select` element.
+diff --git a/packages/components/src/utils/colors.js b/packages/components/src/utils/colors.js
+index 2a144eef6647f6..25e7e2063cabde 100644
+--- a/packages/components/src/utils/colors.js
++++ b/packages/components/src/utils/colors.js
+@@ -1,9 +1,13 @@
+ /**
+  * External dependencies
+  */
++import memoize from 'memize';
+ import { colord, extend } from 'colord';
+ import namesPlugin from 'colord/plugins/names';
+ 
++/** @type {HTMLDivElement} */
++let colorComputationNode;
++
+ extend( [ namesPlugin ] );
+ 
+ /**
+@@ -20,3 +24,90 @@ extend( [ namesPlugin ] );
+ export function rgba( hexValue = '', alpha = 1 ) {
+ 	return colord( hexValue ).alpha( alpha ).toRgbString();
+ }
++
++/**
++ * @return {HTMLDivElement | undefined} The HTML element for color computation.
++ */
++function getColorComputationNode() {
++	if ( typeof document === 'undefined' ) return;
++
++	if ( ! colorComputationNode ) {
++		// Create a temporary element for style computation.
++		const el = document.createElement( 'div' );
++		el.setAttribute( 'data-g2-color-computation-node', '' );
++		// Inject for window computed style.
++		document.body.appendChild( el );
++		colorComputationNode = el;
++	}
++
++	return colorComputationNode;
++}
++
++/**
++ * @param {string | unknown} value
++ *
++ * @return {boolean} Whether the value is a valid color.
++ */
++function isColor( value ) {
++	if ( typeof value !== 'string' ) return false;
++	const test = colord( value );
++
++	return test.isValid();
++}
++
++/**
++ * Retrieves the computed background color. This is useful for getting the
++ * value of a CSS variable color.
++ *
++ * @param {string | unknown} backgroundColor The background color to compute.
++ *
++ * @return {string} The computed background color.
++ */
++function _getComputedBackgroundColor( backgroundColor ) {
++	if ( typeof backgroundColor !== 'string' ) return '';
++
++	if ( isColor( backgroundColor ) ) return backgroundColor;
++
++	if ( ! backgroundColor.includes( 'var(' ) ) return '';
++	if ( typeof document === 'undefined' ) return '';
++
++	// Attempts to gracefully handle CSS variables color values.
++	const el = getColorComputationNode();
++	if ( ! el ) return '';
++
++	el.style.background = backgroundColor;
++	// Grab the style.
++	const computedColor = window?.getComputedStyle( el ).background;
++	// Reset.
++	el.style.background = '';
++
++	return computedColor || '';
++}
++
++const getComputedBackgroundColor = memoize( _getComputedBackgroundColor );
++
++/**
++ * Get the text shade optimized for readability, based on a background color.
++ *
++ * @param {string | unknown} backgroundColor The background color.
++ *
++ * @return {string} The optimized text color (black or white).
++ */
++export function getOptimalTextColor( backgroundColor ) {
++	const background = getComputedBackgroundColor( backgroundColor );
++
++	return colord( background ).isLight() ? '#000000' : '#ffffff';
++}
++
++/**
++ * Get the text shade optimized for readability, based on a background color.
++ *
++ * @param {string | unknown} backgroundColor The background color.
++ *
++ * @return {string} The optimized text shade (dark or light).
++ */
++export function getOptimalTextShade( backgroundColor ) {
++	const result = getOptimalTextColor( backgroundColor );
++
++	return result === '#000000' ? 'dark' : 'light';
++}
+diff --git a/packages/components/src/utils/config-values.js b/packages/components/src/utils/config-values.js
+index 7f4ee6971b8c46..f279bce888b9d9 100644
+--- a/packages/components/src/utils/config-values.js
++++ b/packages/components/src/utils/config-values.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { space } from '../ui/utils/space';
++import { space } from './space';
+ import { COLORS } from './colors-values';
+ 
+ const CONTROL_HEIGHT = '36px';
+diff --git a/packages/components/src/ui/utils/font-size.ts b/packages/components/src/utils/font-size.ts
+similarity index 96%
+rename from packages/components/src/ui/utils/font-size.ts
+rename to packages/components/src/utils/font-size.ts
+index 1393426991c604..e1a5a543709f43 100644
+--- a/packages/components/src/ui/utils/font-size.ts
++++ b/packages/components/src/utils/font-size.ts
+@@ -6,7 +6,7 @@ import type { CSSProperties, ReactText } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import CONFIG from '../../utils/config-values';
++import CONFIG from './config-values';
+ 
+ export type HeadingSize =
+ 	| 1
+diff --git a/packages/components/src/ui/utils/get-valid-children.ts b/packages/components/src/utils/get-valid-children.ts
+similarity index 100%
+rename from packages/components/src/ui/utils/get-valid-children.ts
+rename to packages/components/src/utils/get-valid-children.ts
+diff --git a/packages/components/src/ui/utils/space.ts b/packages/components/src/utils/space.ts
+similarity index 100%
+rename from packages/components/src/ui/utils/space.ts
+rename to packages/components/src/utils/space.ts
+diff --git a/packages/components/src/utils/test/colors.js b/packages/components/src/utils/test/colors.js
+index 511e11ad2bfd1b..cc088cb2705bb0 100644
+--- a/packages/components/src/utils/test/colors.js
++++ b/packages/components/src/utils/test/colors.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { rgba } from '../colors';
++import { getOptimalTextColor, getOptimalTextShade, rgba } from '../colors';
+ 
+ describe( 'rbga', () => {
+ 	it( 'should output the expected string', () => {
+@@ -9,3 +9,41 @@ describe( 'rbga', () => {
+ 		expect( rgba( '#f00', 0.2 ) ).toBe( 'rgba(255, 0, 0, 0.2)' );
+ 	} );
+ } );
++
++describe( 'getOptimalTextColor', () => {
++	test( 'should be white for dark backgrounds', () => {
++		expect( getOptimalTextColor( 'black' ) ).toBe( '#ffffff' );
++		expect( getOptimalTextColor( '#000' ) ).toBe( '#ffffff' );
++		expect( getOptimalTextColor( '#111' ) ).toBe( '#ffffff' );
++		expect( getOptimalTextColor( '#123' ) ).toBe( '#ffffff' );
++		expect( getOptimalTextColor( '#555' ) ).toBe( '#ffffff' );
++		expect( getOptimalTextColor( '#05f' ) ).toBe( '#ffffff' );
++	} );
++
++	test( 'should be black for light backgrounds', () => {
++		expect( getOptimalTextColor( 'white' ) ).toBe( '#000000' );
++		expect( getOptimalTextColor( '#fff' ) ).toBe( '#000000' );
++		expect( getOptimalTextColor( '#def' ) ).toBe( '#000000' );
++		expect( getOptimalTextColor( '#c3c3c3' ) ).toBe( '#000000' );
++		expect( getOptimalTextColor( '#0ff' ) ).toBe( '#000000' );
++	} );
++} );
++
++describe( 'getOptimalTextShade', () => {
++	test( 'should be "light" for dark backgrounds', () => {
++		expect( getOptimalTextShade( 'black' ) ).toBe( 'light' );
++		expect( getOptimalTextShade( '#000' ) ).toBe( 'light' );
++		expect( getOptimalTextShade( '#111' ) ).toBe( 'light' );
++		expect( getOptimalTextShade( '#123' ) ).toBe( 'light' );
++		expect( getOptimalTextShade( '#555' ) ).toBe( 'light' );
++		expect( getOptimalTextShade( '#05f' ) ).toBe( 'light' );
++	} );
++
++	test( 'should be "dark" for light backgrounds', () => {
++		expect( getOptimalTextShade( 'white' ) ).toBe( 'dark' );
++		expect( getOptimalTextShade( '#fff' ) ).toBe( 'dark' );
++		expect( getOptimalTextShade( '#def' ) ).toBe( 'dark' );
++		expect( getOptimalTextShade( '#c3c3c3' ) ).toBe( 'dark' );
++		expect( getOptimalTextShade( '#0ff' ) ).toBe( 'dark' );
++	} );
++} );
+diff --git a/packages/components/src/ui/utils/test/space.js b/packages/components/src/utils/test/space.js
+similarity index 100%
+rename from packages/components/src/ui/utils/test/space.js
+rename to packages/components/src/utils/test/space.js
+diff --git a/packages/components/src/ui/utils/types.ts b/packages/components/src/utils/types.ts
+similarity index 100%
+rename from packages/components/src/ui/utils/types.ts
+rename to packages/components/src/utils/types.ts
+diff --git a/packages/components/src/ui/utils/use-responsive-value.ts b/packages/components/src/utils/use-responsive-value.ts
+similarity index 100%
+rename from packages/components/src/ui/utils/use-responsive-value.ts
+rename to packages/components/src/utils/use-responsive-value.ts
+diff --git a/packages/components/src/z-stack/component.tsx b/packages/components/src/z-stack/component.tsx
+index 4c29fa69b748e3..411ef13c7085e3 100644
+--- a/packages/components/src/z-stack/component.tsx
++++ b/packages/components/src/z-stack/component.tsx
+@@ -11,7 +11,7 @@ import { isValidElement } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { getValidChildren } from '../ui/utils/get-valid-children';
++import { getValidChildren } from '../utils/get-valid-children';
+ import { contextConnect, useContextSystem } from '../context';
+ import { ZStackView, ZStackChildView } from './styles';
+ import type { ZStackProps } from './types';

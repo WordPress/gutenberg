@@ -1,0 +1,87 @@
+diff --git a/packages/components/src/custom-select-control/stories/index.story.tsx b/packages/components/src/custom-select-control/stories/index.story.tsx
+index 836fc540c6d1ed..7c743de58d202d 100644
+--- a/packages/components/src/custom-select-control/stories/index.story.tsx
++++ b/packages/components/src/custom-select-control/stories/index.story.tsx
+@@ -14,8 +14,9 @@ import { useState } from '@wordpress/element';
+ import CustomSelectControl from '..';
+ 
+ const meta: Meta< typeof CustomSelectControl > = {
+-	title: 'Components/CustomSelectControl',
++	title: 'Components/Selection & Input/Common/CustomSelectControl',
+ 	component: CustomSelectControl,
++	id: 'components-customselectcontrol',
+ 	argTypes: {
+ 		onChange: { control: { type: null } },
+ 		value: { control: { type: null } },
+diff --git a/packages/components/src/dropdown-menu/stories/index.story.tsx b/packages/components/src/dropdown-menu/stories/index.story.tsx
+index dd4907bd0b96b1..8c13a0b57dbda6 100644
+--- a/packages/components/src/dropdown-menu/stories/index.story.tsx
++++ b/packages/components/src/dropdown-menu/stories/index.story.tsx
+@@ -23,8 +23,9 @@ import {
+ } from '@wordpress/icons';
+ 
+ const meta: Meta< typeof DropdownMenu > = {
+-	title: 'Components/DropdownMenu',
++	title: 'Components/Actions/DropdownMenu',
+ 	component: DropdownMenu,
++	id: 'components-dropdownmenu',
+ 	parameters: {
+ 		actions: { argTypesRegex: '^on.*' },
+ 		controls: { expanded: true },
+diff --git a/packages/components/src/menu-group/stories/index.story.tsx b/packages/components/src/menu-group/stories/index.story.tsx
+index 7cb9004b45a8c2..f53cbbf5b7b0a0 100644
+--- a/packages/components/src/menu-group/stories/index.story.tsx
++++ b/packages/components/src/menu-group/stories/index.story.tsx
+@@ -16,8 +16,9 @@ import MenuItemsChoice from '../../menu-items-choice';
+ import type { Meta, StoryFn } from '@storybook/react';
+ 
+ const meta: Meta< typeof MenuGroup > = {
+-	title: 'Components/MenuGroup',
++	title: 'Components/Actions/MenuGroup',
+ 	component: MenuGroup,
++	id: 'components-menugroup',
+ 	argTypes: {
+ 		children: { control: { type: null } },
+ 	},
+diff --git a/packages/components/src/menu-item/stories/index.story.tsx b/packages/components/src/menu-item/stories/index.story.tsx
+index 763ee6e96be922..24c592b66f3aea 100644
+--- a/packages/components/src/menu-item/stories/index.story.tsx
++++ b/packages/components/src/menu-item/stories/index.story.tsx
+@@ -17,7 +17,8 @@ import Shortcut from '../../shortcut';
+ 
+ const meta: Meta< typeof MenuItem > = {
+ 	component: MenuItem,
+-	title: 'Components/MenuItem',
++	title: 'Components/Actions/MenuItem',
++	id: 'components-menuitem',
+ 	argTypes: {
+ 		children: { control: { type: null } },
+ 		icon: {
+diff --git a/packages/components/src/menu-items-choice/stories/index.story.tsx b/packages/components/src/menu-items-choice/stories/index.story.tsx
+index 02e76158981e8e..f4a14054e8f27f 100644
+--- a/packages/components/src/menu-items-choice/stories/index.story.tsx
++++ b/packages/components/src/menu-items-choice/stories/index.story.tsx
+@@ -16,7 +16,8 @@ import MenuGroup from '../../menu-group';
+ 
+ const meta: Meta< typeof MenuItemsChoice > = {
+ 	component: MenuItemsChoice,
+-	title: 'Components/MenuItemsChoice',
++	title: 'Components/Actions/MenuItemsChoice',
++	id: 'components-menuitemschoice',
+ 	argTypes: {
+ 		onHover: { action: 'onHover' },
+ 		onSelect: { action: 'onSelect' },
+diff --git a/packages/components/src/text-control/stories/index.story.tsx b/packages/components/src/text-control/stories/index.story.tsx
+index 948eca84a634c7..481ae714f0ce2f 100644
+--- a/packages/components/src/text-control/stories/index.story.tsx
++++ b/packages/components/src/text-control/stories/index.story.tsx
+@@ -15,7 +15,8 @@ import TextControl from '..';
+ 
+ const meta: Meta< typeof TextControl > = {
+ 	component: TextControl,
+-	title: 'Components/TextControl',
++	title: 'Components/Selection & Input/Common/TextControl',
++	id: 'components-textcontrol',
+ 	argTypes: {
+ 		help: { control: { type: 'text' } },
+ 		label: { control: { type: 'text' } },

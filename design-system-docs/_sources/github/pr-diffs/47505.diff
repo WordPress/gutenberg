@@ -1,0 +1,78 @@
+diff --git a/packages/block-editor/src/components/url-popover/index.js b/packages/block-editor/src/components/url-popover/index.js
+index 98b22e86f6b0bd..8c2bbec69c5de6 100644
+--- a/packages/block-editor/src/components/url-popover/index.js
++++ b/packages/block-editor/src/components/url-popover/index.js
+@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
+ import {
+ 	Button,
+ 	Popover,
+-	__experimentalPopoverPositionToPlacement as positionToPlacement,
++	experiments as componentsExperiments,
+ } from '@wordpress/components';
+ import { chevronDown } from '@wordpress/icons';
+ import deprecated from '@wordpress/deprecated';
+@@ -16,6 +16,11 @@ import deprecated from '@wordpress/deprecated';
+  */
+ import LinkViewer from './link-viewer';
+ import LinkEditor from './link-editor';
++import { unlock } from '../../lock-unlock';
++
++const { __experimentalPopoverLegacyPositionToPlacement } = unlock(
++	componentsExperiments
++);
+ 
+ const DEFAULT_PLACEMENT = 'bottom';
+ 
+@@ -46,7 +51,8 @@ function URLPopover( {
+ 	if ( placement !== undefined ) {
+ 		computedPlacement = placement;
+ 	} else if ( position !== undefined ) {
+-		computedPlacement = positionToPlacement( position );
++		computedPlacement =
++			__experimentalPopoverLegacyPositionToPlacement( position );
+ 	}
+ 	computedPlacement = computedPlacement || DEFAULT_PLACEMENT;
+ 
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e23c719d11ae57..f9ad838a668aa3 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,8 @@
+ 
+ ### Internal
+ 
++-   `CustomSelectControl`: lock the `__experimentalShowSelectedHint` prop ([#47229](https://github.com/WordPress/gutenberg/pull/47229)).
++-   Lock the `__experimentalPopoverPositionToPlacement` function and rename it to `__experimentalPopoverLegacyPositionToPlacement` ([#47505](https://github.com/WordPress/gutenberg/pull/47505)).
+ -   `ComboboxControl`: Convert to TypeScript ([#47581](https://github.com/WordPress/gutenberg/pull/47581)).
+ -   `Panel`, `PanelHeader`, `PanelRow`: Convert to TypeScript ([#47259](https://github.com/WordPress/gutenberg/pull/47259)).
+ -   `BoxControl`: Convert to TypeScript ([#47622](https://github.com/WordPress/gutenberg/pull/47622)).
+diff --git a/packages/components/src/experiments.js b/packages/components/src/experiments.js
+index 4133f094077d23..67506a853a928d 100644
+--- a/packages/components/src/experiments.js
++++ b/packages/components/src/experiments.js
+@@ -7,6 +7,7 @@ import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/exp
+  * Internal dependencies
+  */
+ import { default as CustomSelectControl } from './custom-select-control';
++import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
+ 
+ export const { lock, unlock } =
+ 	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
+@@ -17,4 +18,5 @@ export const { lock, unlock } =
+ export const experiments = {};
+ lock( experiments, {
+ 	CustomSelectControl,
++	__experimentalPopoverLegacyPositionToPlacement,
+ } );
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 3cf3a97f044549..48338464b1ae41 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -126,7 +126,6 @@ export { default as PanelHeader } from './panel/header';
+ export { default as PanelRow } from './panel/row';
+ export { default as Placeholder } from './placeholder';
+ export { default as Popover } from './popover';
+-export { positionToPlacement as __experimentalPopoverPositionToPlacement } from './popover/utils';
+ export { default as QueryControls } from './query-controls';
+ export { default as __experimentalRadio } from './radio-group/radio';
+ export { default as __experimentalRadioGroup } from './radio-group';

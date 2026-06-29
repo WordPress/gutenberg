@@ -1,0 +1,259 @@
+diff --git a/packages/block-editor/src/components/rich-text/format-toolbar-container.js b/packages/block-editor/src/components/rich-text/format-toolbar-container.js
+index 24a931dc791754..94610af8fcda1a 100644
+--- a/packages/block-editor/src/components/rich-text/format-toolbar-container.js
++++ b/packages/block-editor/src/components/rich-text/format-toolbar-container.js
+@@ -17,28 +17,32 @@ import BlockControls from '../block-controls';
+ import FormatToolbar from './format-toolbar';
+ import { store as blockEditorStore } from '../../store';
+ 
+-function InlineSelectionToolbar( { value, anchorRef, activeFormats } ) {
++function InlineSelectionToolbar( {
++	value,
++	editableContentRef,
++	activeFormats,
++} ) {
+ 	const lastFormat = activeFormats[ activeFormats.length - 1 ];
+ 	const lastFormatType = lastFormat?.type;
+ 	const settings = useSelect(
+ 		( select ) => select( richTextStore ).getFormatType( lastFormatType ),
+ 		[ lastFormatType ]
+ 	);
+-	const selectionRef = useAnchorRef( {
+-		ref: anchorRef,
++	const popoverAnchor = useAnchorRef( {
++		ref: editableContentRef,
+ 		value,
+ 		settings,
+ 	} );
+ 
+-	return <InlineToolbar anchorRef={ selectionRef } />;
++	return <InlineToolbar popoverAnchor={ popoverAnchor } />;
+ }
+ 
+-function InlineToolbar( { anchorRef } ) {
++function InlineToolbar( { popoverAnchor } ) {
+ 	return (
+ 		<Popover
+ 			position="top center"
+ 			focusOnMount={ false }
+-			anchorRef={ anchorRef }
++			anchor={ popoverAnchor }
+ 			className="block-editor-rich-text__inline-format-toolbar"
+ 			__unstableSlotName="block-toolbar"
+ 		>
+@@ -51,14 +55,14 @@ function InlineToolbar( { anchorRef } ) {
+ 	);
+ }
+ 
+-const FormatToolbarContainer = ( { inline, anchorRef, value } ) => {
++const FormatToolbarContainer = ( { inline, editableContentRef, value } ) => {
+ 	const hasInlineToolbar = useSelect(
+ 		( select ) => select( blockEditorStore ).getSettings().hasInlineToolbar,
+ 		[]
+ 	);
+ 
+ 	if ( inline ) {
+-		return <InlineToolbar anchorRef={ anchorRef } />;
++		return <InlineToolbar popoverAnchor={ editableContentRef.current } />;
+ 	}
+ 
+ 	if ( hasInlineToolbar ) {
+@@ -70,7 +74,7 @@ const FormatToolbarContainer = ( { inline, anchorRef, value } ) => {
+ 
+ 		return (
+ 			<InlineSelectionToolbar
+-				anchorRef={ anchorRef }
++				editableContentRef={ editableContentRef }
+ 				value={ value }
+ 				activeFormats={ activeFormats }
+ 			/>
+diff --git a/packages/block-editor/src/components/rich-text/index.js b/packages/block-editor/src/components/rich-text/index.js
+index 21c004b225f6c5..ae0942349b90c8 100644
+--- a/packages/block-editor/src/components/rich-text/index.js
++++ b/packages/block-editor/src/components/rich-text/index.js
+@@ -354,7 +354,7 @@ function RichTextWrapper(
+ 			{ isSelected && hasFormats && (
+ 				<FormatToolbarContainer
+ 					inline={ inlineToolbar }
+-					anchorRef={ anchorRef }
++					editableContentRef={ anchorRef }
+ 					value={ value }
+ 				/>
+ 			) }
+diff --git a/packages/components/src/autocomplete/autocompleter-ui.js b/packages/components/src/autocomplete/autocompleter-ui.js
+index c909aa6a4a5783..c25dcfb4030189 100644
+--- a/packages/components/src/autocomplete/autocompleter-ui.js
++++ b/packages/components/src/autocomplete/autocompleter-ui.js
+@@ -35,7 +35,7 @@ export function getAutoCompleterUI( autocompleter ) {
+ 		contentRef,
+ 	} ) {
+ 		const [ items ] = useItems( filterValue );
+-		const anchorRef = useAnchorRef( { ref: contentRef, value } );
++		const popoverAnchor = useAnchorRef( { ref: contentRef, value } );
+ 
+ 		useLayoutEffect( () => {
+ 			onChangeOptions( items );
+@@ -54,7 +54,7 @@ export function getAutoCompleterUI( autocompleter ) {
+ 				onClose={ onReset }
+ 				position="top right"
+ 				className="components-autocomplete__popover"
+-				anchorRef={ anchorRef }
++				anchor={ popoverAnchor }
+ 			>
+ 				<div
+ 					id={ listBoxId }
+diff --git a/packages/format-library/src/image/index.js b/packages/format-library/src/image/index.js
+index 3c1c2a08e62665..1969b5c5706042 100644
+--- a/packages/format-library/src/image/index.js
++++ b/packages/format-library/src/image/index.js
+@@ -36,7 +36,7 @@ export const image = {
+ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
+ 	const { style } = activeObjectAttributes;
+ 	const [ width, setWidth ] = useState( style?.replace( /\D/g, '' ) );
+-	const anchorRef = useAnchorRef( {
++	const popoverAnchor = useAnchorRef( {
+ 		ref: contentRef,
+ 		value,
+ 		settings: image,
+@@ -46,7 +46,7 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
+ 		<Popover
+ 			position="bottom center"
+ 			focusOnMount={ false }
+-			anchorRef={ anchorRef }
++			anchor={ popoverAnchor }
+ 			className="block-editor-format-toolbar__image-popover"
+ 		>
+ 			<form
+diff --git a/packages/format-library/src/link/inline.js b/packages/format-library/src/link/inline.js
+index b2998636010533..178981b0eb8cac 100644
+--- a/packages/format-library/src/link/inline.js
++++ b/packages/format-library/src/link/inline.js
+@@ -183,13 +183,13 @@ function InlineLinkUI( {
+ 		}
+ 	}
+ 
+-	const anchorRef = useAnchorRef( { ref: contentRef, value, settings } );
++	const popoverAnchor = useAnchorRef( { ref: contentRef, value, settings } );
+ 
+ 	// Generate a string based key that is unique to this anchor reference.
+ 	// This is used to force re-mount the LinkControl component to avoid
+ 	// potential stale state bugs caused by the component not being remounted
+ 	// See https://github.com/WordPress/gutenberg/pull/34742.
+-	const forceRemountKey = useLinkInstanceKey( anchorRef );
++	const forceRemountKey = useLinkInstanceKey( popoverAnchor );
+ 
+ 	// The focusOnMount prop shouldn't evolve during render of a Popover
+ 	// otherwise it causes a render of the content.
+@@ -223,7 +223,7 @@ function InlineLinkUI( {
+ 
+ 	return (
+ 		<Popover
+-			anchorRef={ anchorRef }
++			anchor={ popoverAnchor }
+ 			focusOnMount={ focusOnMount.current }
+ 			onClose={ stopAddingLink }
+ 			position="bottom center"
+diff --git a/packages/format-library/src/text-color/inline.js b/packages/format-library/src/text-color/inline.js
+index 03a80fb18e6871..62d8d7d55c2a77 100644
+--- a/packages/format-library/src/text-color/inline.js
++++ b/packages/format-library/src/text-color/inline.js
+@@ -142,14 +142,14 @@ export default function InlineColorUI( {
+ 	onClose,
+ 	contentRef,
+ } ) {
+-	/* 
++	/*
+ 	 As you change the text color by typing a HEX value into a field,
+ 	 the return value of document.getSelection jumps to the field you're editing,
+ 	 not the highlighted text. Given that useAnchorRef uses document.getSelection,
+ 	 it will return null, since it can't find the <mark> element within the HEX input.
+ 	 This caches the last truthy value of the selection anchor reference.
+ 	 */
+-	const anchorRef = useCachedTruthy(
++	const popoverAnchor = useCachedTruthy(
+ 		useAnchorRef( { ref: contentRef, value, settings } )
+ 	);
+ 
+@@ -157,7 +157,7 @@ export default function InlineColorUI( {
+ 		<Popover
+ 			onClose={ onClose }
+ 			className="components-inline-color-popover"
+-			anchorRef={ anchorRef }
++			anchor={ popoverAnchor }
+ 		>
+ 			<TabPanel
+ 				tabs={ [
+diff --git a/packages/rich-text/README.md b/packages/rich-text/README.md
+index 006f0b8b095cd5..4c87a5d4a1d869 100644
+--- a/packages/rich-text/README.md
++++ b/packages/rich-text/README.md
+@@ -477,9 +477,9 @@ _Returns_
+ ### useAnchorRef
+ 
+ This hook, to be used in a format type's Edit component, returns the active
+-element that is formatted, or the selection range if no format is active.
+-The returned value is meant to be used for positioning UI, e.g. by passing it
+-to the `Popover` component.
++element that is formatted, or a virtual element for the selection range if
++no format is active. The returned value is meant to be used for positioning
++UI, e.g. by passing it to the `Popover` component.
+ 
+ _Parameters_
+ 
+@@ -490,7 +490,7 @@ _Parameters_
+ 
+ _Returns_
+ 
+--   `Element|Range`: The active element or selection range.
++-   `Element|VirtualAnchorElement|undefined|null`: The active element or selection range.
+ 
+ <!-- END TOKEN(Autogenerated API docs) -->
+ 
+diff --git a/packages/rich-text/src/component/use-anchor-ref.js b/packages/rich-text/src/component/use-anchor-ref.js
+index 4be4fdd93096a7..d601174ad379d7 100644
+--- a/packages/rich-text/src/component/use-anchor-ref.js
++++ b/packages/rich-text/src/component/use-anchor-ref.js
+@@ -12,11 +12,17 @@ import { getActiveFormat } from '../get-active-format';
+ /** @typedef {import('../register-format-type').RichTextFormatType} RichTextFormatType */
+ /** @typedef {import('../create').RichTextValue} RichTextValue */
+ 
++/**
++ * @typedef {Object} VirtualAnchorElement
++ * @property {Function} getBoundingClientRect A function returning a DOMRect
++ * @property {Document} ownerDocument         The element's ownerDocument
++ */
++
+ /**
+  * This hook, to be used in a format type's Edit component, returns the active
+- * element that is formatted, or the selection range if no format is active.
+- * The returned value is meant to be used for positioning UI, e.g. by passing it
+- * to the `Popover` component.
++ * element that is formatted, or a virtual element for the selection range if
++ * no format is active. The returned value is meant to be used for positioning
++ * UI, e.g. by passing it to the `Popover` component.
+  *
+  * @param {Object}                 $1          Named parameters.
+  * @param {RefObject<HTMLElement>} $1.ref      React ref of the element
+@@ -24,7 +30,7 @@ import { getActiveFormat } from '../get-active-format';
+  * @param {RichTextValue}          $1.value    Value to check for selection.
+  * @param {RichTextFormatType}     $1.settings The format type's settings.
+  *
+- * @return {Element|Range} The active element or selection range.
++ * @return {Element|VirtualAnchorElement|undefined|null} The active element or selection range.
+  */
+ export function useAnchorRef( { ref, value, settings = {} } ) {
+ 	const { tagName, className, name } = settings;
+@@ -44,7 +50,12 @@ export function useAnchorRef( { ref, value, settings = {} } ) {
+ 		const range = selection.getRangeAt( 0 );
+ 
+ 		if ( ! activeFormat ) {
+-			return range;
++			return {
++				ownerDocument: range.startContainer.ownerDocument,
++				getBoundingClientRect() {
++					return range.getBoundingClientRect();
++				},
++			};
+ 		}
+ 
+ 		let element = range.startContainer;

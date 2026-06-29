@@ -1,0 +1,20 @@
+diff --git a/packages/components/src/radio-control/index.js b/packages/components/src/radio-control/index.js
+index fcb167b07be249..3b3bbc5eb63f16 100644
+--- a/packages/components/src/radio-control/index.js
++++ b/packages/components/src/radio-control/index.js
+@@ -21,6 +21,7 @@ export default function RadioControl( {
+ 	help,
+ 	onChange,
+ 	options = [],
++	...props
+ } ) {
+ 	const instanceId = useInstanceId( RadioControl );
+ 	const id = `inspector-radio-control-${ instanceId }`;
+@@ -53,6 +54,7 @@ export default function RadioControl( {
+ 							aria-describedby={
+ 								!! help ? `${ id }__help` : undefined
+ 							}
++							{ ...props }
+ 						/>
+ 						<label htmlFor={ `${ id }-${ index }` }>
+ 							{ option.label }

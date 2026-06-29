@@ -1,0 +1,12 @@
+diff --git a/packages/components/src/confirm-dialog/stories/index.story.tsx b/packages/components/src/confirm-dialog/stories/index.story.tsx
+index f8d302b14c42ca..98f426cec41fff 100644
+--- a/packages/components/src/confirm-dialog/stories/index.story.tsx
++++ b/packages/components/src/confirm-dialog/stories/index.story.tsx
+@@ -36,6 +36,7 @@ const meta: Meta< typeof ConfirmDialog > = {
+ 		componentStatus: {
+ 			status: 'recommended',
+ 			whereUsed: 'global',
++			notes: 'Will be superseded by `AlertDialog` in `@wordpress/ui`, but continue using for now.',
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
+ 	},

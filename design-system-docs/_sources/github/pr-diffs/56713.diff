@@ -1,0 +1,35 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4114a32f148542..165fc283fb6c70 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fix
++
++-   `PaletteEdit`: Consider digits when generating kebab-cased slug ([#56713](https://github.com/WordPress/gutenberg/pull/56713)).
++
+ ### Experimental
+ 
+ -   `TabPanel`: do not render hidden content ([#57046](https://github.com/WordPress/gutenberg/pull/57046)).
+diff --git a/packages/components/src/palette-edit/index.tsx b/packages/components/src/palette-edit/index.tsx
+index 40621a407f2173..91303471792ebd 100644
+--- a/packages/components/src/palette-edit/index.tsx
++++ b/packages/components/src/palette-edit/index.tsx
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { paramCase as kebabCase } from 'change-case';
+ 
+ /**
+  * WordPress dependencies
+@@ -49,6 +48,7 @@ import {
+ import { NavigableMenu } from '../navigable-container';
+ import { DEFAULT_GRADIENT } from '../custom-gradient-picker/constants';
+ import CustomGradientPicker from '../custom-gradient-picker';
++import { kebabCase } from '../utils/strings';
+ import type {
+ 	Color,
+ 	ColorPickerPopoverProps,

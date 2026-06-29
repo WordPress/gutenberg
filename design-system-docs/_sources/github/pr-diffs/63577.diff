@@ -1,0 +1,26 @@
+diff --git a/packages/components/src/font-size-picker/README.md b/packages/components/src/font-size-picker/README.md
+index 2a342d3de9114d..790468acc6c1fa 100644
+--- a/packages/components/src/font-size-picker/README.md
++++ b/packages/components/src/font-size-picker/README.md
+@@ -92,7 +92,7 @@ Size of the control.
+ Available units for custom font size selection.
+ 
+ -   Required: No
+--   Default: `[ 'px', 'em', 'rem' ]`
++-   Default: `[ 'px', 'em', 'rem', 'vw', 'vh' ]`
+ 
+ ### `value`: `number | string`
+ 
+diff --git a/packages/components/src/font-size-picker/types.ts b/packages/components/src/font-size-picker/types.ts
+index 0072c47df6f052..39016849fd9f95 100644
+--- a/packages/components/src/font-size-picker/types.ts
++++ b/packages/components/src/font-size-picker/types.ts
+@@ -29,7 +29,7 @@ export type FontSizePickerProps = {
+ 	/**
+ 	 * Available units for custom font size selection.
+ 	 *
+-	 * @default `[ 'px', 'em', 'rem' ]`
++	 * @default [ 'px', 'em', 'rem', 'vw', 'vh' ]
+ 	 */
+ 	units?: string[];
+ 	/**

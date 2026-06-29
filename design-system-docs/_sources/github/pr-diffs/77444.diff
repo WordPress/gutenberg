@@ -1,0 +1,1288 @@
+diff --git a/packages/ui/src/index.ts b/packages/ui/src/index.ts
+index 800fb880628e5e..82602d537324db 100644
+--- a/packages/ui/src/index.ts
++++ b/packages/ui/src/index.ts
+@@ -17,3 +17,4 @@ export * as Tabs from './tabs';
+ export * from './text';
+ export * as Tooltip from './tooltip';
+ export * from './visually-hidden';
++export * as Menu from './menu';
+diff --git a/packages/ui/src/menu/checkbox-item-indicator.tsx b/packages/ui/src/menu/checkbox-item-indicator.tsx
+new file mode 100644
+index 00000000000000..be65da05d6a0c5
+--- /dev/null
++++ b/packages/ui/src/menu/checkbox-item-indicator.tsx
+@@ -0,0 +1,23 @@
++import { Menu as BaseMenu } from '@base-ui/react/menu';
++import { Icon, check } from '@wordpress/icons';
++import { forwardRef } from '@wordpress/element';
++import clsx from 'clsx';
++import type { MenuCheckboxItemIndicatorProps } from './types';
++import styles from './styles.module.css';
++
++const CheckboxItemIndicator = forwardRef<
++	HTMLSpanElement,
++	MenuCheckboxItemIndicatorProps
++>( ( { className, ...props }, ref ) => (
++	<BaseMenu.CheckboxItemIndicator
++		ref={ ref }
++		className={ clsx( styles.prefix, styles.indicatorPrefix, className ) }
++		keepMounted
++		{ ...props }
++	>
++		<Icon icon={ check } size={ 24 } />
++	</BaseMenu.CheckboxItemIndicator>
++) );
++CheckboxItemIndicator.displayName = 'Menu.CheckboxItemIndicator';
++
++export { CheckboxItemIndicator };
+diff --git a/packages/ui/src/menu/checkbox-item.tsx b/packages/ui/src/menu/checkbox-item.tsx
+new file mode 100644
+index 00000000000000..3edcdc19b798e3
+--- /dev/null
++++ b/packages/ui/src/menu/checkbox-item.tsx
+@@ -0,0 +1,23 @@
++import { Menu as BaseMenu } from '@base-ui/react/menu';
++import { forwardRef } from '@wordpress/element';
++import clsx from 'clsx';
++import { CheckboxItemIndicator } from './checkbox-item-indicator';
++import { ItemContent } from './item-content';
++import type { MenuCheckboxItemProps } from './types';
++import styles from './styles.module.css';
++
++const CheckboxItem = forwardRef< HTMLDivElement, MenuCheckboxItemProps >(
++	( { className, children, suffix, ...props }, ref ) => (
++		<BaseMenu.CheckboxItem
++			ref={ ref }
++			className={ clsx( styles.item, className ) }
++			{ ...props }
++		>
++			<CheckboxItemIndicator />
++			<ItemContent suffix={ suffix }>{ children }</ItemContent>
++		</BaseMenu.CheckboxItem>
++	)
++);
++CheckboxItem.displayName = 'Menu.CheckboxItem';
++
++export { CheckboxItem };
+diff --git a/packages/ui/src/menu/group-label.tsx b/packages/ui/src/menu/group-label.tsx
+new file mode 100644
+index 00000000000000..47f272439830e5
+--- /dev/null
++++ b/packages/ui/src/menu/group-label.tsx
+@@ -0,0 +1,20 @@
++import { Menu as BaseMenu } from '@base-ui/react/menu';
++import { forwardRef } from '@wordpress/element';
++import clsx from 'clsx';
++import { Text } from '../text';
++import type { MenuGroupLabelProps } from './types';
++import styles from './styles.module.css';
++
++const GroupLabel = forwardRef< HTMLDivElement, MenuGroupLabelProps >(
++	( { className, ...props }, ref ) => (
++		<Text
++			ref={ ref }
++			variant="body-sm"
++			render={ <BaseMenu.GroupLabel { ...props } /> }
++			className={ clsx( styles.groupLabel, className ) }
++		/>
++	)
++);
++GroupLabel.displayName = 'Menu.GroupLabel';
++
++export { GroupLabel };
+diff --git a/packages/ui/src/menu/group.tsx b/packages/ui/src/menu/group.tsx
+new file mode 100644
+index 00000000000000..fef5c6769ee966
+--- /dev/null
++++ b/packages/ui/src/menu/group.tsx
+@@ -0,0 +1,18 @@
++import { Menu as BaseMenu } from '@base-ui/react/menu';
++import { forwardRef } from '@wordpress/element';
++import clsx from 'clsx';
++import type { MenuGroupProps } from './types';
++import styles from './styles.module.css';
++
++const Group = forwardRef< HTMLDivElement, MenuGroupProps >(
++	( { className, ...props }, ref ) => (
++		<BaseMenu.Group
++			ref={ ref }
++			className={ clsx( styles.group, className ) }
++			{ ...props }
++		/>
++	)
++);
++Group.displayName = 'Menu.Group';
++
++export { Group };
+diff --git a/packages/ui/src/menu/index.ts b/packages/ui/src/menu/index.ts
+new file mode 100644
+index 00000000000000..4edfc9059a12f4
+--- /dev/null
++++ b/packages/ui/src/menu/index.ts
+@@ -0,0 +1,41 @@
++import { CheckboxItem } from './checkbox-item';
++import { CheckboxItemIndicator } from './checkbox-item-indicator';
++import { Group } from './group';
++import { GroupLabel } from './group-label';
++import { Item } from './item';
++import { ItemHelpText } from './item-help-text';
++import { ItemLabel } from './item-label';
++import { Popup } from './popup';
++import { Portal } from './portal';
++import { Positioner } from './positioner';
++import { RadioGroup } from './radio-group';
++import { RadioItem } from './radio-item';
++import { RadioItemIndicator } from './radio-item-indicator';
++import { Root } from './root';
++import { Separator } from './separator';
++import { SubmenuRoot } from './submenu-root';
++import { SubmenuTriggerItem } from './submenu-trigger-item';
++import { Trigger } from './trigger';
++
++export const Menu = {
++	Root,
++	Trigger,
++	Portal,
++	Positioner,
++	Popup,
++	Item,
++	ItemLabel,
++	ItemHelpText,
++	CheckboxItem,
++	CheckboxItemIndicator,
++	RadioItem,
++	RadioItemIndicator,
++	Separator,
++	Group,
++	GroupLabel,
++	RadioGroup,
++	SubmenuRoot,
++	SubmenuTriggerItem,
++};
++
++export * from './types';
+diff --git a/packages/ui/src/menu/item-content.tsx b/packages/ui/src/menu/item-content.tsx
+new file mode 100644
+index 00000000000000..96f35baf25caef
+--- /dev/null
++++ b/packages/ui/src/menu/item-content.tsx
+@@ -0,0 +1,32 @@
++import type { ReactNode } from 'react';
++import styles from './styles.module.css';
++import { ItemHelpText } from './item-help-text';
++import { ItemLabel } from './item-label';
++
++interface ItemContentProps {
++	children: ReactNode;
++	helpText?: ReactNode;
++	suffix?: ReactNode;
++}
++
++const renderLabel = ( children: ReactNode ) => {
++	if ( typeof children === 'string' || typeof children === 'number' ) {
++		return <ItemLabel>{ children }</ItemLabel>;
++	}
++
++	return children;
++};
++
++function ItemContent( { children, helpText, suffix }: ItemContentProps ) {
++	return (
++		<div className={ styles.content }>
++			<div className={ styles.label }>
++				{ renderLabel( children ) }
++				{ helpText && <ItemHelpText>{ helpText }</ItemHelpText> }
++			</div>
++			{ suffix && <span className={ styles.suffix }>{ suffix }</span> }
++		</div>
++	);
++}
++
++export { ItemContent };
+diff --git a/packages/ui/src/menu/item-help-text.tsx b/packages/ui/src/menu/item-help-text.tsx
+new file mode 100644
+index 00000000000000..ef6ed8d37bd937
+--- /dev/null
++++ b/packages/ui/src/menu/item-help-text.tsx
+@@ -0,0 +1,19 @@
++import { forwardRef } from '@wordpress/element';
++import clsx from 'clsx';
++import { Text } from '../text';
++import type { MenuItemHelpTextProps } from './types';
++import styles from './styles.module.css';
++
++const ItemHelpText = forwardRef< HTMLSpanElement, MenuItemHelpTextProps >(
++	( { className, ...props }, ref ) => (
++		<Text
++			ref={ ref }
++			variant="body-sm"
++			className={ clsx( styles.itemHelpText, className ) }
++			{ ...props }
++		/>
++	)
++);
++ItemHelpText.displayName = 'Menu.ItemHelpText';
++
++export { ItemHelpText };
+diff --git a/packages/ui/src/menu/item-label.tsx b/packages/ui/src/menu/item-label.tsx
+new file mode 100644
+index 00000000000000..aa43d31d023638
+--- /dev/null
++++ b/packages/ui/src/menu/item-label.tsx
+@@ -0,0 +1,19 @@
++import { forwardRef } from '@wordpress/element';
++import clsx from 'clsx';
++import { Text } from '../text';
++import type { MenuItemLabelProps } from './types';
++import styles from './styles.module.css';
++
++const ItemLabel = forwardRef< HTMLSpanElement, MenuItemLabelProps >(
++	( { className, ...props }, ref ) => (
++		<Text
++			ref={ ref }
++			variant="body-md"
++			className={ clsx( styles.itemLabel, className ) }
++			{ ...props }
++		/>
++	)
++);
++ItemLabel.displayName = 'Menu.ItemLabel';
++
++export { ItemLabel };
+diff --git a/packages/ui/src/menu/item.tsx b/packages/ui/src/menu/item.tsx
+new file mode 100644
+index 00000000000000..cf332e4cad2071
+--- /dev/null
++++ b/packages/ui/src/menu/item.tsx
+@@ -0,0 +1,24 @@
++import { Menu as BaseMenu } from '@base-ui/react/menu';
++import { forwardRef } from '@wordpress/element';
++import clsx from 'clsx';
++import { ItemContent } from './item-content';
++import type { MenuItemProps } from './types';
++import styles from './styles.module.css';
++
++const Item = forwardRef< HTMLDivElement, MenuItemProps >(
++	( { className, children, prefix, suffix, helpText, ...props }, ref ) => (
++		<BaseMenu.Item
++			ref={ ref }
++			className={ clsx( styles.item, className ) }
++			{ ...props }
++		>
++			<span className={ styles.prefix }>{ prefix }</span>
++			<ItemContent suffix={ suffix } helpText={ helpText }>
++				{ children }
++			</ItemContent>
++		</BaseMenu.Item>
++	)
++);
++Item.displayName = 'Menu.Item';
++
++export { Item };
+diff --git a/packages/ui/src/menu/popup.tsx b/packages/ui/src/menu/popup.tsx
+new file mode 100644
+index 00000000000000..c8fe5c36800d1c
+--- /dev/null
++++ b/packages/ui/src/menu/popup.tsx
+@@ -0,0 +1,18 @@
++import { Menu as BaseMenu } from '@base-ui/react/menu';
++import { forwardRef } from '@wordpress/element';
++import clsx from 'clsx';
++import type { MenuPopupProps } from './types';
++import styles from './styles.module.css';
++
++const Popup = forwardRef< HTMLDivElement, MenuPopupProps >(
++	( { className, ...props }, ref ) => (
++		<BaseMenu.Popup
++			ref={ ref }
++			className={ clsx( styles.popup, className ) }
++			{ ...props }
++		/>
++	)
++);
++Popup.displayName = 'Menu.Popup';
++
++export { Popup };
+diff --git a/packages/ui/src/menu/portal.tsx b/packages/ui/src/menu/portal.tsx
+new file mode 100644
+index 00000000000000..cd0c2e6d4ea957
+--- /dev/null
++++ b/packages/ui/src/menu/portal.tsx
+@@ -0,0 +1,8 @@
++import { Menu as BaseMenu } from '@base-ui/react/menu';
++import type { MenuPortalProps } from './types';
++
++function Portal( props: MenuPortalProps ) {
++	return <BaseMenu.Portal { ...props } />;
++}
++
++export { Portal };
+diff --git a/packages/ui/src/menu/positioner.tsx b/packages/ui/src/menu/positioner.tsx
+new file mode 100644
+index 00000000000000..cc3bb2014627ca
+--- /dev/null
++++ b/packages/ui/src/menu/positioner.tsx
+@@ -0,0 +1,18 @@
++import { Menu as BaseMenu } from '@base-ui/react/menu';
++import { forwardRef } from '@wordpress/element';
++import clsx from 'clsx';
++import type { MenuPositionerProps } from './types';
++import styles from './styles.module.css';
++
++const Positioner = forwardRef< HTMLDivElement, MenuPositionerProps >(
++	( { className, ...props }, ref ) => (
++		<BaseMenu.Positioner
++			ref={ ref }
++			className={ clsx( styles.positioner, className ) }
++			{ ...props }
++		/>
++	)
++);
++Positioner.displayName = 'Menu.Positioner';
++
++export { Positioner };
+diff --git a/packages/ui/src/menu/radio-group.tsx b/packages/ui/src/menu/radio-group.tsx
+new file mode 100644
+index 00000000000000..d1214816899187
+--- /dev/null
++++ b/packages/ui/src/menu/radio-group.tsx
+@@ -0,0 +1,18 @@
++import { Menu as BaseMenu } from '@base-ui/react/menu';
++import { forwardRef } from '@wordpress/element';
++import clsx from 'clsx';
++import type { MenuRadioGroupProps } from './types';
++import styles from './styles.module.css';
++
++const RadioGroup = forwardRef< HTMLDivElement, MenuRadioGroupProps >(
++	( { className, ...props }, ref ) => (
++		<BaseMenu.RadioGroup
++			ref={ ref }
++			className={ clsx( styles.group, className ) }
++			{ ...props }
++		/>
++	)
++);
++RadioGroup.displayName = 'Menu.RadioGroup';
++
++export { RadioGroup };
+diff --git a/packages/ui/src/menu/radio-item-indicator.tsx b/packages/ui/src/menu/radio-item-indicator.tsx
+new file mode 100644
+index 00000000000000..1a89ee8aaffde7
+--- /dev/null
++++ b/packages/ui/src/menu/radio-item-indicator.tsx
+@@ -0,0 +1,30 @@
++import { Menu as BaseMenu } from '@base-ui/react/menu';
++import { forwardRef } from '@wordpress/element';
++import { Icon } from '@wordpress/icons';
++import { Circle, SVG } from '@wordpress/primitives';
++import clsx from 'clsx';
++import type { MenuRadioItemIndicatorProps } from './types';
++import styles from './styles.module.css';
++
++const radioCheck = (
++	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
++		<Circle cx={ 12 } cy={ 12 } r={ 3 } />
++	</SVG>
++);
++
++const RadioItemIndicator = forwardRef<
++	HTMLSpanElement,
++	MenuRadioItemIndicatorProps
++>( ( { className, ...props }, ref ) => (
++	<BaseMenu.RadioItemIndicator
++		ref={ ref }
++		className={ clsx( styles.prefix, styles.indicatorPrefix, className ) }
++		keepMounted
++		{ ...props }
++	>
++		<Icon icon={ radioCheck } size={ 24 } />
++	</BaseMenu.RadioItemIndicator>
++) );
++RadioItemIndicator.displayName = 'Menu.RadioItemIndicator';
++
++export { RadioItemIndicator };
+diff --git a/packages/ui/src/menu/radio-item.tsx b/packages/ui/src/menu/radio-item.tsx
+new file mode 100644
+index 00000000000000..cd31ce492291ef
+--- /dev/null
++++ b/packages/ui/src/menu/radio-item.tsx
+@@ -0,0 +1,23 @@
++import { Menu as BaseMenu } from '@base-ui/react/menu';
++import { forwardRef } from '@wordpress/element';
++import clsx from 'clsx';
++import { ItemContent } from './item-content';
++import { RadioItemIndicator } from './radio-item-indicator';
++import type { MenuRadioItemProps } from './types';
++import styles from './styles.module.css';
++
++const RadioItem = forwardRef< HTMLDivElement, MenuRadioItemProps >(
++	( { className, children, suffix, ...props }, ref ) => (
++		<BaseMenu.RadioItem
++			ref={ ref }
++			className={ clsx( styles.item, className ) }
++			{ ...props }
++		>
++			<RadioItemIndicator />
++			<ItemContent suffix={ suffix }>{ children }</ItemContent>
++		</BaseMenu.RadioItem>
++	)
++);
++RadioItem.displayName = 'Menu.RadioItem';
++
++export { RadioItem };
+diff --git a/packages/ui/src/menu/root.tsx b/packages/ui/src/menu/root.tsx
+new file mode 100644
+index 00000000000000..fbba40a5976449
+--- /dev/null
++++ b/packages/ui/src/menu/root.tsx
+@@ -0,0 +1,8 @@
++import { Menu as BaseMenu } from '@base-ui/react/menu';
++import type { MenuRootProps } from './types';
++
++function Root( props: MenuRootProps ) {
++	return <BaseMenu.Root { ...props } />;
++}
++
++export { Root };
+diff --git a/packages/ui/src/menu/separator.tsx b/packages/ui/src/menu/separator.tsx
+new file mode 100644
+index 00000000000000..187b7ea516aefa
+--- /dev/null
++++ b/packages/ui/src/menu/separator.tsx
+@@ -0,0 +1,18 @@
++import { Menu as BaseMenu } from '@base-ui/react/menu';
++import { forwardRef } from '@wordpress/element';
++import clsx from 'clsx';
++import type { MenuSeparatorProps } from './types';
++import styles from './styles.module.css';
++
++const Separator = forwardRef< HTMLHRElement, MenuSeparatorProps >(
++	( { className, ...props }, ref ) => (
++		<BaseMenu.Separator
++			ref={ ref }
++			className={ clsx( styles.separator, className ) }
++			{ ...props }
++		/>
++	)
++);
++Separator.displayName = 'Menu.Separator';
++
++export { Separator };
+diff --git a/packages/ui/src/menu/stories/index.story.tsx b/packages/ui/src/menu/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..172bd459809c90
+--- /dev/null
++++ b/packages/ui/src/menu/stories/index.story.tsx
+@@ -0,0 +1,402 @@
++import type { Meta, StoryObj } from '@storybook/react-vite';
++import { useState } from '@wordpress/element';
++import { customLink, formatCapitalize } from '@wordpress/icons';
++import { Button } from '../../button';
++import { Icon } from '../../icon';
++import { Menu } from '../index';
++
++const meta: Meta< typeof Menu.Root > = {
++	title: 'Design System/Components/Menu',
++	component: Menu.Root,
++	subcomponents: {
++		'Menu.Trigger': Menu.Trigger,
++		'Menu.Positioner': Menu.Positioner,
++		'Menu.Popup': Menu.Popup,
++		'Menu.Item': Menu.Item,
++		'Menu.ItemLabel': Menu.ItemLabel,
++		'Menu.ItemHelpText': Menu.ItemHelpText,
++		'Menu.CheckboxItem': Menu.CheckboxItem,
++		'Menu.RadioGroup': Menu.RadioGroup,
++		'Menu.RadioItem': Menu.RadioItem,
++		'Menu.Group': Menu.Group,
++		'Menu.GroupLabel': Menu.GroupLabel,
++		'Menu.Separator': Menu.Separator,
++		'Menu.SubmenuRoot': Menu.SubmenuRoot,
++		'Menu.SubmenuTriggerItem': Menu.SubmenuTriggerItem,
++	},
++	argTypes: {
++		children: { control: false },
++	},
++};
++
++export default meta;
++
++type Story = StoryObj< typeof Menu.Root >;
++
++export const Default: Story = {
++	render: () => (
++		<Menu.Root>
++			<Menu.Trigger
++				render={ <Button variant="outline" tone="neutral" /> }
++			>
++				Open menu
++			</Menu.Trigger>
++
++			<Menu.Portal>
++				<Menu.Positioner sideOffset={ 8 }>
++					<Menu.Popup>
++						<Menu.Item>
++							<Menu.ItemLabel>Label</Menu.ItemLabel>
++						</Menu.Item>
++
++						<Menu.Item>
++							<Menu.ItemLabel>Label</Menu.ItemLabel>
++							<Menu.ItemHelpText>Help text</Menu.ItemHelpText>
++						</Menu.Item>
++
++						<Menu.Item>
++							<Menu.ItemLabel>Label</Menu.ItemLabel>
++							<Menu.ItemHelpText>
++								The menu item help text is automatically
++								truncated when there are more than two lines of
++								text.
++							</Menu.ItemHelpText>
++						</Menu.Item>
++
++						<Menu.Item closeOnClick={ false }>
++							<Menu.ItemLabel>Label</Menu.ItemLabel>
++							<Menu.ItemHelpText>
++								This item does not close the menu on click.
++							</Menu.ItemHelpText>
++						</Menu.Item>
++
++						<Menu.Item disabled>
++							<Menu.ItemLabel>Disabled item</Menu.ItemLabel>
++						</Menu.Item>
++
++						<Menu.Separator />
++
++						<Menu.Group>
++							<Menu.GroupLabel>Group label</Menu.GroupLabel>
++
++							<Menu.Item
++								prefix={
++									<Icon icon={ customLink } size={ 24 } />
++								}
++							>
++								<Menu.ItemLabel>With prefix</Menu.ItemLabel>
++							</Menu.Item>
++
++							<Menu.Item suffix="⌘S">
++								<Menu.ItemLabel>With suffix</Menu.ItemLabel>
++							</Menu.Item>
++
++							<Menu.Item
++								disabled
++								prefix={
++									<Icon
++										icon={ formatCapitalize }
++										size={ 24 }
++									/>
++								}
++								suffix="⌥⌘T"
++							>
++								<Menu.ItemLabel>
++									Disabled with prefix and suffix
++								</Menu.ItemLabel>
++								<Menu.ItemHelpText>
++									And help text
++								</Menu.ItemHelpText>
++							</Menu.Item>
++						</Menu.Group>
++					</Menu.Popup>
++				</Menu.Positioner>
++			</Menu.Portal>
++		</Menu.Root>
++	),
++};
++
++export const WithSubmenu: Story = {
++	render: () => (
++		<Menu.Root>
++			<Menu.Trigger
++				render={ <Button variant="outline" tone="neutral" /> }
++			>
++				Open menu
++			</Menu.Trigger>
++
++			<Menu.Portal>
++				<Menu.Positioner sideOffset={ 8 }>
++					<Menu.Popup>
++						<Menu.Item>
++							<Menu.ItemLabel>Level 1 item</Menu.ItemLabel>
++						</Menu.Item>
++
++						<Menu.SubmenuRoot>
++							<Menu.SubmenuTriggerItem suffix="⌘K">
++								<Menu.ItemLabel>
++									Submenu trigger item with a long label
++								</Menu.ItemLabel>
++							</Menu.SubmenuTriggerItem>
++
++							<Menu.Portal>
++								<Menu.Positioner sideOffset={ 0 }>
++									<Menu.Popup>
++										<Menu.Item>
++											<Menu.ItemLabel>
++												Level 2 item
++											</Menu.ItemLabel>
++										</Menu.Item>
++										<Menu.Item>
++											<Menu.ItemLabel>
++												Level 2 item
++											</Menu.ItemLabel>
++										</Menu.Item>
++
++										<Menu.SubmenuRoot>
++											<Menu.SubmenuTriggerItem>
++												<Menu.ItemLabel>
++													Submenu trigger
++												</Menu.ItemLabel>
++											</Menu.SubmenuTriggerItem>
++											<Menu.Portal>
++												<Menu.Positioner
++													sideOffset={ 0 }
++												>
++													<Menu.Popup>
++														<Menu.Item>
++															<Menu.ItemLabel>
++																Level 3 item
++															</Menu.ItemLabel>
++														</Menu.Item>
++														<Menu.Item>
++															<Menu.ItemLabel>
++																Level 3 item
++															</Menu.ItemLabel>
++														</Menu.Item>
++													</Menu.Popup>
++												</Menu.Positioner>
++											</Menu.Portal>
++										</Menu.SubmenuRoot>
++									</Menu.Popup>
++								</Menu.Positioner>
++							</Menu.Portal>
++						</Menu.SubmenuRoot>
++					</Menu.Popup>
++				</Menu.Positioner>
++			</Menu.Portal>
++		</Menu.Root>
++	),
++};
++
++export const WithCheckboxes: Story = {
++	render: () => {
++		const [ isAChecked, setAChecked ] = useState( false );
++		const [ isBChecked, setBChecked ] = useState( true );
++		const [ isMultipleAChecked, setMultipleAChecked ] = useState( false );
++		const [ isMultipleBChecked, setMultipleBChecked ] = useState( true );
++
++		return (
++			<Menu.Root>
++				<Menu.Trigger
++					render={ <Button variant="outline" tone="neutral" /> }
++				>
++					Open menu
++				</Menu.Trigger>
++
++				<Menu.Portal>
++					<Menu.Positioner sideOffset={ 8 }>
++						<Menu.Popup>
++							<Menu.Group>
++								<Menu.GroupLabel>
++									Single selection, uncontrolled
++								</Menu.GroupLabel>
++								<Menu.CheckboxItem suffix="⌘P">
++									<Menu.ItemLabel>
++										Checkbox item A
++									</Menu.ItemLabel>
++									<Menu.ItemHelpText>
++										Initially unchecked
++									</Menu.ItemHelpText>
++								</Menu.CheckboxItem>
++								<Menu.CheckboxItem defaultChecked>
++									<Menu.ItemLabel>
++										Checkbox item B
++									</Menu.ItemLabel>
++									<Menu.ItemHelpText>
++										Initially checked
++									</Menu.ItemHelpText>
++								</Menu.CheckboxItem>
++							</Menu.Group>
++
++							<Menu.Separator />
++
++							<Menu.Group>
++								<Menu.GroupLabel>
++									Single selection, controlled
++								</Menu.GroupLabel>
++								<Menu.CheckboxItem
++									checked={ isAChecked }
++									onCheckedChange={ ( checked ) =>
++										setAChecked( checked === true )
++									}
++								>
++									<Menu.ItemLabel>
++										Checkbox item A
++									</Menu.ItemLabel>
++									<Menu.ItemHelpText>
++										Initially unchecked
++									</Menu.ItemHelpText>
++								</Menu.CheckboxItem>
++								<Menu.CheckboxItem
++									checked={ isBChecked }
++									onCheckedChange={ ( checked ) =>
++										setBChecked( checked === true )
++									}
++								>
++									<Menu.ItemLabel>
++										Checkbox item B
++									</Menu.ItemLabel>
++									<Menu.ItemHelpText>
++										Initially checked
++									</Menu.ItemHelpText>
++								</Menu.CheckboxItem>
++							</Menu.Group>
++
++							<Menu.Separator />
++
++							<Menu.Group>
++								<Menu.GroupLabel>
++									Multiple selection, uncontrolled
++								</Menu.GroupLabel>
++								<Menu.CheckboxItem>
++									<Menu.ItemLabel>
++										Checkbox item A
++									</Menu.ItemLabel>
++									<Menu.ItemHelpText>
++										Initially unchecked
++									</Menu.ItemHelpText>
++								</Menu.CheckboxItem>
++								<Menu.CheckboxItem defaultChecked>
++									<Menu.ItemLabel>
++										Checkbox item B
++									</Menu.ItemLabel>
++									<Menu.ItemHelpText>
++										Initially checked
++									</Menu.ItemHelpText>
++								</Menu.CheckboxItem>
++							</Menu.Group>
++
++							<Menu.Separator />
++
++							<Menu.Group>
++								<Menu.GroupLabel>
++									Multiple selection, controlled
++								</Menu.GroupLabel>
++								<Menu.CheckboxItem
++									checked={ isMultipleAChecked }
++									onCheckedChange={ ( checked ) =>
++										setMultipleAChecked( checked === true )
++									}
++								>
++									<Menu.ItemLabel>
++										Checkbox item A
++									</Menu.ItemLabel>
++									<Menu.ItemHelpText>
++										Initially unchecked
++									</Menu.ItemHelpText>
++								</Menu.CheckboxItem>
++								<Menu.CheckboxItem
++									checked={ isMultipleBChecked }
++									onCheckedChange={ ( checked ) =>
++										setMultipleBChecked( checked === true )
++									}
++								>
++									<Menu.ItemLabel>
++										Checkbox item B
++									</Menu.ItemLabel>
++									<Menu.ItemHelpText>
++										Initially checked
++									</Menu.ItemHelpText>
++								</Menu.CheckboxItem>
++							</Menu.Group>
++						</Menu.Popup>
++					</Menu.Positioner>
++				</Menu.Portal>
++			</Menu.Root>
++		);
++	},
++};
++
++export const WithRadios: Story = {
++	render: () => {
++		const [ radioValue, setRadioValue ] = useState( 'two' );
++
++		return (
++			<Menu.Root>
++				<Menu.Trigger
++					render={ <Button variant="outline" tone="neutral" /> }
++				>
++					Open menu
++				</Menu.Trigger>
++
++				<Menu.Portal>
++					<Menu.Positioner sideOffset={ 8 }>
++						<Menu.Popup>
++							<Menu.Group>
++								<Menu.GroupLabel>Uncontrolled</Menu.GroupLabel>
++								<Menu.RadioGroup defaultValue="two">
++									<Menu.RadioItem value="one">
++										<Menu.ItemLabel>
++											Radio item 1
++										</Menu.ItemLabel>
++										<Menu.ItemHelpText>
++											Initially unchecked
++										</Menu.ItemHelpText>
++									</Menu.RadioItem>
++									<Menu.RadioItem value="two">
++										<Menu.ItemLabel>
++											Radio item 2
++										</Menu.ItemLabel>
++										<Menu.ItemHelpText>
++											Initially checked
++										</Menu.ItemHelpText>
++									</Menu.RadioItem>
++								</Menu.RadioGroup>
++							</Menu.Group>
++
++							<Menu.Separator />
++
++							<Menu.Group>
++								<Menu.GroupLabel>Controlled</Menu.GroupLabel>
++								<Menu.RadioGroup
++									value={ radioValue }
++									onValueChange={ ( value ) =>
++										setRadioValue( value as string )
++									}
++								>
++									<Menu.RadioItem value="one">
++										<Menu.ItemLabel>
++											Radio item 1
++										</Menu.ItemLabel>
++										<Menu.ItemHelpText>
++											Initially unchecked
++										</Menu.ItemHelpText>
++									</Menu.RadioItem>
++									<Menu.RadioItem value="two">
++										<Menu.ItemLabel>
++											Radio item 2
++										</Menu.ItemLabel>
++										<Menu.ItemHelpText>
++											Initially checked
++										</Menu.ItemHelpText>
++									</Menu.RadioItem>
++								</Menu.RadioGroup>
++							</Menu.Group>
++						</Menu.Popup>
++					</Menu.Positioner>
++				</Menu.Portal>
++			</Menu.Root>
++		);
++	},
++};
+diff --git a/packages/ui/src/menu/styles.module.css b/packages/ui/src/menu/styles.module.css
+new file mode 100644
+index 00000000000000..9f1e2633e535a8
+--- /dev/null
++++ b/packages/ui/src/menu/styles.module.css
+@@ -0,0 +1,246 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-components {
++	.trigger {
++		display: inline-flex;
++		align-items: center;
++		cursor: var(--wpds-cursor-control);
++	}
++
++	.positioner {
++		z-index: var(--wp-ui-menu-z-index, var(--wp-ui-popover-z-index, 1000000));
++	}
++
++	.popup {
++		--wp-ui-menu-min-width: 160px;
++		--wp-ui-menu-max-width: 320px;
++		--wp-ui-menu-padding: var(--wpds-dimension-padding-xs);
++		--wp-ui-menu-item-min-height: 32px;
++		--wp-ui-menu-item-padding-block: var(--wpds-dimension-padding-xs);
++		--wp-ui-menu-item-padding-inline: var(--wpds-dimension-padding-md);
++		--wp-ui-menu-prefix-min-width: 24px;
++		--wp-ui-menu-prefix-gap: var(--wpds-dimension-gap-sm);
++		--wp-ui-menu-content-gap: var(--wpds-dimension-gap-md);
++		--wp-ui-menu-line-gap: var(--wpds-dimension-gap-xs);
++		--wp-ui-menu-focus-ring-width: 1.5px;
++		--wp-ui-menu-outline-width: 2px;
++		--wp-ui-menu-submenu-chevron-size: 12px;
++
++		position: relative;
++
++		display: grid;
++		grid-template-columns: minmax(0, max-content) 1fr;
++		grid-template-rows: auto;
++
++		box-sizing: border-box;
++		min-width: var(--wp-ui-menu-min-width);
++		max-width: var(--wp-ui-menu-max-width);
++		max-height: var(--popover-available-height);
++		padding: var(--wp-ui-menu-padding);
++
++		overflow: auto;
++		overscroll-behavior: contain;
++
++		background-color: var(--wpds-color-bg-surface-neutral-strong);
++		border:
++			var(--wpds-border-width-xs) solid
++			var(--wpds-color-stroke-surface-neutral-weak);
++		border-radius: var(--wpds-border-radius-md);
++		box-shadow: var(--wpds-elevation-md);
++		color: var(--wpds-color-fg-content-neutral);
++
++		/* Visible only in high contrast mode. */
++		outline: var(--wp-ui-menu-outline-width) solid transparent;
++	}
++
++	.item {
++		all: unset;
++		position: relative;
++		box-sizing: border-box;
++		min-height: var(--wp-ui-menu-item-min-height);
++
++		/* Occupy all menu columns. */
++		grid-column: 1 / -1;
++
++		display: grid;
++		grid-template-columns: minmax(0, max-content) 1fr;
++		align-items: center;
++
++		@supports ( grid-template-columns: subgrid ) {
++			grid-template-columns: subgrid;
++		}
++
++		padding-block: var(--wp-ui-menu-item-padding-block);
++		padding-inline: var(--wp-ui-menu-item-padding-inline);
++		scroll-margin: var(--wp-ui-menu-padding);
++		border-radius: var(--wpds-border-radius-sm);
++		font-family: inherit;
++		font-size: var(--wpds-typography-font-size-md);
++		font-weight: var(--wpds-typography-font-weight-regular);
++		line-height: var(--wpds-typography-line-height-sm);
++		color: inherit;
++
++		cursor: default;
++		user-select: none;
++		outline: none;
++		text-decoration: none;
++	}
++
++	.content {
++		grid-column: 2;
++
++		display: flex;
++		align-items: center;
++		justify-content: space-between;
++		gap: var(--wp-ui-menu-content-gap);
++
++		pointer-events: none;
++	}
++
++	.label {
++		flex: 1;
++		min-width: 0;
++
++		display: inline-flex;
++		flex-direction: column;
++		gap: var(--wp-ui-menu-line-gap);
++
++		overflow: hidden;
++		text-overflow: ellipsis;
++		white-space: nowrap;
++	}
++
++	.itemLabel {
++		display: block;
++		min-width: 0;
++		color: inherit;
++
++		overflow: hidden;
++		text-overflow: ellipsis;
++		white-space: nowrap;
++	}
++
++	.itemHelpText {
++		display: -webkit-box;
++		color: var(--wpds-color-fg-content-neutral-weak);
++		overflow: hidden;
++		overflow-wrap: anywhere;
++		text-overflow: ellipsis;
++		-webkit-box-orient: block-axis;
++		-webkit-line-clamp: 2;
++		line-clamp: 2;
++		white-space: normal;
++	}
++
++	.prefix {
++		grid-column: 1;
++
++		display: flex;
++		align-items: center;
++		justify-content: center;
++
++		color: var(--wpds-color-fg-content-neutral-weak);
++	}
++
++	.prefix:not(:empty) {
++		margin-inline-end: var(--wp-ui-menu-prefix-gap);
++	}
++
++	.indicatorPrefix {
++		/* Keep checkbox/radio rows aligned even when unchecked icons are hidden. */
++		min-width: var(--wp-ui-menu-prefix-min-width);
++		margin-inline-end: var(--wp-ui-menu-prefix-gap);
++	}
++
++	.indicatorPrefix[data-unchecked] svg {
++		opacity: 0;
++	}
++
++	.suffix {
++		flex: 0 1 fit-content;
++		min-width: 0;
++		width: fit-content;
++
++		display: flex;
++		align-items: center;
++		justify-content: center;
++		gap: var(--wp-ui-menu-content-gap);
++
++		color: var(--wpds-color-fg-content-neutral-weak);
++	}
++
++	.submenuChevron {
++		width: var(--wp-ui-menu-submenu-chevron-size);
++		height: var(--wp-ui-menu-submenu-chevron-size);
++		flex: 0 0 auto;
++		margin-inline-start: var(--wpds-dimension-gap-xs);
++		fill: currentColor;
++	}
++
++	.item[aria-disabled="true"] {
++		color: var(--wpds-color-fg-interactive-neutral-disabled);
++		cursor: not-allowed;
++	}
++
++	.item[data-highlighted]:not([data-focus-visible]):not(
++	[aria-disabled="true"]
++) {
++		background-color: var(--wpds-color-bg-interactive-brand-strong);
++		color: var(--wpds-color-fg-interactive-brand-strong);
++	}
++
++	.item[data-focus-visible] {
++		box-shadow:
++			0 0 0 var(--wp-ui-menu-focus-ring-width)
++			var(--wpds-color-stroke-interactive-brand);
++		outline: var(--wp-ui-menu-outline-width) solid transparent;
++	}
++
++	/* Match Components behavior for open submenu trigger item. */
++	.popup
++	:not(:focus) > .item[aria-expanded="true"]:not([data-highlighted]) {
++		background-color: var(--wpds-color-bg-interactive-neutral-weak);
++		color: var(--wpds-color-fg-content-neutral);
++	}
++
++	.item[data-highlighted]:not([data-focus-visible]) .prefix,
++	.item[aria-disabled="true"] .prefix,
++	.item[data-highlighted]:not([data-focus-visible]) .suffix,
++	.item[aria-disabled="true"] .suffix,
++	.item[data-highlighted]:not([data-focus-visible]) .itemHelpText,
++	.item[aria-disabled="true"] .itemHelpText {
++		color: inherit;
++	}
++
++	.group {
++		/* Ignore this wrapper in the parent grid layout. */
++		display: contents;
++	}
++
++	.separator {
++		grid-column: 1 / -1;
++
++		border: 0;
++		height: var(--wpds-border-width-xs);
++		background-color: var(--wpds-color-stroke-surface-neutral-weak);
++		margin-block: var(--wpds-dimension-gap-sm);
++		margin-inline: var(--wp-ui-menu-item-padding-inline);
++
++		outline: var(--wp-ui-menu-outline-width) solid transparent;
++	}
++
++	.groupLabel {
++		grid-column: 1 / -1;
++
++		font-family: var(--wpds-typography-font-family-body);
++		font-size: var(--wpds-typography-font-size-sm);
++		font-weight: var(--wpds-typography-font-weight-medium);
++		line-height: var(--wpds-typography-line-height-xs);
++		text-transform: uppercase;
++		color: var(--wpds-color-fg-content-neutral-weak);
++
++		padding-block-start: var(--wpds-dimension-gap-md);
++		padding-block-end: var(--wpds-dimension-gap-sm);
++		padding-inline: var(--wp-ui-menu-item-padding-inline);
++	}
++}
+diff --git a/packages/ui/src/menu/submenu-root.tsx b/packages/ui/src/menu/submenu-root.tsx
+new file mode 100644
+index 00000000000000..b41c537a5d3736
+--- /dev/null
++++ b/packages/ui/src/menu/submenu-root.tsx
+@@ -0,0 +1,9 @@
++import { Menu as BaseMenu } from '@base-ui/react/menu';
++import type { MenuSubmenuRootProps } from './types';
++
++function SubmenuRoot( props: MenuSubmenuRootProps ) {
++	return <BaseMenu.SubmenuRoot { ...props } />;
++}
++SubmenuRoot.displayName = 'Menu.SubmenuRoot';
++
++export { SubmenuRoot };
+diff --git a/packages/ui/src/menu/submenu-trigger-item.tsx b/packages/ui/src/menu/submenu-trigger-item.tsx
+new file mode 100644
+index 00000000000000..6d8414dc2dfc47
+--- /dev/null
++++ b/packages/ui/src/menu/submenu-trigger-item.tsx
+@@ -0,0 +1,37 @@
++import { Menu as BaseMenu } from '@base-ui/react/menu';
++import { Icon, chevronRightSmall } from '@wordpress/icons';
++import { forwardRef } from '@wordpress/element';
++import clsx from 'clsx';
++import { ItemContent } from './item-content';
++import type { MenuSubmenuTriggerProps } from './types';
++import styles from './styles.module.css';
++
++const SubmenuTriggerItem = forwardRef<
++	HTMLDivElement,
++	MenuSubmenuTriggerProps
++>( ( { className, children, suffix, ...props }, ref ) => (
++	<BaseMenu.SubmenuTrigger
++		ref={ ref }
++		className={ clsx( styles.item, className ) }
++		{ ...props }
++	>
++		<div className={ styles.prefix } />
++		<ItemContent
++			suffix={
++				<>
++					{ suffix }
++					<Icon
++						icon={ chevronRightSmall }
++						size={ 24 }
++						className={ styles.submenuChevron }
++					/>
++				</>
++			}
++		>
++			{ children }
++		</ItemContent>
++	</BaseMenu.SubmenuTrigger>
++) );
++SubmenuTriggerItem.displayName = 'Menu.SubmenuTriggerItem';
++
++export { SubmenuTriggerItem };
+diff --git a/packages/ui/src/menu/trigger.tsx b/packages/ui/src/menu/trigger.tsx
+new file mode 100644
+index 00000000000000..07c112935c0378
+--- /dev/null
++++ b/packages/ui/src/menu/trigger.tsx
+@@ -0,0 +1,18 @@
++import { Menu as BaseMenu } from '@base-ui/react/menu';
++import { forwardRef } from '@wordpress/element';
++import clsx from 'clsx';
++import type { MenuTriggerProps } from './types';
++import styles from './styles.module.css';
++
++const Trigger = forwardRef< HTMLButtonElement, MenuTriggerProps >(
++	( { className, ...props }, ref ) => (
++		<BaseMenu.Trigger
++			ref={ ref }
++			className={ clsx( styles.trigger, className ) }
++			{ ...props }
++		/>
++	)
++);
++Trigger.displayName = 'Menu.Trigger';
++
++export { Trigger };
+diff --git a/packages/ui/src/menu/types.ts b/packages/ui/src/menu/types.ts
+new file mode 100644
+index 00000000000000..ca2c2c8d4e044d
+--- /dev/null
++++ b/packages/ui/src/menu/types.ts
+@@ -0,0 +1,69 @@
++import type { ComponentPropsWithoutRef, ReactNode } from 'react';
++import type { Menu as BaseMenu } from '@base-ui/react/menu';
++
++export type MenuRootProps = ComponentPropsWithoutRef< typeof BaseMenu.Root >;
++export type MenuTriggerProps = ComponentPropsWithoutRef<
++	typeof BaseMenu.Trigger
++>;
++export type MenuPortalProps = ComponentPropsWithoutRef<
++	typeof BaseMenu.Portal
++>;
++export type MenuPositionerProps = ComponentPropsWithoutRef<
++	typeof BaseMenu.Positioner
++>;
++export type MenuPopupProps = ComponentPropsWithoutRef< typeof BaseMenu.Popup >;
++
++// Extended to match Gutenberg's rich layout capabilities
++export interface MenuItemProps
++	extends Omit<
++		ComponentPropsWithoutRef< typeof BaseMenu.Item >,
++		'prefix' | 'suffix'
++	> {
++	prefix?: ReactNode;
++	suffix?: ReactNode;
++	helpText?: ReactNode;
++}
++
++export type MenuItemLabelProps = ComponentPropsWithoutRef< 'span' >;
++export type MenuItemHelpTextProps = ComponentPropsWithoutRef< 'span' >;
++
++export type MenuSeparatorProps = ComponentPropsWithoutRef<
++	typeof BaseMenu.Separator
++>;
++export type MenuGroupProps = ComponentPropsWithoutRef< typeof BaseMenu.Group >;
++export type MenuGroupLabelProps = ComponentPropsWithoutRef<
++	typeof BaseMenu.GroupLabel
++>;
++export interface MenuCheckboxItemProps
++	extends Omit<
++		ComponentPropsWithoutRef< typeof BaseMenu.CheckboxItem >,
++		'suffix'
++	> {
++	suffix?: ReactNode;
++}
++export type MenuCheckboxItemIndicatorProps = ComponentPropsWithoutRef<
++	typeof BaseMenu.CheckboxItemIndicator
++>;
++export type MenuRadioGroupProps = ComponentPropsWithoutRef<
++	typeof BaseMenu.RadioGroup
++>;
++export interface MenuRadioItemProps
++	extends Omit<
++		ComponentPropsWithoutRef< typeof BaseMenu.RadioItem >,
++		'suffix'
++	> {
++	suffix?: ReactNode;
++}
++export type MenuRadioItemIndicatorProps = ComponentPropsWithoutRef<
++	typeof BaseMenu.RadioItemIndicator
++>;
++export type MenuSubmenuRootProps = ComponentPropsWithoutRef<
++	typeof BaseMenu.SubmenuRoot
++>;
++export interface MenuSubmenuTriggerProps
++	extends Omit<
++		ComponentPropsWithoutRef< typeof BaseMenu.SubmenuTrigger >,
++		'suffix'
++	> {
++	suffix?: ReactNode;
++}

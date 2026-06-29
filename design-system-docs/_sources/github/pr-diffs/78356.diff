@@ -1,0 +1,712 @@
+diff --git a/packages/components/src/draggable/index.tsx b/packages/components/src/draggable/index.tsx
+index 98c6afc7103f7d..fd20883b7a9019 100644
+--- a/packages/components/src/draggable/index.tsx
++++ b/packages/components/src/draggable/index.tsx
+@@ -16,10 +16,9 @@ import { getWpCompatOverlaySlot } from '@wordpress/ui';
+ import type { DraggableProps } from './types';
+ import styles from './style.module.scss';
+ 
+-// The hardcoded legacy class names are preserved alongside the
+-// CSS-module hashed ones for backwards compatibility. `filter(Boolean)`
+-// keeps Jest's CSS-module mock (which returns `undefined`) from leaking
+-// a literal "undefined" class.
++// Legacy class names preserved alongside the CSS-module hashed ones for
++// backwards compatibility. `filter(Boolean)` strips `undefined` from Jest's
++// CSS-module mock.
+ const dragImageClasses = [
+ 	styles[ 'invisible-drag-image' ],
+ 	'components-draggable__invisible-drag-image',
+@@ -28,8 +27,7 @@ const cloneWrapperClasses = [
+ 	styles.clone,
+ 	'components-draggable__clone',
+ ].filter( Boolean );
+-// Body-level signal shared with external code (e.g. block-editor keyboard
+-// drag), so it stays as a plain global class rather than module-scoped.
++// Global class — shared with external code (e.g. block-editor keyboard drag).
+ const bodyClass = 'is-dragging-components-draggable';
+ const clonePadding = 0;
+ 
+@@ -114,8 +112,7 @@ export function Draggable( {
+ 	function start( event: DragEvent ) {
+ 		const { ownerDocument } = event.target as HTMLElement;
+ 		// Only use the slot when it lives in the same document as the
+-		// dragged element, so the clone's viewport-relative coordinates
+-		// resolve in one coordinate space.
++		// dragged element, so coordinate resolution stays in one space.
+ 		const slot = getWpCompatOverlaySlot();
+ 		const compatSlot = slot?.ownerDocument === ownerDocument ? slot : null;
+ 
+@@ -136,8 +133,7 @@ export function Draggable( {
+ 		// IE, we need to check for its existence first.
+ 		if ( 'function' === typeof event.dataTransfer.setDragImage ) {
+ 			dragImage.classList.add( ...dragImageClasses );
+-			// Stays at the document body — invisible, so the slot's stacking
+-			// guarantees aren't needed here.
++			// Invisible — stays at the document body, no slot needed.
+ 			ownerDocument.body.appendChild( dragImage );
+ 			event.dataTransfer.setDragImage( dragImage, 0, 0 );
+ 		}
+diff --git a/packages/components/src/draggable/stories/index.story.tsx b/packages/components/src/draggable/stories/index.story.tsx
+index 3bf09ef7a037d7..caee23d005658b 100644
+--- a/packages/components/src/draggable/stories/index.story.tsx
++++ b/packages/components/src/draggable/stories/index.story.tsx
+@@ -34,9 +34,9 @@ const meta: Meta< typeof Draggable > = {
+ 		controls: { expanded: true },
+ 		docs: {
+ 			source: { code: '' },
+-			// Render each story in its own iframe — Storybook's docs-page
+-			// wrappers create transform-based containing blocks that break
+-			// the drag clone's `position: fixed` resolution.
++			// Render in its own iframe — Storybook's docs-page wrappers
++			// create transform-based containing blocks that break the
++			// clone's `position: fixed` resolution.
+ 			story: { inline: false, height: '250px' },
+ 		},
+ 		componentStatus: {
+diff --git a/packages/components/src/draggable/style.module.scss b/packages/components/src/draggable/style.module.scss
+index eefc8765bd78d6..029f4a84941885 100644
+--- a/packages/components/src/draggable/style.module.scss
++++ b/packages/components/src/draggable/style.module.scss
+@@ -10,20 +10,19 @@
+ 
+ .clone {
+ 	position: fixed;
+-	padding: 0; // Should match clonePadding variable.
++	padding: 0; // Matches the `clonePadding` JS constant.
+ 	background: transparent;
+ 	pointer-events: none;
+ }
+ 
+-// Apply the stacking fallback only outside the `@wordpress/ui` compat
+-// overlay slot — inside it, the slot's isolated stacking context
+-// already handles ordering.
++// Fallback for clones placed outside the compat overlay slot — the
++// slot's stacking context handles ordering inside it.
+ .clone:not(.is-in-compat-slot) {
+ 	z-index: z-index(".components-draggable__clone");
+ }
+ 
+-// Keep this selector global so external code that toggles the same
+-// body class (e.g. block-editor keyboard drag) gets the same cursor.
++// Global selector — external code (e.g. block-editor keyboard drag)
++// toggles the same body class.
+ :global(body.is-dragging-components-draggable) {
+ 	cursor: move; /* Fallback for IE/Edge < 14 */
+ 	cursor: grabbing !important;
+diff --git a/packages/components/src/draggable/types.ts b/packages/components/src/draggable/types.ts
+index e3081a21c0409d..48214979b37401 100644
+--- a/packages/components/src/draggable/types.ts
++++ b/packages/components/src/draggable/types.ts
+@@ -21,9 +21,9 @@ export type DraggableProps = {
+ 	 * Whether to append the cloned element to the `ownerDocument` body.
+ 	 * By default, elements sourced by id are appended to the element's wrapper.
+ 	 *
+-	 * Has no effect while the `@wordpress/ui` compat overlay slot is in use
+-	 * in the same document (the clone is placed in the slot instead). Cross-
+-	 * document drags fall back to this prop's regular semantics.
++	 * Has no effect when the `@wordpress/ui` compat overlay slot is in use in
++	 * the same document — the clone goes into the slot instead. Cross-document
++	 * drags fall back to this prop's regular semantics.
+ 	 *
+ 	 * @default false
+ 	 */
+diff --git a/packages/ui/README.md b/packages/ui/README.md
+index 8b927621cd852d..dbe5d5919ceb5e 100644
+--- a/packages/ui/README.md
++++ b/packages/ui/README.md
+@@ -64,7 +64,7 @@ body {
+ 
+ #### Mixing with `@wordpress/components`
+ 
+-If your app pairs `@wordpress/ui` with `@wordpress/components` overlays (popovers, modals, tooltips, …) and you bundle both packages directly — i.e. you aren't relying on the `window.wp.components` global that WordPress's script-loader exposes — call `useEnableWpCompatOverlaySlot()` once from a component that mounts for the lifetime of your app (typically the root):
++If your app pairs `@wordpress/ui` with `@wordpress/components` overlays and bundles both packages directly (i.e. without relying on the `window.wp.components` global exposed by WordPress's script-loader), call `useEnableWpCompatOverlaySlot()` once from a long-lived root component:
+ 
+ ```tsx
+ import { useEnableWpCompatOverlaySlot } from '@wordpress/ui';
+@@ -75,7 +75,7 @@ function App() {
+ }
+ ```
+ 
+-This opts the app into a shared body-level overlay container so `@wordpress/ui` overlays reliably stack above `@wordpress/components` overlays. The opt-in is one-way (a single component shouldn't be able to turn off shared infrastructure for everyone else) and idempotent (safe to call from multiple components). It is not needed in standard WordPress editor screens, where the slot auto-enables based on the presence of `window.wp.components`.
++This opts the app into a shared body-level overlay container so `@wordpress/ui` overlays reliably stack above `@wordpress/components` overlays. The opt-in is one-way and idempotent. It is not needed in standard WordPress editor screens, where the slot auto-enables based on `window.wp.components`.
+ 
+ ## Usage
+ 
+diff --git a/packages/ui/src/tooltip/portal.tsx b/packages/ui/src/tooltip/portal.tsx
+index e8a616482eca99..32745605d97a54 100644
+--- a/packages/ui/src/tooltip/portal.tsx
++++ b/packages/ui/src/tooltip/portal.tsx
+@@ -5,7 +5,7 @@ import { getWpCompatOverlaySlot } from '../utils/wp-compat-overlay-slot';
+ 
+ /**
+  * Used to apply custom portal behavior to `Tooltip`'s floating content.
+- * Defaults the `container` prop to the `@wordpress/ui` compat overlay slot.
++ * `container` defaults to the `@wordpress/ui` compat overlay slot.
+  */
+ const Portal = forwardRef< HTMLDivElement, PortalProps >(
+ 	function TooltipPortal( { container, ...restProps }, ref ) {
+diff --git a/packages/ui/src/tooltip/test/index.test.tsx b/packages/ui/src/tooltip/test/index.test.tsx
+index b5921a828a8901..bfd83510a9b6c0 100644
+--- a/packages/ui/src/tooltip/test/index.test.tsx
++++ b/packages/ui/src/tooltip/test/index.test.tsx
+@@ -154,26 +154,19 @@ describe( 'Tooltip', () => {
+ 		} );
+ 	} );
+ 
+-	// The slot is identified by a data attribute (cross-tooling marker, no
+-	// user-facing role/text), so direct DOM queries are appropriate here —
+-	// Testing Library's role/text accessors don't apply.
++	// Slot is identified by a data attribute, not a user-facing role/text.
+ 	/* eslint-disable testing-library/no-node-access */
+ 	describe( 'wp compat overlay slot', () => {
+ 		const SLOT_SELECTOR = '[data-wp-compat-overlay-slot]';
+ 
+-		// Wrapper that exercises the public opt-in path
+-		// (`useEnableWpCompatOverlaySlot`), so the integration tests
+-		// reflect how a real consumer would activate the slot rather
+-		// than poking at the internal flag directly.
++		// Exercises the public opt-in path rather than poking the flag.
+ 		function WithSlotEnabled( { children }: { children: ReactNode } ) {
+ 			useEnableWpCompatOverlaySlot();
+ 			return <>{ children }</>;
+ 		}
+ 
+ 		afterEach( () => {
+-			// Tear down anything the hook left behind so the next test
+-			// starts from the dormant baseline. The hook is intentionally
+-			// one-way at runtime; tests need to reset it explicitly.
++			// The hook is one-way at runtime; reset explicitly between tests.
+ 			delete ( window as { __wpUiCompatOverlaySlotEnabled?: boolean } )
+ 				.__wpUiCompatOverlaySlotEnabled;
+ 			document
+diff --git a/packages/ui/src/utils/css/wp-compat-overlay-slot.module.css b/packages/ui/src/utils/css/wp-compat-overlay-slot.module.css
+index 3e0bda4fff397d..c3b919041a4066 100644
+--- a/packages/ui/src/utils/css/wp-compat-overlay-slot.module.css
++++ b/packages/ui/src/utils/css/wp-compat-overlay-slot.module.css
+@@ -1,46 +1,24 @@
+ /*
+- * WP compat overlay slot — body-level positioned container that hosts
++ * Compat overlay slot — body-level positioned container that hosts
+  * `@wordpress/ui` overlays so they reliably stack in mixed-library
+- * compositions. The `data-wp-compat-overlay-slot` attribute is the
+- * architectural identifier (see `getWpCompatOverlaySlot()`); `.slot` is
+- * the styling vehicle.
++ * compositions. See `getWpCompatOverlaySlot()` for the runtime side.
+  *
+- * Authored unlayered — outside `@layer wp-ui-*` — so the slot's z-index
+- * and positioning win against any `@layer`-scoped rule. CSS cascade
+- * layers always lose to unlayered styles, so unlayering is the ceiling.
+- *
+- * Why each declaration is what it is:
+- *
+- * - `z-index: 1000000003` — sits in a reserved billion-scale band above
+- *   the legacy z-index map in `packages/base-styles/_z-index.scss`.
+- *
+- * - `position: fixed` — load-bearing for two reasons. (1) `z-index` is
+- *   ignored on `position: static`. (2) A non-static position makes the
+- *   slot a containing block for absolute-positioned descendants;
+- *   floating-ui writes physical viewport-relative `top` / `left` onto
+- *   the floating element, so the containing block must sit at viewport
+- *   `(0, 0)`. `position: fixed` (with `top: 0; left: 0`) pins it there
+- *   regardless of scroll; `position: relative` would anchor at body's
+- *   flow position and silently break popover positioning.
+- *
+- * - `top: 0; left: 0` — physical, not logical. `inset-inline-start: 0`
+- *   would resolve to `right: 0` in RTL, anchoring the (zero-width) slot
+- *   at the viewport's top-right corner; an absolute child with
+- *   `left: 200px` would then resolve off the right edge of the screen.
+- *   Same hazard for `inset-block-start` under vertical writing modes.
+- *
+- * - `isolation: isolate` — redundant once `position: fixed` and
+- *   `z-index` are set (the slot is already a stacking context). Kept as
+- *   an explicit declaration of intent.
+- *
+- * The slot has zero content size, so it never intercepts pointer events.
++ * Authored unlayered (outside `@layer wp-ui-*`) so the slot's z-index and
++ * positioning win against any `@layer`-scoped rule.
+  */
+ 
+ .slot {
++	/* `position: fixed` is load-bearing: `z-index` is ignored on `static`,
++	 * and the slot must be a containing block at viewport `(0, 0)` so
++	 * floating-ui's viewport-relative `top`/`left` resolve correctly. */
+ 	position: fixed;
+ 	top: 0;
+-	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical anchoring required so floating-ui's viewport-relative coordinates resolve correctly; see file header. */
++	/* Physical, not logical. `inset-inline-start: 0` would resolve to
++	 * `right: 0` in RTL and offset every absolute child off-viewport. */
++	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- See comment above. */
+ 	left: 0;
++	/* Sits in a reserved billion-scale band above the legacy z-index map in
++	 * `packages/base-styles/_z-index.scss`. */
+ 	z-index: 1000000003;
+ 	isolation: isolate;
+ }
+diff --git a/packages/ui/src/utils/test/use-enable-wp-compat-overlay-slot.test.tsx b/packages/ui/src/utils/test/use-enable-wp-compat-overlay-slot.test.tsx
+index f26adf11be725f..e09ee9f6c2956e 100644
+--- a/packages/ui/src/utils/test/use-enable-wp-compat-overlay-slot.test.tsx
++++ b/packages/ui/src/utils/test/use-enable-wp-compat-overlay-slot.test.tsx
+@@ -10,9 +10,7 @@ const internalWindow = window as unknown as {
+ 	__wpUiCompatOverlaySlotEnabled?: boolean;
+ };
+ 
+-// The slot is identified by a data attribute (cross-tooling marker, not a
+-// user-facing role/text), so direct DOM queries are appropriate here —
+-// Testing Library's role/text accessors don't apply.
++// Slot is identified by a data attribute, not a user-facing role/text.
+ /* eslint-disable testing-library/no-node-access */
+ 
+ function findSlots(): HTMLElement[] {
+@@ -60,11 +58,8 @@ describe( 'useEnableWpCompatOverlaySlot', () => {
+ 	} );
+ 
+ 	it( 'leaves the slot enabled after the hook caller unmounts (one-way opt-in)', () => {
+-		// The slot is shared infrastructure across all `@wordpress/ui`
+-		// consumers in the document; a single component shouldn't be
+-		// able to disable it for everyone else once enabled. This test
+-		// pins that one-way behavior — unmounting the hook caller does
+-		// not flip the gate back off.
++		// Pins the one-way behavior — unmounting must not flip the gate
++		// back off; the slot is shared infrastructure.
+ 		const { unmount } = render( <HookHost /> );
+ 
+ 		expect( getWpCompatOverlaySlot() ).toBeDefined();
+diff --git a/packages/ui/src/utils/test/wp-compat-overlay-slot.test.ts b/packages/ui/src/utils/test/wp-compat-overlay-slot.test.ts
+index ff03e8ed9d4d1e..ab405842c95382 100644
+--- a/packages/ui/src/utils/test/wp-compat-overlay-slot.test.ts
++++ b/packages/ui/src/utils/test/wp-compat-overlay-slot.test.ts
+@@ -4,25 +4,12 @@ import {
+ 	__resetWpCompatOverlaySlotCacheForTests,
+ } from '../wp-compat-overlay-slot';
+ 
+-/**
+- * Typed accessor for the internal opt-in flag the helper reads. The flag
+- * is intentionally undeclared on the global `Window` interface — the
+- * public API is `useEnableWpCompatOverlaySlot()` (tested separately) — so
+- * tests that exercise the gating mechanism directly stay behind this
+- * cast, mirroring how the helper itself reads the flag.
+- */
++// Typed accessors mirroring the helper's local casts: the flag and the
++// `wp` global are both intentionally undeclared on `Window` so the
++// package's published types don't leak augmentations.
+ const internalWindow = window as unknown as {
+ 	__wpUiCompatOverlaySlotEnabled?: unknown;
+ };
+-
+-/**
+- * Typed accessor for the WordPress runtime global the auto-detect heuristic
+- * reads. Mirrors the helper's local `WpEnvironmentWindow` cast pattern (kept
+- * off the global `Window` interface to avoid leaking a `Window.wp`
+- * augmentation into downstream TS consumers via the package's published
+- * types). Tests use this accessor to plant / observe the runtime shape the
+- * heuristic inspects.
+- */
+ const wpEnvWindow = window as unknown as {
+ 	wp?: { components?: unknown };
+ };
+@@ -112,8 +99,7 @@ describe( 'getWpCompatOverlaySlot', () => {
+ 		);
+ 
+ 		it( 'does not auto-enable when window.wp.components is null', () => {
+-			// `typeof null === 'object'` so the check needs an explicit null
+-			// guard. This test pins that behavior.
++			// `typeof null === 'object'` — pins the explicit null guard.
+ 			wpEnvWindow.wp = { components: null };
+ 
+ 			expect( getWpCompatOverlaySlot() ).toBeUndefined();
+@@ -134,15 +120,10 @@ describe( 'getWpCompatOverlaySlot', () => {
+ 			expect( getWpCompatOverlaySlot() ).toBeDefined();
+ 		} );
+ 
+-		// The cross-origin `window.top` throw path (where `.wp` access
+-		// throws because the top window is in another origin) isn't unit-
+-		// tested: jsdom defines `window.top` as a non-configurable, non-
+-		// writable getter, so neither `Object.defineProperty` nor
+-		// `jest.spyOn(window, 'top', 'get')` nor `jest.replaceProperty`
+-		// can simulate the throw. The helper's `try/catch` is readable in
+-		// place and the same-origin happy path (`window.top === window` in
+-		// jsdom, exercised by every other auto-detect test in this suite)
+-		// covers the no-throw branch. Real cross-origin embeddings are
++		// The cross-origin `window.top` throw path isn't unit-tested:
++		// jsdom's `window.top` is a non-configurable, non-writable getter,
++		// so the throw can't be simulated. Same-origin happy path is
++		// covered by every other auto-detect test; cross-origin is
+ 		// validated via manual smoke testing.
+ 	} );
+ 
+@@ -176,8 +157,7 @@ describe( 'getWpCompatOverlaySlot', () => {
+ 			expect( second?.isConnected ).toBe( true );
+ 			expect( findSlots() ).toHaveLength( 1 );
+ 
+-			// The recreated element should now be cached: a third call must
+-			// return it directly without creating a third slot.
++			// A third call returns the cached recreated slot directly.
+ 			const third = getWpCompatOverlaySlot();
+ 			expect( third ).toBe( second );
+ 			expect( findSlots() ).toHaveLength( 1 );
+@@ -193,16 +173,10 @@ describe( 'getWpCompatOverlaySlot', () => {
+ 		} );
+ 
+ 		it( 'invalidates the cache and detaches the stale slot when the cached element belongs to a different document', () => {
+-			// Drives the `cachedSlot.ownerDocument !== ownerDocument` branch
+-			// and the subsequent `if ( cachedSlot?.isConnected )
+-			// cachedSlot.remove();` cleanup. Triggered in real environments
+-			// by a runtime-detected switch in the owning document (e.g. a
+-			// jsdom test teardown that tears down the realm, or a host
+-			// swapping the active document). Simulated here by moving the
+-			// cached slot into a foreign parsed document so its
+-			// `ownerDocument` differs from the helper's local `document`
+-			// while staying `isConnected` to that foreign document — the
+-			// exact shape the cleanup branch was written to handle.
++			// Exercises the foreign-document cleanup branch by moving the
++			// cached slot into a parsed foreign document, so it stays
++			// `isConnected` but `ownerDocument` differs from the helper's
++			// local `document`.
+ 			const first = getWpCompatOverlaySlot();
+ 			expect( first ).toBeDefined();
+ 
+@@ -235,9 +209,8 @@ describe( 'getWpCompatOverlaySlot', () => {
+ 		} );
+ 
+ 		it( 'adopts a pre-existing slot element rather than appending a duplicate', () => {
+-			// Simulate a second `@wordpress/ui` package instance having
+-			// already created the slot before this instance's call. The
+-			// module-level `cachedSlot` is null, but the DOM has the slot.
++			// Simulates a second `@wordpress/ui` instance creating the slot
++			// first: `cachedSlot` is null but the slot already exists in the DOM.
+ 			const preExisting = document.createElement( 'div' );
+ 			preExisting.setAttribute( WP_COMPAT_OVERLAY_SLOT_ATTRIBUTE, '' );
+ 			document.body.appendChild( preExisting );
+@@ -286,9 +259,7 @@ describe( 'getWpCompatOverlaySlot', () => {
+ 				if ( bodyDescriptor ) {
+ 					Object.defineProperty( document, 'body', bodyDescriptor );
+ 				} else {
+-					// jsdom typically defines `body` on Document.prototype; if
+-					// it isn't present, fall back to deleting the override so
+-					// `document.body` resolves to the live element again.
++					// Fallback if `body` wasn't on Document.prototype.
+ 					delete ( document as unknown as { body: unknown } ).body;
+ 				}
+ 				expect( document.body ).toBe( realBody );
+diff --git a/packages/ui/src/utils/use-enable-wp-compat-overlay-slot.ts b/packages/ui/src/utils/use-enable-wp-compat-overlay-slot.ts
+index e1b794a7a8545e..51ce164698be5a 100644
+--- a/packages/ui/src/utils/use-enable-wp-compat-overlay-slot.ts
++++ b/packages/ui/src/utils/use-enable-wp-compat-overlay-slot.ts
+@@ -1,37 +1,28 @@
+ /**
+  * Opts the host application into the `@wordpress/ui` compat overlay slot —
+- * a body-level positioned container into which `@wordpress/ui` overlays
+- * portal so they reliably stack above `@wordpress/components` overlays in
+- * mixed-library compositions.
++ * a body-level container into which `@wordpress/ui` overlays portal so they
++ * reliably stack above `@wordpress/components` overlays in mixed-library
++ * compositions.
+  *
+  * Call once from a component that mounts for the lifetime of the app
+- * (typically the root). The opt-in is intentionally one-way: the slot is
+- * shared infrastructure across every `@wordpress/ui` consumer in the same
+- * document, and a single component shouldn't be able to turn it off for
+- * everyone else. If the slot isn't wanted, simply don't call this hook.
++ * (typically the root). Idempotent and one-way: a single caller should not
++ * be able to turn off shared infrastructure for everyone else; if the slot
++ * isn't wanted, simply don't call this hook.
+  *
+- * Anywhere `window.wp.components` is on the global — the typical setup
+- * for plugins enqueueing `wp-components` through WordPress's script-
+- * loader — the slot auto-enables and this hook is a no-op. The hook
+- * exists for apps that aren't built with standard WordPress build
+- * tooling.
+- *
+- * Idempotent and safe to call from multiple components.
++ * Where `window.wp.components` is on the global — the typical setup for
++ * plugins enqueueing `wp-components` through WordPress's script-loader —
++ * the slot auto-enables and this hook is a no-op.
+  */
+ export function useEnableWpCompatOverlaySlot(): void {
+ 	if ( typeof window === 'undefined' ) {
+ 		return;
+ 	}
+ 
+-	// The opt-in is applied during render (not in `useLayoutEffect`) so
+-	// descendants in the same render pass — e.g. `Tooltip.Portal`, which
+-	// reads `getWpCompatOverlaySlot()` on every render — see the gate
+-	// open on first mount. Render-phase visibility extends only to
+-	// components rendered *after* this hook in the same pass; calling
+-	// from a top-level component keeps that invariant trivially
+-	// satisfied. An idempotent boolean write is the kind of side effect
+-	// render is allowed to emit: re-renders, StrictMode double-renders,
+-	// and multiple hook callers all collapse to the same final state.
++	// Applied during render (not in `useLayoutEffect`) so descendants in
++	// the same render pass — e.g. `Tooltip.Portal`, which reads
++	// `getWpCompatOverlaySlot()` on every render — see the gate open on
++	// first mount. Safe to write during render: the value is an idempotent
++	// boolean.
+ 	const internalWindow = window as {
+ 		__wpUiCompatOverlaySlotEnabled?: boolean;
+ 	};
+diff --git a/packages/ui/src/utils/wp-compat-overlay-slot.ts b/packages/ui/src/utils/wp-compat-overlay-slot.ts
+index 33b536e9a1f160..b2e4cbc82b1852 100644
+--- a/packages/ui/src/utils/wp-compat-overlay-slot.ts
++++ b/packages/ui/src/utils/wp-compat-overlay-slot.ts
+@@ -1,88 +1,49 @@
+ import styles from './css/wp-compat-overlay-slot.module.css';
+ 
+-/**
+- * Minimal shape of the WordPress runtime global. Local cast so the auto-
+- * detect heuristic type-checks without leaking a `Window.wp` augmentation
+- * into downstream TS consumers via this package's published `.d.ts`.
+- */
++// Local casts for the auto-detect heuristic and the shared opt-in flag,
++// kept off the global `Window` interface so this package's `.d.ts` doesn't
++// leak `Window.wp` / `Window.__wpUiCompatOverlaySlotEnabled` augmentations.
+ type WpEnvironmentWindow = {
+ 	wp?: {
+ 		components?: unknown;
+ 	};
+ };
+-
+-/**
+- * Cross-`@wordpress/ui`-instance shared store for the explicit opt-in.
+- * Set by `useEnableWpCompatOverlaySlot()`; read here. Intentionally not
+- * declared on the global `Window` interface — direct access is in-package
+- * only and stays behind a local cast.
+- */
+ type CompatOverlaySlotInternalWindow = {
+ 	__wpUiCompatOverlaySlotEnabled?: boolean;
+ };
+ 
+ /**
+- * Identifies the compat overlay slot DOM element. Used as the cross-
+- * `@wordpress/ui`-instance singleton marker (see `getWpCompatOverlaySlot()`);
+- * styling is delivered via the CSS-module class on the same element.
++ * Marker attribute on the compat overlay slot element.
+  */
+ export const WP_COMPAT_OVERLAY_SLOT_ATTRIBUTE = 'data-wp-compat-overlay-slot';
+ 
+-/**
+- * Resolves the document that should own the slot — always the local
+- * document, i.e., the one the JS realm calling this helper sees as
+- * `globalThis.document`. Not `window.top?.document`, which would put the
+- * slot in a document where this bundle's CSS modules aren't loaded
+- * (Storybook's preview iframe being the canonical example). "Is this a
+- * WordPress environment?" (auto-detect) and "which document hosts the
+- * slot?" (placement) are orthogonal; the helper always answers the
+- * second with the local realm.
+- */
+ function resolveOwnerDocument(): Document | null {
+-	if ( typeof document === 'undefined' ) {
+-		return null;
+-	}
+-	return document;
++	// Always the local document — not `window.top?.document`, which would
++	// put the slot in a document where this bundle's CSS modules aren't
++	// loaded (e.g. Storybook's preview iframe).
++	return typeof document === 'undefined' ? null : document;
+ }
+ 
+-/**
+- * Detects whether the runtime is a WordPress-flavored environment by
+- * checking for `window.wp.components`. Tries the top window first so an
+- * iframe (e.g., the editor canvas) inherits the parent's WP environment;
+- * falls back to the local window. The `typeof === 'object'` check is
+- * deliberately stricter than `!== undefined` so a stray non-object
+- * `components` doesn't trigger auto-enable, and the explicit null
+- * comparison covers `typeof null === 'object'`.
+- */
+ function isInWordPressEnvironment(): boolean {
+ 	let topWp: WpEnvironmentWindow[ 'wp' ];
+ 	try {
++		// Try the top window first so an iframe (e.g. the editor canvas)
++		// inherits the parent's WP environment.
+ 		topWp = ( window.top as WpEnvironmentWindow | undefined )?.wp;
+ 	} catch {
+ 		// Cross-origin top window — fall through to the local window.
+ 	}
+ 	const wp = topWp ?? ( window as WpEnvironmentWindow ).wp;
++	// Stricter than `!== undefined` so a stray non-object `components`
++	// doesn't trigger auto-enable. Explicit null check covers
++	// `typeof null === 'object'`.
+ 	return typeof wp?.components === 'object' && wp.components !== null;
+ }
+ 
+-/**
+- * Module-level cache. Revalidated on each call against the current owner
+- * document and the slot's connection state. On miss, the helper falls
+- * back to a DOM query for an existing slot before creating one — that's
+- * what coordinates multiple `@wordpress/ui` package instances loaded on
+- * the same page around a single DOM-level singleton via the
+- * `[data-wp-compat-overlay-slot]` attribute.
+- */
++// Revalidated on each call against the current owner document and the
++// slot's connection state.
+ let cachedSlot: HTMLDivElement | null = null;
+ 
+-/**
+- * Creates the slot element, tags it with the cross-instance singleton
+- * attribute, applies the co-located CSS-module class, and appends it to
+- * the given document's body. Callers must have already verified the gate
+- * is open and `ownerDocument.body` exists.
+- *
+- * @param ownerDocument The document that should own and host the slot.
+- */
+ function createSlot( ownerDocument: Document ): HTMLDivElement {
+ 	const element = ownerDocument.createElement( 'div' );
+ 	element.setAttribute( WP_COMPAT_OVERLAY_SLOT_ATTRIBUTE, '' );
+@@ -94,28 +55,24 @@ function createSlot( ownerDocument: Document ): HTMLDivElement {
+ }
+ 
+ /**
+- * Returns the body-level compat overlay slot element when the runtime
+- * opts in, lazily creating it on first call. Returns `undefined`
+- * otherwise, leaving the underlying overlay primitives' default portal
+- * container in effect — so the return value can be forwarded straight
+- * to a `container` prop.
++ * Returns the body-level compat overlay slot when the runtime opts in,
++ * lazily creating it on first call. Returns `undefined` otherwise — so the
++ * return value can be forwarded straight to a `container` prop, leaving the
++ * default portal container in effect.
+  *
+  * Two opt-in paths:
+  *
+  * - Auto-detected when `window.wp.components` is on the global — the
+- *   typical script-loader setup for WordPress plugins and admin
+- *   screens. Zero developer intervention required.
+- * - Explicit, via `useEnableWpCompatOverlaySlot()` from a top-level
+- *   component — for hosts that bundle `@wordpress/components` (or only
+- *   `@wordpress/ui`) directly rather than relying on the global.
++ *   typical script-loader setup for WordPress plugins and admin screens.
++ * - Explicit, via `useEnableWpCompatOverlaySlot()` — for hosts that bundle
++ *   `@wordpress/components` (or only `@wordpress/ui`) directly rather than
++ *   relying on the global.
+  *
+- * The slot is a single `<div data-wp-compat-overlay-slot>` appended to
+- * the local document's body (see `resolveOwnerDocument`) with styles
+- * pinned via the co-located CSS module. Subsequent calls return the
+- * same element; if it's been removed from the DOM it's recreated, and
+- * if a different `@wordpress/ui` instance already created a slot in
+- * the same document this call adopts it rather than appending a
+- * duplicate.
++ * The slot is a single `<div data-wp-compat-overlay-slot>` appended to the
++ * local document's body. Subsequent calls return the same element; if it's
++ * been removed it's recreated, and a slot created by another
++ * `@wordpress/ui` instance in the same document is adopted rather than
++ * duplicated.
+  */
+ export function getWpCompatOverlaySlot(): HTMLDivElement | undefined {
+ 	if ( typeof window === 'undefined' ) {
+@@ -131,9 +88,8 @@ export function getWpCompatOverlaySlot(): HTMLDivElement | undefined {
+ 	}
+ 
+ 	const ownerDocument = resolveOwnerDocument();
+-	// `document.body` can be null if the helper runs before `<body>` is
+-	// parsed (e.g. a `<script>` in `<head>`). Bail rather than throw in
+-	// `createSlot`; callers fall through to the default portal container.
++	// `document.body` can be null if this runs before `<body>` is parsed
++	// (e.g. a `<script>` in `<head>`). Bail rather than throw in `createSlot`.
+ 	if ( ! ownerDocument || ! ownerDocument.body ) {
+ 		return undefined;
+ 	}
+@@ -146,9 +102,8 @@ export function getWpCompatOverlaySlot(): HTMLDivElement | undefined {
+ 		return cachedSlot;
+ 	}
+ 
+-	// DOM-level singleton: prefer an existing slot in the document over
+-	// creating a duplicate. Coordinates multiple `@wordpress/ui` package
+-	// instances around one slot via the attribute marker.
++	// Prefer an existing slot in the document over creating a duplicate —
++	// this is how multiple `@wordpress/ui` instances share one slot.
+ 	const existing = ownerDocument.querySelector< HTMLDivElement >(
+ 		`[${ WP_COMPAT_OVERLAY_SLOT_ATTRIBUTE }]`
+ 	);
+@@ -157,8 +112,7 @@ export function getWpCompatOverlaySlot(): HTMLDivElement | undefined {
+ 		return existing;
+ 	}
+ 
+-	// Detach any cached slot still attached to a foreign document, so we
+-	// don't orphan a slot in a document we no longer manage.
++	// Don't orphan a cached slot still attached to a foreign document.
+ 	if ( cachedSlot?.isConnected ) {
+ 		cachedSlot.remove();
+ 	}
+@@ -168,8 +122,7 @@ export function getWpCompatOverlaySlot(): HTMLDivElement | undefined {
+ }
+ 
+ /**
+- * Test-only escape hatch that drops the cached singleton so a fresh
+- * element is created on the next `getWpCompatOverlaySlot()` call.
++ * Test-only escape hatch that drops the cached singleton.
+  */
+ export function __resetWpCompatOverlaySlotCacheForTests(): void {
+ 	cachedSlot = null;
+diff --git a/storybook/stories/playground/popover-with-slotfill.story.jsx b/storybook/stories/playground/popover-with-slotfill.story.jsx
+index 63995d46c10800..4ebb8197d9c5f2 100644
+--- a/storybook/stories/playground/popover-with-slotfill.story.jsx
++++ b/storybook/stories/playground/popover-with-slotfill.story.jsx
+@@ -10,9 +10,9 @@ export default {
+ 	component: Popover.Root,
+ };
+ 
+-// Renders an iframe and portals `children` into its body once `load` fires.
+-// Gating the portal on `load` avoids a Firefox-only React portal bug — see
+-// https://github.com/facebook/react/issues/22847#issuecomment-991394558.
++// Renders an iframe and portals `children` into its body on `load`.
++// Gating on `load` avoids a Firefox-only React portal bug:
++// https://github.com/facebook/react/issues/22847#issuecomment-991394558
+ function IframePortal( { children, iframeRef, ...iframeProps } ) {
+ 	const [ bodyNode, setBodyNode ] = useState( null );
+ 	return (
+diff --git a/storybook/stories/playground/with-wp-compat-overlay-slot.tsx b/storybook/stories/playground/with-wp-compat-overlay-slot.tsx
+index 9a3dd0dd56549e..245e732cf5292d 100644
+--- a/storybook/stories/playground/with-wp-compat-overlay-slot.tsx
++++ b/storybook/stories/playground/with-wp-compat-overlay-slot.tsx
+@@ -5,12 +5,12 @@ import type { Decorator } from '@storybook/react-vite';
+ /**
+  * Storybook decorator that opts the decorated story into the
+  * `@wordpress/ui` compat overlay slot. The cleanup clears the internal
+- * flag so navigating to an un-decorated story closes the gate again —
+- * `useEnableWpCompatOverlaySlot()` itself is intentionally one-way.
++ * flag on unmount so navigating to an un-decorated story closes the gate
++ * again — `useEnableWpCompatOverlaySlot()` is one-way at runtime.
+  *
+- * Kept private to the playground stories: the flag is window-level, so
+- * applying the decorator to per-component stories would leak the opt-in
+- * into sibling stories on the same autodocs page.
++ * Kept private to playground stories: applying it to per-component
++ * stories would leak the window-level flag into sibling stories on the
++ * same autodocs page.
+  */
+ export const WithWpCompatOverlaySlot: Decorator = ( Story ) => {
+ 	useEnableWpCompatOverlaySlot();
+diff --git a/storybook/stories/playground/wp-compat-overlay-slot.story.jsx b/storybook/stories/playground/wp-compat-overlay-slot.story.jsx
+index 89b4fe1a5b02f8..dda4b41b83ac69 100644
+--- a/storybook/stories/playground/wp-compat-overlay-slot.story.jsx
++++ b/storybook/stories/playground/wp-compat-overlay-slot.story.jsx
+@@ -10,11 +10,9 @@ import { useState } from '@wordpress/element';
+ import * as Tooltip from '../../../packages/ui/src/tooltip';
+ import { WithWpCompatOverlaySlot } from './with-wp-compat-overlay-slot';
+ 
+-/**
+- * Cross-library stacking: a `@wordpress/ui` `Tooltip` rendered inside a
+- * `@wordpress/components` `Modal` (or `Popover`) reliably sits above the
+- * components-side overlay, via the `@wordpress/ui` compat overlay slot.
+- */
++// Cross-library stacking: a `@wordpress/ui` Tooltip inside a
++// `@wordpress/components` Modal / Popover should sit above the
++// components-side overlay via the compat overlay slot.
+ export default {
+ 	title: 'Playground/Debug fixtures/WP Compat Overlay Slot',
+ 	decorators: [ WithWpCompatOverlaySlot ],
+diff --git a/test/e2e/specs/editor/various/draggable-blocks.spec.js b/test/e2e/specs/editor/various/draggable-blocks.spec.js
+index 80f2e6c7ab3715..e09d119084860a 100644
+--- a/test/e2e/specs/editor/various/draggable-blocks.spec.js
++++ b/test/e2e/specs/editor/various/draggable-blocks.spec.js
+@@ -485,8 +485,7 @@ test.describe( 'Draggable block', () => {
+ 		);
+ 		await expect( chip ).toBeVisible();
+ 
+-		// The chip should live inside the body-level
+-		// `[data-wp-compat-overlay-slot]` — that's what keeps it above
++		// Living in the compat overlay slot is what keeps the chip above
+ 		// any `@wordpress/components` overlays opened mid-drag.
+ 		const chipIsInsideCompatSlot = await chip.evaluate(
+ 			( el ) => el.closest( '[data-wp-compat-overlay-slot]' ) !== null

@@ -1,0 +1,26 @@
+diff --git a/packages/components/src/angle-picker-control/README.md b/packages/components/src/angle-picker-control/README.md
+index 9908282fd9ef9a..28260de1f986cf 100644
+--- a/packages/components/src/angle-picker-control/README.md
++++ b/packages/components/src/angle-picker-control/README.md
+@@ -19,7 +19,7 @@ function Example() {
+     <AnglePickerControl
+       value={ angle }
+       onChange={ setAngle }
+-    </>
++    />
+   );
+ }
+ ```
+diff --git a/packages/components/src/angle-picker-control/index.tsx b/packages/components/src/angle-picker-control/index.tsx
+index 9c436c36caf660..2743746bfd76a2 100644
+--- a/packages/components/src/angle-picker-control/index.tsx
++++ b/packages/components/src/angle-picker-control/index.tsx
+@@ -97,7 +97,7 @@ function UnforwardedAnglePickerControl(
+  *     <AnglePickerControl
+  *       value={ angle }
+  *       onChange={ setAngle }
+- *     </>
++ *     />
+  *   );
+  * }
+  * ```

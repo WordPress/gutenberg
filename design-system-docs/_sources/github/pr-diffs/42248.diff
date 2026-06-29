@@ -1,0 +1,143 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 6c20731385f131..497399b9a484b5 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -344,5 +344,11 @@ module.exports = {
+ 				'jsdoc/require-param': 'off',
+ 			},
+ 		},
++		{
++			files: [ 'packages/components/src/**' ],
++			excludedFiles: [ 'packages/components/src/**/@(test|stories)/**' ],
++			plugins: [ 'ssr-friendly' ],
++			extends: [ 'plugin:ssr-friendly/recommended' ],
++		},
+ 	],
+ };
+diff --git a/package-lock.json b/package-lock.json
+index e8d2e0a9961a5c..022d39b2cc6432 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -33959,6 +33959,15 @@
+ 			"integrity": "sha512-XslZy0LnMn+84NEG9jSGR6eGqaZB3133L8xewQo3fQagbQuGt7a63gf+P1NGKZavEYEC3UXaWEAA/AqDkuN6xA==",
+ 			"dev": true
+ 		},
++		"eslint-plugin-ssr-friendly": {
++			"version": "1.0.6",
++			"resolved": "https://registry.npmjs.org/eslint-plugin-ssr-friendly/-/eslint-plugin-ssr-friendly-1.0.6.tgz",
++			"integrity": "sha512-O1S/0Q8FYTl1c4vwIr0cg59u37mL5qe7sxpMzjdIo2v8l0LjCugU699trmkgOheQINTq7R9yhfCo6YaAb4tYUQ==",
++			"dev": true,
++			"requires": {
++				"globals": "^13.8.0"
++			}
++		},
+ 		"eslint-scope": {
+ 			"version": "4.0.3",
+ 			"resolved": "https://registry.npmjs.org/eslint-scope/-/eslint-scope-4.0.3.tgz",
+diff --git a/package.json b/package.json
+index 0c6cbf246803e5..4ea5ec126895c6 100755
+--- a/package.json
++++ b/package.json
+@@ -183,6 +183,7 @@
+ 		"eslint-plugin-eslint-comments": "3.1.2",
+ 		"eslint-plugin-import": "2.25.2",
+ 		"eslint-plugin-playwright": "0.8.0",
++		"eslint-plugin-ssr-friendly": "1.0.6",
+ 		"execa": "4.0.2",
+ 		"fast-glob": "3.2.7",
+ 		"filenamify": "4.2.0",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e30bdbf076ec31..281068047017f4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Bug Fix
+ 
+ -   `BoxControl`: Change ARIA role from `region` to `group` to avoid unwanted ARIA landmark regions ([#42094](https://github.com/WordPress/gutenberg/pull/42094)).
++-   `FocalPointPicker`, `FormTokenField`, `ResizableBox`: Fixed SSR breakage ([#42248](https://github.com/WordPress/gutenberg/pull/42248)).
+ -   `Popover`: pass missing anchor ref to the `getAnchorRect` callback prop. ([#42076](https://github.com/WordPress/gutenberg/pull/42076))
+ -   `ComboboxControl`: use custom prefix when generating the instanceId ([#42134](https://github.com/WordPress/gutenberg/pull/42134).
+ 
+diff --git a/packages/components/src/focal-point-picker/grid.js b/packages/components/src/focal-point-picker/grid.js
+index 776419eaef5b3d..b894e81e946ca2 100644
+--- a/packages/components/src/focal-point-picker/grid.js
++++ b/packages/components/src/focal-point-picker/grid.js
+@@ -13,9 +13,6 @@ import {
+ } from './styles/focal-point-picker-style';
+ import { useUpdateEffect } from '../utils/hooks';
+ 
+-const { clearTimeout, setTimeout } =
+-	typeof window !== 'undefined' ? window : {};
+-
+ export default function FocalPointPickerGrid( {
+ 	bounds = {},
+ 	value,
+@@ -52,11 +49,11 @@ function useRevealAnimation( value ) {
+ 
+ 	useUpdateEffect( () => {
+ 		setIsActive( true );
+-		const timeout = setTimeout( () => {
++		const timeout = window.setTimeout( () => {
+ 			setIsActive( false );
+ 		}, 600 );
+ 
+-		return () => clearTimeout( timeout );
++		return () => window.clearTimeout( timeout );
+ 	}, [ value ] );
+ 
+ 	return {
+diff --git a/packages/components/src/form-token-field/suggestions-list.tsx b/packages/components/src/form-token-field/suggestions-list.tsx
+index 3de8b925f516c2..3828feef5dfab2 100644
+--- a/packages/components/src/form-token-field/suggestions-list.tsx
++++ b/packages/components/src/form-token-field/suggestions-list.tsx
+@@ -17,8 +17,6 @@ import { useRefEffect } from '@wordpress/compose';
+  */
+ import type { SuggestionsListProps } from './types';
+ 
+-const { setTimeout, clearTimeout } = window;
+-
+ const handleMouseDown: MouseEventHandler = ( e ) => {
+ 	// By preventing default here, we will not lose focus of <input> when clicking a suggestion.
+ 	e.preventDefault();
+@@ -54,14 +52,14 @@ export function SuggestionsList< T extends string | { value: string } >( {
+ 						onlyScrollIfNeeded: true,
+ 					}
+ 				);
+-				id = setTimeout( () => {
++				id = window.setTimeout( () => {
+ 					setScrollingIntoView( false );
+ 				}, 100 );
+ 			}
+ 
+ 			return () => {
+ 				if ( id !== undefined ) {
+-					clearTimeout( id );
++					window.clearTimeout( id );
+ 				}
+ 			};
+ 		},
+diff --git a/packages/components/src/resizable-box/resize-tooltip/utils.ts b/packages/components/src/resizable-box/resize-tooltip/utils.ts
+index fac92b6e5f7e24..54d96a1e6d1d60 100644
+--- a/packages/components/src/resizable-box/resize-tooltip/utils.ts
++++ b/packages/components/src/resizable-box/resize-tooltip/utils.ts
+@@ -4,7 +4,6 @@
+ import { useEffect, useRef, useState } from '@wordpress/element';
+ import { useResizeObserver } from '@wordpress/compose';
+ 
+-const { clearTimeout, setTimeout } = window;
+ const noop = () => {};
+ 
+ export type Axis = 'x' | 'y';
+@@ -97,10 +96,10 @@ export function useResizeLabel( {
+ 
+ 	const debounceUnsetMoveXY = () => {
+ 		if ( moveTimeoutRef.current ) {
+-			clearTimeout( moveTimeoutRef.current );
++			window.clearTimeout( moveTimeoutRef.current );
+ 		}
+ 
+-		moveTimeoutRef.current = setTimeout( unsetMoveXY, fadeTimeout );
++		moveTimeoutRef.current = window.setTimeout( unsetMoveXY, fadeTimeout );
+ 	};
+ 
+ 	useEffect( () => {

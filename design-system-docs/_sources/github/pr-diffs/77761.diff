@@ -1,0 +1,44 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c1a9d4d1f9e7f5..c6466f7c1bc7c9 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -25,6 +25,7 @@
+ -   `Modal`: Portal modals into the overlay legacy slot. Update the aria-helper to walk up from the modal so siblings of the slot wrapper (and outer modals when nested) continue to be aria-hidden.
+ -   `Tooltip`, `Menu`, `CustomSelectControl` v2: Pass `portalElement={ getOverlayLegacySlot }` so each Ariakit-backed overlay portals into the overlay legacy slot. Per-overlay z-indexes are unchanged.
+ -   `SnackbarList`: Bake the previously-mixin-only positioning (`position: fixed; bottom; padding-inline; pointer-events: none;`) into `.components-snackbar-list` directly so the list self-positions whether portaled or rendered inline.
++-   `Draggable`: Append the drag clone wrapper to the overlay legacy slot instead of the document body. The clone's z-index is unchanged; it stacks relative to the slot.
+ -   `NavigableContainer`: Refactor from class component to function component with hooks ([#77171](https://github.com/WordPress/gutenberg/pull/77171)).
+ -   `Menu`: Refactor `Menu.Popover` to use Ariakit’s `render` prop, wrapping content in `MenuMotionRoot` (motion styles) and `MenuSurface` (panel layout and `variant` chrome) ([#77460](https://github.com/WordPress/gutenberg/pull/77460)).
+ -   Fix types for TypeScript 7.0 ([#77177](https://github.com/WordPress/gutenberg/pull/77177)).
+diff --git a/packages/components/src/draggable/index.tsx b/packages/components/src/draggable/index.tsx
+index b9dea8fed43061..fb33cc788c5a6e 100644
+--- a/packages/components/src/draggable/index.tsx
++++ b/packages/components/src/draggable/index.tsx
+@@ -13,6 +13,7 @@ import { useEffect, useRef } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import type { DraggableProps } from './types';
++import { getOverlayLegacySlot } from '../utils/overlay-legacy-slot';
+ 
+ const dragImageClass = 'components-draggable__invisible-drag-image';
+ const cloneWrapperClass = 'components-draggable__clone';
+@@ -141,8 +142,8 @@ export function Draggable( {
+ 			clonedDragComponent.innerHTML = dragComponentRef.current.innerHTML;
+ 			cloneWrapper.appendChild( clonedDragComponent );
+ 
+-			// Inject the cloneWrapper into the DOM.
+-			ownerDocument.body.appendChild( cloneWrapper );
++			// Inject the cloneWrapper into the overlay legacy slot.
++			getOverlayLegacySlot().appendChild( cloneWrapper );
+ 		} else {
+ 			const element = ownerDocument.getElementById(
+ 				elementId
+@@ -175,7 +176,7 @@ export function Draggable( {
+ 
+ 			// Inject the cloneWrapper into the DOM.
+ 			if ( appendToOwnerDocument ) {
+-				ownerDocument.body.appendChild( cloneWrapper );
++				getOverlayLegacySlot().appendChild( cloneWrapper );
+ 			} else {
+ 				elementWrapper?.appendChild( cloneWrapper );
+ 			}

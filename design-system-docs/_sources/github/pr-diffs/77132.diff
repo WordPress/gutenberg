@@ -1,0 +1,136 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f9b75fd7d94a66..4a33538367685a 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,13 +4,17 @@
+ 
+ ### Bug Fixes
+ 
+--   `RadioControl`: Add support for disabled radio group [#77127](https://github.com/WordPress/gutenberg/pull/77127).
++-   `CheckboxControl`: Fix disabled styles [#77132](https://github.com/WordPress/gutenberg/pull/77132).
+ -   `FormTokenField`: Fix disabled styles. [#77137](https://github.com/WordPress/gutenberg/pull/77137)
+ -   `Textarea`: Fix disabled styles [#77129](https://github.com/WordPress/gutenberg/pull/77129).
+ -   `Autocomplete`: Fix value comparison to avoid resetting block inserter in RTC ([#76980](https://github.com/WordPress/gutenberg/pull/76980)).
+ -   `ValidatedRangeControl`: Fix `aria-label` rendered as `[object Object]` when `required` or `markWhenOptional` is set ([#77042](https://github.com/WordPress/gutenberg/pull/77042)).
+ -   `Autocomplete`: Fix matching logic to prefer longest overlapping trigger ([#77018](https://github.com/WordPress/gutenberg/pull/77018)).
+ 
++### Enhancements
++
++-   `RadioControl`: Add support for disabled radio group [#77127](https://github.com/WordPress/gutenberg/pull/77127).
++
+ ### Internal
+ 
+ -   `Autocomplete`: Refactor `useAutocomplete` to use `useReducer` ([#77020](https://github.com/WordPress/gutenberg/pull/77020)).
+diff --git a/packages/components/src/checkbox-control/style.scss b/packages/components/src/checkbox-control/style.scss
+index f9978eed7befbb..b307e222bdda49 100644
+--- a/packages/components/src/checkbox-control/style.scss
++++ b/packages/components/src/checkbox-control/style.scss
+@@ -17,7 +17,10 @@
+ .components-checkbox-control__label {
+ 	// Ensure label is aligned with checkbox along X axis
+ 	line-height: var(--checkbox-input-size);
+-	cursor: pointer;
++
++	.components-checkbox-control:not(:has(:disabled)) & {
++		cursor: pointer;
++	}
+ }
+ 
+ .components-checkbox-control__input[type="checkbox"] {
+@@ -25,7 +28,6 @@
+ 	background: $white;
+ 	color: $gray-900;
+ 	clear: none;
+-	cursor: pointer;
+ 	display: inline-block;
+ 	line-height: 0;
+ 	margin: 0 $grid-unit-05 0 0;
+@@ -46,12 +48,15 @@
+ 		@include button-style-outset__focus(var(--wp-admin-theme-color));
+ 	}
+ 
+-	&:checked,
+-	&:indeterminate {
++	&:not(:disabled):is(:checked, :indeterminate) {
+ 		background: $components-color-accent;
+ 		border-color: $components-color-accent;
+ 	}
+ 
++	&:not(:disabled) {
++		cursor: pointer;
++	}
++
+ 	&:checked::before {
+ 		content: none;
+ 	}
+@@ -88,6 +93,13 @@ svg.components-checkbox-control__indeterminate {
+ 	}
+ }
+ 
++.components-checkbox-control:has(:disabled) {
++	svg.components-checkbox-control__checked,
++	svg.components-checkbox-control__indeterminate {
++		fill: $components-color-gray-400;
++	}
++}
++
+ .components-checkbox-control__help {
+ 	display: inline-block;
+ 	margin-inline-start: calc(var(--checkbox-input-size) + var(--checkbox-input-margin));
+diff --git a/packages/components/src/checkbox-control/types.ts b/packages/components/src/checkbox-control/types.ts
+index 6eca33c91a913d..447a7f03858185 100644
+--- a/packages/components/src/checkbox-control/types.ts
++++ b/packages/components/src/checkbox-control/types.ts
+@@ -12,6 +12,10 @@ export type CheckboxControlProps = Pick<
+ 	BaseControlProps,
+ 	'__nextHasNoMarginBottom' | 'help'
+ > & {
++	/**
++	 * Whether the checkbox should be disabled.
++	 */
++	disabled?: boolean;
+ 	/**
+ 	 * A function that receives the checked state (boolean) as input.
+ 	 */
+diff --git a/packages/components/src/radio-control/style.scss b/packages/components/src/radio-control/style.scss
+index 4df3bb7ea6a4d9..d34b71e1e9d82a 100644
+--- a/packages/components/src/radio-control/style.scss
++++ b/packages/components/src/radio-control/style.scss
+@@ -60,7 +60,7 @@
+ 		opacity: 1; // Override style from wp-admin forms.css.
+ 
+ 		&:checked::before {
+-			border-color: $components-color-gray-300;
++			border-color: $components-color-gray-400;
+ 			opacity: 1; // Override style from wp-admin forms.css.
+ 
+ 		}
+diff --git a/packages/dataviews/src/dataform/stories/layout-regular.tsx b/packages/dataviews/src/dataform/stories/layout-regular.tsx
+index da68ab71ef9fbc..d8c5a43aa8e151 100644
+--- a/packages/dataviews/src/dataform/stories/layout-regular.tsx
++++ b/packages/dataviews/src/dataform/stories/layout-regular.tsx
+@@ -126,7 +126,7 @@ const fields: Field< SamplePost >[] = [
+ 		id: 'can_comment',
+ 		label: 'Allow people to leave a comment',
+ 		type: 'boolean',
+-		Edit: 'checkbox',
++		Edit: 'toggle',
+ 	},
+ 	{
+ 		id: 'filesize',
+@@ -356,6 +356,7 @@ const LayoutRegularComponent = ( {
+ 				'title',
+ 				'order',
+ 				'sticky',
++				'can_comment',
+ 				'author',
+ 				'status',
+ 				'reviewer',
+@@ -363,7 +364,6 @@ const LayoutRegularComponent = ( {
+ 				'password',
+ 				'date',
+ 				'birthdate',
+-				'can_comment',
+ 				'filesize',
+ 				'dimensions',
+ 				'tags',

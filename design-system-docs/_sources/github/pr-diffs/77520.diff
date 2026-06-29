@@ -1,0 +1,215 @@
+diff --git a/package-lock.json b/package-lock.json
+index 6d1afa9ad8cb9a..ba834445117490 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -4073,13 +4073,13 @@
+ 			}
+ 		},
+ 		"node_modules/@base-ui/react": {
+-			"version": "1.4.0",
+-			"resolved": "https://registry.npmjs.org/@base-ui/react/-/react-1.4.0.tgz",
+-			"integrity": "sha512-QcqdVbr/+ba2/RAKJIV1PV6S02Q5+r6a4Eym8ndBw+ZbBILkkmQAyRxXCg/pArrHnkrGeU8goe26aw0h6eE8pg==",
++			"version": "1.4.1",
++			"resolved": "https://registry.npmjs.org/@base-ui/react/-/react-1.4.1.tgz",
++			"integrity": "sha512-Ab5/LIhcmL8BQcsBUYiOfkSDRdLpvgUBzMK30cu684JPcLclYlztharvCZyNNgzJtbAiREzI9q0pI5erHCMgCw==",
+ 			"license": "MIT",
+ 			"dependencies": {
+ 				"@babel/runtime": "^7.29.2",
+-				"@base-ui/utils": "0.2.7",
++				"@base-ui/utils": "0.2.8",
+ 				"@floating-ui/react-dom": "^2.1.8",
+ 				"@floating-ui/utils": "^0.2.11",
+ 				"use-sync-external-store": "^1.6.0"
+@@ -4099,8 +4099,14 @@
+ 				"react-dom": "^17 || ^18 || ^19"
+ 			},
+ 			"peerDependenciesMeta": {
++				"@date-fns/tz": {
++					"optional": true
++				},
+ 				"@types/react": {
+ 					"optional": true
++				},
++				"date-fns": {
++					"optional": true
+ 				}
+ 			}
+ 		},
+@@ -4118,9 +4124,9 @@
+ 			}
+ 		},
+ 		"node_modules/@base-ui/utils": {
+-			"version": "0.2.7",
+-			"resolved": "https://registry.npmjs.org/@base-ui/utils/-/utils-0.2.7.tgz",
+-			"integrity": "sha512-nXYKhiL/0JafyJE8PfcflipGftOftlIwKd72rU15iZ1M5yqgg5J9P8NHU71GReDuXco5MJA/eVQqUT5WRqX9sA==",
++			"version": "0.2.8",
++			"resolved": "https://registry.npmjs.org/@base-ui/utils/-/utils-0.2.8.tgz",
++			"integrity": "sha512-jvOi+c+ftGlGotNcKnzPVg2IhCaDTB6/6R3JeqdjdXktuAJi3wKH9T7+svuaKh1mmfVU11UWzUZVH74JDfi/wQ==",
+ 			"license": "MIT",
+ 			"dependencies": {
+ 				"@babel/runtime": "^7.29.2",
+@@ -62714,7 +62720,7 @@
+ 			"version": "0.11.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@base-ui/react": "^1.4.0",
++				"@base-ui/react": "^1.4.1",
+ 				"@wordpress/a11y": "file:../a11y",
+ 				"@wordpress/compose": "file:../compose",
+ 				"@wordpress/element": "file:../element",
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 79c65bcd0c5bf7..f810dd6bd12fbd 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -13,7 +13,8 @@
+ ### Bug Fixes
+ 
+ -   `Link`: Fix text decoration on the `unstyled` variant when `openInNewTab` is enabled, and simplify new-tab icon markup ([#77420](https://github.com/WordPress/gutenberg/pull/77420)).
+--   `Dialog`, `AlertDialog`, `Popover`, `Tooltip`, `Select`: Fix broken focus-trap caused by ThemeProvider's `display: contents` and Base UI's `checkVisibility()` ([#77381](https://github.com/WordPress/gutenberg/pull/77381)).
++-   `Dialog`, `AlertDialog`, `Popover`, `Tooltip`, `Select`: Restore focus-trap tabbability through `ThemeProvider`'s `display: contents` wrapper ([#77381](https://github.com/WordPress/gutenberg/pull/77381), [#77520](https://github.com/WordPress/gutenberg/pull/77520)).
++-   Remove the transitive peer dependency on `date-fns` / `@date-fns/tz` ([#77520](https://github.com/WordPress/gutenberg/pull/77520)), resolving [#77395](https://github.com/WordPress/gutenberg/issues/77395).
+ -   `Text`: Apply both heading and paragraph CSS defenses regardless of variant, so the correct defense kicks in based on the rendered element rather than the typographic variant ([#77461](https://github.com/WordPress/gutenberg/pull/77461)).
+ -   `CollapsibleCard`: Fix missing keyboard focus ring on the header chevron icon when rendered inside wp-admin ([#77468](https://github.com/WordPress/gutenberg/pull/77468)).
+ -   `Tabs`: Fix missing keyboard focus ring on the panel in Windows High Contrast mode when rendered inside wp-admin ([#77469](https://github.com/WordPress/gutenberg/pull/77469)).
+@@ -26,6 +27,7 @@
+ 
+ ### Internal
+ 
++-   Update `@base-ui/react` from `1.4.0` to [`1.4.1`](https://github.com/mui/base-ui/releases/tag/v1.4.1) ([#77520](https://github.com/WordPress/gutenberg/pull/77520)).
+ -   Extract shared `useScheduleValidation` hook; refactor `Dialog`, `Popover`, and `Tabs` validation contexts to use it ([#77165](https://github.com/WordPress/gutenberg/pull/77165)).
+ -   `Tabs`: Wrap two validation timeout waits in `act(...)` to avoid intermittent test warnings ([#77319](https://github.com/WordPress/gutenberg/pull/77319)).
+ 
+diff --git a/packages/ui/package.json b/packages/ui/package.json
+index e3280998c935e8..8623bf38e3beec 100644
+--- a/packages/ui/package.json
++++ b/packages/ui/package.json
+@@ -43,7 +43,7 @@
+ 	"types": "build-types",
+ 	"sideEffects": false,
+ 	"dependencies": {
+-		"@base-ui/react": "^1.4.0",
++		"@base-ui/react": "^1.4.1",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/compose": "file:../compose",
+ 		"@wordpress/element": "file:../element",
+diff --git a/packages/ui/src/dialog/style.module.css b/packages/ui/src/dialog/style.module.css
+index 0d70c6d6d6b0c1..894b16287b5ed3 100644
+--- a/packages/ui/src/dialog/style.module.css
++++ b/packages/ui/src/dialog/style.module.css
+@@ -1,17 +1,5 @@
+ @layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+ 
+-/*
+- * Temporary workaround for a Base UI tabbability regression with
+- * checkVisibility() and display: contents.
+- * See: https://github.com/mui/base-ui/issues/4622
+- *
+- * This must stay outside the CSS layers to override ThemeProvider's
+- * unlayered display: contents.
+- */
+-[data-wpds-theme-provider-id]:has(> .popup) {
+-	display: block;
+-}
+-
+ @layer wp-ui-components {
+ 	.backdrop {
+ 		position: fixed;
+diff --git a/packages/ui/src/popover/popup.tsx b/packages/ui/src/popover/popup.tsx
+index 97c393a8aa3dcd..3c105bff1d45ff 100644
+--- a/packages/ui/src/popover/popup.tsx
++++ b/packages/ui/src/popover/popup.tsx
+@@ -87,10 +87,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
+ 					ref={ mergedPopupRef }
+ 					initialFocus={ resolvedInitialFocus }
+ 					finalFocus={ finalFocus }
+-					className={ clsx(
+-						styles.popup,
+-						variant !== 'unstyled' && styles.default
+-					) }
++					className={ clsx( variant !== 'unstyled' && styles.popup ) }
+ 					{ ...props }
+ 				>
+ 					<PopoverValidationProvider>
+diff --git a/packages/ui/src/popover/style.module.css b/packages/ui/src/popover/style.module.css
+index 5ad128083f8809..150e9aff57c8d0 100644
+--- a/packages/ui/src/popover/style.module.css
++++ b/packages/ui/src/popover/style.module.css
+@@ -1,33 +1,11 @@
+ @layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+ 
+-/*
+- * Temporary workaround for a Base UI tabbability regression with
+- * checkVisibility() and display: contents.
+- * See: https://github.com/mui/base-ui/issues/4622
+- *
+- * This must stay outside the CSS layers to override ThemeProvider's
+- * unlayered display: contents.
+- */
+-[data-wpds-theme-provider-id]:has(> .popup) {
+-	display: block;
+-}
+-
+ @layer wp-ui-components {
+ 	.positioner {
+ 		z-index: var(--wp-ui-popover-z-index, initial);
+ 	}
+ 
+-	/*
+-	 * Structural marker; no visual styles. Always applied to the popup so
+-	 * the ThemeProvider display workaround above matches regardless of
+-	 * `variant`. Visuals live in `.default`.
+-	 */
+-	/* stylelint-disable-next-line block-no-empty -- structural marker for the
+-	 * ThemeProvider display workaround above; kept class-based (not a data
+-	 * attribute) so it is defined alongside the other component classes. */
+-	.popup {}
+-
+-	.default {
++	.popup {
+ 		background-color: var(--wpds-color-bg-surface-neutral-strong);
+ 		padding: var(--wpds-dimension-padding-lg);
+ 		border-radius: var(--wpds-border-radius-md);
+diff --git a/packages/ui/src/tooltip/style.module.css b/packages/ui/src/tooltip/style.module.css
+index a23ca5abb1c349..58a705a623d093 100644
+--- a/packages/ui/src/tooltip/style.module.css
++++ b/packages/ui/src/tooltip/style.module.css
+@@ -1,17 +1,5 @@
+ @layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+ 
+-/*
+- * Temporary workaround for a Base UI tabbability regression with
+- * checkVisibility() and display: contents.
+- * See: https://github.com/mui/base-ui/issues/4622
+- *
+- * This must stay outside the CSS layers to override ThemeProvider's
+- * unlayered display: contents.
+- */
+-[data-wpds-theme-provider-id]:has(> .popup) {
+-	display: block;
+-}
+-
+ @layer wp-ui-components {
+ 	.positioner {
+ 		z-index: var(--wp-ui-tooltip-z-index, initial);
+diff --git a/packages/ui/src/utils/css/item-popup.module.css b/packages/ui/src/utils/css/item-popup.module.css
+index 93a1c181c2e0ee..217bf45c176821 100644
+--- a/packages/ui/src/utils/css/item-popup.module.css
++++ b/packages/ui/src/utils/css/item-popup.module.css
+@@ -1,17 +1,5 @@
+ @layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+ 
+-/*
+- * Temporary workaround for a Base UI tabbability regression with
+- * checkVisibility() and display: contents.
+- * See: https://github.com/mui/base-ui/issues/4622
+- *
+- * This must stay outside the CSS layers to override ThemeProvider's
+- * unlayered display: contents.
+- */
+-[data-wpds-theme-provider-id]:has(> .popup) {
+-	display: block;
+-}
+-
+ @layer wp-ui-utilities {
+ 	.popup {
+ 		composes: dropdown-motion from "./dropdown-motion.module.css";

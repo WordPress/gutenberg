@@ -1,0 +1,12 @@
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index a94d259f13acab..9dfe4cc8dd663b 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -8,6 +8,7 @@ export { default as Button } from './button';
+ export { default as ButtonGroup } from './button-group';
+ export { default as CheckboxControl } from './checkbox-control';
+ export { default as ClipboardButton } from './clipboard-button';
++export { default as CategorySelect } from './query-controls/category-select';
+ export { default as ColorIndicator } from './color-indicator';
+ export { default as ColorPalette } from './color-palette';
+ export { default as Dashicon } from './dashicon';

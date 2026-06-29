@@ -1,0 +1,85 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index db8b0f749217f4..06072925ad5e6a 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `ColorPicker`: Replace color copy button icon with visible text ([#57168](https://github.com/WordPress/gutenberg/pull/57168)).
+ -   `BoxControl`: Better respect for the `min` prop in the Range Slider ([#67819](https://github.com/WordPress/gutenberg/pull/67819)).
+ 
+ ### Experimental
+diff --git a/packages/components/src/color-picker/color-copy-button.tsx b/packages/components/src/color-picker/color-copy-button.tsx
+index 6e49fa7ae85e74..230022a913db01 100644
+--- a/packages/components/src/color-picker/color-copy-button.tsx
++++ b/packages/components/src/color-picker/color-copy-button.tsx
+@@ -3,14 +3,12 @@
+  */
+ import { useCopyToClipboard } from '@wordpress/compose';
+ import { useState, useEffect, useRef } from '@wordpress/element';
+-import { copy } from '@wordpress/icons';
+ import { __ } from '@wordpress/i18n';
+ 
+ /**
+  * Internal dependencies
+  */
+ import { Button } from '../button';
+-import Tooltip from '../tooltip';
+ 
+ import type { ColorCopyButtonProps } from './types';
+ 
+@@ -55,18 +53,9 @@ export const ColorCopyButton = ( props: ColorCopyButtonProps ) => {
+ 		};
+ 	}, [] );
+ 
+-	const label =
+-		copiedColor === color.toHex() ? __( 'Copied!' ) : __( 'Copy' );
+-
+ 	return (
+-		<Tooltip delay={ 0 } hideOnClick={ false } text={ label }>
+-			<Button
+-				size="compact"
+-				aria-label={ label }
+-				ref={ copyRef }
+-				icon={ copy }
+-				showTooltip={ false }
+-			/>
+-		</Tooltip>
++		<Button variant="secondary" ref={ copyRef } size="compact">
++			{ copiedColor === color.toHex() ? __( 'Copied!' ) : __( 'Copy' ) }
++		</Button>
+ 	);
+ };
+diff --git a/packages/components/src/color-picker/component.tsx b/packages/components/src/color-picker/component.tsx
+index a2ddb6cd8ee4b6..1ef1816345531c 100644
+--- a/packages/components/src/color-picker/component.tsx
++++ b/packages/components/src/color-picker/component.tsx
+@@ -97,18 +97,22 @@ const UnconnectedColorPicker = (
+ 						hideLabelFromVision
+ 						variant="minimal"
+ 					/>
+-					<ColorCopyButton
+-						color={ safeColordColor }
+-						colorType={ copyFormat || colorType }
+-					/>
+ 				</AuxiliaryColorArtefactHStackHeader>
+-				<ColorInputWrapper direction="column" gap={ 2 }>
++				<ColorInputWrapper
++					direction="column"
++					align="flex-start"
++					gap={ 2 }
++				>
+ 					<ColorInput
+ 						colorType={ colorType }
+ 						color={ safeColordColor }
+ 						onChange={ handleChange }
+ 						enableAlpha={ enableAlpha }
+ 					/>
++					<ColorCopyButton
++						color={ safeColordColor }
++						colorType={ copyFormat || colorType }
++					/>
+ 				</ColorInputWrapper>
+ 			</AuxiliaryColorArtefactWrapper>
+ 		</ColorfulWrapper>

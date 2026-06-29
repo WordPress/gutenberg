@@ -1,0 +1,87 @@
+diff --git a/packages/block-editor/src/hooks/child-layout.js b/packages/block-editor/src/hooks/child-layout.js
+index 89e5c345085a8b..a4d57ef44258d8 100644
+--- a/packages/block-editor/src/hooks/child-layout.js
++++ b/packages/block-editor/src/hooks/child-layout.js
+@@ -84,7 +84,6 @@ export function ChildLayoutEdit( {
+ 			{ selfStretch === 'fixed' && (
+ 				<UnitControl
+ 					size={ '__unstable-large' }
+-					style={ { height: 'auto' } }
+ 					onChange={ ( value ) => {
+ 						setAttributes( {
+ 							style: {
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 00c1aea07ed14c..1208c73f6360b3 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ ### Bug Fix
+ 
+ -   `ColorPalette`: show "Clear" button even when colors array is empty ([#46001](https://github.com/WordPress/gutenberg/pull/46001)).
++-   `InputControl`: Fix internal `Flex` wrapper usage that could add an unintended `height: 100%` ([#46213](https://github.com/WordPress/gutenberg/pull/46213)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+index 5f932fd5e0fffb..9bfbc7e01ed4cc 100644
+--- a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
++++ b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+@@ -37,7 +37,6 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+-  height: 100%;
+   box-sizing: border-box;
+   position: relative;
+   border-radius: 2px;
+@@ -309,7 +308,6 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+-  height: 100%;
+   box-sizing: border-box;
+   position: relative;
+   border-radius: 2px;
+@@ -591,7 +589,6 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`]
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+-  height: 100%;
+   box-sizing: border-box;
+   position: relative;
+   border-radius: 2px;
+@@ -885,7 +882,6 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+-  height: 100%;
+   box-sizing: border-box;
+   position: relative;
+   border-radius: 2px;
+diff --git a/packages/components/src/input-control/input-base.tsx b/packages/components/src/input-control/input-base.tsx
+index 3f520e279b8fab..bd88f72be23d76 100644
+--- a/packages/components/src/input-control/input-base.tsx
++++ b/packages/components/src/input-control/input-base.tsx
+@@ -33,14 +33,21 @@ function useUniqueId( idProp?: string ) {
+ 
+ // Adapter to map props for the new ui/flex component.
+ function getUIFlexProps( labelPosition?: LabelPosition ) {
+-	const props: { direction?: string; gap?: number; justify?: string } = {};
++	const props: {
++		direction?: string;
++		gap?: number;
++		justify?: string;
++		expanded?: boolean;
++	} = {};
+ 	switch ( labelPosition ) {
+ 		case 'top':
+ 			props.direction = 'column';
++			props.expanded = false;
+ 			props.gap = 0;
+ 			break;
+ 		case 'bottom':
+ 			props.direction = 'column-reverse';
++			props.expanded = false;
+ 			props.gap = 0;
+ 			break;
+ 		case 'edge':

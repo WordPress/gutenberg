@@ -1,0 +1,281 @@
+diff --git a/packages/block-editor/src/components/block-tools/index.js b/packages/block-editor/src/components/block-tools/index.js
+index 6f02c04be6b323..f19bb532e9d725 100644
+--- a/packages/block-editor/src/components/block-tools/index.js
++++ b/packages/block-editor/src/components/block-tools/index.js
+@@ -8,9 +8,12 @@ import clsx from 'clsx';
+  */
+ import { useSelect, useDispatch } from '@wordpress/data';
+ import { isTextField } from '@wordpress/dom';
+-import { Popover } from '@wordpress/components';
++import {
++	Popover,
++	privateApis as componentsPrivateApis,
++} from '@wordpress/components';
+ import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
+-import { useRef, useState } from '@wordpress/element';
++import { useRef, useState, createPortal } from '@wordpress/element';
+ import {
+ 	switchToBlockType,
+ 	hasBlockSupport,
+@@ -33,6 +36,10 @@ import usePopoverScroll from '../block-popover/use-popover-scroll';
+ import ZoomOutModeInserters from './zoom-out-mode-inserters';
+ import { useShowBlockTools } from './use-show-block-tools';
+ import { unlock } from '../../lock-unlock';
++
++const { __experimentalGetOverlayLegacySlot: getOverlayLegacySlot } = unlock(
++	componentsPrivateApis
++);
+ import usePasteStyles from '../use-paste-styles';
+ import { BlockRenameModal, useBlockRename } from '../block-rename';
+ import { BlockVisibilityModal } from '../block-visibility';
+@@ -322,18 +329,24 @@ export default function BlockTools( {
+ 				) }
+ 
+ 				{ /* Used for the inline rich text toolbar. Until this toolbar is combined into BlockToolbar, someone implementing their own BlockToolbar will also need to use this to see the image caption toolbar. */ }
+-				{ ! isZoomOutMode && ! hasFixedToolbar && (
+-					<Popover.Slot
+-						name="block-toolbar"
+-						ref={ blockToolbarRef }
+-					/>
+-				) }
++				{ ! isZoomOutMode &&
++					! hasFixedToolbar &&
++					createPortal(
++						<Popover.Slot
++							name="block-toolbar"
++							ref={ blockToolbarRef }
++						/>,
++						getOverlayLegacySlot()
++					) }
+ 				{ children }
+ 				{ /* Used for inline rich text popovers. */ }
+-				<Popover.Slot
+-					name="__unstable-block-tools-after"
+-					ref={ blockToolbarAfterRef }
+-				/>
++				{ createPortal(
++					<Popover.Slot
++						name="__unstable-block-tools-after"
++						ref={ blockToolbarAfterRef }
++					/>,
++					getOverlayLegacySlot()
++				) }
+ 				{ isZoomOutMode && ! isDragging && (
+ 					<ZoomOutModeInserters
+ 						__unstableContentRef={ __unstableContentRef }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 51031d70ab6871..b8c70666ce643e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -20,6 +20,7 @@
+ ### Internal
+ 
+ -   Add `getOverlayLegacySlot()` helper and matching `.wp-overlay-legacy` styles. Lazily mounts a body-level container at `z-index: 99997` with `isolation: isolate` to be used as the portal target for legacy overlays in a follow-up. No runtime behavior change yet.
++-   `Popover`: Render the fallback container inside the new overlay legacy slot. The popover's per-class z-index is preserved and now stacks relative to the slot.
+ -   `NavigableContainer`: Refactor from class component to function component with hooks ([#77171](https://github.com/WordPress/gutenberg/pull/77171)).
+ -   `Menu`: Refactor `Menu.Popover` to use Ariakit’s `render` prop, wrapping content in `MenuMotionRoot` (motion styles) and `MenuSurface` (panel layout and `variant` chrome) ([#77460](https://github.com/WordPress/gutenberg/pull/77460)).
+ -   Fix types for TypeScript 7.0 ([#77177](https://github.com/WordPress/gutenberg/pull/77177)).
+diff --git a/packages/components/src/popover/index.tsx b/packages/components/src/popover/index.tsx
+index 3acc818ff35d08..10f556f56f506a 100644
+--- a/packages/components/src/popover/index.tsx
++++ b/packages/components/src/popover/index.tsx
+@@ -35,6 +35,7 @@ import { __ } from '@wordpress/i18n';
+ import Button from '../button';
+ import ScrollLock from '../scroll-lock';
+ import { Slot, Fill, useSlot } from '../slot-fill';
++import { getOverlayLegacySlot } from '../utils/overlay-legacy-slot';
+ import {
+ 	computePopoverPosition,
+ 	positionToPlacement,
+@@ -93,13 +94,14 @@ import { slotNameContext } from './context';
+ 
+ const fallbackContainerClassname = 'components-popover__fallback-container';
+ const getPopoverFallbackContainer = () => {
+-	let container = document.body.querySelector(
++	const legacySlot = getOverlayLegacySlot();
++	let container = legacySlot.querySelector(
+ 		'.' + fallbackContainerClassname
+ 	);
+ 	if ( ! container ) {
+ 		container = document.createElement( 'div' );
+ 		container.className = fallbackContainerClassname;
+-		document.body.append( container );
++		legacySlot.append( container );
+ 	}
+ 
+ 	return container;
+diff --git a/packages/components/src/private-apis.ts b/packages/components/src/private-apis.ts
+index 43d85db9365f7a..d60339bfa7e641 100644
+--- a/packages/components/src/private-apis.ts
++++ b/packages/components/src/private-apis.ts
+@@ -11,6 +11,7 @@ import { Menu } from './menu';
+ import { ComponentsContext } from './context/context-system-provider';
+ import Theme from './theme';
+ import { Tabs } from './tabs';
++import { getOverlayLegacySlot } from './utils/overlay-legacy-slot';
+ import { kebabCase, normalizeTextString } from './utils/strings';
+ import { withIgnoreIMEEvents } from './utils/with-ignore-ime-events';
+ import { lock } from './lock-unlock';
+@@ -34,6 +35,7 @@ import { ValidatedFormTokenField } from './validated-form-controls/components/fo
+ export const privateApis = {};
+ lock( privateApis, {
+ 	__experimentalPopoverLegacyPositionToPlacement,
++	__experimentalGetOverlayLegacySlot: getOverlayLegacySlot,
+ 	ComponentsContext,
+ 	Tabs,
+ 	Theme,
+diff --git a/packages/customize-widgets/src/components/customize-widgets/index.js b/packages/customize-widgets/src/components/customize-widgets/index.js
+index d206108398283a..0d503bd1466d2c 100644
+--- a/packages/customize-widgets/src/components/customize-widgets/index.js
++++ b/packages/customize-widgets/src/components/customize-widgets/index.js
+@@ -2,7 +2,11 @@
+  * WordPress dependencies
+  */
+ import { useState, useEffect, useRef, createPortal } from '@wordpress/element';
+-import { SlotFillProvider, Popover } from '@wordpress/components';
++import {
++	SlotFillProvider,
++	Popover,
++	privateApis as componentsPrivateApis,
++} from '@wordpress/components';
+ 
+ /**
+  * Internal dependencies
+@@ -12,6 +16,11 @@ import SidebarBlockEditor from '../sidebar-block-editor';
+ import FocusControl from '../focus-control';
+ import SidebarControls from '../sidebar-controls';
+ import useClearSelectedBlock from './use-clear-selected-block';
++import { unlock } from '../../lock-unlock';
++
++const { __experimentalGetOverlayLegacySlot: getOverlayLegacySlot } = unlock(
++	componentsPrivateApis
++);
+ 
+ export default function CustomizeWidgets( {
+ 	api,
+@@ -19,9 +28,6 @@ export default function CustomizeWidgets( {
+ 	blockEditorSettings,
+ } ) {
+ 	const [ activeSidebarControl, setActiveSidebarControl ] = useState( null );
+-	const parentContainer = document.getElementById(
+-		'customize-theme-controls'
+-	);
+ 	const popoverRef = useRef();
+ 
+ 	useClearSelectedBlock( activeSidebarControl, popoverRef );
+@@ -55,16 +61,15 @@ export default function CustomizeWidgets( {
+ 			activeSidebarControl.container[ 0 ]
+ 		);
+ 
+-	// We have to portal this to the parent of both the editor and the inspector,
+-	// so that the popovers will appear above both of them.
+-	const popover =
+-		parentContainer &&
+-		createPortal(
+-			<div className="customize-widgets-popover" ref={ popoverRef }>
+-				<Popover.Slot />
+-			</div>,
+-			parentContainer
+-		);
++	// Portal this into the overlay legacy slot so popovers appear above both
++	// the editor and the inspector. The slot's stacking context (above the
++	// customizer panes, below the WP admin bar) handles the layering.
++	const popover = createPortal(
++		<div className="customize-widgets-popover" ref={ popoverRef }>
++			<Popover.Slot />
++		</div>,
++		getOverlayLegacySlot()
++	);
+ 
+ 	return (
+ 		<SlotFillProvider>
+diff --git a/packages/edit-widgets/src/components/header/index.js b/packages/edit-widgets/src/components/header/index.js
+index c3d26d7f17b388..af11b6372e2862 100644
+--- a/packages/edit-widgets/src/components/header/index.js
++++ b/packages/edit-widgets/src/components/header/index.js
+@@ -3,9 +3,12 @@
+  */
+ import { BlockToolbar } from '@wordpress/block-editor';
+ import { useSelect } from '@wordpress/data';
+-import { useRef } from '@wordpress/element';
++import { createPortal, useRef } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+-import { Popover } from '@wordpress/components';
++import {
++	Popover,
++	privateApis as componentsPrivateApis,
++} from '@wordpress/components';
+ import { PinnedItems } from '@wordpress/interface';
+ import { useViewportMatch } from '@wordpress/compose';
+ import { store as preferencesStore } from '@wordpress/preferences';
+@@ -17,6 +20,11 @@ import { VisuallyHidden } from '@wordpress/ui';
+ import DocumentTools from './document-tools';
+ import SaveButton from '../save-button';
+ import MoreMenu from '../more-menu';
++import { unlock } from '../../lock-unlock';
++
++const { __experimentalGetOverlayLegacySlot: getOverlayLegacySlot } = unlock(
++	componentsPrivateApis
++);
+ 
+ function Header() {
+ 	const isLargeViewport = useViewportMatch( 'medium' );
+@@ -54,10 +62,13 @@ function Header() {
+ 							<div className="selected-block-tools-wrapper">
+ 								<BlockToolbar hideDragHandle />
+ 							</div>
+-							<Popover.Slot
+-								ref={ blockToolbarRef }
+-								name="block-toolbar"
+-							/>
++							{ createPortal(
++								<Popover.Slot
++									ref={ blockToolbarRef }
++									name="block-toolbar"
++								/>,
++								getOverlayLegacySlot()
++							) }
+ 						</>
+ 					) }
+ 				</div>
+diff --git a/packages/editor/src/components/collapsible-block-toolbar/index.js b/packages/editor/src/components/collapsible-block-toolbar/index.js
+index cafbfecb72516c..b1d833639b71b5 100644
+--- a/packages/editor/src/components/collapsible-block-toolbar/index.js
++++ b/packages/editor/src/components/collapsible-block-toolbar/index.js
+@@ -11,8 +11,12 @@ import {
+ 	store as blockEditorStore,
+ 	privateApis as blockEditorPrivateApis,
+ } from '@wordpress/block-editor';
+-import { useEffect } from '@wordpress/element';
+-import { Button, Popover } from '@wordpress/components';
++import { createPortal, useEffect } from '@wordpress/element';
++import {
++	Button,
++	Popover,
++	privateApis as componentsPrivateApis,
++} from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
+ import { next, previous } from '@wordpress/icons';
+ import { useSelect } from '@wordpress/data';
+@@ -23,6 +27,9 @@ import { useSelect } from '@wordpress/data';
+ import { unlock } from '../../lock-unlock';
+ 
+ const { useHasBlockToolbar } = unlock( blockEditorPrivateApis );
++const { __experimentalGetOverlayLegacySlot: getOverlayLegacySlot } = unlock(
++	componentsPrivateApis
++);
+ 
+ export default function CollapsibleBlockToolbar( { isCollapsed, onToggle } ) {
+ 	const { blockSelectionStart } = useSelect( ( select ) => {
+@@ -55,7 +62,10 @@ export default function CollapsibleBlockToolbar( { isCollapsed, onToggle } ) {
+ 			>
+ 				<BlockToolbar hideDragHandle />
+ 			</div>
+-			<Popover.Slot name="block-toolbar" />
++			{ createPortal(
++				<Popover.Slot name="block-toolbar" />,
++				getOverlayLegacySlot()
++			) }
+ 
+ 			<Button
+ 				className="editor-collapsible-block-toolbar__toggle"

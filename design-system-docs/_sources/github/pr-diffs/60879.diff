@@ -1,0 +1,404 @@
+diff --git a/package-lock.json b/package-lock.json
+index 54d6545fdf2cba..b89e8bc9c279fd 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -43340,11 +43340,6 @@
+ 				"node": ">= 14"
+ 			}
+ 		},
+-		"node_modules/proxy-compare": {
+-			"version": "2.3.0",
+-			"resolved": "https://registry.npmjs.org/proxy-compare/-/proxy-compare-2.3.0.tgz",
+-			"integrity": "sha512-c3L2CcAi7f7pvlD0D7xsF+2CQIW8C3HaYx2Pfgq8eA4HAl3GAH6/dVYsyBbYF/0XJs2ziGLrzmz5fmzPm6A0pQ=="
+-		},
+ 		"node_modules/proxy-from-env": {
+ 			"version": "1.1.0",
+ 			"resolved": "https://registry.npmjs.org/proxy-from-env/-/proxy-from-env-1.1.0.tgz",
+@@ -50511,46 +50506,6 @@
+ 			"integrity": "sha512-PnFM3xiZ+kYmLyTiMgTYmU7ZHkjBZz2/+F0DaALc/uUtVzdCt1wAosvYJ5hFQi/hz8O4zb52FQhHZRC+uVkJ+g==",
+ 			"dev": true
+ 		},
+-		"node_modules/valtio": {
+-			"version": "1.7.0",
+-			"resolved": "https://registry.npmjs.org/valtio/-/valtio-1.7.0.tgz",
+-			"integrity": "sha512-3Tnix66EERwMcrl1rfB3ylcewOcL5L/GiPmC3FlVNreQzqf2jufEeqlNmgnLgSGchkEmH3WYVtS+x6Qw4r+yzQ==",
+-			"dependencies": {
+-				"proxy-compare": "2.3.0",
+-				"use-sync-external-store": "1.2.0"
+-			},
+-			"engines": {
+-				"node": ">=12.7.0"
+-			},
+-			"peerDependencies": {
+-				"@babel/helper-module-imports": ">=7.12",
+-				"@babel/types": ">=7.13",
+-				"aslemammad-vite-plugin-macro": ">=1.0.0-alpha.1",
+-				"babel-plugin-macros": ">=3.0",
+-				"react": ">=16.8",
+-				"vite": ">=2.8.6"
+-			},
+-			"peerDependenciesMeta": {
+-				"@babel/helper-module-imports": {
+-					"optional": true
+-				},
+-				"@babel/types": {
+-					"optional": true
+-				},
+-				"aslemammad-vite-plugin-macro": {
+-					"optional": true
+-				},
+-				"babel-plugin-macros": {
+-					"optional": true
+-				},
+-				"react": {
+-					"optional": true
+-				},
+-				"vite": {
+-					"optional": true
+-				}
+-			}
+-		},
+ 		"node_modules/vary": {
+ 			"version": "1.1.2",
+ 			"resolved": "https://registry.npmjs.org/vary/-/vary-1.1.2.tgz",
+@@ -53564,8 +53519,7 @@
+ 				"react-colorful": "^5.3.1",
+ 				"remove-accents": "^0.5.0",
+ 				"use-lilius": "^2.0.5",
+-				"uuid": "^9.0.1",
+-				"valtio": "1.7.0"
++				"uuid": "^9.0.1"
+ 			},
+ 			"engines": {
+ 				"node": ">=12"
+@@ -68837,8 +68791,7 @@
+ 				"react-colorful": "^5.3.1",
+ 				"remove-accents": "^0.5.0",
+ 				"use-lilius": "^2.0.5",
+-				"uuid": "^9.0.1",
+-				"valtio": "1.7.0"
++				"uuid": "^9.0.1"
+ 			},
+ 			"dependencies": {
+ 				"@floating-ui/react-dom": {
+@@ -89427,11 +89380,6 @@
+ 				}
+ 			}
+ 		},
+-		"proxy-compare": {
+-			"version": "2.3.0",
+-			"resolved": "https://registry.npmjs.org/proxy-compare/-/proxy-compare-2.3.0.tgz",
+-			"integrity": "sha512-c3L2CcAi7f7pvlD0D7xsF+2CQIW8C3HaYx2Pfgq8eA4HAl3GAH6/dVYsyBbYF/0XJs2ziGLrzmz5fmzPm6A0pQ=="
+-		},
+ 		"proxy-from-env": {
+ 			"version": "1.1.0",
+ 			"resolved": "https://registry.npmjs.org/proxy-from-env/-/proxy-from-env-1.1.0.tgz",
+@@ -94930,15 +94878,6 @@
+ 			"integrity": "sha512-PnFM3xiZ+kYmLyTiMgTYmU7ZHkjBZz2/+F0DaALc/uUtVzdCt1wAosvYJ5hFQi/hz8O4zb52FQhHZRC+uVkJ+g==",
+ 			"dev": true
+ 		},
+-		"valtio": {
+-			"version": "1.7.0",
+-			"resolved": "https://registry.npmjs.org/valtio/-/valtio-1.7.0.tgz",
+-			"integrity": "sha512-3Tnix66EERwMcrl1rfB3ylcewOcL5L/GiPmC3FlVNreQzqf2jufEeqlNmgnLgSGchkEmH3WYVtS+x6Qw4r+yzQ==",
+-			"requires": {
+-				"proxy-compare": "2.3.0",
+-				"use-sync-external-store": "1.2.0"
+-			}
+-		},
+ 		"vary": {
+ 			"version": "1.1.2",
+ 			"resolved": "https://registry.npmjs.org/vary/-/vary-1.1.2.tgz",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 34d1a328671a89..6d9c96839257f9 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -29,6 +29,7 @@
+ -   `CheckboxControl`: Streamline size styles ([#60475](https://github.com/WordPress/gutenberg/pull/60475)).
+ -   Deprecate `reduceMotion` util ([#60839](https://github.com/WordPress/gutenberg/pull/60839)).
+ -   `InputBase`: Simplify management of focus styles. Affects all components based on `InputControl` (e.g. `SearchControl`, `NumberControl`, `UnitControl`), as well as `SelectControl`, `CustomSelectControl`, and `TreeSelect` ([#60226](https://github.com/WordPress/gutenberg/pull/60226)).
++-   Removed dependency on `valtio`, replaced its usage in `SlotFill` with a custom object [#60879](https://github.com/WordPress/gutenberg/pull/60879)).
+ 
+ ## 27.3.0 (2024-04-03)
+ 
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 188e214e79bd45..261000bfd4617e 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -76,8 +76,7 @@
+ 		"react-colorful": "^5.3.1",
+ 		"remove-accents": "^0.5.0",
+ 		"use-lilius": "^2.0.5",
+-		"uuid": "^9.0.1",
+-		"valtio": "1.7.0"
++		"uuid": "^9.0.1"
+ 	},
+ 	"peerDependencies": {
+ 		"react": "^18.0.0",
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/observable-map.ts b/packages/components/src/slot-fill/bubbles-virtually/observable-map.ts
+new file mode 100644
+index 00000000000000..d6ef70dac5830c
+--- /dev/null
++++ b/packages/components/src/slot-fill/bubbles-virtually/observable-map.ts
+@@ -0,0 +1,78 @@
++/**
++ * WordPress dependencies
++ */
++import { useMemo, useSyncExternalStore } from '@wordpress/element';
++
++export type ObservableMap< K, V > = {
++	get( name: K ): V | undefined;
++	set( name: K, value: V ): void;
++	delete( name: K ): void;
++	subscribe( name: K, listener: () => void ): () => void;
++};
++
++export function observableMap< K, V >(): ObservableMap< K, V > {
++	const map = new Map< K, V >();
++	const listeners = new Map< K, Set< () => void > >();
++
++	function callListeners( name: K ) {
++		const list = listeners.get( name );
++		if ( ! list ) {
++			return;
++		}
++		for ( const listener of list ) {
++			listener();
++		}
++	}
++
++	function unsubscribe( name: K, listener: () => void ) {
++		return () => {
++			const list = listeners.get( name );
++			if ( ! list ) {
++				return;
++			}
++
++			list.delete( listener );
++			if ( list.size === 0 ) {
++				listeners.delete( name );
++			}
++		};
++	}
++
++	return {
++		get( name ) {
++			return map.get( name );
++		},
++		set( name, value ) {
++			map.set( name, value );
++			callListeners( name );
++		},
++		delete( name ) {
++			map.delete( name );
++			callListeners( name );
++		},
++		subscribe( name, listener ) {
++			let list = listeners.get( name );
++			if ( ! list ) {
++				list = new Set();
++				listeners.set( name, list );
++			}
++			list.add( listener );
++
++			return unsubscribe( name, listener );
++		},
++	};
++}
++
++export function useObservableValue< K, V >(
++	map: ObservableMap< K, V >,
++	name: K
++): V | undefined {
++	const [ subscribe, getValue ] = useMemo(
++		() => [
++			( listener: () => void ) => map.subscribe( name, listener ),
++			() => map.get( name ),
++		],
++		[ map, name ]
++	);
++	return useSyncExternalStore( subscribe, getValue );
++}
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.ts b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.ts
+index 7c0ef340e53fe8..e5af99fd3c95a7 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.ts
++++ b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.ts
+@@ -1,7 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { proxyMap } from 'valtio/utils';
+ /**
+  * WordPress dependencies
+  */
+@@ -11,10 +7,11 @@ import warning from '@wordpress/warning';
+  * Internal dependencies
+  */
+ import type { SlotFillBubblesVirtuallyContext } from '../types';
++import { observableMap } from './observable-map';
+ 
+ const initialContextValue: SlotFillBubblesVirtuallyContext = {
+-	slots: proxyMap(),
+-	fills: proxyMap(),
++	slots: observableMap(),
++	fills: observableMap(),
+ 	registerSlot: () => {
+ 		warning(
+ 			'Components must be wrapped within `SlotFillProvider`. ' +
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.tsx b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.tsx
+index 6d10d08aca239c..b68e06d05e60ad 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.tsx
++++ b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.tsx
+@@ -1,9 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { ref as valRef } from 'valtio';
+-import { proxyMap } from 'valtio/utils';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -18,10 +12,11 @@ import type {
+ 	SlotFillProviderProps,
+ 	SlotFillBubblesVirtuallyContext,
+ } from '../types';
++import { observableMap } from './observable-map';
+ 
+ function createSlotRegistry(): SlotFillBubblesVirtuallyContext {
+-	const slots: SlotFillBubblesVirtuallyContext[ 'slots' ] = proxyMap();
+-	const fills: SlotFillBubblesVirtuallyContext[ 'fills' ] = proxyMap();
++	const slots: SlotFillBubblesVirtuallyContext[ 'slots' ] = observableMap();
++	const fills: SlotFillBubblesVirtuallyContext[ 'fills' ] = observableMap();
+ 
+ 	const registerSlot: SlotFillBubblesVirtuallyContext[ 'registerSlot' ] = (
+ 		name,
+@@ -30,14 +25,11 @@ function createSlotRegistry(): SlotFillBubblesVirtuallyContext {
+ 	) => {
+ 		const slot = slots.get( name );
+ 
+-		slots.set(
+-			name,
+-			valRef( {
+-				...slot,
+-				ref: ref || slot?.ref,
+-				fillProps: fillProps || slot?.fillProps || {},
+-			} )
+-		);
++		slots.set( name, {
++			...slot,
++			ref: ref || slot?.ref,
++			fillProps: fillProps || slot?.fillProps || {},
++		} );
+ 	};
+ 
+ 	const unregisterSlot: SlotFillBubblesVirtuallyContext[ 'unregisterSlot' ] =
+@@ -74,7 +66,7 @@ function createSlotRegistry(): SlotFillBubblesVirtuallyContext {
+ 		name,
+ 		ref
+ 	) => {
+-		fills.set( name, valRef( [ ...( fills.get( name ) || [] ), ref ] ) );
++		fills.set( name, [ ...( fills.get( name ) || [] ), ref ] );
+ 	};
+ 
+ 	const unregisterFill: SlotFillBubblesVirtuallyContext[ 'registerFill' ] = (
+@@ -88,7 +80,7 @@ function createSlotRegistry(): SlotFillBubblesVirtuallyContext {
+ 
+ 		fills.set(
+ 			name,
+-			valRef( fillsForName.filter( ( fillRef ) => fillRef !== ref ) )
++			fillsForName.filter( ( fillRef ) => fillRef !== ref )
+ 		);
+ 	};
+ 
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/use-slot-fills.ts b/packages/components/src/slot-fill/bubbles-virtually/use-slot-fills.ts
+index 0131bbfc434e59..819c43c4e78917 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/use-slot-fills.ts
++++ b/packages/components/src/slot-fill/bubbles-virtually/use-slot-fills.ts
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { useSnapshot } from 'valtio';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -13,12 +8,9 @@ import { useContext } from '@wordpress/element';
+  */
+ import SlotFillContext from './slot-fill-context';
+ import type { SlotKey } from '../types';
++import { useObservableValue } from './observable-map';
+ 
+ export default function useSlotFills( name: SlotKey ) {
+ 	const registry = useContext( SlotFillContext );
+-	const fills = useSnapshot( registry.fills, { sync: true } );
+-	// The important bit here is that this call ensures that the hook
+-	// only causes a re-render if the "fills" of a given slot name
+-	// change, not any fills.
+-	return fills.get( name );
++	return useObservableValue( registry.fills, name );
+ }
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/use-slot.ts b/packages/components/src/slot-fill/bubbles-virtually/use-slot.ts
+index c039a36946991f..6d211fbb3fa37f 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/use-slot.ts
++++ b/packages/components/src/slot-fill/bubbles-virtually/use-slot.ts
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { useSnapshot } from 'valtio';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -18,14 +13,11 @@ import type {
+ 	FillProps,
+ 	SlotKey,
+ } from '../types';
++import { useObservableValue } from './observable-map';
+ 
+ export default function useSlot( name: SlotKey ) {
+ 	const registry = useContext( SlotFillContext );
+-	const slots = useSnapshot( registry.slots, { sync: true } );
+-	// The important bit here is that the `useSnapshot` call ensures that the
+-	// hook only causes a re-render if the slot with the given name changes,
+-	// not any other slot.
+-	const slot = slots.get( name );
++	const slot = useObservableValue( registry.slots, name );
+ 
+ 	const api = useMemo(
+ 		() => ( {
+diff --git a/packages/components/src/slot-fill/types.ts b/packages/components/src/slot-fill/types.ts
+index f3a8f2255f2874..5e24ba20c72b4e 100644
+--- a/packages/components/src/slot-fill/types.ts
++++ b/packages/components/src/slot-fill/types.ts
+@@ -3,6 +3,11 @@
+  */
+ import type { Component, MutableRefObject, ReactNode, RefObject } from 'react';
+ 
++/**
++ * Internal dependencies
++ */
++import type { ObservableMap } from './bubbles-virtually/observable-map';
++
+ export type DistributiveOmit< T, K extends keyof any > = T extends any
+ 	? Omit< T, K >
+ 	: never;
+@@ -109,14 +114,14 @@ export type SlotFillBubblesVirtuallyFillRef = MutableRefObject< {
+ } >;
+ 
+ export type SlotFillBubblesVirtuallyContext = {
+-	slots: Map<
++	slots: ObservableMap<
+ 		SlotKey,
+ 		{
+ 			ref: SlotFillBubblesVirtuallySlotRef;
+ 			fillProps: FillProps;
+ 		}
+ 	>;
+-	fills: Map< SlotKey, SlotFillBubblesVirtuallyFillRef[] >;
++	fills: ObservableMap< SlotKey, SlotFillBubblesVirtuallyFillRef[] >;
+ 	registerSlot: (
+ 		name: SlotKey,
+ 		ref: SlotFillBubblesVirtuallySlotRef,

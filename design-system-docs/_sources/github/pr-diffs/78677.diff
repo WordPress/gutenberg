@@ -1,0 +1,113 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 803c01b8f4336c..f99fd10a1737c9 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fixes
++
++-   `SandBox`: Fix the viewport-unit (`vh`, `vw`, etc.) stripping so user-supplied HTML using these units in `width`/`height` no longer triggers a runaway resize loop in the preview ([#78677](https://github.com/WordPress/gutenberg/pull/78677)).
++
+ ## 35.0.0 (2026-06-10)
+ 
+ ### Breaking Changes
+diff --git a/packages/components/src/sandbox/index.tsx b/packages/components/src/sandbox/index.tsx
+index b5b2f55753098f..bd8290437208db 100644
+--- a/packages/components/src/sandbox/index.tsx
++++ b/packages/components/src/sandbox/index.tsx
+@@ -17,6 +17,23 @@ import type { SandBoxProps } from './types';
+ 
+ type SandBoxContentProps = Omit< SandBoxProps, 'allowSameOrigin' >;
+ 
++/**
++ * Matches CSS viewport-relative length values such as `100vh`, `50.5vw`,
++ * and `.5dvh`. Used to strip viewport units from user-supplied HTML inside
++ * the sandbox iframe, because those units are relative to the iframe's
++ * own size and would create a measurement feedback loop with the
++ * resize observer.
++ *
++ * Exported for tests. NOTE: an identical regex literal is duplicated
++ * inside `observeAndResizeJS` below because that function is serialized
++ * via `.toString()` and embedded into the iframe's `srcdoc` — it has no
++ * access to this module's scope at runtime. If you change one, change
++ * the other; the "is embedded in the sandbox iframe srcdoc" test
++ * guards against drift.
++ */
++export const VIEWPORT_UNIT_VALUE_REGEX =
++	/^\d*\.?\d+(?:vw|vh|svw|lvw|dvw|svh|lvh|dvh|vi|svi|lvi|dvi|vb|svb|lvb|dvb|vmin|svmin|lvmin|dvmin|vmax|svmax|lvmax|dvmax)$/;
++
+ const observeAndResizeJS = function () {
+ 	const { MutationObserver } = window;
+ 
+@@ -58,7 +75,7 @@ const observeAndResizeJS = function () {
+ 				[ 'width', 'height', 'minHeight', 'maxHeight' ] as const
+ 			 ).forEach( function ( style ) {
+ 				if (
+-					/^\\d+(vw|vh|svw|lvw|dvw|svh|lvh|dvh|vi|svi|lvi|dvi|vb|svb|lvb|dvb|vmin|svmin|lvmin|dvmin|vmax|svmax|lvmax|dvmax)$/.test(
++					/^\d*\.?\d+(?:vw|vh|svw|lvw|dvw|svh|lvh|dvh|vi|svi|lvi|dvi|vb|svb|lvb|dvb|vmin|svmin|lvmin|dvmin|vmax|svmax|lvmax|dvmax)$/.test(
+ 						ruleOrNode.style[ style ]
+ 					)
+ 				) {
+diff --git a/packages/components/src/sandbox/test/index.tsx b/packages/components/src/sandbox/test/index.tsx
+index 70af01fd094f2a..e970ef564c0545 100644
+--- a/packages/components/src/sandbox/test/index.tsx
++++ b/packages/components/src/sandbox/test/index.tsx
+@@ -11,7 +11,7 @@ import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import SandBox from '..';
++import SandBox, { VIEWPORT_UNIT_VALUE_REGEX } from '..';
+ 
+ describe( 'SandBox', () => {
+ 	const TestWrapper = () => {
+@@ -109,4 +109,47 @@ describe( 'SandBox', () => {
+ 			expect.stringContaining( 'https://another.super.embed' )
+ 		);
+ 	} );
++
++	describe( 'VIEWPORT_UNIT_VALUE_REGEX', () => {
++		it.each( [
++			'100vh',
++			'50vw',
++			'0vh',
++			'50.5vh',
++			'.5vh',
++			'100dvh',
++			'50svw',
++			'1lvi',
++			'100vmin',
++			'100vmax',
++		] )( 'matches viewport unit value %s', ( value ) => {
++			expect( VIEWPORT_UNIT_VALUE_REGEX.test( value ) ).toBe( true );
++		} );
++
++		it.each( [
++			'100px',
++			'50%',
++			'100',
++			'vh',
++			'.vh',
++			'calc(100vh - 10px)',
++			'100 vh',
++			'',
++		] )( 'does not match %s', ( value ) => {
++			expect( VIEWPORT_UNIT_VALUE_REGEX.test( value ) ).toBe( false );
++		} );
++
++		it( 'is embedded in the sandbox iframe srcdoc', () => {
++			// Guards against drift between the exported constant and
++			// the copy inlined into `observeAndResizeJS`, which is
++			// serialized via `.toString()` into the iframe srcdoc and
++			// cannot reference module-scope values at runtime.
++			render( <SandBox html="<p>x</p>" title="Regex Sync Test" /> );
++			const iframe =
++				screen.getByTitle< HTMLIFrameElement >( 'Regex Sync Test' );
++			const srcDoc = iframe.getAttribute( 'srcdoc' ) ?? '';
++
++			expect( srcDoc ).toContain( VIEWPORT_UNIT_VALUE_REGEX.source );
++		} );
++	} );
+ } );

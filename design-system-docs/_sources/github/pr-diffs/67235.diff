@@ -1,0 +1,32 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 29e746c905f8d4..921467ce0156d3 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -22,6 +22,7 @@
+ -   `FormFileUpload`: Prevent HEIC and HEIF files from being uploaded on Safari ([#67139](https://github.com/WordPress/gutenberg/pull/67139)).
+ -   `Composite.Hover`: Restore functionality ([#67212](https://github.com/WordPress/gutenberg/pull/67212)).
+ -   `Composite.Typeahead`: Restore functionality ([#67212](https://github.com/WordPress/gutenberg/pull/67212)).
++-   `Dashicons`: Remove non-existent icons from type ([#67235](https://github.com/WordPress/gutenberg/pull/67235)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/dashicon/types.ts b/packages/components/src/dashicon/types.ts
+index eeee9c2d40a19d..a4a4f5156aff5f 100644
+--- a/packages/components/src/dashicon/types.ts
++++ b/packages/components/src/dashicon/types.ts
+@@ -219,7 +219,6 @@ export type IconKey =
+ 	| 'insert-before'
+ 	| 'insert'
+ 	| 'instagram'
+-	| 'keyboard-hide'
+ 	| 'laptop'
+ 	| 'layout'
+ 	| 'leftright'
+@@ -266,7 +265,6 @@ export type IconKey =
+ 	| 'playlist-audio'
+ 	| 'playlist-video'
+ 	| 'plus-alt'
+-	| 'plus-light'
+ 	| 'plus'
+ 	| 'portfolio'
+ 	| 'post-status'

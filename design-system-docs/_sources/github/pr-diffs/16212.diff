@@ -1,0 +1,131 @@
+diff --git a/packages/components/src/autocomplete/index.js b/packages/components/src/autocomplete/index.js
+index 6cc8a87e3a3999..1226ec3bbfd7fe 100644
+--- a/packages/components/src/autocomplete/index.js
++++ b/packages/components/src/autocomplete/index.js
+@@ -130,7 +130,8 @@ function filterOptions( search, options = [], maxResults = 10 ) {
+ }
+ 
+ function getCaretRect() {
+-	const range = window.getSelection().getRangeAt( 0 );
++	const selection = window.getSelection();
++	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+ 
+ 	if ( range ) {
+ 		return getRectangleFromRange( range );
+diff --git a/packages/eslint-plugin/CHANGELOG.md b/packages/eslint-plugin/CHANGELOG.md
+index b209286ab3fd3b..c00d09ef19f02c 100644
+--- a/packages/eslint-plugin/CHANGELOG.md
++++ b/packages/eslint-plugin/CHANGELOG.md
+@@ -3,6 +3,7 @@
+ ### New Features
+ 
+ - [`@wordpress/no-unused-vars-before-return`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md) now supports an `excludePattern` option to exempt function calls by name.
++- New Rule: [`@wordpress/no-unguarded-get-range-at`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/no-unguarded-get-range-at.md)
+ 
+ ### Improvements
+ 
+diff --git a/packages/eslint-plugin/README.md b/packages/eslint-plugin/README.md
+index 2c8ef189000c15..f6f89c95f10819 100644
+--- a/packages/eslint-plugin/README.md
++++ b/packages/eslint-plugin/README.md
+@@ -55,6 +55,7 @@ Rule|Description|Recommended
+ [react-no-unsafe-timeout](/packages/eslint-plugin/docs/rules/react-no-unsafe-timeout.md)|Disallow unsafe `setTimeout` in component|
+ [valid-sprintf](/packages/eslint-plugin/docs/rules/valid-sprintf.md)|Enforce valid sprintf usage|✓
+ [no-base-control-with-label-without-id](/packages/eslint-plugin/docs/rules/no-base-control-with-label-without-id.md)| Disallow the usage of BaseControl component with a label prop set but omitting the id property|✓
++[no-unguarded-get-range-at](/packages/eslint-plugin/docs/rules/no-unguarded-get-range-at.md)| Disallow the usage of unguarded `getRangeAt` calls|✓
+ 
+ ### Legacy
+ 
+diff --git a/packages/eslint-plugin/configs/custom.js b/packages/eslint-plugin/configs/custom.js
+index a09c22148cc592..efb873980b22f4 100644
+--- a/packages/eslint-plugin/configs/custom.js
++++ b/packages/eslint-plugin/configs/custom.js
+@@ -8,6 +8,7 @@ module.exports = {
+ 		'@wordpress/no-unused-vars-before-return': 'error',
+ 		'@wordpress/valid-sprintf': 'error',
+ 		'@wordpress/no-base-control-with-label-without-id': 'error',
++		'@wordpress/no-unguarded-get-range-at': 'error',
+ 		'no-restricted-syntax': [
+ 			'error',
+ 			{
+diff --git a/packages/eslint-plugin/docs/rules/no-unguarded-get-range-at.md b/packages/eslint-plugin/docs/rules/no-unguarded-get-range-at.md
+new file mode 100644
+index 00000000000000..1dd2e3e3ec44b0
+--- /dev/null
++++ b/packages/eslint-plugin/docs/rules/no-unguarded-get-range-at.md
+@@ -0,0 +1,18 @@
++# Avoid unguarded getRangeAt (no-unguarded-get-range-at)
++
++Some browsers (e.g. Safari) will throw an error when `getRangeAt` is called and there are no ranges in the selection.
++
++## Rule details
++
++Example of **incorrect** code for this rule:
++
++```js
++window.getSelection().getRangeAt( 0 );
++```
++
++Example of **correct** code for this rule:
++
++```js
++const selection = window.getSelection();
++const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
++```
+diff --git a/packages/eslint-plugin/rules/__tests__/no-unguarded-get-range-at.js b/packages/eslint-plugin/rules/__tests__/no-unguarded-get-range-at.js
+new file mode 100644
+index 00000000000000..b3e0a7592f8f08
+--- /dev/null
++++ b/packages/eslint-plugin/rules/__tests__/no-unguarded-get-range-at.js
+@@ -0,0 +1,29 @@
++/**
++ * External dependencies
++ */
++import { RuleTester } from 'eslint';
++
++/**
++ * Internal dependencies
++ */
++import rule from '../no-unguarded-get-range-at';
++
++const ruleTester = new RuleTester( {
++	parserOptions: {
++		ecmaVersion: 6,
++	},
++} );
++
++ruleTester.run( 'no-unguarded-get-range-at', rule, {
++	valid: [
++		{
++			code: `const selection = window.getSelection(); const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;`,
++		},
++	],
++	invalid: [
++		{
++			code: `window.getSelection().getRangeAt( 0 );`,
++			errors: [ { message: 'Avoid unguarded getRangeAt' } ],
++		},
++	],
++} );
+diff --git a/packages/eslint-plugin/rules/no-unguarded-get-range-at.js b/packages/eslint-plugin/rules/no-unguarded-get-range-at.js
+new file mode 100644
+index 00000000000000..e74bc775de54f3
+--- /dev/null
++++ b/packages/eslint-plugin/rules/no-unguarded-get-range-at.js
+@@ -0,0 +1,16 @@
++module.exports = {
++	meta: {
++		type: 'problem',
++		schema: [],
++	},
++	create( context ) {
++		return {
++			'CallExpression[callee.object.callee.object.name="window"][callee.object.callee.property.name="getSelection"][callee.property.name="getRangeAt"]'( node ) {
++				context.report( {
++					node,
++					message: 'Avoid unguarded getRangeAt',
++				} );
++			},
++		};
++	},
++};

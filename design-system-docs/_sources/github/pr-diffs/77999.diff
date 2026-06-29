@@ -1,0 +1,38 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ed6af6c7baba4f..ecb1a58c3df63e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancements
+ 
+ -   `Button`: Align `link` variant underline (offset and thickness) with `ExternalLink` and `Link` from `@wordpress/ui` ([#77842](https://github.com/WordPress/gutenberg/pull/77842)).
++-   `Text`: Use a theme-aware gray token for the muted variant ([#77999](https://github.com/WordPress/gutenberg/pull/77999)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/src/text/styles.ts b/packages/components/src/text/styles.ts
+index c0c7dfbb1e1955..ab9c9c215bb180 100644
+--- a/packages/components/src/text/styles.ts
++++ b/packages/components/src/text/styles.ts
+@@ -28,7 +28,7 @@ export const destructive = css`
+ `;
+ 
+ export const muted = css`
+-	color: ${ COLORS.gray[ 700 ] };
++	color: ${ COLORS.theme.gray[ 700 ] };
+ `;
+ 
+ export const highlighterText = css`
+diff --git a/packages/components/src/text/test/index.tsx b/packages/components/src/text/test/index.tsx
+index 5fad5582f4d46e..d83b05bac8334e 100644
+--- a/packages/components/src/text/test/index.tsx
++++ b/packages/components/src/text/test/index.tsx
+@@ -69,7 +69,7 @@ describe( 'Text', () => {
+ 			</Text>
+ 		);
+ 		expect( screen.getByRole( 'heading' ) ).toHaveStyle( {
+-			color: COLORS.gray[ 700 ],
++			color: COLORS.theme.gray[ 700 ],
+ 		} );
+ 	} );
+ 

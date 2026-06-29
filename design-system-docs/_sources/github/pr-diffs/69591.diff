@@ -1,0 +1,28 @@
+diff --git a/packages/components/src/range-control/index.tsx b/packages/components/src/range-control/index.tsx
+index 89dd8248a1e614..1ef761622524f5 100644
+--- a/packages/components/src/range-control/index.tsx
++++ b/packages/components/src/range-control/index.tsx
+@@ -391,17 +391,18 @@ function UnforwardedRangeControl(
+  * import { useState } from '@wordpress/element';
+  *
+  * const MyRangeControl = () => {
+- *   const [ isChecked, setChecked ] = useState( true );
++ *   const [ value, setValue ] = useState();
+  *   return (
+  *     <RangeControl
+  *       __nextHasNoMarginBottom
+  *       __next40pxDefaultSize
+  *       help="Please select how transparent you would like this."
+- *       initialPosition={50}
++ *       initialPosition={ 50 }
+  *       label="Opacity"
+- *       max={100}
+- *       min={0}
+- *       onChange={() => {}}
++ *       max={ 100 }
++ *       min={ 0 }
++ *       value={ value }
++ *       onChange={ setValue }
+  *     />
+  *   );
+  * };

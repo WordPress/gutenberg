@@ -1,0 +1,165 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0021df7a361106..48bdc1e9cbdcfb 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -64,7 +64,7 @@
+ 
+ ### Internal
+ 
+--   `DropdownMenu` v2: fix flashing menu item styles when using keyboard ([#64873](https://github.com/WordPress/gutenberg/pull/64873)).
++-   `DropdownMenu` v2: fix flashing menu item styles when using keyboard ([#64873](https://github.com/WordPress/gutenberg/pull/64873), [#64942](https://github.com/WordPress/gutenberg/pull/64942)).
+ -   `DropdownMenu` v2: refactor to overloaded naming convention ([#64654](https://github.com/WordPress/gutenberg/pull/64654)).
+ -   `DropdownMenu` v2: add `GroupLabel` subcomponent ([#64854](https://github.com/WordPress/gutenberg/pull/64854)).
+ -   `Composite` V2: fix Storybook docgen ([#64682](https://github.com/WordPress/gutenberg/pull/64682)).
+diff --git a/packages/components/src/dropdown-menu-v2/checkbox-item.tsx b/packages/components/src/dropdown-menu-v2/checkbox-item.tsx
+index 2f0d15557bb5e5..bcbc920cbb7205 100644
+--- a/packages/components/src/dropdown-menu-v2/checkbox-item.tsx
++++ b/packages/components/src/dropdown-menu-v2/checkbox-item.tsx
+@@ -16,20 +16,24 @@ import type { WordPressComponentProps } from '../context';
+ import { DropdownMenuContext } from './context';
+ import type { DropdownMenuCheckboxItemProps } from './types';
+ import * as Styled from './styles';
++import { useTemporaryFocusVisibleFix } from './use-temporary-focus-visible-fix';
+ 
+ export const DropdownMenuCheckboxItem = forwardRef<
+ 	HTMLDivElement,
+ 	WordPressComponentProps< DropdownMenuCheckboxItemProps, 'div', false >
+ >( function DropdownMenuCheckboxItem(
+-	{ suffix, children, hideOnClick = false, ...props },
++	{ suffix, children, onBlur, hideOnClick = false, ...props },
+ 	ref
+ ) {
++	// TODO: Remove when https://github.com/ariakit/ariakit/issues/4083 is fixed
++	const focusVisibleFixProps = useTemporaryFocusVisibleFix( { onBlur } );
+ 	const dropdownMenuContext = useContext( DropdownMenuContext );
+ 
+ 	return (
+ 		<Styled.DropdownMenuCheckboxItem
+ 			ref={ ref }
+ 			{ ...props }
++			{ ...focusVisibleFixProps }
+ 			accessibleWhenDisabled
+ 			hideOnClick={ hideOnClick }
+ 			store={ dropdownMenuContext?.store }
+diff --git a/packages/components/src/dropdown-menu-v2/item.tsx b/packages/components/src/dropdown-menu-v2/item.tsx
+index 50cf21f614dc59..2680603db22aa7 100644
+--- a/packages/components/src/dropdown-menu-v2/item.tsx
++++ b/packages/components/src/dropdown-menu-v2/item.tsx
+@@ -10,20 +10,24 @@ import type { WordPressComponentProps } from '../context';
+ import type { DropdownMenuItemProps } from './types';
+ import * as Styled from './styles';
+ import { DropdownMenuContext } from './context';
++import { useTemporaryFocusVisibleFix } from './use-temporary-focus-visible-fix';
+ 
+ export const DropdownMenuItem = forwardRef<
+ 	HTMLDivElement,
+ 	WordPressComponentProps< DropdownMenuItemProps, 'div', false >
+ >( function DropdownMenuItem(
+-	{ prefix, suffix, children, hideOnClick = true, ...props },
++	{ prefix, suffix, children, onBlur, hideOnClick = true, ...props },
+ 	ref
+ ) {
++	// TODO: Remove when https://github.com/ariakit/ariakit/issues/4083 is fixed
++	const focusVisibleFixProps = useTemporaryFocusVisibleFix( { onBlur } );
+ 	const dropdownMenuContext = useContext( DropdownMenuContext );
+ 
+ 	return (
+ 		<Styled.DropdownMenuItem
+ 			ref={ ref }
+ 			{ ...props }
++			{ ...focusVisibleFixProps }
+ 			accessibleWhenDisabled
+ 			hideOnClick={ hideOnClick }
+ 			store={ dropdownMenuContext?.store }
+diff --git a/packages/components/src/dropdown-menu-v2/radio-item.tsx b/packages/components/src/dropdown-menu-v2/radio-item.tsx
+index c31f3ca0486398..547d8f257cdf4b 100644
+--- a/packages/components/src/dropdown-menu-v2/radio-item.tsx
++++ b/packages/components/src/dropdown-menu-v2/radio-item.tsx
+@@ -17,6 +17,7 @@ import { DropdownMenuContext } from './context';
+ import type { DropdownMenuRadioItemProps } from './types';
+ import * as Styled from './styles';
+ import { SVG, Circle } from '@wordpress/primitives';
++import { useTemporaryFocusVisibleFix } from './use-temporary-focus-visible-fix';
+ 
+ const radioCheck = (
+ 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+@@ -28,15 +29,18 @@ export const DropdownMenuRadioItem = forwardRef<
+ 	HTMLDivElement,
+ 	WordPressComponentProps< DropdownMenuRadioItemProps, 'div', false >
+ >( function DropdownMenuRadioItem(
+-	{ suffix, children, hideOnClick = false, ...props },
++	{ suffix, children, onBlur, hideOnClick = false, ...props },
+ 	ref
+ ) {
++	// TODO: Remove when https://github.com/ariakit/ariakit/issues/4083 is fixed
++	const focusVisibleFixProps = useTemporaryFocusVisibleFix( { onBlur } );
+ 	const dropdownMenuContext = useContext( DropdownMenuContext );
+ 
+ 	return (
+ 		<Styled.DropdownMenuRadioItem
+ 			ref={ ref }
+ 			{ ...props }
++			{ ...focusVisibleFixProps }
+ 			accessibleWhenDisabled
+ 			hideOnClick={ hideOnClick }
+ 			store={ dropdownMenuContext?.store }
+diff --git a/packages/components/src/dropdown-menu-v2/styles.ts b/packages/components/src/dropdown-menu-v2/styles.ts
+index 9bb2f07b282622..fb336377bd9f18 100644
+--- a/packages/components/src/dropdown-menu-v2/styles.ts
++++ b/packages/components/src/dropdown-menu-v2/styles.ts
+@@ -171,23 +171,16 @@ const baseItem = css`
+ 		cursor: not-allowed;
+ 	}
+ 
+-	/* Active item (including hover)
+-	 * Note: we should be able to remove :focus-visible once
+-	 * https://github.com/ariakit/ariakit/issues/4083 is fixed and released
+-	 */
+-	&[data-active-item]:not( [data-focus-visible] ):not( :focus-visible ):not(
++	/* Active item (including hover) */
++	&[data-active-item]:not( [data-focus-visible] ):not(
+ 			[aria-disabled='true']
+ 		) {
+ 		background-color: ${ COLORS.theme.accent };
+ 		color: ${ COLORS.white };
+ 	}
+ 
+-	/* Keyboard focus (focus-visible)
+-	 * Note: we should be able to remove :focus-visible once
+-	 * https://github.com/ariakit/ariakit/issues/4083 is fixed and released
+-	 */
+-	&[data-focus-visible],
+-	&:focus-visible {
++	/* Keyboard focus (focus-visible) */
++	&[data-focus-visible] {
+ 		box-shadow: 0 0 0 1.5px ${ COLORS.theme.accent };
+ 
+ 		/* Only visible in Windows High Contrast mode */
+diff --git a/packages/components/src/dropdown-menu-v2/use-temporary-focus-visible-fix.ts b/packages/components/src/dropdown-menu-v2/use-temporary-focus-visible-fix.ts
+new file mode 100644
+index 00000000000000..0df13133739609
+--- /dev/null
++++ b/packages/components/src/dropdown-menu-v2/use-temporary-focus-visible-fix.ts
+@@ -0,0 +1,22 @@
++/**
++ * WordPress dependencies
++ */
++import { useState, flushSync } from '@wordpress/element';
++
++export function useTemporaryFocusVisibleFix( {
++	onBlur: onBlurProp,
++}: {
++	onBlur?: React.FocusEventHandler< HTMLDivElement >;
++} ) {
++	const [ focusVisible, setFocusVisible ] = useState( false );
++	return {
++		'data-focus-visible': focusVisible || undefined,
++		onFocusVisible: () => {
++			flushSync( () => setFocusVisible( true ) );
++		},
++		onBlur: ( ( event ) => {
++			onBlurProp?.( event );
++			setFocusVisible( false );
++		} ) as React.FocusEventHandler< HTMLDivElement >,
++	};
++}

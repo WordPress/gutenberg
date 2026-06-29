@@ -1,0 +1,652 @@
+diff --git a/package-lock.json b/package-lock.json
+index d3500a5e00505d..6601e3c840dad3 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -12433,10 +12433,10 @@
+ 				"@wordpress/primitives": "file:packages/primitives",
+ 				"@wordpress/rich-text": "file:packages/rich-text",
+ 				"@wordpress/warning": "file:packages/warning",
+-				"@wp-g2/components": "^0.0.160",
+-				"@wp-g2/context": "^0.0.160",
+-				"@wp-g2/styles": "^0.0.160",
+-				"@wp-g2/utils": "^0.0.160",
++				"@wp-g2/components": "^0.0.162",
++				"@wp-g2/context": "^0.0.162",
++				"@wp-g2/styles": "^0.0.162",
++				"@wp-g2/utils": "^0.0.162",
+ 				"classnames": "^2.2.5",
+ 				"dom-scroll-into-view": "^1.2.1",
+ 				"downshift": "^6.0.15",
+@@ -12450,7 +12450,7 @@
+ 				"react-resize-aware": "^3.1.0",
+ 				"react-spring": "^8.0.20",
+ 				"react-use-gesture": "^9.0.0",
+-				"reakit": "^1.3.5",
++				"reakit": "1.3.5",
+ 				"rememo": "^3.0.0",
+ 				"tinycolor2": "^1.4.2",
+ 				"uuid": "^8.3.0"
+@@ -13405,14 +13405,14 @@
+ 			}
+ 		},
+ 		"@wp-g2/components": {
+-			"version": "0.0.160",
+-			"resolved": "https://registry.npmjs.org/@wp-g2/components/-/components-0.0.160.tgz",
+-			"integrity": "sha512-44qUtiF5Nl/srD7Vzbpcd0im/EIej04fOdDfa0lfDxXJDNK3RRtSSEwCRhok/M5SKCmvYbZKRUx2K0ugXNqK0Q==",
++			"version": "0.0.162",
++			"resolved": "https://registry.npmjs.org/@wp-g2/components/-/components-0.0.162.tgz",
++			"integrity": "sha512-AQPIod0hTE+82LdkBRWhzjdcWmS4eA9MHTH5wUc3G+nfgEhRN/Z7p/7/pGvJUOGdbsht7Nubc4jQJR+eFGbUSg==",
+ 			"requires": {
+ 				"@popperjs/core": "^2.5.4",
+-				"@wp-g2/context": "^0.0.160",
+-				"@wp-g2/styles": "^0.0.160",
+-				"@wp-g2/utils": "^0.0.160",
++				"@wp-g2/context": "^0.0.162",
++				"@wp-g2/styles": "^0.0.162",
++				"@wp-g2/utils": "^0.0.162",
+ 				"csstype": "^3.0.3",
+ 				"downshift": "^6.0.15",
+ 				"framer-motion": "^2.1.0",
+@@ -13447,25 +13447,25 @@
+ 			}
+ 		},
+ 		"@wp-g2/context": {
+-			"version": "0.0.160",
+-			"resolved": "https://registry.npmjs.org/@wp-g2/context/-/context-0.0.160.tgz",
+-			"integrity": "sha512-50wSQCZkdZEexP88Ljutskn7/klT2Id1ks4GpzKDSBM8kadrfNdr2iabjgJdFLIH33S+r4dzEnzLs9SFtqUgwg==",
++			"version": "0.0.162",
++			"resolved": "https://registry.npmjs.org/@wp-g2/context/-/context-0.0.162.tgz",
++			"integrity": "sha512-EUe3GhFXBZBr/jVJ5HcAGjGvHVjbAud82l9+9VoUM2JnCBDnXDRweRtybQ4FouQ2qRu7Dx4i75vq/oAJRqZwUA==",
+ 			"requires": {
+-				"@wp-g2/create-styles": "^0.0.160",
+-				"@wp-g2/styles": "^0.0.160",
+-				"@wp-g2/utils": "^0.0.160",
++				"@wp-g2/create-styles": "^0.0.162",
++				"@wp-g2/styles": "^0.0.162",
++				"@wp-g2/utils": "^0.0.162",
+ 				"lodash": "^4.17.19"
+ 			}
+ 		},
+ 		"@wp-g2/create-styles": {
+-			"version": "0.0.160",
+-			"resolved": "https://registry.npmjs.org/@wp-g2/create-styles/-/create-styles-0.0.160.tgz",
+-			"integrity": "sha512-2/q8jcB9wIyfxkoCfNhz+9otRmAbDwfgk3nSEFhyz9ExR+OCqNUWqmITE3TZ4hYaSsV8E/gUUO4JjnPPy989bA==",
++			"version": "0.0.162",
++			"resolved": "https://registry.npmjs.org/@wp-g2/create-styles/-/create-styles-0.0.162.tgz",
++			"integrity": "sha512-sxomtVj4tEvI4NcwRMsUVEd7H4qj7JiAXppqHb1dBDxdDVUTIb327SeNdPg3c++NtDdDS/91ysh10LdbhJfytg==",
+ 			"requires": {
+ 				"@emotion/core": "^10.1.1",
+ 				"@emotion/hash": "^0.8.0",
+ 				"@emotion/is-prop-valid": "^0.8.8",
+-				"@wp-g2/utils": "^0.0.160",
++				"@wp-g2/utils": "^0.0.162",
+ 				"create-emotion": "^10.0.27",
+ 				"emotion": "^10.0.27",
+ 				"emotion-theming": "^10.0.27",
+@@ -13491,18 +13491,18 @@
+ 			}
+ 		},
+ 		"@wp-g2/styles": {
+-			"version": "0.0.160",
+-			"resolved": "https://registry.npmjs.org/@wp-g2/styles/-/styles-0.0.160.tgz",
+-			"integrity": "sha512-o91jxb0ZwEDRJrtVVjnqn3qTAXjnxZ1fX5KF3Q7oz776lMZPHsyfC0hvqnOz0w7zqaZZpdWtVQRShgrYXN6JHw==",
++			"version": "0.0.162",
++			"resolved": "https://registry.npmjs.org/@wp-g2/styles/-/styles-0.0.162.tgz",
++			"integrity": "sha512-kFiJOH4c9r7r/joOrx+tYbpwE0aVJWFFAq6vvFzOaw+Z6E4B6OZB4w5aGcaKAm0eelIveW42mezpaGy8vNH5kg==",
+ 			"requires": {
+-				"@wp-g2/create-styles": "^0.0.160",
+-				"@wp-g2/utils": "^0.0.160"
++				"@wp-g2/create-styles": "^0.0.162",
++				"@wp-g2/utils": "^0.0.162"
+ 			}
+ 		},
+ 		"@wp-g2/utils": {
+-			"version": "0.0.160",
+-			"resolved": "https://registry.npmjs.org/@wp-g2/utils/-/utils-0.0.160.tgz",
+-			"integrity": "sha512-4FhezjKyeYVb+3PZahW1kmqXpCvVvuJM97EcGqkKf+u4Qf66J3n1niHgfnRbn8aNydYK6EFze+6/UL48U35z1w==",
++			"version": "0.0.162",
++			"resolved": "https://registry.npmjs.org/@wp-g2/utils/-/utils-0.0.162.tgz",
++			"integrity": "sha512-+UqLMNzNhJH/+oCk7WKQCyPLOi2v99QPIrJ+fSSYyIfTV8BfT0pzfXV6CGGWQPmTG2Te4ooHkYjxuXBhXx8XkQ==",
+ 			"requires": {
+ 				"copy-to-clipboard": "^3.3.1",
+ 				"create-emotion": "^10.0.27",
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 3e8ff18c56f0da..a404b0653265bf 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -45,10 +45,10 @@
+ 		"@wordpress/primitives": "file:../primitives",
+ 		"@wordpress/rich-text": "file:../rich-text",
+ 		"@wordpress/warning": "file:../warning",
+-		"@wp-g2/components": "^0.0.160",
+-		"@wp-g2/context": "^0.0.160",
+-		"@wp-g2/styles": "^0.0.160",
+-		"@wp-g2/utils": "^0.0.160",
++		"@wp-g2/components": "^0.0.162",
++		"@wp-g2/context": "^0.0.162",
++		"@wp-g2/styles": "^0.0.162",
++		"@wp-g2/utils": "^0.0.162",
+ 		"classnames": "^2.2.5",
+ 		"dom-scroll-into-view": "^1.2.1",
+ 		"downshift": "^6.0.15",
+@@ -62,7 +62,7 @@
+ 		"react-resize-aware": "^3.1.0",
+ 		"react-spring": "^8.0.20",
+ 		"react-use-gesture": "^9.0.0",
+-		"reakit": "^1.3.5",
++		"reakit": "1.3.5",
+ 		"rememo": "^3.0.0",
+ 		"tinycolor2": "^1.4.2",
+ 		"uuid": "^8.3.0"
+diff --git a/packages/components/src/ui/menu/component.js b/packages/components/src/ui/menu/component.js
+new file mode 100644
+index 00000000000000..13309e47e95f59
+--- /dev/null
++++ b/packages/components/src/ui/menu/component.js
+@@ -0,0 +1,61 @@
++/**
++ * External dependencies
++ */
++import { contextConnect, useContextSystem } from '@wp-g2/context';
++import { cx } from '@wp-g2/styles';
++
++/**
++ * Internal dependencies
++ */
++import { View } from '../view';
++import * as styles from './styles';
++
++/**
++ * `Menu` is an actionable component that displays a list of actions, links, or informative content.
++ *
++ * @example
++ * ```jsx
++ * <Menu>
++ *  <MenuItem>...</MenuItem>
++ *  <MenuItem>...</MenuItem>
++ *  <MenuItem>...</MenuItem>
++ * </Menu>
++ * ```
++ *
++ * @see https://reakit.io/docs/menu/#menu
++ *
++ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'div'>} props
++ * @param {import('react').Ref<any>} forwardedRef
++ */
++function Menu( props, forwardedRef ) {
++	const { children, className, ...otherProps } = useContextSystem(
++		props,
++		'Menu'
++	);
++
++	const classes = cx( styles.Menu, className );
++
++	return (
++		<View { ...otherProps } className={ classes } ref={ forwardedRef }>
++			{ children }
++		</View>
++	);
++}
++
++/**
++ * `Menu` is an actionable component that displays a list of actions, links, or informative content.
++ *
++ * @example
++ * ```jsx
++ * <Menu>
++ *  <MenuItem>...</MenuItem>
++ *  <MenuItem>...</MenuItem>
++ *  <MenuItem>...</MenuItem>
++ * </Menu>
++ * ```
++ *
++ * @see https://reakit.io/docs/menu/#menu
++ */
++const ConnectedMenu = contextConnect( Menu, 'Menu' );
++
++export default ConnectedMenu;
+diff --git a/packages/components/src/ui/menu/context.js b/packages/components/src/ui/menu/context.js
+new file mode 100644
+index 00000000000000..fcd44747c4df38
+--- /dev/null
++++ b/packages/components/src/ui/menu/context.js
+@@ -0,0 +1,8 @@
++/**
++ * WordPress dependencies
++ */
++import { createContext, useContext } from '@wordpress/element';
++
++/** @type {import('react').Context<{ menu?: import('reakit').MenuStateReturn }>} */
++export const MenuContext = createContext( {} );
++export const useMenuContext = () => useContext( MenuContext );
+diff --git a/packages/components/src/ui/menu/header.js b/packages/components/src/ui/menu/header.js
+new file mode 100644
+index 00000000000000..f434c36982f7cc
+--- /dev/null
++++ b/packages/components/src/ui/menu/header.js
+@@ -0,0 +1,54 @@
++/**
++ * External dependencies
++ */
++import { contextConnect, useContextSystem } from '@wp-g2/context';
++import { cx } from '@wp-g2/styles';
++import { pick } from 'lodash';
++
++/**
++ * Internal dependencies
++ */
++import * as baseButtonStyles from '../base-button/styles';
++import { Heading } from '../heading';
++import * as styles from './styles';
++
++const sizeStyles = pick( baseButtonStyles, [ 'large', 'small', 'xSmall' ] );
++
++/**
++ * @typedef OwnProps
++ * @property {keyof sizeStyles} size Size of the menu header.
++ */
++
++/**
++ * @typedef {import('../heading').HeadingProps & OwnProps} Props
++ */
++
++/**
++ *
++ * @param {import('@wp-g2/create-styles').ViewOwnProps<Props, 'div'>} props
++ * @param {import('react').Ref<any>} forwardedRef
++ */
++function MenuHeader( props, forwardedRef ) {
++	const {
++		children,
++		className,
++		size,
++		level = 5,
++		...otherProps
++	} = useContextSystem( props, 'MenuHeader' );
++
++	const classes = cx( styles.MenuHeader, sizeStyles[ size ], className );
++
++	return (
++		<Heading
++			level={ level }
++			{ ...otherProps }
++			className={ classes }
++			ref={ forwardedRef }
++		>
++			{ children }
++		</Heading>
++	);
++}
++
++export default contextConnect( MenuHeader, 'MenuHeader' );
+diff --git a/packages/components/src/ui/menu/index.js b/packages/components/src/ui/menu/index.js
+new file mode 100644
+index 00000000000000..ad105d7bdd5bf1
+--- /dev/null
++++ b/packages/components/src/ui/menu/index.js
+@@ -0,0 +1,5 @@
++export { default as Menu } from './component';
++export { default as MenuHeader } from './header';
++export { default as MenuItem } from './item';
++
++export * from './context';
+diff --git a/packages/components/src/ui/menu/item.js b/packages/components/src/ui/menu/item.js
+new file mode 100644
+index 00000000000000..d21757222240e6
+--- /dev/null
++++ b/packages/components/src/ui/menu/item.js
+@@ -0,0 +1,149 @@
++/**
++ * External dependencies
++ */
++import { contextConnect, useContextSystem } from '@wp-g2/context';
++import { cx } from '@wp-g2/styles';
++import { is, noop } from '@wp-g2/utils';
++
++/**
++ * WordPress dependencies
++ */
++import { Icon, check, chevronLeft, chevronRight } from '@wordpress/icons';
++import { useCallback, useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { BaseButton } from '../base-button';
++import { Flex } from '../flex';
++import { Text } from '../text';
++import * as styles from './styles';
++
++/**
++ *
++ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').MenuItemProps, 'button'>} props
++ * @param {import('react').Ref<any>} forwardedRef
++ */
++function MenuItem( props, forwardedRef ) {
++	const {
++		children,
++		className,
++		isBack = false,
++		isOffset = false,
++		isSelected,
++		onClick = noop,
++		prefix,
++		showArrow = false,
++		size,
++		suffix,
++		...otherProps
++	} = useContextSystem( props, 'MenuItem' );
++
++	const shouldShowArrow = ! isBack && showArrow;
++
++	const classes = cx(
++		styles.MenuItem,
++		size && styles[ size ],
++		shouldShowArrow && styles.showArrow,
++		isBack && styles.showBackArrow,
++		isOffset && styles.offset,
++		className
++	);
++
++	const prevArrow = useMemo(
++		() =>
++			isBack && (
++				<Text isBlock variant="muted">
++					<Icon icon={ chevronLeft } size={ 16 } />
++				</Text>
++			),
++		[ isBack ]
++	);
++
++	const nextArrow = useMemo(
++		() =>
++			shouldShowArrow && (
++				<Text isBlock variant="muted">
++					<Icon icon={ chevronRight } size={ 16 } />
++				</Text>
++			),
++		[ shouldShowArrow ]
++	);
++
++	const selectedContent = useMemo(
++		() =>
++			is.defined( isSelected ) && (
++				<Icon
++					icon={ check }
++					size={ 16 }
++					style={ { opacity: isSelected ? 1 : 0 } }
++				/>
++			),
++		[ isSelected ]
++	);
++
++	const prefixContent = useMemo( () => {
++		return prevArrow || prefix ? (
++			<Flex>
++				{ prevArrow }
++				{ prefix }
++			</Flex>
++		) : undefined;
++	}, [ prefix, prevArrow ] );
++
++	const suffixContent = useMemo( () => {
++		return (
++			( selectedContent || nextArrow || suffix ) && (
++				<Flex>
++					{ selectedContent }
++					{ suffix }
++					{ nextArrow }
++				</Flex>
++			)
++		);
++	}, [ nextArrow, selectedContent, suffix ] );
++
++	const handleOnClick = useCallback(
++		(
++			/** @type {import('react').MouseEvent<HTMLButtonElement>} */ event
++		) => {
++			onClick( event );
++		},
++		[ onClick ]
++	);
++
++	return (
++		<BaseButton
++			isBlock
++			noWrap={ false }
++			{ ...otherProps }
++			className={ classes }
++			onClick={ handleOnClick }
++			pre={ prefixContent }
++			ref={ forwardedRef }
++			size={ size }
++			suffix={ suffixContent }
++			textAlign="left"
++		>
++			{ children }
++		</BaseButton>
++	);
++}
++
++/**
++ * `MenuItem` is an actionable component that renders within a `Menu`.
++ *
++ * @example
++ * ```jsx
++ * <Menu>
++ *  <MenuItem onClick={...}>Ana</MenuItem>
++ *  <MenuItem onClick={...}>Elsa</MenuItem>
++ *  <MenuItem onClick={...}>Olaf</MenuItem>
++ * </Menu>
++ * ```
++ *
++ * @see https://reakit.io/docs/menu/#menuitem
++ */
++const ConnectedMenuItem = contextConnect( MenuItem, 'MenuItem' );
++
++export default ConnectedMenuItem;
+diff --git a/packages/components/src/ui/menu/stories/index.js b/packages/components/src/ui/menu/stories/index.js
+new file mode 100644
+index 00000000000000..35ab51d35a7ec5
+--- /dev/null
++++ b/packages/components/src/ui/menu/stories/index.js
+@@ -0,0 +1,31 @@
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { Menu, MenuItem, MenuHeader } from '..';
++
++export default {
++	component: Menu,
++	title: 'G2 Components (Experimental)/Menu',
++};
++
++const Example = () => {
++	const [ isSelected, setIsSelected ] = useState( false );
++	return (
++		<Menu css={ { width: '150px' } }>
++			<MenuHeader>WordPress.org</MenuHeader>
++			<MenuItem
++				isSelected={ isSelected }
++				onClick={ () => setIsSelected( ! isSelected ) }
++			>
++				Code is Poetry
++			</MenuItem>
++		</Menu>
++	);
++};
++
++export const _default = () => <Example />;
+diff --git a/packages/components/src/ui/menu/styles.js b/packages/components/src/ui/menu/styles.js
+new file mode 100644
+index 00000000000000..1801ac59fce88b
+--- /dev/null
++++ b/packages/components/src/ui/menu/styles.js
+@@ -0,0 +1,127 @@
++/**
++ * External dependencies
++ */
++import { css, highContrastMode, ui } from '@wp-g2/styles';
++
++export const Menu = css`
++	outline: none;
++	padding: 0;
++	position: relative;
++`;
++
++export const MenuItem = css`
++	${ ui.font.color.text };
++	${ ui.font.size( undefined ) };
++	border-color: transparent;
++	border-width: ${ ui.get( 'menuItemBorderWidth' ) };
++	box-sizing: border-box;
++	cursor: pointer;
++	min-height: ${ ui.get( 'menuItemHeight' ) };
++	outline: none;
++	position: relative;
++	text-decoration: none;
++	transition: background ${ ui.get( 'transitionDurationFastest' ) } linear,
++		border-color ${ ui.get( 'transitionDurationFastest' ) } linear;
++	width: 100%;
++
++	a:hover > &,
++	&:hover {
++		background: ${ ui.get( 'controlBackgroundBrightColor' ) };
++	}
++
++	a:focus > &,
++	&:focus {
++		${ ui.zIndex( 'ControlFocus', 1 ) };
++		background-color: ${ ui.get( 'menuItemFocusBackgroundColor' ) };
++		border-color: ${ ui.get( 'menuItemFocusBorderColor' ) };
++		box-shadow: ${ ui.get( 'menuItemFocusBoxShadow' ) };
++		color: ${ ui.get( 'menuItemFocusTextColor' ) };
++	}
++
++	a:active > &,
++	&:active {
++		background: ${ ui.get( 'menuItemActiveBackgroundColor' ) };
++		border-color: ${ ui.get( 'menuItemActiveBorderColor' ) };
++		box-shadow: ${ ui.get( 'menuItemActiveBoxShadow' ) };
++		color: ${ ui.get( 'menuItemActiveTextColor' ) };
++	}
++
++	&.is-active,
++	&[aria-current='page'],
++	&[aria-selected='true'] {
++		background-color: ${ ui.get( 'surfaceBackgroundSubtleColor' ) };
++		color: ${ ui.color.text };
++
++		&:active {
++			color: ${ ui.color.textInverted };
++		}
++
++		&:hover,
++		&:focus {
++			background-color: ${ ui.get( 'surfaceBackgroundSubtleColor' ) };
++		}
++
++		&:focus {
++			border-color: ${ ui.get( 'surfaceBackgroundSubtleColor' ) };
++		}
++
++		&:active {
++			background-color: ${ ui.color.text };
++		}
++	}
++
++	${ highContrastMode`
++		&:hover,
++		&:focus {
++			border-color: ${ ui.get( 'controlBorderColor' ) };
++		}
++	` }
++`;
++
++export const xLarge = css`
++	min-height: ${ ui.get( 'menuItemHeightXLarge' ) };
++`;
++
++export const large = css`
++	min-height: ${ ui.get( 'menuItemHeightLarge' ) };
++`;
++
++export const medium = css``;
++
++export const small = css`
++	min-height: ${ ui.get( 'menuItemHeightSmall' ) };
++`;
++
++export const xSmall = css`
++	min-height: ${ ui.get( 'menuItemHeightXSmall' ) };
++`;
++
++export const xxSmall = css`
++	min-height: ${ ui.get( 'menuItemHeightXXSmall' ) };
++`;
++
++export const MenuHeader = css`
++	align-items: center;
++	display: flex;
++	min-height: ${ ui.get( 'menuItemHeight' ) };
++	padding-bottom: ${ ui.space( 1 ) };
++	padding-left: ${ ui.get( 'controlPaddingX' ) };
++	padding-right: ${ ui.get( 'controlPaddingX' ) };
++	padding-top: ${ ui.space( 1 ) };
++`;
++
++export const offset = css`
++	${ ui.margin.x( -2 ) };
++	${ ui.margin.y( -1 ) };
++	${ ui.padding.y( 2 ) };
++	min-height: calc( ${ ui.get( 'menuItemHeight' ) } + ${ ui.space( 1 ) } );
++	width: calc( 100% + ${ ui.space( 4 ) } );
++`;
++
++export const showArrow = css`
++	${ ui.padding.right( 1 ) };
++`;
++
++export const showBackArrow = css`
++	${ ui.padding.left( 1 ) };
++`;
+diff --git a/packages/components/src/ui/menu/types.ts b/packages/components/src/ui/menu/types.ts
+new file mode 100644
+index 00000000000000..fac4c46e015a86
+--- /dev/null
++++ b/packages/components/src/ui/menu/types.ts
+@@ -0,0 +1,29 @@
++/**
++ * Internal dependencies
++ */
++import type { Props as BaseButtonProps } from '../base-button/types';
++
++export type Props = {};
++
++export type MenuItemProps = BaseButtonProps & {
++	/**
++	 * Renders a "back" arrow `Icon`, indicating a backwards navigation direction.
++	 *
++	 * @default false
++	 */
++	isBack?: boolean;
++	/**
++	 * Renders offset styles, used for negative margins within list-based component (e.g. `ListGroup`).
++	 */
++	isOffset?: boolean;
++	/**
++	 * Renders an opaque icon when the item is selected or a transparent one when the item is not selected.
++	 */
++	isSelected?: boolean;
++	/**
++	 * Renders a "forward" arrow `Icon`, indicating a forwards navigation direction.
++	 *
++	 * @default false
++	 */
++	showArrow?: boolean;
++};

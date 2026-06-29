@@ -1,0 +1,637 @@
+diff --git a/packages/components/src/divider/component.tsx b/packages/components/src/divider/component.tsx
+index 4fd45723736789..2ea05e62d63f4d 100644
+--- a/packages/components/src/divider/component.tsx
++++ b/packages/components/src/divider/component.tsx
+@@ -19,7 +19,7 @@ import { useMemo } from '@wordpress/element';
+  */
+ import { contextConnect, useContextSystem } from '../ui/context';
+ // eslint-disable-next-line no-duplicate-imports
+-import type { ViewOwnProps } from '../ui/context';
++import type { PolymorphicComponentProps } from '../ui/context';
+ import * as styles from './styles';
+ import { space } from '../ui/utils/space';
+ 
+@@ -39,7 +39,7 @@ export interface DividerProps extends SeparatorProps {
+ }
+ 
+ function Divider(
+-	props: ViewOwnProps< DividerProps, 'hr' >,
++	props: PolymorphicComponentProps< DividerProps, 'hr' >,
+ 	forwardedRef: Ref< any >
+ ) {
+ 	const {
+diff --git a/packages/components/src/flex/flex-block/hook.js b/packages/components/src/flex/flex-block/hook.js
+index 9780aa896ad588..82d0e2abb6e9d0 100644
+--- a/packages/components/src/flex/flex-block/hook.js
++++ b/packages/components/src/flex/flex-block/hook.js
+@@ -5,7 +5,7 @@ import { useContextSystem } from '../../ui/context';
+ import { useFlexItem } from '../flex-item';
+ 
+ /**
+- * @param {import('../../ui/context').ViewOwnProps<import('../types').FlexBlockProps, 'div'>} props
++ * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').FlexBlockProps, 'div'>} props
+  */
+ export function useFlexBlock( props ) {
+ 	const otherProps = useContextSystem( props, 'FlexBlock' );
+diff --git a/packages/components/src/flex/flex-item/hook.js b/packages/components/src/flex/flex-item/hook.js
+index cc1fb57e2fbe39..27b36edbaf2eb9 100644
+--- a/packages/components/src/flex/flex-item/hook.js
++++ b/packages/components/src/flex/flex-item/hook.js
+@@ -11,7 +11,7 @@ import { useFlexContext } from '../context';
+ import * as styles from '../styles';
+ 
+ /**
+- * @param {import('../../ui/context').ViewOwnProps<import('../types').FlexItemProps, 'div'>} props
++ * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').FlexItemProps, 'div'>} props
+  */
+ export function useFlexItem( props ) {
+ 	const {
+diff --git a/packages/components/src/flex/flex/component.js b/packages/components/src/flex/flex/component.js
+index 758b4fc98e9f1f..f2241aa47511e7 100644
+--- a/packages/components/src/flex/flex/component.js
++++ b/packages/components/src/flex/flex/component.js
+@@ -7,7 +7,7 @@ import { FlexContext } from './../context';
+ import { View } from '../../view';
+ 
+ /**
+- * @param {import('../../ui/context').ViewOwnProps<import('../types').FlexProps, 'div'>} props
++ * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').FlexProps, 'div'>} props
+  * @param {import('react').Ref<any>} forwardedRef
+  */
+ function Flex( props, forwardedRef ) {
+diff --git a/packages/components/src/flex/flex/hook.js b/packages/components/src/flex/flex/hook.js
+index 89d1d8070ed946..7fb645ebc2e71e 100644
+--- a/packages/components/src/flex/flex/hook.js
++++ b/packages/components/src/flex/flex/hook.js
+@@ -19,8 +19,8 @@ import * as styles from '../styles';
+ 
+ /**
+  *
+- * @param {import('../../ui/context').ViewOwnProps<import('../types').FlexProps, 'div'>} props
+- * @return {import('../../ui/context').ViewOwnProps<import('../types').FlexProps, 'div'>} Props with the deprecated props removed.
++ * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').FlexProps, 'div'>} props
++ * @return {import('../../ui/context').PolymorphicComponentProps<import('../types').FlexProps, 'div'>} Props with the deprecated props removed.
+  */
+ function useDeprecatedProps( { isReversed, ...otherProps } ) {
+ 	if ( typeof isReversed !== 'undefined' ) {
+@@ -38,7 +38,7 @@ function useDeprecatedProps( { isReversed, ...otherProps } ) {
+ }
+ 
+ /**
+- * @param {import('../../ui/context').ViewOwnProps<import('../types').FlexProps, 'div'>} props
++ * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').FlexProps, 'div'>} props
+  */
+ export function useFlex( props ) {
+ 	const {
+diff --git a/packages/components/src/grid/hook.js b/packages/components/src/grid/hook.js
+index 6b44bae25e3feb..e596b1644dfd44 100644
+--- a/packages/components/src/grid/hook.js
++++ b/packages/components/src/grid/hook.js
+@@ -17,7 +17,7 @@ import { useResponsiveValue } from '../ui/utils/use-responsive-value';
+ import CONFIG from '../utils/config-values';
+ 
+ /**
+- * @param {import('../ui/context').ViewOwnProps<import('./types').Props, 'div'>} props
++ * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+  */
+ export default function useGrid( props ) {
+ 	const {
+diff --git a/packages/components/src/h-stack/hook.js b/packages/components/src/h-stack/hook.js
+index 8d05fa1ada0d7b..ceadb162e307b6 100644
+--- a/packages/components/src/h-stack/hook.js
++++ b/packages/components/src/h-stack/hook.js
+@@ -8,7 +8,7 @@ import { getValidChildren } from '../ui/utils/get-valid-children';
+ 
+ /**
+  *
+- * @param {import('../ui/context').ViewOwnProps<import('./types').Props, 'div'>} props
++ * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+  */
+ export function useHStack( props ) {
+ 	const {
+diff --git a/packages/components/src/heading/hook.ts b/packages/components/src/heading/hook.ts
+index aa58ac90890208..cb85d5704f36ca 100644
+--- a/packages/components/src/heading/hook.ts
++++ b/packages/components/src/heading/hook.ts
+@@ -3,7 +3,7 @@
+  */
+ import { useContextSystem } from '../ui/context';
+ // eslint-disable-next-line no-duplicate-imports
+-import type { ViewOwnProps } from '../ui/context';
++import type { PolymorphicComponentProps } from '../ui/context';
+ import type { Props as TextProps } from '../text/types';
+ import { useText } from '../text';
+ import { getHeadingFontSize } from '../ui/utils/font-size';
+@@ -50,7 +50,9 @@ export interface HeadingProps extends Omit< TextProps, 'size' > {
+ 	level: HeadingSize;
+ }
+ 
+-export function useHeading( props: ViewOwnProps< HeadingProps, 'h1' > ) {
++export function useHeading(
++	props: PolymorphicComponentProps< HeadingProps, 'h1' >
++) {
+ 	const { as: asProp, level = 2, ...otherProps } = useContextSystem(
+ 		props,
+ 		'Heading'
+diff --git a/packages/components/src/spacer/hook.ts b/packages/components/src/spacer/hook.ts
+index cd2465627d31c8..a40bbcc1de44a5 100644
+--- a/packages/components/src/spacer/hook.ts
++++ b/packages/components/src/spacer/hook.ts
+@@ -8,7 +8,7 @@ import { css, cx } from 'emotion';
+  */
+ import { useContextSystem } from '../ui/context';
+ // eslint-disable-next-line no-duplicate-imports
+-import type { ViewOwnProps } from '../ui/context';
++import type { PolymorphicComponentProps } from '../ui/context';
+ import { space } from '../ui/utils/space';
+ 
+ const isDefined = < T >( o: T ): o is Exclude< T, null | undefined > =>
+@@ -75,7 +75,9 @@ export interface SpacerProps {
+ 	paddingRight?: number;
+ }
+ 
+-export function useSpacer( props: ViewOwnProps< SpacerProps, 'div' > ) {
++export function useSpacer(
++	props: PolymorphicComponentProps< SpacerProps, 'div' >
++) {
+ 	const {
+ 		className,
+ 		margin,
+diff --git a/packages/components/src/text/hook.js b/packages/components/src/text/hook.js
+index 24bc033dc2dbcd..ae2afc7282558e 100644
+--- a/packages/components/src/text/hook.js
++++ b/packages/components/src/text/hook.js
+@@ -22,7 +22,7 @@ import { CONFIG, COLORS } from '../utils';
+ import { getLineHeight } from './get-line-height';
+ 
+ /**
+- * @param {import('../ui/context').ViewOwnProps<import('./types').Props, 'span'>} props
++ * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'span'>} props
+  */
+ export default function useText( props ) {
+ 	const {
+diff --git a/packages/components/src/truncate/hook.js b/packages/components/src/truncate/hook.js
+index 07bfc21f6830fd..2d8755f3b9a336 100644
+--- a/packages/components/src/truncate/hook.js
++++ b/packages/components/src/truncate/hook.js
+@@ -16,7 +16,7 @@ import * as styles from './styles';
+ import { TRUNCATE_ELLIPSIS, TRUNCATE_TYPE, truncateContent } from './utils';
+ 
+ /**
+- * @param {import('../ui/context').ViewOwnProps<import('./types').Props, 'span'>} props
++ * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'span'>} props
+  */
+ export default function useTruncate( props ) {
+ 	const {
+diff --git a/packages/components/src/ui/card/body.js b/packages/components/src/ui/card/body.js
+index b0514c654f21fe..99b624ba8cab7f 100644
+--- a/packages/components/src/ui/card/body.js
++++ b/packages/components/src/ui/card/body.js
+@@ -17,7 +17,7 @@ import { View } from '../../view';
+ import * as styles from './styles';
+ 
+ /**
+- * @param {import('../context').ViewOwnProps<import('./types').CardBodyProps, 'div'>} props
++ * @param {import('../context').PolymorphicComponentProps<import('./types').CardBodyProps, 'div'>} props
+  * @param {import('react').Ref<any>} forwardedRef
+  */
+ function CardBody( props, forwardedRef ) {
+diff --git a/packages/components/src/ui/card/component.js b/packages/components/src/ui/card/component.js
+index 9f169ad4df40f4..47affa19f95280 100644
+--- a/packages/components/src/ui/card/component.js
++++ b/packages/components/src/ui/card/component.js
+@@ -19,7 +19,7 @@ import { useCard } from './hook';
+ import CONFIG from '../../utils/config-values';
+ 
+ /**
+- * @param {import('../context').ViewOwnProps<import('./types').CardProps, 'div'>} props
++ * @param {import('../context').PolymorphicComponentProps<import('./types').CardProps, 'div'>} props
+  * @param {import('react').Ref<any>} forwardedRef
+  */
+ function Card( props, forwardedRef ) {
+diff --git a/packages/components/src/ui/card/footer.js b/packages/components/src/ui/card/footer.js
+index 40a74450100775..f31a9e5510ace1 100644
+--- a/packages/components/src/ui/card/footer.js
++++ b/packages/components/src/ui/card/footer.js
+@@ -16,7 +16,7 @@ import { Flex } from '../../flex';
+ import * as styles from './styles';
+ 
+ /**
+- * @param {import('../context').ViewOwnProps<import('./types').CardFooterProps, 'div'>} props
++ * @param {import('../context').PolymorphicComponentProps<import('./types').CardFooterProps, 'div'>} props
+  * @param {import('react').Ref<any>} forwardedRef
+  */
+ function CardFooter( props, forwardedRef ) {
+diff --git a/packages/components/src/ui/card/header.js b/packages/components/src/ui/card/header.js
+index 051608dea02b86..bf1ba57260686a 100644
+--- a/packages/components/src/ui/card/header.js
++++ b/packages/components/src/ui/card/header.js
+@@ -16,7 +16,7 @@ import { Flex } from '../../flex';
+ import * as styles from './styles';
+ 
+ /**
+- * @param {import('../context').ViewOwnProps<import('./types').CardHeaderProps, 'div'>} props
++ * @param {import('../context').PolymorphicComponentProps<import('./types').CardHeaderProps, 'div'>} props
+  * @param {import('react').Ref<any>} forwardedRef
+  */
+ function CardHeader( props, forwardedRef ) {
+diff --git a/packages/components/src/ui/card/hook.js b/packages/components/src/ui/card/hook.js
+index b7b4392b41e807..f434a3626a066e 100644
+--- a/packages/components/src/ui/card/hook.js
++++ b/packages/components/src/ui/card/hook.js
+@@ -16,7 +16,7 @@ import { useSurface } from '../surface';
+ import * as styles from './styles';
+ 
+ /**
+- * @param {import('../context').ViewOwnProps<import('./types').CardProps, 'div'>} props
++ * @param {import('../context').PolymorphicComponentProps<import('./types').CardProps, 'div'>} props
+  */
+ export function useCard( props ) {
+ 	const {
+diff --git a/packages/components/src/ui/card/inner-body.js b/packages/components/src/ui/card/inner-body.js
+index 59efaf6e92567a..ab12a97e020ed2 100644
+--- a/packages/components/src/ui/card/inner-body.js
++++ b/packages/components/src/ui/card/inner-body.js
+@@ -11,7 +11,7 @@ import { contextConnect, useContextSystem } from '../context';
+ import * as styles from './styles';
+ 
+ /**
+- * @param {import('../context').ViewOwnProps<{}, 'div'>} props
++ * @param {import('../context').PolymorphicComponentProps<{}, 'div'>} props
+  * @param {import('react').Ref<any>} forwardedRef
+  */
+ function CardInnerBody( props, forwardedRef ) {
+diff --git a/packages/components/src/ui/context/context-connect.js b/packages/components/src/ui/context/context-connect.js
+index a6960e3389a8e6..6f6c90f24123b9 100644
+--- a/packages/components/src/ui/context/context-connect.js
++++ b/packages/components/src/ui/context/context-connect.js
+@@ -24,12 +24,12 @@ import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
+  * The hope is that we can improve render performance by removing functional
+  * component wrappers.
+  *
+- * @template {import('./polymorphic-component').ViewOwnProps<{}, any>} P
++ * @template {import('./polymorphic-component').PolymorphicComponentProps<{}, any>} P
+  * @param {(props: P, ref: import('react').Ref<any>) => JSX.Element | null} Component The component to register into the Context system.
+  * @param {string} namespace The namespace to register the component under.
+  * @param {Object} options
+  * @param {boolean} [options.memo=false]
+- * @return {import('./polymorphic-component').PolymorphicComponent<import('./polymorphic-component').ElementTypeFromViewOwnProps<P>, import('./polymorphic-component').PropsFromViewOwnProps<P>>} The connected PolymorphicComponent
++ * @return {import('./polymorphic-component').PolymorphicComponent<import('./polymorphic-component').ElementTypeFromPolymorphicComponentProps<P>, import('./polymorphic-component').PropsFromPolymorphicComponentProps<P>>} The connected PolymorphicComponent
+  */
+ export function contextConnect( Component, namespace, options = {} ) {
+ 	/* eslint-enable jsdoc/valid-types */
+diff --git a/packages/components/src/ui/context/polymorphic-component.ts b/packages/components/src/ui/context/polymorphic-component.ts
+index e8f4abc9f09a8b..dcc2f3df8090fb 100644
+--- a/packages/components/src/ui/context/polymorphic-component.ts
++++ b/packages/components/src/ui/context/polymorphic-component.ts
+@@ -9,28 +9,25 @@ import type { Interpolation } from 'create-emotion';
+ /**
+  * Based on https://github.com/reakit/reakit/blob/master/packages/reakit-utils/src/types.ts
+  */
+-export type ViewOwnProps< P, T extends As > = P &
++export type PolymorphicComponentProps< P, T extends As > = P &
+ 	Omit< React.ComponentPropsWithRef< T >, 'as' | keyof P > & {
+ 		as?: T | keyof JSX.IntrinsicElements;
+ 		children?: React.ReactNode | RenderProp< ExtractHTMLAttributes< any > >;
+ 	};
+ 
+-export type ElementTypeFromViewOwnProps< P > = P extends ViewOwnProps<
+-	unknown,
+-	infer T
+->
+-	? T
+-	: never;
++export type ElementTypeFromPolymorphicComponentProps<
++	P
++> = P extends PolymorphicComponentProps< unknown, infer T > ? T : never;
+ 
+-export type PropsFromViewOwnProps< P > = P extends ViewOwnProps< infer PP, any >
+-	? PP
+-	: never;
++export type PropsFromPolymorphicComponentProps<
++	P
++> = P extends PolymorphicComponentProps< infer PP, any > ? PP : never;
+ 
+ export type PolymorphicComponent< T extends As, O > = {
+ 	< TT extends As >(
+-		props: ViewOwnProps< O, TT > & { as: TT }
++		props: PolymorphicComponentProps< O, TT > & { as: TT }
+ 	): JSX.Element | null;
+-	( props: ViewOwnProps< O, T > ): JSX.Element | null;
++	( props: PolymorphicComponentProps< O, T > ): JSX.Element | null;
+ 	displayName?: string;
+ 	selector: string;
+ };
+diff --git a/packages/components/src/ui/control-group/component.js b/packages/components/src/ui/control-group/component.js
+index 7cab290d17a871..7ea82f01387114 100644
+--- a/packages/components/src/ui/control-group/component.js
++++ b/packages/components/src/ui/control-group/component.js
+@@ -11,7 +11,7 @@ import { useControlGroup } from './hook';
+ import { contextConnect } from '../context';
+ 
+ /**
+- * @param {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
++ * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+  * @param {import('react').Ref<any>} forwardedRef
+  */
+ function ControlGroup( props, forwardedRef ) {
+diff --git a/packages/components/src/ui/control-group/hook.js b/packages/components/src/ui/control-group/hook.js
+index db3db0c60c19b1..3166a2d67c8113 100644
+--- a/packages/components/src/ui/control-group/hook.js
++++ b/packages/components/src/ui/control-group/hook.js
+@@ -12,7 +12,7 @@ import { ControlGroupContext } from './context';
+ import * as styles from './styles';
+ 
+ /**
+- * @param {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
++ * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+  */
+ export function useControlGroup( props ) {
+ 	const {
+diff --git a/packages/components/src/ui/control-label/hook.js b/packages/components/src/ui/control-label/hook.js
+index 81f201d80112ef..c21cbe3fc292fe 100644
+--- a/packages/components/src/ui/control-label/hook.js
++++ b/packages/components/src/ui/control-label/hook.js
+@@ -12,7 +12,7 @@ import { useText } from '../../text';
+ import * as styles from './styles';
+ 
+ /**
+- * @param {import('../context').ViewOwnProps<import('./types').Props, 'label'>} props
++ * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'label'>} props
+  */
+ export function useControlLabel( props ) {
+ 	const {
+diff --git a/packages/components/src/ui/elevation/hook.js b/packages/components/src/ui/elevation/hook.js
+index 04896987455740..a72d27124f815a 100644
+--- a/packages/components/src/ui/elevation/hook.js
++++ b/packages/components/src/ui/elevation/hook.js
+@@ -29,7 +29,7 @@ export function getBoxShadow( value ) {
+ }
+ 
+ /**
+- * @param {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
++ * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+  */
+ export function useElevation( props ) {
+ 	const {
+diff --git a/packages/components/src/ui/form-group/form-group-content.js b/packages/components/src/ui/form-group/form-group-content.js
+index 98dbd1a1a83583..a84f5fa32faab4 100644
+--- a/packages/components/src/ui/form-group/form-group-content.js
++++ b/packages/components/src/ui/form-group/form-group-content.js
+@@ -12,7 +12,7 @@ import FormGroupHelp from './form-group-help';
+ import FormGroupLabel from './form-group-label';
+ 
+ /**
+- * @param {import('../context').ViewOwnProps<import('./types').FormGroupContentProps, 'label'>} props
++ * @param {import('../context').PolymorphicComponentProps<import('./types').FormGroupContentProps, 'label'>} props
+  */
+ function FormGroupContent( {
+ 	alignLabel,
+diff --git a/packages/components/src/ui/form-group/form-group-label.js b/packages/components/src/ui/form-group/form-group-label.js
+index fd4af178cf6203..b39f000916a5ff 100644
+--- a/packages/components/src/ui/form-group/form-group-label.js
++++ b/packages/components/src/ui/form-group/form-group-label.js
+@@ -10,7 +10,7 @@ import { ControlLabel } from '../control-label';
+ import VisuallyHidden from '../../visually-hidden';
+ 
+ /**
+- * @param {import('../context').ViewOwnProps<import('./types').FormGroupLabelProps, 'label'>} props
++ * @param {import('../context').PolymorphicComponentProps<import('./types').FormGroupLabelProps, 'label'>} props
+  * @return {JSX.Element | null} The form group's label.
+  */
+ function FormGroupLabel( { children, id, labelHidden = false, ...props } ) {
+diff --git a/packages/components/src/ui/form-group/form-group.js b/packages/components/src/ui/form-group/form-group.js
+index 0c05df1bb81110..33a16482eb308f 100644
+--- a/packages/components/src/ui/form-group/form-group.js
++++ b/packages/components/src/ui/form-group/form-group.js
+@@ -8,7 +8,7 @@ import FormGroupContent from './form-group-content';
+ import { useFormGroup } from './use-form-group';
+ 
+ /**
+- * @param {import('../context').ViewOwnProps<import('./types').FormGroupProps, 'div'>} props
++ * @param {import('../context').PolymorphicComponentProps<import('./types').FormGroupProps, 'div'>} props
+  * @param {import('react').Ref<any>} forwardedRef
+  */
+ function FormGroup( props, forwardedRef ) {
+diff --git a/packages/components/src/ui/form-group/use-form-group.js b/packages/components/src/ui/form-group/use-form-group.js
+index a8dbcaf1e046f8..27ea0b4f96d018 100644
+--- a/packages/components/src/ui/form-group/use-form-group.js
++++ b/packages/components/src/ui/form-group/use-form-group.js
+@@ -11,7 +11,7 @@ import * as styles from './form-group-styles';
+ import { useInstanceId } from '../utils';
+ 
+ /**
+- * @param {import('../context').ViewOwnProps<import('./types').FormGroupProps, 'div'>} props
++ * @param {import('../context').PolymorphicComponentProps<import('./types').FormGroupProps, 'div'>} props
+  */
+ export function useFormGroup( props ) {
+ 	const {
+diff --git a/packages/components/src/ui/popover/component.js b/packages/components/src/ui/popover/component.js
+index 70638993796ae8..4d0fe390962de4 100644
+--- a/packages/components/src/ui/popover/component.js
++++ b/packages/components/src/ui/popover/component.js
+@@ -21,7 +21,7 @@ import { useUpdateEffect } from '../../utils/hooks';
+ 
+ /**
+  *
+- * @param {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
++ * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+  * @param {import('react').Ref<any>} forwardedRef
+  */
+ function Popover( props, forwardedRef ) {
+@@ -112,7 +112,7 @@ function Popover( props, forwardedRef ) {
+  * @example
+  * ```jsx
+  * import { Button, Popover, Text } from `@wordpress/components/ui`;
+- 
++ *
+  * function Example() {
+  * 	return (
+  * 		<Popover trigger={ <Button>Popover</Button> }>
+diff --git a/packages/components/src/ui/popover/content.js b/packages/components/src/ui/popover/content.js
+index 0c161e248b9852..6356049bb98c12 100644
+--- a/packages/components/src/ui/popover/content.js
++++ b/packages/components/src/ui/popover/content.js
+@@ -16,7 +16,7 @@ import { contextConnect, useContextSystem } from '../context';
+ 
+ /**
+  *
+- * @param {import('../context').ViewOwnProps<import('./types').ContentProps, 'div'>} props
++ * @param {import('../context').PolymorphicComponentProps<import('./types').ContentProps, 'div'>} props
+  * @param {import('react').Ref<any>} forwardedRef
+  */
+ function PopoverContent( props, forwardedRef ) {
+diff --git a/packages/components/src/ui/scrollable/hook.js b/packages/components/src/ui/scrollable/hook.js
+index 3cf82c907307cd..ca95f237dbd6aa 100644
+--- a/packages/components/src/ui/scrollable/hook.js
++++ b/packages/components/src/ui/scrollable/hook.js
+@@ -16,7 +16,7 @@ import * as styles from './styles';
+ 
+ /* eslint-disable jsdoc/valid-types */
+ /**
+- * @param {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
++ * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+  */
+ /* eslint-enable jsdoc/valid-types */
+ export function useScrollable( props ) {
+diff --git a/packages/components/src/ui/shortcut/component.tsx b/packages/components/src/ui/shortcut/component.tsx
+index 549055b2f96b7d..d82cd26fedeb8f 100644
+--- a/packages/components/src/ui/shortcut/component.tsx
++++ b/packages/components/src/ui/shortcut/component.tsx
+@@ -9,7 +9,7 @@ import type { Ref } from 'react';
+  */
+ import { useContextSystem, contextConnect } from '../context';
+ // eslint-disable-next-line no-duplicate-imports
+-import type { ViewOwnProps } from '../context';
++import type { PolymorphicComponentProps } from '../context';
+ 
+ export interface ShortcutDescription {
+ 	display: string;
+@@ -22,7 +22,7 @@ export interface Props {
+ }
+ 
+ function Shortcut(
+-	props: ViewOwnProps< Props, 'span' >,
++	props: PolymorphicComponentProps< Props, 'span' >,
+ 	forwardedRef: Ref< any >
+ ): JSX.Element | null {
+ 	const { shortcut, className, ...otherProps } = useContextSystem(
+diff --git a/packages/components/src/ui/spinner/component.js b/packages/components/src/ui/spinner/component.js
+index acbb5d32aa949f..d5c4ed3f69b4da 100644
+--- a/packages/components/src/ui/spinner/component.js
++++ b/packages/components/src/ui/spinner/component.js
+@@ -16,7 +16,7 @@ import { COLORS } from '../../utils/colors-values';
+ 
+ /**
+  *
+- * @param {import('../context').ViewOwnProps<Props, 'div'>} props
++ * @param {import('../context').PolymorphicComponentProps<Props, 'div'>} props
+  * @param {import('react').Ref<any>} forwardedRef
+  */
+ function Spinner( props, forwardedRef ) {
+diff --git a/packages/components/src/ui/surface/hook.js b/packages/components/src/ui/surface/hook.js
+index 889d879a4d3f57..cf69919b512f23 100644
+--- a/packages/components/src/ui/surface/hook.js
++++ b/packages/components/src/ui/surface/hook.js
+@@ -15,7 +15,7 @@ import { useContextSystem } from '../context';
+ import * as styles from './styles';
+ 
+ /**
+- * @param {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
++ * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+  */
+ export function useSurface( props ) {
+ 	const {
+diff --git a/packages/components/src/ui/tooltip/component.js b/packages/components/src/ui/tooltip/component.js
+index 94f5ed3ea01390..059872e61d88eb 100644
+--- a/packages/components/src/ui/tooltip/component.js
++++ b/packages/components/src/ui/tooltip/component.js
+@@ -18,7 +18,7 @@ import TooltipContent from './content';
+ import { TooltipShortcut } from './styles';
+ 
+ /**
+- * @param {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
++ * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+  * @param {import('react').Ref<any>} forwardedRef
+  */
+ function Tooltip( props, forwardedRef ) {
+diff --git a/packages/components/src/ui/tooltip/content.js b/packages/components/src/ui/tooltip/content.js
+index 370dee96a7644f..1fc0780eae468b 100644
+--- a/packages/components/src/ui/tooltip/content.js
++++ b/packages/components/src/ui/tooltip/content.js
+@@ -17,7 +17,7 @@ const { TooltipPopoverView } = styles;
+ 
+ /**
+  *
+- * @param {import('../context').ViewOwnProps<import('reakit').TooltipProps, 'div'>} props
++ * @param {import('../context').PolymorphicComponentProps<import('reakit').TooltipProps, 'div'>} props
+  * @param {import('react').Ref<any>} forwardedRef
+  */
+ function TooltipContent( props, forwardedRef ) {
+diff --git a/packages/components/src/ui/utils/create-component.tsx b/packages/components/src/ui/utils/create-component.tsx
+index 45b77424489423..4cf21c2352751e 100644
+--- a/packages/components/src/ui/utils/create-component.tsx
++++ b/packages/components/src/ui/utils/create-component.tsx
+@@ -12,13 +12,16 @@ import { contextConnect } from '../context';
+ // eslint-disable-next-line no-duplicate-imports
+ import type {
+ 	PolymorphicComponent,
+-	PropsFromViewOwnProps,
+-	ElementTypeFromViewOwnProps,
+-	ViewOwnProps,
++	PropsFromPolymorphicComponentProps,
++	ElementTypeFromPolymorphicComponentProps,
++	PolymorphicComponentProps,
+ } from '../context';
+ import { View } from '../../view';
+ 
+-interface Options< A extends As, P extends ViewOwnProps< {}, A > > {
++interface Options<
++	A extends As,
++	P extends PolymorphicComponentProps< {}, A >
++> {
+ 	as: A;
+ 	name: string;
+ 	useHook: ( props: P ) => any;
+@@ -37,15 +40,15 @@ interface Options< A extends As, P extends ViewOwnProps< {}, A > > {
+  */
+ export const createComponent = <
+ 	A extends As,
+-	P extends ViewOwnProps< {}, A >
++	P extends PolymorphicComponentProps< {}, A >
+ >( {
+ 	as,
+ 	name,
+ 	useHook,
+ 	memo = false,
+ }: Options< A, P > ): PolymorphicComponent<
+-	ElementTypeFromViewOwnProps< P >,
+-	PropsFromViewOwnProps< P >
++	ElementTypeFromPolymorphicComponentProps< P >,
++	PropsFromPolymorphicComponentProps< P >
+ > => {
+ 	function Component( props: P, forwardedRef: Ref< any > ) {
+ 		const otherProps = useHook( props );
+diff --git a/packages/components/src/ui/utils/test/create-component.js b/packages/components/src/ui/utils/test/create-component.js
+index 44819369c381b5..01dbd7b9917974 100644
+--- a/packages/components/src/ui/utils/test/create-component.js
++++ b/packages/components/src/ui/utils/test/create-component.js
+@@ -15,7 +15,7 @@ import { createComponent } from '../create-component';
+ 
+ describe( 'createComponent', () => {
+ 	/**
+-	 * @param {import('../context').ViewOwnProps<{}, 'output'>} props
++	 * @param {import('../context').PolymorphicComponentProps<{}, 'output'>} props
+ 	 */
+ 	const useHook = ( props ) => ( { ...props, 'data-hook-test-prop': true } );
+ 	const name = 'Output';
+diff --git a/packages/components/src/ui/visually-hidden/hook.js b/packages/components/src/ui/visually-hidden/hook.js
+index d46c65cb8cbfe9..e8e7980c72dbec 100644
+--- a/packages/components/src/ui/visually-hidden/hook.js
++++ b/packages/components/src/ui/visually-hidden/hook.js
+@@ -9,10 +9,10 @@ import { cx } from 'emotion';
+ import * as styles from './styles';
+ 
+ // duplicate this for the sake of being able to export it, it'll be removed when we replace VisuallyHidden in components/src anyway
+-/** @typedef {import('../context').ViewOwnProps<{}, 'div'>} Props */
++/** @typedef {import('../context').PolymorphicComponentProps<{}, 'div'>} Props */
+ 
+ /**
+- * @param {import('../context').ViewOwnProps<{}, 'div'>} props
++ * @param {import('../context').PolymorphicComponentProps<{}, 'div'>} props
+  */
+ export function useVisuallyHidden( { className, ...props } ) {
+ 	// circumvent the context system and write the classnames ourselves
+diff --git a/packages/components/src/v-stack/hook.js b/packages/components/src/v-stack/hook.js
+index 86cd61076ffcee..0dcd4d33c739ae 100644
+--- a/packages/components/src/v-stack/hook.js
++++ b/packages/components/src/v-stack/hook.js
+@@ -6,7 +6,7 @@ import { useHStack } from '../h-stack';
+ 
+ /**
+  *
+- * @param {import('../ui/context').ViewOwnProps<import('./types').Props, 'div'>} props
++ * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+  */
+ export function useVStack( props ) {
+ 	const { expanded = false, ...otherProps } = useContextSystem(

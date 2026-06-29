@@ -1,0 +1,100 @@
+diff --git a/packages/components/src/search-control/index.js b/packages/components/src/search-control/index.js
+index 3f2b78fc536122..09ff733918f3a2 100644
+--- a/packages/components/src/search-control/index.js
++++ b/packages/components/src/search-control/index.js
+@@ -6,17 +6,16 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
+-import { useInstanceId } from '@wordpress/compose';
++import { useInstanceId, useMergeRefs } from '@wordpress/compose';
+ import { __ } from '@wordpress/i18n';
+ import { Icon, search, closeSmall } from '@wordpress/icons';
+-import { forwardRef } from '@wordpress/element';
++import { forwardRef, useRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+ import { Button } from '../';
+ import BaseControl from '../base-control';
+-import { useCombinedRef } from '../utils';
+ 
+ function SearchControl(
+ 	{
+@@ -30,10 +29,10 @@ function SearchControl(
+ 		help,
+ 		onClose,
+ 	},
+-	ref
++	forwardedRef
+ ) {
++	const searchRef = useRef();
+ 	const instanceId = useInstanceId( SearchControl );
+-	const searchInput = useCombinedRef( ref );
+ 	const id = `components-search-control-${ instanceId }`;
+ 
+ 	const renderRightButton = () => {
+@@ -54,7 +53,7 @@ function SearchControl(
+ 					label={ __( 'Reset search' ) }
+ 					onClick={ () => {
+ 						onChange( '' );
+-						searchInput.current.focus();
++						searchRef.current.focus();
+ 					} }
+ 				/>
+ 			);
+@@ -73,7 +72,7 @@ function SearchControl(
+ 		>
+ 			<div className="components-search-control__input-wrapper">
+ 				<input
+-					ref={ searchInput }
++					ref={ useMergeRefs( [ searchRef, forwardedRef ] ) }
+ 					className="components-search-control__input"
+ 					id={ id }
+ 					type="search"
+diff --git a/packages/components/src/utils/hooks/index.js b/packages/components/src/utils/hooks/index.js
+index 9d8273f901b606..beacf31b7562cd 100644
+--- a/packages/components/src/utils/hooks/index.js
++++ b/packages/components/src/utils/hooks/index.js
+@@ -1,6 +1,5 @@
+ export { default as useControlledState } from './use-controlled-state';
+ export { default as useUpdateEffect } from './use-update-effect';
+-export { useCombinedRef } from './use-combined-ref';
+ export { useControlledValue } from './use-controlled-value';
+ export { useCx } from './use-cx';
+ export { useLatestRef } from './use-latest-ref';
+diff --git a/packages/components/src/utils/hooks/use-combined-ref.ts b/packages/components/src/utils/hooks/use-combined-ref.ts
+deleted file mode 100644
+index 332818662a1c9d..00000000000000
+--- a/packages/components/src/utils/hooks/use-combined-ref.ts
++++ /dev/null
+@@ -1,28 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useRef, useEffect } from '@wordpress/element';
+-/**
+- * External dependencies
+- */
+-import type { MutableRefObject, RefCallback } from 'react';
+-
+-type Ref< T > = MutableRefObject< T | null > | RefCallback< T | null >;
+-
+-export function useCombinedRef< T extends HTMLElement >( ...refs: Ref< T >[] ) {
+-	const targetRef = useRef( null );
+-
+-	useEffect( () => {
+-		refs.forEach( ( ref ) => {
+-			if ( ! ref ) return;
+-
+-			if ( typeof ref === 'function' ) {
+-				ref( targetRef.current );
+-			} else {
+-				ref.current = targetRef.current;
+-			}
+-		} );
+-	}, [ refs ] );
+-
+-	return targetRef;
+-}

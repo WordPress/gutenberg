@@ -1,0 +1,26 @@
+diff --git a/packages/components/src/button/stories/index.story.tsx b/packages/components/src/button/stories/index.story.tsx
+index 0a0152fac8e93e..5abe3fa13a647c 100644
+--- a/packages/components/src/button/stories/index.story.tsx
++++ b/packages/components/src/button/stories/index.story.tsx
+@@ -18,7 +18,6 @@ import {
+ /**
+  * Internal dependencies
+  */
+-import './style.css';
+ import Button from '..';
+ 
+ const meta: Meta< typeof Button > = {
+diff --git a/packages/components/src/button/stories/style.css b/packages/components/src/button/stories/style.css
+deleted file mode 100644
+index 239018d6a298a4..00000000000000
+--- a/packages/components/src/button/stories/style.css
++++ /dev/null
+@@ -1,8 +0,0 @@
+-.story-buttons-container {
+-	display: flex;
+-}
+-
+-.story-buttons-container > * {
+-	margin-right: 10px;
+-	margin-bottom: 10px;
+-}

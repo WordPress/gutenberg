@@ -1,0 +1,69 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5df10f16b91942..bd31d14c3e07a0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -18,6 +18,7 @@
+ 
+ ### Internal
+ 
++-   `Toolbar/ToolbarDropdownMenu `: Convert to TypeScript ([#54321](https://github.com/WordPress/gutenberg/pull/54321)).
+ -   `Composite`: Convert to TypeScript ([#54028](https://github.com/WordPress/gutenberg/pull/54028)).
+ -   `BorderControl`: Refactor unit tests to use `userEvent` ([#54155](https://github.com/WordPress/gutenberg/pull/54155))
+ -   `FocusableIframe`: Convert to TypeScript ([#53979](https://github.com/WordPress/gutenberg/pull/53979)).
+diff --git a/packages/components/src/toolbar/toolbar-dropdown-menu/index.js b/packages/components/src/toolbar/toolbar-dropdown-menu/index.tsx
+similarity index 73%
+rename from packages/components/src/toolbar/toolbar-dropdown-menu/index.js
+rename to packages/components/src/toolbar/toolbar-dropdown-menu/index.tsx
+index 5a99fe00a6d507..6dc5fd523ec2fa 100644
+--- a/packages/components/src/toolbar/toolbar-dropdown-menu/index.js
++++ b/packages/components/src/toolbar/toolbar-dropdown-menu/index.tsx
+@@ -1,25 +1,32 @@
+-// @ts-nocheck
+-
+ /**
+  * WordPress dependencies
+  */
+ import { forwardRef, useContext } from '@wordpress/element';
+ 
++/**
++ * External dependencies
++ */
++import type { ForwardedRef } from 'react';
++
+ /**
+  * Internal dependencies
+  */
+ import ToolbarItem from '../toolbar-item';
+ import ToolbarContext from '../toolbar-context';
+ import DropdownMenu from '../../dropdown-menu';
++import type { DropdownMenuProps } from '../../dropdown-menu/types';
+ 
+-function ToolbarDropdownMenu( props, ref ) {
++function ToolbarDropdownMenu(
++	props: DropdownMenuProps,
++	ref: ForwardedRef< any >
++) {
+ 	const accessibleToolbarState = useContext( ToolbarContext );
+ 
+ 	if ( ! accessibleToolbarState ) {
+ 		return <DropdownMenu { ...props } />;
+ 	}
+ 
+-	// ToobarItem will pass all props to the render prop child, which will pass
++	// ToolbarItem will pass all props to the render prop child, which will pass
+ 	// all props to the toggle of DropdownMenu. This means that ToolbarDropdownMenu
+ 	// has the same API as DropdownMenu.
+ 	return (
+diff --git a/packages/components/src/ui/context/wordpress-component.ts b/packages/components/src/ui/context/wordpress-component.ts
+index 3fc499900153bc..bf70924b40bbbd 100644
+--- a/packages/components/src/ui/context/wordpress-component.ts
++++ b/packages/components/src/ui/context/wordpress-component.ts
+@@ -14,7 +14,7 @@ export type WordPressComponentProps<
+ > = P &
+ 	// The `children` prop is being explicitly omitted since it is otherwise implicitly added
+ 	// by `ComponentPropsWithRef`. The context is that components should require the `children`
+-	// prop explicitely when needed (see https://github.com/WordPress/gutenberg/pull/31817).
++	// prop explicitly when needed (see https://github.com/WordPress/gutenberg/pull/31817).
+ 	Omit< React.ComponentPropsWithoutRef< T >, 'as' | keyof P | 'children' > &
+ 	( IsPolymorphic extends true
+ 		? {

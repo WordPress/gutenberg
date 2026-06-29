@@ -1,0 +1,53 @@
+diff --git a/packages/block-editor/src/components/block-styles/index.js b/packages/block-editor/src/components/block-styles/index.js
+index 22aa36239defd9..02be59b98deece 100644
+--- a/packages/block-editor/src/components/block-styles/index.js
++++ b/packages/block-editor/src/components/block-styles/index.js
+@@ -11,7 +11,7 @@ import { useState, useLayoutEffect } from '@wordpress/element';
+ import { useViewportMatch } from '@wordpress/compose';
+ import {
+ 	Button,
+-	__experimentalText as Text,
++	__experimentalTruncate as Truncate,
+ 	Slot,
+ 	Fill,
+ } from '@wordpress/components';
+@@ -117,15 +117,12 @@ function BlockStyles( {
+ 							onClick={ () => onSelectStylePreview( style ) }
+ 							aria-current={ activeStyle.name === style.name }
+ 						>
+-							<Text
+-								as="span"
+-								limit={ 12 }
+-								ellipsizeMode="tail"
++							<Truncate
++								numberOfLines={ 1 }
+ 								className="block-editor-block-styles__item-text"
+-								truncate
+ 							>
+ 								{ buttonText }
+-							</Text>
++							</Truncate>
+ 						</Button>
+ 					);
+ 				} ) }
+diff --git a/packages/block-editor/src/components/block-styles/style.scss b/packages/block-editor/src/components/block-styles/style.scss
+index bed73bfedf1e23..794608c5d3c96f 100644
+--- a/packages/block-editor/src/components/block-styles/style.scss
++++ b/packages/block-editor/src/components/block-styles/style.scss
+@@ -64,6 +64,16 @@
+ 			box-shadow: inset 0 0 0 1px $white, 0 0 0 2px var(--wp-admin-theme-color);
+ 		}
+ 	}
++
++	.block-editor-block-styles__item-text {
++		word-break: break-all;
++		// The Button component is white-space: nowrap, and that won't work with line-clamp.
++		white-space: normal;
++
++		// Without this, the ellipsis can sometimes be partially hidden by the Button padding.
++		text-align: start;
++		text-align-last: center;
++	}
+ }
+ 
+ // To prevent overflow in the preview container,

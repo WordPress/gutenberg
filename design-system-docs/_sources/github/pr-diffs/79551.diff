@@ -1,0 +1,30 @@
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index 75c4fcc23059cf..48064c2a05cc67 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fixes
++
++-   Mark the published `design-tokens.css` file as side-effectful so downstream bundlers preserve the documented CSS import ([#79551](https://github.com/WordPress/gutenberg/pull/79551)).
++
+ ## 0.16.0 (2026-06-24)
+ 
+ ### Breaking Changes
+diff --git a/packages/theme/package.json b/packages/theme/package.json
+index e8cc14ee1e6d78..14241be92a182f 100644
+--- a/packages/theme/package.json
++++ b/packages/theme/package.json
+@@ -77,7 +77,9 @@
+ 	},
+ 	"wpScript": true,
+ 	"types": "build-types",
+-	"sideEffects": false,
++	"sideEffects": [
++		"src/prebuilt/css/design-tokens.css"
++	],
+ 	"dependencies": {
+ 		"@wordpress/compose": "file:../compose",
+ 		"@wordpress/element": "file:../element",

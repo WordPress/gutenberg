@@ -1,0 +1,479 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 7a89002064936a..4af772a5060927 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -18,6 +18,7 @@
+ -   `withFallbackStyles` HOC: Convert to TypeScript ([#48720](https://github.com/WordPress/gutenberg/pull/48720)).
+ -   `navigateRegions` HOC: Convert to TypeScript ([#48632](https://github.com/WordPress/gutenberg/pull/48632)).
+ -   `withSpokenMessages`: HOC: Convert to TypeScript ([#48163](https://github.com/WordPress/gutenberg/pull/48163)).
++-   `DimensionControl(Experimental)`: Convert to TypeScript ([#47351](https://github.com/WordPress/gutenberg/pull/47351)).
+ 
+ ## 23.5.0 (2023-03-01)
+ 
+diff --git a/packages/components/src/dimension-control/README.md b/packages/components/src/dimension-control/README.md
+index d310820a12f84d..498322931b7ab6 100644
+--- a/packages/components/src/dimension-control/README.md
++++ b/packages/components/src/dimension-control/README.md
+@@ -8,77 +8,46 @@ This feature is still experimental. “Experimental” means this is an early im
+ 
+ ## Usage
+ 
+-In a block's `edit` implementation, render a `<DimensionControl />` component.
+-
+ ```jsx
+-import { registerBlockType } from '@wordpress/blocks';
+-import { __ } from '@wordpress/i18n';
+-import { DimensionControl } from '@wordpress/components';
+-
+-const partialRight =
+-	( fn, ...partialArgs ) =>
+-	( ...args ) =>
+-		fn( ...args, ...partialArgs );
+-
+-registerBlockType( 'my-plugin/my-block', {
+-	// ...
+-
+-	attributes: {
+-		// other attributes here
+-		// ...
+-
+-		paddingSize: {
+-			type: 'string',
+-		},
+-	},
+-
+-	edit( { attributes, setAttributes, clientId } ) {
+-		const { paddingSize } = attributes;
+-
+-		const updateSpacing = ( dimension, size, device = '' ) => {
+-			setAttributes( {
+-				[ `${ dimension }${ device }` ]: size,
+-			} );
+-		};
+-
+-		return (
+-			<DimensionControl
+-				label={ __( 'Padding' ) }
+-				icon={ 'desktop' }
+-				onChange={ partialRight( updateSpacing, 'paddingSize' ) }
+-				value={ paddingSize }
+-			/>
+-		);
+-	},
+-} );
++import { useState } from 'react';
++import { __experimentalDimensionControl as DimensionControl } from '@wordpress/components';
++
++export default function MyCustomDimensionControl() {
++	const [ paddingSize, setPaddingSize ] = useState( '' );
++
++	return (
++		<DimensionControl
++			label={ 'Padding' }
++			icon={ 'desktop' }
++			onChange={ ( value ) => setPaddingSize( value ) }
++			value={ paddingSize }
++		/>
++	);
++}
+ ```
+ 
+-_Note:_ it is recommended to partially apply the value of the Block attribute to be updated (eg: `paddingSize`, `marginSize`...etc) to your callback functions. This avoids the need to unnecessarily couple the component to the Block attribute schema.
+-
+ _Note:_ by default, if you do not provide an initial `value` prop for the current dimension value, then no value will be selected (ie: there is no default dimension set).
+ 
+ ## Props
+ 
+ ### `label`
+ 
+--   **Type:** `String`
+--   **Default:** `undefined`
++-   **Type:** `string`
+ -   **Required:** Yes
+ 
+ The human readable label for the control.
+ 
+ ### `value`
+ 
+--   **Type:** `String`
+--   **Default:** `''`
++-   **Type:** `string`
+ -   **Required:** No
+ 
+ The current value of the dimension UI control. If provided the UI with automatically select the value.
+ 
+ ### `sizes`
+ 
+--   **Type:** `Array`
+--   **Default:** See `packages/block-editor/src/components/dimension-control/sizes.js`
++-   **Type:** `{ name: string; slug: string }[]`
++-   **Default:** See `packages/block-editor/src/components/dimension-control/sizes.ts`
+ -   **Required:** No
+ 
+ An optional array of size objects in the following shape:
+@@ -101,16 +70,14 @@ By default a set of relative sizes (`small`, `medium`...etc) are provided. See `
+ 
+ ### `icon`
+ 
+--   **Type:** `String`
+--   **Default:** `undefined`
++-   **Type:** `string`
+ -   **Required:** No
+ 
+ An optional dashicon to display before to the control label.
+ 
+ ### `onChange`
+ 
+--   **Type:** `Function`
+--   **Default:** `undefined`
++-   **Type:** `( value?: string ) => void;`
+ -   **Required:** No
+ -   **Arguments:**:
+     -   `size` - a string representing the selected size (eg: `medium`)
+@@ -119,7 +86,7 @@ A callback which is triggered when a spacing size value changes (is selected/cli
+ 
+ ### `className`
+ 
+--   **Type:** `String`
++-   **Type:** `string`
+ -   **Default:** `''`
+ -   **Required:** No
+ 
+diff --git a/packages/components/src/dimension-control/index.js b/packages/components/src/dimension-control/index.js
+deleted file mode 100644
+index a6893b165fbf0a..00000000000000
+--- a/packages/components/src/dimension-control/index.js
++++ /dev/null
+@@ -1,73 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { __ } from '@wordpress/i18n';
+-
+-/**
+- * Internal dependencies
+- */
+-import { Icon, SelectControl } from '../';
+-import sizesTable, { findSizeBySlug } from './sizes';
+-
+-export function DimensionControl( props ) {
+-	const {
+-		label,
+-		value,
+-		sizes = sizesTable,
+-		icon,
+-		onChange,
+-		className = '',
+-	} = props;
+-
+-	const onChangeSpacingSize = ( val ) => {
+-		const theSize = findSizeBySlug( sizes, val );
+-
+-		if ( ! theSize || value === theSize.slug ) {
+-			onChange( undefined );
+-		} else if ( typeof onChange === 'function' ) {
+-			onChange( theSize.slug );
+-		}
+-	};
+-
+-	const formatSizesAsOptions = ( theSizes ) => {
+-		const options = theSizes.map( ( { name, slug } ) => ( {
+-			label: name,
+-			value: slug,
+-		} ) );
+-
+-		return [
+-			{
+-				label: __( 'Default' ),
+-				value: '',
+-			},
+-		].concat( options );
+-	};
+-
+-	const selectLabel = (
+-		<>
+-			{ icon && <Icon icon={ icon } /> }
+-			{ label }
+-		</>
+-	);
+-
+-	return (
+-		<SelectControl
+-			className={ classnames(
+-				className,
+-				'block-editor-dimension-control'
+-			) }
+-			label={ selectLabel }
+-			hideLabelFromVision={ false }
+-			value={ value }
+-			onChange={ onChangeSpacingSize }
+-			options={ formatSizesAsOptions( sizes ) }
+-		/>
+-	);
+-}
+-
+-export default DimensionControl;
+diff --git a/packages/components/src/dimension-control/index.tsx b/packages/components/src/dimension-control/index.tsx
+new file mode 100644
+index 00000000000000..21255a0ec65e04
+--- /dev/null
++++ b/packages/components/src/dimension-control/index.tsx
+@@ -0,0 +1,101 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * WordPress dependencies
++ */
++import { __ } from '@wordpress/i18n';
++
++/**
++ * Internal dependencies
++ */
++import Icon from '../icon';
++import SelectControl from '../select-control';
++import sizesTable, { findSizeBySlug } from './sizes';
++import type { DimensionControlProps, Size } from './types';
++import type { SelectControlSingleSelectionProps } from '../select-control/types';
++
++/**
++ * `DimensionControl` is a component designed to provide a UI to control spacing and/or dimensions.
++ *
++ * This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
++ *
++ * ```jsx
++ * import { useState } from 'react';
++ * import { __experimentalDimensionControl as DimensionControl } from '@wordpress/components';
++ *
++ * export default function MyCustomDimensionControl() {
++ * 	const [ paddingSize, setPaddingSize ] = useState( '' );
++ *
++ * 	return (
++ * 		<DimensionControl
++ * 			label={ 'Padding' }
++ * 			icon={ 'desktop' }
++ * 			onChange={ ( value ) => setPaddingSize( value ) }
++ * 			value={ paddingSize }
++ * 		/>
++ * 	);
++ * }
++ * ```
++ */
++export function DimensionControl( props: DimensionControlProps ) {
++	const {
++		label,
++		value,
++		sizes = sizesTable,
++		icon,
++		onChange,
++		className = '',
++	} = props;
++
++	const onChangeSpacingSize: SelectControlSingleSelectionProps[ 'onChange' ] =
++		( val ) => {
++			const theSize = findSizeBySlug( sizes, val );
++
++			if ( ! theSize || value === theSize.slug ) {
++				onChange?.( undefined );
++			} else if ( typeof onChange === 'function' ) {
++				onChange( theSize.slug );
++			}
++		};
++
++	const formatSizesAsOptions = ( theSizes: Size[] ) => {
++		const options = theSizes.map( ( { name, slug } ) => ( {
++			label: name,
++			value: slug,
++		} ) );
++
++		return [
++			{
++				label: __( 'Default' ),
++				value: '',
++			},
++			...options,
++		];
++	};
++
++	const selectLabel = (
++		<>
++			{ icon && <Icon icon={ icon } /> }
++			{ label }
++		</>
++	);
++
++	return (
++		<SelectControl
++			className={ classnames(
++				className,
++				'block-editor-dimension-control'
++			) }
++			label={ selectLabel }
++			hideLabelFromVision={ false }
++			value={ value }
++			onChange={ onChangeSpacingSize }
++			options={ formatSizesAsOptions( sizes ) }
++		/>
++	);
++}
++
++export default DimensionControl;
+diff --git a/packages/components/src/dimension-control/sizes.js b/packages/components/src/dimension-control/sizes.ts
+similarity index 76%
+rename from packages/components/src/dimension-control/sizes.js
+rename to packages/components/src/dimension-control/sizes.ts
+index 55dcff9698d4e4..40700d34f191df 100644
+--- a/packages/components/src/dimension-control/sizes.js
++++ b/packages/components/src/dimension-control/sizes.ts
+@@ -12,16 +12,19 @@
+  */
+ import { _x } from '@wordpress/i18n';
+ 
++/**
++ * Internal dependencies
++ */
++import type { Size } from './types';
++
+ /**
+  * Finds the correct size object from the provided sizes
+  * table by size slug (eg: `medium`)
+  *
+- * @param {Array}  sizes containing objects for each size definition.
+- * @param {string} slug  a string representation of the size (eg: `medium`).
+- *
+- * @return {Object} the matching size definition.
++ * @param sizes containing objects for each size definition.
++ * @param slug  a string representation of the size (eg: `medium`).
+  */
+-export const findSizeBySlug = ( sizes, slug ) =>
++export const findSizeBySlug = ( sizes: Size[], slug: string ) =>
+ 	sizes.find( ( size ) => slug === size.slug );
+ 
+ export default [
+diff --git a/packages/components/src/dimension-control/stories/index.tsx b/packages/components/src/dimension-control/stories/index.tsx
+new file mode 100644
+index 00000000000000..e34200754c9c4a
+--- /dev/null
++++ b/packages/components/src/dimension-control/stories/index.tsx
+@@ -0,0 +1,48 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++/**
++ * Internal dependencies
++ */
++import { DimensionControl } from '..';
++import sizes from '../sizes';
++
++/**
++ * WordPress dependencies
++ */
++import { desktop, tablet, mobile } from '@wordpress/icons';
++
++export default {
++	component: DimensionControl,
++	title: 'Components (Experimental)/DimensionControl',
++	argTypes: {
++		onChange: { action: 'onChange' },
++		value: { control: { type: null } },
++		icon: {
++			control: { type: 'select' },
++			options: [ '-', 'desktop', 'tablet', 'mobile' ],
++			mapping: {
++				'-': undefined,
++				desktop,
++				tablet,
++				mobile,
++			},
++		},
++		parameters: {
++			controls: { expanded: true },
++			docs: { source: { state: 'open' } },
++		},
++	},
++} as ComponentMeta< typeof DimensionControl >;
++
++const Template: ComponentStory< typeof DimensionControl > = ( args ) => (
++	<DimensionControl { ...args } />
++);
++
++export const Default = Template.bind( {} );
++
++Default.args = {
++	label: 'Please select a size',
++	sizes,
++};
+diff --git a/packages/components/src/dimension-control/types.ts b/packages/components/src/dimension-control/types.ts
+new file mode 100644
+index 00000000000000..534b80053db968
+--- /dev/null
++++ b/packages/components/src/dimension-control/types.ts
+@@ -0,0 +1,48 @@
++/**
++ * Internal dependencies
++ */
++import type { IconType } from '../icon';
++
++export type Size = {
++	/**
++	 * Human-readable name of the size.
++	 */
++	name: string;
++	/**
++	 * Short unique identifying name of the size.
++	 */
++	slug: string;
++};
++
++export type DimensionControlProps = {
++	/**
++	 * Label for the control.
++	 */
++	label: string;
++	/**
++	 * An array of sizes to choose from.
++	 *
++	 * @default DEFAULT_SIZES
++	 *
++	 * @see packages/components/src/dimension-control/sizes.ts
++	 */
++	sizes?: Size[];
++	/**
++	 * Optional icon rendered in front on the label.
++	 */
++	icon?: IconType;
++	/**
++	 * Used to externally control the current value of the control.
++	 */
++	value?: string;
++	/**
++	 * Function called with the control's internal state changes. The `value` property is equal to a given size slug.
++	 */
++	onChange?: ( value?: string ) => void;
++	/**
++	 * CSS class applied to `SelectControl`.
++	 *
++	 * @default ''
++	 */
++	className?: string;
++};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index b8c3c53144f005..149fede3458fd8 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -46,7 +46,6 @@
+ 		"src/**/test/**/*.js", // only exclude js files, ts{x} files should be checked
+ 		"src/index.js",
+ 		"src/custom-gradient-picker",
+-		"src/dimension-control",
+ 		"src/duotone-picker",
+ 		"src/gradient-picker",
+ 		"src/higher-order/with-filters",

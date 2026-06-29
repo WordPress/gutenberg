@@ -1,0 +1,61 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1e368b8baa75b8..6fdcea3ef8150b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -28,6 +28,7 @@
+ -   `Flex`, `FlexItem`, `FlexBlock`: Convert to TypeScript ([#42537](https://github.com/WordPress/gutenberg/pull/42537)).
+ -   `InputControl`: Fix incorrect `size` prop passing ([#42793](https://github.com/WordPress/gutenberg/pull/42793)).
+ -   `Popover`: rewrite Storybook examples using controls [#42903](https://github.com/WordPress/gutenberg/pull/42903)).
++-   `Swatch`: Convert to TypeScript ([#42162](https://github.com/WordPress/gutenberg/pull/42162)).
+ 
+ ## 19.16.0 (2022-07-27)
+ 
+diff --git a/packages/components/src/swatch/index.js b/packages/components/src/swatch/index.tsx
+similarity index 57%
+rename from packages/components/src/swatch/index.js
+rename to packages/components/src/swatch/index.tsx
+index 1d86ace0ec7736..955fb3079fe4ae 100644
+--- a/packages/components/src/swatch/index.js
++++ b/packages/components/src/swatch/index.tsx
+@@ -7,8 +7,11 @@ import { swatch } from '@wordpress/icons';
+  * Internal dependencies
+  */
+ import Icon from '../icon';
++import type { SwatchProps } from './types';
+ 
+-function Swatch( { fill } ) {
++// This component will be deprecated. Use `ColorIndicator` instead.
++// TODO: Consolidate this component with `ColorIndicator`.
++function Swatch( { fill }: SwatchProps ) {
+ 	return fill ? (
+ 		<span className="components-swatch" style={ { background: fill } } />
+ 	) : (
+diff --git a/packages/components/src/swatch/types.ts b/packages/components/src/swatch/types.ts
+new file mode 100644
+index 00000000000000..96db68094ad6fe
+--- /dev/null
++++ b/packages/components/src/swatch/types.ts
+@@ -0,0 +1,11 @@
++/**
++ * External dependencies
++ */
++import type { CSSProperties } from 'react';
++
++export type SwatchProps = {
++	/**
++	 * The color to display in the swatch.
++	 */
++	fill?: CSSProperties[ 'background' ];
++};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index cc5f7e3be2634b..b58f29202efddb 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -85,6 +85,7 @@
+ 		"src/spacer/**/*",
+ 		"src/spinner/**/*",
+ 		"src/surface/**/*",
++		"src/swatch/**/*",
+ 		"src/text/**/*",
+ 		"src/text-control/**/*",
+ 		"src/text-highlight/**/*",

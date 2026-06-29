@@ -1,0 +1,238 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 36b1c8fcc55d00..594bb47e187d51 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -23,11 +23,13 @@
+ 
+ -   `Composite`: add stable version of the component ([#63564](https://github.com/WordPress/gutenberg/pull/63564)).
+ -   `Composite`: add `Hover` and `Typeahead` subcomponents ([#64399](https://github.com/WordPress/gutenberg/pull/64399)).
+--   `Composite`: export `useCompositeStore, add focus-related props to `Composite`and`Composite.Item` subcomponents ([#64450](https://github.com/WordPress/gutenberg/pull/64450)).
++-   `Composite`: export `useCompositeStore`, add focus-related props to `Composite`and`Composite.Item` subcomponents ([#64450](https://github.com/WordPress/gutenberg/pull/64450)).
++-   `Composite`: add `Context` subcomponent ([#64493](https://github.com/WordPress/gutenberg/pull/64493)).
+ 
+ ### Enhancements
+ 
+ -   `Composite`: improve Storybook examples and add interactive controls ([#64397](https://github.com/WordPress/gutenberg/pull/64397)).
++-   `Composite`: use internal context to forward the composite store to sub-components ([#64493](https://github.com/WordPress/gutenberg/pull/64493)).
+ -   `QueryControls`: Default to new 40px size ([#64457](https://github.com/WordPress/gutenberg/pull/64457)).
+ -   `TimePicker`: add `hideLabelFromVision` prop ([#64267](https://github.com/WordPress/gutenberg/pull/64267)).
+ -   `DropdownMenuV2`: adopt elevation scale ([#64432](https://github.com/WordPress/gutenberg/pull/64432)).
+diff --git a/packages/components/src/composite/README.md b/packages/components/src/composite/README.md
+index 3670e31b01e9df..76e345b16d13fa 100644
+--- a/packages/components/src/composite/README.md
++++ b/packages/components/src/composite/README.md
+@@ -315,3 +315,7 @@ Allows the component to be rendered as a different HTML element or React compone
+ The contents of the component.
+ 
+ -   Required: no
++
++### `Composite.Context`
++
++The React context used by the composite components. It can be used by to access the composite store, and to forward the context when composite sub-components are rendered across portals (ie. `SlotFill` components) that would not otherwise forward the context to the `Fill` children.
+diff --git a/packages/components/src/composite/context.ts b/packages/components/src/composite/context.ts
+new file mode 100644
+index 00000000000000..69a052c5bfba19
+--- /dev/null
++++ b/packages/components/src/composite/context.ts
+@@ -0,0 +1,14 @@
++/**
++ * WordPress dependencies
++ */
++import { createContext, useContext } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import type { CompositeContextProps } from './types';
++
++export const CompositeContext =
++	createContext< CompositeContextProps >( undefined );
++
++export const useCompositeContext = () => useContext( CompositeContext );
+diff --git a/packages/components/src/composite/index.tsx b/packages/components/src/composite/index.tsx
+index f5d92330cada3c..0bfcec2bf76600 100644
+--- a/packages/components/src/composite/index.tsx
++++ b/packages/components/src/composite/index.tsx
+@@ -16,12 +16,13 @@ import * as Ariakit from '@ariakit/react';
+ /**
+  * WordPress dependencies
+  */
+-import { forwardRef } from '@wordpress/element';
++import { useMemo, forwardRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+ import type { WordPressComponentProps } from '../context';
++import { CompositeContext, useCompositeContext } from './context';
+ import type {
+ 	CompositeStoreProps,
+ 	CompositeProps,
+@@ -72,7 +73,14 @@ const Group = forwardRef<
+ 	HTMLDivElement,
+ 	WordPressComponentProps< CompositeGroupProps, 'div', false >
+ >( function CompositeGroup( props, ref ) {
+-	return <Ariakit.CompositeGroup { ...props } ref={ ref } />;
++	const context = useCompositeContext();
++	return (
++		<Ariakit.CompositeGroup
++			store={ context?.store }
++			{ ...props }
++			ref={ ref }
++		/>
++	);
+ } );
+ Group.displayName = 'Composite.Group';
+ 
+@@ -80,7 +88,14 @@ const GroupLabel = forwardRef<
+ 	HTMLDivElement,
+ 	WordPressComponentProps< CompositeGroupLabelProps, 'div', false >
+ >( function CompositeGroupLabel( props, ref ) {
+-	return <Ariakit.CompositeGroupLabel { ...props } ref={ ref } />;
++	const context = useCompositeContext();
++	return (
++		<Ariakit.CompositeGroupLabel
++			store={ context?.store }
++			{ ...props }
++			ref={ ref }
++		/>
++	);
+ } );
+ GroupLabel.displayName = 'Composite.GroupLabel';
+ 
+@@ -88,7 +103,14 @@ const Item = forwardRef<
+ 	HTMLButtonElement,
+ 	WordPressComponentProps< CompositeItemProps, 'button', false >
+ >( function CompositeItem( props, ref ) {
+-	return <Ariakit.CompositeItem { ...props } ref={ ref } />;
++	const context = useCompositeContext();
++	return (
++		<Ariakit.CompositeItem
++			store={ context?.store }
++			{ ...props }
++			ref={ ref }
++		/>
++	);
+ } );
+ Item.displayName = 'Composite.Item';
+ 
+@@ -96,7 +118,14 @@ const Row = forwardRef<
+ 	HTMLDivElement,
+ 	WordPressComponentProps< CompositeRowProps, 'div', false >
+ >( function CompositeRow( props, ref ) {
+-	return <Ariakit.CompositeRow { ...props } ref={ ref } />;
++	const context = useCompositeContext();
++	return (
++		<Ariakit.CompositeRow
++			store={ context?.store }
++			{ ...props }
++			ref={ ref }
++		/>
++	);
+ } );
+ Row.displayName = 'Composite.Row';
+ 
+@@ -104,7 +133,14 @@ const Hover = forwardRef<
+ 	HTMLDivElement,
+ 	WordPressComponentProps< CompositeHoverProps, 'div', false >
+ >( function CompositeHover( props, ref ) {
+-	return <Ariakit.CompositeHover { ...props } ref={ ref } />;
++	const context = useCompositeContext();
++	return (
++		<Ariakit.CompositeHover
++			store={ context?.store }
++			{ ...props }
++			ref={ ref }
++		/>
++	);
+ } );
+ Hover.displayName = 'Composite.Hover';
+ 
+@@ -112,7 +148,14 @@ const Typeahead = forwardRef<
+ 	HTMLDivElement,
+ 	WordPressComponentProps< CompositeTypeaheadProps, 'div', false >
+ >( function CompositeTypeahead( props, ref ) {
+-	return <Ariakit.CompositeTypeahead { ...props } ref={ ref } />;
++	const context = useCompositeContext();
++	return (
++		<Ariakit.CompositeTypeahead
++			store={ context?.store }
++			{ ...props }
++			ref={ ref }
++		/>
++	);
+ } );
+ Typeahead.displayName = 'Composite.Typeahead';
+ 
+@@ -136,9 +179,28 @@ export const Composite = Object.assign(
+ 	forwardRef<
+ 		HTMLDivElement,
+ 		WordPressComponentProps< CompositeProps, 'div', false >
+-	>( function Composite( { disabled = false, ...props }, ref ) {
++	>( function Composite(
++		{ children, store, disabled = false, ...props },
++		ref
++	) {
++		const contextValue = useMemo(
++			() => ( {
++				store,
++			} ),
++			[ store ]
++		);
++
+ 		return (
+-			<Ariakit.Composite disabled={ disabled } { ...props } ref={ ref } />
++			<Ariakit.Composite
++				disabled={ disabled }
++				store={ store }
++				{ ...props }
++				ref={ ref }
++			>
++				<CompositeContext.Provider value={ contextValue }>
++					{ children }
++				</CompositeContext.Provider>
++			</Ariakit.Composite>
+ 		);
+ 	} ),
+ 	{
+@@ -260,5 +322,20 @@ export const Composite = Object.assign(
+ 		 * ```
+ 		 */
+ 		Typeahead,
++		/**
++		 * The React context used by the composite components. It can be used by
++		 * to access the composite store, and to forward the context when composite
++		 * sub-components are rendered across portals (ie. `SlotFill` components)
++		 * that would not otherwise forward the context to the `Fill` children.
++		 *
++		 * @example
++		 * ```jsx
++		 * import { Composite } from '@wordpress/components';
++		 * import { useContext } from '@wordpress/element';
++		 *
++		 * const compositeContext = useContext( Composite.Context );
++		 * ```
++		 */
++		Context: CompositeContext,
+ 	}
+ );
+diff --git a/packages/components/src/composite/types.ts b/packages/components/src/composite/types.ts
+index 5afe410f7582ba..05a2b8473eb349 100644
+--- a/packages/components/src/composite/types.ts
++++ b/packages/components/src/composite/types.ts
+@@ -3,6 +3,15 @@
+  */
+ import type * as Ariakit from '@ariakit/react';
+ 
++export type CompositeContextProps =
++	| {
++			/**
++			 * Object returned by the `useCompositeStore` hook.
++			 */
++			store: Ariakit.CompositeStore;
++	  }
++	| undefined;
++
+ export type CompositeStoreProps = {
+ 	/**
+ 	 * The current active item `id`. The active item is the element within the

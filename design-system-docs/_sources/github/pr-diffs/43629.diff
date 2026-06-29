@@ -1,0 +1,190 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 725c6e30237081..7af876eb214a9f 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-const { escapeRegExp } = require( 'lodash' );
+ const glob = require( 'glob' ).sync;
+ const { join } = require( 'path' );
+ 
+@@ -17,7 +16,8 @@ const { version } = require( './package' );
+  * @type {string}
+  */
+ const majorMinorRegExp =
+-	escapeRegExp( version.replace( /\.\d+$/, '' ) ) + '(\\.\\d+)?';
++	version.replace( /\.\d+$/, '' ).replace( /[\\^$.*+?()[\]{}|]/g, '\\$&' ) +
++	'(\\.\\d+)?';
+ 
+ /**
+  * The list of patterns matching files used only for development purposes.
+@@ -94,6 +94,7 @@ module.exports = {
+ 							'differenceWith',
+ 							'dropRight',
+ 							'each',
++							'escapeRegExp',
+ 							'extend',
+ 							'findIndex',
+ 							'findKey',
+diff --git a/bin/plugin/commands/changelog.js b/bin/plugin/commands/changelog.js
+index 520e9c60a29e12..7c8ad778d3cbf4 100644
+--- a/bin/plugin/commands/changelog.js
++++ b/bin/plugin/commands/changelog.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-const { groupBy, escapeRegExp, flow } = require( 'lodash' );
++const { groupBy, flow } = require( 'lodash' );
+ const Octokit = require( '@octokit/rest' );
+ const { sprintf } = require( 'sprintf-js' );
+ const semver = require( 'semver' );
+@@ -185,6 +185,17 @@ const REWORD_TERMS = {
+ 	docs: 'documentation',
+ };
+ 
++/**
++ * Escapes the RegExp special characters.
++ *
++ * @param {string} string Input string.
++ *
++ * @return {string} Regex-escaped string.
++ */
++function escapeRegExp( string ) {
++	return string.replace( /[\\^$.*+?()[\]{}|]/g, '\\$&' );
++}
++
+ /**
+  * Returns candidates based on whether the given labels
+  * are part of the allowed list.
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a12b09a153309e..ae644beb094e6d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -68,6 +68,8 @@
+ -   `TreeGrid`: Refactor away from `_.includes()` ([#43518](https://github.com/WordPress/gutenberg/pull/43518/)).
+ -   `FormTokenField`: use `KeyboardEvent.code`, refactor tests to modern RTL and `user-event` ([#43442](https://github.com/WordPress/gutenberg/pull/43442/)).
+ -   `DropdownMenu`: use `KeyboardEvent.code`, refactor tests to model RTL and `user-event` ([#43439](https://github.com/WordPress/gutenberg/pull/43439/)).
++-   `Autocomplete`: Refactor away from `_.escapeRegExp()` ([#43629](https://github.com/WordPress/gutenberg/pull/43629/)).
++-   `TextHighlight`: Refactor away from `_.escapeRegExp()` ([#43629](https://github.com/WordPress/gutenberg/pull/43629/)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/autocomplete/get-default-use-items.js b/packages/components/src/autocomplete/get-default-use-items.js
+index 14d67f3ff45341..900c1561c13366 100644
+--- a/packages/components/src/autocomplete/get-default-use-items.js
++++ b/packages/components/src/autocomplete/get-default-use-items.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { debounce, escapeRegExp } from 'lodash';
++import { debounce } from 'lodash';
+ import removeAccents from 'remove-accents';
+ 
+ /**
+@@ -9,6 +9,11 @@ import removeAccents from 'remove-accents';
+  */
+ import { useLayoutEffect, useState } from '@wordpress/element';
+ 
++/**
++ * Internal dependencies
++ */
++import { escapeRegExp } from '../utils/strings';
++
+ function filterOptions( search, options = [], maxResults = 10 ) {
+ 	const filtered = [];
+ 	for ( let i = 0; i < options.length; i++ ) {
+diff --git a/packages/components/src/autocomplete/index.js b/packages/components/src/autocomplete/index.js
+index 11bcf4aa18ab93..ce2b0e861a0eee 100644
+--- a/packages/components/src/autocomplete/index.js
++++ b/packages/components/src/autocomplete/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { escapeRegExp, find } from 'lodash';
++import { find } from 'lodash';
+ import removeAccents from 'remove-accents';
+ 
+ /**
+@@ -34,6 +34,7 @@ import { speak } from '@wordpress/a11y';
+  * Internal dependencies
+  */
+ import { getAutoCompleterUI } from './autocompleter-ui';
++import { escapeRegExp } from '../utils/strings';
+ 
+ /**
+  * A raw completer option.
+diff --git a/packages/components/src/text-highlight/index.tsx b/packages/components/src/text-highlight/index.tsx
+index 7c21b26244e0c7..dd2e909898653c 100644
+--- a/packages/components/src/text-highlight/index.tsx
++++ b/packages/components/src/text-highlight/index.tsx
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { escapeRegExp } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -11,6 +6,7 @@ import { createInterpolateElement } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
++import { escapeRegExp } from '../utils/strings';
+ import type { TextHighlightProps } from './types';
+ 
+ /**
+diff --git a/packages/components/src/utils/strings.ts b/packages/components/src/utils/strings.ts
+index 7807836b96c01e..e4d1d8f73bda1e 100644
+--- a/packages/components/src/utils/strings.ts
++++ b/packages/components/src/utils/strings.ts
+@@ -70,3 +70,14 @@ export const normalizeTextString = ( value: string ): string => {
+ 		.toLocaleLowerCase()
+ 		.replace( ALL_UNICODE_DASH_CHARACTERS, '-' );
+ };
++
++/**
++ * Escapes the RegExp special characters.
++ *
++ * @param {string} string Input string.
++ *
++ * @return {string} Regex-escaped string.
++ */
++export function escapeRegExp( string: string ): string {
++	return string.replace( /[\\^$.*+?()[\]{}|]/g, '\\$&' );
++}
+diff --git a/tools/webpack/blocks.js b/tools/webpack/blocks.js
+index c9a5af0b631ce1..f37cb0472a647a 100644
+--- a/tools/webpack/blocks.js
++++ b/tools/webpack/blocks.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
+-const { escapeRegExp } = require( 'lodash' );
+ const { join, sep } = require( 'path' );
+ const fastGlob = require( 'fast-glob' );
+ 
+@@ -30,6 +29,17 @@ const blockViewRegex = new RegExp(
+  */
+ const prefixFunctions = [ 'build_query_vars_from_query_block' ];
+ 
++/**
++ * Escapes the RegExp special characters.
++ *
++ * @param {string} string Input string.
++ *
++ * @return {string} Regex-escaped string.
++ */
++function escapeRegExp( string ) {
++	return string.replace( /[\\^$.*+?()[\]{}|]/g, '\\$&' );
++}
++
+ const createEntrypoints = () => {
+ 	/*
+ 	 * Returns an array of paths to block view files within the `@wordpress/block-library` package.

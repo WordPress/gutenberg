@@ -1,0 +1,99 @@
+diff --git a/packages/components/src/animate/index.js b/packages/components/src/animate/index.js
+index 2eeed8e7be1306..5f5170d9bfcf1d 100644
+--- a/packages/components/src/animate/index.js
++++ b/packages/components/src/animate/index.js
+@@ -3,11 +3,41 @@
+  */
+ import classnames from 'classnames';
+ 
++/**
++ * WordPress dependencies
++ */
++import deprecated from '@wordpress/deprecated';
++
++/**
++ * @typedef {'top' | 'top left' | 'top right' | 'middle' | 'middle left' | 'middle right' | 'bottom' | 'bottom left' | 'bottom right'} AppearOrigin
++ * @typedef {'left' | 'right'} SlideInOrigin
++ * @typedef {{type: 'appear'; origin?: AppearOrigin}} AppearOptions
++ * @typedef {{type: 'slide-in'; origin?: SlideInOrigin}} SlideInOptions
++ * @typedef {{type: 'loading'}} LoadingOptions
++ * @typedef {AppearOptions|SlideInOptions|LoadingOptions} UseAnimateOptions
++ */
++
++/* eslint-disable jsdoc/valid-types */
++/**
++ * @param {UseAnimateOptions['type']} type The animation type
++ * @return {'top'|'left'} Default origin
++ */
+ function getDefaultOrigin( type ) {
+ 	return type === 'appear' ? 'top' : 'left';
+ }
++/* eslint-enable jsdoc/valid-types */
++
++/**
++ * @param {UseAnimateOptions} options
++ * @return {string | undefined} Classname that applies the animations
++ */
++export function useAnimate( { type } ) {
++	if ( type === 'loading' ) {
++		return classnames( 'components-animate__loading' );
++	}
++
++	const origin = getDefaultOrigin( type );
+ 
+-export function useAnimate( { type, origin = getDefaultOrigin( type ) } ) {
+ 	if ( type === 'appear' ) {
+ 		const [ yAxis, xAxis = 'center' ] = origin.split( ' ' );
+ 		return classnames( 'components-animate__appear', {
+@@ -23,13 +53,29 @@ export function useAnimate( { type, origin = getDefaultOrigin( type ) } ) {
+ 		);
+ 	}
+ 
+-	if ( type === 'loading' ) {
+-		return classnames( 'components-animate__loading' );
+-	}
++	return undefined;
+ }
+ 
+-export default function Animate( { type, options = {}, children } ) {
++/**
++ *
++ * @todo Remove options when deprecated handling has been removed.
++ *
++ * @param {{options?: any; children: (props: {className?: string})=> JSX.Element;} & UseAnimateOptions} props
++ * @return {JSX.Element} Element
++ */
++export default function Animate( {
++	type,
++	options: _deprecatedOptions,
++	children,
++	...options
++} ) {
++	if ( Boolean( _deprecatedOptions ) ) {
++		deprecated( '<Animate> options prop', {
++			version: '9.3',
++			hint: 'Pass options directly as props instead.',
++		} );
++	}
+ 	return children( {
+-		className: useAnimate( { type, ...options } ),
++		className: useAnimate( { type, ..._deprecatedOptions, ...options } ),
+ 	} );
+ }
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 9267432f4f8914..066e9d10e37703 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -2,10 +2,8 @@
+ 	"extends": "../../tsconfig.base.json",
+ 	"compilerOptions": {
+ 		"rootDir": "src",
+-		"declarationDir": "build-types",
++		"declarationDir": "build-types"
+ 	},
+ 	"references": [],
+-    "include": [
+-		"src/dashicon/*"
+-	],
++	"include": [ "src/animate/*", "src/dashicon/*" ]
+ }

@@ -1,0 +1,26 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d577c8898c7bc1..0ca8fb69cde4fd 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,10 +2,6 @@
+ 
+ ## Unreleased
+ 
+-### Bug fix
+-
+--   `Dropdown`: remove extra white space around toggle ([#56005](https://github.com/WordPress/gutenberg/pull/56005))
+-
+ ### Internal
+ 
+ -   Migrate `Divider` from `reakit` to `ariakit` ([#55622](https://github.com/WordPress/gutenberg/pull/55622))
+diff --git a/packages/components/src/dropdown/style.scss b/packages/components/src/dropdown/style.scss
+index 1bc270166fe609..f3b0570eca1d84 100644
+--- a/packages/components/src/dropdown/style.scss
++++ b/packages/components/src/dropdown/style.scss
+@@ -1,5 +1,5 @@
+ .components-dropdown {
+-	display: inline-flex;
++	display: inline-block;
+ }
+ 
+ .components-dropdown__content {

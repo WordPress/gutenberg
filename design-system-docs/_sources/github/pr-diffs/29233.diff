@@ -1,0 +1,128 @@
+diff --git a/packages/components/src/ui/font-size-control/font-size-control.js b/packages/components/src/ui/font-size-control/font-size-control.js
+index f53e0c10921ef6..f8acfa35ef5f85 100755
+--- a/packages/components/src/ui/font-size-control/font-size-control.js
++++ b/packages/components/src/ui/font-size-control/font-size-control.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import { contextConnect } from '@wp-g2/context';
+-import { VisuallyHidden, VStack } from '@wp-g2/components';
+ 
+ /**
+  * WordPress dependencies
+@@ -12,6 +11,8 @@ import { __ } from '@wordpress/i18n';
+ /**
+  * Internal dependencies
+  */
++import { VisuallyHidden } from '../visually-hidden';
++import { VStack } from '../v-stack';
+ import FontSizeControlSelect from './select';
+ import FontSizeControlSlider from './slider';
+ import useFontSizeControl from './use-font-size-control';
+diff --git a/packages/components/src/ui/font-size-control/slider.js b/packages/components/src/ui/font-size-control/slider.js
+index 82305c01e4430b..793bbd684773ba 100755
+--- a/packages/components/src/ui/font-size-control/slider.js
++++ b/packages/components/src/ui/font-size-control/slider.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import { noop } from 'lodash';
+-import { ControlLabel, Slider, TextInput, VStack } from '@wp-g2/components';
++import { ControlLabel, Slider, TextInput } from '@wp-g2/components';
+ 
+ /**
+  * WordPress dependencies
+@@ -14,6 +14,7 @@ import { __ } from '@wordpress/i18n';
+  */
+ import { getSliderTemplateColumns } from './utils';
+ import { Grid } from '../grid';
++import { VStack } from '../v-stack';
+ 
+ function FontSizeControlSlider( props ) {
+ 	const {
+diff --git a/packages/components/src/ui/form-group/stories/index.js b/packages/components/src/ui/form-group/stories/index.js
+index 29845d12ca527a..1da78f16d4b08e 100644
+--- a/packages/components/src/ui/form-group/stories/index.js
++++ b/packages/components/src/ui/form-group/stories/index.js
+@@ -1,12 +1,8 @@
+-/**
+- * External dependencies
+- */
+-import { Text } from '@wp-g2/components';
+-
+ /**
+  * Internal dependencies
+  */
+ import { FormGroup, useFormGroupContextId } from '../index';
++import { Text } from '../../text';
+ 
+ // @todo: Refactor this after adding next TextInput component.
+ const TextInput = ( { id: idProp, ...props } ) => {
+diff --git a/packages/components/src/ui/h-stack/README.md b/packages/components/src/ui/h-stack/README.md
+index 2d3b03d1a868c9..a1361cce5a3384 100644
+--- a/packages/components/src/ui/h-stack/README.md
++++ b/packages/components/src/ui/h-stack/README.md
+@@ -7,6 +7,8 @@
+ `HStack` can render anything inside.
+ 
+ ```jsx
++import { HStack, Text, View } from '@wordpress/components/ui';
++
+ function Example() {
+ 	return (
+ 		<HStack>
+diff --git a/packages/components/src/ui/visually-hidden/README.md b/packages/components/src/ui/visually-hidden/README.md
+new file mode 100644
+index 00000000000000..6200eed80dacb1
+--- /dev/null
++++ b/packages/components/src/ui/visually-hidden/README.md
+@@ -0,0 +1,17 @@
++# VisuallyHidden
++
++`VisuallyHidden` is a component used to render text intended to be visually hidden, but will show for alternate devices, for example a screen reader.
++
++## Usage
++
++```jsx
++import { View, VisuallyHidden } from '@wordpress/components/ui';
++
++function Example() {
++	return (
++		<VisuallyHidden>
++			<View as="label">Code is Poetry</View>
++		</VisuallyHidden>
++	);
++}
++```
+diff --git a/packages/components/src/ui/visually-hidden/component.js b/packages/components/src/ui/visually-hidden/component.js
+index cdb36fc474ca68..6912caa4e08433 100644
+--- a/packages/components/src/ui/visually-hidden/component.js
++++ b/packages/components/src/ui/visually-hidden/component.js
+@@ -5,15 +5,23 @@ import { createComponent } from '../utils';
+ import { useVisuallyHidden } from './hook';
+ 
+ /**
+- * `VisuallyHidden` is used hide content from the visual client, but keep it readable for screen readers.
++ * `VisuallyHidden` is a component used to render text intended to be visually
++ * hidden, but will show for alternate devices, for example a screen reader.
+  *
+  * @example
+  * ```jsx
+- * <VisuallyHidden>
+- *  <Text>Hidding</Text>
+- * </VisuallyHidden>
++ * import { View, VisuallyHidden } from `@wordpress/components/ui`;
++ *
++ * function Example() {
++ * 	return (
++ * 		<VisuallyHidden>
++ * 			<View as="label">Code is Poetry</View>
++ * 		</VisuallyHidden>
++ * 	);
++ * }
+  * ```
+  */
++
+ const VisuallyHidden = createComponent( {
+ 	as: 'div',
+ 	useHook: useVisuallyHidden,

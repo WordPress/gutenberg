@@ -1,0 +1,826 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8bba4668114c1e..02572459bcc6b5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `ColorPalette`, `BorderBox`, `BorderBoxControl`: polish and DRY prop types, add default values ([#45463](https://github.com/WordPress/gutenberg/pull/45463)).
++
+ ## 22.0.0 (2022-11-02)
+ 
+ ### Breaking Changes
+diff --git a/packages/components/src/border-box-control/border-box-control-split-controls/hook.ts b/packages/components/src/border-box-control/border-box-control-split-controls/hook.ts
+index 1ecc201e5618a6..46e9f7b78ff956 100644
+--- a/packages/components/src/border-box-control/border-box-control-split-controls/hook.ts
++++ b/packages/components/src/border-box-control/border-box-control-split-controls/hook.ts
+@@ -17,7 +17,12 @@ export function useBorderBoxControlSplitControls(
+ ) {
+ 	const {
+ 		className,
++		colors = [],
++		enableAlpha = false,
++		enableStyle = true,
+ 		size = 'default',
++		__experimentalHasMultipleOrigins = false,
++		__experimentalIsRenderedInSidebar = false,
+ 		...otherProps
+ 	} = useContextSystem( props, 'BorderBoxControlSplitControls' );
+ 
+@@ -39,7 +44,12 @@ export function useBorderBoxControlSplitControls(
+ 		...otherProps,
+ 		centeredClassName,
+ 		className: classes,
++		colors,
++		enableAlpha,
++		enableStyle,
+ 		rightAlignedClassName,
+ 		size,
++		__experimentalHasMultipleOrigins,
++		__experimentalIsRenderedInSidebar,
+ 	};
+ }
+diff --git a/packages/components/src/border-box-control/border-box-control/README.md b/packages/components/src/border-box-control/border-box-control/README.md
+index 86492a4f4136a1..ce0c3a9ebc7054 100644
+--- a/packages/components/src/border-box-control/border-box-control/README.md
++++ b/packages/components/src/border-box-control/border-box-control/README.md
+@@ -68,7 +68,7 @@ a `SlotFillProvider` overall.
+ 
+ ## Props
+ 
+-### `colors`: `Array`
++### `colors`: `( PaletteObject | ColorObject )[]`
+ 
+ An array of color definitions. This may also be a multi-dimensional array where
+ colors are organized by multiple origins.
+@@ -76,6 +76,7 @@ colors are organized by multiple origins.
+ Each color may be an object containing a `name` and `color` value.
+ 
+ - Required: No
++- Default: `[]`
+ 
+ ### `disableCustomColors`: `boolean`
+ 
+@@ -89,6 +90,7 @@ This controls whether the alpha channel will be offered when selecting
+ custom colors.
+ 
+ - Required: No
++- Default: `false`
+ 
+ ### `enableStyle`: `boolean`
+ 
+@@ -124,7 +126,7 @@ _Note: The will be `undefined` if a user clears all borders._
+ 
+ ### `popoverPlacement`: `string`
+ 
+-The position of the color popover relative to the control wrapper.
++The position of the color popovers relative to the control wrapper.
+ 
+ By default, popovers are displayed relative to the button that initiated the popover. By supplying a popover placement, you force the popover to display in a specific location.
+ 
+@@ -134,7 +136,7 @@ The available base placements are 'top', 'right', 'bottom', 'left'. Each of thes
+ 
+ ### `popoverOffset`: `number`
+ 
+-Works in conjunctions with `popoverPlacement` and allows leaving a space between the color popover and the control wrapper.
++The space between the popover and the control wrapper.
+ 
+ - Required: No
+ 
+@@ -166,17 +168,3 @@ const splitBorders = {
+ ```
+ 
+ - Required: No
+-
+-### `__experimentalHasMultipleOrigins`: `boolean`
+-
+-This is passed on to the color related sub-components which need to be made
+-aware of whether the colors prop contains multiple origins.
+-
+-- Required: No
+-
+-### `__experimentalIsRenderedInSidebar`: `boolean`
+-
+-This is passed on to the color related sub-components so they may render more
+-effectively when used within a sidebar.
+-
+-- Required: No
+diff --git a/packages/components/src/border-box-control/border-box-control/component.tsx b/packages/components/src/border-box-control/border-box-control/component.tsx
+index 4918abafebfce3..bbb2b1e05afc08 100644
+--- a/packages/components/src/border-box-control/border-box-control/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control/component.tsx
+@@ -58,7 +58,7 @@ const UnconnectedBorderBoxControl = (
+ 		onSplitChange,
+ 		popoverPlacement,
+ 		popoverOffset,
+-		size = 'default',
++		size,
+ 		splitValue,
+ 		toggleLinked,
+ 		wrapperClassName,
+diff --git a/packages/components/src/border-box-control/border-box-control/hook.ts b/packages/components/src/border-box-control/border-box-control/hook.ts
+index fed695d182b42e..fc3214efbcd569 100644
+--- a/packages/components/src/border-box-control/border-box-control/hook.ts
++++ b/packages/components/src/border-box-control/border-box-control/hook.ts
+@@ -25,10 +25,18 @@ import type { Borders, BorderSide, BorderBoxControlProps } from '../types';
+ export function useBorderBoxControl(
+ 	props: WordPressComponentProps< BorderBoxControlProps, 'div' >
+ ) {
+-	const { className, onChange, value, ...otherProps } = useContextSystem(
+-		props,
+-		'BorderBoxControl'
+-	);
++	const {
++		className,
++		colors = [],
++		onChange,
++		enableAlpha = false,
++		enableStyle = true,
++		size = 'default',
++		value,
++		__experimentalHasMultipleOrigins = false,
++		__experimentalIsRenderedInSidebar = false,
++		...otherProps
++	} = useContextSystem( props, 'BorderBoxControl' );
+ 
+ 	const mixedBorders = hasMixedBorders( value );
+ 	const splitBorders = hasSplitBorders( value );
+@@ -114,7 +122,10 @@ export function useBorderBoxControl(
+ 	return {
+ 		...otherProps,
+ 		className: classes,
++		colors,
+ 		disableUnits: mixedBorders && ! hasWidthValue,
++		enableAlpha,
++		enableStyle,
+ 		hasMixedBorders: mixedBorders,
+ 		isLinked,
+ 		linkedControlClassName,
+@@ -122,7 +133,10 @@ export function useBorderBoxControl(
+ 		onSplitChange,
+ 		toggleLinked,
+ 		linkedValue,
++		size,
+ 		splitValue,
+ 		wrapperClassName,
++		__experimentalHasMultipleOrigins,
++		__experimentalIsRenderedInSidebar,
+ 	};
+ }
+diff --git a/packages/components/src/border-box-control/types.ts b/packages/components/src/border-box-control/types.ts
+index 8e88e0b958c568..0b454d8ed09292 100644
+--- a/packages/components/src/border-box-control/types.ts
++++ b/packages/components/src/border-box-control/types.ts
+@@ -1,7 +1,12 @@
+ /**
+  * Internal dependencies
+  */
+-import type { Border, ColorProps, LabelProps } from '../border-control/types';
++import type {
++	Border,
++	ColorProps,
++	LabelProps,
++	BorderControlProps,
++} from '../border-control/types';
+ import type { PopoverProps } from '../popover/types';
+ 
+ export type Borders = {
+@@ -16,11 +21,8 @@ export type BorderProp = keyof Border;
+ export type BorderSide = keyof Borders;
+ 
+ export type BorderBoxControlProps = ColorProps &
+-	LabelProps & {
+-		/**
+-		 * This controls whether to support border style selections.
+-		 */
+-		enableStyle?: boolean;
++	LabelProps &
++	Pick< BorderControlProps, 'enableStyle' | 'size' > & {
+ 		/**
+ 		 * A callback function invoked when any border value is changed. The value
+ 		 * received may be a "flat" border object, one that has properties defining
+@@ -43,15 +45,9 @@ export type BorderBoxControlProps = ColorProps &
+ 		 * properties but for each side; `top`, `right`, `bottom`, and `left`.
+ 		 */
+ 		value: AnyBorder;
+-		/**
+-		 * Size of the control.
+-		 *
+-		 * @default 'default'
+-		 */
+-		size?: 'default' | '__unstable-large';
+ 	};
+ 
+-export type LinkedButtonProps = {
++export type LinkedButtonProps = Pick< BorderBoxControlProps, 'size' > & {
+ 	/**
+ 	 * This prop allows the `LinkedButton` to reflect whether the parent
+ 	 * `BorderBoxControl` is currently displaying "linked" or "unlinked"
+@@ -64,58 +60,36 @@ export type LinkedButtonProps = {
+ 	 * `BorderBoxControl`.
+ 	 */
+ 	onClick: () => void;
+-	/**
+-	 * Size of the control.
+-	 *
+-	 * @default 'default'
+-	 */
+-	size?: 'default' | '__unstable-large';
+ };
+ 
+-export type VisualizerProps = {
++export type VisualizerProps = Pick< BorderBoxControlProps, 'size' > & {
+ 	/**
+ 	 * An object representing the current border configuration. It contains
+ 	 * properties for each side, with each side an object reflecting the border
+ 	 * color, style, and width.
+ 	 */
+ 	value?: Borders;
+-	/**
+-	 * Size of the control.
+-	 *
+-	 * @default 'default'
+-	 */
+-	size?: 'default' | '__unstable-large';
+ };
+ 
+-export type SplitControlsProps = ColorProps & {
+-	/**
+-	 * This controls whether to include border style options within the
+-	 * individual `BorderControl` components.
+-	 */
+-	enableStyle?: boolean;
+-	/**
+-	 * A callback that is invoked whenever an individual side's border has
+-	 * changed.
+-	 */
+-	onChange: ( value: Border | undefined, side: BorderSide ) => void;
+-	/**
+-	 * The position of the color popovers compared to the control wrapper.
+-	 */
+-	popoverPlacement?: PopoverProps[ 'placement' ];
+-	/**
+-	 * The space between the popover and the control wrapper.
+-	 */
+-	popoverOffset?: PopoverProps[ 'offset' ];
+-	/**
+-	 * An object representing the current border configuration. It contains
+-	 * properties for each side, with each side an object reflecting the border
+-	 * color, style, and width.
+-	 */
+-	value?: Borders;
+-	/**
+-	 * Size of the control.
+-	 *
+-	 * @default 'default'
+-	 */
+-	size?: 'default' | '__unstable-large';
+-};
++export type SplitControlsProps = ColorProps &
++	Pick< BorderBoxControlProps, 'enableStyle' | 'size' > & {
++		/**
++		 * A callback that is invoked whenever an individual side's border has
++		 * changed.
++		 */
++		onChange: ( value: Border | undefined, side: BorderSide ) => void;
++		/**
++		 * The position of the color popovers compared to the control wrapper.
++		 */
++		popoverPlacement?: PopoverProps[ 'placement' ];
++		/**
++		 * The space between the popover and the control wrapper.
++		 */
++		popoverOffset?: PopoverProps[ 'offset' ];
++		/**
++		 * An object representing the current border configuration. It contains
++		 * properties for each side, with each side an object reflecting the border
++		 * color, style, and width.
++		 */
++		value?: Borders;
++	};
+diff --git a/packages/components/src/border-control/border-control-dropdown/component.tsx b/packages/components/src/border-control/border-control-dropdown/component.tsx
+index bfe442f4c65b29..20fe8d41f8142e 100644
+--- a/packages/components/src/border-control/border-control-dropdown/component.tsx
++++ b/packages/components/src/border-control/border-control-dropdown/component.tsx
+@@ -24,12 +24,13 @@ import { useBorderControlDropdown } from './hook';
+ import { StyledLabel } from '../../base-control/styles/base-control-styles';
+ import DropdownContentWrapper from '../../dropdown/dropdown-content-wrapper';
+ 
+-import type { Color, ColorOrigin, Colors, DropdownProps } from '../types';
++import type { ColorObject, PaletteObject } from '../../color-palette/types';
++import type { ColorProps, DropdownProps } from '../types';
+ 
+ const noop = () => undefined;
+ const getColorObject = (
+ 	colorValue: CSSProperties[ 'borderColor' ],
+-	colors: Colors | undefined,
++	colors: ColorProps[ 'colors' ] | undefined,
+ 	hasMultipleColorOrigins: boolean
+ ) => {
+ 	if ( ! colorValue || ! colors ) {
+@@ -39,7 +40,7 @@ const getColorObject = (
+ 	if ( hasMultipleColorOrigins ) {
+ 		let matchedColor;
+ 
+-		( colors as ColorOrigin[] ).some( ( origin ) =>
++		( colors as PaletteObject[] ).some( ( origin ) =>
+ 			origin.colors.some( ( color ) => {
+ 				if ( color.color === colorValue ) {
+ 					matchedColor = color;
+@@ -53,14 +54,14 @@ const getColorObject = (
+ 		return matchedColor;
+ 	}
+ 
+-	return ( colors as Color[] ).find(
++	return ( colors as ColorObject[] ).find(
+ 		( color ) => color.color === colorValue
+ 	);
+ };
+ 
+ const getToggleAriaLabel = (
+ 	colorValue: CSSProperties[ 'borderColor' ],
+-	colorObject: Color | undefined,
++	colorObject: ColorObject | undefined,
+ 	style: CSSProperties[ 'borderStyle' ],
+ 	isStyleEnabled: boolean
+ ) => {
+@@ -131,6 +132,7 @@ const BorderControlDropdown = (
+ 		colors,
+ 		disableCustomColors,
+ 		enableAlpha,
++		enableStyle,
+ 		indicatorClassName,
+ 		indicatorWrapperClassName,
+ 		onReset,
+@@ -140,7 +142,6 @@ const BorderControlDropdown = (
+ 		popoverControlsClassName,
+ 		resetButtonClassName,
+ 		showDropdownHeader,
+-		enableStyle = true,
+ 		__unstablePopoverProps,
+ 		...otherProps
+ 	} = useBorderControlDropdown( props );
+diff --git a/packages/components/src/border-control/border-control-dropdown/hook.ts b/packages/components/src/border-control/border-control-dropdown/hook.ts
+index a50ad72150054e..d7fef513a74eb0 100644
+--- a/packages/components/src/border-control/border-control-dropdown/hook.ts
++++ b/packages/components/src/border-control/border-control-dropdown/hook.ts
+@@ -19,10 +19,14 @@ export function useBorderControlDropdown(
+ 	const {
+ 		border,
+ 		className,
+-		colors,
++		colors = [],
++		enableAlpha = false,
++		enableStyle = true,
+ 		onChange,
+ 		previousStyleSelection,
+ 		size = 'default',
++		__experimentalHasMultipleOrigins = false,
++		__experimentalIsRenderedInSidebar = false,
+ 		...otherProps
+ 	} = useContextSystem( props, 'BorderControlDropdown' );
+ 
+@@ -81,6 +85,8 @@ export function useBorderControlDropdown(
+ 		border,
+ 		className: classes,
+ 		colors,
++		enableAlpha,
++		enableStyle,
+ 		indicatorClassName,
+ 		indicatorWrapperClassName,
+ 		onColorChange,
+@@ -89,5 +95,7 @@ export function useBorderControlDropdown(
+ 		popoverContentClassName,
+ 		popoverControlsClassName,
+ 		resetButtonClassName,
++		__experimentalHasMultipleOrigins,
++		__experimentalIsRenderedInSidebar,
+ 	};
+ }
+diff --git a/packages/components/src/border-control/border-control/README.md b/packages/components/src/border-control/border-control/README.md
+index 83bf939b979615..901859df2395e9 100644
+--- a/packages/components/src/border-control/border-control/README.md
++++ b/packages/components/src/border-control/border-control/README.md
+@@ -51,7 +51,7 @@ for the `BorderControl`'s color and style options, by rendering your
+ 
+ ## Props
+ 
+-### `colors`: `Array`
++### `colors`: `( PaletteObject | ColorObject )[]`
+ 
+ An array of color definitions. This may also be a multi-dimensional array where
+ colors are organized by multiple origins.
+@@ -59,6 +59,7 @@ colors are organized by multiple origins.
+ Each color may be an object containing a `name` and `color` value.
+ 
+ - Required: No
++- Default: `[]`
+ 
+ ### `disableCustomColors`: `boolean`
+ 
+@@ -78,11 +79,11 @@ This controls whether the alpha channel will be offered when selecting
+ custom colors.
+ 
+ - Required: No
++- Default: `false`
+ 
+ ### `enableStyle`: `boolean`
+ 
+-This controls whether to include border style options within the
+-`BorderDropdown` sub-component.
++This controls whether to support border style selection.
+ 
+ - Required: No
+ - Default: `true`
+@@ -172,17 +173,3 @@ Flags whether this `BorderControl` should also render a `RangeControl` for
+ additional control over a border's width.
+ 
+ - Required: No
+-
+-### `__experimentalHasMultipleOrigins`: `boolean`
+-
+-This is passed on to the color related sub-components which need to be made
+-aware of whether the colors prop contains multiple origins.
+-
+-- Required: No
+-
+-### `__experimentalIsRenderedInSidebar`: `boolean`
+-
+-This is passed on to the color related sub-components so they may render more
+-effectively when used within a sidebar.
+-
+-- Required: No
+diff --git a/packages/components/src/border-control/border-control/component.tsx b/packages/components/src/border-control/border-control/component.tsx
+index bf0beb85085465..942adc4e95b477 100644
+--- a/packages/components/src/border-control/border-control/component.tsx
++++ b/packages/components/src/border-control/border-control/component.tsx
+@@ -41,7 +41,7 @@ const UnconnectedBorderControl = (
+ 		disableCustomColors,
+ 		disableUnits,
+ 		enableAlpha,
+-		enableStyle = true,
++		enableStyle,
+ 		hideLabelFromVision,
+ 		innerWrapperClassName,
+ 		inputWidth,
+@@ -53,7 +53,7 @@ const UnconnectedBorderControl = (
+ 		__unstablePopoverProps,
+ 		previousStyleSelection,
+ 		showDropdownHeader,
+-		size = 'default',
++		size,
+ 		sliderClassName,
+ 		value: border,
+ 		widthUnit,
+diff --git a/packages/components/src/border-control/border-control/hook.ts b/packages/components/src/border-control/border-control/hook.ts
+index dec43fe7a1454e..72b8ca0ec93c8a 100644
+--- a/packages/components/src/border-control/border-control/hook.ts
++++ b/packages/components/src/border-control/border-control/hook.ts
+@@ -30,12 +30,17 @@ export function useBorderControl(
+ ) {
+ 	const {
+ 		className,
++		colors = [],
+ 		isCompact,
+ 		onChange,
++		enableAlpha = true,
++		enableStyle = true,
+ 		shouldSanitizeBorder = true,
+ 		size = 'default',
+ 		value: border,
+ 		width,
++		__experimentalHasMultipleOrigins = false,
++		__experimentalIsRenderedInSidebar = false,
+ 		...otherProps
+ 	} = useContextSystem( props, 'BorderControl' );
+ 
+@@ -137,6 +142,9 @@ export function useBorderControl(
+ 	return {
+ 		...otherProps,
+ 		className: classes,
++		colors,
++		enableAlpha,
++		enableStyle,
+ 		innerWrapperClassName,
+ 		inputWidth: wrapperWidth,
+ 		onBorderChange,
+@@ -148,5 +156,7 @@ export function useBorderControl(
+ 		widthUnit,
+ 		widthValue,
+ 		size,
++		__experimentalHasMultipleOrigins,
++		__experimentalIsRenderedInSidebar,
+ 	};
+ }
+diff --git a/packages/components/src/border-control/types.ts b/packages/components/src/border-control/types.ts
+index 7710fb47054934..290618fbff8cf9 100644
+--- a/packages/components/src/border-control/types.ts
++++ b/packages/components/src/border-control/types.ts
+@@ -6,6 +6,7 @@ import type { CSSProperties } from 'react';
+ /**
+  * Internal dependencies
+  */
++import type { ColorPaletteProps } from '../color-palette/types';
+ import type { PopoverProps } from '../popover/types';
+ 
+ export type Border = {
+@@ -14,43 +15,17 @@ export type Border = {
+ 	width?: CSSProperties[ 'borderWidth' ];
+ };
+ 
+-export type Color = {
+-	name: string;
+-	color: NonNullable< CSSProperties[ 'color' ] >;
+-};
+-
+-export type ColorOrigin = {
+-	name: string;
+-	colors: Color[];
+-};
+-
+-export type Colors = ColorOrigin[] | Color[];
+-
+-export type ColorProps = {
+-	/**
+-	 * An array of color definitions. This may also be a multi-dimensional array
+-	 * where colors are organized by multiple origins.
+-	 */
+-	colors?: Colors;
++export type ColorProps = Pick<
++	ColorPaletteProps,
++	| 'colors'
++	| 'enableAlpha'
++	| '__experimentalHasMultipleOrigins'
++	| '__experimentalIsRenderedInSidebar'
++> & {
+ 	/**
+ 	 * This toggles the ability to choose custom colors.
+ 	 */
+ 	disableCustomColors?: boolean;
+-	/**
+-	 * This controls whether the alpha channel will be offered when selecting
+-	 * custom colors.
+-	 */
+-	enableAlpha?: boolean;
+-	/**
+-	 * This is passed on to the color related sub-components which need to be
+-	 * made aware of whether the colors prop contains multiple origins.
+-	 */
+-	__experimentalHasMultipleOrigins?: boolean;
+-	/**
+-	 * This is passed on to the color related sub-components so they may render
+-	 * more effectively when used within a sidebar.
+-	 */
+-	__experimentalIsRenderedInSidebar?: boolean;
+ };
+ 
+ export type LabelProps = {
+@@ -72,8 +47,7 @@ export type BorderControlProps = ColorProps &
+ 		 */
+ 		disableUnits?: boolean;
+ 		/**
+-		 * This controls whether to include border style options within the
+-		 * `BorderDropdown` sub-component.
++		 * This controls whether to support border style selection.
+ 		 *
+ 		 * @default true
+ 		 */
+@@ -107,6 +81,12 @@ export type BorderControlProps = ColorProps &
+ 		 * and a close button.
+ 		 */
+ 		showDropdownHeader?: boolean;
++		/**
++		 * Size of the control.
++		 *
++		 * @default 'default'
++		 */
++		size?: 'default' | '__unstable-large';
+ 		/**
+ 		 * An object representing a border or `undefined`. Used to set the
+ 		 * current border configuration for this component.
+@@ -122,55 +102,38 @@ export type BorderControlProps = ColorProps &
+ 		 * `RangeControl` for additional control over a border's width.
+ 		 */
+ 		withSlider?: boolean;
++	};
++
++export type DropdownProps = ColorProps &
++	Pick< BorderControlProps, 'enableStyle' | 'size' > & {
+ 		/**
+-		 * Size of the control.
+-		 *
+-		 * @default 'default'
++		 * An object representing a border or `undefined`. This component will
++		 * extract the border color and style selections from this object to use as
++		 * values for its popover controls.
+ 		 */
+-		size?: 'default' | '__unstable-large';
++		border?: Border;
++		/**
++		 * An internal prop used to control the visibility of the dropdown.
++		 */
++		__unstablePopoverProps?: Omit< PopoverProps, 'children' >;
++		/**
++		 * A callback invoked when the border color or style selections change.
++		 */
++		onChange: ( newBorder?: Border ) => void;
++		/**
++		 * Any previous style selection made by the user. This can be used to
++		 * reapply that previous selection when, for example, a zero border width is
++		 * to a non-zero value.
++		 */
++		previousStyleSelection?: string;
++		/**
++		 * Whether or not to render a header for the border color and style picker
++		 * dropdown. The header includes a label for the color picker and a
++		 * close button.
++		 */
++		showDropdownHeader?: boolean;
+ 	};
+ 
+-export type DropdownProps = ColorProps & {
+-	/**
+-	 * An object representing a border or `undefined`. This component will
+-	 * extract the border color and style selections from this object to use as
+-	 * values for its popover controls.
+-	 */
+-	border?: Border;
+-	/**
+-	 * An internal prop used to control the visibility of the dropdown.
+-	 */
+-	__unstablePopoverProps?: Omit< PopoverProps, 'children' >;
+-	/**
+-	 * This controls whether to render border style options.
+-	 *
+-	 * @default true
+-	 */
+-	enableStyle?: boolean;
+-	/**
+-	 * A callback invoked when the border color or style selections change.
+-	 */
+-	onChange: ( newBorder?: Border ) => void;
+-	/**
+-	 * Any previous style selection made by the user. This can be used to
+-	 * reapply that previous selection when, for example, a zero border width is
+-	 * to a non-zero value.
+-	 */
+-	previousStyleSelection?: string;
+-	/**
+-	 * Whether or not to render a header for the border color and style picker
+-	 * dropdown. The header includes a label for the color picker and a
+-	 * close button.
+-	 */
+-	showDropdownHeader?: boolean;
+-	/**
+-	 * Size of the control.
+-	 *
+-	 * @default 'default'
+-	 */
+-	size?: 'default' | '__unstable-large';
+-};
+-
+ export type StylePickerProps = LabelProps & {
+ 	/**
+ 	 * A callback function invoked when a border style is selected or cleared.
+diff --git a/packages/components/src/color-palette/README.md b/packages/components/src/color-palette/README.md
+index 78db82c391b90f..f5689cb0af0364 100644
+--- a/packages/components/src/color-palette/README.md
++++ b/packages/components/src/color-palette/README.md
+@@ -36,6 +36,13 @@ for the `ColorPalette`'s color swatches, by rendering your `ColorPalette` with a
+ 
+ The component accepts the following props.
+ 
++### `clearable`: `boolean`
++
++Whether the palette should have a clearing button.
++
++-   Required: No
++-   Default: `true`
++
+ ### `colors`: `( PaletteObject | ColorObject )[]`
+ 
+ Array with the colors to be shown. When displaying multiple color palettes to choose from, the format of the array changes from an array of colors objects, to an array of color palettes.
+@@ -45,21 +52,23 @@ Array with the colors to be shown. When displaying multiple color palettes to ch
+ 
+ ### `disableCustomColors`: `boolean`
+ 
+-Whether to allow the user to pick a custom color on top of the predefined choices (defined via the `colors` prop).
++Whether to allow the user to pick a custom color on top of the predefined
++choices (defined via the `colors` prop).
+ 
+ -   Required: No
+ -   Default: `false`
+ 
+ ### `enableAlpha`: `boolean`
+ 
+-Whether the color picker should display the alpha channel both in the bottom inputs as well as in the color picker itself.
++This controls whether the alpha channel will be offered when selecting custom
++colors.
+ 
+ -   Required: No
+ -   Default: `false`
+ 
+ ### `value`: `string`
+ 
+-currently active value
++Currently active value.
+ 
+ -   Required: No
+ 
+@@ -68,16 +77,3 @@ currently active value
+ Callback called when a color is selected.
+ 
+ -   Required: Yes
+-
+-### `className`: `string`
+-
+-classes to be applied to the container.
+-
+--   Required: No
+-
+-### `clearable`: `boolean`
+-
+-Whether the palette should have a clearing button.
+-
+--   Required: No
+--   Default: `true`
+diff --git a/packages/components/src/color-palette/index.tsx b/packages/components/src/color-palette/index.tsx
+index 492d0f40709cda..8a403d75192064 100644
+--- a/packages/components/src/color-palette/index.tsx
++++ b/packages/components/src/color-palette/index.tsx
+@@ -223,7 +223,7 @@ function UnforwardedColorPalette(
+ 		clearable = true,
+ 		colors = [],
+ 		disableCustomColors = false,
+-		enableAlpha,
++		enableAlpha = false,
+ 		onChange,
+ 		value,
+ 		__experimentalHasMultipleOrigins = false,
+diff --git a/packages/components/src/color-palette/types.ts b/packages/components/src/color-palette/types.ts
+index 2b498351f132d2..f9356634d3ef89 100644
+--- a/packages/components/src/color-palette/types.ts
++++ b/packages/components/src/color-palette/types.ts
+@@ -3,7 +3,10 @@
+  */
+ import type { CSSProperties, MouseEventHandler, ReactNode } from 'react';
+ 
+-type OnColorChange = ( newColor?: string ) => void;
++/**
++ * Internal dependencies
++ */
++import type { PopoverProps } from '../popover/types';
+ 
+ export type ColorObject = {
+ 	name: string;
+@@ -18,7 +21,10 @@ export type PaletteObject = {
+ type PaletteProps = {
+ 	className?: string;
+ 	clearColor: () => void;
+-	onChange: OnColorChange;
++	/**
++	 * Callback called when a color is selected.
++	 */
++	onChange: ( newColor?: string ) => void;
+ 	value?: string;
+ 	actions?: ReactNode;
+ };
+@@ -35,14 +41,14 @@ export type MultiplePalettesProps = PaletteProps & {
+ export type CustomColorPickerDropdownProps = {
+ 	isRenderedInSidebar: boolean;
+ 	renderContent: () => ReactNode;
+-	popoverProps?: string[];
++	popoverProps?: Omit< PopoverProps, 'children' >;
+ 	renderToggle: ( props: {
+ 		isOpen: boolean;
+ 		onToggle: MouseEventHandler< HTMLButtonElement >;
+ 	} ) => ReactNode;
+ };
+ 
+-export type ColorPaletteProps = {
++export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
+ 	/**
+ 	 * Whether the palette should have a clearing button.
+ 	 *
+@@ -65,14 +71,12 @@ export type ColorPaletteProps = {
+ 	 */
+ 	disableCustomColors?: boolean;
+ 	/**
+-	 * Whether the color picker should display the alpha channel
+-	 * both in the bottom inputs as well as in the color picker itself.
++	 * This controls whether the alpha channel will be offered when selecting
++	 * custom colors.
++	 *
++	 * @default false
+ 	 */
+ 	enableAlpha?: boolean;
+-	/**
+-	 * Callback called when a color is selected.
+-	 */
+-	onChange: OnColorChange;
+ 	/**
+ 	 * Currently active value.
+ 	 */

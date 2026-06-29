@@ -1,0 +1,98 @@
+diff --git a/packages/components/src/utils/test/unit-values.js b/packages/components/src/utils/test/unit-values.js
+new file mode 100644
+index 00000000000000..f9b721344b4881
+--- /dev/null
++++ b/packages/components/src/utils/test/unit-values.js
+@@ -0,0 +1,47 @@
++/**
++ * Internal dependencies
++ */
++import { createCSSUnitValue, parseCSSUnitValue } from '../unit-values';
++
++describe( 'unit-values', () => {
++	describe( 'createCSSUnitValue', () => {
++		it.each`
++			value     | unit      | output
++			${ 100 }  | ${ 'em' } | ${ '100em' }
++			${ '40' } | ${ 'vw' } | ${ '40vw' }
++		`(
++			'should combine $value and $unit to create $output',
++			( { value, unit, output } ) =>
++				expect( createCSSUnitValue( value, unit ) ).toEqual( output )
++		);
++	} );
++
++	describe( 'parseCSSUnitValue', () => {
++		it.each`
++			value                  | output
++			${ '10fr' }            | ${ [ 10, 'fr' ] }
++			${ '10cm' }            | ${ [ 10, 'cm' ] }
++			${ '10mm' }            | ${ [ 10, 'mm' ] }
++			${ '10Q' }             | ${ [ 10, 'Q' ] }
++			${ '10in' }            | ${ [ 10, 'in' ] }
++			${ '10pc' }            | ${ [ 10, 'pc' ] }
++			${ '10pt' }            | ${ [ 10, 'pt' ] }
++			${ '10px' }            | ${ [ 10, 'px' ] }
++			${ 'abc em' }          | ${ [ undefined, undefined ] }
++			${ '10ex' }            | ${ [ 10, 'ex' ] }
++			${ '10ch' }            | ${ [ 10, 'ch' ] }
++			${ '10rem' }           | ${ [ 10, 'rem' ] }
++			${ '10lh' }            | ${ [ 10, 'lh' ] }
++			${ '10vw' }            | ${ [ 10, 'vw' ] }
++			${ '10vh' }            | ${ [ 10, 'vh' ] }
++			${ '10vmin' }          | ${ [ 10, 'vmin' ] }
++			${ '10vmax' }          | ${ [ 10, 'vmax' ] }
++			${ '10 vmax' }         | ${ [ 10, 'vmax' ] }
++			${ '10notacssunit' }   | ${ [ undefined, undefined ] }
++			${ 'notaunitedvalue' } | ${ [ undefined, undefined ] }
++			${ '10' }              | ${ [ 10, undefined ] }
++		`( 'should parse $value into $output', ( { value, output } ) =>
++			expect( parseCSSUnitValue( value ) ).toEqual( output )
++		);
++	} );
++} );
+diff --git a/packages/components/src/utils/unit-values.ts b/packages/components/src/utils/unit-values.ts
+new file mode 100644
+index 00000000000000..2579db0c1672e6
+--- /dev/null
++++ b/packages/components/src/utils/unit-values.ts
+@@ -0,0 +1,39 @@
++const UNITED_VALUE_REGEX = /^([\d.\-+]*)\s*(fr|cm|mm|Q|in|pc|pt|px|em|ex|ch|rem|lh|vw|vh|vmin|vmax|%|cap|ic|rlh|vi|vb|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)?$/;
++
++/**
++ * Parses a number and unit from a value.
++ *
++ * @param  toParse Value to parse
++ *
++ * @return  The extracted number and unit.
++ */
++export function parseCSSUnitValue(
++	toParse: string
++): [ number | undefined, string | undefined ] {
++	const value = toParse.trim();
++
++	const matched = value.match( UNITED_VALUE_REGEX );
++	if ( ! matched ) {
++		return [ undefined, undefined ];
++	}
++	const [ , num, unit ] = matched;
++	let numParsed: number | undefined = parseFloat( num );
++	numParsed = Number.isNaN( numParsed ) ? undefined : numParsed;
++
++	return [ numParsed, unit ];
++}
++
++/**
++ * Combines a value and a unit into a unit value.
++ *
++ * @param  value
++ * @param  unit
++ *
++ * @return The unit value.
++ */
++export function createCSSUnitValue(
++	value: string | number,
++	unit: string
++): string {
++	return `${ value }${ unit }`;
++}

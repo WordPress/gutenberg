@@ -1,0 +1,371 @@
+diff --git a/packages/theme/docs/ds-tokens.md b/packages/theme/docs/ds-tokens.md
+index 12a0fe9f4d9559..99927d40d38781 100644
+--- a/packages/theme/docs/ds-tokens.md
++++ b/packages/theme/docs/ds-tokens.md
+@@ -157,20 +157,22 @@ Do not edit directly.
+ 
+ ### Typography
+ 
+-| Variable name                      | Description             |
+-| ---------------------------------- | ----------------------- |
+-| `--wpds-font-family-heading`       | Headings font family    |
+-| `--wpds-font-family-body`          | Body font family        |
+-| `--wpds-font-family-mono`          | Monospace font family   |
+-| `--wpds-font-size-x-small`         | Extra small font size   |
+-| `--wpds-font-size-small`           | Small font size         |
+-| `--wpds-font-size-medium`          | Medium font size        |
+-| `--wpds-font-size-large`           | Large font size         |
+-| `--wpds-font-size-x-large`         | Extra large font size   |
+-| `--wpds-font-size-2x-large`        | 2X large font size      |
+-| `--wpds-font-line-height-x-small`  | Extra small line height |
+-| `--wpds-font-line-height-small`    | Small line height       |
+-| `--wpds-font-line-height-medium`   | Medium line height      |
+-| `--wpds-font-line-height-large`    | Large line height       |
+-| `--wpds-font-line-height-x-large`  | Extra large line height |
+-| `--wpds-font-line-height-2x-large` | 2X large line height    |
++| Variable name                 | Description                                  |
++| ----------------------------- | -------------------------------------------- |
++| `--wpds-font-family-heading`  | Headings font family                         |
++| `--wpds-font-family-body`     | Body font family                             |
++| `--wpds-font-family-mono`     | Monospace font family                        |
++| `--wpds-font-size-xs`         | Extra small font size                        |
++| `--wpds-font-size-sm`         | Small font size                              |
++| `--wpds-font-size-md`         | Medium font size                             |
++| `--wpds-font-size-lg`         | Large font size                              |
++| `--wpds-font-size-xl`         | Extra large font size                        |
++| `--wpds-font-size-2xl`        | 2X large font size                           |
++| `--wpds-font-line-height-xs`  | Extra small line height                      |
++| `--wpds-font-line-height-sm`  | Small line height                            |
++| `--wpds-font-line-height-md`  | Medium line height                           |
++| `--wpds-font-line-height-lg`  | Large line height                            |
++| `--wpds-font-line-height-xl`  | Extra large line height                      |
++| `--wpds-font-line-height-2xl` | 2X large line height                         |
++| `--wpds-font-weight-regular`  | Regular font weight for body text            |
++| `--wpds-font-weight-medium`   | Medium font weight for emphasis and headings |
+diff --git a/packages/theme/src/prebuilt/css/design-tokens.css b/packages/theme/src/prebuilt/css/design-tokens.css
+index d63c02438976cd..38c13296fb14d7 100644
+--- a/packages/theme/src/prebuilt/css/design-tokens.css
++++ b/packages/theme/src/prebuilt/css/design-tokens.css
+@@ -140,18 +140,20 @@
+ 	--wpds-font-family-heading: -apple-system, system-ui, 'Segoe UI', 'Roboto',
+ 		'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue', sans-serif; /* Headings font family */
+ 	--wpds-font-family-mono: 'Menlo', 'Consolas', monaco, monospace; /* Monospace font family */
+-	--wpds-font-line-height-2x-large: 40px; /* 2X large line height */
+-	--wpds-font-line-height-large: 28px; /* Large line height */
+-	--wpds-font-line-height-medium: 24px; /* Medium line height */
+-	--wpds-font-line-height-small: 20px; /* Small line height */
+-	--wpds-font-line-height-x-large: 32px; /* Extra large line height */
+-	--wpds-font-line-height-x-small: 16px; /* Extra small line height */
+-	--wpds-font-size-2x-large: 32px; /* 2X large font size */
+-	--wpds-font-size-large: 15px; /* Large font size */
+-	--wpds-font-size-medium: 13px; /* Medium font size */
+-	--wpds-font-size-small: 12px; /* Small font size */
+-	--wpds-font-size-x-large: 20px; /* Extra large font size */
+-	--wpds-font-size-x-small: 11px; /* Extra small font size */
++	--wpds-font-line-height-2xl: 40px; /* 2X large line height */
++	--wpds-font-line-height-lg: 28px; /* Large line height */
++	--wpds-font-line-height-md: 24px; /* Medium line height */
++	--wpds-font-line-height-sm: 20px; /* Small line height */
++	--wpds-font-line-height-xl: 32px; /* Extra large line height */
++	--wpds-font-line-height-xs: 16px; /* Extra small line height */
++	--wpds-font-size-2xl: 32px; /* 2X large font size */
++	--wpds-font-size-lg: 15px; /* Large font size */
++	--wpds-font-size-md: 13px; /* Medium font size */
++	--wpds-font-size-sm: 12px; /* Small font size */
++	--wpds-font-size-xl: 20px; /* Extra large font size */
++	--wpds-font-size-xs: 11px; /* Extra small font size */
++	--wpds-font-weight-medium: 499; /* Medium font weight for emphasis and headings */
++	--wpds-font-weight-regular: 400; /* Regular font weight for body text */
+ }
+ 
+ [data-wpds-theme-provider-id][data-wpds-density='default'] {
+diff --git a/packages/theme/src/prebuilt/js/design-tokens.js b/packages/theme/src/prebuilt/js/design-tokens.js
+index 434a0aaff94a0f..f0294c3ecbbf21 100644
+--- a/packages/theme/src/prebuilt/js/design-tokens.js
++++ b/packages/theme/src/prebuilt/js/design-tokens.js
+@@ -135,16 +135,18 @@ export default [
+ 	'--wpds-font-family-heading',
+ 	'--wpds-font-family-body',
+ 	'--wpds-font-family-mono',
+-	'--wpds-font-size-x-small',
+-	'--wpds-font-size-small',
+-	'--wpds-font-size-medium',
+-	'--wpds-font-size-large',
+-	'--wpds-font-size-x-large',
+-	'--wpds-font-size-2x-large',
+-	'--wpds-font-line-height-x-small',
+-	'--wpds-font-line-height-small',
+-	'--wpds-font-line-height-medium',
+-	'--wpds-font-line-height-large',
+-	'--wpds-font-line-height-x-large',
+-	'--wpds-font-line-height-2x-large',
++	'--wpds-font-size-xs',
++	'--wpds-font-size-sm',
++	'--wpds-font-size-md',
++	'--wpds-font-size-lg',
++	'--wpds-font-size-xl',
++	'--wpds-font-size-2xl',
++	'--wpds-font-line-height-xs',
++	'--wpds-font-line-height-sm',
++	'--wpds-font-line-height-md',
++	'--wpds-font-line-height-lg',
++	'--wpds-font-line-height-xl',
++	'--wpds-font-line-height-2xl',
++	'--wpds-font-weight-regular',
++	'--wpds-font-weight-medium',
+ ];
+diff --git a/packages/theme/src/prebuilt/ts/token-types.ts b/packages/theme/src/prebuilt/ts/token-types.ts
+index c7888c44873364..bf72210af4397e 100644
+--- a/packages/theme/src/prebuilt/ts/token-types.ts
++++ b/packages/theme/src/prebuilt/ts/token-types.ts
+@@ -123,3 +123,57 @@ export type InteractiveStrokeColor =
+ 	| 'brand'
+ 	| 'error'
+ 	| 'error-strong';
++
++/**
++ * Foreground color variants for text elements.
++ */
++export type ForegroundColor =
++	| 'neutral'
++	| 'neutral-weak'
++	| 'success'
++	| 'success-weak'
++	| 'info'
++	| 'info-weak'
++	| 'warning'
++	| 'warning-weak'
++	| 'caution'
++	| 'caution-weak'
++	| 'error'
++	| 'error-weak'
++	| 'neutral-active'
++	| 'neutral-disabled'
++	| 'neutral-strong'
++	| 'neutral-strong-active'
++	| 'neutral-strong-disabled'
++	| 'neutral-weak-disabled'
++	| 'brand'
++	| 'brand-active'
++	| 'brand-disabled'
++	| 'brand-strong'
++	| 'brand-strong-active'
++	| 'brand-strong-disabled'
++	| 'error-active'
++	| 'error-disabled'
++	| 'error-strong'
++	| 'error-strong-active'
++	| 'error-strong-disabled';
++
++/**
++ * Font family variants.
++ */
++export type FontFamily = 'heading' | 'body' | 'mono';
++
++/**
++ * Font size scale.
++ */
++export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
++
++/**
++ * Font weight variants.
++ */
++export type FontWeight = 'regular' | 'medium';
++
++/**
++ * Line height scale.
++ */
++export type LineHeight = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+diff --git a/packages/theme/terrazzo.config.ts b/packages/theme/terrazzo.config.ts
+index b4d1ffb74cc492..c133c7bde78027 100644
+--- a/packages/theme/terrazzo.config.ts
++++ b/packages/theme/terrazzo.config.ts
+@@ -189,6 +189,37 @@ export default defineConfig( {
+ 						},
+ 					],
+ 				},
++				{
++					name: 'ForegroundColor',
++					description: 'Foreground color variants for text elements.',
++					patterns: [
++						{
++							pattern: /^wpds-color\.fg\.[^.]+\.(.+)$/,
++							transform: ( variant ) =>
++								variant.split( '.' ).join( '-' ),
++						},
++					],
++				},
++				{
++					name: 'FontFamily',
++					description: 'Font family variants.',
++					patterns: [ /^wpds-font\.family\.([^.]+)$/ ],
++				},
++				{
++					name: 'FontSize',
++					description: 'Font size scale.',
++					patterns: [ /^wpds-font\.size\.([^.]+)$/ ],
++				},
++				{
++					name: 'FontWeight',
++					description: 'Font weight variants.',
++					patterns: [ /^wpds-font\.weight\.([^.]+)$/ ],
++				},
++				{
++					name: 'LineHeight',
++					description: 'Line height scale.',
++					patterns: [ /^wpds-font\.line-height\.([^.]+)$/ ],
++				},
+ 			],
+ 		} ),
+ 		pluginModeOverrides(),
+diff --git a/packages/theme/tokens/typography.json b/packages/theme/tokens/typography.json
+index b781daff612e3a..7713e02a7b7232 100644
+--- a/packages/theme/tokens/typography.json
++++ b/packages/theme/tokens/typography.json
+@@ -37,57 +37,68 @@
+ 		},
+ 		"size": {
+ 			"$type": "dimension",
+-			"x-small": {
++			"xs": {
+ 				"$value": { "value": 11, "unit": "px" },
+ 				"$description": "Extra small font size"
+ 			},
+-			"small": {
++			"sm": {
+ 				"$value": { "value": 12, "unit": "px" },
+ 				"$description": "Small font size"
+ 			},
+-			"medium": {
++			"md": {
+ 				"$value": { "value": 13, "unit": "px" },
+ 				"$description": "Medium font size"
+ 			},
+-			"large": {
++			"lg": {
+ 				"$value": { "value": 15, "unit": "px" },
+ 				"$description": "Large font size"
+ 			},
+-			"x-large": {
++			"xl": {
+ 				"$value": { "value": 20, "unit": "px" },
+ 				"$description": "Extra large font size"
+ 			},
+-			"2x-large": {
++			"2xl": {
+ 				"$value": { "value": 32, "unit": "px" },
+ 				"$description": "2X large font size"
+ 			}
+ 		},
+-		"lineHeight": {
++		"line-height": {
+ 			"$type": "dimension",
+-			"x-small": {
++			"xs": {
+ 				"$value": { "value": 16, "unit": "px" },
+ 				"$description": "Extra small line height"
+ 			},
+-			"small": {
++			"sm": {
+ 				"$value": { "value": 20, "unit": "px" },
+ 				"$description": "Small line height"
+ 			},
+-			"medium": {
++			"md": {
+ 				"$value": { "value": 24, "unit": "px" },
+ 				"$description": "Medium line height"
+ 			},
+-			"large": {
++			"lg": {
+ 				"$value": { "value": 28, "unit": "px" },
+ 				"$description": "Large line height"
+ 			},
+-			"x-large": {
++			"xl": {
+ 				"$value": { "value": 32, "unit": "px" },
+ 				"$description": "Extra large line height"
+ 			},
+-			"2x-large": {
++			"2xl": {
+ 				"$value": { "value": 40, "unit": "px" },
+ 				"$description": "2X large line height"
+ 			}
++		},
++		"weight": {
++			"$type": "fontWeight",
++			"regular": {
++				"$value": 400,
++				"$description": "Regular font weight for body text"
++			},
++			"medium": {
++				"$value": 499,
++				"$description": "Medium font weight for emphasis and headings"
++			}
+ 		}
+ 	}
+ }
+diff --git a/packages/ui/src/badge/badge.tsx b/packages/ui/src/badge/badge.tsx
+index 9efdb392bd6f8f..81846b304dd90d 100644
+--- a/packages/ui/src/badge/badge.tsx
++++ b/packages/ui/src/badge/badge.tsx
+@@ -85,9 +85,9 @@ export const Badge = forwardRef< HTMLDivElement, BadgeProps >( function Badge(
+ 			render={ render }
+ 			style={ {
+ 				fontFamily: 'var(--wpds-font-family-body)',
+-				fontSize: 'var(--wpds-font-size-small)',
+-				fontWeight: '400',
+-				lineHeight: 'var(--wpds-font-line-height-x-small)',
++				fontSize: 'var(--wpds-font-size-sm)',
++				fontWeight: 'var(--wpds-font-weight-regular)',
++				lineHeight: 'var(--wpds-font-line-height-xs)',
+ 				...props.style,
+ 			} }
+ 			ref={ ref }
+diff --git a/packages/ui/src/index.ts b/packages/ui/src/index.ts
+index 8efe7bdc93fcaa..61e9eace29381f 100644
+--- a/packages/ui/src/index.ts
++++ b/packages/ui/src/index.ts
+@@ -1,5 +1,5 @@
+-export * from './box';
+ export * from './badge';
++export * from './box';
+ export * from './form/primitives';
+ export * from './stack';
+ export * from './visually-hidden';
+diff --git a/packages/ui/src/utils/css/field.module.css b/packages/ui/src/utils/css/field.module.css
+index dd5c15f1f8142f..a9e566f8b24bd1 100644
+--- a/packages/ui/src/utils/css/field.module.css
++++ b/packages/ui/src/utils/css/field.module.css
+@@ -2,17 +2,17 @@
+ 
+ @layer wp-ui-utilities {
+ 	.label {
+-		--wp-ui-field-label-line-height: var(--wpds-font-line-height-x-small);
++		--wp-ui-field-label-line-height: var(--wpds-font-line-height-xs);
+ 
+ 		font-family: var(--wpds-font-family-body);
+-		font-size: var(--wpds-font-size-x-small);
++		font-size: var(--wpds-font-size-xs);
+ 		line-height: var(--wp-ui-field-label-line-height);
+-		font-weight: 499; /* TODO: Use variable? */
++		font-weight: var(--wpds-font-weight-medium);
+ 		text-transform: uppercase;
+ 		color: var(--wpds-color-fg-content-neutral);
+ 
+ 		&.is-plain {
+-			font-size: var(--wpds-font-size-medium);
++			font-size: var(--wpds-font-size-md);
+ 			text-transform: none;
+ 		}
+ 	}
+@@ -20,8 +20,8 @@
+ 	.description {
+ 		margin: 0;
+ 		font-family: var(--wpds-font-family-body);
+-		font-size: var(--wpds-font-size-small);
+-		line-height: var(--wpds-font-line-height-x-small);
++		font-size: var(--wpds-font-size-sm);
++		line-height: var(--wpds-font-line-height-xs);
+ 		color: var(--wpds-color-fg-content-neutral-weak);
+ 	}
+ }

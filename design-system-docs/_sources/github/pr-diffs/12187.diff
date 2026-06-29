@@ -1,0 +1,19 @@
+diff --git a/packages/block-library/src/cover/style.scss b/packages/block-library/src/cover/style.scss
+index a9223bfb30c2fe..6cbc5f1e3366c6 100644
+--- a/packages/block-library/src/cover/style.scss
++++ b/packages/block-library/src/cover/style.scss
+@@ -84,7 +84,13 @@
+ 	}
+ 
+ 	&.components-placeholder {
+-		height: inherit;
++		// use opacity to work in various editor styles
++		background: $dark-opacity-light-200;
++		min-height: 200px;
++
++		.is-dark-theme & {
++			background: $light-opacity-light-200;
++		}
+ 	}
+ 
+ 	// Apply max-width to floated items that have no intrinsic width

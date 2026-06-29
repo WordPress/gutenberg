@@ -1,0 +1,557 @@
+diff --git a/package-lock.json b/package-lock.json
+index ac2f9a01ac06b5..9a1edfca9befe2 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -17442,6 +17442,7 @@
+ 				"@wordpress/dom": "file:packages/dom",
+ 				"@wordpress/element": "file:packages/element",
+ 				"@wordpress/escape-html": "file:packages/escape-html",
++				"@wordpress/experiments": "file:packages/experiments",
+ 				"@wordpress/hooks": "file:packages/hooks",
+ 				"@wordpress/html-entities": "file:packages/html-entities",
+ 				"@wordpress/i18n": "file:packages/i18n",
+diff --git a/package.json b/package.json
+index 2ecfed4c20fda7..2d6e7ab238d0fc 100644
+--- a/package.json
++++ b/package.json
+@@ -19,7 +19,8 @@
+ 		"npm": ">=6.9.0 <7"
+ 	},
+ 	"config": {
+-		"IS_GUTENBERG_PLUGIN": true
++		"IS_GUTENBERG_PLUGIN": true,
++		"ALLOW_EXPERIMENT_REREGISTRATION": true
+ 	},
+ 	"dependencies": {
+ 		"@wordpress/a11y": "file:packages/a11y",
+diff --git a/packages/block-editor/src/components/block-tools/selected-block-popover.js b/packages/block-editor/src/components/block-tools/selected-block-popover.js
+index 6ebd743f22d2f8..b4d14296e823d4 100644
+--- a/packages/block-editor/src/components/block-tools/selected-block-popover.js
++++ b/packages/block-editor/src/components/block-tools/selected-block-popover.js
+@@ -21,7 +21,7 @@ import { store as blockEditorStore } from '../../store';
+ import BlockPopover from '../block-popover';
+ import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
+ import Inserter from '../inserter';
+-import { unlock } from '../../experiments';
++import { unlock } from '../../lock-unlock';
+ 
+ function selector( select ) {
+ 	const {
+diff --git a/packages/block-editor/src/components/off-canvas-editor/block-contents.js b/packages/block-editor/src/components/off-canvas-editor/block-contents.js
+index 4048f25b49c989..78e97a6c0cf335 100644
+--- a/packages/block-editor/src/components/off-canvas-editor/block-contents.js
++++ b/packages/block-editor/src/components/off-canvas-editor/block-contents.js
+@@ -12,7 +12,7 @@ import { forwardRef, useEffect, useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { unlock } from '../../experiments';
++import { unlock } from '../../lock-unlock';
+ import ListViewBlockSelectButton from './block-select-button';
+ import BlockDraggable from '../block-draggable';
+ import { store as blockEditorStore } from '../../store';
+diff --git a/packages/block-editor/src/components/provider/index.js b/packages/block-editor/src/components/provider/index.js
+index 323ce68765c40a..dbd646426718de 100644
+--- a/packages/block-editor/src/components/provider/index.js
++++ b/packages/block-editor/src/components/provider/index.js
+@@ -11,7 +11,7 @@ import withRegistryProvider from './with-registry-provider';
+ import useBlockSync from './use-block-sync';
+ import { store as blockEditorStore } from '../../store';
+ import { BlockRefsProvider } from './block-refs-provider';
+-import { unlock } from '../../experiments';
++import { unlock } from '../../lock-unlock';
+ 
+ /** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
+ 
+diff --git a/packages/block-editor/src/experiments.js b/packages/block-editor/src/experiments.js
+index d954fc7515530d..2e59430ae78b2f 100644
+--- a/packages/block-editor/src/experiments.js
++++ b/packages/block-editor/src/experiments.js
+@@ -1,21 +1,11 @@
+-/**
+- * WordPress dependencies
+- */
+-import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/experiments';
+-
+ /**
+  * Internal dependencies
+  */
+ import * as globalStyles from './components/global-styles';
+ import { ExperimentalBlockEditorProvider } from './components/provider';
++import { lock } from './lock-unlock';
+ import OffCanvasEditor from './components/off-canvas-editor';
+ 
+-export const { lock, unlock } =
+-	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
+-		'I know using unstable features means my plugin or theme will inevitably break on the next WordPress release.',
+-		'@wordpress/block-editor'
+-	);
+-
+ /**
+  * Experimental @wordpress/block-editor APIs.
+  */
+diff --git a/packages/block-editor/src/hooks/dimensions.js b/packages/block-editor/src/hooks/dimensions.js
+index e520f5dd7b4acd..14384d19b0000b 100644
+--- a/packages/block-editor/src/hooks/dimensions.js
++++ b/packages/block-editor/src/hooks/dimensions.js
+@@ -59,7 +59,7 @@ import {
+ } from './child-layout';
+ import useSetting from '../components/use-setting';
+ import { store as blockEditorStore } from '../store';
+-import { unlock } from '../experiments';
++import { unlock } from '../lock-unlock';
+ 
+ export const DIMENSIONS_SUPPORT_KEY = 'dimensions';
+ export const SPACING_SUPPORT_KEY = 'spacing';
+diff --git a/packages/block-editor/src/hooks/position.js b/packages/block-editor/src/hooks/position.js
+index d2924a84db4397..c5176304fb958d 100644
+--- a/packages/block-editor/src/hooks/position.js
++++ b/packages/block-editor/src/hooks/position.js
+@@ -8,7 +8,10 @@ import classnames from 'classnames';
+  */
+ import { __, sprintf } from '@wordpress/i18n';
+ import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
+-import { BaseControl, CustomSelectControl } from '@wordpress/components';
++import {
++	BaseControl,
++	experiments as componentsExperiments,
++} from '@wordpress/components';
+ import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
+ import { useSelect } from '@wordpress/data';
+ import {
+@@ -26,8 +29,11 @@ import BlockList from '../components/block-list';
+ import useSetting from '../components/use-setting';
+ import InspectorControls from '../components/inspector-controls';
+ import { cleanEmptyObject } from './utils';
++import { unlock } from '../lock-unlock';
+ import { store as blockEditorStore } from '../store';
+ 
++const { CustomSelectControl } = unlock( componentsExperiments );
++
+ const POSITION_SUPPORT_KEY = 'position';
+ 
+ const OPTION_CLASSNAME =
+diff --git a/packages/block-editor/src/lock-unlock.js b/packages/block-editor/src/lock-unlock.js
+new file mode 100644
+index 00000000000000..09199196e9cf05
+--- /dev/null
++++ b/packages/block-editor/src/lock-unlock.js
+@@ -0,0 +1,10 @@
++/**
++ * WordPress dependencies
++ */
++import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/experiments';
++
++export const { lock, unlock } =
++	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
++		'I know using unstable features means my plugin or theme will inevitably break on the next WordPress release.',
++		'@wordpress/block-editor'
++	);
+diff --git a/packages/block-editor/src/store/index.js b/packages/block-editor/src/store/index.js
+index 346979e6106457..ed17b387ba5884 100644
+--- a/packages/block-editor/src/store/index.js
++++ b/packages/block-editor/src/store/index.js
+@@ -12,7 +12,7 @@ import * as privateActions from './private-actions';
+ import * as privateSelectors from './private-selectors';
+ import * as actions from './actions';
+ import { STORE_NAME } from './constants';
+-import { unlock } from '../experiments';
++import { unlock } from '../lock-unlock';
+ 
+ /**
+  * Block editor data store configuration.
+diff --git a/packages/block-editor/tsconfig.json b/packages/block-editor/tsconfig.json
+index 79adc0b78c6164..37432183cfc3c1 100644
+--- a/packages/block-editor/tsconfig.json
++++ b/packages/block-editor/tsconfig.json
+@@ -16,6 +16,7 @@
+ 		{ "path": "../dom" },
+ 		{ "path": "../element" },
+ 		{ "path": "../escape-html" },
++		{ "path": "../experiments" },
+ 		{ "path": "../hooks" },
+ 		{ "path": "../html-entities" },
+ 		{ "path": "../i18n" },
+diff --git a/packages/block-library/tsconfig.json b/packages/block-library/tsconfig.json
+index f24b0524d7c7b0..dedc1d7db2daf0 100644
+--- a/packages/block-library/tsconfig.json
++++ b/packages/block-library/tsconfig.json
+@@ -21,6 +21,7 @@
+ 		{ "path": "../dom" },
+ 		{ "path": "../element" },
+ 		{ "path": "../escape-html" },
++		{ "path": "../experiments" },
+ 		{ "path": "../hooks" },
+ 		{ "path": "../html-entities" },
+ 		{ "path": "../i18n" },
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 531b1a6fa46e58..f31816feecb484 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -45,6 +45,7 @@
+ 		"@wordpress/dom": "file:../dom",
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/escape-html": "file:../escape-html",
++		"@wordpress/experiments": "file:../experiments",
+ 		"@wordpress/hooks": "file:../hooks",
+ 		"@wordpress/html-entities": "file:../html-entities",
+ 		"@wordpress/i18n": "file:../i18n",
+diff --git a/packages/components/src/custom-select-control/index.js b/packages/components/src/custom-select-control/index.js
+index 326bd42ac53b3a..10b9f0a307c010 100644
+--- a/packages/components/src/custom-select-control/index.js
++++ b/packages/components/src/custom-select-control/index.js
+@@ -257,3 +257,12 @@ export default function CustomSelectControl( props ) {
+ 		</div>
+ 	);
+ }
++
++export function StableCustomSelectControl( props ) {
++	return (
++		<CustomSelectControl
++			{ ...props }
++			__experimentalShowSelectedHint={ false }
++		/>
++	);
++}
+diff --git a/packages/components/src/custom-select-control/stories/index.js b/packages/components/src/custom-select-control/stories/index.js
+index 4891bcf2109378..68f179864f86d5 100644
+--- a/packages/components/src/custom-select-control/stories/index.js
++++ b/packages/components/src/custom-select-control/stories/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import CustomSelectControl from '../';
++import CustomSelectControl from '..';
+ 
+ export default {
+ 	title: 'Components/CustomSelectControl',
+diff --git a/packages/components/src/custom-select-control/test/index.js b/packages/components/src/custom-select-control/test/index.js
+index 413760b63ebed7..3ef6d52ab1f6ec 100644
+--- a/packages/components/src/custom-select-control/test/index.js
++++ b/packages/components/src/custom-select-control/test/index.js
+@@ -4,9 +4,9 @@
+ import { render, fireEvent, screen } from '@testing-library/react';
+ 
+ /**
+- * WordPress dependencies
++ * Internal dependencies
+  */
+-import { CustomSelectControl } from '@wordpress/components';
++import CustomSelectControl from '..';
+ 
+ describe( 'CustomSelectControl', () => {
+ 	it( 'Captures the keypress event and does not let it propagate', () => {
+diff --git a/packages/components/src/experiments.js b/packages/components/src/experiments.js
+new file mode 100644
+index 00000000000000..4133f094077d23
+--- /dev/null
++++ b/packages/components/src/experiments.js
+@@ -0,0 +1,20 @@
++/**
++ * WordPress dependencies
++ */
++import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/experiments';
++
++/**
++ * Internal dependencies
++ */
++import { default as CustomSelectControl } from './custom-select-control';
++
++export const { lock, unlock } =
++	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
++		'I know using unstable features means my plugin or theme will inevitably break on the next WordPress release.',
++		'@wordpress/components'
++	);
++
++export const experiments = {};
++lock( experiments, {
++	CustomSelectControl,
++} );
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index ee20e323a363e9..3cf3a97f044549 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -59,7 +59,7 @@ export {
+ 	useCompositeState as __unstableUseCompositeState,
+ } from './composite';
+ export { ConfirmDialog as __experimentalConfirmDialog } from './confirm-dialog';
+-export { default as CustomSelectControl } from './custom-select-control';
++export { StableCustomSelectControl as CustomSelectControl } from './custom-select-control';
+ export { default as Dashicon } from './dashicon';
+ export { default as DateTimePicker, DatePicker, TimePicker } from './date-time';
+ export { default as __experimentalDimensionControl } from './dimension-control';
+@@ -212,3 +212,6 @@ export {
+ } from './higher-order/with-focus-return';
+ export { default as withNotices } from './higher-order/with-notices';
+ export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
++
++// Experiments.
++export { experiments } from './experiments';
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index d9828676beb10e..9e17a86a41c8ce 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -25,6 +25,7 @@
+ 		{ "path": "../dom" },
+ 		{ "path": "../element" },
+ 		{ "path": "../escape-html" },
++		{ "path": "../experiments" },
+ 		{ "path": "../hooks" },
+ 		{ "path": "../html-entities" },
+ 		{ "path": "../i18n" },
+diff --git a/packages/data/tsconfig.json b/packages/data/tsconfig.json
+index c604c1785853c0..fc80d7ed5fc8ff 100644
+--- a/packages/data/tsconfig.json
++++ b/packages/data/tsconfig.json
+@@ -10,6 +10,7 @@
+ 		{ "path": "../compose" },
+ 		{ "path": "../deprecated" },
+ 		{ "path": "../element" },
++		{ "path": "../experiments" },
+ 		{ "path": "../is-shallow-equal" },
+ 		{ "path": "../priority-queue" },
+ 		{ "path": "../redux-routine" }
+diff --git a/packages/experiments/package.json b/packages/experiments/package.json
+index 4d71c3980150a6..e45d4c4a569864 100644
+--- a/packages/experiments/package.json
++++ b/packages/experiments/package.json
+@@ -25,6 +25,7 @@
+ 	"main": "build/index.js",
+ 	"module": "build-module/index.js",
+ 	"react-native": "src/index",
++	"types": "build-types",
+ 	"sideEffects": false,
+ 	"dependencies": {
+ 		"@babel/runtime": "^7.16.0"
+diff --git a/packages/experiments/src/implementation.js b/packages/experiments/src/implementation.js
+index 143411ba640442..26502a47231112 100644
+--- a/packages/experiments/src/implementation.js
++++ b/packages/experiments/src/implementation.js
+@@ -10,20 +10,23 @@
+  * The list of core modules allowed to opt-in to the experimental APIs.
+  */
+ const CORE_MODULES_USING_EXPERIMENTS = [
+-	'@wordpress/data',
+-	'@wordpress/editor',
+-	'@wordpress/blocks',
+ 	'@wordpress/block-editor',
++	'@wordpress/block-library',
++	'@wordpress/blocks',
++	'@wordpress/components',
+ 	'@wordpress/customize-widgets',
+-	'@wordpress/edit-site',
++	'@wordpress/data',
+ 	'@wordpress/edit-post',
++	'@wordpress/edit-site',
+ 	'@wordpress/edit-widgets',
+-	'@wordpress/block-library',
++	'@wordpress/editor',
+ ];
+ 
+ /**
+  * A list of core modules that already opted-in to
+  * the experiments package.
++ *
++ * @type {string[]}
+  */
+ const registeredExperiments = [];
+ 
+@@ -44,6 +47,24 @@ const registeredExperiments = [];
+ const requiredConsent =
+ 	'I know using unstable features means my plugin or theme will inevitably break on the next WordPress release.';
+ 
++/** @type {boolean} */
++let allowReRegistration;
++// Use try/catch to force "false" if the environment variable is not explicitly
++// set to true (e.g. when building WordPress core).
++try {
++	allowReRegistration = process.env.ALLOW_EXPERIMENT_REREGISTRATION ?? false;
++} catch ( error ) {
++	allowReRegistration = false;
++}
++
++/**
++ * Called by a @wordpress package wishing to opt-in to accessing or exposing
++ * private experimental APIs.
++ *
++ * @param {string} consent    The consent string.
++ * @param {string} moduleName The name of the module that is opting in.
++ * @return {{lock: typeof lock, unlock: typeof unlock}} An object containing the lock and unlock functions.
++ */
+ export const __dangerousOptInToUnstableAPIsOnlyForCoreModules = (
+ 	consent,
+ 	moduleName
+@@ -57,7 +78,13 @@ export const __dangerousOptInToUnstableAPIsOnlyForCoreModules = (
+ 				'your product will inevitably break on one of the next WordPress releases.'
+ 		);
+ 	}
+-	if ( registeredExperiments.includes( moduleName ) ) {
++	if (
++		! allowReRegistration &&
++		registeredExperiments.includes( moduleName )
++	) {
++		// This check doesn't play well with Story Books / Hot Module Reloading
++		// and isn't included in the Gutenberg plugin. It only matters in the
++		// WordPress core release.
+ 		throw new Error(
+ 			`You tried to opt-in to unstable APIs as module "${ moduleName }" which is already registered. ` +
+ 				'This feature is only for JavaScript modules shipped with WordPress core. ' +
+@@ -104,8 +131,8 @@ export const __dangerousOptInToUnstableAPIsOnlyForCoreModules = (
+  * // { a: 1 }
+  * ```
+  *
+- * @param {Object|Function} object      The object to bind the private data to.
+- * @param {any}             privateData The private data to bind to the object.
++ * @param {any} object      The object to bind the private data to.
++ * @param {any} privateData The private data to bind to the object.
+  */
+ function lock( object, privateData ) {
+ 	if ( ! object ) {
+diff --git a/packages/experiments/tsconfig.json b/packages/experiments/tsconfig.json
+new file mode 100644
+index 00000000000000..671d4a5eba4403
+--- /dev/null
++++ b/packages/experiments/tsconfig.json
+@@ -0,0 +1,9 @@
++{
++	"extends": "../../tsconfig.base.json",
++	"compilerOptions": {
++		"rootDir": "src",
++		"declarationDir": "build-types",
++		"types": [ "gutenberg-env" ]
++	},
++	"include": [ "src/**/*" ]
++}
+diff --git a/storybook/main.js b/storybook/main.js
+index 3397c831f4da3f..92f2d7b4998e5d 100644
+--- a/storybook/main.js
++++ b/storybook/main.js
+@@ -5,8 +5,6 @@ const stories = [
+ 	'../packages/icons/src/**/stories/*.@(js|tsx|mdx)',
+ ].filter( Boolean );
+ 
+-const customEnvVariables = {};
+-
+ module.exports = {
+ 	core: {
+ 		builder: 'webpack5',
+@@ -30,20 +28,10 @@ module.exports = {
+ 		emotionAlias: false,
+ 		storyStoreV7: true,
+ 	},
+-	// Workaround:
+-	// https://github.com/storybookjs/storybook/issues/12270
+-	webpackFinal: async ( config ) => {
+-		// Find the DefinePlugin.
+-		const plugin = config.plugins.find( ( p ) => {
+-			return p.definitions && p.definitions[ 'process.env' ];
+-		} );
+-		// Add custom env variables.
+-		Object.keys( customEnvVariables ).forEach( ( key ) => {
+-			plugin.definitions[ 'process.env' ][ key ] = JSON.stringify(
+-				customEnvVariables[ key ]
+-			);
+-		} );
+-
+-		return config;
+-	},
++	env: ( config ) => ( {
++		...config,
++		// Inject the `ALLOW_EXPERIMENT_REREGISTRATION` global, used by
++		// @wordpress/experiments.
++		ALLOW_EXPERIMENT_REREGISTRATION: true,
++	} ),
+ };
+diff --git a/test/native/setup.js b/test/native/setup.js
+index 5f1801a338985f..b9e32a51d28799 100644
+--- a/test/native/setup.js
++++ b/test/native/setup.js
+@@ -8,6 +8,14 @@ import { Image, NativeModules as RNNativeModules } from 'react-native';
+ // testing environment: https://github.com/facebook/react-native/blob/6c19dc3266b84f47a076b647a1c93b3c3b69d2c5/Libraries/Core/setUpNavigator.js#L17
+ global.navigator = global.navigator ?? {};
+ 
++/**
++ * Whether to allow the same experiment to be registered multiple times.
++ * This is useful for development purposes, but should be set to false
++ * during the unit tests to ensure the Gutenberg plugin can be cleanly
++ * merged into WordPress core where this is false.
++ */
++global.process.env.ALLOW_EXPERIMENT_REREGISTRATION = true;
++
+ // Set up the app runtime globals for the test environment, which includes
+ // modifying the above `global.navigator`
+ require( '../../packages/react-native-editor/src/globals' );
+diff --git a/test/unit/config/is-gutenberg-plugin.js b/test/unit/config/gutenberg-env.js
+similarity index 73%
+rename from test/unit/config/is-gutenberg-plugin.js
+rename to test/unit/config/gutenberg-env.js
+index 7af5e4ad9a8647..72527ecb725a3c 100644
+--- a/test/unit/config/is-gutenberg-plugin.js
++++ b/test/unit/config/gutenberg-env.js
+@@ -22,4 +22,11 @@ global.process.env = {
+ 	// eslint-disable-next-line @wordpress/is-gutenberg-plugin
+ 	IS_GUTENBERG_PLUGIN:
+ 		String( process.env.npm_package_config_IS_GUTENBERG_PLUGIN ) === 'true',
++	/**
++	 * Whether to allow the same experiment to be registered multiple times.
++	 * This is useful for development purposes, but should be set to false
++	 * during the unit tests to ensure the Gutenberg plugin can be cleanly
++	 * merged into WordPress core where this is false.
++	 */
++	ALLOW_EXPERIMENT_REREGISTRATION: false,
+ };
+diff --git a/test/unit/jest.config.js b/test/unit/jest.config.js
+index 77d7818bacc852..0f0480072e569a 100644
+--- a/test/unit/jest.config.js
++++ b/test/unit/jest.config.js
+@@ -17,7 +17,7 @@ module.exports = {
+ 	preset: '@wordpress/jest-preset-default',
+ 	setupFiles: [
+ 		'<rootDir>/test/unit/config/global-mocks.js',
+-		'<rootDir>/test/unit/config/is-gutenberg-plugin.js',
++		'<rootDir>/test/unit/config/gutenberg-env.js',
+ 	],
+ 	setupFilesAfterEnv: [ '<rootDir>/test/unit/config/testing-library.js' ],
+ 	testURL: 'http://localhost',
+diff --git a/tools/webpack/shared.js b/tools/webpack/shared.js
+index a8079439528659..414ac4adf940b3 100644
+--- a/tools/webpack/shared.js
++++ b/tools/webpack/shared.js
+@@ -66,6 +66,9 @@ const plugins = [
+ 		// Inject the `IS_GUTENBERG_PLUGIN` global, used for feature flagging.
+ 		'process.env.IS_GUTENBERG_PLUGIN':
+ 			process.env.npm_package_config_IS_GUTENBERG_PLUGIN,
++		// Inject the `ALLOW_EXPERIMENT_REREGISTRATION` global, used by @wordpress/experiments.
++		'process.env.ALLOW_EXPERIMENT_REREGISTRATION':
++			process.env.npm_package_config_ALLOW_EXPERIMENT_REREGISTRATION,
+ 	} ),
+ 	mode === 'production' && new ReadableJsAssetsWebpackPlugin(),
+ ];
+diff --git a/tsconfig.json b/tsconfig.json
+index 633406a0154d56..10bb351d891807 100644
+--- a/tsconfig.json
++++ b/tsconfig.json
+@@ -21,8 +21,10 @@
+ 		{ "path": "packages/element" },
+ 		{ "path": "packages/escape-html" },
+ 		{ "path": "packages/eslint-plugin" },
++		{ "path": "packages/experiments" },
+ 		{ "path": "packages/hooks" },
+ 		{ "path": "packages/html-entities" },
++		{ "path": "packages/html-entities" },
+ 		{ "path": "packages/i18n" },
+ 		{ "path": "packages/icons" },
+ 		{ "path": "packages/is-shallow-equal" },
+diff --git a/typings/gutenberg-env/index.d.ts b/typings/gutenberg-env/index.d.ts
+index 7fe6d587446f59..834c307515893b 100644
+--- a/typings/gutenberg-env/index.d.ts
++++ b/typings/gutenberg-env/index.d.ts
+@@ -1,5 +1,7 @@
+ interface Environment {
+ 	NODE_ENV: unknown;
++	IS_GUTENBERG_PLUGIN?: boolean;
++	ALLOW_EXPERIMENT_REREGISTRATION?: boolean;
+ }
+ interface Process {
+ 	env: Environment;

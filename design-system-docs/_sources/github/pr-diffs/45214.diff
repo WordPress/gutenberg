@@ -1,0 +1,159 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d699e53a7fd7ce..e04bcaa1018211 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -30,6 +30,7 @@
+ -   `TabPanel`: Call `onSelect()` on every tab selection, regardless of whether it was triggered by user interaction ([#44028](https://github.com/WordPress/gutenberg/pull/44028)).
+ -   `FontSizePicker`: Fallback to font size `slug` if `name` is undefined  ([#45041](https://github.com/WordPress/gutenberg/pull/45041)).
+ -   `AutocompleterUI`: fix issue where autocompleter UI would appear on top of other UI elements ([#44795](https://github.com/WordPress/gutenberg/pull/44795/))
++-   `ExternalLink`: Fix to re-enable support for `onClick` event handler ([#45214](https://github.com/WordPress/gutenberg/pull/45214)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/external-link/index.tsx b/packages/components/src/external-link/index.tsx
+index f40b1b33509e46..d11f7e1eb71f67 100644
+--- a/packages/components/src/external-link/index.tsx
++++ b/packages/components/src/external-link/index.tsx
+@@ -43,17 +43,25 @@ function UnforwardedExternalLink(
+ 	to prevent them from being opened in the editor. */
+ 	const isInternalAnchor = !! href?.startsWith( '#' );
+ 
++	const onClickHandler = (
++		event: React.MouseEvent< HTMLAnchorElement, MouseEvent >
++	) => {
++		if ( isInternalAnchor ) {
++			event.preventDefault();
++		}
++
++		if ( props.onClick ) {
++			props.onClick( event );
++		}
++	};
++
+ 	return (
+ 		/* eslint-disable react/jsx-no-target-blank */
+ 		<a
+ 			{ ...additionalProps }
+ 			className={ classes }
+ 			href={ href }
+-			onClick={
+-				isInternalAnchor
+-					? ( event ) => event.preventDefault()
+-					: undefined
+-			}
++			onClick={ onClickHandler }
+ 			target="_blank"
+ 			rel={ optimizedRel }
+ 			ref={ ref }
+diff --git a/packages/components/src/external-link/test/index.tsx b/packages/components/src/external-link/test/index.tsx
+new file mode 100644
+index 00000000000000..bb001961ae33e8
+--- /dev/null
++++ b/packages/components/src/external-link/test/index.tsx
+@@ -0,0 +1,106 @@
++/**
++ * External dependencies
++ */
++import { render, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++
++/**
++ * Internal dependencies
++ */
++import { ExternalLink } from '..';
++
++const setupUser = () =>
++	userEvent.setup( {
++		advanceTimers: jest.advanceTimersByTime,
++	} );
++
++describe( 'ExternalLink', () => {
++	test( 'should call function passed in onClick handler when clicking the link', async () => {
++		const user = setupUser();
++		const onClickMock = jest.fn();
++
++		render(
++			<ExternalLink href="https://wordpress.org" onClick={ onClickMock }>
++				WordPress.org
++			</ExternalLink>
++		);
++
++		const link = screen.getByRole( 'link', {
++			name: 'WordPress.org (opens in a new tab)',
++		} );
++
++		await user.click( link );
++
++		expect( onClickMock ).toHaveBeenCalledTimes( 1 );
++	} );
++
++	test( 'should prevent default action when clicking an internal anchor link without passing onClick prop', async () => {
++		const user = setupUser();
++
++		render(
++			<ExternalLink href="#test">I&apos;m an anchor link!</ExternalLink>
++		);
++
++		const link = screen.getByRole( 'link', {
++			name: "I'm an anchor link! (opens in a new tab)",
++		} );
++
++		// We are using this approach so we can test the defaultPrevented
++		// without passing an onClick prop to the component.
++		const onClickMock = jest.fn();
++		link.onclick = onClickMock;
++
++		await user.click( link );
++		expect( onClickMock ).toHaveBeenCalledTimes( 1 );
++		expect( onClickMock ).toHaveBeenLastCalledWith(
++			expect.objectContaining( { defaultPrevented: true } )
++		);
++	} );
++
++	test( 'should call function passed in onClick handler and prevent default action when clicking an internal anchor link', async () => {
++		const user = setupUser();
++		const onClickMock = jest.fn();
++
++		render(
++			<ExternalLink href="#test" onClick={ onClickMock }>
++				I&apos;m an anchor link!
++			</ExternalLink>
++		);
++
++		const link = screen.getByRole( 'link', {
++			name: "I'm an anchor link! (opens in a new tab)",
++		} );
++
++		await user.click( link );
++		expect( onClickMock ).toHaveBeenCalledTimes( 1 );
++		expect( onClickMock ).toHaveBeenLastCalledWith(
++			expect.objectContaining( { defaultPrevented: true } )
++		);
++	} );
++
++	test( 'should not prevent default action when clicking a non anchor link without passing onClick prop', async () => {
++		const user = setupUser();
++
++		render(
++			<ExternalLink href="https://wordpress.org">
++				I&apos;m not an anchor link!
++			</ExternalLink>
++		);
++
++		const link = screen.getByRole( 'link', {
++			name: "I'm not an anchor link! (opens in a new tab)",
++		} );
++
++		// We are using this approach so we can test the defaultPrevented
++		// without passing an onClick prop to the component.
++		const onClickMock = jest.fn();
++		link.onclick = onClickMock;
++
++		await user.click( link );
++
++		expect( onClickMock ).toHaveBeenCalledTimes( 1 );
++		expect( onClickMock ).toHaveBeenLastCalledWith(
++			expect.objectContaining( { defaultPrevented: false } )
++		);
++	} );
++} );

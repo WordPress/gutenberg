@@ -1,0 +1,618 @@
+diff --git a/packages/components/src/elevation/component.js b/packages/components/src/elevation/component.js
+deleted file mode 100644
+index a225e665a9ff67..00000000000000
+--- a/packages/components/src/elevation/component.js
++++ /dev/null
+@@ -1,36 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { useElevation } from './hook';
+-import { createComponent } from '../ui/utils';
+-
+-/**
+- * `Elevation` is a core component that renders shadow, using the library's shadow system.
+- *
+- * The shadow effect is generated using the `value` prop.
+- *
+- * @example
+- * ```jsx
+- * import {
+- *	__experimentalElevation as Elevation,
+- *	__experimentalSurface as Surface,
+- *	__experimentalText as Text,
+- * } from '@wordpress/components';
+- *
+- * function Example() {
+- * 	return (
+- * 		<Surface>
+- * 			<Text>Code is Poetry</Text>
+- * 			<Elevation value={ 5 } />
+- * 		</Surface>
+- * 	);
+- * }
+- * ```
+- */
+-const Elevation = createComponent( {
+-	as: 'div',
+-	useHook: useElevation,
+-	name: 'Elevation',
+-} );
+-
+-export default Elevation;
+diff --git a/packages/components/src/elevation/component.tsx b/packages/components/src/elevation/component.tsx
+new file mode 100644
+index 00000000000000..21b8864ae5ba1a
+--- /dev/null
++++ b/packages/components/src/elevation/component.tsx
+@@ -0,0 +1,69 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { Ref } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import {
++	useContextSystem,
++	contextConnect,
++	PolymorphicComponentProps,
++} from '../ui/context';
++import type { Props } from './types';
++import { ElevationView, ElevationViewProps } from './styles';
++
++const DEFAULT_PROPS: ElevationViewProps = {
++	isInteractive: false,
++	offset: 0,
++	value: 0,
++	active: null,
++	focus: null,
++	hover: null,
++	borderRadius: 'inherit',
++};
++
++function Elevation(
++	props: PolymorphicComponentProps< Props, 'div', false >,
++	forwardedRef: Ref< any >
++) {
++	const contextProps = useContextSystem( props, 'Elevation' );
++
++	return (
++		<ElevationView
++			ref={ forwardedRef }
++			{ ...DEFAULT_PROPS }
++			{ ...contextProps }
++			aria-hidden="true"
++		/>
++	);
++}
++
++/**
++ * `Elevation` is a core component that renders shadow, using the library's shadow system.
++ *
++ * The shadow effect is generated using the `value` prop.
++ *
++ * @example
++ * ```jsx
++ * import {
++ *	__experimentalElevation as Elevation,
++ *	__experimentalSurface as Surface,
++ *	__experimentalText as Text,
++ * } from '@wordpress/components';
++ *
++ * function Example() {
++ * 	return (
++ * 		<Surface>
++ * 			<Text>Code is Poetry</Text>
++ * 			<Elevation value={ 5 } />
++ * 		</Surface>
++ * 	);
++ * }
++ * ```
++ */
++const ConnectedElevation = contextConnect( Elevation, 'Elevation' );
++
++export default ConnectedElevation;
+diff --git a/packages/components/src/elevation/hook.js b/packages/components/src/elevation/hook.js
+deleted file mode 100644
+index 3f4d6c88dbedee..00000000000000
+--- a/packages/components/src/elevation/hook.js
++++ /dev/null
+@@ -1,120 +0,0 @@
+-/**
+- * External dependencies
+- */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { css, cx } from '@emotion/css';
+-import { isNil } from 'lodash';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useMemo } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { useContextSystem } from '../ui/context';
+-import * as styles from './styles';
+-import CONFIG from '../utils/config-values';
+-
+-/**
+- * @param {number} value
+- * @return {string} The box shadow value.
+- */
+-export function getBoxShadow( value ) {
+-	const boxShadowColor = `rgba(0 ,0, 0, ${ value / 20 })`;
+-	const boxShadow = `0 ${ value }px ${ value * 2 }px 0
+-	${ boxShadowColor }`;
+-
+-	return boxShadow;
+-}
+-
+-/**
+- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+- */
+-export function useElevation( props ) {
+-	const {
+-		active,
+-		borderRadius = 'inherit',
+-		className,
+-		focus,
+-		hover,
+-		isInteractive = false,
+-		offset = 0,
+-		value = 0,
+-		...otherProps
+-	} = useContextSystem( props, 'Elevation' );
+-
+-	const classes = useMemo( () => {
+-		/** @type {number | undefined} */
+-		let hoverValue = ! isNil( hover ) ? hover : value * 2;
+-		/** @type {number | undefined} */
+-		let activeValue = ! isNil( active ) ? active : value / 2;
+-
+-		if ( ! isInteractive ) {
+-			hoverValue = ! isNil( hover ) ? hover : undefined;
+-			activeValue = ! isNil( active ) ? active : undefined;
+-		}
+-
+-		const transition = `box-shadow ${ CONFIG.transitionDuration } ${ CONFIG.transitionTimingFunction }`;
+-
+-		const sx = {};
+-
+-		sx.Base = css( {
+-			borderRadius,
+-			bottom: offset,
+-			boxShadow: getBoxShadow( value ),
+-			opacity: CONFIG.elevationIntensity,
+-			left: offset,
+-			right: offset,
+-			top: offset,
+-			transition,
+-		} );
+-
+-		if ( ! isNil( hoverValue ) ) {
+-			sx.hover = css`
+-				*:hover > & {
+-					box-shadow: ${ getBoxShadow( hoverValue ) };
+-				}
+-			`;
+-		}
+-
+-		if ( ! isNil( activeValue ) ) {
+-			sx.active = css`
+-				*:active > & {
+-					box-shadow: ${ getBoxShadow( activeValue ) };
+-				}
+-			`;
+-		}
+-
+-		if ( ! isNil( focus ) ) {
+-			sx.focus = css`
+-				*:focus > & {
+-					box-shadow: ${ getBoxShadow( focus ) };
+-				}
+-			`;
+-		}
+-
+-		return cx(
+-			styles.Elevation,
+-			sx.Base,
+-			sx.hover && sx.hover,
+-			sx.focus && sx.focus,
+-			sx.active && sx.active,
+-			className
+-		);
+-	}, [
+-		active,
+-		borderRadius,
+-		className,
+-		focus,
+-		hover,
+-		isInteractive,
+-		offset,
+-		value,
+-	] );
+-
+-	return { ...otherProps, className: classes, 'aria-hidden': true };
+-}
+diff --git a/packages/components/src/elevation/index.js b/packages/components/src/elevation/index.ts
+similarity index 68%
+rename from packages/components/src/elevation/index.js
+rename to packages/components/src/elevation/index.ts
+index dcf1b5cbf71e2b..9108e8aa1e9b17 100644
+--- a/packages/components/src/elevation/index.js
++++ b/packages/components/src/elevation/index.ts
+@@ -1,2 +1 @@
+ export { default as Elevation } from './component';
+-export * from './hook';
+diff --git a/packages/components/src/elevation/styles.js b/packages/components/src/elevation/styles.js
+deleted file mode 100644
+index 8199f1264023d2..00000000000000
+--- a/packages/components/src/elevation/styles.js
++++ /dev/null
+@@ -1,16 +0,0 @@
+-/**
+- * External dependencies
+- */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { css } from '@emotion/css';
+-
+-export const Elevation = css`
+-	background: transparent;
+-	display: block;
+-	margin: 0 !important;
+-	pointer-events: none;
+-	position: absolute;
+-	will-change: box-shadow;
+-`;
+diff --git a/packages/components/src/elevation/styles.ts b/packages/components/src/elevation/styles.ts
+new file mode 100644
+index 00000000000000..1f0a28252db4bc
+--- /dev/null
++++ b/packages/components/src/elevation/styles.ts
+@@ -0,0 +1,102 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++import { css, CSSObject } from '@emotion/react';
++import type { Required } from 'utility-types';
++
++/**
++ * Internal dependencies
++ */
++import type { Props } from './types';
++import { CONFIG, reduceMotion } from '../utils';
++
++export type ElevationViewProps = Required< Props >;
++
++const getBoxShadow = ( value: number ) => {
++	const boxShadowColor = `rgba(0 ,0, 0, ${ value / 20 })`;
++	return `0 ${ value }px ${ value * 2 }px 0
++	${ boxShadowColor }`;
++};
++
++const renderBoxShadow = ( { value }: ElevationViewProps ) =>
++	css( { boxShadow: getBoxShadow( value ) } );
++
++const renderTransition = () =>
++	css( {
++		transition: `box-shadow ${ CONFIG.transitionDuration }
++${ CONFIG.transitionTimingFunction }`,
++	} );
++
++const renderBorderRadius = ( { borderRadius }: ElevationViewProps ) =>
++	css( { borderRadius } );
++
++const renderOffset = ( { offset }: ElevationViewProps ) =>
++	css( { bottom: offset, left: offset, right: offset, top: offset } );
++
++const renderHoverActiveFocus = ( {
++	isInteractive,
++	active,
++	hover,
++	focus,
++	value,
++}: ElevationViewProps ) => {
++	let hoverValue: number | null = hover !== null ? hover : value * 2;
++	let activeValue: number | null = active !== null ? active : value / 2;
++
++	if ( ! isInteractive ) {
++		hoverValue = hover;
++		activeValue = active;
++	}
++
++	const cssObj: CSSObject = {};
++
++	if ( hoverValue !== null ) {
++		cssObj[ '*:hover > &' ] = {
++			boxShadow: getBoxShadow( hoverValue ),
++		};
++	}
++
++	if ( activeValue !== null ) {
++		cssObj[ '*:active > &' ] = {
++			boxShadow: getBoxShadow( activeValue ),
++		};
++	}
++
++	if ( focus !== null ) {
++		cssObj[ '*focus > &' ] = {
++			boxShadow: getBoxShadow( focus ),
++		};
++	}
++
++	return css( cssObj );
++};
++
++const DO_NOT_FORWARD = [
++	'value',
++	'offset',
++	'hover',
++	'active',
++	'focus',
++	'borderRadius',
++	'isInteractive',
++];
++
++export const ElevationView = styled( 'div', {
++	shouldForwardProp: ( propName ) =>
++		! DO_NOT_FORWARD.includes( propName as string ),
++} )< ElevationViewProps >`
++	background: transparent;
++	display: block;
++	margin: 0 !important;
++	pointer-events: none;
++	position: absolute;
++	will-change: box-shadow;
++	opacity: ${ CONFIG.elevationIntensity };
++	${ renderTransition }
++	${ reduceMotion( 'transition' ) }
++	${ renderBoxShadow }
++	${ renderBorderRadius }
++	${ renderOffset }
++	${ renderHoverActiveFocus }
++`;
+diff --git a/packages/components/src/elevation/test/__snapshots__/index.js.snap b/packages/components/src/elevation/test/__snapshots__/index.js.snap
+index d00b77d5b52d68..bf08a6254e3443 100644
+--- a/packages/components/src/elevation/test/__snapshots__/index.js.snap
++++ b/packages/components/src/elevation/test/__snapshots__/index.js.snap
+@@ -8,15 +8,21 @@ exports[`props should render active 1`] = `
+   pointer-events: none;
+   position: absolute;
+   will-change: box-shadow;
++  opacity: 1;
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  box-shadow: 0 7px 14px 0 rgba(0 ,0, 0, 0.35);
+   border-radius: inherit;
+   bottom: 0;
+-  box-shadow: 0 7px 14px 0 rgba(0 ,0, 0, 0.35);
+-  opacity: 1;
+   left: 0;
+   right: 0;
+   top: 0;
+-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++}
++
++@media ( prefers-reduced-motion: reduce ) {
++  .emotion-0 {
++    transition-duration: 0ms;
++  }
+ }
+ 
+ *:hover>.emotion-0 {
+@@ -29,7 +35,7 @@ exports[`props should render active 1`] = `
+ 
+ <div
+   aria-hidden="true"
+-  class="components-elevation emotion-0 emotion-1 emotion-2"
++  class="components-elevation emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="Elevation"
+ />
+@@ -43,20 +49,26 @@ exports[`props should render correctly 1`] = `
+   pointer-events: none;
+   position: absolute;
+   will-change: box-shadow;
++  opacity: 1;
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  box-shadow: 0 0px 0px 0 rgba(0 ,0, 0, 0);
+   border-radius: inherit;
+   bottom: 0;
+-  box-shadow: 0 0px 0px 0 rgba(0 ,0, 0, 0);
+-  opacity: 1;
+   left: 0;
+   right: 0;
+   top: 0;
+-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++}
++
++@media ( prefers-reduced-motion: reduce ) {
++  .emotion-0 {
++    transition-duration: 0ms;
++  }
+ }
+ 
+ <div
+   aria-hidden="true"
+-  class="components-elevation emotion-0 emotion-1 emotion-2"
++  class="components-elevation emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="Elevation"
+ />
+@@ -70,15 +82,21 @@ exports[`props should render hover 1`] = `
+   pointer-events: none;
+   position: absolute;
+   will-change: box-shadow;
++  opacity: 1;
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  box-shadow: 0 7px 14px 0 rgba(0 ,0, 0, 0.35);
+   border-radius: inherit;
+   bottom: 0;
+-  box-shadow: 0 7px 14px 0 rgba(0 ,0, 0, 0.35);
+-  opacity: 1;
+   left: 0;
+   right: 0;
+   top: 0;
+-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++}
++
++@media ( prefers-reduced-motion: reduce ) {
++  .emotion-0 {
++    transition-duration: 0ms;
++  }
+ }
+ 
+ *:hover>.emotion-0 {
+@@ -87,7 +105,7 @@ exports[`props should render hover 1`] = `
+ 
+ <div
+   aria-hidden="true"
+-  class="components-elevation emotion-0 emotion-1 emotion-2"
++  class="components-elevation emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="Elevation"
+ />
+@@ -101,15 +119,21 @@ exports[`props should render isInteractive 1`] = `
+   pointer-events: none;
+   position: absolute;
+   will-change: box-shadow;
++  opacity: 1;
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  box-shadow: 0 0px 0px 0 rgba(0 ,0, 0, 0);
+   border-radius: inherit;
+   bottom: 0;
+-  box-shadow: 0 0px 0px 0 rgba(0 ,0, 0, 0);
+-  opacity: 1;
+   left: 0;
+   right: 0;
+   top: 0;
+-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++}
++
++@media ( prefers-reduced-motion: reduce ) {
++  .emotion-0 {
++    transition-duration: 0ms;
++  }
+ }
+ 
+ *:hover>.emotion-0 {
+@@ -122,7 +146,7 @@ exports[`props should render isInteractive 1`] = `
+ 
+ <div
+   aria-hidden="true"
+-  class="components-elevation emotion-0 emotion-1 emotion-2"
++  class="components-elevation emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="Elevation"
+ />
+@@ -136,15 +160,21 @@ exports[`props should render offset 1`] = `
+   pointer-events: none;
+   position: absolute;
+   will-change: box-shadow;
++  opacity: 1;
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  box-shadow: 0 7px 14px 0 rgba(0 ,0, 0, 0.35);
+   border-radius: inherit;
+   bottom: -2px;
+-  box-shadow: 0 7px 14px 0 rgba(0 ,0, 0, 0.35);
+-  opacity: 1;
+   left: -2px;
+   right: -2px;
+   top: -2px;
+-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++}
++
++@media ( prefers-reduced-motion: reduce ) {
++  .emotion-0 {
++    transition-duration: 0ms;
++  }
+ }
+ 
+ *:hover>.emotion-0 {
+@@ -157,7 +187,7 @@ exports[`props should render offset 1`] = `
+ 
+ <div
+   aria-hidden="true"
+-  class="components-elevation emotion-0 emotion-1 emotion-2"
++  class="components-elevation emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="Elevation"
+ />
+@@ -171,20 +201,26 @@ exports[`props should render value 1`] = `
+   pointer-events: none;
+   position: absolute;
+   will-change: box-shadow;
++  opacity: 1;
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  box-shadow: 0 7px 14px 0 rgba(0 ,0, 0, 0.35);
+   border-radius: inherit;
+   bottom: 0;
+-  box-shadow: 0 7px 14px 0 rgba(0 ,0, 0, 0.35);
+-  opacity: 1;
+   left: 0;
+   right: 0;
+   top: 0;
+-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++}
++
++@media ( prefers-reduced-motion: reduce ) {
++  .emotion-0 {
++    transition-duration: 0ms;
++  }
+ }
+ 
+ <div
+   aria-hidden="true"
+-  class="components-elevation emotion-0 emotion-1 emotion-2"
++  class="components-elevation emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="Elevation"
+ />
+diff --git a/packages/components/src/elevation/types.ts b/packages/components/src/elevation/types.ts
+index dee387b07aa368..14586d2cc44a54 100644
+--- a/packages/components/src/elevation/types.ts
++++ b/packages/components/src/elevation/types.ts
+@@ -8,7 +8,7 @@ export type Props = {
+ 	/**
+ 	 * Renders the active (interaction) shadow value.
+ 	 */
+-	active?: number;
++	active?: number | null;
+ 	/**
+ 	 * Renders the border-radius of the shadow.
+ 	 */
+@@ -16,11 +16,11 @@ export type Props = {
+ 	/**
+ 	 * Renders the focus (interaction) shadow value.
+ 	 */
+-	focus?: number;
++	focus?: number | null;
+ 	/**
+ 	 * Renders the hover (interaction) shadow value.
+ 	 */
+-	hover?: number;
++	hover?: number | null;
+ 	/**
+ 	 * Determines if hover, active, and focus shadow values should be automatically calculated and rendered.
+ 	 */

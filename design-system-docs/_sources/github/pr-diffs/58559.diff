@@ -1,0 +1,76 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6080498d5e92ba..628466b1583a39 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancements
+ 
+ -   `ConfirmDialog`: Add `__next40pxDefaultSize` to buttons ([#58421](https://github.com/WordPress/gutenberg/pull/58421)).
++-   `SnackbarList`: Allow limiting the number of maximum visible Snackbars ([#58559](https://github.com/WordPress/gutenberg/pull/58559)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/snackbar/list.tsx b/packages/components/src/snackbar/list.tsx
+index e423cf6c3a7f7e..fc9f0ec580d19b 100644
+--- a/packages/components/src/snackbar/list.tsx
++++ b/packages/components/src/snackbar/list.tsx
+@@ -62,12 +62,14 @@ const SNACKBAR_VARIANTS = {
+  */
+ export function SnackbarList( {
+ 	notices,
++	maxVisible,
+ 	className,
+ 	children,
+ 	onRemove,
+ }: WordPressComponentProps< SnackbarListProps, 'div' > ) {
+ 	const listRef = useRef< HTMLDivElement | null >( null );
+ 	const isReducedMotion = useReducedMotion();
++	const visibleNotices = maxVisible ? notices.slice( -maxVisible ) : notices;
+ 	className = classnames( 'components-snackbar-list', className );
+ 	const removeNotice =
+ 		( notice: SnackbarListProps[ 'notices' ][ number ] ) => () =>
+@@ -76,7 +78,7 @@ export function SnackbarList( {
+ 		<div className={ className } tabIndex={ -1 } ref={ listRef }>
+ 			{ children }
+ 			<AnimatePresence>
+-				{ notices.map( ( notice ) => {
++				{ visibleNotices.map( ( notice ) => {
+ 					const { content, ...restNotice } = notice;
+ 
+ 					return (
+diff --git a/packages/components/src/snackbar/types.ts b/packages/components/src/snackbar/types.ts
+index 539c4c3ebdf65e..ecd7abff6d56a6 100644
+--- a/packages/components/src/snackbar/types.ts
++++ b/packages/components/src/snackbar/types.ts
+@@ -38,6 +38,7 @@ export type SnackbarListProps = {
+ 			content: string;
+ 		}
+ 	>;
++	maxVisible?: number;
+ 	onRemove: ( id: string ) => void;
+ 	children?: NoticeChildren | Array< NoticeChildren >;
+ };
+diff --git a/packages/edit-widgets/src/components/notices/index.js b/packages/edit-widgets/src/components/notices/index.js
+index bb02274e92871d..b595d810dfc298 100644
+--- a/packages/edit-widgets/src/components/notices/index.js
++++ b/packages/edit-widgets/src/components/notices/index.js
+@@ -36,6 +36,7 @@ function Notices() {
+ 			/>
+ 			<SnackbarList
+ 				notices={ snackbarNotices }
++				maxVisible={ 3 }
+ 				className="edit-widgets-notices__snackbar"
+ 				onRemove={ removeNotice }
+ 			/>
+diff --git a/packages/editor/src/components/editor-snackbars/index.js b/packages/editor/src/components/editor-snackbars/index.js
+index 57f0fe4bf88af5..bfdbb504cf8e95 100644
+--- a/packages/editor/src/components/editor-snackbars/index.js
++++ b/packages/editor/src/components/editor-snackbars/index.js
+@@ -18,6 +18,7 @@ export default function EditorSnackbars() {
+ 	return (
+ 		<SnackbarList
+ 			notices={ snackbarNotices }
++			maxVisible={ 3 }
+ 			className="components-editor-notices__snackbar"
+ 			onRemove={ removeNotice }
+ 		/>

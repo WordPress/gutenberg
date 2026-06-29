@@ -1,0 +1,567 @@
+diff --git a/packages/components/src/font-size-picker/index.js b/packages/components/src/font-size-picker/index.js
+index 764aece8cbef05..61b63c15923c80 100644
+--- a/packages/components/src/font-size-picker/index.js
++++ b/packages/components/src/font-size-picker/index.js
+@@ -18,7 +18,6 @@ import Button from '../button';
+ import RangeControl from '../range-control';
+ import CustomSelectControl from '../custom-select-control';
+ import VisuallyHidden from '../visually-hidden';
+-import { withNextComponent } from './next';
+ 
+ const DEFAULT_FONT_SIZE = 'default';
+ const CUSTOM_FONT_SIZE = 'custom';
+@@ -177,4 +176,4 @@ function FontSizePicker(
+ 	);
+ }
+ 
+-export default withNextComponent( forwardRef( FontSizePicker ) );
++export default forwardRef( FontSizePicker );
+diff --git a/packages/components/src/font-size-picker/next.js b/packages/components/src/font-size-picker/next.js
+deleted file mode 100644
+index 2d3815661ba116..00000000000000
+--- a/packages/components/src/font-size-picker/next.js
++++ /dev/null
+@@ -1,26 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { withNext } from '../ui/context';
+-import { FontSizeControl } from '../ui/font-size-control';
+-
+-const FontSizePicker =
+-	process.env.COMPONENT_SYSTEM_PHASE === 1
+-		? ( props, ref ) => {
+-				// @todo Wrapped with div.components-base-control for spacing reasons.
+-				// Remove this when the inner Typography Tools component uses VStack
+-				// to automatically space elements apart vertically.
+-				return (
+-					<div className="components-base-control">
+-						<FontSizeControl
+-							{ ...props }
+-							{ ...( ref ? {} : { ref } ) }
+-						/>
+-					</div>
+-				);
+-		  }
+-		: undefined;
+-
+-export function withNextComponent( current ) {
+-	return withNext( current, FontSizePicker, 'WPComponentsFontSizePicker' );
+-}
+diff --git a/packages/components/src/ui/font-size-control/README.md b/packages/components/src/ui/font-size-control/README.md
+deleted file mode 100644
+index aff5e97a568d24..00000000000000
+--- a/packages/components/src/ui/font-size-control/README.md
++++ /dev/null
+@@ -1,5 +0,0 @@
+-# FontSizeControl
+-
+-`FontSizeControl` is a tool that renders a UI that allows users to select a font size.
+-
+-For more information, see the [`FontSizePicker`](../../font-size-picker).
+diff --git a/packages/components/src/ui/font-size-control/font-size-control.js b/packages/components/src/ui/font-size-control/font-size-control.js
+deleted file mode 100755
+index f8acfa35ef5f85..00000000000000
+--- a/packages/components/src/ui/font-size-control/font-size-control.js
++++ /dev/null
+@@ -1,78 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { contextConnect } from '@wp-g2/context';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { __ } from '@wordpress/i18n';
+-
+-/**
+- * Internal dependencies
+- */
+-import { VisuallyHidden } from '../visually-hidden';
+-import { VStack } from '../v-stack';
+-import FontSizeControlSelect from './select';
+-import FontSizeControlSlider from './slider';
+-import useFontSizeControl from './use-font-size-control';
+-import { View } from '../view';
+-
+-function FontSizeControl( props, forwardedRef ) {
+-	const {
+-		options,
+-		inputValue,
+-		isDefaultValue,
+-		value,
+-		onChange,
+-		onReset,
+-		onInputChange,
+-		size,
+-		withSlider,
+-		withNumberInput,
+-		withSelect,
+-		...otherProps
+-	} = useFontSizeControl( props );
+-
+-	if ( ! options ) return null;
+-
+-	const label = __( 'Font size' );
+-	const customLabel = __( 'Custom' );
+-	const max = 100;
+-	const min = 1;
+-
+-	return (
+-		<View as="fieldset" { ...otherProps }>
+-			<VisuallyHidden as="legend">{ label }</VisuallyHidden>
+-			<VStack spacing={ 3 }>
+-				<FontSizeControlSelect
+-					customLabel={ customLabel }
+-					inputValue={ inputValue }
+-					isDefaultValue={ isDefaultValue }
+-					label={ label }
+-					max={ max }
+-					min={ min }
+-					onChange={ onChange }
+-					onInputChange={ onInputChange }
+-					onReset={ onReset }
+-					options={ options }
+-					ref={ forwardedRef }
+-					size={ size }
+-					value={ value }
+-					withNumberInput={ withNumberInput }
+-					withSelect={ withSelect }
+-				/>
+-				<FontSizeControlSlider
+-					max={ max }
+-					min={ min }
+-					onChange={ onInputChange }
+-					size={ size }
+-					value={ inputValue }
+-					withSlider={ withSlider }
+-				/>
+-			</VStack>
+-		</View>
+-	);
+-}
+-
+-export default contextConnect( FontSizeControl, 'FontSizeControl' );
+diff --git a/packages/components/src/ui/font-size-control/index.js b/packages/components/src/ui/font-size-control/index.js
+deleted file mode 100644
+index 38f84af096d9b1..00000000000000
+--- a/packages/components/src/ui/font-size-control/index.js
++++ /dev/null
+@@ -1,2 +0,0 @@
+-export { default as FontSizeControl } from './font-size-control';
+-export { default as useFontSizeControl } from './use-font-size-control';
+diff --git a/packages/components/src/ui/font-size-control/select.js b/packages/components/src/ui/font-size-control/select.js
+deleted file mode 100755
+index 9ed1999be28d37..00000000000000
+--- a/packages/components/src/ui/font-size-control/select.js
++++ /dev/null
+@@ -1,100 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-import { contextConnect, useContextSystem } from '@wp-g2/context';
+-import {
+-	TextInput,
+-	SelectDropdown,
+-	FormGroup,
+-	Button,
+-} from '@wp-g2/components';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { __ } from '@wordpress/i18n';
+-
+-/**
+- * Internal dependencies
+- */
+-import { getSelectTemplateColumns } from './utils';
+-import { Grid } from '../grid';
+-import { View } from '../view';
+-
+-function renderItem( { name, style } ) {
+-	return <span style={ style }>{ name }</span>;
+-}
+-
+-function FontSizeControlSelect( props, forwardedRef ) {
+-	const {
+-		customLabel,
+-		disabled,
+-		inputValue,
+-		isDefaultValue,
+-		label,
+-		max,
+-		min,
+-		onChange = noop,
+-		onInputChange = noop,
+-		onReset = noop,
+-		options = [],
+-		size,
+-		value,
+-		withNumberInput,
+-		withSelect,
+-		...otherProps
+-	} = useContextSystem( props, 'FontSizeControlSelect' );
+-
+-	const templateColumns = getSelectTemplateColumns( withNumberInput );
+-	const subControlsTemplateColumns = withNumberInput ? '1fr 1fr' : '1fr';
+-
+-	return (
+-		<Grid alignment="bottom" templateColumns={ templateColumns }>
+-			{ withSelect && (
+-				<FormGroup label={ label }>
+-					<SelectDropdown
+-						disabled={ disabled }
+-						max={ 260 }
+-						onChange={ onChange }
+-						options={ options }
+-						renderItem={ renderItem }
+-						ref={ forwardedRef }
+-						size={ size }
+-						value={ value }
+-						{ ...otherProps }
+-					/>
+-				</FormGroup>
+-			) }
+-			<Grid
+-				alignment="bottom"
+-				templateColumns={ subControlsTemplateColumns }
+-			>
+-				{ withNumberInput && (
+-					<FormGroup label={ customLabel }>
+-						<TextInput
+-							disabled={ disabled }
+-							max={ max }
+-							min={ min }
+-							onChange={ onInputChange }
+-							size={ size }
+-							type="number"
+-							value={ inputValue }
+-						/>
+-					</FormGroup>
+-				) }
+-				<View>
+-					<Button
+-						disabled={ isDefaultValue }
+-						isBlock
+-						onClick={ onReset }
+-					>
+-						{ __( 'Reset' ) }
+-					</Button>
+-				</View>
+-			</Grid>
+-		</Grid>
+-	);
+-}
+-
+-export default contextConnect( FontSizeControlSelect, 'FontSizeControlSelect' );
+diff --git a/packages/components/src/ui/font-size-control/slider.js b/packages/components/src/ui/font-size-control/slider.js
+deleted file mode 100755
+index 793bbd684773ba..00000000000000
+--- a/packages/components/src/ui/font-size-control/slider.js
++++ /dev/null
+@@ -1,55 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-import { ControlLabel, Slider, TextInput } from '@wp-g2/components';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { __ } from '@wordpress/i18n';
+-
+-/**
+- * Internal dependencies
+- */
+-import { getSliderTemplateColumns } from './utils';
+-import { Grid } from '../grid';
+-import { VStack } from '../v-stack';
+-
+-function FontSizeControlSlider( props ) {
+-	const {
+-		label = __( 'Custom size' ),
+-		disabled,
+-		min,
+-		max,
+-		onChange = noop,
+-		size,
+-		value,
+-		withSlider,
+-	} = props;
+-
+-	if ( ! withSlider ) return null;
+-
+-	const templateColumns = getSliderTemplateColumns();
+-
+-	const controlProps = {
+-		disabled,
+-		min,
+-		max,
+-		onChange,
+-		size,
+-		value,
+-	};
+-
+-	return (
+-		<VStack spacing={ 0 }>
+-			<ControlLabel>{ label }</ControlLabel>
+-			<Grid templateColumns={ templateColumns }>
+-				<Slider { ...controlProps } />
+-				<TextInput { ...controlProps } type="number" />
+-			</Grid>
+-		</VStack>
+-	);
+-}
+-
+-export default FontSizeControlSlider;
+diff --git a/packages/components/src/ui/font-size-control/styles.js b/packages/components/src/ui/font-size-control/styles.js
+deleted file mode 100755
+index b4c34f8aa338e5..00000000000000
+--- a/packages/components/src/ui/font-size-control/styles.js
++++ /dev/null
+@@ -1,11 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { css } from '@wp-g2/styles';
+-
+-export const FontSizeControl = css`
+-	appearance: none;
+-	border: none;
+-	margin: 0;
+-	padding: 0;
+-`;
+diff --git a/packages/components/src/ui/font-size-control/use-font-size-control.js b/packages/components/src/ui/font-size-control/use-font-size-control.js
+deleted file mode 100755
+index 38a345045c92fe..00000000000000
+--- a/packages/components/src/ui/font-size-control/use-font-size-control.js
++++ /dev/null
+@@ -1,113 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { useContextSystem } from '@wp-g2/context';
+-import { cx } from '@wp-g2/styles';
+-import { createUnitValue, is, noop } from '@wp-g2/utils';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useCallback, useMemo } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import * as styles from './styles';
+-import {
+-	getInputValue,
+-	getSelectOptions,
+-	getSelectValueFromFontSize,
+-	hasUnit,
+-	isCustomSelectedItem,
+-	isCustomValue,
+-} from './utils';
+-
+-export default function useFontSizeControl( props ) {
+-	const {
+-		disableCustomFontSizes,
+-		fontSizes = [],
+-		onChange = noop,
+-		value,
+-		withSlider = false,
+-		className,
+-		...otherProps
+-	} = useContextSystem( props, 'FontSizeControl' );
+-
+-	const hasUnits = hasUnit( value || fontSizes[ 0 ]?.size );
+-
+-	const hasCustomValue = isCustomValue( fontSizes, value );
+-
+-	const options = useMemo(
+-		() =>
+-			getSelectOptions( {
+-				options: fontSizes,
+-				disableCustomFontSizes,
+-				hasCustomValue,
+-			} ),
+-		[ fontSizes, disableCustomFontSizes, hasCustomValue ]
+-	);
+-
+-	const handleOnReset = useCallback( () => {
+-		onChange( undefined );
+-	}, [ onChange ] );
+-
+-	const handleOnChange = useCallback(
+-		( { selectedItem } ) => {
+-			if ( isCustomSelectedItem( selectedItem ) ) return;
+-
+-			if ( hasUnits ) {
+-				onChange( selectedItem.size );
+-			} else if ( is.defined( selectedItem.size ) ) {
+-				onChange( Number( selectedItem.size ) );
+-			} else {
+-				handleOnReset();
+-			}
+-		},
+-		[ handleOnReset, hasUnits, onChange ]
+-	);
+-
+-	const handleOnInputChange = useCallback(
+-		( next ) => {
+-			if ( ! next && next !== 0 ) {
+-				handleOnReset();
+-				return;
+-			}
+-			if ( hasUnits ) {
+-				onChange( createUnitValue( next, 'px' ) );
+-			} else {
+-				onChange( Number( next ) );
+-			}
+-		},
+-		[ handleOnReset, hasUnits, onChange ]
+-	);
+-
+-	const inputValue = getInputValue( fontSizes, value );
+-
+-	const selectedFontSizeSlug = getSelectValueFromFontSize( fontSizes, value );
+-	const currentValue = options.find(
+-		( option ) => option.key === selectedFontSizeSlug
+-	);
+-
+-	const isDefaultValue = ! is.defined( value, className );
+-
+-	const classes = cx( styles.FontSizeControl );
+-
+-	const withSelect = fontSizes.length > 0;
+-	const withNumberInput = ! withSlider && ! disableCustomFontSizes;
+-
+-	return {
+-		...otherProps,
+-		className: classes,
+-		inputValue,
+-		isDefaultValue,
+-		onChange: handleOnChange,
+-		onInputChange: handleOnInputChange,
+-		onReset: handleOnReset,
+-		options,
+-		value: currentValue,
+-		withNumberInput,
+-		withSelect,
+-		withSlider,
+-	};
+-}
+diff --git a/packages/components/src/ui/font-size-control/utils.js b/packages/components/src/ui/font-size-control/utils.js
+deleted file mode 100755
+index a3c085c1054b6e..00000000000000
+--- a/packages/components/src/ui/font-size-control/utils.js
++++ /dev/null
+@@ -1,105 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { __ } from '@wordpress/i18n';
+-
+-/**
+- * External dependencies
+- */
+-import { ui } from '@wp-g2/styles';
+-import { createUnitValue, parseUnitValue } from '@wp-g2/utils';
+-
+-const DEFAULT_FONT_SIZE = 'default';
+-const CUSTOM_FONT_SIZE = 'custom';
+-const MAX_FONT_SIZE_DISPLAY = '25px';
+-const ASIDE_CONTROL_WIDTH = 70;
+-
+-export function hasUnit( value ) {
+-	const [ , unit ] = parseUnitValue( value );
+-	return !! unit;
+-}
+-
+-function getFontSize( values = [], value ) {
+-	return values.find( ( item ) => item.size === value );
+-}
+-
+-export function isCustomValue( values = [], value ) {
+-	const item = getFontSize( values, value );
+-	return !! item;
+-}
+-
+-export function isCustomSelectedItem( selectedItem ) {
+-	return selectedItem?.key === CUSTOM_FONT_SIZE;
+-}
+-
+-export function getSelectValueFromFontSize( fontSizes, value ) {
+-	if ( ! value ) return DEFAULT_FONT_SIZE;
+-
+-	const fontSize = getFontSize( fontSizes, value );
+-	return fontSize ? fontSize.slug : CUSTOM_FONT_SIZE;
+-}
+-
+-export function getSelectOptions( {
+-	disableCustomFontSizes,
+-	hasCustomValue,
+-	options,
+-} ) {
+-	if ( disableCustomFontSizes && ! options.length ) return null;
+-
+-	options = [
+-		{ slug: DEFAULT_FONT_SIZE, name: __( 'Default' ), size: undefined },
+-		...options,
+-	];
+-
+-	if ( ! hasCustomValue && ! disableCustomFontSizes ) {
+-		options.push( { slug: CUSTOM_FONT_SIZE, name: __( 'Custom' ) } );
+-	}
+-
+-	return options.map( ( option ) => {
+-		const fontSize =
+-			typeof option.size === 'number'
+-				? createUnitValue( option.size, 'px' )
+-				: option.size;
+-
+-		return {
+-			...option,
+-			key: option.slug,
+-			style: {
+-				fontSize: `min( ${ fontSize }, ${ MAX_FONT_SIZE_DISPLAY } )`,
+-			},
+-		};
+-	} );
+-}
+-
+-export function getInputValue( fontSizes = [], value ) {
+-	const hasUnits = hasUnit( value || fontSizes[ 0 ]?.size );
+-
+-	let noUnitsValue;
+-	if ( ! hasUnits ) {
+-		noUnitsValue = value;
+-	} else {
+-		noUnitsValue = parseInt( value );
+-	}
+-
+-	const isPixelValue =
+-		typeof value === 'number' ||
+-		( typeof value === 'string' && value.endsWith( 'px' ) );
+-
+-	const inputValue = ( isPixelValue && noUnitsValue ) || '';
+-
+-	return inputValue;
+-}
+-
+-export function getSelectTemplateColumns( withNumberInput ) {
+-	return withNumberInput
+-		? `minmax(0, 1fr) minmax(auto, ${ ui.value.px(
+-				ASIDE_CONTROL_WIDTH * 2
+-		  ) })`
+-		: `minmax(0, 2fr) minmax(auto, ${ ui.value.px(
+-				ASIDE_CONTROL_WIDTH
+-		  ) })`;
+-}
+-
+-export function getSliderTemplateColumns() {
+-	return `2fr minmax(auto, ${ ui.value.px( ASIDE_CONTROL_WIDTH ) })`;
+-}

@@ -1,0 +1,143 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index aff6181833b354..59d8a3cb46f5fc 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `ColorPalette`: Remove extra bottom margin when `CircularOptionPicker` is unneeded ([#63961](https://github.com/WordPress/gutenberg/pull/63961)).
+ -   `CustomSelectControl`: Restore `describedBy` functionality ([#63957](https://github.com/WordPress/gutenberg/pull/63957)).
++-   `Button`: Improve the aria-disabled focus style ([#62480](https://github.com/WordPress/gutenberg/pull/62480)).
+ -   `Modal`: Fix the dismissal logic for React development mode ([#64132](https://github.com/WordPress/gutenberg/pull/64132)).
+ 
+ ### Enhancements
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 3541699a08eefd..fcbd363e17c7dd 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -30,16 +30,10 @@
+ 	}
+ 
+ 	&[aria-expanded="true"],
+-	&:hover {
++	&:hover:not(:disabled, [aria-disabled="true"]) {
+ 		color: $components-color-accent;
+ 	}
+ 
+-	// Unset some hovers, instead of adding :not specificity.
+-	&:disabled:hover,
+-	&[aria-disabled="true"]:hover {
+-		color: initial;
+-	}
+-
+ 	// Focus.
+ 	// See https://github.com/WordPress/gutenberg/issues/13267 for more context on these selectors.
+ 	&:focus:not(:disabled) {
+@@ -87,7 +81,6 @@
+ 			color: rgba($white, 0.4);
+ 			background: $components-color-accent;
+ 			border-color: $components-color-accent;
+-			opacity: 1;
+ 			outline: none;
+ 
+ 			&:focus:enabled {
+@@ -132,7 +125,6 @@
+ 			color: $gray-600;
+ 			background: transparent;
+ 			transform: none;
+-			opacity: 1;
+ 		}
+ 	}
+ 
+@@ -206,17 +198,22 @@
+ 		&:not(.is-primary):not(.is-secondary):not(.is-tertiary):not(.is-link) {
+ 			color: $alert-red;
+ 
+-			&:hover:not(:disabled) {
++			&:hover:not(:disabled, [aria-disabled="true"]) {
+ 				color: darken($alert-red, 20%);
+ 			}
+ 
+-			&:focus:not(:disabled) {
++			&:focus {
+ 				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $alert-red;
+ 			}
+ 
+-			&:active:not(:disabled) {
++			&:active:not(:disabled, [aria-disabled="true"]) {
+ 				background: $gray-400;
+ 			}
++
++			&:disabled,
++			&[aria-disabled="true"] {
++				color: $gray-600;
++			}
+ 		}
+ 	}
+ 
+@@ -244,6 +241,11 @@
+ 		&:focus {
+ 			border-radius: $radius-block-ui;
+ 		}
++
++		&:disabled,
++		&[aria-disabled="true"] {
++			color: $gray-600;
++		}
+ 	}
+ 
+ 	&:not(:disabled, [aria-disabled="true"]):active {
+@@ -253,7 +255,7 @@
+ 	&:disabled,
+ 	&[aria-disabled="true"] {
+ 		cursor: default;
+-		opacity: 0.3;
++		color: $gray-600;
+ 	}
+ 
+ 	&.is-busy,
+@@ -266,7 +268,6 @@
+ 		@media (prefers-reduced-motion: reduce) {
+ 			animation-duration: 0s;
+ 		}
+-		opacity: 1;
+ 		background-size: 100px 100%;
+ 		/* stylelint-disable -- Disable reason: This function call looks nicer when each argument is on its own line. */
+ 		background-image: linear-gradient(
+@@ -332,8 +333,23 @@
+ 
+ 	// Toggled style.
+ 	&.is-pressed {
+-		color: $components-color-foreground-inverted;
+-		background: $components-color-foreground;
++		&,
++		&:hover {
++			color: $components-color-foreground-inverted;
++			&:not(:disabled, [aria-disabled="true"]) {
++				background: $components-color-foreground;
++			}
++		}
++
++		&:disabled,
++		&[aria-disabled="true"] {
++			color: $gray-600;
++
++			&:not(.is-primary):not(.is-secondary):not(.is-tertiary) {
++				color: $components-color-foreground-inverted;
++				background: $gray-600;
++			}
++		}
+ 
+ 		&:focus:not(:disabled) {
+ 			box-shadow: inset 0 0 0 1px $components-color-background, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+@@ -341,11 +357,6 @@
+ 			// Windows High Contrast mode will show this outline, but not the box-shadow.
+ 			outline: 2px solid transparent;
+ 		}
+-
+-		&:hover:not(:disabled) {
+-			color: $components-color-foreground-inverted;
+-			background: $components-color-foreground;
+-		}
+ 	}
+ 
+ 	svg {

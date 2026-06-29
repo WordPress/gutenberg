@@ -1,0 +1,53 @@
+diff --git a/packages/block-editor/src/components/inserter-draggable-blocks/index.js b/packages/block-editor/src/components/inserter-draggable-blocks/index.js
+index 7d20b5e53650bf..19f459ce2f5376 100644
+--- a/packages/block-editor/src/components/inserter-draggable-blocks/index.js
++++ b/packages/block-editor/src/components/inserter-draggable-blocks/index.js
+@@ -63,11 +63,15 @@ const InserterDraggableBlocks = ( {
+ 				stopDragging();
+ 			} }
+ 			__experimentalDragComponent={
+-				<BlockDraggableChip
+-					count={ blocks.length }
+-					icon={ icon || ( ! pattern && blockTypeIcon ) }
+-					isPattern={ !! pattern }
+-				/>
++				pattern ? (
++					false // Setting dragComponent explicitly to false, so that the browser handles the drag image.
++				) : (
++					<BlockDraggableChip
++						count={ blocks.length }
++						icon={ icon || ( ! pattern && blockTypeIcon ) }
++						isPattern={ !! pattern }
++					/>
++				)
+ 			}
+ 		>
+ 			{ ( { onDraggableStart, onDraggableEnd } ) => {
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 205749b3336bb5..05c5fa5fae26a4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Internal
+ 
+ -   Replaced `classnames` package with the faster and smaller `clsx` package ([#61138](https://github.com/WordPress/gutenberg/pull/61138)).
++-   Zoom Out: Show a preview when dragging and dropping patterns from the inserter. ([#61511](https://github.com/WordPress/gutenberg/pull/61511))
+ 
+ ### Enhancements
+ -   `PaletteEdit`: Use consistent spacing and metrics. ([#61368](https://github.com/WordPress/gutenberg/pull/61368)).
+diff --git a/packages/components/src/draggable/index.tsx b/packages/components/src/draggable/index.tsx
+index 0a3000538dbf24..c60fc551bc0eec 100644
+--- a/packages/components/src/draggable/index.tsx
++++ b/packages/components/src/draggable/index.tsx
+@@ -105,6 +105,11 @@ export function Draggable( {
+ 			JSON.stringify( transferData )
+ 		);
+ 
++		// If dragComponent is explicitly set to false then let the browser handle the drag image.
++		if ( dragComponent === false ) {
++			return;
++		}
++
+ 		const cloneWrapper = ownerDocument.createElement( 'div' );
+ 		// Reset position to 0,0. Natural stacking order will position this lower, even with a transform otherwise.
+ 		cloneWrapper.style.top = '0';

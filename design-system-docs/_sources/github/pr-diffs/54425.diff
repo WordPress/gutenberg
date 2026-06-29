@@ -1,0 +1,65 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d8690b46a2ca77..17c36201952eb9 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -19,6 +19,7 @@
+ -   `ToolbarItem`: Fix children not showing in rendered components ([#53314](https://github.com/WordPress/gutenberg/pull/53314)).
+ -   `CircularOptionPicker`: make focus styles resilient to button size changes ([#54196](https://github.com/WordPress/gutenberg/pull/54196)).
+ -   `InputControl`: Fix focus style size ([#54394](https://github.com/WordPress/gutenberg/pull/54394)).
++-   `Color values`: Update borderFocus to ADMIN.theme ([#54425](https://github.com/WordPress/gutenberg/pull/54425)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index 296e9483b9f705..786038c5de893c 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -57,7 +57,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+ }
+ 
+ .emotion-8:focus-within {
+-  border-color: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6));
++  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+   box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+   z-index: 1;
+   outline: 2px solid transparent;
+@@ -380,7 +380,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+ }
+ 
+ .emotion-8:focus-within {
+-  border-color: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6));
++  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+   box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+   z-index: 1;
+   outline: 2px solid transparent;
+@@ -598,7 +598,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+ }
+ 
+ .emotion-8:focus-within {
+-  border-color: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6));
++  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+   box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+   z-index: 1;
+   outline: 2px solid transparent;
+@@ -915,7 +915,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
+ }
+ 
+ .emotion-8:focus-within {
+-  border-color: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6));
++  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+   box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+   z-index: 1;
+   outline: 2px solid transparent;
+diff --git a/packages/components/src/utils/colors-values.js b/packages/components/src/utils/colors-values.js
+index 473330b853a9c3..1f2cdab6729094 100644
+--- a/packages/components/src/utils/colors-values.js
++++ b/packages/components/src/utils/colors-values.js
+@@ -41,7 +41,7 @@ const UI = {
+ 	backgroundDisabled: GRAY[ 100 ],
+ 	border: GRAY[ 600 ],
+ 	borderHover: GRAY[ 700 ],
+-	borderFocus: ADMIN.themeDark10,
++	borderFocus: ADMIN.theme,
+ 	borderDisabled: GRAY[ 400 ],
+ 	textDisabled: GRAY[ 600 ],
+ 	textDark: white,

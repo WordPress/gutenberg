@@ -1,0 +1,617 @@
+diff --git a/packages/components/src/ui/surface/README.md b/packages/components/src/ui/surface/README.md
+new file mode 100644
+index 00000000000000..84055ae53ed4d1
+--- /dev/null
++++ b/packages/components/src/ui/surface/README.md
+@@ -0,0 +1,67 @@
++# Surface
++
++`Surface` is a core component that renders a primary background color.
++
++## Usage
++
++In the example below, notice how the `Surface` renders in white (or dark gray if in dark mode).
++
++```jsx
++import { Surface, Text } from '@wp-g2/components/ui';
++
++function Example() {
++	return (
++		<Surface>
++			<Text>Code is Poetry</Text>
++		</Surface>
++	);
++}
++```
++
++## Props
++
++##### backgroundSize
++
++**Type**: `number`
++
++Determines the grid size for "dotted" and "grid" variants.
++
++##### border
++
++**Type**: `boolean`
++
++Renders a border around the entire `Surface`.
++
++##### borderBottom
++
++**Type**: `boolean`
++
++Renders a bottom border.
++
++##### borderLeft
++
++**Type**: `boolean`
++
++Renders a left border.
++
++##### borderRight
++
++**Type**: `boolean`
++
++Renders a right border.
++
++##### borderTop
++
++**Type**: `boolean`
++
++Renders a top border.
++
++##### variant
++
++**Type**: `"grid"`,`"primary"`,`"secondary"`,`"tertiary"`,`"dotted"`
++
++Modifies the background color of `Surface`.
++
++-   `primary`: Used for almost all cases.
++-   `secondary`: Used as a secondary background for inner `Surface` components.
++-   `tertiary`: Used as the app/site wide background. Visible in **dark mode** only. Use case is rare.
+diff --git a/packages/components/src/ui/surface/component.js b/packages/components/src/ui/surface/component.js
+new file mode 100644
+index 00000000000000..a35f255f430bc3
+--- /dev/null
++++ b/packages/components/src/ui/surface/component.js
+@@ -0,0 +1,11 @@
++/**
++ * Internal dependencies
++ */
++import { createComponent } from '../utils';
++import { useSurface } from './hook';
++
++export default createComponent( {
++	as: 'div',
++	useHook: useSurface,
++	name: 'Surface',
++} );
+diff --git a/packages/components/src/ui/surface/hook.js b/packages/components/src/ui/surface/hook.js
+new file mode 100644
+index 00000000000000..99cee69f0e68be
+--- /dev/null
++++ b/packages/components/src/ui/surface/hook.js
+@@ -0,0 +1,70 @@
++/**
++ * External dependencies
++ */
++import { useContextSystem } from '@wp-g2/context';
++import { css, cx, ui } from '@wp-g2/styles';
++
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import * as styles from './styles';
++
++/**
++ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'div'>} props
++ */
++export function useSurface( props ) {
++	const {
++		backgroundSize = 12,
++		border,
++		borderBottom,
++		borderLeft,
++		borderRight,
++		borderTop,
++		className,
++		variant = 'primary',
++		...otherProps
++	} = useContextSystem( props, 'Surface' );
++
++	const classes = useMemo( () => {
++		const sx = {};
++
++		sx.borders = styles.getBorders( {
++			border,
++			borderBottom,
++			borderLeft,
++			borderRight,
++			borderTop,
++		} );
++
++		return cx(
++			styles.Surface,
++			sx.borders,
++			styles[ variant ],
++			css( {
++				[ ui.createToken( 'surfaceBackgroundSize' ) ]: ui.value.px(
++					backgroundSize
++				),
++				[ ui.createToken(
++					'surfaceBackgroundSizeDotted'
++				) ]: ui.value.px( backgroundSize - 1 ),
++			} ),
++			className
++		);
++	}, [
++		backgroundSize,
++		border,
++		borderBottom,
++		borderLeft,
++		borderRight,
++		borderTop,
++		className,
++		variant,
++	] );
++
++	return { ...otherProps, className: classes };
++}
+diff --git a/packages/components/src/ui/surface/index.js b/packages/components/src/ui/surface/index.js
+new file mode 100644
+index 00000000000000..8aea03e1906fd5
+--- /dev/null
++++ b/packages/components/src/ui/surface/index.js
+@@ -0,0 +1,2 @@
++export { default as Surface } from './component';
++export * from './hook';
+diff --git a/packages/components/src/ui/surface/stories/index.js b/packages/components/src/ui/surface/stories/index.js
+new file mode 100644
+index 00000000000000..3711f7e456e12f
+--- /dev/null
++++ b/packages/components/src/ui/surface/stories/index.js
+@@ -0,0 +1,49 @@
++/**
++ * External dependencies
++ */
++import { boolean, number, select } from '@storybook/addon-knobs';
++import { ThemeProvider } from '@wp-g2/styles';
++
++/**
++ * Internal dependencies
++ */
++import { Surface } from '../index';
++import { Text } from '../../text';
++
++export default {
++	component: Surface,
++	title: 'G2 Components (Experimental)/Surface',
++};
++
++const variantOptions = {
++	default: 'default',
++	secondary: 'secondary',
++	tertiary: 'tertiary',
++	dotted: 'dotted',
++	grid: 'grid',
++};
++
++export const _default = () => {
++	const darkMode = boolean( 'Dark mode', false );
++
++	const props = {
++		backgroundSize: number( 'backgroundSize', 12 ),
++		border: boolean( 'border', false ),
++		borderTop: boolean( 'borderTop', false ),
++		borderBottom: boolean( 'borderBottom', false ),
++		borderLeft: boolean( 'borderLeft', false ),
++		borderRight: boolean( 'borderRight', false ),
++		variant: select( 'variant', variantOptions, 'default' ),
++	};
++
++	return (
++		<ThemeProvider isDark={ darkMode }>
++			<Surface
++				{ ...props }
++				css={ { padding: 20, maxWidth: 400, margin: '20vh auto' } }
++			>
++				<Text>Surface</Text>
++			</Surface>
++		</ThemeProvider>
++	);
++};
+diff --git a/packages/components/src/ui/surface/styles.js b/packages/components/src/ui/surface/styles.js
+new file mode 100644
+index 00000000000000..c49f5dd2b78297
+--- /dev/null
++++ b/packages/components/src/ui/surface/styles.js
+@@ -0,0 +1,105 @@
++/**
++ * External dependencies
++ */
++import { css, ui } from '@wp-g2/styles';
++
++export const Surface = css`
++	background-color: ${ ui.get( 'surfaceColor' ) };
++	color: ${ ui.color.text };
++	position: relative;
++`;
++
++export const background = css`
++	background-color: ${ ui.get( 'surfaceBackgroundColor' ) };
++`;
++
++/**
++ * @param {Object} props
++ * @param {boolean} [props.border]
++ * @param {boolean} [props.borderBottom]
++ * @param {boolean} [props.borderLeft]
++ * @param {boolean} [props.borderRight]
++ * @param {boolean} [props.borderTop]
++ */
++export function getBorders( {
++	border,
++	borderBottom,
++	borderLeft,
++	borderRight,
++	borderTop,
++} ) {
++	const borderStyle = `1px solid ${ ui.get( 'surfaceBorderColor' ) }`;
++
++	return css( {
++		border: border ? borderStyle : undefined,
++		borderBottom: borderBottom ? borderStyle : undefined,
++		borderLeft: borderLeft ? borderStyle : undefined,
++		borderRight: borderRight ? borderStyle : undefined,
++		borderTop: borderTop ? borderStyle : undefined,
++	} );
++}
++
++export const primary = css``;
++
++export const secondary = css`
++	background: ${ ui.get( 'surfaceBackgroundTintColor' ) };
++`;
++
++export const tertiary = css`
++	background: ${ ui.get( 'surfaceBackgroundTertiaryColor' ) };
++`;
++
++const customBackgroundSize = [
++	ui.get( 'surfaceBackgroundSize' ),
++	ui.get( 'surfaceBackgroundSize' ),
++].join( ' ' );
++
++const dottedBackground1 = [
++	'90deg',
++	[
++		ui.get( 'surfaceBackgroundColor' ),
++		ui.get( 'surfaceBackgroundSizeDotted' ),
++	].join( ' ' ),
++	'transparent 1%',
++].join( ',' );
++
++const dottedBackground2 = [
++	[
++		ui.get( 'surfaceBackgroundColor' ),
++		ui.get( 'surfaceBackgroundSizeDotted' ),
++	].join( ' ' ),
++	'transparent 1%',
++].join( ',' );
++
++const dottedBackgroundCombined = [
++	`linear-gradient( ${ dottedBackground1 } ) center`,
++	`linear-gradient( ${ dottedBackground2 } ) center`,
++	ui.get( 'surfaceBorderBoldColor' ),
++].join( ',' );
++
++export const dotted = css`
++	background: ${ dottedBackgroundCombined };
++	background-size: ${ customBackgroundSize };
++`;
++
++const gridBackground1 = [
++	`${ ui.get( 'surfaceBorderSubtleColor' ) } 1px`,
++	'transparent 1px',
++].join( ',' );
++
++const gridBackground2 = [
++	'90deg',
++	`${ ui.get( 'surfaceBorderSubtleColor' ) } 1px`,
++	'transparent 1px',
++].join( ',' );
++
++const gridBackgroundCombined = [
++	`linear-gradient( ${ gridBackground1 } )`,
++	`linear-gradient( ${ gridBackground2 } )`,
++].join( ',' );
++
++export const grid = css`
++	background: ${ ui.get( 'surfaceBackgroundColor' ) };
++	background-image: ${ gridBackgroundCombined };
++	background-size: ${ customBackgroundSize };
++`;
+diff --git a/packages/components/src/ui/surface/test/__snapshots__/index.js.snap b/packages/components/src/ui/surface/test/__snapshots__/index.js.snap
+new file mode 100644
+index 00000000000000..0345990ff6577b
+--- /dev/null
++++ b/packages/components/src/ui/surface/test/__snapshots__/index.js.snap
+@@ -0,0 +1,133 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`props should render borderBottom 1`] = `
++"Snapshot Diff:
++- First value
+++ Second value
++
++  <div
++-   class=\\"components-surface wp-components-surface css-2anhki\\"
+++   class=\\"components-surface wp-components-surface css-9yhif5\\"
++    data-g2-c16t=\\"true\\"
++    data-g2-component=\\"Surface\\"
++  >
++    Surface
++  </div>"
++`;
++
++exports[`props should render borderLeft 1`] = `
++"Snapshot Diff:
++- First value
+++ Second value
++
++  <div
++-   class=\\"components-surface wp-components-surface css-17q8f3e\\"
+++   class=\\"components-surface wp-components-surface css-9yhif5\\"
++    data-g2-c16t=\\"true\\"
++    data-g2-component=\\"Surface\\"
++  >
++    Surface
++  </div>"
++`;
++
++exports[`props should render borderRight 1`] = `
++"Snapshot Diff:
++- First value
+++ Second value
++
++  <div
++-   class=\\"components-surface wp-components-surface css-187zti8\\"
+++   class=\\"components-surface wp-components-surface css-9yhif5\\"
++    data-g2-c16t=\\"true\\"
++    data-g2-component=\\"Surface\\"
++  >
++    Surface
++  </div>"
++`;
++
++exports[`props should render borderTop 1`] = `
++"Snapshot Diff:
++- First value
+++ Second value
++
++  <div
++-   class=\\"components-surface wp-components-surface css-evf9lw\\"
+++   class=\\"components-surface wp-components-surface css-9yhif5\\"
++    data-g2-c16t=\\"true\\"
++    data-g2-component=\\"Surface\\"
++  >
++    Surface
++  </div>"
++`;
++
++exports[`props should render borders 1`] = `
++"Snapshot Diff:
++- First value
+++ Second value
++
++  <div
++-   class=\\"components-surface wp-components-surface css-19tpeum\\"
+++   class=\\"components-surface wp-components-surface css-9yhif5\\"
++    data-g2-c16t=\\"true\\"
++    data-g2-component=\\"Surface\\"
++  >
++    Surface
++  </div>"
++`;
++
++exports[`props should render correctly 1`] = `
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  background-color: #ffffff;
++  background-color: var(--wp-g2-surface-color);
++  color: #1e1e1e;
++  color: var(--wp-g2-color-text);
++  position: relative;
++  --wp-g2-surface-background-size: 12px;
++  --wp-g2-surface-background-size-dotted: 11px;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++<div
++  class="components-surface wp-components-surface emotion-0"
++  data-g2-c16t="true"
++  data-g2-component="Surface"
++>
++  Surface
++</div>
++`;
++
++exports[`props should render variants 1`] = `
++"Snapshot Diff:
++- First value
+++ Second value
++
++  <div
++-   class=\\"components-surface wp-components-surface css-icckk4\\"
+++   class=\\"components-surface wp-components-surface css-9yhif5\\"
++    data-g2-c16t=\\"true\\"
++    data-g2-component=\\"Surface\\"
++  >
++    Surface
++  </div>"
++`;
+diff --git a/packages/components/src/ui/surface/test/index.js b/packages/components/src/ui/surface/test/index.js
+new file mode 100644
+index 00000000000000..40fb3b01ff1524
+--- /dev/null
++++ b/packages/components/src/ui/surface/test/index.js
+@@ -0,0 +1,64 @@
++/**
++ * External dependencies
++ */
++import { render } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { Surface } from '../index';
++
++describe( 'props', () => {
++	let base;
++	beforeEach( () => {
++		base = render( <Surface>Surface</Surface> );
++	} );
++
++	test( 'should render correctly', () => {
++		expect( base.container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render variants', () => {
++		const { container } = render(
++			<Surface variant="secondary">Surface</Surface>
++		);
++		expect( container.firstChild ).toMatchDiffSnapshot(
++			base.container.firstChild
++		);
++	} );
++
++	test( 'should render borders', () => {
++		const { container } = render( <Surface border>Surface</Surface> );
++		expect( container.firstChild ).toMatchDiffSnapshot(
++			base.container.firstChild
++		);
++	} );
++
++	test( 'should render borderLeft', () => {
++		const { container } = render( <Surface borderLeft>Surface</Surface> );
++		expect( container.firstChild ).toMatchDiffSnapshot(
++			base.container.firstChild
++		);
++	} );
++
++	test( 'should render borderRight', () => {
++		const { container } = render( <Surface borderRight>Surface</Surface> );
++		expect( container.firstChild ).toMatchDiffSnapshot(
++			base.container.firstChild
++		);
++	} );
++
++	test( 'should render borderTop', () => {
++		const { container } = render( <Surface borderTop>Surface</Surface> );
++		expect( container.firstChild ).toMatchDiffSnapshot(
++			base.container.firstChild
++		);
++	} );
++
++	test( 'should render borderBottom', () => {
++		const { container } = render( <Surface borderBottom>Surface</Surface> );
++		expect( container.firstChild ).toMatchDiffSnapshot(
++			base.container.firstChild
++		);
++	} );
++} );
+diff --git a/packages/components/src/ui/surface/types.ts b/packages/components/src/ui/surface/types.ts
+new file mode 100644
+index 00000000000000..f49c3a7a384b47
+--- /dev/null
++++ b/packages/components/src/ui/surface/types.ts
+@@ -0,0 +1,62 @@
++export type SurfaceVariant =
++	| 'primary'
++	| 'secondary'
++	| 'tertiary'
++	| 'dotted'
++	| 'grid';
++
++export type Props = {
++	/**
++	 * Determines the grid size for "dotted" and "grid" variants.
++	 */
++	backgroundSize?: number;
++	/**
++	 * Renders a border around the entire `Surface`.
++	 */
++	border?: boolean;
++	/**
++	 * Renders a bottom border.
++	 */
++	borderBottom?: boolean;
++	/**
++	 * Renders a left border.
++	 */
++	borderLeft?: boolean;
++	/**
++	 * Renders a right border.
++	 */
++	borderRight?: boolean;
++	/**
++	 * Renders a top border.
++	 */
++	borderTop?: boolean;
++	/**
++	 * Modifies the background color of `Surface`.
++	 *
++	 * * `primary`: Used for almost all cases.
++	 * * `secondary`: Used as a secondary background for inner `Surface` components.
++	 * * `tertiary`: Used as the app/site wide background. Visible in **dark mode** only. Use case is rare.
++	 *
++	 * @example
++	 * ```jsx
++	 * import { Surface, Text, VStack } from `@wordpress/components/ui`
++	 *
++	 * function Example() {
++	 *   return (
++	 *     <VStack>
++	 *       <Surface variant="primary">
++	 *         <Text>Primary Surface</Text>
++	 *       </Surface>
++	 *       <Surface variant="secondary">
++	 *         <Text>Secondary Surface</Text>
++	 *       </Surface>
++	 *       <Surface variant="tertiary">
++	 *         <Text>Tertiary Surface</Text>
++	 *       </Surface>
++	 *     </VStack>
++	 *   );
++	 * }
++	 * ```
++	 */
++	variant?: SurfaceVariant;
++};

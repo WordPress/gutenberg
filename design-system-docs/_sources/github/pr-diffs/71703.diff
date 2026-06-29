@@ -1,0 +1,1570 @@
+diff --git a/packages/block-editor/src/components/global-styles/typography-panel.js b/packages/block-editor/src/components/global-styles/typography-panel.js
+index 9bc875cdc0a308..6659e6839ac6b9 100644
+--- a/packages/block-editor/src/components/global-styles/typography-panel.js
++++ b/packages/block-editor/src/components/global-styles/typography-panel.js
+@@ -212,6 +212,30 @@ export default function TypographyPanel( {
+ 	const mergedFontSizes = getMergedFontSizes( settings );
+ 
+ 	const fontSize = decodeValue( inheritedValue?.typography?.fontSize );
++
++	// Extract the slug from the CSS custom property if it exists
++	const currentFontSizeSlug = ( () => {
++		const rawValue = inheritedValue?.typography?.fontSize;
++		if ( ! rawValue || typeof rawValue !== 'string' ) {
++			return undefined;
++		}
++
++		// Block supports use `var:preset` format.
++		if ( rawValue.startsWith( 'var:preset|font-size|' ) ) {
++			return rawValue.replace( 'var:preset|font-size|', '' );
++		}
++
++		// Global styles data uses `var(--wp--preset)` format.
++		const cssVarMatch = rawValue.match(
++			/^var\(--wp--preset--font-size--([^)]+)\)$/
++		);
++		if ( cssVarMatch ) {
++			return cssVarMatch[ 1 ];
++		}
++
++		return undefined;
++	} )();
++
+ 	const setFontSize = ( newValue, metadata ) => {
+ 		const actualValue = !! metadata?.slug
+ 			? `var:preset|font-size|${ metadata?.slug }`
+@@ -432,7 +456,8 @@ export default function TypographyPanel( {
+ 					panelId={ panelId }
+ 				>
+ 					<FontSizePicker
+-						value={ fontSize }
++						value={ currentFontSizeSlug || fontSize }
++						valueMode={ currentFontSizeSlug ? 'slug' : 'literal' }
+ 						onChange={ setFontSize }
+ 						fontSizes={ mergedFontSizes }
+ 						disableCustomFontSizes={ disableCustomFontSizes }
+diff --git a/packages/block-editor/src/hooks/font-size.js b/packages/block-editor/src/hooks/font-size.js
+index e0f8c47c163b07..6f0454d61dc450 100644
+--- a/packages/block-editor/src/hooks/font-size.js
++++ b/packages/block-editor/src/hooks/font-size.js
+@@ -97,8 +97,11 @@ export function FontSizeEdit( props ) {
+ 	} = props;
+ 	const [ fontSizes ] = useSettings( 'typography.fontSizes' );
+ 
+-	const onChange = ( value ) => {
+-		const fontSizeSlug = getFontSizeObjectByValue( fontSizes, value ).slug;
++	const onChange = ( value, selectedItem ) => {
++		// Use the selectedItem's slug if available, otherwise fall back to finding by value
++		const fontSizeSlug =
++			selectedItem?.slug ||
++			getFontSizeObjectByValue( fontSizes, value ).slug;
+ 
+ 		setAttributes( {
+ 			style: cleanEmptyObject( {
+@@ -124,7 +127,8 @@ export function FontSizeEdit( props ) {
+ 	return (
+ 		<FontSizePicker
+ 			onChange={ onChange }
+-			value={ fontSizeValue }
++			value={ fontSize || fontSizeValue }
++			valueMode={ fontSize ? 'slug' : 'literal' }
+ 			withReset={ false }
+ 			withSlider
+ 			size="__unstable-large"
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a05d72d4cbbcea..e01aff4e705121 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ -   `SearchControl`: Normalize styles ([#72072](https://github.com/WordPress/gutenberg/pull/72072)).
+ -   `Badge`: Avoid propagating text-decoration styles from ancestors into the component ([#72097](https://github.com/WordPress/gutenberg/pull/72097)).
+ -   `CheckboxControl`, `RadioControl`, `ToggleControl` (`FormToggle`): Ensure elements are focused when clicked in Safari ([#72115](https://github.com/WordPress/gutenberg/pull/72115)).
++-   `FontSizePicker`: Add `valueMode` prop to control how the `value` prop is interpreted (`'literal'` for size values, `'slug'` for font size slugs) ([#71703](https://github.com/WordPress/gutenberg/pull/71703))
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/src/custom-select-control-v2/custom-select.tsx b/packages/components/src/custom-select-control-v2/custom-select.tsx
+index 9b4bd0616cbb16..eda4ad179a61bb 100644
+--- a/packages/components/src/custom-select-control-v2/custom-select.tsx
++++ b/packages/components/src/custom-select-control-v2/custom-select.tsx
+@@ -12,7 +12,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
+ /**
+  * Internal dependencies
+  */
+-import { VisuallyHidden } from '..';
++import { VisuallyHidden } from '../visually-hidden';
+ import * as Styled from './styles';
+ import type {
+ 	CustomSelectContext as CustomSelectContextType,
+diff --git a/packages/components/src/font-size-picker/README.md b/packages/components/src/font-size-picker/README.md
+index 8c5cd1444aa69c..b6e2d26917f384 100644
+--- a/packages/components/src/font-size-picker/README.md
++++ b/packages/components/src/font-size-picker/README.md
+@@ -103,6 +103,16 @@ The current font size value.
+ 
+ -   Required: No
+ 
++### `valueMode`: `'literal' | 'slug'`
++
++Determines how the `value` prop should be interpreted.
++
++- `'literal'`: The `value` prop contains the actual font size value (number or string).
++- `'slug'`: The `value` prop contains the slug of the selected font size.
++
++-   Required: No
++-   Default: `'literal'`
++
+ ### `withReset`: `boolean`
+ 
+ If `true`, a reset button will be displayed alongside the input field when a custom font size is active. Has no effect when `disableCustomFontSizes` is `true`.
+diff --git a/packages/components/src/font-size-picker/font-size-picker-select.tsx b/packages/components/src/font-size-picker/font-size-picker-select.tsx
+index 0d3681f39d5a97..ee62f80a679bbb 100644
+--- a/packages/components/src/font-size-picker/font-size-picker-select.tsx
++++ b/packages/components/src/font-size-picker/font-size-picker-select.tsx
+@@ -2,16 +2,17 @@
+  * WordPress dependencies
+  */
+ import { __, sprintf } from '@wordpress/i18n';
++import { useMemo } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+-import CustomSelectControl from '../custom-select-control';
+ import type {
+ 	FontSizePickerSelectProps,
+ 	FontSizePickerSelectOption,
+ } from './types';
+-import { isSimpleCssValue } from './utils';
++import { generateFontSizeHint } from './utils';
++import { StyledCustomSelectControl } from './styles';
+ 
+ const DEFAULT_OPTION: FontSizePickerSelectOption = {
+ 	key: 'default',
+@@ -20,15 +21,19 @@ const DEFAULT_OPTION: FontSizePickerSelectOption = {
+ };
+ 
+ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
+-	const { __next40pxDefaultSize, fontSizes, value, size, onChange } = props;
++	const {
++		__next40pxDefaultSize,
++		fontSizes,
++		value,
++		size,
++		valueMode = 'literal',
++		onChange,
++	} = props;
+ 
+ 	const options: FontSizePickerSelectOption[] = [
+ 		DEFAULT_OPTION,
+ 		...fontSizes.map( ( fontSize ) => {
+-			let hint;
+-			if ( isSimpleCssValue( fontSize.size ) ) {
+-				hint = String( fontSize.size );
+-			}
++			const hint = generateFontSizeHint( fontSize );
+ 			return {
+ 				key: fontSize.slug,
+ 				name: fontSize.name || fontSize.slug,
+@@ -38,11 +43,30 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
+ 		} ),
+ 	];
+ 
+-	const selectedOption =
+-		options.find( ( option ) => option.value === value ) ?? DEFAULT_OPTION;
++	const selectedOption = useMemo( () => {
++		if ( value === undefined ) {
++			return DEFAULT_OPTION;
++		}
++
++		// If valueMode is 'slug', find by slug
++		if ( valueMode === 'slug' ) {
++			const optionBySlug = options.find(
++				( option ) => option.key === value
++			);
++			if ( optionBySlug ) {
++				return optionBySlug;
++			}
++		}
++
++		// If valueMode is 'literal', find by value (size)
++		return (
++			options.find( ( option ) => option.value === value ) ??
++			DEFAULT_OPTION
++		);
++	}, [ value, valueMode, options ] );
+ 
+ 	return (
+-		<CustomSelectControl
++		<StyledCustomSelectControl
+ 			__next40pxDefaultSize={ __next40pxDefaultSize }
+ 			__shouldNotWarnDeprecated36pxSize
+ 			className="components-font-size-picker__select"
+@@ -61,7 +85,16 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
+ 			}: {
+ 				selectedItem: FontSizePickerSelectOption;
+ 			} ) => {
+-				onChange( selectedItem.value );
++				// Find the corresponding FontSize object
++				const matchingFontSize =
++					selectedItem.key === 'default'
++						? undefined
++						: fontSizes.find(
++								( fontSize ) =>
++									fontSize.slug === selectedItem.key
++						  );
++
++				onChange( selectedItem.value, matchingFontSize );
+ 			} }
+ 			size={ size }
+ 		/>
+diff --git a/packages/components/src/font-size-picker/font-size-picker-toggle-group.tsx b/packages/components/src/font-size-picker/font-size-picker-toggle-group.tsx
+index 1b3619c800e453..783dcb919c3d35 100644
+--- a/packages/components/src/font-size-picker/font-size-picker-toggle-group.tsx
++++ b/packages/components/src/font-size-picker/font-size-picker-toggle-group.tsx
+@@ -14,7 +14,46 @@ import { T_SHIRT_ABBREVIATIONS, T_SHIRT_NAMES } from './constants';
+ import type { FontSizePickerToggleGroupProps } from './types';
+ 
+ const FontSizePickerToggleGroup = ( props: FontSizePickerToggleGroupProps ) => {
+-	const { fontSizes, value, __next40pxDefaultSize, size, onChange } = props;
++	const {
++		fontSizes,
++		value,
++		valueMode = 'literal',
++		__next40pxDefaultSize,
++		size,
++		onChange,
++	} = props;
++
++	// Find the current value based on valueMode
++	const currentValue = ( () => {
++		if ( ! value ) {
++			return undefined;
++		}
++
++		// If valueMode is 'slug', the value is already the slug
++		if ( valueMode === 'slug' ) {
++			return String( value );
++		}
++
++		// If valueMode is 'literal', find the font size by size value
++		// If multiple font sizes have the same size value, we can't distinguish them
++		// without additional information, so we return undefined to avoid incorrect selection
++		const matchingFontSizes = fontSizes.filter(
++			( fontSize ) => fontSize.size === value
++		);
++
++		// If there are multiple matches, return undefined to avoid selecting the wrong font size
++		if ( matchingFontSizes.length > 1 ) {
++			return undefined;
++		}
++
++		// Find the font size by size value
++		const fontSizeBySize = fontSizes.find(
++			( fontSize ) => fontSize.size === value
++		);
++
++		return fontSizeBySize?.slug;
++	} )();
++
+ 	return (
+ 		<ToggleGroupControl
+ 			__nextHasNoMarginBottom
+@@ -22,15 +61,30 @@ const FontSizePickerToggleGroup = ( props: FontSizePickerToggleGroupProps ) => {
+ 			__shouldNotWarnDeprecated36pxSize
+ 			label={ __( 'Font size' ) }
+ 			hideLabelFromVision
+-			value={ value }
+-			onChange={ onChange }
++			value={ currentValue }
++			onChange={ ( newSlug: string | number | undefined ) => {
++				if ( newSlug === undefined ) {
++					onChange( undefined );
++				} else {
++					// Find the font size by slug
++					const selectedFontSize = fontSizes.find(
++						( fontSize ) => fontSize.slug === String( newSlug )
++					);
++					if ( selectedFontSize ) {
++						onChange(
++							selectedFontSize.size as number | string,
++							selectedFontSize
++						);
++					}
++				}
++			} }
+ 			isBlock
+ 			size={ size }
+ 		>
+ 			{ fontSizes.map( ( fontSize, index ) => (
+ 				<ToggleGroupControlOption
+ 					key={ fontSize.slug }
+-					value={ fontSize.size }
++					value={ fontSize.slug }
+ 					label={ T_SHIRT_ABBREVIATIONS[ index ] }
+ 					aria-label={ fontSize.name || T_SHIRT_NAMES[ index ] }
+ 					showTooltip
+diff --git a/packages/components/src/font-size-picker/index.tsx b/packages/components/src/font-size-picker/index.tsx
+index 6bc2bd206ebe0a..b2a6ad01ee1114 100644
+--- a/packages/components/src/font-size-picker/index.tsx
++++ b/packages/components/src/font-size-picker/index.tsx
+@@ -46,6 +46,7 @@ const UnforwardedFontSizePicker = (
+ 		size = 'default',
+ 		units: unitsProp = DEFAULT_UNITS,
+ 		value,
++		valueMode = 'literal',
+ 		withSlider = false,
+ 		withReset = true,
+ 	} = props;
+@@ -59,15 +60,32 @@ const UnforwardedFontSizePicker = (
+ 		availableUnits: unitsProp,
+ 	} );
+ 
+-	const selectedFontSize = fontSizes.find(
+-		( fontSize ) => fontSize.size === value
+-	);
++	const selectedFontSize = ( () => {
++		if ( ! value ) {
++			return undefined;
++		}
++
++		// If valueMode is 'slug', find by slug
++		if ( valueMode === 'slug' ) {
++			return fontSizes.find( ( fontSize ) => fontSize.slug === value );
++		}
++
++		// If valueMode is 'literal', find by size value
++		return fontSizes.find( ( fontSize ) => fontSize.size === value );
++	} )();
+ 	const isCustomValue = !! value && ! selectedFontSize;
+ 
+ 	// Initially request a custom picker if the value is not from the predef list.
+ 	const [ userRequestedCustom, setUserRequestedCustom ] =
+ 		useState( isCustomValue );
+ 
++	// Resolve the literal value to use in custom controls when operating in slug mode.
++	// When `valueMode` is 'slug', the `value` prop contains the slug of the
++	// selected preset. In that case, the custom input should reflect the preset's
++	// actual size value so it pre-populates correctly after clicking "Set custom size".
++	const resolvedValueForControls =
++		valueMode === 'slug' ? selectedFontSize?.size : value;
++
+ 	let currentPickerType;
+ 	if ( ! disableCustomFontSizes && userRequestedCustom ) {
+ 		// While showing the custom value picker, switch back to predef only if
+@@ -88,10 +106,11 @@ const UnforwardedFontSizePicker = (
+ 	// operates in a legacy "unitless" mode where UnitControl can only be used
+ 	// to select px values and onChange() is always called with number values.
+ 	const hasUnits =
+-		typeof value === 'string' || typeof fontSizes[ 0 ]?.size === 'string';
++		typeof resolvedValueForControls === 'string' ||
++		typeof fontSizes[ 0 ]?.size === 'string';
+ 
+ 	const [ valueQuantity, valueUnit ] = parseQuantityAndUnitFromRawValue(
+-		value,
++		resolvedValueForControls,
+ 		units
+ 	);
+ 	const isValueUnitRelative =
+@@ -139,18 +158,16 @@ const UnforwardedFontSizePicker = (
+ 						__next40pxDefaultSize={ __next40pxDefaultSize }
+ 						fontSizes={ fontSizes }
+ 						value={ value }
++						valueMode={ valueMode }
+ 						disableCustomFontSizes={ disableCustomFontSizes }
+ 						size={ size }
+-						onChange={ ( newValue ) => {
++						onChange={ ( newValue, selectedItem ) => {
+ 							if ( newValue === undefined ) {
+-								onChange?.( undefined );
++								onChange?.( undefined, selectedItem );
+ 							} else {
+ 								onChange?.(
+ 									hasUnits ? newValue : Number( newValue ),
+-									fontSizes.find(
+-										( fontSize ) =>
+-											fontSize.size === newValue
+-									)
++									selectedItem
+ 								);
+ 							}
+ 						} }
+@@ -161,18 +178,16 @@ const UnforwardedFontSizePicker = (
+ 					<FontSizePickerToggleGroup
+ 						fontSizes={ fontSizes }
+ 						value={ value }
++						valueMode={ valueMode }
+ 						__next40pxDefaultSize={ __next40pxDefaultSize }
+ 						size={ size }
+-						onChange={ ( newValue ) => {
++						onChange={ ( newValue, selectedItem ) => {
+ 							if ( newValue === undefined ) {
+-								onChange?.( undefined );
++								onChange?.( undefined, selectedItem );
+ 							} else {
+ 								onChange?.(
+ 									hasUnits ? newValue : Number( newValue ),
+-									fontSizes.find(
+-										( fontSize ) =>
+-											fontSize.size === newValue
+-									)
++									selectedItem
+ 								);
+ 							}
+ 						} }
+@@ -187,11 +202,21 @@ const UnforwardedFontSizePicker = (
+ 								label={ __( 'Font size' ) }
+ 								labelPosition="top"
+ 								hideLabelFromVision
+-								value={ value }
++								value={
++									hasUnits
++										? `${ valueQuantity ?? '' }${
++												valueUnit ?? ''
++										  }`
++										: resolvedValueForControls
++								}
+ 								onChange={ ( newValue ) => {
+ 									setUserRequestedCustom( true );
+ 
+-									if ( newValue === undefined ) {
++									// Treat clearing the input (empty string) as a reset
++									if (
++										newValue === undefined ||
++										newValue === ''
++									) {
+ 										onChange?.( undefined );
+ 									} else {
+ 										onChange?.(
+diff --git a/packages/components/src/font-size-picker/styles.ts b/packages/components/src/font-size-picker/styles.ts
+index b55069ba209bd3..3e6a04898b79c5 100644
+--- a/packages/components/src/font-size-picker/styles.ts
++++ b/packages/components/src/font-size-picker/styles.ts
+@@ -8,6 +8,7 @@ import styled from '@emotion/styled';
+  */
+ import BaseControl from '../base-control';
+ import Button from '../button';
++import CustomSelectControl from '../custom-select-control';
+ import { HStack } from '../h-stack';
+ import { space } from '../utils/space';
+ 
+@@ -32,3 +33,11 @@ export const HeaderLabel = styled( BaseControl.VisualLabel )`
+ 	justify-content: flex-start;
+ 	margin-bottom: 0;
+ `;
++
++// Custom styled component to force line break between name and hint while keeping checkmark on the right
++export const StyledCustomSelectControl = styled( CustomSelectControl )`
++	.components-custom-select-control__item
++		.components-custom-select-control__item-hint {
++		width: 100%;
++	}
++`;
+diff --git a/packages/components/src/font-size-picker/test/font-size-picker-select.tsx b/packages/components/src/font-size-picker/test/font-size-picker-select.tsx
+new file mode 100644
+index 00000000000000..1ad8457984752b
+--- /dev/null
++++ b/packages/components/src/font-size-picker/test/font-size-picker-select.tsx
+@@ -0,0 +1,221 @@
++/**
++ * External dependencies
++ */
++import { screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { render } from '@ariakit/test/react';
++
++/**
++ * Internal dependencies
++ */
++import FontSizePickerSelect from '../font-size-picker-select';
++import type { FontSize } from '../types';
++
++describe( 'FontSizePickerSelect', () => {
++	const fontSizes: FontSize[] = [
++		{
++			slug: 'small',
++			name: 'Small',
++			size: '12px',
++		},
++		{
++			slug: 'medium',
++			name: 'Medium',
++			size: '16px',
++		},
++		{
++			slug: 'large',
++			name: 'Large',
++			size: '20px',
++		},
++	];
++
++	describe( 'valueMode prop', () => {
++		it( 'should find font size by size value when valueMode is literal', async () => {
++			const onChange = jest.fn();
++			await render(
++				<FontSizePickerSelect
++					fontSizes={ fontSizes }
++					value="16px"
++					valueMode="literal"
++					onChange={ onChange }
++					onSelectCustom={ jest.fn() }
++					disableCustomFontSizes={ false }
++					__next40pxDefaultSize={ false }
++					size="default"
++				/>
++			);
++			// Should select the medium option (16px)
++			expect(
++				screen.getByRole( 'combobox', { name: 'Font size' } )
++			).toHaveTextContent( 'Medium' );
++		} );
++
++		it( 'should find font size by slug when valueMode is slug', async () => {
++			const onChange = jest.fn();
++			await render(
++				<FontSizePickerSelect
++					fontSizes={ fontSizes }
++					value="medium"
++					valueMode="slug"
++					onChange={ onChange }
++					onSelectCustom={ jest.fn() }
++					disableCustomFontSizes={ false }
++					__next40pxDefaultSize={ false }
++					size="default"
++				/>
++			);
++			// Should select the medium option
++			expect(
++				screen.getByRole( 'combobox', { name: 'Font size' } )
++			).toHaveTextContent( 'Medium' );
++		} );
++
++		it( 'should handle undefined value', async () => {
++			const onChange = jest.fn();
++			await render(
++				<FontSizePickerSelect
++					fontSizes={ fontSizes }
++					value={ undefined }
++					valueMode="literal"
++					onChange={ onChange }
++					onSelectCustom={ jest.fn() }
++					disableCustomFontSizes={ false }
++					__next40pxDefaultSize={ false }
++					size="default"
++				/>
++			);
++			// Should show default option
++			expect(
++				screen.getByRole( 'combobox', { name: 'Font size' } )
++			).toHaveTextContent( 'Default' );
++		} );
++
++		it( 'should handle empty string value', async () => {
++			const onChange = jest.fn();
++			await render(
++				<FontSizePickerSelect
++					fontSizes={ fontSizes }
++					value=""
++					valueMode="literal"
++					onChange={ onChange }
++					onSelectCustom={ jest.fn() }
++					disableCustomFontSizes={ false }
++					__next40pxDefaultSize={ false }
++					size="default"
++				/>
++			);
++			// Should show default option
++			expect(
++				screen.getByRole( 'combobox', { name: 'Font size' } )
++			).toHaveTextContent( 'Default' );
++		} );
++	} );
++
++	describe( 'onChange callback', () => {
++		it( 'should call onChange with FontSize object as second parameter', async () => {
++			const user = userEvent.setup();
++			const onChange = jest.fn();
++			await render(
++				<FontSizePickerSelect
++					fontSizes={ fontSizes }
++					onChange={ onChange }
++					onSelectCustom={ jest.fn() }
++					disableCustomFontSizes={ false }
++					__next40pxDefaultSize={ false }
++					size="default"
++				/>
++			);
++			await user.click(
++				screen.getByRole( 'combobox', { name: 'Font size' } )
++			);
++			await user.click(
++				screen.getByRole( 'option', { name: 'Small 12px' } )
++			);
++			expect( onChange ).toHaveBeenCalledWith( '12px', fontSizes[ 0 ] );
++		} );
++
++		it( 'should call onChange with undefined as second parameter for default option', async () => {
++			const user = userEvent.setup();
++			const onChange = jest.fn();
++			await render(
++				<FontSizePickerSelect
++					fontSizes={ fontSizes }
++					value="16px" // Start with a selected value
++					onChange={ onChange }
++					onSelectCustom={ jest.fn() }
++					disableCustomFontSizes={ false }
++					__next40pxDefaultSize={ false }
++					size="default"
++				/>
++			);
++			await user.click(
++				screen.getByRole( 'combobox', { name: 'Font size' } )
++			);
++			await user.click(
++				screen.getByRole( 'option', { name: 'Default' } )
++			);
++			expect( onChange ).toHaveBeenCalledWith( undefined, undefined );
++		} );
++	} );
++
++	describe( 'edge cases', () => {
++		const fontSizesWithDuplicates: FontSize[] = [
++			{
++				slug: 'small-1',
++				name: 'Small 1',
++				size: '12px',
++			},
++			{
++				slug: 'small-2',
++				name: 'Small 2',
++				size: '12px',
++			},
++			{
++				slug: 'medium',
++				name: 'Medium',
++				size: '16px',
++			},
++		];
++
++		it( 'should handle multiple font sizes with same value in literal mode', async () => {
++			const onChange = jest.fn();
++			await render(
++				<FontSizePickerSelect
++					fontSizes={ fontSizesWithDuplicates }
++					value="12px"
++					valueMode="literal"
++					onChange={ onChange }
++					onSelectCustom={ jest.fn() }
++					disableCustomFontSizes={ false }
++					__next40pxDefaultSize={ false }
++					size="default"
++				/>
++			);
++			// Should show the first matching font size when there are multiple matches
++			expect(
++				screen.getByRole( 'combobox', { name: 'Font size' } )
++			).toHaveTextContent( 'Small 1' );
++		} );
++
++		it( 'should handle multiple font sizes with same value in slug mode', async () => {
++			const onChange = jest.fn();
++			await render(
++				<FontSizePickerSelect
++					fontSizes={ fontSizesWithDuplicates }
++					value="small-1"
++					valueMode="slug"
++					onChange={ onChange }
++					onSelectCustom={ jest.fn() }
++					disableCustomFontSizes={ false }
++					__next40pxDefaultSize={ false }
++					size="default"
++				/>
++			);
++			// Should select the specific font size by slug
++			expect(
++				screen.getByRole( 'combobox', { name: 'Font size' } )
++			).toHaveTextContent( 'Small 1' );
++		} );
++	} );
++} );
+diff --git a/packages/components/src/font-size-picker/test/font-size-picker-toggle-group.tsx b/packages/components/src/font-size-picker/test/font-size-picker-toggle-group.tsx
+new file mode 100644
+index 00000000000000..68fa18f457366b
+--- /dev/null
++++ b/packages/components/src/font-size-picker/test/font-size-picker-toggle-group.tsx
+@@ -0,0 +1,275 @@
++/**
++ * External dependencies
++ */
++import { screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { render } from '@ariakit/test/react';
++
++/**
++ * Internal dependencies
++ */
++import FontSizePickerToggleGroup from '../font-size-picker-toggle-group';
++import type { FontSize } from '../types';
++
++describe( 'FontSizePickerToggleGroup', () => {
++	const fontSizes: FontSize[] = [
++		{
++			slug: 'small',
++			name: 'Small',
++			size: '12px',
++		},
++		{
++			slug: 'medium',
++			name: 'Medium',
++			size: '16px',
++		},
++		{
++			slug: 'large',
++			name: 'Large',
++			size: '20px',
++		},
++	];
++
++	describe( 'valueMode prop', () => {
++		it( 'should find font size by size value when valueMode is literal', async () => {
++			const onChange = jest.fn();
++			await render(
++				<FontSizePickerToggleGroup
++					fontSizes={ fontSizes }
++					value="16px"
++					valueMode="literal"
++					onChange={ onChange }
++					__next40pxDefaultSize={ false }
++					size="default"
++				/>
++			);
++			// Should select the medium option (16px)
++			expect(
++				screen.getByRole( 'radio', { checked: true } )
++			).toHaveAccessibleName( 'Medium' );
++		} );
++
++		it( 'should find font size by slug when valueMode is slug', async () => {
++			const onChange = jest.fn();
++			await render(
++				<FontSizePickerToggleGroup
++					fontSizes={ fontSizes }
++					value="medium"
++					valueMode="slug"
++					onChange={ onChange }
++					__next40pxDefaultSize={ false }
++					size="default"
++				/>
++			);
++			// Should select the medium option
++			expect(
++				screen.getByRole( 'radio', { checked: true } )
++			).toHaveAccessibleName( 'Medium' );
++		} );
++
++		it( 'should handle undefined value', async () => {
++			const onChange = jest.fn();
++			await render(
++				<FontSizePickerToggleGroup
++					fontSizes={ fontSizes }
++					value={ undefined }
++					valueMode="literal"
++					onChange={ onChange }
++					__next40pxDefaultSize={ false }
++					size="default"
++				/>
++			);
++			// Should have no selection
++			expect(
++				screen.queryByRole( 'radio', { checked: true } )
++			).not.toBeInTheDocument();
++		} );
++
++		it( 'should handle empty string value', async () => {
++			const onChange = jest.fn();
++			await render(
++				<FontSizePickerToggleGroup
++					fontSizes={ fontSizes }
++					value=""
++					valueMode="literal"
++					onChange={ onChange }
++					__next40pxDefaultSize={ false }
++					size="default"
++				/>
++			);
++			// Should have no selection
++			expect(
++				screen.queryByRole( 'radio', { checked: true } )
++			).not.toBeInTheDocument();
++		} );
++	} );
++
++	describe( 'onChange callback', () => {
++		it( 'should call onChange with FontSize object as second parameter', async () => {
++			const user = userEvent.setup();
++			const onChange = jest.fn();
++			await render(
++				<FontSizePickerToggleGroup
++					fontSizes={ fontSizes }
++					onChange={ onChange }
++					__next40pxDefaultSize={ false }
++					size="default"
++				/>
++			);
++			await user.click( screen.getByRole( 'radio', { name: 'Small' } ) );
++			expect( onChange ).toHaveBeenCalledWith( '12px', fontSizes[ 0 ] );
++		} );
++
++		it( 'should call onChange with FontSize object when selecting a different option', async () => {
++			const user = userEvent.setup();
++			const onChange = jest.fn();
++			await render(
++				<FontSizePickerToggleGroup
++					fontSizes={ fontSizes }
++					value="medium"
++					onChange={ onChange }
++					__next40pxDefaultSize={ false }
++					size="default"
++				/>
++			);
++			// Click a different option
++			await user.click( screen.getByRole( 'radio', { name: 'Small' } ) );
++			expect( onChange ).toHaveBeenCalledWith( '12px', fontSizes[ 0 ] );
++		} );
++	} );
++
++	describe( 'edge cases', () => {
++		const fontSizesWithDuplicates: FontSize[] = [
++			{
++				slug: 'small-1',
++				name: 'Small 1',
++				size: '12px',
++			},
++			{
++				slug: 'small-2',
++				name: 'Small 2',
++				size: '12px',
++			},
++			{
++				slug: 'medium',
++				name: 'Medium',
++				size: '16px',
++			},
++		];
++
++		it( 'should handle multiple font sizes with same value in literal mode', async () => {
++			const onChange = jest.fn();
++			await render(
++				<FontSizePickerToggleGroup
++					fontSizes={ fontSizesWithDuplicates }
++					value="12px"
++					valueMode="literal"
++					onChange={ onChange }
++					__next40pxDefaultSize={ false }
++					size="default"
++				/>
++			);
++			// Should have no selection when there are multiple matches
++			expect(
++				screen.queryByRole( 'radio', { checked: true } )
++			).not.toBeInTheDocument();
++		} );
++
++		it( 'should handle multiple font sizes with same value in slug mode', async () => {
++			const onChange = jest.fn();
++			await render(
++				<FontSizePickerToggleGroup
++					fontSizes={ fontSizesWithDuplicates }
++					value="small-1"
++					valueMode="slug"
++					onChange={ onChange }
++					__next40pxDefaultSize={ false }
++					size="default"
++				/>
++			);
++			// Should select the specific font size by slug
++			expect(
++				screen.getByRole( 'radio', { checked: true } )
++			).toHaveAccessibleName( 'Small 1' );
++		} );
++	} );
++
++	describe( 'heterogeneous font sizes', () => {
++		const heterogeneousFontSizes: FontSize[] = [
++			{
++				slug: 'small',
++				name: 'Small',
++				size: '12px',
++			},
++			{
++				slug: 'medium',
++				name: 'Medium',
++				size: '1em',
++			},
++			{
++				slug: 'large',
++				name: 'Large',
++				size: '2rem',
++			},
++			{
++				slug: 'x-large',
++				name: 'Extra Large',
++				size: 'clamp(1.75rem, 3vw, 2.25rem)',
++			},
++		];
++
++		it( 'should handle different units in literal mode', async () => {
++			const onChange = jest.fn();
++			await render(
++				<FontSizePickerToggleGroup
++					fontSizes={ heterogeneousFontSizes }
++					value="1em"
++					valueMode="literal"
++					onChange={ onChange }
++					__next40pxDefaultSize={ false }
++					size="default"
++				/>
++			);
++			// Should select the medium option (1em)
++			expect(
++				screen.getByRole( 'radio', { checked: true } )
++			).toHaveAccessibleName( 'Medium' );
++		} );
++
++		it( 'should handle complex font size values in literal mode', async () => {
++			const onChange = jest.fn();
++			await render(
++				<FontSizePickerToggleGroup
++					fontSizes={ heterogeneousFontSizes }
++					value="clamp(1.75rem, 3vw, 2.25rem)"
++					valueMode="literal"
++					onChange={ onChange }
++					__next40pxDefaultSize={ false }
++					size="default"
++				/>
++			);
++			// Should select the extra large option
++			expect(
++				screen.getByRole( 'radio', { checked: true } )
++			).toHaveAccessibleName( 'Extra Large' );
++		} );
++
++		it( 'should handle different units in slug mode', async () => {
++			const onChange = jest.fn();
++			await render(
++				<FontSizePickerToggleGroup
++					fontSizes={ heterogeneousFontSizes }
++					value="medium"
++					valueMode="slug"
++					onChange={ onChange }
++					__next40pxDefaultSize={ false }
++					size="default"
++				/>
++			);
++			// Should select the medium option
++			expect(
++				screen.getByRole( 'radio', { checked: true } )
++			).toHaveAccessibleName( 'Medium' );
++		} );
++	} );
++} );
+diff --git a/packages/components/src/font-size-picker/test/index.tsx b/packages/components/src/font-size-picker/test/index.tsx
+index 53bfc79979720b..8893747c4cf758 100644
+--- a/packages/components/src/font-size-picker/test/index.tsx
++++ b/packages/components/src/font-size-picker/test/index.tsx
+@@ -145,7 +145,7 @@ describe( 'FontSizePicker', () => {
+ 			{
+ 				option: 'Default',
+ 				value: '8px',
+-				expectedArguments: [ undefined ],
++				expectedArguments: [ undefined, undefined ],
+ 			},
+ 			{
+ 				option: 'Tiny 8px',
+@@ -249,7 +249,7 @@ describe( 'FontSizePicker', () => {
+ 			{
+ 				option: 'Default',
+ 				value: '8px',
+-				expectedArguments: [ undefined ],
++				expectedArguments: [ undefined, undefined ],
+ 			},
+ 			{
+ 				option: 'Tiny 8px',
+@@ -358,6 +358,98 @@ describe( 'FontSizePicker', () => {
+ 
+ 		commonToggleGroupTests( fontSizes );
+ 		commonTests( fontSizes );
++
++		describe( 'valueMode prop for toggle group', () => {
++			it( 'should find font size by size value when valueMode is literal', async () => {
++				await render(
++					<FontSizePicker
++						fontSizes={ fontSizes }
++						value="16px"
++						valueMode="literal"
++					/>
++				);
++				// Should select the medium option (16px)
++				expect(
++					screen.getByRole( 'radio', { checked: true } )
++				).toHaveAccessibleName( 'Medium' );
++			} );
++
++			it( 'should find font size by slug when valueMode is slug', async () => {
++				await render(
++					<FontSizePicker
++						fontSizes={ fontSizes }
++						value="medium"
++						valueMode="slug"
++					/>
++				);
++				// Should select the medium option
++				expect(
++					screen.getByRole( 'radio', { checked: true } )
++				).toHaveAccessibleName( 'Medium' );
++			} );
++
++			it( 'should handle multiple font sizes with same value in literal mode', async () => {
++				const fontSizesWithDuplicates = [
++					{
++						slug: 'small-1',
++						name: 'Small 1',
++						size: '12px',
++					},
++					{
++						slug: 'small-2',
++						name: 'Small 2',
++						size: '12px',
++					},
++					{
++						slug: 'medium',
++						name: 'Medium',
++						size: '16px',
++					},
++				];
++				await render(
++					<FontSizePicker
++						fontSizes={ fontSizesWithDuplicates }
++						value="12px"
++						valueMode="literal"
++					/>
++				);
++				// Should have no selection when there are multiple matches
++				expect(
++					screen.queryByRole( 'radio', { checked: true } )
++				).not.toBeInTheDocument();
++			} );
++
++			it( 'should handle multiple font sizes with same value in slug mode', async () => {
++				const fontSizesWithDuplicates = [
++					{
++						slug: 'small-1',
++						name: 'Small 1',
++						size: '12px',
++					},
++					{
++						slug: 'small-2',
++						name: 'Small 2',
++						size: '12px',
++					},
++					{
++						slug: 'medium',
++						name: 'Medium',
++						size: '16px',
++					},
++				];
++				await render(
++					<FontSizePicker
++						fontSizes={ fontSizesWithDuplicates }
++						value="small-1"
++						valueMode="slug"
++					/>
++				);
++				// Should select the specific font size by slug
++				expect(
++					screen.getByRole( 'radio', { checked: true } )
++				).toHaveAccessibleName( 'Small 1' );
++			} );
++		} );
+ 	} );
+ 
+ 	describe( 'with ≤ 5 heterogeneous font sizes', () => {
+@@ -430,6 +522,64 @@ describe( 'FontSizePicker', () => {
+ 
+ 		commonToggleGroupTests( fontSizes );
+ 		commonTests( fontSizes );
++
++		describe( 'valueMode prop for heterogeneous toggle group', () => {
++			it( 'should find font size by size value when valueMode is literal', async () => {
++				await render(
++					<FontSizePicker
++						fontSizes={ fontSizes }
++						value="1em"
++						valueMode="literal"
++					/>
++				);
++				// Should select the medium option (1em)
++				expect(
++					screen.getByRole( 'radio', { checked: true } )
++				).toHaveAccessibleName( 'Medium' );
++			} );
++
++			it( 'should find font size by slug when valueMode is slug', async () => {
++				await render(
++					<FontSizePicker
++						fontSizes={ fontSizes }
++						value="medium"
++						valueMode="slug"
++					/>
++				);
++				// Should select the medium option
++				expect(
++					screen.getByRole( 'radio', { checked: true } )
++				).toHaveAccessibleName( 'Medium' );
++			} );
++
++			it( 'should handle complex font size values in literal mode', async () => {
++				await render(
++					<FontSizePicker
++						fontSizes={ fontSizes }
++						value="clamp(1.75rem, 3vw, 2.25rem)"
++						valueMode="literal"
++					/>
++				);
++				// Should select the extra large option
++				expect(
++					screen.getByRole( 'radio', { checked: true } )
++				).toHaveAccessibleName( 'Extra Large' );
++			} );
++
++			it( 'should handle complex font size values in slug mode', async () => {
++				await render(
++					<FontSizePicker
++						fontSizes={ fontSizes }
++						value="x-large"
++						valueMode="slug"
++					/>
++				);
++				// Should select the extra large option
++				expect(
++					screen.getByRole( 'radio', { checked: true } )
++				).toHaveAccessibleName( 'Extra Large' );
++			} );
++		} );
+ 	} );
+ 
+ 	function commonToggleGroupTests( fontSizes: FontSize[] ) {
+@@ -653,4 +803,312 @@ describe( 'FontSizePicker', () => {
+ 			expect( units[ 2 ] ).toHaveAccessibleName( 'ex' );
+ 		} );
+ 	}
++
++	describe( 'valueMode prop', () => {
++		// Use 6 font sizes to trigger select control (> 5)
++		const fontSizes = [
++			{
++				slug: 'small',
++				name: 'Small',
++				size: '12px',
++			},
++			{
++				slug: 'medium',
++				name: 'Medium',
++				size: '16px',
++			},
++			{
++				slug: 'large',
++				name: 'Large',
++				size: '20px',
++			},
++			{
++				slug: 'x-large',
++				name: 'Extra Large',
++				size: '24px',
++			},
++			{
++				slug: 'xx-large',
++				name: 'XX Large',
++				size: '28px',
++			},
++			{
++				slug: 'huge',
++				name: 'Huge',
++				size: '32px',
++			},
++		];
++
++		describe( 'valueMode="literal" (default)', () => {
++			it( 'should find font size by size value when valueMode is literal', async () => {
++				await render(
++					<FontSizePicker
++						fontSizes={ fontSizes }
++						value="16px"
++						valueMode="literal"
++					/>
++				);
++				// Should select the medium option (16px)
++				expect(
++					screen.getByRole( 'combobox', { name: 'Font size' } )
++				).toHaveTextContent( 'Medium' );
++			} );
++
++			it( 'should call onChange with size value and FontSize object when valueMode is literal', async () => {
++				const user = userEvent.setup();
++				const onChange = jest.fn();
++				await render(
++					<FontSizePicker
++						fontSizes={ fontSizes }
++						onChange={ onChange }
++						valueMode="literal"
++					/>
++				);
++				await user.click(
++					screen.getByRole( 'combobox', { name: 'Font size' } )
++				);
++				await user.click(
++					screen.getByRole( 'option', { name: 'Medium 16px' } )
++				);
++				expect( onChange ).toHaveBeenCalledWith(
++					'16px',
++					fontSizes[ 1 ]
++				);
++			} );
++		} );
++
++		describe( 'valueMode="slug"', () => {
++			it( 'should find font size by slug when valueMode is slug', async () => {
++				await render(
++					<FontSizePicker
++						fontSizes={ fontSizes }
++						value="medium"
++						valueMode="slug"
++					/>
++				);
++				// Should select the medium option
++				expect(
++					screen.getByRole( 'combobox', { name: 'Font size' } )
++				).toHaveTextContent( 'Medium' );
++			} );
++
++			it( 'should call onChange with size value and FontSize object when valueMode is slug', async () => {
++				const user = userEvent.setup();
++				const onChange = jest.fn();
++				await render(
++					<FontSizePicker
++						fontSizes={ fontSizes }
++						onChange={ onChange }
++						valueMode="slug"
++					/>
++				);
++				await user.click(
++					screen.getByRole( 'combobox', { name: 'Font size' } )
++				);
++				await user.click(
++					screen.getByRole( 'option', { name: 'Large 20px' } )
++				);
++				expect( onChange ).toHaveBeenCalledWith(
++					'20px',
++					fontSizes[ 2 ]
++				);
++			} );
++
++			it( 'should handle undefined value when valueMode is slug', async () => {
++				await render(
++					<FontSizePicker
++						fontSizes={ fontSizes }
++						value={ undefined }
++						valueMode="slug"
++					/>
++				);
++				// Should show default option
++				expect(
++					screen.getByRole( 'combobox', { name: 'Font size' } )
++				).toHaveTextContent( 'Default' );
++			} );
++
++			it( 'should handle empty string value when valueMode is slug', async () => {
++				await render(
++					<FontSizePicker
++						fontSizes={ fontSizes }
++						value=""
++						valueMode="slug"
++					/>
++				);
++				// Should show default option
++				expect(
++					screen.getByRole( 'combobox', { name: 'Font size' } )
++				).toHaveTextContent( 'Default' );
++			} );
++		} );
++
++		describe( 'edge cases with valueMode', () => {
++			// Use 6 font sizes to trigger select control (> 5)
++			const fontSizesWithDuplicates = [
++				{
++					slug: 'small-1',
++					name: 'Small 1',
++					size: '12px',
++				},
++				{
++					slug: 'small-2',
++					name: 'Small 2',
++					size: '12px',
++				},
++				{
++					slug: 'medium',
++					name: 'Medium',
++					size: '16px',
++				},
++				{
++					slug: 'large',
++					name: 'Large',
++					size: '20px',
++				},
++				{
++					slug: 'x-large',
++					name: 'Extra Large',
++					size: '24px',
++				},
++				{
++					slug: 'huge',
++					name: 'Huge',
++					size: '28px',
++				},
++			];
++
++			it( 'should handle multiple font sizes with same value in literal mode', async () => {
++				await render(
++					<FontSizePicker
++						fontSizes={ fontSizesWithDuplicates }
++						value="12px"
++						valueMode="literal"
++					/>
++				);
++				// Should show the first matching font size when there are multiple matches
++				expect(
++					screen.getByRole( 'combobox', { name: 'Font size' } )
++				).toHaveTextContent( 'Small 1' );
++			} );
++
++			it( 'should handle multiple font sizes with same value in slug mode', async () => {
++				await render(
++					<FontSizePicker
++						fontSizes={ fontSizesWithDuplicates }
++						value="small-1"
++						valueMode="slug"
++					/>
++				);
++				// Should select the specific font size by slug
++				expect(
++					screen.getByRole( 'combobox', { name: 'Font size' } )
++				).toHaveTextContent( 'Small 1' );
++			} );
++		} );
++	} );
++
++	describe( 'onChange callback signature', () => {
++		// Use 6 font sizes to trigger select control (> 5)
++		const fontSizes = [
++			{
++				slug: 'small',
++				name: 'Small',
++				size: '12px',
++			},
++			{
++				slug: 'medium',
++				name: 'Medium',
++				size: '16px',
++			},
++			{
++				slug: 'large',
++				name: 'Large',
++				size: '20px',
++			},
++			{
++				slug: 'x-large',
++				name: 'Extra Large',
++				size: '24px',
++			},
++			{
++				slug: 'xx-large',
++				name: 'XX Large',
++				size: '28px',
++			},
++			{
++				slug: 'huge',
++				name: 'Huge',
++				size: '32px',
++			},
++		];
++
++		it( 'should call onChange with FontSize object as second parameter for select control', async () => {
++			const user = userEvent.setup();
++			const onChange = jest.fn();
++			await render(
++				<FontSizePicker fontSizes={ fontSizes } onChange={ onChange } />
++			);
++			await user.click(
++				screen.getByRole( 'combobox', { name: 'Font size' } )
++			);
++			await user.click(
++				screen.getByRole( 'option', { name: 'Small 12px' } )
++			);
++			expect( onChange ).toHaveBeenCalledWith( '12px', fontSizes[ 0 ] );
++		} );
++
++		it( 'should call onChange with undefined as second parameter for default option', async () => {
++			const user = userEvent.setup();
++			const onChange = jest.fn();
++			await render(
++				<FontSizePicker
++					fontSizes={ fontSizes }
++					value="16px" // Start with a selected value
++					onChange={ onChange }
++				/>
++			);
++			await user.click(
++				screen.getByRole( 'combobox', { name: 'Font size' } )
++			);
++			await user.click(
++				screen.getByRole( 'option', { name: 'Default' } )
++			);
++			expect( onChange ).toHaveBeenCalledWith( undefined, undefined );
++		} );
++
++		it( 'should call onChange with FontSize object as second parameter for toggle group control', async () => {
++			const user = userEvent.setup();
++			const onChange = jest.fn();
++			// Use fewer font sizes to trigger toggle group (≤ 5)
++			const toggleGroupFontSizes = [
++				{
++					slug: 'small',
++					name: 'Small',
++					size: '12px',
++				},
++				{
++					slug: 'medium',
++					name: 'Medium',
++					size: '16px',
++				},
++				{
++					slug: 'large',
++					name: 'Large',
++					size: '20px',
++				},
++			];
++			await render(
++				<FontSizePicker
++					fontSizes={ toggleGroupFontSizes }
++					onChange={ onChange }
++				/>
++			);
++			await user.click( screen.getByRole( 'radio', { name: 'Small' } ) );
++			expect( onChange ).toHaveBeenCalledWith(
++				'12px',
++				toggleGroupFontSizes[ 0 ]
++			);
++		} );
++	} );
+ } );
+diff --git a/packages/components/src/font-size-picker/types.ts b/packages/components/src/font-size-picker/types.ts
+index 04964e05d45d55..fbefcd39a47bb4 100644
+--- a/packages/components/src/font-size-picker/types.ts
++++ b/packages/components/src/font-size-picker/types.ts
+@@ -40,6 +40,14 @@ export type FontSizePickerProps = {
+ 	 * as a number, the component operates in "unitless mode" where the `units` property has no effect.
+ 	 */
+ 	value?: number | string;
++	/**
++	 * Determines how the `value` prop should be interpreted.
++	 * - `'literal'`: The `value` prop contains the actual font size value (number or string)
++	 * - `'slug'`: The `value` prop contains the slug of the selected font size
++	 *
++	 * @default 'literal'
++	 */
++	valueMode?: 'literal' | 'slug';
+ 	/**
+ 	 * If `true`, a slider will be displayed alongside the input field when a
+ 	 * custom font size is active. Has no effect when `disableCustomFontSizes`
+@@ -96,17 +104,26 @@ export type FontSize = {
+ 	 * size. Used for the class generation process.
+ 	 */
+ 	slug: string;
++	/**
++	 * The `hint` property is an optional string that provides additional information
++	 * about the font size, such as fluid typography ranges or custom descriptions.
++	 * Consumers can use this to provide their own preferred hints.
++	 */
++	hint?: string;
+ };
+ 
+ export type FontSizePickerSelectProps = Pick<
+ 	FontSizePickerProps,
+-	'value' | 'size'
++	'value' | 'size' | 'valueMode'
+ > & {
+ 	fontSizes: NonNullable< FontSizePickerProps[ 'fontSizes' ] >;
+ 	disableCustomFontSizes: NonNullable<
+ 		FontSizePickerProps[ 'disableCustomFontSizes' ]
+ 	>;
+-	onChange: NonNullable< FontSizePickerProps[ 'onChange' ] >;
++	onChange: (
++		value: number | string | undefined,
++		selectedItem?: FontSize
++	) => void;
+ 	onSelectCustom: () => void;
+ 	__next40pxDefaultSize: boolean;
+ };
+@@ -120,8 +137,11 @@ export type FontSizePickerSelectOption = {
+ 
+ export type FontSizePickerToggleGroupProps = Pick<
+ 	FontSizePickerProps,
+-	'value' | 'size' | '__next40pxDefaultSize'
++	'value' | 'size' | '__next40pxDefaultSize' | 'valueMode'
+ > & {
+ 	fontSizes: NonNullable< FontSizePickerProps[ 'fontSizes' ] >;
+-	onChange: NonNullable< FontSizePickerProps[ 'onChange' ] >;
++	onChange: (
++		value: number | string | undefined,
++		selectedItem?: FontSize
++	) => void;
+ };
+diff --git a/packages/components/src/font-size-picker/utils.ts b/packages/components/src/font-size-picker/utils.ts
+index 4d256496e63006..93516faf2efd89 100644
+--- a/packages/components/src/font-size-picker/utils.ts
++++ b/packages/components/src/font-size-picker/utils.ts
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import type { FontSizePickerProps } from './types';
++import type { FontSizePickerProps, FontSize } from './types';
+ 
+ /**
+  * Some themes use css vars for their font sizes, so until we
+@@ -17,3 +17,25 @@ export function isSimpleCssValue(
+ 		/^[\d\.]+(px|em|rem|vw|vh|%|svw|lvw|dvw|svh|lvh|dvh|vi|svi|lvi|dvi|vb|svb|lvb|dvb|vmin|svmin|lvmin|dvmin|vmax|svmax|lvmax|dvmax)?$/i;
+ 	return sizeRegex.test( String( value ) );
+ }
++
++/**
++ * Generates hint text for a font size.
++ * This function returns the hint provided by the consumer, if any.
++ * If no hint is provided, it falls back to showing the size value for simple CSS values.
++ *
++ * @param fontSize The font size object to generate hint text for.
++ * @return The hint text provided by the consumer, or the size value for simple CSS values, or undefined.
++ */
++export function generateFontSizeHint( fontSize: FontSize ): string | undefined {
++	// If the font size already has a hint, use it
++	if ( fontSize.hint ) {
++		return fontSize.hint;
++	}
++
++	// Fallback to showing the size value if it's a simple CSS value
++	if ( isSimpleCssValue( fontSize.size ) ) {
++		return String( fontSize.size );
++	}
++
++	return undefined;
++}

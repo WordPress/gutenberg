@@ -1,0 +1,26 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 59160a89f036c6..3e9b1fe49e3962 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -26,6 +26,7 @@
+ 
+ -   `TreeGrid`: Update docs with `data-expanded` attribute usage ([#50026](https://github.com/WordPress/gutenberg/pull/50026)).
+ -   Consolidate multiple versions of `README` and `CONTRIBUTING` docs, and add them to Storybook ([#50226](https://github.com/WordPress/gutenberg/pull/50226)).
++-   `DimensionControl`: Use WordPress package instead of react in code example ([#50435](https://github.com/WordPress/gutenberg/pull/50435)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/dimension-control/index.tsx b/packages/components/src/dimension-control/index.tsx
+index 21255a0ec65e04..0fbdd62b58a00d 100644
+--- a/packages/components/src/dimension-control/index.tsx
++++ b/packages/components/src/dimension-control/index.tsx
+@@ -23,8 +23,8 @@ import type { SelectControlSingleSelectionProps } from '../select-control/types'
+  * This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+  *
+  * ```jsx
+- * import { useState } from 'react';
+  * import { __experimentalDimensionControl as DimensionControl } from '@wordpress/components';
++ * import { useState } from '@wordpress/element';
+  *
+  * export default function MyCustomDimensionControl() {
+  * 	const [ paddingSize, setPaddingSize ] = useState( '' );

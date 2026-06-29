@@ -1,0 +1,95 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index be8d36763e41d7..d176723f208d13 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Deprecation
+ 
+ -   `Navigation`: Soft deprecate component ([#59182](https://github.com/WordPress/gutenberg/pull/59182)).
++-   `BorderControl`: Remove "experimental" designation ([#60920](https://github.com/WordPress/gutenberg/pull/60920)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/border-control/border-control/README.md b/packages/components/src/border-control/border-control/README.md
+index 51fb7172b7c553..1ce3e3eacbf19d 100644
+--- a/packages/components/src/border-control/border-control/README.md
++++ b/packages/components/src/border-control/border-control/README.md
+@@ -1,9 +1,5 @@
+ #  BorderControl
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-<br />
+ This component provides control over a border's color, style, and width.
+ 
+ ## Development guidelines
+@@ -21,7 +17,7 @@ a "shape" abstraction.
+ 
+ ```jsx
+ import { useState } from 'react';
+-import { __experimentalBorderControl as BorderControl } from '@wordpress/components';
++import { BorderControl } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
+ 
+ const colors = [
+diff --git a/packages/components/src/border-control/border-control/component.tsx b/packages/components/src/border-control/border-control/component.tsx
+index 5fe2abce1b4117..6dc3e8a6891ad2 100644
+--- a/packages/components/src/border-control/border-control/component.tsx
++++ b/packages/components/src/border-control/border-control/component.tsx
+@@ -134,7 +134,7 @@ const UnconnectedBorderControl = (
+  * a "shape" abstraction.
+  *
+  * ```jsx
+- * import { __experimentalBorderControl as BorderControl } from '@wordpress/components';
++ * import { BorderControl } from '@wordpress/components';
+  * import { __ } from '@wordpress/i18n';
+  *
+  * const colors = [
+diff --git a/packages/components/src/border-control/stories/index.story.tsx b/packages/components/src/border-control/stories/index.story.tsx
+index 9a5349d302c276..19938db5d0e51e 100644
+--- a/packages/components/src/border-control/stories/index.story.tsx
++++ b/packages/components/src/border-control/stories/index.story.tsx
+@@ -16,7 +16,7 @@ import { BorderControl } from '..';
+ import type { Border } from '../types';
+ 
+ const meta: Meta< typeof BorderControl > = {
+-	title: 'Components (Experimental)/BorderControl',
++	title: 'Components/BorderControl',
+ 	component: BorderControl,
+ 	argTypes: {
+ 		onChange: {
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index a824162cb24129..0ea8f494c8d6e8 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -34,7 +34,13 @@ export {
+ 	isDefinedBorder as __experimentalIsDefinedBorder,
+ 	isEmptyBorder as __experimentalIsEmptyBorder,
+ } from './border-box-control';
+-export { BorderControl as __experimentalBorderControl } from './border-control';
++export {
++	/**
++	 * @deprecated Import `BorderControl` instead.
++	 */
++	BorderControl as __experimentalBorderControl,
++	BorderControl,
++} from './border-control';
+ export {
+ 	default as __experimentalBoxControl,
+ 	applyValueToSides as __experimentalApplyValueToSides,
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 629f06bf98edf9..ed64b6ef2ea987 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -1,6 +1,9 @@
+ <script>
+ 	( function redirectIfStoryMoved() {
+-		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation' ];
++		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [
++			'navigation',
++			'bordercontrol',
++		];
+ 		const REDIRECTS = [
+ 			{
+ 				from: /\/components-deprecated-/,

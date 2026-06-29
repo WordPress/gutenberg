@@ -1,0 +1,72 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 97bb1a706aaa3c..4d6ea42e8bc0e1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,10 +2,15 @@
+ 
+ ## Unreleased
+ 
++### Bug Fix
++
++-   `FocalPointUnitControl`: Add aria-labels ([#50993](https://github.com/WordPress/gutenberg/pull/50993)).
++
+ ### Experimental
+ 
+ -   `DropdownMenu` v2: Tweak styles ([#50967](https://github.com/WordPress/gutenberg/pull/50967)).
+ 
++
+ ## 25.0.0 (2023-05-24)
+ 
+ ### Breaking Changes
+diff --git a/packages/components/src/focal-point-picker/controls.tsx b/packages/components/src/focal-point-picker/controls.tsx
+index 3e6d33011da730..f204d5736779cb 100644
+--- a/packages/components/src/focal-point-picker/controls.tsx
++++ b/packages/components/src/focal-point-picker/controls.tsx
+@@ -54,6 +54,7 @@ export default function FocalPointPickerControls( {
+ 		>
+ 			<FocalPointUnitControl
+ 				label={ __( 'Left' ) }
++				aria-label={ __( 'Focal point left position' ) }
+ 				value={ [ valueX, '%' ].join( '' ) }
+ 				onChange={
+ 					( ( next ) =>
+@@ -66,6 +67,7 @@ export default function FocalPointPickerControls( {
+ 			/>
+ 			<FocalPointUnitControl
+ 				label={ __( 'Top' ) }
++				aria-label={ __( 'Focal point top position' ) }
+ 				value={ [ valueY, '%' ].join( '' ) }
+ 				onChange={
+ 					( ( next ) =>
+diff --git a/packages/components/src/focal-point-picker/test/index.js b/packages/components/src/focal-point-picker/test/index.js
+index af295150f6cb87..d5c7946cffd860 100644
+--- a/packages/components/src/focal-point-picker/test/index.js
++++ b/packages/components/src/focal-point-picker/test/index.js
+@@ -120,7 +120,9 @@ describe( 'FocalPointPicker', () => {
+ 			const { rerender } = render(
+ 				<Picker value={ { x: 0.25, y: 0.5 } } />
+ 			);
+-			const xInput = screen.getByRole( 'spinbutton', { name: 'Left' } );
++			const xInput = screen.getByRole( 'spinbutton', {
++				name: 'Focal point left position',
++			} );
+ 			rerender( <Picker value={ { x: 0.93, y: 0.5 } } /> );
+ 			expect( xInput.value ).toBe( '93' );
+ 		} );
+@@ -155,10 +157,14 @@ describe( 'FocalPointPicker', () => {
+ 			);
+ 
+ 			expect(
+-				screen.getByRole( 'spinbutton', { name: 'Left' } ).value
++				screen.getByRole( 'spinbutton', {
++					name: 'Focal point left position',
++				} ).value
+ 			).toBe( '10' );
+ 			expect(
+-				screen.getByRole( 'spinbutton', { name: 'Top' } ).value
++				screen.getByRole( 'spinbutton', {
++					name: 'Focal point top position',
++				} ).value
+ 			).toBe( '20' );
+ 			expect( onChangeSpy ).not.toHaveBeenCalled();
+ 		} );

@@ -1,0 +1,321 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f98e5fb73173f6..b2897eae39760d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -22,6 +22,7 @@
+ -   `CustomGradientBar` updated to satisfy `react/exhuastive-deps` eslint rule ([#41463](https://github.com/WordPress/gutenberg/pull/41463))
+ -   `TreeSelect`: Convert to TypeScript ([#41536](https://github.com/WordPress/gutenberg/pull/41536)).
+ -   `FontSizePicker`: updated to satisfy `react/exhuastive-deps` eslint rule ([#41600](https://github.com/WordPress/gutenberg/pull/41600)).
++-   `ZStack`: Convert component story to TypeScript and add inline docs ([#41694](https://github.com/WordPress/gutenberg/pull/41694)).
+ -   `Dropdown`: Make sure cleanup (closing the dropdown) only runs when the menu has actually been opened.
+ -   Enhance the TypeScript migration guidelines ([#41669](https://github.com/WordPress/gutenberg/pull/41669)).
+ 
+diff --git a/packages/components/src/z-stack/README.md b/packages/components/src/z-stack/README.md
+index 8705f82c085175..4de3d93c896812 100644
+--- a/packages/components/src/z-stack/README.md
++++ b/packages/components/src/z-stack/README.md
+@@ -26,16 +26,27 @@ function Example() {
+ 
+ ### `isLayered`: `boolean`
+ 
+-When `true`, the children are stacked on top of each other. When `false`, the children follow the normal flow of the layout. Defaults to `true`.
++Layers children elements on top of each other (first: highest z-index, last: lowest z-index).
++
++-   Required: No
++-   Default: `true`
+ 
+ ### `isReversed`: `boolean`
+ 
+-Reverse the layer ordering. When `true`, the first child has the lowest `z-index` and the last child has the highest `z-index`. When `false`, the first child has the highest `z-index` and the last child has the lowest `z-index`. Defaults to `false`.
++Reverse the layer ordering (first: lowest z-index, last: highest z-index).
++
++-   Required: No
++-   Default: `false`
+ 
+ ### `offset`: `number`
+ 
+-The amount of space between each child element. Defaults to `0`. Its value is automatically inverted (i.e. from positive to negative, and viceversa) when switching from LTR to RTL.
++The amount of space between each child element. Its value is automatically inverted (i.e. from positive to negative, and viceversa) when switching from LTR to RTL.
++
++-   Required: No
++-   Default: `0`
+ 
+ ### `children`: `ReactNode`
+ 
+ The children to stack.
++
++-   Required: Yes
+diff --git a/packages/components/src/z-stack/component.tsx b/packages/components/src/z-stack/component.tsx
+index 7d2d8c2cd1f281..1cbcac56e4fb70 100644
+--- a/packages/components/src/z-stack/component.tsx
++++ b/packages/components/src/z-stack/component.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { ForwardedRef, ReactNode } from 'react';
++import type { ForwardedRef } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -13,35 +13,11 @@ import { isValidElement } from '@wordpress/element';
+  */
+ import { getValidChildren } from '../ui/utils/get-valid-children';
+ import { contextConnect, useContextSystem } from '../ui/context';
+-import type { WordPressComponentProps } from '../ui/context';
+ import { ZStackView, ZStackChildView } from './styles';
++import type { ZStackProps } from './types';
++import type { WordPressComponentProps } from '../ui/context';
+ 
+-export interface ZStackProps {
+-	/**
+-	 * Layers children elements on top of each other (first: highest z-index, last: lowest z-index).
+-	 *
+-	 * @default true
+-	 */
+-	isLayered?: boolean;
+-	/**
+-	 * Reverse the layer ordering (first: lowest z-index, last: highest z-index).
+-	 *
+-	 * @default false
+-	 */
+-	isReversed?: boolean;
+-	/**
+-	 * The amount of offset between each child element. The amount of space between each child element. Defaults to `0`. Its value is automatically inverted (i.e. from positive to negative, and viceversa) when switching from LTR to RTL.
+-	 *
+-	 * @default 0
+-	 */
+-	offset?: number;
+-	/**
+-	 * Child elements.
+-	 */
+-	children: ReactNode;
+-}
+-
+-function ZStack(
++function UnconnectedZStack(
+ 	props: WordPressComponentProps< ZStackProps, 'div' >,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+@@ -86,4 +62,23 @@ function ZStack(
+ 	);
+ }
+ 
+-export default contextConnect( ZStack, 'ZStack' );
++/**
++ * `ZStack` allows you to stack things along the Z-axis.
++ *
++ * ```jsx
++ * import { __experimentalZStack as ZStack } from '@wordpress/components';
++ *
++ * function Example() {
++ *   return (
++ *     <ZStack offset={ 20 } isLayered>
++ *       <ExampleImage />
++ *       <ExampleImage />
++ *       <ExampleImage />
++ *     </ZStack>
++ *   );
++ * }
++ * ```
++ */
++export const ZStack = contextConnect( UnconnectedZStack, 'ZStack' );
++
++export default ZStack;
+diff --git a/packages/components/src/z-stack/stories/index.js b/packages/components/src/z-stack/stories/index.js
+deleted file mode 100644
+index 0befc542116757..00000000000000
+--- a/packages/components/src/z-stack/stories/index.js
++++ /dev/null
+@@ -1,70 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { boolean, number } from '@storybook/addon-knobs';
+-
+-/**
+- * Internal dependencies
+- */
+-import { Elevation } from '../../elevation';
+-import { HStack } from '../../h-stack';
+-import { View } from '../../view';
+-import { ZStack } from '..';
+-
+-export default {
+-	component: ZStack,
+-	title: 'Components (Experimental)/ZStack',
+-	parameters: {
+-		knobs: { disable: false },
+-	},
+-};
+-
+-const Avatar = ( { backgroundColor } ) => {
+-	return (
+-		<View>
+-			<View
+-				style={ {
+-					border: '3px solid black',
+-					borderRadius: '9999px',
+-					height: '48px',
+-					width: '48px',
+-					backgroundColor,
+-				} }
+-			/>
+-			<Elevation
+-				borderRadius={ 9999 }
+-				isInteractive={ false }
+-				value={ 3 }
+-			/>
+-		</View>
+-	);
+-};
+-
+-const AnimatedAvatars = () => {
+-	const props = {
+-		offset: number( 'offset', 20 ),
+-		isLayered: boolean( 'isLayered', true ),
+-		isReversed: boolean( 'isReversed', false ),
+-	};
+-
+-	return (
+-		<HStack>
+-			<View>
+-				<ZStack { ...props }>
+-					<Avatar backgroundColor="#444" />
+-					<Avatar backgroundColor="#777" />
+-					<Avatar backgroundColor="#aaa" />
+-					<Avatar backgroundColor="#fff" />
+-				</ZStack>
+-			</View>
+-		</HStack>
+-	);
+-};
+-
+-export const _default = () => {
+-	return (
+-		<View>
+-			<AnimatedAvatars />
+-		</View>
+-	);
+-};
+diff --git a/packages/components/src/z-stack/stories/index.tsx b/packages/components/src/z-stack/stories/index.tsx
+new file mode 100644
+index 00000000000000..b04e19962aed15
+--- /dev/null
++++ b/packages/components/src/z-stack/stories/index.tsx
+@@ -0,0 +1,76 @@
++/**
++ * External dependencies
++ */
++import type { CSSProperties } from 'react';
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import { Elevation } from '../../elevation';
++import { HStack } from '../../h-stack';
++import { View } from '../../view';
++import { ZStack } from '..';
++
++const meta: ComponentMeta< typeof ZStack > = {
++	component: ZStack,
++	title: 'Components (Experimental)/ZStack',
++	argTypes: {
++		as: { control: { type: 'text' } },
++		children: { control: { type: null } },
++	},
++	parameters: {
++		controls: {
++			expanded: true,
++		},
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Avatar = ( {
++	backgroundColor,
++}: {
++	backgroundColor: CSSProperties[ 'backgroundColor' ];
++} ) => {
++	return (
++		<View>
++			<View
++				style={ {
++					border: '3px solid black',
++					borderRadius: '9999px',
++					height: '48px',
++					width: '48px',
++					backgroundColor,
++				} }
++			/>
++			<Elevation
++				borderRadius={ 9999 }
++				isInteractive={ false }
++				value={ 3 }
++			/>
++		</View>
++	);
++};
++
++const Template: ComponentStory< typeof ZStack > = ( args ) => {
++	return (
++		<View>
++			<HStack>
++				<View>
++					<ZStack { ...args }>
++						<Avatar backgroundColor="#444" />
++						<Avatar backgroundColor="#777" />
++						<Avatar backgroundColor="#aaa" />
++						<Avatar backgroundColor="#fff" />
++					</ZStack>
++				</View>
++			</HStack>
++		</View>
++	);
++};
++
++export const Default: ComponentStory< typeof ZStack > = Template.bind( {} );
++Default.args = {
++	offset: 20,
++};
+diff --git a/packages/components/src/z-stack/types.ts b/packages/components/src/z-stack/types.ts
+new file mode 100644
+index 00000000000000..aa1324962a974a
+--- /dev/null
++++ b/packages/components/src/z-stack/types.ts
+@@ -0,0 +1,33 @@
++/**
++ * External dependencies
++ */
++import type { ReactNode } from 'react';
++
++export type ZStackProps = {
++	/**
++	 * Layers children elements on top of each other (first: highest z-index,
++	 * last: lowest z-index).
++	 *
++	 * @default true
++	 */
++	isLayered?: boolean;
++	/**
++	 * Reverse the layer ordering (first: lowest z-index, last: highest
++	 * z-index).
++	 *
++	 * @default false
++	 */
++	isReversed?: boolean;
++	/**
++	 * The amount of space between each child element. Its value is
++	 * automatically inverted (i.e. from positive to negative, and viceversa)
++	 * when switching from LTR to RTL.
++	 *
++	 * @default 0
++	 */
++	offset?: number;
++	/**
++	 * The children to stack.
++	 */
++	children: ReactNode;
++};

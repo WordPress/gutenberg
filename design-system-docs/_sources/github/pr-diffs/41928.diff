@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/flex/flex-item/README.md b/packages/components/src/flex/flex-item/README.md
+index 2aec78afe35c29..2461abdb0e8d94 100644
+--- a/packages/components/src/flex/flex-item/README.md
++++ b/packages/components/src/flex/flex-item/README.md
+@@ -8,7 +8,7 @@ A layout component to contain items of a fixed width within `Flex`.
+ 
+ ## Usage
+ 
+-See [`flex/README.md#usage`](/packages/components/src/flex/README.md#usage) for how to use `FlexItem`.
++See [`flex/README.md#usage`](/packages/components/src/flex/flex/README.md#usage) for how to use `FlexItem`.
+ 
+ ## Props
+ 

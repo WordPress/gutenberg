@@ -1,0 +1,449 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 89de1016d5fbac..fc3625c07ce951 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ -   `TabPanel`: Fix tab indicator animation while switching tabs ([#77812](https://github.com/WordPress/gutenberg/pull/77812)).
+ -   `ColorPicker`: Fix issue where clearing the hex input entirely doesn't reset the selected color to black ([#77912](https://github.com/WordPress/gutenberg/pull/77912)).
+ -   `ExternalLink`: Fix focus outline rendered in wp-admin ([#77935](https://github.com/WordPress/gutenberg/pull/77935)).
++-   `ColorPalette`: Fix duplicate-key warnings and incorrect selected swatch behavior when multiple palette entries share the same color value ([#78004](https://github.com/WordPress/gutenberg/pull/78004)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/color-palette/index.tsx b/packages/components/src/color-palette/index.tsx
+index 37791bdee9d498..4877ecc4b09211 100644
+--- a/packages/components/src/color-palette/index.tsx
++++ b/packages/components/src/color-palette/index.tsx
+@@ -50,16 +50,25 @@ function SinglePalette( {
+ 	colors,
+ 	onChange,
+ 	value,
++	selectedSlug,
+ 	...additionalProps
+ }: SinglePaletteProps ) {
+ 	const colorOptions = useMemo( () => {
+-		return colors.map( ( { color, name }, index ) => {
++		return colors.map( ( { color, name, slug }, index ) => {
+ 			const colordColor = colord( color );
+-			const isSelected = value === color;
++			// When a non-empty selectedSlug is provided, selection is decided
++			// strictly by slug — entries without a slug or with a different slug
++			// are not selected, even when their color value matches `value`.
++			// This correctly handles mixed palettes where some entries have slugs
++			// and others don't. Fall back to color value matching otherwise
++			// (including when selectedSlug is an empty string).
++			const isSelected = selectedSlug
++				? slug === selectedSlug
++				: value === color;
+ 
+ 			return (
+ 				<CircularOptionPicker.Option
+-					key={ `${ color }-${ index }` }
++					key={ slug ?? `${ color }-${ index }` }
+ 					isSelected={ isSelected }
+ 					selectedIconProps={
+ 						isSelected
+@@ -79,12 +88,14 @@ function SinglePalette( {
+ 					}
+ 					style={ { backgroundColor: color, color } }
+ 					onClick={
+-						isSelected ? clearColor : () => onChange( color, index )
++						isSelected
++							? clearColor
++							: () => onChange( color, index, slug )
+ 					}
+ 				/>
+ 			);
+ 		} );
+-	}, [ colors, value, onChange, clearColor ] );
++	}, [ colors, value, selectedSlug, onChange, clearColor ] );
+ 
+ 	return (
+ 		<CircularOptionPicker.OptionGroup
+@@ -101,6 +112,7 @@ function MultiplePalettes( {
+ 	colors,
+ 	onChange,
+ 	value,
++	selectedSlug,
+ 	headingLevel,
+ }: MultiplePalettesProps ) {
+ 	const instanceId = useInstanceId( MultiplePalettes, 'color-palette' );
+@@ -121,10 +133,11 @@ function MultiplePalettes( {
+ 						<SinglePalette
+ 							clearColor={ clearColor }
+ 							colors={ colorPalette }
+-							onChange={ ( newColor ) =>
+-								onChange( newColor, index )
++							onChange={ ( newColor, _colorIndex, slug ) =>
++								onChange( newColor, index, slug )
+ 							}
+ 							value={ value }
++							selectedSlug={ selectedSlug }
+ 							aria-labelledby={ id }
+ 						/>
+ 					</VStack>
+@@ -185,6 +198,7 @@ function UnforwardedColorPalette(
+ 		enableAlpha = false,
+ 		onChange,
+ 		value,
++		selectedSlug,
+ 		__experimentalIsRenderedInSidebar = false,
+ 		headingLevel = 2,
+ 		'aria-label': ariaLabel,
+@@ -208,9 +222,10 @@ function UnforwardedColorPalette(
+ 			extractColorNameFromCurrentValue(
+ 				value,
+ 				colors,
+-				hasMultipleColorOrigins
++				hasMultipleColorOrigins,
++				selectedSlug
+ 			),
+-		[ value, colors, hasMultipleColorOrigins ]
++		[ value, colors, hasMultipleColorOrigins, selectedSlug ]
+ 	);
+ 
+ 	const renderCustomColorPicker = () => (
+@@ -241,6 +256,7 @@ function UnforwardedColorPalette(
+ 		clearColor,
+ 		onChange,
+ 		value,
++		selectedSlug,
+ 	};
+ 
+ 	const actions = !! clearable && (
+diff --git a/packages/components/src/color-palette/stories/index.story.tsx b/packages/components/src/color-palette/stories/index.story.tsx
+index 30671aba62f106..7d274f02463a99 100644
+--- a/packages/components/src/color-palette/stories/index.story.tsx
++++ b/packages/components/src/color-palette/stories/index.story.tsx
+@@ -21,6 +21,7 @@ const meta: Meta< typeof ColorPalette > = {
+ 	argTypes: {
+ 		as: { control: false },
+ 		onChange: { action: 'onChange', control: false },
++		selectedSlug: { control: false },
+ 		value: { control: false },
+ 	},
+ 	parameters: {
+@@ -39,17 +40,21 @@ type ColorPaletteStory = StoryObj< typeof ColorPalette >;
+ const Template = ( {
+ 	onChange,
+ 	value,
++	selectedSlug,
+ 	...args
+ }: React.ComponentProps< typeof ColorPalette > ) => {
+ 	const [ color, setColor ] = useState< string | undefined >( value );
++	const [ slug, setSlug ] = useState< string | undefined >( selectedSlug );
+ 
+ 	return (
+ 		<ColorPalette
+ 			{ ...args }
+ 			value={ color }
+-			onChange={ ( newColor ) => {
++			selectedSlug={ slug }
++			onChange={ ( newColor, index, newSlug ) => {
+ 				setColor( newColor );
+-				onChange?.( newColor );
++				setSlug( newSlug );
++				onChange?.( newColor, index, newSlug );
+ 			} }
+ 		/>
+ 	);
+@@ -102,6 +107,19 @@ export const MultipleOrigins: ColorPaletteStory = {
+ 	},
+ };
+ 
++export const DuplicateColors: ColorPaletteStory = {
++	render: Template,
++	args: {
++		colors: [
++			{ name: 'Dark Background', slug: 'dark-background', color: '#000' },
++			{ name: 'Dark Text', slug: 'dark-text', color: '#000' },
++			{ name: 'Brand', slug: 'brand', color: '#0073aa' },
++		],
++		value: '#000',
++		selectedSlug: 'dark-text',
++	},
++};
++
+ export const CSSVariables: ColorPaletteStory = {
+ 	render: ( args ) => (
+ 		<div
+diff --git a/packages/components/src/color-palette/test/index.tsx b/packages/components/src/color-palette/test/index.tsx
+index 5401b9d7a13437..34ba249b7949f7 100644
+--- a/packages/components/src/color-palette/test/index.tsx
++++ b/packages/components/src/color-palette/test/index.tsx
+@@ -93,7 +93,11 @@ describe( 'ColorPalette', () => {
+ 
+ 		// Expect the green color to have been selected
+ 		expect( onChange ).toHaveBeenCalledTimes( 1 );
+-		expect( onChange ).toHaveBeenCalledWith( EXAMPLE_COLORS[ 1 ].color, 1 );
++		expect( onChange ).toHaveBeenCalledWith(
++			EXAMPLE_COLORS[ 1 ].color,
++			1,
++			undefined
++		);
+ 	} );
+ 
+ 	it( 'should call onClick with undefined, when the clearButton onClick is triggered', async () => {
+@@ -262,4 +266,151 @@ describe( 'ColorPalette', () => {
+ 			} )
+ 		).toBeInTheDocument();
+ 	} );
++
++	describe( 'duplicate colors in palette', () => {
++		const DUPLICATE_COLOR_PALETTE = [
++			{ name: 'Dark Background', slug: 'dark-background', color: '#000' },
++			{ name: 'Dark Text', slug: 'dark-text', color: '#000' },
++		];
++
++		it( 'should render all swatches even when two entries share the same color value', () => {
++			render(
++				<ColorPalette
++					colors={ DUPLICATE_COLOR_PALETTE }
++					value={ undefined }
++					onChange={ jest.fn() }
++				/>
++			);
++
++			expect( screen.getAllByRole( 'option' ) ).toHaveLength( 2 );
++		} );
++
++		it( 'should select by slug when selectedSlug is provided, marking only the matching entry', () => {
++			render(
++				<ColorPalette
++					colors={ DUPLICATE_COLOR_PALETTE }
++					value="#000"
++					selectedSlug="dark-text"
++					onChange={ jest.fn() }
++				/>
++			);
++
++			const options = screen.getAllByRole( 'option' );
++			// "dark-background" is index 0, "dark-text" is index 1.
++			// With selectedSlug="dark-text", only the second swatch should be selected.
++			expect( options[ 0 ] ).toHaveAttribute( 'aria-selected', 'false' );
++			expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
++		} );
++
++		it( 'should fall back to color-value selection and mark all matching duplicates when no selectedSlug is provided', () => {
++			render(
++				<ColorPalette
++					colors={ DUPLICATE_COLOR_PALETTE }
++					value="#000"
++					onChange={ jest.fn() }
++				/>
++			);
++
++			const options = screen.getAllByRole( 'option' );
++			// Both entries share the same color value, so both appear selected
++			// when no slug-specific selection is provided.
++			expect( options[ 0 ] ).toHaveAttribute( 'aria-selected', 'true' );
++			expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
++		} );
++
++		it( 'should treat an empty-string selectedSlug as no slug and fall back to color-value selection', () => {
++			render(
++				<ColorPalette
++					colors={ DUPLICATE_COLOR_PALETTE }
++					value="#000"
++					selectedSlug=""
++					onChange={ jest.fn() }
++				/>
++			);
++
++			const options = screen.getAllByRole( 'option' );
++			expect( options[ 0 ] ).toHaveAttribute( 'aria-selected', 'true' );
++			expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
++		} );
++
++		it( 'should display the slug-matched entry name in the custom color button label', () => {
++			render(
++				<ColorPalette
++					colors={ DUPLICATE_COLOR_PALETTE }
++					value="#000"
++					selectedSlug="dark-text"
++					onChange={ jest.fn() }
++				/>
++			);
++
++			expect(
++				screen.getByRole( 'button', {
++					name: 'Custom color picker. The currently selected color is called "Dark Text" and has a value of "#000".',
++				} )
++			).toBeInTheDocument();
++		} );
++
++		it( 'should pass slug as third argument to onChange when a swatch is clicked', async () => {
++			const user = userEvent.setup();
++			const onChange = jest.fn();
++
++			render(
++				<ColorPalette
++					colors={ DUPLICATE_COLOR_PALETTE }
++					value={ undefined }
++					onChange={ onChange }
++				/>
++			);
++
++			const options = screen.getAllByRole( 'option' );
++			await user.click( options[ 1 ] );
++			// Second entry: color=#000, index=1, slug='dark-text'
++			expect( onChange ).toHaveBeenCalledWith( '#000', 1, 'dark-text' );
++		} );
++
++		it( 'should clear the selection when the selected swatch is clicked', async () => {
++			const user = userEvent.setup();
++			const onChange = jest.fn();
++
++			render(
++				<ColorPalette
++					colors={ DUPLICATE_COLOR_PALETTE }
++					value="#000"
++					selectedSlug="dark-background"
++					onChange={ onChange }
++				/>
++			);
++
++			// Click the selected swatch — should call onChange with undefined.
++			await user.click(
++				screen.getByRole( 'option', { selected: true } )
++			);
++			expect( onChange ).toHaveBeenCalledWith( undefined );
++		} );
++
++		it( 'should handle mixed palettes with some entries having slugs and others not', () => {
++			const MIXED_PALETTE = [
++				{ name: 'Brand White', slug: 'brand-white', color: '#fff' },
++				{ name: 'Plain White', color: '#fff' },
++				{ name: 'Brand Black', slug: 'brand-black', color: '#000' },
++			];
++
++			render(
++				<ColorPalette
++					colors={ MIXED_PALETTE }
++					value="#fff"
++					selectedSlug="brand-white"
++					onChange={ jest.fn() }
++				/>
++			);
++
++			const options = screen.getAllByRole( 'option' );
++			// Only the entry with slug="brand-white" should be selected.
++			// The unslugged "Plain White" entry should NOT be selected, even though
++			// its color matches the value prop.
++			expect( options[ 0 ] ).toHaveAttribute( 'aria-selected', 'true' );
++			expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'false' );
++			expect( options[ 2 ] ).toHaveAttribute( 'aria-selected', 'false' );
++		} );
++	} );
+ } );
+diff --git a/packages/components/src/color-palette/test/utils.ts b/packages/components/src/color-palette/test/utils.ts
+index 56acec5416ecbd..9d12f2a60dc3c0 100644
+--- a/packages/components/src/color-palette/test/utils.ts
++++ b/packages/components/src/color-palette/test/utils.ts
+@@ -23,6 +23,24 @@ describe( 'ColorPalette: Utils', () => {
+ 			] );
+ 			expect( result ).toBe( 'Blue' );
+ 		} );
++
++		test( 'should prefer selectedSlug over color matching when duplicate colors exist', () => {
++			const result = extractColorNameFromCurrentValue(
++				'#000',
++				[
++					{
++						name: 'Dark Background',
++						slug: 'dark-background',
++						color: '#000',
++					},
++					{ name: 'Dark Text', slug: 'dark-text', color: '#000' },
++				],
++				false,
++				'dark-text'
++			);
++
++			expect( result ).toBe( 'Dark Text' );
++		} );
+ 	} );
+ 
+ 	describe( 'normalizeColorValue', () => {
+diff --git a/packages/components/src/color-palette/types.ts b/packages/components/src/color-palette/types.ts
+index b2a7a884fec57d..40c874b4b36bb0 100644
+--- a/packages/components/src/color-palette/types.ts
++++ b/packages/components/src/color-palette/types.ts
+@@ -12,6 +12,7 @@ import type { HeadingSize } from '../heading/types';
+ export type ColorObject = {
+ 	name: string;
+ 	color: NonNullable< CSSProperties[ 'color' ] >;
++	slug?: string;
+ };
+ 
+ export type PaletteObject = {
+@@ -24,9 +25,22 @@ type PaletteProps = {
+ 	clearColor: () => void;
+ 	/**
+ 	 * Callback called when a color is selected.
++	 * The third argument is the slug of the selected palette entry, when available.
+ 	 */
+-	onChange: ( newColor?: string, index?: number ) => void;
++	onChange: ( newColor?: string, index?: number, slug?: string ) => void;
+ 	value?: string;
++	/**
++	 * The slug of the currently selected palette entry.
++	 *
++	 * When set to a non-empty string, selection is determined by slug rather
++	 * than by color value — this correctly handles palettes where two entries
++	 * share the same color. Palette entries without a slug will not appear
++	 * selected in this mode, even if their color value matches `value`.
++	 *
++	 * An empty string is treated the same as `undefined`: selection falls
++	 * back to matching by color value.
++	 */
++	selectedSlug?: string;
+ 	actions?: ReactNode;
+ 	headingLevel?: HeadingSize;
+ };
+@@ -43,7 +57,10 @@ export type CustomColorPickerDropdownProps = DropdownProps & {
+ 	isRenderedInSidebar: boolean;
+ };
+ 
+-export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
++export type ColorPaletteProps = Pick<
++	PaletteProps,
++	'onChange' | 'selectedSlug'
++> & {
+ 	/**
+ 	 * Whether the palette should have a clearing button.
+ 	 *
+diff --git a/packages/components/src/color-palette/utils.ts b/packages/components/src/color-palette/utils.ts
+index 19fd4b7252f639..eda08e3d7443f9 100644
+--- a/packages/components/src/color-palette/utils.ts
++++ b/packages/components/src/color-palette/utils.ts
+@@ -32,7 +32,8 @@ const isSimpleCSSColor = ( value: string ): boolean => {
+ export const extractColorNameFromCurrentValue = (
+ 	currentValue?: ColorPaletteProps[ 'value' ],
+ 	colors: ColorPaletteProps[ 'colors' ] = [],
+-	showMultiplePalettes: boolean = false
++	showMultiplePalettes: boolean = false,
++	selectedSlug?: ColorPaletteProps[ 'selectedSlug' ]
+ ) => {
+ 	if ( ! currentValue ) {
+ 		return '';
+@@ -50,7 +51,18 @@ export const extractColorNameFromCurrentValue = (
+ 		? ( colors as PaletteObject[] )
+ 		: [ { colors: colors as ColorObject[] } ];
+ 	for ( const { colors: paletteColors } of colorPalettes ) {
+-		for ( const { name: colorName, color: colorValue } of paletteColors ) {
++		for ( const {
++			name: colorName,
++			color: colorValue,
++			slug,
++		} of paletteColors ) {
++			if ( selectedSlug ) {
++				if ( slug === selectedSlug ) {
++					return colorName;
++				}
++				continue;
++			}
++
+ 			const normalizedColorValue = currentValueIsSimpleColor
+ 				? colord( colorValue ).toHex()
+ 				: colorValue;

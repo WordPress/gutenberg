@@ -1,0 +1,68 @@
+diff --git a/packages/components/src/tabs/styles.ts b/packages/components/src/tabs/styles.ts
+index ce575c9f317794..83304a030330bb 100644
+--- a/packages/components/src/tabs/styles.ts
++++ b/packages/components/src/tabs/styles.ts
+@@ -36,22 +36,20 @@ export const TabListWrapper = styled.div`
+ 		outline-offset: -1px;
+ 	}
+ 	&:not( [aria-orientation='vertical'] )::after {
+-		left: var( --indicator-left );
+ 		bottom: 0;
++		left: var( --indicator-left );
+ 		width: var( --indicator-width );
+ 		height: 0;
+ 		border-bottom: var( --wp-admin-border-width-focus ) solid
+ 			${ COLORS.theme.accent };
+ 	}
+ 	&[aria-orientation='vertical']::after {
+-		/* Temporarily hidden, context: https://github.com/WordPress/gutenberg/pull/60560#issuecomment-2126670072 */
+-		opacity: 0;
+-
+-		right: 0;
++		z-index: -1;
++		left: 0;
++		width: 100%;
+ 		top: var( --indicator-top );
+ 		height: var( --indicator-height );
+-		border-right: var( --wp-admin-border-width-focus ) solid
+-			${ COLORS.theme.accent };
++		background-color: ${ COLORS.theme.gray[ 100 ] };
+ 	}
+ `;
+ 
+diff --git a/packages/preferences/src/components/preferences-modal-tabs/style.scss b/packages/preferences/src/components/preferences-modal-tabs/style.scss
+index e20b9aa9064ed6..247da29eb5d12c 100644
+--- a/packages/preferences/src/components/preferences-modal-tabs/style.scss
++++ b/packages/preferences/src/components/preferences-modal-tabs/style.scss
+@@ -6,31 +6,6 @@ $vertical-tabs-width: 160px;
+ 	// Aligns button text instead of button box.
+ 	left: $grid-unit-20;
+ 	width: $vertical-tabs-width;
+-
+-	&::after {
+-		content: none !important;
+-	}
+-}
+-
+-.preferences__tabs-tab {
+-	border-radius: $radius-block-ui;
+-	font-weight: 400;
+-
+-	&[aria-selected="true"] {
+-		background: $gray-100;
+-		box-shadow: none;
+-		font-weight: 500;
+-	}
+-
+-	&[role="tab"]:focus:not(:disabled) {
+-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+-		// Windows high contrast mode.
+-		outline: 2px solid transparent;
+-	}
+-
+-	&:focus-visible::before {
+-		content: none;
+-	}
+ }
+ 
+ .preferences__tabs-tabpanel {

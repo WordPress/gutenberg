@@ -1,0 +1,63 @@
+diff --git a/lib/class-wp-theme-json-gutenberg.php b/lib/class-wp-theme-json-gutenberg.php
+index 67b21f7a84f0ff..f60bd01933959f 100644
+--- a/lib/class-wp-theme-json-gutenberg.php
++++ b/lib/class-wp-theme-json-gutenberg.php
+@@ -3462,40 +3462,6 @@ public function merge( $incoming ) {
+ 		}
+ 	}
+ 
+-	/**
+-	 * Converts all filter (duotone) presets into SVGs.
+-	 *
+-	 * @since 5.9.1
+-	 *
+-	 * @param array $origins List of origins to process.
+-	 * @return string SVG filters.
+-	 */
+-	public function get_svg_filters( $origins ) {
+-		$blocks_metadata = static::get_blocks_metadata();
+-		$setting_nodes   = static::get_setting_nodes( $this->theme_json, $blocks_metadata );
+-
+-		$filters = '';
+-		foreach ( $setting_nodes as $metadata ) {
+-			$node = _wp_array_get( $this->theme_json, $metadata['path'], array() );
+-			if ( empty( $node['color']['duotone'] ) ) {
+-				continue;
+-			}
+-
+-			$duotone_presets = $node['color']['duotone'];
+-
+-			foreach ( $origins as $origin ) {
+-				if ( ! isset( $duotone_presets[ $origin ] ) ) {
+-					continue;
+-				}
+-				foreach ( $duotone_presets[ $origin ] as $duotone_preset ) {
+-					$filters .= wp_get_duotone_filter_svg( $duotone_preset );
+-				}
+-			}
+-		}
+-
+-		return $filters;
+-	}
+-
+ 	/**
+ 	 * Determines whether a presets should be overridden or not.
+ 	 *
+diff --git a/packages/components/src/date-time/date/index.tsx b/packages/components/src/date-time/date/index.tsx
+index 33f44dd92af43f..bb7fc9acfa3c23 100644
+--- a/packages/components/src/date-time/date/index.tsx
++++ b/packages/components/src/date-time/date/index.tsx
+@@ -193,7 +193,12 @@ export function DatePicker( {
+ 								}
+ 								numEvents={
+ 									events.filter( ( event ) =>
+-										isSameDay( event.date, day )
++										isSameDay(
++											startOfDayInConfiguredTimezone(
++												inputToDate( event.date )
++											),
++											day
++										)
+ 									).length
+ 								}
+ 								onClick={ () => {

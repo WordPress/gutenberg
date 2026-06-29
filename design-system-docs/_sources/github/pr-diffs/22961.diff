@@ -1,0 +1,20 @@
+diff --git a/packages/components/src/toolbar-button/index.js b/packages/components/src/toolbar-button/index.js
+index 7e84e89cc99315..e0e79e755718fd 100644
+--- a/packages/components/src/toolbar-button/index.js
++++ b/packages/components/src/toolbar-button/index.js
+@@ -52,6 +52,7 @@ function ToolbarButton( {
+ 					disabled={ isDisabled }
+ 					data-experimental-toolbar-item
+ 					{ ...extraProps }
++					{ ...props }
+ 				>
+ 					{ children }
+ 				</Button>
+@@ -65,6 +66,7 @@ function ToolbarButton( {
+ 	return (
+ 		<ToolbarItem
+ 			className={ classnames( 'components-toolbar-button', className ) }
++			{ ...extraProps }
+ 			{ ...props }
+ 		>
+ 			{ ( toolbarItemProps ) => (

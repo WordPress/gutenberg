@@ -1,0 +1,122 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d3700e6f25a8d5..8b72af17cae987 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,10 @@
+ -   `ToggleGroupControl`: Fix active background for `0` value ([#66855](https://github.com/WordPress/gutenberg/pull/66855)).
+ -   `SlotFill`: Fix a bug where a stale value of `fillProps` could be used ([#67000](https://github.com/WordPress/gutenberg/pull/67000)).
+ 
++### Experimental
++
++-   `SlotFill`: Remove registration API methods from return value of `__experimentalUseSlot` ([#67070](https://github.com/WordPress/gutenberg/pull/67070)).
++
+ ## 28.12.0 (2024-11-16)
+ 
+ ### Deprecations
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/fill.tsx b/packages/components/src/slot-fill/bubbles-virtually/fill.tsx
+index 3cfadbadc62c4b..b1b82aac5c0567 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/fill.tsx
++++ b/packages/components/src/slot-fill/bubbles-virtually/fill.tsx
+@@ -1,12 +1,19 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useRef, useState, useEffect, createPortal } from '@wordpress/element';
++import { useObservableValue } from '@wordpress/compose';
++import {
++	useContext,
++	useRef,
++	useState,
++	useEffect,
++	createPortal,
++} from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+-import useSlot from './use-slot';
++import SlotFillContext from './slot-fill-context';
+ import StyleProvider from '../../style-provider';
+ import type { FillComponentProps } from '../types';
+ 
+@@ -28,9 +35,9 @@ function useForceUpdate() {
+ 	};
+ }
+ 
+-export default function Fill( props: FillComponentProps ) {
+-	const { name, children } = props;
+-	const { registerFill, unregisterFill, ...slot } = useSlot( name );
++export default function Fill( { name, children }: FillComponentProps ) {
++	const registry = useContext( SlotFillContext );
++	const slot = useObservableValue( registry.slots, name );
+ 	const rerender = useForceUpdate();
+ 	const ref = useRef( { rerender } );
+ 
+@@ -38,13 +45,13 @@ export default function Fill( props: FillComponentProps ) {
+ 		// We register fills so we can keep track of their existence.
+ 		// Some Slot implementations need to know if there're already fills
+ 		// registered so they can choose to render themselves or not.
+-		registerFill( ref );
++		registry.registerFill( name, ref );
+ 		return () => {
+-			unregisterFill( ref );
++			registry.unregisterFill( name, ref );
+ 		};
+-	}, [ registerFill, unregisterFill ] );
++	}, [ registry, name ] );
+ 
+-	if ( ! slot.ref || ! slot.ref.current ) {
++	if ( ! slot || ! slot.ref.current ) {
+ 		return null;
+ 	}
+ 
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/use-slot.ts b/packages/components/src/slot-fill/bubbles-virtually/use-slot.ts
+index ec78771bfa92af..cac57a024e4ee2 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/use-slot.ts
++++ b/packages/components/src/slot-fill/bubbles-virtually/use-slot.ts
+@@ -1,42 +1,17 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useMemo, useContext } from '@wordpress/element';
++import { useContext } from '@wordpress/element';
+ import { useObservableValue } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+  */
+ import SlotFillContext from './slot-fill-context';
+-import type {
+-	SlotFillBubblesVirtuallyFillRef,
+-	SlotFillBubblesVirtuallySlotRef,
+-	FillProps,
+-	SlotKey,
+-} from '../types';
++import type { SlotKey } from '../types';
+ 
+ export default function useSlot( name: SlotKey ) {
+ 	const registry = useContext( SlotFillContext );
+ 	const slot = useObservableValue( registry.slots, name );
+-
+-	const api = useMemo(
+-		() => ( {
+-			updateSlot: (
+-				ref: SlotFillBubblesVirtuallySlotRef,
+-				fillProps: FillProps
+-			) => registry.updateSlot( name, ref, fillProps ),
+-			unregisterSlot: ( ref: SlotFillBubblesVirtuallySlotRef ) =>
+-				registry.unregisterSlot( name, ref ),
+-			registerFill: ( ref: SlotFillBubblesVirtuallyFillRef ) =>
+-				registry.registerFill( name, ref ),
+-			unregisterFill: ( ref: SlotFillBubblesVirtuallyFillRef ) =>
+-				registry.unregisterFill( name, ref ),
+-		} ),
+-		[ name, registry ]
+-	);
+-
+-	return {
+-		...slot,
+-		...api,
+-	};
++	return { ...slot };
+ }

@@ -1,0 +1,23 @@
+diff --git a/packages/components/src/mobile/bottom-sheet/cycle-picker-cell.native.js b/packages/components/src/mobile/bottom-sheet/cycle-picker-cell.native.js
+index 56d83af268c6ac..2c54daf586350d 100644
+--- a/packages/components/src/mobile/bottom-sheet/cycle-picker-cell.native.js
++++ b/packages/components/src/mobile/bottom-sheet/cycle-picker-cell.native.js
+@@ -1,7 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { findIndex } from 'lodash';
+ /**
+  * Internal dependencies
+  */
+@@ -14,7 +10,9 @@ export default function BottomSheetCyclePickerCell( props ) {
+ 		return options[ ( selectedOptionIndex + 1 ) % options.length ].value;
+ 	};
+ 
+-	const selectedOptionIndex = findIndex( options, [ 'value', value ] );
++	const selectedOptionIndex = options.findIndex(
++		( option ) => option.value === value
++	);
+ 	const optionsContainsValue =
+ 		options.length > 0 && selectedOptionIndex !== -1;
+ 

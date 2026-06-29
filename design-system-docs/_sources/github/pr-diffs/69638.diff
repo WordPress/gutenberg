@@ -1,0 +1,130 @@
+diff --git a/packages/base-styles/_mixins.scss b/packages/base-styles/_mixins.scss
+index e61541f0270570..25e239734da0de 100644
+--- a/packages/base-styles/_mixins.scss
++++ b/packages/base-styles/_mixins.scss
+@@ -151,10 +151,10 @@
+ }
+ 
+ 
+-@mixin input-style__focus() {
+-	border-color: var(--wp-admin-theme-color);
++@mixin input-style__focus($accent-color: var(--wp-admin-theme-color)) {
++	border-color: $accent-color;
+ 	// Expand the default border focus style by .5px to be a total of 1.5px.
+-	box-shadow: 0 0 0 0.5px var(--wp-admin-theme-color);
++	box-shadow: 0 0 0 0.5px $accent-color;
+ 	// Windows High Contrast mode will show this outline, but not the box-shadow.
+ 	outline: 2px solid transparent;
+ }
+@@ -259,7 +259,7 @@
+ 	}
+ }
+ 
+-@mixin input-control {
++@mixin input-control($accent-color: var(--wp-admin-theme-color)) {
+ 	font-family: $default-font;
+ 	padding: 6px 8px;
+ 	@include input-style__neutral();
+@@ -275,7 +275,7 @@
+ 	}
+ 
+ 	&:focus {
+-		@include input-style__focus();
++		@include input-style__focus($accent-color);
+ 	}
+ 
+ 	// Use opacity to work in various editor styles.
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4c5317457be103..ecda7ac8c2c974 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,11 @@
+ 
+ -   `Button`: Fix tertiary variant displaying incorrect text color in pressed and hover states ([#68542](https://github.com/WordPress/gutenberg/pull/68542)).
+ 
++### Enhancement
++
++-   `FormTokenField`: Add theming support ([#69638](https://github.com/WordPress/gutenberg/pull/69638)).
++-   `ComboboxControl`: Add theming support ([#69638](https://github.com/WordPress/gutenberg/pull/69638)).
++
+ ## 29.7.0 (2025-03-27)
+ 
+ ### Bug Fixes
+diff --git a/packages/components/src/combobox-control/style.scss b/packages/components/src/combobox-control/style.scss
+index 558475f6bd522e..b7cc9b8b59863b 100644
+--- a/packages/components/src/combobox-control/style.scss
++++ b/packages/components/src/combobox-control/style.scss
+@@ -12,6 +12,8 @@ input.components-combobox-control__input[type="text"] {
+ 	margin: 0;
+ 	line-height: inherit;
+ 	min-height: auto;
++	background: $components-color-background;
++	color: $components-color-foreground;
+ 
+ 	// Resolves Zooming on iOS devices
+ 	// https://github.com/WordPress/gutenberg/issues/27405
+@@ -26,7 +28,7 @@ input.components-combobox-control__input[type="text"] {
+ }
+ 
+ .components-combobox-control__suggestions-container {
+-	@include input-control;
++	@include input-control($components-color-accent);
+ 	display: flex;
+ 	flex-wrap: wrap;
+ 	align-items: flex-start;
+@@ -34,7 +36,7 @@ input.components-combobox-control__input[type="text"] {
+ 	padding: 0;
+ 
+ 	&:focus-within {
+-		@include input-style__focus();
++		@include input-style__focus($components-color-accent);
+ 	}
+ 
+ 	.components-spinner {
+diff --git a/packages/components/src/form-token-field/style.scss b/packages/components/src/form-token-field/style.scss
+index 636ba1a981c8d0..416673138484eb 100644
+--- a/packages/components/src/form-token-field/style.scss
++++ b/packages/components/src/form-token-field/style.scss
+@@ -1,5 +1,5 @@
+ .components-form-token-field__input-container {
+-	@include input-control();
++	@include input-control($components-color-accent);
+ 	width: 100%;
+ 	padding: 0;
+ 	cursor: text;
+@@ -10,7 +10,7 @@
+ 	}
+ 
+ 	&.is-active {
+-		@include input-style__focus();
++		@include input-style__focus($components-color-accent);
+ 	}
+ 
+ 	// Token input
+@@ -27,7 +27,7 @@
+ 		min-width: 50px;
+ 		background: inherit;
+ 		border: 0;
+-		color: $gray-900;
++		color: $components-color-foreground;
+ 		box-shadow: none;
+ 
+ 		// Resolves Zooming on iOS devices
+@@ -168,7 +168,7 @@
+ }
+ 
+ .components-form-token-field__suggestion {
+-	color: $gray-900;
++	color: $components-color-foreground;
+ 	display: block;
+ 	font-size: $default-font-size;
+ 	padding: $grid-unit-10 $grid-unit-15;
+@@ -178,7 +178,7 @@
+ 
+ 	&.is-selected {
+ 		background: $components-color-accent;
+-		color: $white;
++		color: $components-color-foreground-inverted;
+ 	}
+ 
+ 	&[aria-disabled="true"] {

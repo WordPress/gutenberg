@@ -1,0 +1,355 @@
+diff --git a/edit-post/components/layout/style.scss b/edit-post/components/layout/style.scss
+index a035ed3397a63f..8aadc813544e2f 100644
+--- a/edit-post/components/layout/style.scss
++++ b/edit-post/components/layout/style.scss
+@@ -17,13 +17,13 @@
+ 			top: inherit;
+ 		}
+ 
+-		.notice {
++		.components-notice {
+ 			margin: 0 0 5px;
+ 			padding: 6px 12px;
+ 			min-height: $panel-header-height;
+ 
+-			.notice-dismiss {
+-				margin: 5px;
++			.components-notice__dismiss {
++				margin: 10px 5px;
+ 			}
+ 		}
+ 	}
+diff --git a/packages/components/src/notice/README.md b/packages/components/src/notice/README.md
+index c703639a0aa1a6..b8b3f9044d3d3c 100644
+--- a/packages/components/src/notice/README.md
++++ b/packages/components/src/notice/README.md
+@@ -28,6 +28,6 @@ const MyNotice = () => (
+ 
+ The following props are used to control the display of the component.
+ 
+-* `status`: (string) can be `warning` (red), `success` (green), `error` (red), `info` (yellow)
++* `status`: (string) can be `warning` (yellow), `success` (green), `error` (red).
+ * `onRemove`: function called when dismissing the notice
+ * `isDismissible`: (bool) defaults to true, whether the notice should be dismissible or not
+diff --git a/packages/components/src/notice/index.js b/packages/components/src/notice/index.js
+index 0fa733695d71f0..398a725c3fd6e7 100644
+--- a/packages/components/src/notice/index.js
++++ b/packages/components/src/notice/index.js
+@@ -9,17 +9,28 @@ import classnames from 'classnames';
+  */
+ import { __ } from '@wordpress/i18n';
+ 
++/**
++ * Internal dependencies
++ */
++import IconButton from '../icon-button';
++
+ function Notice( { className, status, children, onRemove = noop, isDismissible = true } ) {
+-	const classNames = classnames( className, 'notice notice-alt notice-' + status, {
++	const classNames = classnames( className, 'components-notice', {
++		[ `is-${ status }` ]: ! ! status,
++	}, {
+ 		'is-dismissible': isDismissible,
+ 	} );
+ 	return (
+ 		<div className={ classNames }>
+-			{ isString( children ) ? <p>{ children }</p> : children }
++			{ isString( children ) ? <div className="components-notice__content">{ children }</div> : children }
+ 			{ isDismissible && (
+-				<button className="notice-dismiss" type="button" onClick={ onRemove }>
+-					<span className="screen-reader-text">{ __( 'Dismiss this notice' ) }</span>
+-				</button>
++				<IconButton
++					className="components-notice__dismiss"
++					icon="no"
++					label={ __( 'Dismiss this notice' ) }
++					onClick={ onRemove }
++					tooltip={ false }
++				/>
+ 			) }
+ 		</div>
+ 	);
+diff --git a/packages/components/src/notice/style.scss b/packages/components/src/notice/style.scss
+index 7920ff01604a01..43961eb97018e9 100644
+--- a/packages/components/src/notice/style.scss
++++ b/packages/components/src/notice/style.scss
+@@ -1,3 +1,53 @@
++.components-notice {
++	background-color: $blue-medium-100;
++	border-left: 4px solid $blue-medium-500;
++	margin: 5px 15px 2px;
++	padding: 8px 12px;
++
++	&.is-dismissible {
++		padding-right: 36px;
++		position: relative;
++	}
++
++	&.is-success {
++		border-left-color: $alert-green;
++		background-color: lighten($alert-green, 45%);
++	}
++
++	&.is-warning {
++		border-left-color: $alert-yellow;
++		background-color: lighten($alert-yellow, 35%);
++	}
++
++	&.is-error {
++		border-left-color: $alert-red;
++		background-color: lighten($alert-red, 35%);
++	}
++}
++
++.components-notice__content {
++	font-size: 13px;
++	line-height: 1.5;
++}
++
++.components-notice__dismiss {
++	position: absolute;
++	top: 0;
++	right: 0;
++	color: $dark-gray-300;
++
++	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover,
++	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):active,
++	&:not(:disabled):not([aria-disabled="true"]):focus {
++		color: $alert-red;
++		background-color: transparent;
++	}
++
++	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
++		box-shadow: none;
++	}
++}
++
+ .components-notice-list {
+ 	min-width: 300px;
+ 	z-index: z-index(".components-notice-list");
+diff --git a/packages/components/src/notice/test/__snapshots__/index.js.snap b/packages/components/src/notice/test/__snapshots__/index.js.snap
+index e966f19b11ef28..ff00bb4f827232 100644
+--- a/packages/components/src/notice/test/__snapshots__/index.js.snap
++++ b/packages/components/src/notice/test/__snapshots__/index.js.snap
+@@ -2,18 +2,14 @@
+ 
+ exports[`Notice should match snapshot 1`] = `
+ <div
+-  className="notice notice-alt notice-example is-dismissible"
++  className="components-notice is-example is-dismissible"
+ >
+-  <button
+-    className="notice-dismiss"
++  <IconButton
++    className="components-notice__dismiss"
++    icon="no"
++    label="Dismiss this notice"
+     onClick={[Function]}
+-    type="button"
+-  >
+-    <span
+-      className="screen-reader-text"
+-    >
+-      Dismiss this notice
+-    </span>
+-  </button>
++    tooltip={false}
++  />
+ </div>
+ `;
+diff --git a/packages/editor/src/components/block-list/style.scss b/packages/editor/src/components/block-list/style.scss
+index 2374128fc47d78..3f797a35384153 100644
+--- a/packages/editor/src/components/block-list/style.scss
++++ b/packages/editor/src/components/block-list/style.scss
+@@ -173,11 +173,11 @@
+ 		margin: 0 0 12px 0;
+ 		width: 100%;
+ 
+-		.notice {
++		.components-notice {
+ 			margin-left: 0;
+ 			margin-right: 0;
+ 
+-			p {
++			.components-notice__content {
+ 				font-size: $default-font-size;
+ 			}
+ 		}
+diff --git a/packages/editor/src/components/contrast-checker/style.scss b/packages/editor/src/components/contrast-checker/style.scss
+index 7d2f3ddc1e029a..b484e47d48738e 100644
+--- a/packages/editor/src/components/contrast-checker/style.scss
++++ b/packages/editor/src/components/contrast-checker/style.scss
+@@ -1,3 +1,3 @@
+-.editor-contrast-checker > .notice {
++.editor-contrast-checker > .components-notice {
+ 	margin: 0;
+ }
+diff --git a/packages/editor/src/components/contrast-checker/test/__snapshots__/index.js.snap b/packages/editor/src/components/contrast-checker/test/__snapshots__/index.js.snap
+index 323d7fe4e3669a..6bb1dc8d4f5bfb 100644
+--- a/packages/editor/src/components/contrast-checker/test/__snapshots__/index.js.snap
++++ b/packages/editor/src/components/contrast-checker/test/__snapshots__/index.js.snap
+@@ -16,11 +16,13 @@ exports[`ContrastChecker should render component when the colors do not meet AA
+       status="warning"
+     >
+       <div
+-        className="notice notice-alt notice-warning"
++        className="components-notice is-warning"
+       >
+-        <p>
++        <div
++          className="components-notice__content"
++        >
+           This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.
+-        </p>
++        </div>
+       </div>
+     </Notice>
+   </div>
+@@ -43,11 +45,13 @@ exports[`ContrastChecker should render different message matching snapshot when
+       status="warning"
+     >
+       <div
+-        className="notice notice-alt notice-warning"
++        className="components-notice is-warning"
+       >
+-        <p>
++        <div
++          className="components-notice__content"
++        >
+           This color combination may be hard for people to read. Try using a darker background color and/or a brighter text color.
+-        </p>
++        </div>
+       </div>
+     </Notice>
+   </div>
+@@ -67,11 +71,13 @@ exports[`ContrastChecker should render messages when the textColor is valid, but
+       status="warning"
+     >
+       <div
+-        className="notice notice-alt notice-warning"
++        className="components-notice is-warning"
+       >
+-        <p>
++        <div
++          className="components-notice__content"
++        >
+           This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.
+-        </p>
++        </div>
+       </div>
+     </Notice>
+   </div>
+@@ -92,11 +98,13 @@ exports[`ContrastChecker should take into consideration the font size passed 1`]
+       status="warning"
+     >
+       <div
+-        className="notice notice-alt notice-warning"
++        className="components-notice is-warning"
+       >
+-        <p>
++        <div
++          className="components-notice__content"
++        >
+           This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.
+-        </p>
++        </div>
+       </div>
+     </Notice>
+   </div>
+@@ -117,11 +125,13 @@ exports[`ContrastChecker should take into consideration wherever text is large o
+       status="warning"
+     >
+       <div
+-        className="notice notice-alt notice-warning"
++        className="components-notice is-warning"
+       >
+-        <p>
++        <div
++          className="components-notice__content"
++        >
+           This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.
+-        </p>
++        </div>
+       </div>
+     </Notice>
+   </div>
+@@ -143,11 +153,13 @@ exports[`ContrastChecker should use isLargeText to make decisions if both isLarg
+       status="warning"
+     >
+       <div
+-        className="notice notice-alt notice-warning"
++        className="components-notice is-warning"
+       >
+-        <p>
++        <div
++          className="components-notice__content"
++        >
+           This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.
+-        </p>
++        </div>
+       </div>
+     </Notice>
+   </div>
+diff --git a/test/e2e/specs/change-detection.test.js b/test/e2e/specs/change-detection.test.js
+index 0c1902cd718093..ab92f4ac76c4d3 100644
+--- a/test/e2e/specs/change-detection.test.js
++++ b/test/e2e/specs/change-detection.test.js
+@@ -189,7 +189,9 @@ describe( 'Change detection', () => {
+ 			pressWithModifier( META_KEY, 'S' ),
+ 
+ 			// Ensure save update fails and presents button.
+-			page.waitForXPath( "//p[contains(text(), 'Updating failed')]" ),
++			page.waitForXPath(
++				'//*[contains(@class, "components-notice") and contains(@class, "is-error")]/*[text()="Updating failed"]'
++			),
+ 			page.waitForSelector( '.editor-post-save-draft' ),
+ 		] );
+ 
+diff --git a/test/e2e/specs/preview.test.js b/test/e2e/specs/preview.test.js
+index 8b45514245b06f..5d3a065844451d 100644
+--- a/test/e2e/specs/preview.test.js
++++ b/test/e2e/specs/preview.test.js
+@@ -102,7 +102,7 @@ describe( 'Preview', () => {
+ 			editorPage.waitForFunction( () => ! document.querySelector( '.editor-post-preview' ) ),
+ 			editorPage.click( '.editor-post-publish-panel__header button' ),
+ 		] );
+-		expectedPreviewURL = await editorPage.$eval( '.notice-success a', ( node ) => node.href );
++		expectedPreviewURL = await editorPage.$eval( '.components-notice.is-success a', ( node ) => node.href );
+ 
+ 		await editorPage.bringToFront();
+ 		await waitForPreviewNavigation( previewPage );
+diff --git a/test/e2e/specs/reusable-blocks.test.js b/test/e2e/specs/reusable-blocks.test.js
+index 2fa8792a5bf908..2e0b41dc6491e7 100644
+--- a/test/e2e/specs/reusable-blocks.test.js
++++ b/test/e2e/specs/reusable-blocks.test.js
+@@ -45,7 +45,7 @@ describe( 'Reusable Blocks', () => {
+ 
+ 		// Wait for creation to finish
+ 		await page.waitForXPath(
+-			'//*[contains(@class, "notice-success")]/*[text()="Block created."]'
++			'//*[contains(@class, "components-notice") and contains(@class, "is-success")]/*[text()="Block created."]'
+ 		);
+ 
+ 		// Select all of the text in the title field by triple-clicking on it. We
+@@ -92,7 +92,7 @@ describe( 'Reusable Blocks', () => {
+ 
+ 		// Wait for creation to finish
+ 		await page.waitForXPath(
+-			'//*[contains(@class, "notice-success")]/*[text()="Block created."]'
++			'//*[contains(@class, "components-notice") and contains(@class, "is-success")]/*[text()="Block created."]'
+ 		);
+ 
+ 		// Save the reusable block
+diff --git a/test/e2e/support/utils.js b/test/e2e/support/utils.js
+index 77314890b8a52a..ec632993231ccf 100644
+--- a/test/e2e/support/utils.js
++++ b/test/e2e/support/utils.js
+@@ -291,7 +291,7 @@ export async function publishPost() {
+ 	await page.click( '.editor-post-publish-button' );
+ 
+ 	// A success notice should show up
+-	return page.waitForSelector( '.notice-success' );
++	return page.waitForSelector( '.components-notice.is-success' );
+ }
+ 
+ /**

@@ -1,0 +1,212 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 80b5154a995ecd..27aaef43b208b2 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -809,6 +809,12 @@
+ 		"markdown_source": "../packages/components/src/duotone-picker/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "Elevation",
++		"slug": "elevation",
++		"markdown_source": "../packages/components/src/elevation/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "ExternalLink",
+ 		"slug": "external-link",
+diff --git a/packages/components/src/ui/elevation/README.md b/packages/components/src/elevation/README.md
+similarity index 77%
+rename from packages/components/src/ui/elevation/README.md
+rename to packages/components/src/elevation/README.md
+index 6c57b501daf18e..134948c4e801d2 100644
+--- a/packages/components/src/ui/elevation/README.md
++++ b/packages/components/src/elevation/README.md
+@@ -7,7 +7,11 @@
+ The shadow effect is generated using the `value` prop.
+ 
+ ```jsx
+-import { Elevation, Surface, Text, View } from '@wordpress/components/ui';
++import {
++	__experimentalElevation as Elevation,
++	__experimentalSurface as Surface,
++	__experimentalText as Text
++} from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+@@ -63,3 +67,15 @@ Dimensional offsets (margin) for the shadow.
+ 
+ Size of the shadow, based on the Style system's elevation system. The `value` determines the strength of the shadow, which sense of depth.
+ In the example below, `isInteractive` is activated to give a better sense of depth.
++
++```jsx
++import { __experimentalElevation as Elevation } from '@wordpress/components';
++
++function Example() {
++	return (
++		<div>
++			<Elevation isInteractive value={ 200 } />
++		</div>
++	);
++}
++```
+diff --git a/packages/components/src/ui/elevation/component.js b/packages/components/src/elevation/component.js
+similarity index 91%
+rename from packages/components/src/ui/elevation/component.js
+rename to packages/components/src/elevation/component.js
+index 3d525c099ceeac..b4aa774ac0668d 100644
+--- a/packages/components/src/ui/elevation/component.js
++++ b/packages/components/src/elevation/component.js
+@@ -2,7 +2,7 @@
+  * Internal dependencies
+  */
+ import { useElevation } from './hook';
+-import { createComponent } from '../utils';
++import { createComponent } from '../ui/utils';
+ 
+ /**
+  * `Elevation` is a core component that renders shadow, using the library's shadow system.
+@@ -11,7 +11,7 @@ import { createComponent } from '../utils';
+  *
+  * @example
+  * ```jsx
+- * import { Elevation, Surface, Text, View } from `@wordpress/components/ui`;
++ * import { Elevation, Surface, Text, View } from `@wordpress/components`;
+  *
+  * function Example() {
+  * 	return (
+diff --git a/packages/components/src/ui/elevation/hook.js b/packages/components/src/elevation/hook.js
+similarity index 91%
+rename from packages/components/src/ui/elevation/hook.js
+rename to packages/components/src/elevation/hook.js
+index a72d27124f815a..35e0e0bd95f989 100644
+--- a/packages/components/src/ui/elevation/hook.js
++++ b/packages/components/src/elevation/hook.js
+@@ -12,9 +12,9 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem } from '../context';
++import { useContextSystem } from '../ui/context';
+ import * as styles from './styles';
+-import CONFIG from '../../utils/config-values';
++import CONFIG from '../utils/config-values';
+ 
+ /**
+  * @param {number} value
+@@ -29,7 +29,7 @@ export function getBoxShadow( value ) {
+ }
+ 
+ /**
+- * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
++ * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+  */
+ export function useElevation( props ) {
+ 	const {
+diff --git a/packages/components/src/ui/elevation/index.js b/packages/components/src/elevation/index.js
+similarity index 100%
+rename from packages/components/src/ui/elevation/index.js
+rename to packages/components/src/elevation/index.js
+diff --git a/packages/components/src/ui/elevation/stories/index.js b/packages/components/src/elevation/stories/index.js
+similarity index 91%
+rename from packages/components/src/ui/elevation/stories/index.js
+rename to packages/components/src/elevation/stories/index.js
+index 70b157bf5d0f09..f52c1f8ae3216a 100644
+--- a/packages/components/src/ui/elevation/stories/index.js
++++ b/packages/components/src/elevation/stories/index.js
+@@ -7,15 +7,15 @@ import { number } from '@storybook/addon-knobs';
+  * Internal dependencies
+  */
+ import { Elevation } from '../index';
+-import { Grid } from '../../../grid';
+-import { View } from '../../../view';
+-import { HStack } from '../../../h-stack';
+-import { Divider } from '../../../divider';
++import { Grid } from '../../grid';
++import { View } from '../../view';
++import { HStack } from '../../h-stack';
++import { Divider } from '../../divider';
+ import {
+ 	ExampleGrid,
+ 	ExampleGridItem,
+ 	ExampleMetaContent,
+-} from '../../__storybook-utils';
++} from '../../ui/__storybook-utils';
+ 
+ /**
+  * WordPress dependencies
+@@ -24,7 +24,7 @@ import { useCallback } from '@wordpress/element';
+ 
+ export default {
+ 	component: Elevation,
+-	title: 'G2 Components (Experimental)/Elevation',
++	title: 'Components (Experimental)/Elevation',
+ };
+ 
+ const ElevationWrapper = ( { children } ) => (
+diff --git a/packages/components/src/ui/elevation/styles.js b/packages/components/src/elevation/styles.js
+similarity index 100%
+rename from packages/components/src/ui/elevation/styles.js
+rename to packages/components/src/elevation/styles.js
+diff --git a/packages/components/src/ui/elevation/test/__snapshots__/index.js.snap b/packages/components/src/elevation/test/__snapshots__/index.js.snap
+similarity index 100%
+rename from packages/components/src/ui/elevation/test/__snapshots__/index.js.snap
+rename to packages/components/src/elevation/test/__snapshots__/index.js.snap
+diff --git a/packages/components/src/ui/elevation/test/index.js b/packages/components/src/elevation/test/index.js
+similarity index 100%
+rename from packages/components/src/ui/elevation/test/index.js
+rename to packages/components/src/elevation/test/index.js
+diff --git a/packages/components/src/ui/elevation/types.ts b/packages/components/src/elevation/types.ts
+similarity index 100%
+rename from packages/components/src/ui/elevation/types.ts
+rename to packages/components/src/elevation/types.ts
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 233bc8c56f7762..be016dfea95afc 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -57,6 +57,7 @@ export { default as DropZoneProvider } from './drop-zone/provider';
+ export { default as Dropdown } from './dropdown';
+ export { default as DropdownMenu } from './dropdown-menu';
+ export { DuotoneSwatch, DuotonePicker } from './duotone-picker';
++export { Elevation as __experimentalElevation } from './elevation';
+ export { default as ExternalLink } from './external-link';
+ export { Flex, FlexBlock, FlexItem } from './flex';
+ export { default as FocalPointPicker } from './focal-point-picker';
+diff --git a/packages/components/src/ui/card/component.js b/packages/components/src/ui/card/component.js
+index 47affa19f95280..725808d9f249c1 100644
+--- a/packages/components/src/ui/card/component.js
++++ b/packages/components/src/ui/card/component.js
+@@ -12,7 +12,7 @@ import { useMemo } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { contextConnect } from '../context';
+-import { Elevation } from '../elevation';
++import { Elevation } from '../../elevation';
+ import { View } from '../../view';
+ import * as styles from './styles';
+ import { useCard } from './hook';
+diff --git a/packages/components/src/ui/index.js b/packages/components/src/ui/index.js
+index 25a8bb636b8da9..090c2dde8a7c2a 100644
+--- a/packages/components/src/ui/index.js
++++ b/packages/components/src/ui/index.js
+@@ -1,7 +1,6 @@
+ export * from './card';
+ export * from './control-group';
+ export * from './control-label';
+-export * from './elevation';
+ export * from './form-group';
+ export * from './shortcut';
+ export * from './spinner';
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index df78104420ca6a..5e7c69328d8b04 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -20,6 +20,7 @@
+ 		"src/base-control/**/*",
+ 		"src/dashicon/**/*",
+ 		"src/draggable/**/*",
++		"src/elevation/**/*",
+ 		"src/flex/**/*",
+ 		"src/form-group/**/*",
+ 		"src/scroll-lock/**/*",

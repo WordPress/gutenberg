@@ -1,0 +1,212 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 093dea189bdf7b..e2b2722fa2d7d4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -19,6 +19,7 @@
+ -   `DropdownMenuV2`: do not collapse suffix width ([#57238](https://github.com/WordPress/gutenberg/pull/57238)).
+ -   `DateTimePicker`: Adjustment of the dot position on DayButton and expansion of the button area. ([#55502](https://github.com/WordPress/gutenberg/pull/55502)).
+ -   `Modal`: Improve application of body class names ([#55430](https://github.com/WordPress/gutenberg/pull/55430)).
++-   `ToggleGroupControl`: Update button size in large variant to be 32px ([#57338](https://github.com/WordPress/gutenberg/pull/57338)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index 91cd85dc80e750..8a10d314b727f4 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -47,9 +47,9 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+   display: -ms-inline-flexbox;
+   display: inline-flex;
+   min-width: 0;
+-  padding: 2px;
+   position: relative;
+   min-height: 36px;
++  padding: 2px;
+ }
+ 
+ .emotion-8:hover {
+@@ -117,6 +117,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+   z-index: 2;
+   color: #1e1e1e;
+   width: 30px;
++  height: 30px;
+   padding-left: 0;
+   padding-right: 0;
+   color: #fff;
+@@ -199,6 +200,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+   z-index: 2;
+   color: #1e1e1e;
+   width: 30px;
++  height: 30px;
+   padding-left: 0;
+   padding-right: 0;
+ }
+@@ -374,9 +376,9 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+   display: -ms-inline-flexbox;
+   display: inline-flex;
+   min-width: 0;
+-  padding: 2px;
+   position: relative;
+   min-height: 36px;
++  padding: 2px;
+ }
+ 
+ .emotion-8:hover {
+@@ -596,9 +598,9 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+   display: -ms-inline-flexbox;
+   display: inline-flex;
+   min-width: 0;
+-  padding: 2px;
+   position: relative;
+   min-height: 36px;
++  padding: 2px;
+ }
+ 
+ .emotion-8:hover {
+@@ -666,6 +668,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+   z-index: 2;
+   color: #1e1e1e;
+   width: 30px;
++  height: 30px;
+   padding-left: 0;
+   padding-right: 0;
+   color: #fff;
+@@ -748,6 +751,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+   z-index: 2;
+   color: #1e1e1e;
+   width: 30px;
++  height: 30px;
+   padding-left: 0;
+   padding-right: 0;
+ }
+@@ -917,9 +921,9 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
+   display: -ms-inline-flexbox;
+   display: inline-flex;
+   min-width: 0;
+-  padding: 2px;
+   position: relative;
+   min-height: 36px;
++  padding: 2px;
+ }
+ 
+ .emotion-8:hover {
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
+index dac297fd3ddfa3..8885eae11d2c7c 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
+@@ -102,12 +102,13 @@ const isIconStyles = ( {
+ }: Pick< ToggleGroupControlProps, 'size' > ) => {
+ 	const iconButtonSizes = {
+ 		default: '30px',
+-		'__unstable-large': '34px',
++		'__unstable-large': '32px',
+ 	};
+ 
+ 	return css`
+ 		color: ${ COLORS.gray[ 900 ] };
+-		width: ${ iconButtonSizes[ size ] };
++		height: ${ iconButtonSizes[ size ] };
++		aspect-ratio: 1;
+ 		padding-left: 0;
+ 		padding-right: 0;
+ 	`;
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index 1d48349f0ee799..2fa35e2a5e80a6 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -47,6 +47,8 @@ function UnconnectedToggleGroupControl(
+ 	} = useContextSystem( props, 'ToggleGroupControl' );
+ 
+ 	const baseId = useInstanceId( ToggleGroupControl, 'toggle-group-control' );
++	const normalizedSize =
++		__next40pxDefaultSize && size === 'default' ? '__unstable-large' : size;
+ 
+ 	const cx = useCx();
+ 
+@@ -56,13 +58,12 @@ function UnconnectedToggleGroupControl(
+ 				styles.toggleGroupControl( {
+ 					isBlock,
+ 					isDeselectable,
+-					size,
+-					__next40pxDefaultSize,
++					size: normalizedSize,
+ 				} ),
+ 				isBlock && styles.block,
+ 				className
+ 			),
+-		[ className, cx, isBlock, isDeselectable, size, __next40pxDefaultSize ]
++		[ className, cx, isBlock, isDeselectable, normalizedSize ]
+ 	);
+ 
+ 	const MainControl = isDeselectable
+@@ -86,7 +87,7 @@ function UnconnectedToggleGroupControl(
+ 				label={ label }
+ 				onChange={ onChange }
+ 				ref={ forwardedRef }
+-				size={ size }
++				size={ normalizedSize }
+ 				value={ value }
+ 			>
+ 				<LayoutGroup id={ baseId }>{ children }</LayoutGroup>
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
+index b8a8552f98beb0..7310024706e1de 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
+@@ -14,11 +14,7 @@ export const toggleGroupControl = ( {
+ 	isBlock,
+ 	isDeselectable,
+ 	size,
+-	__next40pxDefaultSize,
+-}: Pick<
+-	ToggleGroupControlProps,
+-	'isBlock' | 'isDeselectable' | '__next40pxDefaultSize'
+-> & {
++}: Pick< ToggleGroupControlProps, 'isBlock' | 'isDeselectable' > & {
+ 	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
+ } ) => css`
+ 	background: ${ COLORS.ui.background };
+@@ -26,10 +22,9 @@ export const toggleGroupControl = ( {
+ 	border-radius: ${ CONFIG.controlBorderRadius };
+ 	display: inline-flex;
+ 	min-width: 0;
+-	padding: 2px;
+ 	position: relative;
+ 
+-	${ toggleGroupControlSize( size, __next40pxDefaultSize ) }
++	${ toggleGroupControlSize( size ) }
+ 	${ ! isDeselectable && enclosingBorders( isBlock ) }
+ `;
+ 
+@@ -57,21 +52,20 @@ const enclosingBorders = ( isBlock: ToggleGroupControlProps[ 'isBlock' ] ) => {
+ };
+ 
+ export const toggleGroupControlSize = (
+-	size: NonNullable< ToggleGroupControlProps[ 'size' ] >,
+-	__next40pxDefaultSize: ToggleGroupControlProps[ '__next40pxDefaultSize' ]
++	size: NonNullable< ToggleGroupControlProps[ 'size' ] >
+ ) => {
+-	const heights = {
+-		default: '40px',
+-		'__unstable-large': '40px',
++	const styles = {
++		default: css`
++			min-height: 36px;
++			padding: 2px;
++		`,
++		'__unstable-large': css`
++			min-height: 40px;
++			padding: 3px;
++		`,
+ 	};
+ 
+-	if ( ! __next40pxDefaultSize ) {
+-		heights.default = '36px';
+-	}
+-
+-	return css`
+-		min-height: ${ heights[ size ] };
+-	`;
++	return styles[ size ];
+ };
+ 
+ export const block = css`

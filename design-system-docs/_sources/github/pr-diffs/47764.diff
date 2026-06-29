@@ -1,0 +1,747 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ee0a64ca5ff3fb..4031a4712e3e0d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -23,6 +23,7 @@
+ -   `navigateRegions` HOC: Convert to TypeScript ([#48632](https://github.com/WordPress/gutenberg/pull/48632)).
+ -   `withSpokenMessages`: HOC: Convert to TypeScript ([#48163](https://github.com/WordPress/gutenberg/pull/48163)).
+ -   `DimensionControl(Experimental)`: Convert to TypeScript ([#47351](https://github.com/WordPress/gutenberg/pull/47351)).
++-   `PaletteEdit`: Convert to TypeScript ([#47764](https://github.com/WordPress/gutenberg/pull/47764)).
+ 
+ ## 23.5.0 (2023-03-01)
+ 
+diff --git a/packages/components/src/circular-option-picker/types.ts b/packages/components/src/circular-option-picker/types.ts
+index c3791a42108cd5..cd966681c55f7b 100644
+--- a/packages/components/src/circular-option-picker/types.ts
++++ b/packages/components/src/circular-option-picker/types.ts
+@@ -57,7 +57,7 @@ export type OptionProps = Omit<
+ > & {
+ 	className?: string;
+ 	tooltipText?: string;
+-	isSelected: boolean;
++	isSelected?: boolean;
+ 	// `icon` is explicitly defined as 'check' by CircleOptionPicker.Option
+ 	// and is not intended to be overridden.
+ 	// `size` relies on the `Icon` component's default size of `24` to fit
+diff --git a/packages/components/src/custom-gradient-picker/gradient-bar/control-points.js b/packages/components/src/custom-gradient-picker/gradient-bar/control-points.js
+index c7086833269e22..6b964d047b2a59 100644
+--- a/packages/components/src/custom-gradient-picker/gradient-bar/control-points.js
++++ b/packages/components/src/custom-gradient-picker/gradient-bar/control-points.js
+@@ -1,3 +1,5 @@
++// @ts-nocheck
++
+ /**
+  * External dependencies
+  */
+diff --git a/packages/components/src/custom-gradient-picker/gradient-bar/index.js b/packages/components/src/custom-gradient-picker/gradient-bar/index.js
+index 9767071c03e2a2..19b5746847e4b8 100644
+--- a/packages/components/src/custom-gradient-picker/gradient-bar/index.js
++++ b/packages/components/src/custom-gradient-picker/gradient-bar/index.js
+@@ -1,3 +1,5 @@
++// @ts-nocheck
++
+ /**
+  * External dependencies
+  */
+diff --git a/packages/components/src/custom-gradient-picker/gradient-bar/utils.js b/packages/components/src/custom-gradient-picker/gradient-bar/utils.js
+index 660fe7ac807ed2..24b552e0c149fd 100644
+--- a/packages/components/src/custom-gradient-picker/gradient-bar/utils.js
++++ b/packages/components/src/custom-gradient-picker/gradient-bar/utils.js
+@@ -1,3 +1,5 @@
++// @ts-nocheck
++
+ /**
+  * Internal dependencies
+  */
+diff --git a/packages/components/src/custom-gradient-picker/index.js b/packages/components/src/custom-gradient-picker/index.js
+index 824cc89bce1730..db47f25c88d948 100644
+--- a/packages/components/src/custom-gradient-picker/index.js
++++ b/packages/components/src/custom-gradient-picker/index.js
+@@ -1,3 +1,5 @@
++// @ts-nocheck
++
+ /**
+  * External dependencies
+  */
+diff --git a/packages/components/src/custom-gradient-picker/serializer.js b/packages/components/src/custom-gradient-picker/serializer.js
+index f0b08404896da2..934cf392ddd1e3 100644
+--- a/packages/components/src/custom-gradient-picker/serializer.js
++++ b/packages/components/src/custom-gradient-picker/serializer.js
+@@ -1,3 +1,5 @@
++// @ts-nocheck
++
+ export function serializeGradientColor( { type, value } ) {
+ 	if ( type === 'literal' ) {
+ 		return value;
+diff --git a/packages/components/src/custom-gradient-picker/utils.js b/packages/components/src/custom-gradient-picker/utils.js
+index 74c23db5b26d44..69d8223fbdb877 100644
+--- a/packages/components/src/custom-gradient-picker/utils.js
++++ b/packages/components/src/custom-gradient-picker/utils.js
+@@ -1,3 +1,5 @@
++// @ts-nocheck
++
+ /**
+  * External dependencies
+  */
+diff --git a/packages/components/src/gradient-picker/index.js b/packages/components/src/gradient-picker/index.js
+index e1d3892cc51d50..626c8d0667e5b3 100644
+--- a/packages/components/src/gradient-picker/index.js
++++ b/packages/components/src/gradient-picker/index.js
+@@ -1,3 +1,5 @@
++// @ts-nocheck
++
+ /**
+  * WordPress dependencies
+  */
+diff --git a/packages/components/src/palette-edit/index.js b/packages/components/src/palette-edit/index.tsx
+similarity index 78%
+rename from packages/components/src/palette-edit/index.js
+rename to packages/components/src/palette-edit/index.tsx
+index a02fcabe2ae18d..7882950431bbab 100644
+--- a/packages/components/src/palette-edit/index.js
++++ b/packages/components/src/palette-edit/index.tsx
+@@ -42,10 +42,20 @@ import {
+ import { NavigableMenu } from '../navigable-container';
+ import { DEFAULT_GRADIENT } from '../custom-gradient-picker/constants';
+ import CustomGradientPicker from '../custom-gradient-picker';
++import type {
++	Color,
++	ColorPickerPopoverProps,
++	Gradient,
++	NameInputProps,
++	OptionProps,
++	PaletteEditListViewProps,
++	PaletteEditProps,
++	PaletteElement,
++} from './types';
+ 
+ const DEFAULT_COLOR = '#000';
+ 
+-function NameInput( { value, onChange, label } ) {
++function NameInput( { value, onChange, label }: NameInputProps ) {
+ 	return (
+ 		<NameInputControl
+ 			label={ label }
+@@ -62,12 +72,15 @@ function NameInput( { value, onChange, label } ) {
+  * It expects slugs to be in the format: slugPrefix + color- + number.
+  * It then sets the id component of the new name based on the incremented id of the highest existing slug id.
+  *
+- * @param {string} elements   An array of color palette items.
+- * @param {string} slugPrefix The slug prefix used to match the element slug.
++ * @param elements   An array of color palette items.
++ * @param slugPrefix The slug prefix used to match the element slug.
+  *
+- * @return {string} A unique name for a palette item.
++ * @return A unique name for a palette item.
+  */
+-export function getNameForPosition( elements, slugPrefix ) {
++export function getNameForPosition(
++	elements: PaletteElement[],
++	slugPrefix: string
++) {
+ 	const temporaryNameRegex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
+ 	const position = elements.reduce( ( previousValue, currentValue ) => {
+ 		if ( typeof currentValue?.slug === 'string' ) {
+@@ -89,12 +102,12 @@ export function getNameForPosition( elements, slugPrefix ) {
+ 	);
+ }
+ 
+-function ColorPickerPopover( {
++function ColorPickerPopover< T extends Color | Gradient >( {
+ 	isGradient,
+ 	element,
+ 	onChange,
+ 	onClose = () => {},
+-} ) {
++}: ColorPickerPopoverProps< T > ) {
+ 	return (
+ 		<Popover
+ 			placement="left-start"
+@@ -106,12 +119,12 @@ function ColorPickerPopover( {
+ 				<ColorPicker
+ 					color={ element.color }
+ 					enableAlpha
+-					onChange={ ( newColor ) =>
++					onChange={ ( newColor ) => {
+ 						onChange( {
+ 							...element,
+ 							color: newColor,
+-						} )
+-					}
++						} );
++					} }
+ 				/>
+ 			) }
+ 			{ isGradient && (
+@@ -120,12 +133,12 @@ function ColorPickerPopover( {
+ 						__nextHasNoMargin
+ 						__experimentalIsRenderedInSidebar
+ 						value={ element.gradient }
+-						onChange={ ( newGradient ) =>
++						onChange={ ( newGradient: Gradient[ 'gradient' ] ) => {
+ 							onChange( {
+ 								...element,
+ 								gradient: newGradient,
+-							} )
+-						}
++							} );
++						} }
+ 					/>
+ 				</div>
+ 			) }
+@@ -133,7 +146,7 @@ function ColorPickerPopover( {
+ 	);
+ }
+ 
+-function Option( {
++function Option< T extends Color | Gradient >( {
+ 	canOnlyChangeValues,
+ 	element,
+ 	onChange,
+@@ -143,7 +156,7 @@ function Option( {
+ 	onStopEditing,
+ 	slugPrefix,
+ 	isGradient,
+-} ) {
++}: OptionProps< T > ) {
+ 	const focusOutsideProps = useFocusOutside( onStopEditing );
+ 	const value = isGradient ? element.gradient : element.color;
+ 
+@@ -175,11 +188,13 @@ function Option( {
+ 									: __( 'Color name' )
+ 							}
+ 							value={ element.name }
+-							onChange={ ( nextName ) =>
++							onChange={ ( nextName?: string ) =>
+ 								onChange( {
+ 									...element,
+ 									name: nextName,
+-									slug: slugPrefix + kebabCase( nextName ),
++									slug:
++										slugPrefix +
++										kebabCase( nextName ?? '' ),
+ 								} )
+ 							}
+ 						/>
+@@ -209,7 +224,10 @@ function Option( {
+ 	);
+ }
+ 
+-function isTemporaryElement( slugPrefix, { slug, color, gradient } ) {
++function isTemporaryElement(
++	slugPrefix: string,
++	{ slug, color, gradient }: Color | Gradient
++) {
+ 	const regex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
+ 	return (
+ 		regex.test( slug ) &&
+@@ -218,7 +236,7 @@ function isTemporaryElement( slugPrefix, { slug, color, gradient } ) {
+ 	);
+ }
+ 
+-function PaletteEditListView( {
++function PaletteEditListView< T extends Color | Gradient >( {
+ 	elements,
+ 	onChange,
+ 	editingElement,
+@@ -226,17 +244,17 @@ function PaletteEditListView( {
+ 	canOnlyChangeValues,
+ 	slugPrefix,
+ 	isGradient,
+-} ) {
++}: PaletteEditListViewProps< T > ) {
+ 	// When unmounting the component if there are empty elements (the user did not complete the insertion) clean them.
+-	const elementsReference = useRef();
++	const elementsReference = useRef< typeof elements >();
+ 	useEffect( () => {
+ 		elementsReference.current = elements;
+ 	}, [ elements ] );
+ 	useEffect( () => {
+ 		return () => {
+ 			if (
+-				elementsReference.current.some( ( element, index ) =>
+-					isTemporaryElement( slugPrefix, element, index )
++				elementsReference.current?.some( ( element ) =>
++					isTemporaryElement( slugPrefix, element )
+ 				)
+ 			) {
+ 				const newElements = elementsReference.current.filter(
+@@ -306,9 +324,29 @@ function PaletteEditListView( {
+ 	);
+ }
+ 
+-const EMPTY_ARRAY = [];
++const EMPTY_ARRAY: Color[] = [];
+ 
+-export default function PaletteEdit( {
++/**
++ * Allows editing a palette of colors or gradients.
++ *
++ * ```jsx
++ * import { PaletteEdit } from '@wordpress/components';
++ * const MyPaletteEdit = () => {
++ *   const [ controlledColors, setControlledColors ] = useState( colors );
++ *
++ *   return (
++ *     <PaletteEdit
++ *       colors={ controlledColors }
++ *       onChange={ ( newColors?: Color[] ) => {
++ *         setControlledColors( newColors );
++ *       } }
++ *       paletteLabel="Here is a label"
++ *     />
++ *   );
++ * };
++ * ```
++ */
++export function PaletteEdit( {
+ 	gradients,
+ 	colors = EMPTY_ARRAY,
+ 	onChange,
+@@ -318,22 +356,30 @@ export default function PaletteEdit( {
+ 	canOnlyChangeValues,
+ 	canReset,
+ 	slugPrefix = '',
+-} ) {
++}: PaletteEditProps ) {
+ 	const isGradient = !! gradients;
+ 	const elements = isGradient ? gradients : colors;
+ 	const [ isEditing, setIsEditing ] = useState( false );
+-	const [ editingElement, setEditingElement ] = useState( null );
++	const [ editingElement, setEditingElement ] = useState<
++		number | null | undefined
++	>( null );
+ 	const isAdding =
+ 		isEditing &&
+-		editingElement &&
++		!! editingElement &&
+ 		elements[ editingElement ] &&
+ 		! elements[ editingElement ].slug;
+ 	const elementsLength = elements.length;
+ 	const hasElements = elementsLength > 0;
+ 	const debounceOnChange = useDebounce( onChange, 100 );
+ 	const onSelectPaletteItem = useCallback(
+-		( value, newEditingElementIndex ) => {
+-			const selectedElement = elements[ newEditingElementIndex ];
++		(
++			value?: PaletteElement[ keyof PaletteElement ],
++			newEditingElementIndex?: number
++		) => {
++			const selectedElement =
++				newEditingElementIndex === undefined
++					? undefined
++					: elements[ newEditingElementIndex ];
+ 			const key = isGradient ? 'gradient' : 'color';
+ 			// Ensures that the index returned matches a known element value.
+ 			if ( !! selectedElement && selectedElement[ key ] === value ) {
+@@ -379,18 +425,29 @@ export default function PaletteEdit( {
+ 									slugPrefix
+ 								);
+ 
+-								onChange( [
+-									...elements,
+-									{
+-										...( isGradient
+-											? { gradient: DEFAULT_GRADIENT }
+-											: { color: DEFAULT_COLOR } ),
+-										name: tempOptionName,
+-										slug:
+-											slugPrefix +
+-											kebabCase( tempOptionName ),
+-									},
+-								] );
++								if ( !! gradients ) {
++									onChange( [
++										...gradients,
++										{
++											gradient: DEFAULT_GRADIENT,
++											name: tempOptionName,
++											slug:
++												slugPrefix +
++												kebabCase( tempOptionName ),
++										},
++									] );
++								} else {
++									onChange( [
++										...colors,
++										{
++											color: DEFAULT_COLOR,
++											name: tempOptionName,
++											slug:
++												slugPrefix +
++												kebabCase( tempOptionName ),
++										},
++									] );
++								}
+ 								setIsEditing( true );
+ 								setEditingElement( elements.length );
+ 							} }
+@@ -412,7 +469,7 @@ export default function PaletteEdit( {
+ 									isSmall: true,
+ 								} }
+ 							>
+-								{ ( { onClose } ) => (
++								{ ( { onClose }: { onClose: () => void } ) => (
+ 									<>
+ 										<NavigableMenu role="menu">
+ 											{ ! isEditing && (
+@@ -475,9 +532,10 @@ export default function PaletteEdit( {
+ 			{ hasElements && (
+ 				<>
+ 					{ isEditing && (
+-						<PaletteEditListView
++						<PaletteEditListView< typeof elements[ number ] >
+ 							canOnlyChangeValues={ canOnlyChangeValues }
+ 							elements={ elements }
++							// @ts-expect-error TODO: Don't know how to resolve
+ 							onChange={ onChange }
+ 							editingElement={ editingElement }
+ 							setEditingElement={ setEditingElement }
+@@ -489,10 +547,16 @@ export default function PaletteEdit( {
+ 						<ColorPickerPopover
+ 							isGradient={ isGradient }
+ 							onClose={ () => setEditingElement( null ) }
+-							onChange={ ( newElement ) => {
++							onChange={ (
++								newElement: typeof elements[ number ]
++							) => {
+ 								debounceOnChange(
++									// @ts-expect-error TODO: Don't know how to resolve
+ 									elements.map(
+-										( currentElement, currentIndex ) => {
++										(
++											currentElement: typeof elements[ number ],
++											currentIndex: number
++										) => {
+ 											if (
+ 												currentIndex === editingElement
+ 											) {
+@@ -503,11 +567,12 @@ export default function PaletteEdit( {
+ 									)
+ 								);
+ 							} }
+-							element={ elements[ editingElement ] }
++							element={ elements[ editingElement ?? -1 ] }
+ 						/>
+ 					) }
+ 					{ ! isEditing &&
+ 						( isGradient ? (
++							// @ts-expect-error TODO: Remove when GradientPicker is typed.
+ 							<GradientPicker
+ 								__nextHasNoMargin
+ 								gradients={ gradients }
+@@ -529,3 +594,5 @@ export default function PaletteEdit( {
+ 		</PaletteEditStyles>
+ 	);
+ }
++
++export default PaletteEdit;
+diff --git a/packages/components/src/palette-edit/stories/index.tsx b/packages/components/src/palette-edit/stories/index.tsx
+new file mode 100644
+index 00000000000000..5fd0d45592a823
+--- /dev/null
++++ b/packages/components/src/palette-edit/stories/index.tsx
+@@ -0,0 +1,82 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import PaletteEdit from '..';
++import type { Color, Gradient } from '../types';
++
++const meta: ComponentMeta< typeof PaletteEdit > = {
++	title: 'Components/PaletteEdit',
++	component: PaletteEdit,
++	parameters: {
++		actions: { argTypesRegex: '^on.*' },
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof PaletteEdit > = ( args ) => {
++	const { colors, gradients, onChange, ...props } = args;
++	const [ value, setValue ] = useState( gradients || colors );
++
++	return (
++		<PaletteEdit
++			{ ...( gradients
++				? {
++						gradients: value as Gradient[],
++						onChange: ( newValue?: Gradient[] ) => {
++							setValue( newValue );
++							onChange( newValue );
++						},
++				  }
++				: {
++						colors: value as Color[],
++						onChange: ( newValue?: Color[] ) => {
++							setValue( newValue );
++							onChange( newValue );
++						},
++				  } ) }
++			{ ...props }
++		/>
++	);
++};
++
++export const Default = Template.bind( {} );
++Default.args = {
++	colors: [
++		{ color: '#1a4548', name: 'Primary', slug: 'primary' },
++		{ color: '#0000ff', name: 'Secondary', slug: 'secondary' },
++	],
++	paletteLabel: 'Colors',
++	emptyMessage: 'Colors are empty',
++};
++
++export const Gradients = Template.bind( {} );
++Gradients.args = {
++	gradients: [
++		{
++			gradient:
++				'linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%)',
++			name: 'Pale ocean',
++			slug: 'pale-ocean',
++		},
++		{
++			gradient:
++				'linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%)',
++			name: 'Midnight',
++			slug: 'midnight',
++		},
++	],
++	paletteLabel: 'Gradients',
++	emptyMessage: 'Gradients are empty',
++};
+diff --git a/packages/components/src/palette-edit/test/index.js b/packages/components/src/palette-edit/test/index.tsx
+similarity index 80%
+rename from packages/components/src/palette-edit/test/index.js
+rename to packages/components/src/palette-edit/test/index.tsx
+index c08185cc4fc653..1bf2802709de7f 100644
+--- a/packages/components/src/palette-edit/test/index.js
++++ b/packages/components/src/palette-edit/test/index.tsx
+@@ -6,12 +6,13 @@ import { render, fireEvent, screen } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import PaletteEdit, { getNameForPosition } from '../';
++import PaletteEdit, { getNameForPosition } from '..';
++import type { PaletteElement } from '../types';
+ 
+ describe( 'getNameForPosition', () => {
+ 	test( 'should return 1 by default', () => {
+ 		const slugPrefix = 'test-';
+-		const elements = [];
++		const elements: PaletteElement[] = [];
+ 
+ 		expect( getNameForPosition( elements, slugPrefix ) ).toEqual(
+ 			'Color 1'
+@@ -23,6 +24,8 @@ describe( 'getNameForPosition', () => {
+ 		const elements = [
+ 			{
+ 				slug: 'test-color-1',
++				color: '#ffffff',
++				name: 'Test Color 1',
+ 			},
+ 		];
+ 
+@@ -36,6 +39,8 @@ describe( 'getNameForPosition', () => {
+ 		const elements = [
+ 			{
+ 				slug: 'a-sweet-color-2',
++				color: '#ffffff',
++				name: 'Test Color 1',
+ 			},
+ 		];
+ 
+@@ -49,15 +54,23 @@ describe( 'getNameForPosition', () => {
+ 		const elements = [
+ 			{
+ 				slug: 'test-color-1',
++				color: '#ffffff',
++				name: 'Test Color 1',
+ 			},
+ 			{
+ 				slug: 'test-color-2',
++				color: '#1a4548',
++				name: 'Test Color 2',
+ 			},
+ 			{
+ 				slug: 'test-color-150',
++				color: '#f6f6f6',
++				name: 'Test Color 150',
+ 			},
+ 			{
+ 				slug: 'a-sweet-color-100',
++				color: '#ffe2c7',
++				name: 'A Sweet Color 100',
+ 			},
+ 		];
+ 
+@@ -69,7 +82,6 @@ describe( 'getNameForPosition', () => {
+ 
+ describe( 'PaletteEdit', () => {
+ 	const defaultProps = {
+-		gradients: false,
+ 		colors: [ { color: '#ffffff', name: 'Base', slug: 'base' } ],
+ 		onChange: jest.fn(),
+ 		paletteLabel: 'Test label',
+diff --git a/packages/components/src/palette-edit/types.ts b/packages/components/src/palette-edit/types.ts
+new file mode 100644
+index 00000000000000..5513b945537784
+--- /dev/null
++++ b/packages/components/src/palette-edit/types.ts
+@@ -0,0 +1,126 @@
++/**
++ * External dependencies
++ */
++import type { Key, MouseEventHandler } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import type { HeadingSize } from '../heading/types';
++
++export type Color = {
++	color: string;
++	name: string;
++	slug: string;
++	gradient?: never;
++};
++
++export type Gradient = {
++	gradient: string;
++	name: string;
++	slug: string;
++	color?: never;
++};
++
++export type PaletteElement = Color | Gradient;
++
++export type BasePaletteEdit = {
++	/**
++	 * Whether the user can only change the color or gradient values.
++	 * If true, they cannot change names or delete values.
++	 *
++	 * @default false
++	 */
++	canOnlyChangeValues?: boolean;
++	/**
++	 * Whether the user can reset the editor.
++	 *
++	 * @default false
++	 */
++	canReset?: boolean;
++	/**
++	 * A message to show if there's nothing to edit.
++	 */
++	emptyMessage?: string;
++	/**
++	 * A heading label for the palette.
++	 */
++	paletteLabel: string;
++	/**
++	 * The label's heading level.
++	 *
++	 * @default 2
++	 */
++	paletteLabelHeadingLevel?: HeadingSize;
++	/**
++	 * The prefix for the element slug.
++	 *
++	 * @default ''
++	 */
++	slugPrefix?: string;
++};
++
++type PaletteEditColors = {
++	/**
++	 * The colors in the palette.
++	 */
++	colors?: Color[];
++	/**
++	 * Runs on changing the value.
++	 */
++	onChange: ( values?: Color[] ) => void;
++	gradients?: never;
++};
++
++type PaletteEditGradients = {
++	/**
++	 * The gradients in the palette.
++	 */
++	gradients: Gradient[];
++	/**
++	 * Runs on changing the value.
++	 */
++	onChange: ( values?: Gradient[] ) => void;
++	colors?: never;
++};
++
++export type PaletteEditProps = BasePaletteEdit &
++	( PaletteEditColors | PaletteEditGradients );
++
++type EditingElement = number | null;
++
++export type ColorPickerPopoverProps< T extends Color | Gradient > = {
++	element: T;
++	onChange: ( newElement: T ) => void;
++	isGradient?: T extends Gradient ? true : false;
++	onClose?: () => void;
++};
++
++export type NameInputProps = {
++	label: string;
++	onChange: ( nextName?: PaletteElement[ 'name' ] ) => void;
++	value: PaletteElement[ 'name' ];
++};
++
++export type OptionProps< T extends Color | Gradient > = {
++	element: T;
++	onChange: ( newElement: T ) => void;
++	isGradient: T extends Gradient ? true : false;
++	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
++	isEditing: boolean;
++	key: Key;
++	onRemove: MouseEventHandler< HTMLButtonElement >;
++	onStartEditing: () => void;
++	onStopEditing: () => void;
++	slugPrefix: string;
++};
++
++export type PaletteEditListViewProps< T extends Color | Gradient > = {
++	elements: T[];
++	onChange: ( newElements?: T[] ) => void;
++	isGradient: T extends Gradient ? true : false;
++	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
++	editingElement?: EditingElement;
++	setEditingElement: ( newEditingElement?: EditingElement ) => void;
++	slugPrefix: string;
++};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 11da77d3cc83fb..aa2434d026ca17 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -45,10 +45,7 @@
+ 		"src/**/stories/**/*.js", // only exclude js files, tsx files should be checked
+ 		"src/**/test/**/*.js", // only exclude js files, ts{x} files should be checked
+ 		"src/index.js",
+-		"src/custom-gradient-picker",
+ 		"src/duotone-picker",
+-		"src/gradient-picker",
+-		"src/higher-order/with-notices",
+-		"src/palette-edit"
++		"src/higher-order/with-notices"
+ 	]
+ }

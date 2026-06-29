@@ -1,0 +1,218 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d2580e0b009b5f..9fbe3257e26564 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ 
+ -   `LinkedButton`: remove unnecessary `span` tag ([#46063](https://github.com/WordPress/gutenberg/pull/46063))
+ -   NumberControl: refactor styles/tests/stories to TypeScript, replace fireEvent with user-event ([#45990](https://github.com/WordPress/gutenberg/pull/45990)).
++-   `useBaseField`: Convert to TypeScript ([#45712](https://github.com/WordPress/gutenberg/pull/45712)).
+ 
+ ## 22.1.0 (2022-11-16)
+ 
+diff --git a/packages/components/src/base-field/README.md b/packages/components/src/base-field/README.md
+index 228cd328429242..53a7cd0fc53aea 100644
+--- a/packages/components/src/base-field/README.md
++++ b/packages/components/src/base-field/README.md
+@@ -12,37 +12,25 @@ This feature is still experimental. “Experimental” means this is an early im
+ 
+ ```js
+ function useExampleField( props ) {
+-	const { 
+-		as = 'input',
+-		...baseProps,
+-	} = useBaseField( props );
++	const { as = 'input', ...baseProps } = useBaseField( props );
+ 
+ 	const inputProps = {
+ 		as,
+ 		// more cool stuff here
+-	}
++	};
+ 
+ 	return { inputProps, ...baseProps };
+ }
+ 
+ function ExampleField( props, forwardRef ) {
+-	const {
+-		preFix,
+-		affix,
+-		disabled,
+-		inputProps,
+-		...baseProps
+-	} = useExampleField( props );
++	const { preFix, affix, disabled, inputProps, ...baseProps } =
++		useExampleField( props );
+ 
+ 	return (
+ 		<View { ...baseProps } disabled={ disabled }>
+-			{preFix}
+-			<View
+-				autocomplete="off"
+-				{ ...inputProps }
+-				disabled={ disabled }
+-			/>
+-			{affix}
++			{ preFix }
++			<View autocomplete="off" { ...inputProps } disabled={ disabled } />
++			{ affix }
+ 		</View>
+ 	);
+ }
+@@ -50,18 +38,29 @@ function ExampleField( props, forwardRef ) {
+ 
+ ## Props
+ 
++### `disabled`: `boolean`
++
++Whether the field is disabled.
++
++-   Required: No
++
+ ### `hasError`: `boolean`
+ 
+ Renders an error style around the component.
+ 
+-### `disabled`: `boolean`
+-
+-Whether the field is disabled.
++-   Required: No
++-   Default: `false`
+ 
+ ### `isInline`: `boolean`
+ 
+ Renders a component that can be inlined in some text.
+ 
++-   Required: No
++-   Default: `false`
++
+ ### `isSubtle`: `boolean`
+ 
+ Renders a subtle variant of the component.
++
++-   Required: No
++-   Default: `false`
+diff --git a/packages/components/src/base-field/hook.js b/packages/components/src/base-field/hook.ts
+similarity index 63%
+rename from packages/components/src/base-field/hook.js
+rename to packages/components/src/base-field/hook.ts
+index afaa9e56f74b02..9e3ae89b33fa5f 100644
+--- a/packages/components/src/base-field/hook.js
++++ b/packages/components/src/base-field/hook.ts
+@@ -6,26 +6,16 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem } from '../ui/context';
++import { useContextSystem, WordPressComponentProps } from '../ui/context';
+ import { useControlGroupContext } from '../ui/control-group';
+ import { useFlex } from '../flex';
+ import * as styles from './styles';
+ import { useCx } from '../utils/hooks/use-cx';
++import type { BaseFieldProps } from './types';
+ 
+-/**
+- * @typedef OwnProps
+- * @property {boolean} [hasError=false] Renders an error.
+- * @property {boolean} [disabled]       Whether the field is disabled.
+- * @property {boolean} [isInline=false] Renders as an inline element (layout).
+- * @property {boolean} [isSubtle=false] Renders a subtle variant.
+- */
+-
+-/** @typedef {import('../flex/types').FlexProps & OwnProps} Props */
+-
+-/**
+- * @param {import('../ui/context').WordPressComponentProps<Props, 'div'>} props
+- */
+-export function useBaseField( props ) {
++export function useBaseField(
++	props: WordPressComponentProps< BaseFieldProps, 'div' >
++) {
+ 	const {
+ 		className,
+ 		hasError = false,
+diff --git a/packages/components/src/base-field/index.js b/packages/components/src/base-field/index.ts
+similarity index 100%
+rename from packages/components/src/base-field/index.js
+rename to packages/components/src/base-field/index.ts
+diff --git a/packages/components/src/base-field/styles.js b/packages/components/src/base-field/styles.ts
+similarity index 100%
+rename from packages/components/src/base-field/styles.js
+rename to packages/components/src/base-field/styles.ts
+diff --git a/packages/components/src/base-field/test/__snapshots__/index.js.snap b/packages/components/src/base-field/test/__snapshots__/index.tsx.snap
+similarity index 100%
+rename from packages/components/src/base-field/test/__snapshots__/index.js.snap
+rename to packages/components/src/base-field/test/__snapshots__/index.tsx.snap
+diff --git a/packages/components/src/base-field/test/index.js b/packages/components/src/base-field/test/index.tsx
+similarity index 83%
+rename from packages/components/src/base-field/test/index.js
+rename to packages/components/src/base-field/test/index.tsx
+index 871bd8b3f595ee..5ac4a70d16e84d 100644
+--- a/packages/components/src/base-field/test/index.js
++++ b/packages/components/src/base-field/test/index.tsx
+@@ -8,9 +8,10 @@ import { render, screen } from '@testing-library/react';
+  */
+ import { useBaseField } from '../index';
+ import { View } from '../../view';
++import type { BaseFieldProps } from '../types';
+ 
+-const TestField = ( props ) => {
+-	return <View { ...useBaseField( props ) } />;
++const TestField = ( props: Omit< BaseFieldProps, 'children' > ) => {
++	return <View { ...useBaseField( { ...props, children: '' } ) } />;
+ };
+ 
+ describe( 'base field', () => {
+@@ -62,10 +63,14 @@ describe( 'base field', () => {
+ 			// wrap this in a component so that `useContext` calls don't fail inside the hook
+ 			// assertions will still run as normal when we `render` the component :)
+ 			const Component = () => {
+-				const disabled = Symbol.for( 'disabled' );
+-				const defaultValue = Symbol.for( 'defaultValue' );
++				const disabled = true;
++				const defaultValue = 'Lorem ipsum';
+ 
+-				const result = useBaseField( { disabled, defaultValue } );
++				const result = useBaseField( {
++					disabled,
++					defaultValue,
++					children: '',
++				} );
+ 
+ 				expect( result.disabled ).toBe( disabled );
+ 				expect( result.defaultValue ).toBe( defaultValue );
+diff --git a/packages/components/src/base-field/types.ts b/packages/components/src/base-field/types.ts
+new file mode 100644
+index 00000000000000..1a6e4378fcd7fc
+--- /dev/null
++++ b/packages/components/src/base-field/types.ts
+@@ -0,0 +1,29 @@
++/**
++ * Internal dependencies
++ */
++import type { FlexProps } from '../flex/types';
++
++export type BaseFieldProps = FlexProps & {
++	/**
++	 * Whether the field is disabled.
++	 */
++	disabled?: boolean;
++	/**
++	 * Renders an error style around the component.
++	 *
++	 * @default false
++	 */
++	hasError?: boolean;
++	/**
++	 * Renders a component that can be inlined in some text.
++	 *
++	 * @default false
++	 */
++	isInline?: boolean;
++	/**
++	 * Renders a subtle variant of the component.
++	 *
++	 * @default false
++	 */
++	isSubtle?: boolean;
++};

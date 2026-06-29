@@ -1,0 +1,86 @@
+diff --git a/packages/components/src/guide/index.js b/packages/components/src/guide/index.js
+index 4bbc7198b668a7..f16cd25456494d 100644
+--- a/packages/components/src/guide/index.js
++++ b/packages/components/src/guide/index.js
+@@ -78,11 +78,13 @@ export default function Guide( {
+ 				<div className="components-guide__page">
+ 					{ pages[ currentPage ].image }
+ 
+-					<PageControl
+-						currentPage={ currentPage }
+-						numberOfPages={ pages.length }
+-						setCurrentPage={ setCurrentPage }
+-					/>
++					{ pages.length > 1 && (
++						<PageControl
++							currentPage={ currentPage }
++							numberOfPages={ pages.length }
++							setCurrentPage={ setCurrentPage }
++						/>
++					) }
+ 
+ 					{ pages[ currentPage ].content }
+ 
+diff --git a/packages/components/src/guide/style.scss b/packages/components/src/guide/style.scss
+index b2ca62dcb2ac7d..305c339da364b9 100644
+--- a/packages/components/src/guide/style.scss
++++ b/packages/components/src/guide/style.scss
+@@ -62,16 +62,18 @@
+ 	}
+ 
+ 	&__page-control {
+-		margin: $grid-unit-10 0 $grid-unit-10 0;
++		margin: 0;
+ 		text-align: center;
+ 
+ 		li {
+ 			display: inline-block;
++			margin: 0;
+ 		}
+ 
+ 		.components-button {
+ 			height: 30px;
+ 			min-width: 20px;
++			margin: -6px 0;
+ 		}
+ 	}
+ 
+diff --git a/packages/components/src/guide/test/index.js b/packages/components/src/guide/test/index.js
+index f2e1a584c7ca35..0e38f63c20037e 100644
+--- a/packages/components/src/guide/test/index.js
++++ b/packages/components/src/guide/test/index.js
+@@ -71,6 +71,13 @@ describe( 'Guide', () => {
+ 		).toHaveLength( 1 );
+ 	} );
+ 
++	it( "doesn't display the page control if there is only one page", () => {
++		const wrapper = shallow(
++			<Guide pages={ [ { content: <p>Page 1</p> } ] } />
++		);
++		expect( wrapper.find( PageControl ).exists() ).toBeFalsy();
++	} );
++
+ 	it( 'calls onFinish when the finish button is clicked', () => {
+ 		const onFinish = jest.fn();
+ 		const wrapper = shallow(
+diff --git a/packages/edit-post/src/components/welcome-guide/style.scss b/packages/edit-post/src/components/welcome-guide/style.scss
+index f76ae8bd9536c3..1697a694b6291e 100644
+--- a/packages/edit-post/src/components/welcome-guide/style.scss
++++ b/packages/edit-post/src/components/welcome-guide/style.scss
+@@ -6,6 +6,7 @@
+ 	&__image {
+ 		background: #00a0d2;
+ 		height: 240px;
++		margin: 0 0 $grid-unit-20;
+ 
+ 		&__prm-r {
+ 			display: none;
+@@ -26,7 +27,7 @@
+ 		font-family: $default-font;
+ 		font-size: 24px;
+ 		line-height: 1.4;
+-		margin: 0 0 $grid-unit-20 0;
++		margin: $grid-unit-20 0 $grid-unit-20 0;
+ 		padding: 0 $grid-unit-40;
+ 	}
+ 

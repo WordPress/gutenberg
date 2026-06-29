@@ -1,0 +1,630 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9eea42bcf61ca0..ccd526664ea57b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   `BaseControl`: Convert to TypeScript ([#39468](https://github.com/WordPress/gutenberg/pull/39468)).
++
+ ## 19.7.0 (2022-03-23)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/base-control/README.md b/packages/components/src/base-control/README.md
+index 6e507ee4df87a8..d940a7bc2fdc24 100644
+--- a/packages/components/src/base-control/README.md
++++ b/packages/components/src/base-control/README.md
+@@ -1,14 +1,15 @@
+ # BaseControl
+ 
+-BaseControl component is used to generate labels and help text for components handling user inputs.
++`BaseControl` is a component used to generate labels and help text for components handling user inputs.
+ 
+ ## Usage
+ 
+-Render a BaseControl for a textarea input:
++Render a `BaseControl` for a textarea input:
+ 
+ ```jsx
+ import { BaseControl } from '@wordpress/components';
+ 
++// The `id` prop is necessary to accessibly associate the label with the textarea
+ const MyBaseControl = () => (
+ 	<BaseControl id="textarea-1" label="Text" help="Enter some text" __nextHasNoMarginBottom={ true }>
+ 		<textarea id="textarea-1" />
+@@ -22,10 +23,10 @@ The component accepts the following props:
+ 
+ ### id
+ 
+-The id of the element to which labels and help text are being generated. That element should be passed as a child.
++The HTML `id` of the element (passed in as a child to `BaseControl`) to which labels and help text are being generated. This is necessary to accessibly associate the label with that element.
+ 
+ -   Type: `String`
+--   Required: Yes
++-   Required: No
+ 
+ ### label
+ 
+@@ -50,8 +51,7 @@ If this property is added, a help text will be generated using help property as
+ 
+ ### className
+ 
+-The class that will be added with "components-base-control" to the classes of the wrapper div.
+-If no className is passed only components-base-control is used.
++Any other classes to add to the wrapper div.
+ 
+ -   Type: `String`
+ -   Required: No
+@@ -73,8 +73,9 @@ Start opting into the new margin-free styles that will become the default in a f
+ 
+ ## BaseControl.VisualLabel
+ 
+-`BaseControl.VisualLabel` component is used to render a purely visual label inside a `BaseControl` component.
+-It should only be used in cases where the children being rendered inside BaseControl are already properly labeled, e.g., a button, but we want an additional visual label for that section equivalent to the labels BaseControl would otherwise use if the label prop was passed.
++`BaseControl.VisualLabel` is used to render a purely visual label inside a `BaseControl` component.
++
++It should only be used in cases where the children being rendered inside BaseControl are already accessibly labeled, e.g., a button, but we want an additional visual label for that section equivalent to the labels `BaseControl` would otherwise use if the `label` prop was passed.
+ 
+ ## Usage
+ 
+@@ -82,7 +83,7 @@ It should only be used in cases where the children being rendered inside BaseCon
+ import { BaseControl } from '@wordpress/components';
+ 
+ const MyBaseControl = () => (
+-	<BaseControl help="Pressing the Select an author button will open a modal that allows an advanced mechanism for author selection">
++	<BaseControl help="This button is already accessibly labeled.">
+ 		<BaseControl.VisualLabel>Author</BaseControl.VisualLabel>
+ 		<Button>Select an author</Button>
+ 	</BaseControl>
+@@ -93,8 +94,7 @@ const MyBaseControl = () => (
+ 
+ #### className
+ 
+-The class that will be added with `components-base-control__label` to the classes of the wrapper div.
+-If no className is passed only `components-base-control__label` is used.
++Any other classes to add to the wrapper div.
+ 
+ -   Type: `String`
+ -   Required: No
+diff --git a/packages/components/src/base-control/index.js b/packages/components/src/base-control/index.js
+deleted file mode 100644
+index a8c19457d13644..00000000000000
+--- a/packages/components/src/base-control/index.js
++++ /dev/null
+@@ -1,118 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-
+-/**
+- * Internal dependencies
+- */
+-import { VisuallyHidden } from '../visually-hidden';
+-import {
+-	Wrapper,
+-	StyledField,
+-	StyledLabel,
+-	StyledHelp,
+-	StyledVisualLabel,
+-} from './styles/base-control-styles';
+-
+-/**
+- * @typedef Props
+- * @property {boolean}                   [__nextHasNoMarginBottom] Start opting into the new margin-free styles that will become the default in a future version.
+- * @property {string}                    [id]                      The id of the element to which labels and help text are being generated.
+- *                                                                 That element should be passed as a child.
+- * @property {import('react').ReactNode} help                      If this property is added, a help text will be
+- *                                                                 generated using help property as the content.
+- * @property {import('react').ReactNode} [label]                   If this property is added, a label will be generated
+- *                                                                 using label property as the content.
+- * @property {boolean}                   [hideLabelFromVision]     If true, the label will only be visible to screen readers.
+- * @property {string}                    [className]               The class that will be added with "components-base-control" to the
+- *                                                                 classes of the wrapper div. If no className is passed only
+- *                                                                 components-base-control is used.
+- * @property {import('react').ReactNode} [children]                The content to be displayed within
+- *                                                                 the BaseControl.
+- */
+-
+-/**
+- * @param {Props} props
+- * @return {JSX.Element} Element
+- */
+-function BaseControl( {
+-	__nextHasNoMarginBottom = false,
+-	id,
+-	label,
+-	hideLabelFromVision,
+-	help,
+-	className,
+-	children,
+-} ) {
+-	return (
+-		<Wrapper
+-			className={ classnames( 'components-base-control', className ) }
+-		>
+-			<StyledField
+-				className="components-base-control__field"
+-				// TODO: Official deprecation for this should start after all internal usages have been migrated
+-				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+-			>
+-				{ label &&
+-					id &&
+-					( hideLabelFromVision ? (
+-						<VisuallyHidden as="label" htmlFor={ id }>
+-							{ label }
+-						</VisuallyHidden>
+-					) : (
+-						<StyledLabel
+-							className="components-base-control__label"
+-							htmlFor={ id }
+-						>
+-							{ label }
+-						</StyledLabel>
+-					) ) }
+-				{ label &&
+-					! id &&
+-					( hideLabelFromVision ? (
+-						<VisuallyHidden as="label">{ label }</VisuallyHidden>
+-					) : (
+-						<BaseControl.VisualLabel>
+-							{ label }
+-						</BaseControl.VisualLabel>
+-					) ) }
+-				{ children }
+-			</StyledField>
+-			{ !! help && (
+-				<StyledHelp
+-					id={ id ? id + '__help' : undefined }
+-					className="components-base-control__help"
+-					__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+-				>
+-					{ help }
+-				</StyledHelp>
+-			) }
+-		</Wrapper>
+-	);
+-}
+-
+-/**
+- * @typedef VisualLabelProps
+- * @property {string}                    [className] Class name
+- * @property {import('react').ReactNode} [children]  Children
+- */
+-
+-/**
+- * @param {VisualLabelProps} Props
+- * @return {JSX.Element} Element
+- */
+-BaseControl.VisualLabel = ( { className, children } ) => {
+-	return (
+-		<StyledVisualLabel
+-			className={ classnames(
+-				'components-base-control__label',
+-				className
+-			) }
+-		>
+-			{ children }
+-		</StyledVisualLabel>
+-	);
+-};
+-
+-export default BaseControl;
+diff --git a/packages/components/src/base-control/index.tsx b/packages/components/src/base-control/index.tsx
+new file mode 100644
+index 00000000000000..ab2af8858dbaae
+--- /dev/null
++++ b/packages/components/src/base-control/index.tsx
+@@ -0,0 +1,124 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++import type { FunctionComponent } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import { VisuallyHidden } from '../visually-hidden';
++import type { BaseControlProps, BaseControlVisualLabelProps } from './types';
++import {
++	Wrapper,
++	StyledField,
++	StyledLabel,
++	StyledHelp,
++	StyledVisualLabel,
++} from './styles/base-control-styles';
++
++/**
++ * `BaseControl` is a component used to generate labels and help text for components handling user inputs.
++ *
++ * @example
++ * // Render a `BaseControl` for a textarea input
++ * import { BaseControl } from '@wordpress/components';
++ *
++ * // The `id` prop is necessary to accessibly associate the label with the textarea
++ * const MyBaseControl = () => (
++ *   <BaseControl id="textarea-1" label="Text" help="Enter some text" __nextHasNoMarginBottom={ true }>
++ *     <textarea id="textarea-1" />
++ *   </BaseControl>
++ * );
++ */
++export const BaseControl = ( {
++	__nextHasNoMarginBottom = false,
++	id,
++	label,
++	hideLabelFromVision = false,
++	help,
++	className,
++	children,
++}: BaseControlProps ) => {
++	return (
++		<Wrapper
++			className={ classnames( 'components-base-control', className ) }
++		>
++			<StyledField
++				className="components-base-control__field"
++				// TODO: Official deprecation for this should start after all internal usages have been migrated
++				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
++			>
++				{ label &&
++					id &&
++					( hideLabelFromVision ? (
++						<VisuallyHidden as="label" htmlFor={ id }>
++							{ label }
++						</VisuallyHidden>
++					) : (
++						<StyledLabel
++							className="components-base-control__label"
++							htmlFor={ id }
++						>
++							{ label }
++						</StyledLabel>
++					) ) }
++				{ label &&
++					! id &&
++					( hideLabelFromVision ? (
++						<VisuallyHidden as="label">{ label }</VisuallyHidden>
++					) : (
++						<BaseControl.VisualLabel>
++							{ label }
++						</BaseControl.VisualLabel>
++					) ) }
++				{ children }
++			</StyledField>
++			{ !! help && (
++				<StyledHelp
++					id={ id ? id + '__help' : undefined }
++					className="components-base-control__help"
++					__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
++				>
++					{ help }
++				</StyledHelp>
++			) }
++		</Wrapper>
++	);
++};
++
++/**
++ * `BaseControl.VisualLabel` is used to render a purely visual label inside a `BaseControl` component.
++ *
++ * It should only be used in cases where the children being rendered inside `BaseControl` are already accessibly labeled,
++ * e.g., a button, but we want an additional visual label for that section equivalent to the labels `BaseControl` would
++ * otherwise use if the `label` prop was passed.
++ *
++ * @example
++ * import { BaseControl } from '@wordpress/components';
++ *
++ * const MyBaseControl = () => (
++ * 	<BaseControl help="This button is already accessibly labeled.">
++ * 		<BaseControl.VisualLabel>Author</BaseControl.VisualLabel>
++ * 		<Button>Select an author</Button>
++ * 	</BaseControl>
++ * );
++ */
++export const VisualLabel: FunctionComponent< BaseControlVisualLabelProps > = ( {
++	className,
++	children,
++} ) => {
++	return (
++		<StyledVisualLabel
++			className={ classnames(
++				'components-base-control__label',
++				className
++			) }
++		>
++			{ children }
++		</StyledVisualLabel>
++	);
++};
++BaseControl.VisualLabel = VisualLabel;
++
++export default BaseControl;
+diff --git a/packages/components/src/base-control/stories/index.js b/packages/components/src/base-control/stories/index.js
+deleted file mode 100644
+index ed238093846225..00000000000000
+--- a/packages/components/src/base-control/stories/index.js
++++ /dev/null
+@@ -1,81 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import BaseControl from '../';
+-import Button from '../../button';
+-import { Spacer } from '../../spacer';
+-
+-export default {
+-	title: 'Components/BaseControl',
+-	component: BaseControl,
+-	subcomponents: { BaseControl: BaseControl.VisualLabel },
+-};
+-
+-const BaseControlWithTextarea = ( { id, ...props } ) => {
+-	return (
+-		<BaseControl id={ id } { ...props }>
+-			<textarea style={ { display: 'block' } } id={ id } />
+-		</BaseControl>
+-	);
+-};
+-
+-export const Default = BaseControlWithTextarea.bind( {} );
+-Default.args = {
+-	__nextHasNoMarginBottom: true,
+-	id: 'textarea-1',
+-	label: '',
+-	hideLabelFromVision: false,
+-	help: '',
+-};
+-
+-export const WithLabel = BaseControlWithTextarea.bind( {} );
+-WithLabel.args = {
+-	...Default.args,
+-	label: 'Label text',
+-};
+-
+-export const WithHelpText = BaseControlWithTextarea.bind( {} );
+-WithHelpText.args = {
+-	...WithLabel.args,
+-	help: 'Help text adds more explanation.',
+-};
+-
+-export const WithVisualLabel = ( { visualLabelChildren, ...props } ) => {
+-	return (
+-		<>
+-			<BaseControl { ...props }>
+-				<div>
+-					<BaseControl.VisualLabel>
+-						{ visualLabelChildren }
+-					</BaseControl.VisualLabel>
+-				</div>
+-				<Button variant="secondary">Select an author</Button>
+-			</BaseControl>
+-			<Spacer marginTop={ 12 }>
+-				<p>
+-					<code>BaseControl.VisualLabel</code> is used to render a
+-					purely visual label inside a <code>BaseControl</code>{ ' ' }
+-					component.
+-				</p>
+-				<p>
+-					It should <strong>only</strong> be used in cases where the
+-					children being rendered inside BaseControl are already
+-					accessibly labeled, e.g., a button, but we want an
+-					additional visual label for that section equivalent to the
+-					labels BaseControl would otherwise use if the{ ' ' }
+-					<code>label</code> prop was passed.
+-				</p>
+-			</Spacer>
+-		</>
+-	);
+-};
+-WithVisualLabel.args = {
+-	...Default.args,
+-	help: 'This button is already accessibly labeled.',
+-	visualLabelChildren: 'Author',
+-};
+-WithVisualLabel.argTypes = {
+-	visualLabelChildren: {
+-		name: 'VisualLabel children',
+-	},
+-};
+diff --git a/packages/components/src/base-control/stories/index.tsx b/packages/components/src/base-control/stories/index.tsx
+new file mode 100644
+index 00000000000000..20bae840f41b5a
+--- /dev/null
++++ b/packages/components/src/base-control/stories/index.tsx
+@@ -0,0 +1,80 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import BaseControl from '..';
++import Button from '../../button';
++
++const meta: ComponentMeta< typeof BaseControl > = {
++	title: 'Components/BaseControl',
++	component: BaseControl,
++	argTypes: {
++		children: { control: { type: null } },
++		help: { control: { type: 'text' } },
++		label: { control: { type: 'text' } },
++	},
++	parameters: {
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const BaseControlWithTextarea: ComponentStory< typeof BaseControl > = ( {
++	id,
++	...props
++} ) => {
++	return (
++		<BaseControl id={ id } { ...props }>
++			<textarea style={ { display: 'block' } } id={ id } />
++		</BaseControl>
++	);
++};
++
++export const Default: ComponentStory<
++	typeof BaseControl
++> = BaseControlWithTextarea.bind( {} );
++Default.args = {
++	__nextHasNoMarginBottom: true,
++	id: 'textarea-default-1',
++	label: 'Label text',
++};
++
++export const WithHelpText = BaseControlWithTextarea.bind( {} );
++WithHelpText.args = {
++	...Default.args,
++	id: 'textarea-with-help-text-1',
++	help: 'Help text adds more explanation.',
++};
++
++/**
++ * `BaseControl.VisualLabel` is used to render a purely visual label inside a `BaseControl` component.
++ *
++ * It should only be used in cases where the children being rendered inside `BaseControl` are already accessibly labeled,
++ * e.g., a button, but we want an additional visual label for that section equivalent to the labels `BaseControl` would
++ * otherwise use if the `label` prop was passed.
++ */
++export const WithVisualLabel: ComponentStory< typeof BaseControl > = (
++	props
++) => {
++	BaseControl.VisualLabel.displayName = 'BaseControl.VisualLabel';
++
++	return (
++		<BaseControl { ...props }>
++			<BaseControl.VisualLabel>Visual label</BaseControl.VisualLabel>
++			<div>
++				<Button variant="secondary">Select an author</Button>
++			</div>
++		</BaseControl>
++	);
++};
++WithVisualLabel.args = {
++	...Default.args,
++	help: 'This button is already accessibly labeled.',
++	id: undefined,
++	label: undefined,
++};
+diff --git a/packages/components/src/base-control/styles/base-control-styles.js b/packages/components/src/base-control/styles/base-control-styles.ts
+similarity index 100%
+rename from packages/components/src/base-control/styles/base-control-styles.js
+rename to packages/components/src/base-control/styles/base-control-styles.ts
+diff --git a/packages/components/src/base-control/types.ts b/packages/components/src/base-control/types.ts
+new file mode 100644
+index 00000000000000..0cefb33db0ec90
+--- /dev/null
++++ b/packages/components/src/base-control/types.ts
+@@ -0,0 +1,42 @@
++/**
++ * External dependencies
++ */
++import type { ReactNode } from 'react';
++
++export type BaseControlProps = {
++	/**
++	 * Start opting into the new margin-free styles that will become the default in a future version.
++	 *
++	 * @default false
++	 */
++	__nextHasNoMarginBottom?: boolean;
++	/**
++	 * The HTML `id` of the element (passed in as a child to `BaseControl`) to which labels and help text are being generated.
++	 * This is necessary to accessibly associate the label with that element.
++	 */
++	id?: string;
++	/**
++	 * If this property is added, a help text will be generated using help property as the content.
++	 */
++	help?: ReactNode;
++	/**
++	 * If this property is added, a label will be generated using label property as the content.
++	 */
++	label?: ReactNode;
++	/**
++	 * If true, the label will only be visible to screen readers.
++	 *
++	 * @default false
++	 */
++	hideLabelFromVision?: boolean;
++	className?: string;
++	/**
++	 * The content to be displayed within the `BaseControl`.
++	 */
++	children: ReactNode;
++};
++
++export type BaseControlVisualLabelProps = {
++	className?: string;
++	children: ReactNode;
++};
+diff --git a/packages/components/src/tools-panel/test/__snapshots__/index.js.snap b/packages/components/src/tools-panel/test/__snapshots__/index.js.snap
+index 771f9a8008889d..0ff75b502fdb0c 100644
+--- a/packages/components/src/tools-panel/test/__snapshots__/index.js.snap
++++ b/packages/components/src/tools-panel/test/__snapshots__/index.js.snap
+@@ -89,15 +89,15 @@ exports[`ToolsPanel first and last panel items should apply first/last classes t
+   max-width: 100%;
+ }
+ 
+-.emotion-6.emotion-6 .e1puf3u4 {
++.emotion-6.emotion-6 .ej5x27r4 {
+   margin-bottom: 0;
+ }
+ 
+-.emotion-6.emotion-6 .e1puf3u4 .e1puf3u3:last-child {
++.emotion-6.emotion-6 .ej5x27r4 .ej5x27r3:last-child {
+   margin-bottom: 0;
+ }
+ 
+-.emotion-6 .e1puf3u1 {
++.emotion-6 .ej5x27r1 {
+   margin-bottom: 0;
+ }
+ 
+@@ -106,7 +106,7 @@ exports[`ToolsPanel first and last panel items should apply first/last classes t
+ }
+ 
+ .emotion-6 .components-custom-select-control__label,
+-.emotion-6 .e1puf3u2 {
++.emotion-6 .ej5x27r2 {
+   line-height: 1.4em;
+ }
+ 
+@@ -121,15 +121,15 @@ exports[`ToolsPanel first and last panel items should apply first/last classes t
+   max-width: 100%;
+ }
+ 
+-.emotion-8.emotion-8 .e1puf3u4 {
++.emotion-8.emotion-8 .ej5x27r4 {
+   margin-bottom: 0;
+ }
+ 
+-.emotion-8.emotion-8 .e1puf3u4 .e1puf3u3:last-child {
++.emotion-8.emotion-8 .ej5x27r4 .ej5x27r3:last-child {
+   margin-bottom: 0;
+ }
+ 
+-.emotion-8 .e1puf3u1 {
++.emotion-8 .ej5x27r1 {
+   margin-bottom: 0;
+ }
+ 
+@@ -138,7 +138,7 @@ exports[`ToolsPanel first and last panel items should apply first/last classes t
+ }
+ 
+ .emotion-8 .components-custom-select-control__label,
+-.emotion-8 .e1puf3u2 {
++.emotion-8 .ej5x27r2 {
+   line-height: 1.4em;
+ }
+ 

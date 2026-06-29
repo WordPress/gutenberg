@@ -1,0 +1,235 @@
+diff --git a/packages/components/src/validated-form-controls/components/stories/checkbox-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/checkbox-control.story.tsx
+index 0cc0900c0594e5..1a88a2677f31d3 100644
+--- a/packages/components/src/validated-form-controls/components/stories/checkbox-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/checkbox-control.story.tsx
+@@ -15,7 +15,8 @@ import { ValidatedCheckboxControl } from '../checkbox-control';
+ import { formDecorator } from './story-utils';
+ 
+ const meta: Meta< typeof ValidatedCheckboxControl > = {
+-	title: 'Components (Experimental)/Validated Form Controls/ValidatedCheckboxControl',
++	title: 'Components/Selection & Input/Validated Form Controls/ValidatedCheckboxControl',
++	id: 'components-validatedcheckboxcontrol',
+ 	component: ValidatedCheckboxControl,
+ 	tags: [ 'status-private' ],
+ 	decorators: formDecorator,
+diff --git a/packages/components/src/validated-form-controls/components/stories/combobox-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/combobox-control.story.tsx
+index 0687dacc719f8f..10af5060bd7f8e 100644
+--- a/packages/components/src/validated-form-controls/components/stories/combobox-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/combobox-control.story.tsx
+@@ -15,7 +15,8 @@ import { ValidatedComboboxControl } from '../combobox-control';
+ import { formDecorator } from './story-utils';
+ 
+ const meta: Meta< typeof ValidatedComboboxControl > = {
+-	title: 'Components (Experimental)/Validated Form Controls/ValidatedComboboxControl',
++	title: 'Components/Selection & Input/Validated Form Controls/ValidatedComboboxControl',
++	id: 'components-validatedcomboboxcontrol',
+ 	component: ValidatedComboboxControl,
+ 	tags: [ 'status-private' ],
+ 	decorators: formDecorator,
+diff --git a/packages/components/src/validated-form-controls/components/stories/custom-select-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/custom-select-control.story.tsx
+index c6a45b7ecbe67a..d6d6ecf6d10d27 100644
+--- a/packages/components/src/validated-form-controls/components/stories/custom-select-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/custom-select-control.story.tsx
+@@ -15,7 +15,8 @@ import { ValidatedCustomSelectControl } from '../custom-select-control';
+ import { formDecorator } from './story-utils';
+ 
+ const meta: Meta< typeof ValidatedCustomSelectControl > = {
+-	title: 'Components (Experimental)/Validated Form Controls/ValidatedCustomSelectControl',
++	title: 'Components/Selection & Input/Validated Form Controls/ValidatedCustomSelectControl',
++	id: 'components-validatedcustomselectcontrol',
+ 	component: ValidatedCustomSelectControl,
+ 	tags: [ 'status-private' ],
+ 	decorators: formDecorator,
+diff --git a/packages/components/src/validated-form-controls/components/stories/input-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/input-control.story.tsx
+index 90e8c4ddc0bc4c..4f08e48d8e3748 100644
+--- a/packages/components/src/validated-form-controls/components/stories/input-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/input-control.story.tsx
+@@ -22,7 +22,8 @@ import InputControlSuffixWrapper from '../../../input-control/input-suffix-wrapp
+ import { Button } from '../../../button';
+ 
+ const meta: Meta< typeof ValidatedInputControl > = {
+-	title: 'Components (Experimental)/Validated Form Controls/ValidatedInputControl',
++	title: 'Components/Selection & Input/Validated Form Controls/ValidatedInputControl',
++	id: 'components-validatedinputcontrol',
+ 	component: ValidatedInputControl,
+ 	tags: [ 'status-private' ],
+ 	decorators: formDecorator,
+diff --git a/packages/components/src/validated-form-controls/components/stories/number-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/number-control.story.tsx
+index 7efa5acb6d9459..3b28a7e4d86593 100644
+--- a/packages/components/src/validated-form-controls/components/stories/number-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/number-control.story.tsx
+@@ -15,7 +15,8 @@ import { ValidatedNumberControl } from '../number-control';
+ import { formDecorator } from './story-utils';
+ 
+ const meta: Meta< typeof ValidatedNumberControl > = {
+-	title: 'Components (Experimental)/Validated Form Controls/ValidatedNumberControl',
++	title: 'Components/Selection & Input/Validated Form Controls/ValidatedNumberControl',
++	id: 'components-validatednumbercontrol',
+ 	component: ValidatedNumberControl,
+ 	tags: [ 'status-private' ],
+ 	decorators: formDecorator,
+diff --git a/packages/components/src/validated-form-controls/components/stories/overview.mdx b/packages/components/src/validated-form-controls/components/stories/overview.mdx
+index 7836344a8995a9..19666fd44895d0 100644
+--- a/packages/components/src/validated-form-controls/components/stories/overview.mdx
++++ b/packages/components/src/validated-form-controls/components/stories/overview.mdx
+@@ -2,7 +2,7 @@ import { ArgTypes, Meta, Stories } from '@storybook/blocks';
+ import * as OverviewStories from './overview.story';
+ import { ValidatedInputControl } from '..';
+ 
+-<Meta of={ OverviewStories } title="Components (Private)/Validated Form Controls/Overview" />
++<Meta of={ OverviewStories } title="Components/Selection & Input/Validated Form Controls/Overview" />
+ 
+ # Validated Form Controls
+ 
+diff --git a/packages/components/src/validated-form-controls/components/stories/overview.story.tsx b/packages/components/src/validated-form-controls/components/stories/overview.story.tsx
+index d7faf4631a1db6..4b7dcccc8ae4d4 100644
+--- a/packages/components/src/validated-form-controls/components/stories/overview.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/overview.story.tsx
+@@ -16,8 +16,8 @@ import { formDecorator } from './story-utils';
+ import type { ControlWithError } from '../../control-with-error';
+ 
+ const meta: Meta< typeof ControlWithError > = {
+-	title: 'Components (Experimental)/Validated Form Controls/Overview',
+-	tags: [ 'status-private' ],
++	title: 'Components/Selection & Input/Validated Form Controls/Overview',
++	id: 'components-validated-form-controls-overview',
+ 	decorators: formDecorator,
+ };
+ export default meta;
+diff --git a/packages/components/src/validated-form-controls/components/stories/radio-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/radio-control.story.tsx
+index bed3cfacfe5aa1..5f38d32a1d7c39 100644
+--- a/packages/components/src/validated-form-controls/components/stories/radio-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/radio-control.story.tsx
+@@ -15,7 +15,8 @@ import { ValidatedRadioControl } from '../radio-control';
+ import { formDecorator } from './story-utils';
+ 
+ const meta: Meta< typeof ValidatedRadioControl > = {
+-	title: 'Components (Experimental)/Validated Form Controls/ValidatedRadioControl',
++	title: 'Components/Selection & Input/Validated Form Controls/ValidatedRadioControl',
++	id: 'components-validatedradiocontrol',
+ 	component: ValidatedRadioControl,
+ 	tags: [ 'status-private' ],
+ 	decorators: formDecorator,
+diff --git a/packages/components/src/validated-form-controls/components/stories/range-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/range-control.story.tsx
+index 977857bd6007ea..296541475412db 100644
+--- a/packages/components/src/validated-form-controls/components/stories/range-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/range-control.story.tsx
+@@ -15,7 +15,8 @@ import { formDecorator } from './story-utils';
+ import { ValidatedRangeControl } from '../range-control';
+ 
+ const meta: Meta< typeof ValidatedRangeControl > = {
+-	title: 'Components (Experimental)/Validated Form Controls/ValidatedRangeControl',
++	title: 'Components/Selection & Input/Validated Form Controls/ValidatedRangeControl',
++	id: 'components-validatedrangecontrol',
+ 	component: ValidatedRangeControl,
+ 	tags: [ 'status-private' ],
+ 	decorators: formDecorator,
+diff --git a/packages/components/src/validated-form-controls/components/stories/select-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/select-control.story.tsx
+index 093626541934b5..b8d6d434e01b5c 100644
+--- a/packages/components/src/validated-form-controls/components/stories/select-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/select-control.story.tsx
+@@ -15,7 +15,8 @@ import { ValidatedSelectControl } from '../select-control';
+ import { formDecorator } from './story-utils';
+ 
+ const meta: Meta< typeof ValidatedSelectControl > = {
+-	title: 'Components (Experimental)/Validated Form Controls/ValidatedSelectControl',
++	title: 'Components/Selection & Input/Validated Form Controls/ValidatedSelectControl',
++	id: 'components-validatedselectcontrol',
+ 	component: ValidatedSelectControl,
+ 	tags: [ 'status-private' ],
+ 	decorators: formDecorator,
+diff --git a/packages/components/src/validated-form-controls/components/stories/text-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/text-control.story.tsx
+index bf8279fa165f7d..c8f5ab3c0e68cf 100644
+--- a/packages/components/src/validated-form-controls/components/stories/text-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/text-control.story.tsx
+@@ -15,7 +15,8 @@ import { formDecorator } from './story-utils';
+ import { ValidatedTextControl } from '../text-control';
+ 
+ const meta: Meta< typeof ValidatedTextControl > = {
+-	title: 'Components (Experimental)/Validated Form Controls/ValidatedTextControl',
++	title: 'Components/Selection & Input/Validated Form Controls/ValidatedTextControl',
++	id: 'components-validatedtextcontrol',
+ 	component: ValidatedTextControl,
+ 	tags: [ 'status-private' ],
+ 	decorators: formDecorator,
+diff --git a/packages/components/src/validated-form-controls/components/stories/textarea-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/textarea-control.story.tsx
+index e7440db54e0da7..7800286762fe74 100644
+--- a/packages/components/src/validated-form-controls/components/stories/textarea-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/textarea-control.story.tsx
+@@ -14,7 +14,8 @@ import { formDecorator } from './story-utils';
+ import { ValidatedTextareaControl } from '../textarea-control';
+ 
+ const meta: Meta< typeof ValidatedTextareaControl > = {
+-	title: 'Components (Experimental)/Validated Form Controls/ValidatedTextareaControl',
++	title: 'Components/Selection & Input/Validated Form Controls/ValidatedTextareaControl',
++	id: 'components-validatedtextareacontrol',
+ 	component: ValidatedTextareaControl,
+ 	tags: [ 'status-private' ],
+ 	decorators: formDecorator,
+diff --git a/packages/components/src/validated-form-controls/components/stories/toggle-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/toggle-control.story.tsx
+index 1fb0921d137fd8..f38885785a4ae9 100644
+--- a/packages/components/src/validated-form-controls/components/stories/toggle-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/toggle-control.story.tsx
+@@ -15,7 +15,8 @@ import { formDecorator } from './story-utils';
+ import { ValidatedToggleControl } from '../toggle-control';
+ 
+ const meta: Meta< typeof ValidatedToggleControl > = {
+-	title: 'Components (Experimental)/Validated Form Controls/ValidatedToggleControl',
++	title: 'Components/Selection & Input/Validated Form Controls/ValidatedToggleControl',
++	id: 'components-validatedtogglecontrol',
+ 	component: ValidatedToggleControl,
+ 	tags: [ 'status-private' ],
+ 	decorators: formDecorator,
+diff --git a/packages/components/src/validated-form-controls/components/stories/toggle-group-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/toggle-group-control.story.tsx
+index 32d8ed163b3239..0021207eb2011e 100644
+--- a/packages/components/src/validated-form-controls/components/stories/toggle-group-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/toggle-group-control.story.tsx
+@@ -16,7 +16,8 @@ import { ValidatedToggleGroupControl } from '../toggle-group-control';
+ import { ToggleGroupControlOption } from '../../../toggle-group-control';
+ 
+ const meta: Meta< typeof ValidatedToggleGroupControl > = {
+-	title: 'Components (Experimental)/Validated Form Controls/ValidatedToggleGroupControl',
++	title: 'Components/Selection & Input/Validated Form Controls/ValidatedToggleGroupControl',
++	id: 'components-validatedtogglegroupcontrol',
+ 	component: ValidatedToggleGroupControl,
+ 	tags: [ 'status-private' ],
+ 	decorators: formDecorator,
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index e4ae281960b6bc..5ee6ffef7eb2de 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -30,6 +30,10 @@
+ 				from: /\/components-deprecated-/,
+ 				to: '/components-',
+ 			},
++			{
++				from: /\/components-experimental-validated-form-controls-/,
++				to: '/components-',
++			},
+ 			{
+ 				from: new RegExp(
+ 					`\/components-experimental-(?=${ PREVIOUSLY_EXPERIMENTAL_COMPONENTS.map(
+diff --git a/storybook/preview.js b/storybook/preview.js
+index b74640d9bcfbcf..4b54beb8d3eba3 100644
+--- a/storybook/preview.js
++++ b/storybook/preview.js
+@@ -141,11 +141,17 @@ export const parameters = {
+ 					'Navigation',
+ 					'Overlays',
+ 					'Selection & Input',
+-					[ 'Color', 'Common', 'File Upload', 'Time & Date' ],
++					[
++						'Color',
++						'Common',
++						'File Upload',
++						'Time & Date',
++						'Validated Form Controls',
++						[ 'Overview' ],
++					],
+ 					'Typography',
+ 					'Utilities',
+ 				],
+-				'Components (Experimental)',
+ 				[
+ 					'Actions',
+ 					'Layout',

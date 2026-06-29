@@ -1,0 +1,456 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 6beaf2e881b997..0e041262278073 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -85,6 +85,7 @@ module.exports = {
+ 							'findIndex',
+ 							'isArray',
+ 							'isFinite',
++							'isFunction',
+ 							'isUndefined',
+ 							'memoize',
+ 							'negate',
+diff --git a/package-lock.json b/package-lock.json
+index 75e9ef7fe93768..418859a7327b37 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -18138,8 +18138,7 @@
+ 				"@wordpress/i18n": "file:packages/i18n",
+ 				"@wordpress/icons": "file:packages/icons",
+ 				"@wordpress/notices": "file:packages/notices",
+-				"@wordpress/url": "file:packages/url",
+-				"lodash": "^4.17.21"
++				"@wordpress/url": "file:packages/url"
+ 			}
+ 		},
+ 		"@wordpress/rich-text": {
+diff --git a/packages/block-editor/src/components/link-control/search-create-button.js b/packages/block-editor/src/components/link-control/search-create-button.js
+index 679c5df55c0fca..1786b516df5c02 100644
+--- a/packages/block-editor/src/components/link-control/search-create-button.js
++++ b/packages/block-editor/src/components/link-control/search-create-button.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { isFunction } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -25,7 +24,10 @@ export const LinkControlSearchCreate = ( {
+ 
+ 	let text;
+ 	if ( buttonText ) {
+-		text = isFunction( buttonText ) ? buttonText( searchTerm ) : buttonText;
++		text =
++			typeof buttonText === 'function'
++				? buttonText( searchTerm )
++				: buttonText;
+ 	} else {
+ 		text = createInterpolateElement(
+ 			sprintf(
+diff --git a/packages/block-editor/src/components/url-input/index.js b/packages/block-editor/src/components/url-input/index.js
+index f2db4d30077891..846376722cdc84 100644
+--- a/packages/block-editor/src/components/url-input/index.js
++++ b/packages/block-editor/src/components/url-input/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { debounce, isFunction } from 'lodash';
++import { debounce } from 'lodash';
+ import classnames from 'classnames';
+ import scrollIntoView from 'dom-scroll-into-view';
+ 
+@@ -27,6 +27,16 @@ import { isURL } from '@wordpress/url';
+  */
+ import { store as blockEditorStore } from '../../store';
+ 
++/**
++ * Whether the argument is a function.
++ *
++ * @param {*} maybeFunc The argument to check.
++ * @return {boolean} True if the argument is a function, false otherwise.
++ */
++function isFunction( maybeFunc ) {
++	return typeof maybeFunc === 'function';
++}
++
+ class URLInput extends Component {
+ 	constructor( props ) {
+ 		super( props );
+diff --git a/packages/blocks/src/api/raw-handling/utils.js b/packages/blocks/src/api/raw-handling/utils.js
+index de6baf53e518b4..f637a9516c7f8b 100644
+--- a/packages/blocks/src/api/raw-handling/utils.js
++++ b/packages/blocks/src/api/raw-handling/utils.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { mapValues, mergeWith, isFunction } from 'lodash';
++import { mapValues, mergeWith } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -20,7 +20,7 @@ export function getBlockContentSchemaFromTransforms( transforms, context ) {
+ 	const schemas = transforms.map( ( { isMatch, blockName, schema } ) => {
+ 		const hasAnchorSupport = hasBlockSupport( blockName, 'anchor' );
+ 
+-		schema = isFunction( schema ) ? schema( schemaArgs ) : schema;
++		schema = typeof schema === 'function' ? schema( schemaArgs ) : schema;
+ 
+ 		// If the block does not has anchor support and the transform does not
+ 		// provides an isMatch we can return the schema right away.
+diff --git a/packages/blocks/src/api/utils.js b/packages/blocks/src/api/utils.js
+index 1cc87b237cabd6..c96d225504b2b8 100644
+--- a/packages/blocks/src/api/utils.js
++++ b/packages/blocks/src/api/utils.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { every, has, isFunction, isString, reduce, maxBy } from 'lodash';
++import { every, has, isString, reduce, maxBy } from 'lodash';
+ import { colord, extend } from 'colord';
+ import namesPlugin from 'colord/plugins/names';
+ import a11yPlugin from 'colord/plugins/a11y';
+@@ -77,7 +77,7 @@ export function isValidIcon( icon ) {
+ 		!! icon &&
+ 		( isString( icon ) ||
+ 			isValidElement( icon ) ||
+-			isFunction( icon ) ||
++			typeof icon === 'function' ||
+ 			icon instanceof Component )
+ 	);
+ }
+diff --git a/packages/blocks/src/store/actions.js b/packages/blocks/src/store/actions.js
+index 832e2827eece04..3372a8c4ba0e98 100644
+--- a/packages/blocks/src/store/actions.js
++++ b/packages/blocks/src/store/actions.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { castArray, isFunction, isPlainObject, omit, pick, some } from 'lodash';
++import { castArray, isPlainObject, omit, pick, some } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -30,6 +30,16 @@ const LEGACY_CATEGORY_MAPPING = {
+ 	layout: 'design',
+ };
+ 
++/**
++ * Whether the argument is a function.
++ *
++ * @param {*} maybeFunc The argument to check.
++ * @return {boolean} True if the argument is a function, false otherwise.
++ */
++function isFunction( maybeFunc ) {
++	return typeof maybeFunc === 'function';
++}
++
+ /**
+  * Takes the unprocessed block type data and applies all the existing filters for the registered block type.
+  * Next, it validates all the settings and performs additional processing to the block type definition.
+diff --git a/packages/components/src/dimension-control/index.js b/packages/components/src/dimension-control/index.js
+index 0ed09d86014f52..9c22ba7487c9e4 100644
+--- a/packages/components/src/dimension-control/index.js
++++ b/packages/components/src/dimension-control/index.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { isFunction } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -35,7 +34,7 @@ export function DimensionControl( props ) {
+ 
+ 		if ( ! theSize || value === theSize.slug ) {
+ 			onChange( undefined );
+-		} else if ( isFunction( onChange ) ) {
++		} else if ( typeof onChange === 'function' ) {
+ 			onChange( theSize.slug );
+ 		}
+ 	};
+diff --git a/packages/components/src/dropdown-menu/index.js b/packages/components/src/dropdown-menu/index.js
+index 85983f92305aca..eff41fee62cc29 100644
+--- a/packages/components/src/dropdown-menu/index.js
++++ b/packages/components/src/dropdown-menu/index.js
+@@ -3,7 +3,7 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { flatMap, isEmpty, isFunction } from 'lodash';
++import { flatMap, isEmpty } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -34,6 +34,16 @@ function mergeProps( defaultProps = {}, props = {} ) {
+ 	return mergedProps;
+ }
+ 
++/**
++ * Whether the argument is a function.
++ *
++ * @param {*} maybeFunc The argument to check.
++ * @return {boolean} True if the argument is a function, false otherwise.
++ */
++function isFunction( maybeFunc ) {
++	return typeof maybeFunc === 'function';
++}
++
+ function DropdownMenu( dropdownMenuProps ) {
+ 	const {
+ 		children,
+diff --git a/packages/components/src/dropdown-menu/index.native.js b/packages/components/src/dropdown-menu/index.native.js
+index 56e2b1ed88ecd5..848b51062f03ae 100644
+--- a/packages/components/src/dropdown-menu/index.native.js
++++ b/packages/components/src/dropdown-menu/index.native.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { flatMap, isEmpty, isFunction } from 'lodash';
++import { flatMap, isEmpty } from 'lodash';
+ import { Platform } from 'react-native';
+ /**
+  * WordPress dependencies
+@@ -34,6 +34,16 @@ function mergeProps( defaultProps = {}, props = {} ) {
+ 	return mergedProps;
+ }
+ 
++/**
++ * Whether the argument is a function.
++ *
++ * @param {*} maybeFunc The argument to check.
++ * @return {boolean} True if the argument is a function, false otherwise.
++ */
++function isFunction( maybeFunc ) {
++	return typeof maybeFunc === 'function';
++}
++
+ function DropdownMenu( {
+ 	children,
+ 	className,
+diff --git a/packages/components/src/higher-order/with-spoken-messages/test/index.js b/packages/components/src/higher-order/with-spoken-messages/test/index.js
+index f6d90b2a418cd2..e8d6932e0dc85e 100644
+--- a/packages/components/src/higher-order/with-spoken-messages/test/index.js
++++ b/packages/components/src/higher-order/with-spoken-messages/test/index.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import { render } from 'enzyme';
+-import { isFunction } from 'lodash';
+ 
+ /**
+  * Internal dependencies
+@@ -13,6 +12,7 @@ describe( 'withSpokenMessages', () => {
+ 	it( 'should generate speak and debouncedSpeak props', () => {
+ 		const testSpeak = jest.fn();
+ 		const testDebouncedSpeak = jest.fn();
++		const isFunction = ( maybeFunc ) => typeof maybeFunc === 'function';
+ 		const DumpComponent = withSpokenMessages(
+ 			( { speak, debouncedSpeak } ) => {
+ 				testSpeak( isFunction( speak ) );
+diff --git a/packages/components/src/navigable-container/container.js b/packages/components/src/navigable-container/container.js
+index c74ad66ba372e2..a4e7377681049d 100644
+--- a/packages/components/src/navigable-container/container.js
++++ b/packages/components/src/navigable-container/container.js
+@@ -2,7 +2,7 @@
+ /**
+  * External dependencies
+  */
+-import { omit, isFunction } from 'lodash';
++import { omit } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -53,7 +53,7 @@ class NavigableContainer extends Component {
+ 		const { forwardedRef } = this.props;
+ 		this.container = ref;
+ 
+-		if ( isFunction( forwardedRef ) ) {
++		if ( typeof forwardedRef === 'function' ) {
+ 			forwardedRef( ref );
+ 		} else if ( forwardedRef && 'current' in forwardedRef ) {
+ 			forwardedRef.current = ref;
+diff --git a/packages/components/src/slot-fill/fill.js b/packages/components/src/slot-fill/fill.js
+index dce1f53eb3d165..77188ab8a16144 100644
+--- a/packages/components/src/slot-fill/fill.js
++++ b/packages/components/src/slot-fill/fill.js
+@@ -1,8 +1,4 @@
+ // @ts-nocheck
+-/**
+- * External dependencies
+- */
+-import { isFunction } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -50,7 +46,7 @@ function FillComponent( { name, children, registerFill, unregisterFill } ) {
+ 	}
+ 
+ 	// If a function is passed as a child, provide it with the fillProps.
+-	if ( isFunction( children ) ) {
++	if ( typeof children === 'function' ) {
+ 		children = children( slot.props.fillProps );
+ 	}
+ 
+diff --git a/packages/components/src/slot-fill/slot.js b/packages/components/src/slot-fill/slot.js
+index 0d8130895f3219..1227b0fed1fc7b 100644
+--- a/packages/components/src/slot-fill/slot.js
++++ b/packages/components/src/slot-fill/slot.js
+@@ -2,7 +2,7 @@
+ /**
+  * External dependencies
+  */
+-import { isFunction, isString, map } from 'lodash';
++import { isString, map } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -19,6 +19,16 @@ import {
+  */
+ import SlotFillContext from './context';
+ 
++/**
++ * Whether the argument is a function.
++ *
++ * @param {*} maybeFunc The argument to check.
++ * @return {boolean} True if the argument is a function, false otherwise.
++ */
++function isFunction( maybeFunc ) {
++	return typeof maybeFunc === 'function';
++}
++
+ class SlotComponent extends Component {
+ 	constructor() {
+ 		super( ...arguments );
+diff --git a/packages/components/src/toggle-control/index.js b/packages/components/src/toggle-control/index.js
+index 16615c4fb3282c..67e8ba5c25bb61 100644
+--- a/packages/components/src/toggle-control/index.js
++++ b/packages/components/src/toggle-control/index.js
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import { isFunction } from 'lodash';
+ import classnames from 'classnames';
+ 
+ /**
+@@ -32,7 +31,7 @@ export default function ToggleControl( {
+ 	let describedBy, helpLabel;
+ 	if ( help ) {
+ 		describedBy = id + '__help';
+-		helpLabel = isFunction( help ) ? help( checked ) : help;
++		helpLabel = typeof help === 'function' ? help( checked ) : help;
+ 	}
+ 
+ 	return (
+diff --git a/packages/components/src/toggle-control/index.native.js b/packages/components/src/toggle-control/index.native.js
+index 043ba2dd5d40f5..e94608e527a801 100644
+--- a/packages/components/src/toggle-control/index.native.js
++++ b/packages/components/src/toggle-control/index.native.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { isFunction } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -16,7 +11,8 @@ const ToggleControl = memo(
+ 	( { label, checked, help, instanceId, className, onChange, ...props } ) => {
+ 		const id = `inspector-toggle-control-${ instanceId }`;
+ 
+-		const helpLabel = help && isFunction( help ) ? help( checked ) : help;
++		const helpLabel =
++			help && typeof help === 'function' ? help( checked ) : help;
+ 
+ 		return (
+ 			<SwitchCell
+diff --git a/packages/core-data/src/batch/create-batch.js b/packages/core-data/src/batch/create-batch.js
+index 380637545528f5..b99968759f3e5c 100644
+--- a/packages/core-data/src/batch/create-batch.js
++++ b/packages/core-data/src/batch/create-batch.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { isFunction, zip } from 'lodash';
++import { zip } from 'lodash';
+ 
+ /**
+  * Internal dependencies
+@@ -88,7 +88,7 @@ export default function createBatch( processor = defaultProcessor ) {
+ 					pending.delete( id );
+ 				} );
+ 
+-			if ( isFunction( inputOrThunk ) ) {
++			if ( typeof inputOrThunk === 'function' ) {
+ 				return Promise.resolve( inputOrThunk( add ) ).finally( () => {
+ 					pending.delete( id );
+ 				} );
+diff --git a/packages/plugins/src/api/index.js b/packages/plugins/src/api/index.js
+index dd7680f7e7f5f4..3e6a3f2b16c9d0 100644
+--- a/packages/plugins/src/api/index.js
++++ b/packages/plugins/src/api/index.js
+@@ -6,11 +6,6 @@
+ import { applyFilters, doAction } from '@wordpress/hooks';
+ import { plugins as pluginsIcon } from '@wordpress/icons';
+ 
+-/**
+- * External dependencies
+- */
+-import { isFunction } from 'lodash';
+-
+ /**
+  * Defined behavior of a plugin type.
+  *
+@@ -135,7 +130,7 @@ export function registerPlugin( name, settings ) {
+ 
+ 	const { render, scope } = settings;
+ 
+-	if ( ! isFunction( render ) ) {
++	if ( typeof render !== 'function' ) {
+ 		console.error(
+ 			'The "render" property must be specified and must be a valid function.'
+ 		);
+diff --git a/packages/reusable-blocks/package.json b/packages/reusable-blocks/package.json
+index 7bd2a3778c5511..f607d324a6cb41 100644
+--- a/packages/reusable-blocks/package.json
++++ b/packages/reusable-blocks/package.json
+@@ -37,8 +37,7 @@
+ 		"@wordpress/i18n": "file:../i18n",
+ 		"@wordpress/icons": "file:../icons",
+ 		"@wordpress/notices": "file:../notices",
+-		"@wordpress/url": "file:../url",
+-		"lodash": "^4.17.21"
++		"@wordpress/url": "file:../url"
+ 	},
+ 	"peerDependencies": {
+ 		"react": "^17.0.0",
+diff --git a/packages/reusable-blocks/src/store/actions.js b/packages/reusable-blocks/src/store/actions.js
+index ed5f4f26e5f16b..1c4825dbcb700f 100644
+--- a/packages/reusable-blocks/src/store/actions.js
++++ b/packages/reusable-blocks/src/store/actions.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { isFunction } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -33,7 +28,7 @@ export const __experimentalConvertBlockToStatic = ( clientId ) => ( {
+ 		);
+ 
+ 	const newBlocks = parse(
+-		isFunction( reusableBlock.content )
++		typeof reusableBlock.content === 'function'
+ 			? reusableBlock.content( reusableBlock )
+ 			: reusableBlock.content
+ 	);

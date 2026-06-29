@@ -1,0 +1,15 @@
+diff --git a/packages/components/src/menu/test/index.tsx b/packages/components/src/menu/test/index.tsx
+index 9bd2aeab9414e6..d1d4e665b9d657 100644
+--- a/packages/components/src/menu/test/index.tsx
++++ b/packages/components/src/menu/test/index.tsx
+@@ -180,7 +180,9 @@ describe( 'Menu', () => {
+ 			// Menu closed
+ 			expect( screen.queryByRole( 'menuitem' ) ).not.toBeInTheDocument();
+ 
+-			await press.Space();
++			// Keyboard-triggered clicks have `detail: 0`, which Ariakit uses to
++			// choose the initial item focus path instead of the pointer path.
++			await press.Space( toggleButton, { detail: 0 } );
+ 
+ 			// Menu open, focus is on the first focusable item
+ 			await waitForFocusedMenuItem( 'First item' );

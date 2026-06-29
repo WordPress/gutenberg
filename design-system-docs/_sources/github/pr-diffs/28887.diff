@@ -1,0 +1,419 @@
+diff --git a/packages/components/src/button/test/index.js b/packages/components/src/button/test/index.js
+index de027bbe41fed8..7c16354c42e8de 100644
+--- a/packages/components/src/button/test/index.js
++++ b/packages/components/src/button/test/index.js
+@@ -13,6 +13,7 @@ import { plusCircle } from '@wordpress/icons';
+  * Internal dependencies
+  */
+ import ButtonWithForwardedRef, { Button } from '../';
++import VisuallyHidden from '../../visually-hidden';
+ 
+ describe( 'Button', () => {
+ 	describe( 'basic rendering', () => {
+@@ -135,7 +136,7 @@ describe( 'Button', () => {
+ 			const buttonDescription = shallow(
+ 				<Button describedBy="Description text" />
+ 			)
+-				.find( 'VisuallyHidden' )
++				.find( VisuallyHidden )
+ 				.shallow()
+ 				.text();
+ 			expect( buttonDescription ).toBe( 'Description text' );
+diff --git a/packages/components/src/ui/index.js b/packages/components/src/ui/index.js
+index da9767cf37496b..82998e48cc5b2c 100644
+--- a/packages/components/src/ui/index.js
++++ b/packages/components/src/ui/index.js
+@@ -6,3 +6,4 @@ export * from './text';
+ export * from './truncate';
+ export * from './v-stack';
+ export * from './view';
++export * from './visually-hidden';
+diff --git a/packages/components/src/ui/visually-hidden/component.js b/packages/components/src/ui/visually-hidden/component.js
+new file mode 100644
+index 00000000000000..cdb36fc474ca68
+--- /dev/null
++++ b/packages/components/src/ui/visually-hidden/component.js
+@@ -0,0 +1,23 @@
++/**
++ * Internal dependencies
++ */
++import { createComponent } from '../utils';
++import { useVisuallyHidden } from './hook';
++
++/**
++ * `VisuallyHidden` is used hide content from the visual client, but keep it readable for screen readers.
++ *
++ * @example
++ * ```jsx
++ * <VisuallyHidden>
++ *  <Text>Hidding</Text>
++ * </VisuallyHidden>
++ * ```
++ */
++const VisuallyHidden = createComponent( {
++	as: 'div',
++	useHook: useVisuallyHidden,
++	name: 'VisuallyHidden',
++} );
++
++export default VisuallyHidden;
+diff --git a/packages/components/src/ui/visually-hidden/hook.js b/packages/components/src/ui/visually-hidden/hook.js
+new file mode 100644
+index 00000000000000..b9bbb10919f44e
+--- /dev/null
++++ b/packages/components/src/ui/visually-hidden/hook.js
+@@ -0,0 +1,28 @@
++/**
++ * External dependencies
++ */
++import { cx } from '@wp-g2/styles';
++
++/**
++ * Internal dependencies
++ */
++import * as styles from './styles';
++
++/** @typedef {import('@wp-g2/create-styles').ViewOwnProps<{}, 'div'>} Props */
++
++/**
++ * @param {Props} props
++ */
++export function useVisuallyHidden( { className, ...props } ) {
++	// circumvent the context system and write the classnames ourselves
++	const classes = cx(
++		'components-visually-hidden wp-components-visually-hidden',
++		className,
++		styles.VisuallyHidden
++	);
++
++	return {
++		className: classes,
++		...props,
++	};
++}
+diff --git a/packages/components/src/ui/visually-hidden/index.js b/packages/components/src/ui/visually-hidden/index.js
+new file mode 100644
+index 00000000000000..8bbed8b73ac9eb
+--- /dev/null
++++ b/packages/components/src/ui/visually-hidden/index.js
+@@ -0,0 +1,2 @@
++export { default as VisuallyHidden } from './component';
++export * from './hook';
+diff --git a/packages/components/src/ui/visually-hidden/stories/index.js b/packages/components/src/ui/visually-hidden/stories/index.js
+new file mode 100644
+index 00000000000000..b5f55c1fa1d24d
+--- /dev/null
++++ b/packages/components/src/ui/visually-hidden/stories/index.js
+@@ -0,0 +1,42 @@
++/**
++ * Internal dependencies
++ */
++import { VisuallyHidden } from '..';
++
++export default {
++	title: 'G2 Components (Experimental)/VisuallyHidden',
++	component: VisuallyHidden,
++};
++
++export const _default = () => (
++	<>
++		<VisuallyHidden>This should not show.</VisuallyHidden>
++		<div>
++			This text will{ ' ' }
++			<VisuallyHidden as="span">but not inline </VisuallyHidden> always
++			show.
++		</div>
++	</>
++);
++
++export const withForwardedProps = () => (
++	<>
++		Additional props can be passed to VisuallyHidden and are forwarded to
++		the rendered element.{ ' ' }
++		<VisuallyHidden as="span" data-id="test">
++			Check out my data attribute!{ ' ' }
++		</VisuallyHidden>
++		Inspect the HTML to see!
++	</>
++);
++
++export const withAdditionalClassNames = () => (
++	<>
++		Additional class names passed to VisuallyHidden extend the component
++		class name.{ ' ' }
++		<VisuallyHidden as="label" className="test-input">
++			Check out my class!{ ' ' }
++		</VisuallyHidden>
++		Inspect the HTML to see!
++	</>
++);
+diff --git a/packages/components/src/ui/visually-hidden/styles.js b/packages/components/src/ui/visually-hidden/styles.js
+new file mode 100644
+index 00000000000000..870f46950cecc5
+--- /dev/null
++++ b/packages/components/src/ui/visually-hidden/styles.js
+@@ -0,0 +1,35 @@
++/**
++ * External dependencies
++ */
++import { css, ui } from '@wp-g2/styles';
++
++export const VisuallyHidden = css`
++	border: 0;
++	clip: rect( 1px, 1px, 1px, 1px );
++	-webkit-clip-path: inset( 50% );
++	clip-path: inset( 50% );
++	height: 1px;
++	margin: -1px;
++	overflow: hidden;
++	padding: 0;
++	position: absolute;
++	width: 1px;
++	word-wrap: normal !important;
++
++	&:focus {
++		background-color: ${ ui.get( 'lightGray300' ) };
++		clip: auto !important;
++		clip-path: none;
++		color: #444;
++		display: block;
++		font-size: 1em;
++		height: auto;
++		left: 5px;
++		line-height: normal;
++		padding: 15px 23px 14px;
++		text-decoration: none;
++		top: 5px;
++		width: auto;
++		z-index: 100000;
++	}
++`;
+diff --git a/packages/components/src/ui/visually-hidden/test/__snapshots__/index.js.snap b/packages/components/src/ui/visually-hidden/test/__snapshots__/index.js.snap
+new file mode 100644
+index 00000000000000..82b4c5c16f38cf
+--- /dev/null
++++ b/packages/components/src/ui/visually-hidden/test/__snapshots__/index.js.snap
+@@ -0,0 +1,68 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`VisuallyHidden should render correctly 1`] = `
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  border: 0;
++  -webkit-clip: rect( 1px,1px,1px,1px );
++  clip: rect( 1px,1px,1px,1px );
++  -webkit-clip-path: inset( 50% );
++  -webkit-clip-path: inset( 50% );
++  clip-path: inset( 50% );
++  height: 1px;
++  margin: -1px;
++  overflow: hidden;
++  padding: 0;
++  position: absolute;
++  width: 1px;
++  word-wrap: normal !important;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0:focus {
++  background-color: #edeff0;
++  background-color: var(--wp-g2-light-gray-300);
++  -webkit-clip: auto !important;
++  clip: auto !important;
++  -webkit-clip-path: none;
++  clip-path: none;
++  color: #444;
++  display: block;
++  font-size: 1em;
++  height: auto;
++  left: 5px;
++  line-height: normal;
++  padding: 15px 23px 14px;
++  -webkit-text-decoration: none;
++  text-decoration: none;
++  top: 5px;
++  width: auto;
++  z-index: 100000;
++}
++
++<div
++  class="components-visually-hidden wp-components-visually-hidden emotion-0"
++>
++  This is hidden
++</div>
++`;
+diff --git a/packages/components/src/ui/visually-hidden/test/index.js b/packages/components/src/ui/visually-hidden/test/index.js
+new file mode 100644
+index 00000000000000..6925edbee9eefb
+--- /dev/null
++++ b/packages/components/src/ui/visually-hidden/test/index.js
+@@ -0,0 +1,29 @@
++/**
++ * External dependencies
++ */
++import { render } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { VisuallyHidden, useVisuallyHidden } from '..';
++
++describe( 'useVisuallyHidden', () => {
++	it( 'should apply the expected classnames', () => {
++		const { className } = useVisuallyHidden( {
++			className: 'my-custom-classname',
++		} );
++		expect( className ).toContain( 'my-custom-classname' );
++		expect( className ).toContain( 'components-visually-hidden' );
++	} );
++} );
++
++describe( 'VisuallyHidden', () => {
++	it( 'should render correctly', () => {
++		const { container } = render(
++			<VisuallyHidden>This is hidden</VisuallyHidden>
++		);
++
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++} );
+diff --git a/packages/components/src/visually-hidden/index.js b/packages/components/src/visually-hidden/index.js
+index 5ce7e3ff6cca2e..92801940d38b9c 100644
+--- a/packages/components/src/visually-hidden/index.js
++++ b/packages/components/src/visually-hidden/index.js
+@@ -3,10 +3,16 @@
+  */
+ import classnames from 'classnames';
+ 
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
+ /**
+  * Internal dependencies
+  */
+ import { renderAsRenderProps } from './utils';
++import { withNextComponent } from './next';
+ 
+ /**
+  * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T
+@@ -16,23 +22,25 @@ import { renderAsRenderProps } from './utils';
+ 
+ /**
+  * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T
+- * @typedef {OwnProps<T> & import('react').ComponentProps<T>} Props
++ * @typedef {OwnProps<T> & import('react').ComponentPropsWithRef<T>} Props
+  */
+ 
+ /**
+  * VisuallyHidden component to render text out non-visually
+  * for use in devices such as a screen reader.
+  *
+- * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T
+- *
++ * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T T
+  * @param {Props<T>} props
++ * @param {import('react').Ref<any>} forwardedRef
+  * @return {JSX.Element} Element
+  */
+-function VisuallyHidden( { as = 'div', className, ...props } ) {
++function VisuallyHidden( { as = 'div', className, ...props }, forwardedRef ) {
+ 	return renderAsRenderProps( {
+ 		as,
+ 		className: classnames( 'components-visually-hidden', className ),
+ 		...props,
++		ref: forwardedRef,
+ 	} );
+ }
+-export default VisuallyHidden;
++
++export default withNextComponent( forwardRef( VisuallyHidden ) );
+diff --git a/packages/components/src/visually-hidden/next.js b/packages/components/src/visually-hidden/next.js
+new file mode 100644
+index 00000000000000..088f90f6be5ed6
+--- /dev/null
++++ b/packages/components/src/visually-hidden/next.js
+@@ -0,0 +1,31 @@
++/**
++ * Internal dependencies
++ */
++import { VisuallyHidden as NextVisuallyHidden } from '../ui/visually-hidden';
++import { withNext } from '../ui/context';
++
++const VisuallyHidden =
++	process.env.COMPONENT_SYSTEM_PHASE === 1 ? NextVisuallyHidden : undefined;
++
++/**
++ * There is nothing to adapt, the props are equal.
++ *
++ * @param {import('.').Props<any>} props
++ * @return {import('../ui/visually-hidden/hook').Props} Adapted props
++ */
++const adapter = ( props ) =>
++	/** @type {import('../ui/visually-hidden/hook').Props} */ ( props );
++
++/**
++ * The generic type is too difficult to type here, default to any to circumvent that.
++ *
++ * @param {import('react').ForwardRefExoticComponent<import('.').Props<any>>} Current
++ */
++export function withNextComponent( Current ) {
++	return withNext(
++		Current,
++		VisuallyHidden,
++		'WPComponentsVisuallyHidden',
++		adapter
++	);
++}
+diff --git a/packages/editor/src/components/post-preview-button/test/__snapshots__/index.js.snap b/packages/editor/src/components/post-preview-button/test/__snapshots__/index.js.snap
+index e03484534e4ab0..220042a8a41aa7 100644
+--- a/packages/editor/src/components/post-preview-button/test/__snapshots__/index.js.snap
++++ b/packages/editor/src/components/post-preview-button/test/__snapshots__/index.js.snap
+@@ -10,11 +10,11 @@ exports[`PostPreviewButton render() should render currentPostLink otherwise 1`]
+   target="wp-preview-1"
+ >
+   Preview
+-  <VisuallyHidden
++  <ForwardRef(VisuallyHidden)
+     as="span"
+   >
+     (opens in a new tab)
+-  </VisuallyHidden>
++  </ForwardRef(VisuallyHidden)>
+ </ForwardRef(Button)>
+ `;
+ 
+@@ -28,10 +28,10 @@ exports[`PostPreviewButton render() should render previewLink if provided 1`] =
+   target="wp-preview-1"
+ >
+   Preview
+-  <VisuallyHidden
++  <ForwardRef(VisuallyHidden)
+     as="span"
+   >
+     (opens in a new tab)
+-  </VisuallyHidden>
++  </ForwardRef(VisuallyHidden)>
+ </ForwardRef(Button)>
+ `;

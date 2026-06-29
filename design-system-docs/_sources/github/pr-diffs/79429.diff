@@ -1,0 +1,533 @@
+diff --git a/package-lock.json b/package-lock.json
+index 7002d864773175..cd8b086c5497fd 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -47681,9 +47681,6 @@
+ 			"name": "@wordpress/base-styles",
+ 			"version": "10.0.1",
+ 			"license": "GPL-2.0-or-later",
+-			"dependencies": {
+-				"@wordpress/theme": "file:../theme"
+-			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+ 				"npm": ">=8.19.2"
+diff --git a/packages/base-styles/CHANGELOG.md b/packages/base-styles/CHANGELOG.md
+index 60372ccf7ebd9d..4c1c5db4c0ae88 100644
+--- a/packages/base-styles/CHANGELOG.md
++++ b/packages/base-styles/CHANGELOG.md
+@@ -2,10 +2,6 @@
+ 
+ ## Unreleased
+ 
+-### Enhancements
+-
+--   Add `outset-ring__focus` mixin for outline-based focus rings using `--wpds-*` design tokens ([#78698](https://github.com/WordPress/gutenberg/pull/78698)).
+-
+ ## 10.0.1 (2026-06-16)
+ 
+ ## 10.0.0 (2026-06-10)
+diff --git a/packages/base-styles/_mixins.scss b/packages/base-styles/_mixins.scss
+index 2347b13a7d7e71..8732b3796fe3dd 100644
+--- a/packages/base-styles/_mixins.scss
++++ b/packages/base-styles/_mixins.scss
+@@ -4,7 +4,6 @@
+ 
+ @use "sass:color";
+ @use "sass:math";
+-@use "@wordpress/theme/src/prebuilt/scss/design-token-fallbacks" as wpds;
+ @use "./variables";
+ @use "./colors";
+ @use "./breakpoints";
+@@ -181,19 +180,6 @@
+ }
+ 
+ 
+-/**
+- * Standard focus rings for the WordPress Design System.
+-
+- * Apply `outset-ring__focus` inside the relevant pseudo-class at the call site,
+- * e.g. `&:focus { @include outset-ring__focus(); }`.
+- */
+-
+-@mixin outset-ring__focus() {
+-	outline: wpds.wpds-var("--wpds-border-width-focus") solid wpds.wpds-var("--wpds-color-stroke-focus");
+-	outline-offset: wpds.wpds-var("--wpds-border-width-focus");
+-}
+-
+-
+ /**
+  * Applies editor left position to the selector passed as argument
+  */
+diff --git a/packages/base-styles/package.json b/packages/base-styles/package.json
+index 72c03a4cc9b241..6fec945c1a4b4c 100644
+--- a/packages/base-styles/package.json
++++ b/packages/base-styles/package.json
+@@ -41,9 +41,6 @@
+ 		"./z-index": "./_z-index.scss"
+ 	},
+ 	"wpScript": true,
+-	"dependencies": {
+-		"@wordpress/theme": "file:../theme"
+-	},
+ 	"publishConfig": {
+ 		"access": "public"
+ 	}
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index 8021842db5e448..df6a1003c945aa 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -12,7 +12,6 @@
+ -   Add `--wpds-border-radius-xl` for page and app shell surfaces so nested cards and notices can stay on `--wpds-border-radius-lg` without matching the parent radius ([#78913](https://github.com/WordPress/gutenberg/pull/78913)).
+ -   Add `cornerRadius` prop to `ThemeProvider` for configuring the border-radius preset (`none`, `subtle`, `moderate`, `pronounced`) via prebuilt design token modes. [#78816](https://github.com/WordPress/gutenberg/pull/78816).
+ -   Add disabled variants for the `brand` and `error` tones of the interactive `background`, `foreground`, and `stroke` color tokens (e.g. `--wpds-color-stroke-interactive-brand-disabled`, `--wpds-color-background-interactive-brand-strong-disabled`), for parity with the existing `neutral` disabled tokens ([#79124](https://github.com/WordPress/gutenberg/pull/79124)).
+--   Export `@wordpress/theme/design-token-fallbacks` with a generated `wpds-var()` Sass function for compile-time design token fallback injection ([#78698](https://github.com/WordPress/gutenberg/pull/78698)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/theme/README.md b/packages/theme/README.md
+index 79f284c30f316b..a569fa6f00a5d9 100644
+--- a/packages/theme/README.md
++++ b/packages/theme/README.md
+@@ -54,11 +54,9 @@ If your application renders React content into additional documents (an iframe,
+ 
+ ### Developer Tools
+ 
+-For the best development experience, we recommend configuring the [Stylelint rules](#stylelint-plugins) provided by this package. The Stylelint rules catch typos, unknown tokens, and other discouraged patterns during development.
++For the best development experience, we recommend configuring the [build plugins](#build-plugins) and [Stylelint rules](#stylelint-plugins) provided by this package. The build plugins automatically inject fallback values into `var(--wpds-*)` references so components render correctly even when the tokens stylesheet is not yet loaded, and will raise an error if a reference does not match a known token. The Stylelint rules catch typos, unknown tokens, and other discouraged patterns during development.
+ 
+-If you reference `--wpds-*` tokens in CSS or JS/TS source, use the [build plugins](#build-plugins) to inject fallback values at build time so components render correctly even when the tokens stylesheet is not loaded. If you use `@wordpress/build`, these plugins are already enabled by default when `@wordpress/theme` is installed.
+-
+-If you write Sass/SCSS but cannot load the design tokens stylesheet, add build plugins to your pipeline, or use `@wordpress/build`, use the [Sass helper](#sass-helper) instead.
++If you use `@wordpress/build` to build your scripts, the build plugins are already enabled by default.
+ 
+ ## Theme Provider
+ 
+@@ -230,9 +228,7 @@ This rule reports an error when a CSS declaration sets (defines) a custom proper
+ 
+ ### `plugin-wpds/no-token-fallback-values`
+ 
+-This rule reports an error when a `var()` call for a `--wpds-*` token includes a manual fallback value. In CSS processed by the [build plugins](#build-plugins), fallback values are injected automatically, so manual fallbacks in `var(--wpds-*)` references are redundant and can drift out of sync with the token definitions.
+-
+-For Sass sources that cannot use the build plugins, use the [Sass helper](#sass-helper) instead of writing manual fallback values.
++This rule reports an error when a `var()` call for a `--wpds-*` token includes a manual fallback value. Fallback values for design tokens are injected automatically at build time by the [build plugins](#build-plugins), so manual fallbacks in source are redundant and can drift out of sync with the token definitions.
+ 
+ ```css
+ /* ✗ Error: Do not add a fallback value for Design System token '--wpds-color-foreground-content-neutral' */
+@@ -308,34 +304,6 @@ export default defineConfig( {
+ } );
+ ```
+ 
+-## Sass helper
+-
+-An alternative to loading the [design tokens stylesheet](#outside-wordpress), using the [build plugins](#build-plugins), or `@wordpress/build`. Use it when you write Sass/SCSS and cannot change your build setup to support any of those options.
+-
+-You do not need this helper if you already load the design tokens stylesheet or use fallback injection via the build plugins or `@wordpress/build`. In those cases, write bare `var(--wpds-*)` references in your source.
+-
+-The `@wordpress/theme/design-token-fallbacks` export provides a generated `wpds-var()` function that wraps token references with the same fallback map used by the build plugins — for example, `wpds.wpds-var('--wpds-color-fg-content-neutral')` compiles to `var(--wpds-color-fg-content-neutral, #1e1e1e)`.
+-
+-```scss
+-@use '@wordpress/theme/design-token-fallbacks' as wpds;
+-
+-.example {
+-	color: wpds.wpds-var( '--wpds-color-fg-content-neutral' );
+-}
+-```
+-
+-When using Sass with [`NodePackageImporter`](https://sass-lang.com/documentation/js-api/classes/nodepackageimporter/), you can import via the `pkg:` scheme:
+-
+-```scss
+-@use 'pkg:@wordpress/theme/design-token-fallbacks' as wpds;
+-```
+-
+-For Sass setups that resolve packages from `node_modules` with a load path, use:
+-
+-```scss
+-@use '@wordpress/theme/src/prebuilt/scss/design-token-fallbacks' as wpds;
+-```
+-
+ ## Contributing to this package
+ 
+ This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+diff --git a/packages/theme/bin/terrazzo-plugin-ds-token-fallbacks/index.ts b/packages/theme/bin/terrazzo-plugin-ds-token-fallbacks/index.ts
+index 77942d72b13d1b..1cf7c2625a6b67 100644
+--- a/packages/theme/bin/terrazzo-plugin-ds-token-fallbacks/index.ts
++++ b/packages/theme/bin/terrazzo-plugin-ds-token-fallbacks/index.ts
+@@ -186,50 +186,8 @@ export function computeBrandFallback( stepHex: string ): string {
+ 	}%, ${ mixWith })`;
+ }
+ 
+-function escapeScssString( value: string ): string {
+-	return value.replace( /\\/g, '\\\\' ).replace( /'/g, "\\'" );
+-}
+-
+-export function formatDesignTokenFallbacksScss(
+-	fallbacks: Record< string, string >
+-): string {
+-	const mapEntries = Object.entries( fallbacks )
+-		.map( ( [ token, fallback ] ) => {
+-			if ( fallback.includes( '#{' ) ) {
+-				throw new Error(
+-					`Sass interpolation syntax is not supported in design token fallbacks: ${ token }`
+-				);
+-			}
+-
+-			return `\t'${ token }': '${ escapeScssString( fallback ) }'`;
+-		} )
+-		.join( ',\n' );
+-
+-	return [
+-		'// This file is generated by the @wordpress/terrazzo-plugin-ds-token-fallbacks plugin.',
+-		'// Do not edit this file directly.',
+-		'',
+-		'@use "sass:map";',
+-		'@use "sass:string";',
+-		'',
+-		'$fallbacks: (',
+-		mapEntries,
+-		');',
+-		'',
+-		'@function wpds-var($token) {',
+-		'\t@if not map.has-key($fallbacks, $token) {',
+-		'\t\t@error "Unknown design token: #{$token}";',
+-		'\t}',
+-		'',
+-		'\t@return string.unquote("var(#{$token}, #{map.get($fallbacks, $token)})");',
+-		'}',
+-		'',
+-	].join( '\n' );
+-}
+-
+ export default function pluginDsTokenFallbacks( {
+ 	filename = 'js/design-token-fallbacks.mjs',
+-	scssFilename = 'scss/design-token-fallbacks.scss',
+ } = {} ): Plugin {
+ 	return {
+ 		name: '@wordpress/terrazzo-plugin-ds-token-fallbacks',
+@@ -322,24 +280,17 @@ export default function pluginDsTokenFallbacks( {
+ 				)
+ 			);
+ 
+-			const generatedHeader = [
+-				'/*',
+-				' * This file is generated by the @wordpress/terrazzo-plugin-ds-token-fallbacks plugin.',
+-				' * Do not edit this file directly.',
+-				' */',
+-				'',
+-			].join( '\n' );
+-
+ 			outputFile(
+ 				filename,
+-				generatedHeader +
+-					`export default ${ JSON.stringify( sorted, null, '\t' ) }` +
+-					'\n'
+-			);
+-
+-			outputFile(
+-				scssFilename,
+-				formatDesignTokenFallbacksScss( sorted )
++				[
++					'/*',
++					' * This file is generated by the @wordpress/terrazzo-plugin-ds-token-fallbacks plugin.',
++					' * Do not edit this file directly.',
++					' */',
++					'',
++					`export default ${ JSON.stringify( sorted, null, '\t' ) }`,
++					'',
++				].join( '\n' )
+ 			);
+ 		},
+ 	};
+diff --git a/packages/theme/bin/terrazzo-plugin-ds-token-fallbacks/test/index.test.ts b/packages/theme/bin/terrazzo-plugin-ds-token-fallbacks/test/index.test.ts
+index f9f0b3235b32f7..e9023b23fc00fc 100644
+--- a/packages/theme/bin/terrazzo-plugin-ds-token-fallbacks/test/index.test.ts
++++ b/packages/theme/bin/terrazzo-plugin-ds-token-fallbacks/test/index.test.ts
+@@ -1,4 +1,4 @@
+-import { computeBrandFallback, formatDesignTokenFallbacksScss } from '../index';
++import { computeBrandFallback } from '../index';
+ 
+ jest.mock( '@terrazzo/plugin-css', () => ( { FORMAT_ID: 'css/value' } ) );
+ 
+@@ -15,47 +15,3 @@ describe( 'computeBrandFallback', () => {
+ 		);
+ 	} );
+ } );
+-
+-describe( 'formatDesignTokenFallbacksScss', () => {
+-	it( 'generates a Sass map and wpds-var function', () => {
+-		const scss = formatDesignTokenFallbacksScss( {
+-			'--wpds-border-radius-sm': '2px',
+-			'--wpds-border-width-focus':
+-				'var(--wp-admin-border-width-focus, 2px)',
+-			'--wpds-typography-font-family-mono':
+-				'"Menlo", "Consolas", monaco, monospace',
+-		} );
+-
+-		expect( scss ).toContain( '@use "sass:map";' );
+-		expect( scss ).toContain( '@function wpds-var($token)' );
+-		expect( scss ).toContain( "'--wpds-border-radius-sm': '2px'" );
+-		expect( scss ).toContain(
+-			"'--wpds-border-width-focus': 'var(--wp-admin-border-width-focus, 2px)'"
+-		);
+-		expect( scss ).toContain(
+-			'\'--wpds-typography-font-family-mono\': \'"Menlo", "Consolas", monaco, monospace\''
+-		);
+-	} );
+-
+-	it( 'escapes backslashes and single quotes', () => {
+-		const scss = formatDesignTokenFallbacksScss( {
+-			'--wpds-x-single-quote': "a'b",
+-			'--wpds-x-backslash': 'a\\b',
+-			'--wpds-x-both': "a'\\b",
+-		} );
+-
+-		expect( scss ).toContain( "'--wpds-x-single-quote': 'a\\'b'" );
+-		expect( scss ).toContain( "'--wpds-x-backslash': 'a\\\\b'" );
+-		expect( scss ).toContain( "'--wpds-x-both': 'a\\'\\\\b'" );
+-	} );
+-
+-	it( 'throws on Sass interpolation syntax', () => {
+-		expect( () =>
+-			formatDesignTokenFallbacksScss( {
+-				'--wpds-x-interpolation': 'calc(#{some-value} * 1px)',
+-			} )
+-		).toThrow(
+-			/Sass interpolation syntax is not supported in design token fallbacks: --wpds-x-interpolation/
+-		);
+-	} );
+-} );
+diff --git a/packages/theme/package.json b/packages/theme/package.json
+index a9eb4ac843a402..03d6585a5d0227 100644
+--- a/packages/theme/package.json
++++ b/packages/theme/package.json
+@@ -38,7 +38,6 @@
+ 			"default": "./build/index.cjs"
+ 		},
+ 		"./design-tokens.css": "./src/prebuilt/css/design-tokens.css",
+-		"./design-token-fallbacks": "./src/prebuilt/scss/design-token-fallbacks.scss",
+ 		"./design-tokens.js": {
+ 			"types": "./build-types/prebuilt/js/design-tokens.d.ts",
+ 			"import": "./build-module/prebuilt/js/design-tokens.mjs",
+diff --git a/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs b/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
+index ee65112d91c26f..a78762c4706779 100644
+--- a/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
++++ b/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
+@@ -2,6 +2,7 @@
+  * This file is generated by the @wordpress/terrazzo-plugin-ds-token-fallbacks plugin.
+  * Do not edit this file directly.
+  */
++
+ export default {
+ 	'--wpds-border-radius-lg': '8px',
+ 	'--wpds-border-radius-md': '4px',
+diff --git a/packages/theme/src/prebuilt/scss/design-token-fallbacks.scss b/packages/theme/src/prebuilt/scss/design-token-fallbacks.scss
+deleted file mode 100644
+index 8fdbd997354452..00000000000000
+--- a/packages/theme/src/prebuilt/scss/design-token-fallbacks.scss
++++ /dev/null
+@@ -1,205 +0,0 @@
+-// This file is generated by the @wordpress/terrazzo-plugin-ds-token-fallbacks plugin.
+-// Do not edit this file directly.
+-
+-@use 'sass:map';
+-@use 'sass:string';
+-
+-$fallbacks: (
+-	'--wpds-border-radius-lg': '8px',
+-	'--wpds-border-radius-md': '4px',
+-	'--wpds-border-radius-sm': '2px',
+-	'--wpds-border-radius-xl': '12px',
+-	'--wpds-border-radius-xs': '1px',
+-	'--wpds-border-width-focus': 'var(--wp-admin-border-width-focus, 2px)',
+-	'--wpds-border-width-lg': '8px',
+-	'--wpds-border-width-md': '4px',
+-	'--wpds-border-width-sm': '2px',
+-	'--wpds-border-width-xs': '1px',
+-	'--wpds-color-background-interactive-brand-strong':
+-		'var(--wp-admin-theme-color, #3858e9)',
+-	'--wpds-color-background-interactive-brand-strong-active':
+-		'color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 93%, black)',
+-	'--wpds-color-background-interactive-brand-strong-disabled': '#e6e6e6',
+-	'--wpds-color-background-interactive-brand-weak': '#0000',
+-	'--wpds-color-background-interactive-brand-weak-active':
+-		'color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 12%, white)',
+-	'--wpds-color-background-interactive-brand-weak-disabled': '#0000',
+-	'--wpds-color-background-interactive-error': '#0000',
+-	'--wpds-color-background-interactive-error-active': '#fff6f5',
+-	'--wpds-color-background-interactive-error-disabled': '#0000',
+-	'--wpds-color-background-interactive-error-strong': '#cc1818',
+-	'--wpds-color-background-interactive-error-strong-active': '#b90000',
+-	'--wpds-color-background-interactive-error-strong-disabled': '#e6e6e6',
+-	'--wpds-color-background-interactive-error-weak': '#0000',
+-	'--wpds-color-background-interactive-error-weak-active': '#f6e6e3',
+-	'--wpds-color-background-interactive-error-weak-disabled': '#0000',
+-	'--wpds-color-background-interactive-neutral-strong': '#2d2d2d',
+-	'--wpds-color-background-interactive-neutral-strong-active': '#1e1e1e',
+-	'--wpds-color-background-interactive-neutral-strong-disabled': '#e6e6e6',
+-	'--wpds-color-background-interactive-neutral-weak': '#0000',
+-	'--wpds-color-background-interactive-neutral-weak-active': '#ededed',
+-	'--wpds-color-background-interactive-neutral-weak-disabled': '#0000',
+-	'--wpds-color-background-surface-brand':
+-		'color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 9%, white)',
+-	'--wpds-color-background-surface-caution': '#fee995',
+-	'--wpds-color-background-surface-caution-weak': '#fff9ca',
+-	'--wpds-color-background-surface-error': '#f6e6e3',
+-	'--wpds-color-background-surface-error-weak': '#fff6f5',
+-	'--wpds-color-background-surface-info': '#deebfa',
+-	'--wpds-color-background-surface-info-weak': '#f3f9ff',
+-	'--wpds-color-background-surface-neutral': '#fcfcfc',
+-	'--wpds-color-background-surface-neutral-strong': '#fff',
+-	'--wpds-color-background-surface-neutral-weak': '#f4f4f4',
+-	'--wpds-color-background-surface-success': '#c6f7cd',
+-	'--wpds-color-background-surface-success-weak': '#ebffed',
+-	'--wpds-color-background-surface-warning': '#fde6be',
+-	'--wpds-color-background-surface-warning-weak': '#fff7e1',
+-	'--wpds-color-background-thumb-brand':
+-		'var(--wp-admin-theme-color, #3858e9)',
+-	'--wpds-color-background-thumb-brand-active':
+-		'var(--wp-admin-theme-color, #3858e9)',
+-	'--wpds-color-background-thumb-neutral-disabled': '#dbdbdb',
+-	'--wpds-color-background-thumb-neutral-weak': '#8d8d8d',
+-	'--wpds-color-background-thumb-neutral-weak-active': '#6e6e6e',
+-	'--wpds-color-background-track-neutral': '#dbdbdb',
+-	'--wpds-color-background-track-neutral-weak': '#f0f0f0',
+-	'--wpds-color-foreground-content-caution': '#281d00',
+-	'--wpds-color-foreground-content-caution-weak': '#826a00',
+-	'--wpds-color-foreground-content-error': '#470000',
+-	'--wpds-color-foreground-content-error-weak': '#cc1818',
+-	'--wpds-color-foreground-content-info': '#001b4f',
+-	'--wpds-color-foreground-content-info-weak': '#006bd7',
+-	'--wpds-color-foreground-content-neutral': '#1e1e1e',
+-	'--wpds-color-foreground-content-neutral-weak': '#707070',
+-	'--wpds-color-foreground-content-success': '#002900',
+-	'--wpds-color-foreground-content-success-weak': '#008030',
+-	'--wpds-color-foreground-content-warning': '#2e1900',
+-	'--wpds-color-foreground-content-warning-weak': '#926300',
+-	'--wpds-color-foreground-interactive-brand':
+-		'var(--wp-admin-theme-color, #3858e9)',
+-	'--wpds-color-foreground-interactive-brand-active':
+-		'color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 52%, black)',
+-	'--wpds-color-foreground-interactive-brand-disabled': '#8d8d8d',
+-	'--wpds-color-foreground-interactive-brand-strong': '#fff',
+-	'--wpds-color-foreground-interactive-brand-strong-active': '#fff',
+-	'--wpds-color-foreground-interactive-brand-strong-disabled': '#8d8d8d',
+-	'--wpds-color-foreground-interactive-error': '#cc1818',
+-	'--wpds-color-foreground-interactive-error-active': '#470000',
+-	'--wpds-color-foreground-interactive-error-disabled': '#8d8d8d',
+-	'--wpds-color-foreground-interactive-error-strong': '#f2efef',
+-	'--wpds-color-foreground-interactive-error-strong-active': '#f2efef',
+-	'--wpds-color-foreground-interactive-error-strong-disabled': '#8d8d8d',
+-	'--wpds-color-foreground-interactive-neutral': '#1e1e1e',
+-	'--wpds-color-foreground-interactive-neutral-active': '#1e1e1e',
+-	'--wpds-color-foreground-interactive-neutral-disabled': '#8d8d8d',
+-	'--wpds-color-foreground-interactive-neutral-strong': '#f0f0f0',
+-	'--wpds-color-foreground-interactive-neutral-strong-active': '#f0f0f0',
+-	'--wpds-color-foreground-interactive-neutral-strong-disabled': '#8d8d8d',
+-	'--wpds-color-foreground-interactive-neutral-weak': '#707070',
+-	'--wpds-color-foreground-interactive-neutral-weak-disabled': '#8d8d8d',
+-	'--wpds-color-stroke-focus': 'var(--wp-admin-theme-color, #3858e9)',
+-	'--wpds-color-stroke-interactive-brand':
+-		'var(--wp-admin-theme-color, #3858e9)',
+-	'--wpds-color-stroke-interactive-brand-active':
+-		'color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 85%, black)',
+-	'--wpds-color-stroke-interactive-brand-disabled': '#dbdbdb',
+-	'--wpds-color-stroke-interactive-error': '#cc1818',
+-	'--wpds-color-stroke-interactive-error-active': '#9d0000',
+-	'--wpds-color-stroke-interactive-error-disabled': '#dbdbdb',
+-	'--wpds-color-stroke-interactive-error-strong': '#cc1818',
+-	'--wpds-color-stroke-interactive-neutral': '#8d8d8d',
+-	'--wpds-color-stroke-interactive-neutral-active': '#6e6e6e',
+-	'--wpds-color-stroke-interactive-neutral-disabled': '#dbdbdb',
+-	'--wpds-color-stroke-interactive-neutral-strong': '#6e6e6e',
+-	'--wpds-color-stroke-surface-brand':
+-		'color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 40%, white)',
+-	'--wpds-color-stroke-surface-brand-strong':
+-		'var(--wp-admin-theme-color, #3858e9)',
+-	'--wpds-color-stroke-surface-caution': '#cfc28d',
+-	'--wpds-color-stroke-surface-caution-strong': '#826a00',
+-	'--wpds-color-stroke-surface-error': '#dab1aa',
+-	'--wpds-color-stroke-surface-error-strong': '#cc1818',
+-	'--wpds-color-stroke-surface-info': '#a9c6e7',
+-	'--wpds-color-stroke-surface-info-strong': '#006bd7',
+-	'--wpds-color-stroke-surface-neutral': '#dbdbdb',
+-	'--wpds-color-stroke-surface-neutral-strong': '#8d8d8d',
+-	'--wpds-color-stroke-surface-neutral-weak': '#f0f0f0',
+-	'--wpds-color-stroke-surface-success': '#94d29e',
+-	'--wpds-color-stroke-surface-success-strong': '#008030',
+-	'--wpds-color-stroke-surface-warning': '#e1bc7c',
+-	'--wpds-color-stroke-surface-warning-strong': '#926300',
+-	'--wpds-cursor-control': 'pointer',
+-	'--wpds-dimension-base': '4px',
+-	'--wpds-dimension-gap-2xl': '32px',
+-	'--wpds-dimension-gap-3xl': '40px',
+-	'--wpds-dimension-gap-lg': '16px',
+-	'--wpds-dimension-gap-md': '12px',
+-	'--wpds-dimension-gap-sm': '8px',
+-	'--wpds-dimension-gap-xl': '24px',
+-	'--wpds-dimension-gap-xs': '4px',
+-	'--wpds-dimension-padding-2xl': '24px',
+-	'--wpds-dimension-padding-3xl': '32px',
+-	'--wpds-dimension-padding-lg': '16px',
+-	'--wpds-dimension-padding-md': '12px',
+-	'--wpds-dimension-padding-sm': '8px',
+-	'--wpds-dimension-padding-xl': '20px',
+-	'--wpds-dimension-padding-xs': '4px',
+-	'--wpds-dimension-size-2xs': '16px',
+-	'--wpds-dimension-size-3xs': '12px',
+-	'--wpds-dimension-size-4xs': '8px',
+-	'--wpds-dimension-size-5xs': '4px',
+-	'--wpds-dimension-size-lg': '40px',
+-	'--wpds-dimension-size-md': '32px',
+-	'--wpds-dimension-size-sm': '24px',
+-	'--wpds-dimension-size-xs': '20px',
+-	'--wpds-dimension-surface-width-2xl': '960px',
+-	'--wpds-dimension-surface-width-lg': '560px',
+-	'--wpds-dimension-surface-width-md': '400px',
+-	'--wpds-dimension-surface-width-sm': '320px',
+-	'--wpds-dimension-surface-width-xl': '720px',
+-	'--wpds-dimension-surface-width-xs': '240px',
+-	'--wpds-elevation-lg':
+-		'0 5px 15px 0 #00000014, 0 15px 27px 0 #00000012, 0 30px 36px 0 #0000000a, 0 50px 43px 0 #00000005',
+-	'--wpds-elevation-md':
+-		'0 2px 3px 0 #0000000d, 0 4px 5px 0 #0000000a, 0 12px 12px 0 #00000008, 0 16px 16px 0 #00000005',
+-	'--wpds-elevation-sm':
+-		'0 1px 2px 0 #0000000d, 0 2px 3px 0 #0000000a, 0 6px 6px 0 #00000008, 0 8px 8px 0 #00000005',
+-	'--wpds-elevation-xs':
+-		'0 1px 1px 0 #00000008, 0 1px 2px 0 #00000005, 0 3px 3px 0 #00000005, 0 4px 4px 0 #00000003',
+-	'--wpds-motion-duration-lg': '300ms',
+-	'--wpds-motion-duration-md': '200ms',
+-	'--wpds-motion-duration-sm': '100ms',
+-	'--wpds-motion-duration-xl': '400ms',
+-	'--wpds-motion-duration-xs': '50ms',
+-	'--wpds-motion-easing-balanced': 'cubic-bezier(0.4, 0, 0.2, 1)',
+-	'--wpds-motion-easing-expressive': 'cubic-bezier(0.25, 0, 0, 1)',
+-	'--wpds-motion-easing-subtle': 'cubic-bezier(0.15, 0, 0.15, 1)',
+-	'--wpds-typography-font-family-body':
+-		'-apple-system, system-ui, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif',
+-	'--wpds-typography-font-family-heading':
+-		'-apple-system, system-ui, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif',
+-	'--wpds-typography-font-family-mono':
+-		'"Menlo", "Consolas", monaco, monospace',
+-	'--wpds-typography-font-size-2xl': '32px',
+-	'--wpds-typography-font-size-lg': '15px',
+-	'--wpds-typography-font-size-md': '13px',
+-	'--wpds-typography-font-size-sm': '12px',
+-	'--wpds-typography-font-size-xl': '20px',
+-	'--wpds-typography-font-size-xs': '11px',
+-	'--wpds-typography-font-weight-medium': '499',
+-	'--wpds-typography-font-weight-regular': '400',
+-	'--wpds-typography-line-height-2xl': '40px',
+-	'--wpds-typography-line-height-lg': '28px',
+-	'--wpds-typography-line-height-md': '24px',
+-	'--wpds-typography-line-height-sm': '20px',
+-	'--wpds-typography-line-height-xl': '32px',
+-	'--wpds-typography-line-height-xs': '16px',
+-);
+-
+-@function wpds-var( $token ) {
+-	@if not map.has-key( $fallbacks, $token ) {
+-		@error "Unknown design token: #{$token}";
+-	}
+-
+-	@return string.unquote( 'var(#{$token}, #{map.get($fallbacks, $token)})' );
+-}

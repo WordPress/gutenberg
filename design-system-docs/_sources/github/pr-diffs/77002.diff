@@ -1,0 +1,565 @@
+diff --git a/packages/block-editor/src/components/block-list/block-crash-warning.js b/packages/block-editor/src/components/block-list/block-crash-warning.js
+index 3a1b2100f55c3b..fa1a2487e826e9 100644
+--- a/packages/block-editor/src/components/block-list/block-crash-warning.js
++++ b/packages/block-editor/src/components/block-list/block-crash-warning.js
+@@ -14,4 +14,6 @@ const warning = (
+ 	</Warning>
+ );
+ 
+-export default () => warning;
++export default function BlockCrashWarning() {
++	return warning;
++}
+diff --git a/packages/block-editor/src/components/block-list/block-crash-warning.native.js b/packages/block-editor/src/components/block-list/block-crash-warning.native.js
+index 4736938b9d74f2..c575a58c9bb501 100644
+--- a/packages/block-editor/src/components/block-list/block-crash-warning.native.js
++++ b/packages/block-editor/src/components/block-list/block-crash-warning.native.js
+@@ -16,4 +16,6 @@ const warning = (
+ 	/>
+ );
+ 
+-export default () => warning;
++export default function BlockCrashWarning() {
++	return warning;
++}
+diff --git a/packages/block-editor/src/components/rich-text/index.js b/packages/block-editor/src/components/rich-text/index.js
+index 97a98ae644537c..2d3c724f7c4d70 100644
+--- a/packages/block-editor/src/components/rich-text/index.js
++++ b/packages/block-editor/src/components/rich-text/index.js
+@@ -555,4 +555,4 @@ PublicForwardedRichTextContainer.isEmpty = ( value ) => {
+ export default PublicForwardedRichTextContainer;
+ export { RichTextShortcut } from './shortcut';
+ export { RichTextToolbarButton } from './toolbar-button';
+-export { __unstableRichTextInputEvent } from './input-event';
++export { RichTextInputEvent as __unstableRichTextInputEvent } from './input-event';
+diff --git a/packages/block-editor/src/components/rich-text/index.native.js b/packages/block-editor/src/components/rich-text/index.native.js
+index 12dfcd5994f0a3..c70315424d032a 100644
+--- a/packages/block-editor/src/components/rich-text/index.native.js
++++ b/packages/block-editor/src/components/rich-text/index.native.js
+@@ -698,4 +698,4 @@ PrivateRichText.Raw = forwardRef( ( props, ref ) => (
+ export default PrivateRichText;
+ export { RichTextShortcut } from './shortcut';
+ export { RichTextToolbarButton } from './toolbar-button';
+-export { __unstableRichTextInputEvent } from './input-event';
++export { RichTextInputEvent as __unstableRichTextInputEvent } from './input-event';
+diff --git a/packages/block-editor/src/components/rich-text/input-event.js b/packages/block-editor/src/components/rich-text/input-event.js
+index ab79a9a51dd98b..3dd6d08659adcd 100644
+--- a/packages/block-editor/src/components/rich-text/input-event.js
++++ b/packages/block-editor/src/components/rich-text/input-event.js
+@@ -8,7 +8,7 @@ import { useEffect, useContext, useRef } from '@wordpress/element';
+  */
+ import { inputEventContext } from './';
+ 
+-export function __unstableRichTextInputEvent( { inputType, onInput } ) {
++export function RichTextInputEvent( { inputType, onInput } ) {
+ 	const callbacks = useContext( inputEventContext );
+ 	const onInputRef = useRef();
+ 	onInputRef.current = onInput;
+diff --git a/packages/block-editor/src/components/rich-text/input-event.native.js b/packages/block-editor/src/components/rich-text/input-event.native.js
+index f888365ccba59b..71f2ce4797e24a 100644
+--- a/packages/block-editor/src/components/rich-text/input-event.native.js
++++ b/packages/block-editor/src/components/rich-text/input-event.native.js
+@@ -3,7 +3,7 @@
+  */
+ import { Component } from '@wordpress/element';
+ 
+-export class __unstableRichTextInputEvent extends Component {
++export class RichTextInputEvent extends Component {
+ 	render() {
+ 		return null;
+ 	}
+diff --git a/packages/block-editor/src/components/rich-text/native/index.native.js b/packages/block-editor/src/components/rich-text/native/index.native.js
+index f30a56fd1268ce..637da3d5ea05ee 100644
+--- a/packages/block-editor/src/components/rich-text/native/index.native.js
++++ b/packages/block-editor/src/components/rich-text/native/index.native.js
+@@ -15,7 +15,6 @@ import {
+ 	showUserSuggestions,
+ 	showXpostSuggestions,
+ } from '@wordpress/react-native-bridge';
+-import { BlockFormatControls } from '@wordpress/block-editor';
+ import { getPxFromCssUnit } from '@wordpress/components';
+ import { Component } from '@wordpress/element';
+ import {
+@@ -42,6 +41,7 @@ import {
+ 	isCollapsed,
+ 	remove,
+ } from '@wordpress/rich-text';
++import { BlockFormatControls } from '@wordpress/block-editor';
+ 
+ /**
+  * Internal dependencies
+@@ -1342,22 +1342,23 @@ RichText.defaultProps = {
+ 	tagName: 'div',
+ };
+ 
+-const withFormatTypes = ( WrappedComponent ) => ( props ) => {
+-	const {
+-		clientId,
+-		identifier,
+-		withoutInteractiveFormatting,
+-		allowedFormats,
+-	} = props;
+-	const { formatTypes } = useFormatTypes( {
+-		clientId,
+-		identifier,
+-		withoutInteractiveFormatting,
+-		allowedFormats,
+-	} );
+-
+-	return <WrappedComponent { ...props } formatTypes={ formatTypes } />;
+-};
++const withFormatTypes = ( WrappedComponent ) =>
++	function WithFormatTypes( props ) {
++		const {
++			clientId,
++			identifier,
++			withoutInteractiveFormatting,
++			allowedFormats,
++		} = props;
++		const { formatTypes } = useFormatTypes( {
++			clientId,
++			identifier,
++			withoutInteractiveFormatting,
++			allowedFormats,
++		} );
++
++		return <WrappedComponent { ...props } formatTypes={ formatTypes } />;
++	};
+ 
+ export default compose( [
+ 	withSelect( ( select, { clientId } ) => {
+diff --git a/packages/components/src/higher-order/with-focus-outside/index.native.js b/packages/components/src/higher-order/with-focus-outside/index.native.js
+index e23ae14b0b52de..946606237d22b2 100644
+--- a/packages/components/src/higher-order/with-focus-outside/index.native.js
++++ b/packages/components/src/higher-order/with-focus-outside/index.native.js
+@@ -12,26 +12,27 @@ import {
+ } from '@wordpress/compose';
+ 
+ export default createHigherOrderComponent(
+-	( WrappedComponent ) => ( props ) => {
+-		const [ handleFocusOutside, setHandleFocusOutside ] = useState();
+-		const bindFocusOutsideHandler = useCallback(
+-			( node ) =>
+-				setHandleFocusOutside( () =>
+-					node?.handleFocusOutside
+-						? node.handleFocusOutside.bind( node )
+-						: undefined
+-				),
+-			[]
+-		);
++	( WrappedComponent ) =>
++		function WithFocusOutside( props ) {
++			const [ handleFocusOutside, setHandleFocusOutside ] = useState();
++			const bindFocusOutsideHandler = useCallback(
++				( node ) =>
++					setHandleFocusOutside( () =>
++						node?.handleFocusOutside
++							? node.handleFocusOutside.bind( node )
++							: undefined
++					),
++				[]
++			);
+ 
+-		return (
+-			<View { ...useFocusOutside( handleFocusOutside ) }>
+-				<WrappedComponent
+-					ref={ bindFocusOutsideHandler }
+-					{ ...props }
+-				/>
+-			</View>
+-		);
+-	},
++			return (
++				<View { ...useFocusOutside( handleFocusOutside ) }>
++					<WrappedComponent
++						ref={ bindFocusOutsideHandler }
++						{ ...props }
++					/>
++				</View>
++			);
++		},
+ 	'withFocusOutside'
+ );
+diff --git a/packages/components/src/toolbar/toolbar-button/toolbar-button-container.native.js b/packages/components/src/toolbar/toolbar-button/toolbar-button-container.native.js
+index 2141f79430b016..0ac1ae188285ab 100644
+--- a/packages/components/src/toolbar/toolbar-button/toolbar-button-container.native.js
++++ b/packages/components/src/toolbar/toolbar-button/toolbar-button-container.native.js
+@@ -3,4 +3,6 @@
+  */
+ import { View } from 'react-native';
+ 
+-export default ( props ) => <View>{ props.children }</View>;
++export default function ToolbarButtonContainer( props ) {
++	return <View>{ props.children }</View>;
++}
+diff --git a/packages/core-data/src/hooks/index.ts b/packages/core-data/src/hooks/index.ts
+index 9843d9a7c22522..6bda451f13882d 100644
+--- a/packages/core-data/src/hooks/index.ts
++++ b/packages/core-data/src/hooks/index.ts
+@@ -9,15 +9,15 @@ import type { WithPermissions } from './use-entity-records';
+ export type { WithPermissions };
+ export {
+ 	default as useEntityRecord,
+-	__experimentalUseEntityRecord,
++	useDeprecatedEntityRecord as __experimentalUseEntityRecord,
+ } from './use-entity-record';
+ export {
+ 	default as useEntityRecords,
+-	__experimentalUseEntityRecords,
++	useDeprecatedEntityRecords as __experimentalUseEntityRecords,
+ } from './use-entity-records';
+ export {
+ 	default as useResourcePermissions,
+-	__experimentalUseResourcePermissions,
++	useDeprecatedResourcePermissions as __experimentalUseResourcePermissions,
+ } from './use-resource-permissions';
+ export { default as useEntityBlockEditor } from './use-entity-block-editor';
+ export { default as useEntityId } from './use-entity-id';
+diff --git a/packages/core-data/src/hooks/use-entity-record.ts b/packages/core-data/src/hooks/use-entity-record.ts
+index 2020a365d87bcc..2d4abf954993d7 100644
+--- a/packages/core-data/src/hooks/use-entity-record.ts
++++ b/packages/core-data/src/hooks/use-entity-record.ts
+@@ -222,7 +222,7 @@ export default function useEntityRecord< RecordType >(
+ 	};
+ }
+ 
+-export function __experimentalUseEntityRecord(
++export function useDeprecatedEntityRecord(
+ 	kind: string,
+ 	name: string,
+ 	recordId: any,
+diff --git a/packages/core-data/src/hooks/use-entity-records.ts b/packages/core-data/src/hooks/use-entity-records.ts
+index d9604a34a22fe7..cc9b202fd73e6f 100644
+--- a/packages/core-data/src/hooks/use-entity-records.ts
++++ b/packages/core-data/src/hooks/use-entity-records.ts
+@@ -153,7 +153,7 @@ export default function useEntityRecords< RecordType >(
+ 	};
+ }
+ 
+-export function __experimentalUseEntityRecords(
++export function useDeprecatedEntityRecords(
+ 	kind: string,
+ 	name: string,
+ 	queryArgs: any,
+diff --git a/packages/core-data/src/hooks/use-resource-permissions.ts b/packages/core-data/src/hooks/use-resource-permissions.ts
+index 72163c1a55bde8..129c20682a1613 100644
+--- a/packages/core-data/src/hooks/use-resource-permissions.ts
++++ b/packages/core-data/src/hooks/use-resource-permissions.ts
+@@ -209,7 +209,7 @@ function useResourcePermissions< IdType = void >(
+ 
+ export default useResourcePermissions;
+ 
+-export function __experimentalUseResourcePermissions(
++export function useDeprecatedResourcePermissions(
+ 	resource: string,
+ 	id?: unknown
+ ) {
+diff --git a/packages/dependency-extraction-webpack-plugin/lib/types.d.ts b/packages/dependency-extraction-webpack-plugin/lib/types.d.ts
+index 5a1bff90aa49ad..83840fab241de9 100644
+--- a/packages/dependency-extraction-webpack-plugin/lib/types.d.ts
++++ b/packages/dependency-extraction-webpack-plugin/lib/types.d.ts
+@@ -1,4 +1,4 @@
+-import { Compiler } from 'webpack';
++import type { Compiler } from 'webpack';
+ 
+ export = DependencyExtractionWebpackPlugin;
+ 
+diff --git a/packages/e2e-test-utils-playwright/src/test.ts b/packages/e2e-test-utils-playwright/src/test.ts
+index 45213ca953cfec..440ab76f41690b 100644
+--- a/packages/e2e-test-utils-playwright/src/test.ts
++++ b/packages/e2e-test-utils-playwright/src/test.ts
+@@ -1,3 +1,5 @@
++// Playwright fixtures use `use()` which is not a React hook.
++
+ /**
+  * External dependencies
+  */
+diff --git a/packages/editor/src/components/collaborators-overlay/use-render-cursors.ts b/packages/editor/src/components/collaborators-overlay/use-render-cursors.ts
+index 055a2a41e3848c..61005ca094672d 100644
+--- a/packages/editor/src/components/collaborators-overlay/use-render-cursors.ts
++++ b/packages/editor/src/components/collaborators-overlay/use-render-cursors.ts
+@@ -1,12 +1,14 @@
+ import {
+ 	privateApis as coreDataPrivateApis,
+ 	SelectionType,
+-	type PostEditorAwarenessState as ActiveCollaborator,
++} from '@wordpress/core-data';
++import type {
++	ResolvedSelection,
++	PostEditorAwarenessState as ActiveCollaborator,
+ } from '@wordpress/core-data';
+ import { useSelect } from '@wordpress/data';
+ import { useEffect, useState } from '@wordpress/element';
+ import { store as preferencesStore } from '@wordpress/preferences';
+-import type { ResolvedSelection } from '@wordpress/core-data';
+ 
+ import { unlock } from '../../lock-unlock';
+ import { getAvatarUrl } from './get-avatar-url';
+diff --git a/packages/fields/src/stories/index.story.tsx b/packages/fields/src/stories/index.story.tsx
+index 10aa82e64775ac..649246c448fa55 100644
+--- a/packages/fields/src/stories/index.story.tsx
++++ b/packages/fields/src/stories/index.story.tsx
+@@ -2,8 +2,8 @@
+  * WordPress dependencies
+  */
+ import { useState } from '@wordpress/element';
+-import { DataForm, DataViews, type Form } from '@wordpress/dataviews';
+-import type { Field, View } from '@wordpress/dataviews';
++import type { Field, View, Form } from '@wordpress/dataviews';
++import { DataForm, DataViews } from '@wordpress/dataviews';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/media-fields/src/stories/index.story.tsx b/packages/media-fields/src/stories/index.story.tsx
+index e461cea15d319d..da5a2cf2438223 100644
+--- a/packages/media-fields/src/stories/index.story.tsx
++++ b/packages/media-fields/src/stories/index.story.tsx
+@@ -2,8 +2,8 @@
+  * WordPress dependencies
+  */
+ import { useState } from '@wordpress/element';
+-import { DataForm, DataViews, type Form } from '@wordpress/dataviews';
+-import type { Field, View } from '@wordpress/dataviews';
++import type { Field, View, Form } from '@wordpress/dataviews';
++import { DataForm, DataViews } from '@wordpress/dataviews';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/report-flaky-tests/src/__tests__/markdown.test.ts b/packages/report-flaky-tests/src/__tests__/markdown.test.ts
+index 4a0fa73f354924..30de48de610f1f 100644
+--- a/packages/report-flaky-tests/src/__tests__/markdown.test.ts
++++ b/packages/report-flaky-tests/src/__tests__/markdown.test.ts
+@@ -93,14 +93,14 @@ describe( 'renderIssueBody', () => {
+ 			totalCommits: 100,
+ 		};
+ 
+-		const body = renderIssueBody( {
++		const view = renderIssueBody( {
+ 			meta,
+ 			testTitle: 'Test title',
+ 			testPath: 'test/e2e/specs/test-title.spec.js',
+ 			formattedTestResults: 'FORMATTED_TEST_RESULTS',
+ 		} );
+ 
+-		expect( body ).toMatchInlineSnapshot( `
++		expect( view ).toMatchInlineSnapshot( `
+ 		"<!-- __META_DATA__:{"failedTimes":5,"totalCommits":100} -->
+ 		**Flaky test detected. This is an auto-generated issue by GitHub Actions. Please do NOT edit this manually.**
+ 
+@@ -195,16 +195,16 @@ describe( 'parseIssueBody', () => {
+ 			totalCommits: 95,
+ 		};
+ 
+-		const body = renderIssueBody( {
++		const view = renderIssueBody( {
+ 			meta,
+ 			testTitle: 'Test title',
+ 			testPath: 'test/e2e/specs/test-title.spec.js',
+ 			formattedTestResults: testResults.join( '\n' ),
+ 		} );
+ 
+-		expect( body ).toMatchSnapshot();
++		expect( view ).toMatchSnapshot();
+ 
+-		const parsed = parseIssueBody( body );
++		const parsed = parseIssueBody( view );
+ 
+ 		expect( core.error ).toHaveBeenCalledTimes( 1 );
+ 
+@@ -248,13 +248,13 @@ describe( 'renderCommitComment', () => {
+ 		];
+ 		const commitSHA = 'commitSHA';
+ 
+-		const commentBody = renderCommitComment( {
++		const view = renderCommitComment( {
+ 			reportedIssues,
+ 			runURL,
+ 			commitSHA,
+ 		} );
+ 
+-		expect( commentBody ).toMatchInlineSnapshot( `
++		expect( view ).toMatchInlineSnapshot( `
+ 		"<!-- flaky-tests-report-comment -->
+ 		**Flaky tests detected in commitSHA.**
+ 		Some tests passed with failed attempts. The failures may not be related to this commit but are still reported for visibility. See [the documentation](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/testing-overview.md#flaky-tests) for more information.
+@@ -269,13 +269,13 @@ describe( 'renderCommitComment', () => {
+ 
+ describe( 'isReportComment', () => {
+ 	it( 'matches the report comment', () => {
+-		const commentBody = renderCommitComment( {
++		const view = renderCommitComment( {
+ 			reportedIssues: [],
+ 			runURL: '',
+ 			commitSHA: 'commitSHA',
+ 		} );
+ 
+-		expect( isReportComment( commentBody ) ).toBe( true );
++		expect( isReportComment( view ) ).toBe( true );
+ 
+ 		expect( isReportComment( 'random string' ) ).toBe( false );
+ 	} );
+diff --git a/packages/rich-text/src/hook/index.js b/packages/rich-text/src/hook/index.js
+index 7e11c7303b26d2..c114af516d10c8 100644
+--- a/packages/rich-text/src/hook/index.js
++++ b/packages/rich-text/src/hook/index.js
+@@ -301,7 +301,7 @@ export function useRichText( {
+ 	return { ...result, formatTypes };
+ }
+ 
+-export function __unstableUseRichText( props ) {
++export function useDeprecatedRichText( props ) {
+ 	deprecated( '`__unstableUseRichText` hook', {
+ 		since: '7.0',
+ 	} );
+diff --git a/packages/rich-text/src/index.ts b/packages/rich-text/src/index.ts
+index 75a67dca599955..dabcbd4cb1f835 100644
+--- a/packages/rich-text/src/index.ts
++++ b/packages/rich-text/src/index.ts
+@@ -26,7 +26,7 @@ export { createElement as __unstableCreateElement } from './create-element';
+ export { privateApis } from './private-apis';
+ export { useAnchorRef } from './hook/use-anchor-ref';
+ export { useAnchor } from './hook/use-anchor';
+-export { __unstableUseRichText } from './hook';
++export { useDeprecatedRichText as __unstableUseRichText } from './hook';
+ 
+ // Remnant that is left in an abundance of caution to ensure there's no errors.
+ export function __experimentalRichText() {}
+diff --git a/test/e2e/specs/editor/blocks/avatar.spec.js b/test/e2e/specs/editor/blocks/avatar.spec.js
+index 8bf39a7a60dbac..85e9b844878b40 100644
+--- a/test/e2e/specs/editor/blocks/avatar.spec.js
++++ b/test/e2e/specs/editor/blocks/avatar.spec.js
+@@ -68,8 +68,10 @@ test.describe( 'Avatar', () => {
+ 		await newUser.click();
+ 
+ 		const updatedAvatarImage = avatarBlock.locator( 'img' );
+-		const newSrc = await updatedAvatarImage.getAttribute( 'src' );
+ 
+-		expect( newSrc ).not.toBe( originalSrc );
++		await expect( updatedAvatarImage ).not.toHaveAttribute(
++			'src',
++			originalSrc
++		);
+ 	} );
+ } );
+diff --git a/test/e2e/specs/editor/various/copy-cut-paste.spec.js b/test/e2e/specs/editor/various/copy-cut-paste.spec.js
+index 9d710f640c3961..54ff9cff0e01f0 100644
+--- a/test/e2e/specs/editor/various/copy-cut-paste.spec.js
++++ b/test/e2e/specs/editor/various/copy-cut-paste.spec.js
+@@ -374,7 +374,7 @@ test.describe( 'Copy/cut/paste', () => {
+ 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+ 	} );
+ 
+-	test( 'should cut partial selection and merge like a normal `delete` - not forward ', async ( {
++	test( 'should cut partial selection and merge like a normal `delete` - not forward', async ( {
+ 		editor,
+ 		page,
+ 		pageUtils,
+@@ -405,7 +405,7 @@ test.describe( 'Copy/cut/paste', () => {
+ 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+ 	} );
+ 
+-	test( 'should paste plain text in plain text context when cross block selection is copied ', async ( {
++	test( 'should paste plain text in plain text context when cross block selection is copied', async ( {
+ 		editor,
+ 		page,
+ 		pageUtils,
+diff --git a/test/e2e/specs/editor/various/post-title.spec.js b/test/e2e/specs/editor/various/post-title.spec.js
+index 5181efae598aa2..35005aea5c2ea4 100644
+--- a/test/e2e/specs/editor/various/post-title.spec.js
++++ b/test/e2e/specs/editor/various/post-title.spec.js
+@@ -103,7 +103,7 @@ test.describe( 'Post title', () => {
+ 			);
+ 		} );
+ 
+-		test( `should show raw HTML in the post title field when in Code view mode `, async ( {
++		test( `should show raw HTML in the post title field when in Code view mode`, async ( {
+ 			page,
+ 			admin,
+ 			requestUtils,
+diff --git a/test/e2e/specs/editor/various/pref-modal.spec.js b/test/e2e/specs/editor/various/pref-modal.spec.js
+index 08c3cd322586a1..b0b618400b8670 100644
+--- a/test/e2e/specs/editor/various/pref-modal.spec.js
++++ b/test/e2e/specs/editor/various/pref-modal.spec.js
+@@ -9,7 +9,7 @@ test.describe( 'Preferences modal', () => {
+ 	} );
+ 
+ 	test.describe( 'Preferences modal adaps to viewport', () => {
+-		test( 'Enable pre-publish checks is visible on desktop ', async ( {
++		test( 'Enable pre-publish checks is visible on desktop', async ( {
+ 			page,
+ 		} ) => {
+ 			await page.click(
+@@ -25,7 +25,7 @@ test.describe( 'Preferences modal', () => {
+ 		} );
+ 	} );
+ 	test.describe( 'Preferences modal adaps to viewport', () => {
+-		test( 'Enable pre-publish checks is not visible on mobile ', async ( {
++		test( 'Enable pre-publish checks is not visible on mobile', async ( {
+ 			page,
+ 		} ) => {
+ 			await page.setViewportSize( { width: 500, height: 800 } );
+diff --git a/test/e2e/specs/editor/various/revisions.spec.js b/test/e2e/specs/editor/various/revisions.spec.js
+index 703c97517c6b7c..b3fcfe77a85653 100644
+--- a/test/e2e/specs/editor/various/revisions.spec.js
++++ b/test/e2e/specs/editor/various/revisions.spec.js
+@@ -147,8 +147,10 @@ test.describe( 'Post revisions', () => {
+ 		await page.keyboard.press( 'Home' );
+ 
+ 		// Verify the heading's clientId is preserved (prevents flashing).
+-		const clientIdAfter = await headingBlock.getAttribute( 'data-block' );
+-		expect( clientIdAfter ).toBe( clientIdBefore );
++		await expect( headingBlock ).toHaveAttribute(
++			'data-block',
++			clientIdBefore
++		);
+ 	} );
+ 
+ 	// Regression test for https://github.com/WordPress/gutenberg/issues/75926
+diff --git a/test/e2e/specs/interactivity/directive-context.spec.ts b/test/e2e/specs/interactivity/directive-context.spec.ts
+index a1e9f3dff2d267..8545609df57b7f 100644
+--- a/test/e2e/specs/interactivity/directive-context.spec.ts
++++ b/test/e2e/specs/interactivity/directive-context.spec.ts
+@@ -366,7 +366,7 @@ test.describe( 'data-wp-context', () => {
+ 		await expect( isProxyPreservedOnCopy ).toHaveText( 'true' );
+ 	} );
+ 
+-	test( 'objects referenced from the context inherit properties where they are originally defined ', async ( {
++	test( 'objects referenced from the context inherit properties where they are originally defined', async ( {
+ 		page,
+ 	} ) => {
+ 		await page.getByTestId( 'child copy obj' ).click();
+diff --git a/test/e2e/specs/interactivity/router-regions.spec.ts b/test/e2e/specs/interactivity/router-regions.spec.ts
+index 31902963271b83..22f84320745973 100644
+--- a/test/e2e/specs/interactivity/router-regions.spec.ts
++++ b/test/e2e/specs/interactivity/router-regions.spec.ts
+@@ -500,7 +500,7 @@ test.describe( 'Router regions', () => {
+ 		await expect( region1 ).toHaveAttribute( 'data-tag', 'region-1' );
+ 	} );
+ 
+-	test( 'should be preserved on first navigation with `data-wp-key` and other directives ', async ( {
++	test( 'should be preserved on first navigation with `data-wp-key` and other directives', async ( {
+ 		page,
+ 	} ) => {
+ 		const region2 = page.getByTestId( 'region-2' );
+diff --git a/typings/gutenberg-test-env/index.d.ts b/typings/gutenberg-test-env/index.d.ts
+index fa9a715be65751..5a0aa5c155478a 100644
+--- a/typings/gutenberg-test-env/index.d.ts
++++ b/typings/gutenberg-test-env/index.d.ts
+@@ -7,14 +7,14 @@ declare namespace jest {
+ 		 *
+ 		 * @see [to-match-style-diff-snapshot.js]
+ 		 * @see [Testing Overview docs]
+-		 * @cite https://github.com/testing-library/react-testing-library/issues/36#issuecomment-440442300
++		 * @see https://github.com/testing-library/react-testing-library/issues/36#issuecomment-440442300
+ 		 *
+ 		 * [`toMatchDiffSnapshot` matcher]: https://github.com/jest-community/snapshot-diff
+ 		 * [to-match-style-diff-snapshot.js]: https://github.com/WordPress/gutenberg/blob/trunk/test/unit/config/matchers/to-match-style-diff-snapshot.js
+ 		 * [Testing Overview docs]: https://github.com/WordPress/gutenberg/blob/trunk/docs/contributors/code/testing-overview.md#best-practices
+ 		 */
+-		toMatchStyleDiffSnapshot( expected: Element | null ): R;
++		toMatchStyleDiffSnapshot: ( expected: Element | null ) => R;
+ 
+-		toBePositionedPopover(): R;
++		toBePositionedPopover: () => R;
+ 	}
+ }

@@ -1,0 +1,132 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index fd0407a1f0a941..661decd6d97408 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -15,6 +15,7 @@
+ 
+ -   `Placeholder`: set fixed right margin for label's icon ([46918](https://github.com/WordPress/gutenberg/pull/46918)).
+ -   `TreeGrid`: Fix right-arrow keyboard navigation when a row contains more than two focusable elements ([46998](https://github.com/WordPress/gutenberg/pull/46998)).
++-   `TabPanel`: Fix initial tab selection when the tab declaration is lazily added to the `tabs` array ([47100](https://github.com/WordPress/gutenberg/pull/47100)).
+ 
+ ## 23.1.0 (2023-01-02)
+ 
+diff --git a/packages/components/src/tab-panel/index.tsx b/packages/components/src/tab-panel/index.tsx
+index d26a6a862b6d68..1bb63b77063273 100644
+--- a/packages/components/src/tab-panel/index.tsx
++++ b/packages/components/src/tab-panel/index.tsx
+@@ -103,25 +103,47 @@ export function TabPanel( {
+ 	const selectedTab = tabs.find( ( { name } ) => name === selected );
+ 	const selectedId = `${ instanceId }-${ selectedTab?.name ?? 'none' }`;
+ 
++	// Handle selecting the initial tab.
+ 	useEffect( () => {
+-		const firstEnabledTab = tabs.find( ( tab ) => ! tab.disabled );
++		// If there's a selected tab, don't override it.
++		if ( selectedTab ) {
++			return;
++		}
++
+ 		const initialTab = tabs.find( ( tab ) => tab.name === initialTabName );
+-		if ( ! selectedTab?.name && firstEnabledTab ) {
+-			handleTabSelection(
+-				initialTab && ! initialTab.disabled
+-					? initialTab.name
+-					: firstEnabledTab.name
+-			);
+-		} else if ( selectedTab?.disabled && firstEnabledTab ) {
++
++		// Wait for the denoted initial tab to be declared before making a
++		// selection. This ensures that if a tab is declared lazily it can
++		// still receive initial selection.
++		if ( initialTabName && ! initialTab ) {
++			return;
++		}
++
++		if ( initialTab && ! initialTab.disabled ) {
++			// Select the initial tab if it's not disabled.
++			handleTabSelection( initialTab.name );
++		} else {
++			// Fallback to the first enabled tab when the initial is disabled.
++			const firstEnabledTab = tabs.find( ( tab ) => ! tab.disabled );
++			if ( firstEnabledTab ) handleTabSelection( firstEnabledTab.name );
++		}
++	}, [ tabs, selectedTab, initialTabName, handleTabSelection ] );
++
++	// Handle the currently selected tab becoming disabled.
++	useEffect( () => {
++		// This effect only runs when the selected tab is defined and becomes disabled.
++		if ( ! selectedTab?.disabled ) {
++			return;
++		}
++
++		const firstEnabledTab = tabs.find( ( tab ) => ! tab.disabled );
++
++		// If the currently selected tab becomes disabled, select the first enabled tab.
++		// (if there is one).
++		if ( firstEnabledTab ) {
+ 			handleTabSelection( firstEnabledTab.name );
+ 		}
+-	}, [
+-		tabs,
+-		selectedTab?.name,
+-		selectedTab?.disabled,
+-		initialTabName,
+-		handleTabSelection,
+-	] );
++	}, [ tabs, selectedTab?.disabled, handleTabSelection ] );
+ 
+ 	return (
+ 		<div className={ className }>
+diff --git a/packages/components/src/tab-panel/test/index.tsx b/packages/components/src/tab-panel/test/index.tsx
+index 3ae9122bd94af5..176ddf717992e7 100644
+--- a/packages/components/src/tab-panel/test/index.tsx
++++ b/packages/components/src/tab-panel/test/index.tsx
+@@ -147,7 +147,7 @@ describe( 'TabPanel', () => {
+ 		);
+ 	} );
+ 
+-	it( 'should select `initialTabname` if defined', () => {
++	it( 'should select `initialTabName` if defined', () => {
+ 		const mockOnSelect = jest.fn();
+ 
+ 		render(
+@@ -162,6 +162,39 @@ describe( 'TabPanel', () => {
+ 		expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
+ 	} );
+ 
++	it( 'waits for the tab with the `initialTabName` to become present in the `tabs` array before selecting it', () => {
++		const mockOnSelect = jest.fn();
++
++		const { rerender } = render(
++			<TabPanel
++				tabs={ TABS }
++				initialTabName="delta"
++				children={ () => undefined }
++				onSelect={ mockOnSelect }
++			/>
++		);
++
++		// There should be no selected tab.
++		expect(
++			screen.queryByRole( 'tab', { selected: true } )
++		).not.toBeInTheDocument();
++
++		rerender(
++			<TabPanel
++				tabs={ [
++					{ name: 'delta', title: 'Delta', className: 'delta-class' },
++					...TABS,
++				] }
++				initialTabName="delta"
++				children={ () => undefined }
++				onSelect={ mockOnSelect }
++			/>
++		);
++
++		expect( getSelectedTab() ).toHaveTextContent( 'Delta' );
++		expect( mockOnSelect ).toHaveBeenLastCalledWith( 'delta' );
++	} );
++
+ 	it( 'should disable the tab when `disabled` is true', async () => {
+ 		const user = setupUser();
+ 		const mockOnSelect = jest.fn();

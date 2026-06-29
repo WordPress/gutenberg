@@ -1,0 +1,32 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 398eb53faaa541..088768e7070ae9 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ ### Internal
+ 
+ -   `CustomSelectControlV2`: prevent keyboard event propagation in legacy wrapper. ([#62907](https://github.com/WordPress/gutenberg/pull/62907))
++-   `CustomSelectControlV2`: expose legacy wrapper through private APIs. ([#62936](https://github.com/WordPress/gutenberg/pull/62936))
+ -   `CustomSelectControlV2`: fix item styles ([#62825](https://github.com/WordPress/gutenberg/pull/62825))
+ -   `CustomSelectControlV2`: add root element wrapper. ([#62803](https://github.com/WordPress/gutenberg/pull/62803))
+ -   `CustomSelectControlV2`: tweak item inline padding based on size ([#62850](https://github.com/WordPress/gutenberg/pull/62850)).
+diff --git a/packages/components/src/private-apis.ts b/packages/components/src/private-apis.ts
+index f55373664efffa..2c0eb92d3c76e5 100644
+--- a/packages/components/src/private-apis.ts
++++ b/packages/components/src/private-apis.ts
+@@ -14,6 +14,7 @@ import {
+ 	useCompositeStore as useCompositeStoreV2,
+ } from './composite/v2';
+ import { default as CustomSelectControl } from './custom-select-control';
++import { default as CustomSelectControlV2Legacy } from './custom-select-control-v2/legacy-component';
+ import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
+ import { createPrivateSlotFill } from './slot-fill';
+ import {
+@@ -39,6 +40,7 @@ lock( privateApis, {
+ 	CompositeItemV2,
+ 	CompositeRowV2,
+ 	useCompositeStoreV2,
++	CustomSelectControlV2Legacy,
+ 	CustomSelectControl,
+ 	__experimentalPopoverLegacyPositionToPlacement,
+ 	createPrivateSlotFill,

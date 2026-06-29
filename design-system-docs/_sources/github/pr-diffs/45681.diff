@@ -1,0 +1,276 @@
+diff --git a/packages/components/src/color-palette/index.tsx b/packages/components/src/color-palette/index.tsx
+index 8a403d75192064..4c36a8e56df83c 100644
+--- a/packages/components/src/color-palette/index.tsx
++++ b/packages/components/src/color-palette/index.tsx
+@@ -70,7 +70,7 @@ function SinglePalette( {
+ 					}
+ 					style={ { backgroundColor: color, color } }
+ 					onClick={
+-						isSelected ? clearColor : () => onChange( color )
++						isSelected ? clearColor : () => onChange( color, index )
+ 					}
+ 					aria-label={
+ 						name
+@@ -118,7 +118,9 @@ function MultiplePalettes( {
+ 						<SinglePalette
+ 							clearColor={ clearColor }
+ 							colors={ colorPalette }
+-							onChange={ onChange }
++							onChange={ ( newColor ) =>
++								onChange( newColor, index )
++							}
+ 							value={ value }
+ 							actions={
+ 								colors.length === index + 1 ? actions : null
+diff --git a/packages/components/src/color-palette/test/index.tsx b/packages/components/src/color-palette/test/index.tsx
+index 9918a530918af4..ce81b1241a5f4f 100644
+--- a/packages/components/src/color-palette/test/index.tsx
++++ b/packages/components/src/color-palette/test/index.tsx
+@@ -90,7 +90,7 @@ describe( 'ColorPalette', () => {
+ 		);
+ 
+ 		expect( onChange ).toHaveBeenCalledTimes( 1 );
+-		expect( onChange ).toHaveBeenCalledWith( '#fff' );
++		expect( onChange ).toHaveBeenCalledWith( '#fff', 1 );
+ 	} );
+ 
+ 	test( 'should call onClick with undefined, when the clearButton onClick is triggered', async () => {
+diff --git a/packages/components/src/color-palette/types.ts b/packages/components/src/color-palette/types.ts
+index f9356634d3ef89..2b1be5a35bb678 100644
+--- a/packages/components/src/color-palette/types.ts
++++ b/packages/components/src/color-palette/types.ts
+@@ -24,7 +24,7 @@ type PaletteProps = {
+ 	/**
+ 	 * Callback called when a color is selected.
+ 	 */
+-	onChange: ( newColor?: string ) => void;
++	onChange: ( newColor?: string, index?: number ) => void;
+ 	value?: string;
+ 	actions?: ReactNode;
+ };
+diff --git a/packages/components/src/gradient-picker/index.js b/packages/components/src/gradient-picker/index.js
+index 0da35f8736a7c8..ab2fe98966bea5 100644
+--- a/packages/components/src/gradient-picker/index.js
++++ b/packages/components/src/gradient-picker/index.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { map } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -28,7 +23,7 @@ function SingleOrigin( {
+ 	actions,
+ } ) {
+ 	const gradientOptions = useMemo( () => {
+-		return map( gradients, ( { gradient, name } ) => (
++		return gradients.map( ( { gradient, name }, index ) => (
+ 			<CircularOptionPicker.Option
+ 				key={ gradient }
+ 				value={ gradient }
+@@ -42,7 +37,7 @@ function SingleOrigin( {
+ 				onClick={
+ 					value === gradient
+ 						? clearGradient
+-						: () => onChange( gradient )
++						: () => onChange( gradient, index )
+ 				}
+ 				aria-label={
+ 					name
+@@ -80,7 +75,9 @@ function MultipleOrigin( {
+ 						<SingleOrigin
+ 							clearGradient={ clearGradient }
+ 							gradients={ gradientSet }
+-							onChange={ onChange }
++							onChange={ ( gradient ) =>
++								onChange( gradient, index )
++							}
+ 							value={ value }
+ 							{ ...( gradients.length === index + 1
+ 								? { actions }
+diff --git a/packages/components/src/palette-edit/index.js b/packages/components/src/palette-edit/index.js
+index 0b52d309c03fa7..5beccbeebfb85a 100644
+--- a/packages/components/src/palette-edit/index.js
++++ b/packages/components/src/palette-edit/index.js
+@@ -6,7 +6,7 @@ import { kebabCase } from 'lodash';
+ /**
+  * WordPress dependencies
+  */
+-import { useState, useRef, useEffect } from '@wordpress/element';
++import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
+ import { __, sprintf } from '@wordpress/i18n';
+ import { lineSolid, moreVertical, plus } from '@wordpress/icons';
+ import {
+@@ -89,6 +89,50 @@ export function getNameForPosition( elements, slugPrefix ) {
+ 	);
+ }
+ 
++function ColorPickerPopover( {
++	isGradient,
++	element,
++	onChange,
++	onClose = () => {},
++} ) {
++	return (
++		<Popover
++			placement="left-start"
++			offset={ 20 }
++			className="components-palette-edit__popover"
++			onClose={ onClose }
++		>
++			{ ! isGradient && (
++				<ColorPicker
++					color={ element.color }
++					enableAlpha
++					onChange={ ( newColor ) =>
++						onChange( {
++							...element,
++							color: newColor,
++						} )
++					}
++				/>
++			) }
++			{ isGradient && (
++				<div className="components-palette-edit__popover-gradient-picker">
++					<CustomGradientPicker
++						__nextHasNoMargin
++						__experimentalIsRenderedInSidebar
++						value={ element.gradient }
++						onChange={ ( newGradient ) =>
++							onChange( {
++								...element,
++								gradient: newGradient,
++							} )
++						}
++					/>
++				</div>
++			) }
++		</Popover>
++	);
++}
++
+ function Option( {
+ 	canOnlyChangeValues,
+ 	element,
+@@ -155,39 +199,11 @@ function Option( {
+ 				) }
+ 			</HStack>
+ 			{ isEditing && (
+-				<Popover
+-					placement="left-start"
+-					offset={ 20 }
+-					className="components-palette-edit__popover"
+-				>
+-					{ ! isGradient && (
+-						<ColorPicker
+-							color={ value }
+-							enableAlpha
+-							onChange={ ( newColor ) =>
+-								onChange( {
+-									...element,
+-									color: newColor,
+-								} )
+-							}
+-						/>
+-					) }
+-					{ isGradient && (
+-						<div className="components-palette-edit__popover-gradient-picker">
+-							<CustomGradientPicker
+-								__nextHasNoMargin
+-								__experimentalIsRenderedInSidebar
+-								value={ value }
+-								onChange={ ( newGradient ) =>
+-									onChange( {
+-										...element,
+-										gradient: newGradient,
+-									} )
+-								}
+-							/>
+-						</div>
+-					) }
+-				</Popover>
++				<ColorPickerPopover
++					isGradient={ isGradient }
++					onChange={ onChange }
++					element={ element }
++				/>
+ 			) }
+ 		</PaletteItem>
+ 	);
+@@ -313,6 +329,20 @@ export default function PaletteEdit( {
+ 		! elements[ editingElement ].slug;
+ 	const elementsLength = elements.length;
+ 	const hasElements = elementsLength > 0;
++	const debounceOnChange = useDebounce( onChange, 100 );
++	const onSelectPaletteItem = useCallback(
++		( value, newEditingElementIndex ) => {
++			const selectedElement = elements[ newEditingElementIndex ];
++			const key = isGradient ? 'gradient' : 'color';
++			// Ensures that the index returned matches a known element value.
++			if ( !! selectedElement && selectedElement[ key ] === value ) {
++				setEditingElement( newEditingElementIndex );
++			} else {
++				setIsEditing( true );
++			}
++		},
++		[ isGradient, elements ]
++	);
+ 
+ 	return (
+ 		<PaletteEditStyles>
+@@ -391,9 +421,7 @@ export default function PaletteEdit( {
+ 													} }
+ 													className="components-palette-edit__menu-button"
+ 												>
+-													{ isGradient
+-														? __( 'Edit gradients' )
+-														: __( 'Edit colors' ) }
++													{ __( 'Show details' ) }
+ 												</Button>
+ 											) }
+ 											{ ! canOnlyChangeValues && (
+@@ -454,19 +482,40 @@ export default function PaletteEdit( {
+ 							isGradient={ isGradient }
+ 						/>
+ 					) }
++					{ ! isEditing && editingElement !== null && (
++						<ColorPickerPopover
++							isGradient={ isGradient }
++							onClose={ () => setEditingElement( null ) }
++							onChange={ ( newElement ) => {
++								debounceOnChange(
++									elements.map(
++										( currentElement, currentIndex ) => {
++											if (
++												currentIndex === editingElement
++											) {
++												return newElement;
++											}
++											return currentElement;
++										}
++									)
++								);
++							} }
++							element={ elements[ editingElement ] }
++						/>
++					) }
+ 					{ ! isEditing &&
+ 						( isGradient ? (
+ 							<GradientPicker
+ 								__nextHasNoMargin
+ 								gradients={ gradients }
+-								onChange={ () => {} }
++								onChange={ onSelectPaletteItem }
+ 								clearable={ false }
+ 								disableCustomGradients={ true }
+ 							/>
+ 						) : (
+ 							<ColorPalette
+ 								colors={ colors }
+-								onChange={ () => {} }
++								onChange={ onSelectPaletteItem }
+ 								clearable={ false }
+ 								disableCustomColors={ true }
+ 							/>

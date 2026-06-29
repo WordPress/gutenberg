@@ -1,0 +1,113 @@
+diff --git a/packages/components/src/validated-form-controls/components/input-control.tsx b/packages/components/src/validated-form-controls/components/input-control.tsx
+index 5274ef0b2f6115..a27f7c3c4cdb70 100644
+--- a/packages/components/src/validated-form-controls/components/input-control.tsx
++++ b/packages/components/src/validated-form-controls/components/input-control.tsx
+@@ -16,6 +16,7 @@ const UnforwardedValidatedInputControl = (
+ 		required,
+ 		customValidity,
+ 		markWhenOptional,
++		revalidateOn,
+ 		...restProps
+ 	}: Omit<
+ 		React.ComponentProps< typeof InputControl >,
+@@ -27,11 +28,15 @@ const UnforwardedValidatedInputControl = (
+ 	const validityTargetRef = useRef< HTMLInputElement >( null );
+ 	const mergedRefs = useMergeRefs( [ forwardedRef, validityTargetRef ] );
+ 
++	const _revalidateOn =
++		revalidateOn ?? ( restProps.type === 'email' ? 'blur' : 'change' );
++
+ 	return (
+ 		<ControlWithError
+ 			required={ required }
+ 			markWhenOptional={ markWhenOptional }
+ 			customValidity={ customValidity }
++			revalidateOn={ _revalidateOn }
+ 			getValidityTarget={ () => validityTargetRef.current }
+ 		>
+ 			<InputControl
+diff --git a/packages/components/src/validated-form-controls/components/types.ts b/packages/components/src/validated-form-controls/components/types.ts
+index 66740a3d98f765..cc141d5f942b1e 100644
+--- a/packages/components/src/validated-form-controls/components/types.ts
++++ b/packages/components/src/validated-form-controls/components/types.ts
+@@ -26,4 +26,13 @@ export type ValidatedControlProps = {
+ 		type: 'validating' | 'valid' | 'invalid';
+ 		message: string;
+ 	};
++	/**
++	 * When to revalidate the control.
++	 *
++	 * - `change` (default): Revalidate whenever the user inputs data.
++	 * - `blur`: Revalidate only when the user finishes interacting with the control and focuses away.
++	 *
++	 * @default 'change'
++	 */
++	revalidateOn?: 'change' | 'blur';
+ };
+diff --git a/packages/components/src/validated-form-controls/control-with-error.tsx b/packages/components/src/validated-form-controls/control-with-error.tsx
+index ef3f985bd33c30..36fc2bf312293f 100644
+--- a/packages/components/src/validated-form-controls/control-with-error.tsx
++++ b/packages/components/src/validated-form-controls/control-with-error.tsx
+@@ -65,6 +65,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ 		required,
+ 		markWhenOptional,
+ 		customValidity,
++		revalidateOn = 'change',
+ 		getValidityTarget,
+ 		children,
+ 	}: {
+@@ -77,6 +78,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ 		 */
+ 		markWhenOptional?: boolean;
+ 		customValidity?: ValidatedControlProps[ 'customValidity' ];
++		revalidateOn?: ValidatedControlProps[ 'revalidateOn' ];
+ 		/**
+ 		 * A function that returns the actual element on which the validity data should be applied.
+ 		 */
+@@ -309,6 +311,15 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ 					markWhenOptional
+ 				),
+ 				required,
++				onChange: ( ...args: any[] ) => {
++					if ( revalidateOn === 'blur' ) {
++						setShowMessage( false );
++						setIsTouched( false );
++					}
++					if ( children.props.onChange ) {
++						children.props.onChange( ...args );
++					}
++				},
+ 			} ) }
+ 			<div aria-live="polite">{ visibleMessage }</div>
+ 		</div>
+diff --git a/packages/dataviews/src/components/dataform-controls/utils/validated-input.tsx b/packages/dataviews/src/components/dataform-controls/utils/validated-input.tsx
+index 37c2b8f9448b53..9a29dc0ce11553 100644
+--- a/packages/dataviews/src/components/dataform-controls/utils/validated-input.tsx
++++ b/packages/dataviews/src/components/dataform-controls/utils/validated-input.tsx
+@@ -27,6 +27,10 @@ export type DataFormValidatedTextControlProps< Item > =
+ 		 * Optional suffix element to display after the input.
+ 		 */
+ 		suffix?: React.ReactElement;
++		/**
++		 * When to revalidate the control.
++		 */
++		revalidateOn?: 'change' | 'blur';
+ 	};
+ 
+ export default function ValidatedText< Item >( {
+@@ -39,6 +43,7 @@ export default function ValidatedText< Item >( {
+ 	prefix,
+ 	suffix,
+ 	validity,
++	revalidateOn,
+ }: DataFormValidatedTextControlProps< Item > ) {
+ 	const { label, placeholder, description, getValue, setValue, isValid } =
+ 		field;
+@@ -61,6 +66,7 @@ export default function ValidatedText< Item >( {
+ 			required={ !! isValid.required }
+ 			markWhenOptional={ markWhenOptional }
+ 			customValidity={ getCustomValidity( isValid, validity ) }
++			revalidateOn={ revalidateOn }
+ 			label={ label }
+ 			placeholder={ placeholder }
+ 			value={ value ?? '' }

@@ -1,0 +1,154 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index fd22bd2f949e60..e7f1702f686ef1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,11 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `BaseControl`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([#39325](https://github.com/WordPress/gutenberg/pull/39325)).
++-   `Divider`: Make the divider visible by default (`display: inline`) in flow layout containers when the divider orientation is vertical ([#39316](https://github.com/WordPress/gutenberg/pull/39316)).
++
+ ## 19.6.0 (2022-03-11)
+ 
+ ### Enhancements
+@@ -10,7 +15,6 @@
+ -   `InputControl`: Allow `onBlur` for empty values to commit the change when `isPressEnterToChange` is true, and move reset behavior to the ESCAPE key. ([#39109](https://github.com/WordPress/gutenberg/pull/39109)).
+ -   `TreeGrid`: Add tests for Home/End keyboard navigation. Add `onFocusRow` callback for Home/End keyboard navigation, this was missed in the implementation PR. Modify test for expanding/collapsing a row as row 1 implements this now. Update README with latest changes. ([#39302](https://github.com/WordPress/gutenberg/pull/39302))
+ -   `ToggleGroupControlOption`: Calculate width from button content and remove `LabelPlaceholderView` ([#39345](https://github.com/WordPress/gutenberg/pull/39345))
+--   `BaseControl`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([#39325](https://github.com/WordPress/gutenberg/pull/39325)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/divider/stories/index.tsx b/packages/components/src/divider/stories/index.tsx
+index b2e6bb05e03a37..46f9b45837a0d2 100644
+--- a/packages/components/src/divider/stories/index.tsx
++++ b/packages/components/src/divider/stories/index.tsx
+@@ -8,6 +8,7 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
+  */
+ import { Text } from '../../text';
+ import { Divider } from '..';
++import { Flex } from '../../flex';
+ 
+ const meta: ComponentMeta< typeof Divider > = {
+ 	component: Divider,
+@@ -30,7 +31,7 @@ const meta: ComponentMeta< typeof Divider > = {
+ };
+ export default meta;
+ 
+-const HorizontalTemplate: ComponentStory< typeof Divider > = ( args ) => (
++const Template: ComponentStory< typeof Divider > = ( args ) => (
+ 	<div>
+ 		<Text>Some text before the divider</Text>
+ 		<Divider { ...args } />
+@@ -38,33 +39,35 @@ const HorizontalTemplate: ComponentStory< typeof Divider > = ( args ) => (
+ 	</div>
+ );
+ 
+-const VerticalTemplate: ComponentStory< typeof Divider > = ( args ) => {
+-	const styles = {
+-		display: 'flex',
+-		alignItems: 'stretch',
+-		justifyContent: 'start',
+-	};
+-
+-	return (
+-		<div style={ styles }>
+-			<Text>Some text before the divider</Text>
+-			<Divider { ...args } />
+-			<Text>Some text after the divider</Text>
+-		</div>
+-	);
+-};
+-
+-export const Horizontal: ComponentStory<
+-	typeof Divider
+-> = HorizontalTemplate.bind( {} );
++export const Horizontal: ComponentStory< typeof Divider > = Template.bind( {} );
+ Horizontal.args = {
+ 	margin: 2,
+ };
+ 
+-export const Vertical: ComponentStory< typeof Divider > = VerticalTemplate.bind(
+-	{}
+-);
++export const Vertical: ComponentStory< typeof Divider > = Template.bind( {} );
+ Vertical.args = {
+ 	...Horizontal.args,
+ 	orientation: 'vertical',
+ };
++
++// Inside a `flex` container, the divider will need to be `stretch` aligned in order to be visible.
++export const InFlexContainer: ComponentStory< typeof Divider > = ( args ) => {
++	return (
++		<Flex align="stretch">
++			<Text>
++				Some text before the divider Some text before the divider Some
++				text before the divider Some text before the divider Some text
++				before the divider Some text before the divider Some text before
++				the divider
++			</Text>
++			<Divider { ...args } />
++			<Text>
++				Some text after the divider Some text after the divider Some
++				text after the divider
++			</Text>
++		</Flex>
++	);
++};
++InFlexContainer.args = {
++	...Vertical.args,
++};
+diff --git a/packages/components/src/divider/styles.ts b/packages/components/src/divider/styles.ts
+index 50b49342118027..7f2f92375ce6e6 100644
+--- a/packages/components/src/divider/styles.ts
++++ b/packages/components/src/divider/styles.ts
+@@ -45,6 +45,14 @@ const renderMargin = ( {
+ 		} )()
+ 	);
+ 
++const renderDisplay = ( {
++	'aria-orientation': orientation = 'horizontal',
++}: Props ) => {
++	return orientation === 'vertical'
++		? css( { display: 'inline' } )
++		: undefined;
++};
++
+ const renderBorder = ( {
+ 	'aria-orientation': orientation = 'horizontal',
+ }: Props ) => {
+@@ -67,6 +75,7 @@ export const DividerView = styled.hr< Props >`
+ 	border: 0;
+ 	margin: 0;
+ 
++	${ renderDisplay }
+ 	${ renderBorder }
+ 	${ renderSize }
+ 	${ renderMargin }
+diff --git a/packages/components/src/divider/types.ts b/packages/components/src/divider/types.ts
+index 885d78f6925c98..d48f53795505be 100644
+--- a/packages/components/src/divider/types.ts
++++ b/packages/components/src/divider/types.ts
+@@ -22,8 +22,18 @@ export interface OwnProps {
+ 	 * Adjusts the inline-end margin.
+ 	 */
+ 	marginEnd?: SpaceInput;
++	/**
++	 * Divider's orientation. When using inside a flex container, you may need to make sure the divider is `stretch` aligned
++	 * in order for it to be visible.
++	 *
++	 * @default 'horizontal'
++	 */
++	orientation?: SeparatorProps[ 'orientation' ];
+ }
+ 
+ export interface Props
+-	extends Omit< SeparatorProps, 'children' | 'unstable_system' >,
++	extends Omit<
++			SeparatorProps,
++			'children' | 'unstable_system' | 'orientation'
++		>,
+ 		OwnProps {}

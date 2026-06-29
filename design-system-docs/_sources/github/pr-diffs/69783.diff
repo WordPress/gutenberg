@@ -1,0 +1,55 @@
+diff --git a/package-lock.json b/package-lock.json
+index 90b8a9fd716984..30652b2be324e0 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -26572,9 +26572,9 @@
+ 			"integrity": "sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ=="
+ 		},
+ 		"node_modules/gradient-parser": {
+-			"version": "0.1.5",
+-			"resolved": "https://registry.npmjs.org/gradient-parser/-/gradient-parser-0.1.5.tgz",
+-			"integrity": "sha512-+uPlcVbjrKOnTzvz0MjTj7BfACj8OmxIa1moIjJV7btvhUMSJk0D47RfDCgDrZE3dYMz9Cf5xKJwnrKLjUq0KQ==",
++			"version": "1.0.2",
++			"resolved": "https://registry.npmjs.org/gradient-parser/-/gradient-parser-1.0.2.tgz",
++			"integrity": "sha512-gR6nY33xC9yJoH4wGLQtZQMXDi6RI3H37ERu7kQCVUzlXjNedpZM7xcA489Opwbq0BSGohtWGsWsntupmxelMg==",
+ 			"engines": {
+ 				"node": ">=0.10.0"
+ 			}
+@@ -50477,7 +50477,7 @@
+ 				"deepmerge": "^4.3.0",
+ 				"fast-deep-equal": "^3.1.3",
+ 				"framer-motion": "^11.1.9",
+-				"gradient-parser": "^0.1.5",
++				"gradient-parser": "1.0.2",
+ 				"highlight-words-core": "^1.2.2",
+ 				"is-plain-object": "^5.0.0",
+ 				"memize": "^2.1.0",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4c5317457be103..18b7c12c146cec 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,11 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   Update `gradient-parser` to version `1.0.2` ([#69783](https://github.com/WordPress/gutenberg/pull/69783)).
++
++
+ ### Bug Fixes
+ 
+ -   `Button`: Fix tertiary variant displaying incorrect text color in pressed and hover states ([#68542](https://github.com/WordPress/gutenberg/pull/68542)).
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 1742132ed585d1..8dfd75bd3cc637 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -68,7 +68,7 @@
+ 		"deepmerge": "^4.3.0",
+ 		"fast-deep-equal": "^3.1.3",
+ 		"framer-motion": "^11.1.9",
+-		"gradient-parser": "^0.1.5",
++		"gradient-parser": "1.0.2",
+ 		"highlight-words-core": "^1.2.2",
+ 		"is-plain-object": "^5.0.0",
+ 		"memize": "^2.1.0",

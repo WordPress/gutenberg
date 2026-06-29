@@ -1,0 +1,34 @@
+diff --git a/packages/block-editor/src/components/global-styles/filters-panel.js b/packages/block-editor/src/components/global-styles/filters-panel.js
+index 581661e0c84071..c62099596f66c6 100644
+--- a/packages/block-editor/src/components/global-styles/filters-panel.js
++++ b/packages/block-editor/src/components/global-styles/filters-panel.js
+@@ -10,10 +10,10 @@ import {
+ 	__experimentalToolsPanel as ToolsPanel,
+ 	__experimentalToolsPanelItem as ToolsPanelItem,
+ 	__experimentalItemGroup as ItemGroup,
++	__experimentalItem as Item,
+ 	__experimentalHStack as HStack,
+ 	__experimentalZStack as ZStack,
+ 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
+-	Button,
+ 	MenuGroup,
+ 	ColorIndicator,
+ 	DuotonePicker,
+@@ -189,15 +189,12 @@ export default function FiltersPanel( {
+ 
+ 							return (
+ 								<ItemGroup isBordered isSeparated>
+-									<Button
+-										__next40pxDefaultSize
+-										{ ...toggleProps }
+-									>
++									<Item as="button" { ...toggleProps }>
+ 										<LabeledColorIndicator
+ 											indicator={ duotone }
+ 											label={ __( 'Duotone' ) }
+ 										/>
+-									</Button>
++									</Item>
+ 								</ItemGroup>
+ 							);
+ 						} }

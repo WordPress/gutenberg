@@ -1,0 +1,217 @@
+diff --git a/packages/block-editor/src/components/border-radius-control/index.js b/packages/block-editor/src/components/border-radius-control/index.js
+index 0821ab38acc3ca..8754d39ac570f4 100644
+--- a/packages/block-editor/src/components/border-radius-control/index.js
++++ b/packages/block-editor/src/components/border-radius-control/index.js
+@@ -94,7 +94,7 @@ export default function BorderRadiusControl( { onChange, values } ) {
+ 				{ isLinked ? (
+ 					<>
+ 						<AllInputControl
+-							__unstableWrapperClassName="components-border-radius-control__unit-control"
++							className="components-border-radius-control__unit-control"
+ 							values={ values }
+ 							min={ MIN_BORDER_RADIUS_VALUE }
+ 							onChange={ onChange }
+diff --git a/packages/components/src/border-control/styles.ts b/packages/components/src/border-control/styles.ts
+index 6ee8fc7487df3f..b105e8b62bd7bd 100644
+--- a/packages/components/src/border-control/styles.ts
++++ b/packages/components/src/border-control/styles.ts
+@@ -13,7 +13,7 @@ import {
+ 	StyledLabel,
+ } from '../base-control/styles/base-control-styles';
+ import {
+-	Root as UnitControlWrapper,
++	ValueInput as UnitControlWrapper,
+ 	UnitSelect,
+ } from '../unit-control/styles/unit-control-styles';
+ 
+diff --git a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+index 83e6fe500faa1a..5f932fd5e0fffb 100644
+--- a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
++++ b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+@@ -38,6 +38,7 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+   height: 100%;
++  box-sizing: border-box;
+   position: relative;
+   border-radius: 2px;
+   padding-top: 0;
+@@ -309,6 +310,7 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+   height: 100%;
++  box-sizing: border-box;
+   position: relative;
+   border-radius: 2px;
+   padding-top: 0;
+@@ -590,6 +592,7 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`]
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+   height: 100%;
++  box-sizing: border-box;
+   position: relative;
+   border-radius: 2px;
+   padding-top: 0;
+@@ -883,6 +886,7 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+   height: 100%;
++  box-sizing: border-box;
+   position: relative;
+   border-radius: 2px;
+   padding-top: 0;
+diff --git a/packages/components/src/input-control/styles/input-control-styles.tsx b/packages/components/src/input-control/styles/input-control-styles.tsx
+index b35efb42378ea7..1be98530d1fa48 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.tsx
++++ b/packages/components/src/input-control/styles/input-control-styles.tsx
+@@ -34,6 +34,7 @@ const rootFocusedStyles = ( { isFocused }: RootProps ) => {
+ };
+ 
+ export const Root = styled( Flex )< RootProps >`
++	box-sizing: border-box;
+ 	position: relative;
+ 	border-radius: 2px;
+ 	padding-top: 0;
+diff --git a/packages/components/src/unit-control/index.tsx b/packages/components/src/unit-control/index.tsx
+index 44b453f5f6943f..c4baaf64568da6 100644
+--- a/packages/components/src/unit-control/index.tsx
++++ b/packages/components/src/unit-control/index.tsx
+@@ -23,7 +23,7 @@ import { __ } from '@wordpress/i18n';
+  */
+ import type { WordPressComponentProps } from '../ui/context';
+ import * as inputControlActionTypes from '../input-control/reducer/actions';
+-import { Root, ValueInput } from './styles/unit-control-styles';
++import { ValueInput } from './styles/unit-control-styles';
+ import UnitSelectControl from './unit-select-control';
+ import {
+ 	CSS_UNITS,
+@@ -58,12 +58,10 @@ function UnforwardedUnitControl(
+ 		onChange: onChangeProp,
+ 		onUnitChange,
+ 		size = 'default',
+-		style,
+ 		unit: unitProp,
+ 		units: unitsProp = CSS_UNITS,
+ 		value: valueProp,
+ 		onBlur: onBlurProp,
+-		__unstableWrapperClassName,
+ 		...props
+ 	} = unitControlProps;
+ 
+@@ -106,10 +104,12 @@ function UnforwardedUnitControl(
+ 	// Stores parsed value for hand-off in state reducer.
+ 	const refParsedQuantity = useRef< number | undefined >( undefined );
+ 
+-	const classes = classnames( 'components-unit-control', className );
+-	const wrapperClasses = classnames(
++	const classes = classnames(
++		'components-unit-control',
++		// This class is added for legacy purposes to maintain it on the outer
++		// wrapper. See: https://github.com/WordPress/gutenberg/pull/45139
+ 		'components-unit-control-wrapper',
+-		__unstableWrapperClassName
++		className
+ 	);
+ 
+ 	const handleOnQuantityChange = (
+@@ -182,7 +182,7 @@ function UnforwardedUnitControl(
+ 				: undefined;
+ 			const changeProps = { event, data };
+ 
+-			// The `onChange` callback already gets called, no need to call it explicitely.
++			// The `onChange` callback already gets called, no need to call it explicitly.
+ 			onUnitChange?.( validParsedUnit, changeProps );
+ 
+ 			setUnit( validParsedUnit );
+@@ -263,27 +263,25 @@ function UnforwardedUnitControl(
+ 	}
+ 
+ 	return (
+-		<Root className={ wrapperClasses } style={ style }>
+-			<ValueInput
+-				type={ isPressEnterToChange ? 'text' : 'number' }
+-				{ ...props }
+-				autoComplete={ autoComplete }
+-				className={ classes }
+-				disabled={ disabled }
+-				hideHTMLArrows
+-				isPressEnterToChange={ isPressEnterToChange }
+-				label={ label }
+-				onBlur={ handleOnBlur }
+-				onKeyDown={ handleOnKeyDown }
+-				onChange={ handleOnQuantityChange }
+-				ref={ forwardedRef }
+-				size={ size }
+-				suffix={ inputSuffix }
+-				value={ parsedQuantity ?? '' }
+-				step={ step }
+-				__unstableStateReducer={ stateReducer }
+-			/>
+-		</Root>
++		<ValueInput
++			type={ isPressEnterToChange ? 'text' : 'number' }
++			{ ...props }
++			autoComplete={ autoComplete }
++			className={ classes }
++			disabled={ disabled }
++			hideHTMLArrows
++			isPressEnterToChange={ isPressEnterToChange }
++			label={ label }
++			onBlur={ handleOnBlur }
++			onKeyDown={ handleOnKeyDown }
++			onChange={ handleOnQuantityChange }
++			ref={ forwardedRef }
++			size={ size }
++			suffix={ inputSuffix }
++			value={ parsedQuantity ?? '' }
++			step={ step }
++			__unstableStateReducer={ stateReducer }
++		/>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/unit-control/styles/unit-control-styles.ts b/packages/components/src/unit-control/styles/unit-control-styles.ts
+index ba5952a5ba65d6..2d9dc5f13fb111 100644
+--- a/packages/components/src/unit-control/styles/unit-control-styles.ts
++++ b/packages/components/src/unit-control/styles/unit-control-styles.ts
+@@ -18,16 +18,6 @@ type SelectProps = {
+ 	selectSize: SelectSize;
+ };
+ 
+-export const Root = styled.div`
+-	box-sizing: border-box;
+-	position: relative;
+-
+-	/* Target the InputControl's backdrop and make focus styles smoother. */
+-	&&& ${ BackdropUI } {
+-		transition: box-shadow 0.1s linear;
+-	}
+-`;
+-
+ // TODO: Resolve need to use &&& to increase specificity
+ // https://github.com/WordPress/gutenberg/issues/18483
+ 
+@@ -37,6 +27,10 @@ export const ValueInput = styled( NumberControl )`
+ 			display: block;
+ 			width: 100%;
+ 		}
++
++		${ BackdropUI } {
++			transition: box-shadow 0.1s linear;
++		}
+ 	}
+ `;
+ 
+diff --git a/packages/components/src/unit-control/types.ts b/packages/components/src/unit-control/types.ts
+index 78200369fb8592..edbd5ac8f4cd6b 100644
+--- a/packages/components/src/unit-control/types.ts
++++ b/packages/components/src/unit-control/types.ts
+@@ -100,8 +100,4 @@ export type UnitControlProps = Omit< UnitSelectControlProps, 'unit' > &
+ 		 * Callback when either the quantity or the unit inputs lose focus.
+ 		 */
+ 		onBlur?: FocusEventHandler< HTMLInputElement | HTMLSelectElement >;
+-		/**
+-		 * Custom CSS class to apply to the unit control's outer wrapper.
+-		 */
+-		__unstableWrapperClassName?: string;
+ 	};

@@ -1,0 +1,33 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f3b42ea3a185bb..38cd5e3a32a145 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ -   `TextControl`, `TextareaControl`, `ToggleGroupControl`: Add `box-sizing` reset style ([#42889](https://github.com/WordPress/gutenberg/pull/42889)).
+ -   `Popover`: fix arrow placement and design ([#42874](https://github.com/WordPress/gutenberg/pull/42874/)).
+ -   `Popover`: fix minor glitch in arrow [#42903](https://github.com/WordPress/gutenberg/pull/42903)).
++-   `ColorPicker`: fix layout overflow [#42992](https://github.com/WordPress/gutenberg/pull/42992)).
+ -   `ToolsPanel`: Constrain grid columns to 50% max-width ([#42795](https://github.com/WordPress/gutenberg/pull/42795)).
+ 
+ ### Enhancements
+diff --git a/packages/components/src/color-picker/styles.ts b/packages/components/src/color-picker/styles.ts
+index d234f6fbb3c5d0..97a1171dd53beb 100644
+--- a/packages/components/src/color-picker/styles.ts
++++ b/packages/components/src/color-picker/styles.ts
+@@ -11,6 +11,7 @@ import InnerSelectControl from '../select-control';
+ import InnerRangeControl from '../range-control';
+ import { StyledField } from '../base-control/styles/base-control-styles';
+ import { space } from '../ui/utils/space';
++import { boxSizingReset } from '../utils';
+ import Button from '../button';
+ import { Flex } from '../flex';
+ import { HStack } from '../h-stack';
+@@ -70,6 +71,8 @@ export const ColorInputWrapper = styled( Flex )`
+ `;
+ 
+ export const ColorfulWrapper = styled.div`
++	${ boxSizingReset };
++
+ 	width: 216px;
+ 
+ 	.react-colorful {

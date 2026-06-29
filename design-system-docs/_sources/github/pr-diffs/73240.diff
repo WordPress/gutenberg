@@ -1,0 +1,122 @@
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index 7db90954e0adf4..b5820f5aba429d 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Enhancements
+ 
++- DataViews: Make sticky elements (table headers, footer, actions column) inherit background colors from parent container. This allows DataViews instances to seamlessly adapt to containers with custom background colors. [#73240](https://github.com/WordPress/gutenberg/pull/73240)
+ - DataViews table layout: only apply hover styles when bulk actions are available. [#73248](https://github.com/WordPress/gutenberg/pull/73248)
+ - Improve docs for Edit component. [#73202](https://github.com/WordPress/gutenberg/pull/73202)
+ - Field API: introduce the `format` prop to format the `date` field type. [#72999](https://github.com/WordPress/gutenberg/pull/72999)
+diff --git a/packages/dataviews/src/components/dataviews-footer/style.scss b/packages/dataviews/src/components/dataviews-footer/style.scss
+index 15420f6cce3546..9f22c42c2d6163 100644
+--- a/packages/dataviews/src/components/dataviews-footer/style.scss
++++ b/packages/dataviews/src/components/dataviews-footer/style.scss
+@@ -6,7 +6,7 @@
+ 	position: sticky;
+ 	bottom: 0;
+ 	left: 0;
+-	background-color: $white;
++	background-color: inherit;
+ 	padding: $grid-unit-15 $grid-unit-60;
+ 	border-top: $border-width solid $gray-100;
+ 	flex-shrink: 0;
+diff --git a/packages/dataviews/src/components/dataviews/style.scss b/packages/dataviews/src/components/dataviews/style.scss
+index cd428d1739ecf7..32de6515cb89da 100644
+--- a/packages/dataviews/src/components/dataviews/style.scss
++++ b/packages/dataviews/src/components/dataviews/style.scss
+@@ -14,6 +14,7 @@
+ 	flex-direction: column;
+ 	font-size: $default-font-size;
+ 	line-height: $default-line-height;
++	background-color: inherit;
+ }
+ 
+ .dataviews__view-actions,
+@@ -23,6 +24,7 @@
+ 	flex-shrink: 0;
+ 	position: sticky;
+ 	left: 0;
++	background-color: inherit;
+ 
+ 	@media not (prefers-reduced-motion) {
+ 		transition: padding ease-out 0.1s;
+diff --git a/packages/dataviews/src/dataviews-layouts/picker-table/style.scss b/packages/dataviews/src/dataviews-layouts/picker-table/style.scss
+index 2686e17f41300f..b3f93c956c7019 100644
+--- a/packages/dataviews/src/dataviews-layouts/picker-table/style.scss
++++ b/packages/dataviews/src/dataviews-layouts/picker-table/style.scss
+@@ -3,6 +3,8 @@
+ // Add any picker-specific overrides here if needed in the future.
+ 
+ .dataviews-view-picker-table {
++	background-color: inherit;
++
+ 	tbody:focus-visible {
+ 		// Only show one focus outline at a time. When focus is on a child element,
+ 		// hide the table's own focus outline.
+diff --git a/packages/dataviews/src/dataviews-layouts/table/style.scss b/packages/dataviews/src/dataviews-layouts/table/style.scss
+index 4b8d4062ed3710..c054e152cf4818 100644
+--- a/packages/dataviews/src/dataviews-layouts/table/style.scss
++++ b/packages/dataviews/src/dataviews-layouts/table/style.scss
+@@ -11,6 +11,7 @@
+ 	position: relative;
+ 	color: $gray-700;
+ 	margin-bottom: auto;
++	background-color: inherit;
+ 
+ 	th {
+ 		text-align: left;
+@@ -29,7 +30,7 @@
+ 		&.dataviews-view-table__actions-column--sticky {
+ 			position: sticky;
+ 			right: 0;
+-			background-color: $white;
++			background-color: inherit;
+ 		}
+ 
+ 		&.dataviews-view-table__actions-column--stuck {
+@@ -56,6 +57,7 @@
+ 	}
+ 	tr {
+ 		border-top: 1px solid $gray-100;
++		background-color: inherit;
+ 
+ 		.dataviews-view-table-header-button {
+ 			gap: $grid-unit-05;
+@@ -102,7 +104,7 @@
+ 		}
+ 
+ 		&.is-selected {
+-			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.04);
++			background-color: color-mix(in srgb, rgb(var(--wp-admin-theme-color--rgb)) 4%, $white);
+ 			color: $gray-700;
+ 
+ 			&,
+@@ -111,7 +113,7 @@
+ 			}
+ 
+ 			&:hover {
+-				background-color: rgba(var(--wp-admin-theme-color--rgb), 0.08);
++				background-color: color-mix(in srgb, rgb(var(--wp-admin-theme-color--rgb)) 8%, $white);
+ 			}
+ 
+ 			.dataviews-view-table__actions-column--sticky {
+@@ -150,6 +152,7 @@
+ 		position: sticky;
+ 		inset-block-start: 0;
+ 		z-index: z-index(".dataviews-view-table thead");
++		background-color: inherit;
+ 
+ 		tr {
+ 			border: 0;
+@@ -159,7 +162,7 @@
+ 			}
+ 		}
+ 		th {
+-			background-color: $white;
++			background-color: inherit;
+ 			padding-top: $grid-unit-10;
+ 			padding-bottom: $grid-unit-10;
+ 			padding-left: $grid-unit-15;

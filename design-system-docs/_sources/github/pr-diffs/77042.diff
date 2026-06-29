@@ -1,0 +1,102 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index fda15ca8fcb19e..a31dbf4011c25d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `ValidatedRangeControl`: Fix `aria-label` rendered as `[object Object]` when `required` or `markWhenOptional` is set ([#77042](https://github.com/WordPress/gutenberg/pull/77042)).
+ -   `Autocomplete`: Fix matching logic to prefer longest overlapping trigger ([#77018](https://github.com/WordPress/gutenberg/pull/77018)).
+ 
+ ### Internal
+diff --git a/packages/components/src/validated-form-controls/control-with-error.tsx b/packages/components/src/validated-form-controls/control-with-error.tsx
+index bbac0b40be01b9..ef3f985bd33c30 100644
+--- a/packages/components/src/validated-form-controls/control-with-error.tsx
++++ b/packages/components/src/validated-form-controls/control-with-error.tsx
+@@ -21,21 +21,26 @@ function appendRequiredIndicator(
+ 	required: boolean | undefined,
+ 	markWhenOptional: boolean | undefined
+ ) {
++	let suffix;
+ 	if ( required && ! markWhenOptional ) {
+-		return (
+-			<>
+-				{ label } { `(${ __( 'Required' ) })` }
+-			</>
+-		);
++		suffix = `(${ __( 'Required' ) })`;
++	} else if ( ! required && markWhenOptional ) {
++		suffix = `(${ __( 'Optional' ) })`;
+ 	}
+-	if ( ! required && markWhenOptional ) {
+-		return (
+-			<>
+-				{ label } { `(${ __( 'Optional' ) })` }
+-			</>
+-		);
++
++	if ( ! suffix ) {
++		return label;
++	}
++
++	if ( typeof label === 'string' ) {
++		return `${ label } ${ suffix }`;
+ 	}
+-	return label;
++
++	return (
++		<>
++			{ label } { suffix }
++		</>
++	);
+ }
+ 
+ const VALIDITY_VISIBLE_ATTRIBUTE = 'data-validity-visible';
+diff --git a/packages/components/src/validated-form-controls/test/control-with-error.tsx b/packages/components/src/validated-form-controls/test/control-with-error.tsx
+index 1fbd9325061388..dc2267c2a854b9 100644
+--- a/packages/components/src/validated-form-controls/test/control-with-error.tsx
++++ b/packages/components/src/validated-form-controls/test/control-with-error.tsx
+@@ -12,7 +12,7 @@ import { useState, useCallback, useId, useRef } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { ValidatedInputControl } from '../components';
++import { ValidatedInputControl, ValidatedRangeControl } from '../components';
+ 
+ describe( 'ControlWithError', () => {
+ 	describe( 'Async Validation', () => {
+@@ -464,6 +464,33 @@ describe( 'ControlWithError', () => {
+ 		} );
+ 	} );
+ 
++	describe( 'ValidatedRangeControl', () => {
++		it( 'should accessibly label the internal slider and spin button', () => {
++			render(
++				<ValidatedRangeControl
++					label="Opacity"
++					required
++					min={ 0 }
++					max={ 100 }
++					onChange={ () => {} }
++				/>
++			);
++
++			// The slider is styled with `opacity: 0`, so it's not "visible"
++			// in the DOM sense, but it's still accessible.
++			expect(
++				screen.getByRole( 'slider', {
++					name: 'Opacity (Required)',
++				} )
++			).toBeInTheDocument();
++			expect(
++				screen.getByRole( 'spinbutton', {
++					name: 'Opacity (Required)',
++				} )
++			).toBeVisible();
++		} );
++	} );
++
+ 	describe( 'Focus behavior', () => {
+ 		it( 'should focus the first error in the form', async () => {
+ 			const user = userEvent.setup();

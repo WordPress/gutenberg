@@ -1,0 +1,99 @@
+diff --git a/packages/base-styles/_variables.scss b/packages/base-styles/_variables.scss
+index fcfc2356168274..96d7aba226996b 100644
+--- a/packages/base-styles/_variables.scss
++++ b/packages/base-styles/_variables.scss
+@@ -48,6 +48,7 @@ $icon-size: 24px;
+ $button-size: 36px;
+ $button-size-next-default-40px: 40px; // transitionary variable for next default button size
+ $button-size-small: 24px;
++$button-size-small-next-default-32px: 32px; // transitionary variable for next small button size
+ $header-height: 60px;
+ $panel-header-height: $grid-unit-60;
+ $nav-sidebar-width: 360px;
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4d6ea42e8bc0e1..a7fdb1597efbc1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `Button`: Add `__next32pxSmallSize` prop to opt into the new 32px size when the `isSmall` prop is enabled ([#51012](https://github.com/WordPress/gutenberg/pull/51012)).
++
+ ### Bug Fix
+ 
+ -   `FocalPointUnitControl`: Add aria-labels ([#50993](https://github.com/WordPress/gutenberg/pull/50993)).
+diff --git a/packages/components/src/button/index.tsx b/packages/components/src/button/index.tsx
+index 098f6eaac3b1cf..24932ab06a9b69 100644
+--- a/packages/components/src/button/index.tsx
++++ b/packages/components/src/button/index.tsx
+@@ -76,6 +76,7 @@ export function UnforwardedButton(
+ ) {
+ 	const {
+ 		__next40pxDefaultSize,
++		__next32pxSmallSize,
+ 		isSmall,
+ 		isPressed,
+ 		isBusy,
+@@ -117,6 +118,7 @@ export function UnforwardedButton(
+ 
+ 	const classes = classnames( 'components-button', className, {
+ 		'is-next-40px-default-size': __next40pxDefaultSize,
++		'is-next-32px-small-size': __next32pxSmallSize,
+ 		'is-secondary': variant === 'secondary',
+ 		'is-primary': variant === 'primary',
+ 		'is-small': isSmall,
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index fefc93b4fa8e0e..5916876aad589d 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -263,15 +263,24 @@
+ 	}
+ 
+ 	&.is-small {
+-		height: $icon-size;
++		height: $button-size-small-next-default-32px;
+ 		line-height: 22px;
+ 		padding: 0 8px;
+ 		font-size: 11px;
+ 
+ 		&.has-icon:not(.has-text) {
+ 			padding: 0;
+-			width: $icon-size;
+-			min-width: $icon-size;
++			width: $button-size-small-next-default-32px;
++			min-width: $button-size-small-next-default-32px;
++		}
++
++		&:not(.is-next-32px-small-size) {
++			height: $button-size-small;
++
++			&.has-icon:not(.has-text) {
++				width: $button-size-small;
++				min-width: $button-size-small;
++			}
+ 		}
+ 	}
+ 
+diff --git a/packages/components/src/button/types.ts b/packages/components/src/button/types.ts
+index 57e2a3df6ee61e..85188476e5f370 100644
+--- a/packages/components/src/button/types.ts
++++ b/packages/components/src/button/types.ts
+@@ -25,6 +25,15 @@ type BaseButtonProps = {
+ 	 * @default false
+ 	 */
+ 	__next40pxDefaultSize?: boolean;
++	/**
++	 * Start opting into the larger `isSmall` button size that will become the
++	 * default small size in a future version.
++	 *
++	 * Only takes effect when the `isSmall` prop is `true`.
++	 *
++	 * @default false
++	 */
++	__next32pxSmallSize?: boolean;
+ 	/**
+ 	 * The button's children.
+ 	 */

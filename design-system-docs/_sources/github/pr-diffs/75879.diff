@@ -1,0 +1,12 @@
+diff --git a/packages/theme/src/style.scss b/packages/theme/src/style.scss
+deleted file mode 100644
+index 8493c5cf13a0ed..00000000000000
+--- a/packages/theme/src/style.scss
++++ /dev/null
+@@ -1,6 +0,0 @@
+-/**
+- * WordPress Design System theme styles.
+- * This exports the design tokens (CSS custom properties) for use across WordPress packages.
+- */
+-
+-@use "./prebuilt/css/design-tokens.css";

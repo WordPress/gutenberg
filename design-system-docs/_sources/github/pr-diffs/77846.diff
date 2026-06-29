@@ -1,0 +1,311 @@
+diff --git a/packages/block-editor/src/components/block-tools/block-toolbar-popover.js b/packages/block-editor/src/components/block-tools/block-toolbar-popover.js
+index 0724928cfeacb2..215fd69d00bc77 100644
+--- a/packages/block-editor/src/components/block-tools/block-toolbar-popover.js
++++ b/packages/block-editor/src/components/block-tools/block-toolbar-popover.js
+@@ -52,7 +52,6 @@ export default function BlockToolbarPopover( {
+ 	const clientIdToPositionOver = capturingClientId || clientId;
+ 
+ 	const popoverProps = useBlockToolbarPopoverProps( {
+-		contentElement: __unstableContentRef?.current,
+ 		clientId: clientIdToPositionOver,
+ 	} );
+ 
+diff --git a/packages/block-editor/src/components/block-tools/empty-block-inserter.js b/packages/block-editor/src/components/block-tools/empty-block-inserter.js
+index 7faeda933f4c48..db55fb34e26244 100644
+--- a/packages/block-editor/src/components/block-tools/empty-block-inserter.js
++++ b/packages/block-editor/src/components/block-tools/empty-block-inserter.js
+@@ -22,10 +22,7 @@ export default function EmptyBlockInserter( {
+ 		rootClientId,
+ 	} = useSelectedBlockToolProps( clientId );
+ 
+-	const popoverProps = useBlockToolbarPopoverProps( {
+-		contentElement: __unstableContentRef?.current,
+-		clientId,
+-	} );
++	const popoverProps = useBlockToolbarPopoverProps( { clientId } );
+ 
+ 	return (
+ 		<BlockPopoverCover
+diff --git a/packages/block-editor/src/components/block-tools/style.scss b/packages/block-editor/src/components/block-tools/style.scss
+index 2cdf3e7096ce39..2c5d6b35aad516 100644
+--- a/packages/block-editor/src/components/block-tools/style.scss
++++ b/packages/block-editor/src/components/block-tools/style.scss
+@@ -105,8 +105,6 @@
+ 	// Position the block toolbar.
+ 	.block-editor-block-contextual-toolbar {
+ 		pointer-events: all;
+-		margin-top: $grid-unit-10;
+-		margin-bottom: $grid-unit-10;
+ 		border: $border-width solid $gray-900;
+ 		border-radius: $radius-small;
+ 		overflow: visible; // allow the parent selector to be visible
+diff --git a/packages/block-editor/src/components/block-tools/use-block-toolbar-popover-props.js b/packages/block-editor/src/components/block-tools/use-block-toolbar-popover-props.js
+index df016e73c29d45..0a297d10e22aef 100644
+--- a/packages/block-editor/src/components/block-tools/use-block-toolbar-popover-props.js
++++ b/packages/block-editor/src/components/block-tools/use-block-toolbar-popover-props.js
+@@ -1,199 +1,54 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useRefEffect } from '@wordpress/compose';
+ import { useSelect } from '@wordpress/data';
+-import { getScrollContainer } from '@wordpress/dom';
+-import {
+-	useCallback,
+-	useLayoutEffect,
+-	useMemo,
+-	useState,
+-} from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+ import { store as blockEditorStore } from '../../store';
+-import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
+ import { hasStickyOrFixedPositionValue } from '../../hooks/position';
+-import { getElementBounds } from '../../utils/dom';
+ 
++// `offset` keeps the toolbar 8px ($grid-unit-10) off the block;
++// `shift.padding` keeps it the same 8px off the viewport edges when shifting.
+ const COMMON_PROPS = {
+-	placement: 'top-start',
++	flip: false,
++	offset: 8,
++	shift: { padding: 8 },
+ };
+ 
+-// By default the toolbar sets the `shift` prop. If the user scrolls the page
+-// down the toolbar will stay on screen by adopting a sticky position at the
+-// top of the viewport.
++// Default: anchor above the selected block. `shift` keeps it on screen as the
++// user scrolls.
+ const DEFAULT_PROPS = {
+ 	...COMMON_PROPS,
+-	flip: false,
+-	shift: true,
++	placement: 'top-start',
+ };
+ 
+-// When there isn't enough height between the top of the block and the editor
+-// canvas, the `shift` prop is set to `false`, as it will cause the block to be
+-// obscured. The `flip` behavior is enabled, which positions the toolbar below
+-// the block. This only happens if the block is smaller than the viewport, as
+-// otherwise the toolbar will be off-screen.
+-const RESTRICTED_HEIGHT_PROPS = {
++// Place the toolbar below the block when:
++// - It's the first top-level block (no room above and scrolling can't rescue
++//   the user since they're already at the canvas top), or
++// - The block has sticky/fixed positioning (it can pin to the viewport top
++//   where a toolbar above would overlap or get clipped by editor chrome).
++const BELOW_BLOCK_PROPS = {
+ 	...COMMON_PROPS,
+-	flip: true,
+-	shift: false,
++	placement: 'bottom-start',
+ };
+ 
+-/**
+- * Get the popover props for the block toolbar, determined by the space at the top of the canvas and the toolbar height.
+- *
+- * @param {Element} contentElement       The DOM element that represents the editor content or canvas.
+- * @param {Element} selectedBlockElement The outer DOM element of the first selected block.
+- * @param {Element} scrollContainer      The scrollable container for the contentElement.
+- * @param {number}  toolbarHeight        The height of the toolbar in pixels.
+- * @param {boolean} isSticky             Whether or not the selected block is sticky or fixed.
+- *
+- * @return {Object} The popover props used to determine the position of the toolbar.
+- */
+-function getProps(
+-	contentElement,
+-	selectedBlockElement,
+-	scrollContainer,
+-	toolbarHeight,
+-	isSticky
+-) {
+-	if ( ! contentElement || ! selectedBlockElement ) {
+-		return DEFAULT_PROPS;
+-	}
+-
+-	// Get how far the content area has been scrolled.
+-	const scrollTop = scrollContainer?.scrollTop || 0;
+-
+-	const blockRect = getElementBounds( selectedBlockElement );
+-	const contentRect = contentElement.getBoundingClientRect();
+-
+-	// Get the vertical position of top of the visible content area.
+-	const topOfContentElementInViewport = scrollTop + contentRect.top;
+-
+-	// The document element's clientHeight represents the viewport height.
+-	const viewportHeight =
+-		contentElement.ownerDocument.documentElement.clientHeight;
+-
+-	// The restricted height area is calculated as the sum of the
+-	// vertical position of the visible content area, plus the height
+-	// of the block toolbar.
+-	const restrictedTopArea = topOfContentElementInViewport + toolbarHeight;
+-	const hasSpaceForToolbarAbove = blockRect.top > restrictedTopArea;
+-
+-	const isBlockTallerThanViewport =
+-		blockRect.height > viewportHeight - toolbarHeight;
+-
+-	// Sticky blocks are treated as if they will never have enough space for the toolbar above.
+-	if (
+-		! isSticky &&
+-		( hasSpaceForToolbarAbove || isBlockTallerThanViewport )
+-	) {
+-		return DEFAULT_PROPS;
+-	}
+-
+-	return RESTRICTED_HEIGHT_PROPS;
+-}
+-
+-/**
+- * Determines the desired popover positioning behavior, returning a set of appropriate props.
+- *
+- * @param {Object}  elements
+- * @param {Element} elements.contentElement The DOM element that represents the editor content or canvas.
+- * @param {string}  elements.clientId       The clientId of the first selected block.
+- *
+- * @return {Object} The popover props used to determine the position of the toolbar.
+- */
+-export default function useBlockToolbarPopoverProps( {
+-	contentElement,
+-	clientId,
+-} ) {
+-	const selectedBlockElement = useBlockElement( clientId );
+-	const [ toolbarHeight, setToolbarHeight ] = useState( 0 );
+-	const { blockIndex, isSticky } = useSelect(
++export default function useBlockToolbarPopoverProps( { clientId } ) {
++	const placeBelow = useSelect(
+ 		( select ) => {
+-			const { getBlockIndex, getBlockAttributes } =
++			const { getBlockRootClientId, getBlockIndex, getBlockAttributes } =
+ 				select( blockEditorStore );
+-			return {
+-				blockIndex: getBlockIndex( clientId ),
+-				isSticky: hasStickyOrFixedPositionValue(
+-					getBlockAttributes( clientId )
+-				),
+-			};
++			const isFirstTopLevelBlock =
++				! getBlockRootClientId( clientId ) &&
++				getBlockIndex( clientId ) === 0;
++			const isSticky = hasStickyOrFixedPositionValue(
++				getBlockAttributes( clientId )
++			);
++			return isFirstTopLevelBlock || isSticky;
+ 		},
+ 		[ clientId ]
+ 	);
+-	const scrollContainer = useMemo( () => {
+-		if ( ! contentElement ) {
+-			return;
+-		}
+-		return getScrollContainer( contentElement );
+-	}, [ contentElement ] );
+-	const [ props, setProps ] = useState( () =>
+-		getProps(
+-			contentElement,
+-			selectedBlockElement,
+-			scrollContainer,
+-			toolbarHeight,
+-			isSticky
+-		)
+-	);
+-
+-	const popoverRef = useRefEffect( ( popoverNode ) => {
+-		setToolbarHeight( popoverNode.offsetHeight );
+-	}, [] );
+-
+-	const updateProps = useCallback(
+-		() =>
+-			setProps(
+-				getProps(
+-					contentElement,
+-					selectedBlockElement,
+-					scrollContainer,
+-					toolbarHeight,
+-					isSticky
+-				)
+-			),
+-		[ contentElement, selectedBlockElement, scrollContainer, toolbarHeight ]
+-	);
+-
+-	// Update props when the block is moved. This also ensures the props are
+-	// correct on initial mount, and when the selected block or content element
+-	// changes (since the callback ref will update).
+-	useLayoutEffect( updateProps, [ blockIndex, updateProps ] );
+-
+-	// Update props when the viewport is resized or the block is resized.
+-	useLayoutEffect( () => {
+-		if ( ! contentElement || ! selectedBlockElement ) {
+-			return;
+-		}
+-
+-		// Update the toolbar props on viewport resize.
+-		const contentView = contentElement?.ownerDocument?.defaultView;
+-		contentView?.addEventHandler?.( 'resize', updateProps );
+-
+-		// Update the toolbar props on block resize.
+-		let resizeObserver;
+-		const blockView = selectedBlockElement?.ownerDocument?.defaultView;
+-		if ( blockView.ResizeObserver ) {
+-			resizeObserver = new blockView.ResizeObserver( updateProps );
+-			resizeObserver.observe( selectedBlockElement );
+-		}
+-
+-		return () => {
+-			contentView?.removeEventHandler?.( 'resize', updateProps );
+-
+-			if ( resizeObserver ) {
+-				resizeObserver.disconnect();
+-			}
+-		};
+-	}, [ updateProps, contentElement, selectedBlockElement ] );
+ 
+-	return {
+-		...props,
+-		ref: popoverRef,
+-	};
++	return placeBelow ? BELOW_BLOCK_PROPS : DEFAULT_PROPS;
+ }
+diff --git a/packages/components/src/popover/index.tsx b/packages/components/src/popover/index.tsx
+index 3acc818ff35d08..b8074362e67b2b 100644
+--- a/packages/components/src/popover/index.tsx
++++ b/packages/components/src/popover/index.tsx
+@@ -242,7 +242,12 @@ const UnforwardedPopover = (
+ 			shiftMiddleware( {
+ 				crossAxis: true,
+ 				limiter: limitShift(),
+-				padding: 1, // Necessary to avoid flickering at the edge of the viewport.
++				// `1` avoids flickering at the edge of the viewport. Callers
++				// can opt into a larger inset by passing `shift={ { padding } }`.
++				padding:
++					typeof shift === 'object' && shift.padding !== undefined
++						? shift.padding
++						: 1,
+ 			} ),
+ 		arrow( { element: arrowRef } ),
+ 	];
+diff --git a/packages/components/src/popover/types.ts b/packages/components/src/popover/types.ts
+index 644ca9512d7e23..02e60631dbf7f8 100644
+--- a/packages/components/src/popover/types.ts
++++ b/packages/components/src/popover/types.ts
+@@ -138,12 +138,16 @@ export type PopoverProps = {
+ 	/**
+ 	 * Enables the `Popover` to shift in order to stay in view when meeting the
+ 	 * viewport edges.
++	 *
++	 * Pass an object with a `padding` value (in px) to control the gap kept
++	 * from the viewport edges before shifting kicks in (default `1`).
++	 *
+ 	 * _Note: The `resize` and `shift` props are not intended to be used together.
+ 	 * Enabling both can cause unexpected behavior._
+ 	 *
+ 	 * @default false
+ 	 */
+-	shift?: boolean;
++	shift?: boolean | { padding?: number };
+ 	/**
+ 	 * Specifies the popover's style.
+ 	 *

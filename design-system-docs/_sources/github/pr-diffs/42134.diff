@@ -1,0 +1,31 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c0295cfd63bac9..745fb2c73fcaa5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -20,6 +20,10 @@
+ 
+ -   `Popover`: pass missing anchor ref to the `getAnchorRect` callback prop. ([#42076](https://github.com/WordPress/gutenberg/pull/42076))
+ 
++### Bug Fix
++
++-   `ComboboxControl`: use custom prefix when generating the instanceId ([#42134](https://github.com/WordPress/gutenberg/pull/42134).
++
+ ## 19.14.0 (2022-06-29)
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/combobox-control/index.js b/packages/components/src/combobox-control/index.js
+index 2903b7d3cce2ac..1db82994217173 100644
+--- a/packages/components/src/combobox-control/index.js
++++ b/packages/components/src/combobox-control/index.js
+@@ -61,7 +61,10 @@ function ComboboxControl( {
+ } ) {
+ 	const currentOption = options.find( ( option ) => option.value === value );
+ 	const currentLabel = currentOption?.label ?? '';
+-	const instanceId = useInstanceId( ComboboxControl );
++	// Use a custom prefix when generating the `instanceId` to avoid having
++	// duplicate input IDs when rendering this component and `FormTokenField`
++	// in the same page (see https://github.com/WordPress/gutenberg/issues/42112).
++	const instanceId = useInstanceId( ComboboxControl, 'combobox-control' );
+ 	const [ selectedSuggestion, setSelectedSuggestion ] = useState(
+ 		currentOption || null
+ 	);

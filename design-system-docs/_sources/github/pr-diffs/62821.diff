@@ -1,0 +1,38 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 708fd49b13ed43..7d84ff872be224 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Internal
+ 
+ -   `CustomSelectControlV2`: add root element wrapper. ([#62803](https://github.com/WordPress/gutenberg/pull/62803))
++-   `CustomSelectControlV2`: fix popover styles. ([#62821](https://github.com/WordPress/gutenberg/pull/62821))
+ 
+ ## 28.2.0 (2024-06-26)
+ 
+diff --git a/packages/components/src/custom-select-control-v2/styles.ts b/packages/components/src/custom-select-control-v2/styles.ts
+index c75a9a79c71c5f..683bb1d157994d 100644
+--- a/packages/components/src/custom-select-control-v2/styles.ts
++++ b/packages/components/src/custom-select-control-v2/styles.ts
+@@ -105,10 +105,20 @@ export const Select = styled( Ariakit.Select, {
+ } );
+ 
+ export const SelectPopover = styled( Ariakit.SelectPopover )`
++	display: flex;
++	flex-direction: column;
++
++	background-color: ${ COLORS.theme.background };
+ 	border-radius: 2px;
+-	background: ${ COLORS.theme.background };
+ 	border: 1px solid ${ COLORS.theme.foreground };
+ 
++	/* z-index(".components-popover") */
++	z-index: 1000000;
++
++	max-height: min( var( --popover-available-height, 400px ), 400px );
++	overflow: auto;
++	overscroll-behavior: contain;
++
+ 	&[data-focus-visible] {
+ 		outline: none; // outline will be on the trigger, rather than the popover
+ 	}

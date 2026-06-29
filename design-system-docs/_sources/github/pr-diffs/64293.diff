@@ -1,0 +1,252 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 761e6604a127a2..c17f61e55e00d4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,10 @@
+ -   `TimePicker`: add `hideLabelFromVision` prop ([#64267](https://github.com/WordPress/gutenberg/pull/64267)).
+ -   `DropdownMenuV2`: adopt elevation scale ([#64432](https://github.com/WordPress/gutenberg/pull/64432)).
+ 
++### Internal
++
++-   `TextControl`: Support generic props type ([#64293](https://github.com/WordPress/gutenberg/pull/64293)).
++
+ ## 28.5.0 (2024-08-07)
+ 
+ ### Bug Fixes
+diff --git a/packages/components/src/text-control/index.tsx b/packages/components/src/text-control/index.tsx
+index 1643c5bc37c347..67baa442cb3332 100644
+--- a/packages/components/src/text-control/index.tsx
++++ b/packages/components/src/text-control/index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { ChangeEvent, ForwardedRef } from 'react';
++import type { ChangeEvent, ForwardedRef, JSX, Ref } from 'react';
+ import clsx from 'clsx';
+ 
+ /**
+@@ -15,10 +15,14 @@ import { forwardRef } from '@wordpress/element';
+  */
+ import BaseControl from '../base-control';
+ import type { WordPressComponentProps } from '../context';
+-import type { TextControlProps } from './types';
++import type {
++	TextControlProps,
++	TextControlPropsType,
++	ValueOfType,
++} from './types';
+ 
+-function UnforwardedTextControl(
+-	props: WordPressComponentProps< TextControlProps, 'input', false >,
++function UnforwardedTextControl< T extends TextControlPropsType = 'text' >(
++	props: WordPressComponentProps< TextControlProps< T >, 'input', false >,
+ 	ref: ForwardedRef< HTMLInputElement >
+ ) {
+ 	const {
+@@ -36,7 +40,11 @@ function UnforwardedTextControl(
+ 	} = props;
+ 	const id = useInstanceId( TextControl, 'inspector-text-control', idProp );
+ 	const onChangeValue = ( event: ChangeEvent< HTMLInputElement > ) =>
+-		onChange( event.target.value );
++		onChange(
++			( type === 'number'
++				? event.target.valueAsNumber
++				: event.target.value ) as ValueOfType< T >
++		);
+ 
+ 	return (
+ 		<BaseControl
+@@ -84,6 +92,12 @@ function UnforwardedTextControl(
+  * };
+  * ```
+  */
+-export const TextControl = forwardRef( UnforwardedTextControl );
++export const TextControl = forwardRef( UnforwardedTextControl ) as <
++	T extends TextControlPropsType = 'text',
++>(
++	props: WordPressComponentProps< TextControlProps< T >, 'input', false > & {
++		ref?: Ref< HTMLInputElement >;
++	}
++) => JSX.Element;
+ 
+ export default TextControl;
+diff --git a/packages/components/src/text-control/stories/index.story.tsx b/packages/components/src/text-control/stories/index.story.tsx
+index ddc8af7a9f2b3a..2324d63bf6b118 100644
+--- a/packages/components/src/text-control/stories/index.story.tsx
++++ b/packages/components/src/text-control/stories/index.story.tsx
+@@ -35,7 +35,7 @@ const DefaultTemplate: StoryFn< typeof TextControl > = ( {
+ 	onChange,
+ 	...args
+ } ) => {
+-	const [ value, setValue ] = useState( '' );
++	const [ value, setValue ] = useState< string | number >( '' );
+ 
+ 	return (
+ 		<TextControl
+diff --git a/packages/components/src/text-control/test/text-control.tsx b/packages/components/src/text-control/test/text-control.tsx
+index fc048b93992f08..2bbc4a9fe0684b 100644
+--- a/packages/components/src/text-control/test/text-control.tsx
++++ b/packages/components/src/text-control/test/text-control.tsx
+@@ -2,6 +2,7 @@
+  * External dependencies
+  */
+ import { render, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
+ 
+ /**
+  * Internal dependencies
+@@ -58,4 +59,93 @@ describe( 'TextControl', () => {
+ 			).toBeVisible();
+ 		} );
+ 	} );
++
++	describe( 'When a type prop is provided', () => {
++		it( 'should return string onChange', async () => {
++			const mockOnChange = jest.fn();
++
++			render(
++				<TextControl type="text" onChange={ mockOnChange } value="" />
++			);
++
++			await userEvent.type( screen.getByRole( 'textbox' ), '6' );
++
++			expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
++			expect( mockOnChange ).toHaveBeenLastCalledWith( '6' );
++		} );
++
++		it( 'should return number onChange', async () => {
++			const mockOnChange = jest.fn();
++
++			render(
++				<TextControl
++					type="number"
++					onChange={ mockOnChange }
++					value={ 0 }
++				/>
++			);
++
++			await userEvent.type( screen.getByRole( 'spinbutton' ), '6' );
++
++			expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
++			expect( mockOnChange ).toHaveBeenLastCalledWith( 6 );
++		} );
++	} );
++
++	describe( 'Check typings', () => {
++		// eslint-disable-next-line jest/expect-expect
++		it( 'should infer the value type from `type` prop', () => {
++			const onChangeString: ( value: string ) => void = () => {};
++			const onChangeNumber: ( value: number ) => void = () => {};
++
++			// default type is 'text'
++			<TextControl onChange={ onChangeString } value="foo" />;
++			<TextControl
++				// @ts-expect-error: onChange should accept a string
++				onChange={ onChangeNumber }
++				value="foo"
++			/>;
++			<TextControl
++				onChange={ onChangeString }
++				// @ts-expect-error: value should be a string
++				value={ 1 }
++			/>;
++
++			// explicitly set type to 'text'
++			<TextControl type="text" onChange={ onChangeString } value="foo" />;
++			<TextControl
++				type="text"
++				// @ts-expect-error: onChange should accept a string
++				onChange={ onChangeNumber }
++				value="foo"
++			/>;
++			<TextControl
++				type="text"
++				onChange={ onChangeString }
++				// @ts-expect-error: value should be a string
++				value={ 1 }
++			/>;
++
++			// explicitly set type to 'number'
++			<TextControl
++				type="number"
++				onChange={ onChangeNumber }
++				value={ 1 }
++			/>;
++
++			<TextControl
++				type="number"
++				onChange={ onChangeNumber }
++				// @ts-expect-error: value should be a number
++				value="foo"
++			/>;
++
++			<TextControl
++				type="number"
++				// @ts-expect-error: onChange should accept a number
++				onChange={ onChangeString }
++				value={ 1 }
++			/>;
++		} );
++	} );
+ } );
+diff --git a/packages/components/src/text-control/types.ts b/packages/components/src/text-control/types.ts
+index 0b2d2016614007..74978ca4db09cd 100644
+--- a/packages/components/src/text-control/types.ts
++++ b/packages/components/src/text-control/types.ts
+@@ -3,7 +3,23 @@
+  */
+ import type { BaseControlProps } from '../base-control/types';
+ 
+-export type TextControlProps = Pick<
++export type TextControlPropsType =
++	| 'date'
++	| 'datetime-local'
++	| 'email'
++	| 'number'
++	| 'password'
++	| 'tel'
++	| 'text'
++	| 'time'
++	| 'search'
++	| 'url';
++
++export type ValueOfType< T extends TextControlPropsType > = T extends 'number'
++	? number
++	: string;
++
++export type TextControlProps< T extends TextControlPropsType = 'text' > = Pick<
+ 	BaseControlProps,
+ 	| 'className'
+ 	| 'hideLabelFromVision'
+@@ -14,27 +30,17 @@ export type TextControlProps = Pick<
+ 	/**
+ 	 * A function that receives the value of the input.
+ 	 */
+-	onChange: ( value: string ) => void;
++	onChange: ( value: ValueOfType< T > ) => void;
+ 	/**
+ 	 * The current value of the input.
+ 	 */
+-	value: string | number;
++	value: ValueOfType< T >;
+ 	/**
+ 	 * Type of the input element to render. Defaults to "text".
+ 	 *
+ 	 * @default 'text'
+ 	 */
+-	type?:
+-		| 'date'
+-		| 'datetime-local'
+-		| 'email'
+-		| 'number'
+-		| 'password'
+-		| 'tel'
+-		| 'text'
+-		| 'time'
+-		| 'search'
+-		| 'url';
++	type?: T;
+ 
+ 	/**
+ 	 * Start opting into the larger default height that will become the default size in a future version.

@@ -1,0 +1,1531 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index e709db6c0d156b..79569225825084 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -108,16 +108,6 @@ const restrictedSyntax = [
+ 	},
+ ];
+ 
+-/** `no-restricted-syntax` rules for components. */
+-const restrictedSyntaxComponents = [
+-	{
+-		selector:
+-			'JSXOpeningElement[name.name="Button"]:not(:has(JSXAttribute[name.name="accessibleWhenDisabled"])) JSXAttribute[name.name="disabled"]',
+-		message:
+-			'`disabled` used without the `accessibleWhenDisabled` prop. Disabling a control without maintaining focusability can cause accessibility issues, by hiding their presence from screen reader users, or preventing focus from returning to a trigger element. (Ignore this error if you truly mean to disable.)',
+-	},
+-];
+-
+ module.exports = {
+ 	root: true,
+ 	extends: [
+@@ -257,11 +247,8 @@ module.exports = {
+ 			],
+ 			excludedFiles: [ '**/*.native.js' ],
+ 			rules: {
+-				'no-restricted-syntax': [
+-					'error',
+-					...restrictedSyntax,
+-					...restrictedSyntaxComponents,
+-				],
++				'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
++				'@wordpress/components-no-unsafe-button-disabled': 'error',
+ 			},
+ 		},
+ 		{
+@@ -271,47 +258,9 @@ module.exports = {
+ 				'**/*.@(native|ios|android).js',
+ 			],
+ 			rules: {
+-				'no-restricted-syntax': [
+-					'error',
+-					...restrictedSyntax,
+-					...restrictedSyntaxComponents,
+-					// Temporary rules until we're ready to officially default to the new size.
+-					...[
+-						'BorderBoxControl',
+-						'BorderControl',
+-						'BoxControl',
+-						'Button',
+-						'ComboboxControl',
+-						'CustomSelectControl',
+-
+-						'FontAppearanceControl',
+-						'FontFamilyControl',
+-						'FontSizePicker',
+-						'FormTokenField',
+-						'InputControl',
+-						'LetterSpacingControl',
+-						'LineHeightControl',
+-						'NumberControl',
+-						'RangeControl',
+-						'SelectControl',
+-						'TextControl',
+-						'ToggleGroupControl',
+-						'UnitControl',
+-					].map( ( componentName ) => ( {
+-						// Falsy `__next40pxDefaultSize` without a non-default `size` prop.
+-						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"][value.expression.value!=false])):not(:has(JSXAttribute[name.name="size"][value.value!="default"]))`,
+-						message:
+-							componentName +
+-							' should have the `__next40pxDefaultSize` prop when using the default size.',
+-					} ) ),
+-					{
+-						// Falsy `__next40pxDefaultSize` without a `render` prop.
+-						selector:
+-							'JSXOpeningElement[name.name="FormFileUpload"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"][value.expression.value!=false])):not(:has(JSXAttribute[name.name="render"]))',
+-						message:
+-							'FormFileUpload should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
+-					},
+-				],
++				'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
++				'@wordpress/components-no-unsafe-button-disabled': 'error',
++				'@wordpress/components-no-missing-40px-size-prop': 'error',
+ 			},
+ 		},
+ 		{
+@@ -443,7 +392,6 @@ module.exports = {
+ 				'no-restricted-syntax': [
+ 					'error',
+ 					...restrictedSyntax,
+-					...restrictedSyntaxComponents,
+ 					{
+ 						selector:
+ 							':matches(Literal[value=/--wp-admin-theme-/],TemplateElement[value.cooked=/--wp-admin-theme-/])',
+@@ -460,6 +408,22 @@ module.exports = {
+ 				],
+ 			},
+ 		},
++		{
++			// Override the @wordpress/components-* rules by adding the
++			// `checkLocalImports` flag, which adds the linting also to relative
++			// imports.
++			files: [ 'packages/components/src/**' ],
++			rules: {
++				'@wordpress/components-no-unsafe-button-disabled': [
++					'error',
++					{ checkLocalImports: true },
++				],
++				// '@wordpress/components-no-missing-40px-size-prop': [
++				// 	'error',
++				// 	{ checkLocalImports: true },
++				// ],
++			},
++		},
+ 		{
+ 			files: [ 'packages/components/src/**' ],
+ 			excludedFiles: [ 'packages/components/src/**/@(test|stories)/**' ],
+diff --git a/packages/block-editor/src/components/button-block-appender/index.js b/packages/block-editor/src/components/button-block-appender/index.js
+index 4cde8c26d75638..89b78f65ca5812 100644
+--- a/packages/block-editor/src/components/button-block-appender/index.js
++++ b/packages/block-editor/src/components/button-block-appender/index.js
+@@ -54,6 +54,8 @@ function ButtonBlockAppender(
+ 					  );
+ 
+ 				return (
++					// Disable reason: There shouldn't be a case where this button is disabled but not visually hidden.
++					// eslint-disable-next-line @wordpress/components-no-unsafe-button-disabled
+ 					<Button
+ 						__next40pxDefaultSize
+ 						ref={ ref }
+@@ -66,8 +68,6 @@ function ButtonBlockAppender(
+ 						onClick={ onToggle }
+ 						aria-haspopup={ isToggleButton ? 'true' : undefined }
+ 						aria-expanded={ isToggleButton ? isOpen : undefined }
+-						// Disable reason: There shouldn't be a case where this button is disabled but not visually hidden.
+-						// eslint-disable-next-line no-restricted-syntax
+ 						disabled={ disabled }
+ 						label={ label }
+ 						showTooltip
+diff --git a/packages/block-editor/src/components/font-sizes/font-size-picker.js b/packages/block-editor/src/components/font-sizes/font-size-picker.js
+index 959b2c23806ded..477e6165bc53ef 100644
+--- a/packages/block-editor/src/components/font-sizes/font-size-picker.js
++++ b/packages/block-editor/src/components/font-sizes/font-size-picker.js
+@@ -19,6 +19,7 @@ function FontSizePicker( props ) {
+ 			{ ...props }
+ 			fontSizes={ fontSizes }
+ 			disableCustomFontSizes={ ! customFontSize }
++			__next40pxDefaultSize
+ 		/>
+ 	);
+ }
+diff --git a/packages/components/src/button/test/index.tsx b/packages/components/src/button/test/index.tsx
+index fe1e1926b10cbe..6167d4a6daa3a1 100644
+--- a/packages/components/src/button/test/index.tsx
++++ b/packages/components/src/button/test/index.tsx
+@@ -234,7 +234,6 @@ describe( 'Button', () => {
+ 		} );
+ 
+ 		it( 'should add a disabled prop to the button', () => {
+-			// eslint-disable-next-line no-restricted-syntax
+ 			render( <Button disabled /> );
+ 
+ 			expect( screen.getByRole( 'button' ) ).toBeDisabled();
+@@ -522,7 +521,6 @@ describe( 'Button', () => {
+ 
+ 		it( 'should become a button again when disabled is supplied', () => {
+ 			// @ts-expect-error - a button should not have `href`
+-			// eslint-disable-next-line no-restricted-syntax
+ 			render( <Button href="https://wordpress.org/" disabled /> );
+ 
+ 			expect( screen.getByRole( 'button' ) ).toBeVisible();
+@@ -618,7 +616,6 @@ describe( 'Button', () => {
+ 		} );
+ 
+ 		it( 'should not break when the legacy __experimentalIsFocusable prop is passed', () => {
+-			// eslint-disable-next-line no-restricted-syntax
+ 			render( <Button disabled __experimentalIsFocusable /> );
+ 			const button = screen.getByRole( 'button' );
+ 
+@@ -633,10 +630,8 @@ describe( 'Button', () => {
+ 			{ /* @ts-expect-error - `target` requires `href` */ }
+ 			<Button target="foo" />
+ 
+-			{ /* eslint-disable no-restricted-syntax */ }
+ 			{ /* @ts-expect-error - `disabled` is only for buttons */ }
+ 			<Button href="foo" disabled />
+-			{ /* eslint-enable no-restricted-syntax */ }
+ 
+ 			<Button href="foo" type="image/png" />
+ 			{ /* @ts-expect-error - if button, type must be submit/reset/button */ }
+diff --git a/packages/components/src/form-token-field/token.tsx b/packages/components/src/form-token-field/token.tsx
+index d7c14b0d68825d..973d37d148c4d1 100644
+--- a/packages/components/src/form-token-field/token.tsx
++++ b/packages/components/src/form-token-field/token.tsx
+@@ -70,13 +70,13 @@ export default function Token( {
+ 				<span aria-hidden="true">{ transformedValue }</span>
+ 			</span>
+ 
++			{ /* Disable reason: Even when FormTokenField itself is accessibly disabled, token reset buttons shouldn't be in the tab sequence. */ }
++			{ /* eslint-disable-next-line @wordpress/components-no-unsafe-button-disabled */ }
+ 			<Button
+ 				className="components-form-token-field__remove-token"
+ 				size="small"
+ 				icon={ closeSmall }
+ 				onClick={ ! disabled ? onClick : undefined }
+-				// Disable reason: Even when FormTokenField itself is accessibly disabled, token reset buttons shouldn't be in the tab sequence.
+-				// eslint-disable-next-line no-restricted-syntax
+ 				disabled={ disabled }
+ 				label={ messages.remove }
+ 				aria-describedby={ `components-form-token-field__token-text-${ instanceId }` }
+diff --git a/packages/eslint-plugin/CHANGELOG.md b/packages/eslint-plugin/CHANGELOG.md
+index 77fb4d81e0ffad..6f107f1b58eb10 100644
+--- a/packages/eslint-plugin/CHANGELOG.md
++++ b/packages/eslint-plugin/CHANGELOG.md
+@@ -11,6 +11,8 @@
+ 
+ -   Added [`no-setting-ds-tokens`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-setting-ds-tokens.md) rule to disallow setting Design System token CSS custom properties (`--wpds-*`). ([#74325](https://github.com/WordPress/gutenberg/pull/74325))
+ -   Added [`no-unknown-ds-tokens`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-unknown-ds-tokens.md) rule to disallow unknown Design System tokens. ([#74325](https://github.com/WordPress/gutenberg/pull/74325))
++-   Added [`components-no-missing-40px-size-prop`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md) rule to opt-in to the new 40px default size for components from the `@wordpress/components` package. ([#74611](https://github.com/WordPress/gutenberg/pull/74611))
++-   Added [`components-no-unsafe-button-disabled`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/components-no-unsafe-button-disabled.md) rule to ensure that buttons from the `@wordpress/components` package are accessible when disabled. ([#74611](https://github.com/WordPress/gutenberg/pull/74611))
+ 
+ ### Enhancements
+ 
+diff --git a/packages/eslint-plugin/README.md b/packages/eslint-plugin/README.md
+index 8dc2df8cbf9b69..a5d42e207cac2f 100644
+--- a/packages/eslint-plugin/README.md
++++ b/packages/eslint-plugin/README.md
+@@ -82,8 +82,10 @@ The granular rulesets will not define any environment globals. As such, if they
+ | [i18n-text-domain](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-text-domain.md)                                           | Enforce passing valid text domains.                                                             | ✓           |
+ | [i18n-translator-comments](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-translator-comments.md)                           | Enforce adding translator comments.                                                             | ✓           |
+ | [no-base-control-with-label-without-id](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-base-control-with-label-without-id.md) | Disallow the usage of BaseControl component with a label prop set but omitting the id property. | ✓           |
++| [components-no-missing-40px-size-prop](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md)   | Disallow missing `__next40pxDefaultSize` prop on `@wordpress/components` components.            | ✓           |
++| [components-no-unsafe-button-disabled](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/components-no-unsafe-button-disabled.md)   | Disallow using `disabled` on Button without `accessibleWhenDisabled`.                           | ✓           |
+ | [no-unguarded-get-range-at](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-unguarded-get-range-at.md)                         | Disallow the usage of unguarded `getRangeAt` calls.                                             | ✓           |
+-| [no-unsafe-wp-apis](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-unsafe-wp-apis.md)                                         | Disallow the usage of unsafe APIs from `@wordpress/*` packagesl                                 | ✓           |
++| [no-unsafe-wp-apis](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-unsafe-wp-apis.md)                                         | Disallow the usage of unsafe APIs from `@wordpress/*` packages                                  | ✓           |
+ | [no-unused-vars-before-return](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md)                   | Disallow assigning variable values if unused before a return.                                   | ✓           |
+ | [no-wp-process-env](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-wp-process-env.md)                                         | Disallow legacy usage of WordPress variables via `process.env` like `process.env.SCRIPT_DEBUG`. | ✓           |
+ | [react-no-unsafe-timeout](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/react-no-unsafe-timeout.md)                             | Disallow unsafe `setTimeout` in component.                                                      |             |
+diff --git a/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md b/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md
+new file mode 100644
+index 00000000000000..4bfe8699477196
+--- /dev/null
++++ b/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md
+@@ -0,0 +1,88 @@
++# Disallow missing `__next40pxDefaultSize` prop (components-no-missing-40px-size-prop)
++
++Enforces that specific components from `@wordpress/components` include the `__next40pxDefaultSize` prop to opt-in to the new 40px default size.
++
++This is a temporary rule to help migrate components to the new default size. Once the grace period is over and all components default to the new 40px size, this rule can be removed.
++
++## Rule details
++
++The following components are checked by this rule:
++
++-   BorderBoxControl
++-   BorderControl
++-   BoxControl
++-   Button
++-   ComboboxControl
++-   CustomSelectControl
++-   FontAppearanceControl
++-   FontFamilyControl
++-   FontSizePicker
++-   FormFileUpload (special case - see below)
++-   FormTokenField
++-   InputControl
++-   LetterSpacingControl
++-   LineHeightControl
++-   NumberControl
++-   RangeControl
++-   SelectControl
++-   TextControl
++-   ToggleGroupControl
++-   UnitControl
++
++Examples of **incorrect** code for this rule:
++
++```jsx
++import { Button, InputControl } from '@wordpress/components';
++
++<Button>Click me</Button>
++<InputControl value={value} onChange={onChange} />
++<Button __next40pxDefaultSize={false}>Click me</Button>
++<Button size="default">Click me</Button>
++```
++
++Examples of **correct** code for this rule:
++
++```jsx
++import { Button, InputControl } from '@wordpress/components';
++
++<Button __next40pxDefaultSize>Click me</Button>
++<Button __next40pxDefaultSize={true}>Click me</Button>
++<InputControl __next40pxDefaultSize value={value} onChange={onChange} />
++<Button size="small">Click me</Button>
++<Button size="compact">Click me</Button>
++```
++
++## FormFileUpload special case
++
++`FormFileUpload` can use either the `__next40pxDefaultSize` prop or the `render` prop to be considered valid:
++
++```jsx
++import { FormFileUpload } from '@wordpress/components';
++
++// Both are valid:
++<FormFileUpload __next40pxDefaultSize />
++<FormFileUpload render={({ open }) => <button onClick={open}>Upload</button>} />
++```
++
++## Options
++
++### checkLocalImports
++
++When set to `true`, the rule also checks components imported from relative paths. This is useful inside the `@wordpress/components` package itself, where components are imported via relative paths instead of `@wordpress/components`.
++
++```json
++{
++	"@wordpress/components-no-missing-40px-size-prop": [
++		"error",
++		{ "checkLocalImports": true }
++	]
++}
++```
++
++## Important notes
++
++-   By default, this rule only applies to components imported from `@wordpress/components`.
++-   Components from other packages (like `@wordpress/ui`) or locally defined components with the same name are not affected.
++-   Aliased imports (e.g., `import { Button as WPButton }`) are correctly tracked.
++-   Components with a non-default `size` prop (e.g., `size="small"`, `size="compact"`) are exempt from this rule.
++-   Use the `checkLocalImports` option when linting inside the `@wordpress/components` package.
+diff --git a/packages/eslint-plugin/docs/rules/components-no-unsafe-button-disabled.md b/packages/eslint-plugin/docs/rules/components-no-unsafe-button-disabled.md
+new file mode 100644
+index 00000000000000..4b74665cb18070
+--- /dev/null
++++ b/packages/eslint-plugin/docs/rules/components-no-unsafe-button-disabled.md
+@@ -0,0 +1,52 @@
++# Disallow using disabled on Button without accessibleWhenDisabled (components-no-unsafe-button-disabled)
++
++Disabling a `Button` component without maintaining focusability can cause accessibility issues by hiding its presence from screen reader users, or preventing focus from returning to a trigger element.
++
++This rule enforces that `Button` components from `@wordpress/components` include the `accessibleWhenDisabled` prop when the `disabled` prop is set.
++
++## Rule details
++
++Examples of **incorrect** code for this rule:
++
++```jsx
++import { Button } from '@wordpress/components';
++
++<Button disabled>Click me</Button>
++<Button disabled={true}>Click me</Button>
++<Button disabled={someVar}>Click me</Button>
++```
++
++Examples of **correct** code for this rule:
++
++```jsx
++import { Button } from '@wordpress/components';
++
++<Button disabled accessibleWhenDisabled>Click me</Button>
++<Button disabled accessibleWhenDisabled={true}>Click me</Button>
++<Button disabled accessibleWhenDisabled={false}>Click me</Button>
++<Button disabled accessibleWhenDisabled={someVar}>Click me</Button>
++<Button disabled={false}>Click me</Button>
++<Button onClick={handleClick}>Click me</Button>
++```
++
++## Options
++
++### checkLocalImports
++
++When set to `true`, the rule also checks `Button` components imported from relative paths. This is useful inside the `@wordpress/components` package itself, where components are imported via relative paths instead of `@wordpress/components`.
++
++```json
++{
++	"@wordpress/components-no-unsafe-button-disabled": [
++		"error",
++		{ "checkLocalImports": true }
++	]
++}
++```
++
++## Important notes
++
++-   By default, this rule only applies to `Button` components imported from `@wordpress/components`.
++-   `Button` components from other packages (like `@wordpress/ui`) or locally defined components with the same name are not affected.
++-   Aliased imports (e.g., `import { Button as WPButton }`) are correctly tracked.
++-   Use the `checkLocalImports` option when linting inside the `@wordpress/components` package.
+diff --git a/packages/eslint-plugin/rules/__tests__/components-no-missing-40px-size-prop.js b/packages/eslint-plugin/rules/__tests__/components-no-missing-40px-size-prop.js
+new file mode 100644
+index 00000000000000..88e0b6890ca94d
+--- /dev/null
++++ b/packages/eslint-plugin/rules/__tests__/components-no-missing-40px-size-prop.js
+@@ -0,0 +1,346 @@
++import { RuleTester } from 'eslint';
++import rule from '../components-no-missing-40px-size-prop';
++
++const ruleTester = new RuleTester( {
++	parserOptions: {
++		sourceType: 'module',
++		ecmaVersion: 6,
++		ecmaFeatures: {
++			jsx: true,
++		},
++	},
++} );
++
++ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
++	valid: [
++		// Component with __next40pxDefaultSize (boolean attribute)
++		{
++			code: `
++				import { Button } from '@wordpress/components';
++				<Button __next40pxDefaultSize />
++			`,
++		},
++		// Component with __next40pxDefaultSize={true}
++		{
++			code: `
++				import { InputControl } from '@wordpress/components';
++				<InputControl __next40pxDefaultSize={true} />
++			`,
++		},
++		// Component with non-default size prop
++		{
++			code: `
++				import { Button } from '@wordpress/components';
++				<Button size="small" />
++			`,
++		},
++		// Component with size="compact"
++		{
++			code: `
++				import { SelectControl } from '@wordpress/components';
++				<SelectControl size="compact" />
++			`,
++		},
++		// Component from @wordpress/ui (should not be checked)
++		{
++			code: `
++				import { Button } from '@wordpress/ui';
++				<Button />
++			`,
++		},
++		// Local component (should not be checked)
++		{
++			code: `
++				const Button = () => <button />;
++				<Button />
++			`,
++		},
++		// Component from another package (should not be checked)
++		{
++			code: `
++				import { Button } from 'some-other-package';
++				<Button />
++			`,
++		},
++		// Aliased import with correct prop
++		{
++			code: `
++				import { Button as WPButton } from '@wordpress/components';
++				<WPButton __next40pxDefaultSize />
++			`,
++		},
++		// FormFileUpload with render prop (special case)
++		{
++			code: `
++				import { FormFileUpload } from '@wordpress/components';
++				<FormFileUpload render={({ open }) => <button onClick={open}>Upload</button>} />
++			`,
++		},
++		// FormFileUpload with __next40pxDefaultSize
++		{
++			code: `
++				import { FormFileUpload } from '@wordpress/components';
++				<FormFileUpload __next40pxDefaultSize />
++			`,
++		},
++		// Component with dynamic size prop (assumes it could be non-default)
++		{
++			code: `
++				import { Button } from '@wordpress/components';
++				<Button size={buttonSize} />
++			`,
++		},
++		// Non-targeted component (should not be checked)
++		{
++			code: `
++				import { Modal } from '@wordpress/components';
++				<Modal />
++			`,
++		},
++		// All targeted components with __next40pxDefaultSize
++		{
++			code: `
++				import {
++					BorderBoxControl,
++					BorderControl,
++					BoxControl,
++					ComboboxControl,
++					CustomSelectControl,
++					FontAppearanceControl,
++					FontFamilyControl,
++					FontSizePicker,
++					FormTokenField,
++					InputControl,
++					LetterSpacingControl,
++					LineHeightControl,
++					NumberControl,
++					RangeControl,
++					SelectControl,
++					TextControl,
++					ToggleGroupControl,
++					UnitControl,
++				} from '@wordpress/components';
++				<>
++					<BorderBoxControl __next40pxDefaultSize />
++					<BorderControl __next40pxDefaultSize />
++					<BoxControl __next40pxDefaultSize />
++					<ComboboxControl __next40pxDefaultSize />
++					<CustomSelectControl __next40pxDefaultSize />
++					<FontAppearanceControl __next40pxDefaultSize />
++					<FontFamilyControl __next40pxDefaultSize />
++					<FontSizePicker __next40pxDefaultSize />
++					<FormTokenField __next40pxDefaultSize />
++					<InputControl __next40pxDefaultSize />
++					<LetterSpacingControl __next40pxDefaultSize />
++					<LineHeightControl __next40pxDefaultSize />
++					<NumberControl __next40pxDefaultSize />
++					<RangeControl __next40pxDefaultSize />
++					<SelectControl __next40pxDefaultSize />
++					<TextControl __next40pxDefaultSize />
++					<ToggleGroupControl __next40pxDefaultSize />
++					<UnitControl __next40pxDefaultSize />
++				</>
++			`,
++		},
++	],
++	invalid: [
++		// Button without __next40pxDefaultSize
++		{
++			code: `
++				import { Button } from '@wordpress/components';
++				<Button />
++			`,
++			errors: [
++				{
++					messageId: 'missingProp',
++					data: { component: 'Button' },
++				},
++			],
++		},
++		// InputControl without __next40pxDefaultSize
++		{
++			code: `
++				import { InputControl } from '@wordpress/components';
++				<InputControl value={value} onChange={onChange} />
++			`,
++			errors: [
++				{
++					messageId: 'missingProp',
++					data: { component: 'InputControl' },
++				},
++			],
++		},
++		// Component with __next40pxDefaultSize={false}
++		{
++			code: `
++				import { SelectControl } from '@wordpress/components';
++				<SelectControl __next40pxDefaultSize={false} />
++			`,
++			errors: [
++				{
++					messageId: 'missingProp',
++					data: { component: 'SelectControl' },
++				},
++			],
++		},
++		// Component with size="default" (should still require __next40pxDefaultSize)
++		{
++			code: `
++				import { Button } from '@wordpress/components';
++				<Button size="default" />
++			`,
++			errors: [
++				{
++					messageId: 'missingProp',
++					data: { component: 'Button' },
++				},
++			],
++		},
++		// Aliased import without __next40pxDefaultSize
++		{
++			code: `
++				import { TextControl as MyTextControl } from '@wordpress/components';
++				<MyTextControl />
++			`,
++			errors: [
++				{
++					messageId: 'missingProp',
++					data: { component: 'TextControl' },
++				},
++			],
++		},
++		// FormFileUpload without __next40pxDefaultSize or render
++		{
++			code: `
++				import { FormFileUpload } from '@wordpress/components';
++				<FormFileUpload onChange={handleChange} />
++			`,
++			errors: [
++				{
++					messageId: 'missingPropFormFileUpload',
++				},
++			],
++		},
++		// Multiple components, some invalid
++		{
++			code: `
++				import { Button, InputControl } from '@wordpress/components';
++				<>
++					<Button __next40pxDefaultSize />
++					<InputControl />
++				</>
++			`,
++			errors: [
++				{
++					messageId: 'missingProp',
++					data: { component: 'InputControl' },
++				},
++			],
++		},
++		// Multiple invalid components
++		{
++			code: `
++				import { Button, SelectControl } from '@wordpress/components';
++				<>
++					<Button />
++					<SelectControl />
++				</>
++			`,
++			errors: [
++				{
++					messageId: 'missingProp',
++					data: { component: 'Button' },
++				},
++				{
++					messageId: 'missingProp',
++					data: { component: 'SelectControl' },
++				},
++			],
++		},
++		// Relative import with checkLocalImports enabled
++		{
++			code: `
++				import { Button } from '../button';
++				<Button />
++			`,
++			options: [ { checkLocalImports: true } ],
++			errors: [
++				{
++					messageId: 'missingProp',
++					data: { component: 'Button' },
++				},
++			],
++		},
++		// Default import from input-control path with checkLocalImports enabled
++		{
++			code: `
++				import InputControl from '../input-control';
++				<InputControl />
++			`,
++			options: [ { checkLocalImports: true } ],
++			errors: [
++				{
++					messageId: 'missingProp',
++					data: { component: 'InputControl' },
++				},
++			],
++		},
++	],
++} );
++
++// Additional tests for checkLocalImports option
++ruleTester.run(
++	'components-no-missing-40px-size-prop (checkLocalImports)',
++	rule,
++	{
++		valid: [
++			// Relative import with correct props
++			{
++				code: `
++				import { Button } from '../button';
++				<Button __next40pxDefaultSize />
++			`,
++				options: [ { checkLocalImports: true } ],
++			},
++			// Default import with correct props
++			{
++				code: `
++				import InputControl from './input-control';
++				<InputControl __next40pxDefaultSize />
++			`,
++				options: [ { checkLocalImports: true } ],
++			},
++			// Relative import with non-default size
++			{
++				code: `
++				import { Button } from '../button';
++				<Button size="small" />
++			`,
++				options: [ { checkLocalImports: true } ],
++			},
++			// Relative import without checkLocalImports (should not be checked)
++			{
++				code: `
++				import { Button } from '../button';
++				<Button />
++			`,
++			},
++			// Default import without checkLocalImports (should not be checked)
++			{
++				code: `
++				import InputControl from '../input-control';
++				<InputControl />
++			`,
++			},
++			// FormFileUpload relative import with render prop
++			{
++				code: `
++				import { FormFileUpload } from '../form-file-upload';
++				<FormFileUpload render={({ open }) => <button onClick={open}>Upload</button>} />
++			`,
++				options: [ { checkLocalImports: true } ],
++			},
++		],
++		invalid: [],
++	}
++);
+diff --git a/packages/eslint-plugin/rules/__tests__/components-no-unsafe-button-disabled.js b/packages/eslint-plugin/rules/__tests__/components-no-unsafe-button-disabled.js
+new file mode 100644
+index 00000000000000..e27669b34823de
+--- /dev/null
++++ b/packages/eslint-plugin/rules/__tests__/components-no-unsafe-button-disabled.js
+@@ -0,0 +1,235 @@
++import { RuleTester } from 'eslint';
++import rule from '../components-no-unsafe-button-disabled';
++
++const ruleTester = new RuleTester( {
++	parserOptions: {
++		sourceType: 'module',
++		ecmaVersion: 6,
++		ecmaFeatures: {
++			jsx: true,
++		},
++	},
++} );
++
++ruleTester.run( 'components-no-unsafe-button-disabled', rule, {
++	valid: [
++		// Button with both disabled and accessibleWhenDisabled
++		{
++			code: `
++				import { Button } from '@wordpress/components';
++				<Button disabled accessibleWhenDisabled />
++			`,
++		},
++		// Button with accessibleWhenDisabled={true}
++		{
++			code: `
++				import { Button } from '@wordpress/components';
++				<Button disabled accessibleWhenDisabled={true} />
++			`,
++		},
++		// Button with accessibleWhenDisabled={false}
++		{
++			code: `
++						import { Button } from '@wordpress/components';
++						<Button disabled accessibleWhenDisabled={false} />
++					`,
++		},
++		// Button with accessibleWhenDisabled={someVar}
++		{
++			code: `
++				import { Button } from '@wordpress/components';
++				<Button disabled accessibleWhenDisabled={someVar} />
++			`,
++		},
++		// Button with accessibleWhenDisabled={false} should error (handled in invalid)
++		// Button with disabled={false} should not require accessibleWhenDisabled
++		{
++			code: `
++				import { Button } from '@wordpress/components';
++				<Button disabled={false} />
++			`,
++		},
++		// Button with disabled={someVar} and accessibleWhenDisabled={someVar}
++		{
++			code: `
++						import { Button } from '@wordpress/components';
++						<Button disabled={isDisabled} accessibleWhenDisabled={someVar} />
++					`,
++		},
++		// Button without disabled prop
++		{
++			code: `
++				import { Button } from '@wordpress/components';
++				<Button onClick={handleClick} />
++			`,
++		},
++		// Button from @wordpress/ui (should not be checked)
++		{
++			code: `
++				import { Button } from '@wordpress/ui';
++				<Button disabled />
++			`,
++		},
++		// Local Button component (should not be checked)
++		{
++			code: `
++				const Button = () => <button />;
++				<Button disabled />
++			`,
++		},
++		// Button from another package (should not be checked)
++		{
++			code: `
++				import { Button } from 'some-other-package';
++				<Button disabled />
++			`,
++		},
++		// Aliased import with correct props
++		{
++			code: `
++				import { Button as WPButton } from '@wordpress/components';
++				<WPButton disabled accessibleWhenDisabled />
++			`,
++		},
++		// Non-Button component with disabled (should not be checked)
++		{
++			code: `
++				import { TextControl } from '@wordpress/components';
++				<TextControl disabled />
++			`,
++		},
++	],
++	invalid: [
++		// Button with disabled but no accessibleWhenDisabled
++		{
++			code: `
++				import { Button } from '@wordpress/components';
++				<Button disabled />
++			`,
++			errors: [
++				{
++					messageId: 'missingAccessibleWhenDisabled',
++				},
++			],
++		},
++		// Button with disabled={someVar} but no accessibleWhenDisabled
++		{
++			code: `
++				import { Button } from '@wordpress/components';
++				<Button disabled={isDisabled} />
++			`,
++			errors: [
++				{
++					messageId: 'missingAccessibleWhenDisabled',
++				},
++			],
++		},
++		// Button with disabled={true} but no accessibleWhenDisabled
++		{
++			code: `
++				import { Button } from '@wordpress/components';
++				<Button disabled={true} />
++			`,
++			errors: [
++				{
++					messageId: 'missingAccessibleWhenDisabled',
++				},
++			],
++		},
++		// Aliased import without accessibleWhenDisabled
++		{
++			code: `
++				import { Button as MyButton } from '@wordpress/components';
++				<MyButton disabled />
++			`,
++			errors: [
++				{
++					messageId: 'missingAccessibleWhenDisabled',
++				},
++			],
++		},
++		// Multiple Buttons, one invalid
++		{
++			code: `
++				import { Button } from '@wordpress/components';
++				<>
++					<Button disabled accessibleWhenDisabled />
++					<Button disabled />
++				</>
++			`,
++			errors: [
++				{
++					messageId: 'missingAccessibleWhenDisabled',
++				},
++			],
++		},
++	],
++} );
++
++// Additional tests for checkLocalImports option
++ruleTester.run(
++	'components-no-unsafe-button-disabled (checkLocalImports)',
++	rule,
++	{
++		valid: [
++			// Relative import with correct props
++			{
++				code: `
++				import { Button } from '../button';
++				<Button disabled accessibleWhenDisabled />
++			`,
++				options: [ { checkLocalImports: true } ],
++			},
++			// Default import with correct props
++			{
++				code: `
++				import Button from './button';
++				<Button disabled accessibleWhenDisabled />
++			`,
++				options: [ { checkLocalImports: true } ],
++			},
++			// Relative import without checkLocalImports (should not be checked)
++			{
++				code: `
++				import { Button } from '../button';
++				<Button disabled />
++			`,
++			},
++			// Default import without checkLocalImports (should not be checked)
++			{
++				code: `
++				import Button from '../button';
++				<Button disabled />
++			`,
++			},
++		],
++		invalid: [
++			// Relative import with checkLocalImports enabled
++			{
++				code: `
++				import { Button } from '../button';
++				<Button disabled />
++			`,
++				options: [ { checkLocalImports: true } ],
++				errors: [
++					{
++						messageId: 'missingAccessibleWhenDisabled',
++					},
++				],
++			},
++			// Default import from button path with checkLocalImports enabled
++			{
++				code: `
++				import Button from '../button';
++				<Button disabled />
++			`,
++				options: [ { checkLocalImports: true } ],
++				errors: [
++					{
++						messageId: 'missingAccessibleWhenDisabled',
++					},
++				],
++			},
++		],
++	}
++);
+diff --git a/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js b/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js
+new file mode 100644
+index 00000000000000..7e6786478b880a
+--- /dev/null
++++ b/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js
+@@ -0,0 +1,276 @@
++const { hasTruthyJsxAttribute } = require( '../utils' );
++
++/**
++ * Enforces that specific components from @wordpress/components include the
++ * `__next40pxDefaultSize` prop.
++ *
++ * @type {import('eslint').Rule.RuleModule}
++ */
++
++/**
++ * Components that require the __next40pxDefaultSize prop.
++ * These can be exempted if they have a non-default `size` prop.
++ */
++const COMPONENTS_REQUIRING_40PX = new Set( [
++	'BorderBoxControl',
++	'BorderControl',
++	'BoxControl',
++	'Button',
++	'ComboboxControl',
++	'CustomSelectControl',
++	'FontAppearanceControl',
++	'FontFamilyControl',
++	'FontSizePicker',
++	'FormTokenField',
++	'InputControl',
++	'LetterSpacingControl',
++	'LineHeightControl',
++	'NumberControl',
++	'RangeControl',
++	'SelectControl',
++	'TextControl',
++	'ToggleGroupControl',
++	'UnitControl',
++] );
++
++/**
++ * Components that can use the `render` prop as an alternative to __next40pxDefaultSize.
++ */
++const COMPONENTS_WITH_RENDER_EXEMPTION = new Set( [ 'FormFileUpload' ] );
++
++/**
++ * All tracked component names for path-based detection.
++ */
++const ALL_TRACKED_COMPONENTS = new Set( [
++	...COMPONENTS_REQUIRING_40PX,
++	...COMPONENTS_WITH_RENDER_EXEMPTION,
++] );
++
++module.exports = {
++	meta: {
++		type: 'problem',
++		schema: [
++			{
++				type: 'object',
++				properties: {
++					checkLocalImports: {
++						type: 'boolean',
++						description:
++							'When true, also checks components imported from relative paths (for use inside @wordpress/components package).',
++					},
++				},
++				additionalProperties: false,
++			},
++		],
++		messages: {
++			missingProp:
++				'{{ component }} should have the `__next40pxDefaultSize` prop when using the default size.',
++			missingPropFormFileUpload:
++				'FormFileUpload should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
++		},
++	},
++	create( context ) {
++		const checkLocalImports =
++			context.options[ 0 ]?.checkLocalImports ?? false;
++
++		// Track local names of components imported from @wordpress/components
++		// Map: localName -> importedName
++		const trackedImports = new Map();
++
++		/**
++		 * Check if the import source should be tracked.
++		 *
++		 * @param {string} source - The import source path
++		 * @return {boolean} Whether to track imports from this source
++		 */
++		function shouldTrackImportSource( source ) {
++			if ( source === '@wordpress/components' ) {
++				return true;
++			}
++
++			// When checkLocalImports is enabled, also track relative imports
++			if ( checkLocalImports ) {
++				return source.startsWith( '.' ) || source.startsWith( '/' );
++			}
++
++			return false;
++		}
++
++		/**
++		 * Try to infer component name from import path.
++		 * e.g., '../button' -> 'Button', '../input-control' -> 'InputControl'
++		 *
++		 * @param {string} source - The import source path
++		 * @return {string|null} The inferred component name or null
++		 */
++		function inferComponentNameFromPath( source ) {
++			// Get the last segment of the path
++			const lastSegment = source.split( '/' ).pop();
++			if ( ! lastSegment ) {
++				return null;
++			}
++
++			// Convert kebab-case to PascalCase
++			const pascalCase = lastSegment
++				.split( '-' )
++				.map(
++					( part ) => part.charAt( 0 ).toUpperCase() + part.slice( 1 )
++				)
++				.join( '' );
++
++			// Check if it's one of our tracked components
++			if ( ALL_TRACKED_COMPONENTS.has( pascalCase ) ) {
++				return pascalCase;
++			}
++
++			return null;
++		}
++
++		/**
++		 * Check if the `size` prop has a non-default value.
++		 *
++		 * @param {Array} attributes - JSX attributes array
++		 * @return {boolean} Whether size has a non-default value
++		 */
++		function hasNonDefaultSize( attributes ) {
++			const sizeAttr = attributes.find(
++				( a ) =>
++					a.type === 'JSXAttribute' &&
++					a.name &&
++					a.name.name === 'size'
++			);
++
++			if ( ! sizeAttr ) {
++				return false;
++			}
++
++			// String value like `size="small"` or `size="compact"`
++			if (
++				sizeAttr.value &&
++				sizeAttr.value.type === 'Literal' &&
++				typeof sizeAttr.value.value === 'string'
++			) {
++				return sizeAttr.value.value !== 'default';
++			}
++
++			// Expression - could be non-default, so don't report
++			if (
++				sizeAttr.value &&
++				sizeAttr.value.type === 'JSXExpressionContainer'
++			) {
++				return true;
++			}
++
++			return false;
++		}
++
++		/**
++		 * Check if the `render` prop exists.
++		 *
++		 * @param {Array} attributes - JSX attributes array
++		 * @return {boolean} Whether render prop exists
++		 */
++		function hasRenderProp( attributes ) {
++			return attributes.some(
++				( a ) =>
++					a.type === 'JSXAttribute' &&
++					a.name &&
++					a.name.name === 'render'
++			);
++		}
++
++		return {
++			ImportDeclaration( node ) {
++				const source = node.source.value;
++
++				if ( ! shouldTrackImportSource( source ) ) {
++					return;
++				}
++
++				// Handle named imports
++				node.specifiers.forEach( ( specifier ) => {
++					if ( specifier.type !== 'ImportSpecifier' ) {
++						return;
++					}
++
++					const importedName = specifier.imported.name;
++					const localName = specifier.local.name;
++
++					// Track components that require the prop
++					if (
++						COMPONENTS_REQUIRING_40PX.has( importedName ) ||
++						COMPONENTS_WITH_RENDER_EXEMPTION.has( importedName )
++					) {
++						trackedImports.set( localName, importedName );
++					}
++				} );
++
++				// Handle default imports when checking local imports
++				// e.g., import InputControl from '../input-control'
++				if ( checkLocalImports ) {
++					node.specifiers.forEach( ( specifier ) => {
++						if ( specifier.type === 'ImportDefaultSpecifier' ) {
++							const localName = specifier.local.name;
++							const inferredName =
++								inferComponentNameFromPath( source );
++							if ( inferredName ) {
++								trackedImports.set( localName, inferredName );
++							}
++						}
++					} );
++				}
++			},
++
++			JSXOpeningElement( node ) {
++				// Only check simple JSX element names (not member expressions)
++				if ( node.name.type !== 'JSXIdentifier' ) {
++					return;
++				}
++
++				const elementName = node.name.name;
++				const importedName = trackedImports.get( elementName );
++
++				// Only check if this is a tracked component from @wordpress/components
++				if ( ! importedName ) {
++					return;
++				}
++
++				const attributes = node.attributes;
++
++				// Check if __next40pxDefaultSize has a truthy value
++				if (
++					hasTruthyJsxAttribute( attributes, '__next40pxDefaultSize' )
++				) {
++					return;
++				}
++
++				// Handle FormFileUpload special case
++				if ( COMPONENTS_WITH_RENDER_EXEMPTION.has( importedName ) ) {
++					// FormFileUpload is valid if it has a `render` prop
++					if ( hasRenderProp( attributes ) ) {
++						return;
++					}
++
++					context.report( {
++						node,
++						messageId: 'missingPropFormFileUpload',
++					} );
++					return;
++				}
++
++				// For other components, check if size prop has a non-default value
++				if ( hasNonDefaultSize( attributes ) ) {
++					return;
++				}
++
++				context.report( {
++					node,
++					messageId: 'missingProp',
++					data: {
++						component: importedName,
++					},
++				} );
++			},
++		};
++	},
++};
+diff --git a/packages/eslint-plugin/rules/components-no-unsafe-button-disabled.js b/packages/eslint-plugin/rules/components-no-unsafe-button-disabled.js
+new file mode 100644
+index 00000000000000..a5ce52d86973a9
+--- /dev/null
++++ b/packages/eslint-plugin/rules/components-no-unsafe-button-disabled.js
+@@ -0,0 +1,126 @@
++const { hasTruthyJsxAttribute } = require( '../utils' );
++
++/**
++ * Enforces that Button from @wordpress/components includes `accessibleWhenDisabled`
++ * when `disabled` is set.
++ *
++ * @type {import('eslint').Rule.RuleModule}
++ */
++module.exports = {
++	meta: {
++		type: 'problem',
++		schema: [
++			{
++				type: 'object',
++				properties: {
++					checkLocalImports: {
++						type: 'boolean',
++						description:
++							'When true, also checks components imported from relative paths (for use inside @wordpress/components package).',
++					},
++				},
++				additionalProperties: false,
++			},
++		],
++		messages: {
++			missingAccessibleWhenDisabled:
++				'`disabled` used without the `accessibleWhenDisabled` prop. Disabling a control without maintaining focusability can cause accessibility issues, by hiding their presence from screen reader users, or preventing focus from returning to a trigger element. (Ignore this error if you truly mean to disable.)',
++		},
++	},
++	create( context ) {
++		const checkLocalImports =
++			context.options[ 0 ]?.checkLocalImports ?? false;
++
++		// Track local names of Button imported from @wordpress/components
++		const wpComponentsButtons = new Set();
++
++		/**
++		 * Check if the import source should be tracked.
++		 *
++		 * @param {string} source - The import source path
++		 * @return {boolean} Whether to track imports from this source
++		 */
++		function shouldTrackImportSource( source ) {
++			if ( source === '@wordpress/components' ) {
++				return true;
++			}
++
++			// When checkLocalImports is enabled, also track relative imports
++			if ( checkLocalImports ) {
++				return source.startsWith( '.' ) || source.startsWith( '/' );
++			}
++
++			return false;
++		}
++
++		return {
++			ImportDeclaration( node ) {
++				if ( ! shouldTrackImportSource( node.source.value ) ) {
++					return;
++				}
++
++				node.specifiers.forEach( ( specifier ) => {
++					if ( specifier.type !== 'ImportSpecifier' ) {
++						return;
++					}
++
++					const importedName = specifier.imported.name;
++					if ( importedName === 'Button' ) {
++						// Track the local name (handles aliased imports)
++						wpComponentsButtons.add( specifier.local.name );
++					}
++				} );
++
++				// Also handle default imports when checking local imports
++				// e.g., import Button from './button'
++				if ( checkLocalImports ) {
++					node.specifiers.forEach( ( specifier ) => {
++						if ( specifier.type === 'ImportDefaultSpecifier' ) {
++							const localName = specifier.local.name;
++							// Check if the import path suggests it's a Button component
++							const source = node.source.value;
++							if (
++								source.endsWith( '/button' ) ||
++								source.endsWith( '/Button' )
++							) {
++								wpComponentsButtons.add( localName );
++							}
++						}
++					} );
++				}
++			},
++
++			JSXOpeningElement( node ) {
++				// Only check simple JSX element names (not member expressions)
++				if ( node.name.type !== 'JSXIdentifier' ) {
++					return;
++				}
++
++				const elementName = node.name.name;
++
++				// Only check if this is a Button from @wordpress/components
++				if ( ! wpComponentsButtons.has( elementName ) ) {
++					return;
++				}
++
++				if ( ! hasTruthyJsxAttribute( node.attributes, 'disabled' ) ) {
++					return;
++				}
++
++				const hasAccessibleWhenDisabled = node.attributes.some(
++					( attr ) =>
++						attr.type === 'JSXAttribute' &&
++						attr.name &&
++						attr.name.name === 'accessibleWhenDisabled'
++				);
++
++				if ( ! hasAccessibleWhenDisabled ) {
++					context.report( {
++						node,
++						messageId: 'missingAccessibleWhenDisabled',
++					} );
++				}
++			},
++		};
++	},
++};
+diff --git a/packages/eslint-plugin/utils/has-truthy-jsx-attribute.js b/packages/eslint-plugin/utils/has-truthy-jsx-attribute.js
+new file mode 100644
+index 00000000000000..262829bb20cbc1
+--- /dev/null
++++ b/packages/eslint-plugin/utils/has-truthy-jsx-attribute.js
+@@ -0,0 +1,50 @@
++/**
++ * Check if a JSX/React attribute exists and has a truthy value.
++ *
++ * This utility analyzes JSX attribute nodes from an ESLint AST to determine
++ * if a specific attribute is present with a truthy value.
++ *
++ * Handles the following patterns:
++ * - Boolean shorthand: `<Component prop />` → truthy
++ * - Explicit true: `<Component prop={true} />` → truthy
++ * - Explicit false: `<Component prop={false} />` → NOT truthy
++ * - String values: `<Component prop="value" />` → truthy (if non-empty)
++ * - Dynamic expressions: `<Component prop={someVar} />` → assumed truthy
++ *
++ * @param {Array}  attributes - Array of JSX attribute nodes from the ESLint AST
++ * @param {string} attrName   - The attribute name to check
++ * @return {boolean} Whether the attribute exists with a truthy value
++ */
++function hasTruthyJsxAttribute( attributes, attrName ) {
++	const attr = attributes.find(
++		( a ) => a.type === 'JSXAttribute' && a.name && a.name.name === attrName
++	);
++
++	if ( ! attr ) {
++		return false;
++	}
++
++	// Boolean attribute without value (e.g., `<Button disabled />`)
++	if ( attr.value === null ) {
++		return true;
++	}
++
++	// Expression like `prop={true}` or `prop={false}`
++	if (
++		attr.value.type === 'JSXExpressionContainer' &&
++		attr.value.expression.type === 'Literal'
++	) {
++		return attr.value.expression.value !== false;
++	}
++
++	// String value - truthy if not empty
++	if ( attr.value.type === 'Literal' ) {
++		return Boolean( attr.value.value );
++	}
++
++	// For any other expression (variables, function calls, etc.),
++	// assume it could be truthy since we can't statically analyze it
++	return true;
++}
++
++module.exports = { hasTruthyJsxAttribute };
+diff --git a/packages/eslint-plugin/utils/index.js b/packages/eslint-plugin/utils/index.js
+index 53c6804b72e8a4..8e794be127e54e 100644
+--- a/packages/eslint-plugin/utils/index.js
++++ b/packages/eslint-plugin/utils/index.js
+@@ -9,6 +9,7 @@ const {
+ const { getTranslateFunctionArgs } = require( './get-translate-function-args' );
+ const { getTextContentFromNode } = require( './get-text-content-from-node' );
+ const { getTranslateFunctionName } = require( './get-translate-function-name' );
++const { hasTruthyJsxAttribute } = require( './has-truthy-jsx-attribute' );
+ const isPackageInstalled = require( './is-package-installed' );
+ 
+ module.exports = {
+@@ -18,5 +19,6 @@ module.exports = {
+ 	getTranslateFunctionArgs,
+ 	getTextContentFromNode,
+ 	getTranslateFunctionName,
++	hasTruthyJsxAttribute,
+ 	isPackageInstalled,
+ };
+diff --git a/packages/ui/src/button/stories/index.story.tsx b/packages/ui/src/button/stories/index.story.tsx
+index da0c980438341c..b2e40a50371548 100644
+--- a/packages/ui/src/button/stories/index.story.tsx
++++ b/packages/ui/src/button/stories/index.story.tsx
+@@ -131,11 +131,6 @@ export const AllTonesAndVariants: Story = {
+ 									{ ...args }
+ 									tone={ tone }
+ 									variant={ variant }
+-									// Disabling because this lint rule was meant for the
+-									// `@wordpress/components` Button, but is being applied here.
+-									// TODO: rework the lint rule so that it checks the package
+-									// where the Button comes from.
+-									// eslint-disable-next-line no-restricted-syntax
+ 									disabled
+ 								/>
+ 							</div>
+diff --git a/packages/ui/src/button/test/button.test.tsx b/packages/ui/src/button/test/button.test.tsx
+index 9b44211e97c1cf..1ecc053e6bbcbf 100644
+--- a/packages/ui/src/button/test/button.test.tsx
++++ b/packages/ui/src/button/test/button.test.tsx
+@@ -25,11 +25,6 @@ describe( 'Button', () => {
+ 
+ 		const onClickMock = jest.fn();
+ 		render(
+-			// Disabling because this lint rule was meant for the
+-			// `@wordpress/components` Button, but is being applied here.
+-			// TODO: rework the lint rule so that it checks the package
+-			// where the Button comes from.
+-			// eslint-disable-next-line no-restricted-syntax
+ 			<Button disabled onClick={ onClickMock }>
+ 				Click me
+ 			</Button>
+@@ -57,12 +52,6 @@ describe( 'Button', () => {
+ 
+ 	it( 'can be enabled explicitly when loading', () => {
+ 		render(
+-			// Disabling because this lint rule was meant for the
+-			// `@wordpress/components` Button, but is being applied here.
+-			// TODO: rework the lint rule so that it checks the package
+-			// where the Button comes from.
+-			// TODO: Additional improvement in the original lint rule: only error if disabled=true?
+-			// eslint-disable-next-line no-restricted-syntax
+ 			<Button loading disabled={ false }>
+ 				Click me
+ 			</Button>
+@@ -76,11 +65,7 @@ describe( 'Button', () => {
+ 
+ 	it( 'supports custom render prop while retaining the default focusable when disabled behavior', () => {
+ 		render(
+-			// Disabling because this lint rule was meant for the
+-			// `@wordpress/components` Button, but is being applied here.
+-			// TODO: rework the lint rule so that it checks the package
+-			// where the Button comes from.
+-			// eslint-disable-next-line jsx-a11y/anchor-has-content, no-restricted-syntax
++			// eslint-disable-next-line jsx-a11y/anchor-has-content
+ 			<Button render={ <a href="/" /> } nativeButton={ false } disabled>
+ 				Click me
+ 			</Button>

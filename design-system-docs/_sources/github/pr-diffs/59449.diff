@@ -1,0 +1,442 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 49911738dcd635..68368efca525be 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `InputControl`: Ignore IME events when `isPressEnterToChange` is enabled ([#60090](https://github.com/WordPress/gutenberg/pull/60090)).
+ 
++### Internal
++
++-   `Popover`, `ColorPicker`: Obviate pointer event trap #59449 ([#59449](https://github.com/WordPress/gutenberg/pull/59449)).
++
+ ## 27.2.0 (2024-03-21)
+ 
+ -   `Dropdown` : Add styling support for `MenuGroup` ([#59723](https://github.com/WordPress/gutenberg/pull/59723)).
+diff --git a/packages/components/src/color-picker/component.tsx b/packages/components/src/color-picker/component.tsx
+index 98e37df9783c55..8154a0a41331a5 100644
+--- a/packages/components/src/color-picker/component.tsx
++++ b/packages/components/src/color-picker/component.tsx
+@@ -10,7 +10,7 @@ import namesPlugin from 'colord/plugins/names';
+  * WordPress dependencies
+  */
+ import { useCallback, useState, useMemo } from '@wordpress/element';
+-import { useDebounce, useMergeRefs } from '@wordpress/compose';
++import { useDebounce } from '@wordpress/compose';
+ import { __ } from '@wordpress/i18n';
+ 
+ /**
+@@ -56,24 +56,8 @@ const UnconnectedColorPicker = (
+ 		onChange,
+ 		defaultValue = '#fff',
+ 		copyFormat,
+-
+-		// Context
+-		onPickerDragStart,
+-		onPickerDragEnd,
+ 		...divProps
+-	} = useContextSystem<
+-		ColorPickerProps & {
+-			onPickerDragStart?: ( event: MouseEvent ) => void;
+-			onPickerDragEnd?: ( event: MouseEvent ) => void;
+-		}
+-	>( props, 'ColorPicker' );
+-
+-	const [ containerEl, setContainerEl ] = useState< HTMLElement | null >(
+-		null
+-	);
+-	const containerRef = ( node: HTMLElement | null ) => {
+-		setContainerEl( node );
+-	};
++	} = useContextSystem( props, 'ColorPicker' );
+ 
+ 	// Use a safe default value for the color and remove the possibility of `undefined`.
+ 	const [ color, setColor ] = useControlledValue( {
+@@ -100,17 +84,11 @@ const UnconnectedColorPicker = (
+ 	);
+ 
+ 	return (
+-		<ColorfulWrapper
+-			ref={ useMergeRefs( [ containerRef, forwardedRef ] ) }
+-			{ ...divProps }
+-		>
++		<ColorfulWrapper ref={ forwardedRef } { ...divProps }>
+ 			<Picker
+-				containerEl={ containerEl }
+ 				onChange={ handleChange }
+ 				color={ safeColordColor }
+ 				enableAlpha={ enableAlpha }
+-				onDragStart={ onPickerDragStart }
+-				onDragEnd={ onPickerDragEnd }
+ 			/>
+ 			<AuxiliaryColorArtefactWrapper>
+ 				<AuxiliaryColorArtefactHStackHeader justify="space-between">
+diff --git a/packages/components/src/color-picker/picker.tsx b/packages/components/src/color-picker/picker.tsx
+index af3727f1f82014..f2c068d8a46be2 100644
+--- a/packages/components/src/color-picker/picker.tsx
++++ b/packages/components/src/color-picker/picker.tsx
+@@ -7,118 +7,34 @@ import { colord } from 'colord';
+ /**
+  * WordPress dependencies
+  */
+-import { useMemo, useEffect, useRef } from '@wordpress/element';
++import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+ import type { PickerProps } from './types';
+ 
+-/**
+- * Track the start and the end of drag pointer events related to controlling
+- * the picker's saturation / hue / alpha, and fire the corresponding callbacks.
+- * This is particularly useful to implement synergies like the one with the
+- * `Popover` component, where a pointer events "trap" is rendered while
+- * the user is dragging the pointer to avoid potential interference with iframe
+- * elements.
+- *
+- * @param props
+- * @param props.containerEl
+- * @param props.onDragStart
+- * @param props.onDragEnd
+- */
+-const useOnPickerDrag = ( {
+-	containerEl,
+-	onDragStart,
+-	onDragEnd,
+-}: Pick< PickerProps, 'containerEl' | 'onDragStart' | 'onDragEnd' > ) => {
+-	const isDragging = useRef( false );
+-	const leftWhileDragging = useRef( false );
+-	useEffect( () => {
+-		if ( ! containerEl || ( ! onDragStart && ! onDragEnd ) ) {
+-			return;
+-		}
+-		const interactiveElements = [
+-			containerEl.querySelector( '.react-colorful__saturation' ),
+-			containerEl.querySelector( '.react-colorful__hue' ),
+-			containerEl.querySelector( '.react-colorful__alpha' ),
+-		].filter( ( el ) => !! el ) as Element[];
+-
+-		if ( interactiveElements.length === 0 ) {
+-			return;
+-		}
+-
+-		const doc = containerEl.ownerDocument;
+-
+-		const onPointerUp: EventListener = ( event ) => {
+-			isDragging.current = false;
+-			leftWhileDragging.current = false;
+-			onDragEnd?.( event as MouseEvent );
+-		};
+-
+-		const onPointerDown: EventListener = ( event ) => {
+-			isDragging.current = true;
+-			onDragStart?.( event as MouseEvent );
+-		};
+-
+-		const onPointerLeave: EventListener = () => {
+-			leftWhileDragging.current = isDragging.current;
+-		};
+-
+-		// Try to detect if the user released the pointer while away from the
+-		// current window. If the check is successfull, the dragEnd callback will
+-		// called as soon as the pointer re-enters the window (better late than never)
+-		const onPointerEnter: EventListener = ( event ) => {
+-			const noPointerButtonsArePressed =
+-				( event as PointerEvent ).buttons === 0;
+-
+-			if ( leftWhileDragging.current && noPointerButtonsArePressed ) {
+-				onPointerUp( event );
+-			}
+-		};
+-
+-		// The pointerdown event is added on the interactive elements,
+-		// while the remaining events are added on the document object since
+-		// the pointer wouldn't necessarily be hovering the initial interactive
+-		// element at that point.
+-		interactiveElements.forEach( ( el ) =>
+-			el.addEventListener( 'pointerdown', onPointerDown )
+-		);
+-		doc.addEventListener( 'pointerup', onPointerUp );
+-		doc.addEventListener( 'pointerenter', onPointerEnter );
+-		doc.addEventListener( 'pointerleave', onPointerLeave );
+-
+-		return () => {
+-			interactiveElements.forEach( ( el ) =>
+-				el.removeEventListener( 'pointerdown', onPointerDown )
+-			);
+-			doc.removeEventListener( 'pointerup', onPointerUp );
+-			doc.removeEventListener( 'pointerenter', onPointerEnter );
+-			doc.removeEventListener( 'pointerleave', onPointerUp );
+-		};
+-	}, [ onDragStart, onDragEnd, containerEl ] );
+-};
+-
+-export const Picker = ( {
+-	color,
+-	enableAlpha,
+-	onChange,
+-	onDragStart,
+-	onDragEnd,
+-	containerEl,
+-}: PickerProps ) => {
++export const Picker = ( { color, enableAlpha, onChange }: PickerProps ) => {
+ 	const Component = enableAlpha
+ 		? RgbaStringColorPicker
+ 		: RgbStringColorPicker;
+ 	const rgbColor = useMemo( () => color.toRgbString(), [ color ] );
+ 
+-	useOnPickerDrag( { containerEl, onDragStart, onDragEnd } );
+-
+ 	return (
+ 		<Component
+ 			color={ rgbColor }
+ 			onChange={ ( nextColor ) => {
+ 				onChange( colord( nextColor ) );
+ 			} }
++			// Pointer capture fortifies drag gestures so that they continue to
++			// work while dragging outside the component over objects like
++			// iframes. If a newer version of react-colorful begins to employ
++			// pointer capture this will be redundant and should be removed.
++			onPointerDown={ ( { currentTarget, pointerId } ) => {
++				currentTarget.setPointerCapture( pointerId );
++			} }
++			onPointerUp={ ( { currentTarget, pointerId } ) => {
++				currentTarget.releasePointerCapture( pointerId );
++			} }
+ 		/>
+ 	);
+ };
+diff --git a/packages/components/src/color-picker/types.ts b/packages/components/src/color-picker/types.ts
+index 37c199e4c3b00d..5f98404c528444 100644
+--- a/packages/components/src/color-picker/types.ts
++++ b/packages/components/src/color-picker/types.ts
+@@ -59,9 +59,6 @@ export interface PickerProps {
+ 	color: Colord;
+ 	enableAlpha: boolean;
+ 	onChange: ( nextColor: Colord ) => void;
+-	containerEl: HTMLElement | null;
+-	onDragStart?: ( event: MouseEvent ) => void;
+-	onDragEnd?: ( event: MouseEvent ) => void;
+ }
+ 
+ export interface ColorInputProps {
+diff --git a/packages/components/src/popover/index.tsx b/packages/components/src/popover/index.tsx
+index 1634079c8cae76..1f41ffcd331083 100644
+--- a/packages/components/src/popover/index.tsx
++++ b/packages/components/src/popover/index.tsx
+@@ -53,11 +53,7 @@ import {
+ 	placementToMotionAnimationProps,
+ 	getReferenceElement,
+ } from './utils';
+-import {
+-	contextConnect,
+-	useContextSystem,
+-	ContextSystemProvider,
+-} from '../context';
++import { contextConnect, useContextSystem } from '../context';
+ import type { WordPressComponentProps } from '../context';
+ import type {
+ 	PopoverProps,
+@@ -113,7 +109,7 @@ const getPopoverFallbackContainer = () => {
+ 	return container;
+ };
+ 
+-const UnconnectedPopover = (
++const UnforwardedPopover = (
+ 	props: Omit<
+ 		WordPressComponentProps< PopoverProps, 'div', false >,
+ 		// To avoid overlaps between the standard HTML attributes and the props
+@@ -390,100 +386,63 @@ const UnconnectedPopover = (
+ 	const isPositioned =
+ 		( ! shouldAnimate || animationFinished ) && x !== null && y !== null;
+ 
+-	// In case a `ColorPicker` component is rendered as a child of `Popover`,
+-	// the `Popover` component can be notified of when the user is dragging
+-	// parts of the `ColorPicker` UI (this is possible because the `ColorPicker`
+-	// component exposes the `onPickerDragStart` and `onPickerDragEnd` props
+-	// via internal context).
+-	// While the user is performing a pointer drag, the `Popover` will render
+-	// a transparent backdrop element that will serve as a "pointer events trap",
+-	// making sure that no pointer events reach any potential `iframe` element
+-	// underneath (like, for example, the editor canvas in the WordPress editor).
+-	const [ showBackdrop, setShowBackdrop ] = useState( false );
+-	const contextValue = useMemo(
+-		() => ( {
+-			ColorPicker: {
+-				onPickerDragStart() {
+-					setShowBackdrop( true );
+-				},
+-				onPickerDragEnd() {
+-					setShowBackdrop( false );
+-				},
+-			},
+-		} ),
+-		[]
+-	);
+-
+ 	let content = (
+-		<>
+-			{ showBackdrop && (
+-				<div
+-					className="components-popover-pointer-events-trap"
+-					aria-hidden="true"
+-					onClick={ () => setShowBackdrop( false ) }
+-				/>
++		<motion.div
++			className={ classnames( className, {
++				'is-expanded': isExpanded,
++				'is-positioned': isPositioned,
++				// Use the 'alternate' classname for 'toolbar' variant for back compat.
++				[ `is-${
++					computedVariant === 'toolbar'
++						? 'alternate'
++						: computedVariant
++				}` ]: computedVariant,
++			} ) }
++			{ ...animationProps }
++			{ ...contentProps }
++			ref={ mergedFloatingRef }
++			{ ...dialogProps }
++			tabIndex={ -1 }
++		>
++			{ /* Prevents scroll on the document */ }
++			{ isExpanded && <ScrollLock /> }
++			{ isExpanded && (
++				<div className="components-popover__header">
++					<span className="components-popover__header-title">
++						{ headerTitle }
++					</span>
++					<Button
++						className="components-popover__close"
++						icon={ close }
++						onClick={ onClose }
++					/>
++				</div>
+ 			) }
+-			<motion.div
+-				className={ classnames( 'components-popover', className, {
+-					'is-expanded': isExpanded,
+-					'is-positioned': isPositioned,
+-					// Use the 'alternate' classname for 'toolbar' variant for back compat.
+-					[ `is-${
+-						computedVariant === 'toolbar'
+-							? 'alternate'
+-							: computedVariant
+-					}` ]: computedVariant,
+-				} ) }
+-				{ ...animationProps }
+-				{ ...contentProps }
+-				ref={ mergedFloatingRef }
+-				{ ...dialogProps }
+-				tabIndex={ -1 }
+-			>
+-				{ /* Prevents scroll on the document */ }
+-				{ isExpanded && <ScrollLock /> }
+-				{ isExpanded && (
+-					<div className="components-popover__header">
+-						<span className="components-popover__header-title">
+-							{ headerTitle }
+-						</span>
+-						<Button
+-							className="components-popover__close"
+-							icon={ close }
+-							onClick={ onClose }
+-						/>
+-					</div>
+-				) }
+-				<div className="components-popover__content">
+-					<ContextSystemProvider value={ contextValue }>
+-						{ children }
+-					</ContextSystemProvider>
++			<div className="components-popover__content">{ children }</div>
++			{ hasArrow && (
++				<div
++					ref={ arrowCallbackRef }
++					className={ [
++						'components-popover__arrow',
++						`is-${ computedPlacement.split( '-' )[ 0 ] }`,
++					].join( ' ' ) }
++					style={ {
++						left:
++							typeof arrowData?.x !== 'undefined' &&
++							Number.isFinite( arrowData.x )
++								? `${ arrowData.x }px`
++								: '',
++						top:
++							typeof arrowData?.y !== 'undefined' &&
++							Number.isFinite( arrowData.y )
++								? `${ arrowData.y }px`
++								: '',
++					} }
++				>
++					<ArrowTriangle />
+ 				</div>
+-				{ hasArrow && (
+-					<div
+-						ref={ arrowCallbackRef }
+-						className={ [
+-							'components-popover__arrow',
+-							`is-${ computedPlacement.split( '-' )[ 0 ] }`,
+-						].join( ' ' ) }
+-						style={ {
+-							left:
+-								typeof arrowData?.x !== 'undefined' &&
+-								Number.isFinite( arrowData.x )
+-									? `${ arrowData.x }px`
+-									: '',
+-							top:
+-								typeof arrowData?.y !== 'undefined' &&
+-								Number.isFinite( arrowData.y )
+-									? `${ arrowData.y }px`
+-									: '',
+-						} }
+-					>
+-						<ArrowTriangle />
+-					</div>
+-				) }
+-			</motion.div>
+-		</>
++			) }
++		</motion.div>
+ 	);
+ 
+ 	const shouldRenderWithinSlot = slot.ref && ! inline;
+@@ -533,7 +492,7 @@ const UnconnectedPopover = (
+  * ```
+  *
+  */
+-export const Popover = contextConnect( UnconnectedPopover, 'Popover' );
++export const Popover = contextConnect( UnforwardedPopover, 'Popover' );
+ 
+ function PopoverSlot(
+ 	{ name = SLOT_NAME }: { name?: string },
+diff --git a/packages/components/src/popover/style.scss b/packages/components/src/popover/style.scss
+index 72d1d16eca2d12..c7ff0510986bfa 100644
+--- a/packages/components/src/popover/style.scss
++++ b/packages/components/src/popover/style.scss
+@@ -134,12 +134,3 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
+ 		stroke: $gray-900;
+ 	}
+ }
+-
+-.components-popover-pointer-events-trap {
+-	// Same z-index as popover, but rendered before the popover element
+-	// in DOM order = it will display just under the popover
+-	z-index: z-index(".components-popover");
+-	position: fixed;
+-	inset: 0;
+-	background-color: transparent;
+-}
+diff --git a/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap b/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap
+index 287c550bb09c1b..77e32d991fa4d3 100644
+--- a/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap
++++ b/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap
+@@ -3,7 +3,7 @@
+ exports[`DotTip should render correctly 1`] = `
+ <div
+   aria-label="Editor tips"
+-  class="components-popover components-popover nux-dot-tip is-positioned"
++  class="components-popover nux-dot-tip is-positioned"
+   data-wp-c16t="true"
+   data-wp-component="Popover"
+   role="dialog"

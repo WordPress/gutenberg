@@ -1,0 +1,58 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4a33538367685a..df0f930314364a 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ 
+ ### Enhancements
+ 
++-   `FormToggle`: Update disabled styles [#77208](https://github.com/WordPress/gutenberg/pull/77208).
+ -   `RadioControl`: Add support for disabled radio group [#77127](https://github.com/WordPress/gutenberg/pull/77127).
+ 
+ ### Internal
+diff --git a/packages/components/src/form-toggle/style.scss b/packages/components/src/form-toggle/style.scss
+index f1aacc74484be5..057eae87ad5676 100644
+--- a/packages/components/src/form-toggle/style.scss
++++ b/packages/components/src/form-toggle/style.scss
+@@ -104,7 +104,40 @@ $transition-duration: 0.2s;
+ 	// Disabled state:
+ 	&.is-disabled,
+ 	.components-disabled & {
+-		opacity: 0.3;
++		.components-form-toggle__track {
++			background-color: $components-color-gray-100;
++			border-color: $components-color-gray-300;
++
++			@media ( forced-colors: active ) {
++				border-color: GrayText;
++			}
++		}
++
++		.components-form-toggle__thumb {
++			background-color: $components-color-gray-400;
++			box-shadow: none;
++
++			@media ( forced-colors: active ) {
++				border-color: GrayText;
++			}
++		}
++
++		&.is-checked .components-form-toggle__track {
++			background-color: $components-color-gray-400;
++			border-color: $components-color-gray-400;
++
++			@media ( forced-colors: active ) {
++				border-color: GrayText;
++
++				&::after {
++					border-top-color: GrayText;
++				}
++			}
++		}
++
++		&.is-checked .components-form-toggle__thumb {
++			background-color: $white;
++		}
+ 	}
+ }
+ 

@@ -1,0 +1,50 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ae66af0f4d23dc..3ae391898378b2 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,10 @@
+ -   `Snackbar`: Add support to open links in a new tab ([#69905](https://github.com/WordPress/gutenberg/pull/69905)).
+ -   `ColorPicker`: Add a visual cue when the value is copied ([#70083](https://github.com/WordPress/gutenberg/pull/70083)).
+ 
++### Internal
++
++-   Clarify `withIgnoreIMEEvents` documentation to reflect support for all keyboard event handlers ([#70098](https://github.com/WordPress/gutenberg/pull/70098)).
++
+ ## 29.9.0 (2025-05-07)
+ 
+ ### Enhancement
+diff --git a/packages/components/src/utils/with-ignore-ime-events.ts b/packages/components/src/utils/with-ignore-ime-events.ts
+index 26c5cd67b25397..88e62ea20b6b9b 100644
+--- a/packages/components/src/utils/with-ignore-ime-events.ts
++++ b/packages/components/src/utils/with-ignore-ime-events.ts
+@@ -1,18 +1,18 @@
+ /**
+- * A higher-order function that wraps a keydown event handler to ensure it is not an IME event.
++ * A higher-order function that wraps a keyboard event handler to ensure it is not an IME event.
+  *
+  * In CJK languages, an IME (Input Method Editor) is used to input complex characters.
+- * During an IME composition, keydown events (e.g. Enter or Escape) can be fired
++ * During an IME composition, keyboard events (e.g. Enter or Escape) can be fired
+  * which are intended to control the IME and not the application.
+  * These events should be ignored by any application logic.
+  *
+- * @param keydownHandler The keydown event handler to execute after ensuring it was not an IME event.
++ * @param handler The keyboard event handler to execute after ensuring it was not an IME event.
+  *
+  * @return A wrapped version of the given event handler that ignores IME events.
+  */
+ export function withIgnoreIMEEvents<
+ 	E extends React.KeyboardEvent | KeyboardEvent,
+->( keydownHandler: ( event: E ) => void ) {
++>( handler: ( event: E ) => void ) {
+ 	return ( event: E ) => {
+ 		const { isComposing } =
+ 			'nativeEvent' in event ? event.nativeEvent : event;
+@@ -27,6 +27,6 @@ export function withIgnoreIMEEvents<
+ 			return;
+ 		}
+ 
+-		keydownHandler( event );
++		handler( event );
+ 	};
+ }

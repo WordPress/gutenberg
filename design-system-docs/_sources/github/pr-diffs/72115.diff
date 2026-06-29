@@ -1,0 +1,91 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index fbec75c01653e0..02defdca7133cf 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,11 @@
+ -   `SearchControl`: Move search icon to prefix position ([#71984](https://github.com/WordPress/gutenberg/pull/71984)).
+ -   `SearchControl`: Flip search icon depending on placement ([#72070](https://github.com/WordPress/gutenberg/pull/72070)).
+ -   `SearchControl`: Normalize styles ([#72072](https://github.com/WordPress/gutenberg/pull/72072)).
++-   `CheckboxControl`, `RadioControl`, `ToggleControl` (`FormToggle`): Ensure elements are focused when clicked in Safari ([#72115](https://github.com/WordPress/gutenberg/pull/72115)).
++
++### Bug Fixes
++
++-   `ValidatedCheckboxControl`, `ValidatedRadioControl`, `ValidatedToggleControl`: Fix issue where validation may not be triggered in Safari when elements are toggled by clicking ([#72115](https://github.com/WordPress/gutenberg/pull/72115)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/checkbox-control/index.tsx b/packages/components/src/checkbox-control/index.tsx
+index a24d1abaab45a7..98cf15dd228c14 100644
+--- a/packages/components/src/checkbox-control/index.tsx
++++ b/packages/components/src/checkbox-control/index.tsx
+@@ -54,6 +54,7 @@ export function CheckboxControl(
+ 		help,
+ 		id: idProp,
+ 		onChange,
++		onClick,
+ 		...additionalProps
+ 	} = props;
+ 
+@@ -118,6 +119,12 @@ export function CheckboxControl(
+ 						onChange={ onChangeValue }
+ 						checked={ checked }
+ 						aria-describedby={ !! help ? id + '__help' : undefined }
++						onClick={ ( event ) => {
++							// Compat code for Safari to ensure that the checkbox is focused when clicked.
++							event.currentTarget.focus();
++
++							onClick?.( event );
++						} }
+ 						{ ...additionalProps }
+ 					/>
+ 					{ showIndeterminateIcon ? (
+diff --git a/packages/components/src/form-toggle/index.tsx b/packages/components/src/form-toggle/index.tsx
+index 8a90fe4561bff4..37cc312da4f4d4 100644
+--- a/packages/components/src/form-toggle/index.tsx
++++ b/packages/components/src/form-toggle/index.tsx
+@@ -27,6 +27,7 @@ function UnforwardedFormToggle(
+ 		id,
+ 		disabled,
+ 		onChange = noop,
++		onClick,
+ 		...additionalProps
+ 	} = props;
+ 	const wrapperClasses = clsx( 'components-form-toggle', className, {
+@@ -43,6 +44,12 @@ function UnforwardedFormToggle(
+ 				checked={ checked }
+ 				onChange={ onChange }
+ 				disabled={ disabled }
++				onClick={ ( event ) => {
++					// Compat code for Safari to ensure that the toggle is focused when clicked.
++					event.currentTarget.focus();
++
++					onClick?.( event );
++				} }
+ 				{ ...additionalProps }
+ 				ref={ ref }
+ 			/>
+diff --git a/packages/components/src/radio-control/index.tsx b/packages/components/src/radio-control/index.tsx
+index 29927558c58cd4..6b181671332c88 100644
+--- a/packages/components/src/radio-control/index.tsx
++++ b/packages/components/src/radio-control/index.tsx
+@@ -65,6 +65,7 @@ export function RadioControl(
+ 		selected,
+ 		help,
+ 		onChange,
++		onClick,
+ 		hideLabelFromVision,
+ 		options = [],
+ 		id: preferredId,
+@@ -121,6 +122,12 @@ export function RadioControl(
+ 									? generateOptionDescriptionId( id, index )
+ 									: undefined
+ 							}
++							onClick={ ( event ) => {
++								// Compat code for Safari to ensure that the radio is focused when clicked.
++								event.currentTarget.focus();
++
++								onClick?.( event );
++							} }
+ 							{ ...additionalProps }
+ 						/>
+ 						<label

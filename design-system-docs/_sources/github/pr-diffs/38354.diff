@@ -1,0 +1,83 @@
+diff --git a/packages/components/src/dropdown-menu/index.js b/packages/components/src/dropdown-menu/index.tsx
+similarity index 91%
+rename from packages/components/src/dropdown-menu/index.js
+rename to packages/components/src/dropdown-menu/index.tsx
+index 85983f92305aca..23050ce853d386 100644
+--- a/packages/components/src/dropdown-menu/index.js
++++ b/packages/components/src/dropdown-menu/index.tsx
+@@ -17,8 +17,10 @@ import { menu } from '@wordpress/icons';
+ import Button from '../button';
+ import Dropdown from '../dropdown';
+ import { NavigableMenu } from '../navigable-container';
++import { useContextSystem } from '../ui/context';
++import type { Merge, DropdownMenuProps } from './types';
+ 
+-function mergeProps( defaultProps = {}, props = {} ) {
++function mergeProps( { defaultProps, props, className }: Merge ) {
+ 	const mergedProps = {
+ 		...defaultProps,
+ 		...props,
+@@ -34,20 +36,19 @@ function mergeProps( defaultProps = {}, props = {} ) {
+ 	return mergedProps;
+ }
+ 
+-function DropdownMenu( dropdownMenuProps ) {
+-	const {
+-		children,
+-		className,
+-		controls,
+-		icon = menu,
+-		label,
+-		popoverProps,
+-		toggleProps,
+-		menuProps,
+-		disableOpenOnArrowDown = false,
+-		text,
+-		noIcons,
+-	} = dropdownMenuProps;
++function DropdownMenu( {
++	children,
++	className,
++	controls,
++	label,
++	popoverProps,
++	toggleProps,
++	menuProps,
++	text,
++	noIcons,
++}: DropdownMenuProps ) {
++	const icon = menu;
++	const disableOpenOnArrowDown = false;
+ 
+ 	if ( isEmpty( controls ) && ! isFunction( children ) ) {
+ 		return null;
+diff --git a/packages/components/src/dropdown-menu/types.ts b/packages/components/src/dropdown-menu/types.ts
+new file mode 100644
+index 00000000000000..114d02b3501708
+--- /dev/null
++++ b/packages/components/src/dropdown-menu/types.ts
+@@ -0,0 +1,24 @@
++/**
++ * External dependencies
++ */
++import type { ReactNode } from 'react';
++
++export type Merge = {
++	defaultProps: [  ];
++	props: [  ];
++	className: string;
++};
++
++export type DropdownMenuProps = {
++	children?: ReactNode;
++	className?: string;
++	controls?: [  ];
++	icon: JSX.Element;
++	label: string;
++	popoverProps?: JSX.Element;
++	toggleProps: { isSmall: boolean };
++	menuProps: { className: string };
++	disableOpenOnArrowDown?: boolean;
++	text?: string;
++	noIcons?: string;
++};

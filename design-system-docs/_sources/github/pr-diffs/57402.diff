@@ -1,0 +1,69 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 026ad72de90eae..3e3a29728490bd 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,7 +4,8 @@
+ 
+ ### Bug Fix
+ 
+--   `DropdownMenu V2 `: better fallback on browsers that don't support CSS subgrid([#57327](https://github.com/WordPress/gutenberg/pull/57327)).
++-   `NumberControl`: Make increment and decrement buttons keyboard accessible. ([#57402](https://github.com/WordPress/gutenberg/pull/57402)).
++-   `DropdownMenu V2`: better fallback on browsers that don't support CSS subgrid([#57327](https://github.com/WordPress/gutenberg/pull/57327)).
+ -   `FontSizePicker`: Use Button API for keeping focus on reset ([#57221](https://github.com/WordPress/gutenberg/pull/57221)).
+ -   `FontSizePicker`: Fix Reset button focus loss ([#57196](https://github.com/WordPress/gutenberg/pull/57196)).
+ -   `PaletteEdit`: Consider digits when generating kebab-cased slug ([#56713](https://github.com/WordPress/gutenberg/pull/56713)).
+diff --git a/packages/components/src/number-control/README.md b/packages/components/src/number-control/README.md
+index 1a78cd25bb457c..3a54351cd29258 100644
+--- a/packages/components/src/number-control/README.md
++++ b/packages/components/src/number-control/README.md
+@@ -46,9 +46,9 @@ If `isDragEnabled` is true, this controls the amount of `px` to have been dragge
+ 
+ ### spinControls
+ 
+- The type of spin controls to display. These are butons that allow the user to
++ The type of spin controls to display. These are buttons that allow the user to
+  quickly increment and decrement the number.
+- 
++
+  - 'none' - Do not show spin controls.
+  - 'native' - Use browser's native HTML `input` controls.
+  - 'custom' - Use plus and minus icon buttons.
+diff --git a/packages/components/src/number-control/index.tsx b/packages/components/src/number-control/index.tsx
+index 320ef4cb87d1da..57d811d69939b4 100644
+--- a/packages/components/src/number-control/index.tsx
++++ b/packages/components/src/number-control/index.tsx
+@@ -247,9 +247,7 @@ function UnforwardedNumberControl(
+ 									className={ spinButtonClasses }
+ 									icon={ plusIcon }
+ 									size="small"
+-									aria-hidden="true"
+-									aria-label={ __( 'Increment' ) }
+-									tabIndex={ -1 }
++									label={ __( 'Increment' ) }
+ 									onClick={ buildSpinButtonClickHandler(
+ 										'up'
+ 									) }
+@@ -258,9 +256,7 @@ function UnforwardedNumberControl(
+ 									className={ spinButtonClasses }
+ 									icon={ resetIcon }
+ 									size="small"
+-									aria-hidden="true"
+-									aria-label={ __( 'Decrement' ) }
+-									tabIndex={ -1 }
++									label={ __( 'Decrement' ) }
+ 									onClick={ buildSpinButtonClickHandler(
+ 										'down'
+ 									) }
+diff --git a/packages/components/src/number-control/types.ts b/packages/components/src/number-control/types.ts
+index 98ee8e0a672f08..8d198e777bd557 100644
+--- a/packages/components/src/number-control/types.ts
++++ b/packages/components/src/number-control/types.ts
+@@ -15,7 +15,7 @@ export type NumberControlProps = Omit<
+ 	 */
+ 	hideHTMLArrows?: boolean;
+ 	/**
+-	 * The type of spin controls to display. These are butons that allow the
++	 * The type of spin controls to display. These are buttons that allow the
+ 	 * user to quickly increment and decrement the number.
+ 	 *
+ 	 * - 'none' - Do not show spin controls.

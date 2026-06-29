@@ -1,0 +1,37 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0a63ad187d33e9..e4bb1c306c5faa 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,8 @@
+ -   `ColorPicker`: Preserve hue and saturation when the selected color becomes achromatic ([#75493](https://github.com/WordPress/gutenberg/pull/75493)).
+ -   `SnackbarList`: Fix scaling distortion when a snackbar's content is updated in place via a shared notice ID ([#75709](https://github.com/WordPress/gutenberg/pull/75709)).
+ -   `ToggleGroupControl`: Fix hover styles on disabled items ([#75737](https://github.com/WordPress/gutenberg/pull/75737)).
++-   `FormTokenField`: Fixed incorrect height of input field when rendered on pages using WordPress 7.0 form styles ([#75880](https://github.com/WordPress/gutenberg/pull/75880)).
++-   `SelectControl`: Fixed misalignment of option label on some variants when rendered on pages using WordPress 7.0 form styles ([#75880](https://github.com/WordPress/gutenberg/pull/75880)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/form-token-field/style.scss b/packages/components/src/form-token-field/style.scss
+index 319407445812db..a7b31dd5c9f6dc 100644
+--- a/packages/components/src/form-token-field/style.scss
++++ b/packages/components/src/form-token-field/style.scss
+@@ -25,6 +25,7 @@
+ 		flex: 1;
+ 		font-family: inherit;
+ 		font-size: 16px;
++		line-height: 1; // Override forms.css styles
+ 		width: 100%;
+ 		max-width: 100%;
+ 		margin-left: 4px;
+diff --git a/packages/components/src/select-control/styles/select-control-styles.ts b/packages/components/src/select-control/styles/select-control-styles.ts
+index 5248e7af988285..731d17ce91509d 100644
+--- a/packages/components/src/select-control/styles/select-control-styles.ts
++++ b/packages/components/src/select-control/styles/select-control-styles.ts
+@@ -162,6 +162,7 @@ export const Select = styled.select< SelectProps >`
+ 		cursor: inherit;
+ 		display: block;
+ 		font-family: inherit;
++		line-height: 1.3; // Override forms.css styles, large enough value to prevent descender clipping without affecting height
+ 		margin: 0;
+ 		width: 100%;
+ 		max-width: none;

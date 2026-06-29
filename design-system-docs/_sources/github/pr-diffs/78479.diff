@@ -1,0 +1,28 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index ea9a552ae2f397..851f21f436e823 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `Button`: Do not show the interactive cursor when disabled ([#78479](https://github.com/WordPress/gutenberg/pull/78479)).
+ -   `Autocomplete`: Fix the TypeScript prop types for the `Root` and `Value` primitives ([#78450](https://github.com/WordPress/gutenberg/pull/78450)).
+ -   Apply shared item popup typography to inline lists and empty states ([#78403](https://github.com/WordPress/gutenberg/pull/78403)).
+ -   Stretch the compat overlay slot to viewport size so portaled popups stop collapsing to their min-content width — most visible on long-text tooltips, which wrapped to one word per line ([#78441](https://github.com/WordPress/gutenberg/pull/78441)).
+diff --git a/packages/ui/src/button/style.module.css b/packages/ui/src/button/style.module.css
+index 0d9600700fc493..d62e57bd43eb9a 100644
+--- a/packages/ui/src/button/style.module.css
++++ b/packages/ui/src/button/style.module.css
+@@ -59,7 +59,10 @@
+ 		text-decoration: none;
+ 		color: var(--wp-ui-button-foreground-color);
+ 		overflow-wrap: anywhere;
+-		cursor: var(--wpds-cursor-control);
++
++		&:not([data-disabled]) {
++			cursor: var(--wpds-cursor-control);
++		}
+ 
+ 		@media not ( prefers-reduced-motion ) {
+ 			transition: color 0.1s ease-out;

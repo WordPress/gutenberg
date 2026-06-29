@@ -1,0 +1,130 @@
+diff --git a/packages/base-styles/_mixins.scss b/packages/base-styles/_mixins.scss
+index 506d12af84b2ff..69735d75aac71a 100644
+--- a/packages/base-styles/_mixins.scss
++++ b/packages/base-styles/_mixins.scss
+@@ -162,22 +162,6 @@
+ 	}
+ }
+ 
+-@mixin placeholder-style() {
+-	border-radius: $radius-block-ui;
+-
+-	&::before {
+-		content: "";
+-		position: absolute;
+-		top: 0;
+-		right: 0;
+-		bottom: 0;
+-		left: 0;
+-		pointer-events: none;
+-		background: currentColor;
+-		opacity: 0.1;
+-	}
+-}
+-
+ /**
+  * Allows users to opt-out of animations via OS-level preferences.
+  */
+diff --git a/packages/block-editor/src/components/button-block-appender/content.scss b/packages/block-editor/src/components/button-block-appender/content.scss
+index 87243ea9271826..4e3f32b3f4ffc3 100644
+--- a/packages/block-editor/src/components/button-block-appender/content.scss
++++ b/packages/block-editor/src/components/button-block-appender/content.scss
+@@ -52,7 +52,7 @@
+ 			left: 0;
+ 			pointer-events: none;
+ 			border: $border-width dashed currentColor;
+-			@include placeholder-style();
++			border-radius: $radius-block-ui;
+ 		}
+ 
+ 		.block-editor-inserter {
+diff --git a/packages/block-library/src/group/editor.scss b/packages/block-library/src/group/editor.scss
+index a2926c89ae8021..041a2f9f884e84 100644
+--- a/packages/block-library/src/group/editor.scss
++++ b/packages/block-library/src/group/editor.scss
+@@ -43,7 +43,7 @@
+ 		pointer-events: none;
+ 		min-height: $grid-unit-60 - $border-width - $border-width;
+ 		border: $border-width dashed currentColor;
+-		@include placeholder-style();
++		border-radius: $radius-block-ui;
+ 	}
+ 
+ 	// Let the parent be selectable in the placeholder area.
+diff --git a/packages/block-library/src/image/editor.scss b/packages/block-library/src/image/editor.scss
+index 6aaa8e7491ed58..db6928766c0b72 100644
+--- a/packages/block-library/src/image/editor.scss
++++ b/packages/block-library/src/image/editor.scss
+@@ -67,12 +67,24 @@ figure.wp-block-image:not(.wp-block) {
+ 		top: 50%;
+ 		left: 50%;
+ 		transform: translate(-50%, -50%);
++		margin: 0;
+ 	}
+ }
+ 
+ // Shown while image is being uploded but cannot be previewed.
+ .wp-block-image__placeholder {
+ 	aspect-ratio: 4 / 3;
++
++	// Make placeholder background white so that you can see the spinner on top of it.
++	&.has-illustration::before {
++		background: $white;
++		opacity: 0.8;
++	}
++
++	// Reduce opacity of diagonal stroke so that it doesn't obscure the spinner.
++	.components-placeholder__illustration {
++		opacity: 0.1;
++	}
+ }
+ 
+ // This is necessary for the editor resize handles to accurately work on a non-floated, non-resized, small image.
+diff --git a/packages/block-library/src/navigation/editor.scss b/packages/block-library/src/navigation/editor.scss
+index c62cbe9614c916..b279dc08cfe6e7 100644
+--- a/packages/block-library/src/navigation/editor.scss
++++ b/packages/block-library/src/navigation/editor.scss
+@@ -287,7 +287,6 @@ $color-control-label-height: 20px;
+ 		left: 0;
+ 		pointer-events: none;
+ 		border: $border-width dashed currentColor;
+-		@include placeholder-style();
+ 
+ 		// Inherit border radius from style variations.
+ 		border-radius: inherit;
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index aa11a7c90e2632..a4bab1f67d3b56 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -33,6 +33,7 @@
+ -   `Tabs`: Vertical Tabs should be 40px min height. ([#63446](https://github.com/WordPress/gutenberg/pull/63446)).
+ -   `ColorPicker`: Use `minimal` variant for `SelectControl` ([#63676](https://github.com/WordPress/gutenberg/pull/63676)).
+ -   `Tabs`: keep full opacity of focus ring and remove hover styles on disabled tabs ([#63754](https://github.com/WordPress/gutenberg/pull/63754)).
++-   `Placeholder`: Remove unnecssary `placeholder-style` Sass mixin ([#63885](https://github.com/WordPress/gutenberg/pull/63885)).
+ 
+ ### Documentation
+ 
+diff --git a/packages/components/src/placeholder/style.scss b/packages/components/src/placeholder/style.scss
+index 0e9bfa0f86a0ce..e046ce1e3a427e 100644
+--- a/packages/components/src/placeholder/style.scss
++++ b/packages/components/src/placeholder/style.scss
+@@ -183,8 +183,17 @@
+ 		}
+ 	}
+ 
+-	// By painting the borders here, we enable them to be replaced by the Border control.
+-	@include placeholder-style();
++	&::before {
++		content: "";
++		position: absolute;
++		top: 0;
++		right: 0;
++		bottom: 0;
++		left: 0;
++		pointer-events: none;
++		background: currentColor;
++		opacity: 0.1;
++	}
+ 
+ 	overflow: hidden;
+ 	.is-selected & {

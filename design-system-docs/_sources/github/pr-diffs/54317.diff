@@ -1,0 +1,447 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d79a5de61c63ec..0aefc8941fe159 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -36,6 +36,7 @@
+ -   `IsolatedEventContainer`: Convert unit test to TypeScript ([#54316](https://github.com/WordPress/gutenberg/pull/54316)).
+ -   `Popover`: Remove `scroll` and `resize` listeners for iframe overflow parents and rely on recently added native Floating UI support ([#54286](https://github.com/WordPress/gutenberg/pull/54286)).
+ -   `Button`: Update documentation to remove the button `focus` prop ([#54397](https://github.com/WordPress/gutenberg/pull/54397)).
++-   `Toolbar/ToolbarGroup`: Convert component to TypeScript ([#54317](https://github.com/WordPress/gutenberg/pull/54317)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/dropdown-menu/types.ts b/packages/components/src/dropdown-menu/types.ts
+index 2e70557a7fe43e..7b141c97acf580 100644
+--- a/packages/components/src/dropdown-menu/types.ts
++++ b/packages/components/src/dropdown-menu/types.ts
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { ReactNode } from 'react';
++import type { HTMLAttributes, ReactNode } from 'react';
+ /**
+  * Internal dependencies
+  */
+@@ -13,7 +13,7 @@ import type { NavigableMenuProps } from '../navigable-container/types';
+ 
+ export type DropdownOption = {
+ 	/**
+-	 * The Dashicon icon slug to be shown for the option.
++	 * The icon to be shown for the option.
+ 	 */
+ 	icon?: IconProps[ 'icon' ];
+ 	/**
+@@ -29,7 +29,7 @@ export type DropdownOption = {
+ 	/**
+ 	 * A callback function to invoke when the option is selected.
+ 	 */
+-	onClick?: () => void;
++	onClick?: ( event?: React.MouseEvent ) => void;
+ 	/**
+ 	 * Whether or not the control is currently active.
+ 	 */
+@@ -41,7 +41,7 @@ export type DropdownOption = {
+ 	/**
+ 	 * The role to apply to the option's HTML element
+ 	 */
+-	role?: HTMLElement[ 'role' ];
++	role?: HTMLAttributes< HTMLElement >[ 'role' ];
+ };
+ 
+ type DropdownCallbackProps = {
+@@ -50,7 +50,7 @@ type DropdownCallbackProps = {
+ 	onClose: () => void;
+ };
+ 
+-// Manually including `as` prop because `WordPressComponentProps` polymorhpism
++// Manually including `as` prop because `WordPressComponentProps` polymorphism
+ // creates a union that is too large for TypeScript to handle.
+ type ToggleProps = Partial<
+ 	Omit<
+@@ -59,11 +59,12 @@ type ToggleProps = Partial<
+ 	>
+ > & {
+ 	as?: React.ElementType | keyof JSX.IntrinsicElements;
++	'data-toolbar-item'?: boolean;
+ };
+ 
+ export type DropdownMenuProps = {
+ 	/**
+-	 * The Dashicon icon slug to be shown in the collapsed menu button.
++	 * The icon to be shown in the collapsed menu button.
+ 	 *
+ 	 * @default "menu"
+ 	 */
+diff --git a/packages/components/src/toolbar/stories/index.story.tsx b/packages/components/src/toolbar/stories/index.story.tsx
+index 643c32b6909e0e..2eecf54a4a4939 100644
+--- a/packages/components/src/toolbar/stories/index.story.tsx
++++ b/packages/components/src/toolbar/stories/index.story.tsx
+@@ -117,9 +117,8 @@ Default.args = {
+ 				<ToolbarButton icon={ link } label="Link" />
+ 				<ToolbarGroup
+ 					isCollapsed
+-					// @ts-expect-error TODO: Remove when ToolbarGroup is typed
+-					icon={ false }
+-					label="More rich text controls"
++					icon={ null }
++					title="More rich text controls"
+ 					controls={ [
+ 						{ icon: code, title: 'Inline code' },
+ 						{ icon: <InlineImageIcon />, title: 'Inline image' },
+@@ -131,9 +130,8 @@ Default.args = {
+ 				/>
+ 			</ToolbarGroup>
+ 			<ToolbarGroup
+-				// @ts-expect-error TODO: Remove when ToolbarGroup is typed
+ 				icon={ more }
+-				label="Align"
++				title="Align"
+ 				isCollapsed
+ 				controls={ [
+ 					{
+diff --git a/packages/components/src/toolbar/test/toolbar-group.tsx b/packages/components/src/toolbar/test/toolbar-group.tsx
+index e37d9fdc14972a..50aa1399c50a65 100644
+--- a/packages/components/src/toolbar/test/toolbar-group.tsx
++++ b/packages/components/src/toolbar/test/toolbar-group.tsx
+@@ -8,6 +8,11 @@ import { fireEvent, render, screen } from '@testing-library/react';
+  */
+ import { ToolbarGroup } from '..';
+ 
++/**
++ * WordPress dependencies
++ */
++import { wordpress } from '@wordpress/icons';
++
+ describe( 'ToolbarGroup', () => {
+ 	describe( 'basic rendering', () => {
+ 		it( 'should render an empty node, when controls are not passed', () => {
+@@ -23,10 +28,11 @@ describe( 'ToolbarGroup', () => {
+ 		} );
+ 
+ 		it( 'should render a list of controls with buttons', () => {
+-			const clickHandler = ( event: Event ) => event;
++			const clickHandler = ( event?: React.MouseEvent ) => event;
++
+ 			const controls = [
+ 				{
+-					icon: 'wordpress',
++					icon: wordpress,
+ 					title: 'WordPress',
+ 					onClick: clickHandler,
+ 					isActive: false,
+@@ -41,10 +47,10 @@ describe( 'ToolbarGroup', () => {
+ 		} );
+ 
+ 		it( 'should render a list of controls with buttons and active control', () => {
+-			const clickHandler = ( event: Event ) => event;
++			const clickHandler = ( event?: React.MouseEvent ) => event;
+ 			const controls = [
+ 				{
+-					icon: 'wordpress',
++					icon: wordpress,
+ 					title: 'WordPress',
+ 					onClick: clickHandler,
+ 					isActive: true,
+@@ -63,14 +69,14 @@ describe( 'ToolbarGroup', () => {
+ 				[
+ 					// First set.
+ 					{
+-						icon: 'wordpress',
++						icon: wordpress,
+ 						title: 'WordPress',
+ 					},
+ 				],
+ 				[
+ 					// Second set.
+ 					{
+-						icon: 'wordpress',
++						icon: wordpress,
+ 						title: 'WordPress',
+ 					},
+ 				],
+@@ -95,7 +101,7 @@ describe( 'ToolbarGroup', () => {
+ 			const clickHandler = jest.fn();
+ 			const controls = [
+ 				{
+-					icon: 'wordpress',
++					icon: wordpress,
+ 					title: 'WordPress',
+ 					onClick: clickHandler,
+ 					isActive: true,
+diff --git a/packages/components/src/toolbar/toolbar-group/index.js b/packages/components/src/toolbar/toolbar-group/index.tsx
+similarity index 71%
+rename from packages/components/src/toolbar/toolbar-group/index.js
+rename to packages/components/src/toolbar/toolbar-group/index.tsx
+index c86954e04929a1..e2c0b5b2f22c41 100644
+--- a/packages/components/src/toolbar/toolbar-group/index.js
++++ b/packages/components/src/toolbar/toolbar-group/index.tsx
+@@ -1,5 +1,3 @@
+-// @ts-nocheck
+-
+ /**
+  * External dependencies
+  */
+@@ -17,6 +15,11 @@ import ToolbarButton from '../toolbar-button';
+ import ToolbarGroupContainer from './toolbar-group-container';
+ import ToolbarGroupCollapsed from './toolbar-group-collapsed';
+ import ToolbarContext from '../toolbar-context';
++import type { ToolbarGroupProps, ToolbarGroupControls } from './types';
++
++function isNestedArray< T = any >( arr: T[] | T[][] ): arr is T[][] {
++	return Array.isArray( arr ) && Array.isArray( arr[ 0 ] );
++}
+ 
+ /**
+  * Renders a collapsible group of controls
+@@ -41,12 +44,12 @@ import ToolbarContext from '../toolbar-context';
+  * Either `controls` or `children` is required, otherwise this components
+  * renders nothing.
+  *
+- * @param {Object}    props               Component props.
+- * @param {Array}     [props.controls]    The controls to render in this toolbar.
+- * @param {WPElement} [props.children]    Any other things to render inside the toolbar besides the controls.
+- * @param {string}    [props.className]   Class to set on the container div.
+- * @param {boolean}   [props.isCollapsed] Turns ToolbarGroup into a dropdown menu.
+- * @param {string}    [props.title]       ARIA label for dropdown menu if is collapsed.
++ * @param props               Component props.
++ * @param [props.controls]    The controls to render in this toolbar.
++ * @param [props.children]    Any other things to render inside the toolbar besides the controls.
++ * @param [props.className]   Class to set on the container div.
++ * @param [props.isCollapsed] Turns ToolbarGroup into a dropdown menu.
++ * @param [props.title]       ARIA label for dropdown menu if is collapsed.
+  */
+ function ToolbarGroup( {
+ 	controls = [],
+@@ -55,7 +58,7 @@ function ToolbarGroup( {
+ 	isCollapsed,
+ 	title,
+ 	...props
+-} ) {
++}: ToolbarGroupProps ) {
+ 	// It'll contain state if `ToolbarGroup` is being used within
+ 	// `<Toolbar label="label" />`
+ 	const accessibleToolbarState = useContext( ToolbarContext );
+@@ -74,9 +77,11 @@ function ToolbarGroup( {
+ 	);
+ 
+ 	// Normalize controls to nested array of objects (sets of controls)
+-	let controlSets = controls;
+-	if ( ! Array.isArray( controlSets[ 0 ] ) ) {
+-		controlSets = [ controlSets ];
++	let controlSets: ToolbarGroupControls[][];
++	if ( isNestedArray( controls ) ) {
++		controlSets = controls;
++	} else {
++		controlSets = [ controls ];
+ 	}
+ 
+ 	if ( isCollapsed ) {
+@@ -94,13 +99,13 @@ function ToolbarGroup( {
+ 	return (
+ 		<ToolbarGroupContainer className={ finalClassName } { ...props }>
+ 			{ controlSets?.flatMap( ( controlSet, indexOfSet ) =>
+-				controlSet.map( ( control, indexOfControl ) => (
++				controlSet.map( ( control, indexOfControl: number ) => (
+ 					<ToolbarButton
+ 						key={ [ indexOfSet, indexOfControl ].join() }
+ 						containerClassName={
+ 							indexOfSet > 0 && indexOfControl === 0
+ 								? 'has-left-divider'
+-								: null
++								: undefined
+ 						}
+ 						{ ...control }
+ 					/>
+diff --git a/packages/components/src/toolbar/toolbar-group/toolbar-group-collapsed.js b/packages/components/src/toolbar/toolbar-group/toolbar-group-collapsed.tsx
+similarity index 70%
+rename from packages/components/src/toolbar/toolbar-group/toolbar-group-collapsed.js
+rename to packages/components/src/toolbar/toolbar-group/toolbar-group-collapsed.tsx
+index 147e610bb0624f..a829aa3b001442 100644
+--- a/packages/components/src/toolbar/toolbar-group/toolbar-group-collapsed.js
++++ b/packages/components/src/toolbar/toolbar-group/toolbar-group-collapsed.tsx
+@@ -1,5 +1,3 @@
+-// @ts-nocheck
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -11,13 +9,21 @@ import { useContext } from '@wordpress/element';
+ import DropdownMenu from '../../dropdown-menu';
+ import ToolbarContext from '../toolbar-context';
+ import ToolbarItem from '../toolbar-item';
++import type { ToolbarGroupCollapsedProps } from './types';
++import type { DropdownMenuProps } from '../../dropdown-menu/types';
+ 
+-function ToolbarGroupCollapsed( { controls = [], toggleProps, ...props } ) {
++function ToolbarGroupCollapsed( {
++	controls = [],
++	toggleProps,
++	...props
++}: ToolbarGroupCollapsedProps ) {
+ 	// It'll contain state if `ToolbarGroup` is being used within
+ 	// `<Toolbar label="label" />`
+ 	const accessibleToolbarState = useContext( ToolbarContext );
+ 
+-	const renderDropdownMenu = ( internalToggleProps ) => (
++	const renderDropdownMenu = (
++		internalToggleProps?: DropdownMenuProps[ 'toggleProps' ]
++	) => (
+ 		<DropdownMenu
+ 			controls={ controls }
+ 			toggleProps={ {
+diff --git a/packages/components/src/toolbar/toolbar-group/toolbar-group-container.js b/packages/components/src/toolbar/toolbar-group/toolbar-group-container.js
+deleted file mode 100644
+index 903da65b6be40a..00000000000000
+--- a/packages/components/src/toolbar/toolbar-group/toolbar-group-container.js
++++ /dev/null
+@@ -1,8 +0,0 @@
+-// @ts-nocheck
+-
+-const ToolbarGroupContainer = ( { className, children, ...props } ) => (
+-	<div className={ className } { ...props }>
+-		{ children }
+-	</div>
+-);
+-export default ToolbarGroupContainer;
+diff --git a/packages/components/src/toolbar/toolbar-group/toolbar-group-container.tsx b/packages/components/src/toolbar/toolbar-group/toolbar-group-container.tsx
+new file mode 100644
+index 00000000000000..faddda8a83101a
+--- /dev/null
++++ b/packages/components/src/toolbar/toolbar-group/toolbar-group-container.tsx
+@@ -0,0 +1,16 @@
++/**
++ * Internal dependencies
++ */
++import type { WordPressComponentProps } from '../../ui/context';
++import type { ToolbarGroupContainerProps } from './types';
++
++const ToolbarGroupContainer = ( {
++	className,
++	children,
++	...props
++}: WordPressComponentProps< ToolbarGroupContainerProps, 'div', false > ) => (
++	<div className={ className } { ...props }>
++		{ children }
++	</div>
++);
++export default ToolbarGroupContainer;
+diff --git a/packages/components/src/toolbar/toolbar-group/types.ts b/packages/components/src/toolbar/toolbar-group/types.ts
+new file mode 100644
+index 00000000000000..6475f3cf927f4a
+--- /dev/null
++++ b/packages/components/src/toolbar/toolbar-group/types.ts
+@@ -0,0 +1,92 @@
++/**
++ * External dependencies
++ */
++import type { ReactNode } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import type {
++	DropdownMenuProps,
++	DropdownOption,
++} from '../../dropdown-menu/types';
++
++/**
++ * WordPress dependencies
++ */
++import type { Props as IconProps } from '../../icon';
++
++export type ToolbarGroupControls = DropdownOption & {
++	/**
++	 * An optional subscript associated to the control.
++	 */
++	subscript?: string;
++};
++
++type ToolbarGroupPropsBase = {
++	/**
++	 * The controls to render in this toolbar.
++	 */
++	controls?: ToolbarGroupControls[] | ToolbarGroupControls[][];
++
++	/**
++	 * Class to set on the container div.
++	 */
++	className?: string;
++
++	/**
++	 * Any other things to render inside the toolbar besides the controls.
++	 */
++	children?: ReactNode;
++
++	/**
++	 * The Dashicon icon slug to be shown for the option.
++	 */
++	icon?: IconProps[ 'icon' ];
++};
++
++export type ToolbarGroupProps = ToolbarGroupPropsBase &
++	(
++		| {
++				/**
++				 * When true, turns `ToolbarGroup` into a dropdown menu.
++				 */
++				isCollapsed?: false;
++				/**
++				 * Any other things to render inside the toolbar besides the controls.
++				 */
++				children?: ReactNode;
++				title?: never;
++		  }
++		| {
++				/**
++				 * When true, turns `ToolbarGroup` into a dropdown menu.
++				 */
++				isCollapsed: true;
++				/**
++				 * Any other things to render inside the toolbar besides the controls.
++				 */
++				children?: ToolbarGroupCollapsedProps[ 'children' ];
++				/**
++				 * ARIA label for dropdown menu if is collapsed.
++				 */
++				title: string;
++		  }
++	 );
++
++export type ToolbarGroupCollapsedProps = DropdownMenuProps;
++
++export type ToolbarGroupContainerProps = {
++	/**
++	 * Children to be rendered inside the toolbar.
++	 */
++	children?: ReactNode;
++	/**
++	 * Class to set on the container div.
++	 */
++	className?: string;
++	/**
++	 * Props to be passed.
++	 */
++	props?: any;
++};
+diff --git a/packages/components/src/toolbar/toolbar/index.tsx b/packages/components/src/toolbar/toolbar/index.tsx
+index 96e35d399df944..2eac5c5e614e3b 100644
+--- a/packages/components/src/toolbar/toolbar/index.tsx
++++ b/packages/components/src/toolbar/toolbar/index.tsx
+@@ -42,7 +42,15 @@ function UnforwardedToolbar(
+ 			alternative: 'ToolbarGroup component',
+ 			link: 'https://developer.wordpress.org/block-editor/components/toolbar/',
+ 		} );
+-		return <ToolbarGroup { ...props } className={ className } />;
++		// Extracting title from `props` because `ToolbarGroup` doesn't accept it.
++		const { title: _title, ...restProps } = props;
++		return (
++			<ToolbarGroup
++				isCollapsed={ false }
++				{ ...restProps }
++				className={ className }
++			/>
++		);
+ 	}
+ 	// `ToolbarGroup` already uses components-toolbar for compatibility reasons.
+ 	const finalClassName = classnames(

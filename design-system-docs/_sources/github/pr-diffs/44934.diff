@@ -1,0 +1,25 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6539e5bfd1004a..dcd329283bc6f1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ 
+ ### Internal
+ 
++-   `Snackbar`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44934](https://github.com/WordPress/gutenberg/pull/44934))
+ -   `AnglePickerControl`: Set Storybook Label control type to 'text' ([#45122](https://github.com/WordPress/gutenberg/pull/45122)).
+ -   `Button`: Refactor Storybook to controls and align docs ([#44105](https://github.com/WordPress/gutenberg/pull/44105)).
+ 
+diff --git a/packages/components/src/snackbar/index.js b/packages/components/src/snackbar/index.js
+index 05afc83a944d21..6a67f055e9ed1f 100644
+--- a/packages/components/src/snackbar/index.js
++++ b/packages/components/src/snackbar/index.js
+@@ -93,7 +93,7 @@ function Snackbar(
+ 		}, NOTICE_TIMEOUT );
+ 
+ 		return () => clearTimeout( timeoutHandle );
+-	}, [ onDismiss, onRemove ] );
++	}, [ onDismiss, onRemove, explicitDismiss ] );
+ 
+ 	const classes = classnames( className, 'components-snackbar', {
+ 		'components-snackbar-explicit-dismiss': !! explicitDismiss,

@@ -1,0 +1,38 @@
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index b38a13698a9d7e..e114756f9614f1 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -121,7 +121,6 @@
+ 
+ 		&:hover:not(:disabled) {
+ 			color: $components-color-accent-darker-10;
+-			box-shadow: inset 0 0 0 $border-width $components-color-accent-darker-10;
+ 		}
+ 
+ 		&:disabled,
+@@ -147,6 +146,10 @@
+ 		white-space: nowrap;
+ 		color: $components-color-accent;
+ 		background: transparent;
++
++		&:hover:not(:disabled) {
++			box-shadow: inset 0 0 0 $border-width $components-color-accent-darker-10;
++		}
+ 	}
+ 
+ 	/**
+@@ -159,6 +162,14 @@
+ 		background: transparent;
+ 		padding: $grid-unit-15 * 0.5; // This reduces the horizontal padding on tertiary/text buttons, so as to space them optically.
+ 
++		&:hover:not(:disabled) {
++			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
++		}
++
++		&:active:not(:disabled) {
++			background: rgba(var(--wp-admin-theme-color--rgb), 0.08);
++		}
++
+ 		.dashicon {
+ 			display: inline-block;
+ 			flex: 0 0 auto;

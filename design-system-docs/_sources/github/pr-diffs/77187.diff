@@ -1,0 +1,51 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index c502acc39f5473..c45b77fe68a3a7 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -25,6 +25,7 @@
+ 
+ ### Internal
+ 
++-   `Card`: Remove redundant `margin: 0` from `Card.Title` now that `Text` applies it by default ([#77187](https://github.com/WordPress/gutenberg/pull/77187)).
+ -   `AlertDialog`: Rewrite internals to use Base UI's `AlertDialog` primitives directly instead of `Dialog` wrappers. Introduces an internal state machine for async confirm flows ([#76937](https://github.com/WordPress/gutenberg/pull/76937)).
+ 
+ ## 0.10.0 (2026-04-01)
+diff --git a/packages/ui/src/card/style.module.css b/packages/ui/src/card/style.module.css
+index 34611d4753505c..47030ae18ac1f8 100644
+--- a/packages/ui/src/card/style.module.css
++++ b/packages/ui/src/card/style.module.css
+@@ -38,8 +38,4 @@
+ 		margin-inline: calc(-1 * var(--wp-ui-card-padding));
+ 		width: calc(100% + 2 * var(--wp-ui-card-padding));
+ 	}
+-
+-	.title {
+-		margin: 0;
+-	}
+ }
+diff --git a/packages/ui/src/card/title.tsx b/packages/ui/src/card/title.tsx
+index 56ab55f8c50d7d..4350bd94f7b34c 100644
+--- a/packages/ui/src/card/title.tsx
++++ b/packages/ui/src/card/title.tsx
+@@ -1,7 +1,5 @@
+ import { forwardRef } from '@wordpress/element';
+-import clsx from 'clsx';
+ import { Text } from '../text';
+-import styles from './style.module.css';
+ import type { TitleProps } from './types';
+ 
+ /**
+@@ -9,12 +7,11 @@ import type { TitleProps } from './types';
+  * prop to swap in a semantic heading element when appropriate.
+  */
+ export const Title = forwardRef< HTMLDivElement, TitleProps >(
+-	function CardTitle( { className, render, children, ...props }, ref ) {
++	function CardTitle( { render, children, ...props }, ref ) {
+ 		return (
+ 			<Text
+ 				variant="heading-lg"
+ 				render={ render ?? <div ref={ ref } { ...props } /> }
+-				className={ clsx( styles.title, className ) }
+ 			>
+ 				{ children }
+ 			</Text>

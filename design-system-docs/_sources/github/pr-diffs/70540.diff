@@ -1,0 +1,526 @@
+diff --git a/packages/components/src/confirm-dialog/stories/index.story.tsx b/packages/components/src/confirm-dialog/stories/index.story.tsx
+index 7c08d48369a2b0..960fe7d997e604 100644
+--- a/packages/components/src/confirm-dialog/stories/index.story.tsx
++++ b/packages/components/src/confirm-dialog/stories/index.story.tsx
+@@ -16,13 +16,14 @@ import { ConfirmDialog } from '../component';
+ 
+ const meta: Meta< typeof ConfirmDialog > = {
+ 	component: ConfirmDialog,
+-	title: 'Components (Experimental)/Overlays/ConfirmDialog',
+-	id: 'components-experimental-confirmdialog',
++	title: 'Components/Overlays/ConfirmDialog',
++	id: 'components-confirmdialog',
+ 	argTypes: {
+ 		isOpen: {
+ 			control: false,
+ 		},
+ 	},
++	tags: [ 'status-experimental' ],
+ 	parameters: {
+ 		actions: { argTypesRegex: '^on.*' },
+ 		controls: {
+diff --git a/packages/components/src/divider/stories/index.story.tsx b/packages/components/src/divider/stories/index.story.tsx
+index 3f143fc5237694..754cd009469b11 100644
+--- a/packages/components/src/divider/stories/index.story.tsx
++++ b/packages/components/src/divider/stories/index.story.tsx
+@@ -12,7 +12,7 @@ import { Flex } from '../../flex';
+ 
+ const meta: Meta< typeof Divider > = {
+ 	component: Divider,
+-	title: 'Components (Experimental)/Divider',
++	title: 'Components/Divider',
+ 	argTypes: {
+ 		margin: {
+ 			control: { type: 'text' },
+@@ -32,6 +32,7 @@ const meta: Meta< typeof Divider > = {
+ 			},
+ 		},
+ 	},
++	tags: [ 'status-experimental' ],
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
+diff --git a/packages/components/src/elevation/stories/index.story.tsx b/packages/components/src/elevation/stories/index.story.tsx
+index 912268f5341147..10308db49f88d0 100644
+--- a/packages/components/src/elevation/stories/index.story.tsx
++++ b/packages/components/src/elevation/stories/index.story.tsx
+@@ -10,11 +10,12 @@ import { Elevation } from '..';
+ 
+ const meta: Meta< typeof Elevation > = {
+ 	component: Elevation,
+-	title: 'Components (Experimental)/Elevation',
++	title: 'Components/Elevation',
+ 	argTypes: {
+ 		as: { control: { type: 'text' } },
+ 		borderRadius: { control: { type: 'text' } },
+ 	},
++	tags: [ 'status-experimental' ],
+ 	parameters: {
+ 		controls: {
+ 			expanded: true,
+diff --git a/packages/components/src/grid/stories/index.story.tsx b/packages/components/src/grid/stories/index.story.tsx
+index 5b2284e22d27e3..8a77668c570164 100644
+--- a/packages/components/src/grid/stories/index.story.tsx
++++ b/packages/components/src/grid/stories/index.story.tsx
+@@ -11,7 +11,7 @@ import { Grid } from '..';
+ 
+ const meta: Meta< typeof Grid > = {
+ 	component: Grid,
+-	title: 'Components (Experimental)/Grid',
++	title: 'Components/Grid',
+ 	argTypes: {
+ 		as: { control: { type: 'text' } },
+ 		align: { control: { type: 'text' } },
+@@ -30,6 +30,7 @@ const meta: Meta< typeof Grid > = {
+ 		templateColumns: { control: { type: 'text' } },
+ 		templateRows: { control: { type: 'text' } },
+ 	},
++	tags: [ 'status-experimental' ],
+ 	parameters: {
+ 		controls: {
+ 			expanded: true,
+diff --git a/packages/components/src/h-stack/stories/e2e/index.story.tsx b/packages/components/src/h-stack/stories/e2e/index.story.tsx
+index db965b5ac18987..753ac0016dc363 100644
+--- a/packages/components/src/h-stack/stories/e2e/index.story.tsx
++++ b/packages/components/src/h-stack/stories/e2e/index.story.tsx
+@@ -11,7 +11,7 @@ import { HStack } from '../..';
+ 
+ const meta: Meta< typeof HStack > = {
+ 	component: HStack,
+-	title: 'Components (Experimental)/HStack',
++	title: 'Components/HStack',
+ };
+ export default meta;
+ 
+diff --git a/packages/components/src/h-stack/stories/index.story.tsx b/packages/components/src/h-stack/stories/index.story.tsx
+index a2e5b4fa55e9fa..6ac0e5dc18d8d3 100644
+--- a/packages/components/src/h-stack/stories/index.story.tsx
++++ b/packages/components/src/h-stack/stories/index.story.tsx
+@@ -42,8 +42,8 @@ const JUSTIFICATIONS = {
+ 
+ const meta: Meta< typeof HStack > = {
+ 	component: HStack,
+-	title: 'Components (Experimental)/Layout/HStack',
+-	id: 'components-experimental-hstack',
++	title: 'Components/Layout/HStack',
++	id: 'components-hstack',
+ 	argTypes: {
+ 		as: {
+ 			control: false,
+@@ -70,6 +70,7 @@ const meta: Meta< typeof HStack > = {
+ 			control: { type: 'text' },
+ 		},
+ 	},
++	tags: [ 'status-experimental' ],
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
+diff --git a/packages/components/src/heading/stories/index.story.tsx b/packages/components/src/heading/stories/index.story.tsx
+index 8777fb2c2e6507..2596ca0739df70 100644
+--- a/packages/components/src/heading/stories/index.story.tsx
++++ b/packages/components/src/heading/stories/index.story.tsx
+@@ -10,8 +10,8 @@ import { Heading } from '..';
+ 
+ const meta: Meta< typeof Heading > = {
+ 	component: Heading,
+-	title: 'Components (Experimental)/Typography/Heading',
+-	id: 'components-experimental-heading',
++	title: 'Components/Typography/Heading',
++	id: 'components-heading',
+ 	argTypes: {
+ 		as: { control: { type: 'text' } },
+ 		color: { control: { type: 'color' } },
+@@ -25,6 +25,7 @@ const meta: Meta< typeof Heading > = {
+ 		},
+ 		weight: { control: { type: 'text' } },
+ 	},
++	tags: [ 'status-experimental' ],
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
+diff --git a/packages/components/src/input-control/stories/index.story.tsx b/packages/components/src/input-control/stories/index.story.tsx
+index 40630938dbb370..211e4a1b973921 100644
+--- a/packages/components/src/input-control/stories/index.story.tsx
++++ b/packages/components/src/input-control/stories/index.story.tsx
+@@ -16,8 +16,8 @@ import { InputControlSuffixWrapper } from '../input-suffix-wrapper';
+ import Button from '../../button';
+ 
+ const meta: Meta< typeof InputControl > = {
+-	title: 'Components (Experimental)/Selection & Input/InputControl',
+-	id: 'components-experimental-inputcontrol',
++	title: 'Components/Selection & Input/Common/InputControl',
++	id: 'components-inputcontrol',
+ 	component: InputControl,
+ 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+ 	subcomponents: { InputControlPrefixWrapper, InputControlSuffixWrapper },
+@@ -30,6 +30,7 @@ const meta: Meta< typeof InputControl > = {
+ 		type: { control: { type: 'text' } },
+ 		value: { control: { disable: true } },
+ 	},
++	tags: [ 'status-experimental' ],
+ 	parameters: {
+ 		actions: { argTypesRegex: '^on.*' },
+ 		controls: { expanded: true },
+diff --git a/packages/components/src/item-group/stories/index.story.tsx b/packages/components/src/item-group/stories/index.story.tsx
+index 845843d2433db9..25bbbc619db5f3 100644
+--- a/packages/components/src/item-group/stories/index.story.tsx
++++ b/packages/components/src/item-group/stories/index.story.tsx
+@@ -15,11 +15,12 @@ const meta: Meta< typeof ItemGroup > = {
+ 	component: ItemGroup,
+ 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+ 	subcomponents: { Item },
+-	title: 'Components (Experimental)/ItemGroup',
++	title: 'Components/ItemGroup',
+ 	argTypes: {
+ 		as: { control: false },
+ 		children: { control: false },
+ 	},
++	tags: [ 'status-experimental' ],
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
+diff --git a/packages/components/src/menu/stories/index.story.tsx b/packages/components/src/menu/stories/index.story.tsx
+index de9e4cdd652102..91936f92adb6d9 100644
+--- a/packages/components/src/menu/stories/index.story.tsx
++++ b/packages/components/src/menu/stories/index.story.tsx
+@@ -24,7 +24,7 @@ import type { Props } from '../types';
+ 
+ const meta: Meta< typeof Menu > = {
+ 	id: 'components-menu',
+-	title: 'Components (Experimental)/Actions/Menu',
++	title: 'Components/Actions/Menu',
+ 	component: Menu,
+ 	subcomponents: {
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+diff --git a/packages/components/src/number-control/stories/index.story.tsx b/packages/components/src/number-control/stories/index.story.tsx
+index e66be3490bb716..0b03c04c73e471 100644
+--- a/packages/components/src/number-control/stories/index.story.tsx
++++ b/packages/components/src/number-control/stories/index.story.tsx
+@@ -14,8 +14,8 @@ import { useState } from '@wordpress/element';
+ import NumberControl from '..';
+ 
+ const meta: Meta< typeof NumberControl > = {
+-	title: 'Components (Experimental)/Selection & Input/NumberControl',
+-	id: 'components-experimental-numbercontrol',
++	title: 'Components/Selection & Input/Common/NumberControl',
++	id: 'components-numbercontrol',
+ 	component: NumberControl,
+ 	argTypes: {
+ 		onChange: { action: 'onChange' },
+@@ -25,6 +25,7 @@ const meta: Meta< typeof NumberControl > = {
+ 		type: { control: { type: 'text' } },
+ 		value: { control: false },
+ 	},
++	tags: [ 'status-experimental' ],
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
+diff --git a/packages/components/src/scrollable/stories/index.story.tsx b/packages/components/src/scrollable/stories/index.story.tsx
+index 4970b3720e8a07..425fd549460aa9 100644
+--- a/packages/components/src/scrollable/stories/index.story.tsx
++++ b/packages/components/src/scrollable/stories/index.story.tsx
+@@ -16,7 +16,7 @@ import { Scrollable } from '..';
+ 
+ const meta: Meta< typeof Scrollable > = {
+ 	component: Scrollable,
+-	title: 'Components (Experimental)/Scrollable',
++	title: 'Components/Scrollable',
+ 	argTypes: {
+ 		as: {
+ 			control: { type: 'text' },
+@@ -25,6 +25,7 @@ const meta: Meta< typeof Scrollable > = {
+ 			control: false,
+ 		},
+ 	},
++	tags: [ 'status-experimental' ],
+ 	parameters: {
+ 		controls: {
+ 			expanded: true,
+diff --git a/packages/components/src/spacer/stories/index.story.tsx b/packages/components/src/spacer/stories/index.story.tsx
+index 586658ac0f01f5..df63f8533516ad 100644
+--- a/packages/components/src/spacer/stories/index.story.tsx
++++ b/packages/components/src/spacer/stories/index.story.tsx
+@@ -31,7 +31,7 @@ const controls = [
+ 
+ const meta: Meta< typeof Spacer > = {
+ 	component: Spacer,
+-	title: 'Components (Experimental)/Spacer',
++	title: 'Components/Spacer',
+ 	argTypes: {
+ 		as: { control: { type: 'text' } },
+ 		children: {
+@@ -39,6 +39,7 @@ const meta: Meta< typeof Spacer > = {
+ 		},
+ 		...controls,
+ 	},
++	tags: [ 'status-experimental' ],
+ 	parameters: {
+ 		controls: {
+ 			expanded: true,
+diff --git a/packages/components/src/surface/stories/index.story.tsx b/packages/components/src/surface/stories/index.story.tsx
+index 1ef0c0d5637cb4..0a18db11516028 100644
+--- a/packages/components/src/surface/stories/index.story.tsx
++++ b/packages/components/src/surface/stories/index.story.tsx
+@@ -11,11 +11,12 @@ import { Text } from '../../text';
+ 
+ const meta: Meta< typeof Surface > = {
+ 	component: Surface,
+-	title: 'Components (Experimental)/Surface',
++	title: 'Components/Surface',
+ 	argTypes: {
+ 		children: { control: false },
+ 		as: { control: { type: 'text' } },
+ 	},
++	tags: [ 'status-experimental' ],
+ 	parameters: {
+ 		controls: {
+ 			expanded: true,
+diff --git a/packages/components/src/text/stories/index.story.tsx b/packages/components/src/text/stories/index.story.tsx
+index 18e2c219460852..139df730a107f4 100644
+--- a/packages/components/src/text/stories/index.story.tsx
++++ b/packages/components/src/text/stories/index.story.tsx
+@@ -10,8 +10,8 @@ import { Text } from '../component';
+ 
+ const meta: Meta< typeof Text > = {
+ 	component: Text,
+-	title: 'Components (Experimental)/Typography/Text',
+-	id: 'components-experimental-text',
++	title: 'Components/Typography/Text',
++	id: 'components-text',
+ 	argTypes: {
+ 		as: { control: { type: 'text' } },
+ 		color: { control: { type: 'color' } },
+@@ -26,6 +26,7 @@ const meta: Meta< typeof Text > = {
+ 		},
+ 		weight: { control: { type: 'text' } },
+ 	},
++	tags: [ 'status-experimental' ],
+ 	parameters: {
+ 		actions: { argTypesRegex: '^on.*' },
+ 		controls: { expanded: true },
+diff --git a/packages/components/src/toggle-group-control/stories/index.story.tsx b/packages/components/src/toggle-group-control/stories/index.story.tsx
+index 0f3c0a299617af..4d7269c30704ec 100644
+--- a/packages/components/src/toggle-group-control/stories/index.story.tsx
++++ b/packages/components/src/toggle-group-control/stories/index.story.tsx
+@@ -27,13 +27,14 @@ const meta: Meta< typeof ToggleGroupControl > = {
+ 	component: ToggleGroupControl,
+ 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+ 	subcomponents: { ToggleGroupControlOption, ToggleGroupControlOptionIcon },
+-	title: 'Components (Experimental)/Selection & Input/ToggleGroupControl',
+-	id: 'components-experimental-togglegroupcontrol',
++	title: 'Components/Selection & Input/Common/ToggleGroupControl',
++	id: 'components-togglegroupcontrol',
+ 	argTypes: {
+ 		help: { control: { type: 'text' } },
+ 		onChange: { action: 'onChange' },
+ 		value: { control: false },
+ 	},
++	tags: [ 'status-experimental' ],
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
+diff --git a/packages/components/src/tools-panel/stories/index.story.tsx b/packages/components/src/tools-panel/stories/index.story.tsx
+index 76735c845c3ea6..811afaa3473fd0 100644
+--- a/packages/components/src/tools-panel/stories/index.story.tsx
++++ b/packages/components/src/tools-panel/stories/index.story.tsx
+@@ -26,7 +26,7 @@ import UnitControl from '../../unit-control';
+ import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
+ 
+ const meta: Meta< typeof ToolsPanel > = {
+-	title: 'Components (Experimental)/ToolsPanel',
++	title: 'Components/ToolsPanel',
+ 	component: ToolsPanel,
+ 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+ 	subcomponents: { ToolsPanelItem },
+@@ -36,6 +36,7 @@ const meta: Meta< typeof ToolsPanel > = {
+ 		panelId: { control: false },
+ 		resetAll: { action: 'resetAll' },
+ 	},
++	tags: [ 'status-experimental' ],
+ 	parameters: {
+ 		actions: { argTypesRegex: '^on.*' },
+ 		controls: {
+diff --git a/packages/components/src/tree-grid/stories/index.story.tsx b/packages/components/src/tree-grid/stories/index.story.tsx
+index e113103897dbdb..c1ee430941c613 100644
+--- a/packages/components/src/tree-grid/stories/index.story.tsx
++++ b/packages/components/src/tree-grid/stories/index.story.tsx
+@@ -16,14 +16,15 @@ import { Button } from '../../button';
+ import InputControl from '../../input-control';
+ 
+ const meta: Meta< typeof TreeGrid > = {
+-	title: 'Components (Experimental)/Navigation/TreeGrid',
+-	id: 'components-experimental-treegrid',
++	title: 'Components/Navigation/TreeGrid',
++	id: 'components-treegrid',
+ 	component: TreeGrid,
+ 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+ 	subcomponents: { TreeGridRow, TreeGridCell },
+ 	argTypes: {
+ 		children: { control: false },
+ 	},
++	tags: [ 'status-experimental' ],
+ 	parameters: {
+ 		actions: { argTypesRegex: '^on.*' },
+ 		controls: { expanded: true },
+diff --git a/packages/components/src/truncate/stories/index.story.tsx b/packages/components/src/truncate/stories/index.story.tsx
+index 3b06831c59aa07..8dcb1f912e7579 100644
+--- a/packages/components/src/truncate/stories/index.story.tsx
++++ b/packages/components/src/truncate/stories/index.story.tsx
+@@ -10,12 +10,13 @@ import { Truncate } from '..';
+ 
+ const meta: Meta< typeof Truncate > = {
+ 	component: Truncate,
+-	title: 'Components (Experimental)/Typography/Truncate',
+-	id: 'components-experimental-truncate',
++	title: 'Components/Typography/Truncate',
++	id: 'components-truncate',
+ 	argTypes: {
+ 		children: { control: { type: 'text' } },
+ 		as: { control: { type: 'text' } },
+ 	},
++	tags: [ 'status-experimental' ],
+ 	parameters: {
+ 		controls: {
+ 			expanded: true,
+diff --git a/packages/components/src/unit-control/stories/index.story.tsx b/packages/components/src/unit-control/stories/index.story.tsx
+index 3a9da70ad5095f..acfbcd71eaff5a 100644
+--- a/packages/components/src/unit-control/stories/index.story.tsx
++++ b/packages/components/src/unit-control/stories/index.story.tsx
+@@ -16,8 +16,8 @@ import { CSS_UNITS } from '../utils';
+ 
+ const meta: Meta< typeof UnitControl > = {
+ 	component: UnitControl,
+-	title: 'Components (Experimental)/Selection & Input/UnitControl',
+-	id: 'components-experimental-unitcontrol',
++	title: 'Components/Selection & Input/Common/UnitControl',
++	id: 'components-unitcontrol',
+ 	argTypes: {
+ 		__unstableInputWidth: { control: { type: 'text' } },
+ 		__unstableStateReducer: { control: false },
+@@ -26,6 +26,7 @@ const meta: Meta< typeof UnitControl > = {
+ 		prefix: { control: { type: 'text' } },
+ 		value: { control: false },
+ 	},
++	tags: [ 'status-experimental' ],
+ 	parameters: {
+ 		actions: { argTypesRegex: '^on.*' },
+ 		controls: {
+diff --git a/packages/components/src/v-stack/stories/e2e/index.story.tsx b/packages/components/src/v-stack/stories/e2e/index.story.tsx
+index c83402e66a7b46..b11e56684164ad 100644
+--- a/packages/components/src/v-stack/stories/e2e/index.story.tsx
++++ b/packages/components/src/v-stack/stories/e2e/index.story.tsx
+@@ -11,7 +11,7 @@ import { VStack } from '../..';
+ 
+ const meta: Meta< typeof VStack > = {
+ 	component: VStack,
+-	title: 'Components (Experimental)/VStack',
++	title: 'Components/VStack',
+ };
+ export default meta;
+ 
+diff --git a/packages/components/src/v-stack/stories/index.story.tsx b/packages/components/src/v-stack/stories/index.story.tsx
+index 11d6d579abc81e..a5b3c7194408ef 100644
+--- a/packages/components/src/v-stack/stories/index.story.tsx
++++ b/packages/components/src/v-stack/stories/index.story.tsx
+@@ -25,8 +25,8 @@ const ALIGNMENTS = {
+ 
+ const meta: Meta< typeof VStack > = {
+ 	component: VStack,
+-	title: 'Components (Experimental)/Layout/VStack',
+-	id: 'components-experimental-vstack',
++	title: 'Components/Layout/VStack',
++	id: 'components-vstack',
+ 	argTypes: {
+ 		alignment: {
+ 			control: { type: 'select' },
+@@ -38,6 +38,7 @@ const meta: Meta< typeof VStack > = {
+ 		justify: { control: { type: 'text' } },
+ 		spacing: { control: { type: 'text' } },
+ 	},
++	tags: [ 'status-experimental' ],
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
+diff --git a/packages/components/src/view/stories/index.story.tsx b/packages/components/src/view/stories/index.story.tsx
+index ee4bb71b8a243f..4d5e16408a6f75 100644
+--- a/packages/components/src/view/stories/index.story.tsx
++++ b/packages/components/src/view/stories/index.story.tsx
+@@ -10,11 +10,12 @@ import { View } from '..';
+ 
+ const meta: Meta< typeof View > = {
+ 	component: View,
+-	title: 'Components (Experimental)/View',
++	title: 'Components/View',
+ 	argTypes: {
+ 		as: { control: false },
+ 		children: { control: { type: 'text' } },
+ 	},
++	tags: [ 'status-experimental' ],
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
+diff --git a/packages/components/src/z-stack/stories/index.story.tsx b/packages/components/src/z-stack/stories/index.story.tsx
+index 53c7d950e75b1b..faf3c0556bdb76 100644
+--- a/packages/components/src/z-stack/stories/index.story.tsx
++++ b/packages/components/src/z-stack/stories/index.story.tsx
+@@ -13,11 +13,12 @@ import { ZStack } from '..';
+ 
+ const meta: Meta< typeof ZStack > = {
+ 	component: ZStack,
+-	title: 'Components (Experimental)/ZStack',
++	title: 'Components/ZStack',
+ 	argTypes: {
+ 		as: { control: { type: 'text' } },
+ 		children: { control: false },
+ 	},
++	tags: [ 'status-experimental' ],
+ 	parameters: {
+ 		controls: {
+ 			expanded: true,
+diff --git a/storybook/badges.js b/storybook/badges.js
+index abde7948c923a7..3f31dd27489dc5 100644
+--- a/storybook/badges.js
++++ b/storybook/badges.js
+@@ -33,4 +33,12 @@ export default {
+ 			desc: 'This component is not ready for use in production, including the Gutenberg codebase. DO NOT export outside of @wordpress/components.',
+ 		},
+ 	},
++	experimental: {
++		icon: '🧪',
++		title: '🧪 Experimental',
++		tooltip: {
++			title: 'Component is experimental',
++			desc: 'This component is under active development and may change in future releases.',
++		},
++	},
+ };
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index a4f6941e981114..e4ae281960b6bc 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -5,14 +5,25 @@
+ 			'borderboxcontrol',
+ 			'bordercontrol',
+ 			'boxcontrol',
++			'confirmdialog',
+ 			'customselectcontrol-v2',
+ 			'dimensioncontrol',
++			'heading',
++			'hstack',
++			'inputcontrol',
+ 			'menu',
+ 			'navigation',
+ 			'navigator',
++			'numbercontrol',
+ 			'progressbar',
+ 			'tabs',
++			'text',
+ 			'theme',
++			'togglegroupcontrol',
++			'treegrid',
++			'truncate',
++			'unitcontrol',
++			'vstack',
+ 		];
+ 		const REDIRECTS = [
+ 			{

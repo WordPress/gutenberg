@@ -1,0 +1,73 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 72edad0df4e10e..5759f21263325c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ ### Enhancements
+ 
+ -   `ToggleGroupControl`: Add opt-in prop for 40px default size ([#55789](https://github.com/WordPress/gutenberg/pull/55789)).
++-   `TextControl`: Add opt-in prop for 40px default size ([#55471](https://github.com/WordPress/gutenberg/pull/55471)).
+ 
+ ## 25.11.0 (2023-11-02)
+ 
+diff --git a/packages/components/src/text-control/index.tsx b/packages/components/src/text-control/index.tsx
+index 31b1462a3b3a43..30298357c3c01d 100644
+--- a/packages/components/src/text-control/index.tsx
++++ b/packages/components/src/text-control/index.tsx
+@@ -2,6 +2,7 @@
+  * External dependencies
+  */
+ import type { ChangeEvent, ForwardedRef } from 'react';
++import classnames from 'classnames';
+ 
+ /**
+  * WordPress dependencies
+@@ -22,6 +23,7 @@ function UnforwardedTextControl(
+ ) {
+ 	const {
+ 		__nextHasNoMarginBottom,
++		__next40pxDefaultSize = false,
+ 		label,
+ 		hideLabelFromVision,
+ 		value,
+@@ -46,7 +48,9 @@ function UnforwardedTextControl(
+ 			className={ className }
+ 		>
+ 			<input
+-				className="components-text-control__input"
++				className={ classnames( 'components-text-control__input', {
++					'is-next-40px-default-size': __next40pxDefaultSize,
++				} ) }
+ 				type={ type }
+ 				id={ id }
+ 				value={ value }
+diff --git a/packages/components/src/text-control/style.scss b/packages/components/src/text-control/style.scss
+index 38c35eec9c8455..e9f5a79fbe490c 100644
+--- a/packages/components/src/text-control/style.scss
++++ b/packages/components/src/text-control/style.scss
+@@ -13,5 +13,10 @@
+ .components-text-control__input[type="month"],
+ .components-text-control__input[type="number"] {
+ 	width: 100%;
++	height: $grid-unit-40;
+ 	@include input-control;
++
++	&.is-next-40px-default-size {
++		height: $grid-unit-50;
++	}
+ }
+diff --git a/packages/components/src/text-control/types.ts b/packages/components/src/text-control/types.ts
+index b5a230207bcfcc..1324da625e2c59 100644
+--- a/packages/components/src/text-control/types.ts
++++ b/packages/components/src/text-control/types.ts
+@@ -25,4 +25,10 @@ export type TextControlProps = Pick<
+ 	 * @default 'text'
+ 	 */
+ 	type?: 'email' | 'number' | 'password' | 'tel' | 'text' | 'search' | 'url';
++	/**
++	 * Start opting into the larger default height that will become the default size in a future version.
++	 *
++	 * @default false
++	 */
++	__next40pxDefaultSize?: boolean;
+ };

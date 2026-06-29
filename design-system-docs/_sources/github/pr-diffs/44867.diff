@@ -1,0 +1,31 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f462a29f65b1be..2417f18a8af784 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,9 +2,13 @@
+ 
+ ## Unreleased
+ 
+-### Bug Fix 
++### Bug Fix
+ -   `FontSizePicker`: Ensure that fluid font size presets appear correctly in the UI controls ([#44791](https://github.com/WordPress/gutenberg/pull/44791))
+ 
++### Documentation
++
++-   `VisuallyHidden`: Add some notes on best practices around stacking contexts when using this component ([#44867](https://github.com/WordPress/gutenberg/pull/44867))
++
+ ## 21.2.0 (2022-10-05)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/visually-hidden/README.md b/packages/components/src/visually-hidden/README.md
+index 9da03aeeb3b7b8..2aafb44a681bad 100644
+--- a/packages/components/src/visually-hidden/README.md
++++ b/packages/components/src/visually-hidden/README.md
+@@ -15,3 +15,7 @@ function Example() {
+ 	);
+ }
+ ```
++
++## Best practices
++
++The element that `VisuallyHidden` renders has the style `position: absolute`. When using this component be careful of the [stacking context](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context). Even though `VisuallyHidden` isn't visible, it can still affect layout. An example of this is that `VisuallyHidden` may ignore `overflow` styles of ancestor elements because it instead adopts the `overflow` of its stacking context. One known side-effect can be an unexpected scrollbar appearing. To fix this kind of issue, introduce a stacking context on a more immediate parent of `VisuallyHidden`. Adding `position: relative` is often an easy way to do this.

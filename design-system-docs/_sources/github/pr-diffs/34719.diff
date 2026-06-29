@@ -1,0 +1,118 @@
+diff --git a/packages/components/src/range-control/index.js b/packages/components/src/range-control/index.js
+index 6c3094c8b71756..fbc12dea691468 100644
+--- a/packages/components/src/range-control/index.js
++++ b/packages/components/src/range-control/index.js
+@@ -115,8 +115,7 @@ function RangeControl(
+ 	const describedBy = !! help ? `${ id }__help` : undefined;
+ 	const enableTooltip = showTooltipProp !== false && isFinite( value );
+ 
+-	const handleOnRangeChange = ( event ) => {
+-		const nextValue = parseFloat( event.target.value );
++	const handleOnRangeChange = ( nextValue ) => {
+ 		setValue( nextValue );
+ 		onChange( nextValue );
+ 	};
+@@ -216,6 +215,7 @@ function RangeControl(
+ 						className="components-range-control__slider"
+ 						describedBy={ describedBy }
+ 						disabled={ disabled }
++						failsafeValue={ rangeFillValue }
+ 						id={ id }
+ 						isShiftStepEnabled={ isShiftStepEnabled }
+ 						label={ label }
+diff --git a/packages/components/src/range-control/input-range.js b/packages/components/src/range-control/input-range.js
+index 6a0f57bd8e0ff2..a1657e1d2b6467 100644
+--- a/packages/components/src/range-control/input-range.js
++++ b/packages/components/src/range-control/input-range.js
+@@ -7,7 +7,7 @@ import { noop } from 'lodash';
+ /**
+  * WordPress dependencies
+  */
+-import { forwardRef } from '@wordpress/element';
++import { forwardRef, useRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -15,32 +15,59 @@ import { forwardRef } from '@wordpress/element';
+ import { InputRange as BaseInputRange } from './styles/range-control-styles';
+ import { useDebouncedHoverInteraction } from './utils';
+ import { useJumpStep } from '../utils/hooks';
++import { roundClamp } from '../utils/math';
+ 
+ function InputRange(
+ 	{
+ 		describedBy,
++		failsafeValue,
+ 		isShiftStepEnabled = true,
+ 		label,
+ 		onHideTooltip = noop,
+ 		onMouseLeave = noop,
+-		step = 1,
+-		onBlur = noop,
+-		onChange = noop,
+-		onFocus = noop,
+ 		onMouseMove = noop,
+ 		onShowTooltip = noop,
+-		shiftStep = 10,
+-		value,
++		shiftStep,
++		step,
+ 		...props
+ 	},
+ 	ref
+ ) {
++	const baseStep = step === 'any' ? 1 : step;
+ 	const jumpStep = useJumpStep( {
+-		step,
++		baseStep,
+ 		shiftStep,
+ 		isShiftStepEnabled,
+ 	} );
+ 
++	const refIsMouseDown = useRef( false );
++	let onChange;
++	let onMouseDown;
++	if ( isShiftStepEnabled ) {
++		onChange = ( { target: { value: nextValue } } ) => {
++			nextValue = parseFloat( nextValue );
++			if ( jumpStep !== baseStep ) {
++				const { min, max } = props;
++				if ( ! refIsMouseDown.current ) {
++					const difference = nextValue - failsafeValue;
++					nextValue = failsafeValue + difference * jumpStep;
++				}
++				nextValue = roundClamp( nextValue, min, max, jumpStep );
++			}
++			props.onChange( nextValue );
++		};
++		// Syncs refIsMouseDown to mouse down/up events
++		onMouseDown = ( event ) => {
++			props.onMouseDown?.( event );
++			refIsMouseDown.current = true;
++			document.addEventListener(
++				'mouseup',
++				() => ( refIsMouseDown.current = false ),
++				{ once: true }
++			);
++		};
++	}
++
+ 	const hoverInteractions = useDebouncedHoverInteraction( {
+ 		onHide: onHideTooltip,
+ 		onMouseLeave,
+@@ -55,14 +82,11 @@ function InputRange(
+ 			aria-describedby={ describedBy }
+ 			aria-label={ label }
+ 			aria-hidden={ false }
+-			onBlur={ onBlur }
+ 			onChange={ onChange }
+-			onFocus={ onFocus }
++			onMouseDown={ onMouseDown }
+ 			ref={ ref }
+-			step={ jumpStep }
+ 			tabIndex={ 0 }
+ 			type="range"
+-			value={ value }
+ 		/>
+ 	);
+ }

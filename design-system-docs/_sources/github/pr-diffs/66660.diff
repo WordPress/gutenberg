@@ -1,0 +1,96 @@
+diff --git a/packages/components/src/notice/stories/index.story.tsx b/packages/components/src/notice/stories/index.story.tsx
+index 95bf82016c2b04..042b4ac3ec79b3 100644
+--- a/packages/components/src/notice/stories/index.story.tsx
++++ b/packages/components/src/notice/stories/index.story.tsx
+@@ -17,7 +17,8 @@ import NoticeList from '../list';
+ import type { NoticeListProps } from '../types';
+ 
+ const meta: Meta< typeof Notice > = {
+-	title: 'Components/Notice',
++	title: 'Components/Feedback/Notice',
++	id: 'components-notice',
+ 	component: Notice,
+ 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+ 	subcomponents: { NoticeList },
+diff --git a/packages/components/src/progress-bar/stories/index.story.tsx b/packages/components/src/progress-bar/stories/index.story.tsx
+index 4396c4cc48eebb..2f6bb4dbe000fd 100644
+--- a/packages/components/src/progress-bar/stories/index.story.tsx
++++ b/packages/components/src/progress-bar/stories/index.story.tsx
+@@ -10,7 +10,8 @@ import { ProgressBar } from '..';
+ 
+ const meta: Meta< typeof ProgressBar > = {
+ 	component: ProgressBar,
+-	title: 'Components/ProgressBar',
++	title: 'Components/Feedback/ProgressBar',
++	id: 'components-progressbar',
+ 	argTypes: {
+ 		value: { control: { type: 'number', min: 0, max: 100, step: 1 } },
+ 	},
+diff --git a/packages/components/src/snackbar/stories/index.story.tsx b/packages/components/src/snackbar/stories/index.story.tsx
+index c1f525b60b3919..9bd1dae42b71be 100644
+--- a/packages/components/src/snackbar/stories/index.story.tsx
++++ b/packages/components/src/snackbar/stories/index.story.tsx
+@@ -15,7 +15,8 @@ import Icon from '../../icon';
+ import Snackbar from '..';
+ 
+ const meta: Meta< typeof Snackbar > = {
+-	title: 'Components/Snackbar',
++	title: 'Components/Feedback/Snackbar',
++	id: 'components-snackbar',
+ 	component: Snackbar,
+ 	argTypes: {
+ 		as: { control: { type: null } },
+diff --git a/packages/components/src/snackbar/stories/list.story.tsx b/packages/components/src/snackbar/stories/list.story.tsx
+index 8548ffba1e1f09..1f93f374ec1745 100644
+--- a/packages/components/src/snackbar/stories/list.story.tsx
++++ b/packages/components/src/snackbar/stories/list.story.tsx
+@@ -14,7 +14,8 @@ import { useState } from '@wordpress/element';
+ import SnackbarList from '../list';
+ 
+ const meta: Meta< typeof SnackbarList > = {
+-	title: 'Components/SnackbarList',
++	title: 'Components/Feedback/SnackbarList',
++	id: 'components-snackbarlist',
+ 	component: SnackbarList,
+ 	argTypes: {
+ 		as: { control: { type: null } },
+diff --git a/packages/components/src/spinner/stories/index.story.tsx b/packages/components/src/spinner/stories/index.story.tsx
+index 1062c6406bfb4e..1dc5879ac41444 100644
+--- a/packages/components/src/spinner/stories/index.story.tsx
++++ b/packages/components/src/spinner/stories/index.story.tsx
+@@ -10,7 +10,8 @@ import Spinner from '../';
+ import { space } from '../../utils/space';
+ 
+ const meta: Meta< typeof Spinner > = {
+-	title: 'Components/Spinner',
++	title: 'Components/Feedback/Spinner',
++	id: 'components-spinner',
+ 	component: Spinner,
+ 	parameters: {
+ 		controls: {
+diff --git a/packages/components/src/tip/stories/index.story.tsx b/packages/components/src/tip/stories/index.story.tsx
+index 3999c6b9be45f4..3026f2a58fae73 100644
+--- a/packages/components/src/tip/stories/index.story.tsx
++++ b/packages/components/src/tip/stories/index.story.tsx
+@@ -10,7 +10,8 @@ import Tip from '..';
+ 
+ const meta: Meta< typeof Tip > = {
+ 	component: Tip,
+-	title: 'Components/Tip',
++	title: 'Components/Feedback/Tip',
++	id: 'components-tip',
+ 	argTypes: {
+ 		children: { control: { type: 'text' } },
+ 	},
+diff --git a/storybook/preview.js b/storybook/preview.js
+index 21f2eab912059a..7672e7ebdcdff2 100644
+--- a/storybook/preview.js
++++ b/storybook/preview.js
+@@ -132,6 +132,7 @@ export const parameters = {
+ 					'Contributing Guidelines',
+ 					'Actions',
+ 					'Containers',
++					'Feedback',
+ 					'Utilities',
+ 				],
+ 				'Components (Experimental)',

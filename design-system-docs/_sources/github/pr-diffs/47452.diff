@@ -1,0 +1,46 @@
+diff --git a/packages/components/src/query-controls/README.md b/packages/components/src/query-controls/README.md
+index c34aae6f4217cd..6eea31e2af1a07 100644
+--- a/packages/components/src/query-controls/README.md
++++ b/packages/components/src/query-controls/README.md
+@@ -177,9 +177,10 @@ A function that receives the new author value. If not specified, the author cont
+ -   Required: No
+ -   Platform: Web
+ 
+-#### `onCategoryChange`: `CategorySelectProps[ 'onChange' ] | FormTokenFieldProps[ 'onChange' ]`
++#### `onCategoryChange`: `( newCategory: string ) => void | FormTokenFieldProps[ 'onChange' ]`
+ 
+ A function that receives the new category value. If not specified, the category controls are not rendered.
++The function's signature changes depending on whether multiple category selection is enabled or not.
+ 
+ -   Required: No
+ -   Platform: Web
+diff --git a/packages/components/src/query-controls/types.ts b/packages/components/src/query-controls/types.ts
+index 63bbfeaa5a0aac..f620e6040eed3c 100644
+--- a/packages/components/src/query-controls/types.ts
++++ b/packages/components/src/query-controls/types.ts
+@@ -116,8 +116,10 @@ export type QueryControlsWithSingleCategorySelectionProps =
+ 		 */
+ 		selectedCategoryId?: CategorySelectProps[ 'selectedCategoryId' ];
+ 		/**
+-		 * A function that receives the new category value.
+-		 * If not specified, the category controls are not rendered.
++		 * A function that receives the new category value. If not specified, the
++		 * category controls are not rendered.
++		 * The function's signature changes depending on whether multiple category
++		 * selection is enabled or not.
+ 		 */
+ 		onCategoryChange?: CategorySelectProps[ 'onChange' ];
+ 	};
+@@ -135,8 +137,10 @@ export type QueryControlsWithMultipleCategorySelectionProps =
+ 		 */
+ 		selectedCategories?: Category[];
+ 		/**
+-		 * A function that receives the new category value.
+-		 * If not specified, the category controls are not rendered.
++		 * A function that receives the new category value. If not specified, the
++		 * category controls are not rendered.
++		 * The function's signature changes depending on whether multiple category
++		 * selection is enabled or not.
+ 		 */
+ 		onCategoryChange?: FormTokenFieldProps[ 'onChange' ];
+ 	};

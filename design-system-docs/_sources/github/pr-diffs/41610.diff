@@ -1,0 +1,26 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0ddf7c5e512112..3054f5482a49b5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -27,6 +27,8 @@
+ -   Enhance the TypeScript migration guidelines ([#41669](https://github.com/WordPress/gutenberg/pull/41669)).
+ -   `ExternalLink`: Convert to TypeScript ([#41681](https://github.com/WordPress/gutenberg/pull/41681)).
+ -   `InputControl` updated to satisfy `react/exhuastive-deps` eslint rule ([#41601](https://github.com/WordPress/gutenberg/pull/41601))
++-   `Modal`: updated to satisfy `react/exhuastive-deps` eslint rule ([#41610](https://github.com/WordPress/gutenberg/pull/41610))
++
+ 
+ ## 19.12.0 (2022-06-01)
+ 
+diff --git a/packages/components/src/modal/index.js b/packages/components/src/modal/index.js
+index de86220f03bbe6..4d19e6f6fadb13 100644
+--- a/packages/components/src/modal/index.js
++++ b/packages/components/src/modal/index.js
+@@ -89,7 +89,7 @@ function Modal( props, forwardedRef ) {
+ 				ariaHelper.showApp();
+ 			}
+ 		};
+-	}, [] );
++	}, [ bodyOpenClassName ] );
+ 
+ 	function handleEscapeKeyDown( event ) {
+ 		if (

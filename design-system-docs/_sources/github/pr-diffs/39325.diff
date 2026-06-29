@@ -1,0 +1,180 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d8f53cd75fab5b..fd22bd2f949e60 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ -   `InputControl`: Allow `onBlur` for empty values to commit the change when `isPressEnterToChange` is true, and move reset behavior to the ESCAPE key. ([#39109](https://github.com/WordPress/gutenberg/pull/39109)).
+ -   `TreeGrid`: Add tests for Home/End keyboard navigation. Add `onFocusRow` callback for Home/End keyboard navigation, this was missed in the implementation PR. Modify test for expanding/collapsing a row as row 1 implements this now. Update README with latest changes. ([#39302](https://github.com/WordPress/gutenberg/pull/39302))
+ -   `ToggleGroupControlOption`: Calculate width from button content and remove `LabelPlaceholderView` ([#39345](https://github.com/WordPress/gutenberg/pull/39345))
++-   `BaseControl`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([#39325](https://github.com/WordPress/gutenberg/pull/39325)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/base-control/README.md b/packages/components/src/base-control/README.md
+index 6ed5b75b76b333..6e507ee4df87a8 100644
+--- a/packages/components/src/base-control/README.md
++++ b/packages/components/src/base-control/README.md
+@@ -10,7 +10,7 @@ Render a BaseControl for a textarea input:
+ import { BaseControl } from '@wordpress/components';
+ 
+ const MyBaseControl = () => (
+-	<BaseControl id="textarea-1" label="Text" help="Enter some text">
++	<BaseControl id="textarea-1" label="Text" help="Enter some text" __nextHasNoMarginBottom={ true }>
+ 		<textarea id="textarea-1" />
+ 	</BaseControl>
+ );
+@@ -63,6 +63,14 @@ The content to be displayed within the BaseControl.
+ -   Type: `Element`
+ -   Required: Yes
+ 
++### __nextHasNoMarginBottom
++
++Start opting into the new margin-free styles that will become the default in a future version.
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `false`
++
+ ## BaseControl.VisualLabel
+ 
+ `BaseControl.VisualLabel` component is used to render a purely visual label inside a `BaseControl` component.
+diff --git a/packages/components/src/base-control/index.js b/packages/components/src/base-control/index.js
+index 86746d6174fd61..a8c19457d13644 100644
+--- a/packages/components/src/base-control/index.js
++++ b/packages/components/src/base-control/index.js
+@@ -17,18 +17,19 @@ import {
+ 
+ /**
+  * @typedef Props
+- * @property {string}                    [id]                  The id of the element to which labels and help text are being generated.
+- *                                                             That element should be passed as a child.
+- * @property {import('react').ReactNode} help                  If this property is added, a help text will be
+- *                                                             generated using help property as the content.
+- * @property {import('react').ReactNode} [label]               If this property is added, a label will be generated
+- *                                                             using label property as the content.
+- * @property {boolean}                   [hideLabelFromVision] If true, the label will only be visible to screen readers.
+- * @property {string}                    [className]           The class that will be added with "components-base-control" to the
+- *                                                             classes of the wrapper div. If no className is passed only
+- *                                                             components-base-control is used.
+- * @property {import('react').ReactNode} [children]            The content to be displayed within
+- *                                                             the BaseControl.
++ * @property {boolean}                   [__nextHasNoMarginBottom] Start opting into the new margin-free styles that will become the default in a future version.
++ * @property {string}                    [id]                      The id of the element to which labels and help text are being generated.
++ *                                                                 That element should be passed as a child.
++ * @property {import('react').ReactNode} help                      If this property is added, a help text will be
++ *                                                                 generated using help property as the content.
++ * @property {import('react').ReactNode} [label]                   If this property is added, a label will be generated
++ *                                                                 using label property as the content.
++ * @property {boolean}                   [hideLabelFromVision]     If true, the label will only be visible to screen readers.
++ * @property {string}                    [className]               The class that will be added with "components-base-control" to the
++ *                                                                 classes of the wrapper div. If no className is passed only
++ *                                                                 components-base-control is used.
++ * @property {import('react').ReactNode} [children]                The content to be displayed within
++ *                                                                 the BaseControl.
+  */
+ 
+ /**
+@@ -36,6 +37,7 @@ import {
+  * @return {JSX.Element} Element
+  */
+ function BaseControl( {
++	__nextHasNoMarginBottom = false,
+ 	id,
+ 	label,
+ 	hideLabelFromVision,
+@@ -47,7 +49,11 @@ function BaseControl( {
+ 		<Wrapper
+ 			className={ classnames( 'components-base-control', className ) }
+ 		>
+-			<StyledField className="components-base-control__field">
++			<StyledField
++				className="components-base-control__field"
++				// TODO: Official deprecation for this should start after all internal usages have been migrated
++				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
++			>
+ 				{ label &&
+ 					id &&
+ 					( hideLabelFromVision ? (
+@@ -77,6 +83,7 @@ function BaseControl( {
+ 				<StyledHelp
+ 					id={ id ? id + '__help' : undefined }
+ 					className="components-base-control__help"
++					__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+ 				>
+ 					{ help }
+ 				</StyledHelp>
+diff --git a/packages/components/src/base-control/stories/index.js b/packages/components/src/base-control/stories/index.js
+index 53b09aba82507d..ed238093846225 100644
+--- a/packages/components/src/base-control/stories/index.js
++++ b/packages/components/src/base-control/stories/index.js
+@@ -4,7 +4,6 @@
+ import BaseControl from '../';
+ import Button from '../../button';
+ import { Spacer } from '../../spacer';
+-import TextareaControl from '../../textarea-control';
+ 
+ export default {
+ 	title: 'Components/BaseControl',
+@@ -15,13 +14,14 @@ export default {
+ const BaseControlWithTextarea = ( { id, ...props } ) => {
+ 	return (
+ 		<BaseControl id={ id } { ...props }>
+-			<TextareaControl id={ id } />
++			<textarea style={ { display: 'block' } } id={ id } />
+ 		</BaseControl>
+ 	);
+ };
+ 
+ export const Default = BaseControlWithTextarea.bind( {} );
+ Default.args = {
++	__nextHasNoMarginBottom: true,
+ 	id: 'textarea-1',
+ 	label: '',
+ 	hideLabelFromVision: false,
+diff --git a/packages/components/src/base-control/styles/base-control-styles.js b/packages/components/src/base-control/styles/base-control-styles.js
+index 9255c818583da1..376585139523e7 100644
+--- a/packages/components/src/base-control/styles/base-control-styles.js
++++ b/packages/components/src/base-control/styles/base-control-styles.js
+@@ -15,8 +15,17 @@ export const Wrapper = styled.div`
+ 	font-size: ${ font( 'default.fontSize' ) };
+ `;
+ 
++const deprecatedMarginField = ( { __nextHasNoMarginBottom = false } ) => {
++	return (
++		! __nextHasNoMarginBottom &&
++		css`
++			margin-bottom: ${ space( 2 ) };
++		`
++	);
++};
++
+ export const StyledField = styled.div`
+-	margin-bottom: ${ space( 2 ) };
++	${ deprecatedMarginField }
+ 
+ 	.components-panel__row & {
+ 		margin-bottom: inherit;
+@@ -32,10 +41,23 @@ export const StyledLabel = styled.label`
+ 	${ labelStyles }
+ `;
+ 
++const deprecatedMarginHelp = ( { __nextHasNoMarginBottom = false } ) => {
++	return (
++		! __nextHasNoMarginBottom &&
++		css`
++			margin-bottom: revert;
++		`
++	);
++};
++
+ export const StyledHelp = styled.p`
++	margin-top: ${ space( 2 ) };
++	margin-bottom: 0;
+ 	font-size: ${ font( 'helpText.fontSize' ) };
+ 	font-style: normal;
+ 	color: ${ COLORS.mediumGray.text };
++
++	${ deprecatedMarginHelp }
+ `;
+ 
+ export const StyledVisualLabel = styled.span`

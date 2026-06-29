@@ -1,0 +1,37 @@
+diff --git a/packages/components/src/ui/shortcut/component.tsx b/packages/components/src/ui/shortcut/component.tsx
+index 8bef7084d65523..549055b2f96b7d 100644
+--- a/packages/components/src/ui/shortcut/component.tsx
++++ b/packages/components/src/ui/shortcut/component.tsx
+@@ -3,8 +3,13 @@
+  */
+ // eslint-disable-next-line no-restricted-imports
+ import type { Ref } from 'react';
+-import type { ViewOwnProps } from '@wp-g2/create-styles';
+-import { useContextSystem, contextConnect } from '@wp-g2/context';
++
++/**
++ * Internal dependencies
++ */
++import { useContextSystem, contextConnect } from '../context';
++// eslint-disable-next-line no-duplicate-imports
++import type { ViewOwnProps } from '../context';
+ 
+ export interface ShortcutDescription {
+ 	display: string;
+diff --git a/packages/components/src/ui/shortcut/test/__snapshots__/index.js.snap b/packages/components/src/ui/shortcut/test/__snapshots__/index.js.snap
+index dc66c48331aefb..048fffafe4589c 100644
+--- a/packages/components/src/ui/shortcut/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/shortcut/test/__snapshots__/index.js.snap
+@@ -2,9 +2,9 @@
+ 
+ exports[`Shortcut should render a span with the shortcut text 1`] = `
+ <span
+-  class="components-shortcut wp-components-shortcut ic-1x9nauu"
+-  data-g2-c16t="true"
+-  data-g2-component="Shortcut"
++  class="components-shortcut"
++  data-wp-c16t="true"
++  data-wp-component="Shortcut"
+ >
+   meta + P
+ </span>

@@ -1,0 +1,703 @@
+diff --git a/packages/components/src/card/test/__snapshots__/index.js.snap b/packages/components/src/card/test/__snapshots__/index.js.snap
+index 163c3d63f0957a..ff86de24ccc4b6 100644
+--- a/packages/components/src/card/test/__snapshots__/index.js.snap
++++ b/packages/components/src/card/test/__snapshots__/index.js.snap
+@@ -298,41 +298,44 @@ Object {
+ }
+ 
+ .emotion-15 {
++  box-sizing: border-box;
++  display: block;
++  width: 100%;
++  border-color: rgba(0, 0, 0, 0.1);
++}
++
++.emotion-16 {
+   border-color: rgba(0, 0, 0, 0.1);
+   border-width: 0 0 1px 0;
+   height: 0;
+   margin: 0;
+   width: auto;
+-  box-sizing: border-box;
+-  display: block;
+-  width: 100%;
+-  border-color: rgba(0, 0, 0, 0.1);
+ }
+ 
+-.emotion-19 {
++.emotion-21 {
+   box-sizing: border-box;
+   overflow: hidden;
+ }
+ 
+-.emotion-19>img,
+-.emotion-19>iframe {
++.emotion-21>img,
++.emotion-21>iframe {
+   display: block;
+   height: auto;
+   max-width: 100%;
+   width: 100%;
+ }
+ 
+-.emotion-19:first-of-type {
++.emotion-21:first-of-type {
+   border-top-left-radius: 2px;
+   border-top-right-radius: 2px;
+ }
+ 
+-.emotion-19:last-of-type {
++.emotion-21:last-of-type {
+   border-bottom-left-radius: 2px;
+   border-bottom-right-radius: 2px;
+ }
+ 
+-.emotion-22 {
++.emotion-24 {
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: -ms-flexbox;
+@@ -353,29 +356,29 @@ Object {
+   padding: calc(4px * 4) calc(4px * 6);
+ }
+ 
+-.emotion-22>*+*:not(marquee) {
++.emotion-24>*+*:not(marquee) {
+   margin-left: calc(4px * 2);
+ }
+ 
+-.emotion-22>* {
++.emotion-24>* {
+   min-width: 0;
+ }
+ 
+-.emotion-22:first-child {
++.emotion-24:first-child {
+   border-top: none;
+ }
+ 
+-.emotion-22:first-of-type {
++.emotion-24:first-of-type {
+   border-top-left-radius: 2px;
+   border-top-right-radius: 2px;
+ }
+ 
+-.emotion-22:last-of-type {
++.emotion-24:last-of-type {
+   border-bottom-left-radius: 2px;
+   border-bottom-right-radius: 2px;
+ }
+ 
+-.emotion-25 {
++.emotion-27 {
+   background: transparent;
+   display: block;
+   margin: 0!important;
+@@ -427,7 +430,7 @@ Object {
+           </div>
+           <hr
+             aria-orientation="horizontal"
+-            class="components-divider components-card__divider components-card-divider emotion-15"
++            class="components-divider components-card__divider components-card-divider emotion-15 emotion-16 emotion-17"
+             data-wp-c16t="true"
+             data-wp-component="CardDivider"
+             role="separator"
+@@ -440,7 +443,7 @@ Object {
+             Card Body 3
+           </div>
+           <div
+-            class="components-card__media components-card-media emotion-19 emotion-1 emotion-2"
++            class="components-card__media components-card-media emotion-21 emotion-1 emotion-2"
+             data-wp-c16t="true"
+             data-wp-component="CardMedia"
+           >
+@@ -450,7 +453,7 @@ Object {
+             />
+           </div>
+           <div
+-            class="components-flex components-card__footer components-card-footer emotion-22 emotion-1 emotion-2"
++            class="components-flex components-card__footer components-card-footer emotion-24 emotion-1 emotion-2"
+             data-wp-c16t="true"
+             data-wp-component="CardFooter"
+           >
+@@ -459,13 +462,13 @@ Object {
+         </div>
+         <div
+           aria-hidden="true"
+-          class="components-elevation emotion-25 emotion-1 emotion-2"
++          class="components-elevation emotion-27 emotion-1 emotion-2"
+           data-wp-c16t="true"
+           data-wp-component="Elevation"
+         />
+         <div
+           aria-hidden="true"
+-          class="components-elevation emotion-25 emotion-1 emotion-2"
++          class="components-elevation emotion-27 emotion-1 emotion-2"
+           data-wp-c16t="true"
+           data-wp-component="Elevation"
+         />
+@@ -576,41 +579,44 @@ Object {
+ }
+ 
+ .emotion-15 {
++  box-sizing: border-box;
++  display: block;
++  width: 100%;
++  border-color: rgba(0, 0, 0, 0.1);
++}
++
++.emotion-16 {
+   border-color: rgba(0, 0, 0, 0.1);
+   border-width: 0 0 1px 0;
+   height: 0;
+   margin: 0;
+   width: auto;
+-  box-sizing: border-box;
+-  display: block;
+-  width: 100%;
+-  border-color: rgba(0, 0, 0, 0.1);
+ }
+ 
+-.emotion-19 {
++.emotion-21 {
+   box-sizing: border-box;
+   overflow: hidden;
+ }
+ 
+-.emotion-19>img,
+-.emotion-19>iframe {
++.emotion-21>img,
++.emotion-21>iframe {
+   display: block;
+   height: auto;
+   max-width: 100%;
+   width: 100%;
+ }
+ 
+-.emotion-19:first-of-type {
++.emotion-21:first-of-type {
+   border-top-left-radius: 2px;
+   border-top-right-radius: 2px;
+ }
+ 
+-.emotion-19:last-of-type {
++.emotion-21:last-of-type {
+   border-bottom-left-radius: 2px;
+   border-bottom-right-radius: 2px;
+ }
+ 
+-.emotion-22 {
++.emotion-24 {
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: -ms-flexbox;
+@@ -631,29 +637,29 @@ Object {
+   padding: calc(4px * 4) calc(4px * 6);
+ }
+ 
+-.emotion-22>*+*:not(marquee) {
++.emotion-24>*+*:not(marquee) {
+   margin-left: calc(4px * 2);
+ }
+ 
+-.emotion-22>* {
++.emotion-24>* {
+   min-width: 0;
+ }
+ 
+-.emotion-22:first-child {
++.emotion-24:first-child {
+   border-top: none;
+ }
+ 
+-.emotion-22:first-of-type {
++.emotion-24:first-of-type {
+   border-top-left-radius: 2px;
+   border-top-right-radius: 2px;
+ }
+ 
+-.emotion-22:last-of-type {
++.emotion-24:last-of-type {
+   border-bottom-left-radius: 2px;
+   border-bottom-right-radius: 2px;
+ }
+ 
+-.emotion-25 {
++.emotion-27 {
+   background: transparent;
+   display: block;
+   margin: 0!important;
+@@ -704,7 +710,7 @@ Object {
+         </div>
+         <hr
+           aria-orientation="horizontal"
+-          class="components-divider components-card__divider components-card-divider emotion-15"
++          class="components-divider components-card__divider components-card-divider emotion-15 emotion-16 emotion-17"
+           data-wp-c16t="true"
+           data-wp-component="CardDivider"
+           role="separator"
+@@ -717,7 +723,7 @@ Object {
+           Card Body 3
+         </div>
+         <div
+-          class="components-card__media components-card-media emotion-19 emotion-1 emotion-2"
++          class="components-card__media components-card-media emotion-21 emotion-1 emotion-2"
+           data-wp-c16t="true"
+           data-wp-component="CardMedia"
+         >
+@@ -727,7 +733,7 @@ Object {
+           />
+         </div>
+         <div
+-          class="components-flex components-card__footer components-card-footer emotion-22 emotion-1 emotion-2"
++          class="components-flex components-card__footer components-card-footer emotion-24 emotion-1 emotion-2"
+           data-wp-c16t="true"
+           data-wp-component="CardFooter"
+         >
+@@ -736,13 +742,13 @@ Object {
+       </div>
+       <div
+         aria-hidden="true"
+-        class="components-elevation emotion-25 emotion-1 emotion-2"
++        class="components-elevation emotion-27 emotion-1 emotion-2"
+         data-wp-c16t="true"
+         data-wp-component="Elevation"
+       />
+       <div
+         aria-hidden="true"
+-        class="components-elevation emotion-25 emotion-1 emotion-2"
++        class="components-elevation emotion-27 emotion-1 emotion-2"
+         data-wp-c16t="true"
+         data-wp-component="Elevation"
+       />
+diff --git a/packages/components/src/divider/component.tsx b/packages/components/src/divider/component.tsx
+index 3e296464554e72..e83013ef782b5f 100644
+--- a/packages/components/src/divider/component.tsx
++++ b/packages/components/src/divider/component.tsx
+@@ -1,94 +1,30 @@
+ /**
+  * External dependencies
+  */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { css, cx } from '@emotion/css';
+ // eslint-disable-next-line no-restricted-imports
+ import { Separator } from 'reakit';
+-// eslint-disable-next-line no-restricted-imports, no-duplicate-imports
+-import type { SeparatorProps } from 'reakit';
+ // eslint-disable-next-line no-restricted-imports
+ import type { Ref } from 'react';
+ 
+-/**
+- * WordPress dependencies
+- */
+-import { useMemo } from '@wordpress/element';
+-
+ /**
+  * Internal dependencies
+  */
+ import { contextConnect, useContextSystem } from '../ui/context';
+ // eslint-disable-next-line no-duplicate-imports
+ import type { PolymorphicComponentProps } from '../ui/context';
+-import * as styles from './styles';
+-import { space } from '../ui/utils/space';
+-
+-export interface DividerProps extends Omit< SeparatorProps, 'children' > {
+-	/**
+-	 * Adjusts all margins.
+-	 */
+-	margin?: number;
+-	/**
+-	 * Adjusts top margins.
+-	 */
+-	marginTop?: number;
+-	/**
+-	 * Adjusts bottom margins.
+-	 */
+-	marginBottom?: number;
+-}
++import { DividerView } from './styles';
++import type { Props } from './types';
+ 
+ function Divider(
+-	props: PolymorphicComponentProps< DividerProps, 'hr', false >,
++	props: PolymorphicComponentProps< Props, 'hr', false >,
+ 	forwardedRef: Ref< any >
+ ) {
+-	const {
+-		className,
+-		margin,
+-		marginBottom,
+-		marginTop,
+-		...otherProps
+-	} = useContextSystem( props, 'Divider' );
+-
+-	const classes = useMemo( () => {
+-		const sx: Record< string, string > = {};
+-
+-		if ( typeof margin !== 'undefined' ) {
+-			sx.margin = css`
+-				margin-bottom: ${ space( margin ) };
+-				margin-top: ${ space( margin ) };
+-			`;
+-		} else {
+-			if ( typeof marginTop !== 'undefined' ) {
+-				sx.marginTop = css`
+-					margin-top: ${ space( marginTop ) };
+-				`;
+-			}
+-
+-			if ( typeof marginBottom !== 'undefined' ) {
+-				sx.marginBottom = css`
+-					margin-bottom: ${ space( marginBottom ) };
+-				`;
+-			}
+-		}
+-
+-		return cx(
+-			styles.Divider,
+-			sx.marginBottom,
+-			sx.marginTop,
+-			sx.margin,
+-			className
+-		);
+-	}, [ className, margin, marginBottom, marginTop ] );
++	const contextProps = useContextSystem( props, 'Divider' );
+ 
+ 	return (
+ 		<Separator
+-			as="hr"
+-			{ ...otherProps }
+-			className={ classes }
++			as={ DividerView }
++			{ ...contextProps }
+ 			ref={ forwardedRef }
+ 		/>
+ 	);
+diff --git a/packages/components/src/divider/index.ts b/packages/components/src/divider/index.ts
+index 28ffb25e49af6f..f0aba16dd3b812 100644
+--- a/packages/components/src/divider/index.ts
++++ b/packages/components/src/divider/index.ts
+@@ -1,2 +1,2 @@
+ export { default as Divider } from './component';
+-export type { DividerProps } from './component';
++export type { Props as DividerProps } from './types';
+diff --git a/packages/components/src/divider/stories/index.js b/packages/components/src/divider/stories/index.js
+index 0d6f416abb7cd0..6ba09152d874c4 100644
+--- a/packages/components/src/divider/stories/index.js
++++ b/packages/components/src/divider/stories/index.js
+@@ -1,3 +1,8 @@
++/**
++ * External dependencies
++ */
++import { number } from '@storybook/addon-knobs';
++
+ /**
+  * Internal dependencies
+  */
+@@ -8,6 +13,23 @@ export default {
+ 	title: 'Components (Experimental)/Divider',
+ };
+ 
++const BlackDivider = ( props ) => (
++	<Divider { ...props } style={ { borderColor: 'black' } } />
++);
++
+ export const _default = () => {
+-	return <Divider />;
++	const props = {
++		margin: number( 'margin', 0 ),
++	};
++	// make the border color black to give higher contrast and help it appear in storybook better
++	return <BlackDivider { ...props } />;
++};
++
++export const splitMargins = () => {
++	const props = {
++		marginTop: number( 'marginTop', 0 ),
++		marginBottom: number( 'marginBottom', 0 ),
++	};
++
++	return <BlackDivider { ...props } />;
+ };
+diff --git a/packages/components/src/divider/styles.ts b/packages/components/src/divider/styles.ts
+index b13218ab657fe8..270cc27cd80a0d 100644
+--- a/packages/components/src/divider/styles.ts
++++ b/packages/components/src/divider/styles.ts
+@@ -1,20 +1,36 @@
+ /**
+  * External dependencies
+  */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { css } from '@emotion/css';
++import styled from '@emotion/styled';
++import { css } from '@emotion/react';
+ 
+ /**
+  * Internal dependencies
+  */
++import { space } from '../ui/utils/space';
+ import CONFIG from '../utils/config-values';
++import type { OwnProps } from './types';
+ 
+-export const Divider = css`
++const renderMargin = ( { margin, marginTop, marginBottom }: OwnProps ) => {
++	if ( typeof margin !== 'undefined' ) {
++		return css( {
++			marginBottom: space( margin ),
++			marginTop: space( margin ),
++		} );
++	}
++
++	return css( {
++		marginTop: space( marginTop ),
++		marginBottom: space( marginBottom ),
++	} );
++};
++
++export const DividerView = styled.hr< OwnProps >`
+ 	border-color: ${ CONFIG.colorDivider };
+ 	border-width: 0 0 1px 0;
+ 	height: 0;
+ 	margin: 0;
+ 	width: auto;
++
++	${ renderMargin }
+ `;
+diff --git a/packages/components/src/divider/test/__snapshots__/index.js.snap b/packages/components/src/divider/test/__snapshots__/index.js.snap
+index 417c424956ef50..d19ce16daf39c5 100644
+--- a/packages/components/src/divider/test/__snapshots__/index.js.snap
++++ b/packages/components/src/divider/test/__snapshots__/index.js.snap
+@@ -11,7 +11,7 @@ exports[`props should render correctly 1`] = `
+ 
+ <hr
+   aria-orientation="horizontal"
+-  class="emotion-0 components-divider"
++  class="components-divider emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="Divider"
+   role="separator"
+diff --git a/packages/components/src/divider/types.ts b/packages/components/src/divider/types.ts
+new file mode 100644
+index 00000000000000..70a17881cc0e6a
+--- /dev/null
++++ b/packages/components/src/divider/types.ts
+@@ -0,0 +1,27 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { SeparatorProps } from 'reakit';
++
++/**
++ * Internal dependencies
++ */
++import type { SpaceInput } from '../ui/utils/space';
++
++export interface OwnProps {
++	/**
++	 * Adjusts all margins.
++	 */
++	margin?: SpaceInput;
++	/**
++	 * Adjusts top margins.
++	 */
++	marginTop?: SpaceInput;
++	/**
++	 * Adjusts bottom margins.
++	 */
++	marginBottom?: SpaceInput;
++}
++
++export interface Props extends Omit< SeparatorProps, 'children' >, OwnProps {}
+diff --git a/packages/components/src/flex/types.ts b/packages/components/src/flex/types.ts
+index b52b1e4d282bcf..da4ea5996e4b65 100644
+--- a/packages/components/src/flex/types.ts
++++ b/packages/components/src/flex/types.ts
+@@ -8,6 +8,7 @@ import type { CSSProperties } from 'react';
+  * Internal dependencies
+  */
+ import type { ResponsiveCSSValue } from '../ui/utils/types';
++import type { SpaceInput } from '../ui/utils/space';
+ 
+ export type FlexDirection = ResponsiveCSSValue<
+ 	CSSProperties[ 'flexDirection' ]
+@@ -39,7 +40,7 @@ export type FlexProps = {
+ 	 *
+ 	 * @default 2
+ 	 */
+-	gap?: import('react').ReactText;
++	gap?: SpaceInput;
+ 	/**
+ 	 * Horizontally aligns content if the `direction` is `row`, or vertically aligns content if the `direction` is `column`.
+ 	 * In the example below, `flex-start` will align the children content to the left.
+diff --git a/packages/components/src/spacer/hook.ts b/packages/components/src/spacer/hook.ts
+index 2bca326ed584f4..67e11f24e43885 100644
+--- a/packages/components/src/spacer/hook.ts
++++ b/packages/components/src/spacer/hook.ts
+@@ -12,7 +12,7 @@ import { css, cx } from '@emotion/css';
+ import { useContextSystem } from '../ui/context';
+ // eslint-disable-next-line no-duplicate-imports
+ import type { PolymorphicComponentProps } from '../ui/context';
+-import { space } from '../ui/utils/space';
++import { space, SpaceInput } from '../ui/utils/space';
+ 
+ const isDefined = < T >( o: T ): o is Exclude< T, null | undefined > =>
+ 	typeof o !== 'undefined' && o !== null;
+@@ -21,61 +21,61 @@ export interface SpacerProps {
+ 	/**
+ 	 * Adjusts all margins.
+ 	 */
+-	margin?: number;
++	margin?: SpaceInput;
+ 	/**
+ 	 * Adjusts top and bottom margins.
+ 	 */
+-	marginY?: number;
++	marginY?: SpaceInput;
+ 	/**
+ 	 * Adjusts left and right margins.
+ 	 */
+-	marginX?: number;
++	marginX?: SpaceInput;
+ 	/**
+ 	 * Adjusts top margins.
+ 	 */
+-	marginTop?: number;
++	marginTop?: SpaceInput;
+ 	/**
+ 	 * Adjusts bottom margins.
+ 	 *
+ 	 * @default 2
+ 	 */
+-	marginBottom?: number;
++	marginBottom?: SpaceInput;
+ 	/**
+ 	 * Adjusts left margins.
+ 	 */
+-	marginLeft?: number;
++	marginLeft?: SpaceInput;
+ 	/**
+ 	 * Adjusts right margins.
+ 	 */
+-	marginRight?: number;
++	marginRight?: SpaceInput;
+ 	/**
+ 	 * Adjusts all padding.
+ 	 */
+-	padding?: number;
++	padding?: SpaceInput;
+ 	/**
+ 	 * Adjusts top and bottom padding.
+ 	 */
+-	paddingY?: number;
++	paddingY?: SpaceInput;
+ 	/**
+ 	 * Adjusts left and right padding.
+ 	 */
+-	paddingX?: number;
++	paddingX?: SpaceInput;
+ 	/**
+ 	 * Adjusts top padding.
+ 	 */
+-	paddingTop?: number;
++	paddingTop?: SpaceInput;
+ 	/**
+ 	 * Adjusts bottom padding.
+ 	 */
+-	paddingBottom?: number;
++	paddingBottom?: SpaceInput;
+ 	/**
+ 	 * Adjusts left padding.
+ 	 */
+-	paddingLeft?: number;
++	paddingLeft?: SpaceInput;
+ 	/**
+ 	 * Adjusts right padding.
+ 	 */
+-	paddingRight?: number;
++	paddingRight?: SpaceInput;
+ 	/**
+ 	 * The children elements.
+ 	 */
+diff --git a/packages/components/src/ui/utils/space.ts b/packages/components/src/ui/utils/space.ts
+index ccd7a2b81fd743..d6a3748a5a0eca 100644
+--- a/packages/components/src/ui/utils/space.ts
++++ b/packages/components/src/ui/utils/space.ts
+@@ -1,16 +1,40 @@
+ /**
+- * External dependencies
++ * A real number or something parsable as a number
+  */
+-// eslint-disable-next-line no-restricted-imports
+-import type { ReactText } from 'react';
++export type SpaceInput = number | string;
++
++const GRID_BASE = '4px';
++
+ /**
+- * Internal dependencies
++ * A function that handles numbers, numeric strings, and unit values.
++ *
++ * When given a number or a numeric string, it will return the grid-based
++ * value as a factor of GRID_BASE, defined above.
++ *
++ * When given a unit value or one of the named CSS values like `auto`,
++ * it will simply return the value back.
++ *
++ * @param  value A number, numeric string, or a unit value.
+  */
++export function space( value?: SpaceInput ): string | undefined {
++	if ( typeof value === 'undefined' ) {
++		return undefined;
++	}
+ 
+-const GRID_BASE = '4px';
++	// handle empty strings, if it's the number 0 this still works
++	if ( ! value ) {
++		return '0';
++	}
++
++	const asInt = typeof value === 'number' ? value : Number( value );
++
++	// test if the input has a unit, was NaN, or was one of the named CSS values (like `auto`), in which case just use that value
++	if (
++		CSS.supports?.( 'margin', value.toString() ) ||
++		Number.isNaN( asInt )
++	) {
++		return value.toString();
++	}
+ 
+-export function space( value: ReactText ): string {
+-	return typeof value === 'number'
+-		? `calc(${ GRID_BASE } * ${ value })`
+-		: value;
++	return `calc(${ GRID_BASE } * ${ value })`;
+ }
+diff --git a/packages/components/src/ui/utils/test/space.js b/packages/components/src/ui/utils/test/space.js
+new file mode 100644
+index 00000000000000..8259d26d037dee
+--- /dev/null
++++ b/packages/components/src/ui/utils/test/space.js
+@@ -0,0 +1,18 @@
++/**
++ * Internal dependencies
++ */
++import { space } from '../space';
++
++describe( 'space', () => {
++	it.each`
++		input            | output
++		${ 1 }           | ${ 'calc(4px * 1)' }
++		${ '1' }         | ${ 'calc(4px * 1)' }
++		${ '-1px' }      | ${ '-1px' }
++		${ '1em' }       | ${ '1em' }
++		${ '1notaunit' } | ${ '1notaunit' }
++		${ 'auto' }      | ${ 'auto' }
++	`( 'should return $output when given $input', ( { input, output } ) => {
++		expect( space( input ) ).toEqual( output );
++	} );
++} );

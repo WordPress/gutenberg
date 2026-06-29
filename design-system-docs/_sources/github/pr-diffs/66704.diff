@@ -1,0 +1,306 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index acb59c743c81e8..fe326e847970b4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Deprecations
+ 
+ -   `BoxControl`: Passive deprecate `onMouseOver`/`onMouseOut`. Pass to the `inputProps` prop instead ([#67332](https://github.com/WordPress/gutenberg/pull/67332)).
++-   `BoxControl`: Deprecate 36px default size ([#66704](https://github.com/WordPress/gutenberg/pull/66704)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/box-control/README.md b/packages/components/src/box-control/README.md
+index ddadf938798ee9..8bcb5a5dad8fc2 100644
+--- a/packages/components/src/box-control/README.md
++++ b/packages/components/src/box-control/README.md
+@@ -21,6 +21,7 @@ function Example() {
+ 
+   return (
+     <BoxControl
++      __next40pxDefaultSize
+       values={ values }
+       onChange={ setValues }
+     />
+diff --git a/packages/components/src/box-control/index.tsx b/packages/components/src/box-control/index.tsx
+index 7418fa19d74a0a..46cf2cd93a9444 100644
+--- a/packages/components/src/box-control/index.tsx
++++ b/packages/components/src/box-control/index.tsx
+@@ -33,6 +33,7 @@ import type {
+ 	BoxControlProps,
+ 	BoxControlValue,
+ } from './types';
++import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
+ 
+ const defaultInputProps = {
+ 	min: 0,
+@@ -64,6 +65,7 @@ function useUniqueId( idProp?: string ) {
+  *
+  *   return (
+  *     <BoxControl
++ *       __next40pxDefaultSize
+  *       values={ values }
+  *       onChange={ setValues }
+  *     />
+@@ -155,6 +157,12 @@ function BoxControl( {
+ 		__next40pxDefaultSize,
+ 	};
+ 
++	maybeWarnDeprecated36pxSize( {
++		componentName: 'BoxControl',
++		__next40pxDefaultSize,
++		size: undefined,
++	} );
++
+ 	return (
+ 		<Grid
+ 			id={ id }
+diff --git a/packages/components/src/box-control/stories/index.story.tsx b/packages/components/src/box-control/stories/index.story.tsx
+index 783f9d047b1bb0..aa94e8c4bf00b8 100644
+--- a/packages/components/src/box-control/stories/index.story.tsx
++++ b/packages/components/src/box-control/stories/index.story.tsx
+@@ -49,6 +49,7 @@ const TemplateControlled: StoryFn< typeof BoxControl > = ( props ) => {
+ export const Default = TemplateUncontrolled.bind( {} );
+ Default.args = {
+ 	label: 'Label',
++	__next40pxDefaultSize: true,
+ };
+ 
+ export const Controlled = TemplateControlled.bind( {} );
+diff --git a/packages/components/src/box-control/test/index.tsx b/packages/components/src/box-control/test/index.tsx
+index 681e7721d0c13a..185a18b258951f 100644
+--- a/packages/components/src/box-control/test/index.tsx
++++ b/packages/components/src/box-control/test/index.tsx
+@@ -15,11 +15,14 @@ import { useState } from '@wordpress/element';
+ import BoxControl from '..';
+ import type { BoxControlProps, BoxControlValue } from '../types';
+ 
+-const Example = ( extraProps: Omit< BoxControlProps, 'onChange' > ) => {
++const ControlledBoxControl = (
++	extraProps: Omit< BoxControlProps, 'onChange' >
++) => {
+ 	const [ state, setState ] = useState< BoxControlValue >();
+ 
+ 	return (
+ 		<BoxControl
++			__next40pxDefaultSize
+ 			values={ state }
+ 			onChange={ ( next ) => setState( next ) }
+ 			{ ...extraProps }
+@@ -27,10 +30,17 @@ const Example = ( extraProps: Omit< BoxControlProps, 'onChange' > ) => {
+ 	);
+ };
+ 
++const UncontrolledBoxControl = ( {
++	onChange = () => {},
++	...props
++}: Omit< BoxControlProps, 'onChange' > & {
++	onChange?: BoxControlProps[ 'onChange' ];
++} ) => <BoxControl __next40pxDefaultSize onChange={ onChange } { ...props } />;
++
+ describe( 'BoxControl', () => {
+ 	describe( 'Basic rendering', () => {
+ 		it( 'should render a box control input', () => {
+-			render( <BoxControl onChange={ () => {} } /> );
++			render( <UncontrolledBoxControl /> );
+ 
+ 			expect(
+ 				screen.getByRole( 'group', { name: 'Box Control' } )
+@@ -43,7 +53,7 @@ describe( 'BoxControl', () => {
+ 		it( 'should update values when interacting with input', async () => {
+ 			const user = userEvent.setup();
+ 
+-			render( <BoxControl onChange={ () => {} } /> );
++			render( <UncontrolledBoxControl /> );
+ 
+ 			const input = screen.getByRole( 'textbox', { name: 'All sides' } );
+ 
+@@ -54,7 +64,7 @@ describe( 'BoxControl', () => {
+ 		} );
+ 
+ 		it( 'should update input values when interacting with slider', () => {
+-			render( <BoxControl onChange={ () => {} } /> );
++			render( <UncontrolledBoxControl /> );
+ 
+ 			const slider = screen.getByRole( 'slider' );
+ 
+@@ -68,7 +78,7 @@ describe( 'BoxControl', () => {
+ 
+ 		it( 'should update slider values when interacting with input', async () => {
+ 			const user = userEvent.setup();
+-			render( <BoxControl onChange={ () => {} } /> );
++			render( <UncontrolledBoxControl /> );
+ 
+ 			const input = screen.getByRole( 'textbox', {
+ 				name: 'All sides',
+@@ -82,7 +92,7 @@ describe( 'BoxControl', () => {
+ 		} );
+ 
+ 		it( 'should render the number input with a default min value of 0', () => {
+-			render( <BoxControl onChange={ () => {} } /> );
++			render( <UncontrolledBoxControl /> );
+ 
+ 			const input = screen.getByRole( 'textbox', { name: 'All sides' } );
+ 
+@@ -91,10 +101,7 @@ describe( 'BoxControl', () => {
+ 
+ 		it( 'should pass down `inputProps` to the underlying number input', () => {
+ 			render(
+-				<BoxControl
+-					onChange={ () => {} }
+-					inputProps={ { min: 10, max: 50 } }
+-				/>
++				<UncontrolledBoxControl inputProps={ { min: 10, max: 50 } } />
+ 			);
+ 
+ 			const input = screen.getByRole( 'textbox', { name: 'All sides' } );
+@@ -108,7 +115,7 @@ describe( 'BoxControl', () => {
+ 		it( 'should reset values when clicking Reset', async () => {
+ 			const user = userEvent.setup();
+ 
+-			render( <BoxControl onChange={ () => {} } /> );
++			render( <UncontrolledBoxControl /> );
+ 
+ 			const input = screen.getByRole( 'textbox', {
+ 				name: 'All sides',
+@@ -127,7 +134,7 @@ describe( 'BoxControl', () => {
+ 		it( 'should reset values when clicking Reset, if controlled', async () => {
+ 			const user = userEvent.setup();
+ 
+-			render( <Example /> );
++			render( <ControlledBoxControl /> );
+ 
+ 			const input = screen.getByRole( 'textbox', {
+ 				name: 'All sides',
+@@ -146,7 +153,7 @@ describe( 'BoxControl', () => {
+ 		it( 'should reset values when clicking Reset, if controlled <-> uncontrolled state changes', async () => {
+ 			const user = userEvent.setup();
+ 
+-			render( <Example /> );
++			render( <ControlledBoxControl /> );
+ 
+ 			const input = screen.getByRole( 'textbox', {
+ 				name: 'All sides',
+@@ -166,7 +173,9 @@ describe( 'BoxControl', () => {
+ 			const user = userEvent.setup();
+ 			const spyChange = jest.fn();
+ 
+-			render( <BoxControl onChange={ ( v ) => spyChange( v ) } /> );
++			render(
++				<UncontrolledBoxControl onChange={ ( v ) => spyChange( v ) } />
++			);
+ 
+ 			const input = screen.getByRole( 'textbox', {
+ 				name: 'All sides',
+@@ -196,7 +205,7 @@ describe( 'BoxControl', () => {
+ 		it( 'should update a single side value when unlinked', async () => {
+ 			const user = userEvent.setup();
+ 
+-			render( <Example /> );
++			render( <ControlledBoxControl /> );
+ 
+ 			await user.click(
+ 				screen.getByRole( 'button', { name: 'Unlink sides' } )
+@@ -224,7 +233,7 @@ describe( 'BoxControl', () => {
+ 		it( 'should update a single side value when using slider unlinked', async () => {
+ 			const user = userEvent.setup();
+ 
+-			render( <Example /> );
++			render( <ControlledBoxControl /> );
+ 
+ 			await user.click(
+ 				screen.getByRole( 'button', { name: 'Unlink sides' } )
+@@ -252,7 +261,7 @@ describe( 'BoxControl', () => {
+ 		it( 'should update a whole axis when value is changed when unlinked', async () => {
+ 			const user = userEvent.setup();
+ 
+-			render( <Example splitOnAxis /> );
++			render( <ControlledBoxControl splitOnAxis /> );
+ 
+ 			await user.click(
+ 				screen.getByRole( 'button', { name: 'Unlink sides' } )
+@@ -276,7 +285,7 @@ describe( 'BoxControl', () => {
+ 		it( 'should update a whole axis using a slider when value is changed when unlinked', async () => {
+ 			const user = userEvent.setup();
+ 
+-			render( <Example splitOnAxis /> );
++			render( <ControlledBoxControl splitOnAxis /> );
+ 
+ 			await user.click(
+ 				screen.getByRole( 'button', { name: 'Unlink sides' } )
+@@ -300,7 +309,7 @@ describe( 'BoxControl', () => {
+ 		it( 'should show "Mixed" label when sides have different values but are linked', async () => {
+ 			const user = userEvent.setup();
+ 
+-			render( <Example /> );
++			render( <ControlledBoxControl /> );
+ 
+ 			const unlinkButton = screen.getByRole( 'button', {
+ 				name: 'Unlink sides',
+@@ -330,7 +339,7 @@ describe( 'BoxControl', () => {
+ 			const user = userEvent.setup();
+ 
+ 			// Render control.
+-			render( <BoxControl onChange={ () => {} } /> );
++			render( <UncontrolledBoxControl /> );
+ 
+ 			// Make unit selection on all input control.
+ 			await user.selectOptions(
+@@ -362,7 +371,7 @@ describe( 'BoxControl', () => {
+ 			const user = userEvent.setup();
+ 
+ 			// Render control.
+-			const { rerender } = render( <BoxControl onChange={ () => {} } /> );
++			const { rerender } = render( <UncontrolledBoxControl /> );
+ 
+ 			// Make unit selection on all input control.
+ 			await user.selectOptions(
+@@ -390,9 +399,7 @@ describe( 'BoxControl', () => {
+ 			} );
+ 
+ 			// Rerender with individual side value & confirm unit is selected.
+-			rerender(
+-				<BoxControl values={ { top: '2.5em' } } onChange={ () => {} } />
+-			);
++			rerender( <UncontrolledBoxControl values={ { top: '2.5em' } } /> );
+ 
+ 			const rerenderedControls = screen.getAllByRole( 'combobox', {
+ 				name: 'Select unit',
+@@ -414,7 +421,7 @@ describe( 'BoxControl', () => {
+ 			const user = userEvent.setup();
+ 			const onChangeSpy = jest.fn();
+ 
+-			render( <BoxControl onChange={ onChangeSpy } /> );
++			render( <UncontrolledBoxControl onChange={ onChangeSpy } /> );
+ 
+ 			const valueInput = screen.getByRole( 'textbox', {
+ 				name: 'All sides',
+@@ -443,7 +450,7 @@ describe( 'BoxControl', () => {
+ 			const user = userEvent.setup();
+ 			const setState = jest.fn();
+ 
+-			render( <BoxControl onChange={ setState } /> );
++			render( <UncontrolledBoxControl onChange={ setState } /> );
+ 
+ 			await user.selectOptions(
+ 				screen.getByRole( 'combobox', {
+diff --git a/packages/components/src/tools-panel/tools-panel/README.md b/packages/components/src/tools-panel/tools-panel/README.md
+index 1daa7537335e1c..1895f5ccc843ec 100644
+--- a/packages/components/src/tools-panel/tools-panel/README.md
++++ b/packages/components/src/tools-panel/tools-panel/README.md
+@@ -124,6 +124,7 @@ export function DimensionPanel() {
+ 				onDeselect={ () => setPadding( undefined ) }
+ 			>
+ 				<BoxControl
++					__next40pxDefaultSize
+ 					label={ __( 'Padding' ) }
+ 					onChange={ setPadding }
+ 					values={ padding }
+@@ -136,6 +137,7 @@ export function DimensionPanel() {
+ 				onDeselect={ () => setMargin( undefined ) }
+ 			>
+ 				<BoxControl
++					__next40pxDefaultSize
+ 					label={ __( 'Margin' ) }
+ 					onChange={ setMargin }
+ 					values={ margin }

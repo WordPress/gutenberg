@@ -1,0 +1,476 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index eb4e732b4438c7..c3d28c0de13f9f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   Update `BorderControl` and `BorderBoxControl` to allow the passing of custom class names to popovers ([#39753](https://github.com/WordPress/gutenberg/pull/39753)).
+ -   `ToggleGroupControl`: Reintroduce backdrop animation ([#40021](https://github.com/WordPress/gutenberg/pull/40021)).
++-   `Card`: Adjust border radius effective size ([#40032](https://github.com/WordPress/gutenberg/pull/40032)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/card/styles.js b/packages/components/src/card/styles.js
+index 9162a4790a93b3..ad08bf2690e8fa 100644
+--- a/packages/components/src/card/styles.js
++++ b/packages/components/src/card/styles.js
+@@ -8,6 +8,12 @@ import { css } from '@emotion/react';
+  */
+ import { COLORS, CONFIG } from '../utils';
+ 
++// Since the border for `Card` is rendered via the `box-shadow` property
++// (as opposed to the `border` property), the value of the border radius needs
++// to be adjusted by removing 1px (this is because the `box-shadow` renders
++// as an "outer radius").
++const adjustedBorderRadius = `calc(${ CONFIG.cardBorderRadius } - 1px)`;
++
+ export const Card = css`
+ 	box-shadow: 0 0 0 1px ${ CONFIG.surfaceBorderColor };
+ 	outline: none;
+@@ -62,13 +68,13 @@ export const Divider = css`
+ 
+ export const borderRadius = css`
+ 	&:first-of-type {
+-		border-top-left-radius: ${ CONFIG.cardBorderRadius };
+-		border-top-right-radius: ${ CONFIG.cardBorderRadius };
++		border-top-left-radius: ${ adjustedBorderRadius };
++		border-top-right-radius: ${ adjustedBorderRadius };
+ 	}
+ 
+ 	&:last-of-type {
+-		border-bottom-left-radius: ${ CONFIG.cardBorderRadius };
+-		border-bottom-right-radius: ${ CONFIG.cardBorderRadius };
++		border-bottom-left-radius: ${ adjustedBorderRadius };
++		border-bottom-right-radius: ${ adjustedBorderRadius };
+ 	}
+ `;
+ 
+@@ -85,7 +91,7 @@ export const borderless = css`
+ `;
+ 
+ export const rounded = css`
+-	border-radius: ${ CONFIG.cardBorderRadius };
++	border-radius: ${ adjustedBorderRadius };
+ `;
+ 
+ const xSmallCardPadding = css`
+diff --git a/packages/components/src/card/test/__snapshots__/index.js.snap b/packages/components/src/card/test/__snapshots__/index.js.snap
+index 2c0dc3d22eb2d0..eea876b0cffe56 100644
+--- a/packages/components/src/card/test/__snapshots__/index.js.snap
++++ b/packages/components/src/card/test/__snapshots__/index.js.snap
+@@ -8,8 +8,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-card__body components-card-body css-1lr0m0h-View-Body-borderRadius-medium em57xhy0"
+-+     class="components-scrollable components-card__body components-card-body css-qqu4qj-View-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium em57xhy0"
++-     class="components-card__body components-card-body css-1nwhnu3-View-Body-borderRadius-medium em57xhy0"
+++     class="components-scrollable components-card__body components-card-body css-1w878rm-View-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="CardBody"
+     >
+@@ -25,8 +25,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-card__body components-card-body css-1lr0m0h-View-Body-borderRadius-medium em57xhy0"
+-+     class="components-card__body components-card-body css-19nlika-View-Body-borderRadius-medium-shady em57xhy0"
++-     class="components-card__body components-card-body css-1nwhnu3-View-Body-borderRadius-medium em57xhy0"
+++     class="components-card__body components-card-body css-kqnlb3-View-Body-borderRadius-medium-shady em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="CardBody"
+     >
+@@ -42,8 +42,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-flex components-card__footer components-card-footer css-otmewz-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium em57xhy0"
+-+     class="components-flex components-card__footer components-card-footer css-f5ly6j-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium-shady em57xhy0"
++-     class="components-flex components-card__footer components-card-footer css-p1v47q-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium em57xhy0"
+++     class="components-flex components-card__footer components-card-footer css-1xx98hc-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium-shady em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="CardFooter"
+     >
+@@ -59,8 +59,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-flex components-card__footer components-card-footer css-otmewz-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium em57xhy0"
+-+     class="components-flex components-card__footer components-card-footer css-sonr8h-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium em57xhy0"
++-     class="components-flex components-card__footer components-card-footer css-p1v47q-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium em57xhy0"
+++     class="components-flex components-card__footer components-card-footer css-gg08fg-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="CardFooter"
+     >
+@@ -76,8 +76,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-flex components-card__header components-card-header css-cw4qrt-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-medium em57xhy0"
+-+     class="components-flex components-card__header components-card-header css-d00z5k-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-medium-shady em57xhy0"
++-     class="components-flex components-card__header components-card-header css-1g5oj2q-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-medium em57xhy0"
+++     class="components-flex components-card__header components-card-header css-121pfkj-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-medium-shady em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="CardHeader"
+     >
+@@ -96,16 +96,16 @@ Snapshot Diff:
+       class="css-mgwsf4-View-Content em57xhy0"
+     >
+       <div
+--       class="components-flex components-card__header components-card-header css-cw4qrt-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-medium em57xhy0"
+-+       class="components-flex components-card__header components-card-header css-1dtpden-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-large em57xhy0"
++-       class="components-flex components-card__header components-card-header css-1g5oj2q-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-medium em57xhy0"
+++       class="components-flex components-card__header components-card-header css-1e8ifbz-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-large em57xhy0"
+         data-wp-c16t="true"
+         data-wp-component="CardHeader"
+       >
+         Header
+       </div>
+       <div
+--       class="components-card__body components-card-body css-1lr0m0h-View-Body-borderRadius-medium em57xhy0"
+-+       class="components-card__body components-card-body css-bwr6fa-View-Body-borderRadius-large em57xhy0"
++-       class="components-card__body components-card-body css-1nwhnu3-View-Body-borderRadius-medium em57xhy0"
+++       class="components-card__body components-card-body css-1nonx1n-View-Body-borderRadius-large em57xhy0"
+         data-wp-c16t="true"
+         data-wp-component="CardBody"
+       >
+@@ -113,6 +113,23 @@ Snapshot Diff:
+       </div>
+ `;
+ 
++exports[`Card Card component should add rounded border when the isRounded prop is true 1`] = `
++Snapshot Diff:
++- Received styles
+++ Base styles
++
++@@ -1,9 +1,8 @@
++  Array [
++    Object {
++      "background-color": "#fff",
++-     "border-radius": "calc(2px - 1px)",
++      "box-shadow": "0 0 0 1px rgba(0, 0, 0, 0.1)",
++      "color": "#000",
++      "outline": "none",
++      "position": "relative",
++    },
++`;
++
+ exports[`Card Card component should get the isBorderless and isSize props (passed from its context) overriddenwhen the same props is specified directly on the component 1`] = `
+ Snapshot Diff:
+ - First value
+@@ -124,24 +141,24 @@ Snapshot Diff:
+         class="css-mgwsf4-View-Content em57xhy0"
+       >
+         <div
+--         class="components-flex components-card__header components-card-header css-t8b09c-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-large-borderless em57xhy0"
+-+         class="components-flex components-card__header components-card-header css-1e0mt81-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-small em57xhy0"
++-         class="components-flex components-card__header components-card-header css-1uuauve-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-large-borderless em57xhy0"
+++         class="components-flex components-card__header components-card-header css-yf9nll-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-small em57xhy0"
+           data-wp-c16t="true"
+           data-wp-component="CardHeader"
+         >
+           Header
+         </div>
+         <div
+--         class="components-card__body components-card-body css-bwr6fa-View-Body-borderRadius-large em57xhy0"
+-+         class="components-card__body components-card-body css-1lr0m0h-View-Body-borderRadius-medium em57xhy0"
++-         class="components-card__body components-card-body css-1nonx1n-View-Body-borderRadius-large em57xhy0"
+++         class="components-card__body components-card-body css-1nwhnu3-View-Body-borderRadius-medium em57xhy0"
+           data-wp-c16t="true"
+           data-wp-component="CardBody"
+         >
+           Body
+         </div>
+         <div
+--         class="components-flex components-card__footer components-card-footer css-c7cteg-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-large-borderless em57xhy0"
+-+         class="components-flex components-card__footer components-card-footer css-1t7s584-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-xSmallCardPadding em57xhy0"
++-         class="components-flex components-card__footer components-card-footer css-s0icc3-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-large-borderless em57xhy0"
+++         class="components-flex components-card__footer components-card-footer css-cwhos2-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-xSmallCardPadding em57xhy0"
+           data-wp-c16t="true"
+           data-wp-component="CardFooter"
+         >
+@@ -157,8 +174,8 @@ Snapshot Diff:
+ @@ -1,30 +1,30 @@
+   <div>
+     <div
+--     class="components-surface components-card css-ssx2ib-View-Surface-getBorders-primary-Card-boxShadowless-rounded em57xhy0"
+-+     class="components-surface components-card css-1vyvcpq-View-Surface-getBorders-primary-Card-rounded em57xhy0"
++-     class="components-surface components-card css-jutib-View-Surface-getBorders-primary-Card-boxShadowless-rounded em57xhy0"
+++     class="components-surface components-card css-83a3ca-View-Surface-getBorders-primary-Card-rounded em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="Card"
+     >
+@@ -166,24 +183,24 @@ Snapshot Diff:
+         class="css-mgwsf4-View-Content em57xhy0"
+       >
+         <div
+--         class="components-flex components-card__header components-card-header css-t8b09c-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-large-borderless em57xhy0"
+-+         class="components-flex components-card__header components-card-header css-1e0mt81-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-small em57xhy0"
++-         class="components-flex components-card__header components-card-header css-1uuauve-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-large-borderless em57xhy0"
+++         class="components-flex components-card__header components-card-header css-yf9nll-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-small em57xhy0"
+           data-wp-c16t="true"
+           data-wp-component="CardHeader"
+         >
+           Header
+         </div>
+         <div
+--         class="components-card__body components-card-body css-bwr6fa-View-Body-borderRadius-large em57xhy0"
+-+         class="components-card__body components-card-body css-1cnf18v-View-Body-borderRadius-small em57xhy0"
++-         class="components-card__body components-card-body css-1nonx1n-View-Body-borderRadius-large em57xhy0"
+++         class="components-card__body components-card-body css-5spj1a-View-Body-borderRadius-small em57xhy0"
+           data-wp-c16t="true"
+           data-wp-component="CardBody"
+         >
+           Body
+         </div>
+         <div
+--         class="components-flex components-card__footer components-card-footer css-c7cteg-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-large-borderless em57xhy0"
+-+         class="components-flex components-card__footer components-card-footer css-1trggei-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-small em57xhy0"
++-         class="components-flex components-card__footer components-card-footer css-s0icc3-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-large-borderless em57xhy0"
+++         class="components-flex components-card__footer components-card-footer css-oc4v7j-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-small em57xhy0"
+           data-wp-c16t="true"
+           data-wp-component="CardFooter"
+         >
+@@ -200,7 +217,7 @@ Object {
+   position: relative;
+   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+   outline: none;
+-  border-radius: 2px;
++  border-radius: calc(2px - 1px);
+ }
+ 
+ .emotion-2 {
+@@ -242,13 +259,13 @@ Object {
+ }
+ 
+ .emotion-4:first-of-type {
+-  border-top-left-radius: 2px;
+-  border-top-right-radius: 2px;
++  border-top-left-radius: calc(2px - 1px);
++  border-top-right-radius: calc(2px - 1px);
+ }
+ 
+ .emotion-4:last-of-type {
+-  border-bottom-left-radius: 2px;
+-  border-bottom-right-radius: 2px;
++  border-bottom-left-radius: calc(2px - 1px);
++  border-bottom-right-radius: calc(2px - 1px);
+ }
+ 
+ .emotion-6 {
+@@ -259,13 +276,13 @@ Object {
+ }
+ 
+ .emotion-6:first-of-type {
+-  border-top-left-radius: 2px;
+-  border-top-right-radius: 2px;
++  border-top-left-radius: calc(2px - 1px);
++  border-top-right-radius: calc(2px - 1px);
+ }
+ 
+ .emotion-6:last-of-type {
+-  border-bottom-left-radius: 2px;
+-  border-bottom-right-radius: 2px;
++  border-bottom-left-radius: calc(2px - 1px);
++  border-bottom-right-radius: calc(2px - 1px);
+ }
+ 
+ .emotion-10 {
+@@ -294,13 +311,13 @@ Object {
+ }
+ 
+ .emotion-14:first-of-type {
+-  border-top-left-radius: 2px;
+-  border-top-right-radius: 2px;
++  border-top-left-radius: calc(2px - 1px);
++  border-top-right-radius: calc(2px - 1px);
+ }
+ 
+ .emotion-14:last-of-type {
+-  border-bottom-left-radius: 2px;
+-  border-bottom-right-radius: 2px;
++  border-bottom-left-radius: calc(2px - 1px);
++  border-bottom-right-radius: calc(2px - 1px);
+ }
+ 
+ .emotion-16 {
+@@ -338,13 +355,13 @@ Object {
+ }
+ 
+ .emotion-16:first-of-type {
+-  border-top-left-radius: 2px;
+-  border-top-right-radius: 2px;
++  border-top-left-radius: calc(2px - 1px);
++  border-top-right-radius: calc(2px - 1px);
+ }
+ 
+ .emotion-16:last-of-type {
+-  border-bottom-left-radius: 2px;
+-  border-bottom-right-radius: 2px;
++  border-bottom-left-radius: calc(2px - 1px);
++  border-bottom-right-radius: calc(2px - 1px);
+ }
+ 
+ .emotion-18 {
+@@ -456,7 +473,7 @@ Object {
+   position: relative;
+   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+   outline: none;
+-  border-radius: 2px;
++  border-radius: calc(2px - 1px);
+ }
+ 
+ .emotion-2 {
+@@ -498,13 +515,13 @@ Object {
+ }
+ 
+ .emotion-4:first-of-type {
+-  border-top-left-radius: 2px;
+-  border-top-right-radius: 2px;
++  border-top-left-radius: calc(2px - 1px);
++  border-top-right-radius: calc(2px - 1px);
+ }
+ 
+ .emotion-4:last-of-type {
+-  border-bottom-left-radius: 2px;
+-  border-bottom-right-radius: 2px;
++  border-bottom-left-radius: calc(2px - 1px);
++  border-bottom-right-radius: calc(2px - 1px);
+ }
+ 
+ .emotion-6 {
+@@ -515,13 +532,13 @@ Object {
+ }
+ 
+ .emotion-6:first-of-type {
+-  border-top-left-radius: 2px;
+-  border-top-right-radius: 2px;
++  border-top-left-radius: calc(2px - 1px);
++  border-top-right-radius: calc(2px - 1px);
+ }
+ 
+ .emotion-6:last-of-type {
+-  border-bottom-left-radius: 2px;
+-  border-bottom-right-radius: 2px;
++  border-bottom-left-radius: calc(2px - 1px);
++  border-bottom-right-radius: calc(2px - 1px);
+ }
+ 
+ .emotion-10 {
+@@ -550,13 +567,13 @@ Object {
+ }
+ 
+ .emotion-14:first-of-type {
+-  border-top-left-radius: 2px;
+-  border-top-right-radius: 2px;
++  border-top-left-radius: calc(2px - 1px);
++  border-top-right-radius: calc(2px - 1px);
+ }
+ 
+ .emotion-14:last-of-type {
+-  border-bottom-left-radius: 2px;
+-  border-bottom-right-radius: 2px;
++  border-bottom-left-radius: calc(2px - 1px);
++  border-bottom-right-radius: calc(2px - 1px);
+ }
+ 
+ .emotion-16 {
+@@ -594,13 +611,13 @@ Object {
+ }
+ 
+ .emotion-16:first-of-type {
+-  border-top-left-radius: 2px;
+-  border-top-right-radius: 2px;
++  border-top-left-radius: calc(2px - 1px);
++  border-top-right-radius: calc(2px - 1px);
+ }
+ 
+ .emotion-16:last-of-type {
+-  border-bottom-left-radius: 2px;
+-  border-bottom-right-radius: 2px;
++  border-bottom-left-radius: calc(2px - 1px);
++  border-bottom-right-radius: calc(2px - 1px);
+ }
+ 
+ .emotion-18 {
+@@ -796,7 +813,7 @@ exports[`Card Card component should warn when the isElevated prop is passed 1`]
+   position: relative;
+   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+   outline: none;
+-  border-radius: 2px;
++  border-radius: calc(2px - 1px);
+ }
+ 
+ .emotion-2 {
+diff --git a/packages/components/src/card/test/index.js b/packages/components/src/card/test/index.js
+index 01a51c0cf329bc..613de06c24ad8e 100644
+--- a/packages/components/src/card/test/index.js
++++ b/packages/components/src/card/test/index.js
+@@ -14,7 +14,6 @@ import {
+ 	CardHeader,
+ 	CardMedia,
+ } from '../';
+-import { CONFIG } from '../../utils';
+ 
+ describe( 'Card', () => {
+ 	describe( 'Card component', () => {
+@@ -51,12 +50,15 @@ describe( 'Card', () => {
+ 		} );
+ 
+ 		it( 'should add rounded border when the isRounded prop is true', () => {
+-			const { container } = render(
++			const { container: containerRounded } = render(
+ 				<Card isRounded={ true }>Code is Poetry</Card>
+ 			);
+-			expect( container.firstChild ).toHaveStyle( {
+-				borderRadius: CONFIG.cardBorderRadius,
+-			} );
++			const { container: containerSquared } = render(
++				<Card isRounded={ false }>Code is Poetry</Card>
++			);
++			expect( containerRounded.firstChild ).toMatchStyleDiffSnapshot(
++				containerSquared.firstChild
++			);
+ 		} );
+ 
+ 		it( 'should show a box shadow when the elevation prop is greater than 0', () => {
+diff --git a/packages/components/src/flyout/test/__snapshots__/index.js.snap b/packages/components/src/flyout/test/__snapshots__/index.js.snap
+index 9aeeace655ce5e..1759d8ddb0e8b5 100644
+--- a/packages/components/src/flyout/test/__snapshots__/index.js.snap
++++ b/packages/components/src/flyout/test/__snapshots__/index.js.snap
+@@ -7,7 +7,7 @@ exports[`props should render correctly 1`] = `
+   position: relative;
+   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+   outline: none;
+-  border-radius: 2px;
++  border-radius: calc(2px - 1px);
+ }
+ 
+ .emotion-1 .components-card-body {
+@@ -26,13 +26,13 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ .emotion-5:first-of-type {
+-  border-top-left-radius: 2px;
+-  border-top-right-radius: 2px;
++  border-top-left-radius: calc(2px - 1px);
++  border-top-right-radius: calc(2px - 1px);
+ }
+ 
+ .emotion-5:last-of-type {
+-  border-bottom-left-radius: 2px;
+-  border-bottom-right-radius: 2px;
++  border-bottom-left-radius: calc(2px - 1px);
++  border-bottom-right-radius: calc(2px - 1px);
+ }
+ 
+ .emotion-7 {
+@@ -172,7 +172,7 @@ Snapshot Diff:
+           tabindex="-1"
+         />
+ +       <div
+-+         class="components-card__body components-card-body css-1lr0m0h-View-Body-borderRadius-medium em57xhy0"
+++         class="components-card__body components-card-body css-1nwhnu3-View-Body-borderRadius-medium em57xhy0"
+ +         data-wp-c16t="true"
+ +         data-wp-component="CardBody"
+ +       >

@@ -1,0 +1,118 @@
+diff --git a/packages/components/src/base-field/test/index.js b/packages/components/src/base-field/test/index.js
+index b5ed5ef4b05fa4..8204163c2b6c40 100644
+--- a/packages/components/src/base-field/test/index.js
++++ b/packages/components/src/base-field/test/index.js
+@@ -14,18 +14,14 @@ const TestField = ( props ) => {
+ };
+ 
+ describe( 'base field', () => {
+-	let base;
+-
+-	beforeEach( () => {
+-		base = render( <TestField /> ).container;
+-	} );
+-
+ 	it( 'should render correctly', () => {
++		const base = render( <TestField /> ).container;
+ 		expect( base.firstChild ).toMatchSnapshot();
+ 	} );
+ 
+ 	describe( 'props', () => {
+ 		it( 'should render error styles', () => {
++			const base = render( <TestField /> ).container;
+ 			const { container } = render( <TestField hasError /> );
+ 			expect( container.firstChild ).toMatchStyleDiffSnapshot(
+ 				base.firstChild
+@@ -33,6 +29,7 @@ describe( 'base field', () => {
+ 		} );
+ 
+ 		it( 'should render inline styles', () => {
++			const base = render( <TestField /> ).container;
+ 			const { container } = render( <TestField isInline /> );
+ 			expect( container.firstChild ).toMatchStyleDiffSnapshot(
+ 				base.firstChild
+@@ -40,6 +37,7 @@ describe( 'base field', () => {
+ 		} );
+ 
+ 		it( 'should render subtle styles', () => {
++			const base = render( <TestField /> ).container;
+ 			const { container } = render( <TestField isSubtle /> );
+ 			expect( container.firstChild ).toMatchStyleDiffSnapshot(
+ 				base.firstChild
+diff --git a/packages/components/src/ui/spinner/test/index.js b/packages/components/src/ui/spinner/test/index.js
+index fe8dd4390e7f70..39ced6662a7654 100644
+--- a/packages/components/src/ui/spinner/test/index.js
++++ b/packages/components/src/ui/spinner/test/index.js
+@@ -9,17 +9,13 @@ import { render } from '@testing-library/react';
+ import { Spinner } from '..';
+ 
+ describe( 'props', () => {
+-	let base;
+-
+-	beforeEach( () => {
+-		base = render( <Spinner /> );
+-	} );
+-
+ 	test( 'should render correctly', () => {
++		const base = render( <Spinner /> );
+ 		expect( base.container.firstChild ).toMatchSnapshot();
+ 	} );
+ 
+ 	test( 'should render color', () => {
++		const base = render( <Spinner /> );
+ 		const { container } = render( <Spinner color="blue" /> );
+ 		expect( container.firstChild ).toMatchDiffSnapshot(
+ 			base.container.firstChild
+@@ -27,6 +23,7 @@ describe( 'props', () => {
+ 	} );
+ 
+ 	test( 'should render size', () => {
++		const base = render( <Spinner /> );
+ 		const { container } = render( <Spinner size={ 31 } /> );
+ 		expect( container.firstChild ).toMatchDiffSnapshot(
+ 			base.container.firstChild
+diff --git a/packages/components/src/ui/tooltip/test/index.js b/packages/components/src/ui/tooltip/test/index.js
+index 0a13319b999256..f87818d7671373 100644
+--- a/packages/components/src/ui/tooltip/test/index.js
++++ b/packages/components/src/ui/tooltip/test/index.js
+@@ -13,20 +13,22 @@ describe( 'props', () => {
+ 	const baseTooltipId = 'base-tooltip';
+ 	const baseTooltipTriggerContent = 'WordPress.org - Base trigger content';
+ 	const byId = ( id ) => ( t ) => t.id === id;
+-	beforeEach( () => {
++	const renderVisibleTooltip = () => {
+ 		render(
+ 			<Tooltip baseId={ baseTooltipId } content="Code is Poetry" visible>
+ 				<Text>{ baseTooltipTriggerContent }</Text>
+ 			</Tooltip>
+ 		);
+-	} );
++	};
+ 
+ 	test( 'should render correctly', () => {
++		renderVisibleTooltip();
+ 		const tooltip = screen.getByRole( /tooltip/i );
+ 		expect( tooltip ).toMatchSnapshot();
+ 	} );
+ 
+ 	test( 'should render invisible', () => {
++		renderVisibleTooltip();
+ 		const invisibleTooltipTriggerContent = 'WordPress.org - Invisible';
+ 		render(
+ 			<Tooltip
+@@ -50,6 +52,7 @@ describe( 'props', () => {
+ 	} );
+ 
+ 	test( 'should render without children', () => {
++		renderVisibleTooltip();
+ 		const childlessTooltipId = 'tooltip-without-children';
+ 		render(
+ 			<Tooltip
+@@ -64,6 +67,7 @@ describe( 'props', () => {
+ 	} );
+ 
+ 	test( 'should not render a tooltip without content', () => {
++		renderVisibleTooltip();
+ 		const contentlessTooltipId = 'contentless-tooltip';
+ 		render(
+ 			<Tooltip baseId={ contentlessTooltipId } visible>

@@ -1,0 +1,32 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d2580e0b009b5f..ac6bb9731229d9 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ 
+ ### Internal
+ 
++-   `useControlledValue`: let TypeScript infer the return type ([#46164](https://github.com/WordPress/gutenberg/pull/46164))
+ -   `LinkedButton`: remove unnecessary `span` tag ([#46063](https://github.com/WordPress/gutenberg/pull/46063))
+ -   NumberControl: refactor styles/tests/stories to TypeScript, replace fireEvent with user-event ([#45990](https://github.com/WordPress/gutenberg/pull/45990)).
+ 
+diff --git a/packages/components/src/utils/hooks/use-controlled-value.ts b/packages/components/src/utils/hooks/use-controlled-value.ts
+index 5a3824d465c07c..bb7f3aea805c99 100644
+--- a/packages/components/src/utils/hooks/use-controlled-value.ts
++++ b/packages/components/src/utils/hooks/use-controlled-value.ts
+@@ -22,7 +22,7 @@ export function useControlledValue< T >( {
+ 	defaultValue,
+ 	onChange,
+ 	value: valueProp,
+-}: Props< T > ): [ T | undefined, ( value: T ) => void ] {
++}: Props< T > ) {
+ 	const hasValue = typeof valueProp !== 'undefined';
+ 	const initialValue = hasValue ? valueProp : defaultValue;
+ 	const [ state, setState ] = useState( initialValue );
+@@ -40,5 +40,5 @@ export function useControlledValue< T >( {
+ 		setValue = setState;
+ 	}
+ 
+-	return [ value, setValue ];
++	return [ value, setValue as typeof setState ] as const;
+ }

@@ -1,0 +1,253 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 73f297ecfb69f8..b4159bc2d76b58 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fix
++
++-   Consolidate the main black colors to gray-900. Affects `AlignmentMatrixControl`, `InputControl`, `Heading`, `SelectControl`, `Spinner (Experimental)`, and `Text` ([#40391](https://github.com/WordPress/gutenberg/pull/40391)).
++
+ ### Internal
+ 
+ -   Remove individual color object exports from the `utils/colors-values.js` file. Colors should now be used from the main `COLORS` export([#40387](https://github.com/WordPress/gutenberg/pull/40387)).
+diff --git a/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-styles.js b/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-styles.js
+index 918ad927ad5793..1e35a4195460c6 100644
+--- a/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-styles.js
++++ b/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-styles.js
+@@ -43,9 +43,11 @@ export const Row = styled.div`
+ `;
+ 
+ const pointActive = ( { isActive } ) => {
+-	const boxShadow = isActive ? `0 0 0 2px ${ COLORS.black }` : null;
+-	const pointColor = isActive ? COLORS.black : COLORS.lightGray[ 800 ];
+-	const pointColorHover = isActive ? COLORS.black : COLORS.blue.medium.focus;
++	const boxShadow = isActive ? `0 0 0 2px ${ COLORS.gray[ 900 ] }` : null;
++	const pointColor = isActive ? COLORS.gray[ 900 ] : COLORS.lightGray[ 800 ];
++	const pointColorHover = isActive
++		? COLORS.gray[ 900 ]
++		: COLORS.blue.medium.focus;
+ 
+ 	return css`
+ 		box-shadow: ${ boxShadow };
+diff --git a/packages/components/src/heading/hook.ts b/packages/components/src/heading/hook.ts
+index bfb38034dc96ce..fbfb54569b8e77 100644
+--- a/packages/components/src/heading/hook.ts
++++ b/packages/components/src/heading/hook.ts
+@@ -70,7 +70,7 @@ export function useHeading(
+ 	}
+ 
+ 	const textProps = useText( {
+-		color: COLORS.darkGray.heading,
++		color: COLORS.gray[ 900 ],
+ 		size: getHeadingFontSize( level ),
+ 		isBlock: true,
+ 		weight: CONFIG.fontWeightHeading as import('react').CSSProperties[ 'fontWeight' ],
+diff --git a/packages/components/src/heading/test/__snapshots__/index.js.snap b/packages/components/src/heading/test/__snapshots__/index.js.snap
+index 962b4d08654af0..554446c2840cbc 100644
+--- a/packages/components/src/heading/test/__snapshots__/index.js.snap
++++ b/packages/components/src/heading/test/__snapshots__/index.js.snap
+@@ -5,7 +5,7 @@ exports[`props should render correctly 1`] = `
+   color: #1e1e1e;
+   line-height: 1.2;
+   margin: 0;
+-  color: #050505;
++  color: #1e1e1e;
+   font-size: calc(1.95 * 13px);
+   font-weight: 600;
+   display: block;
+@@ -27,7 +27,7 @@ Snapshot Diff:
+ 
+   Array [
+     Object {
+-      "color": "#050505",
++      "color": "#1e1e1e",
+       "display": "block",
+ -     "font-size": "calc(1.25 * 13px)",
+ +     "font-size": "calc(1.95 * 13px)",
+@@ -45,7 +45,7 @@ Snapshot Diff:
+ 
+   Array [
+     Object {
+-      "color": "#050505",
++      "color": "#1e1e1e",
+       "display": "block",
+ -     "font-size": "calc(1.25 * 13px)",
+ +     "font-size": "calc(1.95 * 13px)",
+diff --git a/packages/components/src/input-control/styles/input-control-styles.tsx b/packages/components/src/input-control/styles/input-control-styles.tsx
+index 63e38ac90a6307..62127e2dcf9f71 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.tsx
++++ b/packages/components/src/input-control/styles/input-control-styles.tsx
+@@ -210,7 +210,7 @@ export const Input = styled.input< InputProps >`
+ 		box-sizing: border-box;
+ 		border: none;
+ 		box-shadow: none !important;
+-		color: ${ COLORS.black };
++		color: ${ COLORS.gray[ 900 ] };
+ 		display: block;
+ 		font-family: inherit;
+ 		margin: 0;
+@@ -245,7 +245,6 @@ const labelMargin = ( {
+ const BaseLabel = styled( Text )< { labelPosition?: LabelPosition } >`
+ 	&&& {
+ 		box-sizing: border-box;
+-		color: currentColor;
+ 		display: block;
+ 		padding-top: 0;
+ 		padding-bottom: 0;
+diff --git a/packages/components/src/select-control/styles/select-control-styles.ts b/packages/components/src/select-control/styles/select-control-styles.ts
+index ac0a2cc8887b71..1fabe500f917cd 100644
+--- a/packages/components/src/select-control/styles/select-control-styles.ts
++++ b/packages/components/src/select-control/styles/select-control-styles.ts
+@@ -96,7 +96,7 @@ export const Select = styled.select< SelectProps >`
+ 		box-sizing: border-box;
+ 		border: none;
+ 		box-shadow: none !important;
+-		color: ${ COLORS.black };
++		color: ${ COLORS.gray[ 900 ] };
+ 		display: block;
+ 		font-family: inherit;
+ 		margin: 0;
+diff --git a/packages/components/src/surface/styles.js b/packages/components/src/surface/styles.js
+index 26d8827e49cdba..cf1689f08c362c 100644
+--- a/packages/components/src/surface/styles.js
++++ b/packages/components/src/surface/styles.js
+@@ -10,7 +10,7 @@ import { CONFIG, COLORS } from '../utils';
+ 
+ export const Surface = css`
+ 	background-color: ${ CONFIG.surfaceColor };
+-	color: ${ COLORS.darkGray.primary };
++	color: ${ COLORS.gray[ 900 ] };
+ 	position: relative;
+ `;
+ 
+diff --git a/packages/components/src/text/hook.js b/packages/components/src/text/hook.js
+index a10e3db49168b9..dec667ba0a1c79 100644
+--- a/packages/components/src/text/hook.js
++++ b/packages/components/src/text/hook.js
+@@ -105,7 +105,7 @@ export default function useText( props ) {
+ 				getOptimalTextShade( optimizeReadabilityFor ) === 'dark';
+ 
+ 			sx.optimalTextColor = isOptimalTextColorDark
+-				? css( { color: COLORS.black } )
++				? css( { color: COLORS.gray[ 900 ] } )
+ 				: css( { color: COLORS.white } );
+ 		}
+ 
+diff --git a/packages/components/src/text/styles.js b/packages/components/src/text/styles.js
+index 637a64f8c9dd31..4d7990cd3f3f06 100644
+--- a/packages/components/src/text/styles.js
++++ b/packages/components/src/text/styles.js
+@@ -9,7 +9,7 @@ import { css } from '@emotion/react';
+ import { COLORS, CONFIG } from '../utils';
+ 
+ export const Text = css`
+-	color: ${ COLORS.darkGray.primary };
++	color: ${ COLORS.gray[ 900 ] };
+ 	line-height: ${ CONFIG.fontLineHeightBase };
+ 	margin: 0;
+ `;
+diff --git a/packages/components/src/tools-panel/test/__snapshots__/index.js.snap b/packages/components/src/tools-panel/test/__snapshots__/index.js.snap
+index 0ff75b502fdb0c..4170e62700cfcd 100644
+--- a/packages/components/src/tools-panel/test/__snapshots__/index.js.snap
++++ b/packages/components/src/tools-panel/test/__snapshots__/index.js.snap
+@@ -64,7 +64,7 @@ exports[`ToolsPanel first and last panel items should apply first/last classes t
+   color: #1e1e1e;
+   line-height: 1.2;
+   margin: 0;
+-  color: #050505;
++  color: #1e1e1e;
+   font-size: calc(1.95 * 13px);
+   font-weight: 600;
+   display: block;
+diff --git a/packages/components/src/ui/spinner/component.js b/packages/components/src/ui/spinner/component.js
+index b5928b7ebfe232..d8da4fcf708231 100644
+--- a/packages/components/src/ui/spinner/component.js
++++ b/packages/components/src/ui/spinner/component.js
+@@ -21,7 +21,7 @@ import { COLORS } from '../../utils/colors-values';
+  */
+ function Spinner( props, forwardedRef ) {
+ 	const {
+-		color = COLORS.black,
++		color = COLORS.gray[ 900 ],
+ 		size = BASE_SIZE,
+ 		...otherProps
+ 	} = useContextSystem( props, 'Spinner' );
+diff --git a/packages/components/src/ui/spinner/test/__snapshots__/index.js.snap b/packages/components/src/ui/spinner/test/__snapshots__/index.js.snap
+index badce6e5bb6024..054fff26111b61 100644
+--- a/packages/components/src/ui/spinner/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/spinner/test/__snapshots__/index.js.snap
+@@ -12,7 +12,7 @@ Snapshot Diff:
+       <div
+         class="css-tada40-BarsView e1s9yo7h0"
+ -       style="color: blue;"
+-+       style="color: rgb(0, 0, 0);"
+++       style="color: rgb(30, 30, 30);"
+       >
+         <div
+           class="InnerBar1"
+@@ -193,7 +193,7 @@ exports[`props should render correctly 1`] = `
+   >
+     <div
+       class="emotion-4 emotion-5"
+-      style="color: rgb(0, 0, 0);"
++      style="color: rgb(30, 30, 30);"
+     >
+       <div
+         class="InnerBar1"
+@@ -258,6 +258,6 @@ Snapshot Diff:
+     >
+       <div
+         class="css-tada40-BarsView e1s9yo7h0"
+-        style="color: rgb(0, 0, 0);"
++        style="color: rgb(30, 30, 30);"
+       >
+ `;
+diff --git a/packages/components/src/utils/colors-values.js b/packages/components/src/utils/colors-values.js
+index 8f36a258220001..e2be5b7d25bd06 100644
+--- a/packages/components/src/utils/colors-values.js
++++ b/packages/components/src/utils/colors-values.js
+@@ -13,12 +13,6 @@ const BASE = {
+ 	white: '#fff',
+ };
+ 
+-/**
+- * TODO: Continue to update values as "G2" design evolves.
+- *
+- * "G2" refers to the movement to advance the interface of the block editor.
+- * https://github.com/WordPress/gutenberg/issues/18667
+- */
+ const G2 = {
+ 	blue: {
+ 		medium: {
+@@ -35,10 +29,6 @@ const G2 = {
+ 		200: '#e0e0e0', // Used sparingly for light borders.
+ 		100: '#f0f0f0', // Used for light gray backgrounds.
+ 	},
+-	darkGray: {
+-		primary: '#1e1e1e',
+-		heading: '#050505',
+-	},
+ 	mediumGray: {
+ 		text: '#757575',
+ 	},
+@@ -169,10 +159,16 @@ const UI = {
+ // Using Object.assign instead of { ...spread } syntax helps TypeScript
+ // to extract the correct type defs here.
+ export const COLORS = Object.assign( {}, BASE, {
+-	darkGray: merge( {}, DARK_GRAY, G2.darkGray ),
++	darkGray: DARK_GRAY,
+ 	darkOpacity: DARK_OPACITY,
+ 	darkOpacityLight: DARK_OPACITY_LIGHT,
+ 	mediumGray: G2.mediumGray,
++	/**
++	 * The main gray color object (since Apr 16, 2022).
++	 *
++	 * We are in the process of simplifying the colors in this file,
++	 * please prefer this `gray` object in the meantime.
++	 */
+ 	gray: G2.gray,
+ 	lightGray: merge( {}, LIGHT_GRAY, G2.lightGray ),
+ 	lightGrayLight: LIGHT_OPACITY_LIGHT,

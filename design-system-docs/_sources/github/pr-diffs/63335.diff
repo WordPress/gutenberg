@@ -1,0 +1,2128 @@
+diff --git a/lib/experimental/editor-settings.php b/lib/experimental/editor-settings.php
+index 7c7c8ff88176e5..344ff989ffb25d 100644
+--- a/lib/experimental/editor-settings.php
++++ b/lib/experimental/editor-settings.php
+@@ -37,6 +37,9 @@ function gutenberg_enable_experiments() {
+ 	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-editor-write-mode', $gutenberg_experiments ) ) {
+ 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEditorWriteMode = true', 'before' );
+ 	}
++	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-image-cropper', $gutenberg_experiments ) ) {
++		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalImageCropper = true', 'before' );
++	}
+ }
+ 
+ add_action( 'admin_init', 'gutenberg_enable_experiments' );
+diff --git a/lib/experiments-page.php b/lib/experiments-page.php
+index a2032eb99abdc5..eff1211c594580 100644
+--- a/lib/experiments-page.php
++++ b/lib/experiments-page.php
+@@ -187,6 +187,18 @@ function gutenberg_initialize_experiments_settings() {
+ 		)
+ 	);
+ 
++	add_settings_field(
++		'gutenberg-image-cropper',
++		__( 'Redesigned image cropper', 'gutenberg' ),
++		'gutenberg_display_experiment_field',
++		'gutenberg-experiments',
++		'gutenberg_experiments_section',
++		array(
++			'label' => __( 'Enable a redesigned version of the image cropper in the block editor.', 'gutenberg' ),
++			'id'    => 'gutenberg-image-cropper',
++		)
++	);
++
+ 	add_settings_field(
+ 		'gutenberg-full-page-client-side-navigation',
+ 		__( 'Interactivity API: Full-page client-side navigation', 'gutenberg' ),
+diff --git a/packages/block-editor/src/components/image-editor/v2/aspect-ratio-dropdown.js b/packages/block-editor/src/components/image-editor/v2/aspect-ratio-dropdown.js
+new file mode 100644
+index 00000000000000..8962e140b454b9
+--- /dev/null
++++ b/packages/block-editor/src/components/image-editor/v2/aspect-ratio-dropdown.js
+@@ -0,0 +1,162 @@
++/**
++ * WordPress dependencies
++ */
++import { check, aspectRatio as aspectRatioIcon } from '@wordpress/icons';
++import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
++import { __ } from '@wordpress/i18n';
++
++/**
++ * Internal dependencies
++ */
++import { useSettings } from '../../use-settings';
++import { useImageCropper } from './context';
++
++function AspectRatioGroup( { aspectRatios, label, onClick, value } ) {
++	return (
++		<MenuGroup label={ label }>
++			{ aspectRatios.map( ( { name, slug, ratio } ) => (
++				<MenuItem
++					key={ slug }
++					onClick={ () => {
++						onClick( ratio );
++					} }
++					role="menuitemradio"
++					isSelected={ ratio.toFixed( 4 ) === value.toFixed( 4 ) }
++					icon={ ratio === value ? check : undefined }
++				>
++					{ name }
++				</MenuItem>
++			) ) }
++		</MenuGroup>
++	);
++}
++
++export function ratioToNumber( str ) {
++	// TODO: support two-value aspect ratio?
++	// https://css-tricks.com/almanac/properties/a/aspect-ratio/#aa-it-can-take-two-values
++	const [ a, b, ...rest ] = str.split( '/' ).map( Number );
++	if (
++		a <= 0 ||
++		b <= 0 ||
++		Number.isNaN( a ) ||
++		Number.isNaN( b ) ||
++		rest.length
++	) {
++		return NaN;
++	}
++	return b ? a / b : a;
++}
++
++function presetRatioAsNumber( { ratio, ...rest } ) {
++	return {
++		ratio: ratioToNumber( ratio ),
++		...rest,
++	};
++}
++
++export default function AspectRatioDropdown( { toggleProps } ) {
++	const {
++		state: { image, cropper, isAspectRatioLocked },
++		dispatch,
++	} = useImageCropper();
++	const defaultAspect = image.width / image.height;
++	const aspectRatio = cropper.width / cropper.height;
++
++	const [ defaultRatios, themeRatios, showDefaultRatios ] = useSettings(
++		'dimensions.aspectRatios.default',
++		'dimensions.aspectRatios.theme',
++		'dimensions.defaultAspectRatios'
++	);
++
++	return (
++		<DropdownMenu
++			icon={ aspectRatioIcon }
++			label={ __( 'Aspect Ratio' ) }
++			popoverProps={ { placement: 'bottom-start' } }
++			toggleProps={ toggleProps }
++		>
++			{ ( { onClose } ) => (
++				<>
++					<AspectRatioGroup
++						onClick={ ( newAspect ) => {
++							if ( newAspect === 0 ) {
++								dispatch( { type: 'UNLOCK_ASPECT_RATIO' } );
++							} else {
++								dispatch( {
++									type: 'LOCK_ASPECT_RATIO',
++									aspectRatio: newAspect,
++								} );
++							}
++							onClose();
++						} }
++						value={ isAspectRatioLocked ? aspectRatio : 0 }
++						aspectRatios={ [
++							// All ratios should be mirrored in AspectRatioTool in @wordpress/block-editor.
++							{
++								slug: 'free',
++								name: __( 'Free' ),
++								ratio: 0,
++							},
++							{
++								slug: 'original',
++								name: __( 'Original' ),
++								ratio: defaultAspect,
++							},
++							...( showDefaultRatios
++								? defaultRatios
++										.map( presetRatioAsNumber )
++										.filter( ( { ratio } ) => ratio === 1 )
++								: [] ),
++						] }
++					/>
++					{ themeRatios?.length > 0 && (
++						<AspectRatioGroup
++							label={ __( 'Theme' ) }
++							onClick={ ( newAspect ) => {
++								dispatch( {
++									type: 'LOCK_ASPECT_RATIO',
++									aspectRatio: newAspect,
++								} );
++								onClose();
++							} }
++							value={ aspectRatio }
++							aspectRatios={ themeRatios }
++						/>
++					) }
++					{ showDefaultRatios && (
++						<AspectRatioGroup
++							label={ __( 'Landscape' ) }
++							onClick={ ( newAspect ) => {
++								dispatch( {
++									type: 'LOCK_ASPECT_RATIO',
++									aspectRatio: newAspect,
++								} );
++								onClose();
++							} }
++							value={ aspectRatio }
++							aspectRatios={ defaultRatios
++								.map( presetRatioAsNumber )
++								.filter( ( { ratio } ) => ratio > 1 ) }
++						/>
++					) }
++					{ showDefaultRatios && (
++						<AspectRatioGroup
++							label={ __( 'Portrait' ) }
++							onClick={ ( newAspect ) => {
++								dispatch( {
++									type: 'LOCK_ASPECT_RATIO',
++									aspectRatio: newAspect,
++								} );
++								onClose();
++							} }
++							value={ aspectRatio }
++							aspectRatios={ defaultRatios
++								.map( presetRatioAsNumber )
++								.filter( ( { ratio } ) => ratio < 1 ) }
++						/>
++					) }
++				</>
++			) }
++		</DropdownMenu>
++	);
++}
+diff --git a/packages/block-editor/src/components/image-editor/v2/context.js b/packages/block-editor/src/components/image-editor/v2/context.js
+new file mode 100644
+index 00000000000000..8304d34d5ba822
+--- /dev/null
++++ b/packages/block-editor/src/components/image-editor/v2/context.js
+@@ -0,0 +1,14 @@
++/**
++ * WordPress dependencies
++ */
++import { privateApis as componentsPrivateApis } from '@wordpress/components';
++import { useContext } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { unlock } from '../../../lock-unlock';
++
++const { ImageCropperContext } = unlock( componentsPrivateApis );
++
++export const useImageCropper = () => useContext( ImageCropperContext );
+diff --git a/packages/block-editor/src/components/image-editor/v2/form-controls.js b/packages/block-editor/src/components/image-editor/v2/form-controls.js
+new file mode 100644
+index 00000000000000..020b821ae691e2
+--- /dev/null
++++ b/packages/block-editor/src/components/image-editor/v2/form-controls.js
+@@ -0,0 +1,31 @@
++/**
++ * WordPress dependencies
++ */
++import { ToolbarButton } from '@wordpress/components';
++import { __ } from '@wordpress/i18n';
++
++/**
++ * Internal dependencies
++ */
++import { useImageCropper } from './context';
++
++export default function FormControls( { onCrop, onCancel } ) {
++	const { state, getImageBlob, dispatch } = useImageCropper();
++
++	async function apply() {
++		const blob = await getImageBlob( state );
++		onCrop?.( blob, state );
++	}
++
++	function cancel() {
++		dispatch( { type: 'RESET' } );
++		onCancel?.();
++	}
++
++	return (
++		<>
++			<ToolbarButton onClick={ apply }>{ __( 'Apply' ) }</ToolbarButton>
++			<ToolbarButton onClick={ cancel }>{ __( 'Cancel' ) }</ToolbarButton>
++		</>
++	);
++}
+diff --git a/packages/block-editor/src/components/image-editor/v2/index.js b/packages/block-editor/src/components/image-editor/v2/index.js
+new file mode 100644
+index 00000000000000..18f44b952ee094
+--- /dev/null
++++ b/packages/block-editor/src/components/image-editor/v2/index.js
+@@ -0,0 +1,47 @@
++/**
++ * WordPress dependencies
++ */
++import {
++	ToolbarGroup,
++	ToolbarItem,
++	privateApis as componentsPrivateApis,
++} from '@wordpress/components';
++
++/**
++ * Internal dependencies
++ */
++import AspectRatioDropdown from './aspect-ratio-dropdown';
++import BlockControls from '../../block-controls';
++import RotationButton from './rotation-button';
++import FormControls from './form-controls';
++import { unlock } from '../../../lock-unlock';
++
++const { ImageCropper } = unlock( componentsPrivateApis );
++
++export default function ImageEditor( {
++	src,
++	width,
++	height,
++	onCrop,
++	onCancel,
++} ) {
++	return (
++		<ImageCropper.Provider src={ src } width={ width } height={ height }>
++			<ImageCropper />
++
++			<BlockControls>
++				<ToolbarGroup>
++					<ToolbarItem>
++						{ ( toggleProps ) => (
++							<AspectRatioDropdown toggleProps={ toggleProps } />
++						) }
++					</ToolbarItem>
++					<RotationButton />
++				</ToolbarGroup>
++				<ToolbarGroup>
++					<FormControls onCrop={ onCrop } onCancel={ onCancel } />
++				</ToolbarGroup>
++			</BlockControls>
++		</ImageCropper.Provider>
++	);
++}
+diff --git a/packages/block-editor/src/components/image-editor/v2/rotation-button.js b/packages/block-editor/src/components/image-editor/v2/rotation-button.js
+new file mode 100644
+index 00000000000000..4d30d225942cdf
+--- /dev/null
++++ b/packages/block-editor/src/components/image-editor/v2/rotation-button.js
+@@ -0,0 +1,26 @@
++/**
++ * WordPress dependencies
++ */
++
++import { ToolbarButton } from '@wordpress/components';
++import { __ } from '@wordpress/i18n';
++import { rotateRight as rotateRightIcon } from '@wordpress/icons';
++
++/**
++ * Internal dependencies
++ */
++import { useImageCropper } from './context';
++
++export default function RotationButton() {
++	const { dispatch } = useImageCropper();
++
++	return (
++		<ToolbarButton
++			icon={ rotateRightIcon }
++			label={ __( 'Rotate' ) }
++			onClick={ () => {
++				dispatch( { type: 'ROTATE_90_DEG' } );
++			} }
++		/>
++	);
++}
+diff --git a/packages/block-editor/src/private-apis.js b/packages/block-editor/src/private-apis.js
+index f1a1908b2427ed..a4a6fd22414851 100644
+--- a/packages/block-editor/src/private-apis.js
++++ b/packages/block-editor/src/private-apis.js
+@@ -50,6 +50,7 @@ import useBlockDisplayTitle from './components/block-title/use-block-display-tit
+ import TabbedSidebar from './components/tabbed-sidebar';
+ import CommentIconSlotFill from './components/collab/block-comment-icon-slot';
+ import CommentIconToolbarSlotFill from './components/collab/block-comment-icon-toolbar-slot';
++import ImageEditor from './components/image-editor/v2';
+ import HTMLElementControl from './components/html-element-control';
+ /**
+  * Private @wordpress/block-editor APIs.
+@@ -99,4 +100,5 @@ lock( privateApis, {
+ 	sectionRootClientIdKey,
+ 	CommentIconSlotFill,
+ 	CommentIconToolbarSlotFill,
++	ImageEditor,
+ } );
+diff --git a/packages/block-library/src/image/image.js b/packages/block-library/src/image/image.js
+index 5aaff5c8030f53..4b2e06171c90c1 100644
+--- a/packages/block-library/src/image/image.js
++++ b/packages/block-library/src/image/image.js
+@@ -62,7 +62,11 @@ import {
+ } from './constants';
+ import { evalAspectRatio } from './utils';
+ 
+-const { DimensionsTool, ResolutionTool } = unlock( blockEditorPrivateApis );
++const {
++	DimensionsTool,
++	ResolutionTool,
++	ImageEditor: ImageEditorV2,
++} = unlock( blockEditorPrivateApis );
+ 
+ const scaleOptions = [
+ 	{
+@@ -941,20 +945,41 @@ export default function Image( {
+ 	if ( canEditImage && isEditingImage ) {
+ 		img = (
+ 			<ImageWrapper href={ href }>
+-				<ImageEditor
+-					id={ id }
+-					url={ url }
+-					{ ...pixelSize }
+-					naturalHeight={ naturalHeight }
+-					naturalWidth={ naturalWidth }
+-					onSaveImage={ ( imageAttributes ) =>
+-						setAttributes( imageAttributes )
+-					}
+-					onFinishEditing={ () => {
+-						setIsEditingImage( false );
+-					} }
+-					borderProps={ isRounded ? undefined : borderProps }
+-				/>
++				{ window.__experimentalImageCropper ? (
++					<ImageEditorV2
++						src={ url }
++						{ ...pixelSize }
++						onCrop={ ( imageBlob ) => {
++							getSettings().mediaUpload( {
++								filesList: [ imageBlob ],
++								onFileChange: ( [ media ] ) => {
++									onSelectImage( media );
++								},
++								allowedTypes: ALLOWED_MEDIA_TYPES,
++								onError: onUploadError,
++							} );
++							setIsEditingImage( false );
++						} }
++						onCancel={ () => {
++							setIsEditingImage( false );
++						} }
++					/>
++				) : (
++					<ImageEditor
++						id={ id }
++						url={ url }
++						{ ...pixelSize }
++						naturalHeight={ naturalHeight }
++						naturalWidth={ naturalWidth }
++						onSaveImage={ ( imageAttributes ) =>
++							setAttributes( imageAttributes )
++						}
++						onFinishEditing={ () => {
++							setIsEditingImage( false );
++						} }
++						borderProps={ isRounded ? undefined : borderProps }
++					/>
++				) }
+ 			</ImageWrapper>
+ 		);
+ 	} else {
+diff --git a/packages/components/src/image-cropper/component.tsx b/packages/components/src/image-cropper/component.tsx
+new file mode 100644
+index 00000000000000..b92131b2e465ba
+--- /dev/null
++++ b/packages/components/src/image-cropper/component.tsx
+@@ -0,0 +1,351 @@
++/**
++ * External dependencies
++ */
++import type { RefObject, ReactNode, MouseEvent, TouchEvent } from 'react';
++import { useAnimate } from 'framer-motion';
++/**
++ * WordPress dependencies
++ */
++import {
++	forwardRef,
++	useContext,
++	useRef,
++	useEffect,
++	useState,
++} from '@wordpress/element';
++import { useMergeRefs } from '@wordpress/compose';
++/**
++ * Internal dependencies
++ */
++import {
++	Resizable,
++	Draggable,
++	MaxWidthWrapper,
++	Container,
++	ContainWindow,
++	Img,
++	BackgroundImg,
++} from './styles';
++import { ImageCropperContext } from './context';
++import { useImageCropper } from './hook';
++import type { Position } from './types';
++
++const RESIZING_THRESHOLDS: [ number, number ] = [ 10, 10 ]; // 10px.
++
++function CropWindow( { children }: { children: ReactNode } ) {
++	const {
++		state: {
++			transforms: { scale },
++			cropper,
++			isResizing,
++			isAspectRatioLocked,
++		},
++		refs: { cropperWindowRef },
++		dispatch,
++	} = useContext( ImageCropperContext );
++	const [ resizableScope, animate ] = useAnimate();
++	const initialMousePositionRef = useRef< Position >( { x: 0, y: 0 } );
++
++	useEffect( () => {
++		if ( resizableScope.current ) {
++			animate( [ resizableScope.current ], {
++				'--wp-cropper-window-x': '0px',
++				'--wp-cropper-window-y': '0px',
++				width: `${ cropper.width }px`,
++				height: `${ cropper.height }px`,
++			} );
++		}
++	}, [ resizableScope, animate, cropper.width, cropper.height ] );
++
++	return (
++		<Resizable
++			size={ {
++				width: cropper.width,
++				height: cropper.height,
++			} }
++			// maxWidth={ isAxisSwapped ? image.height : image.width }
++			// maxHeight={ isAxisSwapped ? image.width : image.height }
++			showHandle
++			lockAspectRatio={ isAspectRatioLocked }
++			// Emulate the resizing thresholds.
++			grid={ isResizing ? undefined : RESIZING_THRESHOLDS }
++			onResizeStart={ ( event ) => {
++				if ( event.type === 'mousedown' ) {
++					const mouseEvent = event as MouseEvent;
++					initialMousePositionRef.current = {
++						x: mouseEvent.clientX,
++						y: mouseEvent.clientY,
++					};
++				} else if ( event.type === 'touchstart' ) {
++					const touch = ( event as TouchEvent ).touches[ 0 ];
++					initialMousePositionRef.current = {
++						x: touch.clientX,
++						y: touch.clientY,
++					};
++				}
++			} }
++			onResize={ ( _event, direction, _element, delta ) => {
++				if ( delta.width === 0 && delta.height === 0 ) {
++					if ( Math.abs( scale.x ) === 1 ) {
++						return;
++					}
++					// let x = 0;
++					// let y = 0;
++					// if ( event.type === 'mousemove' ) {
++					// 	const mouseEvent = event as unknown as MouseEvent;
++					// 	x =
++					// 		mouseEvent.clientX -
++					// 		initialMousePositionRef.current.x;
++					// 	y =
++					// 		mouseEvent.clientY -
++					// 		initialMousePositionRef.current.y;
++					// } else if ( event.type === 'touchmove' ) {
++					// 	const touch = ( event as unknown as TouchEvent )
++					// 		.touches[ 0 ];
++					// 	x = touch.clientX - initialMousePositionRef.current.x;
++					// 	y = touch.clientY - initialMousePositionRef.current.y;
++					// }
++				}
++				if ( ! isResizing ) {
++					if (
++						Math.abs( delta.width ) >= RESIZING_THRESHOLDS[ 0 ] ||
++						Math.abs( delta.height ) >= RESIZING_THRESHOLDS[ 1 ]
++					) {
++						dispatch( { type: 'RESIZE_START' } );
++					}
++				} else {
++					const x =
++						( [ 'left', 'topLeft', 'bottomLeft' ].includes(
++							direction
++						)
++							? -delta.width
++							: delta.width ) / 2;
++					const y =
++						( [ 'top', 'topLeft', 'topRight' ].includes( direction )
++							? -delta.height
++							: delta.height ) / 2;
++					animate( [ resizableScope.current ], {
++						'--wp-cropper-window-x': `${ x }px`,
++						'--wp-cropper-window-y': `${ y }px`,
++						width: `${ cropper.width + delta.width }px`,
++						height: `${ cropper.height + delta.height }px`,
++					} ).complete();
++				}
++			} }
++			onResizeStop={ ( _event, direction, _element, delta ) => {
++				dispatch( { type: 'RESIZE_WINDOW', direction, delta } );
++			} }
++			ref={ resizableScope }
++		>
++			<Draggable ref={ cropperWindowRef as RefObject< HTMLDivElement > }>
++				{ children }
++			</Draggable>
++		</Resizable>
++	);
++}
++
++const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
++	const {
++		state: {
++			image,
++			transforms: { rotate, scale, translate },
++			cropper,
++			isAxisSwapped,
++			isResizing,
++			isDragging,
++			isZooming,
++		},
++		originalWidth,
++		originalHeight,
++		src,
++		refs: { imageRef },
++		dispatch,
++	} = useContext( ImageCropperContext );
++
++	const maxWidthWrapperRef = useRef< HTMLDivElement >( null! );
++	useEffect( () => {
++		const maxWidthWrapper = maxWidthWrapperRef.current;
++
++		const resizeObserver = new ResizeObserver( ( [ entry ] ) => {
++			const [ { inlineSize } ] = entry.contentBoxSize;
++			const originalInlineSize = isAxisSwapped
++				? originalHeight
++				: originalWidth;
++
++			dispatch( {
++				type: 'RESIZE_CONTAINER',
++				width:
++					inlineSize < originalInlineSize
++						? inlineSize
++						: originalInlineSize,
++			} );
++		} );
++
++		resizeObserver.observe( maxWidthWrapper );
++
++		return () => {
++			resizeObserver.disconnect();
++		};
++	}, [ dispatch, originalWidth, originalHeight, isAxisSwapped ] );
++
++	return (
++		<MaxWidthWrapper
++			// Disable reason: We're using this ID as a namespace only to increase CSS specificity for this component.
++			// eslint-disable-next-line no-restricted-syntax
++			id="components-image-cropper"
++			style={ {
++				width: isAxisSwapped
++					? `${ originalHeight }px`
++					: `${ originalWidth }px`,
++			} }
++			ref={ useMergeRefs( [ maxWidthWrapperRef, ref ] ) }
++		>
++			<Container
++				animate={ {
++					width: `${ cropper.width }px`,
++					height: `${ cropper.height }px`,
++					'--wp-cropper-angle': `${ rotate }rad`,
++					...( isZooming
++						? {}
++						: {
++								'--wp-cropper-scale-x': scale.x,
++								'--wp-cropper-scale-y': scale.y,
++						  } ),
++					...( isDragging || isZooming
++						? {}
++						: {
++								'--wp-cropper-image-x': `${ translate.x }px`,
++								'--wp-cropper-image-y': `${ translate.y }px`,
++						  } ),
++				} }
++				style={ {
++					'--wp-cropper-image-x': `${ translate.x }px`,
++					'--wp-cropper-image-y': `${ translate.y }px`,
++					'--wp-cropper-window-x': '0px',
++					'--wp-cropper-window-y': '0px',
++					'--wp-cropper-scale-x': scale.x,
++					'--wp-cropper-scale-y': scale.y,
++				} }
++			>
++				<BackgroundImg
++					width={ image.width }
++					height={ image.height }
++					src={ src }
++					alt=""
++					crossOrigin="anonymous"
++					isResizing={ isResizing }
++					isDragging={ isDragging }
++					style={ {
++						width: `${ image.width }px`,
++						height: `${ image.height }px`,
++					} }
++				/>
++				<CropWindow>
++					<ContainWindow>
++						<Img
++							width={ image.width }
++							height={ image.height }
++							src={ src }
++							alt=""
++							crossOrigin="anonymous"
++							ref={ imageRef }
++							style={ {
++								width: `${ image.width }px`,
++								height: `${ image.height }px`,
++							} }
++						/>
++					</ContainWindow>
++				</CropWindow>
++			</Container>
++		</MaxWidthWrapper>
++	);
++} );
++
++function ImageCropperProvider( {
++	src,
++	width,
++	height,
++	children,
++}: {
++	src: string;
++	width: number;
++	height: number;
++	children: ReactNode;
++} ) {
++	const context = useImageCropper( { src, width, height } );
++	return (
++		<ImageCropperContext.Provider value={ context }>
++			{ children }
++		</ImageCropperContext.Provider>
++	);
++}
++
++function ImageCropperAutoSizer( {
++	src,
++	width,
++	height,
++	children,
++}: {
++	src: string;
++	width?: number;
++	height?: number;
++	children: ReactNode;
++} ) {
++	const [ size, setSize ] = useState< { width: number; height: number } >( {
++		width: width || 0,
++		height: height || 0,
++	} );
++
++	useEffect( () => {
++		const image = new Image();
++		image.src = src;
++		if ( width ) {
++			image.width = width;
++		}
++		if ( height ) {
++			image.height = height;
++		}
++
++		function onLoadImage() {
++			setSize( ( currentSize ) => {
++				if (
++					image.width === currentSize.width &&
++					image.height === currentSize.height
++				) {
++					return currentSize;
++				}
++				return { width: image.width, height: image.height };
++			} );
++		}
++
++		if ( image.complete ) {
++			onLoadImage();
++		}
++
++		image.addEventListener( 'load', onLoadImage, false );
++
++		return () => {
++			image.removeEventListener( 'load', onLoadImage );
++		};
++	}, [ src, width, height ] );
++
++	if ( ! size.width || ! size.height ) {
++		return null;
++	}
++
++	return (
++		<ImageCropperProvider
++			src={ src }
++			width={ size.width }
++			height={ size.height }
++		>
++			{ children }
++		</ImageCropperProvider>
++	);
++}
++
++const ImageCropper = Object.assign( Cropper, {
++	Provider: ImageCropperAutoSizer,
++} );
++
++export { ImageCropper };
+diff --git a/packages/components/src/image-cropper/context.ts b/packages/components/src/image-cropper/context.ts
+new file mode 100644
+index 00000000000000..d42f0544f6cb40
+--- /dev/null
++++ b/packages/components/src/image-cropper/context.ts
+@@ -0,0 +1,12 @@
++/**
++ * WordPress dependencies
++ */
++import { createContext } from '@wordpress/element';
++/**
++ * Internal dependencies
++ */
++import type { useImageCropper } from './hook';
++
++export const ImageCropperContext = createContext<
++	ReturnType< typeof useImageCropper >
++>( null! );
+diff --git a/packages/components/src/image-cropper/hook.ts b/packages/components/src/image-cropper/hook.ts
+new file mode 100644
+index 00000000000000..a92bd120c98f9b
+--- /dev/null
++++ b/packages/components/src/image-cropper/hook.ts
+@@ -0,0 +1,169 @@
++/**
++ * External dependencies
++ */
++import {
++	createUseGesture,
++	dragAction,
++	pinchAction,
++	wheelAction,
++} from '@use-gesture/react';
++/**
++ * WordPress dependencies
++ */
++import { useRef, useMemo, useReducer, useCallback } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { imageCropperReducer, createInitialState } from './reducer';
++import type { State } from './reducer';
++
++const useGesture = createUseGesture( [ dragAction, pinchAction, wheelAction ] );
++
++export const useImageCropper = ( {
++	src,
++	width,
++	height,
++}: {
++	src: string;
++	width: number;
++	height: number;
++} ) => {
++	const imageRef = useRef< HTMLImageElement >( null! );
++	const cropperWindowRef = useRef< HTMLElement >( null! );
++
++	const [ state, dispatch ] = useReducer(
++		imageCropperReducer,
++		{ width, height },
++		createInitialState
++	);
++
++	useGesture(
++		{
++			onPinch: ( {
++				origin: [ originX, originY ],
++				offset: [ scale ],
++				movement: [ deltaScale ],
++				memo,
++				first,
++			} ) => {
++				if ( first ) {
++					const {
++						width: imageWidth,
++						height: imageHeight,
++						x,
++						y,
++					} = imageRef.current.getBoundingClientRect();
++					// Save the initial position and distances from the origin.
++					memo = {
++						initial: state.transforms.translate,
++						distances: {
++							x: originX - ( x + imageWidth / 2 ),
++							y: originY - ( y + imageHeight / 2 ),
++						},
++					};
++				}
++				dispatch( {
++					type: 'ZOOM',
++					scale,
++					// Calculate the new position based on the scale from the origin.
++					position: {
++						x:
++							memo.initial.x -
++							( deltaScale - 1 ) * memo.distances.x,
++						y:
++							memo.initial.y -
++							( deltaScale - 1 ) * memo.distances.y,
++					},
++				} );
++				return memo;
++			},
++			onPinchEnd: () => {
++				dispatch( { type: 'ZOOM_END' } );
++			},
++			onDrag: ( { offset: [ x, y ] } ) => {
++				dispatch( { type: 'MOVE', x, y } );
++			},
++			onDragEnd: () => {
++				dispatch( { type: 'MOVE_END' } );
++			},
++		},
++		{
++			target: cropperWindowRef,
++			pinch: {
++				scaleBounds: { min: 1, max: 10 },
++				from: () => [ Math.abs( state.transforms.scale.x ), 0 ],
++			},
++			drag: {
++				from: () => [
++					state.transforms.translate.x,
++					state.transforms.translate.y,
++				],
++			},
++		}
++	);
++
++	const getImageBlob = useCallback( async ( cropperState: State ) => {
++		const image = imageRef.current;
++		const { naturalWidth, naturalHeight } = image;
++		const scaleFactor = naturalWidth / cropperState.image.width;
++		const offscreenCanvas = new OffscreenCanvas(
++			cropperState.cropper.width * scaleFactor,
++			cropperState.cropper.height * scaleFactor
++		);
++		const ctx = offscreenCanvas.getContext( '2d' )!;
++		ctx.translate(
++			cropperState.transforms.translate.x * scaleFactor +
++				offscreenCanvas.width / 2,
++			cropperState.transforms.translate.y * scaleFactor +
++				offscreenCanvas.height / 2
++		);
++		ctx.rotate( cropperState.transforms.rotate );
++		ctx.scale(
++			cropperState.transforms.scale.x,
++			cropperState.transforms.scale.y
++		);
++		const isAxisSwapped = cropperState.isAxisSwapped;
++		const imageDimensions = {
++			width: isAxisSwapped
++				? cropperState.image.height
++				: cropperState.image.width,
++			height: isAxisSwapped
++				? cropperState.image.width
++				: cropperState.image.height,
++		};
++		ctx.translate(
++			-( ( imageDimensions.width - cropperState.cropper.width ) / 2 ) *
++				scaleFactor,
++			-( ( imageDimensions.height - cropperState.cropper.height ) / 2 ) *
++				scaleFactor
++		);
++		const imageOffset = {
++			x: isAxisSwapped ? ( naturalHeight - naturalWidth ) / 2 : 0,
++			y: isAxisSwapped ? ( naturalWidth - naturalHeight ) / 2 : 0,
++		};
++		ctx.drawImage(
++			image,
++			-offscreenCanvas.width / 2 + imageOffset.x,
++			-offscreenCanvas.height / 2 + imageOffset.y
++		);
++		const blob = await offscreenCanvas.convertToBlob();
++		return blob;
++	}, [] );
++
++	return useMemo(
++		() => ( {
++			state,
++			src,
++			originalWidth: width,
++			originalHeight: height,
++			refs: {
++				imageRef,
++				cropperWindowRef,
++			},
++			dispatch,
++			getImageBlob,
++		} ),
++		[ state, src, width, height, getImageBlob ]
++	);
++};
+diff --git a/packages/components/src/image-cropper/index.ts b/packages/components/src/image-cropper/index.ts
+new file mode 100644
+index 00000000000000..58475cb129cba8
+--- /dev/null
++++ b/packages/components/src/image-cropper/index.ts
+@@ -0,0 +1,3 @@
++export { ImageCropper } from './component';
++export { useImageCropper } from './hook';
++export { ImageCropperContext } from './context';
+diff --git a/packages/components/src/image-cropper/math.ts b/packages/components/src/image-cropper/math.ts
+new file mode 100644
+index 00000000000000..7d78586d95a6f0
+--- /dev/null
++++ b/packages/components/src/image-cropper/math.ts
+@@ -0,0 +1,133 @@
++/**
++ * External dependencies
++ */
++import memize from 'memize';
++/**
++ * Internal dependencies
++ */
++import type { Position } from './types';
++
++/**
++ * The conversion factor from degrees to radians.
++ */
++export const DEGREE_TO_RADIAN = Math.PI / 180;
++
++/**
++ * 90 degrees in radians.
++ */
++export const PI_OVER_TWO = Math.PI / 2;
++
++/**
++ * Rotate a point around a center point by a given degree.
++ * @param point  The point to rotate.
++ * @param radian The radian to rotate by.
++ * @param center The optional center point to rotate around. If not provided then the origin is used.
++ */
++export function rotatePoint(
++	point: Position,
++	radian: number,
++	center: Position = { x: 0, y: 0 }
++): Position {
++	const cos = Math.cos( radian );
++	const sin = Math.sin( radian );
++	const dx = point.x - center.x;
++	const dy = point.y - center.y;
++	return {
++		x: center.x + dx * cos - dy * sin,
++		y: center.y + dx * sin + dy * cos,
++	};
++}
++
++/**
++ * Convert degree to radian.
++ * @param degree The degree to convert.
++ */
++export function degreeToRadian( degree: number ): number {
++	return degree * DEGREE_TO_RADIAN;
++}
++
++export const calculateRotatedBounds = memize(
++	(
++		radian: number,
++		imageWidth: number,
++		imageHeight: number,
++		cropperWidth: number,
++		cropperHeight: number
++	) => {
++		// Calculate half dimensions of the image and cropper.
++		const halfImageWidth = imageWidth / 2;
++		const halfImageHeight = imageHeight / 2;
++		const halfCropperWidth = cropperWidth / 2;
++		const halfCropperHeight = cropperHeight / 2;
++
++		// Calculate absolute values of sin and cos for the rotation angle.
++		// This works for all angles due to the periodicity of sine and cosine.
++		const sin = Math.abs( Math.sin( radian ) );
++		const cos = Math.abs( Math.cos( radian ) );
++
++		// Calculate the dimensions of the rotated rectangle's bounding box.
++		// This formula works for all angles because it considers the maximum extent
++		// of the rotated rectangle in each direction.
++		const rotatedWidth = halfCropperWidth * cos + halfCropperHeight * sin;
++		const rotatedHeight = halfCropperHeight * cos + halfCropperWidth * sin;
++
++		// Calculate the boundaries of the area where the cropper can move.
++		// These boundaries ensure the cropper stays within the image.
++		const minX = -halfImageWidth + rotatedWidth;
++		const maxX = halfImageWidth - rotatedWidth;
++		const minY = -halfImageHeight + rotatedHeight;
++		const maxY = halfImageHeight - rotatedHeight;
++
++		return {
++			minX,
++			maxX,
++			minY,
++			maxY,
++		};
++	},
++	{ maxSize: 1 }
++);
++
++export const getMinScale = memize(
++	(
++		radian: number,
++		imageWidth: number,
++		imageHeight: number,
++		cropperWidth: number,
++		cropperHeight: number,
++		imageX: number,
++		imageY: number
++	) => {
++		// Calculate the boundaries of the area where the cropper can move.
++		// These boundaries ensure the cropper stays within the image.
++		const { minX, maxX, minY, maxY } = calculateRotatedBounds(
++			radian,
++			imageWidth,
++			imageHeight,
++			cropperWidth,
++			cropperHeight
++		);
++
++		// Rotate the image center to align with the rotated coordinate system.
++		const rotatedPoint = rotatePoint( { x: imageX, y: imageY }, -radian );
++
++		// Calculate the maximum distances the cropper can move from the current position.
++		const maxDistanceX = Math.max(
++			minX - rotatedPoint.x,
++			rotatedPoint.x - maxX,
++			0
++		);
++		const maxDistanceY = Math.max(
++			minY - rotatedPoint.y,
++			rotatedPoint.y - maxY,
++			0
++		);
++
++		// Calculate the minimum scales that fit the cropper within the image.
++		const widthScale = ( maxDistanceX * 2 + imageWidth ) / imageWidth;
++		const heightScale = ( maxDistanceY * 2 + imageHeight ) / imageHeight;
++
++		return Math.max( widthScale, heightScale );
++	},
++	{ maxSize: 1 }
++);
+diff --git a/packages/components/src/image-cropper/reducer.ts b/packages/components/src/image-cropper/reducer.ts
+new file mode 100644
+index 00000000000000..3959868a4db804
+--- /dev/null
++++ b/packages/components/src/image-cropper/reducer.ts
+@@ -0,0 +1,529 @@
++/**
++ * Internal dependencies
++ */
++import type { ResizeDirection, Position } from './types';
++import {
++	rotatePoint,
++	degreeToRadian,
++	calculateRotatedBounds,
++	getMinScale,
++	PI_OVER_TWO,
++} from './math';
++
++export type State = {
++	/** The image dimensions. */
++	image: {
++		/** The width of the image. */
++		width: number;
++		/** The height of the image. */
++		height: number;
++	};
++	/** The image transforms. */
++	transforms: {
++		/** The rotation angle of the image in radians. */
++		rotate: number;
++		/** The image scale. */
++		scale: { x: number; y: number };
++		/** Position of the image relative to the container in pixels. */
++		translate: { x: number; y: number };
++	};
++	/** The cropper window dimensions. */
++	cropper: {
++		/** The width of the cropper window. */
++		width: number;
++		/** The height of the cropper window */
++		height: number;
++	};
++	/** The tilt angle in degrees from -45 to 45 for UI state. */
++	tilt: number;
++	/** Whether the image axis is swapped from 90 degree turns. */
++	isAxisSwapped: boolean;
++	/** Whether the cropper window aspect ratio is locked. */
++	isAspectRatioLocked: boolean;
++	/** Whether the cropper window is resizing. */
++	isResizing: boolean;
++	/** Whether the image is dragging/moving. */
++	isDragging: boolean;
++	/** Whether the image is zooming/pinching. */
++	isZooming: boolean;
++};
++
++/** Zoom in/out to a scale. */
++type ZoomAction = {
++	/** Zoom type action. */
++	type: 'ZOOM';
++	/** Zoom scale. */
++	scale: number;
++	/** Zoom position. */
++	position: Position;
++};
++
++/** End zooming. */
++type ZoomEndAction = {
++	/** Zoom end type action. */
++	type: 'ZOOM_END';
++};
++
++/** Flip the image horizontally. */
++type FlipAction = {
++	/** Flip type action. */
++	type: 'FLIP';
++};
++
++/** Set the image tilt to an angle. */
++type SetTiltAction = {
++	/** Rotate type action. */
++	type: 'SET_TILT';
++	/** Angle in degrees from -45 to 45. */
++	tilt: number;
++};
++
++/** Rotate the image 90-degree clockwise or counter-clockwise. */
++type Rotate90DegAction = {
++	/** Rotate clockwise type action. */
++	type: 'ROTATE_90_DEG';
++	/** Whether to rotate counter-clockwise instead. */
++	isCounterClockwise?: boolean;
++};
++
++/** Move the image to a position. */
++type MoveAction = {
++	/** Move type action. */
++	type: 'MOVE';
++	/** Move x position. */
++	x: number;
++	/** Move y position. */
++	y: number;
++};
++
++/** End moving the image. */
++type MoveEndAction = {
++	/** Move end type action. */
++	type: 'MOVE_END';
++};
++
++/** Start resizing the cropper window. */
++type ResizeStartAction = {
++	/** Resize start type action. */
++	type: 'RESIZE_START';
++};
++
++/** Resize the cropper window by a delta size in a direction. */
++type ResizeWindowAction = {
++	/** Resize window type action. */
++	type: 'RESIZE_WINDOW';
++	/** Resize direction. */
++	direction: ResizeDirection;
++	/** Change in size. */
++	delta: {
++		/** Change in width. */
++		width: number;
++		/** Change in height. */
++		height: number;
++	};
++};
++
++/** Resize the container and image to a new width. */
++type ResizeContainerAction = {
++	/** Resize container type action. */
++	type: 'RESIZE_CONTAINER';
++	/** New width of the container. */
++	width: number;
++};
++
++/** Reset the state to the initial state. */
++type ResetAction = {
++	/** Reset type action. */
++	type: 'RESET';
++};
++
++/** Lock the aspect ratio of the cropper window. */
++type lockAspectRatioAction = {
++	/** Lock aspect ratio type action. */
++	type: 'LOCK_ASPECT_RATIO';
++	/** Aspect ratio to lock. */
++	aspectRatio: number;
++};
++
++/** Unlock the aspect ratio of the cropper window. */
++type unlockAspectRatioAction = {
++	/** Unlock aspect ratio type action. */
++	type: 'UNLOCK_ASPECT_RATIO';
++};
++
++/** All possible actions. */
++type Action =
++	| ZoomAction
++	| ZoomEndAction
++	| FlipAction
++	| SetTiltAction
++	| Rotate90DegAction
++	| MoveAction
++	| MoveEndAction
++	| ResizeStartAction
++	| ResizeWindowAction
++	| ResizeContainerAction
++	| ResetAction
++	| lockAspectRatioAction
++	| unlockAspectRatioAction;
++
++function createInitialState( {
++	width,
++	height,
++}: {
++	width: number;
++	height: number;
++} ): State {
++	return {
++		image: {
++			width,
++			height,
++		},
++		transforms: {
++			rotate: 0,
++			scale: { x: 1, y: 1 },
++			translate: { x: 0, y: 0 },
++		},
++		cropper: {
++			width,
++			height,
++		},
++		tilt: 0,
++		isAxisSwapped: false,
++		isAspectRatioLocked: false,
++		isResizing: false,
++		isDragging: false,
++		isZooming: false,
++	};
++}
++
++function imageCropperReducer( state: State, action: Action ): State {
++	const {
++		image,
++		transforms: { rotate, scale, translate },
++		cropper,
++		isAxisSwapped,
++	} = state;
++	switch ( action.type ) {
++		case 'ZOOM': {
++			const minScale = getMinScale(
++				rotate,
++				image.width,
++				image.height,
++				cropper.width,
++				cropper.height,
++				translate.x,
++				translate.y
++			);
++			const nextScale = Math.min(
++				Math.max( action.scale, minScale ),
++				10
++			);
++
++			return {
++				...state,
++				transforms: {
++					...state.transforms,
++					translate: action.position,
++					scale: {
++						x: nextScale * Math.sign( scale.x ),
++						y: nextScale * Math.sign( scale.y ),
++					},
++				},
++				isZooming: true,
++			};
++		}
++		case 'ZOOM_END': {
++			return {
++				...state,
++				isZooming: false,
++			};
++		}
++		case 'FLIP': {
++			return {
++				...state,
++				transforms: {
++					...state.transforms,
++					rotate: rotate + Math.PI,
++					scale: {
++						x: isAxisSwapped ? -scale.x : scale.x,
++						y: isAxisSwapped ? scale.y : -scale.y,
++					},
++				},
++			};
++		}
++		case 'SET_TILT': {
++			const radian = degreeToRadian( state.tilt );
++			const nextRadian = degreeToRadian( action.tilt );
++			const nextRotate = rotate - radian + nextRadian;
++			const absScale = Math.abs( scale.x );
++			const scaledWidth = image.width * absScale;
++			const scaledHeight = image.height * absScale;
++
++			// Calculate the translation of the image center after the rotation.
++			// This is needed to rotate from the center of the cropper rather than the
++			// center of the image.
++			const rotatedPosition = rotatePoint(
++				translate,
++				nextRotate - rotate
++			);
++
++			// Calculate the minimum scale to fit the image within the cropper.
++			// TODO: Optimize the performance?
++			const minScale =
++				getMinScale(
++					nextRotate,
++					scaledWidth,
++					scaledHeight,
++					cropper.width,
++					cropper.height,
++					rotatedPosition.x,
++					rotatedPosition.y
++				) * absScale;
++			const nextScale = Math.min( Math.max( absScale, minScale ), 10 );
++
++			return {
++				...state,
++				transforms: {
++					...state.transforms,
++					rotate: nextRotate,
++					translate: rotatedPosition,
++					scale: {
++						x: nextScale * Math.sign( scale.x ),
++						y: nextScale * Math.sign( scale.y ),
++					},
++				},
++				tilt: action.tilt,
++			};
++		}
++		case 'ROTATE_90_DEG': {
++			const angle = action.isCounterClockwise
++				? -PI_OVER_TWO
++				: PI_OVER_TWO;
++			const rotatedPosition = rotatePoint( translate, angle );
++			return {
++				...state,
++				transforms: {
++					...state.transforms,
++					translate: rotatedPosition,
++					rotate: rotate + angle,
++				},
++				cropper: {
++					...state.cropper,
++					width: cropper.height,
++					height: cropper.width,
++				},
++				isAxisSwapped: ! isAxisSwapped,
++			};
++		}
++		case 'MOVE': {
++			const absScale = Math.abs( scale.x );
++
++			// Calculate the boundaries of the area where the cropper can move.
++			// These boundaries ensure the cropper stays within the image.
++			const { minX, maxX, minY, maxY } = calculateRotatedBounds(
++				rotate,
++				image.width * absScale,
++				image.height * absScale,
++				cropper.width,
++				cropper.height
++			);
++
++			// Rotate the action point to align with the non-rotated coordinate system.
++			const rotatedPoint = rotatePoint(
++				{ x: action.x, y: action.y },
++				-rotate
++			);
++
++			// Constrain the rotated point to within the calculated boundaries.
++			// This ensures the cropper doesn't move outside the image.
++			const boundPoint = {
++				x: Math.min( Math.max( rotatedPoint.x, minX ), maxX ),
++				y: Math.min( Math.max( rotatedPoint.y, minY ), maxY ),
++			};
++
++			// Rotate the constrained point back to the original coordinate system.
++			const nextPosition = rotatePoint( boundPoint, rotate );
++
++			return {
++				...state,
++				transforms: {
++					...state.transforms,
++					translate: nextPosition,
++				},
++				isDragging: true,
++			};
++		}
++		case 'MOVE_END': {
++			return {
++				...state,
++				isDragging: false,
++			};
++		}
++		case 'RESIZE_START': {
++			return {
++				...state,
++				isResizing: true,
++			};
++		}
++		case 'RESIZE_WINDOW': {
++			const { direction, delta } = action;
++
++			// Calculate the new size of the cropper.
++			const newSize = {
++				width: cropper.width + delta.width,
++				height: cropper.height + delta.height,
++			};
++
++			// Determine the actual dimensions of the image, considering rotations.
++			const imageDimensions = {
++				width: isAxisSwapped ? image.height : image.width,
++				height: isAxisSwapped ? image.width : image.height,
++			};
++
++			// Calculate the scale of the image to fit within the new size.
++			const widthScale = imageDimensions.width / newSize.width;
++			const heightScale = imageDimensions.height / newSize.height;
++			const windowScale = Math.min( widthScale, heightScale );
++			const absScale = Math.abs( scale.x );
++			const nextScale = absScale * windowScale;
++
++			const scaledSize = {
++				width: imageDimensions.width,
++				height: imageDimensions.height,
++			};
++			const translated = { x: 0, y: 0 };
++			// Adjust scaled size and translation based on which dimension is limiting.
++			// We do this instead of multiplying by windowScale to account for floating point errors.
++			if ( widthScale === windowScale ) {
++				scaledSize.height = newSize.height * windowScale;
++				translated.y =
++					imageDimensions.height / 2 - scaledSize.height / 2;
++			} else {
++				scaledSize.width = newSize.width * windowScale;
++				translated.x = imageDimensions.width / 2 - scaledSize.width / 2;
++			}
++
++			// Calculate the delta for the image in each direction.
++			const deltaX = [ 'left', 'bottomLeft', 'topLeft' ].includes(
++				direction
++			)
++				? delta.width
++				: -delta.width;
++			const deltaY = [ 'top', 'topLeft', 'topRight' ].includes(
++				direction
++			)
++				? delta.height
++				: -delta.height;
++
++			return {
++				...state,
++				transforms: {
++					...state.transforms,
++					translate: {
++						x: ( translate.x + deltaX / 2 ) * windowScale,
++						y: ( translate.y + deltaY / 2 ) * windowScale,
++					},
++					scale: {
++						x: nextScale * Math.sign( scale.x ),
++						y: nextScale * Math.sign( scale.y ),
++					},
++				},
++				cropper: {
++					...state.cropper,
++					width: scaledSize.width,
++					height: scaledSize.height,
++				},
++				isResizing: false,
++			};
++		}
++		case 'LOCK_ASPECT_RATIO': {
++			// Calculate the size of the cropper based on the aspect ratio.
++			const largerDimension = Math.max( image.width, image.height );
++			const cropperSize =
++				action.aspectRatio > 1
++					? {
++							width: largerDimension,
++							height: largerDimension / action.aspectRatio,
++					  }
++					: {
++							width: largerDimension * action.aspectRatio,
++							height: largerDimension,
++					  };
++
++			const minScale = getMinScale(
++				rotate,
++				image.width,
++				image.height,
++				cropperSize.width,
++				cropperSize.height,
++				translate.x,
++				translate.y
++			);
++			const absScale = Math.abs( scale.x );
++			const nextScale = Math.min( Math.max( absScale, minScale ), 10 );
++
++			return {
++				...state,
++				transforms: {
++					...state.transforms,
++					scale: {
++						x: nextScale * Math.sign( scale.x ),
++						y: nextScale * Math.sign( scale.y ),
++					},
++				},
++				cropper: {
++					...state.cropper,
++					...cropperSize,
++				},
++				isAspectRatioLocked: true,
++			};
++		}
++		case 'UNLOCK_ASPECT_RATIO': {
++			return {
++				...state,
++				isAspectRatioLocked: false,
++			};
++		}
++		case 'RESIZE_CONTAINER': {
++			const imageInlineSize = isAxisSwapped ? image.height : image.width;
++			const ratio = action.width / imageInlineSize;
++
++			if ( ratio === 1 ) {
++				return state;
++			}
++
++			return {
++				...state,
++				image: {
++					...state.image,
++					width: image.width * ratio,
++					height: image.height * ratio,
++				},
++				cropper: {
++					...state.cropper,
++					width: cropper.width * ratio,
++					height: cropper.height * ratio,
++				},
++				transforms: {
++					...state.transforms,
++					translate: {
++						x: translate.x * ratio,
++						y: translate.y * ratio,
++					},
++				},
++			};
++		}
++		case 'RESET': {
++			return createInitialState( {
++				width: image.width,
++				height: image.height,
++			} );
++		}
++		default: {
++			throw new Error( 'Unknown action' );
++		}
++	}
++}
++
++export { createInitialState, imageCropperReducer };
+diff --git a/packages/components/src/image-cropper/stories/index.story.tsx b/packages/components/src/image-cropper/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..6688a2b4a1367c
+--- /dev/null
++++ b/packages/components/src/image-cropper/stories/index.story.tsx
+@@ -0,0 +1,234 @@
++/**
++ * External dependencies
++ */
++import type { Meta, StoryObj } from '@storybook/react';
++import type { ComponentProps } from 'react';
++/**
++ * WordPress dependencies
++ */
++import { useState, useContext } from '@wordpress/element';
++import { aspectRatio } from '@wordpress/icons';
++/**
++ * Internal dependencies
++ */
++import { ImageCropper, ImageCropperContext } from '../';
++import { Button, RangeControl, Flex, FlexItem, DropdownMenu } from '../../';
++
++const meta: Meta< typeof ImageCropper.Provider > = {
++	component: ImageCropper.Provider,
++	title: 'Components/ImageCropper',
++	argTypes: {
++		src: { control: { type: 'text' } },
++		width: { control: { type: 'number' } },
++		height: { control: { type: 'number' } },
++	},
++	parameters: {
++		controls: { expanded: true },
++	},
++};
++export default meta;
++
++function Controls() {
++	const { state, dispatch } = useContext( ImageCropperContext );
++	return (
++		<Flex wrap justify="flex-start">
++			<FlexItem style={ { width: 200 } }>
++				<RangeControl
++					label="angle"
++					min={ -45 }
++					max={ 45 }
++					step={ 1 }
++					value={ state.tilt }
++					onChange={ ( value ) => {
++						dispatch( {
++							type: 'SET_TILT',
++							tilt: Number( value ),
++						} );
++					} }
++				/>
++			</FlexItem>
++
++			<Button
++				variant="secondary"
++				onClick={ () => {
++					dispatch( {
++						type: 'ROTATE_90_DEG',
++						isCounterClockwise: true,
++					} );
++				} }
++			>
++				Rotate -90°
++			</Button>
++			<Button
++				variant="secondary"
++				onClick={ () => {
++					dispatch( { type: 'ROTATE_90_DEG' } );
++				} }
++			>
++				Rotate 90°
++			</Button>
++			<Button
++				variant="secondary"
++				onClick={ () => {
++					dispatch( { type: 'FLIP' } );
++				} }
++			>
++				Flip horizontally
++			</Button>
++			<DropdownMenu
++				label="Aspect ratio"
++				text="Aspect ratio"
++				icon={ null }
++				toggleProps={ { variant: 'secondary' } }
++				controls={ [
++					{ value: 0, title: 'Free' },
++					{
++						value: state.image.width / state.image.height,
++						title: 'Original',
++					},
++					{ value: 1, title: 'Square' },
++					{ value: 4 / 3, title: '4:3' },
++					{ value: 16 / 9, title: '16:9' },
++					{ value: 9 / 16, title: '9:16' },
++					{ value: 3 / 4, title: '3:4' },
++				].map( ( control ) => ( {
++					title: control.title,
++					role: 'menuitemradio',
++					icon: aspectRatio,
++					isActive: state.isAspectRatioLocked
++						? state.cropper.width / state.cropper.height ===
++						  control.value
++						: 0 === control.value,
++					onClick: () => {
++						if ( control.value === 0 ) {
++							dispatch( {
++								type: 'UNLOCK_ASPECT_RATIO',
++							} );
++						} else {
++							dispatch( {
++								type: 'LOCK_ASPECT_RATIO',
++								aspectRatio: control.value,
++							} );
++						}
++					},
++				} ) ) }
++			/>
++		</Flex>
++	);
++}
++
++function Apply( {
++	previewUrl,
++	setPreviewUrl,
++}: {
++	previewUrl: string;
++	setPreviewUrl: ( url: string ) => void;
++} ) {
++	const { state, dispatch, getImageBlob } = useContext( ImageCropperContext );
++
++	return (
++		<Flex justify="flex-start">
++			<Button
++				variant="primary"
++				onClick={ async () => {
++					const blob = await getImageBlob( state );
++					if ( previewUrl ) {
++						URL.revokeObjectURL( previewUrl );
++					}
++					setPreviewUrl( URL.createObjectURL( blob ) );
++				} }
++			>
++				Apply
++			</Button>
++			<Button
++				variant="secondary"
++				onClick={ () => {
++					dispatch( { type: 'RESET' } );
++					setPreviewUrl( '' );
++					URL.revokeObjectURL( previewUrl );
++				} }
++			>
++				Reset
++			</Button>
++		</Flex>
++	);
++}
++
++function Preview( { previewUrl }: { previewUrl: string } ) {
++	const { state } = useContext( ImageCropperContext );
++	return previewUrl ? (
++		<a href={ previewUrl } target="_blank" rel="noreferrer">
++			<img
++				src={ previewUrl }
++				alt="preview"
++				width={ state.cropper.width }
++				height={ state.cropper.height }
++			/>
++		</a>
++	) : null;
++}
++
++function StateLogger() {
++	const { state } = useContext( ImageCropperContext );
++	return (
++		<pre style={ { overflow: 'auto' } }>
++			{ JSON.stringify( state, null, 2 ) }
++		</pre>
++	);
++}
++
++export const Inline: StoryObj< typeof ImageCropper.Provider > = (
++	args: ComponentProps< typeof ImageCropper.Provider >
++) => {
++	const [ previewUrl, setPreviewUrl ] = useState< string >( '' );
++
++	return (
++		<ImageCropper.Provider { ...args }>
++			<Flex justify="flex-start">
++				<FlexItem>
++					<ImageCropper />
++				</FlexItem>
++				<FlexItem>
++					<Preview previewUrl={ previewUrl } />
++				</FlexItem>
++			</Flex>
++			<Controls />
++			<Apply previewUrl={ previewUrl } setPreviewUrl={ setPreviewUrl } />
++			<StateLogger />
++		</ImageCropper.Provider>
++	);
++};
++Inline.args = {
++	src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Hydrochoeris_hydrochaeris_in_Brazil_in_Petr%C3%B3polis%2C_Rio_de_Janeiro%2C_Brazil_09.jpg/1200px-Hydrochoeris_hydrochaeris_in_Brazil_in_Petr%C3%B3polis%2C_Rio_de_Janeiro%2C_Brazil_09.jpg',
++	width: 300,
++	height: 200,
++};
++
++export const Framed: StoryObj< typeof ImageCropper.Provider > = (
++	args: ComponentProps< typeof ImageCropper.Provider >
++) => {
++	const [ previewUrl, setPreviewUrl ] = useState< string >( '' );
++
++	return (
++		<ImageCropper.Provider { ...args }>
++			<Flex justify="space-between" align="stretch" gap={ 20 }>
++				<Flex justify="center" style={ { overflow: 'hidden' } }>
++					<ImageCropper />
++				</Flex>
++				<Flex direction="column" style={ { width: '400px' } }>
++					<Controls />
++					<Apply
++						previewUrl={ previewUrl }
++						setPreviewUrl={ setPreviewUrl }
++					/>
++					<StateLogger />
++				</Flex>
++			</Flex>
++		</ImageCropper.Provider>
++	);
++};
++Framed.args = {
++	src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Hydrochoeris_hydrochaeris_in_Brazil_in_Petr%C3%B3polis%2C_Rio_de_Janeiro%2C_Brazil_09.jpg/1200px-Hydrochoeris_hydrochaeris_in_Brazil_in_Petr%C3%B3polis%2C_Rio_de_Janeiro%2C_Brazil_09.jpg',
++	width: 300,
++	height: 200,
++};
+diff --git a/packages/components/src/image-cropper/styles.tsx b/packages/components/src/image-cropper/styles.tsx
+new file mode 100644
+index 00000000000000..9f9bf1a5904f52
+--- /dev/null
++++ b/packages/components/src/image-cropper/styles.tsx
+@@ -0,0 +1,153 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++import { motion } from 'framer-motion';
++import type { ComponentProps } from 'react';
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++/**
++ * Internal dependencies
++ */
++import ResizableBox from '../resizable-box';
++
++export const Draggable = styled.div`
++	position: absolute;
++	inset: 0;
++	cursor: move;
++	touch-action: none;
++	overscroll-behavior: none;
++`;
++
++const MotionResizable = motion(
++	forwardRef< HTMLDivElement, ComponentProps< typeof ResizableBox > >(
++		( props, ref ) => {
++			const updateRef = ( element: HTMLDivElement | null ) => {
++				if ( typeof ref === 'function' ) {
++					ref( element );
++				} else if ( ref ) {
++					ref.current = element;
++				}
++			};
++
++			return (
++				<ResizableBox
++					{ ...props }
++					ref={ ( resizable ) => {
++						updateRef(
++							resizable?.resizable as HTMLDivElement | null
++						);
++					} }
++				/>
++			);
++		}
++	)
++);
++
++export const Resizable = styled( MotionResizable )`
++	/* --wp-cropper-window-x: 0px;
++	--wp-cropper-window-y: 0px; */
++	position: absolute;
++	top: 50%;
++	left: 50%;
++	transform-origin: center center;
++	translate: calc( var( --wp-cropper-window-x ) - 50% )
++		calc( var( --wp-cropper-window-y ) - 50% );
++	will-change: translate;
++	contain: layout size style;
++
++	&:active {
++		&::after,
++		&::before,
++		${ Draggable }::after, ${ Draggable }::before {
++			content: ' ';
++			position: absolute;
++			display: block;
++			width: 1px;
++			height: 100%;
++			overflow: hidden;
++			left: 33.33%;
++			background: rgba( 255, 255, 255, 0.33 );
++		}
++
++		&::before {
++			right: 33.33%;
++			left: auto;
++		}
++
++		${ Draggable }::before {
++			left: auto;
++			width: 100%;
++			height: 1px;
++			top: 33.33%;
++		}
++
++		${ Draggable }::after {
++			left: auto;
++			width: 100%;
++			height: 1px;
++			bottom: 33.33%;
++			top: auto;
++		}
++	}
++`;
++
++export const MaxWidthWrapper = styled.div`
++	position: relative;
++	max-width: 100%;
++	min-width: 0;
++`;
++
++export const Container = styled( motion.div )`
++	position: relative;
++	display: flex;
++	box-sizing: border-box;
++`;
++
++export const ContainWindow = styled.div`
++	position: absolute;
++	inset: 0;
++	contain: strict;
++	overflow: hidden;
++`;
++
++export const Img = styled( motion.img )`
++	// Using a "namespace" ID to increase CSS specificity for this component.
++	#components-image-cropper & {
++		position: absolute;
++		pointer-events: none;
++		top: 50%;
++		left: 50%;
++		transform-origin: center center;
++		rotate: var( --wp-cropper-angle );
++		scale: var( --wp-cropper-scale-x ) var( --wp-cropper-scale-y );
++		translate: calc(
++				var( --wp-cropper-image-x ) - var( --wp-cropper-window-x ) - 50%
++			)
++			calc(
++				var( --wp-cropper-image-y ) - var( --wp-cropper-window-y ) - 50%
++			);
++		will-change: rotate, scale, translate;
++		contain: strict;
++		max-width: none;
++	}
++`;
++
++export const BackgroundImg = styled( Img, {
++	shouldForwardProp: ( propName: string ) =>
++		propName !== 'isResizing' && propName !== 'isDragging',
++} )< {
++	isResizing: boolean;
++	isDragging: boolean;
++} >`
++	filter: ${ ( props ) =>
++		props.isResizing || props.isDragging ? 'none' : 'blur( 5px )' };
++	opacity: 0;
++	transition: opacity 0.2s ease-in-out;
++
++	${ Container }:hover & {
++		opacity: 0.5;
++	}
++`;
+diff --git a/packages/components/src/image-cropper/types.ts b/packages/components/src/image-cropper/types.ts
+new file mode 100644
+index 00000000000000..26f6ce1ef85167
+--- /dev/null
++++ b/packages/components/src/image-cropper/types.ts
+@@ -0,0 +1,9 @@
++/**
++ * External dependencies
++ */
++export type { ResizeDirection } from 're-resizable';
++
++export type Position = {
++	x: number;
++	y: number;
++};
+diff --git a/packages/components/src/private-apis.ts b/packages/components/src/private-apis.ts
+index fa618e21ed2938..5bb9da86900e03 100644
+--- a/packages/components/src/private-apis.ts
++++ b/packages/components/src/private-apis.ts
+@@ -10,6 +10,7 @@ import { kebabCase, normalizeTextString } from './utils/strings';
+ import { withIgnoreIMEEvents } from './utils/with-ignore-ime-events';
+ import { lock } from './lock-unlock';
+ import Badge from './badge';
++import { ImageCropper, ImageCropperContext } from './image-cropper';
+ 
+ export const privateApis = {};
+ lock( privateApis, {
+@@ -21,5 +22,7 @@ lock( privateApis, {
+ 	kebabCase,
+ 	withIgnoreIMEEvents,
+ 	Badge,
++	ImageCropper,
++	ImageCropperContext,
+ 	normalizeTextString,
+ } );
+diff --git a/packages/components/src/resizable-box/index.tsx b/packages/components/src/resizable-box/index.tsx
+index 3bf3d36aa0d5c3..561e025c5f5296 100644
+--- a/packages/components/src/resizable-box/index.tsx
++++ b/packages/components/src/resizable-box/index.tsx
+@@ -88,7 +88,7 @@ const HANDLE_STYLES = {
+ };
+ 
+ type ResizableBoxProps = ResizableProps & {
+-	children: ReactNode;
++	children?: ReactNode;
+ 	showHandle?: boolean;
+ 	__experimentalShowTooltip?: boolean;
+ 	__experimentalTooltipProps?: Parameters< typeof ResizeTooltip >[ 0 ];
+diff --git a/packages/interactivity-router/tsconfig.json b/packages/interactivity-router/tsconfig.json
+index 5785e94a169c9f..1a49e679f5e021 100644
+--- a/packages/interactivity-router/tsconfig.json
++++ b/packages/interactivity-router/tsconfig.json
+@@ -11,4 +11,3 @@
+ 		{ "path": "tsconfig.full-page.json" }
+ 	]
+ }
+- 
+\ No newline at end of file

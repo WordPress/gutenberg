@@ -1,0 +1,211 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3ae391898378b2..87f154040b790e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `Snackbar`: Add support to open links in a new tab ([#69905](https://github.com/WordPress/gutenberg/pull/69905)).
+ -   `ColorPicker`: Add a visual cue when the value is copied ([#70083](https://github.com/WordPress/gutenberg/pull/70083)).
++-   `TreeGrid`: Add proper initial tabindex for roving tabindex implementation ([#70125](https://github.com/WordPress/gutenberg/pull/70125)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/tree-grid/roving-tab-index-context.ts b/packages/components/src/tree-grid/roving-tab-index-context.ts
+index a0ff4ae486df45..e36e1091cad9d9 100644
+--- a/packages/components/src/tree-grid/roving-tab-index-context.ts
++++ b/packages/components/src/tree-grid/roving-tab-index-context.ts
+@@ -9,6 +9,8 @@ const RovingTabIndexContext = createContext<
+ 			setLastFocusedElement: React.Dispatch<
+ 				React.SetStateAction< HTMLElement | undefined >
+ 			>;
++			isInitialRender: boolean;
++			registerItem: ( element: HTMLElement | null ) => void;
+ 	  }
+ 	| undefined
+ >( undefined );
+diff --git a/packages/components/src/tree-grid/roving-tab-index-item.tsx b/packages/components/src/tree-grid/roving-tab-index-item.tsx
+index d5ed3410ddf684..5245df0edbfb28 100644
+--- a/packages/components/src/tree-grid/roving-tab-index-item.tsx
++++ b/packages/components/src/tree-grid/roving-tab-index-item.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useRef, forwardRef } from '@wordpress/element';
++import { useRef, forwardRef, useEffect, useMemo } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -17,10 +17,20 @@ export const RovingTabIndexItem = forwardRef(
+ 		const localRef = useRef< any >();
+ 		const ref = forwardedRef || localRef;
+ 		// @ts-expect-error - We actually want to throw an error if this is undefined.
+-		const { lastFocusedElement, setLastFocusedElement } =
++		const { lastFocusedElement, setLastFocusedElement, registerItem } =
+ 			useRovingTabIndexContext();
+ 		let tabIndex;
+ 
++		const getElement = useMemo(
++			() => () => ( 'current' in ref ? ref.current : undefined ),
++			[ ref ]
++		);
++
++		// Register this item with the RovingTabIndex parent on mount.
++		useEffect( () => {
++			registerItem( getElement() );
++		}, [ registerItem, getElement ] );
++
+ 		if ( lastFocusedElement ) {
+ 			tabIndex =
+ 				lastFocusedElement ===
+@@ -31,11 +41,20 @@ export const RovingTabIndexItem = forwardRef(
+ 				( 'current' in ref ? ref.current : undefined )
+ 					? 0
+ 					: -1;
++		} else {
++			// On initial render, ensure all items have tabIndex="-1" by default.
++			tabIndex = -1;
+ 		}
+ 
+ 		const onFocus: React.FocusEventHandler< HTMLElement > = ( event ) =>
+ 			setLastFocusedElement?.( event.target );
+-		const allProps = { ref, tabIndex, onFocus, ...props };
++
++		const allProps = {
++			ref,
++			tabIndex,
++			onFocus,
++			...props,
++		};
+ 
+ 		if ( typeof children === 'function' ) {
+ 			return children( allProps );
+diff --git a/packages/components/src/tree-grid/roving-tab-index.tsx b/packages/components/src/tree-grid/roving-tab-index.tsx
+index 6d6d989fbc3ffa..5debc3fc0dfae5 100644
+--- a/packages/components/src/tree-grid/roving-tab-index.tsx
++++ b/packages/components/src/tree-grid/roving-tab-index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useState, useMemo } from '@wordpress/element';
++import { useState, useMemo, useEffect, useRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -15,18 +15,68 @@ import { RovingTabIndexProvider } from './roving-tab-index-context';
+  */
+ export default function RovingTabIndex( {
+ 	children,
++	initialFocusedIndex = 0,
+ }: {
+ 	children: React.ReactNode;
++	initialFocusedIndex?: number;
+ } ) {
+ 	const [ lastFocusedElement, setLastFocusedElement ] =
+ 		useState< HTMLElement >();
++	const rovingTabIndexItems = useRef< HTMLElement[] >( [] );
++
++	/**
++	 * Function to register a RovingTabIndexItem component's DOM element.
++	 *
++	 * @param {HTMLElement|null} element The DOM element to register.
++	 */
++	const registerItem = useMemo(
++		() => ( element: HTMLElement | null ) => {
++			if (
++				element &&
++				! rovingTabIndexItems.current.includes( element )
++			) {
++				rovingTabIndexItems.current.push( element );
++			}
++		},
++		[]
++	);
++
++	/**
++	 * Track whether the initial render has completed.
++	 */
++	const [ hasRendered, setHasRendered ] = useState( false );
++
++	/**
++	 * Set initial focus on the first render.
++	 */
++	useEffect( () => {
++		if ( ! hasRendered ) {
++			setHasRendered( true );
++
++			requestAnimationFrame( () => {
++				if (
++					rovingTabIndexItems.current.length &&
++					initialFocusedIndex >= 0 &&
++					initialFocusedIndex < rovingTabIndexItems.current.length
++				) {
++					const initialElement =
++						rovingTabIndexItems.current[ initialFocusedIndex ];
++					setLastFocusedElement( initialElement );
++				}
++			} );
++		}
++	}, [ initialFocusedIndex ] );
+ 
+ 	// Use `useMemo` to avoid creation of a new object for the providerValue
+-	// on every render. Only create a new object when the `lastFocusedElement`
+-	// value changes.
++	// on every render. Only create a new object when the dependencies change.
+ 	const providerValue = useMemo(
+-		() => ( { lastFocusedElement, setLastFocusedElement } ),
+-		[ lastFocusedElement ]
++		() => ( {
++			lastFocusedElement,
++			setLastFocusedElement,
++			isInitialRender: ! hasRendered,
++			registerItem,
++		} ),
++		[ lastFocusedElement, registerItem, hasRendered ]
+ 	);
+ 
+ 	return (
+diff --git a/packages/components/src/tree-grid/test/__snapshots__/cell.tsx.snap b/packages/components/src/tree-grid/test/__snapshots__/cell.tsx.snap
+index 889b883f36c480..85a865d709a123 100644
+--- a/packages/components/src/tree-grid/test/__snapshots__/cell.tsx.snap
++++ b/packages/components/src/tree-grid/test/__snapshots__/cell.tsx.snap
+@@ -15,6 +15,7 @@ exports[`TreeGridCell uses a child render function to render children 1`] = `
+           >
+             <button
+               class="my-button"
++              tabindex="-1"
+             >
+               Click Me!
+             </button>
+diff --git a/packages/components/src/tree-grid/test/__snapshots__/roving-tab-index-item.tsx.snap b/packages/components/src/tree-grid/test/__snapshots__/roving-tab-index-item.tsx.snap
+index 5e803bdd95c85f..5dc01f4c3ed4a0 100644
+--- a/packages/components/src/tree-grid/test/__snapshots__/roving-tab-index-item.tsx.snap
++++ b/packages/components/src/tree-grid/test/__snapshots__/roving-tab-index-item.tsx.snap
+@@ -2,7 +2,9 @@
+ 
+ exports[`RovingTabIndexItem allows another component to be specified as the rendered component using the \`as\` prop 1`] = `
+ <div>
+-  <button />
++  <button
++    tabindex="-1"
++  />
+ </div>
+ `;
+ 
+@@ -10,6 +12,7 @@ exports[`RovingTabIndexItem allows children to be declared using a child render
+ <div>
+   <button
+     class="my-button"
++    tabindex="-1"
+   >
+     Click Me!
+   </button>
+@@ -20,6 +23,7 @@ exports[`RovingTabIndexItem forwards props to the \`as\` component 1`] = `
+ <div>
+   <button
+     class="my-button"
++    tabindex="-1"
+   >
+     Click Me!
+   </button>

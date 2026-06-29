@@ -1,0 +1,206 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 076940d3590d84..fd898240693547 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -67,6 +67,8 @@ vendor/bin/phpcbf <path_to_php_file.php>
+ 
+ For full architecture details, see `docs/explanations/architecture/`.
+ 
++-   **Design system**: When building admin UI, read `DESIGN.md` first — it covers which packages and components to use, composition patterns, and a working example.
++
+ ## Common pitfalls
+ 
+ -   PHP features in `lib/compat/` MUST target a specific `wordpress-X.Y/` subdirectory.
+diff --git a/CLAUDE.md b/CLAUDE.md
+index 43c994c2d3617f..9aa85866f53c9c 100644
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -1 +1,2 @@
+ @AGENTS.md
++@DESIGN.md
+diff --git a/DESIGN.md b/DESIGN.md
+new file mode 100644
+index 00000000000000..2cba7929a7e4c7
+--- /dev/null
++++ b/DESIGN.md
+@@ -0,0 +1,180 @@
++# WordPress Design System (WPDS)
++
++The WordPress design system is built for utility-first software — an interface where millions of people write, publish, and manage content daily. The visual language prioritizes clarity and neutrality, with a restrained palette and a single accent color. Where marketing sites might chase trends, WordPress opts for quiet professionalism — an interface that disappears behind the work.
++
++The system font stack ensures the UI feels native on every operating system, loading instantly and inheriting the familiar reading texture of the user's platform. There is no custom display font — the typography should feel effortless and invisible, serving the content rather than calling attention to itself. The base font size of 13px runs tight and information-dense, reflecting the admin's dashboard-like nature.
++
++This preference for native extends beyond typography. The design system favors platform-native UI wherever practical rather than building bespoke replacements. Native controls are inherently accessible, consistent with the user's OS, performant, and maintained by browser vendors. Custom UI should only be introduced when native elements genuinely cannot meet the interaction requirements. When custom widgets are necessary, they should follow established [WAI-ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/patterns/) patterns.
++
++Color is used sparingly and semantically. A single accent color signals interactivity without competing with user content. The full color palette is algorithmically generated from seed values passed to the `ThemeProvider`. Components accept a `tone` prop to express semantic intent: `neutral` (default), `brand` (primary actions, accent), `success` (completed, saved), `info` (informational), `caution` (low-severity), `warning` (needs attention), or `error` (failures, destructive actions). For the full set of design tokens (`--wpds-*`), see the **[Design Tokens Reference](packages/theme/docs/tokens.md)**.
++
++**Key Characteristics:**
++- Favor native UI — system fonts, native form controls, established WAI-ARIA patterns
++- Don't build custom controls when a component exists in `@wordpress/ui` or `@wordpress/components`
++- 13px base for admin chrome
++- System font stack only — no web fonts
++- Two font weights: regular and medium — hierarchy through size and color, not weight
++- Single accent color, customizable via `ThemeProvider` or admin color schemes
++- Neutral palette algorithmically generated from seed colors
++- Small border-radius scale, with most controls using the smallest values
++- Multi-layer neutral `box-shadow` for all elevation — untinted, pure black at low opacities
++- 4px spatial grid — all spacing tokens are multiples of 4px
++- Three density modes (compact, default, comfortable) via `ThemeProvider`
++- Three control sizes: default (40px), compact (32px), small (24px)
++- Reduced-motion support on every animation
++- CSS logical properties for RTL support (`margin-inline-start`, `padding-block`, etc.)
++
++## Packages
++
++**For new code, use `@wordpress/ui` and `@wordpress/theme`.** Fall back to `@wordpress/components` only when `@wordpress/ui` doesn't have the component you need. Use `@wordpress/admin-ui` for page-level layout and `@wordpress/dataviews` for list and edit patterns. The hierarchy flows downward — `@wordpress/theme` (tokens, `ThemeProvider`) → `@wordpress/ui` (primitives) → `@wordpress/admin-ui` (page chrome) → `@wordpress/dataviews` (`DataViews`, `DataForm`).
++
++```tsx
++// Theming — already provided at the app root; nest for themed sub-regions
++import { ThemeProvider } from '@wordpress/theme';
++
++// Components — new design system
++import { Button, Badge, Icon, IconButton, Link, Stack, Text, VisuallyHidden } from '@wordpress/ui';
++import { Card, Dialog, AlertDialog, Tabs, Tooltip, Notice, Collapsible, CollapsibleCard, EmptyState } from '@wordpress/ui';
++import { Input, Textarea, Select, InputControl, InputLayout, Field, Fieldset } from '@wordpress/ui';
++import { Page, Breadcrumbs } from '@wordpress/admin-ui';
++import { DataViews, DataForm } from '@wordpress/dataviews';
++
++// Icons
++import { plus, settings, chevronRight } from '@wordpress/icons';
++
++// Fallback — when @wordpress/ui lacks the component
++import { Snackbar } from '@wordpress/components';
++```
++
++**Import patterns:** Most components are **direct exports** — import and use as-is (`<Button>`, `<Stack>`, `<Text>`). Components with sub-parts are **namespace exports** — use dot notation (`<Card.Root>`, `<Dialog.Popup>`, `<Tabs.Panel>`). The table below indicates which pattern each component uses.
++
++## Available Components (`@wordpress/ui`)
++
++| Component | Purpose |
++|-----------|---------|
++| `Button` (+ `Button.Icon`) | Actions and CTAs — solid, outline, and minimal variants in brand/neutral tones |
++| `IconButton` | Icon-only button with required `aria-label` |
++| `Link` | Inline and standalone text links |
++| `Badge` | Semantic status indicators (success, info, caution, warning, error) |
++| `Card` (`.Root`, `.Header`, `.Content`, `.FullBleed`, `.Title`) | Contained content surfaces |
++| `Dialog` (`.Root`, `.Trigger`, `.Popup`, `.Header`, `.Footer`, `.Title`, `.Action`, `.CloseIcon`) | Modal dialogs with managed focus |
++| `AlertDialog` (`.Root`, `.Trigger`, `.Popup`) | Confirmation dialogs requiring immediate response |
++| `Tabs` (`.Root`, `.List`, `.Tab`, `.Panel`) | Tabbed navigation |
++| `Collapsible` (`.Root`, `.Trigger`, `.Panel`) | Expandable/collapsible content |
++| `CollapsibleCard` (`.Root`, `.Header`, `.HeaderDescription`, `.Content`) | Card with collapsible body |
++| `Notice` (`.Root`, `.Title`, `.Description`, `.Actions`, `.ActionButton`, `.ActionLink`, `.CloseIcon`) | Inline status notices |
++| `EmptyState` (`.Root`, `.Visual`, `.Icon`, `.Title`, `.Description`, `.Actions`) | Placeholder for empty collections |
++| `Tooltip` (`.Provider`, `.Root`, `.Trigger`, `.Popup`) | Hover/focus information overlays |
++| `Stack` | Flexbox layout with gap tokens |
++| `Text` | Styled text with semantic variants |
++| `Icon` | Icon rendering (wraps `@wordpress/icons`) |
++| `VisuallyHidden` | Screen-reader-only content |
++| **Form primitives:** | |
++| `Input` | Text input |
++| `Textarea` | Multi-line text input |
++| `Select` (`.Root`, `.Trigger`, `.Popup`, `.Item`) | Dropdown select |
++| `InputControl` | Enhanced input with prefix/suffix slots |
++| `InputLayout` | Label + control + description layout |
++| `Field` (`.Root`, `.Item`, `.Label`, `.Description`, `.Details`, `.Control`) | Form field wrapper |
++| `Fieldset` (`.Root`, `.Legend`, `.Description`, `.Details`) | Grouped form fields |
++
++## Building Pages
++
++Most admin pages use `Page` from `@wordpress/admin-ui` as the outer shell. List pages use `DataViews` as content; edit/settings pages use `DataForm`. `DataViews` and `DataForm` share the same `fields` array — one set of field definitions drives both the list view and the edit form. See each package's README for the full API.
++
++Connect to the WordPress data layer via `@wordpress/core-data`: `useEntityRecords` for lists, `useEntityRecord` for single records. For client-side data, use `filterSortAndPaginate()` from `@wordpress/dataviews` instead. `Breadcrumbs` uses `Link` from `@wordpress/route` internally.
++
++## Accessibility
++
++Components in `@wordpress/ui` handle focus rings, keyboard navigation, ARIA roles, and forced-colors mode automatically. What you need to do: every `IconButton` requires an `aria-label` (the icon is decorative; tooltips supplement but don't replace the label). Use `VisuallyHidden` for screen-reader-only text. For dynamic status changes, use `speak( message, 'polite' )` from `@wordpress/a11y` (or `'assertive'` for errors). When `focusableWhenDisabled` is true, a control stays in the tab order via `aria-disabled` so keyboard users can discover it.
++
++## Theming
++
++The `ThemeProvider` component from `@wordpress/theme` is already provided at the app root. It accepts seed colors and a density mode, generating the full `--wpds-*` token set. From two seeds (`primary` and `bg`), it produces the entire color ramp and determines light vs. dark mode from background luminance. Providers can be nested for themed sub-regions (e.g., a dark sidebar). Portaled content (modals, tooltips) wraps itself in a `ThemeProvider` to maintain token continuity across the DOM tree.
++
++The `density` prop adjusts spacing tokens to suit different levels of information density.
++
++## Minimal Working Example
++
++A complete admin list page wired to the WordPress data layer:
++
++```tsx
++import { ThemeProvider } from '@wordpress/theme';
++import { Button, Badge } from '@wordpress/ui';
++import { Page, Breadcrumbs } from '@wordpress/admin-ui';
++import { DataViews } from '@wordpress/dataviews';
++import { useEntityRecords } from '@wordpress/core-data';
++import { useState } from '@wordpress/element';
++
++const fields = [
++  {
++    id: 'title',
++    type: 'text',
++    label: 'Title',
++    enableGlobalSearch: true,
++    enableSorting: true,
++    render: ( { item } ) => item.title.rendered,
++  },
++  {
++    id: 'status',
++    type: 'text',
++    label: 'Status',
++    elements: [
++      { value: 'draft', label: 'Draft' },
++      { value: 'publish', label: 'Published' },
++    ],
++    render: ( { item } ) => (
++      <Badge tone={ item.status === 'publish' ? 'success' : 'neutral' }>
++        { item.status }
++      </Badge>
++    ),
++    filterBy: { operators: [ 'is', 'isAny' ] },
++  },
++];
++
++function PagesListPage() {
++  const [ view, setView ] = useState( {
++    type: 'table',
++    search: '',
++    page: 1,
++    perPage: 20,
++    sort: { field: 'title', direction: 'asc' },
++    filters: [],
++  } );
++
++  const queryArgs = {
++    per_page: view.perPage,
++    page: view.page,
++    search: view.search,
++    orderby: view.sort?.field,
++    order: view.sort?.direction,
++    status: 'any',
++  };
++
++  const { records, totalItems, totalPages, isResolving } = useEntityRecords(
++    'postType', 'page', queryArgs
++  );
++
++  return (
++    <ThemeProvider color={ { primary: '#3858e9' } } density="default">
++      <Page
++        title="Pages"
++        breadcrumbs={
++          <Breadcrumbs items={ [ { label: 'Home', to: '/' }, { label: 'Pages' } ] } />
++        }
++        actions={ <Button variant="solid" tone="brand">Add new</Button> }
++      >
++        <DataViews
++          data={ records ?? [] }
++          fields={ fields }
++          view={ view }
++          onChangeView={ setView }
++          defaultLayouts={ { table: {}, grid: {} } }
++          paginationInfo={ { totalItems, totalPages } }
++          isLoading={ isResolving }
++        />
++      </Page>
++    </ThemeProvider>
++  );
++}
++```

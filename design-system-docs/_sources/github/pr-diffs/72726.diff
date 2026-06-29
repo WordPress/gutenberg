@@ -1,0 +1,115 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 967084192afd83..18d612904c72b1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,7 @@
+ -   `Button`: Update font weight to `500` ([#70787](https://github.com/WordPress/gutenberg/pull/70787)).
+ -   `TabPanel`: Update tab font weight ([#72455](https://github.com/WordPress/gutenberg/pull/72455)).
+ -   Consistently use font-weight 499 instead of 500 ([#72473](https://github.com/WordPress/gutenberg/pull/72473)).
++-   `RadioControl`: Move the help text above ([#72726](https://github.com/WordPress/gutenberg/pull/72726)).
+ -   `ComboboxControl`: Show reset button only when there is a value ([#72595](https://github.com/WordPress/gutenberg/pull/72595)).
+ 
+ ### Bug Fixes
+diff --git a/packages/components/src/radio-control/index.tsx b/packages/components/src/radio-control/index.tsx
+index 6b181671332c88..79b48957b12a6a 100644
+--- a/packages/components/src/radio-control/index.tsx
++++ b/packages/components/src/radio-control/index.tsx
+@@ -12,7 +12,6 @@ import { useInstanceId } from '@wordpress/compose';
+ /**
+  * Internal dependencies
+  */
+-import BaseControl from '../base-control';
+ import type { WordPressComponentProps } from '../context';
+ import type { RadioControlProps } from './types';
+ import { VStack } from '../v-stack';
+@@ -93,16 +92,23 @@ export function RadioControl(
+ 			{ hideLabelFromVision ? (
+ 				<VisuallyHidden as="legend">{ label }</VisuallyHidden>
+ 			) : (
+-				<BaseControl.VisualLabel as="legend">
++				<legend className="components-radio-control__label">
+ 					{ label }
+-				</BaseControl.VisualLabel>
++				</legend>
++			) }
++
++			{ !! help && (
++				<div
++					id={ generateHelpId( id ) }
++					className="components-radio-control__help"
++				>
++					{ help }
++				</div>
+ 			) }
+ 
+ 			<VStack
+ 				spacing={ 3 }
+-				className={ clsx( 'components-radio-control__group-wrapper', {
+-					'has-help': !! help,
+-				} ) }
++				className="components-radio-control__group-wrapper"
+ 			>
+ 				{ options.map( ( option, index ) => (
+ 					<div
+@@ -131,7 +137,7 @@ export function RadioControl(
+ 							{ ...additionalProps }
+ 						/>
+ 						<label
+-							className="components-radio-control__label"
++							className="components-radio-control__option-label"
+ 							htmlFor={ generateOptionId( id, index ) }
+ 						>
+ 							{ option.label }
+@@ -148,15 +154,6 @@ export function RadioControl(
+ 					</div>
+ 				) ) }
+ 			</VStack>
+-			{ !! help && (
+-				<StyledHelp
+-					__nextHasNoMarginBottom
+-					id={ generateHelpId( id ) }
+-					className="components-base-control__help"
+-				>
+-					{ help }
+-				</StyledHelp>
+-			) }
+ 		</fieldset>
+ 	);
+ }
+diff --git a/packages/components/src/radio-control/style.scss b/packages/components/src/radio-control/style.scss
+index d7a2a1f1d9217c..157549924584cd 100644
+--- a/packages/components/src/radio-control/style.scss
++++ b/packages/components/src/radio-control/style.scss
+@@ -12,8 +12,21 @@
+ 	font-size: $default-font-size;
+ }
+ 
+-.components-radio-control__group-wrapper.has-help {
+-	margin-block-end: $grid-unit-15;
++.components-radio-control__label {
++	margin-bottom: $grid-unit-05;
++	font-size: $font-size-medium;
++	font-style: normal;
++	color: $gray-900;
++}
++
++.components-radio-control__help {
++	font-size: $helptext-font-size;
++	font-style: normal;
++	color: $gray-700;
++}
++
++.components-radio-control__group-wrapper {
++	margin-top: $grid-unit-20;
+ }
+ 
+ .components-radio-control__option {
+@@ -51,7 +64,7 @@
+ 	}
+ }
+ 
+-.components-radio-control__label {
++.components-radio-control__option-label {
+ 	grid-column: 2;
+ 	grid-row: 1;
+ 

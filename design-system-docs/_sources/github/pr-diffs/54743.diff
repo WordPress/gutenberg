@@ -1,0 +1,134 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5f9f5de9327cd4..986c7fa19b9ea2 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,7 @@
+ -   `SearchControl`: polish metrics for `compact` size variant ([#54663](https://github.com/WordPress/gutenberg/pull/54663)).
+ -   `Button`: deprecating `isPressed` prop in favour of `aria-pressed` ([#54740](https://github.com/WordPress/gutenberg/pull/54740)).
+ -   `DuotonePicker/ColorListPicker`: Adds appropriate label and description to 'Duotone Filter' picker ([#54473](https://github.com/WordPress/gutenberg/pull/54473)).
++-   `Modal`: Accessibly hide/show outer modal when nested ([#54743](https://github.com/WordPress/gutenberg/pull/54743)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/modal/aria-helper.ts b/packages/components/src/modal/aria-helper.ts
+index 25ef449a30d3df..6d4427ddea948e 100644
+--- a/packages/components/src/modal/aria-helper.ts
++++ b/packages/components/src/modal/aria-helper.ts
+@@ -6,8 +6,7 @@ const LIVE_REGION_ARIA_ROLES = new Set( [
+ 	'timer',
+ ] );
+ 
+-let hiddenElements: Element[] = [],
+-	isHidden = false;
++const hiddenElementsByDepth: Element[][] = [];
+ 
+ /**
+  * Hides all elements in the body element from screen-readers except
+@@ -19,31 +18,28 @@ let hiddenElements: Element[] = [],
+  * we should consider removing these helper functions in favor of
+  * `aria-modal="true"`.
+  *
+- * @param {HTMLDivElement} unhiddenElement The element that should not be hidden.
++ * @param modalElement The element that should not be hidden.
+  */
+-export function hideApp( unhiddenElement?: HTMLDivElement ) {
+-	if ( isHidden ) {
+-		return;
+-	}
++export function modalize( modalElement?: HTMLDivElement ) {
+ 	const elements = Array.from( document.body.children );
+-	elements.forEach( ( element ) => {
+-		if ( element === unhiddenElement ) {
+-			return;
+-		}
++	const hiddenElements: Element[] = [];
++	hiddenElementsByDepth.push( hiddenElements );
++	for ( const element of elements ) {
++		if ( element === modalElement ) continue;
++
+ 		if ( elementShouldBeHidden( element ) ) {
+ 			element.setAttribute( 'aria-hidden', 'true' );
+ 			hiddenElements.push( element );
+ 		}
+-	} );
+-	isHidden = true;
++	}
+ }
+ 
+ /**
+  * Determines if the passed element should not be hidden from screen readers.
+  *
+- * @param {HTMLElement} element The element that should be checked.
++ * @param element The element that should be checked.
+  *
+- * @return {boolean} Whether the element should not be hidden from screen-readers.
++ * @return Whether the element should not be hidden from screen-readers.
+  */
+ export function elementShouldBeHidden( element: Element ) {
+ 	const role = element.getAttribute( 'role' );
+@@ -56,16 +52,12 @@ export function elementShouldBeHidden( element: Element ) {
+ }
+ 
+ /**
+- * Makes all elements in the body that have been hidden by `hideApp`
+- * visible again to screen-readers.
++ * Accessibly reveals the elements hidden by the latest modal.
+  */
+-export function showApp() {
+-	if ( ! isHidden ) {
+-		return;
+-	}
+-	hiddenElements.forEach( ( element ) => {
++export function unmodalize() {
++	const hiddenElements = hiddenElementsByDepth.pop();
++	if ( ! hiddenElements ) return;
++
++	for ( const element of hiddenElements )
+ 		element.removeAttribute( 'aria-hidden' );
+-	} );
+-	hiddenElements = [];
+-	isHidden = false;
+ }
+diff --git a/packages/components/src/modal/index.tsx b/packages/components/src/modal/index.tsx
+index 139b0805a04dbb..13d352f46058b1 100644
+--- a/packages/components/src/modal/index.tsx
++++ b/packages/components/src/modal/index.tsx
+@@ -112,11 +112,15 @@ function UnforwardedModal(
+ 		}
+ 	}, [ contentRef ] );
+ 
++	useEffect( () => {
++		ariaHelper.modalize( ref.current );
++		return () => ariaHelper.unmodalize();
++	}, [] );
++
+ 	useEffect( () => {
+ 		openModalCount++;
+ 
+ 		if ( openModalCount === 1 ) {
+-			ariaHelper.hideApp( ref.current );
+ 			document.body.classList.add( bodyOpenClassName );
+ 		}
+ 
+@@ -125,7 +129,6 @@ function UnforwardedModal(
+ 
+ 			if ( openModalCount === 0 ) {
+ 				document.body.classList.remove( bodyOpenClassName );
+-				ariaHelper.showApp();
+ 			}
+ 		};
+ 	}, [ bodyOpenClassName ] );
+diff --git a/packages/components/src/modal/test/index.tsx b/packages/components/src/modal/test/index.tsx
+index ae606bb8315136..69f28508c14059 100644
+--- a/packages/components/src/modal/test/index.tsx
++++ b/packages/components/src/modal/test/index.tsx
+@@ -167,8 +167,7 @@ describe( 'Modal', () => {
+ 		expect( onRequestClose ).not.toHaveBeenCalled();
+ 	} );
+ 
+-	// TODO enable once nested modals hide outer modals.
+-	it.skip( 'should accessibly hide and show siblings including outer modals', async () => {
++	it( 'should accessibly hide and show siblings including outer modals', async () => {
+ 		const user = userEvent.setup();
+ 
+ 		const AriaDemo = () => {

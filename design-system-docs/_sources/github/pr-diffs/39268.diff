@@ -1,0 +1,170 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b9099425eb9ec4..3e9fa4a22e04cd 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ -   `Divider`: Make the divider visible by default (`display: inline`) in flow layout containers when the divider orientation is vertical ([#39316](https://github.com/WordPress/gutenberg/pull/39316)).
+ -   Stop using deprecated `event.keyCode` in favor of `event.key` for keyboard events in `UnitControl` and `InputControl`.  ([#39360](https://github.com/WordPress/gutenberg/pull/39360))
+ -   `ColorPalette`: refine custom color button's label. ([#39386](https://github.com/WordPress/gutenberg/pull/39386))
++-   Add `onClick` prop on `FormFileUpload`. ([#39268](https://github.com/WordPress/gutenberg/pull/39268))
+ -   `FocalPointPicker`: stop using `UnitControl`'s deprecated `unit` prop ([#39504](https://github.com/WordPress/gutenberg/pull/39504)).
+ -   `CheckboxControl`: Add support for the `indeterminate` state ([#39462](https://github.com/WordPress/gutenberg/pull/39462)).
+ 
+diff --git a/packages/components/src/form-file-upload/README.md b/packages/components/src/form-file-upload/README.md
+index 5c0244b9e07f42..b834bd3f364216 100644
+--- a/packages/components/src/form-file-upload/README.md
++++ b/packages/components/src/form-file-upload/README.md
+@@ -57,6 +57,24 @@ Callback function passed directly to the `input` file element.
+ -   Type: `Function`
+ -   Required: Yes
+ 
++### onClick
++
++Callback function passed directly to the `input` file element.
++
++This can be useful when you want to force a `change` event to fire when the user chooses the same file again. To do this, set the target value to an empty string in the `onClick` function.
++
++```jsx
++<FormFileUpload
++	onClick={ ( event ) => ( event.target.value = '' ) }
++	onChange={ onChange }
++>
++	Upload
++</FormFileUpload>
++```
++
++-   Type: `Function`
++-   Required: No
++
+ ### render
+ 
+ Optional callback function used to render the UI. If passed the component does not render any UI and calls this function to render it.
+diff --git a/packages/components/src/form-file-upload/index.js b/packages/components/src/form-file-upload/index.js
+index 5d5b5812b520c4..0628b5149e0882 100644
+--- a/packages/components/src/form-file-upload/index.js
++++ b/packages/components/src/form-file-upload/index.js
+@@ -13,6 +13,7 @@ function FormFileUpload( {
+ 	children,
+ 	multiple = false,
+ 	onChange,
++	onClick,
+ 	render,
+ 	...props
+ } ) {
+@@ -38,6 +39,8 @@ function FormFileUpload( {
+ 				style={ { display: 'none' } }
+ 				accept={ accept }
+ 				onChange={ onChange }
++				onClick={ onClick }
++				data-testid="form-file-upload-input"
+ 			/>
+ 		</div>
+ 	);
+diff --git a/packages/components/src/form-file-upload/test/index.js b/packages/components/src/form-file-upload/test/index.js
+index 1f9faad4e5cd27..0be360f73d9a7e 100644
+--- a/packages/components/src/form-file-upload/test/index.js
++++ b/packages/components/src/form-file-upload/test/index.js
+@@ -1,30 +1,92 @@
+ /**
+  * External dependencies
+  */
+-import { shallow } from 'enzyme';
+-import { noop } from 'lodash';
++import { render as RTLrender, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
+ 
+ /**
+  * Internal dependencies
+  */
+ import FormFileUpload from '../';
+ 
++/**
++ * Browser dependencies
++ */
++const { File } = window;
++
++function render( jsx ) {
++	return {
++		user: userEvent.setup( {
++			// Avoids timeout errors (https://github.com/testing-library/user-event/issues/565#issuecomment-1064579531).
++			delay: null,
++		} ),
++		...RTLrender( jsx ),
++	};
++}
++
++// @testing-library/user-event considers changing <input type="file"> to a string as a change, but it do not occur on real browsers, so the comparisons will be against this result
++const fakePath = expect.objectContaining( {
++	target: expect.objectContaining( {
++		value: 'C:\\fakepath\\hello.png',
++	} ),
++} );
++
+ describe( 'FormFileUpload', () => {
+ 	it( 'should show an Icon Button and a hidden input', () => {
+-		const wrapper = shallow(
++		render( <FormFileUpload>My Upload Button</FormFileUpload> );
++
++		const button = screen.getByText( 'My Upload Button' );
++		const input = screen.getByTestId( 'form-file-upload-input' );
++		expect( button ).toBeInTheDocument();
++		expect( input.style.display ).toBe( 'none' );
++	} );
++
++	it( 'should not fire a change event after selecting the same file', async () => {
++		const onChange = jest.fn();
++
++		const { user } = render(
++			<FormFileUpload onChange={ onChange }>
++				My Upload Button
++			</FormFileUpload>
++		);
++
++		const file = new File( [ 'hello' ], 'hello.png', {
++			type: 'image/png',
++		} );
++
++		const input = screen.getByTestId( 'form-file-upload-input' );
++
++		await user.upload( input, file );
++
++		await user.upload( input, file );
++
++		expect( onChange ).toHaveBeenCalledTimes( 1 );
++		expect( onChange ).toHaveBeenCalledWith( fakePath );
++	} );
++
++	it( 'should fire a change event after selecting the same file if the value was reset in between', async () => {
++		const onChange = jest.fn();
++
++		const { user } = render(
+ 			<FormFileUpload
+-				instanceId={ 1 }
+-				blocks={ [] }
+-				recentlyUsedBlocks={ [] }
+-				debouncedSpeak={ noop }
++				onClick={ jest.fn( ( e ) => ( e.target.value = '' ) ) }
++				onChange={ onChange }
+ 			>
+ 				My Upload Button
+ 			</FormFileUpload>
+ 		);
+ 
+-		const button = wrapper.find( 'ForwardRef(Button)' );
+-		const input = wrapper.find( 'input' );
+-		expect( button.prop( 'children' ) ).toBe( 'My Upload Button' );
+-		expect( input.prop( 'style' ).display ).toBe( 'none' );
++		const file = new File( [ 'hello' ], 'hello.png', {
++			type: 'image/png',
++		} );
++
++		const input = screen.getByTestId( 'form-file-upload-input' );
++		await user.upload( input, file );
++
++		expect( onChange ).toHaveBeenNthCalledWith( 1, fakePath );
++
++		await user.upload( input, file );
++
++		expect( onChange ).toHaveBeenNthCalledWith( 2, fakePath );
+ 	} );
+ } );

@@ -1,0 +1,772 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 4043259c26ad1e..02a4ccf9dbb4c8 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -34,6 +34,7 @@
+ -   `Select`: Add a `placeholder` prop to `Select.Trigger`, and support `null` item values for clearable placeholder options ([#78076](https://github.com/WordPress/gutenberg/pull/78076)).
+ -   `Drawer`: Fade the popup elevation shadow alongside the slide ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
+ -   `Drawer`: Allow mouse-drag swipe-dismiss in the popup-edge padding gutter ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
++-   `Tooltip`: Default the floating popup's portal container to the `@wordpress/ui` compat overlay slot when present, so tooltips stack reliably above other overlays in mixed-library compositions. A caller-supplied `Tooltip.Portal` `container` prop continues to take precedence ([#78095](https://github.com/WordPress/gutenberg/pull/78095)).
+ -   `IconButton`: Add a `positioner` prop, accepting a `<Tooltip.Positioner />` element, to customize how the tooltip is positioned relative to the button ([#78089](https://github.com/WordPress/gutenberg/pull/78089)).
+ -   `CollapsibleCard.Header`: Pass `render={ <h2 /> }` (or any of `<h1>`–`<h6>`) to wrap the trigger in a heading and contribute to the document outline, following the W3C APG accordion pattern (heading wraps button) ([#77962](https://github.com/WordPress/gutenberg/pull/77962)).
+ -   `Select`: Add a `Select.Positioner` subcomponent and a `positioner` slot prop on `Select.Popup` to customize the popup placement, mirroring the existing `portal` slot pattern ([#78168](https://github.com/WordPress/gutenberg/pull/78168)).
+@@ -42,9 +43,6 @@
+ ### Internal
+ 
+ -   `Dialog`: Use `--wpds-motion-*` design tokens for animation duration and easing ([#76097](https://github.com/WordPress/gutenberg/pull/76097)).
+-
+-### Internal
+-
+ -   Add internal `getWpCompatOverlaySlot()` helper and a co-located unlayered CSS module that lazily provide a body-level `[data-wp-compat-overlay-slot]` container at z-index `1000000003`, gated by `useEnableWpCompatOverlaySlot()` and by auto-detection of `window.wp.components` ([#77851](https://github.com/WordPress/gutenberg/pull/77851)).
+ 
+ ## 0.12.0 (2026-04-29)
+diff --git a/packages/ui/README.md b/packages/ui/README.md
+index 53b275819b532e..8b927621cd852d 100644
+--- a/packages/ui/README.md
++++ b/packages/ui/README.md
+@@ -62,6 +62,21 @@ body {
+ }
+ ```
+ 
++#### Mixing with `@wordpress/components`
++
++If your app pairs `@wordpress/ui` with `@wordpress/components` overlays (popovers, modals, tooltips, …) and you bundle both packages directly — i.e. you aren't relying on the `window.wp.components` global that WordPress's script-loader exposes — call `useEnableWpCompatOverlaySlot()` once from a component that mounts for the lifetime of your app (typically the root):
++
++```tsx
++import { useEnableWpCompatOverlaySlot } from '@wordpress/ui';
++
++function App() {
++	useEnableWpCompatOverlaySlot();
++	return <YourApp />;
++}
++```
++
++This opts the app into a shared body-level overlay container so `@wordpress/ui` overlays reliably stack above `@wordpress/components` overlays. The opt-in is one-way (a single component shouldn't be able to turn off shared infrastructure for everyone else) and idempotent (safe to call from multiple components). It is not needed in standard WordPress editor screens, where the slot auto-enables based on the presence of `window.wp.components`.
++
+ ## Usage
+ 
+ ### Basic Component Usage
+diff --git a/packages/ui/src/alert-dialog/portal.tsx b/packages/ui/src/alert-dialog/portal.tsx
+index 09fc6af6ca433c..0f1f6bdb863c57 100644
+--- a/packages/ui/src/alert-dialog/portal.tsx
++++ b/packages/ui/src/alert-dialog/portal.tsx
+@@ -3,10 +3,7 @@ import { forwardRef } from '@wordpress/element';
+ import type { PortalProps } from './types';
+ 
+ /**
+- * Root element that portals `AlertDialog` overlay content. Pass to
+- * `AlertDialog.Popup`'s `portal` prop to customize the portal target and
+- * wrapper. When `portal` is omitted, `AlertDialog.Popup` uses this component
+- * with default props.
++ * Used to apply custom portal behavior to `AlertDialog`'s overlay content.
+  */
+ const Portal = forwardRef< HTMLDivElement, PortalProps >(
+ 	function AlertDialogPortal( props, ref ) {
+diff --git a/packages/ui/src/dialog/portal.tsx b/packages/ui/src/dialog/portal.tsx
+index bed507b68e01cb..b5edab344bef60 100644
+--- a/packages/ui/src/dialog/portal.tsx
++++ b/packages/ui/src/dialog/portal.tsx
+@@ -3,11 +3,7 @@ import { forwardRef } from '@wordpress/element';
+ import type { PortalProps } from './types';
+ 
+ /**
+- * Root element that portals `Dialog` overlay content (`Backdrop`, inner
+- * `Popup`, etc.) outside the DOM hierarchy. Pass to `Dialog.Popup`'s
+- * `portal` prop to customize `container`, `className`, `style`, and other
+- * Base UI portal options. When `portal` is omitted, `Dialog.Popup` uses this
+- * component with default props.
++ * Used to apply custom portal behavior to `Dialog`'s overlay content.
+  */
+ const Portal = forwardRef< HTMLDivElement, PortalProps >(
+ 	function DialogPortal( props, ref ) {
+diff --git a/packages/ui/src/drawer/portal.tsx b/packages/ui/src/drawer/portal.tsx
+index 08a3ed8d1ffff9..261fce5b6f36e1 100644
+--- a/packages/ui/src/drawer/portal.tsx
++++ b/packages/ui/src/drawer/portal.tsx
+@@ -3,11 +3,7 @@ import { forwardRef } from '@wordpress/element';
+ import type { PortalProps } from './types';
+ 
+ /**
+- * Root element that portals `Drawer` overlay content (`Backdrop`, `Viewport`
+- * with the inner `Popup`, etc.) outside the DOM hierarchy. Pass to
+- * `Drawer.Popup`'s `portal` prop to customize `container`, `className`,
+- * `style`, and other Base UI portal options. When `portal` is omitted,
+- * `Drawer.Popup` uses this component with default props.
++ * Used to apply custom portal behavior to `Drawer`'s overlay content.
+  */
+ const Portal = forwardRef< HTMLDivElement, PortalProps >(
+ 	function DrawerPortal( props, ref ) {
+diff --git a/packages/ui/src/form/primitives/autocomplete/portal.tsx b/packages/ui/src/form/primitives/autocomplete/portal.tsx
+index 631837cb5eb051..e311099fc1ac07 100644
+--- a/packages/ui/src/form/primitives/autocomplete/portal.tsx
++++ b/packages/ui/src/form/primitives/autocomplete/portal.tsx
+@@ -3,9 +3,7 @@ import { forwardRef } from '@wordpress/element';
+ import type { PortalProps } from './types';
+ 
+ /**
+- * Root element that portals `Autocomplete` popup content. Pass to
+- * `Autocomplete.Popup`'s `portal` prop. When `portal` is omitted,
+- * `Autocomplete.Popup` uses this component with default props.
++ * Used to apply custom portal behavior to `Autocomplete`'s popup content.
+  */
+ const Portal = forwardRef< HTMLDivElement, PortalProps >(
+ 	function AutocompletePortal( props, ref ) {
+diff --git a/packages/ui/src/form/primitives/autocomplete/positioner.tsx b/packages/ui/src/form/primitives/autocomplete/positioner.tsx
+index 9ca5721595c7b1..1e9b4462013854 100644
+--- a/packages/ui/src/form/primitives/autocomplete/positioner.tsx
++++ b/packages/ui/src/form/primitives/autocomplete/positioner.tsx
+@@ -7,10 +7,7 @@ import styles from './style.module.css';
+ import { ITEM_POPUP_POSITIONER_PROPS } from '../constants';
+ 
+ /**
+- * Positions the floating autocomplete popup relative to its input. Pass to
+- * `Autocomplete.Popup`'s `positioner` prop to customize `side`, `align`,
+- * `sideOffset`, collision behavior, etc. When `positioner` is omitted,
+- * `Autocomplete.Popup` uses this component with default props.
++ * Used to apply custom positioning to `Autocomplete`'s popup content.
+  */
+ const Positioner = forwardRef< HTMLDivElement, PositionerProps >(
+ 	function AutocompletePositioner( { className, ...props }, ref ) {
+diff --git a/packages/ui/src/form/primitives/select/portal.tsx b/packages/ui/src/form/primitives/select/portal.tsx
+index 4dfa46a3fa9474..88370aa2215e4c 100644
+--- a/packages/ui/src/form/primitives/select/portal.tsx
++++ b/packages/ui/src/form/primitives/select/portal.tsx
+@@ -3,9 +3,7 @@ import { forwardRef } from '@wordpress/element';
+ import type { PortalProps } from './types';
+ 
+ /**
+- * Root element that portals `Select` listbox content. Pass to
+- * `Select.Popup`'s `portal` prop. When `portal` is omitted, `Select.Popup`
+- * uses this component with default props.
++ * Used to apply custom portal behavior to `Select`'s listbox content.
+  */
+ const Portal = forwardRef< HTMLDivElement, PortalProps >(
+ 	function SelectPortal( props, ref ) {
+diff --git a/packages/ui/src/form/primitives/select/positioner.tsx b/packages/ui/src/form/primitives/select/positioner.tsx
+index 490eae38100cab..9dc3dc0d140752 100644
+--- a/packages/ui/src/form/primitives/select/positioner.tsx
++++ b/packages/ui/src/form/primitives/select/positioner.tsx
+@@ -7,10 +7,7 @@ import styles from './style.module.css';
+ import { ITEM_POPUP_POSITIONER_PROPS } from '../constants';
+ 
+ /**
+- * Positions the floating select popup relative to its trigger. Pass to
+- * `Select.Popup`'s `positioner` prop to customize `side`, `align`,
+- * `sideOffset`, collision behavior, etc. When `positioner` is omitted,
+- * `Select.Popup` uses this component with default props.
++ * Used to apply custom positioning to `Select`'s listbox content.
+  */
+ const Positioner = forwardRef< HTMLDivElement, PositionerProps >(
+ 	function SelectPositioner( { className, ...props }, ref ) {
+diff --git a/packages/ui/src/popover/portal.tsx b/packages/ui/src/popover/portal.tsx
+index a30e17600ddd07..8f5cb4c99df5b3 100644
+--- a/packages/ui/src/popover/portal.tsx
++++ b/packages/ui/src/popover/portal.tsx
+@@ -3,10 +3,7 @@ import { forwardRef } from '@wordpress/element';
+ import type { PortalProps } from './types';
+ 
+ /**
+- * Root element that portals `Popover` floating content. Pass to
+- * `Popover.Popup`'s `portal` prop (for example `container` for
+- * cross-document rendering). When `portal` is omitted, `Popover.Popup` uses
+- * this component with default props.
++ * Used to apply custom portal behavior to `Popover`'s floating content.
+  */
+ const Portal = forwardRef< HTMLDivElement, PortalProps >(
+ 	function PopoverPortal( props, ref ) {
+diff --git a/packages/ui/src/popover/positioner.tsx b/packages/ui/src/popover/positioner.tsx
+index 4193ddfe307a4d..d0d9d8f6c867f3 100644
+--- a/packages/ui/src/popover/positioner.tsx
++++ b/packages/ui/src/popover/positioner.tsx
+@@ -6,10 +6,7 @@ import resetStyles from '../utils/css/resets.module.css';
+ import styles from './style.module.css';
+ 
+ /**
+- * Positions the floating popover content relative to the anchor. Pass to
+- * `Popover.Popup`'s `positioner` prop to customize `side`, `align`,
+- * `sideOffset`, collision behavior, etc. When `positioner` is omitted,
+- * `Popover.Popup` uses this component with default props.
++ * Used to apply custom positioning to `Popover`'s floating content.
+  */
+ const Positioner = forwardRef< HTMLDivElement, PositionerProps >(
+ 	function PopoverPositioner(
+diff --git a/packages/ui/src/tooltip/portal.tsx b/packages/ui/src/tooltip/portal.tsx
+index f61091cc43abaa..e8a616482eca99 100644
+--- a/packages/ui/src/tooltip/portal.tsx
++++ b/packages/ui/src/tooltip/portal.tsx
+@@ -1,15 +1,21 @@
+ import { Tooltip as _Tooltip } from '@base-ui/react/tooltip';
+ import { forwardRef } from '@wordpress/element';
+ import type { PortalProps } from './types';
++import { getWpCompatOverlaySlot } from '../utils/wp-compat-overlay-slot';
+ 
+ /**
+- * Root element that portals `Tooltip` floating content. Pass to
+- * `Tooltip.Popup`'s `portal` prop. When `portal` is omitted, `Tooltip.Popup`
+- * uses this component with default props.
++ * Used to apply custom portal behavior to `Tooltip`'s floating content.
++ * Defaults the `container` prop to the `@wordpress/ui` compat overlay slot.
+  */
+ const Portal = forwardRef< HTMLDivElement, PortalProps >(
+-	function TooltipPortal( props, ref ) {
+-		return <_Tooltip.Portal ref={ ref } { ...props } />;
++	function TooltipPortal( { container, ...restProps }, ref ) {
++		return (
++			<_Tooltip.Portal
++				container={ container ?? getWpCompatOverlaySlot() }
++				{ ...restProps }
++				ref={ ref }
++			/>
++		);
+ 	}
+ );
+ 
+diff --git a/packages/ui/src/tooltip/positioner.tsx b/packages/ui/src/tooltip/positioner.tsx
+index e604ac5a0e3e92..d4e0d7da0aced5 100644
+--- a/packages/ui/src/tooltip/positioner.tsx
++++ b/packages/ui/src/tooltip/positioner.tsx
+@@ -6,10 +6,7 @@ import resetStyles from '../utils/css/resets.module.css';
+ import styles from './style.module.css';
+ 
+ /**
+- * Positions the floating tooltip content relative to the trigger. Pass to
+- * `Tooltip.Popup`'s `positioner` prop to customize `side`, `align`,
+- * `sideOffset`, collision behavior, etc. When `positioner` is omitted,
+- * `Tooltip.Popup` uses this component with default props.
++ * Used to apply custom positioning to `Tooltip`'s floating content.
+  */
+ const Positioner = forwardRef< HTMLDivElement, PositionerProps >(
+ 	function TooltipPositioner(
+diff --git a/packages/ui/src/tooltip/test/index.test.tsx b/packages/ui/src/tooltip/test/index.test.tsx
+index f4b4e9f4381b7d..b5921a828a8901 100644
+--- a/packages/ui/src/tooltip/test/index.test.tsx
++++ b/packages/ui/src/tooltip/test/index.test.tsx
+@@ -1,7 +1,9 @@
+ import { render, screen, waitFor } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+ import { createRef } from '@wordpress/element';
++import type { ReactNode } from 'react';
+ import * as Tooltip from '../index';
++import { useEnableWpCompatOverlaySlot } from '../../utils/use-enable-wp-compat-overlay-slot';
+ import type { ProviderProps } from '../types';
+ 
+ // Test wrapper that sets delay={0} to avoid real-time delays in tests.
+@@ -151,4 +153,119 @@ describe( 'Tooltip', () => {
+ 			);
+ 		} );
+ 	} );
++
++	// The slot is identified by a data attribute (cross-tooling marker, no
++	// user-facing role/text), so direct DOM queries are appropriate here —
++	// Testing Library's role/text accessors don't apply.
++	/* eslint-disable testing-library/no-node-access */
++	describe( 'wp compat overlay slot', () => {
++		const SLOT_SELECTOR = '[data-wp-compat-overlay-slot]';
++
++		// Wrapper that exercises the public opt-in path
++		// (`useEnableWpCompatOverlaySlot`), so the integration tests
++		// reflect how a real consumer would activate the slot rather
++		// than poking at the internal flag directly.
++		function WithSlotEnabled( { children }: { children: ReactNode } ) {
++			useEnableWpCompatOverlaySlot();
++			return <>{ children }</>;
++		}
++
++		afterEach( () => {
++			// Tear down anything the hook left behind so the next test
++			// starts from the dormant baseline. The hook is intentionally
++			// one-way at runtime; tests need to reset it explicitly.
++			delete ( window as { __wpUiCompatOverlaySlotEnabled?: boolean } )
++				.__wpUiCompatOverlaySlotEnabled;
++			document
++				.querySelectorAll( SLOT_SELECTOR )
++				.forEach( ( el ) => el.remove() );
++		} );
++
++		it( 'portals the popup into the slot when the consumer opts in', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<WithSlotEnabled>
++					<TestProvider>
++						<Tooltip.Root>
++							<Tooltip.Trigger>Hover me</Tooltip.Trigger>
++							<Tooltip.Popup>Tooltip content</Tooltip.Popup>
++						</Tooltip.Root>
++					</TestProvider>
++				</WithSlotEnabled>
++			);
++
++			await user.hover(
++				screen.getByRole( 'button', { name: 'Hover me' } )
++			);
++
++			const content = await screen.findByText( 'Tooltip content' );
++			expect( content ).toBeVisible();
++
++			const slot = document.querySelector( SLOT_SELECTOR );
++			expect( slot ).not.toBeNull();
++			expect( slot ).toContainElement( content );
++		} );
++
++		it( 'does not create a slot when the consumer has not opted in (dormant default)', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<TestProvider>
++					<Tooltip.Root>
++						<Tooltip.Trigger>Hover me</Tooltip.Trigger>
++						<Tooltip.Popup>Tooltip content</Tooltip.Popup>
++					</Tooltip.Root>
++				</TestProvider>
++			);
++
++			await user.hover(
++				screen.getByRole( 'button', { name: 'Hover me' } )
++			);
++
++			const content = await screen.findByText( 'Tooltip content' );
++			expect( content ).toBeVisible();
++
++			expect( document.querySelector( SLOT_SELECTOR ) ).toBeNull();
++		} );
++
++		it( 'lets a caller-supplied portal container override the slot', async () => {
++			const user = userEvent.setup();
++			const containerRef = createRef< HTMLDivElement >();
++
++			render(
++				<WithSlotEnabled>
++					<TestProvider>
++						<Tooltip.Root>
++							<Tooltip.Trigger>Hover me</Tooltip.Trigger>
++							<div
++								ref={ containerRef }
++								data-testid="custom-container"
++							/>
++							<Tooltip.Popup
++								portal={
++									<Tooltip.Portal
++										container={ containerRef }
++									/>
++								}
++							>
++								Tooltip content
++							</Tooltip.Popup>
++						</Tooltip.Root>
++					</TestProvider>
++				</WithSlotEnabled>
++			);
++
++			await user.hover(
++				screen.getByRole( 'button', { name: 'Hover me' } )
++			);
++
++			const content = await screen.findByText( 'Tooltip content' );
++			expect( content ).toBeVisible();
++			expect( screen.getByTestId( 'custom-container' ) ).toContainElement(
++				content
++			);
++		} );
++	} );
++	/* eslint-enable testing-library/no-node-access */
+ } );
+diff --git a/packages/ui/src/utils/test/use-enable-wp-compat-overlay-slot.test.tsx b/packages/ui/src/utils/test/use-enable-wp-compat-overlay-slot.test.tsx
+index 6bcb4b1649e689..f26adf11be725f 100644
+--- a/packages/ui/src/utils/test/use-enable-wp-compat-overlay-slot.test.tsx
++++ b/packages/ui/src/utils/test/use-enable-wp-compat-overlay-slot.test.tsx
+@@ -36,12 +36,12 @@ describe( 'useEnableWpCompatOverlaySlot', () => {
+ 	} );
+ 
+ 	it( 'enables the slot once mounted, so getWpCompatOverlaySlot() returns the slot', () => {
+-		expect( getWpCompatOverlaySlot() ).toBeNull();
++		expect( getWpCompatOverlaySlot() ).toBeUndefined();
+ 
+ 		render( <HookHost /> );
+ 
+ 		const slot = getWpCompatOverlaySlot();
+-		expect( slot ).not.toBeNull();
++		expect( slot ).toBeDefined();
+ 		expect( slot?.parentElement ).toBe( document.body );
+ 		expect( findSlots() ).toHaveLength( 1 );
+ 	} );
+@@ -55,7 +55,7 @@ describe( 'useEnableWpCompatOverlaySlot', () => {
+ 			</>
+ 		);
+ 
+-		expect( getWpCompatOverlaySlot() ).not.toBeNull();
++		expect( getWpCompatOverlaySlot() ).toBeDefined();
+ 		expect( findSlots() ).toHaveLength( 1 );
+ 	} );
+ 
+@@ -67,12 +67,12 @@ describe( 'useEnableWpCompatOverlaySlot', () => {
+ 		// not flip the gate back off.
+ 		const { unmount } = render( <HookHost /> );
+ 
+-		expect( getWpCompatOverlaySlot() ).not.toBeNull();
++		expect( getWpCompatOverlaySlot() ).toBeDefined();
+ 
+ 		unmount();
+ 
+ 		expect( internalWindow.__wpUiCompatOverlaySlotEnabled ).toBe( true );
+-		expect( getWpCompatOverlaySlot() ).not.toBeNull();
++		expect( getWpCompatOverlaySlot() ).toBeDefined();
+ 	} );
+ } );
+ 
+diff --git a/packages/ui/src/utils/test/wp-compat-overlay-slot.test.ts b/packages/ui/src/utils/test/wp-compat-overlay-slot.test.ts
+index 25d4b8aef68607..ff03e8ed9d4d1e 100644
+--- a/packages/ui/src/utils/test/wp-compat-overlay-slot.test.ts
++++ b/packages/ui/src/utils/test/wp-compat-overlay-slot.test.ts
+@@ -44,15 +44,15 @@ describe( 'getWpCompatOverlaySlot', () => {
+ 	} );
+ 
+ 	describe( 'explicit opt-in via internal flag', () => {
+-		it( 'returns null when no gate is open', () => {
+-			expect( getWpCompatOverlaySlot() ).toBeNull();
++		it( 'returns undefined when no gate is open', () => {
++			expect( getWpCompatOverlaySlot() ).toBeUndefined();
+ 			expect( findSlots() ).toHaveLength( 0 );
+ 		} );
+ 
+-		it( 'returns null when the flag is explicitly false', () => {
++		it( 'returns undefined when the flag is explicitly false', () => {
+ 			internalWindow.__wpUiCompatOverlaySlotEnabled = false;
+ 
+-			expect( getWpCompatOverlaySlot() ).toBeNull();
++			expect( getWpCompatOverlaySlot() ).toBeUndefined();
+ 			expect( findSlots() ).toHaveLength( 0 );
+ 		} );
+ 
+@@ -62,11 +62,11 @@ describe( 'getWpCompatOverlaySlot', () => {
+ 			[ 'null', null ],
+ 			[ 'undefined', undefined ],
+ 		] )(
+-			'returns null when the flag is %s (strict-equality gate)',
++			'returns undefined when the flag is %s (strict-equality gate)',
+ 			( _label, value ) => {
+ 				internalWindow.__wpUiCompatOverlaySlotEnabled = value;
+ 
+-				expect( getWpCompatOverlaySlot() ).toBeNull();
++				expect( getWpCompatOverlaySlot() ).toBeUndefined();
+ 				expect( findSlots() ).toHaveLength( 0 );
+ 			}
+ 		);
+@@ -76,7 +76,7 @@ describe( 'getWpCompatOverlaySlot', () => {
+ 
+ 			const slot = getWpCompatOverlaySlot();
+ 
+-			expect( slot ).not.toBeNull();
++			expect( slot ).toBeDefined();
+ 			expect( slot ).toBeInstanceOf( HTMLDivElement );
+ 			expect( slot?.parentElement ).toBe( document.body );
+ 			expect(
+@@ -92,7 +92,7 @@ describe( 'getWpCompatOverlaySlot', () => {
+ 
+ 			const slot = getWpCompatOverlaySlot();
+ 
+-			expect( slot ).not.toBeNull();
++			expect( slot ).toBeDefined();
+ 			expect( findSlots() ).toHaveLength( 1 );
+ 		} );
+ 
+@@ -106,7 +106,7 @@ describe( 'getWpCompatOverlaySlot', () => {
+ 			( _label, value ) => {
+ 				wpEnvWindow.wp = { components: value };
+ 
+-				expect( getWpCompatOverlaySlot() ).toBeNull();
++				expect( getWpCompatOverlaySlot() ).toBeUndefined();
+ 				expect( findSlots() ).toHaveLength( 0 );
+ 			}
+ 		);
+@@ -116,12 +116,12 @@ describe( 'getWpCompatOverlaySlot', () => {
+ 			// guard. This test pins that behavior.
+ 			wpEnvWindow.wp = { components: null };
+ 
+-			expect( getWpCompatOverlaySlot() ).toBeNull();
++			expect( getWpCompatOverlaySlot() ).toBeUndefined();
+ 			expect( findSlots() ).toHaveLength( 0 );
+ 		} );
+ 
+ 		it( 'does not auto-enable when window.wp itself is missing', () => {
+-			expect( getWpCompatOverlaySlot() ).toBeNull();
++			expect( getWpCompatOverlaySlot() ).toBeUndefined();
+ 			expect( findSlots() ).toHaveLength( 0 );
+ 		} );
+ 
+@@ -131,7 +131,7 @@ describe( 'getWpCompatOverlaySlot', () => {
+ 				internalWindow.__wpUiCompatOverlaySlotEnabled
+ 			).toBeUndefined();
+ 
+-			expect( getWpCompatOverlaySlot() ).not.toBeNull();
++			expect( getWpCompatOverlaySlot() ).toBeDefined();
+ 		} );
+ 
+ 		// The cross-origin `window.top` throw path (where `.wp` access
+@@ -156,7 +156,7 @@ describe( 'getWpCompatOverlaySlot', () => {
+ 			const second = getWpCompatOverlaySlot();
+ 			const third = getWpCompatOverlaySlot();
+ 
+-			expect( first ).not.toBeNull();
++			expect( first ).toBeDefined();
+ 			expect( second ).toBe( first );
+ 			expect( third ).toBe( first );
+ 			expect( findSlots() ).toHaveLength( 1 );
+@@ -164,14 +164,14 @@ describe( 'getWpCompatOverlaySlot', () => {
+ 
+ 		it( 'creates a fresh element when the previous one was removed from the DOM, and re-caches it', () => {
+ 			const first = getWpCompatOverlaySlot();
+-			expect( first ).not.toBeNull();
++			expect( first ).toBeDefined();
+ 
+ 			first?.remove();
+ 			expect( findSlots() ).toHaveLength( 0 );
+ 
+ 			const second = getWpCompatOverlaySlot();
+ 
+-			expect( second ).not.toBeNull();
++			expect( second ).toBeDefined();
+ 			expect( second ).not.toBe( first );
+ 			expect( second?.isConnected ).toBe( true );
+ 			expect( findSlots() ).toHaveLength( 1 );
+@@ -183,13 +183,13 @@ describe( 'getWpCompatOverlaySlot', () => {
+ 			expect( findSlots() ).toHaveLength( 1 );
+ 		} );
+ 
+-		it( 'returns null after the gate is closed, even if a slot was previously created', () => {
++		it( 'returns undefined after the gate is closed, even if a slot was previously created', () => {
+ 			const slot = getWpCompatOverlaySlot();
+-			expect( slot ).not.toBeNull();
++			expect( slot ).toBeDefined();
+ 
+ 			delete internalWindow.__wpUiCompatOverlaySlotEnabled;
+ 
+-			expect( getWpCompatOverlaySlot() ).toBeNull();
++			expect( getWpCompatOverlaySlot() ).toBeUndefined();
+ 		} );
+ 
+ 		it( 'invalidates the cache and detaches the stale slot when the cached element belongs to a different document', () => {
+@@ -204,7 +204,7 @@ describe( 'getWpCompatOverlaySlot', () => {
+ 			// while staying `isConnected` to that foreign document — the
+ 			// exact shape the cleanup branch was written to handle.
+ 			const first = getWpCompatOverlaySlot();
+-			expect( first ).not.toBeNull();
++			expect( first ).toBeDefined();
+ 
+ 			const foreignDocument = new DOMParser().parseFromString(
+ 				'<!DOCTYPE html><html><body></body></html>',
+@@ -219,7 +219,7 @@ describe( 'getWpCompatOverlaySlot', () => {
+ 
+ 			const second = getWpCompatOverlaySlot();
+ 
+-			expect( second ).not.toBeNull();
++			expect( second ).toBeDefined();
+ 			expect( second ).not.toBe( first );
+ 			expect( second?.ownerDocument ).toBe( document );
+ 			expect( second?.parentElement ).toBe( document.body );
+@@ -267,7 +267,7 @@ describe( 'getWpCompatOverlaySlot', () => {
+ 			internalWindow.__wpUiCompatOverlaySlotEnabled = true;
+ 		} );
+ 
+-		it( 'returns null without throwing when document.body is missing', () => {
++		it( 'returns undefined without throwing when document.body is missing', () => {
+ 			const realBody = document.body;
+ 			const bodyDescriptor = Object.getOwnPropertyDescriptor(
+ 				Document.prototype,
+@@ -281,7 +281,7 @@ describe( 'getWpCompatOverlaySlot', () => {
+ 
+ 			try {
+ 				expect( () => getWpCompatOverlaySlot() ).not.toThrow();
+-				expect( getWpCompatOverlaySlot() ).toBeNull();
++				expect( getWpCompatOverlaySlot() ).toBeUndefined();
+ 			} finally {
+ 				if ( bodyDescriptor ) {
+ 					Object.defineProperty( document, 'body', bodyDescriptor );
+diff --git a/packages/ui/src/utils/wp-compat-overlay-slot.ts b/packages/ui/src/utils/wp-compat-overlay-slot.ts
+index 87c993c1e7163f..33b536e9a1f160 100644
+--- a/packages/ui/src/utils/wp-compat-overlay-slot.ts
++++ b/packages/ui/src/utils/wp-compat-overlay-slot.ts
+@@ -95,9 +95,10 @@ function createSlot( ownerDocument: Document ): HTMLDivElement {
+ 
+ /**
+  * Returns the body-level compat overlay slot element when the runtime
+- * opts in, lazily creating it on first call. Returns `null` otherwise,
+- * leaving the underlying overlay primitives' default portal container
+- * in effect.
++ * opts in, lazily creating it on first call. Returns `undefined`
++ * otherwise, leaving the underlying overlay primitives' default portal
++ * container in effect — so the return value can be forwarded straight
++ * to a `container` prop.
+  *
+  * Two opt-in paths:
+  *
+@@ -116,9 +117,9 @@ function createSlot( ownerDocument: Document ): HTMLDivElement {
+  * the same document this call adopts it rather than appending a
+  * duplicate.
+  */
+-export function getWpCompatOverlaySlot(): HTMLDivElement | null {
++export function getWpCompatOverlaySlot(): HTMLDivElement | undefined {
+ 	if ( typeof window === 'undefined' ) {
+-		return null;
++		return undefined;
+ 	}
+ 
+ 	if (
+@@ -126,7 +127,7 @@ export function getWpCompatOverlaySlot(): HTMLDivElement | null {
+ 		( window as CompatOverlaySlotInternalWindow )
+ 			.__wpUiCompatOverlaySlotEnabled !== true
+ 	) {
+-		return null;
++		return undefined;
+ 	}
+ 
+ 	const ownerDocument = resolveOwnerDocument();
+@@ -134,7 +135,7 @@ export function getWpCompatOverlaySlot(): HTMLDivElement | null {
+ 	// parsed (e.g. a `<script>` in `<head>`). Bail rather than throw in
+ 	// `createSlot`; callers fall through to the default portal container.
+ 	if ( ! ownerDocument || ! ownerDocument.body ) {
+-		return null;
++		return undefined;
+ 	}
+ 
+ 	if (
+diff --git a/storybook/stories/playground/with-wp-compat-overlay-slot.tsx b/storybook/stories/playground/with-wp-compat-overlay-slot.tsx
+new file mode 100644
+index 00000000000000..9a3dd0dd56549e
+--- /dev/null
++++ b/storybook/stories/playground/with-wp-compat-overlay-slot.tsx
+@@ -0,0 +1,30 @@
++import { useLayoutEffect } from '@wordpress/element';
++import { useEnableWpCompatOverlaySlot } from '@wordpress/ui';
++import type { Decorator } from '@storybook/react-vite';
++
++/**
++ * Storybook decorator that opts the decorated story into the
++ * `@wordpress/ui` compat overlay slot. The cleanup clears the internal
++ * flag so navigating to an un-decorated story closes the gate again —
++ * `useEnableWpCompatOverlaySlot()` itself is intentionally one-way.
++ *
++ * Kept private to the playground stories: the flag is window-level, so
++ * applying the decorator to per-component stories would leak the opt-in
++ * into sibling stories on the same autodocs page.
++ */
++export const WithWpCompatOverlaySlot: Decorator = ( Story ) => {
++	useEnableWpCompatOverlaySlot();
++
++	useLayoutEffect( () => {
++		const internalWindow = window as {
++			__wpUiCompatOverlaySlotEnabled?: boolean;
++		};
++		internalWindow.__wpUiCompatOverlaySlotEnabled = true;
++		return () => {
++			delete ( window as { __wpUiCompatOverlaySlotEnabled?: boolean } )
++				.__wpUiCompatOverlaySlotEnabled;
++		};
++	}, [] );
++
++	return <Story />;
++};
+diff --git a/storybook/stories/playground/wp-compat-overlay-slot.story.jsx b/storybook/stories/playground/wp-compat-overlay-slot.story.jsx
+new file mode 100644
+index 00000000000000..5ed406df6487cb
+--- /dev/null
++++ b/storybook/stories/playground/wp-compat-overlay-slot.story.jsx
+@@ -0,0 +1,98 @@
++/**
++ * WordPress dependencies
++ */
++import { Modal, Popover, Button } from '@wordpress/components';
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import * as Tooltip from '../../../packages/ui/src/tooltip';
++import { WithWpCompatOverlaySlot } from './with-wp-compat-overlay-slot';
++
++/**
++ * Cross-library stacking: a `@wordpress/ui` `Tooltip` rendered inside a
++ * `@wordpress/components` `Modal` (or `Popover`) reliably sits above the
++ * components-side overlay, via the `@wordpress/ui` compat overlay slot.
++ */
++export default {
++	title: 'Playground/WP Compat Overlay Slot',
++	decorators: [ WithWpCompatOverlaySlot ],
++};
++
++export const InsideComponentsModal = {
++	name: 'Tooltip inside @wordpress/components Modal',
++	render: function Render() {
++		const [ isOpen, setIsOpen ] = useState( false );
++		return (
++			<>
++				<Button variant="primary" onClick={ () => setIsOpen( true ) }>
++					Open `@wordpress/components` Modal
++				</Button>
++				{ isOpen && (
++					<Modal
++						title="Modal from @wordpress/components"
++						onRequestClose={ () => setIsOpen( false ) }
++					>
++						<p>
++							The Tooltip below is from `@wordpress/ui`. Hover its
++							trigger; the tooltip popup should render above this
++							modal, not behind it.
++						</p>
++						<Tooltip.Provider delay={ 0 }>
++							<Tooltip.Root>
++								<Tooltip.Trigger>Hover me</Tooltip.Trigger>
++								<Tooltip.Popup>
++									@wordpress/ui Tooltip — should sit above the
++									Modal
++								</Tooltip.Popup>
++							</Tooltip.Root>
++						</Tooltip.Provider>
++					</Modal>
++				) }
++			</>
++		);
++	},
++};
++
++export const InsideComponentsPopover = {
++	name: 'Tooltip inside @wordpress/components Popover',
++	render: function Render() {
++		const [ anchor, setAnchor ] = useState( null );
++		const [ isOpen, setIsOpen ] = useState( false );
++		return (
++			<>
++				<Button
++					ref={ setAnchor }
++					variant="primary"
++					onClick={ () => setIsOpen( ( v ) => ! v ) }
++				>
++					Toggle `@wordpress/components` Popover
++				</Button>
++				{ isOpen && anchor && (
++					<Popover
++						anchor={ anchor }
++						onClose={ () => setIsOpen( false ) }
++					>
++						<div style={ { padding: '1rem', maxWidth: '20rem' } }>
++							<p>
++								The Tooltip below is from `@wordpress/ui`. Hover
++								its trigger; the tooltip popup should render
++								above this popover.
++							</p>
++							<Tooltip.Provider delay={ 0 }>
++								<Tooltip.Root>
++									<Tooltip.Trigger>Hover me</Tooltip.Trigger>
++									<Tooltip.Popup>
++										@wordpress/ui Tooltip — should sit above
++										the Popover
++									</Tooltip.Popup>
++								</Tooltip.Root>
++							</Tooltip.Provider>
++						</div>
++					</Popover>
++				) }
++			</>
++		);
++	},
++};

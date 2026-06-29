@@ -1,0 +1,63 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1473cf5f5df40e..e7fc1598ff7ada 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ ### New Features
+ 
+ -   `Composite`: add stable version of the component ([#63569](https://github.com/WordPress/gutenberg/pull/63569)).
++-   `ComboboxControl`: add support for `placeholder` attribute ([#65254](https://github.com/WordPress/gutenberg/pull/65254)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/combobox-control/README.md b/packages/components/src/combobox-control/README.md
+index 61611f82fee233..5831c5ec2832c2 100644
+--- a/packages/components/src/combobox-control/README.md
++++ b/packages/components/src/combobox-control/README.md
+@@ -111,6 +111,13 @@ If the control is clicked, the dropdown will expand regardless of this prop.
+ -   Required: No
+ -   Default: `true`
+ 
++### placeholder
++
++If passed, the combobox input will show a placeholder string if no values are present.
++
++-   Type: `string`
++-   Required: No
++
+ #### __experimentalRenderItem
+ 
+ Custom renderer invoked for each option in the suggestion list. The render prop receives as its argument an object containing, under the `item` key, the single option's data (directly from the array of data passed to the `options` prop).
+diff --git a/packages/components/src/combobox-control/index.tsx b/packages/components/src/combobox-control/index.tsx
+index fc3ecccf0b6599..5c6725a51b435d 100644
+--- a/packages/components/src/combobox-control/index.tsx
++++ b/packages/components/src/combobox-control/index.tsx
+@@ -129,6 +129,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
+ 		},
+ 		__experimentalRenderItem,
+ 		expandOnFocus = true,
++		placeholder,
+ 	} = useDeprecated36pxDefaultSizeProp( props );
+ 
+ 	const [ value, setValue ] = useControlledValue( {
+@@ -340,6 +341,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
+ 								className="components-combobox-control__input"
+ 								instanceId={ instanceId }
+ 								ref={ inputContainer }
++								placeholder={ placeholder }
+ 								value={ isExpanded ? inputValue : currentLabel }
+ 								onFocus={ onFocus }
+ 								onBlur={ onBlur }
+diff --git a/packages/components/src/combobox-control/types.ts b/packages/components/src/combobox-control/types.ts
+index 10adf8c0ff0ef6..470b38c35e2c8a 100644
+--- a/packages/components/src/combobox-control/types.ts
++++ b/packages/components/src/combobox-control/types.ts
+@@ -82,4 +82,8 @@ export type ComboboxControlProps = Pick<
+ 	 * The current value of the control.
+ 	 */
+ 	value?: string | null;
++	/**
++	 * If passed, the combobox input will show a placeholder string if no values are present.
++	 */
++	placeholder?: string;
+ };

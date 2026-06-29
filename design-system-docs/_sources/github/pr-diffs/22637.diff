@@ -1,0 +1,279 @@
+diff --git a/packages/block-editor/src/components/rich-text/format-toolbar/index.js b/packages/block-editor/src/components/rich-text/format-toolbar/index.js
+index e0c35b11cdae50..a029bc3bc58633 100644
+--- a/packages/block-editor/src/components/rich-text/format-toolbar/index.js
++++ b/packages/block-editor/src/components/rich-text/format-toolbar/index.js
+@@ -22,6 +22,17 @@ const POPOVER_PROPS = {
+ 	isAlternate: true,
+ };
+ 
++function translateToolbarButtonProps( { label, isPressed, ...props } ) {
++	return { title: label, isActive: isPressed, ...props };
++}
++
++function getFillsProps( fills ) {
++	return orderBy(
++		fills.map( ( [ { props } ] ) => translateToolbarButtonProps( props ) ),
++		'label'
++	);
++}
++
+ const FormatToolbar = () => {
+ 	return (
+ 		<div className="block-editor-format-toolbar">
+@@ -45,12 +56,7 @@ const FormatToolbar = () => {
+ 											'More rich text controls'
+ 										) }
+ 										toggleProps={ toggleProps }
+-										controls={ orderBy(
+-											fills.map(
+-												( [ { props } ] ) => props
+-											),
+-											'title'
+-										) }
++										controls={ getFillsProps( fills ) }
+ 										popoverProps={ POPOVER_PROPS }
+ 									/>
+ 								) }
+diff --git a/packages/block-editor/src/components/rich-text/toolbar-button.js b/packages/block-editor/src/components/rich-text/toolbar-button.js
+index e7ff63189fd92e..b562313d645402 100644
+--- a/packages/block-editor/src/components/rich-text/toolbar-button.js
++++ b/packages/block-editor/src/components/rich-text/toolbar-button.js
+@@ -8,6 +8,8 @@ export function RichTextToolbarButton( {
+ 	name,
+ 	shortcutType,
+ 	shortcutCharacter,
++	title,
++	isActive,
+ 	...props
+ } ) {
+ 	let shortcut;
+@@ -23,7 +25,12 @@ export function RichTextToolbarButton( {
+ 
+ 	return (
+ 		<Fill name={ fillName }>
+-			<ToolbarButton { ...props } shortcut={ shortcut } />
++			<ToolbarButton
++				label={ title }
++				isPressed={ isActive }
++				{ ...props }
++				shortcut={ shortcut }
++			/>
+ 		</Fill>
+ 	);
+ }
+diff --git a/packages/block-library/src/button/edit.js b/packages/block-library/src/button/edit.js
+index b6280d0a81f56d..5bad6139cc2109 100644
+--- a/packages/block-library/src/button/edit.js
++++ b/packages/block-library/src/button/edit.js
+@@ -104,7 +104,7 @@ function URLPicker( {
+ 					<ToolbarButton
+ 						name="link"
+ 						icon={ link }
+-						title={ __( 'Link' ) }
++						label={ __( 'Link' ) }
+ 						shortcut={ displayShortcut.primary( 'k' ) }
+ 						onClick={ openLinkControl }
+ 					/>
+diff --git a/packages/block-library/src/navigation-link/edit.js b/packages/block-library/src/navigation-link/edit.js
+index a2f50b80dd1f89..ed58a3d8ea9368 100644
+--- a/packages/block-library/src/navigation-link/edit.js
++++ b/packages/block-library/src/navigation-link/edit.js
+@@ -149,14 +149,14 @@ function NavigationLinkEdit( {
+ 					<ToolbarButton
+ 						name="link"
+ 						icon={ linkIcon }
+-						title={ __( 'Link' ) }
++						label={ __( 'Link' ) }
+ 						shortcut={ displayShortcut.primary( 'k' ) }
+ 						onClick={ () => setIsLinkOpen( true ) }
+ 					/>
+ 					<ToolbarButton
+ 						name="submenu"
+ 						icon={ <ToolbarSubmenuIcon /> }
+-						title={ __( 'Add submenu' ) }
++						label={ __( 'Add submenu' ) }
+ 						onClick={ insertLinkBlock }
+ 					/>
+ 				</ToolbarGroup>
+diff --git a/packages/block-library/src/post-date/edit.js b/packages/block-library/src/post-date/edit.js
+index fae4aceef783df..2a8ab9c2faf2b0 100644
+--- a/packages/block-library/src/post-date/edit.js
++++ b/packages/block-library/src/post-date/edit.js
+@@ -43,7 +43,7 @@ function PostDateEditor( { format, setAttributes } ) {
+ 				<ToolbarGroup>
+ 					<ToolbarButton
+ 						icon="edit"
+-						title={ __( 'Change Date' ) }
++						label={ __( 'Change Date' ) }
+ 						onClick={ () =>
+ 							setIsPickerOpen(
+ 								( _isPickerOpen ) => ! _isPickerOpen
+diff --git a/packages/components/src/toolbar-button/index.js b/packages/components/src/toolbar-button/index.js
+index 7e84e89cc99315..f7651a995ca8da 100644
+--- a/packages/components/src/toolbar-button/index.js
++++ b/packages/components/src/toolbar-button/index.js
+@@ -7,6 +7,7 @@ import classnames from 'classnames';
+  * WordPress dependencies
+  */
+ import { useContext } from '@wordpress/element';
++import deprecated from '@wordpress/deprecated';
+ 
+ /**
+  * Internal dependencies
+@@ -28,6 +29,25 @@ function ToolbarButton( {
+ } ) {
+ 	const accessibleToolbarState = useContext( ToolbarContext );
+ 
++	if ( extraProps ) {
++		deprecated( 'ToolbarButton extraProps prop', {
++			hint:
++				'You can pass extra Button props directly to the ToolbarButton component instead.',
++		} );
++	}
++
++	if ( title ) {
++		deprecated( 'ToolbarButton title prop', {
++			alternative: 'label',
++		} );
++	}
++
++	if ( isActive !== undefined ) {
++		deprecated( 'ToolbarButton isActive prop', {
++			alternative: 'isPressed',
++		} );
++	}
++
+ 	if ( ! accessibleToolbarState ) {
+ 		// This should be deprecated when <Toolbar __experimentalAccessibilityLabel="label">
+ 		// becomes stable.
+@@ -52,6 +72,7 @@ function ToolbarButton( {
+ 					disabled={ isDisabled }
+ 					data-experimental-toolbar-item
+ 					{ ...extraProps }
++					{ ...props }
+ 				>
+ 					{ children }
+ 				</Button>
+@@ -65,6 +86,7 @@ function ToolbarButton( {
+ 	return (
+ 		<ToolbarItem
+ 			className={ classnames( 'components-toolbar-button', className ) }
++			{ ...extraProps }
+ 			{ ...props }
+ 		>
+ 			{ ( toolbarItemProps ) => (
+diff --git a/packages/components/src/toolbar-group/index.js b/packages/components/src/toolbar-group/index.js
+index 50d69ccbf89eb4..4b08adfb4b1594 100644
+--- a/packages/components/src/toolbar-group/index.js
++++ b/packages/components/src/toolbar-group/index.js
+@@ -94,17 +94,26 @@ function ToolbarGroup( {
+ 	return (
+ 		<ToolbarGroupContainer className={ finalClassName } { ...props }>
+ 			{ flatMap( controlSets, ( controlSet, indexOfSet ) =>
+-				controlSet.map( ( control, indexOfControl ) => (
+-					<ToolbarButton
+-						key={ [ indexOfSet, indexOfControl ].join() }
+-						containerClassName={
+-							indexOfSet > 0 && indexOfControl === 0
+-								? 'has-left-divider'
+-								: null
+-						}
+-						{ ...control }
+-					/>
+-				) )
++				controlSet.map( ( control, indexOfControl ) => {
++					const {
++						title: controlTitle,
++						isActive,
++						...controlProps
++					} = control;
++					return (
++						<ToolbarButton
++							key={ [ indexOfSet, indexOfControl ].join() }
++							containerClassName={
++								indexOfSet > 0 && indexOfControl === 0
++									? 'has-left-divider'
++									: null
++							}
++							label={ controlTitle }
++							isPressed={ isActive }
++							{ ...controlProps }
++						/>
++					);
++				} )
+ 			) }
+ 			{ children }
+ 		</ToolbarGroupContainer>
+diff --git a/packages/components/src/toolbar-group/stories/index.js b/packages/components/src/toolbar-group/stories/index.js
+index c24447be9dfab4..fc51b66eb891c9 100644
+--- a/packages/components/src/toolbar-group/stories/index.js
++++ b/packages/components/src/toolbar-group/stories/index.js
+@@ -13,9 +13,9 @@ export default { title: 'Components/ToolbarGroup', component: ToolbarGroup };
+ export const _default = () => {
+ 	return (
+ 		<ToolbarGroup>
+-			<ToolbarButton icon={ formatBold } title="Bold" isActive />
+-			<ToolbarButton icon={ formatItalic } title="Italic" />
+-			<ToolbarButton icon={ link } title="Link" />
++			<ToolbarButton icon={ formatBold } label="Bold" isPressed />
++			<ToolbarButton icon={ formatItalic } label="Italic" />
++			<ToolbarButton icon={ link } label="Link" />
+ 		</ToolbarGroup>
+ 	);
+ };
+diff --git a/packages/components/src/toolbar/stories/index.js b/packages/components/src/toolbar/stories/index.js
+index 2749329089b775..3c1c53ecd21174 100644
+--- a/packages/components/src/toolbar/stories/index.js
++++ b/packages/components/src/toolbar/stories/index.js
+@@ -133,13 +133,13 @@ export const toolbars = () => {
+ 			<div style={ { padding: '20px' } }>
+ 				<h2>Icon-only Toolbar</h2>
+ 				<Toolbar>
+-					<ToolbarButton icon={ formatBold } title="Bold" />
++					<ToolbarButton icon={ formatBold } label="Bold" />
+ 					<ToolbarButton
+ 						icon={ formatItalic }
+-						title="Italic"
+-						isActive
++						label="Italic"
++						isPressed
+ 					/>
+-					<ToolbarButton icon={ link } title="Link" />
++					<ToolbarButton icon={ link } label="Link" />
+ 				</Toolbar>
+ 			</div>
+ 
+@@ -147,7 +147,7 @@ export const toolbars = () => {
+ 				<h2>Text-only Toolbar</h2>
+ 				<Toolbar>
+ 					<ToolbarButton>Bold Format</ToolbarButton>
+-					<ToolbarButton isActive>Italic Format</ToolbarButton>
++					<ToolbarButton isPressed>Italic Format</ToolbarButton>
+ 					<ToolbarButton>Link Format</ToolbarButton>
+ 				</Toolbar>
+ 			</div>
+@@ -155,11 +155,11 @@ export const toolbars = () => {
+ 			<div style={ { padding: '20px' } }>
+ 				<h2>Text and Icon Toolbar</h2>
+ 				<Toolbar>
+-					<ToolbarButton icon={ formatBold } title="Bold" />
+-					<ToolbarButton isActive>Bold Format</ToolbarButton>
+-					<ToolbarButton icon={ formatItalic } title="Italic" />
++					<ToolbarButton icon={ formatBold } label="Bold" />
++					<ToolbarButton isPressed>Bold Format</ToolbarButton>
++					<ToolbarButton icon={ formatItalic } label="Italic" />
+ 					<ToolbarButton>Italic Format</ToolbarButton>
+-					<ToolbarButton icon={ link } title="Link" />
++					<ToolbarButton icon={ link } label="Link" />
+ 					<ToolbarButton>Link Format</ToolbarButton>
+ 				</Toolbar>
+ 			</div>
+@@ -167,7 +167,7 @@ export const toolbars = () => {
+ 			<div style={ { padding: '20px' } }>
+ 				<h2>Single Icon Button Toolbar</h2>
+ 				<Toolbar>
+-					<ToolbarButton icon={ formatBold } title="Bold" />
++					<ToolbarButton icon={ formatBold } label="Bold" />
+ 				</Toolbar>
+ 			</div>
+ 

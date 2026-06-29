@@ -1,0 +1,172 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e6f130a034bfb6..c5a16a336d0eff 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ -   `Button`: Fix RTL alignment for buttons containing an icon and text ([#44787](https://github.com/WordPress/gutenberg/pull/44787)).
+ -   `TabPanel`: Call `onSelect()` on every tab selection, regardless of whether it was triggered by user interaction ([#44028](https://github.com/WordPress/gutenberg/pull/44028)).
+ -   `FontSizePicker`: Fallback to font size `slug` if `name` is undefined  ([#45041](https://github.com/WordPress/gutenberg/pull/45041)).
++-   `AutocompleterUI`: fix issue where autocompleter UI would appear on top of other UI elements ([#44795](https://github.com/WordPress/gutenberg/pull/44795/))
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/autocomplete/autocompleter-ui.js b/packages/components/src/autocomplete/autocompleter-ui.js
+index f8a9fd08eaf95e..13da75123c4176 100644
+--- a/packages/components/src/autocomplete/autocompleter-ui.js
++++ b/packages/components/src/autocomplete/autocompleter-ui.js
+@@ -7,7 +7,7 @@ import { map } from 'lodash';
+ /**
+  * WordPress dependencies
+  */
+-import { useLayoutEffect } from '@wordpress/element';
++import { useLayoutEffect, useRef, useEffect } from '@wordpress/element';
+ import { useAnchor } from '@wordpress/rich-text';
+ 
+ /**
+@@ -31,6 +31,7 @@ export function getAutoCompleterUI( autocompleter ) {
+ 		onChangeOptions,
+ 		onSelect,
+ 		onReset,
++		reset,
+ 		value,
+ 		contentRef,
+ 	} ) {
+@@ -40,6 +41,10 @@ export function getAutoCompleterUI( autocompleter ) {
+ 			value,
+ 		} );
+ 
++		const popoverRef = useRef();
++
++		useOnClickOutside( popoverRef, reset );
++
+ 		useLayoutEffect( () => {
+ 			onChangeOptions( items );
+ 			// Temporarily disabling exhaustive-deps to avoid introducing unexpected side effecst.
+@@ -58,6 +63,7 @@ export function getAutoCompleterUI( autocompleter ) {
+ 				position="top right"
+ 				className="components-autocomplete__popover"
+ 				anchor={ popoverAnchor }
++				ref={ popoverRef }
+ 			>
+ 				<div
+ 					id={ listBoxId }
+@@ -90,3 +96,24 @@ export function getAutoCompleterUI( autocompleter ) {
+ 
+ 	return AutocompleterUI;
+ }
++
++function useOnClickOutside( ref, handler ) {
++	useEffect( () => {
++		const listener = ( event ) => {
++			// Do nothing if clicking ref's element or descendent elements, or if the ref is not referencing an element
++			if ( ! ref.current || ref.current.contains( event.target ) ) {
++				return;
++			}
++			handler( event );
++		};
++		document.addEventListener( 'mousedown', listener );
++		document.addEventListener( 'touchstart', listener );
++		return () => {
++			document.removeEventListener( 'mousedown', listener );
++			document.removeEventListener( 'touchstart', listener );
++		};
++		// Disable reason: `ref` is a ref object and should not be included in a
++		// hook's dependency list.
++		// eslint-disable-next-line react-hooks/exhaustive-deps
++	}, [ handler ] );
++}
+diff --git a/packages/components/src/autocomplete/test/index.js b/packages/components/src/autocomplete/test/index.js
+new file mode 100644
+index 00000000000000..b33f585ea9d5f6
+--- /dev/null
++++ b/packages/components/src/autocomplete/test/index.js
+@@ -0,0 +1,89 @@
++/**
++ * External dependencies
++ */
++import { render, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++
++/**
++ * WordPress dependencies
++ */
++import { useRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { getAutoCompleterUI } from '../autocompleter-ui';
++
++describe( 'AutocompleterUI', () => {
++	describe( 'click outside behavior', () => {
++		it( 'should call reset function when a click on another element occurs', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
++			const resetSpy = jest.fn();
++
++			const autocompleter = {
++				name: 'fruit',
++				// The prefix that triggers this completer
++				triggerPrefix: '~',
++				// Mock useItems function to return a autocomplete item.
++				useItems: () => {
++					return [
++						[
++							{
++								isDisabled: false,
++								key: 'Apple',
++								value: 'Apple',
++								label: (
++									<span>
++										<span className="icon">🍎</span>
++										{ 'Apple' }
++									</span>
++								),
++							},
++						],
++					];
++				},
++			};
++
++			const AutocompleterUI = getAutoCompleterUI( autocompleter );
++
++			const OtherElement = <div>Other Element</div>;
++
++			const Container = () => {
++				const contentRef = useRef();
++
++				return (
++					<div>
++						<AutocompleterUI
++							className={ 'test' }
++							filterValue={ '~' }
++							instanceId={ '1' }
++							listBoxId={ '1' }
++							selectedIndex={ 0 }
++							onChangeOptions={ () => {} }
++							onSelect={ () => {} }
++							value={ { visual: '🍎', name: 'Apple', id: 1 } }
++							contentRef={ contentRef }
++							reset={ resetSpy }
++						/>
++						{ OtherElement }
++					</div>
++				);
++			};
++
++			render( <Container /> );
++
++			// Click on autocompleter.
++			await user.click( screen.getByText( 'Apple' ) );
++
++			expect( resetSpy ).toHaveBeenCalledTimes( 0 );
++
++			// Click on other element out side of the tree.
++			await user.click( screen.getByText( 'Other Element' ) );
++
++			expect( resetSpy ).toHaveBeenCalledTimes( 1 );
++		} );
++	} );
++} );

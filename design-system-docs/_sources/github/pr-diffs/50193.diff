@@ -1,0 +1,258 @@
+diff --git a/bin/packages/build-worker.js b/bin/packages/build-worker.js
+index e82091ff843749..3f1512ef0feb78 100644
+--- a/bin/packages/build-worker.js
++++ b/bin/packages/build-worker.js
+@@ -103,9 +103,13 @@ async function buildCSS( file ) {
+ 		'animations',
+ 		'z-index',
+ 	]
+-		// Editor styles should be excluded from the default CSS vars output.
++		// Editor and component styles should be excluded from the default CSS vars output.
+ 		.concat(
+-			file.includes( 'common.scss' ) || ! file.includes( 'block-library' )
++			file.includes( 'common.scss' ) ||
++				! (
++					file.includes( 'block-library' ) ||
++					file.includes( 'components' )
++				)
+ 				? [ 'default-custom-properties' ]
+ 				: []
+ 		)
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b78fbe133eb727..f3264b5ef15955 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,9 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   Change the default color scheme to use the new WP Blueberry color. See PR description for instructions on how to restore the previous color scheme when using in a non-WordPress context ([#50193](https://github.com/WordPress/gutenberg/pull/50193)).
+ -   `CheckboxControl`, `CustomGradientPicker`, `FormToggle`, : Refactor and correct the focus style for consistency ([#50127](https://github.com/WordPress/gutenberg/pull/50127)).
+ 
+ ### Internal
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index e114756f9614f1..9daabb1955e236 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -163,10 +163,12 @@
+ 		padding: $grid-unit-15 * 0.5; // This reduces the horizontal padding on tertiary/text buttons, so as to space them optically.
+ 
+ 		&:hover:not(:disabled) {
++			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
+ 			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+ 		}
+ 
+ 		&:active:not(:disabled) {
++			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
+ 			background: rgba(var(--wp-admin-theme-color--rgb), 0.08);
+ 		}
+ 
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index 1c19336552aba4..02dce83f66dcc6 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -1,3 +1,9 @@
++// Include the default WP Components color variables.
++// TODO: Remove this once all admin-scheme variables are accounted for in the wp-components fallback values.
++:root {
++	@include admin-scheme(#3858e9);
++}
++
+ // Variables
+ @import "./utils/theme-variables.scss";
+ 
+diff --git a/packages/components/src/theme/color-algorithms.ts b/packages/components/src/theme/color-algorithms.ts
+index c260b4ac5704d5..b2f69e1db21284 100644
+--- a/packages/components/src/theme/color-algorithms.ts
++++ b/packages/components/src/theme/color-algorithms.ts
+@@ -48,7 +48,7 @@ export function checkContrasts(
+ 	outputs: ThemeOutputValues[ 'colors' ]
+ ) {
+ 	const background = inputs.background || COLORS.white;
+-	const accent = inputs.accent || '#007cba';
++	const accent = inputs.accent || '#3858e9';
+ 	const foreground = outputs.foreground || COLORS.gray[ 900 ];
+ 	const gray = outputs.gray || COLORS.gray;
+ 
+diff --git a/packages/components/src/theme/stories/index.tsx b/packages/components/src/theme/stories/index.tsx
+index 923b4fff4cdacd..c9a3f495e48350 100644
+--- a/packages/components/src/theme/stories/index.tsx
++++ b/packages/components/src/theme/stories/index.tsx
+@@ -103,7 +103,7 @@ export const ColorScheme: ComponentStory< typeof Theme > = ( {
+ 	);
+ };
+ ColorScheme.args = {
+-	accent: '#007cba',
++	accent: '#3858e9',
+ 	background: '#fff',
+ };
+ ColorScheme.argTypes = {
+diff --git a/packages/components/src/theme/test/color-algorithms.ts b/packages/components/src/theme/test/color-algorithms.ts
+index f901c8ad83a87b..ff04c0b9511bf2 100644
+--- a/packages/components/src/theme/test/color-algorithms.ts
++++ b/packages/components/src/theme/test/color-algorithms.ts
+@@ -53,9 +53,9 @@ describe( 'Theme color algorithms', () => {
+ 				'wp.components.Theme: The background color ("#000") does not have sufficient contrast against the accent color ("#111").'
+ 			);
+ 
+-			generateThemeVariables( { background: '#eee' } );
++			generateThemeVariables( { background: '#1a1a1a' } );
+ 			expect( console ).toHaveWarnedWith(
+-				'wp.components.Theme: The background color ("#eee") does not have sufficient contrast against the accent color ("#007cba").'
++				'wp.components.Theme: The background color ("#1a1a1a") does not have sufficient contrast against the accent color ("#3858e9").'
+ 			);
+ 		} );
+ 
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index be5b20d593954c..d9f173a571e48a 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -65,8 +65,8 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+ }
+ 
+ .emotion-8:focus-within {
+-  border-color: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #006ba1));
+-  box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
++  border-color: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6));
++  box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+   outline: none;
+   z-index: 1;
+ }
+@@ -400,8 +400,8 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+ }
+ 
+ .emotion-8:focus-within {
+-  border-color: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #006ba1));
+-  box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
++  border-color: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6));
++  box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+   outline: none;
+   z-index: 1;
+ }
+diff --git a/packages/components/src/utils/colors-values.js b/packages/components/src/utils/colors-values.js
+index 06dc62b881c652..556455b09ce336 100644
+--- a/packages/components/src/utils/colors-values.js
++++ b/packages/components/src/utils/colors-values.js
+@@ -29,11 +29,11 @@ const ALERT = {
+ 	green: '#4ab866',
+ };
+ 
+-// Matches @wordpress/base-styles
++// Matches the Modern admin scheme in @wordpress/base-styles
+ const ADMIN = {
+-	theme: 'var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba))',
++	theme: 'var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9))',
+ 	themeDark10:
+-		'var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #006ba1))',
++		'var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6))',
+ };
+ 
+ const UI = {
+diff --git a/packages/components/src/utils/theme-variables.scss b/packages/components/src/utils/theme-variables.scss
+index 0b664b8cd72e31..14e44f3ddc7d2f 100644
+--- a/packages/components/src/utils/theme-variables.scss
++++ b/packages/components/src/utils/theme-variables.scss
+@@ -2,10 +2,10 @@
+ //
+ // If the `--wp-components-color-accent` variable is not defined, fallback to
+ // `--wp-admin-theme-color`. If the `--wp-admin-theme-color` variable is not
+-// defined, fallback to the default theme color (WP blue).
+-$components-color-accent: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+-$components-color-accent-darker-10: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #006ba1));
+-$components-color-accent-darker-20: var(--wp-components-color-accent-darker-20, var(--wp-admin-theme-color-darker-20, #005a87));
++// defined, fallback to the default theme color (WP blueberry).
++$components-color-accent: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
++$components-color-accent-darker-10: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6));
++$components-color-accent-darker-20: var(--wp-components-color-accent-darker-20, var(--wp-admin-theme-color-darker-20, #183ad6));
+ 
+ // Used when placing text on the accent color.
+ $components-color-accent-inverted: var(--wp-components-color-accent-inverted, $white);
+diff --git a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
+index f9a2573352e95c..5a6ff1e5fffee4 100644
+--- a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
++++ b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
+@@ -610,13 +610,13 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
+ }
+ 
+ .emotion-13:hover {
+-  color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
++  color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+ }
+ 
+ .emotion-13:focus {
+   background-color: transparent;
+-  color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+-  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
++  color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
++  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+   outline: 3px solid transparent;
+ }
+ 
+diff --git a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+index 50bd6c2bd9bd87..c5aad5aa3be9b9 100644
+--- a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
++++ b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+@@ -593,7 +593,7 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
+   display: inline-block;
+   margin: 5px 11px 0;
+   position: relative;
+-  color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
++  color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+   overflow: visible;
+   opacity: 1;
+   background-color: transparent;
+diff --git a/storybook/decorators/with-theme.js b/storybook/decorators/with-theme.js
+index 9f11dc63dbaed9..083d929a5865a4 100644
+--- a/storybook/decorators/with-theme.js
++++ b/storybook/decorators/with-theme.js
+@@ -19,8 +19,8 @@ const themes = {
+ 		accent: '#3858e9',
+ 		background: '#f0f0f0',
+ 	},
+-	modern: {
+-		accent: '#3858e9',
++	classic: {
++		accent: '#007cba',
+ 	},
+ };
+ 
+diff --git a/storybook/preview.js b/storybook/preview.js
+index 9b4e1e334b7394..ff73a95fa41313 100644
+--- a/storybook/preview.js
++++ b/storybook/preview.js
+@@ -6,7 +6,6 @@ import { WithMarginChecker } from './decorators/with-margin-checker';
+ import { WithMaxWidthWrapper } from './decorators/with-max-width-wrapper';
+ import { WithRTL } from './decorators/with-rtl';
+ import { WithTheme } from './decorators/with-theme';
+-import './style.scss';
+ 
+ export const globalTypes = {
+ 	direction: {
+@@ -31,7 +30,7 @@ export const globalTypes = {
+ 				{ value: 'default', title: 'Default' },
+ 				{ value: 'darkBg', title: 'Dark (background)' },
+ 				{ value: 'lightGrayBg', title: 'Light gray (background)' },
+-				{ value: 'modern', title: 'Modern (accent)' },
++				{ value: 'classic', title: 'Classic (accent)' },
+ 			],
+ 		},
+ 	},
+diff --git a/storybook/style.scss b/storybook/style.scss
+deleted file mode 100644
+index 172fc48710b801..00000000000000
+--- a/storybook/style.scss
++++ /dev/null
+@@ -1,11 +0,0 @@
+-@use "sass:math";
+-
+-// Loading @wordpress/base-styles as they have mixins and other dependencies
+-// used within @wordpress/*/src/*.scss
+-@import "~@wordpress/base-styles/animations";
+-@import "~@wordpress/base-styles/breakpoints";
+-@import "~@wordpress/base-styles/colors";
+-@import "~@wordpress/base-styles/mixins";
+-@import "~@wordpress/base-styles/default-custom-properties";
+-@import "~@wordpress/base-styles/variables";
+-@import "~@wordpress/base-styles/z-index";

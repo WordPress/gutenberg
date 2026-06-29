@@ -1,0 +1,246 @@
+diff --git a/package-lock.json b/package-lock.json
+index f9320522206951..d9debc95a26c28 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -21305,6 +21305,7 @@
+ 			"version": "4.1.2",
+ 			"resolved": "https://registry.npmjs.org/change-case/-/change-case-4.1.2.tgz",
+ 			"integrity": "sha512-bSxY2ws9OtviILG1EiY5K7NNxkqg/JnRnFxLtKQ96JaviiIxi7djMrSd0ECT9AC+lttClmYwKw53BWpOMblo7A==",
++			"license": "MIT",
+ 			"dependencies": {
+ 				"camel-case": "^4.1.2",
+ 				"capital-case": "^1.0.4",
+@@ -51499,7 +51500,8 @@
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/jest-console": "file:../jest-console",
+-				"babel-jest": "^29.7.0"
++				"babel-jest": "^29.7.0",
++				"change-case": "^4.1.2"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+diff --git a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+index cbc6c621a83596..49372373500a88 100644
+--- a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
++++ b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+@@ -176,14 +176,14 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+                     data-wp-component="VStack"
+                   >
+                     <span
+-                      class="components-truncate components-color-palette__custom-color-name emotion-14 emotion-5"
++                      class="style-truncate components-truncate components-color-palette__custom-color-name emotion-14 emotion-5"
+                       data-wp-c16t="true"
+                       data-wp-component="Truncate"
+                     >
+                       red
+                     </span>
+                     <span
+-                      class="components-truncate components-color-palette__custom-color-value components-color-palette__custom-color-value--is-hex emotion-14 emotion-5"
++                      class="style-truncate components-truncate components-color-palette__custom-color-value components-color-palette__custom-color-value--is-hex emotion-14 emotion-5"
+                       data-wp-c16t="true"
+                       data-wp-component="Truncate"
+                     >
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 28143eaf581de2..73ff63baa30eee 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,7 +11,7 @@
+ 
+ ### Documentation
+ 
+--   Document the safe `clsx` pattern for conditional CSS Module classes ([#79490](https://github.com/WordPress/gutenberg/pull/79490)).
++-   Document `clsx` object syntax for conditional CSS Module classes ([#79490](https://github.com/WordPress/gutenberg/pull/79490), [#79535](https://github.com/WordPress/gutenberg/pull/79535)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/CONTRIBUTING.md b/packages/components/CONTRIBUTING.md
+index 3af10691aabb91..77f4be193a143d 100644
+--- a/packages/components/CONTRIBUTING.md
++++ b/packages/components/CONTRIBUTING.md
+@@ -418,7 +418,7 @@ On the component's main named export, add a JSDoc comment that includes the main
+ 
+ All new components should be styled using SCSS Modules.
+ 
+-Place component-local styles in a `style.module.scss` file next to the component, import the module from JavaScript or TypeScript, and compose class names with `clsx`. Preserve existing public `components-*` class names where consumers may rely on them. For dynamic values, prefer inline CSS custom properties consumed by the SCSS module. For variants and state, prefer conditional module classes composed with `clsx`. When a conditional class comes from a CSS module, use `condition && styles.className` instead of a computed object key (`{ [ styles.className ]: condition }`), because CSS modules are mocked as empty objects in Jest tests, which result in a literal `undefined` class.
++Place component-local styles in a `style.module.scss` file next to the component, import the module from JavaScript or TypeScript, and compose class names with `clsx`. Preserve existing public `components-*` class names where consumers may rely on them. For dynamic values, prefer inline CSS custom properties consumed by the SCSS module. For variants and state, prefer conditional module classes composed with `clsx` object syntax, e.g. `{ [ styles.className ]: condition }`.
+ 
+ Legacy components may still use Emotion while they are being migrated, but new Emotion usage should not be added.
+ 
+@@ -446,8 +446,10 @@ function MyComponent( { __nextHasNoOuterMargins = false, className } ) {
+ 				'components-my-component',
+ 				styles.root,
+ 				className,
+-				! __nextHasNoOuterMargins &&
+-					styles.deprecatedOuterMargins
++				{
++					[ styles.deprecatedOuterMargins ]:
++						! __nextHasNoOuterMargins,
++				}
+ 			) }
+ 		/>
+ 	);
+diff --git a/packages/components/src/card/test/__snapshots__/index.tsx.snap b/packages/components/src/card/test/__snapshots__/index.tsx.snap
+index 609d6fd5924de3..2a07096261b4c3 100644
+--- a/packages/components/src/card/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/card/test/__snapshots__/index.tsx.snap
+@@ -171,8 +171,8 @@ Snapshot Diff:
+ @@ -1,30 +1,30 @@
+   <div>
+     <div
+--     class="components-surface components-card css-1hgll2p-PolymorphicDiv-Card-boxShadowless-rounded e19lxcc00"
+-+     class="components-surface components-card css-11ld97d-PolymorphicDiv-Card-rounded e19lxcc00"
++-     class="style-surface components-surface components-card css-1hgll2p-PolymorphicDiv-Card-boxShadowless-rounded e19lxcc00"
+++     class="style-surface components-surface components-card css-11ld97d-PolymorphicDiv-Card-rounded e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="Card"
+     >
+@@ -374,7 +374,7 @@ exports[`Card Card component should render correctly 1`] = `
+ 
+ <div>
+   <div
+-    class="components-surface components-card emotion-0 emotion-1"
++    class="style-surface components-surface components-card emotion-0 emotion-1"
+     data-wp-c16t="true"
+     data-wp-component="Card"
+   >
+@@ -404,7 +404,7 @@ exports[`Card Card component should render correctly 1`] = `
+       </div>
+       <hr
+         aria-orientation="horizontal"
+-        class="components-divider emotion-10 emotion-11 components-card__divider components-card-divider"
++        class="style-divider components-divider emotion-10 emotion-11 components-card__divider components-card-divider"
+         data-wp-c16t="true"
+         data-wp-component="CardDivider"
+         role="separator"
+@@ -543,7 +543,7 @@ exports[`Card Card component should warn when the isElevated prop is passed 1`]
+ 
+ <div>
+   <div
+-    class="components-surface components-card emotion-0 emotion-1"
++    class="style-surface components-surface components-card emotion-0 emotion-1"
+     data-wp-c16t="true"
+     data-wp-component="Card"
+   >
+diff --git a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+index 3bba0650f513ef..afb5dacff8d8fd 100644
+--- a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
++++ b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+@@ -163,6 +163,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
+               target="_blank"
+             >
+               <span
++                class="style-visually-hidden"
+                 data-visually-hidden=""
+               >
+                 (opens in a new tab)
+diff --git a/packages/jest-preset-default/CHANGELOG.md b/packages/jest-preset-default/CHANGELOG.md
+index 118b955f5ccd3a..a88850cac34b2f 100644
+--- a/packages/jest-preset-default/CHANGELOG.md
++++ b/packages/jest-preset-default/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fixes
++
++-   Mock CSS Module class names with prefixed kebab-case values in unit tests ([#79535](https://github.com/WordPress/gutenberg/pull/79535)).
++
+ ## 12.49.0 (2026-06-24)
+ 
+ ## 12.48.1 (2026-06-16)
+diff --git a/packages/jest-preset-default/package.json b/packages/jest-preset-default/package.json
+index 1628e22ed953d4..2a203e2cef12ed 100644
+--- a/packages/jest-preset-default/package.json
++++ b/packages/jest-preset-default/package.json
+@@ -32,7 +32,8 @@
+ 	"main": "index.js",
+ 	"dependencies": {
+ 		"@wordpress/jest-console": "file:../jest-console",
+-		"babel-jest": "^29.7.0"
++		"babel-jest": "^29.7.0",
++		"change-case": "^4.1.2"
+ 	},
+ 	"peerDependencies": {
+ 		"@babel/core": ">=7",
+diff --git a/packages/jest-preset-default/scripts/style-mock.js b/packages/jest-preset-default/scripts/style-mock.js
+index f053ebf7976e37..574d72d27524ef 100644
+--- a/packages/jest-preset-default/scripts/style-mock.js
++++ b/packages/jest-preset-default/scripts/style-mock.js
+@@ -1 +1,18 @@
+-module.exports = {};
++const { paramCase: kebabCase } = require( 'change-case' );
++
++const cssClass = ( property ) => `style-${ kebabCase( property ) }`;
++
++const styles = new Proxy(
++	{},
++	{
++		get( target, property ) {
++			if ( typeof property === 'string' && property !== '__esModule' ) {
++				return cssClass( property );
++			}
++
++			return Reflect.get( target, property );
++		},
++	}
++);
++
++module.exports = styles;
+diff --git a/packages/jest-preset-default/test/style-mock.js b/packages/jest-preset-default/test/style-mock.js
+new file mode 100644
+index 00000000000000..bd176cd7ce8d43
+--- /dev/null
++++ b/packages/jest-preset-default/test/style-mock.js
+@@ -0,0 +1,29 @@
++const clsx = require( 'clsx' );
++const styles = require( '../scripts/style-mock' );
++
++describe( 'style mock', () => {
++	it( 'returns prefixed kebab-case class names for CSS Module properties', () => {
++		expect( styles.root ).toBe( 'style-root' );
++		expect( styles.className ).toBe( 'style-class-name' );
++		expect( styles.singleLineClamp ).toBe( 'style-single-line-clamp' );
++		expect( styles.Content ).toBe( 'style-content' );
++		expect( styles[ 'already-kebab' ] ).toBe( 'style-already-kebab' );
++	} );
++
++	it( 'does not emit an undefined class when used with clsx object syntax', () => {
++		const classes = clsx( {
++			[ styles.conditionalClass ]: true,
++		} );
++
++		expect( classes ).toBe( 'style-conditional-class' );
++		expect( classes ).not.toContain( 'undefined' );
++	} );
++
++	it( 'does not mark the CommonJS mock as an ES module', () => {
++		expect( styles.__esModule ).toBeUndefined();
++	} );
++
++	it( 'ignores symbol property access', () => {
++		expect( styles[ Symbol.toStringTag ] ).toBeUndefined();
++	} );
++} );
+diff --git a/packages/ui/src/popover/test/index.test.tsx b/packages/ui/src/popover/test/index.test.tsx
+index 38ae907d209feb..bd2b08f252f588 100644
+--- a/packages/ui/src/popover/test/index.test.tsx
++++ b/packages/ui/src/popover/test/index.test.tsx
+@@ -450,6 +450,8 @@ describe( 'Popover', () => {
+ 			expect(
+ 				await screen.findByText( 'Unstyled content' )
+ 			).toBeVisible();
++			const unstyledPopup = unstyledRef.current;
++			expect( unstyledPopup ).not.toBeNull();
+ 
+ 			await user.click(
+ 				screen.getByRole( 'button', { name: 'Open styled' } )
+@@ -458,7 +460,7 @@ describe( 'Popover', () => {
+ 
+ 			const styledClasses = Array.from( styledPopup.classList );
+ 			for ( const cls of styledClasses ) {
+-				expect( unstyledRef.current! ).not.toHaveClass( cls );
++				expect( unstyledPopup! ).not.toHaveClass( cls );
+ 			}
+ 		} );
+ 	} );

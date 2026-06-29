@@ -1,0 +1,288 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index dd8a7a720258f2..96bf76815e71dd 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### New Features
+ 
+ -   `Composite`: add stable version of the component ([#63564](https://github.com/WordPress/gutenberg/pull/63564)).
++-   `Composite`: add `Hover` and `Typeahead` subcomponents ([#64399](https://github.com/WordPress/gutenberg/pull/64399)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/composite/README.md b/packages/components/src/composite/README.md
+index 384fa46b1a9217..7bd12d0cabfa0c 100644
+--- a/packages/components/src/composite/README.md
++++ b/packages/components/src/composite/README.md
+@@ -216,3 +216,35 @@ Allows the component to be rendered as a different HTML element or React compone
+ The contents of the component.
+ 
+ -   Required: no
++
++### `Composite.Hover`
++
++Renders an element in a composite widget that receives focus on mouse move and loses focus to the composite base element on mouse leave. This should be combined with the `Composite.Item` component.
++
++##### `render`: `RenderProp<React.HTMLAttributes<any> & { ref?: React.Ref<any> | undefined; }> | React.ReactElement<any, string | React.JSXElementConstructor<any>>`
++
++Allows the component to be rendered as a different HTML element or React component. The value can be a React element or a function that takes in the original component props and gives back a React element with the props merged.
++
++-   Required: no
++
++##### `children`: `React.ReactNode`
++
++The contents of the component.
++
++-   Required: no
++
++### `Composite.Typeahead`
++
++Renders a component that adds typeahead functionality to composite components. Hitting printable character keys will move focus to the next composite item that begins with the input characters.
++
++##### `render`: `RenderProp<React.HTMLAttributes<any> & { ref?: React.Ref<any> | undefined; }> | React.ReactElement<any, string | React.JSXElementConstructor<any>>`
++
++Allows the component to be rendered as a different HTML element or React component. The value can be a React element or a function that takes in the original component props and gives back a React element with the props merged.
++
++-   Required: no
++
++##### `children`: `React.ReactNode`
++
++The contents of the component.
++
++-   Required: no
+diff --git a/packages/components/src/composite/index.tsx b/packages/components/src/composite/index.tsx
+index 73df75272054c7..4e87b9a55fa5bb 100644
+--- a/packages/components/src/composite/index.tsx
++++ b/packages/components/src/composite/index.tsx
+@@ -29,6 +29,8 @@ import type {
+ 	CompositeGroupLabelProps,
+ 	CompositeItemProps,
+ 	CompositeRowProps,
++	CompositeHoverProps,
++	CompositeTypeaheadProps,
+ } from './types';
+ 
+ /**
+@@ -98,6 +100,22 @@ const Row = forwardRef<
+ } );
+ Row.displayName = 'Composite.Row';
+ 
++const Hover = forwardRef<
++	HTMLDivElement,
++	WordPressComponentProps< CompositeHoverProps, 'div', false >
++>( function CompositeHover( props, ref ) {
++	return <Ariakit.CompositeHover { ...props } ref={ ref } />;
++} );
++Hover.displayName = 'Composite.Hover';
++
++const Typeahead = forwardRef<
++	HTMLDivElement,
++	WordPressComponentProps< CompositeTypeaheadProps, 'div', false >
++>( function CompositeTypeahead( props, ref ) {
++	return <Ariakit.CompositeTypeahead { ...props } ref={ ref } />;
++} );
++Typeahead.displayName = 'Composite.Typeahead';
++
+ /**
+  * Renders a widget based on the WAI-ARIA [`composite`](https://w3c.github.io/aria/#composite)
+  * role, which provides a single tab stop on the page and arrow key navigation
+@@ -202,5 +220,43 @@ export const Composite = Object.assign(
+ 		 * ```
+ 		 */
+ 		Row,
++		/**
++		 * Renders an element in a composite widget that receives focus on mouse move
++		 * and loses focus to the composite base element on mouse leave. This should
++		 * be combined with the `Composite.Item` component.
++		 *
++		 * @example
++		 * ```jsx
++		 * import { Composite, useCompositeStore } from '@wordpress/components';
++		 *
++		 * const store = useCompositeStore();
++		 * <Composite store={store}>
++		 *   <Composite.Hover render={ <Composite.Item /> }>
++		 *     Item 1
++		 *   </Composite.Hover>
++		 *   <Composite.Hover render={ <Composite.Item /> }>
++		 *     Item 2
++		 *   </Composite.Hover>
++		 * </Composite>
++		 * ```
++		 */
++		Hover,
++		/**
++		 * Renders a component that adds typeahead functionality to composite
++		 * components. Hitting printable character keys will move focus to the next
++		 * composite item that begins with the input characters.
++		 *
++		 * @example
++		 * ```jsx
++		 * import { Composite, useCompositeStore } from '@wordpress/components';
++		 *
++		 * const store = useCompositeStore();
++		 * <Composite store={store} render={ <CompositeTypeahead /> }>
++		 *   <Composite.Item>Item 1</Composite.Item>
++		 *   <Composite.Item>Item 2</Composite.Item>
++		 * </Composite>
++		 * ```
++		 */
++		Typeahead,
+ 	}
+ );
+diff --git a/packages/components/src/composite/stories/index.story.tsx b/packages/components/src/composite/stories/index.story.tsx
+index 280ed7b70546a4..f1be53445f79ad 100644
+--- a/packages/components/src/composite/stories/index.story.tsx
++++ b/packages/components/src/composite/stories/index.story.tsx
+@@ -28,6 +28,10 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
+ 		'Composite.Row': Composite.Row,
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+ 		'Composite.Item': Composite.Item,
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		'Composite.Hover': Composite.Hover,
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		'Composite.Typeahead': Composite.Typeahead,
+ 	},
+ 	argTypes: {
+ 		activeId: { control: 'text' },
+@@ -227,6 +231,8 @@ This only affects the composite widget behavior. You still need to set \`dir="rt
+ 					'Composite.GroupLabel': commonArgTypes,
+ 					'Composite.Row': commonArgTypes,
+ 					'Composite.Item': commonArgTypes,
++					'Composite.Hover': commonArgTypes,
++					'Composite.Typeahead': commonArgTypes,
+ 				};
+ 
+ 				const name = component.displayName ?? '';
+@@ -237,6 +243,41 @@ This only affects the composite widget behavior. You still need to set \`dir="rt
+ 			},
+ 		},
+ 	},
++	decorators: [
++		( Story ) => {
++			return (
++				<>
++					{ /* Visually style the active composite item  */ }
++					<style>{ `
++						[data-active-item] {
++							background-color: #ffc0b5;
++						}
++					` }</style>
++					<Story />
++					<div
++						style={ {
++							marginTop: '2em',
++							fontSize: '12px',
++							fontStyle: 'italic',
++						} }
++					>
++						{ /* eslint-disable-next-line no-restricted-syntax */ }
++						<p id="list-title">Notes</p>
++						<ul aria-labelledby="list-title">
++							<li>
++								The active composite item is highlighted with a
++								different background color;
++							</li>
++							<li>
++								A composite item can be the active item even
++								when it doesn&apos;t have keyboard focus.
++							</li>
++						</ul>
++					</div>
++				</>
++			);
++		},
++	],
+ };
+ export default meta;
+ 
+@@ -303,3 +344,53 @@ export const Grid: StoryFn< typeof UseCompositeStorePlaceholder > = (
+ 		</Composite>
+ 	);
+ };
++
++export const Hover: StoryFn< typeof UseCompositeStorePlaceholder > = (
++	storeProps
++) => {
++	const rtl = isRTL();
++	const store = useCompositeStore( { rtl, ...storeProps } );
++
++	return (
++		<Composite store={ store }>
++			<Composite.Hover render={ <Composite.Item /> }>
++				Hover item one
++			</Composite.Hover>
++			<Composite.Hover render={ <Composite.Item /> }>
++				Hover item two
++			</Composite.Hover>
++			<Composite.Hover render={ <Composite.Item /> }>
++				Hover item three
++			</Composite.Hover>
++		</Composite>
++	);
++};
++Hover.parameters = {
++	docs: {
++		description: {
++			story: 'Elements in the composite widget will receive focus on mouse move and lose focus to the composite base element on mouse leave.',
++		},
++	},
++};
++
++export const Typeahead: StoryFn< typeof UseCompositeStorePlaceholder > = (
++	storeProps
++) => {
++	const rtl = isRTL();
++	const store = useCompositeStore( { rtl, ...storeProps } );
++
++	return (
++		<Composite store={ store } render={ <Composite.Typeahead /> }>
++			<Composite.Item>Apple</Composite.Item>
++			<Composite.Item>Banana</Composite.Item>
++			<Composite.Item>Peach</Composite.Item>
++		</Composite>
++	);
++};
++Typeahead.parameters = {
++	docs: {
++		description: {
++			story: 'When focus in on the composite widget, hitting printable character keys will move focus to the next composite item that begins with the input characters.',
++		},
++	},
++};
+diff --git a/packages/components/src/composite/types.ts b/packages/components/src/composite/types.ts
+index 37709133915d6c..8bd4b447a83aef 100644
+--- a/packages/components/src/composite/types.ts
++++ b/packages/components/src/composite/types.ts
+@@ -192,3 +192,31 @@ export type CompositeRowProps = {
+ 	 */
+ 	children?: Ariakit.CompositeRowProps[ 'children' ];
+ };
++
++export type CompositeHoverProps = {
++	/**
++	 * Allows the component to be rendered as a different HTML element or React
++	 * component. The value can be a React element or a function that takes in the
++	 * original component props and gives back a React element with the props
++	 * merged.
++	 */
++	render?: Ariakit.CompositeHoverProps[ 'render' ];
++	/**
++	 * The contents of the component.
++	 */
++	children?: Ariakit.CompositeHoverProps[ 'children' ];
++};
++
++export type CompositeTypeaheadProps = {
++	/**
++	 * Allows the component to be rendered as a different HTML element or React
++	 * component. The value can be a React element or a function that takes in the
++	 * original component props and gives back a React element with the props
++	 * merged.
++	 */
++	render?: Ariakit.CompositeTypeaheadProps[ 'render' ];
++	/**
++	 * The contents of the component.
++	 */
++	children?: Ariakit.CompositeTypeaheadProps[ 'children' ];
++};

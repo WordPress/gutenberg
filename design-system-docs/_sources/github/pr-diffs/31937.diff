@@ -1,0 +1,1253 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 42f2c0ae80a8ed..8459d00cb5c710 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -1151,6 +1151,12 @@
+ 		"markdown_source": "../packages/components/src/search-control/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "SegmentedControl",
++		"slug": "segmented-control",
++		"markdown_source": "../packages/components/src/segmented-control/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "SelectControl",
+ 		"slug": "select-control",
+diff --git a/packages/components/src/base-field/test/__snapshots__/index.js.snap b/packages/components/src/base-field/test/__snapshots__/index.js.snap
+index 61b20cae1af63b..28a31f0da30b6f 100644
+--- a/packages/components/src/base-field/test/__snapshots__/index.js.snap
++++ b/packages/components/src/base-field/test/__snapshots__/index.js.snap
+@@ -131,7 +131,7 @@ exports[`base field should render correctly 1`] = `
+ .emotion-0:focus,
+ .emotion-0[data-focused='true'] {
+   border-color: var( --wp-admin-theme-color, #00669b);
+-  box-shadow: 0 0 0,0.5px,[object Object];
++  box-shadow: 0 0 0,0.5px,var( --wp-admin-theme-color, #00669b);
+ }
+ 
+ <div
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index a97f0743c58d23..b114267b92909f 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -109,6 +109,10 @@ export { default as ResizableBox } from './resizable-box';
+ export { default as ResponsiveWrapper } from './responsive-wrapper';
+ export { default as SandBox } from './sandbox';
+ export { default as SearchControl } from './search-control';
++export {
++	SegmentedControl as __experimentalSegmentedControl,
++	SegmentedControlOption as __experimentalSegmentedControlOption,
++} from './segmented-control';
+ export { default as SelectControl } from './select-control';
+ export { default as Snackbar } from './snackbar';
+ export { default as SnackbarList } from './snackbar/list';
+diff --git a/packages/components/src/segmented-control/README.md b/packages/components/src/segmented-control/README.md
+new file mode 100644
+index 00000000000000..aa823811312d78
+--- /dev/null
++++ b/packages/components/src/segmented-control/README.md
+@@ -0,0 +1,70 @@
++# SegementedControl
++
++<div class="callout callout-alert">
++This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
++</div>
++
++`SegementedControl` is a form component that lets users choose options represented in horizontal segments. To render options for this control use `SegmentedControlOption` component.
++
++## Usage
++
++```js
++import {
++	__experimentalSegmentedControl as SegmentedControl,
++	__experimentalSegmentedControlOption as SegmentedControlOption,
++} from '@wordpress/components';
++
++function Example() {
++	return (
++		<SegmentedControl label="my label" value="vertical" isBlock>
++			<SegmentedControlOption value="horizontal" label="Horizontal" />
++			<SegmentedControlOption value="vertical" label="Vertical" />
++		</SegmentedControl>
++	);
++}
++```
++
++## Props
++
++### `label`
++
++-   Type: `string`
++
++Label for the form element.
++
++### `baseId`
++
++-   Type: `string`
++-   Required: No
++
++ID that will serve as a base for all the items IDs.
++
++### `isAdaptiveWidth`
++
++-   Type: `boolean`
++-   Required: No
++-   Default: `false`
++
++Determines if segments should be rendered with equal widths.
++
++### `isBlock`
++
++-   Type: `boolean`
++-   Required: No
++-   Default: `false`
++
++Renders `SegmentedControl` as a (CSS) block element.
++
++### `onChange`
++
++-   Type: `boolean`
++-   Required: No
++-   Default: `false`
++
++Callback when a segment is selected.
++
++### `value`
++
++-   Type: `string | number`
++
++The value of the `SegmentedControl`.
+diff --git a/packages/components/src/segmented-control/component.tsx b/packages/components/src/segmented-control/component.tsx
+new file mode 100644
+index 00000000000000..71607e99864d4d
+--- /dev/null
++++ b/packages/components/src/segmented-control/component.tsx
+@@ -0,0 +1,103 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import { RadioGroup, useRadioState } from 'reakit';
++import useResizeAware from 'react-resize-aware';
++
++/**
++ * WordPress dependencies
++ */
++import { __ } from '@wordpress/i18n';
++import { useRef, useMemo } from '@wordpress/element';
++import { useMergeRefs } from '@wordpress/compose';
++
++/**
++ * Internal dependencies
++ */
++import {
++	contextConnect,
++	useContextSystem,
++	PolymorphicComponentProps,
++} from '../ui/context';
++import { View } from '../view';
++import * as styles from './styles';
++import { useUpdateEffect, useCx } from '../utils/hooks';
++import Backdrop from './segmented-control-backdrop';
++import type { SegmentedControlProps } from './types';
++import SegmentedControlContext from './segmented-control-context';
++
++const noop = () => {};
++
++function SegmentedControl(
++	props: PolymorphicComponentProps< SegmentedControlProps, 'input' >,
++	forwardedRef: import('react').Ref< any >
++) {
++	const {
++		className,
++		baseId,
++		isAdaptiveWidth = false,
++		isBlock = false,
++		id,
++		label,
++		onChange = noop,
++		value,
++		children,
++		...otherProps
++	} = useContextSystem( props, 'SegmentedControl' );
++	const cx = useCx();
++	const containerRef = useRef();
++	const [ resizeListener, sizes ] = useResizeAware();
++
++	const radio = useRadioState( {
++		baseId: baseId || id,
++		state: value,
++	} );
++
++	// Propagate radio.state change
++	useUpdateEffect( () => {
++		onChange( radio.state );
++	}, [ radio.state ] );
++
++	// Sync incoming value with radio.state
++	useUpdateEffect( () => {
++		if ( value !== radio.state ) {
++			radio.setState( value );
++		}
++	}, [ value ] );
++
++	const classes = useMemo(
++		() =>
++			cx(
++				styles.SegmentedControl,
++				isBlock && styles.block,
++				'medium',
++				className
++			),
++		[ className ]
++	);
++	return (
++		<SegmentedControlContext.Provider
++			value={ { ...radio, isBlock: ! isAdaptiveWidth } }
++		>
++			<RadioGroup
++				{ ...radio }
++				aria-label={ label }
++				as={ View }
++				className={ classes }
++				{ ...otherProps }
++				ref={ useMergeRefs( [ containerRef, forwardedRef ] ) }
++			>
++				{ resizeListener }
++				<Backdrop
++					{ ...radio }
++					containerRef={ containerRef }
++					containerWidth={ sizes.width }
++				/>
++				{ children }
++			</RadioGroup>
++		</SegmentedControlContext.Provider>
++	);
++}
++
++export default contextConnect( SegmentedControl, 'SegmentedControl' );
+diff --git a/packages/components/src/segmented-control/index.ts b/packages/components/src/segmented-control/index.ts
+new file mode 100644
+index 00000000000000..e7672f9be700a0
+--- /dev/null
++++ b/packages/components/src/segmented-control/index.ts
+@@ -0,0 +1,2 @@
++export { default as SegmentedControl } from './component';
++export { default as SegmentedControlOption } from './segmented-control-option';
+diff --git a/packages/components/src/segmented-control/segmented-control-backdrop.tsx b/packages/components/src/segmented-control/segmented-control-backdrop.tsx
+new file mode 100644
+index 00000000000000..5cca63e22c4a1e
+--- /dev/null
++++ b/packages/components/src/segmented-control/segmented-control-backdrop.tsx
+@@ -0,0 +1,60 @@
++/**
++ * WordPress dependencies
++ */
++import { useState, useEffect, memo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import type { SegmentedControlBackdropProps } from './types';
++import { BackdropView } from './styles';
++
++function SegmentedControlBackdrop( {
++	containerRef,
++	containerWidth,
++	state,
++}: SegmentedControlBackdropProps ) {
++	const [ left, setLeft ] = useState( 0 );
++	const [ width, setWidth ] = useState( 0 );
++	const [ canAnimate, setCanAnimate ] = useState( false );
++
++	useEffect( () => {
++		const containerNode = containerRef?.current;
++		if ( ! containerNode ) return;
++
++		/**
++		 * Workaround for Reakit
++		 */
++		const targetNode = containerNode.querySelector(
++			`[data-value="${ state }"]`
++		);
++		if ( ! targetNode ) return;
++
++		const { x: parentX } = containerNode.getBoundingClientRect();
++		const { width: offsetWidth, x } = targetNode.getBoundingClientRect();
++		const borderWidth = 1;
++		const offsetLeft = x - parentX - borderWidth;
++
++		setLeft( offsetLeft );
++		setWidth( offsetWidth );
++
++		if ( ! canAnimate ) {
++			window.requestAnimationFrame( () => {
++				setCanAnimate( true );
++			} );
++		}
++	}, [ canAnimate, containerRef, containerWidth, state ] );
++
++	return (
++		<BackdropView
++			role="presentation"
++			style={ {
++				transform: `translateX(${ left }px)`,
++				transition: canAnimate ? undefined : 'none',
++				width,
++			} }
++		/>
++	);
++}
++
++export default memo( SegmentedControlBackdrop );
+diff --git a/packages/components/src/segmented-control/segmented-control-button.tsx b/packages/components/src/segmented-control/segmented-control-button.tsx
+new file mode 100644
+index 00000000000000..6bf3de5f3a6beb
+--- /dev/null
++++ b/packages/components/src/segmented-control/segmented-control-button.tsx
+@@ -0,0 +1,72 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import { Radio } from 'reakit';
++
++/**
++ * WordPress dependencies
++ */
++import { memo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import * as styles from './styles';
++import type { SegmentedControlButtonProps } from './types';
++import { useCx } from '../utils/hooks';
++
++const {
++	ButtonContentView,
++	LabelPlaceholderView,
++	LabelView,
++	SeparatorView,
++} = styles;
++
++function SegmentedControlButton( {
++	className,
++	forwardedRef,
++	isBlock = false,
++	label,
++	showSeparator,
++	value,
++	...props
++}: SegmentedControlButtonProps ) {
++	const isActive = props.state === value;
++	const cx = useCx();
++	const labelViewClasses = cx( isBlock && styles.labelBlock );
++	const classes = cx(
++		styles.buttonView,
++		className,
++		isActive && styles.buttonActive
++	);
++	return (
++		<LabelView className={ labelViewClasses } data-active={ isActive }>
++			<Radio
++				{ ...props }
++				as="button"
++				aria-label={ label }
++				className={ classes }
++				data-value={ value }
++				ref={ forwardedRef }
++				value={ value }
++			>
++				<ButtonContentView>{ label }</ButtonContentView>
++				<LabelPlaceholderView aria-hidden>
++					{ label }
++				</LabelPlaceholderView>
++			</Radio>
++			<SegmentedControlSeparator isActive={ ! showSeparator } />
++		</LabelView>
++	);
++}
++
++const SegmentedControlSeparator = memo(
++	( { isActive }: { isActive: boolean } ) => {
++		const cx = useCx();
++		const classes = cx( isActive && styles.separatorActive );
++		return <SeparatorView aria-hidden className={ classes } />;
++	}
++);
++
++export default memo( SegmentedControlButton );
+diff --git a/packages/components/src/segmented-control/segmented-control-context.ts b/packages/components/src/segmented-control/segmented-control-context.ts
+new file mode 100644
+index 00000000000000..3554556fb79638
+--- /dev/null
++++ b/packages/components/src/segmented-control/segmented-control-context.ts
+@@ -0,0 +1,16 @@
++/**
++ * WordPress dependencies
++ */
++import { createContext, useContext } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import type { SegmentedControlContextProps } from './types';
++
++const SegmentedControlContext = createContext(
++	{} as SegmentedControlContextProps
++);
++export const useSegmentedControlContext = () =>
++	useContext( SegmentedControlContext );
++export default SegmentedControlContext;
+diff --git a/packages/components/src/segmented-control/segmented-control-option.tsx b/packages/components/src/segmented-control/segmented-control-option.tsx
+new file mode 100644
+index 00000000000000..261e6836152f22
+--- /dev/null
++++ b/packages/components/src/segmented-control/segmented-control-option.tsx
+@@ -0,0 +1,71 @@
++/**
++ * WordPress dependencies
++ */
++import { __ } from '@wordpress/i18n';
++import { useInstanceId } from '@wordpress/compose';
++
++/**
++ * Internal dependencies
++ */
++import {
++	contextConnect,
++	useContextSystem,
++	PolymorphicComponentProps,
++} from '../ui/context';
++import SegmentedControlButton from './segmented-control-button';
++import type {
++	SegmentedControlOptionProps,
++	SegmentedControlContextProps,
++} from './types';
++import { useSegmentedControlContext } from './segmented-control-context';
++
++function getShowSeparator(
++	segmentedControlContext: SegmentedControlContextProps,
++	index: number
++) {
++	const { currentId, items } = segmentedControlContext;
++	const isLast = index === items.length - 1;
++	const isActive = items[ index ]?.id === currentId;
++	const isNextActive = items[ index + 1 ]?.id === currentId;
++
++	let showSeparator = true;
++
++	if ( items.length < 3 ) {
++		showSeparator = false;
++	}
++
++	if ( isActive || isNextActive || isLast ) {
++		showSeparator = false;
++	}
++
++	return showSeparator;
++}
++
++function SegmentedControlOption(
++	props: PolymorphicComponentProps< SegmentedControlOptionProps, 'input' >,
++	forwardedRef: import('react').Ref< any >
++) {
++	const segmentedControlContext = useSegmentedControlContext();
++	const id = useInstanceId(
++		SegmentedControlOption,
++		segmentedControlContext.baseId || 'segmented-control-option'
++	);
++	const buttonProps = useContextSystem(
++		{ ...props, id },
++		'SegmentedControlOption'
++	);
++	const index = segmentedControlContext.items.findIndex(
++		( item ) => item.id === buttonProps.id
++	);
++	const showSeparator = getShowSeparator( segmentedControlContext, index );
++	return (
++		<SegmentedControlButton
++			ref={ forwardedRef }
++			{ ...{ ...segmentedControlContext, ...buttonProps, showSeparator } }
++		/>
++	);
++}
++export default contextConnect(
++	SegmentedControlOption,
++	'SegmentedControlOption'
++);
+diff --git a/packages/components/src/segmented-control/stories/index.js b/packages/components/src/segmented-control/stories/index.js
+new file mode 100644
+index 00000000000000..dbce70d59ecc93
+--- /dev/null
++++ b/packages/components/src/segmented-control/stories/index.js
+@@ -0,0 +1,59 @@
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { __experimentalSpacer as Spacer } from '../../';
++import { SegmentedControl, SegmentedControlOption } from '../index';
++import { View } from '../../view';
++
++export default {
++	component: SegmentedControl,
++	title: 'Components/SegmentedControl',
++};
++
++const aligns = [ 'Left', 'Center', 'Right', 'Justify' ];
++const alignOptions = aligns.map( ( key ) => (
++	<SegmentedControlOption key={ key } value={ key } label={ key } />
++) );
++
++export const _default = () => {
++	const [ alignState, setAlignState ] = useState( aligns[ 0 ] );
++	const label = 'Segmented Control';
++
++	return (
++		<View>
++			<Spacer>
++				<SegmentedControl
++					isBlock
++					onChange={ setAlignState }
++					value={ alignState }
++					label={ label }
++				>
++					{ alignOptions }
++				</SegmentedControl>
++			</Spacer>
++			<Spacer>
++				<SegmentedControl label={ label } value="horizontal">
++					<SegmentedControlOption
++						value="horizontal"
++						label="Horizontal"
++					/>
++					<SegmentedControlOption value="vertical" label="Vertical" />
++				</SegmentedControl>
++			</Spacer>
++			<Spacer>
++				<SegmentedControl isAdaptiveWidth label={ label } value="long">
++					<SegmentedControlOption value="short" label="Short" />
++					<SegmentedControlOption
++						value="long"
++						label="Looooooooooooong"
++					/>
++				</SegmentedControl>
++			</Spacer>
++		</View>
++	);
++};
+diff --git a/packages/components/src/segmented-control/styles.ts b/packages/components/src/segmented-control/styles.ts
+new file mode 100644
+index 00000000000000..e02a8d33dd4147
+--- /dev/null
++++ b/packages/components/src/segmented-control/styles.ts
+@@ -0,0 +1,135 @@
++/**
++ * External dependencies
++ */
++import { css } from '@emotion/react';
++import styled from '@emotion/styled';
++
++/**
++ * Internal dependencies
++ */
++import { CONFIG, COLORS, reduceMotion } from '../utils';
++
++export const SegmentedControl = css`
++	background: ${ COLORS.ui.background };
++	border: 1px solid;
++	border-color: ${ COLORS.ui.border };
++	border-radius: ${ CONFIG.controlBorderRadius };
++	display: inline-flex;
++	min-height: ${ CONFIG.controlHeight };
++	min-width: 0;
++	padding: 2px;
++	position: relative;
++	transition: transform ${ CONFIG.transitionDurationFastest } linear;
++	${ reduceMotion( 'transition' ) }
++	&:hover {
++		border-color: ${ COLORS.ui.borderHover };
++	}
++
++	&:focus-within {
++		border-color: ${ COLORS.ui.borderFocus };
++		box-shadow: ${ CONFIG.controlBoxShadowFocus };
++		outline: none;
++		z-index: 1;
++	}
++`;
++
++export const block = css`
++	display: flex;
++	width: 100%;
++`;
++
++export const BackdropView = styled.div`
++	background: ${ COLORS.gray[ 900 ] };
++	border-radius: ${ CONFIG.controlBorderRadius };
++	box-shadow: ${ CONFIG.segmentedControlBackdropBoxShadow };
++	left: 0;
++	position: absolute;
++	top: 2px;
++	bottom: 2px;
++	transition: transform ${ CONFIG.transitionDurationFast } ease;
++	${ reduceMotion( 'transition' ) }
++	z-index: 1;
++`;
++
++export const LabelView = styled.div`
++	display: inline-flex;
++	max-width: 100%;
++	min-width: 0;
++	position: relative;
++`;
++
++export const labelBlock = css`
++	flex: 1;
++`;
++
++export const buttonView = css`
++	align-items: center;
++	appearance: none;
++	background: transparent;
++	border: none;
++	border-radius: ${ CONFIG.controlBorderRadius };
++	color: ${ COLORS.gray[ 700 ] };
++	cursor: pointer;
++	display: flex;
++	height: 100%;
++	justify-content: center;
++	line-height: 100%;
++	outline: none;
++	padding: 0 12px;
++	position: relative;
++	text-align: center;
++	transition: background ${ CONFIG.transitionDurationFast } linear,
++		color ${ CONFIG.transitionDurationFast } linear, font-weight 60ms linear;
++	${ reduceMotion( 'transition' ) }
++	user-select: none;
++	width: 100%;
++	z-index: 2;
++
++	&::-moz-focus-inner {
++		border: 0;
++	}
++
++	&:active {
++		background: ${ CONFIG.segmentedControlBackgroundColor };
++	}
++`;
++
++export const buttonActive = css`
++	color: ${ COLORS.white };
++`;
++
++export const ButtonContentView = styled.div`
++	font-size: ${ CONFIG.fontSize };
++	line-height: 1;
++	position: absolute;
++	top: 50%;
++	left: 50%;
++	transform: translate( -50%, -50% );
++`;
++
++export const SeparatorView = styled.div`
++	background: ${ CONFIG.colorDivider };
++	height: calc( 100% - 4px - 4px );
++	position: absolute;
++	right: 0;
++	top: 4px;
++	transition: background ${ CONFIG.transitionDuration } linear;
++	${ reduceMotion( 'transition' ) }
++	width: 1px;
++`;
++
++export const separatorActive = css`
++	background: transparent;
++`;
++
++export const LabelPlaceholderView = styled.div`
++	font-size: ${ CONFIG.fontSize };
++	font-weight: bold;
++	height: 0;
++	overflow: hidden;
++	visibility: hidden;
++`;
++
++export const medium = css`
++	min-height: ${ CONFIG.controlHeight };
++`;
+diff --git a/packages/components/src/segmented-control/test/__snapshots__/index.js.snap b/packages/components/src/segmented-control/test/__snapshots__/index.js.snap
+new file mode 100644
+index 00000000000000..589da552388e3f
+--- /dev/null
++++ b/packages/components/src/segmented-control/test/__snapshots__/index.js.snap
+@@ -0,0 +1,245 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`SegmentedControl should render correctly 1`] = `
++.emotion-0 {
++  background: #fff;
++  border: 1px solid;
++  border-color: #757575;
++  border-radius: 2px;
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  min-height: 36px;
++  min-width: 0;
++  padding: 2px;
++  position: relative;
++  -webkit-transition: -webkit-transform 100ms linear;
++  transition: transform 100ms linear;
++}
++
++@media ( prefers-reduced-motion: reduce ) {
++  .emotion-0 {
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-0:hover {
++  border-color: #757575;
++}
++
++.emotion-0:focus-within {
++  border-color: var( --wp-admin-theme-color-darker-10, #007cba);
++  box-shadow: 0 0 0,0.5px,var( --wp-admin-theme-color, #00669b);
++  outline: none;
++  z-index: 1;
++}
++
++.emotion-2 {
++  background: #1e1e1e;
++  border-radius: 2px;
++  box-shadow: transparent;
++  left: 0;
++  position: absolute;
++  top: 2px;
++  bottom: 2px;
++  -webkit-transition: -webkit-transform 160ms ease;
++  transition: transform 160ms ease;
++  z-index: 1;
++}
++
++@media ( prefers-reduced-motion: reduce ) {
++  .emotion-2 {
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-4 {
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  max-width: 100%;
++  min-width: 0;
++  position: relative;
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
++}
++
++.emotion-6 {
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  -webkit-appearance: none;
++  -moz-appearance: none;
++  -ms-appearance: none;
++  appearance: none;
++  background: transparent;
++  border: none;
++  border-radius: 2px;
++  color: #757575;
++  cursor: pointer;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  height: 100%;
++  -webkit-box-pack: center;
++  -ms-flex-pack: center;
++  -webkit-justify-content: center;
++  justify-content: center;
++  line-height: 100%;
++  outline: none;
++  padding: 0 12px;
++  position: relative;
++  text-align: center;
++  -webkit-transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
++  transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++  width: 100%;
++  z-index: 2;
++}
++
++@media ( prefers-reduced-motion: reduce ) {
++  .emotion-6 {
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-6::-moz-focus-inner {
++  border: 0;
++}
++
++.emotion-6:active {
++  background: #fff;
++}
++
++.emotion-7 {
++  font-size: 13px;
++  line-height: 1;
++  position: absolute;
++  top: 50%;
++  left: 50%;
++  -webkit-transform: translate( -50%, -50% );
++  -moz-transform: translate( -50%, -50% );
++  -ms-transform: translate( -50%, -50% );
++  transform: translate( -50%, -50% );
++}
++
++.emotion-9 {
++  font-size: 13px;
++  font-weight: bold;
++  height: 0;
++  overflow: hidden;
++  visibility: hidden;
++}
++
++.emotion-11 {
++  background: rgba(0, 0, 0, 0.1);
++  height: calc( 100% - 4px - 4px );
++  position: absolute;
++  right: 0;
++  top: 4px;
++  -webkit-transition: background 200ms linear;
++  transition: background 200ms linear;
++  width: 1px;
++  background: transparent;
++}
++
++@media ( prefers-reduced-motion: reduce ) {
++  .emotion-11 {
++    transition-duration: 0ms;
++  }
++}
++
++<div
++  aria-label="Test Segmented Control"
++  class="medium components-segmented-control emotion-0 emotion-1"
++  data-wp-c16t="true"
++  data-wp-component="SegmentedControl"
++  id="segmented"
++  role="radiogroup"
++>
++  <iframe
++    aria-hidden="true"
++    frameborder="0"
++    src="about:blank"
++    style="display: block; opacity: 0; position: absolute; top: 0px; left: 0px; height: 100%; width: 100%; overflow: hidden; pointer-events: none; z-index: -1;"
++    tabindex="-1"
++  />
++  <div
++    class="emotion-2 emotion-3"
++    role="presentation"
++    style="transform: translateX(0px); transition: none; width: 0px;"
++  />
++  <div
++    class="emotion-4 emotion-5"
++    data-active="false"
++  >
++    <button
++      aria-checked="false"
++      aria-label="R"
++      class="emotion-6 components-segmented-control-option"
++      data-value="rigas"
++      data-wp-c16t="true"
++      data-wp-component="SegmentedControlOption"
++      id="segmented-0"
++      role="radio"
++      tabindex="0"
++    >
++      <div
++        class="emotion-7 emotion-8"
++      >
++        R
++      </div>
++      <div
++        aria-hidden="true"
++        class="emotion-9 emotion-10"
++      >
++        R
++      </div>
++    </button>
++    <div
++      aria-hidden="true"
++      class="emotion-11 emotion-12"
++    />
++  </div>
++  <div
++    class="emotion-4 emotion-5"
++    data-active="false"
++  >
++    <button
++      aria-checked="false"
++      aria-label="J"
++      class="emotion-6 components-segmented-control-option"
++      data-value="jack"
++      data-wp-c16t="true"
++      data-wp-component="SegmentedControlOption"
++      id="segmented-1"
++      role="radio"
++      tabindex="-1"
++    >
++      <div
++        class="emotion-7 emotion-8"
++      >
++        J
++      </div>
++      <div
++        aria-hidden="true"
++        class="emotion-9 emotion-10"
++      >
++        J
++      </div>
++    </button>
++    <div
++      aria-hidden="true"
++      class="emotion-11 emotion-12"
++    />
++  </div>
++</div>
++`;
+diff --git a/packages/components/src/segmented-control/test/index.js b/packages/components/src/segmented-control/test/index.js
+new file mode 100644
+index 00000000000000..269921f8db436c
+--- /dev/null
++++ b/packages/components/src/segmented-control/test/index.js
+@@ -0,0 +1,42 @@
++/**
++ * External dependencies
++ */
++import { render, fireEvent } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { SegmentedControl, SegmentedControlOption } from '../index';
++
++describe( 'SegmentedControl', () => {
++	const options = (
++		<>
++			<SegmentedControlOption value="rigas" label="R" />
++			<SegmentedControlOption value="jack" label="J" />
++		</>
++	);
++	it( 'should render correctly', () => {
++		const { container } = render(
++			<SegmentedControl baseId="segmented" label="Test Segmented Control">
++				{ options }
++			</SegmentedControl>
++		);
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++	it( 'should call onChange with proper value', () => {
++		const mockOnChange = jest.fn();
++		const { getByLabelText } = render(
++			<SegmentedControl
++				baseId="segmented"
++				value="jack"
++				onChange={ mockOnChange }
++				label="Test Segmented Control"
++			>
++				{ options }
++			</SegmentedControl>
++		);
++		const firstButton = getByLabelText( 'R' );
++		fireEvent.click( firstButton );
++		expect( mockOnChange ).toHaveBeenCalledWith( 'rigas' );
++	} );
++} );
+diff --git a/packages/components/src/segmented-control/types.ts b/packages/components/src/segmented-control/types.ts
+new file mode 100644
+index 00000000000000..14e5cba75043cf
+--- /dev/null
++++ b/packages/components/src/segmented-control/types.ts
+@@ -0,0 +1,87 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { MutableRefObject, Ref, ReactNode, ReactText } from 'react';
++// eslint-disable-next-line no-restricted-imports
++import type { RadioStateReturn } from 'reakit';
++
++/**
++ * Internal dependencies
++ */
++import type { FormElementProps } from '../utils/types';
++
++export type SegmentedControlOptionProps = {
++	value: ReactText;
++	label: string;
++};
++
++export type SegmentedControlProps = Omit<
++	FormElementProps< any >,
++	'defaultValue'
++> & {
++	/**
++	 * Label for the form element.
++	 */
++	label: string;
++	/**
++	 * ID that will serve as a base for all the items IDs.
++	 *
++	 * @see https://reakit.io/docs/radio/#useradiostate
++	 */
++	baseId?: string;
++	/**
++	 * Determines if segments should be rendered with equal widths.
++	 *
++	 * @default false
++	 */
++	isAdaptiveWidth?: boolean;
++	/**
++	 * Renders `SegmentedControl` as a (CSS) block element.
++	 *
++	 * @default false
++	 */
++	isBlock?: boolean;
++	/**
++	 * Callback when a segment is selected.
++	 */
++	onChange?: ( value: ReactText | undefined ) => void;
++	/**
++	 * The value of `SegmentedControl`
++	 */
++	value?: ReactText;
++	/**
++	 * React children
++	 */
++	children: ReactNode;
++};
++
++export type SegmentedControlContextProps = RadioStateReturn & {
++	/**
++	 * Renders `SegmentedControl` as a (CSS) block element.
++	 *
++	 * @default false
++	 */
++	isBlock?: boolean;
++};
++
++export type SegmentedControlButtonProps = {
++	className?: string;
++	forwardedRef?: Ref< any >;
++	/**
++	 * Renders `SegmentedControl` is a (CSS) block element.
++	 *
++	 * @default false
++	 */
++	isBlock?: boolean;
++	label: string;
++	showSeparator?: boolean;
++	value?: ReactText;
++	state?: any;
++};
++
++export type SegmentedControlBackdropProps = {
++	containerRef: MutableRefObject< HTMLElement | undefined >;
++	containerWidth?: number | null;
++	state?: any;
++};
+diff --git a/packages/components/src/ui/control-label/test/__snapshots__/index.js.snap b/packages/components/src/ui/control-label/test/__snapshots__/index.js.snap
+index 4d4445451d1ae7..efc1f96815bb29 100644
+--- a/packages/components/src/ui/control-label/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/control-label/test/__snapshots__/index.js.snap
+@@ -6,10 +6,10 @@ exports[`props should render correctly 1`] = `
+   line-height: calc(13px * 1.2);
+   margin: 0;
+   max-width: 100%;
+-  padding-bottom: calc((30px - calc(13px * 1.2)) / 2);
+-  padding-top: calc((30px - calc(13px * 1.2)) / 2);
+-  padding-bottom: calc((30px - calc(13px * 1.2)) / 2);
+-  padding-top: calc((30px - calc(13px * 1.2)) / 2);
++  padding-bottom: calc((36px - calc(13px * 1.2)) / 2);
++  padding-top: calc((36px - calc(13px * 1.2)) / 2);
++  padding-bottom: calc((36px - calc(13px * 1.2)) / 2);
++  padding-top: calc((36px - calc(13px * 1.2)) / 2);
+   display: block;
+   overflow: hidden;
+   text-overflow: ellipsis;
+@@ -52,10 +52,10 @@ exports[`props should render no truncate 1`] = `
+   line-height: calc(13px * 1.2);
+   margin: 0;
+   max-width: 100%;
+-  padding-bottom: calc((30px - calc(13px * 1.2)) / 2);
+-  padding-top: calc((30px - calc(13px * 1.2)) / 2);
+-  padding-bottom: calc((30px - calc(13px * 1.2)) / 2);
+-  padding-top: calc((30px - calc(13px * 1.2)) / 2);
++  padding-bottom: calc((36px - calc(13px * 1.2)) / 2);
++  padding-top: calc((36px - calc(13px * 1.2)) / 2);
++  padding-bottom: calc((36px - calc(13px * 1.2)) / 2);
++  padding-top: calc((36px - calc(13px * 1.2)) / 2);
+   color: #000;
+   line-height: 1.2;
+   margin: 0;
+@@ -94,10 +94,10 @@ exports[`props should render size 1`] = `
+   line-height: calc(13px * 1.2);
+   margin: 0;
+   max-width: 100%;
+-  padding-bottom: calc((30px - calc(13px * 1.2)) / 2);
+-  padding-top: calc((30px - calc(13px * 1.2)) / 2);
+-  padding-bottom: calc((calc( 30px * 0.8 ) - calc(13px * 1.2)) / 2);
+-  padding-top: calc((calc( 30px * 0.8 ) - calc(13px * 1.2)) / 2);
++  padding-bottom: calc((36px - calc(13px * 1.2)) / 2);
++  padding-top: calc((36px - calc(13px * 1.2)) / 2);
++  padding-bottom: calc((calc( 36px * 0.8 ) - calc(13px * 1.2)) / 2);
++  padding-top: calc((calc( 36px * 0.8 ) - calc(13px * 1.2)) / 2);
+   display: block;
+   overflow: hidden;
+   text-overflow: ellipsis;
+diff --git a/packages/components/src/ui/form-group/test/__snapshots__/index.js.snap b/packages/components/src/ui/form-group/test/__snapshots__/index.js.snap
+index 5a64ab4c2af0c0..f2904933445213 100644
+--- a/packages/components/src/ui/form-group/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/form-group/test/__snapshots__/index.js.snap
+@@ -10,10 +10,10 @@ exports[`props should render alignLabel 1`] = `
+   line-height: calc(13px * 1.2);
+   margin: 0;
+   max-width: 100%;
+-  padding-bottom: calc((30px - calc(13px * 1.2)) / 2);
+-  padding-top: calc((30px - calc(13px * 1.2)) / 2);
+-  padding-bottom: calc((30px - calc(13px * 1.2)) / 2);
+-  padding-top: calc((30px - calc(13px * 1.2)) / 2);
++  padding-bottom: calc((36px - calc(13px * 1.2)) / 2);
++  padding-top: calc((36px - calc(13px * 1.2)) / 2);
++  padding-bottom: calc((36px - calc(13px * 1.2)) / 2);
++  padding-top: calc((36px - calc(13px * 1.2)) / 2);
+   color: #000;
+   line-height: 1.2;
+   margin: 0;
+@@ -68,10 +68,10 @@ exports[`props should render vertically 1`] = `
+   line-height: calc(13px * 1.2);
+   margin: 0;
+   max-width: 100%;
+-  padding-bottom: calc((30px - calc(13px * 1.2)) / 2);
+-  padding-top: calc((30px - calc(13px * 1.2)) / 2);
+-  padding-bottom: calc((30px - calc(13px * 1.2)) / 2);
+-  padding-top: calc((30px - calc(13px * 1.2)) / 2);
++  padding-bottom: calc((36px - calc(13px * 1.2)) / 2);
++  padding-top: calc((36px - calc(13px * 1.2)) / 2);
++  padding-bottom: calc((36px - calc(13px * 1.2)) / 2);
++  padding-top: calc((36px - calc(13px * 1.2)) / 2);
+   color: #000;
+   line-height: 1.2;
+   margin: 0;
+diff --git a/packages/components/src/utils/colors-values.js b/packages/components/src/utils/colors-values.js
+index 2d54d4935d3a33..0462fc98b532fa 100644
+--- a/packages/components/src/utils/colors-values.js
++++ b/packages/components/src/utils/colors-values.js
+@@ -155,6 +155,7 @@ export const UI = {
+ 	background: BASE.white,
+ 	backgroundDisabled: LIGHT_GRAY[ 200 ],
+ 	border: G2.gray[ 700 ],
++	borderHover: G2.gray[ 700 ],
+ 	borderFocus: ADMIN.themeDark10,
+ 	borderDisabled: G2.gray[ 400 ],
+ 	borderLight: G2.gray[ 200 ],
+diff --git a/packages/components/src/utils/config-values.js b/packages/components/src/utils/config-values.js
+index c19b7d73c5a554..b32c0101c933fb 100644
+--- a/packages/components/src/utils/config-values.js
++++ b/packages/components/src/utils/config-values.js
+@@ -4,10 +4,40 @@
+ import { space } from '../ui/utils/space';
+ import { COLORS } from './colors-values';
+ 
+-const CONTROL_HEIGHT = '30px';
++const CONTROL_HEIGHT = '36px';
+ const CONTROL_PADDING_X = '12px';
+ 
++const CONTROL_PROPS = {
++	controlSurfaceColor: COLORS.white,
++	controlTextActiveColor: COLORS.ui.theme,
++	controlPaddingX: CONTROL_PADDING_X,
++	controlPaddingXLarge: `calc(${ CONTROL_PADDING_X } * 1.3334)`,
++	controlPaddingXSmall: `calc(${ CONTROL_PADDING_X } / 1.3334)`,
++	controlBackgroundColor: COLORS.white,
++	controlBorderRadius: '2px',
++	controlBorderColor: COLORS.gray[ 700 ],
++	controlBoxShadow: 'transparent',
++	controlBorderColorHover: COLORS.gray[ 700 ],
++	controlBoxShadowFocus: `0 0 0, 0.5px, ${ COLORS.admin.theme }`,
++	controlDestructiveBorderColor: COLORS.alert.red,
++	controlHeight: CONTROL_HEIGHT,
++	controlHeightXSmall: `calc( ${ CONTROL_HEIGHT } * 0.6 )`,
++	controlHeightSmall: `calc( ${ CONTROL_HEIGHT } * 0.8 )`,
++	controlHeightLarge: `calc( ${ CONTROL_HEIGHT } * 1.2 )`,
++	controlHeightXLarge: `calc( ${ CONTROL_HEIGHT } * 1.4 )`,
++};
++const SEGMENTED_CONTROL_PROPS = {
++	segmentedControlBackgroundColor: CONTROL_PROPS.controlBackgroundColor,
++	segmentedControlBorderColor: COLORS.ui.border,
++	segmentedControlBackdropBackgroundColor: CONTROL_PROPS.controlSurfaceColor,
++	segmentedControlBackdropBorderColor: COLORS.ui.border,
++	segmentedControlBackdropBoxShadow: 'transparent',
++	segmentedControlButtonColorActive: CONTROL_PROPS.controlBackgroundColor,
++};
++
+ export default {
++	...CONTROL_PROPS,
++	...SEGMENTED_CONTROL_PROPS,
+ 	colorDivider: 'rgba(0, 0, 0, 0.1)',
+ 	colorScrollbarThumb: 'rgba(0, 0, 0, 0.2)',
+ 	colorScrollbarThumbHover: 'rgba(0, 0, 0, 0.5)',
+@@ -33,20 +63,6 @@ export default {
+ 	fontWeight: 'normal',
+ 	fontWeightHeading: '600',
+ 	gridBase: '4px',
+-	controlPaddingX: CONTROL_PADDING_X,
+-	controlPaddingXLarge: `calc(${ CONTROL_PADDING_X } * 1.3334)`,
+-	controlPaddingXSmall: `calc(${ CONTROL_PADDING_X } / 1.3334)`,
+-	controlBackgroundColor: COLORS.white,
+-	controlBorderRadius: '2px',
+-	controlBorderColor: COLORS.gray[ 700 ],
+-	controlBoxShadow: 'transparent',
+-	controlBorderColorHover: COLORS.gray[ 700 ],
+-	controlBoxShadowFocus: `0 0 0, 0.5px, ${ COLORS.admin }`,
+-	controlDestructiveBorderColor: COLORS.alert.red,
+-	controlHeight: CONTROL_HEIGHT,
+-	controlHeightLarge: `calc( ${ CONTROL_HEIGHT } * 1.2 )`,
+-	controlHeightSmall: `calc( ${ CONTROL_HEIGHT } * 0.8 )`,
+-	controlHeightXSmall: `calc( ${ CONTROL_HEIGHT } * 0.6 )`,
+ 	cardBorderRadius: '2px',
+ 	cardPaddingXSmall: `${ space( 2 ) }`,
+ 	cardPaddingSmall: `${ space( 4 ) }`,
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 4589afd554f1a7..d01a781b3f9c91 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -37,6 +37,7 @@
+ 		"src/icon/**/*",
+ 		"src/scroll-lock/**/*",
+ 		"src/scrollable/**/*",
++		"src/segmented-control/**/*",
+ 		"src/shortcut/**/*",
+ 		"src/spacer/**/*",
+ 		"src/spinner/**/*",

@@ -1,0 +1,74 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d7741f4caa9886..04453e4a3d2c81 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -36,6 +36,7 @@
+ -   `SlotFill`: fix dependencies of `Fill` registration effects ([#67071](https://github.com/WordPress/gutenberg/pull/67071)).
+ -   `SlotFill`: rewrite the `Slot` component from class component to functional ([#67153](https://github.com/WordPress/gutenberg/pull/67153)).
+ -   `Menu.ItemHelpText`: Fix text wrapping to prevent unintended word breaks ([#67011](https://github.com/WordPress/gutenberg/pull/67011)).
++-   `BorderBoxControl`: Suppress redundant warnings for deprecated 36px size ([#67213](https://github.com/WordPress/gutenberg/pull/67213)).
+ 
+ ## 28.12.0 (2024-11-16)
+ 
+diff --git a/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx b/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
+index 8f125cdb8f9261..0c887ab5f701c3 100644
+--- a/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
+@@ -67,6 +67,7 @@ const BorderBoxControlSplitControls = (
+ 		isCompact: true,
+ 		__experimentalIsRenderedInSidebar,
+ 		size,
++		__shouldNotWarnDeprecated36pxSize: true,
+ 	};
+ 
+ 	const mergedRef = useMergeRefs( [ setPopoverAnchor, forwardedRef ] );
+diff --git a/packages/components/src/border-box-control/border-box-control/component.tsx b/packages/components/src/border-box-control/border-box-control/component.tsx
+index d2d77adc69eb89..0e84c7b56ee483 100644
+--- a/packages/components/src/border-box-control/border-box-control/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control/component.tsx
+@@ -118,6 +118,7 @@ const UnconnectedBorderBoxControl = (
+ 						__experimentalIsRenderedInSidebar={
+ 							__experimentalIsRenderedInSidebar
+ 						}
++						__shouldNotWarnDeprecated36pxSize
+ 						size={ size }
+ 					/>
+ 				) : (
+diff --git a/packages/components/src/border-control/border-control/hook.ts b/packages/components/src/border-control/border-control/hook.ts
+index 67af7ce42416c3..9b0f064c51921f 100644
+--- a/packages/components/src/border-control/border-control/hook.ts
++++ b/packages/components/src/border-control/border-control/hook.ts
+@@ -38,6 +38,7 @@ export function useBorderControl(
+ 		width,
+ 		__experimentalIsRenderedInSidebar = false,
+ 		__next40pxDefaultSize,
++		__shouldNotWarnDeprecated36pxSize,
+ 		...otherProps
+ 	} = useContextSystem( props, 'BorderControl' );
+ 
+@@ -45,6 +46,7 @@ export function useBorderControl(
+ 		componentName: 'BorderControl',
+ 		__next40pxDefaultSize,
+ 		size,
++		__shouldNotWarnDeprecated36pxSize,
+ 	} );
+ 
+ 	const computedSize =
+diff --git a/packages/components/src/border-control/types.ts b/packages/components/src/border-control/types.ts
+index 8ab614907684d2..ecd3f67c9be08d 100644
+--- a/packages/components/src/border-control/types.ts
++++ b/packages/components/src/border-control/types.ts
+@@ -116,6 +116,13 @@ export type BorderControlProps = ColorProps &
+ 		 * @default false
+ 		 */
+ 		__next40pxDefaultSize?: boolean;
++		/**
++		 * Do not throw a warning for the deprecated 36px default size.
++		 * For internal components of other components that already throw the warning.
++		 *
++		 * @ignore
++		 */
++		__shouldNotWarnDeprecated36pxSize?: boolean;
+ 	};
+ 
+ export type DropdownProps = ColorProps &

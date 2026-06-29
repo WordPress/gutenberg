@@ -1,0 +1,362 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1651c0e99b4f89..126bfc82e31776 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -27,6 +27,7 @@
+ ### Enhancements
+ 
+ -   Wrapped `Modal` in a `forwardRef` call ([#36831](https://github.com/WordPress/gutenberg/pull/36831)).
++-   Refactor `DateTime` class component to functional component ([#36835](https://github.com/WordPress/gutenberg/pull/36835))
+ -   Unify styles for `ColorIndicator` with how they appear in Global Styles ([#37028](https://github.com/WordPress/gutenberg/pull/37028))
+ -   Add support for rendering the `ColorPalette` in a `Dropdown` when opened in the sidebar ([#37067](https://github.com/WordPress/gutenberg/pull/37067))
+ -   Show an incremental sequence of numbers (1/2/3/4/5) as a label of the font size, when we have at most five font sizes, where at least one the them contains a complex css value(clamp, var, etc..). We do this because complex css values cannot be calculated properly and the incremental sequence of numbers as labels can help the user better mentally map the different available font sizes. ([#37038](https://github.com/WordPress/gutenberg/pull/37038))
+diff --git a/packages/components/src/date-time/README.md b/packages/components/src/date-time/README.md
+index 1ecaa8b68e3833..acf927d12c51d7 100644
+--- a/packages/components/src/date-time/README.md
++++ b/packages/components/src/date-time/README.md
+@@ -64,3 +64,10 @@ A callback function which receives a Date object representing a day as an argume
+ 
+ -   Type: `Function`
+ -   Required: No
++
++### onMonthPreviewed
++
++A callback invoked when selecting the previous/next month in the date picker. The callback receives the new month date in the ISO format as an argument.
++
++- Type: `Function`
++- Required: No
+diff --git a/packages/components/src/date-time/date.js b/packages/components/src/date-time/date.js
+index d70181d3d655d3..fd6869ac843339 100644
+--- a/packages/components/src/date-time/date.js
++++ b/packages/components/src/date-time/date.js
+@@ -11,9 +11,14 @@ import DayPickerSingleDateController from 'react-dates/lib/components/DayPickerS
+ /**
+  * WordPress dependencies
+  */
+-import { Component, createRef, useEffect, useRef } from '@wordpress/element';
++import { useEffect, useRef } from '@wordpress/element';
+ import { isRTL, _n, sprintf } from '@wordpress/i18n';
+ 
++/**
++ * Internal dependencies
++ */
++import { getMomentDate } from './utils';
++
+ /**
+  * Module Constants
+  */
+@@ -70,21 +75,18 @@ function DatePickerDay( { day, events = [] } ) {
+ 	);
+ }
+ 
+-class DatePicker extends Component {
+-	constructor() {
+-		super( ...arguments );
+-
+-		this.onChangeMoment = this.onChangeMoment.bind( this );
+-		this.nodeRef = createRef();
+-		this.onMonthPreviewedHandler = this.onMonthPreviewedHandler.bind(
+-			this
+-		);
+-	}
+-
+-	onMonthPreviewedHandler( newMonthDate ) {
+-		this.props.onMonthPreviewed?.( newMonthDate.toISOString() );
+-		this.keepFocusInside();
+-	}
++function DatePicker( {
++	currentDate,
++	onChange,
++	events,
++	isInvalidDate,
++	onMonthPreviewed,
++} ) {
++	const nodeRef = useRef();
++	const onMonthPreviewedHandler = ( newMonthDate ) => {
++		onMonthPreviewed?.( newMonthDate.toISOString() );
++		keepFocusInside();
++	};
+ 
+ 	/*
+ 	 * Todo: We should remove this function ASAP.
+@@ -92,21 +94,21 @@ class DatePicker extends Component {
+ 	 * This focus loss closes the date picker popover.
+ 	 * Ideally we should add an upstream commit on react-dates to fix this issue.
+ 	 */
+-	keepFocusInside() {
+-		if ( ! this.nodeRef.current ) {
++	const keepFocusInside = () => {
++		if ( ! nodeRef.current ) {
+ 			return;
+ 		}
+ 
+-		const { ownerDocument } = this.nodeRef.current;
++		const { ownerDocument } = nodeRef.current;
+ 		const { activeElement } = ownerDocument;
+ 
+ 		// If focus was lost.
+ 		if (
+ 			! activeElement ||
+-			! this.nodeRef.current.contains( ownerDocument.activeElement )
++			! nodeRef.current.contains( ownerDocument.activeElement )
+ 		) {
+ 			// Retrieve the focus region div.
+-			const focusRegion = this.nodeRef.current.querySelector(
++			const focusRegion = nodeRef.current.querySelector(
+ 				'.DayPicker_focusRegion'
+ 			);
+ 			if ( ! focusRegion ) {
+@@ -115,11 +117,9 @@ class DatePicker extends Component {
+ 			// Keep the focus on focus region.
+ 			focusRegion.focus();
+ 		}
+-	}
+-
+-	onChangeMoment( newDate ) {
+-		const { currentDate, onChange } = this.props;
++	};
+ 
++	const onChangeMoment = ( newDate ) => {
+ 		// If currentDate is null, use now as momentTime to designate hours, minutes, seconds.
+ 		const momentDate = currentDate ? moment( currentDate ) : moment();
+ 		const momentTime = {
+@@ -131,71 +131,54 @@ class DatePicker extends Component {
+ 		onChange( newDate.set( momentTime ).format( TIMEZONELESS_FORMAT ) );
+ 
+ 		// Keep focus on the date picker.
+-		this.keepFocusInside();
+-	}
+-
+-	/**
+-	 * Create a Moment object from a date string. With no currentDate supplied, default to a Moment
+-	 * object representing now. If a null value is passed, return a null value.
+-	 *
+-	 * @param {?string} currentDate Date representing the currently selected date or null to signify no selection.
+-	 * @return {?moment.Moment} Moment object for selected date or null.
+-	 */
+-	getMomentDate( currentDate ) {
+-		if ( null === currentDate ) {
+-			return null;
+-		}
+-		return currentDate ? moment( currentDate ) : moment();
+-	}
++		keepFocusInside();
++	};
+ 
+-	getEventsPerDay( day ) {
+-		if ( ! this.props.events?.length ) {
++	const getEventsPerDay = ( day ) => {
++		if ( ! events?.length ) {
+ 			return [];
+ 		}
+ 
+-		return this.props.events.filter( ( eventDay ) =>
++		return events.filter( ( eventDay ) =>
+ 			day.isSame( eventDay.date, 'day' )
+ 		);
+-	}
+-
+-	render() {
+-		const { currentDate, isInvalidDate } = this.props;
+-		const momentDate = this.getMomentDate( currentDate );
+-
+-		return (
+-			<div className="components-datetime__date" ref={ this.nodeRef }>
+-				<DayPickerSingleDateController
+-					date={ momentDate }
+-					daySize={ 30 }
+-					focused
+-					hideKeyboardShortcutsPanel
+-					// This is a hack to force the calendar to update on month or year change
+-					// https://github.com/airbnb/react-dates/issues/240#issuecomment-361776665
+-					key={ `datepicker-controller-${
+-						momentDate ? momentDate.format( 'MM-YYYY' ) : 'null'
+-					}` }
+-					noBorder
+-					numberOfMonths={ 1 }
+-					onDateChange={ this.onChangeMoment }
+-					transitionDuration={ 0 }
+-					weekDayFormat="ddd"
+-					dayAriaLabelFormat={ ARIAL_LABEL_TIME_FORMAT }
+-					isRTL={ isRTL() }
+-					isOutsideRange={ ( date ) => {
+-						return isInvalidDate && isInvalidDate( date.toDate() );
+-					} }
+-					onPrevMonthClick={ this.onMonthPreviewedHandler }
+-					onNextMonthClick={ this.onMonthPreviewedHandler }
+-					renderDayContents={ ( day ) => (
+-						<DatePickerDay
+-							day={ day }
+-							events={ this.getEventsPerDay( day ) }
+-						/>
+-					) }
+-				/>
+-			</div>
+-		);
+-	}
++	};
++
++	const momentDate = getMomentDate( currentDate );
++
++	return (
++		<div className="components-datetime__date" ref={ nodeRef }>
++			<DayPickerSingleDateController
++				date={ momentDate }
++				daySize={ 30 }
++				focused
++				hideKeyboardShortcutsPanel
++				// This is a hack to force the calendar to update on month or year change
++				// https://github.com/airbnb/react-dates/issues/240#issuecomment-361776665
++				key={ `datepicker-controller-${
++					momentDate ? momentDate.format( 'MM-YYYY' ) : 'null'
++				}` }
++				noBorder
++				numberOfMonths={ 1 }
++				onDateChange={ onChangeMoment }
++				transitionDuration={ 0 }
++				weekDayFormat="ddd"
++				dayAriaLabelFormat={ ARIAL_LABEL_TIME_FORMAT }
++				isRTL={ isRTL() }
++				isOutsideRange={ ( date ) => {
++					return isInvalidDate && isInvalidDate( date.toDate() );
++				} }
++				onPrevMonthClick={ onMonthPreviewedHandler }
++				onNextMonthClick={ onMonthPreviewedHandler }
++				renderDayContents={ ( day ) => (
++					<DatePickerDay
++						day={ day }
++						events={ getEventsPerDay( day ) }
++					/>
++				) }
++			/>
++		</div>
++	);
+ }
+ 
+ export default DatePicker;
+diff --git a/packages/components/src/date-time/test/date.js b/packages/components/src/date-time/test/date.js
+index 3646249f14b003..4149a76e4eddf2 100644
+--- a/packages/components/src/date-time/test/date.js
++++ b/packages/components/src/date-time/test/date.js
+@@ -31,32 +31,6 @@ describe( 'DatePicker', () => {
+ 		expect( moment.isMoment( date ) ).toBe( true );
+ 	} );
+ 
+-	describe( 'getMomentDate', () => {
+-		it( 'should return a Moment object representing a given date string', () => {
+-			const currentDate = '1986-10-18T23:00:00';
+-			const wrapper = shallow( <DatePicker /> );
+-			const momentDate = wrapper.instance().getMomentDate( currentDate );
+-
+-			expect( moment.isMoment( momentDate ) ).toBe( true );
+-			expect( momentDate.isSame( moment( currentDate ) ) ).toBe( true );
+-		} );
+-
+-		it( 'should return null when given a null agrument', () => {
+-			const currentDate = null;
+-			const wrapper = shallow( <DatePicker /> );
+-			const momentDate = wrapper.instance().getMomentDate( currentDate );
+-
+-			expect( momentDate ).toBeNull();
+-		} );
+-
+-		it( 'should return a Moment object representing now when given an undefined argument', () => {
+-			const wrapper = shallow( <DatePicker /> );
+-			const momentDate = wrapper.instance().getMomentDate();
+-
+-			expect( moment.isMoment( momentDate ) ).toBe( true );
+-		} );
+-	} );
+-
+ 	describe( 'onChangeMoment', () => {
+ 		it( 'should call onChange with a formated date of the input', () => {
+ 			const onChangeSpy = jest.fn();
+@@ -69,7 +43,7 @@ describe( 'DatePicker', () => {
+ 			);
+ 			const newDate = moment();
+ 
+-			wrapper.instance().onChangeMoment( newDate );
++			wrapper.childAt( 0 ).props().onDateChange( newDate );
+ 
+ 			expect( onChangeSpy ).toHaveBeenCalledWith(
+ 				newDate.format( TIMEZONELESS_FORMAT )
+@@ -87,7 +61,7 @@ describe( 'DatePicker', () => {
+ 				minutes: current.minutes(),
+ 				seconds: current.seconds(),
+ 			} );
+-			wrapper.instance().onChangeMoment( newDate );
++			wrapper.childAt( 0 ).props().onDateChange( newDate );
+ 
+ 			expect(
+ 				moment( onChangeSpyArgument ).isSame(
+@@ -110,7 +84,7 @@ describe( 'DatePicker', () => {
+ 				minutes: current.minutes(),
+ 				seconds: current.seconds(),
+ 			} );
+-			wrapper.instance().onChangeMoment( newDate );
++			wrapper.childAt( 0 ).props().onDateChange( newDate );
+ 
+ 			expect(
+ 				moment( onChangeSpyArgument ).isSame(
+diff --git a/packages/components/src/date-time/test/utils.js b/packages/components/src/date-time/test/utils.js
+new file mode 100644
+index 00000000000000..0f7d7a78ae390f
+--- /dev/null
++++ b/packages/components/src/date-time/test/utils.js
+@@ -0,0 +1,32 @@
++/**
++ * External dependencies
++ */
++import moment from 'moment';
++
++/**
++ * Internal dependencies
++ */
++import { getMomentDate } from '../utils';
++
++describe( 'getMomentDate', () => {
++	it( 'should return a Moment object representing a given date string', () => {
++		const currentDate = '1986-10-18T23:00:00';
++		const momentDate = getMomentDate( currentDate );
++
++		expect( moment.isMoment( momentDate ) ).toBe( true );
++		expect( momentDate.isSame( moment( currentDate ) ) ).toBe( true );
++	} );
++
++	it( 'should return null when given a null argument', () => {
++		const currentDate = null;
++		const momentDate = getMomentDate( currentDate );
++
++		expect( momentDate ).toBeNull();
++	} );
++
++	it( 'should return a Moment object representing now when given an undefined argument', () => {
++		const momentDate = getMomentDate();
++
++		expect( moment.isMoment( momentDate ) ).toBe( true );
++	} );
++} );
+diff --git a/packages/components/src/date-time/utils.js b/packages/components/src/date-time/utils.js
+new file mode 100644
+index 00000000000000..857b831ebb17ac
+--- /dev/null
++++ b/packages/components/src/date-time/utils.js
+@@ -0,0 +1,18 @@
++/**
++ * External dependencies
++ */
++import moment from 'moment';
++
++/**
++ * Create a Moment object from a date string. With no date supplied, default to a Moment
++ * object representing now. If a null value is passed, return a null value.
++ *
++ * @param {?string} date Date representing the currently selected date or null to signify no selection.
++ * @return {?moment.Moment} Moment object for selected date or null.
++ */
++export const getMomentDate = ( date ) => {
++	if ( null === date ) {
++		return null;
++	}
++	return date ? moment( date ) : moment();
++};

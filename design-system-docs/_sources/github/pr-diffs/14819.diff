@@ -1,0 +1,180 @@
+diff --git a/packages/components/src/form-token-field/index.js b/packages/components/src/form-token-field/index.js
+index 18c05f4f0ffa45..6f519def020627 100644
+--- a/packages/components/src/form-token-field/index.js
++++ b/packages/components/src/form-token-field/index.js
+@@ -11,6 +11,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
+ import { Component } from '@wordpress/element';
+ import { withInstanceId } from '@wordpress/compose';
+ import { BACKSPACE, ENTER, UP, DOWN, LEFT, RIGHT, SPACE, DELETE, ESCAPE } from '@wordpress/keycodes';
++import isShallowEqual from '@wordpress/is-shallow-equal';
+ 
+ /**
+  * Internal dependencies
+@@ -48,13 +49,20 @@ class FormTokenField extends Component {
+ 		this.onInputChange = this.onInputChange.bind( this );
+ 		this.bindInput = this.bindInput.bind( this );
+ 		this.bindTokensAndInput = this.bindTokensAndInput.bind( this );
++		this.updateSuggestions = this.updateSuggestions.bind( this );
+ 	}
+ 
+-	componentDidUpdate() {
++	componentDidUpdate( prevProps ) {
+ 		// Make sure to focus the input when the isActive state is true.
+ 		if ( this.state.isActive && ! this.input.hasFocus() ) {
+ 			this.input.focus();
+ 		}
++
++		const { suggestions, value } = this.props;
++		const suggestionsDidUpdate = ! isShallowEqual( suggestions, prevProps.suggestions );
++		if ( suggestionsDidUpdate || value !== prevProps.value ) {
++			this.updateSuggestions( suggestionsDidUpdate );
++		}
+ 	}
+ 
+ 	static getDerivedStateFromProps( props, state ) {
+@@ -193,38 +201,14 @@ class FormTokenField extends Component {
+ 		const separator = this.props.tokenizeOnSpace ? /[ ,\t]+/ : /[,\t]+/;
+ 		const items = text.split( separator );
+ 		const tokenValue = last( items ) || '';
+-		const inputHasMinimumChars = tokenValue.trim().length > 1;
+-		const matchingSuggestions = this.getMatchingSuggestions( tokenValue );
+-		const hasVisibleSuggestions = inputHasMinimumChars && !! matchingSuggestions.length;
+ 
+ 		if ( items.length > 1 ) {
+ 			this.addNewTokens( items.slice( 0, -1 ) );
+ 		}
+ 
+-		this.setState( {
+-			incompleteTokenValue: tokenValue,
+-			selectedSuggestionIndex: -1,
+-			selectedSuggestionScroll: false,
+-			isExpanded: false,
+-		} );
++		this.setState( { incompleteTokenValue: tokenValue }, this.updateSuggestions );
+ 
+ 		this.props.onInputChange( tokenValue );
+-
+-		if ( inputHasMinimumChars ) {
+-			this.setState( {
+-				isExpanded: hasVisibleSuggestions,
+-			} );
+-
+-			if ( !! matchingSuggestions.length ) {
+-				this.props.debouncedSpeak( sprintf( _n(
+-					'%d result found, use up and down arrow keys to navigate.',
+-					'%d results found, use up and down arrow keys to navigate.',
+-					matchingSuggestions.length
+-				), matchingSuggestions.length ), 'assertive' );
+-			} else {
+-				this.props.debouncedSpeak( __( 'No results.' ), 'assertive' );
+-			}
+-		}
+ 	}
+ 
+ 	handleDeleteKey( deleteToken ) {
+@@ -467,6 +451,38 @@ class FormTokenField extends Component {
+ 		return this.props.saveTransform( this.state.incompleteTokenValue ).length > 0;
+ 	}
+ 
++	updateSuggestions( resetSelectedSuggestion = true ) {
++		const { incompleteTokenValue } = this.state;
++
++		const inputHasMinimumChars = incompleteTokenValue.trim().length > 1;
++		const matchingSuggestions = this.getMatchingSuggestions( incompleteTokenValue );
++		const hasMatchingSuggestions = matchingSuggestions.length > 0;
++
++		const newState = {
++			isExpanded: inputHasMinimumChars && hasMatchingSuggestions,
++		};
++		if ( resetSelectedSuggestion ) {
++			newState.selectedSuggestionIndex = -1;
++			newState.selectedSuggestionScroll = false;
++		}
++
++		this.setState( newState );
++
++		if ( inputHasMinimumChars ) {
++			const { debouncedSpeak } = this.props;
++
++			const message = hasMatchingSuggestions ?
++				sprintf( _n(
++					'%d result found, use up and down arrow keys to navigate.',
++					'%d results found, use up and down arrow keys to navigate.',
++					matchingSuggestions.length
++				), matchingSuggestions.length ) :
++				__( 'No results.' );
++
++			debouncedSpeak( message, 'assertive' );
++		}
++	}
++
+ 	renderTokensAndInput() {
+ 		const components = map( this.props.value, this.renderToken );
+ 		components.splice( this.getIndexOfInput(), 0, this.renderInput() );
+diff --git a/packages/components/src/form-token-field/test/index.js b/packages/components/src/form-token-field/test/index.js
+index 3199cdfa447cd3..3bfcf6e5baf0d7 100644
+--- a/packages/components/src/form-token-field/test/index.js
++++ b/packages/components/src/form-token-field/test/index.js
+@@ -237,6 +237,26 @@ describe( 'FormTokenField', function() {
+ 			expect( getSelectedSuggestion() ).toBe( null );
+ 			expect( getTokensHTML() ).toEqual( [ 'foo', 'bar', 'with' ] );
+ 		} );
++
++		it( 'should re-render when suggestions prop has changed', function() {
++			wrapper.setState( {
++				tokenSuggestions: [],
++				isExpanded: true,
++			} );
++			expect( getSuggestionsText() ).toEqual( [] );
++			setText( 'so' );
++			expect( getSuggestionsText() ).toEqual( [] );
++
++			wrapper.setState( {
++				tokenSuggestions: fixtures.specialSuggestions.default,
++			} );
++			expect( getSuggestionsText() ).toEqual( fixtures.matchingSuggestions.so );
++
++			wrapper.setState( {
++				tokenSuggestions: [],
++			} );
++			expect( getSuggestionsText() ).toEqual( [] );
++		} );
+ 	} );
+ 
+ 	describe( 'adding tokens', function() {
+diff --git a/packages/components/src/form-token-field/test/lib/fixtures.js b/packages/components/src/form-token-field/test/lib/fixtures.js
+index b5d27598fd7802..6811275377788d 100644
+--- a/packages/components/src/form-token-field/test/lib/fixtures.js
++++ b/packages/components/src/form-token-field/test/lib/fixtures.js
+@@ -6,6 +6,11 @@ export default {
+ 		htmlUnescaped: [ 'a&nbsp;&nbsp;&nbsp;b', 'i&nbsp;&lt;3&nbsp;tags', '1&amp;2&amp;3&amp;4' ],
+ 	},
+ 	specialSuggestions: {
++		default: [
++			'the', 'of', 'and', 'to', 'a', 'in', 'for', 'is', 'on', 'that', 'by', 'this', 'with', 'i', 'you', 'it',
++			'not', 'or', 'be', 'are', 'from', 'at', 'as', 'your', 'all', 'have', 'new', 'more', 'an', 'was', 'we',
++			'associate', 'snake', 'pipes', 'sound',
++		],
+ 		textEscaped: [ '&lt;3', 'Stuff &amp; Things', 'Tags &amp; Stuff', 'Tags &amp; Stuff 2' ],
+ 		textUnescaped: [ '<3', 'Stuff & Things', 'Tags & Stuff', 'Tags & Stuff 2' ],
+ 		matchAmpersandUnescaped: [
+diff --git a/packages/components/src/form-token-field/test/lib/token-field-wrapper.js b/packages/components/src/form-token-field/test/lib/token-field-wrapper.js
+index 15729d4404041f..12dc95581b4336 100644
+--- a/packages/components/src/form-token-field/test/lib/token-field-wrapper.js
++++ b/packages/components/src/form-token-field/test/lib/token-field-wrapper.js
+@@ -11,13 +11,10 @@ import { Component } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
++import fixtures from './fixtures';
+ import TokenField from '../../';
+ 
+-const suggestions = [
+-	'the', 'of', 'and', 'to', 'a', 'in', 'for', 'is', 'on', 'that', 'by', 'this', 'with', 'i', 'you', 'it',
+-	'not', 'or', 'be', 'are', 'from', 'at', 'as', 'your', 'all', 'have', 'new', 'more', 'an', 'was', 'we',
+-	'associate', 'snake', 'pipes', 'sound',
+-];
++const { specialSuggestions: { default: suggestions } } = fixtures;
+ 
+ function unescapeAndFormatSpaces( str ) {
+ 	const nbsp = String.fromCharCode( 160 );

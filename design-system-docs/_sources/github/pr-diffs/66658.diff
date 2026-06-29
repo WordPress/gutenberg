@@ -1,0 +1,58 @@
+diff --git a/packages/components/src/external-link/stories/index.story.tsx b/packages/components/src/external-link/stories/index.story.tsx
+index 91131e0c88aab0..eb70999413187f 100644
+--- a/packages/components/src/external-link/stories/index.story.tsx
++++ b/packages/components/src/external-link/stories/index.story.tsx
+@@ -10,7 +10,8 @@ import ExternalLink from '..';
+ 
+ const meta: Meta< typeof ExternalLink > = {
+ 	component: ExternalLink,
+-	title: 'Components/ExternalLink',
++	title: 'Components/Navigation/ExternalLink',
++	id: 'components-externallink',
+ 	argTypes: {
+ 		children: { control: { type: 'text' } },
+ 	},
+diff --git a/packages/components/src/navigator/stories/index.story.tsx b/packages/components/src/navigator/stories/index.story.tsx
+index e9e342bb0d2eee..bd2cdc17a1263c 100644
+--- a/packages/components/src/navigator/stories/index.story.tsx
++++ b/packages/components/src/navigator/stories/index.story.tsx
+@@ -21,7 +21,8 @@ const meta: Meta< typeof Navigator > = {
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+ 		BackButton: Navigator.BackButton,
+ 	},
+-	title: 'Components/Navigator',
++	title: 'Components/Navigation/Navigator',
++	id: 'components-navigator',
+ 	argTypes: {
+ 		as: { control: { type: null } },
+ 		children: { control: { type: null } },
+diff --git a/packages/components/src/tree-grid/stories/index.story.tsx b/packages/components/src/tree-grid/stories/index.story.tsx
+index 44af154c685b2f..5a1ed95e1fd627 100644
+--- a/packages/components/src/tree-grid/stories/index.story.tsx
++++ b/packages/components/src/tree-grid/stories/index.story.tsx
+@@ -16,7 +16,8 @@ import { Button } from '../../button';
+ import InputControl from '../../input-control';
+ 
+ const meta: Meta< typeof TreeGrid > = {
+-	title: 'Components (Experimental)/TreeGrid',
++	title: 'Components (Experimental)/Navigation/TreeGrid',
++	id: 'components-experimental-treegrid',
+ 	component: TreeGrid,
+ 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+ 	subcomponents: { TreeGridRow, TreeGridCell },
+diff --git a/storybook/preview.js b/storybook/preview.js
+index 7672e7ebdcdff2..9e9dd587b39c4c 100644
+--- a/storybook/preview.js
++++ b/storybook/preview.js
+@@ -133,9 +133,11 @@ export const parameters = {
+ 					'Actions',
+ 					'Containers',
+ 					'Feedback',
++					'Navigation',
+ 					'Utilities',
+ 				],
+ 				'Components (Experimental)',
++				[ 'Navigation' ],
+ 				'Icons',
+ 			],
+ 		},

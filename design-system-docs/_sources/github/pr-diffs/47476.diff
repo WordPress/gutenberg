@@ -1,0 +1,73 @@
+diff --git a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+index ddc08d9985fbbc..69020210efbf57 100644
+--- a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
++++ b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+@@ -152,7 +152,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+               data-wp-component="VStack"
+             >
+               <div
+-                class="components-dropdown"
++                class="components-dropdown components-color-palette__transparent-background"
+                 tabindex="-1"
+               >
+                 <button
+diff --git a/packages/components/src/color-palette/index.tsx b/packages/components/src/color-palette/index.tsx
+index c967703141ea34..95853d70e1895e 100644
+--- a/packages/components/src/color-palette/index.tsx
++++ b/packages/components/src/color-palette/index.tsx
+@@ -241,6 +241,7 @@ function UnforwardedColorPalette(
+ 		<VStack spacing={ 3 } ref={ forwardedRef } { ...otherProps }>
+ 			{ ! disableCustomColors && (
+ 				<CustomColorPickerDropdown
++					className="components-color-palette__transparent-background"
+ 					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
+ 					renderContent={ renderCustomColorPicker }
+ 					renderToggle={ ( { isOpen, onToggle } ) => (
+diff --git a/packages/components/src/color-palette/style.scss b/packages/components/src/color-palette/style.scss
+index 82f1858d64d3c4..ae031fc6ee04a3 100644
+--- a/packages/components/src/color-palette/style.scss
++++ b/packages/components/src/color-palette/style.scss
+@@ -1,12 +1,4 @@
+-.components-color-palette__custom-color {
+-	position: relative;
+-	border: none;
+-	background: none;
+-	border-radius: $radius-block-ui;
+-	height: $grid-unit-80;
+-	padding: $grid-unit-15;
+-	font-family: inherit;
+-	width: 100%;
++.components-color-palette__transparent-background {
+ 	// The background image creates a checkerboard pattern. Ignore rtlcss to
+ 	// make it work both in LTR and RTL.
+ 	// See https://github.com/WordPress/gutenberg/pull/42510
+@@ -17,6 +9,16 @@
+ 	background-position: 0 0, 24px 24px;
+ 	/*rtl:end:ignore*/
+ 	background-size: calc(2 * 24px) calc(2 * 24px);
++}
++
++.components-color-palette__custom-color {
++	position: relative;
++	border: none;
++	background: none;
++	border-radius: $radius-block-ui;
++	height: $grid-unit-80;
++	padding: $grid-unit-15;
++	font-family: inherit;
+ 	box-sizing: border-box;
+ 	color: $white;
+ 	cursor: pointer;
+diff --git a/packages/components/src/color-palette/test/__snapshots__/index.tsx.snap b/packages/components/src/color-palette/test/__snapshots__/index.tsx.snap
+index d4ea4015c639fa..f878b31b585086 100644
+--- a/packages/components/src/color-palette/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/color-palette/test/__snapshots__/index.tsx.snap
+@@ -173,7 +173,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+     data-wp-component="VStack"
+   >
+     <div
+-      class="components-dropdown"
++      class="components-dropdown components-color-palette__transparent-background"
+       tabindex="-1"
+     >
+       <button

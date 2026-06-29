@@ -1,0 +1,85 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b8134a90bf5f97..22f479e5a5dcbe 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ ### Bug Fix
+ 
+ -   `Button`: Fix RTL alignment for buttons containing an icon and text ([#44787](https://github.com/WordPress/gutenberg/pull/44787)).
++-   `FontSizePicker`: Fallback to font size `slug` if `name` is undefined  ([#45041](https://github.com/WordPress/gutenberg/pull/45041)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/font-size-picker/index.tsx b/packages/components/src/font-size-picker/index.tsx
+index 78158b33f43dbe..ed3a691c301f84 100644
+--- a/packages/components/src/font-size-picker/index.tsx
++++ b/packages/components/src/font-size-picker/index.tsx
+@@ -169,12 +169,15 @@ const UnforwardedFontSizePicker = (
+ 		__( 'Currently selected font size: %s' ),
+ 		selectedOption.name
+ 	);
++
++	const headerAriaLabel = `${ __( 'Size' ) } ${ headerHint || '' }`;
++
+ 	return (
+ 		<Container ref={ ref } className="components-font-size-picker">
+ 			<VisuallyHidden as="legend">{ __( 'Font size' ) }</VisuallyHidden>
+ 			<Spacer>
+ 				<HStack className="components-font-size-picker__header">
+-					<HeaderLabel>
++					<HeaderLabel aria-label={ headerAriaLabel }>
+ 						{ __( 'Size' ) }
+ 						{ headerHint && (
+ 							<HeaderHint className="components-font-size-picker__header__hint">
+diff --git a/packages/components/src/font-size-picker/test/index.tsx b/packages/components/src/font-size-picker/test/index.tsx
+index 4965097790480f..719dd612c45d95 100644
+--- a/packages/components/src/font-size-picker/test/index.tsx
++++ b/packages/components/src/font-size-picker/test/index.tsx
+@@ -244,6 +244,47 @@ describe( 'FontSizePicker', () => {
+ 					'XL'
+ 				);
+ 			} );
++			it( 'should use font size `slug` for for header hint label by default', () => {
++				const fontSizes = [
++					{
++						name: 'Allosaurus Large',
++						slug: 'allosaurus-l',
++						size: '20rem',
++					},
++				];
++				render(
++					<FontSizePicker
++						fontSizes={ fontSizes }
++						value={ fontSizes[ 0 ].size }
++						__nextHasNoMarginBottom
++					/>
++				);
++
++				const largeFontSizeElement = screen.getByLabelText(
++					'Size Allosaurus Large(rem)'
++				);
++				expect( largeFontSizeElement ).toBeInTheDocument();
++			} );
++			it( 'should fallback to font size `slug` for header hint label if `name` is undefined', () => {
++				const fontSizes = [
++					{
++						slug: 'gigantosaurus',
++						size: '1000px',
++					},
++				];
++				render(
++					<FontSizePicker
++						fontSizes={ fontSizes }
++						value={ fontSizes[ 0 ].size }
++						__nextHasNoMarginBottom
++					/>
++				);
++
++				const giganticFontSizeElement = screen.getByLabelText(
++					'Size gigantosaurus(px)'
++				);
++				expect( giganticFontSizeElement ).toBeInTheDocument();
++			} );
+ 		} );
+ 	} );
+ } );

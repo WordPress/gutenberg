@@ -1,0 +1,2736 @@
+diff --git a/package-lock.json b/package-lock.json
+index 6d1d7be1649121..e58d76c7d2a927 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -16708,6 +16708,7 @@
+ 				"change-case": "^4.1.2",
+ 				"classnames": "^2.3.1",
+ 				"colord": "^2.7.0",
++				"date-fns": "^2.28.0",
+ 				"dom-scroll-into-view": "^1.2.1",
+ 				"downshift": "^6.0.15",
+ 				"framer-motion": "^6.2.8",
+@@ -16715,12 +16716,11 @@
+ 				"highlight-words-core": "^1.2.2",
+ 				"lodash": "^4.17.21",
+ 				"memize": "^1.1.0",
+-				"moment": "^2.26.0",
+ 				"re-resizable": "^6.4.0",
+ 				"react-colorful": "^5.3.1",
+-				"react-dates": "^21.8.0",
+ 				"reakit": "^1.3.8",
+ 				"remove-accents": "^0.4.2",
++				"use-lilius": "^2.0.1",
+ 				"uuid": "^8.3.0"
+ 			},
+ 			"dependencies": {
+@@ -16746,6 +16746,11 @@
+ 					"resolved": "https://registry.npmjs.org/csstype/-/csstype-3.0.10.tgz",
+ 					"integrity": "sha512-2u44ZG2OcNUO9HDp/Jl8C07x6pU/eTR3ncV91SiK3dhG9TWvRVsCoJw14Ckx5DgWkzGA3waZWO3d7pgqpUI/XA=="
+ 				},
++				"date-fns": {
++					"version": "2.28.0",
++					"resolved": "https://registry.npmjs.org/date-fns/-/date-fns-2.28.0.tgz",
++					"integrity": "sha512-8d35hViGYx/QH0icHYCeLmsLmMUheMmTyV9Fcm6gvNwdw31yXXH+O85sOBJ+OLnLQMKZowvpKb6FgMIQjcpvQw=="
++				},
+ 				"moment": {
+ 					"version": "2.29.3",
+ 					"resolved": "https://registry.npmjs.org/moment/-/moment-2.29.3.tgz",
+@@ -16756,19 +16761,12 @@
+ 					"resolved": "https://registry.npmjs.org/react-dates/-/react-dates-21.8.0.tgz",
+ 					"integrity": "sha512-PPriGqi30CtzZmoHiGdhlA++YPYPYGCZrhydYmXXQ6RAvAsaONcPtYgXRTLozIOrsQ5mSo40+DiA5eOFHnZ6xw==",
+ 					"requires": {
+-						"airbnb-prop-types": "^2.15.0",
+-						"consolidated-events": "^1.1.1 || ^2.0.0",
+ 						"enzyme-shallow-equal": "^1.0.0",
+-						"is-touch-device": "^1.0.1",
+ 						"lodash": "^4.1.1",
+ 						"object.assign": "^4.1.0",
+ 						"object.values": "^1.1.0",
+ 						"prop-types": "^15.7.2",
+ 						"raf": "^3.4.1",
+-						"react-moment-proptypes": "^1.6.0",
+-						"react-outside-click-handler": "^1.2.4",
+-						"react-portal": "^4.2.0",
+-						"react-with-direction": "^1.3.1",
+ 						"react-with-styles": "^4.1.0",
+ 						"react-with-styles-interface-css": "^6.0.0"
+ 					}
+@@ -16778,11 +16776,9 @@
+ 					"resolved": "https://registry.npmjs.org/react-with-styles/-/react-with-styles-4.2.0.tgz",
+ 					"integrity": "sha512-tZCTY27KriRNhwHIbg1NkSdTTOSfXDg6Z7s+Q37mtz0Ym7Sc7IOr3PzVt4qJhJMW6Nkvfi3g34FuhtiGAJCBQA==",
+ 					"requires": {
+-						"airbnb-prop-types": "^2.14.0",
+ 						"hoist-non-react-statics": "^3.2.1",
+ 						"object.assign": "^4.1.0",
+-						"prop-types": "^15.7.2",
+-						"react-with-direction": "^1.3.1"
++						"prop-types": "^15.7.2"
+ 					}
+ 				},
+ 				"react-with-styles-interface-css": {
+@@ -16790,8 +16786,7 @@
+ 					"resolved": "https://registry.npmjs.org/react-with-styles-interface-css/-/react-with-styles-interface-css-6.0.0.tgz",
+ 					"integrity": "sha512-6khSG1Trf4L/uXOge/ZAlBnq2O2PEXlQEqAhCRbvzaQU4sksIkdwpCPEl6d+DtP3+IdhyffTWuHDO9lhe1iYvA==",
+ 					"requires": {
+-						"array.prototype.flat": "^1.2.1",
+-						"global-cache": "^1.2.1"
++						"array.prototype.flat": "^1.2.1"
+ 					}
+ 				}
+ 			}
+@@ -18462,263 +18457,6 @@
+ 				"symbol.prototype.description": "^1.0.0"
+ 			}
+ 		},
+-		"airbnb-prop-types": {
+-			"version": "2.16.0",
+-			"resolved": "https://registry.npmjs.org/airbnb-prop-types/-/airbnb-prop-types-2.16.0.tgz",
+-			"integrity": "sha512-7WHOFolP/6cS96PhKNrslCLMYAI8yB1Pp6u6XmxozQOiZbsI5ycglZr5cHhBFfuRcQQjzCMith5ZPZdYiJCxUg==",
+-			"requires": {
+-				"array.prototype.find": "^2.1.1",
+-				"function.prototype.name": "^1.1.2",
+-				"is-regex": "^1.1.0",
+-				"object-is": "^1.1.2",
+-				"object.assign": "^4.1.0",
+-				"object.entries": "^1.1.2",
+-				"prop-types": "^15.7.2",
+-				"prop-types-exact": "^1.2.0",
+-				"react-is": "^16.13.1"
+-			},
+-			"dependencies": {
+-				"array.prototype.find": {
+-					"version": "2.1.1",
+-					"resolved": "https://registry.npmjs.org/array.prototype.find/-/array.prototype.find-2.1.1.tgz",
+-					"integrity": "sha512-mi+MYNJYLTx2eNYy+Yh6raoQacCsNeeMUaspFPh9Y141lFSsWxxB8V9mM2ye+eqiRs917J6/pJ4M9ZPzenWckA==",
+-					"requires": {
+-						"define-properties": "^1.1.3",
+-						"es-abstract": "^1.17.4"
+-					}
+-				},
+-				"define-properties": {
+-					"version": "1.1.3",
+-					"resolved": "https://registry.npmjs.org/define-properties/-/define-properties-1.1.3.tgz",
+-					"integrity": "sha512-3MqfYKj2lLzdMSf8ZIZE/V+Zuy+BgD6f164e8K2w7dgnpKArBDerGYpM46IYYcjnkdPNMjPk9A6VFB8+3SKlXQ==",
+-					"requires": {
+-						"object-keys": "^1.0.12"
+-					}
+-				},
+-				"es-abstract": {
+-					"version": "1.17.7",
+-					"resolved": "https://registry.npmjs.org/es-abstract/-/es-abstract-1.17.7.tgz",
+-					"integrity": "sha512-VBl/gnfcJ7OercKA9MVaegWsBHFjV492syMudcnQZvt/Dw8ezpcOHYZXa/J96O8vx+g4x65YKhxOwDUh63aS5g==",
+-					"requires": {
+-						"es-to-primitive": "^1.2.1",
+-						"function-bind": "^1.1.1",
+-						"has": "^1.0.3",
+-						"has-symbols": "^1.0.1",
+-						"is-callable": "^1.2.2",
+-						"is-regex": "^1.1.1",
+-						"object-inspect": "^1.8.0",
+-						"object-keys": "^1.1.1",
+-						"object.assign": "^4.1.1",
+-						"string.prototype.trimend": "^1.0.1",
+-						"string.prototype.trimstart": "^1.0.1"
+-					},
+-					"dependencies": {
+-						"object-keys": {
+-							"version": "1.1.1",
+-							"resolved": "https://registry.npmjs.org/object-keys/-/object-keys-1.1.1.tgz",
+-							"integrity": "sha512-NuAESUOUMrlIXOfHKzD6bpPu3tYt3xvjNdRIQ+FeT0lNb4K8WR70CaDxhuNguS2XG+GjkyMwOzsN5ZktImfhLA=="
+-						},
+-						"object.assign": {
+-							"version": "4.1.2",
+-							"resolved": "https://registry.npmjs.org/object.assign/-/object.assign-4.1.2.tgz",
+-							"integrity": "sha512-ixT2L5THXsApyiUPYKmW+2EHpXXe5Ii3M+f4e+aJFAHao5amFRW6J0OO6c/LU8Be47utCx2GL89hxGB6XSmKuQ==",
+-							"requires": {
+-								"call-bind": "^1.0.0",
+-								"define-properties": "^1.1.3",
+-								"has-symbols": "^1.0.1",
+-								"object-keys": "^1.1.1"
+-							}
+-						}
+-					}
+-				},
+-				"es-to-primitive": {
+-					"version": "1.2.1",
+-					"resolved": "https://registry.npmjs.org/es-to-primitive/-/es-to-primitive-1.2.1.tgz",
+-					"integrity": "sha512-QCOllgZJtaUo9miYBcLChTUaHNjJF3PYs1VidD7AwiEj1kYxKeQTctLAezAOH5ZKRH0g2IgPn6KwB4IT8iRpvA==",
+-					"requires": {
+-						"is-callable": "^1.1.4",
+-						"is-date-object": "^1.0.1",
+-						"is-symbol": "^1.0.2"
+-					}
+-				},
+-				"function.prototype.name": {
+-					"version": "1.1.3",
+-					"resolved": "https://registry.npmjs.org/function.prototype.name/-/function.prototype.name-1.1.3.tgz",
+-					"integrity": "sha512-H51qkbNSp8mtkJt+nyW1gyStBiKZxfRqySNUR99ylq6BPXHKI4SEvIlTKp4odLfjRKJV04DFWMU3G/YRlQOsag==",
+-					"requires": {
+-						"call-bind": "^1.0.0",
+-						"define-properties": "^1.1.3",
+-						"es-abstract": "^1.18.0-next.1",
+-						"functions-have-names": "^1.2.1"
+-					},
+-					"dependencies": {
+-						"es-abstract": {
+-							"version": "1.18.0-next.2",
+-							"resolved": "https://registry.npmjs.org/es-abstract/-/es-abstract-1.18.0-next.2.tgz",
+-							"integrity": "sha512-Ih4ZMFHEtZupnUh6497zEL4y2+w8+1ljnCyaTa+adcoafI1GOvMwFlDjBLfWR7y9VLfrjRJe9ocuHY1PSR9jjw==",
+-							"requires": {
+-								"call-bind": "^1.0.2",
+-								"es-to-primitive": "^1.2.1",
+-								"function-bind": "^1.1.1",
+-								"get-intrinsic": "^1.0.2",
+-								"has": "^1.0.3",
+-								"has-symbols": "^1.0.1",
+-								"is-callable": "^1.2.2",
+-								"is-negative-zero": "^2.0.1",
+-								"is-regex": "^1.1.1",
+-								"object-inspect": "^1.9.0",
+-								"object-keys": "^1.1.1",
+-								"object.assign": "^4.1.2",
+-								"string.prototype.trimend": "^1.0.3",
+-								"string.prototype.trimstart": "^1.0.3"
+-							},
+-							"dependencies": {
+-								"call-bind": {
+-									"version": "1.0.2",
+-									"resolved": "https://registry.npmjs.org/call-bind/-/call-bind-1.0.2.tgz",
+-									"integrity": "sha512-7O+FbCihrB5WGbFYesctwmTKae6rOiIzmz1icreWJ+0aA7LJfuqhEso2T9ncpcFtzMQtzXf2QGGueWJGTYsqrA==",
+-									"requires": {
+-										"function-bind": "^1.1.1",
+-										"get-intrinsic": "^1.0.2"
+-									}
+-								}
+-							}
+-						},
+-						"object-keys": {
+-							"version": "1.1.1",
+-							"resolved": "https://registry.npmjs.org/object-keys/-/object-keys-1.1.1.tgz",
+-							"integrity": "sha512-NuAESUOUMrlIXOfHKzD6bpPu3tYt3xvjNdRIQ+FeT0lNb4K8WR70CaDxhuNguS2XG+GjkyMwOzsN5ZktImfhLA=="
+-						},
+-						"object.assign": {
+-							"version": "4.1.2",
+-							"resolved": "https://registry.npmjs.org/object.assign/-/object.assign-4.1.2.tgz",
+-							"integrity": "sha512-ixT2L5THXsApyiUPYKmW+2EHpXXe5Ii3M+f4e+aJFAHao5amFRW6J0OO6c/LU8Be47utCx2GL89hxGB6XSmKuQ==",
+-							"requires": {
+-								"call-bind": "^1.0.0",
+-								"define-properties": "^1.1.3",
+-								"has-symbols": "^1.0.1",
+-								"object-keys": "^1.1.1"
+-							}
+-						}
+-					}
+-				},
+-				"has-symbols": {
+-					"version": "1.0.1",
+-					"resolved": "https://registry.npmjs.org/has-symbols/-/has-symbols-1.0.1.tgz",
+-					"integrity": "sha512-PLcsoqu++dmEIZB+6totNFKq/7Do+Z0u4oT0zKOJNl3lYK6vGwwu2hjHs+68OEZbTjiUE9bgOABXbP/GvrS0Kg=="
+-				},
+-				"is-callable": {
+-					"version": "1.2.2",
+-					"resolved": "https://registry.npmjs.org/is-callable/-/is-callable-1.2.2.tgz",
+-					"integrity": "sha512-dnMqspv5nU3LoewK2N/y7KLtxtakvTuaCsU9FU50/QDmdbHNy/4/JuRtMHqRU22o3q+W89YQndQEeCVwK+3qrA=="
+-				},
+-				"is-regex": {
+-					"version": "1.1.1",
+-					"resolved": "https://registry.npmjs.org/is-regex/-/is-regex-1.1.1.tgz",
+-					"integrity": "sha512-1+QkEcxiLlB7VEyFtyBg94e08OAsvq7FUBgApTq/w2ymCLyKJgDPsybBENVtA7XCQEgEXxKPonG+mvYRxh/LIg==",
+-					"requires": {
+-						"has-symbols": "^1.0.1"
+-					}
+-				},
+-				"is-symbol": {
+-					"version": "1.0.3",
+-					"resolved": "https://registry.npmjs.org/is-symbol/-/is-symbol-1.0.3.tgz",
+-					"integrity": "sha512-OwijhaRSgqvhm/0ZdAcXNZt9lYdKFpcRDT5ULUuYXPoT794UNOdU+gpT6Rzo7b4V2HUl/op6GqY894AZwv9faQ==",
+-					"requires": {
+-						"has-symbols": "^1.0.1"
+-					}
+-				},
+-				"object-inspect": {
+-					"version": "1.9.0",
+-					"resolved": "https://registry.npmjs.org/object-inspect/-/object-inspect-1.9.0.tgz",
+-					"integrity": "sha512-i3Bp9iTqwhaLZBxGkRfo5ZbE07BQRT7MGu8+nNgwW9ItGp1TzCTw2DLEoWwjClxBjOFI/hWljTAmYGCEwmtnOw=="
+-				},
+-				"object-is": {
+-					"version": "1.1.4",
+-					"resolved": "https://registry.npmjs.org/object-is/-/object-is-1.1.4.tgz",
+-					"integrity": "sha512-1ZvAZ4wlF7IyPVOcE1Omikt7UpaFlOQq0HlSti+ZvDH3UiD2brwGMwDbyV43jao2bKJ+4+WdPJHSd7kgzKYVqg==",
+-					"requires": {
+-						"call-bind": "^1.0.0",
+-						"define-properties": "^1.1.3"
+-					}
+-				},
+-				"object.entries": {
+-					"version": "1.1.3",
+-					"resolved": "https://registry.npmjs.org/object.entries/-/object.entries-1.1.3.tgz",
+-					"integrity": "sha512-ym7h7OZebNS96hn5IJeyUmaWhaSM4SVtAPPfNLQEI2MYWCO2egsITb9nab2+i/Pwibx+R0mtn+ltKJXRSeTMGg==",
+-					"requires": {
+-						"call-bind": "^1.0.0",
+-						"define-properties": "^1.1.3",
+-						"es-abstract": "^1.18.0-next.1",
+-						"has": "^1.0.3"
+-					},
+-					"dependencies": {
+-						"es-abstract": {
+-							"version": "1.18.0-next.2",
+-							"resolved": "https://registry.npmjs.org/es-abstract/-/es-abstract-1.18.0-next.2.tgz",
+-							"integrity": "sha512-Ih4ZMFHEtZupnUh6497zEL4y2+w8+1ljnCyaTa+adcoafI1GOvMwFlDjBLfWR7y9VLfrjRJe9ocuHY1PSR9jjw==",
+-							"requires": {
+-								"call-bind": "^1.0.2",
+-								"es-to-primitive": "^1.2.1",
+-								"function-bind": "^1.1.1",
+-								"get-intrinsic": "^1.0.2",
+-								"has": "^1.0.3",
+-								"has-symbols": "^1.0.1",
+-								"is-callable": "^1.2.2",
+-								"is-negative-zero": "^2.0.1",
+-								"is-regex": "^1.1.1",
+-								"object-inspect": "^1.9.0",
+-								"object-keys": "^1.1.1",
+-								"object.assign": "^4.1.2",
+-								"string.prototype.trimend": "^1.0.3",
+-								"string.prototype.trimstart": "^1.0.3"
+-							},
+-							"dependencies": {
+-								"call-bind": {
+-									"version": "1.0.2",
+-									"resolved": "https://registry.npmjs.org/call-bind/-/call-bind-1.0.2.tgz",
+-									"integrity": "sha512-7O+FbCihrB5WGbFYesctwmTKae6rOiIzmz1icreWJ+0aA7LJfuqhEso2T9ncpcFtzMQtzXf2QGGueWJGTYsqrA==",
+-									"requires": {
+-										"function-bind": "^1.1.1",
+-										"get-intrinsic": "^1.0.2"
+-									}
+-								}
+-							}
+-						},
+-						"object-keys": {
+-							"version": "1.1.1",
+-							"resolved": "https://registry.npmjs.org/object-keys/-/object-keys-1.1.1.tgz",
+-							"integrity": "sha512-NuAESUOUMrlIXOfHKzD6bpPu3tYt3xvjNdRIQ+FeT0lNb4K8WR70CaDxhuNguS2XG+GjkyMwOzsN5ZktImfhLA=="
+-						},
+-						"object.assign": {
+-							"version": "4.1.2",
+-							"resolved": "https://registry.npmjs.org/object.assign/-/object.assign-4.1.2.tgz",
+-							"integrity": "sha512-ixT2L5THXsApyiUPYKmW+2EHpXXe5Ii3M+f4e+aJFAHao5amFRW6J0OO6c/LU8Be47utCx2GL89hxGB6XSmKuQ==",
+-							"requires": {
+-								"call-bind": "^1.0.0",
+-								"define-properties": "^1.1.3",
+-								"has-symbols": "^1.0.1",
+-								"object-keys": "^1.1.1"
+-							}
+-						}
+-					}
+-				},
+-				"react-is": {
+-					"version": "16.13.1",
+-					"resolved": "https://registry.npmjs.org/react-is/-/react-is-16.13.1.tgz",
+-					"integrity": "sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ=="
+-				},
+-				"string.prototype.trimend": {
+-					"version": "1.0.3",
+-					"resolved": "https://registry.npmjs.org/string.prototype.trimend/-/string.prototype.trimend-1.0.3.tgz",
+-					"integrity": "sha512-ayH0pB+uf0U28CtjlLvL7NaohvR1amUvVZk+y3DYb0Ey2PUV5zPkkKy9+U1ndVEIXO8hNg18eIv9Jntbii+dKw==",
+-					"requires": {
+-						"call-bind": "^1.0.0",
+-						"define-properties": "^1.1.3"
+-					}
+-				}
+-			}
+-		},
+ 		"ajv": {
+ 			"version": "8.7.1",
+ 			"resolved": "https://registry.npmjs.org/ajv/-/ajv-8.7.1.tgz",
+@@ -27952,11 +27690,6 @@
+ 				}
+ 			}
+ 		},
+-		"brcast": {
+-			"version": "2.0.2",
+-			"resolved": "https://registry.npmjs.org/brcast/-/brcast-2.0.2.tgz",
+-			"integrity": "sha512-Tfn5JSE7hrUlFcOoaLzVvkbgIemIorMIyoMr3TgvszWW7jFt2C9PdeMLtysYD9RU0MmU17b69+XJG1eRY2OBRg=="
+-		},
+ 		"brorand": {
+ 			"version": "1.1.0",
+ 			"resolved": "https://registry.npmjs.org/brorand/-/brorand-1.1.0.tgz",
+@@ -29669,11 +29402,6 @@
+ 			"integrity": "sha1-PXz0Rk22RG6mRL9LOVB/mFEAjo4=",
+ 			"dev": true
+ 		},
+-		"consolidated-events": {
+-			"version": "2.0.2",
+-			"resolved": "https://registry.npmjs.org/consolidated-events/-/consolidated-events-2.0.2.tgz",
+-			"integrity": "sha512-2/uRVMdRypf5z/TW/ncD/66l75P5hH2vM/GR8Jf8HLc2xnfJtmina6F6du8+v4Z2vTrMo7jC+W1tmEEuuELgkQ=="
+-		},
+ 		"constant-case": {
+ 			"version": "3.0.4",
+ 			"resolved": "https://registry.npmjs.org/constant-case/-/constant-case-3.0.4.tgz",
+@@ -31714,11 +31442,6 @@
+ 				}
+ 			}
+ 		},
+-		"direction": {
+-			"version": "1.0.4",
+-			"resolved": "https://registry.npmjs.org/direction/-/direction-1.0.4.tgz",
+-			"integrity": "sha512-GYqKi1aH7PJXxdhTeZBFrg8vUBeKXi+cNprXsC1kpJcbcVnV9wBsrOu1cQEdG0WeQwlfHiy3XvnKfIrJ2R0NzQ=="
+-		},
+ 		"discontinuous-range": {
+ 			"version": "1.0.0",
+ 			"resolved": "https://registry.npmjs.org/discontinuous-range/-/discontinuous-range-1.0.0.tgz",
+@@ -31765,24 +31488,6 @@
+ 				"esutils": "^2.0.2"
+ 			}
+ 		},
+-		"document.contains": {
+-			"version": "1.0.2",
+-			"resolved": "https://registry.npmjs.org/document.contains/-/document.contains-1.0.2.tgz",
+-			"integrity": "sha512-YcvYFs15mX8m3AO1QNQy3BlIpSMfNRj3Ujk2BEJxsZG+HZf7/hZ6jr7mDpXrF8q+ff95Vef5yjhiZxm8CGJr6Q==",
+-			"requires": {
+-				"define-properties": "^1.1.3"
+-			},
+-			"dependencies": {
+-				"define-properties": {
+-					"version": "1.1.3",
+-					"resolved": "https://registry.npmjs.org/define-properties/-/define-properties-1.1.3.tgz",
+-					"integrity": "sha512-3MqfYKj2lLzdMSf8ZIZE/V+Zuy+BgD6f164e8K2w7dgnpKArBDerGYpM46IYYcjnkdPNMjPk9A6VFB8+3SKlXQ==",
+-					"requires": {
+-						"object-keys": "^1.0.12"
+-					}
+-				}
+-			}
+-		},
+ 		"dom-accessibility-api": {
+ 			"version": "0.5.14",
+ 			"resolved": "https://registry.npmjs.org/dom-accessibility-api/-/dom-accessibility-api-0.5.14.tgz",
+@@ -36062,7 +35767,8 @@
+ 		"functions-have-names": {
+ 			"version": "1.2.1",
+ 			"resolved": "https://registry.npmjs.org/functions-have-names/-/functions-have-names-1.2.1.tgz",
+-			"integrity": "sha512-j48B/ZI7VKs3sgeI2cZp7WXWmZXu7Iq5pl5/vptV5N2mq+DGFuS/ulaDjtaoLpYzuD6u8UgrUKHfgo7fDTSiBA=="
++			"integrity": "sha512-j48B/ZI7VKs3sgeI2cZp7WXWmZXu7Iq5pl5/vptV5N2mq+DGFuS/ulaDjtaoLpYzuD6u8UgrUKHfgo7fDTSiBA==",
++			"dev": true
+ 		},
+ 		"gauge": {
+ 			"version": "2.7.4",
+@@ -36696,15 +36402,6 @@
+ 				"process": "^0.11.10"
+ 			}
+ 		},
+-		"global-cache": {
+-			"version": "1.2.1",
+-			"resolved": "https://registry.npmjs.org/global-cache/-/global-cache-1.2.1.tgz",
+-			"integrity": "sha512-EOeUaup5DgWKlCMhA9YFqNRIlZwoxt731jCh47WBV9fQqHgXhr3Fa55hfgIUqilIcPsfdNKN7LHjrNY+Km40KA==",
+-			"requires": {
+-				"define-properties": "^1.1.2",
+-				"is-symbol": "^1.0.1"
+-			}
+-		},
+ 		"global-modules": {
+ 			"version": "2.0.0",
+ 			"resolved": "https://registry.npmjs.org/global-modules/-/global-modules-2.0.0.tgz",
+@@ -38769,11 +38466,6 @@
+ 				"text-extensions": "^1.0.0"
+ 			}
+ 		},
+-		"is-touch-device": {
+-			"version": "1.0.1",
+-			"resolved": "https://registry.npmjs.org/is-touch-device/-/is-touch-device-1.0.1.tgz",
+-			"integrity": "sha512-LAYzo9kMT1b2p19L/1ATGt2XcSilnzNlyvq6c0pbPRVisLbAPpLqr53tIJS00kvrTkj0HtR8U7+u8X0yR8lPSw=="
+-		},
+ 		"is-typedarray": {
+ 			"version": "1.0.0",
+ 			"resolved": "https://registry.npmjs.org/is-typedarray/-/is-typedarray-1.0.0.tgz",
+@@ -49992,16 +49684,6 @@
+ 				"react-is": "^16.8.1"
+ 			}
+ 		},
+-		"prop-types-exact": {
+-			"version": "1.2.0",
+-			"resolved": "https://registry.npmjs.org/prop-types-exact/-/prop-types-exact-1.2.0.tgz",
+-			"integrity": "sha512-K+Tk3Kd9V0odiXFP9fwDHUYRyvK3Nun3GVyPapSIs5OBkITAm15W0CPFD/YKTkMUAbc0b9CUwRQp2ybiBIq+eA==",
+-			"requires": {
+-				"has": "^1.0.3",
+-				"object.assign": "^4.1.0",
+-				"reflect.ownkeys": "^0.2.0"
+-			}
+-		},
+ 		"propagate": {
+ 			"version": "2.0.1",
+ 			"resolved": "https://registry.npmjs.org/propagate/-/propagate-2.0.1.tgz",
+@@ -50684,14 +50366,6 @@
+ 			"integrity": "sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==",
+ 			"dev": true
+ 		},
+-		"react-moment-proptypes": {
+-			"version": "1.7.0",
+-			"resolved": "https://registry.npmjs.org/react-moment-proptypes/-/react-moment-proptypes-1.7.0.tgz",
+-			"integrity": "sha512-ZbOn/P4u469WEGAw5hgkS/E+g1YZqdves2BjYsLluJobzUZCtManhjHiZKjniBVT7MSHM6D/iKtRVzlXVv3ikA==",
+-			"requires": {
+-				"moment": ">=1.6.0"
+-			}
+-		},
+ 		"react-native": {
+ 			"version": "0.66.2",
+ 			"resolved": "https://registry.npmjs.org/react-native/-/react-native-0.66.2.tgz",
+@@ -50995,18 +50669,6 @@
+ 				}
+ 			}
+ 		},
+-		"react-outside-click-handler": {
+-			"version": "1.3.0",
+-			"resolved": "https://registry.npmjs.org/react-outside-click-handler/-/react-outside-click-handler-1.3.0.tgz",
+-			"integrity": "sha512-Te/7zFU0oHpAnctl//pP3hEAeobfeHMyygHB8MnjP6sX5OR8KHT1G3jmLsV3U9RnIYo+Yn+peJYWu+D5tUS8qQ==",
+-			"requires": {
+-				"airbnb-prop-types": "^2.15.0",
+-				"consolidated-events": "^1.1.1 || ^2.0.0",
+-				"document.contains": "^1.0.1",
+-				"object.values": "^1.1.0",
+-				"prop-types": "^15.7.2"
+-			}
+-		},
+ 		"react-popper": {
+ 			"version": "2.2.5",
+ 			"resolved": "https://registry.npmjs.org/react-popper/-/react-popper-2.2.5.tgz",
+@@ -51028,14 +50690,6 @@
+ 				"react-popper": "^2.2.4"
+ 			}
+ 		},
+-		"react-portal": {
+-			"version": "4.2.1",
+-			"resolved": "https://registry.npmjs.org/react-portal/-/react-portal-4.2.1.tgz",
+-			"integrity": "sha512-fE9kOBagwmTXZ3YGRYb4gcMy+kSA+yLO0xnPankjRlfBv4uCpFXqKPfkpsGQQR15wkZ9EssnvTOl1yMzbkxhPQ==",
+-			"requires": {
+-				"prop-types": "^15.5.8"
+-			}
+-		},
+ 		"react-refresh": {
+ 			"version": "0.10.0",
+ 			"resolved": "https://registry.npmjs.org/react-refresh/-/react-refresh-0.10.0.tgz",
+@@ -51196,36 +50850,6 @@
+ 				"prop-types": "^15.6.2"
+ 			}
+ 		},
+-		"react-with-direction": {
+-			"version": "1.3.1",
+-			"resolved": "https://registry.npmjs.org/react-with-direction/-/react-with-direction-1.3.1.tgz",
+-			"integrity": "sha512-aGcM21ZzhqeXFvDCfPj0rVNYuaVXfTz5D3Rbn0QMz/unZe+CCiLHthrjQWO7s6qdfXORgYFtmS7OVsRgSk5LXQ==",
+-			"requires": {
+-				"airbnb-prop-types": "^2.10.0",
+-				"brcast": "^2.0.2",
+-				"deepmerge": "^1.5.2",
+-				"direction": "^1.0.2",
+-				"hoist-non-react-statics": "^3.3.0",
+-				"object.assign": "^4.1.0",
+-				"object.values": "^1.0.4",
+-				"prop-types": "^15.6.2"
+-			},
+-			"dependencies": {
+-				"deepmerge": {
+-					"version": "1.5.2",
+-					"resolved": "https://registry.npmjs.org/deepmerge/-/deepmerge-1.5.2.tgz",
+-					"integrity": "sha512-95k0GDqvBjZavkuvzx/YqVLv/6YYa17fz6ILMSf7neqQITCPbnfEnQvEgMPNjH4kgobe7+WIL0yJEHku+H3qtQ=="
+-				},
+-				"hoist-non-react-statics": {
+-					"version": "3.3.2",
+-					"resolved": "https://registry.npmjs.org/hoist-non-react-statics/-/hoist-non-react-statics-3.3.2.tgz",
+-					"integrity": "sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==",
+-					"requires": {
+-						"react-is": "^16.7.0"
+-					}
+-				}
+-			}
+-		},
+ 		"read": {
+ 			"version": "1.0.7",
+ 			"resolved": "https://registry.npmjs.org/read/-/read-1.0.7.tgz",
+@@ -51511,11 +51135,6 @@
+ 				"@babel/runtime": "^7.9.2"
+ 			}
+ 		},
+-		"reflect.ownkeys": {
+-			"version": "0.2.0",
+-			"resolved": "https://registry.npmjs.org/reflect.ownkeys/-/reflect.ownkeys-0.2.0.tgz",
+-			"integrity": "sha1-dJrO7H8/34tj+SegSAnpDFwLNGA="
+-		},
+ 		"refractor": {
+ 			"version": "3.4.0",
+ 			"resolved": "https://registry.npmjs.org/refractor/-/refractor-3.4.0.tgz",
+@@ -58041,6 +57660,21 @@
+ 				"use-isomorphic-layout-effect": "^1.0.0"
+ 			}
+ 		},
++		"use-lilius": {
++			"version": "2.0.1",
++			"resolved": "https://registry.npmjs.org/use-lilius/-/use-lilius-2.0.1.tgz",
++			"integrity": "sha512-Dque7ax/91znesQWz2wM95O5iTHWzAsKQa2e7qvyPhXev/UAfgQIiXSqiB96tfiwQ+8+371FDK7oftuzw0Awhg==",
++			"requires": {
++				"date-fns": "^2.28.0"
++			},
++			"dependencies": {
++				"date-fns": {
++					"version": "2.28.0",
++					"resolved": "https://registry.npmjs.org/date-fns/-/date-fns-2.28.0.tgz",
++					"integrity": "sha512-8d35hViGYx/QH0icHYCeLmsLmMUheMmTyV9Fcm6gvNwdw31yXXH+O85sOBJ+OLnLQMKZowvpKb6FgMIQjcpvQw=="
++				}
++			}
++		},
+ 		"use-memo-one": {
+ 			"version": "1.1.1",
+ 			"resolved": "https://registry.npmjs.org/use-memo-one/-/use-memo-one-1.1.1.tgz",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index af8f3c52a3fd6b..e541f11cee70dd 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,11 @@
+ 
+ -   `ComboboxControl`: Normalize hyphen-like characters to an ASCII hyphen ([#42942](https://github.com/WordPress/gutenberg/pull/42942)).
+ 
++### Internal
++
++-   `DateTimePicker`, `TimePicker`, `DatePicker`: Switch from `moment` to `date-fns` ([#43005](https://github.com/WordPress/gutenberg/pull/43005)).
++-   `DatePicker`: Switch from `react-dates` to `use-lilius` ([#43005](https://github.com/WordPress/gutenberg/pull/43005)).
++
+ ## 19.17.0 (2022-08-10)
+ 
+ ### Bug Fix
+diff --git a/packages/components/package.json b/packages/components/package.json
+index c9227b8cfa6cf3..7860b4a9f3b420 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -56,6 +56,7 @@
+ 		"change-case": "^4.1.2",
+ 		"classnames": "^2.3.1",
+ 		"colord": "^2.7.0",
++		"date-fns": "^2.28.0",
+ 		"dom-scroll-into-view": "^1.2.1",
+ 		"downshift": "^6.0.15",
+ 		"framer-motion": "^6.2.8",
+@@ -63,12 +64,11 @@
+ 		"highlight-words-core": "^1.2.2",
+ 		"lodash": "^4.17.21",
+ 		"memize": "^1.1.0",
+-		"moment": "^2.26.0",
+ 		"re-resizable": "^6.4.0",
+ 		"react-colorful": "^5.3.1",
+-		"react-dates": "^21.8.0",
+ 		"reakit": "^1.3.8",
+ 		"remove-accents": "^0.4.2",
++		"use-lilius": "^2.0.1",
+ 		"uuid": "^8.3.0"
+ 	},
+ 	"peerDependencies": {
+diff --git a/packages/components/src/date-time/constants.ts b/packages/components/src/date-time/constants.ts
+new file mode 100644
+index 00000000000000..ebd88aaf7d4186
+--- /dev/null
++++ b/packages/components/src/date-time/constants.ts
+@@ -0,0 +1 @@
++export const TIMEZONELESS_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+diff --git a/packages/components/src/date-time/date-time/index.tsx b/packages/components/src/date-time/date-time/index.tsx
+index ae82f9a2b3d9db..5324a13a8d7cc8 100644
+--- a/packages/components/src/date-time/date-time/index.tsx
++++ b/packages/components/src/date-time/date-time/index.tsx
+@@ -21,6 +21,7 @@ import { CalendarHelp } from './styles';
+ import { HStack } from '../../h-stack';
+ import { Heading } from '../../heading';
+ import { Spacer } from '../../spacer';
++import { VStack } from '../../v-stack';
+ 
+ export { DatePicker, TimePicker };
+ 
+@@ -63,7 +64,7 @@ function UnforwardedDateTimePicker(
+ 	}
+ 
+ 	return (
+-		<div ref={ ref } className="components-datetime">
++		<VStack ref={ ref } className="components-datetime" spacing={ 4 }>
+ 			{ ! calendarHelpIsVisible && (
+ 				<>
+ 					<TimePicker
+@@ -186,7 +187,7 @@ function UnforwardedDateTimePicker(
+ 					) }
+ 				</HStack>
+ 			) }
+-		</div>
++		</VStack>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/date-time/date/datepicker.scss b/packages/components/src/date-time/date/datepicker.scss
+deleted file mode 100644
+index ed61a12d5edd32..00000000000000
+--- a/packages/components/src/date-time/date/datepicker.scss
++++ /dev/null
+@@ -1,863 +0,0 @@
+-/**
+- * Parts of this source were derived and modified from react-dates,
+- * released under the MIT license.
+- *
+- * https://github.com/airbnb/react-dates
+- *
+- * The MIT License (MIT)
+- *
+- * Copyright (c) 2016 Airbnb
+- *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to deal
+- * in the Software without restriction, including without limitation the rights
+- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+- * copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in all
+- * copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+- * SOFTWARE.
+- */
+-
+-// We don't convert styles to RTL because react-dates uses an isRTL flag instead.
+-/*rtl:begin:ignore*/
+-.PresetDateRangePicker_panel {
+-	padding: 0 22px 11px;
+-}
+-.PresetDateRangePicker_button {
+-	position: relative;
+-	height: 100%;
+-	text-align: center;
+-	background: 0 0;
+-	border: 2px solid #00a699;
+-	color: #00a699;
+-	padding: 4px 12px;
+-	margin-right: 8px;
+-	font: inherit;
+-	font-weight: 700;
+-	line-height: normal;
+-	overflow: visible;
+-	-moz-box-sizing: border-box;
+-	box-sizing: border-box;
+-	cursor: pointer;
+-}
+-.PresetDateRangePicker_button:active {
+-	outline: 0;
+-}
+-.PresetDateRangePicker_button__selected {
+-	color: #fff;
+-	background: #00a699;
+-}
+-.SingleDatePickerInput {
+-	display: inline-block;
+-	background-color: #fff;
+-}
+-.SingleDatePickerInput__withBorder {
+-	border-radius: 2px;
+-	border: 1px solid #dbdbdb;
+-}
+-.SingleDatePickerInput__rtl {
+-	direction: rtl;
+-}
+-.SingleDatePickerInput__disabled {
+-	background-color: #f2f2f2;
+-}
+-.SingleDatePickerInput__block {
+-	display: block;
+-}
+-.SingleDatePickerInput__showClearDate {
+-	padding-right: 30px;
+-}
+-.SingleDatePickerInput_clearDate {
+-	background: 0 0;
+-	border: 0;
+-	color: inherit;
+-	font: inherit;
+-	line-height: normal;
+-	overflow: visible;
+-	cursor: pointer;
+-	padding: 10px;
+-	margin: 0 10px 0 5px;
+-	position: absolute;
+-	right: 0;
+-	top: 50%;
+-	-webkit-transform: translateY(-50%);
+-	-ms-transform: translateY(-50%);
+-	transform: translateY(-50%);
+-}
+-.SingleDatePickerInput_clearDate__default:focus,
+-.SingleDatePickerInput_clearDate__default:hover {
+-	background: #dbdbdb;
+-	border-radius: 50%;
+-}
+-.SingleDatePickerInput_clearDate__small {
+-	padding: 6px;
+-}
+-.SingleDatePickerInput_clearDate__hide {
+-	visibility: hidden;
+-}
+-.SingleDatePickerInput_clearDate_svg {
+-	fill: #82888a;
+-	height: 12px;
+-	width: 15px;
+-	vertical-align: middle;
+-}
+-.SingleDatePickerInput_clearDate_svg__small {
+-	height: 9px;
+-}
+-.SingleDatePickerInput_calendarIcon {
+-	background: 0 0;
+-	border: 0;
+-	color: inherit;
+-	font: inherit;
+-	line-height: normal;
+-	overflow: visible;
+-	cursor: pointer;
+-	display: inline-block;
+-	vertical-align: middle;
+-	padding: 10px;
+-	margin: 0 5px 0 10px;
+-}
+-.SingleDatePickerInput_calendarIcon_svg {
+-	fill: #82888a;
+-	height: 15px;
+-	width: 14px;
+-	vertical-align: middle;
+-}
+-.SingleDatePicker {
+-	position: relative;
+-	display: inline-block;
+-}
+-.SingleDatePicker__block {
+-	display: block;
+-}
+-.SingleDatePicker_picker {
+-	z-index: 1;
+-	background-color: #fff;
+-	position: absolute;
+-}
+-.SingleDatePicker_picker__rtl {
+-	direction: rtl;
+-}
+-.SingleDatePicker_picker__directionLeft {
+-	left: 0;
+-}
+-.SingleDatePicker_picker__directionRight {
+-	right: 0;
+-}
+-.SingleDatePicker_picker__portal {
+-	background-color: rgba(0, 0, 0, 0.3);
+-	position: fixed;
+-	top: 0;
+-	left: 0;
+-	height: 100%;
+-	width: 100%;
+-}
+-.SingleDatePicker_picker__fullScreenPortal {
+-	background-color: #fff;
+-}
+-.SingleDatePicker_closeButton {
+-	background: 0 0;
+-	border: 0;
+-	color: inherit;
+-	font: inherit;
+-	line-height: normal;
+-	overflow: visible;
+-	cursor: pointer;
+-	position: absolute;
+-	top: 0;
+-	right: 0;
+-	padding: 15px;
+-	z-index: 2;
+-}
+-.SingleDatePicker_closeButton:focus,
+-.SingleDatePicker_closeButton:hover {
+-	color: darken(#cacccd, 10%);
+-	text-decoration: none;
+-}
+-.SingleDatePicker_closeButton_svg {
+-	height: 15px;
+-	width: 15px;
+-	fill: #cacccd;
+-}
+-.DayPickerKeyboardShortcuts_buttonReset {
+-	background: 0 0;
+-	border: 0;
+-	border-radius: 0;
+-	color: inherit;
+-	font: inherit;
+-	line-height: normal;
+-	overflow: visible;
+-	padding: 0;
+-	cursor: pointer;
+-	font-size: 14px;
+-}
+-.DayPickerKeyboardShortcuts_buttonReset:active {
+-	outline: 0;
+-}
+-.DayPickerKeyboardShortcuts_show {
+-	width: 22px;
+-	position: absolute;
+-	z-index: 2;
+-}
+-.DayPickerKeyboardShortcuts_show__bottomRight {
+-	border-top: 26px solid transparent;
+-	border-right: 33px solid #00a699;
+-	bottom: 0;
+-	right: 0;
+-}
+-.DayPickerKeyboardShortcuts_show__bottomRight:hover {
+-	border-right: 33px solid #008489;
+-}
+-.DayPickerKeyboardShortcuts_show__topRight {
+-	border-bottom: 26px solid transparent;
+-	border-right: 33px solid #00a699;
+-	top: 0;
+-	right: 0;
+-}
+-.DayPickerKeyboardShortcuts_show__topRight:hover {
+-	border-right: 33px solid #008489;
+-}
+-.DayPickerKeyboardShortcuts_show__topLeft {
+-	border-bottom: 26px solid transparent;
+-	border-left: 33px solid #00a699;
+-	top: 0;
+-	left: 0;
+-}
+-.DayPickerKeyboardShortcuts_show__topLeft:hover {
+-	border-left: 33px solid #008489;
+-}
+-.DayPickerKeyboardShortcuts_showSpan {
+-	color: #fff;
+-	position: absolute;
+-}
+-.DayPickerKeyboardShortcuts_showSpan__bottomRight {
+-	bottom: 0;
+-	right: -28px;
+-}
+-.DayPickerKeyboardShortcuts_showSpan__topRight {
+-	top: 1px;
+-	right: -28px;
+-}
+-.DayPickerKeyboardShortcuts_showSpan__topLeft {
+-	top: 1px;
+-	left: -28px;
+-}
+-.DayPickerKeyboardShortcuts_panel {
+-	overflow: auto;
+-	background: #fff;
+-	border: 1px solid #dbdbdb;
+-	border-radius: 2px;
+-	position: absolute;
+-	top: 0;
+-	bottom: 0;
+-	right: 0;
+-	left: 0;
+-	z-index: 2;
+-	padding: 22px;
+-	margin: 33px;
+-}
+-.DayPickerKeyboardShortcuts_title {
+-	font-size: 16px;
+-	font-weight: 700;
+-	margin: 0;
+-}
+-.DayPickerKeyboardShortcuts_list {
+-	list-style: none;
+-	padding: 0;
+-	font-size: 14px;
+-}
+-.DayPickerKeyboardShortcuts_close {
+-	position: absolute;
+-	right: 22px;
+-	top: 22px;
+-	z-index: 2;
+-}
+-.DayPickerKeyboardShortcuts_close:active {
+-	outline: 0;
+-}
+-.DayPickerKeyboardShortcuts_closeSvg {
+-	height: 15px;
+-	width: 15px;
+-	fill: #cacccd;
+-}
+-.DayPickerKeyboardShortcuts_closeSvg:focus,
+-.DayPickerKeyboardShortcuts_closeSvg:hover {
+-	fill: #82888a;
+-}
+-.CalendarDay {
+-	-moz-box-sizing: border-box;
+-	box-sizing: border-box;
+-	cursor: pointer;
+-	font-size: 14px;
+-	text-align: center;
+-}
+-.CalendarDay:active {
+-	outline: 0;
+-}
+-.CalendarDay__defaultCursor {
+-	cursor: default;
+-}
+-.CalendarDay__default {
+-	border: 1px solid #e4e7e7;
+-	color: #484848;
+-	background: #fff;
+-}
+-.CalendarDay__default:hover {
+-	background: #e4e7e7;
+-	border: 1px double #e4e7e7;
+-	color: inherit;
+-}
+-.CalendarDay__hovered_offset {
+-	background: #f4f5f5;
+-	border: 1px double #e4e7e7;
+-	color: inherit;
+-}
+-.CalendarDay__outside {
+-	border: 0;
+-	background: #fff;
+-	color: #484848;
+-}
+-.CalendarDay__outside:hover {
+-	border: 0;
+-}
+-.CalendarDay__blocked_minimum_nights {
+-	background: #fff;
+-	border: 1px solid #eceeee;
+-	color: #cacccd;
+-}
+-.CalendarDay__blocked_minimum_nights:active,
+-.CalendarDay__blocked_minimum_nights:hover {
+-	background: #fff;
+-	color: #cacccd;
+-}
+-.CalendarDay__highlighted_calendar {
+-	background: #ffe8bc;
+-	color: #484848;
+-}
+-.CalendarDay__highlighted_calendar:active,
+-.CalendarDay__highlighted_calendar:hover {
+-	background: #ffce71;
+-	color: #484848;
+-}
+-.CalendarDay__selected_span {
+-	background: #66e2da;
+-	border: 1px solid #33dacd;
+-	color: #fff;
+-}
+-.CalendarDay__selected_span:active,
+-.CalendarDay__selected_span:hover {
+-	background: #33dacd;
+-	border: 1px solid #33dacd;
+-	color: #fff;
+-}
+-.CalendarDay__last_in_range {
+-	border-right: #00a699;
+-}
+-.CalendarDay__selected,
+-.CalendarDay__selected:active,
+-.CalendarDay__selected:hover {
+-	background: #00a699;
+-	border: 1px solid #00a699;
+-	color: #fff;
+-}
+-.CalendarDay__hovered_span,
+-.CalendarDay__hovered_span:hover {
+-	background: #b2f1ec;
+-	border: 1px solid #80e8e0;
+-	color: #007a87;
+-}
+-.CalendarDay__hovered_span:active {
+-	background: #80e8e0;
+-	border: 1px solid #80e8e0;
+-	color: #007a87;
+-}
+-.CalendarDay__blocked_calendar,
+-.CalendarDay__blocked_calendar:active,
+-.CalendarDay__blocked_calendar:hover {
+-	background: #cacccd;
+-	border: 1px solid #cacccd;
+-	color: #82888a;
+-}
+-.CalendarDay__blocked_out_of_range,
+-.CalendarDay__blocked_out_of_range:active,
+-.CalendarDay__blocked_out_of_range:hover {
+-	background: #fff;
+-	border: 1px solid #e4e7e7;
+-	color: #cacccd;
+-}
+-.CalendarMonth {
+-	background: #fff;
+-	text-align: center;
+-	vertical-align: top;
+-	-webkit-user-select: none;
+-	-moz-user-select: none;
+-	-ms-user-select: none;
+-	user-select: none;
+-}
+-.CalendarMonth_table {
+-	border-collapse: collapse;
+-	border-spacing: 0;
+-}
+-.CalendarMonth_verticalSpacing {
+-	border-collapse: separate;
+-}
+-.CalendarMonth_caption {
+-	color: #484848;
+-	font-size: 18px;
+-	text-align: center;
+-	padding-top: 22px;
+-	padding-bottom: 37px;
+-	caption-side: initial;
+-}
+-.CalendarMonth_caption__verticalScrollable {
+-	padding-top: 12px;
+-	padding-bottom: 7px;
+-}
+-.CalendarMonthGrid {
+-	background: #fff;
+-	text-align: left;
+-	z-index: 0;
+-}
+-.CalendarMonthGrid__animating {
+-	z-index: 1;
+-}
+-.CalendarMonthGrid__horizontal {
+-	position: absolute;
+-	left: 0;
+-}
+-.CalendarMonthGrid__vertical {
+-	margin: 0 auto;
+-}
+-.CalendarMonthGrid__vertical_scrollable {
+-	margin: 0 auto;
+-	overflow-y: scroll;
+-}
+-.CalendarMonthGrid_month__horizontal {
+-	display: inline-block;
+-	vertical-align: top;
+-	min-height: 100%;
+-}
+-.CalendarMonthGrid_month__hideForAnimation {
+-	position: absolute;
+-	z-index: -1;
+-	opacity: 0;
+-	pointer-events: none;
+-}
+-.CalendarMonthGrid_month__hidden {
+-	visibility: hidden;
+-}
+-.DayPickerNavigation {
+-	position: relative;
+-	z-index: 2;
+-}
+-.DayPickerNavigation__horizontal {
+-	height: 0;
+-}
+-.DayPickerNavigation__verticalDefault {
+-	position: absolute;
+-	width: 100%;
+-	height: 52px;
+-	bottom: 0;
+-	left: 0;
+-}
+-.DayPickerNavigation__verticalScrollableDefault {
+-	position: relative;
+-}
+-.DayPickerNavigation_button {
+-	cursor: pointer;
+-	-webkit-user-select: none;
+-	-moz-user-select: none;
+-	-ms-user-select: none;
+-	user-select: none;
+-	border: 0;
+-	padding: 0;
+-	margin: 0;
+-}
+-.DayPickerNavigation_button__default {
+-	border: 1px solid #e4e7e7;
+-	background-color: #fff;
+-	color: #757575;
+-}
+-.DayPickerNavigation_button__default:focus,
+-.DayPickerNavigation_button__default:hover {
+-	border: 1px solid #c4c4c4;
+-}
+-.DayPickerNavigation_button__default:active {
+-	background: #f2f2f2;
+-}
+-.DayPickerNavigation_button__horizontalDefault {
+-	position: absolute;
+-	top: 18px;
+-	line-height: 0.78;
+-	border-radius: 3px;
+-	padding: 6px 9px;
+-}
+-.DayPickerNavigation_leftButton__horizontalDefault {
+-	left: 22px;
+-}
+-.DayPickerNavigation_rightButton__horizontalDefault {
+-	right: 22px;
+-}
+-.DayPickerNavigation_button__verticalDefault {
+-	padding: 5px;
+-	background: #fff;
+-	box-shadow: 0 0 5px 2px rgba(0, 0, 0, 0.1);
+-	position: relative;
+-	display: inline-block;
+-	height: 100%;
+-	width: 50%;
+-}
+-.DayPickerNavigation_nextButton__verticalDefault {
+-	border-left: 0;
+-}
+-.DayPickerNavigation_nextButton__verticalScrollableDefault {
+-	width: 100%;
+-}
+-.DayPickerNavigation_svg__horizontal {
+-	height: 19px;
+-	width: 19px;
+-	fill: #82888a;
+-	display: block;
+-}
+-.DayPickerNavigation_svg__vertical {
+-	height: 42px;
+-	width: 42px;
+-	fill: #484848;
+-	display: block;
+-}
+-.DayPicker {
+-	background: #fff;
+-	position: relative;
+-	text-align: left;
+-}
+-.DayPicker__horizontal {
+-	background: #fff;
+-}
+-.DayPicker__verticalScrollable {
+-	height: 100%;
+-}
+-.DayPicker__hidden {
+-	visibility: hidden;
+-}
+-.DayPicker__withBorder {
+-	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0, 0, 0, 0.07);
+-	border-radius: 3px;
+-}
+-.DayPicker_portal__horizontal {
+-	box-shadow: none;
+-	position: absolute;
+-	left: 50%;
+-	top: 50%;
+-}
+-.DayPicker_portal__vertical {
+-	position: initial;
+-}
+-.DayPicker_focusRegion {
+-	outline: 0;
+-}
+-.DayPicker_calendarInfo__horizontal,
+-.DayPicker_wrapper__horizontal {
+-	display: inline-block;
+-	vertical-align: top;
+-}
+-.DayPicker_weekHeaders {
+-	position: relative;
+-}
+-.DayPicker_weekHeaders__horizontal {
+-	margin-left: 13px;
+-}
+-.DayPicker_weekHeader {
+-	color: #757575;
+-	position: absolute;
+-	top: 62px;
+-	z-index: 2;
+-	text-align: left;
+-	padding: 0 !important;
+-}
+-.DayPicker_weekHeader__vertical {
+-	left: 50%;
+-}
+-.DayPicker_weekHeader__verticalScrollable {
+-	top: 0;
+-	display: table-row;
+-	border-bottom: 1px solid #dbdbdb;
+-	background: #fff;
+-	margin-left: 0;
+-	left: 0;
+-	width: 100%;
+-	text-align: center;
+-}
+-.DayPicker_weekHeader_ul {
+-	list-style: none;
+-	margin: 1px 0;
+-	padding-left: 0;
+-	padding-right: 0;
+-	font-size: 14px;
+-}
+-.DayPicker_weekHeader_li {
+-	display: inline-block;
+-	text-align: center;
+-	margin: 0 1px;
+-}
+-.DayPicker_transitionContainer {
+-	position: relative;
+-	overflow: hidden;
+-	border-radius: 3px;
+-}
+-.DayPicker_transitionContainer__horizontal {
+-	-webkit-transition: height 0.2s ease-in-out;
+-	-moz-transition: height 0.2s ease-in-out;
+-	transition: height 0.2s ease-in-out;
+-}
+-.DayPicker_transitionContainer__vertical {
+-	width: 100%;
+-}
+-.DayPicker_transitionContainer__verticalScrollable {
+-	padding-top: 20px;
+-	height: 100%;
+-	position: absolute;
+-	top: 0;
+-	bottom: 0;
+-	right: 0;
+-	left: 0;
+-	overflow-y: scroll;
+-}
+-.DateInput {
+-	margin: 0;
+-	padding: 0;
+-	background: #fff;
+-	position: relative;
+-	display: inline-block;
+-	width: 130px;
+-	vertical-align: middle;
+-}
+-.DateInput__small {
+-	width: 97px;
+-}
+-.DateInput__block {
+-	width: 100%;
+-}
+-.DateInput__disabled {
+-	background: #f2f2f2;
+-	color: #dbdbdb;
+-}
+-.DateInput_input {
+-	font-weight: 200;
+-	font-size: 19px;
+-	line-height: 24px;
+-	color: #484848;
+-	background-color: #fff;
+-	width: 100%;
+-	padding: 11px 11px 9px;
+-	border: 0;
+-	border-top: 0;
+-	border-right: 0;
+-	border-bottom: 2px solid transparent;
+-	border-left: 0;
+-	border-radius: 0;
+-}
+-.DateInput_input__small {
+-	font-size: 15px;
+-	line-height: 18px;
+-	letter-spacing: 0.2px;
+-	padding: 7px 7px 5px;
+-}
+-.DateInput_input__regular {
+-	font-weight: auto;
+-}
+-.DateInput_input__readOnly {
+-	-webkit-user-select: none;
+-	-moz-user-select: none;
+-	-ms-user-select: none;
+-	user-select: none;
+-}
+-.DateInput_input__focused {
+-	outline: 0;
+-	background: #fff;
+-	border: 0;
+-	border-top: 0;
+-	border-right: 0;
+-	border-bottom: 2px solid #008489;
+-	border-left: 0;
+-}
+-.DateInput_input__disabled {
+-	background: #f2f2f2;
+-	font-style: italic;
+-}
+-.DateInput_screenReaderMessage {
+-	border: 0;
+-	clip: rect(0, 0, 0, 0);
+-	height: 1px;
+-	margin: -1px;
+-	overflow: hidden;
+-	padding: 0;
+-	position: absolute;
+-	width: 1px;
+-}
+-.DateInput_fang {
+-	position: absolute;
+-	width: 20px;
+-	height: 10px;
+-	left: 22px;
+-	z-index: 2;
+-}
+-.DateInput_fangShape {
+-	fill: #fff;
+-}
+-.DateInput_fangStroke {
+-	stroke: #dbdbdb;
+-	fill: transparent;
+-}
+-.DateRangePickerInput {
+-	background-color: #fff;
+-	display: inline-block;
+-}
+-.DateRangePickerInput__disabled {
+-	background: #f2f2f2;
+-}
+-.DateRangePickerInput__withBorder {
+-	border-radius: 2px;
+-	border: 1px solid #dbdbdb;
+-}
+-.DateRangePickerInput__rtl {
+-	direction: rtl;
+-}
+-.DateRangePickerInput__block {
+-	display: block;
+-}
+-.DateRangePickerInput__showClearDates {
+-	padding-right: 30px;
+-}
+-.DateRangePickerInput_arrow {
+-	display: inline-block;
+-	vertical-align: middle;
+-	color: #484848;
+-}
+-.DateRangePickerInput_arrow_svg {
+-	vertical-align: middle;
+-	fill: #484848;
+-	height: 24px;
+-	width: 24px;
+-}
+-.DateRangePickerInput_clearDates {
+-	background: 0 0;
+-	border: 0;
+-	color: inherit;
+-	font: inherit;
+-	line-height: normal;
+-	overflow: visible;
+-	cursor: pointer;
+-	padding: 10px;
+-	margin: 0 10px 0 5px;
+-	position: absolute;
+-	right: 0;
+-	top: 50%;
+-	-webkit-transform: translateY(-50%);
+-	-ms-transform: translateY(-50%);
+-	transform: translateY(-50%);
+-}
+-.DateRangePickerInput_clearDates__small {
+-	padding: 6px;
+-}
+-.DateRangePickerInput_clearDates_default:focus,
+-.DateRangePickerInput_clearDates_default:hover {
+-	background: #dbdbdb;
+-	border-radius: 50%;
+-}
+-.DateRangePickerInput_clearDates__hide {
+-	visibility: hidden;
+-}
+-.DateRangePickerInput_clearDates_svg {
+-	fill: #82888a;
+-	height: 12px;
+-	width: 15px;
+-	vertical-align: middle;
+-}
+-.DateRangePickerInput_clearDates_svg__small {
+-	height: 9px;
+-}
+-.DateRangePickerInput_calendarIcon {
+-	background: 0 0;
+-	border: 0;
+-	color: inherit;
+-	font: inherit;
+-	line-height: normal;
+-	overflow: visible;
+-	cursor: pointer;
+-	display: inline-block;
+-	vertical-align: middle;
+-	padding: 10px;
+-	margin: 0 5px 0 10px;
+-}
+-.DateRangePickerInput_calendarIcon_svg {
+-	fill: #82888a;
+-	height: 15px;
+-	width: 14px;
+-	vertical-align: middle;
+-}
+-.DateRangePicker {
+-	position: relative;
+-	display: inline-block;
+-}
+-.DateRangePicker__block {
+-	display: block;
+-}
+-.DateRangePicker_picker {
+-	z-index: 1;
+-	background-color: #fff;
+-	position: absolute;
+-}
+-.DateRangePicker_picker__rtl {
+-	direction: rtl;
+-}
+-.DateRangePicker_picker__directionLeft {
+-	left: 0;
+-}
+-.DateRangePicker_picker__directionRight {
+-	right: 0;
+-}
+-.DateRangePicker_picker__portal {
+-	background-color: rgba(0, 0, 0, 0.3);
+-	position: fixed;
+-	top: 0;
+-	left: 0;
+-	height: 100%;
+-	width: 100%;
+-}
+-.DateRangePicker_picker__fullScreenPortal {
+-	background-color: #fff;
+-}
+-.DateRangePicker_closeButton {
+-	background: 0 0;
+-	border: 0;
+-	color: inherit;
+-	font: inherit;
+-	line-height: normal;
+-	overflow: visible;
+-	cursor: pointer;
+-	position: absolute;
+-	top: 0;
+-	right: 0;
+-	padding: 15px;
+-	z-index: 2;
+-}
+-.DateRangePicker_closeButton:focus,
+-.DateRangePicker_closeButton:hover {
+-	color: darken(#cacccd, 10%);
+-	text-decoration: none;
+-}
+-.DateRangePicker_closeButton_svg {
+-	height: 15px;
+-	width: 15px;
+-	fill: #cacccd;
+-}
+-/*rtl:end:ignore*/
+diff --git a/packages/components/src/date-time/date/index.tsx b/packages/components/src/date-time/date/index.tsx
+index df7447aaee1f47..2cad8a18131c81 100644
+--- a/packages/components/src/date-time/date/index.tsx
++++ b/packages/components/src/date-time/date/index.tsx
+@@ -1,82 +1,42 @@
+ /**
+  * External dependencies
+  */
+-import moment from 'moment';
+-import type { Moment } from 'moment';
+-// Needed to initialise the default datepicker styles.
+-// See: https://github.com/airbnb/react-dates#initialize
+-import 'react-dates/initialize';
+-// `react-dates` doesn't tree-shake correctly, so we import from the individual
+-// component here.
+-import DayPickerSingleDateController from 'react-dates/lib/components/DayPickerSingleDateController';
++import { useLilius } from 'use-lilius';
++import {
++	format,
++	isSameDay,
++	subMonths,
++	addMonths,
++	startOfDay,
++	isEqual,
++	addDays,
++	subWeeks,
++	addWeeks,
++	isSameMonth,
++} from 'date-fns';
+ 
+ /**
+  * WordPress dependencies
+  */
+-import { useEffect, useRef } from '@wordpress/element';
+-import { isRTL, _n, sprintf } from '@wordpress/i18n';
++import { __, _n, sprintf, isRTL } from '@wordpress/i18n';
+ import { arrowLeft, arrowRight } from '@wordpress/icons';
++import { dateI18n, __experimentalGetSettings } from '@wordpress/date';
++import { useState, useRef, useEffect } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+-import { getMomentDate } from './utils';
+-import type { DatePickerDayProps, DatePickerProps } from '../types';
+-import { Day, NavPrevButton, NavNextButton } from './styles';
+-
+-const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
+-const ARIAL_LABEL_TIME_FORMAT = 'dddd, LL';
+-const noop = () => {};
+-
+-function DatePickerDay( { day, events = [] }: DatePickerDayProps ) {
+-	const ref = useRef< HTMLDivElement >( null );
+-
+-	/*
+-	 * a11y hack to make the `There is/are n events` string
+-	 * available speaking for readers,
+-	 * re-defining the aria-label attribute.
+-	 * This attribute is handled by the react-dates component.
+-	 */
+-	useEffect( () => {
+-		// Bail when no parent node.
+-		if ( ! ( ref?.current?.parentNode instanceof Element ) ) {
+-			return;
+-		}
+-
+-		const { parentNode } = ref.current;
+-		const dayAriaLabel = moment( day ).format( ARIAL_LABEL_TIME_FORMAT );
+-
+-		if ( ! events.length ) {
+-			// Set aria-label without event description.
+-			parentNode.setAttribute( 'aria-label', dayAriaLabel );
+-			return;
+-		}
+-
+-		const dayWithEventsDescription = sprintf(
+-			// translators: 1: Calendar day format, 2: Calendar event number.
+-			_n(
+-				'%1$s. There is %2$d event.',
+-				'%1$s. There are %2$d events.',
+-				events.length
+-			),
+-			dayAriaLabel,
+-			events.length
+-		);
+-
+-		parentNode.setAttribute( 'aria-label', dayWithEventsDescription );
+-	}, [ day, events.length ] );
+-
+-	return (
+-		<Day
+-			ref={ ref }
+-			className="components-datetime__date__day" // Unused, for backwards compatibility.
+-			hasEvents={ !! events?.length }
+-			alignment="center"
+-		>
+-			{ day.format( 'D' ) }
+-		</Day>
+-	);
+-}
++import type { DatePickerProps } from '../types';
++import {
++	Navigator,
++	NavigatorHeading,
++	Calendar,
++	DayOfWeek,
++	DayButton,
++} from './styles';
++import { inputToDate } from '../utils';
++import Button from '../../button';
++import { TIMEZONELESS_FORMAT } from '../constants';
+ 
+ /**
+  * DatePicker is a React component that renders a calendar for date selection.
+@@ -100,139 +60,284 @@ function DatePickerDay( { day, events = [] }: DatePickerDayProps ) {
+ export function DatePicker( {
+ 	currentDate,
+ 	onChange,
+-	events,
++	events = [],
+ 	isInvalidDate,
+ 	onMonthPreviewed,
+ 	startOfWeek = 0,
+ }: DatePickerProps ) {
+-	const nodeRef = useRef< HTMLDivElement >( null );
++	const date = currentDate ? inputToDate( currentDate ) : new Date();
+ 
+-	const onMonthPreviewedHandler = ( newMonthDate: Moment ) => {
+-		onMonthPreviewed?.( newMonthDate.toISOString() );
+-		keepFocusInside();
+-	};
++	const {
++		calendar,
++		viewing,
++		setSelected,
++		setViewing,
++		isSelected,
++		viewPreviousMonth,
++		viewNextMonth,
++	} = useLilius( {
++		selected: [ startOfDay( date ) ],
++		viewing: startOfDay( date ),
++		weekStartsOn: startOfWeek,
++	} );
+ 
+-	/*
+-	 * Todo: We should remove this function ASAP.
+-	 * It is kept because focus is lost when we click on the previous and next month buttons.
+-	 * This focus loss closes the date picker popover.
+-	 * Ideally we should add an upstream commit on react-dates to fix this issue.
+-	 */
+-	const keepFocusInside = () => {
+-		if ( ! nodeRef.current ) {
+-			return;
+-		}
+-
+-		const { ownerDocument } = nodeRef.current;
+-		const { activeElement } = ownerDocument;
++	// Used to implement a roving tab index. Tracks the day that receives focus
++	// when the user tabs into the calendar.
++	const [ focusable, setFocusable ] = useState( startOfDay( date ) );
+ 
+-		// If focus was lost.
+-		if (
+-			! activeElement ||
+-			! nodeRef.current.contains( ownerDocument.activeElement )
+-		) {
+-			// Retrieve the focus region div.
+-			const focusRegion = nodeRef.current.querySelector(
+-				'.DayPicker_focusRegion'
+-			);
+-			if ( ! ( focusRegion instanceof HTMLElement ) ) {
+-				return;
+-			}
+-			// Keep the focus on focus region.
+-			focusRegion.focus();
+-		}
+-	};
++	// Allows us to only programmatically focus() a day when focus was already
++	// within the calendar. This stops us stealing focus from e.g. a TimePicker
++	// input.
++	const [ isFocusWithinCalendar, setIsFocusWithinCalendar ] =
++		useState( false );
+ 
+-	const onChangeMoment = ( newDate: Moment | null ) => {
+-		if ( ! newDate ) {
+-			return;
+-		}
++	// Update internal state when currentDate prop changes.
++	const [ prevCurrentDate, setPrevCurrentDate ] = useState( currentDate );
++	if ( currentDate !== prevCurrentDate ) {
++		setPrevCurrentDate( currentDate );
++		setSelected( [ startOfDay( date ) ] );
++		setViewing( startOfDay( date ) );
++		setFocusable( startOfDay( date ) );
++	}
+ 
+-		// If currentDate is null, use now as momentTime to designate hours, minutes, seconds.
+-		const momentDate = currentDate ? moment( currentDate ) : moment();
+-		const momentTime = {
+-			hours: momentDate.hours(),
+-			minutes: momentDate.minutes(),
+-			seconds: 0,
+-		};
++	return (
++		<div
++			className="components-datetime__date"
++			role="application"
++			aria-label={ __( 'Calendar' ) }
++		>
++			<Navigator>
++				<Button
++					icon={ isRTL() ? arrowRight : arrowLeft }
++					variant="tertiary"
++					aria-label={ __( 'View previous month' ) }
++					onClick={ () => {
++						viewPreviousMonth();
++						setFocusable( subMonths( focusable, 1 ) );
++						onMonthPreviewed?.(
++							format(
++								subMonths( viewing, 1 ),
++								TIMEZONELESS_FORMAT
++							)
++						);
++					} }
++				/>
++				<NavigatorHeading level={ 3 }>
++					<strong>
++						{ dateI18n(
++							'F',
++							viewing,
++							-viewing.getTimezoneOffset()
++						) }
++					</strong>{ ' ' }
++					{ dateI18n( 'Y', viewing, -viewing.getTimezoneOffset() ) }
++				</NavigatorHeading>
++				<Button
++					icon={ isRTL() ? arrowLeft : arrowRight }
++					variant="tertiary"
++					aria-label={ __( 'View next month' ) }
++					onClick={ () => {
++						viewNextMonth();
++						setFocusable( addMonths( focusable, 1 ) );
++						onMonthPreviewed?.(
++							format(
++								addMonths( viewing, 1 ),
++								TIMEZONELESS_FORMAT
++							)
++						);
++					} }
++				/>
++			</Navigator>
++			<Calendar
++				onFocus={ () => setIsFocusWithinCalendar( true ) }
++				onBlur={ () => setIsFocusWithinCalendar( false ) }
++			>
++				{ calendar[ 0 ][ 0 ].map( ( day ) => (
++					<DayOfWeek key={ day.toString() }>
++						{ dateI18n( 'D', day, -day.getTimezoneOffset() ) }
++					</DayOfWeek>
++				) ) }
++				{ calendar[ 0 ].map( ( week ) =>
++					week.map( ( day, index ) => {
++						if ( ! isSameMonth( day, viewing ) ) {
++							return null;
++						}
++						return (
++							<Day
++								key={ day.toString() }
++								day={ day }
++								column={ index + 1 }
++								isSelected={ isSelected( day ) }
++								isFocusable={ isEqual( day, focusable ) }
++								isFocusAllowed={ isFocusWithinCalendar }
++								isToday={ isSameDay( day, new Date() ) }
++								isInvalid={
++									isInvalidDate ? isInvalidDate( day ) : false
++								}
++								numEvents={
++									events.filter( ( event ) =>
++										isSameDay( event.date, day )
++									).length
++								}
++								onClick={ () => {
++									setSelected( [ day ] );
++									setFocusable( day );
++									onChange?.(
++										format(
++											// Don't change the selected date's time fields.
++											new Date(
++												day.getFullYear(),
++												day.getMonth(),
++												day.getDate(),
++												date.getHours(),
++												date.getMinutes(),
++												date.getSeconds(),
++												date.getMilliseconds()
++											),
++											TIMEZONELESS_FORMAT
++										)
++									);
++								} }
++								onKeyDown={ ( event ) => {
++									let nextFocusable;
++									if ( event.key === 'ArrowLeft' ) {
++										nextFocusable = addDays(
++											day,
++											isRTL() ? 1 : -1
++										);
++									}
++									if ( event.key === 'ArrowRight' ) {
++										nextFocusable = addDays(
++											day,
++											isRTL() ? -1 : 1
++										);
++									}
++									if ( event.key === 'ArrowUp' ) {
++										nextFocusable = subWeeks( day, 1 );
++									}
++									if ( event.key === 'ArrowDown' ) {
++										nextFocusable = addWeeks( day, 1 );
++									}
++									if ( nextFocusable ) {
++										setFocusable( nextFocusable );
++										if (
++											! isSameMonth(
++												nextFocusable,
++												viewing
++											)
++										) {
++											setViewing( nextFocusable );
++											onMonthPreviewed?.(
++												format(
++													nextFocusable,
++													TIMEZONELESS_FORMAT
++												)
++											);
++										}
++									}
++								} }
++							/>
++						);
++					} )
++				) }
++			</Calendar>
++		</div>
++	);
++}
+ 
+-		onChange?.( newDate.set( momentTime ).format( TIMEZONELESS_FORMAT ) );
++type DayProps = {
++	day: Date;
++	column: number;
++	isSelected: boolean;
++	isFocusable: boolean;
++	isFocusAllowed: boolean;
++	isToday: boolean;
++	numEvents: number;
++	isInvalid: boolean;
++	onClick: () => void;
++	onKeyDown: ( event: KeyboardEvent ) => void;
++};
+ 
+-		// Keep focus on the date picker.
+-		keepFocusInside();
+-	};
++function Day( {
++	day,
++	column,
++	isSelected,
++	isFocusable,
++	isFocusAllowed,
++	isToday,
++	isInvalid,
++	numEvents,
++	onClick,
++	onKeyDown,
++}: DayProps ) {
++	const ref = useRef< HTMLButtonElement >();
+ 
+-	const getEventsPerDay = ( day: Moment ) => {
+-		if ( ! events?.length ) {
+-			return [];
++	// Focus the day when it becomes focusable, e.g. because an arrow key is
++	// pressed. Only do this if focus is allowed - this stops us stealing focus
++	// from e.g. a TimePicker input. Note that isFocusAllowed is not a dep as
++	// there is no point calling focus() on an already focused element.
++	useEffect( () => {
++		if ( ref.current && isFocusable && isFocusAllowed ) {
++			ref.current.focus();
+ 		}
+-
+-		return events.filter( ( eventDay ) =>
+-			day.isSame( eventDay.date, 'day' )
+-		);
+-	};
+-
+-	const momentDate = getMomentDate( currentDate );
++	}, [ isFocusable ] );
+ 
+ 	return (
+-		<div className="components-datetime__date" ref={ nodeRef }>
+-			<DayPickerSingleDateController
+-				date={ momentDate }
+-				initialVisibleMonth={ null }
+-				daySize={ 30 }
+-				horizontalMonthPadding={ 0 }
+-				focused
+-				hideKeyboardShortcutsPanel
+-				// This is a hack to force the calendar to update on month or year change
+-				// https://github.com/airbnb/react-dates/issues/240#issuecomment-361776665
+-				key={ `datepicker-controller-${
+-					momentDate ? momentDate.format( 'MM-YYYY' ) : 'null'
+-				}` }
+-				noBorder
+-				numberOfMonths={ 1 }
+-				onDateChange={ onChangeMoment }
+-				transitionDuration={ 0 }
+-				weekDayFormat="ddd"
+-				dayAriaLabelFormat={ ARIAL_LABEL_TIME_FORMAT }
+-				isRTL={ isRTL() }
+-				isOutsideRange={ ( date ) => {
+-					return !! isInvalidDate && isInvalidDate( date.toDate() );
+-				} }
+-				firstDayOfWeek={ startOfWeek }
+-				onPrevMonthClick={ onMonthPreviewedHandler }
+-				onNextMonthClick={ onMonthPreviewedHandler }
+-				renderDayContents={ ( day ) => (
+-					<DatePickerDay
+-						day={ day }
+-						events={ getEventsPerDay( day ) }
+-					/>
+-				) }
+-				renderMonthElement={ ( { month } ) => (
+-					<>
+-						<strong>{ month.format( 'MMMM' ) }</strong>{ ' ' }
+-						{ month.format( 'YYYY' ) }
+-					</>
+-				) }
+-				renderNavPrevButton={ ( { ariaLabel, ...props } ) => (
+-					<NavPrevButton
+-						icon={ arrowLeft }
+-						variant="tertiary"
+-						aria-label={ ariaLabel }
+-						{ ...props }
+-					/>
+-				) }
+-				renderNavNextButton={ ( { ariaLabel, ...props } ) => (
+-					<NavNextButton
+-						icon={ arrowRight }
+-						variant="tertiary"
+-						aria-label={ ariaLabel }
+-						{ ...props }
+-					/>
+-				) }
+-				onFocusChange={ noop }
+-			/>
+-		</div>
++		<DayButton
++			ref={ ref }
++			className="components-datetime__date__day" // Unused, for backwards compatibility.
++			disabled={ isInvalid }
++			tabIndex={ isFocusable ? 0 : -1 }
++			aria-label={ getDayLabel( day, isSelected, numEvents ) }
++			column={ column }
++			isSelected={ isSelected }
++			isToday={ isToday }
++			hasEvents={ numEvents > 0 }
++			onClick={ onClick }
++			onKeyDown={ onKeyDown }
++		>
++			{ dateI18n( 'j', day, -day.getTimezoneOffset() ) }
++		</DayButton>
+ 	);
+ }
+ 
++function getDayLabel( date: Date, isSelected: boolean, numEvents: number ) {
++	const { formats } = __experimentalGetSettings();
++	const localizedDate = dateI18n(
++		formats.date,
++		date,
++		-date.getTimezoneOffset()
++	);
++	if ( isSelected && numEvents > 0 ) {
++		return sprintf(
++			// translators: 1: The calendar date. 2: Number of events on the calendar date.
++			_n(
++				'%1$s. Selected. There is %2$d event',
++				'%1$s. Selected. There are %2$d events',
++				numEvents
++			),
++			localizedDate,
++			numEvents
++		);
++	} else if ( isSelected ) {
++		return sprintf(
++			// translators: %s: The calendar date.
++			__( '%1$s. Selected' ),
++			localizedDate
++		);
++	} else if ( numEvents > 0 ) {
++		return sprintf(
++			// translators: 1: The calendar date. 2: Number of events on the calendar date.
++			_n(
++				'%1$s. There is %2$d event',
++				'%1$s. There are %2$d events',
++				numEvents
++			),
++			localizedDate,
++			numEvents
++		);
++	}
++	return localizedDate;
++}
++
+ export default DatePicker;
+diff --git a/packages/components/src/date-time/date/style.scss b/packages/components/src/date-time/date/style.scss
+deleted file mode 100644
+index a41c24520fb152..00000000000000
+--- a/packages/components/src/date-time/date/style.scss
++++ /dev/null
+@@ -1,85 +0,0 @@
+-@import "./datepicker.scss";
+-
+-// Styles that overrides the calendar styling provided by react-dates go here.
+-// Everything else goes in styles.ts.
+-
+-.components-datetime__date {
+-	//
+-	// Margin overrides
+-	//
+-
+-	// Remove the left and right margin from the calendar by setting all the
+-	// containers' widths to 100%. This means that the slide left / slide right
+-	// animation won't work but we don't want that, anyway.
+-
+-	.CalendarMonthGrid__horizontal,
+-	.DayPicker_weekHeader_li {
+-		transform: none !important; // Override inline style.
+-		width: 100% !important; // Override inline style.
+-	}
+-
+-	.CalendarMonthGrid_month__horizontal,
+-	.CalendarMonth_table,
+-	.DayPicker_weekHeader {
+-		width: 100%;
+-	}
+-
+-	.DayPicker_weekHeaders__horizontal {
+-		margin: 0;
+-	}
+-
+-	.DayPicker_weekHeader_ul {
+-		display: flex;
+-	}
+-
+-	//
+-	// Theming
+-	//
+-
+-	.DayPicker_weekHeader {
+-		top: 50px;
+-	}
+-
+-	.CalendarMonth_caption {
+-		font-size: $default-font-size;
+-	}
+-
+-	.CalendarMonth_table {
+-		border-collapse: separate;
+-		border-spacing: 2px;
+-	}
+-
+-	.CalendarDay {
+-		border: none;
+-		font-size: $default-font-size;
+-		border-radius: $radius-round;
+-		background: $white;
+-
+-		&:hover {
+-			color: var(--wp-admin-theme-color);
+-		}
+-
+-		&:focus {
+-			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 0 #{ $border-width-focus + $border-width } $white;
+-			outline: 2px solid transparent; // Shown in Windows 10 high contrast mode.
+-		}
+-	}
+-
+-	.CalendarDay__today {
+-		background: $gray-100;
+-	}
+-
+-	.CalendarDay__selected {
+-		background: var(--wp-admin-theme-color);
+-		border: 2px solid transparent; // This indicates selection in Windows 10 high contrast mode.
+-
+-		&:hover {
+-			background: var(--wp-admin-theme-color-darker-20);
+-			color: $white;
+-		}
+-
+-		&:focus {
+-			box-shadow: inset 0 0 0 $border-width $white;
+-		}
+-	}
+-}
+diff --git a/packages/components/src/date-time/date/styles.ts b/packages/components/src/date-time/date/styles.ts
+index e80229a3050b4c..76288be8a2ef62 100644
+--- a/packages/components/src/date-time/date/styles.ts
++++ b/packages/components/src/date-time/date/styles.ts
+@@ -2,27 +2,105 @@
+  * External dependencies
+  */
+ import styled from '@emotion/styled';
+-import { css } from '@emotion/react';
+ 
+ /**
+  * Internal dependencies
+  */
+ import Button from '../../button';
+-import { COLORS } from '../../utils';
+-import { VStack } from '../../v-stack';
++import { COLORS, CONFIG } from '../../utils';
++import { HStack } from '../../h-stack';
++import { Heading } from '../../heading';
++import { space } from '../../ui/utils/space';
+ 
+-// Styles that overrides the calendar styling provided by react-dates go in
+-// style.scss. Everything else goes here.
++export const Navigator = styled( HStack )`
++	margin-bottom: ${ space( 4 ) };
++`;
++
++export const NavigatorHeading = styled( Heading )`
++	font-size: ${ CONFIG.fontSize };
++	font-weight: ${ CONFIG.fontWeight };
++
++	strong {
++		font-weight: ${ CONFIG.fontWeightHeading };
++	}
++`;
++
++export const Calendar = styled.div`
++	column-gap: ${ space( 2 ) };
++	display: grid;
++	grid-template-columns: 0.5fr repeat( 5, 1fr ) 0.5fr;
++	justify-items: center;
++	row-gap: ${ space( 2 ) };
++`;
++
++export const DayOfWeek = styled.div`
++	color: ${ COLORS.gray[ 700 ] };
++
++	&:nth-of-type( 1 ) {
++		justify-self: start;
++	}
+ 
+-export const Day = styled( VStack )< { hasEvents: boolean } >`
+-	height: 100%;
++	&:nth-of-type( 7 ) {
++		justify-self: end;
++	}
++`;
++
++export const DayButton = styled( Button, {
++	shouldForwardProp: ( prop: string ) =>
++		! [ 'column', 'isSelected', 'isToday', 'hasEvents' ].includes( prop ),
++} )< {
++	column: number;
++	isSelected: boolean;
++	isToday: boolean;
++	hasEvents: boolean;
++} >`
++	grid-column: ${ ( props ) => props.column };
+ 	position: relative;
++	justify-content: center;
++
++	${ ( props ) =>
++		props.column === 1 &&
++		`
++		justify-self: start;
++		` }
++
++	${ ( props ) =>
++		props.column === 7 &&
++		`
++		justify-self: end;
++		` }
++
++	${ ( props ) =>
++		props.disabled &&
++		`
++		pointer-events: none;
++		` }
++
++	&&& {
++		border-radius: 100%;
++		height: ${ space( 7 ) };
++		width: ${ space( 7 ) };
++
++		${ ( props ) =>
++			props.isSelected &&
++			`
++			background: ${ COLORS.ui.theme };
++			color: ${ COLORS.white };
++			` }
++
++		${ ( props ) =>
++			! props.isSelected &&
++			props.isToday &&
++			`
++			background: ${ COLORS.gray[ 200 ] };
++			` }
++	}
+ 
+ 	${ ( props ) =>
+ 		props.hasEvents &&
+ 		`
+ 		::before {
+-			background: var(--wp-admin-theme-color);
++			background: ${ props.isSelected ? COLORS.white : COLORS.ui.theme };
+ 			border-radius: 2px;
+ 			bottom: 0;
+ 			content: " ";
+@@ -31,25 +109,6 @@ export const Day = styled( VStack )< { hasEvents: boolean } >`
+ 			margin-left: -2px;
+ 			position: absolute;
+ 			width: 4px;
+-
+-			.CalendarDay__selected & {
+-				background: ${ COLORS.white };
+-			}
+ 		}
+ 		` }
+ `;
+-
+-const baseNavButton = css`
+-	position: absolute;
+-	top: 15px;
+-`;
+-
+-export const NavPrevButton = styled( Button )`
+-	${ baseNavButton }
+-	left: 0;
+-`;
+-
+-export const NavNextButton = styled( Button )`
+-	${ baseNavButton }
+-	right: 0;
+-`;
+diff --git a/packages/components/src/date-time/date/test/index.tsx b/packages/components/src/date-time/date/test/index.tsx
+index ef6c201252d17a..7cd7eeaf6a10c8 100644
+--- a/packages/components/src/date-time/date/test/index.tsx
++++ b/packages/components/src/date-time/date/test/index.tsx
+@@ -1,10 +1,9 @@
+ /**
+  * External dependencies
+  */
+-import moment from 'moment';
++import { format } from 'date-fns';
+ import { render, screen } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+-import 'react-dates/initialize';
+ 
+ /**
+  * Internal dependencies
+@@ -16,22 +15,19 @@ describe( 'DatePicker', () => {
+ 		render( <DatePicker currentDate="2022-05-02T11:00:00" /> );
+ 
+ 		expect(
+-			screen.getByRole( 'button', { name: 'Monday, May 2, 2022' } )
+-		).toHaveClass( 'CalendarDay__selected' );
+-
+-		// Expect React deprecation warning due to 'react-dates' using outdated
+-		// React lifecycle methods.
+-		// https://github.com/react-dates/react-dates/issues/1748
+-		expect( console ).toHaveWarned();
++			screen.getByRole( 'button', { name: 'May 2, 2022. Selected' } )
++		).not.toBeNull();
+ 	} );
+ 
+ 	it( "should highlight today's date when not provided a currentDate", () => {
+ 		render( <DatePicker /> );
+ 
+-		const todayDescription = moment().format( 'dddd, MMMM D, YYYY' );
++		const todayDescription = format( new Date(), 'MMMM d, yyyy' );
+ 		expect(
+-			screen.getByRole( 'button', { name: todayDescription } )
+-		).toHaveClass( 'CalendarDay__selected' );
++			screen.getByRole( 'button', {
++				name: `${ todayDescription }. Selected`,
++			} )
++		).not.toBeNull();
+ 	} );
+ 
+ 	it( 'should call onChange when a day is selected', async () => {
+@@ -47,7 +43,7 @@ describe( 'DatePicker', () => {
+ 		);
+ 
+ 		await user.click(
+-			screen.getByRole( 'button', { name: 'Friday, May 20, 2022' } )
++			screen.getByRole( 'button', { name: 'May 20, 2022' } )
+ 		);
+ 
+ 		expect( onChange ).toHaveBeenCalledWith( '2022-05-20T11:00:00' );
+@@ -69,7 +65,7 @@ describe( 'DatePicker', () => {
+ 
+ 		await user.click(
+ 			screen.getByRole( 'button', {
+-				name: 'Move forward to switch to the next month.',
++				name: 'View next month',
+ 			} )
+ 		);
+ 
+@@ -78,7 +74,7 @@ describe( 'DatePicker', () => {
+ 		);
+ 
+ 		await user.click(
+-			screen.getByRole( 'button', { name: 'Monday, June 20, 2022' } )
++			screen.getByRole( 'button', { name: 'June 20, 2022' } )
+ 		);
+ 
+ 		expect( onChange ).toHaveBeenCalledWith( '2022-06-20T11:00:00' );
+@@ -97,31 +93,25 @@ describe( 'DatePicker', () => {
+ 
+ 		expect(
+ 			screen
+-				.getAllByLabelText( 'There is 1 event.', { exact: false } )
++				.getAllByLabelText( 'There is 1 event', { exact: false } )
+ 				.map( ( day ) => day.getAttribute( 'aria-label' ) )
+ 		).toEqual( [
+-			'Wednesday, May 4, 2022. There is 1 event.',
+-			'Thursday, May 19, 2022. There is 1 event.',
++			'May 4, 2022. There is 1 event',
++			'May 19, 2022. There is 1 event',
+ 		] );
+ 	} );
+ 
+ 	it( 'should not allow invalid date to be selected', async () => {
+-		const user = userEvent.setup( { delay: null } );
+-
+-		const onChange = jest.fn();
+-
+ 		render(
+ 			<DatePicker
+ 				currentDate="2022-05-02T11:00:00"
+-				onChange={ onChange }
+ 				isInvalidDate={ ( date ) => date.getDate() === 20 }
+ 			/>
+ 		);
+ 
+-		await user.click(
+-			screen.getByRole( 'button', { name: 'Friday, May 20, 2022' } )
+-		);
+-
+-		expect( onChange ).not.toHaveBeenCalledWith( '2022-05-20T11:00:00' );
++		const button = screen.getByRole( 'button', {
++			name: 'May 20, 2022',
++		} ) as HTMLButtonElement;
++		expect( button.disabled ).toBe( true );
+ 	} );
+ } );
+diff --git a/packages/components/src/date-time/date/test/utils.ts b/packages/components/src/date-time/date/test/utils.ts
+deleted file mode 100644
+index b301b3ebde3330..00000000000000
+--- a/packages/components/src/date-time/date/test/utils.ts
++++ /dev/null
+@@ -1,32 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import moment from 'moment';
+-
+-/**
+- * Internal dependencies
+- */
+-import { getMomentDate } from '../utils';
+-
+-describe( 'getMomentDate', () => {
+-	it( 'should return a Moment object representing a given date string', () => {
+-		const currentDate = '1986-10-18T23:00:00';
+-		const momentDate = getMomentDate( currentDate );
+-
+-		expect( moment.isMoment( momentDate ) ).toBe( true );
+-		expect( momentDate?.isSame( moment( currentDate ) ) ).toBe( true );
+-	} );
+-
+-	it( 'should return null when given a null argument', () => {
+-		const currentDate = null;
+-		const momentDate = getMomentDate( currentDate );
+-
+-		expect( momentDate ).toBeNull();
+-	} );
+-
+-	it( 'should return a Moment object representing now when given an undefined argument', () => {
+-		const momentDate = getMomentDate();
+-
+-		expect( moment.isMoment( momentDate ) ).toBe( true );
+-	} );
+-} );
+diff --git a/packages/components/src/date-time/date/utils.ts b/packages/components/src/date-time/date/utils.ts
+deleted file mode 100644
+index 25bb63a84d0125..00000000000000
+--- a/packages/components/src/date-time/date/utils.ts
++++ /dev/null
+@@ -1,20 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import moment from 'moment';
+-
+-/**
+- * Create a Moment object from a date string. With no date supplied, default to
+- * a Moment object representing now. If a null value is passed, return a null
+- * value.
+- *
+- * @param  [date] Date representing the currently selected
+- *                date or null to signify no selection.
+- * @return Moment object for selected date or null.
+- */
+-export const getMomentDate = ( date?: Date | string | number | null ) => {
+-	if ( null === date ) {
+-		return null;
+-	}
+-	return date ? moment( date ) : moment();
+-};
+diff --git a/packages/components/src/date-time/style.scss b/packages/components/src/date-time/style.scss
+deleted file mode 100644
+index 9e059d0d5be6d3..00000000000000
+--- a/packages/components/src/date-time/style.scss
++++ /dev/null
+@@ -1 +0,0 @@
+-@import "./date/style.scss";
+diff --git a/packages/components/src/date-time/time/index.tsx b/packages/components/src/date-time/time/index.tsx
+index 33c86948856f64..f1ae842044a777 100644
+--- a/packages/components/src/date-time/time/index.tsx
++++ b/packages/components/src/date-time/time/index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import moment from 'moment';
++import { startOfMinute, format, set, setHours, setMonth } from 'date-fns';
+ 
+ /**
+  * WordPress dependencies
+@@ -39,8 +39,8 @@ import {
+ 	PRESS_DOWN,
+ 	PRESS_UP,
+ } from '../../input-control/reducer/actions';
+-
+-const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
++import { inputToDate } from '../utils';
++import { TIMEZONELESS_FORMAT } from '../constants';
+ 
+ function from12hTo24h( hours: number, isPm: boolean ) {
+ 	return isPm ? ( ( hours % 12 ) + 12 ) % 24 : hours % 12;
+@@ -98,24 +98,27 @@ export function TimePicker( {
+ }: TimePickerProps ) {
+ 	const [ date, setDate ] = useState( () =>
+ 		// Truncate the date at the minutes, see: #15495.
+-		currentTime ? moment( currentTime ).startOf( 'minutes' ) : moment()
++		currentTime ? startOfMinute( inputToDate( currentTime ) ) : new Date()
+ 	);
+ 
+ 	// Reset the state when currentTime changed.
++	// TODO: useEffect() shouldn't be used like this, causes an unnecessary render
+ 	useEffect( () => {
+ 		setDate(
+-			currentTime ? moment( currentTime ).startOf( 'minutes' ) : moment()
++			currentTime
++				? startOfMinute( inputToDate( currentTime ) )
++				: new Date()
+ 		);
+ 	}, [ currentTime ] );
+ 
+ 	const { day, month, year, minutes, hours, am } = useMemo(
+ 		() => ( {
+-			day: date.format( 'DD' ),
+-			month: date.format( 'MM' ),
+-			year: date.format( 'YYYY' ),
+-			minutes: date.format( 'mm' ),
+-			hours: date.format( is12Hour ? 'hh' : 'HH' ),
+-			am: Number( date.format( 'H' ) ) <= 11 ? 'AM' : 'PM',
++			day: format( date, 'dd' ),
++			month: format( date, 'MM' ),
++			year: format( date, 'yyyy' ),
++			minutes: format( date, 'mm' ),
++			hours: format( date, is12Hour ? 'hh' : 'HH' ),
++			am: format( date, 'a' ),
+ 		} ),
+ 		[ date, is12Hour ]
+ 	);
+@@ -142,9 +145,9 @@ export function TimePicker( {
+ 				numberValue = from12hTo24h( numberValue, am === 'PM' );
+ 			}
+ 
+-			const newDate = date.clone()[ method ]( numberValue );
++			const newDate = set( date, { [ method ]: numberValue } );
+ 			setDate( newDate );
+-			onChange?.( newDate.format( TIMEZONELESS_FORMAT ) );
++			onChange?.( format( newDate, TIMEZONELESS_FORMAT ) );
+ 		};
+ 		return callback;
+ 	};
+@@ -157,11 +160,12 @@ export function TimePicker( {
+ 
+ 			const parsedHours = parseInt( hours, 10 );
+ 
+-			const newDate = date
+-				.clone()
+-				.hours( from12hTo24h( parsedHours, value === 'PM' ) );
++			const newDate = setHours(
++				date,
++				from12hTo24h( parsedHours, value === 'PM' )
++			);
+ 			setDate( newDate );
+-			onChange?.( newDate.format( TIMEZONELESS_FORMAT ) );
++			onChange?.( format( newDate, TIMEZONELESS_FORMAT ) );
+ 		};
+ 	}
+ 
+@@ -207,9 +211,9 @@ export function TimePicker( {
+ 					{ value: '12', label: __( 'December' ) },
+ 				] }
+ 				onChange={ ( value ) => {
+-					const newDate = date.clone().month( Number( value ) - 1 );
++					const newDate = setMonth( date, Number( value ) - 1 );
+ 					setDate( newDate );
+-					onChange?.( newDate.format( TIMEZONELESS_FORMAT ) );
++					onChange?.( format( newDate, TIMEZONELESS_FORMAT ) );
+ 				} }
+ 			/>
+ 		</MonthSelectWrapper>
+diff --git a/packages/components/src/date-time/utils.ts b/packages/components/src/date-time/utils.ts
+new file mode 100644
+index 00000000000000..e99f52f9900413
+--- /dev/null
++++ b/packages/components/src/date-time/utils.ts
+@@ -0,0 +1,17 @@
++/**
++ * External dependencies
++ */
++import { toDate } from 'date-fns';
++
++/**
++ * Like date-fn's toDate, but tries to guess the format when a string is
++ * given.
++ *
++ * @param  input Value to turn into a date.
++ */
++export function inputToDate( input: Date | string | number ): Date {
++	if ( typeof input === 'string' ) {
++		return new Date( input );
++	}
++	return toDate( input );
++}
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index d26b4aee22c7d2..54c8da4286c0e1 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -11,7 +11,6 @@
+ @import "./color-palette/style.scss";
+ @import "./custom-gradient-picker/style.scss";
+ @import "./custom-select-control/style.scss";
+-@import "./date-time/style.scss";
+ @import "./dimension-control/style.scss";
+ @import "./draggable/style.scss";
+ @import "./drop-zone/style.scss";
+diff --git a/packages/date/README.md b/packages/date/README.md
+index 89839bcffa0360..e3ec0b02871aa7 100644
+--- a/packages/date/README.md
++++ b/packages/date/README.md
+@@ -29,7 +29,7 @@ _Parameters_
+ 
+ -   _dateFormat_ `string`: PHP-style formatting string. See php.net/date.
+ -   _dateValue_ `Moment | Date | string | undefined`: Date object or string, parsable by moment.js.
+--   _timezone_ `string | undefined`: Timezone to output result in or a UTC offset. Defaults to timezone from site.
++-   _timezone_ `string | number | undefined`: Timezone to output result in or a UTC offset. Defaults to timezone from site.
+ 
+ _Returns_
+ 
+@@ -51,7 +51,7 @@ _Parameters_
+ 
+ -   _dateFormat_ `string`: PHP-style formatting string. See php.net/date.
+ -   _dateValue_ `Moment | Date | string | undefined`: Date object or string, parsable by moment.js.
+--   _timezone_ `string | boolean | undefined`: Timezone to output result in or a UTC offset. Defaults to timezone from site. Notice: `boolean` is effectively deprecated, but still supported for backward compatibility reasons.
++-   _timezone_ `string | number | boolean | undefined`: Timezone to output result in or a UTC offset. Defaults to timezone from site. Notice: `boolean` is effectively deprecated, but still supported for backward compatibility reasons.
+ 
+ _Returns_
+ 
+diff --git a/packages/date/src/index.js b/packages/date/src/index.js
+index fe593d3894c07b..2a67fc35d59a26 100644
+--- a/packages/date/src/index.js
++++ b/packages/date/src/index.js
+@@ -452,7 +452,7 @@ export function format( dateFormat, dateValue = new Date() ) {
+  *                                                        See php.net/date.
+  * @param {Moment | Date | string | undefined} dateValue  Date object or string, parsable
+  *                                                        by moment.js.
+- * @param {string | undefined}                 timezone   Timezone to output result in or a
++ * @param {string | number | undefined}        timezone   Timezone to output result in or a
+  *                                                        UTC offset. Defaults to timezone from
+  *                                                        site.
+  *
+@@ -487,15 +487,15 @@ export function gmdate( dateFormat, dateValue = new Date() ) {
+  * Backward Compatibility Notice: if `timezone` is set to `true`, the function
+  * behaves like `gmdateI18n`.
+  *
+- * @param {string}                             dateFormat PHP-style formatting string.
+- *                                                        See php.net/date.
+- * @param {Moment | Date | string | undefined} dateValue  Date object or string, parsable by
+- *                                                        moment.js.
+- * @param {string | boolean | undefined}       timezone   Timezone to output result in or a
+- *                                                        UTC offset. Defaults to timezone from
+- *                                                        site. Notice: `boolean` is effectively
+- *                                                        deprecated, but still supported for
+- *                                                        backward compatibility reasons.
++ * @param {string}                                dateFormat PHP-style formatting string.
++ *                                                           See php.net/date.
++ * @param {Moment | Date | string | undefined}    dateValue  Date object or string, parsable by
++ *                                                           moment.js.
++ * @param {string | number | boolean | undefined} timezone   Timezone to output result in or a
++ *                                                           UTC offset. Defaults to timezone from
++ *                                                           site. Notice: `boolean` is effectively
++ *                                                           deprecated, but still supported for
++ *                                                           backward compatibility reasons.
+  *
+  * @see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  * @see https://en.wikipedia.org/wiki/ISO_8601#Time_offsets_from_UTC
+@@ -567,7 +567,7 @@ export function getDate( dateString ) {
+  *
+  * @param {Moment | Date | string | undefined} dateValue Date object or string, parsable
+  *                                                       by moment.js.
+- * @param {string | undefined}                 timezone  Timezone to output result in or a
++ * @param {string | number | undefined}        timezone  Timezone to output result in or a
+  *                                                       UTC offset. Defaults to timezone from
+  *                                                       site.
+  *
+@@ -580,7 +580,7 @@ function buildMoment( dateValue, timezone = '' ) {
+ 	const dateMoment = momentLib( dateValue );
+ 
+ 	if ( timezone && ! isUTCOffset( timezone ) ) {
+-		return dateMoment.tz( timezone );
++		return dateMoment.tz( String( timezone ) );
+ 	}
+ 
+ 	if ( timezone && isUTCOffset( timezone ) ) {
+diff --git a/packages/e2e-tests/specs/editor/various/post-visibility.test.js b/packages/e2e-tests/specs/editor/various/post-visibility.test.js
+index c49613663ec2f3..44f3122c7dd95b 100644
+--- a/packages/e2e-tests/specs/editor/various/post-visibility.test.js
++++ b/packages/e2e-tests/specs/editor/various/post-visibility.test.js
+@@ -91,12 +91,10 @@ describe( 'Post visibility', () => {
+ 
+ 		// Set a publish date for the next month.
+ 		await page.click( '*[aria-label^="Change date"]' );
+-		await page.click(
+-			'*[aria-label="Move forward to switch to the next month."]'
+-		);
++		await page.click( '*[aria-label="View next month"]' );
+ 		await (
+ 			await page.$x(
+-				'//*[@role="application"][@aria-label="Calendar"]//td[@role="button"]/*[text() = "15"]'
++				'//*[@role="application"][@aria-label="Calendar"]//button[text()="15"]'
+ 			)
+ 		 )[ 0 ].click();
+ 
+diff --git a/packages/e2e-tests/specs/editor/various/scheduling.test.js b/packages/e2e-tests/specs/editor/various/scheduling.test.js
+index 55cc9952aec7c6..61c3541c1f47e5 100644
+--- a/packages/e2e-tests/specs/editor/various/scheduling.test.js
++++ b/packages/e2e-tests/specs/editor/various/scheduling.test.js
+@@ -57,13 +57,9 @@ describe( 'Scheduling', () => {
+ 		await createNewPost();
+ 
+ 		await page.click( '*[aria-label^="Change date"]' );
+-		await page.click(
+-			'*[aria-label="Move backward to switch to the previous month."]'
+-		);
++		await page.click( '*[aria-label="View previous month"]' );
+ 		expect( await isDateTimeComponentFocused() ).toBe( true );
+-		await page.click(
+-			'*[aria-label="Move forward to switch to the next month."]'
+-		);
++		await page.click( '*[aria-label="View next month"]' );
+ 		expect( await isDateTimeComponentFocused() ).toBe( true );
+ 	} );
+ } );
+diff --git a/packages/e2e-tests/specs/editor/various/switch-to-draft.test.js b/packages/e2e-tests/specs/editor/various/switch-to-draft.test.js
+index f92468cd6037cb..4f536d204976de 100644
+--- a/packages/e2e-tests/specs/editor/various/switch-to-draft.test.js
++++ b/packages/e2e-tests/specs/editor/various/switch-to-draft.test.js
+@@ -62,13 +62,11 @@ async function scheduleTestPost( postType, viewport ) {
+ 	}
+ 	// Set a publish date for the next month.
+ 	await page.click( '.edit-post-post-schedule__toggle' );
+-	await page.click(
+-		'*[aria-label="Move forward to switch to the next month."]'
+-	);
++	await page.click( '*[aria-label="View next month"]' );
+ 
+ 	await (
+ 		await page.$x(
+-			'//*[@role="application"][@aria-label="Calendar"]//td[@role="button"]/*[text() = "15"]'
++			'//*[@role="application"][@aria-label="Calendar"]//button[text()="15"]'
+ 		)
+ 	 )[ 0 ].click();
+ 

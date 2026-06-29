@@ -1,0 +1,20 @@
+diff --git a/packages/components/src/form-toggle/README.md b/packages/components/src/form-toggle/README.md
+index f247a2a12d1a6c..1f69d38e3717ed 100644
+--- a/packages/components/src/form-toggle/README.md
++++ b/packages/components/src/form-toggle/README.md
+@@ -23,13 +23,11 @@ Use toggles when you want users to:
+ 
+ ![FormToggle used for a “fixed background” setting](https://wordpress.org/gutenberg/files/2019/01/Toggle-Do.jpg)
+ 
+-**Do**
+-Use toggles to switch an option on or off.
++**Do** Use toggles to switch an option on or off.
+ 
+ ![Radio used for a “fixed background” setting](https://wordpress.org/gutenberg/files/2019/01/Toggle-Dont.jpg)
+ 
+-**Don’t**
+-Don’t use radio buttons for settings that toggle on and off.
++**Don’t** Use radio buttons for settings that toggle on and off.
+ 
+ Toggles are preferred when the user is not expecting to submit data, as is the case with checkboxes and radio buttons.
+ 

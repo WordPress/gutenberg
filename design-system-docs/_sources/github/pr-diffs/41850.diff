@@ -1,0 +1,243 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 83321b7e94bec5..cfe26ca3949606 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ -   `InputControl`: Add tests and update to use `@testing-library/user-event` ([#41421](https://github.com/WordPress/gutenberg/pull/41421)).
+ -   `FormToggle`: Convert to TypeScript ([#41729](https://github.com/WordPress/gutenberg/pull/41729)).
+ -   `ColorIndicator`: Convert to TypeScript ([#41587](https://github.com/WordPress/gutenberg/pull/41587)).
++-   `VStack`: Convert to TypeScript ([#41850](https://github.com/WordPress/gutenberg/pull/41587)).
+ -   `AlignmentMatrixControl`: Refactor away from `_.flattenDeep()` in utils ([#41814](https://github.com/WordPress/gutenberg/pull/41814/)).
+ -   `AutoComplete`: Revert recent `exhaustive-deps` refactor ([#41820](https://github.com/WordPress/gutenberg/pull/41820)).
+ 
+diff --git a/packages/components/src/v-stack/README.md b/packages/components/src/v-stack/README.md
+index e1fbba7f90d165..4b42ac1eb0a0e2 100644
+--- a/packages/components/src/v-stack/README.md
++++ b/packages/components/src/v-stack/README.md
+@@ -29,9 +29,7 @@ function Example() {
+ 
+ ## Props
+ 
+-##### alignment
+-
+-**Type**: `HStackAlignment`,`CSS['alignItems']`
++##### `alignment`: `HStackAlignment | CSSProperties['alignItems']`
+ 
+ Determines how the child elements are aligned.
+ 
+@@ -47,35 +45,25 @@ Determines how the child elements are aligned.
+ -   `edge`: Aligns content to the edges of the container.
+ -   `stretch`: Stretches content to the edges of the container.
+ 
+-##### direction
+-
+-**Type**: `FlexDirection`
++##### `direction`: `FlexDirection`
+ 
+ The direction flow of the children content can be adjusted with `direction`. `column` will align children vertically and `row` will align children horizontally.
+ 
+-##### expanded
+-
+-**Type**: `boolean`
++##### `expanded`: `boolean`
+ 
+ Expands to the maximum available width (if horizontal) or height (if vertical).
+ 
+-##### justify
+-
+-**Type**: `CSS['justifyContent']`
++##### `justify`: `CSSProperties['justifyContent']`
+ 
+ Horizontally aligns content if the `direction` is `row`, or vertically aligns content if the `direction` is `column`.
+ In the example below, `flex-start` will align the children content to the left.
+ 
+-##### spacing
+-
+-**Type**: `CSS['width']`
++##### `spacing`: `CSSProperties['width']`
+ 
+ The amount of space between each child element. Spacing in between each child can be adjusted by using `spacing`.
+ The value of `spacing` works as a multiplier to the library's grid system (base of `4px`).
+ 
+-##### wrap
+-
+-**Type**: `boolean`
++##### `wrap`: `boolean`
+ 
+ Determines if children should wrap.
+ 
+diff --git a/packages/components/src/v-stack/component.js b/packages/components/src/v-stack/component.tsx
+similarity index 58%
+rename from packages/components/src/v-stack/component.js
+rename to packages/components/src/v-stack/component.tsx
+index b0bc65fd511947..aa24673db1677f 100644
+--- a/packages/components/src/v-stack/component.js
++++ b/packages/components/src/v-stack/component.tsx
+@@ -1,26 +1,31 @@
++/**
++ * External dependencies
++ */
++import type { ForwardedRef } from 'react';
++
+ /**
+  * Internal dependencies
+  */
+-import { contextConnect } from '../ui/context';
++import { contextConnect, WordPressComponentProps } from '../ui/context';
+ import { View } from '../view';
+ import { useVStack } from './hook';
++import type { VStackProps } from './types';
+ 
+-/**
+- * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
+- * @param {import('react').ForwardedRef<any>}                                               forwardedRef
+- */
+-function VStack( props, forwardedRef ) {
++function UnconnectedVStack(
++	props: WordPressComponentProps< VStackProps, 'div' >,
++	forwardedRef: ForwardedRef< any >
++) {
+ 	const vStackProps = useVStack( props );
+ 
+ 	return <View { ...vStackProps } ref={ forwardedRef } />;
+ }
+ 
+ /**
+- * `VStack` (or Vertical Stack) is a layout component that arranges child elements in a vertical line.
++ * `VStack` (or Vertical Stack) is a layout component that arranges child
++ * elements in a vertical line.
+  *
+  * `VStack` can render anything inside.
+  *
+- * @example
+  * ```jsx
+  * import {
+  * 	__experimentalText as Text,
+@@ -38,6 +43,6 @@ function VStack( props, forwardedRef ) {
+  * }
+  * ```
+  */
+-const ConnectedVStack = contextConnect( VStack, 'VStack' );
++export const VStack = contextConnect( UnconnectedVStack, 'VStack' );
+ 
+-export default ConnectedVStack;
++export default VStack;
+diff --git a/packages/components/src/v-stack/hook.js b/packages/components/src/v-stack/hook.ts
+similarity index 57%
+rename from packages/components/src/v-stack/hook.js
+rename to packages/components/src/v-stack/hook.ts
+index 1852da47bad090..aeeb5d2546d74d 100644
+--- a/packages/components/src/v-stack/hook.js
++++ b/packages/components/src/v-stack/hook.ts
+@@ -1,14 +1,13 @@
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem } from '../ui/context';
++import { useContextSystem, WordPressComponentProps } from '../ui/context';
+ import { useHStack } from '../h-stack';
++import type { VStackProps } from './types';
+ 
+-/**
+- *
+- * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
+- */
+-export function useVStack( props ) {
++export function useVStack(
++	props: WordPressComponentProps< VStackProps, 'div' >
++) {
+ 	const { expanded = false, ...otherProps } = useContextSystem(
+ 		props,
+ 		'VStack'
+diff --git a/packages/components/src/v-stack/index.js b/packages/components/src/v-stack/index.ts
+similarity index 100%
+rename from packages/components/src/v-stack/index.js
+rename to packages/components/src/v-stack/index.ts
+diff --git a/packages/components/src/v-stack/stories/index.tsx b/packages/components/src/v-stack/stories/index.tsx
+new file mode 100644
+index 00000000000000..46e3100778963e
+--- /dev/null
++++ b/packages/components/src/v-stack/stories/index.tsx
+@@ -0,0 +1,41 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import { View } from '../../view';
++import { VStack } from '..';
++
++const meta: ComponentMeta< typeof VStack > = {
++	component: VStack,
++	title: 'Components (Experimental)/VStack',
++	argTypes: {
++		alignment: { control: { type: 'text' } },
++		as: { control: { type: 'text' } },
++		direction: { control: { type: 'text' } },
++		justify: { control: { type: 'text' } },
++		spacing: { control: { type: 'text' } },
++	},
++	parameters: {
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof VStack > = ( props ) => {
++	return (
++		<VStack { ...props }>
++			<View>One</View>
++			<View>Two</View>
++			<View>Three</View>
++			<View>Four</View>
++			<View>Five</View>
++		</VStack>
++	);
++};
++
++export const Default = Template.bind( {} );
+diff --git a/packages/components/src/v-stack/test/__snapshots__/index.js.snap b/packages/components/src/v-stack/test/__snapshots__/index.tsx.snap
+similarity index 100%
+rename from packages/components/src/v-stack/test/__snapshots__/index.js.snap
+rename to packages/components/src/v-stack/test/__snapshots__/index.tsx.snap
+diff --git a/packages/components/src/v-stack/test/index.js b/packages/components/src/v-stack/test/index.tsx
+similarity index 100%
+rename from packages/components/src/v-stack/test/index.js
+rename to packages/components/src/v-stack/test/index.tsx
+diff --git a/packages/components/src/v-stack/types.ts b/packages/components/src/v-stack/types.ts
+index 4f62c0441dad49..00daf1a4222afb 100644
+--- a/packages/components/src/v-stack/types.ts
++++ b/packages/components/src/v-stack/types.ts
+@@ -8,7 +8,27 @@ import type { CSSProperties } from 'react';
+  */
+ import type { HStackAlignment, Props as HStackProps } from '../h-stack/types';
+ 
+-export type Props = HStackProps & {
++export type VStackProps = HStackProps & {
++	/**
++	 * Determines how the child elements are aligned.
++	 *
++	 * -   `top`: Aligns content to the top.
++	 * -   `topLeft`: Aligns content to the top/left.
++	 * -   `topRight`: Aligns content to the top/right.
++	 * -   `left`: Aligns content to the left.
++	 * -   `center`: Aligns content to the center.
++	 * -   `right`: Aligns content to the right.
++	 * -   `bottom`: Aligns content to the bottom.
++	 * -   `bottomLeft`: Aligns content to the bottom/left.
++	 * -   `bottomRight`: Aligns content to the bottom/right.
++	 * -   `edge`: Aligns content to the edges of the container.
++	 * -   `stretch`: Stretches content to the edges of the container.
++	 */
+ 	alignment?: HStackAlignment | CSSProperties[ 'alignItems' ];
++	/**
++	 * The amount of space between each child element. Spacing in between each
++	 * child can be adjusted by using `spacing`. The value of `spacing` works as
++	 * a multiplier to the library's grid system (base of `4px`).
++	 */
+ 	spacing?: CSSProperties[ 'width' ];
+ };

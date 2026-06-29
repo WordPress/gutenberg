@@ -1,0 +1,76 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 43da96f8dbce06..5ad178d855af53 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ 
+ -   `Mobile` updated to ignore `react/exhaustive-deps` eslint rule ([#44207](https://github.com/WordPress/gutenberg/pull/44207)).
+ -   `Popover`: refactor unit tests to TypeScript and modern RTL assertions ([#44373](https://github.com/WordPress/gutenberg/pull/44373)).
++-   `Sandbox`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44378](https://github.com/WordPress/gutenberg/pull/44378))
+ 
+ ## 21.1.0 (2022-09-21)
+ 
+diff --git a/packages/components/src/sandbox/index.js b/packages/components/src/sandbox/index.js
+index 6bf96696131146..a73df2f640673b 100644
+--- a/packages/components/src/sandbox/index.js
++++ b/packages/components/src/sandbox/index.js
+@@ -205,32 +205,38 @@ export default function Sandbox( {
+ 			setHeight( data.height );
+ 		}
+ 
+-		const { ownerDocument } = ref.current;
++		const iframe = ref.current;
++		const { ownerDocument } = iframe;
+ 		const { defaultView } = ownerDocument;
+ 
+ 		// This used to be registered using <iframe onLoad={} />, but it made the iframe blank
+ 		// after reordering the containing block. See these two issues for more details:
+ 		// https://github.com/WordPress/gutenberg/issues/6146
+ 		// https://github.com/facebook/react/issues/18752
+-		ref.current.addEventListener( 'load', tryNoForceSandbox, false );
++		iframe.addEventListener( 'load', tryNoForceSandbox, false );
+ 		defaultView.addEventListener( 'message', checkMessageForResize );
+ 
+ 		return () => {
+-			ref.current?.removeEventListener(
+-				'load',
+-				tryNoForceSandbox,
+-				false
+-			);
++			iframe?.removeEventListener( 'load', tryNoForceSandbox, false );
+ 			defaultView.addEventListener( 'message', checkMessageForResize );
+ 		};
++		// Ignore reason: passing `exhaustive-deps` will likely involve a more detailed refactor.
++		// See https://github.com/WordPress/gutenberg/pull/44378
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [] );
+ 
+ 	useEffect( () => {
+ 		trySandbox();
++		// Ignore reason: passing `exhaustive-deps` will likely involve a more detailed refactor.
++		// See https://github.com/WordPress/gutenberg/pull/44378
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ title, styles, scripts ] );
+ 
+ 	useEffect( () => {
+ 		trySandbox( true );
++		// Ignore reason: passing `exhaustive-deps` will likely involve a more detailed refactor.
++		// See https://github.com/WordPress/gutenberg/pull/44378
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ html, type ] );
+ 
+ 	return (
+diff --git a/packages/components/src/sandbox/index.native.js b/packages/components/src/sandbox/index.native.js
+index df5f0138fb95f8..65eb87305fda10 100644
+--- a/packages/components/src/sandbox/index.native.js
++++ b/packages/components/src/sandbox/index.native.js
+@@ -282,6 +282,9 @@ function Sandbox( {
+ 
+ 	useEffect( () => {
+ 		updateContentHtml();
++		// Disable reason: deferring this refactor to the native team.
++		// see https://github.com/WordPress/gutenberg/pull/41166
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ html, title, type, styles, scripts ] );
+ 
+ 	useEffect( () => {

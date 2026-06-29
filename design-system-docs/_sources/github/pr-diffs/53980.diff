@@ -1,0 +1,213 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5df10f16b91942..b50e7dce23c905 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -22,6 +22,7 @@
+ -   `BorderControl`: Refactor unit tests to use `userEvent` ([#54155](https://github.com/WordPress/gutenberg/pull/54155))
+ -   `FocusableIframe`: Convert to TypeScript ([#53979](https://github.com/WordPress/gutenberg/pull/53979)).
+ -   `Popover`: Remove unused `overlay` type from `positionToPlacement` utility function ([#54101](https://github.com/WordPress/gutenberg/pull/54101)).
++-   `Higher Order` -- `with-focus-outside`: Convert to TypeScript ([#53980](https://github.com/WordPress/gutenberg/pull/53980)).
+ -   `IsolatedEventContainer`: Convert unit test to TypeScript ([#54316](https://github.com/WordPress/gutenberg/pull/54316)).
+ 
+ ### Experimental
+diff --git a/packages/components/src/combobox-control/index.tsx b/packages/components/src/combobox-control/index.tsx
+index eb8ae89c0971e5..f4292d9980ee41 100644
+--- a/packages/components/src/combobox-control/index.tsx
++++ b/packages/components/src/combobox-control/index.tsx
+@@ -36,16 +36,18 @@ import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props'
+ 
+ const noop = () => {};
+ 
++interface DetectOutsideComponentProps {
++	onFocusOutside: ( event: React.FocusEvent ) => void;
++	children?: React.ReactNode;
++}
++
+ const DetectOutside = withFocusOutside(
+-	class extends Component {
+-		// @ts-expect-error - TODO: Should be resolved when `withFocusOutside` is refactored to TypeScript
+-		handleFocusOutside( event ) {
+-			// @ts-expect-error - TODO: Should be resolved when `withFocusOutside` is refactored to TypeScript
++	class extends Component< DetectOutsideComponentProps > {
++		handleFocusOutside( event: React.FocusEvent ) {
+ 			this.props.onFocusOutside( event );
+ 		}
+ 
+ 		render() {
+-			// @ts-expect-error - TODO: Should be resolved when `withFocusOutside` is refactored to TypeScript
+ 			return this.props.children;
+ 		}
+ 	}
+diff --git a/packages/components/src/higher-order/with-focus-outside/index.js b/packages/components/src/higher-order/with-focus-outside/index.tsx
+similarity index 79%
+rename from packages/components/src/higher-order/with-focus-outside/index.js
+rename to packages/components/src/higher-order/with-focus-outside/index.tsx
+index 41a7d9c9c3ea47..d340874b8bf136 100644
+--- a/packages/components/src/higher-order/with-focus-outside/index.js
++++ b/packages/components/src/higher-order/with-focus-outside/index.tsx
+@@ -1,5 +1,3 @@
+-//@ts-nocheck
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -11,9 +9,14 @@ import {
+ 
+ export default createHigherOrderComponent(
+ 	( WrappedComponent ) => ( props ) => {
+-		const [ handleFocusOutside, setHandleFocusOutside ] = useState();
+-		const bindFocusOutsideHandler = useCallback(
+-			( node ) =>
++		const [ handleFocusOutside, setHandleFocusOutside ] = useState<
++			undefined | ( ( event: React.FocusEvent ) => void )
++		>( undefined );
++
++		const bindFocusOutsideHandler = useCallback<
++			( node: React.FocusEvent ) => void
++		>(
++			( node: any ) =>
+ 				setHandleFocusOutside( () =>
+ 					node?.handleFocusOutside
+ 						? node.handleFocusOutside.bind( node )
+diff --git a/packages/components/src/higher-order/with-focus-outside/test/index.js b/packages/components/src/higher-order/with-focus-outside/test/index.tsx
+similarity index 85%
+rename from packages/components/src/higher-order/with-focus-outside/test/index.js
+rename to packages/components/src/higher-order/with-focus-outside/test/index.tsx
+index ed0e70f2ec37a6..a53a1cf11298df 100644
+--- a/packages/components/src/higher-order/with-focus-outside/test/index.js
++++ b/packages/components/src/higher-order/with-focus-outside/test/index.tsx
+@@ -12,17 +12,21 @@ import { Component } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import withFocusOutside from '../';
++import withFocusOutside from '..';
+ 
+-let onFocusOutside;
++interface TestComponentProps {
++	onFocusOutside: ( event: FocusEvent ) => void;
++}
++
++let onFocusOutside: () => void;
+ 
+ describe( 'withFocusOutside', () => {
+-	let origHasFocus;
++	let origHasFocus: typeof document.hasFocus;
+ 
+ 	const EnhancedComponent = withFocusOutside(
+-		class extends Component {
++		class extends Component< TestComponentProps > {
+ 			handleFocusOutside() {
+-				this.props.onFocusOutside();
++				this.props.onFocusOutside( new FocusEvent( 'blur' ) );
+ 			}
+ 
+ 			render() {
+@@ -36,15 +40,13 @@ describe( 'withFocusOutside', () => {
+ 		}
+ 	);
+ 
+-	class TestComponent extends Component {
+-		render() {
+-			return <EnhancedComponent { ...this.props } />;
+-		}
+-	}
++	const TestComponent: React.FC< TestComponentProps > = ( props ) => {
++		return <EnhancedComponent { ...props } />;
++	};
+ 
+ 	beforeEach( () => {
+ 		// Mock document.hasFocus() to always be true for testing
+-		// note: we overide this for some tests.
++		// note: we override this for some tests.
+ 		origHasFocus = document.hasFocus;
+ 		document.hasFocus = () => true;
+ 
+diff --git a/packages/compose/src/hooks/use-focus-outside/index.ts b/packages/compose/src/hooks/use-focus-outside/index.ts
+index 8d50a078ad70b5..3d85b588a9ab3a 100644
+--- a/packages/compose/src/hooks/use-focus-outside/index.ts
++++ b/packages/compose/src/hooks/use-focus-outside/index.ts
+@@ -1,16 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import type {
+-	FocusEventHandler,
+-	EventHandler,
+-	MouseEventHandler,
+-	TouchEventHandler,
+-	FocusEvent,
+-	MouseEvent,
+-	TouchEvent,
+-} from 'react';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -63,12 +50,12 @@ function isFocusNormalizedButton(
+ }
+ 
+ type UseFocusOutsideReturn = {
+-	onFocus: FocusEventHandler;
+-	onMouseDown: MouseEventHandler;
+-	onMouseUp: MouseEventHandler;
+-	onTouchStart: TouchEventHandler;
+-	onTouchEnd: TouchEventHandler;
+-	onBlur: FocusEventHandler;
++	onFocus: React.FocusEventHandler;
++	onMouseDown: React.MouseEventHandler;
++	onMouseUp: React.MouseEventHandler;
++	onTouchStart: React.TouchEventHandler;
++	onTouchEnd: React.TouchEventHandler;
++	onBlur: React.FocusEventHandler;
+ };
+ 
+ /**
+@@ -82,7 +69,7 @@ type UseFocusOutsideReturn = {
+  * wrapping element element to capture when focus moves outside that element.
+  */
+ export default function useFocusOutside(
+-	onFocusOutside: ( event: FocusEvent ) => void
++	onFocusOutside: ( ( event: React.FocusEvent ) => void ) | undefined
+ ): UseFocusOutsideReturn {
+ 	const currentOnFocusOutside = useRef( onFocusOutside );
+ 	useEffect( () => {
+@@ -122,17 +109,18 @@ export default function useFocusOutside(
+ 	 * @param event
+ 	 * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
+ 	 */
+-	const normalizeButtonFocus: EventHandler< MouseEvent | TouchEvent > =
+-		useCallback( ( event ) => {
+-			const { type, target } = event;
+-			const isInteractionEnd = [ 'mouseup', 'touchend' ].includes( type );
+-
+-			if ( isInteractionEnd ) {
+-				preventBlurCheck.current = false;
+-			} else if ( isFocusNormalizedButton( target ) ) {
+-				preventBlurCheck.current = true;
+-			}
+-		}, [] );
++	const normalizeButtonFocus: React.EventHandler<
++		React.MouseEvent | React.TouchEvent
++	> = useCallback( ( event ) => {
++		const { type, target } = event;
++		const isInteractionEnd = [ 'mouseup', 'touchend' ].includes( type );
++
++		if ( isInteractionEnd ) {
++			preventBlurCheck.current = false;
++		} else if ( isFocusNormalizedButton( target ) ) {
++			preventBlurCheck.current = true;
++		}
++	}, [] );
+ 
+ 	/**
+ 	 * A callback triggered when a blur event occurs on the element the handler
+@@ -141,7 +129,7 @@ export default function useFocusOutside(
+ 	 * Calls the `onFocusOutside` callback in an immediate timeout if focus has
+ 	 * move outside the bound element and is still within the document.
+ 	 */
+-	const queueBlurCheck: FocusEventHandler = useCallback( ( event ) => {
++	const queueBlurCheck: React.FocusEventHandler = useCallback( ( event ) => {
+ 		// React does not allow using an event reference asynchronously
+ 		// due to recycling behavior, except when explicitly persisted.
+ 		event.persist();

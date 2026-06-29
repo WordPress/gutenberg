@@ -1,0 +1,166 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c1e91d2e04720e..0ca8fb69cde4fd 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ -   `Tabs`: Add `focusable` prop to the `Tabs.TabPanel` sub-component ([#55287](https://github.com/WordPress/gutenberg/pull/55287))
+ -   `Tabs`: Update sub-components to accept relevant HTML element props ([#55860](https://github.com/WordPress/gutenberg/pull/55860))
+ -   `DropdownMenuV2`: Fix radio menu item check icon not rendering correctly in some browsers ([#55964](https://github.com/WordPress/gutenberg/pull/55964))
++-   `DropdownMenuV2`: prevent default when pressing Escape key to close menu ([#55962](https://github.com/WordPress/gutenberg/pull/55962))
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/dropdown-menu-v2-ariakit/README.md b/packages/components/src/dropdown-menu-v2-ariakit/README.md
+index 89fccb54e7d011..f74098efff4103 100644
+--- a/packages/components/src/dropdown-menu-v2-ariakit/README.md
++++ b/packages/components/src/dropdown-menu-v2-ariakit/README.md
+@@ -113,13 +113,6 @@ The skidding of the popover along the anchor element. Can be set to negative val
+ - Required: no
+ - Default: `0` for root-level menus, `-8` for nested menus
+ 
+-##### `hideOnEscape`: `boolean | ( ( event: KeyboardEvent | React.KeyboardEvent< Element > ) => boolean )`
+-
+-Determines whether the menu popover will be hidden when the user presses the Escape key.
+-
+-- Required: no
+-- Default: `true`
+-
+ ### `DropdownMenuItem`
+ 
+ Used to render a menu item.
+diff --git a/packages/components/src/dropdown-menu-v2-ariakit/index.tsx b/packages/components/src/dropdown-menu-v2-ariakit/index.tsx
+index d7894f565faddd..10b93d8c552c13 100644
+--- a/packages/components/src/dropdown-menu-v2-ariakit/index.tsx
++++ b/packages/components/src/dropdown-menu-v2-ariakit/index.tsx
+@@ -14,6 +14,7 @@ import {
+ 	useMemo,
+ 	cloneElement,
+ 	isValidElement,
++	useCallback,
+ } from '@wordpress/element';
+ import { isRTL } from '@wordpress/i18n';
+ import { check, chevronRightSmall } from '@wordpress/icons';
+@@ -180,7 +181,6 @@ const UnconnectedDropdownMenu = (
+ 		children,
+ 		shift,
+ 		modal = true,
+-		hideOnEscape = true,
+ 
+ 		// From internal components context
+ 		variant,
+@@ -248,6 +248,28 @@ const UnconnectedDropdownMenu = (
+ 		);
+ 	}
+ 
++	const hideOnEscape = useCallback(
++		( event: React.KeyboardEvent< Element > ) => {
++			// Pressing Escape can cause unexpected consequences (ie. exiting
++			// full screen mode on MacOs, close parent modals...).
++			event.preventDefault();
++			// Returning `true` causes the menu to hide.
++			return true;
++		},
++		[]
++	);
++
++	const wrapperProps = useMemo(
++		() => ( {
++			dir: computedDirection,
++			style: {
++				direction:
++					computedDirection as React.CSSProperties[ 'direction' ],
++			},
++		} ),
++		[ computedDirection ]
++	);
++
+ 	return (
+ 		<>
+ 			{ /* Menu trigger */ }
+@@ -280,12 +302,7 @@ const UnconnectedDropdownMenu = (
+ 				hideOnHoverOutside={ false }
+ 				data-side={ appliedPlacementSide }
+ 				variant={ variant }
+-				wrapperProps={ {
+-					dir: computedDirection,
+-					style: {
+-						direction: computedDirection,
+-					},
+-				} }
++				wrapperProps={ wrapperProps }
+ 				hideOnEscape={ hideOnEscape }
+ 				unmountOnHide
+ 			>
+diff --git a/packages/components/src/dropdown-menu-v2-ariakit/stories/index.story.tsx b/packages/components/src/dropdown-menu-v2-ariakit/stories/index.story.tsx
+index 901a1c32ec4743..a6319c6cfdc932 100644
+--- a/packages/components/src/dropdown-menu-v2-ariakit/stories/index.story.tsx
++++ b/packages/components/src/dropdown-menu-v2-ariakit/stories/index.story.tsx
+@@ -40,6 +40,7 @@ const meta: Meta< typeof DropdownMenu > = {
+ 	},
+ 	argTypes: {
+ 		children: { control: { type: null } },
++		trigger: { control: { type: null } },
+ 	},
+ 	parameters: {
+ 		actions: { argTypesRegex: '^on.*' },
+@@ -494,10 +495,6 @@ export const InsideModal: StoryFn< typeof DropdownMenu > = ( props ) => {
+ };
+ InsideModal.args = {
+ 	...Default.args,
+-	hideOnEscape: ( e ) => {
+-		e.stopPropagation();
+-		return true;
+-	},
+ };
+ InsideModal.parameters = {
+ 	docs: {
+diff --git a/packages/components/src/dropdown-menu-v2-ariakit/test/index.tsx b/packages/components/src/dropdown-menu-v2-ariakit/test/index.tsx
+index 3976159a82e68d..297bc0dec9390f 100644
+--- a/packages/components/src/dropdown-menu-v2-ariakit/test/index.tsx
++++ b/packages/components/src/dropdown-menu-v2-ariakit/test/index.tsx
+@@ -197,32 +197,6 @@ describe( 'DropdownMenu', () => {
+ 			);
+ 		} );
+ 
+-		it( 'should not close when pressing the escape key if the `hideOnEscape` prop is set to `false`', async () => {
+-			render(
+-				<DropdownMenu
+-					trigger={ <button>Open dropdown</button> }
+-					hideOnEscape={ false }
+-				>
+-					<DropdownMenuItem>Dropdown menu item</DropdownMenuItem>
+-				</DropdownMenu>
+-			);
+-
+-			const trigger = screen.getByRole( 'button', {
+-				name: 'Open dropdown',
+-			} );
+-
+-			await click( trigger );
+-
+-			// Focuses menu on mouse click, focuses first item on keyboard press
+-			// Can be changed with a custom useEffect
+-			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
+-
+-			// Pressing esc will close the menu and move focus to the toggle
+-			await press.Escape();
+-
+-			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
+-		} );
+-
+ 		it( 'should close when clicking outside of the content', async () => {
+ 			render(
+ 				<DropdownMenu
+diff --git a/packages/components/src/dropdown-menu-v2-ariakit/types.ts b/packages/components/src/dropdown-menu-v2-ariakit/types.ts
+index 198b112faa3120..27d3b1e8c43393 100644
+--- a/packages/components/src/dropdown-menu-v2-ariakit/types.ts
++++ b/packages/components/src/dropdown-menu-v2-ariakit/types.ts
+@@ -72,7 +72,7 @@ export interface DropdownMenuProps {
+ 	 * Determines whether the menu popover will be hidden when the user presses
+ 	 * the Escape key.
+ 	 *
+-	 * @default true
++	 * @default `( event ) => { event.preventDefault(); return true; }`
+ 	 */
+ 	hideOnEscape?:
+ 		| boolean

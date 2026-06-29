@@ -1,0 +1,195 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 74fe423a8b81c5..3d2ca92747d159 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ 
+ -   `PaletteEdit`: Use consistent spacing and metrics. ([#61368](https://github.com/WordPress/gutenberg/pull/61368)).
+ -   `FormTokenField`: Hide label when not defined ([#61336](https://github.com/WordPress/gutenberg/pull/61336)).
++-   `ComboboxControl`: supports disabled items ([#61294](https://github.com/WordPress/gutenberg/pull/61294)).
+ -   Upgraded the @types/react and @types/react-dom packages ([#60796](https://github.com/WordPress/gutenberg/pull/60796)).
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/combobox-control/README.md b/packages/components/src/combobox-control/README.md
+index b84e01b7d6a077..fade4c66a796e3 100644
+--- a/packages/components/src/combobox-control/README.md
++++ b/packages/components/src/combobox-control/README.md
+@@ -77,7 +77,7 @@ If this property is added, a help text will be generated using help property as
+ 
+ The options that can be chosen from.
+ 
+--   Type: `Array<{ value: string, label: string }>`
++-   Type: `Array<{ value: string, label: string, disabled?: boolean }>`
+ -   Required: Yes
+ 
+ #### onFilterValueChange
+diff --git a/packages/components/src/combobox-control/index.tsx b/packages/components/src/combobox-control/index.tsx
+index 1bfcd430b3e905..b11a77b1dbdae6 100644
+--- a/packages/components/src/combobox-control/index.tsx
++++ b/packages/components/src/combobox-control/index.tsx
+@@ -78,10 +78,12 @@ const getIndexOfMatchingSuggestion = (
+  * 	{
+  * 		value: 'normal',
+  * 		label: 'Normal',
++ * 		disabled: true,
+  * 	},
+  * 	{
+  * 		value: 'large',
+  * 		label: 'Large',
++ * 		disabled: false,
+  * 	},
+  * ];
+  *
+@@ -165,6 +167,10 @@ function ComboboxControl( props: ComboboxControlProps ) {
+ 	const onSuggestionSelected = (
+ 		newSelectedSuggestion: ComboboxControlOption
+ 	) => {
++		if ( newSelectedSuggestion.disabled ) {
++			return;
++		}
++
+ 		setValue( newSelectedSuggestion.value );
+ 		speak( messages.selected, 'assertive' );
+ 		setSelectedSuggestion( newSelectedSuggestion );
+diff --git a/packages/components/src/combobox-control/stories/index.story.tsx b/packages/components/src/combobox-control/stories/index.story.tsx
+index 9c0e5455ebc06c..e58f68277c916c 100644
+--- a/packages/components/src/combobox-control/stories/index.story.tsx
++++ b/packages/components/src/combobox-control/stories/index.story.tsx
+@@ -20,6 +20,17 @@ const countries = [
+ 	{ name: 'Albania', code: 'AL' },
+ 	{ name: 'Algeria', code: 'DZ' },
+ 	{ name: 'American Samoa', code: 'AS' },
++	{ name: 'Andorra', code: 'AD' },
++	{ name: 'Angola', code: 'AO' },
++	{ name: 'Anguilla', code: 'AI' },
++	{ name: 'Antarctica', code: 'AQ' },
++	{ name: 'Antigua and Barbuda', code: 'AG' },
++	{ name: 'Argentina', code: 'AR' },
++	{ name: 'Armenia', code: 'AM' },
++	{ name: 'Aruba', code: 'AW' },
++	{ name: 'Australia', code: 'AU' },
++	{ name: 'Austria', code: 'AT' },
++	{ name: 'Azerbaijan', code: 'AZ' },
+ ];
+ 
+ const meta: Meta< typeof ComboboxControl > = {
+@@ -111,3 +122,20 @@ WithCustomRenderItem.args = {
+ 		);
+ 	},
+ };
++
++/**
++ * You can disable options in the list
++ * by setting the `disabled` property to true
++ * for individual items in the option object.
++ */
++export const WithDisabledOptions = Template.bind( {} );
++const optionsWithDisabledOptions = countryOptions.map( ( option, index ) => ( {
++	...option,
++	disabled: index % 3 === 0, // Disable options at index 0, 3, 6, etc.
++} ) );
++
++WithDisabledOptions.args = {
++	allowReset: false,
++	label: 'Select a country',
++	options: optionsWithDisabledOptions,
++};
+diff --git a/packages/components/src/combobox-control/types.ts b/packages/components/src/combobox-control/types.ts
+index 6a32fb17e16c08..ae20170629873c 100644
+--- a/packages/components/src/combobox-control/types.ts
++++ b/packages/components/src/combobox-control/types.ts
+@@ -6,6 +6,7 @@ import type { BaseControlProps } from '../base-control/types';
+ export type ComboboxControlOption = {
+ 	label: string;
+ 	value: string;
++	disabled?: boolean;
+ 	[ key: string ]: any;
+ };
+ 
+diff --git a/packages/components/src/form-token-field/style.scss b/packages/components/src/form-token-field/style.scss
+index 72a5b7929a7b04..57435a3f62ad26 100644
+--- a/packages/components/src/form-token-field/style.scss
++++ b/packages/components/src/form-token-field/style.scss
+@@ -181,4 +181,13 @@
+ 		background: $components-color-accent;
+ 		color: $white;
+ 	}
++
++	&[aria-disabled="true"] {
++		pointer-events: none;
++		color: $gray-600;
++
++		&.is-selected {
++			background-color: $components-color-accent-transparent-40;
++		}
++	}
+ }
+diff --git a/packages/components/src/form-token-field/suggestions-list.tsx b/packages/components/src/form-token-field/suggestions-list.tsx
+index 328bbed9d4eb89..43a9b87c2030b3 100644
+--- a/packages/components/src/form-token-field/suggestions-list.tsx
++++ b/packages/components/src/form-token-field/suggestions-list.tsx
+@@ -19,7 +19,9 @@ const handleMouseDown: MouseEventHandler = ( e ) => {
+ 	e.preventDefault();
+ };
+ 
+-export function SuggestionsList< T extends string | { value: string } >( {
++export function SuggestionsList<
++	T extends string | { value: string; disabled?: boolean },
++>( {
+ 	selectedIndex,
+ 	scrollIntoView,
+ 	match,
+@@ -103,10 +105,18 @@ export function SuggestionsList< T extends string | { value: string } >( {
+ 		>
+ 			{ suggestions.map( ( suggestion, index ) => {
+ 				const matchText = computeSuggestionMatch( suggestion );
++				const isSelected = index === selectedIndex;
++				const isDisabled =
++					typeof suggestion === 'object' && suggestion?.disabled;
++				const key =
++					typeof suggestion === 'object' && 'value' in suggestion
++						? suggestion?.value
++						: displayTransform( suggestion );
++
+ 				const className = clsx(
+ 					'components-form-token-field__suggestion',
+ 					{
+-						'is-selected': index === selectedIndex,
++						'is-selected': isSelected,
+ 					}
+ 				);
+ 
+@@ -134,16 +144,12 @@ export function SuggestionsList< T extends string | { value: string } >( {
+ 						id={ `components-form-token-suggestions-${ instanceId }-${ index }` }
+ 						role="option"
+ 						className={ className }
+-						key={
+-							typeof suggestion === 'object' &&
+-							'value' in suggestion
+-								? suggestion?.value
+-								: displayTransform( suggestion )
+-						}
++						key={ key }
+ 						onMouseDown={ handleMouseDown }
+ 						onClick={ handleClick( suggestion ) }
+ 						onMouseEnter={ handleHover( suggestion ) }
+ 						aria-selected={ index === selectedIndex }
++						aria-disabled={ isDisabled }
+ 					>
+ 						{ output }
+ 					</li>
+diff --git a/packages/components/src/utils/theme-variables.scss b/packages/components/src/utils/theme-variables.scss
+index 14e44f3ddc7d2f..8c8c2d8a5633f7 100644
+--- a/packages/components/src/utils/theme-variables.scss
++++ b/packages/components/src/utils/theme-variables.scss
+@@ -4,6 +4,10 @@
+ // `--wp-admin-theme-color`. If the `--wp-admin-theme-color` variable is not
+ // defined, fallback to the default theme color (WP blueberry).
+ $components-color-accent: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
++
++// Define accent color transparent variants.
++$components-color-accent-transparent-40: rgba(var(--wp-components-color-accent--rgb, var(--wp-admin-theme-color--rgb)), 0.04);
++
+ $components-color-accent-darker-10: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6));
+ $components-color-accent-darker-20: var(--wp-components-color-accent-darker-20, var(--wp-admin-theme-color-darker-20, #183ad6));
+ 

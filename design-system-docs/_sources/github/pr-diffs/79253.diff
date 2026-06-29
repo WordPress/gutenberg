@@ -1,0 +1,25 @@
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index 2a5a96d6eeb4e7..749f20bb4c94af 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -28,6 +28,7 @@
+ 
+ ### Code Quality
+ 
++-   `ThemeProvider`: Stop serializing `data-wpds-root-provider="false"` on non-root providers by only setting the attribute when `isRoot` is `true` ([#79253](https://github.com/WordPress/gutenberg/pull/79253)).
+ -   Declare `postcss`, `esbuild`, and `vite` as optional peer dependencies for the bundler plugins, and move `@types/react` from `dependencies` to an optional peer dependency ([#79095](https://github.com/WordPress/gutenberg/pull/79095)).
+ 
+ ## 0.15.1 (2026-06-16)
+diff --git a/packages/theme/src/theme-provider.tsx b/packages/theme/src/theme-provider.tsx
+index d034cbf24b4979..e666512407a55a 100644
+--- a/packages/theme/src/theme-provider.tsx
++++ b/packages/theme/src/theme-provider.tsx
+@@ -70,7 +70,7 @@ export const ThemeProvider = ( {
+ 			) : null }
+ 			<div
+ 				data-wpds-theme-provider-id={ instanceId }
+-				data-wpds-root-provider={ isRoot }
++				data-wpds-root-provider={ isRoot || undefined }
+ 				data-wpds-corner-radius={ cornerRadiusPreset }
+ 				className={ styles.root }
+ 			>

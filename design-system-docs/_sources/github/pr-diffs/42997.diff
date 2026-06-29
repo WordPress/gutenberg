@@ -1,0 +1,54 @@
+diff --git a/packages/block-editor/src/components/list-view/expander.js b/packages/block-editor/src/components/list-view/expander.js
+index 7512689b9cdb1c..3b93f8ad01185c 100644
+--- a/packages/block-editor/src/components/list-view/expander.js
++++ b/packages/block-editor/src/components/list-view/expander.js
+@@ -1,7 +1,9 @@
+ /**
+  * WordPress dependencies
+  */
+-import { chevronRightSmall, Icon } from '@wordpress/icons';
++import { chevronRightSmall, chevronLeftSmall, Icon } from '@wordpress/icons';
++import { isRTL } from '@wordpress/i18n';
++
+ export default function ListViewExpander( { onClick } ) {
+ 	return (
+ 		// Keyboard events are handled by TreeGrid see: components/src/tree-grid/index.js
+@@ -18,7 +20,7 @@ export default function ListViewExpander( { onClick } ) {
+ 			onClick={ ( event ) => onClick( event, { forceToggle: true } ) }
+ 			aria-hidden="true"
+ 		>
+-			<Icon icon={ chevronRightSmall } />
++			<Icon icon={ isRTL() ? chevronLeftSmall : chevronRightSmall } />
+ 		</span>
+ 	);
+ }
+diff --git a/packages/icons/src/index.js b/packages/icons/src/index.js
+index e25c4b256bc12a..a967293418d5c0 100644
+--- a/packages/icons/src/index.js
++++ b/packages/icons/src/index.js
+@@ -34,6 +34,7 @@ export { default as chartBar } from './library/chart-bar';
+ export { default as check } from './library/check';
+ export { default as chevronDown } from './library/chevron-down';
+ export { default as chevronLeft } from './library/chevron-left';
++export { default as chevronLeftSmall } from './library/chevron-left-small';
+ export { default as chevronRight } from './library/chevron-right';
+ export { default as chevronRightSmall } from './library/chevron-right-small';
+ export { default as chevronUp } from './library/chevron-up';
+diff --git a/packages/icons/src/library/chevron-left-small.js b/packages/icons/src/library/chevron-left-small.js
+new file mode 100644
+index 00000000000000..aaa0e8f0218fe3
+--- /dev/null
++++ b/packages/icons/src/library/chevron-left-small.js
+@@ -0,0 +1,12 @@
++/**
++ * WordPress dependencies
++ */
++import { SVG, Path } from '@wordpress/primitives';
++
++const chevronLeftSmall = (
++	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
++		<Path d="m13.1 16-3.4-4 3.4-4 1.1 1-2.6 3 2.6 3-1.1 1z" />
++	</SVG>
++);
++
++export default chevronLeftSmall;

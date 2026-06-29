@@ -1,0 +1,4089 @@
+diff --git a/package-lock.json b/package-lock.json
+index d3500a5e00505d..8749fedc24c131 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -1507,6 +1507,7 @@
+ 			"version": "0.2.1",
+ 			"resolved": "https://registry.npmjs.org/@choojs/findup/-/findup-0.2.1.tgz",
+ 			"integrity": "sha512-YstAqNb0MCN8PjdLCDfRsBcGVRN41f3vgLvaI0IrIcBp4AqILRSS0DeWNGkicC+f/zRIPJLc+9RURVSepwvfBw==",
++			"dev": true,
+ 			"requires": {
+ 				"commander": "^2.15.1"
+ 			},
+@@ -1514,7 +1515,8 @@
+ 				"commander": {
+ 					"version": "2.20.3",
+ 					"resolved": "https://registry.npmjs.org/commander/-/commander-2.20.3.tgz",
+-					"integrity": "sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ=="
++					"integrity": "sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==",
++					"dev": true
+ 				}
+ 			}
+ 		},
+@@ -12433,10 +12435,10 @@
+ 				"@wordpress/primitives": "file:packages/primitives",
+ 				"@wordpress/rich-text": "file:packages/rich-text",
+ 				"@wordpress/warning": "file:packages/warning",
+-				"@wp-g2/components": "^0.0.160",
+-				"@wp-g2/context": "^0.0.160",
+-				"@wp-g2/styles": "^0.0.160",
+-				"@wp-g2/utils": "^0.0.160",
++				"@wp-g2/components": "^0.0.163",
++				"@wp-g2/context": "^0.0.163",
++				"@wp-g2/styles": "^0.0.163",
++				"@wp-g2/utils": "^0.0.163",
+ 				"classnames": "^2.2.5",
+ 				"dom-scroll-into-view": "^1.2.1",
+ 				"downshift": "^6.0.15",
+@@ -12454,6 +12456,131 @@
+ 				"rememo": "^3.0.0",
+ 				"tinycolor2": "^1.4.2",
+ 				"uuid": "^8.3.0"
++			},
++			"dependencies": {
++				"@emotion/is-prop-valid": {
++					"version": "0.8.8",
++					"resolved": "https://registry.npmjs.org/@emotion/is-prop-valid/-/is-prop-valid-0.8.8.tgz",
++					"integrity": "sha512-u5WtneEAr5IDG2Wv65yhunPSMLIpuKsbuOktRojfrEiEvRyC85LgPMZI63cr7NUqT8ZIGdSVg8ZKGxIug4lXcA==",
++					"requires": {
++						"@emotion/memoize": "0.7.4"
++					}
++				},
++				"@emotion/memoize": {
++					"version": "0.7.4",
++					"resolved": "https://registry.npmjs.org/@emotion/memoize/-/memoize-0.7.4.tgz",
++					"integrity": "sha512-Ja/Vfqe3HpuzRsG1oBtWTHk2PGZ7GR+2Vz5iYGelAw8dx32K0y7PjVuxK6z1nMpZOqAFsRUPCkK1YjJ56qJlgw=="
++				},
++				"@wp-g2/components": {
++					"version": "0.0.163",
++					"resolved": "https://registry.npmjs.org/@wp-g2/components/-/components-0.0.163.tgz",
++					"integrity": "sha512-kL4yvBG5f3Xlw1ktf860Mp3oisAVgacDeCrV5pyeCQdH9m47QlK161Sdr6qliCupeS0ec0nr9XNoTietFZaOwA==",
++					"requires": {
++						"@popperjs/core": "^2.5.4",
++						"@wp-g2/context": "^0.0.163",
++						"@wp-g2/styles": "^0.0.163",
++						"@wp-g2/utils": "^0.0.163",
++						"csstype": "^3.0.3",
++						"downshift": "^6.0.15",
++						"framer-motion": "^2.1.0",
++						"highlight-words-core": "^1.2.2",
++						"history": "^4.9.0",
++						"lodash": "^4.17.19",
++						"path-to-regexp": "^1.7.0",
++						"react-colorful": "4.4.4",
++						"react-textarea-autosize": "^8.2.0",
++						"react-use-gesture": "^9.0.0",
++						"reakit": "^1.3.4"
++					}
++				},
++				"@wp-g2/context": {
++					"version": "0.0.163",
++					"resolved": "https://registry.npmjs.org/@wp-g2/context/-/context-0.0.163.tgz",
++					"integrity": "sha512-9qQi8U16hgbRWrH+8JFfiJD0C1yX3kkk11ppwGPsM0uyfv8ES8bD+j7L0a45YIt6mCmBdXp5JUQQiqutsoKA/Q==",
++					"requires": {
++						"@wp-g2/create-styles": "^0.0.163",
++						"@wp-g2/styles": "^0.0.163",
++						"@wp-g2/utils": "^0.0.163",
++						"lodash": "^4.17.19"
++					}
++				},
++				"@wp-g2/create-styles": {
++					"version": "0.0.163",
++					"resolved": "https://registry.npmjs.org/@wp-g2/create-styles/-/create-styles-0.0.163.tgz",
++					"integrity": "sha512-dKegPWg39929WRRqInbuaAayQs+No+bnx2tYNMfHkeCw9R6berQnGcC+toqLecD72L6hcNfcTA9nJ9g6HMexRQ==",
++					"requires": {
++						"@emotion/core": "^10.1.1",
++						"@emotion/hash": "^0.8.0",
++						"@emotion/is-prop-valid": "^0.8.8",
++						"@wp-g2/utils": "^0.0.163",
++						"create-emotion": "^10.0.27",
++						"emotion": "^10.0.27",
++						"emotion-theming": "^10.0.27",
++						"lodash": "^4.17.19",
++						"mitt": "^2.1.0",
++						"styled-griddie": "^0.1.3"
++					}
++				},
++				"@wp-g2/styles": {
++					"version": "0.0.163",
++					"resolved": "https://registry.npmjs.org/@wp-g2/styles/-/styles-0.0.163.tgz",
++					"integrity": "sha512-QDQB7imJmxEPrhqjh6f5DBwmDV75+8plchJ1AO/9AACdBrTProWi/EW5y5Jui+r+f7sCUnRbkeLVdcp9MySRYw==",
++					"requires": {
++						"@wp-g2/create-styles": "^0.0.163",
++						"@wp-g2/utils": "^0.0.163"
++					}
++				},
++				"@wp-g2/utils": {
++					"version": "0.0.163",
++					"resolved": "https://registry.npmjs.org/@wp-g2/utils/-/utils-0.0.163.tgz",
++					"integrity": "sha512-W3tr3MxQV+nd0wMWrENW4ZR2KoUIqroSIs1CZ4Rvd2apmEy4RaCrteKsud1ZCv64MkqHt85glMh6ifDILtDgjA==",
++					"requires": {
++						"copy-to-clipboard": "^3.3.1",
++						"create-emotion": "^10.0.27",
++						"deepmerge": "^4.2.2",
++						"fast-deep-equal": "^3.1.3",
++						"hoist-non-react-statics": "^3.3.2",
++						"json2mq": "^0.2.0",
++						"lodash": "^4.17.19",
++						"memize": "^1.1.0",
++						"react-merge-refs": "^1.1.0",
++						"react-resize-aware": "^3.1.0",
++						"tinycolor2": "^1.4.2",
++						"use-enhanced-state": "^0.0.13",
++						"use-isomorphic-layout-effect": "^1.0.0"
++					}
++				},
++				"csstype": {
++					"version": "3.0.7",
++					"resolved": "https://registry.npmjs.org/csstype/-/csstype-3.0.7.tgz",
++					"integrity": "sha512-KxnUB0ZMlnUWCsx2Z8MUsr6qV6ja1w9ArPErJaJaF8a5SOWoHLIszeCTKGRGRgtLgYrs1E8CHkNSP1VZTTPc9g=="
++				},
++				"fast-deep-equal": {
++					"version": "3.1.3",
++					"resolved": "https://registry.npmjs.org/fast-deep-equal/-/fast-deep-equal-3.1.3.tgz",
++					"integrity": "sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q=="
++				},
++				"hoist-non-react-statics": {
++					"version": "3.3.2",
++					"resolved": "https://registry.npmjs.org/hoist-non-react-statics/-/hoist-non-react-statics-3.3.2.tgz",
++					"integrity": "sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==",
++					"requires": {
++						"react-is": "^16.7.0"
++					}
++				},
++				"isarray": {
++					"version": "0.0.1",
++					"resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz",
++					"integrity": "sha1-ihis/Kmo9Bd+Cav8YDiTmwXR7t8="
++				},
++				"path-to-regexp": {
++					"version": "1.8.0",
++					"resolved": "https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-1.8.0.tgz",
++					"integrity": "sha512-n43JRhlUKUAlibEJhPeir1ncUID16QnEjNpwzNdO3Lm4ywrBpBZ5oLD0I6br9evr1Y9JTqwRtAh7JLoOzAQdVA==",
++					"requires": {
++						"isarray": "0.0.1"
++					}
++				}
+ 			}
+ 		},
+ 		"@wordpress/compose": {
+@@ -13404,136 +13531,6 @@
+ 				"lodash": "^4.17.19"
+ 			}
+ 		},
+-		"@wp-g2/components": {
+-			"version": "0.0.160",
+-			"resolved": "https://registry.npmjs.org/@wp-g2/components/-/components-0.0.160.tgz",
+-			"integrity": "sha512-44qUtiF5Nl/srD7Vzbpcd0im/EIej04fOdDfa0lfDxXJDNK3RRtSSEwCRhok/M5SKCmvYbZKRUx2K0ugXNqK0Q==",
+-			"requires": {
+-				"@popperjs/core": "^2.5.4",
+-				"@wp-g2/context": "^0.0.160",
+-				"@wp-g2/styles": "^0.0.160",
+-				"@wp-g2/utils": "^0.0.160",
+-				"csstype": "^3.0.3",
+-				"downshift": "^6.0.15",
+-				"framer-motion": "^2.1.0",
+-				"highlight-words-core": "^1.2.2",
+-				"history": "^4.9.0",
+-				"lodash": "^4.17.19",
+-				"path-to-regexp": "^1.7.0",
+-				"react-colorful": "4.4.4",
+-				"react-textarea-autosize": "^8.2.0",
+-				"react-use-gesture": "^9.0.0",
+-				"reakit": "^1.3.4"
+-			},
+-			"dependencies": {
+-				"csstype": {
+-					"version": "3.0.7",
+-					"resolved": "https://registry.npmjs.org/csstype/-/csstype-3.0.7.tgz",
+-					"integrity": "sha512-KxnUB0ZMlnUWCsx2Z8MUsr6qV6ja1w9ArPErJaJaF8a5SOWoHLIszeCTKGRGRgtLgYrs1E8CHkNSP1VZTTPc9g=="
+-				},
+-				"isarray": {
+-					"version": "0.0.1",
+-					"resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz",
+-					"integrity": "sha1-ihis/Kmo9Bd+Cav8YDiTmwXR7t8="
+-				},
+-				"path-to-regexp": {
+-					"version": "1.8.0",
+-					"resolved": "https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-1.8.0.tgz",
+-					"integrity": "sha512-n43JRhlUKUAlibEJhPeir1ncUID16QnEjNpwzNdO3Lm4ywrBpBZ5oLD0I6br9evr1Y9JTqwRtAh7JLoOzAQdVA==",
+-					"requires": {
+-						"isarray": "0.0.1"
+-					}
+-				}
+-			}
+-		},
+-		"@wp-g2/context": {
+-			"version": "0.0.160",
+-			"resolved": "https://registry.npmjs.org/@wp-g2/context/-/context-0.0.160.tgz",
+-			"integrity": "sha512-50wSQCZkdZEexP88Ljutskn7/klT2Id1ks4GpzKDSBM8kadrfNdr2iabjgJdFLIH33S+r4dzEnzLs9SFtqUgwg==",
+-			"requires": {
+-				"@wp-g2/create-styles": "^0.0.160",
+-				"@wp-g2/styles": "^0.0.160",
+-				"@wp-g2/utils": "^0.0.160",
+-				"lodash": "^4.17.19"
+-			}
+-		},
+-		"@wp-g2/create-styles": {
+-			"version": "0.0.160",
+-			"resolved": "https://registry.npmjs.org/@wp-g2/create-styles/-/create-styles-0.0.160.tgz",
+-			"integrity": "sha512-2/q8jcB9wIyfxkoCfNhz+9otRmAbDwfgk3nSEFhyz9ExR+OCqNUWqmITE3TZ4hYaSsV8E/gUUO4JjnPPy989bA==",
+-			"requires": {
+-				"@emotion/core": "^10.1.1",
+-				"@emotion/hash": "^0.8.0",
+-				"@emotion/is-prop-valid": "^0.8.8",
+-				"@wp-g2/utils": "^0.0.160",
+-				"create-emotion": "^10.0.27",
+-				"emotion": "^10.0.27",
+-				"emotion-theming": "^10.0.27",
+-				"lodash": "^4.17.19",
+-				"mitt": "^2.1.0",
+-				"rtlcss": "^2.6.2",
+-				"styled-griddie": "^0.1.3"
+-			},
+-			"dependencies": {
+-				"@emotion/is-prop-valid": {
+-					"version": "0.8.8",
+-					"resolved": "https://registry.npmjs.org/@emotion/is-prop-valid/-/is-prop-valid-0.8.8.tgz",
+-					"integrity": "sha512-u5WtneEAr5IDG2Wv65yhunPSMLIpuKsbuOktRojfrEiEvRyC85LgPMZI63cr7NUqT8ZIGdSVg8ZKGxIug4lXcA==",
+-					"requires": {
+-						"@emotion/memoize": "0.7.4"
+-					}
+-				},
+-				"@emotion/memoize": {
+-					"version": "0.7.4",
+-					"resolved": "https://registry.npmjs.org/@emotion/memoize/-/memoize-0.7.4.tgz",
+-					"integrity": "sha512-Ja/Vfqe3HpuzRsG1oBtWTHk2PGZ7GR+2Vz5iYGelAw8dx32K0y7PjVuxK6z1nMpZOqAFsRUPCkK1YjJ56qJlgw=="
+-				}
+-			}
+-		},
+-		"@wp-g2/styles": {
+-			"version": "0.0.160",
+-			"resolved": "https://registry.npmjs.org/@wp-g2/styles/-/styles-0.0.160.tgz",
+-			"integrity": "sha512-o91jxb0ZwEDRJrtVVjnqn3qTAXjnxZ1fX5KF3Q7oz776lMZPHsyfC0hvqnOz0w7zqaZZpdWtVQRShgrYXN6JHw==",
+-			"requires": {
+-				"@wp-g2/create-styles": "^0.0.160",
+-				"@wp-g2/utils": "^0.0.160"
+-			}
+-		},
+-		"@wp-g2/utils": {
+-			"version": "0.0.160",
+-			"resolved": "https://registry.npmjs.org/@wp-g2/utils/-/utils-0.0.160.tgz",
+-			"integrity": "sha512-4FhezjKyeYVb+3PZahW1kmqXpCvVvuJM97EcGqkKf+u4Qf66J3n1niHgfnRbn8aNydYK6EFze+6/UL48U35z1w==",
+-			"requires": {
+-				"copy-to-clipboard": "^3.3.1",
+-				"create-emotion": "^10.0.27",
+-				"deepmerge": "^4.2.2",
+-				"fast-deep-equal": "^3.1.3",
+-				"hoist-non-react-statics": "^3.3.2",
+-				"json2mq": "^0.2.0",
+-				"lodash": "^4.17.19",
+-				"memize": "^1.1.0",
+-				"react-merge-refs": "^1.1.0",
+-				"react-resize-aware": "^3.1.0",
+-				"tinycolor2": "^1.4.2",
+-				"use-enhanced-state": "^0.0.13",
+-				"use-isomorphic-layout-effect": "^1.0.0"
+-			},
+-			"dependencies": {
+-				"fast-deep-equal": {
+-					"version": "3.1.3",
+-					"resolved": "https://registry.npmjs.org/fast-deep-equal/-/fast-deep-equal-3.1.3.tgz",
+-					"integrity": "sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q=="
+-				},
+-				"hoist-non-react-statics": {
+-					"version": "3.3.2",
+-					"resolved": "https://registry.npmjs.org/hoist-non-react-statics/-/hoist-non-react-statics-3.3.2.tgz",
+-					"integrity": "sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==",
+-					"requires": {
+-						"react-is": "^16.7.0"
+-					}
+-				}
+-			}
+-		},
+ 		"@xtuc/ieee754": {
+ 			"version": "1.2.0",
+ 			"resolved": "https://registry.npmjs.org/@xtuc/ieee754/-/ieee754-1.2.0.tgz",
+@@ -49477,6 +49474,7 @@
+ 			"version": "2.6.2",
+ 			"resolved": "https://registry.npmjs.org/rtlcss/-/rtlcss-2.6.2.tgz",
+ 			"integrity": "sha512-06LFAr+GAPo+BvaynsXRfoYTJvSaWRyOhURCQ7aeI1MKph9meM222F+Zkt3bDamyHHJuGi3VPtiRkpyswmQbGA==",
++			"dev": true,
+ 			"requires": {
+ 				"@choojs/findup": "^0.2.1",
+ 				"chalk": "^2.4.2",
+@@ -49489,6 +49487,7 @@
+ 					"version": "2.4.2",
+ 					"resolved": "https://registry.npmjs.org/chalk/-/chalk-2.4.2.tgz",
+ 					"integrity": "sha512-Mti+f9lpJNcwF4tWV8/OrTTtF1gZi+f8FqlyAdouralcFWFQWF2+NgCHShjkCb+IFBLq9buZwE1xckQU4peSuQ==",
++					"dev": true,
+ 					"requires": {
+ 						"ansi-styles": "^3.2.1",
+ 						"escape-string-regexp": "^1.0.5",
+@@ -49499,6 +49498,7 @@
+ 					"version": "6.0.23",
+ 					"resolved": "https://registry.npmjs.org/postcss/-/postcss-6.0.23.tgz",
+ 					"integrity": "sha512-soOk1h6J3VMTZtVeVpv15/Hpdl2cBLX3CAw4TAbkpTJiNPk9YP/zWcD1ND+xEtvyuuvKzbxliTOIyvkSeSJ6ag==",
++					"dev": true,
+ 					"requires": {
+ 						"chalk": "^2.4.1",
+ 						"source-map": "^0.6.1",
+@@ -49508,7 +49508,8 @@
+ 				"source-map": {
+ 					"version": "0.6.1",
+ 					"resolved": "https://registry.npmjs.org/source-map/-/source-map-0.6.1.tgz",
+-					"integrity": "sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g=="
++					"integrity": "sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==",
++					"dev": true
+ 				}
+ 			}
+ 		},
+@@ -51717,7 +51718,8 @@
+ 		"strip-json-comments": {
+ 			"version": "2.0.1",
+ 			"resolved": "https://registry.npmjs.org/strip-json-comments/-/strip-json-comments-2.0.1.tgz",
+-			"integrity": "sha1-PFMZQukIwml8DsNEhYwobHygpgo="
++			"integrity": "sha1-PFMZQukIwml8DsNEhYwobHygpgo=",
++			"dev": true
+ 		},
+ 		"strong-log-transformer": {
+ 			"version": "2.1.0",
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 3e8ff18c56f0da..e2506fb622573f 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -45,10 +45,10 @@
+ 		"@wordpress/primitives": "file:../primitives",
+ 		"@wordpress/rich-text": "file:../rich-text",
+ 		"@wordpress/warning": "file:../warning",
+-		"@wp-g2/components": "^0.0.160",
+-		"@wp-g2/context": "^0.0.160",
+-		"@wp-g2/styles": "^0.0.160",
+-		"@wp-g2/utils": "^0.0.160",
++		"@wp-g2/components": "^0.0.163",
++		"@wp-g2/context": "^0.0.163",
++		"@wp-g2/styles": "^0.0.163",
++		"@wp-g2/utils": "^0.0.163",
+ 		"classnames": "^2.2.5",
+ 		"dom-scroll-into-view": "^1.2.1",
+ 		"downshift": "^6.0.15",
+diff --git a/packages/components/src/button/index.js b/packages/components/src/button/index.js
+index 3af63e473d21fc..39db4a4d1d3c0a 100644
+--- a/packages/components/src/button/index.js
++++ b/packages/components/src/button/index.js
+@@ -1,166 +1,17 @@
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-import { isArray, uniqueId } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+-import deprecated from '@wordpress/deprecated';
+ import { forwardRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+-import Tooltip from '../tooltip';
+-import Icon from '../icon';
+-import VisuallyHidden from '../visually-hidden';
+-import { withNextComponent } from './next';
+-
+-const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ];
+-
+-export function Button( props, ref ) {
+-	const {
+-		href,
+-		target,
+-		isPrimary,
+-		isSmall,
+-		isTertiary,
+-		isPressed,
+-		isBusy,
+-		isDefault,
+-		isSecondary,
+-		isLink,
+-		isDestructive,
+-		className,
+-		disabled,
+-		icon,
+-		iconPosition = 'left',
+-		iconSize,
+-		showTooltip,
+-		tooltipPosition,
+-		shortcut,
+-		label,
+-		children,
+-		text,
+-		__experimentalIsFocusable: isFocusable,
+-		describedBy,
+-		...additionalProps
+-	} = props;
+-
+-	if ( isDefault ) {
+-		deprecated( 'Button isDefault prop', {
+-			alternative: 'isSecondary',
+-		} );
+-	}
+-
+-	const classes = classnames( 'components-button', className, {
+-		'is-secondary': isDefault || isSecondary,
+-		'is-primary': isPrimary,
+-		'is-small': isSmall,
+-		'is-tertiary': isTertiary,
+-		'is-pressed': isPressed,
+-		'is-busy': isBusy,
+-		'is-link': isLink,
+-		'is-destructive': isDestructive,
+-		'has-text': !! icon && !! children,
+-		'has-icon': !! icon,
+-	} );
+-
+-	const trulyDisabled = disabled && ! isFocusable;
+-	const Tag = href !== undefined && ! trulyDisabled ? 'a' : 'button';
+-	const tagProps =
+-		Tag === 'a'
+-			? { href, target }
+-			: {
+-					type: 'button',
+-					disabled: trulyDisabled,
+-					'aria-pressed': isPressed,
+-			  };
+-
+-	if ( disabled && isFocusable ) {
+-		// In this case, the button will be disabled, but still focusable and
+-		// perceivable by screen reader users.
+-		tagProps[ 'aria-disabled' ] = true;
+-
+-		for ( const disabledEvent of disabledEventsOnDisabledButton ) {
+-			additionalProps[ disabledEvent ] = ( event ) => {
+-				event.stopPropagation();
+-				event.preventDefault();
+-			};
+-		}
+-	}
+-
+-	// Should show the tooltip if...
+-	const shouldShowTooltip =
+-		! trulyDisabled &&
+-		// an explicit tooltip is passed or...
+-		( ( showTooltip && label ) ||
+-			// there's a shortcut or...
+-			shortcut ||
+-			// there's a label and...
+-			( !! label &&
+-				// the children are empty and...
+-				( ! children ||
+-					( isArray( children ) && ! children.length ) ) &&
+-				// the tooltip is not explicitly disabled.
+-				false !== showTooltip ) );
+-
+-	const descriptionId = describedBy ? uniqueId() : null;
+-
+-	const describedById =
+-		additionalProps[ 'aria-describedby' ] || descriptionId;
+-
+-	const element = (
+-		<Tag
+-			{ ...tagProps }
+-			{ ...additionalProps }
+-			className={ classes }
+-			aria-label={ additionalProps[ 'aria-label' ] || label }
+-			aria-describedby={ describedById }
+-			ref={ ref }
+-		>
+-			{ icon && iconPosition === 'left' && (
+-				<Icon icon={ icon } size={ iconSize } />
+-			) }
+-			{ text && <>{ text }</> }
+-			{ icon && iconPosition === 'right' && (
+-				<Icon icon={ icon } size={ iconSize } />
+-			) }
+-			{ children }
+-		</Tag>
+-	);
+-
+-	if ( ! shouldShowTooltip ) {
+-		return (
+-			<>
+-				{ element }
+-				{ describedBy && (
+-					<VisuallyHidden>
+-						<span id={ descriptionId }>{ describedBy }</span>
+-					</VisuallyHidden>
+-				) }
+-			</>
+-		);
+-	}
++import { TooltipButton as NextButton } from '../ui/tooltip-button';
++import { useDeprecatedButtonProps } from './use-deprecated-button-props';
+ 
+-	return (
+-		<>
+-			<Tooltip
+-				text={ describedBy ? describedBy : label }
+-				shortcut={ shortcut }
+-				position={ tooltipPosition }
+-			>
+-				{ element }
+-			</Tooltip>
+-			{ describedBy && (
+-				<VisuallyHidden>
+-					<span id={ descriptionId }>{ describedBy }</span>
+-				</VisuallyHidden>
+-			) }
+-		</>
+-	);
++function Button( props, forwardedRef ) {
++	const cleanedProps = useDeprecatedButtonProps( props );
++	return <NextButton { ...cleanedProps } ref={ forwardedRef } />;
+ }
+ 
+-export default withNextComponent( forwardRef( Button ) );
++export default forwardRef( Button );
+diff --git a/packages/components/src/button/use-deprecated-button-props.js b/packages/components/src/button/use-deprecated-button-props.js
+new file mode 100644
+index 00000000000000..d6df6556f25b53
+--- /dev/null
++++ b/packages/components/src/button/use-deprecated-button-props.js
+@@ -0,0 +1,193 @@
++/**
++ * WordPress dependencies
++ */
++import deprecated from '@wordpress/deprecated';
++/**
++ * Internal dependencies
++ */
++import Dashicon from '../dashicon';
++
++const getVariant = ( {
++	variant,
++	isPrimary,
++	isTertiary,
++	isSecondary,
++	isLink,
++	isDefault,
++} ) => {
++	if ( typeof variant !== 'undefined' ) {
++		return variant;
++	}
++
++	if ( isPrimary ) {
++		deprecated( 'Button isPrimary', {
++			alternative: 'variant="primary"',
++		} );
++		return 'primary';
++	}
++
++	if ( isTertiary ) {
++		deprecated( 'Button isTertiary', {
++			alternative: 'variant="tertiary"',
++		} );
++		return 'tertiary';
++	}
++
++	if ( isSecondary ) {
++		deprecated( 'Button isSecondary', {
++			alternative: 'variant="secondary"',
++		} );
++		return 'secondary';
++	}
++
++	if ( isDefault ) {
++		deprecated( 'Button isDefault', { alternative: 'variant="plain"' } );
++		return 'plain';
++	}
++
++	if ( isLink ) {
++		deprecated( 'Button isLink', { alternative: 'variant="link"' } );
++		return 'link';
++	}
++
++	return 'plain';
++};
++
++function getTooltip( {
++	tooltip,
++	describedBy,
++	ariaLabel,
++	label,
++	tooltipPosition,
++	shortcut,
++} ) {
++	if ( typeof tooltip !== 'undefined' ) {
++		return tooltip;
++	}
++
++	tooltip = {};
++
++	if ( tooltipPosition ) {
++		deprecated( 'Button tooltipPosition', {
++			alternative: 'tooltip={{ position: tooltipPosition }}',
++		} );
++		tooltip.position = tooltipPosition;
++	}
++
++	if ( shortcut ) {
++		deprecated( 'Button shortcut', {
++			alternative: 'tooltip={{ shortcut }}',
++		} );
++		tooltip.shortcut = shortcut;
++	}
++
++	if ( Object.keys( tooltip ).length !== 0 ) {
++		// if there is indeed deprecated tooltip props being passed in
++		deprecated( 'Button implicit tooltip content', {
++			alternative: 'tooltip={{ content }}',
++		} );
++		tooltip.content = describedBy ? describedBy : ariaLabel || label;
++	}
++
++	return tooltip;
++}
++
++function getPre( { pre, text } ) {
++	if ( typeof text !== 'undefined' ) {
++		deprecated( 'Button text', { alternative: 'pre={ text }' } );
++		return text;
++	}
++	return pre;
++}
++
++function getAriaLabel( { ariaLabel, label } ) {
++	if ( typeof label !== 'undefined' ) {
++		deprecated( 'Button label', { alternative: 'aria-label={ label }' } );
++		return label;
++	}
++	return ariaLabel;
++}
++
++function getSize( { isSmall, size } ) {
++	if ( typeof isSmall !== 'undefined' ) {
++		deprecated( 'Button isSmall', { alternative: 'Button size' } );
++		return isSmall ? 'small' : undefined;
++	}
++	return size;
++}
++
++function getIsActive( { isPressed, isActive } ) {
++	if ( typeof isPressed !== 'undefined' ) {
++		deprecated( 'Button isPressed', { alternative: 'Button isActive' } );
++		return isPressed;
++	}
++	return isActive;
++}
++
++function getIsLoading( { isBusy, isLoading } ) {
++	if ( typeof isBusy !== 'undefined' ) {
++		deprecated( 'Button isBusy', { alternative: 'Button isLoading' } );
++		return isBusy;
++	}
++	return isLoading;
++}
++
++function getIcon( { icon } ) {
++	if ( typeof icon === 'string' ) {
++		// We can't deprecate this strategy because block authors depend on it but the new component is ignorant of Dashicon
++		return <Dashicon icon={ icon } />;
++	}
++	return icon;
++}
++
++export function useDeprecatedButtonProps( {
++	variant,
++	isPrimary,
++	isTertiary,
++	isSecondary,
++	isLink,
++	isDefault,
++	isSmall,
++	isBusy,
++	isLoading,
++	isActive,
++	isPressed,
++	label,
++	'aria-label': ariaLabel,
++	describedBy,
++	shortcut,
++	tooltipPosition,
++	tooltip,
++	text,
++	pre,
++	size,
++	icon,
++	...props
++} ) {
++	return {
++		...props,
++		describedBy,
++		icon: getIcon( { icon } ),
++		variant: getVariant( {
++			variant,
++			isPrimary,
++			isTertiary,
++			isSecondary,
++			isLink,
++			isDefault,
++		} ),
++		isActive: getIsActive( { isActive, isPressed } ),
++		isLoading: getIsLoading( { isLoading, isBusy } ),
++		size: getSize( { size, isSmall } ),
++		'aria-label': getAriaLabel( { ariaLabel, label } ),
++		pre: getPre( { pre, text } ),
++		tooltip: getTooltip( {
++			tooltip,
++			describedBy,
++			ariaLabel,
++			tooltipPosition,
++			shortcut,
++			label,
++		} ),
++	};
++}
+diff --git a/packages/components/src/ui/base-button/styles.js b/packages/components/src/ui/base-button/styles.js
+index ecde123176fbd9..a886b0464fbcff 100644
+--- a/packages/components/src/ui/base-button/styles.js
++++ b/packages/components/src/ui/base-button/styles.js
+@@ -61,6 +61,11 @@ export const Button = css`
+ 	svg {
+ 		display: block;
+ 	}
++
++	&[data-active='true'] {
++		background: ${ ui.get( 'colorText' ) };
++		color: ${ ui.get( 'colorTextInverted' ) };
++	}
+ `;
+ 
+ export const destructive = css`
+diff --git a/packages/components/src/ui/base-button/test/__snapshots__/index.js.snap b/packages/components/src/ui/base-button/test/__snapshots__/index.js.snap
+index 7c2e9de5b95c49..8ad8a478d36e52 100644
+--- a/packages/components/src/ui/base-button/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/base-button/test/__snapshots__/index.js.snap
+@@ -1,7 +1,7 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++.emotion-2 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -81,61 +81,61 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  .emotion-2 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-2 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
++.emotion-2 > * + *:not(marquee) {
+   margin-left: calc(4px * 2);
+   margin-left: calc(var(--wp-g2-grid-base) * 2);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
++.emotion-2 > * {
+   min-width: 0;
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:hover,
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:active,
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:focus {
++.emotion-2:hover,
++.emotion-2:active,
++.emotion-2:focus {
+   -webkit-transition: all 200ms cubic-bezier( 0.12,0.8,0.32,1 );
+   -webkit-transition: all var(--wp-g2-transition-duration) cubic-bezier( 0.12,0.8,0.32,1 );
+   transition: all 200ms cubic-bezier( 0.12,0.8,0.32,1 );
+   transition: all var(--wp-g2-transition-duration) cubic-bezier( 0.12,0.8,0.32,1 );
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[disabled]:not( [aria-busy='true'] ),
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[aria-disabled='true']:not( [aria-busy='true'] ) {
++.emotion-2[disabled]:not( [aria-busy='true'] ),
++.emotion-2[aria-disabled='true']:not( [aria-busy='true'] ) {
+   opacity: 0.5;
+   cursor: auto;
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:focus {
++.emotion-2:focus {
+   box-shadow: 0 0 0 0.5px #007cba;
+   box-shadow: var(--wp-g2-control-box-shadow-focus);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-destructive='true']:focus {
++.emotion-2[data-destructive='true']:focus {
+   box-shadow: 0 0 0 0.5px #D94F4F;
+   box-shadow: var(--wp-g2-control-destructive-box-shadow-focus);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-icon='true'] {
++.emotion-2[data-icon='true'] {
+   min-width: 30px;
+   min-width: var(--wp-g2-control-height);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 svg {
++.emotion-2 svg {
+   display: block;
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -162,18 +162,18 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++.emotion-1 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -205,13 +205,13 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++  .emotion-1 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-1 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+diff --git a/packages/components/src/ui/button-group/test/__snapshots__/index.js.snap b/packages/components/src/ui/button-group/test/__snapshots__/index.js.snap
+index ea2343cd92c680..d6b1cd17d5e36b 100644
+--- a/packages/components/src/ui/button-group/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/button-group/test/__snapshots__/index.js.snap
+@@ -1,7 +1,7 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9 {
++.emotion-9 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -19,18 +19,18 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9 {
++  .emotion-9 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-9 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++.emotion-2 {
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: -ms-flexbox;
+@@ -128,63 +128,63 @@ exports[`props should render correctly 1`] = `
+   background-color: transparent;
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
++.emotion-2 > * + *:not(marquee) {
+   margin-left: calc(4px * 2);
+   margin-left: calc(var(--wp-g2-grid-base) * 2);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
++.emotion-2 > * {
+   min-width: 0;
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:hover,
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:active,
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:focus {
++.emotion-2:hover,
++.emotion-2:active,
++.emotion-2:focus {
+   -webkit-transition: all 200ms cubic-bezier( 0.12,0.8,0.32,1 );
+   -webkit-transition: all var(--wp-g2-transition-duration) cubic-bezier( 0.12,0.8,0.32,1 );
+   transition: all 200ms cubic-bezier( 0.12,0.8,0.32,1 );
+   transition: all var(--wp-g2-transition-duration) cubic-bezier( 0.12,0.8,0.32,1 );
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[disabled]:not( [aria-busy='true'] ),
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[aria-disabled='true']:not( [aria-busy='true'] ) {
++.emotion-2[disabled]:not( [aria-busy='true'] ),
++.emotion-2[aria-disabled='true']:not( [aria-busy='true'] ) {
+   opacity: 0.5;
+   cursor: auto;
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:focus {
++.emotion-2:focus {
+   box-shadow: 0 0 0 0.5px #007cba;
+   box-shadow: var(--wp-g2-control-box-shadow-focus);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-destructive='true']:focus {
++.emotion-2[data-destructive='true']:focus {
+   box-shadow: 0 0 0 0.5px #D94F4F;
+   box-shadow: var(--wp-g2-control-destructive-box-shadow-focus);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-icon='true'] {
++.emotion-2[data-icon='true'] {
+   min-width: 30px;
+   min-width: var(--wp-g2-control-height);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 svg {
++.emotion-2 svg {
+   display: block;
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:active {
++.emotion-2:active {
+   color: #007cba;
+   color: var(--wp-g2-button-text-color-active);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:hover {
++.emotion-2:hover {
+   background-color: transparent;
+   background-color: var(--wp-g2-button-secondary-color-hover);
+   border-color: #007cba;
+   border-color: var(--wp-g2-button-secondary-border-color-hover);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:focus,
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-focused='true'] {
++.emotion-2:focus,
++.emotion-2[data-focused='true'] {
+   background-color: transparent;
+   background-color: var(--wp-g2-button-secondary-color-focus);
+   border-color: #007cba;
+@@ -193,7 +193,7 @@ exports[`props should render correctly 1`] = `
+   color: var(--wp-g2-button-secondary-text-color-focus);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:active {
++.emotion-2:active {
+   background-color: rgba(0, 0, 0, 0.05);
+   background-color: var(--wp-g2-button-secondary-color-active);
+   border-color: #007cba;
+@@ -202,80 +202,80 @@ exports[`props should render correctly 1`] = `
+   color: var(--wp-g2-button-secondary-text-color-active);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-destructive='true'] {
++.emotion-2[data-destructive='true'] {
+   border-color: #D94F4F;
+   border-color: var(--wp-g2-color-destructive);
+   color: #D94F4F;
+   color: var(--wp-g2-color-destructive);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-destructive='true']:hover,
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-destructive='true']:active,
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-destructive='true']:focus,
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-destructive='true'][data-focused='true'] {
++.emotion-2[data-destructive='true']:hover,
++.emotion-2[data-destructive='true']:active,
++.emotion-2[data-destructive='true']:focus,
++.emotion-2[data-destructive='true'][data-focused='true'] {
+   border-color: #D94F4F;
+   border-color: var(--wp-g2-color-destructive);
+   color: #D94F4F;
+   color: var(--wp-g2-color-destructive);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-destructive='true']:active {
++.emotion-2[data-destructive='true']:active {
+   color: #1e1e1e;
+   color: var(--wp-g2-color-text);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:hover,
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:active,
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:focus {
++.emotion-2:hover,
++.emotion-2:active,
++.emotion-2:focus {
+   color: #1e1e1e;
+   color: var(--wp-g2-color-text);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:focus {
++.emotion-2:focus {
+   border-color: #007cba;
+   border-color: var(--wp-g2-button-primary-border-color-focus);
+   box-shadow: 0 0 0 0.5px #007cba;
+   box-shadow: var(--wp-g2-control-box-shadow-focus);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:hover,
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:active,
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:focus {
++.emotion-2:hover,
++.emotion-2:active,
++.emotion-2:focus {
+   border-color: transparent;
+   border-color: var(--wp-g2-control-border-color-subtle);
+   color: #1e1e1e;
+   color: var(--wp-g2-color-text);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:focus {
++.emotion-2:focus {
+   border-color: #007cba;
+   border-color: var(--wp-g2-button-primary-border-color-focus);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:hover,
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:focus {
++.emotion-2:hover,
++.emotion-2:focus {
+   background-color: #ffffff;
+   background-color: var(--wp-g2-control-background-color);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:focus {
++.emotion-2:focus {
+   border-color: #007cba;
+   border-color: var(--wp-g2-button-primary-border-color-focus);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:active {
++.emotion-2:active {
+   background-color: rgba(0, 0, 0, 0.05);
+   background-color: var(--wp-g2-control-background-color-active);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-active='true'] {
++.emotion-2[data-active='true'] {
+   background: #1e1e1e;
+   background: var(--wp-g2-color-text);
+   color: #ffffff;
+   color: var(--wp-g2-color-text-inverted);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-active='true'] {
++.emotion-2[data-active='true'] {
+   -webkit-transition: all 200ms cubic-bezier(0.12, 0.8, 0.32, 1);
+   -webkit-transition: all var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function-control);
+   transition: all 200ms cubic-bezier(0.12, 0.8, 0.32, 1);
+@@ -289,12 +289,12 @@ exports[`props should render correctly 1`] = `
+   color: var(--wp-g2-button-control-active-state-text-color);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-active='true']:hover {
++.emotion-2[data-active='true']:hover {
+   background: #1e1e1e;
+   background: var(--wp-g2-button-control-active-state-color-hover);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-active='true']:focus {
++.emotion-2[data-active='true']:focus {
+   background: #1e1e1e;
+   background: var(--wp-g2-button-control-active-state-color-focus);
+   box-shadow: 0 0 0 0.5px #007cba , 0 0 0 2px #ffffff inset;
+@@ -303,12 +303,12 @@ exports[`props should render correctly 1`] = `
+   border-color: var(--wp-g2-button-control-active-state-border-color-focus);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-active='true']:active {
++.emotion-2[data-active='true']:active {
+   background: #1e1e1e;
+   background: var(--wp-g2-button-control-active-state-color-active);
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -335,18 +335,18 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++.emotion-1 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -378,13 +378,13 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++  .emotion-1 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-1 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+diff --git a/packages/components/src/ui/button/test/__snapshots__/index.js.snap b/packages/components/src/ui/button/test/__snapshots__/index.js.snap
+index c4668adb1f4954..7a60700c1bb604 100644
+--- a/packages/components/src/ui/button/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/button/test/__snapshots__/index.js.snap
+@@ -50,7 +50,7 @@ Snapshot Diff:
+ `;
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++.emotion-2 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -143,74 +143,74 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  .emotion-2 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-2 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
++.emotion-2 > * + *:not(marquee) {
+   margin-left: calc(4px * 2);
+   margin-left: calc(var(--wp-g2-grid-base) * 2);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
++.emotion-2 > * {
+   min-width: 0;
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:hover,
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:active,
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:focus {
++.emotion-2:hover,
++.emotion-2:active,
++.emotion-2:focus {
+   -webkit-transition: all 200ms cubic-bezier( 0.12,0.8,0.32,1 );
+   -webkit-transition: all var(--wp-g2-transition-duration) cubic-bezier( 0.12,0.8,0.32,1 );
+   transition: all 200ms cubic-bezier( 0.12,0.8,0.32,1 );
+   transition: all var(--wp-g2-transition-duration) cubic-bezier( 0.12,0.8,0.32,1 );
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[disabled]:not( [aria-busy='true'] ),
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[aria-disabled='true']:not( [aria-busy='true'] ) {
++.emotion-2[disabled]:not( [aria-busy='true'] ),
++.emotion-2[aria-disabled='true']:not( [aria-busy='true'] ) {
+   opacity: 0.5;
+   cursor: auto;
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:focus {
++.emotion-2:focus {
+   box-shadow: 0 0 0 0.5px #007cba;
+   box-shadow: var(--wp-g2-control-box-shadow-focus);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-destructive='true']:focus {
++.emotion-2[data-destructive='true']:focus {
+   box-shadow: 0 0 0 0.5px #D94F4F;
+   box-shadow: var(--wp-g2-control-destructive-box-shadow-focus);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-icon='true'] {
++.emotion-2[data-icon='true'] {
+   min-width: 30px;
+   min-width: var(--wp-g2-control-height);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 svg {
++.emotion-2 svg {
+   display: block;
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:active {
++.emotion-2:active {
+   color: #007cba;
+   color: var(--wp-g2-button-text-color-active);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:hover {
++.emotion-2:hover {
+   background-color: transparent;
+   background-color: var(--wp-g2-button-secondary-color-hover);
+   border-color: #007cba;
+   border-color: var(--wp-g2-button-secondary-border-color-hover);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:focus,
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-focused='true'] {
++.emotion-2:focus,
++.emotion-2[data-focused='true'] {
+   background-color: transparent;
+   background-color: var(--wp-g2-button-secondary-color-focus);
+   border-color: #007cba;
+@@ -219,7 +219,7 @@ exports[`props should render correctly 1`] = `
+   color: var(--wp-g2-button-secondary-text-color-focus);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:active {
++.emotion-2:active {
+   background-color: rgba(0, 0, 0, 0.05);
+   background-color: var(--wp-g2-button-secondary-color-active);
+   border-color: #007cba;
+@@ -228,29 +228,29 @@ exports[`props should render correctly 1`] = `
+   color: var(--wp-g2-button-secondary-text-color-active);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-destructive='true'] {
++.emotion-2[data-destructive='true'] {
+   border-color: #D94F4F;
+   border-color: var(--wp-g2-color-destructive);
+   color: #D94F4F;
+   color: var(--wp-g2-color-destructive);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-destructive='true']:hover,
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-destructive='true']:active,
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-destructive='true']:focus,
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-destructive='true'][data-focused='true'] {
++.emotion-2[data-destructive='true']:hover,
++.emotion-2[data-destructive='true']:active,
++.emotion-2[data-destructive='true']:focus,
++.emotion-2[data-destructive='true'][data-focused='true'] {
+   border-color: #D94F4F;
+   border-color: var(--wp-g2-color-destructive);
+   color: #D94F4F;
+   color: var(--wp-g2-color-destructive);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-destructive='true']:active {
++.emotion-2[data-destructive='true']:active {
+   color: #1e1e1e;
+   color: var(--wp-g2-color-text);
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -277,18 +277,18 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++.emotion-1 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -320,13 +320,13 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++  .emotion-1 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-1 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+diff --git a/packages/components/src/ui/card/test/__snapshots__/index.js.snap b/packages/components/src/ui/card/test/__snapshots__/index.js.snap
+index e129d3afa248f9..17d790cd328c26 100644
+--- a/packages/components/src/ui/card/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/card/test/__snapshots__/index.js.snap
+@@ -24,7 +24,7 @@ Snapshot Diff:
+ `;
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6 {
++.emotion-6 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -50,18 +50,18 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6 {
++  .emotion-6 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-6 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 {
++.emotion-3 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -76,18 +76,18 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 {
++  .emotion-3 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-3 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -132,41 +132,41 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 > * + *:not(marquee) {
++.emotion-0 > * + *:not(marquee) {
+   margin-left: calc(4px * 2);
+   margin-left: calc(var(--wp-g2-grid-base) * 2);
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 > * {
++.emotion-0 > * {
+   min-width: 0;
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0:first-of-type {
++.emotion-0:first-of-type {
+   border-top-left-radius: 2px;
+   border-top-left-radius: var(--wp-g2-card-border-radius);
+   border-top-right-radius: 2px;
+   border-top-right-radius: var(--wp-g2-card-border-radius);
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0:last-of-type {
++.emotion-0:last-of-type {
+   border-bottom-left-radius: 2px;
+   border-bottom-left-radius: var(--wp-g2-card-border-radius);
+   border-bottom-right-radius: 2px;
+   border-bottom-right-radius: var(--wp-g2-card-border-radius);
+ }
+ 
+-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++.emotion-1 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -187,34 +187,34 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++  .emotion-1 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-1 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+ @media only screen and ( min-device-width:40em ) {
+-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1::-webkit-scrollbar {
++  .emotion-1::-webkit-scrollbar {
+     height: 12px;
+     width: 12px;
+   }
+ 
+-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1::-webkit-scrollbar-track {
++  .emotion-1::-webkit-scrollbar-track {
+     background-color: transparent;
+   }
+ 
+-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1::-webkit-scrollbar-track {
++  .emotion-1::-webkit-scrollbar-track {
+     background: rgba(0, 0, 0, 0.04);
+     background: var(--wp-g2-color-scrollbar-track);
+     border-radius: 8px;
+   }
+ 
+-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1::-webkit-scrollbar-thumb {
++  .emotion-1::-webkit-scrollbar-thumb {
+     background-clip: padding-box;
+     background-color: rgba(0, 0, 0, 0.2);
+     background-color: var(--wp-g2-color-scrollbar-thumb);
+@@ -222,27 +222,27 @@ exports[`props should render correctly 1`] = `
+     border-radius: 7px;
+   }
+ 
+-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1:hover::-webkit-scrollbar-thumb {
++  .emotion-1:hover::-webkit-scrollbar-thumb {
+     background-color: rgba(0, 0, 0, 0.5);
+     background-color: var(--wp-g2-color-scrollbar-thumb-hover);
+   }
+ }
+ 
+-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1:first-of-type {
++.emotion-1:first-of-type {
+   border-top-left-radius: 2px;
+   border-top-left-radius: var(--wp-g2-card-border-radius);
+   border-top-right-radius: 2px;
+   border-top-right-radius: var(--wp-g2-card-border-radius);
+ }
+ 
+-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1:last-of-type {
++.emotion-1:last-of-type {
+   border-bottom-left-radius: 2px;
+   border-bottom-left-radius: var(--wp-g2-card-border-radius);
+   border-bottom-right-radius: 2px;
+   border-bottom-right-radius: var(--wp-g2-card-border-radius);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++.emotion-2 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -286,41 +286,41 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  .emotion-2 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-2 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
++.emotion-2 > * + *:not(marquee) {
+   margin-left: calc(4px * 2);
+   margin-left: calc(var(--wp-g2-grid-base) * 2);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
++.emotion-2 > * {
+   min-width: 0;
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:first-of-type {
++.emotion-2:first-of-type {
+   border-top-left-radius: 2px;
+   border-top-left-radius: var(--wp-g2-card-border-radius);
+   border-top-right-radius: 2px;
+   border-top-right-radius: var(--wp-g2-card-border-radius);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:last-of-type {
++.emotion-2:last-of-type {
+   border-bottom-left-radius: 2px;
+   border-bottom-left-radius: var(--wp-g2-card-border-radius);
+   border-bottom-right-radius: 2px;
+   border-bottom-right-radius: var(--wp-g2-card-border-radius);
+ }
+ 
+-.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4 {
++.emotion-4 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -354,18 +354,18 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4 {
++  .emotion-4 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-4 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5 {
++.emotion-5 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -399,13 +399,13 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5 {
++  .emotion-5 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-5 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+diff --git a/packages/components/src/ui/control-group/test/__snapshots__/index.js.snap b/packages/components/src/ui/control-group/test/__snapshots__/index.js.snap
+index 8b76670df18854..4e8657c73efc93 100644
+--- a/packages/components/src/ui/control-group/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/control-group/test/__snapshots__/index.js.snap
+@@ -1,7 +1,7 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6 {
++.emotion-6 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -32,30 +32,30 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6 {
++  .emotion-6 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-6 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6 > * + *:not(marquee) {
++.emotion-6 > * + *:not(marquee) {
+   margin-left: -1px;
+ }
+ 
+-.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6 > * {
++.emotion-6 > * {
+   min-width: 0;
+ }
+ 
+-.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6 > *:focus-within {
++.emotion-6 > *:focus-within {
+   z-index: 1;
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++.emotion-2 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -152,74 +152,74 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  .emotion-2 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-2 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
++.emotion-2 > * + *:not(marquee) {
+   margin-left: calc(4px * 2);
+   margin-left: calc(var(--wp-g2-grid-base) * 2);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
++.emotion-2 > * {
+   min-width: 0;
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:hover,
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:active,
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:focus {
++.emotion-2:hover,
++.emotion-2:active,
++.emotion-2:focus {
+   -webkit-transition: all 200ms cubic-bezier(0.12,0.8,0.32,1);
+   -webkit-transition: all var(--wp-g2-transition-duration) cubic-bezier(0.12,0.8,0.32,1);
+   transition: all 200ms cubic-bezier(0.12,0.8,0.32,1);
+   transition: all var(--wp-g2-transition-duration) cubic-bezier(0.12,0.8,0.32,1);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[disabled]:not([aria-busy='true']),
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[aria-disabled='true']:not([aria-busy='true']) {
++.emotion-2[disabled]:not([aria-busy='true']),
++.emotion-2[aria-disabled='true']:not([aria-busy='true']) {
+   opacity: 0.5;
+   cursor: auto;
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:focus {
++.emotion-2:focus {
+   box-shadow: 0 0 0 0.5px #007cba;
+   box-shadow: var(--wp-g2-control-box-shadow-focus);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-destructive='true']:focus {
++.emotion-2[data-destructive='true']:focus {
+   box-shadow: 0 0 0 0.5px #D94F4F;
+   box-shadow: var(--wp-g2-control-destructive-box-shadow-focus);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-icon='true'] {
++.emotion-2[data-icon='true'] {
+   min-width: 30px;
+   min-width: var(--wp-g2-control-height);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 svg {
++.emotion-2 svg {
+   display: block;
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:active {
++.emotion-2:active {
+   color: #007cba;
+   color: var(--wp-g2-button-text-color-active);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:hover {
++.emotion-2:hover {
+   background-color: transparent;
+   background-color: var(--wp-g2-button-secondary-color-hover);
+   border-color: #007cba;
+   border-color: var(--wp-g2-button-secondary-border-color-hover);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:focus,
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-focused='true'] {
++.emotion-2:focus,
++.emotion-2[data-focused='true'] {
+   background-color: transparent;
+   background-color: var(--wp-g2-button-secondary-color-focus);
+   border-color: #007cba;
+@@ -228,7 +228,7 @@ exports[`props should render correctly 1`] = `
+   color: var(--wp-g2-button-secondary-text-color-focus);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:active {
++.emotion-2:active {
+   background-color: rgba(0, 0, 0, 0.05);
+   background-color: var(--wp-g2-button-secondary-color-active);
+   border-color: #007cba;
+@@ -237,29 +237,29 @@ exports[`props should render correctly 1`] = `
+   color: var(--wp-g2-button-secondary-text-color-active);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-destructive='true'] {
++.emotion-2[data-destructive='true'] {
+   border-color: #D94F4F;
+   border-color: var(--wp-g2-color-destructive);
+   color: #D94F4F;
+   color: var(--wp-g2-color-destructive);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-destructive='true']:hover,
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-destructive='true']:active,
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-destructive='true']:focus,
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-destructive='true'][data-focused='true'] {
++.emotion-2[data-destructive='true']:hover,
++.emotion-2[data-destructive='true']:active,
++.emotion-2[data-destructive='true']:focus,
++.emotion-2[data-destructive='true'][data-focused='true'] {
+   border-color: #D94F4F;
+   border-color: var(--wp-g2-color-destructive);
+   color: #D94F4F;
+   color: var(--wp-g2-color-destructive);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-destructive='true']:active {
++.emotion-2[data-destructive='true']:active {
+   color: #1e1e1e;
+   color: var(--wp-g2-color-text);
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -286,18 +286,18 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++.emotion-1 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -329,13 +329,13 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++  .emotion-1 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-1 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+@@ -354,6 +354,7 @@ exports[`props should render correctly 1`] = `
+     data-g2-c16t="true"
+     data-g2-component="Button"
+     data-icon="false"
++    type="button"
+   >
+     <span
+       class="components-flex-item wp-components-flex-item ic-1p3tlc8 ic-192yz5d emotion-0"
+@@ -377,6 +378,7 @@ exports[`props should render correctly 1`] = `
+     data-g2-c16t="true"
+     data-g2-component="Button"
+     data-icon="false"
++    type="button"
+   >
+     <span
+       class="components-flex-item wp-components-flex-item ic-1p3tlc8 ic-192yz5d emotion-0"
+@@ -395,7 +397,7 @@ exports[`props should render correctly 1`] = `
+ `;
+ 
+ exports[`props should render mixed control types 1`] = `
+-.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10 {
++.emotion-10 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -426,30 +428,30 @@ exports[`props should render mixed control types 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-10.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10 {
++  .emotion-10 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-10.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-10 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10 > * + *:not(marquee) {
++.emotion-10 > * + *:not(marquee) {
+   margin-left: -1px;
+ }
+ 
+-.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10 > * {
++.emotion-10 > * {
+   min-width: 0;
+ }
+ 
+-.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10 > *:focus-within {
++.emotion-10 > *:focus-within {
+   z-index: 1;
+ }
+ 
+-.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9 {
++.emotion-9 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -546,74 +548,74 @@ exports[`props should render mixed control types 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9 {
++  .emotion-9 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-9 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9 > * + *:not(marquee) {
++.emotion-9 > * + *:not(marquee) {
+   margin-left: calc(4px * 2);
+   margin-left: calc(var(--wp-g2-grid-base) * 2);
+ }
+ 
+-.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9 > * {
++.emotion-9 > * {
+   min-width: 0;
+ }
+ 
+-.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9:hover,
+-.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9:active,
+-.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9:focus {
++.emotion-9:hover,
++.emotion-9:active,
++.emotion-9:focus {
+   -webkit-transition: all 200ms cubic-bezier(0.12,0.8,0.32,1);
+   -webkit-transition: all var(--wp-g2-transition-duration) cubic-bezier(0.12,0.8,0.32,1);
+   transition: all 200ms cubic-bezier(0.12,0.8,0.32,1);
+   transition: all var(--wp-g2-transition-duration) cubic-bezier(0.12,0.8,0.32,1);
+ }
+ 
+-.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9[disabled]:not([aria-busy='true']),
+-.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9[aria-disabled='true']:not([aria-busy='true']) {
++.emotion-9[disabled]:not([aria-busy='true']),
++.emotion-9[aria-disabled='true']:not([aria-busy='true']) {
+   opacity: 0.5;
+   cursor: auto;
+ }
+ 
+-.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9:focus {
++.emotion-9:focus {
+   box-shadow: 0 0 0 0.5px #007cba;
+   box-shadow: var(--wp-g2-control-box-shadow-focus);
+ }
+ 
+-.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9[data-destructive='true']:focus {
++.emotion-9[data-destructive='true']:focus {
+   box-shadow: 0 0 0 0.5px #D94F4F;
+   box-shadow: var(--wp-g2-control-destructive-box-shadow-focus);
+ }
+ 
+-.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9[data-icon='true'] {
++.emotion-9[data-icon='true'] {
+   min-width: 30px;
+   min-width: var(--wp-g2-control-height);
+ }
+ 
+-.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9 svg {
++.emotion-9 svg {
+   display: block;
+ }
+ 
+-.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9:active {
++.emotion-9:active {
+   color: #007cba;
+   color: var(--wp-g2-button-text-color-active);
+ }
+ 
+-.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9:hover {
++.emotion-9:hover {
+   background-color: transparent;
+   background-color: var(--wp-g2-button-secondary-color-hover);
+   border-color: #007cba;
+   border-color: var(--wp-g2-button-secondary-border-color-hover);
+ }
+ 
+-.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9:focus,
+-.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9[data-focused='true'] {
++.emotion-9:focus,
++.emotion-9[data-focused='true'] {
+   background-color: transparent;
+   background-color: var(--wp-g2-button-secondary-color-focus);
+   border-color: #007cba;
+@@ -622,7 +624,7 @@ exports[`props should render mixed control types 1`] = `
+   color: var(--wp-g2-button-secondary-text-color-focus);
+ }
+ 
+-.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9:active {
++.emotion-9:active {
+   background-color: rgba(0, 0, 0, 0.05);
+   background-color: var(--wp-g2-button-secondary-color-active);
+   border-color: #007cba;
+@@ -631,29 +633,29 @@ exports[`props should render mixed control types 1`] = `
+   color: var(--wp-g2-button-secondary-text-color-active);
+ }
+ 
+-.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9[data-destructive='true'] {
++.emotion-9[data-destructive='true'] {
+   border-color: #D94F4F;
+   border-color: var(--wp-g2-color-destructive);
+   color: #D94F4F;
+   color: var(--wp-g2-color-destructive);
+ }
+ 
+-.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9[data-destructive='true']:hover,
+-.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9[data-destructive='true']:active,
+-.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9[data-destructive='true']:focus,
+-.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9[data-destructive='true'][data-focused='true'] {
++.emotion-9[data-destructive='true']:hover,
++.emotion-9[data-destructive='true']:active,
++.emotion-9[data-destructive='true']:focus,
++.emotion-9[data-destructive='true'][data-focused='true'] {
+   border-color: #D94F4F;
+   border-color: var(--wp-g2-color-destructive);
+   color: #D94F4F;
+   color: var(--wp-g2-color-destructive);
+ }
+ 
+-.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9[data-destructive='true']:active {
++.emotion-9[data-destructive='true']:active {
+   color: #1e1e1e;
+   color: var(--wp-g2-color-text);
+ }
+ 
+-.emotion-7.emotion-7.emotion-7.emotion-7.emotion-7.emotion-7.emotion-7 {
++.emotion-7 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -680,18 +682,18 @@ exports[`props should render mixed control types 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-7.emotion-7.emotion-7.emotion-7.emotion-7.emotion-7.emotion-7 {
++  .emotion-7 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-7.emotion-7.emotion-7.emotion-7.emotion-7.emotion-7.emotion-7 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-7 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-8.emotion-8.emotion-8.emotion-8.emotion-8.emotion-8.emotion-8 {
++.emotion-8 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -723,18 +725,18 @@ exports[`props should render mixed control types 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-8.emotion-8.emotion-8.emotion-8.emotion-8.emotion-8.emotion-8 {
++  .emotion-8 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-8.emotion-8.emotion-8.emotion-8.emotion-8.emotion-8.emotion-8 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-8 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4 {
++.emotion-4 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -800,44 +802,44 @@ exports[`props should render mixed control types 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4 {
++  .emotion-4 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-4 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4 > * + *:not(marquee) {
++.emotion-4 > * + *:not(marquee) {
+   margin-left: calc(4px * 0);
+   margin-left: calc(var(--wp-g2-grid-base) * 0);
+ }
+ 
+-.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4 > * {
++.emotion-4 > * {
+   min-width: 0;
+ }
+ 
+-.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4[disabled] {
++.emotion-4[disabled] {
+   opacity: 0.6;
+ }
+ 
+-.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4:hover {
++.emotion-4:hover {
+   border-color: #757575;
+   border-color: var(--wp-g2-control-border-color-hover);
+ }
+ 
+-.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4:focus,
+-.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4[data-focused='true'] {
++.emotion-4:focus,
++.emotion-4[data-focused='true'] {
+   border-color: #007cba;
+   border-color: var(--wp-g2-color-admin);
+   box-shadow: 0 0 0 0.5px #007cba;
+   box-shadow: var(--wp-g2-control-box-shadow-focus);
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -883,35 +885,35 @@ exports[`props should render mixed control types 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+ @media (min-width:36em) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     font-size: 13px;
+     font-size: var(--wp-g2-font-size);
+   }
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0::-webkit-outer-spin-button,
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0::-webkit-inner-spin-button {
++.emotion-0::-webkit-outer-spin-button,
++.emotion-0::-webkit-inner-spin-button {
+   -webkit-appearance: none;
+   margin: 0;
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0[type='number'] {
++.emotion-0[type='number'] {
+   -moz-appearance: textfield;
+ }
+ 
+-.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 {
++.emotion-3 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -959,30 +961,30 @@ exports[`props should render mixed control types 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 {
++  .emotion-3 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-3 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 {
++  .emotion-3 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-3 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++.emotion-2 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -1007,18 +1009,18 @@ exports[`props should render mixed control types 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  .emotion-2 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-2 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++.emotion-1 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -1041,22 +1043,22 @@ exports[`props should render mixed control types 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++  .emotion-1 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-1 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 svg {
++.emotion-1 svg {
+   display: block;
+ }
+ 
+-.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6 {
++.emotion-6 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -1120,44 +1122,44 @@ exports[`props should render mixed control types 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6 {
++  .emotion-6 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-6 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6 > * + *:not(marquee) {
++.emotion-6 > * + *:not(marquee) {
+   margin-left: calc(4px * 2.5);
+   margin-left: calc(var(--wp-g2-grid-base) * 2.5);
+ }
+ 
+-.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6 > * {
++.emotion-6 > * {
+   min-width: 0;
+ }
+ 
+-.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6[disabled] {
++.emotion-6[disabled] {
+   opacity: 0.6;
+ }
+ 
+-.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6:hover {
++.emotion-6:hover {
+   border-color: #757575;
+   border-color: var(--wp-g2-control-border-color-hover);
+ }
+ 
+-.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6:focus,
+-.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6[data-focused='true'] {
++.emotion-6:focus,
++.emotion-6[data-focused='true'] {
+   border-color: #007cba;
+   border-color: var(--wp-g2-color-admin);
+   box-shadow: 0 0 0 0.5px #007cba;
+   box-shadow: var(--wp-g2-control-box-shadow-focus);
+ }
+ 
+-.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5 {
++.emotion-5 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -1200,31 +1202,31 @@ exports[`props should render mixed control types 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5 {
++  .emotion-5 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-5 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+ @media (min-width:36em) {
+-  .emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5 {
++  .emotion-5 {
+     font-size: 13px;
+     font-size: var(--wp-g2-font-size);
+   }
+ }
+ 
+-.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5::-webkit-outer-spin-button,
+-.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5::-webkit-inner-spin-button {
++.emotion-5::-webkit-outer-spin-button,
++.emotion-5::-webkit-inner-spin-button {
+   -webkit-appearance: none;
+   margin: 0;
+ }
+ 
+-.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5[type='number'] {
++.emotion-5[type='number'] {
+   -moz-appearance: textfield;
+ }
+ 
+@@ -1302,6 +1304,7 @@ exports[`props should render mixed control types 1`] = `
+     data-g2-c16t="true"
+     data-g2-component="Button"
+     data-icon="false"
++    type="button"
+   >
+     <span
+       class="components-flex-item wp-components-flex-item ic-1p3tlc8 ic-192yz5d emotion-7"
+diff --git a/packages/components/src/ui/control-label/test/__snapshots__/index.js.snap b/packages/components/src/ui/control-label/test/__snapshots__/index.js.snap
+index 360b5d7f92c901..6235ffc4e2c58f 100644
+--- a/packages/components/src/ui/control-label/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/control-label/test/__snapshots__/index.js.snap
+@@ -1,7 +1,7 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -42,18 +42,18 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0:active {
++.emotion-0:active {
+   -webkit-user-select: none;
+   -moz-user-select: none;
+   -ms-user-select: none;
+@@ -61,7 +61,7 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (-webkit-min-device-pixel-ratio:1.25), (min-resolution:120dpi) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 > * {
++  .emotion-0 > * {
+     position: relative;
+     top: 0.5px;
+   }
+@@ -77,7 +77,7 @@ exports[`props should render correctly 1`] = `
+ `;
+ 
+ exports[`props should render no truncate 1`] = `
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -114,18 +114,18 @@ exports[`props should render no truncate 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0:active {
++.emotion-0:active {
+   -webkit-user-select: none;
+   -moz-user-select: none;
+   -ms-user-select: none;
+@@ -133,7 +133,7 @@ exports[`props should render no truncate 1`] = `
+ }
+ 
+ @media (-webkit-min-device-pixel-ratio:1.25), (min-resolution:120dpi) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 > * {
++  .emotion-0 > * {
+     position: relative;
+     top: 0.5px;
+   }
+@@ -149,7 +149,7 @@ exports[`props should render no truncate 1`] = `
+ `;
+ 
+ exports[`props should render size 1`] = `
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -190,18 +190,18 @@ exports[`props should render size 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0:active {
++.emotion-0:active {
+   -webkit-user-select: none;
+   -moz-user-select: none;
+   -ms-user-select: none;
+@@ -209,7 +209,7 @@ exports[`props should render size 1`] = `
+ }
+ 
+ @media (-webkit-min-device-pixel-ratio:1.25), (min-resolution:120dpi) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 > * {
++  .emotion-0 > * {
+     position: relative;
+     top: 0.5px;
+   }
+diff --git a/packages/components/src/ui/divider/test/__snapshots__/index.js.snap b/packages/components/src/ui/divider/test/__snapshots__/index.js.snap
+index b1f8239dc123ff..d90d7c1e0d29fb 100644
+--- a/packages/components/src/ui/divider/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/divider/test/__snapshots__/index.js.snap
+@@ -1,7 +1,7 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   border-color: rgba(0, 0, 0, 0.1);
+   border-color: var(--wp-g2-color-divider);
+   border-width: 0 0 1px 0;
+diff --git a/packages/components/src/ui/elevation/test/__snapshots__/index.js.snap b/packages/components/src/ui/elevation/test/__snapshots__/index.js.snap
+index c48534bbe69bb2..a507c641aae1c4 100644
+--- a/packages/components/src/ui/elevation/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/elevation/test/__snapshots__/index.js.snap
+@@ -1,7 +1,7 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`props should render active 1`] = `
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -33,22 +33,22 @@ exports[`props should render active 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-*:hover > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++*:hover > .emotion-0 {
+   box-shadow: 0 14px 28px 0 rgba(0 ,0,0,0.7);
+ }
+ 
+-*:active > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++*:active > .emotion-0 {
+   box-shadow: 0 5px 10px 0 rgba(0 ,0,0,0.25);
+ }
+ 
+@@ -61,7 +61,7 @@ exports[`props should render active 1`] = `
+ `;
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -93,13 +93,13 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+@@ -113,7 +113,7 @@ exports[`props should render correctly 1`] = `
+ `;
+ 
+ exports[`props should render hover 1`] = `
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -145,18 +145,18 @@ exports[`props should render hover 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-*:hover > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++*:hover > .emotion-0 {
+   box-shadow: 0 14px 28px 0 rgba(0 ,0,0,0.7);
+ }
+ 
+@@ -169,7 +169,7 @@ exports[`props should render hover 1`] = `
+ `;
+ 
+ exports[`props should render isInteractive 1`] = `
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -201,22 +201,22 @@ exports[`props should render isInteractive 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-*:hover > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++*:hover > .emotion-0 {
+   box-shadow: 0 0px 0px 0 rgba(0 ,0,0,0);
+ }
+ 
+-*:active > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++*:active > .emotion-0 {
+   box-shadow: 0 0px 0px 0 rgba(0 ,0,0,0);
+ }
+ 
+@@ -229,7 +229,7 @@ exports[`props should render isInteractive 1`] = `
+ `;
+ 
+ exports[`props should render offset 1`] = `
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -261,22 +261,22 @@ exports[`props should render offset 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-*:hover > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++*:hover > .emotion-0 {
+   box-shadow: 0 14px 28px 0 rgba(0 ,0,0,0.7);
+ }
+ 
+-*:active > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++*:active > .emotion-0 {
+   box-shadow: 0 5px 10px 0 rgba(0 ,0,0,0.25);
+ }
+ 
+@@ -289,7 +289,7 @@ exports[`props should render offset 1`] = `
+ `;
+ 
+ exports[`props should render value 1`] = `
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -321,13 +321,13 @@ exports[`props should render value 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+diff --git a/packages/components/src/ui/flex/test/__snapshots__/index.js.snap b/packages/components/src/ui/flex/test/__snapshots__/index.js.snap
+index 56fe7c5abb8a2f..1f1cea6a4fbc46 100644
+--- a/packages/components/src/ui/flex/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/flex/test/__snapshots__/index.js.snap
+@@ -54,7 +54,7 @@ Snapshot Diff:
+ `;
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++.emotion-2 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -86,27 +86,27 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  .emotion-2 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-2 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
++.emotion-2 > * + *:not(marquee) {
+   margin-left: calc(4px * 2);
+   margin-left: calc(var(--wp-g2-grid-base) * 2);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
++.emotion-2 > * {
+   min-width: 0;
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -126,18 +126,18 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++.emotion-1 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -160,13 +160,13 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++  .emotion-1 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-1 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+diff --git a/packages/components/src/ui/form-group/test/__snapshots__/index.js.snap b/packages/components/src/ui/form-group/test/__snapshots__/index.js.snap
+index 288e655271f9b6..e3752401bedc20 100644
+--- a/packages/components/src/ui/form-group/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/form-group/test/__snapshots__/index.js.snap
+@@ -1,7 +1,7 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`props should render alignLabel 1`] = `
+-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++.emotion-1 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -16,18 +16,18 @@ exports[`props should render alignLabel 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++  .emotion-1 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-1 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -65,18 +65,18 @@ exports[`props should render alignLabel 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0:active {
++.emotion-0:active {
+   -webkit-user-select: none;
+   -moz-user-select: none;
+   -ms-user-select: none;
+@@ -84,7 +84,7 @@ exports[`props should render alignLabel 1`] = `
+ }
+ 
+ @media (-webkit-min-device-pixel-ratio:1.25), (min-resolution:120dpi) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 > * {
++  .emotion-0 > * {
+     position: relative;
+     top: 0.5px;
+   }
+@@ -111,7 +111,7 @@ exports[`props should render alignLabel 1`] = `
+ `;
+ 
+ exports[`props should render vertically 1`] = `
+-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++.emotion-1 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -126,18 +126,18 @@ exports[`props should render vertically 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++  .emotion-1 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-1 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -175,18 +175,18 @@ exports[`props should render vertically 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0:active {
++.emotion-0:active {
+   -webkit-user-select: none;
+   -moz-user-select: none;
+   -ms-user-select: none;
+@@ -194,7 +194,7 @@ exports[`props should render vertically 1`] = `
+ }
+ 
+ @media (-webkit-min-device-pixel-ratio:1.25), (min-resolution:120dpi) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 > * {
++  .emotion-0 > * {
+     position: relative;
+     top: 0.5px;
+   }
+diff --git a/packages/components/src/ui/h-stack/test/__snapshots__/index.js.snap b/packages/components/src/ui/h-stack/test/__snapshots__/index.js.snap
+index 0ab029a25e91ea..524b6242e0162a 100644
+--- a/packages/components/src/ui/h-stack/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/h-stack/test/__snapshots__/index.js.snap
+@@ -1,7 +1,7 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`props should render alignment 1`] = `
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -15,18 +15,18 @@ exports[`props should render alignment 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++.emotion-2 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -58,23 +58,23 @@ exports[`props should render alignment 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  .emotion-2 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-2 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
++.emotion-2 > * + *:not(marquee) {
+   margin-left: calc(4px * 2);
+   margin-left: calc(var(--wp-g2-grid-base) * 2);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
++.emotion-2 > * {
+   min-width: 0;
+ }
+ 
+@@ -93,7 +93,7 @@ exports[`props should render alignment 1`] = `
+ `;
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++.emotion-2 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -125,27 +125,27 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  .emotion-2 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-2 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
++.emotion-2 > * + *:not(marquee) {
+   margin-left: calc(4px * 2);
+   margin-left: calc(var(--wp-g2-grid-base) * 2);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
++.emotion-2 > * {
+   min-width: 0;
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -159,13 +159,13 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+@@ -185,7 +185,7 @@ exports[`props should render correctly 1`] = `
+ `;
+ 
+ exports[`props should render spacing 1`] = `
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -199,18 +199,18 @@ exports[`props should render spacing 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++.emotion-2 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -242,23 +242,23 @@ exports[`props should render spacing 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  .emotion-2 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-2 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
++.emotion-2 > * + *:not(marquee) {
+   margin-left: calc(4px * 5);
+   margin-left: calc(var(--wp-g2-grid-base) * 5);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
++.emotion-2 > * {
+   min-width: 0;
+ }
+ 
+diff --git a/packages/components/src/ui/heading/test/__snapshots__/index.js.snap b/packages/components/src/ui/heading/test/__snapshots__/index.js.snap
+index a0505ff6fe8881..291d305fd017a6 100644
+--- a/packages/components/src/ui/heading/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/heading/test/__snapshots__/index.js.snap
+@@ -1,7 +1,7 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -26,13 +26,13 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+diff --git a/packages/components/src/ui/popover/test/__snapshots__/index.js.snap b/packages/components/src/ui/popover/test/__snapshots__/index.js.snap
+index 0cfe871f278e61..b82db34f585132 100644
+--- a/packages/components/src/ui/popover/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/popover/test/__snapshots__/index.js.snap
+@@ -1,7 +1,7 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4 {
++.emotion-4 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -27,22 +27,22 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4 {
++  .emotion-4 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-4 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4 .ic-1reds0m {
++.emotion-4 .ic-1reds0m {
+   max-height: 80vh;
+ }
+ 
+-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++.emotion-1 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -57,18 +57,18 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++  .emotion-1 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-1 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -89,34 +89,34 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+ @media only screen and ( min-device-width:40em ) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0::-webkit-scrollbar {
++  .emotion-0::-webkit-scrollbar {
+     height: 12px;
+     width: 12px;
+   }
+ 
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0::-webkit-scrollbar-track {
++  .emotion-0::-webkit-scrollbar-track {
+     background-color: transparent;
+   }
+ 
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0::-webkit-scrollbar-track {
++  .emotion-0::-webkit-scrollbar-track {
+     background: rgba(0, 0, 0, 0.04);
+     background: var(--wp-g2-color-scrollbar-track);
+     border-radius: 8px;
+   }
+ 
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0::-webkit-scrollbar-thumb {
++  .emotion-0::-webkit-scrollbar-thumb {
+     background-clip: padding-box;
+     background-color: rgba(0, 0, 0, 0.2);
+     background-color: var(--wp-g2-color-scrollbar-thumb);
+@@ -124,27 +124,27 @@ exports[`props should render correctly 1`] = `
+     border-radius: 7px;
+   }
+ 
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0:hover::-webkit-scrollbar-thumb {
++  .emotion-0:hover::-webkit-scrollbar-thumb {
+     background-color: rgba(0, 0, 0, 0.5);
+     background-color: var(--wp-g2-color-scrollbar-thumb-hover);
+   }
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0:first-of-type {
++.emotion-0:first-of-type {
+   border-top-left-radius: 2px;
+   border-top-left-radius: var(--wp-g2-card-border-radius);
+   border-top-right-radius: 2px;
+   border-top-right-radius: var(--wp-g2-card-border-radius);
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0:last-of-type {
++.emotion-0:last-of-type {
+   border-bottom-left-radius: 2px;
+   border-bottom-left-radius: var(--wp-g2-card-border-radius);
+   border-bottom-right-radius: 2px;
+   border-bottom-right-radius: var(--wp-g2-card-border-radius);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++.emotion-2 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -178,18 +178,18 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  .emotion-2 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-2 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 {
++.emotion-3 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -223,13 +223,13 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 {
++  .emotion-3 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-3 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+diff --git a/packages/components/src/ui/scrollable/test/__snapshots__/index.js.snap b/packages/components/src/ui/scrollable/test/__snapshots__/index.js.snap
+index d4af7ee1efa686..7cdfef42bb9eee 100644
+--- a/packages/components/src/ui/scrollable/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/scrollable/test/__snapshots__/index.js.snap
+@@ -1,7 +1,7 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -18,34 +18,34 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+ @media only screen and ( min-device-width:40em ) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0::-webkit-scrollbar {
++  .emotion-0::-webkit-scrollbar {
+     height: 12px;
+     width: 12px;
+   }
+ 
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0::-webkit-scrollbar-track {
++  .emotion-0::-webkit-scrollbar-track {
+     background-color: transparent;
+   }
+ 
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0::-webkit-scrollbar-track {
++  .emotion-0::-webkit-scrollbar-track {
+     background: rgba(0, 0, 0, 0.04);
+     background: var(--wp-g2-color-scrollbar-track);
+     border-radius: 8px;
+   }
+ 
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0::-webkit-scrollbar-thumb {
++  .emotion-0::-webkit-scrollbar-thumb {
+     background-clip: padding-box;
+     background-color: rgba(0, 0, 0, 0.2);
+     background-color: var(--wp-g2-color-scrollbar-thumb);
+@@ -53,7 +53,7 @@ exports[`props should render correctly 1`] = `
+     border-radius: 7px;
+   }
+ 
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0:hover::-webkit-scrollbar-thumb {
++  .emotion-0:hover::-webkit-scrollbar-thumb {
+     background-color: rgba(0, 0, 0, 0.5);
+     background-color: var(--wp-g2-color-scrollbar-thumb-hover);
+   }
+diff --git a/packages/components/src/ui/spinner/test/__snapshots__/index.js.snap b/packages/components/src/ui/spinner/test/__snapshots__/index.js.snap
+index dfa5c8b20eea9c..225cda1786fc01 100644
+--- a/packages/components/src/ui/spinner/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/spinner/test/__snapshots__/index.js.snap
+@@ -20,7 +20,7 @@ Snapshot Diff:
+ `;
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++.emotion-2 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -40,18 +40,18 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  .emotion-2 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-2 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++.emotion-1 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -74,18 +74,18 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++  .emotion-1 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-1 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -113,18 +113,18 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 > div {
++.emotion-0 > div {
+   -webkit-animation: ComponentsUISpinnerFadeAnimation 1000ms linear infinite;
+   animation: ComponentsUISpinnerFadeAnimation 1000ms linear infinite;
+   background: currentColor;
+@@ -137,7 +137,7 @@ exports[`props should render correctly 1`] = `
+   width: 6%;
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 .InnerBar1 {
++.emotion-0 .InnerBar1 {
+   -webkit-animation-delay: 0s;
+   animation-delay: 0s;
+   -webkit-transform: rotate( 0deg ) translate( 0,-130% );
+@@ -145,7 +145,7 @@ exports[`props should render correctly 1`] = `
+   transform: rotate( 0deg ) translate( 0,-130% );
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 .InnerBar2 {
++.emotion-0 .InnerBar2 {
+   -webkit-animation-delay: -0.9167s;
+   animation-delay: -0.9167s;
+   -webkit-transform: rotate( 30deg ) translate( 0,-130% );
+@@ -153,7 +153,7 @@ exports[`props should render correctly 1`] = `
+   transform: rotate( 30deg ) translate( 0,-130% );
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 .InnerBar3 {
++.emotion-0 .InnerBar3 {
+   -webkit-animation-delay: -0.833s;
+   animation-delay: -0.833s;
+   -webkit-transform: rotate( 60deg ) translate( 0,-130% );
+@@ -161,7 +161,7 @@ exports[`props should render correctly 1`] = `
+   transform: rotate( 60deg ) translate( 0,-130% );
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 .InnerBar4 {
++.emotion-0 .InnerBar4 {
+   -webkit-animation-delay: -0.7497s;
+   animation-delay: -0.7497s;
+   -webkit-transform: rotate( 90deg ) translate( 0,-130% );
+@@ -169,7 +169,7 @@ exports[`props should render correctly 1`] = `
+   transform: rotate( 90deg ) translate( 0,-130% );
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 .InnerBar5 {
++.emotion-0 .InnerBar5 {
+   -webkit-animation-delay: -0.667s;
+   animation-delay: -0.667s;
+   -webkit-transform: rotate( 120deg ) translate( 0,-130% );
+@@ -177,7 +177,7 @@ exports[`props should render correctly 1`] = `
+   transform: rotate( 120deg ) translate( 0,-130% );
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 .InnerBar6 {
++.emotion-0 .InnerBar6 {
+   -webkit-animation-delay: -0.5837s;
+   animation-delay: -0.5837s;
+   -webkit-transform: rotate( 150deg ) translate( 0,-130% );
+@@ -185,7 +185,7 @@ exports[`props should render correctly 1`] = `
+   transform: rotate( 150deg ) translate( 0,-130% );
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 .InnerBar7 {
++.emotion-0 .InnerBar7 {
+   -webkit-animation-delay: -0.5s;
+   animation-delay: -0.5s;
+   -webkit-transform: rotate( 180deg ) translate( 0,-130% );
+@@ -193,7 +193,7 @@ exports[`props should render correctly 1`] = `
+   transform: rotate( 180deg ) translate( 0,-130% );
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 .InnerBar8 {
++.emotion-0 .InnerBar8 {
+   -webkit-animation-delay: -0.4167s;
+   animation-delay: -0.4167s;
+   -webkit-transform: rotate( 210deg ) translate( 0,-130% );
+@@ -201,7 +201,7 @@ exports[`props should render correctly 1`] = `
+   transform: rotate( 210deg ) translate( 0,-130% );
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 .InnerBar9 {
++.emotion-0 .InnerBar9 {
+   -webkit-animation-delay: -0.333s;
+   animation-delay: -0.333s;
+   -webkit-transform: rotate( 240deg ) translate( 0,-130% );
+@@ -209,7 +209,7 @@ exports[`props should render correctly 1`] = `
+   transform: rotate( 240deg ) translate( 0,-130% );
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 .InnerBar10 {
++.emotion-0 .InnerBar10 {
+   -webkit-animation-delay: -0.2497s;
+   animation-delay: -0.2497s;
+   -webkit-transform: rotate( 270deg ) translate( 0,-130% );
+@@ -217,7 +217,7 @@ exports[`props should render correctly 1`] = `
+   transform: rotate( 270deg ) translate( 0,-130% );
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 .InnerBar11 {
++.emotion-0 .InnerBar11 {
+   -webkit-animation-delay: -0.167s;
+   animation-delay: -0.167s;
+   -webkit-transform: rotate( 300deg ) translate( 0,-130% );
+@@ -225,7 +225,7 @@ exports[`props should render correctly 1`] = `
+   transform: rotate( 300deg ) translate( 0,-130% );
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 .InnerBar12 {
++.emotion-0 .InnerBar12 {
+   -webkit-animation-delay: -0.0833s;
+   animation-delay: -0.0833s;
+   -webkit-transform: rotate( 330deg ) translate( 0,-130% );
+diff --git a/packages/components/src/ui/styles/test/css.js b/packages/components/src/ui/styles/test/css.js
+index 593bb40b3a91a7..fd2b2a873bb664 100644
+--- a/packages/components/src/ui/styles/test/css.js
++++ b/packages/components/src/ui/styles/test/css.js
+@@ -82,34 +82,4 @@ describe( 'plugins', () => {
+ 
+ 		expect( container.firstChild ).toHaveStyle( `background: blue;` );
+ 	} );
+-
+-	test( 'should automatically render rtl styles', () => {
+-		// Simulate an rtl environment
+-		document.documentElement.setAttribute( 'dir', 'rtl' );
+-		// Create the style
+-		const style = css`
+-			padding-right: 55px;
+-			margin-right: 55px;
+-			right: 55px;
+-			transform: translateX( 55% );
+-		`;
+-
+-		const { container } = render( <div className={ style } /> );
+-
+-		expect( container.firstChild ).toHaveStyle( `margin-left: 55px;` );
+-		expect( container.firstChild ).toHaveStyle( `padding-left: 55px;` );
+-		expect( container.firstChild ).toHaveStyle( `left: 55px;` );
+-		expect( container.firstChild ).toHaveStyle(
+-			`transform: translateX( -55% );`
+-		);
+-
+-		expect( container.firstChild ).not.toHaveStyle( `margin-right: 55px;` );
+-		expect( container.firstChild ).not.toHaveStyle(
+-			`padding-right: 55px;`
+-		);
+-		expect( container.firstChild ).not.toHaveStyle( `right: 55px;` );
+-		expect( container.firstChild ).not.toHaveStyle(
+-			`transform: translateX( 55% );`
+-		);
+-	} );
+ } );
+diff --git a/packages/components/src/ui/surface/test/__snapshots__/index.js.snap b/packages/components/src/ui/surface/test/__snapshots__/index.js.snap
+index 25c7c08c951b10..aaa844eb7f0539 100644
+--- a/packages/components/src/ui/surface/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/surface/test/__snapshots__/index.js.snap
+@@ -76,7 +76,7 @@ Snapshot Diff:
+ `;
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -97,13 +97,13 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+diff --git a/packages/components/src/ui/text/test/__snapshots__/text.js.snap b/packages/components/src/ui/text/test/__snapshots__/text.js.snap
+index 199b820be1f32c..e967fb52198c4f 100644
+--- a/packages/components/src/ui/text/test/__snapshots__/text.js.snap
++++ b/packages/components/src/ui/text/test/__snapshots__/text.js.snap
+@@ -1,7 +1,7 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`Text should render highlighted words with highlightCaseSensitive 1`] = `
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -23,18 +23,18 @@ exports[`Text should render highlighted words with highlightCaseSensitive 1`] =
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 mark {
++.emotion-0 mark {
+   background: rgba(255, 185, 0, 0.7);
+   background: var(--wp-g2-yellow-rgba-70);
+   border-radius: 2px;
+@@ -56,7 +56,7 @@ exports[`Text should render highlighted words with highlightCaseSensitive 1`] =
+ `;
+ 
+ exports[`Text snapshot tests should render correctly 1`] = `
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -78,13 +78,13 @@ exports[`Text snapshot tests should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+diff --git a/packages/components/src/ui/tooltip/test/__snapshots__/index.js.snap b/packages/components/src/ui/tooltip/test/__snapshots__/index.js.snap
+index a3176b338b2e33..ad961885f35034 100644
+--- a/packages/components/src/ui/tooltip/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/tooltip/test/__snapshots__/index.js.snap
+@@ -1,7 +1,7 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++.emotion-1 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -26,22 +26,22 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++  .emotion-1 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-1 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1[data-enter] {
++.emotion-1[data-enter] {
+   opacity: 1;
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -61,13 +61,13 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+diff --git a/packages/components/src/ui/v-stack/test/__snapshots__/index.js.snap b/packages/components/src/ui/v-stack/test/__snapshots__/index.js.snap
+index 6efe1d60b36ac5..b8f799dc13715e 100644
+--- a/packages/components/src/ui/v-stack/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/v-stack/test/__snapshots__/index.js.snap
+@@ -1,7 +1,7 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`props should render alignment 1`] = `
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -15,18 +15,18 @@ exports[`props should render alignment 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++.emotion-2 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -58,23 +58,23 @@ exports[`props should render alignment 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  .emotion-2 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-2 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
++.emotion-2 > * + *:not(marquee) {
+   margin-top: calc(4px * 2);
+   margin-top: calc(var(--wp-g2-grid-base) * 2);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
++.emotion-2 > * {
+   min-height: 0;
+ }
+ 
+@@ -93,7 +93,7 @@ exports[`props should render alignment 1`] = `
+ `;
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++.emotion-2 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -125,27 +125,27 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  .emotion-2 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-2 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
++.emotion-2 > * + *:not(marquee) {
+   margin-top: calc(4px * 2);
+   margin-top: calc(var(--wp-g2-grid-base) * 2);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
++.emotion-2 > * {
+   min-height: 0;
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -159,13 +159,13 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+@@ -185,7 +185,7 @@ exports[`props should render correctly 1`] = `
+ `;
+ 
+ exports[`props should render spacing 1`] = `
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -199,18 +199,18 @@ exports[`props should render spacing 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++.emotion-2 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -242,23 +242,23 @@ exports[`props should render spacing 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  .emotion-2 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-2 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
++.emotion-2 > * + *:not(marquee) {
+   margin-top: calc(4px * 5);
+   margin-top: calc(var(--wp-g2-grid-base) * 5);
+ }
+ 
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
++.emotion-2 > * {
+   min-height: 0;
+ }
+ 
+diff --git a/packages/components/src/ui/view/test/__snapshots__/index.js.snap b/packages/components/src/ui/view/test/__snapshots__/index.js.snap
+index d03442176e45fb..8b1f949f23e366 100644
+--- a/packages/components/src/ui/view/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/view/test/__snapshots__/index.js.snap
+@@ -1,7 +1,7 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`props should render as another element 1`] = `
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -15,13 +15,13 @@ exports[`props should render as another element 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+@@ -34,7 +34,7 @@ exports[`props should render as another element 1`] = `
+ `;
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -48,13 +48,13 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+@@ -67,7 +67,7 @@ exports[`props should render correctly 1`] = `
+ `;
+ 
+ exports[`props should render with custom styles (Array) 1`] = `
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -83,13 +83,13 @@ exports[`props should render with custom styles (Array) 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+@@ -102,7 +102,7 @@ exports[`props should render with custom styles (Array) 1`] = `
+ `;
+ 
+ exports[`props should render with custom styles (object) 1`] = `
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -117,13 +117,13 @@ exports[`props should render with custom styles (object) 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+@@ -136,7 +136,7 @@ exports[`props should render with custom styles (object) 1`] = `
+ `;
+ 
+ exports[`props should render with custom styles (string) 1`] = `
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -151,13 +151,13 @@ exports[`props should render with custom styles (string) 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+diff --git a/packages/components/src/ui/visually-hidden/test/__snapshots__/index.js.snap b/packages/components/src/ui/visually-hidden/test/__snapshots__/index.js.snap
+index 704f6d4f5830c3..7d69dc62f78a09 100644
+--- a/packages/components/src/ui/visually-hidden/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/visually-hidden/test/__snapshots__/index.js.snap
+@@ -1,7 +1,7 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`VisuallyHidden should render correctly 1`] = `
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++.emotion-0 {
+   box-sizing: border-box;
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+@@ -28,18 +28,18 @@ exports[`VisuallyHidden should render correctly 1`] = `
+ }
+ 
+ @media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  .emotion-0 {
+     -webkit-transition: none !important;
+     transition: none !important;
+   }
+ }
+ 
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
+   -webkit-transition: none !important;
+   transition: none !important;
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0:focus {
++.emotion-0:focus {
+   background-color: #edeff0;
+   background-color: var(--wp-g2-light-gray-300);
+   -webkit-clip: auto !important;

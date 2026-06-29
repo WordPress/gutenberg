@@ -1,0 +1,87 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b8c70666ce643e..b7a386ed87c9a7 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -21,6 +21,7 @@
+ 
+ -   Add `getOverlayLegacySlot()` helper and matching `.wp-overlay-legacy` styles. Lazily mounts a body-level container at `z-index: 99997` with `isolation: isolate` to be used as the portal target for legacy overlays in a follow-up. No runtime behavior change yet.
+ -   `Popover`: Render the fallback container inside the new overlay legacy slot. The popover's per-class z-index is preserved and now stacks relative to the slot.
++-   `Modal`: Portal modals into the overlay legacy slot. Update the aria-helper to walk up from the modal so siblings of the slot wrapper (and outer modals when nested) continue to be aria-hidden.
+ -   `NavigableContainer`: Refactor from class component to function component with hooks ([#77171](https://github.com/WordPress/gutenberg/pull/77171)).
+ -   `Menu`: Refactor `Menu.Popover` to use Ariakit’s `render` prop, wrapping content in `MenuMotionRoot` (motion styles) and `MenuSurface` (panel layout and `variant` chrome) ([#77460](https://github.com/WordPress/gutenberg/pull/77460)).
+ -   Fix types for TypeScript 7.0 ([#77177](https://github.com/WordPress/gutenberg/pull/77177)).
+diff --git a/packages/components/src/modal/aria-helper.ts b/packages/components/src/modal/aria-helper.ts
+index bd11fb71253e1e..9452504d98c6e0 100644
+--- a/packages/components/src/modal/aria-helper.ts
++++ b/packages/components/src/modal/aria-helper.ts
+@@ -21,18 +21,42 @@ const hiddenElementsByDepth: Element[][] = [];
+  * @param modalElement The element that should not be hidden.
+  */
+ export function modalize( modalElement?: HTMLDivElement ) {
+-	const elements = Array.from( document.body.children );
+ 	const hiddenElements: Element[] = [];
+ 	hiddenElementsByDepth.push( hiddenElements );
+-	for ( const element of elements ) {
+-		if ( element === modalElement ) {
+-			continue;
++
++	if ( ! modalElement ) {
++		// Fallback (no modal element provided): hide all body children. Kept
++		// for backwards compatibility with legacy callers.
++		for ( const element of Array.from( document.body.children ) ) {
++			if ( elementShouldBeHidden( element ) ) {
++				element.setAttribute( 'aria-hidden', 'true' );
++				hiddenElements.push( element );
++			}
+ 		}
++		return;
++	}
+ 
+-		if ( elementShouldBeHidden( element ) ) {
+-			element.setAttribute( 'aria-hidden', 'true' );
+-			hiddenElements.push( element );
++	// Walk up from the modal to <body>, hiding non-modal siblings at each
++	// level. This preserves correct screen-reader semantics when the modal
++	// is portaled into a wrapper (e.g. the overlay legacy slot): siblings
++	// inside the wrapper — including an outer modal when nested — get
++	// hidden, and so do siblings of the wrapper at the body level.
++	let current: Element = modalElement;
++	while ( current.parentElement ) {
++		const parent = current.parentElement;
++		for ( const sibling of Array.from( parent.children ) ) {
++			if ( sibling === current ) {
++				continue;
++			}
++			if ( elementShouldBeHidden( sibling ) ) {
++				sibling.setAttribute( 'aria-hidden', 'true' );
++				hiddenElements.push( sibling );
++			}
++		}
++		if ( parent === document.body ) {
++			break;
+ 		}
++		current = parent;
+ 	}
+ }
+ 
+diff --git a/packages/components/src/modal/index.tsx b/packages/components/src/modal/index.tsx
+index 0e06f277421de3..59ef6fa8725414 100644
+--- a/packages/components/src/modal/index.tsx
++++ b/packages/components/src/modal/index.tsx
+@@ -23,6 +23,7 @@ import * as ariaHelper from './aria-helper';
+ import Button from '../button';
+ import StyleProvider from '../style-provider';
+ import type { ModalProps } from './types';
++import { getOverlayLegacySlot } from '../utils/overlay-legacy-slot';
+ import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
+ import { Spacer } from '../spacer';
+ import { useModalExitAnimation } from './use-modal-exit-animation';
+@@ -363,7 +364,7 @@ function UnforwardedModal(
+ 		<ModalContext.Provider value={ nestedDismissers }>
+ 			{ modal }
+ 		</ModalContext.Provider>,
+-		document.body
++		getOverlayLegacySlot()
+ 	);
+ }
+ 

@@ -1,0 +1,174 @@
+diff --git a/packages/block-editor/src/components/inserter/stories/index.story.js b/packages/block-editor/src/components/inserter/stories/index.story.js
+index 960fd86b3bc8ff..58dd99b48d9a02 100644
+--- a/packages/block-editor/src/components/inserter/stories/index.story.js
++++ b/packages/block-editor/src/components/inserter/stories/index.story.js
+@@ -8,7 +8,7 @@ import Inserter from '../';
+ 
+ export default { title: 'BlockEditor/Inserter' };
+ 
+-export const libraryWithoutPatterns = () => {
++export const LibraryWithoutPatterns = () => {
+ 	const wrapperStyle = {
+ 		margin: '24px',
+ 		height: 400,
+@@ -24,7 +24,7 @@ export const libraryWithoutPatterns = () => {
+ 	);
+ };
+ 
+-export const libraryWithPatterns = () => {
++export const LibraryWithPatterns = () => {
+ 	const wrapperStyle = {
+ 		margin: '24px',
+ 		height: 400,
+@@ -45,7 +45,7 @@ export const libraryWithPatterns = () => {
+ 	);
+ };
+ 
+-export const libraryWithPatternsAndReusableBlocks = () => {
++export const LibraryWithPatternsAndReusableBlocks = () => {
+ 	const wrapperStyle = {
+ 		margin: '24px',
+ 		height: 400,
+@@ -67,7 +67,7 @@ export const libraryWithPatternsAndReusableBlocks = () => {
+ 	);
+ };
+ 
+-export const quickInserter = () => {
++export const QuickInserter = () => {
+ 	const wrapperStyle = {
+ 		margin: '24px',
+ 		height: 400,
+diff --git a/packages/components/src/box-control/stories/index.story.js b/packages/components/src/box-control/stories/index.story.js
+index 55cf2628c670c7..adbd0e15f7c441 100644
+--- a/packages/components/src/box-control/stories/index.story.js
++++ b/packages/components/src/box-control/stories/index.story.js
+@@ -42,7 +42,7 @@ function DemoExample( {
+ 	);
+ }
+ 
+-export const arbitrarySides = () => {
++export const ArbitrarySides = () => {
+ 	return (
+ 		<DemoExample
+ 			sides={ [ 'top', 'bottom' ] }
+@@ -51,7 +51,7 @@ export const arbitrarySides = () => {
+ 	);
+ };
+ 
+-export const singleSide = () => {
++export const SingleSide = () => {
+ 	return (
+ 		<DemoExample
+ 			sides={ [ 'bottom' ] }
+@@ -60,11 +60,11 @@ export const singleSide = () => {
+ 	);
+ };
+ 
+-export const axialControls = () => {
++export const AxialControls = () => {
+ 	return <DemoExample splitOnAxis={ true } />;
+ };
+ 
+-export const axialControlsWithSingleSide = () => {
++export const AxialControlsWithSingleSide = () => {
+ 	return (
+ 		<DemoExample
+ 			sides={ [ 'horizontal' ] }
+diff --git a/packages/components/src/confirm-dialog/stories/index.story.js b/packages/components/src/confirm-dialog/stories/index.story.js
+index 10d051c23fcf03..a4250d28da1f2d 100644
+--- a/packages/components/src/confirm-dialog/stories/index.story.js
++++ b/packages/components/src/confirm-dialog/stories/index.story.js
+@@ -116,8 +116,8 @@ _default.parameters = {
+ };
+ 
+ // To customize button text, pass the `cancelButtonText` and/or `confirmButtonText` props.
+-export const withCustomButtonLabels = Template.bind( {} );
+-withCustomButtonLabels.args = {
++export const WithCustomButtonLabels = Template.bind( {} );
++WithCustomButtonLabels.args = {
+ 	cancelButtonText: 'No thanks',
+ 	confirmButtonText: 'Yes please!',
+ };
+diff --git a/packages/components/src/navigation/stories/index.story.tsx b/packages/components/src/navigation/stories/index.story.tsx
+index 43beb4daae1e12..c007038d129e64 100644
+--- a/packages/components/src/navigation/stories/index.story.tsx
++++ b/packages/components/src/navigation/stories/index.story.tsx
+@@ -36,8 +36,8 @@ const meta: ComponentMeta< typeof Navigation > = {
+ export default meta;
+ 
+ export const _default = DefaultStory.bind( {} );
+-export const controlledState = ControlledStateStory.bind( {} );
+-export const groups = GroupStory.bind( {} );
+-export const search = SearchStory.bind( {} );
+-export const moreExamples = MoreExamplesStory.bind( {} );
+-export const hideIfEmpty = HideIfEmptyStory.bind( {} );
++export const ControlledState = ControlledStateStory.bind( {} );
++export const Groups = GroupStory.bind( {} );
++export const Search = SearchStory.bind( {} );
++export const MoreExamples = MoreExamplesStory.bind( {} );
++export const HideIfEmpty = HideIfEmptyStory.bind( {} );
+diff --git a/packages/components/src/radio-group/stories/index.story.js b/packages/components/src/radio-group/stories/index.story.js
+index 4c6742017c420f..2099c88d866afe 100644
+--- a/packages/components/src/radio-group/stories/index.story.js
++++ b/packages/components/src/radio-group/stories/index.story.js
+@@ -39,7 +39,7 @@ export const _default = () => {
+ 	/* eslint-enable no-restricted-syntax */
+ };
+ 
+-export const disabled = () => {
++export const Disabled = () => {
+ 	/* eslint-disable no-restricted-syntax */
+ 	return (
+ 		<RadioGroup
+@@ -77,6 +77,6 @@ const ControlledRadioGroupWithState = () => {
+ 	/* eslint-enable no-restricted-syntax */
+ };
+ 
+-export const controlled = () => {
++export const Controlled = () => {
+ 	return <ControlledRadioGroupWithState />;
+ };
+diff --git a/packages/components/src/slot-fill/stories/index.story.js b/packages/components/src/slot-fill/stories/index.story.js
+index 4a5bb6b059f165..3e23493020ec77 100644
+--- a/packages/components/src/slot-fill/stories/index.story.js
++++ b/packages/components/src/slot-fill/stories/index.story.js
+@@ -33,7 +33,7 @@ export const _default = () => {
+ 	);
+ };
+ 
+-export const withFillProps = () => {
++export const WithFillProps = () => {
+ 	return (
+ 		<SlotFillProvider>
+ 			<h2>Profile</h2>
+@@ -61,7 +61,7 @@ export const withFillProps = () => {
+ 	);
+ };
+ 
+-export const withContext = () => {
++export const WithContext = () => {
+ 	const Context = createContext();
+ 	const ContextFill = ( { name } ) => {
+ 		const value = useContext( Context );
+diff --git a/packages/components/src/text/stories/index.story.js b/packages/components/src/text/stories/index.story.js
+index a1cdf917b98c9e..b1b4e3f455536b 100644
+--- a/packages/components/src/text/stories/index.story.js
++++ b/packages/components/src/text/stories/index.story.js
+@@ -12,7 +12,7 @@ export const _default = () => {
+ 	return <Text>Hello</Text>;
+ };
+ 
+-export const truncate = () => {
++export const Truncate = () => {
+ 	return (
+ 		<Text numberOfLines={ 2 } truncate>
+ 			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
+@@ -32,7 +32,7 @@ export const truncate = () => {
+ 	);
+ };
+ 
+-export const highlight = () => {
++export const Highlight = () => {
+ 	return (
+ 		<Text highlightWords={ [ 'con' ] }>
+ 			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut

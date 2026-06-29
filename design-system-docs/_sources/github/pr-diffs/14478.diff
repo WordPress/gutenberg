@@ -1,0 +1,40 @@
+diff --git a/packages/block-library/src/video/editor.scss b/packages/block-library/src/video/editor.scss
+index 1dc81eb54e0291..ed7b70c1278dc4 100644
+--- a/packages/block-library/src/video/editor.scss
++++ b/packages/block-library/src/video/editor.scss
+@@ -3,6 +3,7 @@
+ }
+ 
+ .editor-video-poster-control .components-button {
++	display: block;
+ 	margin-right: 8px;
+ }
+ 
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 26c1c2ecdaed68..df84f9e05daaa8 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -53,6 +53,10 @@
+ - Added a new `preview` prop to the `Placeholder` component which allows to display a preview, for example a media preview when the Placeholder is used in media editing contexts.
+ - Added a new `anchorRect` prop to `Popover` which enables a developer to provide a custom `DOMRect` object at which to position the popover.
+ 
++### Improvements
++
++- Limit `Base Control Label` to the width of its content. 
++
+ ### Bug fixes
+ 
+ - Fix `instanceId` prop passed through to `Button` component via `MenuItems` producing React console error. Fixed by removing the unnecessary use of `withInstanceId` on the `MenuItems` component [#14599](https://github.com/WordPress/gutenberg/pull/14599)
+diff --git a/packages/components/src/base-control/style.scss b/packages/components/src/base-control/style.scss
+index e3af118add5e16..b8509f77433971 100644
+--- a/packages/components/src/base-control/style.scss
++++ b/packages/components/src/base-control/style.scss
+@@ -11,7 +11,7 @@
+ 	}
+ 
+ 	.components-base-control__label {
+-		display: block;
++		display: inline-block;
+ 		margin-bottom: $grid-size-small;
+ 	}
+ 

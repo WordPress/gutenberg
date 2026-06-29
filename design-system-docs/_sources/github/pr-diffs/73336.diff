@@ -1,0 +1,113 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 55f5f489fbb31b..e47f0ce466caac 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `UnitControl`: Add maxUnitWidth Prop to customize max width for suffix (units). ([#73336](https://github.com/WordPress/gutenberg/pull/73336)).
++
+ ## 30.8.0 (2025-11-12)
+ 
+ ### Bug Fixes
+diff --git a/packages/components/src/unit-control/index.tsx b/packages/components/src/unit-control/index.tsx
+index 65e1e56cda3b3b..e492fe8d37b1f9 100644
+--- a/packages/components/src/unit-control/index.tsx
++++ b/packages/components/src/unit-control/index.tsx
+@@ -49,6 +49,7 @@ function UnforwardedUnitControl(
+ 		isResetValueOnUnitChange = false,
+ 		isUnitSelectTabbable = true,
+ 		label,
++		maxUnitWidth = 48,
+ 		onChange: onChangeProp,
+ 		onUnitChange,
+ 		size = 'default',
+@@ -205,6 +206,7 @@ function UnforwardedUnitControl(
+ 			}
+ 			unit={ unit }
+ 			units={ units }
++			maxUnitWidth={ maxUnitWidth }
+ 			onFocus={ onFocusProp }
+ 			onBlur={ unitControlProps.onBlur }
+ 		/>
+diff --git a/packages/components/src/unit-control/styles/unit-control-styles.ts b/packages/components/src/unit-control/styles/unit-control-styles.ts
+index 8ec575c8499ec2..2be8c86db4e763 100644
+--- a/packages/components/src/unit-control/styles/unit-control-styles.ts
++++ b/packages/components/src/unit-control/styles/unit-control-styles.ts
+@@ -16,6 +16,7 @@ import { space } from '../../utils/space';
+ // `size` HTML attribute of the `select` element.
+ type SelectProps = {
+ 	selectSize: SelectSize;
++	maxUnitWidth?: number;
+ };
+ 
+ // TODO: Resolve need to use &&& to increase specificity
+@@ -34,7 +35,7 @@ export const ValueInput = styled( NumberControl )`
+ 	}
+ `;
+ 
+-const baseUnitLabelStyles = ( { selectSize }: SelectProps ) => {
++const baseUnitLabelStyles = ( { selectSize, maxUnitWidth }: SelectProps ) => {
+ 	const sizes = {
+ 		small: css`
+ 			box-sizing: border-box;
+@@ -53,7 +54,9 @@ const baseUnitLabelStyles = ( { selectSize }: SelectProps ) => {
+ 		default: css`
+ 			box-sizing: border-box;
+ 			min-width: 24px;
+-			max-width: 48px;
++			${ maxUnitWidth
++				? `max-width: ${ maxUnitWidth.toString() }px;`
++				: `max-width: 48px;` }
+ 			height: 24px;
+ 			margin-inline-end: ${ space( 2 ) };
+ 			padding: ${ space( 1 ) };
+diff --git a/packages/components/src/unit-control/types.ts b/packages/components/src/unit-control/types.ts
+index 891945b422862a..218b1c53137325 100644
+--- a/packages/components/src/unit-control/types.ts
++++ b/packages/components/src/unit-control/types.ts
+@@ -66,6 +66,13 @@ export type UnitSelectControlProps = {
+ 	 * @default CSS_UNITS
+ 	 */
+ 	units?: WPUnitControlUnit[];
++	/**
++	 * Maximum width for the unit select control. If not specified, will use
++	 * default width of 48px.
++	 *
++	 * @default 48
++	 */
++	maxUnitWidth?: number;
+ };
+ 
+ export type UnitControlProps = Pick< InputControlProps, 'size' > &
+diff --git a/packages/components/src/unit-control/unit-select-control.tsx b/packages/components/src/unit-control/unit-select-control.tsx
+index 3bd3266a0a9af0..72db3f64d612f5 100644
+--- a/packages/components/src/unit-control/unit-select-control.tsx
++++ b/packages/components/src/unit-control/unit-select-control.tsx
+@@ -21,6 +21,7 @@ function UnitSelectControl(
+ 	{
+ 		className,
+ 		isUnitSelectTabbable: isTabbable = true,
++		maxUnitWidth = 48,
+ 		onChange,
+ 		size = 'default',
+ 		unit = 'px',
+@@ -33,6 +34,7 @@ function UnitSelectControl(
+ 		return (
+ 			<UnitLabel
+ 				className="components-unit-control__unit-label"
++				maxUnitWidth={ maxUnitWidth }
+ 				selectSize={ size }
+ 			>
+ 				{ unit }
+@@ -53,6 +55,7 @@ function UnitSelectControl(
+ 		<UnitSelect
+ 			ref={ ref }
+ 			className={ classes }
++			maxUnitWidth={ maxUnitWidth }
+ 			onChange={ handleOnChange }
+ 			selectSize={ size }
+ 			tabIndex={ isTabbable ? undefined : -1 }

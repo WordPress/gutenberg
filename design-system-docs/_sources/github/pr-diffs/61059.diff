@@ -1,0 +1,142 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 12277f793d2d92..dad39adee1617d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++- `InputControl`: Remove "experimental" designation ([#61059](https://github.com/WordPress/gutenberg/pull/61059)).
++
+ ### Enhancements
+ 
+ -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index a824162cb24129..fb9b4f7bf9f641 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -100,7 +100,13 @@ export {
+ 	ItemGroup as __experimentalItemGroup,
+ 	Item as __experimentalItem,
+ } from './item-group';
+-export { default as __experimentalInputControl } from './input-control';
++export {
++	/**
++	 * @deprecated Import `InputControl` instead.
++	 */
++	default as __experimentalInputControl,
++	InputControl,
++} from './input-control';
+ export { default as __experimentalInputControlPrefixWrapper } from './input-control/input-prefix-wrapper';
+ export { default as __experimentalInputControlSuffixWrapper } from './input-control/input-suffix-wrapper';
+ export { default as KeyboardShortcuts } from './keyboard-shortcuts';
+diff --git a/packages/components/src/input-control/README.md b/packages/components/src/input-control/README.md
+index 7af244f823516d..733d37b378917f 100644
+--- a/packages/components/src/input-control/README.md
++++ b/packages/components/src/input-control/README.md
+@@ -1,15 +1,11 @@
+ # InputControl
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+ InputControl components let users enter and edit text. This is an experimental component intended to (in time) merge with or replace [TextControl](../text-control).
+ 
+ ## Usage
+ 
+ ```js
+-import { __experimentalInputControl as InputControl } from '@wordpress/components';
++import { InputControl } from '@wordpress/components';
+ import { useState } from 'react';
+ 
+ const Example = () => {
+diff --git a/packages/components/src/input-control/index.tsx b/packages/components/src/input-control/index.tsx
+index 1cf9000a467dd7..89d72abf5da68f 100644
+--- a/packages/components/src/input-control/index.tsx
++++ b/packages/components/src/input-control/index.tsx
+@@ -120,7 +120,7 @@ export function UnforwardedInputControl(
+  * intended to (in time) merge with or replace `TextControl`.
+  *
+  * ```jsx
+- * import { __experimentalInputControl as InputControl } from '@wordpress/components';
++ * import { InputControl } from '@wordpress/components';
+  * import { useState } from 'react';
+  *
+  * const Example = () => {
+diff --git a/packages/components/src/input-control/input-prefix-wrapper.tsx b/packages/components/src/input-control/input-prefix-wrapper.tsx
+index 23d9e823da932d..0c2c39cafe7eaa 100644
+--- a/packages/components/src/input-control/input-prefix-wrapper.tsx
++++ b/packages/components/src/input-control/input-prefix-wrapper.tsx
+@@ -28,7 +28,7 @@ function UnconnectedInputControlPrefixWrapper(
+  *
+  * ```jsx
+  * import {
+- *   __experimentalInputControl as InputControl,
++ *   InputControl,
+  *   __experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+  * } from '@wordpress/components';
+  *
+diff --git a/packages/components/src/input-control/input-suffix-wrapper.tsx b/packages/components/src/input-control/input-suffix-wrapper.tsx
+index 1be352f562e369..fa607258f24779 100644
+--- a/packages/components/src/input-control/input-suffix-wrapper.tsx
++++ b/packages/components/src/input-control/input-suffix-wrapper.tsx
+@@ -28,7 +28,7 @@ function UnconnectedInputControlSuffixWrapper(
+  *
+  * ```jsx
+  * import {
+- *   __experimentalInputControl as InputControl,
++ *   InputControl,
+  *   __experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
+  * } from '@wordpress/components';
+  *
+diff --git a/packages/components/src/input-control/stories/index.story.tsx b/packages/components/src/input-control/stories/index.story.tsx
+index 6067c467f9fe68..8997b6e443877e 100644
+--- a/packages/components/src/input-control/stories/index.story.tsx
++++ b/packages/components/src/input-control/stories/index.story.tsx
+@@ -16,7 +16,7 @@ import { InputControlSuffixWrapper } from '../input-suffix-wrapper';
+ import Button from '../../button';
+ 
+ const meta: Meta< typeof InputControl > = {
+-	title: 'Components (Experimental)/InputControl',
++	title: 'Components/InputControl',
+ 	component: InputControl,
+ 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+ 	subcomponents: { InputControlPrefixWrapper, InputControlSuffixWrapper },
+diff --git a/packages/components/src/input-control/types.ts b/packages/components/src/input-control/types.ts
+index ef01a9fe3db00a..cf8021ef97f504 100644
+--- a/packages/components/src/input-control/types.ts
++++ b/packages/components/src/input-control/types.ts
+@@ -130,7 +130,7 @@ export interface InputBaseProps extends BaseProps, FlexProps {
+ 	 *
+ 	 * @example
+ 	 * import {
+-	 *   __experimentalInputControl as InputControl,
++	 *   InputControl,
+ 	 *   __experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+ 	 * } from '@wordpress/components';
+ 	 *
+@@ -148,7 +148,7 @@ export interface InputBaseProps extends BaseProps, FlexProps {
+ 	 *
+ 	 * @example
+ 	 * import {
+-	 *   __experimentalInputControl as InputControl,
++	 *   InputControl,
+ 	 *   __experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
+ 	 * } from '@wordpress/components';
+ 	 *
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 629f06bf98edf9..37f2603418064e 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -1,6 +1,9 @@
+ <script>
+ 	( function redirectIfStoryMoved() {
+-		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation' ];
++		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [
++			'navigation',
++			'inputcontrol',
++		];
+ 		const REDIRECTS = [
+ 			{
+ 				from: /\/components-deprecated-/,

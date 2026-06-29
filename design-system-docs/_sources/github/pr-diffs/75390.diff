@@ -1,0 +1,115 @@
+diff --git a/packages/ui/src/dialog/close-icon.tsx b/packages/ui/src/dialog/close-icon-button.tsx
+similarity index 87%
+rename from packages/ui/src/dialog/close-icon.tsx
+rename to packages/ui/src/dialog/close-icon-button.tsx
+index b70b1f0b114227..62a176f0536352 100644
+--- a/packages/ui/src/dialog/close-icon.tsx
++++ b/packages/ui/src/dialog/close-icon-button.tsx
+@@ -9,7 +9,7 @@ import type { CloseIconProps } from './types';
+  * Renders an icon button that closes the dialog when clicked.
+  * Provides a default close icon and accessible label.
+  */
+-const CloseIcon = forwardRef< HTMLButtonElement, CloseIconProps >(
++const CloseIconButton = forwardRef< HTMLButtonElement, CloseIconProps >(
+ 	function DialogCloseIcon( { icon, label, ...props }, ref ) {
+ 		return (
+ 			<_Dialog.Close
+@@ -29,4 +29,4 @@ const CloseIcon = forwardRef< HTMLButtonElement, CloseIconProps >(
+ 	}
+ );
+ 
+-export { CloseIcon };
++export { CloseIconButton };
+diff --git a/packages/ui/src/dialog/index.ts b/packages/ui/src/dialog/index.ts
+index 22f7bae4e66e9b..2e0e5a057ba1c6 100644
+--- a/packages/ui/src/dialog/index.ts
++++ b/packages/ui/src/dialog/index.ts
+@@ -1,5 +1,5 @@
+ import { Action } from './action';
+-import { CloseIcon } from './close-icon';
++import { CloseIconButton } from './close-icon-button';
+ import { Footer } from './footer';
+ import { Header } from './header';
+ import { Popup } from './popup';
+@@ -7,4 +7,4 @@ import { Root } from './root';
+ import { Title } from './title';
+ import { Trigger } from './trigger';
+ 
+-export { Action, CloseIcon, Footer, Header, Popup, Root, Title, Trigger };
++export { Action, CloseIconButton, Footer, Header, Popup, Root, Title, Trigger };
+diff --git a/packages/ui/src/dialog/stories/index.story.tsx b/packages/ui/src/dialog/stories/index.story.tsx
+index f2af5aa127d359..c4f89ae31a9daf 100644
+--- a/packages/ui/src/dialog/stories/index.story.tsx
++++ b/packages/ui/src/dialog/stories/index.story.tsx
+@@ -11,7 +11,7 @@ const meta: Meta< typeof Dialog.Root > = {
+ 		'Dialog.Popup': Dialog.Popup,
+ 		'Dialog.Header': Dialog.Header,
+ 		'Dialog.Title': Dialog.Title,
+-		'Dialog.CloseIcon': Dialog.CloseIcon,
++		'Dialog.CloseIconButton': Dialog.CloseIconButton,
+ 		'Dialog.Action': Dialog.Action,
+ 		'Dialog.Footer': Dialog.Footer,
+ 	},
+@@ -33,9 +33,9 @@ const meta: Meta< typeof Dialog.Root > = {
+ 				component: `
+ Dialog is a popup that opens on top of the entire page. Every dialog must include a \`Dialog.Title\` component for accessibility — it serves as both the visible heading and the accessible label for the dialog.
+ 
+-When using the Dialog component, make sure to always include a visible close button, either \`Dialog.CloseIcon\` or a clear dismissing action button. If your dialog has a "Cancel" button in the footer, the close icon may be redundant and create confusion about what clicking "X" means.
++When using the Dialog component, make sure to always include a visible close button, either \`Dialog.CloseIconButton\` or a clear dismissing action button. If your dialog has a "Cancel" button in the footer, the close icon may be redundant and create confusion about what clicking "X" means.
+ 
+-Use \`Dialog.CloseIcon\` for informational dialogs where dismissing is safe and expected. For dialogs requiring explicit user choice (especially destructive actions), omit the close icon and rely on footer action buttons like "Cancel" and "Confirm" instead.
++Use \`Dialog.CloseIconButton\` for informational dialogs where dismissing is safe and expected. For dialogs requiring explicit user choice (especially destructive actions), omit the close icon and rely on footer action buttons like "Cancel" and "Confirm" instead.
+ 				`,
+ 			},
+ 		},
+@@ -57,7 +57,7 @@ export const _Default: Story = {
+ 				<Dialog.Popup>
+ 					<Dialog.Header>
+ 						<Dialog.Title>Welcome</Dialog.Title>
+-						<Dialog.CloseIcon />
++						<Dialog.CloseIconButton />
+ 					</Dialog.Header>
+ 					<p>
+ 						This dialog demonstrates best practices for
+@@ -155,7 +155,7 @@ function SizePlaygroundContent() {
+ 			<Dialog.Popup size={ size }>
+ 				<Dialog.Header>
+ 					<Dialog.Title>Size Playground</Dialog.Title>
+-					<Dialog.CloseIcon />
++					<Dialog.CloseIconButton />
+ 				</Dialog.Header>
+ 				<SizeSelector value={ size } onChange={ setSize } />
+ 				<p>
+diff --git a/packages/ui/src/dialog/style.module.css b/packages/ui/src/dialog/style.module.css
+index 759da730c20e16..42421f3e503b32 100644
+--- a/packages/ui/src/dialog/style.module.css
++++ b/packages/ui/src/dialog/style.module.css
+@@ -90,13 +90,14 @@
+ 
+ 	.header {
+ 		display: flex;
+-		justify-content: space-between;
+ 		align-items: center;
++		gap: var(--wpds-dimension-gap-sm);
+ 		margin-bottom: var(--wpds-dimension-gap-lg);
+ 	}
+ 
+ 	.title {
+ 		margin: 0;
++		margin-inline-end: auto;
+ 		font-size: var(--wpds-font-size-xl);
+ 		font-weight: var(--wpds-font-weight-medium);
+ 		line-height: var(--wpds-font-line-height-xl);
+diff --git a/packages/ui/src/dialog/test/index.test.tsx b/packages/ui/src/dialog/test/index.test.tsx
+index efce84ee6de797..dc9ab10bee0d36 100644
+--- a/packages/ui/src/dialog/test/index.test.tsx
++++ b/packages/ui/src/dialog/test/index.test.tsx
+@@ -52,7 +52,7 @@ describe( 'Dialog', () => {
+ 						<Dialog.Title ref={ titleRef }>
+ 							Test Dialog
+ 						</Dialog.Title>
+-						<Dialog.CloseIcon ref={ closeIconRef } />
++						<Dialog.CloseIconButton ref={ closeIconRef } />
+ 					</Dialog.Header>
+ 					<Dialog.Footer ref={ footerRef }>
+ 						<Dialog.Action ref={ actionRef }>Close</Dialog.Action>

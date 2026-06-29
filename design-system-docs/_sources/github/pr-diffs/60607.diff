@@ -1,0 +1,47 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 356a0f1e13cbd8..7b1786c08cba0c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ 
+ ### Enhancements
+ 
++-   `FontSizePicker`: Add `vw` and `vh` units to the default units in the font size picker ([#60507]((https://github.com/WordPress/gutenberg/pull/60607)).
+ -   `PaletteEdit`: Use consistent spacing and metrics. ([#61368](https://github.com/WordPress/gutenberg/pull/61368)).
+ -   `FormTokenField`: Hide label when not defined ([#61336](https://github.com/WordPress/gutenberg/pull/61336)).
+ -   Upgraded the @types/react and @types/react-dom packages ([#60796](https://github.com/WordPress/gutenberg/pull/60796)).
+diff --git a/packages/components/src/font-size-picker/index.native.js b/packages/components/src/font-size-picker/index.native.js
+index b6e9d5797564b0..63a13b27d72787 100644
+--- a/packages/components/src/font-size-picker/index.native.js
++++ b/packages/components/src/font-size-picker/index.native.js
+@@ -59,7 +59,7 @@ function FontSizePicker( {
+ 	const label = __( 'Font Size' );
+ 
+ 	const units = useCustomUnits( {
+-		availableUnits: [ 'px', 'em', 'rem' ],
++		availableUnits: [ 'px', 'em', 'rem', 'vw', 'vh' ],
+ 	} );
+ 
+ 	const accessibilityLabel = sprintf(
+diff --git a/packages/components/src/font-size-picker/index.tsx b/packages/components/src/font-size-picker/index.tsx
+index 6a18660adfda1d..cb17b7a16e3637 100644
+--- a/packages/components/src/font-size-picker/index.tsx
++++ b/packages/components/src/font-size-picker/index.tsx
+@@ -36,7 +36,7 @@ import FontSizePickerSelect from './font-size-picker-select';
+ import FontSizePickerToggleGroup from './font-size-picker-toggle-group';
+ import { T_SHIRT_NAMES } from './constants';
+ 
+-const DEFAULT_UNITS = [ 'px', 'em', 'rem' ];
++const DEFAULT_UNITS = [ 'px', 'em', 'rem', 'vw', 'vh' ];
+ 
+ const UnforwardedFontSizePicker = (
+ 	props: FontSizePickerProps,
+@@ -112,7 +112,7 @@ const UnforwardedFontSizePicker = (
+ 		units
+ 	);
+ 	const isValueUnitRelative =
+-		!! valueUnit && [ 'em', 'rem' ].includes( valueUnit );
++		!! valueUnit && [ 'em', 'rem', 'vw', 'vh' ].includes( valueUnit );
+ 	const isDisabled = value === undefined;
+ 
+ 	return (

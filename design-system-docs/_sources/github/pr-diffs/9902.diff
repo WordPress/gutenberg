@@ -1,0 +1,17 @@
+diff --git a/editor/components/block-inspector/style.scss b/editor/components/block-inspector/style.scss
+index 5b582584e5444d..ef45acde77d7a7 100644
+--- a/editor/components/block-inspector/style.scss
++++ b/editor/components/block-inspector/style.scss
+@@ -15,6 +15,12 @@
+ 	border-bottom: 1px solid $light-gray-500;
+ 	margin: -16px -16px 16px -16px;
+ 	padding: 16px;
++
++	.editor-block-icon {
++		svg {
++			vertical-align: middle; 
++		}
++	}
+ }
+ 
+ .editor-block-inspector__card-icon {

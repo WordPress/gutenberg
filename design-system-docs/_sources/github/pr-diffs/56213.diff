@@ -1,0 +1,73 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 856926988089a3..2f6b741c0d4ff5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -17,6 +17,7 @@
+ -   `Tabs`: Add `focusable` prop to the `Tabs.TabPanel` sub-component ([#55287](https://github.com/WordPress/gutenberg/pull/55287))
+ -   `Tabs`: Update sub-components to accept relevant HTML element props ([#55860](https://github.com/WordPress/gutenberg/pull/55860))
+ -   `DropdownMenuV2`: Fix radio menu item check icon not rendering correctly in some browsers ([#55964](https://github.com/WordPress/gutenberg/pull/55964))
++-   `DropdownMenuV2`: inherit placement for nested submenus ([#56213](https://github.com/WordPress/gutenberg/pull/56213))
+ -   `DropdownMenuV2`: prevent default when pressing Escape key to close menu ([#55962](https://github.com/WordPress/gutenberg/pull/55962))
+ 
+ ### Enhancements
+diff --git a/packages/components/src/dropdown-menu-v2-ariakit/README.md b/packages/components/src/dropdown-menu-v2-ariakit/README.md
+index f74098efff4103..dec9fa8f05b866 100644
+--- a/packages/components/src/dropdown-menu-v2-ariakit/README.md
++++ b/packages/components/src/dropdown-menu-v2-ariakit/README.md
+@@ -96,6 +96,8 @@ The modality of the dropdown menu. When set to true, interaction with outside el
+ 
+ The placement of the dropdown menu popover.
+ 
++Submenus from the second level of nesting onwards will inherit the parent menu's placement by default, which can still be changed via this prop.
++
+ - Required: no
+ - Default: `'bottom-start'` for root-level menus, `'right-start'` for nested menus
+ 
+diff --git a/packages/components/src/dropdown-menu-v2-ariakit/index.tsx b/packages/components/src/dropdown-menu-v2-ariakit/index.tsx
+index 10b93d8c552c13..3cd1bf142f9366 100644
+--- a/packages/components/src/dropdown-menu-v2-ariakit/index.tsx
++++ b/packages/components/src/dropdown-menu-v2-ariakit/index.tsx
+@@ -195,12 +195,23 @@ const UnconnectedDropdownMenu = (
+ 
+ 	const computedDirection = isRTL() ? 'rtl' : 'ltr';
+ 
+-	// If an explicit value for the `placement` prop is not passed,
+-	// apply a default placement of `bottom-start` for the root dropdown,
+-	// and of `right-start` for nested dropdowns.
+-	let computedPlacement =
+-		props.placement ??
+-		( parentContext?.store ? 'right-start' : 'bottom-start' );
++	let computedPlacement: typeof props.placement;
++	if ( props.placement ) {
++		// The `placement` prop has priority.
++		computedPlacement = props.placement;
++	} else if ( parentContext?.store.parent ) {
++		// If the current menu is at least a second-gen nested menu, it inherits
++		// the placement from its parent menu.
++		computedPlacement = parentContext.store.useState( 'currentPlacement' );
++	} else if ( parentContext?.store ) {
++		// If the current menu is at least a first-gen nested menu, the default
++		// placement is `right-start`.
++		computedPlacement = 'right-start';
++	} else {
++		// For the root dropdown menu, the default placement is `bottom-start`.
++		computedPlacement = 'bottom-start';
++	}
++
+ 	// Swap left/right in case of RTL direction
+ 	if ( computedDirection === 'rtl' ) {
+ 		if ( /right/.test( computedPlacement ) ) {
+diff --git a/packages/components/src/dropdown-menu-v2-ariakit/types.ts b/packages/components/src/dropdown-menu-v2-ariakit/types.ts
+index 27d3b1e8c43393..08bdbdc59d7c19 100644
+--- a/packages/components/src/dropdown-menu-v2-ariakit/types.ts
++++ b/packages/components/src/dropdown-menu-v2-ariakit/types.ts
+@@ -52,6 +52,9 @@ export interface DropdownMenuProps {
+ 	/**
+ 	 * The placement of the dropdown menu popover.
+ 	 *
++	 * Submenus from the second level of nesting onwards will inherit the parent
++	 * menu's placement by default, which can still be changed via this prop.
++	 *
+ 	 * @default 'bottom-start' for root-level menus, 'right-start' for nested menus
+ 	 */
+ 	placement?: Placement;

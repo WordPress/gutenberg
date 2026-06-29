@@ -1,0 +1,242 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a051a3437d9fe1..e665abdddca0ee 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ -   `Popover`: refine position-to-placement conversion logic, add tests ([#44377](https://github.com/WordPress/gutenberg/pull/44377)).
+ -   `ToggleGroupControl`: adjust icon color when inactive, from `gray-700` to `gray-900` ([#44575](https://github.com/WordPress/gutenberg/pull/44575)).
+ -   `TokenInput`: improve logic around the `aria-activedescendant` attribute, which was causing unintended focus behavior for some screen readers ([#44526](https://github.com/WordPress/gutenberg/pull/44526)).
++-   `NavigatorScreen`: fix focus issue where back button received focus unexpectedly ([#44239](https://github.com/WordPress/gutenberg/pull/44239))
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/navigator/navigator-screen/component.tsx b/packages/components/src/navigator/navigator-screen/component.tsx
+index 94b7bfee306e97..9bb8b3c2d83d22 100644
+--- a/packages/components/src/navigator/navigator-screen/component.tsx
++++ b/packages/components/src/navigator/navigator-screen/component.tsx
+@@ -83,6 +83,14 @@ function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
+ 			return;
+ 		}
+ 
++		const activeElement = wrapperRef.current.ownerDocument.activeElement;
++
++		// If an element is already focused within the wrapper do not focus the
++		// element. This prevents inputs or buttons from losing focus unecessarily.
++		if ( wrapperRef.current.contains( activeElement ) ) {
++			return;
++		}
++
+ 		let elementToFocus: HTMLElement | null = null;
+ 
+ 		// When navigating back, if a selector is provided, use it to look for the
+@@ -99,7 +107,6 @@ function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
+ 			const firstTabbable = (
+ 				focus.tabbable.find( wrapperRef.current ) as HTMLElement[]
+ 			 )[ 0 ];
+-
+ 			elementToFocus = firstTabbable ?? wrapperRef.current;
+ 		}
+ 
+diff --git a/packages/components/src/navigator/test/index.js b/packages/components/src/navigator/test/index.js
+index 497e1c2612b34e..7374ede686e815 100644
+--- a/packages/components/src/navigator/test/index.js
++++ b/packages/components/src/navigator/test/index.js
+@@ -2,6 +2,12 @@
+  * External dependencies
+  */
+ import { render, screen, fireEvent } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -86,60 +92,74 @@ function CustomNavigatorBackButton( { onClick, ...props } ) {
+ const MyNavigation = ( {
+ 	initialPath = PATHS.HOME,
+ 	onNavigatorButtonClick,
+-} ) => (
+-	<NavigatorProvider initialPath={ initialPath }>
+-		<NavigatorScreen path={ PATHS.HOME }>
+-			<p>This is the home screen.</p>
+-			<CustomNavigatorButton
+-				path={ PATHS.NOT_FOUND }
+-				onClick={ onNavigatorButtonClick }
+-			>
+-				Navigate to non-existing screen.
+-			</CustomNavigatorButton>
+-			<CustomNavigatorButton
+-				path={ PATHS.CHILD }
+-				onClick={ onNavigatorButtonClick }
+-			>
+-				Navigate to child screen.
+-			</CustomNavigatorButton>
+-			<CustomNavigatorButton
+-				path={ PATHS.INVALID_HTML_ATTRIBUTE }
+-				onClick={ onNavigatorButtonClick }
+-			>
+-				Navigate to screen with an invalid HTML value as a path.
+-			</CustomNavigatorButton>
+-		</NavigatorScreen>
+-
+-		<NavigatorScreen path={ PATHS.CHILD }>
+-			<p>This is the child screen.</p>
+-			<CustomNavigatorButtonWithFocusRestoration
+-				path={ PATHS.NESTED }
+-				onClick={ onNavigatorButtonClick }
+-			>
+-				Navigate to nested screen.
+-			</CustomNavigatorButtonWithFocusRestoration>
+-			<CustomNavigatorBackButton onClick={ onNavigatorButtonClick }>
+-				Go back
+-			</CustomNavigatorBackButton>
+-		</NavigatorScreen>
+-
+-		<NavigatorScreen path={ PATHS.NESTED }>
+-			<p>This is the nested screen.</p>
+-			<CustomNavigatorBackButton onClick={ onNavigatorButtonClick }>
+-				Go back
+-			</CustomNavigatorBackButton>
+-		</NavigatorScreen>
+-
+-		<NavigatorScreen path={ PATHS.INVALID_HTML_ATTRIBUTE }>
+-			<p>This is the screen with an invalid HTML value as a path.</p>
+-			<CustomNavigatorBackButton onClick={ onNavigatorButtonClick }>
+-				Go back
+-			</CustomNavigatorBackButton>
+-		</NavigatorScreen>
+-
+-		{ /* A `NavigatorScreen` with `path={ PATHS.NOT_FOUND }` is purposefully not included. */ }
+-	</NavigatorProvider>
+-);
++} ) => {
++	const [ inputValue, setInputValue ] = useState( '' );
++	return (
++		<NavigatorProvider initialPath={ initialPath }>
++			<NavigatorScreen path={ PATHS.HOME }>
++				<p>This is the home screen.</p>
++				<CustomNavigatorButton
++					path={ PATHS.NOT_FOUND }
++					onClick={ onNavigatorButtonClick }
++				>
++					Navigate to non-existing screen.
++				</CustomNavigatorButton>
++				<CustomNavigatorButton
++					path={ PATHS.CHILD }
++					onClick={ onNavigatorButtonClick }
++				>
++					Navigate to child screen.
++				</CustomNavigatorButton>
++				<CustomNavigatorButton
++					path={ PATHS.INVALID_HTML_ATTRIBUTE }
++					onClick={ onNavigatorButtonClick }
++				>
++					Navigate to screen with an invalid HTML value as a path.
++				</CustomNavigatorButton>
++			</NavigatorScreen>
++
++			<NavigatorScreen path={ PATHS.CHILD }>
++				<p>This is the child screen.</p>
++				<CustomNavigatorButtonWithFocusRestoration
++					path={ PATHS.NESTED }
++					onClick={ onNavigatorButtonClick }
++				>
++					Navigate to nested screen.
++				</CustomNavigatorButtonWithFocusRestoration>
++				<CustomNavigatorBackButton onClick={ onNavigatorButtonClick }>
++					Go back
++				</CustomNavigatorBackButton>
++
++				<label htmlFor="test-input">This is a test input</label>
++				<input
++					name="test-input"
++					// eslint-disable-next-line no-restricted-syntax
++					id="test-input"
++					onChange={ ( e ) => {
++						setInputValue( e.target.value );
++					} }
++					value={ inputValue }
++				/>
++			</NavigatorScreen>
++
++			<NavigatorScreen path={ PATHS.NESTED }>
++				<p>This is the nested screen.</p>
++				<CustomNavigatorBackButton onClick={ onNavigatorButtonClick }>
++					Go back
++				</CustomNavigatorBackButton>
++			</NavigatorScreen>
++
++			<NavigatorScreen path={ PATHS.INVALID_HTML_ATTRIBUTE }>
++				<p>This is the screen with an invalid HTML value as a path.</p>
++				<CustomNavigatorBackButton onClick={ onNavigatorButtonClick }>
++					Go back
++				</CustomNavigatorBackButton>
++			</NavigatorScreen>
++
++			{ /* A `NavigatorScreen` with `path={ PATHS.NOT_FOUND }` is purposefully not included. */ }
++		</NavigatorProvider>
++	);
++};
+ 
+ const getNavigationScreenByText = ( text, { throwIfNotFound = true } = {} ) => {
+ 	const fnName = throwIfNotFound ? 'getByText' : 'queryByText';
+@@ -194,6 +214,28 @@ const getBackButton = ( { throwIfNotFound } = {} ) =>
+ 	} );
+ 
+ describe( 'Navigator', () => {
++	const originalGetClientRects = window.Element.prototype.getClientRects;
++
++	// `getClientRects` needs to be mocked so that `isVisible` from the `@wordpress/dom`
++	// `focusable` module can pass, in a JSDOM env where the DOM elements have no width/height.
++	const mockedGetClientRects = jest.fn( () => [
++		{
++			x: 0,
++			y: 0,
++			width: 100,
++			height: 100,
++		},
++	] );
++
++	beforeAll( () => {
++		window.Element.prototype.getClientRects =
++			jest.fn( mockedGetClientRects );
++	} );
++
++	afterAll( () => {
++		window.Element.prototype.getClientRects = originalGetClientRects;
++	} );
++
+ 	it( 'should render', () => {
+ 		render( <MyNavigation /> );
+ 
+@@ -404,4 +446,27 @@ describe( 'Navigator', () => {
+ 		expect( getHomeScreen() ).toBeInTheDocument();
+ 		expect( getToInvalidHTMLPathScreenButton() ).toHaveFocus();
+ 	} );
++
++	it( 'should keep focus on the element that is being interacted with, while re-rendering', async () => {
++		const user = userEvent.setup( {
++			advanceTimers: jest.advanceTimersByTime,
++		} );
++
++		render( <MyNavigation /> );
++
++		expect( getHomeScreen() ).toBeInTheDocument();
++		expect( getToChildScreenButton() ).toBeInTheDocument();
++
++		// Navigate to child screen.
++		await user.click( getToChildScreenButton() );
++
++		expect( getChildScreen() ).toBeInTheDocument();
++		expect( getBackButton() ).toBeInTheDocument();
++		expect( getToNestedScreenButton() ).toHaveFocus();
++
++		// Interact with the input, the focus should stay on the input element.
++		const input = screen.getByLabelText( 'This is a test input' );
++		await user.type( input, 'd' );
++		expect( input ).toHaveFocus();
++	} );
+ } );

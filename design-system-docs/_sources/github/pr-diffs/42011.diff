@@ -1,0 +1,12 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 7cab43979de8d6..c988097fe23fce 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ 
+ -   Wrapped `ColorIndicator` in a `forwardRef` call ([#41587](https://github.com/WordPress/gutenberg/pull/41587)).
+ -   `BorderControl`: Improve TypeScript support. ([#41843](https://github.com/WordPress/gutenberg/pull/41843)).
++-   `DatePicer`: highlight today's date. ([#41647](https://github.com/WordPress/gutenberg/pull/41647/)).
+ 
+ ### Internal
+ 

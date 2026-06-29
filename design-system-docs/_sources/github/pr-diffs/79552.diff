@@ -1,0 +1,1262 @@
+diff --git a/.github/workflows/static-checks.yml b/.github/workflows/static-checks.yml
+index 04f1ad8589d95c..006bc297ece968 100644
+--- a/.github/workflows/static-checks.yml
++++ b/.github/workflows/static-checks.yml
+@@ -104,6 +104,9 @@ jobs:
+             - name: Type checking
+               run: npm run build
+ 
++            - name: Validate package contents
++              run: npm run lint:package-contents
++
+             - name: Audit published dependencies
+               if: ${{ matrix.annotations }}
+               run: npm run lint:published-deps -- --fail-unused-ignores
+diff --git a/package-lock.json b/package-lock.json
+index f9ed3d94a56f43..599d0ade622249 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -94,6 +94,12 @@
+ 			"dev": true,
+ 			"license": "MIT"
+ 		},
++		"node_modules/@andrewbranch/untar.js": {
++			"version": "1.0.3",
++			"resolved": "https://registry.npmjs.org/@andrewbranch/untar.js/-/untar.js-1.0.3.tgz",
++			"integrity": "sha512-Jh15/qVmrLGhkKJBdXlK1+9tY4lZruYjsgkDFj08ZmDiWVBLJcqkok7Z0/R0In+i1rScBpJlSvrTS2Lm41Pbnw==",
++			"dev": true
++		},
+ 		"node_modules/@apidevtools/json-schema-ref-parser": {
+ 			"version": "11.6.4",
+ 			"resolved": "https://registry.npmjs.org/@apidevtools/json-schema-ref-parser/-/json-schema-ref-parser-11.6.4.tgz",
+@@ -135,6 +141,105 @@
+ 				"js-yaml": "bin/js-yaml.js"
+ 			}
+ 		},
++		"node_modules/@arethetypeswrong/cli": {
++			"version": "0.18.4",
++			"resolved": "https://registry.npmjs.org/@arethetypeswrong/cli/-/cli-0.18.4.tgz",
++			"integrity": "sha512-kNWo6LTzGAuLYPpJ7Sgo63whSUeeSuKMlYx6IBgzs4ONEG807gW4hSSENvpeCHzO2H2wIzG5EFl0OKBbqGBAyA==",
++			"dev": true,
++			"license": "MIT",
++			"dependencies": {
++				"@arethetypeswrong/core": "0.18.4",
++				"chalk": "^4.1.2",
++				"cli-table3": "^0.6.3",
++				"commander": "^10.0.1",
++				"marked": "^9.1.2",
++				"marked-terminal": "^7.1.0",
++				"semver": "^7.5.4"
++			},
++			"bin": {
++				"attw": "dist/index.js"
++			},
++			"engines": {
++				"node": ">=20"
++			}
++		},
++		"node_modules/@arethetypeswrong/cli/node_modules/commander": {
++			"version": "10.0.1",
++			"resolved": "https://registry.npmjs.org/commander/-/commander-10.0.1.tgz",
++			"integrity": "sha512-y4Mg2tXshplEbSGzx7amzPwKKOCGuoSRP/CjEdwwk0FOGlUbq6lKuoyDZTNZkmxHdJtp54hdfY/JUrdL7Xfdug==",
++			"dev": true,
++			"license": "MIT",
++			"engines": {
++				"node": ">=14"
++			}
++		},
++		"node_modules/@arethetypeswrong/cli/node_modules/marked": {
++			"version": "9.1.6",
++			"resolved": "https://registry.npmjs.org/marked/-/marked-9.1.6.tgz",
++			"integrity": "sha512-jcByLnIFkd5gSXZmjNvS1TlmRhCXZjIzHYlaGkPlLIekG55JDR2Z4va9tZwCiP+/RDERiNhMOFu01xd6O5ct1Q==",
++			"dev": true,
++			"license": "MIT",
++			"bin": {
++				"marked": "bin/marked.js"
++			},
++			"engines": {
++				"node": ">= 16"
++			}
++		},
++		"node_modules/@arethetypeswrong/core": {
++			"version": "0.18.4",
++			"resolved": "https://registry.npmjs.org/@arethetypeswrong/core/-/core-0.18.4.tgz",
++			"integrity": "sha512-M5F0ePyN6h2Z6XxRiyIPqjGbltotXLjR0CKA0uKspsDu0QmgTNYvRb4RSQPMUs2ZXZHCCYpbaZbFbYOXLxCjUA==",
++			"dev": true,
++			"license": "MIT",
++			"dependencies": {
++				"@andrewbranch/untar.js": "^1.0.3",
++				"@loaderkit/resolve": "^1.0.2",
++				"cjs-module-lexer": "^1.2.3",
++				"fflate": "^0.8.3",
++				"lru-cache": "^11.0.1",
++				"semver": "^7.5.4",
++				"typescript": "5.6.1-rc",
++				"validate-npm-package-name": "^5.0.0"
++			},
++			"engines": {
++				"node": ">=20"
++			}
++		},
++		"node_modules/@arethetypeswrong/core/node_modules/lru-cache": {
++			"version": "11.5.1",
++			"resolved": "https://registry.npmjs.org/lru-cache/-/lru-cache-11.5.1.tgz",
++			"integrity": "sha512-RPimw/7aMdv2oqRrxKwvZXcPfwBrn/JZ2xYcY9Hus/6LaS3VOAKVWKWgNLCFSiOm1ESXinjsDlidVU7JlnCN2A==",
++			"dev": true,
++			"license": "BlueOak-1.0.0",
++			"engines": {
++				"node": "20 || >=22"
++			}
++		},
++		"node_modules/@arethetypeswrong/core/node_modules/typescript": {
++			"version": "5.6.1-rc",
++			"resolved": "https://registry.npmjs.org/typescript/-/typescript-5.6.1-rc.tgz",
++			"integrity": "sha512-E3b2+1zEFu84jB0YQi9BORDjz9+jGbwwy1Zi3G0LUNw7a7cePUrHMRNy8aPh53nXpkFGVHSxIZo5vKTfYaFiBQ==",
++			"dev": true,
++			"license": "Apache-2.0",
++			"bin": {
++				"tsc": "bin/tsc",
++				"tsserver": "bin/tsserver"
++			},
++			"engines": {
++				"node": ">=14.17"
++			}
++		},
++		"node_modules/@arethetypeswrong/core/node_modules/validate-npm-package-name": {
++			"version": "5.0.1",
++			"resolved": "https://registry.npmjs.org/validate-npm-package-name/-/validate-npm-package-name-5.0.1.tgz",
++			"integrity": "sha512-OljLrQ9SQdOUqTaQxqL5dEfZWrXExyyWsozYlAWFawPVNuD83igl7uJD2RTkNMbniIYgt8l81eCJGIdQF7avLQ==",
++			"dev": true,
++			"license": "ISC",
++			"engines": {
++				"node": "^14.17.0 || ^16.13.0 || >=18.0.0"
++			}
++		},
+ 		"node_modules/@ariakit/components": {
+ 			"version": "0.1.2",
+ 			"resolved": "https://registry.npmjs.org/@ariakit/components/-/components-0.1.2.tgz",
+@@ -2311,6 +2416,13 @@
+ 			"resolved": "https://registry.npmjs.org/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz",
+ 			"integrity": "sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw=="
+ 		},
++		"node_modules/@braidai/lang": {
++			"version": "1.1.2",
++			"resolved": "https://registry.npmjs.org/@braidai/lang/-/lang-1.1.2.tgz",
++			"integrity": "sha512-qBcknbBufNHlui137Hft8xauQMTZDKdophmLFv05r2eNmdIv/MlPuP4TdUknHG68UdWLgVZwgxVe735HzJNIwA==",
++			"dev": true,
++			"license": "ISC"
++		},
+ 		"node_modules/@bufbuild/protobuf": {
+ 			"version": "2.9.0",
+ 			"resolved": "https://registry.npmjs.org/@bufbuild/protobuf/-/protobuf-2.9.0.tgz",
+@@ -2323,6 +2435,17 @@
+ 			"integrity": "sha512-gAmrUZSGtKc3AiBL71iNWxDsyUC5uMaKKGdvzYsBoTW/xi42JQHl7eKV2OYzCUqvc+D2RCcf7EXY2iCyFIk6og==",
+ 			"license": "MIT"
+ 		},
++		"node_modules/@colors/colors": {
++			"version": "1.5.0",
++			"resolved": "https://registry.npmjs.org/@colors/colors/-/colors-1.5.0.tgz",
++			"integrity": "sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==",
++			"dev": true,
++			"license": "MIT",
++			"optional": true,
++			"engines": {
++				"node": ">=0.1.90"
++			}
++		},
+ 		"node_modules/@csstools/color-helpers": {
+ 			"version": "5.1.0",
+ 			"resolved": "https://registry.npmjs.org/@csstools/color-helpers/-/color-helpers-5.1.0.tgz",
+@@ -5057,6 +5180,16 @@
+ 			"resolved": "https://registry.npmjs.org/@leichtgewicht/ip-codec/-/ip-codec-2.0.4.tgz",
+ 			"integrity": "sha512-Hcv+nVC0kZnQ3tD9GVu5xSMR4VVYOteQIr/hwFPVEvPdlXqgGEuRjiheChHgdM+JyqdgNcmzZOX/tnl0JOiI7A=="
+ 		},
++		"node_modules/@loaderkit/resolve": {
++			"version": "1.0.6",
++			"resolved": "https://registry.npmjs.org/@loaderkit/resolve/-/resolve-1.0.6.tgz",
++			"integrity": "sha512-G8FdIoF5CypfwmD9rl8BXod5HDn8JqB0CCNBXDTaRZ+yRYhARrrSToX1zg1zy9jX3zLqigsELwhT4gNtkdQAUg==",
++			"dev": true,
++			"license": "ISC",
++			"dependencies": {
++				"@braidai/lang": "^1.0.0"
++			}
++		},
+ 		"node_modules/@mawesome/dependency-audit": {
+ 			"version": "0.4.4",
+ 			"resolved": "https://registry.npmjs.org/@mawesome/dependency-audit/-/dependency-audit-0.4.4.tgz",
+@@ -19329,6 +19462,13 @@
+ 			"resolved": "https://registry.npmjs.org/color-name/-/color-name-1.1.4.tgz",
+ 			"integrity": "sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA=="
+ 		},
++		"node_modules/any-promise": {
++			"version": "1.3.0",
++			"resolved": "https://registry.npmjs.org/any-promise/-/any-promise-1.3.0.tgz",
++			"integrity": "sha512-7UvmKalWRt1wgjL1RrGxoSJW/0QZFIegpeGvZG9kjp8vrRu55XTHbwnqq2GpXm9uLbcuhxm3IqX9OB4MZR1b2A==",
++			"dev": true,
++			"license": "MIT"
++		},
+ 		"node_modules/anymatch": {
+ 			"version": "3.1.3",
+ 			"resolved": "https://registry.npmjs.org/anymatch/-/anymatch-3.1.3.tgz",
+@@ -21568,6 +21708,94 @@
+ 				"url": "https://github.com/sponsors/sindresorhus"
+ 			}
+ 		},
++		"node_modules/cli-highlight": {
++			"version": "2.1.11",
++			"resolved": "https://registry.npmjs.org/cli-highlight/-/cli-highlight-2.1.11.tgz",
++			"integrity": "sha512-9KDcoEVwyUXrjcJNvHD0NFc/hiwe/WPVYIleQh2O1N2Zro5gWJZ/K+3DGn8w8P/F6FxOgzyC5bxDyHIgCSPhGg==",
++			"dev": true,
++			"license": "ISC",
++			"dependencies": {
++				"chalk": "^4.0.0",
++				"highlight.js": "^10.7.1",
++				"mz": "^2.4.0",
++				"parse5": "^5.1.1",
++				"parse5-htmlparser2-tree-adapter": "^6.0.0",
++				"yargs": "^16.0.0"
++			},
++			"bin": {
++				"highlight": "bin/highlight"
++			},
++			"engines": {
++				"node": ">=8.0.0",
++				"npm": ">=5.0.0"
++			}
++		},
++		"node_modules/cli-highlight/node_modules/cliui": {
++			"version": "7.0.4",
++			"resolved": "https://registry.npmjs.org/cliui/-/cliui-7.0.4.tgz",
++			"integrity": "sha512-OcRE68cOsVMXp1Yvonl/fzkQOyjLSu/8bhPDfQt0e0/Eb283TKP20Fs2MqoPsr9SwA595rRCA+QMzYc9nBP+JQ==",
++			"dev": true,
++			"license": "ISC",
++			"dependencies": {
++				"string-width": "^4.2.0",
++				"strip-ansi": "^6.0.0",
++				"wrap-ansi": "^7.0.0"
++			}
++		},
++		"node_modules/cli-highlight/node_modules/parse5": {
++			"version": "5.1.1",
++			"resolved": "https://registry.npmjs.org/parse5/-/parse5-5.1.1.tgz",
++			"integrity": "sha512-ugq4DFI0Ptb+WWjAdOK16+u/nHfiIrcE+sh8kZMaM0WllQKLI9rOUq6c2b7cwPkXdzfQESqvoqK6ug7U/Yyzug==",
++			"dev": true,
++			"license": "MIT"
++		},
++		"node_modules/cli-highlight/node_modules/wrap-ansi": {
++			"version": "7.0.0",
++			"resolved": "https://registry.npmjs.org/wrap-ansi/-/wrap-ansi-7.0.0.tgz",
++			"integrity": "sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==",
++			"dev": true,
++			"license": "MIT",
++			"dependencies": {
++				"ansi-styles": "^4.0.0",
++				"string-width": "^4.1.0",
++				"strip-ansi": "^6.0.0"
++			},
++			"engines": {
++				"node": ">=10"
++			},
++			"funding": {
++				"url": "https://github.com/chalk/wrap-ansi?sponsor=1"
++			}
++		},
++		"node_modules/cli-highlight/node_modules/y18n": {
++			"version": "5.0.8",
++			"resolved": "https://registry.npmjs.org/y18n/-/y18n-5.0.8.tgz",
++			"integrity": "sha512-0pfFzegeDWJHJIAmTLRP2DwHjdF5s7jo9tuztdQxAhINCdvS+3nGINqPd00AphqJR/0LhANUS6/+7SCb98YOfA==",
++			"dev": true,
++			"license": "ISC",
++			"engines": {
++				"node": ">=10"
++			}
++		},
++		"node_modules/cli-highlight/node_modules/yargs": {
++			"version": "16.2.2",
++			"resolved": "https://registry.npmjs.org/yargs/-/yargs-16.2.2.tgz",
++			"integrity": "sha512-Nt9ZJjXTv5R8MHbqby/wXQ6Gi0Bb3TcYZkR1bzuL4yB2OxWPkXknz513gEF0GoA6tn00UpbPvERW8rzCuWCA6w==",
++			"dev": true,
++			"license": "MIT",
++			"dependencies": {
++				"cliui": "^7.0.2",
++				"escalade": "^3.1.1",
++				"get-caller-file": "^2.0.5",
++				"require-directory": "^2.1.1",
++				"string-width": "^4.2.0",
++				"y18n": "^5.0.5",
++				"yargs-parser": "^20.2.2"
++			},
++			"engines": {
++				"node": ">=10"
++			}
++		},
+ 		"node_modules/cli-spinners": {
+ 			"version": "2.6.1",
+ 			"resolved": "https://registry.npmjs.org/cli-spinners/-/cli-spinners-2.6.1.tgz",
+@@ -21579,6 +21807,22 @@
+ 				"url": "https://github.com/sponsors/sindresorhus"
+ 			}
+ 		},
++		"node_modules/cli-table3": {
++			"version": "0.6.5",
++			"resolved": "https://registry.npmjs.org/cli-table3/-/cli-table3-0.6.5.tgz",
++			"integrity": "sha512-+W/5efTR7y5HRD7gACw9yQjqMVvEMLBHmboM/kPWam+H+Hmyrgjh6YncVKK122YZkXrLudzTuAukUw9FnMf7IQ==",
++			"dev": true,
++			"license": "MIT",
++			"dependencies": {
++				"string-width": "^4.2.0"
++			},
++			"engines": {
++				"node": "10.* || >= 12.*"
++			},
++			"optionalDependencies": {
++				"@colors/colors": "1.5.0"
++			}
++		},
+ 		"node_modules/cli-truncate": {
+ 			"version": "5.2.0",
+ 			"resolved": "https://registry.npmjs.org/cli-truncate/-/cli-truncate-5.2.0.tgz",
+@@ -24488,6 +24732,13 @@
+ 				"url": "https://github.com/sindresorhus/emittery?sponsor=1"
+ 			}
+ 		},
++		"node_modules/emojilib": {
++			"version": "2.4.0",
++			"resolved": "https://registry.npmjs.org/emojilib/-/emojilib-2.4.0.tgz",
++			"integrity": "sha512-5U0rVMU5Y2n2+ykNLQqMoqklN9ICBT/KsvC1Gz6vqHbz2AXXGkG+Pm5rMWk/8Vjrr/mY9985Hi8DYzn1F09Nyw==",
++			"dev": true,
++			"license": "MIT"
++		},
+ 		"node_modules/emojis-list": {
+ 			"version": "3.0.0",
+ 			"resolved": "https://registry.npmjs.org/emojis-list/-/emojis-list-3.0.0.tgz",
+@@ -26485,6 +26736,13 @@
+ 				}
+ 			}
+ 		},
++		"node_modules/fflate": {
++			"version": "0.8.3",
++			"resolved": "https://registry.npmjs.org/fflate/-/fflate-0.8.3.tgz",
++			"integrity": "sha512-tbZNuJrLwGUp3zshBtdy4W+ORxZuIh8a5ilyIEQDC5rY1f3U20JMry0Ll3WBzU58EZKsEuJFXhb5gwv8CsPvgA==",
++			"dev": true,
++			"license": "MIT"
++		},
+ 		"node_modules/figgy-pudding": {
+ 			"version": "3.5.2",
+ 			"resolved": "https://registry.npmjs.org/figgy-pudding/-/figgy-pudding-3.5.2.tgz",
+@@ -27896,6 +28154,16 @@
+ 			"resolved": "https://registry.npmjs.org/highlight-words-core/-/highlight-words-core-1.2.2.tgz",
+ 			"integrity": "sha512-BXUKIkUuh6cmmxzi5OIbUJxrG8OAk2MqoL1DtO3Wo9D2faJg2ph5ntyuQeLqaHJmzER6H5tllCDA9ZnNe9BVGg=="
+ 		},
++		"node_modules/highlight.js": {
++			"version": "10.7.3",
++			"resolved": "https://registry.npmjs.org/highlight.js/-/highlight.js-10.7.3.tgz",
++			"integrity": "sha512-tzcUFauisWKNHaRkN4Wjl/ZA07gENAjFl3J/c480dprkGTg5EQstgaNFqBfUqCq54kZRIEcreTsAgF/m2quD7A==",
++			"dev": true,
++			"license": "BSD-3-Clause",
++			"engines": {
++				"node": "*"
++			}
++		},
+ 		"node_modules/history": {
+ 			"version": "5.3.0",
+ 			"resolved": "https://registry.npmjs.org/history/-/history-5.3.0.tgz",
+@@ -33652,6 +33920,70 @@
+ 				"node": ">= 20"
+ 			}
+ 		},
++		"node_modules/marked-terminal": {
++			"version": "7.3.0",
++			"resolved": "https://registry.npmjs.org/marked-terminal/-/marked-terminal-7.3.0.tgz",
++			"integrity": "sha512-t4rBvPsHc57uE/2nJOLmMbZCQ4tgAccAED3ngXQqW6g+TxA488JzJ+FK3lQkzBQOI1mRV/r/Kq+1ZlJ4D0owQw==",
++			"dev": true,
++			"license": "MIT",
++			"dependencies": {
++				"ansi-escapes": "^7.0.0",
++				"ansi-regex": "^6.1.0",
++				"chalk": "^5.4.1",
++				"cli-highlight": "^2.1.11",
++				"cli-table3": "^0.6.5",
++				"node-emoji": "^2.2.0",
++				"supports-hyperlinks": "^3.1.0"
++			},
++			"engines": {
++				"node": ">=16.0.0"
++			},
++			"peerDependencies": {
++				"marked": ">=1 <16"
++			}
++		},
++		"node_modules/marked-terminal/node_modules/ansi-escapes": {
++			"version": "7.3.0",
++			"resolved": "https://registry.npmjs.org/ansi-escapes/-/ansi-escapes-7.3.0.tgz",
++			"integrity": "sha512-BvU8nYgGQBxcmMuEeUEmNTvrMVjJNSH7RgW24vXexN4Ven6qCvy4TntnvlnwnMLTVlcRQQdbRY8NKnaIoeWDNg==",
++			"dev": true,
++			"license": "MIT",
++			"dependencies": {
++				"environment": "^1.0.0"
++			},
++			"engines": {
++				"node": ">=18"
++			},
++			"funding": {
++				"url": "https://github.com/sponsors/sindresorhus"
++			}
++		},
++		"node_modules/marked-terminal/node_modules/ansi-regex": {
++			"version": "6.2.2",
++			"resolved": "https://registry.npmjs.org/ansi-regex/-/ansi-regex-6.2.2.tgz",
++			"integrity": "sha512-Bq3SmSpyFHaWjPk8If9yc6svM8c56dB5BAtW4Qbw5jHTwwXXcTLoRMkpDJp6VL0XzlWaCHTXrkFURMYmD0sLqg==",
++			"dev": true,
++			"license": "MIT",
++			"engines": {
++				"node": ">=12"
++			},
++			"funding": {
++				"url": "https://github.com/chalk/ansi-regex?sponsor=1"
++			}
++		},
++		"node_modules/marked-terminal/node_modules/chalk": {
++			"version": "5.6.2",
++			"resolved": "https://registry.npmjs.org/chalk/-/chalk-5.6.2.tgz",
++			"integrity": "sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA==",
++			"dev": true,
++			"license": "MIT",
++			"engines": {
++				"node": "^12.17.0 || ^14.13 || >=16.0.0"
++			},
++			"funding": {
++				"url": "https://github.com/chalk/chalk?sponsor=1"
++			}
++		},
+ 		"node_modules/marky": {
+ 			"version": "1.2.5",
+ 			"resolved": "https://registry.npmjs.org/marky/-/marky-1.2.5.tgz",
+@@ -34566,6 +34898,18 @@
+ 			"resolved": "https://registry.npmjs.org/mute-stream/-/mute-stream-0.0.8.tgz",
+ 			"integrity": "sha512-nnbWWOkoWyUsTjKrhgD0dcz22mdkSnpYqbEjIm2nhwhuxlSkpywJmBo8h0ZqJdkp73mb90SssHkN4rsRaBAfAA=="
+ 		},
++		"node_modules/mz": {
++			"version": "2.7.0",
++			"resolved": "https://registry.npmjs.org/mz/-/mz-2.7.0.tgz",
++			"integrity": "sha512-z81GNO7nnYMEhrGh9LeymoE4+Yr0Wn5McHIZMK5cfQCl+NDX08sCZgUc9/6MHni9IWuFLm1Z3HTCXu2z9fN62Q==",
++			"dev": true,
++			"license": "MIT",
++			"dependencies": {
++				"any-promise": "^1.0.0",
++				"object-assign": "^4.0.1",
++				"thenify-all": "^1.0.0"
++			}
++		},
+ 		"node_modules/nan": {
+ 			"version": "2.24.0",
+ 			"resolved": "https://registry.npmjs.org/nan/-/nan-2.24.0.tgz",
+@@ -34677,6 +35021,22 @@
+ 				"tslib": "^2.0.3"
+ 			}
+ 		},
++		"node_modules/node-emoji": {
++			"version": "2.2.0",
++			"resolved": "https://registry.npmjs.org/node-emoji/-/node-emoji-2.2.0.tgz",
++			"integrity": "sha512-Z3lTE9pLaJF47NyMhd4ww1yFTAP8YhYI8SleJiHzM46Fgpm5cnNzSl9XfzFNqbaz+VlJrIj3fXQ4DeN1Rjm6cw==",
++			"dev": true,
++			"license": "MIT",
++			"dependencies": {
++				"@sindresorhus/is": "^4.6.0",
++				"char-regex": "^1.0.2",
++				"emojilib": "^2.4.0",
++				"skin-tone": "^2.0.0"
++			},
++			"engines": {
++				"node": ">=18"
++			}
++		},
+ 		"node_modules/node-exports-info": {
+ 			"version": "1.6.0",
+ 			"resolved": "https://registry.npmjs.org/node-exports-info/-/node-exports-info-1.6.0.tgz",
+@@ -37708,6 +38068,23 @@
+ 				"url": "https://github.com/inikulin/parse5?sponsor=1"
+ 			}
+ 		},
++		"node_modules/parse5-htmlparser2-tree-adapter": {
++			"version": "6.0.1",
++			"resolved": "https://registry.npmjs.org/parse5-htmlparser2-tree-adapter/-/parse5-htmlparser2-tree-adapter-6.0.1.tgz",
++			"integrity": "sha512-qPuWvbLgvDGilKc5BoicRovlT4MtYT6JfJyBOMDsKoiT+GiuP5qyrPCnR9HcPECIJJmZh5jRndyNThnhhb/vlA==",
++			"dev": true,
++			"license": "MIT",
++			"dependencies": {
++				"parse5": "^6.0.1"
++			}
++		},
++		"node_modules/parse5-htmlparser2-tree-adapter/node_modules/parse5": {
++			"version": "6.0.1",
++			"resolved": "https://registry.npmjs.org/parse5/-/parse5-6.0.1.tgz",
++			"integrity": "sha512-Ofn/CTFzRGTTxwpNEs9PP93gXShHcTq255nzRYSKe8AkVpZY7e1fpmTfOyoIvjP5HG7Z2ZM7VS9PPhQGW2pOpw==",
++			"dev": true,
++			"license": "MIT"
++		},
+ 		"node_modules/parse5/node_modules/entities": {
+ 			"version": "6.0.1",
+ 			"resolved": "https://registry.npmjs.org/entities/-/entities-6.0.1.tgz",
+@@ -41972,6 +42349,19 @@
+ 			"resolved": "https://registry.npmjs.org/sisteransi/-/sisteransi-1.0.5.tgz",
+ 			"integrity": "sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg=="
+ 		},
++		"node_modules/skin-tone": {
++			"version": "2.0.0",
++			"resolved": "https://registry.npmjs.org/skin-tone/-/skin-tone-2.0.0.tgz",
++			"integrity": "sha512-kUMbT1oBJCpgrnKoSr0o6wPtvRWT9W9UKvGLwfJYO2WuahZRHOpEyL1ckyMGgMWh0UdpmaoFqKKD29WTomNEGA==",
++			"dev": true,
++			"license": "MIT",
++			"dependencies": {
++				"unicode-emoji-modifier-base": "^1.0.0"
++			},
++			"engines": {
++				"node": ">=8"
++			}
++		},
+ 		"node_modules/slash": {
+ 			"version": "3.0.0",
+ 			"resolved": "https://registry.npmjs.org/slash/-/slash-3.0.0.tgz",
+@@ -43307,14 +43697,6 @@
+ 				"node": ">= 6"
+ 			}
+ 		},
+-		"node_modules/stylelint/node_modules/has-flag": {
+-			"version": "4.0.0",
+-			"resolved": "https://registry.npmjs.org/has-flag/-/has-flag-4.0.0.tgz",
+-			"integrity": "sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==",
+-			"engines": {
+-				"node": ">=8"
+-			}
+-		},
+ 		"node_modules/stylelint/node_modules/ignore": {
+ 			"version": "5.3.2",
+ 			"resolved": "https://registry.npmjs.org/ignore/-/ignore-5.3.2.tgz",
+@@ -43437,32 +43819,6 @@
+ 				"url": "https://github.com/chalk/ansi-regex?sponsor=1"
+ 			}
+ 		},
+-		"node_modules/stylelint/node_modules/supports-color": {
+-			"version": "7.2.0",
+-			"resolved": "https://registry.npmjs.org/supports-color/-/supports-color-7.2.0.tgz",
+-			"integrity": "sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==",
+-			"dependencies": {
+-				"has-flag": "^4.0.0"
+-			},
+-			"engines": {
+-				"node": ">=8"
+-			}
+-		},
+-		"node_modules/stylelint/node_modules/supports-hyperlinks": {
+-			"version": "3.1.0",
+-			"resolved": "https://registry.npmjs.org/supports-hyperlinks/-/supports-hyperlinks-3.1.0.tgz",
+-			"integrity": "sha512-2rn0BZ+/f7puLOHZm1HOJfwBggfaHXUpPUSSG/SWM4TWp5KCfmNYwnC3hruy2rZlMnmWZ+QAGpZfchu3f3695A==",
+-			"dependencies": {
+-				"has-flag": "^4.0.0",
+-				"supports-color": "^7.0.0"
+-			},
+-			"engines": {
+-				"node": ">=14.18"
+-			},
+-			"funding": {
+-				"url": "https://github.com/sponsors/sindresorhus"
+-			}
+-		},
+ 		"node_modules/stylelint/node_modules/write-file-atomic": {
+ 			"version": "5.0.1",
+ 			"resolved": "https://registry.npmjs.org/write-file-atomic/-/write-file-atomic-5.0.1.tgz",
+@@ -43493,6 +43849,43 @@
+ 				"node": ">=4"
+ 			}
+ 		},
++		"node_modules/supports-hyperlinks": {
++			"version": "3.2.0",
++			"resolved": "https://registry.npmjs.org/supports-hyperlinks/-/supports-hyperlinks-3.2.0.tgz",
++			"integrity": "sha512-zFObLMyZeEwzAoKCyu1B91U79K2t7ApXuQfo8OuxwXLDgcKxuwM+YvcbIhm6QWqz7mHUH1TVytR1PwVVjEuMig==",
++			"license": "MIT",
++			"dependencies": {
++				"has-flag": "^4.0.0",
++				"supports-color": "^7.0.0"
++			},
++			"engines": {
++				"node": ">=14.18"
++			},
++			"funding": {
++				"url": "https://github.com/chalk/supports-hyperlinks?sponsor=1"
++			}
++		},
++		"node_modules/supports-hyperlinks/node_modules/has-flag": {
++			"version": "4.0.0",
++			"resolved": "https://registry.npmjs.org/has-flag/-/has-flag-4.0.0.tgz",
++			"integrity": "sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==",
++			"license": "MIT",
++			"engines": {
++				"node": ">=8"
++			}
++		},
++		"node_modules/supports-hyperlinks/node_modules/supports-color": {
++			"version": "7.2.0",
++			"resolved": "https://registry.npmjs.org/supports-color/-/supports-color-7.2.0.tgz",
++			"integrity": "sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==",
++			"license": "MIT",
++			"dependencies": {
++				"has-flag": "^4.0.0"
++			},
++			"engines": {
++				"node": ">=8"
++			}
++		},
+ 		"node_modules/supports-preserve-symlinks-flag": {
+ 			"version": "1.0.0",
+ 			"resolved": "https://registry.npmjs.org/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz",
+@@ -44116,6 +44509,29 @@
+ 				"node": ">=0.10"
+ 			}
+ 		},
++		"node_modules/thenify": {
++			"version": "3.3.1",
++			"resolved": "https://registry.npmjs.org/thenify/-/thenify-3.3.1.tgz",
++			"integrity": "sha512-RVZSIV5IG10Hk3enotrhvz0T9em6cyHBLkH/YAZuKqd8hRkKhSfCGIcP2KUY0EPxndzANBmNllzWPwak+bheSw==",
++			"dev": true,
++			"license": "MIT",
++			"dependencies": {
++				"any-promise": "^1.0.0"
++			}
++		},
++		"node_modules/thenify-all": {
++			"version": "1.6.0",
++			"resolved": "https://registry.npmjs.org/thenify-all/-/thenify-all-1.6.0.tgz",
++			"integrity": "sha512-RNxQH/qI8/t3thXJDwcstUO4zeqo64+Uy/+sNVRBx4Xn2OX+OZ9oP+iJnNFqplFra2ZUVeKCSa2oVWi3T4uVmA==",
++			"dev": true,
++			"license": "MIT",
++			"dependencies": {
++				"thenify": ">= 3.1.0 < 4"
++			},
++			"engines": {
++				"node": ">=0.8"
++			}
++		},
+ 		"node_modules/third-party-web": {
+ 			"version": "0.26.2",
+ 			"resolved": "https://registry.npmjs.org/third-party-web/-/third-party-web-0.26.2.tgz",
+@@ -44842,6 +45258,16 @@
+ 				"node": ">=4"
+ 			}
+ 		},
++		"node_modules/unicode-emoji-modifier-base": {
++			"version": "1.0.0",
++			"resolved": "https://registry.npmjs.org/unicode-emoji-modifier-base/-/unicode-emoji-modifier-base-1.0.0.tgz",
++			"integrity": "sha512-yLSH4py7oFH3oG/9K+XWrz1pSi3dfUrWEnInbxMfArOfc1+33BlGPQtLsOYwvdMy11AwUBetYuaRxSPqgkq+8g==",
++			"dev": true,
++			"license": "MIT",
++			"engines": {
++				"node": ">=4"
++			}
++		},
+ 		"node_modules/unicode-match-property-ecmascript": {
+ 			"version": "2.0.0",
+ 			"resolved": "https://registry.npmjs.org/unicode-match-property-ecmascript/-/unicode-match-property-ecmascript-2.0.0.tgz",
+@@ -55226,6 +55652,7 @@
+ 			"version": "0.0.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"devDependencies": {
++				"@arethetypeswrong/cli": "^0.18.4",
+ 				"@mawesome/dependency-audit": "^0.4.4",
+ 				"@wordpress/create-block": "file:../../packages/create-block",
+ 				"@wordpress/scripts": "file:../../packages/scripts",
+diff --git a/package.json b/package.json
+index 3c16469e0edf97..02c4633ea867d0 100644
+--- a/package.json
++++ b/package.json
+@@ -121,6 +121,7 @@
+ 		"lint:js:fix": "npm run lint:js -- --fix",
+ 		"lint:js:prune-suppressions": "npm run lint:js -- --prune-suppressions",
+ 		"lint:lockfile": "npm run --workspace @wordpress/validation-tools validate-package-lock --",
++		"lint:package-contents": "npm run validate:package-contents --workspace @wordpress/theme",
+ 		"lint:tsconfig": "npm run --workspace @wordpress/validation-tools validate-tsconfig --",
+ 		"lint:md:docs": "wp-scripts lint-md-docs",
+ 		"prelint:php": "npm run other:update-packages:php",
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index 5b5284fca98dcd..3732784f3d0dbd 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -10,6 +10,10 @@
+ 
+ -   Mark the published `design-tokens.css` file as side-effectful so downstream bundlers preserve the documented CSS import ([#79551](https://github.com/WordPress/gutenberg/pull/79551)).
+ 
++### Code Quality
++
++-   Clean the npm package publish surface and add package contents and type/export validation for tests, stories, fixtures, snapshots, test/story declaration output, and packaged type resolution ([#79552](https://github.com/WordPress/gutenberg/pull/79552)).
++
+ ## 0.16.0 (2026-06-24)
+ 
+ ### Breaking Changes
+diff --git a/packages/theme/package.json b/packages/theme/package.json
+index e6bb0e893bd083..7e92a8c1be1c91 100644
+--- a/packages/theme/package.json
++++ b/packages/theme/package.json
+@@ -23,12 +23,37 @@
+ 		"npm": ">=8.19.2"
+ 	},
+ 	"files": [
+-		"src",
+ 		"build",
+ 		"build-module",
+-		"build-types",
++		"build-types/index.d.ts",
++		"build-types/index.d.ts.map",
++		"build-types/prebuilt/js/design-tokens.d.mts",
++		"build-types/prebuilt/js/design-tokens.d.mts.map",
++		"build-types/prebuilt/ts/token-types.d.ts",
++		"build-types/prebuilt/ts/token-types.d.ts.map",
++		"build-types/stylelint-plugins/no-setting-wpds-custom-properties.d.mts",
++		"build-types/stylelint-plugins/no-setting-wpds-custom-properties.d.mts.map",
++		"build-types/stylelint-plugins/no-token-fallback-values.d.mts",
++		"build-types/stylelint-plugins/no-token-fallback-values.d.mts.map",
++		"build-types/stylelint-plugins/no-unknown-ds-tokens.d.mts",
++		"build-types/stylelint-plugins/no-unknown-ds-tokens.d.mts.map",
++		"build-types/theme-provider.d.ts",
++		"build-types/theme-provider.d.ts.map",
++		"build-types/types.d.ts",
++		"build-types/types.d.ts.map",
++		"src/*-plugins/**",
++		"src/prebuilt/css",
++		"src/prebuilt/js/*.mjs",
+ 		"utils.scss",
+-		"*.md"
++		"*.md",
++		"!**/__snapshots__",
++		"!**/__snapshots__/**",
++		"!**/fixtures",
++		"!**/fixtures/**",
++		"!**/stories",
++		"!**/stories/**",
++		"!**/test",
++		"!**/test/**"
+ 	],
+ 	"main": "build/index.cjs",
+ 	"module": "build-module/index.mjs",
+@@ -43,7 +68,7 @@
+ 			"sass": "./utils.scss"
+ 		},
+ 		"./design-tokens.js": {
+-			"types": "./build-types/prebuilt/js/design-tokens.d.ts",
++			"types": "./build-types/prebuilt/js/design-tokens.d.mts",
+ 			"import": "./build-module/prebuilt/js/design-tokens.mjs",
+ 			"default": "./build/prebuilt/js/design-tokens.cjs"
+ 		},
+@@ -63,17 +88,17 @@
+ 			"default": "./src/vite-plugins/vite-ds-token-fallbacks.mjs"
+ 		},
+ 		"./stylelint-plugins/no-unknown-ds-tokens": {
+-			"types": "./build-types/stylelint-plugins/no-unknown-ds-tokens.d.ts",
++			"types": "./build-types/stylelint-plugins/no-unknown-ds-tokens.d.mts",
+ 			"import": "./src/stylelint-plugins/no-unknown-ds-tokens.mjs",
+ 			"default": "./build/stylelint-plugins/no-unknown-ds-tokens.cjs"
+ 		},
+ 		"./stylelint-plugins/no-setting-wpds-custom-properties": {
+-			"types": "./build-types/stylelint-plugins/no-setting-wpds-custom-properties.d.ts",
++			"types": "./build-types/stylelint-plugins/no-setting-wpds-custom-properties.d.mts",
+ 			"import": "./src/stylelint-plugins/no-setting-wpds-custom-properties.mjs",
+ 			"default": "./build/stylelint-plugins/no-setting-wpds-custom-properties.cjs"
+ 		},
+ 		"./stylelint-plugins/no-token-fallback-values": {
+-			"types": "./build-types/stylelint-plugins/no-token-fallback-values.d.ts",
++			"types": "./build-types/stylelint-plugins/no-token-fallback-values.d.mts",
+ 			"import": "./src/stylelint-plugins/no-token-fallback-values.mjs",
+ 			"default": "./build/stylelint-plugins/no-token-fallback-values.cjs"
+ 		},
+@@ -141,6 +166,7 @@
+ 		"build:default-ramps": "node --import=esbuild-esm-loader/register bin/generate-default-ramps/index.ts",
+ 		"build:tokens": "node --import=esbuild-esm-loader/register bin/generate-primitive-tokens/index.ts && node --import=esbuild-esm-loader/register bin/build-design-tokens/index.ts",
+ 		"build": "npm run build:tokens && npm run build:default-ramps && npm run prelint:js",
+-		"postbuild": "prettier --write tokens/color.json tokens/modes src/prebuilt src/color-ramps/lib/default-ramps.ts docs"
++		"postbuild": "prettier --write tokens/color.json tokens/modes src/prebuilt src/color-ramps/lib/default-ramps.ts docs",
++		"validate:package-contents": "node ../../tools/validation/validate-package-contents.mjs . --attw-profile node16 --attw-exclude-entrypoint ./design-tokens.css --attw-exclude-entrypoint ./utils --attw-ignore-rule false-cjs --attw-ignore-rule false-esm --attw-ignore-rule cjs-resolves-to-esm"
+ 	}
+ }
+diff --git a/tools/validation/package.json b/tools/validation/package.json
+index 7fc106203e1598..796543a041910c 100644
+--- a/tools/validation/package.json
++++ b/tools/validation/package.json
+@@ -21,6 +21,7 @@
+ 	},
+ 	"type": "module",
+ 	"devDependencies": {
++		"@arethetypeswrong/cli": "^0.18.4",
+ 		"@mawesome/dependency-audit": "^0.4.4",
+ 		"@wordpress/create-block": "file:../../packages/create-block",
+ 		"@wordpress/scripts": "file:../../packages/scripts",
+@@ -39,6 +40,7 @@
+ 		"check-local-changes": "node ./check-local-changes.cjs",
+ 		"check-root-dependencies": "node ./check-root-dependencies.mjs",
+ 		"test-create-block": "node ./test-create-block.mjs",
++		"test-package-contents": "node --test ./validate-package-contents.test.mjs",
+ 		"validate-package-lock": "node ./validate-package-lock.cjs",
+ 		"validate-tsconfig": "node ./validate-tsconfig.mjs"
+ 	}
+diff --git a/tools/validation/validate-package-contents.mjs b/tools/validation/validate-package-contents.mjs
+new file mode 100644
+index 00000000000000..b6518741af2321
+--- /dev/null
++++ b/tools/validation/validate-package-contents.mjs
+@@ -0,0 +1,256 @@
++#!/usr/bin/env node
++
++import { spawnSync } from 'node:child_process';
++import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
++import { createRequire } from 'node:module';
++import { tmpdir } from 'node:os';
++import { dirname, join, resolve } from 'node:path';
++
++const [ packagePath, ...args ] = process.argv.slice( 2 );
++
++if ( ! packagePath ) {
++	console.error(
++		[
++			'Usage: node tools/validation/validate-package-contents.mjs <package-directory> [options]',
++			'Options:',
++			'  --attw-profile <profile>',
++			'  --attw-exclude-entrypoint <entrypoint>',
++			'  --attw-ignore-rule <rule>',
++		].join( '\n' )
++	);
++	process.exit( 1 );
++}
++
++const packageRoot = resolve( process.cwd(), packagePath );
++const require = createRequire( import.meta.url );
++const attwPackagePath = require.resolve( '@arethetypeswrong/cli/package.json' );
++const attwCliPath = join( dirname( attwPackagePath ), 'dist/index.js' );
++
++const attwOptions = {
++	profile: 'strict',
++	excludedEntryPoints: [],
++	ignoredRules: [],
++};
++
++const disallowedPathPatterns = [
++	/(^|\/)(__fixtures__|__snapshots__|__tests__|fixtures|stories|test|tests)(\/|$)/,
++	/(^|\/)[^/]+\.(spec|test)\.[^/]+$/,
++	/(^|\/)[^/]+\.stories?\.[^/]+$/,
++];
++
++/** @typedef {{ exports?: unknown, name?: string }} PackageJson */
++
++/** @type {PackageJson} */
++const packageJson = JSON.parse(
++	readFileSync( join( packageRoot, 'package.json' ), 'utf8' )
++);
++
++for ( let index = 0; index < args.length; index++ ) {
++	const arg = args[ index ];
++	const value = args[ index + 1 ];
++
++	if ( ! value || value.startsWith( '--' ) ) {
++		console.error( `Missing value for ${ arg }.` );
++		process.exit( 1 );
++	}
++
++	switch ( arg ) {
++		case '--attw-profile':
++			attwOptions.profile = value;
++			break;
++		case '--attw-exclude-entrypoint':
++			attwOptions.excludedEntryPoints.push( value );
++			break;
++		case '--attw-ignore-rule':
++			attwOptions.ignoredRules.push( value );
++			break;
++		default:
++			console.error( `Unknown option: ${ arg }.` );
++			process.exit( 1 );
++	}
++
++	index++;
++}
++
++/**
++ * @param {unknown} value Export map value.
++ * @return {string[]} Export target paths.
++ */
++function getExportTargets( value ) {
++	if ( typeof value === 'string' ) {
++		return [ value ];
++	}
++
++	if ( Array.isArray( value ) ) {
++		return value.flatMap( getExportTargets );
++	}
++
++	if ( ! value || typeof value !== 'object' ) {
++		return [];
++	}
++
++	return Object.values( value ).flatMap( getExportTargets );
++}
++
++/**
++ * @param {string} path Package-relative path.
++ * @return {string} Normalized package path.
++ */
++function normalizePackagePath( path ) {
++	return path.replace( /^\.\//, '' );
++}
++
++const env = {
++	...process.env,
++	npm_config_cache:
++		process.env.WORDPRESS_PACKAGE_NPM_CACHE ??
++		process.env.WORDPRESS_THEME_NPM_CACHE ??
++		join( tmpdir(), 'wordpress-package-npm-cache' ),
++};
++
++const npmExecPath = process.env.npm_execpath;
++const packCommand = npmExecPath ? process.execPath : 'npm';
++const packArgs = [
++	...( npmExecPath ? [ npmExecPath ] : [] ),
++	'pack',
++	'--json',
++];
++
++const packDirectory = mkdtempSync(
++	join( tmpdir(), 'wordpress-package-contents-' )
++);
++
++packArgs.push( '--pack-destination', packDirectory );
++
++const packResult = spawnSync( packCommand, packArgs, {
++	cwd: packageRoot,
++	encoding: 'utf8',
++	env,
++	shell: ! npmExecPath && process.platform === 'win32',
++} );
++
++if ( packResult.error ) {
++	throw packResult.error;
++}
++
++if ( packResult.status !== 0 ) {
++	process.stderr.write( packResult.stdout ?? '' );
++	process.stderr.write( packResult.stderr ?? '' );
++	rmSync( packDirectory, { force: true, recursive: true } );
++	process.exit( packResult.status ?? 1 );
++}
++
++/** @type {Array<{ filename: string, files: Array<{ path: string }> }>} */
++const packs = JSON.parse( packResult.stdout );
++const [ pack ] = packs;
++const packedPaths = pack.files.map( ( { path } ) => path );
++const packedPathSet = new Set( packedPaths );
++const tarballPath = join( packDirectory, pack.filename );
++
++const disallowedPaths = packedPaths.filter( ( path ) =>
++	disallowedPathPatterns.some( ( pattern ) => pattern.test( path ) )
++);
++// attw does not model non-JavaScript entry points like CSS. Keep explicit
++// exclusions honest by checking only the package targets skipped by attw.
++const missingAttwExcludedTargetPaths = attwOptions.excludedEntryPoints
++	.flatMap( ( entryPoint ) => {
++		if (
++			! packageJson.exports ||
++			typeof packageJson.exports !== 'object' ||
++			Array.isArray( packageJson.exports )
++		) {
++			return [];
++		}
++
++		const exportValue = packageJson.exports[ entryPoint ];
++
++		return getExportTargets( exportValue )
++			.filter( ( target ) => target.startsWith( './' ) )
++			.map( normalizePackagePath );
++	} )
++	.filter( ( path ) => ! packedPathSet.has( path ) );
++
++const attwArgs = [
++	attwCliPath,
++	tarballPath,
++	'--format',
++	'table',
++	'--no-color',
++	'--no-emoji',
++	'--no-summary',
++	'--profile',
++	attwOptions.profile,
++];
++
++if ( attwOptions.excludedEntryPoints.length ) {
++	attwArgs.push(
++		'--exclude-entrypoints',
++		...attwOptions.excludedEntryPoints
++	);
++}
++
++if ( attwOptions.ignoredRules.length ) {
++	attwArgs.push( '--ignore-rules', ...attwOptions.ignoredRules );
++}
++
++const attwResult = spawnSync( process.execPath, attwArgs, {
++	cwd: packageRoot,
++	encoding: 'utf8',
++} );
++
++if ( attwResult.error ) {
++	rmSync( packDirectory, { force: true, recursive: true } );
++	throw attwResult.error;
++}
++
++if (
++	packedPaths.length === 0 ||
++	disallowedPaths.length ||
++	missingAttwExcludedTargetPaths.length
++) {
++	if ( packedPaths.length === 0 ) {
++		console.error( 'The package tarball does not include any files.' );
++	}
++
++	if ( disallowedPaths.length ) {
++		console.error(
++			[
++				'The package tarball includes disallowed files:',
++				...disallowedPaths.map( ( path ) => `- ${ path }` ),
++			].join( '\n' )
++		);
++	}
++
++	if ( missingAttwExcludedTargetPaths.length ) {
++		console.error(
++			[
++				'The package tarball is missing targets for entry points excluded from attw:',
++				...missingAttwExcludedTargetPaths.map(
++					( path ) => `- ${ path }`
++				),
++			].join( '\n' )
++		);
++	}
++}
++
++if ( attwResult.status !== 0 ) {
++	process.stderr.write( attwResult.stdout ?? '' );
++	process.stderr.write( attwResult.stderr ?? '' );
++}
++
++rmSync( packDirectory, { force: true, recursive: true } );
++
++if (
++	packedPaths.length === 0 ||
++	disallowedPaths.length ||
++	missingAttwExcludedTargetPaths.length ||
++	attwResult.status !== 0
++) {
++	process.exit( attwResult.status || 1 );
++}
++
++console.log(
++	`Validated ${ packedPaths.length } packed files for ${
++		packageJson.name ?? packageRoot
++	}.`
++);
+diff --git a/tools/validation/validate-package-contents.test.mjs b/tools/validation/validate-package-contents.test.mjs
+new file mode 100644
+index 00000000000000..55c193f130e61b
+--- /dev/null
++++ b/tools/validation/validate-package-contents.test.mjs
+@@ -0,0 +1,196 @@
++import assert from 'node:assert/strict';
++import { spawnSync } from 'node:child_process';
++import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
++import { tmpdir } from 'node:os';
++import { dirname, join } from 'node:path';
++import { afterEach, test } from 'node:test';
++import { fileURLToPath } from 'node:url';
++
++const validatorPath = fileURLToPath(
++	new URL( './validate-package-contents.mjs', import.meta.url )
++);
++const temporaryRoots = [];
++
++afterEach( () => {
++	for ( const root of temporaryRoots.splice( 0 ) ) {
++		rmSync( root, { force: true, recursive: true } );
++	}
++} );
++
++function createPackage( { files, packageJson } ) {
++	const root = mkdtempSync( join( tmpdir(), 'validate-package-contents-' ) );
++	temporaryRoots.push( root );
++
++	for ( const [ path, contents ] of Object.entries( files ) ) {
++		const filePath = join( root, path );
++		mkdirSync( dirname( filePath ), { recursive: true } );
++		writeFileSync( filePath, contents );
++	}
++
++	writeFileSync(
++		join( root, 'package.json' ),
++		JSON.stringify(
++			{
++				name: 'test-package',
++				version: '1.0.0',
++				...packageJson,
++			},
++			null,
++			'\t'
++		) + '\n'
++	);
++
++	return root;
++}
++
++function runValidator( packageRoot, args = [] ) {
++	return spawnSync(
++		process.execPath,
++		[ validatorPath, packageRoot, ...args ],
++		{
++			encoding: 'utf8',
++			env: {
++				...process.env,
++				WORDPRESS_PACKAGE_NPM_CACHE: join(
++					tmpdir(),
++					'wordpress-package-npm-cache'
++				),
++			},
++		}
++	);
++}
++
++test( 'passes for a package with clean packed contents and resolvable types', () => {
++	const packageRoot = createPackage( {
++		files: {
++			'index.cjs': "exports.value = 'ok';\n",
++			'index.d.ts': 'export declare const value: string;\n',
++		},
++		packageJson: {
++			files: [ 'index.cjs', 'index.d.ts' ],
++			main: './index.cjs',
++			types: './index.d.ts',
++			exports: {
++				'.': {
++					types: './index.d.ts',
++					default: './index.cjs',
++				},
++			},
++		},
++	} );
++
++	const result = runValidator( packageRoot );
++
++	assert.equal( result.status, 0, result.stderr );
++	assert.match(
++		result.stdout,
++		/Validated \d+ packed files for test-package\./
++	);
++} );
++
++test( 'fails when packed contents include test files', () => {
++	const packageRoot = createPackage( {
++		files: {
++			'index.cjs': "exports.value = 'ok';\n",
++			'index.d.ts': 'export declare const value: string;\n',
++			'index.test.js': "require( './index.cjs' );\n",
++		},
++		packageJson: {
++			files: [ 'index.cjs', 'index.d.ts', 'index.test.js' ],
++			main: './index.cjs',
++			types: './index.d.ts',
++			exports: {
++				'.': {
++					types: './index.d.ts',
++					default: './index.cjs',
++				},
++			},
++		},
++	} );
++
++	const result = runValidator( packageRoot );
++
++	assert.notEqual( result.status, 0 );
++	assert.match(
++		result.stderr,
++		/The package tarball includes disallowed files:\n- index\.test\.js/
++	);
++} );
++
++test( 'fails when an entry point excluded from attw has a missing package target', () => {
++	const packageRoot = createPackage( {
++		files: {
++			'index.cjs': "exports.value = 'ok';\n",
++			'index.d.ts': 'export declare const value: string;\n',
++		},
++		packageJson: {
++			files: [ 'index.cjs', 'index.d.ts' ],
++			main: './index.cjs',
++			types: './index.d.ts',
++			exports: {
++				'.': {
++					types: './index.d.ts',
++					default: './index.cjs',
++				},
++				'./styles.css': './styles.css',
++			},
++		},
++	} );
++
++	const result = runValidator( packageRoot, [
++		'--attw-exclude-entrypoint',
++		'./styles.css',
++	] );
++
++	assert.notEqual( result.status, 0 );
++	assert.match(
++		result.stderr,
++		/The package tarball is missing targets for entry points excluded from attw:\n- styles\.css/
++	);
++} );
++
++test( 'fails when an exported types target is missing from the packed package', () => {
++	const packageRoot = createPackage( {
++		files: {
++			'feature.d.mts': 'export declare const value: string;\n',
++			'feature.mjs': "export const value = 'ok';\n",
++			'index.cjs': "exports.value = 'ok';\n",
++			'index.d.ts': 'export declare const value: string;\n',
++		},
++		packageJson: {
++			files: [
++				'feature.d.mts',
++				'feature.mjs',
++				'index.cjs',
++				'index.d.ts',
++			],
++			main: './index.cjs',
++			types: './index.d.ts',
++			exports: {
++				'.': {
++					types: './index.d.ts',
++					default: './index.cjs',
++				},
++				'./feature': {
++					types: './feature.d.ts',
++					import: './feature.mjs',
++				},
++			},
++		},
++	} );
++
++	const result = runValidator( packageRoot, [
++		'--attw-profile',
++		'node16',
++		'--attw-ignore-rule',
++		'false-cjs',
++		'--attw-ignore-rule',
++		'false-esm',
++		'--attw-ignore-rule',
++		'cjs-resolves-to-esm',
++	] );
++
++	assert.notEqual( result.status, 0 );
++	assert.match( result.stderr, /Resolution failed/ );
++	assert.match( result.stderr, /Used fallback condition/ );
++} );

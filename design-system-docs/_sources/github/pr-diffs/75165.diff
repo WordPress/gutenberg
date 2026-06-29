@@ -1,0 +1,122 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2cb640580eb884..c656da1af2b49c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,7 +4,8 @@
+ 
+ ### Bug Fixes
+ 
+--   `Text`: Remove `text-wrap: balance` fallback. Only `text-wrap: pretty` is now used.
++-   `Text`: Remove `text-wrap: balance` fallback. Only `text-wrap: pretty` is now used ([#75089](https://github.com/WordPress/gutenberg/pull/75089)).
++-   `RangeControl`: support forced-colors mode ([#75165](https://github.com/WordPress/gutenberg/pull/75165)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/range-control/styles/range-control-styles.ts b/packages/components/src/range-control/styles/range-control-styles.ts
+index 0ad77f5f2f8686..36c2660af1ea2c 100644
+--- a/packages/components/src/range-control/styles/range-control-styles.ts
++++ b/packages/components/src/range-control/styles/range-control-styles.ts
+@@ -78,17 +78,18 @@ export const AfterIconWrapper = styled.span`
+ `;
+ 
+ const railBackgroundColor = ( { disabled, railColor }: RailProps ) => {
+-	let background = railColor || '';
+-
+-	if ( disabled ) {
+-		background = COLORS.ui.backgroundDisabled;
+-	}
++	return css`
++		background: ${ disabled
++			? COLORS.ui.backgroundDisabled
++			: railColor || COLORS.theme.gray[ 300 ] };
+ 
+-	return css( { background } );
++		@media ( forced-colors: active ) {
++			background: GrayText;
++		}
++	`;
+ };
+ 
+ export const Rail = styled.span`
+-	background-color: ${ COLORS.gray[ 300 ] };
+ 	left: 0;
+ 	pointer-events: none;
+ 	right: 0;
+@@ -103,17 +104,18 @@ export const Rail = styled.span`
+ `;
+ 
+ const trackBackgroundColor = ( { disabled, trackColor }: TrackProps ) => {
+-	let background = trackColor || 'currentColor';
+-
+-	if ( disabled ) {
+-		background = COLORS.gray[ 400 ];
+-	}
++	return css`
++		background: ${ disabled
++			? COLORS.theme.gray[ 400 ]
++			: trackColor || 'currentColor' };
+ 
+-	return css( { background } );
++		@media ( forced-colors: active ) {
++			background: ${ disabled ? 'GrayText' : 'CanvasText' };
++		}
++	`;
+ };
+ 
+ export const Track = styled.span`
+-	background-color: currentColor;
+ 	border-radius: ${ CONFIG.radiusFull };
+ 	height: ${ railHeight }px;
+ 	pointer-events: none;
+@@ -153,12 +155,12 @@ export const Mark = styled.span`
+ 
+ const markLabelFill = ( { isFilled }: RangeMarkProps ) => {
+ 	return css( {
+-		color: isFilled ? COLORS.gray[ 700 ] : COLORS.gray[ 300 ],
++		color: isFilled ? COLORS.theme.gray[ 700 ] : COLORS.theme.gray[ 300 ],
+ 	} );
+ };
+ 
+ export const MarkLabel = styled.span`
+-	color: ${ COLORS.gray[ 300 ] };
++	color: ${ COLORS.theme.gray[ 300 ] };
+ 	font-size: 11px;
+ 	position: absolute;
+ 	top: 8px;
+@@ -173,14 +175,17 @@ export const MarkLabel = styled.span`
+ 	${ markLabelFill };
+ `;
+ 
+-const thumbColor = ( { disabled }: ThumbProps ) =>
+-	disabled
+-		? css`
+-				background-color: ${ COLORS.gray[ 400 ] };
+-		  `
+-		: css`
+-				background-color: ${ COLORS.theme.accent };
+-		  `;
++const thumbColor = ( { disabled }: ThumbProps ) => {
++	return css`
++		background: ${ disabled
++			? COLORS.theme.gray[ 400 ]
++			: COLORS.theme.accent };
++
++		@media ( forced-colors: active ) {
++			background: ${ disabled ? 'GrayText' : 'CanvasText' };
++		}
++	`;
++};
+ 
+ export const ThumbWrapper = styled.span`
+ 	align-items: center;
+@@ -224,6 +229,10 @@ const thumbFocus = ( { isFocused }: ThumbProps ) => {
+ 					width: ${ thumbSize + 8 }px;
+ 					top: -4px;
+ 					left: -4px;
++
++					@media ( forced-colors: active ) {
++						background: GrayText;
++					}
+ 				}
+ 		  `
+ 		: '';

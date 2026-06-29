@@ -1,0 +1,4072 @@
+diff --git a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+index cbc6c621a83596..bab90eeb2963ab 100644
+--- a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
++++ b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+@@ -22,6 +22,9 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+   display: -webkit-flex;
+   display: -ms-flexbox;
+   display: flex;
++}
++
++.emotion-5 {
+   -webkit-align-items: stretch;
+   -webkit-box-align: stretch;
+   -ms-flex-align: stretch;
+@@ -36,11 +39,11 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+   justify-content: center;
+ }
+ 
+-.emotion-4>* {
++.emotion-6>* {
+   min-height: 0;
+ }
+ 
+-.emotion-6 {
++.emotion-7 {
+   font-size: 11px;
+   font-weight: 499;
+   line-height: 1.4;
+@@ -50,11 +53,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+   padding: 0;
+ }
+ 
+-.emotion-8 {
+-  display: -webkit-box;
+-  display: -webkit-flex;
+-  display: -ms-flexbox;
+-  display: flex;
++.emotion-10 {
+   -webkit-align-items: stretch;
+   -webkit-box-align: stretch;
+   -ms-flex-align: stretch;
+@@ -69,15 +68,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+   justify-content: center;
+ }
+ 
+-.emotion-8>* {
+-  min-height: 0;
+-}
+-
+-.emotion-10 {
+-  display: -webkit-box;
+-  display: -webkit-flex;
+-  display: -ms-flexbox;
+-  display: flex;
++.emotion-13 {
+   -webkit-align-items: stretch;
+   -webkit-box-align: stretch;
+   -ms-flex-align: stretch;
+@@ -92,15 +83,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+   justify-content: center;
+ }
+ 
+-.emotion-10>* {
+-  min-height: 0;
+-}
+-
+-.emotion-12 {
+-  display: -webkit-box;
+-  display: -webkit-flex;
+-  display: -ms-flexbox;
+-  display: flex;
++.emotion-16 {
+   -webkit-align-items: stretch;
+   -webkit-box-align: stretch;
+   -ms-flex-align: stretch;
+@@ -115,10 +98,6 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+   justify-content: center;
+ }
+ 
+-.emotion-12>* {
+-  min-height: 0;
+-}
+-
+ <div>
+   <div
+     class="components-base-control block-editor-color-gradient-control emotion-0 emotion-1"
+@@ -130,7 +109,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+         class="block-editor-color-gradient-control__fieldset"
+       >
+         <div
+-          class="components-flex components-h-stack components-v-stack emotion-4 emotion-5"
++          class="emotion-4 emotion-5 emotion-6 components-flex components-h-stack components-v-stack"
+           data-wp-c16t="true"
+           data-wp-component="VStack"
+         >
+@@ -139,7 +118,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+               class="block-editor-color-gradient-control__color-indicator"
+             >
+               <span
+-                class="components-base-control__label emotion-6 emotion-7"
++                class="components-base-control__label emotion-7 emotion-8"
+               >
+                 Test Color
+               </span>
+@@ -149,7 +128,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+             class="block-editor-color-gradient-control__panel"
+           >
+             <div
+-              class="components-flex components-h-stack components-v-stack emotion-8 emotion-5"
++              class="emotion-4 emotion-10 emotion-6 components-flex components-h-stack components-v-stack"
+               data-wp-c16t="true"
+               data-wp-component="VStack"
+             >
+@@ -158,7 +137,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+                 tabindex="-1"
+               >
+                 <div
+-                  class="components-flex components-h-stack components-v-stack components-color-palette__custom-color-wrapper emotion-10 emotion-5"
++                  class="emotion-4 emotion-13 emotion-6 components-flex components-h-stack components-v-stack components-color-palette__custom-color-wrapper"
+                   data-wp-c16t="true"
+                   data-wp-component="VStack"
+                 >
+@@ -171,19 +150,19 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+                     type="button"
+                   />
+                   <div
+-                    class="components-flex components-h-stack components-v-stack components-color-palette__custom-color-text-wrapper emotion-12 emotion-5"
++                    class="emotion-4 emotion-16 emotion-6 components-flex components-h-stack components-v-stack components-color-palette__custom-color-text-wrapper"
+                     data-wp-c16t="true"
+                     data-wp-component="VStack"
+                   >
+                     <span
+-                      class="components-truncate components-color-palette__custom-color-name emotion-14 emotion-5"
++                      class="components-truncate components-color-palette__custom-color-name"
+                       data-wp-c16t="true"
+                       data-wp-component="Truncate"
+                     >
+                       red
+                     </span>
+                     <span
+-                      class="components-truncate components-color-palette__custom-color-value components-color-palette__custom-color-value--is-hex emotion-14 emotion-5"
++                      class="components-truncate components-color-palette__custom-color-value components-color-palette__custom-color-value--is-hex"
+                       data-wp-c16t="true"
+                       data-wp-component="Truncate"
+                     >
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0c542322d0cedd..6009f61db02361 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Breaking Changes
+ 
++-   `View`: The legacy Emotion `css` prop no longer has any effect. Use `style` for inline styles or `className` for CSS-based styling instead ([#79443](https://github.com/WordPress/gutenberg/pull/79443)).
+ -   The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed from the following:
+     -   `BorderBoxControl` ([#79420](https://github.com/WordPress/gutenberg/pull/79420))
+     -   `BorderControl` ([#79418](https://github.com/WordPress/gutenberg/pull/79418))
+@@ -17,6 +18,7 @@
+ 
+ -   `Surface`: Migrate styles from Emotion to SCSS Modules and use WPDS tokens for migrated visual values ([#79445](https://github.com/WordPress/gutenberg/pull/79445)).
+ -   `Truncate`: Migrate styles from Emotion to SCSS Modules ([#79446](https://github.com/WordPress/gutenberg/pull/79446)).
++-   `View`: Migrate away from Emotion while preserving polymorphic `as` behavior and style cascade order ([#79443](https://github.com/WordPress/gutenberg/pull/79443)).
+ 
+ ## 36.0.0 (2026-06-24)
+ 
+diff --git a/packages/components/src/border-control/border-control/hook.ts b/packages/components/src/border-control/border-control/hook.ts
+index 27be9cc12ba9be..6806ac24fcb379 100644
+--- a/packages/components/src/border-control/border-control/hook.ts
++++ b/packages/components/src/border-control/border-control/hook.ts
+@@ -130,10 +130,11 @@ export function useBorderControl(
+ 		wrapperWidth = '116px';
+ 	}
+ 	const innerWrapperClassName = useMemo( () => {
+-		const widthStyle = !! wrapperWidth && styles.wrapperWidth;
+-		const heightStyle = styles.wrapperHeight;
+-
+-		return cx( styles.innerWrapper(), widthStyle, heightStyle );
++		return cx(
++			styles.getInnerWrapperStyles( {
++				hasWidth: !! wrapperWidth,
++			} )
++		);
+ 	}, [ wrapperWidth, cx ] );
+ 
+ 	const sliderClassName = useMemo( () => {
+diff --git a/packages/components/src/border-control/styles.ts b/packages/components/src/border-control/styles.ts
+index 9e514c9e890e84..7e3b8b112012f4 100644
+--- a/packages/components/src/border-control/styles.ts
++++ b/packages/components/src/border-control/styles.ts
+@@ -53,6 +53,10 @@ export const wrapperHeight = css`
+ 	height: 40px;
+ `;
+ 
++export function getInnerWrapperStyles( { hasWidth }: { hasWidth: boolean } ) {
++	return css( innerWrapper(), hasWidth && wrapperWidth, wrapperHeight );
++}
++
+ export const borderControlDropdown = css`
+ 	background: #fff;
+ 
+diff --git a/packages/components/src/border-control/test/index.js b/packages/components/src/border-control/test/index.js
+index 5b58a32a0cae79..47d617bc7f5ecc 100644
+--- a/packages/components/src/border-control/test/index.js
++++ b/packages/components/src/border-control/test/index.js
+@@ -14,6 +14,8 @@ import userEvent from '@testing-library/user-event';
+  * Internal dependencies
+  */
+ import { BorderControl } from '../';
++import * as styles from '../styles';
++import { useCx } from '../../utils/hooks/use-cx';
+ 
+ const colors = [
+ 	{ name: 'Gray', color: '#f6f7f7' },
+@@ -80,6 +82,19 @@ function TestBorderControl( restProps ) {
+ 	return <BorderControl { ...restProps } />;
+ }
+ 
++const getGeneratedEmotionClassNames = ( element ) =>
++	Array.from( element.classList ).filter( ( className ) =>
++		/^(css|emotion)-/.test( className )
++	);
++
++function EmotionStyleTest( { styleFragment } ) {
++	const cx = useCx();
++
++	return (
++		<div data-testid="emotion-style" className={ cx( styleFragment ) } />
++	);
++}
++
+ describe( 'BorderControl', () => {
+ 	describe( 'basic rendering', () => {
+ 		it( 'should render standard border control', () => {
+@@ -125,6 +140,22 @@ describe( 'BorderControl', () => {
+ 			expect( slider ).toBeInTheDocument();
+ 		} );
+ 
++		it( 'should compose inner wrapper width and height styles in a single generated class', () => {
++			render(
++				<EmotionStyleTest
++					styleFragment={ styles.getInnerWrapperStyles( {
++						hasWidth: true,
++					} ) }
++				/>
++			);
++
++			expect(
++				getGeneratedEmotionClassNames(
++					screen.getByTestId( 'emotion-style' )
++				)
++			).toHaveLength( 1 );
++		} );
++
+ 		it( 'should render placeholder in UnitControl', () => {
+ 			const props = createProps( { placeholder: 'Mixed' } );
+ 			render( <TestBorderControl { ...props } /> );
+diff --git a/packages/components/src/card/card-footer/hook.ts b/packages/components/src/card/card-footer/hook.ts
+index 037b74d833cd21..a95c16f73e41ff 100644
+--- a/packages/components/src/card/card-footer/hook.ts
++++ b/packages/components/src/card/card-footer/hook.ts
+@@ -11,7 +11,6 @@ import { useContextSystem } from '../../context';
+ import * as styles from '../styles';
+ import { useCx } from '../../utils/hooks/use-cx';
+ import type { FooterProps } from '../types';
+-import { getPaddingBySize } from '../get-padding-by-size';
+ 
+ export function useCardFooter(
+ 	props: WordPressComponentProps< FooterProps, 'div' >
+@@ -27,21 +26,18 @@ export function useCardFooter(
+ 
+ 	const cx = useCx();
+ 
+-	const classes = useMemo(
+-		() =>
+-			cx(
+-				styles.Footer,
+-				styles.borderRadius,
+-				styles.borderColor,
+-				getPaddingBySize( size ),
+-				isBorderless && styles.borderless,
+-				isShady && styles.shady,
+-				// This classname is added for legacy compatibility reasons.
+-				'components-card__footer',
+-				className
+-			),
+-		[ className, cx, isBorderless, isShady, size ]
+-	);
++	const classes = useMemo( () => {
++		return cx(
++			styles.getCardFooterStyles( {
++				isBorderless,
++				isShady,
++				size,
++			} ),
++			// This classname is added for legacy compatibility reasons.
++			'components-card__footer',
++			className
++		);
++	}, [ className, cx, isBorderless, isShady, size ] );
+ 
+ 	return {
+ 		...otherProps,
+diff --git a/packages/components/src/card/card-header/hook.ts b/packages/components/src/card/card-header/hook.ts
+index e8b112ca35055d..564d733f957714 100644
+--- a/packages/components/src/card/card-header/hook.ts
++++ b/packages/components/src/card/card-header/hook.ts
+@@ -11,7 +11,6 @@ import { useContextSystem } from '../../context';
+ import * as styles from '../styles';
+ import { useCx } from '../../utils/hooks/use-cx';
+ import type { HeaderProps } from '../types';
+-import { getPaddingBySize } from '../get-padding-by-size';
+ 
+ export function useCardHeader(
+ 	props: WordPressComponentProps< HeaderProps, 'div' >
+@@ -26,21 +25,18 @@ export function useCardHeader(
+ 
+ 	const cx = useCx();
+ 
+-	const classes = useMemo(
+-		() =>
+-			cx(
+-				styles.Header,
+-				styles.borderRadius,
+-				styles.borderColor,
+-				getPaddingBySize( size ),
+-				isBorderless && styles.borderless,
+-				isShady && styles.shady,
+-				// This classname is added for legacy compatibility reasons.
+-				'components-card__header',
+-				className
+-			),
+-		[ className, cx, isBorderless, isShady, size ]
+-	);
++	const classes = useMemo( () => {
++		return cx(
++			styles.getCardHeaderStyles( {
++				isBorderless,
++				isShady,
++				size,
++			} ),
++			// This classname is added for legacy compatibility reasons.
++			'components-card__header',
++			className
++		);
++	}, [ className, cx, isBorderless, isShady, size ] );
+ 
+ 	return {
+ 		...otherProps,
+diff --git a/packages/components/src/card/card/hook.ts b/packages/components/src/card/card/hook.ts
+index 93e313934b22a2..ea5a825b495acc 100644
+--- a/packages/components/src/card/card/hook.ts
++++ b/packages/components/src/card/card/hook.ts
+@@ -57,9 +57,10 @@ export function useCard( props: CardProps ) {
+ 
+ 	const classes = useMemo( () => {
+ 		return cx(
+-			styles.Card,
+-			isBorderless && styles.boxShadowless,
+-			isRounded && styles.rounded,
++			styles.getCardStyles( {
++				isBorderless,
++				isRounded,
++			} ),
+ 			className
+ 		);
+ 	}, [ className, cx, isBorderless, isRounded ] );
+diff --git a/packages/components/src/card/styles.ts b/packages/components/src/card/styles.ts
+index 80ba26cd0f55fb..1985384549b185 100644
+--- a/packages/components/src/card/styles.ts
++++ b/packages/components/src/card/styles.ts
+@@ -7,6 +7,8 @@ import { css } from '@emotion/react';
+  * Internal dependencies
+  */
+ import { COLORS, CONFIG } from '../utils';
++import { getPaddingBySize } from './get-padding-by-size';
++import type { FooterProps, HeaderProps, Props } from './types';
+ 
+ // Since the border for `Card` is rendered via the `box-shadow` property
+ // (as opposed to the `border` property), the value of the border radius needs
+@@ -97,3 +99,50 @@ export const rounded = css`
+ export const shady = css`
+ 	background-color: ${ COLORS.ui.backgroundDisabled };
+ `;
++
++export function getCardStyles( {
++	isBorderless,
++	isRounded,
++}: Pick< Props, 'isBorderless' | 'isRounded' > ) {
++	const cardStyles = css(
++		Card,
++		isBorderless && boxShadowless,
++		isRounded && rounded
++	);
++
++	return cardStyles;
++}
++
++export function getCardHeaderStyles( {
++	isBorderless,
++	isShady,
++	size,
++}: Pick< HeaderProps, 'isBorderless' | 'isShady' | 'size' > ) {
++	const headerStyles = css(
++		Header,
++		borderRadius,
++		borderColor,
++		getPaddingBySize( size ),
++		isBorderless && borderless,
++		isShady && shady
++	);
++
++	return headerStyles;
++}
++
++export function getCardFooterStyles( {
++	isBorderless,
++	isShady,
++	size,
++}: Pick< FooterProps, 'isBorderless' | 'isShady' | 'size' > ) {
++	const footerStyles = css(
++		Footer,
++		borderRadius,
++		borderColor,
++		getPaddingBySize( size ),
++		isBorderless && borderless,
++		isShady && shady
++	);
++
++	return footerStyles;
++}
+diff --git a/packages/components/src/card/test/__snapshots__/index.tsx.snap b/packages/components/src/card/test/__snapshots__/index.tsx.snap
+index 609d6fd5924de3..22b5217a44d4c0 100644
+--- a/packages/components/src/card/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/card/test/__snapshots__/index.tsx.snap
+@@ -8,8 +8,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-card__body components-card-body css-1gg1viu-PolymorphicDiv-Body-borderRadius-medium e19lxcc00"
+-+     class="components-scrollable components-card__body components-card-body css-9p6d97-PolymorphicDiv-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium e19lxcc00"
++-     class="css-1klm29z-Body css-156bl4t-borderRadius css-2ktc4y-medium components-card__body components-card-body"
+++     class="css-drdujb-Scrollable css-9laccq-scrollableScrollbar css-flie1-scrollY components-scrollable css-1klm29z-Body css-156bl4t-borderRadius css-2ktc4y-medium components-card__body components-card-body"
+       data-wp-c16t="true"
+       data-wp-component="CardBody"
+     >
+@@ -25,8 +25,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-card__body components-card-body css-1gg1viu-PolymorphicDiv-Body-borderRadius-medium e19lxcc00"
+-+     class="components-card__body components-card-body css-1jxruy0-PolymorphicDiv-Body-borderRadius-medium-shady e19lxcc00"
++-     class="css-1klm29z-Body css-156bl4t-borderRadius css-2ktc4y-medium components-card__body components-card-body"
+++     class="css-1klm29z-Body css-156bl4t-borderRadius css-2ktc4y-medium css-1284mxe-shady components-card__body components-card-body"
+       data-wp-c16t="true"
+       data-wp-component="CardBody"
+     >
+@@ -42,8 +42,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-flex components-card__footer components-card-footer css-1s5uzde-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium e19lxcc00"
+-+     class="components-flex components-card__footer components-card-footer css-1nz7z3h-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium-shady e19lxcc00"
++-     class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex css-14ezg3c-Footer-borderRadius-borderColor-medium-footerStyles components-card__footer components-card-footer"
+++     class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex css-zu9yjw-Footer-borderRadius-borderColor-medium-shady-footerStyles components-card__footer components-card-footer"
+       data-wp-c16t="true"
+       data-wp-component="CardFooter"
+     >
+@@ -59,8 +59,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-flex components-card__footer components-card-footer css-1s5uzde-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium e19lxcc00"
+-+     class="components-flex components-card__footer components-card-footer css-11v2u4y-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium e19lxcc00"
++-     class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex css-14ezg3c-Footer-borderRadius-borderColor-medium-footerStyles components-card__footer components-card-footer"
+++     class="css-a57899-Flex css-qs9i8n-base css-1ozeagb-ItemsRow components-flex css-14ezg3c-Footer-borderRadius-borderColor-medium-footerStyles components-card__footer components-card-footer"
+       data-wp-c16t="true"
+       data-wp-component="CardFooter"
+     >
+@@ -76,8 +76,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-flex components-card__header components-card-header css-1hlwlpa-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium e19lxcc00"
+-+     class="components-flex components-card__header components-card-header css-zom6gv-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium-shady e19lxcc00"
++-     class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex css-knjbwb-Header-borderRadius-borderColor-medium-headerStyles components-card__header components-card-header"
+++     class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex css-1e8qxyk-Header-borderRadius-borderColor-medium-shady-headerStyles components-card__header components-card-header"
+       data-wp-c16t="true"
+       data-wp-component="CardHeader"
+     >
+@@ -93,19 +93,19 @@ Snapshot Diff:
+ @@ -6,18 +6,18 @@
+     >
+       <div
+-        class="css-1yddrvs-PolymorphicDiv-Content e19lxcc00"
++        class="css-1ruapvy-Content"
+       >
+         <div
+--         class="components-flex components-card__header components-card-header css-1hlwlpa-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium e19lxcc00"
+-+         class="components-flex components-card__header components-card-header css-dxbfrz-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-large e19lxcc00"
++-         class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex css-knjbwb-Header-borderRadius-borderColor-medium-headerStyles components-card__header components-card-header"
+++         class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex css-1to91lo-Header-borderRadius-borderColor-large-headerStyles components-card__header components-card-header"
+           data-wp-c16t="true"
+           data-wp-component="CardHeader"
+         >
+           Header
+         </div>
+         <div
+--         class="components-card__body components-card-body css-1gg1viu-PolymorphicDiv-Body-borderRadius-medium e19lxcc00"
+-+         class="components-card__body components-card-body css-16631vj-PolymorphicDiv-Body-borderRadius-large e19lxcc00"
++-         class="css-1klm29z-Body css-156bl4t-borderRadius css-2ktc4y-medium components-card__body components-card-body"
+++         class="css-1klm29z-Body css-156bl4t-borderRadius css-1url6g9-large components-card__body components-card-body"
+           data-wp-c16t="true"
+           data-wp-component="CardBody"
+         >
+@@ -135,27 +135,27 @@ Snapshot Diff:
+ @@ -6,25 +6,25 @@
+     >
+       <div
+-        class="css-1yddrvs-PolymorphicDiv-Content e19lxcc00"
++        class="css-1ruapvy-Content"
+       >
+         <div
+--         class="components-flex components-card__header components-card-header css-1qrvb07-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-large-borderless e19lxcc00"
+-+         class="components-flex components-card__header components-card-header css-nhtehb-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-small e19lxcc00"
++-         class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex css-1knfgzz-Header-borderRadius-borderColor-large-borderless-headerStyles components-card__header components-card-header"
+++         class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex css-utqozr-Header-borderRadius-borderColor-small-headerStyles components-card__header components-card-header"
+           data-wp-c16t="true"
+           data-wp-component="CardHeader"
+         >
+           Header
+         </div>
+         <div
+--         class="components-card__body components-card-body css-16631vj-PolymorphicDiv-Body-borderRadius-large e19lxcc00"
+-+         class="components-card__body components-card-body css-1gg1viu-PolymorphicDiv-Body-borderRadius-medium e19lxcc00"
++-         class="css-1klm29z-Body css-156bl4t-borderRadius css-1url6g9-large components-card__body components-card-body"
+++         class="css-1klm29z-Body css-156bl4t-borderRadius css-2ktc4y-medium components-card__body components-card-body"
+           data-wp-c16t="true"
+           data-wp-component="CardBody"
+         >
+           Body
+         </div>
+         <div
+--         class="components-flex components-card__footer components-card-footer css-ny5e27-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-large-borderless e19lxcc00"
+-+         class="components-flex components-card__footer components-card-footer css-1isabr8-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-xSmallCardPadding e19lxcc00"
++-         class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex css-jtu0fc-Footer-borderRadius-borderColor-large-borderless-footerStyles components-card__footer components-card-footer"
+++         class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex css-egj1bt-Footer-borderRadius-borderColor-xSmallCardPadding-footerStyles components-card__footer components-card-footer"
+           data-wp-c16t="true"
+           data-wp-component="CardFooter"
+         >
+@@ -171,33 +171,33 @@ Snapshot Diff:
+ @@ -1,30 +1,30 @@
+   <div>
+     <div
+--     class="components-surface components-card css-1hgll2p-PolymorphicDiv-Card-boxShadowless-rounded e19lxcc00"
+-+     class="components-surface components-card css-11ld97d-PolymorphicDiv-Card-rounded e19lxcc00"
++-     class="components-surface css-2wm9l0-Card-boxShadowless-rounded-cardStyles components-card"
+++     class="components-surface css-9kgksu-Card-rounded-cardStyles components-card"
+       data-wp-c16t="true"
+       data-wp-component="Card"
+     >
+       <div
+-        class="css-1yddrvs-PolymorphicDiv-Content e19lxcc00"
++        class="css-1ruapvy-Content"
+       >
+         <div
+--         class="components-flex components-card__header components-card-header css-1qrvb07-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-large-borderless e19lxcc00"
+-+         class="components-flex components-card__header components-card-header css-nhtehb-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-small e19lxcc00"
++-         class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex css-1knfgzz-Header-borderRadius-borderColor-large-borderless-headerStyles components-card__header components-card-header"
+++         class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex css-utqozr-Header-borderRadius-borderColor-small-headerStyles components-card__header components-card-header"
+           data-wp-c16t="true"
+           data-wp-component="CardHeader"
+         >
+           Header
+         </div>
+         <div
+--         class="components-card__body components-card-body css-16631vj-PolymorphicDiv-Body-borderRadius-large e19lxcc00"
+-+         class="components-card__body components-card-body css-be2ezs-PolymorphicDiv-Body-borderRadius-small e19lxcc00"
++-         class="css-1klm29z-Body css-156bl4t-borderRadius css-1url6g9-large components-card__body components-card-body"
+++         class="css-1klm29z-Body css-156bl4t-borderRadius css-5swhss-small components-card__body components-card-body"
+           data-wp-c16t="true"
+           data-wp-component="CardBody"
+         >
+           Body
+         </div>
+         <div
+--         class="components-flex components-card__footer components-card-footer css-ny5e27-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-large-borderless e19lxcc00"
+-+         class="components-flex components-card__footer components-card-footer css-wpxcc4-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-small e19lxcc00"
++-         class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex css-jtu0fc-Footer-borderRadius-borderColor-large-borderless-footerStyles components-card__footer components-card-footer"
+++         class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex css-zrnqar-Footer-borderRadius-borderColor-small-footerStyles components-card__footer components-card-footer"
+           data-wp-c16t="true"
+           data-wp-component="CardFooter"
+         >
+@@ -212,15 +212,18 @@ exports[`Card Card component should render correctly 1`] = `
+   border-radius: calc(8px - 1px);
+ }
+ 
+-.emotion-2 {
++.emotion-1 {
+   height: 100%;
+ }
+ 
+-.emotion-4 {
++.emotion-2 {
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: -ms-flexbox;
+   display: flex;
++}
++
++.emotion-3 {
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -233,26 +236,29 @@ exports[`Card Card component should render correctly 1`] = `
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+   width: 100%;
+-  border-bottom: 1px solid;
+-  box-sizing: border-box;
+-  border-color: rgba(0, 0, 0, 0.1);
+-  padding: calc(4px * 4) calc(4px * 6);
+ }
+ 
+ .emotion-4>* {
+   min-width: 0;
+ }
+ 
+-.emotion-4:last-child {
++.emotion-5 {
++  border-bottom: 1px solid;
++  box-sizing: border-box;
++  border-color: rgba(0, 0, 0, 0.1);
++  padding: calc(4px * 4) calc(4px * 6);
++}
++
++.emotion-5:last-child {
+   border-bottom: none;
+ }
+ 
+-.emotion-4:first-of-type {
++.emotion-5:first-of-type {
+   border-top-left-radius: calc(8px - 1px);
+   border-top-right-radius: calc(8px - 1px);
+ }
+ 
+-.emotion-4:last-of-type {
++.emotion-5:last-of-type {
+   border-bottom-left-radius: calc(8px - 1px);
+   border-bottom-right-radius: calc(8px - 1px);
+ }
+@@ -261,94 +267,67 @@ exports[`Card Card component should render correctly 1`] = `
+   box-sizing: border-box;
+   height: auto;
+   max-height: 100%;
+-  padding: calc(4px * 4) calc(4px * 6);
+ }
+ 
+-.emotion-6:first-of-type {
++.emotion-7:first-of-type {
+   border-top-left-radius: calc(8px - 1px);
+   border-top-right-radius: calc(8px - 1px);
+ }
+ 
+-.emotion-6:last-of-type {
++.emotion-7:last-of-type {
+   border-bottom-left-radius: calc(8px - 1px);
+   border-bottom-right-radius: calc(8px - 1px);
+ }
+ 
+-.emotion-10 {
++.emotion-8 {
++  padding: calc(4px * 4) calc(4px * 6);
++}
++
++.emotion-12 {
+   box-sizing: border-box;
+   display: block;
+   width: 100%;
+ }
+ 
+-.emotion-11 {
++.emotion-13 {
+   border-color: rgba(0, 0, 0, 0.1);
+ }
+ 
+-.emotion-14 {
++.emotion-17 {
+   box-sizing: border-box;
+   overflow: hidden;
+ }
+ 
+-.emotion-14>img,
+-.emotion-14>iframe {
++.emotion-17>img,
++.emotion-17>iframe {
+   display: block;
+   height: auto;
+   max-width: 100%;
+   width: 100%;
+ }
+ 
+-.emotion-14:first-of-type {
+-  border-top-left-radius: calc(8px - 1px);
+-  border-top-right-radius: calc(8px - 1px);
+-}
+-
+-.emotion-14:last-of-type {
+-  border-bottom-left-radius: calc(8px - 1px);
+-  border-bottom-right-radius: calc(8px - 1px);
+-}
+-
+-.emotion-16 {
+-  display: -webkit-box;
+-  display: -webkit-flex;
+-  display: -ms-flexbox;
+-  display: flex;
+-  -webkit-align-items: center;
+-  -webkit-box-align: center;
+-  -ms-flex-align: center;
+-  align-items: center;
+-  -webkit-flex-direction: row;
+-  -ms-flex-direction: row;
+-  flex-direction: row;
+-  gap: calc(4px * 2);
+-  -webkit-box-pack: justify;
+-  -webkit-justify-content: space-between;
+-  justify-content: space-between;
+-  width: 100%;
++.emotion-22 {
+   border-top: 1px solid;
+   box-sizing: border-box;
+   border-color: rgba(0, 0, 0, 0.1);
+   padding: calc(4px * 4) calc(4px * 6);
+ }
+ 
+-.emotion-16>* {
+-  min-width: 0;
+-}
+-
+-.emotion-16:first-of-type {
++.emotion-22:first-of-type {
+   border-top: none;
+ }
+ 
+-.emotion-16:first-of-type {
++.emotion-22:first-of-type {
+   border-top-left-radius: calc(8px - 1px);
+   border-top-right-radius: calc(8px - 1px);
+ }
+ 
+-.emotion-16:last-of-type {
++.emotion-22:last-of-type {
+   border-bottom-left-radius: calc(8px - 1px);
+   border-bottom-right-radius: calc(8px - 1px);
+ }
+ 
+-.emotion-18 {
++.emotion-23 {
+   background: transparent;
+   display: block;
+   margin: 0!important;
+@@ -362,41 +341,44 @@ exports[`Card Card component should render correctly 1`] = `
+   left: 0;
+   right: 0;
+   top: 0;
+-  border-radius: 8px;
+ }
+ 
+ @media not ( prefers-reduced-motion ) {
+-  .emotion-18 {
++  .emotion-23 {
+     -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+     transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+   }
+ }
+ 
++.emotion-24 {
++  border-radius: 8px;
++}
++
+ <div>
+   <div
+-    class="components-surface components-card emotion-0 emotion-1"
++    class="components-surface emotion-0 components-card"
+     data-wp-c16t="true"
+     data-wp-component="Card"
+   >
+     <div
+-      class="emotion-2 emotion-1"
++      class="emotion-1"
+     >
+       <div
+-        class="components-flex components-card__header components-card-header emotion-4 emotion-1"
++        class="emotion-2 emotion-3 emotion-4 components-flex emotion-5 components-card__header components-card-header"
+         data-wp-c16t="true"
+         data-wp-component="CardHeader"
+       >
+         Card Header
+       </div>
+       <div
+-        class="components-card__body components-card-body emotion-6 emotion-1"
++        class="emotion-6 emotion-7 emotion-8 components-card__body components-card-body"
+         data-wp-c16t="true"
+         data-wp-component="CardBody"
+       >
+         Card Body 1
+       </div>
+       <div
+-        class="components-card__body components-card-body emotion-6 emotion-1"
++        class="emotion-6 emotion-7 emotion-8 components-card__body components-card-body"
+         data-wp-c16t="true"
+         data-wp-component="CardBody"
+       >
+@@ -404,20 +386,20 @@ exports[`Card Card component should render correctly 1`] = `
+       </div>
+       <hr
+         aria-orientation="horizontal"
+-        class="components-divider emotion-10 emotion-11 components-card__divider components-card-divider"
++        class="components-divider emotion-12 emotion-13 components-card__divider components-card-divider"
+         data-wp-c16t="true"
+         data-wp-component="CardDivider"
+         role="separator"
+       />
+       <div
+-        class="components-card__body components-card-body emotion-6 emotion-1"
++        class="emotion-6 emotion-7 emotion-8 components-card__body components-card-body"
+         data-wp-c16t="true"
+         data-wp-component="CardBody"
+       >
+         Card Body 3
+       </div>
+       <div
+-        class="components-card__media components-card-media emotion-14 emotion-1"
++        class="emotion-17 emotion-7 components-card__media components-card-media"
+         data-wp-c16t="true"
+         data-wp-component="CardMedia"
+       >
+@@ -427,7 +409,7 @@ exports[`Card Card component should render correctly 1`] = `
+         />
+       </div>
+       <div
+-        class="components-flex components-card__footer components-card-footer emotion-16 emotion-1"
++        class="emotion-2 emotion-3 emotion-4 components-flex emotion-22 components-card__footer components-card-footer"
+         data-wp-c16t="true"
+         data-wp-component="CardFooter"
+       >
+@@ -436,13 +418,13 @@ exports[`Card Card component should render correctly 1`] = `
+     </div>
+     <div
+       aria-hidden="true"
+-      class="components-elevation emotion-18 emotion-1"
++      class="emotion-23 components-elevation emotion-24"
+       data-wp-c16t="true"
+       data-wp-component="Elevation"
+     />
+     <div
+       aria-hidden="true"
+-      class="components-elevation emotion-18 emotion-1"
++      class="emotion-23 components-elevation emotion-24"
+       data-wp-c16t="true"
+       data-wp-component="Elevation"
+     />
+@@ -461,15 +443,15 @@ Snapshot Diff:
+       </div>
+       <div
+         aria-hidden="true"
+--       class="components-elevation css-1gw374p-PolymorphicDiv-Elevation-sx-Base-sx-Base-elevationClassName e19lxcc00"
+-+       class="components-elevation css-12og79l-PolymorphicDiv-Elevation-sx-Base-sx-Base-elevationClassName e19lxcc00"
++-       class="css-jirgir-Elevation-sx-Base-sx-Base-elevationStyles components-elevation css-3cgmlt-elevationClassName"
+++       class="css-pudyh0-Elevation-sx-Base-sx-Base-elevationStyles components-elevation css-3cgmlt-elevationClassName"
+         data-wp-c16t="true"
+         data-wp-component="Elevation"
+       />
+       <div
+         aria-hidden="true"
+--       class="components-elevation css-1570405-PolymorphicDiv-Elevation-sx-Base-sx-Base-elevationClassName e19lxcc00"
+-+       class="components-elevation css-12og79l-PolymorphicDiv-Elevation-sx-Base-sx-Base-elevationClassName e19lxcc00"
++-       class="css-12yxda4-Elevation-sx-Base-sx-Base-elevationStyles components-elevation css-3cgmlt-elevationClassName"
+++       class="css-pudyh0-Elevation-sx-Base-sx-Base-elevationStyles components-elevation css-3cgmlt-elevationClassName"
+         data-wp-c16t="true"
+         data-wp-component="Elevation"
+       />
+@@ -489,11 +471,11 @@ exports[`Card Card component should warn when the isElevated prop is passed 1`]
+   border-radius: calc(8px - 1px);
+ }
+ 
+-.emotion-2 {
++.emotion-1 {
+   height: 100%;
+ }
+ 
+-.emotion-4 {
++.emotion-2 {
+   background: transparent;
+   display: block;
+   margin: 0!important;
+@@ -507,17 +489,20 @@ exports[`Card Card component should warn when the isElevated prop is passed 1`]
+   left: 0;
+   right: 0;
+   top: 0;
+-  border-radius: 8px;
+ }
+ 
+ @media not ( prefers-reduced-motion ) {
+-  .emotion-4 {
++  .emotion-2 {
+     -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+     transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+   }
+ }
+ 
+-.emotion-6 {
++.emotion-3 {
++  border-radius: 8px;
++}
++
++.emotion-4 {
+   background: transparent;
+   display: block;
+   margin: 0!important;
+@@ -531,11 +516,10 @@ exports[`Card Card component should warn when the isElevated prop is passed 1`]
+   left: 0;
+   right: 0;
+   top: 0;
+-  border-radius: 8px;
+ }
+ 
+ @media not ( prefers-reduced-motion ) {
+-  .emotion-6 {
++  .emotion-4 {
+     -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+     transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+   }
+@@ -543,24 +527,24 @@ exports[`Card Card component should warn when the isElevated prop is passed 1`]
+ 
+ <div>
+   <div
+-    class="components-surface components-card emotion-0 emotion-1"
++    class="components-surface emotion-0 components-card"
+     data-wp-c16t="true"
+     data-wp-component="Card"
+   >
+     <div
+-      class="emotion-2 emotion-1"
++      class="emotion-1"
+     >
+       Code is Poetry
+     </div>
+     <div
+       aria-hidden="true"
+-      class="components-elevation emotion-4 emotion-1"
++      class="emotion-2 components-elevation emotion-3"
+       data-wp-c16t="true"
+       data-wp-component="Elevation"
+     />
+     <div
+       aria-hidden="true"
+-      class="components-elevation emotion-6 emotion-1"
++      class="emotion-4 components-elevation emotion-3"
+       data-wp-c16t="true"
+       data-wp-component="Elevation"
+     />
+diff --git a/packages/components/src/card/test/index.tsx b/packages/components/src/card/test/index.tsx
+index fb1c6d972aa698..a0a4bfffa192ee 100644
+--- a/packages/components/src/card/test/index.tsx
++++ b/packages/components/src/card/test/index.tsx
+@@ -14,6 +14,39 @@ import {
+ 	CardHeader,
+ 	CardMedia,
+ } from '../';
++import { useCx } from '../../utils/hooks/use-cx';
++import * as styles from '../styles';
++
++function EmotionStylePrimer( {
++	styleFragment,
++}: {
++	styleFragment: Parameters< ReturnType< typeof useCx > >[ 0 ];
++} ) {
++	const cx = useCx();
++
++	return <div className={ cx( styleFragment ) } />;
++}
++
++function expectComposedEmotionClassName(
++	element: HTMLElement,
++	styleLabels: string[]
++) {
++	const matchingClassNames = element.className
++		.split( /\s+/ )
++		.filter( ( className ) => className.startsWith( 'css-' ) )
++		.filter( ( className ) =>
++			styleLabels.some( ( styleLabel ) =>
++				className.includes( styleLabel )
++			)
++		);
++
++	expect( matchingClassNames ).toHaveLength( 1 );
++	for ( const styleLabel of styleLabels ) {
++		expect( matchingClassNames[ 0 ] ).toEqual(
++			expect.stringContaining( styleLabel )
++		);
++	}
++}
+ 
+ describe( 'Card', () => {
+ 	describe( 'Card component', () => {
+@@ -57,6 +90,22 @@ describe( 'Card', () => {
+ 			);
+ 		} );
+ 
++		it( 'should remove borders regardless of Emotion insertion order', () => {
++			render(
++				<EmotionStylePrimer styleFragment={ styles.boxShadowless } />
++			);
++			render(
++				<Card data-testid="card-wrapper" isBorderless>
++					Code is Poetry
++				</Card>
++			);
++
++			const card = screen.getByTestId( 'card-wrapper' );
++
++			expectComposedEmotionClassName( card, [ 'Card', 'boxShadowless' ] );
++			expect( window.getComputedStyle( card ).boxShadow ).toBe( 'none' );
++		} );
++
+ 		it( 'should add rounded border when the isRounded prop is true', () => {
+ 			render(
+ 				<Card data-testid="card-rounded" isRounded>
+@@ -181,6 +230,30 @@ describe( 'Card', () => {
+ 				);
+ 				expect( container ).toMatchDiffSnapshot( containerShady );
+ 			} );
++
++			it( 'should remove borders regardless of Emotion insertion order', () => {
++				expect.hasAssertions();
++
++				render(
++					<EmotionStylePrimer styleFragment={ styles.borderless } />
++				);
++				render(
++					<Card>
++						<CardHeader data-testid="card-header" isBorderless>
++							Header
++						</CardHeader>
++						<CardBody>Body</CardBody>
++					</Card>
++				);
++
++				expectComposedEmotionClassName(
++					screen.getByTestId( 'card-header' ),
++					[ 'Header', 'borderRadius', 'borderColor', 'borderless' ]
++				);
++				expect( screen.getByTestId( 'card-header' ) ).toHaveStyle(
++					'border: none'
++				);
++			} );
+ 		} );
+ 
+ 		describe( 'CardFooter', () => {
+@@ -199,6 +272,30 @@ describe( 'Card', () => {
+ 				);
+ 				expect( container ).toMatchDiffSnapshot( containerWithFlexEnd );
+ 			} );
++
++			it( 'should remove borders regardless of Emotion insertion order', () => {
++				expect.hasAssertions();
++
++				render(
++					<EmotionStylePrimer styleFragment={ styles.borderless } />
++				);
++				render(
++					<Card>
++						<CardBody>Body</CardBody>
++						<CardFooter data-testid="card-footer" isBorderless>
++							Footer
++						</CardFooter>
++					</Card>
++				);
++
++				expectComposedEmotionClassName(
++					screen.getByTestId( 'card-footer' ),
++					[ 'Footer', 'borderRadius', 'borderColor', 'borderless' ]
++				);
++				expect( screen.getByTestId( 'card-footer' ) ).toHaveStyle(
++					'border: none'
++				);
++			} );
+ 		} );
+ 
+ 		describe( 'CardBody', () => {
+diff --git a/packages/components/src/elevation/hook.ts b/packages/components/src/elevation/hook.ts
+index ce95de6ef6b67d..2bb9424b7b21f0 100644
+--- a/packages/components/src/elevation/hook.ts
++++ b/packages/components/src/elevation/hook.ts
+@@ -108,14 +108,15 @@ export function useElevation(
+ 			`;
+ 		}
+ 
+-		return cx(
++		const elevationStyles = css(
+ 			styles.Elevation,
+ 			sx.Base,
+ 			sx.hover,
+ 			sx.focus,
+-			sx.active,
+-			className
++			sx.active
+ 		);
++
++		return cx( elevationStyles, className );
+ 	}, [
+ 		active,
+ 		borderRadius,
+diff --git a/packages/components/src/elevation/test/__snapshots__/index.tsx.snap b/packages/components/src/elevation/test/__snapshots__/index.tsx.snap
+index 2c78ed92d491b5..97e98cb9363af6 100644
+--- a/packages/components/src/elevation/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/elevation/test/__snapshots__/index.tsx.snap
+@@ -34,7 +34,7 @@ exports[`props should render active 1`] = `
+ 
+ <div
+   aria-hidden="true"
+-  class="components-elevation emotion-0 emotion-1"
++  class="emotion-0 components-elevation"
+   data-testid="elevation"
+   data-wp-c16t="true"
+   data-wp-component="Elevation"
+@@ -67,7 +67,7 @@ exports[`props should render correctly 1`] = `
+ 
+ <div
+   aria-hidden="true"
+-  class="components-elevation emotion-0 emotion-1"
++  class="emotion-0 components-elevation"
+   data-testid="elevation"
+   data-wp-c16t="true"
+   data-wp-component="Elevation"
+@@ -104,7 +104,7 @@ exports[`props should render hover 1`] = `
+ 
+ <div
+   aria-hidden="true"
+-  class="components-elevation emotion-0 emotion-1"
++  class="emotion-0 components-elevation"
+   data-testid="elevation"
+   data-wp-c16t="true"
+   data-wp-component="Elevation"
+@@ -145,7 +145,7 @@ exports[`props should render isInteractive 1`] = `
+ 
+ <div
+   aria-hidden="true"
+-  class="components-elevation emotion-0 emotion-1"
++  class="emotion-0 components-elevation"
+   data-testid="elevation"
+   data-wp-c16t="true"
+   data-wp-component="Elevation"
+@@ -186,7 +186,7 @@ exports[`props should render offset 1`] = `
+ 
+ <div
+   aria-hidden="true"
+-  class="components-elevation emotion-0 emotion-1"
++  class="emotion-0 components-elevation"
+   data-testid="elevation"
+   data-wp-c16t="true"
+   data-wp-component="Elevation"
+@@ -219,7 +219,7 @@ exports[`props should render value 1`] = `
+ 
+ <div
+   aria-hidden="true"
+-  class="components-elevation emotion-0 emotion-1"
++  class="emotion-0 components-elevation"
+   data-testid="elevation"
+   data-wp-c16t="true"
+   data-wp-component="Elevation"
+diff --git a/packages/components/src/elevation/test/index.tsx b/packages/components/src/elevation/test/index.tsx
+index 6f14b58148a7b5..a102836e3c37e7 100644
+--- a/packages/components/src/elevation/test/index.tsx
++++ b/packages/components/src/elevation/test/index.tsx
+@@ -8,6 +8,11 @@ import { render, screen } from '@testing-library/react';
+  */
+ import { Elevation } from '..';
+ 
++const getGeneratedEmotionClassNames = ( element: HTMLElement ) =>
++	Array.from( element.classList ).filter( ( className ) =>
++		/^(css|emotion)-/.test( className )
++	);
++
+ describe( 'props', () => {
+ 	test( 'should render correctly', () => {
+ 		render( <Elevation data-testid="elevation" /> );
+@@ -61,4 +66,20 @@ describe( 'props', () => {
+ 
+ 		expect( screen.getByTestId( 'elevation' ) ).toMatchSnapshot();
+ 	} );
++
++	test( 'should compose interactive styles in a single generated class', () => {
++		render(
++			<Elevation
++				active={ 5 }
++				focus={ 9 }
++				hover={ 14 }
++				value={ 7 }
++				data-testid="elevation"
++			/>
++		);
++
++		expect(
++			getGeneratedEmotionClassNames( screen.getByTestId( 'elevation' ) )
++		).toHaveLength( 1 );
++	} );
+ } );
+diff --git a/packages/components/src/flex/flex-item/hook.ts b/packages/components/src/flex/flex-item/hook.ts
+index 4de791905a4065..45a8c438f67088 100644
+--- a/packages/components/src/flex/flex-item/hook.ts
++++ b/packages/components/src/flex/flex-item/hook.ts
+@@ -1,7 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import type { SerializedStyles } from '@emotion/react';
+ import { css } from '@emotion/react';
+ 
+ /**
+@@ -24,24 +20,17 @@ export function useFlexItem(
+ 		...otherProps
+ 	} = useContextSystem( props, 'FlexItem' );
+ 
+-	const sx: {
+-		Base?: SerializedStyles;
+-	} = {};
+-
+ 	const contextDisplay = useFlexContext().flexItemDisplay;
+ 
+-	sx.Base = css( {
++	const base = css( {
+ 		display: displayProp || contextDisplay,
+ 	} );
+ 
+ 	const cx = useCx();
+ 
+-	const classes = cx(
+-		styles.Item,
+-		sx.Base,
+-		isBlock && styles.block,
+-		className
+-	);
++	const itemStyles = css( styles.Item, base, isBlock && styles.block );
++
++	const classes = cx( itemStyles, className );
+ 
+ 	return {
+ 		...otherProps,
+diff --git a/packages/components/src/flex/test/__snapshots__/index.tsx.snap b/packages/components/src/flex/test/__snapshots__/index.tsx.snap
+index 55d70bb67bed96..48757970ba7b84 100644
+--- a/packages/components/src/flex/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/flex/test/__snapshots__/index.tsx.snap
+@@ -5,27 +5,25 @@ Snapshot Diff:
+ - First value
+ + Second value
+ 
+-@@ -1,22 +1,18 @@
++@@ -1,20 +1,18 @@
+   <div
+-    class="components-flex css-4xxgm8-PolymorphicDiv-Flex-base-ItemsRow e19lxcc00"
++    class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex"
+ -   data-testid="flex"
+ +   data-testid="base-flex"
+     data-wp-c16t="true"
+     data-wp-component="Flex"
+   >
+     <div
+-      class="components-flex-item css-11ygw1k-PolymorphicDiv-Item-sx-Base e19lxcc00"
++      class="css-1rk86jm-Item-base-itemStyles components-flex-item"
+       data-wp-c16t="true"
+       data-wp-component="FlexItem"
+     >
+       Item
+     </div>
+--   <div
+--     class="css-1ragr82-PolymorphicDiv e19lxcc00"
+--   />
++-   <div />
+ -   <div />
+     <div
+-      class="components-flex-item components-flex-block css-1gfd63q-PolymorphicDiv-Item-sx-Base-block e19lxcc00"
++      class="css-7ugsc8-Item-base-block-itemStyles components-flex-item components-flex-block"
+       data-wp-c16t="true"
+       data-wp-component="FlexBlock"
+     >
+@@ -36,9 +34,12 @@ Snapshot Diff:
+ - Received styles
+ + Base styles
+ 
+-@@ -1,15 +1,15 @@
++@@ -1,18 +1,18 @@
+   Array [
+     Object {
++      "display": "flex",
++    },
++    Object {
+ -     "-ms-flex-align": "flex-start",
+ +     "-ms-flex-align": "center",
+       "-ms-flex-direction": "row",
+@@ -51,11 +52,11 @@ Snapshot Diff:
+       "-webkit-justify-content": "space-between",
+ -     "align-items": "flex-start",
+ +     "align-items": "center",
+-      "display": "flex",
+       "flex-direction": "row",
+       "gap": "calc(4px * 2)",
+       "justify-content": "space-between",
+       "width": "100%",
++    },
+ `;
+ 
+ exports[`props should render correctly 1`] = `
+@@ -64,6 +65,9 @@ exports[`props should render correctly 1`] = `
+   display: -webkit-flex;
+   display: -ms-flexbox;
+   display: flex;
++}
++
++.emotion-1 {
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -78,11 +82,11 @@ exports[`props should render correctly 1`] = `
+   width: 100%;
+ }
+ 
+-.emotion-0>* {
++.emotion-2>* {
+   min-width: 0;
+ }
+ 
+-.emotion-2 {
++.emotion-3 {
+   display: block;
+   max-height: 100%;
+   max-width: 100%;
+@@ -102,20 +106,20 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ <div
+-  class="components-flex emotion-0 emotion-1"
++  class="emotion-0 emotion-1 emotion-2 components-flex"
+   data-testid="base-flex"
+   data-wp-c16t="true"
+   data-wp-component="Flex"
+ >
+   <div
+-    class="components-flex-item emotion-2 emotion-1"
++    class="emotion-3 components-flex-item"
+     data-wp-c16t="true"
+     data-wp-component="FlexItem"
+   >
+     Item
+   </div>
+   <div
+-    class="components-flex-item components-flex-block emotion-4 emotion-1"
++    class="emotion-4 components-flex-item components-flex-block"
+     data-wp-c16t="true"
+     data-wp-component="FlexBlock"
+   >
+@@ -129,7 +133,9 @@ Snapshot Diff:
+ - Received styles
+ + Base styles
+ 
+-  Array [
++@@ -3,18 +3,17 @@
++      "display": "flex",
++    },
+     Object {
+       "-ms-flex-align": "center",
+       "-ms-flex-direction": "row",
+@@ -142,7 +148,6 @@ Snapshot Diff:
+ -     "-webkit-justify-content": "flex-start",
+ +     "-webkit-justify-content": "space-between",
+       "align-items": "center",
+-      "display": "flex",
+       "flex-direction": "row",
+       "gap": "calc(4px * 2)",
+ -     "justify-content": "flex-start",
+@@ -154,25 +159,5 @@ Snapshot Diff:
+ 
+ exports[`props should render spacing 1`] = `
+ Snapshot Diff:
+-- Received styles
+-+ Base styles
+-
+-  Array [
+-    Object {
+--     "min-width": "0",
+--   },
+--   Object {
+-      "-ms-flex": "1",
+-      "-webkit-flex": "1",
+-      "display": "block",
+-      "flex": "1",
+-      "max-height": "100%",
+-      "max-width": "100%",
+-      "min-height": "0",
+-+     "min-width": "0",
+-+   },
+-+   Object {
+-      "min-width": "0",
+-    },
+-  ]
++Compared values have no visual difference.
+ `;
+diff --git a/packages/components/src/flex/test/index.tsx b/packages/components/src/flex/test/index.tsx
+index c4147278b47747..7815fbe7e1842b 100644
+--- a/packages/components/src/flex/test/index.tsx
++++ b/packages/components/src/flex/test/index.tsx
+@@ -9,6 +9,11 @@ import { render, screen } from '@testing-library/react';
+ import { View } from '../../view';
+ import { Flex, FlexBlock, FlexItem } from '../';
+ 
++const getGeneratedEmotionClassNames = ( element: HTMLElement ) =>
++	Array.from( element.classList ).filter( ( className ) =>
++		/^(css|emotion)-/.test( className )
++	);
++
+ describe( 'props', () => {
+ 	test( 'should render correctly', () => {
+ 		render(
+@@ -107,4 +112,19 @@ describe( 'props', () => {
+ 			screen.getByTestId( 'flex-block-with-gap' )
+ 		);
+ 	} );
++
++	test( 'should compose flex item styles in a single generated class', () => {
++		render(
++			<Flex>
++				<FlexItem isBlock display="inline-flex" data-testid="item">
++					Item
++				</FlexItem>
++			</Flex>
++		);
++
++		const item = screen.getByTestId( 'item' );
++
++		expect( getGeneratedEmotionClassNames( item ) ).toHaveLength( 1 );
++		expect( item ).toHaveStyle( { display: 'inline-flex' } );
++	} );
+ } );
+diff --git a/packages/components/src/h-stack/test/__snapshots__/index.tsx.snap b/packages/components/src/h-stack/test/__snapshots__/index.tsx.snap
+index bb7cd65d8f3771..aa5b7cfdb453a0 100644
+--- a/packages/components/src/h-stack/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/h-stack/test/__snapshots__/index.tsx.snap
+@@ -6,6 +6,9 @@ exports[`props should render alignment 1`] = `
+   display: -webkit-flex;
+   display: -ms-flexbox;
+   display: flex;
++}
++
++.emotion-1 {
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -21,22 +24,18 @@ exports[`props should render alignment 1`] = `
+   width: 100%;
+ }
+ 
+-.emotion-0>* {
++.emotion-2>* {
+   min-width: 0;
+ }
+ 
+ <div>
+   <div
+-    class="components-flex components-h-stack emotion-0 emotion-1"
++    class="emotion-0 emotion-1 emotion-2 components-flex components-h-stack"
+     data-wp-c16t="true"
+     data-wp-component="HStack"
+   >
+-    <div
+-      class="emotion-2 emotion-1"
+-    />
+-    <div
+-      class="emotion-2 emotion-1"
+-    />
++    <div />
++    <div />
+   </div>
+ </div>
+ `;
+@@ -47,6 +46,9 @@ exports[`props should render correctly 1`] = `
+   display: -webkit-flex;
+   display: -ms-flexbox;
+   display: flex;
++}
++
++.emotion-1 {
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -61,22 +63,18 @@ exports[`props should render correctly 1`] = `
+   width: 100%;
+ }
+ 
+-.emotion-0>* {
++.emotion-2>* {
+   min-width: 0;
+ }
+ 
+ <div>
+   <div
+-    class="components-flex components-h-stack emotion-0 emotion-1"
++    class="emotion-0 emotion-1 emotion-2 components-flex components-h-stack"
+     data-wp-c16t="true"
+     data-wp-component="HStack"
+   >
+-    <div
+-      class="emotion-2 emotion-1"
+-    />
+-    <div
+-      class="emotion-2 emotion-1"
+-    />
++    <div />
++    <div />
+   </div>
+ </div>
+ `;
+@@ -87,6 +85,9 @@ exports[`props should render spacing 1`] = `
+   display: -webkit-flex;
+   display: -ms-flexbox;
+   display: flex;
++}
++
++.emotion-1 {
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -101,22 +102,18 @@ exports[`props should render spacing 1`] = `
+   width: 100%;
+ }
+ 
+-.emotion-0>* {
++.emotion-2>* {
+   min-width: 0;
+ }
+ 
+ <div>
+   <div
+-    class="components-flex components-h-stack emotion-0 emotion-1"
++    class="emotion-0 emotion-1 emotion-2 components-flex components-h-stack"
+     data-wp-c16t="true"
+     data-wp-component="HStack"
+   >
+-    <div
+-      class="emotion-2 emotion-1"
+-    />
+-    <div
+-      class="emotion-2 emotion-1"
+-    />
++    <div />
++    <div />
+   </div>
+ </div>
+ `;
+diff --git a/packages/components/src/heading/test/__snapshots__/index.tsx.snap b/packages/components/src/heading/test/__snapshots__/index.tsx.snap
+index 73bfcaed4ee161..0b707be0769cec 100644
+--- a/packages/components/src/heading/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/heading/test/__snapshots__/index.tsx.snap
+@@ -13,7 +13,7 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ <h2
+-  class="components-truncate components-text components-heading emotion-0 emotion-1"
++  class="components-truncate emotion-0 components-text components-heading"
+   data-wp-c16t="true"
+   data-wp-component="Heading"
+ >
+diff --git a/packages/components/src/item-group/test/__snapshots__/index.js.snap b/packages/components/src/item-group/test/__snapshots__/index.js.snap
+index a37644ae7773c8..0e7d93a296c7f3 100644
+--- a/packages/components/src/item-group/test/__snapshots__/index.js.snap
++++ b/packages/components/src/item-group/test/__snapshots__/index.js.snap
+@@ -11,8 +11,8 @@ Snapshot Diff:
+         role="listitem"
+       >
+         <div
+--         class="components-item css-14dwj71-PolymorphicDiv-medium-item-spacedAround e19lxcc00"
+-+         class="components-item css-avymxl-PolymorphicDiv-large-item-spacedAround e19lxcc00"
++-         class="css-17kujwd-medium css-1izz8ne-item css-166x88h-spacedAround components-item"
+++         class="css-o0djae-large css-1izz8ne-item css-166x88h-spacedAround components-item"
+           data-wp-c16t="true"
+           data-wp-component="Item"
+         >
+@@ -24,8 +24,8 @@ Snapshot Diff:
+         role="listitem"
+       >
+         <div
+--         class="components-item css-14dwj71-PolymorphicDiv-medium-item-spacedAround e19lxcc00"
+-+         class="components-item css-avymxl-PolymorphicDiv-large-item-spacedAround e19lxcc00"
++-         class="css-17kujwd-medium css-1izz8ne-item css-166x88h-spacedAround components-item"
+++         class="css-o0djae-large css-1izz8ne-item css-166x88h-spacedAround components-item"
+           data-wp-c16t="true"
+           data-wp-component="Item"
+         >
+@@ -44,8 +44,8 @@ Snapshot Diff:
+       role="listitem"
+     >
+       <div
+--       class="components-item css-5pzc6i-PolymorphicDiv-medium-item e19lxcc00"
+-+       class="components-item css-y16wpf-PolymorphicDiv-large-item e19lxcc00"
++-       class="css-17kujwd-medium css-1izz8ne-item components-item"
+++       class="css-o0djae-large css-1izz8ne-item components-item"
+         data-wp-c16t="true"
+         data-wp-component="Item"
+       >
+@@ -68,34 +68,40 @@ exports[`ItemGroup ItemGroup component should render correctly 1`] = `
+   border-bottom-right-radius: 2px;
+ }
+ 
+-.emotion-2 {
++.emotion-1 {
+   width: 100%;
+   display: block;
+ }
+ 
+-.emotion-3 {
++.emotion-2 {
+   padding: calc((36px - calc(13px * 1.4) - 2px) / 2) 12px;
++}
++
++.emotion-3 {
+   box-sizing: border-box;
+   width: 100%;
+   display: block;
+   margin: 0;
+   color: inherit;
++}
++
++.emotion-4 {
+   border-radius: 2px;
+ }
+ 
+ <div>
+   <div
+-    class="components-item-group emotion-0 emotion-1"
++    class="emotion-0 components-item-group"
+     data-wp-c16t="true"
+     data-wp-component="ItemGroup"
+     role="list"
+   >
+     <div
+-      class="emotion-2"
++      class="emotion-1"
+       role="listitem"
+     >
+       <div
+-        class="components-item emotion-3 emotion-1"
++        class="emotion-2 emotion-3 emotion-4 components-item"
+         data-wp-c16t="true"
+         data-wp-component="Item"
+       >
+@@ -114,8 +120,8 @@ Snapshot Diff:
+ @@ -1,18 +1,18 @@
+   <div>
+     <div
+--     class="components-item-group css-7sdlfv-PolymorphicDiv-rounded e19lxcc00"
+-+     class="components-item-group css-12ds22-PolymorphicDiv-separated-rounded e19lxcc00"
++-     class="css-1e6snp6-rounded components-item-group"
+++     class="css-qr0sb5-separated css-1e6snp6-rounded components-item-group"
+       data-wp-c16t="true"
+       data-wp-component="ItemGroup"
+       role="list"
+@@ -125,8 +131,8 @@ Snapshot Diff:
+         role="listitem"
+       >
+         <div
+--         class="components-item css-14dwj71-PolymorphicDiv-medium-item-spacedAround e19lxcc00"
+-+         class="components-item css-5pzc6i-PolymorphicDiv-medium-item e19lxcc00"
++-         class="css-17kujwd-medium css-1izz8ne-item css-166x88h-spacedAround components-item"
+++         class="css-17kujwd-medium css-1izz8ne-item components-item"
+           data-wp-c16t="true"
+           data-wp-component="Item"
+         >
+@@ -142,8 +148,8 @@ Snapshot Diff:
+ @@ -1,18 +1,18 @@
+   <div>
+     <div
+--     class="components-item-group css-7sdlfv-PolymorphicDiv-rounded e19lxcc00"
+-+     class="components-item-group css-z3k5b4-PolymorphicDiv-bordered-rounded e19lxcc00"
++-     class="css-1e6snp6-rounded components-item-group"
+++     class="css-9rmwob-bordered css-1e6snp6-rounded components-item-group"
+       data-wp-c16t="true"
+       data-wp-component="ItemGroup"
+       role="list"
+@@ -153,8 +159,8 @@ Snapshot Diff:
+         role="listitem"
+       >
+         <div
+--         class="components-item css-14dwj71-PolymorphicDiv-medium-item-spacedAround e19lxcc00"
+-+         class="components-item css-5pzc6i-PolymorphicDiv-medium-item e19lxcc00"
++-         class="css-17kujwd-medium css-1izz8ne-item css-166x88h-spacedAround components-item"
+++         class="css-17kujwd-medium css-1izz8ne-item components-item"
+           data-wp-c16t="true"
+           data-wp-component="Item"
+         >
+@@ -170,8 +176,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-item-group css-7sdlfv-PolymorphicDiv-rounded e19lxcc00"
+-+     class="components-item-group css-1ragr82-PolymorphicDiv e19lxcc00"
++-     class="css-1e6snp6-rounded components-item-group"
+++     class="components-item-group"
+       data-wp-c16t="true"
+       data-wp-component="ItemGroup"
+       role="list"
+diff --git a/packages/components/src/notice/test/__snapshots__/index.tsx.snap b/packages/components/src/notice/test/__snapshots__/index.tsx.snap
+index a4507dc69e6a43..35938e54a36873 100644
+--- a/packages/components/src/notice/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/notice/test/__snapshots__/index.tsx.snap
+@@ -6,7 +6,7 @@ exports[`Notice should match snapshot 1`] = `
+     class="components-notice is-success"
+   >
+     <div
+-      class="components-visually-hidden css-1ragr82-PolymorphicDiv emotion-0"
++      class="components-visually-hidden"
+       data-visually-hidden=""
+       data-wp-c16t="true"
+       data-wp-component="VisuallyHidden"
+diff --git a/packages/components/src/scrollable/test/__snapshots__/index.tsx.snap b/packages/components/src/scrollable/test/__snapshots__/index.tsx.snap
+index 0c09b34f2a03d3..060a8ca1b7d270 100644
+--- a/packages/components/src/scrollable/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/scrollable/test/__snapshots__/index.tsx.snap
+@@ -3,26 +3,24 @@
+ exports[`props should render correctly 1`] = `
+ .emotion-0 {
+   height: 100%;
+-  overflow-x: hidden;
+-  overflow-y: auto;
+ }
+ 
+ @media only screen and ( min-device-width: 40em ) {
+-  .emotion-0::-webkit-scrollbar {
++  .emotion-1::-webkit-scrollbar {
+     height: 12px;
+     width: 12px;
+   }
+ 
+-  .emotion-0::-webkit-scrollbar-track {
++  .emotion-1::-webkit-scrollbar-track {
+     background-color: transparent;
+   }
+ 
+-  .emotion-0::-webkit-scrollbar-track {
++  .emotion-1::-webkit-scrollbar-track {
+     background: rgba(0, 0, 0, 0.04);
+     border-radius: 8px;
+   }
+ 
+-  .emotion-0::-webkit-scrollbar-thumb {
++  .emotion-1::-webkit-scrollbar-thumb {
+     -webkit-background-clip: padding-box;
+     background-clip: padding-box;
+     background-color: rgba(0, 0, 0, 0.2);
+@@ -30,13 +28,18 @@ exports[`props should render correctly 1`] = `
+     border-radius: 7px;
+   }
+ 
+-  .emotion-0:hover::-webkit-scrollbar-thumb {
++  .emotion-1:hover::-webkit-scrollbar-thumb {
+     background-color: rgba(0, 0, 0, 0.5);
+   }
+ }
+ 
++.emotion-2 {
++  overflow-x: hidden;
++  overflow-y: auto;
++}
++
+ <div
+-  class="components-scrollable emotion-0 emotion-1"
++  class="emotion-0 emotion-1 emotion-2 components-scrollable"
+   data-testid="scrollable"
+   data-wp-c16t="true"
+   data-wp-component="Scrollable"
+@@ -50,12 +53,14 @@ Snapshot Diff:
+ - Received styles
+ + Base styles
+ 
+-  Array [
++@@ -4,9 +4,6 @@
++    },
+     Object {
+-      "height": "100%",
+       "overflow-x": "hidden",
+       "overflow-y": "auto",
+--     "scroll-behavior": "smooth",
+     },
++-   Object {
++-     "scroll-behavior": "smooth",
++-   },
+   ]
+ `;
+diff --git a/packages/components/src/slot-fill/test/__snapshots__/slot.js.snap b/packages/components/src/slot-fill/test/__snapshots__/slot.js.snap
+index 1c42041f3bf0d4..3155c53d0bd660 100644
+--- a/packages/components/src/slot-fill/test/__snapshots__/slot.js.snap
++++ b/packages/components/src/slot-fill/test/__snapshots__/slot.js.snap
+@@ -42,16 +42,12 @@ exports[`Slot bubblesVirtually true should subsume another slot by the same name
+   <div
+     data-position="first"
+   >
+-    <div
+-      class="css-1ragr82-PolymorphicDiv emotion-0"
+-    />
++    <div />
+   </div>
+   <div
+     data-position="second"
+   >
+-    <div
+-      class="css-1ragr82-PolymorphicDiv emotion-0"
+-    >
++    <div>
+       Content
+     </div>
+   </div>
+@@ -66,9 +62,7 @@ exports[`Slot bubblesVirtually true should subsume another slot by the same name
+   <div
+     data-position="second"
+   >
+-    <div
+-      class="css-1ragr82-PolymorphicDiv emotion-0"
+-    >
++    <div>
+       Content
+     </div>
+   </div>
+@@ -207,9 +201,7 @@ exports[`Slot should render in expected order when fills unmounted 1`] = `
+ exports[`Slot should warn without a Provider 1`] = `
+ <div>
+   <div>
+-    <div
+-      class="css-1ragr82-PolymorphicDiv emotion-0"
+-    />
++    <div />
+   </div>
+ </div>
+ `;
+diff --git a/packages/components/src/spacer/hook.ts b/packages/components/src/spacer/hook.ts
+index 3ef4b21e104c74..2b985d562f5b72 100644
+--- a/packages/components/src/spacer/hook.ts
++++ b/packages/components/src/spacer/hook.ts
+@@ -40,7 +40,7 @@ export function useSpacer(
+ 
+ 	const cx = useCx();
+ 
+-	const classes = cx(
++	const spacerStyles = css(
+ 		isDefined( margin ) &&
+ 			css`
+ 				margin: ${ space( margin ) };
+@@ -100,9 +100,10 @@ export function useSpacer(
+ 		isDefined( paddingRight ) &&
+ 			rtl( {
+ 				paddingRight: space( paddingRight ),
+-			} )(),
+-		className
++			} )()
+ 	);
+ 
++	const classes = cx( spacerStyles, className );
++
+ 	return { ...otherProps, className: classes };
+ }
+diff --git a/packages/components/src/spacer/test/__snapshots__/index.tsx.snap b/packages/components/src/spacer/test/__snapshots__/index.tsx.snap
+index 8f0aab30c74a1b..a710f752567f2f 100644
+--- a/packages/components/src/spacer/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/spacer/test/__snapshots__/index.tsx.snap
+@@ -38,7 +38,7 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ <div
+-  class="components-spacer emotion-0 emotion-1"
++  class="emotion-0 components-spacer"
+   data-testid="spacer"
+   data-wp-c16t="true"
+   data-wp-component="Spacer"
+diff --git a/packages/components/src/spacer/test/index.tsx b/packages/components/src/spacer/test/index.tsx
+index 1dfdd45615185a..c9336dba147dcf 100644
+--- a/packages/components/src/spacer/test/index.tsx
++++ b/packages/components/src/spacer/test/index.tsx
+@@ -95,6 +95,20 @@ describe( 'props', () => {
+ 		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
+ 	} );
+ 
++	test( 'should preserve explicit margin props regardless of Emotion insertion order', () => {
++		render( <Spacer marginRight={ 5 } data-testid="primer" /> );
++		render(
++			<Spacer margin={ 10 } marginRight={ 5 } data-testid="target" />
++		);
++
++		const styles = window.getComputedStyle(
++			screen.getByTestId( 'target' )
++		);
++
++		expect( styles.marginRight ).toBe( 'calc(20px)' );
++		expect( styles.marginTop ).toBe( 'calc(40px)' );
++	} );
++
+ 	test( 'should render padding', () => {
+ 		render( <Spacer data-testid="spacer" /> );
+ 		render( <Spacer padding={ 5 } data-testid="customized-spacer" /> );
+@@ -176,4 +190,18 @@ describe( 'props', () => {
+ 			screen.getByTestId( 'customized-spacer' )
+ 		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
+ 	} );
++
++	test( 'should preserve explicit padding props regardless of Emotion insertion order', () => {
++		render( <Spacer paddingRight={ 5 } data-testid="primer" /> );
++		render(
++			<Spacer padding={ 10 } paddingRight={ 5 } data-testid="target" />
++		);
++
++		const styles = window.getComputedStyle(
++			screen.getByTestId( 'target' )
++		);
++
++		expect( styles.paddingRight ).toBe( 'calc(20px)' );
++		expect( styles.paddingTop ).toBe( 'calc(40px)' );
++	} );
+ } );
+diff --git a/packages/components/src/text/README.md b/packages/components/src/text/README.md
+index ef06f63e950f0e..8ee95c661ae909 100644
+--- a/packages/components/src/text/README.md
++++ b/packages/components/src/text/README.md
+@@ -171,7 +171,7 @@ function Example() {
+ 	const backgroundColor = 'blue';
+ 
+ 	return (
+-		<View css={ { backgroundColor } }>
++		<View style={ { backgroundColor } }>
+ 			<Text optimizeReadabilityFor={ backgroundColor }>
+ 				Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+ 			</Text>
+diff --git a/packages/components/src/text/hook.ts b/packages/components/src/text/hook.ts
+index 76314686eb963b..09ddc6d1903944 100644
+--- a/packages/components/src/text/hook.ts
++++ b/packages/components/src/text/hook.ts
+@@ -3,6 +3,7 @@
+  */
+ import type { SerializedStyles } from '@emotion/react';
+ import { css } from '@emotion/react';
++import type React from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -23,7 +24,6 @@ import { CONFIG, COLORS } from '../utils';
+ import { getLineHeight } from './get-line-height';
+ import { useCx } from '../utils/hooks/use-cx';
+ import type { Props } from './types';
+-import type React from 'react';
+ 
+ /**
+  * @param {import('../context').WordPressComponentProps<import('./types').Props, 'span'>} props
+@@ -79,14 +79,12 @@ export default function useText(
+ 	const cx = useCx();
+ 
+ 	const classes = useMemo( () => {
+-		const sx: Record< string, SerializedStyles | null > = {};
+-
+ 		const lineHeight = getLineHeight(
+ 			adjustLineHeightForInnerControls,
+ 			lineHeightProp
+ 		);
+ 
+-		sx.Base = css( {
++		const base = css( {
+ 			color,
+ 			display,
+ 			fontSize: getFontSize( size ),
+@@ -96,32 +94,33 @@ export default function useText(
+ 			textAlign: align,
+ 		} );
+ 
+-		sx.upperCase = css( { textTransform: 'uppercase' } );
++		const upperCaseStyles = css( { textTransform: 'uppercase' } );
+ 
+-		sx.optimalTextColor = null;
++		let optimalTextColor: SerializedStyles | null = null;
+ 
+ 		if ( optimizeReadabilityFor ) {
+ 			const isOptimalTextColorDark =
+ 				getOptimalTextShade( optimizeReadabilityFor ) === 'dark';
+ 
+ 			// Should not use theme colors
+-			sx.optimalTextColor = isOptimalTextColorDark
++			optimalTextColor = isOptimalTextColorDark
+ 				? css( { color: COLORS.gray[ 900 ] } )
+ 				: css( { color: COLORS.white } );
+ 		}
+ 
+-		return cx(
++		const textStyles = css(
+ 			styles.Text,
+-			sx.Base,
+-			sx.optimalTextColor,
++			base,
++			optimalTextColor,
+ 			isDestructive && styles.destructive,
+ 			!! isHighlighter && styles.highlighterText,
+ 			isBlock && styles.block,
+ 			isCaption && styles.muted,
+ 			variant && styles[ variant ],
+-			upperCase && sx.upperCase,
+-			className
++			upperCase && upperCaseStyles
+ 		);
++
++		return cx( textStyles, className );
+ 	}, [
+ 		adjustLineHeightForInnerControls,
+ 		align,
+diff --git a/packages/components/src/text/test/__snapshots__/index.tsx.snap b/packages/components/src/text/test/__snapshots__/index.tsx.snap
+index b2c65e3128b5be..3c0f23f8cfe5ac 100644
+--- a/packages/components/src/text/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/text/test/__snapshots__/index.tsx.snap
+@@ -35,7 +35,7 @@ exports[`Text should render highlighted words with highlightCaseSensitive 1`] =
+ 
+ <div>
+   <span
+-    class="components-truncate components-text emotion-0 emotion-1"
++    class="components-truncate emotion-0 components-text"
+     data-wp-c16t="true"
+     data-wp-component="Text"
+     role="heading"
+@@ -61,7 +61,7 @@ exports[`Text snapshot tests should render correctly 1`] = `
+ 
+ <div>
+   <span
+-    class="components-truncate components-text emotion-0 emotion-1"
++    class="components-truncate emotion-0 components-text"
+     data-wp-c16t="true"
+     data-wp-component="Text"
+   >
+diff --git a/packages/components/src/text/test/index.tsx b/packages/components/src/text/test/index.tsx
+index 4dfe21c705f862..4ae1c1dc280916 100644
+--- a/packages/components/src/text/test/index.tsx
++++ b/packages/components/src/text/test/index.tsx
+@@ -106,6 +106,23 @@ describe( 'Text', () => {
+ 		} );
+ 	} );
+ 
++	test( 'should render variant color regardless of Emotion insertion order', () => {
++		render(
++			<>
++				<Text role="note" variant="muted">
++					Primer.
++				</Text>
++				<Text role="heading" color="orange" variant="muted">
++					Lorem ipsum.
++				</Text>
++			</>
++		);
++
++		expect( screen.getByRole( 'heading' ) ).toHaveStyle( {
++			color: COLORS.theme.gray[ 700 ],
++		} );
++	} );
++
+ 	test( 'should render display', () => {
+ 		render(
+ 			<Text role="heading" display="inline-flex">
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index d35c62d3e04605..3267ec2552ac48 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -81,7 +81,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+   		);
+ }
+ 
+-.emotion-8 {
++.emotion-7 {
+   display: -webkit-inline-box;
+   display: -webkit-inline-flex;
+   display: -ms-inline-flexbox;
+@@ -94,7 +94,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+   flex: 1;
+ }
+ 
+-.emotion-10 {
++.emotion-9 {
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -139,27 +139,27 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+ }
+ 
+ @media not ( prefers-reduced-motion ) {
+-  .emotion-10 {
++  .emotion-9 {
+     -webkit-transition: color 160ms linear,font-weight 60ms linear;
+     transition: color 160ms linear,font-weight 60ms linear;
+   }
+ }
+ 
+-.emotion-10::-moz-focus-inner {
++.emotion-9::-moz-focus-inner {
+   border: 0;
+ }
+ 
+-.emotion-10[disabled],
+-.emotion-10[aria-disabled='true'] {
++.emotion-9[disabled],
++.emotion-9[aria-disabled='true'] {
+   opacity: 0.4;
+   cursor: default;
+ }
+ 
+-.emotion-10:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
++.emotion-9:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
+   color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
+ }
+ 
+-.emotion-11 {
++.emotion-10 {
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: -ms-flexbox;
+@@ -168,7 +168,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+   line-height: 1;
+ }
+ 
+-.emotion-15 {
++.emotion-14 {
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -211,23 +211,23 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+ }
+ 
+ @media not ( prefers-reduced-motion ) {
+-  .emotion-15 {
++  .emotion-14 {
+     -webkit-transition: color 160ms linear,font-weight 60ms linear;
+     transition: color 160ms linear,font-weight 60ms linear;
+   }
+ }
+ 
+-.emotion-15::-moz-focus-inner {
++.emotion-14::-moz-focus-inner {
+   border: 0;
+ }
+ 
+-.emotion-15[disabled],
+-.emotion-15[aria-disabled='true'] {
++.emotion-14[disabled],
++.emotion-14[aria-disabled='true'] {
+   opacity: 0.4;
+   cursor: default;
+ }
+ 
+-.emotion-15:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
++.emotion-14:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
+   color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
+ }
+ 
+@@ -246,19 +246,19 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+       </label>
+       <div
+         aria-label="Test Toggle Group Control"
+-        class="components-toggle-group-control emotion-6 emotion-7"
++        class="emotion-6 components-toggle-group-control"
+         data-wp-c16t="true"
+         data-wp-component="ToggleGroupControl"
+         id="wp-components-base-control-19"
+         role="radiogroup"
+       >
+         <div
+-          class="emotion-8 emotion-9"
++          class="emotion-7 emotion-8"
+         >
+           <button
+             aria-checked="true"
+             aria-label="Uppercase"
+-            class="emotion-10 components-toggle-group-control-option-base"
++            class="emotion-9 components-toggle-group-control-option-base"
+             data-active-item="true"
+             data-value="uppercase"
+             data-wp-c16t="true"
+@@ -270,7 +270,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+             value="uppercase"
+           >
+             <div
+-              class="emotion-11 emotion-12"
++              class="emotion-10 emotion-11"
+             >
+               <svg
+                 aria-hidden="true"
+@@ -289,12 +289,12 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+           </button>
+         </div>
+         <div
+-          class="emotion-8 emotion-9"
++          class="emotion-7 emotion-8"
+         >
+           <button
+             aria-checked="false"
+             aria-label="Lowercase"
+-            class="emotion-15 components-toggle-group-control-option-base"
++            class="emotion-14 components-toggle-group-control-option-base"
+             data-value="lowercase"
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+@@ -305,7 +305,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+             value="lowercase"
+           >
+             <div
+-              class="emotion-11 emotion-12"
++              class="emotion-10 emotion-11"
+             >
+               <svg
+                 aria-hidden="true"
+@@ -416,7 +416,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+   		);
+ }
+ 
+-.emotion-8 {
++.emotion-7 {
+   display: -webkit-inline-box;
+   display: -webkit-inline-flex;
+   display: -ms-inline-flexbox;
+@@ -429,7 +429,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+   flex: 1;
+ }
+ 
+-.emotion-10 {
++.emotion-9 {
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -468,27 +468,27 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+ }
+ 
+ @media not ( prefers-reduced-motion ) {
+-  .emotion-10 {
++  .emotion-9 {
+     -webkit-transition: color 160ms linear,font-weight 60ms linear;
+     transition: color 160ms linear,font-weight 60ms linear;
+   }
+ }
+ 
+-.emotion-10::-moz-focus-inner {
++.emotion-9::-moz-focus-inner {
+   border: 0;
+ }
+ 
+-.emotion-10[disabled],
+-.emotion-10[aria-disabled='true'] {
++.emotion-9[disabled],
++.emotion-9[aria-disabled='true'] {
+   opacity: 0.4;
+   cursor: default;
+ }
+ 
+-.emotion-10:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
++.emotion-9:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
+   color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
+ }
+ 
+-.emotion-11 {
++.emotion-10 {
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: -ms-flexbox;
+@@ -512,19 +512,19 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+       </label>
+       <div
+         aria-label="Test Toggle Group Control"
+-        class="components-toggle-group-control emotion-6 emotion-7"
++        class="emotion-6 components-toggle-group-control"
+         data-wp-c16t="true"
+         data-wp-component="ToggleGroupControl"
+         id="wp-components-base-control-18"
+         role="radiogroup"
+       >
+         <div
+-          class="emotion-8 emotion-9"
++          class="emotion-7 emotion-8"
+         >
+           <button
+             aria-checked="false"
+             aria-label="R"
+-            class="emotion-10 components-toggle-group-control-option-base"
++            class="emotion-9 components-toggle-group-control-option-base"
+             data-value="rigas"
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+@@ -535,19 +535,19 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+             value="rigas"
+           >
+             <div
+-              class="emotion-11 emotion-12"
++              class="emotion-10 emotion-11"
+             >
+               R
+             </div>
+           </button>
+         </div>
+         <div
+-          class="emotion-8 emotion-9"
++          class="emotion-7 emotion-8"
+         >
+           <button
+             aria-checked="false"
+             aria-label="J"
+-            class="emotion-10 components-toggle-group-control-option-base"
++            class="emotion-9 components-toggle-group-control-option-base"
+             data-value="jack"
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+@@ -558,7 +558,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+             value="jack"
+           >
+             <div
+-              class="emotion-11 emotion-12"
++              class="emotion-10 emotion-11"
+             >
+               J
+             </div>
+@@ -657,7 +657,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+   		);
+ }
+ 
+-.emotion-8 {
++.emotion-7 {
+   display: -webkit-inline-box;
+   display: -webkit-inline-flex;
+   display: -ms-inline-flexbox;
+@@ -670,7 +670,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+   flex: 1;
+ }
+ 
+-.emotion-10 {
++.emotion-9 {
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -715,27 +715,27 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+ }
+ 
+ @media not ( prefers-reduced-motion ) {
+-  .emotion-10 {
++  .emotion-9 {
+     -webkit-transition: color 160ms linear,font-weight 60ms linear;
+     transition: color 160ms linear,font-weight 60ms linear;
+   }
+ }
+ 
+-.emotion-10::-moz-focus-inner {
++.emotion-9::-moz-focus-inner {
+   border: 0;
+ }
+ 
+-.emotion-10[disabled],
+-.emotion-10[aria-disabled='true'] {
++.emotion-9[disabled],
++.emotion-9[aria-disabled='true'] {
+   opacity: 0.4;
+   cursor: default;
+ }
+ 
+-.emotion-10:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
++.emotion-9:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
+   color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
+ }
+ 
+-.emotion-11 {
++.emotion-10 {
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: -ms-flexbox;
+@@ -744,7 +744,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+   line-height: 1;
+ }
+ 
+-.emotion-15 {
++.emotion-14 {
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -787,23 +787,23 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+ }
+ 
+ @media not ( prefers-reduced-motion ) {
+-  .emotion-15 {
++  .emotion-14 {
+     -webkit-transition: color 160ms linear,font-weight 60ms linear;
+     transition: color 160ms linear,font-weight 60ms linear;
+   }
+ }
+ 
+-.emotion-15::-moz-focus-inner {
++.emotion-14::-moz-focus-inner {
+   border: 0;
+ }
+ 
+-.emotion-15[disabled],
+-.emotion-15[aria-disabled='true'] {
++.emotion-14[disabled],
++.emotion-14[aria-disabled='true'] {
+   opacity: 0.4;
+   cursor: default;
+ }
+ 
+-.emotion-15:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
++.emotion-14:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
+   color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
+ }
+ 
+@@ -822,19 +822,19 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+       </label>
+       <div
+         aria-label="Test Toggle Group Control"
+-        class="components-toggle-group-control emotion-6 emotion-7"
++        class="emotion-6 components-toggle-group-control"
+         data-wp-c16t="true"
+         data-wp-component="ToggleGroupControl"
+         id="wp-components-base-control-1"
+         role="radiogroup"
+       >
+         <div
+-          class="emotion-8 emotion-9"
++          class="emotion-7 emotion-8"
+         >
+           <button
+             aria-checked="true"
+             aria-label="Uppercase"
+-            class="emotion-10 components-toggle-group-control-option-base"
++            class="emotion-9 components-toggle-group-control-option-base"
+             data-active-item="true"
+             data-value="uppercase"
+             data-wp-c16t="true"
+@@ -846,7 +846,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+             value="uppercase"
+           >
+             <div
+-              class="emotion-11 emotion-12"
++              class="emotion-10 emotion-11"
+             >
+               <svg
+                 aria-hidden="true"
+@@ -865,12 +865,12 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+           </button>
+         </div>
+         <div
+-          class="emotion-8 emotion-9"
++          class="emotion-7 emotion-8"
+         >
+           <button
+             aria-checked="false"
+             aria-label="Lowercase"
+-            class="emotion-15 components-toggle-group-control-option-base"
++            class="emotion-14 components-toggle-group-control-option-base"
+             data-value="lowercase"
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+@@ -881,7 +881,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+             value="lowercase"
+           >
+             <div
+-              class="emotion-11 emotion-12"
++              class="emotion-10 emotion-11"
+             >
+               <svg
+                 aria-hidden="true"
+@@ -986,7 +986,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
+   		);
+ }
+ 
+-.emotion-8 {
++.emotion-7 {
+   display: -webkit-inline-box;
+   display: -webkit-inline-flex;
+   display: -ms-inline-flexbox;
+@@ -999,7 +999,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
+   flex: 1;
+ }
+ 
+-.emotion-10 {
++.emotion-9 {
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -1038,27 +1038,27 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
+ }
+ 
+ @media not ( prefers-reduced-motion ) {
+-  .emotion-10 {
++  .emotion-9 {
+     -webkit-transition: color 160ms linear,font-weight 60ms linear;
+     transition: color 160ms linear,font-weight 60ms linear;
+   }
+ }
+ 
+-.emotion-10::-moz-focus-inner {
++.emotion-9::-moz-focus-inner {
+   border: 0;
+ }
+ 
+-.emotion-10[disabled],
+-.emotion-10[aria-disabled='true'] {
++.emotion-9[disabled],
++.emotion-9[aria-disabled='true'] {
+   opacity: 0.4;
+   cursor: default;
+ }
+ 
+-.emotion-10:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
++.emotion-9:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
+   color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
+ }
+ 
+-.emotion-11 {
++.emotion-10 {
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: -ms-flexbox;
+@@ -1082,19 +1082,19 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
+       </label>
+       <div
+         aria-label="Test Toggle Group Control"
+-        class="components-toggle-group-control emotion-6 emotion-7"
++        class="emotion-6 components-toggle-group-control"
+         data-wp-c16t="true"
+         data-wp-component="ToggleGroupControl"
+         id="wp-components-base-control-0"
+         role="radiogroup"
+       >
+         <div
+-          class="emotion-8 emotion-9"
++          class="emotion-7 emotion-8"
+         >
+           <button
+             aria-checked="false"
+             aria-label="R"
+-            class="emotion-10 components-toggle-group-control-option-base"
++            class="emotion-9 components-toggle-group-control-option-base"
+             data-value="rigas"
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+@@ -1105,19 +1105,19 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
+             value="rigas"
+           >
+             <div
+-              class="emotion-11 emotion-12"
++              class="emotion-10 emotion-11"
+             >
+               R
+             </div>
+           </button>
+         </div>
+         <div
+-          class="emotion-8 emotion-9"
++          class="emotion-7 emotion-8"
+         >
+           <button
+             aria-checked="false"
+             aria-label="J"
+-            class="emotion-10 components-toggle-group-control-option-base"
++            class="emotion-9 components-toggle-group-control-option-base"
+             data-value="jack"
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+@@ -1128,7 +1128,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
+             value="jack"
+           >
+             <div
+-              class="emotion-11 emotion-12"
++              class="emotion-10 emotion-11"
+             >
+               J
+             </div>
+diff --git a/packages/components/src/toggle-group-control/test/index.tsx b/packages/components/src/toggle-group-control/test/index.tsx
+index fe688f774b9313..84901d40a52f45 100644
+--- a/packages/components/src/toggle-group-control/test/index.tsx
++++ b/packages/components/src/toggle-group-control/test/index.tsx
+@@ -31,6 +31,11 @@ const ToggleGroupControl = ( props: ToggleGroupControlProps ) => {
+ 	return <_ToggleGroupControl { ...props } __next40pxDefaultSize />;
+ };
+ 
++const getGeneratedEmotionClassNames = ( element: HTMLElement ) =>
++	Array.from( element.classList ).filter( ( className ) =>
++		/^(css|emotion)-/.test( className )
++	);
++
+ const ControlledToggleGroupControl = ( {
+ 	value: valueProp,
+ 	onChange,
+@@ -635,3 +640,18 @@ describe.each( [
+ 		} );
+ 	} );
+ } );
++
++test( 'should compose block styles in a single generated class', () => {
++	render(
++		<ToggleGroupControl label="Test Toggle Group Control" isBlock>
++			{ options }
++		</ToggleGroupControl>
++	);
++
++	const control = screen.getByRole( 'radiogroup', {
++		name: 'Test Toggle Group Control',
++	} );
++
++	expect( getGeneratedEmotionClassNames( control ) ).toHaveLength( 1 );
++	expect( control ).toHaveStyle( { display: 'flex' } );
++} );
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index f71415a96de153..26d28854573cde 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -80,7 +80,6 @@ function UnconnectedToggleGroupControl(
+ 					isDeselectable,
+ 					size: normalizedSize,
+ 				} ),
+-				isBlock && styles.block,
+ 				className
+ 			),
+ 		[ className, cx, isBlock, isDeselectable, normalizedSize ]
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
+index 7953befd0074e8..1885f7abba503d 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
+@@ -9,6 +9,11 @@ import { css } from '@emotion/react';
+ import { CONFIG, COLORS } from '../../utils';
+ import type { ToggleGroupControlProps } from '../types';
+ 
++export const block = css`
++	display: flex;
++	width: 100%;
++`;
++
+ export const toggleGroupControl = ( {
+ 	isBlock,
+ 	isDeselectable,
+@@ -25,6 +30,7 @@ export const toggleGroupControl = ( {
+ 
+ 	${ toggleGroupControlSize( size ) }
+ 	${ ! isDeselectable && enclosingBorders( isBlock ) }
++	${ isBlock && block }
+ 
+ 	@media not ( prefers-reduced-motion ) {
+ 		&[data-indicator-animated]::before {
+@@ -94,8 +100,3 @@ export const toggleGroupControlSize = (
+ 
+ 	return styles[ size ];
+ };
+-
+-export const block = css`
+-	display: flex;
+-	width: 100%;
+-`;
+diff --git a/packages/components/src/tools-panel/styles.ts b/packages/components/src/tools-panel/styles.ts
+index d92b82dea1f75d..438747e3f008c4 100644
+--- a/packages/components/src/tools-panel/styles.ts
++++ b/packages/components/src/tools-panel/styles.ts
+@@ -62,6 +62,22 @@ export const ToolsPanelHiddenInnerWrapper = css`
+ 	}
+ `;
+ 
++export function getToolsPanelStyles( {
++	columns,
++	hasInnerWrapper,
++	areAllOptionalControlsHidden,
++}: {
++	columns: number;
++	hasInnerWrapper: boolean;
++	areAllOptionalControlsHidden: boolean;
++} ) {
++	return css(
++		ToolsPanel( columns ),
++		hasInnerWrapper && ToolsPanelWithInnerWrapper( columns ),
++		areAllOptionalControlsHidden && ToolsPanelHiddenInnerWrapper
++	);
++}
++
+ export const ToolsPanelHeader = css`
+ 	${ toolsPanelGrid.item.fullWidth }
+ 	gap: ${ space( 2 ) };
+diff --git a/packages/components/src/tools-panel/test/index.tsx b/packages/components/src/tools-panel/test/index.tsx
+index 68cf72233121e0..7e3d9c784df9b8 100644
+--- a/packages/components/src/tools-panel/test/index.tsx
++++ b/packages/components/src/tools-panel/test/index.tsx
+@@ -9,6 +9,8 @@ import userEvent from '@testing-library/user-event';
+  */
+ import { ToolsPanel, ToolsPanelContext, ToolsPanelItem } from '../';
+ import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
++import * as styles from '../styles';
++import { useCx } from '../../utils/hooks/use-cx';
+ import type {
+ 	ToolsPanelContext as ToolsPanelContextType,
+ 	ResetAllFilter,
+@@ -18,6 +20,25 @@ const { Fill: ToolsPanelItems, Slot } = createSlotFill( 'ToolsPanelSlot' );
+ const resetAll = jest.fn();
+ const noop = () => undefined;
+ 
++type EmotionStyleFragment = Parameters< ReturnType< typeof useCx > >[ 0 ];
++
++const getGeneratedEmotionClassNames = ( element: HTMLElement ) =>
++	Array.from( element.classList ).filter( ( className ) =>
++		/^(css|emotion)-/.test( className )
++	);
++
++function EmotionStyleTest( {
++	styleFragment,
++}: {
++	styleFragment: EmotionStyleFragment;
++} ) {
++	const cx = useCx();
++
++	return (
++		<div data-testid="emotion-style" className={ cx( styleFragment ) } />
++	);
++}
++
+ type ControlValue = boolean | undefined;
+ 
+ // Default props for the tools panel.
+@@ -259,6 +280,24 @@ describe( 'ToolsPanel', () => {
+ 			expect( resetAllItem ).toBeInTheDocument();
+ 		} );
+ 
++		it( 'should compose inner wrapper visibility styles in a single generated class', () => {
++			render(
++				<EmotionStyleTest
++					styleFragment={ styles.getToolsPanelStyles( {
++						columns: 2,
++						hasInnerWrapper: true,
++						areAllOptionalControlsHidden: true,
++					} ) }
++				/>
++			);
++
++			expect(
++				getGeneratedEmotionClassNames(
++					screen.getByTestId( 'emotion-style' )
++				)
++			).toHaveLength( 1 );
++		} );
++
+ 		it( 'should render panel menu items correctly', async () => {
+ 			renderPanel();
+ 			await openDropdownMenu();
+diff --git a/packages/components/src/tools-panel/tools-panel/hook.ts b/packages/components/src/tools-panel/tools-panel/hook.ts
+index 583a079ab20026..93fccaf220e0be 100644
+--- a/packages/components/src/tools-panel/tools-panel/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel/hook.ts
+@@ -341,16 +341,12 @@ export function useToolsPanel(
+ 
+ 	const cx = useCx();
+ 	const classes = useMemo( () => {
+-		const wrapperStyle =
+-			hasInnerWrapper &&
+-			styles.ToolsPanelWithInnerWrapper( DEFAULT_COLUMNS );
+-		const emptyStyle =
+-			areAllOptionalControlsHidden && styles.ToolsPanelHiddenInnerWrapper;
+-
+ 		return cx(
+-			styles.ToolsPanel( DEFAULT_COLUMNS ),
+-			wrapperStyle,
+-			emptyStyle,
++			styles.getToolsPanelStyles( {
++				columns: DEFAULT_COLUMNS,
++				hasInnerWrapper,
++				areAllOptionalControlsHidden,
++			} ),
+ 			className
+ 		);
+ 	}, [ areAllOptionalControlsHidden, className, cx, hasInnerWrapper ] );
+diff --git a/packages/components/src/utils/hooks/use-cx.ts b/packages/components/src/utils/hooks/use-cx.ts
+index aea2f8e4a7a732..258f915b0418e6 100644
+--- a/packages/components/src/utils/hooks/use-cx.ts
++++ b/packages/components/src/utils/hooks/use-cx.ts
+@@ -24,6 +24,10 @@ const isSerializedStyles = ( o: any ): o is SerializedStyles =>
+  * `cx` normally knows how to handle. It also hooks into the Emotion
+  * Cache, allowing `css` calls to work inside iframes.
+  *
++ * Passing multiple `SerializedStyles` arguments emits multiple classes. When
++ * fragments rely on source-order overrides, compose them in a single `css()`
++ * call before passing them to `cx`.
++ *
+  * ```jsx
+  * import { css } from '@emotion/react';
+  *
+diff --git a/packages/components/src/utils/polymorphic-element.tsx b/packages/components/src/utils/polymorphic-element.tsx
+new file mode 100644
+index 00000000000000..e1f30523570be0
+--- /dev/null
++++ b/packages/components/src/utils/polymorphic-element.tsx
+@@ -0,0 +1,152 @@
++/**
++ * External dependencies
++ */
++import type * as React from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
++type PolymorphicElementProps< T extends React.ElementType > = Omit<
++	React.ComponentPropsWithoutRef< T >,
++	'as'
++> & {
++	as?: T;
++};
++
++type PolymorphicElementRef< T extends React.ElementType > =
++	React.ComponentPropsWithRef< T >[ 'ref' ];
++
++const customAttributeRegExp = /^(data|aria|x)-/i;
++const eventHandlerRegExp = /^on[A-Z]/;
++
++// Derived from @emotion/is-prop-valid's React prop allowlist, but split by
++// element type so SVG-only props are intentionally filtered from HTML elements.
++// The event-handler check is also deliberately stricter than Emotion's
++// charCode-based `on*` fallback.
++const svgElementNames = new Set(
++	`animate animateMotion animateTransform circle clipPath defs desc ellipse
++	feBlend feColorMatrix feComponentTransfer feComposite feConvolveMatrix
++	feDiffuseLighting feDisplacementMap feDistantLight feDropShadow feFlood
++	feFuncA feFuncB feFuncG feFuncR feGaussianBlur feImage feMerge feMergeNode
++	feMorphology feOffset fePointLight feSpecularLighting feSpotLight feTile
++	feTurbulence filter foreignObject g image line linearGradient marker mask
++	metadata mpath path pattern polygon polyline radialGradient rect set stop svg
++	switch symbol text textPath tspan use view`.split( /\s+/ )
++);
++
++const baseElementProps = new Set(
++	`children dangerouslySetInnerHTML key autoFocus defaultValue defaultChecked
++	innerHTML suppressContentEditableWarning suppressHydrationWarning valueLink
++	abbr accept acceptCharset accessKey action allow allowUserMedia
++	allowPaymentRequest allowFullScreen allowTransparency alt async autoComplete
++	autoPlay capture cellPadding cellSpacing challenge charSet checked cite classID
++	className cols colSpan content contentEditable contextMenu controls controlsList
++	coords crossOrigin data dateTime decoding default defer dir disabled
++	disablePictureInPicture disableRemotePlayback download draggable encType
++	enterKeyHint fetchpriority fetchPriority form formAction formEncType formMethod
++	formNoValidate formTarget frameBorder headers height hidden high href hrefLang
++	htmlFor httpEquiv id inputMode integrity is keyParams keyType kind label lang
++	list loading loop low marginHeight marginWidth max maxLength media mediaGroup
++	method min minLength multiple muted name nonce noValidate open optimum pattern
++	placeholder playsInline popover popoverTarget popoverTargetAction poster
++	preload profile radioGroup readOnly referrerPolicy rel required reversed role
++	rows rowSpan sandbox scope scoped scrolling seamless selected shape size sizes
++	slot span spellCheck src srcDoc srcLang srcSet start step style summary
++	tabIndex target title translate type useMap value width wmode wrap about
++	datatype inlist prefix property resource typeof vocab autoCapitalize
++	autoCorrect autoSave color incremental fallback inert itemProp itemScope
++	itemType itemID itemRef on option results security unselectable`.split( /\s+/ )
++);
++
++const svgElementProps = new Set(
++	`accentHeight accumulate additive alignmentBaseline allowReorder alphabetic
++	amplitude arabicForm ascent attributeName attributeType autoReverse azimuth
++	baseFrequency baselineShift baseProfile bbox begin bias by calcMode capHeight
++	clip clipPathUnits clipPath clipRule colorInterpolation
++	colorInterpolationFilters colorProfile colorRendering contentScriptType
++	contentStyleType cursor cx cy d decelerate descent diffuseConstant direction
++	display divisor dominantBaseline dur dx dy edgeMode elevation enableBackground
++	end exponent externalResourcesRequired fill fillOpacity fillRule filter
++	filterRes filterUnits floodColor floodOpacity focusable fontFamily fontSize
++	fontSizeAdjust fontStretch fontStyle fontVariant fontWeight format from fr fx
++	fy g1 g2 glyphName glyphOrientationHorizontal glyphOrientationVertical
++	glyphRef gradientTransform gradientUnits hanging horizAdvX horizOriginX
++	ideographic imageRendering in in2 intercept k k1 k2 k3 k4 kernelMatrix
++	kernelUnitLength kerning keyPoints keySplines keyTimes lengthAdjust
++	letterSpacing lightingColor limitingConeAngle local markerEnd markerMid
++	markerStart markerHeight markerUnits markerWidth mask maskContentUnits
++	maskUnits mathematical mode numOctaves offset opacity operator order orient
++	orientation origin overflow overlinePosition overlineThickness panose1
++	paintOrder pathLength patternContentUnits patternTransform patternUnits
++	pointerEvents points pointsAtX pointsAtY pointsAtZ preserveAlpha
++	preserveAspectRatio primitiveUnits r radius refX refY renderingIntent
++	repeatCount repeatDur requiredExtensions requiredFeatures restart result rotate
++	rx ry scale seed shapeRendering slope spacing specularConstant
++	specularExponent speed spreadMethod startOffset stdDeviation stemh stemv
++	stitchTiles stopColor stopOpacity strikethroughPosition strikethroughThickness
++	string stroke strokeDasharray strokeDashoffset strokeLinecap strokeLinejoin
++	strokeMiterlimit strokeOpacity strokeWidth surfaceScale systemLanguage
++	tableValues targetX targetY textAnchor textDecoration textRendering textLength
++	to transform u1 u2 underlinePosition underlineThickness unicode unicodeBidi
++	unicodeRange unitsPerEm vAlphabetic vHanging vIdeographic vMathematical values
++	vectorEffect version vertAdvY vertOriginX vertOriginY viewBox viewTarget
++	visibility widths wordSpacing writingMode x xHeight x1 x2 xChannelSelector
++	xlinkActuate xlinkArcrole xlinkHref xlinkRole xlinkShow xlinkTitle xlinkType
++	xmlBase xmlns xmlnsXlink xmlLang xmlSpace y y1 y2 yChannelSelector z
++	zoomAndPan`.split( /\s+/ )
++);
++
++const compatElementProps = new Set( [ 'autofocus', 'class', 'for' ] );
++
++function isValidIntrinsicElementProp( prop: string, element: string ) {
++	if (
++		customAttributeRegExp.test( prop ) ||
++		eventHandlerRegExp.test( prop )
++	) {
++		return true;
++	}
++
++	if ( baseElementProps.has( prop ) || compatElementProps.has( prop ) ) {
++		return true;
++	}
++
++	return svgElementNames.has( element ) && svgElementProps.has( prop );
++}
++
++function filterIntrinsicElementProps(
++	props: PolymorphicElementProps< React.ElementType >,
++	element: string
++) {
++	return Object.fromEntries(
++		Object.entries( props ).filter( ( [ prop ] ) =>
++			isValidIntrinsicElementProp( prop, element )
++		)
++	);
++}
++
++function UnforwardedPolymorphicElement(
++	{ as, ...props }: PolymorphicElementProps< React.ElementType >,
++	ref: React.ForwardedRef< unknown >
++) {
++	const Element = as || 'div';
++	const forwardedProps =
++		typeof Element === 'string'
++			? filterIntrinsicElementProps( props, Element )
++			: props;
++
++	return <Element ref={ ref } { ...forwardedProps } />;
++}
++
++/**
++ * Internal utility for components that need Emotion-compatible `as` behavior
++ * while rendering with plain React elements.
++ */
++export const PolymorphicElement = forwardRef(
++	UnforwardedPolymorphicElement
++) as < T extends React.ElementType = 'div' >(
++	props: PolymorphicElementProps< T > & {
++		ref?: PolymorphicElementRef< T >;
++	}
++) => React.ReactElement | null;
+diff --git a/packages/components/src/utils/test/polymorphic-element.tsx b/packages/components/src/utils/test/polymorphic-element.tsx
+new file mode 100644
+index 00000000000000..bcb0b063556051
+--- /dev/null
++++ b/packages/components/src/utils/test/polymorphic-element.tsx
+@@ -0,0 +1,231 @@
++import styled from '@emotion/styled';
++import { render, screen } from '@testing-library/react';
++import { renderToString } from 'react-dom/server';
++
++import { createElement, createRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { PolymorphicElement } from '../polymorphic-element';
++
++const StyledDiv = styled.div``;
++
++const components = [
++	{
++		name: 'PolymorphicElement',
++		Component: PolymorphicElement,
++	},
++	{
++		name: 'styled.div',
++		Component: StyledDiv,
++	},
++] as const;
++
++describe.each( components )( '$name', ( { Component: RawComponent } ) => {
++	const Component = RawComponent as typeof PolymorphicElement;
++
++	it( 'filters invalid props from intrinsic elements', () => {
++		render(
++			createElement( Component, {
++				as: 'label',
++				'data-testid': 'label',
++				htmlFor: 'field',
++				labelPosition: 'top',
++			} as Parameters< typeof Component >[ 0 ] & {
++				labelPosition: string;
++			} )
++		);
++
++		const label = screen.getByTestId( 'label' );
++
++		expect( label ).toHaveAttribute( 'for', 'field' );
++		expect( label ).not.toHaveAttribute( 'labelPosition' );
++		expect( label ).not.toHaveAttribute( 'labelposition' );
++	} );
++
++	it( 'preserves standard props for intrinsic elements', () => {
++		render(
++			<Component
++				aria-label="Notice"
++				className="custom-class"
++				data-testid="notice"
++				style={ { color: 'red' } }
++				title="Notice title"
++			/>
++		);
++
++		const element = screen.getByTestId( 'notice' );
++
++		expect( element ).toHaveAttribute( 'aria-label', 'Notice' );
++		expect( element ).toHaveAttribute( 'title', 'Notice title' );
++		expect( element ).toHaveClass( 'custom-class' );
++		expect( element ).toHaveStyle( { color: 'rgb(255, 0, 0)' } );
++	} );
++
++	it( 'preserves standard props without relying on the DOM', () => {
++		const view = renderToString(
++			createElement( Component, {
++				as: 'form',
++				acceptCharset: 'utf-8',
++			} as Parameters< typeof Component >[ 0 ] & {
++				acceptCharset: string;
++			} )
++		);
++
++		expect( view ).toContain( 'accept-charset="utf-8"' );
++	} );
++
++	it( 'preserves SVG props for SVG intrinsic elements', () => {
++		render(
++			<Component
++				as="svg"
++				data-testid="svg"
++				fill="currentColor"
++				preserveAspectRatio="xMidYMid meet"
++				stroke="none"
++				strokeWidth={ 2 }
++				viewBox="0 0 24 24"
++			/>
++		);
++
++		const svg = screen.getByTestId( 'svg' );
++
++		expect( svg ).toHaveAttribute( 'fill', 'currentColor' );
++		expect( svg ).toHaveAttribute( 'preserveAspectRatio', 'xMidYMid meet' );
++		expect( svg ).toHaveAttribute( 'stroke', 'none' );
++		expect( svg ).toHaveAttribute( 'stroke-width', '2' );
++		expect( svg ).toHaveAttribute( 'viewBox', '0 0 24 24' );
++	} );
++
++	it( 'preserves SVG props without relying on the DOM', () => {
++		const view = renderToString(
++			<Component
++				as="svg"
++				fill="currentColor"
++				strokeWidth={ 2 }
++				viewBox="0 0 24 24"
++			/>
++		);
++
++		expect( view ).toContain( 'fill="currentColor"' );
++		expect( view ).toContain( 'stroke-width="2"' );
++		expect( view ).toContain( 'viewBox="0 0 24 24"' );
++	} );
++
++	it( 'preserves SVG props for non-SVG-root intrinsic elements', () => {
++		render(
++			<svg>
++				<Component
++					as="path"
++					d="M0 0h24v24H0z"
++					data-testid="path"
++					fillRule="evenodd"
++					clipPath="url(#clip)"
++				/>
++			</svg>
++		);
++
++		const path = screen.getByTestId( 'path' );
++
++		expect( path ).toHaveAttribute( 'clip-path', 'url(#clip)' );
++		expect( path ).toHaveAttribute( 'd', 'M0 0h24v24H0z' );
++		expect( path ).toHaveAttribute( 'fill-rule', 'evenodd' );
++	} );
++
++	it( 'filters invalid props from SVG intrinsic elements', () => {
++		render(
++			createElement( Component, {
++				as: 'svg',
++				'data-testid': 'svg',
++				labelPosition: 'top',
++				viewBox: '0 0 24 24',
++			} as Parameters< typeof Component >[ 0 ] & {
++				labelPosition: string;
++			} )
++		);
++
++		const svg = screen.getByTestId( 'svg' );
++
++		expect( svg ).toHaveAttribute( 'viewBox', '0 0 24 24' );
++		expect( svg ).not.toHaveAttribute( 'labelPosition' );
++		expect( svg ).not.toHaveAttribute( 'labelposition' );
++	} );
++
++	it( 'passes custom props through to custom components', () => {
++		function CustomComponent( {
++			variant,
++			...props
++		}: JSX.IntrinsicElements[ 'section' ] & {
++			variant: string;
++		} ) {
++			return <section data-variant={ variant } { ...props } />;
++		}
++
++		render(
++			<Component
++				as={ CustomComponent }
++				data-testid="custom"
++				variant="primary"
++			/>
++		);
++
++		expect( screen.getByTestId( 'custom' ) ).toHaveAttribute(
++			'data-variant',
++			'primary'
++		);
++	} );
++
++	it( 'forwards refs to the rendered element', () => {
++		const ref = createRef< HTMLButtonElement >();
++
++		render(
++			<Component
++				as="button"
++				data-testid="button"
++				ref={ ref }
++				type="button"
++			/>
++		);
++
++		expect( ref.current ).toBe( screen.getByTestId( 'button' ) );
++	} );
++} );
++
++describe( 'PolymorphicElement prop filtering', () => {
++	it( 'filters invalid on-prefixed props from intrinsic elements', () => {
++		render(
++			createElement( PolymorphicElement, {
++				'data-testid': 'element',
++				on1: 'invalid',
++				'on-foo': 'invalid',
++			} as Parameters< typeof PolymorphicElement >[ 0 ] & {
++				on1: string;
++				'on-foo': string;
++			} )
++		);
++
++		const element = screen.getByTestId( 'element' );
++
++		expect( element ).not.toHaveAttribute( 'on1' );
++		expect( element ).not.toHaveAttribute( 'on-foo' );
++	} );
++
++	it( 'filters SVG-only props from HTML intrinsic elements', () => {
++		render(
++			createElement( PolymorphicElement, {
++				'data-testid': 'element',
++				fill: 'currentColor',
++				strokeWidth: 2,
++			} as Parameters< typeof PolymorphicElement >[ 0 ] & {
++				fill: string;
++				strokeWidth: number;
++			} )
++		);
++
++		const element = screen.getByTestId( 'element' );
++
++		expect( element ).not.toHaveAttribute( 'fill' );
++		expect( element ).not.toHaveAttribute( 'stroke-width' );
++	} );
++} );
+diff --git a/packages/components/src/v-stack/test/__snapshots__/index.tsx.snap b/packages/components/src/v-stack/test/__snapshots__/index.tsx.snap
+index fbac33f7dc72c8..ebbd08d87154f3 100644
+--- a/packages/components/src/v-stack/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/v-stack/test/__snapshots__/index.tsx.snap
+@@ -6,6 +6,9 @@ exports[`props should render alignment 1`] = `
+   display: -webkit-flex;
+   display: -ms-flexbox;
+   display: flex;
++}
++
++.emotion-1 {
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -20,22 +23,18 @@ exports[`props should render alignment 1`] = `
+   justify-content: center;
+ }
+ 
+-.emotion-0>* {
++.emotion-2>* {
+   min-height: 0;
+ }
+ 
+ <div>
+   <div
+-    class="components-flex components-h-stack components-v-stack emotion-0 emotion-1"
++    class="emotion-0 emotion-1 emotion-2 components-flex components-h-stack components-v-stack"
+     data-wp-c16t="true"
+     data-wp-component="VStack"
+   >
+-    <div
+-      class="emotion-2 emotion-1"
+-    />
+-    <div
+-      class="emotion-2 emotion-1"
+-    />
++    <div />
++    <div />
+   </div>
+ </div>
+ `;
+@@ -46,6 +45,9 @@ exports[`props should render correctly 1`] = `
+   display: -webkit-flex;
+   display: -ms-flexbox;
+   display: flex;
++}
++
++.emotion-1 {
+   -webkit-align-items: stretch;
+   -webkit-box-align: stretch;
+   -ms-flex-align: stretch;
+@@ -60,22 +62,18 @@ exports[`props should render correctly 1`] = `
+   justify-content: center;
+ }
+ 
+-.emotion-0>* {
++.emotion-2>* {
+   min-height: 0;
+ }
+ 
+ <div>
+   <div
+-    class="components-flex components-h-stack components-v-stack emotion-0 emotion-1"
++    class="emotion-0 emotion-1 emotion-2 components-flex components-h-stack components-v-stack"
+     data-wp-c16t="true"
+     data-wp-component="VStack"
+   >
+-    <div
+-      class="emotion-2 emotion-1"
+-    />
+-    <div
+-      class="emotion-2 emotion-1"
+-    />
++    <div />
++    <div />
+   </div>
+ </div>
+ `;
+@@ -86,6 +84,9 @@ exports[`props should render spacing 1`] = `
+   display: -webkit-flex;
+   display: -ms-flexbox;
+   display: flex;
++}
++
++.emotion-1 {
+   -webkit-align-items: stretch;
+   -webkit-box-align: stretch;
+   -ms-flex-align: stretch;
+@@ -100,22 +101,18 @@ exports[`props should render spacing 1`] = `
+   justify-content: center;
+ }
+ 
+-.emotion-0>* {
++.emotion-2>* {
+   min-height: 0;
+ }
+ 
+ <div>
+   <div
+-    class="components-flex components-h-stack components-v-stack emotion-0 emotion-1"
++    class="emotion-0 emotion-1 emotion-2 components-flex components-h-stack components-v-stack"
+     data-wp-c16t="true"
+     data-wp-component="VStack"
+   >
+-    <div
+-      class="emotion-2 emotion-1"
+-    />
+-    <div
+-      class="emotion-2 emotion-1"
+-    />
++    <div />
++    <div />
+   </div>
+ </div>
+ `;
+diff --git a/packages/components/src/view/README.md b/packages/components/src/view/README.md
+index d480e01f30e297..f08c94e770ec99 100644
+--- a/packages/components/src/view/README.md
++++ b/packages/components/src/view/README.md
+@@ -29,9 +29,3 @@ function Example() {
+ **Type**: `string`,`E`
+ 
+ Render the component as another React Component or HTML Element.
+-
+-### css
+-
+-**Type**: `InterpolatedCSS`
+-
+-Render custom CSS using the style system.
+diff --git a/packages/components/src/view/component.tsx b/packages/components/src/view/component.tsx
+index 6742bd9f52e510..8c5866a904181d 100644
+--- a/packages/components/src/view/component.tsx
++++ b/packages/components/src/view/component.tsx
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import styled from '@emotion/styled';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -12,14 +7,28 @@ import { forwardRef } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import type { WordPressComponentProps } from '../context';
++import { PolymorphicElement } from '../utils/polymorphic-element';
+ 
+-const PolymorphicDiv = styled.div``;
++type ViewProps< T extends React.ElementType > = WordPressComponentProps<
++	{},
++	T
++> & {
++	/**
++	 * Legacy Emotion prop accepted by `View` so it does not leak to the
++	 * rendered element.
++	 *
++	 * @deprecated This prop no longer has any effect.
++	 * @ignore
++	 */
++	css?: unknown;
++};
+ 
+ function UnforwardedView< T extends React.ElementType = 'div' >(
+-	{ as, ...restProps }: WordPressComponentProps< {}, T >,
++	{ css, ...restProps }: ViewProps< T >,
+ 	ref: React.ForwardedRef< any >
+ ) {
+-	return <PolymorphicDiv as={ as } ref={ ref } { ...restProps } />;
++	void css;
++	return <PolymorphicElement ref={ ref } { ...restProps } />;
+ }
+ 
+ /**
+diff --git a/packages/components/src/view/test/__snapshots__/index.js.snap b/packages/components/src/view/test/__snapshots__/index.js.snap
+index f7014a5fd7b191..6a80237402112a 100644
+--- a/packages/components/src/view/test/__snapshots__/index.js.snap
++++ b/packages/components/src/view/test/__snapshots__/index.js.snap
+@@ -1,20 +1,28 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`props should render as another element 1`] = `
++exports[`props should render as a custom component 1`] = `
+ <div>
+-  <p
+-    class="css-1ragr82-PolymorphicDiv emotion-0"
++  <section
++    class="custom-class"
++    data-custom-component="true"
++    data-testid="custom-view"
+   >
+     <span />
++  </section>
++</div>
++`;
++
++exports[`props should render as another element 1`] = `
++<div>
++  <p>
++    <span />
+   </p>
+ </div>
+ `;
+ 
+ exports[`props should render correctly 1`] = `
+ <div>
+-  <div
+-    class="css-1ragr82-PolymorphicDiv emotion-0"
+-  >
++  <div>
+     <span />
+   </div>
+ </div>
+@@ -23,7 +31,7 @@ exports[`props should render correctly 1`] = `
+ exports[`props should render with custom styles (Array) 1`] = `
+ <div>
+   <p
+-    class="css-1ragr82-PolymorphicDiv emotion-0"
++    data-testid="custom-css-array-view"
+   >
+     <span />
+   </p>
+@@ -33,7 +41,7 @@ exports[`props should render with custom styles (Array) 1`] = `
+ exports[`props should render with custom styles (object) 1`] = `
+ <div>
+   <p
+-    class="css-1ragr82-PolymorphicDiv emotion-0"
++    data-testid="custom-css-object-view"
+   >
+     <span />
+   </p>
+@@ -43,7 +51,7 @@ exports[`props should render with custom styles (object) 1`] = `
+ exports[`props should render with custom styles (string) 1`] = `
+ <div>
+   <p
+-    class="css-1ragr82-PolymorphicDiv emotion-0"
++    data-testid="custom-css-string-view"
+   >
+     <span />
+   </p>
+diff --git a/packages/components/src/view/test/index.js b/packages/components/src/view/test/index.js
+index 56c6f7cd7a1487..53cd29a78df705 100644
+--- a/packages/components/src/view/test/index.js
++++ b/packages/components/src/view/test/index.js
+@@ -1,7 +1,12 @@
+ /**
+  * External dependencies
+  */
+-import { render } from '@testing-library/react';
++import { render, screen } from '@testing-library/react';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -27,10 +32,50 @@ describe( 'props', () => {
+ 		expect( container ).toMatchSnapshot();
+ 	} );
+ 
++	test( 'should render as a custom component', () => {
++		const CustomComponent = forwardRef( ( props, ref ) => (
++			<section ref={ ref } data-custom-component { ...props } />
++		) );
++
++		const ref = jest.fn();
++		const { container } = render(
++			<View
++				as={ CustomComponent }
++				className="custom-class"
++				data-testid="custom-view"
++				ref={ ref }
++			>
++				<span />
++			</View>
++		);
++
++		const customView = screen.getByTestId( 'custom-view' );
++		expect( container ).toMatchSnapshot();
++		expect( ref ).toHaveBeenCalledWith( customView );
++	} );
++
++	test( 'should preserve SVG attributes', () => {
++		render(
++			<View
++				as="svg"
++				data-testid="svg-view"
++				fill="currentColor"
++				strokeWidth={ 2 }
++				viewBox="0 0 24 24"
++			/>
++		);
++
++		const svgView = screen.getByTestId( 'svg-view' );
++		expect( svgView ).toHaveAttribute( 'fill', 'currentColor' );
++		expect( svgView ).toHaveAttribute( 'stroke-width', '2' );
++		expect( svgView ).toHaveAttribute( 'viewBox', '0 0 24 24' );
++	} );
++
+ 	test( 'should render with custom styles (string)', () => {
+ 		const { container } = render(
+ 			<View
+ 				as="p"
++				data-testid="custom-css-string-view"
+ 				css={ `
+ 					background: pink;
+ 				` }
+@@ -39,12 +84,16 @@ describe( 'props', () => {
+ 			</View>
+ 		);
+ 		expect( container ).toMatchSnapshot();
++		expect(
++			screen.getByTestId( 'custom-css-string-view' )
++		).not.toHaveAttribute( 'css' );
+ 	} );
+ 
+ 	test( 'should render with custom styles (object)', () => {
+ 		const { container } = render(
+ 			<View
+ 				as="p"
++				data-testid="custom-css-object-view"
+ 				css={ {
+ 					background: 'pink',
+ 				} }
+@@ -53,12 +102,16 @@ describe( 'props', () => {
+ 			</View>
+ 		);
+ 		expect( container ).toMatchSnapshot();
++		expect(
++			screen.getByTestId( 'custom-css-object-view' )
++		).not.toHaveAttribute( 'css' );
+ 	} );
+ 
+ 	test( 'should render with custom styles (Array)', () => {
+ 		const { container } = render(
+ 			<View
+ 				as="p"
++				data-testid="custom-css-array-view"
+ 				css={ [
+ 					{
+ 						background: 'pink',
+@@ -70,5 +123,8 @@ describe( 'props', () => {
+ 			</View>
+ 		);
+ 		expect( container ).toMatchSnapshot();
++		expect(
++			screen.getByTestId( 'custom-css-array-view' )
++		).not.toHaveAttribute( 'css' );
+ 	} );
+ } );
+diff --git a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/enable-custom-fields.js.snap b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/enable-custom-fields.js.snap
+index bf12d7d0d8facc..e817ec74c96f5f 100644
+--- a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/enable-custom-fields.js.snap
++++ b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/enable-custom-fields.js.snap
+@@ -22,6 +22,9 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation
+   display: -webkit-flex;
+   display: -ms-flexbox;
+   display: flex;
++}
++
++.emotion-5 {
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -37,11 +40,11 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation
+   width: 100%;
+ }
+ 
+-.emotion-4>* {
++.emotion-6>* {
+   min-width: 0;
+ }
+ 
+-.emotion-6 {
++.emotion-7 {
+   display: block;
+   max-height: 100%;
+   max-width: 100%;
+@@ -63,7 +66,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation
+         class="components-base-control__field emotion-2 emotion-3"
+       >
+         <div
+-          class="components-flex components-h-stack emotion-4 emotion-5"
++          class="emotion-4 emotion-5 emotion-6 components-flex components-h-stack"
+           data-wp-c16t="true"
+           data-wp-component="HStack"
+         >
+@@ -83,7 +86,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation
+             />
+           </span>
+           <label
+-            class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
++            class="emotion-7 components-flex-item components-flex-block components-toggle-control__label"
+             data-wp-c16t="true"
+             data-wp-component="FlexBlock"
+             for="inspector-toggle-control-3"
+@@ -128,6 +131,9 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields
+   display: -webkit-flex;
+   display: -ms-flexbox;
+   display: flex;
++}
++
++.emotion-5 {
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -143,11 +149,11 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields
+   width: 100%;
+ }
+ 
+-.emotion-4>* {
++.emotion-6>* {
+   min-width: 0;
+ }
+ 
+-.emotion-6 {
++.emotion-7 {
+   display: block;
+   max-height: 100%;
+   max-width: 100%;
+@@ -169,7 +175,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields
+         class="components-base-control__field emotion-2 emotion-3"
+       >
+         <div
+-          class="components-flex components-h-stack emotion-4 emotion-5"
++          class="emotion-4 emotion-5 emotion-6 components-flex components-h-stack"
+           data-wp-c16t="true"
+           data-wp-component="HStack"
+         >
+@@ -190,7 +196,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields
+             />
+           </span>
+           <label
+-            class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
++            class="emotion-7 components-flex-item components-flex-block components-toggle-control__label"
+             data-wp-c16t="true"
+             data-wp-component="FlexBlock"
+             for="inspector-toggle-control-0"
+@@ -224,6 +230,9 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
+   display: -webkit-flex;
+   display: -ms-flexbox;
+   display: flex;
++}
++
++.emotion-5 {
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -239,11 +248,11 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
+   width: 100%;
+ }
+ 
+-.emotion-4>* {
++.emotion-6>* {
+   min-width: 0;
+ }
+ 
+-.emotion-6 {
++.emotion-7 {
+   display: block;
+   max-height: 100%;
+   max-width: 100%;
+@@ -265,7 +274,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
+         class="components-base-control__field emotion-2 emotion-3"
+       >
+         <div
+-          class="components-flex components-h-stack emotion-4 emotion-5"
++          class="emotion-4 emotion-5 emotion-6 components-flex components-h-stack"
+           data-wp-c16t="true"
+           data-wp-component="HStack"
+         >
+@@ -286,7 +295,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
+             />
+           </span>
+           <label
+-            class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
++            class="emotion-7 components-flex-item components-flex-block components-toggle-control__label"
+             data-wp-c16t="true"
+             data-wp-component="FlexBlock"
+             for="inspector-toggle-control-2"
+@@ -331,6 +340,9 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fiel
+   display: -webkit-flex;
+   display: -ms-flexbox;
+   display: flex;
++}
++
++.emotion-5 {
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -346,11 +358,11 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fiel
+   width: 100%;
+ }
+ 
+-.emotion-4>* {
++.emotion-6>* {
+   min-width: 0;
+ }
+ 
+-.emotion-6 {
++.emotion-7 {
+   display: block;
+   max-height: 100%;
+   max-width: 100%;
+@@ -372,7 +384,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fiel
+         class="components-base-control__field emotion-2 emotion-3"
+       >
+         <div
+-          class="components-flex components-h-stack emotion-4 emotion-5"
++          class="emotion-4 emotion-5 emotion-6 components-flex components-h-stack"
+           data-wp-c16t="true"
+           data-wp-component="HStack"
+         >
+@@ -392,7 +404,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fiel
+             />
+           </span>
+           <label
+-            class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
++            class="emotion-7 components-flex-item components-flex-block components-toggle-control__label"
+             data-wp-c16t="true"
+             data-wp-component="FlexBlock"
+             for="inspector-toggle-control-1"
+diff --git a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/meta-boxes-section.js.snap b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/meta-boxes-section.js.snap
+index f9fb99199a3197..e9d909ac655264 100644
+--- a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/meta-boxes-section.js.snap
++++ b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/meta-boxes-section.js.snap
+@@ -22,6 +22,9 @@ exports[`MetaBoxesSection renders a Custom Fields option 1`] = `
+   display: -webkit-flex;
+   display: -ms-flexbox;
+   display: flex;
++}
++
++.emotion-5 {
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -37,11 +40,11 @@ exports[`MetaBoxesSection renders a Custom Fields option 1`] = `
+   width: 100%;
+ }
+ 
+-.emotion-4>* {
++.emotion-6>* {
+   min-width: 0;
+ }
+ 
+-.emotion-6 {
++.emotion-7 {
+   display: block;
+   max-height: 100%;
+   max-width: 100%;
+@@ -77,7 +80,7 @@ exports[`MetaBoxesSection renders a Custom Fields option 1`] = `
+           class="components-base-control__field emotion-2 emotion-3"
+         >
+           <div
+-            class="components-flex components-h-stack emotion-4 emotion-5"
++            class="emotion-4 emotion-5 emotion-6 components-flex components-h-stack"
+             data-wp-c16t="true"
+             data-wp-component="HStack"
+           >
+@@ -97,7 +100,7 @@ exports[`MetaBoxesSection renders a Custom Fields option 1`] = `
+               />
+             </span>
+             <label
+-              class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
++              class="emotion-7 components-flex-item components-flex-block components-toggle-control__label"
+               data-wp-c16t="true"
+               data-wp-component="FlexBlock"
+               for="inspector-toggle-control-0"
+@@ -134,6 +137,9 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
+   display: -webkit-flex;
+   display: -ms-flexbox;
+   display: flex;
++}
++
++.emotion-5 {
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -149,11 +155,11 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
+   width: 100%;
+ }
+ 
+-.emotion-4>* {
++.emotion-6>* {
+   min-width: 0;
+ }
+ 
+-.emotion-6 {
++.emotion-7 {
+   display: block;
+   max-height: 100%;
+   max-width: 100%;
+@@ -189,7 +195,7 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
+           class="components-base-control__field emotion-2 emotion-3"
+         >
+           <div
+-            class="components-flex components-h-stack emotion-4 emotion-5"
++            class="emotion-4 emotion-5 emotion-6 components-flex components-h-stack"
+             data-wp-c16t="true"
+             data-wp-component="HStack"
+           >
+@@ -209,7 +215,7 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
+               />
+             </span>
+             <label
+-              class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
++              class="emotion-7 components-flex-item components-flex-block components-toggle-control__label"
+               data-wp-c16t="true"
+               data-wp-component="FlexBlock"
+               for="inspector-toggle-control-3"
+@@ -230,7 +236,7 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
+           class="components-base-control__field emotion-2 emotion-3"
+         >
+           <div
+-            class="components-flex components-h-stack emotion-4 emotion-5"
++            class="emotion-4 emotion-5 emotion-6 components-flex components-h-stack"
+             data-wp-c16t="true"
+             data-wp-component="HStack"
+           >
+@@ -251,7 +257,7 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
+               />
+             </span>
+             <label
+-              class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
++              class="emotion-7 components-flex-item components-flex-block components-toggle-control__label"
+               data-wp-c16t="true"
+               data-wp-component="FlexBlock"
+               for="inspector-toggle-control-4"
+@@ -272,7 +278,7 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
+           class="components-base-control__field emotion-2 emotion-3"
+         >
+           <div
+-            class="components-flex components-h-stack emotion-4 emotion-5"
++            class="emotion-4 emotion-5 emotion-6 components-flex components-h-stack"
+             data-wp-c16t="true"
+             data-wp-component="HStack"
+           >
+@@ -293,7 +299,7 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
+               />
+             </span>
+             <label
+-              class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
++              class="emotion-7 components-flex-item components-flex-block components-toggle-control__label"
+               data-wp-c16t="true"
+               data-wp-component="FlexBlock"
+               for="inspector-toggle-control-5"
+@@ -330,6 +336,9 @@ exports[`MetaBoxesSection renders meta box options 1`] = `
+   display: -webkit-flex;
+   display: -ms-flexbox;
+   display: flex;
++}
++
++.emotion-5 {
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -345,11 +354,11 @@ exports[`MetaBoxesSection renders meta box options 1`] = `
+   width: 100%;
+ }
+ 
+-.emotion-4>* {
++.emotion-6>* {
+   min-width: 0;
+ }
+ 
+-.emotion-6 {
++.emotion-7 {
+   display: block;
+   max-height: 100%;
+   max-width: 100%;
+@@ -385,7 +394,7 @@ exports[`MetaBoxesSection renders meta box options 1`] = `
+           class="components-base-control__field emotion-2 emotion-3"
+         >
+           <div
+-            class="components-flex components-h-stack emotion-4 emotion-5"
++            class="emotion-4 emotion-5 emotion-6 components-flex components-h-stack"
+             data-wp-c16t="true"
+             data-wp-component="HStack"
+           >
+@@ -406,7 +415,7 @@ exports[`MetaBoxesSection renders meta box options 1`] = `
+               />
+             </span>
+             <label
+-              class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
++              class="emotion-7 components-flex-item components-flex-block components-toggle-control__label"
+               data-wp-c16t="true"
+               data-wp-component="FlexBlock"
+               for="inspector-toggle-control-1"
+@@ -427,7 +436,7 @@ exports[`MetaBoxesSection renders meta box options 1`] = `
+           class="components-base-control__field emotion-2 emotion-3"
+         >
+           <div
+-            class="components-flex components-h-stack emotion-4 emotion-5"
++            class="emotion-4 emotion-5 emotion-6 components-flex components-h-stack"
+             data-wp-c16t="true"
+             data-wp-component="HStack"
+           >
+@@ -448,7 +457,7 @@ exports[`MetaBoxesSection renders meta box options 1`] = `
+               />
+             </span>
+             <label
+-              class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
++              class="emotion-7 components-flex-item components-flex-block components-toggle-control__label"
+               data-wp-c16t="true"
+               data-wp-component="FlexBlock"
+               for="inspector-toggle-control-2"
+diff --git a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+index 3bba0650f513ef..d45cfaefc48370 100644
+--- a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
++++ b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+@@ -32,6 +32,9 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
+   display: -webkit-flex;
+   display: -ms-flexbox;
+   display: flex;
++}
++
++.emotion-11 {
+   -webkit-align-items: flex-start;
+   -webkit-box-align: flex-start;
+   -ms-flex-align: flex-start;
+@@ -47,7 +50,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
+   width: 100%;
+ }
+ 
+-.emotion-10>* {
++.emotion-12>* {
+   min-width: 0;
+ }
+ 
+@@ -199,7 +202,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
+           class="components-base-control__field emotion-2 emotion-3"
+         >
+           <div
+-            class="components-flex components-h-stack emotion-10 emotion-11"
++            class="emotion-10 emotion-11 emotion-12 components-flex components-h-stack"
+             data-wp-c16t="true"
+             data-wp-component="HStack"
+           >
+@@ -259,6 +262,9 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
+   display: -webkit-flex;
+   display: -ms-flexbox;
+   display: flex;
++}
++
++.emotion-11 {
+   -webkit-align-items: flex-start;
+   -webkit-box-align: flex-start;
+   -ms-flex-align: flex-start;
+@@ -274,7 +280,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
+   width: 100%;
+ }
+ 
+-.emotion-10>* {
++.emotion-12>* {
+   min-width: 0;
+ }
+ 
+@@ -405,7 +411,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
+           class="components-base-control__field emotion-2 emotion-3"
+         >
+           <div
+-            class="components-flex components-h-stack emotion-10 emotion-11"
++            class="emotion-10 emotion-11 emotion-12 components-flex components-h-stack"
+             data-wp-c16t="true"
+             data-wp-component="HStack"
+           >
+@@ -455,6 +461,9 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is
+   display: -webkit-flex;
+   display: -ms-flexbox;
+   display: flex;
++}
++
++.emotion-5 {
+   -webkit-align-items: flex-start;
+   -webkit-box-align: flex-start;
+   -ms-flex-align: flex-start;
+@@ -470,7 +479,7 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is
+   width: 100%;
+ }
+ 
+-.emotion-4>* {
++.emotion-6>* {
+   min-width: 0;
+ }
+ 
+@@ -560,7 +569,7 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is
+           class="components-base-control__field emotion-2 emotion-3"
+         >
+           <div
+-            class="components-flex components-h-stack emotion-4 emotion-5"
++            class="emotion-4 emotion-5 emotion-6 components-flex components-h-stack"
+             data-wp-c16t="true"
+             data-wp-component="HStack"
+           >
+@@ -610,6 +619,9 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
+   display: -webkit-flex;
+   display: -ms-flexbox;
+   display: flex;
++}
++
++.emotion-5 {
+   -webkit-align-items: flex-start;
+   -webkit-box-align: flex-start;
+   -ms-flex-align: flex-start;
+@@ -625,7 +637,7 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
+   width: 100%;
+ }
+ 
+-.emotion-4>* {
++.emotion-6>* {
+   min-width: 0;
+ }
+ 
+@@ -715,7 +727,7 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
+           class="components-base-control__field emotion-2 emotion-3"
+         >
+           <div
+-            class="components-flex components-h-stack emotion-4 emotion-5"
++            class="emotion-4 emotion-5 emotion-6 components-flex components-h-stack"
+             data-wp-c16t="true"
+             data-wp-component="HStack"
+           >
+@@ -809,6 +821,9 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
+   display: -webkit-flex;
+   display: -ms-flexbox;
+   display: flex;
++}
++
++.emotion-11 {
+   -webkit-align-items: flex-start;
+   -webkit-box-align: flex-start;
+   -ms-flex-align: flex-start;
+@@ -824,7 +839,7 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
+   width: 100%;
+ }
+ 
+-.emotion-10>* {
++.emotion-12>* {
+   min-width: 0;
+ }
+ 
+@@ -894,7 +909,7 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
+           class="components-base-control__field emotion-8 emotion-9"
+         >
+           <div
+-            class="components-flex components-h-stack emotion-10 emotion-11"
++            class="emotion-10 emotion-11 emotion-12 components-flex components-h-stack"
+             data-wp-c16t="true"
+             data-wp-component="HStack"
+           >
+diff --git a/tools/eslint/suppressions.json b/tools/eslint/suppressions.json
+index 20420c5950768d..3e055b5843825a 100644
+--- a/tools/eslint/suppressions.json
++++ b/tools/eslint/suppressions.json
+@@ -754,7 +754,7 @@
+ 	},
+ 	"packages/components/src/flex/flex-item/hook.ts": {
+ 		"no-restricted-imports": {
+-			"count": 2
++			"count": 1
+ 		}
+ 	},
+ 	"packages/components/src/flex/flex/hook.ts": {
+@@ -970,6 +970,11 @@
+ 			"count": 2
+ 		}
+ 	},
++	"packages/components/src/utils/test/polymorphic-element.tsx": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
+ 	"packages/components/src/tree-grid/cell.tsx": {
+ 		"react-hooks/refs": {
+ 			"count": 1
+@@ -1010,11 +1015,6 @@
+ 			"count": 1
+ 		}
+ 	},
+-	"packages/components/src/view/component.tsx": {
+-		"no-restricted-imports": {
+-			"count": 1
+-		}
+-	},
+ 	"packages/components/src/z-stack/styles.ts": {
+ 		"no-restricted-imports": {
+ 			"count": 2

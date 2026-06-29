@@ -1,0 +1,160 @@
+diff --git a/packages/components/src/text-control/README.md b/packages/components/src/text-control/README.md
+index 2a95e4c46864b8..4e2bfccb786d22 100644
+--- a/packages/components/src/text-control/README.md
++++ b/packages/components/src/text-control/README.md
+@@ -62,6 +62,7 @@ const MyTextControl = () => {
+ 
+ 	return (
+ 		<TextControl
++			__nextHasNoMarginBottom
+ 			label="Additional CSS Class"
+ 			value={ className }
+ 			onChange={ ( value ) => setClassName( value ) }
+diff --git a/packages/components/src/text-control/index.tsx b/packages/components/src/text-control/index.tsx
+index e964f918c119e0..1643c5bc37c347 100644
+--- a/packages/components/src/text-control/index.tsx
++++ b/packages/components/src/text-control/index.tsx
+@@ -75,6 +75,7 @@ function UnforwardedTextControl(
+  *
+  *   return (
+  *     <TextControl
++ *       __nextHasNoMarginBottom
+  *       label="Additional CSS Class"
+  *       value={ className }
+  *       onChange={ ( value ) => setClassName( value ) }
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md
+index 8b96470e21301e..a0e3a44cf74607 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md
+@@ -17,7 +17,7 @@ import { formatLowercase, formatUppercase } from '@wordpress/icons';
+ 
+ function Example() {
+ 	return (
+-		<ToggleGroupControl>
++		<ToggleGroupControl __nextHasNoMarginBottom>
+ 			<ToggleGroupControlOptionIcon
+ 				value="uppercase"
+ 				icon={ formatUppercase }
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
+index ec009d82344c39..352b4acee71844 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
+@@ -51,20 +51,20 @@ function UnforwardedToggleGroupControlOptionIcon(
+  * import { formatLowercase, formatUppercase } from '@wordpress/icons';
+  *
+  * function Example() {
+- *	return (
+- *		<ToggleGroupControl>
+- *			<ToggleGroupControlOptionIcon
+- *				value="uppercase"
+- *				label="Uppercase"
+- *				icon={ formatUppercase }
+- *			/>
+- *			<ToggleGroupControlOptionIcon
+- *				value="lowercase"
+- *				label="Lowercase"
+- *				icon={ formatLowercase }
+- *			/>
+- *		</ToggleGroupControl>
+- *	);
++ *  return (
++ *    <ToggleGroupControl __nextHasNoMarginBottom>
++ *      <ToggleGroupControlOptionIcon
++ *        value="uppercase"
++ *        label="Uppercase"
++ *        icon={ formatUppercase }
++ *      />
++ *      <ToggleGroupControlOptionIcon
++ *        value="lowercase"
++ *        label="Lowercase"
++ *        icon={ formatLowercase }
++ *      />
++ *    </ToggleGroupControl>
++ *  );
+  * }
+  * ```
+  */
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option/README.md b/packages/components/src/toggle-group-control/toggle-group-control-option/README.md
+index 7f9f4d32f29fc3..2e7c55bd688361 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option/README.md
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option/README.md
+@@ -17,7 +17,12 @@ import {
+ 
+ function Example() {
+ 	return (
+-		<ToggleGroupControl label="my label" value="vertical" isBlock>
++		<ToggleGroupControl
++			label="my label"
++			value="vertical"
++			isBlock
++			__nextHasNoMarginBottom
++		>
+ 			<ToggleGroupControlOption
+ 				value="horizontal"
+ 				label="Horizontal"
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
+index e4b9cff4b80330..b71d37e81cf25f 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
+@@ -48,7 +48,12 @@ function UnforwardedToggleGroupControlOption(
+  *
+  * function Example() {
+  *   return (
+- *     <ToggleGroupControl label="my label" value="vertical" isBlock>
++ *     <ToggleGroupControl
++ *       label="my label"
++ *       value="vertical"
++ *       isBlock
++ *       __nextHasNoMarginBottom
++ *     >
+  *       <ToggleGroupControlOption value="horizontal" label="Horizontal" />
+  *       <ToggleGroupControlOption value="vertical" label="Vertical" />
+  *     </ToggleGroupControl>
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/README.md b/packages/components/src/toggle-group-control/toggle-group-control/README.md
+index 64e0489f4171b7..6db7ec20544185 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/README.md
++++ b/packages/components/src/toggle-group-control/toggle-group-control/README.md
+@@ -20,7 +20,12 @@ import {
+ 
+ function Example() {
+ 	return (
+-		<ToggleGroupControl label="my label" value="vertical" isBlock>
++		<ToggleGroupControl
++			label="my label"
++			value="vertical"
++			isBlock
++			__nextHasNoMarginBottom
++		>
+ 			<ToggleGroupControlOption value="horizontal" label="Horizontal" />
+ 			<ToggleGroupControlOption value="vertical" label="Vertical" />
+ 		</ToggleGroupControl>
+@@ -82,3 +87,10 @@ Callback when a segment is selected.
+ The value of the `ToggleGroupControl`.
+ 
+ -   Required: No
++
++### `__nextHasNoMarginBottom`: `boolean`
++
++Start opting into the new margin-free styles that will become the default in a future version.
++
++-   Required: No
++-   Default: `false`
+\ No newline at end of file
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index 520b2c414d70b9..8138b76505fe50 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -115,7 +115,12 @@ function UnconnectedToggleGroupControl(
+  *
+  * function Example() {
+  *   return (
+- *     <ToggleGroupControl label="my label" value="vertical" isBlock>
++ *     <ToggleGroupControl
++ *       label="my label"
++ *       value="vertical"
++ *       isBlock
++ *       __nextHasNoMarginBottom
++ *     >
+  *       <ToggleGroupControlOption value="horizontal" label="Horizontal" />
+  *       <ToggleGroupControlOption value="vertical" label="Vertical" />
+  *     </ToggleGroupControl>

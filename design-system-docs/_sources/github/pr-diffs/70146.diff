@@ -1,0 +1,36 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 521c2e5699c975..8f045f7d27aee0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancement
++
++-   `ColorPicker`: Improve color picker slider focus styles for better keyboard navigation accessibility ([#70146](https://github.com/WordPress/gutenberg/pull/70146)).
++
+ ### Bug Fixes
+ 
+ -   `FormFileUpload`: Extend audio accept MIME types for iOS compatibility ([#70354](https://github.com/WordPress/gutenberg/pull/70354)).
+diff --git a/packages/components/src/color-picker/styles.ts b/packages/components/src/color-picker/styles.ts
+index 50ce33da9f2333..608d1cc7b0d7e6 100644
+--- a/packages/components/src/color-picker/styles.ts
++++ b/packages/components/src/color-picker/styles.ts
+@@ -91,6 +91,16 @@ export const ColorfulWrapper = styled.div`
+ 
+ 		// Shown instead of box-shadow to Windows high contrast mode.
+ 		outline: 2px solid transparent;
++
++		@media not ( prefers-reduced-motion ) {
++			transition: transform ${ CONFIG.transitionDurationFast } ease-in-out;
++		}
++	}
++
++	.react-colorful__interactive:focus .react-colorful__pointer {
++		box-shadow: 0 0 0 ${ CONFIG.borderWidthFocus } ${ CONFIG.surfaceColor };
++		border: ${ CONFIG.borderWidthFocus } solid black;
++		transform: translate( -50%, -50% ) scale( 1.5 );
+ 	}
+ 
+ 	.react-colorful__pointer-fill {

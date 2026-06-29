@@ -1,0 +1,126 @@
+diff --git a/packages/components/src/slot-fill/fill.js b/packages/components/src/slot-fill/fill.js
+index 745439a275dd1e..e7ff943df07bff 100644
+--- a/packages/components/src/slot-fill/fill.js
++++ b/packages/components/src/slot-fill/fill.js
+@@ -3,7 +3,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { createPortal, useLayoutEffect, useRef } from '@wordpress/element';
++import { useContext, useLayoutEffect, useRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -11,7 +11,8 @@ import { createPortal, useLayoutEffect, useRef } from '@wordpress/element';
+ import SlotFillContext from './context';
+ import useSlot from './use-slot';
+ 
+-function FillComponent( { name, children, registerFill, unregisterFill } ) {
++export default function Fill( { name, children } ) {
++	const { registerFill, unregisterFill } = useContext( SlotFillContext );
+ 	const slot = useSlot( name );
+ 
+ 	const ref = useRef( {
+@@ -51,28 +52,5 @@ function FillComponent( { name, children, registerFill, unregisterFill } ) {
+ 		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ name ] );
+ 
+-	if ( ! slot || ! slot.node ) {
+-		return null;
+-	}
+-
+-	// If a function is passed as a child, provide it with the fillProps.
+-	if ( typeof children === 'function' ) {
+-		children = children( slot.props.fillProps );
+-	}
+-
+-	return createPortal( children, slot.node );
++	return null;
+ }
+-
+-const Fill = ( props ) => (
+-	<SlotFillContext.Consumer>
+-		{ ( { registerFill, unregisterFill } ) => (
+-			<FillComponent
+-				{ ...props }
+-				registerFill={ registerFill }
+-				unregisterFill={ unregisterFill }
+-			/>
+-		) }
+-	</SlotFillContext.Consumer>
+-);
+-
+-export default Fill;
+diff --git a/packages/components/src/slot-fill/index.js b/packages/components/src/slot-fill/index.js
+index 24e68aa8877044..8deaa180492a7f 100644
+--- a/packages/components/src/slot-fill/index.js
++++ b/packages/components/src/slot-fill/index.js
+@@ -13,7 +13,7 @@ import BubblesVirtuallyFill from './bubbles-virtually/fill';
+ import BubblesVirtuallySlot from './bubbles-virtually/slot';
+ import BubblesVirtuallySlotFillProvider from './bubbles-virtually/slot-fill-provider';
+ import SlotFillProvider from './provider';
+-import useSlot from './bubbles-virtually/use-slot';
++export { default as useSlot } from './bubbles-virtually/use-slot';
+ export { default as useSlotFills } from './bubbles-virtually/use-slot-fills';
+ 
+ export function Fill( props ) {
+@@ -65,5 +65,3 @@ export const createPrivateSlotFill = ( name ) => {
+ 
+ 	return { privateKey, ...privateSlotFill };
+ };
+-
+-export { useSlot };
+diff --git a/packages/components/src/slot-fill/provider.js b/packages/components/src/slot-fill/provider.js
+index 37b4560140516c..94c83c3c350111 100644
+--- a/packages/components/src/slot-fill/provider.js
++++ b/packages/components/src/slot-fill/provider.js
+@@ -19,7 +19,6 @@ export default class SlotFillProvider extends Component {
+ 		this.unregisterFill = this.unregisterFill.bind( this );
+ 		this.getSlot = this.getSlot.bind( this );
+ 		this.getFills = this.getFills.bind( this );
+-		this.hasFills = this.hasFills.bind( this );
+ 		this.subscribe = this.subscribe.bind( this );
+ 
+ 		this.slots = {};
+@@ -32,7 +31,6 @@ export default class SlotFillProvider extends Component {
+ 			unregisterFill: this.unregisterFill,
+ 			getSlot: this.getSlot,
+ 			getFills: this.getFills,
+-			hasFills: this.hasFills,
+ 			subscribe: this.subscribe,
+ 		};
+ 	}
+@@ -91,10 +89,6 @@ export default class SlotFillProvider extends Component {
+ 		return this.fills[ name ];
+ 	}
+ 
+-	hasFills( name ) {
+-		return this.fills[ name ] && !! this.fills[ name ].length;
+-	}
+-
+ 	forceUpdateSlot( name ) {
+ 		const slot = this.getSlot( name );
+ 
+diff --git a/packages/components/src/slot-fill/slot.js b/packages/components/src/slot-fill/slot.js
+index a314047600bd32..a960647c3ab64e 100644
+--- a/packages/components/src/slot-fill/slot.js
++++ b/packages/components/src/slot-fill/slot.js
+@@ -29,7 +29,6 @@ class SlotComponent extends Component {
+ 		super( ...arguments );
+ 
+ 		this.isUnmounted = false;
+-		this.bindNode = this.bindNode.bind( this );
+ 	}
+ 
+ 	componentDidMount() {
+@@ -53,10 +52,6 @@ class SlotComponent extends Component {
+ 		}
+ 	}
+ 
+-	bindNode( node ) {
+-		this.node = node;
+-	}
+-
+ 	forceUpdate() {
+ 		if ( this.isUnmounted ) {
+ 			return;

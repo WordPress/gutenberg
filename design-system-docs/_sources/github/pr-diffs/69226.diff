@@ -1,0 +1,27 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f425baae726172..6917427ef15716 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,10 @@
+ 
+ -   `NumberControl`: Fix invalid HTML attributes for infinite bounds ([#69033](https://github.com/WordPress/gutenberg/pull/69033)).
+ 
++### Bug Fixes
++
++-   `Notice`: Fix text contrast for dark mode ([#69226](https://github.com/WordPress/gutenberg/pull/69226)).
++
+ ## 29.4.0 (2025-02-12)
+ 
+ -   `FontSizePicker`: Remove Custom option from dropdown to prevent unexpected context changes during keyboard navigation ([#69038](https://github.com/WordPress/gutenberg/pull/69038)).
+diff --git a/packages/components/src/notice/style.scss b/packages/components/src/notice/style.scss
+index a2d6aca530a93c..9cfc2b983a4918 100644
+--- a/packages/components/src/notice/style.scss
++++ b/packages/components/src/notice/style.scss
+@@ -6,6 +6,7 @@
+ 	border-left: 4px solid $components-color-accent;
+ 	padding: 8px 12px;
+ 	align-items: center;
++	color: $gray-900;
+ 
+ 	&.is-dismissible {
+ 		position: relative;

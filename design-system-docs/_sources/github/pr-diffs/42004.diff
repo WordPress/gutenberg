@@ -1,0 +1,65 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 7cab43979de8d6..3cf72af32330dd 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Bug Fix
+ 
+ -   `ColorPicker`: Remove horizontal scrollbar when using HSL or RGB color input types. ([#41646](https://github.com/WordPress/gutenberg/pull/41646))
++-   `ColorPicker`: Widen hex input field for mobile. ([#42004](https://github.com/WordPress/gutenberg/pull/42004))
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/color-picker/hex-input.tsx b/packages/components/src/color-picker/hex-input.tsx
+index e62e8d3e526431..e1453a94ac9925 100644
+--- a/packages/components/src/color-picker/hex-input.tsx
++++ b/packages/components/src/color-picker/hex-input.tsx
+@@ -11,10 +11,10 @@ import { __ } from '@wordpress/i18n';
+ /**
+  * Internal dependencies
+  */
++import { InputControl } from '../input-control';
+ import { Text } from '../text';
+ import { Spacer } from '../spacer';
+ import { space } from '../ui/utils/space';
+-import { ColorHexInputControl } from './styles';
+ import { COLORS } from '../utils/colors-values';
+ import type { StateReducer } from '../input-control/reducer/state';
+ 
+@@ -49,7 +49,7 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
+ 	};
+ 
+ 	return (
+-		<ColorHexInputControl
++		<InputControl
+ 			prefix={
+ 				<Spacer
+ 					as={ Text }
+@@ -66,6 +66,7 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
+ 			label={ __( 'Hex color' ) }
+ 			hideLabelFromVision
+ 			__unstableStateReducer={ stateReducer }
++			__unstableInputWidth="9em"
+ 		/>
+ 	);
+ };
+diff --git a/packages/components/src/color-picker/styles.ts b/packages/components/src/color-picker/styles.ts
+index 4ff9e7fd61e528..17c44df6f0c184 100644
+--- a/packages/components/src/color-picker/styles.ts
++++ b/packages/components/src/color-picker/styles.ts
+@@ -19,7 +19,6 @@ import {
+ 	Container as InputControlContainer,
+ 	Input,
+ } from '../input-control/styles/input-control-styles';
+-import InputControl from '../input-control';
+ import CONFIG from '../utils/config-values';
+ 
+ export const NumberControlWrapper = styled( NumberControl )`
+@@ -140,7 +139,3 @@ export const CopyButton = styled( Button )`
+ 		}
+ 	}
+ `;
+-
+-export const ColorHexInputControl = styled( InputControl )`
+-	width: 8em;
+-`;

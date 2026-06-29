@@ -1,0 +1,108 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 50c96143bb4f0e..0012c14b6f64c8 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -17,6 +17,7 @@
+ 
+ ### Internal
+ 
++-   Remove `Picker` from private APIs ([#75394](https://github.com/WordPress/gutenberg/pull/75394)).
+ -   Expose `useDrag` from `@use-gesture/react` package via private API's ([#66735](https://github.com/WordPress/gutenberg/pull/66735)).
+ -   `Disabled`, `Modal`, `Popover`, `Tooltip`: Move context code to separate files to help docgen prop extraction ([#75316](https://github.com/WordPress/gutenberg/pull/75316)).
+ -   Update Emotion dependencies to ensure compatibility with React 19 ([#75324](https://github.com/WordPress/gutenberg/pull/75324)).
+diff --git a/packages/components/src/private-apis.ts b/packages/components/src/private-apis.ts
+index 862245ce6a1b66..43d85db9365f7a 100644
+--- a/packages/components/src/private-apis.ts
++++ b/packages/components/src/private-apis.ts
+@@ -30,7 +30,6 @@ import {
+ 	ValidatedToggleGroupControl,
+ } from './validated-form-controls';
+ import { ValidatedFormTokenField } from './validated-form-controls/components/form-token-field';
+-import { Picker } from './color-picker/picker';
+ 
+ export const privateApis = {};
+ lock( privateApis, {
+@@ -46,7 +45,6 @@ lock( privateApis, {
+ 	DateCalendar,
+ 	DateRangeCalendar,
+ 	TZDate,
+-	Picker,
+ 	useDrag,
+ 	ValidatedInputControl,
+ 	ValidatedCheckboxControl,
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index 8229445a68249c..e4daef564ea1c2 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -21,6 +21,10 @@
+ - Add new `adaptiveSelect` DataForm control. [#74937](https://github.com/WordPress/gutenberg/pull/74937)
+ - DataViews: Consistent rendering of selection checkbox and actions in grid layout. [#75056](https://github.com/WordPress/gutenberg/pull/75056)
+ 
++### Internal
++
++- DataForm: Use public `ColorPicker` component instead of internal `Picker` in color control. [#75394](https://github.com/WordPress/gutenberg/pull/75394)
++
+ ## 11.3.0 (2026-01-29)
+ 
+ ### Enhancements
+diff --git a/packages/dataviews/src/components/dataform-controls/color.tsx b/packages/dataviews/src/components/dataform-controls/color.tsx
+index 94225da8884243..8c096510e59db7 100644
+--- a/packages/dataviews/src/components/dataform-controls/color.tsx
++++ b/packages/dataviews/src/components/dataform-controls/color.tsx
+@@ -7,6 +7,7 @@ import { colord } from 'colord';
+  * WordPress dependencies
+  */
+ import {
++	ColorPicker,
+ 	Dropdown,
+ 	privateApis,
+ 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+@@ -20,14 +21,14 @@ import type { DataFormControlProps } from '../../types';
+ import { unlock } from '../../lock-unlock';
+ import getCustomValidity from './utils/get-custom-validity';
+ 
+-const { ValidatedInputControl, Picker } = unlock( privateApis );
++const { ValidatedInputControl } = unlock( privateApis );
+ 
+-const ColorPicker = ( {
++const ColorPickerDropdown = ( {
+ 	color,
+ 	onColorChange,
+ }: {
+ 	color: string;
+-	onColorChange: ( colorObject: any ) => void;
++	onColorChange: ( newColor: string ) => void;
+ } ) => {
+ 	const validColor = color && colord( color ).isValid() ? color : '#ffffff';
+ 
+@@ -59,8 +60,8 @@ const ColorPicker = ( {
+ 			) }
+ 			renderContent={ () => (
+ 				<div style={ { padding: '16px' } }>
+-					<Picker
+-						color={ colord( validColor ) }
++					<ColorPicker
++						color={ validColor }
+ 						onChange={ onColorChange }
+ 						enableAlpha
+ 					/>
+@@ -82,8 +83,8 @@ export default function Color< Item >( {
+ 	const value = field.getValue( { item: data } ) || '';
+ 
+ 	const handleColorChange = useCallback(
+-		( colorObject: any ) => {
+-			onChange( setValue( { item: data, value: colorObject.toHex() } ) );
++		( newColor: string ) => {
++			onChange( setValue( { item: data, value: newColor } ) );
+ 		},
+ 		[ data, onChange, setValue ]
+ 	);
+@@ -108,7 +109,7 @@ export default function Color< Item >( {
+ 			hideLabelFromVision={ hideLabelFromVision }
+ 			type="text"
+ 			prefix={
+-				<ColorPicker
++				<ColorPickerDropdown
+ 					color={ value }
+ 					onColorChange={ handleColorChange }
+ 				/>

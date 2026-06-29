@@ -1,0 +1,27 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b154c67525de5c..dd4cefe1cb2d47 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,10 @@
+ -   `Button`: Update font weight to `500` ([#70787](https://github.com/WordPress/gutenberg/pull/70787)).
+ -   `TabPanel`: Update tab font weight ([#72455](https://github.com/WordPress/gutenberg/pull/72455)).
+ 
++### Bug Fixes
++
++-   `Button`: Ensure that icons don't shrink ([#72474](https://github.com/WordPress/gutenberg/pull/72474)).
++
+ ## 30.6.0 (2025-10-17)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 5b42187a5bdb37..694b83f2cebd05 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -390,6 +390,7 @@
+ 	svg {
+ 		fill: currentColor;
+ 		outline: none;
++		flex-shrink: 0;
+ 
+ 		// Optimize for high contrast modes.
+ 		// See also https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/.

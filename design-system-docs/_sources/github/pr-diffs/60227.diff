@@ -1,0 +1,3892 @@
+diff --git a/packages/components/src/alignment-matrix-control/index.tsx b/packages/components/src/alignment-matrix-control/index.tsx
+index 3de0e401187d53..6f06be7a2b8bf1 100644
+--- a/packages/components/src/alignment-matrix-control/index.tsx
++++ b/packages/components/src/alignment-matrix-control/index.tsx
+@@ -18,7 +18,13 @@ import { Root, Row } from './styles/alignment-matrix-control-styles';
+ import AlignmentMatrixControlIcon from './icon';
+ import { GRID, getItemId, getItemValue } from './utils';
+ import type { WordPressComponentProps } from '../context';
+-import type { AlignmentMatrixControlProps } from './types';
++import type { AlignmentMatrixControlProps as AlignmentMatrixControlBaseProps } from './types';
++
++export type AlignmentMatrixControlProps = WordPressComponentProps<
++	AlignmentMatrixControlBaseProps,
++	'div',
++	false
++>;
+ 
+ /**
+  *
+@@ -49,7 +55,7 @@ export function AlignmentMatrixControl( {
+ 	onChange,
+ 	width = 92,
+ 	...props
+-}: WordPressComponentProps< AlignmentMatrixControlProps, 'div', false > ) {
++}: AlignmentMatrixControlProps ) {
+ 	const baseId = useInstanceId(
+ 		AlignmentMatrixControl,
+ 		'alignment-matrix-control',
+diff --git a/packages/components/src/angle-picker-control/index.tsx b/packages/components/src/angle-picker-control/index.tsx
+index dcd0fe6f94a2e0..d50c4d721acc14 100644
+--- a/packages/components/src/angle-picker-control/index.tsx
++++ b/packages/components/src/angle-picker-control/index.tsx
+@@ -20,10 +20,15 @@ import AngleCircle from './angle-circle';
+ import { UnitText } from './styles/angle-picker-control-styles';
+ 
+ import type { WordPressComponentProps } from '../context';
+-import type { AnglePickerControlProps } from './types';
++import type { AnglePickerControlProps as AnglePickerControlBaseProps } from './types';
++
++export type AnglePickerControlProps = WordPressComponentProps<
++	AnglePickerControlBaseProps,
++	'div'
++>;
+ 
+ function UnforwardedAnglePickerControl(
+-	props: WordPressComponentProps< AnglePickerControlProps, 'div' >,
++	props: AnglePickerControlProps,
+ 	ref: ForwardedRef< any >
+ ) {
+ 	const {
+diff --git a/packages/components/src/animate/index.tsx b/packages/components/src/animate/index.tsx
+index f73090bf85dba9..e5d5f8704a69bc 100644
+--- a/packages/components/src/animate/index.tsx
++++ b/packages/components/src/animate/index.tsx
+@@ -7,6 +7,7 @@ import classnames from 'classnames';
+  * Internal dependencies
+  */
+ import type { AnimateProps, GetAnimateOptions } from './types';
++export type { AnimateProps } from './types';
+ 
+ /**
+  * @param type The animation type
+diff --git a/packages/components/src/autocomplete/index.tsx b/packages/components/src/autocomplete/index.tsx
+index 944eebf83de068..1fa131752a927b 100644
+--- a/packages/components/src/autocomplete/index.tsx
++++ b/packages/components/src/autocomplete/index.tsx
+@@ -41,6 +41,7 @@ import type {
+ 	UseAutocompleteProps,
+ 	WPCompleter,
+ } from './types';
++export type { AutocompleteProps } from './types';
+ 
+ const getNodeText = ( node: React.ReactNode ): string => {
+ 	if ( node === null ) {
+diff --git a/packages/components/src/base-control/index.tsx b/packages/components/src/base-control/index.tsx
+index 344643f28cfd7c..b6b194e5347b0f 100644
+--- a/packages/components/src/base-control/index.tsx
++++ b/packages/components/src/base-control/index.tsx
+@@ -7,7 +7,10 @@ import classnames from 'classnames';
+  * Internal dependencies
+  */
+ import { VisuallyHidden } from '../visually-hidden';
+-import type { BaseControlProps, BaseControlVisualLabelProps } from './types';
++import type {
++	BaseControlProps as BaseControlBaseProps,
++	BaseControlVisualLabelProps,
++} from './types';
+ import {
+ 	Wrapper,
+ 	StyledField,
+@@ -20,6 +23,11 @@ import { contextConnectWithoutRef, useContextSystem } from '../context';
+ 
+ export { useBaseControlProps } from './hooks';
+ 
++// This prop is exported differently than others because creating a type and
++// then using that type in the component below causes TS union error in other
++// files. `Expression produces a union type that is too complex to represent.`
++export type BaseControlProps = Parameters< typeof UnconnectedBaseControl >[ 0 ];
++
+ /**
+  * `BaseControl` is a component used to generate labels and help text for components handling user inputs.
+  *
+@@ -44,7 +52,7 @@ export { useBaseControlProps } from './hooks';
+  * ```
+  */
+ const UnconnectedBaseControl = (
+-	props: WordPressComponentProps< BaseControlProps, null >
++	props: WordPressComponentProps< BaseControlBaseProps, null >
+ ) => {
+ 	const {
+ 		__nextHasNoMarginBottom = false,
+diff --git a/packages/components/src/border-box-control/border-box-control/component.tsx b/packages/components/src/border-box-control/border-box-control/component.tsx
+index 26967ad7f63ddb..4fe87d1a5cb684 100644
+--- a/packages/components/src/border-box-control/border-box-control/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control/component.tsx
+@@ -18,7 +18,7 @@ import type { WordPressComponentProps } from '../../context';
+ import { contextConnect } from '../../context';
+ import { useBorderBoxControl } from './hook';
+ 
+-import type { BorderBoxControlProps } from '../types';
++import type { BorderBoxControlProps as BorderBoxControlBaseProps } from '../types';
+ import type {
+ 	LabelProps,
+ 	BorderControlProps,
+@@ -38,8 +38,14 @@ const BorderLabel = ( props: LabelProps ) => {
+ 	);
+ };
+ 
++export type BorderBoxControlProps = WordPressComponentProps<
++	BorderBoxControlBaseProps,
++	'div',
++	false
++>;
++
+ const UnconnectedBorderBoxControl = (
+-	props: WordPressComponentProps< BorderBoxControlProps, 'div', false >,
++	props: BorderBoxControlProps,
+ 	forwardedRef: React.ForwardedRef< any >
+ ) => {
+ 	const {
+diff --git a/packages/components/src/border-box-control/border-box-control/index.ts b/packages/components/src/border-box-control/border-box-control/index.ts
+index daaf27db19b825..bf3ac39a71819c 100644
+--- a/packages/components/src/border-box-control/border-box-control/index.ts
++++ b/packages/components/src/border-box-control/border-box-control/index.ts
+@@ -1,2 +1,5 @@
+-export { default as BorderBoxControl } from './component';
++export {
++	default as BorderBoxControl,
++	type BorderBoxControlProps,
++} from './component';
+ export { useBorderBoxControl } from './hook';
+diff --git a/packages/components/src/border-box-control/index.ts b/packages/components/src/border-box-control/index.ts
+index 97f56a171ac728..85db76bfe27ec3 100644
+--- a/packages/components/src/border-box-control/index.ts
++++ b/packages/components/src/border-box-control/index.ts
+@@ -1,3 +1,6 @@
+-export { default as BorderBoxControl } from './border-box-control/component';
++export {
++	default as BorderBoxControl,
++	type BorderBoxControlProps,
++} from './border-box-control/component';
+ export { useBorderBoxControl } from './border-box-control/hook';
+ export { hasSplitBorders, isEmptyBorder, isDefinedBorder } from './utils';
+diff --git a/packages/components/src/border-control/border-control/component.tsx b/packages/components/src/border-control/border-control/component.tsx
+index 5fe2abce1b4117..418d4ca3a78ce8 100644
+--- a/packages/components/src/border-control/border-control/component.tsx
++++ b/packages/components/src/border-control/border-control/component.tsx
+@@ -17,7 +17,10 @@ import type { WordPressComponentProps } from '../../context';
+ import { contextConnect } from '../../context';
+ import { useBorderControl } from './hook';
+ 
+-import type { BorderControlProps, LabelProps } from '../types';
++import type {
++	BorderControlProps as BorderControlBaseProps,
++	LabelProps,
++} from '../types';
+ 
+ const BorderLabel = ( props: LabelProps ) => {
+ 	const { label, hideLabelFromVision } = props;
+@@ -33,8 +36,14 @@ const BorderLabel = ( props: LabelProps ) => {
+ 	);
+ };
+ 
++export type BorderControlProps = WordPressComponentProps<
++	BorderControlBaseProps,
++	'div',
++	false
++>;
++
+ const UnconnectedBorderControl = (
+-	props: WordPressComponentProps< BorderControlProps, 'div', false >,
++	props: BorderControlProps,
+ 	forwardedRef: React.ForwardedRef< any >
+ ) => {
+ 	const {
+diff --git a/packages/components/src/border-control/border-control/index.ts b/packages/components/src/border-control/border-control/index.ts
+index 7aa372d0c656b8..182d326ae0a750 100644
+--- a/packages/components/src/border-control/border-control/index.ts
++++ b/packages/components/src/border-control/border-control/index.ts
+@@ -1,2 +1,2 @@
+-export { default as BorderControl } from './component';
++export { default as BorderControl, type BorderControlProps } from './component';
+ export { useBorderControl } from './hook';
+diff --git a/packages/components/src/border-control/index.ts b/packages/components/src/border-control/index.ts
+index a5eeb763a7c9c1..94203b9a062f12 100644
+--- a/packages/components/src/border-control/index.ts
++++ b/packages/components/src/border-control/index.ts
+@@ -1,2 +1,5 @@
+-export { default as BorderControl } from './border-control/component';
++export {
++	default as BorderControl,
++	type BorderControlProps,
++} from './border-control/component';
+ export { useBorderControl } from './border-control/hook';
+diff --git a/packages/components/src/box-control/index.tsx b/packages/components/src/box-control/index.tsx
+index 9c3452d4ccb806..fe434c0c7ca0c0 100644
+--- a/packages/components/src/box-control/index.tsx
++++ b/packages/components/src/box-control/index.tsx
+@@ -33,6 +33,7 @@ import type {
+ 	BoxControlProps,
+ 	BoxControlValue,
+ } from './types';
++export type { BoxControlProps } from './types';
+ 
+ const defaultInputProps = {
+ 	min: 0,
+diff --git a/packages/components/src/button-group/index.tsx b/packages/components/src/button-group/index.tsx
+index 2eb7451e3e00db..6e36da77e70aa7 100644
+--- a/packages/components/src/button-group/index.tsx
++++ b/packages/components/src/button-group/index.tsx
+@@ -12,11 +12,17 @@ import { forwardRef } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type { ButtonGroupProps } from './types';
++import type { ButtonGroupProps as ButtonGroupBaseProps } from './types';
+ import type { WordPressComponentProps } from '../context';
+ 
++export type ButtonGroupProps = WordPressComponentProps<
++	ButtonGroupBaseProps,
++	'div',
++	false
++>;
++
+ function UnforwardedButtonGroup(
+-	props: WordPressComponentProps< ButtonGroupProps, 'div', false >,
++	props: ButtonGroupProps,
+ 	ref: ForwardedRef< HTMLDivElement >
+ ) {
+ 	const { className, ...restProps } = props;
+diff --git a/packages/components/src/button/index.tsx b/packages/components/src/button/index.tsx
+index 456e563c8159e4..befad97fb239a4 100644
+--- a/packages/components/src/button/index.tsx
++++ b/packages/components/src/button/index.tsx
+@@ -24,6 +24,7 @@ import Tooltip from '../tooltip';
+ import Icon from '../icon';
+ import { VisuallyHidden } from '../visually-hidden';
+ import type { ButtonProps, DeprecatedButtonProps } from './types';
++export type { ButtonProps, DeprecatedButtonProps } from './types';
+ import { positionToPlacement } from '../popover/utils';
+ 
+ const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ] as const;
+diff --git a/packages/components/src/card/card-body/component.tsx b/packages/components/src/card/card-body/component.tsx
+index 44f96ec951123c..83686f758edb95 100644
+--- a/packages/components/src/card/card-body/component.tsx
++++ b/packages/components/src/card/card-body/component.tsx
+@@ -13,8 +13,10 @@ import { View } from '../../view';
+ import { useCardBody } from './hook';
+ import type { BodyProps } from '../types';
+ 
++export type CardBodyProps = WordPressComponentProps< BodyProps, 'div' >;
++
+ function UnconnectedCardBody(
+-	props: WordPressComponentProps< BodyProps, 'div' >,
++	props: CardBodyProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const { isScrollable, ...otherProps } = useCardBody( props );
+diff --git a/packages/components/src/card/card-body/index.ts b/packages/components/src/card/card-body/index.ts
+index 7d6f9023b1e87f..87aba6c6401f17 100644
+--- a/packages/components/src/card/card-body/index.ts
++++ b/packages/components/src/card/card-body/index.ts
+@@ -1,2 +1,2 @@
+-export { default } from './component';
++export { default, type CardBodyProps } from './component';
+ export { useCardBody } from './hook';
+diff --git a/packages/components/src/card/card-divider/component.tsx b/packages/components/src/card/card-divider/component.tsx
+index 8716f7caa9f238..b158c892bcb961 100644
+--- a/packages/components/src/card/card-divider/component.tsx
++++ b/packages/components/src/card/card-divider/component.tsx
+@@ -6,14 +6,13 @@ import type { ForwardedRef } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../context';
+ import { contextConnect } from '../../context';
+ import type { DividerProps } from '../../divider';
+ import { Divider } from '../../divider';
+ import { useCardDivider } from './hook';
+ 
+ function UnconnectedCardDivider(
+-	props: WordPressComponentProps< DividerProps, 'hr', false >,
++	props: DividerProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const dividerProps = useCardDivider( props );
+diff --git a/packages/components/src/card/card-divider/hook.ts b/packages/components/src/card/card-divider/hook.ts
+index e7eb5c92b08cbe..095878b882b36e 100644
+--- a/packages/components/src/card/card-divider/hook.ts
++++ b/packages/components/src/card/card-divider/hook.ts
+@@ -6,15 +6,12 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../context';
+ import { useContextSystem } from '../../context';
+ import * as styles from '../styles';
+ import { useCx } from '../../utils/hooks/use-cx';
+ import type { DividerProps } from '../../divider';
+ 
+-export function useCardDivider(
+-	props: WordPressComponentProps< DividerProps, 'hr', false >
+-) {
++export function useCardDivider( props: DividerProps ) {
+ 	const { className, ...otherProps } = useContextSystem(
+ 		props,
+ 		'CardDivider'
+diff --git a/packages/components/src/card/card-divider/index.ts b/packages/components/src/card/card-divider/index.ts
+index cbf57806c3d6fd..da88e9582d00a8 100644
+--- a/packages/components/src/card/card-divider/index.ts
++++ b/packages/components/src/card/card-divider/index.ts
+@@ -1,2 +1,2 @@
+-export { default } from './component';
++export { default, type CardDividerProps } from './component';
+ export { useCardDivider } from './hook';
+diff --git a/packages/components/src/card/card-footer/component.tsx b/packages/components/src/card/card-footer/component.tsx
+index 74834eb1ca72ed..2f5034df268436 100644
+--- a/packages/components/src/card/card-footer/component.tsx
++++ b/packages/components/src/card/card-footer/component.tsx
+@@ -12,8 +12,10 @@ import { Flex } from '../../flex';
+ import { useCardFooter } from './hook';
+ import type { FooterProps } from '../types';
+ 
++export type CardFooterProps = WordPressComponentProps< FooterProps, 'div' >;
++
+ function UnconnectedCardFooter(
+-	props: WordPressComponentProps< FooterProps, 'div' >,
++	props: CardFooterProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const footerProps = useCardFooter( props );
+diff --git a/packages/components/src/card/card-footer/index.ts b/packages/components/src/card/card-footer/index.ts
+index 11fc4c6b991b11..dd94b2a86b3b94 100644
+--- a/packages/components/src/card/card-footer/index.ts
++++ b/packages/components/src/card/card-footer/index.ts
+@@ -1,2 +1,2 @@
+-export { default } from './component';
++export { default, type CardFooterProps } from './component';
+ export { useCardFooter } from './hook';
+diff --git a/packages/components/src/card/card-header/component.tsx b/packages/components/src/card/card-header/component.tsx
+index 2ba12b5ed854f5..53a8b0338aab55 100644
+--- a/packages/components/src/card/card-header/component.tsx
++++ b/packages/components/src/card/card-header/component.tsx
+@@ -12,8 +12,10 @@ import { Flex } from '../../flex';
+ import { useCardHeader } from './hook';
+ import type { HeaderProps } from '../types';
+ 
++export type CardHeaderProps = WordPressComponentProps< HeaderProps, 'div' >;
++
+ function UnconnectedCardHeader(
+-	props: WordPressComponentProps< HeaderProps, 'div' >,
++	props: CardHeaderProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const headerProps = useCardHeader( props );
+diff --git a/packages/components/src/card/card-header/index.ts b/packages/components/src/card/card-header/index.ts
+index 0cf1892570444e..7ac1aef0205ab8 100644
+--- a/packages/components/src/card/card-header/index.ts
++++ b/packages/components/src/card/card-header/index.ts
+@@ -1,2 +1,2 @@
+-export { default } from './component';
++export { default, type CardHeaderProps } from './component';
+ export { useCardHeader } from './hook';
+diff --git a/packages/components/src/card/card-media/component.tsx b/packages/components/src/card/card-media/component.tsx
+index 36b645d98d822d..38e15efa7922b4 100644
+--- a/packages/components/src/card/card-media/component.tsx
++++ b/packages/components/src/card/card-media/component.tsx
+@@ -12,8 +12,10 @@ import { View } from '../../view';
+ import { useCardMedia } from './hook';
+ import type { MediaProps } from '../types';
+ 
++export type CardMediaProps = WordPressComponentProps< MediaProps, 'div' >;
++
+ function UnconnectedCardMedia(
+-	props: WordPressComponentProps< MediaProps, 'div' >,
++	props: CardMediaProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const cardMediaProps = useCardMedia( props );
+diff --git a/packages/components/src/card/card-media/index.ts b/packages/components/src/card/card-media/index.ts
+index 96ad735f79121c..a4c878dd2eb700 100644
+--- a/packages/components/src/card/card-media/index.ts
++++ b/packages/components/src/card/card-media/index.ts
+@@ -1,2 +1,2 @@
+-export { default } from './component';
++export { default, type CardMediaProps } from './component';
+ export { useCardMedia } from './hook';
+diff --git a/packages/components/src/card/card/component.tsx b/packages/components/src/card/card/component.tsx
+index 8fefc33bd48027..05bcbf50a59320 100644
+--- a/packages/components/src/card/card/component.tsx
++++ b/packages/components/src/card/card/component.tsx
+@@ -22,8 +22,10 @@ import CONFIG from '../../utils/config-values';
+ import { useCx } from '../../utils/hooks/use-cx';
+ import type { Props } from '../types';
+ 
++export type CardProps = WordPressComponentProps< Props, 'div' >;
++
+ function UnconnectedCard(
+-	props: WordPressComponentProps< Props, 'div' >,
++	props: CardProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const {
+diff --git a/packages/components/src/card/card/index.ts b/packages/components/src/card/card/index.ts
+index 666dcafcb235f3..5dc85d685f9910 100644
+--- a/packages/components/src/card/card/index.ts
++++ b/packages/components/src/card/card/index.ts
+@@ -1,2 +1,2 @@
+-export { default } from './component';
++export { default, type CardProps } from './component';
+ export { useCard } from './hook';
+diff --git a/packages/components/src/card/index.ts b/packages/components/src/card/index.ts
+index 53d9e06532e706..d499ac58c7ed41 100644
+--- a/packages/components/src/card/index.ts
++++ b/packages/components/src/card/index.ts
+@@ -1,6 +1,26 @@
+-export { default as Card, useCard } from './card';
+-export { default as CardBody, useCardBody } from './card-body';
+-export { default as CardDivider, useCardDivider } from './card-divider';
+-export { default as CardFooter, useCardFooter } from './card-footer';
+-export { default as CardHeader, useCardHeader } from './card-header';
+-export { default as CardMedia, useCardMedia } from './card-media';
++export { default as Card, type CardProps, useCard } from './card';
++export {
++	default as CardBody,
++	type CardBodyProps,
++	useCardBody,
++} from './card-body';
++export {
++	default as CardDivider,
++	type CardDividerProps,
++	useCardDivider,
++} from './card-divider';
++export {
++	default as CardFooter,
++	type CardFooterProps,
++	useCardFooter,
++} from './card-footer';
++export {
++	default as CardHeader,
++	type CardHeaderProps,
++	useCardHeader,
++} from './card-header';
++export {
++	default as CardMedia,
++	type CardMediaProps,
++	useCardMedia,
++} from './card-media';
+diff --git a/packages/components/src/checkbox-control/index.tsx b/packages/components/src/checkbox-control/index.tsx
+index 54a9952d199491..7c91e4bf78a910 100644
+--- a/packages/components/src/checkbox-control/index.tsx
++++ b/packages/components/src/checkbox-control/index.tsx
+@@ -16,9 +16,15 @@ import { Icon, check, reset } from '@wordpress/icons';
+  * Internal dependencies
+  */
+ import BaseControl from '../base-control';
+-import type { CheckboxControlProps } from './types';
++import type { CheckboxControlProps as CheckboxControlBaseProps } from './types';
+ import type { WordPressComponentProps } from '../context';
+ 
++export type CheckboxControlProps = WordPressComponentProps<
++	CheckboxControlBaseProps,
++	'input',
++	false
++>;
++
+ /**
+  * Checkboxes allow the user to select one or more items from a set.
+  *
+@@ -39,9 +45,7 @@ import type { WordPressComponentProps } from '../context';
+  * };
+  * ```
+  */
+-export function CheckboxControl(
+-	props: WordPressComponentProps< CheckboxControlProps, 'input', false >
+-) {
++export function CheckboxControl( props: CheckboxControlProps ) {
+ 	const {
+ 		__nextHasNoMarginBottom,
+ 		label,
+diff --git a/packages/components/src/clipboard-button/index.tsx b/packages/components/src/clipboard-button/index.tsx
+index 5a9cec30f7d49d..3a9bb1d7249021 100644
+--- a/packages/components/src/clipboard-button/index.tsx
++++ b/packages/components/src/clipboard-button/index.tsx
+@@ -14,9 +14,15 @@ import deprecated from '@wordpress/deprecated';
+  * Internal dependencies
+  */
+ import Button from '../button';
+-import type { ClipboardButtonProps } from './types';
++import type { ClipboardButtonProps as ClipboardButtonBaseProps } from './types';
+ import type { WordPressComponentProps } from '../context';
+ 
++export type ClipboardButtonProps = WordPressComponentProps<
++	ClipboardButtonBaseProps,
++	'button',
++	false
++>;
++
+ const TIMEOUT = 4000;
+ 
+ export default function ClipboardButton( {
+@@ -26,7 +32,7 @@ export default function ClipboardButton( {
+ 	onFinishCopy,
+ 	text,
+ 	...buttonProps
+-}: WordPressComponentProps< ClipboardButtonProps, 'button', false > ) {
++}: ClipboardButtonProps ) {
+ 	deprecated( 'wp.components.ClipboardButton', {
+ 		since: '5.8',
+ 		alternative: 'wp.compose.useCopyToClipboard',
+diff --git a/packages/components/src/color-indicator/index.tsx b/packages/components/src/color-indicator/index.tsx
+index 00312a39cdc7de..b604aa23fe638a 100644
+--- a/packages/components/src/color-indicator/index.tsx
++++ b/packages/components/src/color-indicator/index.tsx
+@@ -13,10 +13,16 @@ import { forwardRef } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import type { WordPressComponentProps } from '../context';
+-import type { ColorIndicatorProps } from './types';
++import type { ColorIndicatorProps as ColorIndicatorBaseProps } from './types';
++
++export type ColorIndicatorProps = WordPressComponentProps<
++	ColorIndicatorBaseProps,
++	'span',
++	false
++>;
+ 
+ function UnforwardedColorIndicator(
+-	props: WordPressComponentProps< ColorIndicatorProps, 'span', false >,
++	props: ColorIndicatorProps,
+ 	forwardedRef: ForwardedRef< HTMLSpanElement >
+ ) {
+ 	const { className, colorValue, ...additionalProps } = props;
+diff --git a/packages/components/src/color-palette/index.tsx b/packages/components/src/color-palette/index.tsx
+index 96f8fba24cd644..c0bf2c64309ec2 100644
+--- a/packages/components/src/color-palette/index.tsx
++++ b/packages/components/src/color-palette/index.tsx
+@@ -26,7 +26,7 @@ import { ColorHeading } from './styles';
+ import DropdownContentWrapper from '../dropdown/dropdown-content-wrapper';
+ import type {
+ 	ColorObject,
+-	ColorPaletteProps,
++	ColorPaletteProps as ColorPaletteBaseProps,
+ 	CustomColorPickerDropdownProps,
+ 	MultiplePalettesProps,
+ 	PaletteObject,
+@@ -177,8 +177,13 @@ export function CustomColorPickerDropdown( {
+ 	);
+ }
+ 
++export type ColorPaletteProps = WordPressComponentProps<
++	ColorPaletteBaseProps,
++	'div'
++>;
++
+ function UnforwardedColorPalette(
+-	props: WordPressComponentProps< ColorPaletteProps, 'div' >,
++	props: ColorPaletteProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const {
+diff --git a/packages/components/src/color-picker/index.ts b/packages/components/src/color-picker/index.ts
+index 876ebb6af499fd..0ef828c6ec868c 100644
+--- a/packages/components/src/color-picker/index.ts
++++ b/packages/components/src/color-picker/index.ts
+@@ -1,4 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-export { LegacyAdapter as ColorPicker } from './legacy-adapter';
++export {
++	LegacyAdapter as ColorPicker,
++	type LegacyAdapterProps as ColorPickerProps,
++} from './legacy-adapter';
+diff --git a/packages/components/src/color-picker/legacy-adapter.tsx b/packages/components/src/color-picker/legacy-adapter.tsx
+index 4da460bc12bb78..b51e4e82af0e4b 100644
+--- a/packages/components/src/color-picker/legacy-adapter.tsx
++++ b/packages/components/src/color-picker/legacy-adapter.tsx
+@@ -3,6 +3,7 @@
+  */
+ import ColorPicker from './component';
+ import type { LegacyAdapterProps } from './types';
++export type { LegacyAdapterProps } from './types';
+ import { useDeprecatedProps } from './use-deprecated-props';
+ 
+ export const LegacyAdapter = ( props: LegacyAdapterProps ) => {
+diff --git a/packages/components/src/combobox-control/index.tsx b/packages/components/src/combobox-control/index.tsx
+index 5ca4f4e0960f10..e8b61bb39af02d 100644
+--- a/packages/components/src/combobox-control/index.tsx
++++ b/packages/components/src/combobox-control/index.tsx
+@@ -62,6 +62,8 @@ const getIndexOfMatchingSuggestion = (
+ 		? -1
+ 		: matchingSuggestions.indexOf( selectedSuggestion );
+ 
++export type { ComboboxControlProps } from './types';
++
+ /**
+  * `ComboboxControl` is an enhanced version of a [`SelectControl`](../select-control/README.md) with the addition of
+  * being able to search for options using a search input.
+diff --git a/packages/components/src/confirm-dialog/component.tsx b/packages/components/src/confirm-dialog/component.tsx
+index 7e787439d91dfd..965c24744a5a33 100644
+--- a/packages/components/src/confirm-dialog/component.tsx
++++ b/packages/components/src/confirm-dialog/component.tsx
+@@ -8,7 +8,10 @@ import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import Modal from '../modal';
+-import type { ConfirmDialogProps, DialogInputEvent } from './types';
++import type {
++	ConfirmDialogProps as ConfirmDialogBaseProps,
++	DialogInputEvent,
++} from './types';
+ import type { WordPressComponentProps } from '../context';
+ import { useContextSystem, contextConnect } from '../context';
+ import { Flex } from '../flex';
+@@ -18,8 +21,14 @@ import { VStack } from '../v-stack';
+ import * as styles from './styles';
+ import { useCx } from '../utils/hooks/use-cx';
+ 
++export type ConfirmDialogProps = WordPressComponentProps<
++	ConfirmDialogBaseProps,
++	'div',
++	false
++>;
++
+ const UnconnectedConfirmDialog = (
+-	props: WordPressComponentProps< ConfirmDialogProps, 'div', false >,
++	props: ConfirmDialogProps,
+ 	forwardedRef: React.ForwardedRef< any >
+ ) => {
+ 	const {
+diff --git a/packages/components/src/confirm-dialog/index.tsx b/packages/components/src/confirm-dialog/index.tsx
+index c7a35aabe032fe..ef0065b123f124 100644
+--- a/packages/components/src/confirm-dialog/index.tsx
++++ b/packages/components/src/confirm-dialog/index.tsx
+@@ -2,5 +2,6 @@
+  * Internal dependencies
+  */
+ import ConfirmDialog from './component';
++import type { ConfirmDialogProps } from './component';
+ 
+-export { ConfirmDialog };
++export { ConfirmDialog, type ConfirmDialogProps };
+diff --git a/packages/components/src/custom-gradient-picker/index.tsx b/packages/components/src/custom-gradient-picker/index.tsx
+index 66add261ce5e67..384f7e0c27e827 100644
+--- a/packages/components/src/custom-gradient-picker/index.tsx
++++ b/packages/components/src/custom-gradient-picker/index.tsx
+@@ -38,6 +38,8 @@ import type {
+ 	GradientTypePickerProps,
+ } from './types';
+ 
++export type { CustomGradientPickerProps } from './types';
++
+ const GradientAnglePicker = ( {
+ 	gradientAST,
+ 	hasGradient,
+diff --git a/packages/components/src/dashicon/index.tsx b/packages/components/src/dashicon/index.tsx
+index d0abe7374da10d..8c97da2684c65d 100644
+--- a/packages/components/src/dashicon/index.tsx
++++ b/packages/components/src/dashicon/index.tsx
+@@ -10,7 +10,13 @@
+  * Internal dependencies
+  */
+ import type { WordPressComponentProps } from '../context';
+-import type { DashiconProps } from './types';
++import type { DashiconProps as DashiconBaseProps } from './types';
++
++export type DashiconProps = WordPressComponentProps<
++	DashiconBaseProps,
++	'span',
++	false
++>;
+ 
+ function Dashicon( {
+ 	icon,
+@@ -18,7 +24,7 @@ function Dashicon( {
+ 	size = 20,
+ 	style = {},
+ 	...extraProps
+-}: WordPressComponentProps< DashiconProps, 'span', false > ) {
++}: DashiconProps ) {
+ 	const iconClass = [
+ 		'dashicon',
+ 		'dashicons',
+diff --git a/packages/components/src/date-time/date-time/index.tsx b/packages/components/src/date-time/date-time/index.tsx
+index a75b9fe57c14ed..bfd6411d0c1a91 100644
+--- a/packages/components/src/date-time/date-time/index.tsx
++++ b/packages/components/src/date-time/date-time/index.tsx
+@@ -17,6 +17,7 @@ import { default as TimePicker } from '../time';
+ import type { DateTimePickerProps } from '../types';
+ import { Wrapper } from './styles';
+ 
++export type { DateTimePickerProps } from '../types';
+ export { DatePicker, TimePicker };
+ 
+ const noop = () => {};
+diff --git a/packages/components/src/date-time/date/index.tsx b/packages/components/src/date-time/date/index.tsx
+index 75bfbb76ba2116..589a997d86bdad 100644
+--- a/packages/components/src/date-time/date/index.tsx
++++ b/packages/components/src/date-time/date/index.tsx
+@@ -42,6 +42,7 @@ import { inputToDate } from '../utils';
+ import Button from '../../button';
+ import { TIMEZONELESS_FORMAT } from '../constants';
+ 
++export type { DatePickerProps } from '../types';
+ /**
+  * DatePicker is a React component that renders a calendar for date selection.
+  *
+diff --git a/packages/components/src/date-time/index.ts b/packages/components/src/date-time/index.ts
+index a103bac0d30efb..2effd716549626 100644
+--- a/packages/components/src/date-time/index.ts
++++ b/packages/components/src/date-time/index.ts
+@@ -1,9 +1,18 @@
+ /**
+  * Internal dependencies
+  */
+-import { default as DatePicker } from './date';
+-import { default as TimePicker } from './time';
+-import { default as DateTimePicker } from './date-time';
++import { default as DatePicker, type DatePickerProps } from './date';
++import { default as TimePicker, type TimePickerProps } from './time';
++import {
++	default as DateTimePicker,
++	type DateTimePickerProps,
++} from './date-time';
+ 
+-export { DatePicker, TimePicker };
++export {
++	DatePicker,
++	TimePicker,
++	type DatePickerProps,
++	type TimePickerProps,
++	type DateTimePickerProps,
++};
+ export default DateTimePicker;
+diff --git a/packages/components/src/date-time/time/index.tsx b/packages/components/src/date-time/time/index.tsx
+index b0d8c20be74ac6..0a6feb3b05a946 100644
+--- a/packages/components/src/date-time/time/index.tsx
++++ b/packages/components/src/date-time/time/index.tsx
+@@ -42,6 +42,8 @@ import {
+ import { inputToDate } from '../utils';
+ import { TIMEZONELESS_FORMAT } from '../constants';
+ 
++export type { TimePickerProps } from '../types';
++
+ function from12hTo24h( hours: number, isPm: boolean ) {
+ 	return isPm ? ( ( hours % 12 ) + 12 ) % 24 : hours % 12;
+ }
+diff --git a/packages/components/src/dimension-control/index.tsx b/packages/components/src/dimension-control/index.tsx
+index 38ad5b2f85ccc7..fe74be1dbbc48f 100644
+--- a/packages/components/src/dimension-control/index.tsx
++++ b/packages/components/src/dimension-control/index.tsx
+@@ -17,6 +17,7 @@ import sizesTable, { findSizeBySlug } from './sizes';
+ import type { DimensionControlProps, Size } from './types';
+ import type { SelectControlSingleSelectionProps } from '../select-control/types';
+ 
++export type { DimensionControlProps } from './types';
+ /**
+  * `DimensionControl` is a component designed to provide a UI to control spacing and/or dimensions.
+  *
+diff --git a/packages/components/src/disabled/index.tsx b/packages/components/src/disabled/index.tsx
+index 32baac3411054c..43f09b6d604774 100644
+--- a/packages/components/src/disabled/index.tsx
++++ b/packages/components/src/disabled/index.tsx
+@@ -7,13 +7,15 @@ import { createContext } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { disabledStyles } from './styles/disabled-styles';
+-import type { DisabledProps } from './types';
++import type { DisabledProps as DisabledBaseProps } from './types';
+ import type { WordPressComponentProps } from '../context';
+ import { useCx } from '../utils';
+ 
+ const Context = createContext< boolean >( false );
+ const { Consumer, Provider } = Context;
+ 
++export type DisabledProps = WordPressComponentProps< DisabledBaseProps, 'div' >;
++
+ /**
+  * `Disabled` is a component which disables descendant tabbable elements and
+  * prevents pointer interaction.
+@@ -56,7 +58,7 @@ function Disabled( {
+ 	children,
+ 	isDisabled = true,
+ 	...props
+-}: WordPressComponentProps< DisabledProps, 'div' > ) {
++}: DisabledProps ) {
+ 	const cx = useCx();
+ 
+ 	return (
+diff --git a/packages/components/src/disclosure/index.tsx b/packages/components/src/disclosure/index.tsx
+index 5bacfcabc349a6..0664f4fecb135c 100644
+--- a/packages/components/src/disclosure/index.tsx
++++ b/packages/components/src/disclosure/index.tsx
+@@ -12,19 +12,21 @@ import { forwardRef } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type { DisclosureContentProps } from './types';
++import type { DisclosureContentProps as DisclosureContentBaseProps } from './types';
+ import type { WordPressComponentProps } from '../context';
+ 
++export type DisclosureContentProps = WordPressComponentProps<
++	DisclosureContentBaseProps,
++	'div',
++	false
++>;
++
+ /**
+  * Accessible Disclosure component that controls visibility of a section of
+  * content. It follows the WAI-ARIA Disclosure Pattern.
+  */
+ const UnforwardedDisclosureContent = (
+-	{
+-		visible,
+-		children,
+-		...props
+-	}: WordPressComponentProps< DisclosureContentProps, 'div', false >,
++	{ visible, children, ...props }: DisclosureContentProps,
+ 	ref: React.ForwardedRef< any >
+ ) => {
+ 	const disclosure = Ariakit.useDisclosureStore( { open: visible } );
+diff --git a/packages/components/src/divider/component.tsx b/packages/components/src/divider/component.tsx
+index 3870c2f12c4fc3..4b8c7620748980 100644
+--- a/packages/components/src/divider/component.tsx
++++ b/packages/components/src/divider/component.tsx
+@@ -11,10 +11,16 @@ import type { ForwardedRef } from 'react';
+ import type { WordPressComponentProps } from '../context';
+ import { contextConnect, useContextSystem } from '../context';
+ import { DividerView } from './styles';
+-import type { DividerProps } from './types';
++import type { DividerProps as DividerBaseProps } from './types';
++
++export type DividerProps = WordPressComponentProps<
++	DividerBaseProps,
++	'hr',
++	false
++>;
+ 
+ function UnconnectedDivider(
+-	props: WordPressComponentProps< DividerProps, 'hr', false >,
++	props: DividerProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const contextProps = useContextSystem( props, 'Divider' );
+diff --git a/packages/components/src/divider/index.ts b/packages/components/src/divider/index.ts
+index 9f21cb2246230b..5de18a97c3aa37 100644
+--- a/packages/components/src/divider/index.ts
++++ b/packages/components/src/divider/index.ts
+@@ -1,2 +1 @@
+-export { default as Divider } from './component';
+-export type { DividerProps } from './types';
++export { default as Divider, type DividerProps } from './component';
+diff --git a/packages/components/src/draggable/index.tsx b/packages/components/src/draggable/index.tsx
+index 0a3000538dbf24..ba04d9890bc3b7 100644
+--- a/packages/components/src/draggable/index.tsx
++++ b/packages/components/src/draggable/index.tsx
+@@ -19,6 +19,8 @@ const cloneWrapperClass = 'components-draggable__clone';
+ const clonePadding = 0;
+ const bodyClass = 'is-dragging-components-draggable';
+ 
++export type { DraggableProps } from './types';
++
+ /**
+  * `Draggable` is a Component that provides a way to set up a cross-browser
+  * (including IE) customizable drag image and the transfer data for the drag
+diff --git a/packages/components/src/drop-zone/index.tsx b/packages/components/src/drop-zone/index.tsx
+index f620e6a03c6b85..064e97c739d64f 100644
+--- a/packages/components/src/drop-zone/index.tsx
++++ b/packages/components/src/drop-zone/index.tsx
+@@ -22,9 +22,15 @@ import {
+ 	__unstableMotion as motion,
+ 	__unstableAnimatePresence as AnimatePresence,
+ } from '../animation';
+-import type { DropType, DropZoneProps } from './types';
++import type { DropType, DropZoneProps as DropZoneBaseProps } from './types';
+ import type { WordPressComponentProps } from '../context';
+ 
++export type DropZoneProps = WordPressComponentProps<
++	DropZoneBaseProps,
++	'div',
++	false
++>;
++
+ /**
+  * `DropZone` is a component creating a drop zone area taking the full size of its parent element. It supports dropping files, HTML content or any other HTML drop event.
+  *
+@@ -55,7 +61,7 @@ export function DropZoneComponent( {
+ 	onHTMLDrop,
+ 	onDrop,
+ 	...restProps
+-}: WordPressComponentProps< DropZoneProps, 'div', false > ) {
++}: DropZoneProps ) {
+ 	const [ isDraggingOverDocument, setIsDraggingOverDocument ] =
+ 		useState< boolean >();
+ 	const [ isDraggingOverElement, setIsDraggingOverElement ] =
+diff --git a/packages/components/src/dropdown-menu/index.tsx b/packages/components/src/dropdown-menu/index.tsx
+index 5d0e69f528204a..4590cde21d996c 100644
+--- a/packages/components/src/dropdown-menu/index.tsx
++++ b/packages/components/src/dropdown-menu/index.tsx
+@@ -43,6 +43,8 @@ function isFunction( maybeFunc: unknown ): maybeFunc is () => void {
+ 	return typeof maybeFunc === 'function';
+ }
+ 
++export type { DropdownMenuProps } from './types';
++
+ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
+ 	const {
+ 		children,
+diff --git a/packages/components/src/dropdown/dropdown-content-wrapper.tsx b/packages/components/src/dropdown/dropdown-content-wrapper.tsx
+index ce41f24081f819..20ccca1321e307 100644
+--- a/packages/components/src/dropdown/dropdown-content-wrapper.tsx
++++ b/packages/components/src/dropdown/dropdown-content-wrapper.tsx
+@@ -9,10 +9,16 @@ import type { ForwardedRef } from 'react';
+ import type { WordPressComponentProps } from '../context';
+ import { contextConnect, useContextSystem } from '../context';
+ import { DropdownContentWrapperDiv } from './styles';
+-import type { DropdownContentWrapperProps } from './types';
++import type { DropdownContentWrapperProps as DropdownContentWrapperBaseProps } from './types';
++
++export type DropdownContentWrapperProps = WordPressComponentProps<
++	DropdownContentWrapperBaseProps,
++	'div',
++	false
++>;
+ 
+ function UnconnectedDropdownContentWrapper(
+-	props: WordPressComponentProps< DropdownContentWrapperProps, 'div', false >,
++	props: DropdownContentWrapperProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const { paddingSize = 'small', ...derivedProps } = useContextSystem(
+diff --git a/packages/components/src/dropdown/index.tsx b/packages/components/src/dropdown/index.tsx
+index 0527f4f0c2cd8d..9ac80ed0823cb5 100644
+--- a/packages/components/src/dropdown/index.tsx
++++ b/packages/components/src/dropdown/index.tsx
+@@ -18,6 +18,7 @@ import { contextConnect, useContextSystem } from '../context';
+ import { useControlledValue } from '../utils/hooks';
+ import Popover from '../popover';
+ import type { DropdownProps, DropdownInternalContext } from './types';
++export type { DropdownProps } from './types';
+ 
+ const UnconnectedDropdown = (
+ 	props: DropdownProps,
+diff --git a/packages/components/src/duotone-picker/duotone-picker.tsx b/packages/components/src/duotone-picker/duotone-picker.tsx
+index ee54c9cdf4235e..1aeb80cfc537ae 100644
+--- a/packages/components/src/duotone-picker/duotone-picker.tsx
++++ b/packages/components/src/duotone-picker/duotone-picker.tsx
+@@ -20,6 +20,7 @@ import CustomDuotoneBar from './custom-duotone-bar';
+ import { getDefaultColors, getGradientFromCSSColors } from './utils';
+ import { Spacer } from '../spacer';
+ import type { DuotonePickerProps } from './types';
++export type { DuotonePickerProps } from './types';
+ 
+ /**
+  * ```jsx
+diff --git a/packages/components/src/duotone-picker/duotone-swatch.tsx b/packages/components/src/duotone-picker/duotone-swatch.tsx
+index 1a40bb68f1c51f..dbc0fc8552d07a 100644
+--- a/packages/components/src/duotone-picker/duotone-swatch.tsx
++++ b/packages/components/src/duotone-picker/duotone-swatch.tsx
+@@ -10,6 +10,7 @@ import ColorIndicator from '../color-indicator';
+ import Icon from '../icon';
+ import { getGradientFromCSSColors } from './utils';
+ import type { DuotoneSwatchProps } from './types';
++export type { DuotoneSwatchProps } from './types';
+ 
+ function DuotoneSwatch( { values }: DuotoneSwatchProps ) {
+ 	return values ? (
+diff --git a/packages/components/src/duotone-picker/index.ts b/packages/components/src/duotone-picker/index.ts
+index 0043b439029001..ff3c95db6fcfde 100644
+--- a/packages/components/src/duotone-picker/index.ts
++++ b/packages/components/src/duotone-picker/index.ts
+@@ -1,2 +1,8 @@
+-export { default as DuotonePicker } from './duotone-picker';
+-export { default as DuotoneSwatch } from './duotone-swatch';
++export {
++	default as DuotonePicker,
++	type DuotonePickerProps,
++} from './duotone-picker';
++export {
++	default as DuotoneSwatch,
++	type DuotoneSwatchProps,
++} from './duotone-swatch';
+diff --git a/packages/components/src/elevation/component.tsx b/packages/components/src/elevation/component.tsx
+index d116859d9a303a..4af5d514d30750 100644
+--- a/packages/components/src/elevation/component.tsx
++++ b/packages/components/src/elevation/component.tsx
+@@ -10,10 +10,15 @@ import type { WordPressComponentProps } from '../context';
+ import { contextConnect } from '../context';
+ import { View } from '../view';
+ import { useElevation } from './hook';
+-import type { ElevationProps } from './types';
++import type { ElevationProps as ElevationBaseProps } from './types';
++
++export type ElevationProps = WordPressComponentProps<
++	ElevationBaseProps,
++	'div'
++>;
+ 
+ function UnconnectedElevation(
+-	props: WordPressComponentProps< ElevationProps, 'div' >,
++	props: ElevationProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const elevationProps = useElevation( props );
+diff --git a/packages/components/src/elevation/index.ts b/packages/components/src/elevation/index.ts
+index dcf1b5cbf71e2b..e30aafb8214d48 100644
+--- a/packages/components/src/elevation/index.ts
++++ b/packages/components/src/elevation/index.ts
+@@ -1,2 +1,2 @@
+-export { default as Elevation } from './component';
++export { default as Elevation, type ElevationProps } from './component';
+ export * from './hook';
+diff --git a/packages/components/src/external-link/index.tsx b/packages/components/src/external-link/index.tsx
+index 312aa88f491d24..206b4b76820026 100644
+--- a/packages/components/src/external-link/index.tsx
++++ b/packages/components/src/external-link/index.tsx
+@@ -16,14 +16,16 @@ import { external } from '@wordpress/icons';
+  */
+ import { VisuallyHidden } from '../visually-hidden';
+ import { StyledIcon } from './styles/external-link-styles';
+-import type { ExternalLinkProps } from './types';
++import type { ExternalLinkProps as ExternalLinkBaseProps } from './types';
+ import type { WordPressComponentProps } from '../context';
+ 
++export type ExternalLinkProps = Omit<
++	WordPressComponentProps< ExternalLinkBaseProps, 'a', false >,
++	'target'
++>;
++
+ function UnforwardedExternalLink(
+-	props: Omit<
+-		WordPressComponentProps< ExternalLinkProps, 'a', false >,
+-		'target'
+-	>,
++	props: ExternalLinkProps,
+ 	ref: ForwardedRef< HTMLAnchorElement >
+ ) {
+ 	const { href, children, className, rel = '', ...additionalProps } = props;
+diff --git a/packages/components/src/flex/flex-block/component.tsx b/packages/components/src/flex/flex-block/component.tsx
+index c156b0af5a01f1..816dba5ce72789 100644
+--- a/packages/components/src/flex/flex-block/component.tsx
++++ b/packages/components/src/flex/flex-block/component.tsx
+@@ -9,11 +9,16 @@ import type { ForwardedRef } from 'react';
+ import type { WordPressComponentProps } from '../../context';
+ import { contextConnect } from '../../context';
+ import { View } from '../../view';
+-import type { FlexBlockProps } from '../types';
++import type { FlexBlockProps as FlexBlockBaseProps } from '../types';
+ import { useFlexBlock } from './hook';
+ 
++export type FlexBlockProps = WordPressComponentProps<
++	FlexBlockBaseProps,
++	'div'
++>;
++
+ function UnconnectedFlexBlock(
+-	props: WordPressComponentProps< FlexBlockProps, 'div' >,
++	props: FlexBlockProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const flexBlockProps = useFlexBlock( props );
+diff --git a/packages/components/src/flex/flex-block/index.ts b/packages/components/src/flex/flex-block/index.ts
+index 5246179377dd8f..08cfd698cba186 100644
+--- a/packages/components/src/flex/flex-block/index.ts
++++ b/packages/components/src/flex/flex-block/index.ts
+@@ -1,2 +1,2 @@
+-export { default } from './component';
++export { default, type FlexBlockProps } from './component';
+ export { useFlexBlock } from './hook';
+diff --git a/packages/components/src/flex/flex-item/component.tsx b/packages/components/src/flex/flex-item/component.tsx
+index c02d3dda7cb8f6..d9be1d7dacbfe6 100644
+--- a/packages/components/src/flex/flex-item/component.tsx
++++ b/packages/components/src/flex/flex-item/component.tsx
+@@ -10,10 +10,12 @@ import type { WordPressComponentProps } from '../../context';
+ import { contextConnect } from '../../context';
+ import { View } from '../../view';
+ import { useFlexItem } from './hook';
+-import type { FlexItemProps } from '../types';
++import type { FlexItemProps as FlexItemBaseProps } from '../types';
++
++export type FlexItemProps = WordPressComponentProps< FlexItemBaseProps, 'div' >;
+ 
+ function UnconnectedFlexItem(
+-	props: WordPressComponentProps< FlexItemProps, 'div' >,
++	props: FlexItemProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const flexItemProps = useFlexItem( props );
+diff --git a/packages/components/src/flex/flex-item/index.ts b/packages/components/src/flex/flex-item/index.ts
+index 897c2b45a6a60a..fdf2d439598bce 100644
+--- a/packages/components/src/flex/flex-item/index.ts
++++ b/packages/components/src/flex/flex-item/index.ts
+@@ -1,2 +1,2 @@
+-export { default } from './component';
++export { default, type FlexItemProps } from './component';
+ export { useFlexItem } from './hook';
+diff --git a/packages/components/src/flex/flex/component.tsx b/packages/components/src/flex/flex/component.tsx
+index c1802c102cc764..e0a50971ddee62 100644
+--- a/packages/components/src/flex/flex/component.tsx
++++ b/packages/components/src/flex/flex/component.tsx
+@@ -11,10 +11,12 @@ import { contextConnect } from '../../context';
+ import { useFlex } from './hook';
+ import { FlexContext } from './../context';
+ import { View } from '../../view';
+-import type { FlexProps } from '../types';
++import type { FlexProps as FlexBaseProps } from '../types';
++
++export type FlexProps = WordPressComponentProps< FlexBaseProps, 'div' >;
+ 
+ function UnconnectedFlex(
+-	props: WordPressComponentProps< FlexProps, 'div' >,
++	props: FlexProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const { children, isColumn, ...otherProps } = useFlex( props );
+diff --git a/packages/components/src/flex/flex/index.ts b/packages/components/src/flex/flex/index.ts
+index e0df125066cf5c..813d3f45ffd3ba 100644
+--- a/packages/components/src/flex/flex/index.ts
++++ b/packages/components/src/flex/flex/index.ts
+@@ -1,2 +1,2 @@
+-export { default } from './component';
++export { default, type FlexProps } from './component';
+ export { useFlex } from './hook';
+diff --git a/packages/components/src/flex/index.ts b/packages/components/src/flex/index.ts
+index 8f320728aba4e3..7b3e462dcb2db8 100644
+--- a/packages/components/src/flex/index.ts
++++ b/packages/components/src/flex/index.ts
+@@ -1,3 +1,11 @@
+-export { default as Flex, useFlex } from './flex';
+-export { default as FlexItem, useFlexItem } from './flex-item';
+-export { default as FlexBlock, useFlexBlock } from './flex-block';
++export { default as Flex, type FlexProps, useFlex } from './flex';
++export {
++	default as FlexItem,
++	type FlexItemProps,
++	useFlexItem,
++} from './flex-item';
++export {
++	default as FlexBlock,
++	type FlexBlockProps,
++	useFlexBlock,
++} from './flex-block';
+diff --git a/packages/components/src/focal-point-picker/index.tsx b/packages/components/src/focal-point-picker/index.tsx
+index 33fd505f67fe17..7887adf540e08f 100644
+--- a/packages/components/src/focal-point-picker/index.tsx
++++ b/packages/components/src/focal-point-picker/index.tsx
+@@ -31,12 +31,18 @@ import { useUpdateEffect } from '../utils/hooks';
+ import type { WordPressComponentProps } from '../context/wordpress-component';
+ import type {
+ 	FocalPoint as FocalPointType,
+-	FocalPointPickerProps,
++	FocalPointPickerProps as FocalPointPickerBaseProps,
+ } from './types';
+ import type { KeyboardEventHandler } from 'react';
+ 
+ const GRID_OVERLAY_TIMEOUT = 600;
+ 
++export type FocalPointPickerProps = WordPressComponentProps<
++	FocalPointPickerBaseProps,
++	'div',
++	false
++>;
++
+ /**
+  * Focal Point Picker is a component which creates a UI for identifying the most important visual point of an image.
+  *
+@@ -100,7 +106,7 @@ export function FocalPointPicker( {
+ 		y: 0.5,
+ 	},
+ 	...restProps
+-}: WordPressComponentProps< FocalPointPickerProps, 'div', false > ) {
++}: FocalPointPickerProps ) {
+ 	const [ point, setPoint ] = useState( valueProp );
+ 	const [ showGridOverlay, setShowGridOverlay ] = useState( false );
+ 
+diff --git a/packages/components/src/focal-point-picker/types.ts b/packages/components/src/focal-point-picker/types.ts
+index bd66ae02451a95..e17ac3724c7f4a 100644
+--- a/packages/components/src/focal-point-picker/types.ts
++++ b/packages/components/src/focal-point-picker/types.ts
+@@ -11,7 +11,7 @@ import type {
+ /**
+  * Internal dependencies
+  */
+-import type { BaseControlProps } from '../base-control/types';
++import type { BaseControlProps } from '../base-control';
+ 
+ export type FocalPoint = Record< FocalPointAxis, number >;
+ export type FocalPointAxis = 'x' | 'y';
+diff --git a/packages/components/src/focusable-iframe/index.tsx b/packages/components/src/focusable-iframe/index.tsx
+index ba1fae45c2928a..7bdd475a1b8193 100644
+--- a/packages/components/src/focusable-iframe/index.tsx
++++ b/packages/components/src/focusable-iframe/index.tsx
+@@ -7,6 +7,7 @@ import deprecated from '@wordpress/deprecated';
+  * Internal dependencies
+  */
+ import type { FocusableIframeProps } from './types';
++export type { FocusableIframeProps } from './types';
+ 
+ export default function FocusableIframe( {
+ 	iframeRef,
+diff --git a/packages/components/src/font-size-picker/index.tsx b/packages/components/src/font-size-picker/index.tsx
+index 3c626cced15693..ee0182a7d2aed2 100644
+--- a/packages/components/src/font-size-picker/index.tsx
++++ b/packages/components/src/font-size-picker/index.tsx
+@@ -36,6 +36,8 @@ import FontSizePickerSelect from './font-size-picker-select';
+ import FontSizePickerToggleGroup from './font-size-picker-toggle-group';
+ import { T_SHIRT_NAMES } from './constants';
+ 
++export type { FontSizePickerProps } from './types';
++
+ const UnforwardedFontSizePicker = (
+ 	props: FontSizePickerProps,
+ 	ref: ForwardedRef< any >
+diff --git a/packages/components/src/form-file-upload/index.tsx b/packages/components/src/form-file-upload/index.tsx
+index 0600e47d7324c3..1382f46b1c4bdd 100644
+--- a/packages/components/src/form-file-upload/index.tsx
++++ b/packages/components/src/form-file-upload/index.tsx
+@@ -8,7 +8,13 @@ import { useRef } from '@wordpress/element';
+  */
+ import Button from '../button';
+ import type { WordPressComponentProps } from '../context';
+-import type { FormFileUploadProps } from './types';
++import type { FormFileUploadProps as FormFileUploadBaseProps } from './types';
++
++export type FormFileUploadProps = WordPressComponentProps<
++	FormFileUploadBaseProps,
++	'button',
++	false
++>;
+ 
+ /**
+  * FormFileUpload is a component that allows users to select files from their local device.
+@@ -34,7 +40,7 @@ export function FormFileUpload( {
+ 	onClick,
+ 	render,
+ 	...props
+-}: WordPressComponentProps< FormFileUploadProps, 'button', false > ) {
++}: FormFileUploadProps ) {
+ 	const ref = useRef< HTMLInputElement >( null );
+ 	const openFileDialog = () => {
+ 		ref.current?.click();
+diff --git a/packages/components/src/form-toggle/index.tsx b/packages/components/src/form-toggle/index.tsx
+index 19cb828023ad89..7eeecf210d673b 100644
+--- a/packages/components/src/form-toggle/index.tsx
++++ b/packages/components/src/form-toggle/index.tsx
+@@ -6,11 +6,17 @@ import classnames from 'classnames';
+ /**
+  * Internal dependencies
+  */
+-import type { FormToggleProps } from './types';
++import type { FormToggleProps as FormToggleBaseProps } from './types';
+ import type { WordPressComponentProps } from '../context';
+ 
+ export const noop = () => {};
+ 
++export type FormToggleProps = WordPressComponentProps<
++	FormToggleBaseProps,
++	'input',
++	false
++>;
++
+ /**
+  * FormToggle switches a single setting on or off.
+  *
+@@ -30,9 +36,7 @@ export const noop = () => {};
+  * };
+  * ```
+  */
+-export function FormToggle(
+-	props: WordPressComponentProps< FormToggleProps, 'input', false >
+-) {
++export function FormToggle( props: FormToggleProps ) {
+ 	const {
+ 		className,
+ 		checked,
+diff --git a/packages/components/src/form-token-field/index.tsx b/packages/components/src/form-token-field/index.tsx
+index 50dc8d66b87863..6e146429459cbd 100644
+--- a/packages/components/src/form-token-field/index.tsx
++++ b/packages/components/src/form-token-field/index.tsx
+@@ -32,6 +32,8 @@ import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
+ 
+ const identity = ( value: string ) => value;
+ 
++export type { FormTokenFieldProps } from './types';
++
+ /**
+  * A `FormTokenField` is a field similar to the tags and categories fields in the interim editor chrome,
+  * or the "to" field in Mail on OS X. Tokens can be entered by typing them or selecting them from a list of suggested tokens.
+diff --git a/packages/components/src/gradient-picker/index.tsx b/packages/components/src/gradient-picker/index.tsx
+index 8368279b8afd70..2f02edcae80906 100644
+--- a/packages/components/src/gradient-picker/index.tsx
++++ b/packages/components/src/gradient-picker/index.tsx
+@@ -18,6 +18,7 @@ import type {
+ 	OriginObject,
+ 	GradientObject,
+ } from './types';
++export type { GradientPickerComponentProps } from './types';
+ 
+ // The Multiple Origin Gradients have a `gradients` property (an array of
+ // gradient objects), while Single Origin ones have a `gradient` property.
+diff --git a/packages/components/src/grid/component.tsx b/packages/components/src/grid/component.tsx
+index f18909c8e1c9ae..159f34ea277aaf 100644
+--- a/packages/components/src/grid/component.tsx
++++ b/packages/components/src/grid/component.tsx
+@@ -10,10 +10,12 @@ import type { WordPressComponentProps } from '../context';
+ import { contextConnect } from '../context';
+ import { View } from '../view';
+ import useGrid from './hook';
+-import type { GridProps } from './types';
++import type { GridProps as GridBaseProps } from './types';
++
++export type GridProps = WordPressComponentProps< GridBaseProps, 'div' >;
+ 
+ function UnconnectedGrid(
+-	props: WordPressComponentProps< GridProps, 'div' >,
++	props: GridProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const gridProps = useGrid( props );
+diff --git a/packages/components/src/grid/index.ts b/packages/components/src/grid/index.ts
+index 7085d14bf0d5ca..6158c1c116d352 100644
+--- a/packages/components/src/grid/index.ts
++++ b/packages/components/src/grid/index.ts
+@@ -1,2 +1,2 @@
+-export { default as Grid } from './component';
++export { default as Grid, type GridProps } from './component';
+ export { default as useGrid } from './hook';
+diff --git a/packages/components/src/guide/index.tsx b/packages/components/src/guide/index.tsx
+index c5655847d99e5e..5d68a2cd3187df 100644
+--- a/packages/components/src/guide/index.tsx
++++ b/packages/components/src/guide/index.tsx
+@@ -18,6 +18,8 @@ import Button from '../button';
+ import PageControl from './page-control';
+ import type { GuideProps } from './types';
+ 
++export type { GuideProps } from './types';
++
+ /**
+  * `Guide` is a React component that renders a _user guide_ in a modal. The guide consists of several pages which the user can step through one by one. The guide is finished when the modal is closed or when the user clicks _Finish_ on the last page of the guide.
+  *
+diff --git a/packages/components/src/h-stack/component.tsx b/packages/components/src/h-stack/component.tsx
+index 1d1efebe8a0912..b04000e10c6cc2 100644
+--- a/packages/components/src/h-stack/component.tsx
++++ b/packages/components/src/h-stack/component.tsx
+@@ -7,6 +7,11 @@ import { View } from '../view';
+ import { useHStack } from './hook';
+ import type { Props } from './types';
+ 
++// This prop is exported differently than others because creating a type and
++// then using that type in the component below causes TS union error in other
++// files. `Expression produces a union type that is too complex to represent.`
++export type HStackProps = Parameters< typeof UnconnectedHStack >[ 0 ];
++
+ function UnconnectedHStack(
+ 	props: WordPressComponentProps< Props, 'div' >,
+ 	forwardedRef: React.ForwardedRef< any >
+diff --git a/packages/components/src/h-stack/index.ts b/packages/components/src/h-stack/index.ts
+index efe27ae9b6a2e3..9d53fdd79a8d37 100644
+--- a/packages/components/src/h-stack/index.ts
++++ b/packages/components/src/h-stack/index.ts
+@@ -1,2 +1,2 @@
+-export { default as HStack } from './component';
++export { default as HStack, type HStackProps } from './component';
+ export { useHStack } from './hook';
+diff --git a/packages/components/src/heading/component.tsx b/packages/components/src/heading/component.tsx
+index a42af8b05f471d..a287b7b8f0ad99 100644
+--- a/packages/components/src/heading/component.tsx
++++ b/packages/components/src/heading/component.tsx
+@@ -10,10 +10,12 @@ import type { WordPressComponentProps } from '../context';
+ import { contextConnect } from '../context';
+ import { View } from '../view';
+ import { useHeading } from './hook';
+-import type { HeadingProps } from './types';
++import type { HeadingProps as HeadingBaseProps } from './types';
++
++export type HeadingProps = WordPressComponentProps< HeadingBaseProps, 'h1' >;
+ 
+ function UnconnectedHeading(
+-	props: WordPressComponentProps< HeadingProps, 'h1' >,
++	props: HeadingProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const headerProps = useHeading( props );
+diff --git a/packages/components/src/heading/index.ts b/packages/components/src/heading/index.ts
+index 1371331423bdd6..89cef58fd81032 100644
+--- a/packages/components/src/heading/index.ts
++++ b/packages/components/src/heading/index.ts
+@@ -1,2 +1,2 @@
+-export { default as Heading } from './component';
++export { default as Heading, type HeadingProps } from './component';
+ export { useHeading } from './hook';
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index a824162cb24129..4df0dd81a499c9 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -12,9 +12,13 @@ export {
+ } from '@wordpress/primitives';
+ 
+ // Components.
+-export { default as __experimentalAlignmentMatrixControl } from './alignment-matrix-control';
++export {
++	default as __experimentalAlignmentMatrixControl,
++	type AlignmentMatrixControlProps as __experimentalAlignmentMatrixControlProps,
++} from './alignment-matrix-control';
+ export {
+ 	default as Animate,
++	type AnimateProps,
+ 	getAnimateClassName as __unstableGetAnimateClassName,
+ } from './animate';
+ export {
+@@ -22,185 +26,422 @@ export {
+ 	__unstableAnimatePresence,
+ 	__unstableMotionContext,
+ } from './animation';
+-export { default as AnglePickerControl } from './angle-picker-control';
++export {
++	default as AnglePickerControl,
++	type AnglePickerControlProps,
++} from './angle-picker-control';
+ export {
+ 	default as Autocomplete,
++	type AutocompleteProps,
+ 	useAutocompleteProps as __unstableUseAutocompleteProps,
+ } from './autocomplete';
+-export { default as BaseControl, useBaseControlProps } from './base-control';
++export {
++	default as BaseControl,
++	type BaseControlProps,
++	useBaseControlProps,
++} from './base-control';
+ export {
+ 	BorderBoxControl as __experimentalBorderBoxControl,
++	type BorderBoxControlProps as __experimentalBorderBoxControlProps,
+ 	hasSplitBorders as __experimentalHasSplitBorders,
+ 	isDefinedBorder as __experimentalIsDefinedBorder,
+ 	isEmptyBorder as __experimentalIsEmptyBorder,
+ } from './border-box-control';
+-export { BorderControl as __experimentalBorderControl } from './border-control';
++export {
++	BorderControl as __experimentalBorderControl,
++	type BorderControlProps as __experimentalBorderControlProps,
++} from './border-control';
+ export {
+ 	default as __experimentalBoxControl,
++	type BoxControlProps as __experimentalBoxControlProps,
+ 	applyValueToSides as __experimentalApplyValueToSides,
+ } from './box-control';
+-export { default as Button } from './button';
+-export { default as ButtonGroup } from './button-group';
++export {
++	default as Button,
++	type ButtonProps,
++	type DeprecatedButtonProps,
++} from './button';
++export { default as ButtonGroup, type ButtonGroupProps } from './button-group';
+ export {
+ 	Card,
++	type CardProps,
+ 	CardBody,
++	type CardBodyProps,
+ 	CardDivider,
++	type CardDividerProps,
+ 	CardFooter,
++	type CardFooterProps,
+ 	CardHeader,
++	type CardHeaderProps,
+ 	CardMedia,
++	type CardMediaProps,
+ } from './card';
+-export { default as CheckboxControl } from './checkbox-control';
+-export { default as ClipboardButton } from './clipboard-button';
+-export { default as __experimentalPaletteEdit } from './palette-edit';
+-export { default as ColorIndicator } from './color-indicator';
+-export { default as ColorPalette } from './color-palette';
+-export { ColorPicker } from './color-picker';
+-export { default as ComboboxControl } from './combobox-control';
++export {
++	default as CheckboxControl,
++	type CheckboxControlProps,
++} from './checkbox-control';
++export {
++	default as ClipboardButton,
++	type ClipboardButtonProps,
++} from './clipboard-button';
++export {
++	default as __experimentalPaletteEdit,
++	type PaletteEditProps as __experimentalPaletteEditProps,
++} from './palette-edit';
++export {
++	default as ColorIndicator,
++	type ColorIndicatorProps,
++} from './color-indicator';
++export {
++	default as ColorPalette,
++	type ColorPaletteProps,
++} from './color-palette';
++export { ColorPicker, type ColorPickerProps } from './color-picker';
++export {
++	default as ComboboxControl,
++	type ComboboxControlProps,
++} from './combobox-control';
+ export {
+ 	Composite as __unstableComposite,
+ 	CompositeGroup as __unstableCompositeGroup,
+ 	CompositeItem as __unstableCompositeItem,
+ 	useCompositeState as __unstableUseCompositeState,
+ } from './composite';
+-export { ConfirmDialog as __experimentalConfirmDialog } from './confirm-dialog';
++export {
++	ConfirmDialog as __experimentalConfirmDialog,
++	type ConfirmDialogProps as __experimentalConfirmDialogProps,
++} from './confirm-dialog';
+ export { StableCustomSelectControl as CustomSelectControl } from './custom-select-control';
+-export { default as Dashicon } from './dashicon';
+-export { default as DateTimePicker, DatePicker, TimePicker } from './date-time';
+-export { default as __experimentalDimensionControl } from './dimension-control';
+-export { default as Disabled } from './disabled';
+-export { DisclosureContent as __unstableDisclosureContent } from './disclosure';
+-export { Divider as __experimentalDivider } from './divider';
+-export { default as Draggable } from './draggable';
+-export { default as DropZone } from './drop-zone';
++export { default as Dashicon, type DashiconProps } from './dashicon';
++export {
++	default as DateTimePicker,
++	type DateTimePickerProps,
++	DatePicker,
++	type DatePickerProps,
++	TimePicker,
++	type TimePickerProps,
++} from './date-time';
++export {
++	default as __experimentalDimensionControl,
++	type DimensionControlProps as __experimentalDimensionControlProps,
++} from './dimension-control';
++export { default as Disabled, type DisabledProps } from './disabled';
++export {
++	DisclosureContent as __unstableDisclosureContent,
++	type DisclosureContentProps as __unstableDisclosureContentProps,
++} from './disclosure';
++export {
++	Divider as __experimentalDivider,
++	type DividerProps as __experimentalDividerProps,
++} from './divider';
++export { default as Draggable, type DraggableProps } from './draggable';
++export { default as DropZone, type DropZoneProps } from './drop-zone';
+ export { default as DropZoneProvider } from './drop-zone/provider';
+-export { default as Dropdown } from './dropdown';
+-export { default as __experimentalDropdownContentWrapper } from './dropdown/dropdown-content-wrapper';
+-export { default as DropdownMenu } from './dropdown-menu';
+-export { DuotoneSwatch, DuotonePicker } from './duotone-picker';
+-export { Elevation as __experimentalElevation } from './elevation';
+-export { default as ExternalLink } from './external-link';
+-export { Flex, FlexBlock, FlexItem } from './flex';
+-export { default as FocalPointPicker } from './focal-point-picker';
+-export { default as FocusableIframe } from './focusable-iframe';
+-export { default as FontSizePicker } from './font-size-picker';
+-export { default as FormFileUpload } from './form-file-upload';
+-export { default as FormToggle } from './form-toggle';
+-export { default as FormTokenField } from './form-token-field';
+-export { default as GradientPicker } from './gradient-picker';
+-export { default as CustomGradientPicker } from './custom-gradient-picker';
+-export { Grid as __experimentalGrid } from './grid';
+-export { default as Guide } from './guide';
++export { default as Dropdown, type DropdownProps } from './dropdown';
++export {
++	default as __experimentalDropdownContentWrapper,
++	type DropdownContentWrapperProps as __experimentalDropdownContentWrapperProps,
++} from './dropdown/dropdown-content-wrapper';
++export {
++	default as DropdownMenu,
++	type DropdownMenuProps,
++} from './dropdown-menu';
++export {
++	DuotoneSwatch,
++	type DuotoneSwatchProps,
++	DuotonePicker,
++	type DuotonePickerProps,
++} from './duotone-picker';
++export {
++	Elevation as __experimentalElevation,
++	type ElevationProps as __experimentalElevationProps,
++} from './elevation';
++export {
++	default as ExternalLink,
++	type ExternalLinkProps,
++} from './external-link';
++export {
++	Flex,
++	type FlexProps,
++	FlexBlock,
++	type FlexBlockProps,
++	FlexItem,
++	type FlexItemProps,
++} from './flex';
++export {
++	default as FocalPointPicker,
++	type FocalPointPickerProps,
++} from './focal-point-picker';
++export {
++	default as FocusableIframe,
++	type FocusableIframeProps,
++} from './focusable-iframe';
++export {
++	default as FontSizePicker,
++	type FontSizePickerProps,
++} from './font-size-picker';
++export {
++	default as FormFileUpload,
++	type FormFileUploadProps,
++} from './form-file-upload';
++export { default as FormToggle, type FormToggleProps } from './form-toggle';
++export {
++	default as FormTokenField,
++	type FormTokenFieldProps,
++} from './form-token-field';
++export {
++	default as GradientPicker,
++	type GradientPickerComponentProps,
++} from './gradient-picker';
++export {
++	default as CustomGradientPicker,
++	type CustomGradientPickerProps,
++} from './custom-gradient-picker';
++export {
++	Grid as __experimentalGrid,
++	type GridProps as __experimentalGridProps,
++} from './grid';
++export { default as Guide, type GuideProps } from './guide';
+ export { default as GuidePage } from './guide/page';
+-export { Heading as __experimentalHeading } from './heading';
+-export { HStack as __experimentalHStack } from './h-stack';
+-export { default as Icon } from './icon';
+-export type { IconType } from './icon';
++export {
++	Heading as __experimentalHeading,
++	type HeadingProps as __experimentalHeadingProps,
++} from './heading';
++export {
++	HStack as __experimentalHStack,
++	type HStackProps as __experimentalHStackProps,
++} from './h-stack';
++export {
++	default as Icon,
++	type Props as IconProps,
++	type IconType,
++} from './icon';
+ export { default as IconButton } from './button/deprecated';
+ export {
+ 	ItemGroup as __experimentalItemGroup,
++	type ItemGroupProps as __experimentalItemGroupProps,
+ 	Item as __experimentalItem,
++	type ItemProps as __experimentalItemProps,
+ } from './item-group';
+-export { default as __experimentalInputControl } from './input-control';
+-export { default as __experimentalInputControlPrefixWrapper } from './input-control/input-prefix-wrapper';
+-export { default as __experimentalInputControlSuffixWrapper } from './input-control/input-suffix-wrapper';
+-export { default as KeyboardShortcuts } from './keyboard-shortcuts';
+-export { default as MenuGroup } from './menu-group';
+-export { default as MenuItem } from './menu-item';
+-export { default as MenuItemsChoice } from './menu-items-choice';
+-export { default as Modal } from './modal';
++export {
++	default as __experimentalInputControl,
++	type InputControlProps as __experimentalInputControlProps,
++} from './input-control';
++export {
++	default as __experimentalInputControlPrefixWrapper,
++	type InputControlPrefixWrapperProps as __experimentalInputControlPrefixWrapperProps,
++} from './input-control/input-prefix-wrapper';
++export {
++	default as __experimentalInputControlSuffixWrapper,
++	type InputControlSuffixWrapperProps as __experimentalInputControlSuffixWrapperProps,
++} from './input-control/input-suffix-wrapper';
++export {
++	default as KeyboardShortcuts,
++	type KeyboardShortcutsProps,
++} from './keyboard-shortcuts';
++export { default as MenuGroup, type MenuGroupProps } from './menu-group';
++export { default as MenuItem, type MenuItemProps } from './menu-item';
++export {
++	default as MenuItemsChoice,
++	type MenuItemsChoiceProps,
++} from './menu-items-choice';
++export { default as Modal, type ModalProps } from './modal';
+ export { default as ScrollLock } from './scroll-lock';
+-export { NavigableMenu, TabbableContainer } from './navigable-container';
+-export { default as __experimentalNavigation } from './navigation';
+-export { default as __experimentalNavigationBackButton } from './navigation/back-button';
+-export { default as __experimentalNavigationGroup } from './navigation/group';
+-export { default as __experimentalNavigationItem } from './navigation/item';
+-export { default as __experimentalNavigationMenu } from './navigation/menu';
++export {
++	NavigableMenu,
++	type NavigableMenuProps,
++	TabbableContainer,
++	type TabbableContainerProps,
++} from './navigable-container';
++export {
++	default as __experimentalNavigation,
++	type NavigationProps as __experimentalNavigationProps,
++} from './navigation';
++export {
++	default as __experimentalNavigationBackButton,
++	type NavigationBackButtonProps as __experimentalNavigationBackButtonProps,
++} from './navigation/back-button';
++export {
++	default as __experimentalNavigationGroup,
++	type NavigationGroupProps as __experimentalNavigationGroupProps,
++} from './navigation/group';
++export {
++	default as __experimentalNavigationItem,
++	type NavigationItemProps as __experimentalNavigationItemProps,
++} from './navigation/item';
++export {
++	default as __experimentalNavigationMenu,
++	type NavigationMenuProps as __experimentalNavigationMenuProps,
++} from './navigation/menu';
+ export {
+ 	NavigatorProvider as __experimentalNavigatorProvider,
++	type NavigatorProviderProps as __experimentalNavigatorProviderProps,
+ 	NavigatorScreen as __experimentalNavigatorScreen,
++	type NavigatorScreenProps as __experimentalNavigatorScreenProps,
+ 	NavigatorButton as __experimentalNavigatorButton,
++	type NavigatorButtonProps as __experimentalNavigatorButtonProps,
+ 	NavigatorBackButton as __experimentalNavigatorBackButton,
++	type NavigatorBackButtonProps as __experimentalNavigatorBackButtonProps,
+ 	NavigatorToParentButton as __experimentalNavigatorToParentButton,
++	type NavigatorToParentButtonProps as __experimentalNavigatorToParentButtonProps,
+ 	useNavigator as __experimentalUseNavigator,
+ } from './navigator';
+-export { default as Notice } from './notice';
+-export { default as __experimentalNumberControl } from './number-control';
+-export { default as NoticeList } from './notice/list';
+-export { default as Panel } from './panel';
+-export { default as PanelBody } from './panel/body';
+-export { default as PanelHeader } from './panel/header';
+-export { default as PanelRow } from './panel/row';
+-export { default as Placeholder } from './placeholder';
+-export { default as Popover } from './popover';
+-export { default as QueryControls } from './query-controls';
++export { default as Notice, type NoticeProps } from './notice';
++export {
++	default as __experimentalNumberControl,
++	type NumberControlProps as __experimentalNumberControlProps,
++} from './number-control';
++export { default as NoticeList, type NoticeListProps } from './notice/list';
++export { default as Panel, type PanelProps } from './panel';
++export { default as PanelBody, type PanelBodyProps } from './panel/body';
++export { default as PanelHeader, type PanelHeaderProps } from './panel/header';
++export { default as PanelRow, type PanelRowProps } from './panel/row';
++export { default as Placeholder, type PlaceholderProps } from './placeholder';
++export { default as Popover, type PopoverProps } from './popover';
++export {
++	default as QueryControls,
++	type QueryControlsProps,
++} from './query-controls';
+ export { default as __experimentalRadio } from './radio-group/radio';
+ export { default as __experimentalRadioGroup } from './radio-group';
+-export { default as RadioControl } from './radio-control';
+-export { default as RangeControl } from './range-control';
+-export { default as ResizableBox } from './resizable-box';
+-export { default as ResponsiveWrapper } from './responsive-wrapper';
+-export { default as SandBox } from './sandbox';
+-export { default as SearchControl } from './search-control';
+-export { default as SelectControl } from './select-control';
+-export { default as Snackbar } from './snackbar';
+-export { default as SnackbarList } from './snackbar/list';
+-export { Spacer as __experimentalSpacer } from './spacer';
+-export { Scrollable as __experimentalScrollable } from './scrollable';
+-export { default as Spinner } from './spinner';
+-export { Surface as __experimentalSurface } from './surface';
+-export { default as TabPanel } from './tab-panel';
+-export { Text as __experimentalText } from './text';
+-export { default as TextControl } from './text-control';
+-export { default as TextareaControl } from './textarea-control';
+-export { default as TextHighlight } from './text-highlight';
+-export { default as Tip } from './tip';
+-export { default as ToggleControl } from './toggle-control';
++export {
++	default as RadioControl,
++	type RadioControlProps,
++} from './radio-control';
++export {
++	default as RangeControl,
++	type RangeControlProps,
++} from './range-control';
++export {
++	default as ResizableBox,
++	type ResizableBoxProps,
++} from './resizable-box';
++export {
++	default as ResponsiveWrapper,
++	type ResponsiveWrapperProps,
++} from './responsive-wrapper';
++export { default as SandBox, type SandBoxProps } from './sandbox';
++export {
++	default as SearchControl,
++	type SearchControlProps,
++} from './search-control';
++export {
++	default as SelectControl,
++	type SelectControlProps,
++} from './select-control';
++export { default as Snackbar, type SnackbarProps } from './snackbar';
++export {
++	default as SnackbarList,
++	type SnackbarListProps,
++} from './snackbar/list';
++export {
++	Spacer as __experimentalSpacer,
++	type SpacerProps as __experimentalSpacerProps,
++} from './spacer';
++export {
++	Scrollable as __experimentalScrollable,
++	type ScrollableProps as __experimentalScrollableProps,
++} from './scrollable';
++export { default as Spinner, type SpinnerProps } from './spinner';
++export {
++	Surface as __experimentalSurface,
++	type SurfaceProps as __experimentalSurfaceProps,
++} from './surface';
++export { default as TabPanel, type TabPanelProps } from './tab-panel';
++export {
++	Text as __experimentalText,
++	type TextProps as __experimentalTextProps,
++} from './text';
++export { default as TextControl, type TextControlProps } from './text-control';
++export {
++	default as TextareaControl,
++	type TextareaControlProps,
++} from './textarea-control';
++export {
++	default as TextHighlight,
++	type TextHighlightProps,
++} from './text-highlight';
++export { default as Tip, type TipProps } from './tip';
++export {
++	default as ToggleControl,
++	type ToggleControlProps,
++} from './toggle-control';
+ export {
+ 	ToggleGroupControl as __experimentalToggleGroupControl,
++	type ToggleGroupControlProps as __experimentalToggleGroupControlProps,
+ 	ToggleGroupControlOption as __experimentalToggleGroupControlOption,
++	type ToggleGroupControlOptionProps as __experimentalToggleGroupControlOptionProps,
+ 	ToggleGroupControlOptionIcon as __experimentalToggleGroupControlOptionIcon,
++	type ToggleGroupControlOptionIconProps as __experimentalToggleGroupControlOptionIconProps,
+ } from './toggle-group-control';
+ export {
+ 	Toolbar,
++	type ToolbarProps,
+ 	ToolbarButton,
++	type ToolbarButtonProps,
+ 	ToolbarContext as __experimentalToolbarContext,
+ 	ToolbarDropdownMenu,
++	type ToolbarDropdownMenuProps,
+ 	ToolbarGroup,
++	type ToolbarGroupProps,
+ 	ToolbarItem,
++	type ToolbarItemProps,
+ } from './toolbar';
+ export {
+ 	ToolsPanel as __experimentalToolsPanel,
++	type ToolsPanelProps as __experimentalToolsPanelProps,
+ 	ToolsPanelItem as __experimentalToolsPanelItem,
++	type ToolsPanelItemProps as __experimentalToolsPanelItemProps,
+ 	ToolsPanelContext as __experimentalToolsPanelContext,
+ } from './tools-panel';
+-export { default as Tooltip } from './tooltip';
++export { default as Tooltip, type TooltipProps } from './tooltip';
+ export {
+ 	default as __experimentalTreeGrid,
++	type TreeGridProps as __experimentalTreeGridProps,
+ 	TreeGridRow as __experimentalTreeGridRow,
++	type TreeGridRowProps as __experimentalTreeGridRowProps,
+ 	TreeGridCell as __experimentalTreeGridCell,
++	type TreeGridCellProps as __experimentalTreeGridCellProps,
+ 	TreeGridItem as __experimentalTreeGridItem,
++	type TreeGridItemProps as __experimentalTreeGridItemProps,
+ } from './tree-grid';
+-export { default as TreeSelect } from './tree-select';
+-export { Truncate as __experimentalTruncate } from './truncate';
++export { default as TreeSelect, type TreeSelectProps } from './tree-select';
++export {
++	Truncate as __experimentalTruncate,
++	type TruncateProps as __experimentalTruncateProps,
++} from './truncate';
+ export {
+ 	default as __experimentalUnitControl,
++	type UnitControlProps as __experimentalUnitControlProps,
+ 	useCustomUnits as __experimentalUseCustomUnits,
+ 	parseQuantityAndUnitFromRawValue as __experimentalParseQuantityAndUnitFromRawValue,
+ } from './unit-control';
+ export { View as __experimentalView } from './view';
+-export { VisuallyHidden } from './visually-hidden';
+-export { VStack as __experimentalVStack } from './v-stack';
++export { VisuallyHidden, type VisuallyHiddenProps } from './visually-hidden';
++export {
++	VStack as __experimentalVStack,
++	type VStackProps as __experimentalVStackProps,
++} from './v-stack';
+ export { default as IsolatedEventContainer } from './isolated-event-container';
+ export {
+ 	createSlotFill,
+ 	Slot,
++	type SlotProps,
+ 	Fill,
++	type FillProps,
+ 	Provider as SlotFillProvider,
++	type SlotFillProviderProps,
+ 	useSlot as __experimentalUseSlot,
+ 	useSlotFills as __experimentalUseSlotFills,
+ } from './slot-fill';
+-export { default as __experimentalStyleProvider } from './style-provider';
+-export { ZStack as __experimentalZStack } from './z-stack';
++export {
++	default as __experimentalStyleProvider,
++	type StyleProviderProps as __experimentalStyleProviderProps,
++} from './style-provider';
++export {
++	ZStack as __experimentalZStack,
++	type ZStackProps as __experimentalZStackProps,
++} from './z-stack';
+ 
+ // Higher-Order Components.
+ export {
+@@ -220,3 +461,5 @@ export { default as withSpokenMessages } from './higher-order/with-spoken-messag
+ 
+ // Private APIs.
+ export { privateApis } from './private-apis';
++
++// Deprecated components
+diff --git a/packages/components/src/input-control/index.tsx b/packages/components/src/input-control/index.tsx
+index be05b6d0d49b8b..195f5c887f55da 100644
+--- a/packages/components/src/input-control/index.tsx
++++ b/packages/components/src/input-control/index.tsx
+@@ -30,6 +30,7 @@ function useUniqueId( idProp?: string ) {
+ 	return idProp || id;
+ }
+ 
++export type { InputControlProps } from './types';
+ export function UnforwardedInputControl(
+ 	props: InputControlProps,
+ 	ref: ForwardedRef< HTMLInputElement >
+diff --git a/packages/components/src/input-control/input-prefix-wrapper.tsx b/packages/components/src/input-control/input-prefix-wrapper.tsx
+index 23d9e823da932d..3f5b35ef24522f 100644
+--- a/packages/components/src/input-control/input-prefix-wrapper.tsx
++++ b/packages/components/src/input-control/input-prefix-wrapper.tsx
+@@ -9,10 +9,15 @@ import type { ForwardedRef } from 'react';
+ import { Spacer } from '../spacer';
+ import type { WordPressComponentProps } from '../context';
+ import { contextConnect, useContextSystem } from '../context';
+-import type { InputControlPrefixWrapperProps } from './types';
++import type { InputControlPrefixWrapperProps as InputControlPrefixWrapperBaseProps } from './types';
++
++export type InputControlPrefixWrapperProps = WordPressComponentProps<
++	InputControlPrefixWrapperBaseProps,
++	'div'
++>;
+ 
+ function UnconnectedInputControlPrefixWrapper(
+-	props: WordPressComponentProps< InputControlPrefixWrapperProps, 'div' >,
++	props: InputControlPrefixWrapperProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const derivedProps = useContextSystem( props, 'InputControlPrefixWrapper' );
+diff --git a/packages/components/src/input-control/input-suffix-wrapper.tsx b/packages/components/src/input-control/input-suffix-wrapper.tsx
+index 1be352f562e369..fab9e829381153 100644
+--- a/packages/components/src/input-control/input-suffix-wrapper.tsx
++++ b/packages/components/src/input-control/input-suffix-wrapper.tsx
+@@ -9,10 +9,15 @@ import type { ForwardedRef } from 'react';
+ import { Spacer } from '../spacer';
+ import type { WordPressComponentProps } from '../context';
+ import { contextConnect, useContextSystem } from '../context';
+-import type { InputControlSuffixWrapperProps } from './types';
++import type { InputControlSuffixWrapperProps as InputControlSuffixWrapperBaseProps } from './types';
++
++export type InputControlSuffixWrapperProps = WordPressComponentProps<
++	InputControlSuffixWrapperBaseProps,
++	'div'
++>;
+ 
+ function UnconnectedInputControlSuffixWrapper(
+-	props: WordPressComponentProps< InputControlSuffixWrapperProps, 'div' >,
++	props: InputControlSuffixWrapperProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const derivedProps = useContextSystem( props, 'InputControlSuffixWrapper' );
+diff --git a/packages/components/src/item-group/index.ts b/packages/components/src/item-group/index.ts
+index 25412ed60e0f66..a54cf1b38d7732 100644
+--- a/packages/components/src/item-group/index.ts
++++ b/packages/components/src/item-group/index.ts
+@@ -1,2 +1,2 @@
+-export { default as Item } from './item';
+-export { default as ItemGroup } from './item-group';
++export { default as Item, type ItemProps } from './item';
++export { default as ItemGroup, type ItemGroupProps } from './item-group';
+diff --git a/packages/components/src/item-group/item-group/component.tsx b/packages/components/src/item-group/item-group/component.tsx
+index 6bfae11dd4f85f..4c86736f3cb9c7 100644
+--- a/packages/components/src/item-group/item-group/component.tsx
++++ b/packages/components/src/item-group/item-group/component.tsx
+@@ -11,10 +11,15 @@ import { contextConnect } from '../../context';
+ import { useItemGroup } from './hook';
+ import { ItemGroupContext, useItemGroupContext } from '../context';
+ import { View } from '../../view';
+-import type { ItemGroupProps } from '../types';
++import type { ItemGroupProps as ItemGroupBaseProps } from '../types';
++
++export type ItemGroupProps = WordPressComponentProps<
++	ItemGroupBaseProps,
++	'div'
++>;
+ 
+ function UnconnectedItemGroup(
+-	props: WordPressComponentProps< ItemGroupProps, 'div' >,
++	props: ItemGroupProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const {
+diff --git a/packages/components/src/item-group/item-group/index.ts b/packages/components/src/item-group/item-group/index.ts
+index 0e60158e7a6166..27faeab51c22f4 100644
+--- a/packages/components/src/item-group/item-group/index.ts
++++ b/packages/components/src/item-group/item-group/index.ts
+@@ -1,2 +1,2 @@
+-export { default } from './component';
++export { default, type ItemGroupProps } from './component';
+ export { useItemGroup } from './hook';
+diff --git a/packages/components/src/item-group/item/component.tsx b/packages/components/src/item-group/item/component.tsx
+index f3f11617312a7c..2d84ad9ddb8748 100644
+--- a/packages/components/src/item-group/item/component.tsx
++++ b/packages/components/src/item-group/item/component.tsx
+@@ -6,14 +6,16 @@ import type { ForwardedRef } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { ItemProps } from '../types';
++import type { ItemProps as ItemBaseProps } from '../types';
+ import { useItem } from './hook';
+ import type { WordPressComponentProps } from '../../context';
+ import { contextConnect } from '../../context';
+ import { View } from '../../view';
+ 
++export type ItemProps = WordPressComponentProps< ItemBaseProps, 'div' >;
++
+ function UnconnectedItem(
+-	props: WordPressComponentProps< ItemProps, 'div' >,
++	props: ItemProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const { role, wrapperClassName, ...otherProps } = useItem( props );
+diff --git a/packages/components/src/item-group/item/index.ts b/packages/components/src/item-group/item/index.ts
+index 146b83853e1d39..9caeaabf445f82 100644
+--- a/packages/components/src/item-group/item/index.ts
++++ b/packages/components/src/item-group/item/index.ts
+@@ -1,2 +1,2 @@
+-export { default } from './component';
++export { default, type ItemProps } from './component';
+ export { useItem } from './hook';
+diff --git a/packages/components/src/keyboard-shortcuts/index.tsx b/packages/components/src/keyboard-shortcuts/index.tsx
+index cc6835c56666d8..ff4fa30ebf3fe5 100644
+--- a/packages/components/src/keyboard-shortcuts/index.tsx
++++ b/packages/components/src/keyboard-shortcuts/index.tsx
+@@ -8,6 +8,7 @@ import { useKeyboardShortcut } from '@wordpress/compose';
+  * Internal dependencies
+  */
+ import type { KeyboardShortcutProps, KeyboardShortcutsProps } from './types';
++export type { KeyboardShortcutsProps } from './types';
+ 
+ function KeyboardShortcut( {
+ 	target,
+diff --git a/packages/components/src/menu-group/index.tsx b/packages/components/src/menu-group/index.tsx
+index 00938928969507..d7ab5b504240c2 100644
+--- a/packages/components/src/menu-group/index.tsx
++++ b/packages/components/src/menu-group/index.tsx
+@@ -13,6 +13,7 @@ import { useInstanceId } from '@wordpress/compose';
+  * Internal dependencies
+  */
+ import type { MenuGroupProps } from './types';
++export type { MenuGroupProps } from './types';
+ 
+ /**
+  * `MenuGroup` wraps a series of related `MenuItem` components into a common
+diff --git a/packages/components/src/menu-item/index.tsx b/packages/components/src/menu-item/index.tsx
+index 644d5bff2b023e..ed9b7db2e81100 100644
+--- a/packages/components/src/menu-item/index.tsx
++++ b/packages/components/src/menu-item/index.tsx
+@@ -16,10 +16,16 @@ import Shortcut from '../shortcut';
+ import Button from '../button';
+ import Icon from '../icon';
+ import type { WordPressComponentProps } from '../context';
+-import type { MenuItemProps } from './types';
++import type { MenuItemProps as MenuItemBaseProps } from './types';
++
++export type MenuItemProps = WordPressComponentProps<
++	MenuItemBaseProps,
++	'button',
++	false
++>;
+ 
+ function UnforwardedMenuItem(
+-	props: WordPressComponentProps< MenuItemProps, 'button', false >,
++	props: MenuItemProps,
+ 	ref: ForwardedRef< HTMLButtonElement >
+ ) {
+ 	let {
+diff --git a/packages/components/src/menu-items-choice/index.tsx b/packages/components/src/menu-items-choice/index.tsx
+index ecdf9ba47242d7..8177ca8833ff82 100644
+--- a/packages/components/src/menu-items-choice/index.tsx
++++ b/packages/components/src/menu-items-choice/index.tsx
+@@ -8,6 +8,7 @@ import { check } from '@wordpress/icons';
+  */
+ import MenuItem from '../menu-item';
+ import type { MenuItemsChoiceProps } from './types';
++export type { MenuItemsChoiceProps } from './types';
+ 
+ const noop = () => {};
+ 
+diff --git a/packages/components/src/modal/index.tsx b/packages/components/src/modal/index.tsx
+index 653c6e7470b327..9364cfb2a010e4 100644
+--- a/packages/components/src/modal/index.tsx
++++ b/packages/components/src/modal/index.tsx
+@@ -43,6 +43,8 @@ import StyleProvider from '../style-provider';
+ import type { ModalProps } from './types';
+ import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
+ 
++export type { ModalProps } from './types';
++
+ // Used to track and dismiss the prior modal when another opens unless nested.
+ const ModalContext = createContext<
+ 	MutableRefObject< ModalProps[ 'onRequestClose' ] | undefined >[]
+diff --git a/packages/components/src/navigable-container/index.tsx b/packages/components/src/navigable-container/index.tsx
+index e98f1b1236d7b4..6e07f43e948c07 100644
+--- a/packages/components/src/navigable-container/index.tsx
++++ b/packages/components/src/navigable-container/index.tsx
+@@ -1,5 +1,8 @@
+ /**
+  * Internal Dependencies
+  */
+-export { default as NavigableMenu } from './menu';
+-export { default as TabbableContainer } from './tabbable';
++export { default as NavigableMenu, type NavigableMenuProps } from './menu';
++export {
++	default as TabbableContainer,
++	type TabbableContainerProps,
++} from './tabbable';
+diff --git a/packages/components/src/navigable-container/menu.tsx b/packages/components/src/navigable-container/menu.tsx
+index ae865fe443aaec..b5ea22dffc4d21 100644
+--- a/packages/components/src/navigable-container/menu.tsx
++++ b/packages/components/src/navigable-container/menu.tsx
+@@ -13,6 +13,7 @@ import { forwardRef } from '@wordpress/element';
+  */
+ import NavigableContainer from './container';
+ import type { NavigableMenuProps } from './types';
++export type { NavigableMenuProps } from './types';
+ 
+ export function UnforwardedNavigableMenu(
+ 	{ role = 'menu', orientation = 'vertical', ...rest }: NavigableMenuProps,
+diff --git a/packages/components/src/navigable-container/tabbable.tsx b/packages/components/src/navigable-container/tabbable.tsx
+index 565007bf62d831..db7f461ea999e6 100644
+--- a/packages/components/src/navigable-container/tabbable.tsx
++++ b/packages/components/src/navigable-container/tabbable.tsx
+@@ -13,6 +13,7 @@ import { forwardRef } from '@wordpress/element';
+  */
+ import NavigableContainer from './container';
+ import type { TabbableContainerProps } from './types';
++export type { TabbableContainerProps } from './types';
+ 
+ export function UnforwardedTabbableContainer(
+ 	{ eventToOffset, ...props }: TabbableContainerProps,
+diff --git a/packages/components/src/navigation/back-button/index.tsx b/packages/components/src/navigation/back-button/index.tsx
+index 182faa8773726d..43bbf4743d64ee 100644
+--- a/packages/components/src/navigation/back-button/index.tsx
++++ b/packages/components/src/navigation/back-button/index.tsx
+@@ -16,6 +16,7 @@ import { useNavigationContext } from '../context';
+ import { MenuBackButtonUI } from '../styles/navigation-styles';
+ 
+ import type { NavigationBackButtonProps } from '../types';
++export type { NavigationBackButtonProps } from '../types';
+ 
+ function UnforwardedNavigationBackButton(
+ 	{
+diff --git a/packages/components/src/navigation/group/index.tsx b/packages/components/src/navigation/group/index.tsx
+index cd91fb97365d26..c458ff44c37512 100644
+--- a/packages/components/src/navigation/group/index.tsx
++++ b/packages/components/src/navigation/group/index.tsx
+@@ -16,6 +16,7 @@ import { GroupTitleUI } from '../styles/navigation-styles';
+ import { useNavigationContext } from '../context';
+ 
+ import type { NavigationGroupProps } from '../types';
++export type { NavigationGroupProps } from '../types';
+ 
+ let uniqueId = 0;
+ 
+diff --git a/packages/components/src/navigation/index.tsx b/packages/components/src/navigation/index.tsx
+index dfc1b26cb33ad0..8f9ba64009cdf1 100644
+--- a/packages/components/src/navigation/index.tsx
++++ b/packages/components/src/navigation/index.tsx
+@@ -22,6 +22,7 @@ import type {
+ 	NavigationProps,
+ 	NavigationContext as NavigationContextType,
+ } from './types';
++export type { NavigationProps } from './types';
+ 
+ const noop = () => {};
+ 
+diff --git a/packages/components/src/navigation/item/index.tsx b/packages/components/src/navigation/item/index.tsx
+index 2fd1aebefcbbac..eff00ffecb4f35 100644
+--- a/packages/components/src/navigation/item/index.tsx
++++ b/packages/components/src/navigation/item/index.tsx
+@@ -19,6 +19,7 @@ import NavigationItemBaseContent from './base-content';
+ import NavigationItemBase from './base';
+ 
+ import type { NavigationItemProps } from '../types';
++export type { NavigationItemProps } from '../types';
+ 
+ const noop = () => {};
+ 
+diff --git a/packages/components/src/navigation/menu/index.tsx b/packages/components/src/navigation/menu/index.tsx
+index b001bd0fa0f3d8..8b91f337903b25 100644
+--- a/packages/components/src/navigation/menu/index.tsx
++++ b/packages/components/src/navigation/menu/index.tsx
+@@ -22,6 +22,7 @@ import { NavigableMenu } from '../../navigable-container';
+ import { MenuUI } from '../styles/navigation-styles';
+ 
+ import type { NavigationMenuProps } from '../types';
++export type { NavigationMenuProps } from '../types';
+ 
+ export function NavigationMenu( props: NavigationMenuProps ) {
+ 	const {
+diff --git a/packages/components/src/navigator/index.ts b/packages/components/src/navigator/index.ts
+index 74c69a0daa9c31..81edef6c443658 100644
+--- a/packages/components/src/navigator/index.ts
++++ b/packages/components/src/navigator/index.ts
+@@ -1,6 +1,15 @@
+-export { NavigatorProvider } from './navigator-provider';
+-export { NavigatorScreen } from './navigator-screen';
+-export { NavigatorButton } from './navigator-button';
+-export { NavigatorBackButton } from './navigator-back-button';
+-export { NavigatorToParentButton } from './navigator-to-parent-button';
++export {
++	NavigatorProvider,
++	type NavigatorProviderProps,
++} from './navigator-provider';
++export { NavigatorScreen, type NavigatorScreenProps } from './navigator-screen';
++export { NavigatorButton, type NavigatorButtonProps } from './navigator-button';
++export {
++	NavigatorBackButton,
++	type NavigatorBackButtonProps,
++} from './navigator-back-button';
++export {
++	NavigatorToParentButton,
++	type NavigatorToParentButtonProps,
++} from './navigator-to-parent-button';
+ export { default as useNavigator } from './use-navigator';
+diff --git a/packages/components/src/navigator/navigator-back-button/component.tsx b/packages/components/src/navigator/navigator-back-button/component.tsx
+index 71c5ac14cd00d9..3a953e2701b7ac 100644
+--- a/packages/components/src/navigator/navigator-back-button/component.tsx
++++ b/packages/components/src/navigator/navigator-back-button/component.tsx
+@@ -10,10 +10,15 @@ import type { WordPressComponentProps } from '../../context';
+ import { contextConnect } from '../../context';
+ import { View } from '../../view';
+ import { useNavigatorBackButton } from './hook';
+-import type { NavigatorBackButtonProps } from '../types';
++import type { NavigatorBackButtonProps as NavigatorBackButtonBaseProps } from '../types';
++
++export type NavigatorBackButtonProps = WordPressComponentProps<
++	NavigatorBackButtonBaseProps,
++	'button'
++>;
+ 
+ function UnconnectedNavigatorBackButton(
+-	props: WordPressComponentProps< NavigatorBackButtonProps, 'button' >,
++	props: NavigatorBackButtonProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const navigatorBackButtonProps = useNavigatorBackButton( props );
+diff --git a/packages/components/src/navigator/navigator-back-button/index.ts b/packages/components/src/navigator/navigator-back-button/index.ts
+index 9046e90350e278..a08b697d5a84a6 100644
+--- a/packages/components/src/navigator/navigator-back-button/index.ts
++++ b/packages/components/src/navigator/navigator-back-button/index.ts
+@@ -1 +1,4 @@
+-export { default as NavigatorBackButton } from './component';
++export {
++	default as NavigatorBackButton,
++	type NavigatorBackButtonProps,
++} from './component';
+diff --git a/packages/components/src/navigator/navigator-button/component.tsx b/packages/components/src/navigator/navigator-button/component.tsx
+index 1b84a2315c04d3..5d3df5d1f2665c 100644
+--- a/packages/components/src/navigator/navigator-button/component.tsx
++++ b/packages/components/src/navigator/navigator-button/component.tsx
+@@ -10,10 +10,15 @@ import type { WordPressComponentProps } from '../../context';
+ import { contextConnect } from '../../context';
+ import { View } from '../../view';
+ import { useNavigatorButton } from './hook';
+-import type { NavigatorButtonProps } from '../types';
++import type { NavigatorButtonProps as NavigatorButtonBaseProps } from '../types';
++
++export type NavigatorButtonProps = WordPressComponentProps<
++	NavigatorButtonBaseProps,
++	'button'
++>;
+ 
+ function UnconnectedNavigatorButton(
+-	props: WordPressComponentProps< NavigatorButtonProps, 'button' >,
++	props: NavigatorButtonProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const navigatorButtonProps = useNavigatorButton( props );
+diff --git a/packages/components/src/navigator/navigator-button/index.ts b/packages/components/src/navigator/navigator-button/index.ts
+index 74975a5e1b0c14..409f57ac7d1ae7 100644
+--- a/packages/components/src/navigator/navigator-button/index.ts
++++ b/packages/components/src/navigator/navigator-button/index.ts
+@@ -1 +1,4 @@
+-export { default as NavigatorButton } from './component';
++export {
++	default as NavigatorButton,
++	type NavigatorButtonProps,
++} from './component';
+diff --git a/packages/components/src/navigator/navigator-provider/component.tsx b/packages/components/src/navigator/navigator-provider/component.tsx
+index cd38bea5748134..e6175692f2f886 100644
+--- a/packages/components/src/navigator/navigator-provider/component.tsx
++++ b/packages/components/src/navigator/navigator-provider/component.tsx
+@@ -27,7 +27,7 @@ import { View } from '../../view';
+ import { NavigatorContext } from '../context';
+ import * as styles from '../styles';
+ import type {
+-	NavigatorProviderProps,
++	NavigatorProviderProps as NavigatorProviderBaseProps,
+ 	NavigatorLocation,
+ 	NavigatorContext as NavigatorContextType,
+ 	Screen,
+@@ -52,8 +52,13 @@ function screensReducer(
+ 	return state;
+ }
+ 
++export type NavigatorProviderProps = WordPressComponentProps<
++	NavigatorProviderBaseProps,
++	'div'
++>;
++
+ function UnconnectedNavigatorProvider(
+-	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
++	props: NavigatorProviderProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const { initialPath, children, className, ...otherProps } =
+diff --git a/packages/components/src/navigator/navigator-provider/index.ts b/packages/components/src/navigator/navigator-provider/index.ts
+index b9a330613ac847..71d936dab62ba4 100644
+--- a/packages/components/src/navigator/navigator-provider/index.ts
++++ b/packages/components/src/navigator/navigator-provider/index.ts
+@@ -1 +1,4 @@
+-export { default as NavigatorProvider } from './component';
++export {
++	default as NavigatorProvider,
++	type NavigatorProviderProps,
++} from './component';
+diff --git a/packages/components/src/navigator/navigator-screen/component.tsx b/packages/components/src/navigator/navigator-screen/component.tsx
+index 29981d46770eed..006b867da4e0ad 100644
+--- a/packages/components/src/navigator/navigator-screen/component.tsx
++++ b/packages/components/src/navigator/navigator-screen/component.tsx
+@@ -27,10 +27,16 @@ import { useCx } from '../../utils/hooks/use-cx';
+ import { View } from '../../view';
+ import { NavigatorContext } from '../context';
+ import * as styles from '../styles';
+-import type { NavigatorScreenProps } from '../types';
++import type { NavigatorScreenProps as NavigatorScreenBaseProps } from '../types';
++
++export type NavigatorScreenProps = WordPressComponentProps<
++	NavigatorScreenBaseProps,
++	'div',
++	false
++>;
+ 
+ function UnconnectedNavigatorScreen(
+-	props: WordPressComponentProps< NavigatorScreenProps, 'div', false >,
++	props: NavigatorScreenProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const screenId = useId();
+diff --git a/packages/components/src/navigator/navigator-screen/index.ts b/packages/components/src/navigator/navigator-screen/index.ts
+index 9c9a40d435fff3..736f49bbceb491 100644
+--- a/packages/components/src/navigator/navigator-screen/index.ts
++++ b/packages/components/src/navigator/navigator-screen/index.ts
+@@ -1 +1,4 @@
+-export { default as NavigatorScreen } from './component';
++export {
++	default as NavigatorScreen,
++	type NavigatorScreenProps,
++} from './component';
+diff --git a/packages/components/src/navigator/navigator-to-parent-button/component.tsx b/packages/components/src/navigator/navigator-to-parent-button/component.tsx
+index e73a3619f3d494..41ff5e544994a2 100644
+--- a/packages/components/src/navigator/navigator-to-parent-button/component.tsx
++++ b/packages/components/src/navigator/navigator-to-parent-button/component.tsx
+@@ -10,10 +10,15 @@ import type { WordPressComponentProps } from '../../context';
+ import { contextConnect } from '../../context';
+ import { View } from '../../view';
+ import { useNavigatorBackButton } from '../navigator-back-button/hook';
+-import type { NavigatorToParentButtonProps } from '../types';
++import type { NavigatorToParentButtonProps as NavigatorToParentButtonBaseProps } from '../types';
++
++export type NavigatorToParentButtonProps = WordPressComponentProps<
++	NavigatorToParentButtonBaseProps,
++	'button'
++>;
+ 
+ function UnconnectedNavigatorToParentButton(
+-	props: WordPressComponentProps< NavigatorToParentButtonProps, 'button' >,
++	props: NavigatorToParentButtonProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const navigatorToParentButtonProps = useNavigatorBackButton( {
+diff --git a/packages/components/src/navigator/navigator-to-parent-button/index.ts b/packages/components/src/navigator/navigator-to-parent-button/index.ts
+index f5218e456065e6..b71456da2bb442 100644
+--- a/packages/components/src/navigator/navigator-to-parent-button/index.ts
++++ b/packages/components/src/navigator/navigator-to-parent-button/index.ts
+@@ -1 +1,4 @@
+-export { default as NavigatorToParentButton } from './component';
++export {
++	default as NavigatorToParentButton,
++	type NavigatorToParentButtonProps,
++} from './component';
+diff --git a/packages/components/src/notice/index.tsx b/packages/components/src/notice/index.tsx
+index 7117295b71975e..d3cab7472a5484 100644
+--- a/packages/components/src/notice/index.tsx
++++ b/packages/components/src/notice/index.tsx
+@@ -19,6 +19,7 @@ import type { NoticeAction, NoticeProps } from './types';
+ import type { DeprecatedButtonProps } from '../button/types';
+ import { VisuallyHidden } from '../visually-hidden';
+ 
++export type { NoticeProps } from './types';
+ const noop = () => {};
+ 
+ /**
+diff --git a/packages/components/src/notice/list.tsx b/packages/components/src/notice/list.tsx
+index 5b92b6902a847d..3419d97db95240 100644
+--- a/packages/components/src/notice/list.tsx
++++ b/packages/components/src/notice/list.tsx
+@@ -8,10 +8,16 @@ import classnames from 'classnames';
+  */
+ import Notice from '.';
+ import type { WordPressComponentProps } from '../context';
+-import type { NoticeListProps } from './types';
++import type { NoticeListProps as NoticeListBaseProps } from './types';
+ 
+ const noop = () => {};
+ 
++export type NoticeListProps = WordPressComponentProps<
++	NoticeListBaseProps,
++	'div',
++	false
++>;
++
+ /**
+  * `NoticeList` is a component used to render a collection of notices.
+  *
+@@ -43,7 +49,7 @@ function NoticeList( {
+ 	onRemove = noop,
+ 	className,
+ 	children,
+-}: WordPressComponentProps< NoticeListProps, 'div', false > ) {
++}: NoticeListProps ) {
+ 	const removeNotice =
+ 		( id: NoticeListProps[ 'notices' ][ number ][ 'id' ] ) => () =>
+ 			onRemove( id );
+diff --git a/packages/components/src/number-control/index.tsx b/packages/components/src/number-control/index.tsx
+index 8c9c9bec8a8aa6..c7c9f85b5413df 100644
+--- a/packages/components/src/number-control/index.tsx
++++ b/packages/components/src/number-control/index.tsx
+@@ -21,7 +21,7 @@ import * as inputControlActionTypes from '../input-control/reducer/actions';
+ import { add, subtract, roundClamp } from '../utils/math';
+ import { ensureNumber, isValueEmpty } from '../utils/values';
+ import type { WordPressComponentProps } from '../context/wordpress-component';
+-import type { NumberControlProps } from './types';
++import type { NumberControlProps as NumberControlBaseProps } from './types';
+ import { HStack } from '../h-stack';
+ import { Spacer } from '../spacer';
+ import { useCx } from '../utils';
+@@ -29,8 +29,14 @@ import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props'
+ 
+ const noop = () => {};
+ 
++export type NumberControlProps = WordPressComponentProps<
++	NumberControlBaseProps,
++	'input',
++	false
++>;
++
+ function UnforwardedNumberControl(
+-	props: WordPressComponentProps< NumberControlProps, 'input', false >,
++	props: NumberControlProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const {
+diff --git a/packages/components/src/palette-edit/index.tsx b/packages/components/src/palette-edit/index.tsx
+index 56234ca5c86bc5..a1069f73d4a808 100644
+--- a/packages/components/src/palette-edit/index.tsx
++++ b/packages/components/src/palette-edit/index.tsx
+@@ -59,6 +59,7 @@ import type {
+ 	PaletteEditProps,
+ 	PaletteElement,
+ } from './types';
++export type { PaletteEditProps } from './types';
+ 
+ const DEFAULT_COLOR = '#000';
+ 
+diff --git a/packages/components/src/panel/body.tsx b/packages/components/src/panel/body.tsx
+index 46841f428fac19..c98b4e1ad9a6de 100644
+--- a/packages/components/src/panel/body.tsx
++++ b/packages/components/src/panel/body.tsx
+@@ -19,6 +19,7 @@ import Button from '../button';
+ import Icon from '../icon';
+ import { useControlledState, useUpdateEffect } from '../utils';
+ 
++export type { PanelBodyProps } from './types';
+ const noop = () => {};
+ 
+ export function UnforwardedPanelBody(
+diff --git a/packages/components/src/panel/header.tsx b/packages/components/src/panel/header.tsx
+index 428626225ada11..5acb6dd1f74c29 100644
+--- a/packages/components/src/panel/header.tsx
++++ b/packages/components/src/panel/header.tsx
+@@ -3,6 +3,8 @@
+  */
+ import type { PanelHeaderProps } from './types';
+ 
++export type { PanelHeaderProps } from './types';
++
+ /**
+  * `PanelHeader` renders the header for the `Panel`.
+  * This is used by the `Panel` component under the hood,
+diff --git a/packages/components/src/panel/index.tsx b/packages/components/src/panel/index.tsx
+index aa15d043647ec4..32a18f0d0f4c61 100644
+--- a/packages/components/src/panel/index.tsx
++++ b/packages/components/src/panel/index.tsx
+@@ -13,6 +13,7 @@ import { forwardRef } from '@wordpress/element';
+  */
+ import PanelHeader from './header';
+ import type { PanelProps } from './types';
++export type { PanelProps } from './types';
+ 
+ function UnforwardedPanel(
+ 	{ header, className, children }: PanelProps,
+diff --git a/packages/components/src/panel/row.tsx b/packages/components/src/panel/row.tsx
+index 72f0e392e90b04..8169cac3ea9976 100644
+--- a/packages/components/src/panel/row.tsx
++++ b/packages/components/src/panel/row.tsx
+@@ -13,6 +13,7 @@ import type { ForwardedRef } from 'react';
+  * Internal dependencies
+  */
+ import type { PanelRowProps } from './types';
++export type { PanelRowProps } from './types';
+ 
+ function UnforwardedPanelRow(
+ 	{ className, children }: PanelRowProps,
+diff --git a/packages/components/src/placeholder/index.tsx b/packages/components/src/placeholder/index.tsx
+index d55741f1f41578..e4030e0ac9eb40 100644
+--- a/packages/components/src/placeholder/index.tsx
++++ b/packages/components/src/placeholder/index.tsx
+@@ -15,7 +15,7 @@ import { speak } from '@wordpress/a11y';
+  * Internal dependencies
+  */
+ import Icon from '../icon';
+-import type { PlaceholderProps } from './types';
++import type { PlaceholderProps as PlaceholderBaseProps } from './types';
+ import type { WordPressComponentProps } from '../context';
+ 
+ const PlaceholderIllustration = (
+@@ -30,6 +30,12 @@ const PlaceholderIllustration = (
+ 	</SVG>
+ );
+ 
++export type PlaceholderProps = WordPressComponentProps<
++	PlaceholderBaseProps,
++	'div',
++	false
++>;
++
+ /**
+  * Renders a placeholder. Normally used by blocks to render their empty state.
+  *
+@@ -40,9 +46,7 @@ const PlaceholderIllustration = (
+  * const MyPlaceholder = () => <Placeholder icon={ more } label="Placeholder" />;
+  * ```
+  */
+-export function Placeholder(
+-	props: WordPressComponentProps< PlaceholderProps, 'div', false >
+-) {
++export function Placeholder( props: PlaceholderProps ) {
+ 	const {
+ 		icon,
+ 		children,
+diff --git a/packages/components/src/popover/index.tsx b/packages/components/src/popover/index.tsx
+index 1f41ffcd331083..e088c6d2c347d6 100644
+--- a/packages/components/src/popover/index.tsx
++++ b/packages/components/src/popover/index.tsx
+@@ -56,7 +56,7 @@ import {
+ import { contextConnect, useContextSystem } from '../context';
+ import type { WordPressComponentProps } from '../context';
+ import type {
+-	PopoverProps,
++	PopoverProps as PopoverBaseProps,
+ 	PopoverAnchorRefReference,
+ 	PopoverAnchorRefTopBottom,
+ } from './types';
+@@ -109,14 +109,16 @@ const getPopoverFallbackContainer = () => {
+ 	return container;
+ };
+ 
++export type PopoverProps = Omit<
++	WordPressComponentProps< PopoverBaseProps, 'div', false >,
++	// To avoid overlaps between the standard HTML attributes and the props
++	// expected by `framer-motion`, omit all framer motion props from popover
++	// props (except for `animate` and `children`, which are re-defined in `PopoverProps`).
++	keyof Omit< MotionProps, 'animate' | 'children' >
++>;
++
+ const UnforwardedPopover = (
+-	props: Omit<
+-		WordPressComponentProps< PopoverProps, 'div', false >,
+-		// To avoid overlaps between the standard HTML attributes and the props
+-		// expected by `framer-motion`, omit all framer motion props from popover
+-		// props (except for `animate` and `children`, which are re-defined in `PopoverProps`).
+-		keyof Omit< MotionProps, 'animate' | 'children' >
+-	>,
++	props: PopoverProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) => {
+ 	const {
+diff --git a/packages/components/src/query-controls/index.tsx b/packages/components/src/query-controls/index.tsx
+index de53c63a9b8a82..66d1ed9dbf6456 100644
+--- a/packages/components/src/query-controls/index.tsx
++++ b/packages/components/src/query-controls/index.tsx
+@@ -18,6 +18,8 @@ import type {
+ 	QueryControlsWithSingleCategorySelectionProps,
+ } from './types';
+ 
++export type { QueryControlsProps } from './types';
++
+ const DEFAULT_MIN_ITEMS = 1;
+ const DEFAULT_MAX_ITEMS = 100;
+ const MAX_CATEGORIES_SUGGESTIONS = 20;
+diff --git a/packages/components/src/radio-control/index.tsx b/packages/components/src/radio-control/index.tsx
+index 0f87f5de7c94e2..ea3a2d9b7b0e78 100644
+--- a/packages/components/src/radio-control/index.tsx
++++ b/packages/components/src/radio-control/index.tsx
+@@ -14,9 +14,15 @@ import { useInstanceId } from '@wordpress/compose';
+  */
+ import BaseControl from '../base-control';
+ import type { WordPressComponentProps } from '../context';
+-import type { RadioControlProps } from './types';
++import type { RadioControlProps as RadioControlBaseProps } from './types';
+ import { VStack } from '../v-stack';
+ 
++export type RadioControlProps = WordPressComponentProps<
++	RadioControlBaseProps,
++	'input',
++	false
++>;
++
+ /**
+  * Render a user interface to select the user type using radio inputs.
+  *
+@@ -42,9 +48,7 @@ import { VStack } from '../v-stack';
+  * };
+  * ```
+  */
+-export function RadioControl(
+-	props: WordPressComponentProps< RadioControlProps, 'input', false >
+-) {
++export function RadioControl( props: RadioControlProps ) {
+ 	const {
+ 		label,
+ 		className,
+diff --git a/packages/components/src/range-control/index.tsx b/packages/components/src/range-control/index.tsx
+index 196985152fa63e..73f96f9a7ff2ba 100644
+--- a/packages/components/src/range-control/index.tsx
++++ b/packages/components/src/range-control/index.tsx
+@@ -35,14 +35,20 @@ import {
+ 	Wrapper,
+ } from './styles/range-control-styles';
+ 
+-import type { RangeControlProps } from './types';
++import type { RangeControlProps as RangeControlBaseProps } from './types';
+ import type { WordPressComponentProps } from '../context';
+ import { space } from '../utils/space';
+ 
+ const noop = () => {};
+ 
++export type RangeControlProps = WordPressComponentProps<
++	RangeControlBaseProps,
++	'input',
++	false
++>;
++
+ function UnforwardedRangeControl(
+-	props: WordPressComponentProps< RangeControlProps, 'input', false >,
++	props: RangeControlProps,
+ 	forwardedRef: ForwardedRef< HTMLInputElement >
+ ) {
+ 	const {
+diff --git a/packages/components/src/resizable-box/index.tsx b/packages/components/src/resizable-box/index.tsx
+index 0955c29c537786..3f842642d73dda 100644
+--- a/packages/components/src/resizable-box/index.tsx
++++ b/packages/components/src/resizable-box/index.tsx
+@@ -87,7 +87,7 @@ const HANDLE_STYLES = {
+ 	bottomLeft: HANDLE_STYLES_OVERRIDES,
+ };
+ 
+-type ResizableBoxProps = ResizableProps & {
++export type ResizableBoxProps = ResizableProps & {
+ 	children: ReactNode;
+ 	showHandle?: boolean;
+ 	__experimentalShowTooltip?: boolean;
+diff --git a/packages/components/src/responsive-wrapper/index.tsx b/packages/components/src/responsive-wrapper/index.tsx
+index a8b2ef9ff438a5..ada7f51d280752 100644
+--- a/packages/components/src/responsive-wrapper/index.tsx
++++ b/packages/components/src/responsive-wrapper/index.tsx
+@@ -12,6 +12,7 @@ import { cloneElement, Children } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import type { ResponsiveWrapperProps } from './types';
++export type { ResponsiveWrapperProps } from './types';
+ 
+ /**
+  * A wrapper component that maintains its aspect ratio when resized.
+diff --git a/packages/components/src/sandbox/index.tsx b/packages/components/src/sandbox/index.tsx
+index 4ad971cb63ca90..342bdb9243a57b 100644
+--- a/packages/components/src/sandbox/index.tsx
++++ b/packages/components/src/sandbox/index.tsx
+@@ -13,6 +13,7 @@ import { useFocusableIframe, useMergeRefs } from '@wordpress/compose';
+  * Internal dependencies
+  */
+ import type { SandBoxProps } from './types';
++export type { SandBoxProps } from './types';
+ 
+ const observeAndResizeJS = function () {
+ 	const { MutationObserver } = window;
+diff --git a/packages/components/src/scrollable/component.tsx b/packages/components/src/scrollable/component.tsx
+index 415ea6d4628e19..78a28510178bd3 100644
+--- a/packages/components/src/scrollable/component.tsx
++++ b/packages/components/src/scrollable/component.tsx
+@@ -10,10 +10,15 @@ import type { WordPressComponentProps } from '../context';
+ import { contextConnect } from '../context';
+ import { View } from '../view';
+ import { useScrollable } from './hook';
+-import type { ScrollableProps } from './types';
++import type { ScrollableProps as ScrollableBaseProps } from './types';
++
++export type ScrollableProps = WordPressComponentProps<
++	ScrollableBaseProps,
++	'div'
++>;
+ 
+ function UnconnectedScrollable(
+-	props: WordPressComponentProps< ScrollableProps, 'div' >,
++	props: ScrollableProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const scrollableProps = useScrollable( props );
+diff --git a/packages/components/src/scrollable/index.ts b/packages/components/src/scrollable/index.ts
+index 1a8ae2905eecb8..83f5b0f9074399 100644
+--- a/packages/components/src/scrollable/index.ts
++++ b/packages/components/src/scrollable/index.ts
+@@ -1,3 +1,3 @@
+-export { default as Scrollable } from './component';
++export { default as Scrollable, type ScrollableProps } from './component';
+ 
+ export * from './hook';
+diff --git a/packages/components/src/search-control/index.tsx b/packages/components/src/search-control/index.tsx
+index 66b7ae619ab7e5..9b9b6cbc1592c7 100644
+--- a/packages/components/src/search-control/index.tsx
++++ b/packages/components/src/search-control/index.tsx
+@@ -16,7 +16,10 @@ import { forwardRef, useMemo, useRef } from '@wordpress/element';
+  */
+ import Button from '../button';
+ import type { WordPressComponentProps } from '../context/wordpress-component';
+-import type { SearchControlProps, SuffixItemProps } from './types';
++import type {
++	SearchControlProps as SearchControlBaseProps,
++	SuffixItemProps,
++} from './types';
+ import type { ForwardedRef } from 'react';
+ import { ContextSystemProvider } from '../context';
+ import { StyledInputControl, SuffixItemWrapper } from './styles';
+@@ -46,6 +49,12 @@ function SuffixItem( {
+ 	);
+ }
+ 
++export type SearchControlProps = Omit<
++	WordPressComponentProps< SearchControlBaseProps, 'input', false >,
++	// TODO: Background styling currently doesn't support a disabled state. Needs design work.
++	'disabled'
++>;
++
+ function UnforwardedSearchControl(
+ 	{
+ 		__nextHasNoMarginBottom = false,
+@@ -58,11 +67,7 @@ function UnforwardedSearchControl(
+ 		onClose,
+ 		size = 'default',
+ 		...restProps
+-	}: Omit<
+-		WordPressComponentProps< SearchControlProps, 'input', false >,
+-		// TODO: Background styling currently doesn't support a disabled state. Needs design work.
+-		'disabled'
+-	>,
++	}: SearchControlProps,
+ 	forwardedRef: ForwardedRef< HTMLInputElement >
+ ) {
+ 	// @ts-expect-error The `disabled` prop is not yet supported in the SearchControl component.
+diff --git a/packages/components/src/select-control/index.tsx b/packages/components/src/select-control/index.tsx
+index 3a550be7daa333..763477702b308d 100644
+--- a/packages/components/src/select-control/index.tsx
++++ b/packages/components/src/select-control/index.tsx
+@@ -16,7 +16,7 @@ import BaseControl from '../base-control';
+ import InputBase from '../input-control/input-base';
+ import { Select } from './styles/select-control-styles';
+ import type { WordPressComponentProps } from '../context';
+-import type { SelectControlProps } from './types';
++import type { SelectControlProps as SelectControlBaseProps } from './types';
+ import SelectControlChevronDown from './chevron-down';
+ import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+ 
+@@ -29,8 +29,14 @@ function useUniqueId( idProp?: string ) {
+ 	return idProp || id;
+ }
+ 
++export type SelectControlProps = WordPressComponentProps<
++	SelectControlBaseProps,
++	'select',
++	false
++>;
++
+ function UnforwardedSelectControl(
+-	props: WordPressComponentProps< SelectControlProps, 'select', false >,
++	props: SelectControlProps,
+ 	ref: React.ForwardedRef< HTMLSelectElement >
+ ) {
+ 	const {
+diff --git a/packages/components/src/slot-fill/index.tsx b/packages/components/src/slot-fill/index.tsx
+index b2df054973a5ba..00970d16d57073 100644
+--- a/packages/components/src/slot-fill/index.tsx
++++ b/packages/components/src/slot-fill/index.tsx
+@@ -24,13 +24,18 @@ export { default as useSlot } from './bubbles-virtually/use-slot';
+ export { default as useSlotFills } from './bubbles-virtually/use-slot-fills';
+ import type {
+ 	DistributiveOmit,
+-	FillComponentProps,
++	FillComponentProps as FillProps,
+ 	SlotComponentProps,
+ 	SlotFillProviderProps,
+ 	SlotKey,
+ } from './types';
+ 
+-export function Fill( props: FillComponentProps ) {
++export type {
++	FillComponentProps as FillProps,
++	SlotFillProviderProps,
++} from './types';
++
++export function Fill( props: FillProps ) {
+ 	// We're adding both Fills here so they can register themselves before
+ 	// their respective slot has been registered. Only the Fill that has a slot
+ 	// will render. The other one will return null.
+@@ -42,11 +47,10 @@ export function Fill( props: FillComponentProps ) {
+ 	);
+ }
+ 
+-export function UnforwardedSlot(
+-	props: SlotComponentProps &
+-		Omit< WordPressComponentProps< {}, 'div' >, 'className' >,
+-	ref: ForwardedRef< any >
+-) {
++export type SlotProps = SlotComponentProps &
++	Omit< WordPressComponentProps< {}, 'div' >, 'className' >;
++
++export function UnforwardedSlot( props: SlotProps, ref: ForwardedRef< any > ) {
+ 	const { bubblesVirtually, ...restProps } = props;
+ 	if ( bubblesVirtually ) {
+ 		return <BubblesVirtuallySlot { ...restProps } ref={ ref } />;
+@@ -74,14 +78,14 @@ export function Provider( {
+ 
+ export function createSlotFill( key: SlotKey ) {
+ 	const baseName = typeof key === 'symbol' ? key.description : key;
+-	const FillComponent = ( props: Omit< FillComponentProps, 'name' > ) => (
++	const FillComponent = ( props: Omit< FillProps, 'name' > ) => (
+ 		<Fill name={ key } { ...props } />
+ 	);
+ 	FillComponent.displayName = `${ baseName }Fill`;
+ 
+-	const SlotComponent = (
+-		props: DistributiveOmit< SlotComponentProps, 'name' >
+-	) => <Slot name={ key } { ...props } />;
++	const SlotComponent = ( props: DistributiveOmit< SlotProps, 'name' > ) => (
++		<Slot name={ key } { ...props } />
++	);
+ 	SlotComponent.displayName = `${ baseName }Slot`;
+ 	SlotComponent.__unstableName = key;
+ 
+diff --git a/packages/components/src/snackbar/index.tsx b/packages/components/src/snackbar/index.tsx
+index c7a5a046a5e924..522a5e3e84f2e4 100644
+--- a/packages/components/src/snackbar/index.tsx
++++ b/packages/components/src/snackbar/index.tsx
+@@ -22,7 +22,7 @@ import warning from '@wordpress/warning';
+  * Internal dependencies
+  */
+ import Button from '../button';
+-import type { SnackbarProps } from './types';
++import type { SnackbarProps as SnackbarBaseProps } from './types';
+ import type { NoticeAction } from '../notice/types';
+ import type { WordPressComponentProps } from '../context';
+ 
+@@ -49,6 +49,8 @@ function useSpokenMessage(
+ 	}, [ spokenMessage, politeness ] );
+ }
+ 
++export type SnackbarProps = WordPressComponentProps< SnackbarBaseProps, 'div' >;
++
+ function UnforwardedSnackbar(
+ 	{
+ 		className,
+@@ -64,7 +66,7 @@ function UnforwardedSnackbar(
+ 		// actually the function to call to remove the snackbar from the UI.
+ 		onDismiss,
+ 		listRef,
+-	}: WordPressComponentProps< SnackbarProps, 'div' >,
++	}: SnackbarProps,
+ 	ref: ForwardedRef< any >
+ ) {
+ 	function dismissMe( event: KeyboardEvent | MouseEvent ) {
+diff --git a/packages/components/src/snackbar/list.tsx b/packages/components/src/snackbar/list.tsx
+index 13772f1f396f20..edd6d3840f5575 100644
+--- a/packages/components/src/snackbar/list.tsx
++++ b/packages/components/src/snackbar/list.tsx
+@@ -17,7 +17,7 @@ import {
+ 	__unstableMotion as motion,
+ 	__unstableAnimatePresence as AnimatePresence,
+ } from '../animation';
+-import type { SnackbarListProps } from './types';
++import type { SnackbarListProps as SnackbarListBaseProps } from './types';
+ import type { WordPressComponentProps } from '../context';
+ 
+ const SNACKBAR_VARIANTS = {
+@@ -48,6 +48,10 @@ const SNACKBAR_VARIANTS = {
+ 	},
+ };
+ 
++export type SnackbarListProps = WordPressComponentProps<
++	SnackbarListBaseProps,
++	'div'
++>;
+ /**
+  * Renders a list of notices.
+  *
+@@ -65,7 +69,7 @@ export function SnackbarList( {
+ 	className,
+ 	children,
+ 	onRemove,
+-}: WordPressComponentProps< SnackbarListProps, 'div' > ) {
++}: SnackbarListProps ) {
+ 	const listRef = useRef< HTMLDivElement | null >( null );
+ 	const isReducedMotion = useReducedMotion();
+ 	className = classnames( 'components-snackbar-list', className );
+diff --git a/packages/components/src/spacer/component.tsx b/packages/components/src/spacer/component.tsx
+index afb4f8675933a5..c675e366553ff4 100644
+--- a/packages/components/src/spacer/component.tsx
++++ b/packages/components/src/spacer/component.tsx
+@@ -10,10 +10,12 @@ import type { WordPressComponentProps } from '../context';
+ import { contextConnect } from '../context';
+ import { View } from '../view';
+ import { useSpacer } from './hook';
+-import type { SpacerProps } from './types';
++import type { SpacerProps as SpacerBaseProps } from './types';
++
++export type SpacerProps = WordPressComponentProps< SpacerBaseProps, 'div' >;
+ 
+ function UnconnectedSpacer(
+-	props: WordPressComponentProps< SpacerProps, 'div' >,
++	props: SpacerProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const spacerProps = useSpacer( props );
+diff --git a/packages/components/src/spacer/hook.ts b/packages/components/src/spacer/hook.ts
+index 82d36baa5e202f..d95dc2565a7a15 100644
+--- a/packages/components/src/spacer/hook.ts
++++ b/packages/components/src/spacer/hook.ts
+@@ -6,18 +6,15 @@ import { css } from '@emotion/react';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../context';
+ import { useContextSystem } from '../context';
+ import { space } from '../utils/space';
+ import { rtl, useCx } from '../utils';
+-import type { SpacerProps } from './types';
++import type { SpacerProps } from './component';
+ 
+ const isDefined = < T >( o: T ): o is Exclude< T, null | undefined > =>
+ 	typeof o !== 'undefined' && o !== null;
+ 
+-export function useSpacer(
+-	props: WordPressComponentProps< SpacerProps, 'div' >
+-) {
++export function useSpacer( props: SpacerProps ) {
+ 	const {
+ 		className,
+ 		margin,
+diff --git a/packages/components/src/spacer/index.ts b/packages/components/src/spacer/index.ts
+index c4bdf466f326c0..6dbc895d0b2fd1 100644
+--- a/packages/components/src/spacer/index.ts
++++ b/packages/components/src/spacer/index.ts
+@@ -1,3 +1,2 @@
+-export { default as Spacer } from './component';
++export { default as Spacer, type SpacerProps } from './component';
+ export { useSpacer } from './hook';
+-export type { SpacerProps } from './types';
+diff --git a/packages/components/src/spinner/index.tsx b/packages/components/src/spinner/index.tsx
+index 9864819fa3d97f..6e80e4acb9c4f5 100644
+--- a/packages/components/src/spinner/index.tsx
++++ b/packages/components/src/spinner/index.tsx
+@@ -15,8 +15,10 @@ import type { WordPressComponentProps } from '../context';
+  */
+ import { forwardRef } from '@wordpress/element';
+ 
++export type SpinnerProps = WordPressComponentProps< {}, 'svg', false >;
++
+ export function UnforwardedSpinner(
+-	{ className, ...props }: WordPressComponentProps< {}, 'svg', false >,
++	{ className, ...props }: SpinnerProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	return (
+diff --git a/packages/components/src/style-provider/index.tsx b/packages/components/src/style-provider/index.tsx
+index 1c1b55589dedcc..767c89f264f77b 100644
+--- a/packages/components/src/style-provider/index.tsx
++++ b/packages/components/src/style-provider/index.tsx
+@@ -10,6 +10,8 @@ import * as uuid from 'uuid';
+  */
+ import type { StyleProviderProps } from './types';
+ 
++export type { StyleProviderProps } from './types';
++
+ const uuidCache = new Set();
+ // Use a weak map so that when the container is detached it's automatically
+ // dereferenced to avoid memory leak.
+diff --git a/packages/components/src/surface/component.tsx b/packages/components/src/surface/component.tsx
+index ba0745a40b5044..ea2a50081effc0 100644
+--- a/packages/components/src/surface/component.tsx
++++ b/packages/components/src/surface/component.tsx
+@@ -9,11 +9,13 @@ import type { ForwardedRef } from 'react';
+ import { contextConnect } from '../context';
+ import { View } from '../view';
+ import { useSurface } from './hook';
+-import type { SurfaceProps } from './types';
++import type { SurfaceProps as SurfaceBaseProps } from './types';
+ import type { WordPressComponentProps } from '../context';
+ 
++export type SurfaceProps = WordPressComponentProps< SurfaceBaseProps, 'div' >;
++
+ function UnconnectedSurface(
+-	props: WordPressComponentProps< SurfaceProps, 'div' >,
++	props: SurfaceProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const surfaceProps = useSurface( props );
+diff --git a/packages/components/src/surface/index.ts b/packages/components/src/surface/index.ts
+index 8aea03e1906fd5..409dfaca8081b7 100644
+--- a/packages/components/src/surface/index.ts
++++ b/packages/components/src/surface/index.ts
+@@ -1,2 +1,2 @@
+-export { default as Surface } from './component';
++export { default as Surface, type SurfaceProps } from './component';
+ export * from './hook';
+diff --git a/packages/components/src/tab-panel/index.tsx b/packages/components/src/tab-panel/index.tsx
+index f4abd1c121b2f9..243aa314fc7cc9 100644
+--- a/packages/components/src/tab-panel/index.tsx
++++ b/packages/components/src/tab-panel/index.tsx
+@@ -22,7 +22,7 @@ import { useInstanceId, usePrevious } from '@wordpress/compose';
+  */
+ 
+ import Button from '../button';
+-import type { TabPanelProps } from './types';
++import type { TabPanelProps as TabPanelBaseProps } from './types';
+ import type { WordPressComponentProps } from '../context';
+ 
+ // Separate the actual tab name from the instance ID. This is
+@@ -36,6 +36,12 @@ const extractTabName = ( id: string | undefined | null ) => {
+ 	return id.match( /^tab-panel-[0-9]*-(.*)/ )?.[ 1 ];
+ };
+ 
++export type TabPanelProps = WordPressComponentProps<
++	TabPanelBaseProps,
++	'div',
++	false
++>;
++
+ /**
+  * TabPanel is an ARIA-compliant tabpanel.
+  *
+@@ -82,7 +88,7 @@ const UnforwardedTabPanel = (
+ 		orientation = 'horizontal',
+ 		activeClass = 'is-active',
+ 		onSelect,
+-	}: WordPressComponentProps< TabPanelProps, 'div', false >,
++	}: TabPanelProps,
+ 	ref: ForwardedRef< any >
+ ) => {
+ 	const instanceId = useInstanceId( TabPanel, 'tab-panel' );
+diff --git a/packages/components/src/text-control/index.tsx b/packages/components/src/text-control/index.tsx
+index 30298357c3c01d..f0f7c7d34879d0 100644
+--- a/packages/components/src/text-control/index.tsx
++++ b/packages/components/src/text-control/index.tsx
+@@ -15,10 +15,16 @@ import { forwardRef } from '@wordpress/element';
+  */
+ import BaseControl from '../base-control';
+ import type { WordPressComponentProps } from '../context';
+-import type { TextControlProps } from './types';
++import type { TextControlProps as TextControlBaseProps } from './types';
++
++export type TextControlProps = WordPressComponentProps<
++	TextControlBaseProps,
++	'input',
++	false
++>;
+ 
+ function UnforwardedTextControl(
+-	props: WordPressComponentProps< TextControlProps, 'input', false >,
++	props: TextControlProps,
+ 	ref: ForwardedRef< HTMLInputElement >
+ ) {
+ 	const {
+diff --git a/packages/components/src/text-highlight/index.tsx b/packages/components/src/text-highlight/index.tsx
+index dd2e909898653c..17e7eca4c80f28 100644
+--- a/packages/components/src/text-highlight/index.tsx
++++ b/packages/components/src/text-highlight/index.tsx
+@@ -8,6 +8,7 @@ import { createInterpolateElement } from '@wordpress/element';
+  */
+ import { escapeRegExp } from '../utils/strings';
+ import type { TextHighlightProps } from './types';
++export type { TextHighlightProps } from './types';
+ 
+ /**
+  * Highlights occurrences of a given string within another string of text. Wraps
+diff --git a/packages/components/src/text/component.tsx b/packages/components/src/text/component.tsx
+index f3fe69d936584c..5a3fc2fc606548 100644
+--- a/packages/components/src/text/component.tsx
++++ b/packages/components/src/text/component.tsx
+@@ -7,6 +7,8 @@ import { View } from '../view';
+ import useText from './hook';
+ import type { Props } from './types';
+ 
++export type TextProps = WordPressComponentProps< Props, 'span' >;
++
+ /**
+  * @param props
+  * @param forwardedRef
+diff --git a/packages/components/src/text/index.ts b/packages/components/src/text/index.ts
+index 2341fd018171b0..3917ea644aca2a 100644
+--- a/packages/components/src/text/index.ts
++++ b/packages/components/src/text/index.ts
+@@ -1,2 +1,2 @@
+-export { default as Text } from './component';
++export { default as Text, type TextProps } from './component';
+ export { default as useText } from './hook';
+diff --git a/packages/components/src/textarea-control/index.tsx b/packages/components/src/textarea-control/index.tsx
+index 7c0b0e92762fa6..f7ba0f30c2db9e 100644
+--- a/packages/components/src/textarea-control/index.tsx
++++ b/packages/components/src/textarea-control/index.tsx
+@@ -9,11 +9,17 @@ import { forwardRef } from '@wordpress/element';
+  */
+ import BaseControl from '../base-control';
+ import { StyledTextarea } from './styles/textarea-control-styles';
+-import type { TextareaControlProps } from './types';
++import type { TextareaControlProps as TextareaControlBaseProps } from './types';
+ import type { WordPressComponentProps } from '../context';
+ 
++export type TextareaControlProps = WordPressComponentProps<
++	TextareaControlBaseProps,
++	'textarea',
++	false
++>;
++
+ function UnforwardedTextareaControl(
+-	props: WordPressComponentProps< TextareaControlProps, 'textarea', false >,
++	props: TextareaControlProps,
+ 	ref: React.ForwardedRef< HTMLTextAreaElement >
+ ) {
+ 	const {
+diff --git a/packages/components/src/tip/index.tsx b/packages/components/src/tip/index.tsx
+index b3918cd94d1432..3aed4b66bdbdcd 100644
+--- a/packages/components/src/tip/index.tsx
++++ b/packages/components/src/tip/index.tsx
+@@ -8,6 +8,8 @@ import { Icon, tip } from '@wordpress/icons';
+  */
+ import type { TipProps } from './types';
+ 
++export type { TipProps } from './types';
++
+ export function Tip( props: TipProps ) {
+ 	const { children } = props;
+ 
+diff --git a/packages/components/src/toggle-control/index.tsx b/packages/components/src/toggle-control/index.tsx
+index c991953d53e4bf..46ae73ec2328e4 100644
+--- a/packages/components/src/toggle-control/index.tsx
++++ b/packages/components/src/toggle-control/index.tsx
+@@ -16,11 +16,17 @@ import { FlexBlock } from '../flex';
+ import FormToggle from '../form-toggle';
+ import BaseControl from '../base-control';
+ import type { WordPressComponentProps } from '../context/wordpress-component';
+-import type { ToggleControlProps } from './types';
++import type { ToggleControlProps as ToggleControlBaseProps } from './types';
+ import { HStack } from '../h-stack';
+ import { useCx } from '../utils';
+ import { space } from '../utils/space';
+ 
++export type ToggleControlProps = WordPressComponentProps<
++	ToggleControlBaseProps,
++	'input',
++	false
++>;
++
+ /**
+  * ToggleControl is used to generate a toggle user interface.
+  *
+@@ -49,7 +55,7 @@ export function ToggleControl( {
+ 	className,
+ 	onChange,
+ 	disabled,
+-}: WordPressComponentProps< ToggleControlProps, 'input', false > ) {
++}: ToggleControlProps ) {
+ 	function onChangeToggle( event: ChangeEvent< HTMLInputElement > ) {
+ 		onChange( event.target.checked );
+ 	}
+diff --git a/packages/components/src/toggle-group-control/index.ts b/packages/components/src/toggle-group-control/index.ts
+index e5e40497d9220e..113b92771dabde 100644
+--- a/packages/components/src/toggle-group-control/index.ts
++++ b/packages/components/src/toggle-group-control/index.ts
+@@ -1,3 +1,12 @@
+-export { ToggleGroupControl } from './toggle-group-control';
+-export { ToggleGroupControlOption } from './toggle-group-control-option';
+-export { ToggleGroupControlOptionIcon } from './toggle-group-control-option-icon';
++export {
++	ToggleGroupControl,
++	type ToggleGroupControlProps,
++} from './toggle-group-control';
++export {
++	ToggleGroupControlOption,
++	type ToggleGroupControlOptionProps,
++} from './toggle-group-control-option';
++export {
++	ToggleGroupControlOptionIcon,
++	type ToggleGroupControlOptionIconProps,
++} from './toggle-group-control-option-icon';
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
+index ec009d82344c39..b093e580f8bbf5 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
+@@ -12,16 +12,18 @@ import { forwardRef } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import type { WordPressComponentProps } from '../../context';
+-import type { ToggleGroupControlOptionIconProps } from '../types';
++import type { ToggleGroupControlOptionIconProps as ToggleGroupControlOptionIconBaseProps } from '../types';
+ import { ToggleGroupControlOptionBase } from '../toggle-group-control-option-base';
+ import Icon from '../../icon';
+ 
++export type ToggleGroupControlOptionIconProps = WordPressComponentProps<
++	ToggleGroupControlOptionIconBaseProps,
++	'button',
++	false
++>;
++
+ function UnforwardedToggleGroupControlOptionIcon(
+-	props: WordPressComponentProps<
+-		ToggleGroupControlOptionIconProps,
+-		'button',
+-		false
+-	>,
++	props: ToggleGroupControlOptionIconProps,
+ 	ref: ForwardedRef< any >
+ ) {
+ 	const { icon, label, ...restProps } = props;
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/index.ts b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/index.ts
+index 631a732b91ef37..3d2bc53fd7640f 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/index.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/index.ts
+@@ -1 +1,4 @@
+-export { default as ToggleGroupControlOptionIcon } from './component';
++export {
++	default as ToggleGroupControlOptionIcon,
++	type ToggleGroupControlOptionIconProps,
++} from './component';
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
+index e4b9cff4b80330..c254b5c9032eb4 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
+@@ -12,15 +12,17 @@ import { forwardRef } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import type { WordPressComponentProps } from '../../context';
+-import type { ToggleGroupControlOptionProps } from '../types';
++import type { ToggleGroupControlOptionProps as ToggleGroupControlOptionBaseProps } from '../types';
+ import { ToggleGroupControlOptionBase } from '../toggle-group-control-option-base';
+ 
++export type ToggleGroupControlOptionProps = WordPressComponentProps<
++	ToggleGroupControlOptionBaseProps,
++	'button',
++	false
++>;
++
+ function UnforwardedToggleGroupControlOption(
+-	props: WordPressComponentProps<
+-		ToggleGroupControlOptionProps,
+-		'button',
+-		false
+-	>,
++	props: ToggleGroupControlOptionProps,
+ 	ref: ForwardedRef< any >
+ ) {
+ 	const { label, ...restProps } = props;
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option/index.ts b/packages/components/src/toggle-group-control/toggle-group-control-option/index.ts
+index 79d06d8b340bda..7ac38a45d69835 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option/index.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option/index.ts
+@@ -1 +1,4 @@
+-export { default as ToggleGroupControlOption } from './component';
++export {
++	default as ToggleGroupControlOption,
++	type ToggleGroupControlOptionProps,
++} from './component';
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index 2fa35e2a5e80a6..03cfab289f6c70 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -19,14 +19,20 @@ import type { WordPressComponentProps } from '../../context';
+ import { contextConnect, useContextSystem } from '../../context';
+ import { useCx } from '../../utils/hooks';
+ import BaseControl from '../../base-control';
+-import type { ToggleGroupControlProps } from '../types';
++import type { ToggleGroupControlProps as ToggleGroupControlBaseProps } from '../types';
+ import { VisualLabelWrapper } from './styles';
+ import * as styles from './styles';
+ import { ToggleGroupControlAsRadioGroup } from './as-radio-group';
+ import { ToggleGroupControlAsButtonGroup } from './as-button-group';
+ 
++export type ToggleGroupControlProps = WordPressComponentProps<
++	ToggleGroupControlBaseProps,
++	'div',
++	false
++>;
++
+ function UnconnectedToggleGroupControl(
+-	props: WordPressComponentProps< ToggleGroupControlProps, 'div', false >,
++	props: ToggleGroupControlProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const {
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/index.ts b/packages/components/src/toggle-group-control/toggle-group-control/index.ts
+index 64756c7127b4c1..5538bfaff74d36 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/index.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control/index.ts
+@@ -1 +1,4 @@
+-export { default as ToggleGroupControl } from './component';
++export {
++	default as ToggleGroupControl,
++	type ToggleGroupControlProps,
++} from './component';
+diff --git a/packages/components/src/toolbar/index.js b/packages/components/src/toolbar/index.js
+deleted file mode 100644
+index a337fd3af4d216..00000000000000
+--- a/packages/components/src/toolbar/index.js
++++ /dev/null
+@@ -1,6 +0,0 @@
+-export { default as Toolbar } from './toolbar';
+-export { default as ToolbarButton } from './toolbar-button';
+-export { default as ToolbarContext } from './toolbar-context';
+-export { default as ToolbarDropdownMenu } from './toolbar-dropdown-menu';
+-export { default as ToolbarGroup } from './toolbar-group';
+-export { default as ToolbarItem } from './toolbar-item';
+diff --git a/packages/components/src/toolbar/index.ts b/packages/components/src/toolbar/index.ts
+new file mode 100644
+index 00000000000000..1ae1363906e6b5
+--- /dev/null
++++ b/packages/components/src/toolbar/index.ts
+@@ -0,0 +1,15 @@
++export { default as Toolbar, type ToolbarProps } from './toolbar';
++export {
++	default as ToolbarButton,
++	type ToolbarButtonProps,
++} from './toolbar-button';
++export { default as ToolbarContext } from './toolbar-context';
++export {
++	default as ToolbarDropdownMenu,
++	type ToolbarDropdownMenuProps,
++} from './toolbar-dropdown-menu';
++export {
++	default as ToolbarGroup,
++	type ToolbarGroupProps,
++} from './toolbar-group';
++export { default as ToolbarItem, type ToolbarItemProps } from './toolbar-item';
+diff --git a/packages/components/src/toolbar/toolbar-button/index.tsx b/packages/components/src/toolbar/toolbar-button/index.tsx
+index 3d77e9cbc8cf6f..02c5d21db6e950 100644
+--- a/packages/components/src/toolbar/toolbar-button/index.tsx
++++ b/packages/components/src/toolbar/toolbar-button/index.tsx
+@@ -16,9 +16,15 @@ import Button from '../../button';
+ import ToolbarItem from '../toolbar-item';
+ import ToolbarContext from '../toolbar-context';
+ import ToolbarButtonContainer from './toolbar-button-container';
+-import type { ToolbarButtonProps } from './types';
++import type { ToolbarButtonProps as ToolbarButtonBaseProps } from './types';
+ import type { WordPressComponentProps } from '../../context';
+ 
++export type ToolbarButtonProps = WordPressComponentProps<
++	ToolbarButtonBaseProps,
++	typeof Button,
++	false
++>;
++
+ function UnforwardedToolbarButton(
+ 	{
+ 		children,
+@@ -29,7 +35,7 @@ function UnforwardedToolbarButton(
+ 		isDisabled,
+ 		title,
+ 		...props
+-	}: WordPressComponentProps< ToolbarButtonProps, typeof Button, false >,
++	}: ToolbarButtonProps,
+ 	ref: ForwardedRef< any >
+ ) {
+ 	const accessibleToolbarState = useContext( ToolbarContext );
+diff --git a/packages/components/src/toolbar/toolbar-dropdown-menu/index.tsx b/packages/components/src/toolbar/toolbar-dropdown-menu/index.tsx
+index 6dc5fd523ec2fa..8921ba8c756107 100644
+--- a/packages/components/src/toolbar/toolbar-dropdown-menu/index.tsx
++++ b/packages/components/src/toolbar/toolbar-dropdown-menu/index.tsx
+@@ -14,10 +14,12 @@ import type { ForwardedRef } from 'react';
+ import ToolbarItem from '../toolbar-item';
+ import ToolbarContext from '../toolbar-context';
+ import DropdownMenu from '../../dropdown-menu';
+-import type { DropdownMenuProps } from '../../dropdown-menu/types';
++import type { DropdownMenuProps } from '../../dropdown-menu';
++
++export type ToolbarDropdownMenuProps = DropdownMenuProps;
+ 
+ function ToolbarDropdownMenu(
+-	props: DropdownMenuProps,
++	props: ToolbarDropdownMenuProps,
+ 	ref: ForwardedRef< any >
+ ) {
+ 	const accessibleToolbarState = useContext( ToolbarContext );
+diff --git a/packages/components/src/toolbar/toolbar-group/index.tsx b/packages/components/src/toolbar/toolbar-group/index.tsx
+index e2c0b5b2f22c41..0db61090ff8166 100644
+--- a/packages/components/src/toolbar/toolbar-group/index.tsx
++++ b/packages/components/src/toolbar/toolbar-group/index.tsx
+@@ -21,6 +21,8 @@ function isNestedArray< T = any >( arr: T[] | T[][] ): arr is T[][] {
+ 	return Array.isArray( arr ) && Array.isArray( arr[ 0 ] );
+ }
+ 
++export type { ToolbarGroupProps } from './types';
++
+ /**
+  * Renders a collapsible group of controls
+  *
+diff --git a/packages/components/src/toolbar/toolbar-item/index.tsx b/packages/components/src/toolbar/toolbar-item/index.tsx
+index 2c343eb173a27b..e58b1cfe6d5ba2 100644
+--- a/packages/components/src/toolbar/toolbar-item/index.tsx
++++ b/packages/components/src/toolbar/toolbar-item/index.tsx
+@@ -17,6 +17,8 @@ import warning from '@wordpress/warning';
+ import ToolbarContext from '../toolbar-context';
+ import type { ToolbarItemProps } from './types';
+ 
++export type { ToolbarItemProps } from './types';
++
+ function ToolbarItem(
+ 	{ children, as: Component, ...props }: ToolbarItemProps,
+ 	ref: ForwardedRef< any >
+diff --git a/packages/components/src/toolbar/toolbar/index.tsx b/packages/components/src/toolbar/toolbar/index.tsx
+index 47c49b270afef2..e0074da4581e0d 100644
+--- a/packages/components/src/toolbar/toolbar/index.tsx
++++ b/packages/components/src/toolbar/toolbar/index.tsx
+@@ -15,17 +15,18 @@ import deprecated from '@wordpress/deprecated';
+  */
+ import ToolbarGroup from '../toolbar-group';
+ import ToolbarContainer from './toolbar-container';
+-import type { ToolbarProps } from './types';
++import type { ToolbarProps as ToolbarBaseProps } from './types';
+ import type { WordPressComponentProps } from '../../context';
+ import { ContextSystemProvider } from '../../context';
+ 
++export type ToolbarProps = WordPressComponentProps<
++	ToolbarBaseProps,
++	'div',
++	false
++>;
++
+ function UnforwardedToolbar(
+-	{
+-		className,
+-		label,
+-		variant,
+-		...props
+-	}: WordPressComponentProps< ToolbarProps, 'div', false >,
++	{ className, label, variant, ...props }: ToolbarProps,
+ 	ref: ForwardedRef< any >
+ ) {
+ 	const isVariantDefined = variant !== undefined;
+diff --git a/packages/components/src/tools-panel/index.ts b/packages/components/src/tools-panel/index.ts
+index bd749977d256ea..07317fc64d9a5a 100644
+--- a/packages/components/src/tools-panel/index.ts
++++ b/packages/components/src/tools-panel/index.ts
+@@ -1,3 +1,6 @@
+-export { default as ToolsPanel } from './tools-panel';
+-export { default as ToolsPanelItem } from './tools-panel-item';
++export { default as ToolsPanel, type ToolsPanelProps } from './tools-panel';
++export {
++	default as ToolsPanelItem,
++	type ToolsPanelItemProps,
++} from './tools-panel-item';
+ export { ToolsPanelContext } from './context';
+diff --git a/packages/components/src/tools-panel/tools-panel-item/component.tsx b/packages/components/src/tools-panel/tools-panel-item/component.tsx
+index a44514824ebef6..e7eb6e6c47f7cc 100644
+--- a/packages/components/src/tools-panel/tools-panel-item/component.tsx
++++ b/packages/components/src/tools-panel/tools-panel-item/component.tsx
+@@ -10,12 +10,17 @@ import { useToolsPanelItem } from './hook';
+ import { View } from '../../view';
+ import type { WordPressComponentProps } from '../../context';
+ import { contextConnect } from '../../context';
+-import type { ToolsPanelItemProps } from '../types';
++import type { ToolsPanelItemProps as ToolsPanelItemBaseProps } from '../types';
++
++export type ToolsPanelItemProps = WordPressComponentProps<
++	ToolsPanelItemBaseProps,
++	'div'
++>;
+ 
+ // This wraps controls to be conditionally displayed within a tools panel. It
+ // prevents props being applied to HTML elements that would make them invalid.
+ const UnconnectedToolsPanelItem = (
+-	props: WordPressComponentProps< ToolsPanelItemProps, 'div' >,
++	props: ToolsPanelItemProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) => {
+ 	const {
+diff --git a/packages/components/src/tools-panel/tools-panel-item/index.ts b/packages/components/src/tools-panel/tools-panel-item/index.ts
+index 8b4b163fe0f222..6626a33a6ab26f 100644
+--- a/packages/components/src/tools-panel/tools-panel-item/index.ts
++++ b/packages/components/src/tools-panel/tools-panel-item/index.ts
+@@ -1,2 +1,2 @@
+-export { default } from './component';
++export { default, type ToolsPanelItemProps } from './component';
+ export { useToolsPanelItem } from './hook';
+diff --git a/packages/components/src/tools-panel/tools-panel/component.tsx b/packages/components/src/tools-panel/tools-panel/component.tsx
+index 4e01e39ffffb43..089ee8e401010e 100644
+--- a/packages/components/src/tools-panel/tools-panel/component.tsx
++++ b/packages/components/src/tools-panel/tools-panel/component.tsx
+@@ -12,10 +12,15 @@ import { useToolsPanel } from './hook';
+ import { Grid } from '../../grid';
+ import type { WordPressComponentProps } from '../../context';
+ import { contextConnect } from '../../context';
+-import type { ToolsPanelProps } from '../types';
++import type { ToolsPanelProps as ToolsPanelBaseProps } from '../types';
++
++export type ToolsPanelProps = WordPressComponentProps<
++	ToolsPanelBaseProps,
++	'div'
++>;
+ 
+ const UnconnectedToolsPanel = (
+-	props: WordPressComponentProps< ToolsPanelProps, 'div' >,
++	props: ToolsPanelProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) => {
+ 	const {
+diff --git a/packages/components/src/tools-panel/tools-panel/index.ts b/packages/components/src/tools-panel/tools-panel/index.ts
+index a0c01e54d06911..b35a7257b9f29f 100644
+--- a/packages/components/src/tools-panel/tools-panel/index.ts
++++ b/packages/components/src/tools-panel/tools-panel/index.ts
+@@ -1,2 +1,2 @@
+-export { default } from './component';
++export { default, type ToolsPanelProps } from './component';
+ export { useToolsPanel } from './hook';
+diff --git a/packages/components/src/tooltip/index.tsx b/packages/components/src/tooltip/index.tsx
+index 87c7506a9c5f7d..e64acee8638ae9 100644
+--- a/packages/components/src/tooltip/index.tsx
++++ b/packages/components/src/tooltip/index.tsx
+@@ -39,6 +39,8 @@ const CONTEXT_VALUE = {
+ 	isNestedInTooltip: true,
+ };
+ 
++export type { TooltipProps } from './types';
++
+ function UnforwardedTooltip(
+ 	props: TooltipProps,
+ 	ref: React.ForwardedRef< any >
+diff --git a/packages/components/src/tree-grid/cell.tsx b/packages/components/src/tree-grid/cell.tsx
+index a9883eb0512266..8ae7626daa7f9a 100644
+--- a/packages/components/src/tree-grid/cell.tsx
++++ b/packages/components/src/tree-grid/cell.tsx
+@@ -8,14 +8,16 @@ import { forwardRef } from '@wordpress/element';
+  */
+ import TreeGridItem from './item';
+ import type { WordPressComponentProps } from '../context';
+-import type { TreeGridCellProps } from './types';
++import type { TreeGridCellProps as TreeGridCellBaseProps } from './types';
++
++export type TreeGridCellProps = WordPressComponentProps<
++	TreeGridCellBaseProps,
++	'td',
++	false
++>;
+ 
+ function UnforwardedTreeGridCell(
+-	{
+-		children,
+-		withoutGridItem = false,
+-		...props
+-	}: WordPressComponentProps< TreeGridCellProps, 'td', false >,
++	{ children, withoutGridItem = false, ...props }: TreeGridCellProps,
+ 	ref: React.ForwardedRef< any >
+ ) {
+ 	return (
+diff --git a/packages/components/src/tree-grid/index.tsx b/packages/components/src/tree-grid/index.tsx
+index 6a02f333854941..e705b46d946cf7 100644
+--- a/packages/components/src/tree-grid/index.tsx
++++ b/packages/components/src/tree-grid/index.tsx
+@@ -9,7 +9,7 @@ import { UP, DOWN, LEFT, RIGHT, HOME, END } from '@wordpress/keycodes';
+  * Internal dependencies
+  */
+ import RovingTabIndexContainer from './roving-tab-index';
+-import type { TreeGridProps } from './types';
++import type { TreeGridProps as TreeGridBaseProps } from './types';
+ import type { WordPressComponentProps } from '../context';
+ 
+ /**
+@@ -30,6 +30,12 @@ function getRowFocusables( rowElement: HTMLElement ) {
+ 	} );
+ }
+ 
++export type TreeGridProps = WordPressComponentProps<
++	TreeGridBaseProps,
++	'table',
++	false
++>;
++
+ /**
+  * Renders both a table and tbody element, used to create a tree hierarchy.
+  *
+@@ -42,7 +48,7 @@ function UnforwardedTreeGrid(
+ 		onFocusRow = () => {},
+ 		applicationAriaLabel,
+ 		...props
+-	}: WordPressComponentProps< TreeGridProps, 'table', false >,
++	}: TreeGridProps,
+ 	/** A ref to the underlying DOM table element. */
+ 	ref: React.ForwardedRef< HTMLTableElement >
+ ) {
+@@ -388,6 +394,6 @@ function UnforwardedTreeGrid(
+ export const TreeGrid = forwardRef( UnforwardedTreeGrid );
+ 
+ export default TreeGrid;
+-export { default as TreeGridRow } from './row';
+-export { default as TreeGridCell } from './cell';
+-export { default as TreeGridItem } from './item';
++export { default as TreeGridRow, type TreeGridRowProps } from './row';
++export { default as TreeGridCell, type TreeGridCellProps } from './cell';
++export { default as TreeGridItem, type TreeGridItemProps } from './item';
+diff --git a/packages/components/src/tree-grid/item.tsx b/packages/components/src/tree-grid/item.tsx
+index 7e32fb346248fa..68b7b8b7449908 100644
+--- a/packages/components/src/tree-grid/item.tsx
++++ b/packages/components/src/tree-grid/item.tsx
+@@ -7,10 +7,11 @@ import { forwardRef } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import RovingTabIndexItem from './roving-tab-index-item';
+-import type { RovingTabIndexItemProps } from './types';
++import type { RovingTabIndexItemProps as TreeGridItemProps } from './types';
++export type { RovingTabIndexItemProps as TreeGridItemProps } from './types';
+ 
+ function UnforwardedTreeGridItem(
+-	{ children, ...props }: RovingTabIndexItemProps,
++	{ children, ...props }: TreeGridItemProps,
+ 	ref: React.ForwardedRef< any >
+ ) {
+ 	return (
+diff --git a/packages/components/src/tree-grid/row.tsx b/packages/components/src/tree-grid/row.tsx
+index a6ea0624fa6a86..a2111f2681aa38 100644
+--- a/packages/components/src/tree-grid/row.tsx
++++ b/packages/components/src/tree-grid/row.tsx
+@@ -7,7 +7,13 @@ import { forwardRef } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import type { WordPressComponentProps } from '../context';
+-import type { TreeGridRowProps } from './types';
++import type { TreeGridRowProps as TreeGridRowBaseProps } from './types';
++
++export type TreeGridRowProps = WordPressComponentProps<
++	TreeGridRowBaseProps,
++	'tr',
++	false
++>;
+ 
+ function UnforwardedTreeGridRow(
+ 	{
+@@ -17,7 +23,7 @@ function UnforwardedTreeGridRow(
+ 		setSize,
+ 		isExpanded,
+ 		...props
+-	}: WordPressComponentProps< TreeGridRowProps, 'tr', false >,
++	}: TreeGridRowProps,
+ 	ref: React.ForwardedRef< HTMLTableRowElement >
+ ) {
+ 	return (
+diff --git a/packages/components/src/tree-select/index.tsx b/packages/components/src/tree-select/index.tsx
+index d6e0738b6beb37..cee1394a7ed2c8 100644
+--- a/packages/components/src/tree-select/index.tsx
++++ b/packages/components/src/tree-select/index.tsx
+@@ -25,6 +25,8 @@ function getSelectOptions(
+ 	] );
+ }
+ 
++export type { TreeSelectProps } from './types';
++
+ /**
+  * TreeSelect component is used to generate select input fields.
+  *
+diff --git a/packages/components/src/truncate/component.tsx b/packages/components/src/truncate/component.tsx
+index 4b6c721f92c70c..906ca5a241b6b1 100644
+--- a/packages/components/src/truncate/component.tsx
++++ b/packages/components/src/truncate/component.tsx
+@@ -10,10 +10,15 @@ import type { WordPressComponentProps } from '../context';
+ import { contextConnect } from '../context';
+ import { View } from '../view';
+ import useTruncate from './hook';
+-import type { TruncateProps } from './types';
++import type { TruncateProps as TruncateBaseProps } from './types';
++
++export type TruncateProps = WordPressComponentProps<
++	TruncateBaseProps,
++	'span'
++>;
+ 
+ function UnconnectedTruncate(
+-	props: WordPressComponentProps< TruncateProps, 'span' >,
++	props: TruncateProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const truncateProps = useTruncate( props );
+diff --git a/packages/components/src/truncate/index.ts b/packages/components/src/truncate/index.ts
+index 0ea1912af03c8b..6a27baa4de8a1a 100644
+--- a/packages/components/src/truncate/index.ts
++++ b/packages/components/src/truncate/index.ts
+@@ -1,2 +1,2 @@
+-export { default as Truncate } from './component';
++export { default as Truncate, type TruncateProps } from './component';
+ export { default as useTruncate } from './hook';
+diff --git a/packages/components/src/unit-control/index.tsx b/packages/components/src/unit-control/index.tsx
+index 93ec2c358ecf15..2dee4d4ae4a1d3 100644
+--- a/packages/components/src/unit-control/index.tsx
++++ b/packages/components/src/unit-control/index.tsx
+@@ -25,15 +25,20 @@ import {
+ } from './utils';
+ import { useControlledState } from '../utils/hooks';
+ import { escapeRegExp } from '../utils/strings';
+-import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
++import type {
++	UnitControlProps as UnitControlBaseProps,
++	UnitControlOnChangeCallback,
++} from './types';
+ import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+ 
++export type UnitControlProps = WordPressComponentProps<
++	UnitControlBaseProps,
++	'input',
++	false
++>;
++
+ function UnforwardedUnitControl(
+-	unitControlProps: WordPressComponentProps<
+-		UnitControlProps,
+-		'input',
+-		false
+-	>,
++	unitControlProps: UnitControlProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const {
+diff --git a/packages/components/src/v-stack/component.tsx b/packages/components/src/v-stack/component.tsx
+index c3ae9fece97dc0..c18d3e38de5552 100644
+--- a/packages/components/src/v-stack/component.tsx
++++ b/packages/components/src/v-stack/component.tsx
+@@ -10,10 +10,12 @@ import type { WordPressComponentProps } from '../context';
+ import { contextConnect } from '../context';
+ import { View } from '../view';
+ import { useVStack } from './hook';
+-import type { VStackProps } from './types';
++import type { VStackProps as VStackBaseProps } from './types';
++
++export type VStackProps = WordPressComponentProps< VStackBaseProps, 'div' >;
+ 
+ function UnconnectedVStack(
+-	props: WordPressComponentProps< VStackProps, 'div' >,
++	props: VStackProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const vStackProps = useVStack( props );
+diff --git a/packages/components/src/v-stack/index.ts b/packages/components/src/v-stack/index.ts
+index 932237a92adf93..c7e1a6a75a19ac 100644
+--- a/packages/components/src/v-stack/index.ts
++++ b/packages/components/src/v-stack/index.ts
+@@ -1,2 +1,2 @@
+-export { default as VStack } from './component';
++export { default as VStack, type VStackProps } from './component';
+ export { useVStack } from './hook';
+diff --git a/packages/components/src/visually-hidden/component.tsx b/packages/components/src/visually-hidden/component.tsx
+index ddf697c9373db6..33b78d6b717b6d 100644
+--- a/packages/components/src/visually-hidden/component.tsx
++++ b/packages/components/src/visually-hidden/component.tsx
+@@ -10,10 +10,15 @@ import type { WordPressComponentProps } from '../context';
+ import { useContextSystem, contextConnect } from '../context';
+ import { visuallyHidden } from './styles';
+ import { View } from '../view';
+-import type { VisuallyHiddenProps } from './types';
++import type { VisuallyHiddenProps as VisuallyHiddenBaseProps } from './types';
++
++export type VisuallyHiddenProps = WordPressComponentProps<
++	VisuallyHiddenBaseProps,
++	'div'
++>;
+ 
+ function UnconnectedVisuallyHidden(
+-	props: WordPressComponentProps< VisuallyHiddenProps, 'div' >,
++	props: VisuallyHiddenProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const { style: styleProp, ...contextProps } = useContextSystem(
+diff --git a/packages/components/src/visually-hidden/index.ts b/packages/components/src/visually-hidden/index.ts
+index 4b0eb62431163f..441cf57d62c23f 100644
+--- a/packages/components/src/visually-hidden/index.ts
++++ b/packages/components/src/visually-hidden/index.ts
+@@ -1 +1,4 @@
+-export { default as VisuallyHidden } from './component';
++export {
++	default as VisuallyHidden,
++	type VisuallyHiddenProps,
++} from './component';
+diff --git a/packages/components/src/z-stack/component.tsx b/packages/components/src/z-stack/component.tsx
+index 411ef13c7085e3..05523525be7d22 100644
+--- a/packages/components/src/z-stack/component.tsx
++++ b/packages/components/src/z-stack/component.tsx
+@@ -14,11 +14,13 @@ import { isValidElement } from '@wordpress/element';
+ import { getValidChildren } from '../utils/get-valid-children';
+ import { contextConnect, useContextSystem } from '../context';
+ import { ZStackView, ZStackChildView } from './styles';
+-import type { ZStackProps } from './types';
++import type { ZStackProps as ZStackBaseProps } from './types';
+ import type { WordPressComponentProps } from '../context';
+ 
++export type ZStackProps = WordPressComponentProps< ZStackBaseProps, 'div' >;
++
+ function UnconnectedZStack(
+-	props: WordPressComponentProps< ZStackProps, 'div' >,
++	props: ZStackProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const {
+diff --git a/packages/components/src/z-stack/index.ts b/packages/components/src/z-stack/index.ts
+index ec29793b39db84..e98753a7f55d3b 100644
+--- a/packages/components/src/z-stack/index.ts
++++ b/packages/components/src/z-stack/index.ts
+@@ -1 +1 @@
+-export { default as ZStack } from './component';
++export { default as ZStack, type ZStackProps } from './component';

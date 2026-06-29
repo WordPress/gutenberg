@@ -1,0 +1,1370 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index d76717fbdedfc1..8387b9079694c0 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -1098,33 +1098,9 @@
+ 		"parent": "components"
+ 	},
+ 	{
+-		"title": "NavigatorBackButton",
+-		"slug": "navigator-back-button",
+-		"markdown_source": "../packages/components/src/navigator/navigator-back-button/README.md",
+-		"parent": "components"
+-	},
+-	{
+-		"title": "NavigatorButton",
+-		"slug": "navigator-button",
+-		"markdown_source": "../packages/components/src/navigator/navigator-button/README.md",
+-		"parent": "components"
+-	},
+-	{
+-		"title": "NavigatorProvider",
+-		"slug": "navigator-provider",
+-		"markdown_source": "../packages/components/src/navigator/navigator-provider/README.md",
+-		"parent": "components"
+-	},
+-	{
+-		"title": "NavigatorScreen",
+-		"slug": "navigator-screen",
+-		"markdown_source": "../packages/components/src/navigator/navigator-screen/README.md",
+-		"parent": "components"
+-	},
+-	{
+-		"title": "NavigatorToParentButton",
+-		"slug": "navigator-to-parent-button",
+-		"markdown_source": "../packages/components/src/navigator/navigator-to-parent-button/README.md",
++		"title": "Navigator",
++		"slug": "navigator",
++		"markdown_source": "../packages/components/src/navigator/README.md",
+ 		"parent": "components"
+ 	},
+ 	{
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d34b411833468f..8ef1c7c3bd2002 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -19,6 +19,7 @@
+ -   `Navigator`: add support for exit animation ([#64777](https://github.com/WordPress/gutenberg/pull/64777)).
+ -   `Guide`: Update finish button to use the new default size ([#65680](https://github.com/WordPress/gutenberg/pull/65680)).
+ -   `BorderControl`: Use `__next40pxDefaultSize` prop for Reset button ([#65682](https://github.com/WordPress/gutenberg/pull/65682)).
++-   `Navigator`: stabilize APIs ([#64613](https://github.com/WordPress/gutenberg/pull/64613)).
+ 
+ ## 28.8.0 (2024-09-19)
+ 
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index 37ba116a7f679e..cc3c0265c42208 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -132,6 +132,7 @@ export {
+ 	NavigatorToParentButton as __experimentalNavigatorToParentButton,
+ 	useNavigator as __experimentalUseNavigator,
+ } from './navigator/legacy';
++export { Navigator, useNavigator } from './navigator';
+ export { default as Notice } from './notice';
+ export { default as __experimentalNumberControl } from './number-control';
+ export { default as NoticeList } from './notice/list';
+diff --git a/packages/components/src/navigator/README.md b/packages/components/src/navigator/README.md
+new file mode 100644
+index 00000000000000..00b1cfaeebe0f7
+--- /dev/null
++++ b/packages/components/src/navigator/README.md
+@@ -0,0 +1,168 @@
++# `Navigator`
++
++`Navigator` is a collection components that allow rendering nested views/panels/menus (via the `Navigator.Screen` component) and navigate between them (via the `Navigator.Button` and `Navigator.BackButton` components).
++
++## Usage
++
++```jsx
++import { Navigator } from '@wordpress/components';
++
++const MyNavigation = () => (
++	<Navigator initialPath="/">
++		<Navigator.Screen path="/">
++			<p>This is the home screen.</p>
++			<Navigator.Button path="/child">
++				Navigate to child screen.
++			</Navigator.Button>
++		</Navigator.Screen>
++		<Navigator.Screen path="/child">
++			<p>This is the child screen.</p>
++			<Navigator.BackButton>Go back</Navigator.BackButton>
++		</Navigator.Screen>
++	</Navigator>
++);
++```
++
++### Hierarchical `path`s
++
++`Navigator` assumes that screens are organized hierarchically according to their `path`, which should follow a URL-like scheme where each path segment starts with and is separated by the `/` character.
++
++`Navigator` will treat "back" navigations as going to the parent screen — it is, therefore, the responsibility of the consumer of the component to create the correct screen hierarchy.
++
++For example:
++
++-   `/` is the root of all paths. There should always be a screen with `path="/"`;
++-   `/parent/child` is a child of `/parent`;
++-   `/parent/child/grand-child` is a child of `/parent/child`;
++-   `/parent/:param` is a child of `/parent` as well;
++-   if the current screen has a `path="/parent/child/grand-child"`, when going "back" `Navigator` will try to recursively navigate the path hierarchy until a matching screen (or the root `/`) is found.
++
++### Height and animations
++
++Due to how `Navigator.Screen` animations work, it is recommended that the `Navigator` component is assigned a `height` to prevent some potential UI jumps while moving across screens.
++
++### Individual components
++
++`Navigator` is comprised of four individual components:
++
++-   `Navigator`: a wrapper component and context provider. It holds the main logic for hiding and showing screens.
++-   `Navigator.Screen`: represents a single view/screen/panel;
++-   `Navigator.Button`: renders a button that allows navigating to a different `Navigator.Screen`;
++-   `Navigator.BackButton`: renders a button that allows navigating to the parent `Navigator.Screen` (see the section above about hierarchical paths).
++
++For advanced usages, consumers can use the `useNavigator` hook.
++
++#### `Navigator`
++
++##### Props
++
++###### `initialPath`: `string`
++
++The initial active path.
++
++-   Required: Yes
++
++###### `children`: `string`
++
++The children elements.
++
++-   Required: Yes
++
++#### `Navigator.Screen`
++
++###### `path`: `string`
++
++The screen's path, matched against the current path stored in the navigator.
++
++`Navigator` assumes that screens are organized hierarchically according to their `path`, which should follow a URL-like scheme where each path segment starts with and is separated by the `/` character.
++
++`Navigator` will treat "back" navigations as going to the parent screen — it is, therefore, the responsibility of the consumer of the component to create the correct screen hierarchy.
++
++For example:
++
++-   `/` is the root of all paths. There should always be a screen with `path="/"`.
++-   `/parent/child` is a child of `/parent`.
++-   `/parent/child/grand-child` is a child of `/parent/child`.
++-   `/parent/:param` is a child of `/parent` as well.
++-   if the current screen has a `path` with value `/parent/child/grand-child`, when going "back" `Navigator` will try to recursively navigate the path hierarchy until a matching screen (or the root `/`) is found.
++
++-   Required: Yes
++
++###### `children`: `string`
++
++The children elements.
++
++-   Required: Yes
++
++##### `Navigator.Button`
++
++###### `path`: `string`
++
++The path of the screen to navigate to. The value of this prop needs to be [a valid value for an HTML attribute](https://html.spec.whatwg.org/multipage/syntax.html#attributes-2).
++
++-   Required: Yes
++
++###### `attributeName`: `string`
++
++The HTML attribute used to identify the `Navigator.Button`, which is used by `Navigator` to restore focus.
++
++-   Required: No
++-   Default: `id`
++
++###### `children`: `string`
++
++The children elements.
++
++-   Required: No
++
++###### Inherited props
++
++`Navigator.Button` also inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href` and `target`.
++
++##### `Navigator.BackButton`
++
++###### `children`: `string`
++
++The children elements.
++
++-   Required: No
++
++###### Inherited props
++
++`Navigator.BackButton` also inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href` and `target`.
++
++###### `useNavigator`
++
++You can retrieve a `navigator` instance by using the `useNavigator` hook.
++
++The `navigator` instance has a few properties:
++
++###### `goTo`: `( path: string, options: NavigateOptions ) => void`
++
++The `goTo` function allows navigating to a given path. The second argument can augment the navigation operations with different options.
++
++The available options are:
++
++-   `focusTargetSelector`: `string`. An optional property used to specify the CSS selector used to restore focus on the matching element when navigating back;
++-   `isBack`: `boolean`. An optional property used to specify whether the navigation should be considered as backwards (thus enabling focus restoration when possible, and causing the animation to be backwards too);
++-   `skipFocus`: `boolean`. An optional property used to opt out of `Navigator`'s focus management, useful when the consumer of the component wants to manage focus themselves;
++
++###### `goBack`: `( path: string, options: NavigateOptions ) => void`
++
++The `goBack` function allows navigating to the parent screen. Parent/child navigation only works if the paths you define are hierarchical (see note above).
++
++When a match is not found, the function will try to recursively navigate the path hierarchy until a matching screen (or the root `/`) is found.
++
++The available options are the same as for the `goTo` method, except for the `isBack` property, which is not available for the `goBack` method.
++
++###### `location`: `NavigatorLocation`
++
++The `location` object represents the current location, and has a few properties:
++
++-   `path`: `string`. The path associated to the location.
++-   `isBack`: `boolean`. A flag that is `true` when the current location was reached by navigating backwards.
++-   `isInitial`: `boolean`. A flag that is `true` only for the initial location.
++
++###### `params`: `Record< string, string | string[] >`
++
++The parsed record of parameters from the current location. For example if the current screen path is `/product/:productId` and the location is `/product/123`, then `params` will be `{ productId: '123' }`.
+diff --git a/packages/components/src/navigator/index.tsx b/packages/components/src/navigator/index.tsx
+new file mode 100644
+index 00000000000000..1d9ae95441e01a
+--- /dev/null
++++ b/packages/components/src/navigator/index.tsx
+@@ -0,0 +1,131 @@
++/**
++ * Internal dependencies
++ */
++import { Navigator as TopLevelNavigator } from './navigator/component';
++import { NavigatorScreen } from './navigator-screen/component';
++import { NavigatorButton } from './navigator-button/component';
++import { NavigatorBackButton } from './navigator-back-button/component';
++export { useNavigator } from './use-navigator';
++
++/**
++ * The `Navigator` component allows rendering nested views/panels/menus
++ * (via the `Navigator.Screen` component) and navigate between them
++ * (via the `Navigator.Button` and `Navigator.BackButton` components).
++ *
++ * ```jsx
++ * import { Navigator } from '@wordpress/components';
++ *
++ * const MyNavigation = () => (
++ *   <Navigator initialPath="/">
++ *     <Navigator.Screen path="/">
++ *       <p>This is the home screen.</p>
++ *        <Navigator.Button path="/child">
++ *          Navigate to child screen.
++ *       </Navigator.Button>
++ *     </Navigator.Screen>
++ *
++ *     <Navigator.Screen path="/child">
++ *       <p>This is the child screen.</p>
++ *       <Navigator.BackButton>
++ *         Go back
++ *       </Navigator.BackButton>
++ *     </Navigator.Screen>
++ *   </Navigator>
++ * );
++ * ```
++ */
++export const Navigator = Object.assign( TopLevelNavigator, {
++	/**
++	 * The `Navigator.Screen` component represents a single view/screen/panel and
++	 * should be used in combination with the `Navigator`, the `Navigator.Button`
++	 * and the `Navigator.BackButton` components.
++	 *
++	 * @example
++	 * ```jsx
++	 * import { Navigator } from '@wordpress/components';
++	 *
++	 * const MyNavigation = () => (
++	 *   <Navigator initialPath="/">
++	 *     <Navigator.Screen path="/">
++	 *       <p>This is the home screen.</p>
++	 *        <Navigator.Button path="/child">
++	 *          Navigate to child screen.
++	 *       </Navigator.Button>
++	 *     </Navigator.Screen>
++	 *
++	 *     <Navigator.Screen path="/child">
++	 *       <p>This is the child screen.</p>
++	 *       <Navigator.BackButton>
++	 *         Go back
++	 *       </Navigator.BackButton>
++	 *     </Navigator.Screen>
++	 *   </Navigator>
++	 * );
++	 * ```
++	 */
++	Screen: Object.assign( NavigatorScreen, {
++		displayName: 'Navigator.Screen',
++	} ),
++	/**
++	 * The `Navigator.Button` component can be used to navigate to a screen and
++	 * should be used in combination with the `Navigator`, the `Navigator.Screen`
++	 * and the `Navigator.BackButton` components.
++	 *
++	 * @example
++	 * ```jsx
++	 * import { Navigator } from '@wordpress/components';
++	 *
++	 * const MyNavigation = () => (
++	 *   <Navigator initialPath="/">
++	 *     <Navigator.Screen path="/">
++	 *       <p>This is the home screen.</p>
++	 *        <Navigator.Button path="/child">
++	 *          Navigate to child screen.
++	 *       </Navigator.Button>
++	 *     </Navigator.Screen>
++	 *
++	 *     <Navigator.Screen path="/child">
++	 *       <p>This is the child screen.</p>
++	 *       <Navigator.BackButton>
++	 *         Go back
++	 *       </Navigator.BackButton>
++	 *     </Navigator.Screen>
++	 *   </Navigator>
++	 * );
++	 * ```
++	 */
++	Button: Object.assign( NavigatorButton, {
++		displayName: 'Navigator.Button',
++	} ),
++	/**
++	 * The `Navigator.BackButton` component can be used to navigate to a screen and
++	 * should be used in combination with the `Navigator`, the `Navigator.Screen`
++	 * and the `Navigator.Button` components.
++	 *
++	 * @example
++	 * ```jsx
++	 * import { Navigator } from '@wordpress/components';
++	 *
++	 * const MyNavigation = () => (
++	 *   <Navigator initialPath="/">
++	 *     <Navigator.Screen path="/">
++	 *       <p>This is the home screen.</p>
++	 *        <Navigator.Button path="/child">
++	 *          Navigate to child screen.
++	 *       </Navigator.Button>
++	 *     </Navigator.Screen>
++	 *
++	 *     <Navigator.Screen path="/child">
++	 *       <p>This is the child screen.</p>
++	 *       <Navigator.BackButton>
++	 *         Go back
++	 *       </Navigator.BackButton>
++	 *     </Navigator.Screen>
++	 *   </Navigator>
++	 * );
++	 * ```
++	 */
++	BackButton: Object.assign( NavigatorBackButton, {
++		displayName: 'Navigator.BackButton',
++	} ),
++} );
+diff --git a/packages/components/src/navigator/legacy.ts b/packages/components/src/navigator/legacy.ts
+index 54bc9e13829b16..1caa5380fc049e 100644
+--- a/packages/components/src/navigator/legacy.ts
++++ b/packages/components/src/navigator/legacy.ts
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { Navigator as InternalNavigator } from './navigator-provider/component';
++import { Navigator as InternalNavigator } from './navigator/component';
+ import { NavigatorScreen as InternalNavigatorScreen } from './navigator-screen/component';
+ import { NavigatorButton as InternalNavigatorButton } from './navigator-button/component';
+ import { NavigatorBackButton as InternalNavigatorBackButton } from './navigator-back-button/component';
+@@ -10,9 +10,8 @@ export { useNavigator } from './use-navigator';
+ 
+ /**
+  * The `NavigatorProvider` component allows rendering nested views/panels/menus
+- * (via the `NavigatorScreen` component and navigate between these different
+- * view (via the `NavigatorButton` and `NavigatorBackButton` components or the
+- * `useNavigator` hook).
++ * (via the `NavigatorScreen` component and navigate between them
++ * (via the `NavigatorButton` and `NavigatorBackButton` components).
+  *
+  * ```jsx
+  * import {
+@@ -48,8 +47,7 @@ export const NavigatorProvider = Object.assign( InternalNavigator, {
+ /**
+  * The `NavigatorScreen` component represents a single view/screen/panel and
+  * should be used in combination with the `NavigatorProvider`, the
+- * `NavigatorButton` and the `NavigatorBackButton` components (or the `useNavigator`
+- * hook).
++ * `NavigatorButton` and the `NavigatorBackButton` components.
+  *
+  * @example
+  * ```jsx
+@@ -86,7 +84,7 @@ export const NavigatorScreen = Object.assign( InternalNavigatorScreen, {
+ /**
+  * The `NavigatorButton` component can be used to navigate to a screen and should
+  * be used in combination with the `NavigatorProvider`, the `NavigatorScreen`
+- * and the `NavigatorBackButton` components (or the `useNavigator` hook).
++ * and the `NavigatorBackButton` components.
+  *
+  * @example
+  * ```jsx
+@@ -123,8 +121,7 @@ export const NavigatorButton = Object.assign( InternalNavigatorButton, {
+ /**
+  * The `NavigatorBackButton` component can be used to navigate to a screen and
+  * should be used in combination with the `NavigatorProvider`, the
+- * `NavigatorScreen` and the `NavigatorButton` components (or the `useNavigator`
+- * hook).
++ * `NavigatorScreen` and the `NavigatorButton` components.
+  *
+  * @example
+  * ```jsx
+diff --git a/packages/components/src/navigator/navigator-back-button/README.md b/packages/components/src/navigator/navigator-back-button/README.md
+deleted file mode 100644
+index 01d4221be536e5..00000000000000
+--- a/packages/components/src/navigator/navigator-back-button/README.md
++++ /dev/null
+@@ -1,15 +0,0 @@
+-# `NavigatorBackButton`
+-
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+-The `NavigatorBackButton` component can be used to navigate to a screen and should be used in combination with the [`NavigatorProvider`](/packages/components/src/navigator/navigator-provider/README.md), the [`NavigatorScreen`](/packages/components/src/navigator/navigator-screen/README.md) and the [`NavigatorButton`](/packages/components/src/navigator/navigator-button/README.md) components (or the `useNavigator` hook).
+-
+-## Usage
+-
+-Refer to [the `NavigatorProvider` component](/packages/components/src/navigator/navigator-provider/README.md#usage) for a usage example.
+-
+-### Inherited props
+-
+-`NavigatorBackButton` also inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href` and `target`.
+diff --git a/packages/components/src/navigator/navigator-back-button/component.tsx b/packages/components/src/navigator/navigator-back-button/component.tsx
+index 9e8d98a963d25b..b5c4de7df78a85 100644
+--- a/packages/components/src/navigator/navigator-back-button/component.tsx
++++ b/packages/components/src/navigator/navigator-back-button/component.tsx
+@@ -23,5 +23,5 @@ function UnconnectedNavigatorBackButton(
+ 
+ export const NavigatorBackButton = contextConnect(
+ 	UnconnectedNavigatorBackButton,
+-	'NavigatorBackButton'
++	'Navigator.BackButton'
+ );
+diff --git a/packages/components/src/navigator/navigator-back-button/hook.ts b/packages/components/src/navigator/navigator-back-button/hook.ts
+index 9ddc095292190a..d6fcd39647bff9 100644
+--- a/packages/components/src/navigator/navigator-back-button/hook.ts
++++ b/packages/components/src/navigator/navigator-back-button/hook.ts
+@@ -20,7 +20,7 @@ export function useNavigatorBackButton(
+ 		as = Button,
+ 
+ 		...otherProps
+-	} = useContextSystem( props, 'NavigatorBackButton' );
++	} = useContextSystem( props, 'Navigator.BackButton' );
+ 
+ 	const { goBack } = useNavigator();
+ 	const handleClick: React.MouseEventHandler< HTMLButtonElement > =
+diff --git a/packages/components/src/navigator/navigator-button/README.md b/packages/components/src/navigator/navigator-button/README.md
+deleted file mode 100644
+index 72154ec317da44..00000000000000
+--- a/packages/components/src/navigator/navigator-button/README.md
++++ /dev/null
+@@ -1,38 +0,0 @@
+-# `NavigatorButton`
+-
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+-The `NavigatorButton` component can be used to navigate to a screen and should be used in combination with the [`NavigatorProvider`](/packages/components/src/navigator/navigator-provider/README.md), the [`NavigatorScreen`](/packages/components/src/navigator/navigator-screen/README.md) and the [`NavigatorBackButton`](/packages/components/src/navigator/navigator-back-button/README.md) components (or the `useNavigator` hook).
+-
+-## Usage
+-
+-Refer to [the `NavigatorProvider` component](/packages/components/src/navigator/navigator-provider/README.md#usage) for a usage example.
+-
+-## Props
+-
+-The component accepts the following props:
+-
+-### `attributeName`: `string`
+-
+-The HTML attribute used to identify the `NavigatorButton`, which is used by `Navigator` to restore focus.
+-
+--   Required: No
+--   Default: `id`
+-
+-### `onClick`: `React.MouseEventHandler< HTMLElement >`
+-
+-The callback called in response to a `click` event.
+-
+--   Required: No
+-
+-### `path`: `string`
+-
+-The path of the screen to navigate to. The value of this prop needs to be [a valid value for an HTML attribute](https://html.spec.whatwg.org/multipage/syntax.html#attributes-2).
+-
+--   Required: Yes
+-
+-### Inherited props
+-
+-`NavigatorButton` also inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href` and `target`.
+diff --git a/packages/components/src/navigator/navigator-button/component.tsx b/packages/components/src/navigator/navigator-button/component.tsx
+index 7c14c8108e82c4..a6dc7963376723 100644
+--- a/packages/components/src/navigator/navigator-button/component.tsx
++++ b/packages/components/src/navigator/navigator-button/component.tsx
+@@ -23,5 +23,5 @@ function UnconnectedNavigatorButton(
+ 
+ export const NavigatorButton = contextConnect(
+ 	UnconnectedNavigatorButton,
+-	'NavigatorButton'
++	'Navigator.Button'
+ );
+diff --git a/packages/components/src/navigator/navigator-button/hook.ts b/packages/components/src/navigator/navigator-button/hook.ts
+index 3e39b05661e1b2..59d2aaa65662d7 100644
+--- a/packages/components/src/navigator/navigator-button/hook.ts
++++ b/packages/components/src/navigator/navigator-button/hook.ts
+@@ -25,7 +25,7 @@ export function useNavigatorButton(
+ 		as = Button,
+ 		attributeName = 'id',
+ 		...otherProps
+-	} = useContextSystem( props, 'NavigatorButton' );
++	} = useContextSystem( props, 'Navigator.Button' );
+ 
+ 	const escapedPath = escapeAttribute( path );
+ 
+diff --git a/packages/components/src/navigator/navigator-provider/README.md b/packages/components/src/navigator/navigator-provider/README.md
+deleted file mode 100644
+index b9bc8f0c6bcdc9..00000000000000
+--- a/packages/components/src/navigator/navigator-provider/README.md
++++ /dev/null
+@@ -1,98 +0,0 @@
+-# `NavigatorProvider`
+-
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+-The `NavigatorProvider` component allows rendering nested views/panels/menus (via the [`NavigatorScreen` component](/packages/components/src/navigator/navigator-screen/README.md)) and navigate between these different states (via the [`NavigatorButton`](/packages/components/src/navigator/navigator-button/README.md), [`NavigatorToParentButton`](/packages/components/src/navigator/navigator-to-parent-button/README.md) and [`NavigatorBackButton`](/packages/components/src/navigator/navigator-back-button/README.md) components or the `useNavigator` hook). The Global Styles sidebar is an example of this.
+-
+-## Usage
+-
+-```jsx
+-import {
+-	__experimentalNavigatorProvider as NavigatorProvider,
+-	__experimentalNavigatorScreen as NavigatorScreen,
+-	__experimentalNavigatorButton as NavigatorButton,
+-	__experimentalNavigatorBackButton as NavigatorBackButton,
+-} from '@wordpress/components';
+-
+-const MyNavigation = () => (
+-	<NavigatorProvider initialPath="/">
+-		<NavigatorScreen path="/">
+-			<p>This is the home screen.</p>
+-			<NavigatorButton path="/child">
+-				Navigate to child screen.
+-			</NavigatorButton>
+-		</NavigatorScreen>
+-
+-		<NavigatorScreen path="/child">
+-			<p>This is the child screen.</p>
+-			<NavigatorBackButton>Go back</NavigatorBackButton>
+-		</NavigatorScreen>
+-	</NavigatorProvider>
+-);
+-```
+-
+-### Hierarchical `path`s
+-
+-`Navigator` assumes that screens are organized hierarchically according to their `path`, which should follow a URL-like scheme where each path segment starts with and is separated by the `/` character.
+-
+-`Navigator` will treat "back" navigations as going to the parent screen — it is therefore responsibility of the consumer of the component to create the correct screen hierarchy.
+-
+-For example:
+-
+--   `/` is the root of all paths. There should always be a screen with `path="/"`.
+--   `/parent/child` is a child of `/parent`.
+--   `/parent/child/grand-child` is a child of `/parent/child`.
+--   `/parent/:param` is a child of `/parent` as well.
+--   if the current screen has a `path` with value `/parent/child/grand-child`, when going "back" `Navigator` will try to recursively navigate the path hierarchy until a matching screen (or the root `/`) is found.
+-
+-### Height and animations
+-
+-Due to how `NavigatorScreen` animations work, it is recommended that the `NavigatorProvider` component is assigned a `height` to prevent some potential UI jumps while moving across screens.
+-
+-## Props
+-
+-The component accepts the following props:
+-
+-### `initialPath`: `string`
+-
+-The initial active path.
+-
+--   Required: No
+-
+-## The `navigator` object
+-
+-You can retrieve a `navigator` instance by using the `useNavigator` hook.
+-
+-The `navigator` instance has a few properties:
+-
+-### `goTo`: `( path: string, options: NavigateOptions ) => void`
+-
+-The `goTo` function allows navigating to a given path. The second argument can augment the navigation operations with different options.
+-
+-The available options are:
+-
+--   `focusTargetSelector`: `string`. An optional property used to specify the CSS selector used to restore focus on the matching element when navigating back;
+--   `isBack`: `boolean`. An optional property used to specify whether the navigation should be considered as backwards (thus enabling focus restoration when possible, and causing the animation to be backwards too);
+--   `skipFocus`: `boolean`. An optional property used to opt out of `Navigator`'s focus management, useful when the consumer of the component wants to manage focus themselves;
+-
+-### `goBack`: `( path: string, options: NavigateOptions ) => void`
+-
+-The `goBack` function allows navigating to the parent screen. Parent/child navigation only works if the paths you define are hierarchical (see note above).
+-
+-When a match is not found, the function will try to recursively navigate the path hierarchy until a matching screen (or the root `/`) are found.
+-
+-The available options are the same as for the `goTo` method, except for the `isBack` property, which is not available for the `goBack` method.
+-
+-### `location`: `NavigatorLocation`
+-
+-The `location` object represent the current location, and has a few properties:
+-
+--   `path`: `string`. The path associated to the location.
+--   `isBack`: `boolean`. A flag that is `true` when the current location was reached by navigating backwards.
+--   `isInitial`: `boolean`. A flag that is `true` only for the initial location.
+-
+-### `params`: `Record< string, string | string[] >`
+-
+-The parsed record of parameters from the current location. For example if the current screen path is `/product/:productId` and the location is `/product/123`, then `params` will be `{ productId: '123' }`.
+diff --git a/packages/components/src/navigator/navigator-screen/README.md b/packages/components/src/navigator/navigator-screen/README.md
+deleted file mode 100644
+index 583da461cd3c27..00000000000000
+--- a/packages/components/src/navigator/navigator-screen/README.md
++++ /dev/null
+@@ -1,33 +0,0 @@
+-# `NavigatorScreen`
+-
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+-The `NavigatorScreen` component represents a single view/screen/panel and should be used in combination with the [`NavigatorProvider`](/packages/components/src/navigator/navigator-provider/README.md), the [`NavigatorButton`](/packages/components/src/navigator/navigator-button/README.md) and the [`NavigatorBackButton`](/packages/components/src/navigator/navigator-back-button/README.md) components (or the `useNavigator` hook).
+-
+-## Usage
+-
+-Refer to [the `NavigatorProvider` component](/packages/components/src/navigator/navigator-provider/README.md#usage) for a usage example.
+-
+-## Props
+-
+-The component accepts the following props:
+-
+-### `path`: `string`
+-
+-The screen&quot;s path, matched against the current path stored in the navigator.
+-
+-`Navigator` assumes that screens are organized hierarchically according to their `path`, which should follow a URL-like scheme where each path segment starts with and is separated by the `/` character.
+-
+-`Navigator` will treat "back" navigations as going to the parent screen — it is therefore responsibility of the consumer of the component to create the correct screen hierarchy.
+-
+-For example:
+-
+--   `/` is the root of all paths. There should always be a screen with `path="/"`.
+--   `/parent/child` is a child of `/parent`.
+--   `/parent/child/grand-child` is a child of `/parent/child`.
+--   `/parent/:param` is a child of `/parent` as well.
+--   if the current screen has a `path` with value `/parent/child/grand-child`, when going "back" `Navigator` will try to recursively navigate the path hierarchy until a matching screen (or the root `/`) is found.
+-
+--   Required: Yes
+diff --git a/packages/components/src/navigator/navigator-screen/component.tsx b/packages/components/src/navigator/navigator-screen/component.tsx
+index 16cc0df24e35dd..fe0d81b90a17be 100644
+--- a/packages/components/src/navigator/navigator-screen/component.tsx
++++ b/packages/components/src/navigator/navigator-screen/component.tsx
+@@ -36,7 +36,7 @@ function UnconnectedNavigatorScreen(
+ ) {
+ 	if ( ! /^\//.test( props.path ) ) {
+ 		warning(
+-			'wp.components.NavigatorScreen: the `path` should follow a URL-like scheme; it should start with and be separated by the `/` character.'
++			'wp.components.Navigator.Screen: the `path` should follow a URL-like scheme; it should start with and be separated by the `/` character.'
+ 		);
+ 	}
+ 
+@@ -48,7 +48,7 @@ function UnconnectedNavigatorScreen(
+ 		path,
+ 		onAnimationEnd: onAnimationEndProp,
+ 		...otherProps
+-	} = useContextSystem( props, 'NavigatorScreen' );
++	} = useContextSystem( props, 'Navigator.Screen' );
+ 
+ 	const { location, match, addScreen, removeScreen } =
+ 		useContext( NavigatorContext );
+@@ -155,5 +155,5 @@ function UnconnectedNavigatorScreen(
+ 
+ export const NavigatorScreen = contextConnect(
+ 	UnconnectedNavigatorScreen,
+-	'NavigatorScreen'
++	'Navigator.Screen'
+ );
+diff --git a/packages/components/src/navigator/navigator-to-parent-button/README.md b/packages/components/src/navigator/navigator-to-parent-button/README.md
+deleted file mode 100644
+index 0100ea9b8d2e1f..00000000000000
+--- a/packages/components/src/navigator/navigator-to-parent-button/README.md
++++ /dev/null
+@@ -1,17 +0,0 @@
+-# `NavigatorToParentButton`
+-
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+-This component is deprecated. Please use the [`NavigatorBackButton`](/packages/components/src/navigator/navigator-back-button/README.md) component instead.
+-
+-The `NavigatorToParentButton` component can be used to navigate to a screen and should be used in combination with the [`NavigatorProvider`](/packages/components/src/navigator/navigator-provider/README.md), the [`NavigatorScreen`](/packages/components/src/navigator/navigator-screen/README.md) and the [`NavigatorButton`](/packages/components/src/navigator/navigator-button/README.md) components (or the `useNavigator` hook).
+-
+-## Usage
+-
+-Refer to [the `NavigatorProvider` component](/packages/components/src/navigator/navigator-provider/README.md#usage) for a usage example.
+-
+-### Inherited props
+-
+-`NavigatorToParentButton` also inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href` and `target`.
+diff --git a/packages/components/src/navigator/navigator-to-parent-button/component.tsx b/packages/components/src/navigator/navigator-to-parent-button/component.tsx
+index 161370a4323f48..f1c2d27e2284a1 100644
+--- a/packages/components/src/navigator/navigator-to-parent-button/component.tsx
++++ b/packages/components/src/navigator/navigator-to-parent-button/component.tsx
+@@ -17,13 +17,16 @@ function UnconnectedNavigatorToParentButton(
+ ) {
+ 	deprecated( 'wp.components.NavigatorToParentButton', {
+ 		since: '6.7',
+-		alternative: 'wp.components.NavigatorBackButton',
++		alternative: 'wp.components.Navigator.BackButton',
+ 	} );
+ 
+ 	return <NavigatorBackButton ref={ forwardedRef } { ...props } />;
+ }
+ 
++/**
++ * @deprecated
++ */
+ export const NavigatorToParentButton = contextConnect(
+ 	UnconnectedNavigatorToParentButton,
+-	'NavigatorToParentButton'
++	'Navigator.ToParentButton'
+ );
+diff --git a/packages/components/src/navigator/navigator-provider/component.tsx b/packages/components/src/navigator/navigator/component.tsx
+similarity index 84%
+rename from packages/components/src/navigator/navigator-provider/component.tsx
+rename to packages/components/src/navigator/navigator/component.tsx
+index 604034a9525577..bd49b3682fb144 100644
+--- a/packages/components/src/navigator/navigator-provider/component.tsx
++++ b/packages/components/src/navigator/navigator/component.tsx
+@@ -222,7 +222,7 @@ function UnconnectedNavigator(
+ 		children,
+ 		className,
+ 		...otherProps
+-	} = useContextSystem( props, 'NavigatorProvider' );
++	} = useContextSystem( props, 'Navigator' );
+ 
+ 	const [ routerState, dispatch ] = useReducer(
+ 		routerReducer,
+@@ -275,7 +275,7 @@ function UnconnectedNavigator(
+ 
+ 	const cx = useCx();
+ 	const classes = useMemo(
+-		() => cx( styles.navigatorProviderWrapper, className ),
++		() => cx( styles.navigatorWrapper, className ),
+ 		[ className, cx ]
+ 	);
+ 
+@@ -288,42 +288,4 @@ function UnconnectedNavigator(
+ 	);
+ }
+ 
+-/**
+- * The `NavigatorProvider` component allows rendering nested views/panels/menus
+- * (via the `NavigatorScreen` component and navigate between these different
+- * view (via the `NavigatorButton` and `NavigatorBackButton` components or the
+- * `useNavigator` hook).
+- *
+- * ```jsx
+- * import {
+- *   __experimentalNavigatorProvider as NavigatorProvider,
+- *   __experimentalNavigatorScreen as NavigatorScreen,
+- *   __experimentalNavigatorButton as NavigatorButton,
+- *   __experimentalNavigatorBackButton as NavigatorBackButton,
+- * } from '@wordpress/components';
+- *
+- * const MyNavigation = () => (
+- *   <NavigatorProvider initialPath="/">
+- *     <NavigatorScreen path="/">
+- *       <p>This is the home screen.</p>
+- *        <NavigatorButton path="/child">
+- *          Navigate to child screen.
+- *       </NavigatorButton>
+- *     </NavigatorScreen>
+- *
+- *     <NavigatorScreen path="/child">
+- *       <p>This is the child screen.</p>
+- *       <NavigatorBackButton>
+- *         Go back
+- *       </NavigatorBackButton>
+- *     </NavigatorScreen>
+- *   </NavigatorProvider>
+- * );
+- * ```
+- */
+-export const Navigator = contextConnect(
+-	UnconnectedNavigator,
+-	'NavigatorProvider'
+-);
+-
+-export default Navigator;
++export const Navigator = contextConnect( UnconnectedNavigator, 'Navigator' );
+diff --git a/packages/components/src/navigator/stories/index.story.tsx b/packages/components/src/navigator/stories/index.story.tsx
+index f703969320ca57..e9e342bb0d2eee 100644
+--- a/packages/components/src/navigator/stories/index.story.tsx
++++ b/packages/components/src/navigator/stories/index.story.tsx
+@@ -8,20 +8,20 @@ import type { Meta, StoryObj } from '@storybook/react';
+  */
+ import Button from '../../button';
+ import { VStack } from '../../v-stack';
+-import {
+-	NavigatorProvider,
+-	NavigatorScreen,
+-	NavigatorButton,
+-	NavigatorBackButton,
+-	useNavigator,
+-} from '../legacy';
+ import { HStack } from '../../h-stack';
+-
+-const meta: Meta< typeof NavigatorProvider > = {
+-	component: NavigatorProvider,
+-	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+-	subcomponents: { NavigatorScreen, NavigatorButton, NavigatorBackButton },
+-	title: 'Components (Experimental)/Navigator',
++import { Navigator, useNavigator } from '../';
++
++const meta: Meta< typeof Navigator > = {
++	component: Navigator,
++	subcomponents: {
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		Screen: Navigator.Screen,
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		Button: Navigator.Button,
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		BackButton: Navigator.BackButton,
++	},
++	title: 'Components/Navigator',
+ 	argTypes: {
+ 		as: { control: { type: null } },
+ 		children: { control: { type: null } },
+@@ -40,10 +40,10 @@ const meta: Meta< typeof NavigatorProvider > = {
+ 						 * detail of the Navigator component. Do not use outside of
+ 						 * its source code.
+ 						 */
+-						[data-wp-component="NavigatorProvider"] {
++						[data-wp-component="Navigator"] {
+ 							height: 250px;
+ 						}
+-						[data-wp-component="NavigatorScreen"]:not([data-sticky]) {
++						[data-wp-component="Navigator.Screen"] {
+ 							padding: 8px;
+ 						}
+ 					` }</style>
+@@ -55,55 +55,55 @@ const meta: Meta< typeof NavigatorProvider > = {
+ };
+ export default meta;
+ 
+-export const Default: StoryObj< typeof NavigatorProvider > = {
++export const Default: StoryObj< typeof Navigator > = {
+ 	args: {
+ 		initialPath: '/',
+ 		children: (
+ 			<>
+-				<NavigatorScreen path="/">
++				<Navigator.Screen path="/">
+ 					<h2>This is the home screen.</h2>
+ 
+ 					<VStack alignment="left">
+-						<NavigatorButton variant="primary" path="/child">
++						<Navigator.Button variant="primary" path="/child">
+ 							Go to child screen.
+-						</NavigatorButton>
++						</Navigator.Button>
+ 
+-						<NavigatorButton variant="primary" path="/product/1">
++						<Navigator.Button variant="primary" path="/product/1">
+ 							Go to dynamic path screen with id 1.
+-						</NavigatorButton>
++						</Navigator.Button>
+ 
+-						<NavigatorButton variant="primary" path="/product/2">
++						<Navigator.Button variant="primary" path="/product/2">
+ 							Go to dynamic path screen with id 2.
+-						</NavigatorButton>
++						</Navigator.Button>
+ 					</VStack>
+-				</NavigatorScreen>
++				</Navigator.Screen>
+ 
+-				<NavigatorScreen path="/child">
++				<Navigator.Screen path="/child">
+ 					<h2>This is the child screen.</h2>
+ 					<HStack spacing={ 2 } alignment="left">
+-						<NavigatorBackButton variant="secondary">
++						<Navigator.BackButton variant="secondary">
+ 							Go back
+-						</NavigatorBackButton>
++						</Navigator.BackButton>
+ 
+-						<NavigatorButton
++						<Navigator.Button
+ 							variant="primary"
+ 							path="/child/grandchild"
+ 						>
+ 							Go to grand child screen.
+-						</NavigatorButton>
++						</Navigator.Button>
+ 					</HStack>
+-				</NavigatorScreen>
++				</Navigator.Screen>
+ 
+-				<NavigatorScreen path="/child/grandchild">
++				<Navigator.Screen path="/child/grandchild">
+ 					<h2>This is the grand child screen.</h2>
+-					<NavigatorBackButton variant="secondary">
++					<Navigator.BackButton variant="secondary">
+ 						Go back
+-					</NavigatorBackButton>
+-				</NavigatorScreen>
++					</Navigator.BackButton>
++				</Navigator.Screen>
+ 
+-				<NavigatorScreen path="/product/:id">
++				<Navigator.Screen path="/product/:id">
+ 					<DynamicScreen />
+-				</NavigatorScreen>
++				</Navigator.Screen>
+ 			</>
+ 		),
+ 	},
+@@ -119,14 +119,14 @@ function DynamicScreen() {
+ 				This screen can parse params dynamically. The current id is:{ ' ' }
+ 				{ params.id }
+ 			</p>
+-			<NavigatorBackButton variant="secondary">
++			<Navigator.BackButton variant="secondary">
+ 				Go back
+-			</NavigatorBackButton>
++			</Navigator.BackButton>
+ 		</>
+ 	);
+ }
+ 
+-export const WithNestedInitialPath: StoryObj< typeof NavigatorProvider > = {
++export const WithNestedInitialPath: StoryObj< typeof Navigator > = {
+ 	...Default,
+ 	args: {
+ 		...Default.args,
+@@ -138,7 +138,7 @@ const NavigatorButtonWithSkipFocus = ( {
+ 	path,
+ 	onClick,
+ 	...props
+-}: React.ComponentProps< typeof NavigatorButton > ) => {
++}: React.ComponentProps< typeof Navigator.Button > ) => {
+ 	const { goTo } = useNavigator();
+ 
+ 	return (
+@@ -156,7 +156,7 @@ const NavigatorButtonWithSkipFocus = ( {
+ 	);
+ };
+ 
+-export const SkipFocus: StoryObj< typeof NavigatorProvider > = {
++export const SkipFocus: StoryObj< typeof Navigator > = {
+ 	args: {
+ 		initialPath: '/',
+ 		children: (
+@@ -170,19 +170,19 @@ export const SkipFocus: StoryObj< typeof NavigatorProvider > = {
+ 						display: 'contents',
+ 					} }
+ 				>
+-					<NavigatorScreen path="/">
++					<Navigator.Screen path="/">
+ 						<h2>Home screen</h2>
+-						<NavigatorButton variant="primary" path="/child">
++						<Navigator.Button variant="primary" path="/child">
+ 							Go to child screen.
+-						</NavigatorButton>
+-					</NavigatorScreen>
++						</Navigator.Button>
++					</Navigator.Screen>
+ 
+-					<NavigatorScreen path="/child">
++					<Navigator.Screen path="/child">
+ 						<h2>Child screen</h2>
+-						<NavigatorBackButton variant="secondary">
++						<Navigator.BackButton variant="secondary">
+ 							Go back to home screen
+-						</NavigatorBackButton>
+-					</NavigatorScreen>
++						</Navigator.BackButton>
++					</Navigator.Screen>
+ 				</div>
+ 
+ 				<NavigatorButtonWithSkipFocus path="/child">
+diff --git a/packages/components/src/navigator/styles.ts b/packages/components/src/navigator/styles.ts
+index fd355bf4dd48fb..167d4ac07de3d6 100644
+--- a/packages/components/src/navigator/styles.ts
++++ b/packages/components/src/navigator/styles.ts
+@@ -3,7 +3,7 @@
+  */
+ import { css, keyframes } from '@emotion/react';
+ 
+-export const navigatorProviderWrapper = css`
++export const navigatorWrapper = css`
+ 	position: relative;
+ 	/* Prevents horizontal overflow while animating screen transitions */
+ 	overflow-x: clip;
+diff --git a/packages/components/src/navigator/test/index.tsx b/packages/components/src/navigator/test/index.tsx
+index 81ffd8d69208d7..cab6e9a4cdadff 100644
+--- a/packages/components/src/navigator/test/index.tsx
++++ b/packages/components/src/navigator/test/index.tsx
+@@ -14,14 +14,8 @@ import { useState } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import Button from '../../button';
+-import {
+-	NavigatorProvider,
+-	NavigatorScreen,
+-	NavigatorButton,
+-	NavigatorBackButton,
+-	NavigatorToParentButton,
+-	useNavigator,
+-} from '../legacy';
++import { Navigator, useNavigator } from '..';
++import { NavigatorToParentButton } from '../legacy';
+ import type { NavigateOptions } from '../types';
+ 
+ const INVALID_HTML_ATTRIBUTE = {
+@@ -76,11 +70,11 @@ function CustomNavigatorButton( {
+ 	path,
+ 	onClick,
+ 	...props
+-}: Omit< ComponentPropsWithoutRef< typeof NavigatorButton >, 'onClick' > & {
++}: Omit< ComponentPropsWithoutRef< typeof Navigator.Button >, 'onClick' > & {
+ 	onClick?: CustomTestOnClickHandler;
+ } ) {
+ 	return (
+-		<NavigatorButton
++		<Navigator.Button
+ 			onClick={ () => {
+ 				// Used to spy on the values passed to `navigator.goTo`.
+ 				onClick?.( { type: 'goTo', path } );
+@@ -95,7 +89,7 @@ function CustomNavigatorGoToBackButton( {
+ 	path,
+ 	onClick,
+ 	...props
+-}: Omit< ComponentPropsWithoutRef< typeof NavigatorButton >, 'onClick' > & {
++}: Omit< ComponentPropsWithoutRef< typeof Navigator.Button >, 'onClick' > & {
+ 	onClick?: CustomTestOnClickHandler;
+ } ) {
+ 	const { goTo } = useNavigator();
+@@ -115,7 +109,7 @@ function CustomNavigatorGoToSkipFocusButton( {
+ 	path,
+ 	onClick,
+ 	...props
+-}: Omit< ComponentPropsWithoutRef< typeof NavigatorButton >, 'onClick' > & {
++}: Omit< ComponentPropsWithoutRef< typeof Navigator.Button >, 'onClick' > & {
+ 	onClick?: CustomTestOnClickHandler;
+ } ) {
+ 	const { goTo } = useNavigator();
+@@ -134,11 +128,14 @@ function CustomNavigatorGoToSkipFocusButton( {
+ function CustomNavigatorBackButton( {
+ 	onClick,
+ 	...props
+-}: Omit< ComponentPropsWithoutRef< typeof NavigatorBackButton >, 'onClick' > & {
++}: Omit<
++	ComponentPropsWithoutRef< typeof Navigator.BackButton >,
++	'onClick'
++> & {
+ 	onClick?: CustomTestOnClickHandler;
+ } ) {
+ 	return (
+-		<NavigatorBackButton
++		<Navigator.BackButton
+ 			onClick={ () => {
+ 				// Used to spy on the values passed to `navigator.goBack`.
+ 				onClick?.( { type: 'goBack' } );
+@@ -151,7 +148,10 @@ function CustomNavigatorBackButton( {
+ function CustomNavigatorToParentButton( {
+ 	onClick,
+ 	...props
+-}: Omit< ComponentPropsWithoutRef< typeof NavigatorBackButton >, 'onClick' > & {
++}: Omit<
++	ComponentPropsWithoutRef< typeof Navigator.BackButton >,
++	'onClick'
++> & {
+ 	onClick?: CustomTestOnClickHandler;
+ } ) {
+ 	return (
+@@ -194,13 +194,13 @@ const ProductScreen = ( {
+ 	const { params } = useNavigator();
+ 
+ 	return (
+-		<NavigatorScreen path={ PATHS.PRODUCT_PATTERN }>
++		<Navigator.Screen path={ PATHS.PRODUCT_PATTERN }>
+ 			<p>{ SCREEN_TEXT.product }</p>
+ 			<p>Product ID is { params.productId }</p>
+ 			<CustomNavigatorBackButton onClick={ onBackButtonClick }>
+ 				{ BUTTON_TEXT.back }
+ 			</CustomNavigatorBackButton>
+-		</NavigatorScreen>
++		</Navigator.Screen>
+ 	);
+ };
+ 
+@@ -215,8 +215,8 @@ const MyNavigation = ( {
+ 	const [ outerInputValue, setOuterInputValue ] = useState( '' );
+ 	return (
+ 		<>
+-			<NavigatorProvider initialPath={ initialPath }>
+-				<NavigatorScreen path={ PATHS.HOME }>
++			<Navigator initialPath={ initialPath }>
++				<Navigator.Screen path={ PATHS.HOME }>
+ 					<p>{ SCREEN_TEXT.home }</p>
+ 					{ /*
+ 					 * A button useful to test focus restoration. This button is the first
+@@ -254,9 +254,9 @@ const MyNavigation = ( {
+ 					>
+ 						{ BUTTON_TEXT.toInvalidHtmlPathScreen }
+ 					</CustomNavigatorButton>
+-				</NavigatorScreen>
++				</Navigator.Screen>
+ 
+-				<NavigatorScreen path={ PATHS.CHILD }>
++				<Navigator.Screen path={ PATHS.CHILD }>
+ 					<p>{ SCREEN_TEXT.child }</p>
+ 					{ /*
+ 					 * A button useful to test focus restoration. This button is the first
+@@ -286,30 +286,30 @@ const MyNavigation = ( {
+ 						} }
+ 						value={ innerInputValue }
+ 					/>
+-				</NavigatorScreen>
++				</Navigator.Screen>
+ 
+-				<NavigatorScreen path={ PATHS.NESTED }>
++				<Navigator.Screen path={ PATHS.NESTED }>
+ 					<p>{ SCREEN_TEXT.nested }</p>
+ 					<CustomNavigatorBackButton
+ 						onClick={ onNavigatorButtonClick }
+ 					>
+ 						{ BUTTON_TEXT.back }
+ 					</CustomNavigatorBackButton>
+-				</NavigatorScreen>
++				</Navigator.Screen>
+ 
+ 				<ProductScreen onBackButtonClick={ onNavigatorButtonClick } />
+ 
+-				<NavigatorScreen path={ PATHS.INVALID_HTML_ATTRIBUTE }>
++				<Navigator.Screen path={ PATHS.INVALID_HTML_ATTRIBUTE }>
+ 					<p>{ SCREEN_TEXT.invalidHtmlPath }</p>
+ 					<CustomNavigatorBackButton
+ 						onClick={ onNavigatorButtonClick }
+ 					>
+ 						{ BUTTON_TEXT.back }
+ 					</CustomNavigatorBackButton>
+-				</NavigatorScreen>
++				</Navigator.Screen>
+ 
+-				{ /* A `NavigatorScreen` with `path={ PATHS.NOT_FOUND }` is purposefully not included. */ }
+-			</NavigatorProvider>
++				{ /* A `Navigator.Screen` with `path={ PATHS.NOT_FOUND }` is purposefully not included. */ }
++			</Navigator>
+ 
+ 			<label htmlFor="test-input-outer">Outer input</label>
+ 			<input
+@@ -334,8 +334,8 @@ const MyHierarchicalNavigation = ( {
+ } ) => {
+ 	return (
+ 		<>
+-			<NavigatorProvider initialPath={ initialPath }>
+-				<NavigatorScreen path={ PATHS.HOME }>
++			<Navigator initialPath={ initialPath }>
++				<Navigator.Screen path={ PATHS.HOME }>
+ 					<p>{ SCREEN_TEXT.home }</p>
+ 					{ /*
+ 					 * A button useful to test focus restoration. This button is the first
+@@ -349,9 +349,9 @@ const MyHierarchicalNavigation = ( {
+ 					>
+ 						{ BUTTON_TEXT.toChildScreen }
+ 					</CustomNavigatorButton>
+-				</NavigatorScreen>
++				</Navigator.Screen>
+ 
+-				<NavigatorScreen path={ PATHS.CHILD }>
++				<Navigator.Screen path={ PATHS.CHILD }>
+ 					<p>{ SCREEN_TEXT.child }</p>
+ 					{ /*
+ 					 * A button useful to test focus restoration. This button is the first
+@@ -370,9 +370,9 @@ const MyHierarchicalNavigation = ( {
+ 					>
+ 						{ BUTTON_TEXT.back }
+ 					</CustomNavigatorBackButton>
+-				</NavigatorScreen>
++				</Navigator.Screen>
+ 
+-				<NavigatorScreen path={ PATHS.NESTED }>
++				<Navigator.Screen path={ PATHS.NESTED }>
+ 					<p>{ SCREEN_TEXT.nested }</p>
+ 					<CustomNavigatorBackButton
+ 						onClick={ onNavigatorButtonClick }
+@@ -385,14 +385,14 @@ const MyHierarchicalNavigation = ( {
+ 					>
+ 						{ BUTTON_TEXT.backUsingGoTo }
+ 					</CustomNavigatorGoToBackButton>
+-				</NavigatorScreen>
++				</Navigator.Screen>
+ 				<CustomNavigatorGoToSkipFocusButton
+ 					path={ PATHS.NESTED }
+ 					onClick={ onNavigatorButtonClick }
+ 				>
+ 					{ BUTTON_TEXT.goToWithSkipFocus }
+ 				</CustomNavigatorGoToSkipFocusButton>
+-			</NavigatorProvider>
++			</Navigator>
+ 		</>
+ 	);
+ };
+@@ -406,8 +406,8 @@ const MyDeprecatedNavigation = ( {
+ } ) => {
+ 	return (
+ 		<>
+-			<NavigatorProvider initialPath={ initialPath }>
+-				<NavigatorScreen path={ PATHS.HOME }>
++			<Navigator initialPath={ initialPath }>
++				<Navigator.Screen path={ PATHS.HOME }>
+ 					<p>{ SCREEN_TEXT.home }</p>
+ 					{ /*
+ 					 * A button useful to test focus restoration. This button is the first
+@@ -421,9 +421,9 @@ const MyDeprecatedNavigation = ( {
+ 					>
+ 						{ BUTTON_TEXT.toChildScreen }
+ 					</CustomNavigatorButton>
+-				</NavigatorScreen>
++				</Navigator.Screen>
+ 
+-				<NavigatorScreen path={ PATHS.CHILD }>
++				<Navigator.Screen path={ PATHS.CHILD }>
+ 					<p>{ SCREEN_TEXT.child }</p>
+ 					{ /*
+ 					 * A button useful to test focus restoration. This button is the first
+@@ -442,17 +442,17 @@ const MyDeprecatedNavigation = ( {
+ 					>
+ 						{ BUTTON_TEXT.back }
+ 					</CustomNavigatorToParentButton>
+-				</NavigatorScreen>
++				</Navigator.Screen>
+ 
+-				<NavigatorScreen path={ PATHS.NESTED }>
++				<Navigator.Screen path={ PATHS.NESTED }>
+ 					<p>{ SCREEN_TEXT.nested }</p>
+ 					<CustomNavigatorToParentButtonAlternative
+ 						onClick={ onNavigatorButtonClick }
+ 					>
+ 						{ BUTTON_TEXT.back }
+ 					</CustomNavigatorToParentButtonAlternative>
+-				</NavigatorScreen>
+-			</NavigatorProvider>
++				</Navigator.Screen>
++			</Navigator>
+ 		</>
+ 	);
+ };
+@@ -643,10 +643,10 @@ describe( 'Navigator', () => {
+ 	} );
+ 
+ 	it( 'should warn if the `path` prop does not follow the required format', () => {
+-		render( <NavigatorScreen path="not-valid">Test</NavigatorScreen> );
++		render( <Navigator.Screen path="not-valid">Test</Navigator.Screen> );
+ 
+ 		expect( console ).toHaveWarnedWith(
+-			'wp.components.NavigatorScreen: the `path` should follow a URL-like scheme; it should start with and be separated by the `/` character.'
++			'wp.components.Navigator.Screen: the `path` should follow a URL-like scheme; it should start with and be separated by the `/` character.'
+ 		);
+ 	} );
+ 
+@@ -880,7 +880,7 @@ describe( 'Navigator', () => {
+ 
+ 			// Rendering `NavigatorToParentButton` logs a deprecation notice
+ 			expect( console ).toHaveWarnedWith(
+-				'wp.components.NavigatorToParentButton is deprecated since version 6.7. Please use wp.components.NavigatorBackButton instead.'
++				'wp.components.NavigatorToParentButton is deprecated since version 6.7. Please use wp.components.Navigator.BackButton instead.'
+ 			);
+ 		} );
+ 
+diff --git a/packages/components/src/navigator/types.ts b/packages/components/src/navigator/types.ts
+index ad26d3f1c9f490..aeb5fd3b12c7fb 100644
+--- a/packages/components/src/navigator/types.ts
++++ b/packages/components/src/navigator/types.ts
+@@ -100,6 +100,24 @@ export type NavigatorProps = {
+ export type NavigatorScreenProps = {
+ 	/**
+ 	 * The screen's path, matched against the current path stored in the navigator.
++	 *
++	 * `Navigator` assumes that screens are organized hierarchically according
++	 * to their `path`, which should follow a URL-like scheme where each path
++	 * segment starts with and is separated by the `/` character.
++	 *
++	 * `Navigator` will treat "back" navigations as going to the parent screen —
++	 * it is, therefore, the responsibility of the consumer of the component to
++	 * create the correct screen hierarchy.
++	 *
++	 * For example:
++	 *  - `/` is the root of all paths. There should always be a screen with
++	 *    `path="/"`;
++	 *  - `/parent/child` is a child of `/parent`;
++	 *  - `/parent/child/grand-child` is a child of `/parent/child`;
++	 *  - `/parent/:param` is a child of `/parent` as well;
++	 *  - if the current screen has a `path="/parent/child/grand-child"`, when
++	 *    going "back" `Navigator` will try to recursively navigate the path
++	 *    hierarchy until a matching screen (or the root `/`) is found.
+ 	 */
+ 	path: string;
+ 	/**
+diff --git a/packages/components/src/navigator/use-navigator.ts b/packages/components/src/navigator/use-navigator.ts
+index 7ac35d73150d32..1ea99f3f1c857d 100644
+--- a/packages/components/src/navigator/use-navigator.ts
++++ b/packages/components/src/navigator/use-navigator.ts
+@@ -10,7 +10,10 @@ import { NavigatorContext } from './context';
+ import type { Navigator } from './types';
+ 
+ /**
+- * Retrieves a `navigator` instance.
++ * Retrieves a `navigator` instance. This hook provides advanced functionality,
++ * such as imperatively navigating to a new location (with options like
++ * navigating back or skipping focus restoration) and accessing the current
++ * location and path parameters.
+  */
+ export function useNavigator(): Navigator {
+ 	const { location, params, goTo, goBack, goToParent } =
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index f3eaef13509218..8525e48fffa585 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -7,6 +7,7 @@
+ 			'customselectcontrol-v2',
+ 			'dimensioncontrol',
+ 			'navigation',
++			'navigator',
+ 			'progressbar',
+ 			'theme',
+ 		];

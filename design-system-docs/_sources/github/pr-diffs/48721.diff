@@ -1,0 +1,154 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3e4e32ffdf955f..a7b647431cbf12 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `Guide`: Convert to TypeScript ([#47493](https://github.com/WordPress/gutenberg/pull/47493)).
+ -   `PanelBody`: Convert to TypeScript ([#47702](https://github.com/WordPress/gutenberg/pull/47702)).
++-   `withFilters` HOC: Convert to TypeScript ([#48721](https://github.com/WordPress/gutenberg/pull/48721)).
+ -   `withFallbackStyles` HOC: Convert to TypeScript ([#48720](https://github.com/WordPress/gutenberg/pull/48720)).
+ -   `navigateRegions` HOC: Convert to TypeScript ([#48632](https://github.com/WordPress/gutenberg/pull/48632)).
+ 
+diff --git a/packages/components/src/higher-order/with-filters/index.js b/packages/components/src/higher-order/with-filters/index.tsx
+similarity index 69%
+rename from packages/components/src/higher-order/with-filters/index.js
+rename to packages/components/src/higher-order/with-filters/index.tsx
+index 9a65c7a5fff9d0..eddd0829f3716e 100644
+--- a/packages/components/src/higher-order/with-filters/index.js
++++ b/packages/components/src/higher-order/with-filters/index.tsx
+@@ -13,11 +13,37 @@ const ANIMATION_FRAME_PERIOD = 16;
+  * to be mounted. When a filter is added or removed that matches the hook name,
+  * the wrapped component re-renders.
+  *
+- * @param {string} hookName Hook name exposed to be used by filters.
++ * @param hookName Hook name exposed to be used by filters.
+  *
+- * @return {Function} Higher-order component factory.
++ * @return Higher-order component factory.
++ *
++ * ```jsx
++ * import { withFilters } from '@wordpress/components';
++ * import { addFilter } from '@wordpress/hooks';
++ *
++ * const MyComponent = ( { title } ) => <h1>{ title }</h1>;
++ *
++ * const ComponentToAppend = () => <div>Appended component</div>;
++ *
++ * function withComponentAppended( FilteredComponent ) {
++ * 	return ( props ) => (
++ * 		<>
++ * 			<FilteredComponent { ...props } />
++ * 			<ComponentToAppend />
++ * 		</>
++ * 	);
++ * }
++ *
++ * addFilter(
++ * 	'MyHookName',
++ * 	'my-plugin/with-component-appended',
++ * 	withComponentAppended
++ * );
++ *
++ * const MyComponentWithFilters = withFilters( 'MyHookName' )( MyComponent );
++ * ```
+  */
+-export default function withFilters( hookName ) {
++export default function withFilters( hookName: string ) {
+ 	return createHigherOrderComponent( ( OriginalComponent ) => {
+ 		const namespace = 'core/with-filters/' + hookName;
+ 
+@@ -25,10 +51,8 @@ export default function withFilters( hookName ) {
+ 		 * The component definition with current filters applied. Each instance
+ 		 * reuse this shared reference as an optimization to avoid excessive
+ 		 * calls to `applyFilters` when many instances exist.
+-		 *
+-		 * @type {?Component}
+ 		 */
+-		let FilteredComponent;
++		let FilteredComponent: React.ComponentType;
+ 
+ 		/**
+ 		 * Initializes the FilteredComponent variable once, if not already
+@@ -36,13 +60,18 @@ export default function withFilters( hookName ) {
+ 		 */
+ 		function ensureFilteredComponent() {
+ 			if ( FilteredComponent === undefined ) {
+-				FilteredComponent = applyFilters( hookName, OriginalComponent );
++				FilteredComponent = applyFilters(
++					hookName,
++					OriginalComponent
++				) as React.ComponentType;
+ 			}
+ 		}
+ 
+ 		class FilteredComponentRenderer extends Component {
+-			constructor() {
+-				super( ...arguments );
++			static instances: FilteredComponentRenderer[];
++
++			constructor( props: { [ key: string ]: any } ) {
++				super( props );
+ 
+ 				ensureFilteredComponent();
+ 			}
+@@ -86,7 +115,10 @@ export default function withFilters( hookName ) {
+ 		const throttledForceUpdate = debounce( () => {
+ 			// Recreate the filtered component, only after delay so that it's
+ 			// computed once, even if many filters added.
+-			FilteredComponent = applyFilters( hookName, OriginalComponent );
++			FilteredComponent = applyFilters(
++				hookName,
++				OriginalComponent
++			) as React.ComponentType;
+ 
+ 			// Force each instance to render.
+ 			FilteredComponentRenderer.instances.forEach( ( instance ) => {
+@@ -99,9 +131,9 @@ export default function withFilters( hookName ) {
+ 		 * mounted instance should re-render with the new filters having been
+ 		 * applied to the original component.
+ 		 *
+-		 * @param {string} updatedHookName Name of the hook that was updated.
++		 * @param updatedHookName Name of the hook that was updated.
+ 		 */
+-		function onHooksUpdated( updatedHookName ) {
++		function onHooksUpdated( updatedHookName: string ) {
+ 			if ( updatedHookName === hookName ) {
+ 				throttledForceUpdate();
+ 			}
+diff --git a/packages/components/src/higher-order/with-filters/test/__snapshots__/index.js.snap b/packages/components/src/higher-order/with-filters/test/__snapshots__/index.tsx.snap
+similarity index 100%
+rename from packages/components/src/higher-order/with-filters/test/__snapshots__/index.js.snap
+rename to packages/components/src/higher-order/with-filters/test/__snapshots__/index.tsx.snap
+diff --git a/packages/components/src/higher-order/with-filters/test/index.js b/packages/components/src/higher-order/with-filters/test/index.tsx
+similarity index 94%
+rename from packages/components/src/higher-order/with-filters/test/index.js
+rename to packages/components/src/higher-order/with-filters/test/index.tsx
+index b7aacb1584079c..0f84054cee7376 100644
+--- a/packages/components/src/higher-order/with-filters/test/index.js
++++ b/packages/components/src/higher-order/with-filters/test/index.tsx
+@@ -18,7 +18,11 @@ describe( 'withFilters', () => {
+ 	const MyComponent = () => <div>My component</div>;
+ 
+ 	afterEach( () => {
+-		removeAllFilters( hookName );
++		removeAllFilters( hookName, 'test/enhanced-component-override' );
++		removeAllFilters( hookName, 'test/enhanced-component-compose' );
++		removeAllFilters( hookName, 'test/enhanced-component-spy' );
++		removeAllFilters( hookName, 'test/enhanced-component-spy-1' );
++		removeAllFilters( hookName, 'test/enhanced-component-spy-2' );
+ 	} );
+ 
+ 	it( 'should display original component when no filters applied', () => {
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index b8c3c53144f005..f136d9bf45474c 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -49,7 +49,6 @@
+ 		"src/dimension-control",
+ 		"src/duotone-picker",
+ 		"src/gradient-picker",
+-		"src/higher-order/with-filters",
+ 		"src/higher-order/with-focus-return",
+ 		"src/higher-order/with-notices",
+ 		"src/navigation",

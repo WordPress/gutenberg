@@ -1,0 +1,21 @@
+diff --git a/packages/components/src/confirm-dialog/component.tsx b/packages/components/src/confirm-dialog/component.tsx
+index d33a07aa7a1536..bfa5590ab20d8b 100644
+--- a/packages/components/src/confirm-dialog/component.tsx
++++ b/packages/components/src/confirm-dialog/component.tsx
+@@ -2,15 +2,13 @@
+  * External dependencies
+  */
+ // eslint-disable-next-line no-restricted-imports
+-import React, { useEffect, useState } from 'react';
+-// eslint-disable-next-line no-restricted-imports
+ import type { Ref, KeyboardEvent } from 'react';
+ 
+ /**
+  * WordPress dependencies
+  */
+ import { __ } from '@wordpress/i18n';
+-import { useCallback } from '@wordpress/element';
++import { useCallback, useEffect, useState } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies

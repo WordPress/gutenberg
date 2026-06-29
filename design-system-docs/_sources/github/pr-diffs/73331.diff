@@ -1,0 +1,1552 @@
+diff --git a/packages/theme/src/color-ramps/index.ts b/packages/theme/src/color-ramps/index.ts
+index 7e9b8c0ceed142..159f66ecd0abbb 100644
+--- a/packages/theme/src/color-ramps/index.ts
++++ b/packages/theme/src/color-ramps/index.ts
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { get, OKLCH, parse, serialize } from 'colorjs.io/fn';
++import { get, OKLCH, parse } from 'colorjs.io/fn';
+ 
+ /**
+  * Internal dependencies
+@@ -89,6 +89,7 @@ export function checkAccessibleCombinations( {
+ 		fgName: keyof Ramp;
+ 		fgColor: string;
+ 		unmetContrast: number;
++		achievedContrast: number;
+ 	}[] = [];
+ 
+ 	// Assess combinations within each ramp
+@@ -96,15 +97,17 @@ export function checkAccessibleCombinations( {
+ 		CONTRAST_COMBINATIONS.forEach( ( { bgs, fgs, target } ) => {
+ 			for ( const bg of bgs ) {
+ 				for ( const fg of fgs ) {
+-					const bgColor = parse( ramp.ramp[ bg ] );
+-					const fgColor = parse( ramp.ramp[ fg ] );
+-					if ( getContrast( bgColor, fgColor ) < target ) {
++					const bgColor = ramp.ramp[ bg ];
++					const fgColor = ramp.ramp[ fg ];
++					const achievedContrast = getContrast( bgColor, fgColor );
++					if ( achievedContrast < target ) {
+ 						unmetTargets.push( {
+ 							bgName: bg,
+-							bgColor: serialize( bgColor ),
++							bgColor,
+ 							fgName: fg,
+-							fgColor: serialize( fgColor ),
++							fgColor,
+ 							unmetContrast: target,
++							achievedContrast,
+ 						} );
+ 					}
+ 				}
+@@ -116,15 +119,17 @@ export function checkAccessibleCombinations( {
+ 		CONTRAST_COMBINATIONS.forEach( ( { bgs, fgs, target } ) => {
+ 			for ( const bg of bgs ) {
+ 				for ( const fg of fgs ) {
+-					const bgColor = parse( bgRamp.ramp[ bg ] );
+-					const fgColor = parse( ramp.ramp[ fg ] );
+-					if ( getContrast( bgColor, fgColor ) < target ) {
++					const bgColor = bgRamp.ramp[ bg ];
++					const fgColor = ramp.ramp[ fg ];
++					const achievedContrast = getContrast( bgColor, fgColor );
++					if ( achievedContrast < target ) {
+ 						unmetTargets.push( {
+ 							bgName: bg,
+-							bgColor: serialize( bgColor ),
++							bgColor,
+ 							fgName: fg,
+-							fgColor: serialize( fgColor ),
++							fgColor,
+ 							unmetContrast: target,
++							achievedContrast,
+ 						} );
+ 					}
+ 				}
+diff --git a/packages/theme/src/color-ramps/lib/color-utils.ts b/packages/theme/src/color-ramps/lib/color-utils.ts
+index b4a8a402a3040a..b31d77499b36b4 100644
+--- a/packages/theme/src/color-ramps/lib/color-utils.ts
++++ b/packages/theme/src/color-ramps/lib/color-utils.ts
+@@ -3,9 +3,11 @@
+  */
+ import {
+ 	to,
++	toGamut,
+ 	serialize,
+ 	contrastWCAG21,
+ 	sRGB,
++	OKLCH,
+ 	type ColorTypes,
+ } from 'colorjs.io/fn';
+ 
+@@ -32,3 +34,12 @@ export function getColorString( color: ColorTypes ): string {
+ export function getContrast( colorA: ColorTypes, colorB: ColorTypes ): number {
+ 	return contrastWCAG21( colorA, colorB );
+ }
++
++/**
++ * Make sure that a color is valid in the sRGB gamut and convert it to OKLCH.
++ * @param c
++ */
++export function clampToGamut( c: ColorTypes ) {
++	// map into sRGB using CSS OKLCH method
++	return to( toGamut( c, { space: sRGB, method: 'css' } ), OKLCH );
++}
+diff --git a/packages/theme/src/color-ramps/lib/constants.ts b/packages/theme/src/color-ramps/lib/constants.ts
+index 0d8db0f547ffc5..35dff1f6ffe409 100644
+--- a/packages/theme/src/color-ramps/lib/constants.ts
++++ b/packages/theme/src/color-ramps/lib/constants.ts
+@@ -14,9 +14,9 @@ export const BLACK = to( 'black', OKLCH );
+ 
+ // Margin added to target contrasts to counter for algorithm approximations and rounding errors.
+ // - the `CONTRAST_EPSILON` value is 0.004, so the real contrast can be lower by this amount.
+-// - the max contrast between adjacent RGB values is 1.016, so half of the difference (0.008) can be rounding error.
+-// - the sum is 0.012: the margin we add to ensure that the target contrast is met after all the rounding.
+-export const UNIVERSAL_CONTRAST_TOPUP = 0.012;
++// - the max contrast between adjacent RGB values is 1.016, so 0.016 is the maximum total rounding error between two values.
++// - the sum is 0.02: the margin we add to ensure that the target contrast is met after all the rounding.
++export const UNIVERSAL_CONTRAST_TOPUP = 0.02;
+ 
+ // When enabling "lighter direction" bias, this is the amount by which
+ // black text contrast needs to be greater than white text contrast.
+diff --git a/packages/theme/src/color-ramps/lib/default-ramps.ts b/packages/theme/src/color-ramps/lib/default-ramps.ts
+index ea88ea3ef96443..fe2a4b0b86bdf3 100644
+--- a/packages/theme/src/color-ramps/lib/default-ramps.ts
++++ b/packages/theme/src/color-ramps/lib/default-ramps.ts
+@@ -13,19 +13,19 @@ export const DEFAULT_RAMPS: Record<
+ 			surface2: '#f8f8f8',
+ 			bgFill1: '#555',
+ 			fgFill: '#f0f0f0',
+-			bgFill2: '#494949',
+-			surface6: '#d3d3d3',
+-			surface5: '#e3e3e3',
++			bgFill2: '#484848',
++			surface6: '#d2d2d2',
++			surface5: '#e2e2e2',
+ 			surface4: '#eaeaea',
+ 			surface3: '#fff',
+ 			fgSurface4: '#1e1e1e',
+-			fgSurface3: '#6e6e6e',
+-			fgSurface2: '#8b8b8b',
+-			fgSurface1: '#ababab',
+-			stroke3: '#8b8b8b',
+-			stroke4: '#6d6d6d',
+-			stroke2: '#adadad',
+-			stroke1: '#cfcfcf',
++			fgSurface3: '#6d6d6d',
++			fgSurface2: '#8a8a8a',
++			fgSurface1: '#aaa',
++			stroke3: '#8a8a8a',
++			stroke4: '#6c6c6c',
++			stroke2: '#d8d8d8',
++			stroke1: '#e0e0e0',
+ 			bgFillDark: '#1e1e1e',
+ 			fgFillDark: '#f0f0f0',
+ 			bgFillInverted2: '#1e1e1e',
+@@ -39,26 +39,26 @@ export const DEFAULT_RAMPS: Record<
+ 		ramp: {
+ 			bgFill1: '#3858e9',
+ 			fgFill: '#eff0f2',
+-			bgFill2: '#2e49da',
++			bgFill2: '#2e49d9',
+ 			surface2: '#f6f8fc',
+-			surface6: '#c7d3ef',
+-			surface5: '#dce3f5',
+-			surface4: '#e5ebf7',
++			surface6: '#c7d2ee',
++			surface5: '#dbe2f4',
++			surface4: '#e4eaf7',
+ 			surface3: '#fff',
+-			fgSurface4: '#080071',
++			fgSurface4: '#0b0070',
+ 			fgSurface3: '#3858e9',
+-			fgSurface2: '#5881ff',
+-			fgSurface1: '#84a9ff',
++			fgSurface2: '#5b82ff',
++			fgSurface1: '#85a9ff',
+ 			stroke3: '#3858e9',
+ 			stroke4: '#2337c8',
+-			stroke2: '#6d83bf',
+-			stroke1: '#91a2cf',
++			stroke2: '#9aaad3',
++			stroke1: '#a2b1d6',
+ 			bgFillDark: '#1b1e26',
+ 			fgFillDark: '#eff0f2',
+ 			bgFillInverted2: '#1b1e26',
+-			bgFillInverted1: '#12009f',
++			bgFillInverted1: '#13009f',
+ 			fgFillInverted: '#eff0f2',
+-			surface1: '#edf0fa',
++			surface1: '#ecf0f9',
+ 		},
+ 		direction: 'darker',
+ 	},
+@@ -66,26 +66,26 @@ export const DEFAULT_RAMPS: Record<
+ 		ramp: {
+ 			bgFill1: '#0090ff',
+ 			fgFill: '#1b1e23',
+-			bgFill2: '#0081ef',
++			bgFill2: '#007fed',
+ 			surface2: '#f5f9fd',
+-			surface6: '#bed6f1',
+-			surface5: '#d5e5f6',
+-			surface4: '#e0ebf8',
++			surface6: '#bdd5f1',
++			surface5: '#d4e4f6',
++			surface4: '#dfebf8',
+ 			surface3: '#fff',
+-			fgSurface4: '#001758',
+-			fgSurface3: '#006dd9',
+-			fgSurface2: '#008cfb',
+-			fgSurface1: '#53b1ff',
+-			stroke3: '#006dd9',
+-			stroke4: '#004eb8',
+-			stroke2: '#5d8fc6',
+-			stroke1: '#8aaed6',
++			fgSurface4: '#001b4f',
++			fgSurface3: '#006bd7',
++			fgSurface2: '#008bfa',
++			fgSurface1: '#59b0ff',
++			stroke3: '#006bd7',
++			stroke4: '#004fa9',
++			stroke2: '#94b5d9',
++			stroke1: '#9fbcdd',
+ 			bgFillDark: '#1b1e23',
+ 			fgFillDark: '#eff0f2',
+ 			bgFillInverted2: '#1b1e23',
+-			bgFillInverted1: '#002675',
++			bgFillInverted1: '#002a69',
+ 			fgFillInverted: '#eff0f2',
+-			surface1: '#eaf1fa',
++			surface1: '#e9f1fa',
+ 		},
+ 		direction: 'darker',
+ 	},
+@@ -93,26 +93,26 @@ export const DEFAULT_RAMPS: Record<
+ 		ramp: {
+ 			bgFill1: '#4ab866',
+ 			fgFill: '#1b1f1c',
+-			bgFill2: '#37a857',
++			bgFill2: '#37a756',
+ 			surface2: '#f0fcf2',
+ 			surface6: '#7eea95',
+-			surface5: '#b7f2c1',
+-			surface4: '#cdf5d3',
++			surface5: '#b5f1bf',
++			surface4: '#cbf5d1',
+ 			surface3: '#fff',
+-			fgSurface4: '#002b00',
+-			fgSurface3: '#008031',
+-			fgSurface2: '#2c9f4e',
+-			fgSurface1: '#54c16f',
+-			stroke3: '#008031',
+-			stroke4: '#006314',
+-			stroke2: '#61986b',
+-			stroke1: '#77ba84',
++			fgSurface4: '#002900',
++			fgSurface3: '#007f30',
++			fgSurface2: '#2b9e4e',
++			fgSurface1: '#53c06e',
++			stroke3: '#007f30',
++			stroke4: '#006013',
++			stroke2: '#7dc189',
++			stroke1: '#82c98f',
+ 			bgFillDark: '#1b1f1c',
+ 			fgFillDark: '#edf2ed',
+ 			bgFillInverted2: '#1b1f1c',
+-			bgFillInverted1: '#003800',
++			bgFillInverted1: '#003701',
+ 			fgFillInverted: '#edf2ed',
+-			surface1: '#ddf8e1',
++			surface1: '#dbf8df',
+ 		},
+ 		direction: 'darker',
+ 	},
+@@ -120,26 +120,26 @@ export const DEFAULT_RAMPS: Record<
+ 		ramp: {
+ 			bgFill1: '#f0d149',
+ 			fgFill: '#1f1e1b',
+-			bgFill2: '#ddbe30',
++			bgFill2: '#dcbe2f',
+ 			surface2: '#fdf9e7',
+-			surface6: '#ecd367',
+-			surface5: '#f5e399',
+-			surface4: '#f8ebb5',
++			surface6: '#ecd264',
++			surface5: '#f5e297',
++			surface4: '#f7eab3',
+ 			surface3: '#fff',
+-			fgSurface4: '#291d00',
+-			fgSurface3: '#876b00',
+-			fgSurface2: '#a78900',
+-			fgSurface1: '#c9aa00',
+-			stroke3: '#876b00',
+-			stroke4: '#675000',
+-			stroke2: '#978c60',
+-			stroke1: '#b8ab75',
++			fgSurface4: '#281d00',
++			fgSurface3: '#836b00',
++			fgSurface2: '#a58700',
++			fgSurface1: '#c7a900',
++			stroke3: '#836b00',
++			stroke4: '#635000',
++			stroke2: '#bfb17a',
++			stroke1: '#c7b97f',
+ 			bgFillDark: '#1f1e1b',
+ 			fgFillDark: '#f6f1da',
+ 			bgFillInverted2: '#1f1e1b',
+-			bgFillInverted1: '#3a2b00',
++			bgFillInverted1: '#392c00',
+ 			fgFillInverted: '#f6f1da',
+-			surface1: '#faf1cd',
++			surface1: '#f9f0c8',
+ 		},
+ 		direction: 'darker',
+ 	},
+@@ -147,26 +147,26 @@ export const DEFAULT_RAMPS: Record<
+ 		ramp: {
+ 			bgFill1: '#f0b849',
+ 			fgFill: '#1f1e1b',
+-			bgFill2: '#dea633',
++			bgFill2: '#dda633',
+ 			surface2: '#fdf7ee',
+-			surface6: '#f1ce90',
+-			surface5: '#f6e0bb',
+-			surface4: '#f8e9cd',
++			surface6: '#f1ce8f',
++			surface5: '#f6e0b9',
++			surface4: '#f8e8cc',
+ 			surface3: '#fff',
+-			fgSurface4: '#2f1800',
+-			fgSurface3: '#976300',
+-			fgSurface2: '#b78100',
+-			fgSurface1: '#d9a22e',
+-			stroke3: '#976300',
+-			stroke4: '#754900',
+-			stroke2: '#9f8860',
+-			stroke1: '#c2a776',
++			fgSurface4: '#2e1900',
++			fgSurface3: '#936400',
++			fgSurface2: '#b68000',
++			fgSurface1: '#d8a12c',
++			stroke3: '#936400',
++			stroke4: '#704a00',
++			stroke2: '#caae7c',
++			stroke1: '#d2b581',
+ 			bgFillDark: '#1f1e1b',
+ 			fgFillDark: '#f3f0e9',
+ 			bgFillInverted2: '#1f1e1b',
+-			bgFillInverted1: '#432600',
++			bgFillInverted1: '#422800',
+ 			fgFillInverted: '#f3f0e9',
+-			surface1: '#faefdc',
++			surface1: '#faeeda',
+ 		},
+ 		direction: 'darker',
+ 	},
+@@ -174,26 +174,26 @@ export const DEFAULT_RAMPS: Record<
+ 		ramp: {
+ 			bgFill1: '#cc1818',
+ 			fgFill: '#f2efef',
+-			bgFill2: '#bc0001',
++			bgFill2: '#b90000',
+ 			surface2: '#fdf6f5',
+-			surface6: '#f5c9c2',
+-			surface5: '#f9dcd8',
+-			surface4: '#fae5e2',
++			surface6: '#f5c8c1',
++			surface5: '#f9dbd7',
++			surface4: '#fae4e1',
+ 			surface3: '#fff',
+-			fgSurface4: '#4a0000',
++			fgSurface4: '#470000',
+ 			fgSurface3: '#cc1818',
+-			fgSurface2: '#f84d41',
+-			fgSurface1: '#ff8373',
++			fgSurface2: '#f74c40',
++			fgSurface1: '#ff8879',
+ 			stroke3: '#cc1818',
+-			stroke4: '#a70000',
+-			stroke2: '#ca675c',
+-			stroke1: '#dc8e83',
++			stroke4: '#9d0000',
++			stroke2: '#de988e',
++			stroke1: '#e1a198',
+ 			bgFillDark: '#231c1b',
+ 			fgFillDark: '#f2efef',
+ 			bgFillInverted2: '#231c1b',
+-			bgFillInverted1: '#680000',
++			bgFillInverted1: '#640000',
+ 			fgFillInverted: '#f2efef',
+-			surface1: '#fcedea',
++			surface1: '#fbece9',
+ 		},
+ 		direction: 'darker',
+ 	},
+diff --git a/packages/theme/src/color-ramps/lib/find-color-with-constraints.ts b/packages/theme/src/color-ramps/lib/find-color-with-constraints.ts
+index 068fccda8f8a5f..f0e265b6423110 100644
+--- a/packages/theme/src/color-ramps/lib/find-color-with-constraints.ts
++++ b/packages/theme/src/color-ramps/lib/find-color-with-constraints.ts
+@@ -7,9 +7,9 @@ import { get, OKLCH, type ColorTypes } from 'colorjs.io/fn';
+  * Internal dependencies
+  */
+ import './register-color-spaces';
+-import { clampToGamut, solveWithBisect } from './utils';
++import { solveWithBisect } from './utils';
+ import { WHITE, BLACK, CONTRAST_EPSILON } from './constants';
+-import { getContrast } from './color-utils';
++import { clampToGamut, getContrast } from './color-utils';
+ import { type TaperChromaOptions, taperChroma } from './taper-chroma';
+ 
+ /**
+diff --git a/packages/theme/src/color-ramps/lib/index.ts b/packages/theme/src/color-ramps/lib/index.ts
+index dbc1a4d40236c7..0523933ac882d0 100644
+--- a/packages/theme/src/color-ramps/lib/index.ts
++++ b/packages/theme/src/color-ramps/lib/index.ts
+@@ -15,10 +15,9 @@ import {
+  * Internal dependencies
+  */
+ import './register-color-spaces';
+-import { getContrast, getColorString } from './color-utils';
++import { clampToGamut, getContrast, getColorString } from './color-utils';
+ import { findColorMeetingRequirements } from './find-color-with-constraints';
+ import {
+-	clampToGamut,
+ 	sortByDependency,
+ 	computeBetterFgColorDirection,
+ 	adjustContrastTarget,
+diff --git a/packages/theme/src/color-ramps/lib/ramp-configs.ts b/packages/theme/src/color-ramps/lib/ramp-configs.ts
+index ac995b7798069d..b3b8acb05045ff 100644
+--- a/packages/theme/src/color-ramps/lib/ramp-configs.ts
++++ b/packages/theme/src/color-ramps/lib/ramp-configs.ts
+@@ -142,7 +142,7 @@ export const BG_RAMP_CONFIG: RampConfig = {
+ 		contrast: {
+ 			reference: 'stroke3',
+ 			followDirection: 'opposite',
+-			target: 2.2,
++			target: 2.6,
+ 		},
+ 		taperChromaOptions: STROKE_TAPER_CHROMA,
+ 	},
+@@ -150,7 +150,7 @@ export const BG_RAMP_CONFIG: RampConfig = {
+ 		contrast: {
+ 			reference: 'stroke3',
+ 			followDirection: 'opposite',
+-			target: 1.5,
++			target: 2.4,
+ 		},
+ 		taperChromaOptions: STROKE_TAPER_CHROMA,
+ 	},
+diff --git a/packages/theme/src/color-ramps/lib/utils.ts b/packages/theme/src/color-ramps/lib/utils.ts
+index 4b57eba5b3489b..ca051e9e2e7660 100644
+--- a/packages/theme/src/color-ramps/lib/utils.ts
++++ b/packages/theme/src/color-ramps/lib/utils.ts
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { toGamut, to, P3, OKLCH, type ColorTypes } from 'colorjs.io/fn';
++import { type ColorTypes } from 'colorjs.io/fn';
+ 
+ /**
+  * Internal dependencies
+@@ -19,13 +19,6 @@ import {
+ import type { Ramp, RampConfig, RampDirection } from './types';
+ import { getContrast } from './color-utils';
+ 
+-/**
+- * Make sure that a color is valid in the p3 gamut, and converts it to oklch.
+- * @param c
+- */
+-export const clampToGamut = ( c: ColorTypes ) =>
+-	to( toGamut( c, { space: P3, method: 'css' } ), OKLCH ); // map into Display-P3 using CSS OKLCH method
+-
+ /**
+  * Build a dependency graph from the steps configuration
+  * @param config - The steps configuration object
+diff --git a/packages/theme/src/color-ramps/stories/index.story.tsx b/packages/theme/src/color-ramps/stories/index.story.tsx
+index 5e17fb949fd76a..2c5903fe7aaa03 100644
+--- a/packages/theme/src/color-ramps/stories/index.story.tsx
++++ b/packages/theme/src/color-ramps/stories/index.story.tsx
+@@ -133,10 +133,12 @@ export const Default: StoryObj< typeof ColorGen > = {
+ 									fgName,
+ 									fgColor,
+ 									unmetContrast,
++									achievedContrast,
+ 								},
+ 								i
+ 							) => (
+ 								<li key={ i }>
++									{ fgName } (
+ 									<span
+ 										style={ {
+ 											width: 20,
+@@ -144,8 +146,8 @@ export const Default: StoryObj< typeof ColorGen > = {
+ 											backgroundColor: fgColor,
+ 											display: 'inline-block',
+ 										} }
+-									></span>
+-									{ fgName } over
++									/>
++									{ fgColor }) over { bgName } (
+ 									<span
+ 										style={ {
+ 											width: 20,
+@@ -153,8 +155,9 @@ export const Default: StoryObj< typeof ColorGen > = {
+ 											backgroundColor: bgColor,
+ 											display: 'inline-block',
+ 										} }
+-									></span>
+-									{ bgName } did not meet { unmetContrast }
++									/>
++									{ bgColor }) did not meet { unmetContrast },
++									achieved just { achievedContrast }
+ 								</li>
+ 							)
+ 						) }
+diff --git a/packages/theme/src/prebuilt/css/design-tokens.css b/packages/theme/src/prebuilt/css/design-tokens.css
+index 596cea33414849..b54fdaedf2ba40 100644
+--- a/packages/theme/src/prebuilt/css/design-tokens.css
++++ b/packages/theme/src/prebuilt/css/design-tokens.css
+@@ -10,91 +10,91 @@
+ 	--wpds-border-width-focus: 2px; /* Border width for focus ring */
+ 	--wpds-color-bg-interactive-brand: #00000000; /* Background color for interactive elements with brand tone and normal emphasis. */
+ 	--wpds-color-bg-interactive-brand-active: #f6f8fc; /* Background color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active. */
+-	--wpds-color-bg-interactive-brand-disabled: #e3e3e3; /* Background color for interactive elements with brand tone and normal emphasis, in their disabled state. */
++	--wpds-color-bg-interactive-brand-disabled: #e2e2e2; /* Background color for interactive elements with brand tone and normal emphasis, in their disabled state. */
+ 	--wpds-color-bg-interactive-brand-strong: #3858e9; /* Background color for interactive elements with brand tone and strong emphasis. */
+-	--wpds-color-bg-interactive-brand-strong-active: #2e49da; /* Background color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active. */
+-	--wpds-color-bg-interactive-brand-strong-disabled: #d3d3d3; /* Background color for interactive elements with brand tone and strong emphasis, in their disabled state. */
++	--wpds-color-bg-interactive-brand-strong-active: #2e49d9; /* Background color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active. */
++	--wpds-color-bg-interactive-brand-strong-disabled: #d2d2d2; /* Background color for interactive elements with brand tone and strong emphasis, in their disabled state. */
+ 	--wpds-color-bg-interactive-brand-weak: #00000000; /* Background color for interactive elements with brand tone and weak emphasis. */
+-	--wpds-color-bg-interactive-brand-weak-active: #e5ebf7; /* Background color for interactive elements with brand tone and weak emphasis that are hovered, focused, or active. */
+-	--wpds-color-bg-interactive-brand-weak-disabled: #e3e3e3; /* Background color for interactive elements with brand tone and weak emphasis, in their disabled state. */
++	--wpds-color-bg-interactive-brand-weak-active: #e4eaf7; /* Background color for interactive elements with brand tone and weak emphasis that are hovered, focused, or active. */
++	--wpds-color-bg-interactive-brand-weak-disabled: #e2e2e2; /* Background color for interactive elements with brand tone and weak emphasis, in their disabled state. */
+ 	--wpds-color-bg-interactive-neutral: #00000000; /* Background color for interactive elements with neutral tone and normal emphasis. */
+ 	--wpds-color-bg-interactive-neutral-active: #eaeaea; /* Background color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active. */
+-	--wpds-color-bg-interactive-neutral-disabled: #e3e3e3; /* Background color for interactive elements with neutral tone and normal emphasis, in their disabled state. */
++	--wpds-color-bg-interactive-neutral-disabled: #e2e2e2; /* Background color for interactive elements with neutral tone and normal emphasis, in their disabled state. */
+ 	--wpds-color-bg-interactive-neutral-strong: #2d2d2d; /* Background color for interactive elements with neutral tone and strong emphasis. */
+ 	--wpds-color-bg-interactive-neutral-strong-active: #1e1e1e; /* Background color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active. */
+-	--wpds-color-bg-interactive-neutral-strong-disabled: #d3d3d3; /* Background color for interactive elements with neutral tone and strong emphasis, in their disabled state. */
++	--wpds-color-bg-interactive-neutral-strong-disabled: #d2d2d2; /* Background color for interactive elements with neutral tone and strong emphasis, in their disabled state. */
+ 	--wpds-color-bg-interactive-neutral-weak: #00000000; /* Background color for interactive elements with neutral tone and weak emphasis. */
+ 	--wpds-color-bg-interactive-neutral-weak-active: #eaeaea; /* Background color for interactive elements with neutral tone and weak emphasis that are hovered, focused, or active. */
+-	--wpds-color-bg-interactive-neutral-weak-disabled: #e3e3e3; /* Background color for interactive elements with neutral tone and weak emphasis, in their disabled state. */
+-	--wpds-color-bg-surface-brand: #edf0fa; /* Background color for surfaces with brand tone and normal emphasis. */
+-	--wpds-color-bg-surface-caution: #f8ebb5; /* Background color for surfaces with caution tone and normal emphasis. */
++	--wpds-color-bg-interactive-neutral-weak-disabled: #e2e2e2; /* Background color for interactive elements with neutral tone and weak emphasis, in their disabled state. */
++	--wpds-color-bg-surface-brand: #ecf0f9; /* Background color for surfaces with brand tone and normal emphasis. */
++	--wpds-color-bg-surface-caution: #f7eab3; /* Background color for surfaces with caution tone and normal emphasis. */
+ 	--wpds-color-bg-surface-caution-weak: #fdf9e7; /* Background color for surfaces with caution tone and weak emphasis. */
+-	--wpds-color-bg-surface-error: #fae5e2; /* Background color for surfaces with error tone and normal emphasis. */
++	--wpds-color-bg-surface-error: #fae4e1; /* Background color for surfaces with error tone and normal emphasis. */
+ 	--wpds-color-bg-surface-error-weak: #fdf6f5; /* Background color for surfaces with error tone and weak emphasis. */
+-	--wpds-color-bg-surface-info: #e0ebf8; /* Background color for surfaces with info tone and normal emphasis. */
++	--wpds-color-bg-surface-info: #dfebf8; /* Background color for surfaces with info tone and normal emphasis. */
+ 	--wpds-color-bg-surface-info-weak: #f5f9fd; /* Background color for surfaces with info tone and weak emphasis. */
+ 	--wpds-color-bg-surface-neutral: #f8f8f8; /* Background color for surfaces with normal emphasis. */
+ 	--wpds-color-bg-surface-neutral-strong: #ffffff; /* Background color for surfaces with strong emphasis. */
+ 	--wpds-color-bg-surface-neutral-weak: #f0f0f0; /* Background color for surfaces with weak emphasis. */
+-	--wpds-color-bg-surface-success: #cdf5d3; /* Background color for surfaces with success tone and normal emphasis. */
++	--wpds-color-bg-surface-success: #cbf5d1; /* Background color for surfaces with success tone and normal emphasis. */
+ 	--wpds-color-bg-surface-success-weak: #f0fcf2; /* Background color for surfaces with success tone and weak emphasis. */
+-	--wpds-color-bg-surface-warning: #f8e9cd; /* Background color for surfaces with warning tone and normal emphasis. */
++	--wpds-color-bg-surface-warning: #f8e8cc; /* Background color for surfaces with warning tone and normal emphasis. */
+ 	--wpds-color-bg-surface-warning-weak: #fdf7ee; /* Background color for surfaces with warning tone and weak emphasis. */
+ 	--wpds-color-bg-thumb-brand: #3858e9; /* Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track). */
+ 	--wpds-color-bg-thumb-brand-active: #3858e9; /* Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track) that are hovered, focused, or active. */
+-	--wpds-color-bg-thumb-brand-disabled: #adadad; /* Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track), in their disabled state. */
+-	--wpds-color-bg-thumb-neutral-weak: #8b8b8b; /* Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb). */
+-	--wpds-color-bg-thumb-neutral-weak-active: #6d6d6d; /* Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb) that are hovered, focused, or active. */
+-	--wpds-color-bg-track-neutral: #adadad; /* Background color for tracks with a neutral tone and normal emphasis (eg. slider or progressbar track). */
+-	--wpds-color-bg-track-neutral-weak: #cfcfcf; /* Background color for tracks with a neutral tone and weak emphasis (eg. scrollbar track). */
+-	--wpds-color-fg-content-caution: #291d00; /* Foreground color for content like text with caution tone and normal emphasis. */
+-	--wpds-color-fg-content-caution-weak: #876b00; /* Foreground color for content like text with caution tone and weak emphasis. */
+-	--wpds-color-fg-content-error: #4a0000; /* Foreground color for content like text with error tone and normal emphasis. */
++	--wpds-color-bg-thumb-brand-disabled: #d8d8d8; /* Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track), in their disabled state. */
++	--wpds-color-bg-thumb-neutral-weak: #8a8a8a; /* Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb). */
++	--wpds-color-bg-thumb-neutral-weak-active: #6c6c6c; /* Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb) that are hovered, focused, or active. */
++	--wpds-color-bg-track-neutral: #d8d8d8; /* Background color for tracks with a neutral tone and normal emphasis (eg. slider or progressbar track). */
++	--wpds-color-bg-track-neutral-weak: #e0e0e0; /* Background color for tracks with a neutral tone and weak emphasis (eg. scrollbar track). */
++	--wpds-color-fg-content-caution: #281d00; /* Foreground color for content like text with caution tone and normal emphasis. */
++	--wpds-color-fg-content-caution-weak: #836b00; /* Foreground color for content like text with caution tone and weak emphasis. */
++	--wpds-color-fg-content-error: #470000; /* Foreground color for content like text with error tone and normal emphasis. */
+ 	--wpds-color-fg-content-error-weak: #cc1818; /* Foreground color for content like text with error tone and weak emphasis. */
+-	--wpds-color-fg-content-info: #001758; /* Foreground color for content like text with info tone and normal emphasis. */
+-	--wpds-color-fg-content-info-weak: #006dd9; /* Foreground color for content like text with info tone and weak emphasis. */
++	--wpds-color-fg-content-info: #001b4f; /* Foreground color for content like text with info tone and normal emphasis. */
++	--wpds-color-fg-content-info-weak: #006bd7; /* Foreground color for content like text with info tone and weak emphasis. */
+ 	--wpds-color-fg-content-neutral: #1e1e1e; /* Foreground color for content like text with normal emphasis. */
+-	--wpds-color-fg-content-neutral-weak: #6e6e6e; /* Foreground color for content like text with weak emphasis. */
+-	--wpds-color-fg-content-success: #002b00; /* Foreground color for content like text with success tone and normal emphasis. */
+-	--wpds-color-fg-content-success-weak: #008031; /* Foreground color for content like text with success tone and weak emphasis. */
+-	--wpds-color-fg-content-warning: #2f1800; /* Foreground color for content like text with warning tone and normal emphasis. */
+-	--wpds-color-fg-content-warning-weak: #976300; /* Foreground color for content like text with warning tone and weak emphasis. */
++	--wpds-color-fg-content-neutral-weak: #6d6d6d; /* Foreground color for content like text with weak emphasis. */
++	--wpds-color-fg-content-success: #002900; /* Foreground color for content like text with success tone and normal emphasis. */
++	--wpds-color-fg-content-success-weak: #007f30; /* Foreground color for content like text with success tone and weak emphasis. */
++	--wpds-color-fg-content-warning: #2e1900; /* Foreground color for content like text with warning tone and normal emphasis. */
++	--wpds-color-fg-content-warning-weak: #936400; /* Foreground color for content like text with warning tone and weak emphasis. */
+ 	--wpds-color-fg-interactive-brand: #3858e9; /* Foreground color for interactive elements with brand tone and normal emphasis. */
+ 	--wpds-color-fg-interactive-brand-active: #3858e9; /* Foreground color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active. */
+-	--wpds-color-fg-interactive-brand-disabled: #8b8b8b; /* Foreground color for interactive elements with brand tone and normal emphasis, in their disabled state. */
++	--wpds-color-fg-interactive-brand-disabled: #8a8a8a; /* Foreground color for interactive elements with brand tone and normal emphasis, in their disabled state. */
+ 	--wpds-color-fg-interactive-brand-strong: #eff0f2; /* Foreground color for interactive elements with brand tone and strong emphasis. */
+ 	--wpds-color-fg-interactive-brand-strong-active: #eff0f2; /* Foreground color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active. */
+-	--wpds-color-fg-interactive-brand-strong-disabled: #6e6e6e; /* Foreground color for interactive elements with brand tone and strong emphasis, in their disabled state. */
++	--wpds-color-fg-interactive-brand-strong-disabled: #6d6d6d; /* Foreground color for interactive elements with brand tone and strong emphasis, in their disabled state. */
+ 	--wpds-color-fg-interactive-neutral: #1e1e1e; /* Foreground color for interactive elements with neutral tone and normal emphasis. */
+ 	--wpds-color-fg-interactive-neutral-active: #1e1e1e; /* Foreground color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active. */
+-	--wpds-color-fg-interactive-neutral-disabled: #8b8b8b; /* Foreground color for interactive elements with neutral tone and normal emphasis, in their disabled state. */
++	--wpds-color-fg-interactive-neutral-disabled: #8a8a8a; /* Foreground color for interactive elements with neutral tone and normal emphasis, in their disabled state. */
+ 	--wpds-color-fg-interactive-neutral-strong: #f0f0f0; /* Foreground color for interactive elements with neutral tone and strong emphasis. */
+ 	--wpds-color-fg-interactive-neutral-strong-active: #f0f0f0; /* Foreground color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active. */
+-	--wpds-color-fg-interactive-neutral-strong-disabled: #6e6e6e; /* Foreground color for interactive elements with neutral tone and strong emphasis, in their disabled state. */
+-	--wpds-color-fg-interactive-neutral-weak: #6e6e6e; /* Foreground color for interactive elements with neutral tone and weak emphasis. */
+-	--wpds-color-fg-interactive-neutral-weak-disabled: #8b8b8b; /* Foreground color for interactive elements with neutral tone and weak emphasis, in their disabled state. */
++	--wpds-color-fg-interactive-neutral-strong-disabled: #6d6d6d; /* Foreground color for interactive elements with neutral tone and strong emphasis, in their disabled state. */
++	--wpds-color-fg-interactive-neutral-weak: #6d6d6d; /* Foreground color for interactive elements with neutral tone and weak emphasis. */
++	--wpds-color-fg-interactive-neutral-weak-disabled: #8a8a8a; /* Foreground color for interactive elements with neutral tone and weak emphasis, in their disabled state. */
+ 	--wpds-color-stroke-focus-brand: #3858e9; /* Accessible stroke color applied to focus rings. */
+ 	--wpds-color-stroke-interactive-brand: #3858e9; /* Accessible stroke color used for interactive brand-toned elements with normal emphasis. */
+ 	--wpds-color-stroke-interactive-brand-active: #2337c8; /* Accessible stroke color used for interactive brand-toned elements with normal emphasis that are hovered, focused, or active. */
+-	--wpds-color-stroke-interactive-brand-disabled: #adadad; /* Accessible stroke color used for interactive brand-toned elements with normal emphasis, in their disabled state. */
++	--wpds-color-stroke-interactive-brand-disabled: #d8d8d8; /* Accessible stroke color used for interactive brand-toned elements with normal emphasis, in their disabled state. */
+ 	--wpds-color-stroke-interactive-error-strong: #cc1818; /* Accessible stroke color used for interactive error-toned elements with strong emphasis. */
+-	--wpds-color-stroke-interactive-neutral: #8b8b8b; /* Accessible stroke color used for interactive neutrally-toned elements with normal emphasis. */
+-	--wpds-color-stroke-interactive-neutral-active: #6d6d6d; /* Accessible stroke color used for interactive neutrally-toned elements with normal emphasis that are hovered, focused, or active. */
+-	--wpds-color-stroke-interactive-neutral-disabled: #adadad; /* Accessible stroke color used for interactive neutrally-toned elements with normal emphasis, in their disabled state. */
+-	--wpds-color-stroke-interactive-neutral-strong: #6d6d6d; /* Accessible stroke color used for interactive neutrally-toned elements with strong emphasis. */
+-	--wpds-color-stroke-surface-brand: #91a2cf; /* Decorative stroke color used to define brand-toned surface boundaries with normal emphasis. */
++	--wpds-color-stroke-interactive-neutral: #8a8a8a; /* Accessible stroke color used for interactive neutrally-toned elements with normal emphasis. */
++	--wpds-color-stroke-interactive-neutral-active: #6c6c6c; /* Accessible stroke color used for interactive neutrally-toned elements with normal emphasis that are hovered, focused, or active. */
++	--wpds-color-stroke-interactive-neutral-disabled: #d8d8d8; /* Accessible stroke color used for interactive neutrally-toned elements with normal emphasis, in their disabled state. */
++	--wpds-color-stroke-interactive-neutral-strong: #6c6c6c; /* Accessible stroke color used for interactive neutrally-toned elements with strong emphasis. */
++	--wpds-color-stroke-surface-brand: #a2b1d6; /* Decorative stroke color used to define brand-toned surface boundaries with normal emphasis. */
+ 	--wpds-color-stroke-surface-brand-strong: #3858e9; /* Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis. */
+-	--wpds-color-stroke-surface-error: #dc8e83; /* Decorative stroke color used to define error-toned surface boundaries with normal emphasis. */
++	--wpds-color-stroke-surface-error: #e1a198; /* Decorative stroke color used to define error-toned surface boundaries with normal emphasis. */
+ 	--wpds-color-stroke-surface-error-strong: #cc1818; /* Decorative stroke color used to define error-toned surface boundaries with strong emphasis. */
+-	--wpds-color-stroke-surface-info: #8aaed6; /* Decorative stroke color used to define info-toned surface boundaries with normal emphasis. */
+-	--wpds-color-stroke-surface-info-strong: #006dd9; /* Decorative stroke color used to define info-toned surface boundaries with strong emphasis. */
+-	--wpds-color-stroke-surface-neutral: #adadad; /* Decorative stroke color used to define neutrally-toned surface boundaries with normal emphasis. */
+-	--wpds-color-stroke-surface-neutral-strong: #8b8b8b; /* Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis. */
+-	--wpds-color-stroke-surface-neutral-weak: #cfcfcf; /* Decorative stroke color used to define neutrally-toned surface boundaries with weak emphasis. */
+-	--wpds-color-stroke-surface-success: #77ba84; /* Decorative stroke color used to define success-toned surface boundaries with normal emphasis. */
+-	--wpds-color-stroke-surface-success-strong: #008031; /* Decorative stroke color used to define success-toned surface boundaries with strong emphasis. */
+-	--wpds-color-stroke-surface-warning: #c2a776; /* Decorative stroke color used to define warning-toned surface boundaries with normal emphasis. */
+-	--wpds-color-stroke-surface-warning-strong: #976300; /* Decorative stroke color used to define warning-toned surface boundaries with strong emphasis. */
++	--wpds-color-stroke-surface-info: #9fbcdd; /* Decorative stroke color used to define info-toned surface boundaries with normal emphasis. */
++	--wpds-color-stroke-surface-info-strong: #006bd7; /* Decorative stroke color used to define info-toned surface boundaries with strong emphasis. */
++	--wpds-color-stroke-surface-neutral: #d8d8d8; /* Decorative stroke color used to define neutrally-toned surface boundaries with normal emphasis. */
++	--wpds-color-stroke-surface-neutral-strong: #8a8a8a; /* Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis. */
++	--wpds-color-stroke-surface-neutral-weak: #e0e0e0; /* Decorative stroke color used to define neutrally-toned surface boundaries with weak emphasis. */
++	--wpds-color-stroke-surface-success: #82c98f; /* Decorative stroke color used to define success-toned surface boundaries with normal emphasis. */
++	--wpds-color-stroke-surface-success-strong: #007f30; /* Decorative stroke color used to define success-toned surface boundaries with strong emphasis. */
++	--wpds-color-stroke-surface-warning: #d2b581; /* Decorative stroke color used to define warning-toned surface boundaries with normal emphasis. */
++	--wpds-color-stroke-surface-warning-strong: #936400; /* Decorative stroke color used to define warning-toned surface boundaries with strong emphasis. */
+ 	--wpds-dimension-base: 4px; /* Base dimension unit */
+ 	--wpds-dimension-padding-surface-large: 24px; /* Large spacing for surfaces */
+ 	--wpds-dimension-padding-surface-medium: 16px; /* Medium spacing for surfaces */
+diff --git a/packages/theme/src/prebuilt/json/figma.json b/packages/theme/src/prebuilt/json/figma.json
+index cd13fe8356e222..07325261569bdd 100644
+--- a/packages/theme/src/prebuilt/json/figma.json
++++ b/packages/theme/src/prebuilt/json/figma.json
+@@ -50,13 +50,13 @@
+ 	},
+ 	"Color/Semantic/Background/Brand/bgSur-brand": {
+ 		"value": {
+-			".": "#edf0fa"
++			".": "#ecf0f9"
+ 		},
+ 		"description": "Background color for surfaces with brand tone and normal emphasis."
+ 	},
+ 	"Color/Semantic/Background/Success/bgSur-success": {
+ 		"value": {
+-			".": "#cdf5d3"
++			".": "#cbf5d1"
+ 		},
+ 		"description": "Background color for surfaces with success tone and normal emphasis."
+ 	},
+@@ -68,7 +68,7 @@
+ 	},
+ 	"Color/Semantic/Background/Info/bgSur-info": {
+ 		"value": {
+-			".": "#e0ebf8"
++			".": "#dfebf8"
+ 		},
+ 		"description": "Background color for surfaces with info tone and normal emphasis."
+ 	},
+@@ -80,7 +80,7 @@
+ 	},
+ 	"Color/Semantic/Background/Warning/bgSur-warning": {
+ 		"value": {
+-			".": "#f8e9cd"
++			".": "#f8e8cc"
+ 		},
+ 		"description": "Background color for surfaces with warning tone and normal emphasis."
+ 	},
+@@ -92,7 +92,7 @@
+ 	},
+ 	"Color/Semantic/Background/Caution/bgSur-caution": {
+ 		"value": {
+-			".": "#f8ebb5"
++			".": "#f7eab3"
+ 		},
+ 		"description": "Background color for surfaces with caution tone and normal emphasis."
+ 	},
+@@ -104,7 +104,7 @@
+ 	},
+ 	"Color/Semantic/Background/Error/bgSur-error": {
+ 		"value": {
+-			".": "#fae5e2"
++			".": "#fae4e1"
+ 		},
+ 		"description": "Background color for surfaces with error tone and normal emphasis."
+ 	},
+@@ -128,7 +128,7 @@
+ 	},
+ 	"Color/Semantic/Background/Neutral/bgInt-neutral-disabled": {
+ 		"value": {
+-			".": "#e3e3e3"
++			".": "#e2e2e2"
+ 		},
+ 		"description": "Background color for interactive elements with neutral tone and normal emphasis, in their disabled state."
+ 	},
+@@ -146,7 +146,7 @@
+ 	},
+ 	"Color/Semantic/Background/Neutral/bgInt-neutral-strong-disabled": {
+ 		"value": {
+-			".": "#d3d3d3"
++			".": "#d2d2d2"
+ 		},
+ 		"description": "Background color for interactive elements with neutral tone and strong emphasis, in their disabled state."
+ 	},
+@@ -164,7 +164,7 @@
+ 	},
+ 	"Color/Semantic/Background/Neutral/bgInt-neutral-weak-disabled": {
+ 		"value": {
+-			".": "#e3e3e3"
++			".": "#e2e2e2"
+ 		},
+ 		"description": "Background color for interactive elements with neutral tone and weak emphasis, in their disabled state."
+ 	},
+@@ -182,7 +182,7 @@
+ 	},
+ 	"Color/Semantic/Background/Brand/bgInt-brand-disabled": {
+ 		"value": {
+-			".": "#e3e3e3"
++			".": "#e2e2e2"
+ 		},
+ 		"description": "Background color for interactive elements with brand tone and normal emphasis, in their disabled state."
+ 	},
+@@ -194,13 +194,13 @@
+ 	},
+ 	"Color/Semantic/Background/Brand/bgInt-brand-strong-active": {
+ 		"value": {
+-			".": "#2e49da"
++			".": "#2e49d9"
+ 		},
+ 		"description": "Background color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active."
+ 	},
+ 	"Color/Semantic/Background/Brand/bgInt-brand-strong-disabled": {
+ 		"value": {
+-			".": "#d3d3d3"
++			".": "#d2d2d2"
+ 		},
+ 		"description": "Background color for interactive elements with brand tone and strong emphasis, in their disabled state."
+ 	},
+@@ -212,37 +212,37 @@
+ 	},
+ 	"Color/Semantic/Background/Brand/bgInt-brand-weak-active": {
+ 		"value": {
+-			".": "#e5ebf7"
++			".": "#e4eaf7"
+ 		},
+ 		"description": "Background color for interactive elements with brand tone and weak emphasis that are hovered, focused, or active."
+ 	},
+ 	"Color/Semantic/Background/Brand/bgInt-brand-weak-disabled": {
+ 		"value": {
+-			".": "#e3e3e3"
++			".": "#e2e2e2"
+ 		},
+ 		"description": "Background color for interactive elements with brand tone and weak emphasis, in their disabled state."
+ 	},
+ 	"Color/Semantic/Background/Neutral/bgTra-neutral-weak": {
+ 		"value": {
+-			".": "#cfcfcf"
++			".": "#e0e0e0"
+ 		},
+ 		"description": "Background color for tracks with a neutral tone and weak emphasis (eg. scrollbar track)."
+ 	},
+ 	"Color/Semantic/Background/Neutral/bgTra-neutral": {
+ 		"value": {
+-			".": "#adadad"
++			".": "#d8d8d8"
+ 		},
+ 		"description": "Background color for tracks with a neutral tone and normal emphasis (eg. slider or progressbar track)."
+ 	},
+ 	"Color/Semantic/Background/Neutral/bgThu-neutral-weak": {
+ 		"value": {
+-			".": "#8b8b8b"
++			".": "#8a8a8a"
+ 		},
+ 		"description": "Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb)."
+ 	},
+ 	"Color/Semantic/Background/Neutral/bgThu-neutral-weak-active": {
+ 		"value": {
+-			".": "#6d6d6d"
++			".": "#6c6c6c"
+ 		},
+ 		"description": "Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb) that are hovered, focused, or active."
+ 	},
+@@ -260,7 +260,7 @@
+ 	},
+ 	"Color/Semantic/Background/Brand/bgThu-brand-disabled": {
+ 		"value": {
+-			".": "#adadad"
++			".": "#d8d8d8"
+ 		},
+ 		"description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track), in their disabled state."
+ 	},
+@@ -272,61 +272,61 @@
+ 	},
+ 	"Color/Semantic/Foreground/Neutral/fgCon-neutral-weak": {
+ 		"value": {
+-			".": "#6e6e6e"
++			".": "#6d6d6d"
+ 		},
+ 		"description": "Foreground color for content like text with weak emphasis."
+ 	},
+ 	"Color/Semantic/Foreground/Success/fgCon-success": {
+ 		"value": {
+-			".": "#002b00"
++			".": "#002900"
+ 		},
+ 		"description": "Foreground color for content like text with success tone and normal emphasis."
+ 	},
+ 	"Color/Semantic/Foreground/Success/fgCon-success-weak": {
+ 		"value": {
+-			".": "#008031"
++			".": "#007f30"
+ 		},
+ 		"description": "Foreground color for content like text with success tone and weak emphasis."
+ 	},
+ 	"Color/Semantic/Foreground/Info/fgCon-info": {
+ 		"value": {
+-			".": "#001758"
++			".": "#001b4f"
+ 		},
+ 		"description": "Foreground color for content like text with info tone and normal emphasis."
+ 	},
+ 	"Color/Semantic/Foreground/Info/fgCon-info-weak": {
+ 		"value": {
+-			".": "#006dd9"
++			".": "#006bd7"
+ 		},
+ 		"description": "Foreground color for content like text with info tone and weak emphasis."
+ 	},
+ 	"Color/Semantic/Foreground/Warning/fgCon-warning": {
+ 		"value": {
+-			".": "#2f1800"
++			".": "#2e1900"
+ 		},
+ 		"description": "Foreground color for content like text with warning tone and normal emphasis."
+ 	},
+ 	"Color/Semantic/Foreground/Warning/fgCon-warning-weak": {
+ 		"value": {
+-			".": "#976300"
++			".": "#936400"
+ 		},
+ 		"description": "Foreground color for content like text with warning tone and weak emphasis."
+ 	},
+ 	"Color/Semantic/Foreground/Caution/fgCon-caution": {
+ 		"value": {
+-			".": "#291d00"
++			".": "#281d00"
+ 		},
+ 		"description": "Foreground color for content like text with caution tone and normal emphasis."
+ 	},
+ 	"Color/Semantic/Foreground/Caution/fgCon-caution-weak": {
+ 		"value": {
+-			".": "#876b00"
++			".": "#836b00"
+ 		},
+ 		"description": "Foreground color for content like text with caution tone and weak emphasis."
+ 	},
+ 	"Color/Semantic/Foreground/Error/fgCon-error": {
+ 		"value": {
+-			".": "#4a0000"
++			".": "#470000"
+ 		},
+ 		"description": "Foreground color for content like text with error tone and normal emphasis."
+ 	},
+@@ -350,7 +350,7 @@
+ 	},
+ 	"Color/Semantic/Foreground/Neutral/fgInt-neutral-disabled": {
+ 		"value": {
+-			".": "#8b8b8b"
++			".": "#8a8a8a"
+ 		},
+ 		"description": "Foreground color for interactive elements with neutral tone and normal emphasis, in their disabled state."
+ 	},
+@@ -368,19 +368,19 @@
+ 	},
+ 	"Color/Semantic/Foreground/Neutral/fgInt-neutral-strong-disabled": {
+ 		"value": {
+-			".": "#6e6e6e"
++			".": "#6d6d6d"
+ 		},
+ 		"description": "Foreground color for interactive elements with neutral tone and strong emphasis, in their disabled state."
+ 	},
+ 	"Color/Semantic/Foreground/Neutral/fgInt-neutral-weak": {
+ 		"value": {
+-			".": "#6e6e6e"
++			".": "#6d6d6d"
+ 		},
+ 		"description": "Foreground color for interactive elements with neutral tone and weak emphasis."
+ 	},
+ 	"Color/Semantic/Foreground/Neutral/fgInt-neutral-weak-disabled": {
+ 		"value": {
+-			".": "#8b8b8b"
++			".": "#8a8a8a"
+ 		},
+ 		"description": "Foreground color for interactive elements with neutral tone and weak emphasis, in their disabled state."
+ 	},
+@@ -398,7 +398,7 @@
+ 	},
+ 	"Color/Semantic/Foreground/Brand/fgInt-brand-disabled": {
+ 		"value": {
+-			".": "#8b8b8b"
++			".": "#8a8a8a"
+ 		},
+ 		"description": "Foreground color for interactive elements with brand tone and normal emphasis, in their disabled state."
+ 	},
+@@ -416,31 +416,31 @@
+ 	},
+ 	"Color/Semantic/Foreground/Brand/fgInt-brand-strong-disabled": {
+ 		"value": {
+-			".": "#6e6e6e"
++			".": "#6d6d6d"
+ 		},
+ 		"description": "Foreground color for interactive elements with brand tone and strong emphasis, in their disabled state."
+ 	},
+ 	"Color/Semantic/Stroke/Neutral/strokeSur-neutral": {
+ 		"value": {
+-			".": "#adadad"
++			".": "#d8d8d8"
+ 		},
+ 		"description": "Decorative stroke color used to define neutrally-toned surface boundaries with normal emphasis."
+ 	},
+ 	"Color/Semantic/Stroke/Neutral/strokeSur-neutral-weak": {
+ 		"value": {
+-			".": "#cfcfcf"
++			".": "#e0e0e0"
+ 		},
+ 		"description": "Decorative stroke color used to define neutrally-toned surface boundaries with weak emphasis."
+ 	},
+ 	"Color/Semantic/Stroke/Neutral/strokeSur-neutral-strong": {
+ 		"value": {
+-			".": "#8b8b8b"
++			".": "#8a8a8a"
+ 		},
+ 		"description": "Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis."
+ 	},
+ 	"Color/Semantic/Stroke/Brand/strokeSur-brand": {
+ 		"value": {
+-			".": "#91a2cf"
++			".": "#a2b1d6"
+ 		},
+ 		"description": "Decorative stroke color used to define brand-toned surface boundaries with normal emphasis."
+ 	},
+@@ -452,43 +452,43 @@
+ 	},
+ 	"Color/Semantic/Stroke/Success/strokeSur-success": {
+ 		"value": {
+-			".": "#77ba84"
++			".": "#82c98f"
+ 		},
+ 		"description": "Decorative stroke color used to define success-toned surface boundaries with normal emphasis."
+ 	},
+ 	"Color/Semantic/Stroke/Success/strokeSur-success-strong": {
+ 		"value": {
+-			".": "#008031"
++			".": "#007f30"
+ 		},
+ 		"description": "Decorative stroke color used to define success-toned surface boundaries with strong emphasis."
+ 	},
+ 	"Color/Semantic/Stroke/Info/strokeSur-info": {
+ 		"value": {
+-			".": "#8aaed6"
++			".": "#9fbcdd"
+ 		},
+ 		"description": "Decorative stroke color used to define info-toned surface boundaries with normal emphasis."
+ 	},
+ 	"Color/Semantic/Stroke/Info/strokeSur-info-strong": {
+ 		"value": {
+-			".": "#006dd9"
++			".": "#006bd7"
+ 		},
+ 		"description": "Decorative stroke color used to define info-toned surface boundaries with strong emphasis."
+ 	},
+ 	"Color/Semantic/Stroke/Warning/strokeSur-warning": {
+ 		"value": {
+-			".": "#c2a776"
++			".": "#d2b581"
+ 		},
+ 		"description": "Decorative stroke color used to define warning-toned surface boundaries with normal emphasis."
+ 	},
+ 	"Color/Semantic/Stroke/Warning/strokeSur-warning-strong": {
+ 		"value": {
+-			".": "#976300"
++			".": "#936400"
+ 		},
+ 		"description": "Decorative stroke color used to define warning-toned surface boundaries with strong emphasis."
+ 	},
+ 	"Color/Semantic/Stroke/Error/strokeSur-error": {
+ 		"value": {
+-			".": "#dc8e83"
++			".": "#e1a198"
+ 		},
+ 		"description": "Decorative stroke color used to define error-toned surface boundaries with normal emphasis."
+ 	},
+@@ -500,25 +500,25 @@
+ 	},
+ 	"Color/Semantic/Stroke/Neutral/strokeInt-neutral": {
+ 		"value": {
+-			".": "#8b8b8b"
++			".": "#8a8a8a"
+ 		},
+ 		"description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis."
+ 	},
+ 	"Color/Semantic/Stroke/Neutral/strokeInt-neutral-active": {
+ 		"value": {
+-			".": "#6d6d6d"
++			".": "#6c6c6c"
+ 		},
+ 		"description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis that are hovered, focused, or active."
+ 	},
+ 	"Color/Semantic/Stroke/Neutral/strokeInt-neutral-disabled": {
+ 		"value": {
+-			".": "#adadad"
++			".": "#d8d8d8"
+ 		},
+ 		"description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis, in their disabled state."
+ 	},
+ 	"Color/Semantic/Stroke/Neutral/strokeInt-neutral-strong": {
+ 		"value": {
+-			".": "#6d6d6d"
++			".": "#6c6c6c"
+ 		},
+ 		"description": "Accessible stroke color used for interactive neutrally-toned elements with strong emphasis."
+ 	},
+@@ -536,7 +536,7 @@
+ 	},
+ 	"Color/Semantic/Stroke/Brand/strokeInt-brand-disabled": {
+ 		"value": {
+-			".": "#adadad"
++			".": "#d8d8d8"
+ 		},
+ 		"description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis, in their disabled state."
+ 	},
+diff --git a/packages/theme/tokens/color.json b/packages/theme/tokens/color.json
+index b8339dea2043d1..3408112e2c7ffd 100644
+--- a/packages/theme/tokens/color.json
++++ b/packages/theme/tokens/color.json
+@@ -10,34 +10,34 @@
+ 					"$value": "#eff0f2"
+ 				},
+ 				"bgFill2": {
+-					"$value": "#2e49da"
++					"$value": "#2e49d9"
+ 				},
+ 				"surface2": {
+ 					"$value": "#f6f8fc"
+ 				},
+ 				"surface6": {
+-					"$value": "#c7d3ef"
++					"$value": "#c7d2ee"
+ 				},
+ 				"surface5": {
+-					"$value": "#dce3f5"
++					"$value": "#dbe2f4"
+ 				},
+ 				"surface4": {
+-					"$value": "#e5ebf7"
++					"$value": "#e4eaf7"
+ 				},
+ 				"surface3": {
+ 					"$value": "#fff"
+ 				},
+ 				"fgSurface4": {
+-					"$value": "#080071"
++					"$value": "#0b0070"
+ 				},
+ 				"fgSurface3": {
+ 					"$value": "#3858e9"
+ 				},
+ 				"fgSurface2": {
+-					"$value": "#5881ff"
++					"$value": "#5b82ff"
+ 				},
+ 				"fgSurface1": {
+-					"$value": "#84a9ff"
++					"$value": "#85a9ff"
+ 				},
+ 				"stroke3": {
+ 					"$value": "#3858e9"
+@@ -46,10 +46,10 @@
+ 					"$value": "#2337c8"
+ 				},
+ 				"stroke2": {
+-					"$value": "#6d83bf"
++					"$value": "#9aaad3"
+ 				},
+ 				"stroke1": {
+-					"$value": "#91a2cf"
++					"$value": "#a2b1d6"
+ 				},
+ 				"bgFillDark": {
+ 					"$value": "#1b1e26"
+@@ -61,13 +61,13 @@
+ 					"$value": "#1b1e26"
+ 				},
+ 				"bgFillInverted1": {
+-					"$value": "#12009f"
++					"$value": "#13009f"
+ 				},
+ 				"fgFillInverted": {
+ 					"$value": "#eff0f2"
+ 				},
+ 				"surface1": {
+-					"$value": "#edf0fa"
++					"$value": "#ecf0f9"
+ 				}
+ 			},
+ 			"info": {
+@@ -78,46 +78,46 @@
+ 					"$value": "#1b1e23"
+ 				},
+ 				"bgFill2": {
+-					"$value": "#0081ef"
++					"$value": "#007fed"
+ 				},
+ 				"surface2": {
+ 					"$value": "#f5f9fd"
+ 				},
+ 				"surface6": {
+-					"$value": "#bed6f1"
++					"$value": "#bdd5f1"
+ 				},
+ 				"surface5": {
+-					"$value": "#d5e5f6"
++					"$value": "#d4e4f6"
+ 				},
+ 				"surface4": {
+-					"$value": "#e0ebf8"
++					"$value": "#dfebf8"
+ 				},
+ 				"surface3": {
+ 					"$value": "#fff"
+ 				},
+ 				"fgSurface4": {
+-					"$value": "#001758"
++					"$value": "#001b4f"
+ 				},
+ 				"fgSurface3": {
+-					"$value": "#006dd9"
++					"$value": "#006bd7"
+ 				},
+ 				"fgSurface2": {
+-					"$value": "#008cfb"
++					"$value": "#008bfa"
+ 				},
+ 				"fgSurface1": {
+-					"$value": "#53b1ff"
++					"$value": "#59b0ff"
+ 				},
+ 				"stroke3": {
+-					"$value": "#006dd9"
++					"$value": "#006bd7"
+ 				},
+ 				"stroke4": {
+-					"$value": "#004eb8"
++					"$value": "#004fa9"
+ 				},
+ 				"stroke2": {
+-					"$value": "#5d8fc6"
++					"$value": "#94b5d9"
+ 				},
+ 				"stroke1": {
+-					"$value": "#8aaed6"
++					"$value": "#9fbcdd"
+ 				},
+ 				"bgFillDark": {
+ 					"$value": "#1b1e23"
+@@ -129,13 +129,13 @@
+ 					"$value": "#1b1e23"
+ 				},
+ 				"bgFillInverted1": {
+-					"$value": "#002675"
++					"$value": "#002a69"
+ 				},
+ 				"fgFillInverted": {
+ 					"$value": "#eff0f2"
+ 				},
+ 				"surface1": {
+-					"$value": "#eaf1fa"
++					"$value": "#e9f1fa"
+ 				}
+ 			},
+ 			"success": {
+@@ -146,7 +146,7 @@
+ 					"$value": "#1b1f1c"
+ 				},
+ 				"bgFill2": {
+-					"$value": "#37a857"
++					"$value": "#37a756"
+ 				},
+ 				"surface2": {
+ 					"$value": "#f0fcf2"
+@@ -155,37 +155,37 @@
+ 					"$value": "#7eea95"
+ 				},
+ 				"surface5": {
+-					"$value": "#b7f2c1"
++					"$value": "#b5f1bf"
+ 				},
+ 				"surface4": {
+-					"$value": "#cdf5d3"
++					"$value": "#cbf5d1"
+ 				},
+ 				"surface3": {
+ 					"$value": "#fff"
+ 				},
+ 				"fgSurface4": {
+-					"$value": "#002b00"
++					"$value": "#002900"
+ 				},
+ 				"fgSurface3": {
+-					"$value": "#008031"
++					"$value": "#007f30"
+ 				},
+ 				"fgSurface2": {
+-					"$value": "#2c9f4e"
++					"$value": "#2b9e4e"
+ 				},
+ 				"fgSurface1": {
+-					"$value": "#54c16f"
++					"$value": "#53c06e"
+ 				},
+ 				"stroke3": {
+-					"$value": "#008031"
++					"$value": "#007f30"
+ 				},
+ 				"stroke4": {
+-					"$value": "#006314"
++					"$value": "#006013"
+ 				},
+ 				"stroke2": {
+-					"$value": "#61986b"
++					"$value": "#7dc189"
+ 				},
+ 				"stroke1": {
+-					"$value": "#77ba84"
++					"$value": "#82c98f"
+ 				},
+ 				"bgFillDark": {
+ 					"$value": "#1b1f1c"
+@@ -197,13 +197,13 @@
+ 					"$value": "#1b1f1c"
+ 				},
+ 				"bgFillInverted1": {
+-					"$value": "#003800"
++					"$value": "#003701"
+ 				},
+ 				"fgFillInverted": {
+ 					"$value": "#edf2ed"
+ 				},
+ 				"surface1": {
+-					"$value": "#ddf8e1"
++					"$value": "#dbf8df"
+ 				}
+ 			},
+ 			"warning": {
+@@ -214,46 +214,46 @@
+ 					"$value": "#1f1e1b"
+ 				},
+ 				"bgFill2": {
+-					"$value": "#dea633"
++					"$value": "#dda633"
+ 				},
+ 				"surface2": {
+ 					"$value": "#fdf7ee"
+ 				},
+ 				"surface6": {
+-					"$value": "#f1ce90"
++					"$value": "#f1ce8f"
+ 				},
+ 				"surface5": {
+-					"$value": "#f6e0bb"
++					"$value": "#f6e0b9"
+ 				},
+ 				"surface4": {
+-					"$value": "#f8e9cd"
++					"$value": "#f8e8cc"
+ 				},
+ 				"surface3": {
+ 					"$value": "#fff"
+ 				},
+ 				"fgSurface4": {
+-					"$value": "#2f1800"
++					"$value": "#2e1900"
+ 				},
+ 				"fgSurface3": {
+-					"$value": "#976300"
++					"$value": "#936400"
+ 				},
+ 				"fgSurface2": {
+-					"$value": "#b78100"
++					"$value": "#b68000"
+ 				},
+ 				"fgSurface1": {
+-					"$value": "#d9a22e"
++					"$value": "#d8a12c"
+ 				},
+ 				"stroke3": {
+-					"$value": "#976300"
++					"$value": "#936400"
+ 				},
+ 				"stroke4": {
+-					"$value": "#754900"
++					"$value": "#704a00"
+ 				},
+ 				"stroke2": {
+-					"$value": "#9f8860"
++					"$value": "#caae7c"
+ 				},
+ 				"stroke1": {
+-					"$value": "#c2a776"
++					"$value": "#d2b581"
+ 				},
+ 				"bgFillDark": {
+ 					"$value": "#1f1e1b"
+@@ -265,13 +265,13 @@
+ 					"$value": "#1f1e1b"
+ 				},
+ 				"bgFillInverted1": {
+-					"$value": "#432600"
++					"$value": "#422800"
+ 				},
+ 				"fgFillInverted": {
+ 					"$value": "#f3f0e9"
+ 				},
+ 				"surface1": {
+-					"$value": "#faefdc"
++					"$value": "#faeeda"
+ 				}
+ 			},
+ 			"error": {
+@@ -282,46 +282,46 @@
+ 					"$value": "#f2efef"
+ 				},
+ 				"bgFill2": {
+-					"$value": "#bc0001"
++					"$value": "#b90000"
+ 				},
+ 				"surface2": {
+ 					"$value": "#fdf6f5"
+ 				},
+ 				"surface6": {
+-					"$value": "#f5c9c2"
++					"$value": "#f5c8c1"
+ 				},
+ 				"surface5": {
+-					"$value": "#f9dcd8"
++					"$value": "#f9dbd7"
+ 				},
+ 				"surface4": {
+-					"$value": "#fae5e2"
++					"$value": "#fae4e1"
+ 				},
+ 				"surface3": {
+ 					"$value": "#fff"
+ 				},
+ 				"fgSurface4": {
+-					"$value": "#4a0000"
++					"$value": "#470000"
+ 				},
+ 				"fgSurface3": {
+ 					"$value": "#cc1818"
+ 				},
+ 				"fgSurface2": {
+-					"$value": "#f84d41"
++					"$value": "#f74c40"
+ 				},
+ 				"fgSurface1": {
+-					"$value": "#ff8373"
++					"$value": "#ff8879"
+ 				},
+ 				"stroke3": {
+ 					"$value": "#cc1818"
+ 				},
+ 				"stroke4": {
+-					"$value": "#a70000"
++					"$value": "#9d0000"
+ 				},
+ 				"stroke2": {
+-					"$value": "#ca675c"
++					"$value": "#de988e"
+ 				},
+ 				"stroke1": {
+-					"$value": "#dc8e83"
++					"$value": "#e1a198"
+ 				},
+ 				"bgFillDark": {
+ 					"$value": "#231c1b"
+@@ -333,13 +333,13 @@
+ 					"$value": "#231c1b"
+ 				},
+ 				"bgFillInverted1": {
+-					"$value": "#680000"
++					"$value": "#640000"
+ 				},
+ 				"fgFillInverted": {
+ 					"$value": "#f2efef"
+ 				},
+ 				"surface1": {
+-					"$value": "#fcedea"
++					"$value": "#fbece9"
+ 				}
+ 			},
+ 			"bg": {
+@@ -353,13 +353,13 @@
+ 					"$value": "#f0f0f0"
+ 				},
+ 				"bgFill2": {
+-					"$value": "#494949"
++					"$value": "#484848"
+ 				},
+ 				"surface6": {
+-					"$value": "#d3d3d3"
++					"$value": "#d2d2d2"
+ 				},
+ 				"surface5": {
+-					"$value": "#e3e3e3"
++					"$value": "#e2e2e2"
+ 				},
+ 				"surface4": {
+ 					"$value": "#eaeaea"
+@@ -371,25 +371,25 @@
+ 					"$value": "#1e1e1e"
+ 				},
+ 				"fgSurface3": {
+-					"$value": "#6e6e6e"
++					"$value": "#6d6d6d"
+ 				},
+ 				"fgSurface2": {
+-					"$value": "#8b8b8b"
++					"$value": "#8a8a8a"
+ 				},
+ 				"fgSurface1": {
+-					"$value": "#ababab"
++					"$value": "#aaa"
+ 				},
+ 				"stroke3": {
+-					"$value": "#8b8b8b"
++					"$value": "#8a8a8a"
+ 				},
+ 				"stroke4": {
+-					"$value": "#6d6d6d"
++					"$value": "#6c6c6c"
+ 				},
+ 				"stroke2": {
+-					"$value": "#adadad"
++					"$value": "#d8d8d8"
+ 				},
+ 				"stroke1": {
+-					"$value": "#cfcfcf"
++					"$value": "#e0e0e0"
+ 				},
+ 				"bgFillDark": {
+ 					"$value": "#1e1e1e"
+@@ -418,46 +418,46 @@
+ 					"$value": "#1f1e1b"
+ 				},
+ 				"bgFill2": {
+-					"$value": "#ddbe30"
++					"$value": "#dcbe2f"
+ 				},
+ 				"surface2": {
+ 					"$value": "#fdf9e7"
+ 				},
+ 				"surface6": {
+-					"$value": "#ecd367"
++					"$value": "#ecd264"
+ 				},
+ 				"surface5": {
+-					"$value": "#f5e399"
++					"$value": "#f5e297"
+ 				},
+ 				"surface4": {
+-					"$value": "#f8ebb5"
++					"$value": "#f7eab3"
+ 				},
+ 				"surface3": {
+ 					"$value": "#fff"
+ 				},
+ 				"fgSurface4": {
+-					"$value": "#291d00"
++					"$value": "#281d00"
+ 				},
+ 				"fgSurface3": {
+-					"$value": "#876b00"
++					"$value": "#836b00"
+ 				},
+ 				"fgSurface2": {
+-					"$value": "#a78900"
++					"$value": "#a58700"
+ 				},
+ 				"fgSurface1": {
+-					"$value": "#c9aa00"
++					"$value": "#c7a900"
+ 				},
+ 				"stroke3": {
+-					"$value": "#876b00"
++					"$value": "#836b00"
+ 				},
+ 				"stroke4": {
+-					"$value": "#675000"
++					"$value": "#635000"
+ 				},
+ 				"stroke2": {
+-					"$value": "#978c60"
++					"$value": "#bfb17a"
+ 				},
+ 				"stroke1": {
+-					"$value": "#b8ab75"
++					"$value": "#c7b97f"
+ 				},
+ 				"bgFillDark": {
+ 					"$value": "#1f1e1b"
+@@ -469,13 +469,13 @@
+ 					"$value": "#1f1e1b"
+ 				},
+ 				"bgFillInverted1": {
+-					"$value": "#3a2b00"
++					"$value": "#392c00"
+ 				},
+ 				"fgFillInverted": {
+ 					"$value": "#f6f1da"
+ 				},
+ 				"surface1": {
+-					"$value": "#faf1cd"
++					"$value": "#f9f0c8"
+ 				}
+ 			}
+ 		},

@@ -1,0 +1,56 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 8f227f2e3be6a1..99c6d22b7bcd64 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### New Features
+ 
+ -   Add `InputControl` component ([#76653](https://github.com/WordPress/gutenberg/pull/76653)).
++-   `Dialog`: Expose `initialFocus` and `finalFocus` props on `Dialog.Popup` for custom focus management ([#76860](https://github.com/WordPress/gutenberg/pull/76860)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/ui/src/dialog/popup.tsx b/packages/ui/src/dialog/popup.tsx
+index f657aba3bb0b77..735b5bbc29b439 100644
+--- a/packages/ui/src/dialog/popup.tsx
++++ b/packages/ui/src/dialog/popup.tsx
+@@ -18,7 +18,14 @@ const ThemeProvider: typeof ThemeProviderType =
+  * Uses a portal to render outside the DOM hierarchy.
+  */
+ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
+-	{ className, size = 'medium', children, ...props },
++	{
++		className,
++		size = 'medium',
++		initialFocus,
++		finalFocus,
++		children,
++		...props
++	},
+ 	ref
+ ) {
+ 	return (
+@@ -32,6 +39,8 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
+ 						className,
+ 						styles[ `is-${ size }` ]
+ 					) }
++					initialFocus={ initialFocus }
++					finalFocus={ finalFocus }
+ 					{ ...props }
+ 				>
+ 					<DialogValidationProvider>
+diff --git a/packages/ui/src/dialog/types.ts b/packages/ui/src/dialog/types.ts
+index e55ee6ea15e5be..f83fc21cedad3c 100644
+--- a/packages/ui/src/dialog/types.ts
++++ b/packages/ui/src/dialog/types.ts
+@@ -22,7 +22,9 @@ export interface TriggerProps extends ComponentProps< 'button' > {
+ 	children?: ReactNode;
+ }
+ 
+-export interface PopupProps extends ComponentProps< 'div' > {
++export interface PopupProps
++	extends ComponentProps< 'div' >,
++		Pick< _Dialog.Popup.Props, 'initialFocus' | 'finalFocus' > {
+ 	/**
+ 	 * The content to be rendered inside the component.
+ 	 */

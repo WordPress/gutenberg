@@ -1,0 +1,425 @@
+diff --git a/packages/components/src/menu-group/hook.ts b/packages/components/src/menu-group/hook.ts
+new file mode 100644
+index 00000000000000..e25ab228b3d2e3
+--- /dev/null
++++ b/packages/components/src/menu-group/hook.ts
+@@ -0,0 +1,45 @@
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { useCx } from '../utils/hooks/use-cx';
++import { useContextSystem, WordPressComponentProps } from '../ui/context';
++import * as styles from './styles';
++import type { MenuGroupProps } from './types';
++
++export function useMenuGroup(
++	props: WordPressComponentProps< MenuGroupProps, 'div' >
++) {
++	const {
++		className = '',
++		children,
++		hideSeparator = false,
++		label = '',
++		...otherProps
++	} = useContextSystem( props, 'MenuGroup' );
++
++	const cx = useCx();
++	const menuGroupClassName = useMemo( () => {
++		return cx(
++			styles.MenuGroup,
++			hideSeparator && styles.MenuGroupWithHiddenSeparator,
++			className
++		);
++	}, [ className, hideSeparator ] );
++
++	const menuGroupLabelClassName = useMemo( () => {
++		return cx( styles.MenuGroupLabel, 'components-menu-group__label' );
++	}, [] );
++
++	return {
++		...otherProps,
++		menuGroupClassName,
++		menuGroupLabelClassName,
++		label,
++		children,
++	};
++}
+diff --git a/packages/components/src/menu-group/index.js b/packages/components/src/menu-group/index.js
+deleted file mode 100644
+index 6054bfcb3e4e29..00000000000000
+--- a/packages/components/src/menu-group/index.js
++++ /dev/null
+@@ -1,44 +0,0 @@
+-// @ts-nocheck
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { Children } from '@wordpress/element';
+-import { useInstanceId } from '@wordpress/compose';
+-
+-export function MenuGroup( props ) {
+-	const { children, className = '', label, hideSeparator } = props;
+-	const instanceId = useInstanceId( MenuGroup );
+-
+-	if ( ! Children.count( children ) ) {
+-		return null;
+-	}
+-
+-	const labelId = `components-menu-group-label-${ instanceId }`;
+-	const classNames = classnames( className, 'components-menu-group', {
+-		'has-hidden-separator': hideSeparator,
+-	} );
+-
+-	return (
+-		<div className={ classNames }>
+-			{ label && (
+-				<div
+-					className="components-menu-group__label"
+-					id={ labelId }
+-					aria-hidden="true"
+-				>
+-					{ label }
+-				</div>
+-			) }
+-			<div role="group" aria-labelledby={ label ? labelId : null }>
+-				{ children }
+-			</div>
+-		</div>
+-	);
+-}
+-
+-export default MenuGroup;
+diff --git a/packages/components/src/menu-group/index.tsx b/packages/components/src/menu-group/index.tsx
+new file mode 100644
+index 00000000000000..59fa742ffae39c
+--- /dev/null
++++ b/packages/components/src/menu-group/index.tsx
+@@ -0,0 +1,79 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { Ref } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { Children } from '@wordpress/element';
++import { useInstanceId } from '@wordpress/compose';
++
++/**
++ * Internal dependencies
++ */
++import { contextConnect, WordPressComponentProps } from '../ui/context';
++import { useMenuGroup } from './hook';
++import type { MenuGroupProps } from './types';
++import { View } from '../view';
++
++function useUniqueId() {
++	return `components-menu-group-label-${ useInstanceId( MenuGroup ) }`;
++}
++
++function MenuGroup(
++	props: WordPressComponentProps< MenuGroupProps, 'div' >,
++	forwardedRef: Ref< any >
++) {
++	const {
++		children,
++		label,
++		menuGroupClassName,
++		menuGroupLabelClassName,
++	} = useMenuGroup( props );
++
++	const labelId = useUniqueId();
++
++	if ( ! Children.count( children ) ) {
++		return null;
++	}
++
++	return (
++		<View className={ menuGroupClassName } ref={ forwardedRef }>
++			{ label && (
++				<View
++					className={ menuGroupLabelClassName }
++					id={ labelId }
++					aria-hidden="true"
++				>
++					{ label }
++				</View>
++			) }
++			<View role="group" aria-labelledby={ label ? labelId : undefined }>
++				{ children }
++			</View>
++		</View>
++	);
++}
++
++/**
++ * `MenuGroup` wraps a series of related `MenuItem` components into a common section.
++ *
++ * @example
++ * ```jsx
++ * import { MenuGroup, MenuItem } from `@wordpress/components`
++ *
++ * function Example() {
++ *   return (
++ *      <MenuGroup label="Settings">
++ *          <MenuItem>Setting 1</MenuItem>
++ *          <MenuItem>Setting 2</MenuItem>
++ *      </MenuGroup>
++ *   );
++ * }
++ * ```
++ */
++const ConnectedMenuGroup = contextConnect( MenuGroup, 'MenuGroup' );
++
++export default ConnectedMenuGroup;
+diff --git a/packages/components/src/menu-group/stories/index.js b/packages/components/src/menu-group/stories/index.js
+new file mode 100644
+index 00000000000000..929eba2a9f5521
+--- /dev/null
++++ b/packages/components/src/menu-group/stories/index.js
+@@ -0,0 +1,33 @@
++/**
++ * External dependencies
++ */
++import { boolean, text } from '@storybook/addon-knobs';
++
++/**
++ * Internal dependencies
++ */
++import MenuGroup from '../';
++
++export default {
++	title: 'Components/MenuGroup',
++	component: MenuGroup,
++	parameters: {
++		knobs: { disabled: false },
++	},
++};
++
++export const _default = () => {
++	const label = text( 'Label', 'MenuGroup label text' );
++	const hideSeparator = boolean( 'Hide top border separator', false );
++	const className = text( 'ClassName', 'menu-group-story' );
++
++	return (
++		<MenuGroup
++			hideSeparator={ hideSeparator }
++			label={ label }
++			className={ className }
++		>
++			<p>MenuGroup item</p>
++		</MenuGroup>
++	);
++};
+diff --git a/packages/components/src/menu-group/style.scss b/packages/components/src/menu-group/style.scss
+deleted file mode 100644
+index d9412c504940b3..00000000000000
+--- a/packages/components/src/menu-group/style.scss
++++ /dev/null
+@@ -1,22 +0,0 @@
+-.components-menu-group + .components-menu-group {
+-	margin-top: $grid-unit-10;
+-	padding-top: $grid-unit-10;
+-	border-top: $border-width solid $gray-900;
+-
+-	&.has-hidden-separator {
+-		border-top: none;
+-		margin-top: 0;
+-		padding-top: 0;
+-	}
+-}
+-
+-.components-menu-group__label {
+-	padding: 0 $grid-unit-10;
+-	margin-top: $grid-unit-05;
+-	margin-bottom: $grid-unit-15;
+-	color: $gray-700;
+-	text-transform: uppercase;
+-	font-size: 11px;
+-	font-weight: 500;
+-	white-space: nowrap;
+-}
+diff --git a/packages/components/src/menu-group/styles.ts b/packages/components/src/menu-group/styles.ts
+new file mode 100644
+index 00000000000000..e2909d6d3d06e7
+--- /dev/null
++++ b/packages/components/src/menu-group/styles.ts
+@@ -0,0 +1,37 @@
++/**
++ * External dependencies
++ */
++import { css } from '@emotion/react';
++
++/**
++ * Internal dependencies
++ */
++import { COLORS, CONFIG } from '../utils';
++import { space } from '../ui/utils/space';
++
++export const MenuGroup = css`
++	& + .components-menu-group {
++		margin-top: ${ space( 2 ) };
++		padding-top: ${ space( 2 ) };
++		border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 900 ] };
++	}
++`;
++
++export const MenuGroupWithHiddenSeparator = css`
++	& + .components-menu-group {
++		border-top: none;
++		margin-top: 0;
++		padding-top: 0;
++	}
++`;
++
++export const MenuGroupLabel = css`
++	padding: 0 ${ space( 2 ) };
++	margin-top: ${ space( 1 ) };
++	margin-bottom: ${ space( 3 ) };
++	color: ${ COLORS.gray[ 700 ] };
++	text-transform: uppercase;
++	font-size: ${ CONFIG.fontSizeSmall };
++	font-weight: ${ CONFIG.fontWeightHeading };
++	white-space: nowrap;
++`;
+diff --git a/packages/components/src/menu-group/test/__snapshots__/index.js.snap b/packages/components/src/menu-group/test/__snapshots__/index.js.snap
+index 4a0c0e751a2667..1eb9ce3a7c5d5d 100644
+--- a/packages/components/src/menu-group/test/__snapshots__/index.js.snap
++++ b/packages/components/src/menu-group/test/__snapshots__/index.js.snap
+@@ -1,18 +1,36 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`MenuGroup should match snapshot 1`] = `
++exports[`MenuGroup should render correctly 1`] = `
++.emotion-0+.components-menu-group {
++  margin-top: calc(4px * 2);
++  padding-top: calc(4px * 2);
++  border-top: 1px solid #1e1e1e;
++}
++
++.emotion-2 {
++  padding: 0 calc(4px * 2);
++  margin-top: calc(4px * 1);
++  margin-bottom: calc(4px * 3);
++  color: #757575;
++  text-transform: uppercase;
++  font-size: calc(0.92 * 13px);
++  font-weight: 600;
++  white-space: nowrap;
++}
++
+ <div
+-  className="components-menu-group"
++  class="components-menu-group emotion-0 emotion-1"
+ >
+   <div
+     aria-hidden="true"
+-    className="components-menu-group__label"
++    class="components-menu-group__label emotion-2 emotion-1"
+     id="components-menu-group-label-1"
+   >
+     My group
+   </div>
+   <div
+     aria-labelledby="components-menu-group-label-1"
++    class="emotion-4 emotion-1"
+     role="group"
+   >
+     <p>
+diff --git a/packages/components/src/menu-group/test/index.js b/packages/components/src/menu-group/test/index.js
+index 63551df4f982ec..223db50b2f1885 100644
+--- a/packages/components/src/menu-group/test/index.js
++++ b/packages/components/src/menu-group/test/index.js
+@@ -1,27 +1,26 @@
+ /**
+  * External dependencies
+  */
+-import { shallow } from 'enzyme';
++import { render } from '@testing-library/react';
+ 
+ /**
+  * Internal dependencies
+  */
+-import { MenuGroup } from '../';
++import MenuGroup from '../';
+ 
+ describe( 'MenuGroup', () => {
+ 	test( 'should render null when no children provided', () => {
+-		const wrapper = shallow( <MenuGroup /> );
++		const wrapper = render( <MenuGroup /> );
+ 
+-		expect( wrapper.html() ).toBe( null );
++		expect( wrapper.container.firstChild ).toBe( null );
+ 	} );
+ 
+-	test( 'should match snapshot', () => {
+-		const wrapper = shallow(
++	test( 'should render correctly', () => {
++		const wrapper = render(
+ 			<MenuGroup label="My group" instanceId="1">
+ 				<p>My item</p>
+ 			</MenuGroup>
+ 		);
+-
+-		expect( wrapper ).toMatchSnapshot();
++		expect( wrapper.container.firstChild ).toMatchSnapshot();
+ 	} );
+ } );
+diff --git a/packages/components/src/menu-group/types.ts b/packages/components/src/menu-group/types.ts
+new file mode 100644
+index 00000000000000..d5818b2b4480e8
+--- /dev/null
++++ b/packages/components/src/menu-group/types.ts
+@@ -0,0 +1,28 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { ReactNode } from 'react';
++
++export type MenuGroupProps = {
++	/**
++	 * Whether to hide top border on the MenuGroup container.
++	 *
++	 * @default false
++	 */
++	hideSeparator?: boolean;
++	/**
++	 * Text to be displayed as the menu group header.
++	 */
++	label?: string;
++	/**
++	 * An optional class name for the MenuGroup container.
++	 *
++	 * @default ''
++	 */
++	className?: string;
++	/**
++	 * Child elements.
++	 */
++	children: ReactNode;
++};
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index cbcc12342aac69..56dd365a7aeac4 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -22,7 +22,6 @@
+ @import "./form-token-field/style.scss";
+ @import "./guide/style.scss";
+ @import "./higher-order/navigate-regions/style.scss";
+-@import "./menu-group/style.scss";
+ @import "./menu-item/style.scss";
+ @import "./menu-items-choice/style.scss";
+ @import "./modal/style.scss";

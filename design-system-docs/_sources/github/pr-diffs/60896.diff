@@ -1,0 +1,28 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6d9c96839257f9..2f7b8a20479239 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -30,6 +30,7 @@
+ -   Deprecate `reduceMotion` util ([#60839](https://github.com/WordPress/gutenberg/pull/60839)).
+ -   `InputBase`: Simplify management of focus styles. Affects all components based on `InputControl` (e.g. `SearchControl`, `NumberControl`, `UnitControl`), as well as `SelectControl`, `CustomSelectControl`, and `TreeSelect` ([#60226](https://github.com/WordPress/gutenberg/pull/60226)).
+ -   Removed dependency on `valtio`, replaced its usage in `SlotFill` with a custom object [#60879](https://github.com/WordPress/gutenberg/pull/60879)).
++-   `CustomSelectControlV2`: Support disabled in item types ([#60896](https://github.com/WordPress/gutenberg/pull/60896)).
+ 
+ ## 27.3.0 (2024-04-03)
+ 
+diff --git a/packages/components/src/custom-select-control-v2/types.ts b/packages/components/src/custom-select-control-v2/types.ts
+index 51b0cb6b38d6a7..313bc06dd493b6 100644
+--- a/packages/components/src/custom-select-control-v2/types.ts
++++ b/packages/components/src/custom-select-control-v2/types.ts
+@@ -187,4 +187,11 @@ export type CustomSelectItemProps = {
+ 	 * used if left `undefined`.
+ 	 */
+ 	children?: React.ReactNode;
++	/**
++	 * If true, the item will be disabled.
++	 *
++	 * You will need to add your own styles (e.g. reduced opacity) to visually show that they are disabled.
++	 * @default false
++	 */
++	disabled?: boolean;
+ };

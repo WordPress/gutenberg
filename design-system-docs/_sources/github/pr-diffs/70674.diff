@@ -1,0 +1,29 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 900ff90ccd0af9..2c18c98631e8e4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancement
+ 
+ -   `ColorPicker`: Improve color picker slider focus styles for better keyboard navigation accessibility ([#70146](https://github.com/WordPress/gutenberg/pull/70146)).
++-   `Button`: Update the disabled state for the Primary button to be less emphasized, to avoid confusing it for enabled. ([#70674](https://github.com/WordPress/gutenberg/pull/70674)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 4e7893c9771e8e..2d993c5942cc89 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -80,9 +80,9 @@
+ 		&[aria-disabled="true"]:enabled, // This catches a situation where a Button is aria-disabled, but not disabled.
+ 		&[aria-disabled="true"]:active:enabled {
+ 			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
+-			color: rgba($white, 0.4);
+-			background: $components-color-accent;
+-			border-color: $components-color-accent;
++			color: $components-color-foreground-inverted;
++			background: $components-color-gray-300;
++			border-color: $components-color-gray-300;
+ 			outline: none;
+ 
+ 			&:focus:enabled {

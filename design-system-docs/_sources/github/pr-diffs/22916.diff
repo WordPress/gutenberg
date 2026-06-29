@@ -1,0 +1,508 @@
+diff --git a/packages/components/src/card/README.md b/packages/components/src/card/README.md
+index 0960ebbaaf23ed..c2738917028494 100644
+--- a/packages/components/src/card/README.md
++++ b/packages/components/src/card/README.md
+@@ -16,11 +16,29 @@ const Example = () => (
+ 
+ ## Props
+ 
+-Name | Type | Default | Description
+---- | --- | --- | ---
+-`isBorderless` | `boolean` | `false` | Determines the border style of the card.
+-`isElevated` | `boolean` | `false` | Determines the elevation style of the card.
+-`size` | `string` | `medium` | Determines the amount of padding within the card.
++### isBorderless
++
++Determines the border style of the card.
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `false`
++
++### isElevated
++
++Determines the elevation style of the card.
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `false`
++
++### size
++
++Determines the amount of padding within the component.
++
++-   Type: `String`
++-   Required: No
++-   Default: `medium`
+ 
+ ## Sub-Components
+ 
+@@ -41,27 +59,19 @@ import {
+ 	CardDivider,
+ 	CardFooter,
+ 	CardHeader,
+-	CardMedia
++	CardMedia,
+ } from '@wordpress/components';
+ 
+ const Example = () => (
+ 	<Card>
+-		<CardHeader>
+-			...
+-		</CardHeader>
+-		<CardBody>
+-			...
+-		</CardBody>
++		<CardHeader>...</CardHeader>
++		<CardBody>...</CardBody>
+ 		<CardDivider />
+-		<CardBody>
+-			...
+-		</CardBody>
++		<CardBody>...</CardBody>
+ 		<CardMedia>
+ 			<img src="..." />
+ 		</CardMedia>
+-		<CardHeader>
+-			...
+-		</CardHeader>
++		<CardHeader>...</CardHeader>
+ 	</Card>
+ );
+ ```
+diff --git a/packages/components/src/card/docs/body.md b/packages/components/src/card/docs/body.md
+index 6693bf644b27c4..f0d95287aed78a 100644
+--- a/packages/components/src/card/docs/body.md
++++ b/packages/components/src/card/docs/body.md
+@@ -16,9 +16,20 @@ const Example = () => (
+ 
+ ## Props
+ 
+-Name | Type | Default | Description
+---- | --- | --- | ---
+-`isShady` | `boolean` | `false` | Renders with a light gray background color.
+-`size` | `string` | `medium` | Determines the amount of padding within the component.
++### isShady
++
++Renders with a light gray background color.
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `false`
++
++### size
++
++Determines the amount of padding within the component.
++
++-   Type: `String`
++-   Required: No
++-   Default: `medium`
+ 
+ Note: This component is connected to [`<Card />`'s Context](../README.md#context). Passing props directly to this component will override the props derived from context.
+diff --git a/packages/components/src/card/docs/footer.md b/packages/components/src/card/docs/footer.md
+index f109db255672af..22745bff7f27e5 100644
+--- a/packages/components/src/card/docs/footer.md
++++ b/packages/components/src/card/docs/footer.md
+@@ -14,13 +14,65 @@ const Example = () => (
+ );
+ ```
+ 
++### Flex
++
++Underneath, CardFooter uses the layout component [`<Flex/>`](../../flex/README.md). This improves the alignment of child items within the component.
++
++```jsx
++import {
++	Button,
++	Card,
++	CardFooter,
++	FlexItem,
++	FlexBlock,
++} from '@wordpress/components';
++
++const Example = () => (
++	<Card>
++		<CardFooter>
++			<FlexBlock>Content</FlexBlock>
++			<FlexItem>
++				<Button>Action</Button>
++			</FlexItem>
++		</CardFooter>
++	</Card>
++);
++```
++
++Check out [the documentation](../../flex/README.md) on `<Flex/>` for more details on layout composition.
++
+ ## Props
+ 
+-Name | Type | Default | Description
+---- | --- | --- | ---
+-`isBorderless` | `boolean` | `false` | Determines the border style of the card.
+-`isElevated` | `boolean` | `false` | Determines the elevation style of the card.
+-`isShady` | `boolean` | `false` | Renders with a light gray background color.
+-`size` | `string` | `medium` | Determines the amount of padding within the component.
++### isBorderless
++
++Determines the border style of the card.
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `false`
++
++### isElevated
++
++Determines the elevation style of the card.
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `false`
++
++### isShady
++
++Renders with a light gray background color.
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `false`
++
++### size
++
++Determines the amount of padding within the component.
++
++-   Type: `String`
++-   Required: No
++-   Default: `medium`
+ 
+ Note: This component is connected to [`<Card />`'s Context](../README.md#context). Passing props directly to this component will override the props derived from context.
+diff --git a/packages/components/src/card/docs/header.md b/packages/components/src/card/docs/header.md
+index b3901f15625cca..b3597d0376aaa5 100644
+--- a/packages/components/src/card/docs/header.md
++++ b/packages/components/src/card/docs/header.md
+@@ -14,13 +14,65 @@ const Example = () => (
+ );
+ ```
+ 
++### Flex
++
++Underneath, CardHeader uses the layout component [`<Flex/>`](../../flex/README.md). This improves the alignment of child items within the component.
++
++```jsx
++import {
++	Button,
++	Card,
++	CardHeader,
++	FlexItem,
++	FlexBlock,
++} from '@wordpress/components';
++
++const Example = () => (
++	<Card>
++		<CardHeader>
++			<FlexBlock>Content</FlexBlock>
++			<FlexItem>
++				<Button>Action</Button>
++			</FlexItem>
++		</CardHeader>
++	</Card>
++);
++```
++
++Check out [the documentation](../../flex/README.md) on `<Flex/>` for more details on layout composition.
++
+ ## Props
+ 
+-Name | Type | Default | Description
+---- | --- | --- | ---
+-`isBorderless` | `boolean` | `false` | Determines the border style of the card.
+-`isElevated` | `boolean` | `false` | Determines the elevation style of the card.
+-`isShady` | `boolean` | `false` | Renders with a light gray background color.
+-`size` | `string` | `medium` | Determines the amount of padding within the component.
++### isBorderless
++
++Determines the border style of the card.
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `false`
++
++### isElevated
++
++Determines the elevation style of the card.
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `false`
++
++### isShady
++
++Renders with a light gray background color.
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `false`
++
++### size
++
++Determines the amount of padding within the component.
++
++-   Type: `String`
++-   Required: No
++-   Default: `medium`
+ 
+ Note: This component is connected to [`<Card />`'s Context](../README.md#context). Passing props directly to this component will override the props derived from context.
+diff --git a/packages/components/src/card/stories/_index.js b/packages/components/src/card/stories/_index.js
+index 5a241fc0ae5e1f..0f976e55a2a111 100644
+--- a/packages/components/src/card/stories/_index.js
++++ b/packages/components/src/card/stories/_index.js
+@@ -1,10 +1,7 @@
+ /**
+  * External dependencies
+  */
+-
+-/* eslint-disable import/no-extraneous-dependencies */
+ import { text, boolean } from '@storybook/addon-knobs';
+-/* eslint-enable import/no-extraneous-dependencies */
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/card/stories/_utils.js b/packages/components/src/card/stories/_utils.js
+index 8e34f08d16a814..b65b511f5ae205 100644
+--- a/packages/components/src/card/stories/_utils.js
++++ b/packages/components/src/card/stories/_utils.js
+@@ -1,9 +1,7 @@
+ /**
+  * External dependencies
+  */
+-/* eslint-disable import/no-extraneous-dependencies */
+ import { boolean, select } from '@storybook/addon-knobs';
+-/* eslint-enable import/no-extraneous-dependencies */
+ 
+ export const getCardProps = ( props = {} ) => {
+ 	const { size } = props;
+diff --git a/packages/components/src/card/stories/body.js b/packages/components/src/card/stories/body.js
+index 5cf033ed525587..e2c1d7d00bbcbb 100644
+--- a/packages/components/src/card/stories/body.js
++++ b/packages/components/src/card/stories/body.js
+@@ -1,9 +1,7 @@
+ /**
+  * External dependencies
+  */
+-/* eslint-disable import/no-extraneous-dependencies */
+ import { boolean, text } from '@storybook/addon-knobs';
+-/* eslint-enable import/no-extraneous-dependencies */
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/card/stories/footer.js b/packages/components/src/card/stories/footer.js
+index 79e4bacff38833..00d622cde4b34d 100644
+--- a/packages/components/src/card/stories/footer.js
++++ b/packages/components/src/card/stories/footer.js
+@@ -1,15 +1,15 @@
+ /**
+  * External dependencies
+  */
+-/* eslint-disable import/no-extraneous-dependencies */
+ import { boolean, text } from '@storybook/addon-knobs';
+-/* eslint-enable import/no-extraneous-dependencies */
+ 
+ /**
+  * Internal dependencies
+  */
+ import Card from '../index';
+ import CardFooter from '../footer';
++import Button from '../../button';
++import { FlexBlock, FlexItem } from '../../flex';
+ import { getCardStoryProps } from './_utils';
+ 
+ export default { title: 'Components/Card/Footer', component: CardFooter };
+@@ -25,3 +25,20 @@ export const _default = () => {
+ 		</Card>
+ 	);
+ };
++
++export const alignment = () => {
++	const props = getCardStoryProps();
++	const content = text( 'Footer: children', 'Content' );
++	const isShady = boolean( 'Footer: isShady', false );
++
++	return (
++		<Card { ...props }>
++			<CardFooter isShady={ isShady }>
++				<FlexBlock>{ content }</FlexBlock>
++				<FlexItem>
++					<Button isPrimary>Action</Button>
++				</FlexItem>
++			</CardFooter>
++		</Card>
++	);
++};
+diff --git a/packages/components/src/card/stories/header.js b/packages/components/src/card/stories/header.js
+index 1e3044c0a5701c..0a2027c532db7e 100644
+--- a/packages/components/src/card/stories/header.js
++++ b/packages/components/src/card/stories/header.js
+@@ -1,23 +1,23 @@
+ /**
+  * External dependencies
+  */
+-/* eslint-disable import/no-extraneous-dependencies */
+ import { boolean, text } from '@storybook/addon-knobs';
+-/* eslint-enable import/no-extraneous-dependencies */
+ 
+ /**
+  * Internal dependencies
+  */
+ import Card from '../index';
+ import CardHeader from '../header';
++import Button from '../../button';
++import { FlexBlock, FlexItem } from '../../flex';
+ import { getCardStoryProps } from './_utils';
+ 
+ export default { title: 'Components/Card/Header', component: CardHeader };
+ 
+ export const _default = () => {
+ 	const props = getCardStoryProps();
+-	const content = text( 'Footer: children', 'Content' );
+-	const isShady = boolean( 'Footer: isShady', false );
++	const content = text( 'Header: children', 'Content' );
++	const isShady = boolean( 'Header: isShady', false );
+ 
+ 	return (
+ 		<Card { ...props }>
+@@ -25,3 +25,20 @@ export const _default = () => {
+ 		</Card>
+ 	);
+ };
++
++export const alignment = () => {
++	const props = getCardStoryProps();
++	const content = text( 'Header: children', 'Content' );
++	const isShady = boolean( 'Header: isShady', false );
++
++	return (
++		<Card { ...props }>
++			<CardHeader isShady={ isShady }>
++				<FlexBlock>{ content }</FlexBlock>
++				<FlexItem>
++					<Button isPrimary>Action</Button>
++				</FlexItem>
++			</CardHeader>
++		</Card>
++	);
++};
+diff --git a/packages/components/src/card/stories/media.js b/packages/components/src/card/stories/media.js
+index d06eb5197fcfc6..4d499b3067f7e0 100644
+--- a/packages/components/src/card/stories/media.js
++++ b/packages/components/src/card/stories/media.js
+@@ -1,9 +1,7 @@
+ /**
+  * External dependencies
+  */
+-/* eslint-disable import/no-extraneous-dependencies */
+ import { boolean, number, select, text } from '@storybook/addon-knobs';
+-/* eslint-enable import/no-extraneous-dependencies */
+ import styled from '@emotion/styled';
+ 
+ /**
+diff --git a/packages/components/src/card/styles/card-styles.js b/packages/components/src/card/styles/card-styles.js
+index 2cf1698d996546..27421a29631d44 100644
+--- a/packages/components/src/card/styles/card-styles.js
++++ b/packages/components/src/card/styles/card-styles.js
+@@ -11,7 +11,8 @@ import { HorizontalRule } from '@wordpress/primitives';
+ /**
+  * Internal dependencies
+  */
+-import { color } from '../../utils/colors';
++import Flex from '../../flex';
++import { color, space } from '../../utils/style-mixins';
+ 
+ export const styleProps = {
+ 	borderColor: color( 'lightGray.500' ),
+@@ -36,7 +37,7 @@ export const CardUI = styled.div`
+ 	}
+ `;
+ 
+-export const HeaderUI = styled.div`
++export const HeaderUI = styled( Flex )`
+ 	border-bottom: 1px solid ${ borderColor };
+ 	border-top-left-radius: ${ borderRadius };
+ 	border-top-right-radius: ${ borderRadius };
+@@ -81,7 +82,7 @@ export const BodyUI = styled.div`
+ 	${ handleShady };
+ `;
+ 
+-export const FooterUI = styled.div`
++export const FooterUI = styled( Flex )`
+ 	border-top: 1px solid ${ borderColor };
+ 	border-bottom-left-radius: ${ borderRadius };
+ 	border-bottom-right-radius: ${ borderRadius };
+@@ -109,16 +110,16 @@ export function bodySize() {
+ 	return `
+ 		&.is-size {
+ 			&-large {
+-				padding: 24px 32px;
++				padding: ${ space( 3 ) } ${ space( 4 ) };
+ 			}
+ 			&-medium {
+-				padding: 16px 24px;
++				padding: ${ space( 2 ) } ${ space( 3 ) };
+ 			}
+ 			&-small {
+-				padding: 16px;
++				padding: ${ space( 2 ) };
+ 			}
+ 			&-extraSmall {
+-				padding: 8px;
++				padding: ${ space( 1 ) };
+ 			}
+ 		}
+ 	`;
+@@ -128,16 +129,16 @@ export function headerFooterSizes() {
+ 	return `
+ 		&.is-size {
+ 			&-large {
+-				padding: 24px 32px;
++				padding: ${ space( 3 ) } ${ space( 4 ) };
+ 			}
+ 			&-medium {
+-				padding: 16px 24px;
++				padding: ${ space( 2 ) } ${ space( 3 ) };
+ 			}
+ 			&-small {
+-				padding: 16px;
++				padding: ${ space( 2 ) };
+ 			}
+ 			&-extraSmall {
+-				padding: 8px;
++				padding: ${ space( 1 ) };
+ 			}
+ 		}
+ 	`;
+diff --git a/packages/components/src/utils/space.js b/packages/components/src/utils/space.js
+new file mode 100644
+index 00000000000000..ecf7a64f069bae
+--- /dev/null
++++ b/packages/components/src/utils/space.js
+@@ -0,0 +1,13 @@
++const SPACE_GRID_BASE = 8;
++
++/**
++ * Creates a spacing CSS value (px) based on grid system values.
++ *
++ * @param {number} value Multiplier against the grid base value (8)
++ * @return {string} The spacing value (px).
++ */
++export function space( value = 1 ) {
++	if ( isNaN( value ) ) return `${ SPACE_GRID_BASE }px`;
++
++	return `${ SPACE_GRID_BASE * value }px`;
++}
+diff --git a/packages/components/src/utils/style-mixins.js b/packages/components/src/utils/style-mixins.js
+index 9480d6fa878f63..bb754959fa3bbb 100644
+--- a/packages/components/src/utils/style-mixins.js
++++ b/packages/components/src/utils/style-mixins.js
+@@ -1,3 +1,4 @@
+ export { color, rgba } from './colors';
+ export { reduceMotion } from './reduce-motion';
+ export { rtl, getRTL, useRTL } from './rtl';
++export { space } from './space';

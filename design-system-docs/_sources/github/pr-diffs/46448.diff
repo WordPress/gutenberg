@@ -1,0 +1,528 @@
+diff --git a/packages/block-editor/src/components/default-style-picker/index.js b/packages/block-editor/src/components/default-style-picker/index.js
+index 4d4bbaac6a259c..0f3190a7a24f72 100644
+--- a/packages/block-editor/src/components/default-style-picker/index.js
++++ b/packages/block-editor/src/components/default-style-picker/index.js
+@@ -58,6 +58,7 @@ export default function DefaultStylePicker( { blockName } ) {
+ 		onUpdatePreferredStyleVariations && (
+ 			<div className="default-style-picker__default-switcher">
+ 				<SelectControl
++					__nextHasNoMarginBottom
+ 					options={ selectOptions }
+ 					value={ preferredStyle || '' }
+ 					label={ __( 'Default Style' ) }
+diff --git a/packages/block-editor/src/components/image-size-control/index.js b/packages/block-editor/src/components/image-size-control/index.js
+index 15337ef3887f14..b8c2d656070558 100644
+--- a/packages/block-editor/src/components/image-size-control/index.js
++++ b/packages/block-editor/src/components/image-size-control/index.js
+@@ -41,6 +41,7 @@ export default function ImageSizeControl( {
+ 		<>
+ 			{ ! isEmpty( imageSizeOptions ) && (
+ 				<SelectControl
++					__nextHasNoMarginBottom
+ 					label={ __( 'Image size' ) }
+ 					value={ slug }
+ 					options={ imageSizeOptions }
+diff --git a/packages/block-library/src/archives/edit.js b/packages/block-library/src/archives/edit.js
+index 118fa5cfa2d1ad..9f1f681e95a09b 100644
+--- a/packages/block-library/src/archives/edit.js
++++ b/packages/block-library/src/archives/edit.js
+@@ -48,6 +48,7 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
+ 						}
+ 					/>
+ 					<SelectControl
++						__nextHasNoMarginBottom
+ 						label={ __( 'Group by:' ) }
+ 						options={ [
+ 							{ label: __( 'Year' ), value: 'yearly' },
+diff --git a/packages/block-library/src/audio/edit.js b/packages/block-library/src/audio/edit.js
+index 47b2f36b2fb342..74429cac3364f3 100644
+--- a/packages/block-library/src/audio/edit.js
++++ b/packages/block-library/src/audio/edit.js
+@@ -218,6 +218,7 @@ function AudioEdit( {
+ 						checked={ loop }
+ 					/>
+ 					<SelectControl
++						__nextHasNoMarginBottom
+ 						label={ _x( 'Preload', 'noun; Audio block parameter' ) }
+ 						value={ preload || '' }
+ 						// `undefined` is required for the preload attribute to be unset.
+diff --git a/packages/block-library/src/comments/edit/comments-inspector-controls.js b/packages/block-library/src/comments/edit/comments-inspector-controls.js
+index acc2bbce4e7c46..e548fece552f9d 100644
+--- a/packages/block-library/src/comments/edit/comments-inspector-controls.js
++++ b/packages/block-library/src/comments/edit/comments-inspector-controls.js
+@@ -13,6 +13,7 @@ export default function CommentsInspectorControls( {
+ 		<InspectorControls>
+ 			<InspectorControls __experimentalGroup="advanced">
+ 				<SelectControl
++					__nextHasNoMarginBottom
+ 					label={ __( 'HTML element' ) }
+ 					options={ [
+ 						{ label: __( 'Default (<div>)' ), value: 'div' },
+diff --git a/packages/block-library/src/file/inspector.js b/packages/block-library/src/file/inspector.js
+index 71e0885eae1c6b..c09e3b7685aec0 100644
+--- a/packages/block-library/src/file/inspector.js
++++ b/packages/block-library/src/file/inspector.js
+@@ -71,6 +71,7 @@ export default function FileBlockInspector( {
+ 				) }
+ 				<PanelBody title={ __( 'Settings' ) }>
+ 					<SelectControl
++						__nextHasNoMarginBottom
+ 						label={ __( 'Link to' ) }
+ 						value={ textLinkHref }
+ 						options={ linkDestinationOptions }
+diff --git a/packages/block-library/src/gallery/edit.js b/packages/block-library/src/gallery/edit.js
+index c56cf1dab84e8f..962cd954bbbfd2 100644
+--- a/packages/block-library/src/gallery/edit.js
++++ b/packages/block-library/src/gallery/edit.js
+@@ -531,6 +531,7 @@ function GalleryEdit( props ) {
+ 						help={ getImageCropHelp }
+ 					/>
+ 					<SelectControl
++						__nextHasNoMarginBottom
+ 						label={ __( 'Link to' ) }
+ 						value={ linkTo }
+ 						onChange={ setLinkTo }
+@@ -546,6 +547,7 @@ function GalleryEdit( props ) {
+ 					) }
+ 					{ imageSizeOptions?.length > 0 && (
+ 						<SelectControl
++							__nextHasNoMarginBottom
+ 							label={ __( 'Image size' ) }
+ 							value={ sizeSlug }
+ 							options={ imageSizeOptions }
+diff --git a/packages/block-library/src/gallery/v1/edit.js b/packages/block-library/src/gallery/v1/edit.js
+index 9c36f02ec028ad..29d88cae4ce9b9 100644
+--- a/packages/block-library/src/gallery/v1/edit.js
++++ b/packages/block-library/src/gallery/v1/edit.js
+@@ -420,6 +420,7 @@ function GalleryEdit( props ) {
+ 						help={ getImageCropHelp }
+ 					/>
+ 					<SelectControl
++						__nextHasNoMarginBottom
+ 						label={ __( 'Link to' ) }
+ 						value={ linkTo }
+ 						onChange={ setLinkTo }
+@@ -428,6 +429,7 @@ function GalleryEdit( props ) {
+ 					/>
+ 					{ shouldShowSizeOptions && (
+ 						<SelectControl
++							__nextHasNoMarginBottom
+ 							label={ __( 'Image size' ) }
+ 							value={ sizeSlug }
+ 							options={ imageSizeOptions }
+diff --git a/packages/block-library/src/group/edit.js b/packages/block-library/src/group/edit.js
+index 8962d8a8a3bf16..a2cd8bd8cbaf22 100644
+--- a/packages/block-library/src/group/edit.js
++++ b/packages/block-library/src/group/edit.js
+@@ -51,6 +51,7 @@ function GroupEditControls( { tagName, onSelectTagName } ) {
+ 	return (
+ 		<InspectorControls __experimentalGroup="advanced">
+ 			<SelectControl
++				__nextHasNoMarginBottom
+ 				label={ __( 'HTML element' ) }
+ 				options={ [
+ 					{ label: __( 'Default (<div>)' ), value: 'div' },
+diff --git a/packages/block-library/src/post-author/edit.js b/packages/block-library/src/post-author/edit.js
+index b0a2fb2883f79a..9573eedde66cfe 100644
+--- a/packages/block-library/src/post-author/edit.js
++++ b/packages/block-library/src/post-author/edit.js
+@@ -112,6 +112,7 @@ function PostAuthorEdit( {
+ 							/>
+ 						) ) || (
+ 							<SelectControl
++								__nextHasNoMarginBottom
+ 								label={ __( 'Author' ) }
+ 								value={ authorId }
+ 								options={ authorOptions }
+@@ -127,6 +128,7 @@ function PostAuthorEdit( {
+ 					/>
+ 					{ showAvatar && (
+ 						<SelectControl
++							__nextHasNoMarginBottom
+ 							label={ __( 'Avatar size' ) }
+ 							value={ attributes.avatarSize }
+ 							options={ avatarSizes }
+diff --git a/packages/block-library/src/post-featured-image/dimension-controls.js b/packages/block-library/src/post-featured-image/dimension-controls.js
+index 9d0b11a6318d26..76bc9787bd5874 100644
+--- a/packages/block-library/src/post-featured-image/dimension-controls.js
++++ b/packages/block-library/src/post-featured-image/dimension-controls.js
+@@ -160,6 +160,7 @@ const DimensionControls = ( {
+ 					panelId={ clientId }
+ 				>
+ 					<SelectControl
++						__nextHasNoMarginBottom
+ 						label={ __( 'Image size' ) }
+ 						value={ sizeSlug || DEFAULT_SIZE }
+ 						options={ imageSizeOptions }
+diff --git a/packages/block-library/src/query/edit/inspector-controls/index.js b/packages/block-library/src/query/edit/inspector-controls/index.js
+index 6bd0289687ad7a..567bcc84f0a0bd 100644
+--- a/packages/block-library/src/query/edit/inspector-controls/index.js
++++ b/packages/block-library/src/query/edit/inspector-controls/index.js
+@@ -144,6 +144,7 @@ export default function QueryInspectorControls( {
+ 						) }
+ 						{ showPostTypeControl && (
+ 							<SelectControl
++								__nextHasNoMarginBottom
+ 								options={ postTypesSelectOptions }
+ 								value={ postType }
+ 								label={ __( 'Post type' ) }
+diff --git a/packages/block-library/src/query/edit/inspector-controls/order-control.js b/packages/block-library/src/query/edit/inspector-controls/order-control.js
+index 143e4c5f8dd8b0..71ddd290989728 100644
+--- a/packages/block-library/src/query/edit/inspector-controls/order-control.js
++++ b/packages/block-library/src/query/edit/inspector-controls/order-control.js
+@@ -27,6 +27,7 @@ const orderOptions = [
+ function OrderControl( { order, orderBy, onChange } ) {
+ 	return (
+ 		<SelectControl
++			__nextHasNoMarginBottom
+ 			label={ __( 'Order by' ) }
+ 			value={ `${ orderBy }/${ order }` }
+ 			options={ orderOptions }
+diff --git a/packages/block-library/src/query/edit/inspector-controls/sticky-control.js b/packages/block-library/src/query/edit/inspector-controls/sticky-control.js
+index 8c0c95e19d56db..d3f29a66385931 100644
+--- a/packages/block-library/src/query/edit/inspector-controls/sticky-control.js
++++ b/packages/block-library/src/query/edit/inspector-controls/sticky-control.js
+@@ -13,6 +13,7 @@ const stickyOptions = [
+ export default function StickyControl( { value, onChange } ) {
+ 	return (
+ 		<SelectControl
++			__nextHasNoMarginBottom
+ 			label={ __( 'Sticky posts' ) }
+ 			options={ stickyOptions }
+ 			value={ value }
+diff --git a/packages/block-library/src/query/edit/query-content.js b/packages/block-library/src/query/edit/query-content.js
+index 9cb8d8775a2bf3..a66a5c75f18411 100644
+--- a/packages/block-library/src/query/edit/query-content.js
++++ b/packages/block-library/src/query/edit/query-content.js
+@@ -113,6 +113,7 @@ export default function QueryContent( {
+ 			</BlockControls>
+ 			<InspectorControls __experimentalGroup="advanced">
+ 				<SelectControl
++					__nextHasNoMarginBottom
+ 					label={ __( 'HTML element' ) }
+ 					options={ [
+ 						{ label: __( 'Default (<div>)' ), value: 'div' },
+diff --git a/packages/block-library/src/tag-cloud/edit.js b/packages/block-library/src/tag-cloud/edit.js
+index dd669a7e840b3f..e13c70b1a97f10 100644
+--- a/packages/block-library/src/tag-cloud/edit.js
++++ b/packages/block-library/src/tag-cloud/edit.js
+@@ -109,6 +109,7 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
+ 		<InspectorControls>
+ 			<PanelBody title={ __( 'Settings' ) }>
+ 				<SelectControl
++					__nextHasNoMarginBottom
+ 					label={ __( 'Taxonomy' ) }
+ 					options={ getTaxonomyOptions() }
+ 					value={ taxonomy }
+diff --git a/packages/block-library/src/template-part/edit/advanced-controls.js b/packages/block-library/src/template-part/edit/advanced-controls.js
+index ca42726b5655fa..1ef81748d7742a 100644
+--- a/packages/block-library/src/template-part/edit/advanced-controls.js
++++ b/packages/block-library/src/template-part/edit/advanced-controls.js
+@@ -63,6 +63,7 @@ export function TemplatePartAdvancedControls( {
+ 					/>
+ 
+ 					<SelectControl
++						__nextHasNoMarginBottom
+ 						label={ __( 'Area' ) }
+ 						labelPosition="top"
+ 						options={ areaOptions }
+@@ -72,6 +73,7 @@ export function TemplatePartAdvancedControls( {
+ 				</>
+ 			) }
+ 			<SelectControl
++				__nextHasNoMarginBottom
+ 				label={ __( 'HTML element' ) }
+ 				options={ [
+ 					{
+diff --git a/packages/block-library/src/video/edit-common-settings.js b/packages/block-library/src/video/edit-common-settings.js
+index 20602e80d89a59..5c8f5e2ab531f0 100644
+--- a/packages/block-library/src/video/edit-common-settings.js
++++ b/packages/block-library/src/video/edit-common-settings.js
+@@ -74,6 +74,7 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
+ 				checked={ !! playsInline }
+ 			/>
+ 			<SelectControl
++				__nextHasNoMarginBottom
+ 				label={ __( 'Preload' ) }
+ 				value={ preload }
+ 				onChange={ onChangePreload }
+diff --git a/packages/block-library/src/video/tracks-editor.js b/packages/block-library/src/video/tracks-editor.js
+index 4f8ebbdba3f243..a9c9e24c53f731 100644
+--- a/packages/block-library/src/video/tracks-editor.js
++++ b/packages/block-library/src/video/tracks-editor.js
+@@ -119,6 +119,7 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
+ 					/>
+ 				</div>
+ 				<SelectControl
++					__nextHasNoMarginBottom
+ 					className="block-library-video-tracks-editor__single-track-editor-kind-select"
+ 					options={ KIND_OPTIONS }
+ 					value={ kind }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 98d12002606e50..3d68e6de62480a 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Internal
+ 
+ -   `Dashicon`: remove unnecessary type for `className` prop ([46849](https://github.com/WordPress/gutenberg/pull/46849)).
++-   `ColorPicker` & `QueryControls`: Replace bottom margin overrides with `__nextHasNoMarginBottom` ([#46448](https://github.com/WordPress/gutenberg/pull/46448)).
+ 
+ ## 23.1.0 (2023-01-02)
+ 
+@@ -75,6 +76,7 @@
+ -   `TabPanel`: Add ability to set icon only tab buttons ([#45005](https://github.com/WordPress/gutenberg/pull/45005)).
+ 
+ ### Internal
++
+ -   `AnglePickerControl`: remove `:focus-visible' outline on `CircleOutlineWrapper` ([#45758](https://github.com/WordPress/gutenberg/pull/45758))
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/color-picker/component.tsx b/packages/components/src/color-picker/component.tsx
+index 9e4777aec3eecb..bb5caedb8082a0 100644
+--- a/packages/components/src/color-picker/component.tsx
++++ b/packages/components/src/color-picker/component.tsx
+@@ -97,6 +97,7 @@ const ColorPicker = (
+ 			<AuxiliaryColorArtefactWrapper>
+ 				<AuxiliaryColorArtefactHStackHeader justify="space-between">
+ 					<SelectControl
++						__nextHasNoMarginBottom
+ 						options={ options }
+ 						value={ colorType }
+ 						onChange={ ( nextColorType ) =>
+diff --git a/packages/components/src/color-picker/styles.ts b/packages/components/src/color-picker/styles.ts
+index 0058cb90f4710e..bf25707ba9c936 100644
+--- a/packages/components/src/color-picker/styles.ts
++++ b/packages/components/src/color-picker/styles.ts
+@@ -9,7 +9,6 @@ import styled from '@emotion/styled';
+ import NumberControl from '../number-control';
+ import InnerSelectControl from '../select-control';
+ import InnerRangeControl from '../range-control';
+-import { StyledField } from '../base-control/styles/base-control-styles';
+ import { space } from '../ui/utils/space';
+ import { boxSizingReset } from '../utils';
+ import Button from '../button';
+@@ -111,10 +110,6 @@ export const ColorfulWrapper = styled.div`
+ 	}
+ 
+ 	${ interactiveHueStyles }
+-
+-	${ StyledField } {
+-		margin-bottom: 0;
+-	}
+ `;
+ 
+ export const CopyButton = styled( Button )`
+diff --git a/packages/components/src/query-controls/index.js b/packages/components/src/query-controls/index.js
+index e62d71eb2d8eb1..79343c5954c94f 100644
+--- a/packages/components/src/query-controls/index.js
++++ b/packages/components/src/query-controls/index.js
+@@ -35,6 +35,7 @@ export default function QueryControls( {
+ 	return [
+ 		onOrderChange && onOrderByChange && (
+ 			<SelectControl
++				__nextHasNoMarginBottom
+ 				key="query-controls-order-select"
+ 				label={ __( 'Order by' ) }
+ 				value={ `${ orderBy }/${ order }` }
+diff --git a/packages/edit-post/src/components/sidebar/post-template/form.js b/packages/edit-post/src/components/sidebar/post-template/form.js
+index 763ab229556661..14c1e6dee76c7d 100644
+--- a/packages/edit-post/src/components/sidebar/post-template/form.js
++++ b/packages/edit-post/src/components/sidebar/post-template/form.js
+@@ -111,6 +111,7 @@ export default function PostTemplateForm( { onClose } ) {
+ 				</Notice>
+ 			) : (
+ 				<SelectControl
++					__nextHasNoMarginBottom
+ 					hideLabelFromVision
+ 					label={ __( 'Template' ) }
+ 					value={ selectedOption?.value ?? '' }
+diff --git a/packages/edit-site/src/components/sidebar-edit-mode/navigation-menu-sidebar/navigation-inspector.js b/packages/edit-site/src/components/sidebar-edit-mode/navigation-menu-sidebar/navigation-inspector.js
+index 1f0c5fefbdc444..34c697a809f3f4 100644
+--- a/packages/edit-site/src/components/sidebar-edit-mode/navigation-menu-sidebar/navigation-inspector.js
++++ b/packages/edit-site/src/components/sidebar-edit-mode/navigation-menu-sidebar/navigation-inspector.js
+@@ -180,6 +180,8 @@ export default function NavigationInspector() {
+ 			) }
+ 			{ hasResolvedNavigationMenus && hasMoreThanOneNavigationMenu && (
+ 				<SelectControl
++					__nextHasNoMarginBottom
++					className="edit-site-navigation-inspector__select-menu"
+ 					aria-controls={
+ 						// aria-controls should only apply when referenced element is in DOM
+ 						hasLoadedInnerBlocks ? navMenuListId : undefined
+diff --git a/packages/edit-site/src/components/sidebar-edit-mode/navigation-menu-sidebar/style.scss b/packages/edit-site/src/components/sidebar-edit-mode/navigation-menu-sidebar/style.scss
+index 8c48661bd700f0..4fb9a1c7596048 100644
+--- a/packages/edit-site/src/components/sidebar-edit-mode/navigation-menu-sidebar/style.scss
++++ b/packages/edit-site/src/components/sidebar-edit-mode/navigation-menu-sidebar/style.scss
+@@ -22,6 +22,10 @@
+ 	.block-editor-list-view-block__menu-cell {
+ 		padding-right: 0;
+ 	}
++
++	.edit-site-navigation-inspector__select-menu {
++		margin-bottom: $grid-unit-10;
++	}
+ }
+ 
+ .edit-site-navigation-inspector__placeholder {
+diff --git a/packages/edit-site/src/components/template-details/edit-template-title.js b/packages/edit-site/src/components/template-details/edit-template-title.js
+index 5d7e63c7054887..ac2266a0a03d76 100644
+--- a/packages/edit-site/src/components/template-details/edit-template-title.js
++++ b/packages/edit-site/src/components/template-details/edit-template-title.js
+@@ -17,6 +17,7 @@ export default function EditTemplateTitle( { template } ) {
+ 
+ 	return (
+ 		<TextControl
++			__nextHasNoMarginBottom
+ 			label={ __( 'Title' ) }
+ 			value={ forceEmpty ? '' : title }
+ 			help={
+diff --git a/packages/edit-site/src/components/template-details/template-part-area-selector.js b/packages/edit-site/src/components/template-details/template-part-area-selector.js
+index 1eff28d2d4c976..4823fea501ce14 100644
+--- a/packages/edit-site/src/components/template-details/template-part-area-selector.js
++++ b/packages/edit-site/src/components/template-details/template-part-area-selector.js
+@@ -28,6 +28,7 @@ export default function TemplatePartAreaSelector( { id } ) {
+ 
+ 	return (
+ 		<SelectControl
++			__nextHasNoMarginBottom
+ 			label={ __( 'Area' ) }
+ 			labelPosition="top"
+ 			options={ areaOptions }
+diff --git a/packages/editor/src/components/post-author/select.js b/packages/editor/src/components/post-author/select.js
+index 4439f75e4e8009..a367f4fb8a4ede 100644
+--- a/packages/editor/src/components/post-author/select.js
++++ b/packages/editor/src/components/post-author/select.js
+@@ -40,6 +40,7 @@ function PostAuthorSelect() {
+ 
+ 	return (
+ 		<SelectControl
++			__nextHasNoMarginBottom
+ 			className="post-author-selector"
+ 			label={ __( 'Author' ) }
+ 			options={ authorOptions }
+diff --git a/packages/editor/src/components/post-format/index.js b/packages/editor/src/components/post-format/index.js
+index 518ec2c0d26bca..2b422ccebbaa84 100644
+--- a/packages/editor/src/components/post-format/index.js
++++ b/packages/editor/src/components/post-format/index.js
+@@ -76,6 +76,7 @@ export default function PostFormat() {
+ 		<PostFormatCheck>
+ 			<div className="editor-post-format">
+ 				<SelectControl
++					__nextHasNoMarginBottom
+ 					label={ __( 'Post Format' ) }
+ 					value={ postFormat }
+ 					onChange={ ( format ) => onUpdatePostFormat( format ) }
+diff --git a/packages/editor/src/components/post-template/index.js b/packages/editor/src/components/post-template/index.js
+index c52fab6316ba2d..3e73135321b183 100644
+--- a/packages/editor/src/components/post-template/index.js
++++ b/packages/editor/src/components/post-template/index.js
+@@ -44,6 +44,7 @@ export function PostTemplate() {
+ 
+ 	return (
+ 		<SelectControl
++			__nextHasNoMarginBottom
+ 			label={ __( 'Template:' ) }
+ 			value={ selectedTemplate }
+ 			onChange={ ( templateSlug ) => {
+diff --git a/packages/widgets/src/blocks/legacy-widget/edit/index.js b/packages/widgets/src/blocks/legacy-widget/edit/index.js
+index a763bbd0dd4045..cb0b993376668f 100644
+--- a/packages/widgets/src/blocks/legacy-widget/edit/index.js
++++ b/packages/widgets/src/blocks/legacy-widget/edit/index.js
+@@ -13,7 +13,7 @@ import {
+ 	BlockIcon,
+ 	store as blockEditorStore,
+ } from '@wordpress/block-editor';
+-import { Spinner, Placeholder } from '@wordpress/components';
++import { Flex, FlexBlock, Spinner, Placeholder } from '@wordpress/components';
+ import { brush as brushIcon } from '@wordpress/icons';
+ import { __ } from '@wordpress/i18n';
+ import { useState, useCallback } from '@wordpress/element';
+@@ -57,30 +57,34 @@ function Empty( { attributes: { id, idBase }, setAttributes } ) {
+ 			icon={ <BlockIcon icon={ brushIcon } /> }
+ 			label={ __( 'Legacy Widget' ) }
+ 		>
+-			<WidgetTypeSelector
+-				selectedId={ id ?? idBase }
+-				onSelect={ ( { selectedId, isMulti } ) => {
+-					if ( ! selectedId ) {
+-						setAttributes( {
+-							id: null,
+-							idBase: null,
+-							instance: null,
+-						} );
+-					} else if ( isMulti ) {
+-						setAttributes( {
+-							id: null,
+-							idBase: selectedId,
+-							instance: {},
+-						} );
+-					} else {
+-						setAttributes( {
+-							id: selectedId,
+-							idBase: null,
+-							instance: null,
+-						} );
+-					}
+-				} }
+-			/>
++			<Flex>
++				<FlexBlock>
++					<WidgetTypeSelector
++						selectedId={ id ?? idBase }
++						onSelect={ ( { selectedId, isMulti } ) => {
++							if ( ! selectedId ) {
++								setAttributes( {
++									id: null,
++									idBase: null,
++									instance: null,
++								} );
++							} else if ( isMulti ) {
++								setAttributes( {
++									id: null,
++									idBase: selectedId,
++									instance: {},
++								} );
++							} else {
++								setAttributes( {
++									id: selectedId,
++									idBase: null,
++									instance: null,
++								} );
++							}
++						} }
++					/>
++				</FlexBlock>
++			</Flex>
+ 		</Placeholder>
+ 	);
+ }
+diff --git a/packages/widgets/src/blocks/legacy-widget/edit/widget-type-selector.js b/packages/widgets/src/blocks/legacy-widget/edit/widget-type-selector.js
+index 4afe1ee1359eae..215e2d2447c3c9 100644
+--- a/packages/widgets/src/blocks/legacy-widget/edit/widget-type-selector.js
++++ b/packages/widgets/src/blocks/legacy-widget/edit/widget-type-selector.js
+@@ -27,6 +27,7 @@ export default function WidgetTypeSelector( { selectedId, onSelect } ) {
+ 
+ 	return (
+ 		<SelectControl
++			__nextHasNoMarginBottom
+ 			label={ __( 'Select a legacy widget to display:' ) }
+ 			value={ selectedId ?? '' }
+ 			options={ [
+diff --git a/packages/widgets/src/blocks/legacy-widget/editor.scss b/packages/widgets/src/blocks/legacy-widget/editor.scss
+index 93e7ab374f70d1..78bcf533ac5e9d 100644
+--- a/packages/widgets/src/blocks/legacy-widget/editor.scss
++++ b/packages/widgets/src/blocks/legacy-widget/editor.scss
+@@ -163,12 +163,3 @@
+ 	min-width: 400px;
+ }
+ 
+-.wp-block-legacy-widget {
+-	.components-base-control {
+-		width: 100%;
+-	}
+-	.components-select-control__input {
+-		padding: 0;
+-		font-family: system-ui;
+-	}
+-}

@@ -1,0 +1,100 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index bfb0e141c69402..b3b6440526ec29 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,7 @@
+ ### Deprecations
+ 
+ -   `Popover`: added new `anchor` prop, supposed to supersede all previous anchor-related props (`anchorRef`, `anchorRect`, `getAnchorRect`). These older anchor-related props are now marked as deprecated and are scheduled to be removed in WordPress 6.3 ([#43691](https://github.com/WordPress/gutenberg/pull/43691)).
++-   `Popover`: deprecate the legacy `position` prop, in favor of the newer `placement` prop. The `position` prop is scheduled to be removed in WordPress 6.4 ([#44386](https://github.com/WordPress/gutenberg/pull/44386)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/popover/README.md b/packages/components/src/popover/README.md
+index 85ae701894616d..149f5163ae483a 100644
+--- a/packages/components/src/popover/README.md
++++ b/packages/components/src/popover/README.md
+@@ -203,7 +203,7 @@ Used to specify the popover's position with respect to its anchor.
+ 
+ ### `position`: `[yAxis] [xAxis] [optionalCorner]`
+ 
+-_Note: use the `placement` prop instead when possible._
++_Note: this prop is deprecated and will be removed in WordPress 6.4. Please use the `placement` prop instead._
+ 
+ Legacy way to specify the popover's position with respect to its anchor.
+ 
+@@ -213,7 +213,6 @@ Possible values:
+ - `xAxis`: `'left' | 'center' | 'right'`
+ - `corner`: `'top' | 'right' | 'bottom' | 'left'`
+ 
+-
+ -   Required: No
+ 
+ ### `resize`: `boolean`
+diff --git a/packages/components/src/popover/index.tsx b/packages/components/src/popover/index.tsx
+index 25bb157247a361..30deb42804d3c5 100644
+--- a/packages/components/src/popover/index.tsx
++++ b/packages/components/src/popover/index.tsx
+@@ -170,7 +170,6 @@ const UnforwardedPopover = (
+ 		className,
+ 		noArrow = true,
+ 		isAlternate,
+-		position,
+ 		placement: placementProp = 'bottom-start',
+ 		offset: offsetProp = 0,
+ 		focusOnMount = 'firstElement',
+@@ -188,6 +187,7 @@ const UnforwardedPopover = (
+ 		anchorRef,
+ 		anchorRect,
+ 		getAnchorRect,
++		position,
+ 		range,
+ 
+ 		// Rest
+@@ -252,6 +252,14 @@ const UnforwardedPopover = (
+ 		} );
+ 	}
+ 
++	if ( position !== undefined ) {
++		deprecated( '`position` prop in wp.components.Popover', {
++			since: '6.2',
++			version: '6.4',
++			alternative: '`placement` prop',
++		} );
++	}
++
+ 	const arrowRef = useRef( null );
+ 
+ 	const [ fallbackReferenceElement, setFallbackReferenceElement ] =
+diff --git a/packages/components/src/popover/types.ts b/packages/components/src/popover/types.ts
+index b80e266c1fe2ce..32ac14923116da 100644
+--- a/packages/components/src/popover/types.ts
++++ b/packages/components/src/popover/types.ts
+@@ -116,13 +116,6 @@ export type PopoverProps = {
+ 	 * @default 'bottom-start'
+ 	 */
+ 	placement?: Placement;
+-	/**
+-	 * Legacy way to specify the popover's position with respect to its anchor.
+-	 * _Note: this prop is deprecated. Use the `placement` prop instead._
+-	 */
+-	position?:
+-		| `${ PositionYAxis } ${ PositionXAxis }`
+-		| `${ PositionYAxis } ${ PositionXAxis } ${ PositionCorner }`;
+ 	/**
+ 	 * Adjusts the size of the popover to prevent its contents from going out of
+ 	 * view when meeting the viewport edges.
+@@ -189,4 +182,13 @@ export type PopoverProps = {
+ 	 * @deprecated
+ 	 */
+ 	range?: unknown;
++	/**
++	 * Legacy way to specify the popover's position with respect to its anchor.
++	 * _Note: this prop is deprecated. Use the `placement` prop instead._
++	 *
++	 * @deprecated
++	 */
++	position?:
++		| `${ PositionYAxis } ${ PositionXAxis }`
++		| `${ PositionYAxis } ${ PositionXAxis } ${ PositionCorner }`;
+ };

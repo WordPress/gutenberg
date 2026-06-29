@@ -1,0 +1,76 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3f00d36c8c882e..600cb21885710d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `TimePicker`: Fix date parsing for years below 1000 by implementing ISO 8601 compliant year formatting with zero-padding ([#75343](https://github.com/WordPress/gutenberg/pull/75343)).
+ -   `Text`: Remove `text-wrap: balance` fallback. Only `text-wrap: pretty` is now used ([#75089](https://github.com/WordPress/gutenberg/pull/75089)).
+ -   `RangeControl`: support forced-colors mode ([#75165](https://github.com/WordPress/gutenberg/pull/75165)).
+ -   `ToggleControl`: Prevent `__nextHasNoMarginBottom` from logging a console warning ([#75296](https://github.com/WordPress/gutenberg/pull/75296)).
+diff --git a/packages/components/src/date-time/time/test/index.tsx b/packages/components/src/date-time/time/test/index.tsx
+index 6a9eb2327a996c..cb0ff6331771db 100644
+--- a/packages/components/src/date-time/time/test/index.tsx
++++ b/packages/components/src/date-time/time/test/index.tsx
+@@ -591,4 +591,46 @@ describe( 'TimePicker', () => {
+ 			} );
+ 		} );
+ 	} );
++
++	describe( 'ISO 8601 compliance', () => {
++		it( 'should handle years below 1000 with zero-padded output', async () => {
++			const user = userEvent.setup();
++			const onChangeSpy = jest.fn();
++
++			render(
++				<TimePicker
++					currentTime="0999-10-18T11:00:00"
++					onChange={ onChangeSpy }
++					is12Hour
++				/>
++			);
++
++			const yearInput = screen.getByLabelText( 'Year' );
++
++			// Verify initial input displays correctly
++			expect( yearInput ).toHaveValue( 999 );
++
++			// Change to year 500
++			await user.clear( yearInput );
++			await user.type( yearInput, '500' );
++			await user.keyboard( '{Tab}' );
++
++			// Verify input field value after change (human-readable, not zero-padded)
++			expect( yearInput ).toHaveValue( 500 );
++
++			// Verify onChange emits zero-padded ISO 8601 format
++			expect( onChangeSpy ).toHaveBeenCalled();
++			const lastCall =
++				onChangeSpy.mock.calls[ onChangeSpy.mock.calls.length - 1 ];
++			const outputDate = lastCall[ 0 ];
++
++			// Extract year from output and verify it's zero-padded to 4 digits
++			const yearMatch = outputDate.match( /^(\d{4})-/ );
++			expect( yearMatch ).not.toBeNull();
++			expect( yearMatch[ 1 ] ).toBe( '0500' ); // Explicitly verify zero-padded year
++
++			expect( outputDate ).not.toContain( 'NaN' );
++			expect( outputDate ).not.toContain( 'Invalid' );
++		} );
++	} );
+ } );
+diff --git a/packages/components/src/date-time/utils.ts b/packages/components/src/date-time/utils.ts
+index 8e95a1dfa8e1da..8689b6bf78cb63 100644
+--- a/packages/components/src/date-time/utils.ts
++++ b/packages/components/src/date-time/utils.ts
+@@ -139,7 +139,7 @@ export function setInConfiguredTimezone(
+ 		...updates,
+ 	};
+ 
+-	const year = String( values.year );
++	const year = String( values.year ).padStart( 4, '0' );
+ 	const month = String( values.month + 1 ).padStart( 2, '0' );
+ 	const day = String( values.date ).padStart( 2, '0' );
+ 	const hours = String( values.hours ).padStart( 2, '0' );

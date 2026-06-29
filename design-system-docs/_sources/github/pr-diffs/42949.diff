@@ -1,0 +1,748 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index dc6759221731ca..9e572aecf3396c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -3,12 +3,17 @@
+ ## Unreleased
+ 
+ ### Bug Fix
++
+ -   `FontSizePicker`: Ensure that fluid font size presets appear correctly in the UI controls ([#44791](https://github.com/WordPress/gutenberg/pull/44791))
+ 
+ ### Documentation
+ 
+ -   `VisuallyHidden`: Add some notes on best practices around stacking contexts when using this component ([#44867](https://github.com/WordPress/gutenberg/pull/44867))
+ 
++### Internal
++
++-   `Modal`: Convert to TypeScript ([#42949](https://github.com/WordPress/gutenberg/pull/42949)).
++
+ ## 21.2.0 (2022-10-05)
+ 
+ ### Enhancements
+@@ -59,7 +64,6 @@
+ -   `UnitControl` updated to pass the `react/exhaustive-deps` eslint rule ([#44161](https://github.com/WordPress/gutenberg/pull/44161)).
+ -   `Notice`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44157](https://github.com/WordPress/gutenberg/pull/44157))
+ 
+-
+ ## 21.0.0 (2022-09-13)
+ 
+ ### Deprecations
+@@ -159,7 +163,7 @@
+ -   `ComboboxControl`: Normalize hyphen-like characters to an ASCII hyphen ([#42942](https://github.com/WordPress/gutenberg/pull/42942)).
+ -   `FormTokenField`: Refactor away from `_.difference()` ([#43224](https://github.com/WordPress/gutenberg/pull/43224/)).
+ -   `Autocomplete`: use `KeyboardEvent.code` instead of `KeyboardEvent.keyCode` ([#43432](https://github.com/WordPress/gutenberg/pull/43432/)).
+--   `ConfirmDialog`: replace (almost) every usage of `fireEvent` with `@testing-library/user-event`  ([#43429](https://github.com/WordPress/gutenberg/pull/43429/)).
++-   `ConfirmDialog`: replace (almost) every usage of `fireEvent` with `@testing-library/user-event` ([#43429](https://github.com/WordPress/gutenberg/pull/43429/)).
+ -   `Popover`: Introduce new `flip` and `resize` props ([#43546](https://github.com/WordPress/gutenberg/pull/43546/)).
+ 
+ ### Internal
+diff --git a/packages/components/src/confirm-dialog/types.ts b/packages/components/src/confirm-dialog/types.ts
+index 73ad03d344a89a..72fef59dc20094 100644
+--- a/packages/components/src/confirm-dialog/types.ts
++++ b/packages/components/src/confirm-dialog/types.ts
+@@ -3,7 +3,13 @@
+  */
+ import type { MouseEvent, KeyboardEvent, ReactNode } from 'react';
+ 
++/**
++ * Internal dependencies
++ */
++import type { ModalProps } from '../modal/types';
++
+ export type DialogInputEvent =
++	| Parameters< ModalProps[ 'onRequestClose' ] >[ 0 ]
+ 	| KeyboardEvent< HTMLDivElement >
+ 	| MouseEvent< HTMLButtonElement >;
+ 
+diff --git a/packages/components/src/modal/README.md b/packages/components/src/modal/README.md
+index b1cf8687f2ae3c..8b0aa84750d16c 100644
+--- a/packages/components/src/modal/README.md
++++ b/packages/components/src/modal/README.md
+@@ -150,118 +150,117 @@ const MyModal = () => {
+ The set of props accepted by the component will be specified below.
+ Props not included in this set will be applied to the input elements.
+ 
+-#### title
++#### `aria.describedby`: `string`
+ 
+-This property is used as the modal header's title.
+-
+-Titles are required for accessibility reasons, see `aria.labelledby` and `contentLabel` for other ways to provide a title.
++If this property is added, it will be added to the modal content `div` as `aria-describedby`.
+ 
+--   Type: `String`
+ -   Required: No
+ 
+-#### onRequestClose
++#### `aria.labelledby`: `string`
+ 
+-This function is called to indicate that the modal should be closed.
++If this property is added, it will be added to the modal content `div` as `aria-labelledby`.
++Use this when you are rendering the title yourself within the modal's content area instead of using the `title` prop. This ensures the title is usable by assistive technology.
+ 
+--   Type: `function`
+--   Required: Yes
++Titles are required for accessibility reasons, see `contentLabel` and `title` for other ways to provide a title.
+ 
+-#### contentLabel
++-   Required: No
++-   Default: if the `title` prop is provided, this will default to the id of the element that renders `title`
+ 
+-If this property is added, it will be added to the modal content `div` as `aria-label`.
++#### `bodyOpenClassName`: `string`
+ 
+-Titles are required for accessibility reasons, see `aria.labelledby` and `title` for other ways to provide a title.
++Class name added to the body element when the modal is open.
+ 
+--   Type: `String`
+ -   Required: No
++-   Default: `modal-open`
+ 
+-#### aria.labelledby
++#### `className`: `string`
+ 
+-If this property is added, it will be added to the modal content `div` as `aria-labelledby`.
+-Use this when you are rendering the title yourself within the modal's content area instead of using the `title` prop. This ensures the title is usable by assistive technology.
+-
+-Titles are required for accessibility reasons, see `contentLabel` and `title` for other ways to provide a title.
++If this property is added, it will an additional class name to the modal content `div`.
+ 
+--   Type: `String`
+ -   Required: No
+--   Default: if the `title` prop is provided, this will default to the id of the element that renders `title`
+ 
+-#### aria.describedby
++#### `contentLabel`: `string`
+ 
+-If this property is added, it will be added to the modal content `div` as `aria-describedby`.
++If this property is added, it will be added to the modal content `div` as `aria-label`.
++
++Titles are required for accessibility reasons, see `aria.labelledby` and `title` for other ways to provide a title.
+ 
+--   Type: `String`
+ -   Required: No
+ 
+-#### focusOnMount
++#### `focusOnMount`: `boolean | 'firstElement'`
+ 
+ If this property is true, it will focus the first tabbable element rendered in the modal.
+ 
+--   Type: `boolean`
+ -   Required: No
+--   Default: true
++-   Default: `true`
+ 
+-#### shouldCloseOnEsc
++#### `isDismissible`: `boolean`
+ 
+-If this property is added, it will determine whether the modal requests to close when the escape key is pressed.
++If this property is set to false, the modal will not display a close icon and cannot be dismissed.
+ 
+--   Type: `boolean`
+ -   Required: No
+--   Default: true
++-   Default: `true`
+ 
+-#### shouldCloseOnClickOutside
++#### `isFullScreen`: `boolean`
+ 
+-If this property is added, it will determine whether the modal requests to close when a mouse click occurs outside of the modal content.
++This property when set to `true` will render a full screen modal.
+ 
+--   Type: `boolean`
+ -   Required: No
+--   Default: true
++-   Default: `false`
+ 
+-#### isDismissible
++#### `onRequestClose`: ``
+ 
+-If this property is set to false, the modal will not display a close icon and cannot be dismissed.
++This function is called to indicate that the modal should be closed.
+ 
+--   Type: `boolean`
+--   Required: No
+--   Default: true
++-   Required: Yes
+ 
+-#### className
++#### `overlayClassName`: `string`
+ 
+-If this property is added, it will an additional class name to the modal content `div`.
++If this property is added, it will an additional class name to the modal overlay `div`.
+ 
+--   Type: `String`
+ -   Required: No
+ 
+-#### role
++#### `role`: `AriaRole`
+ 
+ If this property is added, it will override the default role of the modal.
+ 
+--   Type: `String`
+ -   Required: No
+ -   Default: `dialog`
+ 
+-#### overlayClassName
++#### `shouldCloseOnClickOutside`: `boolean`
+ 
+-If this property is added, it will an additional class name to the modal overlay `div`.
++If this property is added, it will determine whether the modal requests to close when a mouse click occurs outside of the modal content.
+ 
+--   Type: `String`
+ -   Required: No
++-   Default: `true`
+ 
+-#### isFullScreen
++#### `shouldCloseOnEsc`: `boolean`
+ 
+-This property when set to `true` will render a full screen modal.
++If this property is added, it will determine whether the modal requests to close when the escape key is pressed.
++
++-   Required: No
++-   Default: `true`
++
++#### `style`: `CSSProperties`
++
++If this property is added, it will be added to the modal frame `div`.
++
++-   Required: No
++
++#### `title`: `string`
++
++This property is used as the modal header's title.
++
++Titles are required for accessibility reasons, see `aria.labelledby` and `contentLabel` for other ways to provide a title.
+ 
+--   Type: `boolean`
+ -   Required: No
+--   Default: `false`
+ 
+-#### __experimentalHideHeader
++#### `__experimentalHideHeader`: `boolean`
+ 
+ When set to `true`, the Modal's header (including the icon, title and close button) will not be rendered.
+ 
+-*Warning*: This property is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
++_Warning_: This property is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+ 
+--   Type: `boolean`
+ -   Required: No
+ -   Default: `false`
+ 
+diff --git a/packages/components/src/modal/aria-helper.js b/packages/components/src/modal/aria-helper.ts
+similarity index 84%
+rename from packages/components/src/modal/aria-helper.js
+rename to packages/components/src/modal/aria-helper.ts
+index c74627c81dba8c..25ef449a30d3df 100644
+--- a/packages/components/src/modal/aria-helper.js
++++ b/packages/components/src/modal/aria-helper.ts
+@@ -1,5 +1,3 @@
+-// @ts-nocheck
+-
+ const LIVE_REGION_ARIA_ROLES = new Set( [
+ 	'alert',
+ 	'status',
+@@ -8,7 +6,7 @@ const LIVE_REGION_ARIA_ROLES = new Set( [
+ 	'timer',
+ ] );
+ 
+-let hiddenElements = [],
++let hiddenElements: Element[] = [],
+ 	isHidden = false;
+ 
+ /**
+@@ -21,9 +19,9 @@ let hiddenElements = [],
+  * we should consider removing these helper functions in favor of
+  * `aria-modal="true"`.
+  *
+- * @param {Element} unhiddenElement The element that should not be hidden.
++ * @param {HTMLDivElement} unhiddenElement The element that should not be hidden.
+  */
+-export function hideApp( unhiddenElement ) {
++export function hideApp( unhiddenElement?: HTMLDivElement ) {
+ 	if ( isHidden ) {
+ 		return;
+ 	}
+@@ -47,13 +45,13 @@ export function hideApp( unhiddenElement ) {
+  *
+  * @return {boolean} Whether the element should not be hidden from screen-readers.
+  */
+-export function elementShouldBeHidden( element ) {
++export function elementShouldBeHidden( element: Element ) {
+ 	const role = element.getAttribute( 'role' );
+ 	return ! (
+ 		element.tagName === 'SCRIPT' ||
+ 		element.hasAttribute( 'aria-hidden' ) ||
+ 		element.hasAttribute( 'aria-live' ) ||
+-		LIVE_REGION_ARIA_ROLES.has( role )
++		( role && LIVE_REGION_ARIA_ROLES.has( role ) )
+ 	);
+ }
+ 
+diff --git a/packages/components/src/modal/index.js b/packages/components/src/modal/index.tsx
+similarity index 73%
+rename from packages/components/src/modal/index.js
+rename to packages/components/src/modal/index.tsx
+index 26c07113d73b8d..8c4f3a8535704d 100644
+--- a/packages/components/src/modal/index.js
++++ b/packages/components/src/modal/index.tsx
+@@ -1,9 +1,8 @@
+-// @ts-nocheck
+-
+ /**
+  * External dependencies
+  */
+ import classnames from 'classnames';
++import type { ForwardedRef, KeyboardEvent, UIEvent } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -33,11 +32,15 @@ import { close } from '@wordpress/icons';
+ import * as ariaHelper from './aria-helper';
+ import Button from '../button';
+ import StyleProvider from '../style-provider';
++import type { ModalProps } from './types';
+ 
+ // Used to count the number of open modals.
+ let openModalCount = 0;
+ 
+-function Modal( props, forwardedRef ) {
++function UnforwardedModal(
++	props: ModalProps,
++	forwardedRef: ForwardedRef< HTMLDivElement >
++) {
+ 	const {
+ 		bodyOpenClassName = 'modal-open',
+ 		role = 'dialog',
+@@ -48,8 +51,8 @@ function Modal( props, forwardedRef ) {
+ 		isDismissible = true,
+ 		/* Accessibility. */
+ 		aria = {
+-			labelledby: null,
+-			describedby: null,
++			labelledby: undefined,
++			describedby: undefined,
+ 		},
+ 		onRequestClose,
+ 		icon,
+@@ -64,7 +67,7 @@ function Modal( props, forwardedRef ) {
+ 		__experimentalHideHeader = false,
+ 	} = props;
+ 
+-	const ref = useRef();
++	const ref = useRef< HTMLDivElement >();
+ 	const instanceId = useInstanceId( Modal );
+ 	const headingId = title
+ 		? `components-modal-header-${ instanceId }`
+@@ -94,7 +97,7 @@ function Modal( props, forwardedRef ) {
+ 		};
+ 	}, [ bodyOpenClassName ] );
+ 
+-	function handleEscapeKeyDown( event ) {
++	function handleEscapeKeyDown( event: KeyboardEvent< HTMLDivElement > ) {
+ 		if (
+ 			shouldCloseOnEsc &&
+ 			event.code === 'Escape' &&
+@@ -108,8 +111,8 @@ function Modal( props, forwardedRef ) {
+ 	}
+ 
+ 	const onContentContainerScroll = useCallback(
+-		( e ) => {
+-			const scrollY = e?.target?.scrollTop ?? -1;
++		( e: UIEvent< HTMLDivElement > ) => {
++			const scrollY = e?.currentTarget?.scrollTop ?? -1;
+ 
+ 			if ( ! hasScrolledContent && scrollY > 0 ) {
+ 				setHasScrolledContent( true );
+@@ -147,9 +150,9 @@ function Modal( props, forwardedRef ) {
+ 					] ) }
+ 					role={ role }
+ 					aria-label={ contentLabel }
+-					aria-labelledby={ contentLabel ? null : headingId }
++					aria-labelledby={ contentLabel ? undefined : headingId }
+ 					aria-describedby={ aria.describedby }
+-					tabIndex="-1"
++					tabIndex={ -1 }
+ 					{ ...( shouldCloseOnClickOutside
+ 						? focusOutsideProps
+ 						: {} ) }
+@@ -204,4 +207,37 @@ function Modal( props, forwardedRef ) {
+ 	);
+ }
+ 
+-export default forwardRef( Modal );
++/**
++ * Modals give users information and choices related to a task they’re trying to
++ * accomplish. They can contain critical information, require decisions, or
++ * involve multiple tasks.
++ *
++ * ```jsx
++ * import { Button, Modal } from '@wordpress/components';
++ * import { useState } from '@wordpress/element';
++ *
++ * const MyModal = () => {
++ *   const [ isOpen, setOpen ] = useState( false );
++ *   const openModal = () => setOpen( true );
++ *   const closeModal = () => setOpen( false );
++ *
++ *   return (
++ *     <>
++ *       <Button variant="secondary" onClick={ openModal }>
++ *         Open Modal
++ *       </Button>
++ *       { isOpen && (
++ *         <Modal title="This is my modal" onRequestClose={ closeModal }>
++ *           <Button variant="secondary" onClick={ closeModal }>
++ *             My custom close button
++ *           </Button>
++ *         </Modal>
++ *       ) }
++ *     </>
++ *   );
++ * };
++ * ```
++ */
++export const Modal = forwardRef( UnforwardedModal );
++
++export default Modal;
+diff --git a/packages/components/src/modal/stories/index.js b/packages/components/src/modal/stories/index.tsx
+similarity index 54%
+rename from packages/components/src/modal/stories/index.js
+rename to packages/components/src/modal/stories/index.tsx
+index febcb275a60d42..42b7874b1eeaab 100644
+--- a/packages/components/src/modal/stories/index.js
++++ b/packages/components/src/modal/stories/index.tsx
+@@ -1,33 +1,56 @@
+ /**
+  * External dependencies
+  */
+-import { boolean, text } from '@storybook/addon-knobs';
++import type { ComponentStory, ComponentMeta } from '@storybook/react';
+ 
+ /**
+- * Internal dependencies
++ * WordPress dependencies
+  */
+-import Button from '../../button';
+-import Icon from '../../icon';
+-import Modal from '../';
++import { useState } from '@wordpress/element';
+ 
+ /**
+- * WordPress dependencies
++ * Internal dependencies
+  */
+-import { useState } from '@wordpress/element';
+-import { wordpress } from '@wordpress/icons';
++import Button from '../../button';
++import Modal from '../';
++import type { ModalProps } from '../types';
+ 
+-export default {
+-	title: 'Components/Modal',
++const meta: ComponentMeta< typeof Modal > = {
+ 	component: Modal,
++	title: 'Components/Modal',
++	argTypes: {
++		children: {
++			control: { type: null },
++		},
++		onKeyDown: {
++			control: { type: null },
++		},
++		focusOnMount: {
++			control: { type: 'boolean' },
++		},
++		role: {
++			control: { type: 'text' },
++		},
++		onRequestClose: {
++			action: 'onRequestClose',
++		},
++	},
+ 	parameters: {
+-		knobs: { disable: false },
++		controls: { expanded: true },
+ 	},
+ };
++export default meta;
+ 
+-const ModalExample = ( props ) => {
++const Template: ComponentStory< typeof Modal > = ( {
++	onRequestClose,
++	...args
++} ) => {
+ 	const [ isOpen, setOpen ] = useState( false );
+ 	const openModal = () => setOpen( true );
+-	const closeModal = () => setOpen( false );
++	const closeModal: ModalProps[ 'onRequestClose' ] = ( event ) => {
++		setOpen( false );
++		onRequestClose( event );
++	};
+ 
+ 	return (
+ 		<>
+@@ -36,9 +59,9 @@ const ModalExample = ( props ) => {
+ 			</Button>
+ 			{ isOpen && (
+ 				<Modal
+-					{ ...props }
+ 					onRequestClose={ closeModal }
+ 					style={ { maxWidth: '600px' } }
++					{ ...args }
+ 				>
+ 					<p>
+ 						Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+@@ -61,32 +84,14 @@ const ModalExample = ( props ) => {
+ 	);
+ };
+ 
+-export const _default = () => {
+-	const title = text( 'title', 'Title' );
+-	const showIcon = boolean( 'icon', false );
+-	const isDismissible = boolean( 'isDismissible', true );
+-	const focusOnMount = boolean( 'focusOnMount', true );
+-	const shouldCloseOnEsc = boolean( 'shouldCloseOnEsc', true );
+-	const shouldCloseOnClickOutside = boolean(
+-		'shouldCloseOnClickOutside',
+-		true
+-	);
+-	const __experimentalHideHeader = boolean(
+-		'__experimentalHideHeader',
+-		false
+-	);
+-
+-	const iconComponent = showIcon ? <Icon icon={ wordpress } /> : null;
+-
+-	const modalProps = {
+-		icon: iconComponent,
+-		focusOnMount,
+-		isDismissible,
+-		shouldCloseOnEsc,
+-		shouldCloseOnClickOutside,
+-		title,
+-		__experimentalHideHeader,
+-	};
+-
+-	return <ModalExample { ...modalProps } />;
++export const Default: ComponentStory< typeof Modal > = Template.bind( {} );
++Default.args = {
++	title: 'Title',
++};
++Default.parameters = {
++	docs: {
++		source: {
++			code: '',
++		},
++	},
+ };
+diff --git a/packages/components/src/modal/test/aria-helper.js b/packages/components/src/modal/test/aria-helper.ts
+similarity index 100%
+rename from packages/components/src/modal/test/aria-helper.js
+rename to packages/components/src/modal/test/aria-helper.ts
+diff --git a/packages/components/src/modal/test/index.js b/packages/components/src/modal/test/index.tsx
+similarity index 82%
+rename from packages/components/src/modal/test/index.js
+rename to packages/components/src/modal/test/index.tsx
+index 351d1b1f96fe88..a0778bfb8aab8b 100644
+--- a/packages/components/src/modal/test/index.js
++++ b/packages/components/src/modal/test/index.tsx
+@@ -8,10 +8,15 @@ import { render, screen, within } from '@testing-library/react';
+  */
+ import Modal from '../';
+ 
++const noop = () => {};
++
+ describe( 'Modal', () => {
+ 	it( 'applies the aria-describedby attribute when provided', () => {
+ 		render(
+-			<Modal aria={ { describedby: 'description-id' } }>
++			<Modal
++				aria={ { describedby: 'description-id' } }
++				onRequestClose={ noop }
++			>
+ 				{ /* eslint-disable-next-line no-restricted-syntax */ }
+ 				<p id="description-id">Description</p>
+ 			</Modal>
+@@ -24,7 +29,7 @@ describe( 'Modal', () => {
+ 
+ 	it( 'applies the aria-labelledby attribute when provided', () => {
+ 		render(
+-			<Modal aria={ { labelledby: 'title-id' } }>
++			<Modal aria={ { labelledby: 'title-id' } } onRequestClose={ noop }>
+ 				{ /* eslint-disable-next-line no-restricted-syntax */ }
+ 				<h1 id="title-id">Modal Title Text</h1>
+ 			</Modal>
+@@ -39,6 +44,7 @@ describe( 'Modal', () => {
+ 			<Modal
+ 				title="Modal Title Attribute"
+ 				aria={ { labelledby: 'title-id' } }
++				onRequestClose={ noop }
+ 			>
+ 				{ /* eslint-disable-next-line no-restricted-syntax */ }
+ 				<h1 id="title-id">Modal Title Text</h1>
+@@ -51,7 +57,11 @@ describe( 'Modal', () => {
+ 
+ 	it( 'hides the header when the `__experimentalHideHeader` prop is used', () => {
+ 		render(
+-			<Modal title="Test Title" __experimentalHideHeader>
++			<Modal
++				title="Test Title"
++				__experimentalHideHeader
++				onRequestClose={ noop }
++			>
+ 				<p>Modal content</p>
+ 			</Modal>
+ 		);
+diff --git a/packages/components/src/modal/types.ts b/packages/components/src/modal/types.ts
+new file mode 100644
+index 00000000000000..45fe0580d5329b
+--- /dev/null
++++ b/packages/components/src/modal/types.ts
+@@ -0,0 +1,144 @@
++/**
++ * External dependencies
++ */
++import type {
++	AriaRole,
++	CSSProperties,
++	ReactNode,
++	KeyboardEventHandler,
++	KeyboardEvent,
++	SyntheticEvent,
++} from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import type { useFocusOnMount } from '@wordpress/compose';
++
++export type ModalProps = {
++	aria?: {
++		/**
++		 * If this property is added, it will be added to the modal content
++		 * `div` as `aria-describedby`.
++		 */
++		describedby?: string;
++		/**
++		 * If this property is added, it will be added to the modal content
++		 * `div` as `aria-labelledby`. Use this when you are rendering the title
++		 * yourself within the modal's content area instead of using the `title`
++		 * prop. This ensures the title is usable by assistive technology.
++		 *
++		 * Titles are required for accessibility reasons, see `contentLabel` and
++		 * `title` for other ways to provide a title.
++		 */
++		labelledby?: string;
++	};
++	/**
++	 * Class name added to the body element when the modal is open.
++	 *
++	 * @default 'modal-open'
++	 */
++	bodyOpenClassName?: string;
++	/**
++	 * The children elements.
++	 */
++	children: ReactNode;
++	/**
++	 * If this property is added, it will an additional class name to the modal
++	 * content `div`.
++	 */
++	className?: string;
++	/**
++	 * Label on the close button.
++	 */
++	closeButtonLabel?: string;
++	/**
++	 * If this property is added, it will be added to the modal content `div` as
++	 * `aria-label`.
++	 *
++	 * Titles are required for accessibility reasons, see `aria.labelledby` and
++	 * `title` for other ways to provide a title.
++	 */
++	contentLabel?: string;
++	/**
++	 * If this property is true, it will focus the first tabbable element
++	 * rendered in the modal.
++	 *
++	 * @default true
++	 */
++	focusOnMount?: Parameters< typeof useFocusOnMount >[ 0 ];
++	/**
++	 * If this property is added, an icon will be added before the title.
++	 */
++	icon?: JSX.Element;
++	/**
++	 * If this property is set to false, the modal will not display a close icon
++	 * and cannot be dismissed.
++	 *
++	 * @default true
++	 */
++	isDismissible?: boolean;
++	/**
++	 * This property when set to `true` will render a full screen modal.
++	 *
++	 * @default false
++	 */
++	isFullScreen?: boolean;
++	/**
++	 *  Handle the key down on the modal frame `div`.
++	 */
++	onKeyDown?: KeyboardEventHandler< HTMLDivElement >;
++	/**
++	 * This function is called to indicate that the modal should be closed.
++	 */
++	onRequestClose: (
++		event?: KeyboardEvent< HTMLDivElement > | SyntheticEvent
++	) => void;
++	/**
++	 * If this property is added, it will an additional class name to the modal
++	 * overlay `div`.
++	 */
++	overlayClassName?: string;
++	/**
++	 * If this property is added, it will override the default role of the
++	 * modal.
++	 *
++	 * @default 'dialog'
++	 */
++	role?: AriaRole;
++	/**
++	 * If this property is added, it will determine whether the modal requests
++	 * to close when a mouse click occurs outside of the modal content.
++	 *
++	 * @default true
++	 */
++	shouldCloseOnClickOutside?: boolean;
++	/**
++	 * If this property is added, it will determine whether the modal requests
++	 * to close when the escape key is pressed.
++	 *
++	 * @default true
++	 */
++	shouldCloseOnEsc?: boolean;
++	/**
++	 * If this property is added, it will be added to the modal frame `div`.
++	 */
++	style?: CSSProperties;
++	/**
++	 * This property is used as the modal header's title.
++	 *
++	 * Titles are required for accessibility reasons, see `aria.labelledby` and
++	 * `contentLabel` for other ways to provide a title.
++	 */
++	title?: string;
++	/**
++	 * When set to `true`, the Modal's header (including the icon, title and
++	 * close button) will not be rendered.
++	 *
++	 * _Warning_: This property is still experimental. “Experimental” means this
++	 * is an early implementation subject to drastic and breaking changes.
++	 *
++	 * @default false
++	 */
++	__experimentalHideHeader?: boolean;
++};

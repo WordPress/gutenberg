@@ -1,0 +1,813 @@
+diff --git a/package-lock.json b/package-lock.json
+index 8bb461bcc86606..3f572bbabf14e8 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -11119,6 +11119,7 @@
+ 				"moment": "^2.22.1",
+ 				"re-resizable": "^6.4.0",
+ 				"react-dates": "^17.1.1",
++				"react-merge-refs": "^1.0.0",
+ 				"react-resize-aware": "^3.0.1",
+ 				"react-spring": "^8.0.20",
+ 				"react-use-gesture": "^7.0.15",
+@@ -46071,6 +46072,11 @@
+ 			"resolved": "https://registry.npmjs.org/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz",
+ 			"integrity": "sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA=="
+ 		},
++		"react-merge-refs": {
++			"version": "1.0.0",
++			"resolved": "https://registry.npmjs.org/react-merge-refs/-/react-merge-refs-1.0.0.tgz",
++			"integrity": "sha512-VkvWuCR5VoTjb+VYUcOjkFo66HDv1Hw8VjKcwQtWr2lJnT8g7epRRyfz8+Zkl2WhwqNeqR0gIe0XYrBa9ePeXg=="
++		},
+ 		"react-moment-proptypes": {
+ 			"version": "1.6.0",
+ 			"resolved": "https://registry.npmjs.org/react-moment-proptypes/-/react-moment-proptypes-1.6.0.tgz",
+diff --git a/packages/block-editor/src/components/panel-color-settings/test/index.js b/packages/block-editor/src/components/panel-color-settings/test/index.js
+index 4a6c6e5baa3e26..565124f1eb81e4 100644
+--- a/packages/block-editor/src/components/panel-color-settings/test/index.js
++++ b/packages/block-editor/src/components/panel-color-settings/test/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { create, act } from 'react-test-renderer';
++import { render } from '@testing-library/react';
+ import { noop } from 'lodash';
+ 
+ /**
+@@ -11,120 +11,106 @@ import PanelColorSettings from '../';
+ 
+ describe( 'PanelColorSettings', () => {
+ 	it( 'should not render anything if there are no colors to choose', async () => {
+-		let root;
+-
+-		await act( async () => {
+-			root = create(
+-				<PanelColorSettings
+-					title="Test Title"
+-					colors={ [] }
+-					disableCustomColors={ true }
+-					colorSettings={ [
+-						{
+-							value: '#000',
+-							onChange: noop,
+-							label: 'border color',
+-						},
+-						{
+-							value: '#111',
+-							onChange: noop,
+-							label: 'background color',
+-						},
+-					] }
+-				/>
+-			);
+-		} );
+-
+-		expect( root.toJSON() ).toBe( null );
++		const { container } = render(
++			<PanelColorSettings
++				title="Test Title"
++				colors={ [] }
++				disableCustomColors={ true }
++				colorSettings={ [
++					{
++						value: '#000',
++						onChange: noop,
++						label: 'border color',
++					},
++					{
++						value: '#111',
++						onChange: noop,
++						label: 'background color',
++					},
++				] }
++			/>
++		);
++		expect( container.innerHTML ).toBe( '' );
+ 	} );
+ 
+ 	it( 'should render a color panel if at least one setting supports custom colors', async () => {
+-		let root;
+-		await act( async () => {
+-			root = create(
+-				<PanelColorSettings
+-					title="Test Title"
+-					colors={ [] }
+-					disableCustomColors={ true }
+-					colorSettings={ [
+-						{
+-							value: '#000',
+-							onChange: noop,
+-							label: 'border color',
+-						},
+-						{
+-							value: '#111',
+-							onChange: noop,
+-							label: 'background color',
+-							disableCustomColors: false,
+-						},
+-					] }
+-				/>
+-			);
+-		} );
+-		expect( root ).not.toBe( null );
++		const { container } = render(
++			<PanelColorSettings
++				title="Test Title"
++				colors={ [] }
++				disableCustomColors={ true }
++				colorSettings={ [
++					{
++						value: '#000',
++						onChange: noop,
++						label: 'border color',
++					},
++					{
++						value: '#111',
++						onChange: noop,
++						label: 'background color',
++						disableCustomColors: false,
++					},
++				] }
++			/>
++		);
++		expect( container.innerHTML ).not.toBe( '' );
+ 	} );
+ 
+ 	it( 'should render a color panel if at least one setting specifies some colors to choose', async () => {
+-		let root;
+-		await act( async () => {
+-			root = create(
+-				<PanelColorSettings
+-					title="Test Title"
+-					colors={ [] }
+-					disableCustomColors={ true }
+-					colorSettings={ [
+-						{
+-							value: '#000',
+-							onChange: noop,
+-							label: 'border color',
+-							colors: [
+-								{
+-									slug: 'red',
+-									name: 'Red',
+-									color: '#ff0000',
+-								},
+-							],
+-						},
+-						{
+-							value: '#111',
+-							onChange: noop,
+-							label: 'background color',
+-						},
+-					] }
+-				/>
+-			);
+-		} );
+-		expect( root ).not.toBe( null );
++		const { container } = render(
++			<PanelColorSettings
++				title="Test Title"
++				colors={ [] }
++				disableCustomColors={ true }
++				colorSettings={ [
++					{
++						value: '#000',
++						onChange: noop,
++						label: 'border color',
++						colors: [
++							{
++								slug: 'red',
++								name: 'Red',
++								color: '#ff0000',
++							},
++						],
++					},
++					{
++						value: '#111',
++						onChange: noop,
++						label: 'background color',
++					},
++				] }
++			/>
++		);
++		expect( container.innerHTML ).not.toBe( '' );
+ 	} );
+ 
+ 	it( 'should not render anything if none of the setting panels has colors to choose', async () => {
+-		let root;
+-		await act( async () => {
+-			root = create(
+-				<PanelColorSettings
+-					title="Test Title"
+-					colors={ [] }
+-					disableCustomColors={ false }
+-					colorSettings={ [
+-						{
+-							value: '#000',
+-							onChange: noop,
+-							label: 'border color',
+-							colors: [],
+-							disableCustomColors: true,
+-						},
+-						{
+-							value: '#111',
+-							onChange: noop,
+-							label: 'background color',
+-							colors: [],
+-							disableCustomColors: true,
+-						},
+-					] }
+-				/>
+-			);
+-		} );
+-		expect( root ).not.toBe( null );
++		const { container } = render(
++			<PanelColorSettings
++				title="Test Title"
++				colors={ [] }
++				disableCustomColors={ false }
++				colorSettings={ [
++					{
++						value: '#000',
++						onChange: noop,
++						label: 'border color',
++						colors: [],
++						disableCustomColors: true,
++					},
++					{
++						value: '#111',
++						onChange: noop,
++						label: 'background color',
++						colors: [],
++						disableCustomColors: true,
++					},
++				] }
++			/>
++		);
++		expect( container.innerHTML ).not.toBe( '' );
+ 	} );
+ } );
+diff --git a/packages/block-library/src/more/test/__snapshots__/edit.js.snap b/packages/block-library/src/more/test/__snapshots__/edit.js.snap
+index 10b47a9f654220..55069a65868395 100644
+--- a/packages/block-library/src/more/test/__snapshots__/edit.js.snap
++++ b/packages/block-library/src/more/test/__snapshots__/edit.js.snap
+@@ -3,14 +3,14 @@
+ exports[`core/more/edit should match snapshot when noTeaser is false 1`] = `
+ <React.Fragment>
+   <InspectorControls>
+-    <ForwardRef(PanelBody)>
++    <PanelBody>
+       <ToggleControl
+         checked={false}
+         help={[Function]}
+         label="Hide the excerpt on the full content page"
+         onChange={[Function]}
+       />
+-    </ForwardRef(PanelBody)>
++    </PanelBody>
+   </InspectorControls>
+   <div
+     className="wp-block-more"
+@@ -33,14 +33,14 @@ exports[`core/more/edit should match snapshot when noTeaser is false 1`] = `
+ exports[`core/more/edit should match snapshot when noTeaser is true 1`] = `
+ <React.Fragment>
+   <InspectorControls>
+-    <ForwardRef(PanelBody)>
++    <PanelBody>
+       <ToggleControl
+         checked={true}
+         help={[Function]}
+         label="Hide the excerpt on the full content page"
+         onChange={[Function]}
+       />
+-    </ForwardRef(PanelBody)>
++    </PanelBody>
+   </InspectorControls>
+   <div
+     className="wp-block-more"
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 111b0e4dbe894e..5e54db1e9def38 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -52,6 +52,7 @@
+ 		"moment": "^2.22.1",
+ 		"re-resizable": "^6.4.0",
+ 		"react-dates": "^17.1.1",
++		"react-merge-refs": "^1.0.0",
+ 		"react-resize-aware": "^3.0.1",
+ 		"react-spring": "^8.0.20",
+ 		"react-use-gesture": "^7.0.15",
+diff --git a/packages/components/src/panel/body.js b/packages/components/src/panel/body.js
+index 4121a99b6bbe25..dbfd895dc8a618 100644
+--- a/packages/components/src/panel/body.js
++++ b/packages/components/src/panel/body.js
+@@ -2,11 +2,14 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
++import { noop } from 'lodash';
++import mergeRefs from 'react-merge-refs';
+ 
+ /**
+  * WordPress dependencies
+  */
+-import { Component, forwardRef } from '@wordpress/element';
++import { useReducedMotion } from '@wordpress/compose';
++import { forwardRef, useRef } from '@wordpress/element';
+ import { chevronUp, chevronDown } from '@wordpress/icons';
+ 
+ /**
+@@ -14,82 +17,99 @@ import { chevronUp, chevronDown } from '@wordpress/icons';
+  */
+ import Button from '../button';
+ import Icon from '../icon';
++import { useControlledState, useUpdateEffect } from '../utils';
+ 
+-export class PanelBody extends Component {
+-	constructor( props ) {
+-		super( ...arguments );
+-		this.state = {
+-			opened: props.initialOpen === undefined ? true : props.initialOpen,
+-		};
+-		this.toggle = this.toggle.bind( this );
+-	}
++export function PanelBody(
++	{ children, className, icon, initialOpen, onToggle = noop, opened, title },
++	ref
++) {
++	const [ isOpened, setIsOpened ] = useControlledState( opened, {
++		initial: initialOpen === undefined ? true : initialOpen,
++	} );
++	const nodeRef = useRef();
++
++	// Defaults to 'smooth' scrolling
++	// https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView
++	const scrollBehavior = useReducedMotion() ? 'auto' : 'smooth';
+ 
+-	toggle( event ) {
++	const handleOnToggle = ( event ) => {
+ 		event.preventDefault();
+-		if ( this.props.opened === undefined ) {
+-			this.setState( ( state ) => ( {
+-				opened: ! state.opened,
+-			} ) );
+-		}
++		const next = ! isOpened;
++		setIsOpened( next );
++		onToggle( next );
++	};
+ 
+-		if ( this.props.onToggle ) {
+-			this.props.onToggle();
++	// Runs after initial render
++	useUpdateEffect( () => {
++		if ( isOpened ) {
++			/*
++			 * Scrolls the content into view when visible.
++			 * This improves the UX when there are multiple stacking <PanelBody />
++			 * components in a scrollable container.
++			 */
++			if ( nodeRef.current.scrollIntoView ) {
++				nodeRef.current.scrollIntoView( {
++					inline: 'nearest',
++					block: 'nearest',
++					behavior: scrollBehavior,
++				} );
++			}
+ 		}
+-	}
++	}, [ isOpened, scrollBehavior ] );
+ 
+-	render() {
+-		const {
+-			title,
+-			children,
+-			opened,
+-			className,
+-			icon,
+-			forwardedRef,
+-		} = this.props;
+-		const isOpened = opened === undefined ? this.state.opened : opened;
+-		const classes = classnames( 'components-panel__body', className, {
+-			'is-opened': isOpened,
+-		} );
++	const classes = classnames( 'components-panel__body', className, {
++		'is-opened': isOpened,
++	} );
++
++	return (
++		<div className={ classes } ref={ mergeRefs( [ nodeRef, ref ] ) }>
++			<PanelBodyTitle
++				icon={ icon }
++				isOpened={ isOpened }
++				onClick={ handleOnToggle }
++				title={ title }
++			/>
++			{ isOpened && children }
++		</div>
++	);
++}
++
++const PanelBodyTitle = forwardRef(
++	( { isOpened, icon, title, ...props }, ref ) => {
++		if ( ! title ) return null;
+ 
+ 		return (
+-			<div className={ classes } ref={ forwardedRef }>
+-				{ !! title && (
+-					<h2 className="components-panel__body-title">
+-						<Button
+-							className="components-panel__body-toggle"
+-							onClick={ this.toggle }
+-							aria-expanded={ isOpened }
+-						>
+-							{ /*
+-								Firefox + NVDA don't announce aria-expanded because the browser
+-								repaints the whole element, so this wrapping span hides that.
+-							*/ }
+-							<span aria-hidden="true">
+-								<Icon
+-									className="components-panel__arrow"
+-									icon={ isOpened ? chevronUp : chevronDown }
+-								/>
+-							</span>
+-							{ title }
+-							{ icon && (
+-								<Icon
+-									icon={ icon }
+-									className="components-panel__icon"
+-									size={ 20 }
+-								/>
+-							) }
+-						</Button>
+-					</h2>
+-				) }
+-				{ isOpened && children }
+-			</div>
++			<h2 className="components-panel__body-title">
++				<Button
++					className="components-panel__body-toggle"
++					ref={ ref }
++					{ ...props }
++				>
++					{ /*
++					Firefox + NVDA don't announce aria-expanded because the browser
++					repaints the whole element, so this wrapping span hides that.
++				*/ }
++					<span aria-hidden="true">
++						<Icon
++							className="components-panel__arrow"
++							icon={ isOpened ? chevronUp : chevronDown }
++						/>
++					</span>
++					{ title }
++					{ icon && (
++						<Icon
++							icon={ icon }
++							className="components-panel__icon"
++							size={ 20 }
++						/>
++					) }
++				</Button>
++			</h2>
+ 		);
+ 	}
+-}
++);
+ 
+-const forwardedPanelBody = ( props, ref ) => {
+-	return <PanelBody { ...props } forwardedRef={ ref } />;
+-};
+-forwardedPanelBody.displayName = 'PanelBody';
++const ForwardedComponent = forwardRef( PanelBody );
++ForwardedComponent.displayName = 'PanelBody';
+ 
+-export default forwardRef( forwardedPanelBody );
++export default ForwardedComponent;
+diff --git a/packages/components/src/panel/stories/index.js b/packages/components/src/panel/stories/index.js
+index 10c9a163f45494..778140694c9e88 100644
+--- a/packages/components/src/panel/stories/index.js
++++ b/packages/components/src/panel/stories/index.js
+@@ -26,21 +26,31 @@ export const _default = () => {
+ };
+ 
+ export const multipleBodies = () => {
+-	const body1Title = text( '1: Body Title', 'First Settings' );
+-	const body2Title = text( '2: Body Title', 'Second Settings' );
+-	const body1Open = boolean( '1: Opened', true );
+-	const body2Open = boolean( '2: Opened', false );
+-	const row1Text = text( '1: Row Text', 'My Panel Inputs and Labels' );
+-	const row2Text = text( '2: Row Text', 'My Panel Inputs and Labels' );
+ 	return (
+-		<Panel header="My Panel">
+-			<PanelBody title={ body1Title } opened={ body1Open }>
+-				<PanelRow>{ row1Text }</PanelRow>
+-			</PanelBody>
+-			<PanelBody title={ body2Title } opened={ body2Open }>
+-				<PanelRow>{ row2Text }</PanelRow>
+-			</PanelBody>
+-		</Panel>
++		<ScrollableContainer>
++			<Panel header="My Panel">
++				<PanelBody title="First Settings">
++					<PanelRow>
++						<Placeholder height={ 250 } />
++					</PanelRow>
++				</PanelBody>
++				<PanelBody title="Second Settings" initialOpen={ false }>
++					<PanelRow>
++						<Placeholder height={ 400 } />
++					</PanelRow>
++				</PanelBody>
++				<PanelBody title="Third Settings" initialOpen={ false }>
++					<PanelRow>
++						<Placeholder height={ 600 } />
++					</PanelRow>
++				</PanelBody>
++				<PanelBody title="Fourth Settings" initialOpen={ false }>
++					<PanelRow>
++						<Placeholder />
++					</PanelRow>
++				</PanelBody>
++			</Panel>
++		</ScrollableContainer>
+ 	);
+ };
+ 
+@@ -57,3 +67,23 @@ export const withIcon = () => {
+ 		</Panel>
+ 	);
+ };
++
++function ScrollableContainer( { children } ) {
++	return (
++		<div
++			style={ {
++				width: 300,
++				height: '100vh',
++				overflowY: 'auto',
++				margin: 'auto',
++				boxShadow: '0 0 0 1px #ddd inset',
++			} }
++		>
++			{ children }
++		</div>
++	);
++}
++
++function Placeholder( { height = 200 } ) {
++	return <div style={ { background: '#ddd', height, width: '100%' } } />;
++}
+diff --git a/packages/components/src/panel/test/body.js b/packages/components/src/panel/test/body.js
+index a3aa620432217f..bf3f2860ec6ceb 100644
+--- a/packages/components/src/panel/test/body.js
++++ b/packages/components/src/panel/test/body.js
+@@ -1,97 +1,118 @@
+ /**
+  * External dependencies
+  */
+-import { shallow, mount } from 'enzyme';
++import { render, fireEvent } from '@testing-library/react';
+ 
+ /**
+  * Internal dependencies
+  */
+ import { PanelBody } from '../body';
+ 
++const getPanelBody = ( container ) =>
++	container.querySelector( '.components-panel__body' );
++const getPanelBodyContent = ( container ) =>
++	container.querySelector( '.components-panel__body > div' );
++const getPanelToggle = ( container ) =>
++	container.querySelector( '.components-panel__body-toggle' );
++
+ describe( 'PanelBody', () => {
+ 	describe( 'basic rendering', () => {
+ 		it( 'should render an empty div with the matching className', () => {
+-			const panelBody = shallow( <PanelBody /> );
+-			expect( panelBody.hasClass( 'components-panel__body' ) ).toBe(
+-				true
+-			);
+-			expect( panelBody.type() ).toBe( 'div' );
+-		} );
++			const { container } = render( <PanelBody /> );
++			const panelBody = getPanelBody( container );
+ 
+-		it( 'should render an Button matching the following props and state', () => {
+-			const panelBody = shallow( <PanelBody title="Some Text" /> );
+-			const button = panelBody.find( '.components-panel__body-toggle' );
+-			expect( panelBody.hasClass( 'is-opened' ) ).toBe( true );
+-			expect( panelBody.state( 'opened' ) ).toBe( true );
+-			expect( button.prop( 'onClick' ) ).toBe(
+-				panelBody.instance().toggle
+-			);
+-			expect( button.childAt( 0 ).name() ).toBe( 'span' );
+-			expect( button.childAt( 0 ).childAt( 0 ).name() ).toBe( 'Icon' );
+-			expect( button.childAt( 1 ).text() ).toBe( 'Some Text' );
++			expect( panelBody ).toBeTruthy();
++			expect( panelBody.tagName ).toBe( 'DIV' );
+ 		} );
+ 
+-		it( 'should change state and class when sidebar is closed', () => {
+-			const panelBody = shallow(
+-				<PanelBody title="Some Text" initialOpen={ false } />
++		it( 'should render inner content, if opened', () => {
++			const { container } = render(
++				<PanelBody opened={ true }>
++					<div className="inner-content">Content</div>
++				</PanelBody>
+ 			);
+-			expect( panelBody.state( 'opened' ) ).toBe( false );
+-			expect( panelBody.hasClass( 'is-opened' ) ).toBe( false );
++			const panelContent = getPanelBodyContent( container );
++
++			expect( panelContent ).toBeTruthy();
+ 		} );
+ 
+-		it( 'should use the "opened" prop instead of state if provided', () => {
+-			const panelBody = shallow(
+-				<PanelBody
+-					title="Some Text"
+-					opened={ true }
+-					initialOpen={ false }
+-				/>
++		it( 'should be opened by default', () => {
++			const { container } = render(
++				<PanelBody>
++					<div>Content</div>
++				</PanelBody>
+ 			);
+-			expect( panelBody.state( 'opened' ) ).toBe( false );
+-			expect( panelBody.hasClass( 'is-opened' ) ).toBe( true );
+-		} );
++			const panelContent = getPanelBodyContent( container );
+ 
+-		it( 'should render child elements within PanelBody element', () => {
+-			const panelBody = shallow( <PanelBody children="Some Text" /> );
+-			expect( panelBody.instance().props.children ).toBe( 'Some Text' );
+-			expect( panelBody.text() ).toBe( 'Some Text' );
++			expect( panelContent ).toBeTruthy();
+ 		} );
+ 
+-		it( 'should pass children prop but not render when sidebar is closed', () => {
+-			const panelBody = shallow(
+-				<PanelBody children="Some Text" initialOpen={ false } />
++		it( 'should render as initially opened, if specified', () => {
++			const { container } = render(
++				<PanelBody initialOpen={ true }>
++					<div>Content</div>
++				</PanelBody>
+ 			);
+-			expect( panelBody.instance().props.children ).toBe( 'Some Text' );
+-			// Text should be empty even though props.children is set.
+-			expect( panelBody.text() ).toBe( '' );
++			const panelContent = getPanelBodyContent( container );
++
++			expect( panelContent ).toBeTruthy();
+ 		} );
+ 	} );
+ 
+-	describe( 'mounting behavior', () => {
+-		it( 'should mount with a default of being opened', () => {
+-			const panelBody = mount( <PanelBody /> );
+-			expect( panelBody.state( 'opened' ) ).toBe( true );
+-		} );
++	describe( 'toggling', () => {
++		it( 'should toggle collapse with opened prop', () => {
++			const { container, rerender } = render(
++				<PanelBody opened={ true }>
++					<div>Content</div>
++				</PanelBody>
++			);
++			let panelContent = getPanelBodyContent( container );
+ 
+-		it( 'should mount with a state of not opened when initialOpen set to false', () => {
+-			const panelBody = mount( <PanelBody initialOpen={ false } /> );
+-			expect( panelBody.state( 'opened' ) ).toBe( false );
+-		} );
+-	} );
++			expect( panelContent ).toBeTruthy();
++
++			rerender(
++				<PanelBody opened={ false }>
++					<div>Content</div>
++				</PanelBody>
++			);
+ 
+-	describe( 'toggling behavior', () => {
+-		const fakeEvent = { preventDefault: () => undefined };
++			panelContent = getPanelBodyContent( container );
+ 
+-		it( 'should set the opened state to false when a toggle fires', () => {
+-			const panelBody = mount( <PanelBody /> );
+-			panelBody.instance().toggle( fakeEvent );
+-			expect( panelBody.state( 'opened' ) ).toBe( false );
++			expect( panelContent ).toBeFalsy();
++
++			rerender(
++				<PanelBody opened={ true }>
++					<div>Content</div>
++				</PanelBody>
++			);
++
++			panelContent = getPanelBodyContent( container );
++
++			expect( panelContent ).toBeTruthy();
+ 		} );
+ 
+-		it( 'should set the opened state to true when a toggle fires on a closed state', () => {
+-			const panelBody = mount( <PanelBody initialOpen={ false } /> );
+-			panelBody.instance().toggle( fakeEvent );
+-			expect( panelBody.state( 'opened' ) ).toBe( true );
++		it( 'should toggle when clicking header', () => {
++			const { container } = render(
++				<PanelBody title="Panel" initialOpen={ false }>
++					<div>Content</div>
++				</PanelBody>
++			);
++			let panelContent = getPanelBodyContent( container );
++			const panelToggle = getPanelToggle( container );
++
++			expect( panelContent ).toBeFalsy();
++
++			fireEvent.click( panelToggle );
++
++			panelContent = getPanelBodyContent( container );
++
++			expect( panelContent ).toBeTruthy();
++
++			fireEvent.click( panelToggle );
++
++			panelContent = getPanelBodyContent( container );
++
++			expect( panelContent ).toBeFalsy();
+ 		} );
+ 	} );
+ } );
+diff --git a/packages/components/src/utils/index.js b/packages/components/src/utils/index.js
+new file mode 100644
+index 00000000000000..b903874d95f32a
+--- /dev/null
++++ b/packages/components/src/utils/index.js
+@@ -0,0 +1,3 @@
++export * from './hooks';
++export * from './style-mixins';
++export * from './use-update-effect';
+diff --git a/packages/components/src/utils/use-update-effect.js b/packages/components/src/utils/use-update-effect.js
+new file mode 100644
+index 00000000000000..c7dfab9452daef
+--- /dev/null
++++ b/packages/components/src/utils/use-update-effect.js
+@@ -0,0 +1,21 @@
++/**
++ * WordPress dependencies
++ */
++import { useRef, useEffect } from '@wordpress/element';
++
++/*
++ * A `React.useEffect` that will not run on the first render.
++ * Source:
++ * https://github.com/reakit/reakit/blob/master/packages/reakit-utils/src/useUpdateEffect.ts
++ */
++export function useUpdateEffect( effect, deps ) {
++	const mounted = useRef( false );
++
++	useEffect( () => {
++		if ( mounted.current ) {
++			return effect();
++		}
++		mounted.current = true;
++		return undefined;
++	}, deps );
++}
+diff --git a/packages/edit-post/src/components/layout/style.scss b/packages/edit-post/src/components/layout/style.scss
+index f9450581e4418b..741f4d095de894 100644
+--- a/packages/edit-post/src/components/layout/style.scss
++++ b/packages/edit-post/src/components/layout/style.scss
+@@ -59,6 +59,7 @@
+ 
+ .interface-interface-skeleton__sidebar > div {
+ 	height: 100%;
++	padding-bottom: $grid-unit-60;
+ }
+ 
+ .edit-post-layout .editor-post-publish-panel__header-publish-button {
+diff --git a/packages/edit-post/src/components/sidebar/plugin-post-publish-panel/test/__snapshots__/index.js.snap b/packages/edit-post/src/components/sidebar/plugin-post-publish-panel/test/__snapshots__/index.js.snap
+index aafa7c918f1795..a7eb099d379a51 100644
+--- a/packages/edit-post/src/components/sidebar/plugin-post-publish-panel/test/__snapshots__/index.js.snap
++++ b/packages/edit-post/src/components/sidebar/plugin-post-publish-panel/test/__snapshots__/index.js.snap
+@@ -1,3 +1,3 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`PluginPostPublishPanel renders fill properly 1`] = `"<div class=\\"components-panel__body my-plugin-post-publish-panel is-opened\\"><h2 class=\\"components-panel__body-title\\"><button type=\\"button\\" aria-expanded=\\"true\\" class=\\"components-button components-panel__body-toggle\\"><span aria-hidden=\\"true\\"><svg width=\\"24\\" height=\\"24\\" viewBox=\\"0 0 24 24\\" xmlns=\\"http://www.w3.org/2000/svg\\" class=\\"components-panel__arrow\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M12 8l-6 5.4 1 1.2 5-4.6 5 4.6 1-1.2z\\"></path></svg></span>My panel title</button></h2>My panel content</div>"`;
++exports[`PluginPostPublishPanel renders fill properly 1`] = `"<div class=\\"components-panel__body my-plugin-post-publish-panel is-opened\\"><h2 class=\\"components-panel__body-title\\"><button type=\\"button\\" class=\\"components-button components-panel__body-toggle\\"><span aria-hidden=\\"true\\"><svg width=\\"24\\" height=\\"24\\" viewBox=\\"0 0 24 24\\" xmlns=\\"http://www.w3.org/2000/svg\\" class=\\"components-panel__arrow\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M12 8l-6 5.4 1 1.2 5-4.6 5 4.6 1-1.2z\\"></path></svg></span>My panel title</button></h2>My panel content</div>"`;
+diff --git a/packages/edit-post/src/components/sidebar/plugin-pre-publish-panel/test/__snapshots__/index.js.snap b/packages/edit-post/src/components/sidebar/plugin-pre-publish-panel/test/__snapshots__/index.js.snap
+index 6087ec62497e5c..f065917b0ee8a3 100644
+--- a/packages/edit-post/src/components/sidebar/plugin-pre-publish-panel/test/__snapshots__/index.js.snap
++++ b/packages/edit-post/src/components/sidebar/plugin-pre-publish-panel/test/__snapshots__/index.js.snap
+@@ -1,3 +1,3 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`PluginPrePublishPanel renders fill properly 1`] = `"<div class=\\"components-panel__body my-plugin-pre-publish-panel is-opened\\"><h2 class=\\"components-panel__body-title\\"><button type=\\"button\\" aria-expanded=\\"true\\" class=\\"components-button components-panel__body-toggle\\"><span aria-hidden=\\"true\\"><svg width=\\"24\\" height=\\"24\\" viewBox=\\"0 0 24 24\\" xmlns=\\"http://www.w3.org/2000/svg\\" class=\\"components-panel__arrow\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M12 8l-6 5.4 1 1.2 5-4.6 5 4.6 1-1.2z\\"></path></svg></span>My panel title</button></h2>My panel content</div>"`;
++exports[`PluginPrePublishPanel renders fill properly 1`] = `"<div class=\\"components-panel__body my-plugin-pre-publish-panel is-opened\\"><h2 class=\\"components-panel__body-title\\"><button type=\\"button\\" class=\\"components-button components-panel__body-toggle\\"><span aria-hidden=\\"true\\"><svg width=\\"24\\" height=\\"24\\" viewBox=\\"0 0 24 24\\" xmlns=\\"http://www.w3.org/2000/svg\\" class=\\"components-panel__arrow\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M12 8l-6 5.4 1 1.2 5-4.6 5 4.6 1-1.2z\\"></path></svg></span>My panel title</button></h2>My panel content</div>"`;

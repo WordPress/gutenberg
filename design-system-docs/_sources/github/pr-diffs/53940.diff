@@ -1,0 +1,256 @@
+diff --git a/docs/how-to-guides/platform/custom-block-editor.md b/docs/how-to-guides/platform/custom-block-editor.md
+index 800061dba62b7a..242eccf4605630 100644
+--- a/docs/how-to-guides/platform/custom-block-editor.md
++++ b/docs/how-to-guides/platform/custom-block-editor.md
+@@ -278,16 +278,14 @@ With these components available, you can define the `<Editor>` component.
+ 
+ function Editor( { settings } ) {
+ 	return (
+-		<SlotFillProvider>
+-			<DropZoneProvider>
+-				<div className="getdavesbe-block-editor-layout">
+-					<Notices />
+-					<Header />
+-					<Sidebar />
+-					<BlockEditor settings={ settings } />
+-				</div>
+-			</DropZoneProvider>
+-		</SlotFillProvider>
++		<DropZoneProvider>
++			<div className="getdavesbe-block-editor-layout">
++				<Notices />
++				<Header />
++				<Sidebar />
++				<BlockEditor settings={ settings } />
++			</div>
++		</DropZoneProvider>
+ 	);
+ }
+ ```
+@@ -296,8 +294,6 @@ In this process, the core of the editor's layout is being scaffolded, along with
+ 
+ Let's examine these in more detail:
+ 
+--   `<SlotFillProvider>` – Enables the use of the ["Slot/Fill"
+-    pattern](/docs/reference-guides/slotfills/README.md) through the component tree
+ -   `<DropZoneProvider>` – Enables the use of [dropzones for drag and drop functionality](https://github.com/WordPress/gutenberg/tree/e38dbe958c04d8089695eb686d4f5caff2707505/packages/components/src/drop-zone)
+ -   `<Notices>` – Provides a "snack bar" Notice that will be rendered if any messages are dispatched to the `core/notices` store
+ -   `<Header>` – Renders the static title "Standalone Block Editor" at the top of the editor UI
+diff --git a/packages/block-editor/README.md b/packages/block-editor/README.md
+index 6dc568d8b81ec7..add11b1b9b2a53 100644
+--- a/packages/block-editor/README.md
++++ b/packages/block-editor/README.md
+@@ -21,7 +21,6 @@ import {
+ 	BlockTools,
+ 	WritingFlow,
+ } from '@wordpress/block-editor';
+-import { SlotFillProvider, Popover } from '@wordpress/components';
+ import { useState } from '@wordpress/element';
+ 
+ function MyEditorComponent() {
+@@ -33,13 +32,11 @@ function MyEditorComponent() {
+ 			onInput={ ( blocks ) => updateBlocks( blocks ) }
+ 			onChange={ ( blocks ) => updateBlocks( blocks ) }
+ 		>
+-			<SlotFillProvider>
+-				<BlockTools>
+-					<WritingFlow>
+-						<BlockList />
+-					</WritingFlow>
+-				</BlockTools>
+-			</SlotFillProvider>
++			<BlockTools>
++				<WritingFlow>
++					<BlockList />
++				</WritingFlow>
++			</BlockTools>
+ 		</BlockEditorProvider>
+ 	);
+ }
+diff --git a/packages/block-editor/src/components/provider/index.js b/packages/block-editor/src/components/provider/index.js
+index 57cc34b44bfea4..0fa3f042053d08 100644
+--- a/packages/block-editor/src/components/provider/index.js
++++ b/packages/block-editor/src/components/provider/index.js
+@@ -3,6 +3,7 @@
+  */
+ import { useDispatch } from '@wordpress/data';
+ import { useEffect } from '@wordpress/element';
++import { SlotFillProvider } from '@wordpress/components';
+ 
+ /**
+  * Internal dependencies
+@@ -44,10 +45,10 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
+ 		useBlockSync( props );
+ 
+ 		return (
+-			<>
++			<SlotFillProvider>
+ 				<KeyboardShortcuts.Register />
+ 				<BlockRefsProvider>{ children }</BlockRefsProvider>
+-			</>
++			</SlotFillProvider>
+ 		);
+ 	}
+ );
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index dd61df85de6544..4017491e46de67 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   Make the `Popover.Slot` optional and render popovers at the bottom of the document's body by default. ([#53889](https://github.com/WordPress/gutenberg/pull/53889)).
+ -   `ProgressBar`: Add transition to determinate indicator ([#53877](https://github.com/WordPress/gutenberg/pull/53877)).
++-   Prevent nested `SlotFillProvider` from rendering ([#53940](https://github.com/WordPress/gutenberg/pull/53940)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.js b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.js
+index cd1576fd19c3ac..e3c6652f22e94e 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.js
++++ b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.js
+@@ -22,6 +22,9 @@ const SlotFillContext = createContext( {
+ 	unregisterSlot: () => {},
+ 	registerFill: () => {},
+ 	unregisterFill: () => {},
++
++	// This helps the provider know if it's using the default context value or not.
++	isDefault: true,
+ } );
+ 
+ export default SlotFillContext;
+diff --git a/packages/components/src/slot-fill/index.js b/packages/components/src/slot-fill/index.js
+index 8deaa180492a7f..34216fd347c053 100644
+--- a/packages/components/src/slot-fill/index.js
++++ b/packages/components/src/slot-fill/index.js
+@@ -2,7 +2,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { forwardRef } from '@wordpress/element';
++import { forwardRef, useContext } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -13,6 +13,7 @@ import BubblesVirtuallyFill from './bubbles-virtually/fill';
+ import BubblesVirtuallySlot from './bubbles-virtually/slot';
+ import BubblesVirtuallySlotFillProvider from './bubbles-virtually/slot-fill-provider';
+ import SlotFillProvider from './provider';
++import SlotFillContext from './bubbles-virtually/slot-fill-context';
+ export { default as useSlot } from './bubbles-virtually/use-slot';
+ export { default as useSlotFills } from './bubbles-virtually/use-slot-fills';
+ 
+@@ -35,6 +36,10 @@ export const Slot = forwardRef( ( { bubblesVirtually, ...props }, ref ) => {
+ } );
+ 
+ export function Provider( { children, ...props } ) {
++	const parent = useContext( SlotFillContext );
++	if ( ! parent.isDefault ) {
++		return children;
++	}
+ 	return (
+ 		<SlotFillProvider { ...props }>
+ 			<BubblesVirtuallySlotFillProvider>
+diff --git a/storybook/stories/playground/index.story.js b/storybook/stories/playground/index.story.js
+index 5952bc534d9666..380a95f4b79a99 100644
+--- a/storybook/stories/playground/index.story.js
++++ b/storybook/stories/playground/index.story.js
+@@ -9,7 +9,6 @@ import {
+ 	BlockInspector,
+ 	WritingFlow,
+ } from '@wordpress/block-editor';
+-import { SlotFillProvider } from '@wordpress/components';
+ import { registerCoreBlocks } from '@wordpress/block-library';
+ import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
+ import '@wordpress/format-library';
+@@ -37,26 +36,24 @@ function App() {
+ 	return (
+ 		<div className="playground">
+ 			<ShortcutProvider>
+-				<SlotFillProvider>
+-					<BlockEditorProvider
+-						value={ blocks }
+-						onInput={ updateBlocks }
+-						onChange={ updateBlocks }
+-					>
+-						<div className="playground__sidebar">
+-							<BlockInspector />
+-						</div>
+-						<div className="playground__content">
+-							<BlockTools>
+-								<div className="editor-styles-wrapper">
+-									<WritingFlow>
+-										<BlockList />
+-									</WritingFlow>
+-								</div>
+-							</BlockTools>
+-						</div>
+-					</BlockEditorProvider>
+-				</SlotFillProvider>
++				<BlockEditorProvider
++					value={ blocks }
++					onInput={ updateBlocks }
++					onChange={ updateBlocks }
++				>
++					<div className="playground__sidebar">
++						<BlockInspector />
++					</div>
++					<div className="playground__content">
++						<BlockTools>
++							<div className="editor-styles-wrapper">
++								<WritingFlow>
++									<BlockList />
++								</WritingFlow>
++							</div>
++						</BlockTools>
++					</div>
++				</BlockEditorProvider>
+ 			</ShortcutProvider>
+ 		</div>
+ 	);
+diff --git a/test/integration/helpers/integration-test-editor.js b/test/integration/helpers/integration-test-editor.js
+index 58229c19ba0256..7c2fba15060b45 100644
+--- a/test/integration/helpers/integration-test-editor.js
++++ b/test/integration/helpers/integration-test-editor.js
+@@ -15,7 +15,6 @@ import {
+ 	BlockInspector,
+ 	WritingFlow,
+ } from '@wordpress/block-editor';
+-import { SlotFillProvider } from '@wordpress/components';
+ import { registerCoreBlocks } from '@wordpress/block-library';
+ import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
+ import '@wordpress/format-library';
+@@ -68,21 +67,19 @@ export function Editor( { testBlocks, settings = {} } ) {
+ 
+ 	return (
+ 		<ShortcutProvider>
+-			<SlotFillProvider>
+-				<BlockEditorProvider
+-					value={ currentBlocks }
+-					onInput={ updateBlocks }
+-					onChange={ updateBlocks }
+-					settings={ settings }
+-				>
+-					<BlockInspector />
+-					<BlockTools>
+-						<WritingFlow>
+-							<BlockList />
+-						</WritingFlow>
+-					</BlockTools>
+-				</BlockEditorProvider>
+-			</SlotFillProvider>
++			<BlockEditorProvider
++				value={ currentBlocks }
++				onInput={ updateBlocks }
++				onChange={ updateBlocks }
++				settings={ settings }
++			>
++				<BlockInspector />
++				<BlockTools>
++					<WritingFlow>
++						<BlockList />
++					</WritingFlow>
++				</BlockTools>
++			</BlockEditorProvider>
+ 		</ShortcutProvider>
+ 	);
+ }

@@ -1,0 +1,460 @@
+diff --git a/docs/getting-started/fundamentals/block-in-the-editor.md b/docs/getting-started/fundamentals/block-in-the-editor.md
+index d1f2a25063e6c6..1d51239907d8b5 100644
+--- a/docs/getting-started/fundamentals/block-in-the-editor.md
++++ b/docs/getting-started/fundamentals/block-in-the-editor.md
+@@ -139,6 +139,8 @@ export default function Edit( { attributes, setAttributes } ) {
+ 				</div>
+ 			</InspectorControls>
+ 			<TextControl
++				__nextHasNoMarginBottom
++				__next40pxDefaultSize
+ 				value={ attributes.message }
+ 				onChange={ ( val ) => setAttributes( { message: val } ) }
+ 				style={ {
+diff --git a/docs/getting-started/tutorial.md b/docs/getting-started/tutorial.md
+index 4e43241f63fb16..2a5dd979d3a569 100644
+--- a/docs/getting-started/tutorial.md
++++ b/docs/getting-started/tutorial.md
+@@ -480,6 +480,8 @@ export default function Edit( { attributes, setAttributes } ) {
+ 			<InspectorControls>
+ 				<PanelBody title={ __( 'Settings', 'copyright-date-block' ) }>
+ 					<TextControl
++					    __nextHasNoMarginBottom
++						__next40pxDefaultSize
+ 						label={ __(
+ 							'Starting year',
+ 							'copyright-date-block'
+@@ -540,6 +542,8 @@ export default function Edit( { attributes, setAttributes } ) {
+ 					/>
+ 					{ showStartingYear && (
+ 						<TextControl
++							__nextHasNoMarginBottom
++							__next40pxDefaultSize
+ 							label={ __(
+ 								'Starting year',
+ 								'copyright-date-block'
+diff --git a/docs/how-to-guides/data-basics/3-building-an-edit-form.md b/docs/how-to-guides/data-basics/3-building-an-edit-form.md
+index 5f4e30357798d5..1e2b4453e59ee2 100644
+--- a/docs/how-to-guides/data-basics/3-building-an-edit-form.md
++++ b/docs/how-to-guides/data-basics/3-building-an-edit-form.md
+@@ -63,6 +63,8 @@ function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
+ 	return (
+ 		<div className="my-gutenberg-form">
+ 			<TextControl
++				__nextHasNoMarginBottom
++				__next40pxDefaultSize
+ 				value=''
+ 				label='Page title:'
+ 			/>
+@@ -139,6 +141,8 @@ function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
+ 	return (
+ 		<div className="my-gutenberg-form">
+ 			<TextControl
++				__nextHasNoMarginBottom
++				__next40pxDefaultSize
+ 				label='Page title:'
+ 				value={ page.title.rendered }
+ 			/>
+@@ -164,6 +168,8 @@ function VanillaReactForm({ initialTitle }) {
+ 	const [title, setTitle] = useState( initialTitle );
+ 	return (
+ 		<TextControl
++			__nextHasNoMarginBottom
++			__next40pxDefaultSize
+ 			value={ title }
+ 			onChange={ setTitle }
+ 		/>
+@@ -233,6 +239,8 @@ function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
+ 	return (
+ 		<div className="my-gutenberg-form">
+ 			<TextControl
++				__nextHasNoMarginBottom
++				__next40pxDefaultSize
+ 				label="Page title:"
+ 				value={ page.title }
+ 				onChange={ handleChange }
+@@ -501,6 +509,8 @@ function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
+ 	return (
+ 		<div className="my-gutenberg-form">
+ 			<TextControl
++				__nextHasNoMarginBottom
++				__next40pxDefaultSize
+ 				label="Page title:"
+ 				value={ page.title }
+ 				onChange={ handleChange }
+diff --git a/docs/how-to-guides/data-basics/4-building-a-create-page-form.md b/docs/how-to-guides/data-basics/4-building-a-create-page-form.md
+index 9011596e0feddd..c880a1a3897488 100644
+--- a/docs/how-to-guides/data-basics/4-building-a-create-page-form.md
++++ b/docs/how-to-guides/data-basics/4-building-a-create-page-form.md
+@@ -87,6 +87,8 @@ function PageForm( { title, onChangeTitle, hasEdits, lastError, isSaving, onCanc
+ 	return (
+ 		<div className="my-gutenberg-form">
+ 			<TextControl
++				__nextHasNoMarginBottom
++				__next40pxDefaultSize
+ 				label="Page title:"
+ 				value={ title }
+ 				onChange={ onChangeTitle }
+@@ -346,6 +348,8 @@ function PageForm( { title, onChangeTitle, hasEdits, lastError, isSaving, onCanc
+ 	return (
+ 		<div className="my-gutenberg-form">
+ 			<TextControl
++				__nextHasNoMarginBottom
++				__next40pxDefaultSize
+ 				label="Page title:"
+ 				value={ title }
+ 				onChange={ onChangeTitle }
+diff --git a/docs/how-to-guides/metabox.md b/docs/how-to-guides/metabox.md
+index da37b8fba3b7c1..707505d165c7fa 100644
+--- a/docs/how-to-guides/metabox.md
++++ b/docs/how-to-guides/metabox.md
+@@ -91,6 +91,8 @@ registerBlockType( 'myguten/meta-block', {
+ 		return (
+ 			<div { ...blockProps }>
+ 				<TextControl
++					__nextHasNoMarginBottom
++					__next40pxDefaultSize				
+ 					label="Meta Block Field"
+ 					value={ metaFieldValue }
+ 					onChange={ updateMetaValue }
+diff --git a/docs/reference-guides/block-api/block-context.md b/docs/reference-guides/block-api/block-context.md
+index 09c33dfb71b7c3..c5fcfaedbae349 100644
+--- a/docs/reference-guides/block-api/block-context.md
++++ b/docs/reference-guides/block-api/block-context.md
+@@ -141,6 +141,8 @@ export default function Edit( props ) {
+ 	return (
+ 		<div>
+ 			<TextControl
++				__nextHasNoMarginBottom
++				__next40pxDefaultSize
+ 				label={ __( 'Record ID' ) }
+ 				value={ recordId }
+ 				onChange={ ( val ) =>
+diff --git a/docs/reference-guides/block-api/block-edit-save.md b/docs/reference-guides/block-api/block-edit-save.md
+index 9e4dd3d1a916bd..86721c77e463c6 100644
+--- a/docs/reference-guides/block-api/block-edit-save.md
++++ b/docs/reference-guides/block-api/block-edit-save.md
+@@ -210,6 +210,8 @@ edit: ( { attributes, setAttributes } ) => {
+ 	return (
+ 		<div { ...blockProps }>
+ 			<TextControl
++				__nextHasNoMarginBottom
++				__next40pxDefaultSize
+ 				label='My Text Field'
+ 				value={ attributes.content }
+ 				onChange={ updateFieldValue }
+@@ -246,6 +248,8 @@ edit: ( { attributes, setAttributes } ) => {
+ 	return (
+ 		<div { ...blockProps }>
+ 			<TextControl
++				__nextHasNoMarginBottom
++				__next40pxDefaultSize
+ 				label='Number Posts to Show'
+ 				value={ attributes.postsToShow }
+ 				onChange={ ( val ) => {
+diff --git a/docs/reference-guides/slotfills/plugin-sidebar-more-menu-item.md b/docs/reference-guides/slotfills/plugin-sidebar-more-menu-item.md
+index 4a4ff98697b5f3..1a1b2540b258b9 100644
+--- a/docs/reference-guides/slotfills/plugin-sidebar-more-menu-item.md
++++ b/docs/reference-guides/slotfills/plugin-sidebar-more-menu-item.md
+@@ -45,6 +45,8 @@ const PluginSidebarMoreMenuItemTest = () => {
+ 						) }
+ 					</p>
+ 					<TextControl
++						__nextHasNoMarginBottom
++						__next40pxDefaultSize
+ 						label={ __( 'Text Control' ) }
+ 						value={ text }
+ 						onChange={ ( newText ) => setText( newText ) }
+diff --git a/docs/reference-guides/slotfills/plugin-sidebar.md b/docs/reference-guides/slotfills/plugin-sidebar.md
+index 9bf911b3bb13f2..7191b80e54e2d6 100644
+--- a/docs/reference-guides/slotfills/plugin-sidebar.md
++++ b/docs/reference-guides/slotfills/plugin-sidebar.md
+@@ -38,6 +38,8 @@ const PluginSidebarExample = () => {
+ 					) }
+ 				</p>
+ 				<TextControl
++					__nextHasNoMarginBottom
++					__next40pxDefaultSize
+ 					label={ __( 'Text Control' ) }
+ 					value={ text }
+ 					onChange={ ( newText ) => setText( newText ) }
+diff --git a/packages/block-editor/src/components/inspector-controls/README.md b/packages/block-editor/src/components/inspector-controls/README.md
+index fd4847f53472b2..916f53b5f42d8b 100644
+--- a/packages/block-editor/src/components/inspector-controls/README.md
++++ b/packages/block-editor/src/components/inspector-controls/README.md
+@@ -116,6 +116,7 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
+ 
+ 						<TextControl
+ 							__nextHasNoMarginBottom
++							__next40pxDefaultSize
+ 							label="Text Field"
+ 							help="Additional help text"
+ 							value={ textField }
+@@ -208,6 +209,7 @@ function MyBlockEdit( { attributes, setAttributes } ) {
+ 			<InspectorAdvancedControls>
+ 				<TextControl
+ 					__nextHasNoMarginBottom
++					__next40pxDefaultSize
+ 					label="HTML anchor"
+ 					value={ attributes.anchor }
+ 					onChange={ ( nextValue ) => {
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0eb5052c748f10..d7381c7dc57695 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `Radio`: Deprecate 36px default size ([#66572](https://github.com/WordPress/gutenberg/pull/66572)).
+ -   `DimensionControl`: Deprecate 36px default size ([#66705](https://github.com/WordPress/gutenberg/pull/66705)).
++-   `TextControl`: Deprecate 36px default size ([#66745](https://github.com/WordPress/gutenberg/pull/66745).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/src/disabled/README.md b/packages/components/src/disabled/README.md
+index 9b257acd0f737b..e9eb6398554d9d 100644
+--- a/packages/components/src/disabled/README.md
++++ b/packages/components/src/disabled/README.md
+@@ -13,7 +13,14 @@ import { Button, Disabled, TextControl } from '@wordpress/components';
+ const MyDisabled = () => {
+ 	const [ isDisabled, setIsDisabled ] = useState( true );
+ 
+-	let input = <TextControl label="Input" onChange={ () => {} } />;
++	let input = (
++		<TextControl
++			__next40pxDefaultSize
++			__nextHasNoMarginBottom
++			label="Input"
++			onChange={ () => {} }
++		/>
++	);
+ 	if ( isDisabled ) {
+ 		input = <Disabled>{ input }</Disabled>;
+ 	}
+@@ -38,12 +45,7 @@ A component can detect if it has been wrapped in a `<Disabled />` by accessing i
+ ```jsx
+ function CustomButton( props ) {
+ 	const isDisabled = useContext( Disabled.Context );
+-	return (
+-		<button
+-			{ ...props }
+-			style={ { opacity: isDisabled ? 0.5 : 1 } }
+-		/>
+-	);
++	return <button { ...props } style={ { opacity: isDisabled ? 0.5 : 1 } } />;
+ }
+ ```
+ 
+diff --git a/packages/components/src/disabled/index.tsx b/packages/components/src/disabled/index.tsx
+index 32baac3411054c..cc55a4d2e6d672 100644
+--- a/packages/components/src/disabled/index.tsx
++++ b/packages/components/src/disabled/index.tsx
+@@ -31,7 +31,14 @@ const { Consumer, Provider } = Context;
+  * const MyDisabled = () => {
+  * 	const [ isDisabled, setIsDisabled ] = useState( true );
+  *
+- * 	let input = <TextControl label="Input" onChange={ () => {} } />;
++ *	let input = (
++ *		<TextControl
++ *			__next40pxDefaultSize
++ *			__nextHasNoMarginBottom
++ *			label="Input"
++ *			onChange={ () => {} }
++ *		/>
++ *	);
+  * 	if ( isDisabled ) {
+  * 		input = <Disabled>{ input }</Disabled>;
+  * 	}
+diff --git a/packages/components/src/disabled/stories/index.story.tsx b/packages/components/src/disabled/stories/index.story.tsx
+index 59ff84dec43fca..29d9c925f4f5d8 100644
+--- a/packages/components/src/disabled/stories/index.story.tsx
++++ b/packages/components/src/disabled/stories/index.story.tsx
+@@ -42,6 +42,7 @@ const Form = () => {
+ 		<VStack>
+ 			<TextControl
+ 				__nextHasNoMarginBottom
++				__next40pxDefaultSize
+ 				label="Text Control"
+ 				value={ textControlValue }
+ 				onChange={ setTextControlValue }
+diff --git a/packages/components/src/higher-order/with-constrained-tabbing/README.md b/packages/components/src/higher-order/with-constrained-tabbing/README.md
+index 47cb8a033dfbdd..417ab7c133fea5 100644
+--- a/packages/components/src/higher-order/with-constrained-tabbing/README.md
++++ b/packages/components/src/higher-order/with-constrained-tabbing/README.md
+@@ -22,8 +22,18 @@ const MyComponentWithConstrainedTabbing = () => {
+ 	const [ isConstrainedTabbing, setIsConstrainedTabbing ] = useState( false );
+ 	let form = (
+ 		<form>
+-			<TextControl label="Input 1" onChange={ () => {} } />
+-			<TextControl label="Input 2" onChange={ () => {} } />
++			<TextControl
++				__next40pxDefaultSize
++				__nextHasNoMarginBottom
++				label="Input 1"
++				onChange={ () => {} }
++			/>
++			<TextControl
++				__next40pxDefaultSize
++				__nextHasNoMarginBottom
++				label="Input 2"
++				onChange={ () => {} }
++			/>
+ 		</form>
+ 	);
+ 	if ( isConstrainedTabbing ) {
+@@ -43,5 +53,5 @@ const MyComponentWithConstrainedTabbing = () => {
+ 			</Button>
+ 		</div>
+ 	);
+-}
++};
+ ```
+diff --git a/packages/components/src/higher-order/with-focus-return/README.md b/packages/components/src/higher-order/with-focus-return/README.md
+index b99d76bc6f1c9a..81cecad4310f11 100644
+--- a/packages/components/src/higher-order/with-focus-return/README.md
++++ b/packages/components/src/higher-order/with-focus-return/README.md
+@@ -13,7 +13,12 @@ import { withFocusReturn, TextControl, Button } from '@wordpress/components';
+ const EnhancedComponent = withFocusReturn( () => (
+ 	<div>
+ 		Focus will return to the previous input when this component is unmounted
+-		<TextControl autoFocus={ true } onChange={ () => {} } />
++		<TextControl
++			__nextHasNoMarginBottom
++			__next40pxDefaultSize
++			autoFocus={ true }
++			onChange={ () => {} }
++		/>
+ 	</div>
+ ) );
+ 
+@@ -27,6 +32,8 @@ const MyComponentWithFocusReturn = () => {
+ 	return (
+ 		<div>
+ 			<TextControl
++				__nextHasNoMarginBottom
++				__next40pxDefaultSize
+ 				placeholder="Type something"
+ 				value={ text }
+ 				onChange={ ( value ) => setText( value ) }
+@@ -39,7 +46,7 @@ const MyComponentWithFocusReturn = () => {
+ 			) }
+ 		</div>
+ 	);
+-}
++};
+ ```
+ 
+ `withFocusReturn` can optionally be called as a higher-order function creator. Provided an options object, a new higher-order function is returned.
+diff --git a/packages/components/src/placeholder/stories/index.story.tsx b/packages/components/src/placeholder/stories/index.story.tsx
+index 541eeceedc27d4..1a0db673320bca 100644
+--- a/packages/components/src/placeholder/stories/index.story.tsx
++++ b/packages/components/src/placeholder/stories/index.story.tsx
+@@ -45,6 +45,7 @@ const Template: StoryFn< typeof Placeholder > = ( args ) => {
+ 			<div>
+ 				<TextControl
+ 					__nextHasNoMarginBottom
++					__next40pxDefaultSize
+ 					label="Sample Field"
+ 					placeholder="Enter something here"
+ 					value={ value }
+diff --git a/packages/components/src/text-control/README.md b/packages/components/src/text-control/README.md
+index 0b6e2d4ebc684e..80f3145a4325b3 100644
+--- a/packages/components/src/text-control/README.md
++++ b/packages/components/src/text-control/README.md
+@@ -63,6 +63,7 @@ const MyTextControl = () => {
+ 	return (
+ 		<TextControl
+ 			__nextHasNoMarginBottom
++			__next40pxDefaultSize
+ 			label="Additional CSS Class"
+ 			value={ className }
+ 			onChange={ ( value ) => setClassName( value ) }
+diff --git a/packages/components/src/text-control/index.tsx b/packages/components/src/text-control/index.tsx
+index ea2d2c17bb9cf6..83881542fe7b7b 100644
+--- a/packages/components/src/text-control/index.tsx
++++ b/packages/components/src/text-control/index.tsx
+@@ -16,6 +16,7 @@ import { forwardRef } from '@wordpress/element';
+ import BaseControl from '../base-control';
+ import type { WordPressComponentProps } from '../context';
+ import type { TextControlProps } from './types';
++import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
+ 
+ function UnforwardedTextControl(
+ 	props: WordPressComponentProps< TextControlProps, 'input', false >,
+@@ -38,6 +39,12 @@ function UnforwardedTextControl(
+ 	const onChangeValue = ( event: ChangeEvent< HTMLInputElement > ) =>
+ 		onChange( event.target.value );
+ 
++	maybeWarnDeprecated36pxSize( {
++		componentName: 'TextControl',
++		size: undefined,
++		__next40pxDefaultSize,
++	} );
++
+ 	return (
+ 		<BaseControl
+ 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+@@ -77,6 +84,7 @@ function UnforwardedTextControl(
+  *   return (
+  *     <TextControl
+  *       __nextHasNoMarginBottom
++ *       __next40pxDefaultSize
+  *       label="Additional CSS Class"
+  *       value={ className }
+  *       onChange={ ( value ) => setClassName( value ) }
+diff --git a/packages/components/src/text-control/stories/index.story.tsx b/packages/components/src/text-control/stories/index.story.tsx
+index bebdb2caf75f63..948eca84a634c7 100644
+--- a/packages/components/src/text-control/stories/index.story.tsx
++++ b/packages/components/src/text-control/stories/index.story.tsx
+@@ -54,6 +54,7 @@ export const Default: StoryFn< typeof TextControl > = DefaultTemplate.bind(
+ );
+ Default.args = {
+ 	__nextHasNoMarginBottom: true,
++	__next40pxDefaultSize: true,
+ };
+ 
+ export const WithLabelAndHelpText: StoryFn< typeof TextControl > =
+diff --git a/packages/components/src/text-control/test/text-control.tsx b/packages/components/src/text-control/test/text-control.tsx
+index 19b17cae443614..7eb3a82d2fb5f5 100644
+--- a/packages/components/src/text-control/test/text-control.tsx
++++ b/packages/components/src/text-control/test/text-control.tsx
+@@ -9,7 +9,13 @@ import { render, screen } from '@testing-library/react';
+ import _TextControl from '..';
+ 
+ const TextControl = ( props: React.ComponentProps< typeof _TextControl > ) => {
+-	return <_TextControl { ...props } __nextHasNoMarginBottom />;
++	return (
++		<_TextControl
++			{ ...props }
++			__nextHasNoMarginBottom
++			__next40pxDefaultSize
++		/>
++	);
+ };
+ 
+ const noop = () => {};
+diff --git a/packages/core-data/README.md b/packages/core-data/README.md
+index 079f95ddbfc7a6..eb6980cdd4eea1 100644
+--- a/packages/core-data/README.md
++++ b/packages/core-data/README.md
+@@ -1083,6 +1083,8 @@ function PageRenameForm( { id } ) {
+ 	return (
+ 		<form onSubmit={ onRename }>
+ 			<TextControl
++				__nextHasNoMarginBottom
++				__next40pxDefaultSize
+ 				label={ __( 'Name' ) }
+ 				value={ page.editedRecord.title }
+ 				onChange={ setTitle }
+diff --git a/packages/core-data/src/hooks/use-entity-record.ts b/packages/core-data/src/hooks/use-entity-record.ts
+index 60228893e5102e..e3535f0e982ccd 100644
+--- a/packages/core-data/src/hooks/use-entity-record.ts
++++ b/packages/core-data/src/hooks/use-entity-record.ts
+@@ -126,6 +126,8 @@ const EMPTY_OBJECT = {};
+  * 	return (
+  * 		<form onSubmit={ onRename }>
+  * 			<TextControl
++ *				__nextHasNoMarginBottom
++ *				__next40pxDefaultSize
+  * 				label={ __( 'Name' ) }
+  * 				value={ page.editedRecord.title }
+  * 				onChange={ setTitle }

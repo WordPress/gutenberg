@@ -1,0 +1,95 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 129fcfbccf3a31..69fc42916364a6 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++- `DimensionControl`: Remove "experimental" designation ([#61015](https://github.com/WordPress/gutenberg/pull/61015)).
++
+ ### Enhancements
+ 
+ -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
+diff --git a/packages/components/src/dimension-control/README.md b/packages/components/src/dimension-control/README.md
+index 498322931b7ab6..46daac1d1e6a87 100644
+--- a/packages/components/src/dimension-control/README.md
++++ b/packages/components/src/dimension-control/README.md
+@@ -1,16 +1,12 @@
+ # DimensionControl
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+ `DimensionControl` is a component designed to provide a UI to control spacing and/or dimensions.
+ 
+ ## Usage
+ 
+ ```jsx
+ import { useState } from 'react';
+-import { __experimentalDimensionControl as DimensionControl } from '@wordpress/components';
++import { DimensionControl } from '@wordpress/components';
+ 
+ export default function MyCustomDimensionControl() {
+ 	const [ paddingSize, setPaddingSize ] = useState( '' );
+diff --git a/packages/components/src/dimension-control/index.tsx b/packages/components/src/dimension-control/index.tsx
+index 38ad5b2f85ccc7..3f0eabe08de198 100644
+--- a/packages/components/src/dimension-control/index.tsx
++++ b/packages/components/src/dimension-control/index.tsx
+@@ -23,7 +23,7 @@ import type { SelectControlSingleSelectionProps } from '../select-control/types'
+  * This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+  *
+  * ```jsx
+- * import { __experimentalDimensionControl as DimensionControl } from '@wordpress/components';
++ * import { DimensionControl } from '@wordpress/components';
+  * import { useState } from '@wordpress/element';
+  *
+  * export default function MyCustomDimensionControl() {
+diff --git a/packages/components/src/dimension-control/stories/index.story.tsx b/packages/components/src/dimension-control/stories/index.story.tsx
+index 1220be3d4eea1f..f8c1bb30e2f07e 100644
+--- a/packages/components/src/dimension-control/stories/index.story.tsx
++++ b/packages/components/src/dimension-control/stories/index.story.tsx
+@@ -15,7 +15,7 @@ import { desktop, tablet, mobile } from '@wordpress/icons';
+ 
+ export default {
+ 	component: DimensionControl,
+-	title: 'Components (Experimental)/DimensionControl',
++	title: 'Components/DimensionControl',
+ 	argTypes: {
+ 		onChange: { action: 'onChange' },
+ 		value: { control: { type: null } },
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index a824162cb24129..e477d85373881c 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -66,7 +66,13 @@ export { ConfirmDialog as __experimentalConfirmDialog } from './confirm-dialog';
+ export { StableCustomSelectControl as CustomSelectControl } from './custom-select-control';
+ export { default as Dashicon } from './dashicon';
+ export { default as DateTimePicker, DatePicker, TimePicker } from './date-time';
+-export { default as __experimentalDimensionControl } from './dimension-control';
++export {
++	/**
++	 * @deprecated Import `DimensionControl` instead.
++	 */
++	default as __experimentalDimensionControl,
++	DimensionControl,
++} from './dimension-control';
+ export { default as Disabled } from './disabled';
+ export { DisclosureContent as __unstableDisclosureContent } from './disclosure';
+ export { Divider as __experimentalDivider } from './divider';
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 629f06bf98edf9..bafc1c6ad3184d 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -1,6 +1,9 @@
+ <script>
+ 	( function redirectIfStoryMoved() {
+-		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation' ];
++		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [
++			'navigation',
++			'dimensioncontrol',
++		];
+ 		const REDIRECTS = [
+ 			{
+ 				from: /\/components-deprecated-/,

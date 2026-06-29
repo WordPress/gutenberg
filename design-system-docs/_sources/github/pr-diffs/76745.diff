@@ -1,0 +1,68 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index fdeea311958938..09861816dd1ae8 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `RadioControl`: Add `role="radiogroup"` to the wrapping `fieldset` element ([#76745](https://github.com/WordPress/gutenberg/pull/76745)).
+ -   `CustomGradientPicker`: Add state persistence when switching between Linear and Radial Gradient ([#76595](https://github.com/WordPress/gutenberg/pull/76595)).
+ 
+ ## 32.4.0 (2026-03-18)
+diff --git a/packages/components/src/radio-control/index.tsx b/packages/components/src/radio-control/index.tsx
+index dfad752008621b..e8f8ecaa78fbad 100644
+--- a/packages/components/src/radio-control/index.tsx
++++ b/packages/components/src/radio-control/index.tsx
+@@ -87,6 +87,7 @@ export function RadioControl(
+ 	return (
+ 		<fieldset
+ 			id={ id }
++			role="radiogroup"
+ 			className={ clsx( className, 'components-radio-control' ) }
+ 			aria-describedby={ !! help ? generateHelpId( id ) : undefined }
+ 		>
+diff --git a/packages/components/src/radio-control/test/index.tsx b/packages/components/src/radio-control/test/index.tsx
+index 46346a87b7ea16..96806b3b2e4cea 100644
+--- a/packages/components/src/radio-control/test/index.tsx
++++ b/packages/components/src/radio-control/test/index.tsx
+@@ -56,18 +56,18 @@ describe.each( [
+ 	const [ , Component ] = modeAndComponent;
+ 
+ 	describe( 'semantics and labelling', () => {
+-		it( 'should group all radios under a fieldset with an accessible label (legend)', () => {
++		it( 'should render a radiogroup with an accessible label (legend)', () => {
+ 			const onChangeSpy = jest.fn();
+ 			render(
+ 				<Component { ...defaultProps } onChange={ onChangeSpy } />
+ 			);
+ 
+ 			expect(
+-				screen.getByRole( 'group', { name: defaultProps.label } )
++				screen.getByRole( 'radiogroup', { name: defaultProps.label } )
+ 			).toBeVisible();
+ 		} );
+ 
+-		it( 'should group all radios under a fieldset with an accessible label even when the label is visually hidden', () => {
++		it( 'should render a radiogroup with an accessible label even when the label is visually hidden', () => {
+ 			const onChangeSpy = jest.fn();
+ 			render(
+ 				<Component
+@@ -78,7 +78,7 @@ describe.each( [
+ 			);
+ 
+ 			expect(
+-				screen.getByRole( 'group', { name: defaultProps.label } )
++				screen.getByRole( 'radiogroup', { name: defaultProps.label } )
+ 			).toBeVisible();
+ 		} );
+ 
+@@ -93,7 +93,7 @@ describe.each( [
+ 			);
+ 
+ 			expect(
+-				screen.getByRole( 'group', { name: defaultProps.label } )
++				screen.getByRole( 'radiogroup', { name: defaultProps.label } )
+ 			).toHaveAccessibleDescription( 'Test help text' );
+ 		} );
+ 

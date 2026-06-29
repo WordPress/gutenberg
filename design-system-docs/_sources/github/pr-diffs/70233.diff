@@ -1,0 +1,241 @@
+diff --git a/packages/components/src/toggle-control/index.tsx b/packages/components/src/toggle-control/index.tsx
+index d2ee234a9695f8..6c3fe31a7843fd 100644
+--- a/packages/components/src/toggle-control/index.tsx
++++ b/packages/components/src/toggle-control/index.tsx
+@@ -23,6 +23,7 @@ import type { ToggleControlProps } from './types';
+ import { HStack } from '../h-stack';
+ import { useCx } from '../utils';
+ import { space } from '../utils/space';
++import { VisuallyHidden } from '../visually-hidden';
+ 
+ function UnforwardedToggleControl(
+ 	{
+@@ -33,6 +34,7 @@ function UnforwardedToggleControl(
+ 		className,
+ 		onChange,
+ 		disabled,
++		hideLabelFromVision = false,
+ 	}: WordPressComponentProps< ToggleControlProps, 'input', false >,
+ 	ref: ForwardedRef< HTMLInputElement >
+ ) {
+@@ -96,15 +98,25 @@ function UnforwardedToggleControl(
+ 					disabled={ disabled }
+ 					ref={ ref }
+ 				/>
+-				<FlexBlock
+-					as="label"
+-					htmlFor={ id }
+-					className={ clsx( 'components-toggle-control__label', {
+-						'is-disabled': disabled,
+-					} ) }
+-				>
+-					{ label }
+-				</FlexBlock>
++				{ label &&
++					( hideLabelFromVision ? (
++						<VisuallyHidden as="label" htmlFor={ id }>
++							{ label }
++						</VisuallyHidden>
++					) : (
++						<FlexBlock
++							as="label"
++							htmlFor={ id }
++							className={ clsx(
++								'components-toggle-control__label',
++								{
++									'is-disabled': disabled,
++								}
++							) }
++						>
++							{ label }
++						</FlexBlock>
++					) ) }
+ 			</HStack>
+ 		</BaseControl>
+ 	);
+diff --git a/packages/components/src/toggle-control/stories/index.story.tsx b/packages/components/src/toggle-control/stories/index.story.tsx
+index 6511655810066f..3ed8aed240149b 100644
+--- a/packages/components/src/toggle-control/stories/index.story.tsx
++++ b/packages/components/src/toggle-control/stories/index.story.tsx
+@@ -22,6 +22,9 @@ const meta: Meta< typeof ToggleControl > = {
+ 		help: { control: { type: 'text' } },
+ 		label: { control: { type: 'text' } },
+ 		onChange: { action: 'onChange' },
++		hideLabelFromVision: {
++			control: { type: 'boolean' },
++		},
+ 	},
+ 	parameters: {
+ 		controls: { expanded: true },
+diff --git a/packages/components/src/toggle-control/test/index.tsx b/packages/components/src/toggle-control/test/index.tsx
+index b0eec2aca6663d..b91e537cac98a6 100644
+--- a/packages/components/src/toggle-control/test/index.tsx
++++ b/packages/components/src/toggle-control/test/index.tsx
+@@ -56,4 +56,23 @@ describe( 'ToggleControl', () => {
+ 			).toBeInTheDocument();
+ 		} );
+ 	} );
++
++	it( 'should hide label', () => {
++		render(
++			<ToggleControl
++				hideLabelFromVision
++				label="My toggle"
++				onChange={ () => {} }
++			/>
++		);
++		const label = screen.getByText( 'My toggle' );
++
++		// As visually hidden labels are still included in the document
++		// and do not have `display: none` styling, we can't rely on
++		// `.toBeInTheDocument()` or `.toBeVisible()` assertions.
++		expect( label ).toHaveAttribute(
++			'data-wp-component',
++			'VisuallyHidden'
++		);
++	} );
+ } );
+diff --git a/packages/components/src/toggle-control/types.ts b/packages/components/src/toggle-control/types.ts
+index 568c44fb64af07..21b2d80329ecfa 100644
+--- a/packages/components/src/toggle-control/types.ts
++++ b/packages/components/src/toggle-control/types.ts
+@@ -13,7 +13,10 @@ export type ToggleControlProps = Pick<
+ 	FormToggleProps,
+ 	'checked' | 'disabled'
+ > &
+-	Pick< BaseControlProps, '__nextHasNoMarginBottom' | 'className' > & {
++	Pick<
++		BaseControlProps,
++		'__nextHasNoMarginBottom' | 'className' | 'hideLabelFromVision'
++	> & {
+ 		help?: ReactNode | ( ( checked: boolean ) => ReactNode );
+ 		/**
+ 		 * The label for the toggle.
+diff --git a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/enable-custom-fields.js.snap b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/enable-custom-fields.js.snap
+index bf12d7d0d8facc..2d6b1b96c3b1be 100644
+--- a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/enable-custom-fields.js.snap
++++ b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/enable-custom-fields.js.snap
+@@ -41,17 +41,6 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation
+   min-width: 0;
+ }
+ 
+-.emotion-6 {
+-  display: block;
+-  max-height: 100%;
+-  max-width: 100%;
+-  min-height: 0;
+-  min-width: 0;
+-  -webkit-flex: 1;
+-  -ms-flex: 1;
+-  flex: 1;
+-}
+-
+ <div>
+   <div
+     class="preference-base-option"
+@@ -82,12 +71,6 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation
+               class="components-form-toggle__thumb"
+             />
+           </span>
+-          <label
+-            class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+-            data-wp-c16t="true"
+-            data-wp-component="FlexBlock"
+-            for="inspector-toggle-control-3"
+-          />
+         </div>
+       </div>
+     </div>
+@@ -147,17 +130,6 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields
+   min-width: 0;
+ }
+ 
+-.emotion-6 {
+-  display: block;
+-  max-height: 100%;
+-  max-width: 100%;
+-  min-height: 0;
+-  min-width: 0;
+-  -webkit-flex: 1;
+-  -ms-flex: 1;
+-  flex: 1;
+-}
+-
+ <div>
+   <div
+     class="preference-base-option"
+@@ -189,12 +161,6 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields
+               class="components-form-toggle__thumb"
+             />
+           </span>
+-          <label
+-            class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+-            data-wp-c16t="true"
+-            data-wp-component="FlexBlock"
+-            for="inspector-toggle-control-0"
+-          />
+         </div>
+       </div>
+     </div>
+@@ -243,17 +209,6 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
+   min-width: 0;
+ }
+ 
+-.emotion-6 {
+-  display: block;
+-  max-height: 100%;
+-  max-width: 100%;
+-  min-height: 0;
+-  min-width: 0;
+-  -webkit-flex: 1;
+-  -ms-flex: 1;
+-  flex: 1;
+-}
+-
+ <div>
+   <div
+     class="preference-base-option"
+@@ -285,12 +240,6 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
+               class="components-form-toggle__thumb"
+             />
+           </span>
+-          <label
+-            class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+-            data-wp-c16t="true"
+-            data-wp-component="FlexBlock"
+-            for="inspector-toggle-control-2"
+-          />
+         </div>
+       </div>
+     </div>
+@@ -350,17 +299,6 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fiel
+   min-width: 0;
+ }
+ 
+-.emotion-6 {
+-  display: block;
+-  max-height: 100%;
+-  max-width: 100%;
+-  min-height: 0;
+-  min-width: 0;
+-  -webkit-flex: 1;
+-  -ms-flex: 1;
+-  flex: 1;
+-}
+-
+ <div>
+   <div
+     class="preference-base-option"
+@@ -391,12 +329,6 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fiel
+               class="components-form-toggle__thumb"
+             />
+           </span>
+-          <label
+-            class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+-            data-wp-c16t="true"
+-            data-wp-component="FlexBlock"
+-            for="inspector-toggle-control-1"
+-          />
+         </div>
+       </div>
+     </div>

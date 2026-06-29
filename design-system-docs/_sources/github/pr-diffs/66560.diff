@@ -1,0 +1,68 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ccafd5b79f0c0d..1f612bfae6597e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   `Snackbar`: Use link variant for action Button ([#66560](https://github.com/WordPress/gutenberg/pull/66560)).
++
+ ## 28.11.0 (2024-10-30)
+ 
+ ### Deprecations
+diff --git a/packages/components/src/snackbar/index.tsx b/packages/components/src/snackbar/index.tsx
+index 0f2b74caca7d4a..dfcb0a6d8f2a84 100644
+--- a/packages/components/src/snackbar/index.tsx
++++ b/packages/components/src/snackbar/index.tsx
+@@ -150,9 +150,10 @@ function UnforwardedSnackbar(
+ 				{ actions.map( ( { label, onClick, url }, index ) => {
+ 					return (
+ 						<Button
++							__next40pxDefaultSize
+ 							key={ index }
+ 							href={ url }
+-							variant="tertiary"
++							variant="link"
+ 							onClick={ (
+ 								event: MouseEvent< HTMLButtonElement >
+ 							) => onActionClick( event, onClick ) }
+diff --git a/packages/components/src/snackbar/style.scss b/packages/components/src/snackbar/style.scss
+index 1e76a1666411e7..d1afd9b9f01e99 100644
+--- a/packages/components/src/snackbar/style.scss
++++ b/packages/components/src/snackbar/style.scss
+@@ -48,25 +48,16 @@
+ .components-snackbar__action.components-button {
+ 	margin-left: $grid-unit-40;
+ 	color: $white;
+-	height: auto;
+ 	flex-shrink: 0;
+-	line-height: $default-line-height;
+-	padding: 0;
+-
+-	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary) {
+-		text-decoration: underline;
+-		background-color: transparent;
+ 
+-		&:focus {
+-			color: $white;
+-			box-shadow: none;
+-			outline: 1px dotted $white;
+-		}
++	&:focus {
++		box-shadow: none;
++		outline: 1px dotted $white;
++	}
+ 
+-		&:hover {
+-			text-decoration: none;
+-			color: $white;
+-		}
++	&:hover {
++		text-decoration: none;
++		color: currentColor;
+ 	}
+ }
+ 

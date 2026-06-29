@@ -1,0 +1,808 @@
+diff --git a/docs/block-api.md b/docs/block-api.md
+index 5d79335ab1e679..e26fcb9d3d3ae4 100644
+--- a/docs/block-api.md
++++ b/docs/block-api.md
+@@ -54,7 +54,7 @@ description: 'Block showing a Book card.'
+ 
+ * **Type:** `String` [ common | formatting | layout | widgets | embed ]
+ 
+-Blocks are grouped into categories to help users browse and discover them. 
++Blocks are grouped into categories to help users browse and discover them.
+ 
+ The core provided categories are:
+ * common
+@@ -79,9 +79,11 @@ An icon property should be specified to make it easier to identify a block. Thes
+ icon: 'book-alt',
+ 
+ // Specifying a custom svg for the block
+-icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true" focusable="false"><path fill="none" d="M0 0h24v24H0V0z" /><path d="M19 13H5v-2h14v2z" /></svg>,
++icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><path d="M19 13H5v-2h14v2z" /></svg>,
+ ```
+ 
++**Note:** Custom SVG icons are automatically wrapped in the [`wp.components.AccessibleSVG` component](https://github.com/WordPress/gutenberg/tree/master/packages/components/src/accessible-svg/) to add accessibility attributes (`aria-hidden`, `role`, and `focusable`).
++
+ An object can also be passed as icon, in this case, icon, as specified above, should be included in the src property.
+ Besides src the object can contain background and foreground colors, this colors will appear with the icon
+ when they are applicable e.g.: in the inserter.
+diff --git a/edit-post/components/sidebar/plugin-post-publish-panel/test/__snapshots__/index.js.snap b/edit-post/components/sidebar/plugin-post-publish-panel/test/__snapshots__/index.js.snap
+index f35ccd569e3fb3..e703b24d4f4e24 100644
+--- a/edit-post/components/sidebar/plugin-post-publish-panel/test/__snapshots__/index.js.snap
++++ b/edit-post/components/sidebar/plugin-post-publish-panel/test/__snapshots__/index.js.snap
+@@ -27,25 +27,36 @@ exports[`PluginPostPublishPanel renders fill properly 1`] = `
+             onClick={[Function]}
+             type="button"
+           >
+-            <svg
++            <AccessibleSVG
+               className="components-panel__arrow"
+               height="24px"
+               viewBox="0 0 24 24"
+               width="24px"
+               xmlns="http://www.w3.org/2000/svg"
+             >
+-              <g>
+-                <path
+-                  d="M0,0h24v24H0V0z"
+-                  fill="none"
+-                />
+-              </g>
+-              <g>
+-                <path
+-                  d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"
+-                />
+-              </g>
+-            </svg>
++              <svg
++                aria-hidden="true"
++                className="components-panel__arrow"
++                focusable="false"
++                height="24px"
++                role="img"
++                viewBox="0 0 24 24"
++                width="24px"
++                xmlns="http://www.w3.org/2000/svg"
++              >
++                <g>
++                  <path
++                    d="M0,0h24v24H0V0z"
++                    fill="none"
++                  />
++                </g>
++                <g>
++                  <path
++                    d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"
++                  />
++                </g>
++              </svg>
++            </AccessibleSVG>
+             My panel title
+           </button>
+         </Button>
+diff --git a/edit-post/components/sidebar/plugin-pre-publish-panel/test/__snapshots__/index.js.snap b/edit-post/components/sidebar/plugin-pre-publish-panel/test/__snapshots__/index.js.snap
+index cb24a9396aff69..8aafb4673f2b7f 100644
+--- a/edit-post/components/sidebar/plugin-pre-publish-panel/test/__snapshots__/index.js.snap
++++ b/edit-post/components/sidebar/plugin-pre-publish-panel/test/__snapshots__/index.js.snap
+@@ -27,25 +27,36 @@ exports[`PluginPrePublishPanel renders fill properly 1`] = `
+             onClick={[Function]}
+             type="button"
+           >
+-            <svg
++            <AccessibleSVG
+               className="components-panel__arrow"
+               height="24px"
+               viewBox="0 0 24 24"
+               width="24px"
+               xmlns="http://www.w3.org/2000/svg"
+             >
+-              <g>
+-                <path
+-                  d="M0,0h24v24H0V0z"
+-                  fill="none"
+-                />
+-              </g>
+-              <g>
+-                <path
+-                  d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"
+-                />
+-              </g>
+-            </svg>
++              <svg
++                aria-hidden="true"
++                className="components-panel__arrow"
++                focusable="false"
++                height="24px"
++                role="img"
++                viewBox="0 0 24 24"
++                width="24px"
++                xmlns="http://www.w3.org/2000/svg"
++              >
++                <g>
++                  <path
++                    d="M0,0h24v24H0V0z"
++                    fill="none"
++                  />
++                </g>
++                <g>
++                  <path
++                    d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"
++                  />
++                </g>
++              </svg>
++            </AccessibleSVG>
+             My panel title
+           </button>
+         </Button>
+diff --git a/packages/block-library/src/archives/index.js b/packages/block-library/src/archives/index.js
+index 2774569ab6531b..c2917ebfa873eb 100644
+--- a/packages/block-library/src/archives/index.js
++++ b/packages/block-library/src/archives/index.js
+@@ -15,7 +15,7 @@ export const settings = {
+ 
+ 	description: __( 'Display a monthly archive of your site’s Posts.' ),
+ 
+-	icon: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><g><path d="M7 11h2v2H7v-2zm14-5v14l-2 2H5l-2-2V6l2-2h1V2h2v2h8V2h2v2h1l2 2zM5 8h14V6H5v2zm14 12V10H5v10h14zm-4-7h2v-2h-2v2zm-4 0h2v-2h-2v2z" /></g></svg>,
++	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><g><path d="M7 11h2v2H7v-2zm14-5v14l-2 2H5l-2-2V6l2-2h1V2h2v2h8V2h2v2h1l2 2zM5 8h14V6H5v2zm14 12V10H5v10h14zm-4-7h2v-2h-2v2zm-4 0h2v-2h-2v2z" /></g></svg>,
+ 
+ 	category: 'widgets',
+ 
+diff --git a/packages/block-library/src/audio/index.js b/packages/block-library/src/audio/index.js
+index d7e2e2e1b8a85c..6ae69447623914 100644
+--- a/packages/block-library/src/audio/index.js
++++ b/packages/block-library/src/audio/index.js
+@@ -18,7 +18,7 @@ export const settings = {
+ 
+ 	description: __( 'Embed an audio file and a simple audio player.' ),
+ 
+-	icon: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0,0h24v24H0V0z" fill="none" /><path d="m12 3l0.01 10.55c-0.59-0.34-1.27-0.55-2-0.55-2.22 0-4.01 1.79-4.01 4s1.79 4 4.01 4 3.99-1.79 3.99-4v-10h4v-4h-6zm-1.99 16c-1.1 0-2-0.9-2-2s0.9-2 2-2 2 0.9 2 2-0.9 2-2 2z" /></svg>,
++	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0,0h24v24H0V0z" fill="none" /><path d="m12 3l0.01 10.55c-0.59-0.34-1.27-0.55-2-0.55-2.22 0-4.01 1.79-4.01 4s1.79 4 4.01 4 3.99-1.79 3.99-4v-10h4v-4h-6zm-1.99 16c-1.1 0-2-0.9-2-2s0.9-2 2-2 2 0.9 2 2-0.9 2-2 2z" /></svg>,
+ 
+ 	category: 'common',
+ 
+diff --git a/packages/block-library/src/button/index.js b/packages/block-library/src/button/index.js
+index ad81c66336ea20..4735d0a47ede2a 100644
+--- a/packages/block-library/src/button/index.js
++++ b/packages/block-library/src/button/index.js
+@@ -65,7 +65,7 @@ export const settings = {
+ 
+ 	description: __( 'Want visitors to click to subscribe, buy, or read more? Get their attention with a button.' ),
+ 
+-	icon: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><g><path d="M19 6H5L3 8v8l2 2h14l2-2V8l-2-2zm0 10H5V8h14v8z" /></g></svg>,
++	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><g><path d="M19 6H5L3 8v8l2 2h14l2-2V8l-2-2zm0 10H5V8h14v8z" /></g></svg>,
+ 
+ 	category: 'layout',
+ 
+diff --git a/packages/block-library/src/categories/index.js b/packages/block-library/src/categories/index.js
+index 399e5d95d7b2cc..56b7dbf8c2661e 100644
+--- a/packages/block-library/src/categories/index.js
++++ b/packages/block-library/src/categories/index.js
+@@ -15,7 +15,7 @@ export const settings = {
+ 
+ 	description: __( 'Display a list of all your site’s categories.' ),
+ 
+-	icon: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0,0h24v24H0V0z" fill="none" /><path d="M12,2l-5.5,9h11L12,2z M12,5.84L13.93,9h-3.87L12,5.84z" /><path d="m17.5 13c-2.49 0-4.5 2.01-4.5 4.5s2.01 4.5 4.5 4.5 4.5-2.01 4.5-4.5-2.01-4.5-4.5-4.5zm0 7c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" /><path d="m3 21.5h8v-8h-8v8zm2-6h4v4h-4v-4z" /></svg>,
++	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0,0h24v24H0V0z" fill="none" /><path d="M12,2l-5.5,9h11L12,2z M12,5.84L13.93,9h-3.87L12,5.84z" /><path d="m17.5 13c-2.49 0-4.5 2.01-4.5 4.5s2.01 4.5 4.5 4.5 4.5-2.01 4.5-4.5-2.01-4.5-4.5-4.5zm0 7c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" /><path d="m3 21.5h8v-8h-8v8zm2-6h4v4h-4v-4z" /></svg>,
+ 
+ 	category: 'widgets',
+ 
+diff --git a/packages/block-library/src/code/index.js b/packages/block-library/src/code/index.js
+index 0326b7ad2ae510..7cb4883472a7c1 100644
+--- a/packages/block-library/src/code/index.js
++++ b/packages/block-library/src/code/index.js
+@@ -16,7 +16,7 @@ export const settings = {
+ 
+ 	description: __( 'Add text that respects your spacing and tabs -- perfect for displaying code.' ),
+ 
+-	icon: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0,0h24v24H0V0z" fill="none" /><path d="M9.4,16.6L4.8,12l4.6-4.6L8,6l-6,6l6,6L9.4,16.6z M14.6,16.6l4.6-4.6l-4.6-4.6L16,6l6,6l-6,6L14.6,16.6z" /></svg>,
++	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0,0h24v24H0V0z" fill="none" /><path d="M9.4,16.6L4.8,12l4.6-4.6L8,6l-6,6l6,6L9.4,16.6z M14.6,16.6l4.6-4.6l-4.6-4.6L16,6l6,6l-6,6L14.6,16.6z" /></svg>,
+ 
+ 	category: 'formatting',
+ 
+diff --git a/packages/block-library/src/columns/index.js b/packages/block-library/src/columns/index.js
+index ee32d8eb5fd257..5474cfae1e07ac 100644
+--- a/packages/block-library/src/columns/index.js
++++ b/packages/block-library/src/columns/index.js
+@@ -49,7 +49,7 @@ export const settings = {
+ 		__( 'beta' )
+ 	),
+ 
+-	icon: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><g><path d="M21 4H3L2 5v14l1 1h18l1-1V5l-1-1zM8 18H4V6h4v12zm6 0h-4V6h4v12zm6 0h-4V6h4v12z" /></g></svg>,
++	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><g><path d="M21 4H3L2 5v14l1 1h18l1-1V5l-1-1zM8 18H4V6h4v12zm6 0h-4V6h4v12zm6 0h-4V6h4v12z" /></g></svg>,
+ 
+ 	category: 'layout',
+ 
+diff --git a/packages/block-library/src/cover-image/index.js b/packages/block-library/src/cover-image/index.js
+index 9198a0630e6756..69a1df491acacf 100644
+--- a/packages/block-library/src/cover-image/index.js
++++ b/packages/block-library/src/cover-image/index.js
+@@ -59,7 +59,7 @@ export const settings = {
+ 
+ 	description: __( 'Add a full-width image, and layer text over it — great for headers.' ),
+ 
+-	icon: <svg role="img" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 4h7V2H4c-1.1 0-2 .9-2 2v7h2V4zm6 9l-4 5h12l-3-4-2.03 2.71L10 13zm7-4.5c0-.83-.67-1.5-1.5-1.5S14 7.67 14 8.5s.67 1.5 1.5 1.5S17 9.33 17 8.5zM20 2h-7v2h7v7h2V4c0-1.1-.9-2-2-2zm0 18h-7v2h7c1.1 0 2-.9 2-2v-7h-2v7zM4 13H2v7c0 1.1.9 2 2 2h7v-2H4v-7z" /><path d="M0 0h24v24H0z" fill="none" /></svg>,
++	icon: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 4h7V2H4c-1.1 0-2 .9-2 2v7h2V4zm6 9l-4 5h12l-3-4-2.03 2.71L10 13zm7-4.5c0-.83-.67-1.5-1.5-1.5S14 7.67 14 8.5s.67 1.5 1.5 1.5S17 9.33 17 8.5zM20 2h-7v2h7v7h2V4c0-1.1-.9-2-2-2zm0 18h-7v2h7c1.1 0 2-.9 2-2v-7h-2v7zM4 13H2v7c0 1.1.9 2 2 2h7v-2H4v-7z" /><path d="M0 0h24v24H0z" fill="none" /></svg>,
+ 
+ 	category: 'common',
+ 
+diff --git a/packages/block-library/src/embed/index.js b/packages/block-library/src/embed/index.js
+index 470b0baeaa79b5..ea5ca325c3438f 100644
+--- a/packages/block-library/src/embed/index.js
++++ b/packages/block-library/src/embed/index.js
+@@ -329,10 +329,10 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed',
+ }
+ 
+ export const name = 'core/embed';
+-const embedContentIcon = <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0,0h24v24H0V0z" fill="none" /><path d="M19,4H5C3.89,4,3,4.9,3,6v12c0,1.1,0.89,2,2,2h14c1.1,0,2-0.9,2-2V6C21,4.9,20.11,4,19,4z M19,18H5V8h14V18z" /></svg>;
+-const embedAudioIcon = <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><path d="M21 3H3L1 5v14l2 2h18l2-2V5l-2-2zm0 16H3V5h18v14zM8 15a3 3 0 0 1 4-3V6h5v2h-3v7a3 3 0 0 1-6 0z" /></svg>;
+-const embedPhotoIcon = <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0,0h24v24H0V0z" fill="none" /><path d="M21,4H3C1.9,4,1,4.9,1,6v12c0,1.1,0.9,2,2,2h18c1.1,0,2-0.9,2-2V6C23,4.9,22.1,4,21,4z M21,18H3V6h18V18z" /><polygon points="14.5 11 11 15.51 8.5 12.5 5 17 19 17" /></svg>;
+-const embedVideoIcon = <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0,0h24v24H0V0z" fill="none" /><path d="m10 8v8l5-4-5-4zm9-5h-14c-1.1 0-2 0.9-2 2v14c0 1.1 0.9 2 2 2h14c1.1 0 2-0.9 2-2v-14c0-1.1-0.9-2-2-2zm0 16h-14v-14h14v14z" /></svg>;
++const embedContentIcon = <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0,0h24v24H0V0z" fill="none" /><path d="M19,4H5C3.89,4,3,4.9,3,6v12c0,1.1,0.89,2,2,2h14c1.1,0,2-0.9,2-2V6C21,4.9,20.11,4,19,4z M19,18H5V8h14V18z" /></svg>;
++const embedAudioIcon = <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><path d="M21 3H3L1 5v14l2 2h18l2-2V5l-2-2zm0 16H3V5h18v14zM8 15a3 3 0 0 1 4-3V6h5v2h-3v7a3 3 0 0 1-6 0z" /></svg>;
++const embedPhotoIcon = <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0,0h24v24H0V0z" fill="none" /><path d="M21,4H3C1.9,4,1,4.9,1,6v12c0,1.1,0.9,2,2,2h18c1.1,0,2-0.9,2-2V6C23,4.9,22.1,4,21,4z M21,18H3V6h18V18z" /><polygon points="14.5 11 11 15.51 8.5 12.5 5 17 19 17" /></svg>;
++const embedVideoIcon = <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0,0h24v24H0V0z" fill="none" /><path d="m10 8v8l5-4-5-4zm9-5h-14c-1.1 0-2 0.9-2 2v14c0 1.1 0.9 2 2 2h14c1.1 0 2-0.9 2-2v-14c0-1.1-0.9-2-2-2zm0 16h-14v-14h14v14z" /></svg>;
+ 
+ export const settings = getEmbedBlockSettings( {
+ 	title: __( 'Embed' ),
+@@ -360,7 +360,7 @@ export const common = [
+ 			title: 'Twitter',
+ 			icon: {
+ 				foreground: '#1da1f2',
+-				src: <svg role="img" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M22.23 5.924c-.736.326-1.527.547-2.357.646.847-.508 1.498-1.312 1.804-2.27-.793.47-1.67.812-2.606.996C18.325 4.498 17.258 4 16.078 4c-2.266 0-4.103 1.837-4.103 4.103 0 .322.036.635.106.935-3.41-.17-6.433-1.804-8.457-4.287-.353.607-.556 1.312-.556 2.064 0 1.424.724 2.68 1.825 3.415-.673-.022-1.305-.207-1.86-.514v.052c0 1.988 1.415 3.647 3.293 4.023-.344.095-.707.145-1.08.145-.265 0-.522-.026-.773-.074.522 1.63 2.038 2.817 3.833 2.85-1.404 1.1-3.174 1.757-5.096 1.757-.332 0-.66-.02-.98-.057 1.816 1.164 3.973 1.843 6.29 1.843 7.547 0 11.675-6.252 11.675-11.675 0-.178-.004-.355-.012-.53.802-.578 1.497-1.3 2.047-2.124z"></path></g></svg>,
++				src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M22.23 5.924c-.736.326-1.527.547-2.357.646.847-.508 1.498-1.312 1.804-2.27-.793.47-1.67.812-2.606.996C18.325 4.498 17.258 4 16.078 4c-2.266 0-4.103 1.837-4.103 4.103 0 .322.036.635.106.935-3.41-.17-6.433-1.804-8.457-4.287-.353.607-.556 1.312-.556 2.064 0 1.424.724 2.68 1.825 3.415-.673-.022-1.305-.207-1.86-.514v.052c0 1.988 1.415 3.647 3.293 4.023-.344.095-.707.145-1.08.145-.265 0-.522-.026-.773-.074.522 1.63 2.038 2.817 3.833 2.85-1.404 1.1-3.174 1.757-5.096 1.757-.332 0-.66-.02-.98-.057 1.816 1.164 3.973 1.843 6.29 1.843 7.547 0 11.675-6.252 11.675-11.675 0-.178-.004-.355-.012-.53.802-.578 1.497-1.3 2.047-2.124z"></path></g></svg>,
+ 			},
+ 			keywords: [ 'tweet' ],
+ 		} ),
+@@ -372,7 +372,7 @@ export const common = [
+ 			title: 'YouTube',
+ 			icon: {
+ 				foreground: '#ff0000',
+-				src: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M21.8 8s-.195-1.377-.795-1.984c-.76-.797-1.613-.8-2.004-.847-2.798-.203-6.996-.203-6.996-.203h-.01s-4.197 0-6.996.202c-.39.046-1.242.05-2.003.846C2.395 6.623 2.2 8 2.2 8S2 9.62 2 11.24v1.517c0 1.618.2 3.237.2 3.237s.195 1.378.795 1.985c.76.797 1.76.77 2.205.855 1.6.153 6.8.2 6.8.2s4.203-.005 7-.208c.392-.047 1.244-.05 2.005-.847.6-.607.795-1.985.795-1.985s.2-1.618.2-3.237v-1.517C22 9.62 21.8 8 21.8 8zM9.935 14.595v-5.62l5.403 2.82-5.403 2.8z" /></svg>,
++				src: <svg viewBox="0 0 24 24"><path d="M21.8 8s-.195-1.377-.795-1.984c-.76-.797-1.613-.8-2.004-.847-2.798-.203-6.996-.203-6.996-.203h-.01s-4.197 0-6.996.202c-.39.046-1.242.05-2.003.846C2.395 6.623 2.2 8 2.2 8S2 9.62 2 11.24v1.517c0 1.618.2 3.237.2 3.237s.195 1.378.795 1.985c.76.797 1.76.77 2.205.855 1.6.153 6.8.2 6.8.2s4.203-.005 7-.208c.392-.047 1.244-.05 2.005-.847.6-.607.795-1.985.795-1.985s.2-1.618.2-3.237v-1.517C22 9.62 21.8 8 21.8 8zM9.935 14.595v-5.62l5.403 2.82-5.403 2.8z" /></svg>,
+ 			},
+ 			keywords: [ __( 'music' ), __( 'video' ) ],
+ 		} ),
+@@ -384,7 +384,7 @@ export const common = [
+ 			title: 'Facebook',
+ 			icon: {
+ 				foreground: '#3b5998',
+-				src: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M20 3H4c-.6 0-1 .4-1 1v16c0 .5.4 1 1 1h8.6v-7h-2.3v-2.7h2.3v-2c0-2.3 1.4-3.6 3.5-3.6 1 0 1.8.1 2.1.1v2.4h-1.4c-1.1 0-1.3.5-1.3 1.3v1.7h2.7l-.4 2.8h-2.3v7H20c.5 0 1-.4 1-1V4c0-.6-.4-1-1-1z" /></svg>,
++				src: <svg viewBox="0 0 24 24"><path d="M20 3H4c-.6 0-1 .4-1 1v16c0 .5.4 1 1 1h8.6v-7h-2.3v-2.7h2.3v-2c0-2.3 1.4-3.6 3.5-3.6 1 0 1.8.1 2.1.1v2.4h-1.4c-1.1 0-1.3.5-1.3 1.3v1.7h2.7l-.4 2.8h-2.3v7H20c.5 0 1-.4 1-1V4c0-.6-.4-1-1-1z" /></svg>,
+ 			},
+ 		} ),
+ 		patterns: [ /^https?:\/\/www\.facebook.com\/.+/i ],
+@@ -393,7 +393,7 @@ export const common = [
+ 		name: 'core-embed/instagram',
+ 		settings: getEmbedBlockSettings( {
+ 			title: 'Instagram',
+-			icon: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><g><path d="M12 4.622c2.403 0 2.688.01 3.637.052.877.04 1.354.187 1.67.31.42.163.72.358 1.036.673.315.315.51.615.673 1.035.123.317.27.794.31 1.67.043.95.052 1.235.052 3.638s-.01 2.688-.052 3.637c-.04.877-.187 1.354-.31 1.67-.163.42-.358.72-.673 1.036-.315.315-.615.51-1.035.673-.317.123-.794.27-1.67.31-.95.043-1.234.052-3.638.052s-2.688-.01-3.637-.052c-.877-.04-1.354-.187-1.67-.31-.42-.163-.72-.358-1.036-.673-.315-.315-.51-.615-.673-1.035-.123-.317-.27-.794-.31-1.67-.043-.95-.052-1.235-.052-3.638s.01-2.688.052-3.637c.04-.877.187-1.354.31-1.67.163-.42.358-.72.673-1.036.315-.315.615-.51 1.035-.673.317-.123.794-.27 1.67-.31.95-.043 1.235-.052 3.638-.052M12 3c-2.444 0-2.75.01-3.71.054s-1.613.196-2.185.418c-.592.23-1.094.538-1.594 1.04-.5.5-.807 1-1.037 1.593-.223.572-.375 1.226-.42 2.184C3.01 9.25 3 9.555 3 12s.01 2.75.054 3.71.196 1.613.418 2.186c.23.592.538 1.094 1.038 1.594s1.002.808 1.594 1.038c.572.222 1.227.375 2.185.418.96.044 1.266.054 3.71.054s2.75-.01 3.71-.054 1.613-.196 2.186-.418c.592-.23 1.094-.538 1.594-1.038s.808-1.002 1.038-1.594c.222-.572.375-1.227.418-2.185.044-.96.054-1.266.054-3.71s-.01-2.75-.054-3.71-.196-1.613-.418-2.186c-.23-.592-.538-1.094-1.038-1.594s-1.002-.808-1.594-1.038c-.572-.222-1.227-.375-2.185-.418C14.75 3.01 14.445 3 12 3zm0 4.378c-2.552 0-4.622 2.07-4.622 4.622s2.07 4.622 4.622 4.622 4.622-2.07 4.622-4.622S14.552 7.378 12 7.378zM12 15c-1.657 0-3-1.343-3-3s1.343-3 3-3 3 1.343 3 3-1.343 3-3 3zm4.804-8.884c-.596 0-1.08.484-1.08 1.08s.484 1.08 1.08 1.08c.596 0 1.08-.484 1.08-1.08s-.483-1.08-1.08-1.08z"></path></g></svg>,
++			icon: <svg viewBox="0 0 24 24"><g><path d="M12 4.622c2.403 0 2.688.01 3.637.052.877.04 1.354.187 1.67.31.42.163.72.358 1.036.673.315.315.51.615.673 1.035.123.317.27.794.31 1.67.043.95.052 1.235.052 3.638s-.01 2.688-.052 3.637c-.04.877-.187 1.354-.31 1.67-.163.42-.358.72-.673 1.036-.315.315-.615.51-1.035.673-.317.123-.794.27-1.67.31-.95.043-1.234.052-3.638.052s-2.688-.01-3.637-.052c-.877-.04-1.354-.187-1.67-.31-.42-.163-.72-.358-1.036-.673-.315-.315-.51-.615-.673-1.035-.123-.317-.27-.794-.31-1.67-.043-.95-.052-1.235-.052-3.638s.01-2.688.052-3.637c.04-.877.187-1.354.31-1.67.163-.42.358-.72.673-1.036.315-.315.615-.51 1.035-.673.317-.123.794-.27 1.67-.31.95-.043 1.235-.052 3.638-.052M12 3c-2.444 0-2.75.01-3.71.054s-1.613.196-2.185.418c-.592.23-1.094.538-1.594 1.04-.5.5-.807 1-1.037 1.593-.223.572-.375 1.226-.42 2.184C3.01 9.25 3 9.555 3 12s.01 2.75.054 3.71.196 1.613.418 2.186c.23.592.538 1.094 1.038 1.594s1.002.808 1.594 1.038c.572.222 1.227.375 2.185.418.96.044 1.266.054 3.71.054s2.75-.01 3.71-.054 1.613-.196 2.186-.418c.592-.23 1.094-.538 1.594-1.038s.808-1.002 1.038-1.594c.222-.572.375-1.227.418-2.185.044-.96.054-1.266.054-3.71s-.01-2.75-.054-3.71-.196-1.613-.418-2.186c-.23-.592-.538-1.094-1.038-1.594s-1.002-.808-1.594-1.038c-.572-.222-1.227-.375-2.185-.418C14.75 3.01 14.445 3 12 3zm0 4.378c-2.552 0-4.622 2.07-4.622 4.622s2.07 4.622 4.622 4.622 4.622-2.07 4.622-4.622S14.552 7.378 12 7.378zM12 15c-1.657 0-3-1.343-3-3s1.343-3 3-3 3 1.343 3 3-1.343 3-3 3zm4.804-8.884c-.596 0-1.08.484-1.08 1.08s.484 1.08 1.08 1.08c.596 0 1.08-.484 1.08-1.08s-.483-1.08-1.08-1.08z"></path></g></svg>,
+ 			keywords: [ __( 'image' ) ],
+ 		} ),
+ 		patterns: [ /^https?:\/\/(www\.)?instagr(\.am|am\.com)\/.+/i ],
+@@ -404,7 +404,7 @@ export const common = [
+ 			title: 'WordPress',
+ 			icon: {
+ 				foreground: '#0073AA',
+-				src: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><g><path d="M12.158 12.786l-2.698 7.84c.806.236 1.657.365 2.54.365 1.047 0 2.05-.18 2.986-.51-.024-.037-.046-.078-.065-.123l-2.762-7.57zM3.008 12c0 3.56 2.07 6.634 5.068 8.092L3.788 8.342c-.5 1.117-.78 2.354-.78 3.658zm15.06-.454c0-1.112-.398-1.88-.74-2.48-.456-.74-.883-1.368-.883-2.11 0-.825.627-1.595 1.51-1.595.04 0 .078.006.116.008-1.598-1.464-3.73-2.36-6.07-2.36-3.14 0-5.904 1.613-7.512 4.053.21.008.41.012.58.012.94 0 2.395-.114 2.395-.114.484-.028.54.684.057.74 0 0-.487.058-1.03.086l3.275 9.74 1.968-5.902-1.4-3.838c-.485-.028-.944-.085-.944-.085-.486-.03-.43-.77.056-.742 0 0 1.484.114 2.368.114.94 0 2.397-.114 2.397-.114.486-.028.543.684.058.74 0 0-.488.058-1.03.086l3.25 9.665.897-2.997c.456-1.17.684-2.137.684-2.907zm1.82-3.86c.04.286.06.593.06.924 0 .912-.17 1.938-.683 3.22l-2.746 7.94c2.672-1.558 4.47-4.454 4.47-7.77 0-1.564-.4-3.033-1.1-4.314zM12 22C6.486 22 2 17.514 2 12S6.486 2 12 2s10 4.486 10 10-4.486 10-10 10z"></path></g></svg>,
++				src: <svg viewBox="0 0 24 24"><g><path d="M12.158 12.786l-2.698 7.84c.806.236 1.657.365 2.54.365 1.047 0 2.05-.18 2.986-.51-.024-.037-.046-.078-.065-.123l-2.762-7.57zM3.008 12c0 3.56 2.07 6.634 5.068 8.092L3.788 8.342c-.5 1.117-.78 2.354-.78 3.658zm15.06-.454c0-1.112-.398-1.88-.74-2.48-.456-.74-.883-1.368-.883-2.11 0-.825.627-1.595 1.51-1.595.04 0 .078.006.116.008-1.598-1.464-3.73-2.36-6.07-2.36-3.14 0-5.904 1.613-7.512 4.053.21.008.41.012.58.012.94 0 2.395-.114 2.395-.114.484-.028.54.684.057.74 0 0-.487.058-1.03.086l3.275 9.74 1.968-5.902-1.4-3.838c-.485-.028-.944-.085-.944-.085-.486-.03-.43-.77.056-.742 0 0 1.484.114 2.368.114.94 0 2.397-.114 2.397-.114.486-.028.543.684.058.74 0 0-.488.058-1.03.086l3.25 9.665.897-2.997c.456-1.17.684-2.137.684-2.907zm1.82-3.86c.04.286.06.593.06.924 0 .912-.17 1.938-.683 3.22l-2.746 7.94c2.672-1.558 4.47-4.454 4.47-7.77 0-1.564-.4-3.033-1.1-4.314zM12 22C6.486 22 2 17.514 2 12S6.486 2 12 2s10 4.486 10 10-4.486 10-10 10z"></path></g></svg>,
+ 			},
+ 			keywords: [ __( 'post' ), __( 'blog' ) ],
+ 		} ),
+@@ -424,7 +424,7 @@ export const common = [
+ 			title: 'Spotify',
+ 			icon: {
+ 				foreground: '#1db954',
+-				src: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2m4.586 14.424c-.18.295-.563.387-.857.207-2.35-1.434-5.305-1.76-8.786-.963-.335.077-.67-.133-.746-.47-.077-.334.132-.67.47-.745 3.808-.87 7.076-.496 9.712 1.115.293.18.386.563.206.857M17.81 13.7c-.226.367-.706.482-1.072.257-2.687-1.652-6.785-2.13-9.965-1.166-.413.127-.848-.106-.973-.517-.125-.413.108-.848.52-.973 3.632-1.102 8.147-.568 11.234 1.328.366.226.48.707.256 1.072m.105-2.835C14.692 8.95 9.375 8.775 6.297 9.71c-.493.15-1.016-.13-1.166-.624-.148-.495.13-1.017.625-1.167 3.532-1.073 9.404-.866 13.115 1.337.445.264.59.838.327 1.282-.264.443-.838.59-1.282.325" /></svg>,
++				src: <svg viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2m4.586 14.424c-.18.295-.563.387-.857.207-2.35-1.434-5.305-1.76-8.786-.963-.335.077-.67-.133-.746-.47-.077-.334.132-.67.47-.745 3.808-.87 7.076-.496 9.712 1.115.293.18.386.563.206.857M17.81 13.7c-.226.367-.706.482-1.072.257-2.687-1.652-6.785-2.13-9.965-1.166-.413.127-.848-.106-.973-.517-.125-.413.108-.848.52-.973 3.632-1.102 8.147-.568 11.234 1.328.366.226.48.707.256 1.072m.105-2.835C14.692 8.95 9.375 8.775 6.297 9.71c-.493.15-1.016-.13-1.166-.624-.148-.495.13-1.017.625-1.167 3.532-1.073 9.404-.866 13.115 1.337.445.264.59.838.327 1.282-.264.443-.838.59-1.282.325" /></svg>,
+ 			},
+ 			keywords: [ __( 'music' ), __( 'audio' ) ],
+ 		} ),
+@@ -434,7 +434,7 @@ export const common = [
+ 		name: 'core-embed/flickr',
+ 		settings: getEmbedBlockSettings( {
+ 			title: 'Flickr',
+-			icon: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m6.5 7c-2.75 0-5 2.25-5 5s2.25 5 5 5 5-2.25 5-5-2.25-5-5-5zm11 0c-2.75 0-5 2.25-5 5s2.25 5 5 5 5-2.25 5-5-2.25-5-5-5z" /></svg>,
++			icon: <svg viewBox="0 0 24 24"><path d="m6.5 7c-2.75 0-5 2.25-5 5s2.25 5 5 5 5-2.25 5-5-2.25-5-5-5zm11 0c-2.75 0-5 2.25-5 5s2.25 5 5 5 5-2.25 5-5-2.25-5-5-5z" /></svg>,
+ 			keywords: [ __( 'image' ) ],
+ 		} ),
+ 		patterns: [ /^https?:\/\/(www\.)?flickr\.com\/.+/i, /^https?:\/\/flic\.kr\/.+/i ],
+@@ -445,7 +445,7 @@ export const common = [
+ 			title: 'Vimeo',
+ 			icon: {
+ 				foreground: '#1ab7ea',
+-				src: <svg role="img" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M22.396 7.164c-.093 2.026-1.507 4.8-4.245 8.32C15.323 19.16 12.93 21 10.97 21c-1.214 0-2.24-1.12-3.08-3.36-.56-2.052-1.118-4.105-1.68-6.158-.622-2.24-1.29-3.36-2.004-3.36-.156 0-.7.328-1.634.98l-.978-1.26c1.027-.903 2.04-1.806 3.037-2.71C6 3.95 7.03 3.328 7.716 3.265c1.62-.156 2.616.95 2.99 3.32.404 2.558.685 4.148.84 4.77.468 2.12.982 3.18 1.543 3.18.435 0 1.09-.687 1.963-2.064.872-1.376 1.34-2.422 1.402-3.142.125-1.187-.343-1.782-1.4-1.782-.5 0-1.013.115-1.542.34 1.023-3.35 2.977-4.976 5.862-4.883 2.14.063 3.148 1.45 3.024 4.16z"></path></g></svg>,
++				src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M22.396 7.164c-.093 2.026-1.507 4.8-4.245 8.32C15.323 19.16 12.93 21 10.97 21c-1.214 0-2.24-1.12-3.08-3.36-.56-2.052-1.118-4.105-1.68-6.158-.622-2.24-1.29-3.36-2.004-3.36-.156 0-.7.328-1.634.98l-.978-1.26c1.027-.903 2.04-1.806 3.037-2.71C6 3.95 7.03 3.328 7.716 3.265c1.62-.156 2.616.95 2.99 3.32.404 2.558.685 4.148.84 4.77.468 2.12.982 3.18 1.543 3.18.435 0 1.09-.687 1.963-2.064.872-1.376 1.34-2.422 1.402-3.142.125-1.187-.343-1.782-1.4-1.782-.5 0-1.013.115-1.542.34 1.023-3.35 2.977-4.976 5.862-4.883 2.14.063 3.148 1.45 3.024 4.16z"></path></g></svg>,
+ 			},
+ 			keywords: [ __( 'video' ) ],
+ 		} ),
+@@ -563,7 +563,7 @@ export const others = [
+ 		name: 'core-embed/reddit',
+ 		settings: getEmbedBlockSettings( {
+ 			title: 'Reddit',
+-			icon: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M22 11.816c0-1.256-1.02-2.277-2.277-2.277-.593 0-1.122.24-1.526.613-1.48-.965-3.455-1.594-5.647-1.69l1.17-3.702 3.18.75c.01 1.027.847 1.86 1.877 1.86 1.035 0 1.877-.84 1.877-1.877 0-1.035-.842-1.877-1.877-1.877-.77 0-1.43.466-1.72 1.13L13.55 3.92c-.204-.047-.4.067-.46.26l-1.35 4.27c-2.317.037-4.412.67-5.97 1.67-.402-.355-.917-.58-1.493-.58C3.02 9.54 2 10.56 2 11.815c0 .814.433 1.523 1.078 1.925-.037.222-.06.445-.06.673 0 3.292 4.01 5.97 8.94 5.97s8.94-2.678 8.94-5.97c0-.214-.02-.424-.052-.632.687-.39 1.154-1.12 1.154-1.964zm-3.224-7.422c.606 0 1.1.493 1.1 1.1s-.493 1.1-1.1 1.1-1.1-.494-1.1-1.1.493-1.1 1.1-1.1zm-16 7.422c0-.827.673-1.5 1.5-1.5.313 0 .598.103.838.27-.85.675-1.477 1.478-1.812 2.36-.32-.274-.525-.676-.525-1.13zm9.183 7.79c-4.502 0-8.165-2.33-8.165-5.193S7.457 9.22 11.96 9.22s8.163 2.33 8.163 5.193-3.663 5.193-8.164 5.193zM20.635 13c-.326-.89-.948-1.7-1.797-2.383.247-.186.55-.3.882-.3.827 0 1.5.672 1.5 1.5 0 .482-.23.91-.586 1.184zm-11.64 1.704c-.76 0-1.397-.616-1.397-1.376 0-.76.636-1.397 1.396-1.397.76 0 1.376.638 1.376 1.398 0 .76-.616 1.376-1.376 1.376zm7.405-1.376c0 .76-.615 1.376-1.375 1.376s-1.4-.616-1.4-1.376c0-.76.64-1.397 1.4-1.397.76 0 1.376.638 1.376 1.398zm-1.17 3.38c.15.152.15.398 0 .55-.675.674-1.728 1.002-3.22 1.002l-.01-.002-.012.002c-1.492 0-2.544-.328-3.218-1.002-.152-.152-.152-.398 0-.55.152-.152.4-.15.55 0 .52.52 1.394.775 2.67.775l.01.002.01-.002c1.276 0 2.15-.253 2.67-.775.15-.152.398-.152.55 0z" /></svg>,
++			icon: <svg viewBox="0 0 24 24"><path d="M22 11.816c0-1.256-1.02-2.277-2.277-2.277-.593 0-1.122.24-1.526.613-1.48-.965-3.455-1.594-5.647-1.69l1.17-3.702 3.18.75c.01 1.027.847 1.86 1.877 1.86 1.035 0 1.877-.84 1.877-1.877 0-1.035-.842-1.877-1.877-1.877-.77 0-1.43.466-1.72 1.13L13.55 3.92c-.204-.047-.4.067-.46.26l-1.35 4.27c-2.317.037-4.412.67-5.97 1.67-.402-.355-.917-.58-1.493-.58C3.02 9.54 2 10.56 2 11.815c0 .814.433 1.523 1.078 1.925-.037.222-.06.445-.06.673 0 3.292 4.01 5.97 8.94 5.97s8.94-2.678 8.94-5.97c0-.214-.02-.424-.052-.632.687-.39 1.154-1.12 1.154-1.964zm-3.224-7.422c.606 0 1.1.493 1.1 1.1s-.493 1.1-1.1 1.1-1.1-.494-1.1-1.1.493-1.1 1.1-1.1zm-16 7.422c0-.827.673-1.5 1.5-1.5.313 0 .598.103.838.27-.85.675-1.477 1.478-1.812 2.36-.32-.274-.525-.676-.525-1.13zm9.183 7.79c-4.502 0-8.165-2.33-8.165-5.193S7.457 9.22 11.96 9.22s8.163 2.33 8.163 5.193-3.663 5.193-8.164 5.193zM20.635 13c-.326-.89-.948-1.7-1.797-2.383.247-.186.55-.3.882-.3.827 0 1.5.672 1.5 1.5 0 .482-.23.91-.586 1.184zm-11.64 1.704c-.76 0-1.397-.616-1.397-1.376 0-.76.636-1.397 1.396-1.397.76 0 1.376.638 1.376 1.398 0 .76-.616 1.376-1.376 1.376zm7.405-1.376c0 .76-.615 1.376-1.375 1.376s-1.4-.616-1.4-1.376c0-.76.64-1.397 1.4-1.397.76 0 1.376.638 1.376 1.398zm-1.17 3.38c.15.152.15.398 0 .55-.675.674-1.728 1.002-3.22 1.002l-.01-.002-.012.002c-1.492 0-2.544-.328-3.218-1.002-.152-.152-.152-.398 0-.55.152-.152.4-.15.55 0 .52.52 1.394.775 2.67.775l.01.002.01-.002c1.276 0 2.15-.253 2.67-.775.15-.152.398-.152.55 0z" /></svg>,
+ 		} ),
+ 		patterns: [ /^https?:\/\/(www\.)?reddit\.com\/.+/i ],
+ 	},
+@@ -629,7 +629,7 @@ export const others = [
+ 			title: 'Tumblr',
+ 			icon: {
+ 				foreground: '#35465c',
+-				src: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M19 3H5c-1.105 0-2 .895-2 2v14c0 1.105.895 2 2 2h14c1.105 0 2-.895 2-2V5c0-1.105-.895-2-2-2zm-5.57 14.265c-2.445.042-3.37-1.742-3.37-2.998V10.6H8.922V9.15c1.703-.615 2.113-2.15 2.21-3.026.006-.06.053-.084.08-.084h1.645V8.9h2.246v1.7H12.85v3.495c.008.476.182 1.13 1.08 1.107.3-.008.698-.094.907-.194l.54 1.6c-.205.297-1.12.642-1.946.657z" /></svg>,
++				src: <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.105 0-2 .895-2 2v14c0 1.105.895 2 2 2h14c1.105 0 2-.895 2-2V5c0-1.105-.895-2-2-2zm-5.57 14.265c-2.445.042-3.37-1.742-3.37-2.998V10.6H8.922V9.15c1.703-.615 2.113-2.15 2.21-3.026.006-.06.053-.084.08-.084h1.645V8.9h2.246v1.7H12.85v3.495c.008.476.182 1.13 1.08 1.107.3-.008.698-.094.907-.194l.54 1.6c-.205.297-1.12.642-1.946.657z" /></svg>,
+ 			},
+ 		} ),
+ 		patterns: [ /^https?:\/\/(www\.)?tumblr\.com\/.+/i ],
+diff --git a/packages/block-library/src/file/index.js b/packages/block-library/src/file/index.js
+index 2e7b57bab0cd12..6dee26f23b2c07 100644
+--- a/packages/block-library/src/file/index.js
++++ b/packages/block-library/src/file/index.js
+@@ -23,7 +23,7 @@ export const settings = {
+ 
+ 	description: __( 'Add a link to a file that visitors can download.' ),
+ 
+-	icon: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><path d="M9 6l2 2h9v10H4V6h5m1-2H4L2 6v12l2 2h16l2-2V8l-2-2h-8l-2-2z" /></svg>,
++	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><path d="M9 6l2 2h9v10H4V6h5m1-2H4L2 6v12l2 2h16l2-2V8l-2-2h-8l-2-2z" /></svg>,
+ 
+ 	category: 'common',
+ 
+diff --git a/packages/block-library/src/gallery/index.js b/packages/block-library/src/gallery/index.js
+index 7a0e0889141aff..835e85e2b32f42 100644
+--- a/packages/block-library/src/gallery/index.js
++++ b/packages/block-library/src/gallery/index.js
+@@ -69,7 +69,7 @@ export const name = 'core/gallery';
+ export const settings = {
+ 	title: __( 'Gallery' ),
+ 	description: __( 'Display multiple images in an elegantly organized tiled layout.' ),
+-	icon: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><g><path d="M20 4v12H8V4h12m0-2H8L6 4v12l2 2h12l2-2V4l-2-2z" /><path d="M12 12l1 2 3-3 3 4H9z" /><path d="M2 6v14l2 2h14v-2H4V6H2z" /></g></svg>,
++	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><g><path d="M20 4v12H8V4h12m0-2H8L6 4v12l2 2h12l2-2V4l-2-2z" /><path d="M12 12l1 2 3-3 3 4H9z" /><path d="M2 6v14l2 2h14v-2H4V6H2z" /></g></svg>,
+ 	category: 'common',
+ 	keywords: [ __( 'images' ), __( 'photos' ) ],
+ 	attributes: blockAttributes,
+diff --git a/packages/block-library/src/heading/index.js b/packages/block-library/src/heading/index.js
+index 59c1dabb1ed56d..6365d9983e99b3 100644
+--- a/packages/block-library/src/heading/index.js
++++ b/packages/block-library/src/heading/index.js
+@@ -62,7 +62,7 @@ export const settings = {
+ 
+ 	description: __( 'Introduce topics and help visitors (and search engines!) understand how your content is organized.' ),
+ 
+-	icon: <svg role="img" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 4v3h5.5v12h3V7H19V4z" /><path fill="none" d="M0 0h24v24H0V0z" /></svg>,
++	icon: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 4v3h5.5v12h3V7H19V4z" /><path fill="none" d="M0 0h24v24H0V0z" /></svg>,
+ 
+ 	category: 'common',
+ 
+diff --git a/packages/block-library/src/image/index.js b/packages/block-library/src/image/index.js
+index 1be0a9c5815186..3b7f246605a19a 100644
+--- a/packages/block-library/src/image/index.js
++++ b/packages/block-library/src/image/index.js
+@@ -95,7 +95,7 @@ export const settings = {
+ 
+ 	description: __( 'They’re worth 1,000 words! Insert a single image.' ),
+ 
+-	icon: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0,0h24v24H0V0z" fill="none" /><path d="m19 5v14h-14v-14h14m0-2h-14c-1.1 0-2 0.9-2 2v14c0 1.1 0.9 2 2 2h14c1.1 0 2-0.9 2-2v-14c0-1.1-0.9-2-2-2z" /><path d="m14.14 11.86l-3 3.87-2.14-2.59-3 3.86h12l-3.86-5.14z" /></svg>,
++	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0,0h24v24H0V0z" fill="none" /><path d="m19 5v14h-14v-14h14m0-2h-14c-1.1 0-2 0.9-2 2v14c0 1.1 0.9 2 2 2h14c1.1 0 2-0.9 2-2v-14c0-1.1-0.9-2-2-2z" /><path d="m14.14 11.86l-3 3.87-2.14-2.59-3 3.86h12l-3.86-5.14z" /></svg>,
+ 
+ 	category: 'common',
+ 
+diff --git a/packages/block-library/src/latest-comments/index.js b/packages/block-library/src/latest-comments/index.js
+index d5cb44d0964a0b..e4884ab06c04e0 100644
+--- a/packages/block-library/src/latest-comments/index.js
++++ b/packages/block-library/src/latest-comments/index.js
+@@ -15,7 +15,7 @@ export const settings = {
+ 
+ 	description: __( 'Show a list of your site’s most recent comments.' ),
+ 
+-	icon: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><g><path d="M22 4l-2-2H4L2 4v12l2 2h14l4 4V4zm-2 0v13l-1-1H4V4h16z" /><path d="M6 12h12v2H6zM6 9h12v2H6zM6 6h12v2H6z" /></g></svg>,
++	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><g><path d="M22 4l-2-2H4L2 4v12l2 2h14l4 4V4zm-2 0v13l-1-1H4V4h16z" /><path d="M6 12h12v2H6zM6 9h12v2H6zM6 6h12v2H6z" /></g></svg>,
+ 
+ 	category: 'widgets',
+ 
+diff --git a/packages/block-library/src/latest-posts/index.js b/packages/block-library/src/latest-posts/index.js
+index 6fe9e161040411..32b4b636df2f7c 100644
+--- a/packages/block-library/src/latest-posts/index.js
++++ b/packages/block-library/src/latest-posts/index.js
+@@ -15,7 +15,7 @@ export const settings = {
+ 
+ 	description: __( 'Display a list of your most recent posts.' ),
+ 
+-	icon: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0,0h24v24H0V0z" fill="none" /><rect x="11" y="7" width="6" height="2" /><rect x="11" y="11" width="6" height="2" /><rect x="11" y="15" width="6" height="2" /><rect x="7" y="7" width="2" height="2" /><rect x="7" y="11" width="2" height="2" /><rect x="7" y="15" width="2" height="2" /><path d="M20.1,3H3.9C3.4,3,3,3.4,3,3.9v16.2C3,20.5,3.4,21,3.9,21h16.2c0.4,0,0.9-0.5,0.9-0.9V3.9C21,3.4,20.5,3,20.1,3z M19,19H5V5h14V19z" /></svg>,
++	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0,0h24v24H0V0z" fill="none" /><rect x="11" y="7" width="6" height="2" /><rect x="11" y="11" width="6" height="2" /><rect x="11" y="15" width="6" height="2" /><rect x="7" y="7" width="2" height="2" /><rect x="7" y="11" width="2" height="2" /><rect x="7" y="15" width="2" height="2" /><path d="M20.1,3H3.9C3.4,3,3,3.4,3,3.9v16.2C3,20.5,3.4,21,3.9,21h16.2c0.4,0,0.9-0.5,0.9-0.9V3.9C21,3.4,20.5,3,20.1,3z M19,19H5V5h14V19z" /></svg>,
+ 
+ 	category: 'widgets',
+ 
+diff --git a/packages/block-library/src/list/index.js b/packages/block-library/src/list/index.js
+index 6db9511f6c82d0..b3880662721f89 100644
+--- a/packages/block-library/src/list/index.js
++++ b/packages/block-library/src/list/index.js
+@@ -63,7 +63,7 @@ export const name = 'core/list';
+ export const settings = {
+ 	title: __( 'List' ),
+ 	description: __( 'Numbers, bullets, up to you. Add a list of items.' ),
+-	icon: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g><path d="M9 19h12v-2H9v2zm0-6h12v-2H9v2zm0-8v2h12V5H9zm-4-.5c-.828 0-1.5.672-1.5 1.5S4.172 7.5 5 7.5 6.5 6.828 6.5 6 5.828 4.5 5 4.5zm0 6c-.828 0-1.5.672-1.5 1.5s.672 1.5 1.5 1.5 1.5-.672 1.5-1.5-.672-1.5-1.5-1.5zm0 6c-.828 0-1.5.672-1.5 1.5s.672 1.5 1.5 1.5 1.5-.672 1.5-1.5-.672-1.5-1.5-1.5z" /></g></svg>,
++	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g><path d="M9 19h12v-2H9v2zm0-6h12v-2H9v2zm0-8v2h12V5H9zm-4-.5c-.828 0-1.5.672-1.5 1.5S4.172 7.5 5 7.5 6.5 6.828 6.5 6 5.828 4.5 5 4.5zm0 6c-.828 0-1.5.672-1.5 1.5s.672 1.5 1.5 1.5 1.5-.672 1.5-1.5-.672-1.5-1.5-1.5zm0 6c-.828 0-1.5.672-1.5 1.5s.672 1.5 1.5 1.5 1.5-.672 1.5-1.5-.672-1.5-1.5-1.5z" /></g></svg>,
+ 	category: 'common',
+ 	keywords: [ __( 'bullet list' ), __( 'ordered list' ), __( 'numbered list' ) ],
+ 
+diff --git a/packages/block-library/src/more/index.js b/packages/block-library/src/more/index.js
+index d7dee2882f9fb3..45f6b46d5a5acf 100644
+--- a/packages/block-library/src/more/index.js
++++ b/packages/block-library/src/more/index.js
+@@ -22,7 +22,7 @@ export const settings = {
+ 
+ 	description: __( 'Want to show only part of this post on your blog’s home page? Insert a "More" block where you want the split.' ),
+ 
+-	icon: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><g><path d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z" /></g></svg>,
++	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><g><path d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z" /></g></svg>,
+ 
+ 	category: 'layout',
+ 
+diff --git a/packages/block-library/src/nextpage/index.js b/packages/block-library/src/nextpage/index.js
+index 8c9ac9c1214739..2ea2bb2cd7e022 100644
+--- a/packages/block-library/src/nextpage/index.js
++++ b/packages/block-library/src/nextpage/index.js
+@@ -12,7 +12,7 @@ export const settings = {
+ 
+ 	description: __( 'This block allows you to set break points on your post. Visitors of your blog are then presented with content split into multiple pages.' ),
+ 
+-	icon: <svg role="img" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M9 12h6v-2H9zm-7 0h5v-2H2zm15 0h5v-2h-5zm3 2v2l-6 6H6a2 2 0 0 1-2-2v-6h2v6h6v-4a2 2 0 0 1 2-2h6zM4 8V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4h-2V4H6v4z" /></g></svg>,
++	icon: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M9 12h6v-2H9zm-7 0h5v-2H2zm15 0h5v-2h-5zm3 2v2l-6 6H6a2 2 0 0 1-2-2v-6h2v6h6v-4a2 2 0 0 1 2-2h6zM4 8V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4h-2V4H6v4z" /></g></svg>,
+ 
+ 	category: 'layout',
+ 
+diff --git a/packages/block-library/src/paragraph/index.js b/packages/block-library/src/paragraph/index.js
+index b50ebf1a4847f9..37a71015b41300 100644
+--- a/packages/block-library/src/paragraph/index.js
++++ b/packages/block-library/src/paragraph/index.js
+@@ -74,7 +74,7 @@ export const settings = {
+ 
+ 	description: __( 'Add some basic text.' ),
+ 
+-	icon: <svg role="img" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 5v7H9.5C7.6 12 6 10.4 6 8.5S7.6 5 9.5 5H11m8-2H9.5C6.5 3 4 5.5 4 8.5S6.5 14 9.5 14H11v7h2V5h2v16h2V5h2V3z" /></svg>,
++	icon: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 5v7H9.5C7.6 12 6 10.4 6 8.5S7.6 5 9.5 5H11m8-2H9.5C6.5 3 4 5.5 4 8.5S6.5 14 9.5 14H11v7h2V5h2v16h2V5h2V3z" /></svg>,
+ 
+ 	category: 'common',
+ 
+diff --git a/packages/block-library/src/preformatted/index.js b/packages/block-library/src/preformatted/index.js
+index aa766dd71d5cd5..18abd542f14600 100644
+--- a/packages/block-library/src/preformatted/index.js
++++ b/packages/block-library/src/preformatted/index.js
+@@ -12,7 +12,7 @@ export const settings = {
+ 
+ 	description: __( 'Add text that respects your spacing and tabs, and also allows styling.' ),
+ 
+-	icon: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0,0h24v24H0V0z" fill="none" /><path d="M20,4H4C2.9,4,2,4.9,2,6v12c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2V6C22,4.9,21.1,4,20,4z M20,18H4V6h16V18z" /><rect x="6" y="10" width="2" height="2" /><rect x="6" y="14" width="8" height="2" /><rect x="16" y="14" width="2" height="2" /><rect x="10" y="10" width="8" height="2" /></svg>,
++	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0,0h24v24H0V0z" fill="none" /><path d="M20,4H4C2.9,4,2,4.9,2,6v12c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2V6C22,4.9,21.1,4,20,4z M20,18H4V6h16V18z" /><rect x="6" y="10" width="2" height="2" /><rect x="6" y="14" width="8" height="2" /><rect x="16" y="14" width="2" height="2" /><rect x="10" y="10" width="8" height="2" /></svg>,
+ 
+ 	category: 'formatting',
+ 
+diff --git a/packages/block-library/src/pullquote/index.js b/packages/block-library/src/pullquote/index.js
+index 15324812c8f0f2..5cddc48813f4ba 100644
+--- a/packages/block-library/src/pullquote/index.js
++++ b/packages/block-library/src/pullquote/index.js
+@@ -41,7 +41,7 @@ export const settings = {
+ 
+ 	description: __( 'Highlight a quote from your post or page by displaying it as a graphic element.' ),
+ 
+-	icon: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0,0h24v24H0V0z" fill="none" /><polygon points="21 18 2 18 2 20 21 20" /><path d="m19 10v4h-15v-4h15m1-2h-17c-0.55 0-1 0.45-1 1v6c0 0.55 0.45 1 1 1h17c0.55 0 1-0.45 1-1v-6c0-0.55-0.45-1-1-1z" /><polygon points="21 4 2 4 2 6 21 6" /></svg>,
++	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0,0h24v24H0V0z" fill="none" /><polygon points="21 18 2 18 2 20 21 20" /><path d="m19 10v4h-15v-4h15m1-2h-17c-0.55 0-1 0.45-1 1v6c0 0.55 0.45 1 1 1h17c0.55 0 1-0.45 1-1v-6c0-0.55-0.45-1-1-1z" /><polygon points="21 4 2 4 2 6 21 6" /></svg>,
+ 
+ 	category: 'formatting',
+ 
+diff --git a/packages/block-library/src/quote/index.js b/packages/block-library/src/quote/index.js
+index e883a46122aed6..0a58efb0e4b62b 100644
+--- a/packages/block-library/src/quote/index.js
++++ b/packages/block-library/src/quote/index.js
+@@ -47,7 +47,7 @@ export const name = 'core/quote';
+ export const settings = {
+ 	title: __( 'Quote' ),
+ 	description: __( 'Maybe someone else said it better -- add some quoted text.' ),
+-	icon: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><g><path d="M19 18h-6l2-4h-2V6h8v7l-2 5zm-2-2l2-3V8h-4v4h4l-2 4zm-8 2H3l2-4H3V6h8v7l-2 5zm-2-2l2-3V8H5v4h4l-2 4z" /></g></svg>,
++	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><g><path d="M19 18h-6l2-4h-2V6h8v7l-2 5zm-2-2l2-3V8h-4v4h4l-2 4zm-8 2H3l2-4H3V6h8v7l-2 5zm-2-2l2-3V8H5v4h4l-2 4z" /></g></svg>,
+ 	category: 'common',
+ 	keywords: [ __( 'blockquote' ) ],
+ 
+diff --git a/packages/block-library/src/separator/index.js b/packages/block-library/src/separator/index.js
+index 326ee85a2e038f..9c1e463013d13a 100644
+--- a/packages/block-library/src/separator/index.js
++++ b/packages/block-library/src/separator/index.js
+@@ -11,7 +11,7 @@ export const settings = {
+ 
+ 	description: __( 'Insert a horizontal line where you want to create a break between ideas.' ),
+ 
+-	icon: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><path d="M19 13H5v-2h14v2z" /></svg>,
++	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><path d="M19 13H5v-2h14v2z" /></svg>,
+ 
+ 	category: 'layout',
+ 
+diff --git a/packages/block-library/src/shortcode/index.js b/packages/block-library/src/shortcode/index.js
+index 1d5272176f4475..7b9c7e49edebce 100644
+--- a/packages/block-library/src/shortcode/index.js
++++ b/packages/block-library/src/shortcode/index.js
+@@ -15,7 +15,7 @@ export const settings = {
+ 
+ 	description: __( 'Add a shortcode -- a WordPress-specific snippet of code written between square brackets.' ),
+ 
+-	icon: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8.5,21.4l1.9,0.5l5.2-19.3l-1.9-0.5L8.5,21.4z M3,19h4v-2H5V7h2V5H3V19z M17,5v2h2v10h-2v2h4V5H17z" /></svg>,
++	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8.5,21.4l1.9,0.5l5.2-19.3l-1.9-0.5L8.5,21.4z M3,19h4v-2H5V7h2V5H3V19z M17,5v2h2v10h-2v2h4V5H17z" /></svg>,
+ 
+ 	category: 'widgets',
+ 
+diff --git a/packages/block-library/src/spacer/index.js b/packages/block-library/src/spacer/index.js
+index a67b54686fd5e1..d7c3ad3fd888e8 100644
+--- a/packages/block-library/src/spacer/index.js
++++ b/packages/block-library/src/spacer/index.js
+@@ -19,7 +19,7 @@ export const settings = {
+ 
+ 	description: __( 'Add an element with empty space and custom height.' ),
+ 
+-	icon: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g><path d="M13 4v2h3.59L6 16.59V13H4v7h7v-2H7.41L18 7.41V11h2V4h-7" /></g></svg>,
++	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g><path d="M13 4v2h3.59L6 16.59V13H4v7h7v-2H7.41L18 7.41V11h2V4h-7" /></g></svg>,
+ 
+ 	category: 'layout',
+ 
+diff --git a/packages/block-library/src/subhead/index.js b/packages/block-library/src/subhead/index.js
+index 7ea6455b33d40b..39249f9a3e0632 100644
+--- a/packages/block-library/src/subhead/index.js
++++ b/packages/block-library/src/subhead/index.js
+@@ -18,7 +18,7 @@ export const settings = {
+ 
+ 	description: __( 'This block is deprecated. Please use the Paragraph block instead.' ),
+ 
+-	icon: <svg role="img" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7.1 6l-.5 3h4.5L9.4 19h3l1.8-10h4.5l.5-3H7.1z" /></svg>,
++	icon: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7.1 6l-.5 3h4.5L9.4 19h3l1.8-10h4.5l.5-3H7.1z" /></svg>,
+ 
+ 	category: 'common',
+ 
+diff --git a/packages/block-library/src/table/index.js b/packages/block-library/src/table/index.js
+index 54b02a7bcc339d..a59e70bee183a0 100644
+--- a/packages/block-library/src/table/index.js
++++ b/packages/block-library/src/table/index.js
+@@ -78,7 +78,7 @@ export const name = 'core/table';
+ export const settings = {
+ 	title: __( 'Table' ),
+ 	description: __( 'Insert a table -- perfect for sharing charts and data.' ),
+-	icon: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><g><path d="M20 3H5L3 5v14l2 2h15l2-2V5l-2-2zm0 2v3H5V5h15zm-5 14h-5v-9h5v9zM5 10h3v9H5v-9zm12 9v-9h3v9h-3z" /></g></svg>,
++	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><g><path d="M20 3H5L3 5v14l2 2h15l2-2V5l-2-2zm0 2v3H5V5h15zm-5 14h-5v-9h5v9zM5 10h3v9H5v-9zm12 9v-9h3v9h-3z" /></g></svg>,
+ 	category: 'formatting',
+ 
+ 	attributes: {
+diff --git a/packages/block-library/src/verse/index.js b/packages/block-library/src/verse/index.js
+index 1615356ad014fa..2ac312c7a77f62 100644
+--- a/packages/block-library/src/verse/index.js
++++ b/packages/block-library/src/verse/index.js
+@@ -17,7 +17,7 @@ export const settings = {
+ 
+ 	description: __( 'A block for haiku? Why not? Blocks for all the things! (See what we did here?)' ),
+ 
+-	icon: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><path d="M3 17v4h4l11-11-4-4L3 17zm3 2H5v-1l9-9 1 1-9 9zM21 6l-3-3h-1l-2 2 4 4 2-2V6z" /></svg>,
++	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><path d="M3 17v4h4l11-11-4-4L3 17zm3 2H5v-1l9-9 1 1-9 9zM21 6l-3-3h-1l-2 2 4 4 2-2V6z" /></svg>,
+ 
+ 	category: 'formatting',
+ 
+diff --git a/packages/block-library/src/video/index.js b/packages/block-library/src/video/index.js
+index 7a6bb47748201f..8f34b648ddf831 100644
+--- a/packages/block-library/src/video/index.js
++++ b/packages/block-library/src/video/index.js
+@@ -18,7 +18,7 @@ export const settings = {
+ 
+ 	description: __( 'Embed a video file and a simple video player.' ),
+ 
+-	icon: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><path d="M4 6l2 4h14v8H4V6m18-2h-4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4L2 6v12l2 2h16l2-2V4z" /></svg>,
++	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><path d="M4 6l2 4h14v8H4V6m18-2h-4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4L2 6v12l2 2h16l2-2V4z" /></svg>,
+ 
+ 	keywords: [ __( 'movie' ) ],
+ 
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0ddb4879719ebe..54377e137429ce 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -3,4 +3,8 @@
+ ### Breaking Change
+ 
+ - `withAPIData` has been removed. Please use the Core Data module or `@wordpress/api-fetch` directly instead.
+-- `wp.components.Draggable` as a DOM node drag handler has been deprecated. Please, use `wp.components.Draggable` as a wrap component for your DOM node drag handler.
+\ No newline at end of file
++- `wp.components.Draggable` as a DOM node drag handler has been deprecated. Please, use `wp.components.Draggable` as a wrap component for your DOM node drag handler.
++
++### New Feature
++
++- Added a new `AccessibleSVG` component.
+diff --git a/packages/components/src/accessible-svg/README.md b/packages/components/src/accessible-svg/README.md
+new file mode 100644
+index 00000000000000..e5b956640e1609
+--- /dev/null
++++ b/packages/components/src/accessible-svg/README.md
+@@ -0,0 +1,24 @@
++# AccessibleSVG
++
++A drop-in replacement for the svg element that adds the required accessibility attributes for SVG elements across browsers.
++
++## Usage
++
++```jsx
++import { AccessibleSVG } from '@wordpress/components';
++
++const MyIcon = () => (
++	<AccessibleSVG
++		viewBox="0 0 24 24"
++		xmlns="http://www.w3.org/2000/svg"
++	>
++		<path fill="none" d="M0 0h24v24H0V0z" />
++		<g>
++			<path d="M20 4v12H8V4h12m0-2H8L6 4v12l2 2h12l2-2V4l-2-2z" />
++			<path d="M12 12l1 2 3-3 3 4H9z" />
++			<path d="M2 6v14l2 2h14v-2H4V6H2z" />
++		</g>
++	</AccessibleSVG>
++	>
++);
++```
+diff --git a/packages/components/src/accessible-svg/index.js b/packages/components/src/accessible-svg/index.js
+new file mode 100644
+index 00000000000000..e7f0fd7c727136
+--- /dev/null
++++ b/packages/components/src/accessible-svg/index.js
+@@ -0,0 +1,12 @@
++function AccessibleSVG( props ) {
++	const appliedProps = {
++		...props,
++		role: 'img',
++		'aria-hidden': 'true',
++		focusable: 'false',
++	};
++
++	return <svg { ...appliedProps } />;
++}
++
++export default AccessibleSVG;
+diff --git a/packages/components/src/form-toggle/index.js b/packages/components/src/form-toggle/index.js
+index 0847003c763daa..b20eec561f5834 100644
+--- a/packages/components/src/form-toggle/index.js
++++ b/packages/components/src/form-toggle/index.js
+@@ -4,6 +4,11 @@
+ import classnames from 'classnames';
+ import { noop } from 'lodash';
+ 
++/**
++ * Internal dependencies
++ */
++import AccessibleSVG from '../accessible-svg';
++
+ function FormToggle( { className, checked, id, onChange = noop, ...props } ) {
+ 	const wrapperClasses = classnames(
+ 		'components-form-toggle',
+@@ -24,7 +29,8 @@ function FormToggle( { className, checked, id, onChange = noop, ...props } ) {
+ 			<span className="components-form-toggle__track"></span>
+ 			<span className="components-form-toggle__thumb"></span>
+ 			{ checked ?
+-				<svg className="components-form-toggle__on" width="2" height="6" aria-hidden="true" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2 6"><path d="M0 0h2v6H0z" /></svg> : <svg className="components-form-toggle__off" width="6" height="6" aria-hidden="true" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 6"><path d="M3 1.5c.8 0 1.5.7 1.5 1.5S3.8 4.5 3 4.5 1.5 3.8 1.5 3 2.2 1.5 3 1.5M3 0C1.3 0 0 1.3 0 3s1.3 3 3 3 3-1.3 3-3-1.3-3-3-3z" /></svg>
++				<AccessibleSVG className="components-form-toggle__on" width="2" height="6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2 6"><path d="M0 0h2v6H0z" /></AccessibleSVG> :
++				<AccessibleSVG className="components-form-toggle__off" width="6" height="6" aria-hidden="true" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 6"><path d="M3 1.5c.8 0 1.5.7 1.5 1.5S3.8 4.5 3 4.5 1.5 3.8 1.5 3 2.2 1.5 3 1.5M3 0C1.3 0 0 1.3 0 3s1.3 3 3 3 3-1.3 3-3-1.3-3-3-3z" /></AccessibleSVG>
+ 			}
+ 		</span>
+ 	);
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index a74aa8a20cb288..1de176ac2fd137 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -1,6 +1,7 @@
+ // Components
+ export * from './primitives';
+ // eslint-disable-next-line camelcase
++export { default as AccessibleSVG } from './accessible-svg';
+ export { default as Autocomplete } from './autocomplete';
+ export { default as BaseControl } from './base-control';
+ export { default as Button } from './button';
+diff --git a/packages/components/src/panel/body.js b/packages/components/src/panel/body.js
+index 1ad4044c16b69d..5cfb8fc5d314fa 100644
+--- a/packages/components/src/panel/body.js
++++ b/packages/components/src/panel/body.js
+@@ -13,6 +13,7 @@ import { Component } from '@wordpress/element';
+  */
+ import Button from '../button';
+ import Dashicon from '../dashicon';
++import AccessibleSVG from '../accessible-svg';
+ 
+ class PanelBody extends Component {
+ 	constructor( props ) {
+@@ -51,14 +52,14 @@ class PanelBody extends Component {
+ 							aria-expanded={ isOpened }
+ 						>
+ 							{ isOpened ?
+-								<svg className="components-panel__arrow" width="24px" height="24px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
++								<AccessibleSVG className="components-panel__arrow" width="24px" height="24px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+ 									<g><path fill="none" d="M0,0h24v24H0V0z" /></g>
+ 									<g><path d="M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z" /></g>
+-								</svg> :
+-								<svg className="components-panel__arrow" width="24px" height="24px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
++								</AccessibleSVG> :
++								<AccessibleSVG className="components-panel__arrow" width="24px" height="24px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+ 									<g><path fill="none" d="M0,0h24v24H0V0z" /></g>
+ 									<g><path d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z" /></g>
+-								</svg>
++								</AccessibleSVG>
+ 							}
+ 							{ icon && <Dashicon icon={ icon } className="components-panel__icon" /> }
+ 							{ title }
+diff --git a/packages/components/src/panel/test/body.js b/packages/components/src/panel/test/body.js
+index 8553a89b8c1053..6418e4a1bc1459 100644
+--- a/packages/components/src/panel/test/body.js
++++ b/packages/components/src/panel/test/body.js
+@@ -24,7 +24,7 @@ describe( 'PanelBody', () => {
+ 			expect( panelBody.hasClass( 'is-opened' ) ).toBe( true );
+ 			expect( panelBody.state( 'opened' ) ).toBe( true );
+ 			expect( button.prop( 'onClick' ) ).toBe( panelBody.instance().toggle );
+-			expect( button.childAt( 0 ).name() ).toBe( 'svg' );
++			expect( button.childAt( 0 ).name() ).toBe( 'AccessibleSVG' );
+ 			expect( button.childAt( 1 ).text() ).toBe( 'Some Text' );
+ 		} );
+ 
+diff --git a/packages/editor/src/components/block-icon/index.js b/packages/editor/src/components/block-icon/index.js
+index 6e8855b490180d..5ef9f0ce53d119 100644
+--- a/packages/editor/src/components/block-icon/index.js
++++ b/packages/editor/src/components/block-icon/index.js
+@@ -6,7 +6,7 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
+-import { Dashicon } from '@wordpress/components';
++import { Dashicon, AccessibleSVG } from '@wordpress/components';
+ import { createElement, Component } from '@wordpress/element';
+ 
+ function renderIcon( icon ) {
+@@ -18,6 +18,8 @@ function renderIcon( icon ) {
+ 		}
+ 
+ 		return icon();
++	} else if ( icon && icon.type === 'svg' ) {
++		return <AccessibleSVG { ...icon.props } />;
+ 	}
+ 
+ 	return icon || null;
+diff --git a/packages/editor/src/components/block-mover/arrows.js b/packages/editor/src/components/block-mover/arrows.js
+index dbee3b1ef2fc5f..8b4438bce0ac18 100644
+--- a/packages/editor/src/components/block-mover/arrows.js
++++ b/packages/editor/src/components/block-mover/arrows.js
+@@ -1,11 +1,16 @@
++/**
++ * WordPress dependencies
++ */
++import { AccessibleSVG } from '@wordpress/components';
++
+ export const upArrow = (
+-	<svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" aria-hidden role="img" focusable="false">
++	<AccessibleSVG width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18">
+ 		<polygon points="9,4.5 3.3,10.1 4.8,11.5 9,7.3 13.2,11.5 14.7,10.1 " />
+-	</svg>
++	</AccessibleSVG>
+ );
+ 
+ export const downArrow = (
+-	<svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" aria-hidden role="img" focusable="false">
++	<AccessibleSVG width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18">
+ 		<polygon points="9,13.5 14.7,7.9 13.2,6.5 9,10.7 4.8,6.5 3.3,7.9 " />
+-	</svg>
++	</AccessibleSVG>
+ );
+diff --git a/packages/editor/src/components/block-switcher/index.js b/packages/editor/src/components/block-switcher/index.js
+index da31d3cddc2537..dc5e58bfbad517 100644
+--- a/packages/editor/src/components/block-switcher/index.js
++++ b/packages/editor/src/components/block-switcher/index.js
+@@ -7,7 +7,7 @@ import { castArray, filter, first, get, mapKeys, orderBy } from 'lodash';
+  * WordPress dependencies
+  */
+ import { __, _n, sprintf } from '@wordpress/i18n';
+-import { Dropdown, IconButton, Toolbar, PanelBody } from '@wordpress/components';
++import { Dropdown, IconButton, Toolbar, PanelBody, AccessibleSVG } from '@wordpress/components';
+ import { getBlockType, getPossibleBlockTransformations, switchToBlockType, hasChildBlocks } from '@wordpress/blocks';
+ import { Component, Fragment } from '@wordpress/element';
+ import { DOWN } from '@wordpress/keycodes';
+@@ -88,7 +88,7 @@ export class BlockSwitcher extends Component {
+ 								onKeyDown={ openOnArrowDown }
+ 							>
+ 								<BlockIcon icon={ blockType.icon && blockType.icon.src } showColors />
+-								<svg role="img" aria-hidden="true" focusable="false" className="editor-block-switcher__transform" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6.5 8.9c.6-.6 1.4-.9 2.2-.9h6.9l-1.3 1.3 1.4 1.4L19.4 7l-3.7-3.7-1.4 1.4L15.6 6H8.7c-1.4 0-2.6.5-3.6 1.5l-2.8 2.8 1.4 1.4 2.8-2.8zm13.8 2.4l-2.8 2.8c-.6.6-1.3.9-2.1.9h-7l1.3-1.3-1.4-1.4L4.6 16l3.7 3.7 1.4-1.4L8.4 17h6.9c1.3 0 2.6-.5 3.5-1.5l2.8-2.8-1.3-1.4z" /></svg>
++								<AccessibleSVG className="editor-block-switcher__transform" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6.5 8.9c.6-.6 1.4-.9 2.2-.9h6.9l-1.3 1.3 1.4 1.4L19.4 7l-3.7-3.7-1.4 1.4L15.6 6H8.7c-1.4 0-2.6.5-3.6 1.5l-2.8 2.8 1.4 1.4 2.8-2.8zm13.8 2.4l-2.8 2.8c-.6.6-1.3.9-2.1.9h-7l1.3-1.3-1.4-1.4L4.6 16l3.7 3.7 1.4-1.4L8.4 17h6.9c1.3 0 2.6-.5 3.5-1.5l2.8-2.8-1.3-1.4z" /></AccessibleSVG>
+ 							</IconButton>
+ 						</Toolbar>
+ 					);

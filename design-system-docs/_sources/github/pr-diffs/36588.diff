@@ -1,0 +1,627 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b1c5cc814dfbc0..57e572896bdbb1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ -   Added an `__unstable-large` size variant to `InputControl`, `SelectControl`, and `UnitControl` for selective migration to the larger 40px heights. ([#35646](https://github.com/WordPress/gutenberg/pull/35646)).
+ -   Fixed inconsistent padding in `UnitControl` ([#35646](https://github.com/WordPress/gutenberg/pull/35646)).
+ -   Added support for RTL behavior for the `ZStack`'s `offset` prop ([#36769](https://github.com/WordPress/gutenberg/pull/36769))
++-   Fixed race conditions causing conditionally displayed `ToolsPanelItem` components to be erroneously deregistered ([36588](https://github.com/WordPress/gutenberg/pull/36588)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/tools-panel/stories/index.js b/packages/components/src/tools-panel/stories/index.js
+index 18ea49fd55f7bf..158df1a5f14682 100644
+--- a/packages/components/src/tools-panel/stories/index.js
++++ b/packages/components/src/tools-panel/stories/index.js
+@@ -7,6 +7,10 @@ import styled from '@emotion/styled';
+  * WordPress dependencies
+  */
+ import { useState } from '@wordpress/element';
++import {
++	__experimentalToggleGroupControl as ToggleGroupControl,
++	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
++} from '@wordpress/components';
+ 
+ /**
+  * Internal dependencies
+@@ -265,6 +269,185 @@ export const WithSlotFillItems = () => {
+ 	);
+ };
+ 
++export const WithConditionalDefaultControl = () => {
++	const [ attributes, setAttributes ] = useState( {} );
++	const { height, scale } = attributes;
++
++	const resetAll = ( resetFilters = [] ) => {
++		let newAttributes = {};
++
++		resetFilters.forEach( ( resetFilter ) => {
++			newAttributes = {
++				...newAttributes,
++				...resetFilter( newAttributes ),
++			};
++		} );
++
++		setAttributes( newAttributes );
++	};
++
++	const updateAttribute = ( name, value ) => {
++		setAttributes( {
++			...attributes,
++			[ name ]: value,
++		} );
++	};
++
++	return (
++		<SlotFillProvider>
++			<ToolsPanelItems>
++				<SingleColumnItem
++					hasValue={ () => !! height }
++					label="Injected Height"
++					onDeselect={ () => updateAttribute( 'height', undefined ) }
++					resetAllFilter={ () => ( { height: undefined } ) }
++					panelId={ panelId }
++					isShownByDefault={ true }
++				>
++					<UnitControl
++						label="Injected Height"
++						value={ height }
++						onChange={ ( next ) =>
++							updateAttribute( 'height', next )
++						}
++					/>
++				</SingleColumnItem>
++				<ToolsPanelItem
++					hasValue={ () => !! scale }
++					label="Scale"
++					onDeselect={ () => updateAttribute( 'scale', undefined ) }
++					resetAllFilter={ () => ( { scale: undefined } ) }
++					panelId={ panelId }
++					isShownByDefault={ !! height }
++				>
++					<ToggleGroupControl
++						label="Scale"
++						value={ scale }
++						onChange={ ( next ) =>
++							updateAttribute( 'scale', next )
++						}
++						isBlock
++					>
++						<ToggleGroupControlOption value="cover" label="Cover" />
++						<ToggleGroupControlOption
++							value="contain"
++							label="Contain"
++						/>
++						<ToggleGroupControlOption value="fill" label="Fill" />
++					</ToggleGroupControl>
++				</ToolsPanelItem>
++			</ToolsPanelItems>
++			<PanelWrapperView>
++				<Panel>
++					<ToolsPanel
++						label="Tools Panel With Conditional Default via SlotFill"
++						resetAll={ resetAll }
++						panelId={ panelId }
++					>
++						<Slot />
++					</ToolsPanel>
++				</Panel>
++			</PanelWrapperView>
++		</SlotFillProvider>
++	);
++};
++
++export const WithConditionallyRenderedControl = () => {
++	const [ attributes, setAttributes ] = useState( {} );
++	const { height, scale } = attributes;
++
++	const resetAll = ( resetFilters = [] ) => {
++		let newAttributes = {};
++
++		resetFilters.forEach( ( resetFilter ) => {
++			newAttributes = {
++				...newAttributes,
++				...resetFilter( newAttributes ),
++			};
++		} );
++
++		setAttributes( newAttributes );
++	};
++
++	const updateAttribute = ( name, value ) => {
++		setAttributes( {
++			...attributes,
++			[ name ]: value,
++		} );
++	};
++
++	return (
++		<SlotFillProvider>
++			<ToolsPanelItems>
++				<SingleColumnItem
++					hasValue={ () => !! height }
++					label="Injected Height"
++					onDeselect={ () => {
++						updateAttribute( 'scale', undefined );
++						updateAttribute( 'height', undefined );
++					} }
++					resetAllFilter={ () => ( { height: undefined } ) }
++					panelId={ panelId }
++					isShownByDefault={ true }
++				>
++					<UnitControl
++						label="Injected Height"
++						value={ height }
++						onChange={ ( next ) =>
++							updateAttribute( 'height', next )
++						}
++					/>
++				</SingleColumnItem>
++				{ !! height && (
++					<ToolsPanelItem
++						hasValue={ () => !! scale }
++						label="Scale"
++						onDeselect={ () =>
++							updateAttribute( 'scale', undefined )
++						}
++						resetAllFilter={ () => ( { scale: undefined } ) }
++						panelId={ panelId }
++						isShownByDefault={ true }
++					>
++						<ToggleGroupControl
++							label="Scale"
++							value={ scale }
++							onChange={ ( next ) =>
++								updateAttribute( 'scale', next )
++							}
++							isBlock
++						>
++							<ToggleGroupControlOption
++								value="cover"
++								label="Cover"
++							/>
++							<ToggleGroupControlOption
++								value="contain"
++								label="Contain"
++							/>
++							<ToggleGroupControlOption
++								value="fill"
++								label="Fill"
++							/>
++						</ToggleGroupControl>
++					</ToolsPanelItem>
++				) }
++			</ToolsPanelItems>
++			<PanelWrapperView>
++				<Panel>
++					<ToolsPanel
++						label="Tools Panel With Conditionally Rendered Item via SlotFill"
++						resetAll={ resetAll }
++						panelId={ panelId }
++					>
++						<Slot />
++					</ToolsPanel>
++				</Panel>
++			</PanelWrapperView>
++		</SlotFillProvider>
++	);
++};
++
+ export { TypographyPanel } from './typography-panel';
+ 
+ const PanelWrapperView = styled.div`
+diff --git a/packages/components/src/tools-panel/test/index.js b/packages/components/src/tools-panel/test/index.js
+index 2d3fcf022f39aa..3d39b54fe2d855 100644
+--- a/packages/components/src/tools-panel/test/index.js
++++ b/packages/components/src/tools-panel/test/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { render, screen, fireEvent } from '@testing-library/react';
++import { render, screen, fireEvent, within } from '@testing-library/react';
+ 
+ /**
+  * Internal dependencies
+@@ -168,6 +168,7 @@ const selectMenuItem = async ( label ) => {
+ describe( 'ToolsPanel', () => {
+ 	afterEach( () => {
+ 		controlProps.attributes.value = true;
++		altControlProps.attributes.value = false;
+ 	} );
+ 
+ 	describe( 'basic rendering', () => {
+@@ -348,6 +349,238 @@ describe( 'ToolsPanel', () => {
+ 			// there.
+ 			expect( optionalItem ).not.toBeInTheDocument();
+ 		} );
++
++		it( 'should render default controls with conditional isShownByDefault', async () => {
++			const linkedControlProps = {
++				attributes: { value: false },
++				hasValue: jest.fn().mockImplementation( () => {
++					return !! linkedControlProps.attributes.value;
++				} ),
++				label: 'Linked',
++				onDeselect: jest.fn(),
++				onSelect: jest.fn(),
++			};
++
++			const TestPanel = () => (
++				<ToolsPanel { ...defaultProps }>
++					<ToolsPanelItem
++						{ ...altControlProps }
++						isShownByDefault={ true }
++					>
++						<div>Default control</div>
++					</ToolsPanelItem>
++					<ToolsPanelItem
++						{ ...linkedControlProps }
++						isShownByDefault={ !! altControlProps.attributes.value }
++					>
++						<div>Linked control</div>
++					</ToolsPanelItem>
++				</ToolsPanel>
++			);
++
++			const { rerender } = render( <TestPanel /> );
++
++			// The linked control should start out as an optional control and is
++			// not rendered because it does not have a value.
++			let linkedItem = screen.queryByText( 'Linked control' );
++			expect( linkedItem ).not.toBeInTheDocument();
++
++			openDropdownMenu();
++
++			// The linked control should initially appear in the optional controls
++			// menu group. There should be three menu groups: default controls,
++			// optional controls, and the group to reset all options.
++			let menuGroups = screen.getAllByRole( 'group' );
++			expect( menuGroups.length ).toEqual( 3 );
++
++			// The linked control should be in the second group, of optional controls.
++			let optionalItem = within( menuGroups[ 1 ] ).getByText( 'Linked' );
++			expect( optionalItem ).toBeInTheDocument();
++
++			// Simulate the main control having a value set which should
++			// trigger the linked control becoming a default control via the
++			// conditional `isShownByDefault` prop.
++			altControlProps.attributes.value = true;
++
++			rerender( <TestPanel /> );
++
++			// The linked control should now be a default control and rendered
++			// despite not having a value.
++			linkedItem = screen.getByText( 'Linked control' );
++			expect( linkedItem ).toBeInTheDocument();
++
++			// The linked control should now appear in the default controls
++			// menu group and have been removed from the optional group.
++			menuGroups = screen.getAllByRole( 'group' );
++
++			// There should now only be two groups. The default controls and
++			// and the group for the reset all option.
++			expect( menuGroups.length ).toEqual( 2 );
++
++			// The new default control item for the Linked control should be
++			// within the first menu group.
++			const defaultItem = within( menuGroups[ 0 ] ).getByText( 'Linked' );
++			expect( defaultItem ).toBeInTheDocument();
++
++			// Optional controls have an additional aria-label. This can be used
++			// to confirm the conditional default control has been removed from
++			// the optional menu item group.
++			optionalItem = screen.queryByRole( 'menuitemcheckbox', {
++				name: 'Show Linked',
++			} );
++			expect( optionalItem ).not.toBeInTheDocument();
++		} );
++
++		it( 'should handle conditionally rendered default control', async () => {
++			const conditionalControlProps = {
++				attributes: { value: false },
++				hasValue: jest.fn().mockImplementation( () => {
++					return !! conditionalControlProps.attributes.value;
++				} ),
++				label: 'Conditional',
++				onDeselect: jest.fn(),
++				onSelect: jest.fn(),
++			};
++
++			const TestPanel = () => (
++				<ToolsPanel { ...defaultProps }>
++					<ToolsPanelItem
++						{ ...altControlProps }
++						isShownByDefault={ true }
++					>
++						<div>Default control</div>
++					</ToolsPanelItem>
++					{ !! altControlProps.attributes.value && (
++						<ToolsPanelItem
++							{ ...conditionalControlProps }
++							isShownByDefault={ true }
++						>
++							<div>Conditional control</div>
++						</ToolsPanelItem>
++					) }
++				</ToolsPanel>
++			);
++
++			const { rerender } = render( <TestPanel /> );
++
++			// The conditional control should not yet be rendered.
++			let conditionalItem = screen.queryByText( 'Conditional control' );
++			expect( conditionalItem ).not.toBeInTheDocument();
++
++			// The conditional control should not yet appear in the default controls
++			// menu group.
++			openDropdownMenu();
++			let menuGroups = screen.getAllByRole( 'group' );
++			let defaultItem = within( menuGroups[ 0 ] ).queryByText(
++				'Conditional'
++			);
++			expect( defaultItem ).not.toBeInTheDocument();
++
++			// Simulate the main control having a value set which will now
++			// render the new default control into the ToolsPanel.
++			altControlProps.attributes.value = true;
++
++			rerender( <TestPanel /> );
++
++			// The conditional control should now be rendered and included in
++			// the panel's menu.
++			conditionalItem = screen.getByText( 'Conditional control' );
++			expect( conditionalItem ).toBeInTheDocument();
++
++			// The conditional control should now appear in the default controls
++			// menu group.
++			menuGroups = screen.getAllByRole( 'group' );
++
++			// The new default control item for the Conditional control should
++			// be within the first menu group.
++			defaultItem = within( menuGroups[ 0 ] ).getByText( 'Conditional' );
++			expect( defaultItem ).toBeInTheDocument();
++		} );
++	} );
++
++	describe( 'registration of panel items', () => {
++		it( 'should register and deregister items when panelId changes', () => {
++			// This test simulates switching block selection, which causes the
++			// `ToolsPanel` to rerender with a new panelId, necessitating the
++			// registration and deregistration of appropriate `ToolsPanelItem`
++			// children.
++			//
++			// When the `panelId` changes, only items matching the new ID register
++			// themselves, while those for the old panelId deregister.
++			//
++			// See: https://github.com/WordPress/gutenberg/pull/36588
++
++			const noop = () => undefined;
++			const context = {
++				panelId: '1234',
++				menuItems: {
++					default: {},
++					optional: { [ altControlProps.label ]: true },
++				},
++				hasMenuItems: false,
++				isResetting: false,
++				shouldRenderPlaceholderItems: false,
++				registerPanelItem: jest.fn(),
++				deregisterPanelItem: jest.fn(),
++				flagItemCustomization: noop,
++				areAllOptionalControlsHidden: true,
++			};
++
++			const TestPanel = () => (
++				<ToolsPanelContext.Provider value={ context }>
++					<ToolsPanelItem { ...altControlProps } panelId="1234">
++						<div>Item</div>
++					</ToolsPanelItem>
++				</ToolsPanelContext.Provider>
++			);
++
++			// On the initial render of the panel, the ToolsPanelItem should
++			// be registered.
++			const { rerender } = render( <TestPanel /> );
++
++			expect( context.registerPanelItem ).toHaveBeenCalledWith(
++				expect.objectContaining( {
++					label: altControlProps.label,
++					panelId: '1234',
++				} )
++			);
++			expect( context.deregisterPanelItem ).not.toHaveBeenCalled();
++
++			// Simulate a change in panel, e.g. a switch of block selection.
++			context.panelId = '4321';
++			context.menuItems.optional[ altControlProps.label ] = false;
++
++			// Rerender the panel item. Because we have a new panelId, this
++			// panelItem should NOT be registered, but it SHOULD be
++			// deregistered.
++			rerender( <TestPanel /> );
++
++			// registerPanelItem has still only been called once.
++			expect( context.registerPanelItem ).toHaveBeenCalledTimes( 1 );
++			// deregisterPanelItem is called, given that we have switched panels.
++			expect( context.deregisterPanelItem ).toBeCalledWith(
++				altControlProps.label
++			);
++
++			// Simulate switching back to the original panelId, e.g. by selecting
++			// the original block again.
++			context.panelId = '1234';
++			context.menuItems.optional[ altControlProps.label ] = true;
++
++			// Rerender the panel and ensure that the panelItem is registered
++			// again, and it is not de-registered.
++			rerender( <TestPanel /> );
++
++			expect( context.registerPanelItem ).toHaveBeenCalledWith(
++				expect.objectContaining( {
++					label: altControlProps.label,
++					panelId: '1234',
++				} )
++			);
++			expect( context.registerPanelItem ).toHaveBeenCalledTimes( 2 );
++			// deregisterPanelItem has still only been called once.
++			expect( context.deregisterPanelItem ).toHaveBeenCalledTimes( 1 );
++		} );
+ 	} );
+ 
+ 	describe( 'callbacks on menu item selection', () => {
+diff --git a/packages/components/src/tools-panel/tools-panel-item/hook.ts b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+index a68692b40531de..d519f8a4ef5bf5 100644
+--- a/packages/components/src/tools-panel/tools-panel-item/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+@@ -54,7 +54,11 @@ export function useToolsPanelItem(
+ 			} );
+ 		}
+ 
+-		return () => deregisterPanelItem( label );
++		return () => {
++			if ( currentPanelId === panelId ) {
++				deregisterPanelItem( label );
++			}
++		};
+ 	}, [
+ 		currentPanelId,
+ 		panelId,
+diff --git a/packages/components/src/tools-panel/tools-panel/hook.ts b/packages/components/src/tools-panel/tools-panel/hook.ts
+index 2cedad4e7315c8..7647e9c5ca0e9c 100644
+--- a/packages/components/src/tools-panel/tools-panel/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel/hook.ts
+@@ -22,12 +22,21 @@ const DEFAULT_COLUMNS = 2;
+ const generateMenuItems = ( {
+ 	panelItems,
+ 	shouldReset,
++	currentMenuItems,
+ }: ToolsPanelMenuItemsConfig ) => {
+ 	const menuItems: ToolsPanelMenuItems = { default: {}, optional: {} };
+ 
+ 	panelItems.forEach( ( { hasValue, isShownByDefault, label } ) => {
+ 		const group = isShownByDefault ? 'default' : 'optional';
+-		menuItems[ group ][ label ] = shouldReset ? false : hasValue();
++
++		// If a menu item for this label already exists, do not overwrite its value.
++		// This can cause default controls that have been flagged as customized to
++		// lose their value.
++		const existingItemValue = currentMenuItems?.[ group ]?.[ label ];
++		const value =
++			existingItemValue !== undefined ? existingItemValue : hasValue();
++
++		menuItems[ group ][ label ] = shouldReset ? false : value;
+ 	} );
+ 
+ 	return menuItems;
+@@ -62,7 +71,19 @@ export function useToolsPanel(
+ 	const [ panelItems, setPanelItems ] = useState< ToolsPanelItem[] >( [] );
+ 
+ 	const registerPanelItem = ( item: ToolsPanelItem ) => {
+-		setPanelItems( ( items ) => [ ...items, item ] );
++		setPanelItems( ( items ) => {
++			const newItems = [ ...items ];
++			// If an item with this label is already registered, remove it first.
++			// This can happen when an item is moved between the default and optional
++			// groups.
++			const existingIndex = newItems.findIndex(
++				( oldItem ) => oldItem.label === item.label
++			);
++			if ( existingIndex !== -1 ) {
++				newItems.splice( existingIndex, 1 );
++			}
++			return [ ...newItems, item ];
++		} );
+ 	};
+ 
+ 	// Panels need to deregister on unmount to avoid orphans in menu state.
+@@ -72,11 +93,16 @@ export function useToolsPanel(
+ 		// controls, e.g. both panels have a "padding" control, the
+ 		// deregistration of the first panel doesn't occur until after the
+ 		// registration of the next.
+-		const index = panelItems.findIndex( ( item ) => item.label === label );
+-
+-		if ( index !== -1 ) {
+-			setPanelItems( ( items ) => items.splice( index, 1 ) );
+-		}
++		setPanelItems( ( items ) => {
++			const newItems = [ ...items ];
++			const index = newItems.findIndex(
++				( item ) => item.label === label
++			);
++			if ( index !== -1 ) {
++				newItems.splice( index, 1 );
++			}
++			return newItems;
++		} );
+ 	};
+ 
+ 	// Manage and share display state of menu items representing child controls.
+@@ -87,27 +113,33 @@ export function useToolsPanel(
+ 
+ 	// Setup menuItems state as panel items register themselves.
+ 	useEffect( () => {
+-		const items = generateMenuItems( {
+-			panelItems,
+-			shouldReset: false,
++		setMenuItems( ( prevState ) => {
++			const items = generateMenuItems( {
++				panelItems,
++				shouldReset: false,
++				currentMenuItems: prevState,
++			} );
++			return items;
+ 		} );
+-		setMenuItems( items );
+ 	}, [ panelItems ] );
+ 
+ 	// Force a menu item to be checked.
+ 	// This is intended for use with default panel items. They are displayed
+ 	// separately to optional items and have different display states,
+-	//.we need to update that when their value is customized.
++	// we need to update that when their value is customized.
+ 	const flagItemCustomization = (
+ 		label: string,
+ 		group: ToolsPanelMenuItemKey = 'default'
+ 	) => {
+-		setMenuItems( {
+-			...menuItems,
+-			[ group ]: {
+-				...menuItems[ group ],
+-				[ label ]: true,
+-			},
++		setMenuItems( ( items ) => {
++			const newState = {
++				...items,
++				[ group ]: {
++					...items[ group ],
++					[ label ]: true,
++				},
++			};
++			return newState;
+ 		} );
+ 	};
+ 
+diff --git a/packages/components/src/tools-panel/types.ts b/packages/components/src/tools-panel/types.ts
+index 374c98495c8c74..92e4282f68e128 100644
+--- a/packages/components/src/tools-panel/types.ts
++++ b/packages/components/src/tools-panel/types.ts
+@@ -124,7 +124,10 @@ export type ToolsPanelContext = {
+ 	hasMenuItems: boolean;
+ 	registerPanelItem: ( item: ToolsPanelItem ) => void;
+ 	deregisterPanelItem: ( label: string ) => void;
+-	flagItemCustomization: ( label: string ) => void;
++	flagItemCustomization: (
++		label: string,
++		group?: ToolsPanelMenuItemKey
++	) => void;
+ 	isResetting: boolean;
+ 	shouldRenderPlaceholderItems: boolean;
+ 	areAllOptionalControlsHidden: boolean;
+@@ -139,4 +142,5 @@ export type ToolsPanelControlsGroupProps = {
+ export type ToolsPanelMenuItemsConfig = {
+ 	panelItems: ToolsPanelItem[];
+ 	shouldReset: boolean;
++	currentMenuItems?: ToolsPanelMenuItems;
+ };

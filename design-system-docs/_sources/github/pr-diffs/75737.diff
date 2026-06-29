@@ -1,0 +1,187 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 13f7b96bfc16e6..344852abfd6fe2 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,11 @@
+ ### Bug Fixes
+ 
+ -   `SnackbarList`: Fix scaling distortion when a snackbar's content is updated in place via a shared notice ID ([#75709](https://github.com/WordPress/gutenberg/pull/75709)).
++-   `ToggleGroupControl`: Fix hover styles on disabled items ([#75737](https://github.com/WordPress/gutenberg/pull/75737)).
++
++### Enhancements
++
++-   `ToggleGroupControl`: Make unselected item color consistent across all variants ([#75737](https://github.com/WordPress/gutenberg/pull/75737)).
+ 
+ ## 32.2.0 (2026-02-18)
+ 
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index 9f7fda9ffef864..aad6df281eeddd 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -137,7 +137,6 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+   user-select: none;
+   width: 100%;
+   z-index: 2;
+-  color: var(--wp-components-color-foreground, #1e1e1e);
+   height: 38px;
+   aspect-ratio: 1;
+   padding-left: 0;
+@@ -157,12 +156,13 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+   border: 0;
+ }
+ 
+-.emotion-12[disabled] {
++.emotion-12[disabled],
++.emotion-12[aria-disabled='true'] {
+   opacity: 0.4;
+   cursor: default;
+ }
+ 
+-.emotion-12:hover {
++.emotion-12:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
+   color: var(--wp-components-color-foreground, #1e1e1e);
+ }
+ 
+@@ -211,7 +211,6 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+   user-select: none;
+   width: 100%;
+   z-index: 2;
+-  color: var(--wp-components-color-foreground, #1e1e1e);
+   height: 38px;
+   aspect-ratio: 1;
+   padding-left: 0;
+@@ -229,12 +228,13 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+   border: 0;
+ }
+ 
+-.emotion-17[disabled] {
++.emotion-17[disabled],
++.emotion-17[aria-disabled='true'] {
+   opacity: 0.4;
+   cursor: default;
+ }
+ 
+-.emotion-17:hover {
++.emotion-17:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
+   color: var(--wp-components-color-foreground, #1e1e1e);
+ }
+ 
+@@ -491,12 +491,13 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+   border: 0;
+ }
+ 
+-.emotion-12[disabled] {
++.emotion-12[disabled],
++.emotion-12[aria-disabled='true'] {
+   opacity: 0.4;
+   cursor: default;
+ }
+ 
+-.emotion-12:hover {
++.emotion-12:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
+   color: var(--wp-components-color-foreground, #1e1e1e);
+ }
+ 
+@@ -726,7 +727,6 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+   user-select: none;
+   width: 100%;
+   z-index: 2;
+-  color: var(--wp-components-color-foreground, #1e1e1e);
+   height: 38px;
+   aspect-ratio: 1;
+   padding-left: 0;
+@@ -746,12 +746,13 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+   border: 0;
+ }
+ 
+-.emotion-12[disabled] {
++.emotion-12[disabled],
++.emotion-12[aria-disabled='true'] {
+   opacity: 0.4;
+   cursor: default;
+ }
+ 
+-.emotion-12:hover {
++.emotion-12:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
+   color: var(--wp-components-color-foreground, #1e1e1e);
+ }
+ 
+@@ -800,7 +801,6 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+   user-select: none;
+   width: 100%;
+   z-index: 2;
+-  color: var(--wp-components-color-foreground, #1e1e1e);
+   height: 38px;
+   aspect-ratio: 1;
+   padding-left: 0;
+@@ -818,12 +818,13 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+   border: 0;
+ }
+ 
+-.emotion-17[disabled] {
++.emotion-17[disabled],
++.emotion-17[aria-disabled='true'] {
+   opacity: 0.4;
+   cursor: default;
+ }
+ 
+-.emotion-17:hover {
++.emotion-17:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
+   color: var(--wp-components-color-foreground, #1e1e1e);
+ }
+ 
+@@ -1074,12 +1075,13 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
+   border: 0;
+ }
+ 
+-.emotion-12[disabled] {
++.emotion-12[disabled],
++.emotion-12[aria-disabled='true'] {
+   opacity: 0.4;
+   cursor: default;
+ }
+ 
+-.emotion-12:hover {
++.emotion-12:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
+   color: var(--wp-components-color-foreground, #1e1e1e);
+ }
+ 
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
+index 8f9898c57984d0..9021b6b5e16a72 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
+@@ -63,13 +63,14 @@ export const buttonView = ( {
+ 		border: 0;
+ 	}
+ 
+-	&[disabled] {
++	&[disabled],
++	&[aria-disabled='true'] {
+ 		opacity: 0.4;
+ 		cursor: default;
+ 	}
+ 
+-	&:hover {
+-		color: ${ COLORS.theme.gray[ 900 ] };
++	&:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
++		color: ${ COLORS.theme.foreground };
+ 	}
+ 
+ 	${ isDeselectable && deselectable }
+@@ -83,8 +84,6 @@ const pressed = css`
+ `;
+ 
+ const deselectable = css`
+-	color: ${ COLORS.theme.foreground };
+-
+ 	&:focus {
+ 		outline: ${ CONFIG.borderWidthFocus } solid ${ COLORS.ui.borderFocus };
+ 		outline-offset: 2px;
+@@ -112,7 +111,6 @@ const isIconStyles = ( {
+ 	};
+ 
+ 	return css`
+-		color: ${ COLORS.theme.foreground };
+ 		height: ${ iconButtonSizes[ size ] };
+ 		aspect-ratio: 1;
+ 		padding-left: 0;

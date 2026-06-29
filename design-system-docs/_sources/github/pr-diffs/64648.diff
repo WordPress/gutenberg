@@ -1,0 +1,306 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index cff965f161230a..3b8aa54c5ec923 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -70,6 +70,7 @@
+ -   `Composite` v2: add `Context` subcomponent ([#64493](https://github.com/WordPress/gutenberg/pull/64493)).
+ -   `CustomSelectControl`: Improve type inferring ([#64412](https://github.com/WordPress/gutenberg/pull/64412)).
+ -   Update `ariakit` to version `0.4.10` ([#64637](https://github.com/WordPress/gutenberg/pull/64637)).
++-   Ariakit: Use `useStoreState()` instead of `store.useState()` ([#64648](https://github.com/WordPress/gutenberg/pull/64648)).
+ 
+ ## 28.5.0 (2024-08-07)
+ 
+diff --git a/packages/components/src/alignment-matrix-control/index.tsx b/packages/components/src/alignment-matrix-control/index.tsx
+index 1d22c3560625db..cd6bc7acabc3cd 100644
+--- a/packages/components/src/alignment-matrix-control/index.tsx
++++ b/packages/components/src/alignment-matrix-control/index.tsx
+@@ -2,6 +2,7 @@
+  * External dependencies
+  */
+ import clsx from 'clsx';
++import { useStoreState } from '@ariakit/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -68,7 +69,7 @@ export function AlignmentMatrixControl( {
+ 		rtl: isRTL(),
+ 	} );
+ 
+-	const activeId = compositeStore.useState( 'activeId' );
++	const activeId = useStoreState( compositeStore, 'activeId' );
+ 
+ 	const classes = clsx( 'component-alignment-matrix-control', className );
+ 
+diff --git a/packages/components/src/circular-option-picker/circular-option-picker-option.tsx b/packages/components/src/circular-option-picker/circular-option-picker-option.tsx
+index 35a2f427134f40..1ab4fd0d017901 100644
+--- a/packages/components/src/circular-option-picker/circular-option-picker-option.tsx
++++ b/packages/components/src/circular-option-picker/circular-option-picker-option.tsx
+@@ -2,6 +2,7 @@
+  * External dependencies
+  */
+ import clsx from 'clsx';
++import { useStoreState } from '@ariakit/react';
+ import type { ForwardedRef } from 'react';
+ 
+ /**
+@@ -52,7 +53,7 @@ function UnforwardedOptionAsOption(
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const { id, isSelected, compositeStore, ...additionalProps } = props;
+-	const activeId = compositeStore.useState( 'activeId' );
++	const activeId = useStoreState( compositeStore, 'activeId' );
+ 
+ 	if ( isSelected && ! activeId ) {
+ 		compositeStore.setActiveId( id );
+diff --git a/packages/components/src/custom-select-control-v2/custom-select.tsx b/packages/components/src/custom-select-control-v2/custom-select.tsx
+index e925038812fa73..bb458abcc282ff 100644
+--- a/packages/components/src/custom-select-control-v2/custom-select.tsx
++++ b/packages/components/src/custom-select-control-v2/custom-select.tsx
+@@ -2,6 +2,7 @@
+  * External dependencies
+  */
+ import * as Ariakit from '@ariakit/react';
++import { useStoreState } from '@ariakit/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -62,7 +63,7 @@ const CustomSelectButton = ( {
+ 		CustomSelectStore,
+ 	'onChange'
+ > ) => {
+-	const { value: currentValue } = store.useState();
++	const { value: currentValue } = useStoreState( store );
+ 
+ 	const computedRenderSelectedValue = useMemo(
+ 		() => renderSelectedValue ?? defaultRenderSelectedValue,
+diff --git a/packages/components/src/dropdown-menu-v2/index.tsx b/packages/components/src/dropdown-menu-v2/index.tsx
+index c53286a7da128b..b6ac9e45e37758 100644
+--- a/packages/components/src/dropdown-menu-v2/index.tsx
++++ b/packages/components/src/dropdown-menu-v2/index.tsx
+@@ -2,6 +2,7 @@
+  * External dependencies
+  */
+ import * as Ariakit from '@ariakit/react';
++import { useStoreState } from '@ariakit/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -248,9 +249,10 @@ const UnconnectedDropdownMenu = (
+ 	);
+ 
+ 	// Extract the side from the applied placement — useful for animations.
+-	const appliedPlacementSide = dropdownMenuStore
+-		.useState( 'placement' )
+-		.split( '-' )[ 0 ];
++	const appliedPlacementSide = useStoreState(
++		dropdownMenuStore,
++		'placement'
++	).split( '-' )[ 0 ];
+ 
+ 	if (
+ 		dropdownMenuStore.parent &&
+diff --git a/packages/components/src/radio-group/radio.tsx b/packages/components/src/radio-group/radio.tsx
+index 0c90c337fcdf2f..50a5a2647b39d5 100644
+--- a/packages/components/src/radio-group/radio.tsx
++++ b/packages/components/src/radio-group/radio.tsx
+@@ -7,6 +7,7 @@ import { forwardRef, useContext } from '@wordpress/element';
+  * External dependencies
+  */
+ import * as Ariakit from '@ariakit/react';
++import { useStoreState } from '@ariakit/react';
+ 
+ /**
+  * Internal dependencies
+@@ -26,7 +27,7 @@ function UnforwardedRadio(
+ ) {
+ 	const { store, disabled } = useContext( RadioGroupContext );
+ 
+-	const selectedValue = store?.useState( 'value' );
++	const selectedValue = useStoreState( store, 'value' );
+ 	const isChecked = selectedValue !== undefined && selectedValue === value;
+ 
+ 	return (
+diff --git a/packages/components/src/tab-panel/index.tsx b/packages/components/src/tab-panel/index.tsx
+index f85119d938c659..9e180c30321b93 100644
+--- a/packages/components/src/tab-panel/index.tsx
++++ b/packages/components/src/tab-panel/index.tsx
+@@ -2,6 +2,7 @@
+  * External dependencies
+  */
+ import * as Ariakit from '@ariakit/react';
++import { useStoreState } from '@ariakit/react';
+ import clsx from 'clsx';
+ import type { ForwardedRef } from 'react';
+ 
+@@ -121,7 +122,9 @@ const UnforwardedTabPanel = (
+ 		defaultSelectedId: prependInstanceId( initialTabName ),
+ 	} );
+ 
+-	const selectedTabName = extractTabName( tabStore.useState( 'selectedId' ) );
++	const selectedTabName = extractTabName(
++		useStoreState( tabStore, 'selectedId' )
++	);
+ 
+ 	const setTabStoreSelectedId = useCallback(
+ 		( tabName: string ) => {
+diff --git a/packages/components/src/tabs/index.tsx b/packages/components/src/tabs/index.tsx
+index cad4a217efd44d..ef8978b647a904 100644
+--- a/packages/components/src/tabs/index.tsx
++++ b/packages/components/src/tabs/index.tsx
+@@ -2,6 +2,7 @@
+  * External dependencies
+  */
+ import * as Ariakit from '@ariakit/react';
++import { useStoreState } from '@ariakit/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -48,7 +49,7 @@ function Tabs( {
+ 
+ 	const isControlled = selectedTabId !== undefined;
+ 
+-	const { items, selectedId, activeId } = store.useState();
++	const { items, selectedId, activeId } = useStoreState( store );
+ 	const { setSelectedId, setActiveId } = store;
+ 
+ 	// Keep track of whether tabs have been populated. This is used to prevent
+diff --git a/packages/components/src/tabs/tablist.tsx b/packages/components/src/tabs/tablist.tsx
+index 4906e0088417b7..80ed9b4c5bea2f 100644
+--- a/packages/components/src/tabs/tablist.tsx
++++ b/packages/components/src/tabs/tablist.tsx
+@@ -2,6 +2,7 @@
+  * External dependencies
+  */
+ import * as Ariakit from '@ariakit/react';
++import { useStoreState } from '@ariakit/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -26,7 +27,8 @@ export const TabList = forwardRef<
+ >( function TabList( { children, ...otherProps }, ref ) {
+ 	const context = useTabsContext();
+ 
+-	const selectedId = context?.store.useState( 'selectedId' );
++	const tabStoreState = useStoreState( context?.store );
++	const selectedId = tabStoreState?.selectedId;
+ 	const indicatorPosition = useTrackElementOffsetRect(
+ 		context?.store.item( selectedId )?.element
+ 	);
+@@ -37,13 +39,13 @@ export const TabList = forwardRef<
+ 		( { previousValue } ) => previousValue && setAnimationEnabled( true )
+ 	);
+ 
+-	if ( ! context ) {
++	if ( ! context || ! tabStoreState ) {
+ 		warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
+ 		return null;
+ 	}
+-	const { store } = context;
+ 
+-	const { activeId, selectOnMove } = store.useState();
++	const { store } = context;
++	const { activeId, selectOnMove } = tabStoreState;
+ 	const { setActiveId } = store;
+ 
+ 	const onBlur = () => {
+diff --git a/packages/components/src/tabs/tabpanel.tsx b/packages/components/src/tabs/tabpanel.tsx
+index 439671a39ff9b7..512b2609682722 100644
+--- a/packages/components/src/tabs/tabpanel.tsx
++++ b/packages/components/src/tabs/tabpanel.tsx
+@@ -1,7 +1,11 @@
+ /**
+- * WordPress dependencies
++ * External dependencies
+  */
++import { useStoreState } from '@ariakit/react';
+ 
++/**
++ * WordPress dependencies
++ */
+ import { forwardRef } from '@wordpress/element';
+ 
+ /**
+@@ -22,13 +26,13 @@ export const TabPanel = forwardRef<
+ 	ref
+ ) {
+ 	const context = useTabsContext();
++	const selectedId = useStoreState( context?.store, 'selectedId' );
+ 	if ( ! context ) {
+ 		warning( '`Tabs.TabPanel` must be wrapped in a `Tabs` component.' );
+ 		return null;
+ 	}
+ 	const { store, instanceId } = context;
+ 	const instancedTabId = `${ instanceId }-${ tabId }`;
+-	const selectedId = store.useState( ( state ) => state.selectedId );
+ 
+ 	return (
+ 		<StyledTabPanel
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx b/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx
+index c363cb6577d839..6baadd65dc5ff6 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx
+@@ -3,6 +3,7 @@
+  */
+ import type { ForwardedRef } from 'react';
+ import * as Ariakit from '@ariakit/react';
++import { useStoreState } from '@ariakit/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -66,7 +67,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
+ 		setValue: wrappedOnChangeProp,
+ 	} );
+ 
+-	const selectedValue = radio.useState( 'value' );
++	const selectedValue = useStoreState( radio, 'value' );
+ 	const setValue = radio.setValue;
+ 
+ 	const groupContextValue = useMemo(
+diff --git a/packages/components/src/tooltip/index.tsx b/packages/components/src/tooltip/index.tsx
+index e832119393282a..7ce9311fc942ea 100644
+--- a/packages/components/src/tooltip/index.tsx
++++ b/packages/components/src/tooltip/index.tsx
+@@ -2,6 +2,7 @@
+  * External dependencies
+  */
+ import * as Ariakit from '@ariakit/react';
++import { useStoreState } from '@ariakit/react';
+ import clsx from 'clsx';
+ 
+ /**
+@@ -93,7 +94,7 @@ function UnforwardedTooltip(
+ 		placement: computedPlacement,
+ 		showTimeout: delay,
+ 	} );
+-	const mounted = tooltipStore.useState( 'mounted' );
++	const mounted = useStoreState( tooltipStore, 'mounted' );
+ 
+ 	if ( isNestedInTooltip ) {
+ 		return isOnlyChild ? (
+diff --git a/packages/dataviews/src/dataviews-layouts/list/index.tsx b/packages/dataviews/src/dataviews-layouts/list/index.tsx
+index 70eaf3af1cd619..d8889f25b24e9c 100644
+--- a/packages/dataviews/src/dataviews-layouts/list/index.tsx
++++ b/packages/dataviews/src/dataviews-layouts/list/index.tsx
+@@ -3,6 +3,8 @@
+  */
+ import clsx from 'clsx';
+ // TODO: use the @wordpress/components one once public
++// eslint-disable-next-line no-restricted-imports
++import { useStoreState } from '@ariakit/react';
+ // Import CompositeStore type, which is not exported from @wordpress/components.
+ // eslint-disable-next-line no-restricted-imports
+ import type { CompositeStore } from '@ariakit/react';
+@@ -359,10 +361,11 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
+ 
+ 	const store = useCompositeStore( {
+ 		defaultActiveId: getItemDomId( selectedItem ),
+-	} );
++	} ) as CompositeStore; // TODO, remove once composite APIs are public
+ 
+ 	// Manage focused item, when the active one is removed from the list.
+-	const isActiveIdInList = store.useState(
++	const isActiveIdInList = useStoreState(
++		store,
+ 		( state: { items: any[]; activeId: any } ) =>
+ 			state.items.some(
+ 				( item: { id: any } ) => item.id === state.activeId

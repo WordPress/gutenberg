@@ -1,0 +1,76 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a85ee5b37e928d..e176cb36b8fad4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ -   `CircularOptionPicker`: Convert to TypeScript ([#47937](https://github.com/WordPress/gutenberg/pull/47937)).
+ -   `TabPanel`: Improve unit test in preparation for controlled component updates ([#48086](https://github.com/WordPress/gutenberg/pull/48086)).
+ -   `Autocomplete`: performance: avoid setting state on every value change ([#48485](https://github.com/WordPress/gutenberg/pull/48485)).
++-   `Higher Order` -- `with-constrained-tabbing`: Convert to TypeScript ([#48162](https://github.com/WordPress/gutenberg/pull/48162)).
+ 
+ ## 23.4.0 (2023-02-15)
+ 
+diff --git a/packages/components/src/higher-order/with-constrained-tabbing/index.js b/packages/components/src/higher-order/with-constrained-tabbing/index.js
+deleted file mode 100644
+index 506df55550bcc5..00000000000000
+--- a/packages/components/src/higher-order/with-constrained-tabbing/index.js
++++ /dev/null
+@@ -1,22 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import {
+-	createHigherOrderComponent,
+-	useConstrainedTabbing,
+-} from '@wordpress/compose';
+-
+-const withConstrainedTabbing = createHigherOrderComponent(
+-	( WrappedComponent ) =>
+-		function ComponentWithConstrainedTabbing( props ) {
+-			const ref = useConstrainedTabbing();
+-			return (
+-				<div ref={ ref } tabIndex={ -1 }>
+-					<WrappedComponent { ...props } />
+-				</div>
+-			);
+-		},
+-	'withConstrainedTabbing'
+-);
+-
+-export default withConstrainedTabbing;
+diff --git a/packages/components/src/higher-order/with-constrained-tabbing/index.tsx b/packages/components/src/higher-order/with-constrained-tabbing/index.tsx
+new file mode 100644
+index 00000000000000..b470f3309fb8de
+--- /dev/null
++++ b/packages/components/src/higher-order/with-constrained-tabbing/index.tsx
+@@ -0,0 +1,30 @@
++/**
++ * WordPress dependencies
++ */
++import {
++	createHigherOrderComponent,
++	useConstrainedTabbing,
++} from '@wordpress/compose';
++
++/**
++ * `withConstrainedTabbing` is a React [higher-order component](https://facebook.github.io/react/docs/higher-order-components.html)
++ * adding the ability to constrain keyboard navigation with the Tab key within a component.
++ * For accessibility reasons, some UI components need to constrain Tab navigation, for example
++ * modal dialogs or similar UI. Use of this component is recommended only in cases where a way to
++ * navigate away from the wrapped component is implemented by other means, usually by pressing
++ * the Escape key or using a specific UI control, e.g. a "Close" button.
++ */
++const withConstrainedTabbing = createHigherOrderComponent(
++	( WrappedComponent ) =>
++		function ComponentWithConstrainedTabbing( props ) {
++			const ref = useConstrainedTabbing();
++			return (
++				<div ref={ ref } tabIndex={ -1 }>
++					<WrappedComponent { ...props } />
++				</div>
++			);
++		},
++	'withConstrainedTabbing'
++);
++
++export default withConstrainedTabbing;

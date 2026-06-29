@@ -1,0 +1,83 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 12277f793d2d92..a5131f93ddcc0e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++- `ZStack`: Remove "experimental" designation ([#61075](https://github.com/WordPress/gutenberg/pull/61075)).
++
+ ### Enhancements
+ 
+ -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index a824162cb24129..1a4aa3ed32774a 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -200,7 +200,13 @@ export {
+ 	useSlotFills as __experimentalUseSlotFills,
+ } from './slot-fill';
+ export { default as __experimentalStyleProvider } from './style-provider';
+-export { ZStack as __experimentalZStack } from './z-stack';
++export {
++	/**
++	 * @deprecated Import `ZStack` instead.
++	 */
++	ZStack as __experimentalZStack,
++	ZStack,
++} from './z-stack';
+ 
+ // Higher-Order Components.
+ export {
+diff --git a/packages/components/src/z-stack/README.md b/packages/components/src/z-stack/README.md
+index 4de3d93c896812..1480ffaed7aefb 100644
+--- a/packages/components/src/z-stack/README.md
++++ b/packages/components/src/z-stack/README.md
+@@ -9,7 +9,7 @@ This feature is still experimental. “Experimental” means this is an early im
+ `ZStack` allows you to stack things along the Z-axis.
+ 
+ ```jsx
+-import { __experimentalZStack as ZStack } from '@wordpress/components';
++import { ZStack } from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+diff --git a/packages/components/src/z-stack/component.tsx b/packages/components/src/z-stack/component.tsx
+index 411ef13c7085e3..03393cd3ccb399 100644
+--- a/packages/components/src/z-stack/component.tsx
++++ b/packages/components/src/z-stack/component.tsx
+@@ -68,7 +68,7 @@ function UnconnectedZStack(
+  * `ZStack` allows you to stack things along the Z-axis.
+  *
+  * ```jsx
+- * import { __experimentalZStack as ZStack } from '@wordpress/components';
++ * import { ZStack } from '@wordpress/components';
+  *
+  * function Example() {
+  *   return (
+diff --git a/packages/components/src/z-stack/stories/index.story.tsx b/packages/components/src/z-stack/stories/index.story.tsx
+index 46a364bc520f32..b010d3ead04196 100644
+--- a/packages/components/src/z-stack/stories/index.story.tsx
++++ b/packages/components/src/z-stack/stories/index.story.tsx
+@@ -13,7 +13,7 @@ import { ZStack } from '..';
+ 
+ const meta: Meta< typeof ZStack > = {
+ 	component: ZStack,
+-	title: 'Components (Experimental)/ZStack',
++	title: 'Components/ZStack',
+ 	argTypes: {
+ 		as: { control: { type: 'text' } },
+ 		children: { control: { type: null } },
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 629f06bf98edf9..9d1a8cd146d3b9 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -1,6 +1,6 @@
+ <script>
+ 	( function redirectIfStoryMoved() {
+-		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation' ];
++		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation', 'zstack' ];
+ 		const REDIRECTS = [
+ 			{
+ 				from: /\/components-deprecated-/,

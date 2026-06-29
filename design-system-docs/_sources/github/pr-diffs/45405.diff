@@ -1,0 +1,65 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 85ea2c7387322d..26173ee53bce7c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -32,7 +32,7 @@
+ -   `ItemGroup`: fix RTL `Item` styles when rendered as a button ([#45280](https://github.com/WordPress/gutenberg/pull/45280)).
+ -   `Button`: Fix RTL alignment for buttons containing an icon and text ([#44787](https://github.com/WordPress/gutenberg/pull/44787)).
+ -   `TabPanel`: Call `onSelect()` on every tab selection, regardless of whether it was triggered by user interaction ([#44028](https://github.com/WordPress/gutenberg/pull/44028)).
+--   `FontSizePicker`: Fallback to font size `slug` if `name` is undefined  ([#45041](https://github.com/WordPress/gutenberg/pull/45041)).
++-   `FontSizePicker`: Fallback to font size `slug` if `name` is undefined ([#45041](https://github.com/WordPress/gutenberg/pull/45041)).
+ -   `AutocompleterUI`: fix issue where autocompleter UI would appear on top of other UI elements ([#44795](https://github.com/WordPress/gutenberg/pull/44795/))
+ -   `ExternalLink`: Fix to re-enable support for `onClick` event handler ([#45214](https://github.com/WordPress/gutenberg/pull/45214)).
+ 
+@@ -50,6 +50,7 @@
+ -   `UnitControl`: Add tests ([#45260](https://github.com/WordPress/gutenberg/pull/45260)).
+ -   `Disabled`: Refactor the component to rely on the HTML `inert` attribute.
+ -   `CustomGradientBar`: Refactor away from Lodash ([#45367](https://github.com/WordPress/gutenberg/pull/45367/)).
++-   `TextControl`: Set Storybook control types on `help`, `label` and `type` ([#45405](https://github.com/WordPress/gutenberg/pull/45405)).
+ -   `Autocomplete`: use Popover's new `placement` prop instead of legacy `position` prop ([#44396](https://github.com/WordPress/gutenberg/pull/44396/)).
+ 
+ ## 21.3.0 (2022-10-19)
+@@ -59,7 +60,7 @@
+ -   `FontSizePicker`: Ensure that fluid font size presets appear correctly in the UI controls ([#44791](https://github.com/WordPress/gutenberg/pull/44791)).
+ -   `ToggleGroupControl`: Remove unsupported `disabled` prop from types, and correctly mark `label` prop as required ([#45114](https://github.com/WordPress/gutenberg/pull/45114)).
+ -   `Navigator`: prevent partially hiding focus ring styles, by removing unnecessary overflow rules on `NavigatorScreen` ([#44973](https://github.com/WordPress/gutenberg/pull/44973)).
+--   `Navigator`: restore focus only once per location  ([#44972](https://github.com/WordPress/gutenberg/pull/44972)).
++-   `Navigator`: restore focus only once per location ([#44972](https://github.com/WordPress/gutenberg/pull/44972)).
+ 
+ ### Documentation
+ 
+diff --git a/packages/components/src/text-control/index.tsx b/packages/components/src/text-control/index.tsx
+index 9fbe02707f58d9..15d792489ba99e 100644
+--- a/packages/components/src/text-control/index.tsx
++++ b/packages/components/src/text-control/index.tsx
+@@ -62,8 +62,6 @@ function UnforwardedTextControl(
+ /**
+  * TextControl components let users enter and edit text.
+  *
+- *
+- * @example
+  * ```jsx
+  * import { TextControl } from '@wordpress/components';
+  * import { useState } from '@wordpress/element';
+diff --git a/packages/components/src/text-control/stories/index.tsx b/packages/components/src/text-control/stories/index.tsx
+index 89057c2b33910c..9c10a970e1ef1e 100644
+--- a/packages/components/src/text-control/stories/index.tsx
++++ b/packages/components/src/text-control/stories/index.tsx
+@@ -17,12 +17,11 @@ const meta: ComponentMeta< typeof TextControl > = {
+ 	component: TextControl,
+ 	title: 'Components/TextControl',
+ 	argTypes: {
+-		onChange: {
+-			action: 'onChange',
+-		},
+-		value: {
+-			control: { type: null },
+-		},
++		help: { control: { type: 'text' } },
++		label: { control: { type: 'text' } },
++		type: { control: { type: 'text' } },
++		onChange: { action: 'onChange' },
++		value: { control: { type: null } },
+ 	},
+ 	parameters: {
+ 		controls: {

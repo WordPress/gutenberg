@@ -1,0 +1,325 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index c9e4d0b8b32d7c..e7293389ef83cc 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -977,12 +977,6 @@
+ 		"markdown_source": "../packages/components/src/responsive-wrapper/README.md",
+ 		"parent": "components"
+ 	},
+-	{
+-		"title": "RovingTabIndex",
+-		"slug": "roving-tab-index",
+-		"markdown_source": "../packages/components/src/roving-tab-index/README.md",
+-		"parent": "components"
+-	},
+ 	{
+ 		"title": "Sandbox",
+ 		"slug": "sandbox",
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 293eff0c10bf11..9b80e7f1867cac 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -78,10 +78,6 @@ export { default as RadioControl } from './radio-control';
+ export { default as RangeControl } from './range-control';
+ export { default as ResizableBox } from './resizable-box';
+ export { default as ResponsiveWrapper } from './responsive-wrapper';
+-export {
+-	default as __experimentalRovingTabIndex,
+-	RovingTabIndexItem as __experimentalRovingTabIndexItem,
+-} from './roving-tab-index';
+ export { default as SandBox } from './sandbox';
+ export { default as SelectControl } from './select-control';
+ export { default as Snackbar } from './snackbar';
+diff --git a/packages/components/src/roving-tab-index/README.md b/packages/components/src/roving-tab-index/README.md
+deleted file mode 100644
+index 66cf6bdc00eaee..00000000000000
+--- a/packages/components/src/roving-tab-index/README.md
++++ /dev/null
+@@ -1,97 +0,0 @@
+-# RovingTabIndex
+-
+-## Table of contents
+-
+-1. [Development guidelines](#development-guidelines)
+-2. [Related components](#related-components)
+-
+-## Development guidelines
+-
+-`RovingTabIndex` and `RovingTabIndexItem` are components that help to manage focus in the style of a roving tab index.
+-
+-A roving tab index is helpful for a UI component that contains multiple focusable elements, it reduces the number of tab stops in such a component to a single tab stop. Some more information is available here:
+-
+-- [WAI Aria Authoring Practices - Roving Tab Index](https://www.w3.org/TR/wai-aria-practices-1.1/#kbd_roving_tabindex)
+-
+-Some patterns that implement a roving tab index are:
+-
+-- [Layout Grid](https://www.w3.org/TR/wai-aria-practices/examples/grid/LayoutGrids.html)
+-- [Editor Menu Bar](https://www.w3.org/TR/wai-aria-practices/examples/menubar/menubar-2/menubar-2.html)
+-- [Navigation Menu Bar](https://www.w3.org/TR/wai-aria-practices/examples/menubar/menubar-1/menubar-1.html)
+-- [Radio Group](https://www.w3.org/TR/wai-aria-practices/examples/radio/radio-1/radio-1.html)
+-- [Toolbar](https://www.w3.org/TR/wai-aria-practices/examples/toolbar/toolbar.html)
+-- [Tree Grid](https://www.w3.org/TR/wai-aria-practices/examples/treegrid/treegrid-1.html)
+-- [Tree View](https://www.w3.org/TR/wai-aria-practices/examples/treeview/treeview-2/treeview-2a.html)
+-
+-This component doesn't implement any keyboard navigation, instead it handles setting the correct `tabIndex` value on focusable elements. It should be composed with another component that implements keyboard navigation (e.g. arrow key navigation).
+-
+-### Usage
+-
+-Wrap the component with `RovingTabIndex` and declare individual focusable elements within the component with `RovingTabIndexItem`.
+-
+-```jsx
+-function TreeMenu() {
+-	return (
+-		<RovingTabIndex>
+-			<ul role="tree">
+-				<li role="treeitem">
+-					<span>First item</span>
+-					<RovingTabIndexItem as={ Button }>
+-						Select
+-					</RovingTabIndexItem>
+-				</li>
+-				<li role="treeitem">
+-					<span>Second item</span>
+-					<RovingTabIndexItem as={ Button }>
+-						Select
+-					</RovingTabIndexItem>
+-				</li>
+-			</ul>
+-		</RovingTabIndex>
+-	);
+-}
+-```
+-
+-### Sub-Components
+-
+-#### RovingTabIndex
+-
+-##### Props
+-
+-This component takes no props, but should always have `children`.
+-
+-#### `RovingTabIndexItem`
+-
+-##### Props
+-
+-###### as
+-
+-Specify the component that the item should render as. For example the following renders a button with the text 'Close':
+-
+-```jsx
+-<RovingTabIndexItem as={ Button }>Close</RovingTabIndexItem>
+-```
+-
+-All props other than `as` are forwarded to the component, for example, the following code passes the `onClick` handler to the rendered `Button` component:
+-
+-```jsx
+-<RovingTabIndexItem as={ Button } onClick={ onClose }>Close</RovingTabIndexItem>
+-```
+-
+-Components used with the `as` prop must be able to receive the `onFocus`, `tabIndex`, and `ref` props and pass those props to the element it renders.
+-
+-As an alternative to `as`, `RovingTabIndexItem` also supports a render prop function:
+-
+-```jsx
+-<RovingTabIndexItem>
+-	{ ( props ) => <Button onClick={ onClose } { ...props }>Close</Button> }
+-</RovingTabIndexItem>
+-```
+-
+-The `props` passed to `Button` in this example contain the aforementioned `onFocus`, `tabIndex`, and `ref` props. For the roving tab index functionality to work, they should always be passed onto the `RovingTabIndexItem`'s child and handled correctly by that child.
+-
+-- Type: `React Component`
+-- Required: No
+-
+-## Related components
+-- `TreeGrid` implements a `RovingTabIndex`.
+diff --git a/packages/components/src/roving-tab-index/stories/index.js b/packages/components/src/roving-tab-index/stories/index.js
+deleted file mode 100644
+index 36eaf245cd5125..00000000000000
+--- a/packages/components/src/roving-tab-index/stories/index.js
++++ /dev/null
+@@ -1,64 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import RovingTabIndex, { RovingTabIndexItem } from '../';
+-import { Button } from '../../';
+-
+-export default {
+-	title: 'Components/RovingTabIndex',
+-	component: RovingTabIndex,
+-};
+-
+-export const _default = () => {
+-	const onKeyDown = ( event ) => {
+-		// Left key pressed.
+-		if ( event.keyCode === 37 ) {
+-			const previous = event.target.previousElementSibling;
+-			if ( previous ) {
+-				previous.focus();
+-			}
+-		}
+-		// Right key pressed.
+-		if ( event.keyCode === 39 ) {
+-			const next = event.target.nextElementSibling;
+-			if ( next ) {
+-				next.focus();
+-			}
+-		}
+-		// Home key pressed.
+-		if ( event.keyCode === 36 ) {
+-			const first = event.target.parentElement.firstElementChild;
+-			if ( first ) {
+-				first.focus();
+-			}
+-		}
+-		// End key pressed.
+-		if ( event.keyCode === 35 ) {
+-			const last = event.target.parentElement.lastElementChild;
+-			if ( last ) {
+-				last.focus();
+-			}
+-		}
+-	};
+-
+-	return (
+-		<RovingTabIndex>
+-			<div
+-				role="toolbar"
+-				aria-label="Toolbar Example"
+-				style={ { display: 'flex' } }
+-				onKeyDown={ onKeyDown }
+-			>
+-				<RovingTabIndexItem as={ Button } isPrimary>
+-					Item 1
+-				</RovingTabIndexItem>
+-				<RovingTabIndexItem as={ Button } isPrimary>
+-					Item 2
+-				</RovingTabIndexItem>
+-				<RovingTabIndexItem as={ Button } isPrimary>
+-					Item 3
+-				</RovingTabIndexItem>
+-			</div>
+-		</RovingTabIndex>
+-	);
+-};
+diff --git a/packages/components/src/tree-grid/README.md b/packages/components/src/tree-grid/README.md
+index 47820f253c0b66..6cd6b0179cb95c 100644
+--- a/packages/components/src/tree-grid/README.md
++++ b/packages/components/src/tree-grid/README.md
+@@ -1,4 +1,4 @@
+-# TreeGrid
++# TreeGrid (experimental)
+ 
+ ## Table of contents
+ 
+diff --git a/packages/components/src/tree-grid/cell.js b/packages/components/src/tree-grid/cell.js
+index a8e200ddce5647..a804af0d501b8f 100644
+--- a/packages/components/src/tree-grid/cell.js
++++ b/packages/components/src/tree-grid/cell.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { RovingTabIndexItem } from '../roving-tab-index';
++import RovingTabIndexItem from './roving-tab-index-item';
+ 
+ export default function TreeGridCell( { children, ...props } ) {
+ 	return (
+diff --git a/packages/components/src/tree-grid/index.js b/packages/components/src/tree-grid/index.js
+index e9d3c9d507b133..e9e4feb57dacb8 100644
+--- a/packages/components/src/tree-grid/index.js
++++ b/packages/components/src/tree-grid/index.js
+@@ -13,7 +13,7 @@ import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
+ /**
+  * Internal dependencies
+  */
+-import RovingTabIndexContainer from '../roving-tab-index';
++import RovingTabIndexContainer from './roving-tab-index';
+ 
+ /**
+  * Return focusables in a row element, excluding those from other branches
+diff --git a/packages/components/src/roving-tab-index/context.js b/packages/components/src/tree-grid/roving-tab-index-context.js
+similarity index 100%
+rename from packages/components/src/roving-tab-index/context.js
+rename to packages/components/src/tree-grid/roving-tab-index-context.js
+diff --git a/packages/components/src/roving-tab-index/item.js b/packages/components/src/tree-grid/roving-tab-index-item.js
+similarity index 90%
+rename from packages/components/src/roving-tab-index/item.js
+rename to packages/components/src/tree-grid/roving-tab-index-item.js
+index f1f951f2b1eca3..b876aa5be565bd 100644
+--- a/packages/components/src/roving-tab-index/item.js
++++ b/packages/components/src/tree-grid/roving-tab-index-item.js
+@@ -6,7 +6,7 @@ import { useRef } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { useRovingTabIndexContext } from './context';
++import { useRovingTabIndexContext } from './roving-tab-index-context';
+ 
+ export default function RovingTabIndexItem( {
+ 	children,
+diff --git a/packages/components/src/roving-tab-index/index.js b/packages/components/src/tree-grid/roving-tab-index.js
+similarity index 87%
+rename from packages/components/src/roving-tab-index/index.js
+rename to packages/components/src/tree-grid/roving-tab-index.js
+index f39d8bde78f952..7a517b5e66cca0 100644
+--- a/packages/components/src/roving-tab-index/index.js
++++ b/packages/components/src/tree-grid/roving-tab-index.js
+@@ -6,7 +6,7 @@ import { useState, useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { RovingTabIndexProvider } from './context';
++import { RovingTabIndexProvider } from './roving-tab-index-context';
+ 
+ /**
+  * @see https://github.com/WordPress/gutenberg/blob/master/packages/components/src/roving-tab-index/README.md
+@@ -28,5 +28,3 @@ export default function RovingTabIndex( { children } ) {
+ 		</RovingTabIndexProvider>
+ 	);
+ }
+-
+-export { default as RovingTabIndexItem } from './item';
+diff --git a/packages/components/src/roving-tab-index/test/__snapshots__/item.js.snap b/packages/components/src/tree-grid/test/__snapshots__/roving-tab-index-item.js.snap
+similarity index 100%
+rename from packages/components/src/roving-tab-index/test/__snapshots__/item.js.snap
+rename to packages/components/src/tree-grid/test/__snapshots__/roving-tab-index-item.js.snap
+diff --git a/packages/components/src/roving-tab-index/test/__snapshots__/index.js.snap b/packages/components/src/tree-grid/test/__snapshots__/roving-tab-index.js.snap
+similarity index 100%
+rename from packages/components/src/roving-tab-index/test/__snapshots__/index.js.snap
+rename to packages/components/src/tree-grid/test/__snapshots__/roving-tab-index.js.snap
+diff --git a/packages/components/src/roving-tab-index/test/item.js b/packages/components/src/tree-grid/test/roving-tab-index-item.js
+similarity index 93%
+rename from packages/components/src/roving-tab-index/test/item.js
+rename to packages/components/src/tree-grid/test/roving-tab-index-item.js
+index 80b97377da4979..74e071a71881e1 100644
+--- a/packages/components/src/roving-tab-index/test/item.js
++++ b/packages/components/src/tree-grid/test/roving-tab-index-item.js
+@@ -11,8 +11,8 @@ import { forwardRef } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import RovingTabIndex from '../';
+-import RovingTabIndexItem from '../item';
++import RovingTabIndex from '../roving-tab-index';
++import RovingTabIndexItem from '../roving-tab-index-item';
+ 
+ const TestButton = forwardRef( ( { ...props }, ref ) => (
+ 	<button { ...props } ref={ ref }></button>
+diff --git a/packages/components/src/roving-tab-index/test/index.js b/packages/components/src/tree-grid/test/roving-tab-index.js
+similarity index 88%
+rename from packages/components/src/roving-tab-index/test/index.js
+rename to packages/components/src/tree-grid/test/roving-tab-index.js
+index 942064581a351c..4ceba4e3e9d465 100644
+--- a/packages/components/src/roving-tab-index/test/index.js
++++ b/packages/components/src/tree-grid/test/roving-tab-index.js
+@@ -6,7 +6,7 @@ import TestRenderer from 'react-test-renderer';
+ /**
+  * Internal dependencies
+  */
+-import RovingTabIndex from '../';
++import RovingTabIndex from '../roving-tab-index';
+ 
+ describe( 'RovingTabIndex', () => {
+ 	it( 'does not render any elements other than its children', () => {

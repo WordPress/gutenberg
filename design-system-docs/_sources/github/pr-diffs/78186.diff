@@ -1,0 +1,40 @@
+diff --git a/packages/design-system-mcp/CHANGELOG.md b/packages/design-system-mcp/CHANGELOG.md
+index eec5c5540d8b25..0fca92488b8415 100644
+--- a/packages/design-system-mcp/CHANGELOG.md
++++ b/packages/design-system-mcp/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancements
+ 
+ -   `get_component_details` now optionally accepts an array of component names so multiple components can be fetched in a single call. ([#78185](https://github.com/WordPress/gutenberg/pull/78185))
++-   The server now provides instructions on how AI agents should be expected to use it, improving discoverability and tool call efficiency. ([#78186](https://github.com/WordPress/gutenberg/pull/78186))
+ 
+ ## 0.3.0 (2026-05-14)
+ 
+diff --git a/packages/design-system-mcp/src/index.ts b/packages/design-system-mcp/src/index.ts
+index 11f14636d2abb6..f41a24a833bbb3 100644
+--- a/packages/design-system-mcp/src/index.ts
++++ b/packages/design-system-mcp/src/index.ts
+@@ -4,10 +4,19 @@ import { registerTools } from './tools/index';
+ export { parseComponents, parseComponentDetail } from './parse-components';
+ 
+ export function createServer() {
+-	const server = new McpServer( {
+-		name: 'WordPress Design System',
+-		version: '0.1.0',
+-	} );
++	const server = new McpServer(
++		{
++			name: 'WordPress Design System',
++			version: '0.1.0',
++		},
++		{
++			instructions: [
++				'Provides discovery and usage information for the WordPress Design System. Covers components in `@wordpress/components` and `@wordpress/ui`, and the underlying design tokens from `@wordpress/theme` exposed as `--wpds-*` CSS custom properties.',
++				'In a typical flow, a user will often refer to components by generic names ("button", "dropdown menu") that don\'t match the actual export. Call `get_components` first to map the request to canonical component names, then `get_component_details` for one or more of those names to get props, descriptions, and usage notes.',
++				'`get_design_tokens` covers the semantic, themeable design tokens that the components are built on. While these can be used for custom styling that adapts to the current design system theme settings, prefer using the available component APIs when available.',
++			].join( '\n\n' ),
++		}
++	);
+ 
+ 	registerTools( server );
+ 

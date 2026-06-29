@@ -1,0 +1,79 @@
+diff --git a/packages/components/src/box-control/index.js b/packages/components/src/box-control/index.js
+index 4291c756a9aeb7..187e8f10214011 100644
+--- a/packages/components/src/box-control/index.js
++++ b/packages/components/src/box-control/index.js
+@@ -139,7 +139,10 @@ export default function BoxControl( {
+ 				</FlexItem>
+ 				{ isLinked && (
+ 					<FlexBlock>
+-						<AllInputControl { ...inputControlProps } />
++						<AllInputControl
++							aria-label={ label }
++							{ ...inputControlProps }
++						/>
+ 					</FlexBlock>
+ 				) }
+ 				<FlexItem>
+diff --git a/packages/components/src/box-control/linked-button.js b/packages/components/src/box-control/linked-button.js
+index ced8fe5169a857..000a7b505ddcf3 100644
+--- a/packages/components/src/box-control/linked-button.js
++++ b/packages/components/src/box-control/linked-button.js
+@@ -11,12 +11,10 @@ import Button from '../button';
+ import Tooltip from '../tooltip';
+ 
+ export default function LinkedButton( { isLinked, ...props } ) {
+-	const linkedTooltipText = isLinked
+-		? __( 'Unlink Sides' )
+-		: __( 'Link Sides' );
++	const label = isLinked ? __( 'Unlink Sides' ) : __( 'Link Sides' );
+ 
+ 	return (
+-		<Tooltip text={ linkedTooltipText }>
++		<Tooltip text={ label }>
+ 			<span>
+ 				<Button
+ 					{ ...props }
+@@ -26,6 +24,7 @@ export default function LinkedButton( { isLinked, ...props } ) {
+ 					isSmall
+ 					icon={ isLinked ? link : linkOff }
+ 					iconSize={ 16 }
++					aria-label={ label }
+ 				/>
+ 			</span>
+ 		</Tooltip>
+diff --git a/packages/components/src/box-control/unit-control.js b/packages/components/src/box-control/unit-control.js
+index a8b4deaab65ca1..72a9b47a5d7d47 100644
+--- a/packages/components/src/box-control/unit-control.js
++++ b/packages/components/src/box-control/unit-control.js
+@@ -29,9 +29,10 @@ export default function BoxUnitControl( {
+ 	} );
+ 
+ 	return (
+-		<UnitControlWrapper aria-label={ label } { ...bindHoverGesture() }>
++		<UnitControlWrapper { ...bindHoverGesture() }>
+ 			<Tooltip text={ label }>
+ 				<UnitControl
++					aria-label={ label }
+ 					className="component-box-control__unit-control"
+ 					hideHTMLArrows
+ 					isFirst={ isFirst }
+diff --git a/packages/components/src/unit-control/index.js b/packages/components/src/unit-control/index.js
+index 782cce7d910ac3..9b0b0c42d645c0 100644
+--- a/packages/components/src/unit-control/index.js
++++ b/packages/components/src/unit-control/index.js
+@@ -8,6 +8,7 @@ import classnames from 'classnames';
+  * WordPress dependencies
+  */
+ import { forwardRef, useRef } from '@wordpress/element';
++import { __ } from '@wordpress/i18n';
+ import { ENTER } from '@wordpress/keycodes';
+ 
+ /**
+@@ -147,6 +148,7 @@ function UnitControl(
+ 
+ 	const inputSuffix = ! disableUnits ? (
+ 		<UnitSelectControl
++			aria-label={ __( 'Select unit' ) }
+ 			disabled={ disabled }
+ 			isTabbable={ isUnitSelectTabbable }
+ 			options={ units }

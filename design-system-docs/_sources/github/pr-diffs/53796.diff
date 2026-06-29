@@ -1,0 +1,31 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index de682ae40feac8..ea8c2eda513b14 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fix
++
++-   `SandBox`: Fix the cleanup method in useEffect ([#53796](https://github.com/WordPress/gutenberg/pull/53796)).
++
+ ## 25.6.0 (2023-08-16)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/sandbox/index.tsx b/packages/components/src/sandbox/index.tsx
+index b914165721fadc..ecd51e1fc26643 100644
+--- a/packages/components/src/sandbox/index.tsx
++++ b/packages/components/src/sandbox/index.tsx
+@@ -254,7 +254,10 @@ function SandBox( {
+ 
+ 		return () => {
+ 			iframe?.removeEventListener( 'load', tryNoForceSandBox, false );
+-			defaultView?.addEventListener( 'message', checkMessageForResize );
++			defaultView?.removeEventListener(
++				'message',
++				checkMessageForResize
++			);
+ 		};
+ 		// Ignore reason: passing `exhaustive-deps` will likely involve a more detailed refactor.
+ 		// See https://github.com/WordPress/gutenberg/pull/44378

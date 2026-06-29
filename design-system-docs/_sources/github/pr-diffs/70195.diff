@@ -1,0 +1,25 @@
+diff --git a/packages/components/src/form-token-field/suggestions-list.tsx b/packages/components/src/form-token-field/suggestions-list.tsx
+index 1339e0cc189e38..8a23744e614f65 100644
+--- a/packages/components/src/form-token-field/suggestions-list.tsx
++++ b/packages/components/src/form-token-field/suggestions-list.tsx
+@@ -37,7 +37,6 @@ export function SuggestionsList<
+ 		( listNode ) => {
+ 			// only have to worry about scrolling selected suggestion into view
+ 			// when already expanded.
+-			let rafId: number | undefined;
+ 			if (
+ 				selectedIndex > -1 &&
+ 				scrollIntoView &&
+@@ -49,12 +48,6 @@ export function SuggestionsList<
+ 					inline: 'nearest',
+ 				} );
+ 			}
+-
+-			return () => {
+-				if ( rafId !== undefined ) {
+-					cancelAnimationFrame( rafId );
+-				}
+-			};
+ 		},
+ 		[ selectedIndex, scrollIntoView ]
+ 	);

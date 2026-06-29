@@ -1,0 +1,42 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4b0846f906731c..5333b019efb222 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ -   Added `__experimentalHideHeader` prop to `Modal` component ([#36831](https://github.com/WordPress/gutenberg/pull/36831)).
+ -   Added experimental `ConfirmDialog` component ([#34153](https://github.com/WordPress/gutenberg/pull/34153)).
+ -   Divider: improve support for vertical orientation and RTL styles, use start/end logical props instead of top/bottom, change border-color to `currentColor` ([#36579](https://github.com/WordPress/gutenberg/pull/36579)).
++-   ToggleGroupControl: Avoid calling `onChange` if radio state changed from an incoming value ([#37224](https://github.com/WordPress/gutenberg/pull/37224/)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index e2fe005c6e672d..a4059ecef6eeac 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -12,7 +12,7 @@ import useResizeAware from 'react-resize-aware';
+  */
+ import { __ } from '@wordpress/i18n';
+ import { useRef, useMemo } from '@wordpress/element';
+-import { useMergeRefs, useInstanceId } from '@wordpress/compose';
++import { useMergeRefs, useInstanceId, usePrevious } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+@@ -59,10 +59,15 @@ function ToggleGroupControl(
+ 		baseId,
+ 		state: value,
+ 	} );
++	const previousValue = usePrevious( value );
+ 
+ 	// Propagate radio.state change
+ 	useUpdateEffect( () => {
+-		onChange( radio.state );
++		// Avoid calling onChange if radio state changed
++		// from incoming value.
++		if ( previousValue !== radio.state ) {
++			onChange( radio.state );
++		}
+ 	}, [ radio.state ] );
+ 
+ 	// Sync incoming value with radio.state

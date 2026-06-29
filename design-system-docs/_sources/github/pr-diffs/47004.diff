@@ -1,0 +1,499 @@
+diff --git a/packages/block-editor/src/components/block-popover/inbetween.js b/packages/block-editor/src/components/block-popover/inbetween.js
+index 9de5bd36637055..f9dd7adde42fb9 100644
+--- a/packages/block-editor/src/components/block-popover/inbetween.js
++++ b/packages/block-editor/src/components/block-popover/inbetween.js
+@@ -68,53 +68,6 @@ function BlockPopoverInbetween( {
+ 	const previousElement = useBlockElement( previousClientId );
+ 	const nextElement = useBlockElement( nextClientId );
+ 	const isVertical = orientation === 'vertical';
+-	const style = useMemo( () => {
+-		if (
+-			// popoverRecomputeCounter is by definition always equal or greater than 0.
+-			// This check is only there to satisfy the correctness of the
+-			// exhaustive-deps rule for the `useMemo` hook.
+-			popoverRecomputeCounter < 0 ||
+-			( ! previousElement && ! nextElement ) ||
+-			! isVisible
+-		) {
+-			return {};
+-		}
+-
+-		const previousRect = previousElement
+-			? previousElement.getBoundingClientRect()
+-			: null;
+-		const nextRect = nextElement
+-			? nextElement.getBoundingClientRect()
+-			: null;
+-
+-		if ( isVertical ) {
+-			return {
+-				width: previousRect ? previousRect.width : nextRect.width,
+-				height:
+-					nextRect && previousRect
+-						? nextRect.top - previousRect.bottom
+-						: 0,
+-			};
+-		}
+-
+-		let width = 0;
+-		if ( previousRect && nextRect ) {
+-			width = isRTL()
+-				? previousRect.left - nextRect.right
+-				: nextRect.left - previousRect.right;
+-		}
+-
+-		return {
+-			width,
+-			height: previousRect ? previousRect.height : nextRect.height,
+-		};
+-	}, [
+-		previousElement,
+-		nextElement,
+-		isVertical,
+-		popoverRecomputeCounter,
+-		isVisible,
+-	] );
+ 
+ 	const popoverAnchor = useMemo( () => {
+ 		if (
+@@ -142,10 +95,17 @@ function BlockPopoverInbetween( {
+ 
+ 				let left = 0;
+ 				let top = 0;
++				let width = 0;
++				let height = 0;
+ 
+ 				if ( isVertical ) {
+ 					// vertical
+ 					top = previousRect ? previousRect.bottom : nextRect.top;
++					width = previousRect ? previousRect.width : nextRect.width;
++					height =
++						nextRect && previousRect
++							? nextRect.top - previousRect.bottom
++							: 0;
+ 
+ 					if ( isRTL() ) {
+ 						// vertical, rtl
+@@ -158,21 +118,32 @@ function BlockPopoverInbetween( {
+ 					}
+ 				} else {
+ 					top = previousRect ? previousRect.top : nextRect.top;
++					height = previousRect
++						? previousRect.height
++						: nextRect.height;
+ 
+ 					if ( isRTL() ) {
+ 						// non vertical, rtl
+ 						left = previousRect
+ 							? previousRect.left
+ 							: nextRect.right;
++						width =
++							previousRect && nextRect
++								? previousRect.left - nextRect.right
++								: 0;
+ 					} else {
+ 						// non vertical, ltr
+ 						left = previousRect
+ 							? previousRect.right
+ 							: nextRect.left;
++						width =
++							previousRect && nextRect
++								? nextRect.left - previousRect.right
++								: 0;
+ 					}
+ 				}
+ 
+-				return new window.DOMRect( left, top, 0, 0 );
++				return new window.DOMRect( left, top, width, height );
+ 			},
+ 		};
+ 	}, [
+@@ -267,13 +238,10 @@ function BlockPopoverInbetween( {
+ 			) }
+ 			resize={ false }
+ 			flip={ false }
+-			placement="bottom-start"
++			placement="overlay"
+ 			variant="unstyled"
+ 		>
+-			<div
+-				className="block-editor-block-popover__inbetween-container"
+-				style={ style }
+-			>
++			<div className="block-editor-block-popover__inbetween-container">
+ 				{ children }
+ 			</div>
+ 		</Popover>
+diff --git a/packages/block-editor/src/components/iframe/index.js b/packages/block-editor/src/components/iframe/index.js
+index 71ac295979cec7..b7c25fe7dc84b1 100644
+--- a/packages/block-editor/src/components/iframe/index.js
++++ b/packages/block-editor/src/components/iframe/index.js
+@@ -108,6 +108,7 @@ function Iframe( {
+ 	tabIndex = 0,
+ 	scale = 1,
+ 	frameSize = 0,
++	expand = false,
+ 	readonly,
+ 	forwardedRef: ref,
+ 	...props
+@@ -246,11 +247,30 @@ function Iframe( {
+ 		return '<!doctype html>' + renderToString( styleAssets );
+ 	}, [] );
+ 
++	// We need to counter the margin created by scaling the iframe. If the scale
++	// is e.g. 0.45, then the top + bottom margin is 0.55 (1 - scale). Just the
++	// top or bottom margin is 0.55 / 2 ((1 - scale) / 2).
++	const marginFromScaling = ( contentHeight * ( 1 - scale ) ) / 2;
++
+ 	return (
+ 		<>
+ 			{ tabIndex >= 0 && before }
+ 			<iframe
+ 				{ ...props }
++				style={ {
++					...props.style,
++					height: expand ? contentHeight : props.style?.height,
++					marginTop: scale
++						? -marginFromScaling + frameSize
++						: props.style?.marginTop,
++					marginBottom: scale
++						? -marginFromScaling + frameSize
++						: props.style?.marginBottom,
++					transform: scale
++						? `scale( ${ scale } )`
++						: props.style?.transform,
++					transition: 'all .3s',
++				} }
+ 				ref={ useMergeRefs( [ ref, setRef ] ) }
+ 				tabIndex={ tabIndex }
+ 				// Correct doctype is required to enable rendering in standards
+@@ -265,13 +285,6 @@ function Iframe( {
+ 							<head ref={ headRef }>
+ 								{ styleAssets }
+ 								{ head }
+-								<style>
+-									{ `html { transition: background 5s; ${
+-										frameSize
+-											? 'background: #2f2f2f; transition: background 0s;'
+-											: ''
+-									} }` }
+-								</style>
+ 							</head>
+ 							<body
+ 								ref={ bodyRef }
+@@ -280,17 +293,6 @@ function Iframe( {
+ 									'editor-styles-wrapper',
+ 									...bodyClasses
+ 								) }
+-								style={ {
+-									// This is the remaining percentage from the scaling down
+-									// of the iframe body(`scale(0.45)`). We also need to subtract
+-									// the body's bottom margin.
+-									marginBottom: `-${
+-										contentHeight * ( 1 - scale ) -
+-										frameSize
+-									}px`,
+-									marginTop: frameSize,
+-									transform: `scale( ${ scale } )`,
+-								} }
+ 							>
+ 								{ contentResizeListener }
+ 								<StyleProvider document={ iframeDocument }>
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f5e9fea45f264f..f4c1780053b9c8 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ -   `Dropdown`: deprecate `position`  prop, use `popoverProps` instead ([46865](https://github.com/WordPress/gutenberg/pull/46865)).
+ -   `Button`: improve padding for buttons with icon and text. ([46764](https://github.com/WordPress/gutenberg/pull/46764)).
+ -   `ColorPalette`: Use computed color when css variable is passed to `ColorPicker` ([47181](https://github.com/WordPress/gutenberg/pull/47181)).
++-   `Popover`: add `overlay` option to the `placement` prop ([47004](https://github.com/WordPress/gutenberg/pull/47004)).
+ 
+ ### Internal
+ 
+@@ -29,6 +30,7 @@
+ -   `QueryControls`: Convert to TypeScript ([#46721](https://github.com/WordPress/gutenberg/pull/46721)).
+ -   `TreeGrid`: Convert to TypeScript ([#47516](https://github.com/WordPress/gutenberg/pull/47516)).
+ -   `Notice`: refactor to TypeScript ([47118](https://github.com/WordPress/gutenberg/pull/47118)).
++-   `Popover`: Take iframe element scaling into account ([47004](https://github.com/WordPress/gutenberg/pull/47004)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/popover/README.md b/packages/components/src/popover/README.md
+index e012dce41e9a90..ad04de226e90d3 100644
+--- a/packages/components/src/popover/README.md
++++ b/packages/components/src/popover/README.md
+@@ -196,10 +196,13 @@ A callback invoked when the popover should be closed.
+ 
+ -   Required: No
+ 
+-### `placement`: `'top' | 'top-start' | 'top-end' | 'right' | 'right-start' | 'right-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end'`
++### `placement`: `'top' | 'top-start' | 'top-end' | 'right' | 'right-start' | 'right-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end' | 'overlay'`
+ 
+ Used to specify the popover's position with respect to its anchor.
+ 
++`overlay` is a special case that places the popover over the reference element.
++Please note that other placement related props may not behave as excepted.
++
+ -   Required: No
+ -   Default: `"bottom-start"`
+ 
+diff --git a/packages/components/src/popover/index.tsx b/packages/components/src/popover/index.tsx
+index 14f1ddd8bab967..ff72f371c4009b 100644
+--- a/packages/components/src/popover/index.tsx
++++ b/packages/components/src/popover/index.tsx
+@@ -43,6 +43,7 @@ import {
+ import { close } from '@wordpress/icons';
+ import deprecated from '@wordpress/deprecated';
+ import { Path, SVG } from '@wordpress/primitives';
++import { getScrollContainer } from '@wordpress/dom';
+ 
+ /**
+  * Internal dependencies
+@@ -52,6 +53,7 @@ import ScrollLock from '../scroll-lock';
+ import { Slot, Fill, useSlot } from '../slot-fill';
+ import {
+ 	getFrameOffset,
++	getFrameScale,
+ 	positionToPlacement,
+ 	placementToMotionAnimationProps,
+ 	getReferenceOwnerDocument,
+@@ -65,6 +67,7 @@ import type {
+ 	PopoverAnchorRefTopBottom,
+ } from './types';
+ import { limitShift as customLimitShift } from './limit-shift';
++import { overlayMiddlewares } from './overlay-middlewares';
+ 
+ /**
+  * Name of slot in which popover should fill.
+@@ -268,6 +271,7 @@ const UnforwardedPopover = (
+ 	const frameOffsetRef = useRef( getFrameOffset( referenceOwnerDocument ) );
+ 
+ 	const middleware = [
++		...( placementProp === 'overlay' ? overlayMiddlewares() : [] ),
+ 		// Custom middleware which adjusts the popover's position by taking into
+ 		// account the offset of the anchor's iframe (if any) compared to the page.
+ 		{
+@@ -361,7 +365,10 @@ const UnforwardedPopover = (
+ 		placement: computedPlacement,
+ 		middlewareData: { arrow: arrowData },
+ 	} = useFloating( {
+-		placement: normalizedPlacementFromProps,
++		placement:
++			normalizedPlacementFromProps === 'overlay'
++				? undefined
++				: normalizedPlacementFromProps,
+ 		middleware,
+ 		whileElementsMounted: ( referenceParam, floatingParam, updateParam ) =>
+ 			autoUpdate( referenceParam, floatingParam, updateParam, {
+@@ -399,12 +406,14 @@ const UnforwardedPopover = (
+ 			fallbackReferenceElement,
+ 			fallbackDocument: document,
+ 		} );
++		const scale = getFrameScale( resultingReferenceOwnerDoc );
+ 		const resultingReferenceElement = getReferenceElement( {
+ 			anchor,
+ 			anchorRef,
+ 			anchorRect,
+ 			getAnchorRect,
+ 			fallbackReferenceElement,
++			scale,
+ 		} );
+ 
+ 		referenceCallbackRef( resultingReferenceElement );
+@@ -441,17 +450,24 @@ const UnforwardedPopover = (
+ 		}
+ 
+ 		const { defaultView } = referenceOwnerDocument;
++		const { frameElement } = defaultView;
++
++		const scrollContainer = frameElement
++			? getScrollContainer( frameElement )
++			: null;
+ 
+ 		const updateFrameOffset = () => {
+ 			frameOffsetRef.current = getFrameOffset( referenceOwnerDocument );
+ 			update();
+ 		};
+ 		defaultView.addEventListener( 'resize', updateFrameOffset );
++		scrollContainer?.addEventListener( 'scroll', updateFrameOffset );
+ 
+ 		updateFrameOffset();
+ 
+ 		return () => {
+ 			defaultView.removeEventListener( 'resize', updateFrameOffset );
++			scrollContainer?.removeEventListener( 'scroll', updateFrameOffset );
+ 		};
+ 	}, [ referenceOwnerDocument, update, refs.floating ] );
+ 
+diff --git a/packages/components/src/popover/overlay-middlewares.tsx b/packages/components/src/popover/overlay-middlewares.tsx
+new file mode 100644
+index 00000000000000..da138af7fa331f
+--- /dev/null
++++ b/packages/components/src/popover/overlay-middlewares.tsx
+@@ -0,0 +1,29 @@
++/**
++ * External dependencies
++ */
++import { size, MiddlewareArguments } from '@floating-ui/react-dom';
++
++export function overlayMiddlewares() {
++	return [
++		{
++			name: 'overlay',
++			fn( { rects }: MiddlewareArguments ) {
++				return rects.reference;
++			},
++		},
++		size( {
++			apply( { rects, elements } ) {
++				const { firstElementChild } = elements.floating ?? {};
++
++				// Only HTMLElement instances have the `style` property.
++				if ( ! ( firstElementChild instanceof HTMLElement ) ) return;
++
++				// Reduce the height of the popover to the available space.
++				Object.assign( firstElementChild.style, {
++					width: `${ rects.reference.width }px`,
++					height: `${ rects.reference.height }px`,
++				} );
++			},
++		} ),
++	];
++}
+diff --git a/packages/components/src/popover/stories/index.tsx b/packages/components/src/popover/stories/index.tsx
+index f5a8fab45d7fcf..15723becf12f37 100644
+--- a/packages/components/src/popover/stories/index.tsx
++++ b/packages/components/src/popover/stories/index.tsx
+@@ -31,6 +31,7 @@ const AVAILABLE_PLACEMENTS: PopoverProps[ 'placement' ][] = [
+ 	'left',
+ 	'left-start',
+ 	'left-end',
++	'overlay',
+ ];
+ 
+ const meta: ComponentMeta< typeof Popover > = {
+@@ -170,7 +171,12 @@ export const AllPlacements: ComponentStory< typeof Popover > = ( {
+ 		</h2>
+ 		<div>
+ 			{ AVAILABLE_PLACEMENTS.map( ( p ) => (
+-				<PopoverWithAnchor key={ p } placement={ p } { ...args }>
++				<PopoverWithAnchor
++					key={ p }
++					placement={ p }
++					{ ...args }
++					resize={ p === 'overlay' ? true : args.resize }
++				>
+ 					{ children }
+ 					<div>
+ 						<small>(placement: { p })</small>
+diff --git a/packages/components/src/popover/types.ts b/packages/components/src/popover/types.ts
+index 96cb7e5fd6f863..6dc3a4ae7d53f6 100644
+--- a/packages/components/src/popover/types.ts
++++ b/packages/components/src/popover/types.ts
+@@ -12,8 +12,10 @@ type DomRectWithOwnerDocument = DOMRect & {
+ 	ownerDocument?: Document;
+ };
+ 
++type PopoverPlacement = Placement | 'overlay';
++
+ export type AnimatedWrapperProps = {
+-	placement: Placement;
++	placement: PopoverPlacement;
+ 	shouldAnimate?: boolean;
+ };
+ 
+@@ -111,7 +113,7 @@ export type PopoverProps = {
+ 	 *
+ 	 * @default 'bottom-start'
+ 	 */
+-	placement?: Placement;
++	placement?: PopoverPlacement;
+ 	/**
+ 	 * Legacy way to specify the popover's position with respect to its anchor.
+ 	 * _Note: this prop is deprecated. Use the `placement` prop instead._
+diff --git a/packages/components/src/popover/utils.ts b/packages/components/src/popover/utils.ts
+index f14e2c921f1ede..1f31e194260c72 100644
+--- a/packages/components/src/popover/utils.ts
++++ b/packages/components/src/popover/utils.ts
+@@ -105,6 +105,7 @@ const PLACEMENT_TO_ANIMATION_ORIGIN: Record<
+ 	left: { originX: 1, originY: 0.5 }, // open from middle, right
+ 	'left-start': { originX: 1, originY: 0 }, // open from top, right
+ 	'left-end': { originX: 1, originY: 1 }, // open from bottom, right
++	overlay: { originX: 0.5, originY: 0.5 }, // open from center, center
+ };
+ 
+ /**
+@@ -157,6 +158,23 @@ export const getFrameOffset = (
+ 	return { x: iframeRect.left, y: iframeRect.top };
+ };
+ 
++export const getFrameScale = (
++	document?: Document
++): {
++	x: number;
++	y: number;
++} => {
++	const frameElement = document?.defaultView?.frameElement as HTMLElement;
++	if ( ! frameElement ) {
++		return { x: 1, y: 1 };
++	}
++	const rect = frameElement.getBoundingClientRect();
++	return {
++		x: rect.width / frameElement.offsetWidth,
++		y: rect.height / frameElement.offsetHeight,
++	};
++};
++
+ export const getReferenceOwnerDocument = ( {
+ 	anchor,
+ 	anchorRef,
+@@ -213,11 +231,13 @@ export const getReferenceElement = ( {
+ 	anchorRect,
+ 	getAnchorRect,
+ 	fallbackReferenceElement,
++	scale,
+ }: Pick<
+ 	PopoverProps,
+ 	'anchorRef' | 'anchorRect' | 'getAnchorRect' | 'anchor'
+ > & {
+ 	fallbackReferenceElement: Element | null;
++	scale: { x: number; y: number };
+ } ): ReferenceType | null => {
+ 	let referenceElement = null;
+ 
+@@ -279,6 +299,22 @@ export const getReferenceElement = ( {
+ 		referenceElement = fallbackReferenceElement.parentElement;
+ 	}
+ 
++	if ( referenceElement && ( scale.x !== 1 || scale.y !== 1 ) ) {
++		// If the popover is inside an iframe, the coordinates of the
++		// reference element need to be scaled to match the iframe's scale.
++		const rect = referenceElement.getBoundingClientRect();
++		referenceElement = {
++			getBoundingClientRect() {
++				return new window.DOMRect(
++					rect.x * scale.x,
++					rect.y * scale.y,
++					rect.width * scale.x,
++					rect.height * scale.y
++				);
++			},
++		};
++	}
++
+ 	// Convert any `undefined` value to `null`.
+ 	return referenceElement ?? null;
+ };
+diff --git a/packages/edit-site/src/components/block-editor/editor-canvas.js b/packages/edit-site/src/components/block-editor/editor-canvas.js
+index a28e6601a5fcb2..1410a2927cab40 100644
+--- a/packages/edit-site/src/components/block-editor/editor-canvas.js
++++ b/packages/edit-site/src/components/block-editor/editor-canvas.js
+@@ -33,6 +33,7 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
+ 	const mouseMoveTypingRef = useMouseMoveTypingReset();
+ 	return (
+ 		<Iframe
++			expand={ isZoomOutMode }
+ 			scale={ ( isZoomOutMode && 0.45 ) || undefined }
+ 			frameSize={ isZoomOutMode ? 100 : undefined }
+ 			style={ enableResizing ? {} : deviceStyles }

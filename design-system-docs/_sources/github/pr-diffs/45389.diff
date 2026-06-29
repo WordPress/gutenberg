@@ -1,0 +1,168 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e5290611a93e2c..ae1712d35f8148 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,8 @@
+ 
+ ### Deprecations
+ 
++-   `Popover`: the deprecation messages for anchor-related props (`anchorRef`, `anchorRect`, `getAnchorRect`) have been updated ([#45195](https://github.com/WordPress/gutenberg/pull/45195)).
++-   `RadioGroup`: Mark as deprecated, in favor of `RadioControl` and `ToggleGroupControl` ([#45389](https://github.com/WordPress/gutenberg/pull/45389)).
+ -   `Popover`: the deprecation messages for anchor-related props (`anchorRef`, `anchorRect`, `getAnchorRect`) have been updated. ([#45195](https://github.com/WordPress/gutenberg/pull/45195)).
+ -   `Popover`: The `isAlternate` prop has been replaced with a `variant` prop that can be called with the `'toolbar'` string ([#45137](https://github.com/WordPress/gutenberg/pull/45137)).
+ 
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 28f119c9237ef4..dfcc483138a53e 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -127,7 +127,7 @@ export { default as PanelRow } from './panel/row';
+ export { default as Placeholder } from './placeholder';
+ export { default as Popover } from './popover';
+ export { default as QueryControls } from './query-controls';
+-export { default as __experimentalRadio } from './radio';
++export { default as __experimentalRadio } from './radio-group/radio';
+ export { default as __experimentalRadioGroup } from './radio-group';
+ export { default as RadioControl } from './radio-control';
+ export { default as RangeControl } from './range-control';
+diff --git a/packages/components/src/radio-group/README.md b/packages/components/src/radio-group/README.md
+index b446ef705e8a03..239205ec428f75 100644
+--- a/packages/components/src/radio-group/README.md
++++ b/packages/components/src/radio-group/README.md
+@@ -1,5 +1,9 @@
+ # RadioGroup
+ 
++<div class="callout callout-alert">
++This component is deprecated. Consider using `RadioControl` or `ToggleGroupControl` instead.
++</div>
++
+ <div class="callout callout-alert">
+ This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+ </div>
+diff --git a/packages/components/src/radio-group/index.js b/packages/components/src/radio-group/index.js
+index 471734ca421deb..a94493c5f2fd8c 100644
+--- a/packages/components/src/radio-group/index.js
++++ b/packages/components/src/radio-group/index.js
+@@ -1,3 +1,5 @@
++// @ts-nocheck
++
+ /**
+  * External dependencies
+  */
+@@ -12,7 +14,7 @@ import { forwardRef } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import ButtonGroup from '../button-group';
+-import RadioContext from '../radio-context';
++import RadioContext from './radio-context';
+ 
+ function RadioGroup(
+ 	{ label, checked, defaultChecked, disabled, onChange, ...props },
+@@ -43,4 +45,7 @@ function RadioGroup(
+ 	);
+ }
+ 
++/**
++ * @deprecated Use `RadioControl` or `ToggleGroupControl` instead.
++ */
+ export default forwardRef( RadioGroup );
+diff --git a/packages/components/src/radio-context/index.js b/packages/components/src/radio-group/radio-context/index.js
+similarity index 100%
+rename from packages/components/src/radio-context/index.js
+rename to packages/components/src/radio-group/radio-context/index.js
+diff --git a/packages/components/src/radio/index.js b/packages/components/src/radio-group/radio/index.js
+similarity index 84%
+rename from packages/components/src/radio/index.js
+rename to packages/components/src/radio-group/radio/index.js
+index d7bdefbe608c9b..446850c421b4c1 100644
+--- a/packages/components/src/radio/index.js
++++ b/packages/components/src/radio-group/radio/index.js
+@@ -1,3 +1,5 @@
++// @ts-nocheck
++
+ /**
+  * External dependencies
+  */
+@@ -11,7 +13,7 @@ import { useContext, forwardRef } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import Button from '../button';
++import Button from '../../button';
+ import RadioContext from '../radio-context';
+ 
+ function Radio( { children, value, ...props }, ref ) {
+@@ -32,4 +34,7 @@ function Radio( { children, value, ...props }, ref ) {
+ 	);
+ }
+ 
++/**
++ * @deprecated Use `RadioControl` or `ToggleGroupControl` instead.
++ */
+ export default forwardRef( Radio );
+diff --git a/packages/components/src/radio-group/stories/index.js b/packages/components/src/radio-group/stories/index.js
+index c827c180c7fe2f..10fb5dfd028000 100644
+--- a/packages/components/src/radio-group/stories/index.js
++++ b/packages/components/src/radio-group/stories/index.js
+@@ -6,12 +6,21 @@ import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import Radio from '../../radio';
++import Radio from '../radio';
+ import RadioGroup from '../';
+ 
+ export default {
+-	title: 'Components (Experimental)/RadioGroup',
++	title: 'Components (Deprecated)/RadioGroup',
++	subcomponents: { Radio },
+ 	component: RadioGroup,
++	parameters: {
++		docs: {
++			description: {
++				component:
++					'This component is deprecated. Use `RadioControl` or `ToggleGroupControl` instead.',
++			},
++		},
++	},
+ };
+ 
+ export const _default = () => {
+diff --git a/packages/components/src/radio/stories/index.js b/packages/components/src/radio/stories/index.js
+deleted file mode 100644
+index 622935a76e076b..00000000000000
+--- a/packages/components/src/radio/stories/index.js
++++ /dev/null
+@@ -1,20 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import RadioGroup from '../../radio-group';
+-import Radio from '../';
+-
+-export default { title: 'Components (Experimental)/Radio', component: Radio };
+-
+-export const _default = () => {
+-	// Radio components must be a descendent of a RadioGroup component.
+-	/* eslint-disable no-restricted-syntax */
+-	return (
+-		// id is required for server side rendering
+-		<RadioGroup id="default-radiogroup" label="options">
+-			<Radio value="option1">Option 1</Radio>
+-			<Radio value="option2">Option 2</Radio>
+-		</RadioGroup>
+-	);
+-	/* eslint-enable no-restricted-syntax */
+-};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 5c103f27ead053..c5d62d9423779c 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -63,8 +63,6 @@
+ 		"src/palette-edit",
+ 		"src/panel",
+ 		"src/query-controls",
+-		"src/radio",
+-		"src/radio-group",
+ 		"src/responsive-wrapper",
+ 		"src/sandbox",
+ 		"src/snackbar",

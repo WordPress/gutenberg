@@ -1,0 +1,765 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index dcb3ab2bd6ef9e..2eb0b533f6fa20 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ -   `Autocomplete`: Refactor `useAutocomplete` to use `useReducer` ([#77020](https://github.com/WordPress/gutenberg/pull/77020)).
+ -   `Button`: Remove obsolete Safari + VoiceOver workaround for visually hidden text ([#77107](https://github.com/WordPress/gutenberg/pull/77107)).
+ -   `BoxControl`: Remove unused state for icon side ([#77143](https://github.com/WordPress/gutenberg/pull/77143)).
++-   `Autocomplete`: Remove `getAutoCompleterUI` factory pattern ([#77048](https://github.com/WordPress/gutenberg/pull/77048)).
+ 
+ ## 32.5.0 (2026-04-01)
+ 
+diff --git a/packages/components/src/autocomplete/README.md b/packages/components/src/autocomplete/README.md
+index 6b13ff1b744fc3..b549a2e47e2707 100644
+--- a/packages/components/src/autocomplete/README.md
++++ b/packages/components/src/autocomplete/README.md
+@@ -78,7 +78,7 @@ In addition, a completer may optionally declare:
+ 
+ #### name
+ 
+-The name of the completer. Useful for identifying a specific completer to be overridden via extensibility hooks.
++The name of the completer. Useful for identifying a specific completer to be overridden via extensibility hooks. Each completer should have a unique name.
+ 
+ -   Type: `String`
+ -   Required: Yes
+diff --git a/packages/components/src/autocomplete/autocompleter-ui.native.js b/packages/components/src/autocomplete/autocompleter-ui.native.js
+index daf4fe301abf77..3a9c9e6efc4279 100644
+--- a/packages/components/src/autocomplete/autocompleter-ui.native.js
++++ b/packages/components/src/autocomplete/autocompleter-ui.native.js
+@@ -34,185 +34,178 @@ import { __unstableAutocompletionItemsFill as AutocompletionItemsFill } from '..
+ 
+ const { compose: stylesCompose } = StyleSheet;
+ 
+-export function getAutoCompleterUI( autocompleter ) {
++export function AutocompleterUI( {
++	autocompleter,
++	filterValue,
++	selectedIndex,
++	onChangeOptions,
++	onSelect,
++	reset,
++} ) {
++	// The useItems hook is derived from the autocompleter prop. This is safe
++	// because the parent renders this component with a key that triggers
++	// remount when the completer changes.
+ 	const useItems = autocompleter.useItems
+ 		? autocompleter.useItems
+ 		: getDefaultUseItems( autocompleter );
++	const [ items ] = useItems( filterValue );
++	const filteredItems = items.filter( ( item ) => ! item.isDisabled );
++	const scrollViewRef = useRef();
++	const animationValue = useRef( new Animated.Value( 0 ) ).current;
++	const [ isVisible, setIsVisible ] = useState( false );
++
++	useEffect( () => {
++		if ( ! isVisible && filterValue.length > 0 ) {
++			setIsVisible( true );
++		}
++	}, [ isVisible, filterValue ] );
+ 
+-	function AutocompleterUI( {
+-		filterValue,
+-		selectedIndex,
+-		onChangeOptions,
+-		onSelect,
+-		value,
+-		reset,
+-	} ) {
+-		const [ items ] = useItems( filterValue );
+-		const filteredItems = items.filter( ( item ) => ! item.isDisabled );
+-		const scrollViewRef = useRef();
+-		const animationValue = useRef( new Animated.Value( 0 ) ).current;
+-		const [ isVisible, setIsVisible ] = useState( false );
+-		const { text } = value;
+-
+-		useEffect( () => {
+-			if ( ! isVisible && text.length > 0 ) {
+-				setIsVisible( true );
+-			}
+-		}, [ isVisible, text ] );
+-
+-		useLayoutEffect( () => {
+-			onChangeOptions( items );
+-			scrollViewRef.current?.scrollTo( { x: 0, animated: false } );
+-
+-			if ( isVisible && text.length > 0 ) {
+-				startAnimation( true );
+-			} else if ( isVisible && text.length === 0 ) {
+-				startAnimation( false );
+-			}
+-			// We want to avoid introducing unexpected side effects.
+-			// See https://github.com/WordPress/gutenberg/pull/41820
+-		}, [ items, isVisible, text ] );
+-
+-		const activeItemStyles = usePreferredColorSchemeStyle(
+-			styles[ 'components-autocomplete__item-active' ],
+-			styles[ 'components-autocomplete__item-active-dark' ]
+-		);
+-
+-		const iconStyles = usePreferredColorSchemeStyle(
+-			styles[ 'components-autocomplete__icon' ],
+-			styles[ 'components-autocomplete__icon-active-dark' ]
+-		);
+-
+-		const activeIconStyles = usePreferredColorSchemeStyle(
+-			styles[ 'components-autocomplete__icon-active ' ],
+-			styles[ 'components-autocomplete__icon-active-dark' ]
+-		);
+-
+-		const textStyles = usePreferredColorSchemeStyle(
+-			styles[ 'components-autocomplete__text' ],
+-			styles[ 'components-autocomplete__text-dark' ]
+-		);
+-
+-		const activeTextStyles = usePreferredColorSchemeStyle(
+-			styles[ 'components-autocomplete__text-active' ],
+-			styles[ 'components-autocomplete__text-active-dark' ]
+-		);
+-
+-		const startAnimation = useCallback(
+-			( show ) => {
+-				Animated.timing( animationValue, {
+-					toValue: show ? 1 : 0,
+-					duration: show ? 200 : 100,
+-					useNativeDriver: true,
+-				} ).start( ( { finished } ) => {
+-					if ( finished && ! show && isVisible ) {
+-						setIsVisible( false );
+-						reset();
+-					}
+-				} );
+-			},
+-			// We want to avoid introducing unexpected side effects.
+-			// See https://github.com/WordPress/gutenberg/pull/41820
+-			[ isVisible ]
+-		);
+-
+-		const contentStyles = {
+-			transform: [
+-				{
+-					translateY: animationValue.interpolate( {
+-						inputRange: [ 0, 1 ],
+-						outputRange: [
+-							styles[ 'components-autocomplete' ].height,
+-							0,
+-						],
+-					} ),
+-				},
+-			],
+-		};
+-
+-		if ( ! filteredItems.length > 0 || ! isVisible ) {
+-			return null;
++	useLayoutEffect( () => {
++		onChangeOptions( items );
++		scrollViewRef.current?.scrollTo( { x: 0, animated: false } );
++
++		if ( isVisible && filterValue.length > 0 ) {
++			startAnimation( true );
++		} else if ( isVisible && filterValue.length === 0 ) {
++			startAnimation( false );
+ 		}
++		// We want to avoid introducing unexpected side effects.
++		// See https://github.com/WordPress/gutenberg/pull/41820
++	}, [ items, isVisible, filterValue ] );
++
++	const activeItemStyles = usePreferredColorSchemeStyle(
++		styles[ 'components-autocomplete__item-active' ],
++		styles[ 'components-autocomplete__item-active-dark' ]
++	);
++
++	const iconStyles = usePreferredColorSchemeStyle(
++		styles[ 'components-autocomplete__icon' ],
++		styles[ 'components-autocomplete__icon-active-dark' ]
++	);
++
++	const activeIconStyles = usePreferredColorSchemeStyle(
++		styles[ 'components-autocomplete__icon-active ' ],
++		styles[ 'components-autocomplete__icon-active-dark' ]
++	);
++
++	const textStyles = usePreferredColorSchemeStyle(
++		styles[ 'components-autocomplete__text' ],
++		styles[ 'components-autocomplete__text-dark' ]
++	);
++
++	const activeTextStyles = usePreferredColorSchemeStyle(
++		styles[ 'components-autocomplete__text-active' ],
++		styles[ 'components-autocomplete__text-active-dark' ]
++	);
++
++	const startAnimation = useCallback(
++		( show ) => {
++			Animated.timing( animationValue, {
++				toValue: show ? 1 : 0,
++				duration: show ? 200 : 100,
++				useNativeDriver: true,
++			} ).start( ( { finished } ) => {
++				if ( finished && ! show && isVisible ) {
++					setIsVisible( false );
++					reset();
++				}
++			} );
++		},
++		// We want to avoid introducing unexpected side effects.
++		// See https://github.com/WordPress/gutenberg/pull/41820
++		[ isVisible ]
++	);
++
++	const contentStyles = {
++		transform: [
++			{
++				translateY: animationValue.interpolate( {
++					inputRange: [ 0, 1 ],
++					outputRange: [
++						styles[ 'components-autocomplete' ].height,
++						0,
++					],
++				} ),
++			},
++		],
++	};
+ 
+-		return (
+-			<AutocompletionItemsFill>
+-				<View style={ styles[ 'components-autocomplete' ] }>
+-					<Animated.View style={ contentStyles }>
+-						<BackgroundView>
+-							<ScrollView
+-								testID="autocompleter"
+-								ref={ scrollViewRef }
+-								horizontal
+-								contentContainerStyle={
+-									styles[ 'components-autocomplete__content' ]
+-								}
+-								showsHorizontalScrollIndicator={ false }
+-								keyboardShouldPersistTaps="always"
+-								accessibilityLabel={
+-									// translators: Slash inserter autocomplete results
+-									__( 'Slash inserter results' )
+-								}
+-							>
+-								{ filteredItems.map( ( option, index ) => {
+-									const isActive = index === selectedIndex;
+-									const itemStyle = stylesCompose(
+-										styles[
+-											'components-autocomplete__item'
+-										],
+-										isActive && activeItemStyles
+-									);
+-									const textStyle = stylesCompose(
+-										textStyles,
+-										isActive && activeTextStyles
+-									);
+-									const iconStyle = stylesCompose(
+-										iconStyles,
+-										isActive && activeIconStyles
+-									);
+-									const iconSource =
+-										option?.value?.icon?.src ||
+-										option?.value?.icon;
+-
+-									return (
+-										<TouchableOpacity
+-											activeOpacity={ 0.5 }
+-											style={ itemStyle }
+-											key={ index }
+-											onPress={ () => onSelect( option ) }
+-											accessibilityLabel={ sprintf(
+-												// translators: %s: Block name e.g. "Image block"
+-												__( '%s block' ),
+-												option?.value?.title
+-											) }
+-										>
+-											<View
+-												style={
+-													styles[
+-														'components-autocomplete__icon'
+-													]
+-												}
+-											>
+-												<Icon
+-													icon={ iconSource }
+-													size={ 24 }
+-													style={ iconStyle }
+-												/>
+-											</View>
+-											<Text style={ textStyle }>
+-												{ option?.value?.title }
+-											</Text>
+-										</TouchableOpacity>
+-									);
+-								} ) }
+-							</ScrollView>
+-						</BackgroundView>
+-					</Animated.View>
+-				</View>
+-			</AutocompletionItemsFill>
+-		);
++	if ( ! filteredItems.length > 0 || ! isVisible ) {
++		return null;
+ 	}
+ 
+-	return AutocompleterUI;
++	return (
++		<AutocompletionItemsFill>
++			<View style={ styles[ 'components-autocomplete' ] }>
++				<Animated.View style={ contentStyles }>
++					<BackgroundView>
++						<ScrollView
++							testID="autocompleter"
++							ref={ scrollViewRef }
++							horizontal
++							contentContainerStyle={
++								styles[ 'components-autocomplete__content' ]
++							}
++							showsHorizontalScrollIndicator={ false }
++							keyboardShouldPersistTaps="always"
++							accessibilityLabel={
++								// translators: Slash inserter autocomplete results
++								__( 'Slash inserter results' )
++							}
++						>
++							{ filteredItems.map( ( option, index ) => {
++								const isActive = index === selectedIndex;
++								const itemStyle = stylesCompose(
++									styles[ 'components-autocomplete__item' ],
++									isActive && activeItemStyles
++								);
++								const textStyle = stylesCompose(
++									textStyles,
++									isActive && activeTextStyles
++								);
++								const iconStyle = stylesCompose(
++									iconStyles,
++									isActive && activeIconStyles
++								);
++								const iconSource =
++									option?.value?.icon?.src ||
++									option?.value?.icon;
++
++								return (
++									<TouchableOpacity
++										activeOpacity={ 0.5 }
++										style={ itemStyle }
++										key={ index }
++										onPress={ () => onSelect( option ) }
++										accessibilityLabel={ sprintf(
++											// translators: %s: Block name e.g. "Image block"
++											__( '%s block' ),
++											option?.value?.title
++										) }
++									>
++										<View
++											style={
++												styles[
++													'components-autocomplete__icon'
++												]
++											}
++										>
++											<Icon
++												icon={ iconSource }
++												size={ 24 }
++												style={ iconStyle }
++											/>
++										</View>
++										<Text style={ textStyle }>
++											{ option?.value?.title }
++										</Text>
++									</TouchableOpacity>
++								);
++							} ) }
++						</ScrollView>
++					</BackgroundView>
++				</Animated.View>
++			</View>
++		</AutocompletionItemsFill>
++	);
+ }
+-
+-export default getAutoCompleterUI;
+diff --git a/packages/components/src/autocomplete/autocompleter-ui.tsx b/packages/components/src/autocomplete/autocompleter-ui.tsx
+index 2c2e1cd22afcf5..ae730b3164508a 100644
+--- a/packages/components/src/autocomplete/autocompleter-ui.tsx
++++ b/packages/components/src/autocomplete/autocompleter-ui.tsx
+@@ -25,7 +25,7 @@ import getDefaultUseItems from './get-default-use-items';
+ import Button from '../button';
+ import Popover from '../popover';
+ import { VisuallyHidden } from '../visually-hidden';
+-import type { AutocompleterUIProps, KeyedOption, WPCompleter } from './types';
++import type { AutocompleterUIProps, KeyedOption } from './types';
+ 
+ type ListBoxProps = {
+ 	items: KeyedOption[];
+@@ -79,112 +79,125 @@ function ListBox( {
+ 	);
+ }
+ 
+-export function getAutoCompleterUI( autocompleter: WPCompleter ) {
++export function AutocompleterUI( {
++	autocompleter,
++	filterValue,
++	instanceId,
++	listBoxId,
++	className,
++	selectedIndex,
++	onChangeOptions,
++	onSelect,
++	reset,
++	contentRef,
++}: AutocompleterUIProps ) {
++	// The useItems hook is derived from the autocompleter prop. This is safe
++	// because the parent renders this component with key={autocompleter.name},
++	// ensuring a fresh mount (and stable hook identity) when the completer changes.
+ 	const useItems =
+ 		autocompleter.useItems ?? getDefaultUseItems( autocompleter );
++	// eslint-disable-next-line react-compiler/react-compiler
++	const [ items ] = useItems( filterValue );
++	const popoverAnchor = useAnchor( {
++		editableContentElement: contentRef.current,
++	} );
++
++	const [ needsA11yCompat, setNeedsA11yCompat ] = useState( false );
++	const popoverRef = useRef< HTMLElement >( null );
++	const popoverRefs = useMergeRefs( [
++		popoverRef,
++		useRefEffect(
++			( node ) => {
++				if ( ! contentRef.current ) {
++					return;
++				}
+ 
+-	function AutocompleterUI( {
+-		filterValue,
+-		instanceId,
+-		listBoxId,
+-		className,
+-		selectedIndex,
+-		onChangeOptions,
+-		onSelect,
+-		onReset,
+-		reset,
+-		contentRef,
+-	}: AutocompleterUIProps ) {
+-		const [ items ] = useItems( filterValue );
+-		const popoverAnchor = useAnchor( {
+-			editableContentElement: contentRef.current,
+-		} );
+-
+-		const [ needsA11yCompat, setNeedsA11yCompat ] = useState( false );
+-		const popoverRef = useRef< HTMLElement >( null );
+-		const popoverRefs = useMergeRefs( [
+-			popoverRef,
+-			useRefEffect(
+-				( node ) => {
+-					if ( ! contentRef.current ) {
+-						return;
+-					}
+-
+-					// If the popover is rendered in a different document than
+-					// the content, we need to duplicate the options list in the
+-					// content document so that it's available to the screen
+-					// readers, which check the DOM ID based aria-* attributes.
+-					setNeedsA11yCompat(
+-						node.ownerDocument !== contentRef.current.ownerDocument
+-					);
+-				},
+-				[ contentRef ]
+-			),
+-		] );
+-
+-		useOnClickOutside( popoverRef, reset );
+-
+-		const debouncedSpeak = useDebounce( speak, 500 );
+-
+-		function announce( options: Array< KeyedOption > ) {
+-			if ( ! debouncedSpeak ) {
+-				return;
+-			}
+-			if ( !! options.length ) {
+-				if ( filterValue ) {
+-					debouncedSpeak(
+-						sprintf(
+-							/* translators: %d: number of results. */
+-							_n(
+-								'%d result found, use up and down arrow keys to navigate.',
+-								'%d results found, use up and down arrow keys to navigate.',
+-								options.length
+-							),
++				// If the popover is rendered in a different document than
++				// the content, we need to duplicate the options list in the
++				// content document so that it's available to the screen
++				// readers, which check the DOM ID based aria-* attributes.
++				setNeedsA11yCompat(
++					node.ownerDocument !== contentRef.current.ownerDocument
++				);
++			},
++			[ contentRef ]
++		),
++	] );
++
++	useOnClickOutside( popoverRef, reset );
++
++	const debouncedSpeak = useDebounce( speak, 500 );
++
++	function announce( options: Array< KeyedOption > ) {
++		if ( ! debouncedSpeak ) {
++			return;
++		}
++		if ( !! options.length ) {
++			if ( filterValue ) {
++				debouncedSpeak(
++					sprintf(
++						/* translators: %d: number of results. */
++						_n(
++							'%d result found, use up and down arrow keys to navigate.',
++							'%d results found, use up and down arrow keys to navigate.',
+ 							options.length
+ 						),
+-						'assertive'
+-					);
+-				} else {
+-					debouncedSpeak(
+-						sprintf(
+-							/* translators: %d: number of results. */
+-							_n(
+-								'Initial %d result loaded. Type to filter all available results. Use up and down arrow keys to navigate.',
+-								'Initial %d results loaded. Type to filter all available results. Use up and down arrow keys to navigate.',
+-								options.length
+-							),
++						options.length
++					),
++					'assertive'
++				);
++			} else {
++				debouncedSpeak(
++					sprintf(
++						/* translators: %d: number of results. */
++						_n(
++							'Initial %d result loaded. Type to filter all available results. Use up and down arrow keys to navigate.',
++							'Initial %d results loaded. Type to filter all available results. Use up and down arrow keys to navigate.',
+ 							options.length
+ 						),
+-						'assertive'
+-					);
+-				}
+-			} else {
+-				debouncedSpeak( __( 'No results.' ), 'assertive' );
++						options.length
++					),
++					'assertive'
++				);
+ 			}
++		} else {
++			debouncedSpeak( __( 'No results.' ), 'assertive' );
+ 		}
++	}
+ 
+-		useLayoutEffect( () => {
+-			onChangeOptions( items );
+-			announce( items );
+-			// We want to avoid introducing unexpected side effects.
+-			// See https://github.com/WordPress/gutenberg/pull/41820
+-		}, [ items ] );
++	useLayoutEffect( () => {
++		onChangeOptions( items );
++		announce( items );
++		// We want to avoid introducing unexpected side effects.
++		// See https://github.com/WordPress/gutenberg/pull/41820
++	}, [ items ] );
+ 
+-		if ( items.length === 0 ) {
+-			return null;
+-		}
++	if ( items.length === 0 ) {
++		return null;
++	}
+ 
+-		return (
+-			<>
+-				<Popover
+-					offset={ 8 }
+-					focusOnMount={ false }
+-					onClose={ onReset }
+-					placement="top-start"
+-					className="components-autocomplete__popover"
+-					anchor={ popoverAnchor }
+-					ref={ popoverRefs }
+-				>
++	return (
++		<>
++			<Popover
++				offset={ 8 }
++				focusOnMount={ false }
++				placement="top-start"
++				className="components-autocomplete__popover"
++				anchor={ popoverAnchor }
++				ref={ popoverRefs }
++			>
++				<ListBox
++					items={ items }
++					onSelect={ onSelect }
++					selectedIndex={ selectedIndex }
++					instanceId={ instanceId }
++					listBoxId={ listBoxId }
++					className={ className }
++				/>
++			</Popover>
++			{ contentRef.current &&
++				needsA11yCompat &&
++				createPortal(
+ 					<ListBox
+ 						items={ items }
+ 						onSelect={ onSelect }
+@@ -192,27 +205,12 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
+ 						instanceId={ instanceId }
+ 						listBoxId={ listBoxId }
+ 						className={ className }
+-					/>
+-				</Popover>
+-				{ contentRef.current &&
+-					needsA11yCompat &&
+-					createPortal(
+-						<ListBox
+-							items={ items }
+-							onSelect={ onSelect }
+-							selectedIndex={ selectedIndex }
+-							instanceId={ instanceId }
+-							listBoxId={ listBoxId }
+-							className={ className }
+-							Component={ VisuallyHidden }
+-						/>,
+-						contentRef.current.ownerDocument.body
+-					) }
+-			</>
+-		);
+-	}
+-
+-	return AutocompleterUI;
++						Component={ VisuallyHidden }
++					/>,
++					contentRef.current.ownerDocument.body
++				) }
++		</>
++	);
+ }
+ 
+ function useOnClickOutside(
+diff --git a/packages/components/src/autocomplete/index.tsx b/packages/components/src/autocomplete/index.tsx
+index f12533284535e1..64382dd7b12965 100644
+--- a/packages/components/src/autocomplete/index.tsx
++++ b/packages/components/src/autocomplete/index.tsx
+@@ -22,7 +22,7 @@ import { isAppleOS } from '@wordpress/keycodes';
+ /**
+  * Internal dependencies
+  */
+-import { getAutoCompleterUI } from './autocompleter-ui';
++import { AutocompleterUI } from './autocompleter-ui';
+ import { getAutocompleteMatch } from './get-autocomplete-match';
+ import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
+ import type {
+@@ -107,11 +107,6 @@ export function useAutocomplete( {
+ 	const { selectedIndex, filteredOptions, filterValue, autocompleter } =
+ 		state;
+ 
+-	const AutocompleterUI = useMemo(
+-		() => ( autocompleter ? getAutoCompleterUI( autocompleter ) : null ),
+-		[ autocompleter ]
+-	);
+-
+ 	const backspacingRef = useRef( false );
+ 
+ 	function insertCompletion( replacement: React.ReactNode ) {
+@@ -271,7 +266,7 @@ export function useAutocomplete( {
+ 		? `components-autocomplete-item-${ instanceId }-${ selectedKey }`
+ 		: null;
+ 	const hasSelection = record.start !== undefined;
+-	const showPopover = !! textContent && hasSelection && !! AutocompleterUI;
++	const showPopover = !! textContent && hasSelection && !! autocompleter;
+ 
+ 	return {
+ 		listBoxId,
+@@ -279,6 +274,8 @@ export function useAutocomplete( {
+ 		onKeyDown: withIgnoreIMEEvents( handleKeyDown ),
+ 		popover: showPopover && (
+ 			<AutocompleterUI
++				key={ autocompleter.name + autocompleter.triggerPrefix }
++				autocompleter={ autocompleter }
+ 				className={ className }
+ 				filterValue={ filterValue }
+ 				instanceId={ instanceId }
+@@ -286,7 +283,6 @@ export function useAutocomplete( {
+ 				selectedIndex={ selectedIndex }
+ 				onChangeOptions={ onChangeOptions }
+ 				onSelect={ select }
+-				value={ record }
+ 				contentRef={ contentRef }
+ 				reset={ () => dispatch( { type: 'RESET' } ) }
+ 			/>
+diff --git a/packages/components/src/autocomplete/test/index.tsx b/packages/components/src/autocomplete/test/index.tsx
+index f77e685c6370ea..7c31487d639c95 100644
+--- a/packages/components/src/autocomplete/test/index.tsx
++++ b/packages/components/src/autocomplete/test/index.tsx
+@@ -12,7 +12,7 @@ import { useRef } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { getAutoCompleterUI } from '../autocompleter-ui';
++import { AutocompleterUI } from '../autocompleter-ui';
+ import { useLastDifferentValue } from '..';
+ 
+ type FruitOption = { visual: string; name: string; id: number };
+@@ -166,8 +166,6 @@ describe( 'AutocompleterUI', () => {
+ 				},
+ 			};
+ 
+-			const AutocompleterUI = getAutoCompleterUI( autocompleter );
+-
+ 			const OtherElement = <div>Other Element</div>;
+ 
+ 			const Container = () => {
+@@ -176,6 +174,7 @@ describe( 'AutocompleterUI', () => {
+ 				return (
+ 					<div>
+ 						<AutocompleterUI
++							autocompleter={ autocompleter }
+ 							className="test"
+ 							filterValue="Apple"
+ 							instanceId={ 1 }
+diff --git a/packages/components/src/autocomplete/types.ts b/packages/components/src/autocomplete/types.ts
+index 949c48519bb365..52e9ed7ecbba35 100644
+--- a/packages/components/src/autocomplete/types.ts
++++ b/packages/components/src/autocomplete/types.ts
+@@ -109,6 +109,10 @@ export type WPCompleter< TCompleterOption = any > = {
+ type ContentRef = React.RefObject< HTMLElement | null >;
+ 
+ export type AutocompleterUIProps = {
++	/**
++	 * The autocompleter configuration object.
++	 */
++	autocompleter: WPCompleter;
+ 	/**
+ 	 * The value to filter the options by.
+ 	 */
+@@ -138,20 +142,10 @@ export type AutocompleterUIProps = {
+ 	 * A function to be called when an option is selected.
+ 	 */
+ 	onSelect: ( option: KeyedOption ) => void;
+-	/**
+-	 * A function to be called when the completer is reset
+-	 * (e.g. when the user hits the escape key).
+-	 */
+-	onReset?: () => void;
+ 	/**
+ 	 * A function that defines the behavior of the completer when it is reset
+ 	 */
+ 	reset: ( event: Event ) => void;
+-	// This is optional because it's still needed for mobile/native.
+-	/**
+-	 * The rich text value object the autocompleter is being applied to.
+-	 */
+-	value?: RichTextValue;
+ 	/**
+ 	 * A ref containing the editable element that will serve as the anchor for
+ 	 * `Autocomplete`'s `Popover`.

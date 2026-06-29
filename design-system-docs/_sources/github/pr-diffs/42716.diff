@@ -1,0 +1,83 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index be08c2fecd1f85..15210760183f2d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -15,6 +15,7 @@
+ 
+ ### Enhancements
+ 
++-   `FontSizePicker`: Add large size variant ([#42716](https://github.com/WordPress/gutenberg/pull/42716/)).
+ -   `Popover`: tidy up code, add more comments ([#42944](https://github.com/WordPress/gutenberg/pull/42944)).
+ -   Add `box-sizing` reset style mixin to utils ([#42754](https://github.com/WordPress/gutenberg/pull/42754)).
+ -   `ResizableBox`: Make tooltip background match `Tooltip` component's ([#42800](https://github.com/WordPress/gutenberg/pull/42800)).
+diff --git a/packages/components/src/font-size-picker/index.js b/packages/components/src/font-size-picker/index.js
+index 816d94127853c1..71caa13a132760 100644
+--- a/packages/components/src/font-size-picker/index.js
++++ b/packages/components/src/font-size-picker/index.js
+@@ -32,6 +32,8 @@ function FontSizePicker(
+ 		fontSizes = [],
+ 		disableCustomFontSizes = false,
+ 		onChange,
++		/** @type {'default' | '__unstable-large'} */
++		size = 'default',
+ 		value,
+ 		withSlider = false,
+ 		withReset = true,
+@@ -52,7 +54,7 @@ function FontSizePicker(
+ 	 * than six and a select control when they are more.
+ 	 */
+ 	const fontSizesContainComplexValues = fontSizes.some(
+-		( { size } ) => ! isSimpleCssValue( size )
++		( { size: sizeArg } ) => ! isSimpleCssValue( sizeArg )
+ 	);
+ 	const shouldUseSelectControl = fontSizes.length > 5;
+ 	const options = useMemo(
+@@ -163,6 +165,7 @@ function FontSizePicker(
+ 					shouldUseSelectControl &&
+ 					! showCustomValueControl && (
+ 						<CustomSelectControl
++							__nextUnconstrainedWidth
+ 							className={ `${ baseClassName }__select` }
+ 							label={ __( 'Font size' ) }
+ 							hideLabelFromVision
+@@ -181,6 +184,7 @@ function FontSizePicker(
+ 									setShowCustomValueControl( true );
+ 								}
+ 							} }
++							size={ size }
+ 						/>
+ 					) }
+ 				{ ! shouldUseSelectControl && ! showCustomValueControl && (
+@@ -194,6 +198,7 @@ function FontSizePicker(
+ 							);
+ 						} }
+ 						isBlock
++						size={ size }
+ 					>
+ 						{ options.map( ( option ) => (
+ 							<ToggleGroupControlOption
+@@ -233,6 +238,7 @@ function FontSizePicker(
+ 											);
+ 										}
+ 									} }
++									size={ size }
+ 									units={ hasUnits ? units : [] }
+ 								/>
+ 							</FlexItem>
+diff --git a/packages/components/src/font-size-picker/stories/index.js b/packages/components/src/font-size-picker/stories/index.js
+index 5036fa390c430b..7f23a457992911 100644
+--- a/packages/components/src/font-size-picker/stories/index.js
++++ b/packages/components/src/font-size-picker/stories/index.js
+@@ -17,6 +17,12 @@ export default {
+ 			description:
+ 				'If no value exists, this prop defines the starting position for the font size picker slider. Only relevant if `withSlider` is `true`.',
+ 		},
++		size: {
++			control: {
++				type: 'radio',
++				options: [ 'default', '__unstable-large' ],
++			},
++		},
+ 		withReset: {
+ 			description:
+ 				'If `true`, a reset button will be displayed alongside the input field when a custom font size is active. Has no effect when `disableCustomFontSizes` or `withSlider` is `true`.',

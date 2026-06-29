@@ -1,0 +1,419 @@
+diff --git a/packages/ui/src/form/primitives/checkbox/index.ts b/packages/ui/src/form/primitives/checkbox/index.ts
+new file mode 100644
+index 00000000000000..00b5245b940beb
+--- /dev/null
++++ b/packages/ui/src/form/primitives/checkbox/index.ts
+@@ -0,0 +1,2 @@
++export { Indicator } from './indicator';
++export { Root } from './root';
+diff --git a/packages/ui/src/form/primitives/checkbox/indicator.tsx b/packages/ui/src/form/primitives/checkbox/indicator.tsx
+new file mode 100644
+index 00000000000000..5de6ea98c6996d
+--- /dev/null
++++ b/packages/ui/src/form/primitives/checkbox/indicator.tsx
+@@ -0,0 +1,48 @@
++import { Checkbox as _Checkbox } from '@base-ui/react/checkbox';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import { check, reset } from '@wordpress/icons';
++import { Icon } from '../../../icon';
++import styles from './style.module.css';
++import type { CheckboxIndicatorProps } from './types';
++
++const DEFAULT_CHILDREN = (
++	<>
++		<Icon
++			className={ clsx(
++				styles[ 'indicator-icon' ],
++				styles[ 'checked-icon' ]
++			) }
++			icon={ check }
++			size={ 18 }
++		/>
++		<Icon
++			className={ clsx(
++				styles[ 'indicator-icon' ],
++				styles[ 'indeterminate-icon' ]
++			) }
++			icon={ reset }
++			size={ 18 }
++		/>
++	</>
++);
++
++/**
++ * Visual indicator rendered when the checkbox is checked or indeterminate.
++ */
++export const Indicator = forwardRef< HTMLSpanElement, CheckboxIndicatorProps >(
++	function Indicator(
++		{ className, children = DEFAULT_CHILDREN, ...restProps },
++		ref
++	) {
++		return (
++			<_Checkbox.Indicator
++				ref={ ref }
++				className={ clsx( styles.indicator, className ) }
++				{ ...restProps }
++			>
++				{ children }
++			</_Checkbox.Indicator>
++		);
++	}
++);
+diff --git a/packages/ui/src/form/primitives/checkbox/root.tsx b/packages/ui/src/form/primitives/checkbox/root.tsx
+new file mode 100644
+index 00000000000000..d91f9673938e96
+--- /dev/null
++++ b/packages/ui/src/form/primitives/checkbox/root.tsx
+@@ -0,0 +1,31 @@
++import { Checkbox as _Checkbox } from '@base-ui/react/checkbox';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import focusStyles from '../../../utils/css/focus.module.css';
++import resetStyles from '../../../utils/css/resets.module.css';
++import styles from './style.module.css';
++import { Indicator } from './indicator';
++import type { CheckboxRootProps } from './types';
++
++/**
++ * A low-level checkbox primitive for selecting one or more options.
++ */
++export const Root = forwardRef< HTMLElement, CheckboxRootProps >( function Root(
++	{ className, children = <Indicator />, ...restProps },
++	ref
++) {
++	return (
++		<_Checkbox.Root
++			ref={ ref }
++			className={ clsx(
++				resetStyles[ 'box-sizing' ],
++				focusStyles[ 'outset-ring--focus-visible' ],
++				styles.root,
++				className
++			) }
++			{ ...restProps }
++		>
++			{ children }
++		</_Checkbox.Root>
++	);
++} );
+diff --git a/packages/ui/src/form/primitives/checkbox/stories/index.story.tsx b/packages/ui/src/form/primitives/checkbox/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..a94da2dd78ec54
+--- /dev/null
++++ b/packages/ui/src/form/primitives/checkbox/stories/index.story.tsx
+@@ -0,0 +1,73 @@
++import type { Meta, StoryObj } from '@storybook/react-vite';
++import { Stack } from '../../../../stack';
++import * as Field from '../../field';
++import * as Checkbox from '../';
++
++const meta: Meta< typeof Checkbox.Root > = {
++	title: 'Design System/Components/Form/Primitives/Checkbox',
++	component: Checkbox.Root,
++	subcomponents: {
++		Indicator: Checkbox.Indicator,
++	},
++	argTypes: {
++		onCheckedChange: { action: 'onCheckedChange' },
++	},
++};
++export default meta;
++
++type Story = StoryObj< typeof Checkbox.Root >;
++
++export const Default: Story = {
++	args: {
++		'aria-label': 'Option',
++	},
++};
++
++export const Checked: Story = {
++	args: {
++		...Default.args,
++		defaultChecked: true,
++	},
++};
++
++export const Indeterminate: Story = {
++	args: {
++		'aria-label': 'Partially selected option',
++		indeterminate: true,
++	},
++};
++
++export const Disabled: Story = {
++	args: {
++		...Default.args,
++		defaultChecked: true,
++		disabled: true,
++	},
++};
++
++const WithLabelExample = () => (
++	<Field.Root render={ <Stack direction="row" gap="sm" align="center" /> }>
++		<Checkbox.Root />
++		<Field.Label variant="plain">Enable option</Field.Label>
++	</Field.Root>
++);
++
++/**
++ * When composed with `Field.Root`, `Field.Label` is automatically associated
++ * with the checkbox.
++ */
++export const WithLabel: Story = {
++	render: () => <WithLabelExample />,
++};
++
++export const WithCustomIndicator: Story = {
++	render: ( args ) => (
++		<Checkbox.Root { ...args }>
++			<Checkbox.Indicator>✓</Checkbox.Indicator>
++		</Checkbox.Root>
++	),
++	args: {
++		...Default.args,
++		defaultChecked: true,
++	},
++};
+diff --git a/packages/ui/src/form/primitives/checkbox/style.module.css b/packages/ui/src/form/primitives/checkbox/style.module.css
+new file mode 100644
+index 00000000000000..6a3c8394f598f1
+--- /dev/null
++++ b/packages/ui/src/form/primitives/checkbox/style.module.css
+@@ -0,0 +1,87 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-components {
++	.root {
++		--wp-ui-checkbox-size: 20px;
++
++		display: inline-flex;
++		align-items: center;
++		justify-content: center;
++		flex-shrink: 0;
++		inline-size: var(--wp-ui-checkbox-size);
++		block-size: var(--wp-ui-checkbox-size);
++		padding: 0;
++		background-color: var(--wpds-color-bg-surface-neutral-strong);
++		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-interactive-neutral);
++		border-radius: var(--wpds-border-radius-xs);
++		color: var(--wpds-color-fg-interactive-brand-strong);
++		line-height: 0;
++		vertical-align: middle;
++		user-select: none;
++		cursor: var(--wpds-cursor-control);
++
++		@media not (prefers-reduced-motion) {
++			transition:
++				background-color 0.1s ease-in-out,
++				border-color 0.1s ease-in-out;
++		}
++
++		&:hover:not([data-disabled], [data-readonly], [data-checked], [data-indeterminate]) {
++			border-color: var(--wpds-color-stroke-interactive-neutral-active);
++		}
++
++		&[data-checked],
++		&[data-indeterminate] {
++			background-color: var(--wpds-color-bg-interactive-brand-strong);
++			border-color: var(--wpds-color-stroke-interactive-brand);
++		}
++
++		&:hover:is([data-checked], [data-indeterminate]):not([data-disabled], [data-readonly]) {
++			background-color: var(--wpds-color-bg-interactive-brand-strong-active);
++			border-color: var(--wpds-color-stroke-interactive-brand-active);
++		}
++
++		&[data-disabled] {
++			background-color: var(--wpds-color-bg-interactive-neutral-weak-disabled);
++			border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
++			color: var(--wpds-color-fg-interactive-neutral-disabled);
++			cursor: default;
++
++			@media (forced-colors: active) {
++				border-color: GrayText;
++				color: GrayText;
++			}
++		}
++
++		&[data-readonly] {
++			cursor: default;
++		}
++	}
++
++	.indicator {
++		display: inline-flex;
++		align-items: center;
++		justify-content: center;
++		inline-size: 100%;
++		block-size: 100%;
++		line-height: 1;
++		pointer-events: none;
++	}
++
++	.indicator-icon {
++		flex-shrink: 0;
++		fill: currentColor;
++	}
++
++	.indeterminate-icon {
++		display: none;
++	}
++
++	.root[data-indeterminate] .checked-icon {
++		display: none;
++	}
++
++	.root[data-indeterminate] .indeterminate-icon {
++		display: block;
++	}
++}
+diff --git a/packages/ui/src/form/primitives/checkbox/test/index.test.tsx b/packages/ui/src/form/primitives/checkbox/test/index.test.tsx
+new file mode 100644
+index 00000000000000..0b2f3b9decd37b
+--- /dev/null
++++ b/packages/ui/src/form/primitives/checkbox/test/index.test.tsx
+@@ -0,0 +1,104 @@
++import { render, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { createRef } from '@wordpress/element';
++import * as Field from '../../field';
++import * as Checkbox from '../index';
++
++const originalPointerEvent = globalThis.PointerEvent;
++
++describe( 'Checkbox', () => {
++	beforeAll( () => {
++		if ( ! globalThis.PointerEvent ) {
++			Object.defineProperty( globalThis, 'PointerEvent', {
++				configurable: true,
++				value: MouseEvent,
++			} );
++		}
++	} );
++
++	afterAll( () => {
++		if ( originalPointerEvent ) {
++			Object.defineProperty( globalThis, 'PointerEvent', {
++				configurable: true,
++				value: originalPointerEvent,
++			} );
++		} else {
++			Reflect.deleteProperty( globalThis, 'PointerEvent' );
++		}
++	} );
++	it( 'forwards refs', () => {
++		const rootRef = createRef< HTMLElement >();
++		const indicatorRef = createRef< HTMLSpanElement >();
++
++		render(
++			<Checkbox.Root ref={ rootRef } defaultChecked>
++				<Checkbox.Indicator ref={ indicatorRef } />
++			</Checkbox.Root>
++		);
++
++		expect( rootRef.current ).toBeInstanceOf( HTMLSpanElement );
++		expect( indicatorRef.current ).toBeInstanceOf( HTMLSpanElement );
++	} );
++
++	it( 'toggles an uncontrolled checkbox when clicked', async () => {
++		const user = userEvent.setup();
++		const onCheckedChange = jest.fn();
++
++		render(
++			<Checkbox.Root
++				aria-label="Option"
++				onCheckedChange={ onCheckedChange }
++			/>
++		);
++
++		const checkbox = screen.getByRole( 'checkbox', { name: 'Option' } );
++
++		expect( checkbox ).not.toBeChecked();
++
++		await user.click( checkbox );
++
++		expect( checkbox ).toBeChecked();
++		expect( onCheckedChange ).toHaveBeenCalledWith(
++			true,
++			expect.any( Object )
++		);
++	} );
++
++	it( 'is labeled by Field.Label when composed with Field.Root', async () => {
++		const user = userEvent.setup();
++
++		render(
++			<Field.Root>
++				<Checkbox.Root />
++				<Field.Label>Option</Field.Label>
++			</Field.Root>
++		);
++
++		const checkbox = screen.getByRole( 'checkbox', { name: 'Option' } );
++
++		expect( checkbox ).toBeVisible();
++		expect( checkbox ).not.toBeChecked();
++
++		await user.click( screen.getByText( 'Option' ) );
++
++		expect( checkbox ).toBeChecked();
++	} );
++
++	it( 'supports an indeterminate state', () => {
++		const inputRef = createRef< HTMLInputElement >();
++
++		render(
++			<Checkbox.Root
++				aria-label="Mixed option"
++				indeterminate
++				inputRef={ inputRef }
++			/>
++		);
++
++		expect(
++			screen.getByRole( 'checkbox', { name: 'Mixed option' } )
++		).toBePartiallyChecked();
++		expect( inputRef.current ).toBeInstanceOf( HTMLInputElement );
++		expect( inputRef.current?.indeterminate ).toBe( true );
++	} );
++} );
+diff --git a/packages/ui/src/form/primitives/checkbox/types.ts b/packages/ui/src/form/primitives/checkbox/types.ts
+new file mode 100644
+index 00000000000000..ddff9554c524e3
+--- /dev/null
++++ b/packages/ui/src/form/primitives/checkbox/types.ts
+@@ -0,0 +1,22 @@
++import type { Checkbox as _Checkbox } from '@base-ui/react/checkbox';
++import type { ComponentProps } from '../../../utils/types';
++
++export type CheckboxRootProps = ComponentProps< typeof _Checkbox.Root > & {
++	/**
++	 * The indicator to render inside the checkbox.
++	 *
++	 * When omitted, a default checkmark/indeterminate indicator is rendered.
++	 */
++	children?: React.ReactNode;
++};
++
++export type CheckboxIndicatorProps = ComponentProps<
++	typeof _Checkbox.Indicator
++> & {
++	/**
++	 * The content of the indicator.
++	 *
++	 * When omitted, default checkmark/indeterminate icons are rendered.
++	 */
++	children?: React.ReactNode;
++};
+diff --git a/packages/ui/src/form/primitives/index.ts b/packages/ui/src/form/primitives/index.ts
+index b8cdf7d6eb8ed4..510b0feae7e2d3 100644
+--- a/packages/ui/src/form/primitives/index.ts
++++ b/packages/ui/src/form/primitives/index.ts
+@@ -1,4 +1,5 @@
+ export * as Autocomplete from './autocomplete';
++export * as Checkbox from './checkbox';
+ export * as Field from './field';
+ export * as Fieldset from './fieldset';
+ export { Input } from './input';

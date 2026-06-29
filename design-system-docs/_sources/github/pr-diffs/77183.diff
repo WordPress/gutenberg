@@ -1,0 +1,209 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 76d38fbc86a53b..afe11d6065247c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,10 @@
+ -   `ValidatedRangeControl`: Fix `aria-label` rendered as `[object Object]` when `required` or `markWhenOptional` is set ([#77042](https://github.com/WordPress/gutenberg/pull/77042)).
+ -   `Autocomplete`: Fix matching logic to prefer longest overlapping trigger ([#77018](https://github.com/WordPress/gutenberg/pull/77018)).
+ 
++### Enhancements
++
++-   `Composite`: Add context validation to subcomponents to throw a helpful error when rendered outside of `Composite` ([#77183](https://github.com/WordPress/gutenberg/pull/77183)).
++
+ ### Internal
+ 
+ -   `Autocomplete`: Refactor `useAutocomplete` to use `useReducer` ([#77020](https://github.com/WordPress/gutenberg/pull/77020)).
+diff --git a/packages/components/src/composite/context.tsx b/packages/components/src/composite/context.tsx
+index 32f638a66162ce..b350d8e214ad15 100644
+--- a/packages/components/src/composite/context.tsx
++++ b/packages/components/src/composite/context.tsx
+@@ -8,7 +8,9 @@ import { createContext, useContext } from '@wordpress/element';
+  */
+ import type { CompositeContextProps } from './types';
+ 
+-export const CompositeContext = createContext< CompositeContextProps >( {} );
++export const CompositeContext = createContext<
++	CompositeContextProps | undefined
++>( undefined );
+ CompositeContext.displayName = 'CompositeContext';
+ 
+ export const useCompositeContext = () => useContext( CompositeContext );
+diff --git a/packages/components/src/composite/group-label.tsx b/packages/components/src/composite/group-label.tsx
+index 7e3c6ffdc7759c..e4d4b37cc7c67f 100644
+--- a/packages/components/src/composite/group-label.tsx
++++ b/packages/components/src/composite/group-label.tsx
+@@ -24,7 +24,13 @@ export const CompositeGroupLabel = forwardRef<
+ 	// @ts-expect-error The store prop is undocumented and only used by the
+ 	// legacy compat layer. The `store` prop is documented, but its type is
+ 	// obfuscated to discourage its use outside of the component's internals.
+-	const store = ( props.store ?? context.store ) as Ariakit.CompositeStore;
++	const store = ( props.store ?? context?.store ) as Ariakit.CompositeStore;
++
++	if ( ! store ) {
++		throw new Error(
++			'Composite.GroupLabel can only be rendered inside a Composite component'
++		);
++	}
+ 
+ 	return (
+ 		<Ariakit.CompositeGroupLabel store={ store } { ...props } ref={ ref } />
+diff --git a/packages/components/src/composite/group.tsx b/packages/components/src/composite/group.tsx
+index bcfb47e684613d..9b66eff4a7f047 100644
+--- a/packages/components/src/composite/group.tsx
++++ b/packages/components/src/composite/group.tsx
+@@ -24,7 +24,13 @@ export const CompositeGroup = forwardRef<
+ 	// @ts-expect-error The store prop is undocumented and only used by the
+ 	// legacy compat layer. The `store` prop is documented, but its type is
+ 	// obfuscated to discourage its use outside of the component's internals.
+-	const store = ( props.store ?? context.store ) as Ariakit.CompositeStore;
++	const store = ( props.store ?? context?.store ) as Ariakit.CompositeStore;
++
++	if ( ! store ) {
++		throw new Error(
++			'Composite.Group can only be rendered inside a Composite component'
++		);
++	}
+ 
+ 	return <Ariakit.CompositeGroup store={ store } { ...props } ref={ ref } />;
+ } );
+diff --git a/packages/components/src/composite/hover.tsx b/packages/components/src/composite/hover.tsx
+index a8a0ebfb4729fe..47a3ca81eb5e3a 100644
+--- a/packages/components/src/composite/hover.tsx
++++ b/packages/components/src/composite/hover.tsx
+@@ -24,7 +24,13 @@ export const CompositeHover = forwardRef<
+ 	// @ts-expect-error The store prop is undocumented and only used by the
+ 	// legacy compat layer. The `store` prop is documented, but its type is
+ 	// obfuscated to discourage its use outside of the component's internals.
+-	const store = ( props.store ?? context.store ) as Ariakit.CompositeStore;
++	const store = ( props.store ?? context?.store ) as Ariakit.CompositeStore;
++
++	if ( ! store ) {
++		throw new Error(
++			'Composite.Hover can only be rendered inside a Composite component'
++		);
++	}
+ 
+ 	return <Ariakit.CompositeHover store={ store } { ...props } ref={ ref } />;
+ } );
+diff --git a/packages/components/src/composite/item.tsx b/packages/components/src/composite/item.tsx
+index 4a02f76039a5cf..900cd625cdadc4 100644
+--- a/packages/components/src/composite/item.tsx
++++ b/packages/components/src/composite/item.tsx
+@@ -24,7 +24,13 @@ export const CompositeItem = forwardRef<
+ 	// @ts-expect-error The store prop is undocumented and only used by the
+ 	// legacy compat layer. The `store` prop is documented, but its type is
+ 	// obfuscated to discourage its use outside of the component's internals.
+-	const store = ( props.store ?? context.store ) as Ariakit.CompositeStore;
++	const store = ( props.store ?? context?.store ) as Ariakit.CompositeStore;
++
++	if ( ! store ) {
++		throw new Error(
++			'Composite.Item can only be rendered inside a Composite component'
++		);
++	}
+ 
+ 	return <Ariakit.CompositeItem store={ store } { ...props } ref={ ref } />;
+ } );
+diff --git a/packages/components/src/composite/row.tsx b/packages/components/src/composite/row.tsx
+index 1a88da557785e9..455fa6aff8317f 100644
+--- a/packages/components/src/composite/row.tsx
++++ b/packages/components/src/composite/row.tsx
+@@ -24,7 +24,13 @@ export const CompositeRow = forwardRef<
+ 	// @ts-expect-error The store prop is undocumented and only used by the
+ 	// legacy compat layer. The `store` prop is documented, but its type is
+ 	// obfuscated to discourage its use outside of the component's internals.
+-	const store = ( props.store ?? context.store ) as Ariakit.CompositeStore;
++	const store = ( props.store ?? context?.store ) as Ariakit.CompositeStore;
++
++	if ( ! store ) {
++		throw new Error(
++			'Composite.Row can only be rendered inside a Composite component'
++		);
++	}
+ 
+ 	return <Ariakit.CompositeRow store={ store } { ...props } ref={ ref } />;
+ } );
+diff --git a/packages/components/src/composite/test/index.tsx b/packages/components/src/composite/test/index.tsx
+index 197302a5f3c9d3..43669dc5a6b21d 100644
+--- a/packages/components/src/composite/test/index.tsx
++++ b/packages/components/src/composite/test/index.tsx
+@@ -711,4 +711,60 @@ describe( 'Composite', () => {
+ 			} );
+ 		} );
+ 	} );
++
++	describe( 'context validation', () => {
++		it( 'should throw when Composite.Item is rendered outside of Composite', () => {
++			expect( () =>
++				render( <Composite.Item>Item</Composite.Item> )
++			).toThrow(
++				'Composite.Item can only be rendered inside a Composite component'
++			);
++			expect( console ).toHaveErrored();
++		} );
++
++		it( 'should throw when Composite.Row is rendered outside of Composite', () => {
++			expect( () =>
++				render( <Composite.Row>Row</Composite.Row> )
++			).toThrow(
++				'Composite.Row can only be rendered inside a Composite component'
++			);
++			expect( console ).toHaveErrored();
++		} );
++
++		it( 'should throw when Composite.Group is rendered outside of Composite', () => {
++			expect( () =>
++				render( <Composite.Group>Group</Composite.Group> )
++			).toThrow(
++				'Composite.Group can only be rendered inside a Composite component'
++			);
++			expect( console ).toHaveErrored();
++		} );
++
++		it( 'should throw when Composite.GroupLabel is rendered outside of Composite', () => {
++			expect( () =>
++				render( <Composite.GroupLabel>Label</Composite.GroupLabel> )
++			).toThrow(
++				'Composite.GroupLabel can only be rendered inside a Composite component'
++			);
++			expect( console ).toHaveErrored();
++		} );
++
++		it( 'should throw when Composite.Hover is rendered outside of Composite', () => {
++			expect( () =>
++				render( <Composite.Hover>Hover</Composite.Hover> )
++			).toThrow(
++				'Composite.Hover can only be rendered inside a Composite component'
++			);
++			expect( console ).toHaveErrored();
++		} );
++
++		it( 'should throw when Composite.Typeahead is rendered outside of Composite', () => {
++			expect( () =>
++				render( <Composite.Typeahead>Typeahead</Composite.Typeahead> )
++			).toThrow(
++				'Composite.Typeahead can only be rendered inside a Composite component'
++			);
++			expect( console ).toHaveErrored();
++		} );
++	} );
+ } );
+diff --git a/packages/components/src/composite/typeahead.tsx b/packages/components/src/composite/typeahead.tsx
+index 3a3c3875a33604..0bdc205b3b2786 100644
+--- a/packages/components/src/composite/typeahead.tsx
++++ b/packages/components/src/composite/typeahead.tsx
+@@ -24,7 +24,13 @@ export const CompositeTypeahead = forwardRef<
+ 	// @ts-expect-error The store prop is undocumented and only used by the
+ 	// legacy compat layer. The `store` prop is documented, but its type is
+ 	// obfuscated to discourage its use outside of the component's internals.
+-	const store = ( props.store ?? context.store ) as Ariakit.CompositeStore;
++	const store = ( props.store ?? context?.store ) as Ariakit.CompositeStore;
++
++	if ( ! store ) {
++		throw new Error(
++			'Composite.Typeahead can only be rendered inside a Composite component'
++		);
++	}
+ 
+ 	return (
+ 		<Ariakit.CompositeTypeahead store={ store } { ...props } ref={ ref } />

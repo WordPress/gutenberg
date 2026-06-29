@@ -1,0 +1,27 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 771f834b50bfca..b92ee9b8450700 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++-   `TextareaControl`: Add `min-height` to the textarea element ([#72867](https://github.com/WordPress/gutenberg/pull/72867)).
++
+ ## 30.7.0 (2025-10-29)
+ 
+ ### Bug Fixes
+diff --git a/packages/components/src/textarea-control/styles/textarea-control-styles.ts b/packages/components/src/textarea-control/styles/textarea-control-styles.ts
+index da1c191514ecd9..12de09063df047 100644
+--- a/packages/components/src/textarea-control/styles/textarea-control-styles.ts
++++ b/packages/components/src/textarea-control/styles/textarea-control-styles.ts
+@@ -46,6 +46,9 @@ export const StyledTextarea = styled.textarea`
+ 	// "Standard" metrics are 10px 12px, but subtracts 1px each to account for the border width.
+ 	padding: 9px 11px;
+ 
++	// Matching the 20px line-height + the 9px top and bottom padding.
++	min-height: 38px;
++
+ 	${ inputStyleNeutral };
+ 
+ 	/* Fonts smaller than 16px causes mobile safari to zoom. */

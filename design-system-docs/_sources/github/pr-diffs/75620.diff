@@ -1,0 +1,273 @@
+diff --git a/package-lock.json b/package-lock.json
+index 00c6da7e572675..56fcf7ce12de24 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -1341,18 +1341,18 @@
+ 			}
+ 		},
+ 		"node_modules/@ariakit/core": {
+-			"version": "0.4.14",
+-			"resolved": "https://registry.npmjs.org/@ariakit/core/-/core-0.4.14.tgz",
+-			"integrity": "sha512-hpzZvyYzGhP09S9jW1XGsU/FD5K3BKsH1eG/QJ8rfgEeUdPS7BvHPt5lHbOeJ2cMrRzBEvsEzLi1ivfDifHsVA==",
++			"version": "0.4.18",
++			"resolved": "https://registry.npmjs.org/@ariakit/core/-/core-0.4.18.tgz",
++			"integrity": "sha512-9urEa+GbZTSyredq3B/3thQjTcSZSUC68XctwCkJNH/xNfKN5O+VThiem2rcJxpsGw8sRUQenhagZi0yB4foyg==",
+ 			"license": "MIT"
+ 		},
+ 		"node_modules/@ariakit/react": {
+-			"version": "0.4.15",
+-			"resolved": "https://registry.npmjs.org/@ariakit/react/-/react-0.4.15.tgz",
+-			"integrity": "sha512-0V2LkNPFrGRT+SEIiObx/LQjR6v3rR+mKEDUu/3tq7jfCZ+7+6Q6EMR1rFaK+XMkaRY1RWUcj/rRDWAUWnsDww==",
++			"version": "0.4.21",
++			"resolved": "https://registry.npmjs.org/@ariakit/react/-/react-0.4.21.tgz",
++			"integrity": "sha512-UjP99Y7cWxA5seRECEE0RPZFImkLGFIWPflp65t0BVZwlMw4wp9OJZRHMrnkEkKl5KBE2NR/gbbzwHc6VNGzsA==",
+ 			"license": "MIT",
+ 			"dependencies": {
+-				"@ariakit/react-core": "0.4.15"
++				"@ariakit/react-core": "0.4.21"
+ 			},
+ 			"funding": {
+ 				"type": "opencollective",
+@@ -1364,12 +1364,12 @@
+ 			}
+ 		},
+ 		"node_modules/@ariakit/react-core": {
+-			"version": "0.4.15",
+-			"resolved": "https://registry.npmjs.org/@ariakit/react-core/-/react-core-0.4.15.tgz",
+-			"integrity": "sha512-Up8+U97nAPJdyUh9E8BCEhJYTA+eVztWpHoo1R9zZfHd4cnBWAg5RHxEmMH+MamlvuRxBQA71hFKY/735fDg+A==",
++			"version": "0.4.21",
++			"resolved": "https://registry.npmjs.org/@ariakit/react-core/-/react-core-0.4.21.tgz",
++			"integrity": "sha512-rUI9uB/gT3mROFja/ka7/JukkdljIZR3eq3BGiQqX4Ni/KBMDvPK8FvVLnC0TGzWcqNY2bbfve8QllvHzuw4fQ==",
+ 			"license": "MIT",
+ 			"dependencies": {
+-				"@ariakit/core": "0.4.14",
++				"@ariakit/core": "0.4.18",
+ 				"@floating-ui/dom": "^1.0.0",
+ 				"use-sync-external-store": "^1.2.0"
+ 			},
+@@ -1379,13 +1379,13 @@
+ 			}
+ 		},
+ 		"node_modules/@ariakit/test": {
+-			"version": "0.4.7",
+-			"resolved": "https://registry.npmjs.org/@ariakit/test/-/test-0.4.7.tgz",
+-			"integrity": "sha512-Zb5bnulzYGjr6sDubxOeOhk5Es6BYQq5lbcIe8xNrWUlpRiHsje/FlXNFpHnI92/7ESxH6X4pHhbb+qFAho1lw==",
++			"version": "0.4.13",
++			"resolved": "https://registry.npmjs.org/@ariakit/test/-/test-0.4.13.tgz",
++			"integrity": "sha512-Kk0FDiHgvPnQw0HrU6B+XHTherTgvpAeI9kXBwCMcZXfLgYO9dh4BUrn1p0vT6EcMDJePEd9nrwZdAfnBFl0cg==",
+ 			"dev": true,
+ 			"license": "MIT",
+ 			"dependencies": {
+-				"@ariakit/core": "0.4.14",
++				"@ariakit/core": "0.4.18",
+ 				"@testing-library/dom": "^8.0.0 || ^9.0.0 || ^10.0.0"
+ 			},
+ 			"peerDependencies": {
+@@ -57804,7 +57804,7 @@
+ 				"remove-accents": "^0.5.0"
+ 			},
+ 			"devDependencies": {
+-				"@ariakit/test": "^0.4.7",
++				"@ariakit/test": "^0.4.13",
+ 				"deep-freeze": "0.0.1"
+ 			},
+ 			"engines": {
+@@ -58046,7 +58046,7 @@
+ 			"version": "32.1.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@ariakit/react": "^0.4.15",
++				"@ariakit/react": "^0.4.21",
+ 				"@date-fns/utc": "^2.1.1",
+ 				"@emotion/cache": "^11.14.0",
+ 				"@emotion/css": "^11.13.5",
+@@ -58097,7 +58097,7 @@
+ 				"uuid": "^9.0.1"
+ 			},
+ 			"devDependencies": {
+-				"@ariakit/test": "^0.4.7",
++				"@ariakit/test": "^0.4.13",
+ 				"@storybook/addon-docs": "^10.1.11",
+ 				"@storybook/react-vite": "^10.1.11",
+ 				"@testing-library/jest-dom": "^6.9.1",
+@@ -59173,7 +59173,7 @@
+ 			"version": "11.3.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@ariakit/react": "^0.4.15",
++				"@ariakit/react": "^0.4.21",
+ 				"@wordpress/base-styles": "file:../base-styles",
+ 				"@wordpress/components": "file:../components",
+ 				"@wordpress/compose": "file:../compose",
+diff --git a/packages/block-editor/package.json b/packages/block-editor/package.json
+index 2a3d4a91cc6935..795621d4e90433 100644
+--- a/packages/block-editor/package.json
++++ b/packages/block-editor/package.json
+@@ -114,7 +114,7 @@
+ 		"remove-accents": "^0.5.0"
+ 	},
+ 	"devDependencies": {
+-		"@ariakit/test": "^0.4.7",
++		"@ariakit/test": "^0.4.13",
+ 		"deep-freeze": "0.0.1"
+ 	},
+ 	"peerDependencies": {
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f0cbb78796c7d5..612e2bad30181a 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -28,6 +28,7 @@
+ -   Clean up type declarations using the `React` namespace ([#75499](https://github.com/WordPress/gutenberg/pull/75499) and ([#75508](https://github.com/WordPress/gutenberg/pull/75508))).
+ -   Always specify initial values for `useRef` calls ([#75513](https://github.com/WordPress/gutenberg/pull/75513)).
+ -   Update `RefObject` type usage for React 19 compatibility ([#75567](https://github.com/WordPress/gutenberg/pull/75567)).
++-   Upgraded `@ariakit/react` (v0.4.21) and `@ariakit/test` (v0.4.13) ([#75620](https://github.com/WordPress/gutenberg/pull/75620)).
+ 
+ ## 32.1.0 (2026-01-29)
+ 
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 5cd4d5c1407b47..7d120847c41e08 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -51,7 +51,7 @@
+ 		"src/**/*.scss"
+ 	],
+ 	"dependencies": {
+-		"@ariakit/react": "^0.4.15",
++		"@ariakit/react": "^0.4.21",
+ 		"@date-fns/utc": "^2.1.1",
+ 		"@emotion/cache": "^11.14.0",
+ 		"@emotion/css": "^11.13.5",
+@@ -102,7 +102,7 @@
+ 		"uuid": "^9.0.1"
+ 	},
+ 	"devDependencies": {
+-		"@ariakit/test": "^0.4.7",
++		"@ariakit/test": "^0.4.13",
+ 		"@storybook/addon-docs": "^10.1.11",
+ 		"@storybook/react-vite": "^10.1.11",
+ 		"@testing-library/jest-dom": "^6.9.1",
+diff --git a/packages/components/src/custom-select-control-v2/custom-select.tsx b/packages/components/src/custom-select-control-v2/custom-select.tsx
+index eda4ad179a61bb..eaf445675a863b 100644
+--- a/packages/components/src/custom-select-control-v2/custom-select.tsx
++++ b/packages/components/src/custom-select-control-v2/custom-select.tsx
+@@ -31,7 +31,7 @@ export const CustomSelectContext =
+ CustomSelectContext.displayName = 'CustomSelectContext';
+ 
+ function defaultRenderSelectedValue(
+-	value: CustomSelectButtonProps[ 'value' ]
++	value: CustomSelectButtonProps[ 'defaultValue' ]
+ ) {
+ 	const isValueEmpty = Array.isArray( value )
+ 		? value.length === 0
+diff --git a/packages/components/src/custom-select-control-v2/stories/index.story.tsx b/packages/components/src/custom-select-control-v2/stories/index.story.tsx
+index 370abdba637c06..34ca986271cf2e 100644
+--- a/packages/components/src/custom-select-control-v2/stories/index.story.tsx
++++ b/packages/components/src/custom-select-control-v2/stories/index.story.tsx
+@@ -55,11 +55,11 @@ const meta: Meta< typeof CustomSelectControlV2 > = {
+ export default meta;
+ 
+ const Template: StoryFn< typeof CustomSelectControlV2 > = ( props ) => {
+-	const [ value, setValue ] = useState< string | string[] >();
++	const [ value, setValue ] = useState< string | readonly string[] >();
+ 	return (
+ 		<CustomSelectControlV2
+ 			{ ...props }
+-			onChange={ ( nextValue: string | string[] ) => {
++			onChange={ ( nextValue ) => {
+ 				setValue( nextValue );
+ 				props.onChange?.( nextValue );
+ 			} }
+@@ -114,7 +114,7 @@ MultipleSelection.args = {
+ 	),
+ };
+ 
+-const renderItem = ( gravatar: string | string[] ) => {
++const renderItem = ( gravatar: string | readonly string[] ) => {
+ 	const avatar = `https://gravatar.com/avatar?d=${ gravatar }`;
+ 	return (
+ 		<div style={ { display: 'flex', alignItems: 'center' } }>
+diff --git a/packages/components/src/custom-select-control-v2/test/index.tsx b/packages/components/src/custom-select-control-v2/test/index.tsx
+index 060a367ba8597b..26dd6e79603f67 100644
+--- a/packages/components/src/custom-select-control-v2/test/index.tsx
++++ b/packages/components/src/custom-select-control-v2/test/index.tsx
+@@ -47,11 +47,11 @@ const defaultProps = {
+ };
+ 
+ const ControlledCustomSelectControl = ( props: CustomSelectProps ) => {
+-	const [ value, setValue ] = useState< string | string[] >();
++	const [ value, setValue ] = useState< string | readonly string[] >();
+ 	return (
+ 		<UncontrolledCustomSelectControlV2
+ 			{ ...props }
+-			onChange={ ( nextValue: string | string[] ) => {
++			onChange={ ( nextValue ) => {
+ 				setValue( nextValue );
+ 				props.onChange?.( nextValue );
+ 			} }
+@@ -375,7 +375,7 @@ describe.each( [
+ 	} );
+ 
+ 	it( 'Should allow rendering a custom value when using `renderSelectedValue`', async () => {
+-		const renderValue = ( value: string | string[] ) => {
++		const renderValue = ( value: string | readonly string[] ) => {
+ 			return <img src={ `${ value }.jpg` } alt={ value as string } />;
+ 		};
+ 
+diff --git a/packages/components/src/custom-select-control-v2/types.ts b/packages/components/src/custom-select-control-v2/types.ts
+index a31598c1db3ead..621319737207d1 100644
+--- a/packages/components/src/custom-select-control-v2/types.ts
++++ b/packages/components/src/custom-select-control-v2/types.ts
+@@ -32,21 +32,21 @@ export type CustomSelectButtonProps = {
+ 	 * An optional default value for the control when used in uncontrolled mode.
+ 	 * If left `undefined`, the first non-disabled item will be used.
+ 	 */
+-	defaultValue?: string | string[];
++	defaultValue?: string | readonly string[];
+ 	/**
+ 	 * A function that receives the new value of the input.
+ 	 */
+-	onChange?: ( newValue: string | string[] ) => void;
++	onChange?: ( newValue: string | readonly string[] ) => void;
+ 	/**
+ 	 * Can be used to render select UI with custom styled values.
+ 	 */
+ 	renderSelectedValue?: (
+-		selectedValue: string | string[]
++		selectedValue: string | readonly string[]
+ 	) => React.ReactNode;
+ 	/**
+ 	 * The value of the control when used in uncontrolled mode.
+ 	 */
+-	value?: string | string[];
++	value?: string | readonly string[];
+ };
+ 
+ // Props only exposed on the internal implementation
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index 37acea9c81f86a..8c10ee81af0e3d 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -33,8 +33,9 @@
+ - DataForm: Use public `ColorPicker` component instead of internal `Picker` in color control. [#75394](https://github.com/WordPress/gutenberg/pull/75394)
+ - Update Testing Library packages used in unit tests. [#75340](https://github.com/WordPress/gutenberg/pull/75340)
+ - Always specify initial values for `useRef` calls. [#75513](https://github.com/WordPress/gutenberg/pull/75513)
+-- Clean up type declarations using the `React` namespace. ([#75508](https://github.com/WordPress/gutenberg/pull/75508)
++- Clean up type declarations using the `React` namespace. [#75508](https://github.com/WordPress/gutenberg/pull/75508)
+ - Update `RefObject` type usage for React 19 compatibility. [#75567](https://github.com/WordPress/gutenberg/pull/75567)
++- Upgraded `@ariakit/react` (v0.4.21). [#75620](https://github.com/WordPress/gutenberg/pull/75620)
+ 
+ ## 11.3.0 (2026-01-29)
+ 
+diff --git a/packages/dataviews/package.json b/packages/dataviews/package.json
+index 569ef7fa684e04..682876fca3cc17 100644
+--- a/packages/dataviews/package.json
++++ b/packages/dataviews/package.json
+@@ -52,7 +52,7 @@
+ 	"types": "build-types",
+ 	"sideEffects": false,
+ 	"dependencies": {
+-		"@ariakit/react": "^0.4.15",
++		"@ariakit/react": "^0.4.21",
+ 		"@wordpress/base-styles": "file:../base-styles",
+ 		"@wordpress/components": "file:../components",
+ 		"@wordpress/compose": "file:../compose",

@@ -1,0 +1,2353 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8195ff9000af8b..5da6bff0973f8c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   Add new validated form controls (work in progress, not exported): `ValidatedCheckboxControl`, `ValidatedInputControl`, `ValidatedNumberControl`, `ValidatedRadioControl`, `ValidatedRangeControl`, `ValidatedSelectControl`, `ValidatedTextControl`, `ValidatedTextareaControl`, `ValidatedToggleControl`, `ValidatedCustomSelectControl`, `ValidatedComboboxControl`, `ValidatedToggleGroupControl`, and `ControlWithError` for enhanced form validation capabilities ([#70620](https://github.com/WordPress/gutenberg/pull/70620)).
++
+ ### Bug Fixes
+ 
+ -   `FormTokenField`: Fix focus lost on tab when `__experimentalExpandOnFocus` is set ([#70591](https://github.com/WordPress/gutenberg/pull/70591)).
+diff --git a/packages/components/src/private-apis.ts b/packages/components/src/private-apis.ts
+index e6f41c5ae71947..f35805ec47f61f 100644
+--- a/packages/components/src/private-apis.ts
++++ b/packages/components/src/private-apis.ts
+@@ -10,6 +10,7 @@ import { kebabCase, normalizeTextString } from './utils/strings';
+ import { withIgnoreIMEEvents } from './utils/with-ignore-ime-events';
+ import { lock } from './lock-unlock';
+ import Badge from './badge';
++
+ import { DateCalendar, DateRangeCalendar, TZDate } from './calendar';
+ 
+ export const privateApis = {};
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index 1f7b17a1eb8a08..74d8ec7554e43c 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -1,7 +1,7 @@
+ // Include the default WP Components color variables.
+ // TODO: Remove this once all admin-scheme variables are accounted for in the wp-components fallback values.
+ :root {
+-	@include admin-scheme(#3858e9);
++	@include admin-scheme( #3858e9 );
+ }
+ 
+ // Variables
+@@ -55,3 +55,4 @@
+ @import "./toolbar/toolbar-button/style.scss";
+ @import "./toolbar/toolbar-group/style.scss";
+ @import "./tooltip/style.scss";
++@import "./validated-form-controls/style.scss";
+diff --git a/packages/components/src/validated-form-controls/components/checkbox-control.tsx b/packages/components/src/validated-form-controls/components/checkbox-control.tsx
+new file mode 100644
+index 00000000000000..b4f194e5830a23
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/components/checkbox-control.tsx
+@@ -0,0 +1,64 @@
++/**
++ * WordPress dependencies
++ */
++import { useMergeRefs } from '@wordpress/compose';
++import { forwardRef, useRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { ControlWithError } from '../control-with-error';
++import type { ValidatedControlProps } from './types';
++import CheckboxControl from '../../checkbox-control';
++import type { CheckboxControlProps } from '../../checkbox-control/types';
++
++type Value = CheckboxControlProps[ 'checked' ];
++
++const UnforwardedValidatedCheckboxControl = (
++	{
++		required,
++		customValidator,
++		onChange,
++		markWhenOptional,
++		...restProps
++	}: Omit<
++		React.ComponentProps< typeof CheckboxControl >,
++		'__nextHasNoMarginBottom'
++	> &
++		ValidatedControlProps< Value >,
++	forwardedRef: React.ForwardedRef< HTMLInputElement >
++) => {
++	const validityTargetRef = useRef< HTMLDivElement >( null );
++	const mergedRefs = useMergeRefs( [ forwardedRef, validityTargetRef ] );
++	const valueRef = useRef< Value >( restProps.checked );
++
++	return (
++		<ControlWithError
++			required={ required }
++			markWhenOptional={ markWhenOptional }
++			ref={ mergedRefs }
++			customValidator={ () => {
++				return customValidator?.( valueRef.current );
++			} }
++			getValidityTarget={ () =>
++				validityTargetRef.current?.querySelector< HTMLInputElement >(
++					'input[type="checkbox"]'
++				)
++			}
++		>
++			<CheckboxControl
++				__nextHasNoMarginBottom
++				onChange={ ( value ) => {
++					valueRef.current = value;
++					onChange?.( value );
++				} }
++				// TODO: Upstream limitation - CheckboxControl doesn't support uncontrolled mode, visually.
++				{ ...restProps }
++			/>
++		</ControlWithError>
++	);
++};
++
++export const ValidatedCheckboxControl = forwardRef(
++	UnforwardedValidatedCheckboxControl
++);
+diff --git a/packages/components/src/validated-form-controls/components/combobox-control.tsx b/packages/components/src/validated-form-controls/components/combobox-control.tsx
+new file mode 100644
+index 00000000000000..fc2b43b6da15e6
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/components/combobox-control.tsx
+@@ -0,0 +1,77 @@
++/**
++ * WordPress dependencies
++ */
++import { useMergeRefs } from '@wordpress/compose';
++import { forwardRef, useEffect, useRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { ControlWithError } from '../control-with-error';
++import type { ValidatedControlProps } from './types';
++import ComboboxControl from '../../combobox-control';
++import type { ComboboxControlProps } from '../../combobox-control/types';
++
++type Value = ComboboxControlProps[ 'value' ];
++
++const UnforwardedValidatedComboboxControl = (
++	{
++		required,
++		customValidator,
++		onChange,
++		markWhenOptional,
++		...restProps
++	}: Omit<
++		React.ComponentProps< typeof ComboboxControl >,
++		'__next40pxDefaultSize' | '__nextHasNoMarginBottom'
++	> &
++		ValidatedControlProps< Value >,
++	forwardedRef: React.ForwardedRef< HTMLInputElement >
++) => {
++	const validityTargetRef = useRef< HTMLInputElement >( null );
++	const mergedRefs = useMergeRefs( [ forwardedRef, validityTargetRef ] );
++	const valueRef = useRef< Value >( restProps.value );
++
++	// TODO: Upstream limitation - The `required` attribute is not passed down to the input,
++	// so we need to set it manually.
++	useEffect( () => {
++		const input =
++			validityTargetRef.current?.querySelector< HTMLInputElement >(
++				'input[role="combobox"]'
++			);
++		if ( input ) {
++			input.required = required ?? false;
++		}
++	}, [ required ] );
++
++	return (
++		// TODO: Bug - Missing value error is not cleared immediately on change, waits for blur.
++		<ControlWithError
++			required={ required }
++			markWhenOptional={ markWhenOptional }
++			ref={ mergedRefs }
++			customValidator={ () => {
++				return customValidator?.( valueRef.current );
++			} }
++			getValidityTarget={ () =>
++				validityTargetRef.current?.querySelector< HTMLInputElement >(
++					'input[role="combobox"]'
++				)
++			}
++		>
++			<ComboboxControl
++				__nextHasNoMarginBottom
++				__next40pxDefaultSize
++				{ ...restProps }
++				onChange={ ( value ) => {
++					valueRef.current = value;
++					onChange?.( value );
++				} }
++			/>
++		</ControlWithError>
++	);
++};
++
++export const ValidatedComboboxControl = forwardRef(
++	UnforwardedValidatedComboboxControl
++);
+diff --git a/packages/components/src/validated-form-controls/components/custom-select-control.tsx b/packages/components/src/validated-form-controls/components/custom-select-control.tsx
+new file mode 100644
+index 00000000000000..641a98cb57c54b
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/components/custom-select-control.tsx
+@@ -0,0 +1,86 @@
++/**
++ * WordPress dependencies
++ */
++import { forwardRef, useRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { ControlWithError } from '../control-with-error';
++import type { ValidatedControlProps } from './types';
++import CustomSelectControl from '../../custom-select-control';
++import type {
++	CustomSelectOption,
++	CustomSelectProps,
++} from '../../custom-select-control/types';
++
++type CustomSelectControlProps = CustomSelectProps< CustomSelectOption >;
++
++type Value = CustomSelectControlProps[ 'value' ];
++
++const UnforwardedValidatedCustomSelectControl = (
++	{
++		required,
++		customValidator,
++		onChange,
++		markWhenOptional,
++		...restProps
++	}: Omit<
++		React.ComponentProps< typeof CustomSelectControl >,
++		'__next40pxDefaultSize'
++	> &
++		ValidatedControlProps< Value >,
++	forwardedRef: React.ForwardedRef< HTMLDivElement >
++) => {
++	const validityTargetRef = useRef< HTMLSelectElement >( null );
++	const valueRef = useRef< Value >( restProps.value );
++
++	return (
++		<div
++			className="components-validated-control__wrapper-with-error-delegate"
++			ref={ forwardedRef }
++		>
++			<ControlWithError
++				required={ required }
++				markWhenOptional={ markWhenOptional }
++				customValidator={ () => {
++					return customValidator?.( valueRef.current );
++				} }
++				getValidityTarget={ () => validityTargetRef.current }
++			>
++				<CustomSelectControl
++					// TODO: Upstream limitation - Required isn't passed down correctly,
++					// so it needs to be set on a delegate element.
++					__next40pxDefaultSize
++					onChange={ ( value ) => {
++						valueRef.current = value.selectedItem;
++						onChange?.( value );
++					} }
++					{ ...restProps }
++				/>
++			</ControlWithError>
++			<select
++				className="components-validated-control__error-delegate"
++				ref={ validityTargetRef }
++				required={ required }
++				tabIndex={ -1 }
++				value={ restProps.value?.key ? 'hasvalue' : '' }
++				onChange={ () => {} }
++				onFocus={ ( e ) => {
++					e.target.previousElementSibling
++						?.querySelector< HTMLButtonElement >(
++							'[role="combobox"]'
++						)
++						?.focus();
++				} }
++			>
++				<option value="">No selection</option>
++				<option value="hasvalue">Has selection</option>
++			</select>
++		</div>
++	);
++};
++
++export const ValidatedCustomSelectControl = forwardRef(
++	UnforwardedValidatedCustomSelectControl
++);
+diff --git a/packages/components/src/validated-form-controls/components/index.ts b/packages/components/src/validated-form-controls/components/index.ts
+new file mode 100644
+index 00000000000000..4b05ed5f8f49dc
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/components/index.ts
+@@ -0,0 +1,12 @@
++export * from './checkbox-control';
++export * from './combobox-control';
++export * from './custom-select-control';
++export * from './input-control';
++export * from './number-control';
++export * from './radio-control';
++export * from './range-control';
++export * from './select-control';
++export * from './text-control';
++export * from './textarea-control';
++export * from './toggle-control';
++export * from './toggle-group-control';
+diff --git a/packages/components/src/validated-form-controls/components/input-control.tsx b/packages/components/src/validated-form-controls/components/input-control.tsx
+new file mode 100644
+index 00000000000000..fa7d5d39320f2d
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/components/input-control.tsx
+@@ -0,0 +1,59 @@
++/**
++ * WordPress dependencies
++ */
++import { forwardRef, useRef } from '@wordpress/element';
++import { useMergeRefs } from '@wordpress/compose';
++
++/**
++ * Internal dependencies
++ */
++import { ControlWithError } from '../control-with-error';
++import type { ValidatedControlProps } from './types';
++import InputControl from '../../input-control';
++import type { InputControlProps } from '../../input-control/types';
++
++type Value = InputControlProps[ 'value' ];
++
++const UnforwardedValidatedInputControl = (
++	{
++		required,
++		customValidator,
++		onChange,
++		markWhenOptional,
++		...restProps
++	}: Omit<
++		React.ComponentProps< typeof InputControl >,
++		'__next40pxDefaultSize'
++	> &
++		ValidatedControlProps< InputControlProps[ 'value' ] >,
++	forwardedRef: React.ForwardedRef< HTMLInputElement >
++) => {
++	const validityTargetRef = useRef< HTMLInputElement >( null );
++	const mergedRefs = useMergeRefs( [ forwardedRef, validityTargetRef ] );
++	const valueRef = useRef< Value >( restProps.value );
++
++	return (
++		<ControlWithError
++			required={ required }
++			markWhenOptional={ markWhenOptional }
++			customValidator={ () => {
++				return customValidator?.( valueRef.current );
++			} }
++			getValidityTarget={ () => validityTargetRef.current }
++		>
++			<InputControl
++				__next40pxDefaultSize
++				ref={ mergedRefs }
++				onChange={ ( value, ...args ) => {
++					valueRef.current = value;
++					onChange?.( value, ...args );
++				} }
++				{ ...restProps }
++			/>
++		</ControlWithError>
++	);
++};
++
++export const ValidatedInputControl = forwardRef(
++	UnforwardedValidatedInputControl
++);
+diff --git a/packages/components/src/validated-form-controls/components/number-control.tsx b/packages/components/src/validated-form-controls/components/number-control.tsx
+new file mode 100644
+index 00000000000000..ddb1f78b07fbbb
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/components/number-control.tsx
+@@ -0,0 +1,61 @@
++/**
++ * WordPress dependencies
++ */
++import { forwardRef, useRef } from '@wordpress/element';
++import { useMergeRefs } from '@wordpress/compose';
++
++/**
++ * Internal dependencies
++ */
++import { ControlWithError } from '../control-with-error';
++import NumberControl from '../../number-control';
++import type { ValidatedControlProps } from './types';
++import type { NumberControlProps } from '../../number-control/types';
++
++type Value = NumberControlProps[ 'value' ];
++
++const UnforwardedValidatedNumberControl = (
++	{
++		required,
++		customValidator,
++		onChange,
++		markWhenOptional,
++		...restProps
++	}: Omit<
++		React.ComponentProps< typeof NumberControl >,
++		'__next40pxDefaultSize'
++	> &
++		ValidatedControlProps< Value >,
++	forwardedRef: React.ForwardedRef< HTMLInputElement >
++) => {
++	const validityTargetRef = useRef< HTMLInputElement >( null );
++	const mergedRefs = useMergeRefs( [ forwardedRef, validityTargetRef ] );
++	const valueRef = useRef< Value >( restProps.value );
++
++	return (
++		<ControlWithError
++			required={ required }
++			markWhenOptional={ markWhenOptional }
++			customValidator={ () => {
++				return customValidator?.( valueRef.current );
++			} }
++			getValidityTarget={ () => validityTargetRef.current }
++		>
++			<NumberControl
++				__next40pxDefaultSize
++				ref={ mergedRefs }
++				// TODO: Upstream limitation - When form is submitted when value is undefined, it will
++				// automatically set a clamped value (as defined by `min` attribute, so 0 by default).
++				onChange={ ( value, ...args ) => {
++					valueRef.current = value;
++					onChange?.( value, ...args );
++				} }
++				{ ...restProps }
++			/>
++		</ControlWithError>
++	);
++};
++
++export const ValidatedNumberControl = forwardRef(
++	UnforwardedValidatedNumberControl
++);
+diff --git a/packages/components/src/validated-form-controls/components/radio-control.tsx b/packages/components/src/validated-form-controls/components/radio-control.tsx
+new file mode 100644
+index 00000000000000..6d335c01ac3a59
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/components/radio-control.tsx
+@@ -0,0 +1,60 @@
++/**
++ * WordPress dependencies
++ */
++import { useMergeRefs } from '@wordpress/compose';
++import { forwardRef, useRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { ControlWithError } from '../control-with-error';
++import type { ValidatedControlProps } from './types';
++import RadioControl from '../../radio-control';
++import type { RadioControlProps } from '../../radio-control/types';
++
++type Value = RadioControlProps[ 'selected' ];
++
++const UnforwardedValidatedRadioControl = (
++	{
++		required,
++		customValidator,
++		onChange,
++		markWhenOptional,
++		...restProps
++	}: React.ComponentProps< typeof RadioControl > &
++		ValidatedControlProps< Value >,
++	forwardedRef: React.ForwardedRef< HTMLDivElement >
++) => {
++	const validityTargetRef = useRef< HTMLDivElement >( null );
++	const mergedRefs = useMergeRefs( [ forwardedRef, validityTargetRef ] );
++	const valueRef = useRef< Value >( restProps.selected );
++
++	return (
++		<ControlWithError
++			required={ required }
++			markWhenOptional={ markWhenOptional }
++			// TODO: Upstream limitation - RadioControl does not accept a ref.
++			ref={ mergedRefs }
++			customValidator={ () => {
++				return customValidator?.( valueRef.current );
++			} }
++			getValidityTarget={ () =>
++				validityTargetRef.current?.querySelector< HTMLInputElement >(
++					'input[type="radio"]'
++				)
++			}
++		>
++			<RadioControl
++				onChange={ ( value ) => {
++					valueRef.current = value;
++					onChange?.( value );
++				} }
++				{ ...restProps }
++			/>
++		</ControlWithError>
++	);
++};
++
++export const ValidatedRadioControl = forwardRef(
++	UnforwardedValidatedRadioControl
++);
+diff --git a/packages/components/src/validated-form-controls/components/range-control.tsx b/packages/components/src/validated-form-controls/components/range-control.tsx
+new file mode 100644
+index 00000000000000..2ad5b90539fc6b
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/components/range-control.tsx
+@@ -0,0 +1,60 @@
++/**
++ * WordPress dependencies
++ */
++import { useMergeRefs } from '@wordpress/compose';
++import { forwardRef, useRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { ControlWithError } from '../control-with-error';
++import type { ValidatedControlProps } from './types';
++import RangeControl from '../../range-control';
++import type { RangeControlProps } from '../../range-control/types';
++
++type Value = RangeControlProps[ 'value' ];
++
++const UnforwardedValidatedRangeControl = (
++	{
++		required,
++		customValidator,
++		onChange,
++		markWhenOptional,
++		...restProps
++	}: Omit<
++		React.ComponentProps< typeof RangeControl >,
++		'__next40pxDefaultSize' | '__nextHasNoMarginBottom'
++	> &
++		ValidatedControlProps< Value >,
++	forwardedRef: React.ForwardedRef< HTMLInputElement >
++) => {
++	const validityTargetRef = useRef< HTMLInputElement >( null );
++	const mergedRefs = useMergeRefs( [ forwardedRef, validityTargetRef ] );
++	const valueRef = useRef< Value >( restProps.value );
++
++	return (
++		<ControlWithError
++			required={ required }
++			markWhenOptional={ markWhenOptional }
++			customValidator={ () => {
++				return customValidator?.( valueRef.current );
++			} }
++			getValidityTarget={ () => validityTargetRef.current }
++		>
++			<RangeControl
++				__next40pxDefaultSize
++				__nextHasNoMarginBottom
++				ref={ mergedRefs }
++				onChange={ ( value ) => {
++					valueRef.current = value;
++					onChange?.( value );
++				} }
++				{ ...restProps }
++			/>
++		</ControlWithError>
++	);
++};
++
++export const ValidatedRangeControl = forwardRef(
++	UnforwardedValidatedRangeControl
++);
+diff --git a/packages/components/src/validated-form-controls/components/select-control.tsx b/packages/components/src/validated-form-controls/components/select-control.tsx
+new file mode 100644
+index 00000000000000..faeb9164260174
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/components/select-control.tsx
+@@ -0,0 +1,75 @@
++/**
++ * WordPress dependencies
++ */
++import { forwardRef, useRef } from '@wordpress/element';
++import { useMergeRefs } from '@wordpress/compose';
++
++/**
++ * Internal dependencies
++ */
++import { ControlWithError } from '../control-with-error';
++import SelectControl from '../../select-control';
++import type { ValidatedControlProps } from './types';
++import type { SelectControlProps as _SelectControlProps } from '../../select-control/types';
++
++// Only support single value selection
++type SelectControlProps = Omit<
++	_SelectControlProps,
++	'multiple' | 'onChange' | 'value'
++> & {
++	onChange?: ( value: string ) => void;
++	value?: string;
++};
++
++type Value = SelectControlProps[ 'value' ];
++
++const UnforwardedValidatedSelectControl = (
++	{
++		required,
++		customValidator,
++		onChange,
++		markWhenOptional,
++		...restProps
++	}: Omit<
++		React.ComponentProps< typeof SelectControl >,
++		| '__next40pxDefaultSize'
++		| '__nextHasNoMarginBottom'
++		| 'multiple'
++		| 'onChange'
++		| 'value'
++	> & {
++		value?: string;
++		onChange: ( value: string ) => void;
++	} & ValidatedControlProps< Value >,
++	forwardedRef: React.ForwardedRef< HTMLSelectElement >
++) => {
++	const validityTargetRef = useRef< HTMLSelectElement >( null );
++	const mergedRefs = useMergeRefs( [ forwardedRef, validityTargetRef ] );
++	const valueRef = useRef< Value >( restProps.value );
++
++	return (
++		<ControlWithError
++			required={ required }
++			markWhenOptional={ markWhenOptional }
++			customValidator={ () => {
++				return customValidator?.( valueRef.current );
++			} }
++			getValidityTarget={ () => validityTargetRef.current }
++		>
++			<SelectControl
++				__nextHasNoMarginBottom
++				__next40pxDefaultSize
++				ref={ mergedRefs }
++				onChange={ ( value ) => {
++					valueRef.current = value;
++					onChange?.( value );
++				} }
++				{ ...restProps }
++			/>
++		</ControlWithError>
++	);
++};
++
++export const ValidatedSelectControl = forwardRef(
++	UnforwardedValidatedSelectControl
++);
+diff --git a/packages/components/src/validated-form-controls/components/stories/checkbox-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/checkbox-control.story.tsx
+new file mode 100644
+index 00000000000000..0cc0900c0594e5
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/components/stories/checkbox-control.story.tsx
+@@ -0,0 +1,57 @@
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * External dependencies
++ */
++import type { StoryObj, Meta } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import { ValidatedCheckboxControl } from '../checkbox-control';
++import { formDecorator } from './story-utils';
++
++const meta: Meta< typeof ValidatedCheckboxControl > = {
++	title: 'Components (Experimental)/Validated Form Controls/ValidatedCheckboxControl',
++	component: ValidatedCheckboxControl,
++	tags: [ 'status-private' ],
++	decorators: formDecorator,
++	args: { onChange: () => {} },
++	argTypes: {
++		checked: { control: false },
++		// TODO: Figure out why this deprecated prop is still showing up here and not in the WP Storybook.
++		heading: { table: { disable: true } },
++	},
++};
++export default meta;
++
++export const Default: StoryObj< typeof ValidatedCheckboxControl > = {
++	render: function Template( { onChange, ...args } ) {
++		const [ checked, setChecked ] = useState( false );
++
++		return (
++			<ValidatedCheckboxControl
++				{ ...args }
++				checked={ checked }
++				onChange={ ( value ) => {
++					setChecked( value );
++					onChange?.( value );
++				} }
++			/>
++		);
++	},
++};
++Default.args = {
++	required: true,
++	label: 'Checkbox',
++	help: 'This checkbox may neither be checked nor unchecked.',
++	customValidator: ( value ) => {
++		if ( value ) {
++			return 'This checkbox may not be checked.';
++		}
++		return undefined;
++	},
++};
+diff --git a/packages/components/src/validated-form-controls/components/stories/combobox-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/combobox-control.story.tsx
+new file mode 100644
+index 00000000000000..0687dacc719f8f
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/components/stories/combobox-control.story.tsx
+@@ -0,0 +1,64 @@
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * External dependencies
++ */
++import type { StoryObj, Meta } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import { ValidatedComboboxControl } from '../combobox-control';
++import { formDecorator } from './story-utils';
++
++const meta: Meta< typeof ValidatedComboboxControl > = {
++	title: 'Components (Experimental)/Validated Form Controls/ValidatedComboboxControl',
++	component: ValidatedComboboxControl,
++	tags: [ 'status-private' ],
++	decorators: formDecorator,
++	args: { onChange: () => {} },
++	argTypes: {
++		value: { control: false },
++	},
++};
++export default meta;
++
++export const Default: StoryObj< typeof ValidatedComboboxControl > = {
++	render: function Template( { onChange, ...args } ) {
++		const [ value, setValue ] =
++			useState<
++				React.ComponentProps<
++					typeof ValidatedComboboxControl
++				>[ 'value' ]
++			>();
++
++		return (
++			<ValidatedComboboxControl
++				{ ...args }
++				value={ value }
++				onChange={ ( newValue ) => {
++					setValue( newValue );
++					onChange?.( newValue );
++				} }
++			/>
++		);
++	},
++};
++Default.args = {
++	required: true,
++	label: 'Combobox',
++	help: 'Option A is not allowed.',
++	options: [
++		{ value: 'a', label: 'Option A (not allowed)' },
++		{ value: 'b', label: 'Option B' },
++	],
++	customValidator: ( value ) => {
++		if ( value === 'a' ) {
++			return 'Option A is not allowed.';
++		}
++		return undefined;
++	},
++};
+diff --git a/packages/components/src/validated-form-controls/components/stories/custom-select-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/custom-select-control.story.tsx
+new file mode 100644
+index 00000000000000..c6a45b7ecbe67a
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/components/stories/custom-select-control.story.tsx
+@@ -0,0 +1,64 @@
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * External dependencies
++ */
++import type { StoryObj, Meta } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import { ValidatedCustomSelectControl } from '../custom-select-control';
++import { formDecorator } from './story-utils';
++
++const meta: Meta< typeof ValidatedCustomSelectControl > = {
++	title: 'Components (Experimental)/Validated Form Controls/ValidatedCustomSelectControl',
++	component: ValidatedCustomSelectControl,
++	tags: [ 'status-private' ],
++	decorators: formDecorator,
++	args: { onChange: () => {} },
++	argTypes: {
++		value: { control: false },
++	},
++};
++export default meta;
++
++export const Default: StoryObj< typeof ValidatedCustomSelectControl > = {
++	render: function Template( { onChange, ...args } ) {
++		const [ value, setValue ] =
++			useState<
++				React.ComponentProps<
++					typeof ValidatedCustomSelectControl
++				>[ 'value' ]
++			>();
++
++		return (
++			<ValidatedCustomSelectControl
++				{ ...args }
++				value={ value }
++				onChange={ ( newValue ) => {
++					setValue( newValue.selectedItem );
++					onChange?.( newValue );
++				} }
++			/>
++		);
++	},
++};
++Default.args = {
++	required: true,
++	label: 'Custom Select',
++	options: [
++		{ key: '', name: 'Select an option' },
++		{ key: 'a', name: 'Option A (not allowed)' },
++		{ key: 'b', name: 'Option B' },
++	],
++	customValidator: ( value ) => {
++		if ( value?.key === 'a' ) {
++			return 'Option A is not allowed.';
++		}
++		return undefined;
++	},
++};
+diff --git a/packages/components/src/validated-form-controls/components/stories/input-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/input-control.story.tsx
+new file mode 100644
+index 00000000000000..90e8c4ddc0bc4c
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/components/stories/input-control.story.tsx
+@@ -0,0 +1,132 @@
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * External dependencies
++ */
++import type { StoryObj, Meta } from '@storybook/react';
++
++/**
++ * WordPress dependencies
++ */
++import { seen, unseen } from '@wordpress/icons';
++
++/**
++ * Internal dependencies
++ */
++import { ValidatedInputControl } from '../input-control';
++import { formDecorator } from './story-utils';
++import InputControlSuffixWrapper from '../../../input-control/input-suffix-wrapper';
++import { Button } from '../../../button';
++
++const meta: Meta< typeof ValidatedInputControl > = {
++	title: 'Components (Experimental)/Validated Form Controls/ValidatedInputControl',
++	component: ValidatedInputControl,
++	tags: [ 'status-private' ],
++	decorators: formDecorator,
++	args: { onChange: () => {} },
++	argTypes: {
++		__unstableInputWidth: { control: { type: 'text' } },
++		__unstableStateReducer: { control: false },
++		onChange: { control: false },
++		prefix: { control: false },
++		suffix: { control: false },
++		type: { control: { type: 'text' } },
++		value: { control: false },
++	},
++};
++export default meta;
++
++export const Default: StoryObj< typeof ValidatedInputControl > = {
++	render: function Template( { onChange, ...args } ) {
++		const [ value, setValue ] =
++			useState<
++				React.ComponentProps< typeof ValidatedInputControl >[ 'value' ]
++			>( '' );
++
++		return (
++			<ValidatedInputControl
++				{ ...args }
++				value={ value }
++				onChange={ ( newValue, ...rest ) => {
++					setValue( newValue );
++					onChange?.( newValue, ...rest );
++				} }
++			/>
++		);
++	},
++};
++Default.args = {
++	required: true,
++	label: 'Input',
++	help: 'The word "error" will trigger an error.',
++	customValidator: ( value ) => {
++		if ( value?.toLowerCase() === 'error' ) {
++			return 'The word "error" is not allowed.';
++		}
++		return undefined;
++	},
++};
++
++/**
++ * This demonstrates how password validation would work with the standard implementation.
++ *
++ * We are planning to move to a custom implementation more tailored to the password use case.
++ */
++export const Password: StoryObj< typeof ValidatedInputControl > = {
++	render: function Template( { onChange, ...args } ) {
++		const [ value, setValue ] =
++			useState<
++				React.ComponentProps< typeof ValidatedInputControl >[ 'value' ]
++			>( '' );
++		const [ visible, setVisible ] = useState( false );
++
++		return (
++			<ValidatedInputControl
++				{ ...args }
++				type={ visible ? 'text' : 'password' }
++				suffix={
++					<InputControlSuffixWrapper variant="control">
++						<Button
++							size="small"
++							icon={ visible ? unseen : seen }
++							onClick={ () => setVisible( ( v ) => ! v ) }
++							label={
++								visible ? 'Hide password' : 'Show password'
++							}
++						/>
++					</InputControlSuffixWrapper>
++				}
++				value={ value }
++				onChange={ ( newValue, ...rest ) => {
++					setValue( newValue );
++					onChange?.( newValue, ...rest );
++				} }
++			/>
++		);
++	},
++};
++Password.args = {
++	required: true,
++	label: 'Password',
++	help: 'Minimum 8 characters, include a number, capital letter, and symbol (!@£$%^&*#).',
++	minLength: 8,
++	customValidator: ( value ) => {
++		if ( ! /\d/.test( value ?? '' ) ) {
++			return 'Password must include at least one number.';
++		}
++		if ( ! /[A-Z]/.test( value ?? '' ) ) {
++			return 'Password must include at least one capital letter.';
++		}
++		if ( ! /[!@£$%^&*#]/.test( value ?? '' ) ) {
++			return 'Password must include at least one symbol.';
++		}
++		return undefined;
++	},
++};
++Password.argTypes = {
++	suffix: { control: false },
++	type: { control: false },
++};
+diff --git a/packages/components/src/validated-form-controls/components/stories/number-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/number-control.story.tsx
+new file mode 100644
+index 00000000000000..7efa5acb6d9459
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/components/stories/number-control.story.tsx
+@@ -0,0 +1,62 @@
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * External dependencies
++ */
++import type { StoryObj, Meta } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import { ValidatedNumberControl } from '../number-control';
++import { formDecorator } from './story-utils';
++
++const meta: Meta< typeof ValidatedNumberControl > = {
++	title: 'Components (Experimental)/Validated Form Controls/ValidatedNumberControl',
++	component: ValidatedNumberControl,
++	tags: [ 'status-private' ],
++	decorators: formDecorator,
++	args: { onChange: () => {} },
++	argTypes: {
++		prefix: { control: { type: 'text' } },
++		step: { control: { type: 'text' } },
++		suffix: { control: { type: 'text' } },
++		type: { control: { type: 'text' } },
++		value: { control: false },
++	},
++};
++export default meta;
++
++export const Default: StoryObj< typeof ValidatedNumberControl > = {
++	render: function Template( { onChange, ...args } ) {
++		const [ value, setValue ] =
++			useState<
++				React.ComponentProps< typeof ValidatedNumberControl >[ 'value' ]
++			>();
++
++		return (
++			<ValidatedNumberControl
++				{ ...args }
++				value={ value }
++				onChange={ ( newValue, ...rest ) => {
++					setValue( newValue );
++					onChange?.( newValue, ...rest );
++				} }
++			/>
++		);
++	},
++};
++Default.args = {
++	required: true,
++	label: 'Number',
++	help: 'Odd numbers are not allowed.',
++	customValidator: ( value ) => {
++		if ( value && parseInt( value.toString(), 10 ) % 2 !== 0 ) {
++			return 'Choose an even number.';
++		}
++		return undefined;
++	},
++};
+diff --git a/packages/components/src/validated-form-controls/components/stories/overview.mdx b/packages/components/src/validated-form-controls/components/stories/overview.mdx
+new file mode 100644
+index 00000000000000..7836344a8995a9
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/components/stories/overview.mdx
+@@ -0,0 +1,52 @@
++import { ArgTypes, Meta, Stories } from '@storybook/blocks';
++import * as OverviewStories from './overview.story';
++import { ValidatedInputControl } from '..';
++
++<Meta of={ OverviewStories } title="Components (Private)/Validated Form Controls/Overview" />
++
++# Validated Form Controls
++
++This section contains form control components that extend [WordPress components](https://wordpress.github.io/gutenberg/) with additional validation capabilities.
++
++## Status: Beta
++
++We are still gathering feedback and iterating. Please get in touch with `@WordPress/gutenberg-components`  if you are interested in trying them out in the Gutenberg app.
++
++## Usage
++
++Component APIs are the same as the underlying WordPress components, with the addition of some optional props:
++
++<ArgTypes of={ ValidatedInputControl } include={ [ 'required', 'markWhenOptional', 'customValidator' ] } />
++
++## Implementation
++
++These components are designed to work with the native HTML5 [Constraint Validation API](https://developer.mozilla.org/en-US/docs/Web/API/Constraint_validation). Using this browser API as the "source of truth" for form element errors has these benefits:
++
++- Ability to use CSS selectors like `:invalid`, `:user-invalid`, `:required`, and `:optional`.
++- Ability to use simple HTML attribute-based constraints (e.g. `min`, `max`, `required`, `pattern`, `type`) together with fully custom validation logic (with the `setCustomValidity()` method).
++- Attribute-based constraints will already have localized, user-facing error messages built in.
++- When a user clicks the form submit button, the browser will automatically check the validity states of all enclosed form elements and block the submit when there are errors. It will also automatically scroll and focus to the first erroring element and show a prominent error popover.
++- While not _all_ aspects of the Constraint Validation API are well-supported in all screen readers yet, many aspects are, and will continue to improve. We can supplement any accessibility shortcomings with things like `aria-live` announcements of error messages.
++
++## Current limitations
++
++### No easy access to underlying validation APIs
++
++- The consumer does not have a simple way to trigger their custom validators at an arbitrary point in time. Currently, the validation timings for custom validators are handled by the component — first on `blur`, and then on every `change` after the field is considered "touched". Note that this limitation only applies to **custom** validators, not the standard attribute-based validators like `required` or `pattern`, which can be triggered at any time using the `reportValidity()` method on either the underlying control element or the wrapping `<form>` element.
++- The consumer does not have direct access to the [`validity` object](https://developer.mozilla.org/en-US/docs/Web/API/ValidityState) of the underlying element.
++
++We don't foresee these being needed much, but it is technically possible by the consumer accessing the target element's validation APIs via `ref`. Better docs or ergonomics can be added when we have actual use cases.
++
++### Delegate elements
++
++The implementations for `ToggleGroupControl` and `CustomSelectControl` use a "delegate" element for validation, due to upstream limitations that prevent us from using the actual underlying elements for constraint validation. A delegate element in this context is a visually hidden form element that we "delegate" the Constraint Validation API concerns to.
++
++This is not ideal, but lets us maintain a consistent mechanism to scroll to the invalid field when attempting to submit, and block the form from submitting. It is hopefully fine as a stopgap, given the low amount of actual validation that will need happen on these two specific components.
++
++### Controlled mode only
++
++Some of the underlying WordPress components currently do not fully support uncontrolled mode. For now, we recommend sticking to controlled mode to avoid any issues.
++
++## Examples
++
++<Stories />
+diff --git a/packages/components/src/validated-form-controls/components/stories/overview.story.tsx b/packages/components/src/validated-form-controls/components/stories/overview.story.tsx
+new file mode 100644
+index 00000000000000..d7faf4631a1db6
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/components/stories/overview.story.tsx
+@@ -0,0 +1,100 @@
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * External dependencies
++ */
++import type { Meta, StoryObj } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import { ValidatedInputControl } from '..';
++import { formDecorator } from './story-utils';
++import type { ControlWithError } from '../../control-with-error';
++
++const meta: Meta< typeof ControlWithError > = {
++	title: 'Components (Experimental)/Validated Form Controls/Overview',
++	tags: [ 'status-private' ],
++	decorators: formDecorator,
++};
++export default meta;
++
++type Story = StoryObj< typeof ControlWithError >;
++
++/**
++ * When there are multiple controls with errors, attempting to submit will
++ * move focus to the first control with an error.
++ */
++export const WithMultipleControls: Story = {
++	render: function Template() {
++		const [ text, setText ] = useState( '' );
++		const [ text2, setText2 ] = useState( '' );
++
++		return (
++			<>
++				<ValidatedInputControl
++					label="Text"
++					required
++					value={ text }
++					help="The word 'error' will trigger an error."
++					customValidator={ ( value ) => {
++						if ( value?.toLowerCase() === 'error' ) {
++							return 'The word "error" is not allowed.';
++						}
++						return undefined;
++					} }
++					onChange={ ( value ) => setText( value ?? '' ) }
++				/>
++				<ValidatedInputControl
++					label="Text"
++					required
++					value={ text2 }
++					help="The word 'error' will trigger an error."
++					customValidator={ ( value ) => {
++						if ( value?.toLowerCase() === 'error' ) {
++							return 'The word "error" is not allowed.';
++						}
++						return undefined;
++					} }
++					onChange={ ( value ) => setText2( value ?? '' ) }
++				/>
++			</>
++		);
++	},
++};
++
++/**
++ * Help text can be configured to be hidden when a custom error is reported. Whether to opt for this approach
++ * will depend on context.
++ */
++export const WithHelpTextReplacement: Story = {
++	render: function Template() {
++		const [ text, setText ] = useState( '' );
++		const [ hasCustomError, setHasCustomError ] = useState( false );
++
++		return (
++			<ValidatedInputControl
++				label="Text"
++				required
++				value={ text }
++				help={
++					hasCustomError
++						? undefined
++						: 'The word "error" is not allowed.'
++				}
++				customValidator={ ( value ) => {
++					if ( value?.toLowerCase() === 'error' ) {
++						setHasCustomError( true );
++						return 'The word "error" is not allowed.';
++					}
++					setHasCustomError( false );
++					return undefined;
++				} }
++				onChange={ ( value ) => setText( value ?? '' ) }
++			/>
++		);
++	},
++};
+diff --git a/packages/components/src/validated-form-controls/components/stories/radio-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/radio-control.story.tsx
+new file mode 100644
+index 00000000000000..bed3cfacfe5aa1
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/components/stories/radio-control.story.tsx
+@@ -0,0 +1,64 @@
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * External dependencies
++ */
++import type { StoryObj, Meta } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import { ValidatedRadioControl } from '../radio-control';
++import { formDecorator } from './story-utils';
++
++const meta: Meta< typeof ValidatedRadioControl > = {
++	title: 'Components (Experimental)/Validated Form Controls/ValidatedRadioControl',
++	component: ValidatedRadioControl,
++	tags: [ 'status-private' ],
++	decorators: formDecorator,
++	args: { onChange: () => {} },
++	argTypes: {
++		selected: { control: false },
++	},
++};
++export default meta;
++
++export const Default: StoryObj< typeof ValidatedRadioControl > = {
++	render: function Template( { onChange, ...args } ) {
++		const [ selected, setSelected ] =
++			useState<
++				React.ComponentProps<
++					typeof ValidatedRadioControl
++				>[ 'selected' ]
++			>();
++
++		return (
++			<ValidatedRadioControl
++				{ ...args }
++				selected={ selected }
++				onChange={ ( value ) => {
++					setSelected( value );
++					onChange?.( value );
++				} }
++			/>
++		);
++	},
++};
++Default.args = {
++	required: true,
++	label: 'Radio',
++	help: 'Option B is not allowed.',
++	options: [
++		{ label: 'Option A', value: 'a' },
++		{ label: 'Option B (not allowed)', value: 'b' },
++	],
++	customValidator: ( value ) => {
++		if ( value === 'b' ) {
++			return 'Option B is not allowed.';
++		}
++		return undefined;
++	},
++};
+diff --git a/packages/components/src/validated-form-controls/components/stories/range-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/range-control.story.tsx
+new file mode 100644
+index 00000000000000..977857bd6007ea
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/components/stories/range-control.story.tsx
+@@ -0,0 +1,60 @@
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * External dependencies
++ */
++import type { StoryObj, Meta } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import { formDecorator } from './story-utils';
++import { ValidatedRangeControl } from '../range-control';
++
++const meta: Meta< typeof ValidatedRangeControl > = {
++	title: 'Components (Experimental)/Validated Form Controls/ValidatedRangeControl',
++	component: ValidatedRangeControl,
++	tags: [ 'status-private' ],
++	decorators: formDecorator,
++	args: { onChange: () => {} },
++	argTypes: {
++		value: { control: false },
++	},
++};
++export default meta;
++
++export const Default: StoryObj< typeof ValidatedRangeControl > = {
++	render: function Template( { onChange, ...args } ) {
++		const [ value, setValue ] =
++			useState<
++				React.ComponentProps< typeof ValidatedRangeControl >[ 'value' ]
++			>();
++
++		return (
++			<ValidatedRangeControl
++				{ ...args }
++				value={ value }
++				onChange={ ( newValue ) => {
++					setValue( newValue );
++					onChange?.( newValue );
++				} }
++			/>
++		);
++	},
++};
++Default.args = {
++	required: true,
++	label: 'Range',
++	help: 'Odd numbers are not allowed.',
++	min: 0,
++	max: 20,
++	customValidator: ( value ) => {
++		if ( value && value % 2 !== 0 ) {
++			return 'Choose an even number.';
++		}
++		return undefined;
++	},
++};
+diff --git a/packages/components/src/validated-form-controls/components/stories/select-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/select-control.story.tsx
+new file mode 100644
+index 00000000000000..093626541934b5
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/components/stories/select-control.story.tsx
+@@ -0,0 +1,60 @@
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * External dependencies
++ */
++import type { StoryObj, Meta } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import { ValidatedSelectControl } from '../select-control';
++import { formDecorator } from './story-utils';
++
++const meta: Meta< typeof ValidatedSelectControl > = {
++	title: 'Components (Experimental)/Validated Form Controls/ValidatedSelectControl',
++	component: ValidatedSelectControl,
++	tags: [ 'status-private' ],
++	decorators: formDecorator,
++	args: { onChange: () => {} },
++	argTypes: {
++		value: { control: false },
++	},
++};
++export default meta;
++
++export const Default: StoryObj< typeof ValidatedSelectControl > = {
++	render: function Template( { onChange, ...args } ) {
++		const [ value, setValue ] = useState( '' );
++
++		return (
++			<ValidatedSelectControl
++				{ ...args }
++				value={ value }
++				onChange={ ( newValue ) => {
++					setValue( newValue );
++					onChange?.( newValue );
++				} }
++			/>
++		);
++	},
++};
++Default.args = {
++	required: true,
++	label: 'Select',
++	help: 'Selecting option 1 will trigger an error.',
++	options: [
++		{ value: '', label: 'Select an option' },
++		{ value: '1', label: 'Option 1 (not allowed)' },
++		{ value: '2', label: 'Option 2' },
++	],
++	customValidator: ( value ) => {
++		if ( value === '1' ) {
++			return 'Option 1 is not allowed.';
++		}
++		return undefined;
++	},
++};
+diff --git a/packages/components/src/validated-form-controls/components/stories/story-utils.tsx b/packages/components/src/validated-form-controls/components/stories/story-utils.tsx
+new file mode 100644
+index 00000000000000..d22cac0f6870d3
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/components/stories/story-utils.tsx
+@@ -0,0 +1,46 @@
++/**
++ * WordPress dependencies
++ */
++
++/**
++ * External dependencies
++ */
++import type { Meta } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import Button from '../../../button';
++
++export const formDecorator: Meta[ 'decorators' ] = ( Story ) => (
++	<form
++		style={ {
++			fontFamily: 'sans-serif',
++			display: 'flex',
++			flexDirection: 'column',
++			alignItems: 'flex-start',
++			gap: 16,
++		} }
++		onSubmit={ ( e ) => {
++			e.preventDefault();
++			// eslint-disable-next-line no-alert
++			alert( 'Form submitted!' );
++		} }
++	>
++		<div
++			style={ {
++				display: 'flex',
++				flexDirection: 'column',
++				gap: 16,
++				alignItems: 'stretch',
++				width: 300,
++			} }
++		>
++			<Story />
++		</div>
++
++		<Button variant="primary" type="submit" __next40pxDefaultSize>
++			Submit
++		</Button>
++	</form>
++);
+diff --git a/packages/components/src/validated-form-controls/components/stories/text-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/text-control.story.tsx
+new file mode 100644
+index 00000000000000..bf8279fa165f7d
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/components/stories/text-control.story.tsx
+@@ -0,0 +1,55 @@
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * External dependencies
++ */
++import type { StoryObj, Meta } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import { formDecorator } from './story-utils';
++import { ValidatedTextControl } from '../text-control';
++
++const meta: Meta< typeof ValidatedTextControl > = {
++	title: 'Components (Experimental)/Validated Form Controls/ValidatedTextControl',
++	component: ValidatedTextControl,
++	tags: [ 'status-private' ],
++	decorators: formDecorator,
++	args: { onChange: () => {} },
++	argTypes: {
++		value: { control: false },
++	},
++};
++export default meta;
++
++export const Default: StoryObj< typeof ValidatedTextControl > = {
++	render: function Template( { onChange, ...args } ) {
++		const [ value, setValue ] = useState( '' );
++
++		return (
++			<ValidatedTextControl
++				{ ...args }
++				value={ value }
++				onChange={ ( newValue ) => {
++					setValue( newValue );
++					onChange?.( newValue );
++				} }
++			/>
++		);
++	},
++};
++Default.args = {
++	required: true,
++	label: 'Text',
++	help: "The word 'error' will trigger an error.",
++	customValidator: ( value ) => {
++		if ( value?.toString().toLowerCase() === 'error' ) {
++			return 'The word "error" is not allowed.';
++		}
++		return undefined;
++	},
++};
+diff --git a/packages/components/src/validated-form-controls/components/stories/textarea-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/textarea-control.story.tsx
+new file mode 100644
+index 00000000000000..e7440db54e0da7
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/components/stories/textarea-control.story.tsx
+@@ -0,0 +1,52 @@
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * External dependencies
++ */
++import type { StoryObj, Meta } from '@storybook/react';
++/**
++ * Internal dependencies
++ */
++import { formDecorator } from './story-utils';
++import { ValidatedTextareaControl } from '../textarea-control';
++
++const meta: Meta< typeof ValidatedTextareaControl > = {
++	title: 'Components (Experimental)/Validated Form Controls/ValidatedTextareaControl',
++	component: ValidatedTextareaControl,
++	tags: [ 'status-private' ],
++	decorators: formDecorator,
++	args: { onChange: () => {} },
++	argTypes: { value: { control: false } },
++};
++export default meta;
++
++export const Default: StoryObj< typeof ValidatedTextareaControl > = {
++	render: function Template( { onChange, ...args } ) {
++		const [ value, setValue ] = useState( '' );
++
++		return (
++			<ValidatedTextareaControl
++				{ ...args }
++				onChange={ ( newValue ) => {
++					setValue( newValue );
++					onChange?.( newValue );
++				} }
++				value={ value }
++			/>
++		);
++	},
++};
++Default.args = {
++	required: true,
++	label: 'Textarea',
++	help: 'The word "error" will trigger an error.',
++	customValidator: ( value ) => {
++		if ( value?.toLowerCase() === 'error' ) {
++			return 'The word "error" is not allowed.';
++		}
++		return undefined;
++	},
++};
+diff --git a/packages/components/src/validated-form-controls/components/stories/toggle-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/toggle-control.story.tsx
+new file mode 100644
+index 00000000000000..1fb0921d137fd8
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/components/stories/toggle-control.story.tsx
+@@ -0,0 +1,55 @@
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * External dependencies
++ */
++import type { StoryObj, Meta } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import { formDecorator } from './story-utils';
++import { ValidatedToggleControl } from '../toggle-control';
++
++const meta: Meta< typeof ValidatedToggleControl > = {
++	title: 'Components (Experimental)/Validated Form Controls/ValidatedToggleControl',
++	component: ValidatedToggleControl,
++	tags: [ 'status-private' ],
++	decorators: formDecorator,
++	args: { onChange: () => {} },
++	argTypes: {
++		checked: { control: false },
++	},
++};
++export default meta;
++
++export const Default: StoryObj< typeof ValidatedToggleControl > = {
++	render: function Template( { onChange, ...args } ) {
++		const [ checked, setChecked ] = useState( false );
++
++		return (
++			<ValidatedToggleControl
++				{ ...args }
++				checked={ checked }
++				onChange={ ( value ) => {
++					setChecked( value );
++					onChange?.( value );
++				} }
++			/>
++		);
++	},
++};
++Default.args = {
++	required: true,
++	label: 'Toggle',
++	help: 'This toggle may neither be enabled nor disabled.',
++	customValidator: ( value ) => {
++		if ( value ) {
++			return 'This toggle may not be enabled.';
++		}
++		return undefined;
++	},
++};
+diff --git a/packages/components/src/validated-form-controls/components/stories/toggle-group-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/toggle-group-control.story.tsx
+new file mode 100644
+index 00000000000000..32d8ed163b3239
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/components/stories/toggle-group-control.story.tsx
+@@ -0,0 +1,66 @@
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * External dependencies
++ */
++import type { StoryObj, Meta } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import { formDecorator } from './story-utils';
++import { ValidatedToggleGroupControl } from '../toggle-group-control';
++import { ToggleGroupControlOption } from '../../../toggle-group-control';
++
++const meta: Meta< typeof ValidatedToggleGroupControl > = {
++	title: 'Components (Experimental)/Validated Form Controls/ValidatedToggleGroupControl',
++	component: ValidatedToggleGroupControl,
++	tags: [ 'status-private' ],
++	decorators: formDecorator,
++	args: { onChange: () => {} },
++	argTypes: {
++		value: { control: false },
++	},
++};
++export default meta;
++
++export const Default: StoryObj< typeof ValidatedToggleGroupControl > = {
++	render: function Template( { onChange, ...args } ) {
++		const [ value, setValue ] =
++			useState<
++				React.ComponentProps<
++					typeof ValidatedToggleGroupControl
++				>[ 'value' ]
++			>( '1' );
++
++		return (
++			<ValidatedToggleGroupControl
++				{ ...args }
++				value={ value }
++				onChange={ ( newValue ) => {
++					setValue( newValue );
++					onChange?.( newValue );
++				} }
++			/>
++		);
++	},
++};
++Default.args = {
++	required: true,
++	label: 'Toggle Group',
++	isBlock: true,
++	children: [
++		<ToggleGroupControlOption value="1" key="1" label="Option 1" />,
++		<ToggleGroupControlOption value="2" key="2" label="Option 2" />,
++	],
++	help: 'Selecting option 2 will trigger an error.',
++	customValidator: ( value ) => {
++		if ( value === '2' ) {
++			return 'Option 2 is not allowed.';
++		}
++		return undefined;
++	},
++};
+diff --git a/packages/components/src/validated-form-controls/components/text-control.tsx b/packages/components/src/validated-form-controls/components/text-control.tsx
+new file mode 100644
+index 00000000000000..853a671055d7b6
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/components/text-control.tsx
+@@ -0,0 +1,60 @@
++/**
++ * WordPress dependencies
++ */
++import { useMergeRefs } from '@wordpress/compose';
++import { forwardRef, useRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { ControlWithError } from '../control-with-error';
++import type { ValidatedControlProps } from './types';
++import TextControl from '../../text-control';
++import type { TextControlProps } from '../../text-control/types';
++
++type Value = TextControlProps[ 'value' ];
++
++const UnforwardedValidatedTextControl = (
++	{
++		required,
++		customValidator,
++		onChange,
++		markWhenOptional,
++		...restProps
++	}: Omit<
++		React.ComponentProps< typeof TextControl >,
++		'__next40pxDefaultSize' | '__nextHasNoMarginBottom'
++	> &
++		ValidatedControlProps< Value >,
++	forwardedRef: React.ForwardedRef< HTMLInputElement >
++) => {
++	const validityTargetRef = useRef< HTMLInputElement >( null );
++	const mergedRefs = useMergeRefs( [ forwardedRef, validityTargetRef ] );
++	const valueRef = useRef< Value >( restProps.value );
++
++	return (
++		<ControlWithError
++			required={ required }
++			markWhenOptional={ markWhenOptional }
++			customValidator={ () => {
++				return customValidator?.( valueRef.current );
++			} }
++			getValidityTarget={ () => validityTargetRef.current }
++		>
++			<TextControl
++				__next40pxDefaultSize
++				__nextHasNoMarginBottom
++				ref={ mergedRefs }
++				onChange={ ( value ) => {
++					valueRef.current = value;
++					onChange?.( value );
++				} }
++				{ ...restProps }
++			/>
++		</ControlWithError>
++	);
++};
++
++export const ValidatedTextControl = forwardRef(
++	UnforwardedValidatedTextControl
++);
+diff --git a/packages/components/src/validated-form-controls/components/textarea-control.tsx b/packages/components/src/validated-form-controls/components/textarea-control.tsx
+new file mode 100644
+index 00000000000000..c874e4b55b9d15
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/components/textarea-control.tsx
+@@ -0,0 +1,59 @@
++/**
++ * WordPress dependencies
++ */
++import { forwardRef, useRef } from '@wordpress/element';
++import { useMergeRefs } from '@wordpress/compose';
++
++/**
++ * Internal dependencies
++ */
++import { ControlWithError } from '../control-with-error';
++import type { ValidatedControlProps } from './types';
++import TextareaControl from '../../textarea-control';
++import type { TextareaControlProps } from '../../textarea-control/types';
++
++type Value = TextareaControlProps[ 'value' ];
++
++const UnforwardedValidatedTextareaControl = (
++	{
++		required,
++		customValidator,
++		onChange,
++		markWhenOptional,
++		...restProps
++	}: Omit<
++		React.ComponentProps< typeof TextareaControl >,
++		'__nextHasNoMarginBottom'
++	> &
++		ValidatedControlProps< Value >,
++	forwardedRef: React.ForwardedRef< HTMLTextAreaElement >
++) => {
++	const validityTargetRef = useRef< HTMLTextAreaElement >( null );
++	const mergedRefs = useMergeRefs( [ forwardedRef, validityTargetRef ] );
++	const valueRef = useRef< Value >( restProps.value );
++
++	return (
++		<ControlWithError
++			required={ required }
++			markWhenOptional={ markWhenOptional }
++			customValidator={ () => {
++				return customValidator?.( valueRef.current );
++			} }
++			getValidityTarget={ () => validityTargetRef.current }
++		>
++			<TextareaControl
++				__nextHasNoMarginBottom
++				ref={ mergedRefs }
++				onChange={ ( value ) => {
++					valueRef.current = value;
++					onChange?.( value );
++				} }
++				{ ...restProps }
++			/>
++		</ControlWithError>
++	);
++};
++
++export const ValidatedTextareaControl = forwardRef(
++	UnforwardedValidatedTextareaControl
++);
+diff --git a/packages/components/src/validated-form-controls/components/toggle-control.tsx b/packages/components/src/validated-form-controls/components/toggle-control.tsx
+new file mode 100644
+index 00000000000000..802e49d5465a93
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/components/toggle-control.tsx
+@@ -0,0 +1,69 @@
++/**
++ * WordPress dependencies
++ */
++import { forwardRef, useRef, useEffect } from '@wordpress/element';
++import { useMergeRefs } from '@wordpress/compose';
++
++/**
++ * Internal dependencies
++ */
++import { ControlWithError } from '../control-with-error';
++import type { ValidatedControlProps } from './types';
++import ToggleControl from '../../toggle-control';
++import type { ToggleControlProps } from '../../toggle-control/types';
++
++type Value = ToggleControlProps[ 'checked' ];
++
++// TODO: Should we customize the default `missingValue` message? It says to "check this box".
++
++const UnforwardedValidatedToggleControl = (
++	{
++		required,
++		customValidator,
++		onChange,
++		markWhenOptional,
++		...restProps
++	}: Omit<
++		React.ComponentProps< typeof ToggleControl >,
++		'__nextHasNoMarginBottom'
++	> &
++		ValidatedControlProps< Value >,
++	forwardedRef: React.ForwardedRef< HTMLInputElement >
++) => {
++	const validityTargetRef = useRef< HTMLInputElement >( null );
++	const mergedRefs = useMergeRefs( [ forwardedRef, validityTargetRef ] );
++	const valueRef = useRef< Value >( restProps.checked );
++
++	// TODO: Upstream limitation - The `required` attribute is not passed down to the input,
++	// so we need to set it manually.
++	useEffect( () => {
++		if ( validityTargetRef.current ) {
++			validityTargetRef.current.required = required ?? false;
++		}
++	}, [ required ] );
++
++	return (
++		<ControlWithError
++			required={ required }
++			markWhenOptional={ markWhenOptional }
++			customValidator={ () => {
++				return customValidator?.( valueRef.current );
++			} }
++			getValidityTarget={ () => validityTargetRef.current }
++		>
++			<ToggleControl
++				__nextHasNoMarginBottom
++				ref={ mergedRefs }
++				onChange={ ( value ) => {
++					valueRef.current = value;
++					onChange?.( value );
++				} }
++				{ ...restProps }
++			/>
++		</ControlWithError>
++	);
++};
++
++export const ValidatedToggleControl = forwardRef(
++	UnforwardedValidatedToggleControl
++);
+diff --git a/packages/components/src/validated-form-controls/components/toggle-group-control.tsx b/packages/components/src/validated-form-controls/components/toggle-group-control.tsx
+new file mode 100644
+index 00000000000000..16feee33830ea3
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/components/toggle-group-control.tsx
+@@ -0,0 +1,82 @@
++/**
++ * WordPress dependencies
++ */
++import { forwardRef, useId, useRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { ControlWithError } from '../control-with-error';
++import type { ValidatedControlProps } from './types';
++import { ToggleGroupControl } from '../../toggle-group-control';
++import type { ToggleGroupControlProps } from '../../toggle-group-control/types';
++
++type Value = ToggleGroupControlProps[ 'value' ];
++
++const UnforwardedValidatedToggleGroupControl = (
++	{
++		required,
++		customValidator,
++		onChange,
++		markWhenOptional,
++		...restProps
++	}: Omit<
++		React.ComponentProps< typeof ToggleGroupControl >,
++		'__next40pxDefaultSize' | '__nextHasNoMarginBottom'
++	> &
++		ValidatedControlProps< Value >,
++	forwardedRef: React.ForwardedRef< HTMLInputElement >
++) => {
++	const validityTargetRef = useRef< HTMLInputElement >( null );
++	const valueRef = useRef< Value >( restProps.value );
++
++	const nameAttr = useId();
++
++	return (
++		<div className="components-validated-control__wrapper-with-error-delegate">
++			<ControlWithError
++				required={ required }
++				markWhenOptional={ markWhenOptional }
++				customValidator={ () => {
++					return customValidator?.( valueRef.current );
++				} }
++				getValidityTarget={ () => validityTargetRef.current }
++			>
++				<ToggleGroupControl
++					__nextHasNoMarginBottom
++					__next40pxDefaultSize
++					ref={ forwardedRef }
++					// TODO: Upstream limitation - In uncontrolled mode, starting from an undefined value then
++					// setting a value has a visual bug.
++					onChange={ ( value ) => {
++						valueRef.current = value;
++						onChange?.( value );
++					} }
++					{ ...restProps }
++				/>
++			</ControlWithError>
++			<input
++				className="components-validated-control__error-delegate"
++				type="radio"
++				ref={ validityTargetRef }
++				required={ required }
++				checked={ restProps.value !== null }
++				tabIndex={ -1 }
++				// A name attribute is needed for the `required` behavior to work.
++				name={ nameAttr }
++				onChange={ () => {} }
++				onFocus={ ( e ) => {
++					e.target.previousElementSibling
++						?.querySelector< HTMLButtonElement | HTMLInputElement >(
++							'[data-active-item="true"]'
++						)
++						?.focus();
++				} }
++			/>
++		</div>
++	);
++};
++
++export const ValidatedToggleGroupControl = forwardRef(
++	UnforwardedValidatedToggleGroupControl
++);
+diff --git a/packages/components/src/validated-form-controls/components/types.ts b/packages/components/src/validated-form-controls/components/types.ts
+new file mode 100644
+index 00000000000000..83483bb8438cd1
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/components/types.ts
+@@ -0,0 +1,28 @@
++export type ValidatedControlProps< V > = {
++	/**
++	 * Whether the control is required.
++	 * @default false
++	 */
++	required?: boolean;
++	/**
++	 * Label the control as "optional" when _not_ `required`, instead of the inverse.
++	 * @default false
++	 */
++	markWhenOptional?: boolean;
++	/**
++	 * A function that returns a custom validity message when applicable. This error message will be applied to the
++	 * underlying element using the native [`setCustomValidity()` method](https://developer.mozilla.org/en-US/docs/Web/API/HTMLObjectElement/setCustomValidity).
++	 * This means the custom validator will be run _in addition_ to any other HTML attribute-based validation, and
++	 * will be prioritized over any existing validity messages dictated by the HTML attributes.
++	 * An empty string or `undefined` return value will clear any existing custom validity message.
++	 *
++	 * Make sure you don't programatically pass a value (such as an initial value) to the control component
++	 * that fails this validator, because the validator will only run for user-initiated changes.
++	 *
++	 * Always prefer using standard HTML attributes like `required` and `min`/`max` over custom validators
++	 * when possible, as they are simpler and have localized error messages built in.
++	 */
++	// TODO: Technically, we could add an optional `customValidity` string prop so the consumer can set
++	// an error message at any point in time. We should wait until we have a use case though.
++	customValidator?: ( currentValue: V ) => string | void;
++};
+diff --git a/packages/components/src/validated-form-controls/control-with-error.tsx b/packages/components/src/validated-form-controls/control-with-error.tsx
+new file mode 100644
+index 00000000000000..925b9f66119ec2
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/control-with-error.tsx
+@@ -0,0 +1,198 @@
++/**
++ * WordPress dependencies
++ */
++import { __ } from '@wordpress/i18n';
++import { error } from '@wordpress/icons';
++
++/**
++ * External dependencies
++ */
++import {
++	cloneElement,
++	forwardRef,
++	useEffect,
++	useState,
++} from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
++
++import Icon from '../icon';
++
++function appendRequiredIndicator(
++	label: React.ReactNode,
++	required: boolean | undefined,
++	markWhenOptional: boolean | undefined
++) {
++	if ( required && ! markWhenOptional ) {
++		return (
++			<>
++				{ label } { `(${ __( 'Required' ) })` }
++			</>
++		);
++	}
++	if ( ! required && markWhenOptional ) {
++		return (
++			<>
++				{ label } { `(${ __( 'Optional' ) })` }
++			</>
++		);
++	}
++	return label;
++}
++
++/**
++ * HTML elements that support the Constraint Validation API.
++ *
++ * Here, we exclude HTMLButtonElement because although it does technically support the API,
++ * normal buttons are actually exempted from any validation.
++ * @see https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Forms/Form_validation
++ * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLButtonElement/willValidate
++ */
++type ValidityTarget =
++	| HTMLFieldSetElement
++	| HTMLInputElement
++	| HTMLSelectElement
++	| HTMLTextAreaElement;
++
++function UnforwardedControlWithError< C extends React.ReactElement >(
++	{
++		required,
++		markWhenOptional,
++		customValidator,
++		getValidityTarget,
++		children,
++	}: {
++		/**
++		 * Whether the control is required.
++		 */
++		required?: boolean;
++		/**
++		 * Label the control as "optional" when _not_ `required`, instead of the inverse.
++		 */
++		markWhenOptional?: boolean;
++		/**
++		 * A function that returns a custom validity message when applicable.
++		 *
++		 * This message will be applied to the element returned by `getValidityTarget`.
++		 * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLObjectElement/setCustomValidity
++		 */
++		customValidator?: () => string | void;
++		/**
++		 * A function that returns the actual element on which the validity data should be applied.
++		 */
++		getValidityTarget: () => ValidityTarget | null | undefined;
++		/**
++		 * The control component to apply validation to.
++		 */
++		children: C;
++	},
++	forwardedRef: React.ForwardedRef< HTMLDivElement >
++) {
++	const [ errorMessage, setErrorMessage ] = useState< string | undefined >();
++	const [ isTouched, setIsTouched ] = useState( false );
++
++	// Ensure that error messages are visible after user attemps to submit a form
++	// with multiple invalid fields.
++	useEffect( () => {
++		const validityTarget = getValidityTarget();
++		const showValidationMessage = () =>
++			setErrorMessage( validityTarget?.validationMessage );
++
++		validityTarget?.addEventListener( 'invalid', showValidationMessage );
++
++		return () => {
++			validityTarget?.removeEventListener(
++				'invalid',
++				showValidationMessage
++			);
++		};
++	} );
++
++	const validate = () => {
++		const message = customValidator?.();
++		const validityTarget = getValidityTarget();
++
++		validityTarget?.setCustomValidity( message ?? '' );
++		setErrorMessage( validityTarget?.validationMessage );
++	};
++
++	const onBlur = ( event: React.FocusEvent< HTMLDivElement > ) => {
++		// Only consider "blurred from the component" if focus has fully left the wrapping div.
++		// This prevents unnecessary blurs from components with multiple focusable elements.
++		if (
++			! event.relatedTarget ||
++			! event.currentTarget.contains( event.relatedTarget )
++		) {
++			setIsTouched( true );
++
++			const validityTarget = getValidityTarget();
++
++			// Prevents a double flash of the native error tooltip when the control is already showing one.
++			if ( ! validityTarget?.validity.valid ) {
++				if ( ! errorMessage ) {
++					setErrorMessage( validityTarget?.validationMessage );
++				}
++				return;
++			}
++
++			validate();
++		}
++	};
++
++	const onChange = ( ...args: unknown[] ) => {
++		children.props.onChange?.( ...args );
++
++		// Only validate incrementally if the field has blurred at least once,
++		// or currently has an error message.
++		if ( isTouched || errorMessage ) {
++			validate();
++		}
++	};
++
++	const onKeyDown = ( event: React.KeyboardEvent< HTMLDivElement > ) => {
++		// Ensures that custom validators are triggered when the user submits by pressing Enter,
++		// without ever blurring the control.
++		if ( event.key === 'Enter' ) {
++			validate();
++		}
++	};
++
++	return (
++		// Disable reason: Just listening to a bubbled event, not for interaction.
++		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
++		<div
++			className="components-validated-control"
++			ref={ forwardedRef }
++			onBlur={ onBlur }
++			onKeyDown={ withIgnoreIMEEvents( onKeyDown ) }
++		>
++			{ cloneElement( children, {
++				label: appendRequiredIndicator(
++					children.props.label,
++					required,
++					markWhenOptional
++				),
++				onChange,
++				required,
++			} ) }
++			<div aria-live="polite">
++				{ errorMessage && (
++					<p className="components-validated-control__error">
++						<Icon
++							className="components-validated-control__error-icon"
++							icon={ error }
++							size={ 16 }
++							fill="currentColor"
++						/>
++						{ errorMessage }
++					</p>
++				) }
++			</div>
++		</div>
++	);
++}
++
++export const ControlWithError = forwardRef( UnforwardedControlWithError );
+diff --git a/packages/components/src/validated-form-controls/index.ts b/packages/components/src/validated-form-controls/index.ts
+new file mode 100644
+index 00000000000000..c24740c65ec8af
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/index.ts
+@@ -0,0 +1,2 @@
++export * from './components';
++export * from './control-with-error';
+diff --git a/packages/components/src/validated-form-controls/style.scss b/packages/components/src/validated-form-controls/style.scss
+new file mode 100644
+index 00000000000000..1067ab8092b1e1
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/style.scss
+@@ -0,0 +1,75 @@
++.components-validated-control {
++	// For components based on InputBase
++	&:has(:is(input, select):user-invalid)
++	.components-input-control__backdrop {
++		--wp-components-color-accent: $alert-red;
++		border-color: $alert-red;
++	}
++
++	// For TextControl, TextareaControl
++	:is(textarea, input[type="text"]):user-invalid {
++		--wp-admin-theme-color: $alert-red;
++		--wp-components-color-accent: $alert-red;
++		border-color: $alert-red;
++	}
++
++	// For ComboboxControl
++	.components-combobox-control__suggestions-container:has(
++	input:user-invalid
++):not(:has([aria-expanded="true"])) {
++		border-color: $alert-red;
++	}
++}
++
++.components-validated-control__wrapper-with-error-delegate {
++	position: relative;
++
++	// For CustomSelectControl
++	&:has(select:user-invalid) .components-input-control__backdrop {
++		--wp-components-color-accent: $alert-red;
++		border-color: $alert-red;
++	}
++
++	// For ToggleGroupControl
++	&:has(input[type="radio"]:invalid) {
++		--wp-components-color-accent: $alert-red;
++	}
++}
++
++.components-validated-control__error-delegate {
++	position: absolute;
++	top: 0;
++	height: 100%;
++	width: 100%;
++	opacity: 0;
++	pointer-events: none;
++}
++
++.components-validated-control__error {
++	display: flex;
++	align-items: flex-start;
++	gap: 4px;
++	margin: 8px 0 0;
++	font-family: $font-family-body;
++	font-size: 0.75rem;
++	line-height: 16px; // matches the icon size
++	color: $alert-red;
++	animation:
++		components-validated-control__error-jump 0.2s
++		cubic-bezier(0.68, -0.55, 0.27, 1.55);
++}
++
++.components-validated-control__error-icon {
++	flex-shrink: 0;
++}
++
++@keyframes components-validated-control__error-jump {
++	0% {
++		transform: translateY(-4px);
++		opacity: 0;
++	}
++	100% {
++		transform: translateY(0);
++		opacity: 1;
++	}
++}

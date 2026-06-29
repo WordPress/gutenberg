@@ -1,0 +1,498 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 28fb2b0d196bea..f2661fe7cc9501 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -11,3 +11,4 @@
+ -   Add `Stack` component ([#73928](https://github.com/WordPress/gutenberg/pull/73928)).
+ -   Add `VisuallyHidden` component ([#74189](https://github.com/WordPress/gutenberg/pull/74189)).
+ -   Add `Field` primitives ([#74190](https://github.com/WordPress/gutenberg/pull/74190)).
++-   Add `Fieldset` primitives ([#74296](https://github.com/WordPress/gutenberg/pull/74296)).
+diff --git a/packages/ui/src/form/primitives/field/root.tsx b/packages/ui/src/form/primitives/field/root.tsx
+index b924384437f868..6a78b9bd1e283f 100644
+--- a/packages/ui/src/form/primitives/field/root.tsx
++++ b/packages/ui/src/form/primitives/field/root.tsx
+@@ -13,6 +13,8 @@ const DEFAULT_RENDER = ( props: React.ComponentProps< typeof Stack > ) => (
+  * A low-level component that associates an accessible label and description
+  * with a single form control element.
+  *
++ * To label a group of multiple form control elements, use the `Fieldset` component instead.
++ *
+  * Simply wrapping a control with this component does not guarantee
+  * accessible labeling. See examples for how to associate the label in different cases.
+  */
+diff --git a/packages/ui/src/form/primitives/fieldset/context.tsx b/packages/ui/src/form/primitives/fieldset/context.tsx
+new file mode 100644
+index 00000000000000..c1092de187d9b4
+--- /dev/null
++++ b/packages/ui/src/form/primitives/fieldset/context.tsx
+@@ -0,0 +1,13 @@
++import { createContext, useContext } from '@wordpress/element';
++
++type FieldsetContextType = {
++	registerDescriptionId: ( id: string ) => void;
++	unregisterDescriptionId: () => void;
++};
++
++export const FieldsetContext = createContext< FieldsetContextType >( {
++	registerDescriptionId: () => {},
++	unregisterDescriptionId: () => {},
++} );
++
++export const useFieldsetContext = () => useContext( FieldsetContext );
+diff --git a/packages/ui/src/form/primitives/fieldset/description.tsx b/packages/ui/src/form/primitives/fieldset/description.tsx
+new file mode 100644
+index 00000000000000..0271366918b98a
+--- /dev/null
++++ b/packages/ui/src/form/primitives/fieldset/description.tsx
+@@ -0,0 +1,36 @@
++import clsx from 'clsx';
++import { mergeProps, useRender } from '@base-ui/react';
++import { forwardRef, useEffect, useId } from '@wordpress/element';
++import fieldStyles from '../../../utils/css/field.module.css';
++import { useFieldsetContext } from './context';
++import type { FieldsetDescriptionProps } from './types';
++
++export const FieldsetDescription = forwardRef<
++	HTMLParagraphElement,
++	FieldsetDescriptionProps
++>( function FieldsetDescription(
++	{ className, id: idProp, render, ...restProps },
++	ref
++) {
++	const generatedId = useId();
++	const id = idProp ?? generatedId;
++	const { registerDescriptionId, unregisterDescriptionId } =
++		useFieldsetContext();
++
++	useEffect( () => {
++		registerDescriptionId( id );
++		return unregisterDescriptionId;
++	}, [ registerDescriptionId, unregisterDescriptionId, id ] );
++
++	const element = useRender( {
++		defaultTagName: 'p',
++		render,
++		ref,
++		props: mergeProps< 'p' >(
++			{ className: clsx( fieldStyles.description, className ), id },
++			restProps
++		),
++	} );
++
++	return element;
++} );
+diff --git a/packages/ui/src/form/primitives/fieldset/details.tsx b/packages/ui/src/form/primitives/fieldset/details.tsx
+new file mode 100644
+index 00000000000000..5b26cd1d731fe8
+--- /dev/null
++++ b/packages/ui/src/form/primitives/fieldset/details.tsx
+@@ -0,0 +1,46 @@
++import clsx from 'clsx';
++import { forwardRef, useEffect, useId } from '@wordpress/element';
++import { __ } from '@wordpress/i18n';
++import fieldStyles from '../../../utils/css/field.module.css';
++import { useFieldsetContext } from './context';
++import { VisuallyHidden } from '../../../visually-hidden';
++import type { FieldsetDetailsProps } from './types';
++
++/**
++ * A component for showing additional information about the fieldset,
++ * styled similarly to a normal `Fieldset.Description`.
++ * Unlike a normal description, it can include links and other semantic elements.
++ *
++ * Although this content is not associated with the fieldset using direct semantics,
++ * it is made discoverable to screen reader users via a visually hidden description,
++ * alerting them to the presence of additional information below.
++ *
++ * If the content only includes plain text, use `Fieldset.Description` instead,
++ * so the readout is not unnecessarily verbose for screen reader users.
++ */
++export const FieldsetDetails = forwardRef<
++	HTMLDivElement,
++	FieldsetDetailsProps
++>( function FieldsetDetails( { className, ...restProps }, ref ) {
++	const id = useId();
++	const { registerDescriptionId, unregisterDescriptionId } =
++		useFieldsetContext();
++
++	useEffect( () => {
++		registerDescriptionId( id );
++		return unregisterDescriptionId;
++	}, [ registerDescriptionId, unregisterDescriptionId, id ] );
++
++	return (
++		<>
++			<VisuallyHidden id={ id }>
++				{ __( 'More details follow.' ) }
++			</VisuallyHidden>
++			<div
++				ref={ ref }
++				className={ clsx( fieldStyles.description, className ) }
++				{ ...restProps }
++			/>
++		</>
++	);
++} );
+diff --git a/packages/ui/src/form/primitives/fieldset/index.ts b/packages/ui/src/form/primitives/fieldset/index.ts
+new file mode 100644
+index 00000000000000..297d48dd7550e4
+--- /dev/null
++++ b/packages/ui/src/form/primitives/fieldset/index.ts
+@@ -0,0 +1,6 @@
++import { FieldsetRoot as Root } from './root';
++import { FieldsetLegend as Legend } from './legend';
++import { FieldsetDescription as Description } from './description';
++import { FieldsetDetails as Details } from './details';
++
++export { Root, Legend, Description, Details };
+diff --git a/packages/ui/src/form/primitives/fieldset/legend.tsx b/packages/ui/src/form/primitives/fieldset/legend.tsx
+new file mode 100644
+index 00000000000000..d891618016b150
+--- /dev/null
++++ b/packages/ui/src/form/primitives/fieldset/legend.tsx
+@@ -0,0 +1,17 @@
++import clsx from 'clsx';
++import { Fieldset as _Fieldset } from '@base-ui/react/fieldset';
++import { forwardRef } from '@wordpress/element';
++import fieldStyles from '../../../utils/css/field.module.css';
++import type { FieldsetLegendProps } from './types';
++
++export const FieldsetLegend = forwardRef< HTMLDivElement, FieldsetLegendProps >(
++	function FieldsetLegend( { className, ...restProps }, ref ) {
++		return (
++			<_Fieldset.Legend
++				ref={ ref }
++				className={ clsx( fieldStyles.label, className ) }
++				{ ...restProps }
++			/>
++		);
++	}
++);
+diff --git a/packages/ui/src/form/primitives/fieldset/root.tsx b/packages/ui/src/form/primitives/fieldset/root.tsx
+new file mode 100644
+index 00000000000000..c9c8ba17e590b7
+--- /dev/null
++++ b/packages/ui/src/form/primitives/fieldset/root.tsx
+@@ -0,0 +1,42 @@
++import clsx from 'clsx';
++import { Fieldset as _Fieldset } from '@base-ui/react/fieldset';
++import { forwardRef, useState, useMemo } from '@wordpress/element';
++import styles from './style.module.css';
++import { FieldsetContext } from './context';
++import type { FieldsetRootProps } from './types';
++
++/**
++ * A low-level component that associates an accessible legend and description with
++ * a group of multiple form control elements.
++ *
++ * To label a single form control element, use the `Field` component instead.
++ */
++export const FieldsetRoot = forwardRef<
++	HTMLFieldSetElement,
++	FieldsetRootProps
++>( function FieldsetRoot( { className, children, ...restProps }, ref ) {
++	const [ descriptionId, setDescriptionId ] = useState< string >();
++
++	const contextValue = useMemo(
++		() => ( {
++			registerDescriptionId: ( id: string ) => setDescriptionId( id ),
++			unregisterDescriptionId: () => setDescriptionId( undefined ),
++		} ),
++		[]
++	);
++
++	return (
++		<FieldsetContext.Provider value={ contextValue }>
++			<_Fieldset.Root
++				ref={ ref }
++				className={ clsx( styles.root, className ) }
++				// Certain screen readers may not read a fieldset's description
++				// https://w3c.github.io/using-aria/#label-support
++				aria-describedby={ descriptionId }
++				{ ...restProps }
++			>
++				{ children }
++			</_Fieldset.Root>
++		</FieldsetContext.Provider>
++	);
++} );
+diff --git a/packages/ui/src/form/primitives/fieldset/stories/index.story.tsx b/packages/ui/src/form/primitives/fieldset/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..a8f09bdd19488d
+--- /dev/null
++++ b/packages/ui/src/form/primitives/fieldset/stories/index.story.tsx
+@@ -0,0 +1,67 @@
++import type { Meta, StoryObj } from '@storybook/react-webpack5';
++import { Fieldset } from '../../../..';
++
++const meta: Meta< typeof Fieldset.Root > = {
++	title: 'Design System/Components/Form/Primitives/Fieldset',
++	component: Fieldset.Root,
++	subcomponents: {
++		Legend: Fieldset.Legend,
++		Description: Fieldset.Description,
++		Details: Fieldset.Details,
++	},
++};
++export default meta;
++
++type Story = StoryObj< typeof Fieldset.Root >;
++
++export const Default: Story = {
++	args: {
++		children: (
++			<>
++				<Fieldset.Legend>Legend</Fieldset.Legend>
++				{ [ 'Apples', 'Bananas' ].map( ( fruit ) => (
++					// eslint-disable-next-line jsx-a11y/label-has-associated-control
++					<label key={ fruit }>
++						<input type="checkbox" /> { fruit }
++					</label>
++				) ) }
++				<Fieldset.Description>
++					This is a description for the entire fieldset.
++				</Fieldset.Description>
++			</>
++		),
++	},
++};
++
++/**
++ * To add rich content (such as links) to the description, use `Fieldset.Details`.
++ *
++ * Although this content is not associated with the fieldset using direct semantics,
++ * it is made discoverable to screen reader users via a visually hidden description,
++ * alerting them to the presence of additional information below.
++ *
++ * If the content only includes plain text, use `Fieldset.Description` instead,
++ * so the readout is not unnecessarily verbose for screen reader users.
++ */
++export const WithDetails: Story = {
++	args: {
++		children: (
++			<>
++				<Fieldset.Legend>Legend</Fieldset.Legend>
++				{ [ 'Apples', 'Bananas' ].map( ( fruit ) => (
++					// eslint-disable-next-line jsx-a11y/label-has-associated-control
++					<label key={ fruit }>
++						<input type="checkbox" /> { fruit }
++					</label>
++				) ) }
++				<Fieldset.Details>
++					Details can include{ ' ' }
++					<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/a">
++						links to more information
++					</a>{ ' ' }
++					and other semantic elements.
++				</Fieldset.Details>
++			</>
++		),
++	},
++};
+diff --git a/packages/ui/src/form/primitives/fieldset/style.module.css b/packages/ui/src/form/primitives/fieldset/style.module.css
+new file mode 100644
+index 00000000000000..0d8f7511d4bda9
+--- /dev/null
++++ b/packages/ui/src/form/primitives/fieldset/style.module.css
+@@ -0,0 +1,12 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-components {
++	.root {
++		display: flex;
++		flex-direction: column;
++		gap: var(--wpds-dimension-gap-2xs);
++		border: 0;
++		margin: 0;
++		padding: 0;
++	}
++}
+diff --git a/packages/ui/src/form/primitives/fieldset/test/index.test.tsx b/packages/ui/src/form/primitives/fieldset/test/index.test.tsx
+new file mode 100644
+index 00000000000000..36f64c608efadf
+--- /dev/null
++++ b/packages/ui/src/form/primitives/fieldset/test/index.test.tsx
+@@ -0,0 +1,135 @@
++import { render, screen } from '@testing-library/react';
++import { createRef } from '@wordpress/element';
++import * as Fieldset from '../';
++
++describe( 'Fieldset', () => {
++	it( 'forwards ref', () => {
++		const rootRef = createRef< HTMLFieldSetElement >();
++		const legendRef = createRef< HTMLDivElement >();
++		const descriptionRef = createRef< HTMLParagraphElement >();
++		const detailsRef = createRef< HTMLDivElement >();
++
++		render(
++			<Fieldset.Root ref={ rootRef }>
++				<Fieldset.Legend ref={ legendRef }>
++					Fieldset Legend
++				</Fieldset.Legend>
++				<Fieldset.Description ref={ descriptionRef }>
++					Fieldset description
++				</Fieldset.Description>
++				<Fieldset.Details ref={ detailsRef }>
++					Fieldset details
++				</Fieldset.Details>
++			</Fieldset.Root>
++		);
++
++		expect( rootRef.current ).toBeInstanceOf( HTMLFieldSetElement );
++		expect( legendRef.current ).toBeInstanceOf( HTMLDivElement );
++		expect( descriptionRef.current ).toBeInstanceOf( HTMLParagraphElement );
++		expect( detailsRef.current ).toBeInstanceOf( HTMLDivElement );
++	} );
++
++	it( 'accessibly associates description when Fieldset.Description is present', () => {
++		render(
++			<Fieldset.Root>
++				<Fieldset.Legend>Choose your options</Fieldset.Legend>
++				<Fieldset.Description>
++					Select one or more options from the list below.
++				</Fieldset.Description>
++			</Fieldset.Root>
++		);
++
++		expect(
++			screen.getByRole( 'group', {
++				name: 'Choose your options',
++				description: 'Select one or more options from the list below.',
++			} )
++		).toBeVisible();
++	} );
++
++	it( 'does not add aria-describedby when Fieldset.Description is not present', () => {
++		render(
++			<Fieldset.Root>
++				<Fieldset.Legend>Choose your options</Fieldset.Legend>
++			</Fieldset.Root>
++		);
++
++		const fieldset = screen.getByRole( 'group', {
++			name: 'Choose your options',
++		} );
++
++		// Should not have aria-describedby
++		expect( fieldset ).not.toHaveAttribute( 'aria-describedby' );
++	} );
++
++	it( 'respects custom id on description', () => {
++		const customId = 'custom-description-id';
++
++		render(
++			<Fieldset.Root>
++				<Fieldset.Legend>Choose your options</Fieldset.Legend>
++				<Fieldset.Description id={ customId }>
++					Custom description with specific ID.
++				</Fieldset.Description>
++			</Fieldset.Root>
++		);
++
++		const description = screen.getByText(
++			'Custom description with specific ID.'
++		);
++		expect( description ).toHaveAttribute( 'id', customId );
++
++		expect(
++			screen.getByRole( 'group', {
++				name: 'Choose your options',
++				description: 'Custom description with specific ID.',
++			} )
++		).toBeVisible();
++	} );
++
++	it( 'forwards className to the description element', () => {
++		render(
++			<Fieldset.Root>
++				<Fieldset.Description className="custom-class">
++					Fieldset description
++				</Fieldset.Description>
++			</Fieldset.Root>
++		);
++
++		expect( screen.getByText( 'Fieldset description' ) ).toHaveClass(
++			'custom-class'
++		);
++	} );
++
++	it( 'announces additional details via a visually hidden description', () => {
++		render(
++			<Fieldset.Root>
++				<Fieldset.Legend>Choose your options</Fieldset.Legend>
++				<Fieldset.Details>
++					<a href="#more-info">Learn more about these options</a>
++				</Fieldset.Details>
++			</Fieldset.Root>
++		);
++
++		expect(
++			screen.getByRole( 'group', {
++				name: 'Choose your options',
++				description: 'More details follow.',
++			} )
++		).toBeVisible();
++	} );
++
++	it( 'forwards className to the details element', () => {
++		render(
++			<Fieldset.Root>
++				<Fieldset.Details className="custom-class">
++					Fieldset details
++				</Fieldset.Details>
++			</Fieldset.Root>
++		);
++
++		expect( screen.getByText( 'Fieldset details' ) ).toHaveClass(
++			'custom-class'
++		);
++	} );
++} );
+diff --git a/packages/ui/src/form/primitives/fieldset/types.ts b/packages/ui/src/form/primitives/fieldset/types.ts
+new file mode 100644
+index 00000000000000..6c182e2e076411
+--- /dev/null
++++ b/packages/ui/src/form/primitives/fieldset/types.ts
+@@ -0,0 +1,35 @@
++import type { Fieldset as _Fieldset } from '@base-ui/react';
++import type { ComponentProps } from '../../../utils/types';
++
++export type FieldsetRootProps = ComponentProps< typeof _Fieldset.Root > & {
++	children?: React.ReactNode;
++};
++
++export type FieldsetLegendProps = ComponentProps< typeof _Fieldset.Legend > & {
++	children?: React.ReactNode;
++};
++
++export type FieldsetDescriptionProps = ComponentProps< 'p' > & {
++	/**
++	 * The accessible description, associated using `aria-describedby`.
++	 *
++	 * For screen reader accessibility, this should only contain plain text,
++	 * and no semantics such as links.
++	 */
++	children?: string;
++};
++
++export type FieldsetDetailsProps = ComponentProps< 'div' > & {
++	/**
++	 * Additional information about the fieldset, which unlike a normal description,
++	 * can include links and other semantic elements.
++	 *
++	 * Although this content is not associated with the fieldset using direct semantics,
++	 * it is made discoverable to screen reader users via a visually hidden description,
++	 * alerting them to the presence of additional information below.
++	 *
++	 * Do not use this component when the details content is only plain text,
++	 * as it makes the readout unnecessarily verbose for screen reader users.
++	 */
++	children?: React.ReactNode;
++};
+diff --git a/packages/ui/src/form/primitives/index.ts b/packages/ui/src/form/primitives/index.ts
+index 090e4e93b84d07..639e06d04d4ff7 100644
+--- a/packages/ui/src/form/primitives/index.ts
++++ b/packages/ui/src/form/primitives/index.ts
+@@ -1 +1,2 @@
+ export * as Field from './field';
++export * as Fieldset from './fieldset';

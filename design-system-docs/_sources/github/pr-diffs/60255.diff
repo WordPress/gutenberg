@@ -1,0 +1,141 @@
+diff --git a/packages/block-editor/src/components/link-control/test/index.js b/packages/block-editor/src/components/link-control/test/index.js
+index 411ae62d4eee12..fa8c4d86eae5c9 100644
+--- a/packages/block-editor/src/components/link-control/test/index.js
++++ b/packages/block-editor/src/components/link-control/test/index.js
+@@ -2166,7 +2166,7 @@ describe( 'Rich link previews', () => {
+ 		const titlePreview = screen.getByText( selectedLink.title );
+ 
+ 		// eslint-disable-next-line testing-library/no-node-access
+-		expect( titlePreview.parentElement ).toHaveClass(
++		expect( titlePreview.parentElement.parentElement ).toHaveClass(
+ 			'block-editor-link-control__search-item-title'
+ 		);
+ 	} );
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index acabd0666c7a8f..61ccd15d56a8d4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,8 +2,9 @@
+ 
+ ## Unreleased
+ 
+-### Enhancement
++### Enhancements
+ 
++-   `ExternalLink`: Use unicode arrow instead of svg icon ([#60255](https://github.com/WordPress/gutenberg/pull/60255)).
+ -   `ProgressBar`: Move the indicator width styles from emotion to a CSS variable ([#60388](https://github.com/WordPress/gutenberg/pull/60388)).
+ 
+ ## 27.3.0 (2024-04-03)
+diff --git a/packages/components/src/external-link/index.tsx b/packages/components/src/external-link/index.tsx
+index 312aa88f491d24..3f09cdd92b0103 100644
+--- a/packages/components/src/external-link/index.tsx
++++ b/packages/components/src/external-link/index.tsx
+@@ -9,13 +9,10 @@ import type { ForwardedRef } from 'react';
+  */
+ import { __ } from '@wordpress/i18n';
+ import { forwardRef } from '@wordpress/element';
+-import { external } from '@wordpress/icons';
+ 
+ /**
+  * Internal dependencies
+  */
+-import { VisuallyHidden } from '../visually-hidden';
+-import { StyledIcon } from './styles/external-link-styles';
+ import type { ExternalLinkProps } from './types';
+ import type { WordPressComponentProps } from '../context';
+ 
+@@ -66,17 +63,18 @@ function UnforwardedExternalLink(
+ 			rel={ optimizedRel }
+ 			ref={ ref }
+ 		>
+-			{ children }
+-			<VisuallyHidden as="span">
+-				{
++			<span className="components-external-link__contents">
++				{ children }
++			</span>
++			<span
++				className="components-external-link__icon"
++				aria-label={
+ 					/* translators: accessibility text */
+ 					__( '(opens in a new tab)' )
+ 				}
+-			</VisuallyHidden>
+-			<StyledIcon
+-				icon={ external }
+-				className="components-external-link__icon"
+-			/>
++			>
++				&#8599;
++			</span>
+ 		</a>
+ 		/* eslint-enable react/jsx-no-target-blank */
+ 	);
+diff --git a/packages/components/src/external-link/style.scss b/packages/components/src/external-link/style.scss
+new file mode 100644
+index 00000000000000..6af3b0e991e710
+--- /dev/null
++++ b/packages/components/src/external-link/style.scss
+@@ -0,0 +1,12 @@
++.components-external-link {
++	text-decoration: none;
++}
++
++.components-external-link__contents {
++	text-decoration: underline;
++}
++
++.components-external-link__icon {
++	margin-left: 0.5ch;
++	font-weight: 400;
++}
+diff --git a/packages/components/src/external-link/styles/external-link-styles.ts b/packages/components/src/external-link/styles/external-link-styles.ts
+deleted file mode 100644
+index 6b64fd61c8bad4..00000000000000
+--- a/packages/components/src/external-link/styles/external-link-styles.ts
++++ /dev/null
+@@ -1,17 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import styled from '@emotion/styled';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { Icon } from '@wordpress/icons';
+-
+-export const StyledIcon = styled( Icon )`
+-	width: 1em;
+-	height: 1em;
+-	margin: 0;
+-	vertical-align: middle;
+-	fill: currentColor;
+-`;
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index 5c7813cdb1cc1d..3858fdb0376afe 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -27,6 +27,7 @@
+ @import "./dropdown-menu/style.scss";
+ @import "./duotone-picker/style.scss";
+ @import "./duotone-picker/color-list-picker/style.scss";
++@import "./external-link/style.scss";
+ @import "./form-toggle/style.scss";
+ @import "./form-token-field/style.scss";
+ @import "./guide/style.scss";
+diff --git a/test/e2e/specs/editor/various/pattern-overrides.spec.js b/test/e2e/specs/editor/various/pattern-overrides.spec.js
+index 9825c2013fe1c0..80dc667898ae7a 100644
+--- a/test/e2e/specs/editor/various/pattern-overrides.spec.js
++++ b/test/e2e/specs/editor/various/pattern-overrides.spec.js
+@@ -290,8 +290,8 @@ test.describe( 'Pattern Overrides', () => {
+ 			.getByRole( 'textbox', { name: 'Button text' } )
+ 			.focus();
+ 		await expect(
+-			page.getByRole( 'link', { name: 'wp.org' } )
+-		).toContainText( 'opens in a new tab' );
++			page.getByRole( 'link', { name: 'wp.org' } ).getByText( '↗' )
++		).toHaveAttribute( 'aria-label', '(opens in a new tab)' );
+ 
+ 		// The link popup doesn't have a role which is a bit unfortunate.
+ 		// These are the buttons in the link popup.

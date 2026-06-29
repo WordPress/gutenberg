@@ -1,0 +1,35 @@
+diff --git a/packages/components/src/panel/README.md b/packages/components/src/panel/README.md
+index dcb3560bc023bf..2c88f5e28dc00e 100644
+--- a/packages/components/src/panel/README.md
++++ b/packages/components/src/panel/README.md
+@@ -2,6 +2,8 @@
+ 
+ Panels expand and collapse multiple sections of content.
+ 
++The `Panel` family is intended for the block inspector sidebar. For collapsible sections elsewhere, use the [`CollapsibleCard`](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-collapsiblecard--docs) component instead.
++
+ ![](https://make.wordpress.org/design/files/2019/03/panel.png)
+ 
+ ## Design guidelines
+diff --git a/packages/components/src/panel/stories/index.story.tsx b/packages/components/src/panel/stories/index.story.tsx
+index 76c2528b7ddb2c..1a974734f1e92e 100644
+--- a/packages/components/src/panel/stories/index.story.tsx
++++ b/packages/components/src/panel/stories/index.story.tsx
+@@ -17,7 +17,6 @@ import PanelBody from '../body';
+ import InputControl from '../../input-control';
+ 
+ const meta: Meta< typeof Panel > = {
+-	tags: [ 'manifest' ],
+ 	title: 'Components/Containers/Panel',
+ 	id: 'components-panel',
+ 	component: Panel,
+@@ -30,7 +29,8 @@ const meta: Meta< typeof Panel > = {
+ 		docs: { canvas: { sourceState: 'shown' } },
+ 		componentStatus: {
+ 			status: 'recommended',
+-			whereUsed: 'global',
++			whereUsed: 'editor',
++			notes: 'Intended for the block inspector sidebar. For collapsible sections elsewhere, use `CollapsibleCard` from `@wordpress/ui` instead.',
+ 		},
+ 	},
+ };

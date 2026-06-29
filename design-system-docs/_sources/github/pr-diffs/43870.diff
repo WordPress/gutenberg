@@ -1,0 +1,205 @@
+diff --git a/packages/block-editor/CHANGELOG.md b/packages/block-editor/CHANGELOG.md
+index 4e261a8a5fba97..6ef7ae6571ccb2 100644
+--- a/packages/block-editor/CHANGELOG.md
++++ b/packages/block-editor/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Breaking change
++
++-   `FontSizePicker`: Deprecate bottom margin style. Add a `__nextHasNoMarginBottom` prop to start opting into the margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.4 ([#43870](https://github.com/WordPress/gutenberg/pull/43870)).
++
+ ## 9.8.0 (2022-08-24)
+ 
+ ## 9.7.0 (2022-08-10)
+diff --git a/packages/block-editor/src/components/font-sizes/README.MD b/packages/block-editor/src/components/font-sizes/README.MD
+index 69354b90f2a351..adfe0ca8853d8d 100644
+--- a/packages/block-editor/src/components/font-sizes/README.MD
++++ b/packages/block-editor/src/components/font-sizes/README.MD
+@@ -31,6 +31,7 @@ const MyFontSizePicker = () => {
+ 
+ 	return (
+ 		<FontSizePicker
++			__nextHasNoMarginBottom
+ 			value={ fontSize }
+ 			fallbackFontSize={ fallbackFontSize }
+ 			onChange={ ( newFontSize ) => {
+@@ -79,3 +80,11 @@ If `true`, the UI will contain a slider, instead of a numeric text input field.
+ - Type: `Boolean`
+ - Required: no
+ - Default: `false`
++
++### __nextHasNoMarginBottom
++
++Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.4. (The prop can be safely removed once this happens.)
++
++-   Type: `Boolean`
++-   Required: no
++-   Default: `false`
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 16dac405bb2be1..c255dd04d1c144 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Breaking Changes
+ 
++-   `FontSizePicker`: Deprecate bottom margin style. Add a `__nextHasNoMarginBottom` prop to start opting into the margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.4 ([#43870](https://github.com/WordPress/gutenberg/pull/43870)).
+ -   `AnglePickerControl`: Deprecate bottom margin style. Add a `__nextHasNoMarginBottom` prop to start opting into the margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.4 ([#43867](https://github.com/WordPress/gutenberg/pull/43867)).
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/font-size-picker/README.md b/packages/components/src/font-size-picker/README.md
+index 48fdf6a4c6f6b3..99a320d38f94ff 100644
+--- a/packages/components/src/font-size-picker/README.md
++++ b/packages/components/src/font-size-picker/README.md
+@@ -29,6 +29,7 @@ const MyFontSizePicker = () => {
+ 
+ 	return (
+ 		<FontSizePicker
++			__nextHasNoMarginBottom
+ 			fontSizes={ fontSizes }
+ 			value={ fontSize }
+ 			fallbackFontSize={ fallbackFontSize }
+@@ -105,3 +106,11 @@ If `true`, a reset button will be displayed alongside the input field when a cus
+ -   Type: `Boolean`
+ -   Required: no
+ -   Default: `true`
++
++### __nextHasNoMarginBottom
++
++Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.4. (The prop can be safely removed once this happens.)
++
++-   Type: `Boolean`
++-   Required: no
++-   Default: `false`
+\ No newline at end of file
+diff --git a/packages/components/src/font-size-picker/index.js b/packages/components/src/font-size-picker/index.js
+index 74f0f8f90bffce..1fb266bba02b2b 100644
+--- a/packages/components/src/font-size-picker/index.js
++++ b/packages/components/src/font-size-picker/index.js
+@@ -6,6 +6,7 @@ import classNames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
++import deprecated from '@wordpress/deprecated';
+ import { __, sprintf } from '@wordpress/i18n';
+ import { settings } from '@wordpress/icons';
+ import { useState, useMemo, forwardRef } from '@wordpress/element';
+@@ -58,6 +59,14 @@ function FontSizePicker(
+ 	},
+ 	ref
+ ) {
++	if ( ! __nextHasNoMarginBottom ) {
++		deprecated( 'Bottom margin styles for wp.components.FontSizePicker', {
++			since: '6.1',
++			version: '6.4',
++			hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version.',
++		} );
++	}
++
+ 	const hasUnits = [ typeof value, typeof fontSizes?.[ 0 ]?.size ].includes(
+ 		'string'
+ 	);
+diff --git a/packages/components/src/font-size-picker/stories/index.js b/packages/components/src/font-size-picker/stories/index.js
+index b86941e3d9836b..6a2e63eb8ad71b 100644
+--- a/packages/components/src/font-size-picker/stories/index.js
++++ b/packages/components/src/font-size-picker/stories/index.js
+@@ -12,17 +12,14 @@ export default {
+ 	title: 'Components/FontSizePicker',
+ 	component: FontSizePicker,
+ 	argTypes: {
+-		__nextHasNoMarginBottom: { control: { type: 'boolean' } },
+ 		initialValue: { table: { disable: true } }, // hide prop because it's not actually part of FontSizePicker
+ 		fallbackFontSize: {
+ 			description:
+ 				'If no value exists, this prop defines the starting position for the font size picker slider. Only relevant if `withSlider` is `true`.',
+ 		},
+ 		size: {
+-			control: {
+-				type: 'radio',
+-				options: [ 'default', '__unstable-large' ],
+-			},
++			control: { type: 'radio' },
++			options: [ 'default', '__unstable-large' ],
+ 		},
+ 		withReset: {
+ 			description:
+@@ -68,6 +65,7 @@ const TwoFontSizePickersWithState = ( { fontSizes, ...props } ) => {
+ 
+ export const Default = FontSizePickerWithState.bind( {} );
+ Default.args = {
++	__nextHasNoMarginBottom: true,
+ 	disableCustomFontSizes: false,
+ 	fontSizes: [
+ 		{
+diff --git a/packages/components/src/font-size-picker/test/index.js b/packages/components/src/font-size-picker/test/index.js
+index d227f0e9df64f9..ca6a8e1a873308 100644
+--- a/packages/components/src/font-size-picker/test/index.js
++++ b/packages/components/src/font-size-picker/test/index.js
+@@ -28,7 +28,11 @@ describe( 'FontSizePicker', () => {
+ 			);
+ 
+ 			render(
+-				<FontSizePicker value={ fontSize } onChange={ setFontSize } />
++				<FontSizePicker
++					value={ fontSize }
++					onChange={ setFontSize }
++					__nextHasNoMarginBottom
++				/>
+ 			);
+ 
+ 			const unitSelect = getUnitSelect();
+@@ -52,7 +56,11 @@ describe( 'FontSizePicker', () => {
+ 			);
+ 
+ 			render(
+-				<FontSizePicker value={ fontSize } onChange={ setFontSize } />
++				<FontSizePicker
++					value={ fontSize }
++					onChange={ setFontSize }
++					__nextHasNoMarginBottom
++				/>
+ 			);
+ 
+ 			const unitSelect = getUnitSelect();
+@@ -87,6 +95,7 @@ describe( 'FontSizePicker', () => {
+ 					fontSizes={ fontSizes }
+ 					value={ fontSize }
+ 					onChange={ setFontSize }
++					__nextHasNoMarginBottom
+ 				/>
+ 			);
+ 
+@@ -123,6 +132,7 @@ describe( 'FontSizePicker', () => {
+ 					fontSizes={ fontSizes }
+ 					value={ fontSize }
+ 					onChange={ setFontSize }
++					__nextHasNoMarginBottom
+ 				/>
+ 			);
+ 
+@@ -182,6 +192,7 @@ describe( 'FontSizePicker', () => {
+ 				<FontSizePicker
+ 					fontSizes={ fontSizes }
+ 					value={ fontSizes[ 0 ].size }
++					__nextHasNoMarginBottom
+ 				/>
+ 			);
+ 			// Trigger click to open the select menu and take into account
+@@ -199,6 +210,7 @@ describe( 'FontSizePicker', () => {
+ 					<FontSizePicker
+ 						fontSizes={ fontSizes }
+ 						value={ fontSizes[ 0 ].size }
++						__nextHasNoMarginBottom
+ 					/>
+ 				);
+ 				const element = screen.getByLabelText( 'Large' );
+@@ -218,6 +230,7 @@ describe( 'FontSizePicker', () => {
+ 					<FontSizePicker
+ 						fontSizes={ fontSizes }
+ 						value={ fontSizes[ 0 ].size }
++						__nextHasNoMarginBottom
+ 					/>
+ 				);
+ 				const largeElement = screen.getByLabelText( 'Large' );

@@ -1,0 +1,139 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index ba9b97ca6e8855..2b4a6d527f2e03 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -29,6 +29,7 @@
+ -   `Dialog`: `Dialog.Header` and `Dialog.Footer` now default to `<header>` and `<footer>` elements for richer landmark semantics. Their `ref` type widens from `HTMLDivElement` to `HTMLElement`; pass `render` to opt out of the default tag ([#76690](https://github.com/WordPress/gutenberg/pull/76690)).
+ -   `Dialog`, `Popover`: Upgrade dev-only title validation from mount-only to cleanup-based re-validation, catching conditionally rendered titles ([#77165](https://github.com/WordPress/gutenberg/pull/77165)).
+ -   `Link`: Honor `openInNewTab` consistently instead of treating hash links as a special case ([#77422](https://github.com/WordPress/gutenberg/pull/77422)).
++-   `Dialog`, `Drawer`, `Popover`: Align title and description colors across all three overlay primitives. Title color is now authored explicitly (resilient to global CSS defenses), and description color now inherits from the popup foreground token instead of overriding to the weak variant ([#77692](https://github.com/WordPress/gutenberg/pull/77692)).
+ 
+ ### Internal
+ 
+diff --git a/packages/ui/src/dialog/style.module.css b/packages/ui/src/dialog/style.module.css
+index debaf5980fd2a4..697949ec61bbb0 100644
+--- a/packages/ui/src/dialog/style.module.css
++++ b/packages/ui/src/dialog/style.module.css
+@@ -100,8 +100,10 @@
+ 	}
+ 
+ 	.title {
+-		margin-inline-end: auto;
++		color: var(--wpds-color-fg-content-neutral);
++		--_gcd-heading-color: var(--wpds-color-fg-content-neutral);
+ 
++		margin-inline-end: auto;
+ 		/* Workaround: the GCD shorthand `margin` overrides the longhand above.
+ 		 * Keep both so the layout survives GCD removal. */
+ 		--_gcd-heading-margin: 0 auto 0 0;
+@@ -113,7 +115,6 @@
+ 
+ 	.description {
+ 		margin-bottom: var(--wpds-dimension-gap-lg);
+-		color: var(--wpds-color-fg-content-neutral-weak);
+ 	}
+ 
+ 	.footer {
+diff --git a/packages/ui/src/drawer/description.tsx b/packages/ui/src/drawer/description.tsx
+index ede11208781928..a19b78dbccfdae 100644
+--- a/packages/ui/src/drawer/description.tsx
++++ b/packages/ui/src/drawer/description.tsx
+@@ -1,7 +1,6 @@
+ import { Drawer as _Drawer } from '@base-ui/react/drawer';
+ import { forwardRef } from '@wordpress/element';
+ import { Text } from '../text';
+-import styles from './style.module.css';
+ import type { DescriptionProps } from './types';
+ 
+ /**
+@@ -16,7 +15,6 @@ const Description = forwardRef< HTMLParagraphElement, DescriptionProps >(
+ 				ref={ ref }
+ 				variant="body-md"
+ 				render={ <_Drawer.Description { ...props } /> }
+-				className={ styles.description }
+ 			>
+ 				{ children }
+ 			</Text>
+diff --git a/packages/ui/src/drawer/style.module.css b/packages/ui/src/drawer/style.module.css
+index 9a22a798e80f47..79f1bc083ec03f 100644
+--- a/packages/ui/src/drawer/style.module.css
++++ b/packages/ui/src/drawer/style.module.css
+@@ -249,8 +249,10 @@
+ 	}
+ 
+ 	.title {
+-		margin-inline-end: auto;
++		color: var(--wpds-color-fg-content-neutral);
++		--_gcd-heading-color: var(--wpds-color-fg-content-neutral);
+ 
++		margin-inline-end: auto;
+ 		/* Workaround: the GCD shorthand `margin` overrides the longhand above.
+ 		 * Keep both so the layout survives GCD removal. */
+ 		--_gcd-heading-margin: 0 auto 0 0;
+@@ -260,10 +262,6 @@
+ 		}
+ 	}
+ 
+-	.description {
+-		color: var(--wpds-color-fg-content-neutral-weak);
+-	}
+-
+ 	.footer {
+ 		display: flex;
+ 		justify-content: flex-end;
+diff --git a/packages/ui/src/popover/description.tsx b/packages/ui/src/popover/description.tsx
+index 031f1f7357e766..de10e8c7944c30 100644
+--- a/packages/ui/src/popover/description.tsx
++++ b/packages/ui/src/popover/description.tsx
+@@ -1,7 +1,6 @@
+ import { Popover as _Popover } from '@base-ui/react/popover';
+ import { forwardRef } from '@wordpress/element';
+ import { Text } from '../text';
+-import styles from './style.module.css';
+ import type { DescriptionProps } from './types';
+ 
+ /**
+@@ -16,7 +15,6 @@ const Description = forwardRef< HTMLParagraphElement, DescriptionProps >(
+ 				ref={ ref }
+ 				variant="body-md"
+ 				render={ <_Popover.Description { ...props } /> }
+-				className={ styles.description }
+ 			>
+ 				{ children }
+ 			</Text>
+diff --git a/packages/ui/src/popover/style.module.css b/packages/ui/src/popover/style.module.css
+index 150e9aff57c8d0..a4903ddc0c80d1 100644
+--- a/packages/ui/src/popover/style.module.css
++++ b/packages/ui/src/popover/style.module.css
+@@ -50,8 +50,9 @@
+ 		fill: var(--wpds-color-stroke-surface-neutral-weak);
+ 	}
+ 
+-	.description {
+-		color: var(--wpds-color-fg-content-neutral-weak);
++	.title {
++		color: var(--wpds-color-fg-content-neutral);
++		--_gcd-heading-color: var(--wpds-color-fg-content-neutral);
+ 	}
+ 
+ 	.backdrop {
+diff --git a/packages/ui/src/popover/title.tsx b/packages/ui/src/popover/title.tsx
+index 9c70b6d9388c3b..957309fc3403aa 100644
+--- a/packages/ui/src/popover/title.tsx
++++ b/packages/ui/src/popover/title.tsx
+@@ -3,6 +3,7 @@ import { useMergeRefs } from '@wordpress/compose';
+ import { forwardRef, useEffect, useRef } from '@wordpress/element';
+ import { Text } from '../text';
+ import { usePopoverValidationContext } from './context';
++import styles from './style.module.css';
+ import type { TitleProps } from './types';
+ 
+ /**
+@@ -39,6 +40,7 @@ const Title = forwardRef< HTMLHeadingElement, TitleProps >(
+ 				ref={ mergedRef }
+ 				variant="heading-xl"
+ 				render={ <_Popover.Title { ...props } /> }
++				className={ styles.title }
+ 			>
+ 				{ children }
+ 			</Text>

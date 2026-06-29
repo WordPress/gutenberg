@@ -1,0 +1,53 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index ef6376d8c1bc20..82bdc79c82297c 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `Autocomplete`, `Select`: Do not show the interactive cursor for disabled select triggers or disabled popup items ([#78112](https://github.com/WordPress/gutenberg/pull/78112)).
+ -   `Select`: Hide the browser focus ring on highlighted popup items ([#77919](https://github.com/WordPress/gutenberg/pull/77919)).
+ -   `Drawer`: Restore the slide-out animation when the popup closes ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
+ -   `Drawer`: Forward the `render` prop on `Drawer.Content` to the scroll container instead of leaking it as a DOM attribute, matching `Dialog.Content` ([#77941](https://github.com/WordPress/gutenberg/pull/77941)).
+diff --git a/packages/ui/src/utils/css/item-popup.module.css b/packages/ui/src/utils/css/item-popup.module.css
+index 61bab8d8f7f818..234ab5e81c6c01 100644
+--- a/packages/ui/src/utils/css/item-popup.module.css
++++ b/packages/ui/src/utils/css/item-popup.module.css
+@@ -59,7 +59,6 @@
+ 		align-items: center;
+ 		justify-content: flex-start;
+ 		gap: var(--wpds-dimension-gap-xs);
+-		cursor: var(--wpds-cursor-control);
+ 		min-height: var(--wp-ui-popup-item-height);
+ 		border-radius: var(--wpds-border-radius-sm);
+ 		user-select: none;
+@@ -70,6 +69,10 @@
+ 		padding-inline-start: calc(var(--wp-ui-popup-item-padding-inline) - 4px);
+ 		padding-inline-end: var(--wp-ui-popup-item-padding-inline);
+ 
++		&:not([data-disabled]) {
++			cursor: var(--wpds-cursor-control);
++		}
++
+ 		&.is-size-compact {
+ 			--wp-ui-popup-item-height: 32px;
+ 			--wp-ui-popup-item-padding-inline: 8px;
+diff --git a/packages/ui/src/utils/css/select-trigger.module.css b/packages/ui/src/utils/css/select-trigger.module.css
+index dc279804384cc1..b0e3271deb2fdd 100644
+--- a/packages/ui/src/utils/css/select-trigger.module.css
++++ b/packages/ui/src/utils/css/select-trigger.module.css
+@@ -26,9 +26,12 @@
+ 		font-size: inherit;
+ 		line-height: 1.4;
+ 		text-align: start;
+-		cursor: var(--wpds-cursor-control);
+ 		user-select: none;
+ 
++		&:not([data-disabled]) {
++			cursor: var(--wpds-cursor-control);
++		}
++
+ 		&.is-minimal {
+ 			width: auto;
+ 		}

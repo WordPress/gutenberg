@@ -1,0 +1,149 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6431a62038c269..5e9510bf727e3e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Enhancements
+ 
++-   `Notice`: Improve accessibility by adding visually hidden text to clarify what a notice text is about and the notice type (success, error, warning, info) ([#54498](https://github.com/WordPress/gutenberg/pull/54498)).
+ -   Making Circular Option Picker a `listbox`. Note that while this changes some public API, new props are optional, and currently have default values; this will change in another patch ([#52255](https://github.com/WordPress/gutenberg/pull/52255)).
+ -   `ToggleGroupControl`: Rewrite backdrop animation using framer motion shared layout animations, add better support for controlled and uncontrolled modes ([#50278](https://github.com/WordPress/gutenberg/pull/50278)).
+ -   `Popover`: Add the `is-positioned` CSS class only after the popover has finished animating ([#54178](https://github.com/WordPress/gutenberg/pull/54178)).
+@@ -15,6 +16,7 @@
+ 
+ ### Bug Fix
+ 
++-   `Notice`: Make the Close button render a tooltip to visually expose its accessible name. All icon buttons must always show a tooltip ([#54498](https://github.com/WordPress/gutenberg/pull/54498)).
+ -   `Tooltip`: dynamically render in the DOM only when visible ([#54312](https://github.com/WordPress/gutenberg/pull/54312)).
+ -   `PaletteEdit`: Fix padding in RTL languages ([#54034](https://github.com/WordPress/gutenberg/pull/54034)).
+ -   `ToolbarItem`: Fix children not showing in rendered components ([#53314](https://github.com/WordPress/gutenberg/pull/53314)).
+diff --git a/packages/components/src/higher-order/with-notices/test/index.tsx b/packages/components/src/higher-order/with-notices/test/index.tsx
+index cbad7270414e3e..4b34da40838eef 100644
+--- a/packages/components/src/higher-order/with-notices/test/index.tsx
++++ b/packages/components/src/higher-order/with-notices/test/index.tsx
+@@ -27,7 +27,7 @@ import withNotices from '..';
+ import type { WithNoticeProps } from '../types';
+ 
+ // Implementation detail of Notice component used to query the dismissal button.
+-const stockDismissText = 'Dismiss this notice';
++const stockDismissText = 'Close';
+ 
+ function noticesFrom( list: string[] ) {
+ 	return list.map( ( item ) => ( { id: item, content: item } ) );
+diff --git a/packages/components/src/notice/index.tsx b/packages/components/src/notice/index.tsx
+index 02805938b6b7ce..7117295b71975e 100644
+--- a/packages/components/src/notice/index.tsx
++++ b/packages/components/src/notice/index.tsx
+@@ -16,8 +16,8 @@ import { close } from '@wordpress/icons';
+  */
+ import Button from '../button';
+ import type { NoticeAction, NoticeProps } from './types';
+-import type { SyntheticEvent } from 'react';
+ import type { DeprecatedButtonProps } from '../button/types';
++import { VisuallyHidden } from '../visually-hidden';
+ 
+ const noop = () => {};
+ 
+@@ -45,10 +45,23 @@ function getDefaultPoliteness( status: NoticeProps[ 'status' ] ) {
+ 		case 'warning':
+ 		case 'info':
+ 			return 'polite';
++		// The default will also catch the 'error' status.
++		default:
++			return 'assertive';
++	}
++}
+ 
++function getStatusLabel( status: NoticeProps[ 'status' ] ) {
++	switch ( status ) {
++		case 'warning':
++			return __( 'Warning notice' );
++		case 'info':
++			return __( 'Information notice' );
+ 		case 'error':
++			return __( 'Error notice' );
++		// The default will also catch the 'success' status.
+ 		default:
+-			return 'assertive';
++			return __( 'Notice' );
+ 	}
+ }
+ 
+@@ -93,14 +106,14 @@ function Notice( {
+ 		children = <RawHTML>{ children }</RawHTML>;
+ 	}
+ 
+-	const onDismissNotice = ( event: SyntheticEvent ) => {
+-		event?.preventDefault?.();
++	const onDismissNotice = () => {
+ 		onDismiss();
+ 		onRemove();
+ 	};
+ 
+ 	return (
+ 		<div className={ classes }>
++			<VisuallyHidden>{ getStatusLabel( status ) }</VisuallyHidden>
+ 			<div className="components-notice__content">
+ 				{ children }
+ 				<div className="components-notice__actions">
+@@ -154,9 +167,8 @@ function Notice( {
+ 				<Button
+ 					className="components-notice__dismiss"
+ 					icon={ close }
+-					label={ __( 'Dismiss this notice' ) }
++					label={ __( 'Close' ) }
+ 					onClick={ onDismissNotice }
+-					showTooltip={ false }
+ 				/>
+ 			) }
+ 		</div>
+diff --git a/packages/components/src/notice/test/__snapshots__/index.tsx.snap b/packages/components/src/notice/test/__snapshots__/index.tsx.snap
+index 8f31d71af7c90d..a793b5db706a4c 100644
+--- a/packages/components/src/notice/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/notice/test/__snapshots__/index.tsx.snap
+@@ -5,6 +5,14 @@ exports[`Notice should match snapshot 1`] = `
+   <div
+     class="components-notice is-success is-dismissible"
+   >
++    <div
++      class="components-visually-hidden emotion-0 emotion-1"
++      data-wp-c16t="true"
++      data-wp-component="VisuallyHidden"
++      style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal;"
++    >
++      Notice
++    </div>
+     <div
+       class="components-notice__content"
+     >
+@@ -33,7 +41,7 @@ exports[`Notice should match snapshot 1`] = `
+       </div>
+     </div>
+     <button
+-      aria-label="Dismiss this notice"
++      aria-label="Close"
+       class="components-button components-notice__dismiss has-icon"
+       type="button"
+     >
+diff --git a/packages/edit-site/src/components/sidebar-navigation-screen/style.scss b/packages/edit-site/src/components/sidebar-navigation-screen/style.scss
+index 974a0e70c4cf6a..6eb4b9eb91b8f4 100644
+--- a/packages/edit-site/src/components/sidebar-navigation-screen/style.scss
++++ b/packages/edit-site/src/components/sidebar-navigation-screen/style.scss
+@@ -109,10 +109,15 @@
+ 	&.is-dismissible {
+ 		padding-right: $grid-unit-10;
+ 	}
++
++	.components-notice__dismiss:not(:disabled):not([aria-disabled="true"]) {
++		color: $gray-400;
++	}
++
+ 	.components-notice__dismiss:not(:disabled):not([aria-disabled="true"]):focus,
+ 	.components-notice__dismiss:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active,
+ 	.components-notice__dismiss:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover {
+-		color: $gray-100;
++		color: $white;
+ 	}
+ }
+ 

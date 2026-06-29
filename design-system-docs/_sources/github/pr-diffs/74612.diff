@@ -1,0 +1,52 @@
+diff --git a/packages/components/src/date-time/date/README.md b/packages/components/src/date-time/date/README.md
+new file mode 100644
+index 00000000000000..649d6eeb15bc5a
+--- /dev/null
++++ b/packages/components/src/date-time/date/README.md
+@@ -0,0 +1,20 @@
++# DatePicker Component 
++ 
++## Description 
++The `DatePicker` component allows users to select a date from a calendar interface. 
++ 
++## Installation 
++```javascript 
++import { DatePicker } from '@wordpress/components'; 
++``` 
++ 
++## Usage 
++```jsx 
++``` 
++ 
++## Props 
++- currentDate (Date) - The initial date. 
++- onChange (Function) - Called when the date changes. 
++ 
++## Storybook 
++View the component in Storybook: [DatePicker](https://wordpress.github.io/gutenberg/?path=/story/components-datepicker--default) 
+diff --git a/packages/components/src/date-time/time/README.md b/packages/components/src/date-time/time/README.md
+new file mode 100644
+index 00000000000000..ee03e314680a0f
+--- /dev/null
++++ b/packages/components/src/date-time/time/README.md
+@@ -0,0 +1,20 @@
++# TimePicker Component 
++ 
++## Description 
++The `TimePicker` component allows users to select a time. 
++ 
++## Installation 
++```javascript 
++import { TimePicker } from '@wordpress/components'; 
++``` 
++ 
++## Usage 
++```jsx 
++``` 
++ 
++## Props 
++- currentTime (string) - The initial time (HH:mm format). 
++- onChange (Function) - Called when the time changes. 
++ 
++## Storybook 
++View the component in Storybook: [TimePicker](https://wordpress.github.io/gutenberg/?path=/story/components-timepicker--default) 

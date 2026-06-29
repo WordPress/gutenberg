@@ -1,0 +1,204 @@
+diff --git a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+index 93ff7de8807175..039d35937294b4 100644
+--- a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
++++ b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+@@ -172,7 +172,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+                   <button
+                     aria-expanded="false"
+                     aria-haspopup="true"
+-                    aria-label="Custom color picker. The currently selected color is called "red" and has a value of "#-f-0-0"."
++                    aria-label="Custom color picker. The currently selected color is called "red" and has a value of "#f00"."
+                     class="components-color-palette__custom-color-button"
+                     style="background: rgb(255, 0, 0);"
+                   />
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 45ed6d2ec13fc8..2f211094a4a378 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `ColorPalette`, `BorderControl`: Don't hyphenate hex value in `aria-label` ([#52932](https://github.com/WordPress/gutenberg/pull/52932)).
++
+ ## 25.4.0 (2023-07-20)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/border-control/border-control-dropdown/component.tsx b/packages/components/src/border-control/border-control-dropdown/component.tsx
+index c9998af094fbdc..8eb220a0209c1a 100644
+--- a/packages/components/src/border-control/border-control-dropdown/component.tsx
++++ b/packages/components/src/border-control/border-control-dropdown/component.tsx
+@@ -30,12 +30,8 @@ import type { DropdownProps as DropdownComponentProps } from '../../dropdown/typ
+ import type { ColorProps, DropdownProps } from '../types';
+ 
+ const getAriaLabelColorValue = ( colorValue: string ) => {
+-	const isHex = colorValue.startsWith( '#' );
+-
+ 	// Leave hex values as-is. Remove the `var()` wrapper from CSS vars.
+-	const displayValue = colorValue.replace( /^var\((.+)\)$/, '$1' );
+-
+-	return isHex ? displayValue.split( '' ).join( '-' ) : displayValue;
++	return colorValue.replace( /^var\((.+)\)$/, '$1' );
+ };
+ 
+ const getColorObject = (
+@@ -79,14 +75,14 @@ const getToggleAriaLabel = (
+ 			const ariaLabelValue = getAriaLabelColorValue( colorObject.color );
+ 			return style
+ 				? sprintf(
+-						// translators: %1$s: The name of the color e.g. "vivid red". %2$s: The color's hex code, with added hyphens e.g: "#-f-0-0". %3$s: The current border style selection e.g. "solid".
++						// translators: %1$s: The name of the color e.g. "vivid red". %2$s: The color's hex code e.g.: "#f00:". %3$s: The current border style selection e.g. "solid".
+ 						'Border color and style picker. The currently selected color is called "%1$s" and has a value of "%2$s". The currently selected style is "%3$s".',
+ 						colorObject.name,
+ 						ariaLabelValue,
+ 						style
+ 				  )
+ 				: sprintf(
+-						// translators: %1$s: The name of the color e.g. "vivid red". %2$s: The color's hex code, with added hyphens e.g: "#-f-0-0".
++						// translators: %1$s: The name of the color e.g. "vivid red". %2$s: The color's hex code e.g.: "#f00:".
+ 						'Border color and style picker. The currently selected color is called "%1$s" and has a value of "%2$s".',
+ 						colorObject.name,
+ 						ariaLabelValue
+@@ -97,13 +93,13 @@ const getToggleAriaLabel = (
+ 			const ariaLabelValue = getAriaLabelColorValue( colorValue );
+ 			return style
+ 				? sprintf(
+-						// translators: %1$s: The color's hex code, with added hyphens e.g: "#-f-0-0". %2$s: The current border style selection e.g. "solid".
++						// translators: %1$s: The color's hex code e.g.: "#f00:". %2$s: The current border style selection e.g. "solid".
+ 						'Border color and style picker. The currently selected color has a value of "%1$s". The currently selected style is "%2$s".',
+ 						ariaLabelValue,
+ 						style
+ 				  )
+ 				: sprintf(
+-						// translators: %1$s: The color's hex code, with added hyphens e.g: "#-f-0-0".
++						// translators: %1$s: The color's hex code e.g: "#f00".
+ 						'Border color and style picker. The currently selected color has a value of "%1$s".',
+ 						ariaLabelValue
+ 				  );
+@@ -114,7 +110,7 @@ const getToggleAriaLabel = (
+ 
+ 	if ( colorObject ) {
+ 		return sprintf(
+-			// translators: %1$s: The name of the color e.g. "vivid red". %2$s: The color's hex code, with added hyphens e.g: "#-f-0-0".
++			// translators: %1$s: The name of the color e.g. "vivid red". %2$s: The color's hex code e.g: "#f00".
+ 			'Border color picker. The currently selected color is called "%1$s" and has a value of "%2$s".',
+ 			colorObject.name,
+ 			getAriaLabelColorValue( colorObject.color )
+@@ -123,7 +119,7 @@ const getToggleAriaLabel = (
+ 
+ 	if ( colorValue ) {
+ 		return sprintf(
+-			// translators: %1$s: The color's hex code, with added hyphens e.g: "#-f-0-0".
++			// translators: %1$s: The color's hex code e.g: "#f00".
+ 			'Border color picker. The currently selected color has a value of "%1$s".',
+ 			getAriaLabelColorValue( colorValue )
+ 		);
+diff --git a/packages/components/src/border-control/test/index.js b/packages/components/src/border-control/test/index.js
+index ae54ce5c55a847..4e971e59e87b21 100644
+--- a/packages/components/src/border-control/test/index.js
++++ b/packages/components/src/border-control/test/index.js
+@@ -215,7 +215,7 @@ describe( 'BorderControl', () => {
+ 
+ 				expect(
+ 					screen.getByLabelText(
+-						'Border color and style picker. The currently selected color is called "Blue" and has a value of "#-7-2-a-e-e-6".'
++						'Border color and style picker. The currently selected color is called "Blue" and has a value of "#72aee6".'
+ 					)
+ 				).toBeInTheDocument();
+ 			} );
+@@ -226,7 +226,7 @@ describe( 'BorderControl', () => {
+ 
+ 				expect(
+ 					screen.getByLabelText(
+-						'Border color and style picker. The currently selected color has a value of "#-4-b-1-d-8-0".'
++						'Border color and style picker. The currently selected color has a value of "#4b1d80".'
+ 					)
+ 				).toBeInTheDocument();
+ 			} );
+@@ -239,7 +239,7 @@ describe( 'BorderControl', () => {
+ 
+ 				expect(
+ 					screen.getByLabelText(
+-						'Border color and style picker. The currently selected color is called "Blue" and has a value of "#-7-2-a-e-e-6". The currently selected style is "dotted".'
++						'Border color and style picker. The currently selected color is called "Blue" and has a value of "#72aee6". The currently selected style is "dotted".'
+ 					)
+ 				).toBeInTheDocument();
+ 			} );
+@@ -252,7 +252,7 @@ describe( 'BorderControl', () => {
+ 
+ 				expect(
+ 					screen.getByLabelText(
+-						'Border color and style picker. The currently selected color has a value of "#-4-b-1-d-8-0". The currently selected style is "dashed".'
++						'Border color and style picker. The currently selected color has a value of "#4b1d80". The currently selected style is "dashed".'
+ 					)
+ 				).toBeInTheDocument();
+ 			} );
+@@ -280,7 +280,7 @@ describe( 'BorderControl', () => {
+ 
+ 				expect(
+ 					screen.getByLabelText(
+-						'Border color picker. The currently selected color is called "Blue" and has a value of "#-7-2-a-e-e-6".'
++						'Border color picker. The currently selected color is called "Blue" and has a value of "#72aee6".'
+ 					)
+ 				).toBeInTheDocument();
+ 			} );
+@@ -294,7 +294,7 @@ describe( 'BorderControl', () => {
+ 
+ 				expect(
+ 					screen.getByLabelText(
+-						'Border color picker. The currently selected color has a value of "#-4-b-1-d-8-0".'
++						'Border color picker. The currently selected color has a value of "#4b1d80".'
+ 					)
+ 				).toBeInTheDocument();
+ 			} );
+diff --git a/packages/components/src/color-palette/index.tsx b/packages/components/src/color-palette/index.tsx
+index 2347897540f63a..b3b46a68ff21f4 100644
+--- a/packages/components/src/color-palette/index.tsx
++++ b/packages/components/src/color-palette/index.tsx
+@@ -224,12 +224,12 @@ function UnforwardedColorPalette(
+ 	const displayValue = value?.replace( /^var\((.+)\)$/, '$1' );
+ 	const customColorAccessibleLabel = !! displayValue
+ 		? sprintf(
+-				// translators: %1$s: The name of the color e.g: "vivid red". %2$s: The color's hex code, with added hyphens e.g: "#-f-0-0".
++				// translators: %1$s: The name of the color e.g: "vivid red". %2$s: The color's hex code e.g: "#f00".
+ 				__(
+ 					'Custom color picker. The currently selected color is called "%1$s" and has a value of "%2$s".'
+ 				),
+ 				buttonLabelName,
+-				isHex ? displayValue.split( '' ).join( '-' ) : displayValue
++				displayValue
+ 		  )
+ 		: __( 'Custom color picker.' );
+ 
+diff --git a/packages/components/src/color-palette/test/__snapshots__/index.tsx.snap b/packages/components/src/color-palette/test/__snapshots__/index.tsx.snap
+index 8c7557366e37de..a08760a33e252a 100644
+--- a/packages/components/src/color-palette/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/color-palette/test/__snapshots__/index.tsx.snap
+@@ -193,7 +193,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+         <button
+           aria-expanded="false"
+           aria-haspopup="true"
+-          aria-label="Custom color picker. The currently selected color is called "red" and has a value of "#-f-0-0"."
++          aria-label="Custom color picker. The currently selected color is called "red" and has a value of "#f00"."
+           class="components-color-palette__custom-color-button"
+           style="background: rgb(255, 0, 0);"
+         />
+diff --git a/packages/components/src/color-palette/test/index.tsx b/packages/components/src/color-palette/test/index.tsx
+index 90254463ef7a76..65ed02f9e7b2b5 100644
+--- a/packages/components/src/color-palette/test/index.tsx
++++ b/packages/components/src/color-palette/test/index.tsx
+@@ -240,11 +240,7 @@ describe( 'ColorPalette', () => {
+ 		expect( screen.getByText( EXAMPLE_COLORS[ 0 ].color ) ).toBeVisible();
+ 		expect(
+ 			screen.getByRole( 'button', {
+-				name: `Custom color picker. The currently selected color is called "${
+-					EXAMPLE_COLORS[ 0 ].name
+-				}" and has a value of "${ EXAMPLE_COLORS[ 0 ].color
+-					.split( '' )
+-					.join( '-' ) }".`,
++				name: `Custom color picker. The currently selected color is called "${ EXAMPLE_COLORS[ 0 ].name }" and has a value of "${ EXAMPLE_COLORS[ 0 ].color }".`,
+ 				expanded: false,
+ 			} )
+ 		).toBeInTheDocument();

@@ -1,0 +1,50 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 141db1d3274db0..2e971718ba2c46 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancement
+ 
+ -   `Guide`: Make next and previous button text customizable ([#69907](https://github.com/WordPress/gutenberg/pull/69907)).
++-   `Popover`: Introduce a virtual padding of `8px` to prevent it from hitting the viewport edge ([#69555](https://github.com/WordPress/gutenberg/pull/69555)).
+ 
+ ## 29.8.0 (2025-04-11)
+ 
+diff --git a/packages/components/src/popover/index.tsx b/packages/components/src/popover/index.tsx
+index 63c24b4c1f2abf..2dc4015c860919 100644
+--- a/packages/components/src/popover/index.tsx
++++ b/packages/components/src/popover/index.tsx
+@@ -71,6 +71,13 @@ import { StyleProvider } from '../style-provider';
+  */
+ export const SLOT_NAME = 'Popover';
+ 
++/**
++ * Virtual padding to account for overflow boundaries.
++ *
++ * @type {number}
++ */
++const OVERFLOW_PADDING = 8;
++
+ // An SVG displaying a triangle facing down, filled with a solid
+ // color and bordered in such a way to create an arrow-like effect.
+ // Keeping the SVG's viewbox squared simplify the arrow positioning
+@@ -224,6 +231,7 @@ const UnforwardedPopover = (
+ 		computedFlipProp && flipMiddleware(),
+ 		computedResizeProp &&
+ 			size( {
++				padding: OVERFLOW_PADDING,
+ 				apply( sizeProps ) {
+ 					const { firstElementChild } = refs.floating.current ?? {};
+ 
+@@ -234,7 +242,10 @@ const UnforwardedPopover = (
+ 
+ 					// Reduce the height of the popover to the available space.
+ 					Object.assign( firstElementChild.style, {
+-						maxHeight: `${ sizeProps.availableHeight }px`,
++						maxHeight: `${ Math.max(
++							0,
++							sizeProps.availableHeight
++						) }px`,
+ 						overflow: 'auto',
+ 					} );
+ 				},

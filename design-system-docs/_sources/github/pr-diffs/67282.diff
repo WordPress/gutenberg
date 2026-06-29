@@ -1,0 +1,183 @@
+diff --git a/packages/components/src/icon/README.md b/packages/components/src/icon/README.md
+index 5e78f029f169f7..63d52c1fd20b13 100644
+--- a/packages/components/src/icon/README.md
++++ b/packages/components/src/icon/README.md
+@@ -1,82 +1,39 @@
+ # Icon
+ 
+-Allows you to render a raw icon without any initial styling or wrappers.
++<!-- This file is generated automatically and cannot be edited directly. Make edits via TypeScript types and TSDocs. -->
+ 
+-## Usage
++<p class="callout callout-info">See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-icon--docs">WordPress Storybook</a> for more detailed, interactive documentation.</p>
+ 
+-#### With a Dashicon
++Renders a raw icon without any initial styling or wrappers.
+ 
+ ```jsx
+-import { Icon } from '@wordpress/components';
++import { wordpress } from '@wordpress/icons';
+ 
+-const MyIcon = () => <Icon icon="screenoptions" />;
++<Icon icon={ wordpress } />
+ ```
+-
+-#### With a function
+-
+-```jsx
+-import { Icon } from '@wordpress/components';
+-
+-const MyIcon = () => (
+-	<Icon
+-		icon={ () => (
+-			<svg>
+-				<path d="M5 4v3h5.5v12h3V7H19V4z" />
+-			</svg>
+-		) }
+-	/>
+-);
+-```
+-
+-#### With a Component
+-
+-```jsx
+-import { MyIconComponent } from '../my-icon-component';
+-import { Icon } from '@wordpress/components';
+-
+-const MyIcon = () => <Icon icon={ MyIconComponent } />;
+-```
+-
+-#### With an SVG
+-
+-```jsx
+-import { Icon } from '@wordpress/components';
+-
+-const MyIcon = () => (
+-	<Icon
+-		icon={
+-			<svg>
+-				<path d="M5 4v3h5.5v12h3V7H19V4z" />
+-			</svg>
+-		}
+-	/>
+-);
+-```
+-
+-#### Specifying a className
+-
+-```jsx
+-import { Icon } from '@wordpress/components';
+-
+-const MyIcon = () => <Icon icon="screenoptions" className="example-class" />;
+-```
+-
+ ## Props
+ 
+-The component accepts the following props. Any additional props are passed through to the underlying icon element.
++### `icon`
+ 
+-### icon
++The icon to render. In most cases, you should use an icon from
++[the `@wordpress/icons` package](https://wordpress.github.io/gutenberg/?path=/story/icons-icon--library).
+ 
+-The icon to render. Supported values are: Dashicons (specified as strings), functions, Component instances and `null`.
++Other supported values are: component instances, functions,
++[Dashicons](https://developer.wordpress.org/resource/dashicons/)
++(specified as strings), and `null`.
+ 
+--   Type: `String|Function|Component|null`
+--   Required: No
+--   Default: `null`
++The `size` value, as well as any other additional props, will be passed through.
+ 
+-### size
++ - Type: `IconType`
++ - Required: No
++ - Default: `null`
++
++### `size`
+ 
+ The size (width and height) of the icon.
+ 
+--   Type: `Number`
+--   Required: No
+--   Default: `20` when a Dashicon is rendered, `24` for all other icons.
++Defaults to `20` when `icon` is a string (i.e. a Dashicon id), otherwise `24`.
++
++ - Type: `number`
++ - Required: No
++ - Default: `'string' === typeof icon ? 20 : 24`
+diff --git a/packages/components/src/icon/docs-manifest.json b/packages/components/src/icon/docs-manifest.json
+new file mode 100644
+index 00000000000000..4794049a3eb6ce
+--- /dev/null
++++ b/packages/components/src/icon/docs-manifest.json
+@@ -0,0 +1,5 @@
++{
++	"$schema": "../../schemas/docs-manifest.json",
++	"displayName": "Icon",
++	"filePath": "./index.tsx"
++}
+diff --git a/packages/components/src/icon/index.tsx b/packages/components/src/icon/index.tsx
+index 3fbf4d18c5a00e..283b9cd179cd1c 100644
+--- a/packages/components/src/icon/index.tsx
++++ b/packages/components/src/icon/index.tsx
+@@ -25,10 +25,22 @@ export type IconType =
+ 	| ( ( props: { size?: number } ) => JSX.Element )
+ 	| JSX.Element;
+ 
+-interface BaseProps {
++type AdditionalProps< T > = T extends ComponentType< infer U >
++	? U
++	: T extends DashiconIconKey
++	? SVGProps< SVGSVGElement >
++	: {};
++
++export type Props = {
+ 	/**
+-	 * The icon to render. Supported values are: Dashicons (specified as
+-	 * strings), functions, Component instances and `null`.
++	 * The icon to render. In most cases, you should use an icon from
++	 * [the `@wordpress/icons` package](https://wordpress.github.io/gutenberg/?path=/story/icons-icon--library).
++	 *
++	 * Other supported values are: component instances, functions,
++	 * [Dashicons](https://developer.wordpress.org/resource/dashicons/)
++	 * (specified as strings), and `null`.
++	 *
++	 * The `size` value, as well as any other additional props, will be passed through.
+ 	 *
+ 	 * @default null
+ 	 */
+@@ -36,19 +48,22 @@ interface BaseProps {
+ 	/**
+ 	 * The size (width and height) of the icon.
+ 	 *
+-	 * @default `20` when a Dashicon is rendered, `24` for all other icons.
++	 * Defaults to `20` when `icon` is a string (i.e. a Dashicon id), otherwise `24`.
++	 *
++	 * @default `'string' === typeof icon ? 20 : 24`.
+ 	 */
+ 	size?: number;
+-}
+-
+-type AdditionalProps< T > = T extends ComponentType< infer U >
+-	? U
+-	: T extends DashiconIconKey
+-	? SVGProps< SVGSVGElement >
+-	: {};
+-
+-export type Props = BaseProps & AdditionalProps< IconType >;
++} & AdditionalProps< IconType >;
+ 
++/**
++ * Renders a raw icon without any initial styling or wrappers.
++ *
++ * ```jsx
++ * import { wordpress } from '@wordpress/icons';
++ *
++ * <Icon icon={ wordpress } />
++ * ```
++ */
+ function Icon( {
+ 	icon = null,
+ 	size = 'string' === typeof icon ? 20 : 24,

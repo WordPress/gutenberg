@@ -1,0 +1,34 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 314836a34e0688..e784c4c6e31e65 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `Text`: Apply `margin: 0`, removing user-agent margins when the component renders as block-level elements (for example `p` or `h1`–`h6` via `render` prop) ([#76970](https://github.com/WordPress/gutenberg/pull/76970)).
+ 
++### Bug Fixes
++
++-   `Card`: Set default foreground color on `Card.Root` so content and `currentColor` icons (for example the `CollapsibleCard` chevron) are themeable by default ([#77013](https://github.com/WordPress/gutenberg/pull/77013)).
++
+ ## 0.10.0 (2026-04-01)
+ 
+ ### New Features
+diff --git a/packages/ui/src/card/style.module.css b/packages/ui/src/card/style.module.css
+index e1d4c7d732df76..34611d4753505c 100644
+--- a/packages/ui/src/card/style.module.css
++++ b/packages/ui/src/card/style.module.css
+@@ -12,6 +12,7 @@
+ 		border-radius: var(--wpds-border-radius-lg);
+ 		overflow: clip;
+ 		background-color: var(--wpds-color-bg-surface-neutral-strong);
++		color: var(--wpds-color-fg-content-neutral);
+ 	}
+ 
+ 	/* Padding is applied to the individual header/content elements to enable
+@@ -40,6 +41,5 @@
+ 
+ 	.title {
+ 		margin: 0;
+-		color: var(--wpds-color-fg-content-neutral);
+ 	}
+ }

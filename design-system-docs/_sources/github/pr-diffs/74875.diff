@@ -1,0 +1,4507 @@
+diff --git a/package-lock.json b/package-lock.json
+index 4a5a27c95ae781..8c99780a2ff212 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -54295,16 +54295,6 @@
+ 				"npm": ">=8.19.2"
+ 			}
+ 		},
+-		"packages/react-native-editor/node_modules/@babel/helper-plugin-utils": {
+-			"version": "7.27.1",
+-			"resolved": "https://registry.npmjs.org/@babel/helper-plugin-utils/-/helper-plugin-utils-7.27.1.tgz",
+-			"integrity": "sha512-1gn1Up5YXka3YYAHGKpbideQ5Yjf1tDa9qYcgysz+cNCXukyLl6DjPXhD3VRwSb8c0J9tA4b2+rHEZtc6R0tlw==",
+-			"dev": true,
+-			"license": "MIT",
+-			"engines": {
+-				"node": ">=6.9.0"
+-			}
+-		},
+ 		"packages/react-native-editor/node_modules/@babel/plugin-transform-arrow-functions": {
+ 			"version": "7.27.1",
+ 			"resolved": "https://registry.npmjs.org/@babel/plugin-transform-arrow-functions/-/plugin-transform-arrow-functions-7.27.1.tgz",
+diff --git a/packages/theme/bin/generate-default-ramps/index.ts b/packages/theme/bin/generate-default-ramps/index.ts
+index 2ecd1221fc853b..da8fa790d80a52 100644
+--- a/packages/theme/bin/generate-default-ramps/index.ts
++++ b/packages/theme/bin/generate-default-ramps/index.ts
+@@ -38,12 +38,10 @@ const content = `
+  * Internal dependencies
+  */
+ import type { RampResult } from './types';
+-import type { DEFAULT_SEED_COLORS } from './constants';
+ 
+-export const DEFAULT_RAMPS: Record<
+-	keyof typeof DEFAULT_SEED_COLORS,
+-	RampResult
+-> = ${ JSON.stringify( ramps ) };
++export const DEFAULT_RAMPS: Record< string, RampResult > = ${ JSON.stringify(
++	ramps
++) };
+ `;
+ 
+ await writeFile( outputPath, content );
+diff --git a/packages/theme/docs/tokens.md b/packages/theme/docs/tokens.md
+index 3424407d79bef8..136ed275dd69de 100644
+--- a/packages/theme/docs/tokens.md
++++ b/packages/theme/docs/tokens.md
+@@ -39,6 +39,13 @@ Do not edit directly.
+ | `--wpds-color-bg-surface-caution-weak`                | Background color for surfaces with caution tone and weak emphasis.                                                                          |
+ | `--wpds-color-bg-surface-error`                       | Background color for surfaces with error tone and normal emphasis.                                                                          |
+ | `--wpds-color-bg-surface-error-weak`                  | Background color for surfaces with error tone and weak emphasis.                                                                            |
++| `--wpds-color-bg-surface-accent1`                     | Background color for qualitative accent 1 (45° hue rotation from primary).                                                                  |
++| `--wpds-color-bg-surface-accent2`                     | Background color for qualitative accent 2 (90° hue rotation from primary).                                                                  |
++| `--wpds-color-bg-surface-accent3`                     | Background color for qualitative accent 3 (135° hue rotation from primary).                                                                 |
++| `--wpds-color-bg-surface-accent4`                     | Background color for qualitative accent 4 (180° hue rotation from primary).                                                                 |
++| `--wpds-color-bg-surface-accent5`                     | Background color for qualitative accent 5 (225° hue rotation from primary).                                                                 |
++| `--wpds-color-bg-surface-accent6`                     | Background color for qualitative accent 6 (270° hue rotation from primary).                                                                 |
++| `--wpds-color-bg-surface-accent7`                     | Background color for qualitative accent 7 (315° hue rotation from primary).                                                                 |
+ | `--wpds-color-bg-interactive-neutral-strong`          | Background color for interactive elements with neutral tone and strong emphasis.                                                            |
+ | `--wpds-color-bg-interactive-neutral-strong-active`   | Background color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active.                       |
+ | `--wpds-color-bg-interactive-neutral-strong-disabled` | Background color for interactive elements with neutral tone and strong emphasis, in their disabled state.                                   |
+@@ -74,6 +81,13 @@ Do not edit directly.
+ | `--wpds-color-fg-content-caution-weak`                | Foreground color for content like text with caution tone and weak emphasis.                                                                 |
+ | `--wpds-color-fg-content-error`                       | Foreground color for content like text with error tone and normal emphasis.                                                                 |
+ | `--wpds-color-fg-content-error-weak`                  | Foreground color for content like text with error tone and weak emphasis.                                                                   |
++| `--wpds-color-fg-content-accent1`                     | Foreground color for qualitative accent 1 (use on accent1 background).                                                                      |
++| `--wpds-color-fg-content-accent2`                     | Foreground color for qualitative accent 2 (use on accent2 background).                                                                      |
++| `--wpds-color-fg-content-accent3`                     | Foreground color for qualitative accent 3 (use on accent3 background).                                                                      |
++| `--wpds-color-fg-content-accent4`                     | Foreground color for qualitative accent 4 (use on accent4 background).                                                                      |
++| `--wpds-color-fg-content-accent5`                     | Foreground color for qualitative accent 5 (use on accent5 background).                                                                      |
++| `--wpds-color-fg-content-accent6`                     | Foreground color for qualitative accent 6 (use on accent6 background).                                                                      |
++| `--wpds-color-fg-content-accent7`                     | Foreground color for qualitative accent 7 (use on accent7 background).                                                                      |
+ | `--wpds-color-fg-interactive-neutral`                 | Foreground color for interactive elements with neutral tone and normal emphasis.                                                            |
+ | `--wpds-color-fg-interactive-neutral-active`          | Foreground color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active.                       |
+ | `--wpds-color-fg-interactive-neutral-disabled`        | Foreground color for interactive elements with normal emphasis, in their disabled state, regardless of the tone.                            |
+diff --git a/packages/theme/src/color-ramps/index.ts b/packages/theme/src/color-ramps/index.ts
+index 14e692f5534a47..cf1792e2938f9c 100644
+--- a/packages/theme/src/color-ramps/index.ts
++++ b/packages/theme/src/color-ramps/index.ts
+@@ -15,9 +15,15 @@ import type {
+ 	RampDirection,
+ 	Ramp,
+ } from './lib/types';
+-import { getContrast } from './lib/color-utils';
++import { getContrast, rotateHue } from './lib/color-utils';
+ import { CONTRAST_COMBINATIONS } from './lib/constants';
+-export { DEFAULT_SEED_COLORS } from './lib/constants';
++export {
++	DEFAULT_SEED_COLORS,
++	DEFAULT_ACCENT_SEEDS,
++	getQualitativeSeeds,
++	accentSeedsToRecord,
++} from './lib/constants';
++export { rotateHue };
+ 
+ /**
+  * Creates a background ramp.
+diff --git a/packages/theme/src/color-ramps/lib/color-utils.ts b/packages/theme/src/color-ramps/lib/color-utils.ts
+index cbfad0c45f6473..742a622919dee8 100644
+--- a/packages/theme/src/color-ramps/lib/color-utils.ts
++++ b/packages/theme/src/color-ramps/lib/color-utils.ts
+@@ -8,6 +8,9 @@ import {
+ 	contrastWCAG21,
+ 	sRGB,
+ 	OKLCH,
++	clone,
++	get,
++	set,
+ 	type ColorTypes,
+ } from 'colorjs.io/fn';
+ 
+@@ -44,3 +47,18 @@ export function clampToGamut( c: ColorTypes ) {
+ 	// map into sRGB using CSS OKLCH method
+ 	return to( toGamut( c, { space: sRGB, method: 'css' } ), OKLCH );
+ }
++
++/**
++ * Rotates a color's hue by the specified degrees in OKLCH color space.
++ * Preserves lightness and chroma, only modifying the hue angle.
++ * @param seed    The seed color string (hex, rgb, etc.)
++ * @param degrees The number of degrees to rotate the hue (positive = counterclockwise)
++ * @return The rotated color as a hex string
++ */
++export function rotateHue( seed: string, degrees: number ): string {
++	const color = clampToGamut( seed );
++	const currentHue = get( color, [ OKLCH, 'h' ] ) || 0;
++	const newHue = ( currentHue + degrees ) % 360;
++	const rotated = set( clone( color ), [ OKLCH, 'h' ], newHue );
++	return getColorString( toGamut( rotated, { space: sRGB, method: 'css' } ) );
++}
+diff --git a/packages/theme/src/color-ramps/lib/constants.ts b/packages/theme/src/color-ramps/lib/constants.ts
+index 35dff1f6ffe409..a24e0ca3b5aa71 100644
+--- a/packages/theme/src/color-ramps/lib/constants.ts
++++ b/packages/theme/src/color-ramps/lib/constants.ts
+@@ -8,6 +8,7 @@ import { to, OKLCH } from 'colorjs.io/fn';
+  */
+ import './register-color-spaces';
+ import type { Ramp } from './types';
++import { rotateHue } from './color-utils';
+ 
+ export const WHITE = to( 'white', OKLCH );
+ export const BLACK = to( 'black', OKLCH );
+@@ -40,6 +41,13 @@ export const CONTRAST_EPSILON = 4e-3;
+ 
+ export const MAX_BISECTION_ITERATIONS = 10;
+ 
++// Hue rotation step for generating qualitative accent colors (in degrees).
++// 60° produces 7 distinct colors when including the primary (0°).
++export const QUALITATIVE_HUE_STEP = 60;
++
++// Number of qualitative accent colors to generate (accent1 through accent6).
++export const QUALITATIVE_ACCENT_COUNT = 6;
++
+ export const CONTRAST_COMBINATIONS: {
+ 	bgs: ( keyof Ramp )[];
+ 	fgs: ( keyof Ramp )[];
+@@ -77,8 +85,41 @@ export const CONTRAST_COMBINATIONS: {
+ 	},
+ ];
+ 
+-// Used when generating the DTCG tokens and the static color ramps.
+-export const DEFAULT_SEED_COLORS = {
++/**
++ * Converts an array of accent seed color strings into a keyed record
++ * with accent1, accent2, etc. keys.
++ * @param seeds Array of hex color strings.
++ * @return Record with accent{N} keys.
++ */
++export function accentSeedsToRecord(
++	seeds: string[]
++): Record< string, string > {
++	const result: Record< string, string > = {};
++	seeds.forEach( ( seed, i ) => {
++		result[ `accent${ i + 1 }` ] = seed;
++	} );
++	return result;
++}
++
++/**
++ * Generates qualitative accent seed colors by rotating the primary hue.
++ * @param primarySeed The primary seed color to rotate from.
++ * @param count       Number of accents to generate (default: QUALITATIVE_ACCENT_COUNT).
++ * @return Record with accent1 through accent{count} keys.
++ */
++export function getQualitativeSeeds(
++	primarySeed: string,
++	count: number = QUALITATIVE_ACCENT_COUNT
++): Record< string, string > {
++	const seeds: string[] = [];
++	for ( let i = 1; i <= count; i++ ) {
++		seeds.push( rotateHue( primarySeed, QUALITATIVE_HUE_STEP * i ) );
++	}
++	return accentSeedsToRecord( seeds );
++}
++
++// Base seed colors (without derived qualitative accents).
++const BASE_SEED_COLORS = {
+ 	bg: '#f8f8f8',
+ 	primary: '#3858e9',
+ 	info: '#0090ff',
+@@ -87,3 +128,24 @@ export const DEFAULT_SEED_COLORS = {
+ 	warning: '#f0b849',
+ 	error: '#cc1818',
+ };
++
++// Default manually-specified accent seed colors.
++// When empty, accents are auto-generated via hue rotation from the primary.
++export const DEFAULT_ACCENT_SEEDS: string[] = [
++	'#ff0080',
++	'#ff00ea',
++	'#9500ff',
++	'#00d5ff',
++	'#4db3a2',
++	'#c3e619',
++	'#f4800b',
++];
++
++// Used when generating the DTCG tokens and the static color ramps.
++// Includes qualitative accent colors — manual if defined, otherwise hue-rotated.
++export const DEFAULT_SEED_COLORS = {
++	...BASE_SEED_COLORS,
++	...( DEFAULT_ACCENT_SEEDS.length > 0
++		? accentSeedsToRecord( DEFAULT_ACCENT_SEEDS )
++		: getQualitativeSeeds( BASE_SEED_COLORS.primary ) ),
++};
+diff --git a/packages/theme/src/color-ramps/lib/default-ramps.ts b/packages/theme/src/color-ramps/lib/default-ramps.ts
+index b7738a4d728158..465cee8e67fd77 100644
+--- a/packages/theme/src/color-ramps/lib/default-ramps.ts
++++ b/packages/theme/src/color-ramps/lib/default-ramps.ts
+@@ -2,12 +2,8 @@
+  * Internal dependencies
+  */
+ import type { RampResult } from './types';
+-import type { DEFAULT_SEED_COLORS } from './constants';
+ 
+-export const DEFAULT_RAMPS: Record<
+-	keyof typeof DEFAULT_SEED_COLORS,
+-	RampResult
+-> = {
++export const DEFAULT_RAMPS: Record< string, RampResult > = {
+ 	bg: {
+ 		ramp: {
+ 			surface2: '#f8f8f8',
+@@ -197,4 +193,194 @@ export const DEFAULT_RAMPS: Record<
+ 		},
+ 		direction: 'darker',
+ 	},
++	accent1: {
++		ramp: {
++			bgFill1: '#e8006f',
++			fgFill: '#fff',
++			bgFill2: '#cf005e',
++			surface2: '#fff5f7',
++			surface6: '#f6c5d0',
++			surface5: '#f9dae0',
++			surface4: '#f7e4e8',
++			surface3: '#fff',
++			fgSurface4: '#430018',
++			fgSurface3: '#d60061',
++			fgSurface2: '#ff3282',
++			fgSurface1: '#ff82a8',
++			stroke3: '#d60061',
++			stroke4: '#a30048',
++			stroke2: '#dea0ae',
++			stroke1: '#e0a9b5',
++			bgFillDark: '#231c1d',
++			fgFillDark: '#f3eff0',
++			bgFillInverted2: '#231c1d',
++			bgFillInverted1: '#600026',
++			fgFillInverted: '#f3eff0',
++			surface1: '#fdeaee',
++		},
++		warnings: [ 'fgFill' ],
++		direction: 'darker',
++	},
++	accent2: {
++		ramp: {
++			bgFill1: '#ff00ea',
++			fgFill: '#221c21',
++			bgFill2: '#e500d2',
++			surface2: '#fff4fe',
++			surface6: '#f9c0ee',
++			surface5: '#fcd6f5',
++			surface4: '#fee0f7',
++			surface3: '#fff',
++			fgSurface4: '#3c0036',
++			fgSurface3: '#c400b4',
++			fgSurface2: '#f600e2',
++			fgSurface1: '#ff72f6',
++			stroke3: '#c400b4',
++			stroke4: '#950088',
++			stroke2: '#e199d4',
++			stroke1: '#e2a4d7',
++			bgFillDark: '#221c21',
++			fgFillDark: '#f4eef3',
++			bgFillInverted2: '#221c21',
++			bgFillInverted1: '#580050',
++			fgFillInverted: '#f4eef3',
++			surface1: '#ffe7ff',
++		},
++		direction: 'darker',
++	},
++	accent3: {
++		ramp: {
++			bgFill1: '#9500ff',
++			fgFill: '#f0f0f2',
++			bgFill2: '#8100e3',
++			surface2: '#f9f7ff',
++			surface6: '#d9ccf3',
++			surface5: '#e6def7',
++			surface4: '#ece7f6',
++			surface3: '#fff',
++			fgSurface4: '#2c0056',
++			fgSurface3: '#9500ff',
++			fgSurface2: '#af63ff',
++			fgSurface1: '#c494ff',
++			stroke3: '#9500ff',
++			stroke4: '#6e00c3',
++			stroke2: '#b4a1d6',
++			stroke1: '#bba8dd',
++			bgFillDark: '#1f1c25',
++			fgFillDark: '#f0f0f2',
++			bgFillInverted2: '#1f1c25',
++			bgFillInverted1: '#43007c',
++			fgFillInverted: '#f0f0f2',
++			surface1: '#f2edfc',
++		},
++		direction: 'darker',
++	},
++	accent4: {
++		ramp: {
++			bgFill1: '#00d5ff',
++			fgFill: '#1b1f20',
++			bgFill2: '#00c1ea',
++			surface2: '#e5fdff',
++			surface6: '#92def5',
++			surface5: '#b7ebfb',
++			surface4: '#c7f1fe',
++			surface3: '#fff',
++			fgSurface4: '#002432',
++			fgSurface3: '#007795',
++			fgSurface2: '#0096ba',
++			fgSurface1: '#00bae3',
++			stroke3: '#007795',
++			stroke4: '#005972',
++			stroke2: '#7ebbcd',
++			stroke1: '#83c2d6',
++			bgFillDark: '#1b1f20',
++			fgFillDark: '#e6f3f7',
++			bgFillInverted2: '#1b1f20',
++			bgFillInverted1: '#003243',
++			fgFillInverted: '#e6f3f7',
++			surface1: '#cef8ff',
++		},
++		direction: 'darker',
++	},
++	accent5: {
++		ramp: {
++			bgFill1: '#4db3a2',
++			fgFill: '#1c1f1e',
++			bgFill2: '#3aa392',
++			surface2: '#e4fff9',
++			surface6: '#8ce3d3',
++			surface5: '#9bf3e3',
++			surface4: '#b6f7ea',
++			surface3: '#fff',
++			fgSurface4: '#002720',
++			fgSurface3: '#007c6d',
++			fgSurface2: '#309a8a',
++			fgSurface1: '#57bcab',
++			stroke3: '#007c6d',
++			stroke4: '#005e50',
++			stroke2: '#87bdb2',
++			stroke1: '#8dc4b9',
++			bgFillDark: '#1c1f1e',
++			fgFillDark: '#e8f3f0',
++			bgFillInverted2: '#1c1f1e',
++			bgFillInverted1: '#00352c',
++			fgFillInverted: '#e8f3f0',
++			surface1: '#bcfef0',
++		},
++		direction: 'darker',
++	},
++	accent6: {
++		ramp: {
++			bgFill1: '#c3e619',
++			fgFill: '#1e1f1b',
++			bgFill2: '#b0d200',
++			surface2: '#f0ffc3',
++			surface6: '#c4dd77',
++			surface5: '#d3ed81',
++			surface4: '#daf585',
++			surface3: '#fff',
++			fgSurface4: '#1a2200',
++			fgSurface3: '#607500',
++			fgSurface2: '#7a9400',
++			fgSurface1: '#98b700',
++			stroke3: '#607500',
++			stroke4: '#475800',
++			stroke2: '#a8b87a',
++			stroke1: '#afc07f',
++			bgFillDark: '#1e1f1b',
++			fgFillDark: '#e8fab5',
++			bgFillInverted2: '#1e1f1b',
++			bgFillInverted1: '#273200',
++			fgFillInverted: '#e8fab5',
++			surface1: '#e0fb8b',
++		},
++		direction: 'darker',
++	},
++	accent7: {
++		ramp: {
++			bgFill1: '#f4800b',
++			fgFill: '#211d1a',
++			bgFill2: '#e26f00',
++			surface2: '#fff6ee',
++			surface6: '#f4c9ac',
++			surface5: '#f9dbc8',
++			surface4: '#fce4d5',
++			surface3: '#fff',
++			fgSurface4: '#390f00',
++			fgSurface3: '#b24f00',
++			fgSurface2: '#da6900',
++			fgSurface1: '#ff8b24',
++			stroke3: '#b24f00',
++			stroke4: '#883900',
++			stroke2: '#dca580',
++			stroke1: '#dfad8c',
++			bgFillDark: '#211d1a',
++			fgFillDark: '#f4efec',
++			bgFillInverted2: '#211d1a',
++			bgFillInverted1: '#531c00',
++			fgFillInverted: '#f4efec',
++			surface1: '#ffebdb',
++		},
++		direction: 'darker',
++	},
+ };
+diff --git a/packages/theme/src/color-ramps/stories/index.story.tsx b/packages/theme/src/color-ramps/stories/index.story.tsx
+index efcf7c7f5ca512..e25f02aaf2edf4 100644
+--- a/packages/theme/src/color-ramps/stories/index.story.tsx
++++ b/packages/theme/src/color-ramps/stories/index.story.tsx
+@@ -8,11 +8,17 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
+  */
+ import { RampTable } from './ramp-table';
+ import { buildBgRamp, buildAccentRamp, checkAccessibleCombinations } from '..';
+-import { DEFAULT_SEED_COLORS } from '../lib/constants';
++import {
++	DEFAULT_SEED_COLORS,
++	DEFAULT_ACCENT_SEEDS,
++	getQualitativeSeeds,
++	accentSeedsToRecord,
++} from '../lib/constants';
+ 
+ const ColorGen = ( props: {
+ 	background: string;
+ 	primary: string;
++	accents: string;
+ 	children: React.ReactNode;
+ } ) => {
+ 	return <div>{ props.children }</div>;
+@@ -31,6 +37,11 @@ const meta: Meta< typeof ColorGen > = {
+ 				presetColors: [ '#3858e9', '#069e08', '#873eff' ],
+ 			},
+ 		},
++		accents: {
++			control: { type: 'text' },
++			description:
++				'Comma-separated hex colors (e.g. "#ff0000, #00ff00, #0000ff"). Leave empty for auto-generated accents.',
++		},
+ 	},
+ 	parameters: {
+ 		controls: { expanded: true },
+@@ -40,6 +51,20 @@ const meta: Meta< typeof ColorGen > = {
+ };
+ export default meta;
+ 
++/**
++ * Parse comma-separated hex colors from the Storybook text control.
++ * Returns an empty array if the input is empty or undefined.
++ */
++function parseAccentsInput( input?: string ): string[] {
++	if ( ! input || input.trim() === '' ) {
++		return [];
++	}
++	return input
++		.split( ',' )
++		.map( ( s ) => s.trim() )
++		.filter( ( s ) => s.length > 0 );
++}
++
+ export const Default: StoryObj< typeof ColorGen > = {
+ 	render: ( args ) => {
+ 		const bgSeed = args.background ?? DEFAULT_SEED_COLORS.bg;
+@@ -97,6 +122,31 @@ export const Default: StoryObj< typeof ColorGen > = {
+ 			ramp: buildAccentRamp( DEFAULT_SEED_COLORS.error, bgRamp ).ramp,
+ 		};
+ 
++		// Use manual accents if provided, then default seeds, then auto-generate.
++		const manualAccents = parseAccentsInput( args.accents );
++		let qualitativeSeeds;
++		if ( manualAccents.length > 0 ) {
++			qualitativeSeeds = accentSeedsToRecord( manualAccents );
++		} else if ( DEFAULT_ACCENT_SEEDS.length > 0 ) {
++			qualitativeSeeds = accentSeedsToRecord( DEFAULT_ACCENT_SEEDS );
++		} else {
++			qualitativeSeeds = getQualitativeSeeds( primarySeed );
++		}
++
++		const isManual =
++			manualAccents.length > 0 || DEFAULT_ACCENT_SEEDS.length > 0;
++
++		const accentRampObjs = Object.entries( qualitativeSeeds ).map(
++			( [ name, seed ] ) => ( {
++				seed: {
++					name: 'bgFill1' as const,
++					value: seed,
++				},
++				ramp: buildAccentRamp( seed, bgRamp ).ramp,
++				label: name,
++			} )
++		);
++
+ 		const unmetTargets = checkAccessibleCombinations( {
+ 			bgRamp,
+ 		} );
+@@ -109,17 +159,44 @@ export const Default: StoryObj< typeof ColorGen > = {
+ 					gap: '32px',
+ 				} }
+ 			>
+-				<RampTable
+-					ramps={ [
+-						bgRampObj,
+-						primaryRampObj,
+-						infoRampObj,
+-						successRampObj,
+-						warningRampObj,
+-						cautionRampObj,
+-						errorRampObj,
+-					] }
+-				/>
++				<div>
++					<h3 style={ { marginBottom: 8 } }>Semantic Color Ramps</h3>
++					<RampTable
++						ramps={ [
++							bgRampObj,
++							primaryRampObj,
++							infoRampObj,
++							successRampObj,
++							warningRampObj,
++							cautionRampObj,
++							errorRampObj,
++						] }
++					/>
++				</div>
++
++				<div>
++					<h3 style={ { marginBottom: 8 } }>
++						Qualitative Accent Ramps
++					</h3>
++					<p
++						style={ {
++							fontSize: 12,
++							color: '#666',
++							marginBottom: 12,
++						} }
++					>
++						{ isManual
++							? `${
++									Object.keys( qualitativeSeeds ).length
++							  } manually defined accent colors.`
++							: `Primary (0\u00B0) + ${
++									Object.keys( qualitativeSeeds ).length
++							  } hue-rotated accents (60\u00B0 increments).` }
++					</p>
++					<RampTable
++						ramps={ [ primaryRampObj, ...accentRampObjs ] }
++					/>
++				</div>
+ 
+ 				{ unmetTargets.length === 0 ? (
+ 					<p>All accessibility targets met</p>
+@@ -166,7 +243,9 @@ export const Default: StoryObj< typeof ColorGen > = {
+ 			</div>
+ 		);
+ 	},
+-	args: {},
++	args: {
++		background: '#ffffff',
++	},
+ };
+ 
+ export const SampleCombinations: StoryObj< typeof ColorGen > = {
+@@ -262,3 +341,230 @@ export const SampleCombinations: StoryObj< typeof ColorGen > = {
+ 		},
+ 	},
+ };
++
++export const QualitativePalette: StoryObj< typeof ColorGen > = {
++	render: ( args ) => {
++		const primarySeed = args.primary ?? DEFAULT_SEED_COLORS.primary;
++		const bgSeed = args.background ?? DEFAULT_SEED_COLORS.bg;
++		const bgRamp = buildBgRamp( bgSeed );
++
++		// Use manual accents if provided, then default seeds, then auto-generate.
++		const manualAccents = parseAccentsInput( args.accents );
++		const isManual =
++			manualAccents.length > 0 || DEFAULT_ACCENT_SEEDS.length > 0;
++		let qualitativeSeeds;
++		if ( manualAccents.length > 0 ) {
++			qualitativeSeeds = accentSeedsToRecord( manualAccents );
++		} else if ( DEFAULT_ACCENT_SEEDS.length > 0 ) {
++			qualitativeSeeds = accentSeedsToRecord( DEFAULT_ACCENT_SEEDS );
++		} else {
++			qualitativeSeeds = getQualitativeSeeds( primarySeed );
++		}
++
++		const accentCount = Object.keys( qualitativeSeeds ).length;
++
++		// Build primary + accent entries for display
++		const allSeeds = [
++			{ name: 'primary', seed: primarySeed, source: '0\u00B0' },
++			...Object.entries( qualitativeSeeds ).map(
++				( [ name, seed ], i ) => ( {
++					name,
++					seed,
++					source: isManual ? 'manual' : `${ ( i + 1 ) * 60 }\u00B0`,
++				} )
++			),
++		];
++
++		const ramps = allSeeds.map( ( { name, seed, source } ) => {
++			const accentRamp = buildAccentRamp( seed, bgRamp );
++			return { name, seed, source, ramp: accentRamp.ramp };
++		} );
++
++		return (
++			<div
++				style={ {
++					display: 'flex',
++					flexDirection: 'column',
++					gap: 32,
++					fontFamily: '-apple-system, "system-ui", sans-serif',
++				} }
++			>
++				<div>
++					<h3>Qualitative Color Palette</h3>
++					<p style={ { fontSize: 14, color: '#666', maxWidth: 600 } }>
++						{ isManual
++							? `${ accentCount } manually defined accent colors.`
++							: `${
++									accentCount + 1
++							  } visually distinct colors: primary (0\u00B0) + ${ accentCount } accents via 60\u00B0 hue rotation.` }{ ' ' }
++						Use the accents control to provide comma-separated hex
++						colors, or leave empty for auto-generation.
++					</p>
++				</div>
++
++				<div>
++					<h4 style={ { marginBottom: 12 } }>Avatar Example</h4>
++					<div
++						style={ {
++							display: 'flex',
++							gap: 8,
++							flexWrap: 'wrap',
++						} }
++					>
++						{ ramps.map( ( { name, ramp }, i ) => (
++							<div
++								key={ name }
++								style={ {
++									width: 48,
++									height: 48,
++									borderRadius: '50%',
++									backgroundColor: ramp.bgFill1,
++									color: ramp.fgFill,
++									display: 'flex',
++									alignItems: 'center',
++									justifyContent: 'center',
++									fontWeight: 600,
++									fontSize: 16,
++								} }
++								title={ name }
++							>
++								{ String.fromCharCode( 65 + i ) }
++								{ String.fromCharCode(
++									65 + ( ( i + 1 ) % 26 )
++								) }
++							</div>
++						) ) }
++					</div>
++				</div>
++
++				<div>
++					<h4 style={ { marginBottom: 12 } }>Color Swatches</h4>
++					<div
++						style={ {
++							display: 'grid',
++							gridTemplateColumns: `repeat(${ ramps.length }, 1fr)`,
++							gap: 8,
++						} }
++					>
++						{ ramps.map( ( { name, seed, source, ramp } ) => (
++							<div
++								key={ name }
++								style={ {
++									display: 'flex',
++									flexDirection: 'column',
++									alignItems: 'center',
++									gap: 4,
++								} }
++							>
++								<div
++									style={ {
++										width: '100%',
++										height: 60,
++										backgroundColor: ramp.bgFill1,
++										borderRadius: 8,
++										display: 'flex',
++										alignItems: 'center',
++										justifyContent: 'center',
++										color: ramp.fgFill,
++										fontWeight: 500,
++									} }
++								>
++									Aa
++								</div>
++								<span
++									style={ { fontSize: 11, fontWeight: 500 } }
++								>
++									{ name }
++								</span>
++								<span style={ { fontSize: 10, color: '#888' } }>
++									{ source }
++								</span>
++								<span style={ { fontSize: 10, color: '#888' } }>
++									{ seed }
++								</span>
++							</div>
++						) ) }
++					</div>
++				</div>
++
++				<div>
++					<h4 style={ { marginBottom: 12 } }>
++						Full Ramps (bgFill1 + fgFill pairs)
++					</h4>
++					<div
++						style={ {
++							display: 'grid',
++							gridTemplateColumns: 'repeat(4, 1fr)',
++							gap: 16,
++						} }
++					>
++						{ ramps.map( ( { name, ramp } ) => (
++							<div
++								key={ name }
++								style={ {
++									display: 'flex',
++									flexDirection: 'column',
++									gap: 2,
++								} }
++							>
++								<span
++									style={ {
++										fontSize: 11,
++										fontWeight: 500,
++										marginBottom: 4,
++									} }
++								>
++									{ name }
++								</span>
++								<div
++									style={ {
++										height: 32,
++										backgroundColor: ramp.bgFill1,
++										borderRadius: '4px 4px 0 0',
++										display: 'flex',
++										alignItems: 'center',
++										justifyContent: 'center',
++										color: ramp.fgFill,
++										fontSize: 12,
++									} }
++								>
++									bgFill1 + fgFill
++								</div>
++								<div
++									style={ {
++										height: 24,
++										backgroundColor: ramp.surface4,
++										display: 'flex',
++										alignItems: 'center',
++										justifyContent: 'center',
++										color: ramp.fgSurface4,
++										fontSize: 10,
++									} }
++								>
++									surface4
++								</div>
++								<div
++									style={ {
++										height: 24,
++										backgroundColor: ramp.surface2,
++										borderRadius: '0 0 4px 4px',
++										display: 'flex',
++										alignItems: 'center',
++										justifyContent: 'center',
++										color: ramp.fgSurface3,
++										fontSize: 10,
++									} }
++								>
++									surface2
++								</div>
++							</div>
++						) ) }
++					</div>
++				</div>
++			</div>
++		);
++	},
++	args: {
++		accents: '#9f32cd, #ff008c, #ff6300, #e1ff00, #13d3ec, #00ffe1',
++	},
++};
+diff --git a/packages/theme/src/color-ramps/test/__snapshots__/index.test.ts.snap b/packages/theme/src/color-ramps/test/__snapshots__/index.test.ts.snap
+index e83800e0487245..07eba0f3291b57 100644
+--- a/packages/theme/src/color-ramps/test/__snapshots__/index.test.ts.snap
++++ b/packages/theme/src/color-ramps/test/__snapshots__/index.test.ts.snap
+@@ -2690,6 +2690,2293 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+       },
+     },
+   ],
++  [
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "lighter",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0,
++          },
++        },
++        "seedComputed": "#a2a",
++        "seedOriginal": "#a2a",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "lighter",
++        "ramp": {
++          "bgFill1": "#a2a",
++          "bgFill2": "#ba35b9",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#ffc9ff",
++          "bgFillInverted2": "#f2eff2",
++          "fgFill": "#f2eff2",
++          "fgFillDark": "#f2eff2",
++          "fgFillInverted": "#211c21",
++          "fgSurface1": "#7e007f",
++          "fgSurface2": "#a419a4",
++          "fgSurface3": "#fc77fa",
++          "fgSurface4": "#ffe1ff",
++          "stroke1": "#865084",
++          "stroke2": "#954e94",
++          "stroke3": "#fc77fa",
++          "stroke4": "#ffbdff",
++          "surface1": "#000",
++          "surface2": "#000",
++          "surface3": "#180718",
++          "surface4": "#240a23",
++          "surface5": "#2d0f2c",
++          "surface6": "#3f193e",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "lighter",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.1,
++          },
++        },
++        "seedComputed": "#a2a",
++        "seedOriginal": "#a2a",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "lighter",
++        "ramp": {
++          "bgFill1": "#a2a",
++          "bgFill2": "#ba35b9",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#ffc9ff",
++          "bgFillInverted2": "#f2eff2",
++          "fgFill": "#f2eff2",
++          "fgFillDark": "#f2eff2",
++          "fgFillInverted": "#211c21",
++          "fgSurface1": "#7f0081",
++          "fgSurface2": "#a51ba6",
++          "fgSurface3": "#fc77fa",
++          "fgSurface4": "#ffe1ff",
++          "stroke1": "#865084",
++          "stroke2": "#954e94",
++          "stroke3": "#fc77fa",
++          "stroke4": "#ffbdff",
++          "surface1": "#000",
++          "surface2": "#070206",
++          "surface3": "#1e051e",
++          "surface4": "#260c25",
++          "surface5": "#2f112e",
++          "surface6": "#401b3f",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "lighter",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.2,
++          },
++        },
++        "seedComputed": "#a2a",
++        "seedOriginal": "#a2a",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "lighter",
++        "ramp": {
++          "bgFill1": "#a2a",
++          "bgFill2": "#ba35b9",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#ffc9ff",
++          "bgFillInverted2": "#f2eff2",
++          "fgFill": "#f2eff2",
++          "fgFillDark": "#f2eff2",
++          "fgFillInverted": "#211c21",
++          "fgSurface1": "#8b008c",
++          "fgSurface2": "#ae28ae",
++          "fgSurface3": "#fc77fa",
++          "fgSurface4": "#ffe1ff",
++          "stroke1": "#865084",
++          "stroke2": "#954e94",
++          "stroke3": "#fc77fa",
++          "stroke4": "#ffbdff",
++          "surface1": "#140414",
++          "surface2": "#240a23",
++          "surface3": "#2e102e",
++          "surface4": "#341533",
++          "surface5": "#3d183c",
++          "surface6": "#4d1f4c",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "lighter",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.3,
++          },
++        },
++        "seedComputed": "#a2a",
++        "seedOriginal": "#a2a",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "lighter",
++        "ramp": {
++          "bgFill1": "#a2a",
++          "bgFill2": "#ba35b9",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#ffc9ff",
++          "bgFillInverted2": "#f2eff2",
++          "fgFill": "#f2eff2",
++          "fgFillDark": "#f2eff2",
++          "fgFillInverted": "#211c21",
++          "fgSurface1": "#a419a4",
++          "fgSurface2": "#c340c2",
++          "fgSurface3": "#fc77fa",
++          "fgSurface4": "#ffe1ff",
++          "stroke1": "#865084",
++          "stroke2": "#954e94",
++          "stroke3": "#fc77fa",
++          "stroke4": "#ffbdff",
++          "surface1": "#381a38",
++          "surface2": "#421d42",
++          "surface3": "#482347",
++          "surface4": "#502350",
++          "surface5": "#552754",
++          "surface6": "#642e63",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "lighter",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.4,
++          },
++        },
++        "seedComputed": "#a2a",
++        "seedOriginal": "#a2a",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "lighter",
++        "ramp": {
++          "bgFill1": "#a2a",
++          "bgFill2": "#ba35b9",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#ffc9ff",
++          "bgFillInverted2": "#f2eff2",
++          "fgFill": "#f2eff2",
++          "fgFillDark": "#f2eff2",
++          "fgFillInverted": "#211c21",
++          "fgSurface1": "#c13dc0",
++          "fgSurface2": "#e360e2",
++          "fgSurface3": "#ff8eff",
++          "fgSurface4": "#ffe1ff",
++          "stroke1": "#955693",
++          "stroke2": "#9a5c98",
++          "stroke3": "#ff8eff",
++          "stroke4": "#ffd3ff",
++          "surface1": "#602b5f",
++          "surface2": "#653064",
++          "surface3": "#6a3569",
++          "surface4": "#723571",
++          "surface5": "#773975",
++          "surface6": "#863f85",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "darker",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.7,
++          },
++        },
++        "seedComputed": "#fff9ff",
++        "seedOriginal": "#a2a",
++        "seedUnchanged": false,
++      },
++      "output": {
++        "direction": "darker",
++        "ramp": {
++          "bgFill1": "#fff9ff",
++          "bgFill2": "#e9e3e9",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#1e1a1e",
++          "bgFillInverted2": "#000",
++          "fgFill": "#201d20",
++          "fgFillDark": "#f7ecf7",
++          "fgFillInverted": "#f7ecf7",
++          "fgSurface1": "#656065",
++          "fgSurface2": "#4b464b",
++          "fgSurface3": "#302c30",
++          "fgSurface4": "#000",
++          "stroke1": "#855f86",
++          "stroke2": "#7d5b7e",
++          "stroke3": "#302c30",
++          "stroke4": "#000",
++          "surface1": "#be7dc1",
++          "surface2": "#c583c7",
++          "surface3": "#cc89ce",
++          "surface4": "#b87abb",
++          "surface5": "#b375b5",
++          "surface6": "#a36ca5",
++        },
++        "warnings": [
++          "fgSurface4",
++          "stroke4",
++          "bgFillInverted2",
++        ],
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "darker",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.8,
++          },
++        },
++        "seedComputed": "#a2a",
++        "seedOriginal": "#a2a",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "darker",
++        "ramp": {
++          "bgFill1": "#a2a",
++          "bgFill2": "#9b049b",
++          "bgFillDark": "#211c21",
++          "bgFillInverted1": "#560057",
++          "bgFillInverted2": "#211c21",
++          "fgFill": "#f2eff2",
++          "fgFillDark": "#f2eff2",
++          "fgFillInverted": "#f2eff2",
++          "fgSurface1": "#c440c3",
++          "fgSurface2": "#a419a4",
++          "fgSurface3": "#7d007e",
++          "fgSurface4": "#3b003b",
++          "stroke1": "#b56bb3",
++          "stroke2": "#ab68a8",
++          "stroke3": "#7d007e",
++          "stroke4": "#4e004f",
++          "surface1": "#e597e2",
++          "surface2": "#ec9ee9",
++          "surface3": "#f4a5f0",
++          "surface4": "#f186ee",
++          "surface5": "#ea80e7",
++          "surface6": "#dd71db",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "darker",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.9,
++          },
++        },
++        "seedComputed": "#a2a",
++        "seedOriginal": "#a2a",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "darker",
++        "ramp": {
++          "bgFill1": "#a2a",
++          "bgFill2": "#9b049b",
++          "bgFillDark": "#211c21",
++          "bgFillInverted1": "#560057",
++          "bgFillInverted2": "#211c21",
++          "fgFill": "#f2eff2",
++          "fgFillDark": "#f2eff2",
++          "fgFillInverted": "#f2eff2",
++          "fgSurface1": "#e360e1",
++          "fgSurface2": "#c13dc0",
++          "fgSurface3": "#a114a1",
++          "fgSurface4": "#3b003b",
++          "stroke1": "#d587d2",
++          "stroke2": "#cf7fcc",
++          "stroke3": "#a114a1",
++          "stroke4": "#770078",
++          "surface1": "#ecc9ea",
++          "surface2": "#f4d1f2",
++          "surface3": "#fcd9fa",
++          "surface4": "#f6bbf3",
++          "surface5": "#efb5ec",
++          "surface6": "#ed9fea",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "darker",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 1,
++          },
++        },
++        "seedComputed": "#a2a",
++        "seedOriginal": "#a2a",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "darker",
++        "ramp": {
++          "bgFill1": "#a2a",
++          "bgFill2": "#9b049b",
++          "bgFillDark": "#211c21",
++          "bgFillInverted1": "#560057",
++          "bgFillInverted2": "#211c21",
++          "fgFill": "#f2eff2",
++          "fgFillDark": "#f2eff2",
++          "fgFillInverted": "#f2eff2",
++          "fgSurface1": "#ff7dff",
++          "fgSurface2": "#dc58da",
++          "fgSurface3": "#a2a",
++          "fgSurface4": "#3b003b",
++          "stroke1": "#e090dd",
++          "stroke2": "#d88ad5",
++          "stroke3": "#a2a",
++          "stroke4": "#840085",
++          "surface1": "#fdf4fd",
++          "surface2": "#fff",
++          "surface3": "#fff",
++          "surface4": "#fdebfb",
++          "surface5": "#f5e3f4",
++          "surface6": "#f1ceee",
++        },
++        "warnings": undefined,
++      },
++    },
++  ],
++  [
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "lighter",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0,
++          },
++        },
++        "seedComputed": "#cd0007",
++        "seedOriginal": "#cd0007",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "lighter",
++        "ramp": {
++          "bgFill1": "#cd0007",
++          "bgFill2": "#de251f",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#ffd0c7",
++          "bgFillInverted2": "#f2efef",
++          "fgFill": "#f2efef",
++          "fgFillDark": "#f2efef",
++          "fgFillInverted": "#231c1b",
++          "fgSurface1": "#900000",
++          "fgSurface2": "#c10000",
++          "fgSurface3": "#ff8878",
++          "fgSurface4": "#ffe6df",
++          "stroke1": "#974d43",
++          "stroke2": "#ac483d",
++          "stroke3": "#ff8878",
++          "stroke4": "#ffc3b8",
++          "surface1": "#000",
++          "surface2": "#000",
++          "surface3": "#1d0604",
++          "surface4": "#290a07",
++          "surface5": "#340e0a",
++          "surface6": "#4c1510",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "lighter",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.1,
++          },
++        },
++        "seedComputed": "#cd0007",
++        "seedOriginal": "#cd0007",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "lighter",
++        "ramp": {
++          "bgFill1": "#cd0007",
++          "bgFill2": "#de251f",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#ffd0c7",
++          "bgFillInverted2": "#f2efef",
++          "fgFill": "#f2efef",
++          "fgFillDark": "#f2efef",
++          "fgFillInverted": "#231c1b",
++          "fgSurface1": "#920000",
++          "fgSurface2": "#c30000",
++          "fgSurface3": "#ff8878",
++          "fgSurface4": "#ffe6df",
++          "stroke1": "#974d43",
++          "stroke2": "#ac483d",
++          "stroke3": "#ff8878",
++          "stroke4": "#ffc3b8",
++          "surface1": "#000",
++          "surface2": "#0b0100",
++          "surface3": "#230504",
++          "surface4": "#2b0c09",
++          "surface5": "#37100c",
++          "surface6": "#4e1611",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "lighter",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.2,
++          },
++        },
++        "seedComputed": "#cd0007",
++        "seedOriginal": "#cd0007",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "lighter",
++        "ramp": {
++          "bgFill1": "#cd0007",
++          "bgFill2": "#de251f",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#ffd0c7",
++          "bgFillInverted2": "#f2efef",
++          "fgFill": "#f2efef",
++          "fgFillDark": "#f2efef",
++          "fgFillInverted": "#231c1b",
++          "fgSurface1": "#a00000",
++          "fgSurface2": "#d00a0d",
++          "fgSurface3": "#ff8878",
++          "fgSurface4": "#ffe6df",
++          "stroke1": "#974d43",
++          "stroke2": "#ac483d",
++          "stroke3": "#ff8878",
++          "stroke4": "#ffc3b8",
++          "surface1": "#190403",
++          "surface2": "#2a0b07",
++          "surface3": "#36100c",
++          "surface4": "#3c1511",
++          "surface5": "#4b130f",
++          "surface6": "#5b1d17",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "lighter",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.3,
++          },
++        },
++        "seedComputed": "#cd0007",
++        "seedOriginal": "#cd0007",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "lighter",
++        "ramp": {
++          "bgFill1": "#cd0007",
++          "bgFill2": "#de251f",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#ffd0c7",
++          "bgFillInverted2": "#f2efef",
++          "fgFill": "#f2efef",
++          "fgFillDark": "#f2efef",
++          "fgFillInverted": "#231c1b",
++          "fgSurface1": "#c00000",
++          "fgSurface2": "#e73027",
++          "fgSurface3": "#ff8878",
++          "fgSurface4": "#ffe6df",
++          "stroke1": "#974d43",
++          "stroke2": "#ac483d",
++          "stroke3": "#ff8878",
++          "stroke4": "#ffc3b8",
++          "surface1": "#411915",
++          "surface2": "#501913",
++          "surface3": "#571f19",
++          "surface4": "#5e2019",
++          "surface5": "#64241e",
++          "surface6": "#752a23",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "lighter",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.4,
++          },
++        },
++        "seedComputed": "#cd0007",
++        "seedOriginal": "#cd0007",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "lighter",
++        "ramp": {
++          "bgFill1": "#cd0007",
++          "bgFill2": "#de251f",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#ffd0c7",
++          "bgFillInverted2": "#f2efef",
++          "fgFill": "#f2efef",
++          "fgFillDark": "#f2efef",
++          "fgFillInverted": "#231c1b",
++          "fgSurface1": "#e42d25",
++          "fgSurface2": "#ff6151",
++          "fgSurface3": "#ff9e90",
++          "fgSurface4": "#ffe6df",
++          "stroke1": "#a6554b",
++          "stroke2": "#ac5b50",
++          "stroke3": "#ff9e90",
++          "stroke4": "#ffd9d0",
++          "surface1": "#712720",
++          "surface2": "#772c24",
++          "surface3": "#7c3129",
++          "surface4": "#843229",
++          "surface5": "#89362e",
++          "surface6": "#9d3a30",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "darker",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.7,
++          },
++        },
++        "seedComputed": "#fff2ee",
++        "seedOriginal": "#cd0007",
++        "seedUnchanged": false,
++      },
++      "output": {
++        "direction": "darker",
++        "ramp": {
++          "bgFill1": "#fff2ee",
++          "bgFill2": "#e9dcd8",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#221916",
++          "bgFillInverted2": "#000",
++          "fgFill": "#221d1b",
++          "fgFillDark": "#f7eeeb",
++          "fgFillInverted": "#f7eeeb",
++          "fgSurface1": "#6b605d",
++          "fgSurface2": "#514743",
++          "fgSurface3": "#362c29",
++          "fgSurface4": "#000",
++          "stroke1": "#95604d",
++          "stroke2": "#8e5b49",
++          "stroke3": "#362c29",
++          "stroke4": "#060201",
++          "surface1": "#d18165",
++          "surface2": "#d7876b",
++          "surface3": "#de8d71",
++          "surface4": "#ce7b5f",
++          "surface5": "#c8765a",
++          "surface6": "#b96c51",
++        },
++        "warnings": [
++          "fgSurface4",
++          "bgFillInverted2",
++        ],
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "darker",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.8,
++          },
++        },
++        "seedComputed": "#cd0007",
++        "seedOriginal": "#cd0007",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "darker",
++        "ramp": {
++          "bgFill1": "#cd0007",
++          "bgFill2": "#b40000",
++          "bgFillDark": "#231c1b",
++          "bgFillInverted1": "#640000",
++          "bgFillInverted2": "#231c1b",
++          "fgFill": "#f2efef",
++          "fgFillDark": "#f2efef",
++          "fgFillInverted": "#f2efef",
++          "fgSurface1": "#ea342a",
++          "fgSurface2": "#c40000",
++          "fgSurface3": "#930000",
++          "fgSurface4": "#470000",
++          "stroke1": "#c96d61",
++          "stroke2": "#bf695e",
++          "stroke3": "#930000",
++          "stroke4": "#5e0000",
++          "surface1": "#e1a69d",
++          "surface2": "#e9ada3",
++          "surface3": "#f1b4ab",
++          "surface4": "#f2978a",
++          "surface5": "#eb9185",
++          "surface6": "#e58173",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "darker",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.9,
++          },
++        },
++        "seedComputed": "#cd0007",
++        "seedOriginal": "#cd0007",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "darker",
++        "ramp": {
++          "bgFill1": "#cd0007",
++          "bgFill2": "#b40000",
++          "bgFillDark": "#231c1b",
++          "bgFillInverted1": "#640000",
++          "bgFillInverted2": "#231c1b",
++          "fgFill": "#f2efef",
++          "fgFillDark": "#f2efef",
++          "fgFillInverted": "#f2efef",
++          "fgSurface1": "#ff6151",
++          "fgSurface2": "#e42d25",
++          "fgSurface3": "#bd0000",
++          "fgSurface4": "#470000",
++          "stroke1": "#db8f84",
++          "stroke2": "#d4897e",
++          "stroke3": "#bd0000",
++          "stroke4": "#8a0000",
++          "surface1": "#edcec9",
++          "surface2": "#f5d6d1",
++          "surface3": "#feded9",
++          "surface4": "#f1c5be",
++          "surface5": "#ebbfb8",
++          "surface6": "#e8aca3",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "darker",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 1,
++          },
++        },
++        "seedComputed": "#cd0007",
++        "seedOriginal": "#cd0007",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "darker",
++        "ramp": {
++          "bgFill1": "#cd0007",
++          "bgFill2": "#b40000",
++          "bgFillDark": "#231c1b",
++          "bgFillInverted1": "#640000",
++          "bgFillInverted2": "#231c1b",
++          "fgFill": "#f2efef",
++          "fgFillDark": "#f2efef",
++          "fgFillInverted": "#f2efef",
++          "fgSurface1": "#ff9282",
++          "fgSurface2": "#ff4f41",
++          "fgSurface3": "#cd0007",
++          "fgSurface4": "#470000",
++          "stroke1": "#e19d93",
++          "stroke2": "#da968c",
++          "stroke3": "#cd0007",
++          "stroke4": "#9a0000",
++          "surface1": "#fef5f3",
++          "surface2": "#fff",
++          "surface3": "#fff",
++          "surface4": "#fdedea",
++          "surface5": "#f5e5e3",
++          "surface6": "#f1d1cc",
++        },
++        "warnings": undefined,
++      },
++    },
++  ],
++  [
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "lighter",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0,
++          },
++        },
++        "seedComputed": "#8a6600",
++        "seedOriginal": "#8a6600",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "lighter",
++        "ramp": {
++          "bgFill1": "#8a6600",
++          "bgFill2": "#99741c",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#fdd684",
++          "bgFillInverted2": "#f3f0e9",
++          "fgFill": "#f3f0e9",
++          "fgFillDark": "#f3f0e9",
++          "fgFillInverted": "#1f1e1b",
++          "fgSurface1": "#5d3f00",
++          "fgSurface2": "#7c5800",
++          "fgSurface3": "#d5ae5e",
++          "fgSurface4": "#ffeca9",
++          "stroke1": "#786848",
++          "stroke2": "#7e6d49",
++          "stroke3": "#d5ae5e",
++          "stroke4": "#ffd786",
++          "surface1": "#000",
++          "surface2": "#000",
++          "surface3": "#110c03",
++          "surface4": "#1a1305",
++          "surface5": "#211a0b",
++          "surface6": "#31260f",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "lighter",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.1,
++          },
++        },
++        "seedComputed": "#8a6600",
++        "seedOriginal": "#8a6600",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "lighter",
++        "ramp": {
++          "bgFill1": "#8a6600",
++          "bgFill2": "#99741c",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#fdd684",
++          "bgFillInverted2": "#f3f0e9",
++          "fgFill": "#f3f0e9",
++          "fgFillDark": "#f3f0e9",
++          "fgFillInverted": "#1f1e1b",
++          "fgSurface1": "#5f4000",
++          "fgSurface2": "#7d5a00",
++          "fgSurface3": "#d5ae5e",
++          "fgSurface4": "#ffeca9",
++          "stroke1": "#786848",
++          "stroke2": "#7e6d49",
++          "stroke3": "#d5ae5e",
++          "stroke4": "#ffd786",
++          "surface1": "#000",
++          "surface2": "#050300",
++          "surface3": "#140f05",
++          "surface4": "#1c1507",
++          "surface5": "#241c0b",
++          "surface6": "#332811",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "lighter",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.2,
++          },
++        },
++        "seedComputed": "#8a6600",
++        "seedOriginal": "#8a6600",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "lighter",
++        "ramp": {
++          "bgFill1": "#8a6600",
++          "bgFill2": "#99741c",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#fdd684",
++          "bgFillInverted2": "#f3f0e9",
++          "fgFill": "#f3f0e9",
++          "fgFillDark": "#f3f0e9",
++          "fgFillInverted": "#1f1e1b",
++          "fgSurface1": "#694800",
++          "fgSurface2": "#876300",
++          "fgSurface3": "#d5ae5e",
++          "fgSurface4": "#ffeca9",
++          "stroke1": "#786848",
++          "stroke2": "#7e6d49",
++          "stroke3": "#d5ae5e",
++          "stroke4": "#ffd786",
++          "surface1": "#100b03",
++          "surface2": "#1c1506",
++          "surface3": "#251d0c",
++          "surface4": "#292110",
++          "surface5": "#31260f",
++          "surface6": "#3c311a",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "lighter",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.3,
++          },
++        },
++        "seedComputed": "#8a6600",
++        "seedOriginal": "#8a6600",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "lighter",
++        "ramp": {
++          "bgFill1": "#8a6600",
++          "bgFill2": "#99741c",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#fdd684",
++          "bgFillInverted2": "#f3f0e9",
++          "fgFill": "#f3f0e9",
++          "fgFillDark": "#f3f0e9",
++          "fgFillInverted": "#1f1e1b",
++          "fgSurface1": "#7d5a00",
++          "fgSurface2": "#9b761f",
++          "fgSurface3": "#d5ae5e",
++          "fgSurface4": "#ffeca9",
++          "stroke1": "#786848",
++          "stroke2": "#7e6d49",
++          "stroke3": "#d5ae5e",
++          "stroke4": "#ffd786",
++          "surface1": "#31260f",
++          "surface2": "#372c15",
++          "surface3": "#3d311a",
++          "surface4": "#423519",
++          "surface5": "#47391e",
++          "surface6": "#524323",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "lighter",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.4,
++          },
++        },
++        "seedComputed": "#8a6600",
++        "seedOriginal": "#8a6600",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "lighter",
++        "ramp": {
++          "bgFill1": "#8a6600",
++          "bgFill2": "#99741c",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#fdd684",
++          "bgFillInverted2": "#f3f0e9",
++          "fgFill": "#f3f0e9",
++          "fgFillDark": "#f3f0e9",
++          "fgFillInverted": "#1f1e1b",
++          "fgSurface1": "#9a761e",
++          "fgSurface2": "#ba9443",
++          "fgSurface3": "#deb766",
++          "fgSurface4": "#ffeca9",
++          "stroke1": "#7f6e4b",
++          "stroke2": "#857350",
++          "stroke3": "#deb766",
++          "stroke4": "#ffe594",
++          "surface1": "#504021",
++          "surface2": "#554526",
++          "surface3": "#5a4a2b",
++          "surface4": "#5f4d28",
++          "surface5": "#64522c",
++          "surface6": "#705b2f",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "darker",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.7,
++          },
++        },
++        "seedComputed": "#8a6600",
++        "seedOriginal": "#8a6600",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "darker",
++        "ramp": {
++          "bgFill1": "#8a6600",
++          "bgFill2": "#7c5800",
++          "bgFillDark": "#050504",
++          "bgFillInverted1": "#2c1a00",
++          "bgFillInverted2": "#050504",
++          "fgFill": "#f3f0e9",
++          "fgFillDark": "#f3f0e9",
++          "fgFillInverted": "#f3f0e9",
++          "fgSurface1": "#825f00",
++          "fgSurface2": "#654500",
++          "fgSurface3": "#442c00",
++          "fgSurface4": "#0b0300",
++          "stroke1": "#7f6d4a",
++          "stroke2": "#786847",
++          "stroke3": "#442c00",
++          "stroke4": "#110600",
++          "surface1": "#b29454",
++          "surface2": "#b99a5b",
++          "surface3": "#bfa061",
++          "surface4": "#ab9058",
++          "surface5": "#a68b53",
++          "surface6": "#98804d",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "darker",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.8,
++          },
++        },
++        "seedComputed": "#8a6600",
++        "seedOriginal": "#8a6600",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "darker",
++        "ramp": {
++          "bgFill1": "#8a6600",
++          "bgFill2": "#7c5800",
++          "bgFillDark": "#1f1e1b",
++          "bgFillInverted1": "#402900",
++          "bgFillInverted2": "#1f1e1b",
++          "fgFill": "#f3f0e9",
++          "fgFillDark": "#f3f0e9",
++          "fgFillInverted": "#f3f0e9",
++          "fgSurface1": "#9c7821",
++          "fgSurface2": "#7f5c00",
++          "fgSurface3": "#614200",
++          "fgSurface4": "#2d1a00",
++          "stroke1": "#9b875e",
++          "stroke2": "#93815c",
++          "stroke3": "#614200",
++          "stroke4": "#3e2700",
++          "surface1": "#d6b165",
++          "surface2": "#ddb86c",
++          "surface3": "#e5c073",
++          "surface4": "#cead6a",
++          "surface5": "#c8a764",
++          "surface6": "#ba9b5b",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "darker",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.9,
++          },
++        },
++        "seedComputed": "#8a6600",
++        "seedOriginal": "#8a6600",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "darker",
++        "ramp": {
++          "bgFill1": "#8a6600",
++          "bgFill2": "#7c5800",
++          "bgFillDark": "#1f1e1b",
++          "bgFillInverted1": "#402900",
++          "bgFillInverted2": "#1f1e1b",
++          "fgFill": "#f3f0e9",
++          "fgFillDark": "#f3f0e9",
++          "fgFillInverted": "#f3f0e9",
++          "fgSurface1": "#b7913f",
++          "fgSurface2": "#97731a",
++          "fgSurface3": "#7a5700",
++          "fgSurface4": "#2d1a00",
++          "stroke1": "#b8a173",
++          "stroke2": "#b19a6c",
++          "stroke3": "#7a5700",
++          "stroke4": "#5a3d00",
++          "surface1": "#efd399",
++          "surface2": "#f7daa0",
++          "surface3": "#f6e4c3",
++          "surface4": "#f1cb7e",
++          "surface5": "#eac578",
++          "surface6": "#dbb66a",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "darker",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 1,
++          },
++        },
++        "seedComputed": "#8a6600",
++        "seedOriginal": "#8a6600",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "darker",
++        "ramp": {
++          "bgFill1": "#8a6600",
++          "bgFill2": "#7c5800",
++          "bgFillDark": "#1f1e1b",
++          "bgFillInverted1": "#402900",
++          "bgFillInverted2": "#1f1e1b",
++          "fgFill": "#f3f0e9",
++          "fgFillDark": "#f3f0e9",
++          "fgFillInverted": "#f3f0e9",
++          "fgSurface1": "#d0a959",
++          "fgSurface2": "#ad8835",
++          "fgSurface3": "#8a6600",
++          "fgSurface4": "#2d1a00",
++          "stroke1": "#cfb47d",
++          "stroke2": "#c5ad7c",
++          "stroke3": "#8a6600",
++          "stroke4": "#6c4a00",
++          "surface1": "#fff5d3",
++          "surface2": "#fff",
++          "surface3": "#fff",
++          "surface4": "#ffefcd",
++          "surface5": "#f8e7c5",
++          "surface6": "#f2d59b",
++        },
++        "warnings": undefined,
++      },
++    },
++  ],
++  [
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "lighter",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0,
++          },
++        },
++        "seedComputed": "#00861d",
++        "seedOriginal": "#00861d",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "lighter",
++        "ramp": {
++          "bgFill1": "#00861d",
++          "bgFill2": "#21952f",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#88f28a",
++          "bgFillInverted2": "#ebf3eb",
++          "fgFill": "#f7fbf7",
++          "fgFillDark": "#ebf3eb",
++          "fgFillInverted": "#1b1f1b",
++          "fgSurface1": "#005100",
++          "fgSurface2": "#006e00",
++          "fgSurface3": "#65d069",
++          "fgSurface4": "#bcffbc",
++          "stroke1": "#4a784a",
++          "stroke2": "#4f7e50",
++          "stroke3": "#65d069",
++          "stroke4": "#90fb92",
++          "surface1": "#000",
++          "surface2": "#000",
++          "surface3": "#030f03",
++          "surface4": "#041805",
++          "surface5": "#0a1f0b",
++          "surface6": "#162d16",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "lighter",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.1,
++          },
++        },
++        "seedComputed": "#00861d",
++        "seedOriginal": "#00861d",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "lighter",
++        "ramp": {
++          "bgFill1": "#00861d",
++          "bgFill2": "#21952f",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#88f28a",
++          "bgFillInverted2": "#ebf3eb",
++          "fgFill": "#f7fbf7",
++          "fgFillDark": "#ebf3eb",
++          "fgFillInverted": "#1b1f1b",
++          "fgSurface1": "#005300",
++          "fgSurface2": "#007000",
++          "fgSurface3": "#65d069",
++          "fgSurface4": "#bcffbc",
++          "stroke1": "#4a784a",
++          "stroke2": "#4f7e50",
++          "stroke3": "#65d069",
++          "stroke4": "#90fb92",
++          "surface1": "#000",
++          "surface2": "#010501",
++          "surface3": "#051306",
++          "surface4": "#061b07",
++          "surface5": "#0b220c",
++          "surface6": "#0f3011",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "lighter",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.2,
++          },
++        },
++        "seedComputed": "#00861d",
++        "seedOriginal": "#00861d",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "lighter",
++        "ramp": {
++          "bgFill1": "#00861d",
++          "bgFill2": "#21952f",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#88f28a",
++          "bgFillInverted2": "#ebf3eb",
++          "fgFill": "#f7fbf7",
++          "fgFillDark": "#ebf3eb",
++          "fgFillInverted": "#1b1f1b",
++          "fgSurface1": "#005d00",
++          "fgSurface2": "#007b0c",
++          "fgSurface3": "#65d069",
++          "fgSurface4": "#bcffbc",
++          "stroke1": "#4a784a",
++          "stroke2": "#4f7e50",
++          "stroke3": "#65d069",
++          "stroke4": "#90fb92",
++          "surface1": "#041104",
++          "surface2": "#071b07",
++          "surface3": "#0d240e",
++          "surface4": "#112812",
++          "surface5": "#172d17",
++          "surface6": "#193a1b",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "lighter",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.3,
++          },
++        },
++        "seedComputed": "#00861d",
++        "seedOriginal": "#00861d",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "lighter",
++        "ramp": {
++          "bgFill1": "#00861d",
++          "bgFill2": "#21952f",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#88f28a",
++          "bgFillInverted2": "#ebf3eb",
++          "fgFill": "#f7fbf7",
++          "fgFillDark": "#ebf3eb",
++          "fgFillInverted": "#1b1f1b",
++          "fgSurface1": "#007300",
++          "fgSurface2": "#1b912a",
++          "fgSurface3": "#65d069",
++          "fgSurface4": "#bcffbc",
++          "stroke1": "#4a784a",
++          "stroke2": "#4f7e50",
++          "stroke3": "#65d069",
++          "stroke4": "#90fb92",
++          "surface1": "#103011",
++          "surface2": "#163617",
++          "surface3": "#1b3c1c",
++          "surface4": "#19401b",
++          "surface5": "#1e451f",
++          "surface6": "#245025",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "lighter",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.4,
++          },
++        },
++        "seedComputed": "#00861d",
++        "seedOriginal": "#00861d",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "lighter",
++        "ramp": {
++          "bgFill1": "#00861d",
++          "bgFill2": "#21952f",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#88f28a",
++          "bgFillInverted2": "#ebf3eb",
++          "fgFill": "#f7fbf7",
++          "fgFillDark": "#ebf3eb",
++          "fgFillInverted": "#1b1f1b",
++          "fgSurface1": "#1c912b",
++          "fgSurface2": "#45b24c",
++          "fgSurface3": "#6cd770",
++          "fgSurface4": "#bcffbc",
++          "stroke1": "#4c7e4d",
++          "stroke2": "#548354",
++          "stroke3": "#6cd770",
++          "stroke4": "#a7ffa8",
++          "surface1": "#234e24",
++          "surface2": "#285329",
++          "surface3": "#2d582e",
++          "surface4": "#2c5c2e",
++          "surface5": "#316132",
++          "surface6": "#316d34",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "darker",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.7,
++          },
++        },
++        "seedComputed": "#00861d",
++        "seedOriginal": "#00861d",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "darker",
++        "ramp": {
++          "bgFill1": "#00861d",
++          "bgFill2": "#007703",
++          "bgFillDark": "#0d100d",
++          "bgFillInverted1": "#002b00",
++          "bgFillInverted2": "#0d100d",
++          "fgFill": "#f7fbf7",
++          "fgFillDark": "#ebf3eb",
++          "fgFillInverted": "#ebf3eb",
++          "fgSurface1": "#007b0c",
++          "fgSurface2": "#005d00",
++          "fgSurface3": "#003f00",
++          "fgSurface4": "#001400",
++          "stroke1": "#4f7e4f",
++          "stroke2": "#4a794a",
++          "stroke3": "#003f00",
++          "stroke4": "#001600",
++          "surface1": "#59af5c",
++          "surface2": "#5fb562",
++          "surface3": "#66bc68",
++          "surface4": "#59a95b",
++          "surface5": "#53a456",
++          "surface6": "#4d974f",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "darker",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.8,
++          },
++        },
++        "seedComputed": "#00861d",
++        "seedOriginal": "#00861d",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "darker",
++        "ramp": {
++          "bgFill1": "#00861d",
++          "bgFill2": "#007703",
++          "bgFillDark": "#1b1f1b",
++          "bgFillInverted1": "#003700",
++          "bgFillInverted2": "#1b1f1b",
++          "fgFill": "#f7fbf7",
++          "fgFillDark": "#ebf3eb",
++          "fgFillInverted": "#ebf3eb",
++          "fgSurface1": "#23962f",
++          "fgSurface2": "#007704",
++          "fgSurface3": "#005900",
++          "fgSurface4": "#002900",
++          "stroke1": "#619b62",
++          "stroke2": "#5f945f",
++          "stroke3": "#005900",
++          "stroke4": "#003a00",
++          "surface1": "#6cd16f",
++          "surface2": "#73d976",
++          "surface3": "#7be07d",
++          "surface4": "#6bcc6e",
++          "surface5": "#65c568",
++          "surface6": "#60b663",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "darker",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.9,
++          },
++        },
++        "seedComputed": "#00861d",
++        "seedOriginal": "#00861d",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "darker",
++        "ramp": {
++          "bgFill1": "#00861d",
++          "bgFill2": "#007703",
++          "bgFillDark": "#1b1f1b",
++          "bgFillInverted1": "#003700",
++          "bgFillInverted2": "#1b1f1b",
++          "fgFill": "#f7fbf7",
++          "fgFillDark": "#ebf3eb",
++          "fgFillInverted": "#ebf3eb",
++          "fgSurface1": "#43b04a",
++          "fgSurface2": "#189029",
++          "fgSurface3": "#007100",
++          "fgSurface4": "#002900",
++          "stroke1": "#79b779",
++          "stroke2": "#72b072",
++          "stroke3": "#007100",
++          "stroke4": "#005300",
++          "surface1": "#8cf28e",
++          "surface2": "#94fa96",
++          "surface3": "#cdf7cc",
++          "surface4": "#82ed85",
++          "surface5": "#7be67e",
++          "surface6": "#70d674",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "darker",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 1,
++          },
++        },
++        "seedComputed": "#00861d",
++        "seedOriginal": "#00861d",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "darker",
++        "ramp": {
++          "bgFill1": "#00861d",
++          "bgFill2": "#007703",
++          "bgFillDark": "#1b1f1b",
++          "bgFillInverted1": "#003700",
++          "bgFillInverted2": "#1b1f1b",
++          "fgFill": "#f7fbf7",
++          "fgFillDark": "#ebf3eb",
++          "fgFillInverted": "#ebf3eb",
++          "fgSurface1": "#59c45e",
++          "fgSurface2": "#33a23d",
++          "fgSurface3": "#008319",
++          "fgSurface4": "#002900",
++          "stroke1": "#85ce86",
++          "stroke2": "#81c681",
++          "stroke3": "#008319",
++          "stroke4": "#006400",
++          "surface1": "#daffd9",
++          "surface2": "#fff",
++          "surface3": "#fff",
++          "surface4": "#d1fbd1",
++          "surface5": "#9dff9e",
++          "surface6": "#85f087",
++        },
++        "warnings": undefined,
++      },
++    },
++  ],
++  [
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "lighter",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0,
++          },
++        },
++        "seedComputed": "#007d8d",
++        "seedOriginal": "#007d8d",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "lighter",
++        "ramp": {
++          "bgFill1": "#007d8d",
++          "bgFill2": "#218c9c",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#8ae9fa",
++          "bgFillInverted2": "#eaf2f3",
++          "fgFill": "#f0f8fa",
++          "fgFillDark": "#eaf2f3",
++          "fgFillInverted": "#1b1f20",
++          "fgSurface1": "#004c59",
++          "fgSurface2": "#006878",
++          "fgSurface3": "#64c5d5",
++          "fgSurface4": "#b2ffff",
++          "stroke1": "#4b727a",
++          "stroke2": "#4b7981",
++          "stroke3": "#64c5d5",
++          "stroke4": "#8fefff",
++          "surface1": "#000",
++          "surface2": "#000",
++          "surface3": "#040e11",
++          "surface4": "#05161a",
++          "surface5": "#0c1e21",
++          "surface6": "#132b30",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "lighter",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.1,
++          },
++        },
++        "seedComputed": "#007d8d",
++        "seedOriginal": "#007d8d",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "lighter",
++        "ramp": {
++          "bgFill1": "#007d8d",
++          "bgFill2": "#218c9c",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#8ae9fa",
++          "bgFillInverted2": "#eaf2f3",
++          "fgFill": "#f0f8fa",
++          "fgFillDark": "#eaf2f3",
++          "fgFillInverted": "#1b1f20",
++          "fgSurface1": "#004d5b",
++          "fgSurface2": "#006979",
++          "fgSurface3": "#64c5d5",
++          "fgSurface4": "#b2ffff",
++          "stroke1": "#4b727a",
++          "stroke2": "#4b7981",
++          "stroke3": "#64c5d5",
++          "stroke4": "#8fefff",
++          "surface1": "#000",
++          "surface2": "#000405",
++          "surface3": "#061214",
++          "surface4": "#07191c",
++          "surface5": "#082024",
++          "surface6": "#112d32",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "lighter",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.2,
++          },
++        },
++        "seedComputed": "#007d8d",
++        "seedOriginal": "#007d8d",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "lighter",
++        "ramp": {
++          "bgFill1": "#007d8d",
++          "bgFill2": "#218c9c",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#8ae9fa",
++          "bgFillInverted2": "#eaf2f3",
++          "fgFill": "#f0f8fa",
++          "fgFillDark": "#eaf2f3",
++          "fgFillInverted": "#1b1f20",
++          "fgSurface1": "#005766",
++          "fgSurface2": "#007484",
++          "fgSurface3": "#64c5d5",
++          "fgSurface4": "#b2ffff",
++          "stroke1": "#4b727a",
++          "stroke2": "#4b7981",
++          "stroke3": "#64c5d5",
++          "stroke4": "#8fefff",
++          "surface1": "#040f11",
++          "surface2": "#07191c",
++          "surface3": "#092226",
++          "surface4": "#0e262a",
++          "surface5": "#132b30",
++          "surface6": "#1b373c",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "lighter",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.3,
++          },
++        },
++        "seedComputed": "#007d8d",
++        "seedOriginal": "#007d8d",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "lighter",
++        "ramp": {
++          "bgFill1": "#007d8d",
++          "bgFill2": "#218c9c",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#8ae9fa",
++          "bgFillInverted2": "#eaf2f3",
++          "fgFill": "#f0f8fa",
++          "fgFillDark": "#eaf2f3",
++          "fgFillInverted": "#1b1f20",
++          "fgSurface1": "#006b7b",
++          "fgSurface2": "#1d8999",
++          "fgSurface3": "#64c5d5",
++          "fgSurface4": "#b2ffff",
++          "stroke1": "#4b727a",
++          "stroke2": "#4b7981",
++          "stroke3": "#64c5d5",
++          "stroke4": "#8fefff",
++          "surface1": "#112d31",
++          "surface2": "#173337",
++          "surface3": "#1c383d",
++          "surface4": "#1b3c42",
++          "surface5": "#1f4147",
++          "surface6": "#254b52",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "lighter",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.4,
++          },
++        },
++        "seedComputed": "#007d8d",
++        "seedOriginal": "#007d8d",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "lighter",
++        "ramp": {
++          "bgFill1": "#007d8d",
++          "bgFill2": "#218c9c",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#8ae9fa",
++          "bgFillInverted2": "#eaf2f3",
++          "fgFill": "#f0f8fa",
++          "fgFillDark": "#eaf2f3",
++          "fgFillInverted": "#1b1f20",
++          "fgSurface1": "#1d8999",
++          "fgSurface2": "#46a8b9",
++          "fgSurface3": "#6cccdd",
++          "fgSurface4": "#b2ffff",
++          "stroke1": "#4c7981",
++          "stroke2": "#567d85",
++          "stroke3": "#6cccdd",
++          "stroke4": "#99f8ff",
++          "surface1": "#234950",
++          "surface2": "#284e55",
++          "surface3": "#2d535a",
++          "surface4": "#2a5860",
++          "surface5": "#2f5c64",
++          "surface6": "#36666f",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "darker",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.7,
++          },
++        },
++        "seedComputed": "#007d8d",
++        "seedOriginal": "#007d8d",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "darker",
++        "ramp": {
++          "bgFill1": "#007d8d",
++          "bgFill2": "#006e7e",
++          "bgFillDark": "#0a0c0c",
++          "bgFillInverted1": "#00252e",
++          "bgFillInverted2": "#0a0c0c",
++          "fgFill": "#f0f8fa",
++          "fgFillDark": "#eaf2f3",
++          "fgFillInverted": "#eaf2f3",
++          "fgSurface1": "#007282",
++          "fgSurface2": "#005564",
++          "fgSurface3": "#003844",
++          "fgSurface4": "#000d13",
++          "stroke1": "#4c7981",
++          "stroke2": "#4b727a",
++          "stroke3": "#003844",
++          "stroke4": "#001017",
++          "surface1": "#59a6b3",
++          "surface2": "#60acb9",
++          "surface3": "#66b2c0",
++          "surface4": "#5da0ac",
++          "surface5": "#579ba7",
++          "surface6": "#528e99",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "darker",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.8,
++          },
++        },
++        "seedComputed": "#007d8d",
++        "seedOriginal": "#007d8d",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "darker",
++        "ramp": {
++          "bgFill1": "#007d8d",
++          "bgFill2": "#006e7e",
++          "bgFillDark": "#1b1f20",
++          "bgFillInverted1": "#00333d",
++          "bgFillInverted2": "#1b1f20",
++          "fgFill": "#f0f8fa",
++          "fgFillDark": "#eaf2f3",
++          "fgFillInverted": "#eaf2f3",
++          "fgSurface1": "#228c9c",
++          "fgSurface2": "#006f7e",
++          "fgSurface3": "#005260",
++          "fgSurface4": "#00252e",
++          "stroke1": "#64949c",
++          "stroke2": "#618d95",
++          "stroke3": "#005260",
++          "stroke4": "#00343f",
++          "surface1": "#6dc6d6",
++          "surface2": "#74cede",
++          "surface3": "#7bd5e5",
++          "surface4": "#70c0cf",
++          "surface5": "#6abac9",
++          "surface6": "#61adba",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "darker",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.9,
++          },
++        },
++        "seedComputed": "#007d8d",
++        "seedOriginal": "#007d8d",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "darker",
++        "ramp": {
++          "bgFill1": "#007d8d",
++          "bgFill2": "#006e7e",
++          "bgFillDark": "#1b1f20",
++          "bgFillInverted1": "#00333d",
++          "bgFillInverted2": "#1b1f20",
++          "fgFill": "#f0f8fa",
++          "fgFillDark": "#eaf2f3",
++          "fgFillInverted": "#eaf2f3",
++          "fgSurface1": "#43a6b6",
++          "fgSurface2": "#188696",
++          "fgSurface3": "#006978",
++          "fgSurface4": "#00252e",
++          "stroke1": "#78afb9",
++          "stroke2": "#72a8b2",
++          "stroke3": "#006978",
++          "stroke4": "#004c59",
++          "surface1": "#8ae7f7",
++          "surface2": "#a0edfb",
++          "surface3": "#c4f1f9",
++          "surface4": "#84e1f1",
++          "surface5": "#7ddaea",
++          "surface6": "#71cbdb",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "darker",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 1,
++          },
++        },
++        "seedComputed": "#007d8d",
++        "seedOriginal": "#007d8d",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "darker",
++        "ramp": {
++          "bgFill1": "#007d8d",
++          "bgFill2": "#006e7e",
++          "bgFillDark": "#1b1f20",
++          "bgFillInverted1": "#00333d",
++          "bgFillInverted2": "#1b1f20",
++          "fgFill": "#f0f8fa",
++          "fgFillDark": "#eaf2f3",
++          "fgFillInverted": "#eaf2f3",
++          "fgSurface1": "#5dbece",
++          "fgSurface2": "#379bac",
++          "fgSurface3": "#007d8d",
++          "fgSurface4": "#00252e",
++          "stroke1": "#89c8d4",
++          "stroke2": "#86c0cb",
++          "stroke3": "#007d8d",
++          "stroke4": "#005e6e",
++          "surface1": "#d3ffff",
++          "surface2": "#fff",
++          "surface3": "#fff",
++          "surface4": "#cbf8ff",
++          "surface5": "#c4f0f9",
++          "surface6": "#98e5f3",
++        },
++        "warnings": undefined,
++      },
++    },
++  ],
++  [
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "lighter",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0,
++          },
++        },
++        "seedComputed": "#3858e9",
++        "seedOriginal": "#3858e9",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "lighter",
++        "ramp": {
++          "bgFill1": "#3858e9",
++          "bgFill2": "#4367f9",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#c8dcff",
++          "bgFillInverted2": "#eff0f2",
++          "fgFill": "#eff0f2",
++          "fgFillDark": "#eff0f2",
++          "fgFillInverted": "#1a1e27",
++          "fgSurface1": "#1e2dbf",
++          "fgSurface2": "#314ede",
++          "fgSurface3": "#8eb0ff",
++          "fgSurface4": "#e4f0ff",
++          "stroke1": "#4863b5",
++          "stroke2": "#516ab1",
++          "stroke3": "#8eb0ff",
++          "stroke4": "#c6daff",
++          "surface1": "#000",
++          "surface2": "#000",
++          "surface3": "#040a2c",
++          "surface4": "#060d40",
++          "surface5": "#0a154a",
++          "surface6": "#122064",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "lighter",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.1,
++          },
++        },
++        "seedComputed": "#3858e9",
++        "seedOriginal": "#3858e9",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "lighter",
++        "ramp": {
++          "bgFill1": "#3858e9",
++          "bgFill2": "#4367f9",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#c8dcff",
++          "bgFillInverted2": "#eff0f2",
++          "fgFill": "#eff0f2",
++          "fgFillDark": "#eff0f2",
++          "fgFillInverted": "#1a1e27",
++          "fgSurface1": "#1f2fc0",
++          "fgSurface2": "#324fe0",
++          "fgSurface3": "#8eb0ff",
++          "fgSurface4": "#e4f0ff",
++          "stroke1": "#4863b5",
++          "stroke2": "#516ab1",
++          "stroke3": "#8eb0ff",
++          "stroke4": "#c6daff",
++          "surface1": "#000",
++          "surface2": "#010114",
++          "surface3": "#04083b",
++          "surface4": "#071042",
++          "surface5": "#0b174c",
++          "surface6": "#132265",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "lighter",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.2,
++          },
++        },
++        "seedComputed": "#3858e9",
++        "seedOriginal": "#3858e9",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "lighter",
++        "ramp": {
++          "bgFill1": "#3858e9",
++          "bgFill2": "#4367f9",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#c8dcff",
++          "bgFillInverted2": "#eff0f2",
++          "fgFill": "#eff0f2",
++          "fgFillDark": "#eff0f2",
++          "fgFillInverted": "#1a1e27",
++          "fgSurface1": "#2438c9",
++          "fgSurface2": "#3858e9",
++          "fgSurface3": "#8eb0ff",
++          "fgSurface4": "#e4f0ff",
++          "stroke1": "#4863b5",
++          "stroke2": "#516ab1",
++          "stroke3": "#8eb0ff",
++          "stroke4": "#c6daff",
++          "surface1": "#020627",
++          "surface2": "#060e40",
++          "surface3": "#0b164c",
++          "surface4": "#0f1c51",
++          "surface5": "#111f62",
++          "surface6": "#1a2c6f",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "lighter",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.3,
++          },
++        },
++        "seedComputed": "#3858e9",
++        "seedOriginal": "#3858e9",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "lighter",
++        "ramp": {
++          "bgFill1": "#3858e9",
++          "bgFill2": "#4367f9",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#c8dcff",
++          "bgFillInverted2": "#eff0f2",
++          "fgFill": "#eff0f2",
++          "fgFillDark": "#eff0f2",
++          "fgFillInverted": "#1a1e27",
++          "fgSurface1": "#314dde",
++          "fgSurface2": "#476dff",
++          "fgSurface3": "#8eb0ff",
++          "fgSurface4": "#e4f0ff",
++          "stroke1": "#4863b5",
++          "stroke2": "#516ab1",
++          "stroke3": "#8eb0ff",
++          "stroke4": "#c6daff",
++          "surface1": "#132157",
++          "surface2": "#152569",
++          "surface3": "#1a2b6f",
++          "surface4": "#192b82",
++          "surface5": "#1d3087",
++          "surface6": "#22389e",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "lighter",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.4,
++          },
++        },
++        "seedComputed": "#3858e9",
++        "seedOriginal": "#3858e9",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "lighter",
++        "ramp": {
++          "bgFill1": "#3858e9",
++          "bgFill2": "#4367f9",
++          "bgFillDark": "#000",
++          "bgFillInverted1": "#c8dcff",
++          "bgFillInverted2": "#eff0f2",
++          "fgFill": "#eff0f2",
++          "fgFillDark": "#eff0f2",
++          "fgFillInverted": "#1a1e27",
++          "fgSurface1": "#466afc",
++          "fgSurface2": "#6a91ff",
++          "fgSurface3": "#98b8ff",
++          "fgSurface4": "#e4f0ff",
++          "stroke1": "#526ab1",
++          "stroke2": "#5770b5",
++          "stroke3": "#98b8ff",
++          "stroke4": "#d2e3ff",
++          "surface1": "#1f349a",
++          "surface2": "#2339a0",
++          "surface3": "#273fa6",
++          "surface4": "#2840b3",
++          "surface5": "#2b45b8",
++          "surface6": "#3451c0",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "darker",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.7,
++          },
++        },
++        "seedComputed": "#3858e9",
++        "seedOriginal": "#3858e9",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "darker",
++        "ramp": {
++          "bgFill1": "#3858e9",
++          "bgFill2": "#2e49d9",
++          "bgFillDark": "#030407",
++          "bgFillInverted1": "#0b0071",
++          "bgFillInverted2": "#030407",
++          "fgFill": "#eff0f2",
++          "fgFillDark": "#eff0f2",
++          "fgFillInverted": "#eff0f2",
++          "fgSurface1": "#3655e6",
++          "fgSurface2": "#2235c6",
++          "fgSurface3": "#1504a6",
++          "fgSurface4": "#010024",
++          "stroke1": "#546cb2",
++          "stroke2": "#4965bc",
++          "stroke3": "#1504a6",
++          "stroke4": "#020032",
++          "surface1": "#7e96d7",
++          "surface2": "#849cdd",
++          "surface3": "#8aa3e4",
++          "surface4": "#7791d9",
++          "surface5": "#728cd3",
++          "surface6": "#607ed7",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "darker",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.8,
++          },
++        },
++        "seedComputed": "#3858e9",
++        "seedOriginal": "#3858e9",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "darker",
++        "ramp": {
++          "bgFill1": "#3858e9",
++          "bgFill2": "#2e49d9",
++          "bgFillDark": "#1a1e27",
++          "bgFillInverted1": "#13009f",
++          "bgFillInverted2": "#1a1e27",
++          "fgFill": "#eff0f2",
++          "fgFillDark": "#eff0f2",
++          "fgFillInverted": "#eff0f2",
++          "fgSurface1": "#4b71ff",
++          "fgSurface2": "#3352e2",
++          "fgSurface3": "#2031c3",
++          "fgSurface4": "#0b0070",
++          "stroke1": "#7488bd",
++          "stroke2": "#6981c4",
++          "stroke3": "#2031c3",
++          "stroke4": "#13009d",
++          "surface1": "#a6b6e0",
++          "surface2": "#acbde7",
++          "surface3": "#b4c4ef",
++          "surface4": "#9eb1e1",
++          "surface5": "#98abdb",
++          "surface6": "#859ddf",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "darker",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 0.9,
++          },
++        },
++        "seedComputed": "#3858e9",
++        "seedOriginal": "#3858e9",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "darker",
++        "ramp": {
++          "bgFill1": "#3858e9",
++          "bgFill2": "#2e49d9",
++          "bgFillDark": "#1a1e27",
++          "bgFillInverted1": "#13009f",
++          "bgFillInverted2": "#1a1e27",
++          "fgFill": "#eff0f2",
++          "fgFillDark": "#eff0f2",
++          "fgFillInverted": "#eff0f2",
++          "fgSurface1": "#6a91ff",
++          "fgSurface2": "#466bfd",
++          "fgSurface3": "#2f4bdc",
++          "fgSurface4": "#0b0070",
++          "stroke1": "#8fa2d4",
++          "stroke2": "#899ccd",
++          "stroke3": "#2f4bdc",
++          "stroke4": "#1d29bc",
++          "surface1": "#cad5f3",
++          "surface2": "#d6def1",
++          "surface3": "#e2e6f0",
++          "surface4": "#c5d0ee",
++          "surface5": "#becae7",
++          "surface6": "#abbbe5",
++        },
++        "warnings": undefined,
++      },
++    },
++    {
++      "input": {
++        "bgInfo": {
++          "mainDirection": "darker",
++          "pinLightness": {
++            "stepName": "surface2",
++            "value": 1,
++          },
++        },
++        "seedComputed": "#3858e9",
++        "seedOriginal": "#3858e9",
++        "seedUnchanged": true,
++      },
++      "output": {
++        "direction": "darker",
++        "ramp": {
++          "bgFill1": "#3858e9",
++          "bgFill2": "#2e49d9",
++          "bgFillDark": "#1a1e27",
++          "bgFillInverted1": "#13009f",
++          "bgFillInverted2": "#1a1e27",
++          "fgFill": "#eff0f2",
++          "fgFillDark": "#eff0f2",
++          "fgFillInverted": "#eff0f2",
++          "fgSurface1": "#8daeff",
++          "fgSurface2": "#6088ff",
++          "fgSurface3": "#3858e9",
++          "fgSurface4": "#0b0070",
++          "stroke1": "#a3b1d5",
++          "stroke2": "#9caace",
++          "stroke3": "#3858e9",
++          "stroke4": "#2337c8",
++          "surface1": "#f2f7ff",
++          "surface2": "#fff",
++          "surface3": "#fff",
++          "surface4": "#ecf0fa",
++          "surface5": "#e4e9f3",
++          "surface6": "#d1d9ec",
++        },
++        "warnings": undefined,
++      },
++    },
++  ],
+   [
+     {
+       "input": {
+diff --git a/packages/theme/src/prebuilt/css/design-tokens.css b/packages/theme/src/prebuilt/css/design-tokens.css
+index e18ad8bcc8b200..dd8e28025483e0 100644
+--- a/packages/theme/src/prebuilt/css/design-tokens.css
++++ b/packages/theme/src/prebuilt/css/design-tokens.css
+@@ -28,6 +28,13 @@
+ 	--wpds-color-bg-interactive-neutral-weak: #00000000; /* Background color for interactive elements with neutral tone and weak emphasis. */
+ 	--wpds-color-bg-interactive-neutral-weak-active: #eaeaea; /* Background color for interactive elements with neutral tone and weak emphasis that are hovered, focused, or active. */
+ 	--wpds-color-bg-interactive-neutral-weak-disabled: #00000000; /* Background color for interactive elements with weak emphasis, in their disabled state, regardless of the tone. */
++	--wpds-color-bg-surface-accent1: #e8006f; /* Background color for qualitative accent 1 (45° hue rotation from primary). */
++	--wpds-color-bg-surface-accent2: #ff00ea; /* Background color for qualitative accent 2 (90° hue rotation from primary). */
++	--wpds-color-bg-surface-accent3: #9500ff; /* Background color for qualitative accent 3 (135° hue rotation from primary). */
++	--wpds-color-bg-surface-accent4: #00d5ff; /* Background color for qualitative accent 4 (180° hue rotation from primary). */
++	--wpds-color-bg-surface-accent5: #4db3a2; /* Background color for qualitative accent 5 (225° hue rotation from primary). */
++	--wpds-color-bg-surface-accent6: #c3e619; /* Background color for qualitative accent 6 (270° hue rotation from primary). */
++	--wpds-color-bg-surface-accent7: #f4800b; /* Background color for qualitative accent 7 (315° hue rotation from primary). */
+ 	--wpds-color-bg-surface-brand: #ecf0f9; /* Background color for surfaces with brand tone and normal emphasis. */
+ 	--wpds-color-bg-surface-caution: #fee994; /* Background color for surfaces with caution tone and normal emphasis. */
+ 	--wpds-color-bg-surface-caution-weak: #fff9c9; /* Background color for surfaces with caution tone and weak emphasis. */
+@@ -49,6 +56,13 @@
+ 	--wpds-color-bg-thumb-neutral-weak-active: #6c6c6c; /* Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb) that are hovered, focused, or active. */
+ 	--wpds-color-bg-track-neutral: #d8d8d8; /* Background color for tracks with a neutral tone and normal emphasis (eg. slider or progressbar track). */
+ 	--wpds-color-bg-track-neutral-weak: #e0e0e0; /* Background color for tracks with a neutral tone and weak emphasis (eg. scrollbar track). */
++	--wpds-color-fg-content-accent1: #ffffff; /* Foreground color for qualitative accent 1 (use on accent1 background). */
++	--wpds-color-fg-content-accent2: #221c21; /* Foreground color for qualitative accent 2 (use on accent2 background). */
++	--wpds-color-fg-content-accent3: #f0f0f2; /* Foreground color for qualitative accent 3 (use on accent3 background). */
++	--wpds-color-fg-content-accent4: #1b1f20; /* Foreground color for qualitative accent 4 (use on accent4 background). */
++	--wpds-color-fg-content-accent5: #1c1f1e; /* Foreground color for qualitative accent 5 (use on accent5 background). */
++	--wpds-color-fg-content-accent6: #1e1f1b; /* Foreground color for qualitative accent 6 (use on accent6 background). */
++	--wpds-color-fg-content-accent7: #211d1a; /* Foreground color for qualitative accent 7 (use on accent7 background). */
+ 	--wpds-color-fg-content-caution: #281d00; /* Foreground color for content like text with caution tone and normal emphasis. */
+ 	--wpds-color-fg-content-caution-weak: #826a00; /* Foreground color for content like text with caution tone and weak emphasis. */
+ 	--wpds-color-fg-content-error: #470000; /* Foreground color for content like text with error tone and normal emphasis. */
+diff --git a/packages/theme/src/prebuilt/js/design-tokens.mjs b/packages/theme/src/prebuilt/js/design-tokens.mjs
+index 77685322fcfb48..4311a96711a5c9 100644
+--- a/packages/theme/src/prebuilt/js/design-tokens.mjs
++++ b/packages/theme/src/prebuilt/js/design-tokens.mjs
+@@ -27,6 +27,13 @@ export default [
+ 	'--wpds-color-bg-surface-caution-weak',
+ 	'--wpds-color-bg-surface-error',
+ 	'--wpds-color-bg-surface-error-weak',
++	'--wpds-color-bg-surface-accent1',
++	'--wpds-color-bg-surface-accent2',
++	'--wpds-color-bg-surface-accent3',
++	'--wpds-color-bg-surface-accent4',
++	'--wpds-color-bg-surface-accent5',
++	'--wpds-color-bg-surface-accent6',
++	'--wpds-color-bg-surface-accent7',
+ 	'--wpds-color-bg-interactive-neutral-strong',
+ 	'--wpds-color-bg-interactive-neutral-strong-active',
+ 	'--wpds-color-bg-interactive-neutral-strong-disabled',
+@@ -62,6 +69,13 @@ export default [
+ 	'--wpds-color-fg-content-caution-weak',
+ 	'--wpds-color-fg-content-error',
+ 	'--wpds-color-fg-content-error-weak',
++	'--wpds-color-fg-content-accent1',
++	'--wpds-color-fg-content-accent2',
++	'--wpds-color-fg-content-accent3',
++	'--wpds-color-fg-content-accent4',
++	'--wpds-color-fg-content-accent5',
++	'--wpds-color-fg-content-accent6',
++	'--wpds-color-fg-content-accent7',
+ 	'--wpds-color-fg-interactive-neutral',
+ 	'--wpds-color-fg-interactive-neutral-active',
+ 	'--wpds-color-fg-interactive-neutral-disabled',
+diff --git a/packages/theme/src/prebuilt/ts/color-tokens.ts b/packages/theme/src/prebuilt/ts/color-tokens.ts
+index 3f768f8e1c1e6c..94f6d9611d76d6 100644
+--- a/packages/theme/src/prebuilt/ts/color-tokens.ts
++++ b/packages/theme/src/prebuilt/ts/color-tokens.ts
+@@ -116,4 +116,18 @@ export default {
+ 	'caution-surface4': [ 'bg-surface-caution' ],
+ 	'caution-fgSurface4': [ 'fg-content-caution' ],
+ 	'caution-fgSurface3': [ 'fg-content-caution-weak' ],
++	'accent1-bgFill1': [ 'bg-surface-accent1' ],
++	'accent1-fgFill': [ 'fg-content-accent1' ],
++	'accent2-bgFill1': [ 'bg-surface-accent2' ],
++	'accent2-fgFill': [ 'fg-content-accent2' ],
++	'accent3-bgFill1': [ 'bg-surface-accent3' ],
++	'accent3-fgFill': [ 'fg-content-accent3' ],
++	'accent4-bgFill1': [ 'bg-surface-accent4' ],
++	'accent4-fgFill': [ 'fg-content-accent4' ],
++	'accent5-bgFill1': [ 'bg-surface-accent5' ],
++	'accent5-fgFill': [ 'fg-content-accent5' ],
++	'accent6-bgFill1': [ 'bg-surface-accent6' ],
++	'accent6-fgFill': [ 'fg-content-accent6' ],
++	'accent7-bgFill1': [ 'bg-surface-accent7' ],
++	'accent7-fgFill': [ 'fg-content-accent7' ],
+ } as Record< string, string[] >;
+diff --git a/packages/theme/src/prebuilt/ts/token-types.ts b/packages/theme/src/prebuilt/ts/token-types.ts
+index 19b4866adfdde4..711f5345de59cd 100644
+--- a/packages/theme/src/prebuilt/ts/token-types.ts
++++ b/packages/theme/src/prebuilt/ts/token-types.ts
+@@ -51,7 +51,14 @@ export type SurfaceBackgroundColor =
+ 	| 'caution'
+ 	| 'caution-weak'
+ 	| 'error'
+-	| 'error-weak';
++	| 'error-weak'
++	| 'accent1'
++	| 'accent2'
++	| 'accent3'
++	| 'accent4'
++	| 'accent5'
++	| 'accent6'
++	| 'accent7';
+ 
+ /**
+  * Background color variants for interactive elements.
+@@ -80,7 +87,14 @@ export type ContentForegroundColor =
+ 	| 'caution'
+ 	| 'caution-weak'
+ 	| 'error'
+-	| 'error-weak';
++	| 'error-weak'
++	| 'accent1'
++	| 'accent2'
++	| 'accent3'
++	| 'accent4'
++	| 'accent5'
++	| 'accent6'
++	| 'accent7';
+ 
+ /**
+  * Foreground color variants for interactive element text and icons.
+@@ -138,6 +152,13 @@ export type ForegroundColor =
+ 	| 'caution-weak'
+ 	| 'error'
+ 	| 'error-weak'
++	| 'accent1'
++	| 'accent2'
++	| 'accent3'
++	| 'accent4'
++	| 'accent5'
++	| 'accent6'
++	| 'accent7'
+ 	| 'neutral-active'
+ 	| 'neutral-disabled'
+ 	| 'neutral-strong'
+diff --git a/packages/theme/src/types.ts b/packages/theme/src/types.ts
+index 49bad28227afbf..05fad6d45d4285 100644
+--- a/packages/theme/src/types.ts
++++ b/packages/theme/src/types.ts
+@@ -22,6 +22,17 @@ export interface ThemeProviderSettings {
+ 		 * and fallbacks to statically built CSS.
+ 		 */
+ 		bg?: string;
++		/**
++		 * Optional manually-specified accent seed colors as an array of
++		 * hex strings. Any number of accents can be provided. They will
++		 * be mapped to accent1, accent2, etc. in order.
++		 *
++		 * When omitted, accents are auto-generated via hue rotation
++		 * from the primary color.
++		 *
++		 * By default, it inherits from parent `ThemeProvider`.
++		 */
++		accents?: string[];
+ 	};
+ 
+ 	/**
+diff --git a/packages/theme/src/use-theme-provider-styles.ts b/packages/theme/src/use-theme-provider-styles.ts
+index 3af46a501899a4..f24e8d8f58c603 100644
+--- a/packages/theme/src/use-theme-provider-styles.ts
++++ b/packages/theme/src/use-theme-provider-styles.ts
+@@ -27,6 +27,8 @@ import {
+ 	buildBgRamp,
+ 	buildAccentRamp,
+ 	DEFAULT_SEED_COLORS,
++	getQualitativeSeeds,
++	accentSeedsToRecord,
+ 	type RampResult,
+ } from './color-ramps';
+ import { getColorString } from './color-ramps/lib/color-utils';
+@@ -185,23 +187,31 @@ export function useThemeProviderStyles( {
+ 		DEFAULT_SEED_COLORS.primary;
+ 	const bg =
+ 		color.bg ?? inheritedSettings.color?.bg ?? DEFAULT_SEED_COLORS.bg;
++	const accents = color.accents ?? inheritedSettings.color?.accents;
+ 
+ 	const resolvedSettings = useMemo(
+ 		() => ( {
+ 			color: {
+ 				primary,
+ 				bg,
++				accents,
+ 			},
+ 		} ),
+-		[ primary, bg ]
++		[ primary, bg, accents ]
+ 	);
+ 
+ 	const themeProviderStyles = useMemo( () => {
+ 		// Determine which seeds are needed for generating ramps.
++		// Use manually-specified accent seeds if provided,
++		// otherwise derive them from the current primary color.
++		const resolvedAccents = accents
++			? accentSeedsToRecord( accents )
++			: getQualitativeSeeds( primary );
+ 		const seeds = {
+ 			...DEFAULT_SEED_COLORS,
+ 			bg,
+ 			primary,
++			...resolvedAccents,
+ 		};
+ 
+ 		// Generate ramps.
+@@ -222,7 +232,7 @@ export function useThemeProviderStyles( {
+ 			primary: seeds.primary,
+ 			computedColorRamps,
+ 		} );
+-	}, [ primary, bg ] );
++	}, [ primary, bg, accents ] );
+ 
+ 	return {
+ 		resolvedSettings,
+diff --git a/packages/theme/tokens/color.json b/packages/theme/tokens/color.json
+index 21cbdf9c9e2213..88245063ac1989 100644
+--- a/packages/theme/tokens/color.json
++++ b/packages/theme/tokens/color.json
+@@ -1093,6 +1093,1098 @@
+ 						"hex": "#ffef9b"
+ 					}
+ 				}
++			},
++			"accent1": {
++				"bgFill1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.91, 0, 0.435 ],
++						"hex": "#e8006f"
++					}
++				},
++				"fgFill": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 1, 1, 1 ],
++						"hex": "#fff"
++					}
++				},
++				"bgFill2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.812, 0, 0.369 ],
++						"hex": "#cf005e"
++					}
++				},
++				"surface2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 1, 0.961, 0.969 ],
++						"hex": "#fff5f7"
++					}
++				},
++				"surface6": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.965, 0.773, 0.816 ],
++						"hex": "#f6c5d0"
++					}
++				},
++				"surface5": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.976, 0.855, 0.878 ],
++						"hex": "#f9dae0"
++					}
++				},
++				"surface4": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.969, 0.894, 0.91 ],
++						"hex": "#f7e4e8"
++					}
++				},
++				"surface3": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 1, 1, 1 ],
++						"hex": "#fff"
++					}
++				},
++				"fgSurface4": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.263, 0, 0.094 ],
++						"hex": "#430018"
++					}
++				},
++				"fgSurface3": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.839, 0, 0.38 ],
++						"hex": "#d60061"
++					}
++				},
++				"fgSurface2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 1, 0.196, 0.51 ],
++						"hex": "#ff3282"
++					}
++				},
++				"fgSurface1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 1, 0.51, 0.659 ],
++						"hex": "#ff82a8"
++					}
++				},
++				"stroke3": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.839, 0, 0.38 ],
++						"hex": "#d60061"
++					}
++				},
++				"stroke4": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.639, 0, 0.282 ],
++						"hex": "#a30048"
++					}
++				},
++				"stroke2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.871, 0.627, 0.682 ],
++						"hex": "#dea0ae"
++					}
++				},
++				"stroke1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.878, 0.663, 0.71 ],
++						"hex": "#e0a9b5"
++					}
++				},
++				"bgFillDark": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.137, 0.11, 0.114 ],
++						"hex": "#231c1d"
++					}
++				},
++				"fgFillDark": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.953, 0.937, 0.941 ],
++						"hex": "#f3eff0"
++					}
++				},
++				"bgFillInverted2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.137, 0.11, 0.114 ],
++						"hex": "#231c1d"
++					}
++				},
++				"bgFillInverted1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.376, 0, 0.149 ],
++						"hex": "#600026"
++					}
++				},
++				"fgFillInverted": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.953, 0.937, 0.941 ],
++						"hex": "#f3eff0"
++					}
++				},
++				"surface1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.992, 0.918, 0.933 ],
++						"hex": "#fdeaee"
++					}
++				}
++			},
++			"accent2": {
++				"bgFill1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 1, 0, 0.918 ],
++						"hex": "#ff00ea"
++					}
++				},
++				"fgFill": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.133, 0.11, 0.129 ],
++						"hex": "#221c21"
++					}
++				},
++				"bgFill2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.898, 0, 0.824 ],
++						"hex": "#e500d2"
++					}
++				},
++				"surface2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 1, 0.957, 0.996 ],
++						"hex": "#fff4fe"
++					}
++				},
++				"surface6": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.976, 0.753, 0.933 ],
++						"hex": "#f9c0ee"
++					}
++				},
++				"surface5": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.988, 0.839, 0.961 ],
++						"hex": "#fcd6f5"
++					}
++				},
++				"surface4": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.996, 0.878, 0.969 ],
++						"hex": "#fee0f7"
++					}
++				},
++				"surface3": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 1, 1, 1 ],
++						"hex": "#fff"
++					}
++				},
++				"fgSurface4": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.235, 0, 0.212 ],
++						"hex": "#3c0036"
++					}
++				},
++				"fgSurface3": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.769, 0, 0.706 ],
++						"hex": "#c400b4"
++					}
++				},
++				"fgSurface2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.965, 0, 0.886 ],
++						"hex": "#f600e2"
++					}
++				},
++				"fgSurface1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 1, 0.447, 0.965 ],
++						"hex": "#ff72f6"
++					}
++				},
++				"stroke3": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.769, 0, 0.706 ],
++						"hex": "#c400b4"
++					}
++				},
++				"stroke4": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.584, 0, 0.533 ],
++						"hex": "#950088"
++					}
++				},
++				"stroke2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.882, 0.6, 0.831 ],
++						"hex": "#e199d4"
++					}
++				},
++				"stroke1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.886, 0.643, 0.843 ],
++						"hex": "#e2a4d7"
++					}
++				},
++				"bgFillDark": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.133, 0.11, 0.129 ],
++						"hex": "#221c21"
++					}
++				},
++				"fgFillDark": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.957, 0.933, 0.953 ],
++						"hex": "#f4eef3"
++					}
++				},
++				"bgFillInverted2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.133, 0.11, 0.129 ],
++						"hex": "#221c21"
++					}
++				},
++				"bgFillInverted1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.345, 0, 0.314 ],
++						"hex": "#580050"
++					}
++				},
++				"fgFillInverted": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.957, 0.933, 0.953 ],
++						"hex": "#f4eef3"
++					}
++				},
++				"surface1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 1, 0.906, 1 ],
++						"hex": "#ffe7ff"
++					}
++				}
++			},
++			"accent3": {
++				"bgFill1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.584, 0, 1 ],
++						"hex": "#9500ff"
++					}
++				},
++				"fgFill": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.941, 0.941, 0.949 ],
++						"hex": "#f0f0f2"
++					}
++				},
++				"bgFill2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.506, 0, 0.89 ],
++						"hex": "#8100e3"
++					}
++				},
++				"surface2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.976, 0.969, 1 ],
++						"hex": "#f9f7ff"
++					}
++				},
++				"surface6": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.851, 0.8, 0.953 ],
++						"hex": "#d9ccf3"
++					}
++				},
++				"surface5": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.902, 0.871, 0.969 ],
++						"hex": "#e6def7"
++					}
++				},
++				"surface4": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.925, 0.906, 0.965 ],
++						"hex": "#ece7f6"
++					}
++				},
++				"surface3": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 1, 1, 1 ],
++						"hex": "#fff"
++					}
++				},
++				"fgSurface4": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.173, 0, 0.337 ],
++						"hex": "#2c0056"
++					}
++				},
++				"fgSurface3": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.584, 0, 1 ],
++						"hex": "#9500ff"
++					}
++				},
++				"fgSurface2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.686, 0.388, 1 ],
++						"hex": "#af63ff"
++					}
++				},
++				"fgSurface1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.769, 0.58, 1 ],
++						"hex": "#c494ff"
++					}
++				},
++				"stroke3": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.584, 0, 1 ],
++						"hex": "#9500ff"
++					}
++				},
++				"stroke4": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.431, 0, 0.765 ],
++						"hex": "#6e00c3"
++					}
++				},
++				"stroke2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.706, 0.631, 0.839 ],
++						"hex": "#b4a1d6"
++					}
++				},
++				"stroke1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.733, 0.659, 0.867 ],
++						"hex": "#bba8dd"
++					}
++				},
++				"bgFillDark": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.122, 0.11, 0.145 ],
++						"hex": "#1f1c25"
++					}
++				},
++				"fgFillDark": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.941, 0.941, 0.949 ],
++						"hex": "#f0f0f2"
++					}
++				},
++				"bgFillInverted2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.122, 0.11, 0.145 ],
++						"hex": "#1f1c25"
++					}
++				},
++				"bgFillInverted1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.263, 0, 0.486 ],
++						"hex": "#43007c"
++					}
++				},
++				"fgFillInverted": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.941, 0.941, 0.949 ],
++						"hex": "#f0f0f2"
++					}
++				},
++				"surface1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.949, 0.929, 0.988 ],
++						"hex": "#f2edfc"
++					}
++				}
++			},
++			"accent4": {
++				"bgFill1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0, 0.835, 1 ],
++						"hex": "#00d5ff"
++					}
++				},
++				"fgFill": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.106, 0.122, 0.125 ],
++						"hex": "#1b1f20"
++					}
++				},
++				"bgFill2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0, 0.757, 0.918 ],
++						"hex": "#00c1ea"
++					}
++				},
++				"surface2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.898, 0.992, 1 ],
++						"hex": "#e5fdff"
++					}
++				},
++				"surface6": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.573, 0.871, 0.961 ],
++						"hex": "#92def5"
++					}
++				},
++				"surface5": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.718, 0.922, 0.984 ],
++						"hex": "#b7ebfb"
++					}
++				},
++				"surface4": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.78, 0.945, 0.996 ],
++						"hex": "#c7f1fe"
++					}
++				},
++				"surface3": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 1, 1, 1 ],
++						"hex": "#fff"
++					}
++				},
++				"fgSurface4": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0, 0.141, 0.196 ],
++						"hex": "#002432"
++					}
++				},
++				"fgSurface3": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0, 0.467, 0.584 ],
++						"hex": "#007795"
++					}
++				},
++				"fgSurface2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0, 0.588, 0.729 ],
++						"hex": "#0096ba"
++					}
++				},
++				"fgSurface1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0, 0.729, 0.89 ],
++						"hex": "#00bae3"
++					}
++				},
++				"stroke3": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0, 0.467, 0.584 ],
++						"hex": "#007795"
++					}
++				},
++				"stroke4": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0, 0.349, 0.447 ],
++						"hex": "#005972"
++					}
++				},
++				"stroke2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.494, 0.733, 0.804 ],
++						"hex": "#7ebbcd"
++					}
++				},
++				"stroke1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.514, 0.761, 0.839 ],
++						"hex": "#83c2d6"
++					}
++				},
++				"bgFillDark": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.106, 0.122, 0.125 ],
++						"hex": "#1b1f20"
++					}
++				},
++				"fgFillDark": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.902, 0.953, 0.969 ],
++						"hex": "#e6f3f7"
++					}
++				},
++				"bgFillInverted2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.106, 0.122, 0.125 ],
++						"hex": "#1b1f20"
++					}
++				},
++				"bgFillInverted1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0, 0.196, 0.263 ],
++						"hex": "#003243"
++					}
++				},
++				"fgFillInverted": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.902, 0.953, 0.969 ],
++						"hex": "#e6f3f7"
++					}
++				},
++				"surface1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.808, 0.973, 1 ],
++						"hex": "#cef8ff"
++					}
++				}
++			},
++			"accent5": {
++				"bgFill1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.302, 0.702, 0.635 ],
++						"hex": "#4db3a2"
++					}
++				},
++				"fgFill": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.11, 0.122, 0.118 ],
++						"hex": "#1c1f1e"
++					}
++				},
++				"bgFill2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.227, 0.639, 0.573 ],
++						"hex": "#3aa392"
++					}
++				},
++				"surface2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.894, 1, 0.976 ],
++						"hex": "#e4fff9"
++					}
++				},
++				"surface6": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.549, 0.89, 0.827 ],
++						"hex": "#8ce3d3"
++					}
++				},
++				"surface5": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.608, 0.953, 0.89 ],
++						"hex": "#9bf3e3"
++					}
++				},
++				"surface4": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.714, 0.969, 0.918 ],
++						"hex": "#b6f7ea"
++					}
++				},
++				"surface3": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 1, 1, 1 ],
++						"hex": "#fff"
++					}
++				},
++				"fgSurface4": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0, 0.153, 0.125 ],
++						"hex": "#002720"
++					}
++				},
++				"fgSurface3": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0, 0.486, 0.427 ],
++						"hex": "#007c6d"
++					}
++				},
++				"fgSurface2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.188, 0.604, 0.541 ],
++						"hex": "#309a8a"
++					}
++				},
++				"fgSurface1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.341, 0.737, 0.671 ],
++						"hex": "#57bcab"
++					}
++				},
++				"stroke3": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0, 0.486, 0.427 ],
++						"hex": "#007c6d"
++					}
++				},
++				"stroke4": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0, 0.369, 0.314 ],
++						"hex": "#005e50"
++					}
++				},
++				"stroke2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.529, 0.741, 0.698 ],
++						"hex": "#87bdb2"
++					}
++				},
++				"stroke1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.553, 0.769, 0.725 ],
++						"hex": "#8dc4b9"
++					}
++				},
++				"bgFillDark": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.11, 0.122, 0.118 ],
++						"hex": "#1c1f1e"
++					}
++				},
++				"fgFillDark": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.91, 0.953, 0.941 ],
++						"hex": "#e8f3f0"
++					}
++				},
++				"bgFillInverted2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.11, 0.122, 0.118 ],
++						"hex": "#1c1f1e"
++					}
++				},
++				"bgFillInverted1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0, 0.208, 0.173 ],
++						"hex": "#00352c"
++					}
++				},
++				"fgFillInverted": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.91, 0.953, 0.941 ],
++						"hex": "#e8f3f0"
++					}
++				},
++				"surface1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.737, 0.996, 0.941 ],
++						"hex": "#bcfef0"
++					}
++				}
++			},
++			"accent6": {
++				"bgFill1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.765, 0.902, 0.098 ],
++						"hex": "#c3e619"
++					}
++				},
++				"fgFill": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.118, 0.122, 0.106 ],
++						"hex": "#1e1f1b"
++					}
++				},
++				"bgFill2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.69, 0.824, 0 ],
++						"hex": "#b0d200"
++					}
++				},
++				"surface2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.941, 1, 0.765 ],
++						"hex": "#f0ffc3"
++					}
++				},
++				"surface6": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.769, 0.867, 0.467 ],
++						"hex": "#c4dd77"
++					}
++				},
++				"surface5": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.827, 0.929, 0.506 ],
++						"hex": "#d3ed81"
++					}
++				},
++				"surface4": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.855, 0.961, 0.522 ],
++						"hex": "#daf585"
++					}
++				},
++				"surface3": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 1, 1, 1 ],
++						"hex": "#fff"
++					}
++				},
++				"fgSurface4": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.102, 0.133, 0 ],
++						"hex": "#1a2200"
++					}
++				},
++				"fgSurface3": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.376, 0.459, 0 ],
++						"hex": "#607500"
++					}
++				},
++				"fgSurface2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.478, 0.58, 0 ],
++						"hex": "#7a9400"
++					}
++				},
++				"fgSurface1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.596, 0.718, 0 ],
++						"hex": "#98b700"
++					}
++				},
++				"stroke3": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.376, 0.459, 0 ],
++						"hex": "#607500"
++					}
++				},
++				"stroke4": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.278, 0.345, 0 ],
++						"hex": "#475800"
++					}
++				},
++				"stroke2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.659, 0.722, 0.478 ],
++						"hex": "#a8b87a"
++					}
++				},
++				"stroke1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.686, 0.753, 0.498 ],
++						"hex": "#afc07f"
++					}
++				},
++				"bgFillDark": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.118, 0.122, 0.106 ],
++						"hex": "#1e1f1b"
++					}
++				},
++				"fgFillDark": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.91, 0.98, 0.71 ],
++						"hex": "#e8fab5"
++					}
++				},
++				"bgFillInverted2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.118, 0.122, 0.106 ],
++						"hex": "#1e1f1b"
++					}
++				},
++				"bgFillInverted1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.153, 0.196, 0 ],
++						"hex": "#273200"
++					}
++				},
++				"fgFillInverted": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.91, 0.98, 0.71 ],
++						"hex": "#e8fab5"
++					}
++				},
++				"surface1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.878, 0.984, 0.545 ],
++						"hex": "#e0fb8b"
++					}
++				}
++			},
++			"accent7": {
++				"bgFill1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.957, 0.502, 0.043 ],
++						"hex": "#f4800b"
++					}
++				},
++				"fgFill": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.129, 0.114, 0.102 ],
++						"hex": "#211d1a"
++					}
++				},
++				"bgFill2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.886, 0.435, 0 ],
++						"hex": "#e26f00"
++					}
++				},
++				"surface2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 1, 0.965, 0.933 ],
++						"hex": "#fff6ee"
++					}
++				},
++				"surface6": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.957, 0.788, 0.675 ],
++						"hex": "#f4c9ac"
++					}
++				},
++				"surface5": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.976, 0.859, 0.784 ],
++						"hex": "#f9dbc8"
++					}
++				},
++				"surface4": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.988, 0.894, 0.835 ],
++						"hex": "#fce4d5"
++					}
++				},
++				"surface3": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 1, 1, 1 ],
++						"hex": "#fff"
++					}
++				},
++				"fgSurface4": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.224, 0.059, 0 ],
++						"hex": "#390f00"
++					}
++				},
++				"fgSurface3": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.698, 0.31, 0 ],
++						"hex": "#b24f00"
++					}
++				},
++				"fgSurface2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.855, 0.412, 0 ],
++						"hex": "#da6900"
++					}
++				},
++				"fgSurface1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 1, 0.545, 0.141 ],
++						"hex": "#ff8b24"
++					}
++				},
++				"stroke3": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.698, 0.31, 0 ],
++						"hex": "#b24f00"
++					}
++				},
++				"stroke4": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.533, 0.224, 0 ],
++						"hex": "#883900"
++					}
++				},
++				"stroke2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.863, 0.647, 0.502 ],
++						"hex": "#dca580"
++					}
++				},
++				"stroke1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.875, 0.678, 0.549 ],
++						"hex": "#dfad8c"
++					}
++				},
++				"bgFillDark": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.129, 0.114, 0.102 ],
++						"hex": "#211d1a"
++					}
++				},
++				"fgFillDark": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.957, 0.937, 0.925 ],
++						"hex": "#f4efec"
++					}
++				},
++				"bgFillInverted2": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.129, 0.114, 0.102 ],
++						"hex": "#211d1a"
++					}
++				},
++				"bgFillInverted1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.325, 0.11, 0 ],
++						"hex": "#531c00"
++					}
++				},
++				"fgFillInverted": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0.957, 0.937, 0.925 ],
++						"hex": "#f4efec"
++					}
++				},
++				"surface1": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 1, 0.922, 0.859 ],
++						"hex": "#ffebdb"
++					}
++				}
+ 			}
+ 		},
+ 		"bg": {
+@@ -1152,6 +2244,34 @@
+ 				"error-weak": {
+ 					"$value": "{wpds-color.primitive.error.surface2}",
+ 					"$description": "Background color for surfaces with error tone and weak emphasis."
++				},
++				"accent1": {
++					"$value": "{wpds-color.primitive.accent1.bgFill1}",
++					"$description": "Background color for qualitative accent 1 (45° hue rotation from primary)."
++				},
++				"accent2": {
++					"$value": "{wpds-color.primitive.accent2.bgFill1}",
++					"$description": "Background color for qualitative accent 2 (90° hue rotation from primary)."
++				},
++				"accent3": {
++					"$value": "{wpds-color.primitive.accent3.bgFill1}",
++					"$description": "Background color for qualitative accent 3 (135° hue rotation from primary)."
++				},
++				"accent4": {
++					"$value": "{wpds-color.primitive.accent4.bgFill1}",
++					"$description": "Background color for qualitative accent 4 (180° hue rotation from primary)."
++				},
++				"accent5": {
++					"$value": "{wpds-color.primitive.accent5.bgFill1}",
++					"$description": "Background color for qualitative accent 5 (225° hue rotation from primary)."
++				},
++				"accent6": {
++					"$value": "{wpds-color.primitive.accent6.bgFill1}",
++					"$description": "Background color for qualitative accent 6 (270° hue rotation from primary)."
++				},
++				"accent7": {
++					"$value": "{wpds-color.primitive.accent7.bgFill1}",
++					"$description": "Background color for qualitative accent 7 (315° hue rotation from primary)."
+ 				}
+ 			},
+ 			"interactive": {
+@@ -1325,6 +2445,34 @@
+ 				"error-weak": {
+ 					"$value": "{wpds-color.primitive.error.fgSurface3}",
+ 					"$description": "Foreground color for content like text with error tone and weak emphasis."
++				},
++				"accent1": {
++					"$value": "{wpds-color.primitive.accent1.fgFill}",
++					"$description": "Foreground color for qualitative accent 1 (use on accent1 background)."
++				},
++				"accent2": {
++					"$value": "{wpds-color.primitive.accent2.fgFill}",
++					"$description": "Foreground color for qualitative accent 2 (use on accent2 background)."
++				},
++				"accent3": {
++					"$value": "{wpds-color.primitive.accent3.fgFill}",
++					"$description": "Foreground color for qualitative accent 3 (use on accent3 background)."
++				},
++				"accent4": {
++					"$value": "{wpds-color.primitive.accent4.fgFill}",
++					"$description": "Foreground color for qualitative accent 4 (use on accent4 background)."
++				},
++				"accent5": {
++					"$value": "{wpds-color.primitive.accent5.fgFill}",
++					"$description": "Foreground color for qualitative accent 5 (use on accent5 background)."
++				},
++				"accent6": {
++					"$value": "{wpds-color.primitive.accent6.fgFill}",
++					"$description": "Foreground color for qualitative accent 6 (use on accent6 background)."
++				},
++				"accent7": {
++					"$value": "{wpds-color.primitive.accent7.fgFill}",
++					"$description": "Foreground color for qualitative accent 7 (use on accent7 background)."
+ 				}
+ 			},
+ 			"interactive": {

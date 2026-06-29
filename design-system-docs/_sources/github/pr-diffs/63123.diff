@@ -1,0 +1,401 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 7d1bb161a7c3f1..7ed573d67d13a9 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -420,6 +420,26 @@ module.exports = {
+ 			plugins: [ 'ssr-friendly' ],
+ 			extends: [ 'plugin:ssr-friendly/recommended' ],
+ 		},
++		{
++			files: [ 'packages/components/src/**' ],
++			rules: {
++				'no-restricted-imports': [
++					'error',
++					// The `ariakit` and `framer-motion` APIs are meant to be consumed via
++					// the `@wordpress/components` package, hence why importing those
++					// dependencies should be allowed in the components package.
++					{
++						paths: restrictedImports.filter(
++							( { name } ) =>
++								! [
++									'@ariakit/react',
++									'framer-motion',
++								].includes( name )
++						),
++					},
++				],
++			},
++		},
+ 		{
+ 			files: [ 'packages/block-editor/**' ],
+ 			rules: {
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9d3903f70e2add..355942f0d4a8fd 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ 
+ ### Internal
+ 
++-   `Allow ariakit and framer motion imports in the components package. ([#63123](https://github.com/WordPress/gutenberg/pull/63123))
+ -   `CustomSelectControlV2`: prevent keyboard event propagation in legacy wrapper. ([#62907](https://github.com/WordPress/gutenberg/pull/62907))
+ -   `CustomSelectControlV2`: expose legacy wrapper through private APIs. ([#62936](https://github.com/WordPress/gutenberg/pull/62936))
+ -   `CustomSelectControlV2`: fix item styles ([#62825](https://github.com/WordPress/gutenberg/pull/62825))
+diff --git a/packages/components/src/animation/index.tsx b/packages/components/src/animation/index.tsx
+index 39507803d2f401..6620f8d5d4ecae 100644
+--- a/packages/components/src/animation/index.tsx
++++ b/packages/components/src/animation/index.tsx
+@@ -6,7 +6,6 @@
+  * @see https://www.framer.com/docs/animation/
+  */
+ 
+-// eslint-disable-next-line no-restricted-imports
+ export {
+ 	motion as __unstableMotion,
+ 	AnimatePresence as __unstableAnimatePresence,
+diff --git a/packages/components/src/composite/current/index.ts b/packages/components/src/composite/current/index.ts
+index ec844b25a3a9d9..96379f00296516 100644
+--- a/packages/components/src/composite/current/index.ts
++++ b/packages/components/src/composite/current/index.ts
+@@ -8,7 +8,6 @@
+  * @see https://ariakit.org/components/composite
+  */
+ 
+-/* eslint-disable-next-line no-restricted-imports */
+ export {
+ 	Composite,
+ 	CompositeGroup,
+@@ -18,5 +17,4 @@ export {
+ 	useCompositeStore,
+ } from '@ariakit/react';
+ 
+-/* eslint-disable-next-line no-restricted-imports */
+ export type { CompositeStore, CompositeStoreProps } from '@ariakit/react';
+diff --git a/packages/components/src/custom-select-control-v2/default-component/index.tsx b/packages/components/src/custom-select-control-v2/default-component/index.tsx
+index e9a2a9d8f59183..89ff14097e8caf 100644
+--- a/packages/components/src/custom-select-control-v2/default-component/index.tsx
++++ b/packages/components/src/custom-select-control-v2/default-component/index.tsx
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-// eslint-disable-next-line no-restricted-imports
+ import * as Ariakit from '@ariakit/react';
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/custom-select-control-v2/legacy-component/index.tsx b/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
+index d12d1d1e7e87ac..a4c437be97e405 100644
+--- a/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
++++ b/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-// eslint-disable-next-line no-restricted-imports
+ import * as Ariakit from '@ariakit/react';
+ import clsx from 'clsx';
+ 
+diff --git a/packages/components/src/custom-select-control-v2/styles.ts b/packages/components/src/custom-select-control-v2/styles.ts
+index 59d22a45915500..e4d6140fbf6d79 100644
+--- a/packages/components/src/custom-select-control-v2/styles.ts
++++ b/packages/components/src/custom-select-control-v2/styles.ts
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-// eslint-disable-next-line no-restricted-imports
+ import * as Ariakit from '@ariakit/react';
+ import { css } from '@emotion/react';
+ import styled from '@emotion/styled';
+diff --git a/packages/components/src/custom-select-control-v2/types.ts b/packages/components/src/custom-select-control-v2/types.ts
+index 317c363ec3549a..b663f1892ceebc 100644
+--- a/packages/components/src/custom-select-control-v2/types.ts
++++ b/packages/components/src/custom-select-control-v2/types.ts
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-// eslint-disable-next-line no-restricted-imports
+ import type * as Ariakit from '@ariakit/react';
+ import type { FocusEventHandler, MouseEventHandler } from 'react';
+ 
+diff --git a/packages/components/src/disclosure/index.tsx b/packages/components/src/disclosure/index.tsx
+index 5bacfcabc349a6..fa8570fc1d4c5b 100644
+--- a/packages/components/src/disclosure/index.tsx
++++ b/packages/components/src/disclosure/index.tsx
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-// eslint-disable-next-line no-restricted-imports
+ import * as Ariakit from '@ariakit/react';
+ 
+ /**
+diff --git a/packages/components/src/divider/component.tsx b/packages/components/src/divider/component.tsx
+index 3870c2f12c4fc3..8d68f8a6326ac1 100644
+--- a/packages/components/src/divider/component.tsx
++++ b/packages/components/src/divider/component.tsx
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-// eslint-disable-next-line no-restricted-imports
+ import * as Ariakit from '@ariakit/react';
+ import type { ForwardedRef } from 'react';
+ 
+diff --git a/packages/components/src/divider/types.ts b/packages/components/src/divider/types.ts
+index cb29823eb4ca1a..7f7ecf1f0dcca5 100644
+--- a/packages/components/src/divider/types.ts
++++ b/packages/components/src/divider/types.ts
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-// eslint-disable-next-line no-restricted-imports
+ import type { SeparatorProps } from '@ariakit/react';
+ 
+ /**
+diff --git a/packages/components/src/dropdown-menu-v2/index.tsx b/packages/components/src/dropdown-menu-v2/index.tsx
+index 37d4a1f9cfcc5e..c53286a7da128b 100644
+--- a/packages/components/src/dropdown-menu-v2/index.tsx
++++ b/packages/components/src/dropdown-menu-v2/index.tsx
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-// eslint-disable-next-line no-restricted-imports
+ import * as Ariakit from '@ariakit/react';
+ 
+ /**
+diff --git a/packages/components/src/dropdown-menu-v2/styles.ts b/packages/components/src/dropdown-menu-v2/styles.ts
+index b4126503eee556..2165e3af41cb76 100644
+--- a/packages/components/src/dropdown-menu-v2/styles.ts
++++ b/packages/components/src/dropdown-menu-v2/styles.ts
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-// eslint-disable-next-line no-restricted-imports
+ import * as Ariakit from '@ariakit/react';
+ import { css, keyframes } from '@emotion/react';
+ import styled from '@emotion/styled';
+diff --git a/packages/components/src/dropdown-menu-v2/types.ts b/packages/components/src/dropdown-menu-v2/types.ts
+index 478b89c67f136a..f49f026b787933 100644
+--- a/packages/components/src/dropdown-menu-v2/types.ts
++++ b/packages/components/src/dropdown-menu-v2/types.ts
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-// eslint-disable-next-line no-restricted-imports
+ import type * as Ariakit from '@ariakit/react';
+ import type { Placement } from '@floating-ui/react-dom';
+ 
+diff --git a/packages/components/src/popover/index.tsx b/packages/components/src/popover/index.tsx
+index 9df0eca5880516..68d331ce8266ba 100644
+--- a/packages/components/src/popover/index.tsx
++++ b/packages/components/src/popover/index.tsx
+@@ -13,9 +13,7 @@ import {
+ 	offset as offsetMiddleware,
+ 	size,
+ } from '@floating-ui/react-dom';
+-// eslint-disable-next-line no-restricted-imports
+ import type { HTMLMotionProps, MotionProps } from 'framer-motion';
+-// eslint-disable-next-line no-restricted-imports
+ import { motion } from 'framer-motion';
+ 
+ /**
+diff --git a/packages/components/src/popover/utils.ts b/packages/components/src/popover/utils.ts
+index 50e452222677e9..6b9a4fa3c36a9c 100644
+--- a/packages/components/src/popover/utils.ts
++++ b/packages/components/src/popover/utils.ts
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-// eslint-disable-next-line no-restricted-imports
+ import type { MotionProps } from 'framer-motion';
+ import type { Placement, ReferenceType } from '@floating-ui/react-dom';
+ 
+diff --git a/packages/components/src/radio-group/context.tsx b/packages/components/src/radio-group/context.tsx
+index c2fa1b009b4e1f..be03d8d3254a4e 100644
+--- a/packages/components/src/radio-group/context.tsx
++++ b/packages/components/src/radio-group/context.tsx
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-// eslint-disable-next-line no-restricted-imports
+ import type * as Ariakit from '@ariakit/react';
+ 
+ /**
+diff --git a/packages/components/src/radio-group/index.tsx b/packages/components/src/radio-group/index.tsx
+index 8bc35f8382ee34..ac66c79e904e4b 100644
+--- a/packages/components/src/radio-group/index.tsx
++++ b/packages/components/src/radio-group/index.tsx
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-// eslint-disable-next-line no-restricted-imports
+ import * as Ariakit from '@ariakit/react';
+ 
+ /**
+diff --git a/packages/components/src/radio-group/radio.tsx b/packages/components/src/radio-group/radio.tsx
+index 8187b4a4ba573e..0c90c337fcdf2f 100644
+--- a/packages/components/src/radio-group/radio.tsx
++++ b/packages/components/src/radio-group/radio.tsx
+@@ -6,7 +6,6 @@ import { forwardRef, useContext } from '@wordpress/element';
+ /**
+  * External dependencies
+  */
+-// eslint-disable-next-line no-restricted-imports
+ import * as Ariakit from '@ariakit/react';
+ 
+ /**
+diff --git a/packages/components/src/tab-panel/index.tsx b/packages/components/src/tab-panel/index.tsx
+index 882fddc8607d74..f85119d938c659 100644
+--- a/packages/components/src/tab-panel/index.tsx
++++ b/packages/components/src/tab-panel/index.tsx
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-// eslint-disable-next-line no-restricted-imports
+ import * as Ariakit from '@ariakit/react';
+ import clsx from 'clsx';
+ import type { ForwardedRef } from 'react';
+diff --git a/packages/components/src/tabs/index.tsx b/packages/components/src/tabs/index.tsx
+index aaae3ed2527504..cad4a217efd44d 100644
+--- a/packages/components/src/tabs/index.tsx
++++ b/packages/components/src/tabs/index.tsx
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-// eslint-disable-next-line no-restricted-imports
+ import * as Ariakit from '@ariakit/react';
+ 
+ /**
+diff --git a/packages/components/src/tabs/styles.ts b/packages/components/src/tabs/styles.ts
+index 83304a030330bb..bd33476a2ccd2a 100644
+--- a/packages/components/src/tabs/styles.ts
++++ b/packages/components/src/tabs/styles.ts
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import styled from '@emotion/styled';
+-// eslint-disable-next-line no-restricted-imports
+ import * as Ariakit from '@ariakit/react';
+ 
+ /**
+diff --git a/packages/components/src/tabs/tablist.tsx b/packages/components/src/tabs/tablist.tsx
+index ae2a6194d005ed..dd78efd51b36b3 100644
+--- a/packages/components/src/tabs/tablist.tsx
++++ b/packages/components/src/tabs/tablist.tsx
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-// eslint-disable-next-line no-restricted-imports
+ import * as Ariakit from '@ariakit/react';
+ 
+ /**
+diff --git a/packages/components/src/tabs/types.ts b/packages/components/src/tabs/types.ts
+index 1a9e6477385f67..29baf25f224f7a 100644
+--- a/packages/components/src/tabs/types.ts
++++ b/packages/components/src/tabs/types.ts
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-// eslint-disable-next-line no-restricted-imports
+ import type * as Ariakit from '@ariakit/react';
+ 
+ export type TabsContextProps =
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+index 7990dd3b049c8c..b2b94bd6df233a 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+@@ -2,9 +2,7 @@
+  * External dependencies
+  */
+ import type { ForwardedRef } from 'react';
+-// eslint-disable-next-line no-restricted-imports
+ import * as Ariakit from '@ariakit/react';
+-// eslint-disable-next-line no-restricted-imports
+ import { motion } from 'framer-motion';
+ 
+ /**
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx b/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx
+index 24a40527abdc41..c363cb6577d839 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import type { ForwardedRef } from 'react';
+-// eslint-disable-next-line no-restricted-imports
+ import * as Ariakit from '@ariakit/react';
+ 
+ /**
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index 2fa35e2a5e80a6..94d257900a2e35 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import type { ForwardedRef } from 'react';
+-// eslint-disable-next-line no-restricted-imports
+ import { LayoutGroup } from 'framer-motion';
+ 
+ /**
+diff --git a/packages/components/src/toolbar/toolbar-context/index.ts b/packages/components/src/toolbar/toolbar-context/index.ts
+index 87c35c75fc68f1..33d407eac5c180 100644
+--- a/packages/components/src/toolbar/toolbar-context/index.ts
++++ b/packages/components/src/toolbar/toolbar-context/index.ts
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-// eslint-disable-next-line no-restricted-imports
+ import type * as Ariakit from '@ariakit/react';
+ 
+ /**
+diff --git a/packages/components/src/toolbar/toolbar-item/index.tsx b/packages/components/src/toolbar/toolbar-item/index.tsx
+index 7f4ccb7f659cdc..57cd80bc35d233 100644
+--- a/packages/components/src/toolbar/toolbar-item/index.tsx
++++ b/packages/components/src/toolbar/toolbar-item/index.tsx
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-// eslint-disable-next-line no-restricted-imports
+ import * as Ariakit from '@ariakit/react';
+ import type { ForwardedRef } from 'react';
+ 
+diff --git a/packages/components/src/toolbar/toolbar/toolbar-container.tsx b/packages/components/src/toolbar/toolbar/toolbar-container.tsx
+index 5f64ecb3d20cd0..5a12ba61c5d8a3 100644
+--- a/packages/components/src/toolbar/toolbar/toolbar-container.tsx
++++ b/packages/components/src/toolbar/toolbar/toolbar-container.tsx
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-// eslint-disable-next-line no-restricted-imports
+ import * as Ariakit from '@ariakit/react';
+ import type { ForwardedRef } from 'react';
+ 
+diff --git a/packages/components/src/tooltip/index.tsx b/packages/components/src/tooltip/index.tsx
+index 1eb0de7fed009d..37d393edc31c1b 100644
+--- a/packages/components/src/tooltip/index.tsx
++++ b/packages/components/src/tooltip/index.tsx
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-// eslint-disable-next-line no-restricted-imports
+ import * as Ariakit from '@ariakit/react';
+ 
+ /**

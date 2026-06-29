@@ -1,0 +1,86 @@
+diff --git a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+index 94dc53f7da1877..516fa70a321e9b 100644
+--- a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
++++ b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+@@ -218,7 +218,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+                         <button
+                           aria-label="Color: red"
+                           aria-selected="true"
+-                          class="components-button components-circular-option-picker__option is-pressed"
++                          class="components-button components-circular-option-picker__option"
+                           id="components-circular-option-picker-0-0"
+                           role="option"
+                           style="background-color: rgb(255, 0, 0); color: rgb(255, 0, 0);"
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 0487d19db99df4..2d212ed9926216 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -309,7 +309,8 @@
+ 
+ 	// Toggled style.
+ 	&[aria-pressed="true"],
+-	&[aria-pressed="mixed"] {
++	&[aria-pressed="mixed"],
++	&[aria-selected="true"] {
+ 		color: $components-color-foreground-inverted;
+ 		background: $components-color-foreground;
+ 
+diff --git a/packages/components/src/circular-option-picker/circular-option-picker-option.tsx b/packages/components/src/circular-option-picker/circular-option-picker-option.tsx
+index 0cfbea06538aab..2834228715115a 100644
+--- a/packages/components/src/circular-option-picker/circular-option-picker-option.tsx
++++ b/packages/components/src/circular-option-picker/circular-option-picker-option.tsx
+@@ -34,7 +34,14 @@ function UnforwardedOptionAsButton(
+ 	},
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+-	return <Button { ...props } ref={ forwardedRef }></Button>;
++	const { isPressed, ...additionalProps } = props;
++	return (
++		<Button
++			{ ...additionalProps }
++			aria-pressed={ isPressed }
++			ref={ forwardedRef }
++		></Button>
++	);
+ }
+ 
+ const OptionAsButton = forwardRef( UnforwardedOptionAsButton );
+@@ -48,7 +55,7 @@ function UnforwardedOptionAsOption(
+ 	},
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+-	const { id, className, isSelected, context, ...additionalProps } = props;
++	const { id, isSelected, context, ...additionalProps } = props;
+ 	const { isComposite, ..._compositeState } = context;
+ 	const compositeState =
+ 		_compositeState as CircularOptionPickerCompositeState;
+@@ -73,15 +80,6 @@ function UnforwardedOptionAsOption(
+ 			{ ...compositeState }
+ 			as={ Button }
+ 			id={ id }
+-			// Ideally we'd let the underlying `Button` component
+-			// handle this by passing `isPressed` as a prop.
+-			// Unfortunately doing so also sets `aria-pressed` as
+-			// an attribute on the element, which is incompatible
+-			// with `role="option"`, and there is no way at this
+-			// point to override that behaviour.
+-			className={ classnames( className, {
+-				'is-pressed': isSelected,
+-			} ) }
+ 			role="option"
+ 			aria-selected={ !! isSelected }
+ 			ref={ forwardedRef }
+diff --git a/packages/components/src/circular-option-picker/style.scss b/packages/components/src/circular-option-picker/style.scss
+index e0e4f3e81d4190..a705bf62fdb11d 100644
+--- a/packages/components/src/circular-option-picker/style.scss
++++ b/packages/components/src/circular-option-picker/style.scss
+@@ -83,7 +83,8 @@ $color-palette-circle-spacing: 12px;
+ 		box-shadow: inset 0 0 0 ($color-palette-circle-size * 0.5) !important;
+ 	}
+ 
+-	&.is-pressed {
++	&[aria-pressed="true"],
++	&[aria-selected="true"] {
+ 		box-shadow: inset 0 0 0 4px;
+ 		position: relative;
+ 		z-index: z-index(".components-circular-option-picker__option.is-pressed");

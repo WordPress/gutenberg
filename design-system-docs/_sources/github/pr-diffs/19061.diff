@@ -1,0 +1,123 @@
+diff --git a/packages/components/src/custom-select-control/index.js b/packages/components/src/custom-select-control/index.js
+index 0d49c08e4de137..aa73eb083fbbdd 100644
+--- a/packages/components/src/custom-select-control/index.js
++++ b/packages/components/src/custom-select-control/index.js
+@@ -7,7 +7,9 @@ import classnames from 'classnames';
+ /**
+  * Internal dependencies
+  */
+-import { Button, Dashicon } from '../';
++import Button from '../button';
++import Dashicon from '../dashicon';
++import List from '../list';
+ 
+ const itemToString = ( item ) => item && item.name;
+ // This is needed so that in Windows, where
+@@ -107,7 +109,7 @@ export default function CustomSelectControl( {
+ 					className="components-custom-select-control__button-icon"
+ 				/>
+ 			</Button>
+-			<ul { ...menuProps }>
++			<List { ...menuProps }>
+ 				{ isOpen &&
+ 					items.map( ( item, index ) => (
+ 						// eslint-disable-next-line react/jsx-key
+@@ -134,7 +136,7 @@ export default function CustomSelectControl( {
+ 							{ item.name }
+ 						</li>
+ 					) ) }
+-			</ul>
++			</List>
+ 		</div>
+ 	);
+ }
+diff --git a/packages/components/src/form-token-field/suggestions-list.js b/packages/components/src/form-token-field/suggestions-list.js
+index 2d7e64f84be7d0..f23430e039352c 100644
+--- a/packages/components/src/form-token-field/suggestions-list.js
++++ b/packages/components/src/form-token-field/suggestions-list.js
+@@ -11,6 +11,11 @@ import classnames from 'classnames';
+ import { Component } from '@wordpress/element';
+ import { withSafeTimeout } from '@wordpress/compose';
+ 
++/**
++ * Internal dependencies
++ */
++import List from '../list';
++
+ class SuggestionsList extends Component {
+ 	constructor() {
+ 		super( ...arguments );
+@@ -73,12 +78,8 @@ class SuggestionsList extends Component {
+ 	}
+ 
+ 	render() {
+-		// We set `tabIndex` here because otherwise Firefox sets focus on this
+-		// div when tabbing off of the input in `TokenField` -- not really sure
+-		// why, since usually a div isn't focusable by default
+-		// TODO does this still apply now that it's a <ul> and not a <div>?
+ 		return (
+-			<ul
++			<List
+ 				ref={ this.bindList }
+ 				className="components-form-token-field__suggestions-list"
+ 				id={ `components-form-token-suggestions-${ this.props.instanceId }` }
+@@ -120,7 +121,7 @@ class SuggestionsList extends Component {
+ 						/* eslint-enable jsx-a11y/click-events-have-key-events */
+ 					} )
+ 				}
+-			</ul>
++			</List>
+ 		);
+ 	}
+ }
+diff --git a/packages/components/src/guide/page-control.js b/packages/components/src/guide/page-control.js
+index 6a5a451efd6b1d..f046d26c739a44 100644
+--- a/packages/components/src/guide/page-control.js
++++ b/packages/components/src/guide/page-control.js
+@@ -12,11 +12,15 @@ import { __, sprintf } from '@wordpress/i18n';
+  * Internal dependencies
+  */
+ import IconButton from '../icon-button';
++import List from '../list';
+ import { PageControlIcon } from './icons';
+ 
+ export default function PageControl( { currentPage, numberOfPages, setCurrentPage } ) {
+ 	return (
+-		<ul className="components-guide__page-control" aria-label={ __( 'Guide controls' ) }>
++		<List
++			className="components-guide__page-control"
++			accessibilityLabel={ __( 'Guide controls' ) }
++		>
+ 			{ times( numberOfPages, ( page ) => (
+ 				<li key={ page }>
+ 					<IconButton
+@@ -28,6 +32,6 @@ export default function PageControl( { currentPage, numberOfPages, setCurrentPag
+ 					/>
+ 				</li>
+ 			) ) }
+-		</ul>
++		</List>
+ 	);
+ }
+diff --git a/packages/components/src/list/index.js b/packages/components/src/list/index.js
+new file mode 100644
+index 00000000000000..06d8c8f63a8749
+--- /dev/null
++++ b/packages/components/src/list/index.js
+@@ -0,0 +1,16 @@
++/**
++ * WordPress dependencies
++ */
++import { createElement, forwardRef } from '@wordpress/element';
++
++const List = ( { type = 'unordered', accessibilityLabel, ...props }, ref ) => {
++	const tagName = type === 'ordered' ? 'ol' : 'ul';
++	return createElement( tagName, {
++		role: 'list',
++		'aria-label': accessibilityLabel,
++		...props,
++		ref,
++	} );
++};
++
++export default forwardRef( List );

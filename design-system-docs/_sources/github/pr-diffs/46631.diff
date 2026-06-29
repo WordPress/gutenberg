@@ -1,0 +1,30 @@
+diff --git a/packages/block-editor/CHANGELOG.md b/packages/block-editor/CHANGELOG.md
+index 34cd726c55fdf5..a990b54f945b33 100644
+--- a/packages/block-editor/CHANGELOG.md
++++ b/packages/block-editor/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ ### Bug Fix
+ 
+ -   `SpacingSizesControl`: Change ARIA role from `region` to `group` to avoid unwanted ARIA landmark regions ([#46530](https://github.com/WordPress/gutenberg/pull/46530)).
++-   `FocalPointPicker`:  Fix layout misalignment when placed in the `BlockInspector` ([#46631](https://github.com/WordPress/gutenberg/pull/46631)).
+ 
+ ## 10.5.0 (2022-11-16)
+ 
+diff --git a/packages/block-editor/src/components/block-inspector/style.scss b/packages/block-editor/src/components/block-inspector/style.scss
+index 08ca013629927e..3dd4744fb87e2a 100644
+--- a/packages/block-editor/src/components/block-inspector/style.scss
++++ b/packages/block-editor/src/components/block-inspector/style.scss
+@@ -17,6 +17,13 @@
+ 			margin-bottom: $grid-unit-10;
+ 		}
+ 	}
++
++	// Reset unexpected margin-bottom from being applied to the `BaseControl`
++	// component of the `FocalPointPicker` component.
++	.components-focal-point-picker-control .components-base-control {
++		margin-bottom: 0;
++	}
++
+ 	.components-panel__body {
+ 		border: none;
+ 		border-top: $border-width solid $gray-200;

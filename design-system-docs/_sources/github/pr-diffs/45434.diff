@@ -1,0 +1,253 @@
+diff --git a/packages/block-editor/src/components/block-lock/modal.js b/packages/block-editor/src/components/block-lock/modal.js
+index ccdf1ecb1ec9c7..fec05139360810 100644
+--- a/packages/block-editor/src/components/block-lock/modal.js
++++ b/packages/block-editor/src/components/block-lock/modal.js
+@@ -114,6 +114,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
+ 					className="block-editor-block-lock-modal__options"
+ 				>
+ 					<CheckboxControl
++						__nextHasNoMarginBottom
+ 						className="block-editor-block-lock-modal__options-title"
+ 						label={
+ 							<span id={ instanceId }>{ __( 'Lock all' ) }</span>
+@@ -134,6 +135,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
+ 						{ allowsEditLocking && (
+ 							<li className="block-editor-block-lock-modal__checklist-item">
+ 								<CheckboxControl
++									__nextHasNoMarginBottom
+ 									label={
+ 										<>
+ 											{ __( 'Restrict editing' ) }
+@@ -158,6 +160,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
+ 						) }
+ 						<li className="block-editor-block-lock-modal__checklist-item">
+ 							<CheckboxControl
++								__nextHasNoMarginBottom
+ 								label={
+ 									<>
+ 										{ __( 'Disable movement' ) }
+@@ -181,6 +184,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
+ 						</li>
+ 						<li className="block-editor-block-lock-modal__checklist-item">
+ 							<CheckboxControl
++								__nextHasNoMarginBottom
+ 								label={
+ 									<>
+ 										{ __( 'Prevent removal' ) }
+diff --git a/packages/block-editor/src/components/block-lock/style.scss b/packages/block-editor/src/components/block-lock/style.scss
+index fe1689331bca57..4152168e3e8154 100644
+--- a/packages/block-editor/src/components/block-lock/style.scss
++++ b/packages/block-editor/src/components/block-lock/style.scss
+@@ -22,7 +22,6 @@
+ 	.components-base-control__field {
+ 		align-items: center;
+ 		display: flex;
+-		margin: 0;
+ 	}
+ }
+ .block-editor-block-lock-modal__checklist-item {
+@@ -32,7 +31,6 @@
+ 	.components-base-control__field {
+ 		align-items: center;
+ 		display: flex;
+-		margin: 0;
+ 	}
+ 
+ 	.components-checkbox-control__label {
+diff --git a/packages/edit-post/src/components/block-manager/category.js b/packages/edit-post/src/components/block-manager/category.js
+index ad4e87cc91c602..ea3094fdbd2e5a 100644
+--- a/packages/edit-post/src/components/block-manager/category.js
++++ b/packages/edit-post/src/components/block-manager/category.js
+@@ -88,6 +88,7 @@ function BlockManagerCategory( { title, blockTypes } ) {
+ 			className="edit-post-block-manager__category"
+ 		>
+ 			<CheckboxControl
++				__nextHasNoMarginBottom
+ 				checked={ isAllChecked }
+ 				onChange={ toggleAllVisible }
+ 				className="edit-post-block-manager__category-title"
+diff --git a/packages/edit-post/src/components/block-manager/checklist.js b/packages/edit-post/src/components/block-manager/checklist.js
+index 7aa1b025810d3b..02481f0995e2e0 100644
+--- a/packages/edit-post/src/components/block-manager/checklist.js
++++ b/packages/edit-post/src/components/block-manager/checklist.js
+@@ -13,6 +13,7 @@ function BlockTypesChecklist( { blockTypes, value, onItemChange } ) {
+ 					className="edit-post-block-manager__checklist-item"
+ 				>
+ 					<CheckboxControl
++						__nextHasNoMarginBottom
+ 						label={
+ 							<>
+ 								{ blockType.title }
+diff --git a/packages/edit-post/src/components/block-manager/style.scss b/packages/edit-post/src/components/block-manager/style.scss
+index d8e7d5edcb0168..17e98948ac7c28 100644
+--- a/packages/edit-post/src/components/block-manager/style.scss
++++ b/packages/edit-post/src/components/block-manager/style.scss
+@@ -55,7 +55,6 @@
+ 	.components-base-control__field {
+ 		align-items: center;
+ 		display: flex;
+-		margin: 0;
+ 	}
+ }
+ 
+diff --git a/packages/editor/src/components/entities-saved-states/entity-record-item.js b/packages/editor/src/components/entities-saved-states/entity-record-item.js
+index e5de0c19b82c8b..1e3ddcbc696686 100644
+--- a/packages/editor/src/components/entities-saved-states/entity-record-item.js
++++ b/packages/editor/src/components/entities-saved-states/entity-record-item.js
+@@ -77,6 +77,7 @@ export default function EntityRecordItem( {
+ 	return (
+ 		<PanelRow>
+ 			<CheckboxControl
++				__nextHasNoMarginBottom
+ 				label={
+ 					<strong>
+ 						{ decodeEntities( entityRecordTitle ) ||
+diff --git a/packages/editor/src/components/post-comments/index.js b/packages/editor/src/components/post-comments/index.js
+index febea6b3c3ea5e..ea774964c9dd19 100644
+--- a/packages/editor/src/components/post-comments/index.js
++++ b/packages/editor/src/components/post-comments/index.js
+@@ -19,6 +19,7 @@ function PostComments( { commentStatus = 'open', ...props } ) {
+ 
+ 	return (
+ 		<CheckboxControl
++			__nextHasNoMarginBottom
+ 			label={ __( 'Allow comments' ) }
+ 			checked={ commentStatus === 'open' }
+ 			onChange={ onToggleComments }
+diff --git a/packages/editor/src/components/post-pending-status/index.js b/packages/editor/src/components/post-pending-status/index.js
+index d5e6b9ae94becc..a51840d55d7bf8 100644
+--- a/packages/editor/src/components/post-pending-status/index.js
++++ b/packages/editor/src/components/post-pending-status/index.js
+@@ -21,6 +21,7 @@ export function PostPendingStatus( { status, onUpdateStatus } ) {
+ 	return (
+ 		<PostPendingStatusCheck>
+ 			<CheckboxControl
++				__nextHasNoMarginBottom
+ 				label={ __( 'Pending review' ) }
+ 				checked={ status === 'pending' }
+ 				onChange={ togglePendingStatus }
+diff --git a/packages/editor/src/components/post-pingbacks/index.js b/packages/editor/src/components/post-pingbacks/index.js
+index 6b6380e50c64ea..b2274075f1fe4c 100644
+--- a/packages/editor/src/components/post-pingbacks/index.js
++++ b/packages/editor/src/components/post-pingbacks/index.js
+@@ -19,6 +19,7 @@ function PostPingbacks( { pingStatus = 'open', ...props } ) {
+ 
+ 	return (
+ 		<CheckboxControl
++			__nextHasNoMarginBottom
+ 			label={ __( 'Allow pingbacks & trackbacks' ) }
+ 			checked={ pingStatus === 'open' }
+ 			onChange={ onTogglePingback }
+diff --git a/packages/editor/src/components/post-publish-panel/index.js b/packages/editor/src/components/post-publish-panel/index.js
+index db058bc58eae23..c9583254f73597 100644
+--- a/packages/editor/src/components/post-publish-panel/index.js
++++ b/packages/editor/src/components/post-publish-panel/index.js
+@@ -125,6 +125,7 @@ export class PostPublishPanel extends Component {
+ 				</div>
+ 				<div className="editor-post-publish-panel__footer">
+ 					<CheckboxControl
++						__nextHasNoMarginBottom
+ 						label={ __( 'Always show pre-publish checks.' ) }
+ 						checked={ isPublishSidebarEnabled }
+ 						onChange={ onTogglePublishSidebar }
+diff --git a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+index bb24f4559f470b..6382e8dd68ae57 100644
+--- a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
++++ b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+@@ -31,6 +31,10 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
+   padding: 0;
+ }
+ 
++.components-panel__row .emotion-8 {
++  margin-bottom: inherit;
++}
++
+ <div>
+   <div
+     class="editor-post-publish-panel"
+@@ -141,7 +145,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
+         class="components-base-control components-checkbox-control emotion-0 emotion-1"
+       >
+         <div
+-          class="components-base-control__field emotion-2 emotion-3"
++          class="components-base-control__field emotion-8 emotion-3"
+         >
+           <span
+             class="components-checkbox-control__input-container"
+@@ -197,6 +201,10 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
+   padding: 0;
+ }
+ 
++.components-panel__row .emotion-8 {
++  margin-bottom: inherit;
++}
++
+ <div>
+   <div
+     class="editor-post-publish-panel"
+@@ -307,7 +315,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
+         class="components-base-control components-checkbox-control emotion-0 emotion-1"
+       >
+         <div
+-          class="components-base-control__field emotion-2 emotion-3"
++          class="components-base-control__field emotion-8 emotion-3"
+         >
+           <span
+             class="components-checkbox-control__input-container"
+@@ -345,10 +353,6 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is
+   box-sizing: inherit;
+ }
+ 
+-.emotion-2 {
+-  margin-bottom: calc(4px * 2);
+-}
+-
+ .components-panel__row .emotion-2 {
+   margin-bottom: inherit;
+ }
+@@ -472,10 +476,6 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
+   box-sizing: inherit;
+ }
+ 
+-.emotion-2 {
+-  margin-bottom: calc(4px * 2);
+-}
+-
+ .components-panel__row .emotion-2 {
+   margin-bottom: inherit;
+ }
+@@ -641,10 +641,6 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
+   box-sizing: inherit;
+ }
+ 
+-.emotion-8 {
+-  margin-bottom: calc(4px * 2);
+-}
+-
+ .components-panel__row .emotion-8 {
+   margin-bottom: inherit;
+ }
+diff --git a/packages/editor/src/components/post-sticky/index.js b/packages/editor/src/components/post-sticky/index.js
+index 429be4f8d0ba26..253b927f0240c1 100644
+--- a/packages/editor/src/components/post-sticky/index.js
++++ b/packages/editor/src/components/post-sticky/index.js
+@@ -16,6 +16,7 @@ export function PostSticky( { onUpdateSticky, postSticky = false } ) {
+ 	return (
+ 		<PostStickyCheck>
+ 			<CheckboxControl
++				__nextHasNoMarginBottom
+ 				label={ __( 'Stick to the top of the blog' ) }
+ 				checked={ postSticky }
+ 				onChange={ () => onUpdateSticky( ! postSticky ) }
+diff --git a/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js b/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
+index 771b8e9e580cf0..7663113dc03207 100644
+--- a/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
++++ b/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
+@@ -358,6 +358,7 @@ export function HierarchicalTermSelector( { slug } ) {
+ 					className="editor-post-taxonomies__hierarchical-terms-choice"
+ 				>
+ 					<CheckboxControl
++						__nextHasNoMarginBottom
+ 						checked={ terms.indexOf( term.id ) !== -1 }
+ 						onChange={ () => {
+ 							const termId = parseInt( term.id, 10 );

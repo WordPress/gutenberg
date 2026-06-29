@@ -1,0 +1,29 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 62f8014b90cb07..fe79308d87a1a5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Bug Fixes
+ 
+ -   `Badge`: Add max-width for text truncation ([#72653](https://github.com/WordPress/gutenberg/pull/72653)).
++-   `Button`: Revert disabled primary button state to its previous one ([#73037](https://github.com/WordPress/gutenberg/pull/73037)).
+ 
+ ## 30.6.0 (2025-10-17)
+ 
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 2f9a7360247816..f0b92408f07ab4 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -85,9 +85,9 @@
+ 		&[aria-disabled="true"]:enabled, // This catches a situation where a Button is aria-disabled, but not disabled.
+ 		&[aria-disabled="true"]:active:enabled {
+ 			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
+-			color: $components-color-foreground-inverted;
+-			background: $components-color-gray-300;
+-			border-color: $components-color-gray-300;
++			color: rgba($white, 0.4);
++			background: $components-color-accent;
++			border-color: $components-color-accent;
+ 			outline: none;
+ 
+ 			&:focus:enabled {

@@ -1,0 +1,852 @@
+diff --git a/packages/components/src/card/card-media/component.js b/packages/components/src/card/card-media/component.js
+index 3c562604eb964b..c07f78ce52b3ae 100644
+--- a/packages/components/src/card/card-media/component.js
++++ b/packages/components/src/card/card-media/component.js
+@@ -1,9 +1,20 @@
+ /**
+  * Internal dependencies
+  */
+-import { createComponent } from '../../ui/utils';
++import { contextConnect } from '../../ui/context';
++import { View } from '../../view';
+ import { useCardMedia } from './hook';
+ 
++/**
++ * @param {import('../../ui/context').WordPressComponentProps<{ children: import('react').ReactNode }, 'div'>} props
++ * @param {import('react').Ref<any>}                                                                           forwardedRef
++ */
++function CardMedia( props, forwardedRef ) {
++	const cardMediaProps = useCardMedia( props );
++
++	return <View { ...cardMediaProps } ref={ forwardedRef } />;
++}
++
+ /**
+  * `CardMedia` provides a container for media elements within a `Card`.
+  *
+@@ -21,10 +32,6 @@ import { useCardMedia } from './hook';
+  * );
+  * ```
+  */
+-const CardMedia = createComponent( {
+-	as: 'div',
+-	useHook: useCardMedia,
+-	name: 'CardMedia',
+-} );
++const ConnectedCardMedia = contextConnect( CardMedia, 'CardMedia' );
+ 
+-export default CardMedia;
++export default ConnectedCardMedia;
+diff --git a/packages/components/src/elevation/component.js b/packages/components/src/elevation/component.js
+index a225e665a9ff67..1ed01bea55c0ef 100644
+--- a/packages/components/src/elevation/component.js
++++ b/packages/components/src/elevation/component.js
+@@ -1,8 +1,19 @@
+ /**
+  * Internal dependencies
+  */
++import { contextConnect } from '../ui/context';
++import { View } from '../view';
+ import { useElevation } from './hook';
+-import { createComponent } from '../ui/utils';
++
++/**
++ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
++ * @param {import('react').Ref<any>}                                                        forwardedRef
++ */
++function Elevation( props, forwardedRef ) {
++	const elevationProps = useElevation( props );
++
++	return <View { ...elevationProps } ref={ forwardedRef } />;
++}
+ 
+ /**
+  * `Elevation` is a core component that renders shadow, using the library's shadow system.
+@@ -27,10 +38,6 @@ import { createComponent } from '../ui/utils';
+  * }
+  * ```
+  */
+-const Elevation = createComponent( {
+-	as: 'div',
+-	useHook: useElevation,
+-	name: 'Elevation',
+-} );
++const ConnectedElevation = contextConnect( Elevation, 'Elevation' );
+ 
+-export default Elevation;
++export default ConnectedElevation;
+diff --git a/packages/components/src/flex/flex-block/component.js b/packages/components/src/flex/flex-block/component.js
+index 7a1e35ec443725..aa3352ba7b95c3 100644
+--- a/packages/components/src/flex/flex-block/component.js
++++ b/packages/components/src/flex/flex-block/component.js
+@@ -1,9 +1,20 @@
+ /**
+  * Internal dependencies
+  */
+-import { createComponent } from '../../ui/utils';
++import { contextConnect } from '../../ui/context';
++import { View } from '../../view';
+ import { useFlexBlock } from './hook';
+ 
++/**
++ * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexBlockProps, 'div'>} props
++ * @param {import('react').Ref<any>}                                                                     forwardedRef
++ */
++function FlexBlock( props, forwardedRef ) {
++	const flexBlockProps = useFlexBlock( props );
++
++	return <View { ...flexBlockProps } ref={ forwardedRef } />;
++}
++
+ /**
+  * `FlexBlock` is a primitive layout component that adaptively resizes content within layout containers like `Flex`.
+  *
+@@ -14,10 +25,6 @@ import { useFlexBlock } from './hook';
+  * </Flex>
+  * ```
+  */
+-const FlexBlock = createComponent( {
+-	as: 'div',
+-	useHook: useFlexBlock,
+-	name: 'FlexBlock',
+-} );
++const ConnectedFlexBlock = contextConnect( FlexBlock, 'FlexBlock' );
+ 
+-export default FlexBlock;
++export default ConnectedFlexBlock;
+diff --git a/packages/components/src/flex/flex-item/component.js b/packages/components/src/flex/flex-item/component.js
+index bd03f3f1066bd2..560063ef586ceb 100644
+--- a/packages/components/src/flex/flex-item/component.js
++++ b/packages/components/src/flex/flex-item/component.js
+@@ -1,9 +1,20 @@
+ /**
+  * Internal dependencies
+  */
+-import { createComponent } from '../../ui/utils';
++import { contextConnect } from '../../ui/context';
++import { View } from '../../view';
+ import { useFlexItem } from './hook';
+ 
++/**
++ * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexItemProps, 'div'>} props
++ * @param {import('react').Ref<any>}                                                                    forwardedRef
++ */
++function FlexItem( props, forwardedRef ) {
++	const flexItemProps = useFlexItem( props );
++
++	return <View { ...flexItemProps } ref={ forwardedRef } />;
++}
++
+ /**
+  * `FlexItem` is a primitive layout component that aligns content within layout containers like `Flex`.
+  *
+@@ -14,10 +25,6 @@ import { useFlexItem } from './hook';
+  * </Flex>
+  * ```
+  */
+-const FlexItem = createComponent( {
+-	as: 'div',
+-	useHook: useFlexItem,
+-	name: 'FlexItem',
+-} );
++const ConnectedFlexItem = contextConnect( FlexItem, 'FlexItem' );
+ 
+-export default FlexItem;
++export default ConnectedFlexItem;
+diff --git a/packages/components/src/grid/component.js b/packages/components/src/grid/component.js
+index 5abe522a0d7797..71eaee1e112928 100644
+--- a/packages/components/src/grid/component.js
++++ b/packages/components/src/grid/component.js
+@@ -1,9 +1,20 @@
+ /**
+  * Internal dependencies
+  */
+-import { createComponent } from '../ui/utils';
++import { contextConnect } from '../ui/context';
++import { View } from '../view';
+ import useGrid from './hook';
+ 
++/**
++ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
++ * @param {import('react').Ref<any>}                                                        forwardedRef
++ */
++function Grid( props, forwardedRef ) {
++	const gridProps = useGrid( props );
++
++	return <View { ...gridProps } ref={ forwardedRef } />;
++}
++
+ /**
+  * `Grid` is a primitive layout component that can arrange content in a grid configuration.
+  *
+@@ -25,10 +36,6 @@ import useGrid from './hook';
+  * }
+  * ```
+  */
+-const Grid = createComponent( {
+-	as: 'div',
+-	useHook: useGrid,
+-	name: 'Grid',
+-} );
++const ConnectedGrid = contextConnect( Grid, 'Grid' );
+ 
+-export default Grid;
++export default ConnectedGrid;
+diff --git a/packages/components/src/h-stack/component.js b/packages/components/src/h-stack/component.js
+index c26ae1c05abc6a..392e00ba55f4b5 100644
+--- a/packages/components/src/h-stack/component.js
++++ b/packages/components/src/h-stack/component.js
+@@ -1,9 +1,20 @@
+ /**
+  * Internal dependencies
+  */
+-import { createComponent } from '../ui/utils';
++import { contextConnect } from '../ui/context';
++import { View } from '../view';
+ import { useHStack } from './hook';
+ 
++/**
++ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
++ * @param {import('react').Ref<any>}                                                        forwardedRef
++ */
++function HStack( props, forwardedRef ) {
++	const hStackProps = useHStack( props );
++
++	return <View { ...hStackProps } ref={ forwardedRef } />;
++}
++
+ /**
+  * `HStack` (Horizontal Stack) arranges child elements in a horizontal line.
+  *
+@@ -27,10 +38,6 @@ import { useHStack } from './hook';
+  * }
+  * ```
+  */
+-const HStack = createComponent( {
+-	as: 'div',
+-	useHook: useHStack,
+-	name: 'HStack',
+-} );
++const ConnectedHStack = contextConnect( HStack, 'HStack' );
+ 
+-export default HStack;
++export default ConnectedHStack;
+diff --git a/packages/components/src/heading/component.ts b/packages/components/src/heading/component.ts
+deleted file mode 100644
+index 70a572171c4e6d..00000000000000
+--- a/packages/components/src/heading/component.ts
++++ /dev/null
+@@ -1,25 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { createComponent } from '../ui/utils';
+-import { useHeading } from './hook';
+-
+-/**
+- * `Heading` renders headings and titles using the library's typography system.
+- *
+- * @example
+- * ```jsx
+- * import { Heading } from `@wordpress/components/ui`
+- *
+- * function Example() {
+- *   return <Heading>Code is Poetry</Heading>;
+- * }
+- * ```
+- */
+-const Heading = createComponent( {
+-	as: 'h1',
+-	useHook: useHeading,
+-	name: 'Heading',
+-} );
+-
+-export default Heading;
+diff --git a/packages/components/src/heading/component.tsx b/packages/components/src/heading/component.tsx
+new file mode 100644
+index 00000000000000..e7ff7f82ee3267
+--- /dev/null
++++ b/packages/components/src/heading/component.tsx
+@@ -0,0 +1,37 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { Ref } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import { contextConnect, WordPressComponentProps } from '../ui/context';
++import { View } from '../view';
++import { useHeading, HeadingProps } from './hook';
++
++function Heading(
++	props: WordPressComponentProps< HeadingProps, 'h1' >,
++	forwardedRef: Ref< any >
++) {
++	const headerProps = useHeading( props );
++
++	return <View { ...headerProps } ref={ forwardedRef } />;
++}
++
++/**
++ * `Heading` renders headings and titles using the library's typography system.
++ *
++ * @example
++ * ```jsx
++ * import { __experimentalHeading as Heading } from `@wordpress/components`
++ *
++ * function Example() {
++ *   return <Heading>Code is Poetry</Heading>;
++ * }
++ * ```
++ */
++const ConnectedHeading = contextConnect( Heading, 'Heading' );
++
++export default ConnectedHeading;
+diff --git a/packages/components/src/heading/hook.ts b/packages/components/src/heading/hook.ts
+index 238e4e244c0f14..28f07bfcd5c3ac 100644
+--- a/packages/components/src/heading/hook.ts
++++ b/packages/components/src/heading/hook.ts
+@@ -25,7 +25,7 @@ export interface HeadingProps extends Omit< TextProps, 'size' > {
+ 	/**
+ 	 * `Heading` will typically render the sizes `1`, `2`, `3`, `4`, `5`, or `6`, which map to `h1`-`h6`.
+ 	 *
+-	 * @default 3
++	 * @default 2
+ 	 *
+ 	 * @example
+ 	 * ```jsx
+@@ -56,16 +56,17 @@ export function useHeading(
+ 		'Heading'
+ 	);
+ 
+-	const as = asProp || `h${ level }`;
++	const as = ( asProp || `h${ level }` ) as keyof JSX.IntrinsicElements;
+ 
+ 	const a11yProps: {
+ 		role?: string;
+-		'aria-level'?: string | number;
++		'aria-level'?: number;
+ 	} = {};
+ 	if ( typeof as === 'string' && as[ 0 ] !== 'h' ) {
+ 		// if not a semantic `h` element, add a11y props:
+ 		a11yProps.role = 'heading';
+-		a11yProps[ 'aria-level' ] = level;
++		a11yProps[ 'aria-level' ] =
++			typeof level === 'string' ? parseInt( level ) : level;
+ 	}
+ 
+ 	const textProps = useText( {
+diff --git a/packages/components/src/scrollable/component.js b/packages/components/src/scrollable/component.js
+index d89d42d85f5dd6..34e73e284d9ed8 100644
+--- a/packages/components/src/scrollable/component.js
++++ b/packages/components/src/scrollable/component.js
+@@ -1,15 +1,26 @@
+ /**
+  * Internal dependencies
+  */
+-import { createComponent } from '../ui/utils';
++import { contextConnect } from '../ui/context';
++import { View } from '../view';
+ import { useScrollable } from './hook';
+ 
++/**
++ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
++ * @param {import('react').Ref<any>}                                                        forwardedRef
++ */
++function Scrollable( props, forwardedRef ) {
++	const scrollableProps = useScrollable( props );
++
++	return <View { ...scrollableProps } ref={ forwardedRef } />;
++}
++
+ /**
+  * `Scrollable` is a layout component that content in a scrollable container.
+  *
+  * @example
+  * ```jsx
+- * import { __experimentalScrollable as Scrollable } from `@wordpress/components/ui`;
++ * import { __experimentalScrollable as Scrollable } from `@wordpress/components`;
+  *
+  * function Example() {
+  * 	return (
+@@ -21,10 +32,6 @@ import { useScrollable } from './hook';
+  * ```
+  */
+ 
+-const Scrollable = createComponent( {
+-	as: 'div',
+-	useHook: useScrollable,
+-	name: 'Scrollable',
+-} );
++const ConnectedScrollable = contextConnect( Scrollable, 'Scrollable' );
+ 
+-export default Scrollable;
++export default ConnectedScrollable;
+diff --git a/packages/components/src/spacer/component.ts b/packages/components/src/spacer/component.tsx
+similarity index 58%
+rename from packages/components/src/spacer/component.ts
+rename to packages/components/src/spacer/component.tsx
+index 162029e1cb9c66..3f10b316be5298 100644
+--- a/packages/components/src/spacer/component.ts
++++ b/packages/components/src/spacer/component.tsx
+@@ -1,8 +1,25 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { Ref } from 'react';
++
+ /**
+  * Internal dependencies
+  */
+-import { createComponent } from '../ui/utils';
++import { contextConnect, WordPressComponentProps } from '../ui/context';
++import { View } from '../view';
+ import { useSpacer } from './hook';
++import type { Props } from './types';
++
++function Spacer(
++	props: WordPressComponentProps< Props, 'div' >,
++	forwardedRef: Ref< any >
++) {
++	const spacerProps = useSpacer( props );
++
++	return <View { ...spacerProps } ref={ forwardedRef } />;
++}
+ 
+ /**
+  * `Spacer` is a primitive layout component that providers inner (`padding`) or outer (`margin`) space in-between components. It can also be used to adaptively provide space within an `HStack` or `VStack`.
+@@ -27,10 +44,6 @@ import { useSpacer } from './hook';
+  * }
+  * ```
+  */
+-const Spacer = createComponent( {
+-	as: 'div',
+-	useHook: useSpacer,
+-	name: 'Spacer',
+-} );
++const ConnectedSpacer = contextConnect( Spacer, 'Spacer' );
+ 
+-export default Spacer;
++export default ConnectedSpacer;
+diff --git a/packages/components/src/surface/README.md b/packages/components/src/surface/README.md
+index ac8f8a75190c18..db683a1c177388 100644
+--- a/packages/components/src/surface/README.md
++++ b/packages/components/src/surface/README.md
+@@ -14,7 +14,7 @@ In the example below, notice how the `Surface` renders in white (or dark gray if
+ import {
+ 	__experimentalSurface as Surface,
+ 	__experimentalText as Text
+-} from '@wordpress/components/ui';
++} from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+diff --git a/packages/components/src/surface/component.js b/packages/components/src/surface/component.js
+index 06c1ecb6ad3024..d875ef9cd9f876 100644
+--- a/packages/components/src/surface/component.js
++++ b/packages/components/src/surface/component.js
+@@ -1,9 +1,20 @@
+ /**
+  * Internal dependencies
+  */
+-import { createComponent } from '../ui/utils';
++import { contextConnect } from '../ui/context';
++import { View } from '../view';
+ import { useSurface } from './hook';
+ 
++/**
++ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
++ * @param {import('react').Ref<any>}                                                        forwardedRef
++ */
++function Surface( props, forwardedRef ) {
++	const surfaceProps = useSurface( props );
++
++	return <View { ...surfaceProps } ref={ forwardedRef } />;
++}
++
+ /**
+  * `Surface` is a core component that renders a primary background color.
+  *
+@@ -24,8 +35,6 @@ import { useSurface } from './hook';
+  * }
+  * ```
+  */
+-export default createComponent( {
+-	as: 'div',
+-	useHook: useSurface,
+-	name: 'Surface',
+-} );
++const ConnectedSurface = contextConnect( Surface, 'Surface' );
++
++export default ConnectedSurface;
+diff --git a/packages/components/src/text/component.js b/packages/components/src/text/component.js
+index bd7f063294521e..daec53df3cb4b9 100644
+--- a/packages/components/src/text/component.js
++++ b/packages/components/src/text/component.js
+@@ -1,9 +1,20 @@
+ /**
+  * Internal dependencies
+  */
+-import { createComponent } from '../ui/utils';
++import { contextConnect } from '../ui/context';
++import { View } from '../view';
+ import useText from './hook';
+ 
++/**
++ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'span'>} props
++ * @param {import('react').Ref<any>}                                                         forwardedRef
++ */
++function Text( props, forwardedRef ) {
++	const textProps = useText( props );
++
++	return <View { ...textProps } ref={ forwardedRef } />;
++}
++
+ /**
+  * `Text` is a core component that renders text in the library, using the
+  * library's typography system.
+@@ -20,10 +31,6 @@ import useText from './hook';
+  * }
+  * ```
+  */
+-const Text = createComponent( {
+-	as: 'span',
+-	useHook: useText,
+-	name: 'Text',
+-} );
++const ConnectedText = contextConnect( Text, 'Text' );
+ 
+-export default Text;
++export default ConnectedText;
+diff --git a/packages/components/src/text/hook.js b/packages/components/src/text/hook.js
+index 70ccee41f629af..8815c476a77c8a 100644
+--- a/packages/components/src/text/hook.js
++++ b/packages/components/src/text/hook.js
+@@ -29,6 +29,7 @@ export default function useText( props ) {
+ 	const {
+ 		adjustLineHeightForInnerControls,
+ 		align,
++		as = 'span',
+ 		children,
+ 		className,
+ 		color,
+@@ -151,6 +152,7 @@ export default function useText( props ) {
+ 
+ 	const finalComponentProps = {
+ 		...otherProps,
++		as,
+ 		className: classes,
+ 		children,
+ 		ellipsizeMode: ellipsizeMode || finalEllipsizeMode,
+diff --git a/packages/components/src/truncate/component.js b/packages/components/src/truncate/component.js
+index 5cb453b778c8de..124af206c5d0e2 100644
+--- a/packages/components/src/truncate/component.js
++++ b/packages/components/src/truncate/component.js
+@@ -1,9 +1,20 @@
+ /**
+  * Internal dependencies
+  */
+-import { createComponent } from '../ui/utils';
++import { contextConnect } from '../ui/context';
++import { View } from '../view';
+ import useTruncate from './hook';
+ 
++/**
++ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'span'>} props
++ * @param {import('react').Ref<any>}                                                         forwardedRef
++ */
++function Truncate( props, forwardedRef ) {
++	const truncateProps = useTruncate( props );
++
++	return <View { ...truncateProps } ref={ forwardedRef } />;
++}
++
+ /**
+  * `Truncate` is a typography primitive that trims text content.
+  * For almost all cases, it is recommended that `Text`, `Heading`, or
+@@ -25,10 +36,6 @@ import useTruncate from './hook';
+  * }
+  * ```
+  */
+-const Truncate = createComponent( {
+-	as: 'span',
+-	useHook: useTruncate,
+-	name: 'Truncate',
+-} );
++const ConnectedTruncate = contextConnect( Truncate, 'Truncate' );
+ 
+-export default Truncate;
++export default ConnectedTruncate;
+diff --git a/packages/components/src/truncate/hook.js b/packages/components/src/truncate/hook.js
+index 64e45c1bed5ea7..21e5cdff9da0cb 100644
+--- a/packages/components/src/truncate/hook.js
++++ b/packages/components/src/truncate/hook.js
+@@ -21,6 +21,7 @@ import { useCx } from '../utils/hooks/use-cx';
+  */
+ export default function useTruncate( props ) {
+ 	const {
++		as = 'span',
+ 		className,
+ 		children,
+ 		ellipsis = TRUNCATE_ELLIPSIS,
+@@ -61,5 +62,10 @@ export default function useTruncate( props ) {
+ 		);
+ 	}, [ className, numberOfLines, shouldTruncate ] );
+ 
+-	return { ...otherProps, className: classes, children: truncatedContent };
++	return {
++		...otherProps,
++		as,
++		className: classes,
++		children: truncatedContent,
++	};
+ }
+diff --git a/packages/components/src/ui/control-label/component.js b/packages/components/src/ui/control-label/component.js
+index 1e2ff02029e44b..bcafb4810e1b2a 100644
+--- a/packages/components/src/ui/control-label/component.js
++++ b/packages/components/src/ui/control-label/component.js
+@@ -1,9 +1,20 @@
+ /**
+  * Internal dependencies
+  */
+-import { createComponent } from '../utils';
++import { contextConnect } from '../context';
++import { View } from '../../view';
+ import { useControlLabel } from './hook';
+ 
++/**
++ * @param {import('../context').WordPressComponentProps<import('./types').Props, 'label'>} props
++ * @param {import('react').Ref<any>}                                                       forwardedRef
++ */
++function ControlLabel( props, forwardedRef ) {
++	const controlLabelProps = useControlLabel( props );
++
++	return <View { ...controlLabelProps } ref={ forwardedRef } />;
++}
++
+ /**
+  * `ControlLabel` is a form component that works with `FormGroup` to provide a
+  * label for form elements (e.g. `Switch` or `TextInput`).
+@@ -21,10 +32,6 @@ import { useControlLabel } from './hook';
+  * }
+  * ```
+  */
+-const ControlLabel = createComponent( {
+-	as: 'label',
+-	useHook: useControlLabel,
+-	name: 'ControlLabel',
+-} );
++const ConnectedControlLabel = contextConnect( ControlLabel, 'ControlLabel' );
+ 
+-export default ControlLabel;
++export default ConnectedControlLabel;
+diff --git a/packages/components/src/ui/control-label/hook.js b/packages/components/src/ui/control-label/hook.js
+index c7f10444fab792..6d48741eb42ead 100644
+--- a/packages/components/src/ui/control-label/hook.js
++++ b/packages/components/src/ui/control-label/hook.js
+@@ -12,6 +12,7 @@ import { useCx } from '../../utils/hooks/use-cx';
+  */
+ export function useControlLabel( props ) {
+ 	const {
++		as = 'label',
+ 		htmlFor: htmlForProp,
+ 		isBlock = false,
+ 		size = 'medium',
+@@ -37,6 +38,7 @@ export function useControlLabel( props ) {
+ 
+ 	return {
+ 		...textProps,
++		as,
+ 		className: classes,
+ 		htmlFor,
+ 	};
+diff --git a/packages/components/src/ui/utils/create-component.tsx b/packages/components/src/ui/utils/create-component.tsx
+deleted file mode 100644
+index 8e451cffef11c9..00000000000000
+--- a/packages/components/src/ui/utils/create-component.tsx
++++ /dev/null
+@@ -1,58 +0,0 @@
+-/**
+- * External dependencies
+- */
+-// eslint-disable-next-line no-restricted-imports
+-import type { Ref } from 'react';
+-import type { As } from 'reakit-utils/types';
+-
+-/**
+- * Internal dependencies
+- */
+-import { contextConnect } from '../context';
+-import type {
+-	WordPressComponentProps,
+-	WordPressComponentFromProps,
+-} from '../context';
+-import { View } from '../../view';
+-
+-interface Options<
+-	A extends As,
+-	P extends WordPressComponentProps< {}, A, any >
+-> {
+-	as: A;
+-	name: string;
+-	useHook: ( props: P ) => any;
+-	memo?: boolean;
+-}
+-
+-/**
+- * Factory that creates a React component from a hook
+- *
+- * @param  options
+- * @param  options.as      The element to render for the component.
+- * @param  options.name    The name of the component.
+- * @param  options.useHook The hook to use for the component
+- * @param  options.memo    Whether to memo the component.
+- * @return A polymorphic component that uses the hook to process props.
+- */
+-export const createComponent = <
+-	A extends As,
+-	P extends WordPressComponentProps< {}, A, any >
+->( {
+-	as,
+-	name,
+-	useHook,
+-	memo = false,
+-}: Options< A, P > ): WordPressComponentFromProps< P > => {
+-	function Component( props: P, forwardedRef: Ref< any > ) {
+-		const otherProps = useHook( props );
+-
+-		return (
+-			<View as={ as || 'div' } { ...otherProps } ref={ forwardedRef } />
+-		);
+-	}
+-
+-	Component.displayName = name;
+-
+-	return contextConnect( Component, name, { memo } );
+-};
+diff --git a/packages/components/src/ui/utils/index.js b/packages/components/src/ui/utils/index.js
+index 26e05b9d84d7db..c6f4adde96a523 100644
+--- a/packages/components/src/ui/utils/index.js
++++ b/packages/components/src/ui/utils/index.js
+@@ -1,2 +1 @@
+ export { getOptimalTextShade } from './colors';
+-export { createComponent } from './create-component';
+diff --git a/packages/components/src/ui/utils/test/create-component.js b/packages/components/src/ui/utils/test/create-component.js
+deleted file mode 100644
+index 970a774badf29a..00000000000000
+--- a/packages/components/src/ui/utils/test/create-component.js
++++ /dev/null
+@@ -1,70 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { render } from '@testing-library/react';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { createRef } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { createComponent } from '../create-component';
+-
+-describe( 'createComponent', () => {
+-	/**
+-	 * @param {import('../context').WordPressComponentProps<{}, 'output'>} props
+-	 */
+-	const useHook = ( props ) => ( { ...props, 'data-hook-test-prop': true } );
+-	const name = 'Output';
+-	const MemoizedOutput = createComponent( {
+-		as: 'output',
+-		name,
+-		useHook,
+-		memo: true,
+-	} );
+-	const Output = createComponent( {
+-		as: 'output',
+-		name,
+-		useHook,
+-		memo: false,
+-	} );
+-
+-	it( 'should create a output component', () => {
+-		const { container } = render(
+-			<MemoizedOutput>Example output</MemoizedOutput>
+-		);
+-
+-		expect( container.firstChild.tagName ).toBe( 'OUTPUT' );
+-		expect( container.firstChild.innerHTML ).toBe( 'Example output' );
+-	} );
+-
+-	it( 'should create a memoized, ref-forwarded component', () => {
+-		expect( MemoizedOutput.$$typeof ).toEqual( Symbol.for( 'react.memo' ) );
+-		const ref = createRef();
+-		const wrapper = render(
+-			<MemoizedOutput ref={ ref }>Example output</MemoizedOutput>
+-		);
+-
+-		expect( ref.current ).toEqual( wrapper.container.firstChild );
+-	} );
+-
+-	it( 'should create a non-memoized ref-forwarded ouput component', () => {
+-		expect( Output.$$typeof ).toEqual( Symbol.for( 'react.forward_ref' ) );
+-		const ref = createRef();
+-		const wrapper = render( <Output ref={ ref }>Example output</Output> );
+-
+-		expect( ref.current ).toEqual( wrapper.container.firstChild );
+-	} );
+-
+-	it( 'should apply the hook to the component props', () => {
+-		const { container } = render( <Output>Example output</Output> );
+-		expect( container.firstChild.dataset.hookTestProp ).toBe( 'true' );
+-	} );
+-
+-	it( 'should connect the component to its context', () => {
+-		expect( MemoizedOutput.__contextSystemKey__ ).toContain( 'Output' );
+-	} );
+-} );
+diff --git a/packages/components/src/v-stack/component.js b/packages/components/src/v-stack/component.js
+index a37186a04df172..aaf893a757fd6b 100644
+--- a/packages/components/src/v-stack/component.js
++++ b/packages/components/src/v-stack/component.js
+@@ -1,9 +1,20 @@
+ /**
+  * Internal dependencies
+  */
+-import { createComponent } from '../ui/utils';
++import { contextConnect } from '../ui/context';
++import { View } from '../view';
+ import { useVStack } from './hook';
+ 
++/**
++ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
++ * @param {import('react').Ref<any>}                                                        forwardedRef
++ */
++function VStack( props, forwardedRef ) {
++	const vStackProps = useVStack( props );
++
++	return <View { ...vStackProps } ref={ forwardedRef } />;
++}
++
+ /**
+  * `VStack` (or Vertical Stack) is a layout component that arranges child elements in a vertical line.
+  *
+@@ -27,10 +38,6 @@ import { useVStack } from './hook';
+  * }
+  * ```
+  */
+-const VStack = createComponent( {
+-	as: 'div',
+-	useHook: useVStack,
+-	name: 'VStack',
+-} );
++const ConnectedVStack = contextConnect( VStack, 'VStack' );
+ 
+-export default VStack;
++export default ConnectedVStack;

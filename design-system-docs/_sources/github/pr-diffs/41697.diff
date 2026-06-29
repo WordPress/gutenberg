@@ -1,0 +1,475 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index cfe26ca3949606..a6299b07bf4aa5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ -   `InputControl`: Add tests and update to use `@testing-library/user-event` ([#41421](https://github.com/WordPress/gutenberg/pull/41421)).
+ -   `FormToggle`: Convert to TypeScript ([#41729](https://github.com/WordPress/gutenberg/pull/41729)).
+ -   `ColorIndicator`: Convert to TypeScript ([#41587](https://github.com/WordPress/gutenberg/pull/41587)).
++-   `Truncate`: Convert to TypeScript ([#41697](https://github.com/WordPress/gutenberg/pull/41697)).
+ -   `VStack`: Convert to TypeScript ([#41850](https://github.com/WordPress/gutenberg/pull/41587)).
+ -   `AlignmentMatrixControl`: Refactor away from `_.flattenDeep()` in utils ([#41814](https://github.com/WordPress/gutenberg/pull/41814/)).
+ -   `AutoComplete`: Revert recent `exhaustive-deps` refactor ([#41820](https://github.com/WordPress/gutenberg/pull/41820)).
+diff --git a/packages/components/src/text/types.ts b/packages/components/src/text/types.ts
+index 8a5065a9b98ee9..05b1488cd8c6ff 100644
+--- a/packages/components/src/text/types.ts
++++ b/packages/components/src/text/types.ts
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import type { Props as TruncateProps } from '../truncate/types';
++import type { TruncateProps } from '../truncate/types';
+ 
+ /**
+  * External dependencies
+diff --git a/packages/components/src/truncate/README.md b/packages/components/src/truncate/README.md
+index f7c72f53f884a1..d173edb14977cd 100644
+--- a/packages/components/src/truncate/README.md
++++ b/packages/components/src/truncate/README.md
+@@ -24,15 +24,14 @@ function Example() {
+ 
+ ## Props
+ 
+-##### ellipsis
++##### `ellipsis`: `string`
+ 
+-**Type**: `string`
++The ellipsis string when truncating the text by the `limit` prop's value.
+ 
+-The ellipsis string when `truncate` is set.
++-   Required: No
++-   Default: `…`
+ 
+-##### ellipsizeMode
+-
+-**Type**: `"auto"`,`"head"`,`"tail"`,`"middle"`
++##### `ellipsizeMode`: `'auto' | 'head' | 'tail' | 'middle' | 'none'`
+ 
+ Determines where to truncate. For example, we can truncate text right in the middle. To do this, we need to set `ellipsizeMode` to `middle` and a text `limit`.
+ 
+@@ -41,17 +40,22 @@ Determines where to truncate. For example, we can truncate text right in the mid
+ -   `middle`: Trims content in the middle. Requires a `limit`.
+ -   `tail`: Trims content at the end. Requires a `limit`.
+ 
+-##### limit
++-   Required: No
++-   Default: `auto`
++
++##### `limit`: `number`
+ 
+-**Type**: `number`
++Determines the max number of characters to be displayed before the rest of the text gets truncated. Requires `ellipsizeMode` to assume values different from `auto` and `none`.
+ 
+-Determines the max characters when `truncate` is set.
++-   Required: No
++-   Default: `0`
+ 
+-##### numberOfLines
++##### `numberOfLines`: `number`
+ 
+-**Type**: `number`
++Clamps the text content to the specified `numberOfLines`, adding an ellipsis at the end. Note: this feature ignores the value of the `ellipsis` prop and always displays the default `…` ellipsis.
+ 
+-Clamps the text content to the specifiec `numberOfLines`, adding the `ellipsis` at the end.
++-   Required: No
++-   Default: `0`
+ 
+ ```jsx
+ import { __experimentalTruncate as Truncate } from '@wordpress/components';
+diff --git a/packages/components/src/truncate/component.js b/packages/components/src/truncate/component.tsx
+similarity index 67%
+rename from packages/components/src/truncate/component.js
+rename to packages/components/src/truncate/component.tsx
+index 362c5d3e665325..cd14fd3989e88a 100644
+--- a/packages/components/src/truncate/component.js
++++ b/packages/components/src/truncate/component.tsx
+@@ -1,15 +1,20 @@
++/**
++ * External dependencies
++ */
++import type { ForwardedRef } from 'react';
++
+ /**
+  * Internal dependencies
+  */
+-import { contextConnect } from '../ui/context';
++import { contextConnect, WordPressComponentProps } from '../ui/context';
+ import { View } from '../view';
+ import useTruncate from './hook';
++import type { TruncateProps } from './types';
+ 
+-/**
+- * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'span'>} props
+- * @param {import('react').ForwardedRef<any>}                                                forwardedRef
+- */
+-function Truncate( props, forwardedRef ) {
++function UnconnectedTruncate(
++	props: WordPressComponentProps< TruncateProps, 'span' >,
++	forwardedRef: ForwardedRef< any >
++) {
+ 	const truncateProps = useTruncate( props );
+ 
+ 	return <View as="span" { ...truncateProps } ref={ forwardedRef } />;
+@@ -21,7 +26,6 @@ function Truncate( props, forwardedRef ) {
+  * `Subheading` is used to render text content. However,`Truncate` is
+  * available for custom implementations.
+  *
+- * @example
+  * ```jsx
+  * import { __experimentalTruncate as Truncate } from `@wordpress/components`;
+  *
+@@ -36,6 +40,6 @@ function Truncate( props, forwardedRef ) {
+  * }
+  * ```
+  */
+-const ConnectedTruncate = contextConnect( Truncate, 'Truncate' );
++export const Truncate = contextConnect( UnconnectedTruncate, 'Truncate' );
+ 
+-export default ConnectedTruncate;
++export default Truncate;
+diff --git a/packages/components/src/truncate/hook.js b/packages/components/src/truncate/hook.ts
+similarity index 74%
+rename from packages/components/src/truncate/hook.js
+rename to packages/components/src/truncate/hook.ts
+index eb95f27a099458..5fac3b83efe3b0 100644
+--- a/packages/components/src/truncate/hook.js
++++ b/packages/components/src/truncate/hook.ts
+@@ -11,15 +11,15 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem } from '../ui/context';
++import { useContextSystem, WordPressComponentProps } from '../ui/context';
+ import * as styles from './styles';
+ import { TRUNCATE_ELLIPSIS, TRUNCATE_TYPE, truncateContent } from './utils';
+ import { useCx } from '../utils/hooks/use-cx';
++import type { TruncateProps } from './types';
+ 
+-/**
+- * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'span'>} props
+- */
+-export default function useTruncate( props ) {
++export default function useTruncate(
++	props: WordPressComponentProps< TruncateProps, 'span' >
++) {
+ 	const {
+ 		className,
+ 		children,
+@@ -33,7 +33,7 @@ export default function useTruncate( props ) {
+ 	const cx = useCx();
+ 
+ 	const truncatedContent = truncateContent(
+-		typeof children === 'string' ? /** @type {string} */ ( children ) : '',
++		typeof children === 'string' ? children : '',
+ 		{
+ 			ellipsis,
+ 			ellipsizeMode,
+@@ -45,9 +45,7 @@ export default function useTruncate( props ) {
+ 	const shouldTruncate = ellipsizeMode === TRUNCATE_TYPE.auto;
+ 
+ 	const classes = useMemo( () => {
+-		const sx = {};
+-
+-		sx.numberOfLines = css`
++		const truncateLines = css`
+ 			-webkit-box-orient: vertical;
+ 			-webkit-line-clamp: ${ numberOfLines };
+ 			display: -webkit-box;
+@@ -56,7 +54,7 @@ export default function useTruncate( props ) {
+ 
+ 		return cx(
+ 			shouldTruncate && ! numberOfLines && styles.Truncate,
+-			shouldTruncate && !! numberOfLines && sx.numberOfLines,
++			shouldTruncate && !! numberOfLines && truncateLines,
+ 			className
+ 		);
+ 	}, [ className, cx, numberOfLines, shouldTruncate ] );
+diff --git a/packages/components/src/truncate/index.js b/packages/components/src/truncate/index.ts
+similarity index 100%
+rename from packages/components/src/truncate/index.js
+rename to packages/components/src/truncate/index.ts
+diff --git a/packages/components/src/truncate/stories/index.js b/packages/components/src/truncate/stories/index.js
+deleted file mode 100644
+index d488c5e39ff111..00000000000000
+--- a/packages/components/src/truncate/stories/index.js
++++ /dev/null
+@@ -1,38 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { number } from '@storybook/addon-knobs';
+-
+-/**
+- * Internal dependencies
+- */
+-import { Truncate } from '..';
+-
+-export default {
+-	component: Truncate,
+-	title: 'Components (Experimental)/Truncate',
+-	parameters: {
+-		knobs: { disable: false },
+-	},
+-};
+-
+-export const _default = () => {
+-	const numberOfLines = number( 'numberOfLines', 2 );
+-	return (
+-		<Truncate numberOfLines={ numberOfLines }>
+-			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
+-			facilisis dictum tortor, eu tincidunt justo scelerisque tincidunt.
+-			Duis semper dui id augue malesuada, ut feugiat nisi aliquam.
+-			Vestibulum venenatis diam sem, finibus dictum massa semper in. Nulla
+-			facilisi. Nunc vulputate faucibus diam, in lobortis arcu ornare vel.
+-			In dignissim nunc sed facilisis finibus. Etiam imperdiet mattis
+-			arcu, sed rutrum sapien blandit gravida. Aenean sollicitudin neque
+-			eget enim blandit, sit amet rutrum leo vehicula. Nunc malesuada
+-			ultricies eros ut faucibus. Aliquam erat volutpat. Nulla nec feugiat
+-			risus. Vivamus iaculis dui aliquet ante ultricies feugiat.
+-			Vestibulum ante ipsum primis in faucibus orci luctus et ultrices
+-			posuere cubilia curae; Vivamus nec pretium velit, sit amet
+-			consectetur ante. Praesent porttitor ex eget fermentum mattis.
+-		</Truncate>
+-	);
+-};
+diff --git a/packages/components/src/truncate/stories/index.tsx b/packages/components/src/truncate/stories/index.tsx
+new file mode 100644
+index 00000000000000..b339dac6bf9560
+--- /dev/null
++++ b/packages/components/src/truncate/stories/index.tsx
+@@ -0,0 +1,49 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import { Truncate } from '..';
++
++const meta: ComponentMeta< typeof Truncate > = {
++	component: Truncate,
++	title: 'Components (Experimental)/Truncate',
++	argTypes: {
++		children: { control: { type: 'text' } },
++		as: { control: { type: 'text' } },
++	},
++	parameters: {
++		controls: {
++			expanded: true,
++		},
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const defaultText =
++	'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut facilisis dictum tortor, eu tincidunt justo scelerisque tincidunt. Duis semper dui id augue malesuada, ut feugiat nisi aliquam. Vestibulum venenatis diam sem, finibus dictum massa semper in. Nulla facilisi. Nunc vulputate faucibus diam, in lobortis arcu ornare vel. In dignissim nunc sed facilisis finibus. Etiam imperdiet mattis arcu, sed rutrum sapien blandit gravida. Aenean sollicitudin neque eget enim blandit, sit amet rutrum leo vehicula. Nunc malesuada ultricies eros ut faucibus. Aliquam erat volutpat. Nulla nec feugiat risus. Vivamus iaculis dui aliquet ante ultricies feugiat. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Vivamus nec pretium velit, sit amet consectetur ante. Praesent porttitor ex eget fermentum mattis.';
++
++const Template: ComponentStory< typeof Truncate > = ( args ) => {
++	return <Truncate { ...args } />;
++};
++
++export const Default: ComponentStory< typeof Truncate > = Template.bind( {} );
++Default.args = {
++	numberOfLines: 2,
++	children: defaultText,
++};
++
++export const CharacterCount: ComponentStory< typeof Truncate > = Template.bind(
++	{}
++);
++CharacterCount.args = {
++	limit: 23,
++	children: defaultText,
++	ellipsizeMode: 'tail',
++	ellipsis: '[---]',
++};
++CharacterCount.storyName = 'Truncate by character count';
+diff --git a/packages/components/src/truncate/styles.js b/packages/components/src/truncate/styles.ts
+similarity index 100%
+rename from packages/components/src/truncate/styles.js
+rename to packages/components/src/truncate/styles.ts
+diff --git a/packages/components/src/truncate/test/index.js b/packages/components/src/truncate/test/index.tsx
+similarity index 75%
+rename from packages/components/src/truncate/test/index.js
+rename to packages/components/src/truncate/test/index.tsx
+index 82b5b95d6e3e67..bfd9147ede5dae 100644
+--- a/packages/components/src/truncate/test/index.js
++++ b/packages/components/src/truncate/test/index.tsx
+@@ -11,7 +11,7 @@ import { Truncate } from '..';
+ describe( 'props', () => {
+ 	test( 'should render correctly', () => {
+ 		const { container } = render( <Truncate>Lorem ipsum.</Truncate> );
+-		expect( container.firstChild.textContent ).toEqual( 'Lorem ipsum.' );
++		expect( container.firstChild?.textContent ).toEqual( 'Lorem ipsum.' );
+ 	} );
+ 
+ 	test( 'should render limit', () => {
+@@ -20,7 +20,7 @@ describe( 'props', () => {
+ 				Lorem ipsum.
+ 			</Truncate>
+ 		);
+-		expect( container.firstChild.textContent ).toEqual( 'L…' );
++		expect( container.firstChild?.textContent ).toEqual( 'L…' );
+ 	} );
+ 
+ 	test( 'should render custom ellipsis', () => {
+@@ -29,7 +29,7 @@ describe( 'props', () => {
+ 				Lorem ipsum.
+ 			</Truncate>
+ 		);
+-		expect( container.firstChild.textContent ).toEqual( 'Lorem!!!' );
++		expect( container.firstChild?.textContent ).toEqual( 'Lorem!!!' );
+ 	} );
+ 
+ 	test( 'should render custom ellipsizeMode', () => {
+@@ -38,6 +38,6 @@ describe( 'props', () => {
+ 				Lorem ipsum.
+ 			</Truncate>
+ 		);
+-		expect( container.firstChild.textContent ).toEqual( 'Lo!!!m.' );
++		expect( container.firstChild?.textContent ).toEqual( 'Lo!!!m.' );
+ 	} );
+ } );
+diff --git a/packages/components/src/truncate/types.ts b/packages/components/src/truncate/types.ts
+index 74d07cd89a5608..f9b720657d9b59 100644
+--- a/packages/components/src/truncate/types.ts
++++ b/packages/components/src/truncate/types.ts
+@@ -1,14 +1,26 @@
+-export type TruncateEllisizeMode = 'auto' | 'head' | 'tail' | 'middle' | 'none';
++/**
++ * External dependencies
++ */
++import type { ReactNode } from 'react';
+ 
+-export interface Props {
++export type TruncateEllipsizeMode =
++	| 'auto'
++	| 'head'
++	| 'tail'
++	| 'middle'
++	| 'none';
++
++export type TruncateProps = {
+ 	/**
+-	 * The ellipsis string when `truncate` is set.
++	 * The ellipsis string when truncating the text by the `limit` prop's value.
+ 	 *
+-	 * @default '...'
++	 * @default '…'
+ 	 */
+ 	ellipsis?: string;
+ 	/**
+-	 * Determines where to truncate.  For example, we can truncate text right in the middle. To do this, we need to set `ellipsizeMode` to `middle` and a text `limit`.
++	 * Determines where to truncate.  For example, we can truncate text right in
++	 * the middle. To do this, we need to set `ellipsizeMode` to `middle` and a
++	 * text `limit`.
+ 	 *
+ 	 * * `auto`: Trims content at the end automatically without a `limit`.
+ 	 * * `head`: Trims content at the beginning. Requires a `limit`.
+@@ -17,19 +29,25 @@ export interface Props {
+ 	 *
+ 	 * @default 'auto'
+ 	 */
+-	ellipsizeMode?: TruncateEllisizeMode;
++	ellipsizeMode?: TruncateEllipsizeMode;
+ 	/**
+-	 * Determines the max characters when `truncate` is set.
++	 * Determines the max number of characters to be displayed before the rest
++	 * of the text gets truncated. Requires `ellipsizeMode` to assume values
++	 * different from `auto` and `none`.
+ 	 *
+ 	 * @default 0
+ 	 */
+ 	limit?: number;
+ 	/**
+-	 * Clamps the text content to the specified `numberOfLines`, adding the `ellipsis` at the end.
++	 * Clamps the text content to the specified `numberOfLines`, adding an
++	 * ellipsis at the end. Note: this feature ignores the value of the
++	 * `ellipsis` prop and always displays the default `…` ellipsis.
++	 *
++	 * @default 0
+ 	 */
+ 	numberOfLines?: number;
+ 	/**
+ 	 * The children elements.
+ 	 */
+-	children: React.ReactNode;
+-}
++	children: ReactNode;
++};
+diff --git a/packages/components/src/truncate/utils.js b/packages/components/src/truncate/utils.ts
+similarity index 82%
+rename from packages/components/src/truncate/utils.js
+rename to packages/components/src/truncate/utils.ts
+index 80769ee91b0665..9d624ec0e1decb 100644
+--- a/packages/components/src/truncate/utils.js
++++ b/packages/components/src/truncate/utils.ts
+@@ -2,6 +2,7 @@
+  * Internal dependencies
+  */
+ import { isValueDefined } from '../utils/values';
++import type { TruncateProps } from './types';
+ 
+ export const TRUNCATE_ELLIPSIS = '…';
+ export const TRUNCATE_TYPE = {
+@@ -10,7 +11,7 @@ export const TRUNCATE_TYPE = {
+ 	middle: 'middle',
+ 	tail: 'tail',
+ 	none: 'none',
+-};
++} as const;
+ 
+ export const TRUNCATE_DEFAULT_PROPS = {
+ 	ellipsis: TRUNCATE_ELLIPSIS,
+@@ -21,13 +22,12 @@ export const TRUNCATE_DEFAULT_PROPS = {
+ 
+ // Source
+ // https://github.com/kahwee/truncate-middle
+-/**
+- * @param {string} word
+- * @param {number} headLength
+- * @param {number} tailLength
+- * @param {string} ellipsis
+- */
+-export function truncateMiddle( word, headLength, tailLength, ellipsis ) {
++export function truncateMiddle(
++	word: string,
++	headLength: number,
++	tailLength: number,
++	ellipsis: string
++) {
+ 	if ( typeof word !== 'string' ) {
+ 		return '';
+ 	}
+@@ -59,12 +59,10 @@ export function truncateMiddle( word, headLength, tailLength, ellipsis ) {
+ 	);
+ }
+ 
+-/**
+- *
+- * @param {string}                        words
+- * @param {typeof TRUNCATE_DEFAULT_PROPS} props
+- */
+-export function truncateContent( words = '', props ) {
++export function truncateContent(
++	words: string = '',
++	props: Omit< TruncateProps, 'children' >
++) {
+ 	const mergedProps = { ...TRUNCATE_DEFAULT_PROPS, ...props };
+ 	const { ellipsis, ellipsizeMode, limit } = mergedProps;
+ 
+@@ -72,8 +70,8 @@ export function truncateContent( words = '', props ) {
+ 		return words;
+ 	}
+ 
+-	let truncateHead;
+-	let truncateTail;
++	let truncateHead: number;
++	let truncateTail: number;
+ 
+ 	switch ( ellipsizeMode ) {
+ 		case TRUNCATE_TYPE.head:

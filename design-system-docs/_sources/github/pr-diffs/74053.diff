@@ -1,0 +1,411 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 539ea604e02061..53e0df909ba0d1 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -276,14 +276,12 @@ module.exports = {
+ 					...restrictedSyntax,
+ 					...restrictedSyntaxComponents,
+ 					// Temporary rules until we're ready to officially deprecate the bottom margins.
+-					...[ 'BaseControl', 'SearchControl' ].map(
+-						( componentName ) => ( {
+-							selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__nextHasNoMarginBottom"]))`,
+-							message:
+-								componentName +
+-								' should have the `__nextHasNoMarginBottom` prop to opt-in to the new margin-free styles.',
+-						} )
+-					),
++					...[ 'BaseControl' ].map( ( componentName ) => ( {
++						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__nextHasNoMarginBottom"]))`,
++						message:
++							componentName +
++							' should have the `__nextHasNoMarginBottom` prop to opt-in to the new margin-free styles.',
++					} ) ),
+ 					// Temporary rules until we're ready to officially default to the new size.
+ 					...[
+ 						'BorderBoxControl',
+diff --git a/packages/block-editor/src/components/block-manager/index.js b/packages/block-editor/src/components/block-manager/index.js
+index ec8ecae98fac3c..d8b4fb07a3aeb5 100644
+--- a/packages/block-editor/src/components/block-manager/index.js
++++ b/packages/block-editor/src/components/block-manager/index.js
+@@ -71,7 +71,6 @@ export default function BlockManager( {
+ 	return (
+ 		<VStack className="block-editor-block-manager__content" spacing={ 4 }>
+ 			<SearchControl
+-				__nextHasNoMarginBottom
+ 				label={ __( 'Search for a block' ) }
+ 				placeholder={ __( 'Search for a block' ) }
+ 				value={ search }
+diff --git a/packages/block-editor/src/components/inserter/block-patterns-explorer/pattern-explorer-sidebar.js b/packages/block-editor/src/components/inserter/block-patterns-explorer/pattern-explorer-sidebar.js
+index 89384bc0537143..b125fa14e1b556 100644
+--- a/packages/block-editor/src/components/inserter/block-patterns-explorer/pattern-explorer-sidebar.js
++++ b/packages/block-editor/src/components/inserter/block-patterns-explorer/pattern-explorer-sidebar.js
+@@ -37,7 +37,6 @@ function PatternsExplorerSearch( { searchValue, setSearchValue } ) {
+ 	return (
+ 		<div className={ baseClassName }>
+ 			<SearchControl
+-				__nextHasNoMarginBottom
+ 				onChange={ setSearchValue }
+ 				value={ searchValue }
+ 				label={ __( 'Search' ) }
+diff --git a/packages/block-editor/src/components/inserter/media-tab/media-panel.js b/packages/block-editor/src/components/inserter/media-tab/media-panel.js
+index cc19403f9d9473..9a55bd5ef99cef 100644
+--- a/packages/block-editor/src/components/inserter/media-tab/media-panel.js
++++ b/packages/block-editor/src/components/inserter/media-tab/media-panel.js
+@@ -25,7 +25,6 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
+ 	return (
+ 		<div className={ baseCssClass }>
+ 			<SearchControl
+-				__nextHasNoMarginBottom
+ 				className={ `${ baseCssClass }-search` }
+ 				onChange={ setSearch }
+ 				value={ search }
+diff --git a/packages/block-editor/src/components/inserter/menu.js b/packages/block-editor/src/components/inserter/menu.js
+index f1e387c5a59634..c3ea2e09bd7068 100644
+--- a/packages/block-editor/src/components/inserter/menu.js
++++ b/packages/block-editor/src/components/inserter/menu.js
+@@ -172,7 +172,6 @@ function InserterMenu(
+ 		return (
+ 			<>
+ 				<SearchControl
+-					__nextHasNoMarginBottom
+ 					className="block-editor-inserter__search"
+ 					onChange={ ( value ) => {
+ 						if ( hoveredItem ) {
+diff --git a/packages/block-editor/src/components/inserter/quick-inserter.js b/packages/block-editor/src/components/inserter/quick-inserter.js
+index baedf91b87a906..ade44f855499a7 100644
+--- a/packages/block-editor/src/components/inserter/quick-inserter.js
++++ b/packages/block-editor/src/components/inserter/quick-inserter.js
+@@ -89,7 +89,6 @@ export default function QuickInserter( {
+ 		>
+ 			{ showSearch && (
+ 				<SearchControl
+-					__nextHasNoMarginBottom
+ 					className="block-editor-inserter__search"
+ 					value={ filterValue }
+ 					onChange={ ( value ) => {
+diff --git a/packages/block-library/src/query/edit/pattern-selection.js b/packages/block-library/src/query/edit/pattern-selection.js
+index d1b33bf8e04452..490c26ad34ce24 100644
+--- a/packages/block-library/src/query/edit/pattern-selection.js
++++ b/packages/block-library/src/query/edit/pattern-selection.js
+@@ -93,7 +93,6 @@ export default function PatternSelection( {
+ 			{ showSearch && (
+ 				<div className="block-library-query-pattern__selection-search">
+ 					<SearchControl
+-						__nextHasNoMarginBottom
+ 						onChange={ setSearchValue }
+ 						value={ searchValue }
+ 						label={ __( 'Search' ) }
+diff --git a/packages/block-library/src/template-part/edit/selection-modal.js b/packages/block-library/src/template-part/edit/selection-modal.js
+index 71093306b93b2f..83afac7d42b141 100644
+--- a/packages/block-library/src/template-part/edit/selection-modal.js
++++ b/packages/block-library/src/template-part/edit/selection-modal.js
+@@ -75,7 +75,6 @@ export default function TemplatePartSelectionModal( {
+ 		<div className="block-library-template-part__selection-content">
+ 			<div className="block-library-template-part__selection-search">
+ 				<SearchControl
+-					__nextHasNoMarginBottom
+ 					onChange={ setSearchValue }
+ 					value={ searchValue }
+ 					label={ __( 'Search' ) }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ddcb761fb29fdd..b5d2b56c2d382a 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ -   `CheckboxControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#73916](https://github.com/WordPress/gutenberg/pull/73916)).
+ -   `TextControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#73920](https://github.com/WordPress/gutenberg/pull/73920)).
+ -   `FocalPointPicker`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#73980](https://github.com/WordPress/gutenberg/pull/73980)).
++-   `SearchControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#74053](https://github.com/WordPress/gutenberg/pull/74053)).
+ -   `TextareaControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#73970](https://github.com/WordPress/gutenberg/pull/73970)).
+ -   `ToggleGroupControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#74004](https://github.com/WordPress/gutenberg/pull/74004)).
+ -   `ToggleControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#74012](https://github.com/WordPress/gutenberg/pull/74012)).
+diff --git a/packages/components/src/navigation/menu/menu-title-search.tsx b/packages/components/src/navigation/menu/menu-title-search.tsx
+index 9158ba5e2cadca..ddd7d9b2e621cc 100644
+--- a/packages/components/src/navigation/menu/menu-title-search.tsx
++++ b/packages/components/src/navigation/menu/menu-title-search.tsx
+@@ -83,7 +83,6 @@ function MenuTitleSearch( {
+ 	return (
+ 		<MenuTitleSearchControlWrapper>
+ 			<SearchControl
+-				__nextHasNoMarginBottom
+ 				className="components-navigation__menu-search-input"
+ 				id={ inputId }
+ 				onChange={ ( value ) => onSearch?.( value ) }
+diff --git a/packages/components/src/search-control/README.md b/packages/components/src/search-control/README.md
+index 3945f451d6dcf7..073b20534a20f8 100644
+--- a/packages/components/src/search-control/README.md
++++ b/packages/components/src/search-control/README.md
+@@ -20,7 +20,6 @@ function MySearchControl( { className, setState } ) {
+ 
+     return (
+         <SearchControl
+-            __nextHasNoMarginBottom
+             label={ __( 'Search posts' ) }
+             value={ searchInput }
+             onChange={ setSearchInput }
+@@ -100,14 +99,6 @@ If true, the label will not be visible, but will be read by screen readers. Defa
+ -   Required: No
+ -   Default: `true`
+ 
+-#### __nextHasNoMarginBottom
+-
+-Start opting into the new margin-free styles that will become the default in a future version.
+-
+--   Type: `Boolean`
+--   Required: No
+--   Default: `false`
+-
+ #### `size`: `'default'` | `'compact'`
+ 
+ The size of the component.
+diff --git a/packages/components/src/search-control/index.tsx b/packages/components/src/search-control/index.tsx
+index f6be806e7246df..dad793c5496874 100644
+--- a/packages/components/src/search-control/index.tsx
++++ b/packages/components/src/search-control/index.tsx
+@@ -10,7 +10,7 @@ import type { ForwardedRef } from 'react';
+ import { useInstanceId, useMergeRefs } from '@wordpress/compose';
+ import { __ } from '@wordpress/i18n';
+ import { search, closeSmall } from '@wordpress/icons';
+-import { forwardRef, useMemo, useRef } from '@wordpress/element';
++import { forwardRef, useRef } from '@wordpress/element';
+ import deprecated from '@wordpress/deprecated';
+ 
+ /**
+@@ -21,7 +21,6 @@ import { InputControlPrefixWrapper } from '../input-control/input-prefix-wrapper
+ import { InputControlSuffixWrapper } from '../input-control/input-suffix-wrapper';
+ import type { WordPressComponentProps } from '../context/wordpress-component';
+ import type { SearchControlProps, SuffixItemProps } from './types';
+-import { ContextSystemProvider } from '../context';
+ import { StyledInputControl, StyledIcon } from './styles';
+ 
+ function SuffixItem( {
+@@ -59,7 +58,7 @@ function SuffixItem( {
+ 
+ function UnforwardedSearchControl(
+ 	{
+-		__nextHasNoMarginBottom = false,
++		__nextHasNoMarginBottom: _, // Prevent passing to internal component
+ 		className,
+ 		onChange,
+ 		value,
+@@ -86,52 +85,35 @@ function UnforwardedSearchControl(
+ 		'components-search-control'
+ 	);
+ 
+-	const contextValue = useMemo(
+-		() => ( {
+-			BaseControl: {
+-				// Overrides the underlying BaseControl `__nextHasNoMarginBottom` via the context system
+-				// to provide backwards compatible margin for SearchControl.
+-				// (In a standard InputControl, the BaseControl `__nextHasNoMarginBottom` is always set to true.)
+-				_overrides: { __nextHasNoMarginBottom },
+-				__associatedWPComponentName: 'SearchControl',
+-			},
+-		} ),
+-		[ __nextHasNoMarginBottom ]
+-	);
+-
+ 	return (
+-		<ContextSystemProvider value={ contextValue }>
+-			<StyledInputControl
+-				__next40pxDefaultSize
+-				id={ instanceId }
+-				hideLabelFromVision={ hideLabelFromVision }
+-				label={ label }
+-				ref={ useMergeRefs( [ searchRef, forwardedRef ] ) }
+-				type="search"
+-				size={ size }
+-				className={ clsx( 'components-search-control', className ) }
+-				onChange={ ( nextValue?: string ) =>
+-					onChange( nextValue ?? '' )
+-				}
+-				autoComplete="off"
+-				placeholder={ placeholder }
+-				value={ value ?? '' }
+-				prefix={
+-					<InputControlPrefixWrapper variant="icon">
+-						<StyledIcon icon={ search } fill="currentColor" />
+-					</InputControlPrefixWrapper>
+-				}
+-				suffix={
+-					<SuffixItem
+-						searchRef={ searchRef }
+-						value={ value }
+-						onChange={ onChange }
+-						onClose={ onClose }
+-					/>
+-				}
+-				{ ...filteredRestProps }
+-			/>
+-		</ContextSystemProvider>
++		<StyledInputControl
++			__next40pxDefaultSize
++			id={ instanceId }
++			hideLabelFromVision={ hideLabelFromVision }
++			label={ label }
++			ref={ useMergeRefs( [ searchRef, forwardedRef ] ) }
++			type="search"
++			size={ size }
++			className={ clsx( 'components-search-control', className ) }
++			onChange={ ( nextValue?: string ) => onChange( nextValue ?? '' ) }
++			autoComplete="off"
++			placeholder={ placeholder }
++			value={ value ?? '' }
++			prefix={
++				<InputControlPrefixWrapper variant="icon">
++					<StyledIcon icon={ search } fill="currentColor" />
++				</InputControlPrefixWrapper>
++			}
++			suffix={
++				<SuffixItem
++					searchRef={ searchRef }
++					value={ value }
++					onChange={ onChange }
++					onClose={ onClose }
++				/>
++			}
++			{ ...filteredRestProps }
++		/>
+ 	);
+ }
+ 
+@@ -147,7 +129,6 @@ function UnforwardedSearchControl(
+  *
+  *   return (
+  *     <SearchControl
+- *       __nextHasNoMarginBottom
+  *       value={ searchInput }
+  *       onChange={ setSearchInput }
+  *     />
+diff --git a/packages/components/src/search-control/stories/index.story.tsx b/packages/components/src/search-control/stories/index.story.tsx
+index c3385c4eb21b44..d9c9e3d48d5fbf 100644
+--- a/packages/components/src/search-control/stories/index.story.tsx
++++ b/packages/components/src/search-control/stories/index.story.tsx
+@@ -49,5 +49,4 @@ const Template: StoryFn< typeof SearchControl > = ( {
+ export const Default = Template.bind( {} );
+ Default.args = {
+ 	help: 'Help text to explain the input.',
+-	__nextHasNoMarginBottom: true,
+ };
+diff --git a/packages/components/src/search-control/test/index.tsx b/packages/components/src/search-control/test/index.tsx
+index 5250a531f58d09..f1069f3ae6d6ca 100644
+--- a/packages/components/src/search-control/test/index.tsx
++++ b/packages/components/src/search-control/test/index.tsx
+@@ -23,7 +23,6 @@ function ControlledSearchControl( {
+ 	return (
+ 		<SearchControl
+ 			{ ...restProps }
+-			__nextHasNoMarginBottom
+ 			value={ value }
+ 			onChange={ ( ...args ) => {
+ 				setValue( ...args );
+diff --git a/packages/components/src/search-control/types.ts b/packages/components/src/search-control/types.ts
+index e4117e5ed57ffb..3fa7b715afe18b 100644
+--- a/packages/components/src/search-control/types.ts
++++ b/packages/components/src/search-control/types.ts
+@@ -13,6 +13,9 @@ export type SearchControlProps = Pick< InputControlProps, 'help' | 'value' > & {
+ 	 * Start opting into the new margin-free styles that will become the default in a future version.
+ 	 *
+ 	 * @default false
++	 *
++	 * @deprecated Default behavior since WordPress 7.0. Prop can be safely removed.
++	 * @ignore
+ 	 */
+ 	__nextHasNoMarginBottom?: boolean;
+ 	/**
+diff --git a/packages/dataviews/src/components/dataviews-search/index.tsx b/packages/dataviews/src/components/dataviews-search/index.tsx
+index 1aef99872960be..09269c7f70d714 100644
+--- a/packages/dataviews/src/components/dataviews-search/index.tsx
++++ b/packages/dataviews/src/components/dataviews-search/index.tsx
+@@ -42,7 +42,6 @@ const DataViewsSearch = memo( function Search( { label }: SearchProps ) {
+ 	return (
+ 		<SearchControl
+ 			className="dataviews-search"
+-			__nextHasNoMarginBottom
+ 			onChange={ setSearch }
+ 			value={ search }
+ 			label={ searchLabel }
+diff --git a/packages/edit-site/src/components/add-new-template-legacy/add-custom-template-modal-content.js b/packages/edit-site/src/components/add-new-template-legacy/add-custom-template-modal-content.js
+index 4b681abcf9cbbf..73ed28dd45cfbc 100644
+--- a/packages/edit-site/src/components/add-new-template-legacy/add-custom-template-modal-content.js
++++ b/packages/edit-site/src/components/add-new-template-legacy/add-custom-template-modal-content.js
+@@ -130,7 +130,6 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
+ 		<>
+ 			{ showSearchControl && (
+ 				<SearchControl
+-					__nextHasNoMarginBottom
+ 					onChange={ setSearch }
+ 					value={ search }
+ 					label={ labels.search_items }
+diff --git a/packages/edit-site/src/components/add-new-template/add-custom-template-modal-content.js b/packages/edit-site/src/components/add-new-template/add-custom-template-modal-content.js
+index 03f3223e4576d2..7e79dad46a58c7 100644
+--- a/packages/edit-site/src/components/add-new-template/add-custom-template-modal-content.js
++++ b/packages/edit-site/src/components/add-new-template/add-custom-template-modal-content.js
+@@ -130,7 +130,6 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
+ 		<>
+ 			{ showSearchControl && (
+ 				<SearchControl
+-					__nextHasNoMarginBottom
+ 					onChange={ setSearch }
+ 					value={ search }
+ 					label={ labels.search_items }
+diff --git a/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js b/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
+index 4b306b8ed45217..d4190c4496fd45 100644
+--- a/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
++++ b/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
+@@ -418,7 +418,6 @@ export function HierarchicalTermSelector( { slug } ) {
+ 			{ showFilter && ! loading && (
+ 				<SearchControl
+ 					__next40pxDefaultSize
+-					__nextHasNoMarginBottom
+ 					label={ filterLabel }
+ 					placeholder={ filterLabel }
+ 					value={ filterValue }
+diff --git a/packages/editor/src/components/post-template/swap-template-button.js b/packages/editor/src/components/post-template/swap-template-button.js
+index 75239bac879bca..8f3f4d3d346e97 100644
+--- a/packages/editor/src/components/post-template/swap-template-button.js
++++ b/packages/editor/src/components/post-template/swap-template-button.js
+@@ -82,7 +82,6 @@ function TemplatesList( { postType, onSelect } ) {
+ 	return (
+ 		<>
+ 			<SearchControl
+-				__nextHasNoMarginBottom
+ 				onChange={ setSearchValue }
+ 				value={ searchValue }
+ 				label={ __( 'Search' ) }
+diff --git a/packages/global-styles-ui/src/font-library/font-collection.tsx b/packages/global-styles-ui/src/font-library/font-collection.tsx
+index 7a9c84032b3ab4..005f10c49b3fb6 100644
+--- a/packages/global-styles-ui/src/font-library/font-collection.tsx
++++ b/packages/global-styles-ui/src/font-library/font-collection.tsx
+@@ -311,7 +311,6 @@ function FontCollection( { slug }: { slug: string } ) {
+ 									placeholder={ __( 'Font name…' ) }
+ 									label={ __( 'Search' ) }
+ 									onChange={ debouncedUpdateSearchInput }
+-									__nextHasNoMarginBottom
+ 									hideLabelFromVision={ false }
+ 								/>
+ 								<SelectControl
+diff --git a/packages/global-styles-ui/src/screen-block-list.tsx b/packages/global-styles-ui/src/screen-block-list.tsx
+index a530a6a073a686..eb91b969a0b6c3 100644
+--- a/packages/global-styles-ui/src/screen-block-list.tsx
++++ b/packages/global-styles-ui/src/screen-block-list.tsx
+@@ -182,7 +182,6 @@ function ScreenBlockList() {
+ 				) }
+ 			/>
+ 			<SearchControl
+-				__nextHasNoMarginBottom
+ 				className="global-styles-ui-block-types-search"
+ 				onChange={ setFilterValue }
+ 				value={ filterValue }
+diff --git a/routes/template-list/add-new-template/add-custom-template-modal-content.tsx b/routes/template-list/add-new-template/add-custom-template-modal-content.tsx
+index 07086a4ec28139..fa17eaba4817a8 100644
+--- a/routes/template-list/add-new-template/add-custom-template-modal-content.tsx
++++ b/routes/template-list/add-new-template/add-custom-template-modal-content.tsx
+@@ -174,7 +174,6 @@ function SuggestionList( {
+ 		<>
+ 			{ showSearchControl && (
+ 				<SearchControl
+-					__nextHasNoMarginBottom
+ 					onChange={ setSearch }
+ 					value={ search }
+ 					label={ labels.search_items }

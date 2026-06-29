@@ -1,0 +1,88 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 93b191bff269d6..e1c75dcb84f666 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Deprecations
+ 
+ -   `Radio`: Deprecate 36px default size ([#66572](https://github.com/WordPress/gutenberg/pull/66572)).
++-   `ComboboxControl`: Deprecate 36px default size ([#66900](https://github.com/WordPress/gutenberg/pull/66900)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/combobox-control/README.md b/packages/components/src/combobox-control/README.md
+index 5831c5ec2832c2..4089cf9c56e9b5 100644
+--- a/packages/components/src/combobox-control/README.md
++++ b/packages/components/src/combobox-control/README.md
+@@ -34,6 +34,7 @@ function MyComboboxControl() {
+ 	const [ filteredOptions, setFilteredOptions ] = useState( options );
+ 	return (
+ 		<ComboboxControl
++			__next40pxDefaultSize
+ 			__nextHasNoMarginBottom
+ 			label="Font Size"
+ 			value={ fontSize }
+diff --git a/packages/components/src/combobox-control/index.tsx b/packages/components/src/combobox-control/index.tsx
+index 5c6725a51b435d..86fa4f4467318c 100644
+--- a/packages/components/src/combobox-control/index.tsx
++++ b/packages/components/src/combobox-control/index.tsx
+@@ -34,6 +34,7 @@ import type { ComboboxControlOption, ComboboxControlProps } from './types';
+ import type { TokenInputProps } from '../form-token-field/types';
+ import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+ import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
++import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
+ 
+ const noop = () => {};
+ 
+@@ -92,6 +93,7 @@ const getIndexOfMatchingSuggestion = (
+  * 	const [ filteredOptions, setFilteredOptions ] = useState( options );
+  * 	return (
+  * 		<ComboboxControl
++ * 			__next40pxDefaultSize
+  * 			__nextHasNoMarginBottom
+  * 			label="Font Size"
+  * 			value={ fontSize }
+@@ -313,6 +315,12 @@ function ComboboxControl( props: ComboboxControlProps ) {
+ 		}
+ 	}, [ matchingSuggestions, isExpanded ] );
+ 
++	maybeWarnDeprecated36pxSize( {
++		componentName: 'ComboboxControl',
++		__next40pxDefaultSize,
++		size: undefined,
++	} );
++
+ 	// Disable reason: There is no appropriate role which describes the
+ 	// input container intended accessible usability.
+ 	// TODO: Refactor click detection to use blur to stop propagation.
+diff --git a/packages/components/src/combobox-control/stories/index.story.tsx b/packages/components/src/combobox-control/stories/index.story.tsx
+index 516cd262fd5aa6..712ca7fa813a17 100644
+--- a/packages/components/src/combobox-control/stories/index.story.tsx
++++ b/packages/components/src/combobox-control/stories/index.story.tsx
+@@ -76,6 +76,7 @@ const Template: StoryFn< typeof ComboboxControl > = ( {
+ };
+ export const Default = Template.bind( {} );
+ Default.args = {
++	__next40pxDefaultSize: true,
+ 	__nextHasNoMarginBottom: true,
+ 	allowReset: false,
+ 	label: 'Select a country',
+diff --git a/packages/components/src/combobox-control/test/index.tsx b/packages/components/src/combobox-control/test/index.tsx
+index 639407ac998ed2..8f569ed381a844 100644
+--- a/packages/components/src/combobox-control/test/index.tsx
++++ b/packages/components/src/combobox-control/test/index.tsx
+@@ -58,7 +58,13 @@ const getOptionSearchString = ( option: ComboboxControlOption ) =>
+ 	option.label.substring( 0, 11 );
+ 
+ const ComboboxControl = ( props: ComboboxControlProps ) => {
+-	return <_ComboboxControl { ...props } __nextHasNoMarginBottom />;
++	return (
++		<_ComboboxControl
++			{ ...props }
++			__next40pxDefaultSize
++			__nextHasNoMarginBottom
++		/>
++	);
+ };
+ 
+ const ControlledComboboxControl = ( {

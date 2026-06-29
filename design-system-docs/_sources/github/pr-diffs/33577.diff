@@ -1,0 +1,919 @@
+diff --git a/packages/components/src/base-field/index.js b/packages/components/src/base-field/index.js
+deleted file mode 100644
+index 263e623dae3167..00000000000000
+--- a/packages/components/src/base-field/index.js
++++ /dev/null
+@@ -1 +0,0 @@
+-export { useBaseField } from './hook';
+diff --git a/packages/components/src/base-field/index.ts b/packages/components/src/base-field/index.ts
+new file mode 100644
+index 00000000000000..8ee85db7bf3b77
+--- /dev/null
++++ b/packages/components/src/base-field/index.ts
+@@ -0,0 +1,2 @@
++export { useBaseField } from './hook';
++export type { Props as BaseFieldProps } from './hook';
+diff --git a/packages/components/src/slider/component.tsx b/packages/components/src/slider/component.tsx
+new file mode 100644
+index 00000000000000..c41f3e77686dfd
+--- /dev/null
++++ b/packages/components/src/slider/component.tsx
+@@ -0,0 +1,38 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { Ref } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import { contextConnect, PolymorphicComponentProps } from '../ui/context';
++import { useSlider } from './hook';
++import type { Props } from './types';
++import { View } from '../view';
++
++const Slider = (
++	props: PolymorphicComponentProps< Props, 'input', false >,
++	forwardedRef: Ref< any >
++) => {
++	return <View { ...useSlider( props ) } as="input" ref={ forwardedRef } />;
++};
++
++/**
++ * `Slider` is a form component lets users choose a value within a range.
++ *
++ * @example
++ * ```jsx
++ * import { __experimentalSlider as Slider } from `@wordpress/components`
++ *
++ * function Example() {
++ *   return (
++ *     <Slider />
++ *   );
++ * }
++ * ```
++ */
++const ConnectedSlider = contextConnect( Slider, 'Slider' );
++
++export default ConnectedSlider;
+diff --git a/packages/components/src/slider/hook.ts b/packages/components/src/slider/hook.ts
+new file mode 100644
+index 00000000000000..84ab67dd532155
+--- /dev/null
++++ b/packages/components/src/slider/hook.ts
+@@ -0,0 +1,126 @@
++/**
++ * WordPress dependencies
++ */
++import { useCallback, useMemo, useState } from '@wordpress/element';
++/**
++ * Internal dependencies
++ */
++import { useCx, useControlledValue } from '../utils/hooks';
++import { createCSSUnitValue, parseCSSUnitValue } from '../utils/unit-values';
++import { useContextSystem, PolymorphicComponentProps } from '../ui/context';
++import type { Props } from './types';
++
++import { useFormGroupContextId } from '../ui/form-group';
++import * as styles from './styles';
++import { isValueNumeric } from '../utils/values';
++import { interpolate } from '../utils/interpolate';
++
++const noop = () => {};
++
++export function useSlider(
++	props: PolymorphicComponentProps< Props, 'input', false >
++) {
++	const {
++		className,
++		defaultValue,
++		hasError,
++		onBlur = noop,
++		onChange: onChangeProp,
++		onFocus = noop,
++		id: idProp,
++		max = 100,
++		min = 0,
++		size = 'medium',
++		style,
++		value: valueProp,
++		...otherProps
++	} = useContextSystem( props, 'Slider' );
++
++	const [ _value, onChange ] = useControlledValue( {
++		value: valueProp,
++		onChange: onChangeProp,
++		defaultValue: defaultValue || 50,
++	} );
++	const [ value, initialUnit ] = parseCSSUnitValue( _value.toString() );
++
++	const id = useFormGroupContextId( idProp );
++	const [ isFocused, setIsFocused ] = useState( false );
++
++	const handleOnBlur = useCallback(
++		( event ) => {
++			onBlur( event );
++			setIsFocused( false );
++		},
++		[ onBlur ]
++	);
++
++	const handleOnChange = useCallback(
++		( event ) => {
++			const nextValue = parseFloat( event.target.value );
++			if ( ! isValueNumeric( nextValue ) ) return;
++
++			let next: number | string = nextValue;
++
++			if ( initialUnit ) {
++				next = createCSSUnitValue( nextValue, initialUnit );
++			}
++
++			onChange( next );
++		},
++		[ onChange, initialUnit ]
++	);
++
++	const handleOnFocus = useCallback(
++		( event ) => {
++			onFocus( event );
++			setIsFocused( true );
++		},
++		[ onFocus ]
++	);
++
++	const currentValue = interpolate(
++		value,
++		[ parseFloat( min.toString() ), parseFloat( max.toString() ) ],
++		[ 0, 100 ]
++	);
++	const componentStyles = {
++		...style,
++		'--progress': `${ currentValue }%`,
++	};
++
++	const cx = useCx();
++
++	const classes = useMemo(
++		() =>
++			cx(
++				styles.Slider,
++				hasError && styles.error,
++				styles[ size ],
++				isFocused && styles.focused,
++				hasError && isFocused && styles.focusedError,
++				className
++			),
++		[ className, hasError, isFocused, size ]
++	);
++
++	return {
++		...otherProps,
++		className: classes,
++		id,
++		max,
++		min,
++		onBlur: handleOnBlur,
++		onChange: handleOnChange,
++		onFocus: handleOnFocus,
++		style: componentStyles,
++		type: 'range',
++		value,
++		'aria-valuemin': min,
++		'aria-valuemax': max,
++		'aria-valuenow': value,
++		...( initialUnit && {
++			'aria-valuetext': createCSSUnitValue( value, initialUnit ),
++		} ),
++		role: 'slider',
++	};
++}
+diff --git a/packages/components/src/slider/index.ts b/packages/components/src/slider/index.ts
+new file mode 100644
+index 00000000000000..3d7582a37bc907
+--- /dev/null
++++ b/packages/components/src/slider/index.ts
+@@ -0,0 +1,3 @@
++export { default as Slider } from './component';
++export { useSlider } from './hook';
++export type { Props as SliderProps } from './types';
+diff --git a/packages/components/src/slider/stories/index.js b/packages/components/src/slider/stories/index.js
+new file mode 100644
+index 00000000000000..59637da2773fc0
+--- /dev/null
++++ b/packages/components/src/slider/stories/index.js
+@@ -0,0 +1,33 @@
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { FormGroup } from '../../ui/form-group';
++import { Text } from '../../text';
++import { VStack } from '../../v-stack';
++import { Slider } from '..';
++
++export default {
++	component: Slider,
++	title: 'Components (Experimental)/Slider',
++};
++
++export const _default = () => {
++	const [ value, setValue ] = useState( '50px' );
++
++	return (
++		<VStack>
++			<Text>Value: { value }</Text>
++			<FormGroup label="Test slider">
++				<Slider onChange={ setValue } value={ value } />
++			</FormGroup>
++			<FormGroup label="Test slider">
++				<Slider onChange={ setValue } value={ value } />
++			</FormGroup>
++		</VStack>
++	);
++};
+diff --git a/packages/components/src/slider/styles.ts b/packages/components/src/slider/styles.ts
+new file mode 100644
+index 00000000000000..1e7d9cea58c5b0
+--- /dev/null
++++ b/packages/components/src/slider/styles.ts
+@@ -0,0 +1,163 @@
++/**
++ * External dependencies
++ */
++import { css } from '@emotion/react';
++
++/**
++ * Internal dependencies
++ */
++import { CONFIG, COLORS } from '../utils';
++import { space } from '../ui/utils/space';
++
++export const Slider = css`
++	appearance: none;
++	background-color: transparent;
++	border: 1px solid transparent;
++	border-radius: ${ CONFIG.controlBorderRadius };
++	cursor: pointer;
++	display: block;
++	height: ${ CONFIG.controlHeight };
++	max-width: 100%;
++	min-width: 0;
++	padding: ${ space( 1 ) };
++	width: 100%;
++
++	&:focus {
++		outline: none;
++	}
++
++	&::-moz-focus-outer {
++		border: 0;
++	}
++
++	&::-webkit-slider-runnable-track {
++		background: linear-gradient(
++			to right,
++			${ COLORS.admin.theme } calc( var( --progress ) ),
++			${ CONFIG.controlBackgroundDimColor } calc( var( --progress ) )
++		);
++		border-radius: 2px;
++		height: 2px;
++
++		*:disabled& {
++			background: ${ CONFIG.controlBackgroundDimColor };
++		}
++	}
++	&::-moz-range-track {
++		background: linear-gradient(
++			to right,
++			${ COLORS.admin.theme } calc( var( --progress ) ),
++			${ CONFIG.controlBackgroundDimColor } calc( var( --progress ) )
++		);
++		border-radius: 2px;
++		height: 2px;
++		will-change: transform;
++
++		*:disabled& {
++			background: ${ CONFIG.controlBackgroundDimColor };
++		}
++	}
++
++	&::-webkit-slider-thumb {
++		appearance: none;
++		background-color: ${ COLORS.admin.theme };
++		border: 1px solid transparent;
++		border-radius: 50%;
++		box-shadow: ${ CONFIG.sliderThumbBoxShadow };
++		cursor: pointer;
++		height: 12px;
++		margin-top: -5px;
++		opacity: 1;
++		width: 12px;
++		transition: box-shadow ease ${ CONFIG.transitionDurationFast };
++
++		*:disabled& {
++			background: ${ CONFIG.colorTextMuted };
++			border-color: ${ CONFIG.colorTextMuted };
++		}
++	}
++	&::-moz-range-thumb {
++		appearance: none;
++		background-color: ${ COLORS.admin.theme };
++		border: 1px solid transparent;
++		border-radius: 50%;
++		box-shadow: ${ CONFIG.sliderThumbBoxShadow };
++		cursor: pointer;
++		height: 12px;
++		margin-top: -5px;
++		opacity: 1;
++		width: 12px;
++		transition: box-shadow ease ${ CONFIG.transitionDurationFast };
++		will-change: transform;
++
++		*:disabled& {
++			background: ${ CONFIG.colorTextMuted };
++			border-color: ${ CONFIG.colorTextMuted };
++		}
++	}
++
++	&:focus {
++		${ getFocusBoxShadow() }
++	}
++`;
++
++export const focused = css`
++	${ getFocusBoxShadow() }
++`;
++
++export const large = css`
++	height: ${ CONFIG.controlHeightLarge };
++`;
++
++export const small = css`
++	height: ${ CONFIG.controlHeightSmall };
++`;
++
++export const error = css`
++	&::-webkit-slider-runnable-track {
++		background: linear-gradient(
++			to right,
++			${ CONFIG.controlDestructiveBorderColor } calc( var( --progress ) ),
++			${ CONFIG.controlBackgroundDimColor } calc( var( --progress ) )
++		);
++	}
++	&::-moz-range-track {
++		background: linear-gradient(
++			to right,
++			${ CONFIG.controlDestructiveBorderColor } calc( var( --progress ) ),
++			${ CONFIG.controlBackgroundDimColor } calc( var( --progress ) )
++		);
++	}
++
++	&::-webkit-slider-thumb {
++		background-color: ${ CONFIG.controlDestructiveBorderColor };
++		border: 1px solid ${ CONFIG.controlDestructiveBorderColor };
++	}
++	&::-moz-range-thumb {
++		background-color: ${ CONFIG.controlDestructiveBorderColor };
++		border: 1px solid ${ CONFIG.controlDestructiveBorderColor };
++	}
++
++	&:focus {
++		${ getFocusBoxShadow(
++			CONFIG.controlDestructivePseudoBoxShadowFocusSmall
++		) };
++	}
++`;
++
++export const focusedError = css`
++	${ getFocusBoxShadow(
++		CONFIG.controlDestructivePseudoBoxShadowFocusSmall
++	) };
++`;
++
++function getFocusBoxShadow( color = CONFIG.controlPseudoBoxShadowFocusSmall ) {
++	return css`
++		&::-webkit-slider-thumb {
++			box-shadow: ${ color };
++		}
++		&::-moz-range-thumb {
++			box-shadow: ${ color };
++		}
++	`;
++}
+diff --git a/packages/components/src/slider/test/__snapshots__/index.js.snap b/packages/components/src/slider/test/__snapshots__/index.js.snap
+new file mode 100644
+index 00000000000000..d64f879934039b
+--- /dev/null
++++ b/packages/components/src/slider/test/__snapshots__/index.js.snap
+@@ -0,0 +1,145 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`Slider should render correctly 1`] = `
++.emotion-0 {
++  -webkit-appearance: none;
++  -moz-appearance: none;
++  -ms-appearance: none;
++  appearance: none;
++  background-color: transparent;
++  border: 1px solid transparent;
++  border-radius: 2px;
++  cursor: pointer;
++  display: block;
++  height: 36px;
++  max-width: 100%;
++  min-width: 0;
++  padding: calc(4px * 1);
++  width: 100%;
++}
++
++.emotion-0:focus {
++  outline: none;
++}
++
++.emotion-0::-moz-focus-outer {
++  border: 0;
++}
++
++.emotion-0::-webkit-slider-runnable-track {
++  background: linear-gradient(
++  			to right,
++  			var( --wp-admin-theme-color, #00669b) calc( var( --progress ) ),
++  			rgba(0, 0, 0, 0.1) calc( var( --progress ) )
++  		);
++  border-radius: 2px;
++  height: 2px;
++}
++
++*:disabled.emotion-0::-webkit-slider-runnable-track {
++  background: rgba(0, 0, 0, 0.1);
++}
++
++.emotion-0::-moz-range-track {
++  background: linear-gradient(
++  			to right,
++  			var( --wp-admin-theme-color, #00669b) calc( var( --progress ) ),
++  			rgba(0, 0, 0, 0.1) calc( var( --progress ) )
++  		);
++  border-radius: 2px;
++  height: 2px;
++  will-change: transform;
++}
++
++*:disabled.emotion-0::-moz-range-track {
++  background: rgba(0, 0, 0, 0.1);
++}
++
++.emotion-0::-webkit-slider-thumb {
++  -webkit-appearance: none;
++  -moz-appearance: none;
++  -ms-appearance: none;
++  appearance: none;
++  background-color: var( --wp-admin-theme-color, #00669b);
++  border: 1px solid transparent;
++  border-radius: 50%;
++  box-shadow: none;
++  cursor: pointer;
++  height: 12px;
++  margin-top: -5px;
++  opacity: 1;
++  width: 12px;
++  -webkit-transition: box-shadow ease 160ms;
++  transition: box-shadow ease 160ms;
++}
++
++*:disabled.emotion-0::-webkit-slider-thumb {
++  background: #717171;
++  border-color: #717171;
++}
++
++.emotion-0::-moz-range-thumb {
++  -webkit-appearance: none;
++  -moz-appearance: none;
++  -ms-appearance: none;
++  appearance: none;
++  background-color: var( --wp-admin-theme-color, #00669b);
++  border: 1px solid transparent;
++  border-radius: 50%;
++  box-shadow: none;
++  cursor: pointer;
++  height: 12px;
++  margin-top: -5px;
++  opacity: 1;
++  width: 12px;
++  -webkit-transition: box-shadow ease 160ms;
++  transition: box-shadow ease 160ms;
++  will-change: transform;
++}
++
++*:disabled.emotion-0::-moz-range-thumb {
++  background: #717171;
++  border-color: #717171;
++}
++
++.emotion-0:focus::-webkit-slider-thumb {
++  box-shadow: 0 0 0 2px #fff,0 0 0 3px var( --wp-admin-theme-color, #00669b);
++}
++
++.emotion-0:focus::-moz-range-thumb {
++  box-shadow: 0 0 0 2px #fff,0 0 0 3px var( --wp-admin-theme-color, #00669b);
++}
++
++<input
++  aria-valuemax="100"
++  aria-valuemin="0"
++  aria-valuenow="50"
++  class="components-slider emotion-0 emotion-1"
++  data-wp-c16t="true"
++  data-wp-component="Slider"
++  max="100"
++  min="0"
++  role="slider"
++  style="--progress: 50%;"
++  type="range"
++  value="50"
++/>
++`;
++
++exports[`Slider should render valuetext for unit-ed values 1`] = `
++Snapshot Diff:
++- First value
+++ Second value
++
++@@ -1,10 +1,9 @@
++  <input
++    aria-valuemax="100"
++    aria-valuemin="0"
++    aria-valuenow="50"
++-   aria-valuetext="50px"
++    class="components-slider css-78ao8c-View-getFocusBoxShadow-Slider em57xhy0"
++    data-wp-c16t="true"
++    data-wp-component="Slider"
++    max="100"
++    min="0"
++`;
+diff --git a/packages/components/src/slider/test/index.js b/packages/components/src/slider/test/index.js
+new file mode 100644
+index 00000000000000..85859c5203db8f
+--- /dev/null
++++ b/packages/components/src/slider/test/index.js
+@@ -0,0 +1,53 @@
++/**
++ * External dependencies
++ */
++import { render, screen, fireEvent } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { Slider } from '..';
++
++describe( 'Slider', () => {
++	let base;
++
++	beforeEach( () => {
++		( { container: base } = render( <Slider /> ) );
++	} );
++
++	it( 'should render correctly', () => {
++		expect( base.firstChild ).toMatchSnapshot();
++	} );
++
++	it( 'should render valuetext for unit-ed values', () => {
++		const { container } = render( <Slider defaultValue="50px" /> );
++		expect( container.firstChild ).toMatchDiffSnapshot( base.firstChild );
++	} );
++
++	it( 'should fire blur and focus events', async () => {
++		const onBlur = jest.fn();
++		const onFocus = jest.fn();
++		render( <Slider onBlur={ onBlur } onFocus={ onFocus } /> );
++		const slider = ( await screen.findAllByRole( 'slider' ) )[ 1 ];
++		fireEvent.focusIn( slider );
++		expect( onFocus ).toHaveBeenCalledTimes( 1 );
++		fireEvent.focusOut( slider );
++		expect( onBlur ).toHaveBeenCalledTimes( 1 );
++	} );
++
++	it( 'should fire onChange with united value', async () => {
++		const onChange = jest.fn();
++		render( <Slider onChange={ onChange } value="50px" /> );
++		const slider = ( await screen.findAllByRole( 'slider' ) )[ 1 ];
++		fireEvent.change( slider, { target: { value: '51' } } );
++		expect( onChange ).toHaveBeenCalledWith( '51px' );
++	} );
++
++	it( 'should fire onChange with non-united value', async () => {
++		const onChange = jest.fn();
++		render( <Slider onChange={ onChange } value="50" /> );
++		const slider = ( await screen.findAllByRole( 'slider' ) )[ 1 ];
++		fireEvent.change( slider, { target: { value: '51' } } );
++		expect( onChange ).toHaveBeenCalledWith( 51 );
++	} );
++} );
+diff --git a/packages/components/src/slider/types.ts b/packages/components/src/slider/types.ts
+new file mode 100644
+index 00000000000000..f2ad2d9f46c40b
+--- /dev/null
++++ b/packages/components/src/slider/types.ts
+@@ -0,0 +1,15 @@
++/**
++ * Internal dependencies
++ */
++import type { BaseFieldProps } from '../base-field';
++import type { FormElementProps, SizeRangeReduced } from '../utils/types';
++
++type Value = string | number;
++
++export interface Props
++	extends Omit< BaseFieldProps, 'children' >,
++		FormElementProps< Value > {
++	size?: SizeRangeReduced;
++	onChange?: ( value: Value ) => void;
++	value?: Value;
++}
+diff --git a/packages/components/src/ui/form-group/form-group-context.js b/packages/components/src/ui/form-group/form-group-context.js
+index e98f93de5095ac..4c7bdbb60456ed 100644
+--- a/packages/components/src/ui/form-group/form-group-context.js
++++ b/packages/components/src/ui/form-group/form-group-context.js
+@@ -4,7 +4,7 @@
+ import { createContext, useContext } from '@wordpress/element';
+ 
+ /**
+- * @typedef {{ id?: import('react').ReactText, horizontal: boolean }} FormGroupContext
++ * @typedef {{ id?: string, horizontal: boolean }} FormGroupContext
+  */
+ 
+ /**
+@@ -23,7 +23,7 @@ export const useFormGroupContext = () => useContext( FormGroupContext );
+ 
+ /**
+  * @param {string | undefined} id The preferred id for the form group element.
+- * @return {import('react').ReactText | undefined} The form group context id.
++ * @return {string | undefined} The form group context id.
+  */
+ export const useFormGroupContextId = ( id ) => {
+ 	const contextId = useFormGroupContext().id;
+diff --git a/packages/components/src/ui/form-group/types.ts b/packages/components/src/ui/form-group/types.ts
+index a02fa343b459f0..b10d59bdd69df9 100644
+--- a/packages/components/src/ui/form-group/types.ts
++++ b/packages/components/src/ui/form-group/types.ts
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ // eslint-disable-next-line no-restricted-imports
+-import type { CSSProperties, ReactNode, ReactText } from 'react';
++import type { CSSProperties, ReactNode } from 'react';
+ 
+ /**
+  * Internal dependencies
+@@ -12,7 +12,7 @@ import type { Props as GridProps } from '../../grid/types';
+ 
+ export type FormGroupLabelProps = ControlLabelProps & {
+ 	labelHidden?: boolean;
+-	id?: ReactText;
++	id?: string;
+ };
+ 
+ export type FormGroupContentProps = FormGroupLabelProps & {
+diff --git a/packages/components/src/ui/form-group/use-form-group.js b/packages/components/src/ui/form-group/use-form-group.js
+index 3b73fc69f5f4ef..fce7602cf7d69d 100644
+--- a/packages/components/src/ui/form-group/use-form-group.js
++++ b/packages/components/src/ui/form-group/use-form-group.js
+@@ -27,7 +27,7 @@ export function useFormGroup( props ) {
+ 		...otherProps
+ 	} = useContextSystem( props, 'FormGroup' );
+ 
+-	const id = useInstanceId( useFormGroup, 'form-group', idProp );
++	const id = useInstanceId( useFormGroup, 'form-group', idProp ).toString();
+ 
+ 	const cx = useCx();
+ 
+diff --git a/packages/components/src/utils/clamp.ts b/packages/components/src/utils/clamp.ts
+new file mode 100644
+index 00000000000000..1a6e0277cef1c0
+--- /dev/null
++++ b/packages/components/src/utils/clamp.ts
+@@ -0,0 +1,26 @@
++/**
++ * We can't use Lodash here because it doesn't handle Infinity like we want
++ *
++ * @see https://github.com/you-dont-need/You-Dont-Need-Lodash-Underscore#_clamp
++ * @param  number
++ * @param  min
++ * @param  max
++ * @return The clamped value
++ */
++export const clamp = ( number: number, min?: number, max?: number ): number => {
++	if ( min === Infinity && max === Infinity ) return number;
++	if ( typeof max === 'undefined' ) {
++		if ( typeof min === 'undefined' || number > min ) return number;
++		return min;
++	}
++
++	if ( typeof min === 'undefined' ) {
++		if ( typeof max === 'undefined' || number < max ) return number;
++		return max;
++	}
++
++	// otherwise everything is defined
++	if ( number < min ) return min;
++	if ( number > max ) return max;
++	return number;
++};
+diff --git a/packages/components/src/utils/config-values.js b/packages/components/src/utils/config-values.js
+index b32c0101c933fb..818dc8f7669ab7 100644
+--- a/packages/components/src/utils/config-values.js
++++ b/packages/components/src/utils/config-values.js
+@@ -4,6 +4,17 @@
+ import { space } from '../ui/utils/space';
+ import { COLORS } from './colors-values';
+ 
++const SURFACE_PROPS = {
++	surfaceBackgroundColor: COLORS.white,
++	surfaceBackgroundSubtleColor: '#F3F3F3',
++	surfaceBackgroundTintColor: '#F5F5F5',
++	surfaceBorderColor: 'rgba(0, 0, 0, 0.1)',
++	surfaceBorderBoldColor: 'rgba(0, 0, 0, 0.15)',
++	surfaceBorderSubtleColor: 'rgba(0, 0, 0, 0.05)',
++	surfaceBackgroundTertiaryColor: COLORS.white,
++	surfaceColor: COLORS.white,
++};
++
+ const CONTROL_HEIGHT = '36px';
+ const CONTROL_PADDING_X = '12px';
+ 
+@@ -14,6 +25,7 @@ const CONTROL_PROPS = {
+ 	controlPaddingXLarge: `calc(${ CONTROL_PADDING_X } * 1.3334)`,
+ 	controlPaddingXSmall: `calc(${ CONTROL_PADDING_X } / 1.3334)`,
+ 	controlBackgroundColor: COLORS.white,
++	controlBackgroundDimColor: 'rgba(0, 0, 0, 0.1)',
+ 	controlBorderRadius: '2px',
+ 	controlBorderColor: COLORS.gray[ 700 ],
+ 	controlBoxShadow: 'transparent',
+@@ -25,7 +37,10 @@ const CONTROL_PROPS = {
+ 	controlHeightSmall: `calc( ${ CONTROL_HEIGHT } * 0.8 )`,
+ 	controlHeightLarge: `calc( ${ CONTROL_HEIGHT } * 1.2 )`,
+ 	controlHeightXLarge: `calc( ${ CONTROL_HEIGHT } * 1.4 )`,
++	controlPseudoBoxShadowFocusSmall: `0 0 0 2px ${ SURFACE_PROPS.surfaceBackgroundColor }, 0 0 0 3px ${ COLORS.admin.theme }`,
++	controlDestructivePseudoBoxShadowFocusSmall: `0 0 0 2px ${ SURFACE_PROPS.surfaceBackgroundColor }, 0 0 0 3px ${ COLORS.alert.red }`,
+ };
++
+ const SEGMENTED_CONTROL_PROPS = {
+ 	segmentedControlBackgroundColor: CONTROL_PROPS.controlBackgroundColor,
+ 	segmentedControlBorderColor: COLORS.ui.border,
+@@ -35,13 +50,20 @@ const SEGMENTED_CONTROL_PROPS = {
+ 	segmentedControlButtonColorActive: CONTROL_PROPS.controlBackgroundColor,
+ };
+ 
++const SLIDER_CONTROL_PROPS = {
++	sliderThumbBoxShadow: 'none',
++};
++
+ export default {
+ 	...CONTROL_PROPS,
+ 	...SEGMENTED_CONTROL_PROPS,
++	...SLIDER_CONTROL_PROPS,
++	...SURFACE_PROPS,
+ 	colorDivider: 'rgba(0, 0, 0, 0.1)',
+ 	colorScrollbarThumb: 'rgba(0, 0, 0, 0.2)',
+ 	colorScrollbarThumbHover: 'rgba(0, 0, 0, 0.5)',
+ 	colorScrollbarTrack: 'rgba(0, 0, 0, 0.04)',
++	colorTextMuted: '#717171',
+ 	elevationIntensity: 1,
+ 	radiusBlockUi: '2px',
+ 	borderWidth: '1px',
+@@ -68,14 +90,6 @@ export default {
+ 	cardPaddingSmall: `${ space( 4 ) }`,
+ 	cardPaddingMedium: `${ space( 4 ) } ${ space( 6 ) }`,
+ 	cardPaddingLarge: `${ space( 6 ) } ${ space( 8 ) }`,
+-	surfaceBackgroundColor: COLORS.white,
+-	surfaceBackgroundSubtleColor: '#F3F3F3',
+-	surfaceBackgroundTintColor: '#F5F5F5',
+-	surfaceBorderColor: 'rgba(0, 0, 0, 0.1)',
+-	surfaceBorderBoldColor: 'rgba(0, 0, 0, 0.15)',
+-	surfaceBorderSubtleColor: 'rgba(0, 0, 0, 0.05)',
+-	surfaceBackgroundTertiaryColor: COLORS.white,
+-	surfaceColor: COLORS.white,
+ 	transitionDuration: '200ms',
+ 	transitionDurationFast: '160ms',
+ 	transitionDurationFaster: '120ms',
+diff --git a/packages/components/src/utils/interpolate.ts b/packages/components/src/utils/interpolate.ts
+new file mode 100644
+index 00000000000000..d44d8e98a56d1f
+--- /dev/null
++++ b/packages/components/src/utils/interpolate.ts
+@@ -0,0 +1,108 @@
++/**
++ * Internal dependencies
++ */
++import { clamp } from './clamp';
++
++/**
++ * Interpolation from:
++ * https://github.com/react-spring/react-spring/blob/master/src/animated/createInterpolator.ts
++ */
++
++/**
++ * @param {number}   input
++ * @param {number[]} inputRange
++ *
++ * @return {number} The range value
++ */
++function findRange( input: number, inputRange: number[] ): number {
++	let i = 1;
++	for ( ; i < inputRange.length - 1; ++i )
++		if ( inputRange[ i ] >= input ) break;
++	return i - 1;
++}
++
++/**
++ * Base interpolate function.
++ *
++ * @param  [input=0]
++ * @param  [inputMin=0]
++ * @param  [inputMax=1]
++ * @param  [outputMin=0]
++ * @param  [outputMax=1]
++ *
++ * @return The interpolated value.
++ */
++function baseInterpolate(
++	input: number = 0,
++	inputMin: number = 0,
++	inputMax: number = 1,
++	outputMin: number = 0,
++	outputMax: number = 1
++): number {
++	let result = input;
++
++	if ( outputMin === outputMax ) return outputMin;
++	if ( inputMin === inputMax )
++		return input <= inputMin ? outputMin : outputMax;
++
++	// Input Range
++	if ( inputMin === -Infinity ) result = -result;
++	else if ( inputMax === Infinity ) result = result - inputMin;
++	else result = ( result - inputMin ) / ( inputMax - inputMin );
++
++	// Output Range
++	if ( outputMin === -Infinity ) result = -result;
++	else if ( outputMax === Infinity ) result = result + outputMin;
++	else result = result * ( outputMax - outputMin ) + outputMin;
++
++	let clampMin = outputMin;
++	let clampMax = outputMax;
++
++	if ( outputMax < outputMin ) {
++		clampMin = outputMax;
++		clampMax = outputMin;
++	}
++
++	return clamp( result, clampMin, clampMax );
++}
++
++/**
++ * Gets a value based on an input range and an output range.
++ * Can be used for a set of numbers or a set of colors.
++ *
++ * @param  [input=0]
++ * @param  [inputRange=[0,1]]
++ * @param  [outputRange=[0,1]]
++ *
++ * @return The interpolated value.
++ */
++export function interpolate(
++	input: number,
++	inputRange: [ number, number ],
++	outputRange: [ number, number ]
++): number {
++	const range = findRange( input, inputRange );
++	const outputRange1 = outputRange[ range ];
++	const outputRange2 = outputRange[ range + 1 ];
++
++	return baseInterpolate(
++		input,
++		inputRange[ range ],
++		inputRange[ range + 1 ],
++		outputRange1,
++		outputRange2
++	);
++}
++
++/**
++ * Gets a rounded value based on an input range and an output range.
++ *
++ * @param {Parameters<interpolate>} args
++ *
++ * @return {number} The rounded interpolated value.
++ */
++export function interpolateRounded(
++	...args: Parameters< typeof interpolate >
++): number {
++	return Math.round( interpolate( ...args ) );
++}

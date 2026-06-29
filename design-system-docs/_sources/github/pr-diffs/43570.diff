@@ -1,0 +1,94 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5bfb10af6c3148..99304da16f55dc 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -22,6 +22,7 @@
+ 
+ -   `CustomGradientPicker`, `GradientPicker`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43387](https://github.com/WordPress/gutenberg/pull/43387)).
+ -   `ToolsPanel`: Tighten grid gaps ([#43424](https://github.com/WordPress/gutenberg/pull/43424)).
++-   `ColorPalette`: Make popover style consistent ([#43570](https://github.com/WordPress/gutenberg/pull/43570)).
+ -   `ToggleGroupControl`: Improve TypeScript documentation ([#43265](https://github.com/WordPress/gutenberg/pull/43265)).
+ -   `ComboboxControl`: Normalize hyphen-like characters to an ASCII hyphen ([#42942](https://github.com/WordPress/gutenberg/pull/42942)).
+ -   `FormTokenField`: Refactor away from `_.difference()` ([#43224](https://github.com/WordPress/gutenberg/pull/43224/)).
+diff --git a/packages/components/src/color-palette/index.js b/packages/components/src/color-palette/index.js
+index 4d4f3e8bdd5b97..29691a3c63ee94 100644
+--- a/packages/components/src/color-palette/index.js
++++ b/packages/components/src/color-palette/index.js
+@@ -22,6 +22,7 @@ import { VStack } from '../v-stack';
+ import { Flex, FlexItem } from '../flex';
+ import { Truncate } from '../truncate';
+ import { ColorHeading } from './styles';
++import DropdownContentWrapper from '../dropdown/dropdown-content-wrapper';
+ 
+ extend( [ namesPlugin, a11yPlugin ] );
+ 
+@@ -202,11 +203,13 @@ export default function ColorPalette( {
+ 	const Component = showMultiplePalettes ? MultiplePalettes : SinglePalette;
+ 
+ 	const renderCustomColorPicker = () => (
+-		<ColorPicker
+-			color={ value }
+-			onChange={ ( color ) => onChange( color ) }
+-			enableAlpha={ enableAlpha }
+-		/>
++		<DropdownContentWrapper paddingSize="none">
++			<ColorPicker
++				color={ value }
++				onChange={ ( color ) => onChange( color ) }
++				enableAlpha={ enableAlpha }
++			/>
++		</DropdownContentWrapper>
+ 	);
+ 
+ 	const colordColor = colord( value );
+diff --git a/packages/components/src/color-palette/style.scss b/packages/components/src/color-palette/style.scss
+index 6e453236b96faa..1ede67de8d6542 100644
+--- a/packages/components/src/color-palette/style.scss
++++ b/packages/components/src/color-palette/style.scss
+@@ -31,20 +31,6 @@
+ 	}
+ }
+ 
+-.components-dropdown__content.components-color-palette__custom-color-dropdown-content .components-popover__content {
+-	overflow: visible;
+-	box-shadow: 0 4px 4px rgba(0, 0, 0, 0.05);
+-	border: none;
+-	outline: none;
+-	border-radius: $radius-block-ui;
+-	padding: 0;
+-
+-	.react-colorful__saturation {
+-		border-top-right-radius: $radius-block-ui;
+-		border-top-left-radius: $radius-block-ui;
+-	}
+-}
+-
+ .components-color-palette__custom-color-name {
+ 	text-align: left;
+ }
+diff --git a/packages/components/src/color-palette/test/__snapshots__/index.js.snap b/packages/components/src/color-palette/test/__snapshots__/index.js.snap
+index 9c79cdef246d53..30084daf47d7d5 100644
+--- a/packages/components/src/color-palette/test/__snapshots__/index.js.snap
++++ b/packages/components/src/color-palette/test/__snapshots__/index.js.snap
+@@ -1,10 +1,17 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`ColorPalette Dropdown .renderContent should render dropdown content 1`] = `
+-<ColorPicker
+-  color="#f00"
+-  onChange={[Function]}
+-/>
++<DropdownContentWrapperDiv
++  className="components-dropdown-content-wrapper"
++  data-wp-c16t={true}
++  data-wp-component="DropdownContentWrapper"
++  paddingSize="none"
++>
++  <LegacyAdapter
++    color="#f00"
++    onChange={[Function]}
++  />
++</DropdownContentWrapperDiv>
+ `;
+ 
+ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] = `

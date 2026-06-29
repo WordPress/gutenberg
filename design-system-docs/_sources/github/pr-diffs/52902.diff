@@ -1,0 +1,352 @@
+diff --git a/packages/block-editor/src/components/line-height-control/index.js b/packages/block-editor/src/components/line-height-control/index.js
+index 6fee380d52262b..a57add244cc76d 100644
+--- a/packages/block-editor/src/components/line-height-control/index.js
++++ b/packages/block-editor/src/components/line-height-control/index.js
+@@ -12,6 +12,7 @@ import {
+ 	BASE_DEFAULT_VALUE,
+ 	RESET_VALUE,
+ 	STEP,
++	SPIN_FACTOR,
+ 	isLineHeightDefined,
+ } from './utils';
+ 
+@@ -30,24 +31,25 @@ const LineHeightControl = ( {
+ 		if ( isDefined ) return nextValue;
+ 
+ 		/**
+-		 * The following logic handles the initial step up/down action
++		 * The following logic handles the initial spin up/down action
+ 		 * (from an undefined value state) so that the next values are better suited for
+-		 * line-height rendering. For example, the first step up should immediately
++		 * line-height rendering. For example, the first spin up should immediately
+ 		 * go to 1.6, rather than the normally expected 0.1.
+ 		 *
+-		 * Step up/down actions can be triggered by keydowns of the up/down arrow keys,
+-		 * or by clicking the spin buttons.
++		 * Spin up/down actions can be triggered by keydowns of the up/down arrow keys,
++		 * dragging the input or by clicking the spin buttons.
+ 		 */
++		const spin = STEP * SPIN_FACTOR;
+ 		switch ( `${ nextValue }` ) {
+-			case `${ STEP }`:
+-				// Increment by step value.
+-				return BASE_DEFAULT_VALUE + STEP;
++			case `${ spin }`:
++				// Increment by spin value.
++				return BASE_DEFAULT_VALUE + spin;
+ 			case '0': {
+-				// This means the user explicitly input '0', rather than stepped down
+-				// from an undefined value state.
++				// This means the user explicitly input '0', rather than using the
++				// spin down action from an undefined value state.
+ 				if ( wasTypedOrPasted ) return nextValue;
+-				// Decrement by step value.
+-				return BASE_DEFAULT_VALUE - STEP;
++				// Decrement by spin value.
++				return BASE_DEFAULT_VALUE - spin;
+ 			}
+ 			case '':
+ 				return BASE_DEFAULT_VALUE;
+@@ -111,6 +113,7 @@ const LineHeightControl = ( {
+ 				label={ __( 'Line height' ) }
+ 				placeholder={ BASE_DEFAULT_VALUE }
+ 				step={ STEP }
++				spinFactor={ SPIN_FACTOR }
+ 				value={ value }
+ 				min={ 0 }
+ 				spinControls="custom"
+diff --git a/packages/block-editor/src/components/line-height-control/test/index.js b/packages/block-editor/src/components/line-height-control/test/index.js
+index ea2eb2b6f6e25b..3b997c07e9212c 100644
+--- a/packages/block-editor/src/components/line-height-control/test/index.js
++++ b/packages/block-editor/src/components/line-height-control/test/index.js
+@@ -13,7 +13,9 @@ import { UP, DOWN } from '@wordpress/keycodes';
+  * Internal dependencies
+  */
+ import LineHeightControl from '../';
+-import { BASE_DEFAULT_VALUE, STEP } from '../utils';
++import { BASE_DEFAULT_VALUE, SPIN_FACTOR, STEP } from '../utils';
++
++const SPIN = STEP * SPIN_FACTOR;
+ 
+ const ControlledLineHeightControl = () => {
+ 	const [ value, setValue ] = useState();
+@@ -32,7 +34,7 @@ describe( 'LineHeightControl', () => {
+ 		const input = screen.getByRole( 'spinbutton' );
+ 		act( () => input.focus() );
+ 		fireEvent.keyDown( input, { keyCode: UP } );
+-		expect( input ).toHaveValue( BASE_DEFAULT_VALUE + STEP );
++		expect( input ).toHaveValue( BASE_DEFAULT_VALUE + SPIN );
+ 	} );
+ 
+ 	it( 'should immediately step down from the default value if down-arrowed from an unset state', () => {
+@@ -40,7 +42,7 @@ describe( 'LineHeightControl', () => {
+ 		const input = screen.getByRole( 'spinbutton' );
+ 		act( () => input.focus() );
+ 		fireEvent.keyDown( input, { keyCode: DOWN } );
+-		expect( input ).toHaveValue( BASE_DEFAULT_VALUE - STEP );
++		expect( input ).toHaveValue( BASE_DEFAULT_VALUE - SPIN );
+ 	} );
+ 
+ 	it( 'should immediately step up from the default value if spin button up was clicked from an unset state', () => {
+@@ -48,7 +50,7 @@ describe( 'LineHeightControl', () => {
+ 		const input = screen.getByRole( 'spinbutton' );
+ 		act( () => input.focus() );
+ 		fireEvent.change( input, { target: { value: 0.1 } } ); // simulates click on spin button up
+-		expect( input ).toHaveValue( BASE_DEFAULT_VALUE + STEP );
++		expect( input ).toHaveValue( BASE_DEFAULT_VALUE + SPIN );
+ 	} );
+ 
+ 	it( 'should immediately step down from the default value if spin button down was clicked from an unset state', () => {
+@@ -56,6 +58,6 @@ describe( 'LineHeightControl', () => {
+ 		const input = screen.getByRole( 'spinbutton' );
+ 		act( () => input.focus() );
+ 		fireEvent.change( input, { target: { value: 0 } } ); // simulates click on spin button down
+-		expect( input ).toHaveValue( BASE_DEFAULT_VALUE - STEP );
++		expect( input ).toHaveValue( BASE_DEFAULT_VALUE - SPIN );
+ 	} );
+ } );
+diff --git a/packages/block-editor/src/components/line-height-control/utils.js b/packages/block-editor/src/components/line-height-control/utils.js
+index a232394540d2f6..e9bf66259991e3 100644
+--- a/packages/block-editor/src/components/line-height-control/utils.js
++++ b/packages/block-editor/src/components/line-height-control/utils.js
+@@ -1,5 +1,10 @@
+ export const BASE_DEFAULT_VALUE = 1.5;
+-export const STEP = 0.1;
++export const STEP = 0.01;
++/**
++ * A spin factor of 10 allows the spin controls to increment/decrement by 0.1.
++ * e.g. A line-height value of 1.55 will increment to 1.65.
++ */
++export const SPIN_FACTOR = 10;
+ /**
+  * There are varying value types within LineHeightControl:
+  *
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 800189e259aacb..dde70d085724ef 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ -   `ProgressBar`: Use gray 300 for track color ([#53349](https://github.com/WordPress/gutenberg/pull/53349)).
+ -   `Modal`: add `headerActions` prop to render buttons in the header. ([#53328](https://github.com/WordPress/gutenberg/pull/53328)).
+ -   `Snackbar`: Snackbar design and motion improvements ([#53248](https://github.com/WordPress/gutenberg/pull/53248))
++-   `NumberControl`: Add `spinFactor` prop for adjusting the amount by which the spin controls change the value ([#52902](https://github.com/WordPress/gutenberg/pull/52902)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/number-control/index.tsx b/packages/components/src/number-control/index.tsx
+index d2ce9d8ed7d019..a70fc500d4134f 100644
+--- a/packages/components/src/number-control/index.tsx
++++ b/packages/components/src/number-control/index.tsx
+@@ -43,6 +43,7 @@ function UnforwardedNumberControl(
+ 		required = false,
+ 		shiftStep = 10,
+ 		step = 1,
++		spinFactor = 1,
+ 		type: typeProp = 'number',
+ 		value: valueProp,
+ 		size = 'default',
+@@ -65,15 +66,17 @@ function UnforwardedNumberControl(
+ 
+ 	const isStepAny = step === 'any';
+ 	const baseStep = isStepAny ? 1 : ensureNumber( step );
++	const baseSpin = ensureNumber( spinFactor ) * baseStep;
+ 	const baseValue = roundClamp( 0, min, max, baseStep );
+ 	const constrainValue = (
+ 		value: number | string,
+ 		stepOverride?: number
+ 	) => {
+ 		// When step is "any" clamp the value, otherwise round and clamp it.
++		// Use '' + to convert to string for use in input value attribute.
+ 		return isStepAny
+-			? Math.min( max, Math.max( min, ensureNumber( value ) ) )
+-			: roundClamp( value, min, max, stepOverride ?? baseStep );
++			? '' + Math.min( max, Math.max( min, ensureNumber( value ) ) )
++			: '' + roundClamp( value, min, max, stepOverride ?? baseStep );
+ 	};
+ 
+ 	const autoComplete = typeProp === 'number' ? 'off' : undefined;
+@@ -88,7 +91,7 @@ function UnforwardedNumberControl(
+ 	) => {
+ 		event?.preventDefault();
+ 		const shift = event?.shiftKey && isShiftStepEnabled;
+-		const delta = shift ? ensureNumber( shiftStep ) * baseStep : baseStep;
++		const delta = shift ? ensureNumber( shiftStep ) * baseSpin : baseSpin;
+ 		let nextValue = isValueEmpty( value ) ? baseValue : value;
+ 		if ( direction === 'up' ) {
+ 			nextValue = add( nextValue, delta );
+@@ -120,7 +123,6 @@ function UnforwardedNumberControl(
+ 				type === inputControlActionTypes.PRESS_UP ||
+ 				type === inputControlActionTypes.PRESS_DOWN
+ 			) {
+-				// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
+ 				nextState.value = spinValue(
+ 					currentValue,
+ 					type === inputControlActionTypes.PRESS_UP ? 'up' : 'down',
+@@ -135,8 +137,8 @@ function UnforwardedNumberControl(
+ 				const [ x, y ] = payload.delta;
+ 				const enableShift = payload.shiftKey && isShiftStepEnabled;
+ 				const modifier = enableShift
+-					? ensureNumber( shiftStep ) * baseStep
+-					: baseStep;
++					? ensureNumber( shiftStep ) * baseSpin
++					: baseSpin;
+ 
+ 				let directionModifier;
+ 				let delta;
+@@ -167,7 +169,6 @@ function UnforwardedNumberControl(
+ 					delta = Math.ceil( Math.abs( delta ) ) * Math.sign( delta );
+ 					const distance = delta * modifier * directionModifier;
+ 
+-					// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
+ 					nextState.value = constrainValue(
+ 						// @ts-expect-error TODO: Investigate if it's ok for currentValue to be undefined
+ 						add( currentValue, distance ),
+@@ -186,7 +187,6 @@ function UnforwardedNumberControl(
+ 				const applyEmptyValue =
+ 					required === false && currentValue === '';
+ 
+-				// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
+ 				nextState.value = applyEmptyValue
+ 					? currentValue
+ 					: // @ts-expect-error TODO: Investigate if it's ok for currentValue to be undefined
+diff --git a/packages/components/src/number-control/test/index.tsx b/packages/components/src/number-control/test/index.tsx
+index ae92875708b568..3cf3368f1636ba 100644
+--- a/packages/components/src/number-control/test/index.tsx
++++ b/packages/components/src/number-control/test/index.tsx
+@@ -97,7 +97,7 @@ describe( 'NumberControl', () => {
+ 			// Second call: type '1'
+ 			expect( onChangeSpy ).toHaveBeenNthCalledWith( 2, '1', false );
+ 			// Third call: clamp value
+-			expect( onChangeSpy ).toHaveBeenNthCalledWith( 3, 4, true );
++			expect( onChangeSpy ).toHaveBeenNthCalledWith( 3, '4', true );
+ 		} );
+ 
+ 		it( 'should call onChange callback when value is not valid', async () => {
+@@ -139,7 +139,7 @@ describe( 'NumberControl', () => {
+ 			// Third call: invalid, unclamped value
+ 			expect( onChangeSpy ).toHaveBeenNthCalledWith( 3, '14', false );
+ 			// Fourth call: valid, clamped value
+-			expect( onChangeSpy ).toHaveBeenNthCalledWith( 4, 10, true );
++			expect( onChangeSpy ).toHaveBeenNthCalledWith( 4, '10', true );
+ 		} );
+ 	} );
+ 
+@@ -292,6 +292,24 @@ describe( 'NumberControl', () => {
+ 			expect( input ).toHaveValue( 867.5309 );
+ 		} );
+ 
++		it( 'should increment by step multiplied by spinFactor when spinFactor is provided', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<StatefulNumberControl
++					step={ 0.01 }
++					spinFactor={ 10 }
++					value={ 1.65 }
++				/>
++			);
++
++			const input = screen.getByRole( 'spinbutton' );
++			await user.click( input );
++			await user.keyboard( '[ArrowUp]' );
++
++			expect( input ).toHaveValue( 1.75 );
++		} );
++
+ 		it( 'should increment by shiftStep on key UP + shift press', async () => {
+ 			const user = userEvent.setup();
+ 
+@@ -304,6 +322,18 @@ describe( 'NumberControl', () => {
+ 			expect( input ).toHaveValue( 20 );
+ 		} );
+ 
++		it( 'should increment by shiftStep multiplied by spinFactor on key UP + shift press', async () => {
++			const user = userEvent.setup();
++
++			render( <StatefulNumberControl value={ 5 } spinFactor={ 5 } /> );
++
++			const input = screen.getByRole( 'spinbutton' );
++			await user.click( input );
++			await user.keyboard( '{Shift>}[ArrowUp]{/Shift}' );
++
++			expect( input ).toHaveValue( 50 );
++		} );
++
+ 		it( 'should increment by shiftStep while preserving the decimal value when `step` is “any”', async () => {
+ 			const user = userEvent.setup();
+ 
+@@ -415,6 +445,24 @@ describe( 'NumberControl', () => {
+ 			expect( input ).toHaveValue( 867.5309 );
+ 		} );
+ 
++		it( 'should decrement by step multiplied by spinFactor when spinFactor is provided', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<StatefulNumberControl
++					step={ 0.01 }
++					spinFactor={ 10 }
++					value={ 1.65 }
++				/>
++			);
++
++			const input = screen.getByRole( 'spinbutton' );
++			await user.click( input );
++			await user.keyboard( '[ArrowDown]' );
++
++			expect( input ).toHaveValue( 1.55 );
++		} );
++
+ 		it( 'should decrement by shiftStep on key DOWN + shift press', async () => {
+ 			const user = userEvent.setup();
+ 
+@@ -427,6 +475,18 @@ describe( 'NumberControl', () => {
+ 			expect( input ).toHaveValue( 0 );
+ 		} );
+ 
++		it( 'should decrement by shiftStep multiplied by spinFactor on key DOWN + shift press', async () => {
++			const user = userEvent.setup();
++
++			render( <StatefulNumberControl value={ 100 } spinFactor={ 5 } /> );
++
++			const input = screen.getByRole( 'spinbutton' );
++			await user.click( input );
++			await user.keyboard( '{Shift>}[ArrowDown]{/Shift}' );
++
++			expect( input ).toHaveValue( 50 );
++		} );
++
+ 		it( 'should decrement by shiftStep while preserving the decimal value when `step` is “any”', async () => {
+ 			const user = userEvent.setup();
+ 
+@@ -511,10 +571,12 @@ describe( 'NumberControl', () => {
+ 			[ 'up', '2', { value: '1' } ],
+ 			[ 'up', '12', { value: '10', step: '2' } ],
+ 			[ 'up', '10', { value: '10', max: 10 } ],
++			[ 'up', '10.1', { value: '10', step: '0.01', spinFactor: 10 } ],
+ 			[ 'down', '-1', {} ],
+ 			[ 'down', '1', { value: '2' } ],
+ 			[ 'down', '10', { value: '12', step: '2' } ],
+ 			[ 'down', '10', { value: '10', min: 10 } ],
++			[ 'down', '9.9', { value: '10', step: '0.01', spinFactor: 10 } ],
+ 		] )(
+ 			'should spin %s to %s when props = %o',
+ 			async ( direction, expectedValue, props ) => {
+diff --git a/packages/components/src/number-control/types.ts b/packages/components/src/number-control/types.ts
+index a6cb68d81c3914..98ee8e0a672f08 100644
+--- a/packages/components/src/number-control/types.ts
++++ b/packages/components/src/number-control/types.ts
+@@ -74,6 +74,13 @@ export type NumberControlProps = Omit<
+ 	 * @default 1
+ 	 */
+ 	step?: InputControlProps[ 'step' ];
++	/**
++	 * Optional multiplication factor in spin changes. i.e. A spin changes
++	 * by `spinFactor * step` (if `step` is "any", 1 is used instead).
++	 *
++	 * @default 1
++	 */
++	spinFactor?: number;
+ 	/**
+ 	 * The `type` attribute of the `input` element.
+ 	 *

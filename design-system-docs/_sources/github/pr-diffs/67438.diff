@@ -1,0 +1,299 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 7865993d4e995f..e9d99562c59a94 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,7 @@
+ -   `BoxControl`: Passive deprecate `onMouseOver`/`onMouseOut`. Pass to the `inputProps` prop instead ([#67332](https://github.com/WordPress/gutenberg/pull/67332)).
+ -   `BoxControl`: Deprecate 36px default size ([#66704](https://github.com/WordPress/gutenberg/pull/66704)).
+ -   `UnitControl`: Deprecate 36px default size ([#66791](https://github.com/WordPress/gutenberg/pull/66791)).
++-   `FormFileUpload`: Deprecate 36px default size ([#67438](https://github.com/WordPress/gutenberg/pull/67438)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/form-file-upload/README.md b/packages/components/src/form-file-upload/README.md
+index 4dd8affc5f54a0..c6a7205815de53 100644
+--- a/packages/components/src/form-file-upload/README.md
++++ b/packages/components/src/form-file-upload/README.md
+@@ -1,95 +1,105 @@
+ # FormFileUpload
+ 
+-FormFileUpload is a component that allows users to select files from their local device.
++<!-- This file is generated automatically and cannot be edited directly. Make edits via TypeScript types and TSDocs. -->
+ 
+-## Usage
++<p class="callout callout-info">See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-formfileupload--docs">WordPress Storybook</a> for more detailed, interactive documentation.</p>
++
++FormFileUpload allows users to select files from their local device.
+ 
+ ```jsx
+ import { FormFileUpload } from '@wordpress/components';
+ 
+ const MyFormFileUpload = () => (
+-	<FormFileUpload
+-		accept="image/*"
+-		onChange={ ( event ) => console.log( event.currentTarget.files ) }
+-	>
+-		Upload
+-	</FormFileUpload>
++  <FormFileUpload
++    __next40pxDefaultSize
++    accept="image/*"
++    onChange={ ( event ) => console.log( event.currentTarget.files ) }
++  >
++    Upload
++  </FormFileUpload>
+ );
+ ```
+-
+ ## Props
+ 
+-The component accepts the following props. Props not included in this set will be passed to the `Button` component.
++### `__next40pxDefaultSize`
++
++Start opting into the larger default height that will become the default size in a future version.
++
++ - Type: `boolean`
++ - Required: No
++ - Default: `false`
+ 
+-### accept
++### `accept`
+ 
+-A string passed to `input` element that tells the browser which file types can be upload to the upload by the user use. e.g: `image/*,video/*`.
+-More information about this string is available in https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#Unique_file_type_specifiers.
++A string passed to the `input` element that tells the browser which
++[file types](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#Unique_file_type_specifiers)
++can be uploaded by the user. e.g: `image/*,video/*`.
+ 
+--   Type: `String`
+--   Required: No
++ - Type: `string`
++ - Required: No
+ 
+-### children
++### `children`
+ 
+ Children are passed as children of `Button`.
+ 
+--   Type: `Boolean`
+--   Required: No
++ - Type: `ReactNode`
++ - Required: No
+ 
+-### icon
++### `icon`
+ 
+-The icon to render. Supported values are: Dashicons (specified as strings), functions, Component instances and `null`.
++The icon to render in the default button.
+ 
+--   Type: `String|Function|Component|null`
+--   Required: No
+--   Default: `null`
++See the `Icon` component docs for more information.
+ 
+-### multiple
++ - Type: `IconType`
++ - Required: No
++
++### `multiple`
+ 
+ Whether to allow multiple selection of files or not.
+ 
+--   Type: `Boolean`
+--   Required: No
+--   Default: `false`
++ - Type: `boolean`
++ - Required: No
++ - Default: `false`
+ 
+-### onChange
++### `onChange`
+ 
+ Callback function passed directly to the `input` file element.
+ 
+ Select files will be available in `event.currentTarget.files`.
+ 
+--   Type: `Function`
+--   Required: Yes
++ - Type: `ChangeEventHandler<HTMLInputElement>`
++ - Required: Yes
+ 
+-### onClick
++### `onClick`
+ 
+ Callback function passed directly to the `input` file element.
+ 
+-This can be useful when you want to force a `change` event to fire when the user chooses the same file again. To do this, set the target value to an empty string in the `onClick` function.
++This can be useful when you want to force a `change` event to fire when
++the user chooses the same file again. To do this, set the target value to
++an empty string in the `onClick` function.
+ 
+ ```jsx
+ <FormFileUpload
+-	onClick={ ( event ) => ( event.target.value = '' ) }
+-	onChange={ onChange }
++  __next40pxDefaultSize
++  onClick={ ( event ) => ( event.target.value = '' ) }
++  onChange={ onChange }
+ >
+-	Upload
++  Upload
+ </FormFileUpload>
+ ```
+ 
+--   Type: `Function`
+--   Required: No
+-
+-### render
++ - Type: `MouseEventHandler<HTMLInputElement>`
++ - Required: No
+ 
+-Optional callback function used to render the UI. If passed, the component does not render the default UI (a button) and calls this function to render it. The function receives an object with property `openFileDialog`, a function that, when called, opens the browser native file upload modal window.
++### `render`
+ 
+--   Type: `Function`
+--   Required: No
++Optional callback function used to render the UI.
+ 
+-### __next40pxDefaultSize
+-
+-Start opting into the larger default height that will become the default size in a future version.
++If passed, the component does not render the default UI (a button) and
++calls this function to render it. The function receives an object with
++property `openFileDialog`, a function that, when called, opens the browser
++native file upload modal window.
+ 
+--   Type: `Boolean`
+--   Required: No
+--   Default: `false`
++ - Type: `(arg: { openFileDialog: () => void; }) => ReactNode`
++ - Required: No
+diff --git a/packages/components/src/form-file-upload/docs-manifest.json b/packages/components/src/form-file-upload/docs-manifest.json
+new file mode 100644
+index 00000000000000..cb000536d73562
+--- /dev/null
++++ b/packages/components/src/form-file-upload/docs-manifest.json
+@@ -0,0 +1,5 @@
++{
++	"$schema": "../../schemas/docs-manifest.json",
++	"displayName": "FormFileUpload",
++	"filePath": "./index.tsx"
++}
+diff --git a/packages/components/src/form-file-upload/index.tsx b/packages/components/src/form-file-upload/index.tsx
+index 83d563f2074764..378dc144c6fe8c 100644
+--- a/packages/components/src/form-file-upload/index.tsx
++++ b/packages/components/src/form-file-upload/index.tsx
+@@ -9,15 +9,17 @@ import { useRef } from '@wordpress/element';
+ import Button from '../button';
+ import type { WordPressComponentProps } from '../context';
+ import type { FormFileUploadProps } from './types';
++import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
+ 
+ /**
+- * FormFileUpload is a component that allows users to select files from their local device.
++ * FormFileUpload allows users to select files from their local device.
+  *
+  * ```jsx
+  * import { FormFileUpload } from '@wordpress/components';
+  *
+  * const MyFormFileUpload = () => (
+  *   <FormFileUpload
++ *     __next40pxDefaultSize
+  *     accept="image/*"
+  *     onChange={ ( event ) => console.log( event.currentTarget.files ) }
+  *   >
+@@ -40,6 +42,15 @@ export function FormFileUpload( {
+ 		ref.current?.click();
+ 	};
+ 
++	if ( ! render ) {
++		maybeWarnDeprecated36pxSize( {
++			componentName: 'FormFileUpload',
++			__next40pxDefaultSize: props.__next40pxDefaultSize,
++			// @ts-expect-error - We don't "officially" support all Button props but this likely happens.
++			size: props.size,
++		} );
++	}
++
+ 	const ui = render ? (
+ 		render( { openFileDialog } )
+ 	) : (
+diff --git a/packages/components/src/form-file-upload/stories/index.story.tsx b/packages/components/src/form-file-upload/stories/index.story.tsx
+index 3599ccc51c22eb..176d6b2af60983 100644
+--- a/packages/components/src/form-file-upload/stories/index.story.tsx
++++ b/packages/components/src/form-file-upload/stories/index.story.tsx
+@@ -36,6 +36,7 @@ const Template: StoryFn< typeof FormFileUpload > = ( props ) => {
+ export const Default = Template.bind( {} );
+ Default.args = {
+ 	children: 'Select file',
++	__next40pxDefaultSize: true,
+ };
+ 
+ export const RestrictFileTypes = Template.bind( {} );
+diff --git a/packages/components/src/form-file-upload/test/index.tsx b/packages/components/src/form-file-upload/test/index.tsx
+index 3035bcaa670647..b82dcd754bcd20 100644
+--- a/packages/components/src/form-file-upload/test/index.tsx
++++ b/packages/components/src/form-file-upload/test/index.tsx
+@@ -7,13 +7,17 @@ import userEvent from '@testing-library/user-event';
+ /**
+  * Internal dependencies
+  */
+-import FormFileUpload from '..';
++import _FormFileUpload from '..';
+ 
+ /**
+  * Browser dependencies
+  */
+ const { File } = window;
+ 
++const FormFileUpload = (
++	props: React.ComponentProps< typeof _FormFileUpload >
++) => <_FormFileUpload __next40pxDefaultSize { ...props } />;
++
+ // @testing-library/user-event considers changing <input type="file"> to a string as a change, but it do not occur on real browsers, so the comparisons will be against this result
+ const fakePath = expect.objectContaining( {
+ 	target: expect.objectContaining( {
+diff --git a/packages/components/src/form-file-upload/types.ts b/packages/components/src/form-file-upload/types.ts
+index 728ed959aba76e..3bdbbf5ac2d4c0 100644
+--- a/packages/components/src/form-file-upload/types.ts
++++ b/packages/components/src/form-file-upload/types.ts
+@@ -17,10 +17,9 @@ export type FormFileUploadProps = {
+ 	 */
+ 	__next40pxDefaultSize?: boolean;
+ 	/**
+-	 * A string passed to `input` element that tells the browser which file types can be
+-	 * upload to the upload by the user use. e.g: `image/*,video/*`.
+-	 *
+-	 * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#Unique_file_type_specifiers.
++	 * A string passed to the `input` element that tells the browser which
++	 * [file types](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#Unique_file_type_specifiers)
++	 * can be uploaded by the user. e.g: `image/*,video/*`.
+ 	 */
+ 	accept?: InputHTMLAttributes< HTMLInputElement >[ 'accept' ];
+ 	/**
+@@ -28,7 +27,9 @@ export type FormFileUploadProps = {
+ 	 */
+ 	children?: ReactNode;
+ 	/**
+-	 * The icon to render in the `Button`.
++	 * The icon to render in the default button.
++	 *
++	 * See the `Icon` component docs for more information.
+ 	 */
+ 	icon?: ComponentProps< typeof Icon >[ 'icon' ];
+ 	/**
+@@ -50,10 +51,11 @@ export type FormFileUploadProps = {
+ 	 *
+ 	 * ```jsx
+ 	 * <FormFileUpload
+-	 * 	onClick={ ( event ) => ( event.target.value = '' ) }
+-	 * 	onChange={ onChange }
++	 *   __next40pxDefaultSize
++	 *   onClick={ ( event ) => ( event.target.value = '' ) }
++	 *   onChange={ onChange }
+ 	 * >
+-	 * 	Upload
++	 *   Upload
+ 	 * </FormFileUpload>
+ 	 * ```
+ 	 */

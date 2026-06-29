@@ -1,0 +1,82 @@
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index d4fbe60af40597..c2088d44484129 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   The `color.primary` and `color.bg` props on `ThemeProvider` now require an sRGB-parseable string (hex, `rgb(...)`, or CSS named color). Other CSS color formats like `hsl(...)`, `oklch(...)`, and `lab(...)` are no longer supported ([#77653](https://github.com/WordPress/gutenberg/pull/77653)).
+ 
++### Bug Fixes
++
++-   `ThemeProvider`: Propagate `density` through React context so nested providers inherit it via React (not only via the DOM/CSS cascade) ([#78662](https://github.com/WordPress/gutenberg/pull/78662)).
++
+ ### Documentation
+ 
+ -   Add ["Design System/Tokens/Introduction" page](https://wordpress.github.io/gutenberg/?path=/docs/design-system-tokens-introduction--docs) to Storybook ([#78449](https://github.com/WordPress/gutenberg/pull/78449)).
+diff --git a/packages/theme/src/context.ts b/packages/theme/src/context.ts
+index 2193f3fbe85336..7b3de188c9d8f4 100644
+--- a/packages/theme/src/context.ts
++++ b/packages/theme/src/context.ts
+@@ -9,5 +9,6 @@ export const ThemeContext = createContext< ThemeContextType >( {
+ 	resolvedSettings: {
+ 		color: {},
+ 		cursor: undefined,
++		density: undefined,
+ 	},
+ } );
+diff --git a/packages/theme/src/theme-provider.tsx b/packages/theme/src/theme-provider.tsx
+index a039e3aab416c9..066c4240002ae0 100644
+--- a/packages/theme/src/theme-provider.tsx
++++ b/packages/theme/src/theme-provider.tsx
+@@ -46,6 +46,7 @@ export const ThemeProvider = ( {
+ 	const { themeProviderStyles, resolvedSettings } = useThemeProviderStyles( {
+ 		color,
+ 		cursor,
++		density,
+ 	} );
+ 
+ 	const contextValue = useMemo(
+@@ -68,7 +69,7 @@ export const ThemeProvider = ( {
+ 			<div
+ 				data-wpds-theme-provider-id={ instanceId }
+ 				data-wpds-root-provider={ isRoot }
+-				data-wpds-density={ density }
++				data-wpds-density={ resolvedSettings.density }
+ 				className={ styles.root }
+ 			>
+ 				<ThemeContext.Provider value={ contextValue }>
+diff --git a/packages/theme/src/use-theme-provider-styles.ts b/packages/theme/src/use-theme-provider-styles.ts
+index 223e6a8f6164ef..d87f88dc272a75 100644
+--- a/packages/theme/src/use-theme-provider-styles.ts
++++ b/packages/theme/src/use-theme-provider-styles.ts
+@@ -161,9 +161,11 @@ function generateStyles( {
+ export function useThemeProviderStyles( {
+ 	color = {},
+ 	cursor,
++	density,
+ }: {
+ 	color?: ThemeProviderProps[ 'color' ];
+ 	cursor?: ThemeProviderProps[ 'cursor' ];
++	density?: ThemeProviderProps[ 'density' ];
+ } = {} ) {
+ 	const { resolvedSettings: inheritedSettings } = useContext( ThemeContext );
+ 
+@@ -178,6 +180,7 @@ export function useThemeProviderStyles( {
+ 	const bg =
+ 		color.bg ?? inheritedSettings.color?.bg ?? DEFAULT_SEED_COLORS.bg;
+ 	const cursorControl = cursor?.control ?? inheritedSettings.cursor?.control;
++	const resolvedDensity = density ?? inheritedSettings.density;
+ 
+ 	const resolvedSettings = useMemo(
+ 		() => ( {
+@@ -186,8 +189,9 @@ export function useThemeProviderStyles( {
+ 				bg,
+ 			},
+ 			cursor: cursorControl ? { control: cursorControl } : undefined,
++			density: resolvedDensity,
+ 		} ),
+-		[ primary, bg, cursorControl ]
++		[ primary, bg, cursorControl, resolvedDensity ]
+ 	);
+ 
+ 	const colorStyles = useMemo( () => {

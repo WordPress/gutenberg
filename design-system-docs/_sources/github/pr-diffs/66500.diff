@@ -1,0 +1,317 @@
+diff --git a/bin/api-docs/gen-components-docs/get-subcomponent-descriptions.mjs b/bin/api-docs/gen-components-docs/get-subcomponent-descriptions.mjs
+new file mode 100644
+index 00000000000000..4bb82652f1737a
+--- /dev/null
++++ b/bin/api-docs/gen-components-docs/get-subcomponent-descriptions.mjs
+@@ -0,0 +1,46 @@
++/**
++ * External dependencies
++ */
++import fs from 'node:fs/promises';
++import babel from '@babel/core';
++import { parse as commentParser } from 'comment-parser';
++
++/**
++ * Try to get subcomponent descriptions from the main component Object.assign() call.
++ */
++export async function getDescriptionsForSubcomponents(
++	filePath,
++	mainComponentName
++) {
++	const fileContent = await fs.readFile( filePath, 'utf8' );
++	const parsedFile = babel.parse( fileContent, {
++		filename: filePath,
++	} );
++	const mainComponent = parsedFile.program.body
++		.filter( ( node ) => node.type === 'ExportNamedDeclaration' )
++		.flatMap( ( node ) => node.declaration?.declarations )
++		.find( ( node ) => node?.id.name === mainComponentName );
++
++	if (
++		! (
++			// If the main component export has `Object.assign( ... )`
++			(
++				mainComponent?.init?.type === 'CallExpression' &&
++				mainComponent?.init?.callee?.object?.name === 'Object' &&
++				mainComponent?.init?.callee?.property?.name === 'assign'
++			)
++		)
++	) {
++		return;
++	}
++
++	const properties = mainComponent?.init?.arguments[ 1 ]?.properties.map(
++		( node ) => [
++			node.key.name,
++			commentParser( `/*${ node.leadingComments?.[ 0 ].value }*/`, {
++				spacing: 'preserve',
++			} )?.[ 0 ]?.description,
++		]
++	);
++	return Object.fromEntries( properties );
++}
+diff --git a/bin/api-docs/gen-components-docs/index.mjs b/bin/api-docs/gen-components-docs/index.mjs
+index e036995b4c4f74..c7109dc4982c36 100644
+--- a/bin/api-docs/gen-components-docs/index.mjs
++++ b/bin/api-docs/gen-components-docs/index.mjs
+@@ -10,6 +10,7 @@ import path from 'path';
+  * Internal dependencies
+  */
+ import { generateMarkdownDocs } from './markdown/index.mjs';
++import { getDescriptionsForSubcomponents } from './get-subcomponent-descriptions.mjs';
+ 
+ const MANIFEST_GLOB = 'packages/components/src/**/docs-manifest.json';
+ 
+@@ -79,8 +80,10 @@ await Promise.all(
+ 			displayName: manifest.displayName,
+ 		} );
+ 
+-		const subcomponentTypeDocs = manifest.subcomponents?.map(
+-			( subcomponent ) => {
++		let subcomponentDescriptions;
++
++		const subcomponentTypeDocs = await Promise.all(
++			manifest.subcomponents?.map( async ( subcomponent ) => {
+ 				const docs = getTypeDocsForComponent( {
+ 					manifestPath,
+ 					componentFilePath: subcomponent.filePath,
+@@ -91,10 +94,29 @@ await Promise.all(
+ 					docs.displayName = subcomponent.preferredDisplayName;
+ 				}
+ 
++				if ( ! subcomponent.description ) {
++					subcomponentDescriptions ??=
++						getDescriptionsForSubcomponents(
++							path.resolve(
++								path.dirname( manifestPath ),
++								manifest.filePath
++							),
++							manifest.displayName
++						);
++
++					docs.description = ( await subcomponentDescriptions )?.[
++						subcomponent.displayName
++					];
++				}
++
+ 				return docs;
+-			}
++			} ) ?? []
+ 		);
+-		const docs = generateMarkdownDocs( { typeDocs, subcomponentTypeDocs } );
++
++		const docs = generateMarkdownDocs( {
++			typeDocs,
++			subcomponentTypeDocs,
++		} );
+ 		const outputFile = path.resolve(
+ 			path.dirname( manifestPath ),
+ 			'./README.md'
+diff --git a/packages/components/src/base-control/README.md b/packages/components/src/base-control/README.md
+index d51629de6f7253..839464b41260b5 100644
+--- a/packages/components/src/base-control/README.md
++++ b/packages/components/src/base-control/README.md
+@@ -1,8 +1,10 @@
+ # BaseControl
+ 
+-`BaseControl` is a component used to generate labels and help text for components handling user inputs.
++<!-- This file is generated automatically and cannot be edited directly. Make edits via TypeScript types and TSDocs. -->
++
++<p class="callout callout-info">See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-basecontrol--docs">WordPress Storybook</a> for more detailed, interactive documentation.</p>
+ 
+-## Usage
++`BaseControl` is a component used to generate labels and help text for components handling user inputs.
+ 
+ ```jsx
+ import { BaseControl, useBaseControlProps } from '@wordpress/components';
+@@ -23,70 +25,80 @@ const MyCustomTextareaControl = ({ children, ...baseProps }) => (
+ 	);
+ );
+ ```
+-
+ ## Props
+ 
+-The component accepts the following props:
++### `__nextHasNoMarginBottom`
+ 
+-### id
++Start opting into the new margin-free styles that will become the default in a future version.
+ 
+-The HTML `id` of the control element (passed in as a child to `BaseControl`) to which labels and help text are being generated. This is necessary to accessibly associate the label with that element.
++ - Type: `boolean`
++ - Required: No
++ - Default: `false`
+ 
+-The recommended way is to use the `useBaseControlProps` hook, which takes care of generating a unique `id` for you. Otherwise, if you choose to pass an explicit `id` to this prop, you are responsible for ensuring the uniqueness of the `id`.
++### `as`
+ 
+--   Type: `String`
+--   Required: No
++The HTML element or React component to render the component as.
+ 
+-### label
++ - Type: `"symbol" | "object" | "label" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | "base" | "bdi" | "bdo" | "big" | "blockquote" | "body" | "br" | "button" | ... 516 more ... | ("view" & FunctionComponent<...>)`
++ - Required: No
+ 
+-If this property is added, a label will be generated using label property as the content.
++### `className`
+ 
+--   Type: `String`
+--   Required: No
+ 
+-### hideLabelFromVision
++ - Type: `string`
++ - Required: No
+ 
+-If true, the label will only be visible to screen readers.
++### `children`
++
++The content to be displayed within the `BaseControl`.
+ 
+--   Type: `Boolean`
+--   Required: No
++ - Type: `ReactNode`
++ - Required: Yes
+ 
+-### help
++### `help`
+ 
+-Additional description for the control. Only use for meaningful description or instructions for the control. An element containing the description will be programmatically associated to the BaseControl by the means of an `aria-describedby` attribute.
++Additional description for the control.
+ 
+--   Type: `ReactNode`
+--   Required: No
++Only use for meaningful description or instructions for the control. An element containing the description will be programmatically associated to the BaseControl by the means of an `aria-describedby` attribute.
+ 
+-### className
++ - Type: `ReactNode`
++ - Required: No
+ 
+-Any other classes to add to the wrapper div.
++### `hideLabelFromVision`
+ 
+--   Type: `String`
+--   Required: No
++If true, the label will only be visible to screen readers.
+ 
+-### children
++ - Type: `boolean`
++ - Required: No
++ - Default: `false`
+ 
+-The content to be displayed within the BaseControl.
++### `id`
+ 
+--   Type: `Element`
+--   Required: Yes
++The HTML `id` of the control element (passed in as a child to `BaseControl`) to which labels and help text are being generated.
++This is necessary to accessibly associate the label with that element.
+ 
+-### __nextHasNoMarginBottom
++The recommended way is to use the `useBaseControlProps` hook, which takes care of generating a unique `id` for you.
++Otherwise, if you choose to pass an explicit `id` to this prop, you are responsible for ensuring the uniqueness of the `id`.
+ 
+-Start opting into the new margin-free styles that will become the default in a future version.
++ - Type: `string`
++ - Required: No
+ 
+--   Type: `Boolean`
+--   Required: No
+--   Default: `false`
++### `label`
+ 
+-## BaseControl.VisualLabel
++If this property is added, a label will be generated using label property as the content.
+ 
+-`BaseControl.VisualLabel` is used to render a purely visual label inside a `BaseControl` component.
++ - Type: `ReactNode`
++ - Required: No
+ 
+-It should only be used in cases where the children being rendered inside BaseControl are already accessibly labeled, e.g., a button, but we want an additional visual label for that section equivalent to the labels `BaseControl` would otherwise use if the `label` prop was passed.
++## Subcomponents
+ 
+-## Usage
++### BaseControl.VisualLabel
++
++`BaseControl.VisualLabel` is used to render a purely visual label inside a `BaseControl` component.
++
++It should only be used in cases where the children being rendered inside `BaseControl` are already accessibly labeled,
++e.g., a button, but we want an additional visual label for that section equivalent to the labels `BaseControl` would
++otherwise use if the `label` prop was passed.
+ 
+ ```jsx
+ import { BaseControl } from '@wordpress/components';
+@@ -101,19 +113,18 @@ const MyBaseControl = () => (
+ 	</BaseControl>
+ );
+ ```
++#### Props
+ 
+-### Props
+-
+-#### className
++##### `as`
+ 
+-Any other classes to add to the wrapper div.
++The HTML element or React component to render the component as.
+ 
+--   Type: `String`
+--   Required: No
++ - Type: `"symbol" | "object" | "label" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | ...`
++ - Required: No
+ 
+-#### children
++##### `children`
+ 
+ The content to be displayed within the `BaseControl.VisualLabel`.
+ 
+--   Type: `Element`
+--   Required: Yes
++ - Type: `ReactNode`
++ - Required: Yes
+diff --git a/packages/components/src/base-control/docs-manifest.json b/packages/components/src/base-control/docs-manifest.json
+new file mode 100644
+index 00000000000000..fe4cad660a6dc1
+--- /dev/null
++++ b/packages/components/src/base-control/docs-manifest.json
+@@ -0,0 +1,12 @@
++{
++	"$schema": "../../schemas/docs-manifest.json",
++	"displayName": "BaseControl",
++	"filePath": "./index.tsx",
++	"subcomponents": [
++		{
++			"displayName": "VisualLabel",
++			"preferredDisplayName": "BaseControl.VisualLabel",
++			"filePath": "./index.tsx"
++		}
++	]
++}
+diff --git a/packages/components/src/base-control/stories/index.story.tsx b/packages/components/src/base-control/stories/index.story.tsx
+index 62191f906a4ce3..ca35b793621577 100644
+--- a/packages/components/src/base-control/stories/index.story.tsx
++++ b/packages/components/src/base-control/stories/index.story.tsx
+@@ -12,6 +12,10 @@ import Button from '../../button';
+ const meta: Meta< typeof BaseControl > = {
+ 	title: 'Components/BaseControl',
+ 	component: BaseControl,
++	subcomponents: {
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		'BaseControl.VisualLabel': BaseControl.VisualLabel,
++	},
+ 	argTypes: {
+ 		children: { control: { type: null } },
+ 		help: { control: { type: 'text' } },
+diff --git a/packages/components/src/base-control/types.ts b/packages/components/src/base-control/types.ts
+index e4c838459209c4..9ca2b7bdd4c6ed 100644
+--- a/packages/components/src/base-control/types.ts
++++ b/packages/components/src/base-control/types.ts
+@@ -49,5 +49,8 @@ export type BaseControlProps = {
+ };
+ 
+ export type BaseControlVisualLabelProps = {
++	/**
++	 * The content to be displayed within the `BaseControl.VisualLabel`.
++	 */
+ 	children: ReactNode;
+ };

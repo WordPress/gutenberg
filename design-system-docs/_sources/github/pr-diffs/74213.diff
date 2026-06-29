@@ -1,0 +1,209 @@
+diff --git a/packages/base-styles/CHANGELOG.md b/packages/base-styles/CHANGELOG.md
+index 92333be385a4b6..5704fda37cc98e 100644
+--- a/packages/base-styles/CHANGELOG.md
++++ b/packages/base-styles/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   Remove outdated vendor prefix properties ([#74213](https://github.com/WordPress/gutenberg/pull/74213)).
++
+ ## 6.12.0 (2025-11-26)
+ 
+ ## 6.11.0 (2025-11-12)
+diff --git a/packages/base-styles/_long-content-fade.scss b/packages/base-styles/_long-content-fade.scss
+index d33a2aede366df..5c97bd15a898ef 100644
+--- a/packages/base-styles/_long-content-fade.scss
++++ b/packages/base-styles/_long-content-fade.scss
+@@ -10,10 +10,6 @@
+ 	display: block;
+ 	position: absolute;
+ 	-webkit-touch-callout: none;
+-	-webkit-user-select: none;
+-	-khtml-user-select: none;
+-	-moz-user-select: none;
+-	-ms-user-select: none;
+ 	user-select: none;
+ 	pointer-events: none;
+ 
+diff --git a/packages/base-styles/_mixins.scss b/packages/base-styles/_mixins.scss
+index d3492c75005e4e..560f1188c1ef5a 100644
+--- a/packages/base-styles/_mixins.scss
++++ b/packages/base-styles/_mixins.scss
+@@ -283,15 +283,7 @@
+ 	}
+ 
+ 	// Use opacity to work in various editor styles.
+-	&::-webkit-input-placeholder {
+-		color: colors.$dark-gray-placeholder;
+-	}
+-
+-	&::-moz-placeholder {
+-		color: colors.$dark-gray-placeholder;
+-	}
+-
+-	&:-ms-input-placeholder {
++	&::placeholder {
+ 		color: colors.$dark-gray-placeholder;
+ 	}
+ }
+@@ -313,11 +305,6 @@
+ 	&:checked {
+ 		background: var(--wp-admin-theme-color);
+ 		border-color: var(--wp-admin-theme-color);
+-
+-		// Hide default checkbox styles in IE.
+-		&::-ms-check {
+-			opacity: 0;
+-		}
+ 	}
+ 
+ 	&:checked::before,
+diff --git a/packages/block-library/src/reset.scss b/packages/block-library/src/reset.scss
+index 9c88cbef16ed01..69f82197b25cd1 100644
+--- a/packages/block-library/src/reset.scss
++++ b/packages/block-library/src/reset.scss
+@@ -95,7 +95,7 @@
+ 
+ 	select {
+ 		font-family: system-ui;
+-		-webkit-appearance: revert;
++		appearance: revert;
+ 		color: revert;
+ 		border: revert;
+ 		border-radius: revert;
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f6a68604d7c185..bbfbb0066b71f0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -46,6 +46,7 @@
+ 
+ -   `AlignmentMatrixControl`: Migrate styles from Emotion to a CSS module ([#73714](https://github.com/WordPress/gutenberg/pull/73714) and [#73757](https://github.com/WordPress/gutenberg/pull/73757)).
+ -   `AnglePickerControl`: Migrate styles from Emotion to a CSS module ([#73786](https://github.com/WordPress/gutenberg/pull/73786)).
++-   `Button`, `DateCalendar`, `DateRangeCalendar`, `CheckboxControl`, `Panel`, `Placeholder`: Remove outdated vendor prefix properties in CSS ([#74213](https://github.com/WordPress/gutenberg/pull/74213)).
+ 
+ ## 30.9.0 (2025-11-26)
+ 
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 8313506809e05a..11624d01617ed4 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -19,7 +19,7 @@
+ 	margin: 0;
+ 	border: 0;
+ 	cursor: pointer;
+-	-webkit-appearance: none;
++	appearance: none;
+ 	background: none;
+ 
+ 	@media not ( prefers-reduced-motion ) {
+diff --git a/packages/components/src/calendar/style.scss b/packages/components/src/calendar/style.scss
+index 033a2f537fafd1..7db14ee4fcf1eb 100644
+--- a/packages/components/src/calendar/style.scss
++++ b/packages/components/src/calendar/style.scss
+@@ -126,13 +126,11 @@ $wp-components-calendar-preview-border-color: color-mix(in srgb, $components-col
+ 	padding: 0;
+ 	margin: 0;
+ 	cursor: pointer;
+-	-moz-appearance: none;
+-	-webkit-appearance: none;
++	appearance: none;
+ 	display: inline-flex;
+ 	align-items: center;
+ 	justify-content: center;
+ 	position: relative;
+-	appearance: none;
+ 
+ 	width: $wp-components-calendar-button-width;
+ 	height: $wp-components-calendar-button-height;
+diff --git a/packages/components/src/checkbox-control/style.scss b/packages/components/src/checkbox-control/style.scss
+index ec71857e5d4161..f9978eed7befbb 100644
+--- a/packages/components/src/checkbox-control/style.scss
++++ b/packages/components/src/checkbox-control/style.scss
+@@ -50,11 +50,6 @@
+ 	&:indeterminate {
+ 		background: $components-color-accent;
+ 		border-color: $components-color-accent;
+-
+-		// Hide default checkbox styles in IE.
+-		&::-ms-check {
+-			opacity: 0;
+-		}
+ 	}
+ 
+ 	&:checked::before {
+diff --git a/packages/components/src/panel/style.scss b/packages/components/src/panel/style.scss
+index 08f2480306455c..1cba950547e6f5 100644
+--- a/packages/components/src/panel/style.scss
++++ b/packages/components/src/panel/style.scss
+@@ -123,8 +123,6 @@
+ 	/* rtl:begin:ignore */
+ 	body.rtl & .dashicons-arrow-right {
+ 		transform: scaleX(-1);
+-		-ms-filter: fliph;
+-		filter: FlipH;
+ 		margin-top: -10px;
+ 	}
+ 	/* rtl:end:ignore */
+diff --git a/packages/components/src/placeholder/style.scss b/packages/components/src/placeholder/style.scss
+index 58facdad67d0d3..d30b88eb8ad30e 100644
+--- a/packages/components/src/placeholder/style.scss
++++ b/packages/components/src/placeholder/style.scss
+@@ -18,7 +18,6 @@
+ 	gap: $grid-unit-20;
+ 
+ 	// Some editor styles unset this.
+-	-moz-font-smoothing: subpixel-antialiased;
+ 	-webkit-font-smoothing: subpixel-antialiased;
+ 
+ 
+diff --git a/packages/edit-site/src/components/resizable-frame/style.scss b/packages/edit-site/src/components/resizable-frame/style.scss
+index 547ab5a40b6f6b..d23230e302b36e 100644
+--- a/packages/edit-site/src/components/resizable-frame/style.scss
++++ b/packages/edit-site/src/components/resizable-frame/style.scss
+@@ -9,7 +9,6 @@
+ 			body:has(&) {
+ 				cursor: col-resize;
+ 				user-select: none;
+-				-webkit-user-select: none;
+ 			}
+ 		}
+ 
+diff --git a/packages/editor/src/components/post-text-editor/style.scss b/packages/editor/src/components/post-text-editor/style.scss
+index 90e9630abfe17c..5cbc7ada0a5104 100644
+--- a/packages/editor/src/components/post-text-editor/style.scss
++++ b/packages/editor/src/components/post-text-editor/style.scss
+@@ -39,15 +39,7 @@ textarea.editor-post-text-editor {
+ 		position: relative;
+ 	}
+ 
+-	&::-webkit-input-placeholder {
+-		color: $dark-gray-placeholder;
+-	}
+-
+-	&::-moz-placeholder {
+-		color: $dark-gray-placeholder;
+-	}
+-
+-	&:-ms-input-placeholder {
++	&::placeholder {
+ 		color: $dark-gray-placeholder;
+ 	}
+ }
+diff --git a/packages/interface/src/components/complementary-area/style.scss b/packages/interface/src/components/complementary-area/style.scss
+index 6f30bf50454aec..10e8fde9769241 100644
+--- a/packages/interface/src/components/complementary-area/style.scss
++++ b/packages/interface/src/components/complementary-area/style.scss
+@@ -9,10 +9,6 @@
+ 	height: 100%;
+ 	overflow: auto;
+ 
+-	@include break-small() {
+-		-webkit-overflow-scrolling: touch;
+-	}
+-
+ 	@include break-medium() {
+ 		width: $sidebar-width;
+ 	}

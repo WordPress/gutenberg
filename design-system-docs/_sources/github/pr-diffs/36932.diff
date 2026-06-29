@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/form-toggle/README.md b/packages/components/src/form-toggle/README.md
+index 60a8a62477389b..abfa4766c6011f 100644
+--- a/packages/components/src/form-toggle/README.md
++++ b/packages/components/src/form-toggle/README.md
+@@ -61,7 +61,7 @@ const MyFormToggle = () => {
+ 	const [ isChecked, setChecked ] = useState( true );
+ 
+ 	<FormToggle
+-		checked={ checked }
++		checked={ isChecked }
+ 		onChange={ () => setChecked( ( state ) => ! state ) }
+ 	/>
+ };

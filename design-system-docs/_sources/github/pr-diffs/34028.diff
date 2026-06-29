@@ -1,0 +1,922 @@
+diff --git a/packages/components/src/dropdown-menu/index.js b/packages/components/src/dropdown-menu/index.js
+index c3cd6ad969d3fd..85983f92305aca 100644
+--- a/packages/components/src/dropdown-menu/index.js
++++ b/packages/components/src/dropdown-menu/index.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * External dependencies
+  */
+@@ -33,19 +34,21 @@ function mergeProps( defaultProps = {}, props = {} ) {
+ 	return mergedProps;
+ }
+ 
+-function DropdownMenu( {
+-	children,
+-	className,
+-	controls,
+-	icon = menu,
+-	label,
+-	popoverProps,
+-	toggleProps,
+-	menuProps,
+-	disableOpenOnArrowDown = false,
+-	text,
+-	noIcons,
+-} ) {
++function DropdownMenu( dropdownMenuProps ) {
++	const {
++		children,
++		className,
++		controls,
++		icon = menu,
++		label,
++		popoverProps,
++		toggleProps,
++		menuProps,
++		disableOpenOnArrowDown = false,
++		text,
++		noIcons,
++	} = dropdownMenuProps;
++
+ 	if ( isEmpty( controls ) && ! isFunction( children ) ) {
+ 		return null;
+ 	}
+diff --git a/packages/components/src/dropdown/index.js b/packages/components/src/dropdown/index.js
+index ebee9c2b5abd3c..09477a87e0509b 100644
+--- a/packages/components/src/dropdown/index.js
++++ b/packages/components/src/dropdown/index.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * External dependencies
+  */
+diff --git a/packages/components/src/menu-group/index.js b/packages/components/src/menu-group/index.js
+index 19e182ddc74ffe..6054bfcb3e4e29 100644
+--- a/packages/components/src/menu-group/index.js
++++ b/packages/components/src/menu-group/index.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * External dependencies
+  */
+@@ -9,12 +10,8 @@ import classnames from 'classnames';
+ import { Children } from '@wordpress/element';
+ import { useInstanceId } from '@wordpress/compose';
+ 
+-export function MenuGroup( {
+-	children,
+-	className = '',
+-	label,
+-	hideSeparator,
+-} ) {
++export function MenuGroup( props ) {
++	const { children, className = '', label, hideSeparator } = props;
+ 	const instanceId = useInstanceId( MenuGroup );
+ 
+ 	if ( ! Children.count( children ) ) {
+diff --git a/packages/components/src/menu-item/index.js b/packages/components/src/menu-item/index.js
+index 8bed60d84df8f7..f8a97b801b0a02 100644
+--- a/packages/components/src/menu-item/index.js
++++ b/packages/components/src/menu-item/index.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * External dependencies
+  */
+@@ -16,23 +17,8 @@ import Shortcut from '../shortcut';
+ import Button from '../button';
+ import Icon from '../icon';
+ 
+-/**
+- * Renders a generic menu item for use inside the more menu.
+- *
+- * @param {Object}        props                   Component props.
+- * @param {WPElement}     props.children          Element to render as child of button.
+- * @param {string}        props.info              Text to use as description for button text.
+- * @param {string}        props.className         Class to set on the container.
+- * @param {WPIcon}        props.icon              Button's `icon` prop.
+- * @param {string|Object} props.shortcut          Shortcut's `shortcut` prop.
+- * @param {boolean}       props.isSelected        Whether or not the menu item is currently selected.
+- * @param {string}        [props.role="menuitem"] ARIA role of the menu item.
+- * @param {Object}        ref                     React Element ref.
+- *
+- * @return {WPComponent} The component to be rendered.
+- */
+-export function MenuItem(
+-	{
++export function MenuItem( props, ref ) {
++	let {
+ 		children,
+ 		info,
+ 		className,
+@@ -40,10 +26,9 @@ export function MenuItem(
+ 		shortcut,
+ 		isSelected,
+ 		role = 'menuitem',
+-		...props
+-	},
+-	ref
+-) {
++		...buttonProps
++	} = props;
++
+ 	className = classnames( 'components-menu-item__button', className );
+ 
+ 	if ( info ) {
+@@ -72,7 +57,7 @@ export function MenuItem(
+ 			}
+ 			role={ role }
+ 			className={ className }
+-			{ ...props }
++			{ ...buttonProps }
+ 		>
+ 			<span className="components-menu-item__item">{ children }</span>
+ 			<Shortcut
+diff --git a/packages/components/src/navigable-container/container.js b/packages/components/src/navigable-container/container.js
+index 68734f89be8cf0..360bcb21b989dd 100644
+--- a/packages/components/src/navigable-container/container.js
++++ b/packages/components/src/navigable-container/container.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * External dependencies
+  */
+diff --git a/packages/components/src/navigable-container/index.js b/packages/components/src/navigable-container/index.js
+index e98f1b1236d7b4..b47667fd39cd7d 100644
+--- a/packages/components/src/navigable-container/index.js
++++ b/packages/components/src/navigable-container/index.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * Internal Dependencies
+  */
+diff --git a/packages/components/src/navigable-container/menu.js b/packages/components/src/navigable-container/menu.js
+index 6e0dc794d037e7..df238853df0082 100644
+--- a/packages/components/src/navigable-container/menu.js
++++ b/packages/components/src/navigable-container/menu.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * External dependencies
+  */
+diff --git a/packages/components/src/navigable-container/tabbable.js b/packages/components/src/navigable-container/tabbable.js
+index bc572522e9c9f5..00ba8117b85883 100644
+--- a/packages/components/src/navigable-container/tabbable.js
++++ b/packages/components/src/navigable-container/tabbable.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * WordPress dependencies
+  */
+diff --git a/packages/components/src/tools-panel/context.js b/packages/components/src/tools-panel/context.js
+deleted file mode 100644
+index e74e08708db9f9..00000000000000
+--- a/packages/components/src/tools-panel/context.js
++++ /dev/null
+@@ -1,7 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { createContext, useContext } from '@wordpress/element';
+-
+-export const ToolsPanelContext = createContext( {} );
+-export const useToolsPanelContext = () => useContext( ToolsPanelContext );
+diff --git a/packages/components/src/tools-panel/context.ts b/packages/components/src/tools-panel/context.ts
+new file mode 100644
+index 00000000000000..5627b458efa25d
+--- /dev/null
++++ b/packages/components/src/tools-panel/context.ts
+@@ -0,0 +1,23 @@
++/**
++ * WordPress dependencies
++ */
++import { createContext, useContext } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import type { ToolsPanelContext as ToolsPanelContextType } from './types';
++
++const noop = () => undefined;
++
++export const ToolsPanelContext = createContext< ToolsPanelContextType >( {
++	menuItems: { default: {}, optional: {} },
++	hasMenuItems: false,
++	isResetting: false,
++	registerPanelItem: noop,
++	deregisterPanelItem: noop,
++	flagItemCustomization: noop,
++} );
++
++export const useToolsPanelContext = () =>
++	useContext< ToolsPanelContextType >( ToolsPanelContext );
+diff --git a/packages/components/src/tools-panel/index.js b/packages/components/src/tools-panel/index.ts
+similarity index 100%
+rename from packages/components/src/tools-panel/index.js
+rename to packages/components/src/tools-panel/index.ts
+diff --git a/packages/components/src/tools-panel/styles.js b/packages/components/src/tools-panel/styles.ts
+similarity index 100%
+rename from packages/components/src/tools-panel/styles.js
+rename to packages/components/src/tools-panel/styles.ts
+diff --git a/packages/components/src/tools-panel/tools-panel-header/README.md b/packages/components/src/tools-panel/tools-panel-header/README.md
+index 90c50006dca29e..07a7544b6b1435 100644
+--- a/packages/components/src/tools-panel/tools-panel-header/README.md
++++ b/packages/components/src/tools-panel/tools-panel-header/README.md
+@@ -25,7 +25,7 @@ Text to be displayed within the panel header. It is also passed along as the
+ 
+ -   Required: Yes
+ 
+-### `resetAll`: `function`
++### `resetAll`: `() => void`
+ 
+ The `resetAll` prop provides the callback to execute when the "Reset all" menu
+ item is selected. Its purpose is to facilitate resetting any control values
+@@ -33,7 +33,7 @@ for items contained within this header's panel.
+ 
+ -   Required: Yes
+ 
+-### `toggleItem`: `function`
++### `toggleItem`: `( label: string ) => void`
+ 
+ This is executed when an individual control's menu item is toggled. It
+ will update the panel's menu item state and call the panel item's `onSelect` or
+diff --git a/packages/components/src/tools-panel/tools-panel-header/component.js b/packages/components/src/tools-panel/tools-panel-header/component.tsx
+similarity index 82%
+rename from packages/components/src/tools-panel/tools-panel-header/component.js
+rename to packages/components/src/tools-panel/tools-panel-header/component.tsx
+index 2a1e82e2338f71..3204615434b4b3 100644
+--- a/packages/components/src/tools-panel/tools-panel-header/component.js
++++ b/packages/components/src/tools-panel/tools-panel-header/component.tsx
+@@ -1,3 +1,9 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { Ref } from 'react';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -11,9 +17,19 @@ import DropdownMenu from '../../dropdown-menu';
+ import MenuGroup from '../../menu-group';
+ import MenuItem from '../../menu-item';
+ import { useToolsPanelHeader } from './hook';
+-import { contextConnect } from '../../ui/context';
++import { contextConnect, WordPressComponentProps } from '../../ui/context';
++import type {
++	ToolsPanelControlsGroupProps,
++	ToolsPanelHeaderProps,
++} from '../types';
++
++const noop = () => {};
+ 
+-const DefaultControlsGroup = ( { items, onClose, toggleItem } ) => {
++const DefaultControlsGroup = ( {
++	items,
++	onClose,
++	toggleItem,
++}: ToolsPanelControlsGroupProps ) => {
+ 	if ( ! items.length ) {
+ 		return null;
+ 	}
+@@ -51,7 +67,11 @@ const DefaultControlsGroup = ( { items, onClose, toggleItem } ) => {
+ 	);
+ };
+ 
+-const OptionalControlsGroup = ( { items, onClose, toggleItem } ) => {
++const OptionalControlsGroup = ( {
++	items,
++	onClose,
++	toggleItem,
++}: ToolsPanelControlsGroupProps ) => {
+ 	if ( ! items.length ) {
+ 		return null;
+ 	}
+@@ -91,7 +111,10 @@ const OptionalControlsGroup = ( { items, onClose, toggleItem } ) => {
+ 	);
+ };
+ 
+-const ToolsPanelHeader = ( props, forwardedRef ) => {
++const ToolsPanelHeader = (
++	props: WordPressComponentProps< ToolsPanelHeaderProps, 'h2' >,
++	forwardedRef: Ref< any >
++) => {
+ 	const {
+ 		dropdownMenuClassName,
+ 		hasMenuItems,
+@@ -118,7 +141,7 @@ const ToolsPanelHeader = ( props, forwardedRef ) => {
+ 					label={ labelText }
+ 					menuProps={ { className: dropdownMenuClassName } }
+ 				>
+-					{ ( { onClose } ) => (
++					{ ( { onClose = noop } ) => (
+ 						<>
+ 							<DefaultControlsGroup
+ 								items={ defaultItems }
+diff --git a/packages/components/src/tools-panel/tools-panel-header/hook.js b/packages/components/src/tools-panel/tools-panel-header/hook.ts
+similarity index 75%
+rename from packages/components/src/tools-panel/tools-panel-header/hook.js
+rename to packages/components/src/tools-panel/tools-panel-header/hook.ts
+index 462d515b7b6fa2..f31e8cb6372df6 100644
+--- a/packages/components/src/tools-panel/tools-panel-header/hook.js
++++ b/packages/components/src/tools-panel/tools-panel-header/hook.ts
+@@ -8,10 +8,13 @@ import { useMemo } from '@wordpress/element';
+  */
+ import * as styles from '../styles';
+ import { useToolsPanelContext } from '../context';
+-import { useContextSystem } from '../../ui/context';
++import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+ import { useCx } from '../../utils/hooks/use-cx';
++import type { ToolsPanelHeaderProps } from '../types';
+ 
+-export function useToolsPanelHeader( props ) {
++export function useToolsPanelHeader(
++	props: WordPressComponentProps< ToolsPanelHeaderProps, 'h2' >
++) {
+ 	const { className, ...otherProps } = useContextSystem(
+ 		props,
+ 		'ToolsPanelHeader'
+diff --git a/packages/components/src/tools-panel/tools-panel-header/index.js b/packages/components/src/tools-panel/tools-panel-header/index.ts
+similarity index 100%
+rename from packages/components/src/tools-panel/tools-panel-header/index.js
+rename to packages/components/src/tools-panel/tools-panel-header/index.ts
+diff --git a/packages/components/src/tools-panel/tools-panel-item/README.md b/packages/components/src/tools-panel/tools-panel-item/README.md
+index 35a5fae6dba44f..85d03f96d1d04f 100644
+--- a/packages/components/src/tools-panel/tools-panel-item/README.md
++++ b/packages/components/src/tools-panel/tools-panel-item/README.md
+@@ -18,7 +18,7 @@ for how to use `ToolsPanelItem`.
+ 
+ ## Props
+ 
+-### `hasValue`: `function`
++### `hasValue`: `() => boolean`
+ 
+ This is called when building the `ToolsPanel` menu to determine the item's
+ initial checked state.
+@@ -45,14 +45,14 @@ A panel item's `label` should be unique among all items within a single panel.
+ 
+ -   Required: Yes
+ 
+-### `onDeselect`: `function`
++### `onDeselect`: `() => void`
+ 
+ Called when this item is deselected in the `ToolsPanel` menu. This is normally
+ used to reset the panel item control's value.
+ 
+ -   Required: No
+ 
+-### `onSelect`: `function`
++### `onSelect`: `() => void`
+ 
+ A callback to take action when this item is selected in the `ToolsPanel` menu.
+ 
+@@ -66,7 +66,7 @@ allows items to be injected from a shared source.
+ 
+ -   Required: No
+ 
+-### `resetAllFilter`: `function`
++### `resetAllFilter`: `() => void`
+ 
+ A `ToolsPanel` will collect each item's `resetAllFilter` and pass an array of
+ these functions through to the panel's `resetAll` callback. They can then be
+diff --git a/packages/components/src/tools-panel/tools-panel-item/component.js b/packages/components/src/tools-panel/tools-panel-item/component.tsx
+similarity index 62%
+rename from packages/components/src/tools-panel/tools-panel-item/component.js
+rename to packages/components/src/tools-panel/tools-panel-item/component.tsx
+index 92cca8a626022f..cde52e5f3ec0fd 100644
+--- a/packages/components/src/tools-panel/tools-panel-item/component.js
++++ b/packages/components/src/tools-panel/tools-panel-item/component.tsx
+@@ -1,13 +1,23 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { Ref } from 'react';
++
+ /**
+  * Internal dependencies
+  */
+ import { useToolsPanelItem } from './hook';
+ import { View } from '../../view';
+-import { contextConnect } from '../../ui/context';
++import { contextConnect, WordPressComponentProps } from '../../ui/context';
++import type { ToolsPanelItemProps } from '../types';
+ 
+ // This wraps controls to be conditionally displayed within a tools panel. It
+ // prevents props being applied to HTML elements that would make them invalid.
+-const ToolsPanelItem = ( props, forwardedRef ) => {
++const ToolsPanelItem = (
++	props: WordPressComponentProps< ToolsPanelItemProps, 'div' >,
++	forwardedRef: Ref< any >
++) => {
+ 	const { children, isShown, ...toolsPanelItemProps } = useToolsPanelItem(
+ 		props
+ 	);
+diff --git a/packages/components/src/tools-panel/tools-panel-item/hook.js b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+similarity index 76%
+rename from packages/components/src/tools-panel/tools-panel-item/hook.js
+rename to packages/components/src/tools-panel/tools-panel-item/hook.ts
+index 6b7b5cfd3023de..57189eea3916a7 100644
+--- a/packages/components/src/tools-panel/tools-panel-item/hook.js
++++ b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+@@ -2,17 +2,20 @@
+  * WordPress dependencies
+  */
+ import { usePrevious } from '@wordpress/compose';
+-import { useEffect, useMemo } from '@wordpress/element';
++import { useCallback, useEffect, useMemo } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+ import * as styles from '../styles';
+ import { useToolsPanelContext } from '../context';
+-import { useContextSystem } from '../../ui/context';
++import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+ import { useCx } from '../../utils/hooks/use-cx';
++import type { ToolsPanelItemProps } from '../types';
+ 
+-export function useToolsPanelItem( props ) {
++export function useToolsPanelItem(
++	props: WordPressComponentProps< ToolsPanelItemProps, 'div' >
++) {
+ 	const {
+ 		className,
+ 		hasValue,
+@@ -20,15 +23,15 @@ export function useToolsPanelItem( props ) {
+ 		label,
+ 		panelId,
+ 		resetAllFilter,
+-		onDeselect = () => undefined,
+-		onSelect = () => undefined,
++		onDeselect,
++		onSelect,
+ 		...otherProps
+ 	} = useContextSystem( props, 'ToolsPanelItem' );
+ 
+ 	const cx = useCx();
+ 	const classes = useMemo( () => {
+ 		return cx( styles.ToolsPanelItem, className );
+-	} );
++	}, [ className ] );
+ 
+ 	const {
+ 		panelId: currentPanelId,
+@@ -39,21 +42,31 @@ export function useToolsPanelItem( props ) {
+ 		isResetting,
+ 	} = useToolsPanelContext();
+ 
++	const hasValueCallback = useCallback( hasValue, [ panelId ] );
++	const resetAllFilterCallback = useCallback( resetAllFilter, [ panelId ] );
++
+ 	// Registering the panel item allows the panel to include it in its
+ 	// automatically generated menu and determine its initial checked status.
+ 	useEffect( () => {
+ 		if ( currentPanelId === panelId ) {
+ 			registerPanelItem( {
+-				hasValue,
++				hasValue: hasValueCallback,
+ 				isShownByDefault,
+ 				label,
+-				resetAllFilter,
++				resetAllFilter: resetAllFilterCallback,
+ 				panelId,
+ 			} );
+ 		}
+ 
+ 		return () => deregisterPanelItem( label );
+-	}, [ panelId ] );
++	}, [
++		currentPanelId,
++		panelId,
++		isShownByDefault,
++		label,
++		hasValueCallback,
++		resetAllFilterCallback,
++	] );
+ 
+ 	const isValueSet = hasValue();
+ 	const wasValueSet = usePrevious( isValueSet );
+@@ -80,11 +93,11 @@ export function useToolsPanelItem( props ) {
+ 		}
+ 
+ 		if ( isMenuItemChecked && ! isValueSet && ! wasMenuItemChecked ) {
+-			onSelect();
++			onSelect?.();
+ 		}
+ 
+ 		if ( ! isMenuItemChecked && wasMenuItemChecked ) {
+-			onDeselect();
++			onDeselect?.();
+ 		}
+ 	}, [ isMenuItemChecked, wasMenuItemChecked, isValueSet, isResetting ] );
+ 
+diff --git a/packages/components/src/tools-panel/tools-panel-item/index.js b/packages/components/src/tools-panel/tools-panel-item/index.ts
+similarity index 100%
+rename from packages/components/src/tools-panel/tools-panel-item/index.js
+rename to packages/components/src/tools-panel/tools-panel-item/index.ts
+diff --git a/packages/components/src/tools-panel/tools-panel/README.md b/packages/components/src/tools-panel/tools-panel/README.md
+index 889950361eb2f6..de56ab3bdd5c96 100644
+--- a/packages/components/src/tools-panel/tools-panel/README.md
++++ b/packages/components/src/tools-panel/tools-panel/README.md
+@@ -74,7 +74,7 @@ panel's dropdown menu.
+ 
+ - Required: Yes
+ 
+-### `panelId`: `function`
++### `panelId`: `string`
+ 
+ If a `panelId` is set, it is passed through the `ToolsPanelContext` and used
+ to restrict panel items. Only items with a matching `panelId` will be able
+@@ -82,7 +82,7 @@ to register themselves with this panel.
+ 
+ - Required: No
+ 
+-### `resetAll`: `function`
++### `resetAll`: `() => void`
+ 
+ A function to call when the `Reset all` menu option is selected. This is passed
+ through to the panel's header component.
+diff --git a/packages/components/src/tools-panel/tools-panel/component.js b/packages/components/src/tools-panel/tools-panel/component.tsx
+similarity index 67%
+rename from packages/components/src/tools-panel/tools-panel/component.js
+rename to packages/components/src/tools-panel/tools-panel/component.tsx
+index 8f38889fbc8e3c..77199630ed72c2 100644
+--- a/packages/components/src/tools-panel/tools-panel/component.js
++++ b/packages/components/src/tools-panel/tools-panel/component.tsx
+@@ -1,3 +1,9 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { Ref } from 'react';
++
+ /**
+  * Internal dependencies
+  */
+@@ -5,9 +11,13 @@ import ToolsPanelHeader from '../tools-panel-header';
+ import { ToolsPanelContext } from '../context';
+ import { useToolsPanel } from './hook';
+ import { View } from '../../view';
+-import { contextConnect } from '../../ui/context';
++import { contextConnect, WordPressComponentProps } from '../../ui/context';
++import type { ToolsPanelProps } from '../types';
+ 
+-const ToolsPanel = ( props, forwardedRef ) => {
++const ToolsPanel = (
++	props: WordPressComponentProps< ToolsPanelProps, 'div' >,
++	forwardedRef: Ref< any >
++) => {
+ 	const {
+ 		children,
+ 		label,
+diff --git a/packages/components/src/tools-panel/tools-panel/hook.js b/packages/components/src/tools-panel/tools-panel/hook.ts
+similarity index 73%
+rename from packages/components/src/tools-panel/tools-panel/hook.js
+rename to packages/components/src/tools-panel/tools-panel/hook.ts
+index b2b7d35fc6bf5e..9aacf97ed26fa3 100644
+--- a/packages/components/src/tools-panel/tools-panel/hook.js
++++ b/packages/components/src/tools-panel/tools-panel/hook.ts
+@@ -7,21 +7,33 @@ import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import * as styles from '../styles';
+-import { useContextSystem } from '../../ui/context';
++import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+ import { useCx } from '../../utils/hooks/use-cx';
+-
+-const generateMenuItems = ( { panelItems, reset } ) => {
+-	const menuItems = { default: {}, optional: {} };
++import type {
++	ToolsPanelItem,
++	ToolsPanelMenuItemKey,
++	ToolsPanelMenuItems,
++	ToolsPanelMenuItemsConfig,
++	ToolsPanelProps,
++} from '../types';
++
++const generateMenuItems = ( {
++	panelItems,
++	shouldReset,
++}: ToolsPanelMenuItemsConfig ) => {
++	const menuItems: ToolsPanelMenuItems = { default: {}, optional: {} };
+ 
+ 	panelItems.forEach( ( { hasValue, isShownByDefault, label } ) => {
+ 		const group = isShownByDefault ? 'default' : 'optional';
+-		menuItems[ group ][ label ] = reset ? false : hasValue();
++		menuItems[ group ][ label ] = shouldReset ? false : hasValue();
+ 	} );
+ 
+ 	return menuItems;
+ };
+ 
+-export function useToolsPanel( props ) {
++export function useToolsPanel(
++	props: WordPressComponentProps< ToolsPanelProps, 'div' >
++) {
+ 	const { className, resetAll, panelId, ...otherProps } = useContextSystem(
+ 		props,
+ 		'ToolsPanel'
+@@ -46,15 +58,15 @@ export function useToolsPanel( props ) {
+ 	}, [ wasResetting ] );
+ 
+ 	// Allow panel items to register themselves.
+-	const [ panelItems, setPanelItems ] = useState( [] );
++	const [ panelItems, setPanelItems ] = useState< ToolsPanelItem[] >( [] );
+ 
+-	const registerPanelItem = ( item ) => {
++	const registerPanelItem = ( item: ToolsPanelItem ) => {
+ 		setPanelItems( ( items ) => [ ...items, item ] );
+ 	};
+ 
+ 	// Panels need to deregister on unmount to avoid orphans in menu state.
+ 	// This is an issue when panel items are being injected via SlotFills.
+-	const deregisterPanelItem = ( label ) => {
++	const deregisterPanelItem = ( label: string ) => {
+ 		// When switching selections between components injecting matching
+ 		// controls, e.g. both panels have a "padding" control, the
+ 		// deregistration of the first panel doesn't occur until after the
+@@ -66,11 +78,29 @@ export function useToolsPanel( props ) {
+ 		}
+ 	};
+ 
++	// Manage and share display state of menu items representing child controls.
++	const [ menuItems, setMenuItems ] = useState< ToolsPanelMenuItems >( {
++		default: {},
++		optional: {},
++	} );
++
++	// Setup menuItems state as panel items register themselves.
++	useEffect( () => {
++		const items = generateMenuItems( {
++			panelItems,
++			shouldReset: false,
++		} );
++		setMenuItems( items );
++	}, [ panelItems ] );
++
+ 	// Force a menu item to be checked.
+ 	// This is intended for use with default panel items. They are displayed
+ 	// separately to optional items and have different display states,
+ 	//.we need to update that when their value is customized.
+-	const flagItemCustomization = ( label, group = 'default' ) => {
++	const flagItemCustomization = (
++		label: string,
++		group: ToolsPanelMenuItemKey = 'default'
++	) => {
+ 		setMenuItems( {
+ 			...menuItems,
+ 			[ group ]: {
+@@ -80,30 +110,9 @@ export function useToolsPanel( props ) {
+ 		} );
+ 	};
+ 
+-	// Manage and share display state of menu items representing child controls.
+-	const [ menuItems, setMenuItems ] = useState( {} );
+-
+-	const getResetAllFilters = () => {
+-		const filters = [];
+-
+-		panelItems.forEach( ( item ) => {
+-			if ( item.resetAllFilter ) {
+-				filters.push( item.resetAllFilter );
+-			}
+-		} );
+-
+-		return filters;
+-	};
+-
+-	// Setup menuItems state as panel items register themselves.
+-	useEffect( () => {
+-		const items = generateMenuItems( { panelItems, reset: false } );
+-		setMenuItems( items );
+-	}, [ panelItems ] );
+-
+ 	// Toggle the checked state of a menu item which is then used to determine
+ 	// display of the item within the panel.
+-	const toggleItem = ( label ) => {
++	const toggleItem = ( label: string ) => {
+ 		const currentItem = panelItems.find( ( item ) => item.label === label );
+ 
+ 		if ( ! currentItem ) {
+@@ -112,13 +121,26 @@ export function useToolsPanel( props ) {
+ 
+ 		const menuGroup = currentItem.isShownByDefault ? 'default' : 'optional';
+ 
+-		setMenuItems( {
++		const newMenuItems = {
+ 			...menuItems,
+ 			[ menuGroup ]: {
+ 				...menuItems[ menuGroup ],
+ 				[ label ]: ! menuItems[ menuGroup ][ label ],
+ 			},
++		};
++
++		setMenuItems( newMenuItems );
++	};
++
++	const getResetAllFilters = () => {
++		const filters: Array< () => void > = [];
++
++		panelItems.forEach( ( item ) => {
++			if ( item.resetAllFilter ) {
++				filters.push( item.resetAllFilter );
++			}
+ 		} );
++		return filters;
+ 	};
+ 
+ 	// Resets display of children and executes resetAll callback if available.
+@@ -129,7 +151,10 @@ export function useToolsPanel( props ) {
+ 		}
+ 
+ 		// Turn off display of all non-default items.
+-		const resetMenuItems = generateMenuItems( { panelItems, reset: true } );
++		const resetMenuItems = generateMenuItems( {
++			panelItems,
++			shouldReset: true,
++		} );
+ 		setMenuItems( resetMenuItems );
+ 	};
+ 
+@@ -139,7 +164,7 @@ export function useToolsPanel( props ) {
+ 		registerPanelItem,
+ 		deregisterPanelItem,
+ 		flagItemCustomization,
+-		hasMenuItems: panelItems.length,
++		hasMenuItems: !! panelItems.length,
+ 		isResetting: isResetting.current,
+ 	};
+ 
+diff --git a/packages/components/src/tools-panel/tools-panel/index.js b/packages/components/src/tools-panel/tools-panel/index.ts
+similarity index 100%
+rename from packages/components/src/tools-panel/tools-panel/index.js
+rename to packages/components/src/tools-panel/tools-panel/index.ts
+diff --git a/packages/components/src/tools-panel/types.ts b/packages/components/src/tools-panel/types.ts
+new file mode 100644
+index 00000000000000..f763fe13e1ce80
+--- /dev/null
++++ b/packages/components/src/tools-panel/types.ts
+@@ -0,0 +1,130 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { ReactNode } from 'react';
++
++type ResetAllFilter = () => void;
++type ResetAll = ( filters?: ResetAllFilter[] ) => void;
++
++export type ToolsPanelProps = {
++	/**
++	 * The child elements.
++	 */
++	children: ReactNode;
++	/**
++	 * Text to be displayed within the panel's header and as the `aria-label`
++	 * for the panel's dropdown menu.
++	 */
++	label: string;
++	/**
++	 * If a `panelId` is set, it is passed through the `ToolsPanelContext` and
++	 * used to restrict panel items. Only items with a matching `panelId` will
++	 * be able to register themselves with this panel.
++	 */
++	panelId: string;
++	/**
++	 * A function to call when the `Reset all` menu option is selected. This is
++	 * passed through to the panel's header component.
++	 */
++	resetAll: ResetAll;
++};
++
++export type ToolsPanelHeaderProps = {
++	/**
++	 * Text to be displayed within the panel header. It is also passed along as
++	 * the `label` for the panel header's `DropdownMenu`.
++	 */
++	label: string;
++	/**
++	 * The `resetAll` prop provides the callback to execute when the "Reset all"
++	 * menu item is selected. Its purpose is to facilitate resetting any control
++	 * values for items contained within this header's panel.
++	 */
++	resetAll: ResetAll;
++	/**
++	 * This is executed when an individual control's menu item is toggled. It
++	 * will update the panel's menu item state and call the panel item's
++	 * `onSelect` or `onDeselect` callbacks as appropriate.
++	 */
++	toggleItem: ( label: string ) => void;
++};
++
++export type ToolsPanelItem = {
++	/**
++	 * This is called when building the `ToolsPanel` menu to determine the
++	 * item's initial checked state.
++	 */
++	hasValue: () => boolean;
++	/**
++	 * This prop identifies the current item as being displayed by default. This
++	 * means it will show regardless of whether it has a value set or is toggled
++	 * on in the panel's menu.
++	 */
++	isShownByDefault: boolean;
++	/**
++	 * The supplied label is dual purpose. It is used as:
++	 * 1. the human-readable label for the panel's dropdown menu
++	 * 2. a key to locate the corresponding item in the panel's menu context to
++	 * determine if the panel item should be displayed.
++	 * A panel item's `label` should be unique among all items within a single
++	 * panel.
++	 */
++	label: string;
++	/**
++	 * Panel items will ensure they are only registering with their intended
++	 * panel by comparing the `panelId` props set on both the item and the panel
++	 * itself. This allows items to be injected from a shared source.
++	 */
++	panelId: string;
++	/**
++	 * A `ToolsPanel` will collect each item's `resetAllFilter` and pass an
++	 * array of these functions through to the panel's `resetAll` callback. They
++	 * can then be iterated over to perform additional tasks.
++	 */
++	resetAllFilter: ResetAllFilter;
++};
++
++export type ToolsPanelItemProps = ToolsPanelItem & {
++	/**
++	 * The child elements.
++	 */
++	children?: ReactNode;
++	/**
++	 * Called when this item is deselected in the `ToolsPanel` menu. This is
++	 * normally used to reset the panel item control's value.
++	 */
++	onDeselect?: () => void;
++	/**
++	 * A callback to take action when this item is selected in the `ToolsPanel`
++	 * menu.
++	 */
++	onSelect?: () => void;
++};
++
++export type ToolsPanelMenuItemKey = 'default' | 'optional';
++
++export type ToolsPanelMenuItems = {
++	[ menuItemKey in ToolsPanelMenuItemKey ]: { [ key: string ]: boolean };
++};
++
++export type ToolsPanelContext = {
++	panelId?: string;
++	menuItems: ToolsPanelMenuItems;
++	hasMenuItems: boolean;
++	registerPanelItem: ( item: ToolsPanelItem ) => void;
++	deregisterPanelItem: ( label: string ) => void;
++	flagItemCustomization: ( label: string ) => void;
++	isResetting: boolean;
++};
++
++export type ToolsPanelControlsGroupProps = {
++	items: [ string, boolean ][];
++	onClose: () => void;
++	toggleItem: ( label: string ) => void;
++};
++
++export type ToolsPanelMenuItemsConfig = {
++	panelItems: ToolsPanelItem[];
++	shouldReset: boolean;
++};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index a0a0e879a3066f..cd26b356e617e0 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -31,6 +31,8 @@
+ 		"src/disabled/**/*",
+ 		"src/divider/**/*",
+ 		"src/draggable/**/*",
++		"src/dropdown/**/*",
++		"src/dropdown-menu/**/*",
+ 		"src/elevation/**/*",
+ 		"src/flex/**/*",
+ 		"src/flyout/**/*",
+@@ -41,6 +43,9 @@
+ 		"src/item-group/**/*",
+ 		"src/input-control/**/*",
+ 		"src/icon/**/*",
++		"src/menu-item/**/*",
++		"src/menu-group/**/*",
++		"src/navigable-container/**/*",
+ 		"src/number-control/**/*",
+ 		"src/popover/**/*",
+ 		"src/range-control/**/*",
+@@ -55,6 +60,7 @@
+ 		"src/text/**/*",
+ 		"src/tip/**/*",
+ 		"src/toggle-group-control/**/*",
++		"src/tools-panel/**/*",
+ 		"src/tooltip/**/*",
+ 		"src/truncate/**/*",
+ 		"src/ui/**/*",

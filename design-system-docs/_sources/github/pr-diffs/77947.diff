@@ -1,0 +1,88 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 23f851b98978bd..3ff0127c0ffd0c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ ### Bug Fixes
+ 
+ -   `TabPanel`: Fix tab indicator animation while switching tabs ([#77812](https://github.com/WordPress/gutenberg/pull/77812)).
++-   `CustomSelectControlV2`: Flip legacy popover upward when space below trigger is insufficient ([#77947](https://github.com/WordPress/gutenberg/pull/77947)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/custom-select-control-v2/custom-select.tsx b/packages/components/src/custom-select-control-v2/custom-select.tsx
+index 546948d554c670..c8f583e92a9eca 100644
+--- a/packages/components/src/custom-select-control-v2/custom-select.tsx
++++ b/packages/components/src/custom-select-control-v2/custom-select.tsx
+@@ -6,7 +6,12 @@ import * as Ariakit from '@ariakit/react';
+ /**
+  * WordPress dependencies
+  */
+-import { createContext, useCallback, useMemo } from '@wordpress/element';
++import {
++	createContext,
++	useCallback,
++	useMemo,
++	useState,
++} from '@wordpress/element';
+ import { __, _n, sprintf } from '@wordpress/i18n';
+ 
+ /**
+@@ -26,6 +31,10 @@ import InputBase from '../input-control/input-base';
+ import SelectControlChevronDown from '../select-control/chevron-down';
+ import BaseControl from '../base-control';
+ 
++// Minimum px of space required below the trigger to open downward (no flip).
++// See: https://github.com/WordPress/gutenberg/issues/
++const FLIP_THRESHOLD = 150;
++
+ export const CustomSelectContext =
+ 	createContext< CustomSelectContextType >( undefined );
+ CustomSelectContext.displayName = 'CustomSelectContext';
+@@ -102,6 +111,24 @@ function CustomSelect(
+ 		...restProps
+ 	} = props;
+ 
++	const [ shouldFlip, setShouldFlip ] = useState( false );
++
++	const handleTriggerPointerDown = useCallback( () => {
++		if ( ! isLegacy ) {
++			return;
++		}
++
++		const triggerElement = store.getState().selectElement;
++		if ( ! triggerElement ) {
++			return;
++		}
++
++		const spaceBelow =
++			window.innerHeight - triggerElement.getBoundingClientRect().bottom;
++
++		setShouldFlip( spaceBelow < FLIP_THRESHOLD );
++	}, [ isLegacy, store ] );
++
+ 	const onSelectPopoverKeyDown: React.KeyboardEventHandler< HTMLDivElement > =
+ 		useCallback(
+ 			( e ) => {
+@@ -142,6 +169,9 @@ function CustomSelect(
+ 					store={ store }
+ 					// Match legacy behavior (move selection rather than open the popover)
+ 					showOnKeyDown={ ! isLegacy }
++					onPointerDown={
++						isLegacy ? handleTriggerPointerDown : undefined
++					}
+ 				/>
+ 				<Styled.SelectPopover
+ 					gutter={ 12 }
+@@ -149,8 +179,9 @@ function CustomSelect(
+ 					sameWidth
+ 					slide={ false }
+ 					onKeyDown={ onSelectPopoverKeyDown }
+-					// Match legacy behavior
+-					flip={ ! isLegacy }
++					// Match legacy behavior (flip when space below trigger is insufficient)
++					flip={ isLegacy ? shouldFlip : true }
++					overflowPadding={ isLegacy && shouldFlip ? 50 : 0 }
+ 				>
+ 					<CustomSelectContext.Provider value={ contextValue }>
+ 						{ children }

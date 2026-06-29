@@ -1,0 +1,417 @@
+diff --git a/.travis.yml b/.travis.yml
+index bdc50075d7974f..b088911b781453 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -148,6 +148,12 @@ jobs:
+       script:
+         - npm run test-php && npm run test-unit-php-multisite
+ 
++    - name: Visual Regression Tests
++      install:
++        - npm ci
++      script:
++        - npm run storybook:snapshot"
++
+     - name: E2E tests (Admin) (1/4)
+       env: FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
+       script:
+diff --git a/docs/contributors/testing-overview.md b/docs/contributors/testing-overview.md
+index b1f0e42ce4ca78..20cb4946be093b 100644
+--- a/docs/contributors/testing-overview.md
++++ b/docs/contributors/testing-overview.md
+@@ -355,6 +355,21 @@ Sometimes we need to mock refs for some stories which use them. Check the follow
+ - [Using createNodeMock to mock refs](https://github.com/storybookjs/storybook/tree/master/addons/storyshots/storyshots-core#using-createnodemock-to-mock-refs) with StoryShots.
+ 
+ In that case, you might see test failures and `TypeError` reported by Jest in the lines which try to access a property from `ref.current`. If this happens, search for `initStoryshots` method call, which contains all necessary configurations to adjust.
++
++### Visual Regression Testing
++
++> [@percy/storybook](https://docs.percy.io/docs/storybook) adds automattic Visual Regression Testing for [Storybook](https://storybook.js.org/).
++
++A Visual Regression Test compares a screenshot of the UI before a change is made with a screenshot of the UI after a change is made.
++
++Subtle changes to HTML markup or CSS rules can result in significant visual changes to a UI, particularly when layout is affected. When changes to HTML markup or CSS rules are subtle it can be difficult to assess from a diff what impact the change might have on the visuals.
++
++The Visual Regression Tests are setup to run across multiple browsers and can find visual flaws caused by browser inconsistencies.
++
++The tests are automated saving time and effort for a human to review all the stories in all the browsers.
++
++The visual regression tests run on CI and failing tests will need to be [reviewed](https://docs.percy.io/docs/github#section-step-3-run-and-review-builds) by a contributor.
++
+ ## Native mobile testing
+ 
+ Part of the unit-tests suite is a set of Jest tests run exercise native-mobile codepaths, developed in React Native. Since those tests run on Node, they can be launched locally on your development machine without the need for specific native Android or iOS dev tools or SDKs. It also means that they can be debugged using typical dev tools. Read on for instructions how to debug.
+diff --git a/package-lock.json b/package-lock.json
+index 8f777c41671e1a..c813e447547d1f 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -4898,6 +4898,188 @@
+ 				"url-template": "^2.0.8"
+ 			}
+ 		},
++		"@percy/react-percy-api-client": {
++			"version": "0.4.6",
++			"resolved": "https://registry.npmjs.org/@percy/react-percy-api-client/-/react-percy-api-client-0.4.6.tgz",
++			"integrity": "sha512-tbzw8i/iNFJpfw8m+Bgg6dGtLX5VEVyafLidw1rL+LoQ/FgiAgM9/wAzlCnPjyiF2QNaVNhkij9y6HHsNlfevQ==",
++			"dev": true,
++			"requires": {
++				"babel-runtime": "^6.26.0",
++				"debug": "^2.6.3",
++				"es6-promise-pool": "^2.4.4",
++				"mime-types": "^2.1.14",
++				"percy-client": "^3.0.0",
++				"slugify": "^1.1.0"
++			},
++			"dependencies": {
++				"debug": {
++					"version": "2.6.9",
++					"resolved": "https://registry.npmjs.org/debug/-/debug-2.6.9.tgz",
++					"integrity": "sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==",
++					"dev": true,
++					"requires": {
++						"ms": "2.0.0"
++					}
++				}
++			}
++		},
++		"@percy/storybook": {
++			"version": "3.2.0",
++			"resolved": "https://registry.npmjs.org/@percy/storybook/-/storybook-3.2.0.tgz",
++			"integrity": "sha512-vWzbuECidDDrIiiDlje3l/RDwHhc29W95HFVsqdp74JsRtGMpXNf4unIBxwZAcYhHyjQppic4O6jiGGN50Kdsw==",
++			"dev": true,
++			"requires": {
++				"@percy/react-percy-api-client": "^0.4.6",
++				"babel-runtime": "^6.26.0",
++				"debug": "^3.1.0",
++				"es6-error": "^4.0.2",
++				"es6-promise-pool": "^2.4.4",
++				"puppeteer": "^1.4.0",
++				"walk": "^2.3.9",
++				"yargs": "^7.0.2"
++			},
++			"dependencies": {
++				"ansi-regex": {
++					"version": "2.1.1",
++					"resolved": "https://registry.npmjs.org/ansi-regex/-/ansi-regex-2.1.1.tgz",
++					"integrity": "sha1-w7M6te42DYbg5ijwRorn7yfWVN8=",
++					"dev": true
++				},
++				"camelcase": {
++					"version": "3.0.0",
++					"resolved": "https://registry.npmjs.org/camelcase/-/camelcase-3.0.0.tgz",
++					"integrity": "sha1-MvxLn82vhF/N9+c7uXysImHwqwo=",
++					"dev": true
++				},
++				"cliui": {
++					"version": "3.2.0",
++					"resolved": "https://registry.npmjs.org/cliui/-/cliui-3.2.0.tgz",
++					"integrity": "sha1-EgYBU3qRbSmUD5NNo7SNWFo5IT0=",
++					"dev": true,
++					"requires": {
++						"string-width": "^1.0.1",
++						"strip-ansi": "^3.0.1",
++						"wrap-ansi": "^2.0.0"
++					}
++				},
++				"is-fullwidth-code-point": {
++					"version": "1.0.0",
++					"resolved": "https://registry.npmjs.org/is-fullwidth-code-point/-/is-fullwidth-code-point-1.0.0.tgz",
++					"integrity": "sha1-754xOG8DGn8NZDr4L95QxFfvAMs=",
++					"dev": true,
++					"requires": {
++						"number-is-nan": "^1.0.0"
++					}
++				},
++				"ms": {
++					"version": "2.1.2",
++					"resolved": "https://registry.npmjs.org/ms/-/ms-2.1.2.tgz",
++					"integrity": "sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==",
++					"dev": true
++				},
++				"os-locale": {
++					"version": "1.4.0",
++					"resolved": "https://registry.npmjs.org/os-locale/-/os-locale-1.4.0.tgz",
++					"integrity": "sha1-IPnxeuKe00XoveWDsT0gCYA8FNk=",
++					"dev": true,
++					"requires": {
++						"lcid": "^1.0.0"
++					}
++				},
++				"puppeteer": {
++					"version": "1.20.0",
++					"resolved": "https://registry.npmjs.org/puppeteer/-/puppeteer-1.20.0.tgz",
++					"integrity": "sha512-bt48RDBy2eIwZPrkgbcwHtb51mj2nKvHOPMaSH2IsWiv7lOG9k9zhaRzpDZafrk05ajMc3cu+lSQYYOfH2DkVQ==",
++					"dev": true,
++					"requires": {
++						"debug": "^4.1.0",
++						"extract-zip": "^1.6.6",
++						"https-proxy-agent": "^2.2.1",
++						"mime": "^2.0.3",
++						"progress": "^2.0.1",
++						"proxy-from-env": "^1.0.0",
++						"rimraf": "^2.6.1",
++						"ws": "^6.1.0"
++					},
++					"dependencies": {
++						"debug": {
++							"version": "4.1.1",
++							"resolved": "https://registry.npmjs.org/debug/-/debug-4.1.1.tgz",
++							"integrity": "sha512-pYAIzeRo8J6KPEaJ0VWOh5Pzkbw/RetuzehGM7QRRX5he4fPHx2rdKMB256ehJCkX+XRQm16eZLqLNS8RSZXZw==",
++							"dev": true,
++							"requires": {
++								"ms": "^2.1.1"
++							}
++						}
++					}
++				},
++				"string-width": {
++					"version": "1.0.2",
++					"resolved": "https://registry.npmjs.org/string-width/-/string-width-1.0.2.tgz",
++					"integrity": "sha1-EYvfW4zcUaKn5w0hHgfisLmxB9M=",
++					"dev": true,
++					"requires": {
++						"code-point-at": "^1.0.0",
++						"is-fullwidth-code-point": "^1.0.0",
++						"strip-ansi": "^3.0.0"
++					}
++				},
++				"strip-ansi": {
++					"version": "3.0.1",
++					"resolved": "https://registry.npmjs.org/strip-ansi/-/strip-ansi-3.0.1.tgz",
++					"integrity": "sha1-ajhfuIU9lS1f8F0Oiq+UJ43GPc8=",
++					"dev": true,
++					"requires": {
++						"ansi-regex": "^2.0.0"
++					}
++				},
++				"which-module": {
++					"version": "1.0.0",
++					"resolved": "https://registry.npmjs.org/which-module/-/which-module-1.0.0.tgz",
++					"integrity": "sha1-u6Y8qGGUiZT/MHc2CJ47lgJsKk8=",
++					"dev": true
++				},
++				"ws": {
++					"version": "6.2.1",
++					"resolved": "https://registry.npmjs.org/ws/-/ws-6.2.1.tgz",
++					"integrity": "sha512-GIyAXC2cB7LjvpgMt9EKS2ldqr0MTrORaleiOno6TweZ6r3TKtoFQWay/2PceJ3RuBasOHzXNn5Lrw1X0bEjqA==",
++					"dev": true,
++					"requires": {
++						"async-limiter": "~1.0.0"
++					}
++				},
++				"yargs": {
++					"version": "7.1.0",
++					"resolved": "https://registry.npmjs.org/yargs/-/yargs-7.1.0.tgz",
++					"integrity": "sha1-a6MY6xaWFyf10oT46gA+jWFU0Mg=",
++					"dev": true,
++					"requires": {
++						"camelcase": "^3.0.0",
++						"cliui": "^3.2.0",
++						"decamelize": "^1.1.1",
++						"get-caller-file": "^1.0.1",
++						"os-locale": "^1.4.0",
++						"read-pkg-up": "^1.0.1",
++						"require-directory": "^2.1.1",
++						"require-main-filename": "^1.0.1",
++						"set-blocking": "^2.0.0",
++						"string-width": "^1.0.2",
++						"which-module": "^1.0.0",
++						"y18n": "^3.2.1",
++						"yargs-parser": "^5.0.0"
++					}
++				},
++				"yargs-parser": {
++					"version": "5.0.0",
++					"resolved": "https://registry.npmjs.org/yargs-parser/-/yargs-parser-5.0.0.tgz",
++					"integrity": "sha1-J17PDX/+Bcd+ZOfIbkzZS/DhIoo=",
++					"dev": true,
++					"requires": {
++						"camelcase": "^3.0.0"
++					}
++				}
++			}
++		},
+ 		"@reach/router": {
+ 			"version": "1.2.1",
+ 			"resolved": "https://registry.npmjs.org/@reach/router/-/router-1.2.1.tgz",
+@@ -10799,6 +10981,12 @@
+ 			"integrity": "sha512-MKiLiV+I1AA596t9w1sQJ8jkiSr5+ZKi0WKrYGUn6d1Fx+Ij4tIj+m2WMQSGczs5jZVxV339chE8iwk6F64wjA==",
+ 			"dev": true
+ 		},
++		"bluebird-retry": {
++			"version": "0.11.0",
++			"resolved": "https://registry.npmjs.org/bluebird-retry/-/bluebird-retry-0.11.0.tgz",
++			"integrity": "sha1-EomrIsu8OgJYe6rTVZU1HdDBwEc=",
++			"dev": true
++		},
+ 		"bn.js": {
+ 			"version": "4.11.8",
+ 			"resolved": "https://registry.npmjs.org/bn.js/-/bn.js-4.11.8.tgz",
+@@ -14067,6 +14255,12 @@
+ 				"is-obj": "^1.0.0"
+ 			}
+ 		},
++		"dotenv": {
++			"version": "8.2.0",
++			"resolved": "https://registry.npmjs.org/dotenv/-/dotenv-8.2.0.tgz",
++			"integrity": "sha512-8sJ78ElpbDJBHNeBzUbUVLsqKdccaa/BXF1uPTw3GrvQTBgrQrtObr2mUrE38vzYd8cEv+m/JBfDLioYcfXoaw==",
++			"dev": true
++		},
+ 		"dotenv-defaults": {
+ 			"version": "1.0.2",
+ 			"resolved": "https://registry.npmjs.org/dotenv-defaults/-/dotenv-defaults-1.0.2.tgz",
+@@ -14529,12 +14723,24 @@
+ 			"integrity": "sha512-xi6hh6gsvDE0MaW4Vp1lgNEBpVcCXRWfPXj5egDvtgLz4L9MEvNwYEMdJH+JJinWkwa8c3c3o5HduV7dB/e1Hw==",
+ 			"dev": true
+ 		},
++		"es6-error": {
++			"version": "4.1.1",
++			"resolved": "https://registry.npmjs.org/es6-error/-/es6-error-4.1.1.tgz",
++			"integrity": "sha512-Um/+FxMr9CISWh0bi5Zv0iOD+4cFh5qLeks1qhAopKVAJw3drgKbKySikp7wGhDL0HPeaja0P5ULZrxLkniUVg==",
++			"dev": true
++		},
+ 		"es6-promise": {
+ 			"version": "4.2.8",
+ 			"resolved": "https://registry.npmjs.org/es6-promise/-/es6-promise-4.2.8.tgz",
+ 			"integrity": "sha512-HJDGx5daxeIvxdBxvG2cb9g4tEvwIk3i8+nhX0yGrYmZUzbkdg8QbDevheDB8gd0//uPj4c1EQua8Q+MViT0/w==",
+ 			"dev": true
+ 		},
++		"es6-promise-pool": {
++			"version": "2.5.0",
++			"resolved": "https://registry.npmjs.org/es6-promise-pool/-/es6-promise-pool-2.5.0.tgz",
++			"integrity": "sha1-FHxhKza0fxBQJ/nSv1SlmKmdnMs=",
++			"dev": true
++		},
+ 		"es6-promisify": {
+ 			"version": "5.0.0",
+ 			"resolved": "https://registry.npmjs.org/es6-promisify/-/es6-promisify-5.0.0.tgz",
+@@ -16116,6 +16322,12 @@
+ 			"resolved": "https://registry.npmjs.org/foreach/-/foreach-2.0.5.tgz",
+ 			"integrity": "sha1-C+4AUBiusmDQo6865ljdATbsG5k="
+ 		},
++		"foreachasync": {
++			"version": "3.0.0",
++			"resolved": "https://registry.npmjs.org/foreachasync/-/foreachasync-3.0.0.tgz",
++			"integrity": "sha1-VQKYfchxS+M5IJfzLgBxyd7gfPY=",
++			"dev": true
++		},
+ 		"forever-agent": {
+ 			"version": "0.6.1",
+ 			"resolved": "https://registry.npmjs.org/forever-agent/-/forever-agent-0.6.1.tgz",
+@@ -20626,6 +20838,12 @@
+ 				"verror": "1.10.0"
+ 			}
+ 		},
++		"jssha": {
++			"version": "2.3.1",
++			"resolved": "https://registry.npmjs.org/jssha/-/jssha-2.3.1.tgz",
++			"integrity": "sha1-FHshJTaQNcpLL30hDcU58Amz3po=",
++			"dev": true
++		},
+ 		"jsx-ast-utils": {
+ 			"version": "2.2.1",
+ 			"resolved": "https://registry.npmjs.org/jsx-ast-utils/-/jsx-ast-utils-2.2.1.tgz",
+@@ -25120,6 +25338,23 @@
+ 			"integrity": "sha1-elfrVQpng/kRUzH89GY9XI4AelA=",
+ 			"dev": true
+ 		},
++		"percy-client": {
++			"version": "3.3.0",
++			"resolved": "https://registry.npmjs.org/percy-client/-/percy-client-3.3.0.tgz",
++			"integrity": "sha512-KkY6jzUf5s03bHmV6cuaGMXTF7+eYUJIQpB+QXMNlw+V1XWpfzf/8v+xz8M1gxd17S9W5yNVWLYCvvnPQgZ9ag==",
++			"dev": true,
++			"requires": {
++				"bluebird": "^3.5.1",
++				"bluebird-retry": "^0.11.0",
++				"dotenv": "^8.1.0",
++				"es6-promise-pool": "^2.5.0",
++				"jssha": "^2.1.0",
++				"regenerator-runtime": "^0.13.1",
++				"request": "^2.87.0",
++				"request-promise": "^4.2.2",
++				"walk": "^2.3.14"
++			}
++		},
+ 		"performance-now": {
+ 			"version": "2.1.0",
+ 			"resolved": "https://registry.npmjs.org/performance-now/-/performance-now-2.1.0.tgz",
+@@ -28782,6 +29017,29 @@
+ 				}
+ 			}
+ 		},
++		"request-promise": {
++			"version": "4.2.5",
++			"resolved": "https://registry.npmjs.org/request-promise/-/request-promise-4.2.5.tgz",
++			"integrity": "sha512-ZgnepCykFdmpq86fKGwqntyTiUrHycALuGggpyCZwMvGaZWgxW6yagT0FHkgo5LzYvOaCNvxYwWYIjevSH1EDg==",
++			"dev": true,
++			"requires": {
++				"bluebird": "^3.5.0",
++				"request-promise-core": "1.1.3",
++				"stealthy-require": "^1.1.1",
++				"tough-cookie": "^2.3.3"
++			},
++			"dependencies": {
++				"request-promise-core": {
++					"version": "1.1.3",
++					"resolved": "https://registry.npmjs.org/request-promise-core/-/request-promise-core-1.1.3.tgz",
++					"integrity": "sha512-QIs2+ArIGQVp5ZYbWD5ZLCY29D5CfWizP8eWnm8FoGD1TX61veauETVQbrV60662V0oFBkrDOuaBI8XgtuyYAQ==",
++					"dev": true,
++					"requires": {
++						"lodash": "^4.17.15"
++					}
++				}
++			}
++		},
+ 		"request-promise-core": {
+ 			"version": "1.1.1",
+ 			"resolved": "https://registry.npmjs.org/request-promise-core/-/request-promise-core-1.1.1.tgz",
+@@ -29755,6 +30013,12 @@
+ 			"integrity": "sha1-VusCfWW00tzmyy4tMsTUr8nh1wc=",
+ 			"dev": true
+ 		},
++		"slugify": {
++			"version": "1.3.6",
++			"resolved": "https://registry.npmjs.org/slugify/-/slugify-1.3.6.tgz",
++			"integrity": "sha512-wA9XS475ZmGNlEnYYLPReSfuz/c3VQsEMoU43mi6OnKMCdbnFXd4/Yg7J0lBv8jkPolacMpOrWEaoYxuE1+hoQ==",
++			"dev": true
++		},
+ 		"smart-buffer": {
+ 			"version": "4.0.2",
+ 			"resolved": "https://registry.npmjs.org/smart-buffer/-/smart-buffer-4.0.2.tgz",
+@@ -32825,6 +33089,15 @@
+ 				}
+ 			}
+ 		},
++		"walk": {
++			"version": "2.3.14",
++			"resolved": "https://registry.npmjs.org/walk/-/walk-2.3.14.tgz",
++			"integrity": "sha512-5skcWAUmySj6hkBdH6B6+3ddMjVQYH5Qy9QGbPmN8kVmLteXk+yVXg+yfk1nbX30EYakahLrr8iPcCxJQSCBeg==",
++			"dev": true,
++			"requires": {
++				"foreachasync": "^3.0.0"
++			}
++		},
+ 		"walker": {
+ 			"version": "1.0.7",
+ 			"resolved": "https://registry.npmjs.org/walker/-/walker-1.0.7.tgz",
+diff --git a/package.json b/package.json
+index 33974f2d094a22..5bcf0b7b2c89c9 100644
+--- a/package.json
++++ b/package.json
+@@ -72,6 +72,7 @@
+ 		"@babel/runtime-corejs3": "7.4.5",
+ 		"@babel/traverse": "7.4.5",
+ 		"@octokit/rest": "16.26.0",
++		"@percy/storybook": "3.2.0",
+ 		"@storybook/addon-a11y": "5.2.4",
+ 		"@storybook/addon-docs": "5.2.4",
+ 		"@storybook/addon-knobs": "5.2.4",
+@@ -206,6 +207,8 @@
+ 		"storybook:build": "build-storybook -c ./storybook -o ./playground/dist",
+ 		"prestorybook:dev": "npm run build:packages",
+ 		"storybook:dev": "concurrently \"npm run dev:packages\" \"start-storybook -c ./storybook\"",
++		"prestorybook:snapshot": "npm run storybook:build",
++		"storybook:snapshot": "percy-storybook --build_dir ./playground/dist --widths=320,1280",
+ 		"design-system:build": "echo \"Please use storybook:build instead.\"",
+ 		"design-system:dev": "echo \"Please use storybook:dev instead.\"",
+ 		"playground:build": "npm run storybook:build",

@@ -1,0 +1,17 @@
+diff --git a/packages/components/src/button/stories/e2e/index.story.tsx b/packages/components/src/button/stories/e2e/index.story.tsx
+index c2ec8e237d3b2a..1baeb08fb73e23 100644
+--- a/packages/components/src/button/stories/e2e/index.story.tsx
++++ b/packages/components/src/button/stories/e2e/index.story.tsx
+@@ -40,6 +40,12 @@ export const VariantStates: StoryFn< typeof Button > = (
+ 				>
+ 					<Button { ...props } variant={ variant } />
+ 					<Button { ...props } variant={ variant } disabled />
++					<Button
++						{ ...props }
++						variant={ variant }
++						disabled
++						__experimentalIsFocusable
++					/>
+ 					<Button { ...props } variant={ variant } isBusy />
+ 					<Button { ...props } variant={ variant } isDestructive />
+ 					<Button { ...props } variant={ variant } isPressed />

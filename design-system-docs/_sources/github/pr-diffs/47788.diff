@@ -1,0 +1,274 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index be8232e034f962..e23c719d11ae57 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-  `ColorPalette`, `GradientPicker`, `PaletteEdit`, `ToolsPanel`: add new props to set a custom heading level ([43848](https://github.com/WordPress/gutenberg/pull/43848) and [#47788](https://github.com/WordPress/gutenberg/pull/47788)).
++
+ ### Internal
+ 
+ -   `ComboboxControl`: Convert to TypeScript ([#47581](https://github.com/WordPress/gutenberg/pull/47581)).
+diff --git a/packages/components/src/color-palette/README.md b/packages/components/src/color-palette/README.md
+index 870a5ef2d52f14..5db11051655b66 100644
+--- a/packages/components/src/color-palette/README.md
++++ b/packages/components/src/color-palette/README.md
+@@ -66,6 +66,13 @@ colors.
+ -   Required: No
+ -   Default: `false`
+ 
++### `headingLevel`: `1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6'`
++
++The heading level.
++
++-   Required: No
++-   Default: `2`
++
+ ### `value`: `string`
+ 
+ Currently active value.
+diff --git a/packages/components/src/color-palette/types.ts b/packages/components/src/color-palette/types.ts
+index cf7f3e640447c6..a5136341aa68a4 100644
+--- a/packages/components/src/color-palette/types.ts
++++ b/packages/components/src/color-palette/types.ts
+@@ -72,6 +72,12 @@ export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
+ 	 * @default false
+ 	 */
+ 	enableAlpha?: boolean;
++	/**
++	 * The heading level.
++	 *
++	 * @default 2
++	 */
++	headingLevel?: HeadingSize;
+ 	/**
+ 	 * Currently active value.
+ 	 */
+@@ -82,10 +88,4 @@ export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
+ 	 * @default false
+ 	 */
+ 	__experimentalIsRenderedInSidebar?: boolean;
+-	/**
+-	 * The heaeding level.
+-	 *
+-	 * @default 2
+-	 */
+-	headingLevel?: HeadingSize;
+ };
+diff --git a/packages/components/src/gradient-picker/README.md b/packages/components/src/gradient-picker/README.md
+index 8def1ef24de590..33cb159b89056b 100644
+--- a/packages/components/src/gradient-picker/README.md
++++ b/packages/components/src/gradient-picker/README.md
+@@ -101,3 +101,11 @@ Start opting into the new margin-free styles that will become the default in a f
+ -   Type: `Boolean`
+ -   Required: No
+ -   Default: `false`
++
++### headingLevel
++
++The heading level.
++
++-   Type: `1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6'`
++-   Required: No
++-   Default: `2`
+diff --git a/packages/components/src/palette-edit/index.js b/packages/components/src/palette-edit/index.js
+index d90f02d8163e70..ef2abca3cc6b48 100644
+--- a/packages/components/src/palette-edit/index.js
++++ b/packages/components/src/palette-edit/index.js
+@@ -313,7 +313,7 @@ export default function PaletteEdit( {
+ 	colors = EMPTY_ARRAY,
+ 	onChange,
+ 	paletteLabel,
+-	paletteLabelLevel = 2,
++	paletteLabelHeadingLevel = 2,
+ 	emptyMessage,
+ 	canOnlyChangeValues,
+ 	canReset,
+@@ -348,7 +348,7 @@ export default function PaletteEdit( {
+ 	return (
+ 		<PaletteEditStyles>
+ 			<PaletteHStackHeader>
+-				<PaletteHeading level={ paletteLabelLevel }>
++				<PaletteHeading level={ paletteLabelHeadingLevel }>
+ 					{ paletteLabel }
+ 				</PaletteHeading>
+ 				<PaletteActionsContainer>
+diff --git a/packages/components/src/tools-panel/tools-panel-header/README.md b/packages/components/src/tools-panel/tools-panel-header/README.md
+index 07a7544b6b1435..e6164306dbee31 100644
+--- a/packages/components/src/tools-panel/tools-panel-header/README.md
++++ b/packages/components/src/tools-panel/tools-panel-header/README.md
+@@ -18,6 +18,13 @@ This component is generated automatically by its parent
+ 
+ ## Props
+ 
++### `headingLevel`: `1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6'`
++
++The heading level of the panel's header.
++
++-   Required: No
++-   Default: `2`
++
+ ### `label`: `string`
+ 
+ Text to be displayed within the panel header. It is also passed along as the
+diff --git a/packages/components/src/tools-panel/tools-panel-header/hook.ts b/packages/components/src/tools-panel/tools-panel-header/hook.ts
+index b44dc5bc9f7865..6682328810e331 100644
+--- a/packages/components/src/tools-panel/tools-panel-header/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel-header/hook.ts
+@@ -15,10 +15,11 @@ import type { ToolsPanelHeaderProps } from '../types';
+ export function useToolsPanelHeader(
+ 	props: WordPressComponentProps< ToolsPanelHeaderProps, 'h2' >
+ ) {
+-	const { className, ...otherProps } = useContextSystem(
+-		props,
+-		'ToolsPanelHeader'
+-	);
++	const {
++		className,
++		headingLevel = 2,
++		...otherProps
++	} = useContextSystem( props, 'ToolsPanelHeader' );
+ 
+ 	const cx = useCx();
+ 	const classes = useMemo( () => {
+@@ -47,6 +48,7 @@ export function useToolsPanelHeader(
+ 		dropdownMenuClassName,
+ 		hasMenuItems,
+ 		headingClassName,
++		headingLevel,
+ 		menuItems,
+ 		className: classes,
+ 	};
+diff --git a/packages/components/src/tools-panel/tools-panel/README.md b/packages/components/src/tools-panel/tools-panel/README.md
+index 9b75f32f6645e2..e04b774e9201bb 100644
+--- a/packages/components/src/tools-panel/tools-panel/README.md
++++ b/packages/components/src/tools-panel/tools-panel/README.md
+@@ -156,6 +156,13 @@ wrapper element allowing the panel to lay them out accordingly.
+ 
+ - Required: No
+ 
++### `headingLevel`: `1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6'`
++
++The heading level of the panel's header.
++
++-   Required: No
++-   Default: `2`
++
+ ### `label`: `string`
+ 
+ Text to be displayed within the panel's header and as the `aria-label` for the
+diff --git a/packages/components/src/tools-panel/tools-panel/hook.ts b/packages/components/src/tools-panel/tools-panel/hook.ts
+index 2cbce4aad169f5..0a3cf2dbec7ae7 100644
+--- a/packages/components/src/tools-panel/tools-panel/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel/hook.ts
+@@ -57,6 +57,7 @@ export function useToolsPanel(
+ ) {
+ 	const {
+ 		className,
++		headingLevel = 2,
+ 		resetAll,
+ 		panelId,
+ 		hasInnerWrapper,
+@@ -307,6 +308,7 @@ export function useToolsPanel(
+ 
+ 	return {
+ 		...otherProps,
++		headingLevel,
+ 		panelContext,
+ 		resetAllItems,
+ 		toggleItem,
+diff --git a/packages/components/src/tools-panel/types.ts b/packages/components/src/tools-panel/types.ts
+index bb73d06ce50e0d..ed846c900b18e1 100644
+--- a/packages/components/src/tools-panel/types.ts
++++ b/packages/components/src/tools-panel/types.ts
+@@ -21,6 +21,12 @@ export type ToolsPanelProps = {
+ 	 * wrapper element allowing the panel to lay them out accordingly.
+ 	 */
+ 	hasInnerWrapper: boolean;
++	/**
++	 * The heading level of the panel's header.
++	 *
++	 * @default 2
++	 */
++	headingLevel?: HeadingSize;
+ 	/**
+ 	 * Text to be displayed within the panel's header and as the `aria-label`
+ 	 * for the panel's dropdown menu.
+@@ -52,13 +58,15 @@ export type ToolsPanelProps = {
+ 	 * last visible `ToolsPanelItem` within the `ToolsPanel`.
+ 	 */
+ 	__experimentalLastVisibleItemClass?: string;
+-	/**
+-	 * The heading level of the panel's header.
+-	 */
+-	headingLevel: HeadingSize;
+ };
+ 
+ export type ToolsPanelHeaderProps = {
++	/**
++	 * The heading level of the panel's header.
++	 *
++	 * @default 2
++	 */
++	headingLevel?: HeadingSize;
+ 	/**
+ 	 * Text to be displayed within the panel header. It is also passed along as
+ 	 * the `label` for the panel header's `DropdownMenu`.
+@@ -76,10 +84,6 @@ export type ToolsPanelHeaderProps = {
+ 	 * `onSelect` or `onDeselect` callbacks as appropriate.
+ 	 */
+ 	toggleItem: ( label: string ) => void;
+-	/**
+-	 * The heading level of the panel's header.
+-	 */
+-	headingLevel: HeadingSize;
+ };
+ 
+ export type ToolsPanelItem = {
+diff --git a/packages/edit-site/src/components/global-styles/color-palette-panel.js b/packages/edit-site/src/components/global-styles/color-palette-panel.js
+index 0f5984b158fc09..c556878d614a04 100644
+--- a/packages/edit-site/src/components/global-styles/color-palette-panel.js
++++ b/packages/edit-site/src/components/global-styles/color-palette-panel.js
+@@ -55,7 +55,7 @@ export default function ColorPalettePanel( { name } ) {
+ 					colors={ themeColors }
+ 					onChange={ setThemeColors }
+ 					paletteLabel={ __( 'Theme' ) }
+-					paletteLabelLevel={ 3 }
++					paletteLabelHeadingLevel={ 3 }
+ 				/>
+ 			) }
+ 			{ !! defaultColors &&
+@@ -67,14 +67,14 @@ export default function ColorPalettePanel( { name } ) {
+ 						colors={ defaultColors }
+ 						onChange={ setDefaultColors }
+ 						paletteLabel={ __( 'Default' ) }
+-						paletteLabelLevel={ 3 }
++						paletteLabelHeadingLevel={ 3 }
+ 					/>
+ 				) }
+ 			<PaletteEdit
+ 				colors={ customColors }
+ 				onChange={ setCustomColors }
+ 				paletteLabel={ __( 'Custom' ) }
+-				paletteLabelLevel={ 3 }
++				paletteLabelHeadingLevel={ 3 }
+ 				emptyMessage={ __(
+ 					'Custom colors are empty! Add some colors to create your own color palette.'
+ 				) }
+diff --git a/packages/edit-site/src/components/global-styles/gradients-palette-panel.js b/packages/edit-site/src/components/global-styles/gradients-palette-panel.js
+index 02b2f5c1ca4f77..71792b7447a6ff 100644
+--- a/packages/edit-site/src/components/global-styles/gradients-palette-panel.js
++++ b/packages/edit-site/src/components/global-styles/gradients-palette-panel.js
+@@ -75,7 +75,7 @@ export default function GradientPalettePanel( { name } ) {
+ 					gradients={ themeGradients }
+ 					onChange={ setThemeGradients }
+ 					paletteLabel={ __( 'Theme' ) }
+-					paletteLabelLevel={ 3 }
++					paletteLabelHeadingLevel={ 3 }
+ 				/>
+ 			) }
+ 			{ !! defaultGradients &&

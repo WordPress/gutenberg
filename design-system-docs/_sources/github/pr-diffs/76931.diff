@@ -1,0 +1,81 @@
+diff --git a/packages/ui/src/tooltip/stories/index.story.tsx b/packages/ui/src/tooltip/stories/index.story.tsx
+index 0822576f6db59e..fd0d0a27a9de1a 100644
+--- a/packages/ui/src/tooltip/stories/index.story.tsx
++++ b/packages/ui/src/tooltip/stories/index.story.tsx
+@@ -1,4 +1,5 @@
+ import type { Meta, StoryObj } from '@storybook/react-vite';
++import { useState } from '@wordpress/element';
+ import { formatBold, formatItalic } from '@wordpress/icons';
+ import { Icon, Tooltip } from '../..';
+ 
+@@ -79,6 +80,28 @@ export const Positioning: StoryObj< typeof Tooltip.Root > = {
+  * This is useful when you have multiple tooltips and want them to share
+  * the same delay configuration.
+  */
++/**
++ * Use the `open` and `onOpenChange` props to take full control over the
++ * tooltip's visibility. This example toggles the tooltip on click.
++ */
++export const Controlled: StoryObj< typeof Tooltip.Root > = {
++	render: () => {
++		const [ open, setOpen ] = useState( false );
++
++		return (
++			<>
++				<button onClick={ () => setOpen( ( v ) => ! v ) }>
++					Toggle tooltip
++				</button>
++				<Tooltip.Root open={ open } onOpenChange={ setOpen }>
++					<Tooltip.Trigger aria-label="Save">💾</Tooltip.Trigger>
++					<Tooltip.Popup>Save</Tooltip.Popup>
++				</Tooltip.Root>
++			</>
++		);
++	},
++};
++
+ export const WithProvider: StoryObj< typeof Tooltip.Root > = {
+ 	render: () => (
+ 		<Tooltip.Provider delay={ 0 }>
+diff --git a/packages/ui/src/tooltip/test/index.test.tsx b/packages/ui/src/tooltip/test/index.test.tsx
+index 1cd4cbfba56ad3..6d58b8dcfc5844 100644
+--- a/packages/ui/src/tooltip/test/index.test.tsx
++++ b/packages/ui/src/tooltip/test/index.test.tsx
+@@ -65,6 +65,21 @@ describe( 'Tooltip', () => {
+ 		} );
+ 	} );
+ 
++	it( 'shows tooltip when controlled open', async () => {
++		render(
++			<TestProvider>
++				<Tooltip.Root open>
++					<Tooltip.Trigger>Hover me</Tooltip.Trigger>
++					<Tooltip.Popup>Tooltip content</Tooltip.Popup>
++				</Tooltip.Root>
++			</TestProvider>
++		);
++
++		await waitFor( () => {
++			expect( screen.getByText( 'Tooltip content' ) ).toBeVisible();
++		} );
++	} );
++
+ 	it( 'does not show tooltip when disabled', async () => {
+ 		const user = userEvent.setup();
+ 
+diff --git a/packages/ui/src/tooltip/types.ts b/packages/ui/src/tooltip/types.ts
+index e368e832075a6c..f8f84bbb4be0de 100644
+--- a/packages/ui/src/tooltip/types.ts
++++ b/packages/ui/src/tooltip/types.ts
+@@ -2,7 +2,10 @@ import type { ReactNode } from 'react';
+ import type { Tooltip } from '@base-ui/react/tooltip';
+ import type { ComponentProps } from '../utils/types';
+ 
+-export type RootProps = Pick< Tooltip.Root.Props, 'disabled' | 'children' >;
++export type RootProps = Pick<
++	Tooltip.Root.Props,
++	'disabled' | 'children' | 'open' | 'defaultOpen' | 'onOpenChange'
++>;
+ 
+ export type ProviderProps = Pick<
+ 	Tooltip.Provider.Props,

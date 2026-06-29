@@ -1,0 +1,180 @@
+diff --git a/packages/block-editor/src/components/line-height-control/index.js b/packages/block-editor/src/components/line-height-control/index.js
+index b2c99c03f87840..e6af602c2875ae 100644
+--- a/packages/block-editor/src/components/line-height-control/index.js
++++ b/packages/block-editor/src/components/line-height-control/index.js
+@@ -93,6 +93,7 @@ const LineHeightControl = ( {
+ 		<div className="block-editor-line-height-control">
+ 			<NumberControl
+ 				{ ...otherProps }
++				__shouldNotWarnDeprecated36pxSize
+ 				__next40pxDefaultSize={ __next40pxDefaultSize }
+ 				__unstableInputWidth={ __unstableInputWidth }
+ 				__unstableStateReducer={ stateReducer }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c9295e7ef861e0..748525d6d9c15e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `BoxControl`: Passive deprecate `onMouseOver`/`onMouseOut`. Pass to the `inputProps` prop instead ([#67332](https://github.com/WordPress/gutenberg/pull/67332)).
+ -   `BoxControl`: Deprecate 36px default size ([#66704](https://github.com/WordPress/gutenberg/pull/66704)).
++-   `NumberControl`: Deprecate 36px default size ([#66730](https://github.com/WordPress/gutenberg/pull/66730)).
+ -   `UnitControl`: Deprecate 36px default size ([#66791](https://github.com/WordPress/gutenberg/pull/66791)).
+ 
+ ### Enhancements
+diff --git a/packages/components/src/angle-picker-control/index.tsx b/packages/components/src/angle-picker-control/index.tsx
+index b824660fddb134..9c436c36caf660 100644
+--- a/packages/components/src/angle-picker-control/index.tsx
++++ b/packages/components/src/angle-picker-control/index.tsx
+@@ -57,12 +57,12 @@ function UnforwardedAnglePickerControl(
+ 		<Flex { ...restProps } ref={ ref } className={ classes } gap={ 2 }>
+ 			<FlexBlock>
+ 				<NumberControl
++					__next40pxDefaultSize
+ 					label={ label }
+ 					className="components-angle-picker-control__input-field"
+ 					max={ 360 }
+ 					min={ 0 }
+ 					onChange={ handleOnNumberChange }
+-					size="__unstable-large"
+ 					step="1"
+ 					value={ value }
+ 					spinControls="none"
+diff --git a/packages/components/src/color-picker/input-with-slider.tsx b/packages/components/src/color-picker/input-with-slider.tsx
+index 5e08fa42daf80e..221a9289f7450e 100644
+--- a/packages/components/src/color-picker/input-with-slider.tsx
++++ b/packages/components/src/color-picker/input-with-slider.tsx
+@@ -31,6 +31,7 @@ export const InputWithSlider = ( {
+ 	return (
+ 		<HStack spacing={ 4 }>
+ 			<NumberControlWrapper
++				__next40pxDefaultSize
+ 				min={ min }
+ 				max={ max }
+ 				label={ label }
+@@ -45,7 +46,6 @@ export const InputWithSlider = ( {
+ 					</InputControlPrefixWrapper>
+ 				}
+ 				spinControls="none"
+-				size="__unstable-large"
+ 			/>
+ 			<RangeControl
+ 				__nextHasNoMarginBottom
+diff --git a/packages/components/src/number-control/README.md b/packages/components/src/number-control/README.md
+index 8421691296e90a..486092790548ee 100644
+--- a/packages/components/src/number-control/README.md
++++ b/packages/components/src/number-control/README.md
+@@ -16,6 +16,7 @@ const Example = () => {
+ 
+ 	return (
+ 		<NumberControl
++			__next40pxDefaultSize
+ 			isShiftStepEnabled={ true }
+ 			onChange={ setValue }
+ 			shiftStep={ 10 }
+@@ -146,4 +147,4 @@ Start opting into the larger default height that will become the default size in
+ 
+ -   Type: `Boolean`
+ -   Required: No
+--   Default: `false`
+\ No newline at end of file
++-   Default: `false`
+diff --git a/packages/components/src/number-control/index.tsx b/packages/components/src/number-control/index.tsx
+index 5c846aaafc1e02..efa84879b8ff3c 100644
+--- a/packages/components/src/number-control/index.tsx
++++ b/packages/components/src/number-control/index.tsx
+@@ -26,6 +26,7 @@ import { HStack } from '../h-stack';
+ import { Spacer } from '../spacer';
+ import { useCx } from '../utils';
+ import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
++import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
+ 
+ const noop = () => {};
+ 
+@@ -53,9 +54,17 @@ function UnforwardedNumberControl(
+ 		size = 'default',
+ 		suffix,
+ 		onChange = noop,
++		__shouldNotWarnDeprecated36pxSize,
+ 		...restProps
+ 	} = useDeprecated36pxDefaultSizeProp< NumberControlProps >( props );
+ 
++	maybeWarnDeprecated36pxSize( {
++		componentName: 'NumberControl',
++		size,
++		__next40pxDefaultSize: restProps.__next40pxDefaultSize,
++		__shouldNotWarnDeprecated36pxSize,
++	} );
++
+ 	if ( hideHTMLArrows ) {
+ 		deprecated( 'wp.components.NumberControl hideHTMLArrows prop ', {
+ 			alternative: 'spinControls="none"',
+diff --git a/packages/components/src/number-control/stories/index.story.tsx b/packages/components/src/number-control/stories/index.story.tsx
+index 3feb0d63eadc2a..8710839fea6ea5 100644
+--- a/packages/components/src/number-control/stories/index.story.tsx
++++ b/packages/components/src/number-control/stories/index.story.tsx
+@@ -62,4 +62,5 @@ const Template: StoryFn< typeof NumberControl > = ( {
+ export const Default = Template.bind( {} );
+ Default.args = {
+ 	label: 'Value',
++	__next40pxDefaultSize: true,
+ };
+diff --git a/packages/components/src/number-control/test/index.tsx b/packages/components/src/number-control/test/index.tsx
+index 3cf3368f1636ba..bf97b520673ea4 100644
+--- a/packages/components/src/number-control/test/index.tsx
++++ b/packages/components/src/number-control/test/index.tsx
+@@ -12,9 +12,13 @@ import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import NumberControl from '..';
++import _NumberControl from '..';
+ import type { NumberControlProps } from '../types';
+ 
++const NumberControl = (
++	props: React.ComponentProps< typeof _NumberControl >
++) => <_NumberControl __next40pxDefaultSize { ...props } />;
++
+ function StatefulNumberControl( props: NumberControlProps ) {
+ 	const [ value, setValue ] = useState( props.value );
+ 	const handleOnChange = ( v: string | undefined ) => setValue( v );
+diff --git a/packages/components/src/number-control/types.ts b/packages/components/src/number-control/types.ts
+index 8d198e777bd557..2a0fbf402d3569 100644
+--- a/packages/components/src/number-control/types.ts
++++ b/packages/components/src/number-control/types.ts
+@@ -91,4 +91,11 @@ export type NumberControlProps = Omit<
+ 	 * The value of the input.
+ 	 */
+ 	value?: number | string;
++	/**
++	 * Do not throw a warning for the deprecated 36px default size.
++	 * For internal components of other components that already throw the warning.
++	 *
++	 * @ignore
++	 */
++	__shouldNotWarnDeprecated36pxSize?: boolean;
+ };
+diff --git a/packages/components/src/range-control/index.tsx b/packages/components/src/range-control/index.tsx
+index 916571c3ee0e05..89dd8248a1e614 100644
+--- a/packages/components/src/range-control/index.tsx
++++ b/packages/components/src/range-control/index.tsx
+@@ -350,6 +350,7 @@ function UnforwardedRangeControl(
+ 						step={ step }
+ 						// @ts-expect-error TODO: Investigate if the `null` value is necessary
+ 						value={ inputSliderValue }
++						__shouldNotWarnDeprecated36pxSize
+ 					/>
+ 				) }
+ 				{ allowReset && (
+diff --git a/packages/components/src/unit-control/index.tsx b/packages/components/src/unit-control/index.tsx
+index 9845c4eb04ef26..65e1e56cda3b3b 100644
+--- a/packages/components/src/unit-control/index.tsx
++++ b/packages/components/src/unit-control/index.tsx
+@@ -224,6 +224,7 @@ function UnforwardedUnitControl(
+ 	return (
+ 		<ValueInput
+ 			{ ...props }
++			__shouldNotWarnDeprecated36pxSize
+ 			autoComplete={ autoComplete }
+ 			className={ classes }
+ 			disabled={ disabled }

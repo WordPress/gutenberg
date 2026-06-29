@@ -1,0 +1,28 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 8f227f2e3be6a1..56604254ea2772 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ 
+ ### Bug Fixes
+ 
++-   Focus utilities: Keep focus ring visible on `aria-disabled` buttons during `:active` state ([#76896](https://github.com/WordPress/gutenberg/pull/76896)).
+ -   `Card`: Add `overflow: clip` to `Card.Root` to prevent child content from overflowing rounded corners ([#76678](https://github.com/WordPress/gutenberg/pull/76678)).
+ -   `CollapsibleCard`: do not animate the focus ring when expanding/collapsing the card ([#76459](https://github.com/WordPress/gutenberg/pull/76459)).
+ 
+diff --git a/packages/ui/src/utils/css/focus.module.css b/packages/ui/src/utils/css/focus.module.css
+index d11f440305dca8..a4a511e88c83de 100644
+--- a/packages/ui/src/utils/css/focus.module.css
++++ b/packages/ui/src/utils/css/focus.module.css
+@@ -22,9 +22,11 @@
+ 
+ 	.outset-ring--focus:focus,
+ 	.outset-ring--focus-except-active:focus:not(:active),
++	.outset-ring--focus-except-active:focus:active[aria-disabled="true"],
+ 	.outset-ring--focus-visible:focus-visible,
+ 	.outset-ring--focus-within:focus-within,
+ 	.outset-ring--focus-within-except-active:focus-within:not(:has(:active)),
++	.outset-ring--focus-within-except-active:focus-within:has(:active[aria-disabled="true"]),
+ 	.outset-ring--focus-within-visible:focus-within:has(:focus-visible),
+ 	:focus-visible .outset-ring--focus-parent-visible {
+ 		outline-width: var(--wpds-border-width-focus);

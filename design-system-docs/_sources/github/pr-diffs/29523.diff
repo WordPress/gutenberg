@@ -1,0 +1,689 @@
+diff --git a/packages/components/src/button/index.js b/packages/components/src/button/index.js
+index 869f4279a99487..3af63e473d21fc 100644
+--- a/packages/components/src/button/index.js
++++ b/packages/components/src/button/index.js
+@@ -16,6 +16,7 @@ import { forwardRef } from '@wordpress/element';
+ import Tooltip from '../tooltip';
+ import Icon from '../icon';
+ import VisuallyHidden from '../visually-hidden';
++import { withNextComponent } from './next';
+ 
+ const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ];
+ 
+@@ -162,4 +163,4 @@ export function Button( props, ref ) {
+ 	);
+ }
+ 
+-export default forwardRef( Button );
++export default withNextComponent( forwardRef( Button ) );
+diff --git a/packages/components/src/button/next.js b/packages/components/src/button/next.js
+new file mode 100644
+index 00000000000000..59e99860ab1336
+--- /dev/null
++++ b/packages/components/src/button/next.js
+@@ -0,0 +1,79 @@
++/**
++ * Internal dependencies
++ */
++import { withNext } from '../ui/context';
++import { TooltipButton as NextButton } from '../ui/tooltip-button';
++
++const Button =
++	process.env.COMPONENT_SYSTEM_PHASE === 1 ? NextButton : undefined;
++
++const getVariant = ( {
++	isPrimary,
++	isTertiary,
++	isSecondary,
++	isLink,
++	isDefault,
++} ) => {
++	if ( isPrimary ) {
++		return 'primary';
++	}
++
++	if ( isTertiary ) {
++		return 'tertiary';
++	}
++
++	if ( isSecondary ) {
++		return 'secondary';
++	}
++
++	if ( isDefault ) {
++		return 'plain';
++	}
++
++	if ( isLink ) {
++		return 'link';
++	}
++
++	return 'plain';
++};
++
++const adapter = ( {
++	isPrimary,
++	isTertiary,
++	isSecondary,
++	isLink,
++	isDefault,
++	isSmall,
++	isBusy,
++	label,
++	'aria-label': ariaLabel,
++	describedBy,
++	shortcut,
++	tooltipPosition,
++	text,
++	...props
++} ) => ( {
++	...props,
++	describedBy,
++	variant: getVariant( {
++		isPrimary,
++		isTertiary,
++		isSecondary,
++		isLink,
++		isDefault,
++	} ),
++	isActive: isBusy,
++	isLoading: isBusy,
++	size: isSmall ? 'small' : undefined,
++	'aria-label': ariaLabel || label,
++	pre: text,
++	tooltip: {
++		content: describedBy ? describedBy : ariaLabel || label,
++		position: tooltipPosition,
++		shortcut,
++	},
++} );
++
++export function withNextComponent( Component ) {
++	return withNext( Component, Button, 'WPComponentsButton', adapter );
++}
+diff --git a/packages/components/src/ui/base-button/component.js b/packages/components/src/ui/base-button/component.js
+index 1f06eb353ab992..1afc9abf25f82d 100644
+--- a/packages/components/src/ui/base-button/component.js
++++ b/packages/components/src/ui/base-button/component.js
+@@ -38,6 +38,7 @@ function BaseButton( props, forwardedRef ) {
+ 		hasCaret = false,
+ 		href,
+ 		icon,
++		iconPosition = 'left',
+ 		iconSize = 16,
+ 		isActive = false,
+ 		isDestructive = false,
+@@ -52,7 +53,7 @@ function BaseButton( props, forwardedRef ) {
+ 	const buttonGroupState = buttonGroup || {};
+ 
+ 	const BaseComponent = buttonGroup ? ReakitRadio : View;
+-	const as = asProp || ( href ? 'a' : 'button' );
++	const as = asProp || ( href && ! disabled ? 'a' : 'button' );
+ 
+ 	return (
+ 		// @ts-ignore No idea why TS is confused about this but ReakitRadio and View are definitely renderable
+@@ -82,7 +83,7 @@ function BaseButton( props, forwardedRef ) {
+ 					{ pre }
+ 				</FlexItem>
+ 			) }
+-			{ icon && (
++			{ icon && iconPosition === 'left' && (
+ 				<FlexItem
+ 					as="span"
+ 					className={ cx(
+@@ -108,6 +109,18 @@ function BaseButton( props, forwardedRef ) {
+ 					{ children }
+ 				</FlexItem>
+ 			) }
++			{ icon && iconPosition === 'right' && (
++				<FlexItem
++					as="span"
++					className={ cx(
++						styles.PrefixSuffix,
++						isLoading && styles.loading
++					) }
++					{ ...ui.$( 'ButtonIcon' ) }
++				>
++					<Icon icon={ icon } size={ iconSize } />
++				</FlexItem>
++			) }
+ 			{ suffix && (
+ 				<FlexItem
+ 					as="span"
+diff --git a/packages/components/src/ui/base-button/hook.js b/packages/components/src/ui/base-button/hook.js
+index fc5e98bf8bef7a..13ea85904ca05e 100644
+--- a/packages/components/src/ui/base-button/hook.js
++++ b/packages/components/src/ui/base-button/hook.js
+@@ -11,6 +11,11 @@ import { useControlGroupContext } from '../control-group';
+ import { useFlex } from '../flex';
+ import * as styles from './styles';
+ 
++/**
++ * @type {('onMouseDown' | 'onClick')[]}
++ */
++const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ];
++
+ /**
+  * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'button'>} props
+  */
+@@ -33,6 +38,7 @@ export function useBaseButton( props ) {
+ 		isBlock = false,
+ 		isControl = false,
+ 		isDestructive = false,
++		isFocusable = true,
+ 		isLoading = false,
+ 		isNarrow = false,
+ 		isRounded = false,
+@@ -77,12 +83,14 @@ export function useBaseButton( props ) {
+ 		className
+ 	);
+ 
+-	return {
++	const trulyDisabled = disabled && ! isFocusable;
++
++	const returnProps = {
+ 		...flexProps,
+ 		as,
+ 		href,
+ 		children,
+-		disabled,
++		disabled: trulyDisabled,
+ 		elevation,
+ 		className: classes,
+ 		elevationActive,
+@@ -98,4 +106,21 @@ export function useBaseButton( props ) {
+ 		noWrap,
+ 		...otherProps,
+ 	};
++
++	if ( disabled && isFocusable ) {
++		// In this case, the button will be disabled, but still focusable and
++		// perceivable by screen reader users.
++		returnProps[ 'aria-disabled' ] = true;
++
++		for ( const disabledEvent of disabledEventsOnDisabledButton ) {
++			returnProps[ disabledEvent ] = (
++				/** @type {import('react').MouseEvent<any>} */ event
++			) => {
++				event.stopPropagation();
++				event.preventDefault();
++			};
++		}
++	}
++
++	return returnProps;
+ }
+diff --git a/packages/components/src/ui/base-button/types.ts b/packages/components/src/ui/base-button/types.ts
+index 186de8211936b5..c0409b7847e3f1 100644
+--- a/packages/components/src/ui/base-button/types.ts
++++ b/packages/components/src/ui/base-button/types.ts
+@@ -56,10 +56,12 @@ export type Props = {
+ 	 * An HTML anchor link. Transforms the `Button` in a `<a>` element.
+ 	 */
+ 	href?: string;
++	target?: string;
+ 	/**
+ 	 * Renders an `Icon` within the `Button`.
+ 	 */
+ 	icon?: ReactElement;
++	iconPosition?: 'left' | 'right';
+ 	/**
+ 	 * Adjusts the size of the `Icon` within the `Button` (from the `icon` prop).
+ 	 */
+@@ -90,6 +92,7 @@ export type Props = {
+ 	 * Passed to `data-focused`.
+ 	 */
+ 	isFocused?: boolean;
++	isFocusable?: boolean;
+ 	/**
+ 	 * Renders loading, disabling `Button` and renders a `Spinner`.
+ 	 *
+diff --git a/packages/components/src/ui/button/component.js b/packages/components/src/ui/button/component.js
+index 15e19f80509ba9..4a6f17ae2c2126 100644
+--- a/packages/components/src/ui/button/component.js
++++ b/packages/components/src/ui/button/component.js
+@@ -3,7 +3,7 @@
+  */
+ import { contextConnect, useContextSystem } from '@wp-g2/context';
+ import { cx } from '@wp-g2/styles';
+-import { noop } from 'lodash';
++import { noop, uniqueId } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -15,6 +15,7 @@ import { useCallback } from '@wordpress/element';
+  */
+ import { BaseButton } from '../base-button';
+ import { useButtonGroupContext } from '../button-group';
++import { VisuallyHidden } from '../visually-hidden';
+ import * as styles from './styles';
+ 
+ /**
+@@ -24,6 +25,7 @@ import * as styles from './styles';
+ /**
+  * @typedef OwnProps
+  * @property {ButtonVariant} [variant='secondary'] Determinds the `Button` variant to render.
++ * @property {string} [describedBy] Text for element pointed to by aria-describedby (id is auto-generated if aria-describedby is not provided).
+  */
+ 
+ /**
+@@ -46,6 +48,7 @@ function Button( props, forwardedRef ) {
+ 		onClick = noop,
+ 		size = 'medium',
+ 		variant = 'secondary',
++		describedBy,
+ 		...otherProps
+ 	} = useContextSystem( props, 'Button' );
+ 
+@@ -57,6 +60,9 @@ function Button( props, forwardedRef ) {
+ 	const isActive = isActiveProp || isButtonGroupActive;
+ 	const isIconOnly = !! icon && ! children;
+ 
++	const descriptionId = describedBy ? uniqueId() : undefined;
++	const describedById = otherProps[ 'aria-describedby' ] || descriptionId;
++
+ 	const handleOnClickWithinButtonGroup = useCallback(
+ 		( event ) => {
+ 			if (
+@@ -100,16 +106,24 @@ function Button( props, forwardedRef ) {
+ 	);
+ 
+ 	return (
+-		<BaseButton
+-			className={ classes }
+-			icon={ icon }
+-			isActive={ isActive }
+-			onClick={ handleOnClick }
+-			ref={ forwardedRef }
+-			{ ...otherProps }
+-		>
+-			{ children }
+-		</BaseButton>
++		<>
++			<BaseButton
++				className={ classes }
++				icon={ icon }
++				isActive={ isActive }
++				onClick={ handleOnClick }
++				ref={ forwardedRef }
++				aria-describedby={ describedById }
++				{ ...otherProps }
++			>
++				{ children }
++			</BaseButton>
++			{ describedBy && (
++				<VisuallyHidden>
++					<span id={ descriptionId }>{ describedBy }</span>
++				</VisuallyHidden>
++			) }
++		</>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/ui/button/stories/index.js b/packages/components/src/ui/button/stories/index.js
+index 9a5bc141e20331..5fa545d152f089 100644
+--- a/packages/components/src/ui/button/stories/index.js
++++ b/packages/components/src/ui/button/stories/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { boolean, number, select } from '@storybook/addon-knobs';
++import { boolean, number, select, text } from '@storybook/addon-knobs';
+ /**
+  * Internal dependencies
+  */
+@@ -32,6 +32,7 @@ export const _default = () => {
+ 		createSelectProps( [ 'large', 'medium', 'small', 'xSmall' ] ),
+ 		'medium'
+ 	);
++	const describedBy = text( 'describedBy', undefined );
+ 
+ 	const variant = select(
+ 		'variant',
+@@ -59,6 +60,7 @@ export const _default = () => {
+ 		isSubtle,
+ 		size,
+ 		variant,
++		describedBy,
+ 	};
+ 
+ 	return <Button { ...props }>Button</Button>;
+diff --git a/packages/components/src/ui/button/test/__snapshots__/index.js.snap b/packages/components/src/ui/button/test/__snapshots__/index.js.snap
+index c02b72d99fde65..c4668adb1f4954 100644
+--- a/packages/components/src/ui/button/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/button/test/__snapshots__/index.js.snap
+@@ -357,23 +357,49 @@ exports[`props should render correctly 1`] = `
+ </button>
+ `;
+ 
+-exports[`props should render disabled 1`] = `
++exports[`props should render describedBy 1`] = `
+ Snapshot Diff:
+ - First value
+ + Second value
+ 
+-@@ -5,11 +5,10 @@
++@@ -1,8 +1,7 @@
++  <button
++    aria-busy="false"
++-   aria-describedby="1"
++    class="components-flex wp-components-flex ic-17cs4ki components-base-button wp-components-base-button components-button wp-components-button ic-i0z4gr ic-1d6ec17 ic-192yz5d css-pr721c"
++    data-active="false"
+     data-destructive="false"
+     data-focused="false"
+     data-g2-c16t="true"
+-    data-g2-component="Button"
+-    data-icon="false"
+--   disabled=""
+-  >
++@@ -12,11 +11,11 @@
+     <span
+       class="components-flex-item wp-components-flex-item ic-1p3tlc8 ic-192yz5d css-1493c17"
+       data-g2-c16t="true"
+       data-g2-component="ButtonContent"
++    >
++-     WordPress.org
+++     Lorem
++    </span>
++    <span
++      aria-hidden="true"
++      class="components-elevation wp-components-elevation ic-i1zzlu ic-192yz5d css-8abvx7"
++      data-g2-c16t="true"
++`;
++
++exports[`props should render disabled 1`] = `
++Snapshot Diff:
++- First value
+++ Second value
++
++@@ -1,8 +1,7 @@
++  <button
++    aria-busy="false"
++-   aria-disabled="true"
++    class="components-flex wp-components-flex ic-17cs4ki components-base-button wp-components-base-button components-button wp-components-button ic-i0z4gr ic-1d6ec17 ic-192yz5d css-pr721c"
++    data-active="false"
++    data-destructive="false"
++    data-focused="false"
++    data-g2-c16t="true"
+ `;
+ 
+ exports[`props should render elevation 1`] = `
+diff --git a/packages/components/src/ui/button/test/index.js b/packages/components/src/ui/button/test/index.js
+index 3fa290eb561b84..1e63abeaaa5f25 100644
+--- a/packages/components/src/ui/button/test/index.js
++++ b/packages/components/src/ui/button/test/index.js
+@@ -140,4 +140,16 @@ describe( 'props', () => {
+ 			base.container.firstChild
+ 		);
+ 	} );
++
++	test( 'should render describedBy', () => {
++		const { container } = render(
++			<Button describedBy="This is a helpful description">
++				WordPress.org
++			</Button>
++		);
++
++		expect( container.firstChild ).toMatchDiffSnapshot(
++			base.container.firstChild
++		);
++	} );
+ } );
+diff --git a/packages/components/src/ui/tooltip-button/README.md b/packages/components/src/ui/tooltip-button/README.md
+new file mode 100644
+index 00000000000000..cf0ba7987b0454
+--- /dev/null
++++ b/packages/components/src/ui/tooltip-button/README.md
+@@ -0,0 +1,24 @@
++# TooltipButton
++
++`TooltipButton` is a simple component that composes `Button` with a `Tooltip`. It mostly exists as an adaptive layer between the `Button` it uses and the original `Button`.
++
++## Usage
++
++```jsx
++import { TooltipButton } from '@wordpress/components/ui';
++
++function Example() {
++	return (
++		<TooltipButton
++			variant="secondary"
++			tooltip={ { content: 'WordPress.org' } }
++		>
++			Code is Poetry
++		</TooltipButton>
++	);
++}
++```
++
++## Props
++
++`TooltipButton` accepts all the regular `Button` props as well as a special `tooltip` prop. Pass any props you would pass to the `Tooltip` component to the `tooltip` prop and they'll get passed along for you to the wrapping tooltip.
+diff --git a/packages/components/src/ui/tooltip-button/component.tsx b/packages/components/src/ui/tooltip-button/component.tsx
+new file mode 100644
+index 00000000000000..dd9bc5d9102bfb
+--- /dev/null
++++ b/packages/components/src/ui/tooltip-button/component.tsx
+@@ -0,0 +1,95 @@
++/**
++ * External dependencies
++ */
++import type { ViewOwnProps } from '@wp-g2/create-styles';
++// eslint-disable-next-line no-restricted-imports
++import type { Ref } from 'react';
++import { useContextSystem, contextConnect } from '@wp-g2/context';
++
++/**
++ * Internal dependencies
++ */
++import type { Props as ButtonProps } from '../button/component';
++import type { Props as TooltipProps } from '../tooltip/types';
++import { Button } from '../button';
++import { Tooltip } from '../tooltip';
++
++export interface TooltipButtonProps extends ButtonProps {
++	tooltip?: TooltipProps;
++}
++
++function TooltipButton(
++	props: ViewOwnProps< TooltipButtonProps, 'button' >,
++	forwardedRef: Ref< any >
++): JSX.Element {
++	const {
++		tooltip,
++		disabled = false,
++		isFocusable = true,
++		children,
++		...buttonProps
++	} = useContextSystem( props, 'TooltipButton' );
++
++	const trulyDisabled = disabled && ! isFocusable;
++
++	// Should show the tooltip if...
++	const shouldShowTooltip =
++		tooltip &&
++		! trulyDisabled &&
++		// an explicit tooltip is passed or...
++		( tooltip.content ||
++			// there's a shortcut or...
++			tooltip.shortcut ||
++			// there's a label and...
++			( !! buttonProps[ 'aria-label' ] &&
++				// the children are empty
++				( ! children ||
++					( Array.isArray( children ) && ! children.length ) ) ) );
++
++	if ( ! shouldShowTooltip ) {
++		return (
++			<Button
++				disabled={ disabled }
++				isFocusable={ isFocusable }
++				{ ...buttonProps }
++				ref={ forwardedRef }
++			>
++				{ children }
++			</Button>
++		);
++	}
++
++	return (
++		<Tooltip { ...tooltip }>
++			<Button
++				disabled={ disabled }
++				isFocusable={ isFocusable }
++				{ ...buttonProps }
++				ref={ forwardedRef }
++			>
++				{ children }
++			</Button>
++		</Tooltip>
++	);
++}
++
++/**
++ * `TooltipButton` is a simple component that composes `Button` with a `Tooltip`.
++ * It mostly exists as an adaptive layer between the `Button` it uses and the original `Button`.
++ *
++ * ```jsx
++ * import { TooltipButton } from `@wordpress/components/ui`;
++ *
++ * function Example() {
++ * 	return (
++ * 		<TooltipButton
++ * 			variant="secondary"
++ * 			tooltip={ { content: 'WordPress.org' } }
++ * 		>
++ * 			Code is Poetry
++ * 		</TooltipButton>
++ * 	);
++ * }
++ * ```
++ */
++export default contextConnect( TooltipButton, 'TooltipButton' );
+diff --git a/packages/components/src/ui/tooltip-button/index.js b/packages/components/src/ui/tooltip-button/index.js
+new file mode 100644
+index 00000000000000..cead4df48ae1e9
+--- /dev/null
++++ b/packages/components/src/ui/tooltip-button/index.js
+@@ -0,0 +1,2 @@
++export { default as TooltipButton } from './component';
++export * from './component';
+diff --git a/packages/components/src/ui/tooltip-button/stories/index.js b/packages/components/src/ui/tooltip-button/stories/index.js
+new file mode 100644
+index 00000000000000..c73373ec3aa0f8
+--- /dev/null
++++ b/packages/components/src/ui/tooltip-button/stories/index.js
+@@ -0,0 +1,74 @@
++/**
++ * External dependencies
++ */
++import { boolean, number, select, text } from '@storybook/addon-knobs';
++/**
++ * Internal dependencies
++ */
++import { TooltipButton } from '..';
++
++export default {
++	component: TooltipButton,
++	title: 'G2 Components (Experimental)/TooltipButton',
++};
++
++const createSelectProps = ( collection ) =>
++	collection.reduce( ( data, item ) => ( { ...data, [ item ]: item } ), {} );
++
++export const _default = () => {
++	const tooltipContent = text(
++		'tooltip.content',
++		'This is some sample tooltip content'
++	);
++	const disabled = boolean( 'disabled', false );
++	const elevation = number( 'elevation', 0 );
++	const hasCaret = boolean( 'hasCaret', false );
++	const isActive = boolean( 'isActive', false );
++	const isBlock = boolean( 'isBlock', false );
++	const isControl = boolean( 'isControl', false );
++	const isDestructive = boolean( 'isDestructive', false );
++	const isLoading = boolean( 'isLoading', false );
++	const isRounded = boolean( 'isRounded', false );
++	const isSplit = boolean( 'isSplit', false );
++	const isSubtle = boolean( 'isSubtle', false );
++	const size = select(
++		'size',
++		createSelectProps( [ 'large', 'medium', 'small', 'xSmall' ] ),
++		'medium'
++	);
++	const describedBy = text( 'describedBy', undefined );
++
++	const variant = select(
++		'variant',
++		createSelectProps( [
++			'primary',
++			'secondary',
++			'tertiary',
++			'plain',
++			'link',
++		] ),
++		'secondary'
++	);
++
++	const props = {
++		disabled,
++		elevation,
++		hasCaret,
++		isActive,
++		isBlock,
++		isControl,
++		isDestructive,
++		isLoading,
++		isRounded,
++		isSplit,
++		isSubtle,
++		size,
++		variant,
++		describedBy,
++		tooltip: {
++			content: tooltipContent,
++		},
++	};
++
++	return <TooltipButton { ...props }>TooltipButton</TooltipButton>;
++};
+diff --git a/packages/components/src/ui/tooltip-button/test/index.js b/packages/components/src/ui/tooltip-button/test/index.js
+new file mode 100644
+index 00000000000000..93af8b2efb391f
+--- /dev/null
++++ b/packages/components/src/ui/tooltip-button/test/index.js
+@@ -0,0 +1,32 @@
++/**
++ * External dependencies
++ */
++import { render, screen } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { TooltipButton } from '..';
++
++describe( 'TooltipButton', () => {
++	it( 'should render a button without a tooltip if provided no tooltip props', () => {
++		const { container } = render(
++			<TooltipButton>WordPress.org</TooltipButton>
++		);
++		expect( container.firstChild.tagName ).toBe( 'BUTTON' );
++	} );
++
++	it( 'should render a button with a tooltip', () => {
++		render(
++			<TooltipButton
++				tooltip={ { content: 'Code is Poetry', visible: true } }
++			>
++				WordPress.org
++			</TooltipButton>
++		);
++		const button = screen.queryByText( 'WordPress.org' );
++		expect( button ).not.toBeNull();
++		const tooltipContent = screen.queryByText( 'Code is Poetry' );
++		expect( tooltipContent ).not.toBeNull();
++	} );
++} );

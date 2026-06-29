@@ -1,0 +1,415 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8924e98e6a2796..c4742508a09918 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -17,6 +17,10 @@
+ 
+ -   Update the visual design of the `Spinner` component. ([#37551](https://github.com/WordPress/gutenberg/pull/37551))
+ 
++### Experimental
++
++-   `Navigator`: rename `push`/`pop` to `goTo`/`goBack` ([#38582](https://github.com/WordPress/gutenberg/pull/38582))
++
+ ## 19.3.0 (2022-01-27)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/navigator/context.ts b/packages/components/src/navigator/context.ts
+index cf326f7bc352b9..13863aacc5c917 100644
+--- a/packages/components/src/navigator/context.ts
++++ b/packages/components/src/navigator/context.ts
+@@ -10,7 +10,7 @@ import type { NavigatorContext as NavigatorContextType } from './types';
+ 
+ const initialContextValue: NavigatorContextType = {
+ 	location: {},
+-	push: () => {},
+-	pop: () => {},
++	goTo: () => {},
++	goBack: () => {},
+ };
+ export const NavigatorContext = createContext( initialContextValue );
+diff --git a/packages/components/src/navigator/navigator-provider/README.md b/packages/components/src/navigator/navigator-provider/README.md
+index 39d32222979e00..387e30b9ddb2dc 100644
+--- a/packages/components/src/navigator/navigator-provider/README.md
++++ b/packages/components/src/navigator/navigator-provider/README.md
+@@ -16,19 +16,19 @@ import {
+ } from '@wordpress/components';
+ 
+ function NavigatorButton( { path, ...props } ) {
+-	const { push } = useNavigator();
++	const { goTo } = useNavigator();
+ 	return (
+ 		<Button
+ 		 variant="primary"
+-		 onClick={ () => push( path ) }
++		 onClick={ () => goTo( path ) }
+ 		 { ...props }
+ 	 />
+  );
+ }
+ 
+ function NavigatorBackButton( props ) {
+-	const { pop } = useNavigator();
+-	return <Button variant="secondary" onClick={ () => pop() } { ...props } />;
++	const { goBack } = useNavigator();
++	return <Button variant="secondary" onClick={ () => goBack() } { ...props } />;
+ }
+ 
+ const MyNavigation = () => (
+@@ -64,17 +64,17 @@ You can retrieve a `navigator` instance by using the `useNavigator` hook.
+ 
+ The `navigator` instance has a few properties:
+ 
+-### `push`: `( path: string, options: NavigateOptions ) => void`
++### `goTo`: `( path: string, options: NavigateOptions ) => void`
+ 
+-The `push` function allows navigating to a given path. The second argument can augment the navigation operations with different options.
++The `goTo` function allows navigating to a given path. The second argument can augment the navigation operations with different options.
+ 
+ The available options are:
+ 
+ - `focusTargetSelector`: `string`. An optional property used to specify the CSS selector used to restore focus on the matching element when navigating back.
+ 
+-### `pop`: `() => void`
++### `goBack`: `() => void`
+ 
+-The `pop` function allows navigating to the previous path.
++The `goBack` function allows navigating to the previous path.
+ 
+ ### `location`: `NavigatorLocation`
+ 
+diff --git a/packages/components/src/navigator/navigator-provider/component.tsx b/packages/components/src/navigator/navigator-provider/component.tsx
+index a52fd82867e517..f1303931b1fbdf 100644
+--- a/packages/components/src/navigator/navigator-provider/component.tsx
++++ b/packages/components/src/navigator/navigator-provider/component.tsx
+@@ -45,7 +45,7 @@ function NavigatorProvider(
+ 		},
+ 	] );
+ 
+-	const push: NavigatorContextType[ 'push' ] = useCallback(
++	const goTo: NavigatorContextType[ 'goTo' ] = useCallback(
+ 		( path, options = {} ) => {
+ 			setLocationHistory( [
+ 				...locationHistory,
+@@ -59,7 +59,7 @@ function NavigatorProvider(
+ 		[ locationHistory ]
+ 	);
+ 
+-	const pop: NavigatorContextType[ 'pop' ] = useCallback( () => {
++	const goBack: NavigatorContextType[ 'goBack' ] = useCallback( () => {
+ 		if ( locationHistory.length > 1 ) {
+ 			setLocationHistory( [
+ 				...locationHistory.slice( 0, -2 ),
+@@ -77,10 +77,10 @@ function NavigatorProvider(
+ 				...locationHistory[ locationHistory.length - 1 ],
+ 				isInitial: locationHistory.length === 1,
+ 			},
+-			push,
+-			pop,
++			goTo,
++			goBack,
+ 		} ),
+-		[ locationHistory, push, pop ]
++		[ locationHistory, goTo, goBack ]
+ 	);
+ 
+ 	const cx = useCx();
+@@ -111,19 +111,19 @@ function NavigatorProvider(
+  * } from '@wordpress/components';
+  *
+  * function NavigatorButton( { path, ...props } ) {
+- *  const { push } = useNavigator();
++ *  const { goTo } = useNavigator();
+  *  return (
+  *    <Button
+  *      variant="primary"
+- *      onClick={ () => push( path ) }
++ *      onClick={ () => goTo( path ) }
+  *      { ...props }
+  *    />
+  *  );
+  * }
+  *
+  * function NavigatorBackButton( props ) {
+- *   const { pop } = useNavigator();
+- *   return <Button variant="secondary" onClick={ () => pop() } { ...props } />;
++ *   const { goBack } = useNavigator();
++ *   return <Button variant="secondary" onClick={ () => goBack() } { ...props } />;
+  * }
+  *
+  * const MyNavigation = () => (
+diff --git a/packages/components/src/navigator/navigator-screen/component.tsx b/packages/components/src/navigator/navigator-screen/component.tsx
+index d42bd15ac37e1b..5118e28158e35a 100644
+--- a/packages/components/src/navigator/navigator-screen/component.tsx
++++ b/packages/components/src/navigator/navigator-screen/component.tsx
+@@ -182,19 +182,19 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
+  * } from '@wordpress/components';
+  *
+  * function NavigatorButton( { path, ...props } ) {
+- *  const { push } = useNavigator();
++ *  const { goTo } = useNavigator();
+  *  return (
+  *    <Button
+  *      variant="primary"
+- *      onClick={ () => push( path ) }
++ *      onClick={ () => goTo( path ) }
+  *      { ...props }
+  *    />
+  *  );
+  * }
+  *
+  * function NavigatorBackButton( props ) {
+- *   const { pop } = useNavigator();
+- *   return <Button variant="secondary" onClick={ () => pop() } { ...props } />;
++ *   const { goBack } = useNavigator();
++ *   return <Button variant="secondary" onClick={ () => goBack() } { ...props } />;
+  * }
+  *
+  * const MyNavigation = () => (
+diff --git a/packages/components/src/navigator/stories/index.js b/packages/components/src/navigator/stories/index.js
+index 6f7be1bccb96b7..c2baf269f4ddac 100644
+--- a/packages/components/src/navigator/stories/index.js
++++ b/packages/components/src/navigator/stories/index.js
+@@ -19,7 +19,7 @@ export default {
+ };
+ 
+ function NavigatorButton( { path, ...props } ) {
+-	const { push } = useNavigator();
++	const { goTo } = useNavigator();
+ 	const dataAttrName = 'data-navigator-focusable-id';
+ 	const dataAttrValue = path;
+ 
+@@ -34,7 +34,7 @@ function NavigatorButton( { path, ...props } ) {
+ 		<Button
+ 			variant="secondary"
+ 			onClick={ () =>
+-				push( path, { focusTargetSelector: dataAttrCssSelector } )
++				goTo( path, { focusTargetSelector: dataAttrCssSelector } )
+ 			}
+ 			{ ...buttonProps }
+ 		/>
+@@ -42,8 +42,10 @@ function NavigatorButton( { path, ...props } ) {
+ }
+ 
+ function NavigatorBackButton( props ) {
+-	const { pop } = useNavigator();
+-	return <Button variant="secondary" onClick={ () => pop() } { ...props } />;
++	const { goBack } = useNavigator();
++	return (
++		<Button variant="secondary" onClick={ () => goBack() } { ...props } />
++	);
+ }
+ 
+ const MyNavigation = () => {
+diff --git a/packages/components/src/navigator/test/index.js b/packages/components/src/navigator/test/index.js
+index 5f06fdf6eece11..d5c5a4ddc0ccc0 100644
+--- a/packages/components/src/navigator/test/index.js
++++ b/packages/components/src/navigator/test/index.js
+@@ -31,13 +31,13 @@ const PATHS = {
+ };
+ 
+ function NavigatorButton( { path, onClick, ...props } ) {
+-	const { push } = useNavigator();
++	const { goTo } = useNavigator();
+ 	return (
+ 		<button
+ 			onClick={ () => {
+-				push( path );
+-				// Used to spy on the values passed to `navigator.push`
+-				onClick?.( { type: 'push', path } );
++				goTo( path );
++				// Used to spy on the values passed to `navigator.goTo`
++				onClick?.( { type: 'goTo', path } );
+ 			} }
+ 			{ ...props }
+ 		/>
+@@ -45,7 +45,7 @@ function NavigatorButton( { path, onClick, ...props } ) {
+ }
+ 
+ function NavigatorButtonWithFocusRestoration( { path, onClick, ...props } ) {
+-	const { push } = useNavigator();
++	const { goTo } = useNavigator();
+ 	const dataAttrName = 'data-navigator-focusable-id';
+ 	const dataAttrValue = path;
+ 
+@@ -59,9 +59,9 @@ function NavigatorButtonWithFocusRestoration( { path, onClick, ...props } ) {
+ 	return (
+ 		<button
+ 			onClick={ () => {
+-				push( path, { focusTargetSelector: dataAttrCssSelector } );
+-				// Used to spy on the values passed to `navigator.push`
+-				onClick?.( { type: 'push', path } );
++				goTo( path, { focusTargetSelector: dataAttrCssSelector } );
++				// Used to spy on the values passed to `navigator.goTo`
++				onClick?.( { type: 'goTo', path } );
+ 			} }
+ 			{ ...buttonProps }
+ 		/>
+@@ -69,13 +69,13 @@ function NavigatorButtonWithFocusRestoration( { path, onClick, ...props } ) {
+ }
+ 
+ function NavigatorBackButton( { onClick, ...props } ) {
+-	const { pop } = useNavigator();
++	const { goBack } = useNavigator();
+ 	return (
+ 		<button
+ 			onClick={ () => {
+-				pop();
+-				// Used to spy on the values passed to `navigator.push`
+-				onClick?.( { type: 'pop' } );
++				goBack();
++				// Used to spy on the values passed to `navigator.goBack`
++				onClick?.( { type: 'goBack' } );
+ 			} }
+ 			{ ...props }
+ 		/>
+@@ -270,28 +270,28 @@ describe( 'Navigator', () => {
+ 		expect( getHomeScreen() ).toBeInTheDocument();
+ 		expect( getToChildScreenButton() ).toBeInTheDocument();
+ 
+-		// Check the values passed to `navigator.push()`
++		// Check the values passed to `navigator.goTo()`
+ 		expect( spy ).toHaveBeenCalledTimes( 6 );
+ 		expect( spy ).toHaveBeenNthCalledWith( 1, {
+ 			path: PATHS.CHILD,
+-			type: 'push',
++			type: 'goTo',
+ 		} );
+ 		expect( spy ).toHaveBeenNthCalledWith( 2, {
+-			type: 'pop',
++			type: 'goBack',
+ 		} );
+ 		expect( spy ).toHaveBeenNthCalledWith( 3, {
+ 			path: PATHS.CHILD,
+-			type: 'push',
++			type: 'goTo',
+ 		} );
+ 		expect( spy ).toHaveBeenNthCalledWith( 4, {
+ 			path: PATHS.NESTED,
+-			type: 'push',
++			type: 'goTo',
+ 		} );
+ 		expect( spy ).toHaveBeenNthCalledWith( 5, {
+-			type: 'pop',
++			type: 'goBack',
+ 		} );
+ 		expect( spy ).toHaveBeenNthCalledWith( 6, {
+-			type: 'pop',
++			type: 'goBack',
+ 		} );
+ 	} );
+ 
+@@ -315,11 +315,11 @@ describe( 'Navigator', () => {
+ 			getNestedScreen( { throwIfNotFound: false } )
+ 		).not.toBeInTheDocument();
+ 
+-		// Check the values passed to `navigator.push()`
++		// Check the values passed to `navigator.goTo()`
+ 		expect( spy ).toHaveBeenCalledTimes( 1 );
+ 		expect( spy ).toHaveBeenNthCalledWith( 1, {
+ 			path: PATHS.NOT_FOUND,
+-			type: 'push',
++			type: 'goTo',
+ 		} );
+ 	} );
+ 
+diff --git a/packages/components/src/navigator/types.ts b/packages/components/src/navigator/types.ts
+index 24e513d2571806..0caff5df8664c9 100644
+--- a/packages/components/src/navigator/types.ts
++++ b/packages/components/src/navigator/types.ts
+@@ -15,8 +15,8 @@ export type NavigatorLocation = NavigateOptions & {
+ 
+ export type NavigatorContext = {
+ 	location: NavigatorLocation;
+-	push: ( path: string, options?: NavigateOptions ) => void;
+-	pop: () => void;
++	goTo: ( path: string, options?: NavigateOptions ) => void;
++	goBack: () => void;
+ };
+ 
+ // Returned by the `useNavigator` hook
+diff --git a/packages/components/src/navigator/use-navigator.ts b/packages/components/src/navigator/use-navigator.ts
+index 5a425b695ba9c3..052be3d0be498a 100644
+--- a/packages/components/src/navigator/use-navigator.ts
++++ b/packages/components/src/navigator/use-navigator.ts
+@@ -13,12 +13,12 @@ import type { Navigator } from './types';
+  * Retrieves a `navigator` instance.
+  */
+ function useNavigator(): Navigator {
+-	const { location, push, pop } = useContext( NavigatorContext );
++	const { location, goTo, goBack } = useContext( NavigatorContext );
+ 
+ 	return {
+ 		location,
+-		push,
+-		pop,
++		goTo,
++		goBack,
+ 	};
+ }
+ 
+diff --git a/packages/edit-post/src/components/preferences-modal/index.js b/packages/edit-post/src/components/preferences-modal/index.js
+index 22d74c7e0158a1..8fbf807c83160a 100644
+--- a/packages/edit-post/src/components/preferences-modal/index.js
++++ b/packages/edit-post/src/components/preferences-modal/index.js
+@@ -56,7 +56,7 @@ const MODAL_NAME = 'edit-post/preferences';
+ const PREFERENCES_MENU = 'preferences-menu';
+ 
+ function NavigationButton( { as: Tag = Button, path, ...props } ) {
+-	const { push } = useNavigator();
++	const { goTo } = useNavigator();
+ 
+ 	const dataAttrName = 'data-navigator-focusable-id';
+ 	const dataAttrValue = path;
+@@ -71,7 +71,7 @@ function NavigationButton( { as: Tag = Button, path, ...props } ) {
+ 	return (
+ 		<Tag
+ 			onClick={ () =>
+-				push( path, { focusTargetSelector: dataAttrCssSelector } )
++				goTo( path, { focusTargetSelector: dataAttrCssSelector } )
+ 			}
+ 			{ ...tagProps }
+ 		/>
+@@ -79,8 +79,8 @@ function NavigationButton( { as: Tag = Button, path, ...props } ) {
+ }
+ 
+ function NavigationBackButton( { as: Tag = Button, ...props } ) {
+-	const { pop } = useNavigator();
+-	return <Tag onClick={ pop } { ...props } />;
++	const { goBack } = useNavigator();
++	return <Tag onClick={ goBack } { ...props } />;
+ }
+ 
+ export default function PreferencesModal() {
+diff --git a/packages/edit-site/src/components/global-styles/navigation-button.js b/packages/edit-site/src/components/global-styles/navigation-button.js
+index 4d383386840c29..9567e1278c3e08 100644
+--- a/packages/edit-site/src/components/global-styles/navigation-button.js
++++ b/packages/edit-site/src/components/global-styles/navigation-button.js
+@@ -26,7 +26,7 @@ function GenericNavigationButton( { icon, children, ...props } ) {
+ }
+ 
+ function NavigationButton( { path, ...props } ) {
+-	const { push } = useNavigator();
++	const { goTo } = useNavigator();
+ 
+ 	const dataAttrName = 'data-navigator-focusable-id';
+ 	const dataAttrValue = path;
+@@ -41,7 +41,7 @@ function NavigationButton( { path, ...props } ) {
+ 	return (
+ 		<GenericNavigationButton
+ 			onClick={ () =>
+-				push( path, { focusTargetSelector: dataAttrCssSelector } )
++				goTo( path, { focusTargetSelector: dataAttrCssSelector } )
+ 			}
+ 			{ ...buttonProps }
+ 		/>
+@@ -49,8 +49,8 @@ function NavigationButton( { path, ...props } ) {
+ }
+ 
+ function NavigationBackButton( { ...props } ) {
+-	const { pop } = useNavigator();
+-	return <GenericNavigationButton onClick={ pop } { ...props } />;
++	const { goBack } = useNavigator();
++	return <GenericNavigationButton onClick={ goBack } { ...props } />;
+ }
+ 
+ export { NavigationButton, NavigationBackButton };

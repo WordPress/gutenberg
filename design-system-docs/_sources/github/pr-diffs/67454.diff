@@ -1,0 +1,87 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e35ba460ef7c54..2be7450f43d0f5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -15,6 +15,8 @@
+ -   `NumberControl`: Deprecate 36px default size ([#66730](https://github.com/WordPress/gutenberg/pull/66730)).
+ -   `UnitControl`: Deprecate 36px default size ([#66791](https://github.com/WordPress/gutenberg/pull/66791)).
+ -   `FormFileUpload`: Deprecate 36px default size ([#67438](https://github.com/WordPress/gutenberg/pull/67438)).
++-   `FormTokenField`: Deprecate 36px default size ([#67454](https://github.com/WordPress/gutenberg/pull/67454)).
++
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/form-token-field/README.md b/packages/components/src/form-token-field/README.md
+index 70e9bd09a61a36..a04ba5ec7b9d29 100644
+--- a/packages/components/src/form-token-field/README.md
++++ b/packages/components/src/form-token-field/README.md
+@@ -85,6 +85,7 @@ const MyFormTokenField = () => {
+ 
+ 	return (
+ 		<FormTokenField
++			__next40pxDefaultSize
+ 			value={ selectedContinents }
+ 			suggestions={ continents }
+ 			onChange={ ( tokens ) => setSelectedContinents( tokens ) }
+diff --git a/packages/components/src/form-token-field/index.tsx b/packages/components/src/form-token-field/index.tsx
+index 4f2f325e409a76..987c75d769b727 100644
+--- a/packages/components/src/form-token-field/index.tsx
++++ b/packages/components/src/form-token-field/index.tsx
+@@ -30,6 +30,7 @@ import {
+ import { Spacer } from '../spacer';
+ import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+ import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
++import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
+ 
+ const identity = ( value: string ) => value;
+ 
+@@ -86,6 +87,12 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 		} );
+ 	}
+ 
++	maybeWarnDeprecated36pxSize( {
++		componentName: 'FormTokenField',
++		size: undefined,
++		__next40pxDefaultSize,
++	} );
++
+ 	const instanceId = useInstanceId( FormTokenField );
+ 
+ 	// We reset to these initial values again in the onBlur
+diff --git a/packages/components/src/form-token-field/stories/index.story.tsx b/packages/components/src/form-token-field/stories/index.story.tsx
+index 729120ad456553..c43d155c809bb7 100644
+--- a/packages/components/src/form-token-field/stories/index.story.tsx
++++ b/packages/components/src/form-token-field/stories/index.story.tsx
+@@ -64,6 +64,7 @@ Default.args = {
+ 	label: 'Type a continent',
+ 	suggestions: continents,
+ 	__nextHasNoMarginBottom: true,
++	__next40pxDefaultSize: true,
+ };
+ 
+ export const Async: StoryFn< typeof FormTokenField > = ( {
+@@ -102,6 +103,7 @@ Async.args = {
+ 	label: 'Type a continent',
+ 	suggestions: continents,
+ 	__nextHasNoMarginBottom: true,
++	__next40pxDefaultSize: true,
+ };
+ 
+ export const DropdownSelector: StoryFn< typeof FormTokenField > =
+diff --git a/packages/components/src/form-token-field/test/index.tsx b/packages/components/src/form-token-field/test/index.tsx
+index 961214a574c90d..60c17112717bd1 100644
+--- a/packages/components/src/form-token-field/test/index.tsx
++++ b/packages/components/src/form-token-field/test/index.tsx
+@@ -21,7 +21,11 @@ import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import FormTokenField from '../';
++import _FormTokenField from '../';
++
++const FormTokenField = ( props: ComponentProps< typeof _FormTokenField > ) => (
++	<_FormTokenField __next40pxDefaultSize { ...props } />
++);
+ 
+ const FormTokenFieldWithState = ( {
+ 	onChange,

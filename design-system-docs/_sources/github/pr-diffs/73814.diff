@@ -1,0 +1,25 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c694f2a43627f3..f29e73ef7cb36d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `Menu` and othr menu items: change default size to be 32px tall rather than 40px to improve menu density. ([#73429](https://github.com/WordPress/gutenberg/pull/73429)).
+ -   Unify padding using for DataViews, Modals and other container components. ([#73334](https://github.com/WordPress/gutenberg/pull/73334))
++-   `Snackbar`: Shorten timeout duration ([#73814](https://github.com/WordPress/gutenberg/pull/73814)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/src/snackbar/index.tsx b/packages/components/src/snackbar/index.tsx
+index 97b09f9534c46a..c6e8b73da92182 100644
+--- a/packages/components/src/snackbar/index.tsx
++++ b/packages/components/src/snackbar/index.tsx
+@@ -27,7 +27,7 @@ import type { SnackbarProps } from './types';
+ import type { NoticeAction } from '../notice/types';
+ import type { WordPressComponentProps } from '../context';
+ 
+-const NOTICE_TIMEOUT = 10000;
++const NOTICE_TIMEOUT = 6000;
+ 
+ /**
+  * Custom hook which announces the message with the given politeness, if a

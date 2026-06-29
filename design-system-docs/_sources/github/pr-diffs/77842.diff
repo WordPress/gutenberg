@@ -1,0 +1,28 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c0ac3f7493eef1..251c2e6dbaae80 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `Button`: Align `link` variant underline (offset and thickness) with `ExternalLink` and `Link` from `@wordpress/ui` ([#77842](https://github.com/WordPress/gutenberg/pull/77842)).
++
+ ### Bug Fixes
+ 
+ -   `TabPanel`: Fix tab indicator animation while switching tabs ([#77812](https://github.com/WordPress/gutenberg/pull/77812)).
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 84c76c126c2904..37ab30119552e0 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -252,6 +252,8 @@
+ 		font-weight: $font-weight-regular;
+ 		color: $components-color-accent;
+ 		text-decoration: underline;
++		text-underline-offset: 0.2em;
++		text-decoration-thickness: from-font;
+ 
+ 		@media not (prefers-reduced-motion) {
+ 			transition-property: border, background, color;

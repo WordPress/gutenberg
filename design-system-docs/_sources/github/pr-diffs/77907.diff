@@ -1,0 +1,28 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5ce2d734dd6bc8..23f851b98978bd 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ ### Internal
+ 
+ -   Update code to comply with `eslint-plugin-react-hooks` v7 ([#69962](https://github.com/WordPress/gutenberg/pull/69962)).
++-   `SlotFill`: Add dependencies to `updateFill` effect ([#77907](https://github.com/WordPress/gutenberg/pull/77907)).
+ 
+ ## 33.0.0 (2026-04-29)
+ 
+diff --git a/packages/components/src/slot-fill/fill.tsx b/packages/components/src/slot-fill/fill.tsx
+index 6de62c031deec2..084a993a9a61f4 100644
+--- a/packages/components/src/slot-fill/fill.tsx
++++ b/packages/components/src/slot-fill/fill.tsx
+@@ -37,9 +37,9 @@ export default function Fill( { name, children }: FillComponentProps ) {
+ 	useLayoutEffect( () => {
+ 		registry.updateFill( name, {
+ 			instance: instanceRef.current,
+-			children: childrenRef.current,
++			children,
+ 		} );
+-	} );
++	}, [ registry, name, children ] );
+ 
+ 	const slot = useObservableValue( registry.slots, name );
+ 

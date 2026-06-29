@@ -1,0 +1,171 @@
+diff --git a/packages/block-editor/src/components/block-list/use-block-props/index.js b/packages/block-editor/src/components/block-list/use-block-props/index.js
+index 5a94135a8e0b09..52ef3fb6ecaabe 100644
+--- a/packages/block-editor/src/components/block-list/use-block-props/index.js
++++ b/packages/block-editor/src/components/block-list/use-block-props/index.js
+@@ -185,7 +185,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
+ 		'data-block': clientId,
+ 		'data-type': name,
+ 		'data-title': blockTitle,
+-		inert: isSubtreeDisabled ? true : undefined,
++		inert: isSubtreeDisabled,
+ 		className: clsx(
+ 			'block-editor-block-list__block',
+ 			{
+diff --git a/packages/boot/src/components/canvas/index.tsx b/packages/boot/src/components/canvas/index.tsx
+index b5d8f17a614326..e33675c6f4803d 100644
+--- a/packages/boot/src/components/canvas/index.tsx
++++ b/packages/boot/src/components/canvas/index.tsx
+@@ -66,11 +66,7 @@ export default function Canvas( { canvas }: CanvasProps ) {
+ 	// Render the editor with canvas data
+ 	return (
+ 		<div style={ { height: '100%', position: 'relative' } }>
+-			<div
+-				style={ { height: '100%' } }
+-				// @ts-expect-error inert not typed properly
+-				inert={ canvas.isPreview ? 'true' : undefined }
+-			>
++			<div style={ { height: '100%' } } inert={ canvas.isPreview }>
+ 				<Editor
+ 					postType={ canvas.postType }
+ 					postId={ canvas.postId }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1944bb69f68478..a166a7b2e76024 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   `Disabled`: Pass a boolean to the `inert` attribute instead of the string `'true'` to avoid a React 19 warning ([#78798](https://github.com/WordPress/gutenberg/pull/78798)).
++
+ ## 34.0.0 (2026-05-27)
+ 
+ ### Breaking Changes
+diff --git a/packages/components/src/disabled/index.tsx b/packages/components/src/disabled/index.tsx
+index 4c348d3a4b7701..4af3ea8ba0dc4e 100644
+--- a/packages/components/src/disabled/index.tsx
++++ b/packages/components/src/disabled/index.tsx
+@@ -60,8 +60,7 @@ function Disabled( {
+ 	return (
+ 		<Provider value={ isDisabled }>
+ 			<div
+-				// @ts-ignore Reason: inert is a recent HTML attribute
+-				inert={ isDisabled ? true : undefined }
++				inert={ isDisabled }
+ 				className={
+ 					isDisabled
+ 						? cx( disabledStyles, className, 'components-disabled' )
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index 58973050737312..e2e382f60c161f 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++- DataViews: Pass boolean values to the `inert` attribute instead of the string `'true'` to avoid a React 19 warning. [#78798](https://github.com/WordPress/gutenberg/pull/78798)
++
+ ## 15.0.0 (2026-05-27)
+ 
+ ### Breaking Changes
+diff --git a/packages/dataviews/src/components/dataviews-footer/index.tsx b/packages/dataviews/src/components/dataviews-footer/index.tsx
+index 8dac1dc350c940..3bcd98d5f529ce 100644
+--- a/packages/dataviews/src/components/dataviews-footer/index.tsx
++++ b/packages/dataviews/src/components/dataviews-footer/index.tsx
+@@ -51,11 +51,7 @@ export default function DataViewsFooter() {
+ 	}
+ 	return (
+ 		( !! totalItems || isRefreshing ) && (
+-			<div
+-				className="dataviews-footer"
+-				// @ts-ignore
+-				inert={ isRefreshing ? 'true' : undefined }
+-			>
++			<div className="dataviews-footer" inert={ isRefreshing }>
+ 				<Stack
+ 					direction="row"
+ 					justify="end"
+diff --git a/packages/dataviews/src/components/dataviews-layouts/activity/index.tsx b/packages/dataviews/src/components/dataviews-layouts/activity/index.tsx
+index 8b7f5069a5d06b..31cd912a6a2c01 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/activity/index.tsx
++++ b/packages/dataviews/src/components/dataviews-layouts/activity/index.tsx
+@@ -63,8 +63,7 @@ export default function ViewActivity< Item >(
+ 				direction="column"
+ 				gap="sm"
+ 				className={ wrapperClassName }
+-				// @ts-ignore
+-				inert={ isInert ? 'true' : undefined }
++				inert={ isInert }
+ 			>
+ 				{ groupedEntries.map(
+ 					( [ groupName, groupData ]: [ string, Item[] ] ) => (
+@@ -92,8 +91,7 @@ export default function ViewActivity< Item >(
+ 			<div
+ 				className={ wrapperClassName }
+ 				role={ view.infiniteScrollEnabled ? 'feed' : undefined }
+-				// @ts-ignore
+-				inert={ isInert ? 'true' : undefined }
++				inert={ isInert }
+ 			>
+ 				<ActivityItems< Item > { ...props } />
+ 			</div>
+diff --git a/packages/dataviews/src/components/dataviews-layouts/grid/composite-grid.tsx b/packages/dataviews/src/components/dataviews-layouts/grid/composite-grid.tsx
+index 5b0fbe7fbc4b0e..6825097695a4a3 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/grid/composite-grid.tsx
++++ b/packages/dataviews/src/components/dataviews-layouts/grid/composite-grid.tsx
+@@ -344,7 +344,7 @@ interface CompositeGridProps< Item > {
+ 	data: Item[];
+ 	isInfiniteScroll: boolean;
+ 	className?: string;
+-	inert?: string;
++	inert?: boolean;
+ 	isLoading?: boolean;
+ 	view: ViewGridType;
+ 	fields: NormalizedField< Item >[];
+diff --git a/packages/dataviews/src/components/dataviews-layouts/grid/index.tsx b/packages/dataviews/src/components/dataviews-layouts/grid/index.tsx
+index cf6a8407a4d594..813e06ba8ee315 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/grid/index.tsx
++++ b/packages/dataviews/src/components/dataviews-layouts/grid/index.tsx
+@@ -55,7 +55,7 @@ function ViewGrid< Item >( {
+ 		className: clsx( className, {
+ 			'is-refreshing': ! isInfiniteScroll && isDelayedLoading,
+ 		} ),
+-		inert: ! isInfiniteScroll && !! isLoading ? 'true' : undefined,
++		inert: ! isInfiniteScroll && !! isLoading,
+ 		isLoading,
+ 		view,
+ 		fields,
+diff --git a/packages/dataviews/src/components/dataviews-layouts/list/index.tsx b/packages/dataviews/src/components/dataviews-layouts/list/index.tsx
+index 573f026c832edf..6b147480cabb56 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/list/index.tsx
++++ b/packages/dataviews/src/components/dataviews-layouts/list/index.tsx
+@@ -631,10 +631,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
+ 				role={ view.infiniteScrollEnabled ? 'feed' : 'grid' }
+ 				activeId={ activeCompositeId }
+ 				setActiveId={ setActiveCompositeId }
+-				// @ts-ignore
+-				inert={
+-					! isInfiniteScroll && !! isLoading ? 'true' : undefined
+-				}
++				inert={ ! isInfiniteScroll && !! isLoading }
+ 			>
+ 				{ data.map( ( item, index ) => {
+ 					const id = generateCompositeItemIdPrefix( item );
+diff --git a/packages/dataviews/src/components/dataviews-layouts/table/index.tsx b/packages/dataviews/src/components/dataviews-layouts/table/index.tsx
+index b608fa0449e0cd..7484e50544f21b 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/table/index.tsx
++++ b/packages/dataviews/src/components/dataviews-layouts/table/index.tsx
+@@ -426,8 +426,7 @@ function ViewTable< Item >( {
+ 				aria-busy={ isLoading }
+ 				aria-describedby={ tableNoticeId }
+ 				role={ isInfiniteScroll ? 'feed' : undefined }
+-				// @ts-ignore Reason: inert is a recent HTML attribute
+-				inert={ ! isInfiniteScroll && isLoading ? 'true' : undefined }
++				inert={ ! isInfiniteScroll && !! isLoading }
+ 			>
+ 				<colgroup>
+ 					{ hasBulkActions && (

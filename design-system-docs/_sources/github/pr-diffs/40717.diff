@@ -1,0 +1,32 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2d132c096efc8c..7ef9cb07de4a32 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `InputControl`: Add `__next36pxDefaultSize` flag for larger default size ([#40622](https://github.com/WordPress/gutenberg/pull/40622)).
+ -   `UnitControl`: Add `__next36pxDefaultSize` flag for larger default size ([#40627](https://github.com/WordPress/gutenberg/pull/40627)).
++-   `ToggleControlGroup`: Switch to internal `Icon` component for dashicon support ([40717](https://github.com/WordPress/gutenberg/pull/40717)).
+ 
+ ## 19.9.0 (2022-04-21)
+ 
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
+index 1fb3d7f42f6345..b39af225827b5a 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
+@@ -1,14 +1,10 @@
+-/**
+- * WordPress dependencies
+- */
+-import { Icon } from '@wordpress/icons';
+-
+ /**
+  * Internal dependencies
+  */
+ import type { WordPressComponentProps } from '../../ui/context';
+ import type { ToggleGroupControlOptionIconProps } from '../types';
+ import { ToggleGroupControlOptionBase } from '../toggle-group-control-option-base';
++import Icon from '../../icon';
+ 
+ export default function ToggleGroupControlOptionIcon(
+ 	props: WordPressComponentProps<

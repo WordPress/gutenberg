@@ -1,0 +1,32 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e659790312886a..c03e959a54be86 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   Refine `ExternalLink` to be same size as the text, to appear more as a glyph than an icon. ([#37859](https://github.com/WordPress/gutenberg/pull/37859))
++
+ ### Bug Fix
+ 
+ -   Add missing styles to the `BaseControl.VisualLabel` component. ([#37747](https://github.com/WordPress/gutenberg/pull/37747))
+diff --git a/packages/components/src/external-link/styles/external-link-styles.js b/packages/components/src/external-link/styles/external-link-styles.js
+index 06fc737aadffd3..6b64fd61c8bad4 100644
+--- a/packages/components/src/external-link/styles/external-link-styles.js
++++ b/packages/components/src/external-link/styles/external-link-styles.js
+@@ -9,9 +9,9 @@ import styled from '@emotion/styled';
+ import { Icon } from '@wordpress/icons';
+ 
+ export const StyledIcon = styled( Icon )`
+-	width: 1.4em;
+-	height: 1.4em;
+-	margin: -0.2em 0.1em 0;
++	width: 1em;
++	height: 1em;
++	margin: 0;
+ 	vertical-align: middle;
+ 	fill: currentColor;
+ `;

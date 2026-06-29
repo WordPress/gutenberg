@@ -1,0 +1,123 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 00204111a1efd6..5dbe6f7c21853e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -60,6 +60,7 @@
+ ### Bug Fixes
+ 
+ -   `TimePicker`: use ToggleGroupControl for AM/PM toggle ([#64800](https://github.com/WordPress/gutenberg/pull/64800)).
++-   `Tabs`: Fix indicator misalignment when the browser width changes in RTL languages ([#64965](https://github.com/WordPress/gutenberg/pull/64965)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/tabs/styles.ts b/packages/components/src/tabs/styles.ts
+index fcdb43512d82f9..6b1997519f5b6b 100644
+--- a/packages/components/src/tabs/styles.ts
++++ b/packages/components/src/tabs/styles.ts
+@@ -24,7 +24,7 @@ export const TabListWrapper = styled.div`
+ 
+ 	@media not ( prefers-reduced-motion: reduce ) {
+ 		&.is-animation-enabled::after {
+-			transition-property: left, top, width, height;
++			transition-property: inset-inline-start, top, width, height;
+ 			transition-duration: 0.2s;
+ 			transition-timing-function: ease-out;
+ 		}
+@@ -40,7 +40,7 @@ export const TabListWrapper = styled.div`
+ 	}
+ 	&:not( [aria-orientation='vertical'] )::after {
+ 		bottom: 0;
+-		left: var( --indicator-left );
++		inset-inline-start: var( --indicator-inset-inline-start );
+ 		width: var( --indicator-width );
+ 		height: 0;
+ 		border-bottom: var( --wp-admin-border-width-focus ) solid
+diff --git a/packages/components/src/tabs/tablist.tsx b/packages/components/src/tabs/tablist.tsx
+index 80ed9b4c5bea2f..e8bc474016ca0d 100644
+--- a/packages/components/src/tabs/tablist.tsx
++++ b/packages/components/src/tabs/tablist.tsx
+@@ -9,6 +9,7 @@ import { useStoreState } from '@ariakit/react';
+  */
+ import warning from '@wordpress/warning';
+ import { forwardRef, useState } from '@wordpress/element';
++import { isRTL } from '@wordpress/i18n';
+ 
+ /**
+  * Internal dependencies
+@@ -78,7 +79,9 @@ export const TabList = forwardRef<
+ 			onBlur={ onBlur }
+ 			{ ...otherProps }
+ 			style={ {
+-				'--indicator-left': `${ indicatorPosition.left }px`,
++				'--indicator-inset-inline-start': `${
++					isRTL() ? indicatorPosition.right : indicatorPosition.left
++				}px`,
+ 				'--indicator-top': `${ indicatorPosition.top }px`,
+ 				'--indicator-width': `${ indicatorPosition.width }px`,
+ 				'--indicator-height': `${ indicatorPosition.height }px`,
+diff --git a/packages/components/src/utils/element-rect.ts b/packages/components/src/utils/element-rect.ts
+index 9f6eb120b32fc5..a05472e38cf688 100644
+--- a/packages/components/src/utils/element-rect.ts
++++ b/packages/components/src/utils/element-rect.ts
+@@ -125,6 +125,11 @@ export type ElementOffsetRect = {
+ 	 * the element.
+ 	 */
+ 	left: number;
++	/**
++	 * The distance from the right edge of the offset parent to the right edge of
++	 * the element.
++	 */
++	right: number;
+ 	/**
+ 	 * The distance from the top edge of the offset parent to the top edge of
+ 	 * the element.
+@@ -145,6 +150,7 @@ export type ElementOffsetRect = {
+  */
+ export const NULL_ELEMENT_OFFSET_RECT = {
+ 	left: 0,
++	right: 0,
+ 	top: 0,
+ 	width: 0,
+ 	height: 0,
+@@ -163,17 +169,31 @@ export const NULL_ELEMENT_OFFSET_RECT = {
+ export function getElementOffsetRect(
+ 	element: HTMLElement
+ ): ElementOffsetRect {
++	// This is a workaround to obtain these values with a sub-pixel precision,
++	// since `offsetWidth` and `offsetHeight` are rounded to the nearest pixel.
++	const width = parseFloat( getComputedStyle( element ).width );
++	const height = parseFloat( getComputedStyle( element ).height );
++	const parentElementWidth = element?.parentElement
++		? parseFloat( getComputedStyle( element.parentElement ).width )
++		: 0;
++
++	// The adjustments mentioned in the documentation above are necessary
++	// because `offsetLeft` and `offsetTop` are rounded to the nearest pixel,
++	// which can result in a position mismatch that causes unwanted overflow.
++	// For context, see: https://github.com/WordPress/gutenberg/pull/61979
++	const left = Math.max( element.offsetLeft - 1, 0 );
++	const top = Math.max( element.offsetTop - 1, 0 );
++	const right = Math.max(
++		Math.round( parentElementWidth - width ) - element.offsetLeft - 1,
++		0
++	);
++
+ 	return {
+-		// The adjustments mentioned in the documentation above are necessary
+-		// because `offsetLeft` and `offsetTop` are rounded to the nearest pixel,
+-		// which can result in a position mismatch that causes unwanted overflow.
+-		// For context, see: https://github.com/WordPress/gutenberg/pull/61979
+-		left: Math.max( element.offsetLeft - 1, 0 ),
+-		top: Math.max( element.offsetTop - 1, 0 ),
+-		// This is a workaround to obtain these values with a sub-pixel precision,
+-		// since `offsetWidth` and `offsetHeight` are rounded to the nearest pixel.
+-		width: parseFloat( getComputedStyle( element ).width ),
+-		height: parseFloat( getComputedStyle( element ).height ),
++		left,
++		top,
++		right,
++		width,
++		height,
+ 	};
+ }
+ 

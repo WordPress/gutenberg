@@ -1,0 +1,2206 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2f211094a4a378..d905b8c0e6946b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `ColorPalette`, `BorderControl`: Don't hyphenate hex value in `aria-label` ([#52932](https://github.com/WordPress/gutenberg/pull/52932)).
+ 
++### Internal
++
++-   `ControlGroup`, `FormGroup`, `ControlLabel`, `Spinner`: Remove unused `ui/` components from the codebase ([#52953](https://github.com/WordPress/gutenberg/pull/52953)).
++
+ ## 25.4.0 (2023-07-20)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/ui/README.md b/packages/components/src/ui/README.md
+index 4fdf6dd220f563..6099fe0032851f 100644
+--- a/packages/components/src/ui/README.md
++++ b/packages/components/src/ui/README.md
+@@ -1,22 +1,5 @@
+-# (Next) Component System
++# TODO
+ 
+-This directory contains the code for next Component System.
++We want to get rid of this folder. Don't add anything new here.
+ 
+-More information can be found in the original GitHub issue:
+-https://github.com/WordPress/gutenberg/issues/27484
+-
+-## Usage
+-
+-(This is still very much a work in progress)
+-
+-```jsx
+-import { Text, View } from '@wordpress/components/ui';
+-
+-function Example() {
+-	return (
+-		<View>
+-			<Text>Code is Poetry</Text>
+-		</View>
+-	);
+-}
+-```
++What is left of this folder should either be deleted (if unused elsewhere), or be moved into the root `packages/components/src` and `packages/components/src/utils` folders. 
+\ No newline at end of file
+diff --git a/packages/components/src/ui/control-group/README.md b/packages/components/src/ui/control-group/README.md
+deleted file mode 100644
+index 122a6a612a32c1..00000000000000
+--- a/packages/components/src/ui/control-group/README.md
++++ /dev/null
+@@ -1,23 +0,0 @@
+-# ControlGroup
+-
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+-`ControlGroup` is a layout-based component for rendering a group of control-based components, such as `Button`, `Select` or `TextInput`. Control components that render within `ControlGroup` automatically have their borders offset and border-radii rounded.
+-
+-## Usage
+-
+-```jsx
+-import { Button, ControlGroup, Select, TextInput } from `@wordpress/components/ui`
+-
+-function Example() {
+-    return (
+-        <ControlGroup templateColumns="auto 1fr auto">
+-            <Select />
+-            <TextInput placeholder="First name" />
+-            <Button variant="primary" />
+-        </ControlGroup>
+-    );
+-}
+-```
+diff --git a/packages/components/src/ui/control-group/component.js b/packages/components/src/ui/control-group/component.js
+deleted file mode 100644
+index b034f52a0c82ab..00000000000000
+--- a/packages/components/src/ui/control-group/component.js
++++ /dev/null
+@@ -1,75 +0,0 @@
+-/**
+- * External dependencies
+- */
+-
+-/**
+- * Internal dependencies
+- */
+-import { Flex } from '../../flex';
+-import { Grid } from '../../grid';
+-import { useControlGroup } from './hook';
+-import { contextConnect } from '../context';
+-
+-/**
+- * @param {import('../context').WordPressComponentProps<import('./types').Props, 'div'>} props
+- * @param {import('react').ForwardedRef<any>}                                            forwardedRef
+- */
+-function ControlGroup( props, forwardedRef ) {
+-	const {
+-		children,
+-		direction = 'row',
+-		templateColumns,
+-		...otherProps
+-	} = useControlGroup( props );
+-
+-	const isGrid = !! templateColumns;
+-
+-	if ( isGrid ) {
+-		return (
+-			<Grid
+-				gap={ 0 }
+-				templateColumns={ templateColumns }
+-				{ ...otherProps }
+-				ref={ forwardedRef }
+-			>
+-				{ children }
+-			</Grid>
+-		);
+-	}
+-
+-	return (
+-		<Flex
+-			direction={ direction }
+-			gap={ `-1px` }
+-			{ ...otherProps }
+-			ref={ forwardedRef }
+-		>
+-			{ children }
+-		</Flex>
+-	);
+-}
+-
+-/**
+- * `ControlGroup` is a layout-based component for rendering a group of
+- * control-based components, such as `Button`, `Select` or `TextInput`.
+- * Control components that render within `ControlGroup` automatically
+- * have their borders offset and border-radii rounded.
+- *
+- * @example
+- * ```jsx
+- * import { Button, ControlGroup, Select, TextInput } from `@wordpress/components/ui`;
+- *
+- * function Example() {
+- *   return (
+- *     <ControlGroup templateColumns="auto 1fr auto">
+- *       <Select />
+- *       <TextInput placeholder="First name" />
+- *       <Button variant="primary" />
+- *     </ControlGroup>
+- *   );
+- * }
+- * ```
+- */
+-const ConnectedControlGroup = contextConnect( ControlGroup, 'ControlGroup' );
+-
+-export default ConnectedControlGroup;
+diff --git a/packages/components/src/ui/control-group/context.js b/packages/components/src/ui/control-group/context.js
+deleted file mode 100644
+index 99d9c753222823..00000000000000
+--- a/packages/components/src/ui/control-group/context.js
++++ /dev/null
+@@ -1,8 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { createContext, useContext } from '@wordpress/element';
+-
+-/** @type {import('react').Context<import('./types').ControlGroupContext>} */
+-export const ControlGroupContext = createContext( {} );
+-export const useControlGroupContext = () => useContext( ControlGroupContext );
+diff --git a/packages/components/src/ui/control-group/hook.js b/packages/components/src/ui/control-group/hook.js
+deleted file mode 100644
+index bc1f5d34c08b37..00000000000000
+--- a/packages/components/src/ui/control-group/hook.js
++++ /dev/null
+@@ -1,93 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { getValidChildren } from '../utils/get-valid-children';
+-import { useContextSystem } from '../context';
+-import { ControlGroupContext } from './context';
+-import * as styles from './styles';
+-import { useCx } from '../../utils/hooks/use-cx';
+-
+-/**
+- * @param {import('../context').WordPressComponentProps<import('./types').Props, 'div'>} props
+- */
+-export function useControlGroup( props ) {
+-	const {
+-		children,
+-		className,
+-		direction = 'row',
+-		templateColumns,
+-		...otherProps
+-	} = useContextSystem( props, 'ControlGroup' );
+-
+-	const validChildren = getValidChildren( children );
+-	const isVertical = direction === 'column';
+-	const isGrid = !! templateColumns;
+-
+-	const cx = useCx();
+-
+-	const classes = cx(
+-		styles.itemFocus,
+-		isGrid && styles.itemGrid,
+-		className
+-	);
+-
+-	const clonedChildren =
+-		validChildren &&
+-		validChildren.map( ( child, index ) => {
+-			const isFirst = index === 0;
+-			const isLast = index + 1 === validChildren.length;
+-			const isOnly = isFirst && isLast;
+-			const isMiddle = ! isFirst && ! isLast;
+-
+-			// @ts-ignore
+-			const _key = child?.key || index;
+-
+-			/** @type {import('@emotion/react').SerializedStyles | undefined} */
+-			let first;
+-			if ( isFirst ) {
+-				if ( isVertical ) {
+-					first = styles.firstRow;
+-				} else {
+-					first = styles.first;
+-				}
+-			}
+-
+-			/** @type {import('@emotion/react').SerializedStyles | undefined} */
+-			let last;
+-			if ( isLast ) {
+-				if ( isVertical ) {
+-					last = styles.lastRow;
+-				} else {
+-					last = styles.last;
+-				}
+-			}
+-
+-			const contextStyles = cx( first, isMiddle && styles.middle, last );
+-
+-			const contextProps = {
+-				isFirst,
+-				isLast,
+-				isMiddle,
+-				isOnly,
+-				isVertical,
+-				styles: contextStyles,
+-			};
+-
+-			return (
+-				<ControlGroupContext.Provider
+-					key={ _key }
+-					value={ contextProps }
+-				>
+-					{ child }
+-				</ControlGroupContext.Provider>
+-			);
+-		} );
+-
+-	return {
+-		...otherProps,
+-		children: clonedChildren,
+-		className: classes,
+-		direction,
+-		templateColumns,
+-	};
+-}
+diff --git a/packages/components/src/ui/control-group/index.js b/packages/components/src/ui/control-group/index.js
+deleted file mode 100644
+index bb8a730cdacd82..00000000000000
+--- a/packages/components/src/ui/control-group/index.js
++++ /dev/null
+@@ -1,3 +0,0 @@
+-export { default as ControlGroup } from './component';
+-export * from './context';
+-export * from './hook';
+diff --git a/packages/components/src/ui/control-group/styles.js b/packages/components/src/ui/control-group/styles.js
+deleted file mode 100644
+index 24f13a86ac0a2d..00000000000000
+--- a/packages/components/src/ui/control-group/styles.js
++++ /dev/null
+@@ -1,43 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { css } from '@emotion/react';
+-
+-export const first = css`
+-	border-bottom-right-radius: 0;
+-	border-top-right-radius: 0;
+-`;
+-
+-export const middle = css`
+-	border-radius: 0;
+-`;
+-
+-export const last = css`
+-	border-bottom-left-radius: 0;
+-	border-top-left-radius: 0;
+-`;
+-
+-export const firstRow = css`
+-	border-bottom-left-radius: 0;
+-	border-bottom-right-radius: 0;
+-`;
+-
+-export const lastRow = css`
+-	border-top-left-radius: 0;
+-	border-top-right-radius: 0;
+-`;
+-
+-export const itemFocus = css`
+-	> * {
+-		&:focus-within {
+-			z-index: 1;
+-		}
+-	}
+-`;
+-
+-export const itemGrid = css`
+-	> * + *:not( marquee ) {
+-		margin-left: -1px;
+-		width: calc( 100% + 1px );
+-	}
+-`;
+diff --git a/packages/components/src/ui/control-group/test/__snapshots__/index.js.snap b/packages/components/src/ui/control-group/test/__snapshots__/index.js.snap
+deleted file mode 100644
+index d9f26aa5af8d20..00000000000000
+--- a/packages/components/src/ui/control-group/test/__snapshots__/index.js.snap
++++ /dev/null
+@@ -1,51 +0,0 @@
+-// Jest Snapshot v1, https://goo.gl/fbAQLP
+-
+-exports[`props should render correctly 1`] = `
+-.emotion-0 {
+-  display: -webkit-box;
+-  display: -webkit-flex;
+-  display: -ms-flexbox;
+-  display: flex;
+-  -webkit-align-items: center;
+-  -webkit-box-align: center;
+-  -ms-flex-align: center;
+-  align-items: center;
+-  -webkit-flex-direction: row;
+-  -ms-flex-direction: row;
+-  flex-direction: row;
+-  gap: -1px;
+-  -webkit-box-pack: justify;
+-  -webkit-justify-content: space-between;
+-  justify-content: space-between;
+-  width: 100%;
+-}
+-
+-.emotion-0>* {
+-  min-width: 0;
+-}
+-
+-.emotion-0>*:focus-within {
+-  z-index: 1;
+-}
+-
+-<div>
+-  <div
+-    class="components-flex components-control-group emotion-0 emotion-1"
+-    data-wp-c16t="true"
+-    data-wp-component="ControlGroup"
+-  >
+-    <button
+-      class="components-button"
+-      type="button"
+-    >
+-      Code is Poetry
+-    </button>
+-    <button
+-      class="components-button"
+-      type="button"
+-    >
+-      WordPress.org
+-    </button>
+-  </div>
+-</div>
+-`;
+diff --git a/packages/components/src/ui/control-group/test/index.js b/packages/components/src/ui/control-group/test/index.js
+deleted file mode 100644
+index 0587c329b40569..00000000000000
+--- a/packages/components/src/ui/control-group/test/index.js
++++ /dev/null
+@@ -1,22 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { render } from '@testing-library/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import { ControlGroup } from '..';
+-import Button from '../../../button';
+-
+-describe( 'props', () => {
+-	test( 'should render correctly', () => {
+-		const { container } = render(
+-			<ControlGroup>
+-				<Button>Code is Poetry</Button>
+-				<Button>WordPress.org</Button>
+-			</ControlGroup>
+-		);
+-		expect( container ).toMatchSnapshot();
+-	} );
+-} );
+diff --git a/packages/components/src/ui/control-group/types.ts b/packages/components/src/ui/control-group/types.ts
+deleted file mode 100644
+index c7211eb35283a5..00000000000000
+--- a/packages/components/src/ui/control-group/types.ts
++++ /dev/null
+@@ -1,29 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import type { CSSProperties } from 'react';
+-
+-/**
+- * Internal dependencies
+- */
+-import type { FlexProps } from '../../flex/types';
+-
+-export type ControlGroupContext = {
+-	isFirst?: boolean;
+-	isLast?: boolean;
+-	isMiddle?: boolean;
+-	isOnly?: boolean;
+-	isVertical?: boolean;
+-	styles?: string;
+-};
+-
+-export type Props = Pick< FlexProps, 'direction' > & {
+-	/**
+-	 * Adjust the layout (width) of content using CSS grid (`grid-template-columns`).
+-	 */
+-	templateColumns?: CSSProperties[ 'gridTemplateColumns' ];
+-	/**
+-	 * The children elements.
+-	 */
+-	children: React.ReactNode;
+-};
+diff --git a/packages/components/src/ui/control-label/README.md b/packages/components/src/ui/control-label/README.md
+deleted file mode 100644
+index d4e31e034dfd80..00000000000000
+--- a/packages/components/src/ui/control-label/README.md
++++ /dev/null
+@@ -1,22 +0,0 @@
+-# ControlLabel
+-
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+-`ControlLabel` is a form component that works with `FormGroup` to provide a label for form elements (e.g. `Switch` or `TextInput`).
+-
+-## Usage
+-
+-```jsx
+-import { ControlLabel, FormGroup, TextInput } from '@wordpress/components/ui';
+-
+-function Example() {
+-	return (
+-		<FormGroup>
+-			<ControlLabel>First Name</ControlLabel>
+-			<TextInput />
+-		</FormGroup>
+-	);
+-}
+-```
+diff --git a/packages/components/src/ui/control-label/component.js b/packages/components/src/ui/control-label/component.js
+deleted file mode 100644
+index 62a3e8a790c68b..00000000000000
+--- a/packages/components/src/ui/control-label/component.js
++++ /dev/null
+@@ -1,37 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { contextConnect } from '../context';
+-import { View } from '../../view';
+-import { useControlLabel } from './hook';
+-
+-/**
+- * @param {import('../context').WordPressComponentProps<import('./types').Props, 'label', false>} props
+- * @param {import('react').ForwardedRef<any>}                                                     forwardedRef
+- */
+-function ControlLabel( props, forwardedRef ) {
+-	const controlLabelProps = useControlLabel( props );
+-
+-	return <View as="label" { ...controlLabelProps } ref={ forwardedRef } />;
+-}
+-
+-/**
+- * `ControlLabel` is a form component that works with `FormGroup` to provide a
+- * label for form elements (e.g. `Switch` or `TextInput`).
+- *
+- * ```jsx
+- * import { ControlLabel, FormGroup, TextInput } from '@wordpress/components/ui';
+- *
+- * function Example() {
+- * 	return (
+- * 		<FormGroup>
+- * 			<ControlLabel>First Name</ControlLabel>
+- * 			<TextInput />
+- * 		</FormGroup>
+- * 	);
+- * }
+- * ```
+- */
+-const ConnectedControlLabel = contextConnect( ControlLabel, 'ControlLabel' );
+-
+-export default ConnectedControlLabel;
+diff --git a/packages/components/src/ui/control-label/hook.js b/packages/components/src/ui/control-label/hook.js
+deleted file mode 100644
+index dcdd5bb7e7effc..00000000000000
+--- a/packages/components/src/ui/control-label/hook.js
++++ /dev/null
+@@ -1,43 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { useContextSystem } from '../context';
+-import { useFormGroupContextId } from '../form-group';
+-import { useText } from '../../text';
+-import * as styles from './styles';
+-import { useCx } from '../../utils/hooks/use-cx';
+-
+-/**
+- * @param {import('../context').WordPressComponentProps<import('./types').Props, 'label', false>} props
+- */
+-export function useControlLabel( props ) {
+-	const {
+-		htmlFor: htmlForProp,
+-		isBlock = false,
+-		size = 'medium',
+-		truncate = true,
+-		...otherProps
+-	} = useContextSystem( props, 'ControlLabel' );
+-
+-	const { className, ...textProps } = useText( {
+-		...otherProps,
+-		isBlock,
+-		truncate,
+-	} );
+-
+-	const cx = useCx();
+-
+-	const htmlFor = useFormGroupContextId( htmlForProp );
+-	const classes = cx(
+-		styles.ControlLabel,
+-		styles[ /** @type {'small' | 'medium' | 'large'} */ ( size ) ],
+-		className,
+-		isBlock ? styles.block : styles.inline
+-	);
+-
+-	return {
+-		...textProps,
+-		className: classes,
+-		htmlFor,
+-	};
+-}
+diff --git a/packages/components/src/ui/control-label/index.js b/packages/components/src/ui/control-label/index.js
+deleted file mode 100644
+index c73e0027014e24..00000000000000
+--- a/packages/components/src/ui/control-label/index.js
++++ /dev/null
+@@ -1,2 +0,0 @@
+-export { default as ControlLabel } from './component';
+-export * from './hook';
+diff --git a/packages/components/src/ui/control-label/stories/index.js b/packages/components/src/ui/control-label/stories/index.js
+deleted file mode 100644
+index e22d46cbf70198..00000000000000
+--- a/packages/components/src/ui/control-label/stories/index.js
++++ /dev/null
+@@ -1,13 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { ControlLabel } from '../index';
+-
+-export default {
+-	component: ControlLabel,
+-	title: 'Components (Experimental)/ControlLabel',
+-};
+-
+-export const _default = () => {
+-	return <ControlLabel>Label</ControlLabel>;
+-};
+diff --git a/packages/components/src/ui/control-label/styles.js b/packages/components/src/ui/control-label/styles.js
+deleted file mode 100644
+index 8f96e91d0ef3fb..00000000000000
+--- a/packages/components/src/ui/control-label/styles.js
++++ /dev/null
+@@ -1,65 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { css } from '@emotion/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import CONFIG from '../../utils/config-values';
+-import { getHighDpi } from '../utils/get-high-dpi';
+-
+-const lineHeight = `calc(${ CONFIG.fontSize } * 1.2)`;
+-
+-/**
+- * @param {keyof CONFIG} size The padding size.
+- */
+-function getPadding( size ) {
+-	return `calc((${ CONFIG[ size ] } - ${ lineHeight }) / 2)`;
+-}
+-
+-const highDpiAdjust = getHighDpi`
+-	> * {
+-		position: relative;
+-		top: 0.5px;
+-	}
+-`;
+-
+-export const ControlLabel = css`
+-	display: inline-block;
+-	line-height: ${ lineHeight };
+-	margin: 0;
+-	max-width: 100%;
+-	padding-bottom: ${ getPadding( 'controlHeight' ) };
+-	padding-top: ${ getPadding( 'controlHeight' ) };
+-
+-	&:active {
+-		user-select: none;
+-	}
+-
+-	${ highDpiAdjust };
+-`;
+-
+-export const large = css`
+-	padding-bottom: ${ getPadding( 'controlHeightLarge' ) };
+-	padding-top: ${ getPadding( 'controlHeightLarge' ) };
+-`;
+-
+-export const medium = css`
+-	padding-bottom: ${ getPadding( 'controlHeight' ) };
+-	padding-top: ${ getPadding( 'controlHeight' ) };
+-`;
+-
+-export const small = css`
+-	padding-bottom: ${ getPadding( 'controlHeightSmall' ) };
+-	padding-top: ${ getPadding( 'controlHeightSmall' ) };
+-`;
+-
+-export const inline = css`
+-	display: inline-block;
+-	vertical-align: middle;
+-`;
+-
+-export const block = css`
+-	display: block;
+-`;
+diff --git a/packages/components/src/ui/control-label/test/__snapshots__/index.js.snap b/packages/components/src/ui/control-label/test/__snapshots__/index.js.snap
+deleted file mode 100644
+index ffe2d42932d002..00000000000000
+--- a/packages/components/src/ui/control-label/test/__snapshots__/index.js.snap
++++ /dev/null
+@@ -1,141 +0,0 @@
+-// Jest Snapshot v1, https://goo.gl/fbAQLP
+-
+-exports[`props should render correctly 1`] = `
+-.emotion-0 {
+-  display: inline-block;
+-  line-height: calc(13px * 1.2);
+-  margin: 0;
+-  max-width: 100%;
+-  padding-bottom: calc((36px - calc(13px * 1.2)) / 2);
+-  padding-top: calc((36px - calc(13px * 1.2)) / 2);
+-  padding-bottom: calc((36px - calc(13px * 1.2)) / 2);
+-  padding-top: calc((36px - calc(13px * 1.2)) / 2);
+-  display: block;
+-  overflow: hidden;
+-  text-overflow: ellipsis;
+-  white-space: nowrap;
+-  color: #1e1e1e;
+-  line-height: 1.2;
+-  margin: 0;
+-  font-size: calc((13 / 13) * 13px);
+-  font-weight: normal;
+-  display: inline-block;
+-  vertical-align: middle;
+-}
+-
+-.emotion-0:active {
+-  -webkit-user-select: none;
+-  -moz-user-select: none;
+-  -ms-user-select: none;
+-  user-select: none;
+-}
+-
+-@media ( -webkit-min-device-pixel-ratio: 1.25 ), ( min-resolution: 120dpi ) {
+-  .emotion-0>* {
+-    position: relative;
+-    top: 0.5px;
+-  }
+-}
+-
+-<div>
+-  <label
+-    class="components-truncate components-text components-control-label emotion-0 emotion-1"
+-    data-wp-c16t="true"
+-    data-wp-component="ControlLabel"
+-  >
+-    Label
+-  </label>
+-</div>
+-`;
+-
+-exports[`props should render no truncate 1`] = `
+-.emotion-0 {
+-  display: inline-block;
+-  line-height: calc(13px * 1.2);
+-  margin: 0;
+-  max-width: 100%;
+-  padding-bottom: calc((36px - calc(13px * 1.2)) / 2);
+-  padding-top: calc((36px - calc(13px * 1.2)) / 2);
+-  padding-bottom: calc((36px - calc(13px * 1.2)) / 2);
+-  padding-top: calc((36px - calc(13px * 1.2)) / 2);
+-  color: #1e1e1e;
+-  line-height: 1.2;
+-  margin: 0;
+-  font-size: calc((13 / 13) * 13px);
+-  font-weight: normal;
+-  display: inline-block;
+-  vertical-align: middle;
+-}
+-
+-.emotion-0:active {
+-  -webkit-user-select: none;
+-  -moz-user-select: none;
+-  -ms-user-select: none;
+-  user-select: none;
+-}
+-
+-@media ( -webkit-min-device-pixel-ratio: 1.25 ), ( min-resolution: 120dpi ) {
+-  .emotion-0>* {
+-    position: relative;
+-    top: 0.5px;
+-  }
+-}
+-
+-<div>
+-  <label
+-    class="components-truncate components-text components-control-label emotion-0 emotion-1"
+-    data-wp-c16t="true"
+-    data-wp-component="ControlLabel"
+-  >
+-    Label
+-  </label>
+-</div>
+-`;
+-
+-exports[`props should render size 1`] = `
+-.emotion-0 {
+-  display: inline-block;
+-  line-height: calc(13px * 1.2);
+-  margin: 0;
+-  max-width: 100%;
+-  padding-bottom: calc((36px - calc(13px * 1.2)) / 2);
+-  padding-top: calc((36px - calc(13px * 1.2)) / 2);
+-  padding-bottom: calc((calc( 36px * 0.8 ) - calc(13px * 1.2)) / 2);
+-  padding-top: calc((calc( 36px * 0.8 ) - calc(13px * 1.2)) / 2);
+-  display: block;
+-  overflow: hidden;
+-  text-overflow: ellipsis;
+-  white-space: nowrap;
+-  color: #1e1e1e;
+-  line-height: 1.2;
+-  margin: 0;
+-  font-size: calc((13 / 13) * 13px);
+-  font-weight: normal;
+-  display: inline-block;
+-  vertical-align: middle;
+-}
+-
+-.emotion-0:active {
+-  -webkit-user-select: none;
+-  -moz-user-select: none;
+-  -ms-user-select: none;
+-  user-select: none;
+-}
+-
+-@media ( -webkit-min-device-pixel-ratio: 1.25 ), ( min-resolution: 120dpi ) {
+-  .emotion-0>* {
+-    position: relative;
+-    top: 0.5px;
+-  }
+-}
+-
+-<div>
+-  <label
+-    class="components-truncate components-text components-control-label emotion-0 emotion-1"
+-    data-wp-c16t="true"
+-    data-wp-component="ControlLabel"
+-  >
+-    Label
+-  </label>
+-</div>
+-`;
+diff --git a/packages/components/src/ui/control-label/test/index.js b/packages/components/src/ui/control-label/test/index.js
+deleted file mode 100644
+index 4443457a566f9d..00000000000000
+--- a/packages/components/src/ui/control-label/test/index.js
++++ /dev/null
+@@ -1,39 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { render, screen } from '@testing-library/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import { ControlLabel } from '../index';
+-
+-describe( 'props', () => {
+-	test( 'should render correctly', () => {
+-		const { container } = render( <ControlLabel>Label</ControlLabel> );
+-
+-		expect( container ).toMatchSnapshot();
+-	} );
+-
+-	test( 'should render htmlFor', () => {
+-		render( <ControlLabel htmlFor="Field">Label</ControlLabel> );
+-
+-		expect( screen.getByText( 'Label' ) ).toHaveAttribute( 'for', 'Field' );
+-	} );
+-
+-	test( 'should render size', () => {
+-		const { container } = render(
+-			<ControlLabel size="small">Label</ControlLabel>
+-		);
+-
+-		expect( container ).toMatchSnapshot();
+-	} );
+-
+-	test( 'should render no truncate', () => {
+-		const { container } = render(
+-			<ControlLabel truncate={ false }>Label</ControlLabel>
+-		);
+-
+-		expect( container ).toMatchSnapshot();
+-	} );
+-} );
+diff --git a/packages/components/src/ui/control-label/types.ts b/packages/components/src/ui/control-label/types.ts
+deleted file mode 100644
+index e76b7d3d895e73..00000000000000
+--- a/packages/components/src/ui/control-label/types.ts
++++ /dev/null
+@@ -1,9 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import type { Props as TextProps } from '../../text/types';
+-
+-export type Props = TextProps & {
+-	isBlock?: boolean;
+-	size?: 'large' | 'medium' | 'small';
+-};
+diff --git a/packages/components/src/ui/form-group/README.md b/packages/components/src/ui/form-group/README.md
+deleted file mode 100644
+index fec4316caf3553..00000000000000
+--- a/packages/components/src/ui/form-group/README.md
++++ /dev/null
+@@ -1,113 +0,0 @@
+-# FormGroup
+-
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+-`FormGroup` is a form component that groups a label with a form element (e.g. `Switch` or `TextInput`).
+-
+-## Usage
+-
+-```jsx
+-import { FormGroup, TextInput } from '@wordpress/components/ui';
+-
+-function Example() {
+-	return (
+-		<FormGroup label="First name">
+-			<TextInput />
+-		</FormGroup>
+-	);
+-}
+-```
+-
+-## Props
+-
+-##### align
+-
+-**Type**: `CSS['alignItems']`
+-
+-Adjusts the block alignment of children.
+-
+-##### alignLabel
+-
+-**Type**: `Pick<TextProps, "align">`
+-
+-Aligns the label within `FormGroup`.
+-
+-##### alignment
+-
+-**Type**: `string`
+-
+-Adjusts the horizontal and vertical alignment of children.
+-
+-##### columns
+-
+-**Type**: `number`,`(number`,`null)[]`
+-
+-Adjusts the number of columns of the `Grid`.
+-
+-##### gap
+-
+-**Type**: `number`
+-
+-Gap between each child.
+-
+-##### help
+-
+-**Type**: `React.ReactElement`
+-
+-Displays help content.
+-
+-##### horizontal
+-
+-**Type**: `boolean`
+-
+-Displays the label and form field horizontally.
+-
+-##### isInline
+-
+-**Type**: `boolean`
+-
+-Changes the CSS display from `grid` to `inline-grid`.
+-
+-##### justify
+-
+-**Type**: `CSS['justifyContent']`
+-
+-Adjusts the inline alignment of children.
+-
+-##### label
+-
+-**Type**: `string`
+-
+-Label of the form field.
+-
+-##### labelHidden
+-
+-**Type**: `boolean`
+-
+-Visually hides the label.
+-
+-##### rows
+-
+-**Type**: `number`,`(number`,`null)[]`
+-
+-Adjusts the number of rows of the `Grid`.
+-
+-##### templateColumns
+-
+-**Type**: `CSS['gridTemplateColumns']`
+-
+-Adjusts the CSS grid `template-columns`.
+-
+-##### templateRows
+-
+-**Type**: `CSS['gridTemplateRows']`
+-
+-Adjusts the CSS grid `template-rows`.
+-
+-##### truncate
+-
+-**Type**: `boolean`
+-
+-Truncates the label text content.
+diff --git a/packages/components/src/ui/form-group/form-group-content.js b/packages/components/src/ui/form-group/form-group-content.js
+deleted file mode 100644
+index a9bdc87ec1b175..00000000000000
+--- a/packages/components/src/ui/form-group/form-group-content.js
++++ /dev/null
+@@ -1,59 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useMemo, memo } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { VStack } from '../../v-stack';
+-import { FormGroupContext } from './form-group-context';
+-import FormGroupHelp from './form-group-help';
+-import FormGroupLabel from './form-group-label';
+-
+-/**
+- * @param {import('../context').WordPressComponentProps<import('./types').FormGroupContentProps, 'label', false>} props
+- */
+-function FormGroupContent( {
+-	alignLabel,
+-	children,
+-	help,
+-	horizontal = false,
+-	id,
+-	label,
+-	labelHidden,
+-	spacing = 2,
+-	truncate,
+-	...props
+-} ) {
+-	const contextProps = useMemo(
+-		() => ( { id, horizontal } ),
+-		[ id, horizontal ]
+-	);
+-
+-	const content = help ? (
+-		<VStack expanded={ false } spacing={ spacing }>
+-			{ children }
+-			<FormGroupHelp>{ help }</FormGroupHelp>
+-		</VStack>
+-	) : (
+-		children
+-	);
+-
+-	return (
+-		<FormGroupContext.Provider value={ contextProps }>
+-			<FormGroupLabel
+-				align={ alignLabel }
+-				id={ id }
+-				labelHidden={ labelHidden }
+-				truncate={ truncate }
+-				{ ...props }
+-			>
+-				{ label }
+-			</FormGroupLabel>
+-			{ content }
+-		</FormGroupContext.Provider>
+-	);
+-}
+-
+-export default memo( FormGroupContent );
+diff --git a/packages/components/src/ui/form-group/form-group-context.js b/packages/components/src/ui/form-group/form-group-context.js
+deleted file mode 100644
+index e98f93de5095ac..00000000000000
+--- a/packages/components/src/ui/form-group/form-group-context.js
++++ /dev/null
+@@ -1,31 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { createContext, useContext } from '@wordpress/element';
+-
+-/**
+- * @typedef {{ id?: import('react').ReactText, horizontal: boolean }} FormGroupContext
+- */
+-
+-/**
+- * @type {FormGroupContext}
+- */
+-const initialContext = {
+-	id: undefined,
+-	horizontal: true,
+-};
+-
+-/**
+- * @type {import('react').Context<FormGroupContext>}
+- */
+-export const FormGroupContext = createContext( initialContext );
+-export const useFormGroupContext = () => useContext( FormGroupContext );
+-
+-/**
+- * @param {string | undefined} id The preferred id for the form group element.
+- * @return {import('react').ReactText | undefined} The form group context id.
+- */
+-export const useFormGroupContextId = ( id ) => {
+-	const contextId = useFormGroupContext().id;
+-	return id || contextId;
+-};
+diff --git a/packages/components/src/ui/form-group/form-group-help.js b/packages/components/src/ui/form-group/form-group-help.js
+deleted file mode 100644
+index 456d5325b5cbb0..00000000000000
+--- a/packages/components/src/ui/form-group/form-group-help.js
++++ /dev/null
+@@ -1,32 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { memo } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { ContextSystemProvider } from '../context';
+-
+-const contextValue = { Text: { variant: 'muted' } };
+-
+-/**
+- * @typedef Props
+- * @property {import('react').ReactNode} [children] The content to display within `FormGroupHelp`.
+- */
+-
+-/**
+- *
+- * @param {Props} props
+- */
+-function FormGroupHelp( { children } ) {
+-	if ( ! children ) return null;
+-
+-	return (
+-		<ContextSystemProvider value={ contextValue }>
+-			{ children }
+-		</ContextSystemProvider>
+-	);
+-}
+-
+-export default memo( FormGroupHelp );
+diff --git a/packages/components/src/ui/form-group/form-group-label.js b/packages/components/src/ui/form-group/form-group-label.js
+deleted file mode 100644
+index 21a4a2dda5b129..00000000000000
+--- a/packages/components/src/ui/form-group/form-group-label.js
++++ /dev/null
+@@ -1,30 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { memo } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { ControlLabel } from '../control-label';
+-import { VisuallyHidden } from '../../visually-hidden';
+-
+-/**
+- * @param {import('../context').WordPressComponentProps<import('./types').FormGroupLabelProps, 'label', false>} props
+- * @return {JSX.Element | null} The form group's label.
+- */
+-function FormGroupLabel( { children, id, labelHidden = false, ...props } ) {
+-	if ( ! children ) return null;
+-
+-	if ( labelHidden ) {
+-		return (
+-			<VisuallyHidden as="label" htmlFor={ id?.toString() }>
+-				{ children }
+-			</VisuallyHidden>
+-		);
+-	}
+-
+-	return <ControlLabel { ...props }>{ children }</ControlLabel>;
+-}
+-
+-export default memo( FormGroupLabel );
+diff --git a/packages/components/src/ui/form-group/form-group-styles.js b/packages/components/src/ui/form-group/form-group-styles.js
+deleted file mode 100644
+index b675565d243562..00000000000000
+--- a/packages/components/src/ui/form-group/form-group-styles.js
++++ /dev/null
+@@ -1,8 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { css } from '@emotion/react';
+-
+-export const FormGroup = css`
+-	width: 100%;
+-`;
+diff --git a/packages/components/src/ui/form-group/form-group.js b/packages/components/src/ui/form-group/form-group.js
+deleted file mode 100644
+index 79881be46f7116..00000000000000
+--- a/packages/components/src/ui/form-group/form-group.js
++++ /dev/null
+@@ -1,54 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { contextConnect } from '../context';
+-import { Grid } from '../../grid';
+-import { View } from '../../view';
+-import FormGroupContent from './form-group-content';
+-import { useFormGroup } from './use-form-group';
+-
+-/**
+- * @param {import('../context').WordPressComponentProps<import('./types').FormGroupProps, 'div'>} props
+- * @param {import('react').ForwardedRef<any>}                                                     forwardedRef
+- */
+-function FormGroup( props, forwardedRef ) {
+-	const { contentProps, horizontal, ...otherProps } = useFormGroup( props );
+-
+-	if ( horizontal ) {
+-		return (
+-			<Grid
+-				templateColumns="minmax(0, 1fr) 2fr"
+-				{ ...otherProps }
+-				ref={ forwardedRef }
+-			>
+-				<FormGroupContent { ...contentProps } />
+-			</Grid>
+-		);
+-	}
+-
+-	return (
+-		<View { ...otherProps } ref={ forwardedRef }>
+-			<FormGroupContent { ...contentProps } />
+-		</View>
+-	);
+-}
+-
+-/**
+- * `FormGroup` is a form component that groups a label with a form element (e.g. `Switch` or `TextInput`).
+- *
+- * @example
+- * ```jsx
+- * import { FormGroup, TextInput } from `@wordpress/components/ui`;
+- *
+- * function Example() {
+- * 	return (
+- * 		<FormGroup label="First name">
+- * 			<TextInput />
+- * 		</FormGroup>
+- * 	);
+- * }
+- * ```
+- */
+-const ConnectedFormGroup = contextConnect( FormGroup, 'FormGroup' );
+-
+-export default ConnectedFormGroup;
+diff --git a/packages/components/src/ui/form-group/index.js b/packages/components/src/ui/form-group/index.js
+deleted file mode 100644
+index 64c29381529b28..00000000000000
+--- a/packages/components/src/ui/form-group/index.js
++++ /dev/null
+@@ -1,4 +0,0 @@
+-export { default as FormGroup } from './form-group';
+-
+-export * from './use-form-group';
+-export * from './form-group-context';
+diff --git a/packages/components/src/ui/form-group/stories/index.js b/packages/components/src/ui/form-group/stories/index.js
+deleted file mode 100644
+index 804a41ad265f26..00000000000000
+--- a/packages/components/src/ui/form-group/stories/index.js
++++ /dev/null
+@@ -1,44 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { FormGroup, useFormGroupContextId } from '../index';
+-import { Text } from '../../../text';
+-
+-// @todo: Refactor this after adding next TextInput component.
+-const TextInput = ( { id: idProp, ...props } ) => {
+-	const id = useFormGroupContextId( idProp );
+-	return (
+-		<div>
+-			<input type="text" id={ id } { ...props } />
+-		</div>
+-	);
+-};
+-
+-export default {
+-	component: FormGroup,
+-	title: 'Components (Experimental)/FormGroup',
+-};
+-
+-export const _default = () => {
+-	return (
+-		<FormGroup label="Form Group">
+-			<TextInput />
+-		</FormGroup>
+-	);
+-};
+-
+-export const _labelHidden = () => {
+-	return (
+-		<FormGroup label="Form Group" labelHidden>
+-			<TextInput />
+-		</FormGroup>
+-	);
+-};
+-
+-export const _help = () => {
+-	return (
+-		<FormGroup help={ <Text>Help Text</Text> } label="Form Group">
+-			<TextInput />
+-		</FormGroup>
+-	);
+-};
+diff --git a/packages/components/src/ui/form-group/test/__snapshots__/index.js.snap b/packages/components/src/ui/form-group/test/__snapshots__/index.js.snap
+deleted file mode 100644
+index b10a44c09d5d8b..00000000000000
+--- a/packages/components/src/ui/form-group/test/__snapshots__/index.js.snap
++++ /dev/null
+@@ -1,121 +0,0 @@
+-// Jest Snapshot v1, https://goo.gl/fbAQLP
+-
+-exports[`props should render alignLabel 1`] = `
+-.emotion-0 {
+-  width: 100%;
+-}
+-
+-.emotion-2 {
+-  display: inline-block;
+-  line-height: calc(13px * 1.2);
+-  margin: 0;
+-  max-width: 100%;
+-  padding-bottom: calc((36px - calc(13px * 1.2)) / 2);
+-  padding-top: calc((36px - calc(13px * 1.2)) / 2);
+-  padding-bottom: calc((36px - calc(13px * 1.2)) / 2);
+-  padding-top: calc((36px - calc(13px * 1.2)) / 2);
+-  color: #1e1e1e;
+-  line-height: 1.2;
+-  margin: 0;
+-  font-size: calc((13 / 13) * 13px);
+-  font-weight: normal;
+-  text-align: right;
+-  display: inline-block;
+-  vertical-align: middle;
+-}
+-
+-.emotion-2:active {
+-  -webkit-user-select: none;
+-  -moz-user-select: none;
+-  -ms-user-select: none;
+-  user-select: none;
+-}
+-
+-@media ( -webkit-min-device-pixel-ratio: 1.25 ), ( min-resolution: 120dpi ) {
+-  .emotion-2>* {
+-    position: relative;
+-    top: 0.5px;
+-  }
+-}
+-
+-<div>
+-  <div
+-    class="components-form-group emotion-0 emotion-1"
+-    data-wp-c16t="true"
+-    data-wp-component="FormGroup"
+-  >
+-    <label
+-      class="components-truncate components-text components-control-label emotion-2 emotion-1"
+-      data-wp-c16t="true"
+-      data-wp-component="ControlLabel"
+-      for="fname"
+-    >
+-      First name
+-    </label>
+-    <input
+-      id="fname"
+-      type="text"
+-    />
+-  </div>
+-</div>
+-`;
+-
+-exports[`props should render vertically 1`] = `
+-.emotion-0 {
+-  width: 100%;
+-}
+-
+-.emotion-2 {
+-  display: inline-block;
+-  line-height: calc(13px * 1.2);
+-  margin: 0;
+-  max-width: 100%;
+-  padding-bottom: calc((36px - calc(13px * 1.2)) / 2);
+-  padding-top: calc((36px - calc(13px * 1.2)) / 2);
+-  padding-bottom: calc((36px - calc(13px * 1.2)) / 2);
+-  padding-top: calc((36px - calc(13px * 1.2)) / 2);
+-  color: #1e1e1e;
+-  line-height: 1.2;
+-  margin: 0;
+-  font-size: calc((13 / 13) * 13px);
+-  font-weight: normal;
+-  text-align: left;
+-  display: inline-block;
+-  vertical-align: middle;
+-}
+-
+-.emotion-2:active {
+-  -webkit-user-select: none;
+-  -moz-user-select: none;
+-  -ms-user-select: none;
+-  user-select: none;
+-}
+-
+-@media ( -webkit-min-device-pixel-ratio: 1.25 ), ( min-resolution: 120dpi ) {
+-  .emotion-2>* {
+-    position: relative;
+-    top: 0.5px;
+-  }
+-}
+-
+-<div>
+-  <div
+-    class="components-form-group emotion-0 emotion-1"
+-    data-wp-c16t="true"
+-    data-wp-component="FormGroup"
+-  >
+-    <label
+-      class="components-truncate components-text components-control-label emotion-2 emotion-1"
+-      data-wp-c16t="true"
+-      data-wp-component="ControlLabel"
+-      for="fname"
+-    >
+-      First name
+-    </label>
+-    <input
+-      id="fname"
+-      type="text"
+-    />
+-  </div>
+-</div>
+-`;
+diff --git a/packages/components/src/ui/form-group/test/index.js b/packages/components/src/ui/form-group/test/index.js
+deleted file mode 100644
+index b6bfcd4d8f2110..00000000000000
+--- a/packages/components/src/ui/form-group/test/index.js
++++ /dev/null
+@@ -1,82 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { render, screen } from '@testing-library/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import { ControlLabel } from '../../control-label';
+-import { FormGroup, useFormGroupContextId } from '../index';
+-
+-// @todo: Refactor this after adding next TextInput component.
+-const TextInput = ( { id: idProp, ...props } ) => {
+-	const id = useFormGroupContextId( idProp );
+-	return <input type="text" id={ id } { ...props } />;
+-};
+-
+-// We're intentionally using a string literal for the ID to ensure
+-// the htmlFor and id properties of the label and inputs are bound correctly.
+-/* eslint-disable no-restricted-syntax */
+-describe( 'props', () => {
+-	test( 'should render correctly', () => {
+-		render(
+-			<FormGroup id="fname" label="First name">
+-				<TextInput />
+-			</FormGroup>
+-		);
+-
+-		expect(
+-			screen.getByRole( 'textbox', { name: 'First name' } )
+-		).toBeVisible();
+-	} );
+-
+-	test( 'should render label without prop correctly', () => {
+-		render(
+-			<FormGroup id="fname">
+-				<ControlLabel htmlFor="fname">First name</ControlLabel>
+-				<TextInput />
+-			</FormGroup>
+-		);
+-
+-		expect(
+-			screen.getByRole( 'textbox', { name: 'First name' } )
+-		).toBeVisible();
+-	} );
+-
+-	test( 'should render labelHidden', () => {
+-		render(
+-			<FormGroup labelHidden id="fname" label="First name">
+-				<TextInput />
+-			</FormGroup>
+-		);
+-
+-		expect(
+-			screen.getByRole( 'textbox', { name: 'First name' } )
+-		).toBeVisible();
+-		expect( screen.getByText( 'First name' ) ).toHaveClass(
+-			'components-visually-hidden'
+-		);
+-	} );
+-
+-	test( 'should render alignLabel', () => {
+-		const { container } = render(
+-			<FormGroup alignLabel="right" id="fname" label="First name">
+-				<TextInput />
+-			</FormGroup>
+-		);
+-
+-		expect( container ).toMatchSnapshot();
+-	} );
+-
+-	test( 'should render vertically', () => {
+-		const { container } = render(
+-			<FormGroup horizontal={ false } id="fname" label="First name">
+-				<TextInput />
+-			</FormGroup>
+-		);
+-
+-		expect( container ).toMatchSnapshot();
+-	} );
+-} );
+-/* eslint-enable no-restricted-syntax */
+diff --git a/packages/components/src/ui/form-group/types.ts b/packages/components/src/ui/form-group/types.ts
+deleted file mode 100644
+index 288acfdba7e171..00000000000000
+--- a/packages/components/src/ui/form-group/types.ts
++++ /dev/null
+@@ -1,32 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import type { CSSProperties, ReactNode, ReactText } from 'react';
+-
+-/**
+- * Internal dependencies
+- */
+-import type { Props as ControlLabelProps } from '../control-label/types';
+-import type { GridProps } from '../../grid/types';
+-
+-export type FormGroupLabelProps = ControlLabelProps & {
+-	labelHidden?: boolean;
+-	id?: ReactText;
+-};
+-
+-export type FormGroupContentProps = FormGroupLabelProps & {
+-	alignLabel?: CSSProperties[ 'textAlign' ];
+-	help?: ReactNode;
+-	horizontal?: boolean;
+-	label?: ReactNode;
+-	spacing?: CSSProperties[ 'width' ];
+-	truncate?: boolean;
+-};
+-
+-type Horizontal = GridProps & {
+-	horizontal: true;
+-};
+-
+-type Vertical = { horizontal: false };
+-
+-export type FormGroupProps = FormGroupContentProps & ( Horizontal | Vertical );
+diff --git a/packages/components/src/ui/form-group/use-form-group.js b/packages/components/src/ui/form-group/use-form-group.js
+deleted file mode 100644
+index eebc5ae3506398..00000000000000
+--- a/packages/components/src/ui/form-group/use-form-group.js
++++ /dev/null
+@@ -1,53 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useInstanceId } from '@wordpress/compose';
+-
+-/**
+- * Internal dependencies
+- */
+-import { useContextSystem } from '../context';
+-import * as styles from './form-group-styles';
+-import { useCx } from '../../utils/hooks/use-cx';
+-
+-/**
+- * @param {import('../context').WordPressComponentProps<import('./types').FormGroupProps, 'div'>} props
+- */
+-export function useFormGroup( props ) {
+-	const {
+-		alignLabel = 'left',
+-		children,
+-		className,
+-		help,
+-		horizontal = false,
+-		id: idProp,
+-		label,
+-		labelHidden = false,
+-		truncate = false,
+-		...otherProps
+-	} = useContextSystem( props, 'FormGroup' );
+-
+-	const id = useInstanceId( useFormGroup, 'form-group', idProp );
+-
+-	const cx = useCx();
+-
+-	const classes = cx( styles.FormGroup, className );
+-
+-	const contentProps = {
+-		alignLabel,
+-		children,
+-		help,
+-		id,
+-		horizontal,
+-		label,
+-		labelHidden,
+-		truncate,
+-	};
+-
+-	return {
+-		...otherProps,
+-		className: classes,
+-		contentProps,
+-		horizontal,
+-	};
+-}
+diff --git a/packages/components/src/ui/index.js b/packages/components/src/ui/index.js
+deleted file mode 100644
+index e8587d84b298ad..00000000000000
+--- a/packages/components/src/ui/index.js
++++ /dev/null
+@@ -1,5 +0,0 @@
+-export * from './control-group';
+-export * from './control-label';
+-export * from './form-group';
+-export * from './shortcut';
+-export * from './spinner';
+diff --git a/packages/components/src/ui/spinner/README.md b/packages/components/src/ui/spinner/README.md
+deleted file mode 100644
+index 5e25f9992d0c32..00000000000000
+--- a/packages/components/src/ui/spinner/README.md
++++ /dev/null
+@@ -1,31 +0,0 @@
+-# Spinner
+-
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+-`Spinner` is a component that notify users that their action is being processed.
+-
+-## Usage
+-
+-```jsx
+-import { Spinner } from '@wordpress/components/ui';
+-
+-function Example() {
+-	return <Spinner />;
+-}
+-```
+-
+-## Props
+-
+-##### color
+-
+-**Type**: `CSSProperties['color']`
+-
+-The color of the `Spinner`.
+-
+-##### size
+-
+-**Type**: `number`
+-
+-The size of the `Spinner`.
+diff --git a/packages/components/src/ui/spinner/component.js b/packages/components/src/ui/spinner/component.js
+deleted file mode 100644
+index d8da4fcf708231..00000000000000
+--- a/packages/components/src/ui/spinner/component.js
++++ /dev/null
+@@ -1,75 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { BarsView, BarsWrapperView, ContainerView } from './styles';
+-import { BASE_SIZE, WRAPPER_SIZE } from './utils';
+-import { contextConnect, useContextSystem } from '../context';
+-import { COLORS } from '../../utils/colors-values';
+-
+-/* eslint-disable jsdoc/valid-types */
+-/**
+- * @typedef Props
+- * @property {import('react').CSSProperties['color']} [color]   Color of `Spinner`.
+- * @property {number}                                 [size=16] Size of `Spinner`.
+- */
+-/* eslint-enable jsdoc/valid-types */
+-
+-/**
+- *
+- * @param {import('../context').WordPressComponentProps<Props, 'div'>} props
+- * @param {import('react').ForwardedRef<any>}                          forwardedRef
+- */
+-function Spinner( props, forwardedRef ) {
+-	const {
+-		color = COLORS.gray[ 900 ],
+-		size = BASE_SIZE,
+-		...otherProps
+-	} = useContextSystem( props, 'Spinner' );
+-	const ratio = size / BASE_SIZE;
+-	const scale = ( ratio * BASE_SIZE ) / WRAPPER_SIZE;
+-	const transform = `scale(${ scale })`;
+-
+-	const styles = { transform };
+-
+-	return (
+-		<ContainerView
+-			{ ...otherProps }
+-			aria-busy={ true }
+-			ref={ forwardedRef }
+-			style={ { height: size, width: size } }
+-		>
+-			<BarsWrapperView aria-hidden={ true } style={ styles }>
+-				<BarsView style={ { color } }>
+-					<div className="InnerBar1" />
+-					<div className="InnerBar2" />
+-					<div className="InnerBar3" />
+-					<div className="InnerBar4" />
+-					<div className="InnerBar5" />
+-					<div className="InnerBar6" />
+-					<div className="InnerBar7" />
+-					<div className="InnerBar8" />
+-					<div className="InnerBar9" />
+-					<div className="InnerBar10" />
+-					<div className="InnerBar11" />
+-					<div className="InnerBar12" />
+-				</BarsView>
+-			</BarsWrapperView>
+-		</ContainerView>
+-	);
+-}
+-
+-/**
+- * `Spinner` is a component that notify users that their action is being processed.
+- *
+- * @example
+- * ```jsx
+- * import { Spinner } from `@wordpress/components/ui`;
+- *
+- * function Example() {
+- * 	return (
+- * 		<Spinner />
+- * 	);
+- * }
+- * ```
+- */
+-export default contextConnect( Spinner, 'Spinner' );
+diff --git a/packages/components/src/ui/spinner/index.js b/packages/components/src/ui/spinner/index.js
+deleted file mode 100644
+index 84ac37f7401d54..00000000000000
+--- a/packages/components/src/ui/spinner/index.js
++++ /dev/null
+@@ -1 +0,0 @@
+-export { default as Spinner } from './component';
+diff --git a/packages/components/src/ui/spinner/stories/index.js b/packages/components/src/ui/spinner/stories/index.js
+deleted file mode 100644
+index 9cb006d883c1ee..00000000000000
+--- a/packages/components/src/ui/spinner/stories/index.js
++++ /dev/null
+@@ -1,19 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { Spinner } from '../index';
+-
+-export default {
+-	component: Spinner,
+-	title: 'Components (Experimental)/Spinner',
+-};
+-
+-export const _default = () => {
+-	return (
+-		<>
+-			<Spinner />
+-			<Spinner size={ 30 } />
+-			<Spinner color="blue" size="50" />
+-		</>
+-	);
+-};
+diff --git a/packages/components/src/ui/spinner/styles.js b/packages/components/src/ui/spinner/styles.js
+deleted file mode 100644
+index 057cca34c68460..00000000000000
+--- a/packages/components/src/ui/spinner/styles.js
++++ /dev/null
+@@ -1,109 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import styled from '@emotion/styled';
+-
+-/**
+- * Internal dependencies
+- */
+-import { WRAPPER_SIZE } from './utils';
+-
+-export const ContainerView = styled.div`
+-	display: flex;
+-	pointer-events: none;
+-	position: relative;
+-`;
+-
+-export const BarsWrapperView = styled.div`
+-	height: ${ WRAPPER_SIZE }px;
+-	left: 0;
+-	opacity: 0.6;
+-	position: absolute;
+-	top: 0;
+-	transform-origin: top left;
+-	width: ${ WRAPPER_SIZE }px;
+-`;
+-
+-export const BarsView = styled.div`
+-	color: currentColor;
+-	display: inline-flex;
+-	height: 54px;
+-	left: 50%;
+-	padding: 10px;
+-	position: absolute;
+-	top: 50%;
+-	transform: translate( -50%, -50% );
+-	width: 54px;
+-
+-	> div {
+-		animation: ComponentsUISpinnerFadeAnimation 1000ms linear infinite;
+-		background: currentColor;
+-		border-radius: 50px;
+-		height: 16%;
+-		left: 49%;
+-		opacity: 0;
+-		position: absolute;
+-		top: 43%;
+-		width: 6%;
+-	}
+-
+-	@keyframes ComponentsUISpinnerFadeAnimation {
+-		from {
+-			opacity: 1;
+-		}
+-		to {
+-			opacity: 0.25;
+-		}
+-	}
+-
+-	.InnerBar1 {
+-		animation-delay: 0s;
+-		transform: rotate( 0deg ) translate( 0, -130% );
+-	}
+-
+-	.InnerBar2 {
+-		animation-delay: -0.9167s;
+-		transform: rotate( 30deg ) translate( 0, -130% );
+-	}
+-
+-	.InnerBar3 {
+-		animation-delay: -0.833s;
+-		transform: rotate( 60deg ) translate( 0, -130% );
+-	}
+-	.InnerBar4 {
+-		animation-delay: -0.7497s;
+-		transform: rotate( 90deg ) translate( 0, -130% );
+-	}
+-	.InnerBar5 {
+-		animation-delay: -0.667s;
+-		transform: rotate( 120deg ) translate( 0, -130% );
+-	}
+-	.InnerBar6 {
+-		animation-delay: -0.5837s;
+-		transform: rotate( 150deg ) translate( 0, -130% );
+-	}
+-	.InnerBar7 {
+-		animation-delay: -0.5s;
+-		transform: rotate( 180deg ) translate( 0, -130% );
+-	}
+-	.InnerBar8 {
+-		animation-delay: -0.4167s;
+-		transform: rotate( 210deg ) translate( 0, -130% );
+-	}
+-	.InnerBar9 {
+-		animation-delay: -0.333s;
+-		transform: rotate( 240deg ) translate( 0, -130% );
+-	}
+-	.InnerBar10 {
+-		animation-delay: -0.2497s;
+-		transform: rotate( 270deg ) translate( 0, -130% );
+-	}
+-	.InnerBar11 {
+-		animation-delay: -0.167s;
+-		transform: rotate( 300deg ) translate( 0, -130% );
+-	}
+-	.InnerBar12 {
+-		animation-delay: -0.0833s;
+-		transform: rotate( 330deg ) translate( 0, -130% );
+-	}
+-`;
+diff --git a/packages/components/src/ui/spinner/test/__snapshots__/index.js.snap b/packages/components/src/ui/spinner/test/__snapshots__/index.js.snap
+deleted file mode 100644
+index 70fd3df3a5b484..00000000000000
+--- a/packages/components/src/ui/spinner/test/__snapshots__/index.js.snap
++++ /dev/null
+@@ -1,265 +0,0 @@
+-// Jest Snapshot v1, https://goo.gl/fbAQLP
+-
+-exports[`props should render color 1`] = `
+-Snapshot Diff:
+-- First value
+-+ Second value
+-
+-@@ -11,11 +11,11 @@
+-        class="css-1rq9ofd-BarsWrapperView e1s9yo7h1"
+-        style="transform: scale(0.4444444444444444);"
+-      >
+-        <div
+-          class="css-tada40-BarsView e1s9yo7h0"
+--         style="color: blue;"
+-+         style="color: rgb(30, 30, 30);"
+-        >
+-          <div
+-            class="InnerBar1"
+-          />
+-          <div
+-`;
+-
+-exports[`props should render correctly 1`] = `
+-.emotion-0 {
+-  display: -webkit-box;
+-  display: -webkit-flex;
+-  display: -ms-flexbox;
+-  display: flex;
+-  pointer-events: none;
+-  position: relative;
+-}
+-
+-.emotion-2 {
+-  height: 36px;
+-  left: 0;
+-  opacity: 0.6;
+-  position: absolute;
+-  top: 0;
+-  transform-origin: top left;
+-  width: 36px;
+-}
+-
+-.emotion-4 {
+-  color: currentColor;
+-  display: -webkit-inline-box;
+-  display: -webkit-inline-flex;
+-  display: -ms-inline-flexbox;
+-  display: inline-flex;
+-  height: 54px;
+-  left: 50%;
+-  padding: 10px;
+-  position: absolute;
+-  top: 50%;
+-  -webkit-transform: translate( -50%, -50% );
+-  -moz-transform: translate( -50%, -50% );
+-  -ms-transform: translate( -50%, -50% );
+-  transform: translate( -50%, -50% );
+-  width: 54px;
+-}
+-
+-.emotion-4>div {
+-  -webkit-animation: ComponentsUISpinnerFadeAnimation 1000ms linear infinite;
+-  animation: ComponentsUISpinnerFadeAnimation 1000ms linear infinite;
+-  background: currentColor;
+-  border-radius: 50px;
+-  height: 16%;
+-  left: 49%;
+-  opacity: 0;
+-  position: absolute;
+-  top: 43%;
+-  width: 6%;
+-}
+-
+-.emotion-4 .InnerBar1 {
+-  -webkit-animation-delay: 0s;
+-  animation-delay: 0s;
+-  -webkit-transform: rotate( 0deg ) translate( 0, -130% );
+-  -moz-transform: rotate( 0deg ) translate( 0, -130% );
+-  -ms-transform: rotate( 0deg ) translate( 0, -130% );
+-  transform: rotate( 0deg ) translate( 0, -130% );
+-}
+-
+-.emotion-4 .InnerBar2 {
+-  -webkit-animation-delay: -0.9167s;
+-  animation-delay: -0.9167s;
+-  -webkit-transform: rotate( 30deg ) translate( 0, -130% );
+-  -moz-transform: rotate( 30deg ) translate( 0, -130% );
+-  -ms-transform: rotate( 30deg ) translate( 0, -130% );
+-  transform: rotate( 30deg ) translate( 0, -130% );
+-}
+-
+-.emotion-4 .InnerBar3 {
+-  -webkit-animation-delay: -0.833s;
+-  animation-delay: -0.833s;
+-  -webkit-transform: rotate( 60deg ) translate( 0, -130% );
+-  -moz-transform: rotate( 60deg ) translate( 0, -130% );
+-  -ms-transform: rotate( 60deg ) translate( 0, -130% );
+-  transform: rotate( 60deg ) translate( 0, -130% );
+-}
+-
+-.emotion-4 .InnerBar4 {
+-  -webkit-animation-delay: -0.7497s;
+-  animation-delay: -0.7497s;
+-  -webkit-transform: rotate( 90deg ) translate( 0, -130% );
+-  -moz-transform: rotate( 90deg ) translate( 0, -130% );
+-  -ms-transform: rotate( 90deg ) translate( 0, -130% );
+-  transform: rotate( 90deg ) translate( 0, -130% );
+-}
+-
+-.emotion-4 .InnerBar5 {
+-  -webkit-animation-delay: -0.667s;
+-  animation-delay: -0.667s;
+-  -webkit-transform: rotate( 120deg ) translate( 0, -130% );
+-  -moz-transform: rotate( 120deg ) translate( 0, -130% );
+-  -ms-transform: rotate( 120deg ) translate( 0, -130% );
+-  transform: rotate( 120deg ) translate( 0, -130% );
+-}
+-
+-.emotion-4 .InnerBar6 {
+-  -webkit-animation-delay: -0.5837s;
+-  animation-delay: -0.5837s;
+-  -webkit-transform: rotate( 150deg ) translate( 0, -130% );
+-  -moz-transform: rotate( 150deg ) translate( 0, -130% );
+-  -ms-transform: rotate( 150deg ) translate( 0, -130% );
+-  transform: rotate( 150deg ) translate( 0, -130% );
+-}
+-
+-.emotion-4 .InnerBar7 {
+-  -webkit-animation-delay: -0.5s;
+-  animation-delay: -0.5s;
+-  -webkit-transform: rotate( 180deg ) translate( 0, -130% );
+-  -moz-transform: rotate( 180deg ) translate( 0, -130% );
+-  -ms-transform: rotate( 180deg ) translate( 0, -130% );
+-  transform: rotate( 180deg ) translate( 0, -130% );
+-}
+-
+-.emotion-4 .InnerBar8 {
+-  -webkit-animation-delay: -0.4167s;
+-  animation-delay: -0.4167s;
+-  -webkit-transform: rotate( 210deg ) translate( 0, -130% );
+-  -moz-transform: rotate( 210deg ) translate( 0, -130% );
+-  -ms-transform: rotate( 210deg ) translate( 0, -130% );
+-  transform: rotate( 210deg ) translate( 0, -130% );
+-}
+-
+-.emotion-4 .InnerBar9 {
+-  -webkit-animation-delay: -0.333s;
+-  animation-delay: -0.333s;
+-  -webkit-transform: rotate( 240deg ) translate( 0, -130% );
+-  -moz-transform: rotate( 240deg ) translate( 0, -130% );
+-  -ms-transform: rotate( 240deg ) translate( 0, -130% );
+-  transform: rotate( 240deg ) translate( 0, -130% );
+-}
+-
+-.emotion-4 .InnerBar10 {
+-  -webkit-animation-delay: -0.2497s;
+-  animation-delay: -0.2497s;
+-  -webkit-transform: rotate( 270deg ) translate( 0, -130% );
+-  -moz-transform: rotate( 270deg ) translate( 0, -130% );
+-  -ms-transform: rotate( 270deg ) translate( 0, -130% );
+-  transform: rotate( 270deg ) translate( 0, -130% );
+-}
+-
+-.emotion-4 .InnerBar11 {
+-  -webkit-animation-delay: -0.167s;
+-  animation-delay: -0.167s;
+-  -webkit-transform: rotate( 300deg ) translate( 0, -130% );
+-  -moz-transform: rotate( 300deg ) translate( 0, -130% );
+-  -ms-transform: rotate( 300deg ) translate( 0, -130% );
+-  transform: rotate( 300deg ) translate( 0, -130% );
+-}
+-
+-.emotion-4 .InnerBar12 {
+-  -webkit-animation-delay: -0.0833s;
+-  animation-delay: -0.0833s;
+-  -webkit-transform: rotate( 330deg ) translate( 0, -130% );
+-  -moz-transform: rotate( 330deg ) translate( 0, -130% );
+-  -ms-transform: rotate( 330deg ) translate( 0, -130% );
+-  transform: rotate( 330deg ) translate( 0, -130% );
+-}
+-
+-<div>
+-  <div
+-    aria-busy="true"
+-    class="components-spinner emotion-0 emotion-1"
+-    data-wp-c16t="true"
+-    data-wp-component="Spinner"
+-    style="height: 16px; width: 16px;"
+-  >
+-    <div
+-      aria-hidden="true"
+-      class="emotion-2 emotion-3"
+-      style="transform: scale(0.4444444444444444);"
+-    >
+-      <div
+-        class="emotion-4 emotion-5"
+-        style="color: rgb(30, 30, 30);"
+-      >
+-        <div
+-          class="InnerBar1"
+-        />
+-        <div
+-          class="InnerBar2"
+-        />
+-        <div
+-          class="InnerBar3"
+-        />
+-        <div
+-          class="InnerBar4"
+-        />
+-        <div
+-          class="InnerBar5"
+-        />
+-        <div
+-          class="InnerBar6"
+-        />
+-        <div
+-          class="InnerBar7"
+-        />
+-        <div
+-          class="InnerBar8"
+-        />
+-        <div
+-          class="InnerBar9"
+-        />
+-        <div
+-          class="InnerBar10"
+-        />
+-        <div
+-          class="InnerBar11"
+-        />
+-        <div
+-          class="InnerBar12"
+-        />
+-      </div>
+-    </div>
+-  </div>
+-</div>
+-`;
+-
+-exports[`props should render size 1`] = `
+-Snapshot Diff:
+-- First value
+-+ Second value
+-
+-@@ -2,16 +2,16 @@
+-    <div
+-      aria-busy="true"
+-      class="components-spinner css-14ywscc-ContainerView e1s9yo7h2"
+-      data-wp-c16t="true"
+-      data-wp-component="Spinner"
+--     style="height: 31px; width: 31px;"
+-+     style="height: 16px; width: 16px;"
+-    >
+-      <div
+-        aria-hidden="true"
+-        class="css-1rq9ofd-BarsWrapperView e1s9yo7h1"
+--       style="transform: scale(0.8611111111111112);"
+-+       style="transform: scale(0.4444444444444444);"
+-      >
+-        <div
+-          class="css-tada40-BarsView e1s9yo7h0"
+-          style="color: rgb(30, 30, 30);"
+-        >
+-`;
+diff --git a/packages/components/src/ui/spinner/test/index.js b/packages/components/src/ui/spinner/test/index.js
+deleted file mode 100644
+index aa9a4360fedff7..00000000000000
+--- a/packages/components/src/ui/spinner/test/index.js
++++ /dev/null
+@@ -1,32 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { render } from '@testing-library/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import { Spinner } from '..';
+-
+-describe( 'props', () => {
+-	test( 'should render correctly', () => {
+-		const { container } = render( <Spinner /> );
+-		expect( container ).toMatchSnapshot();
+-	} );
+-
+-	test( 'should render color', () => {
+-		const { container } = render( <Spinner /> );
+-		const { container: secondRenderContainer } = render(
+-			<Spinner color="blue" />
+-		);
+-		expect( secondRenderContainer ).toMatchDiffSnapshot( container );
+-	} );
+-
+-	test( 'should render size', () => {
+-		const { container } = render( <Spinner /> );
+-		const { container: secondRenderContainer } = render(
+-			<Spinner size={ 31 } />
+-		);
+-		expect( secondRenderContainer ).toMatchDiffSnapshot( container );
+-	} );
+-} );
+diff --git a/packages/components/src/ui/spinner/utils.js b/packages/components/src/ui/spinner/utils.js
+deleted file mode 100644
+index 843ec1133b953d..00000000000000
+--- a/packages/components/src/ui/spinner/utils.js
++++ /dev/null
+@@ -1,2 +0,0 @@
+-export const BASE_SIZE = 16;
+-export const WRAPPER_SIZE = 36;

@@ -1,0 +1,84 @@
+diff --git a/.stylelintrc.js b/.stylelintrc.js
+index f1d91fb72379d6..6acde213cfa232 100644
+--- a/.stylelintrc.js
++++ b/.stylelintrc.js
+@@ -21,10 +21,15 @@ module.exports = {
+ 		'declaration-property-value-disallowed-list': [
+ 			{
+ 				'/.*/': [ '/--wp-components-color-/' ],
++				cursor: [ 'pointer' ],
+ 			},
+ 			{
+-				message: ( property, value ) =>
+-					`Avoid using "${ value }" in "${ property }". --wp-components-color-* variables are not ready to be used outside of the components package.`,
++				message: ( property, value ) => {
++					if ( property === 'cursor' ) {
++						return 'Use the `var( --wpds-cursor-control )` token for interactive non-link controls. If this is for a link, you can disable this rule.';
++					}
++					return `Avoid using "${ value }" in "${ property }". --wp-components-color-* variables are not ready to be used outside of the components package.`;
++				},
+ 			},
+ 		],
+ 		'font-weight-notation': null,
+diff --git a/packages/block-library/.stylelintrc.mjs b/packages/block-library/.stylelintrc.mjs
+new file mode 100644
+index 00000000000000..6a4c33bff82f50
+--- /dev/null
++++ b/packages/block-library/.stylelintrc.mjs
+@@ -0,0 +1,19 @@
++import baseConfig from '../../.stylelintrc.js';
++
++const [ disallowedValues, disallowedValueMessages ] =
++	baseConfig.rules[ 'declaration-property-value-disallowed-list' ];
++
++// wp-block-library generally should not use theme tokens in most cases.
++const { cursor: _ignoredCursorRule, ...blockLibraryDisallowedValues } =
++	disallowedValues;
++
++/** @type {import('stylelint').Config} */
++export default {
++	extends: '../../.stylelintrc.js',
++	rules: {
++		'declaration-property-value-disallowed-list': [
++			blockLibraryDisallowedValues,
++			disallowedValueMessages,
++		],
++	},
++};
+diff --git a/packages/ui/.stylelintrc.mjs b/packages/ui/.stylelintrc.mjs
+deleted file mode 100644
+index 66390cf20fefc6..00000000000000
+--- a/packages/ui/.stylelintrc.mjs
++++ /dev/null
+@@ -1,18 +0,0 @@
+-/** @type {import('stylelint').Config} */
+-export default {
+-	extends: '../../.stylelintrc.js',
+-	rules: {
+-		'declaration-property-value-disallowed-list': [
+-			{
+-				cursor: [ 'pointer' ],
+-			},
+-			{
+-				message: ( property ) => {
+-					if ( property === 'cursor' ) {
+-						return 'Use the `var( --wpds-cursor-control )` token for interactive non-link controls. If this is for a link, you can disable this rule.';
+-					}
+-				},
+-			},
+-		],
+-	},
+-};
+diff --git a/routes/guidelines/components/guideline-accordion.scss b/routes/guidelines/components/guideline-accordion.scss
+index fb3b13e0f0065d..e87663481a04f4 100644
+--- a/routes/guidelines/components/guideline-accordion.scss
++++ b/routes/guidelines/components/guideline-accordion.scss
+@@ -11,7 +11,7 @@
+ 		border: none;
+ 		padding: 0;
+ 		margin: 0;
+-		cursor: pointer;
++		cursor: var(--wpds-cursor-control);
+ 		text-align: left;
+ 		height: auto;
+ 

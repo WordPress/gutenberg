@@ -1,0 +1,111 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 129fcfbccf3a31..8a45faafbb2812 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++- `HStack`: Remove "experimental" designation ([#61019](https://github.com/WordPress/gutenberg/pull/61019)).
++
+ ### Enhancements
+ 
+ -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
+diff --git a/packages/components/src/h-stack/README.md b/packages/components/src/h-stack/README.md
+index 77e3c77b940f2a..c1819c5d80bf13 100644
+--- a/packages/components/src/h-stack/README.md
++++ b/packages/components/src/h-stack/README.md
+@@ -1,9 +1,5 @@
+ # HStack
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+ `HStack` (Horizontal Stack) arranges child elements in a horizontal line.
+ 
+ ## Usage
+@@ -12,7 +8,7 @@ This feature is still experimental. “Experimental” means this is an early im
+ 
+ ```jsx
+ import {
+-	__experimentalHStack as HStack,
++	HStack,
+ 	__experimentalText as Text,
+ } from '@wordpress/components';
+ 
+@@ -85,7 +81,7 @@ When a `Spacer` is used within an `HStack`, the `Spacer` adaptively expands to t
+ 
+ ```jsx
+ import {
+-	__experimentalHStack as HStack,
++	HStack,
+ 	__experimentalSpacer as Spacer,
+ 	__experimentalText as Text,
+ } from '@wordpress/components';
+@@ -107,7 +103,7 @@ function Example() {
+ 
+ ```jsx
+ import {
+-	__experimentalHStack as HStack,
++	HStack,
+ 	__experimentalSpacer as Spacer,
+ 	__experimentalText as Text,
+ } from '@wordpress/components';
+diff --git a/packages/components/src/h-stack/component.tsx b/packages/components/src/h-stack/component.tsx
+index 1d1efebe8a0912..c2a7cfc51df250 100644
+--- a/packages/components/src/h-stack/component.tsx
++++ b/packages/components/src/h-stack/component.tsx
+@@ -23,7 +23,7 @@ function UnconnectedHStack(
+  *
+  * ```jsx
+  * import {
+- * 	__experimentalHStack as HStack,
++ * 	HStack,
+  * 	__experimentalText as Text,
+  * } from `@wordpress/components`;
+  *
+diff --git a/packages/components/src/h-stack/stories/index.story.tsx b/packages/components/src/h-stack/stories/index.story.tsx
+index 88aebb7682e476..10755905ddc778 100644
+--- a/packages/components/src/h-stack/stories/index.story.tsx
++++ b/packages/components/src/h-stack/stories/index.story.tsx
+@@ -42,7 +42,7 @@ const JUSTIFICATIONS = {
+ 
+ const meta: Meta< typeof HStack > = {
+ 	component: HStack,
+-	title: 'Components (Experimental)/HStack',
++	title: 'Components/HStack',
+ 	argTypes: {
+ 		as: {
+ 			control: { type: null },
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index a824162cb24129..890641ea1fd02a 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -92,7 +92,13 @@ export { Grid as __experimentalGrid } from './grid';
+ export { default as Guide } from './guide';
+ export { default as GuidePage } from './guide/page';
+ export { Heading as __experimentalHeading } from './heading';
+-export { HStack as __experimentalHStack } from './h-stack';
++export {
++	/**
++	 * @deprecated Import `HStack` instead.
++	 */
++	HStack as __experimentalHStack,
++	HStack,
++} from './h-stack';
+ export { default as Icon } from './icon';
+ export type { IconType } from './icon';
+ export { default as IconButton } from './button/deprecated';
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 629f06bf98edf9..c5bf8abda3028e 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -1,6 +1,6 @@
+ <script>
+ 	( function redirectIfStoryMoved() {
+-		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation' ];
++		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation', 'hstack' ];
+ 		const REDIRECTS = [
+ 			{
+ 				from: /\/components-deprecated-/,

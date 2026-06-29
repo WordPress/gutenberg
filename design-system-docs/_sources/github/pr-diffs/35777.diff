@@ -1,0 +1,19 @@
+diff --git a/packages/components/src/range-control/styles/range-control-styles.js b/packages/components/src/range-control/styles/range-control-styles.js
+index 4507107b9f7bbd..5daaeeb259be8d 100644
+--- a/packages/components/src/range-control/styles/range-control-styles.js
++++ b/packages/components/src/range-control/styles/range-control-styles.js
+@@ -189,10 +189,13 @@ export const ThumbWrapper = styled.span`
+ 	user-select: none;
+ 	width: ${ thumbSize }px;
+ 	border-radius: 50%;
+-	transform: translateX( 4.5px );
+ 
+ 	${ thumbColor };
+ 	${ rtl( { marginLeft: -10 } ) };
++	${ rtl(
++		{ transform: 'translateX( 4.5px )' },
++		{ transform: 'translateX( -4.5px )' }
++	) };
+ `;
+ 
+ const thumbFocus = ( { isFocused } ) => {

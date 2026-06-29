@@ -1,0 +1,830 @@
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index e02dde7f7217df..2523e423c4b160 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -80,6 +80,7 @@ export { default as Snackbar } from './snackbar';
+ export { default as SnackbarList } from './snackbar/list';
+ export { default as Spinner } from './spinner';
+ export { default as TabPanel } from './tab-panel';
++export { default as __experimentalText } from './text';
+ export { default as TextControl } from './text-control';
+ export { default as TextareaControl } from './textarea-control';
+ export { default as TextHighlight } from './text-highlight';
+@@ -113,4 +114,3 @@ export {
+ } from './higher-order/with-focus-return';
+ export { default as withNotices } from './higher-order/with-notices';
+ export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
+-export * from './text';
+diff --git a/packages/components/src/index.native.js b/packages/components/src/index.native.js
+index 7d9f14269364ce..5bbef298904d99 100644
+--- a/packages/components/src/index.native.js
++++ b/packages/components/src/index.native.js
+@@ -30,6 +30,7 @@ export { default as TextareaControl } from './textarea-control';
+ export { default as PanelBody } from './panel/body';
+ export { default as PanelActions } from './panel/actions';
+ export { default as Button } from './button';
++export { default as __experimentalText } from './text';
+ export { default as TextControl } from './text-control';
+ export { default as ToggleControl } from './toggle-control';
+ export { default as SelectControl } from './select-control';
+diff --git a/packages/components/src/text/README.md b/packages/components/src/text/README.md
+index 806c60d45a06bc..4a659b34fa4ccc 100644
+--- a/packages/components/src/text/README.md
++++ b/packages/components/src/text/README.md
+@@ -1,18 +1,54 @@
+ # Text
+ 
+-A text component for styling text.
++A component for rendering text.
+ 
+ ## Usage
+ 
+ ```jsx
+-import {Text} from '@wordpress/components';
++import { Text } from '@wordpress/components';
+ 
+ const HeroPanel = () => (
+ 	<>
+-		<Text variant="title.large" as="h1">Hello World!</Text>
++		<Text variant="title.large" as="h1">
++			Hello World!
++		</Text>
+ 		<Text variant="body">Greetings to you!</Text>
+ 	</>
+ );
+ ```
+ 
+-> For most use-cases you can use this component instead of a `h1`, `h2`, `h3`, `h4`, `h5`, `h6` or `p`.
++## Props
++
++The component accepts the following props:
++
++#### as
++
++Determines the HTML selector for the text.
++
++For most use-cases you can use this component instead of a `h1`, `h2`, `h3`, `h4`, `h5`, `h6` or `p`.
++
++-   Type: `String`
++-   Required: No
++-   Default: ''
++
++#### variant
++
++Determines the style for the text. Available variants:
++
++-   `title`
++-   `title.large`
++-   `title.medium`
++-   `title.small`
++-   `subtitle`
++-   `subtitle.large`
++-   `subtitle.small`
++-   `body`
++-   `body.large`
++-   `body.small`
++-   `button`
++-   `caption`
++-   `label`
++
++*   Type: `String`
++*   Required: No
++*   Default: 'body'
+diff --git a/packages/components/src/text/index.js b/packages/components/src/text/index.js
+index c4ae06e2b4f97f..e502e39a59c49a 100644
+--- a/packages/components/src/text/index.js
++++ b/packages/components/src/text/index.js
+@@ -1 +1,19 @@
+-export * from './text.styles';
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++
++/**
++ * Internal dependencies
++ */
++import { text } from './styles/text-mixins';
++
++const Text = styled.p(
++	`
++	box-sizing: border-box;
++	margin: 0;
++`,
++	text
++);
++
++export default Text;
+diff --git a/packages/components/src/text/text.styles.native.js b/packages/components/src/text/index.native.js
+similarity index 51%
+rename from packages/components/src/text/text.styles.native.js
+rename to packages/components/src/text/index.native.js
+index 2304de2efa62f3..8a52d4056d5578 100644
+--- a/packages/components/src/text/text.styles.native.js
++++ b/packages/components/src/text/index.native.js
+@@ -6,6 +6,8 @@ import styled from '@emotion/native';
+ /**
+  * Internal dependencies
+  */
+-import { text } from './mixins';
++import { text } from './styles/text-mixins';
+ 
+-export const __experimentalText = styled.Text( text );
++const Text = styled.Text( text );
++
++export default Text;
+diff --git a/packages/components/src/text/stories/index.js b/packages/components/src/text/stories/index.js
+index f1dca3b2c819b6..aeb3cd330fdd3a 100644
+--- a/packages/components/src/text/stories/index.js
++++ b/packages/components/src/text/stories/index.js
+@@ -1,10 +1,10 @@
+ /**
+  * Internal dependencies
+  */
+-import { __experimentalText as Text } from '../text.styles';
++import Text from '../index';
+ 
+ export default {
+-	title: 'Components/Experimental/Text',
++	title: 'Components/Text',
+ 	component: Text,
+ };
+ 
+@@ -28,31 +28,3 @@ export const _default = () => (
+ 		<Text variant="label">Label</Text>
+ 	</>
+ );
+-
+-export const TitleLarge = () => (
+-	<Text variant="title.large" as="h1">
+-		Title Large
+-	</Text>
+-);
+-export const TitleMedium = () => (
+-	<Text variant="title.medium" as="h2">
+-		Title Medium
+-	</Text>
+-);
+-export const TitleSmall = () => (
+-	<Text variant="title.small" as="h3">
+-		Title Small
+-	</Text>
+-);
+-
+-export const Subtitle = () => <Text variant="subtitle">Subtitle</Text>;
+-export const SubtitleSmall = () => (
+-	<Text variant="subtitle.small">Subtitle Small</Text>
+-);
+-
+-export const Body = () => <Text variant="body">Body</Text>;
+-export const BodySmall = () => <Text variant="body.small">Body Small</Text>;
+-
+-export const Button = () => <Text variant="button">Button</Text>;
+-export const Caption = () => <Text variant="caption">Caption</Text>;
+-export const Label = () => <Text variant="label">Label</Text>;
+diff --git a/packages/components/src/text/emotion-css.js b/packages/components/src/text/styles/emotion-css.js
+similarity index 59%
+rename from packages/components/src/text/emotion-css.js
+rename to packages/components/src/text/styles/emotion-css.js
+index d674885a21d292..c86ee0154e7630 100644
+--- a/packages/components/src/text/emotion-css.js
++++ b/packages/components/src/text/styles/emotion-css.js
+@@ -1,6 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import css from '@emotion/css';
++import { css } from '@emotion/core';
+ 
+ export default css;
+diff --git a/packages/components/src/text/emotion-css.native.js b/packages/components/src/text/styles/emotion-css.native.js
+similarity index 100%
+rename from packages/components/src/text/emotion-css.native.js
+rename to packages/components/src/text/styles/emotion-css.native.js
+diff --git a/packages/components/src/text/font-family.js b/packages/components/src/text/styles/font-family.js
+similarity index 100%
+rename from packages/components/src/text/font-family.js
+rename to packages/components/src/text/styles/font-family.js
+diff --git a/packages/components/src/text/font-family.native.js b/packages/components/src/text/styles/font-family.native.js
+similarity index 100%
+rename from packages/components/src/text/font-family.native.js
+rename to packages/components/src/text/styles/font-family.native.js
+diff --git a/packages/components/src/text/mixins.js b/packages/components/src/text/styles/text-mixins.js
+similarity index 91%
+rename from packages/components/src/text/mixins.js
+rename to packages/components/src/text/styles/text-mixins.js
+index 8d35dbe3b5d70e..d2463e80310a49 100644
+--- a/packages/components/src/text/mixins.js
++++ b/packages/components/src/text/styles/text-mixins.js
+@@ -75,13 +75,13 @@ const label = `
+ `;
+ 
+ /**
+- * @typedef {'title.large'|'title.medium'|'title.small'|'subtitle'|'subtitle.small'|'body'|'body.small'|'button'|'caption'|'label'} TextVariant
++ * @typedef {'title.large'|'title.medium'|'title.small'|'subtitle'|'subtitle.small'|'body'|'body.large'|'body.small'|'button'|'caption'|'label'} TextVariant
+  */
+ 
+ /**
+  * @param {TextVariant} variantName
+  */
+-const variant = ( variantName ) => {
++const variant = ( variantName = 'body' ) => {
+ 	switch ( variantName ) {
+ 		case 'title.large':
+ 			return css`
+@@ -111,6 +111,10 @@ const variant = ( variantName ) => {
+ 			`;
+ 
+ 		case 'body':
++			return css`
++				${body}
++			`;
++		case 'body.large':
+ 			return css`
+ 				${body}
+ 				${bodyLarge}
+diff --git a/packages/components/src/text/test/index.js b/packages/components/src/text/test/index.js
+new file mode 100644
+index 00000000000000..dfa504018ed5dd
+--- /dev/null
++++ b/packages/components/src/text/test/index.js
+@@ -0,0 +1,94 @@
++/**
++ * External dependencies
++ */
++import { render, unmountComponentAtNode } from 'react-dom';
++import { act } from 'react-dom/test-utils';
++
++/**
++ * Internal dependencies
++ */
++import Text from '../';
++
++let container = null;
++
++beforeEach( () => {
++	container = document.createElement( 'div' );
++	document.body.appendChild( container );
++} );
++
++afterEach( () => {
++	unmountComponentAtNode( container );
++	container.remove();
++	container = null;
++} );
++
++function getTextStyle( node ) {
++	const text = node || container.children[ 0 ];
++	return window.getComputedStyle( text );
++}
++
++describe( 'Text', () => {
++	describe( 'Basic rendering', () => {
++		it( 'should render', () => {
++			act( () => {
++				render( <Text>Hello</Text>, container );
++			} );
++
++			const [ text ] = container.children;
++
++			expect( text.innerHTML ).toBe( 'Hello' );
++		} );
++
++		it( 'should render as a <p>, by default', () => {
++			act( () => {
++				render( <Text />, container );
++			} );
++
++			const [ text ] = container.children;
++
++			expect( text.tagName ).toBe( 'P' );
++		} );
++
++		it( 'should render as another selector, if specified', () => {
++			act( () => {
++				render(
++					<>
++						<Text as="h1" />
++						<Text as="h2" />
++						<Text as="span" />
++						<Text as="div" />
++					</>,
++					container
++				);
++			} );
++
++			const [ h1, h2, span, div ] = container.children;
++
++			expect( h1.tagName ).toBe( 'H1' );
++			expect( h2.tagName ).toBe( 'H2' );
++			expect( span.tagName ).toBe( 'SPAN' );
++			expect( div.tagName ).toBe( 'DIV' );
++		} );
++	} );
++
++	describe( 'Variants', () => {
++		it( 'should render with specified variantion styles', () => {
++			act( () => {
++				render(
++					<>
++						<Text>Base</Text>
++						<Text variant="title.large">Title Large</Text>
++						<Text variant="caption">Caption</Text>
++					</>,
++					container
++				);
++			} );
++
++			const [ base, title, caption ] = container.children;
++
++			expect( getTextStyle( base ).fontSize ).toBeFalsy();
++			expect( getTextStyle( title ).fontSize ).toBe( '32px' );
++			expect( getTextStyle( caption ).fontSize ).toBe( '12px' );
++		} );
++	} );
++} );
+diff --git a/packages/components/src/text/text.styles.js b/packages/components/src/text/text.styles.js
+deleted file mode 100644
+index 67545507f0d0b5..00000000000000
+--- a/packages/components/src/text/text.styles.js
++++ /dev/null
+@@ -1,11 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import styled from '@emotion/styled';
+-
+-/**
+- * Internal dependencies
+- */
+-import { text } from './mixins';
+-
+-export const __experimentalText = styled.p( `margin: 0;`, text );
+diff --git a/storybook/test/__snapshots__/index.js.snap b/storybook/test/__snapshots__/index.js.snap
+index f358ac613196e7..6748df02e6d7c6 100644
+--- a/storybook/test/__snapshots__/index.js.snap
++++ b/storybook/test/__snapshots__/index.js.snap
+@@ -2803,309 +2803,6 @@ Array [
+ ]
+ `;
+ 
+-exports[`Storyshots Components/Experimental/Text Body 1`] = `
+-.emotion-0 {
+-  margin: 0;
+-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+-  font-weight: 400;
+-  font-size: 16px;
+-  line-height: 24px;
+-}
+-
+-<p
+-  className="emotion-0 emotion-1"
+->
+-  Body
+-</p>
+-`;
+-
+-exports[`Storyshots Components/Experimental/Text Body Small 1`] = `
+-.emotion-0 {
+-  margin: 0;
+-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+-  font-weight: 400;
+-  font-size: 14px;
+-  line-height: 20px;
+-}
+-
+-<p
+-  className="emotion-0 emotion-1"
+->
+-  Body Small
+-</p>
+-`;
+-
+-exports[`Storyshots Components/Experimental/Text Button 1`] = `
+-.emotion-0 {
+-  margin: 0;
+-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+-  font-weight: 600;
+-  font-size: 14px;
+-  line-height: 20px;
+-}
+-
+-<p
+-  className="emotion-0 emotion-1"
+->
+-  Button
+-</p>
+-`;
+-
+-exports[`Storyshots Components/Experimental/Text Caption 1`] = `
+-.emotion-0 {
+-  margin: 0;
+-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+-  font-weight: 400;
+-  font-size: 12px;
+-  line-height: 16px;
+-}
+-
+-<p
+-  className="emotion-0 emotion-1"
+->
+-  Caption
+-</p>
+-`;
+-
+-exports[`Storyshots Components/Experimental/Text Default 1`] = `
+-Array [
+-  .emotion-0 {
+-  margin: 0;
+-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+-  font-weight: 400;
+-  font-size: 32px;
+-  line-height: 40px;
+-}
+-
+-<h1
+-    className="emotion-0 emotion-1"
+-  >
+-    Title Large
+-  </h1>,
+-  .emotion-0 {
+-  margin: 0;
+-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+-  font-weight: 400;
+-  font-size: 24px;
+-  line-height: 32px;
+-}
+-
+-<h2
+-    className="emotion-0 emotion-1"
+-  >
+-    Title Medium
+-  </h2>,
+-  .emotion-0 {
+-  margin: 0;
+-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+-  font-weight: 400;
+-  font-size: 20px;
+-  line-height: 28px;
+-}
+-
+-<h3
+-    className="emotion-0 emotion-1"
+-  >
+-    Title Small
+-  </h3>,
+-  .emotion-0 {
+-  margin: 0;
+-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+-  font-weight: 600;
+-  font-size: 14px;
+-  line-height: 20px;
+-  font-size: 16px;
+-  line-height: 24px;
+-}
+-
+-<p
+-    className="emotion-0 emotion-1"
+-  >
+-    Subtitle
+-  </p>,
+-  .emotion-0 {
+-  margin: 0;
+-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+-  font-weight: 600;
+-  font-size: 14px;
+-  line-height: 20px;
+-  font-size: 14px;
+-  line-height: 20px;
+-}
+-
+-<p
+-    className="emotion-0 emotion-1"
+-  >
+-    Subtitle Small
+-  </p>,
+-  .emotion-0 {
+-  margin: 0;
+-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+-  font-weight: 400;
+-  font-size: 16px;
+-  line-height: 24px;
+-}
+-
+-<p
+-    className="emotion-0 emotion-1"
+-  >
+-    Body
+-  </p>,
+-  .emotion-0 {
+-  margin: 0;
+-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+-  font-weight: 400;
+-  font-size: 14px;
+-  line-height: 20px;
+-}
+-
+-<p
+-    className="emotion-0 emotion-1"
+-  >
+-    Body Small
+-  </p>,
+-  .emotion-0 {
+-  margin: 0;
+-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+-  font-weight: 600;
+-  font-size: 14px;
+-  line-height: 20px;
+-}
+-
+-<p
+-    className="emotion-0 emotion-1"
+-  >
+-    Button
+-  </p>,
+-  .emotion-0 {
+-  margin: 0;
+-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+-  font-weight: 400;
+-  font-size: 12px;
+-  line-height: 16px;
+-}
+-
+-<p
+-    className="emotion-0 emotion-1"
+-  >
+-    Caption
+-  </p>,
+-  .emotion-0 {
+-  margin: 0;
+-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+-  font-weight: 600;
+-  font-size: 12px;
+-  line-height: 16px;
+-}
+-
+-<p
+-    className="emotion-0 emotion-1"
+-  >
+-    Label
+-  </p>,
+-]
+-`;
+-
+-exports[`Storyshots Components/Experimental/Text Label 1`] = `
+-.emotion-0 {
+-  margin: 0;
+-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+-  font-weight: 600;
+-  font-size: 12px;
+-  line-height: 16px;
+-}
+-
+-<p
+-  className="emotion-0 emotion-1"
+->
+-  Label
+-</p>
+-`;
+-
+-exports[`Storyshots Components/Experimental/Text Subtitle 1`] = `
+-.emotion-0 {
+-  margin: 0;
+-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+-  font-weight: 600;
+-  font-size: 14px;
+-  line-height: 20px;
+-  font-size: 16px;
+-  line-height: 24px;
+-}
+-
+-<p
+-  className="emotion-0 emotion-1"
+->
+-  Subtitle
+-</p>
+-`;
+-
+-exports[`Storyshots Components/Experimental/Text Subtitle Small 1`] = `
+-.emotion-0 {
+-  margin: 0;
+-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+-  font-weight: 600;
+-  font-size: 14px;
+-  line-height: 20px;
+-  font-size: 14px;
+-  line-height: 20px;
+-}
+-
+-<p
+-  className="emotion-0 emotion-1"
+->
+-  Subtitle Small
+-</p>
+-`;
+-
+-exports[`Storyshots Components/Experimental/Text Title Large 1`] = `
+-.emotion-0 {
+-  margin: 0;
+-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+-  font-weight: 400;
+-  font-size: 32px;
+-  line-height: 40px;
+-}
+-
+-<h1
+-  className="emotion-0 emotion-1"
+->
+-  Title Large
+-</h1>
+-`;
+-
+-exports[`Storyshots Components/Experimental/Text Title Medium 1`] = `
+-.emotion-0 {
+-  margin: 0;
+-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+-  font-weight: 400;
+-  font-size: 24px;
+-  line-height: 32px;
+-}
+-
+-<h2
+-  className="emotion-0 emotion-1"
+->
+-  Title Medium
+-</h2>
+-`;
+-
+-exports[`Storyshots Components/Experimental/Text Title Small 1`] = `
+-.emotion-0 {
+-  margin: 0;
+-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+-  font-weight: 400;
+-  font-size: 20px;
+-  line-height: 28px;
+-}
+-
+-<h3
+-  className="emotion-0 emotion-1"
+->
+-  Title Small
+-</h3>
+-`;
+-
+ exports[`Storyshots Components/ExternalLink Default 1`] = `
+ <a
+   className="components-external-link"
+@@ -8063,6 +7760,153 @@ exports[`Storyshots Components/TabPanel Default 1`] = `
+ </div>
+ `;
+ 
++exports[`Storyshots Components/Text Default 1`] = `
++Array [
++  .emotion-0 {
++  box-sizing: border-box;
++  margin: 0;
++  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
++  font-weight: 400;
++  font-size: 32px;
++  line-height: 40px;
++}
++
++<h1
++    className="emotion-0 emotion-1"
++  >
++    Title Large
++  </h1>,
++  .emotion-0 {
++  box-sizing: border-box;
++  margin: 0;
++  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
++  font-weight: 400;
++  font-size: 24px;
++  line-height: 32px;
++}
++
++<h2
++    className="emotion-0 emotion-1"
++  >
++    Title Medium
++  </h2>,
++  .emotion-0 {
++  box-sizing: border-box;
++  margin: 0;
++  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
++  font-weight: 400;
++  font-size: 20px;
++  line-height: 28px;
++}
++
++<h3
++    className="emotion-0 emotion-1"
++  >
++    Title Small
++  </h3>,
++  .emotion-0 {
++  box-sizing: border-box;
++  margin: 0;
++  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
++  font-weight: 600;
++  font-size: 14px;
++  line-height: 20px;
++  font-size: 16px;
++  line-height: 24px;
++}
++
++<p
++    className="emotion-0 emotion-1"
++  >
++    Subtitle
++  </p>,
++  .emotion-0 {
++  box-sizing: border-box;
++  margin: 0;
++  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
++  font-weight: 600;
++  font-size: 14px;
++  line-height: 20px;
++  font-size: 14px;
++  line-height: 20px;
++}
++
++<p
++    className="emotion-0 emotion-1"
++  >
++    Subtitle Small
++  </p>,
++  .emotion-0 {
++  box-sizing: border-box;
++  margin: 0;
++  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
++  font-weight: 400;
++}
++
++<p
++    className="emotion-0 emotion-1"
++  >
++    Body
++  </p>,
++  .emotion-0 {
++  box-sizing: border-box;
++  margin: 0;
++  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
++  font-weight: 400;
++  font-size: 14px;
++  line-height: 20px;
++}
++
++<p
++    className="emotion-0 emotion-1"
++  >
++    Body Small
++  </p>,
++  .emotion-0 {
++  box-sizing: border-box;
++  margin: 0;
++  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
++  font-weight: 600;
++  font-size: 14px;
++  line-height: 20px;
++}
++
++<p
++    className="emotion-0 emotion-1"
++  >
++    Button
++  </p>,
++  .emotion-0 {
++  box-sizing: border-box;
++  margin: 0;
++  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
++  font-weight: 400;
++  font-size: 12px;
++  line-height: 16px;
++}
++
++<p
++    className="emotion-0 emotion-1"
++  >
++    Caption
++  </p>,
++  .emotion-0 {
++  box-sizing: border-box;
++  margin: 0;
++  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
++  font-weight: 600;
++  font-size: 12px;
++  line-height: 16px;
++}
++
++<p
++    className="emotion-0 emotion-1"
++  >
++    Label
++  </p>,
++]
++`;
++
+ exports[`Storyshots Components/TextControl Default 1`] = `
+ <div
+   className="components-base-control"

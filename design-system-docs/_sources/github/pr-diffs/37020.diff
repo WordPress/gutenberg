@@ -1,0 +1,365 @@
+diff --git a/packages/components/src/menu-item/hook.ts b/packages/components/src/menu-item/hook.ts
+new file mode 100644
+index 00000000000000..674101e8a74fbe
+--- /dev/null
++++ b/packages/components/src/menu-item/hook.ts
+@@ -0,0 +1,76 @@
++// @ts-nocheck
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++import { cloneElement } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { useCx } from '../utils/hooks/use-cx';
++import { useContextSystem, WordPressComponentProps } from '../ui/context';
++import * as styles from './styles';
++import type { MenuItemProps } from './types';
++
++export function useMenuItemGroup(
++	props: WordPressComponentProps< MenuItemProps, 'div' >
++) {
++	let {
++		children,
++		info,
++		className,
++		icon,
++		iconPosition = 'right',
++		shortcut,
++		isSelected,
++		role = 'menuitem',
++		...otherProps
++	} = useContextSystem( props, 'MenuGroup' );
++
++	const ariaChecked =
++		role === 'menuitemcheckbox' || role === 'menuitemradio'
++			? isSelected
++			: undefined;
++
++	className = classnames( 'components-menu-item__button', className );
++
++	if ( icon && typeof icon !== 'string' ) {
++		icon = cloneElement( icon, {
++			className: classnames( 'components-menu-items__item-icon', {
++				'has-icon-right': iconPosition === 'right',
++			} ),
++		} );
++	}
++
++	/*	const cx = useCx();
++	const menuGroupClassName = useMemo( () => {
++		return cx(
++			styles.MenuGroup,
++			hideSeparator && styles.MenuGroupWithHiddenSeparator,
++			className
++		);
++	}, [ className, hideSeparator ] );
++
++	const menuGroupLabelClassName = useMemo( () => {
++		return cx( styles.MenuGroupLabel, 'components-menu-group__label' );
++	}, [] );*/
++
++	return {
++		...otherProps,
++		isAriaChecked,
++		children,
++		info,
++		className,
++		icon,
++		iconPosition,
++		shortcut,
++		isSelected,
++		role,
++	};
++}
+diff --git a/packages/components/src/menu-item/index.js b/packages/components/src/menu-item/index.js
+deleted file mode 100644
+index 79f129f8caa8e0..00000000000000
+--- a/packages/components/src/menu-item/index.js
++++ /dev/null
+@@ -1,76 +0,0 @@
+-// @ts-nocheck
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-import { isString } from 'lodash';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { cloneElement, forwardRef } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import Shortcut from '../shortcut';
+-import Button from '../button';
+-import Icon from '../icon';
+-
+-export function MenuItem( props, ref ) {
+-	let {
+-		children,
+-		info,
+-		className,
+-		icon,
+-		iconPosition = 'right',
+-		shortcut,
+-		isSelected,
+-		role = 'menuitem',
+-		...buttonProps
+-	} = props;
+-
+-	className = classnames( 'components-menu-item__button', className );
+-
+-	if ( info ) {
+-		children = (
+-			<span className="components-menu-item__info-wrapper">
+-				<span className="components-menu-item__item">{ children }</span>
+-				<span className="components-menu-item__info">{ info }</span>
+-			</span>
+-		);
+-	}
+-
+-	if ( icon && ! isString( icon ) ) {
+-		icon = cloneElement( icon, {
+-			className: classnames( 'components-menu-items__item-icon', {
+-				'has-icon-right': iconPosition === 'right',
+-			} ),
+-		} );
+-	}
+-
+-	return (
+-		<Button
+-			ref={ ref }
+-			// Make sure aria-checked matches spec https://www.w3.org/TR/wai-aria-1.1/#aria-checked
+-			aria-checked={
+-				role === 'menuitemcheckbox' || role === 'menuitemradio'
+-					? isSelected
+-					: undefined
+-			}
+-			role={ role }
+-			icon={ iconPosition === 'left' ? icon : undefined }
+-			className={ className }
+-			{ ...buttonProps }
+-		>
+-			<span className="components-menu-item__item">{ children }</span>
+-			<Shortcut
+-				className="components-menu-item__shortcut"
+-				shortcut={ shortcut }
+-			/>
+-			{ icon && iconPosition === 'right' && <Icon icon={ icon } /> }
+-		</Button>
+-	);
+-}
+-
+-export default forwardRef( MenuItem );
+diff --git a/packages/components/src/menu-item/index.tsx b/packages/components/src/menu-item/index.tsx
+new file mode 100644
+index 00000000000000..4660c3b82b0c8a
+--- /dev/null
++++ b/packages/components/src/menu-item/index.tsx
+@@ -0,0 +1,89 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { Ref } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import Shortcut from '../shortcut';
++import Button from '../button';
++import Icon from '../icon';
++import { useMenuItemGroup } from './hook';
++import type { MenuItemProps, MenuItemInfoWrapperProps } from './types';
++import { contextConnect, WordPressComponentProps } from '../ui/context';
++
++function MenuItemInfoWrapper( { info, children }: MenuItemInfoWrapperProps ) {
++	if ( info ) {
++		return (
++			<span className="components-menu-item__info-wrapper">
++				<span className="components-menu-item__item">{ children }</span>
++				<span className="components-menu-item__info">{ info }</span>
++			</span>
++		);
++	}
++	return <> { children } </>;
++}
++
++export function MenuItem(
++	props: WordPressComponentProps< MenuItemProps, 'div' >,
++	forwardedRef: Ref< any >
++) {
++	const {
++		isAriaChecked,
++		children,
++		info,
++		className,
++		icon,
++		iconPosition,
++		shortcut,
++		isSelected,
++		role,
++		...buttonProps
++	} = useMenuItemGroup( props );
++
++	return (
++		<Button
++			ref={ forwardedRef }
++			// Make sure aria-checked matches spec https://www.w3.org/TR/wai-aria-1.1/#aria-checked
++			aria-checked={ isAriaChecked }
++			role={ role }
++			icon={ iconPosition === 'left' ? icon : undefined }
++			className={ className }
++			{ ...buttonProps }
++		>
++			<span className="components-menu-item__item">
++				<MenuItemInfoWrapper info={ info }>
++					{ children }
++				</MenuItemInfoWrapper>
++			</span>
++			<Shortcut
++				className="components-menu-item__shortcut"
++				shortcut={ shortcut }
++			/>
++			{ icon && iconPosition === 'right' && <Icon icon={ icon } /> }
++		</Button>
++	);
++}
++
++/**
++ * `MenuItem` is a component which renders a button intended to be used in combination with the `MenuGroup`.
++ *
++ * @example
++ * ```jsx
++ * import { MenuGroup, MenuItem } from `@wordpress/components`
++ *
++ * function Example() {
++ *   return (
++ *      <MenuGroup label="Settings">
++ *          <MenuItem>Setting 1</MenuItem>
++ *          <MenuItem>Setting 2</MenuItem>
++ *      </MenuGroup>
++ *   );
++ * }
++ * ```
++ */
++const ConnectedMenuItem = contextConnect( MenuItem, 'MenuItem' );
++
++export default ConnectedMenuItem;
+diff --git a/packages/components/src/menu-item/styles.ts b/packages/components/src/menu-item/styles.ts
+new file mode 100644
+index 00000000000000..217f34ffeaab5e
+--- /dev/null
++++ b/packages/components/src/menu-item/styles.ts
+@@ -0,0 +1,30 @@
++/**
++ * External dependencies
++ */
++import { css } from '@emotion/react';
++
++/**
++ * Internal dependencies
++ */
++import { COLORS, CONFIG } from '../utils';
++import { space } from '../ui/utils/space';
++
++const InfoWrapper = css`
++	display: flex;
++	flex-direction: column;
++	margin-right: auto;
++	.components-menu-item__item {
++		// Provide a minimum width for text items in menus.
++		white-space: nowrap;
++		min-width: 160px;
++		margin-right: auto;
++		display: inline-flex;
++		align-items: center;
++	}
++	.components-menu-item__info {
++		margin-top: ${ space( 1 ) };
++		font-size: ${ CONFIG.fontSizeSmall };
++		color: ${ COLORS.gray[ 700 ] };
++		white-space: normal;
++	}
++`;
+diff --git a/packages/components/src/menu-item/types.ts b/packages/components/src/menu-item/types.ts
+new file mode 100644
+index 00000000000000..f22c5a76810261
+--- /dev/null
++++ b/packages/components/src/menu-item/types.ts
+@@ -0,0 +1,51 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { ReactNode } from 'react';
++
++export type MenuItemProps = {
++	/**
++	 * Text to be displayed beneath a menu item.
++	 */
++	info?: string;
++	/**
++	 * An optional class name for the MenuItem container.
++	 */
++	className?: string;
++	/**
++	 * A role attribute value for the Button component.
++	 *
++	 * @default 'menuitem'
++	 */
++	role?: string;
++	/**
++	 * A position value for the MenuItem icon.
++	 *
++	 * @default 'right'
++	 */
++	iconPosition?: 'right' | 'left';
++	/**
++	 * Child elements.
++	 */
++	children: ReactNode;
++	/**
++	 * The shortcut prop for <Shortcut />.
++	 */
++	shortcut?: string | { display: string; ariaLabel: string };
++	/**
++	 * Whether the is MenuItem selected.
++	 */
++	isSelected?: boolean;
++};
++
++export type MenuItemInfoWrapperProps = {
++	/**
++	 * Text to be displayed beneath a menu item.
++	 */
++	info?: string;
++	/**
++	 * Child elements.
++	 */
++	children: ReactNode;
++}
+diff --git a/packages/components/src/shortcut/index.js b/packages/components/src/shortcut/index.js
+index 7863fa1d574b83..af99440c514fdc 100644
+--- a/packages/components/src/shortcut/index.js
++++ b/packages/components/src/shortcut/index.js
+@@ -3,7 +3,7 @@
+  */
+ import { isString, isObject } from 'lodash';
+ 
+-/** @typedef {string | { display: string, ariaLabel: string }} Shortcut */
++/** @typedef {string | { display: string, ariaLabel: string } | undefined } Shortcut */
+ /**
+  * @typedef Props
+  * @property {Shortcut} shortcut    Shortcut configuration

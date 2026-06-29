@@ -1,0 +1,113 @@
+diff --git a/package-lock.json b/package-lock.json
+index 67078bc9a8eb0d..a38a0662785996 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -56030,7 +56030,6 @@
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/element": "file:../element",
+-				"@wordpress/private-apis": "file:../private-apis",
+ 				"clsx": "^2.1.1"
+ 			},
+ 			"devDependencies": {
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+new file mode 100644
+index 00000000000000..50061fc828412d
+--- /dev/null
++++ b/packages/ui/CHANGELOG.md
+@@ -0,0 +1,7 @@
++<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
++
++## Unreleased
++
++### New Features
++
++- Add `Stack` component
+diff --git a/packages/ui/package.json b/packages/ui/package.json
+index 7525afc8328052..30027b29ee955f 100644
+--- a/packages/ui/package.json
++++ b/packages/ui/package.json
+@@ -37,7 +37,6 @@
+ 	"sideEffects": false,
+ 	"dependencies": {
+ 		"@wordpress/element": "file:../element",
+-		"@wordpress/private-apis": "file:../private-apis",
+ 		"clsx": "^2.1.1"
+ 	},
+ 	"devDependencies": {
+diff --git a/packages/ui/src/index.ts b/packages/ui/src/index.ts
+index bbe978994125f0..c0dbf28a4550db 100644
+--- a/packages/ui/src/index.ts
++++ b/packages/ui/src/index.ts
+@@ -1 +1,2 @@
+ export * from './box';
++export * from './stack';
+diff --git a/packages/ui/src/lock-unlock.ts b/packages/ui/src/lock-unlock.ts
+deleted file mode 100644
+index d1533da413cfc3..00000000000000
+--- a/packages/ui/src/lock-unlock.ts
++++ /dev/null
+@@ -1,10 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
+-
+-export const { lock, unlock } =
+-	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
+-		'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
+-		'@wordpress/dataviews'
+-	);
+diff --git a/packages/ui/src/stack/index.ts b/packages/ui/src/stack/index.ts
+index ecaca37def83d2..9a57787ab0312a 100644
+--- a/packages/ui/src/stack/index.ts
++++ b/packages/ui/src/stack/index.ts
+@@ -1,4 +1 @@
+-/**
+- * Internal dependencies
+- */
+ export { Stack } from './stack';
+diff --git a/packages/ui/src/test/index.test.ts b/packages/ui/src/test/index.test.ts
+new file mode 100644
+index 00000000000000..ec6c70113c79df
+--- /dev/null
++++ b/packages/ui/src/test/index.test.ts
+@@ -0,0 +1,22 @@
++import { join, dirname, basename } from 'node:path';
++import { readFile } from 'node:fs/promises';
++import glob from 'fast-glob';
++
++describe( 'index', () => {
++	it( 'should export something from each component', async () => {
++		// As described in the CONTRIBUTING.md file, each component should be
++		// exported from an index.ts in its implementation directory.
++		const components = await glob( '*/index.ts', {
++			cwd: join( __dirname, '..' ),
++		} );
++		const directories = components.map( ( c ) => basename( dirname( c ) ) );
++		const index = await readFile(
++			join( __dirname, '../index.ts' ),
++			'utf-8'
++		);
++
++		for ( const directory of directories ) {
++			expect( index ).toContain( `'./${ directory }'` );
++		}
++	} );
++} );
+diff --git a/packages/ui/tsconfig.json b/packages/ui/tsconfig.json
+index 5b6f3248e5a48e..a7d445ffa2cbbb 100644
+--- a/packages/ui/tsconfig.json
++++ b/packages/ui/tsconfig.json
+@@ -4,10 +4,6 @@
+ 	"compilerOptions": {
+ 		"types": [ "node", "jest", "@testing-library/jest-dom" ]
+ 	},
+-	"references": [
+-		{ "path": "../element" },
+-		{ "path": "../private-apis" },
+-		{ "path": "../theme" }
+-	],
++	"references": [ { "path": "../element" }, { "path": "../theme" } ],
+ 	"exclude": []
+ }

@@ -1,0 +1,782 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6b24148d024488..8bba4668114c1e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -28,6 +28,7 @@
+ -   `UnitControl`: Remove outer wrapper to normalize className placement ([#41860](https://github.com/WordPress/gutenberg/pull/41860)).
+ -   `ColorPalette`: Fix transparent checkered background pattern ([#45295](https://github.com/WordPress/gutenberg/pull/45295)).
+ -   `ToggleGroupControl`: Add `isDeselectable` prop to allow deselecting the selected option ([#45123](https://github.com/WordPress/gutenberg/pull/45123)).
++-   `FontSizePicker`: Improve hint text shown next to 'Font size' label ([#44966](https://github.com/WordPress/gutenberg/pull/44966)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/custom-select-control/index.js b/packages/components/src/custom-select-control/index.js
+index 4c8682f0c7cb3e..337c86e8422d45 100644
+--- a/packages/components/src/custom-select-control/index.js
++++ b/packages/components/src/custom-select-control/index.js
+@@ -79,6 +79,7 @@ export default function CustomSelectControl( props ) {
+ 		value: _selectedItem,
+ 		onMouseOver,
+ 		onMouseOut,
++		__experimentalShowSelectedHint = false,
+ 	} = props;
+ 
+ 	const {
+@@ -194,6 +195,12 @@ export default function CustomSelectControl( props ) {
+ 					} ) }
+ 				>
+ 					{ itemToString( selectedItem ) }
++					{ __experimentalShowSelectedHint &&
++						selectedItem.__experimentalHint && (
++							<span className="components-custom-select-control__hint">
++								{ selectedItem.__experimentalHint }
++							</span>
++						) }
+ 				</SelectControlSelect>
+ 			</InputBaseWithBackCompatMinWidth>
+ 			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
+diff --git a/packages/components/src/custom-select-control/stories/index.js b/packages/components/src/custom-select-control/stories/index.js
+index 585c3809237c0d..4891bcf2109378 100644
+--- a/packages/components/src/custom-select-control/stories/index.js
++++ b/packages/components/src/custom-select-control/stories/index.js
+@@ -8,6 +8,7 @@ export default {
+ 	component: CustomSelectControl,
+ 	argTypes: {
+ 		__next36pxDefaultSize: { control: { type: 'boolean' } },
++		__experimentalShowSelectedHint: { control: { type: 'boolean' } },
+ 		size: {
+ 			control: {
+ 				type: 'radio',
+diff --git a/packages/components/src/custom-select-control/style.scss b/packages/components/src/custom-select-control/style.scss
+index e6ca7945abfe1e..b231218ef4b611 100644
+--- a/packages/components/src/custom-select-control/style.scss
++++ b/packages/components/src/custom-select-control/style.scss
+@@ -9,6 +9,11 @@
+ 	outline: 0; // focus ring is handled elsewhere
+ }
+ 
++.components-custom-select-control__hint {
++	color: $gray-600;
++	margin-left: 10px;
++}
++
+ .components-custom-select-control__menu {
+ 	// Hide when collapsed.
+ 	&[aria-hidden="true"] {
+@@ -50,7 +55,7 @@
+ 		background: $gray-300;
+ 	}
+ 	.components-custom-select-control__item-hint {
+-		color: $gray-700;
++		color: $gray-600;
+ 		text-align: right;
+ 		padding-right: $grid-unit-05;
+ 	}
+diff --git a/packages/components/src/custom-select-control/test/index.js b/packages/components/src/custom-select-control/test/index.js
+index e5f7ef728ca0d8..413760b63ebed7 100644
+--- a/packages/components/src/custom-select-control/test/index.js
++++ b/packages/components/src/custom-select-control/test/index.js
+@@ -46,4 +46,43 @@ describe( 'CustomSelectControl', () => {
+ 
+ 		expect( onKeyDown ).toHaveBeenCalledTimes( 0 );
+ 	} );
++
++	it( 'does not show selected hint by default', () => {
++		render(
++			<CustomSelectControl
++				label="Custom select"
++				options={ [
++					{
++						key: 'one',
++						name: 'One',
++						__experimentalHint: 'Hint',
++					},
++				] }
++				__nextUnconstrainedWidth
++			/>
++		);
++		expect(
++			screen.getByRole( 'button', { name: 'Custom select' } )
++		).not.toHaveTextContent( 'Hint' );
++	} );
++
++	it( 'shows selected hint when __experimentalShowSelectedHint is set', () => {
++		render(
++			<CustomSelectControl
++				label="Custom select"
++				options={ [
++					{
++						key: 'one',
++						name: 'One',
++						__experimentalHint: 'Hint',
++					},
++				] }
++				__experimentalShowSelectedHint
++				__nextUnconstrainedWidth
++			/>
++		);
++		expect(
++			screen.getByRole( 'button', { name: 'Custom select' } )
++		).toHaveTextContent( 'Hint' );
++	} );
+ } );
+diff --git a/packages/components/src/font-size-picker/constants.ts b/packages/components/src/font-size-picker/constants.ts
+new file mode 100644
+index 00000000000000..1e321aa90b0dfb
+--- /dev/null
++++ b/packages/components/src/font-size-picker/constants.ts
+@@ -0,0 +1,37 @@
++/**
++ * WordPress dependencies
++ */
++import { __ } from '@wordpress/i18n';
++
++/**
++ * List of T-shirt abbreviations.
++ *
++ * When there are 5 font sizes or fewer, we assume that the font sizes are
++ * ordered by size and show T-shirt labels.
++ */
++export const T_SHIRT_ABBREVIATIONS = [
++	/* translators: S stands for 'small' and is a size label. */
++	__( 'S' ),
++	/* translators: M stands for 'medium' and is a size label. */
++	__( 'M' ),
++	/* translators: L stands for 'large' and is a size label. */
++	__( 'L' ),
++	/* translators: XL stands for 'extra large' and is a size label. */
++	__( 'XL' ),
++	/* translators: XXL stands for 'extra extra large' and is a size label. */
++	__( 'XXL' ),
++];
++
++/**
++ * List of T-shirt names.
++ *
++ * When there are 5 font sizes or fewer, we assume that the font sizes are
++ * ordered by size and show T-shirt labels.
++ */
++export const T_SHIRT_NAMES = [
++	__( 'Small' ),
++	__( 'Medium' ),
++	__( 'Large' ),
++	__( 'Extra Large' ),
++	__( 'Extra Extra Large' ),
++];
+diff --git a/packages/components/src/font-size-picker/font-size-picker-select.tsx b/packages/components/src/font-size-picker/font-size-picker-select.tsx
+index 192a0f5632f715..d3fc2ffe4a61fd 100644
+--- a/packages/components/src/font-size-picker/font-size-picker-select.tsx
++++ b/packages/components/src/font-size-picker/font-size-picker-select.tsx
+@@ -12,6 +12,7 @@ import type {
+ 	FontSizePickerSelectProps,
+ 	FontSizePickerSelectOption,
+ } from './types';
++import { getCommonSizeUnit, isSimpleCssValue } from './utils';
+ 
+ const DEFAULT_OPTION: FontSizePickerSelectOption = {
+ 	key: 'default',
+@@ -34,18 +35,27 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
+ 		onSelectCustom,
+ 	} = props;
+ 
++	const areAllSizesSameUnit = !! getCommonSizeUnit( fontSizes );
++
+ 	const options: FontSizePickerSelectOption[] = [
+ 		DEFAULT_OPTION,
+ 		...fontSizes.map( ( fontSize ) => {
+-			const [ quantity ] = parseQuantityAndUnitFromRawValue(
+-				fontSize.size
+-			);
++			let hint;
++			if ( areAllSizesSameUnit ) {
++				const [ quantity ] = parseQuantityAndUnitFromRawValue(
++					fontSize.size
++				);
++				if ( quantity !== undefined ) {
++					hint = String( quantity );
++				}
++			} else if ( isSimpleCssValue( fontSize.size ) ) {
++				hint = String( fontSize.size );
++			}
+ 			return {
+ 				key: fontSize.slug,
+ 				name: fontSize.name || fontSize.slug,
+ 				value: fontSize.size,
+-				__experimentalHint:
+-					quantity !== undefined ? String( quantity ) : undefined,
++				__experimentalHint: hint,
+ 			};
+ 		} ),
+ 		...( disableCustomFontSizes ? [] : [ CUSTOM_OPTION ] ),
+@@ -68,6 +78,7 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
+ 			) }
+ 			options={ options }
+ 			value={ selectedOption }
++			__experimentalShowSelectedHint
+ 			onChange={ ( {
+ 				selectedItem,
+ 			}: {
+diff --git a/packages/components/src/font-size-picker/font-size-picker-toggle-group.tsx b/packages/components/src/font-size-picker/font-size-picker-toggle-group.tsx
+index a7aed96e76ae6f..697d9e11b67e47 100644
+--- a/packages/components/src/font-size-picker/font-size-picker-toggle-group.tsx
++++ b/packages/components/src/font-size-picker/font-size-picker-toggle-group.tsx
+@@ -10,26 +10,9 @@ import {
+ 	ToggleGroupControl,
+ 	ToggleGroupControlOption,
+ } from '../toggle-group-control';
++import { T_SHIRT_ABBREVIATIONS, T_SHIRT_NAMES } from './constants';
+ import type { FontSizePickerToggleGroupProps } from './types';
+ 
+-/**
+- * In case we have at most five font sizes, show a `T-shirt size` alias as a
+- * label of the font size. The label assumes that the font sizes are ordered
+- * accordingly - from smallest to largest.
+- */
+-const FONT_SIZES_ALIASES = [
+-	/* translators: S stands for 'small' and is a size label. */
+-	__( 'S' ),
+-	/* translators: M stands for 'medium' and is a size label. */
+-	__( 'M' ),
+-	/* translators: L stands for 'large' and is a size label. */
+-	__( 'L' ),
+-	/* translators: XL stands for 'extra large' and is a size label. */
+-	__( 'XL' ),
+-	/* translators: XXL stands for 'extra extra large' and is a size label. */
+-	__( 'XXL' ),
+-];
+-
+ const FontSizePickerToggleGroup = ( props: FontSizePickerToggleGroupProps ) => {
+ 	const { fontSizes, value, __nextHasNoMarginBottom, size, onChange } = props;
+ 	return (
+@@ -46,8 +29,8 @@ const FontSizePickerToggleGroup = ( props: FontSizePickerToggleGroupProps ) => {
+ 				<ToggleGroupControlOption
+ 					key={ fontSize.slug }
+ 					value={ fontSize.size }
+-					label={ FONT_SIZES_ALIASES[ index ] }
+-					aria-label={ fontSize.name || FONT_SIZES_ALIASES[ index ] }
++					label={ T_SHIRT_ABBREVIATIONS[ index ] }
++					aria-label={ fontSize.name || T_SHIRT_NAMES[ index ] }
+ 					showTooltip
+ 				/>
+ 			) ) }
+diff --git a/packages/components/src/font-size-picker/index.tsx b/packages/components/src/font-size-picker/index.tsx
+index 9c4c1cac988850..7aa5d31b1e9e94 100644
+--- a/packages/components/src/font-size-picker/index.tsx
++++ b/packages/components/src/font-size-picker/index.tsx
+@@ -23,7 +23,7 @@ import {
+ 	useCustomUnits,
+ } from '../unit-control';
+ import { VisuallyHidden } from '../visually-hidden';
+-import { isSimpleCssValue } from './utils';
++import { getCommonSizeUnit } from './utils';
+ import { HStack } from '../h-stack';
+ import type { FontSizePickerProps } from './types';
+ import {
+@@ -36,6 +36,7 @@ import {
+ import { Spacer } from '../spacer';
+ import FontSizePickerSelect from './font-size-picker-select';
+ import FontSizePickerToggleGroup from './font-size-picker-toggle-group';
++import { T_SHIRT_NAMES } from './constants';
+ 
+ const UnforwardedFontSizePicker = (
+ 	props: FontSizePickerProps,
+@@ -78,53 +79,29 @@ const UnforwardedFontSizePicker = (
+ 
+ 	const headerHint = useMemo( () => {
+ 		if ( showCustomValueControl ) {
+-			return `(${ __( 'Custom' ) })`;
++			return __( 'Custom' );
+ 		}
+ 
+-		// If we have a custom value that is not available in the font sizes,
+-		// show it as a hint as long as it's a simple CSS value.
+-		if ( isCustomValue ) {
+-			return (
+-				value !== undefined &&
+-				isSimpleCssValue( value ) &&
+-				`(${ value })`
+-			);
++		if ( ! shouldUseSelectControl ) {
++			if ( selectedFontSize ) {
++				return (
++					selectedFontSize.name ||
++					T_SHIRT_NAMES[ fontSizes.indexOf( selectedFontSize ) ]
++				);
++			}
++			return '';
+ 		}
+ 
+-		if ( shouldUseSelectControl ) {
+-			return (
+-				selectedFontSize?.size !== undefined &&
+-				isSimpleCssValue( selectedFontSize?.size ) &&
+-				`(${ selectedFontSize?.size })`
+-			);
++		const commonUnit = getCommonSizeUnit( fontSizes );
++		if ( commonUnit ) {
++			return `(${ commonUnit })`;
+ 		}
+ 
+-		if ( ! selectedFontSize ) {
+-			return __( 'Default' );
+-		}
+-
+-		// Calculate the `hint` for toggle group control.
+-		let hint = selectedFontSize.name || selectedFontSize.slug;
+-		const fontSizesContainComplexValues = fontSizes.some(
+-			( fontSize ) => ! isSimpleCssValue( fontSize.size )
+-		);
+-		if (
+-			! fontSizesContainComplexValues &&
+-			typeof selectedFontSize.size === 'string'
+-		) {
+-			const [ , unit ] = parseQuantityAndUnitFromRawValue(
+-				selectedFontSize.size,
+-				units
+-			);
+-			hint += `(${ unit })`;
+-		}
+-		return hint;
++		return '';
+ 	}, [
+ 		showCustomValueControl,
+-		isCustomValue,
+-		selectedFontSize,
+-		value,
+ 		shouldUseSelectControl,
++		selectedFontSize,
+ 		fontSizes,
+ 	] );
+ 
+diff --git a/packages/components/src/font-size-picker/test/index.tsx b/packages/components/src/font-size-picker/test/index.tsx
+index cdcce2db1cc715..74e0eef2f94dcd 100644
+--- a/packages/components/src/font-size-picker/test/index.tsx
++++ b/packages/components/src/font-size-picker/test/index.tsx
+@@ -67,7 +67,119 @@ describe( 'FontSizePicker', () => {
+ 		}
+ 	);
+ 
+-	describe( 'with > 5 font sizes', () => {
++	describe( 'with > 5 homogeneous font sizes', () => {
++		const fontSizes = [
++			{
++				slug: 'tiny',
++				name: 'Tiny',
++				size: '8px',
++			},
++			{
++				slug: 'small',
++				name: 'Small',
++				size: '12px',
++			},
++			{
++				slug: 'medium',
++				name: 'Medium',
++				size: '16px',
++			},
++			{
++				slug: 'large',
++				name: 'Large',
++				size: '20px',
++			},
++			{
++				slug: 'x-large',
++				name: 'Extra Large',
++				size: '30px',
++			},
++			{
++				slug: 'xx-large',
++				// no name
++				size: '40px',
++			},
++		];
++
++		it( 'displays a select control', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++			render(
++				<FontSizePicker
++					__nextHasNoMarginBottom
++					fontSizes={ fontSizes }
++				/>
++			);
++			await user.click(
++				screen.getByRole( 'button', { name: 'Font size' } )
++			);
++			const options = screen.getAllByRole( 'option' );
++			expect( options ).toHaveLength( 8 );
++			expect( options[ 0 ] ).toHaveAccessibleName( 'Default' );
++			expect( options[ 1 ] ).toHaveAccessibleName( 'Tiny 8' );
++			expect( options[ 2 ] ).toHaveAccessibleName( 'Small 12' );
++			expect( options[ 3 ] ).toHaveAccessibleName( 'Medium 16' );
++			expect( options[ 4 ] ).toHaveAccessibleName( 'Large 20' );
++			expect( options[ 5 ] ).toHaveAccessibleName( 'Extra Large 30' );
++			expect( options[ 6 ] ).toHaveAccessibleName( 'xx-large 40' );
++			expect( options[ 7 ] ).toHaveAccessibleName( 'Custom' );
++		} );
++
++		test.each( [
++			{ value: undefined, expectedLabel: 'Size (px)' },
++			{ value: '8px', expectedLabel: 'Size (px)' },
++			{ value: '3px', expectedLabel: 'Size Custom' },
++		] )(
++			'displays $expectedLabel as label when value is $value',
++			( { value, expectedLabel } ) => {
++				render(
++					<FontSizePicker
++						__nextHasNoMarginBottom
++						fontSizes={ fontSizes }
++						value={ value }
++					/>
++				);
++				expect(
++					screen.getByLabelText( expectedLabel )
++				).toBeInTheDocument();
++			}
++		);
++
++		test.each( [
++			{ option: 'Default', value: '8px', expectedValue: undefined },
++			{ option: 'Tiny 8', value: undefined, expectedValue: '8px' },
++		] )(
++			'calls onChange( $expectedValue ) when $option is selected',
++			async ( { option, value, expectedValue } ) => {
++				const user = userEvent.setup( {
++					advanceTimers: jest.advanceTimersByTime,
++				} );
++				const onChange = jest.fn();
++				render(
++					<FontSizePicker
++						__nextHasNoMarginBottom
++						fontSizes={ fontSizes }
++						value={ value }
++						onChange={ onChange }
++					/>
++				);
++				await user.click(
++					screen.getByRole( 'button', { name: 'Font size' } )
++				);
++				await user.click(
++					screen.getByRole( 'option', { name: option } )
++				);
++				expect( onChange ).toHaveBeenCalledTimes( 1 );
++				expect( onChange ).toHaveBeenCalledWith( expectedValue );
++			}
++		);
++
++		commonSelectTests( fontSizes );
++		commonTests( fontSizes );
++	} );
++
++	describe( 'with > 5 heterogeneous font sizes', () => {
+ 		const fontSizes = [
+ 			{
+ 				slug: 'tiny',
+@@ -117,12 +229,12 @@ describe( 'FontSizePicker', () => {
+ 			const options = screen.getAllByRole( 'option' );
+ 			expect( options ).toHaveLength( 8 );
+ 			expect( options[ 0 ] ).toHaveAccessibleName( 'Default' );
+-			expect( options[ 1 ] ).toHaveAccessibleName( 'Tiny 8' );
+-			expect( options[ 2 ] ).toHaveAccessibleName( 'Small 1' );
+-			expect( options[ 3 ] ).toHaveAccessibleName( 'Medium 2' );
++			expect( options[ 1 ] ).toHaveAccessibleName( 'Tiny 8px' );
++			expect( options[ 2 ] ).toHaveAccessibleName( 'Small 1em' );
++			expect( options[ 3 ] ).toHaveAccessibleName( 'Medium 2rem' );
+ 			expect( options[ 4 ] ).toHaveAccessibleName( 'Large' );
+-			expect( options[ 5 ] ).toHaveAccessibleName( 'Extra Large 30' );
+-			expect( options[ 6 ] ).toHaveAccessibleName( 'xx-large 40' );
++			expect( options[ 5 ] ).toHaveAccessibleName( 'Extra Large 30px' );
++			expect( options[ 6 ] ).toHaveAccessibleName( 'xx-large 40px' );
+ 			expect( options[ 7 ] ).toHaveAccessibleName( 'Custom' );
+ 		} );
+ 
+@@ -148,11 +260,11 @@ describe( 'FontSizePicker', () => {
+ 
+ 		test.each( [
+ 			{ value: undefined, expectedLabel: 'Size' },
+-			{ value: '8px', expectedLabel: 'Size (8px)' },
+-			{ value: '1em', expectedLabel: 'Size (1em)' },
+-			{ value: '2rem', expectedLabel: 'Size (2rem)' },
++			{ value: '8px', expectedLabel: 'Size' },
++			{ value: '1em', expectedLabel: 'Size' },
++			{ value: '2rem', expectedLabel: 'Size' },
+ 			{ value: 'clamp(1.75rem, 3vw, 2.25rem)', expectedLabel: 'Size' },
+-			{ value: '3px', expectedLabel: 'Size (Custom)' },
++			{ value: '3px', expectedLabel: 'Size Custom' },
+ 		] )(
+ 			'displays $expectedLabel as label when value is $value',
+ 			( { value, expectedLabel } ) => {
+@@ -171,9 +283,9 @@ describe( 'FontSizePicker', () => {
+ 
+ 		test.each( [
+ 			{ option: 'Default', value: '8px', expectedValue: undefined },
+-			{ option: 'Tiny 8', value: undefined, expectedValue: '8px' },
+-			{ option: 'Small 1', value: '8px', expectedValue: '1em' },
+-			{ option: 'Medium 2', value: '8px', expectedValue: '2rem' },
++			{ option: 'Tiny 8px', value: undefined, expectedValue: '8px' },
++			{ option: 'Small 1em', value: '8px', expectedValue: '1em' },
++			{ option: 'Medium 2rem', value: '8px', expectedValue: '2rem' },
+ 			{
+ 				option: 'Large',
+ 				value: '8px',
+@@ -205,28 +317,7 @@ describe( 'FontSizePicker', () => {
+ 			}
+ 		);
+ 
+-		it( 'shows custom input when Custom is selected', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
+-			const onChange = jest.fn();
+-			render(
+-				<FontSizePicker
+-					__nextHasNoMarginBottom
+-					fontSizes={ fontSizes }
+-					onChange={ onChange }
+-				/>
+-			);
+-			await user.click(
+-				screen.getByRole( 'button', { name: 'Font size' } )
+-			);
+-			await user.click(
+-				screen.getByRole( 'option', { name: 'Custom' } )
+-			);
+-			expect( screen.getByLabelText( 'Custom' ) ).toBeInTheDocument();
+-			expect( onChange ).not.toHaveBeenCalled();
+-		} );
+-
++		commonSelectTests( fontSizes );
+ 		commonTests( fontSizes );
+ 	} );
+ 
+@@ -269,7 +360,7 @@ describe( 'FontSizePicker', () => {
+ 			const options = screen.getAllByRole( 'radio' );
+ 			expect( options ).toHaveLength( 5 );
+ 			expect( options[ 0 ] ).toHaveTextContent( 'S' );
+-			expect( options[ 0 ] ).toHaveAccessibleName( 'S' );
++			expect( options[ 0 ] ).toHaveAccessibleName( 'Small' );
+ 			expect( options[ 1 ] ).toHaveTextContent( 'M' );
+ 			expect( options[ 1 ] ).toHaveAccessibleName( 'Medium' );
+ 			expect( options[ 2 ] ).toHaveTextContent( 'L' );
+@@ -281,9 +372,9 @@ describe( 'FontSizePicker', () => {
+ 		} );
+ 
+ 		test.each( [
+-			{ value: undefined, expectedLabel: 'Size Default' },
+-			{ value: '12px', expectedLabel: 'Size small(px)' },
+-			{ value: '40px', expectedLabel: 'Size Gigantosaurus(px)' },
++			{ value: undefined, expectedLabel: 'Size' },
++			{ value: '12px', expectedLabel: 'Size Small' },
++			{ value: '40px', expectedLabel: 'Size Gigantosaurus' },
+ 		] )(
+ 			'displays $expectedLabel as label when value is $value',
+ 			( { value, expectedLabel } ) => {
+@@ -365,7 +456,7 @@ describe( 'FontSizePicker', () => {
+ 		} );
+ 
+ 		test.each( [
+-			{ value: undefined, expectedLabel: 'Size Default' },
++			{ value: undefined, expectedLabel: 'Size' },
+ 			{ value: '12px', expectedLabel: 'Size Small' },
+ 			{ value: '1em', expectedLabel: 'Size Medium' },
+ 			{ value: '2rem', expectedLabel: 'Size Large' },
+@@ -455,6 +546,30 @@ describe( 'FontSizePicker', () => {
+ 		);
+ 	}
+ 
++	function commonSelectTests( fontSizes: FontSize[] ) {
++		it( 'shows custom input when Custom is selected', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++			const onChange = jest.fn();
++			render(
++				<FontSizePicker
++					__nextHasNoMarginBottom
++					fontSizes={ fontSizes }
++					onChange={ onChange }
++				/>
++			);
++			await user.click(
++				screen.getByRole( 'button', { name: 'Font size' } )
++			);
++			await user.click(
++				screen.getByRole( 'option', { name: 'Custom' } )
++			);
++			expect( screen.getByLabelText( 'Custom' ) ).toBeInTheDocument();
++			expect( onChange ).not.toHaveBeenCalled();
++		} );
++	}
++
+ 	function commonTests( fontSizes: FontSize[] ) {
+ 		it( 'shows custom input when value is unknown', () => {
+ 			render(
+diff --git a/packages/components/src/font-size-picker/test/utils.ts b/packages/components/src/font-size-picker/test/utils.ts
+index 91205062d57021..584820ae27a71a 100644
+--- a/packages/components/src/font-size-picker/test/utils.ts
++++ b/packages/components/src/font-size-picker/test/utils.ts
+@@ -1,38 +1,69 @@
+ /**
+  * Internal dependencies
+  */
+-import { isSimpleCssValue } from '../utils';
+-
+-const simpleCSSCases: [ number | string, boolean ][] = [
+-	// Test integers and non-integers.
+-	[ 1, true ],
+-	[ 1.25, true ],
+-	[ '123', true ],
+-	[ '1.5', true ],
+-	[ '0.75', true ],
+-	// CSS unit tests.
+-	[ '20px', true ],
+-	[ '0.8em', true ],
+-	[ '2rem', true ],
+-	[ '1.4vw', true ],
+-	[ '0.4vh', true ],
+-	// Invalid negative values,
+-	[ '-5px', false ],
+-	// Complex CSS values that should fail.
+-	[ 'abs(-10px)', false ],
+-	[ 'calc(10px + 1)', false ],
+-	[ 'clamp(2.5rem, 4vw, 3rem)', false ],
+-	[ 'max(4.5em, 3vh)', false ],
+-	[ 'min(10px, 1rem)', false ],
+-	[ 'minmax(30px, auto)', false ],
+-	[ 'var(--wp--font-size)', false ],
+-];
++import { isSimpleCssValue, getCommonSizeUnit } from '../utils';
+ 
+ describe( 'isSimpleCssValue', () => {
+-	test.each( simpleCSSCases )(
+-		'given %p as argument, returns %p',
+-		( cssValue, result ) => {
+-			expect( isSimpleCssValue( cssValue ) ).toBe( result );
+-		}
+-	);
++	test.each( [
++		// Test integers and non-integers.
++		[ 1, true ],
++		[ 1.25, true ],
++		[ '123', true ],
++		[ '1.5', true ],
++		[ '0.75', true ],
++		// CSS unit tests.
++		[ '20px', true ],
++		[ '0.8em', true ],
++		[ '2rem', true ],
++		[ '1.4vw', true ],
++		[ '0.4vh', true ],
++		// Invalid negative values,
++		[ '-5px', false ],
++		// Complex CSS values that should fail.
++		[ 'abs(-10px)', false ],
++		[ 'calc(10px + 1)', false ],
++		[ 'clamp(2.5rem, 4vw, 3rem)', false ],
++		[ 'max(4.5em, 3vh)', false ],
++		[ 'min(10px, 1rem)', false ],
++		[ 'minmax(30px, auto)', false ],
++		[ 'var(--wp--font-size)', false ],
++	] )( 'given %p as argument, returns %p', ( cssValue, result ) => {
++		expect( isSimpleCssValue( cssValue ) ).toBe( result );
++	} );
++} );
++
++describe( 'getCommonSizeUnit', () => {
++	it( 'returns null when fontSizes is empty', () => {
++		expect( getCommonSizeUnit( [] ) ).toBe( null );
++	} );
++
++	it( 'returns px when all sizes are px', () => {
++		expect(
++			getCommonSizeUnit( [
++				{ slug: 'small', size: '10px' },
++				{ slug: 'medium', size: '20px' },
++				{ slug: 'large', size: '30px' },
++			] )
++		).toBe( 'px' );
++	} );
++
++	it( 'returns em when all sizes are em', () => {
++		expect(
++			getCommonSizeUnit( [
++				{ slug: 'small', size: '1em' },
++				{ slug: 'medium', size: '2em' },
++				{ slug: 'large', size: '3em' },
++			] )
++		).toBe( 'em' );
++	} );
++
++	it( 'returns null when sizes are heterogeneous', () => {
++		expect(
++			getCommonSizeUnit( [
++				{ slug: 'small', size: '10px' },
++				{ slug: 'medium', size: '2em' },
++				{ slug: 'large', size: '3rem' },
++			] )
++		).toBe( null );
++	} );
+ } );
+diff --git a/packages/components/src/font-size-picker/utils.ts b/packages/components/src/font-size-picker/utils.ts
+index 3f0c6019da8067..d7e426230329e0 100644
+--- a/packages/components/src/font-size-picker/utils.ts
++++ b/packages/components/src/font-size-picker/utils.ts
+@@ -6,7 +6,8 @@ import { __ } from '@wordpress/i18n';
+ /**
+  * Internal dependencies
+  */
+-import type { FontSizePickerProps } from './types';
++import type { FontSizePickerProps, FontSize } from './types';
++import { parseQuantityAndUnitFromRawValue } from '../unit-control';
+ 
+ /**
+  * Some themes use css vars for their font sizes, so until we
+@@ -21,3 +22,25 @@ export function isSimpleCssValue(
+ 	const sizeRegex = /^[\d\.]+(px|em|rem|vw|vh|%)?$/i;
+ 	return sizeRegex.test( String( value ) );
+ }
++
++/**
++ * If all of the given font sizes have the same unit (e.g. 'px'), return that
++ * unit. Otherwise return null.
++ *
++ * @param  fontSizes List of font sizes.
++ * @return The common unit, or null.
++ */
++export function getCommonSizeUnit( fontSizes: FontSize[] ) {
++	const [ firstFontSize, ...otherFontSizes ] = fontSizes;
++	if ( ! firstFontSize ) {
++		return null;
++	}
++	const [ , firstUnit ] = parseQuantityAndUnitFromRawValue(
++		firstFontSize.size
++	);
++	const areAllSizesSameUnit = otherFontSizes.every( ( fontSize ) => {
++		const [ , unit ] = parseQuantityAndUnitFromRawValue( fontSize.size );
++		return unit === firstUnit;
++	} );
++	return areAllSizesSameUnit ? firstUnit : null;
++}
+diff --git a/test/e2e/specs/site-editor/style-variations.spec.js b/test/e2e/specs/site-editor/style-variations.spec.js
+index ba52eb25d9109a..56de0ac0de2194 100644
+--- a/test/e2e/specs/site-editor/style-variations.spec.js
++++ b/test/e2e/specs/site-editor/style-variations.spec.js
+@@ -100,7 +100,7 @@ test.describe( 'Global styles variations', () => {
+ 
+ 		await expect(
+ 			page.locator( 'css=.components-font-size-picker__header__hint' )
+-		).toHaveText( 'Medium(px)' );
++		).toHaveText( 'Medium' );
+ 	} );
+ 
+ 	test( 'should apply custom colors and font sizes in a variation', async ( {
+@@ -141,7 +141,7 @@ test.describe( 'Global styles variations', () => {
+ 		//  we could provide accessible attributes to the source code in packages/components/src/font-size-picker/index.js.
+ 		await expect(
+ 			page.locator( 'css=.components-font-size-picker__header__hint' )
+-		).toHaveText( '(Custom)' );
++		).toHaveText( 'Custom' );
+ 
+ 		await expect(
+ 			page.locator( 'role=spinbutton[name="Custom"i]' )

@@ -1,0 +1,849 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e176cb36b8fad4..716d3f009d2837 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,8 @@
+ -   `TabPanel`: Improve unit test in preparation for controlled component updates ([#48086](https://github.com/WordPress/gutenberg/pull/48086)).
+ -   `Autocomplete`: performance: avoid setting state on every value change ([#48485](https://github.com/WordPress/gutenberg/pull/48485)).
+ -   `Higher Order` -- `with-constrained-tabbing`: Convert to TypeScript ([#48162](https://github.com/WordPress/gutenberg/pull/48162)).
++-   `Autocomplete`: Convert to TypeScript ([#47751](https://github.com/WordPress/gutenberg/pull/47751)).
++-   `Autocomplete`: avoid calling setState on input ([#48565](https://github.com/WordPress/gutenberg/pull/48565)).
+ 
+ ## 23.4.0 (2023-02-15)
+ 
+diff --git a/packages/components/src/autocomplete/README.md b/packages/components/src/autocomplete/README.md
+index fb0cca339efca8..37c23968940087 100644
+--- a/packages/components/src/autocomplete/README.md
++++ b/packages/components/src/autocomplete/README.md
+@@ -2,6 +2,57 @@
+ 
+ This component is used to provide autocompletion support for a child input component.
+ 
++## Props
++
++The following props are used to control the behavior of the component.
++
++### record
++
++The rich text value object the autocomleter is being applied to.
++
++-   Required: Yes
++-   Type: `RichTextValue`
++
++### onChange
++
++A function to be called when an option is selected to insert into the existing text.
++
++-   Required: Yes
++-   Type: `( value: string ) => void`
++
++A function to be called when an option is selected to replace the existing text.
++
++-   Required: Yes
++-   Type: `( arg: [ OptionCompletion[ 'value' ] ] ) => void;`
++
++### completers
++
++An array of all of the completers to apply to the current element.
++
++-   Required: Yes
++-   Type: `Array< WPCompleter >`
++ 
++### contentRef
++
++A ref containing the editable element that will serve as the anchor for `Autocomplete`'s `Popover`.
++
++-   Required: Yes
++-   `MutableRefObject< HTMLElement | undefined >`
++
++### children
++
++A function that returns nodes to be rendered within the Autocomplete.
++
++-   Required: Yes
++-   Type: `Function`
++
++### isSelected
++
++Whether or not the Autocomplte componenet is selected, and if its `Popover` should be displayed.
++
++- Required: Yes
++- Type: `Boolean`
++
+ ## Autocompleters
+ 
+ Autocompleters enable us to offer users options for completing text input. For example, Gutenberg includes a user autocompleter that provides a list of user names and completes a selection with a user mention like `@mary`.
+diff --git a/packages/components/src/autocomplete/autocompleter-ui.js b/packages/components/src/autocomplete/autocompleter-ui.tsx
+similarity index 84%
+rename from packages/components/src/autocomplete/autocompleter-ui.js
+rename to packages/components/src/autocomplete/autocompleter-ui.tsx
+index 4a5003e2838823..4b0843cad4e5b8 100644
+--- a/packages/components/src/autocomplete/autocompleter-ui.js
++++ b/packages/components/src/autocomplete/autocompleter-ui.tsx
+@@ -12,6 +12,8 @@ import {
+ 	useEffect,
+ 	useState,
+ } from '@wordpress/element';
++// Error expected because `@wordpress/rich-text` is not yet fully typed.
++// @ts-expect-error
+ import { useAnchor } from '@wordpress/rich-text';
+ import { useMergeRefs, useRefEffect } from '@wordpress/compose';
+ 
+@@ -23,8 +25,9 @@ import Button from '../button';
+ import Popover from '../popover';
+ import { VisuallyHidden } from '../visually-hidden';
+ import { createPortal } from 'react-dom';
++import type { AutocompleterUIProps, WPCompleter } from './types';
+ 
+-export function getAutoCompleterUI( autocompleter ) {
++export function getAutoCompleterUI( autocompleter: WPCompleter ) {
+ 	const useItems = autocompleter.useItems
+ 		? autocompleter.useItems
+ 		: getDefaultUseItems( autocompleter );
+@@ -41,7 +44,7 @@ export function getAutoCompleterUI( autocompleter ) {
+ 		reset,
+ 		value,
+ 		contentRef,
+-	} ) {
++	}: AutocompleterUIProps ) {
+ 		const [ items ] = useItems( filterValue );
+ 		const popoverAnchor = useAnchor( {
+ 			editableContentElement: contentRef.current,
+@@ -49,7 +52,7 @@ export function getAutoCompleterUI( autocompleter ) {
+ 		} );
+ 
+ 		const [ needsA11yCompat, setNeedsA11yCompat ] = useState( false );
+-		const popoverRef = useRef();
++		const popoverRef = useRef< HTMLElement >( null );
+ 		const popoverRefs = useMergeRefs( [
+ 			popoverRef,
+ 			useRefEffect(
+@@ -77,11 +80,15 @@ export function getAutoCompleterUI( autocompleter ) {
+ 			// eslint-disable-next-line react-hooks/exhaustive-deps
+ 		}, [ items ] );
+ 
+-		if ( ! items.length > 0 ) {
++		if ( items.length === 0 ) {
+ 			return null;
+ 		}
+ 
+-		const ListBox = ( { Component = 'div' } ) => (
++		const ListBox = ( {
++			Component = 'div',
++		}: {
++			Component?: React.ElementType;
++		} ) => (
+ 			<Component
+ 				id={ listBoxId }
+ 				role="listbox"
+@@ -134,11 +141,17 @@ export function getAutoCompleterUI( autocompleter ) {
+ 	return AutocompleterUI;
+ }
+ 
+-function useOnClickOutside( ref, handler ) {
++function useOnClickOutside(
++	ref: React.RefObject< HTMLElement >,
++	handler: AutocompleterUIProps[ 'reset' ]
++) {
+ 	useEffect( () => {
+-		const listener = ( event ) => {
++		const listener = ( event: MouseEvent | TouchEvent ) => {
+ 			// Do nothing if clicking ref's element or descendent elements, or if the ref is not referencing an element
+-			if ( ! ref.current || ref.current.contains( event.target ) ) {
++			if (
++				! ref.current ||
++				ref.current.contains( event.target as Node )
++			) {
+ 				return;
+ 			}
+ 			handler( event );
+diff --git a/packages/components/src/autocomplete/get-default-use-items.js b/packages/components/src/autocomplete/get-default-use-items.tsx
+similarity index 86%
+rename from packages/components/src/autocomplete/get-default-use-items.js
+rename to packages/components/src/autocomplete/get-default-use-items.tsx
+index 510c07f971dc45..e0be57c8c19cc4 100644
+--- a/packages/components/src/autocomplete/get-default-use-items.js
++++ b/packages/components/src/autocomplete/get-default-use-items.tsx
+@@ -13,8 +13,13 @@ import { useLayoutEffect, useState } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { escapeRegExp } from '../utils/strings';
++import type { CancelablePromise, KeyedOption, WPCompleter } from './types';
+ 
+-function filterOptions( search, options = [], maxResults = 10 ) {
++function filterOptions(
++	search: RegExp,
++	options: Array< KeyedOption > = [],
++	maxResults = 10
++) {
+ 	const filtered = [];
+ 	for ( let i = 0; i < options.length; i++ ) {
+ 		const option = options[ i ];
+@@ -43,9 +48,9 @@ function filterOptions( search, options = [], maxResults = 10 ) {
+ 	return filtered;
+ }
+ 
+-export default function getDefaultUseItems( autocompleter ) {
+-	return ( filterValue ) => {
+-		const [ items, setItems ] = useState( [] );
++export default function getDefaultUseItems( autocompleter: WPCompleter ) {
++	return ( filterValue: string ) => {
++		const [ items, setItems ] = useState< Array< KeyedOption > >( [] );
+ 		/*
+ 		 * We support both synchronous and asynchronous retrieval of completer options
+ 		 * but internally treat all as async so we maintain a single, consistent code path.
+@@ -61,7 +66,7 @@ export default function getDefaultUseItems( autocompleter ) {
+ 			const { options, isDebounced } = autocompleter;
+ 			const loadOptions = debounce(
+ 				() => {
+-					const promise = Promise.resolve(
++					const promise: CancelablePromise = Promise.resolve(
+ 						typeof options === 'function'
+ 							? options( filterValue )
+ 							: options
+@@ -112,6 +117,6 @@ export default function getDefaultUseItems( autocompleter ) {
+ 			};
+ 		}, [ filterValue ] );
+ 
+-		return [ items ];
++		return [ items ] as const;
+ 	};
+ }
+diff --git a/packages/components/src/autocomplete/index.js b/packages/components/src/autocomplete/index.tsx
+similarity index 70%
+rename from packages/components/src/autocomplete/index.js
+rename to packages/components/src/autocomplete/index.tsx
+index 5903e2cf53f1fe..42a44a5df2c196 100644
+--- a/packages/components/src/autocomplete/index.js
++++ b/packages/components/src/autocomplete/index.tsx
+@@ -26,6 +26,8 @@ import {
+ 	insert,
+ 	isCollapsed,
+ 	getTextContent,
++	// Error expected because `@wordpress/rich-text` is not yet fully typed.
++	// @ts-expect-error
+ } from '@wordpress/rich-text';
+ import { speak } from '@wordpress/a11y';
+ 
+@@ -34,102 +36,48 @@ import { speak } from '@wordpress/a11y';
+  */
+ import { getAutoCompleterUI } from './autocompleter-ui';
+ import { escapeRegExp } from '../utils/strings';
+-
+-const EMPTY_ARRAY = [];
+-
+-/**
+- * A raw completer option.
+- *
+- * @typedef {*} CompleterOption
+- */
+-
+-/**
+- * @callback FnGetOptions
+- *
+- * @return {(CompleterOption[]|Promise.<CompleterOption[]>)} The completer options or a promise for them.
+- */
+-
+-/**
+- * @callback FnGetOptionKeywords
+- * @param {CompleterOption} option a completer option.
+- *
+- * @return {string[]} list of key words to search.
+- */
+-
+-/**
+- * @callback FnIsOptionDisabled
+- * @param {CompleterOption} option a completer option.
+- *
+- * @return {string[]} whether or not the given option is disabled.
+- */
+-
+-/**
+- * @callback FnGetOptionLabel
+- * @param {CompleterOption} option a completer option.
+- *
+- * @return {(string|Array.<(string|WPElement)>)} list of react components to render.
+- */
+-
+-/**
+- * @callback FnAllowContext
+- * @param {string} before the string before the auto complete trigger and query.
+- * @param {string} after  the string after the autocomplete trigger and query.
+- *
+- * @return {boolean} true if the completer can handle.
+- */
+-
+-/**
+- * @typedef {Object} OptionCompletion
+- * @property {'insert-at-caret'|'replace'} action the intended placement of the completion.
+- * @property {OptionCompletionValue}       value  the completion value.
+- */
+-
+-/**
+- * A completion value.
+- *
+- * @typedef {(string|WPElement|Object)} OptionCompletionValue
+- */
+-
+-/**
+- * @callback FnGetOptionCompletion
+- * @param {CompleterOption} value the value of the completer option.
+- * @param {string}          query the text value of the autocomplete query.
+- *
+- * @return {(OptionCompletion|OptionCompletionValue)} the completion for the given option. If an
+- * 													   OptionCompletionValue is returned, the
+- * 													   completion action defaults to `insert-at-caret`.
+- */
+-
+-/**
+- * @typedef {Object} WPCompleter
+- * @property {string}                           name                a way to identify a completer, useful for selective overriding.
+- * @property {?string}                          className           A class to apply to the popup menu.
+- * @property {string}                           triggerPrefix       the prefix that will display the menu.
+- * @property {(CompleterOption[]|FnGetOptions)} options             the completer options or a function to get them.
+- * @property {?FnGetOptionKeywords}             getOptionKeywords   get the keywords for a given option.
+- * @property {?FnIsOptionDisabled}              isOptionDisabled    get whether or not the given option is disabled.
+- * @property {FnGetOptionLabel}                 getOptionLabel      get the label for a given option.
+- * @property {?FnAllowContext}                  allowContext        filter the context under which the autocomplete activates.
+- * @property {FnGetOptionCompletion}            getOptionCompletion get the completion associated with a given option.
+- */
+-
+-function useAutocomplete( {
++import type {
++	AutocompleteProps,
++	AutocompleterUIProps,
++	InsertOption,
++	KeyedOption,
++	OptionCompletion,
++	ReplaceOption,
++	UseAutocompleteProps,
++	WPCompleter,
++} from './types';
++
++const EMPTY_FILTERED_OPTIONS: KeyedOption[] = [];
++
++export function useAutocomplete( {
+ 	record,
+ 	onChange,
+ 	onReplace,
+ 	completers,
+ 	contentRef,
+-} ) {
++}: UseAutocompleteProps ) {
+ 	const debouncedSpeak = useDebounce( speak, 500 );
+ 	const instanceId = useInstanceId( useAutocomplete );
+ 	const [ selectedIndex, setSelectedIndex ] = useState( 0 );
+-	const [ filteredOptions, setFilteredOptions ] = useState( EMPTY_ARRAY );
+-	const [ filterValue, setFilterValue ] = useState( '' );
+-	const [ autocompleter, setAutocompleter ] = useState( null );
+-	const [ AutocompleterUI, setAutocompleterUI ] = useState( null );
++
++	const [ filteredOptions, setFilteredOptions ] = useState<
++		Array< KeyedOption >
++	>( EMPTY_FILTERED_OPTIONS );
++	const [ filterValue, setFilterValue ] =
++		useState< AutocompleterUIProps[ 'filterValue' ] >( '' );
++	const [ autocompleter, setAutocompleter ] = useState< WPCompleter | null >(
++		null
++	);
++	const [ AutocompleterUI, setAutocompleterUI ] = useState<
++		( ( props: AutocompleterUIProps ) => JSX.Element | null ) | null
++	>( null );
++
+ 	const backspacing = useRef( false );
+ 
+-	function insertCompletion( replacement ) {
++	function insertCompletion( replacement: React.ReactNode ) {
++		if ( autocompleter === null ) {
++			return;
++		}
+ 		const end = record.start;
+ 		const start =
+ 			end - autocompleter.triggerPrefix.length - filterValue.length;
+@@ -138,7 +86,7 @@ function useAutocomplete( {
+ 		onChange( insert( record, toInsert, start, end ) );
+ 	}
+ 
+-	function select( option ) {
++	function select( option: KeyedOption ) {
+ 		const { getOptionCompletion } = autocompleter || {};
+ 
+ 		if ( option.isDisabled ) {
+@@ -148,19 +96,33 @@ function useAutocomplete( {
+ 		if ( getOptionCompletion ) {
+ 			const completion = getOptionCompletion( option.value, filterValue );
+ 
+-			const { action, value } =
+-				undefined === completion.action ||
+-				undefined === completion.value
+-					? { action: 'insert-at-caret', value: completion }
+-					: completion;
++			const isCompletionObject = (
++				obj: OptionCompletion
++			): obj is InsertOption | ReplaceOption => {
++				return (
++					obj !== null &&
++					typeof obj === 'object' &&
++					'action' in obj &&
++					obj.action !== undefined &&
++					'value' in obj &&
++					obj.value !== undefined
++				);
++			};
+ 
+-			if ( 'replace' === action ) {
+-				onReplace( [ value ] );
++			const completionObject = isCompletionObject( completion )
++				? completion
++				: ( {
++						action: 'insert-at-caret',
++						value: completion,
++				  } as InsertOption );
++
++			if ( 'replace' === completionObject.action ) {
++				onReplace( [ completionObject.value ] );
+ 				// When replacing, the component will unmount, so don't reset
+ 				// state (below) on an unmounted component.
+ 				return;
+-			} else if ( 'insert-at-caret' === action ) {
+-				insertCompletion( value );
++			} else if ( 'insert-at-caret' === completionObject.action ) {
++				insertCompletion( completionObject.value );
+ 			}
+ 		}
+ 
+@@ -171,13 +133,13 @@ function useAutocomplete( {
+ 
+ 	function reset() {
+ 		setSelectedIndex( 0 );
+-		setFilteredOptions( EMPTY_ARRAY );
++		setFilteredOptions( EMPTY_FILTERED_OPTIONS );
+ 		setFilterValue( '' );
+ 		setAutocompleter( null );
+ 		setAutocompleterUI( null );
+ 	}
+ 
+-	function announce( options ) {
++	function announce( options: Array< KeyedOption > ) {
+ 		if ( ! debouncedSpeak ) {
+ 			return;
+ 		}
+@@ -204,7 +166,7 @@ function useAutocomplete( {
+ 	 *
+ 	 * @param {Array} options
+ 	 */
+-	function onChangeOptions( options ) {
++	function onChangeOptions( options: Array< KeyedOption > ) {
+ 		setSelectedIndex(
+ 			options.length === filteredOptions.length ? selectedIndex : 0
+ 		);
+@@ -212,7 +174,7 @@ function useAutocomplete( {
+ 		announce( options );
+ 	}
+ 
+-	function handleKeyDown( event ) {
++	function handleKeyDown( event: KeyboardEvent ) {
+ 		backspacing.current = event.key === 'Backspace';
+ 
+ 		if ( ! autocompleter ) {
+@@ -380,7 +342,7 @@ function useAutocomplete( {
+ 				? getAutoCompleterUI( completer )
+ 				: AutocompleterUI
+ 		);
+-		setFilterValue( query );
++		setFilterValue( query === null ? '' : query );
+ 		// Temporarily disabling exhaustive-deps to avoid introducing unexpected side effecst.
+ 		// See https://github.com/WordPress/gutenberg/pull/41820
+ 		// eslint-disable-next-line react-hooks/exhaustive-deps
+@@ -391,7 +353,7 @@ function useAutocomplete( {
+ 	const isExpanded = !! autocompleter && filteredOptions.length > 0;
+ 	const listBoxId = isExpanded
+ 		? `components-autocomplete-listbox-${ instanceId }`
+-		: null;
++		: undefined;
+ 	const activeId = isExpanded
+ 		? `components-autocomplete-item-${ instanceId }-${ selectedKey }`
+ 		: null;
+@@ -418,8 +380,8 @@ function useAutocomplete( {
+ 	};
+ }
+ 
+-function useLastDifferentValue( value ) {
+-	const history = useRef( new Set() );
++function useLastDifferentValue( value: UseAutocompleteProps[ 'record' ] ) {
++	const history = useRef< Set< typeof value > >( new Set() );
+ 
+ 	history.current.add( value );
+ 
+@@ -431,9 +393,9 @@ function useLastDifferentValue( value ) {
+ 	return Array.from( history.current )[ 0 ];
+ }
+ 
+-export function useAutocompleteProps( options ) {
+-	const ref = useRef();
+-	const onKeyDownRef = useRef();
++export function useAutocompleteProps( options: UseAutocompleteProps ) {
++	const ref = useRef< HTMLElement >( null );
++	const onKeyDownRef = useRef< ( event: KeyboardEvent ) => void >();
+ 	const { record } = options;
+ 	const previousRecord = useLastDifferentValue( record );
+ 	const { popover, listBoxId, activeId, onKeyDown } = useAutocomplete( {
+@@ -444,9 +406,9 @@ export function useAutocompleteProps( options ) {
+ 
+ 	const mergedRefs = useMergeRefs( [
+ 		ref,
+-		useRefEffect( ( element ) => {
+-			function _onKeyDown( event ) {
+-				onKeyDownRef.current( event );
++		useRefEffect( ( element: HTMLElement ) => {
++			function _onKeyDown( event: KeyboardEvent ) {
++				onKeyDownRef.current?.( event );
+ 			}
+ 			element.addEventListener( 'keydown', _onKeyDown );
+ 			return () => {
+@@ -471,7 +433,11 @@ export function useAutocompleteProps( options ) {
+ 	};
+ }
+ 
+-export default function Autocomplete( { children, isSelected, ...options } ) {
++export default function Autocomplete( {
++	children,
++	isSelected,
++	...options
++}: AutocompleteProps ) {
+ 	const { popover, ...props } = useAutocomplete( options );
+ 	return (
+ 		<>
+diff --git a/packages/components/src/autocomplete/test/index.js b/packages/components/src/autocomplete/test/index.tsx
+similarity index 57%
+rename from packages/components/src/autocomplete/test/index.js
+rename to packages/components/src/autocomplete/test/index.tsx
+index 26031a710422f1..e85e0ca91cc6c9 100644
+--- a/packages/components/src/autocomplete/test/index.js
++++ b/packages/components/src/autocomplete/test/index.tsx
+@@ -14,6 +14,8 @@ import { useRef } from '@wordpress/element';
+  */
+ import { getAutoCompleterUI } from '../autocompleter-ui';
+ 
++type FruitOption = { visual: string; name: string; id: number };
++
+ describe( 'AutocompleterUI', () => {
+ 	describe( 'click outside behavior', () => {
+ 		it( 'should call reset function when a click on another element occurs', async () => {
+@@ -23,25 +25,35 @@ describe( 'AutocompleterUI', () => {
+ 
+ 			const autocompleter = {
+ 				name: 'fruit',
++				options: [
++					{ visual: '🍎', name: 'Apple', id: 1 },
++					{ visual: '🍊', name: 'Orange', id: 2 },
++					{ visual: '🍇', name: 'Grapes', id: 3 },
++				],
+ 				// The prefix that triggers this completer
+ 				triggerPrefix: '~',
++				getOptionLabel: ( option: FruitOption ) => (
++					<span>
++						<span className="icon">{ option.visual }</span>
++						{ option.name }
++					</span>
++				),
+ 				// Mock useItems function to return a autocomplete item.
+-				useItems: () => {
+-					return [
+-						[
+-							{
+-								isDisabled: false,
+-								key: 'Apple',
+-								value: 'Apple',
+-								label: (
+-									<span>
+-										<span className="icon">🍎</span>
+-										{ 'Apple' }
+-									</span>
+-								),
+-							},
+-						],
+-					];
++				useItems: ( filterValue: string ) => {
++					const options = autocompleter.options;
++					const keyedOptions = options.map(
++						( optionData, optionIndex ) => ( {
++							key: `${ autocompleter.name }-${ optionIndex }`,
++							value: optionData,
++							label: autocompleter.getOptionLabel( optionData ),
++							keywords: [],
++							isDisabled: false,
++						} )
++					);
++					const filteredOptions = keyedOptions.filter( ( option ) =>
++						option.value.name.includes( filterValue )
++					);
++					return [ filteredOptions ] as const;
+ 				},
+ 			};
+ 
+@@ -50,19 +62,23 @@ describe( 'AutocompleterUI', () => {
+ 			const OtherElement = <div>Other Element</div>;
+ 
+ 			const Container = () => {
+-				const contentRef = useRef();
++				const contentRef = useRef< HTMLElement >( null );
+ 
+ 				return (
+ 					<div>
+ 						<AutocompleterUI
+ 							className={ 'test' }
+-							filterValue={ '~' }
+-							instanceId={ '1' }
++							filterValue={ 'Apple' }
++							instanceId={ 1 }
+ 							listBoxId={ '1' }
+ 							selectedIndex={ 0 }
+ 							onChangeOptions={ () => {} }
+ 							onSelect={ () => {} }
+-							value={ { visual: '🍎', name: 'Apple', id: 1 } }
++							value={ {
++								text: 'This is the text that is being edited.',
++								start: 0,
++								end: 0,
++							} }
+ 							contentRef={ contentRef }
+ 							reset={ resetSpy }
+ 						/>
+diff --git a/packages/components/src/autocomplete/types.ts b/packages/components/src/autocomplete/types.ts
+new file mode 100644
+index 00000000000000..f318322ed6c74c
+--- /dev/null
++++ b/packages/components/src/autocomplete/types.ts
+@@ -0,0 +1,219 @@
++/**
++ * WordPress dependencies
++ */
++import type { WPElement } from '@wordpress/element';
++/**
++ * Internal dependencies
++ */
++import type { useAutocomplete } from '.';
++
++// Insert the `value` into the text.
++export type InsertOption = {
++	action: 'insert-at-caret';
++	value: React.ReactNode;
++};
++
++// Replace the current block with the block specified in the `value` property
++export type ReplaceOption = { action: 'replace'; value: RichTextValue };
++
++export type OptionCompletion = React.ReactNode | InsertOption | ReplaceOption;
++
++type OptionLabel = string | WPElement | Array< string | WPElement >;
++export type KeyedOption = {
++	key: string;
++	value: any;
++	label: OptionLabel;
++	keywords: Array< string >;
++	isDisabled: boolean;
++};
++
++export type WPCompleter< TCompleterOption = any > = {
++	/**
++	 * The name of the completer. Useful for identifying a specific completer to
++	 * be overridden via extensibility hooks.
++	 */
++	name: string;
++	/**
++	 * The string prefix that should trigger the completer. For example,
++	 * Gutenberg's block completer is triggered when the '/' character is
++	 * entered.
++	 */
++	triggerPrefix: string;
++	/**
++	 * The raw options for completion. May be an array, a function that returns
++	 * an array, or a function that returns a promise for an array.
++	 * Options may be of any type or shape. The completer declares how those
++	 * options are rendered and what their completions should be when selected.
++	 */
++	options:
++		| ( (
++				query: string
++		  ) =>
++				| PromiseLike< readonly TCompleterOption[] >
++				| readonly TCompleterOption[] )
++		| readonly TCompleterOption[];
++	/**
++	 * A function that returns the keywords for the specified option.
++	 */
++	getOptionKeywords?: ( option: TCompleterOption ) => Array< string >;
++	/**
++	 * A function that returns whether or not the specified option is disabled.
++	 * Disabled options cannot be selected.
++	 */
++	isOptionDisabled?: ( option: TCompleterOption ) => boolean;
++	/**
++	 * A function that returns the label for a given option. A label may be a
++	 * string or a mixed array of strings, elements, and components.
++	 */
++	getOptionLabel: ( option: TCompleterOption ) => OptionLabel;
++	/**
++	 * A function that takes a Range before and a Range after the autocomplete
++	 * trigger and query text and returns a boolean indicating whether the
++	 * completer should be considered for that context.
++	 */
++	allowContext?: ( before: string, after: string ) => boolean;
++	/**
++	 * A function that takes an option and returns how the option should
++	 * be completed. By default, the result is a value to be inserted in the
++	 * text.
++	 * However, a completer may explicitly declare how a completion should be
++	 * treated by returning an object with `action` and `value` properties. The
++	 * `action` declares what should be done with the `value`.
++	 */
++	getOptionCompletion?: (
++		option: TCompleterOption,
++		query: string
++	) => OptionCompletion;
++	/**
++	 * A function that returns an array of items to be displayed in the
++	 * Autocomplete UI. These items have uniform shape and have been filtered by
++	 * `AutocompleterUIProps.filterValue`.
++	 */
++	useItems?: ( filterValue: string ) => readonly [ Array< KeyedOption > ];
++	/**
++	 * Whether or not changes to the `filterValue` should be debounced.
++	 */
++	isDebounced?: boolean;
++	/**
++	 * A CSS class name to be applied to the completion menu.
++	 */
++	className?: string;
++};
++
++type ContentRef = React.RefObject< HTMLElement >;
++
++export type AutocompleterUIProps = {
++	/**
++	 * The value to filter the options by.
++	 */
++	filterValue: string;
++	/**
++	 * An id unique to each instance of the component, used in the IDs of the
++	 * buttons generated for individual options.
++	 */
++	instanceId: number;
++	/**
++	 * The id of to be applied to the listbox of options.
++	 */
++	listBoxId: string | undefined;
++	/**
++	 * The class to apply to the wrapper element.
++	 */
++	className?: string;
++	/**
++	 * The index of the currently selected option.
++	 */
++	selectedIndex: number;
++	/**
++	 * A function to be called when the filterValue changes.
++	 */
++	onChangeOptions: ( items: Array< KeyedOption > ) => void;
++	/**
++	 * A function to be called when an option is selected.
++	 */
++	onSelect: ( option: KeyedOption ) => void;
++	/**
++	 * A function to be called when the completer is reset
++	 * (e.g. when the user hits the escape key).
++	 */
++	onReset?: () => void;
++	/**
++	 * A function that defines the behavior of the completer when it is reset
++	 */
++	reset: ( event: Event ) => void;
++	/**
++	 * The rich text value object the autocompleter is being applied to.
++	 */
++	value: RichTextValue;
++	/**
++	 * A ref containing the editable element that will serve as the anchor for
++	 * `Autocomplete`'s `Popover`.
++	 */
++	contentRef: ContentRef;
++};
++
++export type CancelablePromise< T = void > = Promise< T > & {
++	canceled?: boolean;
++};
++
++/**
++ * When `@wordpress/rich-text` is fully typed, the following
++ * types should be moved to and imported from there
++ *
++ * @see /packages/rich-text/src/create.js
++ */
++type RichTextFormat = {
++	type: string;
++};
++type RichTextFormatList = Array< RichTextFormat >;
++type RichTextValue = {
++	text: string;
++	formats?: Array< RichTextFormatList >;
++	replacements?: Array< RichTextFormat >;
++	start: number | undefined;
++	end: number | undefined;
++};
++
++export type UseAutocompleteProps = {
++	/**
++	 * The rich text value object the autocompleter is being applied to.
++	 */
++	record: RichTextValue & {
++		start: NonNullable< RichTextValue[ 'start' ] >;
++		end: NonNullable< RichTextValue[ 'end' ] >;
++	};
++	/**
++	 * A function to be called when an option is selected to insert into the
++	 * existing text.
++	 */
++	onChange: ( value: string ) => void;
++	/**
++	 * A function to be called when an option is selected to replace the
++	 * existing text.
++	 */
++	onReplace: ( values: RichTextValue[] ) => void;
++	/**
++	 * An array of all of the completers to apply to the current element.
++	 */
++	completers: Array< WPCompleter >;
++	/**
++	 * A ref containing the editable element that will serve as the anchor for
++	 * `Autocomplete`'s `Popover`.
++	 */
++	contentRef: ContentRef;
++};
++
++export type AutocompleteProps = UseAutocompleteProps & {
++	/**
++	 * A function that returns nodes to be rendered within the Autocomplete.
++	 */
++	children: (
++		props: Omit< ReturnType< typeof useAutocomplete >, 'popover' >
++	) => React.ReactNode;
++	/**
++	 * Whether or not the Autocomplte componenet is selected, and if its
++	 * `Popover`
++	 * should be displayed.
++	 */
++	isSelected: boolean;
++};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 300f4d120957e0..860b6f3ca36cc1 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -45,7 +45,6 @@
+ 		"src/**/stories/**/*.js", // only exclude js files, tsx files should be checked
+ 		"src/**/test/**/*.js", // only exclude js files, ts{x} files should be checked
+ 		"src/index.js",
+-		"src/autocomplete",
+ 		"src/custom-gradient-picker",
+ 		"src/dimension-control",
+ 		"src/duotone-picker",

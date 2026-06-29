@@ -1,0 +1,53 @@
+diff --git a/package-lock.json b/package-lock.json
+index 4c8a714c7221bb..d28b3e05eed1fe 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -4737,7 +4737,7 @@
+ 				"memize": "^1.0.5",
+ 				"moment": "^2.22.1",
+ 				"mousetrap": "^1.6.2",
+-				"re-resizable": "^5.0.1",
++				"re-resizable": "^6.0.0",
+ 				"react-dates": "^17.1.1",
+ 				"react-spring": "^8.0.20",
+ 				"rememo": "^3.0.0",
+@@ -21753,9 +21753,9 @@
+ 			}
+ 		},
+ 		"re-resizable": {
+-			"version": "5.0.1",
+-			"resolved": "https://registry.npmjs.org/re-resizable/-/re-resizable-5.0.1.tgz",
+-			"integrity": "sha512-Iy8v5li7bhNBDxCN1DbA4l6G2Hk8NCZtcExoI1D+5pfvKyQcH8LH2P5h3DGoEfHhs0uyyRC1Qx8bHBomfrmxgA==",
++			"version": "6.0.0",
++			"resolved": "https://registry.npmjs.org/re-resizable/-/re-resizable-6.0.0.tgz",
++			"integrity": "sha512-RTrnhbGgYyZ4hTc6db4JeMnRfmloEPWtuYaXZEa2PRaEC4mreWNFnZtMVsHil3z3iX+WchD+da8BLlTJBcstMA==",
+ 			"requires": {
+ 				"fast-memoize": "^2.5.1"
+ 			}
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 77e05d4bbe59dd..12280e54f03c50 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -1,3 +1,9 @@
++## Master
++
++## New Features
++
++- The bundled `re-resizable` dependency has been updated from requiring `5.0.1` to requiring `^6.0.0` ([#17011](https://github.com/WordPress/gutenberg/pull/17011)).
++
+ ## 8.1.0 (2019-08-05)
+ 
+ ### New Features
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 15c122d787a892..432d38f8fe994b 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -39,7 +39,7 @@
+ 		"memize": "^1.0.5",
+ 		"moment": "^2.22.1",
+ 		"mousetrap": "^1.6.2",
+-		"re-resizable": "^5.0.1",
++		"re-resizable": "^6.0.0",
+ 		"react-dates": "^17.1.1",
+ 		"react-spring": "^8.0.20",
+ 		"rememo": "^3.0.0",

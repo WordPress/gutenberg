@@ -1,0 +1,52 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8345184770646c..c68de39e329996 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `ItemGroup`: Fix focus style to make it consistent with the `Button` component([#69289](https://github.com/WordPress/gutenberg/pull/69289)).
+ -   `Button`: Remove fixed width from small and compact buttons with icons ([#69378](https://github.com/WordPress/gutenberg/pull/69378)).
+ 
+ ## 29.5.0 (2025-02-28)
+diff --git a/packages/components/src/item-group/styles.ts b/packages/components/src/item-group/styles.ts
+index a2d73c8dcfc592..f709cef990f742 100644
+--- a/packages/components/src/item-group/styles.ts
++++ b/packages/components/src/item-group/styles.ts
+@@ -28,18 +28,29 @@ export const unstyledButton = ( as: 'a' | 'button' ) => {
+ 			color: ${ COLORS.theme.accent };
+ 		}
+ 
+-		&:focus {
++		${ as === 'button'
++			? `
++			&:focus:not(:disabled) {
++			box-shadow: 0 0 0 var(--wp-admin-border-width-focus)
++				${ COLORS.theme.accent };
++			// Windows High Contrast mode will show this outline, but not the box-shadow.
++			outline: 3px solid transparent;
++			}
++			`
++			: `
++			&:focus {
+ 			box-shadow: none;
+ 			outline: none;
+-		}
+-
+-		&:focus-visible {
+-			box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
++			}
++			
++			&:focus-visible {
++			box-shadow: 0 0 0 var(--wp-admin-border-width-focus)
+ 				${ COLORS.theme.accent };
+ 			// Windows high contrast mode.
+ 			outline: 2px solid transparent;
+ 			outline-offset: 0;
+-		}
++			}
++		` }
+ 	`;
+ };
+ 

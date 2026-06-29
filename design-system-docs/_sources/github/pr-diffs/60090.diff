@@ -1,0 +1,36 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 30973f7f1bb79a..49911738dcd635 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fix
++
++-   `InputControl`: Ignore IME events when `isPressEnterToChange` is enabled ([#60090](https://github.com/WordPress/gutenberg/pull/60090)).
++
+ ## 27.2.0 (2024-03-21)
+ 
+ -   `Dropdown` : Add styling support for `MenuGroup` ([#59723](https://github.com/WordPress/gutenberg/pull/59723)).
+diff --git a/packages/components/src/input-control/input-field.tsx b/packages/components/src/input-control/input-field.tsx
+index 37e2bf4351c002..23a229800e371e 100644
+--- a/packages/components/src/input-control/input-field.tsx
++++ b/packages/components/src/input-control/input-field.tsx
+@@ -24,6 +24,7 @@ import { useDragCursor } from './utils';
+ import { Input } from './styles/input-control-styles';
+ import { useInputControlStateReducer } from './reducer/reducer';
+ import type { InputFieldProps } from './types';
++import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
+ 
+ const noop = () => {};
+ 
+@@ -222,7 +223,7 @@ function InputField(
+ 			onBlur={ handleOnBlur }
+ 			onChange={ handleOnChange }
+ 			onFocus={ handleOnFocus }
+-			onKeyDown={ handleOnKeyDown }
++			onKeyDown={ withIgnoreIMEEvents( handleOnKeyDown ) }
+ 			onMouseDown={ handleOnMouseDown }
+ 			ref={ ref }
+ 			inputSize={ size }

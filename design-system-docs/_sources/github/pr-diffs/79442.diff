@@ -1,0 +1,575 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3103ad1e1e9b67..6962ec83e1efe1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -21,6 +21,7 @@
+ ### Internal
+ 
+ -   `ResizableBox`: Make the `children` prop optional ([#79370](https://github.com/WordPress/gutenberg/pull/79370)).
++-   Add documentation and lint guardrails for the ongoing Emotion migration ([#79442](https://github.com/WordPress/gutenberg/pull/79442)).
+ -   Adopt `--wpds-dimension-size-*` design tokens [#79093](https://github.com/WordPress/gutenberg/pull/79093).
+ -   Point the legacy `--wp-components-*` color fallbacks at the design system tokens (`--wpds-*` / `--wp-admin-theme-color*`), so component styles get sensible defaults from the prebuilt token stylesheet without a runtime `<ThemeProvider>` ([#78664](https://github.com/WordPress/gutenberg/pull/78664)).
+ -   `withFallbackStyles`: Refactor from a class component to a function component with hooks ([#78837](https://github.com/WordPress/gutenberg/pull/78837)).
+diff --git a/packages/components/CONTRIBUTING.md b/packages/components/CONTRIBUTING.md
+index d8d629180e0005..dd62a2823e2989 100644
+--- a/packages/components/CONTRIBUTING.md
++++ b/packages/components/CONTRIBUTING.md
+@@ -191,10 +191,10 @@ function useExampleComponent(
+ 	);
+ 
+ 	// Any other reusable rendering logic (e.g. computing className, state, event listeners...)
+-	const cx = useCx();
+-	const classes = useMemo(
+-		() => cx( styles.example, isVisible && styles.visible, className ),
+-		[ className, isVisible ]
++	const classes = clsx(
++		styles.example,
++		isVisible && styles.visible,
++		className
+ 	);
+ 
+ 	return {
+@@ -416,9 +416,11 @@ On the component's main named export, add a JSDoc comment that includes the main
+ 
+ ## Styling
+ 
+-All new component should be styled using [Emotion](https://emotion.sh/docs/introduction).
++All new components should be styled using SCSS Modules.
+ 
+-Note: Instead of using Emotion's standard `cx` function, the custom [`useCx` hook](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/src/utils/hooks/use-cx.ts) should be used instead.
++Place component-local styles in a `style.module.scss` file next to the component, import the module from JavaScript or TypeScript, and compose class names with `clsx`. Preserve existing public `components-*` class names where consumers may rely on them. For dynamic values, prefer inline CSS custom properties consumed by the SCSS module. For variants and state, prefer conditional module classes composed with `clsx`.
++
++Legacy components may still use Emotion while they are being migrated, but new Emotion usage should not be added.
+ 
+ ### Deprecating styles
+ 
+@@ -426,10 +428,11 @@ Changing the styles of a non-experimental component must be done with care. To p
+ 
+ ```jsx
+ // component.tsx
++import clsx from 'clsx';
+ import deprecated from '@wordpress/deprecated';
+-import { Wrapper } from './styles.ts';
++import styles from './style.module.scss';
+ 
+-function MyComponent( { __nextHasNoOuterMargins = false } ) {
++function MyComponent( { __nextHasNoOuterMargins = false, className } ) {
+ 	if ( ! __nextHasNoOuterMargins ) {
+ 		deprecated( 'Outer margin styles for wp.components.MyComponent', {
+ 			since: '6.0',
+@@ -437,27 +440,31 @@ function MyComponent( { __nextHasNoOuterMargins = false } ) {
+ 			hint: 'Set the `__nextHasNoOuterMargins` prop to true to start opting into the new styles, which will become the default in a future version.',
+ 		} );
+ 	}
+-	return <Wrapper __nextHasNoOuterMargins={ __nextHasNoOuterMargins } />;
++	return (
++		<div
++			className={ clsx(
++				'components-my-component',
++				styles.root,
++				! __nextHasNoOuterMargins &&
++					styles.deprecatedOuterMargins,
++				className
++			) }
++		/>
++	);
+ }
+ ```
+ 
+ Styles should be structured so the deprecated styles are cleanly encapsulated, and can be easily removed when the deprecation version arrives.
+ 
+-```js
+-// styles.ts
+-const deprecatedMargins = ( { __nextHasNoOuterMargins } ) => {
+-	if ( ! __nextHasNoOuterMargins ) {
+-		return css`
+-			margin: 8px;
+-		`;
+-	}
+-};
+-
+-export const Wrapper = styled.div`
++```scss
++// style.module.scss
++.root {
+ 	margin: 0;
++}
+ 
+-	${ deprecatedMargins }
+-`;
++.deprecatedOuterMargins {
++	margin: 8px;
++}
+ ```
+ 
+ Once deprecated, code examples in docs/stories should include the opt-in prop set to `true` so that new consumers are encouraged to adopt it from the start.
+@@ -683,7 +690,7 @@ component-name/
+ ├── hook.ts
+ ├── index.ts
+ ├── README.md
+-├── styles.ts
++├── style.module.scss
+ └── types.ts
+ ```
+ 
+@@ -696,13 +703,13 @@ component-family-name/
+ │   ├── component.tsx
+ │   ├── hook.ts
+ │   ├── README.md
+-│   └── styles.ts
++│   └── style.module.scss
+ ├── sub-component-name/
+ │   ├── index.ts
+ │   ├── component.tsx
+ │   ├── hook.ts
+ │   ├── README.md
+-│   └── styles.ts
++│   └── style.module.scss
+ ├── stories
+ │   └── index.js
+ ├── test
+@@ -742,7 +749,7 @@ This second approach involves creating a new, separate version (ie. export) of t
+ 
+ If possible, the legacy version of the component should be rewritten so that it uses the same underlying implementation of the new version, with an extra API "translation" layer to adapt the legacy API surface to the new API surface, e.g:
+ 
+-```
++```tsx
+ // legacy-component/index.tsx
+ 
+ function LegacyComponent( props ) {
+diff --git a/tools/eslint/config.mjs b/tools/eslint/config.mjs
+index b287df218f97a8..de526367aa67ae 100644
+--- a/tools/eslint/config.mjs
++++ b/tools/eslint/config.mjs
+@@ -655,7 +655,8 @@ export default dedupePlugins( [
+ 		},
+ 	},
+ 
+-	// Override: Components src — allow ariakit and framer-motion imports.
++	// Override: Components src — allow ariakit/framer-motion imports and
++	// prevent new Emotion usage while existing styles are migrated.
+ 	{
+ 		files: [ 'packages/components/src/**' ],
+ 		rules: {
+@@ -666,8 +667,9 @@ export default dedupePlugins( [
+ 						( { name } ) =>
+ 							! [ '@ariakit/react', 'framer-motion' ].includes(
+ 								name
+-							)
++							) && ! name.startsWith( '@emotion/' )
+ 					),
++					patterns: [ '@emotion/**' ],
+ 				},
+ 			],
+ 		},
+diff --git a/tools/eslint/suppressions.json b/tools/eslint/suppressions.json
+index add4cf0dfa6ebc..81bafa2447e7d6 100644
+--- a/tools/eslint/suppressions.json
++++ b/tools/eslint/suppressions.json
+@@ -627,6 +627,71 @@
+ 			"count": 1
+ 		}
+ 	},
++	"packages/components/src/base-control/styles/base-control-styles.ts": {
++		"no-restricted-imports": {
++			"count": 2
++		}
++	},
++	"packages/components/src/border-box-control/styles.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/border-control/styles.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/box-control/styles/box-control-icon-styles.ts": {
++		"no-restricted-imports": {
++			"count": 2
++		}
++	},
++	"packages/components/src/box-control/styles/box-control-styles.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/card/card/component.tsx": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/card/get-padding-by-size.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/card/styles.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/color-palette/styles.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/color-picker/styles.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/combobox-control/styles.ts": {
++		"no-restricted-imports": {
++			"count": 2
++		}
++	},
++	"packages/components/src/confirm-dialog/styles.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/context/test/context-system-provider.js": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
+ 	"packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx": {
+ 		"react-hooks/refs": {
+ 			"count": 1
+@@ -637,26 +702,151 @@
+ 			"count": 1
+ 		}
+ 	},
++	"packages/components/src/custom-gradient-picker/styles/custom-gradient-picker-styles.tsx": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/custom-select-control-v2/styles.ts": {
++		"no-restricted-imports": {
++			"count": 2
++		}
++	},
++	"packages/components/src/date-time/date-picker/styles.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/date-time/date-time/styles.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/date-time/time-picker/styles.ts": {
++		"no-restricted-imports": {
++			"count": 2
++		}
++	},
++	"packages/components/src/disabled/styles/disabled-styles.tsx": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/divider/styles.ts": {
++		"no-restricted-imports": {
++			"count": 2
++		}
++	},
+ 	"packages/components/src/draggable/index.tsx": {
+ 		"react-hooks/refs": {
+ 			"count": 1
+ 		}
+ 	},
++	"packages/components/src/dropdown/styles.ts": {
++		"no-restricted-imports": {
++			"count": 2
++		}
++	},
++	"packages/components/src/elevation/hook.ts": {
++		"no-restricted-imports": {
++			"count": 2
++		}
++	},
++	"packages/components/src/elevation/styles.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/flex/flex-item/hook.ts": {
++		"no-restricted-imports": {
++			"count": 2
++		}
++	},
++	"packages/components/src/flex/flex/hook.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/flex/styles.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/focal-point-picker/styles/focal-point-picker-style.ts": {
++		"no-restricted-imports": {
++			"count": 2
++		}
++	},
++	"packages/components/src/focal-point-picker/styles/focal-point-style.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/font-size-picker/styles.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
+ 	"packages/components/src/form-file-upload/index.tsx": {
+ 		"react-hooks/refs": {
+ 			"count": 1
+ 		}
+ 	},
++	"packages/components/src/form-token-field/styles.ts": {
++		"no-restricted-imports": {
++			"count": 2
++		}
++	},
++	"packages/components/src/grid/hook.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
+ 	"packages/components/src/input-control/input-field.tsx": {
+ 		"react-hooks/immutability": {
+ 			"count": 2
+ 		}
+ 	},
++	"packages/components/src/input-control/styles/input-control-styles.tsx": {
++		"no-restricted-imports": {
++			"count": 3
++		}
++	},
++	"packages/components/src/item-group/styles.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/menu/stories/index.story.tsx": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/menu/styles.ts": {
++		"no-restricted-imports": {
++			"count": 2
++		}
++	},
++	"packages/components/src/navigator/styles.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
+ 	"packages/components/src/number-control/index.tsx": {
+ 		"react-hooks/refs": {
+ 			"count": 2
+ 		}
+ 	},
++	"packages/components/src/number-control/styles/number-control-styles.ts": {
++		"no-restricted-imports": {
++			"count": 2
++		}
++	},
++	"packages/components/src/palette-edit/styles.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
+ 	"packages/components/src/panel/body.tsx": {
+ 		"react-hooks/refs": {
+ 			"count": 1
+@@ -667,6 +857,11 @@
+ 			"count": 1
+ 		}
+ 	},
++	"packages/components/src/progress-bar/styles.ts": {
++		"no-restricted-imports": {
++			"count": 2
++		}
++	},
+ 	"packages/components/src/range-control/index.tsx": {
+ 		"react-hooks/immutability": {
+ 			"count": 3
+@@ -675,11 +870,91 @@
+ 			"count": 4
+ 		}
+ 	},
++	"packages/components/src/range-control/styles/range-control-styles.ts": {
++		"no-restricted-imports": {
++			"count": 2
++		}
++	},
++	"packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/scrollable/styles.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/search-control/styles.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/select-control/styles/select-control-styles.ts": {
++		"no-restricted-imports": {
++			"count": 2
++		}
++	},
+ 	"packages/components/src/slot-fill/slot.tsx": {
+ 		"react-hooks/refs": {
+ 			"count": 1
+ 		}
+ 	},
++	"packages/components/src/spacer/hook.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/spinner/styles.ts": {
++		"no-restricted-imports": {
++			"count": 2
++		}
++	},
++	"packages/components/src/style-provider/index.tsx": {
++		"no-restricted-imports": {
++			"count": 2
++		}
++	},
++	"packages/components/src/surface/styles.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/tabs/styles.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/text/hook.ts": {
++		"no-restricted-imports": {
++			"count": 2
++		}
++	},
++	"packages/components/src/text/styles.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/textarea-control/styles/textarea-control-styles.ts": {
++		"no-restricted-imports": {
++			"count": 2
++		}
++	},
++	"packages/components/src/theme/styles.ts": {
++		"no-restricted-imports": {
++			"count": 2
++		}
++	},
++	"packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts": {
++		"no-restricted-imports": {
++			"count": 2
++		}
++	},
++	"packages/components/src/toggle-group-control/toggle-group-control/styles.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
+ 	"packages/components/src/toggle-group-control/toggle-group-control/utils.ts": {
+ 		"react-hooks/refs": {
+ 			"count": 11
+@@ -690,6 +965,16 @@
+ 			"count": 1
+ 		}
+ 	},
++	"packages/components/src/tools-panel/stories/index.story.tsx": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/tools-panel/styles.ts": {
++		"no-restricted-imports": {
++			"count": 2
++		}
++	},
+ 	"packages/components/src/tools-panel/tools-panel/hook.ts": {
+ 		"react-hooks/refs": {
+ 			"count": 2
+@@ -700,6 +985,61 @@
+ 			"count": 1
+ 		}
+ 	},
++	"packages/components/src/truncate/hook.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/truncate/styles.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/unit-control/styles/unit-control-styles.ts": {
++		"no-restricted-imports": {
++			"count": 2
++		}
++	},
++	"packages/components/src/utils/base-label.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/utils/box-sizing.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/utils/hooks/emotion.d.ts": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/utils/hooks/test/use-cx.js": {
++		"no-restricted-imports": {
++			"count": 3
++		}
++	},
++	"packages/components/src/utils/hooks/use-cx.ts": {
++		"no-restricted-imports": {
++			"count": 4
++		}
++	},
++	"packages/components/src/utils/rtl.js": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/view/component.tsx": {
++		"no-restricted-imports": {
++			"count": 1
++		}
++	},
++	"packages/components/src/z-stack/styles.ts": {
++		"no-restricted-imports": {
++			"count": 2
++		}
++	},
+ 	"packages/compose/src/hooks/use-dialog/index.ts": {
+ 		"react-hooks/immutability": {
+ 			"count": 1

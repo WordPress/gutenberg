@@ -1,0 +1,35 @@
+diff --git a/packages/components/src/combobox-control/index.tsx b/packages/components/src/combobox-control/index.tsx
+index bd53b03002331b..5f5e0af76d3d66 100644
+--- a/packages/components/src/combobox-control/index.tsx
++++ b/packages/components/src/combobox-control/index.tsx
+@@ -121,6 +121,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
+ 		options,
+ 		onChange: onChangeProp,
+ 		onFilterValueChange = noop,
++		onBlur: onBlurProp = noop,
+ 		hideLabelFromVision,
+ 		help,
+ 		allowReset = true,
+@@ -237,6 +238,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
+ 
+ 	const onBlur = () => {
+ 		setInputHasFocus( false );
++		onBlurProp();
+ 	};
+ 
+ 	const onFocus = () => {
+diff --git a/packages/components/src/combobox-control/types.ts b/packages/components/src/combobox-control/types.ts
+index 3398e9ee9a760e..b9ff7824175eef 100644
+--- a/packages/components/src/combobox-control/types.ts
++++ b/packages/components/src/combobox-control/types.ts
+@@ -74,6 +74,10 @@ export type ComboboxControlProps = Pick<
+ 	 * @default noop
+ 	 */
+ 	onFilterValueChange?: ( value: string ) => void;
++	/**
++	 * Fucntion called when the control loses focus.
++	 */
++	onBlur?: () => void;
+ 	/**
+ 	 * The options that can be chosen from.
+ 	 */

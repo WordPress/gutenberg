@@ -1,0 +1,99 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 47159ec62d079d..20558ced1c83a2 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,12 +4,13 @@
+ 
+ ### Bug Fix
+ 
++-   `Button`, `Icon`: Fix `iconSize` prop doesn't work with some icons ([#43821](https://github.com/WordPress/gutenberg/pull/43821)).
+ -   `Popover`: enable auto-updating every animation frame ([#43617](https://github.com/WordPress/gutenberg/pull/43617)).
+ -   `Popover`: improve the component's performance and reactivity to prop changes by reworking its internals ([#43335](https://github.com/WordPress/gutenberg/pull/43335)).
+ 
+ ### Enhancements
+ 
+--   `ToggleControl`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43717](https://github.com/WordPress/gutenberg/pull/43717)). 
++-   `ToggleControl`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43717](https://github.com/WordPress/gutenberg/pull/43717)).
+ -   `CheckboxControl`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43720](https://github.com/WordPress/gutenberg/pull/43720)).
+ -   `TextControl`, `TextareaControl`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43782](https://github.com/WordPress/gutenberg/pull/43782)).
+ -   `RangeControl`: Tweak dark gray marking color to be consistent with the grays in `@wordpress/base-styles` ([#43773](https://github.com/WordPress/gutenberg/pull/43773)).
+@@ -23,7 +24,7 @@
+ -   `ToggleGroupControl`: Rename `__experimentalIsIconGroup` prop to `__experimentalIsBorderless` ([#43771](https://github.com/WordPress/gutenberg/pull/43771/)).
+ -   Refactor `FocalPointPicker` to function component ([#39168](https://github.com/WordPress/gutenberg/pull/39168)).
+ -   `Guide`: use `code` instead of `keyCode` for keyboard events ([#43604](https://github.com/WordPress/gutenberg/pull/43604/)).
+--   `ToggleControl`: Convert to TypeScript and streamline CSS ([#43717](https://github.com/WordPress/gutenberg/pull/43717)). 
++-   `ToggleControl`: Convert to TypeScript and streamline CSS ([#43717](https://github.com/WordPress/gutenberg/pull/43717)).
+ -   `Navigation`: use `code` instead of `keyCode` for keyboard events ([#43644](https://github.com/WordPress/gutenberg/pull/43644/)).
+ -   `ComboboxControl`: Add unit tests ([#42403](https://github.com/WordPress/gutenberg/pull/42403)).
+ -   `NavigableContainer`: use `code` instead of `keyCode` for keyboard events, rewrite tests using RTL and `user-event` ([#43606](https://github.com/WordPress/gutenberg/pull/43606/)).
+diff --git a/packages/components/src/icon/index.tsx b/packages/components/src/icon/index.tsx
+index 94fe1d66c90a34..504a30444e16ed 100644
+--- a/packages/components/src/icon/index.tsx
++++ b/packages/components/src/icon/index.tsx
+@@ -82,9 +82,9 @@ function Icon< P >( {
+ 
+ 	if ( icon && ( icon.type === 'svg' || icon.type === SVG ) ) {
+ 		const appliedProps = {
++			...icon.props,
+ 			width: size,
+ 			height: size,
+-			...icon.props,
+ 			...additionalProps,
+ 		};
+ 
+diff --git a/packages/components/src/icon/test/index.js b/packages/components/src/icon/test/index.js
+index b1f85a3daf1654..d1c5b7123c3d87 100644
+--- a/packages/components/src/icon/test/index.js
++++ b/packages/components/src/icon/test/index.js
+@@ -63,7 +63,7 @@ describe( 'Icon', () => {
+ 		expect( wrapper.prop( 'height' ) ).toBe( 24 );
+ 	} );
+ 
+-	it( 'renders an svg element and passes the size as its width and height', () => {
++	it( 'renders an svg element and override its width and height', () => {
+ 		const wrapper = shallow(
+ 			<Icon
+ 				icon={
+@@ -75,8 +75,8 @@ describe( 'Icon', () => {
+ 			/>
+ 		);
+ 
+-		expect( wrapper.prop( 'width' ) ).toBe( 64 );
+-		expect( wrapper.prop( 'height' ) ).toBe( 64 );
++		expect( wrapper.prop( 'width' ) ).toBe( 32 );
++		expect( wrapper.prop( 'height' ) ).toBe( 32 );
+ 	} );
+ 
+ 	it( 'renders an svg element and does not override width and height if already specified', () => {
+diff --git a/packages/e2e-tests/specs/editor/plugins/__snapshots__/plugins-api.test.js.snap b/packages/e2e-tests/specs/editor/plugins/__snapshots__/plugins-api.test.js.snap
+index 84e01859c32ff6..e2d70612669aef 100644
+--- a/packages/e2e-tests/specs/editor/plugins/__snapshots__/plugins-api.test.js.snap
++++ b/packages/e2e-tests/specs/editor/plugins/__snapshots__/plugins-api.test.js.snap
+@@ -2,6 +2,6 @@
+ 
+ exports[`Using Plugins API Document Setting Custom Panel Should render a custom panel inside Document Setting sidebar 1`] = `"My Custom Panel"`;
+ 
+-exports[`Using Plugins API Sidebar Medium screen Should open plugins sidebar using More Menu item and render content 1`] = `"<div class=\\"components-panel__header interface-complementary-area-header__small\\"><span class=\\"interface-complementary-area-header__small-title\\">(no title)</span><button type=\\"button\\" class=\\"components-button has-icon\\" aria-label=\\"Close plugin\\"><svg width=\\"24\\" height=\\"24\\" xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 24 24\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M12 13.06l3.712 3.713 1.061-1.06L13.061 12l3.712-3.712-1.06-1.06L12 10.938 8.288 7.227l-1.061 1.06L10.939 12l-3.712 3.712 1.06 1.061L12 13.061z\\"></path></svg></button></div><div class=\\"components-panel__header interface-complementary-area-header\\" tabindex=\\"-1\\"><strong>Plugin sidebar title</strong><button type=\\"button\\" aria-pressed=\\"true\\" aria-expanded=\\"true\\" class=\\"components-button interface-complementary-area__pin-unpin-item is-pressed has-icon\\" aria-label=\\"Unpin from toolbar\\"><svg width=\\"24\\" height=\\"24\\" xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 24 24\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M11.776 4.454a.25.25 0 01.448 0l2.069 4.192a.25.25 0 00.188.137l4.626.672a.25.25 0 01.139.426l-3.348 3.263a.25.25 0 00-.072.222l.79 4.607a.25.25 0 01-.362.263l-4.138-2.175a.25.25 0 00-.232 0l-4.138 2.175a.25.25 0 01-.363-.263l.79-4.607a.25.25 0 00-.071-.222L4.754 9.881a.25.25 0 01.139-.426l4.626-.672a.25.25 0 00.188-.137l2.069-4.192z\\"></path></svg></button><button type=\\"button\\" class=\\"components-button has-icon\\" aria-label=\\"Close plugin\\"><svg width=\\"24\\" height=\\"24\\" xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 24 24\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M12 13.06l3.712 3.713 1.061-1.06L13.061 12l3.712-3.712-1.06-1.06L12 10.938 8.288 7.227l-1.061 1.06L10.939 12l-3.712 3.712 1.06 1.061L12 13.061z\\"></path></svg></button></div><div class=\\"components-panel\\"><div class=\\"components-panel__body sidebar-title-plugin-panel is-opened\\"><div class=\\"components-panel__row\\"><label for=\\"title-plain-text\\">Title:</label><textarea class=\\"block-editor-plain-text\\" id=\\"title-plain-text\\" placeholder=\\"(no title)\\" rows=\\"1\\" style=\\"overflow: hidden; overflow-wrap: break-word; resize: none; height: 18px;\\"></textarea></div><div class=\\"components-panel__row\\"><button type=\\"button\\" class=\\"components-button is-primary\\">Reset</button></div></div></div>"`;
++exports[`Using Plugins API Sidebar Medium screen Should open plugins sidebar using More Menu item and render content 1`] = `"<div class=\\"components-panel__header interface-complementary-area-header__small\\"><span class=\\"interface-complementary-area-header__small-title\\">(no title)</span><button type=\\"button\\" class=\\"components-button has-icon\\" aria-label=\\"Close plugin\\"><svg xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 24 24\\" width=\\"24\\" height=\\"24\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M12 13.06l3.712 3.713 1.061-1.06L13.061 12l3.712-3.712-1.06-1.06L12 10.938 8.288 7.227l-1.061 1.06L10.939 12l-3.712 3.712 1.06 1.061L12 13.061z\\"></path></svg></button></div><div class=\\"components-panel__header interface-complementary-area-header\\" tabindex=\\"-1\\"><strong>Plugin sidebar title</strong><button type=\\"button\\" aria-pressed=\\"true\\" aria-expanded=\\"true\\" class=\\"components-button interface-complementary-area__pin-unpin-item is-pressed has-icon\\" aria-label=\\"Unpin from toolbar\\"><svg xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 24 24\\" width=\\"24\\" height=\\"24\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M11.776 4.454a.25.25 0 01.448 0l2.069 4.192a.25.25 0 00.188.137l4.626.672a.25.25 0 01.139.426l-3.348 3.263a.25.25 0 00-.072.222l.79 4.607a.25.25 0 01-.362.263l-4.138-2.175a.25.25 0 00-.232 0l-4.138 2.175a.25.25 0 01-.363-.263l.79-4.607a.25.25 0 00-.071-.222L4.754 9.881a.25.25 0 01.139-.426l4.626-.672a.25.25 0 00.188-.137l2.069-4.192z\\"></path></svg></button><button type=\\"button\\" class=\\"components-button has-icon\\" aria-label=\\"Close plugin\\"><svg xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 24 24\\" width=\\"24\\" height=\\"24\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M12 13.06l3.712 3.713 1.061-1.06L13.061 12l3.712-3.712-1.06-1.06L12 10.938 8.288 7.227l-1.061 1.06L10.939 12l-3.712 3.712 1.06 1.061L12 13.061z\\"></path></svg></button></div><div class=\\"components-panel\\"><div class=\\"components-panel__body sidebar-title-plugin-panel is-opened\\"><div class=\\"components-panel__row\\"><label for=\\"title-plain-text\\">Title:</label><textarea class=\\"block-editor-plain-text\\" id=\\"title-plain-text\\" placeholder=\\"(no title)\\" rows=\\"1\\" style=\\"overflow: hidden; overflow-wrap: break-word; resize: none; height: 18px;\\"></textarea></div><div class=\\"components-panel__row\\"><button type=\\"button\\" class=\\"components-button is-primary\\">Reset</button></div></div></div>"`;
+ 
+-exports[`Using Plugins API Sidebar Should open plugins sidebar using More Menu item and render content 1`] = `"<div class=\\"components-panel__header interface-complementary-area-header__small\\"><span class=\\"interface-complementary-area-header__small-title\\">(no title)</span><button type=\\"button\\" class=\\"components-button has-icon\\" aria-label=\\"Close plugin\\"><svg width=\\"24\\" height=\\"24\\" xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 24 24\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M12 13.06l3.712 3.713 1.061-1.06L13.061 12l3.712-3.712-1.06-1.06L12 10.938 8.288 7.227l-1.061 1.06L10.939 12l-3.712 3.712 1.06 1.061L12 13.061z\\"></path></svg></button></div><div class=\\"components-panel__header interface-complementary-area-header\\" tabindex=\\"-1\\"><strong>Plugin sidebar title</strong><button type=\\"button\\" aria-pressed=\\"true\\" aria-expanded=\\"true\\" class=\\"components-button interface-complementary-area__pin-unpin-item is-pressed has-icon\\" aria-label=\\"Unpin from toolbar\\"><svg width=\\"24\\" height=\\"24\\" xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 24 24\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M11.776 4.454a.25.25 0 01.448 0l2.069 4.192a.25.25 0 00.188.137l4.626.672a.25.25 0 01.139.426l-3.348 3.263a.25.25 0 00-.072.222l.79 4.607a.25.25 0 01-.362.263l-4.138-2.175a.25.25 0 00-.232 0l-4.138 2.175a.25.25 0 01-.363-.263l.79-4.607a.25.25 0 00-.071-.222L4.754 9.881a.25.25 0 01.139-.426l4.626-.672a.25.25 0 00.188-.137l2.069-4.192z\\"></path></svg></button><button type=\\"button\\" class=\\"components-button has-icon\\" aria-label=\\"Close plugin\\"><svg width=\\"24\\" height=\\"24\\" xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 24 24\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M12 13.06l3.712 3.713 1.061-1.06L13.061 12l3.712-3.712-1.06-1.06L12 10.938 8.288 7.227l-1.061 1.06L10.939 12l-3.712 3.712 1.06 1.061L12 13.061z\\"></path></svg></button></div><div class=\\"components-panel\\"><div class=\\"components-panel__body sidebar-title-plugin-panel is-opened\\"><div class=\\"components-panel__row\\"><label for=\\"title-plain-text\\">Title:</label><textarea class=\\"block-editor-plain-text\\" id=\\"title-plain-text\\" placeholder=\\"(no title)\\" rows=\\"1\\" style=\\"overflow: hidden; overflow-wrap: break-word; resize: none; height: 18px;\\"></textarea></div><div class=\\"components-panel__row\\"><button type=\\"button\\" class=\\"components-button is-primary\\">Reset</button></div></div></div>"`;
++exports[`Using Plugins API Sidebar Should open plugins sidebar using More Menu item and render content 1`] = `"<div class=\\"components-panel__header interface-complementary-area-header__small\\"><span class=\\"interface-complementary-area-header__small-title\\">(no title)</span><button type=\\"button\\" class=\\"components-button has-icon\\" aria-label=\\"Close plugin\\"><svg xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 24 24\\" width=\\"24\\" height=\\"24\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M12 13.06l3.712 3.713 1.061-1.06L13.061 12l3.712-3.712-1.06-1.06L12 10.938 8.288 7.227l-1.061 1.06L10.939 12l-3.712 3.712 1.06 1.061L12 13.061z\\"></path></svg></button></div><div class=\\"components-panel__header interface-complementary-area-header\\" tabindex=\\"-1\\"><strong>Plugin sidebar title</strong><button type=\\"button\\" aria-pressed=\\"true\\" aria-expanded=\\"true\\" class=\\"components-button interface-complementary-area__pin-unpin-item is-pressed has-icon\\" aria-label=\\"Unpin from toolbar\\"><svg xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 24 24\\" width=\\"24\\" height=\\"24\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M11.776 4.454a.25.25 0 01.448 0l2.069 4.192a.25.25 0 00.188.137l4.626.672a.25.25 0 01.139.426l-3.348 3.263a.25.25 0 00-.072.222l.79 4.607a.25.25 0 01-.362.263l-4.138-2.175a.25.25 0 00-.232 0l-4.138 2.175a.25.25 0 01-.363-.263l.79-4.607a.25.25 0 00-.071-.222L4.754 9.881a.25.25 0 01.139-.426l4.626-.672a.25.25 0 00.188-.137l2.069-4.192z\\"></path></svg></button><button type=\\"button\\" class=\\"components-button has-icon\\" aria-label=\\"Close plugin\\"><svg xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 24 24\\" width=\\"24\\" height=\\"24\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M12 13.06l3.712 3.713 1.061-1.06L13.061 12l3.712-3.712-1.06-1.06L12 10.938 8.288 7.227l-1.061 1.06L10.939 12l-3.712 3.712 1.06 1.061L12 13.061z\\"></path></svg></button></div><div class=\\"components-panel\\"><div class=\\"components-panel__body sidebar-title-plugin-panel is-opened\\"><div class=\\"components-panel__row\\"><label for=\\"title-plain-text\\">Title:</label><textarea class=\\"block-editor-plain-text\\" id=\\"title-plain-text\\" placeholder=\\"(no title)\\" rows=\\"1\\" style=\\"overflow: hidden; overflow-wrap: break-word; resize: none; height: 18px;\\"></textarea></div><div class=\\"components-panel__row\\"><button type=\\"button\\" class=\\"components-button is-primary\\">Reset</button></div></div></div>"`;
+diff --git a/packages/edit-post/src/components/sidebar/plugin-post-publish-panel/test/__snapshots__/index.js.snap b/packages/edit-post/src/components/sidebar/plugin-post-publish-panel/test/__snapshots__/index.js.snap
+index f3603e5d5c9dd5..c74f2d35c38212 100644
+--- a/packages/edit-post/src/components/sidebar/plugin-post-publish-panel/test/__snapshots__/index.js.snap
++++ b/packages/edit-post/src/components/sidebar/plugin-post-publish-panel/test/__snapshots__/index.js.snap
+@@ -1,3 +1,3 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`PluginPostPublishPanel renders fill properly 1`] = `"<div class=\\"components-panel__body my-plugin-post-publish-panel is-opened\\"><h2 class=\\"components-panel__body-title\\"><button type=\\"button\\" aria-expanded=\\"true\\" class=\\"components-button components-panel__body-toggle\\"><span aria-hidden=\\"true\\"><svg width=\\"24\\" height=\\"24\\" viewBox=\\"0 0 24 24\\" xmlns=\\"http://www.w3.org/2000/svg\\" class=\\"components-panel__arrow\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M6.5 12.4L12 8l5.5 4.4-.9 1.2L12 10l-4.5 3.6-1-1.2z\\"></path></svg></span>My panel title</button></h2>My panel content</div>"`;
++exports[`PluginPostPublishPanel renders fill properly 1`] = `"<div class=\\"components-panel__body my-plugin-post-publish-panel is-opened\\"><h2 class=\\"components-panel__body-title\\"><button type=\\"button\\" aria-expanded=\\"true\\" class=\\"components-button components-panel__body-toggle\\"><span aria-hidden=\\"true\\"><svg viewBox=\\"0 0 24 24\\" xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"24\\" height=\\"24\\" class=\\"components-panel__arrow\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M6.5 12.4L12 8l5.5 4.4-.9 1.2L12 10l-4.5 3.6-1-1.2z\\"></path></svg></span>My panel title</button></h2>My panel content</div>"`;
+diff --git a/packages/edit-post/src/components/sidebar/plugin-pre-publish-panel/test/__snapshots__/index.js.snap b/packages/edit-post/src/components/sidebar/plugin-pre-publish-panel/test/__snapshots__/index.js.snap
+index c47edef76f5165..7540e756111349 100644
+--- a/packages/edit-post/src/components/sidebar/plugin-pre-publish-panel/test/__snapshots__/index.js.snap
++++ b/packages/edit-post/src/components/sidebar/plugin-pre-publish-panel/test/__snapshots__/index.js.snap
+@@ -1,4 +1,3 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`PluginPrePublishPanel renders fill properly 1`] = `"<div class=\\"components-panel__body my-plugin-pre-publish-panel is-opened\\"><h2 class=\\"components-panel__body-title\\"><button type=\\"button\\" aria-expanded=\\"true\\" class=\\"components-button components-panel__body-toggle\\"><span aria-hidden=\\"true\\"><svg width=\\"24\\" height=\\"24\\" viewBox=\\"0 0 24 24\\" xmlns=\\"http://www.w3.org/2000/svg\\" class=\\"components-panel__arrow\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M6.5 12.4L12 8l5.5 4.4-.9 1.2L12 10l-4.5 3.6-1-1.2z\\"></path></svg></span>My panel title</button></h2>My panel content</div>"`;
+-q
++exports[`PluginPrePublishPanel renders fill properly 1`] = `"<div class=\\"components-panel__body my-plugin-pre-publish-panel is-opened\\"><h2 class=\\"components-panel__body-title\\"><button type=\\"button\\" aria-expanded=\\"true\\" class=\\"components-button components-panel__body-toggle\\"><span aria-hidden=\\"true\\"><svg viewBox=\\"0 0 24 24\\" xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"24\\" height=\\"24\\" class=\\"components-panel__arrow\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M6.5 12.4L12 8l5.5 4.4-.9 1.2L12 10l-4.5 3.6-1-1.2z\\"></path></svg></span>My panel title</button></h2>My panel content</div>"`;

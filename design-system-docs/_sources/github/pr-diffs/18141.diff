@@ -1,0 +1,1203 @@
+diff --git a/packages/components/src/action-bar/action-bar.js b/packages/components/src/action-bar/action-bar.js
+new file mode 100644
+index 00000000000000..93283e1250150e
+--- /dev/null
++++ b/packages/components/src/action-bar/action-bar.js
+@@ -0,0 +1,54 @@
++/**
++ * IDEA:
++ * This is a general component that powers UI like PageHeader or Toolbar
++ */
++
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * Internal dependencies
++ */
++import { ActionBarContext } from './context';
++import Flex from '../flex';
++
++export const defaultProps = {
++	dividerSpacing: null,
++	isBorderless: false,
++	innerPadding: 'medium',
++	gap: 'none',
++};
++
++function ActionBar( props ) {
++	const {
++		className,
++		dividerSpacing,
++		isBorderless,
++		innerPadding,
++		...restProps
++	} = props;
++	const classes = classnames(
++		className,
++		isBorderless && 'is-borderless',
++		'components-action-bar'
++	);
++
++	const { Provider } = ActionBarContext;
++
++	const contextProps = {
++		innerPadding,
++		spacing: dividerSpacing || innerPadding, // Used in ActionBarDivider
++	};
++
++	return (
++		<Provider value={ contextProps }>
++			<Flex className={ classes } { ...restProps } />
++		</Provider>
++	);
++}
++
++ActionBar.defaultProps = defaultProps;
++
++export default ActionBar;
+diff --git a/packages/components/src/action-bar/block.js b/packages/components/src/action-bar/block.js
+new file mode 100644
+index 00000000000000..d32ed0f06447b2
+--- /dev/null
++++ b/packages/components/src/action-bar/block.js
+@@ -0,0 +1,30 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * Internal dependencies
++ */
++import { useActionBarContext } from './context';
++import FlexBlock from '../flex/block';
++
++export const defaultProps = {
++	innerPadding: 'medium',
++};
++
++function ActionBarBlock( props ) {
++	const { className, ...restProps } = props;
++	const mergedProps = { ...defaultProps, ...useActionBarContext(), ...props };
++	const { innerPadding } = mergedProps;
++
++	const classes = classnames(
++		'components-action-bar__block',
++		innerPadding && `is-innerPadding-${ innerPadding }`,
++		className
++	);
++
++	return <FlexBlock className={ classes } { ...restProps } />;
++}
++
++export default ActionBarBlock;
+diff --git a/packages/components/src/action-bar/context.js b/packages/components/src/action-bar/context.js
+new file mode 100644
+index 00000000000000..86f2e5b250cde8
+--- /dev/null
++++ b/packages/components/src/action-bar/context.js
+@@ -0,0 +1,7 @@
++/**
++ * WordPress dependencies
++ */
++import { createContext, useContext } from '@wordpress/element';
++
++export const ActionBarContext = createContext( {} );
++export const useActionBarContext = () => useContext( ActionBarContext );
+diff --git a/packages/components/src/action-bar/divider.js b/packages/components/src/action-bar/divider.js
+new file mode 100644
+index 00000000000000..5dbb791726b13d
+--- /dev/null
++++ b/packages/components/src/action-bar/divider.js
+@@ -0,0 +1,30 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * Internal dependencies
++ */
++import { useActionBarContext } from './context';
++
++export const defaultProps = {
++	role: 'presentation',
++	spacing: 'medium',
++};
++
++function ActionBarDivider( props ) {
++	const { className, ...restProps } = props;
++	const mergedProps = { ...defaultProps, ...useActionBarContext(), ...props };
++	const { spacing } = mergedProps;
++
++	const classes = classnames(
++		'components-action-bar__divider',
++		spacing && `is-spacing-${ spacing }`,
++		className
++	);
++
++	return <div { ...restProps } className={ classes } />;
++}
++
++export default ActionBarDivider;
+diff --git a/packages/components/src/action-bar/index.js b/packages/components/src/action-bar/index.js
+new file mode 100644
+index 00000000000000..c70977393e2646
+--- /dev/null
++++ b/packages/components/src/action-bar/index.js
+@@ -0,0 +1,10 @@
++export { default as ActionBar } from './action-bar';
++export { default as ActionBarBlock } from './block';
++export { default as ActionBarItem } from './item';
++
++/**
++ * Internal dependencies
++ */
++import ActionBar from './action-bar';
++
++export default ActionBar;
+diff --git a/packages/components/src/action-bar/item.js b/packages/components/src/action-bar/item.js
+new file mode 100644
+index 00000000000000..469da8402af5f9
+--- /dev/null
++++ b/packages/components/src/action-bar/item.js
+@@ -0,0 +1,30 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * Internal dependencies
++ */
++import { useActionBarContext } from './context';
++import FlexItem from '../flex/item';
++
++export const defaultProps = {
++	innerPadding: 'medium',
++};
++
++function ActionBarItem( props ) {
++	const { className, ...restProps } = props;
++	const mergedProps = { ...defaultProps, ...useActionBarContext(), ...props };
++	const { innerPadding } = mergedProps;
++
++	const classes = classnames(
++		'components-action-bar__item',
++		innerPadding && `is-innerPadding-${ innerPadding }`,
++		className
++	);
++
++	return <FlexItem className={ classes } { ...restProps } />;
++}
++
++export default ActionBarItem;
+diff --git a/packages/components/src/action-bar/stories/index.js b/packages/components/src/action-bar/stories/index.js
+new file mode 100644
+index 00000000000000..07c50ad05ffd72
+--- /dev/null
++++ b/packages/components/src/action-bar/stories/index.js
+@@ -0,0 +1,155 @@
++/**
++ * Internal dependencies
++ */
++import ActionBar from '../';
++import ActionBarBlock from '../block';
++import ActionBarDivider from '../divider';
++import ActionBarItem from '../item';
++import Dropdown from '../../dropdown';
++import Flex from '../../flex';
++import IconButton from '../../icon-button';
++import MenuGroup from '../../menu-group';
++import MenuItem from '../../menu-item';
++import Tooltip from '../../tooltip';
++
++import './style.css';
++
++export default { title: 'Components|ActionBar', component: ActionBar };
++
++const DropdownActions = () => {
++	return (
++		<div className="additional-actions">
++			<Dropdown
++				className="my-container-class-name"
++				contentClassName="my-popover-content-classname"
++				position="bottom right"
++				renderToggle={ ( { isOpen, onToggle } ) => (
++					<IconButton
++						icon="ellipsis"
++						isTertiary
++						onClick={ onToggle }
++						aria-expanded={ isOpen }
++					/>
++				) }
++				renderContent={ () => (
++					<MenuGroup>
++						<MenuItem icon="star-filled">Favorite</MenuItem>
++						<MenuItem icon="share-alt2">Share</MenuItem>
++						<MenuItem icon="admin-generic">Settings</MenuItem>
++					</MenuGroup>
++				) }
++			/>
++		</div>
++	);
++};
++
++export const _default = () => {
++	return (
++		<ActionBar>
++			<ActionBarItem>
++				<IconButton icon="insert" isTertiary />
++			</ActionBarItem>
++			<ActionBarBlock />
++			<ActionBarItem>
++				<DropdownActions />
++			</ActionBarItem>
++		</ActionBar>
++	);
++};
++
++export const backAndTitle = () => {
++	return (
++		<ActionBar>
++			<ActionBarItem>
++				<IconButton icon="arrow-left-alt" isTertiary />
++			</ActionBarItem>
++			<ActionBarItem>
++				<h3 style={ { margin: 0 } }>Title</h3>
++			</ActionBarItem>
++			<ActionBarBlock />
++			<ActionBarItem>
++				<DropdownActions />
++			</ActionBarItem>
++		</ActionBar>
++	);
++};
++
++export const gutenbergTopBar = () => {
++	return (
++		<ActionBar className="action-bar-story-example" innerPadding="small">
++			<ActionBarItem>
++				<IconButton icon="arrow-left-alt2" />
++			</ActionBarItem>
++			<ActionBarDivider />
++			<ActionBarItem>
++				<Flex justify="left" gap="extraSmall">
++					<Tooltip text="Add block">
++						<IconButton icon="insert" />
++					</Tooltip>
++					<Tooltip text="Undo">
++						<IconButton icon="undo" />
++					</Tooltip>
++					<Tooltip text="Redo">
++						<IconButton icon="redo" />
++					</Tooltip>
++					<Tooltip text="Content structure">
++						<IconButton icon="info" />
++					</Tooltip>
++					<Tooltip text="Block navigation">
++						<IconButton icon="menu" />
++					</Tooltip>
++				</Flex>
++			</ActionBarItem>
++			<ActionBarBlock />
++			<ActionBarItem>
++				<Flex justify="left" gap="extraSmall">
++					<Tooltip text="Settings">
++						<IconButton icon="admin-generic" />
++					</Tooltip>
++					<Tooltip text="More tools & options">
++						<IconButton icon="ellipsis" />
++					</Tooltip>
++				</Flex>
++			</ActionBarItem>
++		</ActionBar>
++	);
++};
++
++/**
++ * EXPERIMENT:
++ * Creating a Toolbar component using ActionBar
++ */
++const Toolbar = ( props ) => {
++	return (
++		<ActionBar
++			{ ...props }
++			className="action-bar-story-example toolbar"
++			dividerSpacing="none"
++			innerPadding="extraSmall"
++			justify="left"
++		/>
++	);
++};
++const ToolbarItem = ActionBarItem;
++
++export const experimentToolbar = () => {
++	return (
++		<Toolbar>
++			<ToolbarItem>
++				<IconButton icon="insert" />
++			</ToolbarItem>
++			<ToolbarItem>
++				<Flex justify="left" gap="extraSmall">
++					<IconButton icon="undo" />
++					<IconButton icon="redo" />
++				</Flex>
++			</ToolbarItem>
++			<ToolbarItem>
++				<Flex justify="left" gap="extraSmall">
++					<IconButton icon="info" />
++					<IconButton icon="menu" />
++				</Flex>
++			</ToolbarItem>
++		</Toolbar>
++	);
++};
+diff --git a/packages/components/src/action-bar/stories/style.css b/packages/components/src/action-bar/stories/style.css
+new file mode 100644
+index 00000000000000..b4f7598e43e5aa
+--- /dev/null
++++ b/packages/components/src/action-bar/stories/style.css
+@@ -0,0 +1,16 @@
++.action-bar-story-example .components-icon-button.has-text svg {
++	margin: 0;
++}
++
++.action-bar-story-example.toolbar {
++	border: 1px solid #ddd;
++	display: inline-flex;
++}
++
++/* EXPERIMENTAL: Toolbar component styles */
++.action-bar-story-example.toolbar > * {
++	border-right: 1px solid #ddd;
++}
++.action-bar-story-example.toolbar > *:last-child {
++	border-right: none;
++}
+diff --git a/packages/components/src/action-bar/style.scss b/packages/components/src/action-bar/style.scss
+new file mode 100644
+index 00000000000000..174620a02e4935
+--- /dev/null
++++ b/packages/components/src/action-bar/style.scss
+@@ -0,0 +1,51 @@
++.components-action-bar {
++	background: #fff;
++	border-bottom: 1px solid $light-gray-500;
++	box-sizing: border-box;
++
++	// Modifiers
++	&.is-borderless {
++		border-bottom: none;
++	}
++
++	&__block,
++	&__item {
++		&.is-innerPadding-large {
++			padding: 20px 10px;
++		}
++		&.is-innerPadding-medium {
++			padding: 12px 6px;
++		}
++		&.is-innerPadding-small {
++			padding: 8px 4px;
++		}
++		&.is-innerPadding-extraSmall {
++			padding: 2px;
++		}
++		&.is-innerPadding-none {
++			padding: 0;
++		}
++	}
++
++	&__divider {
++		align-self: normal;
++		border-right: 1px solid $light-gray-500;
++		width: 0;
++
++		&.is-spacing-large {
++			margin: 0 10px;
++		}
++		&.is-spacing-medium {
++			margin: 0 6px;
++		}
++		&.is-spacing-small {
++			margin: 0 4px;
++		}
++		&.is-spacing-extraSmall {
++			margin: 0 2px;
++		}
++		&.is-spacing-none {
++			margin: 0;
++		}
++	}
++}
+diff --git a/packages/components/src/flex/block.js b/packages/components/src/flex/block.js
+new file mode 100644
+index 00000000000000..bcd386bb955941
+--- /dev/null
++++ b/packages/components/src/flex/block.js
+@@ -0,0 +1,13 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++function FlexBlock( props ) {
++	const { className, ...restProps } = props;
++	const classes = classnames( 'components-flex__block', className );
++
++	return <div { ...restProps } className={ classes } />;
++}
++
++export default FlexBlock;
+diff --git a/packages/components/src/flex/flex.js b/packages/components/src/flex/flex.js
+new file mode 100644
+index 00000000000000..9d15eebebe9634
+--- /dev/null
++++ b/packages/components/src/flex/flex.js
+@@ -0,0 +1,31 @@
++/**
++ * IDEA:
++ * This is a general layout component that helps with aligning content.
++ */
++
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++function Flex( props ) {
++	const { align, className, gap, justify, ...restProps } = props;
++
++	const classes = classnames(
++		'components-flex',
++		align && `is-align-${ align }`,
++		gap && `is-gap-${ gap }`,
++		justify && `is-justify-${ justify }`,
++		className
++	);
++
++	return <div { ...restProps } className={ classes } />;
++}
++
++Flex.defaultProps = {
++	align: 'center',
++	gap: 'medium',
++	justify: 'space-between',
++};
++
++export default Flex;
+diff --git a/packages/components/src/flex/index.js b/packages/components/src/flex/index.js
+new file mode 100644
+index 00000000000000..174da20e5be467
+--- /dev/null
++++ b/packages/components/src/flex/index.js
+@@ -0,0 +1,10 @@
++export { default as Flex } from './flex';
++export { default as FlexBlock } from './block';
++export { default as FlexItem } from './item';
++
++/**
++ * Internal dependencies
++ */
++import Flex from './flex';
++
++export default Flex;
+diff --git a/packages/components/src/flex/item.js b/packages/components/src/flex/item.js
+new file mode 100644
+index 00000000000000..98112860b59e92
+--- /dev/null
++++ b/packages/components/src/flex/item.js
+@@ -0,0 +1,13 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++function FlexItem( props ) {
++	const { className, ...restProps } = props;
++	const classes = classnames( 'components-flex__item', className );
++
++	return <div { ...restProps } className={ classes } />;
++}
++
++export default FlexItem;
+diff --git a/packages/components/src/flex/stories/index.js b/packages/components/src/flex/stories/index.js
+new file mode 100644
+index 00000000000000..00e6e662ca89c3
+--- /dev/null
++++ b/packages/components/src/flex/stories/index.js
+@@ -0,0 +1,251 @@
++/**
++ * External dependencies
++ */
++import { boolean, select } from '@storybook/addon-knobs';
++import { random } from 'lodash';
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import Button from '../../button';
++import IconButton from '../../icon-button';
++import Flex from '../flex';
++import FlexBlock from '../block';
++import FlexItem from '../item';
++
++import './style.css';
++
++export default { title: 'Components|Flex', component: Flex };
++
++const getStoryProps = () => {
++	const showOutline = boolean( 'Example: Show Outline', true );
++
++	const align = select(
++		'align',
++		{
++			top: 'top',
++			center: 'center',
++			bottom: 'bottom',
++		},
++		'center'
++	);
++
++	const gap = select(
++		'gap',
++		{
++			large: 'large',
++			medium: 'medium',
++			small: 'small',
++			extraSmall: 'extraSmall',
++			none: 'none',
++		},
++		'medium'
++	);
++
++	const justify = select(
++		'justify',
++		{
++			'space-between': 'space-between',
++			left: 'left',
++			center: 'center',
++			right: 'right',
++		},
++		'space-between'
++	);
++
++	return {
++		showOutline,
++		align,
++		gap,
++		justify,
++	};
++};
++
++const Box = ( props ) => {
++	const { height, width, style: styleProps = {} } = props;
++
++	const style = {
++		background: '#ddd',
++		fontSize: 12,
++		...styleProps,
++		height: height || 40,
++		width: width || '100%',
++	};
++
++	return <div { ...props } style={ style } />;
++};
++
++const EnhancedFlex = ( props ) => {
++	const { showOutline, ...restProps } = props;
++	const exampleClassName = showOutline ? 'example-only-show-outline' : '';
++
++	return <Flex { ...restProps } className={ exampleClassName } />;
++};
++
++export const _default = () => {
++	const showBlock = boolean( 'Example: Show Block', true );
++	const differSize = boolean( 'Example: Differ Sizes', true );
++	const props = getStoryProps();
++
++	const baseSize = 40;
++
++	return (
++		<EnhancedFlex { ...props }>
++			<FlexItem>
++				<Box
++					width={ differSize ? 100 : baseSize }
++					height={ differSize ? 100 : baseSize }
++				>
++					Item
++				</Box>
++			</FlexItem>
++			{ showBlock && (
++				<FlexBlock>
++					<Box height={ differSize ? 300 : null }>Block</Box>
++				</FlexBlock>
++			) }
++
++			<FlexItem>
++				<Box width={ 40 }>Item</Box>
++			</FlexItem>
++		</EnhancedFlex>
++	);
++};
++
++const ItemExample = () => {
++	const props = getStoryProps();
++
++	const [ items, setItems ] = useState( [
++		{
++			width: 40,
++			height: 40,
++		},
++	] );
++
++	const addItem = () => {
++		setItems( [
++			...items,
++			{ width: random( 12, 150 ), height: random( 12, 150 ) },
++		] );
++	};
++
++	const removeItem = () => {
++		const nextItems = items.filter( ( item, index ) => {
++			return index !== items.length - 1;
++		} );
++		setItems( nextItems );
++	};
++
++	return (
++		<div>
++			<Flex justify="left" gap="small">
++				<FlexItem>
++					<Button onClick={ addItem } isDefault>
++						Add Item
++					</Button>
++				</FlexItem>
++				<FlexItem>
++					<Button onClick={ removeItem } isDefault>
++						Remove Item
++					</Button>
++				</FlexItem>
++			</Flex>
++			<hr />
++			<EnhancedFlex { ...props }>
++				{ items.map( ( item, index ) => (
++					<FlexItem key={ index }>
++						<Box { ...item } />
++					</FlexItem>
++				) ) }
++			</EnhancedFlex>
++		</div>
++	);
++};
++
++export const flexItem = () => {
++	return <ItemExample />;
++};
++
++const BlockExample = () => {
++	const props = getStoryProps();
++
++	const [ items, setItems ] = useState( [
++		{
++			height: 40,
++		},
++	] );
++
++	const addItem = () => {
++		setItems( [ ...items, { height: random( 20, 150 ) } ] );
++	};
++
++	const removeItem = () => {
++		const nextItems = items.filter( ( item, index ) => {
++			return index !== items.length - 1;
++		} );
++		setItems( nextItems );
++	};
++
++	return (
++		<div>
++			<Flex justify="left" gap="small">
++				<FlexItem>
++					<Button onClick={ addItem } isDefault>
++						Add Block
++					</Button>
++				</FlexItem>
++				<FlexItem>
++					<Button onClick={ removeItem } isDefault>
++						Remove Blcok
++					</Button>
++				</FlexItem>
++			</Flex>
++			<hr />
++			<EnhancedFlex { ...props }>
++				<FlexItem>
++					<Box width={ 40 } height={ 40 } />
++				</FlexItem>
++				{ items.map( ( item, index ) => (
++					<FlexBlock key={ index }>
++						<Box { ...item } />
++					</FlexBlock>
++				) ) }
++				<FlexItem>
++					<Box width={ 40 } height={ 40 } />
++				</FlexItem>
++			</EnhancedFlex>
++		</div>
++	);
++};
++
++export const flexBlock = () => {
++	return <BlockExample />;
++};
++
++export const exampleActions = () => {
++	const props = getStoryProps();
++
++	return (
++		<EnhancedFlex { ...props }>
++			<FlexItem>
++				<IconButton icon="arrow-left-alt" isTertiary />
++			</FlexItem>
++			<FlexItem>
++				<Flex justify="left" gap="small">
++					<FlexItem>
++						<Button isDefault isPrimary>
++							Add
++						</Button>
++					</FlexItem>
++					<FlexItem>
++						<Button isDefault>Remove Item</Button>
++					</FlexItem>
++				</Flex>
++			</FlexItem>
++		</EnhancedFlex>
++	);
++};
+diff --git a/packages/components/src/flex/stories/style.css b/packages/components/src/flex/stories/style.css
+new file mode 100644
+index 00000000000000..06a05379c37354
+--- /dev/null
++++ b/packages/components/src/flex/stories/style.css
+@@ -0,0 +1,7 @@
++.components-flex.example-only-show-outline {
++	box-shadow: 0 0 0 1px pink;
++}
++
++.components-flex.example-only-show-outline > * {
++	box-shadow: 0 0 0 1px pink;
++}
+diff --git a/packages/components/src/flex/style.scss b/packages/components/src/flex/style.scss
+new file mode 100644
+index 00000000000000..f6cf08341bff8b
+--- /dev/null
++++ b/packages/components/src/flex/style.scss
+@@ -0,0 +1,78 @@
++.components-flex {
++	display: flex;
++
++	* {
++		box-sizing: border-box;
++	}
++
++	> * {
++		min-width: 0;
++		max-width: 100%;
++	}
++
++	// Modifiers
++	&.is-align-top {
++		align-items: flex-start;
++	}
++	&.is-align-center {
++		align-items: center;
++	}
++	&.is-align-bottom {
++		align-items: flex-end;
++	}
++
++	&.is-justify-space-between {
++		justify-content: space-between;
++	}
++	&.is-justify-left {
++		justify-content: flex-start;
++	}
++	&.is-justify-center {
++		justify-content: center;
++	}
++	&.is-justify-right {
++		justify-content: flex-end;
++	}
++
++	&.is-gap-large {
++		& > * {
++			margin-right: 20px;
++
++			&:last-child {
++				margin-right: 0;
++			}
++		}
++	}
++	&.is-gap-medium {
++		& > * {
++			margin-right: 16px;
++
++			&:last-child {
++				margin-right: 0;
++			}
++		}
++	}
++	&.is-gap-small {
++		& > * {
++			margin-right: 8px;
++
++			&:last-child {
++				margin-right: 0;
++			}
++		}
++	}
++	&.is-gap-extraSmall {
++		& > * {
++			margin-right: 4px;
++
++			&:last-child {
++				margin-right: 0;
++			}
++		}
++	}
++
++	// Elements
++	&__block {
++		flex: 1;
++	}
++}
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 3803719c2d8d1b..11fa8d6eb7a3e5 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -1,5 +1,8 @@
+ // Components
+ export * from './primitives';
++export { default as ActionBar } from './action-bar';
++export { default as ActionBarBlock } from './action-bar/block';
++export { default as ActionBarItem } from './action-bar/item';
+ export { default as Animate } from './animate';
+ export { default as Autocomplete } from './autocomplete';
+ export { default as BaseControl } from './base-control';
+@@ -26,6 +29,9 @@ export { default as DropZoneProvider } from './drop-zone/provider';
+ export { default as Dropdown } from './dropdown';
+ export { default as DropdownMenu } from './dropdown-menu';
+ export { default as ExternalLink } from './external-link';
++export { default as Flex } from './flex';
++export { default as FlexBlock } from './flex/block';
++export { default as FlexItem } from './flex/item';
+ export { default as FocalPointPicker } from './focal-point-picker';
+ export { default as FocusableIframe } from './focusable-iframe';
+ export { default as FontSizePicker } from './font-size-picker';
+diff --git a/packages/components/src/page-header/index.js b/packages/components/src/page-header/index.js
+new file mode 100644
+index 00000000000000..1140da45e5d52e
+--- /dev/null
++++ b/packages/components/src/page-header/index.js
+@@ -0,0 +1,64 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++/**
++ * Internal dependencies
++ */
++import ActionBar from '../action-bar';
++import ActionBarBlock from '../action-bar/block';
++import ActionBarItem from '../action-bar/item';
++
++function PageHeader( props ) {
++	const {
++		children,
++		className,
++		leftActions,
++		rightActions,
++		title,
++		subtitle,
++		...restProps
++	} = props;
++
++	const classes = classnames( 'components-page-header', className );
++
++	return (
++		<ActionBar { ...restProps } className={ classes }>
++			{ leftActions && (
++				<ActionBarItem className="components-page-header__left-actions">
++					{ leftActions }
++				</ActionBarItem>
++			) }
++			<ActionBarBlock className="components-page-header__body">
++				{ title && (
++					<div className="components-page-header__title-wrapper">
++						<h1 className="components-page-header__title">
++							{ title }
++						</h1>
++					</div>
++				) }
++				{ subtitle && (
++					<div className="components-page-header__subtitle">
++						{ subtitle }
++					</div>
++				) }
++				{ children && (
++					<div className="components-page-header__content">
++						{ children }
++					</div>
++				) }
++			</ActionBarBlock>
++			{ rightActions && (
++				<ActionBarItem className="components-page-header__right-actions">
++					{ rightActions }
++				</ActionBarItem>
++			) }
++		</ActionBar>
++	);
++}
++
++PageHeader.defaultProps = {
++	align: 'top',
++};
++
++export default PageHeader;
+diff --git a/packages/components/src/page-header/stories/index.js b/packages/components/src/page-header/stories/index.js
+new file mode 100644
+index 00000000000000..8b4880e66a5c18
+--- /dev/null
++++ b/packages/components/src/page-header/stories/index.js
+@@ -0,0 +1,128 @@
++/**
++ * External dependencies
++ */
++import { select, text } from '@storybook/addon-knobs';
++
++/**
++ * Internal dependencies
++ */
++import Button from '../../button';
++import Dropdown from '../../dropdown';
++import Flex from '../../flex';
++import MenuGroup from '../../menu-group';
++import MenuItem from '../../menu-item';
++import IconButton from '../../icon-button';
++import PageHeader from '../';
++import './styles.css';
++
++export default { title: 'Components|PageHeader', component: PageHeader };
++
++const InlineActions = () => {
++	return (
++		<Flex justify="left" gap="small">
++			<Button isDefault isPrimary>
++				Add New
++			</Button>
++			<Button isDefault>Add New</Button>
++			<Button isDefault>Add New</Button>
++		</Flex>
++	);
++};
++
++const DropdownActions = () => {
++	return (
++		<div className="additional-actions">
++			<Dropdown
++				className="my-container-class-name"
++				contentClassName="my-popover-content-classname"
++				position="bottom right"
++				renderToggle={ ( { isOpen, onToggle } ) => (
++					<IconButton
++						icon="ellipsis"
++						isTertiary
++						onClick={ onToggle }
++						aria-expanded={ isOpen }
++					/>
++				) }
++				renderContent={ () => (
++					<MenuGroup>
++						<MenuItem icon="star-filled">Favorite</MenuItem>
++						<MenuItem icon="share-alt2">Share</MenuItem>
++						<MenuItem icon="admin-generic">Settings</MenuItem>
++					</MenuGroup>
++				) }
++			/>
++		</div>
++	);
++};
++
++export const _default = () => {
++	const actionsPlacement = select(
++		'Example: Actions Placement',
++
++		{
++			Right: 'right',
++			Bottom: 'bottom',
++		},
++		'bottom'
++	);
++
++	const title = text( 'title', 'Title' );
++	const subtitle = text( 'subtitle', 'Subtitle Content' );
++
++	const props = {
++		title,
++		subtitle,
++	};
++
++	const isPlacedRight = actionsPlacement === 'right';
++	const isPlacedBottom = ! isPlacedRight;
++
++	return (
++		<PageHeader
++			{ ...props }
++			rightActions={
++				<>
++					{ isPlacedRight ? <InlineActions /> : null }
++					<DropdownActions />
++				</>
++			}
++		>
++			{ isPlacedBottom ? <InlineActions /> : null }
++		</PageHeader>
++	);
++};
++
++export const simple = () => {
++	const title = text( 'title', 'Title' );
++
++	const props = {
++		title,
++	};
++
++	return (
++		<PageHeader
++			{ ...props }
++			rightActions={
++				<>
++					<InlineActions />
++					<DropdownActions />
++				</>
++			}
++		/>
++	);
++};
++
++export const actionBar = () => {
++	return (
++		<PageHeader
++			leftActions={ <IconButton icon="insert" isTertiary /> }
++			rightActions={
++				<>
++					<InlineActions />
++					<DropdownActions />
++				</>
++			}
++		></PageHeader>
++	);
++};
+diff --git a/packages/components/src/page-header/stories/styles.css b/packages/components/src/page-header/stories/styles.css
+new file mode 100644
+index 00000000000000..0141a7740c8eee
+--- /dev/null
++++ b/packages/components/src/page-header/stories/styles.css
+@@ -0,0 +1,33 @@
++/*
++CUSTOM CSS
++This CSS exists just for this story + dev.
++Please remove when submitting for PR review.
++*/
++.components-page-header__body {
++	flex: 1;
++	padding: 0 8px;
++}
++
++.components-page-header__title-wrapper {
++	margin-top: 4px;
++}
++
++.components-page-header__body > *:last-child {
++	margin-bottom: 0;
++}
++
++.components-page-header__body > * + .components-page-header__content {
++	margin-top: 12px;
++}
++
++.components-page-header__right-actions {
++	display: flex;
++}
++.components-page-header__right-actions > * {
++	min-width: 0;
++	max-width: 100%;
++}
++
++.additional-actions {
++	margin-left: 8px;
++}
+diff --git a/packages/components/src/page-header/style.scss b/packages/components/src/page-header/style.scss
+new file mode 100644
+index 00000000000000..5910770014987f
+--- /dev/null
++++ b/packages/components/src/page-header/style.scss
+@@ -0,0 +1,24 @@
++// WIP: Color variables need to be used
++.components-page-header {
++	box-sizing: border-box;
++
++	* {
++		box-sizing: border-box;
++	}
++
++	&__title-wrapper {
++		margin-bottom: 8px;
++	}
++
++	&__title {
++		font-size: 20px;
++		line-height: 1.1;
++		padding: 0;
++		margin: 0;
++	}
++
++	&__subtitle {
++		color: #666;
++		max-width: 680px;
++	}
++}
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index 7a62ba0534539d..102af0f809d1d8 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -1,3 +1,4 @@
++@import "./action-bar/style.scss";
+ @import "./animate/style.scss";
+ @import "./autocomplete/style.scss";
+ @import "./base-control/style.scss";
+@@ -20,6 +21,7 @@
+ @import "./form-file-upload/style.scss";
+ @import "./form-toggle/style.scss";
+ @import "./form-token-field/style.scss";
++@import "./flex/style.scss";
+ @import "./higher-order/navigate-regions/style.scss";
+ @import "./icon-button/style.scss";
+ @import "./menu-group/style.scss";
+@@ -27,6 +29,7 @@
+ @import "./modal/style.scss";
+ @import "./notice/style.scss";
+ @import "./panel/style.scss";
++@import "./page-header/style.scss";
+ @import "./placeholder/style.scss";
+ @import "./popover/style.scss";
+ @import "./radio-control/style.scss";

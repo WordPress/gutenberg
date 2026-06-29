@@ -1,0 +1,212 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8805736c2e4409..c3c33d3411d457 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -31,6 +31,7 @@
+ -   `InputControl`, `NumberControl`, `UnitControl`, `SelectControl`, `TreeSelect`: Add `compact` size variant ([#57398](https://github.com/WordPress/gutenberg/pull/57398)).
+ -   `ToggleGroupControl`: Update button size in large variant to be 32px ([#57338](https://github.com/WordPress/gutenberg/pull/57338)).
+ -   `Tooltip`: improve unit tests ([#57345](https://github.com/WordPress/gutenberg/pull/57345)).
++-   `CustomSelectControl`: Update experimental Ariakit version to offer `popoverProps` and `hideLabelFromVision` props ([#57703](https://github.com/WordPress/gutenberg/pull/57703)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/custom-select-control-v2/README.md b/packages/components/src/custom-select-control-v2/README.md
+index 3cd9c3f8534e76..1fb8edb90c8780 100644
+--- a/packages/components/src/custom-select-control-v2/README.md
++++ b/packages/components/src/custom-select-control-v2/README.md
+@@ -22,6 +22,13 @@ An optional default value for the control. If left `undefined`, the first non-di
+ 
+ -   Required: no
+ 
++##### `hideLabelFromVision`: `boolean`
++
++If true, the label will only be visible to screen readers.
++
++-   Required: no
++-   Default: `false`
++
+ ##### `label`: `string`
+ 
+ Label for the control.
+@@ -34,6 +41,12 @@ A function that receives the new value of the input.
+ 
+ -   Required: no
+ 
++##### `popoverProps`: `Object`
++
++Optional props passed to the Ariakit Select Popover.
++
++-   Required: no
++
+ ##### `renderSelectedValue`: `( selectValue: string ) => React.ReactNode`
+ 
+ Can be used to render select UI with custom styled values.
+diff --git a/packages/components/src/custom-select-control-v2/index.tsx b/packages/components/src/custom-select-control-v2/index.tsx
+index 614f52105513f4..6bc38db3080bb3 100644
+--- a/packages/components/src/custom-select-control-v2/index.tsx
++++ b/packages/components/src/custom-select-control-v2/index.tsx
+@@ -19,6 +19,7 @@ import type {
+ 	CustomSelectContext as CustomSelectContextType,
+ } from './types';
+ import type { WordPressComponentProps } from '../context';
++import { VisuallyHidden } from '../visually-hidden';
+ 
+ export const CustomSelectContext =
+ 	createContext< CustomSelectContextType >( undefined );
+@@ -45,11 +46,13 @@ function defaultRenderSelectedValue( value: CustomSelectProps[ 'value' ] ) {
+ export function CustomSelect( {
+ 	children,
+ 	defaultValue,
++	hideLabelFromVision = false,
+ 	label,
+ 	onChange,
+ 	size = 'default',
+ 	value,
+ 	renderSelectedValue = defaultRenderSelectedValue,
++	popoverProps,
+ 	...props
+ }: WordPressComponentProps< CustomSelectProps, 'button', false > ) {
+ 	const store = Ariakit.useSelectStore( {
+@@ -59,12 +62,23 @@ export function CustomSelect( {
+ 	} );
+ 
+ 	const { value: currentValue } = store.useState();
++	const selectPopoverProps = {
++		gutter: 12,
++		sameWidth: true,
++		...popoverProps,
++		store,
++	};
+ 
+ 	return (
+ 		<>
+-			<Styled.CustomSelectLabel store={ store }>
+-				{ label }
+-			</Styled.CustomSelectLabel>
++			{ hideLabelFromVision && (
++				<VisuallyHidden as="label">{ label }</VisuallyHidden>
++			) }
++			{ ! hideLabelFromVision && (
++				<Styled.CustomSelectLabel store={ store }>
++					{ label }
++				</Styled.CustomSelectLabel>
++			) }
+ 			<Styled.CustomSelectButton
+ 				{ ...props }
+ 				size={ size }
+@@ -74,7 +88,7 @@ export function CustomSelect( {
+ 				{ renderSelectedValue( currentValue ) }
+ 				<Ariakit.SelectArrow />
+ 			</Styled.CustomSelectButton>
+-			<Styled.CustomSelectPopover gutter={ 12 } store={ store } sameWidth>
++			<Styled.CustomSelectPopover { ...selectPopoverProps }>
+ 				<CustomSelectContext.Provider value={ { store } }>
+ 					{ children }
+ 				</CustomSelectContext.Provider>
+diff --git a/packages/components/src/custom-select-control-v2/stories/index.story.tsx b/packages/components/src/custom-select-control-v2/stories/index.story.tsx
+index 2c7ae3507046bc..0bc88079728cce 100644
+--- a/packages/components/src/custom-select-control-v2/stories/index.story.tsx
++++ b/packages/components/src/custom-select-control-v2/stories/index.story.tsx
+@@ -115,6 +115,40 @@ MultiSelect.args = {
+ 	),
+ };
+ 
++export const HiddenLabelSelect = Template.bind( {} );
++HiddenLabelSelect.args = {
++	hideLabelFromVision: true,
++	label: 'Label',
++	children: (
++		<>
++			<CustomSelectItem value="Small">
++				<span style={ { fontSize: '75%' } }>Small</span>
++			</CustomSelectItem>
++			<CustomSelectItem value="Something bigger">
++				<span style={ { fontSize: '200%' } }>Something bigger</span>
++			</CustomSelectItem>
++		</>
++	),
++};
++
++export const CustomPopoverSelect = Template.bind( {} );
++CustomPopoverSelect.args = {
++	popoverProps: {
++		sameWidth: false,
++	},
++	label: 'Label',
++	children: (
++		<>
++			<CustomSelectItem value="Small">
++				<span style={ { fontSize: '75%' } }>Small</span>
++			</CustomSelectItem>
++			<CustomSelectItem value="Something bigger">
++				<span style={ { fontSize: '200%' } }>Something bigger</span>
++			</CustomSelectItem>
++		</>
++	),
++};
++
+ const renderControlledValue = ( gravatar: string | string[] ) => {
+ 	const avatar = `https://gravatar.com/avatar?d=${ gravatar }`;
+ 	return (
+diff --git a/packages/components/src/custom-select-control-v2/styles.ts b/packages/components/src/custom-select-control-v2/styles.ts
+index c04f6ac32e5ffb..43bd224bb2bb9d 100644
+--- a/packages/components/src/custom-select-control-v2/styles.ts
++++ b/packages/components/src/custom-select-control-v2/styles.ts
+@@ -63,6 +63,8 @@ export const CustomSelectPopover = styled( Ariakit.SelectPopover )`
+ 	border-radius: ${ space( 0.5 ) };
+ 	background: ${ COLORS.white };
+ 	border: 1px solid ${ COLORS.gray[ 900 ] };
++	/* Force the passed wrapper props z-index otherwise it's overridden. */
++	z-index: ${ ( props ) => props.wrapperProps?.style?.zIndex };
+ `;
+ 
+ export const CustomSelectItem = styled( Ariakit.SelectItem )`
+diff --git a/packages/components/src/custom-select-control-v2/types.ts b/packages/components/src/custom-select-control-v2/types.ts
+index 2aecc1d4746f5c..c5da02f40070e0 100644
+--- a/packages/components/src/custom-select-control-v2/types.ts
++++ b/packages/components/src/custom-select-control-v2/types.ts
+@@ -23,6 +23,12 @@ export type CustomSelectProps = {
+ 	 * non-disabled item will be used.
+ 	 */
+ 	defaultValue?: string | string[];
++	/**
++	 * If true, the label will only be visible to screen readers.
++	 *
++	 * @default false
++	 */
++	hideLabelFromVision?: boolean;
+ 	/**
+ 	 * Label for the control.
+ 	 */
+@@ -31,6 +37,10 @@ export type CustomSelectProps = {
+ 	 * A function that receives the new value of the input.
+ 	 */
+ 	onChange?: ( newValue: string | string[] ) => void;
++	/**
++	 * Optional props passed to the Ariakit Select Popover.
++	 */
++	popoverProps?: Ariakit.SelectPopoverProps;
+ 	/**
+ 	 * Can be used to render select UI with custom styled values.
+ 	 */
+diff --git a/packages/components/src/private-apis.ts b/packages/components/src/private-apis.ts
+index 6694c1d30bdce8..6eb019f0f7c3e8 100644
+--- a/packages/components/src/private-apis.ts
++++ b/packages/components/src/private-apis.ts
+@@ -14,6 +14,7 @@ import {
+ 	useCompositeStore as useCompositeStoreV2,
+ } from './composite/v2';
+ import { default as CustomSelectControl } from './custom-select-control';
++import { CustomSelect, CustomSelectItem } from './custom-select-control-v2';
+ import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
+ import { default as ProgressBar } from './progress-bar';
+ import { createPrivateSlotFill } from './slot-fill';
+@@ -41,6 +42,8 @@ lock( privateApis, {
+ 	CompositeRowV2,
+ 	useCompositeStoreV2,
+ 	CustomSelectControl,
++	CustomSelect,
++	CustomSelectItem,
+ 	__experimentalPopoverLegacyPositionToPlacement,
+ 	createPrivateSlotFill,
+ 	ComponentsContext,

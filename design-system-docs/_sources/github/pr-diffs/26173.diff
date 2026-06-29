@@ -1,0 +1,42 @@
+diff --git a/packages/components/src/tip/index.js b/packages/components/src/tip/index.js
+index ca9b05cd2c3df9..877d19b1ef044f 100644
+--- a/packages/components/src/tip/index.js
++++ b/packages/components/src/tip/index.js
+@@ -1,8 +1,17 @@
+ /**
+- * Internal dependencies
++ * WordPress dependencies
+  */
+-import { SVG, Path } from '../';
++import { SVG, Path } from '@wordpress/primitives';
+ 
++/**
++ * @typedef Props
++ * @property {import('react').ReactNode} children Children to render in the tip.
++ */
++
++/**
++ * @param {Props} props
++ * @return {JSX.Element} Element
++ */
+ function Tip( props ) {
+ 	return (
+ 		<div className="components-tip">
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 9267432f4f8914..64398d2ccb7b42 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -2,10 +2,8 @@
+ 	"extends": "../../tsconfig.base.json",
+ 	"compilerOptions": {
+ 		"rootDir": "src",
+-		"declarationDir": "build-types",
++		"declarationDir": "build-types"
+ 	},
+-	"references": [],
+-    "include": [
+-		"src/dashicon/*"
+-	],
++	"references": [ { "path": "../primitives" } ],
++	"include": [ "src/dashicon/*", "src/tip/*" ]
+ }

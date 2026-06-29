@@ -1,0 +1,12 @@
+diff --git a/packages/components/src/tabs/styles.ts b/packages/components/src/tabs/styles.ts
+index 717316227ddb3c..9f0df4c15e744c 100644
+--- a/packages/components/src/tabs/styles.ts
++++ b/packages/components/src/tabs/styles.ts
+@@ -15,6 +15,7 @@ export const StyledTabList = styled( Ariakit.TabList )`
+ 	display: flex;
+ 	align-items: stretch;
+ 	overflow-x: auto;
++	padding-bottom: 3px;
+ 
+ 	&[aria-orientation='vertical'] {
+ 		flex-direction: column;

@@ -1,0 +1,27 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 88cd14c20c9033..6b42ddd598e960 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,9 @@
+ 
+ ## Unreleased
+ 
++### Bug Fixes
++-   `Tooltip`: Ensure tooltips do not capture pointer events, allowing clicks to pass through to underlying elements ([#77415](https://github.com/WordPress/gutenberg/pull/77415)).
++
+ ### Breaking Changes
+ 
+ -   `ExternalLink`: No longer adds `noreferrer` to the `rel` attribute. `noopener` is still applied. Consumers relying on the previous behavior should pass `rel="noopener noreferrer"` explicitly ([#26968](https://github.com/WordPress/gutenberg/pull/26968)).
+diff --git a/packages/components/src/tooltip/index.tsx b/packages/components/src/tooltip/index.tsx
+index 0c0d9d1d183bae..a1b75dcafb1857 100644
+--- a/packages/components/src/tooltip/index.tsx
++++ b/packages/components/src/tooltip/index.tsx
+@@ -123,6 +123,8 @@ function UnforwardedTooltip(
+ 					id={ describedById }
+ 					overflowPadding={ 0.5 }
+ 					store={ tooltipStore }
++					disablePointerEventsOnApproach={ false }
++					wrapperProps={ { style: { pointerEvents: 'none' } } }
+ 				>
+ 					{ text }
+ 					{ shortcut && (

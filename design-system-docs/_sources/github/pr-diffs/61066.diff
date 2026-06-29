@@ -1,0 +1,387 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 12277f793d2d92..9a6e7550bde265 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++- `Text`: Remove "experimental" designation ([#61066](https://github.com/WordPress/gutenberg/pull/61066)).
++
+ ### Enhancements
+ 
+ -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
+diff --git a/packages/components/src/card/card/README.md b/packages/components/src/card/card/README.md
+index 5a97913c884076..5e1e02248a11b1 100644
+--- a/packages/components/src/card/card/README.md
++++ b/packages/components/src/card/card/README.md
+@@ -12,7 +12,7 @@ import {
+ 	CardHeader,
+ 	CardBody,
+ 	CardFooter,
+-	__experimentalText as Text,
++	Text,
+ 	__experimentalHeading as Heading,
+ } from '@wordpress/components';
+ 
+diff --git a/packages/components/src/card/card/component.tsx b/packages/components/src/card/card/component.tsx
+index 8fefc33bd48027..578855b6631b2a 100644
+--- a/packages/components/src/card/card/component.tsx
++++ b/packages/components/src/card/card/component.tsx
+@@ -85,7 +85,7 @@ function UnconnectedCard(
+  *   CardHeader,
+  *   CardBody,
+  *   CardFooter,
+- *   __experimentalText as Text,
++ *   Text,
+  *   __experimentalHeading as Heading,
+  * } from `@wordpress/components`;
+  *
+diff --git a/packages/components/src/divider/README.md b/packages/components/src/divider/README.md
+index c81026b7b55871..06f9a377bb6217 100644
+--- a/packages/components/src/divider/README.md
++++ b/packages/components/src/divider/README.md
+@@ -11,7 +11,7 @@ This feature is still experimental. “Experimental” means this is an early im
+ ```jsx
+ import {
+ 	__experimentalDivider as Divider,
+-	__experimentalText as Text,
++	Text,
+ 	__experimentalVStack as VStack,
+ } from `@wordpress/components`;
+ 
+diff --git a/packages/components/src/divider/component.tsx b/packages/components/src/divider/component.tsx
+index 3870c2f12c4fc3..fd88cc8ef4dc65 100644
+--- a/packages/components/src/divider/component.tsx
++++ b/packages/components/src/divider/component.tsx
+@@ -34,7 +34,7 @@ function UnconnectedDivider(
+  * ```js
+  * import {
+  * 		__experimentalDivider as Divider,
+- * 		__experimentalText as Text,
++ * 		Text,
+  * 		__experimentalVStack as VStack,
+  * } from `@wordpress/components`;
+  *
+diff --git a/packages/components/src/elevation/README.md b/packages/components/src/elevation/README.md
+index 3cdb379b82ab4f..0a2532ddcc2a17 100644
+--- a/packages/components/src/elevation/README.md
++++ b/packages/components/src/elevation/README.md
+@@ -14,7 +14,7 @@ The shadow effect is generated using the `value` prop.
+ import {
+ 	__experimentalElevation as Elevation,
+ 	__experimentalSurface as Surface,
+-	__experimentalText as Text,
++	Text,
+ } from '@wordpress/components';
+ 
+ function Example() {
+diff --git a/packages/components/src/elevation/component.tsx b/packages/components/src/elevation/component.tsx
+index d116859d9a303a..fec1f41f80edd3 100644
+--- a/packages/components/src/elevation/component.tsx
++++ b/packages/components/src/elevation/component.tsx
+@@ -31,7 +31,7 @@ function UnconnectedElevation(
+  * import {
+  *	__experimentalElevation as Elevation,
+  *	__experimentalSurface as Surface,
+- *	__experimentalText as Text,
++ *	Text,
+  * } from '@wordpress/components';
+  *
+  * function Example() {
+diff --git a/packages/components/src/grid/README.md b/packages/components/src/grid/README.md
+index 15cd959e135bee..db0c61e880b13d 100644
+--- a/packages/components/src/grid/README.md
++++ b/packages/components/src/grid/README.md
+@@ -11,7 +11,7 @@ This feature is still experimental. “Experimental” means this is an early im
+ ```jsx
+ import {
+ 	__experimentalGrid as Grid,
+-	__experimentalText as Text,
++	Text,
+ } from '@wordpress/components';
+ 
+ function Example() {
+diff --git a/packages/components/src/grid/component.tsx b/packages/components/src/grid/component.tsx
+index f18909c8e1c9ae..8768c7ec0aab3a 100644
+--- a/packages/components/src/grid/component.tsx
++++ b/packages/components/src/grid/component.tsx
+@@ -27,7 +27,7 @@ function UnconnectedGrid(
+  * ```jsx
+  * import {
+  * 	__experimentalGrid as Grid,
+- * 	__experimentalText as Text
++ * 	Text
+  * } from `@wordpress/components`;
+  *
+  * function Example() {
+diff --git a/packages/components/src/h-stack/README.md b/packages/components/src/h-stack/README.md
+index 77e3c77b940f2a..91b3b5ea57b598 100644
+--- a/packages/components/src/h-stack/README.md
++++ b/packages/components/src/h-stack/README.md
+@@ -13,7 +13,7 @@ This feature is still experimental. “Experimental” means this is an early im
+ ```jsx
+ import {
+ 	__experimentalHStack as HStack,
+-	__experimentalText as Text,
++	Text,
+ } from '@wordpress/components';
+ 
+ function Example() {
+@@ -87,7 +87,7 @@ When a `Spacer` is used within an `HStack`, the `Spacer` adaptively expands to t
+ import {
+ 	__experimentalHStack as HStack,
+ 	__experimentalSpacer as Spacer,
+-	__experimentalText as Text,
++	Text,
+ } from '@wordpress/components';
+ 
+ function Example() {
+@@ -109,7 +109,7 @@ function Example() {
+ import {
+ 	__experimentalHStack as HStack,
+ 	__experimentalSpacer as Spacer,
+-	__experimentalText as Text,
++	Text,
+ } from '@wordpress/components';
+ 
+ function Example() {
+diff --git a/packages/components/src/h-stack/component.tsx b/packages/components/src/h-stack/component.tsx
+index 1d1efebe8a0912..087cfc1af0fc6e 100644
+--- a/packages/components/src/h-stack/component.tsx
++++ b/packages/components/src/h-stack/component.tsx
+@@ -24,7 +24,7 @@ function UnconnectedHStack(
+  * ```jsx
+  * import {
+  * 	__experimentalHStack as HStack,
+- * 	__experimentalText as Text,
++ * 	Text,
+  * } from `@wordpress/components`;
+  *
+  * function Example() {
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index a824162cb24129..4e4000e985cdf6 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -149,7 +149,13 @@ export { Scrollable as __experimentalScrollable } from './scrollable';
+ export { default as Spinner } from './spinner';
+ export { Surface as __experimentalSurface } from './surface';
+ export { default as TabPanel } from './tab-panel';
+-export { Text as __experimentalText } from './text';
++export {
++	/**
++	 * @deprecated Import `Text` instead.
++	 */
++	Text as __experimentalText,
++	Text,
++} from './text';
+ export { default as TextControl } from './text-control';
+ export { default as TextareaControl } from './textarea-control';
+ export { default as TextHighlight } from './text-highlight';
+diff --git a/packages/components/src/surface/README.md b/packages/components/src/surface/README.md
+index 6f0d83ecb9cc9f..468341e43679ef 100644
+--- a/packages/components/src/surface/README.md
++++ b/packages/components/src/surface/README.md
+@@ -13,7 +13,7 @@ In the example below, notice how the `Surface` renders in white (or dark gray if
+ ```jsx
+ import {
+ 	__experimentalSurface as Surface,
+-	__experimentalText as Text,
++	Text,
+ } from '@wordpress/components';
+ 
+ function Example() {
+diff --git a/packages/components/src/surface/component.tsx b/packages/components/src/surface/component.tsx
+index ba0745a40b5044..5dec8c2eebdbba 100644
+--- a/packages/components/src/surface/component.tsx
++++ b/packages/components/src/surface/component.tsx
+@@ -29,7 +29,7 @@ function UnconnectedSurface(
+  * ```jsx
+  * import {
+  *	__experimentalSurface as Surface,
+- *	__experimentalText as Text,
++ *	Text,
+  * } from '@wordpress/components';
+  *
+  * function Example() {
+diff --git a/packages/components/src/text/README.md b/packages/components/src/text/README.md
+index 46bd6a5f10de77..eaeaeea96e12fb 100644
+--- a/packages/components/src/text/README.md
++++ b/packages/components/src/text/README.md
+@@ -1,9 +1,5 @@
+ # Text
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+ `Text` is a core component that renders text in the library, using the library's typography system.
+ 
+ ## Usage
+@@ -11,7 +7,7 @@ This feature is still experimental. “Experimental” means this is an early im
+ `Text` can be used to render any text-content, like an HTML `p` or `span`.
+ 
+ ```jsx
+-import { __experimentalText as Text } from '@wordpress/components';
++import { Text } from '@wordpress/components';
+ 
+ function Example() {
+ 	return <Text>Code is Poetry</Text>;
+@@ -27,7 +23,7 @@ function Example() {
+ Automatically calculate the appropriate line-height value for contents that render text and Control elements (e.g. `TextInput`).
+ 
+ ```jsx
+-import { __experimentalText as Text, TextInput } from '@wordpress/components';
++import { Text, TextInput } from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+@@ -46,7 +42,7 @@ function Example() {
+ Adjusts the text alignment.
+ 
+ ```jsx
+-import { __experimentalText as Text } from '@wordpress/components';
++import { Text } from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+@@ -111,7 +107,7 @@ Array of search words. String search terms are automatically cast to RegExps unl
+ Letters or words within `Text` can be highlighted using `highlightWords`.
+ 
+ ```jsx
+-import { __experimentalText as Text } from '@wordpress/components';
++import { Text } from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+@@ -165,7 +161,7 @@ Clamps the text content to the specifiec `numberOfLines`, adding the `ellipsis`
+ The `Text` color can be adapted to a background color for optimal readability. `optimizeReadabilityFor` can accept CSS variables, in addition to standard CSS color values (e.g. Hex, RGB, HSL, etc...).
+ 
+ ```jsx
+-import { __experimentalText as Text, View } from '@wordpress/components';
++import { Text, View } from '@wordpress/components';
+ 
+ function Example() {
+ 	const backgroundColor = 'blue';
+@@ -187,7 +183,7 @@ function Example() {
+ Adjusts text size based on the typography system. `Text` can render a wide range of font sizes, which are automatically calculated and adapted to the typography system. The `size` value can be a system preset, a `number`, or a custom unit value (`string`) such as `30em`.
+ 
+ ```jsx
+-import { __experimentalText as Text } from '@wordpress/components';
++import { Text } from '@wordpress/components';
+ 
+ function Example() {
+ 	return <Text size="largeTitle">Code is Poetry</Text>;
+@@ -203,7 +199,7 @@ Enables text truncation. When `truncate` is set, we are able to truncate the lon
+ Note: text truncation won't work if the `isBlock` property is set to `true`
+ 
+ ```jsx
+-import { __experimentalText as Text } from '@wordpress/components';
++import { Text } from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+@@ -231,7 +227,7 @@ Uppercases the text content.
+ Adjusts style variation of the text.
+ 
+ ```jsx
+-import { __experimentalText as Text } from '@wordpress/components';
++import { Text } from '@wordpress/components';
+ 
+ function Example() {
+ 	return <Text variant="muted">Code is Poetry</Text>;
+diff --git a/packages/components/src/text/component.tsx b/packages/components/src/text/component.tsx
+index f3fe69d936584c..01c23f5289ebc7 100644
+--- a/packages/components/src/text/component.tsx
++++ b/packages/components/src/text/component.tsx
+@@ -29,7 +29,7 @@ function UnconnectedText(
+  * @example
+  *
+  * ```jsx
+- * import { __experimentalText as Text } from `@wordpress/components`;
++ * import { Text } from `@wordpress/components`;
+  *
+  * function Example() {
+  * 	return <Text>Code is Poetry</Text>;
+diff --git a/packages/components/src/text/stories/index.story.tsx b/packages/components/src/text/stories/index.story.tsx
+index f762ca3b4e3ff7..0f9ab0c1878a74 100644
+--- a/packages/components/src/text/stories/index.story.tsx
++++ b/packages/components/src/text/stories/index.story.tsx
+@@ -10,7 +10,7 @@ import { Text } from '../component';
+ 
+ const meta: Meta< typeof Text > = {
+ 	component: Text,
+-	title: 'Components (Experimental)/Text',
++	title: 'Components/Text',
+ 	argTypes: {
+ 		as: { control: { type: 'text' } },
+ 		color: { control: { type: 'color' } },
+diff --git a/packages/components/src/v-stack/README.md b/packages/components/src/v-stack/README.md
+index 2f447b18015e51..647a9514890189 100644
+--- a/packages/components/src/v-stack/README.md
++++ b/packages/components/src/v-stack/README.md
+@@ -12,7 +12,7 @@ This feature is still experimental. “Experimental” means this is an early im
+ 
+ ```jsx
+ import {
+-	__experimentalText as Text,
++	Text,
+ 	__experimentalVStack as VStack,
+ } from '@wordpress/components';
+ 
+@@ -74,7 +74,7 @@ When a `Spacer` is used within an `VStack`, the `Spacer` adaptively expands to t
+ ```jsx
+ import {
+ 	__experimentalSpacer as Spacer,
+-	__experimentalText as Text,
++	Text,
+ 	__experimentalVStack as VStack,
+ } from '@wordpress/components';
+ 
+@@ -96,7 +96,7 @@ function Example() {
+ ```jsx
+ import {
+ 	__experimentalSpacer as Spacer,
+-	__experimentalText as Text,
++	Text,
+ 	__experimentalVStack as VStack,
+ } from '@wordpress/components';
+ 
+diff --git a/packages/components/src/v-stack/component.tsx b/packages/components/src/v-stack/component.tsx
+index c3ae9fece97dc0..a6d07c73115048 100644
+--- a/packages/components/src/v-stack/component.tsx
++++ b/packages/components/src/v-stack/component.tsx
+@@ -29,7 +29,7 @@ function UnconnectedVStack(
+  *
+  * ```jsx
+  * import {
+- * 	__experimentalText as Text,
++ * 	Text,
+  * 	__experimentalVStack as VStack,
+  * } from `@wordpress/components`;
+  *
+diff --git a/packages/components/src/view/README.md b/packages/components/src/view/README.md
+index c1e04ebd8cfff4..a4e3850ff6f98d 100644
+--- a/packages/components/src/view/README.md
++++ b/packages/components/src/view/README.md
+@@ -12,7 +12,7 @@ This feature is still experimental. “Experimental” means this is an early im
+ 
+ ```jsx
+ import {
+-	__experimentalText as Text,
++	Text,
+ 	__experimentalView as View,
+ } from '@wordpress/components';
+ 
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 629f06bf98edf9..75f35266f077a1 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -1,6 +1,6 @@
+ <script>
+ 	( function redirectIfStoryMoved() {
+-		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation' ];
++		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation', 'text' ];
+ 		const REDIRECTS = [
+ 			{
+ 				from: /\/components-deprecated-/,

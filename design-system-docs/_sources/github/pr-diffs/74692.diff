@@ -1,0 +1,24 @@
+diff --git a/package-lock.json b/package-lock.json
+index c3d43b9f081841..333adcbc025657 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -52440,6 +52440,7 @@
+ 				"@floating-ui/react-dom": "2.0.8",
+ 				"@types/gradient-parser": "1.1.0",
+ 				"@types/highlight-words-core": "1.2.1",
++				"@types/react": "^18.3.27",
+ 				"@use-gesture/react": "^10.3.1",
+ 				"@wordpress/a11y": "file:../a11y",
+ 				"@wordpress/base-styles": "file:../base-styles",
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 9601a12b9e7b0a..6e60d8974a8eb4 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -62,6 +62,7 @@
+ 		"@floating-ui/react-dom": "2.0.8",
+ 		"@types/gradient-parser": "1.1.0",
+ 		"@types/highlight-words-core": "1.2.1",
++		"@types/react": "^18.3.27",
+ 		"@use-gesture/react": "^10.3.1",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/base-styles": "file:../base-styles",

@@ -1,0 +1,24 @@
+diff --git a/packages/components/src/input-control/styles/input-control-styles.tsx b/packages/components/src/input-control/styles/input-control-styles.tsx
+index db24a5e60f137a..cce83d22068317 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.tsx
++++ b/packages/components/src/input-control/styles/input-control-styles.tsx
+@@ -162,18 +162,13 @@ export const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
+ 	};
+ 
+ 	const fontSize = sizes[ size as Size ] || sizes.default;
+-	const fontSizeMobile = '16px';
+ 
+ 	if ( ! fontSize ) {
+ 		return '';
+ 	}
+ 
+ 	return css`
+-		font-size: ${ fontSizeMobile };
+-
+-		@media ( min-width: 600px ) {
+-			font-size: ${ fontSize };
+-		}
++		font-size: ${ fontSize };
+ 	`;
+ };
+ 

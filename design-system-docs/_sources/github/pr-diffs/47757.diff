@@ -1,0 +1,1108 @@
+diff --git a/packages/components/src/tools-panel/stories/index.js b/packages/components/src/tools-panel/stories/index.tsx
+similarity index 67%
+rename from packages/components/src/tools-panel/stories/index.js
+rename to packages/components/src/tools-panel/stories/index.tsx
+index 0ff9824406a914..9b6de87990a8b2 100644
+--- a/packages/components/src/tools-panel/stories/index.js
++++ b/packages/components/src/tools-panel/stories/index.tsx
+@@ -1,50 +1,73 @@
+ /**
+  * External dependencies
+  */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
+ import styled from '@emotion/styled';
+ 
+ /**
+  * WordPress dependencies
+  */
+ import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
+ import {
+-	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+-} from '@wordpress/components';
++	ToggleGroupControl,
++	ToggleGroupControlOption,
++} from '../../toggle-group-control';
+ 
+ /**
+  * Internal dependencies
+  */
+-import { ToolsPanel, ToolsPanelItem } from '../';
++import { ToolsPanel, ToolsPanelItem } from '..';
+ import Panel from '../../panel';
+ import UnitControl from '../../unit-control';
+ import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
+ 
+-export default {
++const meta: ComponentMeta< typeof ToolsPanel > = {
+ 	title: 'Components (Experimental)/ToolsPanel',
+ 	component: ToolsPanel,
++	subcomponents: {
++		ToolsPanelItem,
++	},
++	argTypes: {
++		as: { control: { type: null } },
++		children: { control: { type: null } },
++		panelId: { control: { type: null } },
++		resetAll: { action: 'resetAll' },
++	},
++	parameters: {
++		actions: { argTypesRegex: '^on.*' },
++		controls: {
++			expanded: true,
++		},
++		docs: { source: { state: 'open' } },
++	},
+ };
+-
+-export const _default = () => {
+-	const [ height, setHeight ] = useState();
+-	const [ minHeight, setMinHeight ] = useState();
+-	const [ width, setWidth ] = useState();
+-	const [ scale, setScale ] = useState();
+-
+-	const resetAll = () => {
++export default meta;
++
++export const Default: ComponentStory< typeof ToolsPanel > = ( {
++	resetAll: resetAllProp,
++	...props
++} ) => {
++	const [ height, setHeight ] = useState< string | undefined >();
++	const [ minHeight, setMinHeight ] = useState< string | undefined >();
++	const [ width, setWidth ] = useState< string | undefined >();
++	const [ scale, setScale ] = useState< React.ReactText | undefined >();
++
++	const resetAll: typeof resetAllProp = ( filters ) => {
+ 		setHeight( undefined );
+ 		setWidth( undefined );
+ 		setMinHeight( undefined );
+ 		setScale( undefined );
++		resetAllProp( filters );
+ 	};
+ 
+ 	return (
+ 		<PanelWrapperView>
+ 			<Panel>
+-				<ToolsPanel
+-					label="Tools Panel (default example)"
+-					resetAll={ resetAll }
+-				>
++				<ToolsPanel { ...props } resetAll={ resetAll }>
+ 					<SingleColumnItem
+ 						hasValue={ () => !! width }
+ 						label="Width"
+@@ -112,23 +135,27 @@ export const _default = () => {
+ 		</PanelWrapperView>
+ 	);
+ };
++Default.args = {
++	label: 'Tools Panel (default example)',
++};
+ 
+-export const WithNonToolsPanelItems = () => {
+-	const [ height, setHeight ] = useState();
+-	const [ width, setWidth ] = useState();
++export const WithNonToolsPanelItems: ComponentStory< typeof ToolsPanel > = ( {
++	resetAll: resetAllProp,
++	...props
++} ) => {
++	const [ height, setHeight ] = useState< string | undefined >();
++	const [ width, setWidth ] = useState< string | undefined >();
+ 
+-	const resetAll = () => {
++	const resetAll: typeof resetAllProp = ( filters ) => {
+ 		setHeight( undefined );
+ 		setWidth( undefined );
++		resetAll( filters );
+ 	};
+ 
+ 	return (
+ 		<PanelWrapperView>
+ 			<Panel>
+-				<ToolsPanel
+-					label="ToolsPanel (with non-menu items)"
+-					resetAll={ resetAll }
+-				>
++				<ToolsPanel { ...props } resetAll={ resetAll }>
+ 					<IntroText>
+ 						This text illustrates not all items must be wrapped in a
+ 						ToolsPanelItem and represented in the panel menu.
+@@ -162,31 +189,47 @@ export const WithNonToolsPanelItems = () => {
+ 		</PanelWrapperView>
+ 	);
+ };
++WithNonToolsPanelItems.args = {
++	...Default.args,
++	label: 'ToolsPanel (with non-menu items)',
++};
+ 
+-export const WithOptionalItemsPlusIcon = ( { isShownByDefault } ) => {
+-	const [ height, setHeight ] = useState();
+-	const [ width, setWidth ] = useState();
+-	const [ minWidth, setMinWidth ] = useState();
+-
+-	const resetAll = () => {
++export const WithOptionalItemsPlusIcon: ComponentStory<
++	typeof ToolsPanel
++> = ( {
++	// This is an extra prop that is passed to one underlying `ToolsPanelItem` to
++	// showcase the differences in `ToolsPanel` when all items are optional or not
++	// @ts-expect-error
++	isFirstToolsPanelItemShownByDefault,
++	resetAll: resetAllProp,
++	...props
++} ) => {
++	const [ height, setHeight ] = useState< string | undefined >();
++	const [ width, setWidth ] = useState< string | undefined >();
++	const [ minWidth, setMinWidth ] = useState< string | undefined >();
++
++	const resetAll: typeof resetAllProp = ( filters ) => {
+ 		setHeight( undefined );
+ 		setWidth( undefined );
+ 		setMinWidth( undefined );
++		resetAll( filters );
+ 	};
+ 
+ 	return (
+ 		<PanelWrapperView>
+ 			<Panel>
+ 				<ToolsPanel
+-					label="Tools Panel (optional items only)"
++					{ ...props }
+ 					resetAll={ resetAll }
+-					key={ isShownByDefault }
++					// `key` property here is used as a hack to force `ToolsPanel` to re-render
++					// See https://github.com/WordPress/gutenberg/pull/38262/files#r793422991
++					key={ isFirstToolsPanelItemShownByDefault }
+ 				>
+ 					<SingleColumnItem
+ 						hasValue={ () => !! minWidth }
+ 						label="Minimum width"
+ 						onDeselect={ () => setMinWidth( undefined ) }
+-						isShownByDefault={ isShownByDefault }
++						isShownByDefault={ isFirstToolsPanelItemShownByDefault }
+ 					>
+ 						<UnitControl
+ 							label="Minimum width"
+@@ -225,30 +268,45 @@ export const WithOptionalItemsPlusIcon = ( { isShownByDefault } ) => {
+ };
+ 
+ WithOptionalItemsPlusIcon.args = {
+-	isShownByDefault: false,
++	...Default.args,
++	label: 'Tools Panel (optional items only)',
++	// This is an extra prop that is passed to one underlying `ToolsPanelItem` to
++	// showcase the differences in `ToolsPanel` when all items are optional or not
++	// @ts-expect-error
++	isFirstToolsPanelItemShownByDefault: false,
+ };
+ 
+ const { Fill: ToolsPanelItems, Slot } = createSlotFill( 'ToolsPanelSlot' );
+-const panelId = 'unique-tools-panel-id';
+ 
+-export const WithSlotFillItems = () => {
+-	const [ attributes, setAttributes ] = useState( {} );
++export const WithSlotFillItems: ComponentStory< typeof ToolsPanel > = ( {
++	resetAll: resetAllProp,
++	panelId,
++	...props
++} ) => {
++	const [ attributes, setAttributes ] = useState< {
++		width?: string;
++		height?: string;
++	} >( {} );
+ 	const { width, height } = attributes;
+ 
+-	const resetAll = ( resetFilters = [] ) => {
++	const resetAll: typeof resetAllProp = ( resetFilters = [] ) => {
+ 		let newAttributes = {};
+ 
+ 		resetFilters.forEach( ( resetFilter ) => {
+ 			newAttributes = {
+ 				...newAttributes,
++				// TODO: the `ResetFilter` type doesn't specify any attributes
++				// and doesn't return any objects
++				// @ts-ignore
+ 				...resetFilter( newAttributes ),
+ 			};
+ 		} );
+ 
+ 		setAttributes( newAttributes );
++		resetAllProp( resetFilters );
+ 	};
+ 
+-	const updateAttribute = ( name, value ) => {
++	const updateAttribute = ( name: string, value?: any ) => {
+ 		setAttributes( {
+ 			...attributes,
+ 			[ name ]: value,
+@@ -304,7 +362,7 @@ export const WithSlotFillItems = () => {
+ 			<PanelWrapperView>
+ 				<Panel>
+ 					<ToolsPanel
+-						label="Tools Panel With SlotFill Items"
++						{ ...props }
+ 						resetAll={ resetAll }
+ 						panelId={ panelId }
+ 					>
+@@ -315,25 +373,40 @@ export const WithSlotFillItems = () => {
+ 		</SlotFillProvider>
+ 	);
+ };
++WithSlotFillItems.args = {
++	...Default.args,
++	label: 'Tools Panel With SlotFill Items',
++	panelId: 'unique-tools-panel-id',
++};
+ 
+-export const WithConditionalDefaultControl = () => {
+-	const [ attributes, setAttributes ] = useState( {} );
++export const WithConditionalDefaultControl: ComponentStory<
++	typeof ToolsPanel
++> = ( { resetAll: resetAllProp, panelId, ...props } ) => {
++	const [ attributes, setAttributes ] = useState< {
++		height?: string;
++		scale?: React.ReactText;
++	} >( {} );
+ 	const { height, scale } = attributes;
+ 
+-	const resetAll = ( resetFilters = [] ) => {
++	const resetAll: typeof resetAllProp = ( resetFilters = [] ) => {
+ 		let newAttributes = {};
+ 
+ 		resetFilters.forEach( ( resetFilter ) => {
+ 			newAttributes = {
+ 				...newAttributes,
++				// TODO: the `ResetFilter` type doesn't specify any attributes
++				// and doesn't return any objects
++				// @ts-ignore
+ 				...resetFilter( newAttributes ),
+ 			};
+ 		} );
+ 
+ 		setAttributes( newAttributes );
++
++		resetAllProp( resetFilters );
+ 	};
+ 
+-	const updateAttribute = ( name, value ) => {
++	const updateAttribute = ( name: string, value?: any ) => {
+ 		setAttributes( {
+ 			...attributes,
+ 			[ name ]: value,
+@@ -388,7 +461,7 @@ export const WithConditionalDefaultControl = () => {
+ 			<PanelWrapperView>
+ 				<Panel>
+ 					<ToolsPanel
+-						label="Tools Panel With Conditional Default via SlotFill"
++						{ ...props }
+ 						resetAll={ resetAll }
+ 						panelId={ panelId }
+ 					>
+@@ -399,25 +472,40 @@ export const WithConditionalDefaultControl = () => {
+ 		</SlotFillProvider>
+ 	);
+ };
++WithConditionalDefaultControl.args = {
++	...Default.args,
++	label: 'Tools Panel With Conditional Default via SlotFill',
++	panelId: 'unique-tools-panel-id',
++};
+ 
+-export const WithConditionallyRenderedControl = () => {
+-	const [ attributes, setAttributes ] = useState( {} );
++export const WithConditionallyRenderedControl: ComponentStory<
++	typeof ToolsPanel
++> = ( { resetAll: resetAllProp, panelId, ...props } ) => {
++	const [ attributes, setAttributes ] = useState< {
++		height?: string;
++		scale?: React.ReactText;
++	} >( {} );
+ 	const { height, scale } = attributes;
+ 
+-	const resetAll = ( resetFilters = [] ) => {
++	const resetAll: typeof resetAllProp = ( resetFilters = [] ) => {
+ 		let newAttributes = {};
+ 
+ 		resetFilters.forEach( ( resetFilter ) => {
+ 			newAttributes = {
+ 				...newAttributes,
++				// TODO: the `ResetFilter` type doesn't specify any attributes
++				// and doesn't return any objects
++				// @ts-ignore
+ 				...resetFilter( newAttributes ),
+ 			};
+ 		} );
+ 
+ 		setAttributes( newAttributes );
++
++		resetAllProp( resetFilters );
+ 	};
+ 
+-	const updateAttribute = ( name, value ) => {
++	const updateAttribute = ( name: string, value?: any ) => {
+ 		setAttributes( {
+ 			...attributes,
+ 			[ name ]: value,
+@@ -485,7 +573,7 @@ export const WithConditionallyRenderedControl = () => {
+ 			<PanelWrapperView>
+ 				<Panel>
+ 					<ToolsPanel
+-						label="Tools Panel With Conditionally Rendered Item via SlotFill"
++						{ ...props }
+ 						resetAll={ resetAll }
+ 						panelId={ panelId }
+ 					>
+@@ -496,6 +584,11 @@ export const WithConditionallyRenderedControl = () => {
+ 		</SlotFillProvider>
+ 	);
+ };
++WithConditionallyRenderedControl.args = {
++	...Default.args,
++	label: 'Tools Panel With Conditionally Rendered Item via SlotFill',
++	panelId: 'unique-tools-panel-id',
++};
+ 
+ export { ToolsPanelWithItemGroupSlot } from './utils/tools-panel-with-item-group-slot';
+ 
+diff --git a/packages/components/src/tools-panel/stories/utils/tools-panel-with-item-group-slot.js b/packages/components/src/tools-panel/stories/utils/tools-panel-with-item-group-slot.tsx
+similarity index 74%
+rename from packages/components/src/tools-panel/stories/utils/tools-panel-with-item-group-slot.js
+rename to packages/components/src/tools-panel/stories/utils/tools-panel-with-item-group-slot.tsx
+index d1895324df4c3b..fb83108af34e83 100644
+--- a/packages/components/src/tools-panel/stories/utils/tools-panel-with-item-group-slot.js
++++ b/packages/components/src/tools-panel/stories/utils/tools-panel-with-item-group-slot.tsx
+@@ -3,6 +3,7 @@
+  */
+ import styled from '@emotion/styled';
+ import { css } from '@emotion/react';
++import type { ComponentStory } from '@storybook/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -21,6 +22,7 @@ import { FlexItem } from '../../../flex';
+ import { HStack } from '../../../h-stack';
+ import { Item, ItemGroup } from '../../../item-group';
+ import { ToolsPanel, ToolsPanelItem, ToolsPanelContext } from '../..';
++import type { ToolsPanelContext as ToolsPanelContextType } from '../../types';
+ import {
+ 	createSlotFill,
+ 	Provider as SlotFillProvider,
+@@ -45,7 +47,6 @@ const colors = [
+ 	{ name: 'Yellow 10', color: '#f2d675' },
+ 	{ name: 'Yellow 40', color: '#bd8600' },
+ ];
+-const panelId = 'unique-tools-panel-id';
+ 
+ const { Fill, Slot } = createSlotFill( 'ToolsPanelSlot' );
+ 
+@@ -62,10 +63,10 @@ const { Fill, Slot } = createSlotFill( 'ToolsPanelSlot' );
+ // This custom fill is required to re-establish the ToolsPanelContext for
+ // injected ToolsPanelItem components as they will not have access to the React
+ // Context as the Provider is part of the ToolsPanelItems.Slot tree.
+-const ToolsPanelItems = ( { children } ) => {
++const ToolsPanelItems = ( { children }: { children: React.ReactNode } ) => {
+ 	return (
+ 		<Fill>
+-			{ ( fillProps ) => (
++			{ ( fillProps: ToolsPanelContextType ) => (
+ 				<ToolsPanelContext.Provider value={ fillProps }>
+ 					{ children }
+ 				</ToolsPanelContext.Provider>
+@@ -76,7 +77,13 @@ const ToolsPanelItems = ( { children } ) => {
+ 
+ // This fetches the ToolsPanelContext and passes it through `fillProps` so that
+ // rendered fills can re-establish the `ToolsPanelContext.Provider`.
+-const SlotContainer = ( { Slot: ToolsPanelSlot, ...props } ) => {
++const SlotContainer = ( {
++	Slot: ToolsPanelSlot,
++	...props
++}: {
++	Slot: React.ElementType;
++	[ key: string ]: any;
++} ) => {
+ 	const toolsPanelContext = useContext( ToolsPanelContext );
+ 
+ 	return (
+@@ -90,49 +97,83 @@ const SlotContainer = ( { Slot: ToolsPanelSlot, ...props } ) => {
+ 
+ // This wraps the slot with a `ToolsPanel` mimicking a real-world use case from
+ // the block editor.
+-ToolsPanelItems.Slot = ( { resetAll, ...props } ) => (
++ToolsPanelItems.Slot = ( {
++	resetAll,
++	panelId,
++	label,
++	hasInnerWrapper,
++	shouldRenderPlaceholderItems,
++	__experimentalFirstVisibleItemClass,
++	__experimentalLastVisibleItemClass,
++	...props
++}: React.ComponentProps< typeof ToolsPanel > & {
++	[ key: string ]: any;
++} ) => (
+ 	<ToolsPanel
+-		label="Tools Panel with Item Group"
++		label={ label }
+ 		resetAll={ resetAll }
+ 		panelId={ panelId }
+-		hasInnerWrapper={ true }
+-		shouldRenderPlaceholderItems={ true }
+-		__experimentalFirstVisibleItemClass="first"
+-		__experimentalLastVisibleItemClass="last"
++		hasInnerWrapper={ hasInnerWrapper }
++		shouldRenderPlaceholderItems={ shouldRenderPlaceholderItems }
++		__experimentalFirstVisibleItemClass={
++			__experimentalFirstVisibleItemClass
++		}
++		__experimentalLastVisibleItemClass={
++			__experimentalLastVisibleItemClass
++		}
+ 	>
+ 		<SlotContainer { ...props } Slot={ Slot } />
+ 	</ToolsPanel>
+ );
+ 
+-export const ToolsPanelWithItemGroupSlot = () => {
+-	const [ attributes, setAttributes ] = useState( {} );
++export const ToolsPanelWithItemGroupSlot: ComponentStory<
++	typeof ToolsPanel
++> = ( { resetAll: resetAllProp, panelId, ...props } ) => {
++	const [ attributes, setAttributes ] = useState< {
++		text?: string;
++		background?: string;
++		link?: string;
++	} >( {} );
+ 	const { text, background, link } = attributes;
+ 
+ 	const cx = useCx();
+ 	const slotWrapperClassName = cx( SlotWrapper );
+ 	const itemClassName = cx( ToolsPanelItemClass );
+ 
+-	const resetAll = ( resetFilters = [] ) => {
++	const resetAll: typeof resetAllProp = ( resetFilters = [] ) => {
+ 		let newAttributes = {};
+ 
+ 		resetFilters.forEach( ( resetFilter ) => {
+ 			newAttributes = {
+ 				...newAttributes,
++				// TODO: the `ResetFilter` type doesn't specify any attributes
++				// and doesn't return any objects
++				// @ts-ignore
+ 				...resetFilter( newAttributes ),
+ 			};
+ 		} );
+ 
+ 		setAttributes( newAttributes );
++
++		resetAllProp( resetFilters );
+ 	};
+ 
+-	const updateAttribute = ( name, value ) => {
++	const updateAttribute = ( name: string, value?: any ) => {
+ 		setAttributes( {
+ 			...attributes,
+ 			[ name ]: value,
+ 		} );
+ 	};
+ 
+-	const ToolsPanelColorDropdown = ( { attribute, label, value } ) => {
++	const ToolsPanelColorDropdown = ( {
++		attribute,
++		label,
++		value,
++	}: {
++		attribute: string;
++		label: string;
++		value?: string;
++	} ) => {
+ 		return (
+ 			<ToolsPanelItem
+ 				className={ itemClassName }
+@@ -173,12 +214,16 @@ export const ToolsPanelWithItemGroupSlot = () => {
+ 			<PanelWrapperView>
+ 				<Panel>
+ 					<ToolsPanelItems.Slot
++						{ ...props }
++						// Not sure how to type this
++						// @ts-expect-error
+ 						as={ ItemGroup }
+ 						isBordered
+ 						isSeparated
+ 						isRounded={ false }
+ 						className={ slotWrapperClassName }
+ 						resetAll={ resetAll }
++						panelId={ panelId }
+ 					/>
+ 				</Panel>
+ 			</PanelWrapperView>
+@@ -204,6 +249,14 @@ export const ToolsPanelWithItemGroupSlot = () => {
+ 		</SlotFillProvider>
+ 	);
+ };
++ToolsPanelWithItemGroupSlot.args = {
++	label: 'Tools Panel with Item Group',
++	panelId: 'unique-tools-panel-id',
++	hasInnerWrapper: true,
++	shouldRenderPlaceholderItems: true,
++	__experimentalFirstVisibleItemClass: 'first',
++	__experimentalLastVisibleItemClass: 'last',
++};
+ 
+ const PanelWrapperView = styled.div`
+ 	font-size: 13px;
+diff --git a/packages/components/src/tools-panel/test/index.js b/packages/components/src/tools-panel/test/index.tsx
+similarity index 92%
+rename from packages/components/src/tools-panel/test/index.js
+rename to packages/components/src/tools-panel/test/index.tsx
+index c6b9c88a14b3ec..089ae4afa751a5 100644
+--- a/packages/components/src/tools-panel/test/index.js
++++ b/packages/components/src/tools-panel/test/index.tsx
+@@ -3,12 +3,14 @@
+  */
+ import { render, screen, within } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
++import type { ComponentProps } from 'react';
+ 
+ /**
+  * Internal dependencies
+  */
+-import { ToolsPanel, ToolsPanelContext, ToolsPanelItem } from '../';
++import { ToolsPanel, ToolsPanelContext, ToolsPanelItem } from '..';
+ import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
++import type { ToolsPanelContext as ToolsPanelContextType } from '../types';
+ 
+ const { Fill: ToolsPanelItems, Slot } = createSlotFill( 'ToolsPanelSlot' );
+ const resetAll = jest.fn();
+@@ -21,24 +23,24 @@ const defaultProps = {
+ };
+ 
+ // Default props for an enabled control to be rendered within panel.
++let controlValue: boolean | undefined = true;
+ const controlProps = {
+-	attributes: { value: true },
+ 	hasValue: jest.fn().mockImplementation( () => {
+-		return !! controlProps.attributes.value;
++		return !! controlValue;
+ 	} ),
+ 	label: 'Example',
+ 	onDeselect: jest.fn().mockImplementation( () => {
+-		controlProps.attributes.value = undefined;
++		controlValue = undefined;
+ 	} ),
+ 	onSelect: jest.fn(),
+ };
+ 
+ // Default props without a value for an alternate control to be rendered within
+ // the panel.
++let altControlValue: boolean | undefined = false;
+ const altControlProps = {
+-	attributes: { value: false },
+ 	hasValue: jest.fn().mockImplementation( () => {
+-		return !! altControlProps.attributes.value;
++		return !! altControlValue;
+ 	} ),
+ 	label: 'Alt',
+ 	onDeselect: jest.fn(),
+@@ -46,24 +48,24 @@ const altControlProps = {
+ };
+ 
+ // Default props for wrapped or grouped panel items.
++let nestedControlValue: boolean | undefined = true;
+ const nestedControlProps = {
+-	attributes: { value: true },
+ 	hasValue: jest.fn().mockImplementation( () => {
+-		return !! nestedControlProps.attributes.value;
++		return !! nestedControlValue;
+ 	} ),
+ 	label: 'Nested Control 1',
+ 	onDeselect: jest.fn().mockImplementation( () => {
+-		nestedControlProps.attributes.value = undefined;
++		nestedControlValue = undefined;
+ 	} ),
+ 	onSelect: jest.fn(),
+ 	isShownByDefault: true,
+ };
+ 
+ // Alternative props for wrapped or grouped panel items.
++const altNestedControlValue: boolean | undefined = false;
+ const altNestedControlProps = {
+-	attributes: { value: false },
+ 	hasValue: jest.fn().mockImplementation( () => {
+-		return !! altNestedControlProps.attributes.value;
++		return !! altNestedControlValue;
+ 	} ),
+ 	label: 'Nested Control 2',
+ 	onDeselect: jest.fn(),
+@@ -90,7 +92,7 @@ const GroupedItems = ( {
+ 
+ // This context object is used to help simulate different scenarios in which
+ // `ToolsPanelItem` registration or deregistration requires testing.
+-const panelContext = {
++const panelContext: ToolsPanelContextType = {
+ 	panelId: '1234',
+ 	menuItems: {
+ 		default: {},
+@@ -117,7 +119,10 @@ const renderGroupedItemsInPanel = () => {
+ 
+ // Custom component rendering a panel item within a wrapping element. Also used
+ // to test panel item registration and rendering.
+-const WrappedItem = ( { text, ...props } ) => {
++const WrappedItem = ( {
++	text,
++	...props
++}: ComponentProps< typeof ToolsPanelItem > & { text: string } ) => {
+ 	return (
+ 		<div>
+ 			<span>Wrapper</span>
+@@ -178,7 +183,7 @@ const openDropdownMenu = async () => {
+ };
+ 
+ // Opens dropdown then selects the menu item by label before simulating a click.
+-const selectMenuItem = async ( label ) => {
++const selectMenuItem = async ( label: string ) => {
+ 	const user = userEvent.setup();
+ 	const menuItem = await screen.findByText( label );
+ 	await user.click( menuItem );
+@@ -186,8 +191,8 @@ const selectMenuItem = async ( label ) => {
+ 
+ describe( 'ToolsPanel', () => {
+ 	afterEach( () => {
+-		controlProps.attributes.value = true;
+-		altControlProps.attributes.value = false;
++		controlValue = true;
++		altControlValue = false;
+ 	} );
+ 
+ 	describe( 'basic rendering', () => {
+@@ -229,10 +234,20 @@ describe( 'ToolsPanel', () => {
+ 			render(
+ 				<ToolsPanel { ...defaultProps }>
+ 					{ false && (
+-						<ToolsPanelItem>Should not show</ToolsPanelItem>
++						<ToolsPanelItem
++							label="Not rendered 1"
++							hasValue={ () => false }
++						>
++							Should not show
++						</ToolsPanelItem>
+ 					) }
+ 					{ false && (
+-						<ToolsPanelItem>Not shown either</ToolsPanelItem>
++						<ToolsPanelItem
++							label="Not rendered 2"
++							hasValue={ () => false }
++						>
++							Not shown either
++						</ToolsPanelItem>
+ 					) }
+ 					<span>Visible but insignificant</span>
+ 				</ToolsPanel>
+@@ -387,10 +402,10 @@ describe( 'ToolsPanel', () => {
+ 		} );
+ 
+ 		it( 'should render default controls with conditional isShownByDefault', async () => {
++			const linkedControlValue = false;
+ 			const linkedControlProps = {
+-				attributes: { value: false },
+ 				hasValue: jest.fn().mockImplementation( () => {
+-					return !! linkedControlProps.attributes.value;
++					return !! linkedControlValue;
+ 				} ),
+ 				label: 'Linked',
+ 				onDeselect: jest.fn(),
+@@ -407,7 +422,7 @@ describe( 'ToolsPanel', () => {
+ 					</ToolsPanelItem>
+ 					<ToolsPanelItem
+ 						{ ...linkedControlProps }
+-						isShownByDefault={ !! altControlProps.attributes.value }
++						isShownByDefault={ !! altControlValue }
+ 					>
+ 						<div>Linked control</div>
+ 					</ToolsPanelItem>
+@@ -430,13 +445,14 @@ describe( 'ToolsPanel', () => {
+ 			expect( menuGroups.length ).toEqual( 3 );
+ 
+ 			// The linked control should be in the second group, of optional controls.
+-			let optionalItem = within( menuGroups[ 1 ] ).getByText( 'Linked' );
+-			expect( optionalItem ).toBeInTheDocument();
++			expect(
++				within( menuGroups[ 1 ] ).getByText( 'Linked' )
++			).toBeInTheDocument();
+ 
+ 			// Simulate the main control having a value set which should
+ 			// trigger the linked control becoming a default control via the
+ 			// conditional `isShownByDefault` prop.
+-			altControlProps.attributes.value = true;
++			altControlValue = true;
+ 
+ 			rerender( <TestPanel /> );
+ 
+@@ -461,17 +477,18 @@ describe( 'ToolsPanel', () => {
+ 			// Optional controls have an additional aria-label. This can be used
+ 			// to confirm the conditional default control has been removed from
+ 			// the optional menu item group.
+-			optionalItem = screen.queryByRole( 'menuitemcheckbox', {
+-				name: 'Show Linked',
+-			} );
+-			expect( optionalItem ).not.toBeInTheDocument();
++			expect(
++				screen.queryByRole( 'menuitemcheckbox', {
++					name: 'Show Linked',
++				} )
++			).not.toBeInTheDocument();
+ 		} );
+ 
+ 		it( 'should handle conditionally rendered default control', async () => {
++			const conditionalControlValue = false;
+ 			const conditionalControlProps = {
+-				attributes: { value: false },
+ 				hasValue: jest.fn().mockImplementation( () => {
+-					return !! conditionalControlProps.attributes.value;
++					return !! conditionalControlValue;
+ 				} ),
+ 				label: 'Conditional',
+ 				onDeselect: jest.fn(),
+@@ -486,7 +503,7 @@ describe( 'ToolsPanel', () => {
+ 					>
+ 						<div>Default control</div>
+ 					</ToolsPanelItem>
+-					{ !! altControlProps.attributes.value && (
++					{ !! altControlValue && (
+ 						<ToolsPanelItem
+ 							{ ...conditionalControlProps }
+ 							isShownByDefault={ true }
+@@ -514,7 +531,7 @@ describe( 'ToolsPanel', () => {
+ 
+ 			// Simulate the main control having a value set which will now
+ 			// render the new default control into the ToolsPanel.
+-			altControlProps.attributes.value = true;
++			altControlValue = true;
+ 
+ 			rerender( <TestPanel /> );
+ 
+@@ -549,7 +566,7 @@ describe( 'ToolsPanel', () => {
+ 			// themselves, while those for the old panelId deregister.
+ 			//
+ 			// See: https://github.com/WordPress/gutenberg/pull/36588
+-			const context = { ...panelContext };
++			const context: ToolsPanelContextType = { ...panelContext };
+ 			const TestPanel = () => (
+ 				<ToolsPanelContext.Provider value={ context }>
+ 					<ToolsPanelItem { ...altControlProps } panelId="1234">
+@@ -613,7 +630,10 @@ describe( 'ToolsPanel', () => {
+ 			// individual items should still render themselves in this case.
+ 			//
+ 			// See: https://github.com/WordPress/gutenberg/pull/37216
+-			const context = { ...panelContext, panelId: null };
++			const context: ToolsPanelContextType = {
++				...panelContext,
++				panelId: null,
++			};
+ 			const TestPanel = () => (
+ 				<ToolsPanelContext.Provider value={ context }>
+ 					<ToolsPanelItem { ...altControlProps } panelId="1234">
+@@ -916,7 +936,9 @@ describe( 'ToolsPanel', () => {
+ 			// test that no orphaned items appear registered in the panel menu.
+ 			//
+ 			// See: https://github.com/WordPress/gutenberg/pull/34085
+-			const TestSlotFillPanel = ( { panelId } ) => (
++			const TestSlotFillPanel = ( {
++				panelId,
++			}: Pick< ComponentProps< typeof ToolsPanelItem >, 'panelId' > ) => (
+ 				<SlotFillProvider>
+ 					<ToolsPanelItems>
+ 						<ToolsPanelItem { ...altControlProps } panelId="1234">
+@@ -939,37 +961,38 @@ describe( 'ToolsPanel', () => {
+ 
+ 			// Only the item matching the panelId should have been registered
+ 			// and appear in the panel menu.
+-			let altMenuItem = screen.getByRole( 'menuitemcheckbox', {
+-				name: 'Show Alt',
+-			} );
+-			let exampleMenuItem = screen.queryByRole( 'menuitemcheckbox', {
+-				name: 'Hide and reset Example',
+-			} );
+-
+-			expect( altMenuItem ).toBeInTheDocument();
+-			expect( exampleMenuItem ).not.toBeInTheDocument();
++			expect(
++				screen.getByRole( 'menuitemcheckbox', {
++					name: 'Show Alt',
++				} )
++			).toBeInTheDocument();
++			expect(
++				screen.queryByRole( 'menuitemcheckbox', {
++					name: 'Hide and reset Example',
++				} )
++			).not.toBeInTheDocument();
+ 
+ 			// Re-render the panel with different panelID simulating a block
+ 			// selection change.
+ 			rerender( <TestSlotFillPanel panelId="9999" /> );
+-
+-			altMenuItem = screen.queryByRole( 'menuitemcheckbox', {
+-				name: 'Show Alt',
+-			} );
+-			exampleMenuItem = screen.getByRole( 'menuitemcheckbox', {
+-				name: 'Hide and reset Example',
+-			} );
+-
+-			expect( altMenuItem ).not.toBeInTheDocument();
+-			expect( exampleMenuItem ).toBeInTheDocument();
++			expect(
++				screen.queryByRole( 'menuitemcheckbox', {
++					name: 'Show Alt',
++				} )
++			).not.toBeInTheDocument();
++			expect(
++				screen.getByRole( 'menuitemcheckbox', {
++					name: 'Hide and reset Example',
++				} )
++			).toBeInTheDocument();
+ 		} );
+ 	} );
+ 
+ 	describe( 'panel header icon toggle', () => {
++		const defaultControlsValue = false;
+ 		const defaultControls = {
+-			attributes: { value: false },
+ 			hasValue: jest.fn().mockImplementation( () => {
+-				return !! defaultControls.attributes.value;
++				return !! defaultControlsValue;
+ 			} ),
+ 			label: 'Default',
+ 			onDeselect: jest.fn(),
+@@ -977,10 +1000,10 @@ describe( 'ToolsPanel', () => {
+ 			isShownByDefault: true,
+ 		};
+ 
++		const optionalControlsValue = false;
+ 		const optionalControls = {
+-			attributes: { value: false },
+ 			hasValue: jest.fn().mockImplementation( () => {
+-				return !! optionalControls.attributes.value;
++				return !! optionalControlsValue;
+ 			} ),
+ 			label: 'Optional',
+ 			onDeselect: jest.fn(),
+@@ -1050,9 +1073,10 @@ describe( 'ToolsPanel', () => {
+ 			await openDropdownMenu();
+ 
+ 			const resetAllItem = await screen.findByRole( 'menuitem', {
+-				disabled: false,
++				name: 'Reset all',
+ 			} );
+ 			expect( resetAllItem ).toBeInTheDocument();
++			expect( resetAllItem ).toHaveAttribute( 'aria-disabled', 'false' );
+ 
+ 			await selectMenuItem( 'Reset all' );
+ 
+@@ -1061,9 +1085,13 @@ describe( 'ToolsPanel', () => {
+ 			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
+ 
+ 			const disabledResetAllItem = await screen.findByRole( 'menuitem', {
+-				disabled: true,
++				name: 'Reset all',
+ 			} );
+ 			expect( disabledResetAllItem ).toBeInTheDocument();
++			expect( disabledResetAllItem ).toHaveAttribute(
++				'aria-disabled',
++				'true'
++			);
+ 		} );
+ 	} );
+ 
+diff --git a/packages/components/src/tools-panel/tools-panel-item/README.md b/packages/components/src/tools-panel/tools-panel-item/README.md
+index 85d03f96d1d04f..9e261ddc59be0f 100644
+--- a/packages/components/src/tools-panel/tools-panel-item/README.md
++++ b/packages/components/src/tools-panel/tools-panel-item/README.md
+@@ -31,7 +31,8 @@ This prop identifies the current item as being displayed by default. This means
+ it will show regardless of whether it has a value set or is toggled on in the
+ panel's menu.
+ 
+--   Required: Yes
++-   Required: No
++-   Default: `false`
+ 
+ ### `label`: `string`
+ 
+@@ -58,10 +59,10 @@ A callback to take action when this item is selected in the `ToolsPanel` menu.
+ 
+ -   Required: No
+ 
+-### `panelId`: `string`
++### `panelId`: `string | null`
+ 
+ Panel items will ensure they are only registering with their intended panel by
+-comparing the `panelId` props set on both the item and the panel itself. This
++comparing the `panelId` props set on both the item and the panel itself, or if the `panelId` is explicitly `null`. This
+ allows items to be injected from a shared source.
+ 
+ -   Required: No
+@@ -73,3 +74,4 @@ these functions through to the panel's `resetAll` callback. They can then be
+ iterated over to perform additional tasks.
+ 
+ -   Required: No
++-   Default: `() => {}`
+diff --git a/packages/components/src/tools-panel/tools-panel-item/hook.ts b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+index dcc6c6416e0ce9..7d50a2ad70ff0e 100644
+--- a/packages/components/src/tools-panel/tools-panel-item/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+@@ -13,16 +13,18 @@ import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+ import { useCx } from '../../utils/hooks/use-cx';
+ import type { ToolsPanelItemProps } from '../types';
+ 
++const noop = () => {};
++
+ export function useToolsPanelItem(
+ 	props: WordPressComponentProps< ToolsPanelItemProps, 'div' >
+ ) {
+ 	const {
+ 		className,
+ 		hasValue,
+-		isShownByDefault,
++		isShownByDefault = false,
+ 		label,
+ 		panelId,
+-		resetAllFilter,
++		resetAllFilter = noop,
+ 		onDeselect,
+ 		onSelect,
+ 		...otherProps
+diff --git a/packages/components/src/tools-panel/tools-panel/README.md b/packages/components/src/tools-panel/tools-panel/README.md
+index 9b75f32f6645e2..1a4e3670e77214 100644
+--- a/packages/components/src/tools-panel/tools-panel/README.md
++++ b/packages/components/src/tools-panel/tools-panel/README.md
+@@ -155,6 +155,7 @@ Flags that the items in this ToolsPanel will be contained within an inner
+ wrapper element allowing the panel to lay them out accordingly.
+ 
+ - Required: No
++- Default: `false`
+ 
+ ### `label`: `string`
+ 
+@@ -163,7 +164,7 @@ panel's dropdown menu.
+ 
+ - Required: Yes
+ 
+-### `panelId`: `string`
++### `panelId`: `string | null`
+ 
+ If a `panelId` is set, it is passed through the `ToolsPanelContext` and used
+ to restrict panel items. When a `panelId` is set, items can only register
+@@ -185,3 +186,4 @@ Advises the `ToolsPanel` that all of its `ToolsPanelItem` children should render
+ placeholder content (instead of `null`) when they are toggled off and hidden.
+ 
+ - Required: No
++- Default: `false`
+diff --git a/packages/components/src/tools-panel/tools-panel/hook.ts b/packages/components/src/tools-panel/tools-panel/hook.ts
+index 2cbce4aad169f5..79e0d0dc00621d 100644
+--- a/packages/components/src/tools-panel/tools-panel/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel/hook.ts
+@@ -59,8 +59,8 @@ export function useToolsPanel(
+ 		className,
+ 		resetAll,
+ 		panelId,
+-		hasInnerWrapper,
+-		shouldRenderPlaceholderItems,
++		hasInnerWrapper = false,
++		shouldRenderPlaceholderItems = false,
+ 		__experimentalFirstVisibleItemClass,
+ 		__experimentalLastVisibleItemClass,
+ 		...otherProps
+diff --git a/packages/components/src/tools-panel/types.ts b/packages/components/src/tools-panel/types.ts
+index b95a50a4aa9cbc..d8ec7da56f7594 100644
+--- a/packages/components/src/tools-panel/types.ts
++++ b/packages/components/src/tools-panel/types.ts
+@@ -14,8 +14,10 @@ export type ToolsPanelProps = {
+ 	/**
+ 	 * Flags that the items in this ToolsPanel will be contained within an inner
+ 	 * wrapper element allowing the panel to lay them out accordingly.
++	 *
++	 * @default false
+ 	 */
+-	hasInnerWrapper: boolean;
++	hasInnerWrapper?: boolean;
+ 	/**
+ 	 * Text to be displayed within the panel's header and as the `aria-label`
+ 	 * for the panel's dropdown menu.
+@@ -23,10 +25,11 @@ export type ToolsPanelProps = {
+ 	label: string;
+ 	/**
+ 	 * If a `panelId` is set, it is passed through the `ToolsPanelContext` and
+-	 * used to restrict panel items. Only items with a matching `panelId` will
+-	 * be able to register themselves with this panel.
++	 * used to restrict panel items. When a `panelId` is set, items can only
++	 * register themselves if the `panelId` is explicitly `null` or the item's
++	 * `panelId` matches exactly.
+ 	 */
+-	panelId: string;
++	panelId?: string | null;
+ 	/**
+ 	 * A function to call when the `Reset all` menu option is selected. This is
+ 	 * passed through to the panel's header component.
+@@ -35,8 +38,10 @@ export type ToolsPanelProps = {
+ 	/**
+ 	 * Advises the `ToolsPanel` that its child `ToolsPanelItem`s should render
+ 	 * placeholder content instead of null when they are toggled off and hidden.
++	 *
++	 * @default false
+ 	 */
+-	shouldRenderPlaceholderItems: boolean;
++	shouldRenderPlaceholderItems?: boolean;
+ 	/**
+ 	 * Experimental prop allowing for a custom CSS class to be applied to the
+ 	 * first visible `ToolsPanelItem` within the `ToolsPanel`.
+@@ -79,8 +84,10 @@ export type ToolsPanelItem = {
+ 	 * This prop identifies the current item as being displayed by default. This
+ 	 * means it will show regardless of whether it has a value set or is toggled
+ 	 * on in the panel's menu.
++	 *
++	 * @default false
+ 	 */
+-	isShownByDefault: boolean;
++	isShownByDefault?: boolean;
+ 	/**
+ 	 * The supplied label is dual purpose. It is used as:
+ 	 * 1. the human-readable label for the panel's dropdown menu
+@@ -91,17 +98,20 @@ export type ToolsPanelItem = {
+ 	 */
+ 	label: string;
+ 	/**
+-	 * Panel items will ensure they are only registering with their intended
+-	 * panel by comparing the `panelId` props set on both the item and the panel
+-	 * itself. This allows items to be injected from a shared source.
++	 * Panel items will ensure they are only registering with their intended panel
++	 * by comparing the `panelId` props set on both the item and the panel itself,
++	 * or if the `panelId` is explicitly `null`. This allows items to be injected
++	 * from a shared source.
+ 	 */
+-	panelId: string;
++	panelId?: string | null;
+ 	/**
+ 	 * A `ToolsPanel` will collect each item's `resetAllFilter` and pass an
+ 	 * array of these functions through to the panel's `resetAll` callback. They
+ 	 * can then be iterated over to perform additional tasks.
++	 *
++	 * @default noop
+ 	 */
+-	resetAllFilter: ResetAllFilter;
++	resetAllFilter?: ResetAllFilter;
+ };
+ 
+ export type ToolsPanelItemProps = ToolsPanelItem & {
+@@ -128,7 +138,7 @@ export type ToolsPanelMenuItems = {
+ };
+ 
+ export type ToolsPanelContext = {
+-	panelId?: string;
++	panelId?: string | null;
+ 	menuItems: ToolsPanelMenuItems;
+ 	hasMenuItems: boolean;
+ 	registerPanelItem: ( item: ToolsPanelItem ) => void;

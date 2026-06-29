@@ -1,0 +1,44 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 08082f99a00b92..c4b3a38e37a468 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ 
+ ### Bug Fix
+ 
++-   `DateTime`: Make the Timezone indication render a tooltip only when necessary. ([#56214](https://github.com/WordPress/gutenberg/pull/56214)).
+ -   `ToolsPanelItem`: Use useLayoutEffect to prevent rendering glitch for last panel item styling. ([#56536](https://github.com/WordPress/gutenberg/pull/56536)).
+ -   `FormTokenField`: Fix broken suggestions scrollbar when the `__experimentalExpandOnFocus` prop is defined ([#56426](https://github.com/WordPress/gutenberg/pull/56426)).
+ -   `FormTokenField`: `onFocus` prop is now typed as a React `FocusEvent` ([#56426](https://github.com/WordPress/gutenberg/pull/56426)).
+diff --git a/packages/components/src/date-time/time/timezone.tsx b/packages/components/src/date-time/time/timezone.tsx
+index 9fac1ec094ed89..9b08eac6307aa7 100644
+--- a/packages/components/src/date-time/time/timezone.tsx
++++ b/packages/components/src/date-time/time/timezone.tsx
+@@ -32,12 +32,24 @@ const TimeZone = () => {
+ 			? timezone.abbr
+ 			: `UTC${ offsetSymbol }${ timezone.offset }`;
+ 
++	// Replace underscore with space in strings like `America/Costa_Rica`.
++	const prettyTimezoneString = timezone.string.replace( '_', ' ' );
++
+ 	const timezoneDetail =
+ 		'UTC' === timezone.string
+ 			? __( 'Coordinated Universal Time' )
+-			: `(${ zoneAbbr }) ${ timezone.string.replace( '_', ' ' ) }`;
+-
+-	return (
++			: `(${ zoneAbbr }) ${ prettyTimezoneString }`;
++
++	// When the prettyTimezoneString is empty, there is no additional timezone
++	// detail information to show in a Tooltip.
++	const hasNoAdditionalTimezoneDetail =
++		prettyTimezoneString.trim().length === 0;
++
++	return hasNoAdditionalTimezoneDetail ? (
++		<StyledComponent className="components-datetime__timezone">
++			{ zoneAbbr }
++		</StyledComponent>
++	) : (
+ 		<Tooltip placement="top" text={ timezoneDetail }>
+ 			<StyledComponent className="components-datetime__timezone">
+ 				{ zoneAbbr }

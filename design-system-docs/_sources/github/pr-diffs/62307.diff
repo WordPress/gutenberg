@@ -1,0 +1,14 @@
+diff --git a/packages/components/src/range-control/index.tsx b/packages/components/src/range-control/index.tsx
+index ae39e08d41c032..e9c11922583cfa 100644
+--- a/packages/components/src/range-control/index.tsx
++++ b/packages/components/src/range-control/index.tsx
+@@ -326,7 +326,8 @@ function UnforwardedRangeControl(
+ 					<ActionRightWrapper>
+ 						<Button
+ 							className="components-range-control__reset"
+-							disabled={ disabled || value === undefined }
++							__experimentalIsFocusable={ ! disabled }
++							disabled={ disabled || value === null }
+ 							variant="secondary"
+ 							size="small"
+ 							onClick={ handleOnReset }

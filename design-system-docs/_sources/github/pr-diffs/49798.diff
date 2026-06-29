@@ -1,0 +1,42 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index caa5e067d2560a..f7056713b817a0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Documentation
++
++-   `Autocomplete`: Add heading and fix type for `onReplace` in README. ([#49798](https://github.com/WordPress/gutenberg/pull/49798)).
++
+ ## 23.8.0 (2023-04-12)
+ 
+ ### Internal
+diff --git a/packages/components/src/autocomplete/README.md b/packages/components/src/autocomplete/README.md
+index 37c23968940087..2b9c9209dbed5a 100644
+--- a/packages/components/src/autocomplete/README.md
++++ b/packages/components/src/autocomplete/README.md
+@@ -20,10 +20,12 @@ A function to be called when an option is selected to insert into the existing t
+ -   Required: Yes
+ -   Type: `( value: string ) => void`
+ 
++### onReplace
++
+ A function to be called when an option is selected to replace the existing text.
+ 
+ -   Required: Yes
+--   Type: `( arg: [ OptionCompletion[ 'value' ] ] ) => void;`
++-   Type: `( values: RichTextValue[] ) => void`
+ 
+ ### completers
+ 
+@@ -31,7 +33,7 @@ An array of all of the completers to apply to the current element.
+ 
+ -   Required: Yes
+ -   Type: `Array< WPCompleter >`
+- 
++
+ ### contentRef
+ 
+ A ref containing the editable element that will serve as the anchor for `Autocomplete`'s `Popover`.

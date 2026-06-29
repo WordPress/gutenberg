@@ -1,0 +1,24 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index db8b0f749217f4..1e94853763cd3d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -26,6 +26,7 @@
+ ### Internal
+ 
+ -   `SlotFill`: rewrite the non-portal version to use `observableMap` ([#67400](https://github.com/WordPress/gutenberg/pull/67400)).
++-   `DatePicker`: Prepare day buttons for 40px default size ([#68156](https://github.com/WordPress/gutenberg/pull/68156)).
+ 
+ ## 29.0.0 (2024-12-11)
+ 
+diff --git a/packages/components/src/date-time/date/index.tsx b/packages/components/src/date-time/date/index.tsx
+index ca093f9d70847b..e7afcccf249dc0 100644
+--- a/packages/components/src/date-time/date/index.tsx
++++ b/packages/components/src/date-time/date/index.tsx
+@@ -306,6 +306,7 @@ function Day( {
+ 
+ 	return (
+ 		<DayButton
++			__next40pxDefaultSize
+ 			ref={ ref }
+ 			className="components-datetime__date__day" // Unused, for backwards compatibility.
+ 			disabled={ isInvalid }

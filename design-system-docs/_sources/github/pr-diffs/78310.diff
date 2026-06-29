@@ -1,0 +1,1212 @@
+diff --git a/package-lock.json b/package-lock.json
+index 855e6fd9c1e47c..4f087de879cc86 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -59822,6 +59822,7 @@
+ 				"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
+ 				"@wordpress/keycodes": "file:../keycodes",
+ 				"@wordpress/priority-queue": "file:../priority-queue",
++				"@wordpress/private-apis": "file:../private-apis",
+ 				"@wordpress/undo-manager": "file:../undo-manager",
+ 				"change-case": "^4.1.2",
+ 				"mousetrap": "^1.6.5",
+diff --git a/packages/block-editor/src/components/block-list/use-block-props/use-focus-handler.js b/packages/block-editor/src/components/block-list/use-block-props/use-focus-handler.js
+index 9bf02ae981a057..02d366b7d5cd9a 100644
+--- a/packages/block-editor/src/components/block-list/use-block-props/use-focus-handler.js
++++ b/packages/block-editor/src/components/block-list/use-block-props/use-focus-handler.js
+@@ -2,13 +2,19 @@
+  * WordPress dependencies
+  */
+ import { useSelect, useDispatch } from '@wordpress/data';
+-import { useRefEffect } from '@wordpress/compose';
++import {
++	useRefEffect,
++	privateApis as composePrivateApis,
++} from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+  */
+ import { isInsideRootBlock } from '../../../utils/dom';
+ import { store as blockEditorStore } from '../../../store';
++import { unlock } from '../../../lock-unlock';
++
++const { subscribeDelegatedListener } = unlock( composePrivateApis );
+ 
+ /**
+  * Selects the block if it receives focus.
+@@ -57,11 +63,7 @@ export function useFocusHandler( clientId ) {
+ 				selectBlock( clientId );
+ 			}
+ 
+-			node.addEventListener( 'focusin', onFocus );
+-
+-			return () => {
+-				node.removeEventListener( 'focusin', onFocus );
+-			};
++			return subscribeDelegatedListener( node, 'focusin', onFocus );
+ 		},
+ 		[ isBlockSelected, selectBlock ]
+ 	);
+diff --git a/packages/block-editor/src/components/block-list/use-block-props/use-is-hovered.js b/packages/block-editor/src/components/block-list/use-block-props/use-is-hovered.js
+index 8e3c65770c0932..01c03c45872792 100644
+--- a/packages/block-editor/src/components/block-list/use-block-props/use-is-hovered.js
++++ b/packages/block-editor/src/components/block-list/use-block-props/use-is-hovered.js
+@@ -1,19 +1,17 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useRefEffect } from '@wordpress/compose';
++import {
++	useRefEffect,
++	privateApis as composePrivateApis,
++} from '@wordpress/compose';
+ 
+-function listener( event ) {
+-	if ( event.defaultPrevented ) {
+-		return;
+-	}
++/**
++ * Internal dependencies
++ */
++import { unlock } from '../../../lock-unlock';
+ 
+-	event.preventDefault();
+-	event.currentTarget.classList.toggle(
+-		'is-hovered',
+-		event.type === 'mouseover'
+-	);
+-}
++const { subscribeDelegatedListener } = unlock( composePrivateApis );
+ 
+ /**
+  * Adds `is-hovered` class when the block is hovered and in navigation or
+@@ -31,12 +29,31 @@ export function useIsHovered( { isEnabled = true } = {} ) {
+ 				return;
+ 			}
+ 
+-			node.addEventListener( 'mouseout', listener );
+-			node.addEventListener( 'mouseover', listener );
++			function listener( event ) {
++				if ( event.defaultPrevented ) {
++					return;
++				}
++				event.preventDefault();
++				node.classList.toggle(
++					'is-hovered',
++					event.type === 'mouseover'
++				);
++			}
++
++			const unsubscribeOut = subscribeDelegatedListener(
++				node,
++				'mouseout',
++				listener
++			);
++			const unsubscribeOver = subscribeDelegatedListener(
++				node,
++				'mouseover',
++				listener
++			);
+ 
+ 			return () => {
+-				node.removeEventListener( 'mouseout', listener );
+-				node.removeEventListener( 'mouseover', listener );
++				unsubscribeOut();
++				unsubscribeOver();
+ 
+ 				// Remove class in case it lingers.
+ 				node.classList.remove( 'is-hovered' );
+diff --git a/packages/block-editor/src/components/rich-text/event-listeners/enter.js b/packages/block-editor/src/components/rich-text/event-listeners/enter.js
+index 63c2145fe7acbc..f72eb0aa421d99 100644
+--- a/packages/block-editor/src/components/rich-text/event-listeners/enter.js
++++ b/packages/block-editor/src/components/rich-text/event-listeners/enter.js
+@@ -3,6 +3,14 @@
+  */
+ import { ENTER } from '@wordpress/keycodes';
+ import { insert, remove } from '@wordpress/rich-text';
++import { privateApis as composePrivateApis } from '@wordpress/compose';
++
++/**
++ * Internal dependencies
++ */
++import { unlock } from '../../../lock-unlock';
++
++const { subscribeDelegatedListener } = unlock( composePrivateApis );
+ 
+ export default ( props ) => ( element ) => {
+ 	function onKeyDownDeprecated( event ) {
+@@ -75,10 +83,14 @@ export default ( props ) => ( element ) => {
+ 
+ 	// Attach the listener to the window so parent elements have the chance to
+ 	// prevent the default behavior.
+-	defaultView.addEventListener( 'keydown', onKeyDown );
++	const unsubscribeKeyDown = subscribeDelegatedListener(
++		defaultView,
++		'keydown',
++		onKeyDown
++	);
+ 	element.addEventListener( 'keydown', onKeyDownDeprecated );
+ 	return () => {
+-		defaultView.removeEventListener( 'keydown', onKeyDown );
++		unsubscribeKeyDown();
+ 		element.removeEventListener( 'keydown', onKeyDownDeprecated );
+ 	};
+ };
+diff --git a/packages/block-editor/src/components/rich-text/event-listeners/paste-handler.js b/packages/block-editor/src/components/rich-text/event-listeners/paste-handler.js
+index 080e4eb0ba1907..7672b792f45e26 100644
+--- a/packages/block-editor/src/components/rich-text/event-listeners/paste-handler.js
++++ b/packages/block-editor/src/components/rich-text/event-listeners/paste-handler.js
+@@ -4,6 +4,7 @@
+ import { pasteHandler } from '@wordpress/blocks';
+ import { isEmpty, insert, create } from '@wordpress/rich-text';
+ import { isURL } from '@wordpress/url';
++import { privateApis as composePrivateApis } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+@@ -11,6 +12,9 @@ import { isURL } from '@wordpress/url';
+ import { store as blockEditorStore } from '../../../store';
+ import { addActiveFormats } from '../utils';
+ import { getPasteEventData } from '../../../utils/pasting';
++import { unlock } from '../../../lock-unlock';
++
++const { subscribeDelegatedListener } = unlock( composePrivateApis );
+ 
+ /** @typedef {import('@wordpress/rich-text').RichTextValue} RichTextValue */
+ 
+@@ -141,8 +145,5 @@ export default ( props ) => ( element ) => {
+ 
+ 	// Attach the listener to the window so parent elements have the chance to
+ 	// prevent the default behavior.
+-	defaultView.addEventListener( 'paste', _onPaste );
+-	return () => {
+-		defaultView.removeEventListener( 'paste', _onPaste );
+-	};
++	return subscribeDelegatedListener( defaultView, 'paste', _onPaste );
+ };
+diff --git a/packages/block-library/src/button/edit.js b/packages/block-library/src/button/edit.js
+index b89580164178f9..f87e362dc619c3 100644
+--- a/packages/block-library/src/button/edit.js
++++ b/packages/block-library/src/button/edit.js
+@@ -39,7 +39,11 @@ import {
+ 	getDefaultBlockName,
+ 	getBlockBindingsSource,
+ } from '@wordpress/blocks';
+-import { useMergeRefs, useRefEffect } from '@wordpress/compose';
++import {
++	useMergeRefs,
++	useRefEffect,
++	privateApis as composePrivateApis,
++} from '@wordpress/compose';
+ import { useSelect, useDispatch } from '@wordpress/data';
+ import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
+ import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
+@@ -49,6 +53,7 @@ import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
+ import { getWidthClasses, isPercentageWidth } from './utils';
+ 
+ const { HTMLElementControl } = unlock( blockEditorPrivateApis );
++const { subscribeDelegatedListener } = unlock( composePrivateApis );
+ 
+ const LINK_SETTINGS = [
+ 	...LinkControl.DEFAULT_LINK_SETTINGS,
+@@ -107,10 +112,14 @@ function useEnter( props ) {
+ 			selectionChange( middle.clientId );
+ 		}
+ 
+-		element.addEventListener( 'keydown', onKeyDown );
+-		return () => {
+-			element.removeEventListener( 'keydown', onKeyDown );
+-		};
++		// Capture phase so we run before writing-flow's ancestor-bubble
++		// keydown handlers that gate on `event.defaultPrevented`.
++		return subscribeDelegatedListener(
++			element,
++			'keydown',
++			onKeyDown,
++			true
++		);
+ 	}, [] );
+ }
+ 
+diff --git a/packages/block-library/src/list-item/hooks/use-enter.js b/packages/block-library/src/list-item/hooks/use-enter.js
+index ffe5c55fbbed2e..3dd1f25c209336 100644
+--- a/packages/block-library/src/list-item/hooks/use-enter.js
++++ b/packages/block-library/src/list-item/hooks/use-enter.js
+@@ -7,7 +7,10 @@ import {
+ 	cloneBlock,
+ } from '@wordpress/blocks';
+ import { useRef } from '@wordpress/element';
+-import { useRefEffect } from '@wordpress/compose';
++import {
++	useRefEffect,
++	privateApis as composePrivateApis,
++} from '@wordpress/compose';
+ import { ENTER } from '@wordpress/keycodes';
+ import { useSelect, useDispatch } from '@wordpress/data';
+ import { store as blockEditorStore } from '@wordpress/block-editor';
+@@ -16,6 +19,9 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
+  * Internal dependencies
+  */
+ import useOutdentListItem from './use-outdent-list-item';
++import { unlock } from '../../lock-unlock';
++
++const { subscribeDelegatedListener } = unlock( composePrivateApis );
+ 
+ export default function useEnter( props ) {
+ 	const { replaceBlocks, selectionChange } = useDispatch( blockEditorStore );
+@@ -82,9 +88,13 @@ export default function useEnter( props ) {
+ 			selectionChange( middle.clientId );
+ 		}
+ 
+-		element.addEventListener( 'keydown', onKeyDown );
+-		return () => {
+-			element.removeEventListener( 'keydown', onKeyDown );
+-		};
++		// Capture phase so we run before writing-flow's ancestor-bubble
++		// keydown handlers that gate on `event.defaultPrevented`.
++		return subscribeDelegatedListener(
++			element,
++			'keydown',
++			onKeyDown,
++			true
++		);
+ 	}, [] );
+ }
+diff --git a/packages/block-library/src/list-item/hooks/use-space.js b/packages/block-library/src/list-item/hooks/use-space.js
+index ee4d8bdbf8786e..25ed715b372d71 100644
+--- a/packages/block-library/src/list-item/hooks/use-space.js
++++ b/packages/block-library/src/list-item/hooks/use-space.js
+@@ -1,7 +1,10 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useRefEffect } from '@wordpress/compose';
++import {
++	useRefEffect,
++	privateApis as composePrivateApis,
++} from '@wordpress/compose';
+ import { SPACE, TAB } from '@wordpress/keycodes';
+ import { store as blockEditorStore } from '@wordpress/block-editor';
+ import { useSelect } from '@wordpress/data';
+@@ -11,6 +14,9 @@ import { useSelect } from '@wordpress/data';
+  */
+ import useIndentListItem from './use-indent-list-item';
+ import useOutdentListItem from './use-outdent-list-item';
++import { unlock } from '../../lock-unlock';
++
++const { subscribeDelegatedListener } = unlock( composePrivateApis );
+ 
+ export default function useSpace( clientId ) {
+ 	const { getSelectionStart, getSelectionEnd, getBlockIndex } =
+@@ -55,10 +61,14 @@ export default function useSpace( clientId ) {
+ 				}
+ 			}
+ 
+-			element.addEventListener( 'keydown', onKeyDown );
+-			return () => {
+-				element.removeEventListener( 'keydown', onKeyDown );
+-			};
++			// Capture phase so we run before writing-flow's ancestor-bubble
++			// keydown handlers that gate on `event.defaultPrevented`.
++			return subscribeDelegatedListener(
++				element,
++				'keydown',
++				onKeyDown,
++				true
++			);
+ 		},
+ 		[ clientId, indentListItem ]
+ 	);
+diff --git a/packages/block-library/src/paragraph/use-enter.js b/packages/block-library/src/paragraph/use-enter.js
+index 586baa4ab39cb0..496299911be1f3 100644
+--- a/packages/block-library/src/paragraph/use-enter.js
++++ b/packages/block-library/src/paragraph/use-enter.js
+@@ -2,7 +2,10 @@
+  * WordPress dependencies
+  */
+ import { useRef } from '@wordpress/element';
+-import { useRefEffect } from '@wordpress/compose';
++import {
++	useRefEffect,
++	privateApis as composePrivateApis,
++} from '@wordpress/compose';
+ import { ENTER } from '@wordpress/keycodes';
+ import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+ import { store as blockEditorStore } from '@wordpress/block-editor';
+@@ -13,6 +16,13 @@ import {
+ 	getDefaultBlockName,
+ } from '@wordpress/blocks';
+ 
++/**
++ * Internal dependencies
++ */
++import { unlock } from '../lock-unlock';
++
++const { subscribeDelegatedListener } = unlock( composePrivateApis );
++
+ export function useOnEnter( props ) {
+ 	const { batch } = useRegistry();
+ 	const { moveBlocksToPosition, replaceBlocks, selectionChange } =
+@@ -119,9 +129,13 @@ export function useOnEnter( props ) {
+ 			} );
+ 		}
+ 
+-		element.addEventListener( 'keydown', onKeyDown );
+-		return () => {
+-			element.removeEventListener( 'keydown', onKeyDown );
+-		};
++		// Capture phase so we run before writing-flow's ancestor-bubble
++		// keydown handlers that gate on `event.defaultPrevented`.
++		return subscribeDelegatedListener(
++			element,
++			'keydown',
++			onKeyDown,
++			true
++		);
+ 	}, [] );
+ }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4dba94884c14d1..93f984730ca260 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,10 @@
+ 
+ -   `Popover`: Don't close when focus moves into the `@wordpress/ui` compat overlay slot, or is restored to the popover from any portaled descendant. This unblocks nested overlays such as `@wordpress/ui` `Select`, which previously dismissed the host `Popover` on hover and on overlay dismissal ([#78407](https://github.com/WordPress/gutenberg/pull/78407)).
+ 
++### Internal
++
++-   `Autocomplete`: Share the per-instance `keydown` listener across instances via `subscribeDelegatedListener` so a typical post-editor mount adds 1 native keydown listener on the document instead of one per `RichText` ([#78310](https://github.com/WordPress/gutenberg/pull/78310)).
++
+ ## 33.1.0 (2026-05-14)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/autocomplete/index.tsx b/packages/components/src/autocomplete/index.tsx
+index f33608440a4c6f..cfeeb0f58f426c 100644
+--- a/packages/components/src/autocomplete/index.tsx
++++ b/packages/components/src/autocomplete/index.tsx
+@@ -8,7 +8,12 @@ import {
+ 	useReducer,
+ 	useRef,
+ } from '@wordpress/element';
+-import { useInstanceId, useMergeRefs, useRefEffect } from '@wordpress/compose';
++import {
++	useInstanceId,
++	useMergeRefs,
++	useRefEffect,
++	privateApis as composePrivateApis,
++} from '@wordpress/compose';
+ import {
+ 	create,
+ 	slice,
+@@ -36,6 +41,9 @@ import type {
+ 	UseAutocompleteProps,
+ } from './types';
+ import getNodeText from '../utils/get-node-text';
++import { unlock } from '../lock-unlock';
++
++const { subscribeDelegatedListener } = unlock( composePrivateApis );
+ 
+ const EMPTY_FILTERED_OPTIONS: KeyedOption[] = [];
+ 
+@@ -390,13 +398,23 @@ export function useAutocompleteProps( options: UseAutocompleteProps ) {
+ 	const mergedRefs = useMergeRefs( [
+ 		ref,
+ 		useRefEffect( ( element: HTMLElement ) => {
+-			function _onKeyDown( event: KeyboardEvent ) {
+-				onKeyDownRef.current?.( event );
++			function _onKeyDown( event: Event ) {
++				onKeyDownRef.current?.( event as KeyboardEvent );
+ 			}
+-			element.addEventListener( 'keydown', _onKeyDown );
+-			return () => {
+-				element.removeEventListener( 'keydown', _onKeyDown );
+-			};
++			// Capture phase. When the autocomplete popover is open,
++			// Up/Down/Enter/Escape must navigate the completion list —
++			// they shouldn't be consumed by ancestor handlers (e.g.
++			// block-editor's writing-flow) for block navigation, block
++			// splitting, or "move out of parent" actions. Those handlers
++			// fire at bubble phase and gate on `event.defaultPrevented`,
++			// so firing in capture lets us preventDefault first when the
++			// popover is active.
++			return subscribeDelegatedListener(
++				element,
++				'keydown',
++				_onKeyDown,
++				true
++			);
+ 		}, [] ),
+ 	] );
+ 
+diff --git a/packages/compose/README.md b/packages/compose/README.md
+index 57d1ed4fb53056..8b09c58a06db06 100644
+--- a/packages/compose/README.md
++++ b/packages/compose/README.md
+@@ -147,6 +147,10 @@ _Related_
+ 
+ -   <https://lodash.com/docs/4#flow>
+ 
++### privateApis
++
++Private @wordpress/compose APIs.
++
+ ### pure
+ 
+ > **Deprecated** Use `memo` or `PureComponent` instead.
+diff --git a/packages/compose/package.json b/packages/compose/package.json
+index f6bd8187fb4266..3abe8a09ce5a48 100644
+--- a/packages/compose/package.json
++++ b/packages/compose/package.json
+@@ -53,6 +53,7 @@
+ 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
+ 		"@wordpress/keycodes": "file:../keycodes",
+ 		"@wordpress/priority-queue": "file:../priority-queue",
++		"@wordpress/private-apis": "file:../private-apis",
+ 		"@wordpress/undo-manager": "file:../undo-manager",
+ 		"change-case": "^4.1.2",
+ 		"mousetrap": "^1.6.5",
+diff --git a/packages/compose/src/index.js b/packages/compose/src/index.js
+index 3b428a07776a3a..198dbbea6c615e 100644
+--- a/packages/compose/src/index.js
++++ b/packages/compose/src/index.js
+@@ -7,6 +7,9 @@ export * from './utils/throttle';
+ // The `ObservableMap` data structure
+ export * from './utils/observable-map';
+ 
++// Private APIs.
++export { privateApis } from './private-apis';
++
+ // The `compose` and `pipe` helpers (inspired by `flowRight` and `flow` from Lodash).
+ export { default as compose } from './higher-order/compose';
+ export { default as pipe } from './higher-order/pipe';
+diff --git a/packages/compose/src/lock-unlock.ts b/packages/compose/src/lock-unlock.ts
+new file mode 100644
+index 00000000000000..78cab4d7a3dde4
+--- /dev/null
++++ b/packages/compose/src/lock-unlock.ts
+@@ -0,0 +1,10 @@
++/**
++ * WordPress dependencies
++ */
++import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
++
++export const { lock, unlock } =
++	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
++		'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
++		'@wordpress/compose'
++	);
+diff --git a/packages/compose/src/private-apis.ts b/packages/compose/src/private-apis.ts
+new file mode 100644
+index 00000000000000..64565a9930cc74
+--- /dev/null
++++ b/packages/compose/src/private-apis.ts
+@@ -0,0 +1,13 @@
++/**
++ * Internal dependencies
++ */
++import { lock } from './lock-unlock';
++import subscribeDelegatedListener from './utils/subscribe-delegated-listener';
++
++/**
++ * Private @wordpress/compose APIs.
++ */
++export const privateApis = {};
++lock( privateApis, {
++	subscribeDelegatedListener,
++} );
+diff --git a/packages/compose/src/utils/subscribe-delegated-listener/index.ts b/packages/compose/src/utils/subscribe-delegated-listener/index.ts
+new file mode 100644
+index 00000000000000..7b7a9f28ac0759
+--- /dev/null
++++ b/packages/compose/src/utils/subscribe-delegated-listener/index.ts
+@@ -0,0 +1,136 @@
++/**
++ * Adds a callback to a shared `addEventListener`. Only one underlying
++ * native listener is attached per (root, event type, phase); subscribers
++ * join an in-JS registry that dispatches events along the DOM ancestry
++ * of `event.target`.
++ *
++ * The model mirrors React's synthetic event system: a single root
++ * listener handles every event of a given type, and callbacks bound to
++ * an `Element` only fire when that element is on the target's path.
++ * Callbacks bound to a `Document` always fire (document is the root of
++ * every event in that document); callbacks bound to a `Window` always
++ * fire as a flat fan-out, since `window` isn't on the DOM tree.
++ *
++ * @param target    `Element`, `Document`, or `Window` to bind the
++ *                  callback to. For `Element`, the callback only fires
++ *                  when the event happens on the element or a
++ *                  descendant.
++ * @param eventType DOM event name.
++ * @param callback  Listener to be invoked with the event.
++ * @param capture   Use the capture phase. Required when ancestor
++ *                  listeners gate on `event.defaultPrevented`, since a
++ *                  bubble-phase root listener fires after them. Defaults
++ *                  to `false`.
++ * @return Unsubscribe function.
++ */
++// root -> eventTypeKey -> subscribedTarget -> Set<callback>
++//
++// Inner registry is a `WeakMap`: element subscribers are held weakly so
++// an iframe removal lets the iframe's Elements (and through them, its
++// `ownerDocument`) be garbage-collected. The native listener is
++// attached to the document itself, so it goes when the document goes.
++const registries = new WeakMap<
++	EventTarget,
++	Map< string, WeakMap< EventTarget, Set< EventListener > > >
++>();
++
++function getRoot( target: EventTarget ): EventTarget {
++	// Detect Document / Window via duck typing (works across realms —
++	// the iframe's `Document` constructor is distinct from the parent
++	// window's, so `instanceof` is unreliable).
++	if ( ( target as Document ).nodeType === 9 /* DOCUMENT_NODE */ ) {
++		return target;
++	}
++	if ( ( target as Window ).window === target ) {
++		return target;
++	}
++	// Assume Element/Node.
++	return ( target as Node ).ownerDocument as Document;
++}
++
++export default function subscribeDelegatedListener(
++	target: EventTarget,
++	eventType: string,
++	callback: EventListener,
++	capture: boolean = false
++): () => void {
++	const root = getRoot( target );
++	// Duck-type detection (cross-realm safe).
++	const isWindow = ( root as Window ).window === root;
++
++	let perRoot = registries.get( root );
++	if ( ! perRoot ) {
++		perRoot = new Map();
++		registries.set( root, perRoot );
++	}
++	const key = capture ? `${ eventType }:capture` : eventType;
++	let perEvent = perRoot.get( key );
++	if ( ! perEvent ) {
++		perEvent = new WeakMap< EventTarget, Set< EventListener > >();
++		perRoot.set( key, perEvent );
++		const subscribers = perEvent;
++		root.addEventListener(
++			eventType,
++			( event ) => {
++				if ( isWindow ) {
++					// Window has no DOM ancestry — all subscribers share
++					// the window key; fetch its set and fan out.
++					const set = subscribers.get( root );
++					if ( set ) {
++						for ( const cb of set ) {
++							cb( event );
++						}
++					}
++					return;
++				}
++				// Walk the target → root ancestry, dispatching callbacks
++				// for any node in the path. Bubble order matches the walk
++				// direction, so dispatch inline (no path array). Capture
++				// has to materialise the path to iterate in reverse.
++				if ( capture ) {
++					const path: Array< Node | Document > = [];
++					let current: Node | null = event.target as Node | null;
++					while ( current ) {
++						path.push( current );
++						if ( current === root ) {
++							break;
++						}
++						current = current.parentNode;
++					}
++					for ( let i = path.length - 1; i >= 0; i-- ) {
++						const set = subscribers.get( path[ i ] );
++						if ( set ) {
++							for ( const cb of set ) {
++								cb( event );
++							}
++						}
++					}
++				} else {
++					let current: Node | null = event.target as Node | null;
++					while ( current ) {
++						const set = subscribers.get( current );
++						if ( set ) {
++							for ( const cb of set ) {
++								cb( event );
++							}
++						}
++						if ( current === root ) {
++							break;
++						}
++						current = current.parentNode;
++					}
++				}
++			},
++			capture
++		);
++	}
++	let set = perEvent.get( target );
++	if ( ! set ) {
++		set = new Set();
++		perEvent.set( target, set );
++	}
++	set.add( callback );
++	return () => {
++		set.delete( callback );
++	};
++}
+diff --git a/packages/compose/src/utils/subscribe-delegated-listener/test/index.js b/packages/compose/src/utils/subscribe-delegated-listener/test/index.js
+new file mode 100644
+index 00000000000000..f266873c8c6ea8
+--- /dev/null
++++ b/packages/compose/src/utils/subscribe-delegated-listener/test/index.js
+@@ -0,0 +1,170 @@
++/**
++ * Internal dependencies
++ */
++import subscribeDelegatedListener from '..';
++
++describe( 'subscribeDelegatedListener', () => {
++	let root;
++	let target;
++
++	beforeEach( () => {
++		// Build a nested DOM:
++		//   document.body > #outer > #inner > #leaf
++		root = document.createElement( 'div' );
++		root.id = 'outer';
++		const inner = document.createElement( 'div' );
++		inner.id = 'inner';
++		target = document.createElement( 'span' );
++		target.id = 'leaf';
++		inner.appendChild( target );
++		root.appendChild( inner );
++		document.body.appendChild( root );
++	} );
++
++	afterEach( () => {
++		document.body.removeChild( root );
++	} );
++
++	function fire( element, type = 'click', init = { bubbles: true } ) {
++		element.dispatchEvent( new Event( type, init ) );
++	}
++
++	test( 'invokes element subscriber when event fires on that element', () => {
++		const cb = jest.fn();
++		subscribeDelegatedListener( target, 'click', cb );
++		fire( target );
++		expect( cb ).toHaveBeenCalledTimes( 1 );
++	} );
++
++	test( 'invokes element subscriber when event fires on a descendant', () => {
++		const cb = jest.fn();
++		const child = document.createElement( 'b' );
++		target.appendChild( child );
++		subscribeDelegatedListener( target, 'click', cb );
++		fire( child );
++		expect( cb ).toHaveBeenCalledTimes( 1 );
++	} );
++
++	test( 'does not invoke element subscriber when event fires outside its subtree', () => {
++		const cb = jest.fn();
++		const sibling = document.createElement( 'div' );
++		document.body.appendChild( sibling );
++		subscribeDelegatedListener( target, 'click', cb );
++		fire( sibling );
++		expect( cb ).not.toHaveBeenCalled();
++		document.body.removeChild( sibling );
++	} );
++
++	test( 'bubble phase: nested subscribers fire inner-to-outer', () => {
++		const order = [];
++		subscribeDelegatedListener( root, 'click', () =>
++			order.push( 'outer' )
++		);
++		subscribeDelegatedListener( target, 'click', () =>
++			order.push( 'leaf' )
++		);
++		fire( target );
++		expect( order ).toEqual( [ 'leaf', 'outer' ] );
++	} );
++
++	test( 'capture phase: nested subscribers fire outer-to-inner', () => {
++		const order = [];
++		subscribeDelegatedListener(
++			root,
++			'click',
++			() => order.push( 'outer' ),
++			true
++		);
++		subscribeDelegatedListener(
++			target,
++			'click',
++			() => order.push( 'leaf' ),
++			true
++		);
++		fire( target );
++		expect( order ).toEqual( [ 'outer', 'leaf' ] );
++	} );
++
++	test( 'capture and bubble registries are independent', () => {
++		const captureCb = jest.fn();
++		const bubbleCb = jest.fn();
++		subscribeDelegatedListener( target, 'click', captureCb, true );
++		subscribeDelegatedListener( target, 'click', bubbleCb, false );
++		fire( target );
++		expect( captureCb ).toHaveBeenCalledTimes( 1 );
++		expect( bubbleCb ).toHaveBeenCalledTimes( 1 );
++	} );
++
++	test( 'document subscriber always fires for events in the document', () => {
++		const cb = jest.fn();
++		subscribeDelegatedListener( document, 'click', cb );
++		fire( target );
++		expect( cb ).toHaveBeenCalledTimes( 1 );
++	} );
++
++	test( 'window subscriber fans out independently of element subscribers', () => {
++		const winCb = jest.fn();
++		const elCb = jest.fn();
++		subscribeDelegatedListener( window, 'resize', winCb );
++		subscribeDelegatedListener( target, 'resize', elCb );
++		window.dispatchEvent( new Event( 'resize' ) );
++		expect( winCb ).toHaveBeenCalledTimes( 1 );
++		// Element subscriber doesn't see a resize on window.
++		expect( elCb ).not.toHaveBeenCalled();
++	} );
++
++	test( 'multiple callbacks for the same element all fire', () => {
++		const a = jest.fn();
++		const b = jest.fn();
++		subscribeDelegatedListener( target, 'click', a );
++		subscribeDelegatedListener( target, 'click', b );
++		fire( target );
++		expect( a ).toHaveBeenCalledTimes( 1 );
++		expect( b ).toHaveBeenCalledTimes( 1 );
++	} );
++
++	test( 'unsubscribe stops further dispatch', () => {
++		const cb = jest.fn();
++		const unsub = subscribeDelegatedListener( target, 'click', cb );
++		fire( target );
++		expect( cb ).toHaveBeenCalledTimes( 1 );
++		unsub();
++		fire( target );
++		expect( cb ).toHaveBeenCalledTimes( 1 );
++	} );
++
++	test( 'attaches one native listener per (root, eventType, phase) regardless of subscriber count', () => {
++		const spy = jest.spyOn( document, 'addEventListener' );
++		// First subscribe attaches the native listener; subsequent ones
++		// for the same key share it.
++		subscribeDelegatedListener( target, 'mousemove', jest.fn() );
++		subscribeDelegatedListener( root, 'mousemove', jest.fn() );
++		subscribeDelegatedListener( document, 'mousemove', jest.fn() );
++		const nativeMousemoves = spy.mock.calls.filter(
++			( [ type, , opts ] ) => type === 'mousemove' && ! opts // bubble-phase only
++		).length;
++		expect( nativeMousemoves ).toBe( 1 );
++		spy.mockRestore();
++	} );
++
++	test( 'cross-realm Document/Window: accepts targets from a different realm', () => {
++		// Simulate an iframe document — a Document from a different realm
++		// would not be `instanceof Document` of the parent realm. Replicate
++		// that by passing a duck-typed Document-like object.
++		const iframe = document.createElement( 'iframe' );
++		document.body.appendChild( iframe );
++		const iframeDoc = iframe.contentDocument;
++		const iframeTarget = iframeDoc.createElement( 'span' );
++		iframeDoc.body.appendChild( iframeTarget );
++
++		const cb = jest.fn();
++		expect( () =>
++			subscribeDelegatedListener( iframeTarget, 'click', cb )
++		).not.toThrow();
++		iframeTarget.dispatchEvent(
++			new iframe.contentWindow.Event( 'click', { bubbles: true } )
++		);
++		expect( cb ).toHaveBeenCalledTimes( 1 );
++		document.body.removeChild( iframe );
++	} );
++} );
+diff --git a/packages/compose/tsconfig.json b/packages/compose/tsconfig.json
+index 90ab223f044987..ee20c7ba69fcd6 100644
+--- a/packages/compose/tsconfig.json
++++ b/packages/compose/tsconfig.json
+@@ -13,6 +13,7 @@
+ 		{ "path": "../is-shallow-equal" },
+ 		{ "path": "../keycodes" },
+ 		{ "path": "../priority-queue" },
++		{ "path": "../private-apis" },
+ 		{ "path": "../undo-manager" }
+ 	],
+ 	"include": [ "src/**/*" ]
+diff --git a/packages/private-apis/src/implementation.ts b/packages/private-apis/src/implementation.ts
+index 4d3c3a58bfb4b0..e93de64773c4f2 100644
+--- a/packages/private-apis/src/implementation.ts
++++ b/packages/private-apis/src/implementation.ts
+@@ -17,6 +17,7 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
+ 	'@wordpress/blocks',
+ 	'@wordpress/boot',
+ 	'@wordpress/commands',
++	'@wordpress/compose',
+ 	'@wordpress/connectors',
+ 	'@wordpress/workflows',
+ 	'@wordpress/components',
+diff --git a/packages/rich-text/src/hook/event-listeners/copy-handler.js b/packages/rich-text/src/hook/event-listeners/copy-handler.js
+index 0cc1594c3ab914..3e279788dbc043 100644
+--- a/packages/rich-text/src/hook/event-listeners/copy-handler.js
++++ b/packages/rich-text/src/hook/event-listeners/copy-handler.js
+@@ -1,3 +1,8 @@
++/**
++ * WordPress dependencies
++ */
++import { privateApis as composePrivateApis } from '@wordpress/compose';
++
+ /**
+  * Internal dependencies
+  */
+@@ -5,6 +10,9 @@ import { toHTMLString } from '../../to-html-string';
+ import { isCollapsed } from '../../is-collapsed';
+ import { slice } from '../../slice';
+ import { getTextContent } from '../../get-text-content';
++import { unlock } from '../../lock-unlock';
++
++const { subscribeDelegatedListener } = unlock( composePrivateApis );
+ 
+ export default ( props ) => ( element ) => {
+ 	function onCopy( event ) {
+@@ -31,11 +39,18 @@ export default ( props ) => ( element ) => {
+ 	}
+ 
+ 	const { defaultView } = element.ownerDocument;
+-
+-	defaultView.addEventListener( 'copy', onCopy );
+-	defaultView.addEventListener( 'cut', onCopy );
++	const unsubscribeCopy = subscribeDelegatedListener(
++		defaultView,
++		'copy',
++		onCopy
++	);
++	const unsubscribeCut = subscribeDelegatedListener(
++		defaultView,
++		'cut',
++		onCopy
++	);
+ 	return () => {
+-		defaultView.removeEventListener( 'copy', onCopy );
+-		defaultView.removeEventListener( 'cut', onCopy );
++		unsubscribeCopy();
++		unsubscribeCut();
+ 	};
+ };
+diff --git a/packages/rich-text/src/hook/event-listeners/delete.js b/packages/rich-text/src/hook/event-listeners/delete.js
+index 62dd06a0f2cdb5..fffa80750f2fa2 100644
+--- a/packages/rich-text/src/hook/event-listeners/delete.js
++++ b/packages/rich-text/src/hook/event-listeners/delete.js
+@@ -2,16 +2,19 @@
+  * WordPress dependencies
+  */
+ import { BACKSPACE, DELETE } from '@wordpress/keycodes';
++import { privateApis as composePrivateApis } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+  */
+ import { remove } from '../../remove';
++import { unlock } from '../../lock-unlock';
++
++const { subscribeDelegatedListener } = unlock( composePrivateApis );
+ 
+ export default ( props ) => ( element ) => {
+ 	function onKeyDown( event ) {
+ 		const { keyCode } = event;
+-		const { createRecord, handleChange } = props.current;
+ 
+ 		if ( event.defaultPrevented ) {
+ 			return;
+@@ -21,6 +24,7 @@ export default ( props ) => ( element ) => {
+ 			return;
+ 		}
+ 
++		const { createRecord, handleChange } = props.current;
+ 		const currentValue = createRecord();
+ 		const { start, end, text } = currentValue;
+ 
+@@ -31,8 +35,5 @@ export default ( props ) => ( element ) => {
+ 		}
+ 	}
+ 
+-	element.addEventListener( 'keydown', onKeyDown );
+-	return () => {
+-		element.removeEventListener( 'keydown', onKeyDown );
+-	};
++	return subscribeDelegatedListener( element, 'keydown', onKeyDown );
+ };
+diff --git a/packages/rich-text/src/hook/event-listeners/format-boundaries.js b/packages/rich-text/src/hook/event-listeners/format-boundaries.js
+index e9fdfd10ebfd5c..f0be497fc33fcf 100644
+--- a/packages/rich-text/src/hook/event-listeners/format-boundaries.js
++++ b/packages/rich-text/src/hook/event-listeners/format-boundaries.js
+@@ -2,11 +2,15 @@
+  * WordPress dependencies
+  */
+ import { LEFT, RIGHT } from '@wordpress/keycodes';
++import { privateApis as composePrivateApis } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+  */
+ import { isCollapsed } from '../../is-collapsed';
++import { unlock } from '../../lock-unlock';
++
++const { subscribeDelegatedListener } = unlock( composePrivateApis );
+ 
+ const EMPTY_ACTIVE_FORMATS = [];
+ 
+@@ -34,8 +38,7 @@ export default ( props ) => ( element ) => {
+ 			activeFormats: currentActiveFormats = [],
+ 		} = record.current;
+ 		const collapsed = isCollapsed( record.current );
+-		const { ownerDocument } = element;
+-		const { defaultView } = ownerDocument;
++		const { defaultView } = element.ownerDocument;
+ 		// To do: ideally, we should look at visual position instead.
+ 		const { direction } = defaultView.getComputedStyle( element );
+ 		const reverseKey = direction === 'rtl' ? RIGHT : LEFT;
+@@ -96,8 +99,5 @@ export default ( props ) => ( element ) => {
+ 		forceRender();
+ 	}
+ 
+-	element.addEventListener( 'keydown', onKeyDown );
+-	return () => {
+-		element.removeEventListener( 'keydown', onKeyDown );
+-	};
++	return subscribeDelegatedListener( element, 'keydown', onKeyDown, true );
+ };
+diff --git a/packages/rich-text/src/hook/event-listeners/input-and-selection.js b/packages/rich-text/src/hook/event-listeners/input-and-selection.js
+index 0f3f82a3c65c46..afa9b920a434bd 100644
+--- a/packages/rich-text/src/hook/event-listeners/input-and-selection.js
++++ b/packages/rich-text/src/hook/event-listeners/input-and-selection.js
+@@ -1,9 +1,17 @@
++/**
++ * WordPress dependencies
++ */
++import { privateApis as composePrivateApis } from '@wordpress/compose';
++
+ /**
+  * Internal dependencies
+  */
+ import { getActiveFormats } from '../../get-active-formats';
+ import { isCollapsed } from '../../is-collapsed';
+ import { updateFormats } from '../../update-formats';
++import { unlock } from '../../lock-unlock';
++
++const { subscribeDelegatedListener } = unlock( composePrivateApis );
+ 
+ /**
+  * All inserting input types that would insert HTML into the DOM.
+@@ -213,7 +221,23 @@ export default ( props ) => ( element ) => {
+ 		);
+ 	}
+ 
+-	function onFocus() {
++	function onFocus( event ) {
++		// `focusin` bubbles from focusable descendants too — only act
++		// when focus lands on the editable itself.
++		if ( event.target !== element ) {
++			return;
++		}
++
++		// `contentEditable` can be false even on a tabindex'd element
++		// (e.g. a paragraph with a locked block binding). When that's the
++		// case the rich text isn't actually being edited and shouldn't
++		// claim selection — block-editor's `use-focus-handler.js` will
++		// dispatch `selectionChange(clientId)` to keep `attributeKey`
++		// unset for the wrapper-level focus.
++		if ( element.contentEditable !== 'true' ) {
++			return;
++		}
++
+ 		const { record, isSelected, onSelectionChange, applyRecord } =
+ 			props.current;
+ 
+@@ -252,15 +276,37 @@ export default ( props ) => ( element ) => {
+ 		);
+ 	}
+ 
+-	element.addEventListener( 'input', onInput );
+-	element.addEventListener( 'compositionstart', onCompositionStart );
+-	element.addEventListener( 'compositionend', onCompositionEnd );
+-	element.addEventListener( 'focus', onFocus );
++	// `input` and `compositionend` must run before block-editor's
++	// `input-rules.js` element-level listeners, which call `getValue()`
++	// reading `record.current` updated by our `onInput`. Use capture phase
++	// so we fire before any ancestor bubble handlers.
++	const unsubscribeInput = subscribeDelegatedListener(
++		element,
++		'input',
++		onInput,
++		true
++	);
++	const unsubscribeCompositionStart = subscribeDelegatedListener(
++		element,
++		'compositionstart',
++		onCompositionStart
++	);
++	const unsubscribeCompositionEnd = subscribeDelegatedListener(
++		element,
++		'compositionend',
++		onCompositionEnd,
++		true
++	);
++	const unsubscribeFocus = subscribeDelegatedListener(
++		element,
++		'focusin',
++		onFocus
++	);
+ 
+ 	return () => {
+-		element.removeEventListener( 'input', onInput );
+-		element.removeEventListener( 'compositionstart', onCompositionStart );
+-		element.removeEventListener( 'compositionend', onCompositionEnd );
+-		element.removeEventListener( 'focus', onFocus );
++		unsubscribeInput();
++		unsubscribeCompositionStart();
++		unsubscribeCompositionEnd();
++		unsubscribeFocus();
+ 	};
+ };
+diff --git a/packages/rich-text/src/hook/event-listeners/prevent-focus-capture.js b/packages/rich-text/src/hook/event-listeners/prevent-focus-capture.js
+index 8dc97f73673ce6..0ff7ff58d9b382 100644
+--- a/packages/rich-text/src/hook/event-listeners/prevent-focus-capture.js
++++ b/packages/rich-text/src/hook/event-listeners/prevent-focus-capture.js
+@@ -1,3 +1,15 @@
++/**
++ * WordPress dependencies
++ */
++import { privateApis as composePrivateApis } from '@wordpress/compose';
++
++/**
++ * Internal dependencies
++ */
++import { unlock } from '../../lock-unlock';
++
++const { subscribeDelegatedListener } = unlock( composePrivateApis );
++
+ /**
+  * Prevents focus from being captured by the element when clicking _outside_
+  * around the element. This may happen when the parent element is flex.
+@@ -34,11 +46,19 @@ export function preventFocusCapture() {
+ 			}
+ 		}
+ 
+-		defaultView.addEventListener( 'pointerdown', onPointerDown );
+-		defaultView.addEventListener( 'pointerup', onPointerUp );
++		const unsubscribePointerDown = subscribeDelegatedListener(
++			defaultView,
++			'pointerdown',
++			onPointerDown
++		);
++		const unsubscribePointerUp = subscribeDelegatedListener(
++			defaultView,
++			'pointerup',
++			onPointerUp
++		);
+ 		return () => {
+-			defaultView.removeEventListener( 'pointerdown', onPointerDown );
+-			defaultView.removeEventListener( 'pointerup', onPointerUp );
++			unsubscribePointerDown();
++			unsubscribePointerUp();
+ 		};
+ 	};
+ }
+diff --git a/packages/rich-text/src/hook/event-listeners/select-object.js b/packages/rich-text/src/hook/event-listeners/select-object.js
+index 2598b149d2418f..27462467839608 100644
+--- a/packages/rich-text/src/hook/event-listeners/select-object.js
++++ b/packages/rich-text/src/hook/event-listeners/select-object.js
+@@ -1,3 +1,15 @@
++/**
++ * WordPress dependencies
++ */
++import { privateApis as composePrivateApis } from '@wordpress/compose';
++
++/**
++ * Internal dependencies
++ */
++import { unlock } from '../../lock-unlock';
++
++const { subscribeDelegatedListener } = unlock( composePrivateApis );
++
+ export default () => ( element ) => {
+ 	function onClick( event ) {
+ 		const { target } = event;
+@@ -45,10 +57,18 @@ export default () => ( element ) => {
+ 		}
+ 	}
+ 
+-	element.addEventListener( 'click', onClick );
+-	element.addEventListener( 'focusin', onFocusIn );
++	const unsubscribeClick = subscribeDelegatedListener(
++		element,
++		'click',
++		onClick
++	);
++	const unsubscribeFocusIn = subscribeDelegatedListener(
++		element,
++		'focusin',
++		onFocusIn
++	);
+ 	return () => {
+-		element.removeEventListener( 'click', onClick );
+-		element.removeEventListener( 'focusin', onFocusIn );
++		unsubscribeClick();
++		unsubscribeFocusIn();
+ 	};
+ };
+diff --git a/packages/rich-text/src/hook/event-listeners/selection-change-compat.js b/packages/rich-text/src/hook/event-listeners/selection-change-compat.js
+index f64f22658c329e..b68a368ad40dea 100644
+--- a/packages/rich-text/src/hook/event-listeners/selection-change-compat.js
++++ b/packages/rich-text/src/hook/event-listeners/selection-change-compat.js
+@@ -1,7 +1,15 @@
++/**
++ * WordPress dependencies
++ */
++import { privateApis as composePrivateApis } from '@wordpress/compose';
++
+ /**
+  * Internal dependencies
+  */
+ import { isRangeEqual } from '../../is-range-equal';
++import { unlock } from '../../lock-unlock';
++
++const { subscribeDelegatedListener } = unlock( composePrivateApis );
+ 
+ /**
+  * Sometimes some browsers are not firing a `selectionchange` event when
+@@ -44,10 +52,18 @@ export default () => ( element ) => {
+ 		range = getRange();
+ 	}
+ 
+-	element.addEventListener( 'pointerdown', onDown );
+-	element.addEventListener( 'keydown', onDown );
++	const unsubscribePointerDown = subscribeDelegatedListener(
++		element,
++		'pointerdown',
++		onDown
++	);
++	const unsubscribeKeyDown = subscribeDelegatedListener(
++		element,
++		'keydown',
++		onDown
++	);
+ 	return () => {
+-		element.removeEventListener( 'pointerdown', onDown );
+-		element.removeEventListener( 'keydown', onDown );
++		unsubscribePointerDown();
++		unsubscribeKeyDown();
+ 	};
+ };

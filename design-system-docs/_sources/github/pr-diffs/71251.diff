@@ -1,0 +1,49 @@
+diff --git a/packages/block-library/src/navigation/edit/test/navigation-menu-selector.js b/packages/block-library/src/navigation/edit/test/navigation-menu-selector.js
+index eee9be647cb19c..407af23a857fef 100644
+--- a/packages/block-library/src/navigation/edit/test/navigation-menu-selector.js
++++ b/packages/block-library/src/navigation/edit/test/navigation-menu-selector.js
+@@ -295,7 +295,7 @@ describe( 'NavigationMenuSelector', () => {
+ 					screen.queryByRole( 'menuitem', {
+ 						name: 'Create new Menu',
+ 					} )
+-				).toBeDisabled();
++				).toHaveAttribute( 'aria-disabled', 'true' );
+ 
+ 				// once the menu is created
+ 				// no more network activity to wait on
+@@ -619,7 +619,7 @@ describe( 'NavigationMenuSelector', () => {
+ 				// Check all menu items are present but disabled.
+ 				screen.getAllByRole( 'menuitem' ).forEach( ( item ) => {
+ 					// // Check all menu items are present but disabled.
+-					expect( item ).toBeDisabled();
++					expect( item ).toHaveAttribute( 'aria-disabled', 'true' );
+ 				} );
+ 
+ 				// once the menu is imported
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 92723fbf9b7c12..91b8b849c43a20 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug fixes
++
++-   `MenuItem`: make accessible when disabled ([#71251](https://github.com/WordPress/gutenberg/pull/71251)).
++
+ ### Enhancement
+ 
+ -   Upgrade `gradient-parser` to version `1.1.1` to support HSL/HSLA color, CSS variables, and `calc()` expressions ([#71186](https://github.com/WordPress/gutenberg/pull/71186)).
+diff --git a/packages/components/src/menu-item/index.tsx b/packages/components/src/menu-item/index.tsx
+index cc57d23e585a10..6c83b16b493dd7 100644
+--- a/packages/components/src/menu-item/index.tsx
++++ b/packages/components/src/menu-item/index.tsx
+@@ -67,6 +67,7 @@ function UnforwardedMenuItem(
+ 			role={ role }
+ 			icon={ iconPosition === 'left' ? icon : undefined }
+ 			className={ className }
++			accessibleWhenDisabled
+ 			{ ...buttonProps }
+ 		>
+ 			<span className="components-menu-item__item">{ children }</span>

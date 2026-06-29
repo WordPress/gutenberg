@@ -1,0 +1,3385 @@
+diff --git a/package-lock.json b/package-lock.json
+index 99eb6f546f832a..64a1cd4c73a5a5 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -62110,6 +62110,7 @@
+ 			"dependencies": {
+ 				"@base-ui/react": "^1.0.0",
+ 				"@wordpress/a11y": "file:../a11y",
++				"@wordpress/compose": "file:../compose",
+ 				"@wordpress/element": "file:../element",
+ 				"@wordpress/i18n": "file:../i18n",
+ 				"@wordpress/icons": "file:../icons",
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 741b2911aede40..8b27905637e8a6 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -2,8 +2,16 @@
+ 
+ ## Unreleased
+ 
++### New Features
++
++-   Add `Tabs` primitive ([#74652](https://github.com/WordPress/gutenberg/pull/74652)).
++
+ ## 0.6.0 (2026-01-29)
+ 
++### New Features
++
++-   Add `Select` primitive ([#74661](https://github.com/WordPress/gutenberg/pull/74661)).
++
+ ## 0.5.0 (2026-01-16)
+ 
+ ### Breaking Changes
+@@ -20,4 +28,3 @@
+ -   Add `Button` component ([#74415](https://github.com/WordPress/gutenberg/pull/74415), [#74416](https://github.com/WordPress/gutenberg/pull/74416), [#74470](https://github.com/WordPress/gutenberg/pull/74470)).
+ -   Add `InputLayout` primitive ([#74313](https://github.com/WordPress/gutenberg/pull/74313)).
+ -   Add `Input` primitive ([#74615](https://github.com/WordPress/gutenberg/pull/74615)).
+--   Add `Select` primitive ([#74661](https://github.com/WordPress/gutenberg/pull/74661)).
+diff --git a/packages/ui/package.json b/packages/ui/package.json
+index ca22786a95ccd5..71a6018176dc78 100644
+--- a/packages/ui/package.json
++++ b/packages/ui/package.json
+@@ -45,6 +45,7 @@
+ 	"dependencies": {
+ 		"@base-ui/react": "^1.0.0",
+ 		"@wordpress/a11y": "file:../a11y",
++		"@wordpress/compose": "file:../compose",
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/i18n": "file:../i18n",
+ 		"@wordpress/icons": "file:../icons",
+diff --git a/packages/ui/src/index.ts b/packages/ui/src/index.ts
+index dc886022898c19..64c8c05f34ec93 100644
+--- a/packages/ui/src/index.ts
++++ b/packages/ui/src/index.ts
+@@ -5,5 +5,6 @@ export * from './form/primitives';
+ export * from './icon';
+ export * from './icon-button';
+ export * from './stack';
++export * as Tabs from './tabs';
+ export * as Tooltip from './tooltip';
+ export * from './visually-hidden';
+diff --git a/packages/ui/src/tabs/index.ts b/packages/ui/src/tabs/index.ts
+new file mode 100644
+index 00000000000000..25defcc93c0150
+--- /dev/null
++++ b/packages/ui/src/tabs/index.ts
+@@ -0,0 +1,6 @@
++import { List } from './list';
++import { Panel } from './panel';
++import { Root } from './root';
++import { Tab } from './tab';
++
++export { Root, List, Panel, Tab };
+diff --git a/packages/ui/src/tabs/list.tsx b/packages/ui/src/tabs/list.tsx
+new file mode 100644
+index 00000000000000..f90a3676d76d32
+--- /dev/null
++++ b/packages/ui/src/tabs/list.tsx
+@@ -0,0 +1,130 @@
++import { forwardRef, useEffect, useState } from '@wordpress/element';
++import clsx from 'clsx';
++import { Tabs as _Tabs } from '@base-ui/react/tabs';
++import { useMergeRefs } from '@wordpress/compose';
++import styles from './style.module.css';
++import type { TabListProps } from './types';
++
++// Account for sub-pixel rounding errors.
++const SCROLL_EPSILON = 1;
++
++/**
++ * Groups the individual tab buttons.
++ *
++ * `Tabs` is a collection of React components that combine to render
++ * an [ARIA-compliant tabs pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/).
++ */
++export const List = forwardRef< HTMLDivElement, TabListProps >(
++	function TabList(
++		{
++			children,
++			variant = 'default',
++			className,
++			activateOnFocus,
++			render,
++			...otherProps
++		},
++		forwardedRef
++	) {
++		const [ listEl, setListEl ] = useState< HTMLDivElement | null >( null );
++		const [ overflow, setOverflow ] = useState< {
++			first: boolean;
++			last: boolean;
++			isScrolling: boolean;
++		} >( {
++			first: false,
++			last: false,
++			isScrolling: false,
++		} );
++
++		// Check if list is overflowing when it scrolls or resizes.
++		useEffect( () => {
++			if ( ! listEl ) {
++				return;
++			}
++
++			const measureOverflow = () => {
++				const { scrollWidth, clientWidth, scrollLeft } = listEl;
++				const maxScroll = Math.max( scrollWidth - clientWidth, 0 );
++				const direction =
++					listEl.dir ||
++					( typeof window !== 'undefined'
++						? window.getComputedStyle( listEl ).direction
++						: 'ltr' );
++
++				const scrollFromStart =
++					direction === 'rtl' && scrollLeft < 0
++						? // In RTL layouts, scrollLeft is typically 0 at the visual "start"
++						  // (right edge) and becomes negative toward the "end" (left edge).
++						  // Normalize value for correct first/last detection logic.
++						  -scrollLeft
++						: scrollLeft;
++
++				// Use SCROLL_EPSILON to handle subpixel rendering differences.
++				setOverflow( {
++					first: scrollFromStart > SCROLL_EPSILON,
++					last: scrollFromStart < maxScroll - SCROLL_EPSILON,
++					isScrolling: scrollWidth > clientWidth,
++				} );
++			};
++
++			const resizeObserver = new ResizeObserver( measureOverflow );
++			resizeObserver.observe( listEl );
++
++			let scrollTick = false;
++			const throttleMeasureOverflowOnScroll = () => {
++				if ( ! scrollTick ) {
++					requestAnimationFrame( () => {
++						measureOverflow();
++						scrollTick = false;
++					} );
++					scrollTick = true;
++				}
++			};
++			listEl.addEventListener(
++				'scroll',
++				throttleMeasureOverflowOnScroll,
++				{ passive: true }
++			);
++
++			// Initial check.
++			measureOverflow();
++
++			return () => {
++				listEl.removeEventListener(
++					'scroll',
++					throttleMeasureOverflowOnScroll
++				);
++				resizeObserver.disconnect();
++			};
++		}, [ listEl ] );
++
++		const mergedListRef = useMergeRefs( [
++			forwardedRef,
++			( el: HTMLDivElement | null ) => setListEl( el ),
++		] );
++
++		return (
++			<_Tabs.List
++				ref={ mergedListRef }
++				activateOnFocus={ activateOnFocus }
++				data-select-on-move={ activateOnFocus ? 'true' : 'false' }
++				className={ clsx(
++					styles.tablist,
++					overflow.first && styles[ 'is-overflowing-first' ],
++					overflow.last && styles[ 'is-overflowing-last' ],
++					styles[ `is-${ variant }-variant` ],
++					className
++				) }
++				{ ...otherProps }
++				tabIndex={
++					otherProps.tabIndex ??
++					( overflow.isScrolling ? -1 : undefined )
++				}
++			>
++				{ children }
++				<_Tabs.Indicator className={ styles.indicator } />
++			</_Tabs.List>
++		);
++	}
++);
+diff --git a/packages/ui/src/tabs/panel.tsx b/packages/ui/src/tabs/panel.tsx
+new file mode 100644
+index 00000000000000..6ae551234172a1
+--- /dev/null
++++ b/packages/ui/src/tabs/panel.tsx
+@@ -0,0 +1,23 @@
++import { forwardRef } from '@wordpress/element';
++import clsx from 'clsx';
++import { Tabs as _Tabs } from '@base-ui/react/tabs';
++import styles from './style.module.css';
++import type { TabPanelProps } from './types';
++
++/**
++ * A panel displayed when the corresponding tab is active.
++ *
++ * `Tabs` is a collection of React components that combine to render
++ * an [ARIA-compliant tabs pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/).
++ */
++export const Panel = forwardRef< HTMLDivElement, TabPanelProps >(
++	function TabPanel( { className, ...otherProps }, forwardedRef ) {
++		return (
++			<_Tabs.Panel
++				ref={ forwardedRef }
++				className={ clsx( styles.tabpanel, className ) }
++				{ ...otherProps }
++			/>
++		);
++	}
++);
+diff --git a/packages/ui/src/tabs/root.tsx b/packages/ui/src/tabs/root.tsx
+new file mode 100644
+index 00000000000000..e7a825fdad0ff4
+--- /dev/null
++++ b/packages/ui/src/tabs/root.tsx
+@@ -0,0 +1,15 @@
++import { forwardRef } from '@wordpress/element';
++import { Tabs as _Tabs } from '@base-ui/react/tabs';
++import type { TabRootProps } from './types';
++
++/**
++ * Groups the tabs and the corresponding panels.
++ *
++ * `Tabs` is a collection of React components that combine to render
++ * an [ARIA-compliant tabs pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/).
++ */
++export const Root = forwardRef< HTMLDivElement, TabRootProps >(
++	function TabsRoot( { ...otherProps }, forwardedRef ) {
++		return <_Tabs.Root ref={ forwardedRef } { ...otherProps } />;
++	}
++);
+diff --git a/packages/ui/src/tabs/stories/best-practices.mdx b/packages/ui/src/tabs/stories/best-practices.mdx
+new file mode 100644
+index 00000000000000..41e7b157e3534e
+--- /dev/null
++++ b/packages/ui/src/tabs/stories/best-practices.mdx
+@@ -0,0 +1,85 @@
++import { Meta } from '@storybook/addon-docs/blocks';
++
++<Meta title="Design System/Components/Tabs/Best Practices" />
++
++# Tabs
++
++## Usage
++
++### Uncontrolled Mode
++
++`Tabs` can be used in an uncontrolled mode, where the component manages its own state. In this mode, the `defaultValue` prop can be used to set the initially selected tab.
++
++```jsx
++import { Tabs } from '@wordpress/ui';
++
++const MyUncontrolledTabs = () => (
++	<Tabs.Root
++		onValueChange={ ( tab ) => console.log( 'New selected tab: ', tab ) }
++		defaultValue="tab2"
++	>
++		<Tabs.List>
++			<Tabs.Tab value="tab1">Tab 1</Tabs.Tab>
++			<Tabs.Tab value="tab2">Tab 2</Tabs.Tab>
++			<Tabs.Tab value="tab3">Tab 3</Tabs.Tab>
++		</Tabs.List>
++		<Tabs.Panel value="tab1">
++			<p>Selected tab: Tab 1</p>
++		</Tabs.Panel>
++		<Tabs.Panel value="tab2">
++			<p>Selected tab: Tab 2</p>
++		</Tabs.Panel>
++		<Tabs.Panel value="tab3">
++			<p>Selected tab: Tab 3</p>
++		</Tabs.Panel>
++	</Tabs.Root>
++);
++```
++
++### Controlled Mode
++
++Tabs can also be used in a controlled mode, where the parent component uses the `value` and `onValueChange` props to control tab selection. In this mode, the `defaultValue` prop will be ignored if it is provided. To indicate that no tabs are selected, pass `null` to the `value`.
++
++```tsx
++import { useState } from 'react';
++import { Tabs } from '@wordpress/ui';
++
++const MyControlledTabs = () => {
++	const [ selectedTabId, setSelectedTabId ] = useState<
++		string | undefined | null
++	>( null );
++
++	return (
++		<Tabs.Root
++			value={ selectedTabId }
++			onValueChange={ ( newSelectedTabId ) => {
++				setSelectedTabId( newSelectedTabId );
++				console.log( 'Selecting tab', newSelectedTabId );
++			} }
++		>
++			<Tabs.List>
++				<Tabs.Tab value="tab1">Tab 1</Tabs.Tab>
++				<Tabs.Tab value="tab2">Tab 2</Tabs.Tab>
++				<Tabs.Tab value="tab3">Tab 3</Tabs.Tab>
++			</Tabs.List>
++			<Tabs.Panel value="tab1">
++				<p>Selected tab: Tab 1</p>
++			</Tabs.Panel>
++			<Tabs.Panel value="tab2">
++				<p>Selected tab: Tab 2</p>
++			</Tabs.Panel>
++			<Tabs.Panel value="tab3">
++				<p>Selected tab: Tab 3</p>
++			</Tabs.Panel>
++		</Tabs.Root>
++	);
++};
++```
++
++### Using `Tabs` with links
++
++The semantics implemented by the `Tabs` component don't align well with the semantics needed by a list of links. Furthermore, end users usually expect every link to be tabbable, while `Tabs.List` is a [composite](https://w3c.github.io/aria/#composite) widget acting as a single tab stop.
++
++For these reasons, even if the `Tabs` component is fully extensible, we don't recommend using `Tabs` with links, and we don't currently provide any related Storybook example.
++
++We may provide a dedicated component for tabs-like links in the future based on the feedback received.
+diff --git a/packages/ui/src/tabs/stories/index.story.tsx b/packages/ui/src/tabs/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..e588d6dd22e732
+--- /dev/null
++++ b/packages/ui/src/tabs/stories/index.story.tsx
+@@ -0,0 +1,363 @@
++import type { Meta, StoryObj } from '@storybook/react-vite';
++import { useState, cloneElement } from '@wordpress/element';
++import { link, more, wordpress } from '@wordpress/icons';
++import { Tabs, Tooltip } from '../..';
++
++const meta: Meta< typeof Tabs.Root > = {
++	title: 'Design System/Components/Tabs',
++	component: Tabs.Root,
++	subcomponents: {
++		'Tabs.List': Tabs.List,
++		'Tabs.Tab': Tabs.Tab,
++		'Tabs.Panel': Tabs.Panel,
++	},
++};
++export default meta;
++
++const ThemedParagraph = ( { children }: { children: React.ReactNode } ) => {
++	return (
++		<p style={ { color: 'var( --wpds-color-fg-content-neutral )' } }>
++			{ children }
++		</p>
++	);
++};
++
++export const Default: StoryObj< typeof Tabs.Root > = {
++	args: {
++		defaultValue: 'tab1',
++		children: (
++			<>
++				<Tabs.List>
++					<Tabs.Tab value="tab1">Tab 1</Tabs.Tab>
++					<Tabs.Tab value="tab2">Tab 2</Tabs.Tab>
++					<Tabs.Tab value="tab3">Tab 3</Tabs.Tab>
++				</Tabs.List>
++				<Tabs.Panel value="tab1">
++					<ThemedParagraph>Selected tab: Tab 1</ThemedParagraph>
++				</Tabs.Panel>
++				<Tabs.Panel value="tab2">
++					<ThemedParagraph>Selected tab: Tab 2</ThemedParagraph>
++				</Tabs.Panel>
++				<Tabs.Panel value="tab3">
++					<ThemedParagraph>Selected tab: Tab 3</ThemedParagraph>
++				</Tabs.Panel>
++			</>
++		),
++	},
++};
++
++export const Minimal: StoryObj< typeof Tabs.Root > = {
++	args: {
++		...Default.args,
++		children: (
++			<>
++				<Tabs.List variant="minimal">
++					<Tabs.Tab value="tab1">Tab 1</Tabs.Tab>
++					<Tabs.Tab value="tab2">Tab 2</Tabs.Tab>
++					<Tabs.Tab value="tab3">Tab 3</Tabs.Tab>
++				</Tabs.List>
++				<Tabs.Panel value="tab1">
++					<ThemedParagraph>Selected tab: Tab 1</ThemedParagraph>
++				</Tabs.Panel>
++				<Tabs.Panel value="tab2">
++					<ThemedParagraph>Selected tab: Tab 2</ThemedParagraph>
++				</Tabs.Panel>
++				<Tabs.Panel value="tab3">
++					<ThemedParagraph>Selected tab: Tab 3</ThemedParagraph>
++				</Tabs.Panel>
++			</>
++		),
++	},
++};
++
++export const SizeAndOverflowPlayground: StoryObj< typeof Tabs.Root > = {
++	render: function SizeAndOverflowPlayground( props ) {
++		const [ fullWidth, setFullWidth ] = useState( false );
++		return (
++			<div>
++				<div
++					style={ {
++						maxWidth: '40rem',
++						marginBottom: '1rem',
++						color: 'var( --wpds-color-fg-content-neutral )',
++					} }
++				>
++					<p>
++						This story helps understand how the TabList component
++						behaves under different conditions. The container below
++						(with the dotted red border) can be horizontally
++						resized, and it has a bit of padding to be out of the
++						way of the TabList.
++					</p>
++					<p>
++						The button will toggle between full width (adding{ ' ' }
++						<code>width: 100%</code>) and the default width.
++					</p>
++					<p>Try the following:</p>
++					<ul>
++						<li>
++							<strong>Small container</strong> that causes tabs to
++							overflow with scroll.
++						</li>
++						<li>
++							<strong>Large container</strong> that exceeds the
++							normal width of the tabs.
++							<ul>
++								<li>
++									<strong>
++										With <code>width: 100%</code>
++									</strong>{ ' ' }
++									set on the TabList (tabs fill up the space).
++								</li>
++								<li>
++									<strong>
++										Without <code>width: 100%</code>
++									</strong>{ ' ' }
++									(defaults to <code>auto</code>) set on the
++									TabList (tabs take up space proportional to
++									their content).
++								</li>
++							</ul>
++						</li>
++					</ul>
++				</div>
++				<button
++					style={ { marginBottom: '1rem' } }
++					onClick={ () => setFullWidth( ! fullWidth ) }
++				>
++					{ fullWidth
++						? 'Remove width: 100% from TabList'
++						: 'Set width: 100% in TabList' }
++				</button>
++				<Tabs.Root
++					{ ...props }
++					style={ {
++						...props.style,
++						width: '20rem',
++						border: '2px dotted red',
++						padding: '1rem',
++						resize: 'horizontal',
++						overflow: 'auto',
++					} }
++				>
++					<Tabs.List
++						style={ {
++							maxWidth: '100%',
++							width: fullWidth ? '100%' : undefined,
++						} }
++					>
++						<Tabs.Tab value="tab1">
++							Label with multiple words
++						</Tabs.Tab>
++						<Tabs.Tab value="tab2">Short</Tabs.Tab>
++						<Tabs.Tab value="tab3">
++							Hippopotomonstrosesquippedaliophobia
++						</Tabs.Tab>
++						<Tabs.Tab value="tab4">Tab 4</Tabs.Tab>
++						<Tabs.Tab value="tab5">Tab 5</Tabs.Tab>
++					</Tabs.List>
++
++					<Tabs.Panel value="tab1">
++						<ThemedParagraph>Selected tab: Tab 1</ThemedParagraph>
++						<ThemedParagraph>
++							(Label with multiple words)
++						</ThemedParagraph>
++					</Tabs.Panel>
++					<Tabs.Panel value="tab2">
++						<ThemedParagraph>Selected tab: Tab 2</ThemedParagraph>
++						<ThemedParagraph>(Short)</ThemedParagraph>
++					</Tabs.Panel>
++					<Tabs.Panel value="tab3">
++						<ThemedParagraph>Selected tab: Tab 3</ThemedParagraph>
++						<ThemedParagraph>
++							(Hippopotomonstrosesquippedaliophobia)
++						</ThemedParagraph>
++					</Tabs.Panel>
++					<Tabs.Panel value="tab4">
++						<ThemedParagraph>Selected tab: Tab 4</ThemedParagraph>
++					</Tabs.Panel>
++					<Tabs.Panel value="tab5">
++						<ThemedParagraph>Selected tab: Tab 5</ThemedParagraph>
++					</Tabs.Panel>
++				</Tabs.Root>
++			</div>
++		);
++	},
++	args: {
++		...Default.args,
++		defaultValue: 'tab4',
++	},
++};
++
++export const Vertical: StoryObj< typeof Tabs.Root > = {
++	args: {
++		...Default.args,
++		orientation: 'vertical',
++		style: {
++			minWidth: '320px',
++			display: 'grid',
++			gridTemplateColumns: '120px 1fr',
++			gap: '24px',
++		},
++	},
++};
++
++export const WithDisabledTab: StoryObj< typeof Tabs.Root > = {
++	args: {
++		...Default.args,
++		defaultValue: 'tab3',
++		children: (
++			<>
++				<Tabs.List>
++					<Tabs.Tab value="tab1" disabled>
++						Tab 1
++					</Tabs.Tab>
++					<Tabs.Tab value="tab2">Tab 2</Tabs.Tab>
++					<Tabs.Tab value="tab3">Tab 3</Tabs.Tab>
++				</Tabs.List>
++				<Tabs.Panel value="tab1">
++					<ThemedParagraph>Selected tab: Tab 1</ThemedParagraph>
++				</Tabs.Panel>
++				<Tabs.Panel value="tab2">
++					<ThemedParagraph>Selected tab: Tab 2</ThemedParagraph>
++				</Tabs.Panel>
++				<Tabs.Panel value="tab3">
++					<ThemedParagraph>Selected tab: Tab 3</ThemedParagraph>
++				</Tabs.Panel>
++			</>
++		),
++	},
++};
++
++const LinkIcon = ( props: React.SVGProps< SVGSVGElement > ) => {
++	return cloneElement( link, props );
++};
++
++const MoreIcon = ( props: React.SVGProps< SVGSVGElement > ) => {
++	return cloneElement( more, props );
++};
++
++const WordpressIcon = ( props: React.SVGProps< SVGSVGElement > ) => {
++	return cloneElement( wordpress, props );
++};
++
++const tabWithIconsData = [
++	{
++		value: 'tab1',
++		label: 'Tab one',
++		icon: WordpressIcon,
++	},
++	{
++		value: 'tab2',
++		label: 'Tab two',
++		icon: LinkIcon,
++	},
++	{
++		value: 'tab3',
++		label: 'Tab three',
++		icon: MoreIcon,
++	},
++];
++
++export const WithTabIconsAndTooltips: StoryObj< typeof Tabs.Root > = {
++	args: {
++		...Default.args,
++		children: (
++			<>
++				<Tabs.List>
++					{ tabWithIconsData.map(
++						( { value, label, icon: Icon } ) => (
++							<Tooltip.Root key={ value }>
++								<Tooltip.Trigger
++									aria-label={ label }
++									render={ <Tabs.Tab value={ value } /> }
++								>
++									{ /* TODO: potentially refactor with new Icon component */ }
++									<Icon
++										style={ {
++											width: '20px',
++											height: '20px',
++										} }
++									/>
++								</Tooltip.Trigger>
++								<Tooltip.Popup align="center" side="top">
++									{ label }
++								</Tooltip.Popup>
++							</Tooltip.Root>
++						)
++					) }
++				</Tabs.List>
++				{ tabWithIconsData.map( ( { value, label } ) => (
++					<Tabs.Panel value={ value } key={ value }>
++						<ThemedParagraph>
++							Selected tab: { label }
++						</ThemedParagraph>
++					</Tabs.Panel>
++				) ) }
++			</>
++		),
++	},
++};
++
++export const WithPanelsAlwaysMounted: StoryObj< typeof Tabs.Root > = {
++	args: {
++		...Default.args,
++		children: (
++			<>
++				<Tabs.List>
++					<Tabs.Tab value="tab1">Tab 1</Tabs.Tab>
++					<Tabs.Tab value="tab2">Tab 2</Tabs.Tab>
++					<Tabs.Tab value="tab3">Tab 3</Tabs.Tab>
++				</Tabs.List>
++				<Tabs.Panel value="tab1" keepMounted>
++					<ThemedParagraph>Selected tab: Tab 1</ThemedParagraph>
++				</Tabs.Panel>
++				<Tabs.Panel value="tab2" keepMounted>
++					<ThemedParagraph>Selected tab: Tab 2</ThemedParagraph>
++				</Tabs.Panel>
++				<Tabs.Panel value="tab3" keepMounted>
++					<ThemedParagraph>Selected tab: Tab 3</ThemedParagraph>
++				</Tabs.Panel>
++			</>
++		),
++	},
++};
++
++export const WithNonFocusablePanels: StoryObj< typeof Tabs.Root > = {
++	args: {
++		...Default.args,
++		children: (
++			<>
++				<Tabs.List>
++					<Tabs.Tab value="tab1">Tab 1</Tabs.Tab>
++					<Tabs.Tab value="tab2">Tab 2</Tabs.Tab>
++					<Tabs.Tab value="tab3">Tab 3</Tabs.Tab>
++				</Tabs.List>
++				<Tabs.Panel value="tab1" tabIndex={ -1 }>
++					<ThemedParagraph>Selected tab: Tab 1</ThemedParagraph>
++					<ThemedParagraph>
++						This tabpanel is not focusable, therefore tabbing into
++						it will focus its first tabbable child.
++					</ThemedParagraph>
++					<button>Focus me</button>
++				</Tabs.Panel>
++				<Tabs.Panel value="tab2" tabIndex={ -1 }>
++					<ThemedParagraph>Selected tab: Tab 2</ThemedParagraph>
++					<ThemedParagraph>
++						This tabpanel is not focusable, therefore tabbing into
++						it will focus its first tabbable child.
++					</ThemedParagraph>
++					<button>Focus me</button>
++				</Tabs.Panel>
++				<Tabs.Panel value="tab3" tabIndex={ -1 }>
++					<ThemedParagraph>Selected tab: Tab 3</ThemedParagraph>
++					<ThemedParagraph>
++						This tabpanel is not focusable, therefore tabbing into
++						it will focus its first tabbable child.
++					</ThemedParagraph>
++					<button>Focus me</button>
++				</Tabs.Panel>
++			</>
++		),
++	},
++};
+diff --git a/packages/ui/src/tabs/style.module.css b/packages/ui/src/tabs/style.module.css
+new file mode 100644
+index 00000000000000..08c85cdc523e82
+--- /dev/null
++++ b/packages/ui/src/tabs/style.module.css
+@@ -0,0 +1,270 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-components {
++	.tablist {
++		display: flex;
++		align-items: stretch;
++		overflow-inline: auto;
++		overscroll-behavior-inline: none;
++
++		--direction-factor: 1;
++		--direction-start: left;
++		--direction-end: right;
++
++		&:dir(rtl) {
++			--direction-factor: -1;
++			--direction-start: right;
++			--direction-end: left;
++		}
++
++		position: relative;
++
++		&[data-orientation="horizontal"] {
++			--fade-width: 4rem;
++			--fade-gradient-base: transparent 0%, #000 var(--fade-width);
++			--fade-gradient-composed: var(--fade-gradient-base), #000 60%, transparent 50%;
++
++			width: fit-content;
++
++			&.is-overflowing-first {
++				mask-image: linear-gradient(to var(--direction-end), var(--fade-gradient-base));
++			}
++
++			&.is-overflowing-last {
++				mask-image: linear-gradient(to var(--direction-start), var(--fade-gradient-base));
++			}
++
++			&.is-overflowing-first.is-overflowing-last {
++				mask-image:
++					linear-gradient(to right, var(--fade-gradient-composed)),
++					linear-gradient(to left, var(--fade-gradient-composed));
++			}
++
++			&.is-minimal-variant {
++				gap: 1rem;
++			}
++		}
++
++		&[data-orientation="vertical"] {
++			flex-direction: column;
++		}
++	}
++
++	.indicator {
++		@media not ( prefers-reduced-motion ) {
++			transition-property:
++				translate,
++				width,
++				height,
++				border-radius,
++				border-block;
++			transition-duration: 0.2s;
++			transition-timing-function: ease-out;
++		}
++
++		position: absolute;
++		pointer-events: none;
++
++		/* Windows high contrast mode. */
++		outline: 2px solid transparent;
++		outline-offset: -1px;
++
++		&[data-orientation="horizontal"] {
++			z-index: 1;
++			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical properties are necessary for the indicator to work as expected. */
++			left: 0;
++			bottom: 0;
++			height: var(--wpds-border-width-focus);
++
++			width: var(--active-tab-width);
++			translate: var(--active-tab-left) 0;
++			background-color: var(--wpds-color-stroke-interactive-neutral-strong);
++		}
++
++		&[data-orientation="vertical"] {
++			z-index: 0;
++			border-radius: var(--wpds-border-radius-sm);
++			top: 0;
++			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical properties are necessary for the indicator to work as expected. */
++			left: 50%;
++			width: 100%;
++			height: var(--active-tab-height);
++			translate: -50% var(--active-tab-top);
++			background-color: var(--wpds-color-bg-interactive-neutral-weak-active);
++		}
++
++		.tablist[data-select-on-move="true"]:has(:focus-visible)
++		&[data-orientation="vertical"] {
++			box-sizing: border-box;
++			border:
++				var(--wpds-border-width-focus) solid
++				var(--wpds-color-stroke-focus-brand);
++		}
++	}
++
++	.tab {
++		/* Resets */
++		border-radius: 0;
++		background: transparent;
++		border: none;
++		box-shadow: none;
++		outline: none; /* Focus ring applied to the ::after pseudo-element */
++		padding: 0;
++
++		/* Positioning */
++		z-index: 1;
++		flex: 1 0 auto;
++		position: relative;
++		display: flex;
++		align-items: center;
++
++		/* Appearance */
++		cursor: pointer;
++
++		/* Typography (TODO: replace with theme tokens when available) */
++		font-family: sans-serif;
++		font-size: 13px;
++		white-space: nowrap;
++
++		/* Characters in some languages (e.g. Japanese) may have a native higher line-height. */
++
++		line-height: 1.2;
++		font-weight: 400;
++		color: var(--wpds-color-fg-interactive-neutral);
++
++		&[data-disabled] {
++			cursor: default;
++			color: var(--wpds-color-fg-interactive-neutral-disabled);
++
++			@media ( forced-colors: active ) {
++				color: GrayText;
++			}
++		}
++
++		&:not([data-disabled]):is(:hover, :focus-visible) {
++			color: var(--wpds-color-fg-interactive-neutral-active);
++		}
++
++		/* Focus indicator. */
++		&::after {
++			position: absolute;
++			z-index: -1;
++			pointer-events: none;
++
++			/* Outline works for Windows high contrast mode as well. */
++			outline:
++				var(--wpds-border-width-focus) solid
++				var(--wpds-color-stroke-focus-brand);
++			border-radius: var(--wpds-border-radius-sm);
++
++			/* Animation */
++			opacity: 0;
++
++			@media not ( prefers-reduced-motion ) {
++				transition: opacity 0.1s linear;
++			}
++		}
++
++		&:focus-visible::after {
++			opacity: 1;
++		}
++
++		[data-orientation="horizontal"] & {
++			padding-inline: calc(4 * var(--wpds-dimension-base)); /* TODO: Use or create new control/interactive padding token */
++			height: calc(12 * var(--wpds-dimension-base)); /* TODO: Can we eliminate or hard-code? */
++			scroll-margin: 24px;
++
++			&::after {
++				content: "";
++				inset: calc(3 * var(--wpds-dimension-base)); /* TODO: Use or create new control/interactive padding token */
++			}
++		}
++
++		.is-minimal-variant[data-orientation="horizontal"] & {
++			padding-inline: 0;
++
++			&::after {
++				/*
++				 * Add enough inset to prevent the focus ring (which is 1.5px thick)
++				 * from being visually clipped by the tablist.
++				 */
++				inset-inline: 2px;
++			}
++		}
++
++		[data-orientation="vertical"] & {
++			padding:
++				calc(2 * var(--wpds-dimension-base))
++				calc(3 * var(--wpds-dimension-base)); /* TODO: Use or create new control/interactive padding token */
++			min-height: calc(10 * var(--wpds-dimension-base)); /* TODO: Can we eliminate or hard-code? */
++		}
++
++		[data-orientation="vertical"][data-select-on-move="false"] &::after {
++			content: "";
++			inset: var(--wpds-border-width-focus); /* TODO: Use or create new control/interactive padding token */
++		}
++	}
++
++	.tab-children {
++		flex-grow: 1;
++
++		display: flex;
++		align-items: center;
++
++		[data-orientation="horizontal"] & {
++			justify-content: center;
++		}
++
++		[data-orientation="vertical"] & {
++			justify-content: start;
++		}
++	}
++
++	.tab-chevron {
++		flex-shrink: 0;
++		margin-inline-end: calc(var(--wpds-dimension-base) * -1); /* TODO: Use or create new control/interactive padding token */
++
++		[data-orientation="horizontal"] & {
++			display: none;
++		}
++		opacity: 0;
++
++		[role="tab"]:is([aria-selected="true"], :focus-visible, :hover) & {
++			opacity: 1;
++		}
++
++		/*
++		 * The chevron is transitioned into existence when selectOnMove is enabled,
++		 * because otherwise it looks jarring, as it shows up outside of the focus
++		 * indicator that's being animated at the same time.
++		 */
++		@media not ( prefers-reduced-motion ) {
++			[data-select-on-move="true"]
++			[role="tab"]:is([aria-selected="true"])
++			& {
++				transition: opacity 0.15s 0.15s linear;
++			}
++		}
++
++		&:dir(rtl) {
++			rotate: 180deg;
++		}
++	}
++
++	.tabpanel {
++		&:focus {
++			box-shadow: none;
++			outline: none;
++		}
++
++		&:focus-visible {
++			box-shadow:
++				0 0 0 var(--wpds-border-width-focus)
++				var(--wpds-color-stroke-focus-brand);
++
++			/* Windows high contrast mode. */
++			outline: 2px solid transparent;
++			outline-offset: 0;
++		}
++	}
++}
+diff --git a/packages/ui/src/tabs/tab.tsx b/packages/ui/src/tabs/tab.tsx
+new file mode 100644
+index 00000000000000..949d893536c29f
+--- /dev/null
++++ b/packages/ui/src/tabs/tab.tsx
+@@ -0,0 +1,29 @@
++import { forwardRef } from '@wordpress/element';
++import clsx from 'clsx';
++import { Tabs as _Tabs } from '@base-ui/react/tabs';
++import { chevronRight } from '@wordpress/icons';
++import { Icon } from '../icon';
++import styles from './style.module.css';
++import type { TabProps } from './types';
++
++/**
++ * An individual interactive tab button that toggles the corresponding panel.
++ *
++ * `Tabs` is a collection of React components that combine to render
++ * an [ARIA-compliant tabs pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/).
++ */
++export const Tab = forwardRef< HTMLButtonElement, TabProps >( function Tab(
++	{ className, children, ...otherProps },
++	forwardedRef
++) {
++	return (
++		<_Tabs.Tab
++			ref={ forwardedRef }
++			className={ clsx( styles.tab, className ) }
++			{ ...otherProps }
++		>
++			<span className={ styles[ 'tab-children' ] }>{ children }</span>
++			<Icon icon={ chevronRight } className={ styles[ 'tab-chevron' ] } />
++		</_Tabs.Tab>
++	);
++} );
+diff --git a/packages/ui/src/tabs/test/index.test.tsx b/packages/ui/src/tabs/test/index.test.tsx
+new file mode 100644
+index 00000000000000..88c4bda488eebc
+--- /dev/null
++++ b/packages/ui/src/tabs/test/index.test.tsx
+@@ -0,0 +1,2260 @@
++/* eslint-disable jest/no-conditional-expect */
++import { render, screen, waitFor } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { DirectionProvider } from '@base-ui/react/direction-provider';
++import { useEffect, useState, createRef } from '@wordpress/element';
++import { Tabs } from '../..';
++import type { TabRootProps } from '../types';
++
++type Tab = {
++	value: string;
++	title: string;
++	content: React.ReactNode;
++	tab: {
++		className?: string;
++		disabled?: boolean;
++	};
++	tabpanel?: {
++		tabIndex?: number;
++	};
++};
++
++const TABS: Tab[] = [
++	{
++		value: 'alpha',
++		title: 'Alpha',
++		content: 'Selected tab: Alpha',
++		tab: { className: 'alpha-class' },
++	},
++	{
++		value: 'beta',
++		title: 'Beta',
++		content: 'Selected tab: Beta',
++		tab: { className: 'beta-class' },
++	},
++	{
++		value: 'gamma',
++		title: 'Gamma',
++		content: 'Selected tab: Gamma',
++		tab: { className: 'gamma-class' },
++	},
++];
++
++const TABS_WITH_ALPHA_DISABLED = TABS.map( ( tabObj ) =>
++	tabObj.value === 'alpha'
++		? {
++				...tabObj,
++				tab: {
++					...tabObj.tab,
++					disabled: true,
++				},
++		  }
++		: tabObj
++);
++
++const TABS_WITH_BETA_DISABLED = TABS.map( ( tabObj ) =>
++	tabObj.value === 'beta'
++		? {
++				...tabObj,
++				tab: {
++					...tabObj.tab,
++					disabled: true,
++				},
++		  }
++		: tabObj
++);
++
++const TABS_WITH_DELTA: Tab[] = [
++	...TABS,
++	{
++		value: 'delta',
++		title: 'Delta',
++		content: 'Selected tab: Delta',
++		tab: { className: 'delta-class' },
++	},
++];
++
++const UncontrolledTabs = ( {
++	tabs,
++	selectOnMove,
++	...props
++}: Omit< TabRootProps, 'children' | 'tabs' > & {
++	tabs: Tab[];
++	selectOnMove?: boolean;
++} ) => {
++	return (
++		<Tabs.Root { ...props }>
++			<Tabs.List activateOnFocus={ selectOnMove }>
++				{ tabs.map( ( tabObj, index ) => (
++					<Tabs.Tab
++						key={ `${ tabObj.title }-${ index }` }
++						value={ tabObj.value }
++						className={ tabObj.tab.className }
++						disabled={ tabObj.tab.disabled }
++					>
++						{ tabObj.title }
++					</Tabs.Tab>
++				) ) }
++			</Tabs.List>
++			{ tabs.map( ( tabObj, index ) => (
++				<Tabs.Panel
++					key={ `${ tabObj.title }-${ index }` }
++					value={ tabObj.value }
++					// Only apply tabIndex if defined, otherwise fallback
++					// to default internal implementation
++					{ ...( tabObj.tabpanel?.tabIndex !== undefined && {
++						tabIndex: tabObj.tabpanel.tabIndex,
++					} ) }
++				>
++					{ tabObj.content }
++				</Tabs.Panel>
++			) ) }
++		</Tabs.Root>
++	);
++};
++
++const ControlledTabs = ( {
++	tabs,
++	selectOnMove,
++	...props
++}: Omit< TabRootProps, 'children' | 'tabs' > & {
++	tabs: Tab[];
++	selectOnMove?: boolean;
++} ) => {
++	const [ value, setValue ] = useState( props.value ?? null );
++
++	useEffect( () => {
++		setValue( props.value ?? null );
++	}, [ props.value ] );
++
++	return (
++		<Tabs.Root
++			{ ...props }
++			value={ value }
++			onValueChange={ ( selectedId, event ) => {
++				setValue( selectedId );
++				props.onValueChange?.( selectedId, event );
++			} }
++		>
++			<Tabs.List activateOnFocus={ selectOnMove }>
++				{ tabs.map( ( tabObj, index ) => (
++					<Tabs.Tab
++						key={ `${ tabObj.title }-${ index }` }
++						value={ tabObj.value }
++						className={ tabObj.tab.className }
++						disabled={ tabObj.tab.disabled }
++					>
++						{ tabObj.title }
++					</Tabs.Tab>
++				) ) }
++			</Tabs.List>
++			{ tabs.map( ( tabObj, index ) => (
++				<Tabs.Panel
++					key={ `${ tabObj.title }-${ index }` }
++					value={ tabObj.value }
++					// Only apply tabIndex if defined, otherwise fallback
++					// to default internal implementation
++					{ ...( tabObj.tabpanel?.tabIndex !== undefined && {
++						tabIndex: tabObj.tabpanel.tabIndex,
++					} ) }
++				>
++					{ tabObj.content }
++				</Tabs.Panel>
++			) ) }
++		</Tabs.Root>
++	);
++};
++
++async function waitForComponentToBeInitializedWithSelectedTab(
++	selectedTabName: string | undefined
++) {
++	if ( ! selectedTabName ) {
++		// No initially selected tabs or tabpanels.
++		await waitFor( () =>
++			expect(
++				screen.queryByRole( 'tab', { selected: true } )
++			).not.toBeInTheDocument()
++		);
++		await waitFor( () =>
++			expect( screen.queryByRole( 'tabpanel' ) ).not.toBeInTheDocument()
++		);
++	} else {
++		// Waiting for a tab to be selected is a sign that the component
++		// has fully initialized.
++		expect(
++			await screen.findByRole( 'tab', {
++				selected: true,
++				name: selectedTabName,
++			} )
++		).toBeVisible();
++		// The corresponding tabpanel is also shown.
++		expect(
++			screen.getByRole( 'tabpanel', {
++				name: selectedTabName,
++			} )
++		).toBeVisible();
++	}
++}
++
++describe( 'Tabs', () => {
++	describe( 'Adherence to spec and basic behavior', () => {
++		it( 'should apply the correct roles, semantics and attributes', async () => {
++			render(
++				<Tabs.Root>
++					<Tabs.List>
++						<Tabs.Tab value="one">One</Tabs.Tab>
++						<Tabs.Tab value="two">Two</Tabs.Tab>
++						<Tabs.Tab value="three">Three</Tabs.Tab>
++					</Tabs.List>
++					<Tabs.Panel value="one">First panel</Tabs.Panel>
++					<Tabs.Panel value="two">Second panel</Tabs.Panel>
++					<Tabs.Panel value="three">Third panel</Tabs.Panel>
++				</Tabs.Root>
++			);
++
++			await waitForComponentToBeInitializedWithSelectedTab( 'One' );
++
++			const tabList = screen.getByRole( 'tablist' );
++			const allTabs = screen.getAllByRole( 'tab' );
++			const allTabpanels = screen.getAllByRole( 'tabpanel' );
++
++			expect( tabList ).toBeVisible();
++			// Since 'horizontal' is the default orientation, no need to set it.
++			expect( tabList ).not.toHaveAttribute( 'aria-orientation' );
++
++			expect( allTabs ).toHaveLength( TABS.length );
++
++			// Only 1 tab panel is accessible — the one associated with the
++			// selected tab. The selected `tab` aria-controls the active
++			// `tabpanel`, which is `aria-labelledby` the selected `tab`.
++			expect( allTabpanels ).toHaveLength( 1 );
++
++			expect( allTabpanels[ 0 ] ).toBeVisible();
++
++			expect( allTabs[ 0 ] ).toHaveAttribute(
++				'aria-controls',
++				allTabpanels[ 0 ].getAttribute( 'id' )
++			);
++			expect( allTabpanels[ 0 ] ).toHaveAttribute(
++				'aria-labelledby',
++				allTabs[ 0 ].getAttribute( 'id' )
++			);
++		} );
++
++		it( 'should associate each `tab` with the correct `tabpanel`, even if they are not rendered in the same order', async () => {
++			const TABS_WITH_DELTA_REVERSED = [ ...TABS_WITH_DELTA ].reverse();
++
++			const user = userEvent.setup();
++
++			render(
++				<Tabs.Root defaultValue="alpha">
++					<Tabs.List>
++						{ TABS_WITH_DELTA.map( ( tabObj, index ) => (
++							<Tabs.Tab
++								key={ `${ tabObj.title }-${ index }` }
++								value={ tabObj.value }
++								className={ tabObj.tab.className }
++								disabled={ tabObj.tab.disabled }
++							>
++								{ tabObj.title }
++							</Tabs.Tab>
++						) ) }
++					</Tabs.List>
++					{ TABS_WITH_DELTA_REVERSED.map( ( tabObj, index ) => (
++						<Tabs.Panel
++							key={ `${ tabObj.title }-${ index }` }
++							value={ tabObj.value }
++							// Only apply tabIndex if defined, otherwise fallback
++							// to default internal implementation
++							{ ...( tabObj.tabpanel?.tabIndex !== undefined && {
++								tabIndex: tabObj.tabpanel.tabIndex,
++							} ) }
++						>
++							{ tabObj.content }
++						</Tabs.Panel>
++					) ) }
++				</Tabs.Root>
++			);
++
++			await waitForComponentToBeInitializedWithSelectedTab( 'Alpha' );
++
++			// Select Beta, make sure the correct tabpanel is rendered
++			await user.click( screen.getByRole( 'tab', { name: 'Beta' } ) );
++			expect(
++				screen.getByRole( 'tab', {
++					selected: true,
++					name: 'Beta',
++				} )
++			).toBeVisible();
++			expect(
++				screen.getByRole( 'tabpanel', {
++					name: 'Beta',
++				} )
++			).toBeVisible();
++
++			// Select Gamma, make sure the correct tabpanel is rendered
++			await user.click( screen.getByRole( 'tab', { name: 'Gamma' } ) );
++			expect(
++				screen.getByRole( 'tab', {
++					selected: true,
++					name: 'Gamma',
++				} )
++			).toBeVisible();
++			expect(
++				screen.getByRole( 'tabpanel', {
++					name: 'Gamma',
++				} )
++			).toBeVisible();
++
++			// Select Delta, make sure the correct tabpanel is rendered
++			await user.click( screen.getByRole( 'tab', { name: 'Delta' } ) );
++			expect(
++				screen.getByRole( 'tab', {
++					selected: true,
++					name: 'Delta',
++				} )
++			).toBeVisible();
++			expect(
++				screen.getByRole( 'tabpanel', {
++					name: 'Delta',
++				} )
++			).toBeVisible();
++		} );
++
++		it( "should apply the tab's `className` to the tab button", async () => {
++			render( <UncontrolledTabs tabs={ TABS } /> );
++
++			// Alpha is automatically selected as the selected tab.
++			await waitForComponentToBeInitializedWithSelectedTab( 'Alpha' );
++
++			expect(
++				await screen.findByRole( 'tab', { name: 'Alpha' } )
++			).toHaveClass( 'alpha-class' );
++			expect( screen.getByRole( 'tab', { name: 'Beta' } ) ).toHaveClass(
++				'beta-class'
++			);
++			expect( screen.getByRole( 'tab', { name: 'Gamma' } ) ).toHaveClass(
++				'gamma-class'
++			);
++		} );
++
++		it( 'should forward refs', () => {
++			const rootRef = createRef< HTMLDivElement >();
++			const listRef = createRef< HTMLDivElement >();
++			const tabRef = createRef< HTMLButtonElement >();
++			const panelRef = createRef< HTMLDivElement >();
++
++			render(
++				<Tabs.Root ref={ rootRef } defaultValue="tab1">
++					<Tabs.List ref={ listRef }>
++						<Tabs.Tab ref={ tabRef } value="tab1">
++							Tab 1
++						</Tabs.Tab>
++						<Tabs.Tab value="tab2">Tab 2</Tabs.Tab>
++					</Tabs.List>
++					<Tabs.Panel ref={ panelRef } value="tab1">
++						Panel 1 content
++					</Tabs.Panel>
++					<Tabs.Panel value="tab2">Panel 2 content</Tabs.Panel>
++				</Tabs.Root>
++			);
++
++			expect( rootRef.current ).toBeInstanceOf( HTMLDivElement );
++			expect( listRef.current ).toBeInstanceOf( HTMLDivElement );
++			expect( tabRef.current ).toBeInstanceOf( HTMLButtonElement );
++			expect( panelRef.current ).toBeInstanceOf( HTMLDivElement );
++		} );
++	} );
++
++	describe( 'pointer interactions', () => {
++		it( 'should select a tab when clicked', async () => {
++			const mockOnValueChange = jest.fn();
++
++			const user = userEvent.setup();
++
++			render(
++				<UncontrolledTabs
++					tabs={ TABS }
++					onValueChange={ mockOnValueChange }
++					defaultValue="alpha"
++				/>
++			);
++
++			await waitForComponentToBeInitializedWithSelectedTab( 'Alpha' );
++
++			// Click on Beta, make sure beta is the selected tab
++			await user.click( screen.getByRole( 'tab', { name: 'Beta' } ) );
++
++			expect(
++				screen.getByRole( 'tab', {
++					selected: true,
++					name: 'Beta',
++				} )
++			).toBeVisible();
++			expect(
++				screen.getByRole( 'tabpanel', {
++					name: 'Beta',
++				} )
++			).toBeVisible();
++
++			expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
++			expect( mockOnValueChange ).toHaveBeenLastCalledWith(
++				'beta',
++				expect.anything()
++			);
++
++			// Click on Alpha, make sure alpha is the selected tab
++			await user.click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
++
++			expect(
++				screen.getByRole( 'tab', {
++					selected: true,
++					name: 'Alpha',
++				} )
++			).toBeVisible();
++			expect(
++				screen.getByRole( 'tabpanel', {
++					name: 'Alpha',
++				} )
++			).toBeVisible();
++
++			expect( mockOnValueChange ).toHaveBeenCalledTimes( 2 );
++			expect( mockOnValueChange ).toHaveBeenLastCalledWith(
++				'alpha',
++				expect.anything()
++			);
++		} );
++
++		it( 'should not select a disabled tab when clicked', async () => {
++			const mockOnValueChange = jest.fn();
++
++			const user = userEvent.setup();
++
++			render(
++				<UncontrolledTabs
++					tabs={ TABS_WITH_BETA_DISABLED }
++					onValueChange={ mockOnValueChange }
++					defaultValue="alpha"
++				/>
++			);
++
++			// Alpha is automatically selected as the selected tab.
++			await waitForComponentToBeInitializedWithSelectedTab( 'Alpha' );
++
++			// Clicking on Beta does not result in beta being selected
++			// because the tab is disabled.
++			await user.click( screen.getByRole( 'tab', { name: 'Beta' } ) );
++
++			expect(
++				screen.getByRole( 'tab', {
++					selected: true,
++					name: 'Alpha',
++				} )
++			).toBeVisible();
++			expect(
++				screen.getByRole( 'tabpanel', {
++					name: 'Alpha',
++				} )
++			).toBeVisible();
++
++			expect( mockOnValueChange ).toHaveBeenCalledTimes( 0 );
++		} );
++	} );
++
++	describe( 'initial tab selection', () => {
++		describe( 'when a selected tab id is not specified', () => {
++			describe( 'when left `undefined` [Uncontrolled]', () => {
++				it( 'should choose the first tab as selected', async () => {
++					const user = userEvent.setup();
++
++					render( <UncontrolledTabs tabs={ TABS } /> );
++
++					// Alpha is automatically selected as the selected tab.
++					await waitForComponentToBeInitializedWithSelectedTab(
++						'Alpha'
++					);
++
++					// Press tab. The selected tab (alpha) received focus.
++					await user.keyboard( '{Tab}' );
++					expect(
++						await screen.findByRole( 'tab', {
++							selected: true,
++							name: 'Alpha',
++						} )
++					).toHaveFocus();
++
++					// TODO: check that `onValueChange` fired
++					// once https://github.com/mui/base-ui/issues/2097 is fixed
++				} );
++
++				it( 'should choose the first non-disabled tab if the first tab is disabled', async () => {
++					const user = userEvent.setup();
++
++					render(
++						<UncontrolledTabs tabs={ TABS_WITH_ALPHA_DISABLED } />
++					);
++
++					// Beta is automatically selected as the selected tab, since alpha is
++					// disabled.
++					await waitForComponentToBeInitializedWithSelectedTab(
++						'Beta'
++					);
++
++					// Press tab. The selected tab (beta) received focus. The corresponding
++					// tabpanel is shown.
++					await user.keyboard( '{Tab}' );
++					expect(
++						await screen.findByRole( 'tab', {
++							selected: true,
++							name: 'Beta',
++						} )
++					).toHaveFocus();
++
++					// TODO: check that `onValueChange` fired
++					// once https://github.com/mui/base-ui/issues/2097 is fixed
++				} );
++			} );
++			describe( 'when `null` [Controlled]', () => {
++				it( 'should not have a selected tab nor show any tabpanels, make the tablist tabbable and still allow selecting tabs', async () => {
++					const user = userEvent.setup();
++
++					render( <ControlledTabs tabs={ TABS } value={ null } /> );
++
++					// No initially selected tabs or tabpanels.
++					await waitForComponentToBeInitializedWithSelectedTab(
++						undefined
++					);
++
++					// Press tab to focus and select the first tab (alpha) and
++					// show the related tabpanel.
++					await user.keyboard( '{Tab}' );
++					await user.keyboard( '{Enter}' );
++					expect(
++						await screen.findByRole( 'tab', {
++							selected: true,
++							name: 'Alpha',
++						} )
++					).toHaveFocus();
++					expect(
++						await screen.findByRole( 'tabpanel', {
++							name: 'Alpha',
++						} )
++					).toBeVisible();
++				} );
++			} );
++		} );
++
++		describe( 'when a selected tab id is specified', () => {
++			describe( 'through the `defaultValue` prop [Uncontrolled]', () => {
++				it( 'should select the initial tab matching the `defaultValue` prop', async () => {
++					const user = userEvent.setup();
++
++					render(
++						<UncontrolledTabs tabs={ TABS } defaultValue="beta" />
++					);
++
++					// Beta is the initially selected tab
++					await waitForComponentToBeInitializedWithSelectedTab(
++						'Beta'
++					);
++
++					// Press tab. The selected tab (beta) received focus. The corresponding
++					// tabpanel is shown.
++					await user.keyboard( '{Tab}' );
++					expect(
++						await screen.findByRole( 'tab', {
++							selected: true,
++							name: 'Beta',
++						} )
++					).toHaveFocus();
++				} );
++
++				it( 'should select the initial tab matching the `defaultValue` prop even if the tab is disabled', async () => {
++					const user = userEvent.setup();
++					render(
++						<UncontrolledTabs
++							tabs={ TABS_WITH_BETA_DISABLED }
++							defaultValue="beta"
++						/>
++					);
++
++					// Beta is automatically selected as the selected tab despite being
++					// disabled, respecting the `defaultValue` prop.
++					await waitForComponentToBeInitializedWithSelectedTab(
++						'Beta'
++					);
++
++					// Press tab. The selected tab (beta) received focus, since it is
++					// accessible despite being disabled.
++					await user.keyboard( '{Tab}' );
++					expect(
++						await screen.findByRole( 'tab', {
++							selected: true,
++							name: 'Beta',
++						} )
++					).toHaveFocus();
++				} );
++
++				it( 'should select the first tab and allow tabbing to it when `defaultValue` prop does not match any known tab', async () => {
++					const user = userEvent.setup();
++
++					render(
++						<UncontrolledTabs
++							tabs={ TABS }
++							defaultValue="non-existing-tab"
++						/>
++					);
++
++					// No initially selected tabs or tabpanels, since the `defaultValue`
++					// prop is not matching any known tabs.
++					await waitForComponentToBeInitializedWithSelectedTab(
++						'Alpha'
++					);
++
++					// Press tab. The first tab receives focus, but it's
++					// not selected.
++					await user.keyboard( '{Tab}' );
++					expect(
++						screen.getByRole( 'tab', { name: 'Alpha' } )
++					).toHaveFocus();
++					await user.keyboard( '{Enter}' );
++					expect(
++						screen.queryByRole( 'tab', {
++							selected: true,
++							name: 'Alpha',
++						} )
++					).toBeVisible();
++					expect(
++						await screen.findByRole( 'tabpanel', {
++							name: 'Alpha',
++						} )
++					).toBeVisible();
++				} );
++
++				it( 'should select the first non-disabled tab and allow tabbing to it when `defaultValue` prop does not match any known tab', async () => {
++					const user = userEvent.setup();
++					render(
++						<UncontrolledTabs
++							tabs={ TABS_WITH_ALPHA_DISABLED }
++							defaultValue="non-existing-tab"
++						/>
++					);
++
++					// No initially selected tabs or tabpanels, since the `defaultValue`
++					// prop is not matching any known tabs.
++					await waitForComponentToBeInitializedWithSelectedTab(
++						'Beta'
++					);
++
++					// Press tab. The first non-disabled tab receives focus and is selected.
++					await user.keyboard( '{Tab}' );
++					expect(
++						await screen.findByRole( 'tab', {
++							selected: true,
++							name: 'Beta',
++						} )
++					).toHaveFocus();
++					expect(
++						await screen.findByRole( 'tabpanel', {
++							name: 'Beta',
++						} )
++					).toBeVisible();
++				} );
++
++				it( 'should ignore any changes to the `defaultValue` prop after the first render', async () => {
++					const mockOnValueChange = jest.fn();
++					const consoleErrorSpy = jest
++						.spyOn( console, 'error' )
++						.mockImplementation( () => {} );
++
++					const { rerender } = render(
++						<UncontrolledTabs
++							tabs={ TABS }
++							defaultValue="beta"
++							onValueChange={ mockOnValueChange }
++						/>
++					);
++
++					// Beta is the initially selected tab
++					await waitForComponentToBeInitializedWithSelectedTab(
++						'Beta'
++					);
++
++					// Changing the defaultValue prop to gamma should not have any effect.
++					rerender(
++						<UncontrolledTabs
++							tabs={ TABS }
++							defaultValue="gamma"
++							onValueChange={ mockOnValueChange }
++						/>
++					);
++
++					expect(
++						await screen.findByRole( 'tab', {
++							selected: true,
++							name: 'Beta',
++						} )
++					).toBeVisible();
++					expect(
++						screen.getByRole( 'tabpanel', {
++							name: 'Beta',
++						} )
++					).toBeVisible();
++
++					expect( mockOnValueChange ).not.toHaveBeenCalled();
++
++					expect( consoleErrorSpy ).toHaveBeenCalled();
++					expect( consoleErrorSpy ).toHaveBeenCalledWith(
++						expect.stringContaining(
++							'changing the default value state'
++						)
++					);
++
++					consoleErrorSpy.mockRestore();
++				} );
++			} );
++
++			describe( 'through the `value` prop [Controlled]', () => {
++				describe( 'when the `value` matches an existing tab', () => {
++					it( 'should choose the initial tab matching the `value`', async () => {
++						const user = userEvent.setup();
++
++						render( <ControlledTabs tabs={ TABS } value="beta" /> );
++
++						// Beta is the initially selected tab
++						await waitForComponentToBeInitializedWithSelectedTab(
++							'Beta'
++						);
++
++						// Press tab. The selected tab (beta) received focus, since it is
++						// accessible despite being disabled.
++						await user.keyboard( '{Tab}' );
++						expect(
++							await screen.findByRole( 'tab', {
++								selected: true,
++								name: 'Beta',
++							} )
++						).toHaveFocus();
++					} );
++
++					it( 'should choose the initial tab matching the `value` even if a `defaultValue` is passed', async () => {
++						const user = userEvent.setup();
++
++						render(
++							<ControlledTabs
++								tabs={ TABS }
++								defaultValue="beta"
++								value="gamma"
++							/>
++						);
++
++						// Gamma is the initially selected tab
++						await waitForComponentToBeInitializedWithSelectedTab(
++							'Gamma'
++						);
++
++						// Press tab. The selected tab (gamma) received focus.
++						await user.keyboard( '{Tab}' );
++						expect(
++							await screen.findByRole( 'tab', {
++								selected: true,
++								name: 'Gamma',
++							} )
++						).toHaveFocus();
++					} );
++
++					it( 'should choose the initial tab matching the `value` even if the tab is disabled', async () => {
++						const user = userEvent.setup();
++
++						render(
++							<ControlledTabs
++								tabs={ TABS_WITH_BETA_DISABLED }
++								value="beta"
++							/>
++						);
++
++						// Beta is the initially selected tab
++						await waitForComponentToBeInitializedWithSelectedTab(
++							'Beta'
++						);
++
++						// Press tab. The selected tab (beta) received focus, since it is
++						// accessible despite being disabled.
++						await user.keyboard( '{Tab}' );
++						expect(
++							await screen.findByRole( 'tab', {
++								selected: true,
++								name: 'Beta',
++							} )
++						).toHaveFocus();
++					} );
++				} );
++
++				describe( "when the `value` doesn't match an existing tab", () => {
++					it( 'should not have a selected tab nor show any tabpanels, but allow tabbing to the first tab', async () => {
++						const user = userEvent.setup();
++
++						render(
++							<ControlledTabs
++								tabs={ TABS }
++								value="non-existing-tab"
++							/>
++						);
++
++						// No initially selected tabs or tabpanels, since the `value`
++						// prop is not matching any known tabs.
++						await waitForComponentToBeInitializedWithSelectedTab(
++							undefined
++						);
++
++						// Press tab. The first tab receives focus and gets selected.
++						await user.keyboard( '{Tab}' );
++						await user.keyboard( '{Enter}' );
++						expect(
++							await screen.findByRole( 'tab', {
++								selected: true,
++								name: 'Alpha',
++							} )
++						).toHaveFocus();
++						expect(
++							await screen.findByRole( 'tabpanel', {
++								name: 'Alpha',
++							} )
++						).toBeVisible();
++					} );
++
++					it( 'should not have a selected tab nor show any tabpanels, but allow tabbing to the first tab even when disabled', async () => {
++						const user = userEvent.setup();
++
++						render(
++							<ControlledTabs
++								tabs={ TABS_WITH_ALPHA_DISABLED }
++								value="non-existing-tab"
++							/>
++						);
++
++						// No initially selected tabs or tabpanels, since the `value`
++						// prop is not matching any known tabs.
++						await waitForComponentToBeInitializedWithSelectedTab(
++							undefined
++						);
++
++						// Press tab. The first tab receives focus, but it's
++						// not selected since it's disabled.
++						await user.keyboard( '{Tab}' );
++						expect(
++							screen.getByRole( 'tab', { name: 'Alpha' } )
++						).toHaveFocus();
++						await waitFor( () =>
++							expect(
++								screen.queryByRole( 'tab', { selected: true } )
++							).not.toBeInTheDocument()
++						);
++						await waitFor( () =>
++							expect(
++								screen.queryByRole( 'tabpanel' )
++							).not.toBeInTheDocument()
++						);
++
++						// Press right arrow to select the next tab (beta) and
++						// show the related tabpanel.
++						await user.keyboard( '{ArrowRight}' );
++						await user.keyboard( '{Enter}' );
++						expect(
++							await screen.findByRole( 'tab', {
++								selected: true,
++								name: 'Beta',
++							} )
++						).toHaveFocus();
++						expect(
++							await screen.findByRole( 'tabpanel', {
++								name: 'Beta',
++							} )
++						).toBeVisible();
++					} );
++				} );
++			} );
++		} );
++	} );
++
++	describe( 'keyboard interactions', () => {
++		describe.each( [
++			[ 'Uncontrolled', UncontrolledTabs ],
++			[ 'Controlled', ControlledTabs ],
++		] )( '[`%s`]', ( _mode, Component ) => {
++			it( 'should handle the tablist as one tab stop', async () => {
++				const user = userEvent.setup();
++
++				const valueProps =
++					_mode === 'Uncontrolled'
++						? { defaultValue: 'alpha' }
++						: { value: 'alpha' };
++
++				render( <Component tabs={ TABS } { ...valueProps } /> );
++
++				// Alpha is automatically selected as the selected tab.
++				await waitForComponentToBeInitializedWithSelectedTab( 'Alpha' );
++
++				// Press tab. The selected tab (alpha) received focus.
++				await user.keyboard( '{Tab}' );
++				expect(
++					await screen.findByRole( 'tab', {
++						selected: true,
++						name: 'Alpha',
++					} )
++				).toHaveFocus();
++
++				// By default the tabpanel should receive focus
++				await user.keyboard( '{Tab}' );
++				expect(
++					await screen.findByRole( 'tabpanel', {
++						name: 'Alpha',
++					} )
++				).toHaveFocus();
++			} );
++
++			it( 'should not focus the tabpanel container when it is not tabbable', async () => {
++				const user = userEvent.setup();
++
++				const valueProps =
++					_mode === 'Uncontrolled'
++						? { defaultValue: 'alpha' }
++						: { value: 'alpha' };
++
++				render(
++					<Component
++						tabs={ TABS.map( ( tabObj ) =>
++							tabObj.value === 'alpha'
++								? {
++										...tabObj,
++										content: (
++											<>
++												Selected Tab: Alpha
++												<button>Alpha Button</button>
++											</>
++										),
++										tabpanel: { tabIndex: -1 },
++								  }
++								: tabObj
++						) }
++						{ ...valueProps }
++					/>
++				);
++
++				// Alpha is automatically selected as the selected tab.
++				await waitForComponentToBeInitializedWithSelectedTab( 'Alpha' );
++
++				// Tab should initially focus the first tab in the tablist, which
++				// is Alpha.
++				await user.keyboard( '{Tab}' );
++				expect(
++					await screen.findByRole( 'tab', {
++						selected: true,
++						name: 'Alpha',
++					} )
++				).toHaveFocus();
++
++				// In this case, the tabpanel container is skipped and focus is
++				// moved directly to its contents
++				await user.keyboard( '{Tab}' );
++				expect(
++					await screen.findByRole( 'button', {
++						name: 'Alpha Button',
++					} )
++				).toHaveFocus();
++			} );
++
++			it( 'should select tabs in the tablist when using the left and right arrow keys when automatic tab activation is enabled', async () => {
++				const mockOnValueChange = jest.fn();
++				const user = userEvent.setup();
++
++				const valueProps =
++					_mode === 'Uncontrolled'
++						? { defaultValue: 'alpha' }
++						: { value: 'alpha' };
++
++				render(
++					<Component
++						tabs={ TABS }
++						onValueChange={ mockOnValueChange }
++						selectOnMove
++						{ ...valueProps }
++					/>
++				);
++
++				// Alpha is automatically selected as the selected tab.
++				await waitForComponentToBeInitializedWithSelectedTab( 'Alpha' );
++
++				// TODO: re-enable once https://github.com/mui/base-ui/issues/2097 is fixed
++				// expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
++				// expect( mockOnValueChange ).toHaveBeenLastCalledWith( 'alpha' );
++
++				// Focus the tablist (and the selected tab, alpha)
++				// Tab should initially focus the first tab in the tablist, which
++				// is Alpha.
++				await user.keyboard( '{Tab}' );
++				expect(
++					await screen.findByRole( 'tab', {
++						selected: true,
++						name: 'Alpha',
++					} )
++				).toHaveFocus();
++
++				// Press the right arrow key to select the beta tab
++				await user.keyboard( '{ArrowRight}' );
++
++				expect(
++					screen.getByRole( 'tab', {
++						selected: true,
++						name: 'Beta',
++					} )
++				).toHaveFocus();
++				expect(
++					screen.getByRole( 'tabpanel', {
++						name: 'Beta',
++					} )
++				).toBeVisible();
++
++				expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
++				expect( mockOnValueChange ).toHaveBeenLastCalledWith(
++					'beta',
++					expect.anything()
++				);
++
++				// Press the right arrow key to select the gamma tab
++				await user.keyboard( '{ArrowRight}' );
++
++				expect(
++					screen.getByRole( 'tab', {
++						selected: true,
++						name: 'Gamma',
++					} )
++				).toHaveFocus();
++				expect(
++					screen.getByRole( 'tabpanel', {
++						name: 'Gamma',
++					} )
++				).toBeVisible();
++
++				expect( mockOnValueChange ).toHaveBeenCalledTimes( 2 );
++				expect( mockOnValueChange ).toHaveBeenLastCalledWith(
++					'gamma',
++					expect.anything()
++				);
++
++				// Press the left arrow key to select the beta tab
++				await user.keyboard( '{ArrowLeft}' );
++
++				expect(
++					screen.getByRole( 'tab', {
++						selected: true,
++						name: 'Beta',
++					} )
++				).toHaveFocus();
++				expect(
++					screen.getByRole( 'tabpanel', {
++						name: 'Beta',
++					} )
++				).toBeVisible();
++
++				expect( mockOnValueChange ).toHaveBeenCalledTimes( 3 );
++				expect( mockOnValueChange ).toHaveBeenLastCalledWith(
++					'beta',
++					expect.anything()
++				);
++			} );
++
++			it( 'should not automatically select tabs in the tablist when pressing the left and right arrow keys by default (manual tab activation)', async () => {
++				const mockOnValueChange = jest.fn();
++
++				const user = userEvent.setup();
++
++				const valueProps =
++					_mode === 'Uncontrolled'
++						? { defaultValue: 'alpha' }
++						: { value: 'alpha' };
++
++				render(
++					<Component
++						tabs={ TABS }
++						onValueChange={ mockOnValueChange }
++						{ ...valueProps }
++					/>
++				);
++
++				// Alpha is automatically selected as the selected tab.
++				await waitForComponentToBeInitializedWithSelectedTab( 'Alpha' );
++
++				// TODO: re-enable once https://github.com/mui/base-ui/issues/2097 is fixed
++				// expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
++				// expect( mockOnValueChange ).toHaveBeenLastCalledWith( 'alpha' );
++
++				// Focus the tablist (and the selected tab, alpha)
++				// Tab should initially focus the first tab in the tablist, which
++				// is Alpha.
++				await user.keyboard( '{Tab}' );
++				expect(
++					await screen.findByRole( 'tab', {
++						selected: true,
++						name: 'Alpha',
++					} )
++				).toHaveFocus();
++
++				// Press the right arrow key to move focus to the beta tab,
++				// but without selecting it
++				await user.keyboard( '{ArrowRight}' );
++
++				expect(
++					screen.getByRole( 'tab', {
++						selected: false,
++						name: 'Beta',
++					} )
++				).toHaveFocus();
++				expect(
++					await screen.findByRole( 'tab', {
++						selected: true,
++						name: 'Alpha',
++					} )
++				).toBeVisible();
++				expect(
++					screen.getByRole( 'tabpanel', {
++						name: 'Alpha',
++					} )
++				).toBeVisible();
++
++				expect( mockOnValueChange ).toHaveBeenCalledTimes( 0 );
++
++				// Press the space key to click the beta tab, and select it.
++				// The same should be true with any other mean of clicking the tab button
++				// (ie. mouse click, enter key).
++				await user.keyboard( '{ }' );
++
++				await waitFor( () =>
++					expect(
++						screen.getByRole( 'tab', {
++							selected: true,
++							name: 'Beta',
++						} )
++					).toHaveFocus()
++				);
++				expect(
++					screen.getByRole( 'tabpanel', {
++						name: 'Beta',
++					} )
++				).toBeVisible();
++
++				expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
++				expect( mockOnValueChange ).toHaveBeenLastCalledWith(
++					'beta',
++					expect.anything()
++				);
++			} );
++
++			it( 'should not select tabs in the tablist when using the up and down arrow keys, unless the `orientation` prop is set to `vertical`', async () => {
++				const mockOnValueChange = jest.fn();
++
++				const user = userEvent.setup();
++
++				const valueProps =
++					_mode === 'Uncontrolled'
++						? { defaultValue: 'alpha' }
++						: { value: 'alpha' };
++
++				const { rerender } = render(
++					<Component
++						tabs={ TABS }
++						onValueChange={ mockOnValueChange }
++						{ ...valueProps }
++					/>
++				);
++
++				// Alpha is automatically selected as the selected tab.
++				await waitForComponentToBeInitializedWithSelectedTab( 'Alpha' );
++
++				// TODO: re-enable once https://github.com/mui/base-ui/issues/2097 is fixed
++				// expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
++				// expect( mockOnValueChange ).toHaveBeenLastCalledWith( 'alpha' );
++
++				// Focus the tablist (and the selected tab, alpha)
++				// Tab should initially focus the first tab in the tablist, which
++				// is Alpha.
++				await user.keyboard( '{Tab}' );
++				expect(
++					await screen.findByRole( 'tab', {
++						selected: true,
++						name: 'Alpha',
++					} )
++				).toHaveFocus();
++
++				// Press the up arrow key, but the focused/selected tab does not change.
++				await user.keyboard( '{ArrowUp}' );
++
++				expect(
++					screen.getByRole( 'tab', {
++						selected: true,
++						name: 'Alpha',
++					} )
++				).toHaveFocus();
++				expect(
++					screen.getByRole( 'tabpanel', {
++						name: 'Alpha',
++					} )
++				).toBeVisible();
++
++				expect( mockOnValueChange ).toHaveBeenCalledTimes( 0 );
++
++				// Press the down arrow key, but the focused/selected tab does not change.
++				await user.keyboard( '{ArrowDown}' );
++
++				expect(
++					screen.getByRole( 'tab', {
++						selected: true,
++						name: 'Alpha',
++					} )
++				).toHaveFocus();
++				expect(
++					screen.getByRole( 'tabpanel', {
++						name: 'Alpha',
++					} )
++				).toBeVisible();
++
++				expect( mockOnValueChange ).toHaveBeenCalledTimes( 0 );
++
++				// Change the orientation to "vertical" and rerender the component.
++				rerender(
++					<Component
++						tabs={ TABS }
++						onValueChange={ mockOnValueChange }
++						orientation="vertical"
++						{ ...valueProps }
++					/>
++				);
++
++				// Pressing the down arrow key now selects the next tab (beta).
++				await user.keyboard( '{ArrowDown}' );
++				await user.keyboard( '{Enter}' );
++
++				expect(
++					screen.getByRole( 'tab', {
++						selected: true,
++						name: 'Beta',
++					} )
++				).toHaveFocus();
++				expect(
++					screen.getByRole( 'tabpanel', {
++						name: 'Beta',
++					} )
++				).toBeVisible();
++
++				expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
++				expect( mockOnValueChange ).toHaveBeenLastCalledWith(
++					'beta',
++					expect.anything()
++				);
++
++				// Pressing the up arrow key now selects the previous tab (alpha).
++				await user.keyboard( '{ArrowUp}' );
++				await user.keyboard( '{Enter}' );
++
++				expect(
++					screen.getByRole( 'tab', {
++						selected: true,
++						name: 'Alpha',
++					} )
++				).toHaveFocus();
++				expect(
++					screen.getByRole( 'tabpanel', {
++						name: 'Alpha',
++					} )
++				).toBeVisible();
++
++				expect( mockOnValueChange ).toHaveBeenCalledTimes( 2 );
++				expect( mockOnValueChange ).toHaveBeenLastCalledWith(
++					'alpha',
++					expect.anything()
++				);
++			} );
++
++			it( 'should loop tab focus at the end of the tablist when using arrow keys', async () => {
++				const mockOnValueChange = jest.fn();
++
++				const user = userEvent.setup();
++
++				const valueProps =
++					_mode === 'Uncontrolled'
++						? { defaultValue: 'alpha' }
++						: { value: 'alpha' };
++
++				render(
++					<Component
++						tabs={ TABS }
++						onValueChange={ mockOnValueChange }
++						{ ...valueProps }
++					/>
++				);
++
++				// Alpha is automatically selected as the selected tab.
++				await waitForComponentToBeInitializedWithSelectedTab( 'Alpha' );
++
++				// TODO: re-enable once https://github.com/mui/base-ui/issues/2097 is fixed
++				// expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
++				// expect( mockOnValueChange ).toHaveBeenLastCalledWith( 'alpha' );
++
++				// Focus the tablist (and the selected tab, alpha)
++				// Tab should initially focus the first tab in the tablist, which
++				// is Alpha.
++				await user.keyboard( '{Tab}' );
++				expect(
++					await screen.findByRole( 'tab', {
++						selected: true,
++						name: 'Alpha',
++					} )
++				).toHaveFocus();
++
++				// Press the left arrow key to loop around and select the gamma tab
++				await user.keyboard( '{ArrowLeft}' );
++				await user.keyboard( '{Enter}' );
++
++				expect(
++					screen.getByRole( 'tab', {
++						selected: true,
++						name: 'Gamma',
++					} )
++				).toHaveFocus();
++				expect(
++					screen.getByRole( 'tabpanel', {
++						name: 'Gamma',
++					} )
++				).toBeVisible();
++
++				expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
++				expect( mockOnValueChange ).toHaveBeenLastCalledWith(
++					'gamma',
++					expect.anything()
++				);
++
++				// Press the right arrow key to loop around and select the alpha tab
++				await user.keyboard( '{ArrowRight}' );
++				await user.keyboard( '{Enter}' );
++
++				expect(
++					screen.getByRole( 'tab', {
++						selected: true,
++						name: 'Alpha',
++					} )
++				).toHaveFocus();
++				expect(
++					screen.getByRole( 'tabpanel', {
++						name: 'Alpha',
++					} )
++				).toBeVisible();
++
++				expect( mockOnValueChange ).toHaveBeenCalledTimes( 2 );
++				expect( mockOnValueChange ).toHaveBeenLastCalledWith(
++					'alpha',
++					expect.anything()
++				);
++			} );
++
++			it( 'should swap the left and right arrow keys when selecting tabs if the writing direction is set to RTL', async () => {
++				const mockOnValueChange = jest.fn();
++
++				const user = userEvent.setup();
++
++				const valueProps =
++					_mode === 'Uncontrolled'
++						? { defaultValue: 'alpha' }
++						: { value: 'alpha' };
++
++				render(
++					<DirectionProvider direction="rtl">
++						<Component
++							tabs={ TABS }
++							onValueChange={ mockOnValueChange }
++							{ ...valueProps }
++						/>
++					</DirectionProvider>
++				);
++
++				// Alpha is automatically selected as the selected tab.
++				await waitForComponentToBeInitializedWithSelectedTab( 'Alpha' );
++
++				// TODO: re-enable once https://github.com/mui/base-ui/issues/2097 is fixed
++				// expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
++				// expect( mockOnValueChange ).toHaveBeenLastCalledWith( 'alpha' );
++
++				// Focus the tablist (and the selected tab, alpha)
++				// Tab should initially focus the first tab in the tablist, which
++				// is Alpha.
++				await user.keyboard( '{Tab}' );
++				expect(
++					await screen.findByRole( 'tab', {
++						selected: true,
++						name: 'Alpha',
++					} )
++				).toHaveFocus();
++
++				// Press the left arrow key to select the beta tab
++				await user.keyboard( '{ArrowLeft}' );
++				await user.keyboard( '{Enter}' );
++
++				expect(
++					screen.getByRole( 'tab', {
++						selected: true,
++						name: 'Beta',
++					} )
++				).toHaveFocus();
++				expect(
++					screen.getByRole( 'tabpanel', {
++						name: 'Beta',
++					} )
++				).toBeVisible();
++
++				expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
++				expect( mockOnValueChange ).toHaveBeenLastCalledWith(
++					'beta',
++					expect.anything()
++				);
++
++				// Press the left arrow key to select the gamma tab
++				await user.keyboard( '{ArrowLeft}' );
++				await user.keyboard( '{Enter}' );
++
++				expect(
++					screen.getByRole( 'tab', {
++						selected: true,
++						name: 'Gamma',
++					} )
++				).toHaveFocus();
++				expect(
++					screen.getByRole( 'tabpanel', {
++						name: 'Gamma',
++					} )
++				).toBeVisible();
++
++				expect( mockOnValueChange ).toHaveBeenCalledTimes( 2 );
++				expect( mockOnValueChange ).toHaveBeenLastCalledWith(
++					'gamma',
++					expect.anything()
++				);
++
++				// Press the right arrow key to select the beta tab
++				await user.keyboard( '{ArrowRight}' );
++				await user.keyboard( '{Enter}' );
++
++				expect(
++					screen.getByRole( 'tab', {
++						selected: true,
++						name: 'Beta',
++					} )
++				).toHaveFocus();
++				expect(
++					screen.getByRole( 'tabpanel', {
++						name: 'Beta',
++					} )
++				).toBeVisible();
++
++				expect( mockOnValueChange ).toHaveBeenCalledTimes( 3 );
++				expect( mockOnValueChange ).toHaveBeenLastCalledWith(
++					'beta',
++					expect.anything()
++				);
++			} );
++
++			it( 'should focus tabs in the tablist even if disabled', async () => {
++				const mockOnValueChange = jest.fn();
++
++				const user = userEvent.setup();
++
++				const valueProps =
++					_mode === 'Uncontrolled'
++						? { defaultValue: 'alpha' }
++						: { value: 'alpha' };
++
++				render(
++					<Component
++						tabs={ TABS_WITH_BETA_DISABLED }
++						onValueChange={ mockOnValueChange }
++						{ ...valueProps }
++					/>
++				);
++
++				// Alpha is automatically selected as the selected tab.
++				await waitForComponentToBeInitializedWithSelectedTab( 'Alpha' );
++
++				// TODO: re-enable once https://github.com/mui/base-ui/issues/2097 is fixed
++				// expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
++				// expect( mockOnValueChange ).toHaveBeenLastCalledWith( 'alpha' );
++
++				// Focus the tablist (and the selected tab, alpha)
++				// Tab should initially focus the first tab in the tablist, which
++				// is Alpha.
++				await user.keyboard( '{Tab}' );
++				expect(
++					await screen.findByRole( 'tab', {
++						selected: true,
++						name: 'Alpha',
++					} )
++				).toHaveFocus();
++
++				// Pressing the right arrow key moves focus to the beta tab, but alpha
++				// remains the selected tab because beta is disabled.
++				await user.keyboard( '{ArrowRight}' );
++				await user.keyboard( '{Enter}' );
++
++				expect(
++					screen.getByRole( 'tab', {
++						selected: false,
++						name: 'Beta',
++					} )
++				).toHaveFocus();
++				expect(
++					screen.getByRole( 'tab', {
++						selected: true,
++						name: 'Alpha',
++					} )
++				).toBeVisible();
++				expect(
++					screen.getByRole( 'tabpanel', {
++						name: 'Alpha',
++					} )
++				).toBeVisible();
++
++				expect( mockOnValueChange ).toHaveBeenCalledTimes( 0 );
++
++				// Press the right arrow key to select the gamma tab
++				await user.keyboard( '{ArrowRight}' );
++				await user.keyboard( '{Enter}' );
++
++				expect(
++					screen.getByRole( 'tab', {
++						selected: true,
++						name: 'Gamma',
++					} )
++				).toHaveFocus();
++				expect(
++					screen.getByRole( 'tabpanel', {
++						name: 'Gamma',
++					} )
++				).toBeVisible();
++
++				expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
++				expect( mockOnValueChange ).toHaveBeenLastCalledWith(
++					'gamma',
++					expect.anything()
++				);
++			} );
++		} );
++
++		describe( 'When `selectedId` is changed by the controlling component [Controlled]', () => {
++			describe.each( [ true, false ] )(
++				'and automatic tab activation is %s',
++				( selectOnMove ) => {
++					it( 'should continue to handle arrow key navigation properly', async () => {
++						const user = userEvent.setup();
++
++						const { rerender } = render(
++							<ControlledTabs
++								tabs={ TABS }
++								value="beta"
++								selectOnMove={ selectOnMove }
++							/>
++						);
++
++						// Beta is the selected tab.
++						await waitForComponentToBeInitializedWithSelectedTab(
++							'Beta'
++						);
++
++						// Tab key should focus the currently first tab (if manual activation mode),
++						// or the currently selected tab (if automatic activation mode).
++						await user.keyboard( '{Tab}' );
++						expect(
++							screen.getByRole( 'tab', {
++								selected: true,
++								name: 'Beta',
++							} )
++						).toHaveFocus();
++
++						rerender(
++							<ControlledTabs
++								tabs={ TABS }
++								value="gamma"
++								selectOnMove={ selectOnMove }
++							/>
++						);
++
++						expect(
++							screen.getByRole( 'tab', {
++								selected: true,
++								name: 'Gamma',
++							} )
++						).toBeVisible();
++						expect(
++							screen.getByRole( 'tab', {
++								selected: false,
++								name: 'Beta',
++							} )
++						).toHaveFocus();
++
++						// Arrow left should move focus to the previous tab.
++						await user.keyboard( '{ArrowLeft}' );
++
++						await waitFor( () =>
++							expect(
++								screen.getByRole( 'tab', {
++									selected: selectOnMove,
++									name: 'Alpha',
++								} )
++							).toHaveFocus()
++						);
++					} );
++
++					it( 'should focus the correct tab when tabbing out and back into the tablist', async () => {
++						const user = userEvent.setup();
++
++						const { rerender } = render(
++							<>
++								<button>Focus me</button>
++								<ControlledTabs
++									tabs={ TABS }
++									value="beta"
++									selectOnMove={ selectOnMove }
++								/>
++							</>
++						);
++
++						// Beta is the selected tab.
++						await waitForComponentToBeInitializedWithSelectedTab(
++							'Beta'
++						);
++
++						// Tab key should focus the currently selected tab, which is Beta.
++						await user.keyboard( '{Tab}' );
++						await user.keyboard( '{Tab}' );
++						expect(
++							screen.getByRole( 'tab', {
++								selected: true,
++								name: 'Beta',
++							} )
++						).toHaveFocus();
++
++						// Change the selected tab to gamma via a controlled update.
++						rerender(
++							<>
++								<button>Focus me</button>
++								<ControlledTabs
++									tabs={ TABS }
++									value="gamma"
++									selectOnMove={ selectOnMove }
++								/>
++							</>
++						);
++
++						expect(
++							screen.getByRole( 'tab', {
++								selected: true,
++								name: 'Gamma',
++							} )
++						).toBeVisible();
++						expect(
++							screen.getByRole( 'tab', {
++								selected: false,
++								name: 'Beta',
++							} )
++						).toHaveFocus();
++
++						// Press shift+tab, move focus to the button before Tabs
++						await user.keyboard( '{Shift>}{Tab}{/Shift}' );
++						expect(
++							screen.getByRole( 'button', { name: 'Focus me' } )
++						).toHaveFocus();
++
++						// Press tab, move focus back to the tablist
++						await user.keyboard( '{Tab}' );
++
++						expect(
++							screen.getByRole( 'tab', {
++								name: 'Beta',
++							} )
++						).toHaveFocus();
++					} );
++				}
++			);
++		} );
++	} );
++
++	describe( 'miscellaneous runtime changes', () => {
++		describe( 'removing a tab', () => {
++			describe( 'with no explicitly set initial tab', () => {
++				it( 'should not select a new tab when the selected tab is removed', async () => {
++					const mockOnValueChange = jest.fn();
++
++					const user = userEvent.setup();
++
++					const { rerender } = render(
++						<UncontrolledTabs
++							tabs={ TABS }
++							onValueChange={ mockOnValueChange }
++							defaultValue="alpha"
++						/>
++					);
++
++					// Alpha is automatically selected as the selected tab.
++					await waitForComponentToBeInitializedWithSelectedTab(
++						'Alpha'
++					);
++
++					// TODO: re-enable once https://github.com/mui/base-ui/issues/2097 is fixed
++					// expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
++					// expect( mockOnValueChange ).toHaveBeenLastCalledWith( 'alpha' );
++
++					// Select gamma
++					await user.click(
++						screen.getByRole( 'tab', { name: 'Gamma' } )
++					);
++
++					expect(
++						screen.getByRole( 'tab', {
++							selected: true,
++							name: 'Gamma',
++						} )
++					).toHaveFocus();
++					expect(
++						screen.getByRole( 'tabpanel', {
++							name: 'Gamma',
++						} )
++					).toBeVisible();
++
++					expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
++					expect( mockOnValueChange ).toHaveBeenLastCalledWith(
++						'gamma',
++						expect.anything()
++					);
++
++					// Remove gamma
++					rerender(
++						<UncontrolledTabs
++							tabs={ TABS.slice( 0, 2 ) }
++							onValueChange={ mockOnValueChange }
++							defaultValue="alpha"
++						/>
++					);
++
++					expect( screen.getAllByRole( 'tab' ) ).toHaveLength( 2 );
++
++					// Falls back to the first tab.
++					expect(
++						screen.getByRole( 'tab', {
++							name: 'Alpha',
++							selected: true,
++						} )
++					).toBeVisible();
++					expect(
++						screen.getByRole( 'tabpanel', {
++							name: 'Alpha',
++						} )
++					).toBeVisible();
++
++					expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
++				} );
++			} );
++
++			describe.each( [
++				[ 'defaultValue', 'Uncontrolled', UncontrolledTabs ],
++				[ 'value', 'Controlled', ControlledTabs ],
++			] )(
++				'when using the `%s` prop [%s]',
++				( propName, mode, Component ) => {
++					it( 'should handle the selected tab being removed', async () => {
++						const mockOnValueChange = jest.fn();
++
++						const initialComponentProps = {
++							tabs: TABS,
++							[ propName ]: 'gamma',
++							onValueChange: mockOnValueChange,
++						};
++
++						const { rerender } = render(
++							<Component { ...initialComponentProps } />
++						);
++
++						// Gamma is the selected tab.
++						await waitForComponentToBeInitializedWithSelectedTab(
++							'Gamma'
++						);
++
++						// Remove gamma
++						rerender(
++							<Component
++								{ ...initialComponentProps }
++								tabs={ TABS.slice( 0, 2 ) }
++							/>
++						);
++
++						expect( screen.getAllByRole( 'tab' ) ).toHaveLength(
++							2
++						);
++
++						if ( mode === 'Uncontrolled' ) {
++							// Falls back to the first tab.
++							expect(
++								screen.getByRole( 'tab', {
++									name: 'Alpha',
++									selected: true,
++								} )
++							).toBeVisible();
++							expect(
++								screen.getByRole( 'tabpanel', {
++									name: 'Alpha',
++								} )
++							).toBeVisible();
++						}
++
++						if ( mode === 'Controlled' ) {
++							// No tab should be selected i.e. it doesn't fall back to first tab.
++							expect(
++								screen.queryByRole( 'tab', { selected: true } )
++							).not.toBeInTheDocument();
++							expect(
++								screen.queryByRole( 'tabpanel' )
++							).not.toBeInTheDocument();
++						}
++
++						// Re-add gamma.
++						rerender( <Component { ...initialComponentProps } /> );
++
++						expect( screen.getAllByRole( 'tab' ) ).toHaveLength(
++							TABS.length
++						);
++
++						if ( mode === 'Uncontrolled' ) {
++							// First tab stays selected.
++							expect(
++								screen.getByRole( 'tab', {
++									selected: true,
++									name: 'Alpha',
++								} )
++							).toBeVisible();
++							expect(
++								screen.getByRole( 'tabpanel', {
++									name: 'Alpha',
++								} )
++							).toBeVisible();
++						}
++
++						if ( mode === 'Controlled' ) {
++							// Gamma becomes selected again.
++							expect(
++								screen.getByRole( 'tab', {
++									selected: true,
++									name: 'Gamma',
++								} )
++							).toBeVisible();
++							expect(
++								screen.getByRole( 'tabpanel', {
++									name: 'Gamma',
++								} )
++							).toBeVisible();
++						}
++
++						expect( mockOnValueChange ).not.toHaveBeenCalled();
++					} );
++
++					it( `should not fall back to the tab matching the \`${ propName }\` prop when a different selected tab is removed`, async () => {
++						const mockOnValueChange = jest.fn();
++
++						const initialComponentProps = {
++							tabs: TABS,
++							[ propName ]: 'gamma',
++							onValueChange: mockOnValueChange,
++						};
++
++						const user = userEvent.setup();
++
++						const { rerender } = render(
++							<Component { ...initialComponentProps } />
++						);
++
++						// Gamma is the selected tab.
++						await waitForComponentToBeInitializedWithSelectedTab(
++							'Gamma'
++						);
++
++						// Select alpha
++						await user.click(
++							screen.getByRole( 'tab', { name: 'Alpha' } )
++						);
++
++						expect(
++							screen.getByRole( 'tab', {
++								selected: true,
++								name: 'Alpha',
++							} )
++						).toHaveFocus();
++						expect(
++							screen.getByRole( 'tabpanel', {
++								name: 'Alpha',
++							} )
++						).toBeVisible();
++
++						expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
++						expect( mockOnValueChange ).toHaveBeenLastCalledWith(
++							'alpha',
++							expect.anything()
++						);
++
++						// Remove alpha
++						rerender(
++							<Component
++								{ ...initialComponentProps }
++								tabs={ TABS.slice( 1 ) }
++							/>
++						);
++
++						expect( screen.getAllByRole( 'tab' ) ).toHaveLength(
++							2
++						);
++
++						if ( mode === 'Uncontrolled' ) {
++							// Falls back to the first available tab.
++							expect(
++								screen.getByRole( 'tab', {
++									name: 'Beta',
++									selected: true,
++								} )
++							).toBeVisible();
++							expect(
++								screen.getByRole( 'tabpanel', {
++									name: 'Beta',
++								} )
++							).toBeVisible();
++						}
++
++						if ( mode === 'Controlled' ) {
++							// No tab should be selected i.e. it doesn't fall back to gamma,
++							// even if it matches the `defaultValue` prop.
++							expect(
++								screen.queryByRole( 'tab', { selected: true } )
++							).not.toBeInTheDocument();
++							// No tabpanel should be rendered either
++							expect(
++								screen.queryByRole( 'tabpanel' )
++							).not.toBeInTheDocument();
++						}
++
++						// Re-add alpha. Alpha becomes selected again.
++						rerender( <Component { ...initialComponentProps } /> );
++
++						expect( screen.getAllByRole( 'tab' ) ).toHaveLength(
++							TABS.length
++						);
++
++						if ( mode === 'Uncontrolled' ) {
++							// Beta stays selected.
++							expect(
++								screen.getByRole( 'tab', {
++									selected: true,
++									name: 'Beta',
++								} )
++							).toBeVisible();
++							expect(
++								screen.getByRole( 'tabpanel', {
++									name: 'Beta',
++								} )
++							).toBeVisible();
++						}
++
++						if ( mode === 'Controlled' ) {
++							expect(
++								screen.getByRole( 'tab', {
++									selected: true,
++									name: 'Alpha',
++								} )
++							).toBeVisible();
++							expect(
++								screen.getByRole( 'tabpanel', {
++									name: 'Alpha',
++								} )
++							).toBeVisible();
++						}
++
++						expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
++					} );
++				}
++			);
++		} );
++
++		describe( 'adding a tab', () => {
++			describe.each( [
++				[ 'defaultValue', 'Uncontrolled', UncontrolledTabs ],
++				[ 'value', 'Controlled', ControlledTabs ],
++			] )(
++				'when using the `%s` prop [%s]',
++				( propName, mode, Component ) => {
++					it( `should select a newly added tab if it matches the \`${ propName }\` prop`, async () => {
++						const mockOnValueChange = jest.fn();
++
++						const initialComponentProps = {
++							tabs: TABS,
++							[ propName ]: 'delta',
++							onValueChange: mockOnValueChange,
++						};
++
++						const { rerender } = render(
++							<Component { ...initialComponentProps } />
++						);
++
++						if ( mode === 'Uncontrolled' ) {
++							// Falls back to the first tab.
++							await waitForComponentToBeInitializedWithSelectedTab(
++								'Alpha'
++							);
++						}
++
++						if ( mode === 'Controlled' ) {
++							// No initially selected tabs or tabpanels, since the `value`
++							// prop is not matching any known tabs.
++							await waitForComponentToBeInitializedWithSelectedTab(
++								undefined
++							);
++						}
++
++						expect( mockOnValueChange ).not.toHaveBeenCalled();
++
++						// Re-render with delta added.
++						rerender(
++							<Component
++								{ ...initialComponentProps }
++								tabs={ TABS_WITH_DELTA }
++							/>
++						);
++
++						if ( mode === 'Uncontrolled' ) {
++							// Alpha stays selected.
++							expect(
++								screen.getByRole( 'tab', {
++									selected: true,
++									name: 'Alpha',
++								} )
++							).toBeVisible();
++							expect(
++								screen.getByRole( 'tabpanel', {
++									name: 'Alpha',
++								} )
++							).toBeVisible();
++						}
++
++						if ( mode === 'Controlled' ) {
++							// Delta becomes selected
++							expect(
++								screen.getByRole( 'tab', {
++									selected: true,
++									name: 'Delta',
++								} )
++							).toBeVisible();
++							expect(
++								screen.getByRole( 'tabpanel', {
++									name: 'Delta',
++								} )
++							).toBeVisible();
++						}
++
++						expect( mockOnValueChange ).not.toHaveBeenCalled();
++					} );
++				}
++			);
++		} );
++		describe( 'a tab becomes disabled', () => {
++			describe.each( [
++				[ 'defaultValue', 'Uncontrolled', UncontrolledTabs ],
++				[ 'value', 'Controlled', ControlledTabs ],
++			] )(
++				'when using the `%s` prop [%s]',
++				( propName, mode, Component ) => {
++					it( `should keep the initial tab matching the \`${ propName }\` prop as selected even if it becomes disabled`, async () => {
++						const mockOnValueChange = jest.fn();
++
++						const initialComponentProps = {
++							tabs: TABS,
++							[ propName ]: 'beta',
++							onValueChange: mockOnValueChange,
++						};
++
++						const { rerender } = render(
++							<Component { ...initialComponentProps } />
++						);
++
++						// Beta is the selected tab.
++						await waitForComponentToBeInitializedWithSelectedTab(
++							'Beta'
++						);
++
++						expect( mockOnValueChange ).not.toHaveBeenCalled();
++
++						// Re-render with beta disabled.
++						rerender(
++							<Component
++								{ ...initialComponentProps }
++								tabs={ TABS_WITH_BETA_DISABLED }
++							/>
++						);
++
++						// Beta continues to be selected and focused, even if it is disabled.
++						expect(
++							screen.getByRole( 'tab', {
++								selected: true,
++								name: 'Beta',
++							} )
++						).toBeVisible();
++						expect(
++							screen.getByRole( 'tabpanel', {
++								name: 'Beta',
++							} )
++						).toBeVisible();
++
++						// Re-enable beta.
++						rerender( <Component { ...initialComponentProps } /> );
++
++						// Beta continues to be selected and focused.
++						expect(
++							screen.getByRole( 'tab', {
++								selected: true,
++								name: 'Beta',
++							} )
++						).toBeVisible();
++						expect(
++							screen.getByRole( 'tabpanel', {
++								name: 'Beta',
++							} )
++						).toBeVisible();
++
++						expect( mockOnValueChange ).not.toHaveBeenCalled();
++					} );
++
++					it( 'should handle the user-selected tab becoming disabled', async () => {
++						const mockOnValueChange = jest.fn();
++
++						const user = userEvent.setup();
++
++						const initialComponentProps = {
++							tabs: TABS,
++							[ propName ]: 'alpha',
++							onValueChange: mockOnValueChange,
++						};
++
++						const { rerender } = render(
++							<Component { ...initialComponentProps } />
++						);
++
++						// Alpha is automatically selected as the selected tab.
++						await waitForComponentToBeInitializedWithSelectedTab(
++							'Alpha'
++						);
++
++						// TODO: re-enable once https://github.com/mui/base-ui/issues/2097 is fixed
++						// expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
++						// expect( mockOnValueChange ).toHaveBeenLastCalledWith( 'alpha' );
++
++						// Click on beta tab, beta becomes selected.
++						await user.click(
++							screen.getByRole( 'tab', { name: 'Beta' } )
++						);
++
++						expect(
++							screen.getByRole( 'tab', {
++								selected: true,
++								name: 'Beta',
++							} )
++						).toBeVisible();
++						expect(
++							screen.getByRole( 'tabpanel', {
++								name: 'Beta',
++							} )
++						).toBeVisible();
++
++						expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
++						expect( mockOnValueChange ).toHaveBeenLastCalledWith(
++							'beta',
++							expect.anything()
++						);
++
++						// Re-render with beta disabled.
++						rerender(
++							<Component
++								{ ...initialComponentProps }
++								tabs={ TABS_WITH_BETA_DISABLED }
++							/>
++						);
++
++						if ( mode === 'Uncontrolled' ) {
++							// Alpha becomes the selected tab.
++							expect(
++								screen.getByRole( 'tab', {
++									selected: true,
++									name: 'Alpha',
++								} )
++							).toBeVisible();
++							expect(
++								screen.getByRole( 'tabpanel', {
++									name: 'Alpha',
++								} )
++							).toBeVisible();
++						}
++
++						if ( mode === 'Controlled' ) {
++							// Beta continues to be selected, even if it is disabled.
++							expect(
++								screen.getByRole( 'tab', {
++									selected: true,
++									name: 'Beta',
++								} )
++							).toHaveFocus();
++							expect(
++								screen.getByRole( 'tabpanel', {
++									name: 'Beta',
++								} )
++							).toBeVisible();
++						}
++
++						// Re-enable beta.
++						rerender( <Component { ...initialComponentProps } /> );
++
++						if ( mode === 'Uncontrolled' ) {
++							// Alpha stays selected.
++							expect(
++								screen.getByRole( 'tab', {
++									selected: true,
++									name: 'Alpha',
++								} )
++							).toBeVisible();
++							expect(
++								screen.getByRole( 'tabpanel', {
++									name: 'Alpha',
++								} )
++							).toBeVisible();
++						}
++
++						if ( mode === 'Controlled' ) {
++							// Beta continues to be selected and focused.
++							expect(
++								screen.getByRole( 'tab', {
++									selected: true,
++									name: 'Beta',
++								} )
++							).toBeVisible();
++							expect(
++								screen.getByRole( 'tabpanel', {
++									name: 'Beta',
++								} )
++							).toBeVisible();
++						}
++
++						expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
++					} );
++				}
++			);
++		} );
++	} );
++} );
++/* eslint-enable jest/no-conditional-expect */
+diff --git a/packages/ui/src/tabs/types.ts b/packages/ui/src/tabs/types.ts
+new file mode 100644
+index 00000000000000..6125b029a69a19
+--- /dev/null
++++ b/packages/ui/src/tabs/types.ts
+@@ -0,0 +1,36 @@
++import type { ReactNode } from 'react';
++import type { Tabs as _Tabs } from '@base-ui/react/tabs';
++import type { ComponentProps } from '../utils/types';
++
++export type TabRootProps = ComponentProps< typeof _Tabs.Root > & {
++	/**
++	 * The content to be rendered inside the component.
++	 */
++	children?: ReactNode;
++};
++
++export type TabListProps = ComponentProps< typeof _Tabs.List > & {
++	/**
++	 * The content to be rendered inside the component.
++	 */
++	children?: ReactNode;
++	/**
++	 * The visual variant of the tab list.
++	 * @default "default"
++	 */
++	variant?: 'minimal' | 'default';
++};
++
++export type TabProps = ComponentProps< typeof _Tabs.Tab > & {
++	/**
++	 * The content to be rendered inside the component.
++	 */
++	children?: ReactNode;
++};
++
++export type TabPanelProps = ComponentProps< typeof _Tabs.Panel > & {
++	/**
++	 * The content to be rendered inside the component.
++	 */
++	children?: ReactNode;
++};
+diff --git a/packages/ui/src/utils/types.ts b/packages/ui/src/utils/types.ts
+index e8e9ab1f3286b9..8eb9d7d26989c7 100644
+--- a/packages/ui/src/utils/types.ts
++++ b/packages/ui/src/utils/types.ts
+@@ -1,15 +1,16 @@
+-import type {
+-	ElementType,
+-	ComponentPropsWithoutRef,
+-	HTMLAttributes,
+-	ReactElement,
+-	Ref,
++import {
++	type ElementType,
++	type ComponentPropsWithoutRef,
++	type HTMLAttributes,
++	type Ref,
+ } from 'react';
+ 
+ type HTMLAttributesWithRef< T extends ElementType = any > =
+ 	HTMLAttributes< T > & { ref?: Ref< T > | undefined };
+ 
+-type ComponentRenderFn< Props > = ( props: Props ) => ReactElement< unknown >;
++type ComponentRenderFn< Props > = (
++	props: Props
++) => React.ReactElement< unknown >;
+ 
+ export type ComponentProps< E extends ElementType > = Omit<
+ 	ComponentPropsWithoutRef< E >,
+@@ -26,5 +27,5 @@ export type ComponentProps< E extends ElementType > = Omit<
+ 	 */
+ 	render?:
+ 		| ComponentRenderFn< HTMLAttributesWithRef >
+-		| ReactElement< Record< string, unknown > >;
++		| React.ReactElement< Record< string, unknown > >;
+ };
+diff --git a/packages/ui/tsconfig.json b/packages/ui/tsconfig.json
+index e081a8873e6099..81f7e58d2d1619 100644
+--- a/packages/ui/tsconfig.json
++++ b/packages/ui/tsconfig.json
+@@ -6,6 +6,7 @@
+ 	},
+ 	"references": [
+ 		{ "path": "../a11y" },
++		{ "path": "../compose" },
+ 		{ "path": "../element" },
+ 		{ "path": "../i18n" },
+ 		{ "path": "../icons" },

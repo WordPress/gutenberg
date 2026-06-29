@@ -1,0 +1,614 @@
+diff --git a/packages/components/src/tab-panel/README.md b/packages/components/src/tab-panel/README.md
+index 90ec6af37087a8..a4a1c0c525370e 100644
+--- a/packages/components/src/tab-panel/README.md
++++ b/packages/components/src/tab-panel/README.md
+@@ -136,7 +136,7 @@ The class to add to the active tab
+ 
+ #### initialTabName
+ 
+-Optionally provide a tab name for a tab to be selected upon mounting of component. If this prop is not set, the first tab will be selected by default.
++The name of the tab to be selected upon mounting of component. If this prop is not set, the first tab will be selected by default.
+ 
+ -   Type: `String`
+ -   Required: No
+@@ -145,7 +145,6 @@ Optionally provide a tab name for a tab to be selected upon mounting of componen
+ #### children
+ 
+ A function which renders the tabviews given the selected tab. The function is passed the active tab object as an argument as defined the tabs prop.
+-The element to which the tooltip should anchor.
+ 
+ -   Type: (`Object`) => `Element`
+ -   Required: Yes
+diff --git a/packages/components/src/tab-panel/index.js b/packages/components/src/tab-panel/index.tsx
+similarity index 57%
+rename from packages/components/src/tab-panel/index.js
+rename to packages/components/src/tab-panel/index.tsx
+index d6124798c19de3..36450b0aba349a 100644
+--- a/packages/components/src/tab-panel/index.js
++++ b/packages/components/src/tab-panel/index.tsx
+@@ -15,10 +15,16 @@ import { useInstanceId } from '@wordpress/compose';
+  */
+ import { NavigableMenu } from '../navigable-container';
+ import Button from '../button';
++import type { TabButtonProps, TabPanelProps } from './types';
++import type { WordPressComponentProps } from '../ui/context';
+ 
+-const noop = () => {};
+-
+-const TabButton = ( { tabId, onClick, children, selected, ...rest } ) => (
++const TabButton = ( {
++	tabId,
++	onClick,
++	children,
++	selected,
++	...rest
++}: TabButtonProps ) => (
+ 	<Button
+ 		role="tab"
+ 		tabIndex={ selected ? null : -1 }
+@@ -31,24 +37,60 @@ const TabButton = ( { tabId, onClick, children, selected, ...rest } ) => (
+ 	</Button>
+ );
+ 
+-export default function TabPanel( {
++/**
++ * TabPanel is an ARIA-compliant tabpanel.
++ *
++ * TabPanels organize content across different screens, data sets, and interactions.
++ * It has two sections: a list of tabs, and the view to show when tabs are chosen.
++ *
++ * ```jsx
++ * import { TabPanel } from '@wordpress/components';
++ *
++ * const onSelect = ( tabName ) => {
++ *   console.log( 'Selecting tab', tabName );
++ * };
++ *
++ * const MyTabPanel = () => (
++ *   <TabPanel
++ *     className="my-tab-panel"
++ *     activeClass="active-tab"
++ *     onSelect={ onSelect }
++ *     tabs={ [
++ *       {
++ *         name: 'tab1',
++ *         title: 'Tab 1',
++ *         className: 'tab-one',
++ *       },
++ *       {
++ *         name: 'tab2',
++ *         title: 'Tab 2',
++ *         className: 'tab-two',
++ *       },
++ *     ] }
++ *   >
++ *     { ( tab ) => <p>{ tab.title }</p> }
++ *   </TabPanel>
++ * );
++ * ```
++ */
++export function TabPanel( {
+ 	className,
+ 	children,
+ 	tabs,
+ 	initialTabName,
+ 	orientation = 'horizontal',
+ 	activeClass = 'is-active',
+-	onSelect = noop,
+-} ) {
++	onSelect,
++}: WordPressComponentProps< TabPanelProps, 'div', false > ) {
+ 	const instanceId = useInstanceId( TabPanel, 'tab-panel' );
+-	const [ selected, setSelected ] = useState( null );
++	const [ selected, setSelected ] = useState< string >();
+ 
+-	const handleClick = ( tabKey ) => {
++	const handleClick = ( tabKey: string ) => {
+ 		setSelected( tabKey );
+-		onSelect( tabKey );
++		onSelect?.( tabKey );
+ 	};
+ 
+-	const onNavigate = ( childIndex, child ) => {
++	const onNavigate = ( _childIndex: number, child: HTMLButtonElement ) => {
+ 		child.click();
+ 	};
+ 	const selectedTab = find( tabs, { name: selected } );
+@@ -58,7 +100,8 @@ export default function TabPanel( {
+ 		const newSelectedTab = find( tabs, { name: selected } );
+ 		if ( ! newSelectedTab ) {
+ 			setSelected(
+-				initialTabName || ( tabs.length > 0 ? tabs[ 0 ].name : null )
++				initialTabName ||
++					( tabs.length > 0 ? tabs[ 0 ].name : undefined )
+ 			);
+ 		}
+ 	}, [ tabs ] );
+@@ -104,3 +147,5 @@ export default function TabPanel( {
+ 		</div>
+ 	);
+ }
++
++export default TabPanel;
+diff --git a/packages/components/src/tab-panel/stories/index.js b/packages/components/src/tab-panel/stories/index.js
+deleted file mode 100644
+index 44b285af4077f5..00000000000000
+--- a/packages/components/src/tab-panel/stories/index.js
++++ /dev/null
+@@ -1,39 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { text } from '@storybook/addon-knobs';
+-
+-/**
+- * Internal dependencies
+- */
+-import TabPanel from '../';
+-
+-export default {
+-	title: 'Components/TabPanel',
+-	component: TabPanel,
+-	parameters: {
+-		knobs: { disable: false },
+-	},
+-};
+-
+-export const _default = () => {
+-	return (
+-		<TabPanel
+-			className="my-tab-panel"
+-			tabs={ [
+-				{
+-					name: 'tab1',
+-					title: text( 'Tab 1 title', 'Tab 1' ),
+-					className: 'tab-one',
+-				},
+-				{
+-					name: 'tab2',
+-					title: text( 'Tab 2 title', 'Tab 2' ),
+-					className: 'tab-two',
+-				},
+-			] }
+-		>
+-			{ ( tab ) => <p>Selected tab: { tab.title }</p> }
+-		</TabPanel>
+-	);
+-};
+diff --git a/packages/components/src/tab-panel/stories/index.tsx b/packages/components/src/tab-panel/stories/index.tsx
+new file mode 100644
+index 00000000000000..0088f79d7b5d65
+--- /dev/null
++++ b/packages/components/src/tab-panel/stories/index.tsx
+@@ -0,0 +1,37 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import TabPanel from '..';
++
++const meta: ComponentMeta< typeof TabPanel > = {
++	title: 'Components/TabPanel',
++	component: TabPanel,
++	parameters: {
++		controls: { expanded: true },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof TabPanel > = ( props ) => {
++	return <TabPanel { ...props } />;
++};
++
++export const Default = Template.bind( {} );
++Default.args = {
++	children: ( tab ) => <p>Selected tab: { tab.title }</p>,
++	tabs: [
++		{
++			name: 'tab1',
++			title: 'Tab 1',
++		},
++		{
++			name: 'tab2',
++			title: 'Tab 2',
++		},
++	],
++};
+diff --git a/packages/components/src/tab-panel/test/index.js b/packages/components/src/tab-panel/test/index.js
+deleted file mode 100644
+index b3d9bd0477685b..00000000000000
+--- a/packages/components/src/tab-panel/test/index.js
++++ /dev/null
+@@ -1,179 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import TestUtils from 'react-dom/test-utils';
+-
+-/**
+- * Internal dependencies
+- */
+-import TabPanel from '../';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { Component } from '@wordpress/element';
+-
+-describe( 'TabPanel', () => {
+-	const getElementByClass = ( wrapper, className ) => {
+-		return TestUtils.findRenderedDOMComponentWithClass(
+-			wrapper,
+-			className
+-		);
+-	};
+-
+-	const getElementsByClass = ( wrapper, className ) => {
+-		return TestUtils.scryRenderedDOMComponentsWithClass(
+-			wrapper,
+-			className
+-		);
+-	};
+-
+-	const elementClick = ( element ) => {
+-		TestUtils.Simulate.click( element );
+-	};
+-
+-	// This is needed because TestUtils does not accept a stateless component.
+-	// anything run through a HOC ends up as a stateless component.
+-	const getTestComponent = ( WrappedComponent, props ) => {
+-		class TestComponent extends Component {
+-			render() {
+-				return <WrappedComponent { ...props } />;
+-			}
+-		}
+-		return <TestComponent />;
+-	};
+-
+-	describe( 'basic rendering', () => {
+-		it( 'should render a tabpanel, and clicking should change tabs', () => {
+-			const props = {
+-				className: 'test-panel',
+-				activeClass: 'active-tab',
+-				tabs: [
+-					{
+-						name: 'alpha',
+-						title: 'Alpha',
+-						className: 'alpha',
+-					},
+-					{
+-						name: 'beta',
+-						title: 'Beta',
+-						className: 'beta',
+-					},
+-					{
+-						name: 'gamma',
+-						title: 'Gamma',
+-						className: 'gamma',
+-					},
+-				],
+-				children: ( tab ) => {
+-					return (
+-						<p tabIndex="0" className={ tab.name + '-view' }>
+-							{ tab.name }
+-						</p>
+-					);
+-				},
+-			};
+-
+-			let wrapper;
+-			TestUtils.act( () => {
+-				wrapper = TestUtils.renderIntoDocument(
+-					getTestComponent( TabPanel, props )
+-				);
+-			} );
+-
+-			const alphaTab = getElementByClass( wrapper, 'alpha' );
+-			const betaTab = getElementByClass( wrapper, 'beta' );
+-			const gammaTab = getElementByClass( wrapper, 'gamma' );
+-
+-			const getAlphaViews = () =>
+-				getElementsByClass( wrapper, 'alpha-view' );
+-			const getBetaViews = () =>
+-				getElementsByClass( wrapper, 'beta-view' );
+-			const getGammaViews = () =>
+-				getElementsByClass( wrapper, 'gamma-view' );
+-
+-			const getActiveTab = () =>
+-				getElementByClass( wrapper, 'active-tab' );
+-			const getActiveView = () =>
+-				getElementByClass(
+-					wrapper,
+-					'components-tab-panel__tab-content'
+-				).firstChild.textContent;
+-
+-			expect( getActiveTab().innerHTML ).toBe( 'Alpha' );
+-			expect( getAlphaViews() ).toHaveLength( 1 );
+-			expect( getBetaViews() ).toHaveLength( 0 );
+-			expect( getGammaViews() ).toHaveLength( 0 );
+-			expect( getActiveView() ).toBe( 'alpha' );
+-
+-			elementClick( betaTab );
+-
+-			expect( getActiveTab().innerHTML ).toBe( 'Beta' );
+-			expect( getAlphaViews() ).toHaveLength( 0 );
+-			expect( getBetaViews() ).toHaveLength( 1 );
+-			expect( getGammaViews() ).toHaveLength( 0 );
+-			expect( getActiveView() ).toBe( 'beta' );
+-
+-			elementClick( betaTab );
+-
+-			expect( getActiveTab().innerHTML ).toBe( 'Beta' );
+-			expect( getAlphaViews() ).toHaveLength( 0 );
+-			expect( getBetaViews() ).toHaveLength( 1 );
+-			expect( getGammaViews() ).toHaveLength( 0 );
+-			expect( getActiveView() ).toBe( 'beta' );
+-
+-			elementClick( gammaTab );
+-
+-			expect( getActiveTab().innerHTML ).toBe( 'Gamma' );
+-			expect( getAlphaViews() ).toHaveLength( 0 );
+-			expect( getBetaViews() ).toHaveLength( 0 );
+-			expect( getGammaViews() ).toHaveLength( 1 );
+-			expect( getActiveView() ).toBe( 'gamma' );
+-
+-			elementClick( alphaTab );
+-
+-			expect( getActiveTab().innerHTML ).toBe( 'Alpha' );
+-			expect( getAlphaViews() ).toHaveLength( 1 );
+-			expect( getBetaViews() ).toHaveLength( 0 );
+-			expect( getGammaViews() ).toHaveLength( 0 );
+-			expect( getActiveView() ).toBe( 'alpha' );
+-		} );
+-	} );
+-
+-	it( 'should render with a tab initially selected by prop initialTabIndex', () => {
+-		const props = {
+-			className: 'test-panel',
+-			activeClass: 'active-tab',
+-			initialTabName: 'beta',
+-			tabs: [
+-				{
+-					name: 'alpha',
+-					title: 'Alpha',
+-					className: 'alpha',
+-				},
+-				{
+-					name: 'beta',
+-					title: 'Beta',
+-					className: 'beta',
+-				},
+-			],
+-			children: ( tab ) => {
+-				return (
+-					<p tabIndex="0" className={ tab.name + '-view' }>
+-						{ tab.name }
+-					</p>
+-				);
+-			},
+-		};
+-
+-		let wrapper;
+-		TestUtils.act( () => {
+-			wrapper = TestUtils.renderIntoDocument(
+-				getTestComponent( TabPanel, props )
+-			);
+-		} );
+-
+-		const getActiveTab = () => getElementByClass( wrapper, 'active-tab' );
+-		expect( getActiveTab().innerHTML ).toBe( 'Beta' );
+-	} );
+-} );
+diff --git a/packages/components/src/tab-panel/test/index.tsx b/packages/components/src/tab-panel/test/index.tsx
+new file mode 100644
+index 00000000000000..3b8f7aacc265c2
+--- /dev/null
++++ b/packages/components/src/tab-panel/test/index.tsx
+@@ -0,0 +1,120 @@
++/**
++ * External dependencies
++ */
++import { render, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++
++/**
++ * Internal dependencies
++ */
++import TabPanel from '..';
++
++const setupUser = () =>
++	userEvent.setup( {
++		advanceTimers: jest.advanceTimersByTime,
++	} );
++
++const TABS = [
++	{
++		name: 'alpha',
++		title: 'Alpha',
++		className: 'alpha-class',
++	},
++	{
++		name: 'beta',
++		title: 'Beta',
++		className: 'beta-class',
++	},
++	{
++		name: 'gamma',
++		title: 'Gamma',
++		className: 'gamma-class',
++	},
++];
++
++const getSelectedTab = () => screen.getByRole( 'tab', { selected: true } );
++
++describe( 'TabPanel', () => {
++	it( 'should render a tabpanel, and clicking should change tabs', async () => {
++		const user = setupUser();
++		const panelRenderFunction = jest.fn();
++
++		render( <TabPanel tabs={ TABS } children={ panelRenderFunction } /> );
++
++		expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
++		expect(
++			screen.getByRole( 'tabpanel', { name: 'Alpha' } )
++		).toBeInTheDocument();
++		expect( panelRenderFunction ).toHaveBeenLastCalledWith( TABS[ 0 ] );
++
++		await user.click( screen.getByRole( 'tab', { name: 'Beta' } ) );
++
++		expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
++		expect(
++			screen.getByRole( 'tabpanel', { name: 'Beta' } )
++		).toBeInTheDocument();
++		expect( panelRenderFunction ).toHaveBeenLastCalledWith( TABS[ 1 ] );
++
++		await user.click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
++
++		expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
++		expect(
++			screen.getByRole( 'tabpanel', { name: 'Alpha' } )
++		).toBeInTheDocument();
++		expect( panelRenderFunction ).toHaveBeenLastCalledWith( TABS[ 0 ] );
++	} );
++
++	it( 'should render with a tab initially selected by prop initialTabIndex', () => {
++		render(
++			<TabPanel
++				initialTabName="beta"
++				tabs={ TABS }
++				children={ () => undefined }
++			/>
++		);
++		const selectedTab = screen.getByRole( 'tab', { selected: true } );
++		expect( selectedTab ).toHaveTextContent( 'Beta' );
++	} );
++
++	it( 'should apply the `activeClass` to the selected tab', async () => {
++		const user = setupUser();
++		const activeClass = 'my-active-tab';
++
++		render(
++			<TabPanel
++				activeClass={ activeClass }
++				tabs={ TABS }
++				children={ () => undefined }
++			/>
++		);
++		expect( getSelectedTab() ).toHaveClass( activeClass );
++		screen
++			.getAllByRole( 'tab', { selected: false } )
++			.forEach( ( unselectedTab ) => {
++				expect( unselectedTab ).not.toHaveClass( activeClass );
++			} );
++
++		await user.click( screen.getByRole( 'tab', { name: 'Beta' } ) );
++
++		expect( getSelectedTab() ).toHaveClass( activeClass );
++		screen
++			.getAllByRole( 'tab', { selected: false } )
++			.forEach( ( unselectedTab ) => {
++				expect( unselectedTab ).not.toHaveClass( activeClass );
++			} );
++	} );
++
++	it( "should apply the tab's `className` to the tab button", () => {
++		render( <TabPanel tabs={ TABS } children={ () => undefined } /> );
++
++		expect( screen.getByRole( 'tab', { name: 'Alpha' } ) ).toHaveClass(
++			'alpha-class'
++		);
++		expect( screen.getByRole( 'tab', { name: 'Beta' } ) ).toHaveClass(
++			'beta-class'
++		);
++		expect( screen.getByRole( 'tab', { name: 'Gamma' } ) ).toHaveClass(
++			'gamma-class'
++		);
++	} );
++} );
+diff --git a/packages/components/src/tab-panel/types.ts b/packages/components/src/tab-panel/types.ts
+new file mode 100644
+index 00000000000000..2a89da6a215b7d
+--- /dev/null
++++ b/packages/components/src/tab-panel/types.ts
+@@ -0,0 +1,65 @@
++/**
++ * External dependencies
++ */
++import type { ReactNode } from 'react';
++
++type Tab = {
++	/**
++	 * The key of the tab.
++	 */
++	name: string;
++	/**
++	 * The label of the tab.
++	 */
++	title: string;
++	/**
++	 * The class name to apply to the tab button.
++	 */
++	className?: string;
++} & Record< any, any >;
++
++export type TabButtonProps = {
++	children: ReactNode;
++	className?: string;
++	onClick: ( event: MouseEvent ) => void;
++	selected: boolean;
++	tabId: string;
++};
++
++export type TabPanelProps = {
++	/**
++	 * The class name to add to the active tab.
++	 *
++	 * @default 'is-active'
++	 */
++	activeClass?: string;
++	/**
++	 * A function which renders the tabviews given the selected tab.
++	 * The function is passed the active tab object as an argument as defined by the tabs prop.
++	 */
++	children: ( tab: Tab ) => ReactNode;
++	/**
++	 * The class name to give to the outer container for the TabPanel.
++	 */
++	className?: string;
++	/**
++	 * The name of the tab to be selected upon mounting of component.
++	 * If this prop is not set, the first tab will be selected by default.
++	 */
++	initialTabName?: string;
++	/**
++	 * The function called when a tab has been selected.
++	 * It is passed the `tabName` as an argument.
++	 */
++	onSelect?: ( tabName: string ) => void;
++	/**
++	 * The orientation of the tablist.
++	 *
++	 * @default `horizontal`
++	 */
++	orientation?: 'horizontal' | 'vertical';
++	/**
++	 * Array of tab objects. Each tab object should contain at least a `name` and a `title`.
++	 */
++	tabs: Tab[];
++};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 51d57599ccfbdf..8b726b6efc6d7d 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -73,7 +73,6 @@
+ 		"src/sandbox",
+ 		"src/search-control",
+ 		"src/snackbar",
+-		"src/tab-panel",
+ 		"src/toolbar",
+ 		"src/toolbar-button",
+ 		"src/toolbar-context",

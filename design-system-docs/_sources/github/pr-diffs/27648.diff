@@ -1,0 +1,74 @@
+diff --git a/packages/components/src/popover/test/utils.js b/packages/components/src/popover/test/utils.js
+index 131be264a4c1e6..1a97a148a50a26 100644
+--- a/packages/components/src/popover/test/utils.js
++++ b/packages/components/src/popover/test/utils.js
+@@ -154,7 +154,7 @@ describe( 'computePopoverXAxisPosition', () => {
+ 		} );
+ 	} );
+ 
+-	it( "should set a maxWidth if there's not enough space in any direction", () => {
++	it( "should center popover if there's not enough space in any direction", () => {
+ 		const anchorRect = {
+ 			top: 10,
+ 			left: 400,
+@@ -172,9 +172,33 @@ describe( 'computePopoverXAxisPosition', () => {
+ 		expect(
+ 			computePopoverXAxisPosition( anchorRect, contentSize, 'right' )
+ 		).toEqual( {
+-			contentWidth: 614,
+-			popoverLeft: 410,
+-			xAxis: 'right',
++			contentWidth: null,
++			popoverLeft: 512,
++			xAxis: 'center',
++		} );
++	} );
++
++	it( 'should set the content width to the viewport width if content is too wide', () => {
++		const anchorRect = {
++			top: 10,
++			left: 400,
++			bottom: 30,
++			right: 420,
++			width: 20,
++			height: 20,
++		};
++
++		const contentSize = {
++			width: 1500,
++			height: 300,
++		};
++
++		expect(
++			computePopoverXAxisPosition( anchorRect, contentSize, 'right' )
++		).toEqual( {
++			contentWidth: 1024,
++			popoverLeft: 512,
++			xAxis: 'center',
+ 		} );
+ 	} );
+ } );
+diff --git a/packages/components/src/popover/utils.js b/packages/components/src/popover/utils.js
+index 57c697322e8215..6f566916c66c7e 100644
+--- a/packages/components/src/popover/utils.js
++++ b/packages/components/src/popover/utils.js
+@@ -107,7 +107,18 @@ export function computePopoverXAxisPosition(
+ 				chosenXAxis === 'left'
+ 					? leftAlignment.contentWidth
+ 					: rightAlignment.contentWidth;
+-			contentWidth = chosenWidth !== width ? chosenWidth : null;
++
++			// Limit width of the content to the viewport width
++			if ( width > window.innerWidth ) {
++				contentWidth = window.innerWidth;
++			}
++
++			// If we can't find any alignment options that could fit
++			// our content, then let's fallback to the center of the viewport.
++			if ( chosenWidth !== width ) {
++				chosenXAxis = 'center';
++				centerAlignment.popoverLeft = window.innerWidth / 2;
++			}
+ 		}
+ 	}
+ 

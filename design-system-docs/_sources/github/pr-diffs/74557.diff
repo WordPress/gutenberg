@@ -1,0 +1,169 @@
+diff --git a/.stylelintrc.js b/.stylelintrc.js
+index 94f225538c5eb3..e3e6d82a9ab805 100644
+--- a/.stylelintrc.js
++++ b/.stylelintrc.js
+@@ -53,6 +53,19 @@ module.exports = {
+ 		{
+ 			files: [ '**/*.module.css' ],
+ 			rules: {
++				'function-no-unknown': [
++					true,
++					{
++						ignoreFunctions: [
++							// CSS stepped value math functions in Baseline 2024.
++							// This rule exception can likely be removed when
++							// updating to a more recent version of Stylelint.
++							'round',
++							'rem',
++							'mod',
++						],
++					},
++				],
+ 				'declaration-property-max-values': {
+ 					// Prevents left/right values with shorthand property names (unclear for RTL)
+ 					margin: 3,
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 64415a5f667699..91370e60ceebe5 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -10,6 +10,10 @@
+ 
+ -   `Button`: Add minimum content width (`6ch` + padding) to prevent overly narrow buttons with short labels ([#75133](https://github.com/WordPress/gutenberg/pull/75133)).
+ 
++### Internal
++
++-   `Button`, `InputLayout`, `Tabs`: use semantic dimension tokens ([#74557](https://github.com/WordPress/gutenberg/pull/74557)).
++
+ ## 0.6.0 (2026-01-29)
+ 
+ ### New Features
+diff --git a/packages/ui/src/button/style.module.css b/packages/ui/src/button/style.module.css
+index 9b9addd3242e8c..9e5811b5350097 100644
+--- a/packages/ui/src/button/style.module.css
++++ b/packages/ui/src/button/style.module.css
+@@ -17,7 +17,7 @@
+ 		--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-brand-strong);
+ 		--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-brand-strong-active);
+ 		--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-neutral-strong-disabled);
+-		--wp-ui-button-padding-inline: calc(3 * var(--wpds-dimension-base)); /* TODO: Create new interactive padding tokens */
++		--wp-ui-button-padding-inline: var(--wpds-dimension-padding-md);
+ 		--wp-ui-button-height: 40px;
+ 		--wp-ui-button-aspect-ratio: auto; /* Useful for overrides such as icon buttons */
+ 		--wp-ui-button-font-size: var(--wpds-font-size-md);
+@@ -33,7 +33,7 @@
+ 		display: inline-flex;
+ 		justify-content: center;
+ 		align-items: center;
+-		gap: calc(2 * var(--wpds-dimension-base)); /* TODO: Consider new interactive/control gap tokens */
++		gap: var(--wpds-dimension-gap-sm);
+ 		aspect-ratio: var(--wp-ui-button-aspect-ratio);
+ 		min-width: var(--wp-ui-button-min-width);
+ 		height: var(--wp-ui-button-height);
+@@ -121,7 +121,7 @@
+ 	}
+ 
+ 	.is-small {
+-		--wp-ui-button-padding-inline: calc(2 * var(--wpds-dimension-base)); /* TODO: Create new interactive padding tokens */
++		--wp-ui-button-padding-inline: var(--wpds-dimension-padding-sm);
+ 		--wp-ui-button-height: 24px;
+ 	}
+ 
+diff --git a/packages/ui/src/form/primitives/input-layout/style.module.css b/packages/ui/src/form/primitives/input-layout/style.module.css
+index b52c878752235b..075d3645d257ec 100644
+--- a/packages/ui/src/form/primitives/input-layout/style.module.css
++++ b/packages/ui/src/form/primitives/input-layout/style.module.css
+@@ -2,8 +2,7 @@
+ 
+ @layer wp-ui-components {
+ 	.input-layout {
+-		/* TODO: Use padding tokens */
+-		--wp-ui-input-layout-padding-inline: calc(var(--wpds-dimension-base) * 3);
++		--wp-ui-input-layout-padding-inline: var(--wpds-dimension-padding-md);
+ 
+ 		display: flex;
+ 		height: 40px;
+@@ -22,14 +21,12 @@
+ 		}
+ 
+ 		&.is-size-compact {
+-			/* TODO: Use padding tokens */
+-			--wp-ui-input-layout-padding-inline: calc(var(--wpds-dimension-base) * 2);
++			--wp-ui-input-layout-padding-inline: var(--wpds-dimension-padding-sm);
+ 			height: 32px;
+ 		}
+ 
+ 		&.is-size-small {
+-			/* TODO: Use padding tokens */
+-			--wp-ui-input-layout-padding-inline: calc(var(--wpds-dimension-base) * 2);
++			--wp-ui-input-layout-padding-inline: var(--wpds-dimension-padding-sm);
+ 			height: 24px;
+ 		}
+ 
+@@ -66,10 +63,10 @@
+ 		&.is-padding-minimal {
+ 			--wp-ui-input-layout-prefix-padding-start:
+ 				calc(var(--wp-ui-input-layout-padding-inline) -
+-				var(--wpds-dimension-base));
++				var(--wpds-dimension-padding-xs));
+ 			--wp-ui-input-layout-suffix-padding-end:
+ 				calc(var(--wp-ui-input-layout-padding-inline) -
+-				var(--wpds-dimension-base));
++				var(--wpds-dimension-padding-xs));
+ 		}
+ 
+ 		&.is-prefix {
+diff --git a/packages/ui/src/tabs/style.module.css b/packages/ui/src/tabs/style.module.css
+index 08c85cdc523e82..a759fc5fbb8e8b 100644
+--- a/packages/ui/src/tabs/style.module.css
++++ b/packages/ui/src/tabs/style.module.css
+@@ -170,13 +170,13 @@
+ 		}
+ 
+ 		[data-orientation="horizontal"] & {
+-			padding-inline: calc(4 * var(--wpds-dimension-base)); /* TODO: Use or create new control/interactive padding token */
+-			height: calc(12 * var(--wpds-dimension-base)); /* TODO: Can we eliminate or hard-code? */
++			padding-inline: var(--wpds-dimension-padding-lg);
++			height: 48px; /* TODO: use semantic size/height tokens when available */
+ 			scroll-margin: 24px;
+ 
+ 			&::after {
+ 				content: "";
+-				inset: calc(3 * var(--wpds-dimension-base)); /* TODO: Use or create new control/interactive padding token */
++				inset: var(--wpds-dimension-padding-md);
+ 			}
+ 		}
+ 
+@@ -185,18 +185,17 @@
+ 
+ 			&::after {
+ 				/*
+-				 * Add enough inset to prevent the focus ring (which is 1.5px thick)
+-				 * from being visually clipped by the tablist.
++				 * Prevent clipping the focus ring at the tablist edge.
++				 * Use rounding, as the focus ring width may have sub-pixel values
++				 * depending on the screen pixel ratio.
+ 				 */
+-				inset-inline: 2px;
++				inset-inline: round(up, var(--wpds-border-width-focus), 1px);
+ 			}
+ 		}
+ 
+ 		[data-orientation="vertical"] & {
+-			padding:
+-				calc(2 * var(--wpds-dimension-base))
+-				calc(3 * var(--wpds-dimension-base)); /* TODO: Use or create new control/interactive padding token */
+-			min-height: calc(10 * var(--wpds-dimension-base)); /* TODO: Can we eliminate or hard-code? */
++			padding: var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-md);
++			min-height: 40px;  /* TODO: use semantic size/height tokens when available */
+ 		}
+ 
+ 		[data-orientation="vertical"][data-select-on-move="false"] &::after {
+@@ -222,7 +221,7 @@
+ 
+ 	.tab-chevron {
+ 		flex-shrink: 0;
+-		margin-inline-end: calc(var(--wpds-dimension-base) * -1); /* TODO: Use or create new control/interactive padding token */
++		margin-inline-end: calc(var(--wpds-dimension-gap-xs) * -1);
+ 
+ 		[data-orientation="horizontal"] & {
+ 			display: none;

@@ -1,0 +1,722 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 13f7b96bfc16e6..a5855b5840ebe0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `ColorPicker`: Preserve hue and saturation when the selected color becomes achromatic ([#75493](https://github.com/WordPress/gutenberg/pull/75493)).
+ -   `SnackbarList`: Fix scaling distortion when a snackbar's content is updated in place via a shared notice ID ([#75709](https://github.com/WordPress/gutenberg/pull/75709)).
+ 
+ ## 32.2.0 (2026-02-18)
+diff --git a/packages/components/src/color-picker/color-input.tsx b/packages/components/src/color-picker/color-input.tsx
+index 486e1ea319c917..610f43ace8d4e6 100644
+--- a/packages/components/src/color-picker/color-input.tsx
++++ b/packages/components/src/color-picker/color-input.tsx
+@@ -9,17 +9,36 @@ import type { ColorInputProps } from './types';
+ export const ColorInput = ( {
+ 	colorType,
+ 	color,
++	hsla,
+ 	onChange,
++	onHSLChange,
+ 	enableAlpha,
+ }: ColorInputProps ) => {
+-	const props = { color, onChange, enableAlpha };
+ 	switch ( colorType ) {
+ 		case 'hsl':
+-			return <HslInput { ...props } />;
++			return (
++				<HslInput
++					hsla={ hsla }
++					onChange={ onHSLChange }
++					enableAlpha={ enableAlpha }
++				/>
++			);
+ 		case 'rgb':
+-			return <RgbInput { ...props } />;
++			return (
++				<RgbInput
++					color={ color }
++					onChange={ onChange }
++					enableAlpha={ enableAlpha }
++				/>
++			);
+ 		default:
+ 		case 'hex':
+-			return <HexInput { ...props } />;
++			return (
++				<HexInput
++					color={ color }
++					onChange={ onChange }
++					enableAlpha={ enableAlpha }
++				/>
++			);
+ 	}
+ };
+diff --git a/packages/components/src/color-picker/component.tsx b/packages/components/src/color-picker/component.tsx
+index c38d1d34e571a1..3a427db5bfe8c1 100644
+--- a/packages/components/src/color-picker/component.tsx
++++ b/packages/components/src/color-picker/component.tsx
+@@ -4,12 +4,19 @@
+ import type { ClipboardEvent, ForwardedRef } from 'react';
+ import type { Colord } from 'colord';
+ import { colord, extend, getFormat } from 'colord';
++import type { HslaColor } from 'react-colorful';
+ import namesPlugin from 'colord/plugins/names';
+ 
+ /**
+  * WordPress dependencies
+  */
+-import { useCallback, useState, useMemo } from '@wordpress/element';
++import {
++	useCallback,
++	useEffect,
++	useRef,
++	useState,
++	useMemo,
++} from '@wordpress/element';
+ import { useDebounce } from '@wordpress/compose';
+ import { __ } from '@wordpress/i18n';
+ 
+@@ -33,6 +40,21 @@ import type { ColorPickerProps, ColorType } from './types';
+ 
+ extend( [ namesPlugin ] );
+ 
++/**
++ * Merges incoming HSLA with previous state, preserving hue for achromatic
++ * colors and saturation only at lightness extremes (black/white) where
++ * it has no visual effect.
++ */
++function mergeHSLA( nextHSLA: HslaColor, prevHSLA: HslaColor ): HslaColor {
++	if ( nextHSLA.s === 0 ) {
++		if ( nextHSLA.l === 0 || nextHSLA.l === 100 ) {
++			return { ...nextHSLA, h: prevHSLA.h, s: prevHSLA.s };
++		}
++		return { ...nextHSLA, h: prevHSLA.h };
++	}
++	return nextHSLA;
++}
++
+ const options = [
+ 	{ label: 'RGB', value: 'rgb' as const },
+ 	{ label: 'HSL', value: 'hsl' as const },
+@@ -65,9 +87,69 @@ const UnconnectedColorPicker = (
+ 
+ 	const debouncedSetColor = useDebounce( setColor );
+ 
++	// Internal HSLA state preserves hue and saturation values that
++	// would otherwise be lost when converting to/from hex at achromatic
++	// colors (e.g. pure black or white where any H/S maps to the same hex).
++	const [ internalHSLA, setInternalHSLA ] = useState< HslaColor >( () => ( {
++		...safeColordColor.toHsl(),
++	} ) );
++
++	// Track the last hex we produced so the sync effect can
++	// distinguish our own updates from external prop changes.
++	const lastProducedHexRef = useRef( safeColordColor.toHex() );
++
++	// Sync internalHSLA when the color prop changes externally (e.g.
++	// parent passes a new color that wasn't produced by our onChange).
++	useEffect( () => {
++		const incomingHex = safeColordColor.toHex();
++
++		// If this hex matches what we last produced, it's our own
++		// update arriving back — skip the sync to avoid overwriting
++		// internalHSLA with lossy round-tripped values.
++		if ( incomingHex === lastProducedHexRef.current ) {
++			return;
++		}
++
++		// Genuinely external change — sync internalHSLA.
++		lastProducedHexRef.current = incomingHex;
++		const externalHSLA = safeColordColor.toHsl();
++		setInternalHSLA( ( prev ) => mergeHSLA( externalHSLA, prev ) );
++	}, [ safeColordColor ] );
++
++	// Handler for HSL-aware components (Picker, HSL inputs) that
++	// provide raw HSLA values without information loss.
++	// Uses direct setColor (not debounced) to prevent race conditions
++	// where a stale debounced hex would overwrite newer internalHSLA.
++	// This is safe performance-wise because react-colorful internally
++	// throttles its onChange callbacks using requestAnimationFrame.
++
++	const handleHSLAChange = useCallback(
++		( nextHSLA: HslaColor ) => {
++			// No mergeHSLA here — this handler receives the user's explicit
++			// choice from the picker or HSL inputs, with no lossy conversion.
++			setInternalHSLA( nextHSLA );
++			const previousHex = lastProducedHexRef.current;
++			const nextHex = colord( nextHSLA ).toHex();
++			// Only notify parent when the hex actually changes. This
++			// avoids firing onChange for H/S changes on achromatic
++			// colors (e.g. adjusting hue on pure white).
++			if ( nextHex !== previousHex ) {
++				lastProducedHexRef.current = nextHex;
++				setColor( nextHex );
++			}
++		},
++		[ setColor ]
++	);
++
++	// Handler for components that provide Colord values (RGB, Hex inputs).
++	// Uses debouncedSetColor since the hex input fires per keystroke.
+ 	const handleChange = useCallback(
+ 		( nextValue: Colord ) => {
+-			debouncedSetColor( nextValue.toHex() );
++			const nextHSLA = nextValue.toHsl();
++			setInternalHSLA( ( prev ) => mergeHSLA( nextHSLA, prev ) );
++			const nextHex = nextValue.toHex();
++			lastProducedHexRef.current = nextHex;
++			debouncedSetColor( nextHex );
+ 		},
+ 		[ debouncedSetColor ]
+ 	);
+@@ -128,8 +210,8 @@ const UnconnectedColorPicker = (
+ 			onPasteCapture={ maybeHandlePaste }
+ 		>
+ 			<Picker
+-				onChange={ handleChange }
+-				color={ safeColordColor }
++				onChange={ handleHSLAChange }
++				hsla={ internalHSLA }
+ 				enableAlpha={ enableAlpha }
+ 			/>
+ 			<AuxiliaryColorArtefactWrapper>
+@@ -154,7 +236,9 @@ const UnconnectedColorPicker = (
+ 					<ColorInput
+ 						colorType={ colorType }
+ 						color={ safeColordColor }
++						hsla={ internalHSLA }
+ 						onChange={ handleChange }
++						onHSLChange={ handleHSLAChange }
+ 						enableAlpha={ enableAlpha }
+ 					/>
+ 				</ColorInputWrapper>
+diff --git a/packages/components/src/color-picker/hsl-input.tsx b/packages/components/src/color-picker/hsl-input.tsx
+index 8d2b0c7c444899..305ebc3c18c01b 100644
+--- a/packages/components/src/color-picker/hsl-input.tsx
++++ b/packages/components/src/color-picker/hsl-input.tsx
+@@ -1,12 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { colord } from 'colord';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useState, useEffect, useMemo } from '@wordpress/element';
++import type { HslaColor } from 'react-colorful';
+ 
+ /**
+  * Internal dependencies
+@@ -14,49 +9,12 @@ import { useState, useEffect, useMemo } from '@wordpress/element';
+ import { InputWithSlider } from './input-with-slider';
+ import type { HslInputProps } from './types';
+ 
+-export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
+-	const colorPropHSLA = useMemo( () => color.toHsl(), [ color ] );
+-
+-	const [ internalHSLA, setInternalHSLA ] = useState( { ...colorPropHSLA } );
+-
+-	const isInternalColorSameAsReceivedColor = color.isEqual(
+-		colord( internalHSLA )
+-	);
+-
+-	useEffect( () => {
+-		if ( ! isInternalColorSameAsReceivedColor ) {
+-			// Keep internal HSLA color up to date with the received color prop
+-			setInternalHSLA( colorPropHSLA );
+-		}
+-	}, [ colorPropHSLA, isInternalColorSameAsReceivedColor ] );
+-
+-	// If the internal color is equal to the received color prop, we can use the
+-	// HSLA values from the local state which, compared to the received color prop,
+-	// retain more details about the actual H and S values that the user selected,
+-	// and thus allow for better UX when interacting with the H and S sliders.
+-	const colorValue = isInternalColorSameAsReceivedColor
+-		? internalHSLA
+-		: colorPropHSLA;
+-
+-	const updateHSLAValue = (
+-		partialNewValue: Partial< typeof colorPropHSLA >
+-	) => {
+-		const nextOnChangeValue = colord( {
+-			...colorValue,
++export const HslInput = ( { hsla, onChange, enableAlpha }: HslInputProps ) => {
++	const updateHSLAValue = ( partialNewValue: Partial< HslaColor > ) => {
++		onChange( {
++			...hsla,
+ 			...partialNewValue,
+ 		} );
+-
+-		// Fire `onChange` only if the resulting color is different from the
+-		// current one.
+-		// Otherwise, update the internal HSLA color to cause a re-render.
+-		if ( ! color.isEqual( nextOnChangeValue ) ) {
+-			onChange( nextOnChangeValue );
+-		} else {
+-			setInternalHSLA( ( prevHSLA ) => ( {
+-				...prevHSLA,
+-				...partialNewValue,
+-			} ) );
+-		}
+ 	};
+ 
+ 	return (
+@@ -66,7 +24,7 @@ export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
+ 				max={ 359 }
+ 				label="Hue"
+ 				abbreviation="H"
+-				value={ colorValue.h }
++				value={ hsla.h }
+ 				onChange={ ( nextH: number ) => {
+ 					updateHSLAValue( { h: nextH } );
+ 				} }
+@@ -76,7 +34,7 @@ export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
+ 				max={ 100 }
+ 				label="Saturation"
+ 				abbreviation="S"
+-				value={ colorValue.s }
++				value={ hsla.s }
+ 				onChange={ ( nextS: number ) => {
+ 					updateHSLAValue( { s: nextS } );
+ 				} }
+@@ -86,7 +44,7 @@ export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
+ 				max={ 100 }
+ 				label="Lightness"
+ 				abbreviation="L"
+-				value={ colorValue.l }
++				value={ hsla.l }
+ 				onChange={ ( nextL: number ) => {
+ 					updateHSLAValue( { l: nextL } );
+ 				} }
+@@ -97,7 +55,7 @@ export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
+ 					max={ 100 }
+ 					label="Alpha"
+ 					abbreviation="A"
+-					value={ Math.trunc( 100 * colorValue.a ) }
++					value={ Math.trunc( 100 * hsla.a ) }
+ 					onChange={ ( nextA: number ) => {
+ 						updateHSLAValue( { a: nextA / 100 } );
+ 					} }
+diff --git a/packages/components/src/color-picker/picker.tsx b/packages/components/src/color-picker/picker.tsx
+index f2c068d8a46be2..2dff7128079c63 100644
+--- a/packages/components/src/color-picker/picker.tsx
++++ b/packages/components/src/color-picker/picker.tsx
+@@ -1,40 +1,44 @@
+ /**
+  * External dependencies
+  */
+-import { RgbStringColorPicker, RgbaStringColorPicker } from 'react-colorful';
+-import { colord } from 'colord';
++import { HslColorPicker, HslaColorPicker } from 'react-colorful';
+ 
+-/**
+- * WordPress dependencies
+- */
+-import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+ import type { PickerProps } from './types';
+ 
+-export const Picker = ( { color, enableAlpha, onChange }: PickerProps ) => {
+-	const Component = enableAlpha
+-		? RgbaStringColorPicker
+-		: RgbStringColorPicker;
+-	const rgbColor = useMemo( () => color.toRgbString(), [ color ] );
++// Pointer capture fortifies drag gestures so that they continue to work
++// while dragging outside the component over objects like iframes. If a
++// newer version of react-colorful begins to employ pointer capture this
++// will be redundant and should be removed.
++const pointerCaptureProps = {
++	onPointerDown( { currentTarget, pointerId }: React.PointerEvent ) {
++		currentTarget.setPointerCapture( pointerId );
++	},
++	onPointerUp( { currentTarget, pointerId }: React.PointerEvent ) {
++		currentTarget.releasePointerCapture( pointerId );
++	},
++};
++
++export const Picker = ( { hsla, enableAlpha, onChange }: PickerProps ) => {
++	if ( enableAlpha ) {
++		return (
++			<HslaColorPicker
++				color={ hsla }
++				onChange={ onChange }
++				{ ...pointerCaptureProps }
++			/>
++		);
++	}
+ 
+ 	return (
+-		<Component
+-			color={ rgbColor }
++		<HslColorPicker
++			color={ hsla }
+ 			onChange={ ( nextColor ) => {
+-				onChange( colord( nextColor ) );
+-			} }
+-			// Pointer capture fortifies drag gestures so that they continue to
+-			// work while dragging outside the component over objects like
+-			// iframes. If a newer version of react-colorful begins to employ
+-			// pointer capture this will be redundant and should be removed.
+-			onPointerDown={ ( { currentTarget, pointerId } ) => {
+-				currentTarget.setPointerCapture( pointerId );
+-			} }
+-			onPointerUp={ ( { currentTarget, pointerId } ) => {
+-				currentTarget.releasePointerCapture( pointerId );
++				onChange( { ...nextColor, a: hsla.a } );
+ 			} }
++			{ ...pointerCaptureProps }
+ 		/>
+ 	);
+ };
+diff --git a/packages/components/src/color-picker/test/index.tsx b/packages/components/src/color-picker/test/index.tsx
+index c493a733dca1db..6c9501f3ba6498 100644
+--- a/packages/components/src/color-picker/test/index.tsx
++++ b/packages/components/src/color-picker/test/index.tsx
+@@ -248,18 +248,19 @@ describe( 'ColorPicker', () => {
+ 			expect( onChange ).toHaveBeenLastCalledWith( '#597326' );
+ 
+ 			// Interact with the Lightness slider, setting to 100 (ie. white).
+-			// It should also cause the `onChange` callback to fire, and reset the
+-			// hue and saturation inputs to `0`.
++			// It should also cause the `onChange` callback to fire. The hue and
++			// saturation should be preserved (not reset to 0) since the user
++			// explicitly set them earlier.
+ 			fireEvent.change( lightnessSlider, { target: { value: 100 } } );
+ 
+ 			await waitFor( () =>
+ 				expect( lightnessSlider ).toHaveValue( '100' )
+ 			);
+ 			expect( lightnessNumberInput ).toHaveValue( 100 );
+-			expect( hueSlider ).toHaveValue( '0' );
+-			expect( saturationSlider ).toHaveValue( '0' );
+-			expect( hueNumberInput ).toHaveValue( 0 );
+-			expect( saturationNumberInput ).toHaveValue( 0 );
++			expect( hueSlider ).toHaveValue( '80' );
++			expect( saturationSlider ).toHaveValue( '50' );
++			expect( hueNumberInput ).toHaveValue( 80 );
++			expect( saturationNumberInput ).toHaveValue( 50 );
+ 			expect( onChange ).toHaveBeenCalledTimes( 2 );
+ 			expect( onChange ).toHaveBeenLastCalledWith( '#ffffff' );
+ 
+@@ -309,6 +310,138 @@ describe( 'ColorPicker', () => {
+ 			expect( lightnessNumberInput ).toHaveValue( 52 );
+ 		} );
+ 
++		it( 'should preserve hue and saturation when lightness is set to 0 (black)', async () => {
++			const onChange = jest.fn();
++
++			render(
++				<ControlledColorPicker
++					onChange={ onChange }
++					enableAlpha={ false }
++					initialColor="#2ad5d5" // hsl(180, 67%, 50%)
++				/>
++			);
++
++			const formatSelector = screen.getByRole( 'combobox' );
++			await userEvent.setup().selectOptions( formatSelector, 'hsl' );
++
++			const hueSliders = screen.getAllByRole( 'slider', { name: 'Hue' } );
++			const hueSlider = hueSliders.at( -1 )!;
++			const saturationSlider = screen.getByRole( 'slider', {
++				name: 'Saturation',
++			} );
++			const lightnessSlider = screen.getByRole( 'slider', {
++				name: 'Lightness',
++			} );
++			const hueNumberInput = screen.getByRole( 'spinbutton', {
++				name: 'Hue',
++			} );
++			const saturationNumberInput = screen.getByRole( 'spinbutton', {
++				name: 'Saturation',
++			} );
++
++			// Verify initial values
++			expect( hueSlider ).toHaveValue( '180' );
++			expect( saturationSlider ).toHaveValue( '67' );
++
++			// Set lightness to 0 (black)
++			fireEvent.change( lightnessSlider, { target: { value: 0 } } );
++
++			await waitFor( () => expect( lightnessSlider ).toHaveValue( '0' ) );
++
++			// Hue and saturation should be preserved
++			expect( hueSlider ).toHaveValue( '180' );
++			expect( saturationSlider ).toHaveValue( '67' );
++			expect( hueNumberInput ).toHaveValue( 180 );
++			expect( saturationNumberInput ).toHaveValue( 67 );
++			expect( onChange ).toHaveBeenLastCalledWith( '#000000' );
++		} );
++
++		it( 'should reset saturation to 0 when a mid-gray is entered via hex input', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<ControlledColorPicker
++					enableAlpha={ false }
++					initialColor="#2ad5d5" // hsl(180, 67%, 50%)
++				/>
++			);
++
++			const formatSelector = screen.getByRole( 'combobox' );
++
++			// Start in hex mode and enter a mid-gray.
++			await user.selectOptions( formatSelector, 'hex' );
++			const hexInput = screen.getByRole( 'textbox' );
++			await user.clear( hexInput );
++			await user.type( hexInput, '808080' );
++
++			// Switch to HSL to inspect the values.
++			await user.selectOptions( formatSelector, 'hsl' );
++
++			const saturationSlider = screen.getByRole( 'slider', {
++				name: 'Saturation',
++			} );
++			const saturationNumberInput = screen.getByRole( 'spinbutton', {
++				name: 'Saturation',
++			} );
++
++			// #808080 is hsl(0, 0%, 50%) — a pure mid-gray.
++			// Saturation must be 0, not the stale value from the
++			// previous chromatic color.
++			await waitFor( () =>
++				expect( saturationSlider ).toHaveValue( '0' )
++			);
++			expect( saturationNumberInput ).toHaveValue( 0 );
++		} );
++
++		it( 'should preserve hue when saturation is set to 0', async () => {
++			const onChange = jest.fn();
++
++			render(
++				<ControlledColorPicker
++					onChange={ onChange }
++					enableAlpha={ false }
++					initialColor="#ff0000" // hsl(0, 100%, 50%) - pure red
++				/>
++			);
++
++			const formatSelector = screen.getByRole( 'combobox' );
++			await userEvent.setup().selectOptions( formatSelector, 'hsl' );
++
++			const hueSliders = screen.getAllByRole( 'slider', { name: 'Hue' } );
++			const hueSlider = hueSliders.at( -1 )!;
++			const saturationSlider = screen.getByRole( 'slider', {
++				name: 'Saturation',
++			} );
++			const hueNumberInput = screen.getByRole( 'spinbutton', {
++				name: 'Hue',
++			} );
++
++			// Set a specific hue first
++			fireEvent.change( hueSlider, { target: { value: 200 } } );
++
++			await waitFor( () => expect( hueSlider ).toHaveValue( '200' ) );
++
++			// Set saturation to 0 (grayscale)
++			fireEvent.change( saturationSlider, { target: { value: 0 } } );
++
++			await waitFor( () =>
++				expect( saturationSlider ).toHaveValue( '0' )
++			);
++
++			// Hue should be preserved even though color is now gray
++			expect( hueSlider ).toHaveValue( '200' );
++			expect( hueNumberInput ).toHaveValue( 200 );
++
++			// Increase saturation again - hue should still be 200
++			fireEvent.change( saturationSlider, { target: { value: 50 } } );
++
++			await waitFor( () =>
++				expect( saturationSlider ).toHaveValue( '50' )
++			);
++
++			expect( hueSlider ).toHaveValue( '200' );
++			expect( hueNumberInput ).toHaveValue( 200 );
++		} );
+ 		describe.each( [
+ 			[ 'hue', 'Hue', '#aad52a' ],
+ 			[ 'saturation', 'Saturation', '#20dfdf' ],
+diff --git a/packages/components/src/color-picker/types.ts b/packages/components/src/color-picker/types.ts
+index 5f98404c528444..4082a4e357a329 100644
+--- a/packages/components/src/color-picker/types.ts
++++ b/packages/components/src/color-picker/types.ts
+@@ -56,15 +56,17 @@ export type ColorPickerProps = WordPressComponentProps<
+ >;
+ 
+ export interface PickerProps {
+-	color: Colord;
++	hsla: HslaColor;
+ 	enableAlpha: boolean;
+-	onChange: ( nextColor: Colord ) => void;
++	onChange: ( nextHsla: HslaColor ) => void;
+ }
+ 
+ export interface ColorInputProps {
+ 	colorType: 'hsl' | 'hex' | 'rgb';
+ 	color: Colord;
++	hsla: HslaColor;
+ 	onChange: ( nextColor: Colord ) => void;
++	onHSLChange: ( nextHsla: HslaColor ) => void;
+ 	enableAlpha: boolean;
+ }
+ 
+@@ -84,8 +86,8 @@ export interface HexInputProps {
+ }
+ 
+ export interface HslInputProps {
+-	color: Colord;
+-	onChange: ( nextColor: Colord ) => void;
++	hsla: HslaColor;
++	onChange: ( nextHsla: HslaColor ) => void;
+ 	enableAlpha: boolean;
+ }
+ 
+diff --git a/test/e2e/specs/editor/various/color-picker-hsl.spec.js b/test/e2e/specs/editor/various/color-picker-hsl.spec.js
+new file mode 100644
+index 00000000000000..945c8ea5679ed6
+--- /dev/null
++++ b/test/e2e/specs/editor/various/color-picker-hsl.spec.js
+@@ -0,0 +1,135 @@
++/**
++ * WordPress dependencies
++ */
++import { test, expect } from '@wordpress/e2e-test-utils-playwright';
++
++test.describe( 'ColorPicker HSL inputs', () => {
++	test.beforeEach( async ( { admin, editor, page } ) => {
++		await admin.createNewPost();
++
++		// Insert a paragraph block and open the text color picker in HSL mode.
++		await editor.insertBlock( {
++			name: 'core/paragraph',
++			attributes: { content: 'Test paragraph' },
++		} );
++
++		await editor.openDocumentSettingsSidebar();
++
++		await page
++			.getByRole( 'region', { name: 'Editor settings' } )
++			.getByRole( 'button', { name: 'Text' } )
++			.click();
++
++		await page
++			.getByRole( 'button', { name: 'Custom color picker' } )
++			.click();
++
++		// Switch to HSL mode.
++		await page
++			.getByRole( 'combobox', { name: 'Color format' } )
++			.selectOption( 'hsl' );
++	} );
++
++	test( 'should preserve hue and saturation when lightness is set to white', async ( {
++		page,
++	} ) => {
++		const hueSlider = page.getByRole( 'slider', { name: 'Hue' } ).last();
++		const saturationSlider = page.getByRole( 'slider', {
++			name: 'Saturation',
++		} );
++		const lightnessSlider = page.getByRole( 'slider', {
++			name: 'Lightness',
++		} );
++
++		// Set an initial chromatic color: hsl(180, 50%, 50%).
++		await hueSlider.fill( '180' );
++		await saturationSlider.fill( '50' );
++		await lightnessSlider.fill( '50' );
++
++		await expect( hueSlider ).toHaveValue( '180' );
++		await expect( saturationSlider ).toHaveValue( '50' );
++
++		// Set lightness to 100 (white) — hue and saturation should be preserved.
++		await lightnessSlider.fill( '100' );
++
++		await expect( hueSlider ).toHaveValue( '180' );
++		await expect( saturationSlider ).toHaveValue( '50' );
++		await expect( lightnessSlider ).toHaveValue( '100' );
++
++		// Restore lightness — the original color should return.
++		await lightnessSlider.fill( '50' );
++
++		await expect( hueSlider ).toHaveValue( '180' );
++		await expect( saturationSlider ).toHaveValue( '50' );
++	} );
++
++	test( 'should preserve hue and saturation when lightness is set to black', async ( {
++		page,
++	} ) => {
++		const hueSlider = page.getByRole( 'slider', { name: 'Hue' } ).last();
++		const saturationSlider = page.getByRole( 'slider', {
++			name: 'Saturation',
++		} );
++		const lightnessSlider = page.getByRole( 'slider', {
++			name: 'Lightness',
++		} );
++
++		// Set an initial chromatic color: hsl(270, 80%, 60%).
++		await hueSlider.fill( '270' );
++		await saturationSlider.fill( '80' );
++		await lightnessSlider.fill( '60' );
++
++		await expect( hueSlider ).toHaveValue( '270' );
++		await expect( saturationSlider ).toHaveValue( '80' );
++
++		// Set lightness to 0 (black) — hue and saturation should be preserved.
++		await lightnessSlider.fill( '0' );
++
++		await expect( hueSlider ).toHaveValue( '270' );
++		await expect( saturationSlider ).toHaveValue( '80' );
++		await expect( lightnessSlider ).toHaveValue( '0' );
++
++		// Restore lightness — the original color should return.
++		await lightnessSlider.fill( '60' );
++
++		await expect( hueSlider ).toHaveValue( '270' );
++		await expect( saturationSlider ).toHaveValue( '80' );
++	} );
++
++	test( 'should preserve hue and saturation across multiple achromatic round-trips', async ( {
++		page,
++	} ) => {
++		const hueSlider = page.getByRole( 'slider', { name: 'Hue' } ).last();
++		const saturationSlider = page.getByRole( 'slider', {
++			name: 'Saturation',
++		} );
++		const lightnessSlider = page.getByRole( 'slider', {
++			name: 'Lightness',
++		} );
++
++		// Start with hsl(30, 90%, 50%).
++		await hueSlider.fill( '30' );
++		await saturationSlider.fill( '90' );
++		await lightnessSlider.fill( '50' );
++
++		// Round-trip through white.
++		await lightnessSlider.fill( '100' );
++		await expect( hueSlider ).toHaveValue( '30' );
++		await expect( saturationSlider ).toHaveValue( '90' );
++
++		// Back to chromatic.
++		await lightnessSlider.fill( '50' );
++		await expect( hueSlider ).toHaveValue( '30' );
++		await expect( saturationSlider ).toHaveValue( '90' );
++
++		// Round-trip through black.
++		await lightnessSlider.fill( '0' );
++		await expect( hueSlider ).toHaveValue( '30' );
++		await expect( saturationSlider ).toHaveValue( '90' );
++
++		// Back to chromatic — values should still be intact.
++		await lightnessSlider.fill( '50' );
++		await expect( hueSlider ).toHaveValue( '30' );
++		await expect( saturationSlider ).toHaveValue( '90' );
++	} );
++} );

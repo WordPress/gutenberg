@@ -1,0 +1,15 @@
+diff --git a/packages/components/src/radio-control/style.scss b/packages/components/src/radio-control/style.scss
+index 6d93d4bf146bb7..fd0b2070abc7cd 100644
+--- a/packages/components/src/radio-control/style.scss
++++ b/packages/components/src/radio-control/style.scss
+@@ -5,6 +5,10 @@
+ 	.components-base-control__help {
+ 		margin-top: 0;
+ 	}
++
++	.components-base-control__field {
++		margin-bottom: 4px;
++	}
+ }
+ 
+ .components-radio-control__option:not(:last-child) {

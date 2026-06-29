@@ -1,0 +1,1656 @@
+diff --git a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+index 172121132b2436..7db5f3ee20eb63 100644
+--- a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
++++ b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+@@ -29,15 +29,12 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+   -webkit-flex-direction: column;
+   -ms-flex-direction: column;
+   flex-direction: column;
++  gap: calc(4px * 1);
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+ }
+ 
+-.emotion-4>*+*:not( marquee ) {
+-  margin-top: calc(4px * 1);
+-}
+-
+ .emotion-4>* {
+   min-height: 0;
+ }
+@@ -64,15 +61,12 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+   -webkit-flex-direction: column;
+   -ms-flex-direction: column;
+   flex-direction: column;
++  gap: calc(4px * 3);
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+ }
+ 
+-.emotion-8>*+*:not( marquee ) {
+-  margin-top: calc(4px * 3);
+-}
+-
+ .emotion-8>* {
+   min-height: 0;
+ }
+@@ -89,16 +83,13 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
++  gap: calc(4px * 2);
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+   width: 100%;
+ }
+ 
+-.emotion-10>*+*:not( marquee ) {
+-  margin-left: calc(4px * 2);
+-}
+-
+ .emotion-10>* {
+   min-width: 0;
+ }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d8a8147da0e9e0..d74a39bb021dc9 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ ### Bug Fix
+ 
+ -   `Button`, `Icon`: Fix `iconSize` prop doesn't work with some icons ([#43821](https://github.com/WordPress/gutenberg/pull/43821)).
++-   `InputControl`, `NumberControl`, `UnitControl`: Fix margin when `labelPosition` is `bottom` ([#43995](https://github.com/WordPress/gutenberg/pull/43995)).
+ -   `Popover`: enable auto-updating every animation frame ([#43617](https://github.com/WordPress/gutenberg/pull/43617)).
+ -   `Popover`: improve the component's performance and reactivity to prop changes by reworking its internals ([#43335](https://github.com/WordPress/gutenberg/pull/43335)).
+ -   `NavigatorScreen`: updated to satisfy `react/exhaustive-deps` eslint rule ([#43876](https://github.com/WordPress/gutenberg/pull/43876))
+@@ -20,6 +21,7 @@
+ -   `ToggleControl`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43717](https://github.com/WordPress/gutenberg/pull/43717)).
+ -   `CheckboxControl`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43720](https://github.com/WordPress/gutenberg/pull/43720)).
+ -   `TextControl`, `TextareaControl`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43782](https://github.com/WordPress/gutenberg/pull/43782)).
++-   `Flex`: Remove margin-based polyfill implementation of flex `gap` ([#43995](https://github.com/WordPress/gutenberg/pull/43995)).
+ -   `RangeControl`: Tweak dark gray marking color to be consistent with the grays in `@wordpress/base-styles` ([#43773](https://github.com/WordPress/gutenberg/pull/43773)).
+ -   `UnitControl`: Tweak unit dropdown color to be consistent with the grays in `@wordpress/base-styles` ([#43773](https://github.com/WordPress/gutenberg/pull/43773)).
+ -   `SearchControl`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43871](https://github.com/WordPress/gutenberg/pull/43871)).
+diff --git a/packages/components/src/base-field/test/__snapshots__/index.js.snap b/packages/components/src/base-field/test/__snapshots__/index.js.snap
+index bf844bf643de68..f35321afdb0555 100644
+--- a/packages/components/src/base-field/test/__snapshots__/index.js.snap
++++ b/packages/components/src/base-field/test/__snapshots__/index.js.snap
+@@ -25,7 +25,7 @@ Snapshot Diff:
+ - Received styles
+ + Base styles
+ 
+-@@ -14,18 +14,17 @@
++@@ -14,19 +14,18 @@
+       "background": "#fff",
+       "border": "1px solid",
+       "border-color": "#757575",
+@@ -36,6 +36,7 @@ Snapshot Diff:
+       "flex": "1",
+       "flex-direction": "row",
+       "font-size": "13px",
++      "gap": "calc(4px * 2)",
+       "justify-content": "space-between",
+       "outline": "none",
+       "padding": "0 8px",
+@@ -80,6 +81,7 @@ exports[`base field should render correctly 1`] = `
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
++  gap: calc(4px * 2);
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+@@ -105,10 +107,6 @@ exports[`base field should render correctly 1`] = `
+   width: 100%;
+ }
+ 
+-.emotion-0>*+*:not( marquee ) {
+-  margin-left: calc(4px * 2);
+-}
+-
+ .emotion-0>* {
+   min-width: 0;
+ }
+diff --git a/packages/components/src/card/test/__snapshots__/index.tsx.snap b/packages/components/src/card/test/__snapshots__/index.tsx.snap
+index c7329fb8c111df..2325e13746aa95 100644
+--- a/packages/components/src/card/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/card/test/__snapshots__/index.tsx.snap
+@@ -42,8 +42,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-flex components-card__footer components-card-footer css-p1v47q-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium e19lxcc00"
+-+     class="components-flex components-card__footer components-card-footer css-skr34d-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium-shady e19lxcc00"
++-     class="components-flex components-card__footer components-card-footer css-120suhd-View-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium e19lxcc00"
+++     class="components-flex components-card__footer components-card-footer css-19jxwll-View-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium-shady e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="CardFooter"
+     >
+@@ -59,8 +59,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-flex components-card__footer components-card-footer css-p1v47q-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium e19lxcc00"
+-+     class="components-flex components-card__footer components-card-footer css-gg08fg-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium e19lxcc00"
++-     class="components-flex components-card__footer components-card-footer css-120suhd-View-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium e19lxcc00"
+++     class="components-flex components-card__footer components-card-footer css-ys33kb-View-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="CardFooter"
+     >
+@@ -76,8 +76,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-flex components-card__header components-card-header css-1g5oj2q-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-medium e19lxcc00"
+-+     class="components-flex components-card__header components-card-header css-1gv9wvv-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-medium-shady e19lxcc00"
++-     class="components-flex components-card__header components-card-header css-3fkkv8-View-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium e19lxcc00"
+++     class="components-flex components-card__header components-card-header css-1qktnah-View-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium-shady e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="CardHeader"
+     >
+@@ -96,8 +96,8 @@ Snapshot Diff:
+       class="css-mgwsf4-View-Content e19lxcc00"
+     >
+       <div
+--       class="components-flex components-card__header components-card-header css-1g5oj2q-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-medium e19lxcc00"
+-+       class="components-flex components-card__header components-card-header css-1e8ifbz-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-large e19lxcc00"
++-       class="components-flex components-card__header components-card-header css-3fkkv8-View-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium e19lxcc00"
+++       class="components-flex components-card__header components-card-header css-2feznw-View-Flex-base-ItemsRow-Header-borderRadius-borderColor-large e19lxcc00"
+         data-wp-c16t="true"
+         data-wp-component="CardHeader"
+       >
+@@ -141,8 +141,8 @@ Snapshot Diff:
+         class="css-mgwsf4-View-Content e19lxcc00"
+       >
+         <div
+--         class="components-flex components-card__header components-card-header css-1uuauve-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-large-borderless e19lxcc00"
+-+         class="components-flex components-card__header components-card-header css-yf9nll-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-small e19lxcc00"
++-         class="components-flex components-card__header components-card-header css-ed5e1x-View-Flex-base-ItemsRow-Header-borderRadius-borderColor-large-borderless e19lxcc00"
+++         class="components-flex components-card__header components-card-header css-1f9ii60-View-Flex-base-ItemsRow-Header-borderRadius-borderColor-small e19lxcc00"
+           data-wp-c16t="true"
+           data-wp-component="CardHeader"
+         >
+@@ -157,8 +157,8 @@ Snapshot Diff:
+           Body
+         </div>
+         <div
+--         class="components-flex components-card__footer components-card-footer css-s0icc3-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-large-borderless e19lxcc00"
+-+         class="components-flex components-card__footer components-card-footer css-cwhos2-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-xSmallCardPadding e19lxcc00"
++-         class="components-flex components-card__footer components-card-footer css-ide17g-View-Flex-base-ItemsRow-Footer-borderRadius-borderColor-large-borderless e19lxcc00"
+++         class="components-flex components-card__footer components-card-footer css-jsws2e-View-Flex-base-ItemsRow-Footer-borderRadius-borderColor-xSmallCardPadding e19lxcc00"
+           data-wp-c16t="true"
+           data-wp-component="CardFooter"
+         >
+@@ -183,8 +183,8 @@ Snapshot Diff:
+         class="css-mgwsf4-View-Content e19lxcc00"
+       >
+         <div
+--         class="components-flex components-card__header components-card-header css-1uuauve-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-large-borderless e19lxcc00"
+-+         class="components-flex components-card__header components-card-header css-yf9nll-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-small e19lxcc00"
++-         class="components-flex components-card__header components-card-header css-ed5e1x-View-Flex-base-ItemsRow-Header-borderRadius-borderColor-large-borderless e19lxcc00"
+++         class="components-flex components-card__header components-card-header css-1f9ii60-View-Flex-base-ItemsRow-Header-borderRadius-borderColor-small e19lxcc00"
+           data-wp-c16t="true"
+           data-wp-component="CardHeader"
+         >
+@@ -199,8 +199,8 @@ Snapshot Diff:
+           Body
+         </div>
+         <div
+--         class="components-flex components-card__footer components-card-footer css-s0icc3-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-large-borderless e19lxcc00"
+-+         class="components-flex components-card__footer components-card-footer css-oc4v7j-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-small e19lxcc00"
++-         class="components-flex components-card__footer components-card-footer css-ide17g-View-Flex-base-ItemsRow-Footer-borderRadius-borderColor-large-borderless e19lxcc00"
+++         class="components-flex components-card__footer components-card-footer css-1ih54yp-View-Flex-base-ItemsRow-Footer-borderRadius-borderColor-small e19lxcc00"
+           data-wp-c16t="true"
+           data-wp-component="CardFooter"
+         >
+@@ -236,6 +236,7 @@ Object {
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
++  gap: calc(4px * 2);
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+@@ -246,10 +247,6 @@ Object {
+   padding: calc(4px * 4) calc(4px * 6);
+ }
+ 
+-.emotion-4>*+*:not( marquee ) {
+-  margin-left: calc(4px * 2);
+-}
+-
+ .emotion-4>* {
+   min-width: 0;
+ }
+@@ -332,6 +329,7 @@ Object {
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
++  gap: calc(4px * 2);
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+@@ -342,10 +340,6 @@ Object {
+   padding: calc(4px * 4) calc(4px * 6);
+ }
+ 
+-.emotion-16>*+*:not( marquee ) {
+-  margin-left: calc(4px * 2);
+-}
+-
+ .emotion-16>* {
+   min-width: 0;
+ }
+@@ -492,6 +486,7 @@ Object {
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
++  gap: calc(4px * 2);
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+@@ -502,10 +497,6 @@ Object {
+   padding: calc(4px * 4) calc(4px * 6);
+ }
+ 
+-.emotion-4>*+*:not( marquee ) {
+-  margin-left: calc(4px * 2);
+-}
+-
+ .emotion-4>* {
+   min-width: 0;
+ }
+@@ -588,6 +579,7 @@ Object {
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
++  gap: calc(4px * 2);
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+@@ -598,10 +590,6 @@ Object {
+   padding: calc(4px * 4) calc(4px * 6);
+ }
+ 
+-.emotion-16>*+*:not( marquee ) {
+-  margin-left: calc(4px * 2);
+-}
+-
+ .emotion-16>* {
+   min-width: 0;
+ }
+diff --git a/packages/components/src/color-palette/test/__snapshots__/index.js.snap b/packages/components/src/color-palette/test/__snapshots__/index.js.snap
+index 9b5f89011dac7a..da5d93107263a2 100644
+--- a/packages/components/src/color-palette/test/__snapshots__/index.js.snap
++++ b/packages/components/src/color-palette/test/__snapshots__/index.js.snap
+@@ -30,21 +30,18 @@ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`]
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
++  gap: calc(4px * 2);
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+   width: 100%;
+ }
+ 
+-.emotion-2>*+*:not( marquee ) {
+-  margin-left: calc(4px * 2);
+-}
+-
+-.emotion-3>* {
++.emotion-2>* {
+   min-width: 0;
+ }
+ 
+-.emotion-4 {
++.emotion-3 {
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: -ms-flexbox;
+@@ -56,21 +53,18 @@ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`]
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
++  gap: calc(4px * 2);
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+   width: 100%;
+ }
+ 
+-.emotion-4>*+*:not( marquee ) {
+-  margin-left: calc(4px * 2);
+-}
+-
+-.emotion-4>* {
++.emotion-3>* {
+   min-width: 0;
+ }
+ 
+-.emotion-6 {
++.emotion-5 {
+   display: block;
+   max-height: 100%;
+   max-width: 100%;
+@@ -78,13 +72,13 @@ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`]
+   min-width: 0;
+ }
+ 
+-.emotion-8 {
++.emotion-7 {
+   -webkit-flex: 1;
+   -ms-flex: 1;
+   flex: 1;
+ }
+ 
+-.emotion-9 {
++.emotion-8 {
+   display: block;
+   max-height: 100%;
+   max-width: 100%;
+@@ -95,14 +89,14 @@ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`]
+   flex: 1;
+ }
+ 
+-.emotion-11 {
++.emotion-10 {
+   display: block;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+ }
+ 
+-.emotion-15 {
++.emotion-14 {
+   display: block;
+   overflow: hidden;
+   text-overflow: ellipsis;
+@@ -117,7 +111,7 @@ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`]
+   flex: 1;
+ }
+ 
+-.emotion-19 {
++.emotion-18 {
+   display: block;
+   max-height: 100%;
+   max-width: 100%;
+@@ -146,7 +140,7 @@ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`]
+     aria-haspopup="true"
+     aria-label="Custom color picker. The currently selected color is called \\"red\\" and has a value of \\"f00\\"."
+     as="button"
+-    className="emotion-0 emotion-1 emotion-2 emotion-3 components-flex components-color-palette__custom-color"
++    className="emotion-0 emotion-1 emotion-2 components-flex components-color-palette__custom-color"
+     data-wp-c16t={true}
+     data-wp-component="Flex"
+     onClick={[MockFunction]}
+@@ -162,7 +156,7 @@ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`]
+       aria-expanded={true}
+       aria-haspopup="true"
+       aria-label="Custom color picker. The currently selected color is called \\"red\\" and has a value of \\"f00\\"."
+-      className="components-flex components-color-palette__custom-color emotion-4 emotion-5"
++      className="components-flex components-color-palette__custom-color emotion-3 emotion-4"
+       data-wp-c16t={true}
+       data-wp-component="Flex"
+       onClick={[MockFunction]}
+@@ -198,25 +192,25 @@ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`]
+               "selector": ".components-truncate",
+             }
+           }
+-          className="emotion-6 emotion-7 emotion-8 components-flex-item components-color-palette__custom-color-name"
++          className="emotion-5 emotion-6 emotion-7 components-flex-item components-color-palette__custom-color-name"
+           data-wp-c16t={true}
+           data-wp-component="FlexItem"
+         >
+           <Noop />
+           <Truncate
+-            className="components-flex-item components-color-palette__custom-color-name emotion-9 emotion-5"
++            className="components-flex-item components-color-palette__custom-color-name emotion-8 emotion-4"
+             data-wp-c16t={true}
+             data-wp-component="FlexItem"
+           >
+             <View
+               as="span"
+-              className="emotion-11 components-truncate components-flex-item components-color-palette__custom-color-name emotion-9 emotion-5"
++              className="emotion-10 components-truncate components-flex-item components-color-palette__custom-color-name emotion-8 emotion-4"
+               data-wp-c16t={true}
+               data-wp-component="FlexItem"
+             >
+               <Noop />
+               <span
+-                className="components-truncate components-flex-item components-color-palette__custom-color-name emotion-5 emotion-15 emotion-5"
++                className="components-truncate components-flex-item components-color-palette__custom-color-name emotion-4 emotion-14 emotion-4"
+                 data-wp-c16t={true}
+                 data-wp-component="FlexItem"
+               >
+@@ -232,13 +226,13 @@ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`]
+       >
+         <View
+           as="span"
+-          className="emotion-6 emotion-7 components-flex-item components-color-palette__custom-color-value"
++          className="emotion-5 emotion-6 components-flex-item components-color-palette__custom-color-value"
+           data-wp-c16t={true}
+           data-wp-component="FlexItem"
+         >
+           <Noop />
+           <span
+-            className="components-flex-item components-color-palette__custom-color-value emotion-19 emotion-5"
++            className="components-flex-item components-color-palette__custom-color-value emotion-18 emotion-4"
+             data-wp-c16t={true}
+             data-wp-component="FlexItem"
+           >
+@@ -267,21 +261,18 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
++  gap: calc(4px * 2);
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+   width: 100%;
+ }
+ 
+-.emotion-2>*+*:not( marquee ) {
+-  margin-left: calc(4px * 2);
+-}
+-
+-.emotion-3>* {
++.emotion-2>* {
+   min-width: 0;
+ }
+ 
+-.emotion-4 {
++.emotion-3 {
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: -ms-flexbox;
+@@ -293,21 +284,18 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
++  gap: calc(4px * 2);
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+   width: 100%;
+ }
+ 
+-.emotion-4>*+*:not( marquee ) {
+-  margin-left: calc(4px * 2);
+-}
+-
+-.emotion-4>* {
++.emotion-3>* {
+   min-width: 0;
+ }
+ 
+-.emotion-6 {
++.emotion-5 {
+   display: block;
+   max-height: 100%;
+   max-width: 100%;
+@@ -315,13 +303,13 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
+   min-width: 0;
+ }
+ 
+-.emotion-8 {
++.emotion-7 {
+   -webkit-flex: 1;
+   -ms-flex: 1;
+   flex: 1;
+ }
+ 
+-.emotion-9 {
++.emotion-8 {
+   display: block;
+   max-height: 100%;
+   max-width: 100%;
+@@ -332,14 +320,14 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
+   flex: 1;
+ }
+ 
+-.emotion-11 {
++.emotion-10 {
+   display: block;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+ }
+ 
+-.emotion-15 {
++.emotion-14 {
+   display: block;
+   overflow: hidden;
+   text-overflow: ellipsis;
+@@ -354,7 +342,7 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
+   flex: 1;
+ }
+ 
+-.emotion-19 {
++.emotion-18 {
+   display: block;
+   max-height: 100%;
+   max-width: 100%;
+@@ -399,7 +387,7 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
+         aria-haspopup="true"
+         aria-label="Custom color picker. The currently selected color is called \\"red\\" and has a value of \\"f00\\"."
+         as="button"
+-        className="emotion-0 emotion-1 emotion-2 emotion-3 components-flex components-color-palette__custom-color"
++        className="emotion-0 emotion-1 emotion-2 components-flex components-color-palette__custom-color"
+         data-wp-c16t={true}
+         data-wp-component="Flex"
+         onClick={[Function]}
+@@ -415,7 +403,7 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
+           aria-expanded={false}
+           aria-haspopup="true"
+           aria-label="Custom color picker. The currently selected color is called \\"red\\" and has a value of \\"f00\\"."
+-          className="components-flex components-color-palette__custom-color emotion-4 emotion-5"
++          className="components-flex components-color-palette__custom-color emotion-3 emotion-4"
+           data-wp-c16t={true}
+           data-wp-component="Flex"
+           onClick={[Function]}
+@@ -451,25 +439,25 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
+                   "selector": ".components-truncate",
+                 }
+               }
+-              className="emotion-6 emotion-7 emotion-8 components-flex-item components-color-palette__custom-color-name"
++              className="emotion-5 emotion-6 emotion-7 components-flex-item components-color-palette__custom-color-name"
+               data-wp-c16t={true}
+               data-wp-component="FlexItem"
+             >
+               <Noop />
+               <Truncate
+-                className="components-flex-item components-color-palette__custom-color-name emotion-9 emotion-5"
++                className="components-flex-item components-color-palette__custom-color-name emotion-8 emotion-4"
+                 data-wp-c16t={true}
+                 data-wp-component="FlexItem"
+               >
+                 <View
+                   as="span"
+-                  className="emotion-11 components-truncate components-flex-item components-color-palette__custom-color-name emotion-9 emotion-5"
++                  className="emotion-10 components-truncate components-flex-item components-color-palette__custom-color-name emotion-8 emotion-4"
+                   data-wp-c16t={true}
+                   data-wp-component="FlexItem"
+                 >
+                   <Noop />
+                   <span
+-                    className="components-truncate components-flex-item components-color-palette__custom-color-name emotion-5 emotion-15 emotion-5"
++                    className="components-truncate components-flex-item components-color-palette__custom-color-name emotion-4 emotion-14 emotion-4"
+                     data-wp-c16t={true}
+                     data-wp-component="FlexItem"
+                   >
+@@ -485,13 +473,13 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
+           >
+             <View
+               as="span"
+-              className="emotion-6 emotion-7 components-flex-item components-color-palette__custom-color-value"
++              className="emotion-5 emotion-6 components-flex-item components-color-palette__custom-color-value"
+               data-wp-c16t={true}
+               data-wp-component="FlexItem"
+             >
+               <Noop />
+               <span
+-                className="components-flex-item components-color-palette__custom-color-value emotion-19 emotion-5"
++                className="components-flex-item components-color-palette__custom-color-value emotion-18 emotion-4"
+                 data-wp-c16t={true}
+                 data-wp-component="FlexItem"
+               >
+@@ -558,20 +546,17 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+   -webkit-flex-direction: column;
+   -ms-flex-direction: column;
+   flex-direction: column;
++  gap: calc(4px * 3);
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+ }
+ 
+-.emotion-2>*+*:not( marquee ) {
+-  margin-top: calc(4px * 3);
+-}
+-
+-.emotion-3>* {
++.emotion-2>* {
+   min-height: 0;
+ }
+ 
+-.emotion-4 {
++.emotion-3 {
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: -ms-flexbox;
+@@ -583,20 +568,17 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+   -webkit-flex-direction: column;
+   -ms-flex-direction: column;
+   flex-direction: column;
++  gap: calc(4px * 3);
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+ }
+ 
+-.emotion-4>*+*:not( marquee ) {
+-  margin-top: calc(4px * 3);
+-}
+-
+-.emotion-4>* {
++.emotion-3>* {
+   min-height: 0;
+ }
+ 
+-.emotion-7 {
++.emotion-6 {
+   -webkit-align-items: flex-start;
+   -webkit-box-align: flex-start;
+   -ms-flex-align: flex-start;
+@@ -604,21 +586,18 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
++  gap: calc(4px * 2);
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+   width: 100%;
+ }
+ 
+-.emotion-8>*+*:not( marquee ) {
+-  margin-left: calc(4px * 2);
+-}
+-
+-.emotion-9>* {
++.emotion-7>* {
+   min-width: 0;
+ }
+ 
+-.emotion-10 {
++.emotion-8 {
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: -ms-flexbox;
+@@ -630,21 +609,18 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
++  gap: calc(4px * 2);
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+   width: 100%;
+ }
+ 
+-.emotion-10>*+*:not( marquee ) {
+-  margin-left: calc(4px * 2);
+-}
+-
+-.emotion-10>* {
++.emotion-8>* {
+   min-width: 0;
+ }
+ 
+-.emotion-12 {
++.emotion-10 {
+   display: block;
+   max-height: 100%;
+   max-width: 100%;
+@@ -652,13 +628,13 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+   min-width: 0;
+ }
+ 
+-.emotion-14 {
++.emotion-12 {
+   -webkit-flex: 1;
+   -ms-flex: 1;
+   flex: 1;
+ }
+ 
+-.emotion-15 {
++.emotion-13 {
+   display: block;
+   max-height: 100%;
+   max-width: 100%;
+@@ -669,14 +645,14 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+   flex: 1;
+ }
+ 
+-.emotion-17 {
++.emotion-15 {
+   display: block;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+ }
+ 
+-.emotion-21 {
++.emotion-19 {
+   display: block;
+   overflow: hidden;
+   text-overflow: ellipsis;
+@@ -691,7 +667,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+   flex: 1;
+ }
+ 
+-.emotion-25 {
++.emotion-23 {
+   display: block;
+   max-height: 100%;
+   max-width: 100%;
+@@ -723,14 +699,14 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+     spacing={3}
+   >
+     <View
+-      className="emotion-0 emotion-1 emotion-2 emotion-3 components-flex components-h-stack components-v-stack"
++      className="emotion-0 emotion-1 emotion-2 components-flex components-h-stack components-v-stack"
+       data-wp-c16t={true}
+       data-wp-component="VStack"
+       isColumn={true}
+     >
+       <Noop />
+       <div
+-        className="components-flex components-h-stack components-v-stack emotion-4 emotion-5"
++        className="components-flex components-h-stack components-v-stack emotion-3 emotion-4"
+         data-wp-c16t={true}
+         data-wp-component="VStack"
+       >
+@@ -777,7 +753,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+                   aria-haspopup="true"
+                   aria-label="Custom color picker. The currently selected color is called \\"red\\" and has a value of \\"f00\\"."
+                   as="button"
+-                  className="emotion-0 emotion-7 emotion-8 emotion-9 components-flex components-color-palette__custom-color"
++                  className="emotion-0 emotion-6 emotion-7 components-flex components-color-palette__custom-color"
+                   data-wp-c16t={true}
+                   data-wp-component="Flex"
+                   onClick={[Function]}
+@@ -793,7 +769,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+                     aria-expanded={false}
+                     aria-haspopup="true"
+                     aria-label="Custom color picker. The currently selected color is called \\"red\\" and has a value of \\"f00\\"."
+-                    className="components-flex components-color-palette__custom-color emotion-10 emotion-5"
++                    className="components-flex components-color-palette__custom-color emotion-8 emotion-4"
+                     data-wp-c16t={true}
+                     data-wp-component="Flex"
+                     onClick={[Function]}
+@@ -829,25 +805,25 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+                             "selector": ".components-truncate",
+                           }
+                         }
+-                        className="emotion-12 emotion-13 emotion-14 components-flex-item components-color-palette__custom-color-name"
++                        className="emotion-10 emotion-11 emotion-12 components-flex-item components-color-palette__custom-color-name"
+                         data-wp-c16t={true}
+                         data-wp-component="FlexItem"
+                       >
+                         <Noop />
+                         <Truncate
+-                          className="components-flex-item components-color-palette__custom-color-name emotion-15 emotion-5"
++                          className="components-flex-item components-color-palette__custom-color-name emotion-13 emotion-4"
+                           data-wp-c16t={true}
+                           data-wp-component="FlexItem"
+                         >
+                           <View
+                             as="span"
+-                            className="emotion-17 components-truncate components-flex-item components-color-palette__custom-color-name emotion-15 emotion-5"
++                            className="emotion-15 components-truncate components-flex-item components-color-palette__custom-color-name emotion-13 emotion-4"
+                             data-wp-c16t={true}
+                             data-wp-component="FlexItem"
+                           >
+                             <Noop />
+                             <span
+-                              className="components-truncate components-flex-item components-color-palette__custom-color-name emotion-5 emotion-21 emotion-5"
++                              className="components-truncate components-flex-item components-color-palette__custom-color-name emotion-4 emotion-19 emotion-4"
+                               data-wp-c16t={true}
+                               data-wp-component="FlexItem"
+                             >
+@@ -863,13 +839,13 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+                     >
+                       <View
+                         as="span"
+-                        className="emotion-12 emotion-13 components-flex-item components-color-palette__custom-color-value"
++                        className="emotion-10 emotion-11 components-flex-item components-color-palette__custom-color-value"
+                         data-wp-c16t={true}
+                         data-wp-component="FlexItem"
+                       >
+                         <Noop />
+                         <span
+-                          className="components-flex-item components-color-palette__custom-color-value emotion-25 emotion-5"
++                          className="components-flex-item components-color-palette__custom-color-value emotion-23 emotion-4"
+                           data-wp-c16t={true}
+                           data-wp-component="FlexItem"
+                         >
+diff --git a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+index d451fac623884b..83e6fe500faa1a 100644
+--- a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
++++ b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+@@ -33,6 +33,7 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+   -webkit-flex-direction: column;
+   -ms-flex-direction: column;
+   flex-direction: column;
++  gap: calc(4px * 2);
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+@@ -40,17 +41,6 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+   position: relative;
+   border-radius: 2px;
+   padding-top: 0;
+-  -webkit-align-items: flex-start;
+-  -webkit-box-align: flex-start;
+-  -ms-flex-align: flex-start;
+-  align-items: flex-start;
+-  -webkit-flex-direction: column;
+-  -ms-flex-direction: column;
+-  flex-direction: column;
+-}
+-
+-.emotion-5>*+*:not( marquee ) {
+-  margin-top: 0;
+ }
+ 
+ .emotion-5>* {
+@@ -86,10 +76,6 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+   padding-bottom: 0;
+   max-width: 100%;
+   z-index: 1;
+-  margin-top: 0;
+-  margin-right: 0;
+-  margin-bottom: 8px;
+-  margin-left: 0;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+@@ -318,6 +304,7 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
+   -webkit-flex-direction: column;
+   -ms-flex-direction: column;
+   flex-direction: column;
++  gap: calc(4px * 2);
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+@@ -325,17 +312,6 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
+   position: relative;
+   border-radius: 2px;
+   padding-top: 0;
+-  -webkit-align-items: flex-start;
+-  -webkit-box-align: flex-start;
+-  -ms-flex-align: flex-start;
+-  align-items: flex-start;
+-  -webkit-flex-direction: column;
+-  -ms-flex-direction: column;
+-  flex-direction: column;
+-}
+-
+-.emotion-5>*+*:not( marquee ) {
+-  margin-top: 0;
+ }
+ 
+ .emotion-5>* {
+@@ -371,10 +347,6 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
+   padding-bottom: 0;
+   max-width: 100%;
+   z-index: 1;
+-  margin-top: 0;
+-  margin-right: 0;
+-  margin-bottom: 8px;
+-  margin-left: 0;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+@@ -613,6 +585,7 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`]
+   -webkit-flex-direction: column;
+   -ms-flex-direction: column;
+   flex-direction: column;
++  gap: calc(4px * 2);
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+@@ -620,17 +593,6 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`]
+   position: relative;
+   border-radius: 2px;
+   padding-top: 0;
+-  -webkit-align-items: flex-start;
+-  -webkit-box-align: flex-start;
+-  -ms-flex-align: flex-start;
+-  align-items: flex-start;
+-  -webkit-flex-direction: column;
+-  -ms-flex-direction: column;
+-  flex-direction: column;
+-}
+-
+-.emotion-5>*+*:not( marquee ) {
+-  margin-top: 0;
+ }
+ 
+ .emotion-5>* {
+@@ -666,10 +628,6 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`]
+   padding-bottom: 0;
+   max-width: 100%;
+   z-index: 1;
+-  margin-top: 0;
+-  margin-right: 0;
+-  margin-bottom: 8px;
+-  margin-left: 0;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+@@ -920,6 +878,7 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
+   -webkit-flex-direction: column;
+   -ms-flex-direction: column;
+   flex-direction: column;
++  gap: calc(4px * 2);
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+@@ -927,17 +886,6 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
+   position: relative;
+   border-radius: 2px;
+   padding-top: 0;
+-  -webkit-align-items: flex-start;
+-  -webkit-box-align: flex-start;
+-  -ms-flex-align: flex-start;
+-  align-items: flex-start;
+-  -webkit-flex-direction: column;
+-  -ms-flex-direction: column;
+-  flex-direction: column;
+-}
+-
+-.emotion-5>*+*:not( marquee ) {
+-  margin-top: 0;
+ }
+ 
+ .emotion-5>* {
+@@ -973,10 +921,6 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
+   padding-bottom: 0;
+   max-width: 100%;
+   z-index: 1;
+-  margin-top: 0;
+-  margin-right: 0;
+-  margin-bottom: 8px;
+-  margin-left: 0;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+diff --git a/packages/components/src/flex/flex/hook.ts b/packages/components/src/flex/flex/hook.ts
+index 0e12f41ef4f90c..3694ac171a4e3a 100644
+--- a/packages/components/src/flex/flex/hook.ts
++++ b/packages/components/src/flex/flex/hook.ts
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css, SerializedStyles } from '@emotion/react';
++import { css } from '@emotion/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -16,7 +16,7 @@ import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+ import { useResponsiveValue } from '../../ui/utils/use-responsive-value';
+ import { space } from '../../ui/utils/space';
+ import * as styles from '../styles';
+-import { useCx, rtl } from '../../utils';
++import { useCx } from '../../utils';
+ import type { FlexProps } from '../types';
+ 
+ function useDeprecatedProps(
+@@ -61,72 +61,24 @@ export function useFlex( props: WordPressComponentProps< FlexProps, 'div' > ) {
+ 		typeof direction === 'string' && direction.includes( 'reverse' );
+ 
+ 	const cx = useCx();
+-	const rtlWatchResult = rtl.watch();
+ 
+ 	const classes = useMemo( () => {
+-		const sx: {
+-			Base?: SerializedStyles;
+-			Items?: SerializedStyles;
+-			WrapItems?: SerializedStyles;
+-		} = {};
+-
+-		sx.Base = css( {
++		const base = css( {
+ 			alignItems: isColumn ? 'normal' : align,
+ 			flexDirection: direction,
+ 			flexWrap: wrap ? 'wrap' : undefined,
++			gap: space( gap ),
+ 			justifyContent: justify,
+ 			height: isColumn && expanded ? '100%' : undefined,
+ 			width: ! isColumn && expanded ? '100%' : undefined,
+-			marginBottom: wrap ? `calc(${ space( gap ) } * -1)` : undefined,
+ 		} );
+ 
+-		/**
+-		 * Workaround to optimize DOM rendering.
+-		 * We'll enhance alignment with naive parent flex assumptions.
+-		 *
+-		 * Trade-off:
+-		 * Far less DOM less. However, UI rendering is not as reliable.
+-		 */
+-		sx.Items = css`
+-			> * + *:not( marquee ) {
+-				margin-top: ${ isColumn ? space( gap ) : undefined };
+-				${ rtl( {
+-					marginLeft:
+-						! isColumn && ! isReverse ? space( gap ) : undefined,
+-					marginRight:
+-						! isColumn && isReverse ? space( gap ) : undefined,
+-				} )() }
+-			}
+-		`;
+-
+-		sx.WrapItems = css`
+-			> *:not( marquee ) {
+-				margin-bottom: ${ space( gap ) };
+-				${ rtl( {
+-					marginLeft:
+-						! isColumn && isReverse ? space( gap ) : undefined,
+-					marginRight:
+-						! isColumn && ! isReverse ? space( gap ) : undefined,
+-				} )() }
+-			}
+-
+-			> *:last-child:not( marquee ) {
+-				${ rtl( {
+-					marginLeft: ! isColumn && isReverse ? 0 : undefined,
+-					marginRight: ! isColumn && ! isReverse ? 0 : undefined,
+-				} )() }
+-			}
+-		`;
+-
+ 		return cx(
+ 			styles.Flex,
+-			sx.Base,
+-			wrap ? sx.WrapItems : sx.Items,
++			base,
+ 			isColumn ? styles.ItemsColumn : styles.ItemsRow,
+ 			className
+ 		);
+-		// rtlWatchResult is needed to refresh styles when the writing direction changes
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [
+ 		align,
+ 		className,
+@@ -138,7 +90,6 @@ export function useFlex( props: WordPressComponentProps< FlexProps, 'div' > ) {
+ 		isReverse,
+ 		justify,
+ 		wrap,
+-		rtlWatchResult,
+ 	] );
+ 
+ 	return { ...otherProps, className: classes, isColumn };
+diff --git a/packages/components/src/flex/test/__snapshots__/index.tsx.snap b/packages/components/src/flex/test/__snapshots__/index.tsx.snap
+index 5f144b3106dc91..072b70ff9cb806 100644
+--- a/packages/components/src/flex/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/flex/test/__snapshots__/index.tsx.snap
+@@ -7,7 +7,7 @@ Snapshot Diff:
+ 
+ @@ -1,22 +1,18 @@
+   <div
+-    class="components-flex css-1giw1wa-View-Flex-sx-Base-sx-Items-ItemsRow e19lxcc00"
++    class="components-flex css-j6raph-View-Flex-base-ItemsRow e19lxcc00"
+ -   data-testid="flex"
+ +   data-testid="base-flex"
+     data-wp-c16t="true"
+@@ -53,9 +53,9 @@ Snapshot Diff:
+ +     "align-items": "center",
+       "display": "flex",
+       "flex-direction": "row",
++      "gap": "calc(4px * 2)",
+       "justify-content": "space-between",
+       "width": "100%",
+-    },
+ `;
+ 
+ exports[`props should render correctly 1`] = `
+@@ -71,16 +71,13 @@ exports[`props should render correctly 1`] = `
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
++  gap: calc(4px * 2);
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+   width: 100%;
+ }
+ 
+-.emotion-0>*+*:not( marquee ) {
+-  margin-left: calc(4px * 2);
+-}
+-
+ .emotion-0>* {
+   min-width: 0;
+ }
+@@ -147,6 +144,7 @@ Snapshot Diff:
+       "align-items": "center",
+       "display": "flex",
+       "flex-direction": "row",
++      "gap": "calc(4px * 2)",
+ -     "justify-content": "flex-start",
+ +     "justify-content": "space-between",
+       "width": "100%",
+@@ -161,9 +159,6 @@ Snapshot Diff:
+ 
+   Array [
+     Object {
+--     "margin-left": "calc(4px * 2)",
+--   },
+--   Object {
+ -     "min-width": "0",
+ -   },
+ -   Object {
+@@ -176,9 +171,6 @@ Snapshot Diff:
+       "min-height": "0",
+ +     "min-width": "0",
+ +   },
+-+   Object {
+-+     "margin-left": "calc(4px * 5)",
+-+   },
+ +   Object {
+       "min-width": "0",
+     },
+diff --git a/packages/components/src/h-stack/test/__snapshots__/index.tsx.snap b/packages/components/src/h-stack/test/__snapshots__/index.tsx.snap
+index b044c14d8b0e69..2de0fd5e8ea459 100644
+--- a/packages/components/src/h-stack/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/h-stack/test/__snapshots__/index.tsx.snap
+@@ -13,6 +13,7 @@ exports[`props should render alignment 1`] = `
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
++  gap: calc(4px * 2);
+   -webkit-box-pack: center;
+   -ms-flex-pack: center;
+   -webkit-justify-content: center;
+@@ -20,10 +21,6 @@ exports[`props should render alignment 1`] = `
+   width: 100%;
+ }
+ 
+-.emotion-0>*+*:not( marquee ) {
+-  margin-left: calc(4px * 2);
+-}
+-
+ .emotion-0>* {
+   min-width: 0;
+ }
+@@ -55,16 +52,13 @@ exports[`props should render correctly 1`] = `
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
++  gap: calc(4px * 2);
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+   width: 100%;
+ }
+ 
+-.emotion-0>*+*:not( marquee ) {
+-  margin-left: calc(4px * 2);
+-}
+-
+ .emotion-0>* {
+   min-width: 0;
+ }
+@@ -96,16 +90,13 @@ exports[`props should render spacing 1`] = `
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
++  gap: calc(4px * 5);
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+   width: 100%;
+ }
+ 
+-.emotion-0>*+*:not( marquee ) {
+-  margin-left: calc(4px * 5);
+-}
+-
+ .emotion-0>* {
+   min-width: 0;
+ }
+diff --git a/packages/components/src/input-control/input-base.tsx b/packages/components/src/input-control/input-base.tsx
+index 2b7d4123adcbba..677bf35e61f446 100644
+--- a/packages/components/src/input-control/input-base.tsx
++++ b/packages/components/src/input-control/input-base.tsx
+@@ -19,7 +19,6 @@ import {
+ 	Root,
+ 	Prefix,
+ 	Suffix,
+-	LabelWrapper,
+ 	getSizeConfig,
+ } from './styles/input-control-styles';
+ import type { InputBaseProps, LabelPosition } from './types';
+@@ -91,20 +90,19 @@ export function InputBase(
+ 			{ ...props }
+ 			{ ...getUIFlexProps( labelPosition ) }
+ 			className={ className }
++			gap={ 2 }
+ 			isFocused={ isFocused }
+ 			labelPosition={ labelPosition }
+ 			ref={ ref }
+ 		>
+-			<LabelWrapper>
+-				<Label
+-					className="components-input-control__label"
+-					hideLabelFromVision={ hideLabelFromVision }
+-					labelPosition={ labelPosition }
+-					htmlFor={ id }
+-				>
+-					{ label }
+-				</Label>
+-			</LabelWrapper>
++			<Label
++				className="components-input-control__label"
++				hideLabelFromVision={ hideLabelFromVision }
++				labelPosition={ labelPosition }
++				htmlFor={ id }
++			>
++				{ label }
++			</Label>
+ 			<Container
+ 				__unstableInputWidth={ __unstableInputWidth }
+ 				className="components-input-control__container"
+diff --git a/packages/components/src/input-control/label.tsx b/packages/components/src/input-control/label.tsx
+index ea214707b012b8..c0a79f83d95995 100644
+--- a/packages/components/src/input-control/label.tsx
++++ b/packages/components/src/input-control/label.tsx
+@@ -2,7 +2,10 @@
+  * Internal dependencies
+  */
+ import { VisuallyHidden } from '../visually-hidden';
+-import { Label as BaseLabel } from './styles/input-control-styles';
++import {
++	Label as BaseLabel,
++	LabelWrapper,
++} from './styles/input-control-styles';
+ import type { WordPressComponentProps } from '../ui/context';
+ import type { InputControlLabelProps } from './types';
+ 
+@@ -23,8 +26,10 @@ export default function Label( {
+ 	}
+ 
+ 	return (
+-		<BaseLabel htmlFor={ htmlFor } { ...props }>
+-			{ children }
+-		</BaseLabel>
++		<LabelWrapper>
++			<BaseLabel htmlFor={ htmlFor } { ...props }>
++				{ children }
++			</BaseLabel>
++		</LabelWrapper>
+ 	);
+ }
+diff --git a/packages/components/src/input-control/styles/input-control-styles.tsx b/packages/components/src/input-control/styles/input-control-styles.tsx
+index 1fa5dfdbd82e22..b35efb42378ea7 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.tsx
++++ b/packages/components/src/input-control/styles/input-control-styles.tsx
+@@ -33,33 +33,11 @@ const rootFocusedStyles = ( { isFocused }: RootProps ) => {
+ 	return css( { zIndex: 1 } );
+ };
+ 
+-const rootLabelPositionStyles = ( { labelPosition }: RootProps ) => {
+-	switch ( labelPosition ) {
+-		case 'top':
+-			return css`
+-				align-items: flex-start;
+-				flex-direction: column;
+-			`;
+-		case 'bottom':
+-			return css`
+-				align-items: flex-start;
+-				flex-direction: column-reverse;
+-			`;
+-		case 'edge':
+-			return css`
+-				justify-content: space-between;
+-			`;
+-		default:
+-			return '';
+-	}
+-};
+-
+ export const Root = styled( Flex )< RootProps >`
+ 	position: relative;
+ 	border-radius: 2px;
+ 	padding-top: 0;
+ 	${ rootFocusedStyles }
+-	${ rootLabelPositionStyles }
+ `;
+ 
+ const containerDisabledStyles = ( { disabled }: ContainerProps ) => {
+@@ -70,11 +48,6 @@ const containerDisabledStyles = ( { disabled }: ContainerProps ) => {
+ 	return css( { backgroundColor } );
+ };
+ 
+-// Normalizes the margins from the <Flex /> (components/ui/flex/) container.
+-const containerMarginStyles = ( { hideLabel }: ContainerProps ) => {
+-	return hideLabel ? css( { margin: '0 !important' } ) : null;
+-};
+-
+ const containerWidthStyles = ( {
+ 	__unstableInputWidth,
+ 	labelPosition,
+@@ -101,7 +74,6 @@ export const Container = styled.div< ContainerProps >`
+ 	position: relative;
+ 
+ 	${ containerDisabledStyles }
+-	${ containerMarginStyles }
+ 	${ containerWidthStyles }
+ `;
+ 
+@@ -256,20 +228,6 @@ export const Input = styled.input< InputProps >`
+ 	}
+ `;
+ 
+-const labelMargin = ( {
+-	labelPosition,
+-}: {
+-	labelPosition?: LabelPosition;
+-} ) => {
+-	let marginBottom = 8;
+-
+-	if ( labelPosition === 'edge' || labelPosition === 'side' ) {
+-		marginBottom = 0;
+-	}
+-
+-	return css( { marginTop: 0, marginRight: 0, marginBottom, marginLeft: 0 } );
+-};
+-
+ const BaseLabel = styled( Text )< { labelPosition?: LabelPosition } >`
+ 	&&& {
+ 		${ baseLabelTypography };
+@@ -281,7 +239,6 @@ const BaseLabel = styled( Text )< { labelPosition?: LabelPosition } >`
+ 		max-width: 100%;
+ 		z-index: 1;
+ 
+-		${ labelMargin }
+ 		overflow: hidden;
+ 		text-overflow: ellipsis;
+ 		white-space: nowrap;
+diff --git a/packages/components/src/ui/control-group/test/__snapshots__/index.js.snap b/packages/components/src/ui/control-group/test/__snapshots__/index.js.snap
+index 430810f1dbbaf6..b5ab9da09702f5 100644
+--- a/packages/components/src/ui/control-group/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/control-group/test/__snapshots__/index.js.snap
+@@ -13,16 +13,13 @@ exports[`props should render correctly 1`] = `
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
++  gap: -1px;
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+   width: 100%;
+ }
+ 
+-.emotion-0>*+*:not( marquee ) {
+-  margin-left: -1px;
+-}
+-
+ .emotion-0>* {
+   min-width: 0;
+ }
+diff --git a/packages/components/src/unit-control/test/__snapshots__/index.tsx.snap b/packages/components/src/unit-control/test/__snapshots__/index.tsx.snap
+index 10653f783e2aaf..8674b01867901f 100644
+--- a/packages/components/src/unit-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/unit-control/test/__snapshots__/index.tsx.snap
+@@ -5,20 +5,18 @@ Snapshot Diff:
+ - First value
+ + Second value
+ 
+-@@ -1,10 +1,10 @@
++@@ -1,20 +1,20 @@
+   <div
+     class="components-unit-control-wrapper css-zi0c81-Root e1bagdl33"
+   >
+     <div
+--     class="components-flex components-input-control components-number-control components-unit-control e1bagdl32 ep48uk90 em5sgkm7 css-1njfmeu-View-Flex-sx-Base-sx-Items-ItemsColumn-Root-rootLabelPositionStyles-Input-ValueInput-arrowStyles e19lxcc00"
+-+     class="components-flex components-input-control components-number-control components-unit-control hello e1bagdl32 ep48uk90 em5sgkm7 css-1njfmeu-View-Flex-sx-Base-sx-Items-ItemsColumn-Root-rootLabelPositionStyles-Input-ValueInput-arrowStyles e19lxcc00"
++-     class="components-flex components-input-control components-number-control components-unit-control e1bagdl32 ep48uk90 em5sgkm7 css-x6mixa-View-Flex-base-ItemsColumn-Root-Input-ValueInput-arrowStyles e19lxcc00"
+++     class="components-flex components-input-control components-number-control components-unit-control hello e1bagdl32 ep48uk90 em5sgkm7 css-x6mixa-View-Flex-base-ItemsColumn-Root-Input-ValueInput-arrowStyles e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="Flex"
+     >
+       <div
+-        class="components-flex-item em5sgkm3 css-1fmchc6-View-Item-sx-Base-LabelWrapper e19lxcc00"
+-@@ -15,11 +15,11 @@
+-        class="components-input-control__container css-1sy20aj-Container-containerDisabledStyles-containerMarginStyles-containerWidthStyles em5sgkm6"
++        class="components-input-control__container css-1o1a8cj-Container-containerDisabledStyles-containerWidthStyles em5sgkm6"
+       >
+         <input
+           autocomplete="off"
+diff --git a/packages/components/src/v-stack/test/__snapshots__/index.tsx.snap b/packages/components/src/v-stack/test/__snapshots__/index.tsx.snap
+index 02bf559632afb4..5e842a5103a146 100644
+--- a/packages/components/src/v-stack/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/v-stack/test/__snapshots__/index.tsx.snap
+@@ -13,16 +13,13 @@ exports[`props should render alignment 1`] = `
+   -webkit-flex-direction: column;
+   -ms-flex-direction: column;
+   flex-direction: column;
++  gap: calc(4px * 2);
+   -webkit-box-pack: center;
+   -ms-flex-pack: center;
+   -webkit-justify-content: center;
+   justify-content: center;
+ }
+ 
+-.emotion-0>*+*:not( marquee ) {
+-  margin-top: calc(4px * 2);
+-}
+-
+ .emotion-0>* {
+   min-height: 0;
+ }
+@@ -54,15 +51,12 @@ exports[`props should render correctly 1`] = `
+   -webkit-flex-direction: column;
+   -ms-flex-direction: column;
+   flex-direction: column;
++  gap: calc(4px * 2);
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+ }
+ 
+-.emotion-0>*+*:not( marquee ) {
+-  margin-top: calc(4px * 2);
+-}
+-
+ .emotion-0>* {
+   min-height: 0;
+ }
+@@ -94,15 +88,12 @@ exports[`props should render spacing 1`] = `
+   -webkit-flex-direction: column;
+   -ms-flex-direction: column;
+   flex-direction: column;
++  gap: calc(4px * 5);
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+ }
+ 
+-.emotion-0>*+*:not( marquee ) {
+-  margin-top: calc(4px * 5);
+-}
+-
+ .emotion-0>* {
+   min-height: 0;
+ }
+diff --git a/packages/edit-post/src/components/preferences-modal/options/test/__snapshots__/enable-custom-fields.js.snap b/packages/edit-post/src/components/preferences-modal/options/test/__snapshots__/enable-custom-fields.js.snap
+index 5a0769cd1ee337..dcb6fd789d2ccc 100644
+--- a/packages/edit-post/src/components/preferences-modal/options/test/__snapshots__/enable-custom-fields.js.snap
++++ b/packages/edit-post/src/components/preferences-modal/options/test/__snapshots__/enable-custom-fields.js.snap
+@@ -29,6 +29,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
++  gap: calc(4px * 3);
+   -webkit-box-pack: start;
+   -ms-flex-pack: start;
+   -webkit-justify-content: flex-start;
+@@ -36,10 +37,6 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation
+   width: 100%;
+ }
+ 
+-.emotion-4>*+*:not( marquee ) {
+-  margin-left: calc(4px * 3);
+-}
+-
+ .emotion-4>* {
+   min-width: 0;
+ }
+@@ -128,6 +125,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
++  gap: calc(4px * 3);
+   -webkit-box-pack: start;
+   -ms-flex-pack: start;
+   -webkit-justify-content: flex-start;
+@@ -135,10 +133,6 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields
+   width: 100%;
+ }
+ 
+-.emotion-4>*+*:not( marquee ) {
+-  margin-left: calc(4px * 3);
+-}
+-
+ .emotion-4>* {
+   min-width: 0;
+ }
+@@ -213,6 +207,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
++  gap: calc(4px * 3);
+   -webkit-box-pack: start;
+   -ms-flex-pack: start;
+   -webkit-justify-content: flex-start;
+@@ -220,10 +215,6 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
+   width: 100%;
+ }
+ 
+-.emotion-4>*+*:not( marquee ) {
+-  margin-left: calc(4px * 3);
+-}
+-
+ .emotion-4>* {
+   min-width: 0;
+ }
+@@ -312,6 +303,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fiel
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
++  gap: calc(4px * 3);
+   -webkit-box-pack: start;
+   -ms-flex-pack: start;
+   -webkit-justify-content: flex-start;
+@@ -319,10 +311,6 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fiel
+   width: 100%;
+ }
+ 
+-.emotion-4>*+*:not( marquee ) {
+-  margin-left: calc(4px * 3);
+-}
+-
+ .emotion-4>* {
+   min-width: 0;
+ }
+diff --git a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
+index 39ed234a664a07..723d5c071d425a 100644
+--- a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
++++ b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
+@@ -29,6 +29,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
++  gap: calc(4px * 3);
+   -webkit-box-pack: start;
+   -ms-flex-pack: start;
+   -webkit-justify-content: flex-start;
+@@ -36,10 +37,6 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
+   width: 100%;
+ }
+ 
+-.emotion-4>*+*:not( marquee ) {
+-  margin-left: calc(4px * 3);
+-}
+-
+ .emotion-4>* {
+   min-width: 0;
+ }
+@@ -605,16 +602,13 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
++  gap: calc(4px * 2);
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+   justify-content: space-between;
+   width: 100%;
+ }
+ 
+-.emotion-15>*+*:not( marquee ) {
+-  margin-left: calc(4px * 2);
+-}
+-
+ .emotion-15>* {
+   min-width: 0;
+ }
+diff --git a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/meta-boxes-section.js.snap b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/meta-boxes-section.js.snap
+index e76e7c106efb0a..087120098c5831 100644
+--- a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/meta-boxes-section.js.snap
++++ b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/meta-boxes-section.js.snap
+@@ -29,6 +29,7 @@ exports[`MetaBoxesSection renders a Custom Fields option 1`] = `
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
++  gap: calc(4px * 3);
+   -webkit-box-pack: start;
+   -ms-flex-pack: start;
+   -webkit-justify-content: flex-start;
+@@ -36,10 +37,6 @@ exports[`MetaBoxesSection renders a Custom Fields option 1`] = `
+   width: 100%;
+ }
+ 
+-.emotion-4>*+*:not( marquee ) {
+-  margin-left: calc(4px * 3);
+-}
+-
+ .emotion-4>* {
+   min-width: 0;
+ }
+@@ -127,6 +124,7 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
++  gap: calc(4px * 3);
+   -webkit-box-pack: start;
+   -ms-flex-pack: start;
+   -webkit-justify-content: flex-start;
+@@ -134,10 +132,6 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
+   width: 100%;
+ }
+ 
+-.emotion-4>*+*:not( marquee ) {
+-  margin-left: calc(4px * 3);
+-}
+-
+ .emotion-4>* {
+   min-width: 0;
+ }
+@@ -305,6 +299,7 @@ exports[`MetaBoxesSection renders meta box options 1`] = `
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
++  gap: calc(4px * 3);
+   -webkit-box-pack: start;
+   -ms-flex-pack: start;
+   -webkit-justify-content: flex-start;
+@@ -312,10 +307,6 @@ exports[`MetaBoxesSection renders meta box options 1`] = `
+   width: 100%;
+ }
+ 
+-.emotion-4>*+*:not( marquee ) {
+-  margin-left: calc(4px * 3);
+-}
+-
+ .emotion-4>* {
+   min-width: 0;
+ }

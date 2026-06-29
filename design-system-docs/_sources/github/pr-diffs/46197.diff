@@ -1,0 +1,12 @@
+diff --git a/packages/components/src/circular-option-picker/style.scss b/packages/components/src/circular-option-picker/style.scss
+index 56ec9edf1cc1f7..e63cbd5b3ff92a 100644
+--- a/packages/components/src/circular-option-picker/style.scss
++++ b/packages/components/src/circular-option-picker/style.scss
+@@ -26,6 +26,7 @@ $color-palette-circle-spacing: 12px;
+ 	vertical-align: top;
+ 	transform: scale(1);
+ 	transition: 100ms transform ease;
++	will-change: transform;
+ 	@include reduce-motion("transition");
+ 
+ 	&:hover {

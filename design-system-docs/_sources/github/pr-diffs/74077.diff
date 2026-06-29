@@ -1,0 +1,956 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 53e0df909ba0d1..71f4aa5f537910 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -275,13 +275,6 @@ module.exports = {
+ 					'error',
+ 					...restrictedSyntax,
+ 					...restrictedSyntaxComponents,
+-					// Temporary rules until we're ready to officially deprecate the bottom margins.
+-					...[ 'BaseControl' ].map( ( componentName ) => ( {
+-						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__nextHasNoMarginBottom"]))`,
+-						message:
+-							componentName +
+-							' should have the `__nextHasNoMarginBottom` prop to opt-in to the new margin-free styles.',
+-					} ) ),
+ 					// Temporary rules until we're ready to officially default to the new size.
+ 					...[
+ 						'BorderBoxControl',
+diff --git a/packages/block-editor/src/components/block-allowed-blocks/allowed-blocks-control.js b/packages/block-editor/src/components/block-allowed-blocks/allowed-blocks-control.js
+index b7ef01068acb26..f9411bc0aaf949 100644
+--- a/packages/block-editor/src/components/block-allowed-blocks/allowed-blocks-control.js
++++ b/packages/block-editor/src/components/block-allowed-blocks/allowed-blocks-control.js
+@@ -51,7 +51,6 @@ export default function BlockAllowedBlocksControl( { clientId } ) {
+ 				help={ __(
+ 					'Specify which blocks are allowed inside this container.'
+ 				) }
+-				__nextHasNoMarginBottom
+ 			>
+ 				<BaseControl.VisualLabel>
+ 					{ __( 'Allowed Blocks' ) }
+diff --git a/packages/block-editor/src/components/colors-gradients/control.js b/packages/block-editor/src/components/colors-gradients/control.js
+index d6b34876c8eaad..e8f24699c5ce79 100644
+--- a/packages/block-editor/src/components/colors-gradients/control.js
++++ b/packages/block-editor/src/components/colors-gradients/control.js
+@@ -109,7 +109,6 @@ function ColorGradientControlInner( {
+ 
+ 	return (
+ 		<BaseControl
+-			__nextHasNoMarginBottom
+ 			className={ clsx(
+ 				'block-editor-color-gradient-control',
+ 				className
+diff --git a/packages/block-editor/src/components/content-only-controls/rich-text/index.js b/packages/block-editor/src/components/content-only-controls/rich-text/index.js
+index 62d9e22e31572d..8d8c9e6d1f1aef 100644
+--- a/packages/block-editor/src/components/content-only-controls/rich-text/index.js
++++ b/packages/block-editor/src/components/content-only-controls/rich-text/index.js
+@@ -145,7 +145,7 @@ export default function RichTextControl( {
+ 					</inputEventContext.Provider>
+ 				</keyboardShortcutContext.Provider>
+ 			) }
+-			<BaseControl __nextHasNoMarginBottom { ...baseControlProps }>
++			<BaseControl { ...baseControlProps }>
+ 				<div
+ 					className="block-editor-content-only-controls__rich-text"
+ 					role="textbox"
+diff --git a/packages/block-editor/src/components/global-styles/typography-panel.js b/packages/block-editor/src/components/global-styles/typography-panel.js
+index f093e77832a6c6..715886d804d3a9 100644
+--- a/packages/block-editor/src/components/global-styles/typography-panel.js
++++ b/packages/block-editor/src/components/global-styles/typography-panel.js
+@@ -595,7 +595,6 @@ export default function TypographyPanel( {
+ 						value={ writingMode }
+ 						onChange={ setWritingMode }
+ 						size="__unstable-large"
+-						__nextHasNoMarginBottom
+ 					/>
+ 				</ToolsPanelItem>
+ 			) }
+@@ -613,7 +612,6 @@ export default function TypographyPanel( {
+ 						showNone
+ 						isBlock
+ 						size="__unstable-large"
+-						__nextHasNoMarginBottom
+ 					/>
+ 				</ToolsPanelItem>
+ 			) }
+@@ -630,7 +628,6 @@ export default function TypographyPanel( {
+ 						onChange={ setTextAlign }
+ 						options={ [ 'left', 'center', 'right', 'justify' ] }
+ 						size="__unstable-large"
+-						__nextHasNoMarginBottom
+ 					/>
+ 
+ 					{ textAlign === 'justify' && (
+diff --git a/packages/block-editor/src/components/link-picker/link-picker.js b/packages/block-editor/src/components/link-picker/link-picker.js
+index 60aded45bcec5d..ae8372c540e7f3 100644
+--- a/packages/block-editor/src/components/link-picker/link-picker.js
++++ b/packages/block-editor/src/components/link-picker/link-picker.js
+@@ -54,7 +54,6 @@ export function LinkPicker( {
+ 	// Use the proper BaseControl pattern for associating help text
+ 	const { baseControlProps, controlProps } = useBaseControlProps( {
+ 		help,
+-		__nextHasNoMarginBottom: true,
+ 	} );
+ 
+ 	const handleChange = ( newValue ) => {
+@@ -75,7 +74,7 @@ export function LinkPicker( {
+ 	};
+ 
+ 	return (
+-		<BaseControl { ...baseControlProps } __nextHasNoMarginBottom>
++		<BaseControl { ...baseControlProps }>
+ 			<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel>
+ 			<Button
+ 				ref={ anchorRef }
+diff --git a/packages/block-editor/src/components/preset-input-control/index.js b/packages/block-editor/src/components/preset-input-control/index.js
+index abf114d5bd146e..fd9c47b0d50ac4 100644
+--- a/packages/block-editor/src/components/preset-input-control/index.js
++++ b/packages/block-editor/src/components/preset-input-control/index.js
+@@ -262,7 +262,6 @@ export default function PresetInputControl( {
+ 					value={ currentValue }
+ 					withInputField={ false }
+ 					__next40pxDefaultSize
+-					__nextHasNoMarginBottom
+ 				/>
+ 			) }
+ 			{ hasPresets && ! showRangeControl && ! showCustomValueControl && (
+diff --git a/packages/block-editor/src/components/url-input/index.js b/packages/block-editor/src/components/url-input/index.js
+index 7ecf267eb7f889..3fd00eb5d28b6b 100644
+--- a/packages/block-editor/src/components/url-input/index.js
++++ b/packages/block-editor/src/components/url-input/index.js
+@@ -476,7 +476,7 @@ class URLInput extends Component {
+ 		}
+ 
+ 		return (
+-			<BaseControl __nextHasNoMarginBottom { ...controlProps }>
++			<BaseControl { ...controlProps }>
+ 				<InputControl { ...inputProps } __next40pxDefaultSize />
+ 				{ loading && <Spinner /> }
+ 			</BaseControl>
+diff --git a/packages/block-editor/src/hooks/fit-text.js b/packages/block-editor/src/hooks/fit-text.js
+index 6a56098d5c8870..1e9d6b22d47836 100644
+--- a/packages/block-editor/src/hooks/fit-text.js
++++ b/packages/block-editor/src/hooks/fit-text.js
+@@ -248,7 +248,6 @@ export function FitTextControl( {
+ 				panelId={ clientId }
+ 			>
+ 				<ToggleControl
+-					__nextHasNoMarginBottom
+ 					label={ __( 'Fit text' ) }
+ 					checked={ fitText }
+ 					onChange={ () => {
+diff --git a/packages/block-editor/src/hooks/position.js b/packages/block-editor/src/hooks/position.js
+index bf1b730cd67d1a..ea5e29e7332f49 100644
+--- a/packages/block-editor/src/hooks/position.js
++++ b/packages/block-editor/src/hooks/position.js
+@@ -268,10 +268,7 @@ export function PositionPanelPure( {
+ 		web:
+ 			options.length > 1 ? (
+ 				<InspectorControls group="position">
+-					<BaseControl
+-						__nextHasNoMarginBottom
+-						help={ stickyHelpText }
+-					>
++					<BaseControl help={ stickyHelpText }>
+ 						<CustomSelectControl
+ 							__next40pxDefaultSize
+ 							label={ __( 'Position' ) }
+diff --git a/packages/block-library/src/button/edit.js b/packages/block-library/src/button/edit.js
+index 13a1bc7d4ce668..fe1b6295cddc24 100644
+--- a/packages/block-library/src/button/edit.js
++++ b/packages/block-library/src/button/edit.js
+@@ -1,21 +1,4 @@
+-/**
+- * External dependencies
+- */
+ import clsx from 'clsx';
+-
+-/**
+- * Internal dependencies
+- */
+-import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
+-import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
+-import removeAnchorTag from '../utils/remove-anchor-tag';
+-import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+-import { unlock } from '../lock-unlock';
+-import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
+-
+-/**
+- * WordPress dependencies
+- */
+ import { __, sprintf } from '@wordpress/i18n';
+ import {
+ 	useEffect,
+@@ -61,6 +44,12 @@ import {
+ } from '@wordpress/blocks';
+ import { useMergeRefs, useRefEffect } from '@wordpress/compose';
+ import { useSelect, useDispatch } from '@wordpress/data';
++import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
++import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
++import removeAnchorTag from '../utils/remove-anchor-tag';
++import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
++import { unlock } from '../lock-unlock';
++import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
+ 
+ const { HTMLElementControl } = unlock( blockEditorPrivateApis );
+ 
+@@ -142,7 +131,6 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
+ 				isShownByDefault
+ 				hasValue={ () => !! selectedWidth }
+ 				onDeselect={ () => setAttributes( { width: undefined } ) }
+-				__nextHasNoMarginBottom
+ 			>
+ 				<ToggleGroupControl
+ 					label={ __( 'Width' ) }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b5d2b56c2d382a..65be2a9cee0b38 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -17,6 +17,7 @@
+ -   `RangeControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#74033](https://github.com/WordPress/gutenberg/pull/74033)).
+ -   `ComboboxControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#74034](https://github.com/WordPress/gutenberg/pull/74034)).
+ -   `SelectControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#74052](https://github.com/WordPress/gutenberg/pull/74052)).
++-   `BaseControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#74077](https://github.com/WordPress/gutenberg/pull/74077)).
+ -   `DimensionControl`: Completely remove deprecated component ([#73944](https://github.com/WordPress/gutenberg/pull/73944)).
+ 
+ ### Enhancements
+diff --git a/packages/components/src/base-control/README.md b/packages/components/src/base-control/README.md
+index 2a82c19845e47b..f53ae9a8b929ec 100644
+--- a/packages/components/src/base-control/README.md
++++ b/packages/components/src/base-control/README.md
+@@ -17,7 +17,7 @@ const MyCustomTextareaControl = ({ children, ...baseProps }) => (
+ 	const { baseControlProps, controlProps } = useBaseControlProps( baseProps );
+ 
+ 	return (
+-		<BaseControl { ...baseControlProps } __nextHasNoMarginBottom>
++		<BaseControl { ...baseControlProps }>
+ 			<textarea { ...controlProps }>
+ 			  { children }
+ 			</textarea>
+@@ -28,14 +28,6 @@ const MyCustomTextareaControl = ({ children, ...baseProps }) => (
+ 
+ ## Props
+ 
+-### `__nextHasNoMarginBottom`
+-
+- - Type: `boolean`
+- - Required: No
+- - Default: `false`
+-
+-Start opting into the new margin-free styles that will become the default in a future version.
+-
+ ### `as`
+ 
+  - Type: `"symbol" | "object" | "label" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | "base" | "bdi" | "bdo" | "big" | "blockquote" | "body" | "br" | "button" | ... 516 more ... | ("view" & FunctionComponent<...>)`
+@@ -104,10 +96,7 @@ otherwise use if the `label` prop was passed.
+ import { BaseControl } from '@wordpress/components';
+ 
+ const MyBaseControl = () => (
+-	<BaseControl
+-		__nextHasNoMarginBottom
+-		help="This button is already accessibly labeled."
+-	>
++	<BaseControl help="This button is already accessibly labeled.">
+ 		<BaseControl.VisualLabel>Author</BaseControl.VisualLabel>
+ 		<Button>Select an author</Button>
+ 	</BaseControl>
+diff --git a/packages/components/src/base-control/index.tsx b/packages/components/src/base-control/index.tsx
+index 423636a92cd5f0..df28960c8e7f52 100644
+--- a/packages/components/src/base-control/index.tsx
++++ b/packages/components/src/base-control/index.tsx
+@@ -7,7 +7,6 @@ import type { ForwardedRef } from 'react';
+ /**
+  * WordPress dependencies
+  */
+-import deprecated from '@wordpress/deprecated';
+ import { forwardRef } from '@wordpress/element';
+ 
+ /**
+@@ -31,8 +30,6 @@ const UnconnectedBaseControl = (
+ 	props: WordPressComponentProps< BaseControlProps, null >
+ ) => {
+ 	const {
+-		__nextHasNoMarginBottom = false,
+-		__associatedWPComponentName = 'BaseControl',
+ 		id,
+ 		label,
+ 		hideLabelFromVision = false,
+@@ -41,24 +38,9 @@ const UnconnectedBaseControl = (
+ 		children,
+ 	} = useContextSystem( props, 'BaseControl' );
+ 
+-	if ( ! __nextHasNoMarginBottom ) {
+-		deprecated(
+-			`Bottom margin styles for wp.components.${ __associatedWPComponentName }`,
+-			{
+-				since: '6.7',
+-				version: '7.0',
+-				hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version.',
+-			}
+-		);
+-	}
+-
+ 	return (
+ 		<Wrapper className={ className }>
+-			<StyledField
+-				className="components-base-control__field"
+-				// TODO: Official deprecation for this should start after all internal usages have been migrated
+-				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+-			>
++			<StyledField className="components-base-control__field">
+ 				{ label &&
+ 					id &&
+ 					( hideLabelFromVision ? (
+@@ -86,7 +68,6 @@ const UnconnectedBaseControl = (
+ 				<StyledHelp
+ 					id={ id ? id + '__help' : undefined }
+ 					className="components-base-control__help"
+-					__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+ 				>
+ 					{ help }
+ 				</StyledHelp>
+@@ -128,7 +109,7 @@ export const VisualLabel = forwardRef( UnforwardedVisualLabel );
+  * 	const { baseControlProps, controlProps } = useBaseControlProps( baseProps );
+  *
+  * 	return (
+- * 		<BaseControl { ...baseControlProps } __nextHasNoMarginBottom>
++ * 		<BaseControl { ...baseControlProps }>
+  * 			<textarea { ...controlProps }>
+  * 			  { children }
+  * 			</textarea>
+@@ -152,10 +133,7 @@ export const BaseControl = Object.assign(
+ 		 * import { BaseControl } from '@wordpress/components';
+ 		 *
+ 		 * const MyBaseControl = () => (
+-		 * 	<BaseControl
+-		 * 		__nextHasNoMarginBottom
+-		 * 		help="This button is already accessibly labeled."
+-		 * 	>
++		 * 	<BaseControl help="This button is already accessibly labeled.">
+ 		 * 		<BaseControl.VisualLabel>Author</BaseControl.VisualLabel>
+ 		 * 		<Button>Select an author</Button>
+ 		 * 	</BaseControl>
+diff --git a/packages/components/src/base-control/stories/index.story.tsx b/packages/components/src/base-control/stories/index.story.tsx
+index 69188f869656da..8c51992b45a896 100644
+--- a/packages/components/src/base-control/stories/index.story.tsx
++++ b/packages/components/src/base-control/stories/index.story.tsx
+@@ -42,7 +42,6 @@ const BaseControlWithTextarea: StoryFn< typeof BaseControl > = ( props ) => {
+ export const Default: StoryFn< typeof BaseControl > =
+ 	BaseControlWithTextarea.bind( {} );
+ Default.args = {
+-	__nextHasNoMarginBottom: true,
+ 	label: 'Label text',
+ };
+ 
+diff --git a/packages/components/src/base-control/styles/base-control-styles.ts b/packages/components/src/base-control/styles/base-control-styles.ts
+index d633fcdd7e7a77..773e83908d492d 100644
+--- a/packages/components/src/base-control/styles/base-control-styles.ts
++++ b/packages/components/src/base-control/styles/base-control-styles.ts
+@@ -17,18 +17,7 @@ export const Wrapper = styled.div`
+ 	${ boxSizingReset }
+ `;
+ 
+-const deprecatedMarginField = ( { __nextHasNoMarginBottom = false } ) => {
+-	return (
+-		! __nextHasNoMarginBottom &&
+-		css`
+-			margin-bottom: ${ space( 2 ) };
+-		`
+-	);
+-};
+-
+ export const StyledField = styled.div`
+-	${ deprecatedMarginField }
+-
+ 	.components-panel__row & {
+ 		margin-bottom: inherit;
+ 	}
+@@ -50,23 +39,12 @@ export const StyledLabel = styled.label`
+ 	${ labelStyles }
+ `;
+ 
+-const deprecatedMarginHelp = ( { __nextHasNoMarginBottom = false } ) => {
+-	return (
+-		! __nextHasNoMarginBottom &&
+-		css`
+-			margin-bottom: revert;
+-		`
+-	);
+-};
+-
+ export const StyledHelp = styled.p`
+ 	margin-top: ${ space( 2 ) };
+ 	margin-bottom: 0;
+ 	font-size: ${ font( 'helpText.fontSize' ) };
+ 	font-style: normal;
+ 	color: ${ COLORS.gray[ 700 ] };
+-
+-	${ deprecatedMarginHelp }
+ `;
+ 
+ export const StyledVisualLabel = styled.span`
+diff --git a/packages/components/src/base-control/test/index.tsx b/packages/components/src/base-control/test/index.tsx
+index 07623a8b4c3e7d..f8a83a63c57bfc 100644
+--- a/packages/components/src/base-control/test/index.tsx
++++ b/packages/components/src/base-control/test/index.tsx
+@@ -14,7 +14,7 @@ const MyBaseControl = ( props: Omit< BaseControlProps, 'children' > ) => {
+ 	const { baseControlProps, controlProps } = useBaseControlProps( props );
+ 
+ 	return (
+-		<BaseControl { ...baseControlProps } __nextHasNoMarginBottom>
++		<BaseControl { ...baseControlProps }>
+ 			<textarea { ...controlProps } />
+ 		</BaseControl>
+ 	);
+diff --git a/packages/components/src/base-control/types.ts b/packages/components/src/base-control/types.ts
+index 9ca2b7bdd4c6ed..b73ccd8e43621e 100644
+--- a/packages/components/src/base-control/types.ts
++++ b/packages/components/src/base-control/types.ts
+@@ -7,16 +7,10 @@ export type BaseControlProps = {
+ 	/**
+ 	 * Start opting into the new margin-free styles that will become the default in a future version.
+ 	 *
+-	 * @default false
+-	 */
+-	__nextHasNoMarginBottom?: boolean;
+-	/**
+-	 * Temporary private prop for showing better deprecation messages,
+-	 * e.g. `Some feature from wp.components.${ __associatedWPControl } is deprecated`.
+-	 *
++	 * @deprecated Default behavior since WordPress 7.0. Prop can be safely removed.
+ 	 * @ignore
+ 	 */
+-	__associatedWPComponentName?: string;
++	__nextHasNoMarginBottom?: boolean;
+ 	/**
+ 	 * The HTML `id` of the control element (passed in as a child to `BaseControl`) to which labels and help text are being generated.
+ 	 * This is necessary to accessibly associate the label with that element.
+diff --git a/packages/components/src/box-control/input-control.tsx b/packages/components/src/box-control/input-control.tsx
+index a1e5dd7f00f990..c0fa7deec45e9d 100644
+--- a/packages/components/src/box-control/input-control.tsx
++++ b/packages/components/src/box-control/input-control.tsx
+@@ -223,7 +223,6 @@ export default function BoxInputControl( {
+ 					</Tooltip>
+ 
+ 					<FlexedRangeControl
+-						__nextHasNoMarginBottom
+ 						__next40pxDefaultSize={ __next40pxDefaultSize }
+ 						__shouldNotWarnDeprecated36pxSize
+ 						aria-controls={ inputId }
+@@ -283,7 +282,6 @@ export default function BoxInputControl( {
+ 					marks={ marks }
+ 					label={ LABELS[ side ] }
+ 					hideLabelFromVision
+-					__nextHasNoMarginBottom
+ 				/>
+ 			) }
+ 
+diff --git a/packages/components/src/checkbox-control/index.tsx b/packages/components/src/checkbox-control/index.tsx
+index e4fb8d52ed32cf..729f40db4d8906 100644
+--- a/packages/components/src/checkbox-control/index.tsx
++++ b/packages/components/src/checkbox-control/index.tsx
+@@ -95,7 +95,6 @@ export function CheckboxControl(
+ 
+ 	return (
+ 		<BaseControl
+-			__nextHasNoMarginBottom
+ 			label={ heading }
+ 			id={ id }
+ 			help={
+diff --git a/packages/components/src/checkbox-control/types.ts b/packages/components/src/checkbox-control/types.ts
+index 6ee80c869ea5bb..6eca33c91a913d 100644
+--- a/packages/components/src/checkbox-control/types.ts
++++ b/packages/components/src/checkbox-control/types.ts
+@@ -8,16 +8,10 @@ import type { ReactNode } from 'react';
+  */
+ import type { BaseControlProps } from '../base-control/types';
+ 
+-export type CheckboxControlProps = Pick< BaseControlProps, 'help' > & {
+-	/**
+-	 * Start opting into the new margin-free styles that will become the default in a future version.
+-	 *
+-	 * @deprecated Default behavior since WP 7.0. Prop can be safely removed.
+-	 * @ignore
+-	 *
+-	 * @default false
+-	 */
+-	__nextHasNoMarginBottom?: boolean;
++export type CheckboxControlProps = Pick<
++	BaseControlProps,
++	'__nextHasNoMarginBottom' | 'help'
++> & {
+ 	/**
+ 	 * A function that receives the checked state (boolean) as input.
+ 	 */
+diff --git a/packages/components/src/combobox-control/index.tsx b/packages/components/src/combobox-control/index.tsx
+index 4da91e3634f13d..ba954ab7dd9cf5 100644
+--- a/packages/components/src/combobox-control/index.tsx
++++ b/packages/components/src/combobox-control/index.tsx
+@@ -328,7 +328,6 @@ function ComboboxControl( props: ComboboxControlProps ) {
+ 	return (
+ 		<DetectOutside onFocusOutside={ onFocusOutside }>
+ 			<BaseControl
+-				__nextHasNoMarginBottom
+ 				className={ clsx( className, 'components-combobox-control' ) }
+ 				label={ label }
+ 				id={ `components-form-token-input-${ instanceId }` }
+diff --git a/packages/components/src/combobox-control/types.ts b/packages/components/src/combobox-control/types.ts
+index babbca2efea04b..3398e9ee9a760e 100644
+--- a/packages/components/src/combobox-control/types.ts
++++ b/packages/components/src/combobox-control/types.ts
+@@ -12,15 +12,12 @@ export type ComboboxControlOption = {
+ 
+ export type ComboboxControlProps = Pick<
+ 	BaseControlProps,
+-	'className' | 'label' | 'hideLabelFromVision' | 'help'
++	| '__nextHasNoMarginBottom'
++	| 'className'
++	| 'label'
++	| 'hideLabelFromVision'
++	| 'help'
+ > & {
+-	/**
+-	 * Start opting into the new margin-free styles that will become the default in a future version.
+-	 *
+-	 * @deprecated Default behavior since WordPress 7.0. Prop can be safely removed.
+-	 * @ignore
+-	 */
+-	__nextHasNoMarginBottom?: boolean;
+ 	/**
+ 	 * Custom renderer invoked for each option in the suggestion list.
+ 	 * The render prop receives as its argument an object containing, under the `item` key,
+diff --git a/packages/components/src/focal-point-picker/index.tsx b/packages/components/src/focal-point-picker/index.tsx
+index 0c0cb3318ee7c8..e4d38711877d02 100644
+--- a/packages/components/src/focal-point-picker/index.tsx
++++ b/packages/components/src/focal-point-picker/index.tsx
+@@ -286,9 +286,7 @@ export function FocalPointPicker( {
+ 					onChange?.( getFinalValue( value ) );
+ 				} }
+ 			/>
+-			{ !! help && (
+-				<StyledHelp __nextHasNoMarginBottom>{ help }</StyledHelp>
+-			) }
++			{ !! help && <StyledHelp>{ help }</StyledHelp> }
+ 		</Container>
+ 	);
+ }
+diff --git a/packages/components/src/focal-point-picker/types.ts b/packages/components/src/focal-point-picker/types.ts
+index 597f4d1a126f03..9b2139466ebcad 100644
+--- a/packages/components/src/focal-point-picker/types.ts
++++ b/packages/components/src/focal-point-picker/types.ts
+@@ -18,17 +18,8 @@ export type FocalPointAxis = 'x' | 'y';
+ 
+ export type FocalPointPickerProps = Pick<
+ 	BaseControlProps,
+-	'help' | 'hideLabelFromVision' | 'label'
++	'__nextHasNoMarginBottom' | 'help' | 'hideLabelFromVision' | 'label'
+ > & {
+-	/**
+-	 * Start opting into the new margin-free styles that will become the default in a future version.
+-	 *
+-	 * @deprecated Default behavior since WP 7.0. Prop can be safely removed.
+-	 * @ignore
+-	 *
+-	 * @default false
+-	 */
+-	__nextHasNoMarginBottom?: boolean;
+ 	/**
+ 	 * Start opting into the larger default height that will become the default size in a future version.
+ 	 *
+diff --git a/packages/components/src/form-token-field/index.tsx b/packages/components/src/form-token-field/index.tsx
+index 5ff9f670c11c60..8ce13a78c6c0f6 100644
+--- a/packages/components/src/form-token-field/index.tsx
++++ b/packages/components/src/form-token-field/index.tsx
+@@ -753,7 +753,6 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 				<StyledHelp
+ 					id={ `components-form-token-suggestions-howto-${ instanceId }` }
+ 					className="components-form-token-field__help"
+-					__nextHasNoMarginBottom
+ 				>
+ 					{ tokenizeOnSpace
+ 						? __(
+diff --git a/packages/components/src/input-control/index.tsx b/packages/components/src/input-control/index.tsx
+index d346d1b31b1118..2d279ed1867ce6 100644
+--- a/packages/components/src/input-control/index.tsx
++++ b/packages/components/src/input-control/index.tsx
+@@ -78,12 +78,7 @@ export function UnforwardedInputControl(
+ 	} );
+ 
+ 	return (
+-		<BaseControl
+-			className={ classes }
+-			help={ help }
+-			id={ id }
+-			__nextHasNoMarginBottom
+-		>
++		<BaseControl className={ classes } help={ help } id={ id }>
+ 			<InputBase
+ 				__next40pxDefaultSize={ __next40pxDefaultSize }
+ 				__unstableInputWidth={ __unstableInputWidth }
+diff --git a/packages/components/src/radio-control/index.tsx b/packages/components/src/radio-control/index.tsx
+index 6b181671332c88..dfad752008621b 100644
+--- a/packages/components/src/radio-control/index.tsx
++++ b/packages/components/src/radio-control/index.tsx
+@@ -138,7 +138,6 @@ export function RadioControl(
+ 						</label>
+ 						{ !! option.description ? (
+ 							<StyledHelp
+-								__nextHasNoMarginBottom
+ 								id={ generateOptionDescriptionId( id, index ) }
+ 								className="components-radio-control__option-description"
+ 							>
+@@ -150,7 +149,6 @@ export function RadioControl(
+ 			</VStack>
+ 			{ !! help && (
+ 				<StyledHelp
+-					__nextHasNoMarginBottom
+ 					id={ generateHelpId( id ) }
+ 					className="components-base-control__help"
+ 				>
+diff --git a/packages/components/src/range-control/index.tsx b/packages/components/src/range-control/index.tsx
+index 402dae36666ce3..5bd2318a487253 100644
+--- a/packages/components/src/range-control/index.tsx
++++ b/packages/components/src/range-control/index.tsx
+@@ -246,7 +246,6 @@ function UnforwardedRangeControl(
+ 			hideLabelFromVision={ hideLabelFromVision }
+ 			id={ `${ id }` }
+ 			help={ help }
+-			__nextHasNoMarginBottom
+ 		>
+ 			<Root
+ 				className="components-range-control__root"
+diff --git a/packages/components/src/range-control/types.ts b/packages/components/src/range-control/types.ts
+index 85ba4b5294a258..f6e3e69ff7bc5f 100644
+--- a/packages/components/src/range-control/types.ts
++++ b/packages/components/src/range-control/types.ts
+@@ -76,16 +76,9 @@ export type ControlledRangeValue = number | '' | null;
+ 
+ export type RangeControlProps = Pick<
+ 	BaseControlProps,
+-	'hideLabelFromVision' | 'help'
++	'__nextHasNoMarginBottom' | 'hideLabelFromVision' | 'help'
+ > &
+ 	MarksProps & {
+-		/**
+-		 * Start opting into the new margin-free styles that will become the default in a future version.
+-		 *
+-		 * @deprecated Default behavior since WordPress 7.0. Prop can be safely removed.
+-		 * @ignore
+-		 */
+-		__nextHasNoMarginBottom?: boolean;
+ 		/**
+ 		 * If this property is added, an Icon component will be rendered
+ 		 * after the slider with the icon equal to afterIcon.
+diff --git a/packages/components/src/select-control/index.tsx b/packages/components/src/select-control/index.tsx
+index f92203c5f9a1e2..36fba573545e14 100644
+--- a/packages/components/src/select-control/index.tsx
++++ b/packages/components/src/select-control/index.tsx
+@@ -103,12 +103,7 @@ function UnforwardedSelectControl< V extends string >(
+ 	} );
+ 
+ 	return (
+-		<BaseControl
+-			help={ help }
+-			id={ id }
+-			className={ classes }
+-			__nextHasNoMarginBottom
+-		>
++		<BaseControl help={ help } id={ id } className={ classes }>
+ 			<StyledInputBase
+ 				disabled={ disabled }
+ 				hideLabelFromVision={ hideLabelFromVision }
+diff --git a/packages/components/src/select-control/types.ts b/packages/components/src/select-control/types.ts
+index d120421c209157..2af1bb56141fb0 100644
+--- a/packages/components/src/select-control/types.ts
++++ b/packages/components/src/select-control/types.ts
+@@ -22,14 +22,7 @@ type SelectControlBaseProps< V extends string > = Pick<
+ 	| 'size'
+ 	| 'suffix'
+ > &
+-	Pick< BaseControlProps, 'help' > & {
+-		/**
+-		 * Start opting into the new margin-free styles that will become the default in a future version.
+-		 *
+-		 * @deprecated Default behavior since WordPress 7.0. Prop can be safely removed.
+-		 * @ignore
+-		 */
+-		__nextHasNoMarginBottom?: boolean;
++	Pick< BaseControlProps, '__nextHasNoMarginBottom' | 'help' > & {
+ 		/**
+ 		 * An array of option property objects to be rendered,
+ 		 * each with a `label` and `value` property, as well as any other
+diff --git a/packages/components/src/text-control/index.tsx b/packages/components/src/text-control/index.tsx
+index dbd6a5bf8a3e3a..2b4ea21f4de744 100644
+--- a/packages/components/src/text-control/index.tsx
++++ b/packages/components/src/text-control/index.tsx
+@@ -48,7 +48,6 @@ function UnforwardedTextControl(
+ 
+ 	return (
+ 		<BaseControl
+-			__nextHasNoMarginBottom
+ 			label={ label }
+ 			hideLabelFromVision={ hideLabelFromVision }
+ 			id={ id }
+diff --git a/packages/components/src/text-control/types.ts b/packages/components/src/text-control/types.ts
+index 25d119293d2be2..09876b82f11fb8 100644
+--- a/packages/components/src/text-control/types.ts
++++ b/packages/components/src/text-control/types.ts
+@@ -5,17 +5,12 @@ import type { BaseControlProps } from '../base-control/types';
+ 
+ export type TextControlProps = Pick<
+ 	BaseControlProps,
+-	'className' | 'hideLabelFromVision' | 'help' | 'label'
++	| '__nextHasNoMarginBottom'
++	| 'className'
++	| 'hideLabelFromVision'
++	| 'help'
++	| 'label'
+ > & {
+-	/**
+-	 * Start opting into the new margin-free styles that will become the default in a future version.
+-	 *
+-	 * @deprecated Default behavior since WP 7.0. Prop can be safely removed.
+-	 * @ignore
+-	 *
+-	 * @default false
+-	 */
+-	__nextHasNoMarginBottom?: boolean;
+ 	/**
+ 	 * A function that receives the value of the input.
+ 	 */
+diff --git a/packages/components/src/textarea-control/index.tsx b/packages/components/src/textarea-control/index.tsx
+index 94998be647b661..aab176d1595862 100644
+--- a/packages/components/src/textarea-control/index.tsx
++++ b/packages/components/src/textarea-control/index.tsx
+@@ -42,7 +42,6 @@ function UnforwardedTextareaControl(
+ 
+ 	return (
+ 		<BaseControl
+-			__nextHasNoMarginBottom
+ 			label={ label }
+ 			hideLabelFromVision={ hideLabelFromVision }
+ 			id={ id }
+diff --git a/packages/components/src/textarea-control/types.ts b/packages/components/src/textarea-control/types.ts
+index 3723e418036d48..64b9db4b9353bb 100644
+--- a/packages/components/src/textarea-control/types.ts
++++ b/packages/components/src/textarea-control/types.ts
+@@ -10,17 +10,8 @@ import type { BaseControlProps } from '../base-control/types';
+ 
+ export type TextareaControlProps = Pick<
+ 	BaseControlProps,
+-	'hideLabelFromVision' | 'help' | 'label'
++	'__nextHasNoMarginBottom' | 'hideLabelFromVision' | 'help' | 'label'
+ > & {
+-	/**
+-	 * Start opting into the new margin-free styles that will become the default in a future version.
+-	 *
+-	 * @deprecated Default behavior since WP 7.0. Prop can be safely removed.
+-	 * @ignore
+-	 *
+-	 * @default false
+-	 */
+-	__nextHasNoMarginBottom?: boolean;
+ 	/**
+ 	 * A function that receives the new value of the textarea each time it
+ 	 * changes.
+diff --git a/packages/components/src/toggle-control/index.tsx b/packages/components/src/toggle-control/index.tsx
+index f2f068edbfeb5a..ac6f3dc5536550 100644
+--- a/packages/components/src/toggle-control/index.tsx
++++ b/packages/components/src/toggle-control/index.tsx
+@@ -65,7 +65,6 @@ function UnforwardedToggleControl(
+ 				)
+ 			}
+ 			className={ clsx( 'components-toggle-control', className ) }
+-			__nextHasNoMarginBottom
+ 		>
+ 			<HStack justify="flex-start" spacing={ 2 }>
+ 				<FormToggle
+diff --git a/packages/components/src/toggle-control/types.ts b/packages/components/src/toggle-control/types.ts
+index 7db6ec63d9ac02..568c44fb64af07 100644
+--- a/packages/components/src/toggle-control/types.ts
++++ b/packages/components/src/toggle-control/types.ts
+@@ -13,14 +13,7 @@ export type ToggleControlProps = Pick<
+ 	FormToggleProps,
+ 	'checked' | 'disabled'
+ > &
+-	Pick< BaseControlProps, 'className' > & {
+-		/**
+-		 * Start opting into the new margin-free styles that will become the default in a future version.
+-		 *
+-		 * @deprecated Default behavior since WordPress 7.0. Prop can be safely removed.
+-		 * @ignore
+-		 */
+-		__nextHasNoMarginBottom?: boolean;
++	Pick< BaseControlProps, '__nextHasNoMarginBottom' | 'className' > & {
+ 		help?: ReactNode | ( ( checked: boolean ) => ReactNode );
+ 		/**
+ 		 * The label for the toggle.
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index 9e71b9cad59c09..1560223311689d 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -91,7 +91,7 @@ function UnconnectedToggleGroupControl(
+ 	} );
+ 
+ 	return (
+-		<BaseControl help={ help } __nextHasNoMarginBottom>
++		<BaseControl help={ help }>
+ 			{ ! hideLabelFromVision && (
+ 				<VisualLabelWrapper>
+ 					<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel>
+diff --git a/packages/components/src/toggle-group-control/types.ts b/packages/components/src/toggle-group-control/types.ts
+index cf166d30a63eed..1761693a8a7584 100644
+--- a/packages/components/src/toggle-group-control/types.ts
++++ b/packages/components/src/toggle-group-control/types.ts
+@@ -70,14 +70,10 @@ export type WithToolTipProps = {
+ 	showTooltip?: boolean;
+ };
+ 
+-export type ToggleGroupControlProps = Pick< BaseControlProps, 'help' > & {
+-	/**
+-	 * Start opting into the new margin-free styles that will become the default in a future version.
+-	 *
+-	 * @deprecated Default behavior since WordPress 7.0. Prop can be safely removed.
+-	 * @ignore
+-	 */
+-	__nextHasNoMarginBottom?: boolean;
++export type ToggleGroupControlProps = Pick<
++	BaseControlProps,
++	'__nextHasNoMarginBottom' | 'help'
++> & {
+ 	/**
+ 	 * Label for the control.
+ 	 */
+diff --git a/packages/dataviews/src/dataform-controls/date.tsx b/packages/dataviews/src/dataform-controls/date.tsx
+index 0f87231540cd98..374618962e171c 100644
+--- a/packages/dataviews/src/dataform-controls/date.tsx
++++ b/packages/dataviews/src/dataform-controls/date.tsx
+@@ -351,7 +351,6 @@ function CalendarDateControl< Item >( {
+ 			setIsTouched={ setIsTouched }
+ 		>
+ 			<BaseControl
+-				__nextHasNoMarginBottom
+ 				id={ id }
+ 				className="dataviews-controls__date"
+ 				label={ displayLabel }
+@@ -558,7 +557,6 @@ function CalendarDateRangeControl< Item >( {
+ 			setIsTouched={ setIsTouched }
+ 		>
+ 			<BaseControl
+-				__nextHasNoMarginBottom
+ 				id={ id }
+ 				className="dataviews-controls__date"
+ 				label={ displayLabel }
+diff --git a/packages/dataviews/src/dataform-controls/datetime.tsx b/packages/dataviews/src/dataform-controls/datetime.tsx
+index 74723ecd9f1d80..b5da23e995c8c4 100644
+--- a/packages/dataviews/src/dataform-controls/datetime.tsx
++++ b/packages/dataviews/src/dataform-controls/datetime.tsx
+@@ -159,7 +159,6 @@ function CalendarDateTimeControl< Item >( {
+ 
+ 	return (
+ 		<BaseControl
+-			__nextHasNoMarginBottom
+ 			id={ id }
+ 			label={ displayLabel }
+ 			help={ description }
+diff --git a/packages/dataviews/src/dataform-controls/textarea.tsx b/packages/dataviews/src/dataform-controls/textarea.tsx
+index 21b6d614d98afd..c147338cdffd1b 100644
+--- a/packages/dataviews/src/dataform-controls/textarea.tsx
++++ b/packages/dataviews/src/dataform-controls/textarea.tsx
+@@ -48,7 +48,6 @@ export default function Textarea< Item >( {
+ 				isValid.maxLength ? isValid.maxLength.constraint : undefined
+ 			}
+ 			__next40pxDefaultSize
+-			__nextHasNoMarginBottom
+ 			hideLabelFromVision={ hideLabelFromVision }
+ 		/>
+ 	);
+diff --git a/packages/dataviews/src/dataform-controls/toggle.tsx b/packages/dataviews/src/dataform-controls/toggle.tsx
+index 4cfa65515693c1..0eb476e5e93d58 100644
+--- a/packages/dataviews/src/dataform-controls/toggle.tsx
++++ b/packages/dataviews/src/dataform-controls/toggle.tsx
+@@ -33,7 +33,6 @@ export default function Toggle< Item >( {
+ 			required={ !! isValid.required }
+ 			customValidity={ getCustomValidity( isValid, validity ) }
+ 			hidden={ hideLabelFromVision }
+-			__nextHasNoMarginBottom
+ 			label={ label }
+ 			help={ description }
+ 			checked={ getValue( { item: data } ) }
+diff --git a/packages/dataviews/src/dataform-controls/utils/relative-date-control.tsx b/packages/dataviews/src/dataform-controls/utils/relative-date-control.tsx
+index 03a1670215a27a..a66a61c786ea50 100644
+--- a/packages/dataviews/src/dataform-controls/utils/relative-date-control.tsx
++++ b/packages/dataviews/src/dataform-controls/utils/relative-date-control.tsx
+@@ -88,7 +88,6 @@ export default function RelativeDateControl< Item >( {
+ 	return (
+ 		<BaseControl
+ 			id={ id }
+-			__nextHasNoMarginBottom
+ 			className={ clsx( className, 'dataviews-controls__relative-date' ) }
+ 			label={ label }
+ 			hideLabelFromVision={ hideLabelFromVision }
+diff --git a/packages/dataviews/src/dataform-controls/utils/validated-number.tsx b/packages/dataviews/src/dataform-controls/utils/validated-number.tsx
+index 6f291cb9e493ad..b93b95a5b0dac5 100644
+--- a/packages/dataviews/src/dataform-controls/utils/validated-number.tsx
++++ b/packages/dataviews/src/dataform-controls/utils/validated-number.tsx
+@@ -57,7 +57,6 @@ function BetweenControls( {
+ 
+ 	return (
+ 		<BaseControl
+-			__nextHasNoMarginBottom
+ 			help={ __( 'The max. value must be greater than the min. value.' ) }
+ 		>
+ 			<Flex direction="row" gap={ 4 }>
+diff --git a/packages/editor/src/hooks/push-changes-to-global-styles/index.js b/packages/editor/src/hooks/push-changes-to-global-styles/index.js
+index 6b6661ef59bfce..2bfeceba6adcd4 100644
+--- a/packages/editor/src/hooks/push-changes-to-global-styles/index.js
++++ b/packages/editor/src/hooks/push-changes-to-global-styles/index.js
+@@ -326,7 +326,6 @@ function PushChangesToGlobalStylesControl( {
+ 
+ 	return (
+ 		<BaseControl
+-			__nextHasNoMarginBottom
+ 			className="editor-push-changes-to-global-styles-control"
+ 			help={ sprintf(
+ 				// translators: %s: Title of the block e.g. 'Heading'.
+diff --git a/packages/global-styles-ui/src/size-control/index.tsx b/packages/global-styles-ui/src/size-control/index.tsx
+index 9b8a77e066aebd..975fc25a785fe6 100644
+--- a/packages/global-styles-ui/src/size-control/index.tsx
++++ b/packages/global-styles-ui/src/size-control/index.tsx
+@@ -21,14 +21,9 @@ interface SizeControlProps {
+ 	fallbackValue?: number;
+ 	disabled?: boolean;
+ 	label?: string;
+-	__nextHasNoMarginBottom?: boolean;
+ }
+ 
+-function SizeControl( {
+-	// Do not allow manipulation of margin bottom
+-	__nextHasNoMarginBottom,
+-	...props
+-}: SizeControlProps ) {
++function SizeControl( props: SizeControlProps ) {
+ 	const { baseControlProps } = useBaseControlProps( props );
+ 	const { value, onChange, fallbackValue, disabled, label } = props;
+ 
+@@ -57,7 +52,7 @@ function SizeControl( {
+ 	};
+ 
+ 	return (
+-		<BaseControl { ...baseControlProps } __nextHasNoMarginBottom>
++		<BaseControl { ...baseControlProps }>
+ 			<Flex>
+ 				<FlexItem isBlock>
+ 					<UnitControl
+diff --git a/packages/patterns/src/components/pattern-overrides-controls.js b/packages/patterns/src/components/pattern-overrides-controls.js
+index 9ad905b8bd9724..0a1dbc14372143 100644
+--- a/packages/patterns/src/components/pattern-overrides-controls.js
++++ b/packages/patterns/src/components/pattern-overrides-controls.js
+@@ -76,7 +76,6 @@ function PatternOverridesControls( {
+ 		<>
+ 			<InspectorControls group="advanced">
+ 				<BaseControl
+-					__nextHasNoMarginBottom
+ 					id={ controlId }
+ 					label={ __( 'Overrides' ) }
+ 					help={ helpText }

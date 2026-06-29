@@ -1,0 +1,83 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 96bf76815e71dd..44eb0855a739cc 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ ### Enhancements
+ 
+ -   `Composite`: improve Storybook examples and add interactive controls ([#64397](https://github.com/WordPress/gutenberg/pull/64397)).
++-   `QueryControls`: Default to new 40px size ([#64457](https://github.com/WordPress/gutenberg/pull/64457)).
+ -   `TimePicker`: add `hideLabelFromVision` prop ([#64267](https://github.com/WordPress/gutenberg/pull/64267)).
+ 
+ ## 28.5.0 (2024-08-07)
+diff --git a/packages/components/src/query-controls/index.tsx b/packages/components/src/query-controls/index.tsx
+index 3557335ebac5a0..452dd303c778bb 100644
+--- a/packages/components/src/query-controls/index.tsx
++++ b/packages/components/src/query-controls/index.tsx
+@@ -60,7 +60,6 @@ function isMultipleCategorySelection(
+  * ```
+  */
+ export function QueryControls( {
+-	__next40pxDefaultSize = false,
+ 	authorList,
+ 	selectedAuthorId,
+ 	numberOfItems,
+@@ -82,7 +81,7 @@ export function QueryControls( {
+ 				onOrderChange && onOrderByChange && (
+ 					<SelectControl
+ 						__nextHasNoMarginBottom
+-						__next40pxDefaultSize={ __next40pxDefaultSize }
++						__next40pxDefaultSize
+ 						key="query-controls-order-select"
+ 						label={ __( 'Order by' ) }
+ 						value={
+@@ -137,7 +136,7 @@ export function QueryControls( {
+ 					props.categoriesList &&
+ 					props.onCategoryChange && (
+ 						<CategorySelect
+-							__next40pxDefaultSize={ __next40pxDefaultSize }
++							__next40pxDefaultSize
+ 							key="query-controls-category-select"
+ 							categoriesList={ props.categoriesList }
+ 							label={ __( 'Category' ) }
+@@ -150,7 +149,7 @@ export function QueryControls( {
+ 					props.categorySuggestions &&
+ 					props.onCategoryChange && (
+ 						<FormTokenField
+-							__next40pxDefaultSize={ __next40pxDefaultSize }
++							__next40pxDefaultSize
+ 							__nextHasNoMarginBottom
+ 							key="query-controls-categories-select"
+ 							label={ __( 'Categories' ) }
+@@ -174,7 +173,7 @@ export function QueryControls( {
+ 					),
+ 				onAuthorChange && (
+ 					<AuthorSelect
+-						__next40pxDefaultSize={ __next40pxDefaultSize }
++						__next40pxDefaultSize
+ 						key="query-controls-author-select"
+ 						authorList={ authorList }
+ 						label={ __( 'Author' ) }
+@@ -186,7 +185,7 @@ export function QueryControls( {
+ 				onNumberOfItemsChange && (
+ 					<RangeControl
+ 						__nextHasNoMarginBottom
+-						__next40pxDefaultSize={ __next40pxDefaultSize }
++						__next40pxDefaultSize
+ 						key="query-controls-range-control"
+ 						label={ __( 'Number of items' ) }
+ 						value={ numberOfItems }
+diff --git a/packages/components/src/query-controls/types.ts b/packages/components/src/query-controls/types.ts
+index 8c45d22c54c064..eb004bf8215b0a 100644
+--- a/packages/components/src/query-controls/types.ts
++++ b/packages/components/src/query-controls/types.ts
+@@ -107,7 +107,8 @@ type BaseQueryControlsProps = {
+ 	 * Start opting into the larger default height that will become the
+ 	 * default size in a future version.
+ 	 *
+-	 * @default false
++	 * @deprecated Default behavior since WP 6.7. Prop can be safely removed.
++	 * @ignore
+ 	 */
+ 	__next40pxDefaultSize?: boolean;
+ };

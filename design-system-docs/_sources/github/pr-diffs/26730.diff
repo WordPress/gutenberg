@@ -1,0 +1,219 @@
+diff --git a/packages/components/src/disabled/README.md b/packages/components/src/disabled/README.md
+index 3b823b120be1a1..cb871d5d837cf6 100644
+--- a/packages/components/src/disabled/README.md
++++ b/packages/components/src/disabled/README.md
+@@ -49,3 +49,15 @@ function CustomButton() {
+ 	);
+ }
+ ```
++
++### Props
++
++The component accepts the following props:
++
++#### isDisabled
++
++Whether to disable all the descendant fields. Defaults to `true`.
++
++- Type: `Boolean`
++- Required: No
++- Default: `true`
+diff --git a/packages/components/src/disabled/index.js b/packages/components/src/disabled/index.js
+index 22aaa7b7664e63..2e7cab577a2bd1 100644
+--- a/packages/components/src/disabled/index.js
++++ b/packages/components/src/disabled/index.js
+@@ -41,7 +41,7 @@ const DISABLED_ELIGIBLE_NODE_NAMES = [
+ 	'TEXTAREA',
+ ];
+ 
+-function Disabled( { className, children, ...props } ) {
++function Disabled( { className, children, isDisabled = true, ...props } ) {
+ 	const node = useRef();
+ 
+ 	const disable = () => {
+@@ -75,6 +75,10 @@ function Disabled( { className, children, ...props } ) {
+ 	);
+ 
+ 	useLayoutEffect( () => {
++		if ( ! isDisabled ) {
++			return;
++		}
++
+ 		disable();
+ 
+ 		const observer = new window.MutationObserver( debouncedDisable );
+@@ -90,6 +94,10 @@ function Disabled( { className, children, ...props } ) {
+ 		};
+ 	}, [] );
+ 
++	if ( ! isDisabled ) {
++		return <Provider value={ false }>{ children }</Provider>;
++	}
++
+ 	return (
+ 		<Provider value={ true }>
+ 			<StyledWrapper
+diff --git a/packages/components/src/disabled/stories/index.js b/packages/components/src/disabled/stories/index.js
+index 527c76899c6527..fb994153c1037c 100644
+--- a/packages/components/src/disabled/stories/index.js
++++ b/packages/components/src/disabled/stories/index.js
+@@ -1,7 +1,13 @@
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
+ /**
+  * Internal dependencies
+  */
+ import Disabled from '../';
++import Button from '../../button/';
+ import SelectControl from '../../select-control/';
+ import TextControl from '../../text-control/';
+ import TextareaControl from '../../textarea-control/';
+@@ -11,21 +17,45 @@ export default {
+ 	component: Disabled,
+ };
+ 
++const Form = () => (
++	<div>
++		<TextControl label="Text Control" />
++		<TextareaControl label="TextArea Control" />
++		<SelectControl
++			label="Select Control"
++			onChange={ () => {} }
++			options={ [
++				{ value: null, label: 'Select an option', disabled: true },
++				{ value: 'a', label: 'Option A' },
++				{ value: 'b', label: 'Option B' },
++				{ value: 'c', label: 'Option C' },
++			] }
++		/>
++	</div>
++);
++
+ export const _default = () => {
+ 	return (
+ 		<Disabled>
+-			<TextControl label="Text Control" />
+-			<TextareaControl label="TextArea Control" />
+-			<SelectControl
+-				label="Select Control"
+-				onChange={ () => {} }
+-				options={ [
+-					{ value: null, label: 'Select an option', disabled: true },
+-					{ value: 'a', label: 'Option A' },
+-					{ value: 'b', label: 'Option B' },
+-					{ value: 'c', label: 'Option C' },
+-				] }
+-			/>
++			<Form />
+ 		</Disabled>
+ 	);
+ };
++
++export const DisabledWithProp = () => {
++	const [ isDisabled, setState ] = useState( true );
++	const toggleDisabled = () => {
++		setState( () => ! isDisabled );
++	};
++
++	return (
++		<div>
++			<Disabled isDisabled={ isDisabled }>
++				<Form />
++			</Disabled>
++			<Button isPrimary onClick={ toggleDisabled }>
++				Set isDisabled to { isDisabled ? 'false' : 'true' }
++			</Button>
++		</div>
++	);
++};
+diff --git a/packages/components/src/disabled/test/index.js b/packages/components/src/disabled/test/index.js
+index bef7a9e9e1e6cd..57697d51ba13fa 100644
+--- a/packages/components/src/disabled/test/index.js
++++ b/packages/components/src/disabled/test/index.js
+@@ -68,9 +68,9 @@ describe( 'Disabled', () => {
+ 	// this is needed because TestUtils does not accept a stateless component.
+ 	class DisabledComponent extends Component {
+ 		render() {
+-			const { children } = this.props;
++			const { children, isDisabled } = this.props;
+ 
+-			return <Disabled>{ children }</Disabled>;
++			return <Disabled isDisabled={ isDisabled }>{ children }</Disabled>;
+ 		}
+ 	}
+ 
+@@ -133,6 +133,51 @@ describe( 'Disabled', () => {
+ 		expect( div.hasAttribute( 'tabindex' ) ).toBe( true );
+ 	} );
+ 
++	it( 'will disable or enable descendant fields based on the isDisabled prop value', () => {
++		class MaybeDisable extends Component {
++			constructor() {
++				super( ...arguments );
++				this.state = { isDisabled: true };
++			}
++
++			render() {
++				return (
++					<DisabledComponent isDisabled={ this.state.isDisabled }>
++						<Form />
++					</DisabledComponent>
++				);
++			}
++		}
++
++		const wrapper = TestUtils.renderIntoDocument( <MaybeDisable /> );
++
++		const input = TestUtils.findRenderedDOMComponentWithTag(
++			wrapper,
++			'input'
++		);
++		const div = TestUtils.scryRenderedDOMComponentsWithTag(
++			wrapper,
++			'div'
++		)[ 1 ];
++
++		expect( input.hasAttribute( 'disabled' ) ).toBe( true );
++		expect( div.getAttribute( 'contenteditable' ) ).toBe( 'false' );
++
++		wrapper.setState( { isDisabled: false } );
++
++		const input2 = TestUtils.findRenderedDOMComponentWithTag(
++			wrapper,
++			'input'
++		);
++		const div2 = TestUtils.scryRenderedDOMComponentsWithTag(
++			wrapper,
++			'div'
++		)[ 0 ];
++
++		expect( input2.hasAttribute( 'disabled' ) ).toBe( false );
++		expect( div2.getAttribute( 'contenteditable' ) ).not.toBe( 'false' );
++	} );
++
+ 	// Ideally, we'd have two more test cases here:
+ 	//
+ 	//  - it( 'will disable all fields on component render change' )
+@@ -170,6 +215,19 @@ describe( 'Disabled', () => {
+ 			expect( wrapperElement.textContent ).toBe( 'Disabled' );
+ 		} );
+ 
++		test( "lets components know that they're not disabled via context when isDisabled is false", () => {
++			const wrapper = TestUtils.renderIntoDocument(
++				<DisabledComponent isDisabled={ false }>
++					<DisabledStatus />
++				</DisabledComponent>
++			);
++			const wrapperElement = TestUtils.findRenderedDOMComponentWithTag(
++				wrapper,
++				'p'
++			);
++			expect( wrapperElement.textContent ).toBe( 'Not disabled' );
++		} );
++
+ 		test( "lets components know that they're not disabled via context", () => {
+ 			const wrapper = TestUtils.renderIntoDocument( <DisabledStatus /> );
+ 			const wrapperElement = TestUtils.findRenderedDOMComponentWithTag(

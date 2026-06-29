@@ -1,0 +1,146 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index fbf17597df3b2e..45aa53243bdc90 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `FormFileUpload`: Remove temporary fix for selecting .heic file in Chromium browsers ([#70383](https://github.com/WordPress/gutenberg/pull/70383)).
+ 
++### Enhancement
++
++-   `ComboboxControl`: Add direction prop ([#70120](https://github.com/WordPress/gutenberg/pull/70120)).
++
+ ## 29.11.0 (2025-06-04)
+ 
+ ### Enhancement
+diff --git a/packages/components/src/radio-control/README.md b/packages/components/src/radio-control/README.md
+index 5d7204ef627be3..9ee7bbaf514142 100644
+--- a/packages/components/src/radio-control/README.md
++++ b/packages/components/src/radio-control/README.md
+@@ -115,6 +115,15 @@ The value property of the currently selected option.
+ 
+ -   Required: No
+ 
++#### `direction`: `'horizontal' | 'vertical'`
++
++Controls the layout direction of the radio buttons.
++
++-   Use 'horizontal' to display options in a row.
++-   Use 'vertical' (default) to display them in a column.
++
++-   Required: No
++
+ ## Related components
+ 
+ -   To select one or more items from a set, use the `CheckboxControl` component.
+diff --git a/packages/components/src/radio-control/index.tsx b/packages/components/src/radio-control/index.tsx
+index 29927558c58cd4..d1179f62841076 100644
+--- a/packages/components/src/radio-control/index.tsx
++++ b/packages/components/src/radio-control/index.tsx
+@@ -62,6 +62,7 @@ export function RadioControl(
+ 	const {
+ 		label,
+ 		className,
++		direction = 'vertical',
+ 		selected,
+ 		help,
+ 		onChange,
+@@ -101,6 +102,7 @@ export function RadioControl(
+ 				spacing={ 3 }
+ 				className={ clsx( 'components-radio-control__group-wrapper', {
+ 					'has-help': !! help,
++					'is-horizontal': direction === 'horizontal',
+ 				} ) }
+ 			>
+ 				{ options.map( ( option, index ) => (
+diff --git a/packages/components/src/radio-control/stories/index.story.tsx b/packages/components/src/radio-control/stories/index.story.tsx
+index 7b7bc773f323a9..e17bf7b2c51b90 100644
+--- a/packages/components/src/radio-control/stories/index.story.tsx
++++ b/packages/components/src/radio-control/stories/index.story.tsx
+@@ -30,6 +30,10 @@ const meta: Meta< typeof RadioControl > = {
+ 		help: {
+ 			control: { type: 'text' },
+ 		},
++		direction: {
++			control: 'radio',
++			options: [ 'horizontal', 'vertical' ],
++		},
+ 	},
+ 	parameters: {
+ 		controls: {
+diff --git a/packages/components/src/radio-control/style.scss b/packages/components/src/radio-control/style.scss
+index e3dcb8d1e58270..d79ca3c2910eb1 100644
+--- a/packages/components/src/radio-control/style.scss
++++ b/packages/components/src/radio-control/style.scss
+@@ -11,6 +11,12 @@
+ 	margin-block-end: $grid-unit-15;
+ }
+ 
++.components-radio-control__group-wrapper.is-horizontal {
++	flex-direction: row;
++	justify-content: flex-start;
++	flex-wrap: wrap;
++}
++
+ .components-radio-control__option {
+ 	display: grid;
+ 	grid-template-columns: auto 1fr;
+diff --git a/packages/components/src/radio-control/test/index.tsx b/packages/components/src/radio-control/test/index.tsx
+index 7e30744d96b826..688c1e1be6dfed 100644
+--- a/packages/components/src/radio-control/test/index.tsx
++++ b/packages/components/src/radio-control/test/index.tsx
+@@ -274,4 +274,38 @@ describe.each( [
+ 			);
+ 		} );
+ 	} );
++
++	describe( 'layout direction', () => {
++		it( 'should apply vertical layout when direction is not provided (default)', () => {
++			const onChangeSpy = jest.fn();
++
++			render(
++				<Component { ...defaultProps } onChange={ onChangeSpy } />
++			);
++
++			const groupWrapper = screen
++				.getByRole( 'group' )
++				// eslint-disable-next-line testing-library/no-node-access
++				.querySelector( '.components-radio-control__group-wrapper' );
++
++			expect( groupWrapper ).not.toHaveClass( 'is-horizontal' );
++		} );
++
++		it( 'should apply horizontal layout when direction="horizontal"', () => {
++			const onChangeSpy = jest.fn();
++			render(
++				<Component
++					{ ...defaultProps }
++					direction="horizontal"
++					onChange={ onChangeSpy }
++				/>
++			);
++			const groupWrapper = screen
++				.getByRole( 'group' )
++				// eslint-disable-next-line testing-library/no-node-access
++				.querySelector( '.components-radio-control__group-wrapper' );
++
++			expect( groupWrapper ).toHaveClass( 'is-horizontal' );
++		} );
++	} );
+ } );
+diff --git a/packages/components/src/radio-control/types.ts b/packages/components/src/radio-control/types.ts
+index d1c3aa40d96481..625aa5b09f23e8 100644
+--- a/packages/components/src/radio-control/types.ts
++++ b/packages/components/src/radio-control/types.ts
+@@ -33,4 +33,11 @@ export type RadioControlProps = Pick<
+ 	 * The value property of the currently selected option.
+ 	 */
+ 	selected?: string;
++	/**
++	 * Layout direction for the radio options.
++	 * Use 'horizontal' to display options in a row, or 'vertical' (default) for column layout.
++	 *
++	 * @default 'vertical'
++	 */
++	direction?: 'vertical' | 'horizontal';
+ };

@@ -1,0 +1,529 @@
+diff --git a/packages/block-editor/src/components/link-control/test/index.js b/packages/block-editor/src/components/link-control/test/index.js
+index f6bc7a60bf4cc8..fce0478c67dbf2 100644
+--- a/packages/block-editor/src/components/link-control/test/index.js
++++ b/packages/block-editor/src/components/link-control/test/index.js
+@@ -1731,7 +1731,7 @@ describe( 'Selecting links', () => {
+ 					);
+ 				};
+ 
+-				const { container } = render( <LinkControlConsumer /> );
++				render( <LinkControlConsumer /> );
+ 
+ 				// Search Input UI.
+ 				const searchInput = screen.getByRole( 'combobox', {
+@@ -1804,8 +1804,7 @@ describe( 'Selecting links', () => {
+ 				} );
+ 
+ 				// Make sure focus is retained after submission.
+-				// eslint-disable-next-line testing-library/no-node-access
+-				expect( container.firstChild ).toHaveFocus();
++				expect( currentLinkAnchor ).toHaveFocus();
+ 
+ 				expect( currentLink ).toBeVisible();
+ 				expect(
+diff --git a/packages/block-library/src/cover/test/edit.js b/packages/block-library/src/cover/test/edit.js
+index 8e26d0a1ed67bb..99281bb6d515b7 100644
+--- a/packages/block-library/src/cover/test/edit.js
++++ b/packages/block-library/src/cover/test/edit.js
+@@ -39,6 +39,50 @@ const disabledColorSettings = {
+ 	disableCustomGradients: true,
+ };
+ 
++/**
++ * Runs `callback` with `requestAnimationFrame` callbacks flushed on a microtask
++ * ahead of any pending `setTimeout( 0 )` timers, then restores the original.
++ *
++ * In a browser, Ariakit normalizes the matrix's roving tabindex in a
++ * `requestAnimationFrame` before `useFocusOnMount`'s `setTimeout( 0 )` focuses
++ * the active (center) cell, so opening the dropdown leaves the content position
++ * untouched. JSDOM implements `requestAnimationFrame` as a ~16ms timer, which
++ * inverts the ordering and would otherwise focus and select the first DOM cell.
++ *
++ * @param {() => ( Promise< unknown > | unknown )} callback
++ * @return {Promise< unknown >} Resolves with the callback's return value.
++ */
++async function withAnimationFramesBeforeTimers( callback ) {
++	const originalRequestAnimationFrame = global.requestAnimationFrame;
++
++	let flushing = false;
++	global.requestAnimationFrame = ( frameCallback ) => {
++		// Frames scheduled while flushing fall back to the real implementation
++		// so self-rescheduling loops (e.g. Popover's Floating UI `autoUpdate`)
++		// don't spin forever on the microtask queue.
++		if ( flushing ) {
++			return originalRequestAnimationFrame( frameCallback );
++		}
++
++		queueMicrotask( () => {
++			flushing = true;
++			try {
++				frameCallback( performance.now() );
++			} finally {
++				flushing = false;
++			}
++		} );
++
++		return 0;
++	};
++
++	try {
++		return await callback();
++	} finally {
++		global.requestAnimationFrame = originalRequestAnimationFrame;
++	}
++}
++
+ async function setup( attributes, useCoreBlocks, customSettings ) {
+ 	const testBlock = { name: 'core/cover', attributes };
+ 	const settings = customSettings || defaultSettings;
+@@ -149,8 +193,13 @@ describe( 'Cover block', () => {
+ 			await setup();
+ 			await createAndSelectBlock();
+ 
+-			await userEvent.click(
+-				screen.getByLabelText( 'Change content position' )
++			// Open the matrix dropdown with browser-like frame ordering so
++			// focus-on-mount lands on the active cell instead of dirtying the
++			// content position.
++			await withAnimationFramesBeforeTimers( () =>
++				userEvent.click(
++					screen.getByLabelText( 'Change content position' )
++				)
+ 			);
+ 
+ 			expect( screen.getByLabelText( 'Block: Cover' ) ).not.toHaveClass(
+diff --git a/packages/components/src/custom-select-control/test/index.tsx b/packages/components/src/custom-select-control/test/index.tsx
+index 61d212c26c619e..237b01420704b0 100644
+--- a/packages/components/src/custom-select-control/test/index.tsx
++++ b/packages/components/src/custom-select-control/test/index.tsx
+@@ -483,7 +483,7 @@ describe.each( [
+ 			const customSelect = screen.getByRole( 'listbox', {
+ 				name: props.label,
+ 			} );
+-			expect( customSelect ).toHaveFocus();
++			await waitFor( () => expect( customSelect ).toHaveFocus() );
+ 			await press.Enter();
+ 
+ 			expect( onKeyDown ).toHaveBeenCalledTimes( 0 );
+diff --git a/packages/components/src/menu/test/index.tsx b/packages/components/src/menu/test/index.tsx
+index 1d21839aac4e14..b8f5092e18ab45 100644
+--- a/packages/components/src/menu/test/index.tsx
++++ b/packages/components/src/menu/test/index.tsx
+@@ -31,22 +31,6 @@ const resetTypeahead = () => {
+ 
+ describe( 'Menu', () => {
+ 	let user: ReturnType< typeof userEvent.setup >;
+-	let originalGetClientRects: () => DOMRectList;
+-
+-	beforeAll( () => {
+-		// Code that considers focusability considers rects in whether the
+-		// element is visible, but since jsdom does not simulate layout, we
+-		// need to fake it. This should ideally be a global test mock to
+-		// faithfully emulate a true browser environment.
+-		originalGetClientRects = window.Element.prototype.getClientRects;
+-		window.Element.prototype.getClientRects = jest.fn(
+-			() => [ { width: 1, height: 1 } ] as unknown as DOMRectList
+-		);
+-	} );
+-
+-	afterAll( () => {
+-		window.Element.prototype.getClientRects = originalGetClientRects;
+-	} );
+ 
+ 	beforeEach( () => {
+ 		user = userEvent.setup();
+diff --git a/packages/components/src/modal/test/index.tsx b/packages/components/src/modal/test/index.tsx
+index b53e12b450a171..85f2fe8d8cbaa7 100644
+--- a/packages/components/src/modal/test/index.tsx
++++ b/packages/components/src/modal/test/index.tsx
+@@ -269,9 +269,6 @@ describe( 'Modal', () => {
+ 	} );
+ 
+ 	describe( 'Focus handling', () => {
+-		const originalGetClientRects =
+-			window.HTMLElement.prototype.getClientRects;
+-
+ 		const FocusMountDemo = ( {
+ 			focusOnMount,
+ 		}: Pick< ModalProps, 'focusOnMount' > ) => {
+@@ -300,27 +297,6 @@ describe( 'Modal', () => {
+ 			);
+ 		};
+ 
+-		beforeEach( () => {
+-			/**
+-			 * The test environment does not have a layout engine, so we need to mock
+-			 * the getClientRects method. This ensures that the focusable elements can be
+-			 * found by the `focusOnMount` logic which depends on layout information
+-			 * to determine if the element is visible or not.
+-			 * See https://github.com/WordPress/gutenberg/blob/trunk/packages/dom/src/focusable.js#L55-L61.
+-			 */
+-			// @ts-expect-error We're not trying to comply to the DOM spec, only mocking
+-			window.HTMLElement.prototype.getClientRects = function () {
+-				return [ 'trick-jsdom-into-having-size-for-element-rect' ];
+-			};
+-		} );
+-
+-		afterEach( () => {
+-			// Restore original HTMLElement prototype.
+-			// See beforeEach for details.
+-			window.HTMLElement.prototype.getClientRects =
+-				originalGetClientRects;
+-		} );
+-
+ 		it( 'should focus the Modal dialog by default when `focusOnMount` prop is not provided', async () => {
+ 			const user = userEvent.setup();
+ 
+diff --git a/packages/components/src/navigable-container/test/navigable-menu.tsx b/packages/components/src/navigable-container/test/navigable-menu.tsx
+index 50c6c55e46a932..0a9d7806c7f060 100644
+--- a/packages/components/src/navigable-container/test/navigable-menu.tsx
++++ b/packages/components/src/navigable-container/test/navigable-menu.tsx
+@@ -28,23 +28,7 @@ const getNavigableMenuFocusables = () => [
+ 	screen.getByRole( 'link', { name: 'Item 4' } ),
+ ];
+ 
+-const originalGetClientRects = window.HTMLElement.prototype.getClientRects;
+-
+ describe( 'NavigableMenu', () => {
+-	beforeAll( () => {
+-		// Mocking `getClientRects()` is necessary to pass a check performed by
+-		// the `focus.tabbable.find()` and by the `focus.focusable.find()` functions
+-		// from the `@wordpress/dom` package.
+-		// @ts-expect-error We're not trying to comply to the DOM spec, only mocking
+-		window.HTMLElement.prototype.getClientRects = function () {
+-			return [ 'trick-jsdom-into-having-size-for-element-rect' ];
+-		};
+-	} );
+-
+-	afterAll( () => {
+-		window.HTMLElement.prototype.getClientRects = originalGetClientRects;
+-	} );
+-
+ 	it( 'moves focus on its focusable children by using the up/down arrow keys', async () => {
+ 		const user = userEvent.setup();
+ 
+diff --git a/packages/components/src/navigable-container/test/tababble-container.tsx b/packages/components/src/navigable-container/test/tababble-container.tsx
+index eb14842025bec2..996f8c4d692926 100644
+--- a/packages/components/src/navigable-container/test/tababble-container.tsx
++++ b/packages/components/src/navigable-container/test/tababble-container.tsx
+@@ -35,23 +35,7 @@ const getTabbableContainerTabbables = () => [
+ 	screen.getByRole( 'link', { name: 'Item 4' } ),
+ ];
+ 
+-const originalGetClientRects = window.HTMLElement.prototype.getClientRects;
+-
+ describe( 'TabbableContainer', () => {
+-	beforeAll( () => {
+-		// Mocking `getClientRects()` is necessary to pass a check performed by
+-		// the `focus.tabbable.find()` and by the `focus.focusable.find()` functions
+-		// from the `@wordpress/dom` package.
+-		// @ts-expect-error We're not trying to comply to the DOM spec, only mocking
+-		window.HTMLElement.prototype.getClientRects = function () {
+-			return [ 'trick-jsdom-into-having-size-for-element-rect' ];
+-		};
+-	} );
+-
+-	afterAll( () => {
+-		window.HTMLElement.prototype.getClientRects = originalGetClientRects;
+-	} );
+-
+ 	it( 'moves focus on its tabbable children by using the tab key', async () => {
+ 		const user = userEvent.setup();
+ 
+diff --git a/packages/components/src/navigator/test/index.tsx b/packages/components/src/navigator/test/index.tsx
+index c0edb52a00231b..025028a24e32fe 100644
+--- a/packages/components/src/navigator/test/index.tsx
++++ b/packages/components/src/navigator/test/index.tsx
+@@ -469,30 +469,6 @@ const getNavigationButton = ( buttonKey: keyof typeof BUTTON_TEXT ) =>
+ 	screen.getByRole( 'button', { name: BUTTON_TEXT[ buttonKey ] } );
+ 
+ describe( 'Navigator', () => {
+-	const originalGetClientRects = window.Element.prototype.getClientRects;
+-
+-	// `getClientRects` needs to be mocked so that `isVisible` from the `@wordpress/dom`
+-	// `focusable` module can pass, in a JSDOM env where the DOM elements have no width/height.
+-	const mockedGetClientRects = jest.fn( () => [
+-		{
+-			x: 0,
+-			y: 0,
+-			width: 100,
+-			height: 100,
+-		},
+-	] );
+-
+-	beforeAll( () => {
+-		// @ts-expect-error There's no need for an exact mock, this is just needed
+-		// for the tests to pass (see `mockedGetClientRects` inline comments).
+-		window.Element.prototype.getClientRects =
+-			jest.fn( mockedGetClientRects );
+-	} );
+-
+-	afterAll( () => {
+-		window.Element.prototype.getClientRects = originalGetClientRects;
+-	} );
+-
+ 	it( 'should render', () => {
+ 		render( <MyNavigation /> );
+ 
+diff --git a/packages/components/src/tab-panel/test/index.tsx b/packages/components/src/tab-panel/test/index.tsx
+index 28dd1a81e9e84f..5d3eb279fed051 100644
+--- a/packages/components/src/tab-panel/test/index.tsx
++++ b/packages/components/src/tab-panel/test/index.tsx
+@@ -35,8 +35,6 @@ const TABS = [
+ const getSelectedTab = async () =>
+ 	await screen.findByRole( 'tab', { selected: true } );
+ 
+-let originalGetClientRects: () => DOMRectList;
+-
+ describe.each( [
+ 	[ 'uncontrolled', TabPanel ],
+ 	// The controlled component tests will be added once we certify the
+@@ -45,21 +43,6 @@ describe.each( [
+ ] )( 'TabPanel %s', ( ...modeAndComponent ) => {
+ 	const [ , Component ] = modeAndComponent;
+ 
+-	beforeAll( () => {
+-		originalGetClientRects = window.HTMLElement.prototype.getClientRects;
+-		// Mocking `getClientRects()` is necessary to pass a check performed by
+-		// the `focus.tabbable.find()` and by the `focus.focusable.find()` functions
+-		// from the `@wordpress/dom` package.
+-		// @ts-expect-error We're not trying to comply to the DOM spec, only mocking
+-		window.HTMLElement.prototype.getClientRects = function () {
+-			return [ 'trick-jsdom-into-having-size-for-element-rect' ];
+-		};
+-	} );
+-
+-	afterAll( () => {
+-		window.HTMLElement.prototype.getClientRects = originalGetClientRects;
+-	} );
+-
+ 	describe( 'Accessibility and semantics', () => {
+ 		it( 'should use the correct aria attributes', async () => {
+ 			const panelRenderFunction = jest.fn();
+diff --git a/packages/components/src/tabs/test/index.tsx b/packages/components/src/tabs/test/index.tsx
+index 7ff6106a2e8752..3ace41c5508698 100644
+--- a/packages/components/src/tabs/test/index.tsx
++++ b/packages/components/src/tabs/test/index.tsx
+@@ -176,8 +176,6 @@ const ControlledTabs = ( {
+ 	);
+ };
+ 
+-let originalGetClientRects: () => DOMRectList;
+-
+ async function waitForComponentToBeInitializedWithSelectedTab(
+ 	selectedTabName: string | undefined
+ ) {
+@@ -218,21 +216,6 @@ async function waitForComponentToBeInitializedWithSelectedTab(
+ }
+ 
+ describe( 'Tabs', () => {
+-	beforeAll( () => {
+-		originalGetClientRects = window.HTMLElement.prototype.getClientRects;
+-		// Mocking `getClientRects()` is necessary to pass a check performed by
+-		// the `focus.tabbable.find()` and by the `focus.focusable.find()` functions
+-		// from the `@wordpress/dom` package.
+-		// @ts-expect-error We're not trying to comply to the DOM spec, only mocking
+-		window.HTMLElement.prototype.getClientRects = function () {
+-			return [ 'trick-jsdom-into-having-size-for-element-rect' ];
+-		};
+-	} );
+-
+-	afterAll( () => {
+-		window.HTMLElement.prototype.getClientRects = originalGetClientRects;
+-	} );
+-
+ 	describe( 'Adherence to spec and basic behavior', () => {
+ 		it( 'should apply the correct roles, semantics and attributes', async () => {
+ 			await render( <UncontrolledTabs tabs={ TABS } /> );
+diff --git a/packages/components/src/tree-grid/test/index.tsx b/packages/components/src/tree-grid/test/index.tsx
+index b4b9d5d370fb44..4573ae7fa055fc 100644
+--- a/packages/components/src/tree-grid/test/index.tsx
++++ b/packages/components/src/tree-grid/test/index.tsx
+@@ -24,29 +24,6 @@ const TestButton = forwardRef(
+ );
+ 
+ describe( 'TreeGrid', () => {
+-	const originalGetClientRects = window.Element.prototype.getClientRects;
+-
+-	// `getClientRects` needs to be mocked so that `isVisible` from the `@wordpress/dom`
+-	// `focusable` module can pass, in a JSDOM env where the DOM elements have no width/height.
+-	const mockedGetClientRects = jest.fn( () => [
+-		{
+-			x: 0,
+-			y: 0,
+-			width: 100,
+-			height: 100,
+-		},
+-	] );
+-
+-	beforeAll( () => {
+-		// @ts-expect-error - This is just a mock
+-		window.Element.prototype.getClientRects =
+-			jest.fn( mockedGetClientRects );
+-	} );
+-
+-	afterAll( () => {
+-		window.Element.prototype.getClientRects = originalGetClientRects;
+-	} );
+-
+ 	describe( 'simple rendering', () => {
+ 		it( 'renders a table, tbody and any child elements', () => {
+ 			const { container } = render(
+diff --git a/packages/widget-dashboard/src/test/actions.test.tsx b/packages/widget-dashboard/src/test/actions.test.tsx
+index 19e3b028783802..7530f010ff43be 100644
+--- a/packages/widget-dashboard/src/test/actions.test.tsx
++++ b/packages/widget-dashboard/src/test/actions.test.tsx
+@@ -65,6 +65,12 @@ function Harness( {
+ }
+ 
+ describe( 'WidgetDashboard.Actions', () => {
++	let user: ReturnType< typeof userEvent.setup >;
++
++	beforeEach( () => {
++		user = userEvent.setup();
++	} );
++
+ 	it( 'renders the Customize button when editMode is false', () => {
+ 		render( <Harness /> );
+ 
+@@ -91,9 +97,7 @@ describe( 'WidgetDashboard.Actions', () => {
+ 		const onEditChange = jest.fn();
+ 		render( <Harness onEditChange={ onEditChange } /> );
+ 
+-		await userEvent.click(
+-			screen.getByRole( 'button', { name: 'Customize' } )
+-		);
++		await user.click( screen.getByRole( 'button', { name: 'Customize' } ) );
+ 
+ 		expect( onEditChange ).toHaveBeenLastCalledWith( true );
+ 	} );
+@@ -117,9 +121,7 @@ describe( 'WidgetDashboard.Actions', () => {
+ 			/>
+ 		);
+ 
+-		await userEvent.click(
+-			screen.getByRole( 'button', { name: 'Cancel' } )
+-		);
++		await user.click( screen.getByRole( 'button', { name: 'Cancel' } ) );
+ 
+ 		expect( onEditChange ).toHaveBeenLastCalledWith( false );
+ 		expect( onLayoutChange ).not.toHaveBeenCalled();
+@@ -176,7 +178,7 @@ describe( 'WidgetDashboard.Actions', () => {
+ 				<Harness initialEditMode onGridSettingsChange={ () => {} } />
+ 			);
+ 
+-			await userEvent.click(
++			await user.click(
+ 				screen.getByRole( 'button', { name: 'Layout settings' } )
+ 			);
+ 
+@@ -202,7 +204,7 @@ describe( 'WidgetDashboard.Actions', () => {
+ 				</WidgetDashboard>
+ 			);
+ 
+-			await userEvent.click(
++			await user.click(
+ 				screen.getByRole( 'button', { name: 'More options' } )
+ 			);
+ 
+diff --git a/test/unit/config/global-mocks.js b/test/unit/config/global-mocks.js
+index 99fabf7079849b..bff55a0d40c1e3 100644
+--- a/test/unit/config/global-mocks.js
++++ b/test/unit/config/global-mocks.js
+@@ -65,6 +65,62 @@ jest.mock( 'client-zip', () => ( {
+ 
+ global.ResizeObserver = require( 'resize-observer-polyfill' );
+ 
++/**
++ * A minimal, constructable DOMRectList implementation. The browser-native
++ * implementation is not constructable, and DOMRectList differ from arrays.
++ *
++ * @see https://drafts.csswg.org/geometry/#DOMRectList
++ */
++class FakeDOMRectList extends Array {
++	/**
++	 * @param {number} index The index of the DOMRect to return.
++	 *
++	 * @return {DOMRect | null} The DOMRect at the given index, or null if the
++	 *                          given index is out of bounds.
++	 */
++	item( index ) {
++		return this[ index ] ?? null;
++	}
++}
++
++/**
++ * Checks if an element has an associated layout box.
++ *
++ * The checks intentionally avoid `window.getComputedStyle`, which is very slow
++ * in JSDOM. Instead, we check visibility based on accessible attributes and
++ * inline styles. The trade-off is that this doesn't fully resolve visibility
++ * applied through CSS styles, though generally we do not rely on stylesheet
++ * styles in tests.
++ *
++ * @param {HTMLElement} element The element to check.
++ * @return {boolean} Whether the element has an associated layout box.
++ */
++function hasAssociatedLayoutBox( element ) {
++	if ( ! element.isConnected ) {
++		return false;
++	}
++
++	/** @type {HTMLElement | null} */
++	let current = element;
++	while ( current ) {
++		if ( current.hidden ) {
++			return false;
++		}
++
++		if ( current.style?.display === 'none' ) {
++			return false;
++		}
++
++		if ( current === element && current.style?.display === 'contents' ) {
++			return false;
++		}
++
++		current = current.parentElement;
++	}
++
++	return true;
++}
++
+ // The following jsdom-targeted setup is skipped when a test opts into
+ // `@jest-environment node` so SSR-style tests can run under this config.
+ if ( typeof window !== 'undefined' ) {
+@@ -89,6 +145,33 @@ if ( typeof window !== 'undefined' ) {
+ 	 * @see https://github.com/jsdom/jsdom/issues/1695
+ 	 */
+ 	global.Element.prototype.scrollIntoView = jest.fn();
++
++	/**
++	 * Polyfill Element#getClientRects to minimally emulate element visibility.
++	 *
++	 * JSDOM does not have a layout engine, so visible elements otherwise report
++	 * no client rects and can be treated as hidden by focusability checks.
++	 *
++	 * @see https://github.com/jsdom/jsdom/issues/653
++	 * @see https://github.com/jsdom/jsdom/issues/1322
++	 */
++	global.Element.prototype.getClientRects = function () {
++		const rects = [];
++		if ( hasAssociatedLayoutBox( this ) ) {
++			rects.push( {
++				bottom: 1,
++				height: 1,
++				left: 0,
++				right: 1,
++				top: 0,
++				width: 1,
++				x: 0,
++				y: 0,
++			} );
++		}
++
++		return new FakeDOMRectList( ...rects );
++	};
+ }
+ 
+ if ( ! global.TextDecoder ) {

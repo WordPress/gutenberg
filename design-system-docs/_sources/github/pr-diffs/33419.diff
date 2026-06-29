@@ -1,0 +1,17 @@
+diff --git a/packages/components/src/form-token-field/suggestions-list.js b/packages/components/src/form-token-field/suggestions-list.js
+index 0f8b44c4068a0e..1ad0ace0a3b89e 100644
+--- a/packages/components/src/form-token-field/suggestions-list.js
++++ b/packages/components/src/form-token-field/suggestions-list.js
+@@ -21,7 +21,11 @@ class SuggestionsList extends Component {
+ 	componentDidUpdate() {
+ 		// only have to worry about scrolling selected suggestion into view
+ 		// when already expanded
+-		if ( this.props.selectedIndex > -1 && this.props.scrollIntoView ) {
++		if (
++			this.props.selectedIndex > -1 &&
++			this.props.scrollIntoView &&
++			this.list.children[ this.props.selectedIndex ]
++		) {
+ 			this.scrollingIntoView = true;
+ 			scrollIntoView(
+ 				this.list.children[ this.props.selectedIndex ],

@@ -1,0 +1,24 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4269dc95fad469..a367b8f49d23e2 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Bug Fix
+ 
++-   `Tooltip`: Opt in to `__unstableShift` to ensure that the Tooltip is always within the viewport. ([#41524](https://github.com/WordPress/gutenberg/pull/41524))
+ -   `FormTokenField`: Do not suggest the selected one even if `{ value: string }` is passed ([#41216](https://github.com/WordPress/gutenberg/pull/41216)).
+ -   `CustomGradientBar`: Fix insertion and control point positioning to more closely follow cursor. ([#41492](https://github.com/WordPress/gutenberg/pull/41492))
+ 
+diff --git a/packages/components/src/tooltip/index.js b/packages/components/src/tooltip/index.js
+index b9177cf7826704..7bf2d4af2907dc 100644
+--- a/packages/components/src/tooltip/index.js
++++ b/packages/components/src/tooltip/index.js
+@@ -65,6 +65,7 @@ const addPopoverToGrandchildren = ( {
+ 				aria-hidden="true"
+ 				animate={ false }
+ 				offset={ 12 }
++				__unstableShift
+ 			>
+ 				{ text }
+ 				<Shortcut

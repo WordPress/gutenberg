@@ -1,0 +1,93 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8377d17349e683..48cd5b325e705c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -22,6 +22,7 @@
+ ### Enhancements
+ 
+ -   `Tooltip`: Update background color so tooltip boundaries are more visible in the site editor ([#50792](https://github.com/WordPress/gutenberg/pull/50792)).
++-   `FontSizePicker`: Tweak the header spacing to be more consistent with other design tools ([#50855](https://github.com/WordPress/gutenberg/pull/50855)).
+ 
+ ## 24.0.0 (2023-05-10)
+ 
+diff --git a/packages/components/src/font-size-picker/index.tsx b/packages/components/src/font-size-picker/index.tsx
+index a06a6529b0dbce..74d8e54e8fd651 100644
+--- a/packages/components/src/font-size-picker/index.tsx
++++ b/packages/components/src/font-size-picker/index.tsx
+@@ -14,7 +14,6 @@ import { useState, useMemo, forwardRef } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import Button from '../button';
+ import RangeControl from '../range-control';
+ import { Flex, FlexItem } from '../flex';
+ import {
+@@ -24,12 +23,13 @@ import {
+ } from '../unit-control';
+ import { VisuallyHidden } from '../visually-hidden';
+ import { getCommonSizeUnit } from './utils';
+-import { HStack } from '../h-stack';
+ import type { FontSizePickerProps } from './types';
+ import {
+ 	Container,
++	Header,
+ 	HeaderHint,
+ 	HeaderLabel,
++	HeaderToggle,
+ 	Controls,
+ 	ResetButton,
+ } from './styles';
+@@ -127,7 +127,7 @@ const UnforwardedFontSizePicker = (
+ 		<Container ref={ ref } className="components-font-size-picker">
+ 			<VisuallyHidden as="legend">{ __( 'Font size' ) }</VisuallyHidden>
+ 			<Spacer>
+-				<HStack className="components-font-size-picker__header">
++				<Header className="components-font-size-picker__header">
+ 					<HeaderLabel
+ 						aria-label={ `${ __( 'Size' ) } ${ headerHint || '' }` }
+ 					>
+@@ -139,7 +139,7 @@ const UnforwardedFontSizePicker = (
+ 						) }
+ 					</HeaderLabel>
+ 					{ ! disableCustomFontSizes && (
+-						<Button
++						<HeaderToggle
+ 							label={
+ 								showCustomValueControl
+ 									? __( 'Use size preset' )
+@@ -155,7 +155,7 @@ const UnforwardedFontSizePicker = (
+ 							isSmall
+ 						/>
+ 					) }
+-				</HStack>
++				</Header>
+ 			</Spacer>
+ 			<Controls
+ 				className="components-font-size-picker__controls"
+diff --git a/packages/components/src/font-size-picker/styles.ts b/packages/components/src/font-size-picker/styles.ts
+index 643db817442838..525c1be0c94b07 100644
+--- a/packages/components/src/font-size-picker/styles.ts
++++ b/packages/components/src/font-size-picker/styles.ts
+@@ -8,6 +8,7 @@ import styled from '@emotion/styled';
+  */
+ import BaseControl from '../base-control';
+ import Button from '../button';
++import { HStack } from '../h-stack';
+ import { space } from '../ui/utils/space';
+ import { COLORS } from '../utils';
+ import type { FontSizePickerProps } from './types';
+@@ -18,6 +19,14 @@ export const Container = styled.fieldset`
+ 	padding: 0;
+ `;
+ 
++export const Header = styled( HStack )`
++	height: ${ space( 4 ) };
++`;
++
++export const HeaderToggle = styled( Button )`
++	margin-top: ${ space( -1 ) };
++`;
++
+ export const HeaderLabel = styled( BaseControl.VisualLabel )`
+ 	display: flex;
+ 	gap: ${ space( 1 ) };

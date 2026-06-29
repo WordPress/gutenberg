@@ -1,0 +1,232 @@
+diff --git a/package-lock.json b/package-lock.json
+index e11e31aa3be10b..26ce43392273cf 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -11,7 +11,8 @@
+ 			"license": "GPL-2.0-or-later",
+ 			"workspaces": [
+ 				"packages/*",
+-				"routes/*"
++				"routes/*",
++				"storybook"
+ 			],
+ 			"devDependencies": {
+ 				"@apidevtools/json-schema-ref-parser": "11.6.4",
+@@ -23,10 +24,6 @@
+ 				"@octokit/rest": "16.26.0",
+ 				"@playwright/test": "1.57.0",
+ 				"@pmmmwh/react-refresh-webpack-plugin": "0.5.11",
+-				"@storybook/addon-a11y": "10.1.11",
+-				"@storybook/addon-docs": "10.1.11",
+-				"@storybook/icons": "2.0.1",
+-				"@storybook/react-vite": "10.1.11",
+ 				"@testing-library/jest-dom": "^6.6.3",
+ 				"@testing-library/react": "14.3.0",
+ 				"@testing-library/user-event": "14.4.3",
+@@ -98,8 +95,6 @@
+ 				"simple-git": "3.24.0",
+ 				"snapshot-diff": "0.10.0",
+ 				"sprintf-js": "1.1.1",
+-				"storybook": "^10.1.11",
+-				"storybook-addon-tag-badges": "3.0.4",
+ 				"style-loader": "3.2.1",
+ 				"stylelint-plugin-logical-css": "^1.2.3",
+ 				"typescript": "5.9.3",
+@@ -17712,6 +17707,10 @@
+ 			"resolved": "packages/shortcode",
+ 			"link": true
+ 		},
++		"node_modules/@wordpress/storybook": {
++			"resolved": "storybook",
++			"link": true
++		},
+ 		"node_modules/@wordpress/style-engine": {
+ 			"resolved": "packages/style-engine",
+ 			"link": true
+@@ -52489,6 +52488,7 @@
+ 			"devDependencies": {
+ 				"@ariakit/test": "^0.4.7",
+ 				"@storybook/addon-docs": "^10.1.11",
++				"@storybook/react-vite": "^10.1.11",
+ 				"@testing-library/jest-dom": "^6.6.3",
+ 				"@types/jest": "^29.5.14",
+ 				"@wordpress/jest-console": "file:../jest-console",
+@@ -52830,6 +52830,7 @@
+ 				"remove-accents": "^0.5.0"
+ 			},
+ 			"devDependencies": {
++				"@storybook/react-vite": "^10.1.11",
+ 				"@testing-library/jest-dom": "^6.6.3",
+ 				"@types/jest": "^29.5.14",
+ 				"esbuild": "^0.27.2",
+@@ -54935,6 +54936,7 @@
+ 				"memize": "^2.1.0"
+ 			},
+ 			"devDependencies": {
++				"@storybook/react-vite": "^10.1.11",
+ 				"@terrazzo/cli": "^0.10.2",
+ 				"@terrazzo/plugin-css": "^0.10.2",
+ 				"@terrazzo/token-tools": "^0.10.2",
+@@ -54994,6 +54996,7 @@
+ 			},
+ 			"devDependencies": {
+ 				"@storybook/addon-docs": "^10.1.11",
++				"@storybook/react-vite": "^10.1.11",
+ 				"@testing-library/jest-dom": "^6.6.3",
+ 				"@types/jest": "^29.5.14",
+ 				"@types/node": "^20.17.10",
+@@ -55495,6 +55498,19 @@
+ 				"clsx": "^2.1.1",
+ 				"dequal": "^2.0.3"
+ 			}
++		},
++		"storybook": {
++			"name": "@wordpress/storybook",
++			"version": "0.0.0",
++			"license": "GPL-2.0-or-later",
++			"devDependencies": {
++				"@storybook/addon-a11y": "^10.1.11",
++				"@storybook/addon-docs": "^10.1.11",
++				"@storybook/icons": "^2.0.1",
++				"@storybook/react-vite": "^10.1.11",
++				"storybook": "^10.1.11",
++				"storybook-addon-tag-badges": "^3.0.4"
++			}
+ 		}
+ 	}
+ }
+diff --git a/package.json b/package.json
+index a39c6b56fda956..48b969006c362f 100644
+--- a/package.json
++++ b/package.json
+@@ -46,10 +46,6 @@
+ 		"@octokit/rest": "16.26.0",
+ 		"@playwright/test": "1.57.0",
+ 		"@pmmmwh/react-refresh-webpack-plugin": "0.5.11",
+-		"@storybook/addon-a11y": "10.1.11",
+-		"@storybook/addon-docs": "10.1.11",
+-		"@storybook/icons": "2.0.1",
+-		"@storybook/react-vite": "10.1.11",
+ 		"@testing-library/jest-dom": "^6.6.3",
+ 		"@testing-library/react": "14.3.0",
+ 		"@testing-library/user-event": "14.4.3",
+@@ -121,8 +117,6 @@
+ 		"simple-git": "3.24.0",
+ 		"snapshot-diff": "0.10.0",
+ 		"sprintf-js": "1.1.1",
+-		"storybook": "^10.1.11",
+-		"storybook-addon-tag-badges": "3.0.4",
+ 		"style-loader": "3.2.1",
+ 		"stylelint-plugin-logical-css": "^1.2.3",
+ 		"typescript": "5.9.3",
+@@ -180,8 +174,8 @@
+ 		"prepublishOnly": "npm run build",
+ 		"start": "npm run dev",
+ 		"prestorybook:build": "npm run build -- --skip-types",
+-		"storybook:build": "storybook build -c ./storybook -o ./storybook/build",
+-		"storybook:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && storybook dev -c ./storybook -p 50240\"",
++		"storybook:build": "npm run --workspace @wordpress/storybook storybook:build",
++		"storybook:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && npm run --workspace @wordpress/storybook storybook:dev\"",
+ 		"storybook:e2e:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && storybook dev -c test/storybook-playwright/storybook -p 50241\"",
+ 		"test": "npm-run-all lint test:unit",
+ 		"test:create-block": "bash ./bin/test-create-block.sh",
+@@ -253,6 +247,7 @@
+ 	},
+ 	"workspaces": [
+ 		"packages/*",
+-		"routes/*"
++		"routes/*",
++		"storybook"
+ 	]
+ }
+diff --git a/packages/components/package.json b/packages/components/package.json
+index fb180b4b54d747..d201808820580b 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -102,6 +102,7 @@
+ 	"devDependencies": {
+ 		"@ariakit/test": "^0.4.7",
+ 		"@storybook/addon-docs": "^10.1.11",
++		"@storybook/react-vite": "^10.1.11",
+ 		"@testing-library/jest-dom": "^6.6.3",
+ 		"@types/jest": "^29.5.14",
+ 		"@wordpress/jest-console": "file:../jest-console",
+diff --git a/packages/dataviews/package.json b/packages/dataviews/package.json
+index a8fc82c1c84246..0dad4914f01515 100644
+--- a/packages/dataviews/package.json
++++ b/packages/dataviews/package.json
+@@ -78,6 +78,7 @@
+ 		"remove-accents": "^0.5.0"
+ 	},
+ 	"devDependencies": {
++		"@storybook/react-vite": "^10.1.11",
+ 		"@testing-library/jest-dom": "^6.6.3",
+ 		"@types/jest": "^29.5.14",
+ 		"esbuild": "^0.27.2",
+diff --git a/packages/theme/package.json b/packages/theme/package.json
+index 2f70883e4b333b..8deac00dc5d76f 100644
+--- a/packages/theme/package.json
++++ b/packages/theme/package.json
+@@ -70,6 +70,7 @@
+ 		"memize": "^2.1.0"
+ 	},
+ 	"devDependencies": {
++		"@storybook/react-vite": "^10.1.11",
+ 		"@terrazzo/cli": "^0.10.2",
+ 		"@terrazzo/plugin-css": "^0.10.2",
+ 		"@terrazzo/token-tools": "^0.10.2",
+diff --git a/packages/ui/package.json b/packages/ui/package.json
+index b864cb1b1d5b03..16a734a99aafe8 100644
+--- a/packages/ui/package.json
++++ b/packages/ui/package.json
+@@ -53,6 +53,7 @@
+ 	},
+ 	"devDependencies": {
+ 		"@storybook/addon-docs": "^10.1.11",
++		"@storybook/react-vite": "^10.1.11",
+ 		"@testing-library/jest-dom": "^6.6.3",
+ 		"@types/jest": "^29.5.14",
+ 		"@types/node": "^20.17.10",
+diff --git a/storybook/package.json b/storybook/package.json
+new file mode 100644
+index 00000000000000..70fea1e0d46c64
+--- /dev/null
++++ b/storybook/package.json
+@@ -0,0 +1,37 @@
++{
++	"name": "@wordpress/storybook",
++	"version": "0.0.0",
++	"description": "Storybook for WordPress Gutenberg components.",
++	"private": true,
++	"author": "The WordPress Contributors",
++	"license": "GPL-2.0-or-later",
++	"keywords": [
++		"wordpress",
++		"gutenberg",
++		"storybook"
++	],
++	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/storybook/README.md",
++	"repository": {
++		"type": "git",
++		"url": "git+https://github.com/WordPress/gutenberg.git",
++		"directory": "storybook"
++	},
++	"bugs": {
++		"url": "https://github.com/WordPress/gutenberg/issues"
++	},
++	"devDependencies": {
++		"@storybook/addon-a11y": "^10.1.11",
++		"@storybook/addon-docs": "^10.1.11",
++		"@storybook/icons": "^2.0.1",
++		"@storybook/react-vite": "^10.1.11",
++		"storybook": "^10.1.11",
++		"storybook-addon-tag-badges": "^3.0.4"
++	},
++	"publishConfig": {
++		"access": "public"
++	},
++	"scripts": {
++		"storybook:build": "storybook build -c . -o ./build",
++		"storybook:dev": "storybook dev -c . -p 50240"
++	}
++}

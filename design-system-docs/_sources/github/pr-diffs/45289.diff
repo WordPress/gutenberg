@@ -1,0 +1,467 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e5290611a93e2c..c6204577199e33 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -54,6 +54,10 @@
+ -   `Autocomplete`: use Popover's new `placement` prop instead of legacy `position` prop ([#44396](https://github.com/WordPress/gutenberg/pull/44396/)).
+ -   `FontSizePicker`: Add more comprehensive tests ([#45298](https://github.com/WordPress/gutenberg/pull/45298)).
+ 
++### Experimental
++-   Theming: updated Components package to utilize the new `accent` prop of the experimental `Theme` component.
++
++
+ ## 21.3.0 (2022-10-19)
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/angle-picker-control/index.js b/packages/components/src/angle-picker-control/index.js
+index 151ad0edeab020..858b7914db11e2 100644
+--- a/packages/components/src/angle-picker-control/index.js
++++ b/packages/components/src/angle-picker-control/index.js
+@@ -19,6 +19,7 @@ import { Root } from './styles/angle-picker-control-styles';
+ import { space } from '../ui/utils/space';
+ import { Text } from '../text';
+ import { Spacer } from '../spacer';
++import { COLORS } from '../utils/colors-values';
+ 
+ export default function AnglePickerControl( {
+ 	/** Start opting into the new margin-free styles that will become the default in a future version. */
+@@ -70,7 +71,7 @@ export default function AnglePickerControl( {
+ 							marginBottom={ 0 }
+ 							marginRight={ space( 3 ) }
+ 							style={ {
+-								color: 'var( --wp-admin-theme-color )',
++								color: COLORS.ui.theme,
+ 							} }
+ 						>
+ 							°
+diff --git a/packages/components/src/autocomplete/style.scss b/packages/components/src/autocomplete/style.scss
+index 4b8434caacf45a..4d04b3b8b52cf2 100644
+--- a/packages/components/src/autocomplete/style.scss
++++ b/packages/components/src/autocomplete/style.scss
+@@ -11,6 +11,6 @@
+ 	width: 100%;
+ 
+ 	&.is-selected {
+-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
++		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+ 	}
+ }
+diff --git a/packages/components/src/base-field/test/__snapshots__/index.js.snap b/packages/components/src/base-field/test/__snapshots__/index.js.snap
+index f35321afdb0555..273234b79c1f9a 100644
+--- a/packages/components/src/base-field/test/__snapshots__/index.js.snap
++++ b/packages/components/src/base-field/test/__snapshots__/index.js.snap
+@@ -127,8 +127,8 @@ exports[`base field should render correctly 1`] = `
+ 
+ .emotion-0:focus,
+ .emotion-0[data-focused='true'] {
+-  border-color: var( --wp-admin-theme-color, #007cba);
+-  box-shadow: 0 0 0 0.5px var( --wp-admin-theme-color, #007cba);
++  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
++  box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+ }
+ 
+ <div
+diff --git a/packages/components/src/checkbox-control/style.scss b/packages/components/src/checkbox-control/style.scss
+index a9fac4381fb63e..e983ae80ad891f 100644
+--- a/packages/components/src/checkbox-control/style.scss
++++ b/packages/components/src/checkbox-control/style.scss
+@@ -27,7 +27,7 @@ $checkbox-input-size-sm: 24px; // Width & height for small viewports.
+ 	@include reduce-motion("transition");
+ 
+ 	&:focus {
+-		box-shadow: 0 0 0 ($border-width * 2) $white, 0 0 0 ($border-width * 2 + $border-width-focus) var(--wp-admin-theme-color);
++		box-shadow: 0 0 0 ($border-width * 2) $white, 0 0 0 ($border-width * 2 + $border-width-focus) $components-color-accent;
+ 
+ 		// Only visible in Windows High Contrast mode.
+ 		outline: 2px solid transparent;
+@@ -35,8 +35,8 @@ $checkbox-input-size-sm: 24px; // Width & height for small viewports.
+ 
+ 	&:checked,
+ 	&:indeterminate {
+-		background: var(--wp-admin-theme-color);
+-		border-color: var(--wp-admin-theme-color);
++		background: $components-color-accent;
++		border-color: $components-color-accent;
+ 
+ 		// Hide default checkbox styles in IE.
+ 		&::-ms-check {
+diff --git a/packages/components/src/color-palette/style.scss b/packages/components/src/color-palette/style.scss
+index 5f09fcca34edc1..82f1858d64d3c4 100644
+--- a/packages/components/src/color-palette/style.scss
++++ b/packages/components/src/color-palette/style.scss
+@@ -25,7 +25,7 @@
+ 	outline: 1px solid transparent;
+ 
+ 	&:focus {
+-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
++		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+ 		// Show a outline in Windows high contrast mode.
+ 		outline-width: 2px;
+ 	}
+diff --git a/packages/components/src/drop-zone/style.scss b/packages/components/src/drop-zone/style.scss
+index c49232b0f3f6cf..fe23616dc4ad34 100644
+--- a/packages/components/src/drop-zone/style.scss
++++ b/packages/components/src/drop-zone/style.scss
+@@ -24,7 +24,7 @@
+ 	height: 100%;
+ 	width: 100%;
+ 	display: flex;
+-	background-color: var(--wp-admin-theme-color);
++	background-color: $components-color-accent;
+ 	align-items: center;
+ 	justify-content: center;
+ 	z-index: z-index(".components-drop-zone__content");
+diff --git a/packages/components/src/form-toggle/style.scss b/packages/components/src/form-toggle/style.scss
+index 5e24548d80dd1c..b91fc18dd3a6b5 100644
+--- a/packages/components/src/form-toggle/style.scss
++++ b/packages/components/src/form-toggle/style.scss
+@@ -38,13 +38,13 @@ $toggle-border-width: 1px;
+ 
+ 	// Checked state.
+ 	&.is-checked .components-form-toggle__track {
+-		background-color: var(--wp-admin-theme-color);
+-		border: $toggle-border-width solid var(--wp-admin-theme-color);
++		background-color: $components-color-accent;
++		border: $toggle-border-width solid $components-color-accent;
+ 		border: #{ $toggle-height * 0.5 } solid transparent; // Expand the border to fake a solid in Windows High Contrast Mode.
+ 	}
+ 
+ 	.components-form-toggle__input:focus + .components-form-toggle__track {
+-		box-shadow: 0 0 0 2px $white, 0 0 0 (2px + $border-width-focus) var(--wp-admin-theme-color);
++		box-shadow: 0 0 0 2px $white, 0 0 0 (2px + $border-width-focus) $components-color-accent;
+ 
+ 		// Windows High Contrast mode will show this outline, but not the box-shadow.
+ 		outline: 2px solid transparent;
+diff --git a/packages/components/src/form-token-field/style.scss b/packages/components/src/form-token-field/style.scss
+index b56cc1c3620221..a4d5320296bc8f 100644
+--- a/packages/components/src/form-token-field/style.scss
++++ b/packages/components/src/form-token-field/style.scss
+@@ -88,7 +88,7 @@
+ 
+ 		.components-form-token-field__token-text {
+ 			background: transparent;
+-			color: var(--wp-admin-theme-color);
++			color: $components-color-accent;
+ 		}
+ 
+ 		.components-form-token-field__remove-token {
+@@ -183,7 +183,7 @@
+ 	cursor: pointer;
+ 
+ 	&.is-selected {
+-		background: var(--wp-admin-theme-color);
++		background: $components-color-accent;
+ 		color: $white;
+ 	}
+ }
+diff --git a/packages/components/src/higher-order/navigate-regions/style.scss b/packages/components/src/higher-order/navigate-regions/style.scss
+index b34a4ef70fa986..739cb1a9b6175c 100644
+--- a/packages/components/src/higher-order/navigate-regions/style.scss
++++ b/packages/components/src/higher-order/navigate-regions/style.scss
+@@ -14,7 +14,7 @@
+ 		right: 0;
+ 		pointer-events: none;
+ 		outline: 4px solid transparent; // Shown in Windows High Contrast mode.
+-		box-shadow: inset 0 0 0 4px var(--wp-admin-theme-color);
++		box-shadow: inset 0 0 0 4px $components-color-accent;
+ 	}
+ 
+ 	@supports ( outline-offset: 1px ) {
+@@ -24,7 +24,7 @@
+ 
+ 		&:focus {
+ 			outline-style: solid;
+-			outline-color: var(--wp-admin-theme-color);
++			outline-color: $components-color-accent;
+ 			outline-width: 4px;
+ 			outline-offset: -4px;
+ 		}
+diff --git a/packages/components/src/menu-item/style.scss b/packages/components/src/menu-item/style.scss
+index d0d11643d7c96e..43cad98f6391c5 100644
+--- a/packages/components/src/menu-item/style.scss
++++ b/packages/components/src/menu-item/style.scss
+@@ -45,7 +45,7 @@
+ 		// Override the button component's tertiary background and color.
+ 		&.is-tertiary {
+ 			background: none;
+-			color: var(--wp-admin-theme-color-darker-10);
++			color: $components-color-accent-darker-10;
+ 			opacity: 0.3;
+ 		}
+ 	}
+diff --git a/packages/components/src/notice/README.md b/packages/components/src/notice/README.md
+index 30134b3a19a019..5cda6d71266c84 100644
+--- a/packages/components/src/notice/README.md
++++ b/packages/components/src/notice/README.md
+@@ -34,7 +34,8 @@ Notices display at the top of the screen, below any toolbars anchored to the top
+ Notices are color-coded to indicate the type of message being communicated:
+ 
+ -   **Default** notices have **no background**.
+--   **Informational** notices are **blue.**
++-   **Informational** notices are **blue** by default.
++    - If there is a parent `Theme` component with an `accent` color prop, informational notices will take on that color instead.
+ -   **Success** notices are **green.**
+ -   **Warning** notices are **yellow\*\***.\*\*
+ -   **Error** notices are **red.**
+diff --git a/packages/components/src/notice/style.scss b/packages/components/src/notice/style.scss
+index a4b4838a99cc80..23378cefe1ec63 100644
+--- a/packages/components/src/notice/style.scss
++++ b/packages/components/src/notice/style.scss
+@@ -3,7 +3,7 @@
+ 	font-family: $default-font;
+ 	font-size: $default-font-size;
+ 	background-color: $white;
+-	border-left: 4px solid var(--wp-admin-theme-color);
++	border-left: 4px solid $components-color-accent;
+ 	margin: 5px 15px 2px;
+ 	padding: 8px 12px;
+ 	align-items: center;
+diff --git a/packages/components/src/panel/style.scss b/packages/components/src/panel/style.scss
+index 500e5e6fd1a798..b26f134e72350b 100644
+--- a/packages/components/src/panel/style.scss
++++ b/packages/components/src/panel/style.scss
+@@ -91,7 +91,7 @@
+ 	height: auto;
+ 
+ 	&:focus {
+-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
++		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+ 		border-radius: 0;
+ 	}
+ 
+diff --git a/packages/components/src/range-control/styles/range-control-styles.ts b/packages/components/src/range-control/styles/range-control-styles.ts
+index b0d8810a8f3c31..a351a7db26bdd4 100644
+--- a/packages/components/src/range-control/styles/range-control-styles.ts
++++ b/packages/components/src/range-control/styles/range-control-styles.ts
+@@ -174,7 +174,7 @@ const thumbColor = ( { disabled }: ThumbProps ) =>
+ 				background-color: ${ COLORS.gray[ 400 ] };
+ 		  `
+ 		: css`
+-				background-color: var( --wp-admin-theme-color );
++				background-color: ${ COLORS.ui.theme };
+ 		  `;
+ 
+ export const ThumbWrapper = styled.span`
+@@ -205,7 +205,7 @@ const thumbFocus = ( { isFocused }: ThumbProps ) => {
+ 				&::before {
+ 					content: ' ';
+ 					position: absolute;
+-					background-color: var( --wp-admin-theme-color );
++					background-color: ${ COLORS.ui.theme };
+ 					opacity: 0.4;
+ 					border-radius: 50%;
+ 					height: ${ thumbSize + 8 }px;
+diff --git a/packages/components/src/resizable-box/style.scss b/packages/components/src/resizable-box/style.scss
+index feca32387d2e49..6badc505b799a6 100644
+--- a/packages/components/src/resizable-box/style.scss
++++ b/packages/components/src/resizable-box/style.scss
+@@ -35,7 +35,7 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
+ 	top: calc(50% - #{ceil($resize-handler-size * 0.5)});
+ 	right: calc(50% - #{ceil($resize-handler-size * 0.5)});
+ 
+-	box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
++	box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+ 	// Only visible in Windows High Contrast mode.
+ 	outline: 2px solid transparent;
+ }
+@@ -47,7 +47,7 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
+ 	content: "";
+ 	width: 3px;
+ 	height: 3px;
+-	background: var(--wp-admin-theme-color);
++	background: $components-color-accent;
+ 	cursor: inherit;
+ 	position: absolute;
+ 	top: calc(50% - 1px);
+diff --git a/packages/components/src/search-control/style.scss b/packages/components/src/search-control/style.scss
+index 36a51316401cb9..ddd9d0e5b06e3b 100644
+--- a/packages/components/src/search-control/style.scss
++++ b/packages/components/src/search-control/style.scss
+@@ -18,7 +18,7 @@
+ 
+ 		&:focus {
+ 			background: $white;
+-			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
++			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+ 		}
+ 
+ 		&::placeholder {
+diff --git a/packages/components/src/snackbar/style.scss b/packages/components/src/snackbar/style.scss
+index 74d786133f11a4..0e54d3b432b939 100644
+--- a/packages/components/src/snackbar/style.scss
++++ b/packages/components/src/snackbar/style.scss
+@@ -22,7 +22,7 @@
+ 	&:focus {
+ 		box-shadow:
+ 			0 0 0 1px $white,
+-			0 0 0 3px var(--wp-admin-theme-color);
++			0 0 0 3px $components-color-accent;
+ 	}
+ 
+ 	&.components-snackbar-explicit-dismiss {
+@@ -64,7 +64,7 @@
+ 		}
+ 
+ 		&:hover {
+-			color: var(--wp-admin-theme-color);
++			color: $components-color-accent;
+ 		}
+ 	}
+ }
+diff --git a/packages/components/src/spinner/styles.ts b/packages/components/src/spinner/styles.ts
+index 2f1101e1254c88..7a5a2205c97dd9 100644
+--- a/packages/components/src/spinner/styles.ts
++++ b/packages/components/src/spinner/styles.ts
+@@ -24,7 +24,7 @@ export const StyledSpinner = styled.svg`
+ 	display: inline-block;
+ 	margin: 5px 11px 0;
+ 	position: relative;
+-	color: var( --wp-admin-theme-color );
++	color: ${ COLORS.ui.theme };
+ 	overflow: visible;
+ `;
+ 
+diff --git a/packages/components/src/tab-panel/style.scss b/packages/components/src/tab-panel/style.scss
+index 74e3aa2a48379a..6a796b93015771 100644
+--- a/packages/components/src/tab-panel/style.scss
++++ b/packages/components/src/tab-panel/style.scss
+@@ -33,13 +33,12 @@
+ 	}
+ 
+ 	&:focus:not(:disabled) {
+-		box-shadow: inset 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
++		box-shadow: inset 0 var(--wp-admin-border-width-focus) $components-color-accent;
+ 	}
+ 
+-
+ 	&.is-active {
+ 		// The transparent shadow ensures no jumpiness when focus animates on an active tab.
+-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) transparent, inset 0 0 -$border-width-tab 0 0 var(--wp-admin-theme-color);
++		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) transparent, inset 0 0 -$border-width-tab 0 0 $components-color-accent;
+ 		position: relative;
+ 
+ 		// This border appears in Windows High Contrast mode instead of the box-shadow.
+@@ -55,10 +54,10 @@
+ 	}
+ 
+ 	&:focus {
+-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
++		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+ 	}
+ 
+ 	&.is-active:focus {
+-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 -#{$border-width-tab * 2} 0 0 var(--wp-admin-theme-color);
++		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent, inset 0 -#{$border-width-tab * 2} 0 0 $components-color-accent;
+ 	}
+ }
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index 7cf90f8ff5144d..661f3cc01e9155 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -66,8 +66,8 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+ }
+ 
+ .emotion-8:focus-within {
+-  border-color: var( --wp-admin-theme-color-darker-10, #006ba1);
+-  box-shadow: 0 0 0 0.5px var( --wp-admin-theme-color, #007cba);
++  border-color: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #006ba1));
++  box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+   outline: none;
+   z-index: 1;
+ }
+@@ -402,8 +402,8 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+ }
+ 
+ .emotion-8:focus-within {
+-  border-color: var( --wp-admin-theme-color-darker-10, #006ba1);
+-  box-shadow: 0 0 0 0.5px var( --wp-admin-theme-color, #007cba);
++  border-color: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #006ba1));
++  box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+   outline: none;
+   z-index: 1;
+ }
+diff --git a/packages/components/src/tools-panel/styles.ts b/packages/components/src/tools-panel/styles.ts
+index f76bf47ec18c5b..85ad1cb278d9b0 100644
+--- a/packages/components/src/tools-panel/styles.ts
++++ b/packages/components/src/tools-panel/styles.ts
+@@ -148,7 +148,7 @@ export const DropdownMenu = css`
+ `;
+ 
+ export const ResetLabel = styled.span`
+-	color: var( --wp-admin-theme-color-darker-10 );
++	color: ${ COLORS.ui.themeDark10 };
+ 	font-size: 11px;
+ 	font-weight: 500;
+ 	line-height: 1.4;
+diff --git a/packages/components/src/utils/colors-values.js b/packages/components/src/utils/colors-values.js
+index f3cf21ccb54969..0055168a003fb1 100644
+--- a/packages/components/src/utils/colors-values.js
++++ b/packages/components/src/utils/colors-values.js
+@@ -31,12 +31,14 @@ const ALERT = {
+ 
+ // Matches @wordpress/base-styles
+ const ADMIN = {
+-	theme: 'var( --wp-admin-theme-color, #007cba)',
+-	themeDark10: 'var( --wp-admin-theme-color-darker-10, #006ba1)',
++	theme: 'var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba))',
++	themeDark10:
++		'var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #006ba1))',
+ };
+ 
+ const UI = {
+ 	theme: ADMIN.theme,
++	themeDark10: ADMIN.themeDark10,
+ 	background: white,
+ 	backgroundDisabled: GRAY[ 100 ],
+ 	border: GRAY[ 700 ],
+diff --git a/packages/components/src/utils/input/base.js b/packages/components/src/utils/input/base.js
+index 2b4657d47e3b5d..2c5010fc92737c 100644
+--- a/packages/components/src/utils/input/base.js
++++ b/packages/components/src/utils/input/base.js
+@@ -19,10 +19,10 @@ export const inputStyleNeutral = css`
+ `;
+ 
+ export const inputStyleFocus = css`
+-	border-color: var( --wp-admin-theme-color );
++	border-color: ${ COLORS.ui.theme };
+ 	box-shadow: 0 0 0
+ 		calc( ${ CONFIG.borderWidthFocus } - ${ CONFIG.borderWidth } )
+-		var( --wp-admin-theme-color );
++		${ COLORS.ui.theme };
+ 
+ 	// Windows High Contrast mode will show this outline, but not the box-shadow.
+ 	outline: 2px solid transparent;
+diff --git a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
+index 148e2e074feb0c..25b7358a4f1ab5 100644
+--- a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
++++ b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
+@@ -580,13 +580,13 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
+ }
+ 
+ .emotion-13:hover {
+-  color: var( --wp-admin-theme-color, #007cba);
++  color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+ }
+ 
+ .emotion-13:focus {
+   background-color: transparent;
+-  color: var( --wp-admin-theme-color, #007cba);
+-  border-color: var( --wp-admin-theme-color, #007cba);
++  color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
++  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+   outline: 3px solid transparent;
+ }
+ 
+diff --git a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+index bb24f4559f470b..ad470740c9eff2 100644
+--- a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
++++ b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+@@ -609,7 +609,7 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
+   display: inline-block;
+   margin: 5px 11px 0;
+   position: relative;
+-  color: var( --wp-admin-theme-color );
++  color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+   overflow: visible;
+ }
+ 

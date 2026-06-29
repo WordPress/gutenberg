@@ -1,0 +1,267 @@
+diff --git a/packages/block-editor/src/components/inserter/test/menu.js b/packages/block-editor/src/components/inserter/test/menu.js
+index 178bced703a4b3..44f155c831c70a 100644
+--- a/packages/block-editor/src/components/inserter/test/menu.js
++++ b/packages/block-editor/src/components/inserter/test/menu.js
+@@ -185,7 +185,7 @@ describe( 'InserterMenu', () => {
+ 		TestUtils.Simulate.click( layoutTab );
+ 
+ 		const disabledBlocks = element.querySelectorAll(
+-			'.block-editor-block-types-list__item[disabled]'
++			'.block-editor-block-types-list__item[disabled], .block-editor-block-types-list__item[aria-disabled="true"]'
+ 		);
+ 
+ 		expect( disabledBlocks ).toHaveLength( 1 );
+diff --git a/packages/components/src/button/index.js b/packages/components/src/button/index.js
+index 48af0840f46bda..2094b358983ef7 100644
+--- a/packages/components/src/button/index.js
++++ b/packages/components/src/button/index.js
+@@ -16,6 +16,11 @@ import { forwardRef } from '@wordpress/element';
+ import Tooltip from '../tooltip';
+ import Icon from '../icon';
+ 
++const disabledEventsOnDisabledButton = [
++	'onMouseDown',
++	'onClick',
++];
++
+ export function Button( props, ref ) {
+ 	const {
+ 		href,
+@@ -39,6 +44,7 @@ export function Button( props, ref ) {
+ 		shortcut,
+ 		label,
+ 		children,
++		__experimentalIsFocusable: isFocusable,
+ 		...additionalProps
+ 	} = props;
+ 
+@@ -62,13 +68,27 @@ export function Button( props, ref ) {
+ 		'has-icon': !! icon,
+ 	} );
+ 
+-	const Tag = href !== undefined && ! disabled ? 'a' : 'button';
++	const trulyDisabled = disabled && ! isFocusable;
++	const Tag = href !== undefined && ! trulyDisabled ? 'a' : 'button';
+ 	const tagProps = Tag === 'a' ?
+ 		{ href, target } :
+-		{ type: 'button', disabled, 'aria-pressed': isPressed };
++		{ type: 'button', disabled: trulyDisabled, 'aria-pressed': isPressed };
++
++	if ( disabled && isFocusable ) {
++		// In this case, the button will be disabled, but still focusable and
++		// perceivable by screen reader users.
++		tagProps[ 'aria-disabled' ] = true;
++
++		for ( const disabledEvent of disabledEventsOnDisabledButton ) {
++			additionalProps[ disabledEvent ] = ( event ) => {
++				event.stopPropagation();
++				event.preventDefault();
++			};
++		}
++	}
+ 
+ 	// Should show the tooltip if...
+-	const shouldShowTooltip = ! disabled && (
++	const shouldShowTooltip = ! trulyDisabled && (
+ 		// an explicit tooltip is passed or...
+ 		( showTooltip && label ) ||
+ 		// there's a shortcut or...
+diff --git a/packages/components/src/button/stories/index.js b/packages/components/src/button/stories/index.js
+index 76c76b1f618421..b9abcab8a79be7 100644
+--- a/packages/components/src/button/stories/index.js
++++ b/packages/components/src/button/stories/index.js
+@@ -67,6 +67,16 @@ export const disabled = () => {
+ 	);
+ };
+ 
++export const disabledFocusable = () => {
++	const label = text( 'Label', 'Disabled Button' );
++
++	return (
++		<Button disabled __experimentalIsFocusable>
++			{ label }
++		</Button>
++	);
++};
++
+ export const link = () => {
+ 	const label = text( 'Label', 'Link Button' );
+ 
+@@ -101,6 +111,22 @@ export const icon = () => {
+ 	);
+ };
+ 
++export const disabledFocusableIcon = () => {
++	const usedIcon = text( 'Icon', 'ellipsis' );
++	const label = text( 'Label', 'More' );
++	const size = number( 'Size' );
++
++	return (
++		<Button
++			icon={ usedIcon }
++			label={ label }
++			iconSize={ size }
++			disabled
++			__experimentalIsFocusable
++		/>
++	);
++};
++
+ export const groupedIcons = () => {
+ 	const GroupContainer = ( { children } ) => (
+ 		<div style={ { display: 'inline-flex' } }>{ children }</div>
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index bfac8f7c63befd..71eb113ea78b10 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -46,7 +46,7 @@
+ 
+ 		}
+ 
+-		&:active:enabled {
++		&:not([aria-disabled="true"]):active:enabled {
+ 			background: #f3f5f6;
+ 			color: color(theme(button) shade(5%));
+ 			border-color: #7e8993;
+@@ -87,7 +87,7 @@
+ 				0 0 0 3px color(theme(button));
+ 		}
+ 
+-		&:active:enabled {
++		&:not([aria-disabled="true"]):active:enabled {
+ 			background: color(theme(button) shade(20%));
+ 			border-color: color(theme(button) shade(20%));
+ 			color: $white;
+@@ -149,7 +149,7 @@
+ 		height: auto;
+ 
+ 		&:not(:disabled):not([aria-disabled="true"]):hover,
+-		&:active {
++		&:not([aria-disabled="true"]):active {
+ 			color: #00a0d2;
+ 		}
+ 
+@@ -166,7 +166,7 @@
+ 		color: $alert-red;
+ 	}
+ 
+-	&:active {
++	&:not([aria-disabled="true"]):active {
+ 		color: inherit;
+ 	}
+ 
+@@ -212,7 +212,7 @@
+ 			outline: none;
+ 		}
+ 
+-		&:active:focus:enabled {
++		&:not([aria-disabled="true"]):active:focus:enabled {
+ 			box-shadow: none;
+ 		}
+ 
+diff --git a/packages/components/src/button/test/index.js b/packages/components/src/button/test/index.js
+index 0e11bb97a1f195..211f24ceb00726 100644
+--- a/packages/components/src/button/test/index.js
++++ b/packages/components/src/button/test/index.js
+@@ -23,6 +23,7 @@ describe( 'Button', () => {
+ 			expect( button.hasClass( 'is-primary' ) ).toBe( false );
+ 			expect( button.hasClass( 'is-pressed' ) ).toBe( false );
+ 			expect( button.prop( 'disabled' ) ).toBeUndefined();
++			expect( button.prop( 'aria-disabled' ) ).toBeUndefined();
+ 			expect( button.prop( 'type' ) ).toBe( 'button' );
+ 			expect( button.type() ).toBe( 'button' );
+ 		} );
+@@ -58,6 +59,12 @@ describe( 'Button', () => {
+ 			expect( button.prop( 'disabled' ) ).toBe( true );
+ 		} );
+ 
++		it( 'should add only aria-disabled attribute when disabled and isFocusable are true', () => {
++			const button = shallow( <Button disabled __experimentalIsFocusable /> );
++			expect( button.prop( 'disabled' ) ).toBe( false );
++			expect( button.prop( 'aria-disabled' ) ).toBe( true );
++		} );
++
+ 		it( 'should not poss the prop target into the element', () => {
+ 			const button = shallow( <Button target="_blank" /> );
+ 			expect( button.prop( 'target' ) ).toBeUndefined();
+diff --git a/packages/e2e-tests/specs/editor/various/editor-modes.test.js b/packages/e2e-tests/specs/editor/various/editor-modes.test.js
+index 3a002a2d1f25d4..a1a3f27249ea33 100644
+--- a/packages/e2e-tests/specs/editor/various/editor-modes.test.js
++++ b/packages/e2e-tests/specs/editor/various/editor-modes.test.js
+@@ -110,7 +110,7 @@ describe( 'Editing modes (visual/HTML)', () => {
+ 		expect( noBlocksElement ).not.toBeNull();
+ 
+ 		// The inserter is disabled
+-		const disabledInserter = await page.$( '.block-editor-inserter > button:disabled' );
++		const disabledInserter = await page.$( '.block-editor-inserter > button:disabled, .block-editor-inserter > button[aria-disabled="true"]' );
+ 		expect( disabledInserter ).not.toBeNull();
+ 	} );
+ } );
+diff --git a/packages/e2e-tests/specs/editor/various/preview.test.js b/packages/e2e-tests/specs/editor/various/preview.test.js
+index 7c9442f1e982b9..88ab8192b90a53 100644
+--- a/packages/e2e-tests/specs/editor/various/preview.test.js
++++ b/packages/e2e-tests/specs/editor/various/preview.test.js
+@@ -93,7 +93,7 @@ describe( 'Preview', () => {
+ 
+ 		// Disabled until content present.
+ 		const isPreviewDisabled = await editorPage.$$eval(
+-			'.editor-post-preview:not( :disabled )',
++			'.editor-post-preview:not( :disabled ):not( [aria-disabled="true"] )',
+ 			( enabledButtons ) => ! enabledButtons.length,
+ 		);
+ 		expect( isPreviewDisabled ).toBe( true );
+diff --git a/storybook/test/__snapshots__/index.js.snap b/storybook/test/__snapshots__/index.js.snap
+index d24d251f7f9c6c..836ef9bddf163f 100644
+--- a/storybook/test/__snapshots__/index.js.snap
++++ b/storybook/test/__snapshots__/index.js.snap
+@@ -563,6 +563,50 @@ exports[`Storyshots Components|Button Disabled 1`] = `
+ </button>
+ `;
+ 
++exports[`Storyshots Components|Button Disabled Focusable 1`] = `
++<button
++  aria-disabled={true}
++  className="components-button"
++  disabled={false}
++  onClick={[Function]}
++  onMouseDown={[Function]}
++  type="button"
++>
++  Disabled Button
++</button>
++`;
++
++exports[`Storyshots Components|Button Disabled Focusable Icon 1`] = `
++<button
++  aria-disabled={true}
++  aria-label="More"
++  className="components-button has-icon"
++  disabled={false}
++  onBlur={[Function]}
++  onClick={[Function]}
++  onFocus={[Function]}
++  onMouseDown={[Function]}
++  onMouseEnter={[Function]}
++  onMouseLeave={[Function]}
++  type="button"
++>
++  <svg
++    aria-hidden="true"
++    className="dashicon dashicons-ellipsis"
++    focusable="false"
++    height={20}
++    role="img"
++    viewBox="0 0 20 20"
++    width={20}
++    xmlns="http://www.w3.org/2000/svg"
++  >
++    <path
++      d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
++    />
++  </svg>
++</button>
++`;
++
+ exports[`Storyshots Components|Button Disabled Link 1`] = `
+ <button
+   className="components-button"

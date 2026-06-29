@@ -1,0 +1,2321 @@
+diff --git a/docs/explanations/architecture/dashboard-widgets.md b/docs/explanations/architecture/dashboard-widgets.md
+index 9548776355bc6e..5c44eb3d3a4559 100644
+--- a/docs/explanations/architecture/dashboard-widgets.md
++++ b/docs/explanations/architecture/dashboard-widgets.md
+@@ -8,11 +8,13 @@ This document explains how the pieces of the dashboard widget system relate to e
+ 
+ ## Overview
+ 
+-A widget travels through five stations, each owned by a different part of the codebase:
++A widget passes through several stages, each owned by a different part of the codebase:
+ 
+ ![The widget pipeline: from the widgets folder, through the build and the server registry, to the client package and hosts](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/explanations/architecture/assets/dashboard-widgets-pipeline.svg)
+ 
+-No station knows about the internals of the next one; each consumes a narrow artifact (a folder convention, a manifest, a registry, a REST record, a `WidgetType`). That separation is what lets each piece evolve independently and is the reason the client contract lives in its own package.
++Each stage hands the next a single artifact and nothing else: a folder convention, then the build manifest (`build/widgets/registry.php`), then the in-memory registry (`WP_Widget_Type_Registry`), then a REST record, then a `WidgetType`. No stage reaches into how another works.
++
++That separation lets each stage evolve independently. It is also why the client contract lives in its own package.
+ 
+ ## Authoring: a widget is a folder
+ 
+@@ -28,10 +30,10 @@ widgets/hello-world/
+ 
+ The split between `widget.json` and `widget.ts` is deliberate. `widget.json` is build-time input: plain JSON the pipeline can read without executing code. `widget.ts` is the live half of the metadata: values that only exist in JavaScript, such as the icon element or the `attributes` field schema that hosts feed into `DataForm`.
+ 
+-The render component receives the contract props and nothing else:
++Its render component receives the widget's `attributes` and, optionally, `setAttributes`:
+ 
+ ```tsx
+-export default function HelloWorld( { attributes, setAttributes } ) { ... }
++export default function HelloWorld( { attributes } ) { ... }
+ ```
+ 
+ ## Build: from folders to script modules
+@@ -39,44 +41,50 @@ export default function HelloWorld( { attributes, setAttributes } ) { ... }
+ `@wordpress/build` (`packages/wp-build/`) is the generic build tool for packages, routes, and widgets. For widgets specifically, it:
+ 
+ 1. Discovers every directory under `widgets/` and reads its `widget.json`.
+-2. Compiles two ES script modules per widget: `render` (from `render.*`) and `widget` (from `widget.*`), each with an `*.asset.php` carrying module dependencies and a version hash. Missing source files simply produce no module; both are optional.
++2. Compiles up to two ES script modules per widget: `render` (from `render.*`) and `widget` (from `widget.*`). Either may be absent; a missing source file produces no module. Each compiled module ships an `*.asset.php` listing its module dependencies and a cache-busting version.
+ 3. Emits `build/widgets/registry.php`, the manifest: one entry per widget with its directory name, metadata, and which modules were built.
+-4. Emits `widget-registration.php`, which at `init` calls `wp_register_script_module()` for every built module, with IDs derived from the folder name (`<prefix>/widgets/<dir>/render` and `<prefix>/widgets/<dir>/widget`).
+-
+-The output of the build is therefore two things: registered script modules (loadable by the browser through the import map) and a manifest (readable by PHP without executing any JavaScript).
++4. Emits `build/widgets.php`, which at `init` calls `wp_register_script_module()` for every built module, with IDs derived from the folder name (`<prefix>/widgets/<dir>/render` and `<prefix>/widgets/<dir>/widget`).
+ 
+ ## The server registry
+ 
+-`WP_Widget_Type_Registry` (`lib/experimental/dashboard-widgets/`) is a singleton hydrated at `init` from the manifest: each entry becomes a `WP_Widget_Type` with `name`, `render_module`, `widget_module`, and `presentation`. The hydration is a deterministic copy of the manifest, with no filters in between: the `widgets/` folder is the single source of widget authorship in this codebase.
++`WP_Widget_Type_Registry` (`lib/experimental/dashboard-widgets/`) is a singleton, hydrated at `init` from the manifest. Each entry becomes a `WP_Widget_Type` with `name`, `render_module`, `widget_module`, and `presentation`.
++
++The hydration is a deterministic copy, with no filters in between. The `widgets/` folder is the single source of widget authorship in this codebase.
+ 
+-The registry is the server's runtime answer to "which widget types exist on this site", and two consumers read it:
++The registry is the server's authoritative list of widget types for the site. Two consumers read it:
+ 
+ -   The REST controller (`WP_REST_Widget_Modules_Controller`) exposes it at `/wp/v2/widget-modules`, returning `{ name, render_module, widget_module, presentation }` per record.
+--   The dashboard page hooks the (otherwise generic) `{page-id}-wp-admin_boot_dependencies` filter to add every registered module to its import map as a `dynamic` dependency: reachable by `import()`, never eagerly executed.
++-   The dashboard page hooks its `dashboard-wp-admin_boot_dependencies` filter, a per-page instance of the generic `{page-slug}-wp-admin_boot_dependencies`, and adds every registered module to its import map as a `dynamic` dependency. A dynamic dependency is reachable by `import()` but never executed eagerly.
+ 
+-Registration makes the modules known to WordPress; loading them is a separate, per-host decision. Dynamic `import()` against the import map is how the dashboard loads widgets today, but a host can equally enqueue a module eagerly (`wp_enqueue_script_module()`), declare it as a `static` dependency of its own module, or, outside WordPress, skip the import map entirely and resolve modules through its own `ResolveWidgetModule`.
++Registration only makes the modules known to WordPress; loading them is a separate, per-host decision. Dynamic `import()` against the import map is how the dashboard loads widgets today. A host can load them another way: enqueue a module eagerly (`wp_enqueue_script_module()`), declare it as a `static` dependency of its own module, or, outside WordPress, skip the import map and resolve modules through its own `ResolveWidgetModule`.
+ 
+-The registry exists as a class (rather than the manifest being read directly by REST) so that the _source_ of widget types stays an implementation detail. Today the only source is the build manifest; a plugin-facing registration API would target the registry without touching the pipeline behind it.
++The registry exists as a class, rather than having REST read the manifest directly, so the _source_ of widget types stays an implementation detail. Today that source is only the build manifest. A future source, such as a plugin-facing registration API, would target the registry without touching the build pipeline.
+ 
+ ## The client contract: `@wordpress/widget-primitives`
+ 
+-The package is the single source of truth for what a widget _is_ on the client, shared by widget authors and hosts. It exposes three kinds of resources and deliberately nothing else:
++Everything after the REST record is the job of [`@wordpress/widget-primitives`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/widget-primitives), the contract both widget authors and hosts share. Its full surface (the contract types, the discovery hook, and the render component) is covered in the _Widget Primitives / Introduction_ story. In the pipeline it does two things.
+ 
+--   **Contract types**: `WidgetType`, `WidgetName`, `WidgetIcon`, `WidgetRenderProps`, `ResolveWidgetModule`, `WidgetModuleRecord`. Authors type `widget.ts` / `render.tsx` against them; hosts consume the same shapes. Nothing re-exports them.
+--   **Discovery**: `useWidgetTypes( records )` takes host-supplied widget-module records, dynamically imports each record's `widget_module` to retrieve the live metadata, and merges both halves into `WidgetType[]`. The record's `presentation` (originating in `widget.json`) wins over the module's value. The hook reaches for no store or endpoint: the host fetches the records however it wants (the dashboard reads its own `widgetModule` core-data entity, backed by `/wp/v2/widget-modules`) and passes them in.
+--   **Rendering**: `<WidgetRender>` resolves a `WidgetType.renderModule` through a host-provided `ResolveWidgetModule` and mounts the component with the `attributes` / `setAttributes` contract. On a WordPress page the resolver can be as simple as `( id ) => import( id )`, provided the hosting page exposed the module in its import map; hosts with other loading strategies supply their own resolver.
++`useWidgetTypes( records )` takes the host-supplied records, imports each record's `widget_module` for the live metadata, and merges it with the record into `WidgetType[]`. The record's `presentation`, sourced from `widget.json`, wins over the module's value. The hook reaches for no store or endpoint; the dashboard, for instance, reads its own `widgetModule` core-data entity (backed by `/wp/v2/widget-modules`) and passes the records in.
+ 
+-Equally important is what the package does not do: no chrome, no layout, no persistence, no data store of its own, and no knowledge of any host. That is what makes it publishable and consumable outside the WordPress admin.
++`<WidgetRender>` then resolves a `WidgetType.renderModule` through a host-provided `ResolveWidgetModule` and mounts the component with the `attributes` / `setAttributes` contract. On a WordPress page the resolver can be as simple as `( id ) => import( id )`; hosts with other loading strategies supply their own.
++
++For what a widget declares through that contract, layer by layer, see [Anatomy of a widget type](https://github.com/WordPress/gutenberg/blob/HEAD/packages/widget-primitives/src/stories/anatomy.md).
+ 
+ ## Hosts
+ 
+-A host is any context that renders widgets; the contract privileges none of them. The dashboard engine ([`@wordpress/widget-dashboard`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/widget-dashboard), mounted by `routes/dashboard/`) is the host this repository ships today, and it illustrates what a host owns: it registers the `widgetModule` core-data entity when its route module loads (before the dashboard renders), reads the entity's records and passes them to `useWidgetTypes( records )`, owns the layout array and its persistence, wraps every instance in its own chrome (header, toolbars, error boundary, Suspense fallback), and passes `resolveWidgetModule` down through its context (overridable for tests and Storybook).
++The dashboard engine ([`@wordpress/widget-dashboard`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/widget-dashboard), mounted by `routes/dashboard/`) is the host this repository ships today. It shows what a host owns:
++
++-   Registers the `widgetModule` core-data entity in its page init module, which `@wordpress/boot` runs before the dashboard renders.
++-   Reads the entity's records and passes them to `useWidgetTypes( records )`.
++-   Owns the layout array and its persistence.
++-   Wraps every instance in its own chrome: header, toolbars, error boundary, Suspense fallback.
++-   Passes `resolveWidgetModule` down through its context, overridable for tests and Storybook.
+ 
+-The same `WidgetType` could equally be rendered by a sidebar, a plugin panel, or an application outside wp-admin; the choice of where and how to render belongs entirely to the host. Every host is a consumer of the package; not every consumer is a host: tests, Storybook, or a picker that only lists widget types consume the same contract without rendering anything.
++The same `WidgetType` could be rendered by any other host, and where and how to render belongs entirely to the host. Every host is a consumer of the package, but not every consumer is a host: tests, Storybook, or a picker that only lists widget types consume the same contract without rendering anything.
+ 
+ ## Why a standalone package
+ 
+-The pipeline above has a natural seam: everything up to the REST endpoint is WordPress infrastructure, and everything after `WidgetType[]` is host territory. The contract in between is small, stable, and needed by both sides, which is exactly the shape of a package:
++The pipeline above splits in one place: everything up to the REST endpoint is WordPress infrastructure, and everything after `WidgetType[]` is a host concern. The contract in between is small, stable, and needed by both sides, which is the shape of a package:
+ 
+ -   Widget authors depend on it to type their metadata and render components.
+ -   Hosts depend on it to discover and mount widgets without knowing how they were built or registered.
+diff --git a/lib/compat/wordpress-6.9/block-comments.php b/lib/compat/wordpress-6.9/block-comments.php
+new file mode 100644
+index 00000000000000..31e50c67a9724d
+--- /dev/null
++++ b/lib/compat/wordpress-6.9/block-comments.php
+@@ -0,0 +1,423 @@
++<?php
++/**
++ * Block comment infrastructure (notes + suggestions).
++ *
++ * Notes are stored as `note`-type comments. A note can be a pure discussion
++ * thread or carry a proposed edit ("suggestion") attached as comment meta.
++ * Three meta fields drive the lifecycle:
++ *
++ *   - `_wp_note_status`        — discussion lifecycle (`resolved` / `reopen`).
++ *   - `_wp_suggestion`         — proposed edit, JSON payload. Presence of this
++ *                                meta is what makes a note a suggestion.
++ *   - `_wp_suggestion_status`  — suggestion lifecycle (`pending` / `applied`
++ *                                / `rejected`). Set on apply or reject so the
++ *                                comment thread persists as evidence even
++ *                                after the suggestion is resolved.
++ *
++ * A note can have a status without a suggestion (pure discussion) or a
++ * suggestion without a status (edit not yet reviewed); the two axes are
++ * intentionally independent.
++ *
++ * Why store the suggestion as comment meta rather than the comment_content?
++ *   - `comment_content` is intended for human-readable text; suggestions are
++ *     JSON, and surfacing JSON to comment-feed renderers would break them.
++ *   - Separation of concerns: a note can carry both a discussion (content)
++ *     and a proposed edit (meta) so users can reply to a suggestion.
++ *   - Per-meta `auth_callback` and `sanitize_callback` give us strict
++ *     per-field control independent of comment-text moderation.
++ *   - Size validation can be strict (reject oversized) at the meta layer.
++ *
++ * @package gutenberg
++ */
++
++/**
++ * Maximum byte length of a `_wp_suggestion` payload. Mirrored on the client
++ * (`PAYLOAD_MAX_BYTES` in suggestion-mode/provider.js) so the editor refuses
++ * to submit anything the server will reject.
++ */
++if ( ! defined( 'GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES' ) ) {
++	define( 'GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES', 65536 );
++}
++
++/**
++ * Adds support for block comments to the built-in post types.
++ *
++ * @return void
++ */
++function gutenberg_block_comment_add_post_type_support() {
++	$post_types = array( 'post', 'page' );
++
++	foreach ( $post_types as $post_type ) {
++		if ( ! post_type_supports( $post_type, 'editor' ) ) {
++			continue;
++		}
++
++		$supports        = get_all_post_type_supports( $post_type );
++		$editor_supports = array( 'notes' => true );
++
++		// `add_post_type_support()` doesn't merge support sub-properties, so we explicitly merge it here.
++		if ( is_array( $supports['editor'] ) && isset( $supports['editor'][0] ) && is_array( $supports['editor'][0] ) ) {
++			$editor_supports = array_merge( $editor_supports, $supports['editor'][0] );
++		}
++
++		add_post_type_support( $post_type, 'editor', $editor_supports );
++	}
++}
++add_action( 'init', 'gutenberg_block_comment_add_post_type_support' );
++
++/**
++ * Register comment metadata for block comment status.
++ */
++function gutenberg_register_block_comment_metadata() {
++	register_meta(
++		'comment',
++		'_wp_note_status',
++		array(
++			'type'          => 'string',
++			'description'   => __( 'Note resolution status', 'gutenberg' ),
++			'single'        => true,
++			'show_in_rest'  => array(
++				'schema' => array(
++					'type' => 'string',
++					'enum' => array( 'resolved', 'reopen' ),
++				),
++			),
++			'auth_callback' => function ( $allowed, $meta_key, $object_id ) {
++				return current_user_can( 'edit_comment', $object_id );
++			},
++		)
++	);
++
++	// Suggestion payload attached to a note. A note comment with this meta set
++	// is a suggested edit: the value is a JSON-encoded payload describing the
++	// block, baseline revision, and proposed operations. See
++	// packages/editor/src/components/suggestion-mode/provider.js for the shape.
++	$max_suggestion_payload_bytes = GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES;
++
++	register_meta(
++		'comment',
++		'_wp_suggestion',
++		array(
++			'type'              => 'string',
++			'description'       => __( 'Suggested edit payload (JSON).', 'gutenberg' ),
++			'single'            => true,
++			'show_in_rest'      => array(
++				'schema' => array(
++					'type'      => 'string',
++					'maxLength' => $max_suggestion_payload_bytes,
++				),
++			),
++			'sanitize_callback' => function ( $value ) use ( $max_suggestion_payload_bytes ) {
++				if ( ! is_string( $value ) ) {
++					return '';
++				}
++				// Reject rather than truncate. Truncating mid-string produces
++				// invalid JSON; `parseSuggestionPayload` would then return
++				// null and the suggestion would silently disappear.
++				if ( strlen( $value ) > $max_suggestion_payload_bytes ) {
++					return '';
++				}
++				return $value;
++			},
++			'auth_callback'     => function ( $allowed, $meta_key, $object_id ) {
++				// During comment creation the comment does not yet exist, so
++				// `object_id` is 0. Defer to the comment controller's own
++				// create permission — if the request can create the
++				// comment at all, it can set the suggestion meta on it.
++				if ( ! $object_id ) {
++					return current_user_can( 'edit_posts' );
++				}
++				$comment = get_comment( $object_id );
++				if ( $comment && 'note' === $comment->comment_type ) {
++					return current_user_can( 'edit_post', $comment->comment_post_ID );
++				}
++				return current_user_can( 'edit_comment', $object_id );
++			},
++		)
++	);
++
++	register_meta(
++		'comment',
++		'_wp_suggestion_status',
++		array(
++			'type'          => 'string',
++			'description'   => __( 'Suggestion lifecycle status.', 'gutenberg' ),
++			'single'        => true,
++			'show_in_rest'  => array(
++				'schema' => array(
++					'type' => 'string',
++					'enum' => array( 'pending', 'applied', 'rejected' ),
++				),
++			),
++			'auth_callback' => function ( $allowed, $meta_key, $object_id ) {
++				$comment = get_comment( $object_id );
++				if ( $comment && 'note' === $comment->comment_type ) {
++					return current_user_can( 'edit_post', $comment->comment_post_ID );
++				}
++				return current_user_can( 'edit_comment', $object_id );
++			},
++		)
++	);
++}
++add_action( 'init', 'gutenberg_register_block_comment_metadata' );
++
++/**
++ * Updates the comment type for avatars in the WordPress REST API.
++ *
++ * This function adds the 'note' type to the list of comment types
++ * for which avatars should be retrieved in the WordPress REST API.
++ *
++ * @param array $comment_type The array of comment types.
++ * @return array The updated array of comment types.
++ */
++if ( ! function_exists( 'update_get_avatar_comment_type' ) ) {
++	function update_get_avatar_comment_type( $comment_type ) {
++		$comment_type[] = 'note';
++		return $comment_type;
++	}
++	add_filter( 'get_avatar_comment_types', 'update_get_avatar_comment_type' );
++}
++
++/**
++ * Excludes block comments from the admin comments query.
++ *
++ * This function modifies the comments query to exclude comments of type 'note'
++ * when the query is for comments in the WordPress admin.
++ *
++ * @global wpdb $wpdb WordPress database abstraction object.
++ *
++ * @param string[] $clauses The current SQL clauses for the comments query.
++ * @param WP_Comment_Query $query The current comments query.
++ *
++ * @return string[] The modified SQL clauses for the comments query.
++ */
++if ( ! function_exists( 'exclude_block_comments_from_admin' ) ) {
++	function exclude_block_comments_from_admin( $clauses, $query ) {
++		// Only modify the query if it's for comments
++		if ( isset( $query->query_vars['type'] ) && '' === $query->query_vars['type'] ) {
++			$query->set( 'type', '' );
++
++			global $wpdb;
++			$clauses['where'] .= " AND {$wpdb->comments}.comment_type != 'note'";
++		}
++
++		return $clauses;
++	}
++	add_action( 'comments_clauses', 'exclude_block_comments_from_admin', 10, 2 );
++}
++
++/**
++ * Filter the comment count query to exclude block_comment type comments.
++ *
++ * Note: we need to make sure this doesn't interfere with the "Editorial Comments" view
++ * once https://github.com/WordPress/gutenberg/issues/71621 is implemented.
++ *
++ * @param string $query The SQL query string.
++ * @return string The modified SQL query string.
++ */
++function gutenberg_filter_comment_count_query_exclude_block_comments( $query ) {
++	// Adjust the query if it is a comment count query.
++	if ( str_starts_with( $query, 'SELECT comment_post_ID, COUNT(comment_ID) as num_comments FROM' ) && str_contains( $query, 'comment_approved' ) ) {
++		if ( ! str_contains( $query, "comment_type != 'note'" ) ) {
++			$query = str_replace( 'comment_approved', "comment_type != 'note' AND comment_approved", $query );
++		}
++	}
++	return $query;
++}
++add_filter( 'query', 'gutenberg_filter_comment_count_query_exclude_block_comments' );
++
++/**
++ * Adjusts the comments list table query so `comment_type=note` never displays.
++ *
++ * @param array $args An array of get_comments() arguments.
++ * @return array Possibly modified arguments for get_comments().
++ */
++function gutenberg_hide_note_from_comment_list_table( $args ) {
++	if ( ! empty( $_REQUEST['comment_type'] ) && 'note' === $_REQUEST['comment_type'] ) {
++		unset( $args['type'] );
++	}
++	return $args;
++}
++add_filter( 'comments_list_table_query_args', 'gutenberg_hide_note_from_comment_list_table' );
++
++/**
++ * Override comment_count to exclude notes from the comment count.
++ *
++ * @param int|null $new     The new comment count. Default null.
++ * @param int      $old     The old comment count.
++ * @param int      $post_id Post ID.
++ * @return int|null The modified comment count.
++ */
++function gutenberg_exclude_notes_from_comment_count( $new_count, $old_count, $post_id ) {
++	global $wpdb;
++	// If another filter already set a count, respect it.
++	if ( null !== $new_count ) {
++		return $new_count;
++	}
++	$new_count = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->comments WHERE comment_post_ID = %d AND comment_approved = '1' AND comment_type != 'note'", $post_id ) );
++	return $new_count;
++}
++add_filter( 'pre_wp_update_comment_count_now', 'gutenberg_exclude_notes_from_comment_count', 10, 3 );
++
++/**
++ * Registers the `wp_notes_notify` option and renders its UI on the Discussion screen.
++ *
++ * @return void
++ */
++function gutenberg_register_wp_notes_notify_setting() {
++	if ( is_wp_version_compatible( '6.9' ) ) {
++		return;
++	}
++
++	register_setting(
++		'discussion',
++		'wp_notes_notify',
++		array(
++			'type'              => 'boolean',
++			'description'       => __( 'Email me whenever anyone posts a note', 'gutenberg' ),
++			'sanitize_callback' => 'rest_sanitize_boolean',
++			'default'           => 1,
++		)
++	);
++
++	add_settings_field(
++		'wp_notes_notify',
++		__( 'Notes', 'gutenberg' ),
++		function () {
++			?>
++			<label for="wp_notes_notify">
++				<input name="wp_notes_notify" type="checkbox" id="wp_notes_notify" value="1" <?php checked( '1', get_option( 'wp_notes_notify', 1 ) ); ?>/>
++				<?php _e( 'Email me whenever anyone posts a note', 'gutenberg' ); ?>
++			</label>
++			<?php
++		},
++		'discussion'
++	);
++}
++add_action( 'admin_init', 'gutenberg_register_wp_notes_notify_setting' );
++
++/**
++ * Compatibility implementation of wp_new_comment_notify_postauthor() with notes support.
++ *
++ * @param int $comment_id The comment ID.
++ * @return bool True on success, false on failure.
++ */
++function gutenberg_new_comment_notify_postauthor( $comment_id ) {
++	$comment = get_comment( $comment_id );
++	$is_note = ( $comment && 'note' === $comment->comment_type );
++
++	$maybe_notify = $is_note ? get_option( 'wp_notes_notify', 1 ) : get_option( 'comments_notify' );
++
++	/**
++	 * Filters whether to send the post author new comment notification emails,
++	 * overriding the site setting.
++	 *
++	 * @since 4.4.0
++	 *
++	 * @param bool $maybe_notify Whether to notify the post author about the new comment.
++	 * @param int  $comment_id   The ID of the comment for the notification.
++	 */
++	$maybe_notify = apply_filters( 'notify_post_author', $maybe_notify, $comment_id );
++
++	/*
++	 * wp_notify_postauthor() checks if notifying the author of their own comment.
++	 * By default, it won't, but filters can override this.
++	 */
++	if ( ! $maybe_notify ) {
++		return false;
++	}
++
++	// Send notifications for approved comments and all notes.
++	if (
++		! isset( $comment->comment_approved ) ||
++		( '1' !== $comment->comment_approved && ! $is_note ) ) {
++			return false;
++	}
++
++	return wp_notify_postauthor( $comment_id );
++}
++
++/**
++ * Compatibility implementation of wp_new_comment_via_rest_notify_postauthor()
++ * function introduced in WordPress 6.9.
++ *
++ * @param WP_Comment $comment The comment object.
++ */
++function gutenberg_new_comment_via_rest_notify_postauthor( $comment ) {
++	if ( $comment instanceof WP_Comment && 'note' === $comment->comment_type ) {
++		gutenberg_new_comment_notify_postauthor( (int) $comment->comment_ID );
++	}
++}
++
++if ( has_action( 'rest_insert_comment', 'wp_new_comment_via_rest_notify_postauthor' ) ) {
++	remove_action( 'rest_insert_comment', 'wp_new_comment_via_rest_notify_postauthor' );
++	add_action( 'rest_insert_comment', 'gutenberg_new_comment_via_rest_notify_postauthor' );
++}
++
++/**
++ * Filters the note notification text.
++ *
++ * @param string $notify_message The comment notification email text.
++ * @param string $comment_id     Comment ID as a numeric string.
++ *
++ * @return string The filtered notification text.
++ */
++function gutenberg_filter_note_notification_text( $notify_message, $comment_id ) {
++	$comment = get_comment( $comment_id );
++	if ( ! $comment || 'note' !== $comment->comment_type ) {
++		return $notify_message;
++	}
++
++	$post = get_post( $comment->comment_post_ID );
++	if ( ! $post ) {
++		return $notify_message;
++	}
++
++	$comment_author_domain = '';
++	if ( WP_Http::is_ip_address( $comment->comment_author_IP ) ) {
++		$comment_author_domain = gethostbyaddr( $comment->comment_author_IP );
++	}
++
++	$comment_content = wp_specialchars_decode( $comment->comment_content );
++
++	/* translators: %s: Post title. */
++	$notify_message = sprintf( __( 'New note on your post "%s"', 'gutenberg' ), $post->post_title ) . "\r\n";
++	/* translators: 1: Note author's name, 2: Note author's IP address, 3: Note author's hostname. */
++	$notify_message .= sprintf( __( 'Author: %1$s (IP address: %2$s, %3$s)', 'gutenberg' ), $comment->comment_author, $comment->comment_author_IP, $comment_author_domain ) . "\r\n";
++	/* translators: %s: Note author email. */
++	$notify_message .= sprintf( __( 'Email: %s', 'gutenberg' ), $comment->comment_author_email ) . "\r\n";
++	/* translators: %s: Note text. */
++	$notify_message .= sprintf( __( 'Note: %s', 'gutenberg' ), "\r\n" . ( empty( $comment_content ) ? __( 'resolved/reopened' ) : $comment_content ) ) . "\r\n\r\n";
++	$notify_message .= __( 'You can see all notes on this post here:', 'gutenberg' ) . "\r\n";
++	$notify_message .= get_edit_post_link( $comment->comment_post_ID, 'url' ) . "\r\n";
++
++	return $notify_message;
++}
++add_filter( 'comment_notification_text', 'gutenberg_filter_note_notification_text', 10, 2 );
++
++/**
++ * Filters the note notification subject.
++ *
++ * @param string $subject    The comment notification email subject.
++ * @param string $comment_id Comment ID as a numeric string.
++ *
++ * @return string The filtered notification subject.
++ */
++function gutenberg_filter_note_notification_subject( $subject, $comment_id ) {
++	$comment = get_comment( $comment_id );
++	if ( ! $comment || 'note' !== $comment->comment_type ) {
++		return $subject;
++	}
++
++	$post = get_post( $comment->comment_post_ID );
++	if ( ! $post ) {
++		return $subject;
++	}
++
++	$blogname = wp_specialchars_decode( get_option( 'blogname' ), ENT_QUOTES );
++
++	/* translators: Note notification email subject. 1: Site title, 2: Post title. */
++	$subject = sprintf( __( '[%1$s] Note: "%2$s"', 'gutenberg' ), $blogname, $post->post_title );
++	return $subject;
++}
++add_filter( 'comment_notification_subject', 'gutenberg_filter_note_notification_subject', 10, 2 );
+diff --git a/lib/compat/wordpress-7.1/block-comment-suggestions.php b/lib/compat/wordpress-7.1/block-comment-suggestions.php
+index 8816a2f7072ae9..57eef13e572636 100644
+--- a/lib/compat/wordpress-7.1/block-comment-suggestions.php
++++ b/lib/compat/wordpress-7.1/block-comment-suggestions.php
+@@ -70,13 +70,22 @@ function gutenberg_register_block_comment_suggestion_metadata() {
+ 				return $value;
+ 			},
+ 			'auth_callback'     => function ( $allowed, $meta_key, $object_id ) {
++				// During comment creation the comment does not yet exist, so
++				// `object_id` is 0. Defer to the comment controller's own
++				// create permission — if the request can create the
++				// comment at all, it can set the suggestion meta on it.
++				if ( ! $object_id ) {
++					return current_user_can( 'edit_posts' );
++				}
++				$comment = get_comment( $object_id );
++				if ( $comment && 'note' === $comment->comment_type ) {
++					return current_user_can( 'edit_post', $comment->comment_post_ID );
++				}
+ 				return current_user_can( 'edit_comment', $object_id );
+ 			},
+ 		)
+ 	);
+ 
+-	// Lifecycle status for a suggestion. `pending` on creation; moved to
+-	// `applied` or `rejected` by the apply/reject actions.
+ 	register_meta(
+ 		'comment',
+ 		'_wp_suggestion_status',
+@@ -91,6 +100,10 @@ function gutenberg_register_block_comment_suggestion_metadata() {
+ 				),
+ 			),
+ 			'auth_callback' => function ( $allowed, $meta_key, $object_id ) {
++				$comment = get_comment( $object_id );
++				if ( $comment && 'note' === $comment->comment_type ) {
++					return current_user_can( 'edit_post', $comment->comment_post_ID );
++				}
+ 				return current_user_can( 'edit_comment', $object_id );
+ 			},
+ 		)
+diff --git a/lib/compat/wordpress-7.1/class-gutenberg-rest-comment-suggestions-controller.php b/lib/compat/wordpress-7.1/class-gutenberg-rest-comment-suggestions-controller.php
+index 97e6ed062d9082..6285a538730c42 100644
+--- a/lib/compat/wordpress-7.1/class-gutenberg-rest-comment-suggestions-controller.php
++++ b/lib/compat/wordpress-7.1/class-gutenberg-rest-comment-suggestions-controller.php
+@@ -5,14 +5,22 @@
+  *
+  * WordPress core handles notes (`note`-type comments) natively, including
+  * their permissions and the "empty note with a resolution status" case. Suggest
+- * mode only needs to extend two creation behaviors, so this subclass overrides
+- * the minimum and defers everything else to core:
++ * mode only needs to extend a few behaviors, so this subclass overrides the
++ * minimum and defers everything else to core:
+  *
+  *   - A suggestion-only note legitimately has empty `comment_content` (the
+  *     proposed edit lives in the `_wp_suggestion` meta, not the body). Core
+  *     only permits empty note content when a resolution status is present, so
+- *     this scopes an `allow_empty_comment` override to creates that carry a
+- *     suggestion payload.
++ *     `create_item` scopes an `allow_empty_comment` override to creates that
++ *     carry a suggestion payload.
++ *   - A post editor needs to apply or reject a suggestion authored by someone
++ *     else without holding `moderate_comments`. `update_item_permissions_check`
++ *     grants `edit_post`-capable users access to note updates, but only for a
++ *     scope-tightened allowlist (`status` and `_wp_suggestion_status` meta) so
++ *     the path can never rewrite another user's note content or authorship.
++ *   - The `_wp_suggestion` payload is capped at
++ *     `GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES`. Oversized values are rejected
++ *     with a 413 before the meta sanitize_callback can silently drop them.
+  *
+  * The suggestion meta itself is persisted by core via the registered
+  * `_wp_suggestion` meta field; it does not need to be copied in here.
+@@ -22,16 +30,168 @@
+  */
+ class Gutenberg_REST_Comment_Suggestions_Controller extends WP_REST_Comments_Controller {
+ 
++	/**
++	 * Checks if a given request has access to update a comment.
++	 *
++	 * Extends core's check so that users who can `edit_post` on the parent
++	 * post are also allowed to update note-type comments — but only for
++	 * suggestion-lifecycle fields (status and `_wp_suggestion_status` meta).
++	 * This unblocks the suggestion workflow where a post editor applies or
++	 * rejects a suggestion authored by someone else, without granting them
++	 * the ability to rewrite the note's content, reassign authorship, or
++	 * otherwise modify another user's comment.
++	 *
++	 * @param WP_REST_Request $request Full details about the request.
++	 * @return true|WP_Error True if the request has access, WP_Error otherwise.
++	 */
++	public function update_item_permissions_check( $request ) {
++		$comment = $this->get_comment( $request['id'] );
++		if ( is_wp_error( $comment ) ) {
++			return $comment;
++		}
++
++		// For note comments, allow users who can edit the parent post to
++		// update suggestion-lifecycle fields only.
++		if (
++			'note' === $comment->comment_type &&
++			self::is_suggestion_lifecycle_update( $request )
++		) {
++			$post = get_post( $comment->comment_post_ID );
++			if ( $post && current_user_can( 'edit_post', $post->ID ) ) {
++				return true;
++			}
++		}
++
++		// Fall back to core's default check (moderate_comments or edit_comment).
++		return parent::update_item_permissions_check( $request );
++	}
++
++	/**
++	 * Determines whether a note-update request touches only the fields used
++	 * by the suggestion apply/reject lifecycle.
++	 *
++	 * Allowed fields:
++	 *  - `status` (limited to `approved` or `hold`)
++	 *  - `meta._wp_suggestion_status`
++	 *
++	 * Any other field present in the request body disqualifies the request
++	 * from the `edit_post` shortcut, forcing it through core's edit_comment
++	 * check instead.
++	 *
++	 * @param WP_REST_Request $request Full details about the request.
++	 * @return bool Whether the request is a scoped suggestion-lifecycle update.
++	 */
++	private static function is_suggestion_lifecycle_update( $request ) {
++		// Accept either a JSON body (the block editor client) or a form-
++		// encoded body (custom integrations / curl scripts). Either way the
++		// shortcut is gated by the same allowlist below — query/URL params
++		// are intentionally excluded so the body is the source of truth for
++		// what's being written.
++		$params = $request->get_json_params();
++		if ( ! is_array( $params ) ) {
++			$params = $request->get_body_params();
++		}
++		if ( ! is_array( $params ) || empty( $params ) ) {
++			return false;
++		}
++
++		$allowed_keys = array( 'id', 'status', 'meta' );
++		foreach ( array_keys( $params ) as $key ) {
++			if ( ! in_array( $key, $allowed_keys, true ) ) {
++				return false;
++			}
++		}
++
++		if (
++			isset( $params['status'] ) &&
++			! in_array( $params['status'], array( 'approved', 'hold' ), true )
++		) {
++			return false;
++		}
++
++		if ( isset( $params['meta'] ) ) {
++			if ( ! is_array( $params['meta'] ) ) {
++				return false;
++			}
++			$allowed_meta = array( '_wp_suggestion_status' );
++			foreach ( array_keys( $params['meta'] ) as $meta_key ) {
++				if ( ! in_array( $meta_key, $allowed_meta, true ) ) {
++					return false;
++				}
++			}
++		}
++
++		return true;
++	}
++
++	/**
++	 * Validates that an incoming request's `_wp_suggestion` meta is within the
++	 * allowed byte budget. Truncating arbitrary JSON corrupts the payload, so
++	 * we reject before any storage happens.
++	 *
++	 * @param WP_REST_Request $request Full details about the request.
++	 * @return true|WP_Error True if no payload or within bounds, WP_Error otherwise.
++	 */
++	protected static function validate_suggestion_payload_size( $request ) {
++		$meta = $request['meta'] ?? null;
++		if ( ! is_array( $meta ) || ! isset( $meta['_wp_suggestion'] ) ) {
++			return true;
++		}
++		$value = $meta['_wp_suggestion'];
++		if ( ! is_string( $value ) ) {
++			return true;
++		}
++		if ( strlen( $value ) > GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES ) {
++			return new WP_Error(
++				'rest_suggestion_too_large',
++				sprintf(
++					/* translators: %d: maximum allowed byte length. */
++					__( 'Suggestion payload exceeds the %d-byte limit.', 'gutenberg' ),
++					GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES
++				),
++				array( 'status' => 413 )
++			);
++		}
++		return true;
++	}
++
++	/**
++	 * Updates a comment.
++	 *
++	 * Wraps core's update path with a pre-flight size check on the suggestion
++	 * payload so oversized values are rejected with a clean 413 instead of
++	 * silently dropped by the meta sanitize_callback.
++	 *
++	 * @param WP_REST_Request $request Full details about the request.
++	 * @return WP_REST_Response|WP_Error Response object on success, error otherwise.
++	 */
++	public function update_item( $request ) {
++		$size_check = self::validate_suggestion_payload_size( $request );
++		if ( is_wp_error( $size_check ) ) {
++			return $size_check;
++		}
++		return parent::update_item( $request );
++	}
++
+ 	/**
+ 	 * Creates a comment.
+ 	 *
+-	 * Permits empty `comment_content` when the note carries a suggestion
+-	 * payload, then defers to core for the actual creation.
++	 * Rejects oversized suggestion payloads with a 413, and permits empty
++	 * `comment_content` when the note carries a suggestion payload, then
++	 * defers to core for the actual creation.
+ 	 *
+ 	 * @param WP_REST_Request $request Full details about the request.
+ 	 * @return WP_REST_Response|WP_Error Response object on success, error otherwise.
+ 	 */
+ 	public function create_item( $request ) {
++		// Reject oversized suggestion payloads with a 413 so the client knows.
++		// Without this, the meta sanitize_callback would silently reject the
++		// value and the suggestion would disappear server-side.
++		$size_check = self::validate_suggestion_payload_size( $request );
++		if ( is_wp_error( $size_check ) ) {
++			return $size_check;
++		}
++
+ 		$has_suggestion = ! empty( $request['type'] )
+ 			&& 'note' === $request['type']
+ 			&& ! empty( $request['meta']['_wp_suggestion'] );
+diff --git a/lib/load.php b/lib/load.php
+index d7e5f746922ace..3d36dca478dc4a 100644
+--- a/lib/load.php
++++ b/lib/load.php
+@@ -74,6 +74,7 @@ function gutenberg_is_experiment_enabled( $name ) {
+ 	require __DIR__ . '/compat/wordpress-7.1/rest-api.php';
+ 	require __DIR__ . '/compat/wordpress-7.1/collaboration.php';
+ 	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-comment-suggestions-controller.php';
++	require __DIR__ . '/compat/wordpress-6.9/block-comments.php';
+ 	require __DIR__ . '/compat/wordpress-7.1/block-comment-suggestions.php';
+ 	require __DIR__ . '/compat/wordpress-7.1/block-bindings.php';
+ 
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3038efd374fddf..df9a9ee76c6dcd 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   `Surface`: Migrate styles from Emotion to SCSS Modules and use WPDS tokens for migrated visual values ([#79445](https://github.com/WordPress/gutenberg/pull/79445)).
++
+ ## 36.0.0 (2026-06-24)
+ 
+ ### Breaking Changes
+diff --git a/packages/components/src/card/test/__snapshots__/index.tsx.snap b/packages/components/src/card/test/__snapshots__/index.tsx.snap
+index 1e3909c4bf47ca..609d6fd5924de3 100644
+--- a/packages/components/src/card/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/card/test/__snapshots__/index.tsx.snap
+@@ -118,16 +118,13 @@ Snapshot Diff:
+ - Received styles
+ + Base styles
+ 
+-@@ -1,9 +1,8 @@
+   Array [
+     Object {
+-      "background-color": "#fff",
+ -     "border-radius": "calc(8px - 1px)",
+       "box-shadow": "0 0 0 1px rgba(0, 0, 0, 0.1)",
+-      "color": "#1e1e1e",
+       "outline": "none",
+-      "position": "relative",
+     },
++  ]
+ `;
+ 
+ exports[`Card Card component should get the isBorderless and isSize props (passed from its context) overriddenwhen the same props is specified directly on the component 1`] = `
+@@ -174,8 +171,8 @@ Snapshot Diff:
+ @@ -1,30 +1,30 @@
+   <div>
+     <div
+--     class="components-surface components-card css-y9at7f-PolymorphicDiv-Surface-getBorders-primary-Card-boxShadowless-rounded e19lxcc00"
+-+     class="components-surface components-card css-1dj5kxo-PolymorphicDiv-Surface-getBorders-primary-Card-rounded e19lxcc00"
++-     class="components-surface components-card css-1hgll2p-PolymorphicDiv-Card-boxShadowless-rounded e19lxcc00"
+++     class="components-surface components-card css-11ld97d-PolymorphicDiv-Card-rounded e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="Card"
+     >
+@@ -210,9 +207,6 @@ Snapshot Diff:
+ 
+ exports[`Card Card component should render correctly 1`] = `
+ .emotion-0 {
+-  background-color: #fff;
+-  color: #1e1e1e;
+-  position: relative;
+   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+   outline: none;
+   border-radius: calc(8px - 1px);
+@@ -490,9 +484,6 @@ Compared values have no visual difference.
+ 
+ exports[`Card Card component should warn when the isElevated prop is passed 1`] = `
+ .emotion-0 {
+-  background-color: #fff;
+-  color: #1e1e1e;
+-  position: relative;
+   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+   outline: none;
+   border-radius: calc(8px - 1px);
+diff --git a/packages/components/src/surface/hook.ts b/packages/components/src/surface/hook.ts
+index bacc2f2b291348..f9d9a406ad00a0 100644
+--- a/packages/components/src/surface/hook.ts
++++ b/packages/components/src/surface/hook.ts
+@@ -1,16 +1,15 @@
+ /**
+- * WordPress dependencies
++ * External dependencies
+  */
+-import { useMemo } from '@wordpress/element';
++import clsx from 'clsx';
+ 
+ /**
+  * Internal dependencies
+  */
+ import { useContextSystem } from '../context';
+-import * as styles from './styles';
+-import { useCx } from '../utils/hooks/use-cx';
+ import type { SurfaceProps } from './types';
+ import type { WordPressComponentProps } from '../context';
++import styles from './style.module.scss';
+ 
+ export function useSurface(
+ 	props: WordPressComponentProps< SurfaceProps, 'div' >
+@@ -22,42 +21,37 @@ export function useSurface(
+ 		borderRight = false,
+ 		borderTop = false,
+ 		className,
++		style,
+ 		variant = 'primary',
+ 		...otherProps
+ 	} = useContextSystem( props, 'Surface' );
+ 
+-	const cx = useCx();
++	const hasPatternBackground = variant === 'dotted' || variant === 'grid';
++	const surfaceStyle = hasPatternBackground
++		? {
++				...style,
++				'--wp-components-surface-background-size': `${ backgroundSize }px`,
++				'--wp-components-surface-background-size-dotted': `${
++					backgroundSize - 1
++				}px`,
++		  }
++		: style;
+ 
+-	const classes = useMemo( () => {
+-		const sx = {
+-			borders: styles.getBorders( {
+-				borderBottom,
+-				borderLeft,
+-				borderRight,
+-				borderTop,
+-			} ),
+-		};
+-
+-		return cx(
+-			styles.Surface,
+-			sx.borders,
+-			styles.getVariant(
+-				variant,
+-				`${ backgroundSize }px`,
+-				`${ backgroundSize - 1 }px`
+-			),
++	return {
++		...otherProps,
++		className: clsx(
++			styles.surface,
++			{
++				[ styles[ 'border-bottom' ] ]: borderBottom,
++				[ styles[ 'border-left' ] ]: borderLeft,
++				[ styles[ 'border-right' ] ]: borderRight,
++				[ styles[ 'border-top' ] ]: borderTop,
++				[ styles.secondary ]: variant === 'secondary',
++				[ styles.dotted ]: variant === 'dotted',
++				[ styles.grid ]: variant === 'grid',
++			},
+ 			className
+-		);
+-	}, [
+-		backgroundSize,
+-		borderBottom,
+-		borderLeft,
+-		borderRight,
+-		borderTop,
+-		className,
+-		cx,
+-		variant,
+-	] );
+-
+-	return { ...otherProps, className: classes };
++		),
++		style: surfaceStyle,
++	};
+ }
+diff --git a/packages/components/src/surface/style.module.scss b/packages/components/src/surface/style.module.scss
+new file mode 100644
+index 00000000000000..8207a98ed21860
+--- /dev/null
++++ b/packages/components/src/surface/style.module.scss
+@@ -0,0 +1,53 @@
++.surface {
++	background-color: var(--wpds-color-background-surface-neutral-strong);
++	color: var(--wpds-color-foreground-content-neutral);
++	position: relative;
++}
++
++.border-bottom {
++	border-bottom: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
++}
++
++.border-left {
++	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Surface exposes physical border props. */
++	border-left: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
++}
++
++.border-right {
++	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Surface exposes physical border props. */
++	border-right: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
++}
++
++.border-top {
++	border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
++}
++
++.secondary {
++	background: var(--wpds-color-background-surface-neutral-weak);
++}
++
++.dotted {
++	background:
++		linear-gradient(90deg, var(--wpds-color-background-surface-neutral-strong)
++		var(--wp-components-surface-background-size-dotted), transparent 1%)
++		center,
++		linear-gradient(var(--wpds-color-background-surface-neutral-strong)
++		var(--wp-components-surface-background-size-dotted), transparent 1%)
++		center,
++		var(--wpds-color-stroke-surface-neutral);
++	background-size:
++		var(--wp-components-surface-background-size)
++		var(--wp-components-surface-background-size);
++}
++
++.grid {
++	background: var(--wpds-color-background-surface-neutral-strong);
++	background-image:
++		linear-gradient(var(--wpds-color-stroke-surface-neutral-weak)
++		var(--wpds-border-width-xs), transparent var(--wpds-border-width-xs)),
++		linear-gradient(90deg, var(--wpds-color-stroke-surface-neutral-weak)
++		var(--wpds-border-width-xs), transparent var(--wpds-border-width-xs));
++	background-size:
++		var(--wp-components-surface-background-size)
++		var(--wp-components-surface-background-size);
++}
+diff --git a/packages/components/src/surface/styles.ts b/packages/components/src/surface/styles.ts
+deleted file mode 100644
+index cf78448b67d2d1..00000000000000
+--- a/packages/components/src/surface/styles.ts
++++ /dev/null
+@@ -1,139 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { css } from '@emotion/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import { CONFIG, COLORS } from '../utils';
+-import type { SurfaceVariant, SurfaceProps } from './types';
+-
+-export const Surface = css`
+-	background-color: ${ CONFIG.surfaceColor };
+-	color: ${ COLORS.gray[ 900 ] };
+-	position: relative;
+-`;
+-
+-export const background = css`
+-	background-color: ${ CONFIG.surfaceBackgroundColor };
+-`;
+-
+-export function getBorders( {
+-	borderBottom,
+-	borderLeft,
+-	borderRight,
+-	borderTop,
+-}: Pick<
+-	SurfaceProps,
+-	'borderBottom' | 'borderLeft' | 'borderRight' | 'borderTop'
+-> ) {
+-	const borderStyle = `1px solid ${ CONFIG.surfaceBorderColor }`;
+-
+-	return css( {
+-		borderBottom: borderBottom ? borderStyle : undefined,
+-		borderLeft: borderLeft ? borderStyle : undefined,
+-		borderRight: borderRight ? borderStyle : undefined,
+-		borderTop: borderTop ? borderStyle : undefined,
+-	} );
+-}
+-
+-export const primary = css``;
+-
+-export const secondary = css`
+-	background: ${ CONFIG.surfaceBackgroundTintColor };
+-`;
+-
+-export const tertiary = css`
+-	background: ${ CONFIG.surfaceBackgroundTertiaryColor };
+-`;
+-
+-const customBackgroundSize = ( surfaceBackgroundSize: string ) =>
+-	[ surfaceBackgroundSize, surfaceBackgroundSize ].join( ' ' );
+-
+-const dottedBackground1 = ( surfaceBackgroundSizeDotted: string ) =>
+-	[
+-		'90deg',
+-		[ CONFIG.surfaceBackgroundColor, surfaceBackgroundSizeDotted ].join(
+-			' '
+-		),
+-		'transparent 1%',
+-	].join( ',' );
+-
+-const dottedBackground2 = ( surfaceBackgroundSizeDotted: string ) =>
+-	[
+-		[ CONFIG.surfaceBackgroundColor, surfaceBackgroundSizeDotted ].join(
+-			' '
+-		),
+-		'transparent 1%',
+-	].join( ',' );
+-
+-const dottedBackgroundCombined = ( surfaceBackgroundSizeDotted: string ) =>
+-	[
+-		`linear-gradient( ${ dottedBackground1(
+-			surfaceBackgroundSizeDotted
+-		) } ) center`,
+-		`linear-gradient( ${ dottedBackground2(
+-			surfaceBackgroundSizeDotted
+-		) } ) center`,
+-		CONFIG.surfaceBorderBoldColor,
+-	].join( ',' );
+-
+-export const getDotted = (
+-	surfaceBackgroundSize: string,
+-	surfaceBackgroundSizeDotted: string
+-) => css`
+-	background: ${ dottedBackgroundCombined( surfaceBackgroundSizeDotted ) };
+-	background-size: ${ customBackgroundSize( surfaceBackgroundSize ) };
+-`;
+-
+-const gridBackground1 = [
+-	`${ CONFIG.surfaceBorderSubtleColor } 1px`,
+-	'transparent 1px',
+-].join( ',' );
+-
+-const gridBackground2 = [
+-	'90deg',
+-	`${ CONFIG.surfaceBorderSubtleColor } 1px`,
+-	'transparent 1px',
+-].join( ',' );
+-
+-const gridBackgroundCombined = [
+-	`linear-gradient( ${ gridBackground1 } )`,
+-	`linear-gradient( ${ gridBackground2 } )`,
+-].join( ',' );
+-
+-export const getGrid = ( surfaceBackgroundSize: string ) => {
+-	return css`
+-		background: ${ CONFIG.surfaceBackgroundColor };
+-		background-image: ${ gridBackgroundCombined };
+-		background-size: ${ customBackgroundSize( surfaceBackgroundSize ) };
+-	`;
+-};
+-
+-export const getVariant = (
+-	variant: SurfaceVariant,
+-	surfaceBackgroundSize: string,
+-	surfaceBackgroundSizeDotted: string
+-) => {
+-	switch ( variant ) {
+-		case 'dotted': {
+-			return getDotted(
+-				surfaceBackgroundSize,
+-				surfaceBackgroundSizeDotted
+-			);
+-		}
+-		case 'grid': {
+-			return getGrid( surfaceBackgroundSize );
+-		}
+-		case 'primary': {
+-			return primary;
+-		}
+-		case 'secondary': {
+-			return secondary;
+-		}
+-		case 'tertiary': {
+-			return tertiary;
+-		}
+-	}
+-};
+diff --git a/packages/components/src/surface/test/__snapshots__/index.tsx.snap b/packages/components/src/surface/test/__snapshots__/index.tsx.snap
+deleted file mode 100644
+index 72336b03bb3a18..00000000000000
+--- a/packages/components/src/surface/test/__snapshots__/index.tsx.snap
++++ /dev/null
+@@ -1,104 +0,0 @@
+-// Jest Snapshot v1, https://goo.gl/fbAQLP
+-
+-exports[`props should render borderBottom 1`] = `
+-Snapshot Diff:
+-- First value
+-+ Second value
+-
+-@@ -1,8 +1,8 @@
+-  <div>
+-    <div
+--     class="components-surface css-1921uc5-PolymorphicDiv-Surface-getBorders-primary e19lxcc00"
+-+     class="components-surface css-o6qg0g-PolymorphicDiv-Surface-getBorders-primary e19lxcc00"
+-      data-wp-c16t="true"
+-      data-wp-component="Surface"
+-    >
+-      Surface
+-    </div>
+-`;
+-
+-exports[`props should render borderLeft 1`] = `
+-Snapshot Diff:
+-- First value
+-+ Second value
+-
+-@@ -1,8 +1,8 @@
+-  <div>
+-    <div
+--     class="components-surface css-i25gtk-PolymorphicDiv-Surface-getBorders-primary e19lxcc00"
+-+     class="components-surface css-o6qg0g-PolymorphicDiv-Surface-getBorders-primary e19lxcc00"
+-      data-wp-c16t="true"
+-      data-wp-component="Surface"
+-    >
+-      Surface
+-    </div>
+-`;
+-
+-exports[`props should render borderRight 1`] = `
+-Snapshot Diff:
+-- First value
+-+ Second value
+-
+-@@ -1,8 +1,8 @@
+-  <div>
+-    <div
+--     class="components-surface css-1pd05xm-PolymorphicDiv-Surface-getBorders-primary e19lxcc00"
+-+     class="components-surface css-o6qg0g-PolymorphicDiv-Surface-getBorders-primary e19lxcc00"
+-      data-wp-c16t="true"
+-      data-wp-component="Surface"
+-    >
+-      Surface
+-    </div>
+-`;
+-
+-exports[`props should render borderTop 1`] = `
+-Snapshot Diff:
+-- First value
+-+ Second value
+-
+-@@ -1,8 +1,8 @@
+-  <div>
+-    <div
+--     class="components-surface css-y3blhg-PolymorphicDiv-Surface-getBorders-primary e19lxcc00"
+-+     class="components-surface css-o6qg0g-PolymorphicDiv-Surface-getBorders-primary e19lxcc00"
+-      data-wp-c16t="true"
+-      data-wp-component="Surface"
+-    >
+-      Surface
+-    </div>
+-`;
+-
+-exports[`props should render correctly 1`] = `
+-.emotion-0 {
+-  background-color: #fff;
+-  color: #1e1e1e;
+-  position: relative;
+-}
+-
+-<div>
+-  <div
+-    class="components-surface emotion-0 emotion-1"
+-    data-wp-c16t="true"
+-    data-wp-component="Surface"
+-  >
+-    Surface
+-  </div>
+-</div>
+-`;
+-
+-exports[`props should render variants 1`] = `
+-Snapshot Diff:
+-- First value
+-+ Second value
+-
+-@@ -1,8 +1,8 @@
+-  <div>
+-    <div
+--     class="components-surface css-15um7qp-PolymorphicDiv-Surface-getBorders-secondary e19lxcc00"
+-+     class="components-surface css-o6qg0g-PolymorphicDiv-Surface-getBorders-primary e19lxcc00"
+-      data-wp-c16t="true"
+-      data-wp-component="Surface"
+-    >
+-      Surface
+-    </div>
+-`;
+diff --git a/packages/components/src/surface/test/index.tsx b/packages/components/src/surface/test/index.tsx
+index 26deae8a1927ea..e11ef9cdd8d810 100644
+--- a/packages/components/src/surface/test/index.tsx
++++ b/packages/components/src/surface/test/index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { render } from '@testing-library/react';
++import { render, screen } from '@testing-library/react';
+ 
+ /**
+  * Internal dependencies
+@@ -9,40 +9,33 @@ import { render } from '@testing-library/react';
+ import { Surface } from '../index';
+ 
+ describe( 'props', () => {
+-	test( 'should render correctly', () => {
+-		const { container } = render( <Surface>Surface</Surface> );
+-		expect( container ).toMatchSnapshot();
+-	} );
++	test( 'should render children in a Surface wrapper', () => {
++		render( <Surface>Surface</Surface> );
+ 
+-	test( 'should render variants', () => {
+-		const view = render( <Surface>Surface</Surface> );
+-		const { container } = render(
+-			<Surface variant="secondary">Surface</Surface>
+-		);
+-		expect( container ).toMatchDiffSnapshot( view.container );
+-	} );
++		const surface = screen.getByText( 'Surface' );
+ 
+-	test( 'should render borderLeft', () => {
+-		const view = render( <Surface>Surface</Surface> );
+-		const { container } = render( <Surface borderLeft>Surface</Surface> );
+-		expect( container ).toMatchDiffSnapshot( view.container );
++		expect( surface ).toHaveClass( 'components-surface' );
++		expect( surface ).toHaveAttribute( 'data-wp-component', 'Surface' );
+ 	} );
+ 
+-	test( 'should render borderRight', () => {
+-		const view = render( <Surface>Surface</Surface> );
+-		const { container } = render( <Surface borderRight>Surface</Surface> );
+-		expect( container ).toMatchDiffSnapshot( view.container );
+-	} );
++	test( 'should merge custom class names', () => {
++		render( <Surface className="custom-surface">Surface</Surface> );
+ 
+-	test( 'should render borderTop', () => {
+-		const view = render( <Surface>Surface</Surface> );
+-		const { container } = render( <Surface borderTop>Surface</Surface> );
+-		expect( container ).toMatchDiffSnapshot( view.container );
++		expect( screen.getByText( 'Surface' ) ).toHaveClass(
++			'components-surface',
++			'custom-surface'
++		);
+ 	} );
+ 
+-	test( 'should render borderBottom', () => {
+-		const view = render( <Surface>Surface</Surface> );
+-		const { container } = render( <Surface borderBottom>Surface</Surface> );
+-		expect( container ).toMatchDiffSnapshot( view.container );
++	test( 'should render as the requested element', () => {
++		render(
++			<Surface as="section" aria-label="Surface area">
++				Surface
++			</Surface>
++		);
++
++		expect(
++			screen.getByRole( 'region', { name: 'Surface area' } )
++		).toHaveTextContent( 'Surface' );
+ 	} );
+ } );
+diff --git a/packages/components/src/utils/config-values.js b/packages/components/src/utils/config-values.js
+index c8540e8a1180c6..0fba4ff7708568 100644
+--- a/packages/components/src/utils/config-values.js
++++ b/packages/components/src/utils/config-values.js
+@@ -57,13 +57,7 @@ export default Object.assign( {}, CONTROL_PROPS, {
+ 	elevationSmall: `0 1px 2px rgba(0, 0, 0, 0.05), 0 2px 3px rgba(0, 0, 0, 0.04), 0 6px 6px rgba(0, 0, 0, 0.03), 0 8px 8px rgba(0, 0, 0, 0.02)`,
+ 	elevationMedium: `0 2px 3px rgba(0, 0, 0, 0.05), 0 4px 5px rgba(0, 0, 0, 0.04), 0 12px 12px rgba(0, 0, 0, 0.03), 0 16px 16px rgba(0, 0, 0, 0.02)`,
+ 	elevationLarge: `0 5px 15px rgba(0, 0, 0, 0.08), 0 15px 27px rgba(0, 0, 0, 0.07), 0 30px 36px rgba(0, 0, 0, 0.04), 0 50px 43px rgba(0, 0, 0, 0.02)`,
+-	surfaceBackgroundColor: COLORS.white,
+-	surfaceBackgroundSubtleColor: '#F3F3F3',
+-	surfaceBackgroundTintColor: '#F5F5F5',
+ 	surfaceBorderColor: 'rgba(0, 0, 0, 0.1)',
+-	surfaceBorderBoldColor: 'rgba(0, 0, 0, 0.15)',
+-	surfaceBorderSubtleColor: 'rgba(0, 0, 0, 0.05)',
+-	surfaceBackgroundTertiaryColor: COLORS.white,
+ 	surfaceColor: COLORS.white,
+ 	// Modal exit animation: `use-modal-exit-animation` parses this for the
+ 	// `animationend` timeout race; keep the numeric duration equal to the WPDS
+diff --git a/packages/editor/CHANGELOG.md b/packages/editor/CHANGELOG.md
+index c1b7ae9de908f5..6817df9d0488ef 100644
+--- a/packages/editor/CHANGELOG.md
++++ b/packages/editor/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   Added an `editorIntent` preference (`edit`, `suggest`, `view`) with a matching `setEditorIntent` action and `getEditorIntent` selector. Surfaced as an Editing / Suggesting / Viewing menu in the editor options for post types that support notes. The `view` intent puts the block editor into a read-only preview. Keyboard shortcuts follow the Google Docs convention: Ctrl+Alt+Shift+Z (Edit), +X (Suggest), +C (View) on Windows / ⌘⌥⇧Z/X/C on macOS.
+ -   Added a suggestion-overlay subsystem that powers the `suggest` intent. When active, an `editor.BlockEdit` filter diverts `setAttributes` into an in-memory overlay keyed by `clientId`; the block renders with the pending change merged on top of its real attributes, but the block-editor store stays at the baseline. A toolbar button on the selected block submits the overlay as a note comment with a `_wp_suggestion` meta payload (`schemaVersion`, `blockName`, `baseRevision`, `operations`) or discards it. Phase 2: capture only; Apply/Reject and diff rendering follow.
++-   REST: allow post editors to accept or reject suggestion notes on their posts without requiring the `moderate_comments` capability. Tightens the `comments` controller for `type=note` so non-author editors can only update the suggestion lifecycle (`status` and `_wp_suggestion_status`), and rejects suggestion payloads larger than 64 KB before they reach the database.
+ 
+ ## 14.49.0 (2026-06-24)
+ 
+diff --git a/packages/widget-primitives/README.md b/packages/widget-primitives/README.md
+index 2d09039b63e36f..c68603e27f3fc8 100644
+--- a/packages/widget-primitives/README.md
++++ b/packages/widget-primitives/README.md
+@@ -4,9 +4,9 @@
+ This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+ </div>
+ 
+-The host-agnostic toolkit for dashboard widgets: the contract types that define
+-what a widget is, plus the runtime to discover the registered widget types and
+-resolve their render modules.
++The host-agnostic toolkit for widgets: the contract types that define what a
++widget is, plus the runtime to discover widget types and resolve their render
++modules.
+ 
+ ## Installation
+ 
+@@ -43,12 +43,13 @@ With no records, or an empty list, `useWidgetTypes()` returns an empty list.
+ -   `<WidgetRender>`: canonical entry point for any host that mounts a widget.
+     Resolves the widget's render module via a host-provided `resolveWidgetModule`
+     and mounts the resulting component with the standard `attributes` plus
+-    `setAttributes` render contract. Suspense, error handling, and chrome are
+-    host concerns.
++    `setAttributes` render contract. Error handling and chrome are host
++    concerns; because the component is mounted lazily, the host must also
++    wrap it in a `Suspense` boundary.
+ -   `useWidgetTypes( records )` → `[ widgetTypes, isResolvingWidgetTypes ]`:
+     takes host-supplied records (`WidgetModuleRecord[]`, or `null` while
+-    loading), imports each record's metadata, and returns the resolved
+-    `WidgetType[]` plus a flag that is true while they are still resolving.
++    loading) and imports each record's metadata module;
++    `isResolvingWidgetTypes` stays `true` until they resolve.
+ -   Contract types: `WidgetType`, `WidgetName`, `WidgetIcon`,
+     `WidgetRenderProps`, `ResolveWidgetModule`, `WidgetModuleRecord`.
+     `WidgetIcon` is a rendered SVG element; hosts pass it to their icon
+diff --git a/packages/widget-primitives/src/components/widget-render/stories/index.story.tsx b/packages/widget-primitives/src/components/widget-render/stories/index.story.tsx
+index da0a9449ab8ea3..aea35a1caa5d4d 100644
+--- a/packages/widget-primitives/src/components/widget-render/stories/index.story.tsx
++++ b/packages/widget-primitives/src/components/widget-render/stories/index.story.tsx
+@@ -201,7 +201,7 @@ export const Default: StoryObj = {
+ The minimal contract between a host and a widget:
+ 
+ - \`attributes\` flow into the widget as plain data.
+-- The widget writes back through \`setAttributes\`. Here, the "Next world" button updates the \`world\` attribute from inside the widget.
++- The widget writes back through \`setAttributes\`, which the host provides. The "Next world" button calls it from inside the widget, and the host applies the change.
+ 
+ The primitive resolves the render component with \`lazy()\`, so the surrounding \`Suspense\` boundary, and with it the loading UI, is a host decision.
+ `,
+@@ -271,7 +271,7 @@ export const WithSettings: StoryObj = {
+ 		docs: {
+ 			description: {
+ 				story: `
+-A widget type declares its settings as a dataviews \`Field[]\` under \`attributes\`. That single declaration is enough for a host to build a settings UI:
++Where Default lets the widget ask for changes, here the host edits the values itself. A widget type declares its settings as a dataviews \`Field[]\` under \`attributes\`, and that single declaration is enough for a host to build a settings UI:
+ 
+ - The \`DataForm\` on the right is mounted straight from the schema, with no per-widget form wiring.
+ - Validation comes from the same source: the \`greeting\` field is marked as required, and \`useFormValidity\` surfaces the result in the form.
+diff --git a/packages/widget-primitives/src/stories/anatomy.md b/packages/widget-primitives/src/stories/anatomy.md
+new file mode 100644
+index 00000000000000..dca2c4c4ea14aa
+--- /dev/null
++++ b/packages/widget-primitives/src/stories/anatomy.md
+@@ -0,0 +1,62 @@
++# Anatomy of a widget type
++
++<div class="callout callout-alert">
++This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
++</div>
++
++A widget type is the metadata and modules that describe one kind of widget, independent of any place it is rendered. Everything it declares falls into three layers. What separates the layers is how much freedom the host has over each one.
++
++The three layers are what a widget _is_, how it _asks_ to be framed, and what it _shows_. Which layer a property belongs to is what tells the host how to treat it.
++
++![The three layers a widget declares and how the host treats each: identity is copied and shown verbatim, framing is translated, representation is rendered and mounted without interpretation. What separates them is how much freedom the host has.](./assets/three-layers.svg)
++
++## Identity
++
++What the widget is: `name`, `title`, `description`, `icon`, `category`, `keywords`.
++
++The host shows this almost verbatim, in pickers, headers, and help. It decides _where_ identity appears and _whether_ to show it, never _what it says_. Identity is copied, not interpreted: two hosts displaying the same widget show the same title.
++
++## Framing
++
++How the widget asks to sit in the host's frame. Today this layer holds one property, `presentation`.
++
++`presentation` suggests how much chrome the widget wants around it.
++The widget speaks in its own vocabulary ("render me without a frame"); the host decides how to materialize it, including whether to show the identity at all and which parts of it.
++Painting the icon and title into a header is the conventional choice, not the only one: a host could just as well render the title in a footer. Its three values are one axis, from the most chrome to none.
++
++`framed` (the default): the host paints the header from identity and pads the content. Site Health renders inside that frame.
++
++![In framed, the host reads the widget's identity into the chrome header and pads its content. Shown with Site Health.](./assets/presentation-framed.svg)
++
++`content-bleed`: the header stays, but the content fills its area edge to edge, with no padding. Quick Draft uses it.
++
++![In content-bleed, the host still paints the identity header while the widget's content fills its area with no padding. Shown with Quick Draft.](./assets/presentation-content-bleed.svg)
++
++`full-bleed`: no visible header; the widget owns the whole tile. Welcome uses it.
++A host that hides the header still keeps the identity available, so assistive technology can name the tile.
++
++![In full-bleed, the widget owns the tile edge to edge while the host keeps the identity header in a VisuallyHidden node for accessibility. Shown with Welcome.](./assets/presentation-full-bleed.svg)
++
++Framing is the layer the host translates, and the one place where the same declaration can yield different results in different hosts. The dashboard makes these calls; another host could honor the same three values differently.
++
++## Representation
++
++How the widget represents its data: `attributes`, `example`, and the render module.
++
++The `attributes` are the contract between host and widget. The widget owns their shape and meaning; the host owns their values.
++
++A value can change from either side. The widget can ask, when the host grants it `setAttributes` (optional: without it the widget renders read-only). The host can also edit values on its own, mounting a settings form from the `attributes` schema. Both paths write the same instance state.
++
++Either way the host never interprets the values. It mounts the form from the declarative schema, stores and passes the values, and re-renders; the meaning stays the widget's.
++
++![The attributes are a contract both sides write: the render module reads them to produce the output, the widget asks for changes through setAttributes, and the host edits them through a settings form. The meaning stays the widget's.](./assets/representation.svg)
++
++The `WidgetRender` stories show these in motion: Default, where the widget asks; With Settings, where the host edits; and With Host Chrome, where the host frames it.
++
++## Why the split matters
++
++Each layer is consumed by one verb: identity is _copied_, framing is _translated_, representation is _rendered_. Each verb is a boundary of ownership.
++
++A widget does not declare its own header, because the header is host chrome, not something the widget owns. A widget does not declare a width in pixels, because pixels belong to the host's translation of framing, not to the framing itself. Both questions look like they concern the widget, but each is answered by what the host owns: the header, and the pixel translation of framing.
++
++The same separation is what makes a widget portable. Only the framing layer is re-translated when the host changes; identity and representation are consumed the same way everywhere. A host is free to render a widget in a context its author never anticipated, as long as it honors the three layers for what they are.
+diff --git a/packages/widget-primitives/src/stories/anatomy.mdx b/packages/widget-primitives/src/stories/anatomy.mdx
+new file mode 100644
+index 00000000000000..468055f3914995
+--- /dev/null
++++ b/packages/widget-primitives/src/stories/anatomy.mdx
+@@ -0,0 +1,23 @@
++import { Meta, Markdown } from '@storybook/addon-docs/blocks';
++import AnatomyDoc from './anatomy.md?raw';
++import threeLayers from './assets/three-layers.svg';
++import presentationFramed from './assets/presentation-framed.svg';
++import presentationContentBleed from './assets/presentation-content-bleed.svg';
++import presentationFullBleed from './assets/presentation-full-bleed.svg';
++import representation from './assets/representation.svg';
++
++<Meta title="Widget Primitives/Anatomy" />
++
++<Markdown>
++	{ AnatomyDoc.replace( './assets/three-layers.svg', threeLayers )
++		.replace( './assets/presentation-framed.svg', presentationFramed )
++		.replace(
++			'./assets/presentation-content-bleed.svg',
++			presentationContentBleed
++		)
++		.replace(
++			'./assets/presentation-full-bleed.svg',
++			presentationFullBleed
++		)
++		.replace( './assets/representation.svg', representation ) }
++</Markdown>
+diff --git a/packages/widget-primitives/src/stories/assets/presentation-content-bleed.svg b/packages/widget-primitives/src/stories/assets/presentation-content-bleed.svg
+new file mode 100644
+index 00000000000000..0a8e6292bf15d5
+--- /dev/null
++++ b/packages/widget-primitives/src/stories/assets/presentation-content-bleed.svg
+@@ -0,0 +1,48 @@
++<svg viewBox="0 0 760 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="In content-bleed presentation, the host still paints the identity header, but the widget's content fills its area edge to edge with no padding. Shown with the Quick Draft widget.">
++  <defs>
++    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
++      <path d="M 0 1 L 8 5 L 0 9 z" fill="#94a3b8"/>
++    </marker>
++    <clipPath id="cbTileClip">
++      <rect x="308" y="86" width="372" height="210" rx="10"/>
++    </clipPath>
++  </defs>
++
++  <rect x="6" y="6" width="748" height="348" rx="12" fill="#ffffff"/>
++
++  <text x="380" y="42" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="12.5" font-weight="700" fill="#334155">In content-bleed, the header stays, but content fills its area edge to edge.</text>
++
++  <!-- Identity -->
++  <rect x="40" y="116" width="172" height="128" rx="10" fill="#e2ecfd" stroke="#2f54a5" stroke-width="1.5"/>
++  <text x="60" y="144" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="700" fill="#1e3a8a">Identity</text>
++  <text x="60" y="162" font-family="-apple-system, system-ui, sans-serif" font-size="10.5" fill="#2f54a5" opacity="0.8">metadata</text>
++  <rect x="60" y="176" width="18" height="18" rx="4" fill="#2f54a5"/>
++  <text x="86" y="190" font-family="ui-monospace, SFMono-Regular, monospace" font-size="11.5" fill="#2f54a5">icon</text>
++  <text x="60" y="220" font-family="ui-monospace, SFMono-Regular, monospace" font-size="11.5" fill="#2f54a5">title: Quick Draft</text>
++
++  <line x1="212" y1="150" x2="300" y2="150" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
++  <text x="256" y="140" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#94a3b8">host reads</text>
++
++  <!-- Tile -->
++  <rect x="308" y="86" width="372" height="210" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
++
++  <!-- chrome header (still present) -->
++  <rect x="310" y="88" width="368" height="48" rx="8" fill="#f1f5f9"/>
++  <line x1="308" y1="137" x2="680" y2="137" stroke="#e2e8f0" stroke-width="1"/>
++  <rect x="328" y="100" width="24" height="24" rx="5" fill="#2f54a5"/>
++  <text x="364" y="117" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" fill="#334155">Quick Draft</text>
++
++  <!-- content, flush to the content-area edges (no host padding) -->
++  <g clip-path="url(#cbTileClip)">
++    <rect x="308" y="138" width="372" height="158" fill="#f8fafc"/>
++    <line x1="308" y1="138" x2="680" y2="138" stroke="#e2e8f0" stroke-width="1"/>
++    <line x1="324" y1="164" x2="664" y2="164" stroke="#cbd5e1" stroke-width="1.5"/>
++    <line x1="324" y1="186" x2="664" y2="186" stroke="#cbd5e1" stroke-width="1.5"/>
++    <line x1="324" y1="208" x2="600" y2="208" stroke="#cbd5e1" stroke-width="1.5"/>
++    <rect x="308" y="258" width="372" height="38" fill="#eef2fb"/>
++    <text x="324" y="282" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="600" fill="#2f54a5">Save Draft</text>
++  </g>
++  <text x="664" y="252" text-anchor="end" font-family="-apple-system, system-ui, sans-serif" font-size="9.5" font-style="italic" fill="#94a3b8">no padding</text>
++
++  <text x="494" y="322" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="12.5" font-weight="700" fill="#1d6b5a">presentation: content-bleed</text>
++</svg>
+diff --git a/packages/widget-primitives/src/stories/assets/presentation-framed.svg b/packages/widget-primitives/src/stories/assets/presentation-framed.svg
+new file mode 100644
+index 00000000000000..63a95e6bce98a5
+--- /dev/null
++++ b/packages/widget-primitives/src/stories/assets/presentation-framed.svg
+@@ -0,0 +1,42 @@
++<svg viewBox="0 0 760 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="In framed presentation, the host reads the widget's identity into the chrome header and renders the widget's content with padding inside the frame. Shown with the Site Health widget.">
++  <defs>
++    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
++      <path d="M 0 1 L 8 5 L 0 9 z" fill="#94a3b8"/>
++    </marker>
++  </defs>
++
++  <rect x="6" y="6" width="748" height="348" rx="12" fill="#ffffff"/>
++
++  <text x="380" y="42" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="12.5" font-weight="700" fill="#334155">In framed, the host paints identity into the header and pads the content.</text>
++
++  <!-- Identity -->
++  <rect x="40" y="116" width="172" height="128" rx="10" fill="#e2ecfd" stroke="#2f54a5" stroke-width="1.5"/>
++  <text x="60" y="144" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="700" fill="#1e3a8a">Identity</text>
++  <text x="60" y="162" font-family="-apple-system, system-ui, sans-serif" font-size="10.5" fill="#2f54a5" opacity="0.8">metadata</text>
++  <rect x="60" y="176" width="18" height="18" rx="4" fill="#2f54a5"/>
++  <text x="86" y="190" font-family="ui-monospace, SFMono-Regular, monospace" font-size="11.5" fill="#2f54a5">icon</text>
++  <text x="60" y="220" font-family="ui-monospace, SFMono-Regular, monospace" font-size="11.5" fill="#2f54a5">title: Site Health</text>
++
++  <line x1="212" y1="150" x2="300" y2="150" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
++  <text x="256" y="140" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#94a3b8">host reads</text>
++
++  <!-- Tile -->
++  <rect x="308" y="86" width="372" height="210" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
++
++  <!-- chrome header -->
++  <rect x="310" y="88" width="368" height="48" rx="8" fill="#f1f5f9"/>
++  <line x1="308" y1="137" x2="680" y2="137" stroke="#e2e8f0" stroke-width="1"/>
++  <rect x="328" y="100" width="24" height="24" rx="5" fill="#2f54a5"/>
++  <text x="364" y="117" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" fill="#334155">Site Health</text>
++
++  <!-- content, padded (margins visible on all sides) -->
++  <circle cx="350" cy="174" r="7" fill="#2b8d79"/>
++  <text x="366" y="179" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="700" fill="#1d6b5a">Good</text>
++  <rect x="344" y="200" width="12" height="12" rx="3" fill="#e2e8f0"/>
++  <line x1="366" y1="206" x2="556" y2="206" stroke="#cbd5e1" stroke-width="1.5"/>
++  <rect x="344" y="222" width="12" height="12" rx="3" fill="#e2e8f0"/>
++  <line x1="366" y1="228" x2="512" y2="228" stroke="#cbd5e1" stroke-width="1.5"/>
++  <text x="638" y="270" text-anchor="end" font-family="-apple-system, system-ui, sans-serif" font-size="9.5" font-style="italic" fill="#94a3b8">content, padded</text>
++
++  <text x="494" y="322" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="12.5" font-weight="700" fill="#1d6b5a">presentation: framed</text>
++</svg>
+diff --git a/packages/widget-primitives/src/stories/assets/presentation-full-bleed.svg b/packages/widget-primitives/src/stories/assets/presentation-full-bleed.svg
+new file mode 100644
+index 00000000000000..174a3e7343df1f
+--- /dev/null
++++ b/packages/widget-primitives/src/stories/assets/presentation-full-bleed.svg
+@@ -0,0 +1,49 @@
++<svg viewBox="0 0 760 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="In full-bleed presentation, the widget owns the whole tile edge to edge, and the host keeps its identity header in a VisuallyHidden node for accessibility instead of painting it.">
++  <defs>
++    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
++      <path d="M 0 1 L 8 5 L 0 9 z" fill="#94a3b8"/>
++    </marker>
++    <clipPath id="tileClip">
++      <rect x="308" y="86" width="372" height="210" rx="10"/>
++    </clipPath>
++    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
++      <stop offset="0" stop-color="#eef4ff"/>
++      <stop offset="1" stop-color="#e3edfb"/>
++    </linearGradient>
++  </defs>
++
++  <rect x="6" y="6" width="748" height="348" rx="12" fill="#ffffff"/>
++
++  <!-- Caption -->
++  <text x="380" y="42" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="12.5" font-weight="700" fill="#334155">In full-bleed, the widget owns the tile; identity stays hidden, kept for a11y.</text>
++
++  <!-- Identity: the same metadata -->
++  <rect x="40" y="116" width="172" height="128" rx="10" fill="#e2ecfd" stroke="#2f54a5" stroke-width="1.5"/>
++  <text x="60" y="144" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="700" fill="#1e3a8a">Identity</text>
++  <text x="60" y="162" font-family="-apple-system, system-ui, sans-serif" font-size="10.5" fill="#2f54a5" opacity="0.8">metadata</text>
++  <rect x="60" y="176" width="18" height="18" rx="4" fill="#2f54a5"/>
++  <text x="86" y="190" font-family="ui-monospace, SFMono-Regular, monospace" font-size="11.5" fill="#2f54a5">icon</text>
++  <text x="60" y="220" font-family="ui-monospace, SFMono-Regular, monospace" font-size="11.5" fill="#2f54a5">title: Welcome</text>
++
++  <!-- host reads (same read, different outcome) -->
++  <line x1="212" y1="150" x2="300" y2="150" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
++  <text x="256" y="140" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#94a3b8">host reads</text>
++
++  <!-- The tile, full-bleed: the widget owns it edge to edge -->
++  <g clip-path="url(#tileClip)">
++    <rect x="308" y="86" width="372" height="210" fill="url(#sky)"/>
++    <circle cx="602" cy="152" r="46" fill="#c3d9f5" opacity="0.7"/>
++    <path d="M308 296 L308 252 Q 430 216 560 246 Q 642 264 680 240 L680 296 Z" fill="#d7f0ea"/>
++    <path d="M308 296 L308 274 Q 452 246 592 270 Q 652 280 680 266 L680 296 Z" fill="#bfe3d8"/>
++  </g>
++  <rect x="308" y="86" width="372" height="210" rx="10" fill="none" stroke="#cbd5e1" stroke-width="1.5"/>
++
++  <!-- The header the host did NOT paint, kept in a VisuallyHidden node -->
++  <rect x="320" y="98" width="190" height="46" rx="8" fill="#ffffff" fill-opacity="0.82" stroke="#94a3b8" stroke-width="1.3" stroke-dasharray="5 4"/>
++  <rect x="332" y="108" width="16" height="16" rx="4" fill="none" stroke="#94a3b8" stroke-width="1.3"/>
++  <text x="356" y="120" font-family="-apple-system, system-ui, sans-serif" font-size="11" font-weight="600" fill="#475569">icon + Welcome</text>
++  <text x="332" y="136" font-family="-apple-system, system-ui, sans-serif" font-size="9.5" font-style="italic" fill="#94a3b8">VisuallyHidden · a11y</text>
++
++  <!-- value -->
++  <text x="494" y="322" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="12.5" font-weight="700" fill="#1d6b5a">presentation: full-bleed</text>
++</svg>
+diff --git a/packages/widget-primitives/src/stories/assets/representation.svg b/packages/widget-primitives/src/stories/assets/representation.svg
+new file mode 100644
+index 00000000000000..b725ce853b6c99
+--- /dev/null
++++ b/packages/widget-primitives/src/stories/assets/representation.svg
+@@ -0,0 +1,43 @@
++<svg viewBox="0 0 760 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The attributes are a contract both sides write. The render module reads them to produce the widget output; the widget asks for changes through setAttributes, and the host edits them through a settings form built from the schema. Only the widget gives the values meaning.">
++  <defs>
++    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
++      <path d="M 0 1 L 8 5 L 0 9 z" fill="#94a3b8"/>
++    </marker>
++  </defs>
++
++  <rect x="6" y="6" width="748" height="288" rx="12" fill="#ffffff"/>
++
++  <!-- Caption -->
++  <text x="380" y="38" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="12.5" font-weight="700" fill="#334155">Both sides write the attributes; only the widget gives them meaning.</text>
++
++  <!-- Host settings form (a write source) -->
++  <rect x="44" y="112" width="156" height="76" rx="9" fill="#fafbfc" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 5"/>
++  <text x="122" y="130" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="10.5" fill="#64748b">host settings form</text>
++  <rect x="60" y="140" width="124" height="14" rx="3" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.2"/>
++  <rect x="60" y="162" width="124" height="14" rx="3" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.2"/>
++
++  <!-- Attributes: the contract -->
++  <rect x="300" y="120" width="160" height="64" rx="9" fill="#fff3d0" stroke="#b07020" stroke-width="1.5"/>
++  <text x="380" y="148" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="13.5" font-weight="700" fill="#855317">attributes</text>
++  <text x="380" y="166" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#855317" opacity="0.8">the contract</text>
++
++  <!-- Widget output (read destination, and a write source via its control) -->
++  <rect x="566" y="104" width="152" height="92" rx="9" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
++  <rect x="584" y="120" width="18" height="18" rx="4" fill="#2f54a5"/>
++  <line x1="612" y1="125" x2="700" y2="125" stroke="#cbd5e1" stroke-width="1.5"/>
++  <line x1="612" y1="135" x2="678" y2="135" stroke="#cbd5e1" stroke-width="1.5"/>
++  <rect x="584" y="156" width="74" height="22" rx="5" fill="#eef2fb" stroke="#2f54a5" stroke-width="1.2"/>
++  <text x="621" y="171" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="9.5" fill="#2f54a5">control</text>
++
++  <!-- READ: render module reads attributes into the output -->
++  <line x1="460" y1="140" x2="562" y2="140" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
++  <text x="511" y="131" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#94a3b8">render module</text>
++
++  <!-- WRITE (host): the settings form edits the values -->
++  <line x1="200" y1="150" x2="296" y2="150" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
++  <text x="248" y="141" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#94a3b8">host edits</text>
++
++  <!-- WRITE (widget): the control calls setAttributes, looping back -->
++  <path d="M 621 178 L 621 252 L 380 252 L 380 188" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
++  <text x="500" y="244" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#94a3b8">setAttributes · the widget asks</text>
++</svg>
+diff --git a/packages/widget-primitives/src/stories/assets/three-layers.svg b/packages/widget-primitives/src/stories/assets/three-layers.svg
+new file mode 100644
+index 00000000000000..94f3f377f40198
+--- /dev/null
++++ b/packages/widget-primitives/src/stories/assets/three-layers.svg
+@@ -0,0 +1,43 @@
++<svg viewBox="0 0 860 330" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The three layers a widget declares and how the host treats each: identity is copied and shown verbatim, framing is translated and materialized the host's own way, representation is rendered and mounted without interpretation.">
++  <defs>
++    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
++      <path d="M 0 1 L 8 5 L 0 9 z" fill="#94a3b8"/>
++    </marker>
++  </defs>
++
++  <rect x="6" y="6" width="848" height="318" rx="12" fill="#ffffff"/>
++
++  <!-- Column headers -->
++  <text x="196" y="40" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="11.5" font-weight="700" fill="#64748b">the widget declares</text>
++  <text x="688" y="40" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="11.5" font-weight="700" fill="#64748b">the host</text>
++
++  <!-- Row 1: Identity -->
++  <rect x="44" y="58" width="304" height="74" rx="9" fill="#e2ecfd" stroke="#2f54a5" stroke-width="1.5"/>
++  <text x="64" y="88" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" fill="#1e3a8a">Identity</text>
++  <text x="64" y="111" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10.5" fill="#2f54a5">name · title · icon · category</text>
++  <line x1="352" y1="95" x2="556" y2="95" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
++  <text x="454" y="86" text-anchor="middle" font-family="ui-monospace, monospace" font-size="12.5" font-weight="700" fill="#1e3a8a">copied</text>
++  <rect x="560" y="58" width="256" height="74" rx="9" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.4"/>
++  <text x="578" y="90" font-family="-apple-system, system-ui, sans-serif" font-size="12" fill="#475569">shows it verbatim</text>
++  <text x="578" y="110" font-family="-apple-system, system-ui, sans-serif" font-size="10.5" fill="#94a3b8">decides where, not what</text>
++
++  <!-- Row 2: Framing -->
++  <rect x="44" y="144" width="304" height="74" rx="9" fill="#d7f0ea" stroke="#1d6b5a" stroke-width="1.5"/>
++  <text x="64" y="174" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" fill="#1d6b5a">Framing</text>
++  <text x="64" y="197" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10.5" fill="#1d6b5a">presentation</text>
++  <line x1="352" y1="181" x2="556" y2="181" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
++  <text x="454" y="172" text-anchor="middle" font-family="ui-monospace, monospace" font-size="12.5" font-weight="700" fill="#1d6b5a">translated</text>
++  <rect x="560" y="144" width="256" height="74" rx="9" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.4"/>
++  <text x="578" y="176" font-family="-apple-system, system-ui, sans-serif" font-size="12" fill="#475569">materializes it its own way</text>
++  <text x="578" y="196" font-family="-apple-system, system-ui, sans-serif" font-size="10.5" fill="#94a3b8">honor, map, or ignore</text>
++
++  <!-- Row 3: Representation -->
++  <rect x="44" y="230" width="304" height="74" rx="9" fill="#fff3d0" stroke="#b07020" stroke-width="1.5"/>
++  <text x="64" y="260" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" fill="#855317">Representation</text>
++  <text x="64" y="283" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10.5" fill="#855317">attributes · example · render</text>
++  <line x1="352" y1="267" x2="556" y2="267" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
++  <text x="454" y="258" text-anchor="middle" font-family="ui-monospace, monospace" font-size="12.5" font-weight="700" fill="#855317">rendered</text>
++  <rect x="560" y="230" width="256" height="74" rx="9" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.4"/>
++  <text x="578" y="262" font-family="-apple-system, system-ui, sans-serif" font-size="12" fill="#475569">mounts it, no interpretation</text>
++  <text x="578" y="282" font-family="-apple-system, system-ui, sans-serif" font-size="10.5" fill="#94a3b8">provides the container</text>
++</svg>
+diff --git a/packages/widget-primitives/src/stories/introduction.md b/packages/widget-primitives/src/stories/introduction.md
+new file mode 100644
+index 00000000000000..22b032929dc452
+--- /dev/null
++++ b/packages/widget-primitives/src/stories/introduction.md
+@@ -0,0 +1,21 @@
++# Widget Primitives
++
++<div class="callout callout-alert">
++This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
++</div>
++
++The host-agnostic toolkit for widgets. It is the single source of truth for what a widget _is_ on the client: the contract that widget authors write against and that every host renders. Nothing host-specific sits in between.
++
++A _host_ is any context that renders widgets: a dashboard, a sidebar, a plugin panel, an application outside wp-admin. The package privileges none of them. It defines the contract and provides the runtime that turns host records into rendered widgets.
++
++## What it exposes
++
++**Contract types** describe what a widget is: `WidgetType`, `WidgetName`, `WidgetIcon`, `WidgetRenderProps`, `ResolveWidgetModule`, `WidgetModuleRecord`. They are the shapes a host reads to discover and render a widget, defined here and re-exported nowhere else. How a widget is authored (its folder, `widget.json`, `widget.ts`, `render.tsx`) is covered by **System Architecture**.
++
++**Discovery** is `useWidgetTypes( records )`. It takes host-supplied widget-module records, imports each record's metadata module, and returns a `[ WidgetType[], isResolving ]` tuple, where `isResolving` is `true` while the records are still being imported. The hook reaches for no store or endpoint: the host fetches the records however it wants and passes them in.
++
++**Rendering** is `<WidgetRender />`. It resolves a `WidgetType.renderModule` through a host-provided `ResolveWidgetModule` and mounts the component with the `attributes` / `setAttributes` contract. Error handling and chrome stay with the host, and because the module is mounted lazily, the host must wrap it in a Suspense boundary.
++
++## What it does not do
++
++No chrome, no layout, no persistence, no data store of its own, no knowledge of any host. Those are host concerns. Keeping them out is what makes the package publishable and consumable outside the WordPress admin.
+diff --git a/packages/widget-primitives/src/stories/introduction.mdx b/packages/widget-primitives/src/stories/introduction.mdx
+index 02bbfe2cf44f38..d8a20bb72b9d12 100644
+--- a/packages/widget-primitives/src/stories/introduction.mdx
++++ b/packages/widget-primitives/src/stories/introduction.mdx
+@@ -1,14 +1,6 @@
+ import { Meta, Markdown } from '@storybook/addon-docs/blocks';
+-import ArchitectureDoc from '../../../../docs/explanations/architecture/dashboard-widgets.md?raw';
+-import pipelineDiagram from '../../../../docs/explanations/architecture/assets/dashboard-widgets-pipeline.svg';
+-
+-{/* Use the locally served diagram so Storybook renders it offline. */}
++import IntroductionDoc from './introduction.md?raw';
+ 
+ <Meta title="Widget Primitives/Introduction" />
+ 
+-<Markdown>
+-	{ ArchitectureDoc.replace(
+-		'https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/explanations/architecture/assets/dashboard-widgets-pipeline.svg',
+-		pipelineDiagram
+-	) }
+-</Markdown>
++<Markdown>{ IntroductionDoc }</Markdown>
+diff --git a/packages/widget-primitives/src/stories/system-architecture.mdx b/packages/widget-primitives/src/stories/system-architecture.mdx
+new file mode 100644
+index 00000000000000..783d1e48f28f43
+--- /dev/null
++++ b/packages/widget-primitives/src/stories/system-architecture.mdx
+@@ -0,0 +1,14 @@
++import { Meta, Markdown } from '@storybook/addon-docs/blocks';
++import ArchitectureDoc from '../../../../docs/explanations/architecture/dashboard-widgets.md?raw';
++import pipelineDiagram from '../../../../docs/explanations/architecture/assets/dashboard-widgets-pipeline.svg';
++
++{/* Use the locally served diagram so Storybook renders it offline. */}
++
++<Meta title="Widget Primitives/System Architecture" />
++
++<Markdown>
++	{ ArchitectureDoc.replace(
++		'https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/explanations/architecture/assets/dashboard-widgets-pipeline.svg',
++		pipelineDiagram
++	) }
++</Markdown>
+diff --git a/phpunit/experimental/class-wp-rest-comments-controller-gutenberg-test.php b/phpunit/experimental/class-wp-rest-comments-controller-gutenberg-test.php
+index 02d2ea8ed39a56..8863ad73229739 100644
+--- a/phpunit/experimental/class-wp-rest-comments-controller-gutenberg-test.php
++++ b/phpunit/experimental/class-wp-rest-comments-controller-gutenberg-test.php
+@@ -1,6 +1,27 @@
+ <?php
+ /**
+- * Unit tests covering WP_Test_REST_Comments_Controller_Gutenberg functionality.
++ * Tests for the Gutenberg REST comment controller subclass that backs block
++ * notes and suggestions.
++ *
++ * Coverage areas:
++ *   - **Permissions**: that post editors can create/read/update note comments
++ *     under the `edit_post` shortcut; that suggestion-lifecycle updates
++ *     (`status`, `meta._wp_suggestion_status`) are accepted while attempts
++ *     to rewrite content/author/date fall back to the core `edit_comment`
++ *     check; that contributors and subscribers are gated as expected.
++ *   - **Suggestion meta round-trip**: that `_wp_suggestion` and
++ *     `_wp_suggestion_status` survive create + read + update, and that the
++ *     payload-size cap (`GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES`) is
++ *     enforced with a 413 before the meta sanitize_callback can silently
++ *     truncate the JSON.
++ *   - **Note vs. regular comment divergence**: that `note`-typed comments
++ *     follow the new permission model while plain `comment`-type traffic
++ *     stays on core's defaults.
++ *   - **Meta registration setup**: every test re-registers
++ *     `gutenberg_register_block_comment_metadata()` because
++ *     `WP_UnitTestCase_Base` wipes `$wp_meta_keys` between tests; without
++ *     this hook REST sees `_wp_suggestion` as unregistered and silently
++ *     no-ops on writes, masking real failures.
+  *
+  * @package Gutenberg
+  */
+@@ -58,6 +79,20 @@ public static function wpTearDownAfterClass() {
+ 		self::delete_user( self::$author_id );
+ 	}
+ 
++	/**
++	 * Re-register the note/suggestion comment meta before each test.
++	 *
++	 * `WP_UnitTestCase_Base::tear_down()` wipes the global `$wp_meta_keys`
++	 * registry between tests, but `gutenberg_register_block_comment_metadata`
++	 * only fires once on `init`. Without this hook, REST writes to
++	 * `_wp_suggestion` (and friends) silently no-op for any test after the
++	 * first because the meta isn't recognized as a registered REST field.
++	 */
++	public function set_up() {
++		parent::set_up();
++		gutenberg_register_block_comment_metadata();
++	}
++
+ 	/**
+ 	 * Create a test post with note.
+ 	 *
+@@ -455,4 +490,395 @@ public function data_note_status_provider() {
+ 			'reopen'   => array( 'reopen' ),
+ 		);
+ 	}
++
++	/**
++	 * Test that a suggestion payload can be stored and retrieved via meta.
++	 */
++	public function test_create_note_with_suggestion_meta() {
++		wp_set_current_user( self::$editor_id );
++		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
++
++		$payload = wp_json_encode(
++			array(
++				'schemaVersion' => 1,
++				'blockName'     => 'core/paragraph',
++				'baseRevision'  => '2026-04-15T00:00:00',
++				'operations'    => array(
++					array(
++						'type'      => 'attribute-set',
++						'attribute' => 'content',
++						'before'    => 'Hello',
++						'after'     => 'Hello world',
++					),
++				),
++			)
++		);
++
++		$params = array(
++			'post'    => $post_id,
++			'content' => '',
++			'type'    => 'note',
++			'author'  => self::$editor_id,
++			'meta'    => array(
++				'_wp_suggestion' => $payload,
++			),
++		);
++
++		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
++		$request->add_header( 'Content-Type', 'application/json' );
++		$request->set_body( wp_json_encode( $params ) );
++
++		$response = rest_get_server()->dispatch( $request );
++		$this->assertSame( 201, $response->get_status() );
++
++		$data       = $response->get_data();
++		$comment_id = $data['id'] ?? null;
++		$this->assertIsInt( $comment_id );
++
++		// Bypass REST schema variability across WP versions and check the
++		// stored meta directly. The sanitize_callback is in scope of this
++		// test; the REST layer assembles schemas at runtime in a way that
++		// isn't always available in the experimental phpunit harness.
++		$stored = get_comment_meta( $comment_id, '_wp_suggestion', true );
++		$this->assertNotEmpty( $stored, 'Suggestion meta should round-trip into storage.' );
++		$decoded = json_decode( $stored, true );
++		$this->assertSame( 'core/paragraph', $decoded['blockName'] ?? null );
++		$this->assertSame( 1, $decoded['schemaVersion'] ?? null );
++		$this->assertCount( 1, $decoded['operations'] ?? array() );
++	}
++
++	/**
++	 * Test that an editor can update a note they did not author (edit_post check).
++	 */
++	public function test_editor_can_update_note_on_own_post() {
++		wp_set_current_user( self::$admin_id );
++		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
++
++		// Admin creates a note on editor's post.
++		$comment_id = self::factory()->comment->create(
++			array(
++				'comment_post_ID'  => $post_id,
++				'comment_type'     => 'note',
++				'comment_approved' => 1,
++				'user_id'          => self::$admin_id,
++				'comment_content'  => 'suggestion note',
++			)
++		);
++
++		// Editor (post author) updates the note they did not author.
++		wp_set_current_user( self::$editor_id );
++
++		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $comment_id );
++		$request->add_header( 'Content-Type', 'application/json' );
++		$request->set_body(
++			wp_json_encode(
++				array(
++					'status' => 'approved',
++					'meta'   => array(
++						'_wp_suggestion_status' => 'applied',
++					),
++				)
++			)
++		);
++
++		$response = rest_get_server()->dispatch( $request );
++		// The suggestion-lifecycle override passed because the editor owns
++		// the parent post; the update succeeds with a 200 status.
++		$this->assertSame( 200, $response->get_status() );
++	}
++
++	/**
++	 * Test that a subscriber cannot update a note on someone else's post.
++	 */
++	public function test_subscriber_cannot_update_note() {
++		wp_set_current_user( self::$editor_id );
++		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
++
++		$comment_id = self::factory()->comment->create(
++			array(
++				'comment_post_ID' => $post_id,
++				'comment_type'    => 'note',
++				'user_id'         => self::$editor_id,
++				'comment_content' => 'a suggestion',
++			)
++		);
++
++		// Subscriber tries to update the note.
++		wp_set_current_user( self::$subscriber_id );
++
++		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $comment_id );
++		$request->add_header( 'Content-Type', 'application/json' );
++		$request->set_body(
++			wp_json_encode(
++				array(
++					'meta' => array(
++						'_wp_suggestion_status' => 'rejected',
++					),
++				)
++			)
++		);
++
++		$response = rest_get_server()->dispatch( $request );
++		$this->assertErrorResponse( 'rest_cannot_edit', $response, 403 );
++	}
++
++	/**
++	 * Test that _wp_suggestion_status does not persist invalid enum values.
++	 */
++	public function test_suggestion_status_ignores_invalid_value() {
++		wp_set_current_user( self::$editor_id );
++		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
++
++		$comment_id = self::factory()->comment->create(
++			array(
++				'comment_post_ID'  => $post_id,
++				'comment_type'     => 'note',
++				'comment_approved' => 1,
++				'user_id'          => self::$editor_id,
++			)
++		);
++
++		// First set a valid value.
++		update_comment_meta( $comment_id, '_wp_suggestion_status', 'pending' );
++
++		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $comment_id );
++		$request->add_header( 'Content-Type', 'application/json' );
++		$request->set_body(
++			wp_json_encode(
++				array(
++					'meta' => array(
++						'_wp_suggestion_status' => 'invalid_value',
++					),
++				)
++			)
++		);
++
++		rest_get_server()->dispatch( $request );
++		// Even if the request succeeds, the invalid value should not
++		// overwrite the existing valid value.
++		$stored = get_comment_meta( $comment_id, '_wp_suggestion_status', true );
++		$this->assertSame( 'pending', $stored );
++	}
++
++	/**
++	 * Test that a subscriber cannot apply a suggestion even if the request
++	 * only touches the suggestion-lifecycle fields.
++	 */
++	public function test_subscriber_cannot_apply_suggestion() {
++		wp_set_current_user( self::$editor_id );
++		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
++
++		$comment_id = self::factory()->comment->create(
++			array(
++				'comment_post_ID'  => $post_id,
++				'comment_type'     => 'note',
++				'comment_approved' => 1,
++				'user_id'          => self::$editor_id,
++				'comment_content'  => '',
++			)
++		);
++
++		wp_set_current_user( self::$subscriber_id );
++
++		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $comment_id );
++		$request->add_header( 'Content-Type', 'application/json' );
++		$request->set_body(
++			wp_json_encode(
++				array(
++					'status' => 'approved',
++					'meta'   => array(
++						'_wp_suggestion_status' => 'applied',
++					),
++				)
++			)
++		);
++
++		$response = rest_get_server()->dispatch( $request );
++		$this->assertErrorResponse( 'rest_cannot_edit', $response, 403 );
++	}
++
++	/**
++	 * Test that creating a note with an oversized suggestion payload is
++	 * rejected with a clear 413 error rather than silently truncated.
++	 */
++	public function test_create_rejects_oversized_suggestion_payload() {
++		wp_set_current_user( self::$editor_id );
++		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
++
++		$oversized = str_repeat( 'a', GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES + 1 );
++
++		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
++		$request->add_header( 'Content-Type', 'application/json' );
++		$request->set_body(
++			wp_json_encode(
++				array(
++					'post'    => $post_id,
++					'content' => '',
++					'type'    => 'note',
++					'meta'    => array(
++						'_wp_suggestion' => $oversized,
++					),
++				)
++			)
++		);
++
++		$response = rest_get_server()->dispatch( $request );
++		$this->assertErrorResponse( 'rest_suggestion_too_large', $response, 413 );
++	}
++
++	/**
++	 * Test that updating a note with an oversized suggestion payload is
++	 * rejected with a clear 413 error.
++	 */
++	public function test_update_rejects_oversized_suggestion_payload() {
++		wp_set_current_user( self::$editor_id );
++		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
++
++		$comment_id = self::factory()->comment->create(
++			array(
++				'comment_post_ID'  => $post_id,
++				'comment_type'     => 'note',
++				'comment_approved' => 1,
++				'user_id'          => self::$editor_id,
++				'comment_content'  => 'a suggestion',
++			)
++		);
++
++		$oversized = str_repeat( 'a', GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES + 1 );
++
++		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $comment_id );
++		$request->add_header( 'Content-Type', 'application/json' );
++		$request->set_body(
++			wp_json_encode(
++				array(
++					'meta' => array(
++						'_wp_suggestion' => $oversized,
++					),
++				)
++			)
++		);
++
++		$response = rest_get_server()->dispatch( $request );
++		$this->assertErrorResponse( 'rest_suggestion_too_large', $response, 413 );
++	}
++
++	/**
++	 * Test that the sanitize_callback rejects rather than truncates an
++	 * oversized payload reaching the meta layer through a non-REST path.
++	 * Truncating mid-string would corrupt the JSON.
++	 */
++	public function test_sanitize_callback_rejects_oversized_value() {
++		$post_id    = self::factory()->post->create();
++		$comment_id = self::factory()->comment->create(
++			array(
++				'comment_post_ID' => $post_id,
++				'comment_type'    => 'note',
++			)
++		);
++
++		$oversized = str_repeat( 'a', GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES + 1 );
++		update_comment_meta( $comment_id, '_wp_suggestion', $oversized );
++
++		$stored = get_comment_meta( $comment_id, '_wp_suggestion', true );
++		$this->assertSame( '', $stored, 'Oversized payload should be rejected, not truncated.' );
++	}
++
++	/**
++	 * Test that `is_suggestion_lifecycle_update` correctly rejects
++	 * request bodies that touch fields outside the suggestion-lifecycle
++	 * allowlist. We assert against the private helper via a request
++	 * probe rather than through the full REST dispatch because actual
++	 * permission behavior for `edit_comment` on a foreign note on a
++	 * post the current user authored is governed by core's
++	 * `map_meta_cap` for `edit_comment` (which delegates to `edit_post`
++	 * on the comment's parent post) — outside the scope of this override.
++	 */
++	public function test_lifecycle_update_rejects_non_allowlisted_fields() {
++		$cases = array(
++			'content field blocks shortcut'        => array(
++				'body'     => array(
++					'status'  => 'approved',
++					'content' => 'rewritten',
++				),
++				'expected' => false,
++			),
++			'only id/status/meta passes shortcut'  => array(
++				'body'     => array(
++					'status' => 'approved',
++					'meta'   => array(
++						'_wp_suggestion_status' => 'applied',
++					),
++				),
++				'expected' => true,
++			),
++			'non-approved status blocks shortcut'  => array(
++				'body'     => array(
++					'status' => 'spam',
++				),
++				'expected' => false,
++			),
++			'non-allowlisted meta blocks shortcut' => array(
++				'body'     => array(
++					'meta' => array(
++						'_wp_note_status' => 'resolved',
++					),
++				),
++				'expected' => false,
++			),
++		);
++
++		foreach ( $cases as $label => $case ) {
++			$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/1' );
++			$request->add_header( 'Content-Type', 'application/json' );
++			$request->set_body( wp_json_encode( $case['body'] ) );
++
++			$reflection = new ReflectionMethod(
++				'Gutenberg_REST_Comment_Suggestions_Controller',
++				'is_suggestion_lifecycle_update'
++			);
++			// PHP < 8.1 requires explicit accessibility to invoke a private
++			// method; from 8.1 it is automatic and setAccessible() is a no-op
++			// that 8.5 deprecates, so only call it on older versions.
++			if ( PHP_VERSION_ID < 80100 ) {
++				$reflection->setAccessible( true );
++			}
++
++			$this->assertSame(
++				$case['expected'],
++				$reflection->invoke( null, $request ),
++				"Lifecycle shortcut expectation mismatched for: {$label}"
++			);
++		}
++	}
++
++	/**
++	 * Test that the lifecycle helper also accepts form-encoded request
++	 * bodies, not only JSON. Custom integrations may issue updates with
++	 * `application/x-www-form-urlencoded` and should benefit from the
++	 * same `edit_post` shortcut as the JSON path.
++	 */
++	public function test_lifecycle_update_accepts_form_encoded_bodies() {
++		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/1' );
++		$request->add_header( 'Content-Type', 'application/x-www-form-urlencoded' );
++		$request->set_body_params(
++			array(
++				'status' => 'approved',
++				'meta'   => array(
++					'_wp_suggestion_status' => 'applied',
++				),
++			)
++		);
++
++		$reflection = new ReflectionMethod(
++			'Gutenberg_REST_Comment_Suggestions_Controller',
++			'is_suggestion_lifecycle_update'
++		);
++		// PHP < 8.1 requires explicit accessibility to invoke a private
++		// method; from 8.1 it is automatic and setAccessible() is a no-op
++		// that 8.5 deprecates, so only call it on older versions.
++		if ( PHP_VERSION_ID < 80100 ) {
++			$reflection->setAccessible( true );
++		}
++		$this->assertTrue( $reflection->invoke( null, $request ) );
++	}
+ }
+diff --git a/storybook/preview.jsx b/storybook/preview.jsx
+index 6cd95e304d4edd..c601120543cafd 100644
+--- a/storybook/preview.jsx
++++ b/storybook/preview.jsx
+@@ -116,6 +116,8 @@ export const parameters = {
+ 				],
+ 				'Icons',
+ 				'Design System',
++				'Widget Primitives',
++				[ 'Introduction', 'Anatomy', 'System Architecture' ],
+ 			];
+ 			const PRIORITIZED_MDX_DOCS = [ 'Introduction', 'Overview' ];
+ 
+diff --git a/tools/eslint/suppressions.json b/tools/eslint/suppressions.json
+index 206ad4c2593a98..3bbaada54f57e8 100644
+--- a/tools/eslint/suppressions.json
++++ b/tools/eslint/suppressions.json
+@@ -910,11 +910,6 @@
+ 			"count": 2
+ 		}
+ 	},
+-	"packages/components/src/surface/styles.ts": {
+-		"no-restricted-imports": {
+-			"count": 1
+-		}
+-	},
+ 	"packages/components/src/tabs/styles.ts": {
+ 		"no-restricted-imports": {
+ 			"count": 1

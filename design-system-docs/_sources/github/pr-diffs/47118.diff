@@ -1,0 +1,1026 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 526822758678e0..780857975db441 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -22,6 +22,7 @@
+  ([#47384](https://github.com/WordPress/gutenberg/pull/47384)).
+ -   `Button`: Convert to TypeScript ([#46997](https://github.com/WordPress/gutenberg/pull/46997)).
+ -   `QueryControls`: Convert to TypeScript ([#46721](https://github.com/WordPress/gutenberg/pull/46721)).
++-   `Notice`: refactor to TypeScript ([47118](https://github.com/WordPress/gutenberg/pull/47118)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/notice/README.md b/packages/components/src/notice/README.md
+index 5cda6d71266c84..0fd961a281bfc7 100644
+--- a/packages/components/src/notice/README.md
++++ b/packages/components/src/notice/README.md
+@@ -16,62 +16,50 @@ A Notice displays a succinct message. It can also offer the user options, like v
+ 
+ Use Notices to communicate things that are important but don’t necessarily require action — a user can keep using the product even if they don’t choose to act on a Notice. They are less interruptive than a Modal.
+ 
+-### Anatomy
+-
+-![Diagram of a Notice component with numbered labels](https://make.wordpress.org/design/files/2019/03/Notice-Anatomy.png)
+-
+-1. Container (status indicated with color)
+-2. Icon (optional)
+-3. Message
+-4. Dismiss icon (optional)
+-
+ ### Usage
+ 
+ Notices display at the top of the screen, below any toolbars anchored to the top of the page. They’re persistent and non-modal. Since they don’t overlay the content, users can ignore or dismiss them, and choose when to interact with them.
+ 
+-![](https://make.wordpress.org/design/files/2019/03/Notice-States.png)
+-
+ Notices are color-coded to indicate the type of message being communicated:
+ 
+--   **Default** notices have **no background**.
+--   **Informational** notices are **blue** by default.
+-    - If there is a parent `Theme` component with an `accent` color prop, informational notices will take on that color instead.
+--   **Success** notices are **green.**
+--   **Warning** notices are **yellow\*\***.\*\*
+--   **Error** notices are **red.**
++- **Informational** notices are **blue** by default.
++- If there is a parent `Theme` component with an `accent` color prop, informational notices will take on that color instead.
++- **Success** notices are **green.**
++- **Warning** notices are **yellow\*\***.\*\*
++- **Error** notices are **red.**
+ 
+ If an icon is included in the Notice, it should be color-coded to match the Notice state.
+ 
++### Do's and Don'ts
++**Do** use a Notice when you want to communicate a message of medium importance.
++
+ ![A success Notice for updating a post](https://make.wordpress.org/design/files/2019/03/Notice-Do-1-alt.png)
+ 
+-**Do**
+-Do use a Notice when you want to communicate a message of medium importance.
++---
++**Don’t** use a Notice for a message that requires immediate attention and action from the user. Use a Modal for this instead.
+ 
+ ![A Notice that requires an immediate action](https://make.wordpress.org/design/files/2019/03/Notice-Dont-1-alt.png)
+ 
+-**Don’t**
+-Don't use a Notice for a message that requires immediate attention and action from the user. Use a Modal for this instead.
++---
++**Do** display Notices at the top of the screen, below any toolbars.
+ 
+ ![A success Notice for publishing a post](https://make.wordpress.org/design/files/2019/03/Notice-Do-2-alt.png)
+ 
+-**Do**
+-Do display Notices at the top of the screen, below any toolbars.
++---
++**Don’t** show Notices on top of toolbars.
+ 
+ ![A success Notice on top of the editor toolbar](https://make.wordpress.org/design/files/2019/03/Notice-Dont-2-alt.png)
+ 
+-**Don’t**
+-Don't show Notices on top of toolbars.
++---
++**Do** use color to indicate the type of message being communicated.
+ 
+ ![An error Notice using red](https://make.wordpress.org/design/files/2019/03/Notice-Do-3-alt.png)
+ 
+-**Do**
+-Do use color to indicate the type of message being communicated.
++---
++**Don’t** apply any colors other than those for Warnings, Success, or Errors.
+ 
+ ![An error Notice using purple](https://make.wordpress.org/design/files/2019/03/Notice-Dont-3-alt.png)
+ 
+-**Don’t**
+-Don't apply any colors other than those for Warnings, Success, or Errors.
+-
+ ## Development guidelines
+ 
+ ### Usage
+@@ -79,6 +67,8 @@ Don't apply any colors other than those for Warnings, Success, or Errors.
+ To display a plain notice, pass `Notice` a string:
+ 
+ ```jsx
++import { Notice } from `@wordpress/components`;
++
+ const MyNotice = () => (
+ 	<Notice status="error">An unknown error occurred.</Notice>
+ );
+@@ -87,6 +77,8 @@ const MyNotice = () => (
+ For more complex markup, you can pass any JSX element:
+ 
+ ```jsx
++import { Notice } from `@wordpress/components`;
++
+ const MyNotice = () => (
+ 	<Notice status="error">
+ 		<p>
+@@ -96,21 +88,76 @@ const MyNotice = () => (
+ );
+ ```
+ 
+-#### Props
++### Props
+ 
+ The following props are used to control the behavior of the component.
+ 
+--   `children`: (string) The displayed message of a notice. Also used as the spoken message for assistive technology, unless `spokenMessage` is provided as an alternative message.
+--   `spokenMessage`: (string) Used to provide a custom spoken message in place of the `children` default.
+--   `status`: (string) can be `warning` (yellow), `success` (green), `error` (red), or `info`. Defaults to `info`.
+--   `onRemove`: function called when dismissing the notice
+--   `politeness`: (string) A politeness level for the notice's spoken message. Should be provided as one of the valid options for [an `aria-live` attribute value](https://www.w3.org/TR/wai-aria-1.1/#aria-live). If not provided, a sensible default is used based on the notice status. Note that this value should be considered a suggestion; assistive technologies may override it based on internal heuristics.
+-    -   A value of `'assertive'` is to be used for important, and usually time-sensitive, information. It will interrupt anything else the screen reader is announcing in that moment.
+-    -   A value of `'polite'` is to be used for advisory information. It should not interrupt what the screen reader is announcing in that moment (the "speech queue") or interrupt the current task.
+--   `isDismissible`: (boolean) defaults to true, whether the notice should be dismissible or not
+--   `onDismiss` : callback function which is executed when the notice is dismissed. It is distinct from onRemove, which _looks_ like a callback but is actually the function to call to remove the notice from the UI.
+--   `actions`: (array) an array of action objects. Each member object should contain a `label` and either a `url` link string or `onClick` callback function. A `className` property can be used to add custom classes to the button styles. The default appearance of the button is inferred based on whether `url` or `onClick` are provided, rendering the button as a link if appropriate. A `noDefaultClasses` property value of `true` will remove all default styling. You can denote a primary button action for a notice by passing the `variant` property with a value of `primary`.
++#### `children`: `ReactNode`
++
++The displayed message of a notice. Also used as the spoken message for assistive technology, unless `spokenMessage` is provided as an alternative message.
++
++- Required: Yes
++
++#### `spokenMessage`: `ReactNode`
++
++Used to provide a custom spoken message in place of the `children` default.
++
++- Required: No
++- Default: `children`
++
++#### `status`: `'warning' | 'success' | 'error' | 'info'`
++
++Determines the color of the notice: `warning` (yellow), `success` (green), `error` (red), or `'info'`. By default `'info'` will be blue, but if there is a parent Theme component with an accent color prop, the notice will take on that color instead.
++
++- Required: No
++- Default: `info`
++
++#### `onRemove`: `() => void`
++
++A function called to dismiss/remove the notice.
++
++- Required: No
++- Default: `noop`
++
++#### `politeness`: `'polite' | 'assertive'`
++
++A politeness level for the notice's spoken message. Should be provided as one of the valid options for [an `aria-live` attribute value](https://www.w3.org/TR/wai-aria-1.1/#aria-live).
++
++- A value of `'assertive'` is to be used for important, and usually time-sensitive, information. It will interrupt anything else the screen reader is announcing in that moment.
++- A value of `'polite'` is to be used for advisory information. It should not interrupt what the screen reader is announcing in that moment (the "speech queue") or interrupt the current task.
++
++Note that this value should be considered a suggestion; assistive technologies may override it based on internal heuristics.
++
++- Required: No
++- Default: `'assertive'` or `'polite'`, based on the notice status.
++
++#### `isDismissible`: `boolean`
++
++Whether the notice should be dismissible or not
++
++- Required: No
++- Default: `true`
++
++#### `onDismiss` : `() => void`
++
++A deprecated alternative to `onRemove`. This prop is kept for compatibilty reasons but should be avoided.
++
++- Requiered: No
++- Default: `noop`
++
++#### `actions`: `Array<NoticeAction>`.
++
++An array of notice actions. Each member object should contain:
++
++- `label`: `string` containing the text of the button/link
++- `url`: `string` OR `onClick`: `( event: SyntheticEvent ) => void` to specify what the action does.
++- `className`: `string` (optional) to add custom classes to the button styles.
++- `noDefaultClasses`: `boolean` (optional) A value of `true` will remove all default styling.
++- `variant`: `'primary' | 'secondary' | 'link'` (optional) You can denote a primary button action for a notice by passing a value of `primary`.
++
++The default appearance of an action button is inferred based on whether `url` or `onClick` are provided, rendering the button as a link if appropriate. If both props are provided, `url` takes precedence, and the action button will render as an anchor tag.
+ 
+ ## Related components
+ 
+--   To create a more prominent message that requires action, use a Modal.
++- To create a more prominent message that requires action, use a Modal.
++- For low priority, non-interruptive messsages, use Snackbar.
+diff --git a/packages/components/src/notice/index.js b/packages/components/src/notice/index.tsx
+similarity index 75%
+rename from packages/components/src/notice/index.js
+rename to packages/components/src/notice/index.tsx
+index df14240957d91d..02805938b6b7ce 100644
+--- a/packages/components/src/notice/index.js
++++ b/packages/components/src/notice/index.tsx
+@@ -14,20 +14,21 @@ import { close } from '@wordpress/icons';
+ /**
+  * Internal dependencies
+  */
+-import { Button } from '../';
+-
+-/** @typedef {import('@wordpress/element').WPElement} WPElement */
++import Button from '../button';
++import type { NoticeAction, NoticeProps } from './types';
++import type { SyntheticEvent } from 'react';
++import type { DeprecatedButtonProps } from '../button/types';
+ 
+ const noop = () => {};
+ 
+ /**
+  * Custom hook which announces the message with the given politeness, if a
+  * valid message is provided.
+- *
+- * @param {string|WPElement}     [message]  Message to announce.
+- * @param {'polite'|'assertive'} politeness Politeness to announce.
+  */
+-function useSpokenMessage( message, politeness ) {
++function useSpokenMessage(
++	message: NoticeProps[ 'spokenMessage' ],
++	politeness: NoticeProps[ 'politeness' ]
++) {
+ 	const spokenMessage =
+ 		typeof message === 'string' ? message : renderToString( message );
+ 
+@@ -38,15 +39,7 @@ function useSpokenMessage( message, politeness ) {
+ 	}, [ spokenMessage, politeness ] );
+ }
+ 
+-/**
+- * Given a notice status, returns an assumed default politeness for the status.
+- * Defaults to 'assertive'.
+- *
+- * @param {string} [status] Notice status.
+- *
+- * @return {'polite'|'assertive'} Notice politeness.
+- */
+-function getDefaultPoliteness( status ) {
++function getDefaultPoliteness( status: NoticeProps[ 'status' ] ) {
+ 	switch ( status ) {
+ 		case 'success':
+ 		case 'warning':
+@@ -59,6 +52,17 @@ function getDefaultPoliteness( status ) {
+ 	}
+ }
+ 
++/**
++ * `Notice` is a component used to communicate feedback to the user.
++ *
++ *```jsx
++ * import { Notice } from `@wordpress/components`;
++ *
++ * const MyNotice = () => (
++ *   <Notice status="error">An unknown error occurred.</Notice>
++ * );
++ * ```
++ */
+ function Notice( {
+ 	className,
+ 	status = 'info',
+@@ -73,7 +77,7 @@ function Notice( {
+ 	// It is distinct from onRemove, which _looks_ like a callback but is
+ 	// actually the function to call to remove the notice from the UI.
+ 	onDismiss = noop,
+-} ) {
++}: NoticeProps ) {
+ 	useSpokenMessage( spokenMessage, politeness );
+ 
+ 	const classes = classnames(
+@@ -85,11 +89,11 @@ function Notice( {
+ 		}
+ 	);
+ 
+-	if ( __unstableHTML ) {
++	if ( __unstableHTML && typeof children === 'string' ) {
+ 		children = <RawHTML>{ children }</RawHTML>;
+ 	}
+ 
+-	const onDismissNotice = ( event ) => {
++	const onDismissNotice = ( event: SyntheticEvent ) => {
+ 		event?.preventDefault?.();
+ 		onDismiss();
+ 		onRemove();
+@@ -110,7 +114,11 @@ function Notice( {
+ 								noDefaultClasses = false,
+ 								onClick,
+ 								url,
+-							},
++							}: NoticeAction &
++								// `isPrimary` is a legacy prop included for
++								// backcompat, but `variant` should be used
++								// instead.
++								Pick< DeprecatedButtonProps, 'isPrimary' >,
+ 							index
+ 						) => {
+ 							let computedVariant = variant;
+diff --git a/packages/components/src/notice/list.js b/packages/components/src/notice/list.js
+deleted file mode 100644
+index 23c54605e58230..00000000000000
+--- a/packages/components/src/notice/list.js
++++ /dev/null
+@@ -1,48 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-
+-/**
+- * Internal dependencies
+- */
+-import Notice from './';
+-
+-const noop = () => {};
+-
+-/**
+- * Renders a list of notices.
+- *
+- * @param {Object}   $0           Props passed to the component.
+- * @param {Array}    $0.notices   Array of notices to render.
+- * @param {Function} $0.onRemove  Function called when a notice should be removed / dismissed.
+- * @param {Object}   $0.className Name of the class used by the component.
+- * @param {Object}   $0.children  Array of children to be rendered inside the notice list.
+- *
+- * @return {Object} The rendered notices list.
+- */
+-function NoticeList( { notices, onRemove = noop, className, children } ) {
+-	const removeNotice = ( id ) => () => onRemove( id );
+-
+-	className = classnames( 'components-notice-list', className );
+-
+-	return (
+-		<div className={ className }>
+-			{ children }
+-			{ [ ...notices ].reverse().map( ( notice ) => {
+-				const { content, ...restNotice } = notice;
+-				return (
+-					<Notice
+-						{ ...restNotice }
+-						key={ notice.id }
+-						onRemove={ removeNotice( notice.id ) }
+-					>
+-						{ notice.content }
+-					</Notice>
+-				);
+-			} ) }
+-		</div>
+-	);
+-}
+-
+-export default NoticeList;
+diff --git a/packages/components/src/notice/list.tsx b/packages/components/src/notice/list.tsx
+new file mode 100644
+index 00000000000000..6129db8434ee41
+--- /dev/null
++++ b/packages/components/src/notice/list.tsx
+@@ -0,0 +1,72 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * Internal dependencies
++ */
++import Notice from '.';
++import type { WordPressComponentProps } from '../ui/context';
++import type { NoticeListProps } from './types';
++
++const noop = () => {};
++
++/**
++ * `NoticeList` is a component used to render a collection of notices.
++ *
++ *```jsx
++ * import { Notice, NoticeList } from `@wordpress/components`;
++ *
++ * const MyNoticeList = () => {
++ *	const [ notices, setNotices ] = useState( [
++ *		{
++ *			id: 'second-notice',
++ *			content: 'second notice content',
++ *		},
++ *		{
++ *			id: 'fist-notice',
++ *			content: 'first notice content',
++ *		},
++ *	] );
++ *
++ *	const removeNotice = ( id ) => {
++ *		setNotices( notices.filter( ( notice ) => notice.id !== id ) );
++ *	};
++ *
++ *	return <NoticeList notices={ notices } onRemove={ removeNotice } />;
++ *};
++ *```
++ */
++function NoticeList( {
++	notices,
++	onRemove = noop,
++	className,
++	children,
++}: WordPressComponentProps< NoticeListProps, 'div', false > ) {
++	const removeNotice =
++		( id: NoticeListProps[ 'notices' ][ number ][ 'id' ] ) => () =>
++			onRemove( id );
++
++	className = classnames( 'components-notice-list', className );
++
++	return (
++		<div className={ className }>
++			{ children }
++			{ [ ...notices ].reverse().map( ( notice ) => {
++				const { content, ...restNotice } = notice;
++				return (
++					<Notice
++						{ ...restNotice }
++						key={ notice.id }
++						onRemove={ removeNotice( notice.id ) }
++					>
++						{ notice.content }
++					</Notice>
++				);
++			} ) }
++		</div>
++	);
++}
++
++export default NoticeList;
+diff --git a/packages/components/src/notice/stories/index.js b/packages/components/src/notice/stories/index.js
+deleted file mode 100644
+index fad8f919e58712..00000000000000
+--- a/packages/components/src/notice/stories/index.js
++++ /dev/null
+@@ -1,46 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import Notice from '../';
+-
+-// TODO: Add a story involving NoticeList to help people understand
+-// the difference between onDismiss/onRemove.
+-
+-export default {
+-	title: 'Components/Notice',
+-	component: Notice,
+-	argTypes: {
+-		isDismissible: { control: 'boolean' },
+-		onDismiss: { control: { type: null } },
+-		onRemove: { control: { type: null } },
+-		politeness: {
+-			control: 'radio',
+-			options: [ 'assertive', 'polite' ],
+-		},
+-		spokenMessage: { control: 'text' },
+-		status: {
+-			control: 'radio',
+-			options: [ 'warning', 'success', 'error', 'info' ],
+-		},
+-	},
+-	parameters: {
+-		controls: { expanded: true },
+-		docs: { source: { state: 'open' } },
+-	},
+-};
+-
+-const Template = ( props ) => {
+-	return <Notice { ...props } />;
+-};
+-
+-export const Default = Template.bind( {} );
+-Default.args = {
+-	children: 'This is a notice.',
+-};
+-
+-export const WithCustomSpokenMessage = Template.bind( {} );
+-WithCustomSpokenMessage.args = {
+-	...Default.args,
+-	politeness: 'assertive',
+-	spokenMessage: 'This is a notice with a custom spoken message',
+-};
+diff --git a/packages/components/src/notice/stories/index.tsx b/packages/components/src/notice/stories/index.tsx
+new file mode 100644
+index 00000000000000..b0fa9b9baeee1a
+--- /dev/null
++++ b/packages/components/src/notice/stories/index.tsx
+@@ -0,0 +1,119 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import Notice from '..';
++import Button from '../../button';
++import NoticeList from '../list';
++import type { NoticeListProps } from '../types';
++
++const meta: ComponentMeta< typeof Notice > = {
++	title: 'Components/Notice',
++	component: Notice,
++	subcomponents: { NoticeList },
++	parameters: {
++		actions: { argTypesRegex: '^on.*' },
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof Notice > = ( props ) => {
++	return <Notice { ...props } />;
++};
++
++export const Default = Template.bind( {} );
++Default.args = {
++	children: 'This is a notice.',
++};
++
++export const WithCustomSpokenMessage = Template.bind( {} );
++WithCustomSpokenMessage.args = {
++	...Default.args,
++	politeness: 'assertive',
++	spokenMessage: 'This is a notice with a custom spoken message',
++};
++
++export const WithJSXChildren = Template.bind( {} );
++WithJSXChildren.args = {
++	...Default.args,
++	children: (
++		<>
++			<p>
++				JSX elements can be helpful
++				<strong> if you need to format</strong> the notice output.
++			</p>
++			<code>
++				note: in the interest of consistency, this should not be
++				overused!
++			</code>
++		</>
++	),
++};
++
++export const WithActions = Template.bind( {} );
++WithActions.args = {
++	...Default.args,
++	actions: [
++		{
++			label: 'Click me!',
++			onClick: () => {},
++			variant: 'primary',
++		},
++		{
++			label: 'Or click me instead!',
++			onClick: () => {},
++		},
++		{
++			label: 'Or visit a link for more info',
++			url: 'https://wordpress.org',
++			variant: 'link',
++		},
++	],
++};
++
++export const NoticeListSubcomponent: ComponentStory<
++	typeof NoticeList
++> = () => {
++	const exampleNotices = [
++		{
++			id: 'second-notice',
++			content: 'second notice content',
++		},
++		{
++			id: 'first-notice',
++			content: 'first notice content',
++		},
++	];
++	const [ notices, setNotices ] = useState( exampleNotices );
++
++	const removeNotice = (
++		id: NoticeListProps[ 'notices' ][ number ][ 'id' ]
++	) => {
++		setNotices( notices.filter( ( notice ) => notice.id !== id ) );
++	};
++
++	const resetNotices = () => {
++		setNotices( exampleNotices );
++	};
++
++	return (
++		<>
++			<NoticeList notices={ notices } onRemove={ removeNotice } />
++			<Button variant={ 'primary' } onClick={ resetNotices }>
++				Reset Notices
++			</Button>
++		</>
++	);
++};
++NoticeListSubcomponent.storyName = 'NoticeList Subcomponent';
+diff --git a/packages/components/src/notice/test/__snapshots__/index.js.snap b/packages/components/src/notice/test/__snapshots__/index.tsx.snap
+similarity index 100%
+rename from packages/components/src/notice/test/__snapshots__/index.js.snap
+rename to packages/components/src/notice/test/__snapshots__/index.tsx.snap
+diff --git a/packages/components/src/notice/test/index.js b/packages/components/src/notice/test/index.tsx
+similarity index 90%
+rename from packages/components/src/notice/test/index.js
+rename to packages/components/src/notice/test/index.tsx
+index fd823edcf33902..b601e8717a1d3b 100644
+--- a/packages/components/src/notice/test/index.js
++++ b/packages/components/src/notice/test/index.tsx
+@@ -14,14 +14,15 @@ import { speak } from '@wordpress/a11y';
+ import Notice from '../index';
+ 
+ jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
++const mockedSpeak = jest.mocked( speak );
+ 
+-function getNoticeWrapper( container ) {
++function getNoticeWrapper( container: HTMLElement ) {
+ 	return container.firstChild;
+ }
+ 
+ describe( 'Notice', () => {
+ 	beforeEach( () => {
+-		speak.mockReset();
++		mockedSpeak.mockReset();
+ 	} );
+ 
+ 	it( 'should match snapshot', () => {
+@@ -42,7 +43,9 @@ describe( 'Notice', () => {
+ 	} );
+ 
+ 	it( 'should not have is-dismissible class when isDismissible prop is false', () => {
+-		const { container } = render( <Notice isDismissible={ false } /> );
++		const { container } = render(
++			<Notice isDismissible={ false }>I cannot be dismissed!</Notice>
++		);
+ 		const wrapper = getNoticeWrapper( container );
+ 
+ 		expect( wrapper ).toHaveClass( 'components-notice' );
+@@ -50,7 +53,7 @@ describe( 'Notice', () => {
+ 	} );
+ 
+ 	it( 'should default to info status', () => {
+-		const { container } = render( <Notice /> );
++		const { container } = render( <Notice>FYI</Notice> );
+ 
+ 		expect( getNoticeWrapper( container ) ).toHaveClass( 'is-info' );
+ 	} );
+diff --git a/packages/components/src/notice/test/list.js b/packages/components/src/notice/test/list.tsx
+similarity index 100%
+rename from packages/components/src/notice/test/list.js
+rename to packages/components/src/notice/test/list.tsx
+diff --git a/packages/components/src/notice/types.ts b/packages/components/src/notice/types.ts
+new file mode 100644
+index 00000000000000..2af7bc22c7ea5d
+--- /dev/null
++++ b/packages/components/src/notice/types.ts
+@@ -0,0 +1,136 @@
++/**
++ * External dependencies
++ */
++import type { MouseEventHandler, ReactNode } from 'react';
++
++type CommonNoticeActionProps = {
++	label: string;
++	className?: string;
++	noDefaultClasses?: boolean;
++	variant?: 'primary' | 'secondary' | 'link';
++};
++// `url` and `onClick` can both be provided, but `url` takes precedence. If
++// `url` is provided, the action's button will be rendered as an anchor and
++// `onClick` will be ignored.
++type NoticeActionWithURL = CommonNoticeActionProps & {
++	url: string;
++	onClick?: never;
++};
++type NoticeActionWithOnClick = CommonNoticeActionProps & {
++	url?: never;
++	onClick: MouseEventHandler< HTMLButtonElement >;
++};
++
++export type NoticeAction = NoticeActionWithURL | NoticeActionWithOnClick;
++
++export type NoticeChildren = string | JSX.Element;
++
++export type NoticeProps = {
++	/**
++	 * A CSS `class` to give to the wrapper element.
++	 */
++	className?: string;
++	/**
++	 * The displayed message of a notice. Also used as the spoken message for
++	 * assistive technology, unless `spokenMessage` is provided as an alternative message.
++	 */
++	children: ReactNode;
++	/**
++	 * Used to provide a custom spoken message in place of the `children` default.
++	 *
++	 * @default `children`
++	 */
++	spokenMessage?: ReactNode;
++	/**
++	 * Determines the color of the notice: `warning` (yellow),
++	 * `success` (green), `error` (red), or `'info'`.
++	 * By default `'info'` will be blue, but if there is a parent Theme component
++	 * with an accent color prop, the notice will take on that color instead.
++	 *
++	 * @default 'info'
++	 */
++	status?: 'warning' | 'success' | 'error' | 'info';
++	/**
++	 * Function called when dismissing the notice
++	 *
++	 * @default noop
++	 */
++	onRemove?: () => void;
++	/**
++	 * A politeness level for the notice's spoken message. Should be provided as
++	 * one of the valid options for an `aria-live` attribute value.
++	 *
++	 * A value of `'assertive'` is to be used for important, and usually
++	 * time-sensitive, information. It will interrupt anything else the screen
++	 * reader is announcing in that moment.
++	 * A value of `'polite'` is to be used for advisory information. It should
++	 * not interrupt what the screen reader is announcing in that moment
++	 * (the "speech queue") or interrupt the current task.
++	 *
++	 * Note that this value should be considered a suggestion; assistive
++	 * technologies may override it based on internal heuristics.
++	 *
++	 * @see https://www.w3.org/TR/wai-aria-1.1/#aria-live
++	 *
++	 * @default 'assertive' for 'error' status, 'polite' for all other statuses
++	 */
++	politeness?: 'polite' | 'assertive';
++	/**
++	 * Whether the notice should be dismissible or not
++	 *
++	 * @default true
++	 */
++	isDismissible?: boolean;
++	/**
++	 * A deprecated alternative to `onRemove`. This prop is kept for
++	 * compatibilty reasons but should be avoided.
++	 *
++	 * @default noop
++	 */
++	onDismiss?: () => void;
++	/**
++	 * An array of action objects. Each member object should contain:
++	 *
++	 * - `label`: `string` containing the text of the button/link
++	 * - `url`: `string` OR `onClick`: `( event: SyntheticEvent ) => void` to specify
++	 *    what the action does.
++	 * - `className`: `string` (optional) to add custom classes to the button styles.
++	 * - `noDefaultClasses`: `boolean` (optional) A value of `true` will remove all
++	 *    default styling.
++	 * - `variant`: `'primary' | 'secondary' | 'link'` (optional) You can denote a
++	 *    primary button action for a notice by passing a value of `primary`.
++	 *
++	 * The default appearance of an action button is inferred based on whether
++	 * `url` or `onClick` are provided, rendering the button as a link if
++	 * appropriate. If both props are provided, `url` takes precedence, and the
++	 * action button will render as an anchor tag.
++	 *
++	 * @default []
++	 */
++	actions?: Array< NoticeAction >;
++	/**
++	 * Determines whether or not the message should be parsed as custom HTML
++	 * instead of a string.
++	 */
++	__unstableHTML?: boolean;
++};
++
++export type NoticeListProps = {
++	/**
++	 * Array of notices to render.
++	 */
++	notices: Array<
++		Omit< NoticeProps, 'children' > & {
++			id: string;
++			content: string;
++		}
++	>;
++	/**
++	 * Function called when a notice should be removed / dismissed.
++	 */
++	onRemove?: ( id: string ) => void;
++	/**
++	 * Children to be rendered inside the notice list.
++	 */
++	children?: ReactNode;
++};
+diff --git a/packages/components/src/snackbar/index.tsx b/packages/components/src/snackbar/index.tsx
+index 833d9dce8d30ff..c68a97f36122a6 100644
+--- a/packages/components/src/snackbar/index.tsx
++++ b/packages/components/src/snackbar/index.tsx
+@@ -16,7 +16,8 @@ import warning from '@wordpress/warning';
+  * Internal dependencies
+  */
+ import Button from '../button';
+-import type { NoticeAction, SnackbarProps } from './types';
++import type { SnackbarProps } from './types';
++import type { NoticeAction } from '../notice/types';
+ import type { WordPressComponentProps } from '../ui/context';
+ 
+ const NOTICE_TIMEOUT = 10000;
+@@ -73,7 +74,7 @@ function UnforwardedSnackbar(
+ 	}
+ 
+ 	function onActionClick(
+-		event: MouseEvent,
++		event: MouseEvent< HTMLButtonElement >,
+ 		onClick: NoticeAction[ 'onClick' ]
+ 	) {
+ 		event.stopPropagation();
+@@ -139,9 +140,9 @@ function UnforwardedSnackbar(
+ 							key={ index }
+ 							href={ url }
+ 							variant="tertiary"
+-							onClick={ ( event: MouseEvent ) =>
+-								onActionClick( event, onClick )
+-							}
++							onClick={ (
++								event: MouseEvent< HTMLButtonElement >
++							) => onActionClick( event, onClick ) }
+ 							className="components-snackbar__action"
+ 						>
+ 							{ label }
+diff --git a/packages/components/src/snackbar/list.tsx b/packages/components/src/snackbar/list.tsx
+index 093c0b3529612d..ebd1fca2518f51 100644
+--- a/packages/components/src/snackbar/list.tsx
++++ b/packages/components/src/snackbar/list.tsx
+@@ -17,7 +17,7 @@ import {
+ 	__unstableMotion as motion,
+ 	__unstableAnimatePresence as AnimatePresence,
+ } from '../animation';
+-import type { Notice, SnackbarListProps } from './types';
++import type { SnackbarListProps } from './types';
+ import type { WordPressComponentProps } from '../ui/context';
+ 
+ const SNACKBAR_VARIANTS = {
+@@ -61,7 +61,9 @@ export function SnackbarList( {
+ 	const listRef = useRef< HTMLDivElement | null >( null );
+ 	const isReducedMotion = useReducedMotion();
+ 	className = classnames( 'components-snackbar-list', className );
+-	const removeNotice = ( notice: Notice ) => () => onRemove?.( notice.id );
++	const removeNotice =
++		( notice: SnackbarListProps[ 'notices' ][ number ] ) => () =>
++			onRemove?.( notice.id );
+ 	return (
+ 		<div className={ className } tabIndex={ -1 } ref={ listRef }>
+ 			{ children }
+diff --git a/packages/components/src/snackbar/types.ts b/packages/components/src/snackbar/types.ts
+index 46c9a8e67e8cfb..71ded92e5b7d11 100644
+--- a/packages/components/src/snackbar/types.ts
++++ b/packages/components/src/snackbar/types.ts
+@@ -1,116 +1,42 @@
+ /**
+  * External dependencies
+  */
+-import type { MutableRefObject, ReactNode, SyntheticEvent } from 'react';
++import type { MutableRefObject, ReactNode } from 'react';
+ 
+-export type NoticeActionWithURL = {
+-	label: string;
+-	url: string;
+-	onClick?: ( event: SyntheticEvent ) => void;
+-};
+-
+-type NoticeActionWithOnClick = {
+-	label: string;
+-	url?: string;
+-	onClick: ( event: SyntheticEvent ) => void;
+-};
+-
+-// TODO: move this type to the Notice component once it gets typed.
+-export type NoticeAction = NoticeActionWithURL | NoticeActionWithOnClick;
+-
+-export type Notice = {
+-	id: string;
+-	spokenMessage: string;
+-	actions: NoticeAction[];
+-	icon?: ReactNode;
+-	onDismiss?: () => void;
+-	content: string;
+-	isDismissible: boolean;
+-	explicitDismiss: boolean;
+-};
++/**
++ * Internal dependencies
++ */
++import type { NoticeProps, NoticeChildren } from '../notice/types';
+ 
+-export type SnackbarProps = {
+-	/**
+-	 * The displayed message of a notice.
+-	 *
+-	 * Also used as the spoken message for assistive technology,
+-	 * unless `spokenMessage` is provided as an alternative message.
+-	 */
+-	children: string;
+-	/**
+-	 * Used to provide a custom spoken message.
+-	 *
+-	 * @default children
+-	 */
+-	spokenMessage?: Notice[ 'spokenMessage' ];
+-	/**
+-	 * A politeness level for the notice's spoken message. Should be provided as
+-	 * one of the valid options for an `aria-live` attribute value. Note that this
+-	 * value should be considered a suggestion; assistive technologies may
+-	 * override it based on internal heuristics.
+-	 *
+-	 * A value of `'assertive'` is to be used for important, and usually
+-	 * time-sensitive, information. It will interrupt anything else the screen
+-	 * reader is announcing in that moment.
+-	 * A value of `'polite'` is to be used for advisory information. It should
+-	 * not interrupt what the screen reader is announcing in that moment
+-	 * (the "speech queue") or interrupt the current task.
+-	 *
+-	 * @see https://www.w3.org/TR/wai-aria-1.1/#aria-live
+-	 *
+-	 * @default 'polite'
+-	 */
+-	politeness?: 'polite' | 'assertive';
+-	/**
+-	 * An array of action objects.
+-	 *
+-	 * Each member object should contain
+-	 * a `label` and either a `url` link string or `onClick` callback function.
+-	 *
+-	 * @default []
+-	 */
+-	actions?: Notice[ 'actions' ];
+-	/**
+-	 * Called to remove the snackbar from the UI.
+-	 */
+-	onRemove?: () => void;
++type SnackbarOnlyProps = {
+ 	/**
+ 	 * The icon to render in the snackbar.
+ 	 *
+ 	 * @default null
+ 	 */
+-	icon?: Notice[ 'icon' ];
++	icon?: ReactNode;
+ 	/**
+ 	 * Whether to require user action to dismiss the snackbar.
+ 	 * By default, this is dismissed on a timeout, without user interaction.
+ 	 *
+ 	 * @default false
+ 	 */
+-	explicitDismiss?: Notice[ 'explicitDismiss' ];
+-	/**
+-	 * A callback executed when the snackbar is dismissed.
+-	 *
+-	 * It is distinct from onRemove, which _looks_ like a callback but is
+-	 * actually the function to call to remove the snackbar from the UI.
+-	 */
+-	onDismiss?: Notice[ 'onDismiss' ];
++	explicitDismiss?: boolean;
+ 	/**
+ 	 * A ref to the list that contains the snackbar.
+ 	 */
+ 	listRef?: MutableRefObject< HTMLDivElement | null >;
+ };
+ 
++export type SnackbarProps = NoticeProps & SnackbarOnlyProps;
++
+ export type SnackbarListProps = {
+-	/**
+-	 * Array of notices to render.
+-	 */
+-	notices: Notice[];
+-	/**
+-	 * Children to be rendered inside the notice list.
+-	 */
+-	children?: ReactNode;
+-	/**
+-	 * Function called when a notice should be removed / dismissed.
+-	 */
+-	onRemove?: ( id: Notice[ 'id' ] ) => void;
++	notices: Array<
++		Omit< SnackbarProps, 'children' > & {
++			id: string;
++			content: string;
++		}
++	>;
++	onRemove: ( id: string ) => void;
++	children?: NoticeChildren | Array< NoticeChildren >;
+ };
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 83d8d6251b94d6..78ddcbb2d871ab 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -57,7 +57,6 @@
+ 		"src/keyboard-shortcuts",
+ 		"src/menu-items-choice",
+ 		"src/navigation",
+-		"src/notice",
+ 		"src/palette-edit",
+ 		"src/panel",
+ 		"src/toolbar",

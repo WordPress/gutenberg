@@ -1,0 +1,893 @@
+diff --git a/package-lock.json b/package-lock.json
+index 478aab2bf508d4..0e68d0f778f30b 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -16825,12 +16825,6 @@
+ 				"@types/jest": "*"
+ 			}
+ 		},
+-		"@types/tinycolor2": {
+-			"version": "1.4.3",
+-			"resolved": "https://registry.npmjs.org/@types/tinycolor2/-/tinycolor2-1.4.3.tgz",
+-			"integrity": "sha512-Kf1w9NE5HEgGxCRyIcRXR/ZYtDv0V8FVPtYHwLxl0O+maGX0erE77pQlD0gpP+/KByMZ87mOA79SjifhSB3PjQ==",
+-			"dev": true
+-		},
+ 		"@types/uglify-js": {
+ 			"version": "3.9.2",
+ 			"resolved": "https://registry.npmjs.org/@types/uglify-js/-/uglify-js-3.9.2.tgz",
+@@ -18245,7 +18239,6 @@
+ 				"react-use-gesture": "^9.0.0",
+ 				"reakit": "^1.3.8",
+ 				"rememo": "^3.0.0",
+-				"tinycolor2": "^1.4.2",
+ 				"uuid": "^8.3.0"
+ 			},
+ 			"dependencies": {
+diff --git a/package.json b/package.json
+index adea9b3a55dcda..52cd8326a6dc08 100644
+--- a/package.json
++++ b/package.json
+@@ -117,7 +117,6 @@
+ 		"@types/requestidlecallback": "0.3.4",
+ 		"@types/semver": "7.3.8",
+ 		"@types/sprintf-js": "1.1.2",
+-		"@types/tinycolor2": "1.4.3",
+ 		"@types/uuid": "8.3.1",
+ 		"@wordpress/babel-plugin-import-jsx-pragma": "file:packages/babel-plugin-import-jsx-pragma",
+ 		"@wordpress/babel-plugin-makepot": "file:packages/babel-plugin-makepot",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 148b4c06b6b675..f2750a38ca79e6 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,12 +9,18 @@
+ ### Enhancements
+ 
+ -   Removed the separator shown between `ToggleGroupControl` items ([#35497](https://github.com/WordPress/gutenberg/pull/35497)).
++-   The `ColorPicker` component property `onChangeComplete`, a function accepting a color object, was replaced with the property `onChange`, a function accepting a  string on  ([#35220](https://github.com/WordPress/gutenberg/pull/35220)).
++-   The property `disableAlpha`, was removed from the `ColorPicker` component. Use the new opposite property `enableAlpha` instead ([#35220](https://github.com/WordPress/gutenberg/pull/35220)).
+ 
+ ### Experimental
+ 
+ -   Removed the `fieldset` wrapper from the `FontAppearanceControl` component ([35461](https://github.com/WordPress/gutenberg/pull/35461)).
+ -   Refactored the `ToggleGroupControl` component's structure and embedded `ToggleGroupControlButton` directly into `ToggleGroupControlOption` ([#35600](https://github.com/WordPress/gutenberg/pull/35600)).
+ 
++### Breaking Changes
++
++-   The `color` property a `tinycolor2` color object passed on `onChangeComplete` property of the `ColorPicker` component was removed. Please use the new `onChange` property that accepts a string color representation ([#35562](https://github.com/WordPress/gutenberg/pull/35562)).
++
+ ## 18.0.0 (2021-10-12)
+ 
+ ### Breaking Changes
+diff --git a/packages/components/package.json b/packages/components/package.json
+index d3564a1eb2ad64..d7ab1a9887f04e 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -66,7 +66,6 @@
+ 		"react-use-gesture": "^9.0.0",
+ 		"reakit": "^1.3.8",
+ 		"rememo": "^3.0.0",
+-		"tinycolor2": "^1.4.2",
+ 		"uuid": "^8.3.0"
+ 	},
+ 	"peerDependencies": {
+diff --git a/packages/components/src/color-palette/test/__snapshots__/index.js.snap b/packages/components/src/color-palette/test/__snapshots__/index.js.snap
+index fa0b4d2f0f7cd6..7f403d562c6ac3 100644
+--- a/packages/components/src/color-palette/test/__snapshots__/index.js.snap
++++ b/packages/components/src/color-palette/test/__snapshots__/index.js.snap
+@@ -2,14 +2,7 @@
+ 
+ exports[`ColorPalette Dropdown .renderContent should render dropdown content 1`] = `
+ <ColorPicker
+-  color={
+-    Object {
+-      "a": 1,
+-      "h": 0,
+-      "l": 0.5,
+-      "s": 1,
+-    }
+-  }
++  color="#f00"
+   enableAlpha={false}
+   onChange={[Function]}
+ />
+diff --git a/packages/components/src/color-picker/color-display.tsx b/packages/components/src/color-picker/color-display.tsx
+index 7928ec372df285..751858436767ca 100644
+--- a/packages/components/src/color-picker/color-display.tsx
++++ b/packages/components/src/color-picker/color-display.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import colorize, { ColorFormats } from 'tinycolor2';
++import { colord, extend, Colord } from 'colord';
+ 
+ /**
+  * WordPress dependencies
+@@ -20,13 +20,13 @@ import type { ColorType } from './types';
+ import { space } from '../ui/utils/space';
+ 
+ interface ColorDisplayProps {
+-	color: ColorFormats.HSLA;
++	color: Colord;
+ 	colorType: ColorType;
+ 	enableAlpha: boolean;
+ }
+ 
+ interface DisplayProps {
+-	color: ColorFormats.HSLA;
++	color: Colord;
+ 	enableAlpha: boolean;
+ }
+ 
+@@ -50,7 +50,7 @@ const ValueDisplay = ( { values }: ValueDisplayProps ) => (
+ );
+ 
+ const HslDisplay = ( { color, enableAlpha }: DisplayProps ) => {
+-	const { h, s, l, a } = colorize( color ).toHsl();
++	const { h, s, l, a } = color.toHsl();
+ 
+ 	const values: Values = [
+ 		[ Math.floor( h ), 'H' ],
+@@ -65,7 +65,7 @@ const HslDisplay = ( { color, enableAlpha }: DisplayProps ) => {
+ };
+ 
+ const RgbDisplay = ( { color, enableAlpha }: DisplayProps ) => {
+-	const { r, g, b, a } = colorize( color ).toRgb();
++	const { r, g, b, a } = color.toRgb();
+ 
+ 	const values: Values = [
+ 		[ r, 'R' ],
+@@ -80,14 +80,8 @@ const RgbDisplay = ( { color, enableAlpha }: DisplayProps ) => {
+ 	return <ValueDisplay values={ values } />;
+ };
+ 
+-const HexDisplay = ( { color, enableAlpha }: DisplayProps ) => {
+-	const colorized = colorize( color );
+-	const colorWithoutHash = ( enableAlpha
+-		? colorized.toHex8String()
+-		: colorized.toHexString()
+-	)
+-		.slice( 1 )
+-		.toUpperCase();
++const HexDisplay = ( { color }: DisplayProps ) => {
++	const colorWithoutHash = color.toHex().slice( 1 ).toUpperCase();
+ 	return (
+ 		<FlexItem>
+ 			<Text color="blue">#</Text>
+@@ -114,24 +108,21 @@ export const ColorDisplay = ( {
+ 	enableAlpha,
+ }: ColorDisplayProps ) => {
+ 	const [ copiedColor, setCopiedColor ] = useState< string | null >( null );
+-	const copyTimer = useRef< number | undefined >();
++	const copyTimer = useRef< ReturnType< typeof setTimeout > | undefined >();
+ 	const props = { color, enableAlpha };
+ 	const Component = getComponent( colorType );
+ 	const copyRef = useCopyToClipboard< HTMLDivElement >(
+ 		() => {
+ 			switch ( colorType ) {
+ 				case 'hsl': {
+-					return colorize( color ).toHslString();
++					return color.toHslString();
+ 				}
+ 				case 'rgb': {
+-					return colorize( color ).toRgbString();
++					return color.toRgbString();
+ 				}
+ 				default:
+ 				case 'hex': {
+-					const colorized = colorize( color );
+-					return enableAlpha
+-						? colorized.toHex8String()
+-						: colorized.toHexString();
++					return color.toHex();
+ 				}
+ 			}
+ 		},
+@@ -139,7 +130,7 @@ export const ColorDisplay = ( {
+ 			if ( copyTimer.current ) {
+ 				clearTimeout( copyTimer.current );
+ 			}
+-			setCopiedColor( colorize( color ).toHex8String() );
++			setCopiedColor( color.toHex() );
+ 			copyTimer.current = setTimeout( () => {
+ 				setCopiedColor( null );
+ 				copyTimer.current = undefined;
+@@ -158,7 +149,7 @@ export const ColorDisplay = ( {
+ 		<Tooltip
+ 			content={
+ 				<Text color="white">
+-					{ copiedColor === colorize( color ).toHex8String()
++					{ copiedColor === color.toHex()
+ 						? __( 'Copied!' )
+ 						: __( 'Copy' ) }
+ 				</Text>
+diff --git a/packages/components/src/color-picker/color-input.tsx b/packages/components/src/color-picker/color-input.tsx
+index 8caa5fe3a7a5f6..82e9d67e899dc5 100644
+--- a/packages/components/src/color-picker/color-input.tsx
++++ b/packages/components/src/color-picker/color-input.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { ColorFormats } from 'tinycolor2';
++import { colord, extend, Colord } from 'colord';
+ 
+ /**
+  * Internal dependencies
+@@ -12,8 +12,8 @@ import { HexInput } from './hex-input';
+ 
+ interface ColorInputProps {
+ 	colorType: 'hsl' | 'hex' | 'rgb';
+-	color: ColorFormats.HSLA;
+-	onChange: ( value: ColorFormats.HSLA ) => void;
++	color: Colord;
++	onChange: ( nextColor: Colord ) => void;
+ 	enableAlpha: boolean;
+ }
+ 
+diff --git a/packages/components/src/color-picker/component.tsx b/packages/components/src/color-picker/component.tsx
+index a057f51adf21f4..0a3d381bdc8752 100644
+--- a/packages/components/src/color-picker/component.tsx
++++ b/packages/components/src/color-picker/component.tsx
+@@ -2,13 +2,14 @@
+  * External dependencies
+  */
+ // eslint-disable-next-line no-restricted-imports
+-import type { Ref } from 'react';
+-import type { ColorFormats } from 'tinycolor2';
++import { Ref, useCallback } from 'react';
++import { colord, extend, Colord } from 'colord';
++import namesPlugin from 'colord/plugins/names';
+ 
+ /**
+  * WordPress dependencies
+  */
+-import { useState } from '@wordpress/element';
++import { useState, useMemo } from '@wordpress/element';
+ import { settings } from '@wordpress/icons';
+ import { useDebounce } from '@wordpress/compose';
+ import { __ } from '@wordpress/i18n';
+@@ -36,11 +37,13 @@ import { useControlledValue } from '../utils/hooks';
+ 
+ import type { ColorType } from './types';
+ 
++extend( [ namesPlugin ] );
++
+ export interface ColorPickerProps {
+ 	enableAlpha?: boolean;
+-	color?: ColorFormats.HSL | ColorFormats.HSLA;
+-	onChange?: ( color: ColorFormats.HSL | ColorFormats.HSLA ) => void;
+-	defaultValue?: ColorFormats.HSL | ColorFormats.HSLA;
++	color?: string;
++	onChange?: ( color: string ) => void;
++	defaultValue?: string;
+ 	copyFormat?: ColorType;
+ }
+ 
+@@ -50,12 +53,6 @@ const options = [
+ 	{ label: 'Hex', value: 'hex' as const },
+ ];
+ 
+-const getSafeColor = (
+-	color: ColorFormats.HSL | ColorFormats.HSLA | undefined
+-): ColorFormats.HSLA => {
+-	return color ? { a: 1, ...color } : { h: 0, s: 0, l: 100, a: 1 };
+-};
+-
+ const ColorPicker = (
+ 	props: WordPressComponentProps< ColorPickerProps, 'div', false >,
+ 	forwardedRef: Ref< any >
+@@ -75,17 +72,20 @@ const ColorPicker = (
+ 		defaultValue,
+ 	} );
+ 
++	// Use a safe default value for the color and remove the possibility of `undefined`.
++	const safeColordColor = useMemo( () => {
++		return color ? colord( color ) : colord( '#fff' );
++	}, [ color ] );
++
+ 	// Debounce to prevent rapid changes from conflicting with one another.
+ 	const debouncedSetColor = useDebounce( setColor );
+ 
+-	const handleChange = (
+-		nextValue: ColorFormats.HSLA | ColorFormats.HSL
+-	) => {
+-		debouncedSetColor( nextValue );
+-	};
+-
+-	// Use a safe default value for the color and remove the possibility of `undefined`.
+-	const safeColor = getSafeColor( color );
++	const handleChange = useCallback(
++		( nextValue: Colord ) => {
++			debouncedSetColor( nextValue.toHex() );
++		},
++		[ debouncedSetColor ]
++	);
+ 
+ 	const [ showInputs, setShowInputs ] = useState< boolean >( false );
+ 	const [ colorType, setColorType ] = useState< ColorType >(
+@@ -96,7 +96,7 @@ const ColorPicker = (
+ 		<ColorfulWrapper ref={ forwardedRef } { ...divProps }>
+ 			<Picker
+ 				onChange={ handleChange }
+-				color={ safeColor }
++				color={ safeColordColor }
+ 				enableAlpha={ enableAlpha }
+ 			/>
+ 			<AuxiliaryColorArtefactWrapper>
+@@ -113,7 +113,7 @@ const ColorPicker = (
+ 						/>
+ 					) : (
+ 						<ColorDisplay
+-							color={ safeColor }
++							color={ safeColordColor }
+ 							colorType={ copyFormat || colorType }
+ 							enableAlpha={ enableAlpha }
+ 						/>
+@@ -134,7 +134,7 @@ const ColorPicker = (
+ 				{ showInputs && (
+ 					<ColorInput
+ 						colorType={ colorType }
+-						color={ safeColor }
++						color={ safeColordColor }
+ 						onChange={ handleChange }
+ 						enableAlpha={ enableAlpha }
+ 					/>
+diff --git a/packages/components/src/color-picker/hex-input.tsx b/packages/components/src/color-picker/hex-input.tsx
+index e0de70a4f72188..c17d8866fc02fa 100644
+--- a/packages/components/src/color-picker/hex-input.tsx
++++ b/packages/components/src/color-picker/hex-input.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import colorize, { ColorFormats } from 'tinycolor2';
++import { colord, Colord } from 'colord';
+ 
+ /**
+  * WordPress dependencies
+@@ -17,23 +17,18 @@ import { space } from '../ui/utils/space';
+ import { ColorHexInputControl } from './styles';
+ 
+ interface HexInputProps {
+-	color: ColorFormats.HSLA;
+-	onChange: ( value: ColorFormats.HSLA ) => void;
++	color: Colord;
++	onChange: ( nextColor: Colord ) => void;
+ 	enableAlpha: boolean;
+ }
+ 
+ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
+ 	const handleValidate = ( value: string ) => {
+-		if ( ! colorize( value ).isValid() ) {
++		if ( ! colord( '#' + value ).isValid() ) {
+ 			throw new Error( 'Invalid hex color input' );
+ 		}
+ 	};
+ 
+-	const colorized = colorize( color );
+-	const value = enableAlpha
+-		? colorized.toHex8String()
+-		: colorized.toHexString();
+-
+ 	return (
+ 		<ColorHexInputControl
+ 			prefix={
+@@ -46,10 +41,10 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
+ 					#
+ 				</Spacer>
+ 			}
+-			value={ value.slice( 1 ).toUpperCase() }
+-			onChange={ ( nextValue ) =>
+-				onChange( colorize( nextValue ).toHsl() )
+-			}
++			value={ color.toHex().slice( 1 ).toUpperCase() }
++			onChange={ ( nextValue ) => {
++				onChange( colord( '#' + nextValue ) );
++			} }
+ 			onValidate={ handleValidate }
+ 			maxLength={ enableAlpha ? 8 : 6 }
+ 			label={ __( 'Hex color' ) }
+diff --git a/packages/components/src/color-picker/hsl-input.tsx b/packages/components/src/color-picker/hsl-input.tsx
+index d41cc4cf884ae4..c9766244665fb1 100644
+--- a/packages/components/src/color-picker/hsl-input.tsx
++++ b/packages/components/src/color-picker/hsl-input.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { ColorFormats } from 'tinycolor2';
++import { colord, Colord } from 'colord';
+ 
+ /**
+  * Internal dependencies
+@@ -9,45 +9,59 @@ import type { ColorFormats } from 'tinycolor2';
+ import { InputWithSlider } from './input-with-slider';
+ 
+ interface HslInputProps {
+-	color: ColorFormats.HSLA;
+-	onChange: ( color: ColorFormats.HSLA ) => void;
++	color: Colord;
++	onChange: ( nextColor: Colord ) => void;
+ 	enableAlpha: boolean;
+ }
+ 
+ export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
+-	const { h, s, l, a } = color;
++	const { h, s, l, a } = color.toHsl();
+ 
+ 	return (
+ 		<>
+ 			<InputWithSlider
+-				min={ 1 }
+-				max={ 360 }
++				min={ 0 }
++				max={ 359 }
+ 				label="Hue"
+ 				abbreviation="H"
+-				value={ Math.trunc( h ) }
+-				onChange={ ( nextH: number ) =>
+-					onChange( { h: nextH, s, l, a } )
+-				}
++				value={ h }
++				onChange={ ( nextH: number ) => {
++					onChange( colord( { h: nextH, s, l, a } ) );
++				} }
+ 			/>
+ 			<InputWithSlider
+ 				min={ 0 }
+ 				max={ 100 }
+ 				label="Saturation"
+ 				abbreviation="S"
+-				value={ s <= 1 ? Math.trunc( 100 * s ) : s }
+-				onChange={ ( nextS: number ) =>
+-					onChange( { h, s: nextS / 100, l, a } )
+-				}
++				value={ s }
++				onChange={ ( nextS: number ) => {
++					onChange(
++						colord( {
++							h,
++							s: nextS,
++							l,
++							a,
++						} )
++					);
++				} }
+ 			/>
+ 			<InputWithSlider
+ 				min={ 0 }
+ 				max={ 100 }
+ 				label="Lightness"
+ 				abbreviation="L"
+-				value={ l <= 1 ? Math.trunc( 100 * l ) : l }
+-				onChange={ ( nextL: number ) =>
+-					onChange( { h, s, l: nextL / 100, a } )
+-				}
++				value={ l }
++				onChange={ ( nextL: number ) => {
++					onChange(
++						colord( {
++							h,
++							s,
++							l: nextL,
++							a,
++						} )
++					);
++				} }
+ 			/>
+ 			{ enableAlpha && (
+ 				<InputWithSlider
+@@ -56,14 +70,16 @@ export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
+ 					label="Alpha"
+ 					abbreviation="A"
+ 					value={ Math.trunc( 100 * a ) }
+-					onChange={ ( nextA: number ) =>
+-						onChange( {
+-							h,
+-							s,
+-							l,
+-							a: nextA / 100,
+-						} )
+-					}
++					onChange={ ( nextA: number ) => {
++						onChange(
++							colord( {
++								h,
++								s,
++								l,
++								a: nextA / 100,
++							} )
++						);
++					} }
+ 				/>
+ 			) }
+ 		</>
+diff --git a/packages/components/src/color-picker/index.native.js b/packages/components/src/color-picker/index.native.js
+index c740d73a648971..5b3b51eaf91c46 100644
+--- a/packages/components/src/color-picker/index.native.js
++++ b/packages/components/src/color-picker/index.native.js
+@@ -3,7 +3,8 @@
+  */
+ import { View, Text, TouchableWithoutFeedback, Platform } from 'react-native';
+ import HsvColorPicker from 'react-native-hsv-color-picker';
+-import tinycolor from 'tinycolor2';
++import { colord, extend } from 'colord';
++import namesPlugin from 'colord/plugins/names';
+ /**
+  * WordPress dependencies
+  */
+@@ -17,6 +18,8 @@ import { Icon, check, close } from '@wordpress/icons';
+  */
+ import styles from './style.scss';
+ 
++extend( [ namesPlugin ] );
++
+ function ColorPicker( {
+ 	shouldEnableBottomSheetScroll,
+ 	shouldEnableBottomSheetMaxHeight,
+@@ -35,11 +38,11 @@ function ColorPicker( {
+ 	const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
+ 	const { h: initH, s: initS, v: initV } =
+ 		! isGradientColor && activeColor
+-			? tinycolor( activeColor ).toHsv()
+-			: { h: 0, s: 0.5, v: 0.5 };
++			? colord( activeColor ).toHsv()
++			: { h: 0, s: 50, v: 50 };
+ 	const [ hue, setHue ] = useState( initH );
+-	const [ sat, setSaturation ] = useState( initS );
+-	const [ val, setValue ] = useState( initV );
++	const [ sat, setSaturation ] = useState( initS / 100 );
++	const [ val, setValue ] = useState( initV / 100 );
+ 	const [ savedColor ] = useState( activeColor );
+ 
+ 	const {
+@@ -71,9 +74,11 @@ function ColorPicker( {
+ 		styles.footerDark
+ 	);
+ 
+-	const currentColor = tinycolor(
+-		`hsv ${ hue } ${ sat } ${ val }`
+-	).toHexString();
++	const currentColor = colord( {
++		h: hue,
++		s: sat * 100,
++		v: val * 100,
++	} ).toHex();
+ 
+ 	useEffect( () => {
+ 		if ( ! didMount.current ) {
+diff --git a/packages/components/src/color-picker/picker.tsx b/packages/components/src/color-picker/picker.tsx
+index 16723a9e417569..3304112001e25e 100644
+--- a/packages/components/src/color-picker/picker.tsx
++++ b/packages/components/src/color-picker/picker.tsx
+@@ -1,26 +1,29 @@
+ /**
+  * External dependencies
+  */
+-import type { ColorFormats } from 'tinycolor2';
+ import { HslColorPicker, HslaColorPicker } from 'react-colorful';
++import { colord, Colord } from 'colord';
+ 
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
+ interface PickerProps {
+-	color: ColorFormats.HSL | ColorFormats.HSLA;
++	color: Colord;
+ 	enableAlpha: boolean;
+-	onChange: ( nextColor: ColorFormats.HSL | ColorFormats.HSLA ) => void;
++	onChange: ( nextColor: Colord ) => void;
+ }
+ 
+ export const Picker = ( { color, enableAlpha, onChange }: PickerProps ) => {
+-	// RC accepts s and l as a range from 0 - 100, whereas tinycolor expects a decimal value representing the percentage
+-	// so we need to make sure that we're giving RC the correct color format that it expects
+-	const reactColorfulColor = {
+-		h: color.h,
+-		s: color.s <= 1 ? Math.floor( color.s * 100 ) : color.s,
+-		l: color.l <= 1 ? Math.floor( color.l * 100 ) : color.l,
+-		a: ( color as ColorFormats.HSLA ).a,
+-	};
+-
+ 	const Component = enableAlpha ? HslaColorPicker : HslColorPicker;
++	const hslColor = useMemo( () => color.toHsl(), [ color ] );
+ 
+-	return <Component color={ reactColorfulColor } onChange={ onChange } />;
++	return (
++		<Component
++			color={ hslColor }
++			onChange={ ( nextColor ) => {
++				onChange( colord( nextColor ) );
++			} }
++		/>
++	);
+ };
+diff --git a/packages/components/src/color-picker/rgb-input.tsx b/packages/components/src/color-picker/rgb-input.tsx
+index adb0ed6950613d..e2c51a32fd0635 100644
+--- a/packages/components/src/color-picker/rgb-input.tsx
++++ b/packages/components/src/color-picker/rgb-input.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import colorize, { ColorFormats } from 'tinycolor2';
++import { colord, Colord } from 'colord';
+ 
+ /**
+  * Internal dependencies
+@@ -9,13 +9,13 @@ import colorize, { ColorFormats } from 'tinycolor2';
+ import { InputWithSlider } from './input-with-slider';
+ 
+ interface RgbInputProps {
+-	color: ColorFormats.HSLA;
+-	onChange: ( color: ColorFormats.HSLA ) => void;
++	color: Colord;
++	onChange: ( nextColor: Colord ) => void;
+ 	enableAlpha: boolean;
+ }
+ 
+ export const RgbInput = ( { color, onChange, enableAlpha }: RgbInputProps ) => {
+-	const { r, g, b, a } = colorize( color ).toRgb();
++	const { r, g, b, a } = color.toRgb();
+ 
+ 	return (
+ 		<>
+@@ -26,7 +26,7 @@ export const RgbInput = ( { color, onChange, enableAlpha }: RgbInputProps ) => {
+ 				abbreviation="R"
+ 				value={ r }
+ 				onChange={ ( nextR: number ) =>
+-					onChange( colorize( { r: nextR, g, b, a } ).toHsl() )
++					onChange( colord( { r: nextR, g, b, a } ) )
+ 				}
+ 			/>
+ 			<InputWithSlider
+@@ -36,7 +36,7 @@ export const RgbInput = ( { color, onChange, enableAlpha }: RgbInputProps ) => {
+ 				abbreviation="G"
+ 				value={ g }
+ 				onChange={ ( nextG: number ) =>
+-					onChange( colorize( { r, g: nextG, b, a } ).toHsl() )
++					onChange( colord( { r, g: nextG, b, a } ) )
+ 				}
+ 			/>
+ 			<InputWithSlider
+@@ -46,7 +46,7 @@ export const RgbInput = ( { color, onChange, enableAlpha }: RgbInputProps ) => {
+ 				abbreviation="B"
+ 				value={ b }
+ 				onChange={ ( nextB: number ) =>
+-					onChange( colorize( { r, g, b: nextB, a } ).toHsl() )
++					onChange( colord( { r, g, b: nextB, a } ) )
+ 				}
+ 			/>
+ 			{ enableAlpha && (
+@@ -58,12 +58,12 @@ export const RgbInput = ( { color, onChange, enableAlpha }: RgbInputProps ) => {
+ 					value={ Math.trunc( a * 100 ) }
+ 					onChange={ ( nextA: number ) =>
+ 						onChange(
+-							colorize( {
++							colord( {
+ 								r,
+ 								g,
+ 								b,
+ 								a: nextA / 100,
+-							} ).toHsl()
++							} )
+ 						)
+ 					}
+ 				/>
+diff --git a/packages/components/src/color-picker/stories/index.js b/packages/components/src/color-picker/stories/index.js
+index 1ee9baa7d5be8c..95a8fa1ef2bdbb 100644
+--- a/packages/components/src/color-picker/stories/index.js
++++ b/packages/components/src/color-picker/stories/index.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import { boolean, select } from '@storybook/addon-knobs';
+-import colorize from 'tinycolor2';
+ 
+ /**
+  * WordPress dependencies
+@@ -48,9 +47,7 @@ const Example = () => {
+ 			marginTop={ space( 10 ) }
+ 		>
+ 			<ColorPicker { ...props } color={ color } onChange={ setColor } />
+-			<div style={ { width: 200, textAlign: 'center' } }>
+-				{ colorize( color ).toHslString() }
+-			</div>
++			<div style={ { width: 200, textAlign: 'center' } }>{ color }</div>
+ 			<ColorPicker { ...props } color={ color } onChange={ setColor } />
+ 		</Flex>
+ 	);
+diff --git a/packages/components/src/color-picker/test/index.js b/packages/components/src/color-picker/test/index.js
+index 503d5ffa66e8f4..19f8f2130f005e 100644
+--- a/packages/components/src/color-picker/test/index.js
++++ b/packages/components/src/color-picker/test/index.js
+@@ -47,12 +47,6 @@ const sleep = ( ms ) => {
+ 	return promise;
+ };
+ 
+-const hslMatcher = expect.objectContaining( {
+-	h: expect.any( Number ),
+-	s: expect.any( Number ),
+-	l: expect.any( Number ),
+-} );
+-
+ const hslaMatcher = expect.objectContaining( {
+ 	h: expect.any( Number ),
+ 	s: expect.any( Number ),
+@@ -61,7 +55,6 @@ const hslaMatcher = expect.objectContaining( {
+ } );
+ 
+ const legacyColorMatcher = {
+-	color: expect.anything(),
+ 	hex: expect.any( String ),
+ 	hsl: hslaMatcher,
+ 	hsv: expect.objectContaining( {
+@@ -109,14 +102,9 @@ describe( 'ColorPicker', () => {
+ 		} );
+ 	} );
+ 
+-	it( 'should fire onChange with the HSLA value', async () => {
++	it( 'should fire onChange with the string value', async () => {
+ 		const onChange = jest.fn();
+-		const color = {
+-			h: 125,
+-			s: 0.2,
+-			l: 0.5,
+-			a: 0.5,
+-		};
++		const color = 'rgba(1, 1, 1, 0.5)';
+ 
+ 		const { container } = render(
+ 			<ColorPicker onChange={ onChange } color={ color } enableAlpha />
+@@ -132,7 +120,9 @@ describe( 'ColorPicker', () => {
+ 		// `onChange` is debounced so we need to sleep for at least 1ms before checking that onChange was called
+ 		await sleep( 1 );
+ 
+-		expect( onChange ).toHaveBeenCalledWith( hslaMatcher );
++		expect( onChange ).toHaveBeenCalledWith(
++			expect.stringMatching( /^#([a-fA-F0-9]{8})$/ )
++		);
+ 	} );
+ 
+ 	it( 'should fire onChange with the HSL value', async () => {
+@@ -163,6 +153,8 @@ describe( 'ColorPicker', () => {
+ 		// `onChange` is debounced so we need to sleep for at least 1ms before checking that onChange was called
+ 		await sleep( 1 );
+ 
+-		expect( onChange ).toHaveBeenCalledWith( hslMatcher );
++		expect( onChange ).toHaveBeenCalledWith(
++			expect.stringMatching( /^#([a-fA-F0-9]{6})$/ )
++		);
+ 	} );
+ } );
+diff --git a/packages/components/src/color-picker/use-deprecated-props.ts b/packages/components/src/color-picker/use-deprecated-props.ts
+index a4ab085704e60f..d8c9223d265868 100644
+--- a/packages/components/src/color-picker/use-deprecated-props.ts
++++ b/packages/components/src/color-picker/use-deprecated-props.ts
+@@ -1,7 +1,15 @@
+ /**
+  * External dependencies
+  */
+-import colorize, { ColorFormats } from 'tinycolor2';
++import {
++	colord,
++	HslColor,
++	HslaColor,
++	HsvColor,
++	HsvaColor,
++	RgbColor,
++	RgbaColor,
++} from 'colord';
+ // eslint-disable-next-line no-restricted-imports
+ import type { ComponentProps } from 'react';
+ import memoize from 'memize';
+@@ -24,11 +32,10 @@ type ColorPickerProps = ComponentProps< typeof ColorPicker >;
+ type LegacyColor =
+ 	| string
+ 	| {
+-			color: colorize.Instance;
+ 			hex: string;
+-			hsl: ColorFormats.HSL | ColorFormats.HSLA;
+-			hsv: ColorFormats.HSV | ColorFormats.HSVA;
+-			rgb: ColorFormats.RGB | ColorFormats.RGBA;
++			hsl: HslColor | HslaColor;
++			hsv: HsvColor | HsvaColor;
++			rgb: RgbColor | RgbaColor;
+ 			/**
+ 			 * @deprecated
+ 			 */
+@@ -43,7 +50,7 @@ type LegacyColor =
+  * @deprecated
+  */
+ export interface LegacyProps {
+-	color: LegacyColor | undefined;
++	color?: LegacyColor;
+ 	/**
+ 	 * @deprecated
+ 	 */
+@@ -62,51 +69,32 @@ export interface LegacyProps {
+ function isLegacyProps( props: any ): props is LegacyProps {
+ 	return (
+ 		typeof props.onChangeComplete !== 'undefined' ||
+-		typeof props.color === 'string' ||
++		typeof props.disableAlpha !== 'undefined' ||
+ 		typeof props.color?.hex === 'string'
+ 	);
+ }
+ 
+-function getColorFromLegacyProps(
+-	props: LegacyProps
+-): ColorFormats.HSL | ColorFormats.HSLA | undefined {
+-	if ( ! props.color ) {
++function getColorFromLegacyProps( props: LegacyProps ): string | undefined {
++	if ( typeof props?.color === 'undefined' ) {
+ 		return undefined;
+ 	}
+ 	if ( typeof props.color === 'string' ) {
+-		return colorize( props.color ).toHsl();
++		return props.color;
++	}
++	if ( props.color.hex ) {
++		return props.color.hex;
+ 	}
+-
+-	return props.color.hsl;
+-}
+-
+-function toHsv(
+-	color: colorize.Instance
+-): ColorFormats.HSV | ColorFormats.HSVA {
+-	const { h, s, v, a } = color.toHsv();
+-
+-	return {
+-		h: Math.round( h ),
+-		s: Math.round( s * 100 ),
+-		v: Math.round( v * 100 ),
+-		a,
+-	};
+ }
+ 
+-const transformHslToLegacyColor = memoize(
+-	( hsla: ColorFormats.HSL | ColorFormats.HSLA ): LegacyColor => {
+-		const color = colorize( hsla );
+-		const rawHex = color.toHex();
+-		const rgb = color.toRgb();
+-		const hsv = toHsv( color );
+-		const hsl = hsla;
+-
+-		const isTransparent = rawHex === '000000' && rgb.a === 0;
+-
+-		const hex = isTransparent ? 'transparent' : `#${ rawHex }`;
++const transformColorStringToLegacyColor = memoize(
++	( color: string ): LegacyColor => {
++		const colordColor = colord( color );
++		const hex = colordColor.toHex();
++		const rgb = colordColor.toRgb();
++		const hsv = colordColor.toHsv();
++		const hsl = colordColor.toHsl();
+ 
+ 		return {
+-			color,
+ 			hex,
+ 			rgb,
+ 			hsv,
+@@ -121,14 +109,14 @@ export function useDeprecatedProps(
+ 	props: LegacyProps | ColorPickerProps
+ ): ColorPickerProps {
+ 	const onChange = useCallback(
+-		( hsla: ColorFormats.HSL | ColorFormats.HSLA ) => {
++		( color: string ) => {
+ 			if ( isLegacyProps( props ) ) {
+ 				return props.onChangeComplete(
+-					transformHslToLegacyColor( hsla )
++					transformColorStringToLegacyColor( color )
+ 				);
+ 			}
+ 
+-			return props.onChange?.( hsla );
++			return props.onChange?.( color );
+ 		},
+ 		[
+ 			( props as LegacyProps ).onChangeComplete,

@@ -1,0 +1,386 @@
+diff --git a/package-lock.json b/package-lock.json
+index 80c57f1ef52d46..bf281423d26c47 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -15684,6 +15684,7 @@
+ 				"classnames": "^2.2.5",
+ 				"dom-scroll-into-view": "^1.2.1",
+ 				"downshift": "^5.4.0",
++				"fast-average-color": "4.3.0",
+ 				"gradient-parser": "^0.1.5",
+ 				"lodash": "^4.17.19",
+ 				"memize": "^1.1.0",
+@@ -15698,6 +15699,13 @@
+ 				"rememo": "^3.0.0",
+ 				"tinycolor2": "^1.4.1",
+ 				"uuid": "^7.0.2"
++			},
++			"dependencies": {
++				"fast-average-color": {
++					"version": "4.3.0",
++					"resolved": "https://registry.npmjs.org/fast-average-color/-/fast-average-color-4.3.0.tgz",
++					"integrity": "sha512-k8FXd6+JeXoItmdNqB3hMwFgArryjdYBLuzEM8fRY/oztd/051yhSHU6GUrMOfIQU9dDHyFDcIAkGrQKlYtpDA=="
++				}
+ 			}
+ 		},
+ 		"@wordpress/compose": {
+diff --git a/packages/block-editor/src/components/colors-gradients/panel-color-gradient-settings.js b/packages/block-editor/src/components/colors-gradients/panel-color-gradient-settings.js
+index 74a19aa6bb705b..09ceaaddc06af0 100644
+--- a/packages/block-editor/src/components/colors-gradients/panel-color-gradient-settings.js
++++ b/packages/block-editor/src/components/colors-gradients/panel-color-gradient-settings.js
+@@ -85,6 +85,7 @@ export const PanelColorGradientSettingsInner = ( {
+ 	className,
+ 	colors,
+ 	gradients,
++	customColors = [],
+ 	disableCustomColors,
+ 	disableCustomGradients,
+ 	children,
+@@ -111,11 +112,13 @@ export const PanelColorGradientSettingsInner = ( {
+ 		return null;
+ 	}
+ 
++	const mergedColors = [ ...customColors, ...colors ];
++
+ 	const titleElement = (
+ 		<span className="block-editor-panel-color-gradient-settings__panel-title">
+ 			{ title }
+ 			<Indicators
+-				colors={ colors }
++				colors={ mergedColors }
+ 				gradients={ gradients }
+ 				settings={ settings }
+ 			/>
+@@ -134,7 +137,7 @@ export const PanelColorGradientSettingsInner = ( {
+ 				<ColorGradientControl
+ 					key={ index }
+ 					{ ...{
+-						colors,
++						colors: mergedColors,
+ 						gradients,
+ 						disableCustomColors,
+ 						disableCustomGradients,
+diff --git a/packages/block-library/src/cover/edit.js b/packages/block-library/src/cover/edit.js
+index 29c0dee1cfc075..fc3e1359ddd064 100644
+--- a/packages/block-library/src/cover/edit.js
++++ b/packages/block-library/src/cover/edit.js
+@@ -1,6 +1,7 @@
+ /**
+  * External dependencies
+  */
++import { noop } from 'lodash';
+ import classnames from 'classnames';
+ import FastAverageColor from 'fast-average-color';
+ import tinycolor from 'tinycolor2';
+@@ -19,6 +20,7 @@ import {
+ 	ResizableBox,
+ 	ToggleControl,
+ 	withNotices,
++	useColorExtract,
+ 	__experimentalBoxControl as BoxControl,
+ } from '@wordpress/components';
+ import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
+@@ -304,10 +306,25 @@ function CoverEdit( {
+ 		}
+ 	}
+ 
++	const backgroundColorValue = overlayColor.color || gradientValue;
+ 	const hasBackground = !! ( url || overlayColor.color || gradientValue );
++
+ 	const showFocalPointPicker =
+ 		isVideoBackground || ( isImageBackground && ! hasParallax );
+ 
++	/**
++	 * Custom hook used for setting the initial background color.
++	 *
++	 * If a background image is set, this hook extracts the primary color from
++	 * that image and sets it as a background color.
++	 */
++	const { customColors } = useCoverColorExtract( {
++		color: backgroundColorValue,
++		isSelected,
++		onChange: setOverlayColor,
++		src: url,
++	} );
++
+ 	const controls = (
+ 		<>
+ 			<BlockControls>
+@@ -395,6 +412,7 @@ function CoverEdit( {
+ 						<PanelColorGradientSettings
+ 							title={ __( 'Overlay' ) }
+ 							initialOpen={ true }
++							customColors={ customColors }
+ 							settings={ [
+ 								{
+ 									colorValue: overlayColor.color,
+@@ -548,6 +566,53 @@ function CoverEdit( {
+ 	);
+ }
+ 
++function useCoverColorExtract( {
++	backgroundColor,
++	onChange = noop,
++	isSelected = false,
++	src,
++} ) {
++	const [ customExtractedColor, setCustomExtractedColor ] = useState( null );
++	const [ didSelect, setDidSelect ] = useState( false );
++
++	const updateCustomOverlayColor = ( value ) => {
++		onChange( value );
++		setCustomExtractedColor( value );
++	};
++
++	const { extractColor } = useColorExtract( {
++		color: backgroundColor,
++		onChange: updateCustomOverlayColor,
++		src,
++	} );
++
++	useEffect( () => {
++		// Extracts color to add to color palette.
++		// Run when the block is first selected.
++		if ( ! didSelect && isSelected ) {
++			extractColor().then( ( [ value ] ) => {
++				setCustomExtractedColor( value );
++			} );
++			setDidSelect( true );
++		}
++	}, [ isSelected, didSelect ] );
++
++	let customColors = [];
++	if ( customExtractedColor ) {
++		customColors = [
++			{
++				name: __( 'Image dominant color' ),
++				slug: __( 'image-dominant-color' ),
++				color: customExtractedColor,
++			},
++		];
++	}
++
++	return {
++		customColors,
++	};
++}
++
+ export default compose( [
+ 	withDispatch( ( dispatch ) => {
+ 		const { toggleSelection } = dispatch( 'core/block-editor' );
+diff --git a/packages/components/package.json b/packages/components/package.json
+index ffe577ed342a66..c4d9cfd857e623 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -47,6 +47,7 @@
+ 		"classnames": "^2.2.5",
+ 		"dom-scroll-into-view": "^1.2.1",
+ 		"downshift": "^5.4.0",
++		"fast-average-color": "4.3.0",
+ 		"gradient-parser": "^0.1.5",
+ 		"lodash": "^4.17.19",
+ 		"memize": "^1.1.0",
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 177bfc406480a4..6bcbc161c01e80 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -135,3 +135,6 @@ export {
+ } from './higher-order/with-focus-return';
+ export { default as withNotices } from './higher-order/with-notices';
+ export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
++
++// Utilities
++export { useColorExtract } from './utils/hooks';
+diff --git a/packages/components/src/utils/hooks/index.js b/packages/components/src/utils/hooks/index.js
+index 3eeca7881e2563..44ed4673566a8b 100644
+--- a/packages/components/src/utils/hooks/index.js
++++ b/packages/components/src/utils/hooks/index.js
+@@ -1,3 +1,4 @@
++export { useColorExtract } from './use-color-extract';
+ export { default as useControlledState } from './use-controlled-state';
+ export { default as useJumpStep } from './use-jump-step';
+ export { default as useUpdateEffect } from './use-update-effect';
+diff --git a/packages/components/src/utils/hooks/use-color-extract.js b/packages/components/src/utils/hooks/use-color-extract.js
+new file mode 100644
+index 00000000000000..d5eb4c2907699b
+--- /dev/null
++++ b/packages/components/src/utils/hooks/use-color-extract.js
+@@ -0,0 +1,131 @@
++/**
++ * External dependencies
++ */
++import { noop } from 'lodash';
++import FastAverageColor from 'fast-average-color';
++
++/**
++ * WordPress dependencies
++ */
++import { useState, useEffect, useRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++
++/**
++ *
++ * @typedef  UseColorExtractProps
++ *
++ * @property {string} color The initial color, used to track updates.
++ * @property {string} onChange Callback when colors are extracted.
++ * @property {Function} src The source of the image to extract colors from.
++ */
++
++/**
++ *
++ * @typedef  UseColorExtractHookProps
++ *
++ * @property {string} colors The color value extracted from an image source.
++ * @property {Function} extractColor An async method (Promise) that extracts color values from the image source.
++ */
++
++/**
++ * Custom hook that extracts the primary color of an image.
++ *
++ * This component's extraction technique may not work depending on
++ * CORS policy.
++ *
++ * @example
++ *
++ * ```js
++ * useColorExtract({
++ * 		src: '/my-image.png',
++ * 		onChange: imageColor => setState(imageColor)
++ * })
++ * ```
++ * @param {UseColorExtractProps} props Props for the custom hook.
++ * @return {UseColorExtractHookProps} Values and methods.
++ */
++export function useColorExtract( {
++	color: initialColor,
++	onChange = noop,
++	src,
++} ) {
++	const [ color, setColor ] = useState();
++	const srcRef = useRef( src );
++	const initialColorRef = useRef( initialColor );
++	const imageNodeRef = useRef();
++
++	const getImageNode = () => {
++		if ( ! imageNodeRef.current ) {
++			imageNodeRef.current = document.createElement( 'img' );
++			imageNodeRef.current.crossOrigin = 'Anonymous';
++		}
++		return imageNodeRef.current;
++	};
++
++	const extractColor = () => {
++		return new Promise( ( resolve, reject ) => {
++			try {
++				const imageNode = getImageNode();
++
++				imageNode.onload = async () => {
++					const extractor = new FastAverageColor();
++
++					extractor.getColorAsync( imageNode, ( data ) => {
++						setColor( data.hex );
++						resolve( [ data.hex, data ] );
++					} );
++
++					srcRef.current = src;
++				};
++				// Load the image
++				if ( src ) {
++					imageNode.src = src;
++				}
++			} catch ( err ) {
++				reject( err );
++			}
++		} );
++	};
++
++	useEffect( () => {
++		// Guard to quick return if the src does not change
++		if ( srcRef.current === src ) {
++			return;
++		}
++		/**
++		 * Checks to see if the src changes.
++		 * For Cover blocks, the initial src (on load) is undefined.
++		 * This tracks to see if an existing src changes to another.
++		 */
++		const didSrcChange =
++			// Initial src exists
++			srcRef.current &&
++			// Next src exists
++			src &&
++			// Next src does not match initial src (changed)
++			srcRef.current !== src;
++
++		// Guard to handle the initial load of an image (with potential pre-existing color)
++		if ( initialColorRef.current && ! didSrcChange ) {
++			return;
++		}
++
++		extractColor()
++			.then( ( [ value, data ] ) => {
++				const imageNode = getImageNode();
++				onChange( value, { data, node: imageNode } );
++			} )
++			.catch( ( err ) => {
++				// eslint-disable-next-line no-console
++				console.err( err );
++			} );
++	}, [ src ] );
++
++	return {
++		color,
++		extractColor,
++	};
++}
+diff --git a/packages/components/src/utils/stories/use-color-extract.js b/packages/components/src/utils/stories/use-color-extract.js
+new file mode 100644
+index 00000000000000..113c89eb6f12a7
+--- /dev/null
++++ b/packages/components/src/utils/stories/use-color-extract.js
+@@ -0,0 +1,41 @@
++/**
++ * Internal dependencies
++ */
++/**
++ * WordPress dependencies
++ */
++import { useEffect } from '@wordpress/element';
++import { useColorExtract } from '../hooks';
++
++export default { title: 'Utils/Hooks/useColorExtract' };
++
++const Example = () => {
++	const src =
++		'https://i0.wp.com/themes.svn.wordpress.org/twentytwenty/1.5/screenshot.png?w=1144&strip=all';
++	const { color, extractColor } = useColorExtract( { src } );
++
++	useEffect( () => {
++		extractColor();
++	}, [] );
++
++	return (
++		<div>
++			<h3>Extracted Color</h3>
++			<p>
++				<div
++					style={ { width: 40, height: 40, backgroundColor: color } }
++				/>
++			</p>
++			<h3>Image Source</h3>
++			<img
++				src={ src }
++				alt="Twenty Twenty Theme Preview"
++				style={ { width: 300, height: 'auto' } }
++			/>
++		</div>
++	);
++};
++
++export const _default = () => {
++	return <Example />;
++};

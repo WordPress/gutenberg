@@ -1,0 +1,115 @@
+diff --git a/packages/components/src/custom-gradient-picker/index.js b/packages/components/src/custom-gradient-picker/index.js
+index c84a9222b62f3c..b2bbb8a154d9ec 100644
+--- a/packages/components/src/custom-gradient-picker/index.js
++++ b/packages/components/src/custom-gradient-picker/index.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { get, omit } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -34,11 +29,8 @@ import {
+ } from './styles/custom-gradient-picker-styles';
+ 
+ const GradientAnglePicker = ( { gradientAST, hasGradient, onChange } ) => {
+-	const angle = get(
+-		gradientAST,
+-		[ 'orientation', 'value' ],
+-		DEFAULT_LINEAR_GRADIENT_ANGLE
+-	);
++	const angle =
++		gradientAST?.orientation?.value ?? DEFAULT_LINEAR_GRADIENT_ANGLE;
+ 	const onAngleChange = ( newAngle ) => {
+ 		onChange(
+ 			serializeGradient( {
+@@ -74,9 +66,11 @@ const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
+ 	};
+ 
+ 	const onSetRadialGradient = () => {
++		// eslint-disable-next-line no-unused-vars
++		const { orientation, ...restGradientAST } = gradientAST;
+ 		onChange(
+ 			serializeGradient( {
+-				...omit( gradientAST, [ 'orientation' ] ),
++				...restGradientAST,
+ 				type: 'radial-gradient',
+ 			} )
+ 		);
+diff --git a/packages/components/src/custom-gradient-picker/index.native.js b/packages/components/src/custom-gradient-picker/index.native.js
+index a3bea16ddf1286..474df2bd18b9b5 100644
+--- a/packages/components/src/custom-gradient-picker/index.native.js
++++ b/packages/components/src/custom-gradient-picker/index.native.js
+@@ -1,7 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { get, omit } from 'lodash';
+ /**
+  * WordPress dependencies
+  */
+@@ -37,7 +33,7 @@ function CustomGradientPicker( { setColor, currentValue, isGradientColor } ) {
+ 	}
+ 
+ 	function getGradientColor( type ) {
+-		const orientation = get( gradientAST, [ 'orientation' ] );
++		const { orientation, ...restGradientAST } = gradientAST;
+ 
+ 		if ( orientation ) {
+ 			setGradientOrientation( orientation );
+@@ -55,7 +51,7 @@ function CustomGradientPicker( { setColor, currentValue, isGradientColor } ) {
+ 						type,
+ 				  }
+ 				: {
+-						...omit( gradientAST, [ 'orientation' ] ),
++						...restGradientAST,
+ 						type,
+ 				  }
+ 		);
+@@ -83,11 +79,7 @@ function CustomGradientPicker( { setColor, currentValue, isGradientColor } ) {
+ 	}
+ 
+ 	function getGradientAngle() {
+-		return get(
+-			gradientAST,
+-			[ 'orientation', 'value' ],
+-			DEFAULT_LINEAR_GRADIENT_ANGLE
+-		);
++		return gradientAST?.orientation?.value ?? DEFAULT_LINEAR_GRADIENT_ANGLE;
+ 	}
+ 	return (
+ 		<>
+diff --git a/packages/components/src/custom-gradient-picker/serializer.js b/packages/components/src/custom-gradient-picker/serializer.js
+index c270ac50544cd7..f0b08404896da2 100644
+--- a/packages/components/src/custom-gradient-picker/serializer.js
++++ b/packages/components/src/custom-gradient-picker/serializer.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { compact, get } from 'lodash';
+-
+ export function serializeGradientColor( { type, value } ) {
+ 	if ( type === 'literal' ) {
+ 		return value;
+@@ -40,13 +35,12 @@ export function serializeGradient( { type, orientation, colorStops } ) {
+ 	const serializedColorStops = colorStops
+ 		.sort( ( colorStop1, colorStop2 ) => {
+ 			return (
+-				get( colorStop1, [ 'length', 'value' ], 0 ) -
+-				get( colorStop2, [ 'length', 'value' ], 0 )
++				( colorStop1?.length?.value ?? 0 ) -
++				( colorStop2?.length?.value ?? 0 )
+ 			);
+ 		} )
+ 		.map( serializeGradientColorStop );
+-	return `${ type }(${ compact( [
+-		serializedOrientation,
+-		...serializedColorStops,
+-	] ).join( ',' ) })`;
++	return `${ type }(${ [ serializedOrientation, ...serializedColorStops ]
++		.filter( Boolean )
++		.join( ',' ) })`;
+ }

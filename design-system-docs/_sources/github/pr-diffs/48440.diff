@@ -1,0 +1,1744 @@
+diff --git a/packages/base-styles/_z-index.scss b/packages/base-styles/_z-index.scss
+index 8df96260c80664..0739fc1eddd478 100644
+--- a/packages/base-styles/_z-index.scss
++++ b/packages/base-styles/_z-index.scss
+@@ -165,9 +165,6 @@ $z-layers: (
+ 	// And block manager sticky disabled block count is higher still
+ 	".edit-post-block-manager__disabled-blocks-count": 2,
+ 
+-	// Needs to be higher than any other element as this is an overlay to catch all events
+-	".components-tooltip .event-catcher": 100002,
+-
+ 	// Needs to appear below other color circular picker related UI elements.
+ 	".components-circular-option-picker__option-wrapper::before": -1,
+ 
+diff --git a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+index 3fa7e6fd690e8e..fa4083bf62ab14 100644
+--- a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
++++ b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+@@ -214,6 +214,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+                       class="components-circular-option-picker__option-wrapper"
+                     >
+                       <button
++                        aria-describedby="tooltip-0"
+                         aria-label="Color: red"
+                         aria-selected="true"
+                         class="components-button components-circular-option-picker__option is-pressed"
+diff --git a/packages/block-editor/src/components/link-control/test/index.js b/packages/block-editor/src/components/link-control/test/index.js
+index bce5ca5233192a..e12232130be1b1 100644
+--- a/packages/block-editor/src/components/link-control/test/index.js
++++ b/packages/block-editor/src/components/link-control/test/index.js
+@@ -176,7 +176,9 @@ describe( 'Basic rendering', () => {
+ 		await user.type( searchInput, 'Hello' );
+ 
+ 		// Wait for the spinner SVG icon to be rendered.
+-		expect( await screen.findByRole( 'presentation' ) ).toBeVisible();
++		expect(
++			await screen.findByTestId( 'components-spinner' )
++		).toBeVisible();
+ 		// Check the suggestions list is not rendered yet.
+ 		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+ 
+@@ -190,7 +192,9 @@ describe( 'Basic rendering', () => {
+ 		// Check the suggestions list is rendered.
+ 		expect( resultsList ).toBeVisible();
+ 		// Check the spinner SVG icon is not rendered any longer.
+-		expect( screen.queryByRole( 'presentation' ) ).not.toBeInTheDocument();
++		expect(
++			screen.queryByTestId( 'components-spinner' )
++		).not.toBeInTheDocument();
+ 
+ 		const searchResultElements =
+ 			within( resultsList ).getAllByRole( 'option' );
+@@ -455,14 +459,18 @@ describe( 'Searching for a link', () => {
+ 		// Simulate searching for a term.
+ 		await user.type( searchInput, searchTerm );
+ 
+-		expect( await screen.findByRole( 'presentation' ) ).toBeVisible();
++		expect(
++			await screen.findByTestId( 'components-spinner' )
++		).toBeVisible();
+ 		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+ 
+ 		// make the search suggestions fetch return a response
+ 		resolver( fauxEntitySuggestions );
+ 
+ 		expect( await screen.findByRole( 'listbox' ) ).toBeVisible();
+-		expect( screen.queryByRole( 'presentation' ) ).not.toBeInTheDocument();
++		expect(
++			screen.queryByTestId( 'components-spinner' )
++		).not.toBeInTheDocument();
+ 	} );
+ 
+ 	it.each( [ 'With spaces', 'Uppercase', 'lowercase' ] )(
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6ec68347af2595..ca2d278909aa78 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ -   Making Circular Option Picker a `listbox`. Note that while this changes some public API, new props are optional, and currently have default values; this will change in another patch ([#52255](https://github.com/WordPress/gutenberg/pull/52255)).
+ -   `ToggleGroupControl`: Rewrite backdrop animation using framer motion shared layout animations, add better support for controlled and uncontrolled modes ([#50278](https://github.com/WordPress/gutenberg/pull/50278)).
+ -   `Popover`: Add the `is-positioned` CSS class only after the popover has finished animating ([#54178](https://github.com/WordPress/gutenberg/pull/54178)).
++-   `Tooltip`: Replace the existing tooltip to simplify the implementation and improve accessibility while maintaining the same behaviors and API ([#48440](https://github.com/WordPress/gutenberg/pull/48440)).
+ 
+ ### Bug Fix
+ 
+@@ -33,6 +34,7 @@
+ 
+ ### Enhancements
+ 
++-   Make the `Popover.Slot` optional and render popovers at the bottom of the document's body by default. ([#53889](https://github.com/WordPress/gutenberg/pull/53889)).
+ -   `ProgressBar`: Add transition to determinate indicator ([#53877](https://github.com/WordPress/gutenberg/pull/53877)).
+ -   Prevent nested `SlotFillProvider` from rendering ([#53940](https://github.com/WordPress/gutenberg/pull/53940)).
+ 
+diff --git a/packages/components/src/button/test/index.tsx b/packages/components/src/button/test/index.tsx
+index 881a71484c18f2..af1afa801b507f 100644
+--- a/packages/components/src/button/test/index.tsx
++++ b/packages/components/src/button/test/index.tsx
+@@ -15,6 +15,7 @@ import { plusCircle } from '@wordpress/icons';
+  */
+ import Button from '..';
+ import Tooltip from '../../tooltip';
++import cleanupTooltip from '../../tooltip/test/utils';
+ 
+ jest.mock( '../../icon', () => () => <div data-testid="test-icon" /> );
+ 
+@@ -193,7 +194,7 @@ describe( 'Button', () => {
+ 
+ 			render( <Button icon={ plusCircle } label="WordPress" /> );
+ 
+-			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
++			expect( screen.queryByText( 'WordPress' ) ).not.toBeVisible();
+ 
+ 			// Move focus to the button
+ 			await user.tab();
+@@ -230,12 +231,14 @@ describe( 'Button', () => {
+ 				/>
+ 			);
+ 
+-			expect( screen.queryByText( 'Label' ) ).not.toBeInTheDocument();
++			expect( screen.queryByText( 'Label' ) ).not.toBeVisible();
+ 
+ 			// Move focus to the button
+ 			await user.tab();
+ 
+ 			expect( screen.getByText( 'Label' ) ).toBeVisible();
++
++			await cleanupTooltip( user );
+ 		} );
+ 
+ 		it( 'should populate tooltip with description content for buttons with visible labels (buttons with children)', async () => {
+@@ -287,12 +290,14 @@ describe( 'Button', () => {
+ 				<Button icon={ plusCircle } label="WordPress" children={ [] } />
+ 			);
+ 
+-			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
++			expect( screen.queryByText( 'WordPress' ) ).not.toBeVisible();
+ 
+ 			// Move focus to the button
+ 			await user.tab();
+ 
+ 			expect( screen.getByText( 'WordPress' ) ).toBeVisible();
++
++			await cleanupTooltip( user );
+ 		} );
+ 
+ 		it( 'should not show the tooltip when icon and children defined', async () => {
+@@ -321,12 +326,14 @@ describe( 'Button', () => {
+ 				</Button>
+ 			);
+ 
+-			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
++			expect( screen.queryByText( 'WordPress' ) ).not.toBeVisible();
+ 
+ 			// Move focus to the button
+ 			await user.tab();
+ 
+ 			expect( screen.getByText( 'WordPress' ) ).toBeVisible();
++
++			await cleanupTooltip( user );
+ 		} );
+ 	} );
+ 
+diff --git a/packages/components/src/color-palette/test/index.tsx b/packages/components/src/color-palette/test/index.tsx
+index e302fb476db3c0..8d108469fba3a8 100644
+--- a/packages/components/src/color-palette/test/index.tsx
++++ b/packages/components/src/color-palette/test/index.tsx
+@@ -256,7 +256,11 @@ describe( 'ColorPalette', () => {
+ 		// Clear the color, confirm that the relative values are cleared/updated.
+ 		await user.click( screen.getByRole( 'button', { name: 'Clear' } ) );
+ 		expect( screen.getByText( 'No color selected' ) ).toBeVisible();
+-		expect( screen.queryByText( colorName ) ).not.toBeInTheDocument();
++		expect(
++			screen.queryByText( colorName, {
++				selector: '.components-color-palette__custom-color-name',
++			} )
++		).not.toBeInTheDocument();
+ 		expect( screen.queryByText( colorCode ) ).not.toBeInTheDocument();
+ 		expect(
+ 			screen.getByRole( 'button', {
+diff --git a/packages/components/src/spinner/index.tsx b/packages/components/src/spinner/index.tsx
+index 9eee9dde18ef23..6b8131783ff5ae 100644
+--- a/packages/components/src/spinner/index.tsx
++++ b/packages/components/src/spinner/index.tsx
+@@ -30,6 +30,7 @@ export function UnforwardedSpinner(
+ 			focusable="false"
+ 			{ ...props }
+ 			ref={ forwardedRef }
++			data-testid="components-spinner"
+ 		>
+ 			{ /* Gray circular background */ }
+ 			<SpinnerTrack
+diff --git a/packages/components/src/tab-panel/test/index.tsx b/packages/components/src/tab-panel/test/index.tsx
+index 723ed4d17ff2d7..aa9cec2d993383 100644
+--- a/packages/components/src/tab-panel/test/index.tsx
++++ b/packages/components/src/tab-panel/test/index.tsx
+@@ -13,6 +13,7 @@ import { wordpress, category, media } from '@wordpress/icons';
+  * Internal dependencies
+  */
+ import TabPanel from '..';
++import cleanupTooltip from '../../tooltip/test/utils';
+ 
+ const TABS = [
+ 	{
+@@ -116,7 +117,7 @@ describe.each( [
+ 			for ( let i = 0; i < allTabs.length; i++ ) {
+ 				expect(
+ 					screen.queryByText( TABS_WITH_ICON[ i ].title )
+-				).not.toBeInTheDocument();
++				).not.toBeVisible();
+ 
+ 				await user.hover( allTabs[ i ] );
+ 
+@@ -128,6 +129,8 @@ describe.each( [
+ 
+ 				await user.unhover( allTabs[ i ] );
+ 			}
++
++			await cleanupTooltip( user );
+ 		} );
+ 
+ 		it( 'should display a tooltip when moving the selection via the keyboard on tabs provided with an icon', async () => {
+@@ -157,38 +160,40 @@ describe.each( [
+ 
+ 			// Tab to focus the tablist. Make sure alpha is focused, and that the
+ 			// corresponding tooltip is shown.
+-			expect( screen.queryByText( 'Alpha' ) ).not.toBeInTheDocument();
++			expect( screen.queryByText( 'Alpha' ) ).not.toBeVisible();
+ 			await user.keyboard( '[Tab]' );
+ 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+-			expect( screen.getByText( 'Alpha' ) ).toBeInTheDocument();
++			expect( screen.getByText( 'Alpha' ) ).toBeVisible();
+ 			expect( await getSelectedTab() ).toHaveFocus();
+ 
+ 			// Move selection with arrow keys. Make sure beta is focused, and that
+ 			// the corresponding tooltip is shown.
+-			expect( screen.queryByText( 'Beta' ) ).not.toBeInTheDocument();
++			expect( screen.queryByText( 'Beta' ) ).not.toBeVisible();
+ 			await user.keyboard( '[ArrowRight]' );
+ 			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
+ 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
+-			expect( screen.getByText( 'Beta' ) ).toBeInTheDocument();
++			expect( screen.getByText( 'Beta' ) ).toBeVisible();
+ 			expect( await getSelectedTab() ).toHaveFocus();
+ 
+ 			// Move selection with arrow keys. Make sure gamma is focused, and that
+ 			// the corresponding tooltip is shown.
+-			expect( screen.queryByText( 'Gamma' ) ).not.toBeInTheDocument();
++			expect( screen.queryByText( 'Gamma' ) ).not.toBeVisible();
+ 			await user.keyboard( '[ArrowRight]' );
+ 			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
+ 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
+-			expect( screen.getByText( 'Gamma' ) ).toBeInTheDocument();
++			expect( screen.getByText( 'Gamma' ) ).toBeVisible();
+ 			expect( await getSelectedTab() ).toHaveFocus();
+ 
+ 			// Move selection with arrow keys. Make sure beta is focused, and that
+ 			// the corresponding tooltip is shown.
+-			expect( screen.queryByText( 'Beta' ) ).not.toBeInTheDocument();
++			expect( screen.queryByText( 'Beta' ) ).not.toBeVisible();
+ 			await user.keyboard( '[ArrowLeft]' );
+ 			expect( mockOnSelect ).toHaveBeenCalledTimes( 4 );
+ 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
+-			expect( screen.getByText( 'Beta' ) ).toBeInTheDocument();
++			expect( screen.getByText( 'Beta' ) ).toBeVisible();
+ 			expect( await getSelectedTab() ).toHaveFocus();
++
++			await cleanupTooltip( user );
+ 		} );
+ 	} );
+ 
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index 296e9483b9f705..ce95e3d739c2cc 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -246,6 +246,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+         >
+           <button
+             aria-checked="true"
++            aria-describedby="tooltip-4"
+             aria-label="Uppercase"
+             class="emotion-12 components-toggle-group-control-option-base"
+             data-active-item=""
+@@ -284,6 +285,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+         >
+           <button
+             aria-checked="false"
++            aria-describedby="tooltip-5"
+             aria-label="Lowercase"
+             class="emotion-18 components-toggle-group-control-option-base"
+             data-command=""
+@@ -787,6 +789,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+         >
+           <button
+             aria-checked="true"
++            aria-describedby="tooltip-0"
+             aria-label="Uppercase"
+             class="emotion-12 components-toggle-group-control-option-base"
+             data-active-item=""
+@@ -825,6 +828,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+         >
+           <button
+             aria-checked="false"
++            aria-describedby="tooltip-1"
+             aria-label="Lowercase"
+             class="emotion-18 components-toggle-group-control-option-base"
+             data-command=""
+diff --git a/packages/components/src/toggle-group-control/test/index.tsx b/packages/components/src/toggle-group-control/test/index.tsx
+index 162f8357737007..78be0e89fc0bb3 100644
+--- a/packages/components/src/toggle-group-control/test/index.tsx
++++ b/packages/components/src/toggle-group-control/test/index.tsx
+@@ -20,6 +20,7 @@ import {
+ 	ToggleGroupControlOptionIcon,
+ } from '../index';
+ import type { ToggleGroupControlProps } from '../types';
++import cleanupTooltip from '../../tooltip/test/utils';
+ 
+ const ControlledToggleGroupControl = ( {
+ 	value: valueProp,
+@@ -137,9 +138,9 @@ describe.each( [
+ 			'Click for Delicious Gnocchi'
+ 		);
+ 
+-		await waitFor( () => expect( tooltip ).toBePositionedPopover() );
++		await waitFor( () => expect( tooltip ).toBeVisible() );
+ 
+-		expect( tooltip ).toBeVisible();
++		await cleanupTooltip( user );
+ 	} );
+ 
+ 	it( 'should not render tooltip', async () => {
+diff --git a/packages/components/src/toggle-group-control/types.ts b/packages/components/src/toggle-group-control/types.ts
+index d4b21a9e890a89..d170997c5b2608 100644
+--- a/packages/components/src/toggle-group-control/types.ts
++++ b/packages/components/src/toggle-group-control/types.ts
+@@ -7,6 +7,7 @@ import type { ReactNode } from 'react';
+  * Internal dependencies
+  */
+ import type { BaseControlProps } from '../base-control/types';
++import type { TooltipProps } from '../tooltip/types';
+ 
+ export type ToggleGroupControlOptionBaseProps = {
+ 	children: ReactNode;
+@@ -56,7 +57,7 @@ export type WithToolTipProps = {
+ 	/**
+ 	 * React children
+ 	 */
+-	children: ReactNode;
++	children: TooltipProps[ 'children' ];
+ 	/**
+ 	 * Label for the Tooltip component.
+ 	 */
+diff --git a/packages/components/src/tooltip/README.md b/packages/components/src/tooltip/README.md
+index e3589aa9d52ec9..483d6d4cb5d023 100644
+--- a/packages/components/src/tooltip/README.md
++++ b/packages/components/src/tooltip/README.md
+@@ -1,8 +1,6 @@
+-# Tooltip
++# ToolTip
+ 
+-Tooltip is a React component to render floating help text relative to a node when it receives focus or when the user places the mouse cursor atop it. If the tooltip exceeds the bounds of the page in the direction it opens, its position will be flipped automatically.
+-
+-Accessibility note: the tooltip text is hidden from screen readers and assistive technologies that understand ARIA. To make it accessible, use an `aria-label` attribute on the same element the tooltip is applied to, preferably using the same text used for the tooltip.
++Tooltip is a React component to render floating help text relative to a node when it receives focus or it is hovered upon by a mouse. If the tooltip exceeds the bounds of the page in the direction it opens, its position will be flipped automatically.
+ 
+ ## Usage
+ 
+@@ -22,49 +20,38 @@ const MyTooltip = () => (
+ 
+ The component accepts the following props:
+ 
+-### position
+-
+-The direction in which the tooltip should open relative to its parent node. Specify y- and x-axis as a space-separated string. Supports `"top"`, `"middle"`, `"bottom"` y axis, and `"left"`, `"center"`, `"right"` x axis.
+-
+--   Type: `String`
+--   Required: No
+--   Default: `"bottom"`
+-
+-### children
++#### `children`: `React.ReactElement`
+ 
+ The element to which the tooltip should anchor.
+ 
+-**NOTE:** You must pass only a single child. Tooltip renders itself as a clone of `children` with a [`Popover`](/packages/components/src/popover/README.md) added as an additional child.
++**NOTE:** Accepts only one child element.
+ 
+--   Type: `Element`
+ -   Required: Yes
+ 
+-### text
++#### `delay`: `number`
+ 
+-The tooltip text to show on focus or hover.
++The amount of time in milliseconds to wait before showing the tooltip.
+ 
+--   Type: `String`
+ -   Required: No
++-   Default: `700`
+ 
+-### shortcut (web only)
++#### `position`: `string`
++
++The direction in which the tooltip should open relative to its parent node. Specify y- and x-axis as a space-separated string. Supports `"top"`, `"middle"`, `"bottom"` y axis, and `"left"`, `"center"`, `"right"` x axis.
+ 
+--   Type: `string` or `object`
+ -   Required: No
++-   Default: `"bottom"`
+ 
+-If shortcut is a string, it is expecting the display text. If shortcut is an object, it will accept the properties of `display` (string) and `ariaLabel` (string).
++#### `shortcut`: `string` | `object`
+ 
+-### delay (web only)
++An option for adding accessible keyboard shortcuts.
+ 
+-Time in milliseconds to wait before showing tooltip after the tooltip's visibility is toggled. This prop is currently only available for the web platforms.
++If shortcut is a string, it is expecting the display text. If shortcut is an object, it will accept the properties of `display`: `string` and `ariaLabel`: `string`.
+ 
+--   Type: `Number`
+ -   Required: No
+--   Default: 700
+ 
+-### visible (native only)
++#### `text`: `string`
+ 
+-Whether the tooltip should be displayed on initial render. This prop is currently only available for the native mobile app built with React Native.
++The text shown in the tooltip when anchor element is focused or hovered.
+ 
+--   Type: `Boolean`
+ -   Required: No
+--   Default: `false`
+diff --git a/packages/components/src/tooltip/index.js b/packages/components/src/tooltip/index.js
+deleted file mode 100644
+index 65edc71049f250..00000000000000
+--- a/packages/components/src/tooltip/index.js
++++ /dev/null
+@@ -1,293 +0,0 @@
+-// @ts-nocheck
+-
+-/**
+- * External dependencies
+- */
+-import classNames from 'classnames';
+-
+-/**
+- * WordPress dependencies
+- */
+-import {
+-	Children,
+-	cloneElement,
+-	concatChildren,
+-	useEffect,
+-	useState,
+-} from '@wordpress/element';
+-import { useDebounce, useMergeRefs } from '@wordpress/compose';
+-
+-/**
+- * Internal dependencies
+- */
+-import Popover from '../popover';
+-import Shortcut from '../shortcut';
+-
+-/**
+- * Time over children to wait before showing tooltip
+- *
+- * @type {number}
+- */
+-export const TOOLTIP_DELAY = 700;
+-
+-const eventCatcher = <div className="event-catcher" />;
+-
+-const getDisabledElement = ( {
+-	eventHandlers,
+-	child,
+-	childrenWithPopover,
+-	mergedRefs,
+-} ) => {
+-	return cloneElement(
+-		<span className="disabled-element-wrapper">
+-			{ cloneElement( eventCatcher, eventHandlers ) }
+-			{ cloneElement( child, {
+-				children: childrenWithPopover,
+-				ref: mergedRefs,
+-			} ) }
+-		</span>,
+-		{ ...eventHandlers }
+-	);
+-};
+-
+-const getRegularElement = ( {
+-	child,
+-	eventHandlers,
+-	childrenWithPopover,
+-	mergedRefs,
+-} ) => {
+-	return cloneElement( child, {
+-		...eventHandlers,
+-		children: childrenWithPopover,
+-		ref: mergedRefs,
+-	} );
+-};
+-
+-const addPopoverToGrandchildren = ( {
+-	anchor,
+-	grandchildren,
+-	isOver,
+-	offset,
+-	position,
+-	shortcut,
+-	text,
+-	className,
+-	...props
+-} ) =>
+-	concatChildren(
+-		grandchildren,
+-		isOver && (
+-			<Popover
+-				focusOnMount={ false }
+-				position={ position }
+-				className={ classNames( 'components-tooltip', className ) }
+-				aria-hidden="true"
+-				animate={ false }
+-				offset={ offset }
+-				anchor={ anchor }
+-				shift
+-				{ ...props }
+-			>
+-				{ text }
+-				<Shortcut
+-					className="components-tooltip__shortcut"
+-					shortcut={ shortcut }
+-				/>
+-			</Popover>
+-		)
+-	);
+-
+-const emitToChild = ( children, eventName, event ) => {
+-	if ( Children.count( children ) !== 1 ) {
+-		return;
+-	}
+-
+-	const child = Children.only( children );
+-
+-	// If the underlying element is disabled, do not emit the event.
+-	if ( child.props.disabled ) {
+-		return;
+-	}
+-
+-	if ( typeof child.props[ eventName ] === 'function' ) {
+-		child.props[ eventName ]( event );
+-	}
+-};
+-
+-function Tooltip( props ) {
+-	const {
+-		children,
+-		position = 'bottom middle',
+-		text,
+-		shortcut,
+-		delay = TOOLTIP_DELAY,
+-		...popoverProps
+-	} = props;
+-	/**
+-	 * Whether a mouse is currently pressed, used in determining whether
+-	 * to handle a focus event as displaying the tooltip immediately.
+-	 *
+-	 * @type {boolean}
+-	 */
+-	const [ isMouseDown, setIsMouseDown ] = useState( false );
+-	const [ isOver, setIsOver ] = useState( false );
+-	const delayedSetIsOver = useDebounce( setIsOver, delay );
+-	// Using internal state (instead of a ref) for the popover anchor to make sure
+-	// that the component re-renders when the anchor updates.
+-	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+-
+-	// Create a reference to the Tooltip's child, to be passed to the Popover
+-	// so that the Tooltip can be correctly positioned. Also, merge with the
+-	// existing ref for the first child, so that its ref is preserved.
+-	const existingChildRef = Children.toArray( children )[ 0 ]?.ref;
+-	const mergedChildRefs = useMergeRefs( [
+-		setPopoverAnchor,
+-		existingChildRef,
+-	] );
+-
+-	const createMouseDown = ( event ) => {
+-		// In firefox, the mouse down event is also fired when the select
+-		// list is chosen.
+-		// Cancel further processing because re-rendering of child components
+-		// causes onChange to be triggered with the old value.
+-		// See https://github.com/WordPress/gutenberg/pull/42483
+-		if ( event.target.tagName === 'OPTION' ) {
+-			return;
+-		}
+-
+-		// Preserve original child callback behavior.
+-		emitToChild( children, 'onMouseDown', event );
+-
+-		// On mouse down, the next `mouseup` should revert the value of the
+-		// instance property and remove its own event handler. The bind is
+-		// made on the document since the `mouseup` might not occur within
+-		// the bounds of the element.
+-		document.addEventListener( 'mouseup', cancelIsMouseDown );
+-		setIsMouseDown( true );
+-	};
+-
+-	const createMouseUp = ( event ) => {
+-		// In firefox, the mouse up event is also fired when the select
+-		// list is chosen.
+-		// Cancel further processing because re-rendering of child components
+-		// causes onChange to be triggered with the old value.
+-		// See https://github.com/WordPress/gutenberg/pull/42483
+-		if ( event.target.tagName === 'OPTION' ) {
+-			return;
+-		}
+-
+-		emitToChild( children, 'onMouseUp', event );
+-		document.removeEventListener( 'mouseup', cancelIsMouseDown );
+-		setIsMouseDown( false );
+-	};
+-
+-	const createMouseEvent = ( type ) => {
+-		if ( type === 'mouseUp' ) return createMouseUp;
+-		if ( type === 'mouseDown' ) return createMouseDown;
+-	};
+-
+-	/**
+-	 * Prebound `isInMouseDown` handler, created as a constant reference to
+-	 * assure ability to remove in component unmount.
+-	 *
+-	 * @type {Function}
+-	 */
+-	const cancelIsMouseDown = createMouseEvent( 'mouseUp' );
+-
+-	const createToggleIsOver = ( eventName, isDelayed ) => {
+-		return ( event ) => {
+-			// Preserve original child callback behavior.
+-			emitToChild( children, eventName, event );
+-
+-			// Mouse events behave unreliably in React for disabled elements,
+-			// firing on mouseenter but not mouseleave.  Further, the default
+-			// behavior for disabled elements in some browsers is to ignore
+-			// mouse events. Don't bother trying to handle them.
+-			//
+-			// See: https://github.com/facebook/react/issues/4251
+-			if ( event.currentTarget.disabled ) {
+-				return;
+-			}
+-
+-			// A focus event will occur as a result of a mouse click, but it
+-			// should be disambiguated between interacting with the button and
+-			// using an explicit focus shift as a cue to display the tooltip.
+-			if ( 'focus' === event.type && isMouseDown ) {
+-				return;
+-			}
+-
+-			// Needed in case unsetting is over while delayed set pending, i.e.
+-			// quickly blur/mouseleave before delayedSetIsOver is called.
+-			delayedSetIsOver.cancel();
+-
+-			const _isOver = [ 'focus', 'mouseenter' ].includes( event.type );
+-			if ( _isOver === isOver ) {
+-				return;
+-			}
+-
+-			if ( isDelayed ) {
+-				delayedSetIsOver( _isOver );
+-			} else {
+-				setIsOver( _isOver );
+-			}
+-		};
+-	};
+-	const clearOnUnmount = () => {
+-		delayedSetIsOver.cancel();
+-		document.removeEventListener( 'mouseup', cancelIsMouseDown );
+-	};
+-
+-	// Ignore reason: updating the deps array here could cause unexpected changes in behavior.
+-	// Deferring until a more detailed investigation/refactor can be performed.
+-	// eslint-disable-next-line react-hooks/exhaustive-deps
+-	useEffect( () => clearOnUnmount, [] );
+-
+-	if ( Children.count( children ) !== 1 ) {
+-		if ( 'development' === process.env.NODE_ENV ) {
+-			// eslint-disable-next-line no-console
+-			console.error(
+-				'Tooltip should be called with only a single child element.'
+-			);
+-		}
+-
+-		return children;
+-	}
+-
+-	const eventHandlers = {
+-		onMouseEnter: createToggleIsOver( 'onMouseEnter', true ),
+-		onMouseLeave: createToggleIsOver( 'onMouseLeave' ),
+-		onClick: createToggleIsOver( 'onClick' ),
+-		onFocus: createToggleIsOver( 'onFocus' ),
+-		onBlur: createToggleIsOver( 'onBlur' ),
+-		onMouseDown: createMouseEvent( 'mouseDown' ),
+-	};
+-
+-	const child = Children.only( children );
+-	const { children: grandchildren, disabled } = child.props;
+-	const getElementWithPopover = disabled
+-		? getDisabledElement
+-		: getRegularElement;
+-
+-	const popoverData = {
+-		anchor: popoverAnchor,
+-		isOver,
+-		offset: 4,
+-		position,
+-		shortcut,
+-		text,
+-	};
+-	const childrenWithPopover = addPopoverToGrandchildren( {
+-		grandchildren,
+-		...popoverData,
+-		...popoverProps,
+-	} );
+-
+-	return getElementWithPopover( {
+-		child,
+-		eventHandlers,
+-		childrenWithPopover,
+-		mergedRefs: mergedChildRefs,
+-	} );
+-}
+-
+-export default Tooltip;
+diff --git a/packages/components/src/tooltip/index.tsx b/packages/components/src/tooltip/index.tsx
+new file mode 100644
+index 00000000000000..9d2a272b810fc6
+--- /dev/null
++++ b/packages/components/src/tooltip/index.tsx
+@@ -0,0 +1,85 @@
++/**
++ * External dependencies
++ */
++import * as Ariakit from '@ariakit/react/tooltip';
++
++/**
++ * WordPress dependencies
++ */
++import { useInstanceId } from '@wordpress/compose';
++import { Children } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import type { TooltipProps } from './types';
++import Shortcut from '../shortcut';
++import { positionToPlacement } from '../popover/utils';
++
++/**
++ * Time over anchor to wait before showing tooltip
++ */
++export const TOOLTIP_DELAY = 700;
++
++function Tooltip( props: TooltipProps ) {
++	const {
++		children,
++		delay = TOOLTIP_DELAY,
++		position = 'bottom',
++		shortcut,
++		text,
++	} = props;
++
++	const baseId = useInstanceId( Tooltip, 'tooltip' );
++	const describedById = text || shortcut ? baseId : undefined;
++
++	const isOnlyChild = Children.count( children ) === 1;
++	// console error if more than one child element is added
++	if ( ! isOnlyChild ) {
++		if ( 'development' === process.env.NODE_ENV ) {
++			// eslint-disable-next-line no-console
++			console.error(
++				'Tooltip should be called with only a single child element.'
++			);
++		}
++	}
++
++	const tooltipStore = Ariakit.useTooltipStore( {
++		placement: positionToPlacement( position ),
++		timeout: delay,
++	} );
++
++	return (
++		<>
++			<Ariakit.TooltipAnchor
++				onBlur={ tooltipStore.hide }
++				onClick={ tooltipStore.hide }
++				store={ tooltipStore }
++				render={ isOnlyChild ? children : undefined }
++			>
++				{ isOnlyChild ? undefined : children }
++			</Ariakit.TooltipAnchor>
++			{ isOnlyChild && ( text || shortcut ) && (
++				<Ariakit.Tooltip
++					className="components-tooltip"
++					gutter={ 4 }
++					id={ describedById }
++					overflowPadding={ 0.5 }
++					store={ tooltipStore }
++				>
++					{ text }
++					{ shortcut && (
++						<Shortcut
++							className={
++								text ? 'components-tooltip__shortcut' : ''
++							}
++							shortcut={ shortcut }
++						/>
++					) }
++				</Ariakit.Tooltip>
++			) }
++		</>
++	);
++}
++
++export default Tooltip;
+diff --git a/packages/components/src/tooltip/stories/index.story.js b/packages/components/src/tooltip/stories/index.story.js
+deleted file mode 100644
+index a808dc3d4cb82f..00000000000000
+--- a/packages/components/src/tooltip/stories/index.story.js
++++ /dev/null
+@@ -1,85 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import Tooltip from '../';
+-
+-export default {
+-	title: 'Components/ToolTip',
+-	component: Tooltip,
+-	argTypes: {
+-		delay: { control: 'number' },
+-		position: {
+-			control: {
+-				type: 'select',
+-				options: [
+-					'top left',
+-					'top center',
+-					'top right',
+-					'bottom left',
+-					'bottom center',
+-					'bottom right',
+-				],
+-			},
+-		},
+-		text: { control: 'text' },
+-	},
+-	parameters: {
+-		docs: { canvas: { sourceState: 'shown' } },
+-	},
+-};
+-
+-const Template = ( args ) => {
+-	return <Tooltip { ...args } />;
+-};
+-
+-export const Default = Template.bind( {} );
+-Default.args = {
+-	text: 'More information',
+-	children: (
+-		<div
+-			style={ {
+-				margin: '50px auto',
+-				width: '200px',
+-				padding: '20px',
+-				textAlign: 'center',
+-				border: '1px solid #ccc',
+-			} }
+-		>
+-			Hover for more information
+-		</div>
+-	),
+-};
+-
+-export const SmallTarget = Template.bind( {} );
+-SmallTarget.args = {
+-	...Default.args,
+-	children: (
+-		<div
+-			style={ {
+-				margin: '50px auto',
+-				width: 'min-content',
+-				padding: '4px',
+-				textAlign: 'center',
+-				border: '1px solid #ccc',
+-			} }
+-		>
+-			Small target
+-		</div>
+-	),
+-};
+-
+-export const DisabledChild = Template.bind( {} );
+-DisabledChild.args = {
+-	...Default.args,
+-	children: (
+-		<button
+-			disabled
+-			onClick={ () =>
+-				// eslint-disable-next-line no-alert
+-				window.alert( 'This alert should not be triggered' )
+-			}
+-		>
+-			Hover me, but I am disabled
+-		</button>
+-	),
+-};
+diff --git a/packages/components/src/tooltip/stories/index.story.tsx b/packages/components/src/tooltip/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..760f3dcc23e2fd
+--- /dev/null
++++ b/packages/components/src/tooltip/stories/index.story.tsx
+@@ -0,0 +1,59 @@
++/**
++ * External dependencies
++ */
++import type { Meta, StoryFn } from '@storybook/react';
++
++/**
++ * WordPress dependencies
++ */
++import { shortcutAriaLabel } from '@wordpress/keycodes';
++
++/**
++ * Internal dependencies
++ */
++import Tooltip from '..';
++import Button from '../../button';
++
++const meta: Meta< typeof Tooltip > = {
++	title: 'Components/Tooltip',
++	component: Tooltip,
++	argTypes: {
++		children: { control: { type: null } },
++		position: {
++			control: { type: 'select' },
++			options: [
++				'top left',
++				'top center',
++				'top right',
++				'bottom left',
++				'bottom center',
++				'bottom right',
++			],
++		},
++		shortcut: { control: { type: 'text' } },
++	},
++	parameters: {
++		controls: { expanded: true },
++		docs: { canvas: { sourceState: 'shown' } },
++	},
++};
++export default meta;
++
++const Template: StoryFn< typeof Tooltip > = ( props ) => (
++	<Tooltip { ...props } />
++);
++
++export const Default: StoryFn< typeof Tooltip > = Template.bind( {} );
++Default.args = {
++	children: <Button variant="primary">Tooltip Anchor</Button>,
++	text: 'Tooltip Text',
++};
++
++export const KeyboardShortcut = Template.bind( {} );
++KeyboardShortcut.args = {
++	children: <Button variant="secondary">Keyboard Shortcut</Button>,
++	shortcut: {
++		display: '⇧⌘,',
++		ariaLabel: shortcutAriaLabel.primaryShift( ',' ),
++	},
++};
+diff --git a/packages/components/src/tooltip/style.scss b/packages/components/src/tooltip/style.scss
+index 1a5e6c401542b1..c42249e529556f 100644
+--- a/packages/components/src/tooltip/style.scss
++++ b/packages/components/src/tooltip/style.scss
+@@ -1,40 +1,15 @@
+-.components-tooltip.components-popover {
+-	z-index: z-index(".components-tooltip");
+-
+-	.components-popover__content {
+-		min-width: min-content;
+-	}
+-}
+-
+-.components-tooltip .components-popover__content {
++.components-tooltip {
+ 	background: $black; // TODO: Discuss with designers.
+ 	border-radius: $radius-block-ui;
+-	border-width: 0;
+-	outline: none;
+ 	color: $gray-100;
+-	white-space: nowrap;
+ 	text-align: center;
+ 	line-height: 1.4;
+ 	font-size: 12px;
+-	box-shadow: none;
+ 	padding: $grid-unit-05 $grid-unit-10;
++	z-index: z-index(".components-tooltip");
+ }
+ 
+ .components-tooltip__shortcut {
+-	display: inline-block;
+ 	margin-left: $grid-unit-10;
+ }
+ 
+-.disabled-element-wrapper {
+-	position: relative;
+-	.event-catcher {
+-		z-index: z-index(".components-tooltip .event-catcher");
+-		position: absolute;
+-		width: 100%;
+-		height: 100%;
+-		top: 0;
+-		left: 0;
+-		bottom: 0;
+-		right: 0;
+-	}
+-}
+diff --git a/packages/components/src/tooltip/test/index.js b/packages/components/src/tooltip/test/index.js
+deleted file mode 100644
+index 65945c3c103966..00000000000000
+--- a/packages/components/src/tooltip/test/index.js
++++ /dev/null
+@@ -1,309 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { render, screen, waitFor } from '@testing-library/react';
+-import userEvent from '@testing-library/user-event';
+-
+-/**
+- * Internal dependencies
+- */
+-import Tooltip from '../';
+-import Button from '../../button';
+-import { TOOLTIP_DELAY } from '../index.js';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { shortcutAriaLabel } from '@wordpress/keycodes';
+-
+-const props = {
+-	text: 'tooltip text',
+-	delay: TOOLTIP_DELAY,
+-};
+-
+-describe( 'Tooltip', () => {
+-	it( 'should not render the tooltip if multiple children are passed', async () => {
+-		const user = userEvent.setup();
+-
+-		render(
+-			<Tooltip { ...props }>
+-				<Button>Button 1</Button>
+-				<Button>Button 2</Button>
+-			</Tooltip>
+-		);
+-
+-		await user.tab();
+-
+-		expect( screen.queryByText( 'tooltip text' ) ).not.toBeInTheDocument();
+-	} );
+-
+-	it( 'should not render the tooltip if there is no focus', () => {
+-		render(
+-			<Tooltip { ...props }>
+-				<Button>Hover Me!</Button>
+-			</Tooltip>
+-		);
+-
+-		expect(
+-			screen.getByRole( 'button', { name: 'Hover Me!' } )
+-		).toBeVisible();
+-		expect( screen.queryByText( 'tooltip text' ) ).not.toBeInTheDocument();
+-	} );
+-
+-	it( 'should render the tooltip when focusing the tooltip anchor via tab', async () => {
+-		const user = userEvent.setup();
+-
+-		render(
+-			<Tooltip { ...props }>
+-				<Button>Hover Me!</Button>
+-			</Tooltip>
+-		);
+-
+-		await user.tab();
+-
+-		expect(
+-			screen.getByRole( 'button', { name: /Hover me!/i } )
+-		).toHaveFocus();
+-
+-		await waitFor( () =>
+-			expect( screen.getByText( 'tooltip text' ) ).toBeVisible()
+-		);
+-
+-		// Wait for the tooltip element to be positioned (aligned with the button)
+-		await waitFor( () =>
+-			expect( screen.getByText( 'tooltip text' ) ).toBePositionedPopover()
+-		);
+-	} );
+-
+-	it( 'should render the tooltip when the tooltip anchor is hovered', async () => {
+-		const user = userEvent.setup();
+-
+-		render(
+-			<Tooltip { ...props }>
+-				<Button>Hover Me!</Button>
+-			</Tooltip>
+-		);
+-
+-		const button = screen.getByRole( 'button', { name: 'Hover Me!' } );
+-
+-		await user.hover( button );
+-
+-		await waitFor( () =>
+-			expect( screen.getByText( 'tooltip text' ) ).toBeVisible()
+-		);
+-
+-		// Wait for the tooltip element to be positioned (aligned with the button)
+-		await waitFor( () =>
+-			expect( screen.getByText( 'tooltip text' ) ).toBePositionedPopover()
+-		);
+-
+-		await user.unhover( button );
+-
+-		expect( screen.queryByText( 'tooltip text' ) ).not.toBeInTheDocument();
+-	} );
+-
+-	it( 'should not show tooltip on focus as result of mouse click', async () => {
+-		const user = userEvent.setup();
+-
+-		render(
+-			<Tooltip { ...props }>
+-				<Button>Hover Me!</Button>
+-			</Tooltip>
+-		);
+-
+-		await user.click( screen.getByRole( 'button', { text: 'Hover Me!' } ) );
+-
+-		expect( screen.queryByText( 'tooltip text' ) ).not.toBeInTheDocument();
+-	} );
+-
+-	it( 'should respect custom delay prop when showing tooltip', async () => {
+-		const user = userEvent.setup( { delay: TOOLTIP_DELAY } );
+-		const CUSTOM_DELAY = TOOLTIP_DELAY + 25;
+-
+-		render(
+-			<Tooltip { ...props } delay={ CUSTOM_DELAY }>
+-				<Button>Hover Me!</Button>
+-			</Tooltip>
+-		);
+-
+-		const button = screen.getByRole( 'button', { name: 'Hover Me!' } );
+-
+-		await user.hover( button );
+-
+-		expect( screen.queryByText( 'tooltip text' ) ).not.toBeInTheDocument();
+-
+-		await waitFor( () =>
+-			expect( screen.getByText( 'tooltip text' ) ).toBeVisible()
+-		);
+-
+-		// Wait for the tooltip element to be positioned (aligned with the button)
+-		await waitFor( () =>
+-			expect( screen.getByText( 'tooltip text' ) ).toBePositionedPopover()
+-		);
+-	} );
+-
+-	it( 'should show tooltip when an element is disabled', async () => {
+-		const user = userEvent.setup();
+-
+-		render(
+-			<Tooltip { ...props }>
+-				<Button disabled>Click me</Button>
+-			</Tooltip>
+-		);
+-
+-		const button = screen.getByRole( 'button', { name: /Click me/i } );
+-
+-		expect( button ).toBeVisible();
+-		expect( button ).toBeDisabled();
+-
+-		await user.hover( button );
+-
+-		await waitFor( () =>
+-			expect( screen.getByText( 'tooltip text' ) ).toBeVisible()
+-		);
+-
+-		// Wait for the tooltip element to be positioned (aligned with the button)
+-		await waitFor( () =>
+-			expect( screen.getByText( 'tooltip text' ) ).toBePositionedPopover()
+-		);
+-	} );
+-
+-	it( 'should not emit events back to children when they are disabled', async () => {
+-		const user = userEvent.setup();
+-		const onClickMock = jest.fn();
+-
+-		const { container } = render(
+-			<Tooltip { ...props }>
+-				<Button disabled onClick={ onClickMock }>
+-					Click me
+-				</Button>
+-			</Tooltip>
+-		);
+-
+-		// Note: this is testing for implementation details,
+-		// but couldn't find a better way.
+-		const buttonRect = screen
+-			.getByRole( 'button', { name: 'Click me' } )
+-			.getBoundingClientRect();
+-		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+-		const eventCatcher = container.querySelector( '.event-catcher' );
+-		await user.click( eventCatcher );
+-		expect( onClickMock ).not.toHaveBeenCalled();
+-
+-		const eventCatcherRect = eventCatcher.getBoundingClientRect();
+-		expect( buttonRect ).toEqual( eventCatcherRect );
+-	} );
+-
+-	it( 'should not show tooltip if the mouse leaves the tooltip anchor before set delay', async () => {
+-		const user = userEvent.setup();
+-		const onMouseEnterMock = jest.fn();
+-		const onMouseLeaveMock = jest.fn();
+-		const MOUSE_LEAVE_DELAY = TOOLTIP_DELAY - 200;
+-
+-		render(
+-			<>
+-				<Tooltip { ...props }>
+-					<Button
+-						onMouseEnter={ onMouseEnterMock }
+-						onMouseLeave={ onMouseLeaveMock }
+-					>
+-						Hover Me!
+-					</Button>
+-				</Tooltip>
+-				<Button>Hover me instead!</Button>
+-			</>
+-		);
+-
+-		await user.hover(
+-			screen.getByRole( 'button', {
+-				name: 'Hover Me!',
+-			} )
+-		);
+-
+-		// Tooltip hasn't appeared yet
+-		expect( screen.queryByText( 'tooltip text' ) ).not.toBeInTheDocument();
+-		expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );
+-
+-		// Advance time by MOUSE_LEAVE_DELAY time
+-		await new Promise( ( resolve ) =>
+-			setTimeout( resolve, MOUSE_LEAVE_DELAY )
+-		);
+-
+-		expect( screen.queryByText( 'tooltip text' ) ).not.toBeInTheDocument();
+-
+-		// Hover the other button, meaning that the mouse will leave the tooltip anchor
+-		await user.hover(
+-			screen.getByRole( 'button', {
+-				name: 'Hover me instead!',
+-			} )
+-		);
+-
+-		// Tooltip still hasn't appeared yet
+-		expect( screen.queryByText( 'tooltip text' ) ).not.toBeInTheDocument();
+-		expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );
+-		expect( onMouseLeaveMock ).toHaveBeenCalledTimes( 1 );
+-
+-		// Advance time again, so that we reach the full TOOLTIP_DELAY time
+-		await new Promise( ( resolve ) =>
+-			setTimeout( resolve, TOOLTIP_DELAY )
+-		);
+-
+-		// Tooltip won't show, since the mouse has left the tooltip anchor
+-		expect( screen.queryByText( 'tooltip text' ) ).not.toBeInTheDocument();
+-	} );
+-
+-	it( 'should render the shortcut display text when a string is passed as the shortcut', async () => {
+-		const user = userEvent.setup();
+-
+-		render(
+-			<Tooltip { ...props } shortcut="shortcut text">
+-				<Button>Hover Me!</Button>
+-			</Tooltip>
+-		);
+-
+-		await user.hover( screen.getByRole( 'button', { name: 'Hover Me!' } ) );
+-
+-		await waitFor( () =>
+-			expect( screen.getByText( 'shortcut text' ) ).toBeVisible()
+-		);
+-
+-		// Wait for the tooltip element to be positioned (aligned with the button)
+-		await waitFor( () =>
+-			expect(
+-				screen.getByText( 'shortcut text' )
+-			).toBePositionedPopover()
+-		);
+-	} );
+-
+-	it( 'should render the shortcut display text and aria-label when an object is passed as the shortcut with the correct properties', async () => {
+-		const user = userEvent.setup();
+-
+-		render(
+-			<Tooltip
+-				{ ...props }
+-				shortcut={ {
+-					display: '⇧⌘,',
+-					ariaLabel: shortcutAriaLabel.primaryShift( ',' ),
+-				} }
+-			>
+-				<Button>Hover Me!</Button>
+-			</Tooltip>
+-		);
+-
+-		await user.hover( screen.getByRole( 'button', { name: 'Hover Me!' } ) );
+-
+-		await waitFor( () =>
+-			expect( screen.getByText( '⇧⌘,' ) ).toBeVisible()
+-		);
+-
+-		expect( screen.getByText( '⇧⌘,' ) ).toHaveAttribute(
+-			'aria-label',
+-			'Control + Shift + Comma'
+-		);
+-
+-		// Wait for the tooltip element to be positioned (aligned with the button)
+-		await waitFor( () =>
+-			expect( screen.getByText( '⇧⌘,' ) ).toBePositionedPopover()
+-		);
+-	} );
+-} );
+diff --git a/packages/components/src/tooltip/test/index.tsx b/packages/components/src/tooltip/test/index.tsx
+new file mode 100644
+index 00000000000000..14270d2a76fc3f
+--- /dev/null
++++ b/packages/components/src/tooltip/test/index.tsx
+@@ -0,0 +1,301 @@
++/**
++ * External dependencies
++ */
++import { render, screen, waitFor } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++
++/**
++ * WordPress dependencies
++ */
++import { shortcutAriaLabel } from '@wordpress/keycodes';
++
++/**
++ * Internal dependencies
++ */
++import Button from '../../button';
++import Modal from '../../modal';
++import Tooltip, { TOOLTIP_DELAY } from '..';
++import cleanupTooltip from './utils/';
++
++const props = {
++	children: <Button>Button</Button>,
++	text: 'tooltip text',
++};
++
++describe( 'Tooltip', () => {
++	it( 'should not render the tooltip if multiple children are passed', async () => {
++		render(
++			// expected TS error since Tooltip cannot have more than one child element
++			// @ts-expect-error
++			<Tooltip { ...props }>
++				<Button>This is a button</Button>
++				<Button>This is another button</Button>
++			</Tooltip>
++		);
++
++		expect(
++			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
++		).not.toBeInTheDocument();
++	} );
++
++	it( 'should not render the tooltip if there is no focus', () => {
++		render( <Tooltip { ...props } /> );
++
++		expect(
++			screen.getByRole( 'button', { name: /Button/i } )
++		).toBeVisible();
++
++		expect(
++			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
++		).not.toBeInTheDocument();
++	} );
++
++	it( 'should render the tooltip when focusing on the tooltip anchor via tab', async () => {
++		const user = userEvent.setup();
++
++		render( <Tooltip { ...props } /> );
++
++		await user.tab();
++
++		expect(
++			screen.getByRole( 'button', { name: /Button/i } )
++		).toHaveFocus();
++
++		expect(
++			await screen.findByRole( 'tooltip', { name: /tooltip text/i } )
++		).toBeVisible();
++
++		await cleanupTooltip( user );
++	} );
++
++	it( 'should render the tooltip when the tooltip anchor is hovered', async () => {
++		const user = userEvent.setup();
++
++		render( <Tooltip { ...props } /> );
++
++		await user.hover( screen.getByRole( 'button', { name: /Button/i } ) );
++
++		expect(
++			await screen.findByRole( 'tooltip', { name: /tooltip text/i } )
++		).toBeVisible();
++
++		await cleanupTooltip( user );
++	} );
++
++	it( 'should not show tooltip on focus as result of mouse click', async () => {
++		const user = userEvent.setup();
++
++		render( <Tooltip { ...props } /> );
++
++		await user.click( screen.getByRole( 'button', { name: /Button/i } ) );
++
++		expect(
++			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
++		).not.toBeInTheDocument();
++
++		await cleanupTooltip( user );
++	} );
++
++	it( 'should respect custom delay prop when showing tooltip', async () => {
++		const user = userEvent.setup();
++		const ADDITIONAL_DELAY = 100;
++
++		render(
++			<Tooltip { ...props } delay={ TOOLTIP_DELAY + ADDITIONAL_DELAY } />
++		);
++
++		await user.hover( screen.getByRole( 'button', { name: /Button/i } ) );
++
++		// Advance time by default delay
++		await new Promise( ( resolve ) =>
++			setTimeout( resolve, TOOLTIP_DELAY )
++		);
++
++		// Tooltip hasn't appeared yet
++		expect(
++			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
++		).not.toBeInTheDocument();
++
++		// wait for additional delay for tooltip to appear
++		await waitFor(
++			() =>
++				new Promise( ( resolve ) =>
++					setTimeout( resolve, ADDITIONAL_DELAY )
++				)
++		);
++
++		expect(
++			screen.getByRole( 'tooltip', { name: /tooltip text/i } )
++		).toBeVisible();
++
++		await cleanupTooltip( user );
++	} );
++
++	it( 'should show tooltip when an element is disabled', async () => {
++		const user = userEvent.setup();
++
++		render(
++			<Tooltip { ...props }>
++				<Button aria-disabled>Button</Button>
++			</Tooltip>
++		);
++
++		const button = screen.getByRole( 'button', { name: /Button/i } );
++
++		expect( button ).toBeVisible();
++		expect( button ).toHaveAttribute( 'aria-disabled' );
++
++		await user.hover( button );
++
++		expect(
++			await screen.findByRole( 'tooltip', { name: /tooltip text/i } )
++		).toBeVisible();
++
++		await cleanupTooltip( user );
++	} );
++
++	it( 'should not show tooltip if the mouse leaves the tooltip anchor before set delay', async () => {
++		const user = userEvent.setup();
++		const onMouseEnterMock = jest.fn();
++		const onMouseLeaveMock = jest.fn();
++		const MOUSE_LEAVE_DELAY = TOOLTIP_DELAY - 200;
++
++		render(
++			<>
++				<Tooltip { ...props }>
++					<Button
++						onMouseEnter={ onMouseEnterMock }
++						onMouseLeave={ onMouseLeaveMock }
++					>
++						Button 1
++					</Button>
++				</Tooltip>
++				<Button>Button 2</Button>
++			</>
++		);
++
++		await user.hover(
++			screen.getByRole( 'button', {
++				name: 'Button 1',
++			} )
++		);
++
++		// Tooltip hasn't appeared yet
++		expect(
++			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
++		).not.toBeInTheDocument();
++		expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );
++
++		// Advance time by MOUSE_LEAVE_DELAY time
++		await new Promise( ( resolve ) =>
++			setTimeout( resolve, MOUSE_LEAVE_DELAY )
++		);
++
++		expect(
++			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
++		).not.toBeInTheDocument();
++
++		// Hover the other button, meaning that the mouse will leave the tooltip anchor
++		await user.hover(
++			screen.getByRole( 'button', {
++				name: 'Button 2',
++			} )
++		);
++
++		// Tooltip still hasn't appeared yet
++		expect(
++			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
++		).not.toBeInTheDocument();
++		expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );
++		expect( onMouseLeaveMock ).toHaveBeenCalledTimes( 1 );
++
++		// Advance time again, so that we reach the full TOOLTIP_DELAY time
++		await new Promise( ( resolve ) =>
++			setTimeout( resolve, TOOLTIP_DELAY )
++		);
++
++		// Tooltip won't show, since the mouse has left the tooltip anchor
++		expect(
++			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
++		).not.toBeInTheDocument();
++
++		await cleanupTooltip( user );
++	} );
++
++	it( 'should render the shortcut display text when a string is passed as the shortcut', async () => {
++		const user = userEvent.setup();
++
++		render( <Tooltip { ...props } shortcut="shortcut text" /> );
++
++		await user.hover( screen.getByRole( 'button', { name: /Button/i } ) );
++
++		await waitFor( () =>
++			expect( screen.getByText( 'shortcut text' ) ).toBeVisible()
++		);
++
++		await cleanupTooltip( user );
++	} );
++
++	it( 'should render the keyboard shortcut display text and aria-label when an object is passed as the shortcut', async () => {
++		const user = userEvent.setup();
++
++		render(
++			<Tooltip
++				{ ...props }
++				shortcut={ {
++					display: '⇧⌘,',
++					ariaLabel: shortcutAriaLabel.primaryShift( ',' ),
++				} }
++			/>
++		);
++
++		await user.hover( screen.getByRole( 'button', { name: /Button/i } ) );
++
++		await waitFor( () =>
++			expect( screen.getByText( '⇧⌘,' ) ).toBeVisible()
++		);
++
++		expect( screen.getByText( '⇧⌘,' ) ).toHaveAttribute(
++			'aria-label',
++			'Control + Shift + Comma'
++		);
++
++		await cleanupTooltip( user );
++	} );
++
++	it( 'esc should close modal even when tooltip is visible', async () => {
++		const user = userEvent.setup();
++		const onRequestClose = jest.fn();
++		render(
++			<Modal onRequestClose={ onRequestClose }>
++				<p>Modal content</p>
++			</Modal>
++		);
++
++		const tooltip = await screen.findByRole( 'tooltip', { hidden: true } );
++
++		expect( tooltip ).toBeInTheDocument();
++
++		await user.hover(
++			screen.getByRole( 'button', {
++				name: /Close/i,
++			} )
++		);
++
++		await waitFor( () => expect( tooltip ).toBeVisible() );
++
++		await user.keyboard( '[Escape]' );
++
++		expect( onRequestClose ).toHaveBeenCalled();
++
++		await cleanupTooltip( user );
++	} );
++
++	it( 'should associate the tooltip text with its anchor via the accessible description', async () => {
++		render( <Tooltip { ...props } /> );
++
++		expect(
++			screen.getByRole( 'button', { description: 'tooltip text' } )
++		).toBeInTheDocument();
++	} );
++} );
+diff --git a/packages/components/src/tooltip/test/utils/index.tsx b/packages/components/src/tooltip/test/utils/index.tsx
+new file mode 100644
+index 00000000000000..01b0931c1a7900
+--- /dev/null
++++ b/packages/components/src/tooltip/test/utils/index.tsx
+@@ -0,0 +1,20 @@
++/**
++ * External dependencies
++ */
++import type { UserEvent } from '@testing-library/user-event/dist/types/setup/setup';
++
++// TODO: may need to be tested with Playwright; further context:
++// https://github.com/WordPress/gutenberg/pull/52133#issuecomment-1613691258
++// below workaround ensures tooltip is umounted after each test to prevent leaking
++// similarly to ariakit tooltip tests: https://github.com/ariakit/ariakit/blob/249d376e41115e6d4ceba244e231a95fa457bd04/examples/tooltip/test.ts#L12-L14
++
++/**
++ * Ensures the async behaviors and animations in tooltip complete
++ * to avoid leaking into other tests
++ *
++ */
++export default async function cleanupTooltip( user: UserEvent ) {
++	await user.tab();
++	await user.tab();
++	await user.click( document.body );
++}
+diff --git a/packages/components/src/tooltip/types.ts b/packages/components/src/tooltip/types.ts
+new file mode 100644
+index 00000000000000..59df5f2b52fc6f
+--- /dev/null
++++ b/packages/components/src/tooltip/types.ts
+@@ -0,0 +1,40 @@
++/**
++ * Internal dependencies
++ */
++import type { PopoverProps } from '../popover/types';
++import type { ShortcutProps } from '../shortcut/types';
++
++export type TooltipProps = {
++	/**
++	 * The anchor for the tooltip.
++	 *
++	 * **Note**: Accepts only one child element.
++	 */
++	children: React.ReactElement;
++	/**
++	 * The amount of time in milliseconds to wait before showing the tooltip.
++	 *
++	 * @default 700
++	 */
++	delay?: number;
++	/**
++	 * The direction in which the tooltip should open relative to its parent node.
++	 * Specify y- and x-axis as a space-separated string. Supports `"top"`,
++	 * `"bottom"` y axis, and `"left"`, `"center"`, `"right"` x axis.
++	 *
++	 * @default bottom
++	 */
++	position?: PopoverProps[ 'position' ];
++	/**
++	 * An option for adding accessible keyboard shortcuts.
++	 *
++	 * If shortcut is a string, it is expecting the display text. If shortcut is an
++	 * object, it will accept the properties of `display` (string) and `ariaLabel`
++	 * (string).
++	 */
++	shortcut?: ShortcutProps[ 'shortcut' ];
++	/**
++	 * The text shown in the tooltip when anchor element is focused or hovered.
++	 */
++	text?: string;
++};
+diff --git a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+index c5aad5aa3be9b9..0a3c1fa0f171fa 100644
+--- a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
++++ b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+@@ -665,6 +665,7 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
+     >
+       <svg
+         class="components-spinner emotion-0 emotion-1"
++        data-testid="components-spinner"
+         focusable="false"
+         height="16"
+         role="presentation"
+diff --git a/packages/editor/src/components/post-saved-state/test/index.js b/packages/editor/src/components/post-saved-state/test/index.js
+index 200c9855902c29..47fa92cf5a4a2a 100644
+--- a/packages/editor/src/components/post-saved-state/test/index.js
++++ b/packages/editor/src/components/post-saved-state/test/index.js
+@@ -51,7 +51,9 @@ describe( 'PostSavedState', () => {
+ 
+ 		render( <PostSavedState /> );
+ 
+-		expect( screen.getByText( 'Saving' ) ).toBeVisible();
++		expect(
++			screen.getByRole( 'button', { name: /Saving/i } )
++		).toBeVisible();
+ 	} );
+ 
+ 	it( 'returns a disabled button if the post is not saveable', () => {

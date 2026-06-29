@@ -1,0 +1,15 @@
+diff --git a/packages/components/src/card/context.ts b/packages/components/src/card/context.ts
+deleted file mode 100644
+index 5ad31be70c04c7..00000000000000
+--- a/packages/components/src/card/context.ts
++++ /dev/null
+@@ -1,9 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { createContext, useContext } from '@wordpress/element';
+-
+-export const CardContext = createContext( {} );
+-CardContext.displayName = 'CardContext';
+-
+-export const useCardContext = () => useContext( CardContext );

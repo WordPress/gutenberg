@@ -1,0 +1,400 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4b811128c1bdd6..e2cb1f3c4b2045 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ -   `BorderBoxControl`: fix some layout misalignments, especially for RTL users ([#41254](https://github.com/WordPress/gutenberg/pull/41254)).
+ -   `TimePicker`: Update unit tests to use `@testing-library/user-event` ([#41270](https://github.com/WordPress/gutenberg/pull/41270)).
+ -   `DateTimePicker`: Update `moment` to 2.26.0 and update `react-date` typings ([#41266](https://github.com/WordPress/gutenberg/pull/41266)).
++-   `TextareaControl`: Convert to TypeScript ([#41215](https://github.com/WordPress/gutenberg/pull/41215)).
+ 
+ ### Experimental
+ 
+@@ -27,7 +28,7 @@
+ -   `BorderControl` & `BorderBoxControl`: Add `__next36pxDefaultSize` flag for larger default size ([#40920](https://github.com/WordPress/gutenberg/pull/40920)).
+ -   `BorderControl` improved focus and border radius styling for component. ([#40951](https://github.com/WordPress/gutenberg/pull/40951))
+ -   Improve focused `CircularOptionPicker` styling ([#40990](https://github.com/WordPress/gutenberg/pull/40990))
+--   `BorderControl`: Make border color consistent with other controls  ([#40921](https://github.com/WordPress/gutenberg/pull/40921))
++-   `BorderControl`: Make border color consistent with other controls ([#40921](https://github.com/WordPress/gutenberg/pull/40921))
+ -   `SelectControl`: Remove `lineHeight` setting to fix issue with font descenders being cut off ([#40985](https://github.com/WordPress/gutenberg/pull/40985))
+ 
+ ### Internal
+diff --git a/packages/components/src/textarea-control/README.md b/packages/components/src/textarea-control/README.md
+index e9617e6cfbea97..1da2617ef60b5b 100644
+--- a/packages/components/src/textarea-control/README.md
++++ b/packages/components/src/textarea-control/README.md
+@@ -100,47 +100,41 @@ The set of props accepted by the component will be specified below.
+ 
+ Props not included in this set will be applied to the textarea element.
+ 
+-#### label
++#### `help`: `string | WPElement`
+ 
+-If this property is added, a label will be generated using label property as the content.
++If this property is added, a help text will be generated using help property as the content.
+ 
+--   Type: `String`
+ -   Required: No
+ 
+-#### hideLabelFromVision
++#### `hideLabelFromVision`: `boolean`
+ 
+ If true, the label will only be visible to screen readers.
+ 
+--   Type: `Boolean`
+ -   Required: No
+ 
+-#### help
++#### `label`: `string`
+ 
+-If this property is added, a help text will be generated using help property as the content.
++If this property is added, a label will be generated using label property as the content.
+ 
+--   Type: `String|WPElement`
+ -   Required: No
+ 
+-#### rows
++#### `onChange`: `( value: string ) => void`
+ 
+-The number of rows the textarea should contain. Defaults to four.
++A function that receives the new value of the textarea each time it changes.
+ 
+--   Type: `String`
+--   Required: No
+--   Default: 4
++-   Required: Yes
+ 
+-#### value
++#### `rows`: `number`
+ 
+-The current value of the textarea.
++The number of rows the textarea should contain.
+ 
+--   Type: `String`
+--   Required: Yes
++-   Required: No
++-   Default: 4
+ 
+-#### onChange
++#### `value`: `string`
+ 
+-A function that receives the new value of the textarea each time it changes.
++The current value of the textarea.
+ 
+--   Type: `function`
+ -   Required: Yes
+ 
+ ## Related components
+diff --git a/packages/components/src/textarea-control/index.js b/packages/components/src/textarea-control/index.js
+deleted file mode 100644
+index a39588bcc96c07..00000000000000
+--- a/packages/components/src/textarea-control/index.js
++++ /dev/null
+@@ -1,45 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useInstanceId } from '@wordpress/compose';
+-
+-/**
+- * Internal dependencies
+- */
+-import BaseControl from '../base-control';
+-import { StyledTextarea } from './styles/textarea-control-styles';
+-
+-export default function TextareaControl( {
+-	label,
+-	hideLabelFromVision,
+-	value,
+-	help,
+-	onChange,
+-	rows = 4,
+-	className,
+-	...props
+-} ) {
+-	const instanceId = useInstanceId( TextareaControl );
+-	const id = `inspector-textarea-control-${ instanceId }`;
+-	const onChangeValue = ( event ) => onChange( event.target.value );
+-
+-	return (
+-		<BaseControl
+-			label={ label }
+-			hideLabelFromVision={ hideLabelFromVision }
+-			id={ id }
+-			help={ help }
+-			className={ className }
+-		>
+-			<StyledTextarea
+-				className="components-textarea-control__input"
+-				id={ id }
+-				rows={ rows }
+-				onChange={ onChangeValue }
+-				aria-describedby={ !! help ? id + '__help' : undefined }
+-				value={ value }
+-				{ ...props }
+-			/>
+-		</BaseControl>
+-	);
+-}
+diff --git a/packages/components/src/textarea-control/index.tsx b/packages/components/src/textarea-control/index.tsx
+new file mode 100644
+index 00000000000000..3ce656af2ad7cc
+--- /dev/null
++++ b/packages/components/src/textarea-control/index.tsx
+@@ -0,0 +1,86 @@
++/**
++ * External dependencies
++ */
++import type { ChangeEvent } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { useInstanceId } from '@wordpress/compose';
++
++/**
++ * Internal dependencies
++ */
++import BaseControl from '../base-control';
++import { StyledTextarea } from './styles/textarea-control-styles';
++import type { TextareaControlProps } from './types';
++import type { WordPressComponentProps } from '../ui/context';
++
++/**
++ * TextareaControls are TextControls that allow for multiple lines of text, and
++ * wrap overflow text onto a new line. They are a fixed height and scroll
++ * vertically when the cursor reaches the bottom of the field.
++ *
++ * ```jsx
++ * import { TextareaControl } from '@wordpress/components';
++ * import { useState } from '@wordpress/element';
++ *
++ * const MyTextareaControl = () => {
++ *   const [ text, setText ] = useState( '' );
++ *
++ *   return (
++ *     <TextareaControl
++ *       label="Text"
++ *       help="Enter some text"
++ *       value={ text }
++ *       onChange={ ( value ) => setText( value ) }
++ *     />
++ *   );
++ * };
++ * ```
++ */
++export function TextareaControl(
++	// ref is omitted until we have `WordPressComponentPropsWithoutRef` or add
++	// ref forwarding to TextareaControl.
++	props: Omit<
++		WordPressComponentProps< TextareaControlProps, 'textarea', false >,
++		'ref'
++	>
++) {
++	const {
++		label,
++		hideLabelFromVision,
++		value,
++		help,
++		onChange,
++		rows = 4,
++		className,
++		...additionalProps
++	} = props;
++	const instanceId = useInstanceId( TextareaControl );
++	const id = `inspector-textarea-control-${ instanceId }`;
++	const onChangeValue = ( event: ChangeEvent< HTMLTextAreaElement > ) =>
++		onChange( event.target.value );
++
++	return (
++		<BaseControl
++			label={ label }
++			hideLabelFromVision={ hideLabelFromVision }
++			id={ id }
++			help={ help }
++			className={ className }
++		>
++			<StyledTextarea
++				className="components-textarea-control__input"
++				id={ id }
++				rows={ rows }
++				onChange={ onChangeValue }
++				aria-describedby={ !! help ? id + '__help' : undefined }
++				value={ value }
++				{ ...additionalProps }
++			/>
++		</BaseControl>
++	);
++}
++
++export default TextareaControl;
+diff --git a/packages/components/src/textarea-control/stories/index.js b/packages/components/src/textarea-control/stories/index.js
+deleted file mode 100644
+index 6ec629059fd152..00000000000000
+--- a/packages/components/src/textarea-control/stories/index.js
++++ /dev/null
+@@ -1,48 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { boolean, number, text } from '@storybook/addon-knobs';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import TextareaControl from '../';
+-
+-export default {
+-	title: 'Components/TextareaControl',
+-	component: TextareaControl,
+-	parameters: {
+-		knobs: { disable: false },
+-	},
+-};
+-
+-const TextareaControlWithState = ( props ) => {
+-	const [ value, setValue ] = useState();
+-
+-	return (
+-		<TextareaControl { ...props } value={ value } onChange={ setValue } />
+-	);
+-};
+-
+-export const _default = () => {
+-	const label = text( 'Label', 'Label Text' );
+-	const hideLabelFromVision = boolean( 'Hide Label From Vision', false );
+-	const help = text( 'Help Text', 'Help text to explain the textarea.' );
+-	const rows = number( 'Rows', 4 );
+-	const className = text( 'Class Name', '' );
+-
+-	return (
+-		<TextareaControlWithState
+-			label={ label }
+-			hideLabelFromVision={ hideLabelFromVision }
+-			help={ help }
+-			rows={ rows }
+-			className={ className }
+-		/>
+-	);
+-};
+diff --git a/packages/components/src/textarea-control/stories/index.tsx b/packages/components/src/textarea-control/stories/index.tsx
+new file mode 100644
+index 00000000000000..4d6a5f9ceaacbf
+--- /dev/null
++++ b/packages/components/src/textarea-control/stories/index.tsx
+@@ -0,0 +1,58 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import TextareaControl from '..';
++
++const meta: ComponentMeta< typeof TextareaControl > = {
++	component: TextareaControl,
++	title: 'Components/TextareaControl',
++	argTypes: {
++		onChange: { action: 'onChange' },
++		label: { control: { type: 'text' } },
++		help: { control: { type: 'text' } },
++		value: { control: { type: null } },
++	},
++	parameters: {
++		controls: {
++			expanded: true,
++		},
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof TextareaControl > = ( {
++	onChange,
++	...args
++} ) => {
++	const [ value, setValue ] = useState( '' );
++
++	return (
++		<TextareaControl
++			{ ...args }
++			value={ value }
++			onChange={ ( v ) => {
++				setValue( v );
++				onChange( v );
++			} }
++		/>
++	);
++};
++
++export const Default: ComponentStory< typeof TextareaControl > = Template.bind(
++	{}
++);
++Default.args = {
++	label: 'Text',
++	help: 'Enter some text',
++};
+diff --git a/packages/components/src/textarea-control/styles/textarea-control-styles.js b/packages/components/src/textarea-control/styles/textarea-control-styles.ts
+similarity index 100%
+rename from packages/components/src/textarea-control/styles/textarea-control-styles.js
+rename to packages/components/src/textarea-control/styles/textarea-control-styles.ts
+diff --git a/packages/components/src/textarea-control/types.ts b/packages/components/src/textarea-control/types.ts
+new file mode 100644
+index 00000000000000..9a66164577cb38
+--- /dev/null
++++ b/packages/components/src/textarea-control/types.ts
+@@ -0,0 +1,30 @@
++/**
++ * External dependencies
++ */
++import type { TextareaHTMLAttributes } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import type { BaseControlProps } from '../base-control/types';
++
++export type TextareaControlProps = Pick<
++	BaseControlProps,
++	'hideLabelFromVision' | 'help' | 'label'
++> & {
++	/**
++	 * A function that receives the new value of the textarea each time it
++	 * changes.
++	 */
++	onChange: ( value: string ) => void;
++	/**
++	 * The current value of the textarea.
++	 */
++	value: string;
++	/**
++	 * The number of rows the textarea should contain.
++	 *
++	 * @default 4
++	 */
++	rows?: TextareaHTMLAttributes< HTMLTextAreaElement >[ 'rows' ];
++};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index bd14c727181d46..1904cb5da18236 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -82,6 +82,7 @@
+ 		"src/surface/**/*",
+ 		"src/text/**/*",
+ 		"src/text-control/**/*",
++		"src/textarea-control/**/*",
+ 		"src/tip/**/*",
+ 		"src/toggle-group-control/**/*",
+ 		"src/tools-panel/**/*",

@@ -1,0 +1,30 @@
+diff --git a/packages/components/src/range-control/styles/range-control-styles.ts b/packages/components/src/range-control/styles/range-control-styles.ts
+index d943ca472911ed..c86c57800cac46 100644
+--- a/packages/components/src/range-control/styles/range-control-styles.ts
++++ b/packages/components/src/range-control/styles/range-control-styles.ts
+@@ -130,8 +130,10 @@ export const Track = styled.span`
+ 	margin-top: ${ ( rangeHeightValue - railHeight ) / 2 }px;
+ 	top: 0;
+ 
+-	@media not ( prefers-reduced-motion ) {
+-		transition: width ease 0.1s;
++	.is-marked & {
++		@media not ( prefers-reduced-motion ) {
++			transition: width ease 0.1s;
++		}
+ 	}
+ 
+ 	${ trackBackgroundColor };
+@@ -203,8 +205,10 @@ export const ThumbWrapper = styled.span`
+ 	border-radius: ${ CONFIG.radiusRound };
+ 	z-index: 3;
+ 
+-	@media not ( prefers-reduced-motion ) {
+-		transition: left ease 0.1s;
++	.is-marked & {
++		@media not ( prefers-reduced-motion ) {
++			transition: left ease 0.1s;
++		}
+ 	}
+ 
+ 	${ thumbColor };

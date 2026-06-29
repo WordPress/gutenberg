@@ -1,0 +1,906 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index a5b52ae4872d10..3fa9280108d4fb 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -1169,12 +1169,6 @@
+ 		"markdown_source": "../packages/components/src/search-control/README.md",
+ 		"parent": "components"
+ 	},
+-	{
+-		"title": "SegmentedControl",
+-		"slug": "segmented-control",
+-		"markdown_source": "../packages/components/src/segmented-control/README.md",
+-		"parent": "components"
+-	},
+ 	{
+ 		"title": "SelectControl",
+ 		"slug": "select-control",
+@@ -1247,6 +1241,12 @@
+ 		"markdown_source": "../packages/components/src/toggle-control/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "ToggleGroupControl",
++		"slug": "toggle-group-control",
++		"markdown_source": "../packages/components/src/toggle-group-control/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "ToolbarButton",
+ 		"slug": "toolbar-button",
+diff --git a/packages/block-library/src/post-featured-image/dimension-controls.js b/packages/block-library/src/post-featured-image/dimension-controls.js
+index 362b57d5a41f53..c9b1f16c57ff05 100644
+--- a/packages/block-library/src/post-featured-image/dimension-controls.js
++++ b/packages/block-library/src/post-featured-image/dimension-controls.js
+@@ -12,26 +12,26 @@ import {
+ 	__experimentalUnitControl as UnitControl,
+ 	Flex,
+ 	FlexItem,
+-	__experimentalSegmentedControl as SegmentedControl,
+-	__experimentalSegmentedControlOption as SegmentedControlOption,
++	__experimentalToggleGroupControl as ToggleGroupControl,
++	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+ 	__experimentalUseCustomUnits as useCustomUnits,
+ } from '@wordpress/components';
+ import { useSetting } from '@wordpress/block-editor';
+ 
+ const SCALE_OPTIONS = (
+ 	<>
+-		<SegmentedControlOption
++		<ToggleGroupControlOption
+ 			value="cover"
+ 			label={ _x( 'Cover', 'Scale option for Image dimension control' ) }
+ 		/>
+-		<SegmentedControlOption
++		<ToggleGroupControlOption
+ 			value="contain"
+ 			label={ _x(
+ 				'Contain',
+ 				'Scale option for Image dimension control'
+ 			) }
+ 		/>
+-		<SegmentedControlOption
++		<ToggleGroupControlOption
+ 			value="fill"
+ 			label={ _x(
+ 				'Stretch',
+@@ -95,7 +95,7 @@ const DimensionControls = ( {
+ 				</FlexItem>
+ 			</Flex>
+ 			{ !! height && (
+-				<SegmentedControl
++				<ToggleGroupControl
+ 					label={ scaleLabel }
+ 					value={ scale }
+ 					onChange={ ( value ) => {
+@@ -106,7 +106,7 @@ const DimensionControls = ( {
+ 					isBlock
+ 				>
+ 					{ SCALE_OPTIONS }
+-				</SegmentedControl>
++				</ToggleGroupControl>
+ 			) }
+ 		</PanelBody>
+ 	);
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index f054c43e6d7dd8..04146b32a2fb16 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -114,10 +114,6 @@ export { default as ResizableBox } from './resizable-box';
+ export { default as ResponsiveWrapper } from './responsive-wrapper';
+ export { default as SandBox } from './sandbox';
+ export { default as SearchControl } from './search-control';
+-export {
+-	SegmentedControl as __experimentalSegmentedControl,
+-	SegmentedControlOption as __experimentalSegmentedControlOption,
+-} from './segmented-control';
+ export { default as SelectControl } from './select-control';
+ export { default as Snackbar } from './snackbar';
+ export { default as SnackbarList } from './snackbar/list';
+@@ -132,6 +128,10 @@ export { default as TextareaControl } from './textarea-control';
+ export { default as TextHighlight } from './text-highlight';
+ export { default as Tip } from './tip';
+ export { default as ToggleControl } from './toggle-control';
++export {
++	ToggleGroupControl as __experimentalToggleGroupControl,
++	ToggleGroupControlOption as __experimentalToggleGroupControlOption,
++} from './toggle-group-control';
+ export { default as Toolbar } from './toolbar';
+ export { default as ToolbarButton } from './toolbar-button';
+ export { default as ToolbarDropdownMenu } from './toolbar-dropdown-menu';
+diff --git a/packages/components/src/segmented-control/index.ts b/packages/components/src/segmented-control/index.ts
+deleted file mode 100644
+index e7672f9be700a0..00000000000000
+--- a/packages/components/src/segmented-control/index.ts
++++ /dev/null
+@@ -1,2 +0,0 @@
+-export { default as SegmentedControl } from './component';
+-export { default as SegmentedControlOption } from './segmented-control-option';
+diff --git a/packages/components/src/segmented-control/segmented-control-context.ts b/packages/components/src/segmented-control/segmented-control-context.ts
+deleted file mode 100644
+index 3554556fb79638..00000000000000
+--- a/packages/components/src/segmented-control/segmented-control-context.ts
++++ /dev/null
+@@ -1,16 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { createContext, useContext } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import type { SegmentedControlContextProps } from './types';
+-
+-const SegmentedControlContext = createContext(
+-	{} as SegmentedControlContextProps
+-);
+-export const useSegmentedControlContext = () =>
+-	useContext( SegmentedControlContext );
+-export default SegmentedControlContext;
+diff --git a/packages/components/src/segmented-control/segmented-control-option.tsx b/packages/components/src/segmented-control/segmented-control-option.tsx
+deleted file mode 100644
+index 261e6836152f22..00000000000000
+--- a/packages/components/src/segmented-control/segmented-control-option.tsx
++++ /dev/null
+@@ -1,71 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { __ } from '@wordpress/i18n';
+-import { useInstanceId } from '@wordpress/compose';
+-
+-/**
+- * Internal dependencies
+- */
+-import {
+-	contextConnect,
+-	useContextSystem,
+-	PolymorphicComponentProps,
+-} from '../ui/context';
+-import SegmentedControlButton from './segmented-control-button';
+-import type {
+-	SegmentedControlOptionProps,
+-	SegmentedControlContextProps,
+-} from './types';
+-import { useSegmentedControlContext } from './segmented-control-context';
+-
+-function getShowSeparator(
+-	segmentedControlContext: SegmentedControlContextProps,
+-	index: number
+-) {
+-	const { currentId, items } = segmentedControlContext;
+-	const isLast = index === items.length - 1;
+-	const isActive = items[ index ]?.id === currentId;
+-	const isNextActive = items[ index + 1 ]?.id === currentId;
+-
+-	let showSeparator = true;
+-
+-	if ( items.length < 3 ) {
+-		showSeparator = false;
+-	}
+-
+-	if ( isActive || isNextActive || isLast ) {
+-		showSeparator = false;
+-	}
+-
+-	return showSeparator;
+-}
+-
+-function SegmentedControlOption(
+-	props: PolymorphicComponentProps< SegmentedControlOptionProps, 'input' >,
+-	forwardedRef: import('react').Ref< any >
+-) {
+-	const segmentedControlContext = useSegmentedControlContext();
+-	const id = useInstanceId(
+-		SegmentedControlOption,
+-		segmentedControlContext.baseId || 'segmented-control-option'
+-	);
+-	const buttonProps = useContextSystem(
+-		{ ...props, id },
+-		'SegmentedControlOption'
+-	);
+-	const index = segmentedControlContext.items.findIndex(
+-		( item ) => item.id === buttonProps.id
+-	);
+-	const showSeparator = getShowSeparator( segmentedControlContext, index );
+-	return (
+-		<SegmentedControlButton
+-			ref={ forwardedRef }
+-			{ ...{ ...segmentedControlContext, ...buttonProps, showSeparator } }
+-		/>
+-	);
+-}
+-export default contextConnect(
+-	SegmentedControlOption,
+-	'SegmentedControlOption'
+-);
+diff --git a/packages/components/src/segmented-control/README.md b/packages/components/src/toggle-group-control/README.md
+similarity index 61%
+rename from packages/components/src/segmented-control/README.md
+rename to packages/components/src/toggle-group-control/README.md
+index 26955d0aea9a7d..935cc70816d923 100644
+--- a/packages/components/src/segmented-control/README.md
++++ b/packages/components/src/toggle-group-control/README.md
+@@ -1,25 +1,25 @@
+-# SegementedControl
++# ToggleGroupControl
+ 
+ <div class="callout callout-alert">
+ This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+ </div>
+ 
+-`SegementedControl` is a form component that lets users choose options represented in horizontal segments. To render options for this control use `SegmentedControlOption` component.
++`ToggleGroupControl` is a form component that lets users choose options represented in horizontal segments. To render options for this control use `ToggleGroupControlOption` component.
+ 
+ ## Usage
+ 
+ ```js
+ import {
+-	__experimentalSegmentedControl as SegmentedControl,
+-	__experimentalSegmentedControlOption as SegmentedControlOption,
++	__experimentalToggleGroupControl as ToggleGroupControl,
++	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+ } from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+-		<SegmentedControl label="my label" value="vertical" isBlock>
+-			<SegmentedControlOption value="horizontal" label="Horizontal" />
+-			<SegmentedControlOption value="vertical" label="Vertical" />
+-		</SegmentedControl>
++		<ToggleGroupControl label="my label" value="vertical" isBlock>
++			<ToggleGroupControlOption value="horizontal" label="Horizontal" />
++			<ToggleGroupControlOption value="vertical" label="Vertical" />
++		</ToggleGroupControl>
+ 	);
+ }
+ ```
+@@ -54,7 +54,7 @@ Determines if segments should be rendered with equal widths.
+ -   Required: No
+ -   Default: `false`
+ 
+-Renders `SegmentedControl` as a (CSS) block element.
++Renders `ToggleGroupControl` as a (CSS) block element.
+ 
+ ### `onChange`
+ 
+@@ -68,7 +68,7 @@ Callback when a segment is selected.
+ 
+ -   Type: `string | number`
+ 
+-The value of the `SegmentedControl`.
++The value of the `ToggleGroupControl`.
+ 
+ ### `help`
+ 
+diff --git a/packages/components/src/segmented-control/component.tsx b/packages/components/src/toggle-group-control/component.tsx
+similarity index 79%
+rename from packages/components/src/segmented-control/component.tsx
+rename to packages/components/src/toggle-group-control/component.tsx
+index 7026df0b44fac3..2ab3df7d10b639 100644
+--- a/packages/components/src/segmented-control/component.tsx
++++ b/packages/components/src/toggle-group-control/component.tsx
+@@ -24,14 +24,14 @@ import { View } from '../view';
+ import BaseControl from '../base-control';
+ import * as styles from './styles';
+ import { useUpdateEffect, useCx } from '../utils/hooks';
+-import Backdrop from './segmented-control-backdrop';
+-import type { SegmentedControlProps } from './types';
+-import SegmentedControlContext from './segmented-control-context';
++import Backdrop from './toggle-group-control-backdrop';
++import type { ToggleGroupControlProps } from './types';
++import ToggleGroupControlContext from './toggle-group-control-context';
+ 
+ const noop = () => {};
+ 
+-function SegmentedControl(
+-	props: PolymorphicComponentProps< SegmentedControlProps, 'input' >,
++function ToggleGroupControl(
++	props: PolymorphicComponentProps< ToggleGroupControlProps, 'input' >,
+ 	forwardedRef: import('react').Ref< any >
+ ) {
+ 	const {
+@@ -45,13 +45,13 @@ function SegmentedControl(
+ 		value,
+ 		children,
+ 		...otherProps
+-	} = useContextSystem( props, 'SegmentedControl' );
++	} = useContextSystem( props, 'ToggleGroupControl' );
+ 	const cx = useCx();
+ 	const containerRef = useRef();
+ 	const [ resizeListener, sizes ] = useResizeAware();
+ 	const baseId = useInstanceId(
+-		SegmentedControl,
+-		'segmented-control'
++		ToggleGroupControl,
++		'toggle-group-control'
+ 	).toString();
+ 	const radio = useRadioState( {
+ 		baseId,
+@@ -73,7 +73,7 @@ function SegmentedControl(
+ 	const classes = useMemo(
+ 		() =>
+ 			cx(
+-				styles.SegmentedControl,
++				styles.ToggleGroupControl,
+ 				isBlock && styles.block,
+ 				'medium',
+ 				className
+@@ -82,7 +82,7 @@ function SegmentedControl(
+ 	);
+ 	return (
+ 		<BaseControl help={ help }>
+-			<SegmentedControlContext.Provider
++			<ToggleGroupControlContext.Provider
+ 				value={ { ...radio, isBlock: ! isAdaptiveWidth } }
+ 			>
+ 				{ ! hideLabelFromVision && (
+@@ -108,9 +108,9 @@ function SegmentedControl(
+ 					/>
+ 					{ children }
+ 				</RadioGroup>
+-			</SegmentedControlContext.Provider>
++			</ToggleGroupControlContext.Provider>
+ 		</BaseControl>
+ 	);
+ }
+ 
+-export default contextConnect( SegmentedControl, 'SegmentedControl' );
++export default contextConnect( ToggleGroupControl, 'ToggleGroupControl' );
+diff --git a/packages/components/src/toggle-group-control/index.ts b/packages/components/src/toggle-group-control/index.ts
+new file mode 100644
+index 00000000000000..2d29a52b0ae7e9
+--- /dev/null
++++ b/packages/components/src/toggle-group-control/index.ts
+@@ -0,0 +1,2 @@
++export { default as ToggleGroupControl } from './component';
++export { default as ToggleGroupControlOption } from './toggle-group-control-option';
+diff --git a/packages/components/src/segmented-control/stories/index.js b/packages/components/src/toggle-group-control/stories/index.js
+similarity index 57%
+rename from packages/components/src/segmented-control/stories/index.js
+rename to packages/components/src/toggle-group-control/stories/index.js
+index 8a9b6fc091c503..2944afb9486e20 100644
+--- a/packages/components/src/segmented-control/stories/index.js
++++ b/packages/components/src/toggle-group-control/stories/index.js
+@@ -7,57 +7,60 @@ import { useState } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { __experimentalSpacer as Spacer } from '../../';
+-import { SegmentedControl, SegmentedControlOption } from '../index';
++import { ToggleGroupControl, ToggleGroupControlOption } from '../index';
+ import { View } from '../../view';
+ 
+ export default {
+-	component: SegmentedControl,
+-	title: 'Components/SegmentedControl',
++	component: ToggleGroupControl,
++	title: 'Components/ToggleGroupControl',
+ };
+ 
+ const aligns = [ 'Left', 'Center', 'Right', 'Justify' ];
+ const alignOptions = aligns.map( ( key ) => (
+-	<SegmentedControlOption key={ key } value={ key } label={ key } />
++	<ToggleGroupControlOption key={ key } value={ key } label={ key } />
+ ) );
+ 
+ export const _default = () => {
+ 	const [ alignState, setAlignState ] = useState( aligns[ 0 ] );
+-	const label = 'Segmented Control';
++	const label = 'Toggle Group Control';
+ 
+ 	return (
+ 		<View>
+ 			<Spacer>
+-				<SegmentedControl
++				<ToggleGroupControl
+ 					isBlock
+ 					onChange={ setAlignState }
+ 					value={ alignState }
+ 					label={ label }
+ 				>
+ 					{ alignOptions }
+-				</SegmentedControl>
++				</ToggleGroupControl>
+ 			</Spacer>
+ 			<Spacer>
+-				<SegmentedControl label={ label } value="horizontal">
+-					<SegmentedControlOption
++				<ToggleGroupControl label={ label } value="horizontal">
++					<ToggleGroupControlOption
+ 						value="horizontal"
+ 						label="Horizontal"
+ 					/>
+-					<SegmentedControlOption value="vertical" label="Vertical" />
+-				</SegmentedControl>
++					<ToggleGroupControlOption
++						value="vertical"
++						label="Vertical"
++					/>
++				</ToggleGroupControl>
+ 			</Spacer>
+ 			<Spacer>
+-				<SegmentedControl
++				<ToggleGroupControl
+ 					isAdaptiveWidth
+ 					label={ label }
+ 					value="long"
+ 					hideLabelFromVision={ true }
+ 				>
+-					<SegmentedControlOption value="short" label="Short" />
+-					<SegmentedControlOption
++					<ToggleGroupControlOption value="short" label="Short" />
++					<ToggleGroupControlOption
+ 						value="long"
+ 						label="Looooooooooooong"
+ 					/>
+-				</SegmentedControl>
++				</ToggleGroupControl>
+ 			</Spacer>
+ 		</View>
+ 	);
+diff --git a/packages/components/src/segmented-control/styles.ts b/packages/components/src/toggle-group-control/styles.ts
+similarity index 94%
+rename from packages/components/src/segmented-control/styles.ts
+rename to packages/components/src/toggle-group-control/styles.ts
+index e02a8d33dd4147..a5963eadc3c473 100644
+--- a/packages/components/src/segmented-control/styles.ts
++++ b/packages/components/src/toggle-group-control/styles.ts
+@@ -9,7 +9,7 @@ import styled from '@emotion/styled';
+  */
+ import { CONFIG, COLORS, reduceMotion } from '../utils';
+ 
+-export const SegmentedControl = css`
++export const ToggleGroupControl = css`
+ 	background: ${ COLORS.ui.background };
+ 	border: 1px solid;
+ 	border-color: ${ COLORS.ui.border };
+@@ -41,7 +41,7 @@ export const block = css`
+ export const BackdropView = styled.div`
+ 	background: ${ COLORS.gray[ 900 ] };
+ 	border-radius: ${ CONFIG.controlBorderRadius };
+-	box-shadow: ${ CONFIG.segmentedControlBackdropBoxShadow };
++	box-shadow: ${ CONFIG.toggleGroupControlBackdropBoxShadow };
+ 	left: 0;
+ 	position: absolute;
+ 	top: 2px;
+@@ -90,7 +90,7 @@ export const buttonView = css`
+ 	}
+ 
+ 	&:active {
+-		background: ${ CONFIG.segmentedControlBackgroundColor };
++		background: ${ CONFIG.toggleGroupControlBackgroundColor };
+ 	}
+ `;
+ 
+diff --git a/packages/components/src/segmented-control/test/__snapshots__/index.js.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap
+similarity index 89%
+rename from packages/components/src/segmented-control/test/__snapshots__/index.js.snap
+rename to packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap
+index 6e0c296135ddb0..39e8f821a21cd3 100644
+--- a/packages/components/src/segmented-control/test/__snapshots__/index.js.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap
+@@ -1,6 +1,6 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`SegmentedControl should render correctly 1`] = `
++exports[`ToggleGroupControl should render correctly 1`] = `
+ .emotion-0 {
+   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+   font-size: 13px;
+@@ -180,15 +180,15 @@ exports[`SegmentedControl should render correctly 1`] = `
+       <span
+         class="components-base-control__label"
+       >
+-        Test Segmented Control
++        Test Toggle Group Control
+       </span>
+     </div>
+     <div
+-      aria-label="Test Segmented Control"
+-      class="medium components-segmented-control emotion-4 emotion-5"
++      aria-label="Test Toggle Group Control"
++      class="medium components-toggle-group-control emotion-4 emotion-5"
+       data-wp-c16t="true"
+-      data-wp-component="SegmentedControl"
+-      id="segmented-control-0"
++      data-wp-component="ToggleGroupControl"
++      id="toggle-group-control-0"
+       role="radiogroup"
+     >
+       <iframe
+@@ -210,11 +210,11 @@ exports[`SegmentedControl should render correctly 1`] = `
+         <button
+           aria-checked="false"
+           aria-label="R"
+-          class="emotion-10 components-segmented-control-option"
++          class="emotion-10 components-toggle-group-control-option"
+           data-value="rigas"
+           data-wp-c16t="true"
+-          data-wp-component="SegmentedControlOption"
+-          id="segmented-control-0-0"
++          data-wp-component="ToggleGroupControlOption"
++          id="toggle-group-control-0-0"
+           role="radio"
+           tabindex="0"
+         >
+@@ -242,11 +242,11 @@ exports[`SegmentedControl should render correctly 1`] = `
+         <button
+           aria-checked="false"
+           aria-label="J"
+-          class="emotion-10 components-segmented-control-option"
++          class="emotion-10 components-toggle-group-control-option"
+           data-value="jack"
+           data-wp-c16t="true"
+-          data-wp-component="SegmentedControlOption"
+-          id="segmented-control-0-1"
++          data-wp-component="ToggleGroupControlOption"
++          id="toggle-group-control-0-1"
+           role="radio"
+           tabindex="-1"
+         >
+diff --git a/packages/components/src/segmented-control/test/index.js b/packages/components/src/toggle-group-control/test/index.js
+similarity index 62%
+rename from packages/components/src/segmented-control/test/index.js
+rename to packages/components/src/toggle-group-control/test/index.js
+index f2dcd59a52b2f5..be0e7dcbc428d5 100644
+--- a/packages/components/src/segmented-control/test/index.js
++++ b/packages/components/src/toggle-group-control/test/index.js
+@@ -6,33 +6,33 @@ import { render, fireEvent } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import { SegmentedControl, SegmentedControlOption } from '../index';
++import { ToggleGroupControl, ToggleGroupControlOption } from '../index';
+ 
+-describe( 'SegmentedControl', () => {
++describe( 'ToggleGroupControl', () => {
+ 	const options = (
+ 		<>
+-			<SegmentedControlOption value="rigas" label="R" />
+-			<SegmentedControlOption value="jack" label="J" />
++			<ToggleGroupControlOption value="rigas" label="R" />
++			<ToggleGroupControlOption value="jack" label="J" />
+ 		</>
+ 	);
+ 	it( 'should render correctly', () => {
+ 		const { container } = render(
+-			<SegmentedControl label="Test Segmented Control">
++			<ToggleGroupControl label="Test Toggle Group Control">
+ 				{ options }
+-			</SegmentedControl>
++			</ToggleGroupControl>
+ 		);
+ 		expect( container.firstChild ).toMatchSnapshot();
+ 	} );
+ 	it( 'should call onChange with proper value', () => {
+ 		const mockOnChange = jest.fn();
+ 		const { getByLabelText } = render(
+-			<SegmentedControl
++			<ToggleGroupControl
+ 				value="jack"
+ 				onChange={ mockOnChange }
+-				label="Test Segmented Control"
++				label="Test Toggle Group Control"
+ 			>
+ 				{ options }
+-			</SegmentedControl>
++			</ToggleGroupControl>
+ 		);
+ 		const firstButton = getByLabelText( 'R' );
+ 		fireEvent.click( firstButton );
+diff --git a/packages/components/src/segmented-control/segmented-control-backdrop.tsx b/packages/components/src/toggle-group-control/toggle-group-control-backdrop.tsx
+similarity index 86%
+rename from packages/components/src/segmented-control/segmented-control-backdrop.tsx
+rename to packages/components/src/toggle-group-control/toggle-group-control-backdrop.tsx
+index 5cca63e22c4a1e..bd444d245bc9f8 100644
+--- a/packages/components/src/segmented-control/segmented-control-backdrop.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-backdrop.tsx
+@@ -6,14 +6,14 @@ import { useState, useEffect, memo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type { SegmentedControlBackdropProps } from './types';
++import type { ToggleGroupControlBackdropProps } from './types';
+ import { BackdropView } from './styles';
+ 
+-function SegmentedControlBackdrop( {
++function ToggleGroupControlBackdrop( {
+ 	containerRef,
+ 	containerWidth,
+ 	state,
+-}: SegmentedControlBackdropProps ) {
++}: ToggleGroupControlBackdropProps ) {
+ 	const [ left, setLeft ] = useState( 0 );
+ 	const [ width, setWidth ] = useState( 0 );
+ 	const [ canAnimate, setCanAnimate ] = useState( false );
+@@ -57,4 +57,4 @@ function SegmentedControlBackdrop( {
+ 	);
+ }
+ 
+-export default memo( SegmentedControlBackdrop );
++export default memo( ToggleGroupControlBackdrop );
+diff --git a/packages/components/src/segmented-control/segmented-control-button.tsx b/packages/components/src/toggle-group-control/toggle-group-control-button.tsx
+similarity index 81%
+rename from packages/components/src/segmented-control/segmented-control-button.tsx
+rename to packages/components/src/toggle-group-control/toggle-group-control-button.tsx
+index 6bf3de5f3a6beb..8fdce889c50993 100644
+--- a/packages/components/src/segmented-control/segmented-control-button.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-button.tsx
+@@ -13,7 +13,7 @@ import { memo } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import * as styles from './styles';
+-import type { SegmentedControlButtonProps } from './types';
++import type { ToggleGroupControlButtonProps } from './types';
+ import { useCx } from '../utils/hooks';
+ 
+ const {
+@@ -23,7 +23,7 @@ const {
+ 	SeparatorView,
+ } = styles;
+ 
+-function SegmentedControlButton( {
++function ToggleGroupControlButton( {
+ 	className,
+ 	forwardedRef,
+ 	isBlock = false,
+@@ -31,7 +31,7 @@ function SegmentedControlButton( {
+ 	showSeparator,
+ 	value,
+ 	...props
+-}: SegmentedControlButtonProps ) {
++}: ToggleGroupControlButtonProps ) {
+ 	const isActive = props.state === value;
+ 	const cx = useCx();
+ 	const labelViewClasses = cx( isBlock && styles.labelBlock );
+@@ -56,12 +56,12 @@ function SegmentedControlButton( {
+ 					{ label }
+ 				</LabelPlaceholderView>
+ 			</Radio>
+-			<SegmentedControlSeparator isActive={ ! showSeparator } />
++			<ToggleGroupControlSeparator isActive={ ! showSeparator } />
+ 		</LabelView>
+ 	);
+ }
+ 
+-const SegmentedControlSeparator = memo(
++const ToggleGroupControlSeparator = memo(
+ 	( { isActive }: { isActive: boolean } ) => {
+ 		const cx = useCx();
+ 		const classes = cx( isActive && styles.separatorActive );
+@@ -69,4 +69,4 @@ const SegmentedControlSeparator = memo(
+ 	}
+ );
+ 
+-export default memo( SegmentedControlButton );
++export default memo( ToggleGroupControlButton );
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-context.ts b/packages/components/src/toggle-group-control/toggle-group-control-context.ts
+new file mode 100644
+index 00000000000000..a686cee2d97d64
+--- /dev/null
++++ b/packages/components/src/toggle-group-control/toggle-group-control-context.ts
+@@ -0,0 +1,16 @@
++/**
++ * WordPress dependencies
++ */
++import { createContext, useContext } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import type { ToggleGroupControlContextProps } from './types';
++
++const ToggleGroupControlContext = createContext(
++	{} as ToggleGroupControlContextProps
++);
++export const useToggleGroupControlContext = () =>
++	useContext( ToggleGroupControlContext );
++export default ToggleGroupControlContext;
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option.tsx
+new file mode 100644
+index 00000000000000..96b1f4692c7329
+--- /dev/null
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option.tsx
+@@ -0,0 +1,75 @@
++/**
++ * WordPress dependencies
++ */
++import { __ } from '@wordpress/i18n';
++import { useInstanceId } from '@wordpress/compose';
++
++/**
++ * Internal dependencies
++ */
++import {
++	contextConnect,
++	useContextSystem,
++	PolymorphicComponentProps,
++} from '../ui/context';
++import ToggleGroupControlButton from './toggle-group-control-button';
++import type {
++	ToggleGroupControlOptionProps,
++	ToggleGroupControlContextProps,
++} from './types';
++import { useToggleGroupControlContext } from './toggle-group-control-context';
++
++function getShowSeparator(
++	toggleGroupControlContext: ToggleGroupControlContextProps,
++	index: number
++) {
++	const { currentId, items } = toggleGroupControlContext;
++	const isLast = index === items.length - 1;
++	const isActive = items[ index ]?.id === currentId;
++	const isNextActive = items[ index + 1 ]?.id === currentId;
++
++	let showSeparator = true;
++
++	if ( items.length < 3 ) {
++		showSeparator = false;
++	}
++
++	if ( isActive || isNextActive || isLast ) {
++		showSeparator = false;
++	}
++
++	return showSeparator;
++}
++
++function ToggleGroupControlOption(
++	props: PolymorphicComponentProps< ToggleGroupControlOptionProps, 'input' >,
++	forwardedRef: import('react').Ref< any >
++) {
++	const toggleGroupControlContext = useToggleGroupControlContext();
++	const id = useInstanceId(
++		ToggleGroupControlOption,
++		toggleGroupControlContext.baseId || 'toggle-group-control-option'
++	);
++	const buttonProps = useContextSystem(
++		{ ...props, id },
++		'ToggleGroupControlOption'
++	);
++	const index = toggleGroupControlContext.items.findIndex(
++		( item ) => item.id === buttonProps.id
++	);
++	const showSeparator = getShowSeparator( toggleGroupControlContext, index );
++	return (
++		<ToggleGroupControlButton
++			ref={ forwardedRef }
++			{ ...{
++				...toggleGroupControlContext,
++				...buttonProps,
++				showSeparator,
++			} }
++		/>
++	);
++}
++export default contextConnect(
++	ToggleGroupControlOption,
++	'ToggleGroupControlOption'
++);
+diff --git a/packages/components/src/segmented-control/types.ts b/packages/components/src/toggle-group-control/types.ts
+similarity index 75%
+rename from packages/components/src/segmented-control/types.ts
+rename to packages/components/src/toggle-group-control/types.ts
+index 6bb3ba2ebe2a96..ad08436e8da7fc 100644
+--- a/packages/components/src/segmented-control/types.ts
++++ b/packages/components/src/toggle-group-control/types.ts
+@@ -11,12 +11,12 @@ import type { RadioStateReturn } from 'reakit';
+  */
+ import type { FormElementProps } from '../utils/types';
+ 
+-export type SegmentedControlOptionProps = {
++export type ToggleGroupControlOptionProps = {
+ 	value: ReactText;
+ 	label: string;
+ };
+ 
+-export type SegmentedControlProps = Omit<
++export type ToggleGroupControlProps = Omit<
+ 	FormElementProps< any >,
+ 	'defaultValue'
+ > & {
+@@ -37,7 +37,7 @@ export type SegmentedControlProps = Omit<
+ 	 */
+ 	isAdaptiveWidth?: boolean;
+ 	/**
+-	 * Renders `SegmentedControl` as a (CSS) block element.
++	 * Renders `ToggleGroupControl` as a (CSS) block element.
+ 	 *
+ 	 * @default false
+ 	 */
+@@ -47,7 +47,7 @@ export type SegmentedControlProps = Omit<
+ 	 */
+ 	onChange?: ( value: ReactText | undefined ) => void;
+ 	/**
+-	 * The value of `SegmentedControl`
++	 * The value of `ToggleGroupControl`
+ 	 */
+ 	value?: ReactText;
+ 	/**
+@@ -61,20 +61,20 @@ export type SegmentedControlProps = Omit<
+ 	help?: ReactNode;
+ };
+ 
+-export type SegmentedControlContextProps = RadioStateReturn & {
++export type ToggleGroupControlContextProps = RadioStateReturn & {
+ 	/**
+-	 * Renders `SegmentedControl` as a (CSS) block element.
++	 * Renders `ToggleGroupControl` as a (CSS) block element.
+ 	 *
+ 	 * @default false
+ 	 */
+ 	isBlock?: boolean;
+ };
+ 
+-export type SegmentedControlButtonProps = {
++export type ToggleGroupControlButtonProps = {
+ 	className?: string;
+ 	forwardedRef?: Ref< any >;
+ 	/**
+-	 * Renders `SegmentedControl` is a (CSS) block element.
++	 * Renders `ToggleGroupControl` is a (CSS) block element.
+ 	 *
+ 	 * @default false
+ 	 */
+@@ -85,7 +85,7 @@ export type SegmentedControlButtonProps = {
+ 	state?: any;
+ };
+ 
+-export type SegmentedControlBackdropProps = {
++export type ToggleGroupControlBackdropProps = {
+ 	containerRef: MutableRefObject< HTMLElement | undefined >;
+ 	containerWidth?: number | null;
+ 	state?: any;
+diff --git a/packages/components/src/utils/config-values.js b/packages/components/src/utils/config-values.js
+index c5a0758eadf003..b527a2a6baf608 100644
+--- a/packages/components/src/utils/config-values.js
++++ b/packages/components/src/utils/config-values.js
+@@ -26,18 +26,19 @@ const CONTROL_PROPS = {
+ 	controlHeightLarge: `calc( ${ CONTROL_HEIGHT } * 1.2 )`,
+ 	controlHeightXLarge: `calc( ${ CONTROL_HEIGHT } * 1.4 )`,
+ };
+-const SEGMENTED_CONTROL_PROPS = {
+-	segmentedControlBackgroundColor: CONTROL_PROPS.controlBackgroundColor,
+-	segmentedControlBorderColor: COLORS.ui.border,
+-	segmentedControlBackdropBackgroundColor: CONTROL_PROPS.controlSurfaceColor,
+-	segmentedControlBackdropBorderColor: COLORS.ui.border,
+-	segmentedControlBackdropBoxShadow: 'transparent',
+-	segmentedControlButtonColorActive: CONTROL_PROPS.controlBackgroundColor,
++const TOGGLE_GROUP_CONTROL_PROPS = {
++	toggleGroupControlBackgroundColor: CONTROL_PROPS.controlBackgroundColor,
++	toggleGroupControlBorderColor: COLORS.ui.border,
++	toggleGroupControlBackdropBackgroundColor:
++		CONTROL_PROPS.controlSurfaceColor,
++	toggleGroupControlBackdropBorderColor: COLORS.ui.border,
++	toggleGroupControlBackdropBoxShadow: 'transparent',
++	toggleGroupControlButtonColorActive: CONTROL_PROPS.controlBackgroundColor,
+ };
+ 
+ export default {
+ 	...CONTROL_PROPS,
+-	...SEGMENTED_CONTROL_PROPS,
++	...TOGGLE_GROUP_CONTROL_PROPS,
+ 	colorDivider: 'rgba(0, 0, 0, 0.1)',
+ 	colorScrollbarThumb: 'rgba(0, 0, 0, 0.2)',
+ 	colorScrollbarThumbHover: 'rgba(0, 0, 0, 0.5)',
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 0c43554ae83fc0..77809950efbdd5 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -43,7 +43,6 @@
+ 		"src/range-control/**/*",
+ 		"src/scroll-lock/**/*",
+ 		"src/scrollable/**/*",
+-		"src/segmented-control/**/*",
+ 		"src/select-control/**/*",
+ 		"src/shortcut/**/*",
+ 		"src/slot-fill/**/*",
+@@ -52,6 +51,7 @@
+ 		"src/surface/**/*",
+ 		"src/text/**/*",
+ 		"src/tip/**/*",
++		"src/toggle-group-control/**/*",
+ 		"src/tooltip/**/*",
+ 		"src/truncate/**/*",
+ 		"src/ui/**/*",

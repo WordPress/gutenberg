@@ -1,0 +1,105 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index edeb4c919a94ea..3d6e2026f53408 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Bug Fix
+ 
++-   `Button`: Remove unexpected `has-text` class when empty children are passed ([#44198](https://github.com/WordPress/gutenberg/pull/44198)).
+ -   The `LinkedButton` to unlink sides in `BoxControl`, `BorderBoxControl` and `BorderRadiusControl` have changed from a rectangular primary button to an icon-only button, with a sentence case tooltip, and default-size icon for better legibility. The `Button` component has been fixed so when `isSmall` and `icon` props are set, and no text is present, the button shape is square rather than rectangular.
+ 
+ ### New Features
+diff --git a/packages/components/src/button/index.js b/packages/components/src/button/index.js
+index 9b01f0cd49c089..1b0fd57a441a91 100644
+--- a/packages/components/src/button/index.js
++++ b/packages/components/src/button/index.js
+@@ -92,6 +92,12 @@ export function Button( props, ref ) {
+ 		'components-button__description'
+ 	);
+ 
++	const hasChildren =
++		children?.[ 0 ] &&
++		children[ 0 ] !== null &&
++		// Tooltip should not considered as a child
++		children?.[ 0 ]?.props?.className !== 'components-tooltip';
++
+ 	const classes = classnames( 'components-button', className, {
+ 		'is-secondary': variant === 'secondary',
+ 		'is-primary': variant === 'primary',
+@@ -101,7 +107,7 @@ export function Button( props, ref ) {
+ 		'is-busy': isBusy,
+ 		'is-link': variant === 'link',
+ 		'is-destructive': isDestructive,
+-		'has-text': !! icon && !! children,
++		'has-text': !! icon && hasChildren,
+ 		'has-icon': !! icon,
+ 	} );
+ 
+diff --git a/packages/components/src/button/test/index.js b/packages/components/src/button/test/index.js
+index a7ebaf7314a325..5db9f940ec4d16 100644
+--- a/packages/components/src/button/test/index.js
++++ b/packages/components/src/button/test/index.js
+@@ -13,6 +13,7 @@ import { plusCircle } from '@wordpress/icons';
+  * Internal dependencies
+  */
+ import Button from '../';
++import { Tooltip } from '../../';
+ 
+ jest.mock( '../../icon', () => () => <div data-testid="test-icon" /> );
+ 
+@@ -75,6 +76,41 @@ describe( 'Button', () => {
+ 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-pressed' );
+ 		} );
+ 
++		it( 'should render a button element with has-text when children are passed', async () => {
++			render( <Button icon={ plusCircle }>Children</Button> );
++			await screen.getByRole( 'button' ).focus();
++			expect( screen.getByRole( 'button' ) ).toHaveClass( 'has-text' );
++		} );
++
++		it( 'should render a button element without has-text when children are not passed', async () => {
++			render( <Button icon={ plusCircle }></Button> );
++			expect( screen.getByRole( 'button' ) ).not.toHaveClass(
++				'has-text'
++			);
++		} );
++
++		it( 'should render a button element without has-text when children are empty fragment', async () => {
++			render(
++				<Button icon={ plusCircle }>
++					<></>
++				</Button>
++			);
++			expect( screen.getByRole( 'button' ) ).not.toHaveClass(
++				'has-text'
++			);
++		} );
++
++		it( 'should render a button element without has-text when a button wrapped in Tooltip', async () => {
++			render(
++				<Tooltip text="Help text">
++					<Button icon={ plusCircle } />
++				</Tooltip>
++			);
++			expect( screen.getByRole( 'button' ) ).not.toHaveClass(
++				'has-text'
++			);
++		} );
++
+ 		it( 'should add a disabled prop to the button', () => {
+ 			render( <Button disabled /> );
+ 
+diff --git a/packages/editor/src/components/post-saved-state/test/__snapshots__/index.js.snap b/packages/editor/src/components/post-saved-state/test/__snapshots__/index.js.snap
+index 87f462a63817b5..7f14bbc722589a 100644
+--- a/packages/editor/src/components/post-saved-state/test/__snapshots__/index.js.snap
++++ b/packages/editor/src/components/post-saved-state/test/__snapshots__/index.js.snap
+@@ -4,7 +4,7 @@ exports[`PostSavedState returns a disabled button if the post is not saveable 1`
+ <button
+   aria-disabled="true"
+   aria-label="Save draft"
+-  class="components-button has-text has-icon"
++  class="components-button has-icon"
+   type="button"
+ >
+   <svg

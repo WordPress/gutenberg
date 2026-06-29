@@ -1,0 +1,3917 @@
+diff --git a/package-lock.json b/package-lock.json
+index 0bd549a2a083a2..03d34f7e37f47d 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -46725,7 +46725,7 @@
+ 		},
+ 		"packages/a11y": {
+ 			"name": "@wordpress/a11y",
+-			"version": "4.48.0",
++			"version": "4.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/dom-ready": "file:../dom-ready",
+@@ -46738,7 +46738,7 @@
+ 		},
+ 		"packages/abilities": {
+ 			"name": "@wordpress/abilities",
+-			"version": "0.14.0",
++			"version": "0.14.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/data": "file:../data",
+@@ -46771,7 +46771,7 @@
+ 		},
+ 		"packages/admin-ui": {
+ 			"name": "@wordpress/admin-ui",
+-			"version": "2.3.0",
++			"version": "2.3.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/components": "file:../components",
+@@ -46868,7 +46868,7 @@
+ 		},
+ 		"packages/annotations": {
+ 			"name": "@wordpress/annotations",
+-			"version": "3.48.0",
++			"version": "3.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/data": "file:../data",
+@@ -46890,7 +46890,7 @@
+ 		},
+ 		"packages/api-fetch": {
+ 			"name": "@wordpress/api-fetch",
+-			"version": "7.48.0",
++			"version": "7.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/i18n": "file:../i18n",
+@@ -46904,7 +46904,7 @@
+ 		},
+ 		"packages/asset-loader": {
+ 			"name": "@wordpress/asset-loader",
+-			"version": "1.14.0",
++			"version": "1.14.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -46913,7 +46913,7 @@
+ 		},
+ 		"packages/autop": {
+ 			"name": "@wordpress/autop",
+-			"version": "4.48.0",
++			"version": "4.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -46922,7 +46922,7 @@
+ 		},
+ 		"packages/babel-plugin-import-jsx-pragma": {
+ 			"name": "@wordpress/babel-plugin-import-jsx-pragma",
+-			"version": "5.48.0",
++			"version": "5.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"devDependencies": {
+ 				"@babel/plugin-syntax-jsx": "^7.25.7"
+@@ -46937,7 +46937,7 @@
+ 		},
+ 		"packages/babel-plugin-makepot": {
+ 			"name": "@wordpress/babel-plugin-makepot",
+-			"version": "6.48.0",
++			"version": "6.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"deepmerge": "^4.3.1",
+@@ -46957,7 +46957,7 @@
+ 		},
+ 		"packages/babel-preset-default": {
+ 			"name": "@wordpress/babel-preset-default",
+-			"version": "8.48.0",
++			"version": "8.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@babel/core": "^7.25.7",
+@@ -47162,7 +47162,7 @@
+ 		},
+ 		"packages/base-styles": {
+ 			"name": "@wordpress/base-styles",
+-			"version": "10.0.0",
++			"version": "10.0.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -47171,7 +47171,7 @@
+ 		},
+ 		"packages/blob": {
+ 			"name": "@wordpress/blob",
+-			"version": "4.48.0",
++			"version": "4.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -47180,7 +47180,7 @@
+ 		},
+ 		"packages/block-directory": {
+ 			"name": "@wordpress/block-directory",
+-			"version": "5.48.0",
++			"version": "5.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/a11y": "file:../a11y",
+@@ -47288,7 +47288,7 @@
+ 		},
+ 		"packages/block-editor": {
+ 			"name": "@wordpress/block-editor",
+-			"version": "15.21.0",
++			"version": "15.21.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@react-spring/web": "^9.4.5",
+@@ -47460,7 +47460,7 @@
+ 		},
+ 		"packages/block-library": {
+ 			"name": "@wordpress/block-library",
+-			"version": "9.48.0",
++			"version": "9.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@arraypress/waveform-player": "^1.2.1",
+@@ -47613,7 +47613,7 @@
+ 		},
+ 		"packages/block-serialization-default-parser": {
+ 			"name": "@wordpress/block-serialization-default-parser",
+-			"version": "5.48.0",
++			"version": "5.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"devDependencies": {
+ 				"@wordpress/block-serialization-spec-parser": "file:../block-serialization-spec-parser"
+@@ -47625,7 +47625,7 @@
+ 		},
+ 		"packages/block-serialization-spec-parser": {
+ 			"name": "@wordpress/block-serialization-spec-parser",
+-			"version": "5.48.0",
++			"version": "5.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"pegjs": "^0.10.0",
+@@ -47638,7 +47638,7 @@
+ 		},
+ 		"packages/blocks": {
+ 			"name": "@wordpress/blocks",
+-			"version": "15.21.0",
++			"version": "15.21.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/autop": "file:../autop",
+@@ -47692,7 +47692,7 @@
+ 		},
+ 		"packages/boot": {
+ 			"name": "@wordpress/boot",
+-			"version": "0.15.0",
++			"version": "0.15.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/a11y": "file:../a11y",
+@@ -47737,7 +47737,7 @@
+ 		},
+ 		"packages/browserslist-config": {
+ 			"name": "@wordpress/browserslist-config",
+-			"version": "6.48.0",
++			"version": "6.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"devDependencies": {
+ 				"browserslist": "^4.21.10"
+@@ -47749,7 +47749,7 @@
+ 		},
+ 		"packages/commands": {
+ 			"name": "@wordpress/commands",
+-			"version": "1.48.0",
++			"version": "1.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/base-styles": "file:../base-styles",
+@@ -47776,7 +47776,7 @@
+ 		},
+ 		"packages/components": {
+ 			"name": "@wordpress/components",
+-			"version": "35.0.0",
++			"version": "35.0.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@ariakit/react": "^0.4.29",
+@@ -47982,7 +47982,7 @@
+ 		},
+ 		"packages/compose": {
+ 			"name": "@wordpress/compose",
+-			"version": "8.1.0",
++			"version": "8.1.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@types/mousetrap": "^1.6.8",
+@@ -48141,7 +48141,7 @@
+ 		},
+ 		"packages/core-abilities": {
+ 			"name": "@wordpress/core-abilities",
+-			"version": "0.13.0",
++			"version": "0.13.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/abilities": "file:../abilities",
+@@ -48155,7 +48155,7 @@
+ 		},
+ 		"packages/core-commands": {
+ 			"name": "@wordpress/core-commands",
+-			"version": "1.48.0",
++			"version": "1.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/block-editor": "file:../block-editor",
+@@ -48183,7 +48183,7 @@
+ 		},
+ 		"packages/core-data": {
+ 			"name": "@wordpress/core-data",
+-			"version": "7.48.0",
++			"version": "7.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/api-fetch": "file:../api-fetch",
+@@ -48978,7 +48978,7 @@
+ 		},
+ 		"packages/create-block": {
+ 			"name": "@wordpress/create-block",
+-			"version": "4.91.0",
++			"version": "4.91.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@inquirer/prompts": "^7.2.0",
+@@ -49005,7 +49005,7 @@
+ 		},
+ 		"packages/create-block-interactive-template": {
+ 			"name": "@wordpress/create-block-interactive-template",
+-			"version": "2.48.0",
++			"version": "2.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -49014,7 +49014,7 @@
+ 		},
+ 		"packages/create-block-tutorial-template": {
+ 			"name": "@wordpress/create-block-tutorial-template",
+-			"version": "4.48.0",
++			"version": "4.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -49023,7 +49023,7 @@
+ 		},
+ 		"packages/customize-widgets": {
+ 			"name": "@wordpress/customize-widgets",
+-			"version": "5.48.0",
++			"version": "5.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/base-styles": "file:../base-styles",
+@@ -49131,7 +49131,7 @@
+ 		},
+ 		"packages/data": {
+ 			"name": "@wordpress/data",
+-			"version": "10.48.0",
++			"version": "10.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/compose": "file:../compose",
+@@ -49171,7 +49171,7 @@
+ 		},
+ 		"packages/data-controls": {
+ 			"name": "@wordpress/data-controls",
+-			"version": "4.48.0",
++			"version": "4.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/api-fetch": "file:../api-fetch",
+@@ -49253,7 +49253,7 @@
+ 		},
+ 		"packages/dataviews": {
+ 			"name": "@wordpress/dataviews",
+-			"version": "16.0.0",
++			"version": "16.0.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@ariakit/react": "^0.4.29",
+@@ -49413,7 +49413,7 @@
+ 		},
+ 		"packages/date": {
+ 			"name": "@wordpress/date",
+-			"version": "5.48.0",
++			"version": "5.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/deprecated": "file:../deprecated",
+@@ -49427,7 +49427,7 @@
+ 		},
+ 		"packages/dependency-extraction-webpack-plugin": {
+ 			"name": "@wordpress/dependency-extraction-webpack-plugin",
+-			"version": "6.48.0",
++			"version": "6.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"json2php": "^0.0.9"
+@@ -49450,7 +49450,7 @@
+ 		},
+ 		"packages/deprecated": {
+ 			"name": "@wordpress/deprecated",
+-			"version": "4.48.0",
++			"version": "4.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/hooks": "file:../hooks"
+@@ -49462,7 +49462,7 @@
+ 		},
+ 		"packages/design-system-mcp": {
+ 			"name": "@wordpress/design-system-mcp",
+-			"version": "0.5.0",
++			"version": "0.5.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@cfworker/json-schema": "^4.1.1",
+@@ -49491,7 +49491,7 @@
+ 		},
+ 		"packages/docgen": {
+ 			"name": "@wordpress/docgen",
+-			"version": "2.48.0",
++			"version": "2.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@babel/core": "^7.25.7",
+@@ -49515,7 +49515,7 @@
+ 		},
+ 		"packages/dom": {
+ 			"name": "@wordpress/dom",
+-			"version": "4.48.0",
++			"version": "4.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/deprecated": "file:../deprecated"
+@@ -49527,7 +49527,7 @@
+ 		},
+ 		"packages/dom-ready": {
+ 			"name": "@wordpress/dom-ready",
+-			"version": "4.48.0",
++			"version": "4.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -49536,7 +49536,7 @@
+ 		},
+ 		"packages/e2e-test-utils-playwright": {
+ 			"name": "@wordpress/e2e-test-utils-playwright",
+-			"version": "1.48.0",
++			"version": "1.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"change-case": "^4.1.2",
+@@ -49566,7 +49566,7 @@
+ 		},
+ 		"packages/e2e-tests": {
+ 			"name": "@wordpress/e2e-tests",
+-			"version": "9.13.0",
++			"version": "9.13.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/interactivity": "file:../interactivity",
+@@ -49585,7 +49585,7 @@
+ 		},
+ 		"packages/edit-post": {
+ 			"name": "@wordpress/edit-post",
+-			"version": "8.48.0",
++			"version": "8.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/a11y": "file:../a11y",
+@@ -49704,7 +49704,7 @@
+ 		},
+ 		"packages/edit-site": {
+ 			"name": "@wordpress/edit-site",
+-			"version": "6.48.0",
++			"version": "6.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@react-spring/web": "^9.4.5",
+@@ -49786,7 +49786,7 @@
+ 		},
+ 		"packages/edit-widgets": {
+ 			"name": "@wordpress/edit-widgets",
+-			"version": "6.48.0",
++			"version": "6.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/api-fetch": "file:../api-fetch",
+@@ -49900,7 +49900,7 @@
+ 		},
+ 		"packages/editor": {
+ 			"name": "@wordpress/editor",
+-			"version": "14.48.0",
++			"version": "14.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/a11y": "file:../a11y",
+@@ -50057,7 +50057,7 @@
+ 		},
+ 		"packages/element": {
+ 			"name": "@wordpress/element",
+-			"version": "8.0.0",
++			"version": "8.0.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@types/react": "^18.3.27",
+@@ -50145,7 +50145,7 @@
+ 		},
+ 		"packages/env": {
+ 			"name": "@wordpress/env",
+-			"version": "11.8.0",
++			"version": "11.8.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@inquirer/prompts": "^7.2.0",
+@@ -50172,7 +50172,7 @@
+ 		},
+ 		"packages/escape-html": {
+ 			"name": "@wordpress/escape-html",
+-			"version": "3.48.0",
++			"version": "3.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -50181,7 +50181,7 @@
+ 		},
+ 		"packages/eslint-plugin": {
+ 			"name": "@wordpress/eslint-plugin",
+-			"version": "25.4.0",
++			"version": "25.4.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@babel/eslint-parser": "^7.28.6",
+@@ -50373,7 +50373,7 @@
+ 		},
+ 		"packages/fields": {
+ 			"name": "@wordpress/fields",
+-			"version": "0.40.0",
++			"version": "0.40.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@react-spring/web": "^9.4.5",
+@@ -50423,7 +50423,7 @@
+ 		},
+ 		"packages/format-library": {
+ 			"name": "@wordpress/format-library",
+-			"version": "5.48.0",
++			"version": "5.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/a11y": "file:../a11y",
+@@ -50523,7 +50523,7 @@
+ 		},
+ 		"packages/global-styles-engine": {
+ 			"name": "@wordpress/global-styles-engine",
+-			"version": "1.15.0",
++			"version": "1.15.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/blocks": "file:../blocks",
+@@ -50547,7 +50547,7 @@
+ 		},
+ 		"packages/global-styles-ui": {
+ 			"name": "@wordpress/global-styles-ui",
+-			"version": "1.15.0",
++			"version": "1.15.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/a11y": "file:../a11y",
+@@ -50757,7 +50757,7 @@
+ 		},
+ 		"packages/hooks": {
+ 			"name": "@wordpress/hooks",
+-			"version": "4.48.0",
++			"version": "4.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"devDependencies": {
+ 				"benchmark": "^2.1.4"
+@@ -50769,7 +50769,7 @@
+ 		},
+ 		"packages/html-entities": {
+ 			"name": "@wordpress/html-entities",
+-			"version": "4.48.0",
++			"version": "4.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -50778,7 +50778,7 @@
+ 		},
+ 		"packages/i18n": {
+ 			"name": "@wordpress/i18n",
+-			"version": "6.21.0",
++			"version": "6.21.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@tannin/sprintf": "^1.3.2",
+@@ -50800,7 +50800,7 @@
+ 		},
+ 		"packages/icons": {
+ 			"name": "@wordpress/icons",
+-			"version": "14.0.0",
++			"version": "14.0.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/element": "file:../element",
+@@ -50823,7 +50823,7 @@
+ 		},
+ 		"packages/image-cropper": {
+ 			"name": "@wordpress/image-cropper",
+-			"version": "1.12.0",
++			"version": "1.12.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/components": "file:../components",
+@@ -50850,7 +50850,7 @@
+ 		},
+ 		"packages/interactivity": {
+ 			"name": "@wordpress/interactivity",
+-			"version": "6.48.0",
++			"version": "6.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@preact/signals": "^1.3.0",
+@@ -50867,7 +50867,7 @@
+ 		},
+ 		"packages/interactivity-router": {
+ 			"name": "@wordpress/interactivity-router",
+-			"version": "2.48.0",
++			"version": "2.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/a11y": "file:../a11y",
+@@ -50881,7 +50881,7 @@
+ 		},
+ 		"packages/interface": {
+ 			"name": "@wordpress/interface",
+-			"version": "9.33.0",
++			"version": "9.33.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/a11y": "file:../a11y",
+@@ -50979,7 +50979,7 @@
+ 		},
+ 		"packages/is-shallow-equal": {
+ 			"name": "@wordpress/is-shallow-equal",
+-			"version": "5.48.0",
++			"version": "5.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"devDependencies": {
+ 				"benchmark": "^2.1.4"
+@@ -50991,7 +50991,7 @@
+ 		},
+ 		"packages/jest-console": {
+ 			"name": "@wordpress/jest-console",
+-			"version": "8.48.0",
++			"version": "8.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"jest-matcher-utils": "^29.6.2",
+@@ -51011,7 +51011,7 @@
+ 		},
+ 		"packages/jest-preset-default": {
+ 			"name": "@wordpress/jest-preset-default",
+-			"version": "12.48.0",
++			"version": "12.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/jest-console": "file:../jest-console",
+@@ -51028,7 +51028,7 @@
+ 		},
+ 		"packages/jest-puppeteer-axe": {
+ 			"name": "@wordpress/jest-puppeteer-axe",
+-			"version": "7.48.0",
++			"version": "7.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@axe-core/puppeteer": "^4.0.0"
+@@ -51049,7 +51049,7 @@
+ 		},
+ 		"packages/keyboard-shortcuts": {
+ 			"name": "@wordpress/keyboard-shortcuts",
+-			"version": "5.48.0",
++			"version": "5.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/data": "file:../data",
+@@ -51072,7 +51072,7 @@
+ 		},
+ 		"packages/keycodes": {
+ 			"name": "@wordpress/keycodes",
+-			"version": "4.48.0",
++			"version": "4.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/i18n": "file:../i18n"
+@@ -51092,7 +51092,7 @@
+ 		},
+ 		"packages/latex-to-mathml": {
+ 			"name": "@wordpress/latex-to-mathml",
+-			"version": "1.16.0",
++			"version": "1.16.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"temml": "^0.10.33"
+@@ -51104,7 +51104,7 @@
+ 		},
+ 		"packages/lazy-editor": {
+ 			"name": "@wordpress/lazy-editor",
+-			"version": "1.14.0",
++			"version": "1.14.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/asset-loader": "file:../asset-loader",
+@@ -51136,7 +51136,7 @@
+ 		},
+ 		"packages/lazy-import": {
+ 			"name": "@wordpress/lazy-import",
+-			"version": "2.48.0",
++			"version": "2.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"execa": "^4.0.2",
+@@ -51155,7 +51155,7 @@
+ 		},
+ 		"packages/list-reusable-blocks": {
+ 			"name": "@wordpress/list-reusable-blocks",
+-			"version": "5.48.0",
++			"version": "5.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/api-fetch": "file:../api-fetch",
+@@ -51185,7 +51185,7 @@
+ 		},
+ 		"packages/media-editor": {
+ 			"name": "@wordpress/media-editor",
+-			"version": "0.11.0",
++			"version": "0.11.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/api-fetch": "file:../api-fetch",
+@@ -51294,7 +51294,7 @@
+ 		},
+ 		"packages/media-fields": {
+ 			"name": "@wordpress/media-fields",
+-			"version": "0.13.0",
++			"version": "0.13.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/base-styles": "file:../base-styles",
+@@ -51399,7 +51399,7 @@
+ 		},
+ 		"packages/media-utils": {
+ 			"name": "@wordpress/media-utils",
+-			"version": "5.48.0",
++			"version": "5.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/api-fetch": "file:../api-fetch",
+@@ -51505,7 +51505,7 @@
+ 		},
+ 		"packages/notices": {
+ 			"name": "@wordpress/notices",
+-			"version": "5.48.0",
++			"version": "5.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/a11y": "file:../a11y",
+@@ -51599,7 +51599,7 @@
+ 		},
+ 		"packages/npm-package-json-lint-config": {
+ 			"name": "@wordpress/npm-package-json-lint-config",
+-			"version": "5.48.0",
++			"version": "5.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -51611,7 +51611,7 @@
+ 		},
+ 		"packages/nux": {
+ 			"name": "@wordpress/nux",
+-			"version": "10.0.0",
++			"version": "10.0.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/data": "file:../data",
+@@ -51698,7 +51698,7 @@
+ 		},
+ 		"packages/patterns": {
+ 			"name": "@wordpress/patterns",
+-			"version": "2.48.0",
++			"version": "2.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/a11y": "file:../a11y",
+@@ -51728,7 +51728,7 @@
+ 		},
+ 		"packages/plugins": {
+ 			"name": "@wordpress/plugins",
+-			"version": "7.48.0",
++			"version": "7.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/components": "file:../components",
+@@ -51826,7 +51826,7 @@
+ 		},
+ 		"packages/postcss-plugins-preset": {
+ 			"name": "@wordpress/postcss-plugins-preset",
+-			"version": "5.48.0",
++			"version": "5.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/base-styles": "file:../base-styles",
+@@ -51844,7 +51844,7 @@
+ 		},
+ 		"packages/postcss-themes": {
+ 			"name": "@wordpress/postcss-themes",
+-			"version": "6.48.0",
++			"version": "6.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -51856,7 +51856,7 @@
+ 		},
+ 		"packages/preferences": {
+ 			"name": "@wordpress/preferences",
+-			"version": "4.48.0",
++			"version": "4.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/a11y": "file:../a11y",
+@@ -51888,7 +51888,7 @@
+ 		},
+ 		"packages/preferences-persistence": {
+ 			"name": "@wordpress/preferences-persistence",
+-			"version": "2.48.0",
++			"version": "2.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/api-fetch": "file:../api-fetch"
+@@ -51900,7 +51900,7 @@
+ 		},
+ 		"packages/prettier-config": {
+ 			"name": "@wordpress/prettier-config",
+-			"version": "4.48.0",
++			"version": "4.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"devDependencies": {
+ 				"@types/node": "^20.19.39",
+@@ -51916,7 +51916,7 @@
+ 		},
+ 		"packages/primitives": {
+ 			"name": "@wordpress/primitives",
+-			"version": "4.48.0",
++			"version": "4.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/element": "file:../element",
+@@ -51938,7 +51938,7 @@
+ 		},
+ 		"packages/priority-queue": {
+ 			"name": "@wordpress/priority-queue",
+-			"version": "3.48.0",
++			"version": "3.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"requestidlecallback": "^0.3.0"
+@@ -51953,7 +51953,7 @@
+ 		},
+ 		"packages/private-apis": {
+ 			"name": "@wordpress/private-apis",
+-			"version": "1.48.0",
++			"version": "1.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"devDependencies": {
+ 				"react": "^18.3.1"
+@@ -51965,7 +51965,7 @@
+ 		},
+ 		"packages/project-management-automation": {
+ 			"name": "@wordpress/project-management-automation",
+-			"version": "2.48.0",
++			"version": "2.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@actions/core": "^1.9.1",
+@@ -51997,7 +51997,7 @@
+ 		},
+ 		"packages/react-i18n": {
+ 			"name": "@wordpress/react-i18n",
+-			"version": "4.48.0",
++			"version": "4.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/element": "file:../element",
+@@ -52020,7 +52020,7 @@
+ 		},
+ 		"packages/readable-js-assets-webpack-plugin": {
+ 			"name": "@wordpress/readable-js-assets-webpack-plugin",
+-			"version": "3.48.0",
++			"version": "3.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"devDependencies": {
+ 				"glob": "^7.1.2",
+@@ -52037,7 +52037,7 @@
+ 		},
+ 		"packages/redux-routine": {
+ 			"name": "@wordpress/redux-routine",
+-			"version": "5.48.0",
++			"version": "5.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"is-plain-object": "^5.0.0",
+@@ -52074,7 +52074,7 @@
+ 		},
+ 		"packages/reusable-blocks": {
+ 			"name": "@wordpress/reusable-blocks",
+-			"version": "5.48.0",
++			"version": "5.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/base-styles": "file:../base-styles",
+@@ -52101,7 +52101,7 @@
+ 		},
+ 		"packages/rich-text": {
+ 			"name": "@wordpress/rich-text",
+-			"version": "7.48.0",
++			"version": "7.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/a11y": "file:../a11y",
+@@ -52136,7 +52136,7 @@
+ 		},
+ 		"packages/route": {
+ 			"name": "@wordpress/route",
+-			"version": "0.14.0",
++			"version": "0.14.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@tanstack/history": "^1.133.28",
+@@ -52153,7 +52153,7 @@
+ 		},
+ 		"packages/router": {
+ 			"name": "@wordpress/router",
+-			"version": "1.48.0",
++			"version": "1.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/compose": "file:../compose",
+@@ -52179,7 +52179,7 @@
+ 		},
+ 		"packages/scripts": {
+ 			"name": "@wordpress/scripts",
+-			"version": "32.4.0",
++			"version": "32.4.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@babel/core": "^7.25.7",
+@@ -52297,7 +52297,7 @@
+ 		},
+ 		"packages/server-side-render": {
+ 			"name": "@wordpress/server-side-render",
+-			"version": "6.24.0",
++			"version": "6.24.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/api-fetch": "file:../api-fetch",
+@@ -52327,7 +52327,7 @@
+ 		},
+ 		"packages/shortcode": {
+ 			"name": "@wordpress/shortcode",
+-			"version": "4.48.0",
++			"version": "4.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"memize": "^2.1.0"
+@@ -52339,7 +52339,7 @@
+ 		},
+ 		"packages/style-engine": {
+ 			"name": "@wordpress/style-engine",
+-			"version": "2.48.0",
++			"version": "2.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"change-case": "^4.1.2"
+@@ -52359,7 +52359,7 @@
+ 		},
+ 		"packages/style-runtime": {
+ 			"name": "@wordpress/style-runtime",
+-			"version": "0.4.0",
++			"version": "0.4.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"engines": {
+ 				"node": ">=20.10.0",
+@@ -52368,7 +52368,7 @@
+ 		},
+ 		"packages/stylelint-config": {
+ 			"name": "@wordpress/stylelint-config",
+-			"version": "23.40.0",
++			"version": "23.40.1",
+ 			"license": "MIT",
+ 			"dependencies": {
+ 				"@stylistic/stylelint-plugin": "^3.0.1",
+@@ -52486,7 +52486,7 @@
+ 		},
+ 		"packages/sync": {
+ 			"name": "@wordpress/sync",
+-			"version": "1.48.0",
++			"version": "1.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/api-fetch": "file:../api-fetch",
+@@ -53199,7 +53199,7 @@
+ 		},
+ 		"packages/theme": {
+ 			"name": "@wordpress/theme",
+-			"version": "0.15.0",
++			"version": "0.15.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/element": "file:../element",
+@@ -53370,7 +53370,7 @@
+ 		},
+ 		"packages/token-list": {
+ 			"name": "@wordpress/token-list",
+-			"version": "3.48.0",
++			"version": "3.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -53379,7 +53379,7 @@
+ 		},
+ 		"packages/ui": {
+ 			"name": "@wordpress/ui",
+-			"version": "0.15.0",
++			"version": "0.15.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@base-ui/react": "^1.5.0",
+@@ -53489,7 +53489,7 @@
+ 		},
+ 		"packages/undo-manager": {
+ 			"name": "@wordpress/undo-manager",
+-			"version": "1.48.0",
++			"version": "1.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/is-shallow-equal": "file:../is-shallow-equal"
+@@ -53504,7 +53504,7 @@
+ 		},
+ 		"packages/upload-media": {
+ 			"name": "@wordpress/upload-media",
+-			"version": "0.33.0",
++			"version": "0.33.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/blob": "file:../blob",
+@@ -53535,7 +53535,7 @@
+ 		},
+ 		"packages/url": {
+ 			"name": "@wordpress/url",
+-			"version": "4.48.0",
++			"version": "4.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"remove-accents": "^0.5.0"
+@@ -53547,7 +53547,7 @@
+ 		},
+ 		"packages/viewport": {
+ 			"name": "@wordpress/viewport",
+-			"version": "6.48.0",
++			"version": "6.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/compose": "file:../compose",
+@@ -53640,7 +53640,7 @@
+ 		},
+ 		"packages/views": {
+ 			"name": "@wordpress/views",
+-			"version": "1.15.0",
++			"version": "1.15.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/core-data": "file:../core-data",
+@@ -53658,7 +53658,7 @@
+ 		},
+ 		"packages/vips": {
+ 			"name": "@wordpress/vips",
+-			"version": "2.1.0",
++			"version": "2.1.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/worker-threads": "file:../worker-threads",
+@@ -53671,7 +53671,7 @@
+ 		},
+ 		"packages/warning": {
+ 			"name": "@wordpress/warning",
+-			"version": "3.48.0",
++			"version": "3.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"devDependencies": {
+ 				"@babel/core": "^7.25.7"
+@@ -53683,7 +53683,7 @@
+ 		},
+ 		"packages/widgets": {
+ 			"name": "@wordpress/widgets",
+-			"version": "4.48.0",
++			"version": "4.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/api-fetch": "file:../api-fetch",
+@@ -53711,7 +53711,7 @@
+ 		},
+ 		"packages/wordcount": {
+ 			"name": "@wordpress/wordcount",
+-			"version": "4.48.0",
++			"version": "4.48.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -53720,7 +53720,7 @@
+ 		},
+ 		"packages/worker-threads": {
+ 			"name": "@wordpress/worker-threads",
+-			"version": "1.8.0",
++			"version": "1.8.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"comctx": "^1.4.3"
+@@ -53759,7 +53759,7 @@
+ 		},
+ 		"packages/wp-build": {
+ 			"name": "@wordpress/build",
+-			"version": "0.16.0",
++			"version": "0.16.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@emotion/babel-plugin": "^11.13.5",
+diff --git a/packages/a11y/CHANGELOG.md b/packages/a11y/CHANGELOG.md
+index 9f1c618034d424..4726ab8722e8d8 100644
+--- a/packages/a11y/CHANGELOG.md
++++ b/packages/a11y/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 4.48.1 (2026-06-16)
++
+ ## 4.48.0 (2026-06-10)
+ 
+ ## 4.47.0 (2026-05-27)
+diff --git a/packages/a11y/package.json b/packages/a11y/package.json
+index 3310b9afef5bc6..7a9ccd6c079889 100644
+--- a/packages/a11y/package.json
++++ b/packages/a11y/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/a11y",
+-	"version": "4.48.0",
++	"version": "4.48.1",
+ 	"description": "Accessibility (a11y) utilities for WordPress.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/abilities/CHANGELOG.md b/packages/abilities/CHANGELOG.md
+index d0c1e5b436e471..73d05080c0d3f7 100644
+--- a/packages/abilities/CHANGELOG.md
++++ b/packages/abilities/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 0.14.1 (2026-06-16)
++
+ ## 0.14.0 (2026-06-10)
+ 
+ ## 0.13.0 (2026-05-27)
+diff --git a/packages/abilities/package.json b/packages/abilities/package.json
+index 4ca9f8cde833f8..0329e1d8d3ddf9 100644
+--- a/packages/abilities/package.json
++++ b/packages/abilities/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/abilities",
+-	"version": "0.14.0",
++	"version": "0.14.1",
+ 	"description": "JavaScript client for WordPress Abilities API.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/admin-ui/CHANGELOG.md b/packages/admin-ui/CHANGELOG.md
+index e87f91aafcdc16..353727ab749d7b 100644
+--- a/packages/admin-ui/CHANGELOG.md
++++ b/packages/admin-ui/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 2.3.1 (2026-06-16)
++
+ ## 2.3.0 (2026-06-10)
+ 
+ ### Code Quality
+diff --git a/packages/admin-ui/package.json b/packages/admin-ui/package.json
+index b7e2753657d7f2..958f123a06a61d 100644
+--- a/packages/admin-ui/package.json
++++ b/packages/admin-ui/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/admin-ui",
+-	"version": "2.3.0",
++	"version": "2.3.1",
+ 	"description": "Generic components to be used in the Admin UI.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/annotations/CHANGELOG.md b/packages/annotations/CHANGELOG.md
+index 73a979b201fbcd..a95fd00e69039f 100644
+--- a/packages/annotations/CHANGELOG.md
++++ b/packages/annotations/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 3.48.1 (2026-06-16)
++
+ ## 3.48.0 (2026-06-10)
+ 
+ ## 3.47.0 (2026-05-27)
+diff --git a/packages/annotations/package.json b/packages/annotations/package.json
+index 4a3a98081708da..e9a1369f5d7c2c 100644
+--- a/packages/annotations/package.json
++++ b/packages/annotations/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/annotations",
+-	"version": "3.48.0",
++	"version": "3.48.1",
+ 	"description": "Annotate content in the Gutenberg editor.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/api-fetch/CHANGELOG.md b/packages/api-fetch/CHANGELOG.md
+index e0410ec0db49aa..cc77a2d919f39f 100644
+--- a/packages/api-fetch/CHANGELOG.md
++++ b/packages/api-fetch/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 7.48.1 (2026-06-16)
++
+ ## 7.48.0 (2026-06-10)
+ 
+ ## 7.47.0 (2026-05-27)
+diff --git a/packages/api-fetch/package.json b/packages/api-fetch/package.json
+index 7fb8d699af811b..827a720b8c8eb0 100644
+--- a/packages/api-fetch/package.json
++++ b/packages/api-fetch/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/api-fetch",
+-	"version": "7.48.0",
++	"version": "7.48.1",
+ 	"description": "Utility to make WordPress REST API requests.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/asset-loader/CHANGELOG.md b/packages/asset-loader/CHANGELOG.md
+index 0b78e9189c583d..dc31a121dc3998 100644
+--- a/packages/asset-loader/CHANGELOG.md
++++ b/packages/asset-loader/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 1.14.1 (2026-06-16)
++
+ ## 1.14.0 (2026-06-10)
+ 
+ ## 1.13.0 (2026-05-27)
+diff --git a/packages/asset-loader/package.json b/packages/asset-loader/package.json
+index b6b91f1672d521..86a263bb277f72 100644
+--- a/packages/asset-loader/package.json
++++ b/packages/asset-loader/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/asset-loader",
+-	"version": "1.14.0",
++	"version": "1.14.1",
+ 	"description": "Utility to dynamically load WordPress scripts and styles with dependency resolution.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/autop/CHANGELOG.md b/packages/autop/CHANGELOG.md
+index 8cdde2c927808a..9bb37c6b5f56e2 100644
+--- a/packages/autop/CHANGELOG.md
++++ b/packages/autop/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 4.48.1 (2026-06-16)
++
+ ## 4.48.0 (2026-06-10)
+ 
+ ## 4.47.0 (2026-05-27)
+diff --git a/packages/autop/package.json b/packages/autop/package.json
+index f6096e7236d204..c78b841bf5a652 100644
+--- a/packages/autop/package.json
++++ b/packages/autop/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/autop",
+-	"version": "4.48.0",
++	"version": "4.48.1",
+ 	"description": "WordPress's automatic paragraph functions `autop` and `removep`.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/babel-plugin-import-jsx-pragma/CHANGELOG.md b/packages/babel-plugin-import-jsx-pragma/CHANGELOG.md
+index e664423bd36f23..6fe8c7455b6085 100644
+--- a/packages/babel-plugin-import-jsx-pragma/CHANGELOG.md
++++ b/packages/babel-plugin-import-jsx-pragma/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 5.48.1 (2026-06-16)
++
+ ## 5.48.0 (2026-06-10)
+ 
+ ## 5.47.0 (2026-05-27)
+diff --git a/packages/babel-plugin-import-jsx-pragma/package.json b/packages/babel-plugin-import-jsx-pragma/package.json
+index 5a985712e88248..32febf7a16e739 100644
+--- a/packages/babel-plugin-import-jsx-pragma/package.json
++++ b/packages/babel-plugin-import-jsx-pragma/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/babel-plugin-import-jsx-pragma",
+-	"version": "5.48.0",
++	"version": "5.48.1",
+ 	"description": "Babel transform plugin for automatically injecting an import to be used as the pragma for the React JSX Transform plugin.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/babel-plugin-makepot/CHANGELOG.md b/packages/babel-plugin-makepot/CHANGELOG.md
+index f721c37e6ba41f..2c67fb2c1b732a 100644
+--- a/packages/babel-plugin-makepot/CHANGELOG.md
++++ b/packages/babel-plugin-makepot/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 6.48.1 (2026-06-16)
++
+ ## 6.48.0 (2026-06-10)
+ 
+ ## 6.47.0 (2026-05-27)
+diff --git a/packages/babel-plugin-makepot/package.json b/packages/babel-plugin-makepot/package.json
+index acc09314026ea3..b646379b9889bc 100644
+--- a/packages/babel-plugin-makepot/package.json
++++ b/packages/babel-plugin-makepot/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/babel-plugin-makepot",
+-	"version": "6.48.0",
++	"version": "6.48.1",
+ 	"description": "WordPress Babel internationalization (i18n) plugin.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/babel-preset-default/CHANGELOG.md b/packages/babel-preset-default/CHANGELOG.md
+index 7cc3ebf65cba44..74faadd4cc395c 100644
+--- a/packages/babel-preset-default/CHANGELOG.md
++++ b/packages/babel-preset-default/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 8.48.1 (2026-06-16)
++
+ ## 8.48.0 (2026-06-10)
+ 
+ ## 8.47.0 (2026-05-27)
+diff --git a/packages/babel-preset-default/package.json b/packages/babel-preset-default/package.json
+index b1892b7bdc2563..1bc61d0dea0655 100644
+--- a/packages/babel-preset-default/package.json
++++ b/packages/babel-preset-default/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/babel-preset-default",
+-	"version": "8.48.0",
++	"version": "8.48.1",
+ 	"description": "Default Babel preset for WordPress development.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/base-styles/CHANGELOG.md b/packages/base-styles/CHANGELOG.md
+index fec8cc5aa7c8de..4c1c5db4c0ae88 100644
+--- a/packages/base-styles/CHANGELOG.md
++++ b/packages/base-styles/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 10.0.1 (2026-06-16)
++
+ ## 10.0.0 (2026-06-10)
+ 
+ ### Breaking Changes
+diff --git a/packages/base-styles/package.json b/packages/base-styles/package.json
+index a173048af9f7c9..6fec945c1a4b4c 100644
+--- a/packages/base-styles/package.json
++++ b/packages/base-styles/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/base-styles",
+-	"version": "10.0.0",
++	"version": "10.0.1",
+ 	"description": "Base SCSS utilities and variables for WordPress.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/blob/CHANGELOG.md b/packages/blob/CHANGELOG.md
+index 522705b23e64f8..dad419aa9c91bf 100644
+--- a/packages/blob/CHANGELOG.md
++++ b/packages/blob/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 4.48.1 (2026-06-16)
++
+ ## 4.48.0 (2026-06-10)
+ 
+ ## 4.47.0 (2026-05-27)
+diff --git a/packages/blob/package.json b/packages/blob/package.json
+index e06e28a0c36d7b..3b09eb73b5f65f 100644
+--- a/packages/blob/package.json
++++ b/packages/blob/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/blob",
+-	"version": "4.48.0",
++	"version": "4.48.1",
+ 	"description": "Blob utilities for WordPress.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/block-directory/CHANGELOG.md b/packages/block-directory/CHANGELOG.md
+index cbe23495ed31d5..801b5b744172d6 100644
+--- a/packages/block-directory/CHANGELOG.md
++++ b/packages/block-directory/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 5.48.1 (2026-06-16)
++
+ ## 5.48.0 (2026-06-10)
+ 
+ ## 5.47.0 (2026-05-27)
+diff --git a/packages/block-directory/package.json b/packages/block-directory/package.json
+index 849552e54da84f..946a7c1c9d5e75 100644
+--- a/packages/block-directory/package.json
++++ b/packages/block-directory/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/block-directory",
+-	"version": "5.48.0",
++	"version": "5.48.1",
+ 	"description": "Extend editor with block directory features to search, download and install blocks.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/block-editor/CHANGELOG.md b/packages/block-editor/CHANGELOG.md
+index 695ff19f0da495..d7ddc74428117e 100644
+--- a/packages/block-editor/CHANGELOG.md
++++ b/packages/block-editor/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 15.21.1 (2026-06-16)
++
+ ## 15.21.0 (2026-06-10)
+ 
+ ### Code Quality
+diff --git a/packages/block-editor/package.json b/packages/block-editor/package.json
+index 2254f2d8c9283c..0c1588217955e4 100644
+--- a/packages/block-editor/package.json
++++ b/packages/block-editor/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/block-editor",
+-	"version": "15.21.0",
++	"version": "15.21.1",
+ 	"description": "Generic block editor.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/block-library/CHANGELOG.md b/packages/block-library/CHANGELOG.md
+index f6e16b19c52a9b..7df685f31dcb39 100644
+--- a/packages/block-library/CHANGELOG.md
++++ b/packages/block-library/CHANGELOG.md
+@@ -10,6 +10,8 @@
+ 
+ -   Icon Block: Insert with a default icon instead of an empty placeholder ([#79111](https://github.com/WordPress/gutenberg/pull/79111)).
+ 
++## 9.48.1 (2026-06-16)
++
+ ## 9.48.0 (2026-06-10)
+ 
+ ### Code Quality
+diff --git a/packages/block-library/package.json b/packages/block-library/package.json
+index 2e376cef97d815..43b8228cd5bb68 100644
+--- a/packages/block-library/package.json
++++ b/packages/block-library/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/block-library",
+-	"version": "9.48.0",
++	"version": "9.48.1",
+ 	"description": "Block library for the WordPress editor.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/block-serialization-default-parser/CHANGELOG.md b/packages/block-serialization-default-parser/CHANGELOG.md
+index 16d7e55edd386f..e23e61bab4c32e 100644
+--- a/packages/block-serialization-default-parser/CHANGELOG.md
++++ b/packages/block-serialization-default-parser/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 5.48.1 (2026-06-16)
++
+ ## 5.48.0 (2026-06-10)
+ 
+ ## 5.47.0 (2026-05-27)
+diff --git a/packages/block-serialization-default-parser/package.json b/packages/block-serialization-default-parser/package.json
+index f3b6ea0365fefd..cd45481189c718 100644
+--- a/packages/block-serialization-default-parser/package.json
++++ b/packages/block-serialization-default-parser/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/block-serialization-default-parser",
+-	"version": "5.48.0",
++	"version": "5.48.1",
+ 	"description": "Block serialization specification parser for WordPress posts.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/block-serialization-spec-parser/CHANGELOG.md b/packages/block-serialization-spec-parser/CHANGELOG.md
+index 3bd4ac37ae1fd6..741e247a768938 100644
+--- a/packages/block-serialization-spec-parser/CHANGELOG.md
++++ b/packages/block-serialization-spec-parser/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 5.48.1 (2026-06-16)
++
+ ## 5.48.0 (2026-06-10)
+ 
+ ## 5.47.0 (2026-05-27)
+diff --git a/packages/block-serialization-spec-parser/package.json b/packages/block-serialization-spec-parser/package.json
+index 6908b4c60ce76a..3cd59c31f1cea4 100644
+--- a/packages/block-serialization-spec-parser/package.json
++++ b/packages/block-serialization-spec-parser/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/block-serialization-spec-parser",
+-	"version": "5.48.0",
++	"version": "5.48.1",
+ 	"description": "Block serialization specification parser for WordPress posts.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/blocks/CHANGELOG.md b/packages/blocks/CHANGELOG.md
+index dc8a790e1cbd04..4cc56f44f1f458 100644
+--- a/packages/blocks/CHANGELOG.md
++++ b/packages/blocks/CHANGELOG.md
+@@ -6,6 +6,8 @@
+ 
+ - Replace `showdown` with `marked` for Markdown paste handling. Smaller bundle, modern maintenance, native types.
+ 
++## 15.21.1 (2026-06-16)
++
+ ## 15.21.0 (2026-06-10)
+ 
+ ### Code Quality
+diff --git a/packages/blocks/package.json b/packages/blocks/package.json
+index 72efc79b1ea69f..8a6cf652564ce3 100644
+--- a/packages/blocks/package.json
++++ b/packages/blocks/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/blocks",
+-	"version": "15.21.0",
++	"version": "15.21.1",
+ 	"description": "Block API for WordPress.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/boot/CHANGELOG.md b/packages/boot/CHANGELOG.md
+index cc94c43cefd31f..b184d3af87a6aa 100644
+--- a/packages/boot/CHANGELOG.md
++++ b/packages/boot/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 0.15.1 (2026-06-16)
++
+ ## 0.15.0 (2026-06-10)
+ 
+ ### Code Quality
+diff --git a/packages/boot/package.json b/packages/boot/package.json
+index 94661ee4e5decb..32b7b5ae2d3eb6 100644
+--- a/packages/boot/package.json
++++ b/packages/boot/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/boot",
+-	"version": "0.15.0",
++	"version": "0.15.1",
+ 	"description": "Minimal boot package for WordPress admin pages.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/browserslist-config/CHANGELOG.md b/packages/browserslist-config/CHANGELOG.md
+index 9d5753a172f6d8..099204eadfe9de 100644
+--- a/packages/browserslist-config/CHANGELOG.md
++++ b/packages/browserslist-config/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 6.48.1 (2026-06-16)
++
+ ## 6.48.0 (2026-06-10)
+ 
+ ## 6.47.0 (2026-05-27)
+diff --git a/packages/browserslist-config/package.json b/packages/browserslist-config/package.json
+index 03e8a19c0b8a99..c0b36ed136470e 100644
+--- a/packages/browserslist-config/package.json
++++ b/packages/browserslist-config/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/browserslist-config",
+-	"version": "6.48.0",
++	"version": "6.48.1",
+ 	"description": "WordPress Browserslist shared configuration.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/commands/CHANGELOG.md b/packages/commands/CHANGELOG.md
+index 9871b82e63da6a..924174756a871f 100644
+--- a/packages/commands/CHANGELOG.md
++++ b/packages/commands/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 1.48.1 (2026-06-16)
++
+ ## 1.48.0 (2026-06-10)
+ 
+ ## 1.47.0 (2026-05-27)
+diff --git a/packages/commands/package.json b/packages/commands/package.json
+index d64ae359925932..b867ec03ec900e 100644
+--- a/packages/commands/package.json
++++ b/packages/commands/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/commands",
+-	"version": "1.48.0",
++	"version": "1.48.1",
+ 	"description": "Handles the commands menu.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d2ffa69aba48be..fe66bb6eca9958 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -15,6 +15,8 @@
+ 
+ -   Move `@types/react` from `dependencies` to an optional peer dependency so consumers' React type version is used [#79095](https://github.com/WordPress/gutenberg/pull/79095).
+ 
++## 35.0.1 (2026-06-16)
++
+ ## 35.0.0 (2026-06-10)
+ 
+ ### Breaking Changes
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 1db3336414cf49..9234ca683a7b2d 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/components",
+-	"version": "35.0.0",
++	"version": "35.0.1",
+ 	"description": "UI components for WordPress.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/compose/CHANGELOG.md b/packages/compose/CHANGELOG.md
+index 3e0fa5cf76bb1e..d2001abe321bea 100644
+--- a/packages/compose/CHANGELOG.md
++++ b/packages/compose/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 8.1.1 (2026-06-16)
++
+ ## 8.1.0 (2026-06-10)
+ 
+ ### Code Quality
+diff --git a/packages/compose/package.json b/packages/compose/package.json
+index bc4032c0ee3bdc..3de74f75045f91 100644
+--- a/packages/compose/package.json
++++ b/packages/compose/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/compose",
+-	"version": "8.1.0",
++	"version": "8.1.1",
+ 	"description": "WordPress higher-order components (HOCs).",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/core-abilities/package.json b/packages/core-abilities/package.json
+index eecea2dfec21ec..e77bd69cc2ed83 100644
+--- a/packages/core-abilities/package.json
++++ b/packages/core-abilities/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/core-abilities",
+-	"version": "0.13.0",
++	"version": "0.13.1",
+ 	"description": "WordPress core abilities integration for the Abilities API.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/core-commands/CHANGELOG.md b/packages/core-commands/CHANGELOG.md
+index 3c7f2adf981c9e..0ea2f78832e78a 100644
+--- a/packages/core-commands/CHANGELOG.md
++++ b/packages/core-commands/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 1.48.1 (2026-06-16)
++
+ ## 1.48.0 (2026-06-10)
+ 
+ ## 1.47.0 (2026-05-27)
+diff --git a/packages/core-commands/package.json b/packages/core-commands/package.json
+index 372a416e1fbf23..62e3f398aea8f5 100644
+--- a/packages/core-commands/package.json
++++ b/packages/core-commands/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/core-commands",
+-	"version": "1.48.0",
++	"version": "1.48.1",
+ 	"description": "WordPress core reusable commands.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/core-data/CHANGELOG.md b/packages/core-data/CHANGELOG.md
+index 546d952e139d2f..467dbe29f98c39 100644
+--- a/packages/core-data/CHANGELOG.md
++++ b/packages/core-data/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 7.48.1 (2026-06-16)
++
+ ## 7.48.0 (2026-06-10)
+ 
+ ### Code Quality
+diff --git a/packages/core-data/package.json b/packages/core-data/package.json
+index b909b09a6bd238..7c6e93eb88e1ee 100644
+--- a/packages/core-data/package.json
++++ b/packages/core-data/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/core-data",
+-	"version": "7.48.0",
++	"version": "7.48.1",
+ 	"description": "Access to and manipulation of core WordPress entities.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/create-block-interactive-template/package.json b/packages/create-block-interactive-template/package.json
+index 796ff3b186cd09..953bb0601760a1 100644
+--- a/packages/create-block-interactive-template/package.json
++++ b/packages/create-block-interactive-template/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/create-block-interactive-template",
+-	"version": "2.48.0",
++	"version": "2.48.1",
+ 	"description": "Template for @wordpress/create-block to create interactive blocks with the Interactivity API.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/create-block-tutorial-template/CHANGELOG.md b/packages/create-block-tutorial-template/CHANGELOG.md
+index 6b2a52fc95d3ec..2cd6b76eb25fed 100644
+--- a/packages/create-block-tutorial-template/CHANGELOG.md
++++ b/packages/create-block-tutorial-template/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 4.48.1 (2026-06-16)
++
+ ## 4.48.0 (2026-06-10)
+ 
+ ## 4.47.0 (2026-05-27)
+diff --git a/packages/create-block-tutorial-template/package.json b/packages/create-block-tutorial-template/package.json
+index 8705724a504300..c41b9fca3ed7a8 100644
+--- a/packages/create-block-tutorial-template/package.json
++++ b/packages/create-block-tutorial-template/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/create-block-tutorial-template",
+-	"version": "4.48.0",
++	"version": "4.48.1",
+ 	"description": "This is a template for @wordpress/create-block that creates an example 'Copyright Date' block. This block is used in the official WordPress block development Quick Start Guide.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/create-block/CHANGELOG.md b/packages/create-block/CHANGELOG.md
+index ba8dae3846311a..77b95100fe22f5 100644
+--- a/packages/create-block/CHANGELOG.md
++++ b/packages/create-block/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 4.91.1 (2026-06-16)
++
+ ## 4.91.0 (2026-06-10)
+ 
+ ## 4.90.0 (2026-05-27)
+diff --git a/packages/create-block/package.json b/packages/create-block/package.json
+index 466b38b39f8611..d239f816a9d5d6 100644
+--- a/packages/create-block/package.json
++++ b/packages/create-block/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/create-block",
+-	"version": "4.91.0",
++	"version": "4.91.1",
+ 	"description": "Generates PHP, JS and CSS code for registering a block for a WordPress plugin.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/customize-widgets/CHANGELOG.md b/packages/customize-widgets/CHANGELOG.md
+index 21ddc6ade85a57..8000ba36cc3162 100644
+--- a/packages/customize-widgets/CHANGELOG.md
++++ b/packages/customize-widgets/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 5.48.1 (2026-06-16)
++
+ ## 5.48.0 (2026-06-10)
+ 
+ ## 5.47.0 (2026-05-27)
+diff --git a/packages/customize-widgets/package.json b/packages/customize-widgets/package.json
+index a8552e6175f5db..c9961cf357bae6 100644
+--- a/packages/customize-widgets/package.json
++++ b/packages/customize-widgets/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/customize-widgets",
+-	"version": "5.48.0",
++	"version": "5.48.1",
+ 	"description": "Widgets blocks in Customizer Module for WordPress.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/data-controls/CHANGELOG.md b/packages/data-controls/CHANGELOG.md
+index dba7f0c1ed9993..6051edcd628926 100644
+--- a/packages/data-controls/CHANGELOG.md
++++ b/packages/data-controls/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 4.48.1 (2026-06-16)
++
+ ## 4.48.0 (2026-06-10)
+ 
+ ## 4.47.0 (2026-05-27)
+diff --git a/packages/data-controls/package.json b/packages/data-controls/package.json
+index c4fc7148533cfb..c72cfb4fe94ba3 100644
+--- a/packages/data-controls/package.json
++++ b/packages/data-controls/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/data-controls",
+-	"version": "4.48.0",
++	"version": "4.48.1",
+ 	"description": "A set of common controls for the @wordpress/data api.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/data/CHANGELOG.md b/packages/data/CHANGELOG.md
+index cacfeb2c356750..22c0fa2d5960f2 100644
+--- a/packages/data/CHANGELOG.md
++++ b/packages/data/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 10.48.1 (2026-06-16)
++
+ ## 10.48.0 (2026-06-10)
+ 
+ ### Code Quality
+diff --git a/packages/data/package.json b/packages/data/package.json
+index b3474df0c755b3..d756d3017a9b65 100644
+--- a/packages/data/package.json
++++ b/packages/data/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/data",
+-	"version": "10.48.0",
++	"version": "10.48.1",
+ 	"description": "Data module for WordPress.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index 3ba0ab058cf343..84f26a375250fe 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -10,6 +10,8 @@
+ 
+ - Move `@types/react` from `dependencies` to an optional peer dependency so consumers' React type version is used [#79095](https://github.com/WordPress/gutenberg/pull/79095).
+ 
++## 16.0.1 (2026-06-16)
++
+ ## 16.0.0 (2026-06-10)
+ 
+ ### Breaking Changes
+diff --git a/packages/dataviews/package.json b/packages/dataviews/package.json
+index c57c426bd3ff62..c6267793790b93 100644
+--- a/packages/dataviews/package.json
++++ b/packages/dataviews/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/dataviews",
+-	"version": "16.0.0",
++	"version": "16.0.1",
+ 	"description": "DataViews is a component that provides an API to render datasets using different types of layouts (table, grid, list, etc.).",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/date/CHANGELOG.md b/packages/date/CHANGELOG.md
+index 6962dd0e9b51b4..04052a37f872b0 100644
+--- a/packages/date/CHANGELOG.md
++++ b/packages/date/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 5.48.1 (2026-06-16)
++
+ ## 5.48.0 (2026-06-10)
+ 
+ ## 5.47.0 (2026-05-27)
+diff --git a/packages/date/package.json b/packages/date/package.json
+index 748f53227ea643..803c2a6ed10b77 100644
+--- a/packages/date/package.json
++++ b/packages/date/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/date",
+-	"version": "5.48.0",
++	"version": "5.48.1",
+ 	"description": "Date module for WordPress.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/dependency-extraction-webpack-plugin/CHANGELOG.md b/packages/dependency-extraction-webpack-plugin/CHANGELOG.md
+index cf71ce4764cf5e..f23660ebd4e4c4 100644
+--- a/packages/dependency-extraction-webpack-plugin/CHANGELOG.md
++++ b/packages/dependency-extraction-webpack-plugin/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 6.48.1 (2026-06-16)
++
+ ## 6.48.0 (2026-06-10)
+ 
+ ## 6.47.0 (2026-05-27)
+diff --git a/packages/dependency-extraction-webpack-plugin/package.json b/packages/dependency-extraction-webpack-plugin/package.json
+index c0b72ac26ee8c6..d121689df7232f 100644
+--- a/packages/dependency-extraction-webpack-plugin/package.json
++++ b/packages/dependency-extraction-webpack-plugin/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/dependency-extraction-webpack-plugin",
+-	"version": "6.48.0",
++	"version": "6.48.1",
+ 	"description": "Extract WordPress script dependencies from webpack bundles.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/deprecated/CHANGELOG.md b/packages/deprecated/CHANGELOG.md
+index e109ab55663e9d..4323acc8893453 100644
+--- a/packages/deprecated/CHANGELOG.md
++++ b/packages/deprecated/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 4.48.1 (2026-06-16)
++
+ ## 4.48.0 (2026-06-10)
+ 
+ ## 4.47.0 (2026-05-27)
+diff --git a/packages/deprecated/package.json b/packages/deprecated/package.json
+index 533e4daca08d04..299b6ec08f7048 100644
+--- a/packages/deprecated/package.json
++++ b/packages/deprecated/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/deprecated",
+-	"version": "4.48.0",
++	"version": "4.48.1",
+ 	"description": "Deprecation utility for WordPress.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/design-system-mcp/CHANGELOG.md b/packages/design-system-mcp/CHANGELOG.md
+index 1afa11e36fc6ba..cfa418272f5a10 100644
+--- a/packages/design-system-mcp/CHANGELOG.md
++++ b/packages/design-system-mcp/CHANGELOG.md
+@@ -6,6 +6,8 @@
+ 
+ -   Remove implicit dependency on `storybook` in TypeScript types ([#79132](https://github.com/WordPress/gutenberg/pull/79132)).
+ 
++## 0.5.1 (2026-06-16)
++
+ ## 0.5.0 (2026-06-10)
+ 
+ ## 0.4.0 (2026-05-27)
+diff --git a/packages/design-system-mcp/package.json b/packages/design-system-mcp/package.json
+index 9d2dd87b7c614a..77ec0381427d7d 100644
+--- a/packages/design-system-mcp/package.json
++++ b/packages/design-system-mcp/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/design-system-mcp",
+-	"version": "0.5.0",
++	"version": "0.5.1",
+ 	"description": "MCP server for the WordPress Design System.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/docgen/CHANGELOG.md b/packages/docgen/CHANGELOG.md
+index e81a1ef7c2521c..2dc7e30ee93685 100644
+--- a/packages/docgen/CHANGELOG.md
++++ b/packages/docgen/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 2.48.1 (2026-06-16)
++
+ ## 2.48.0 (2026-06-10)
+ 
+ ## 2.47.0 (2026-05-27)
+diff --git a/packages/docgen/package.json b/packages/docgen/package.json
+index 0e917bb9bb39fa..28e99a9cfbd253 100644
+--- a/packages/docgen/package.json
++++ b/packages/docgen/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/docgen",
+-	"version": "2.48.0",
++	"version": "2.48.1",
+ 	"description": "Autogenerate public API documentation from exports and JSDoc comments.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/dom-ready/CHANGELOG.md b/packages/dom-ready/CHANGELOG.md
+index c4fc7c8bfba340..c914cf9cf608ec 100644
+--- a/packages/dom-ready/CHANGELOG.md
++++ b/packages/dom-ready/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 4.48.1 (2026-06-16)
++
+ ## 4.48.0 (2026-06-10)
+ 
+ ## 4.47.0 (2026-05-27)
+diff --git a/packages/dom-ready/package.json b/packages/dom-ready/package.json
+index b9720ce8e43ea9..bda4607f1015ce 100644
+--- a/packages/dom-ready/package.json
++++ b/packages/dom-ready/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/dom-ready",
+-	"version": "4.48.0",
++	"version": "4.48.1",
+ 	"description": "Execute callback after the DOM is loaded.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/dom/CHANGELOG.md b/packages/dom/CHANGELOG.md
+index 27ef5fd01f6405..2eef92177d5652 100644
+--- a/packages/dom/CHANGELOG.md
++++ b/packages/dom/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 4.48.1 (2026-06-16)
++
+ ## 4.48.0 (2026-06-10)
+ 
+ ## 4.47.0 (2026-05-27)
+diff --git a/packages/dom/package.json b/packages/dom/package.json
+index 4f17516bde5a87..c3516603ab5fa4 100644
+--- a/packages/dom/package.json
++++ b/packages/dom/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/dom",
+-	"version": "4.48.0",
++	"version": "4.48.1",
+ 	"description": "DOM utilities module for WordPress.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/e2e-test-utils-playwright/CHANGELOG.md b/packages/e2e-test-utils-playwright/CHANGELOG.md
+index 786368ef7345fe..c47cfdf247c9c2 100644
+--- a/packages/e2e-test-utils-playwright/CHANGELOG.md
++++ b/packages/e2e-test-utils-playwright/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 1.48.1 (2026-06-16)
++
+ ## 1.48.0 (2026-06-10)
+ 
+ ## 1.47.0 (2026-05-27)
+diff --git a/packages/e2e-test-utils-playwright/package.json b/packages/e2e-test-utils-playwright/package.json
+index f53de955f625df..ec533c8c0b8f4a 100644
+--- a/packages/e2e-test-utils-playwright/package.json
++++ b/packages/e2e-test-utils-playwright/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/e2e-test-utils-playwright",
+-	"version": "1.48.0",
++	"version": "1.48.1",
+ 	"description": "End-To-End (E2E) test utils for WordPress.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/e2e-tests/CHANGELOG.md b/packages/e2e-tests/CHANGELOG.md
+index 1d8dc79a523b4a..70bb1bc253e916 100644
+--- a/packages/e2e-tests/CHANGELOG.md
++++ b/packages/e2e-tests/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 9.13.1 (2026-06-16)
++
+ ## 9.13.0 (2026-06-10)
+ 
+ ## 9.12.0 (2026-05-27)
+diff --git a/packages/e2e-tests/package.json b/packages/e2e-tests/package.json
+index 0741600a283440..d67cbb461e2121 100644
+--- a/packages/e2e-tests/package.json
++++ b/packages/e2e-tests/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/e2e-tests",
+-	"version": "9.13.0",
++	"version": "9.13.1",
+ 	"description": "Test plugins and mu-plugins for E2E tests in WordPress.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/edit-post/CHANGELOG.md b/packages/edit-post/CHANGELOG.md
+index 6147e20a5e4253..ffc5a2c367c68d 100644
+--- a/packages/edit-post/CHANGELOG.md
++++ b/packages/edit-post/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 8.48.1 (2026-06-16)
++
+ ## 8.48.0 (2026-06-10)
+ 
+ ## 8.47.0 (2026-05-27)
+diff --git a/packages/edit-post/package.json b/packages/edit-post/package.json
+index 5869a3b124102d..7b7f2f22d6f9b1 100644
+--- a/packages/edit-post/package.json
++++ b/packages/edit-post/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/edit-post",
+-	"version": "8.48.0",
++	"version": "8.48.1",
+ 	"description": "Edit Post module for WordPress.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/edit-site/CHANGELOG.md b/packages/edit-site/CHANGELOG.md
+index 1406dadafcca64..4a611243c1d8a3 100644
+--- a/packages/edit-site/CHANGELOG.md
++++ b/packages/edit-site/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 6.48.1 (2026-06-16)
++
+ ## 6.48.0 (2026-06-10)
+ 
+ ### Enhancements
+diff --git a/packages/edit-site/package.json b/packages/edit-site/package.json
+index bb486f0d6162d0..9b54392f848cd2 100644
+--- a/packages/edit-site/package.json
++++ b/packages/edit-site/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/edit-site",
+-	"version": "6.48.0",
++	"version": "6.48.1",
+ 	"description": "Edit Site Page module for WordPress.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/edit-widgets/CHANGELOG.md b/packages/edit-widgets/CHANGELOG.md
+index c97ebc7cd20f93..fa64a20ea9f207 100644
+--- a/packages/edit-widgets/CHANGELOG.md
++++ b/packages/edit-widgets/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 6.48.1 (2026-06-16)
++
+ ## 6.48.0 (2026-06-10)
+ 
+ ## 6.47.0 (2026-05-27)
+diff --git a/packages/edit-widgets/package.json b/packages/edit-widgets/package.json
+index 79bd8816e324ee..6c6337950a94c9 100644
+--- a/packages/edit-widgets/package.json
++++ b/packages/edit-widgets/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/edit-widgets",
+-	"version": "6.48.0",
++	"version": "6.48.1",
+ 	"description": "Widgets Page module for WordPress..",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/editor/CHANGELOG.md b/packages/editor/CHANGELOG.md
+index 32fd853a493de5..d94ea311a8ec19 100644
+--- a/packages/editor/CHANGELOG.md
++++ b/packages/editor/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 14.48.1 (2026-06-16)
++
+ ## 14.48.0 (2026-06-10)
+ 
+ ### New Features
+diff --git a/packages/editor/package.json b/packages/editor/package.json
+index c5656d7ed3bae2..2fd3159e6b0300 100644
+--- a/packages/editor/package.json
++++ b/packages/editor/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/editor",
+-	"version": "14.48.0",
++	"version": "14.48.1",
+ 	"description": "Enhanced block editor for WordPress posts.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/element/CHANGELOG.md b/packages/element/CHANGELOG.md
+index b380e622bc2b11..3783580732fd62 100644
+--- a/packages/element/CHANGELOG.md
++++ b/packages/element/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 8.0.1 (2026-06-16)
++
+ ## 8.0.0 (2026-06-10)
+ 
+ ### Breaking Changes
+diff --git a/packages/element/package.json b/packages/element/package.json
+index acda968b60c3e3..e42917d7ee4c08 100644
+--- a/packages/element/package.json
++++ b/packages/element/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/element",
+-	"version": "8.0.0",
++	"version": "8.0.1",
+ 	"description": "Element React module for WordPress.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/env/CHANGELOG.md b/packages/env/CHANGELOG.md
+index 0f2901016cb79b..7e7cb1a5f30bfa 100644
+--- a/packages/env/CHANGELOG.md
++++ b/packages/env/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 11.8.1 (2026-06-16)
++
+ ## 11.8.0 (2026-06-10)
+ 
+ ### Enhancements
+diff --git a/packages/env/package.json b/packages/env/package.json
+index 095f69e7e75e73..a97299faeb262d 100644
+--- a/packages/env/package.json
++++ b/packages/env/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/env",
+-	"version": "11.8.0",
++	"version": "11.8.1",
+ 	"description": "A zero-config, self contained local WordPress environment for development and testing.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/escape-html/CHANGELOG.md b/packages/escape-html/CHANGELOG.md
+index 1fa330d3d49ae3..5b0d61b6042012 100644
+--- a/packages/escape-html/CHANGELOG.md
++++ b/packages/escape-html/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 3.48.1 (2026-06-16)
++
+ ## 3.48.0 (2026-06-10)
+ 
+ ## 3.47.0 (2026-05-27)
+diff --git a/packages/escape-html/package.json b/packages/escape-html/package.json
+index 2f61f9e2ad270e..b7c637718dfe4a 100644
+--- a/packages/escape-html/package.json
++++ b/packages/escape-html/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/escape-html",
+-	"version": "3.48.0",
++	"version": "3.48.1",
+ 	"description": "Escape HTML utils.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/eslint-plugin/CHANGELOG.md b/packages/eslint-plugin/CHANGELOG.md
+index c3b22ff2acdc8f..62bdc929b2a6b4 100644
+--- a/packages/eslint-plugin/CHANGELOG.md
++++ b/packages/eslint-plugin/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 25.4.1 (2026-06-16)
++
+ ## 25.4.0 (2026-06-10)
+ 
+ ## 25.3.0 (2026-05-27)
+diff --git a/packages/eslint-plugin/package.json b/packages/eslint-plugin/package.json
+index 75cd8fbf40c30a..ad3b230f765dbe 100644
+--- a/packages/eslint-plugin/package.json
++++ b/packages/eslint-plugin/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/eslint-plugin",
+-	"version": "25.4.0",
++	"version": "25.4.1",
+ 	"description": "ESLint plugin for WordPress development.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/fields/CHANGELOG.md b/packages/fields/CHANGELOG.md
+index dd12086b65a023..6cbcb3306f4008 100644
+--- a/packages/fields/CHANGELOG.md
++++ b/packages/fields/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 0.40.1 (2026-06-16)
++
+ ## 0.40.0 (2026-06-10)
+ 
+ ### Code Quality
+diff --git a/packages/fields/package.json b/packages/fields/package.json
+index 8877336619a4bb..500b46198e677c 100644
+--- a/packages/fields/package.json
++++ b/packages/fields/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/fields",
+-	"version": "0.40.0",
++	"version": "0.40.1",
+ 	"description": "DataViews is a component that provides an API to render datasets using different types of layouts (table, grid, list, etc.).",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/format-library/CHANGELOG.md b/packages/format-library/CHANGELOG.md
+index 7262f3e6d57f69..37e4502d339367 100644
+--- a/packages/format-library/CHANGELOG.md
++++ b/packages/format-library/CHANGELOG.md
+@@ -6,6 +6,8 @@
+ 
+ -   Math format: seed the LaTeX input from the current selection when marking text as math, and toggle an active math object back to its LaTeX source when the button is clicked again. ([79052](https://github.com/WordPress/gutenberg/pull/79052))
+ 
++## 5.48.1 (2026-06-16)
++
+ ## 5.48.0 (2026-06-10)
+ 
+ ## 5.47.0 (2026-05-27)
+diff --git a/packages/format-library/package.json b/packages/format-library/package.json
+index 035c6347902bb8..8d0a2b2f1d5f95 100644
+--- a/packages/format-library/package.json
++++ b/packages/format-library/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/format-library",
+-	"version": "5.48.0",
++	"version": "5.48.1",
+ 	"description": "Format library for the WordPress editor.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/global-styles-engine/package.json b/packages/global-styles-engine/package.json
+index 1c0baffaf17f8c..5639904dce2d55 100644
+--- a/packages/global-styles-engine/package.json
++++ b/packages/global-styles-engine/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/global-styles-engine",
+-	"version": "1.15.0",
++	"version": "1.15.1",
+ 	"description": "Pure CSS generation engine for WordPress global styles.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/global-styles-ui/CHANGELOG.md b/packages/global-styles-ui/CHANGELOG.md
+index f479cdd8a098b4..59909b12735d7a 100644
+--- a/packages/global-styles-ui/CHANGELOG.md
++++ b/packages/global-styles-ui/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 1.15.1 (2026-06-16)
++
+ ## 1.15.0 (2026-06-10)
+ 
+ ### Code Quality
+diff --git a/packages/global-styles-ui/package.json b/packages/global-styles-ui/package.json
+index fa6a1f76a49bb7..56ab42ab60e072 100644
+--- a/packages/global-styles-ui/package.json
++++ b/packages/global-styles-ui/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/global-styles-ui",
+-	"version": "1.15.0",
++	"version": "1.15.1",
+ 	"description": "Global Styles UI components for WordPress.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/hooks/CHANGELOG.md b/packages/hooks/CHANGELOG.md
+index 8ed0507b417388..41b70221af91e7 100644
+--- a/packages/hooks/CHANGELOG.md
++++ b/packages/hooks/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 4.48.1 (2026-06-16)
++
+ ## 4.48.0 (2026-06-10)
+ 
+ ## 4.47.0 (2026-05-27)
+diff --git a/packages/hooks/package.json b/packages/hooks/package.json
+index 2c87ded43917de..03c41468a5640f 100644
+--- a/packages/hooks/package.json
++++ b/packages/hooks/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/hooks",
+-	"version": "4.48.0",
++	"version": "4.48.1",
+ 	"description": "WordPress hooks library.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/html-entities/CHANGELOG.md b/packages/html-entities/CHANGELOG.md
+index dc97db61a7b4d5..4e9fc4426b3448 100644
+--- a/packages/html-entities/CHANGELOG.md
++++ b/packages/html-entities/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 4.48.1 (2026-06-16)
++
+ ## 4.48.0 (2026-06-10)
+ 
+ ## 4.47.0 (2026-05-27)
+diff --git a/packages/html-entities/package.json b/packages/html-entities/package.json
+index 7d614c58d54ebe..a6290f1a2e2c64 100644
+--- a/packages/html-entities/package.json
++++ b/packages/html-entities/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/html-entities",
+-	"version": "4.48.0",
++	"version": "4.48.1",
+ 	"description": "HTML entity utilities for WordPress.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/i18n/CHANGELOG.md b/packages/i18n/CHANGELOG.md
+index 641107a2b949e7..0c28bd60b34f86 100644
+--- a/packages/i18n/CHANGELOG.md
++++ b/packages/i18n/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 6.21.1 (2026-06-16)
++
+ ## 6.21.0 (2026-06-10)
+ 
+ ## 6.20.0 (2026-05-27)
+diff --git a/packages/i18n/package.json b/packages/i18n/package.json
+index 72e263f264b75e..cf5e9f1c900762 100644
+--- a/packages/i18n/package.json
++++ b/packages/i18n/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/i18n",
+-	"version": "6.21.0",
++	"version": "6.21.1",
+ 	"description": "WordPress internationalization (i18n) library.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/icons/CHANGELOG.md b/packages/icons/CHANGELOG.md
+index 6ed1a234383874..a0a6d6dc5e3d3f 100644
+--- a/packages/icons/CHANGELOG.md
++++ b/packages/icons/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 14.0.1 (2026-06-16)
++
+ ## 14.0.0 (2026-06-10)
+ 
+ ### Code Quality
+diff --git a/packages/icons/package.json b/packages/icons/package.json
+index d8416f65b219e8..9d18e26688305c 100644
+--- a/packages/icons/package.json
++++ b/packages/icons/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/icons",
+-	"version": "14.0.0",
++	"version": "14.0.1",
+ 	"description": "WordPress Icons package, based on dashicon.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/image-cropper/CHANGELOG.md b/packages/image-cropper/CHANGELOG.md
+index 98ec1e2ce40ba4..d1a808c73874e2 100644
+--- a/packages/image-cropper/CHANGELOG.md
++++ b/packages/image-cropper/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 1.12.1 (2026-06-16)
++
+ ## 1.12.0 (2026-06-10)
+ 
+ ### Code Quality
+diff --git a/packages/image-cropper/package.json b/packages/image-cropper/package.json
+index 7edc6a511eb78e..82dd75219bec09 100644
+--- a/packages/image-cropper/package.json
++++ b/packages/image-cropper/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/image-cropper",
+-	"version": "1.12.0",
++	"version": "1.12.1",
+ 	"description": "A basic image cropper component.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/interactivity-router/CHANGELOG.md b/packages/interactivity-router/CHANGELOG.md
+index 832f39e5f3cfd3..56cd382f1e0a8a 100644
+--- a/packages/interactivity-router/CHANGELOG.md
++++ b/packages/interactivity-router/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 2.48.1 (2026-06-16)
++
+ ## 2.48.0 (2026-06-10)
+ 
+ ## 2.47.0 (2026-05-27)
+diff --git a/packages/interactivity-router/package.json b/packages/interactivity-router/package.json
+index d75517d64a8bcd..ff24ad8894a562 100644
+--- a/packages/interactivity-router/package.json
++++ b/packages/interactivity-router/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/interactivity-router",
+-	"version": "2.48.0",
++	"version": "2.48.1",
+ 	"description": "Package that exposes state and actions from the `core/router` store, part of the Interactivity API.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/interactivity/CHANGELOG.md b/packages/interactivity/CHANGELOG.md
+index 475ba350fdd414..ae8ab891b3eb62 100644
+--- a/packages/interactivity/CHANGELOG.md
++++ b/packages/interactivity/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 6.48.1 (2026-06-16)
++
+ ## 6.48.0 (2026-06-10)
+ 
+ ## 6.47.0 (2026-05-27)
+diff --git a/packages/interactivity/package.json b/packages/interactivity/package.json
+index 417fdb6a1d8ad3..68da6c35f02ada 100644
+--- a/packages/interactivity/package.json
++++ b/packages/interactivity/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/interactivity",
+-	"version": "6.48.0",
++	"version": "6.48.1",
+ 	"description": "Package that provides a standard and simple way to handle the frontend interactivity of Gutenberg blocks.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/interface/CHANGELOG.md b/packages/interface/CHANGELOG.md
+index 75446e16675f4a..df5f863b5ae3eb 100644
+--- a/packages/interface/CHANGELOG.md
++++ b/packages/interface/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 9.33.1 (2026-06-16)
++
+ ## 9.33.0 (2026-06-10)
+ 
+ ### Documentation
+diff --git a/packages/interface/package.json b/packages/interface/package.json
+index 84194266d1b511..f5988b6729cba3 100644
+--- a/packages/interface/package.json
++++ b/packages/interface/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/interface",
+-	"version": "9.33.0",
++	"version": "9.33.1",
+ 	"description": "Interface module for WordPress. The package contains shared functionality across the modern JavaScript-based WordPress screens.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/is-shallow-equal/CHANGELOG.md b/packages/is-shallow-equal/CHANGELOG.md
+index 0edf829626181e..542ae74c0b9ddd 100644
+--- a/packages/is-shallow-equal/CHANGELOG.md
++++ b/packages/is-shallow-equal/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 5.48.1 (2026-06-16)
++
+ ## 5.48.0 (2026-06-10)
+ 
+ ## 5.47.0 (2026-05-27)
+diff --git a/packages/is-shallow-equal/package.json b/packages/is-shallow-equal/package.json
+index 6c5ba5ba0f8a8a..102d1ccfb434ef 100644
+--- a/packages/is-shallow-equal/package.json
++++ b/packages/is-shallow-equal/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/is-shallow-equal",
+-	"version": "5.48.0",
++	"version": "5.48.1",
+ 	"description": "Test for shallow equality between two objects or arrays.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/jest-console/CHANGELOG.md b/packages/jest-console/CHANGELOG.md
+index e26ad170f6005b..1d5dd52b26f7c4 100644
+--- a/packages/jest-console/CHANGELOG.md
++++ b/packages/jest-console/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 8.48.1 (2026-06-16)
++
+ ## 8.48.0 (2026-06-10)
+ 
+ ## 8.47.0 (2026-05-27)
+diff --git a/packages/jest-console/package.json b/packages/jest-console/package.json
+index 72904af3d95db9..0a593a2514142e 100644
+--- a/packages/jest-console/package.json
++++ b/packages/jest-console/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/jest-console",
+-	"version": "8.48.0",
++	"version": "8.48.1",
+ 	"description": "Custom Jest matchers for the Console object.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/jest-preset-default/CHANGELOG.md b/packages/jest-preset-default/CHANGELOG.md
+index 4bd9f6ba6adb06..d03a17036c08b8 100644
+--- a/packages/jest-preset-default/CHANGELOG.md
++++ b/packages/jest-preset-default/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 12.48.1 (2026-06-16)
++
+ ## 12.48.0 (2026-06-10)
+ 
+ ## 12.47.0 (2026-05-27)
+diff --git a/packages/jest-preset-default/package.json b/packages/jest-preset-default/package.json
+index f99724651e460d..03f9da97e8de03 100644
+--- a/packages/jest-preset-default/package.json
++++ b/packages/jest-preset-default/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/jest-preset-default",
+-	"version": "12.48.0",
++	"version": "12.48.1",
+ 	"description": "Default Jest preset for WordPress development.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/jest-puppeteer-axe/CHANGELOG.md b/packages/jest-puppeteer-axe/CHANGELOG.md
+index 66f10d8a5748c0..9443e5de9ce733 100644
+--- a/packages/jest-puppeteer-axe/CHANGELOG.md
++++ b/packages/jest-puppeteer-axe/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 7.48.1 (2026-06-16)
++
+ ## 7.48.0 (2026-06-10)
+ 
+ ## 7.47.0 (2026-05-27)
+diff --git a/packages/jest-puppeteer-axe/package.json b/packages/jest-puppeteer-axe/package.json
+index f0a68843bcf404..c667f0fbbf25a4 100644
+--- a/packages/jest-puppeteer-axe/package.json
++++ b/packages/jest-puppeteer-axe/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/jest-puppeteer-axe",
+-	"version": "7.48.0",
++	"version": "7.48.1",
+ 	"description": "Axe API integration with Jest and Puppeteer.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/keyboard-shortcuts/CHANGELOG.md b/packages/keyboard-shortcuts/CHANGELOG.md
+index a5daa8986988b0..21f8a8b339f68e 100644
+--- a/packages/keyboard-shortcuts/CHANGELOG.md
++++ b/packages/keyboard-shortcuts/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 5.48.1 (2026-06-16)
++
+ ## 5.48.0 (2026-06-10)
+ 
+ ### Code Quality
+diff --git a/packages/keyboard-shortcuts/package.json b/packages/keyboard-shortcuts/package.json
+index 6f601c349aaef5..9c734d483f31ef 100644
+--- a/packages/keyboard-shortcuts/package.json
++++ b/packages/keyboard-shortcuts/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/keyboard-shortcuts",
+-	"version": "5.48.0",
++	"version": "5.48.1",
+ 	"description": "Handling keyboard shortcuts.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/keycodes/CHANGELOG.md b/packages/keycodes/CHANGELOG.md
+index 410520c6103b47..a52fdd29f900b1 100644
+--- a/packages/keycodes/CHANGELOG.md
++++ b/packages/keycodes/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 4.48.1 (2026-06-16)
++
+ ## 4.48.0 (2026-06-10)
+ 
+ ### Code Quality
+diff --git a/packages/keycodes/package.json b/packages/keycodes/package.json
+index 53deeafedfe63e..f035bf11565274 100644
+--- a/packages/keycodes/package.json
++++ b/packages/keycodes/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/keycodes",
+-	"version": "4.48.0",
++	"version": "4.48.1",
+ 	"description": "Keycodes utilities for WordPress. Used to check for keyboard events across browsers/operating systems.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/latex-to-mathml/CHANGELOG.md b/packages/latex-to-mathml/CHANGELOG.md
+index 9badbd03191c51..77967b5d29dab9 100644
+--- a/packages/latex-to-mathml/CHANGELOG.md
++++ b/packages/latex-to-mathml/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 1.16.1 (2026-06-16)
++
+ ## 1.16.0 (2026-06-10)
+ 
+ ## 1.15.0 (2026-05-27)
+diff --git a/packages/latex-to-mathml/package.json b/packages/latex-to-mathml/package.json
+index e63fa080549923..ead869054e12e8 100644
+--- a/packages/latex-to-mathml/package.json
++++ b/packages/latex-to-mathml/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/latex-to-mathml",
+-	"version": "1.16.0",
++	"version": "1.16.1",
+ 	"description": "Convert LaTeX math syntax to MathML.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/lazy-editor/CHANGELOG.md b/packages/lazy-editor/CHANGELOG.md
+index 71413660e321ef..3d8c94ffef3d28 100644
+--- a/packages/lazy-editor/CHANGELOG.md
++++ b/packages/lazy-editor/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 1.14.1 (2026-06-16)
++
+ ## 1.14.0 (2026-06-10)
+ 
+ ### Code Quality
+diff --git a/packages/lazy-editor/package.json b/packages/lazy-editor/package.json
+index 23f565989c127e..2f82b44ec860b5 100644
+--- a/packages/lazy-editor/package.json
++++ b/packages/lazy-editor/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/lazy-editor",
+-	"version": "1.14.0",
++	"version": "1.14.1",
+ 	"description": "Lazy-loading editor component with automatic asset and settings management.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/lazy-import/CHANGELOG.md b/packages/lazy-import/CHANGELOG.md
+index 4d1c7088f0a75d..c156aa037bfdff 100644
+--- a/packages/lazy-import/CHANGELOG.md
++++ b/packages/lazy-import/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 2.48.1 (2026-06-16)
++
+ ## 2.48.0 (2026-06-10)
+ 
+ ### Documentation
+diff --git a/packages/lazy-import/package.json b/packages/lazy-import/package.json
+index da95efb5dcc7e1..c6b2271570642a 100644
+--- a/packages/lazy-import/package.json
++++ b/packages/lazy-import/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/lazy-import",
+-	"version": "2.48.0",
++	"version": "2.48.1",
+ 	"description": "Lazily import a module, installing it automatically if missing.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/list-reusable-blocks/CHANGELOG.md b/packages/list-reusable-blocks/CHANGELOG.md
+index 9cc81c0fc5059a..d21d7777a07798 100644
+--- a/packages/list-reusable-blocks/CHANGELOG.md
++++ b/packages/list-reusable-blocks/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 5.48.1 (2026-06-16)
++
+ ## 5.48.0 (2026-06-10)
+ 
+ ### Code Quality
+diff --git a/packages/list-reusable-blocks/package.json b/packages/list-reusable-blocks/package.json
+index 679e5c7c2f8fc5..e46f227e1c94bc 100644
+--- a/packages/list-reusable-blocks/package.json
++++ b/packages/list-reusable-blocks/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/list-reusable-blocks",
+-	"version": "5.48.0",
++	"version": "5.48.1",
+ 	"description": "Adding Export/Import support to the reusable blocks listing.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/media-editor/CHANGELOG.md b/packages/media-editor/CHANGELOG.md
+index 36aec96bbe1612..745382636fb94b 100644
+--- a/packages/media-editor/CHANGELOG.md
++++ b/packages/media-editor/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 0.11.1 (2026-06-16)
++
+ ## 0.11.0 (2026-06-10)
+ 
+ ### Bug Fixes
+diff --git a/packages/media-editor/package.json b/packages/media-editor/package.json
+index 7c76b1d2341185..3f32c576fb7911 100644
+--- a/packages/media-editor/package.json
++++ b/packages/media-editor/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/media-editor",
+-	"version": "0.11.0",
++	"version": "0.11.1",
+ 	"description": "Media editor components for WordPress.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/media-fields/CHANGELOG.md b/packages/media-fields/CHANGELOG.md
+index 4acbe4cf58a266..066f2b02d20c5e 100644
+--- a/packages/media-fields/CHANGELOG.md
++++ b/packages/media-fields/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 0.13.1 (2026-06-16)
++
+ ## 0.13.0 (2026-06-10)
+ 
+ ### Code Quality
+diff --git a/packages/media-fields/package.json b/packages/media-fields/package.json
+index 6a711772ebb3d6..dcdd39db84ff91 100644
+--- a/packages/media-fields/package.json
++++ b/packages/media-fields/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/media-fields",
+-	"version": "0.13.0",
++	"version": "0.13.1",
+ 	"description": "Reusable field definitions for displaying and editing media attachment properties in WordPress.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/media-utils/CHANGELOG.md b/packages/media-utils/CHANGELOG.md
+index 9e3d0acfa7e17f..2b4677bfba16b5 100644
+--- a/packages/media-utils/CHANGELOG.md
++++ b/packages/media-utils/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 5.48.1 (2026-06-16)
++
+ ## 5.48.0 (2026-06-10)
+ 
+ ### Code Quality
+diff --git a/packages/media-utils/package.json b/packages/media-utils/package.json
+index 43a0e245e6d772..2924ffe77a7bf4 100644
+--- a/packages/media-utils/package.json
++++ b/packages/media-utils/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/media-utils",
+-	"version": "5.48.0",
++	"version": "5.48.1",
+ 	"description": "WordPress Media Upload Utils.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/notices/CHANGELOG.md b/packages/notices/CHANGELOG.md
+index 8cec78a67765cd..0c036353d4283f 100644
+--- a/packages/notices/CHANGELOG.md
++++ b/packages/notices/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 5.48.1 (2026-06-16)
++
+ ## 5.48.0 (2026-06-10)
+ 
+ ### Code Quality
+diff --git a/packages/notices/package.json b/packages/notices/package.json
+index 82306096af1908..a59b82918a56c3 100644
+--- a/packages/notices/package.json
++++ b/packages/notices/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/notices",
+-	"version": "5.48.0",
++	"version": "5.48.1",
+ 	"description": "State management for notices.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/npm-package-json-lint-config/CHANGELOG.md b/packages/npm-package-json-lint-config/CHANGELOG.md
+index 68382cb0ba941e..9476a3e4a3f226 100644
+--- a/packages/npm-package-json-lint-config/CHANGELOG.md
++++ b/packages/npm-package-json-lint-config/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 5.48.1 (2026-06-16)
++
+ ## 5.48.0 (2026-06-10)
+ 
+ ## 5.47.0 (2026-05-27)
+diff --git a/packages/npm-package-json-lint-config/package.json b/packages/npm-package-json-lint-config/package.json
+index 1d55aa66791588..d11647e5c7fd17 100644
+--- a/packages/npm-package-json-lint-config/package.json
++++ b/packages/npm-package-json-lint-config/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/npm-package-json-lint-config",
+-	"version": "5.48.0",
++	"version": "5.48.1",
+ 	"description": "WordPress npm-package-json-lint shareable configuration.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/nux/CHANGELOG.md b/packages/nux/CHANGELOG.md
+index 6abba12447d771..88678ac9a9a20a 100644
+--- a/packages/nux/CHANGELOG.md
++++ b/packages/nux/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 10.0.1 (2026-06-16)
++
+ ## 10.0.0 (2026-06-10)
+ 
+ ### Breaking Changes
+diff --git a/packages/nux/package.json b/packages/nux/package.json
+index fd3d6e374556d6..844a18cf72d058 100644
+--- a/packages/nux/package.json
++++ b/packages/nux/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/nux",
+-	"version": "10.0.0",
++	"version": "10.0.1",
+ 	"description": "Deprecated no-op NUX (New User eXperience) compatibility module for WordPress.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/patterns/CHANGELOG.md b/packages/patterns/CHANGELOG.md
+index a6f18f3c9c0acd..ca07fd1888e8c4 100644
+--- a/packages/patterns/CHANGELOG.md
++++ b/packages/patterns/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 2.48.1 (2026-06-16)
++
+ ## 2.48.0 (2026-06-10)
+ 
+ ## 2.47.0 (2026-05-27)
+diff --git a/packages/patterns/package.json b/packages/patterns/package.json
+index c6f0e381e9c09a..4fe893dc45bba4 100644
+--- a/packages/patterns/package.json
++++ b/packages/patterns/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/patterns",
+-	"version": "2.48.0",
++	"version": "2.48.1",
+ 	"description": "Management of user pattern editing.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/plugins/CHANGELOG.md b/packages/plugins/CHANGELOG.md
+index c282e3b56094dd..91647d7fbab48e 100644
+--- a/packages/plugins/CHANGELOG.md
++++ b/packages/plugins/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 7.48.1 (2026-06-16)
++
+ ## 7.48.0 (2026-06-10)
+ 
+ ### Code Quality
+diff --git a/packages/plugins/package.json b/packages/plugins/package.json
+index 2d18859c4017da..a06a358f65bed7 100644
+--- a/packages/plugins/package.json
++++ b/packages/plugins/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/plugins",
+-	"version": "7.48.0",
++	"version": "7.48.1",
+ 	"description": "Plugins module for WordPress.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/postcss-plugins-preset/CHANGELOG.md b/packages/postcss-plugins-preset/CHANGELOG.md
+index e0ed77cdb9fd99..dc81ed5670e552 100644
+--- a/packages/postcss-plugins-preset/CHANGELOG.md
++++ b/packages/postcss-plugins-preset/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 5.48.1 (2026-06-16)
++
+ ## 5.48.0 (2026-06-10)
+ 
+ ## 5.47.0 (2026-05-27)
+diff --git a/packages/postcss-plugins-preset/package.json b/packages/postcss-plugins-preset/package.json
+index 8edcdc6d47ca72..376bd9bac5c001 100644
+--- a/packages/postcss-plugins-preset/package.json
++++ b/packages/postcss-plugins-preset/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/postcss-plugins-preset",
+-	"version": "5.48.0",
++	"version": "5.48.1",
+ 	"description": "PostCSS sharable plugins preset for WordPress development.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/postcss-themes/CHANGELOG.md b/packages/postcss-themes/CHANGELOG.md
+index 770e6cdc945c92..f6c46619f51529 100644
+--- a/packages/postcss-themes/CHANGELOG.md
++++ b/packages/postcss-themes/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 6.48.1 (2026-06-16)
++
+ ## 6.48.0 (2026-06-10)
+ 
+ ## 6.47.0 (2026-05-27)
+diff --git a/packages/postcss-themes/package.json b/packages/postcss-themes/package.json
+index 64ca64c98e1ab0..e00e0a9585d124 100644
+--- a/packages/postcss-themes/package.json
++++ b/packages/postcss-themes/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/postcss-themes",
+-	"version": "6.48.0",
++	"version": "6.48.1",
+ 	"description": "PostCSS plugin to generate theme colors.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/preferences-persistence/CHANGELOG.md b/packages/preferences-persistence/CHANGELOG.md
+index 93cca9c82abac1..b5f08742e6a926 100644
+--- a/packages/preferences-persistence/CHANGELOG.md
++++ b/packages/preferences-persistence/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 2.48.1 (2026-06-16)
++
+ ## 2.48.0 (2026-06-10)
+ 
+ ## 2.47.0 (2026-05-27)
+diff --git a/packages/preferences-persistence/package.json b/packages/preferences-persistence/package.json
+index 6071a43cb2fdf7..6592f0baa2336e 100644
+--- a/packages/preferences-persistence/package.json
++++ b/packages/preferences-persistence/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/preferences-persistence",
+-	"version": "2.48.0",
++	"version": "2.48.1",
+ 	"description": "Persistence utilities for `wordpress/preferences`.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/preferences/CHANGELOG.md b/packages/preferences/CHANGELOG.md
+index 52e8239c619c07..53a9fc02e7a31e 100644
+--- a/packages/preferences/CHANGELOG.md
++++ b/packages/preferences/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 4.48.1 (2026-06-16)
++
+ ## 4.48.0 (2026-06-10)
+ 
+ ### Code Quality
+diff --git a/packages/preferences/package.json b/packages/preferences/package.json
+index a26823866344de..6d9bfed7952f44 100644
+--- a/packages/preferences/package.json
++++ b/packages/preferences/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/preferences",
+-	"version": "4.48.0",
++	"version": "4.48.1",
+ 	"description": "Utilities for managing WordPress preferences.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/prettier-config/CHANGELOG.md b/packages/prettier-config/CHANGELOG.md
+index 87d27692c6b095..160f39cd03637d 100644
+--- a/packages/prettier-config/CHANGELOG.md
++++ b/packages/prettier-config/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 4.48.1 (2026-06-16)
++
+ ## 4.48.0 (2026-06-10)
+ 
+ ## 4.47.0 (2026-05-27)
+diff --git a/packages/prettier-config/package.json b/packages/prettier-config/package.json
+index d40f4f3f7ffe38..ff329b66b16ddd 100644
+--- a/packages/prettier-config/package.json
++++ b/packages/prettier-config/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/prettier-config",
+-	"version": "4.48.0",
++	"version": "4.48.1",
+ 	"description": "WordPress Prettier shared configuration.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/primitives/CHANGELOG.md b/packages/primitives/CHANGELOG.md
+index d5293b4c7f9733..24801ea26f6a05 100644
+--- a/packages/primitives/CHANGELOG.md
++++ b/packages/primitives/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 4.48.1 (2026-06-16)
++
+ ## 4.48.0 (2026-06-10)
+ 
+ ### Code Quality
+diff --git a/packages/primitives/package.json b/packages/primitives/package.json
+index 1b0548649646d2..9d9a4bc069ea5b 100644
+--- a/packages/primitives/package.json
++++ b/packages/primitives/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/primitives",
+-	"version": "4.48.0",
++	"version": "4.48.1",
+ 	"description": "WordPress cross-platform primitives.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/priority-queue/CHANGELOG.md b/packages/priority-queue/CHANGELOG.md
+index 8c275fd00ee7bc..e1b4e822b65db2 100644
+--- a/packages/priority-queue/CHANGELOG.md
++++ b/packages/priority-queue/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 3.48.1 (2026-06-16)
++
+ ## 3.48.0 (2026-06-10)
+ 
+ ## 3.47.0 (2026-05-27)
+diff --git a/packages/priority-queue/package.json b/packages/priority-queue/package.json
+index 26d35e0cd8cb03..a644fa885d0c20 100644
+--- a/packages/priority-queue/package.json
++++ b/packages/priority-queue/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/priority-queue",
+-	"version": "3.48.0",
++	"version": "3.48.1",
+ 	"description": "Generic browser priority queue.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/private-apis/CHANGELOG.md b/packages/private-apis/CHANGELOG.md
+index 76a7a5addb2339..914436aa5c4175 100644
+--- a/packages/private-apis/CHANGELOG.md
++++ b/packages/private-apis/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 1.48.1 (2026-06-16)
++
+ ## 1.48.0 (2026-06-10)
+ 
+ ### Enhancements
+diff --git a/packages/private-apis/package.json b/packages/private-apis/package.json
+index e7c0c6551535a8..4b567a7d4562ae 100644
+--- a/packages/private-apis/package.json
++++ b/packages/private-apis/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/private-apis",
+-	"version": "1.48.0",
++	"version": "1.48.1",
+ 	"description": "Internal experimental APIs for WordPress core.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/project-management-automation/CHANGELOG.md b/packages/project-management-automation/CHANGELOG.md
+index c136b1013cb196..eefde7f17b08fa 100644
+--- a/packages/project-management-automation/CHANGELOG.md
++++ b/packages/project-management-automation/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 2.48.1 (2026-06-16)
++
+ ## 2.48.0 (2026-06-10)
+ 
+ ## 2.47.0 (2026-05-27)
+diff --git a/packages/project-management-automation/package.json b/packages/project-management-automation/package.json
+index ead5793776bfa5..525482e3aa4d47 100644
+--- a/packages/project-management-automation/package.json
++++ b/packages/project-management-automation/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/project-management-automation",
+-	"version": "2.48.0",
++	"version": "2.48.1",
+ 	"description": "GitHub Action that implements various automation to assist with managing the Gutenberg GitHub repository.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/react-i18n/CHANGELOG.md b/packages/react-i18n/CHANGELOG.md
+index 544b2da581eb6a..c5c84f1fe84b80 100644
+--- a/packages/react-i18n/CHANGELOG.md
++++ b/packages/react-i18n/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 4.48.1 (2026-06-16)
++
+ ## 4.48.0 (2026-06-10)
+ 
+ ### Code Quality
+diff --git a/packages/react-i18n/package.json b/packages/react-i18n/package.json
+index 40032cc780f303..215c19a4d5e2fc 100644
+--- a/packages/react-i18n/package.json
++++ b/packages/react-i18n/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/react-i18n",
+-	"version": "4.48.0",
++	"version": "4.48.1",
+ 	"description": "React bindings for @wordpress/i18n.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/readable-js-assets-webpack-plugin/CHANGELOG.md b/packages/readable-js-assets-webpack-plugin/CHANGELOG.md
+index d9b2c76616971b..7309e3bf56a76b 100644
+--- a/packages/readable-js-assets-webpack-plugin/CHANGELOG.md
++++ b/packages/readable-js-assets-webpack-plugin/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 3.48.1 (2026-06-16)
++
+ ## 3.48.0 (2026-06-10)
+ 
+ ## 3.47.0 (2026-05-27)
+diff --git a/packages/readable-js-assets-webpack-plugin/package.json b/packages/readable-js-assets-webpack-plugin/package.json
+index ce581d89d2c3be..efc85c8bfe6c5a 100644
+--- a/packages/readable-js-assets-webpack-plugin/package.json
++++ b/packages/readable-js-assets-webpack-plugin/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/readable-js-assets-webpack-plugin",
+-	"version": "3.48.0",
++	"version": "3.48.1",
+ 	"description": "Generate a readable JS file for each JS asset.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/redux-routine/CHANGELOG.md b/packages/redux-routine/CHANGELOG.md
+index 083447ac4e4d03..554e934cf12663 100644
+--- a/packages/redux-routine/CHANGELOG.md
++++ b/packages/redux-routine/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 5.48.1 (2026-06-16)
++
+ ## 5.48.0 (2026-06-10)
+ 
+ ## 5.47.0 (2026-05-27)
+diff --git a/packages/redux-routine/package.json b/packages/redux-routine/package.json
+index 7b61f0f1bd2879..3430213f40bbc7 100644
+--- a/packages/redux-routine/package.json
++++ b/packages/redux-routine/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/redux-routine",
+-	"version": "5.48.0",
++	"version": "5.48.1",
+ 	"description": "Redux middleware for generator coroutines.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/reusable-blocks/CHANGELOG.md b/packages/reusable-blocks/CHANGELOG.md
+index 52871cede68f9b..cf10820e4553f3 100644
+--- a/packages/reusable-blocks/CHANGELOG.md
++++ b/packages/reusable-blocks/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 5.48.1 (2026-06-16)
++
+ ## 5.48.0 (2026-06-10)
+ 
+ ## 5.47.0 (2026-05-27)
+diff --git a/packages/reusable-blocks/package.json b/packages/reusable-blocks/package.json
+index 729d69a0a045fb..eaaf38488694de 100644
+--- a/packages/reusable-blocks/package.json
++++ b/packages/reusable-blocks/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/reusable-blocks",
+-	"version": "5.48.0",
++	"version": "5.48.1",
+ 	"description": "Reusable blocks utilities.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/rich-text/CHANGELOG.md b/packages/rich-text/CHANGELOG.md
+index a4344c06252e13..07388f23e6f6f8 100644
+--- a/packages/rich-text/CHANGELOG.md
++++ b/packages/rich-text/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 7.48.1 (2026-06-16)
++
+ ## 7.48.0 (2026-06-10)
+ 
+ ### Code Quality
+diff --git a/packages/rich-text/package.json b/packages/rich-text/package.json
+index 9d25d47ae80c7b..caa2e01c86663d 100644
+--- a/packages/rich-text/package.json
++++ b/packages/rich-text/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/rich-text",
+-	"version": "7.48.0",
++	"version": "7.48.1",
+ 	"description": "Rich text value and manipulation API.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/route/package.json b/packages/route/package.json
+index ad9592d9dde82b..fdaef98980b49e 100644
+--- a/packages/route/package.json
++++ b/packages/route/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/route",
+-	"version": "0.14.0",
++	"version": "0.14.1",
+ 	"description": "Routing utilities for WordPress admin interfaces.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/router/CHANGELOG.md b/packages/router/CHANGELOG.md
+index 0b40e16b963d9e..4f90b19528bb8b 100644
+--- a/packages/router/CHANGELOG.md
++++ b/packages/router/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 1.48.1 (2026-06-16)
++
+ ## 1.48.0 (2026-06-10)
+ 
+ ### Code Quality
+diff --git a/packages/router/package.json b/packages/router/package.json
+index 80d79fcbc192e1..ccdc48646d7f88 100644
+--- a/packages/router/package.json
++++ b/packages/router/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/router",
+-	"version": "1.48.0",
++	"version": "1.48.1",
+ 	"description": "Router API for WordPress pages.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/scripts/CHANGELOG.md b/packages/scripts/CHANGELOG.md
+index 0025b75c6c65da..0eb2534e3b0667 100644
+--- a/packages/scripts/CHANGELOG.md
++++ b/packages/scripts/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 32.4.1 (2026-06-16)
++
+ ## 32.4.0 (2026-06-10)
+ 
+ ## 32.3.0 (2026-05-27)
+diff --git a/packages/scripts/package.json b/packages/scripts/package.json
+index 6abcfb89c9ce91..1a45e57a53cd73 100644
+--- a/packages/scripts/package.json
++++ b/packages/scripts/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/scripts",
+-	"version": "32.4.0",
++	"version": "32.4.1",
+ 	"description": "Collection of reusable scripts for WordPress development.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/server-side-render/CHANGELOG.md b/packages/server-side-render/CHANGELOG.md
+index 7dca80cb077ab7..20f8207a3a7679 100644
+--- a/packages/server-side-render/CHANGELOG.md
++++ b/packages/server-side-render/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 6.24.1 (2026-06-16)
++
+ ## 6.24.0 (2026-06-10)
+ 
+ ### Code Quality
+diff --git a/packages/server-side-render/package.json b/packages/server-side-render/package.json
+index f1111210e912b7..365c01c9329008 100644
+--- a/packages/server-side-render/package.json
++++ b/packages/server-side-render/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/server-side-render",
+-	"version": "6.24.0",
++	"version": "6.24.1",
+ 	"description": "The component used with WordPress to server-side render a preview of dynamic blocks to display in the editor.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/shortcode/CHANGELOG.md b/packages/shortcode/CHANGELOG.md
+index ca2ec2572a5cb1..345f0bc1db097d 100644
+--- a/packages/shortcode/CHANGELOG.md
++++ b/packages/shortcode/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 4.48.1 (2026-06-16)
++
+ ## 4.48.0 (2026-06-10)
+ 
+ ## 4.47.0 (2026-05-27)
+diff --git a/packages/shortcode/package.json b/packages/shortcode/package.json
+index 2c2cbce803c1f4..f29c41ac1c4f86 100644
+--- a/packages/shortcode/package.json
++++ b/packages/shortcode/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/shortcode",
+-	"version": "4.48.0",
++	"version": "4.48.1",
+ 	"description": "Shortcode module for WordPress.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/style-engine/CHANGELOG.md b/packages/style-engine/CHANGELOG.md
+index 1a29f4f0f26868..f99c27f38773ca 100644
+--- a/packages/style-engine/CHANGELOG.md
++++ b/packages/style-engine/CHANGELOG.md
+@@ -6,6 +6,8 @@
+ 
+ -   Export the `Style`, `StyleOptions`, and `GeneratedCSSRule` TypeScript types so that consumers of the public API can type their usage of `compileCSS` and `getCSSRules`.
+ 
++## 2.48.1 (2026-06-16)
++
+ ## 2.48.0 (2026-06-10)
+ 
+ ### Code Quality
+diff --git a/packages/style-engine/package.json b/packages/style-engine/package.json
+index fd13098149ed6f..ed64eec15edcb7 100644
+--- a/packages/style-engine/package.json
++++ b/packages/style-engine/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/style-engine",
+-	"version": "2.48.0",
++	"version": "2.48.1",
+ 	"description": "A suite of parsers and compilers for WordPress styles.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/style-runtime/CHANGELOG.md b/packages/style-runtime/CHANGELOG.md
+index cc49b7299c0845..7d9b266bc2366a 100644
+--- a/packages/style-runtime/CHANGELOG.md
++++ b/packages/style-runtime/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 0.4.1 (2026-06-16)
++
+ ## 0.4.0 (2026-06-10)
+ 
+ ## 0.3.0 (2026-05-27)
+diff --git a/packages/style-runtime/package.json b/packages/style-runtime/package.json
+index 07b6dcb419e134..e1ebc5a4b684fc 100644
+--- a/packages/style-runtime/package.json
++++ b/packages/style-runtime/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/style-runtime",
+-	"version": "0.4.0",
++	"version": "0.4.1",
+ 	"description": "Runtime helpers for injecting WordPress package styles.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/stylelint-config/CHANGELOG.md b/packages/stylelint-config/CHANGELOG.md
+index 2942e53646c700..c92c5ac5f300d7 100644
+--- a/packages/stylelint-config/CHANGELOG.md
++++ b/packages/stylelint-config/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 23.40.1 (2026-06-16)
++
+ ## 23.40.0 (2026-06-10)
+ 
+ ## 23.39.0 (2026-05-27)
+diff --git a/packages/stylelint-config/package.json b/packages/stylelint-config/package.json
+index 4cc44ad45cb8f1..42c84b8fdb00f1 100644
+--- a/packages/stylelint-config/package.json
++++ b/packages/stylelint-config/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/stylelint-config",
+-	"version": "23.40.0",
++	"version": "23.40.1",
+ 	"description": "stylelint config for WordPress development.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "MIT",
+diff --git a/packages/sync/CHANGELOG.md b/packages/sync/CHANGELOG.md
+index e0c386a2cf8299..69d87be46df5c3 100644
+--- a/packages/sync/CHANGELOG.md
++++ b/packages/sync/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 1.48.1 (2026-06-16)
++
+ ## 1.48.0 (2026-06-10)
+ 
+ -   Prevent RTC polling interval filters from slowing active HTTP polling.
+diff --git a/packages/sync/package.json b/packages/sync/package.json
+index cb082d5a25908a..4d8245ff7ba6c2 100644
+--- a/packages/sync/package.json
++++ b/packages/sync/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/sync",
+-	"version": "1.48.0",
++	"version": "1.48.1",
+ 	"description": "Sync Data.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index d41a3f199c4d88..1c0a8cfd71188d 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -29,6 +29,8 @@
+ 
+ -   Declare `postcss`, `esbuild`, and `vite` as optional peer dependencies for the bundler plugins, and move `@types/react` from `dependencies` to an optional peer dependency ([#79095](https://github.com/WordPress/gutenberg/pull/79095)).
+ 
++## 0.15.1 (2026-06-16)
++
+ ## 0.15.0 (2026-06-10)
+ 
+ ### New Features
+diff --git a/packages/theme/package.json b/packages/theme/package.json
+index bc6f648b9a8ae9..6a1b8747cec0c3 100644
+--- a/packages/theme/package.json
++++ b/packages/theme/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/theme",
+-	"version": "0.15.0",
++	"version": "0.15.1",
+ 	"description": "Theme and context provider for the WordPress Design System.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/token-list/CHANGELOG.md b/packages/token-list/CHANGELOG.md
+index eef3be3f796fdb..d3addf66af0ebb 100644
+--- a/packages/token-list/CHANGELOG.md
++++ b/packages/token-list/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 3.48.1 (2026-06-16)
++
+ ## 3.48.0 (2026-06-10)
+ 
+ ## 3.47.0 (2026-05-27)
+diff --git a/packages/token-list/package.json b/packages/token-list/package.json
+index c8b24f1b1c876b..a83602de51c9ec 100644
+--- a/packages/token-list/package.json
++++ b/packages/token-list/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/token-list",
+-	"version": "3.48.0",
++	"version": "3.48.1",
+ 	"description": "Constructable, plain JavaScript DOMTokenList implementation, supporting non-browser runtimes.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 7483936f39b4f2..d1b4286c2d3089 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -12,6 +12,8 @@
+ -   Move `@types/react` from `dependencies` to an optional peer dependency so consumers' React type version is used ([#79095](https://github.com/WordPress/gutenberg/pull/79095)).
+ -   `Button` and `AlertDialog`: Reference the tone-specific `brand`/`error` disabled color tokens for disabled states instead of the `neutral` ones, to match each element's tone. Disabled `Select`/`Autocomplete`/`Combobox` list items also adopt the `brand` disabled background token. No visual change ([#79124](https://github.com/WordPress/gutenberg/pull/79124)).
+ 
++## 0.15.1 (2026-06-16)
++
+ ## 0.15.0 (2026-06-10)
+ 
+ ### Breaking Changes
+diff --git a/packages/ui/package.json b/packages/ui/package.json
+index 2e2e70446be0ee..d0d85351de9bdc 100644
+--- a/packages/ui/package.json
++++ b/packages/ui/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/ui",
+-	"version": "0.15.0",
++	"version": "0.15.1",
+ 	"description": "Themeable React UI components for the WordPress Design System.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/undo-manager/CHANGELOG.md b/packages/undo-manager/CHANGELOG.md
+index f2c4d07a5e6667..c16b03d0dfb461 100644
+--- a/packages/undo-manager/CHANGELOG.md
++++ b/packages/undo-manager/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 1.48.1 (2026-06-16)
++
+ ## 1.48.0 (2026-06-10)
+ 
+ ## 1.47.0 (2026-05-27)
+diff --git a/packages/undo-manager/package.json b/packages/undo-manager/package.json
+index a3a2b46c97cc91..5f8e9ce39e29b5 100644
+--- a/packages/undo-manager/package.json
++++ b/packages/undo-manager/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/undo-manager",
+-	"version": "1.48.0",
++	"version": "1.48.1",
+ 	"description": "A small package to manage undo/redo.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/upload-media/CHANGELOG.md b/packages/upload-media/CHANGELOG.md
+index 72a9764a233a72..3e63166bd39b7d 100644
+--- a/packages/upload-media/CHANGELOG.md
++++ b/packages/upload-media/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 0.33.1 (2026-06-16)
++
+ ## 0.33.0 (2026-06-10)
+ 
+ ### Enhancement
+diff --git a/packages/upload-media/package.json b/packages/upload-media/package.json
+index 282128576ecfc2..d69a2d6f6bbb17 100644
+--- a/packages/upload-media/package.json
++++ b/packages/upload-media/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/upload-media",
+-	"version": "0.33.0",
++	"version": "0.33.1",
+ 	"description": "Core media upload logic.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/url/CHANGELOG.md b/packages/url/CHANGELOG.md
+index 6b44aa3311f3a1..30e288c0aff9a8 100644
+--- a/packages/url/CHANGELOG.md
++++ b/packages/url/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 4.48.1 (2026-06-16)
++
+ ## 4.48.0 (2026-06-10)
+ 
+ ## 4.47.0 (2026-05-27)
+diff --git a/packages/url/package.json b/packages/url/package.json
+index 0ec60acc5b4f0a..04468f04d29e74 100644
+--- a/packages/url/package.json
++++ b/packages/url/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/url",
+-	"version": "4.48.0",
++	"version": "4.48.1",
+ 	"description": "WordPress URL utilities.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/viewport/CHANGELOG.md b/packages/viewport/CHANGELOG.md
+index 36e4b58bbf2821..6ec94cd31ed1a4 100644
+--- a/packages/viewport/CHANGELOG.md
++++ b/packages/viewport/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 6.48.1 (2026-06-16)
++
+ ## 6.48.0 (2026-06-10)
+ 
+ ### Code Quality
+diff --git a/packages/viewport/package.json b/packages/viewport/package.json
+index 02c934a45f8495..65b5970ec813f6 100644
+--- a/packages/viewport/package.json
++++ b/packages/viewport/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/viewport",
+-	"version": "6.48.0",
++	"version": "6.48.1",
+ 	"description": "Viewport module for WordPress.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/views/package.json b/packages/views/package.json
+index bef4cea69d9ac7..a824ed5eb55755 100644
+--- a/packages/views/package.json
++++ b/packages/views/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/views",
+-	"version": "1.15.0",
++	"version": "1.15.1",
+ 	"description": "View persistence and management for WordPress DataViews.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/vips/CHANGELOG.md b/packages/vips/CHANGELOG.md
+index 16c998b406d71c..3b6f72b0e7cb6c 100644
+--- a/packages/vips/CHANGELOG.md
++++ b/packages/vips/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 2.1.1 (2026-06-16)
++
+ ## 2.1.0 (2026-06-10)
+ 
+ ### New Features
+diff --git a/packages/vips/package.json b/packages/vips/package.json
+index 8eae3d64dcd481..363a803c06b586 100644
+--- a/packages/vips/package.json
++++ b/packages/vips/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/vips",
+-	"version": "2.1.0",
++	"version": "2.1.1",
+ 	"description": "Utils for working with libvips.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/warning/CHANGELOG.md b/packages/warning/CHANGELOG.md
+index 6910d5b00b9b1d..11272de2f0d14a 100644
+--- a/packages/warning/CHANGELOG.md
++++ b/packages/warning/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 3.48.1 (2026-06-16)
++
+ ## 3.48.0 (2026-06-10)
+ 
+ ## 3.47.0 (2026-05-27)
+diff --git a/packages/warning/package.json b/packages/warning/package.json
+index 68336bc8fc8ffa..cd4e770a0ecf93 100644
+--- a/packages/warning/package.json
++++ b/packages/warning/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/warning",
+-	"version": "3.48.0",
++	"version": "3.48.1",
+ 	"description": "Warning utility for WordPress.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/widgets/CHANGELOG.md b/packages/widgets/CHANGELOG.md
+index a233519df4abb8..d6b7c63cf26e87 100644
+--- a/packages/widgets/CHANGELOG.md
++++ b/packages/widgets/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 4.48.1 (2026-06-16)
++
+ ## 4.48.0 (2026-06-10)
+ 
+ ## 4.47.0 (2026-05-27)
+diff --git a/packages/widgets/package.json b/packages/widgets/package.json
+index fe7444f0d52e0a..bb9eaae8bf3e53 100644
+--- a/packages/widgets/package.json
++++ b/packages/widgets/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/widgets",
+-	"version": "4.48.0",
++	"version": "4.48.1",
+ 	"description": "Functionality used by the widgets block editor in the Widgets screen and the Customizer.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/wordcount/CHANGELOG.md b/packages/wordcount/CHANGELOG.md
+index a0563752212e7b..8389ea67566a0b 100644
+--- a/packages/wordcount/CHANGELOG.md
++++ b/packages/wordcount/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 4.48.1 (2026-06-16)
++
+ ## 4.48.0 (2026-06-10)
+ 
+ ## 4.47.0 (2026-05-27)
+diff --git a/packages/wordcount/package.json b/packages/wordcount/package.json
+index 64ea20320d51c8..e37d629fe03704 100644
+--- a/packages/wordcount/package.json
++++ b/packages/wordcount/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/wordcount",
+-	"version": "4.48.0",
++	"version": "4.48.1",
+ 	"description": "WordPress word count utility.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/worker-threads/CHANGELOG.md b/packages/worker-threads/CHANGELOG.md
+index d2665c61b145fb..919a7125fd2434 100644
+--- a/packages/worker-threads/CHANGELOG.md
++++ b/packages/worker-threads/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 1.8.1 (2026-06-16)
++
+ ## 1.8.0 (2026-06-10)
+ 
+ ## 1.7.0 (2026-05-27)
+diff --git a/packages/worker-threads/package.json b/packages/worker-threads/package.json
+index e811c98652d616..c45077df284c46 100644
+--- a/packages/worker-threads/package.json
++++ b/packages/worker-threads/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/worker-threads",
+-	"version": "1.8.0",
++	"version": "1.8.1",
+ 	"description": "Utilities for type-safe Web Worker communication with RPC.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",
+diff --git a/packages/wp-build/CHANGELOG.md b/packages/wp-build/CHANGELOG.md
+index cabdeb1974e7f2..1ba1a9a11838b8 100644
+--- a/packages/wp-build/CHANGELOG.md
++++ b/packages/wp-build/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++## 0.16.1 (2026-06-16)
++
+ ## 0.16.0 (2026-06-10)
+ 
+ ### Bug Fixes
+diff --git a/packages/wp-build/package.json b/packages/wp-build/package.json
+index d9dcb075aac45a..093a5ab1f28775 100644
+--- a/packages/wp-build/package.json
++++ b/packages/wp-build/package.json
+@@ -1,6 +1,6 @@
+ {
+ 	"name": "@wordpress/build",
+-	"version": "0.16.0",
++	"version": "0.16.1",
+ 	"description": "Build tool for WordPress plugins.",
+ 	"author": "The WordPress Contributors",
+ 	"license": "GPL-2.0-or-later",

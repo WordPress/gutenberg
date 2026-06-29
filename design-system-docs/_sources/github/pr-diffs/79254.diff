@@ -1,0 +1,440 @@
+diff --git a/packages/admin-ui/CHANGELOG.md b/packages/admin-ui/CHANGELOG.md
+index 353727ab749d7b..1edb9042ebc018 100644
+--- a/packages/admin-ui/CHANGELOG.md
++++ b/packages/admin-ui/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   Migrate off the removed `var(--wpds-dimension-base)` primitive token, adopting `--wpds-dimension-size-*` tokens ([#79254](https://github.com/WordPress/gutenberg/pull/79254)).
++
+ ## 2.3.1 (2026-06-16)
+ 
+ ## 2.3.0 (2026-06-10)
+diff --git a/packages/admin-ui/src/page/style.module.css b/packages/admin-ui/src/page/style.module.css
+index c13f0d1ac49e99..0f2fb51e99966a 100644
+--- a/packages/admin-ui/src/page/style.module.css
++++ b/packages/admin-ui/src/page/style.module.css
+@@ -19,8 +19,7 @@
+ }
+ 
+ .header-content {
+-	/* @TODO: Replace with a `size` token once that category exists in the theme package. */
+-	min-height: calc(var(--wpds-dimension-base) * 8);
++	min-height: var(--wpds-dimension-size-md);
+ }
+ 
+ .header-actions {
+@@ -39,9 +38,8 @@
+ 	grid-template-columns: 1fr;
+ 	grid-template-rows: 1fr;
+ 	flex-shrink: 0;
+-	/* @TODO: Replace with a `size` token once that category exists in the theme package. */
+-	width: calc(var(--wpds-dimension-base) * 6);
+-	height: calc(var(--wpds-dimension-base) * 6);
++	width: var(--wpds-dimension-size-sm);
++	height: var(--wpds-dimension-size-sm);
+ 
+ 	> * {
+ 		grid-column: 1 / -1;
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index 60c048c5255184..f819eb0312848d 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -24,6 +24,7 @@
+ ### Internal
+ 
+ - Adopt `--wpds-dimension-size-*` design tokens [#79093](https://github.com/WordPress/gutenberg/pull/79093).
++- Migrate the remaining `var(--wpds-dimension-base)` usages off the removed primitive token [#79254](https://github.com/WordPress/gutenberg/pull/79254).
+ 
+ ## 16.0.1 (2026-06-16)
+ 
+diff --git a/packages/dataviews/src/components/dataviews-filters/style.scss b/packages/dataviews/src/components/dataviews-filters/style.scss
+index b32a88916eb527..43fe5a5bcf8ed9 100644
+--- a/packages/dataviews/src/components/dataviews-filters/style.scss
++++ b/packages/dataviews/src/components/dataviews-filters/style.scss
+@@ -171,7 +171,7 @@
+ }
+ 
+ .dataviews-filters__search-widget-filter-combobox-list {
+-	max-height: calc(var(--wpds-dimension-base) * 46);
++	max-height: 184px;
+ 	padding: var(--wpds-dimension-padding-xs);
+ 	overflow: auto;
+ 	border-top: 1px solid var(--wpds-color-stroke-surface-neutral);
+diff --git a/packages/dataviews/src/components/dataviews-layouts/activity/style.scss b/packages/dataviews/src/components/dataviews-layouts/activity/style.scss
+index c3a3eb9826c0e5..a51cd93740b7ea 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/activity/style.scss
++++ b/packages/dataviews/src/components/dataviews-layouts/activity/style.scss
+@@ -109,8 +109,8 @@
+ 				}
+ 			}
+ 			.dataviews-view-activity__item-type-icon {
+-				width: calc(var(--wpds-dimension-base) * 3 - 1px);
+-				height: calc(var(--wpds-dimension-base) * 3 - 1px);
++				width: calc(var(--wpds-dimension-size-3xs) - 1px);
++				height: calc(var(--wpds-dimension-size-3xs) - 1px);
+ 			}
+ 			.dataviews-view-activity__item-content {
+ 				margin: var(--wpds-dimension-gap-md) 0;
+@@ -126,8 +126,8 @@
+ 				}
+ 			}
+ 			.dataviews-view-activity__item-type-icon {
+-				width: calc(var(--wpds-dimension-base) * 6 + 1px);
+-				height: calc(var(--wpds-dimension-base) * 6 + 1px);
++				width: calc(var(--wpds-dimension-size-sm) + 1px);
++				height: calc(var(--wpds-dimension-size-sm) + 1px);
+ 			}
+ 			.dataviews-view-activity__item-content {
+ 				margin: var(--wpds-dimension-gap-md) 0;
+@@ -144,8 +144,8 @@
+ 				}
+ 			}
+ 			.dataviews-view-activity__item-type-icon {
+-				width: calc(var(--wpds-dimension-base) * 8 + 1px);
+-				height: calc(var(--wpds-dimension-base) * 8 + 1px);
++				width: calc(var(--wpds-dimension-size-md) + 1px);
++				height: calc(var(--wpds-dimension-size-md) + 1px);
+ 			}
+ 			.dataviews-view-activity__item-content {
+ 				margin: var(--wpds-dimension-gap-sm) 0 var(--wpds-dimension-gap-lg);
+@@ -156,8 +156,8 @@
+ 		&.is-comfortable,
+ 		&.is-balanced {
+ 			.dataviews-view-activity__item-bullet {
+-				width: calc(var(--wpds-dimension-base) * 2 + 1px);
+-				height: calc(var(--wpds-dimension-base) * 2 + 1px);
++				width: calc(var(--wpds-dimension-size-4xs) + 1px);
++				height: calc(var(--wpds-dimension-size-4xs) + 1px);
+ 				position: relative;
+ 				top: 50%;
+ 				transform: translateY(-50%);
+diff --git a/packages/dataviews/src/components/dataviews-layouts/grid/style.scss b/packages/dataviews/src/components/dataviews-layouts/grid/style.scss
+index 22886262536057..85965f0e49f43b 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/grid/style.scss
++++ b/packages/dataviews/src/components/dataviews-layouts/grid/style.scss
+@@ -147,7 +147,13 @@
+ 		.dataviews-view-grid__field-value:not(:empty) {
+ 			min-height: var(--wpds-dimension-size-sm);
+ 			line-height: var(--wpds-typography-line-height-sm);
+-			padding-top: calc(var(--wpds-dimension-base) / 2);
++			// Top half of the slack between the row height and the line box,
++			// optically centering a single line within the row.
++			padding-top:
++				calc((
++					var(--wpds-dimension-size-sm) -
++					var(--wpds-typography-line-height-sm)
++				) / 2);
+ 		}
+ 
+ 		.dataviews-view-grid__field {
+diff --git a/packages/dataviews/src/components/dataviews-layouts/list/style.scss b/packages/dataviews/src/components/dataviews-layouts/list/style.scss
+index 96e34a88cc533e..bc3c56d4426242 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/list/style.scss
++++ b/packages/dataviews/src/components/dataviews-layouts/list/style.scss
+@@ -1,5 +1,14 @@
+ @use "../../../dataviews/style" as *;
+ 
++// Square media (thumbnail) size per density. The compact density uses the
++// `--wpds-dimension-size-md` token; these larger densities have no matching
++// token, so they're kept as local constants. The field wrapper reuses the
++// same value as its `min-height` to keep the title centered against the media.
++// TODO: Replace with `--wpds-dimension-size-*` tokens if 48px and 64px are
++// added to the WPDS element size scale.
++$media-size: 48px;
++$media-size-comfortable: 64px;
++
+ div.dataviews-view-list {
+ 	list-style-type: none;
+ }
+@@ -135,8 +144,8 @@ div.dataviews-view-list {
+ 	}
+ 
+ 	.dataviews-view-list__media-wrapper {
+-		width: calc(var(--wpds-dimension-base) * 13);
+-		height: calc(var(--wpds-dimension-base) * 13);
++		width: $media-size;
++		height: $media-size;
+ 		overflow: hidden;
+ 		position: relative;
+ 		flex-shrink: 0;
+@@ -162,7 +171,7 @@ div.dataviews-view-list {
+ 	}
+ 
+ 	.dataviews-view-list__field-wrapper {
+-		min-height: calc(var(--wpds-dimension-base) * 13); // Ensures title is centrally aligned when all fields are hidden
++		min-height: $media-size; // Ensures title is centrally aligned when all fields are hidden
+ 		flex-grow: 1;
+ 		min-width: 0;
+ 	}
+@@ -245,12 +254,12 @@ div.dataviews-view-list {
+ 			}
+ 
+ 			.dataviews-view-list__media-wrapper {
+-				width: calc(var(--wpds-dimension-base) * 16);
+-				height: calc(var(--wpds-dimension-base) * 16);
++				width: $media-size-comfortable;
++				height: $media-size-comfortable;
+ 			}
+ 
+ 			.dataviews-view-list__field-wrapper {
+-				min-height: calc(var(--wpds-dimension-base) * 16);
++				min-height: $media-size-comfortable;
+ 			}
+ 
+ 			.dataviews-view-list__fields {
+diff --git a/packages/dataviews/src/components/dataviews-layouts/picker-activity/style.scss b/packages/dataviews/src/components/dataviews-layouts/picker-activity/style.scss
+index 8d8ac72cd509e1..4d45ce24553a5e 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/picker-activity/style.scss
++++ b/packages/dataviews/src/components/dataviews-layouts/picker-activity/style.scss
+@@ -44,8 +44,8 @@
+ 				}
+ 			}
+ 			.dataviews-view-picker-activity__item-type-icon {
+-				width: calc(var(--wpds-dimension-base) * 3 - 1px);
+-				height: calc(var(--wpds-dimension-base) * 3 - 1px);
++				width: calc(var(--wpds-dimension-size-3xs) - 1px);
++				height: calc(var(--wpds-dimension-size-3xs) - 1px);
+ 			}
+ 			.dataviews-view-picker-activity__item-content {
+ 				margin: var(--wpds-dimension-gap-md) 0;
+@@ -61,8 +61,8 @@
+ 				}
+ 			}
+ 			.dataviews-view-picker-activity__item-type-icon {
+-				width: calc(var(--wpds-dimension-base) * 6 + 1px);
+-				height: calc(var(--wpds-dimension-base) * 6 + 1px);
++				width: calc(var(--wpds-dimension-size-sm) + 1px);
++				height: calc(var(--wpds-dimension-size-sm) + 1px);
+ 			}
+ 			.dataviews-view-picker-activity__item-content {
+ 				margin: var(--wpds-dimension-gap-md) 0;
+@@ -79,8 +79,8 @@
+ 				}
+ 			}
+ 			.dataviews-view-picker-activity__item-type-icon {
+-				width: calc(var(--wpds-dimension-base) * 8 + 1px);
+-				height: calc(var(--wpds-dimension-base) * 8 + 1px);
++				width: calc(var(--wpds-dimension-size-md) + 1px);
++				height: calc(var(--wpds-dimension-size-md) + 1px);
+ 			}
+ 			.dataviews-view-picker-activity__item-content {
+ 				margin: var(--wpds-dimension-gap-sm) 0 var(--wpds-dimension-gap-lg);
+@@ -91,8 +91,8 @@
+ 		&.is-comfortable,
+ 		&.is-balanced {
+ 			.dataviews-view-picker-activity__item-bullet {
+-				width: calc(var(--wpds-dimension-base) * 2 + 1px);
+-				height: calc(var(--wpds-dimension-base) * 2 + 1px);
++				width: calc(var(--wpds-dimension-size-4xs) + 1px);
++				height: calc(var(--wpds-dimension-size-4xs) + 1px);
+ 				position: relative;
+ 				top: 50%;
+ 				transform: translateY(-50%);
+diff --git a/packages/dataviews/src/components/dataviews-layouts/picker-grid/style.scss b/packages/dataviews/src/components/dataviews-layouts/picker-grid/style.scss
+index 80cec8a5a47bab..d705c3c241abc0 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/picker-grid/style.scss
++++ b/packages/dataviews/src/components/dataviews-layouts/picker-grid/style.scss
+@@ -110,7 +110,13 @@
+ 		.dataviews-view-picker-grid__field-value:not(:empty) {
+ 			min-height: var(--wpds-dimension-size-sm);
+ 			line-height: var(--wpds-typography-line-height-sm);
+-			padding-top: calc(var(--wpds-dimension-base) / 2);
++			// Top half of the slack between the row height and the line box,
++			// optically centering a single line within the row.
++			padding-top:
++				calc((
++					var(--wpds-dimension-size-sm) -
++					var(--wpds-typography-line-height-sm)
++				) / 2);
+ 		}
+ 
+ 		.dataviews-view-picker-grid__field {
+@@ -178,5 +184,5 @@
+ 	font-weight: var(--wpds-typography-font-weight-medium);
+ 	color: var(--wpds-color-foreground-content-neutral);
+ 	margin: 0 0 var(--wpds-dimension-gap-sm) 0;
+-	padding: 0 calc(var(--wpds-dimension-base) * 12);
++	padding: 0 48px;
+ }
+diff --git a/packages/dataviews/src/components/dataviews-layouts/picker-table/style.scss b/packages/dataviews/src/components/dataviews-layouts/picker-table/style.scss
+index da78c389e7c680..0c9ca11250ec99 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/picker-table/style.scss
++++ b/packages/dataviews/src/components/dataviews-layouts/picker-table/style.scss
+@@ -7,7 +7,9 @@
+ 
+ 	// Constrain checkbox column to fixed width while other columns share remaining space.
+ 	.dataviews-view-table__checkbox-column {
+-		width: calc(var(--wpds-dimension-base) * 12);
++		// TODO: Replace with a `--wpds-dimension-size-*` token if 48px is added
++		// to the WPDS element size scale.
++		width: 48px;
+ 	}
+ 
+ 	tbody:focus-visible {
+diff --git a/packages/dataviews/src/dataviews/style.scss b/packages/dataviews/src/dataviews/style.scss
+index e6f612335d4a62..75733e5e064449 100644
+--- a/packages/dataviews/src/dataviews/style.scss
++++ b/packages/dataviews/src/dataviews/style.scss
+@@ -16,7 +16,7 @@
+ 	flex-grow: 1;
+ 	min-height: 0;
+ 	box-sizing: border-box;
+-	scroll-padding-bottom: calc(var(--wpds-dimension-base) * 16);
++	scroll-padding-bottom: 64px;
+ 	/* stylelint-disable-next-line property-no-unknown -- '@container' not globally permitted */
+ 	container: dataviews-wrapper / inline-size;
+ 	display: flex;
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index df6a1003c945aa..0171aeeb751266 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Breaking Changes
+ 
+ -   Rename the `bg` and `fg` design token groups to `background` and `foreground`. All `--wpds-color-bg-*` custom properties are now `--wpds-color-background-*`, and all `--wpds-color-fg-*` custom properties are now `--wpds-color-foreground-*` ([#79098](https://github.com/WordPress/gutenberg/pull/79098)).
++-   Remove the `--wpds-dimension-base` design token. It was a primitive (the `4px` base unit) and is no longer exposed publicly ([#79254](https://github.com/WordPress/gutenberg/pull/79254)).
+ 
+ ### New Features
+ 
+diff --git a/packages/theme/docs/tokens.md b/packages/theme/docs/tokens.md
+index 30bf0ff5913447..33fc29ad8a1c2e 100644
+--- a/packages/theme/docs/tokens.md
++++ b/packages/theme/docs/tokens.md
+@@ -254,7 +254,6 @@ The interactive state of the element. The default (no modifier) is the idle stat
+ 
+ | Variable name                        | Description                                                              |
+ | ------------------------------------ | ------------------------------------------------------------------------ |
+-| `--wpds-dimension-base`              | Base dimension unit                                                      |
+ | `--wpds-dimension-padding-xs`        | Extra small padding                                                      |
+ | `--wpds-dimension-padding-sm`        | Small padding                                                            |
+ | `--wpds-dimension-padding-md`        | Medium padding                                                           |
+diff --git a/packages/theme/src/prebuilt/css/design-tokens.css b/packages/theme/src/prebuilt/css/design-tokens.css
+index 86f696da40078c..2b58f938c18ee8 100644
+--- a/packages/theme/src/prebuilt/css/design-tokens.css
++++ b/packages/theme/src/prebuilt/css/design-tokens.css
+@@ -227,8 +227,6 @@
+ 	--wpds-color-stroke-focus: #3858e9;
+ 	/* Cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles). */
+ 	--wpds-cursor-control: pointer;
+-	/* Base dimension unit */
+-	--wpds-dimension-base: 4px;
+ 	/* Extra small padding */
+ 	--wpds-dimension-padding-xs: 4px;
+ 	/* Small padding */
+diff --git a/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs b/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
+index a78762c4706779..65e5786b80c30f 100644
+--- a/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
++++ b/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
+@@ -128,7 +128,6 @@ export default {
+ 	'--wpds-color-stroke-surface-warning': '#e1bc7c',
+ 	'--wpds-color-stroke-surface-warning-strong': '#926300',
+ 	'--wpds-cursor-control': 'pointer',
+-	'--wpds-dimension-base': '4px',
+ 	'--wpds-dimension-gap-2xl': '32px',
+ 	'--wpds-dimension-gap-3xl': '40px',
+ 	'--wpds-dimension-gap-lg': '16px',
+diff --git a/packages/theme/src/prebuilt/js/design-tokens.mjs b/packages/theme/src/prebuilt/js/design-tokens.mjs
+index aa9036daeb46b8..6440151c9a32c7 100644
+--- a/packages/theme/src/prebuilt/js/design-tokens.mjs
++++ b/packages/theme/src/prebuilt/js/design-tokens.mjs
+@@ -116,7 +116,6 @@ export default [
+ 	'--wpds-color-stroke-interactive-error-strong',
+ 	'--wpds-color-stroke-focus',
+ 	'--wpds-cursor-control',
+-	'--wpds-dimension-base',
+ 	'--wpds-dimension-padding-xs',
+ 	'--wpds-dimension-padding-sm',
+ 	'--wpds-dimension-padding-md',
+diff --git a/packages/theme/tokens/dimension.json b/packages/theme/tokens/dimension.json
+index 08cd75b876d902..8e191e9db45119 100644
+--- a/packages/theme/tokens/dimension.json
++++ b/packages/theme/tokens/dimension.json
+@@ -45,10 +45,6 @@
+ 				}
+ 			}
+ 		},
+-		"base": {
+-			"$value": "{wpds-dimension.primitive.space.10}",
+-			"$description": "Base dimension unit"
+-		},
+ 		"padding": {
+ 			"xs": {
+ 				"$value": "{wpds-dimension.primitive.space.10}",
+diff --git a/packages/widget-dashboard/src/components/widgets/widget-resize-handle.module.css b/packages/widget-dashboard/src/components/widgets/widget-resize-handle.module.css
+index d161cbe3c52f4b..92d475ec8f544a 100644
+--- a/packages/widget-dashboard/src/components/widgets/widget-resize-handle.module.css
++++ b/packages/widget-dashboard/src/components/widgets/widget-resize-handle.module.css
+@@ -13,8 +13,8 @@
+ 
+ .handle:focus-visible {
+ 	outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+-	/* @TODO: Replace with a `size` token once that category exists in the theme package. */
+-	outline-offset: calc(var(--wpds-dimension-base) * 0.5);
++	/* Offset the ring by an amount equal to its own width. */
++	outline-offset: var(--wpds-border-width-focus);
+ 	border-radius: var(--wpds-border-radius-sm);
+ }
+ 
+diff --git a/widgets/events/components/location-picker/location-picker.module.css b/widgets/events/components/location-picker/location-picker.module.css
+index e004bdb4efd546..cbcad09f1163be 100644
+--- a/widgets/events/components/location-picker/location-picker.module.css
++++ b/widgets/events/components/location-picker/location-picker.module.css
+@@ -1,4 +1,4 @@
+ .locationInput {
+ 	flex: 1;
+-	min-inline-size: calc(var(--wpds-dimension-base) * 30);
++	min-inline-size: 120px;
+ }
+diff --git a/widgets/quick-draft/style.module.css b/widgets/quick-draft/style.module.css
+index 46c6e1c1bb8ea6..561e13905d8639 100644
+--- a/widgets/quick-draft/style.module.css
++++ b/widgets/quick-draft/style.module.css
+@@ -30,7 +30,7 @@
+ /* Wide tile: drafts list sits beside the form, split by a vertical rule. */
+ .row .primaryPane {
+ 	border-inline-end: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+-	max-width: calc(var(--wpds-dimension-base) * 100);
++	max-width: var(--wpds-dimension-surface-width-md);
+ 	margin: 0 auto;
+ }
+ 
+diff --git a/widgets/site-health/components/circle-progress/circle-progress.module.css b/widgets/site-health/components/circle-progress/circle-progress.module.css
+index 0a5cc77fc111ef..abee99140c4402 100644
+--- a/widgets/site-health/components/circle-progress/circle-progress.module.css
++++ b/widgets/site-health/components/circle-progress/circle-progress.module.css
+@@ -1,7 +1,8 @@
+ .root {
+ 	flex-shrink: 0;
+-	width: calc(var(--wpds-dimension-base) * 17);
+-	height: calc(var(--wpds-dimension-base) * 17);
++	/* TODO: Replace with a --wpds-dimension-size-* token if 64px is added to the WPDS element size scale. */
++	width: 64px;
++	height: 64px;
+ }
+ 
+ .root.success {
+diff --git a/widgets/site-health/style.module.css b/widgets/site-health/style.module.css
+index c5e32f4c39c33b..872de0b3dfa44a 100644
+--- a/widgets/site-health/style.module.css
++++ b/widgets/site-health/style.module.css
+@@ -1,11 +1,14 @@
+ .root {
+ 	margin: 0 auto;
+-	max-width: calc(var(--wpds-dimension-base) * 80);
++	max-width: var(--wpds-dimension-surface-width-sm);
+ 	text-align: center;
+ 	height: 100%;
+ }
+ 
+ .loading {
+-	min-height: calc(var(--wpds-dimension-base) * 55);
++	/* TODO: Look into a WPDS token once one exists that fits a vertical
++	   (height) measure; the `surface-width` tokens are width-oriented and
++	   don't exactly match this value. */
++	min-height: 220px;
+ 	height: 100%;
+ }

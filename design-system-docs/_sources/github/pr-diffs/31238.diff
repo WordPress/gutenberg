@@ -1,0 +1,475 @@
+diff --git a/packages/components/src/ui/card/test/__snapshots__/index.js.snap b/packages/components/src/ui/card/test/__snapshots__/index.js.snap
+index 190794eacaf0bd..294f65732019a9 100644
+--- a/packages/components/src/ui/card/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/card/test/__snapshots__/index.js.snap
+@@ -25,6 +25,9 @@ Snapshot Diff:
+ 
+ exports[`props should render correctly 1`] = `
+ .emotion-17 {
++  background-color: #fff;
++  color: #000;
++  position: relative;
+   box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+   outline: none;
+   border-radius: 2px;
+@@ -201,18 +204,8 @@ exports[`props should render correctly 1`] = `
+   border-radius: 2px;
+ }
+ 
+-.emotion-18.emotion-18.emotion-18.emotion-18.emotion-18.emotion-18.emotion-18 {
+-  background-color: #ffffff;
+-  background-color: var(--wp-g2-surface-color);
+-  color: #1e1e1e;
+-  color: var(--wp-g2-color-text);
+-  position: relative;
+-  --wp-g2-surface-background-size: 12px;
+-  --wp-g2-surface-background-size-dotted: 11px;
+-}
+-
+ <div
+-  class="components-surface components-card emotion-17 emotion-18 emotion-1 emotion-2"
++  class="components-surface components-card emotion-17 emotion-1 emotion-2"
+   data-wp-c16t="true"
+   data-wp-component="Card"
+ >
+diff --git a/packages/components/src/ui/popover/test/__snapshots__/index.js.snap b/packages/components/src/ui/popover/test/__snapshots__/index.js.snap
+index 89d5bf7a0460a8..298e64b10f00bf 100644
+--- a/packages/components/src/ui/popover/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/popover/test/__snapshots__/index.js.snap
+@@ -1,17 +1,10 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12 {
+-  background-color: #ffffff;
+-  background-color: var(--wp-g2-surface-color);
+-  color: #1e1e1e;
+-  color: var(--wp-g2-color-text);
+-  position: relative;
+-  --wp-g2-surface-background-size: 12px;
+-  --wp-g2-surface-background-size-dotted: 11px;
+-}
+-
+ .emotion-11 {
++  background-color: #fff;
++  color: #000;
++  position: relative;
+   box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+   outline: none;
+   border-radius: 2px;
+@@ -106,7 +99,7 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ <div
+-  class="components-surface components-card emotion-11 emotion-12 emotion-1 emotion-2"
++  class="components-surface components-card emotion-11 emotion-1 emotion-2"
+   data-wp-c16t="true"
+   data-wp-component="Card"
+ >
+@@ -162,7 +155,7 @@ Snapshot Diff:
+     tabindex="-1"
+   >
+     <div
+-      class="components-surface components-card css-hy95ag-Card-rounded-cardStyle css-10jei3p css-1mm2cvy-View egi4jkx0"
++      class="components-surface components-card css-12tfxmr-Surface-primary-Card-rounded-cardStyle css-1mm2cvy-View egi4jkx0"
+ `;
+ 
+ exports[`props should render without content 1`] = `
+@@ -184,7 +177,7 @@ Snapshot Diff:
+     tabindex="-1"
+   >
+     <div
+-      class="components-surface components-card css-hy95ag-Card-rounded-cardStyle css-10jei3p css-1mm2cvy-View egi4jkx0"
++      class="components-surface components-card css-12tfxmr-Surface-primary-Card-rounded-cardStyle css-1mm2cvy-View egi4jkx0"
+ @@ -21,10 +21,17 @@
+           frameborder="0"
+           src="about:blank"
+diff --git a/packages/components/src/ui/surface/hook.js b/packages/components/src/ui/surface/hook.js
+index c8e368f01bac8e..889d879a4d3f57 100644
+--- a/packages/components/src/ui/surface/hook.js
++++ b/packages/components/src/ui/surface/hook.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css, cx, ui } from '@wp-g2/styles';
++import { cx } from 'emotion';
+ 
+ /**
+  * WordPress dependencies
+@@ -44,15 +44,11 @@ export function useSurface( props ) {
+ 		return cx(
+ 			styles.Surface,
+ 			sx.borders,
+-			styles[ variant ],
+-			css( {
+-				[ ui.createToken( 'surfaceBackgroundSize' ) ]: ui.value.px(
+-					backgroundSize
+-				),
+-				[ ui.createToken(
+-					'surfaceBackgroundSizeDotted'
+-				) ]: ui.value.px( backgroundSize - 1 ),
+-			} ),
++			styles.getVariant(
++				variant,
++				`${ backgroundSize }px`,
++				`${ backgroundSize - 1 }px`
++			),
+ 			className
+ 		);
+ 	}, [
+diff --git a/packages/components/src/ui/surface/stories/index.js b/packages/components/src/ui/surface/stories/index.js
+index 3711f7e456e12f..cac136319bb58e 100644
+--- a/packages/components/src/ui/surface/stories/index.js
++++ b/packages/components/src/ui/surface/stories/index.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import { boolean, number, select } from '@storybook/addon-knobs';
+-import { ThemeProvider } from '@wp-g2/styles';
+ 
+ /**
+  * Internal dependencies
+@@ -24,8 +23,6 @@ const variantOptions = {
+ };
+ 
+ export const _default = () => {
+-	const darkMode = boolean( 'Dark mode', false );
+-
+ 	const props = {
+ 		backgroundSize: number( 'backgroundSize', 12 ),
+ 		border: boolean( 'border', false ),
+@@ -37,13 +34,11 @@ export const _default = () => {
+ 	};
+ 
+ 	return (
+-		<ThemeProvider isDark={ darkMode }>
+-			<Surface
+-				{ ...props }
+-				css={ { padding: 20, maxWidth: 400, margin: '20vh auto' } }
+-			>
+-				<Text>Surface</Text>
+-			</Surface>
+-		</ThemeProvider>
++		<Surface
++			{ ...props }
++			style={ { padding: 20, maxWidth: 400, margin: '20vh auto' } }
++		>
++			<Text>Surface</Text>
++		</Surface>
+ 	);
+ };
+diff --git a/packages/components/src/ui/surface/styles.js b/packages/components/src/ui/surface/styles.js
+index c49f5dd2b78297..3ab046562b5b81 100644
+--- a/packages/components/src/ui/surface/styles.js
++++ b/packages/components/src/ui/surface/styles.js
+@@ -1,16 +1,22 @@
+ /**
+  * External dependencies
+  */
+-import { css, ui } from '@wp-g2/styles';
++import { css } from 'emotion';
++
++/**
++ * Internal dependencies
++ */
++import CONFIG from '../../utils/config-values';
++import { COLORS } from '../../utils/colors-values';
+ 
+ export const Surface = css`
+-	background-color: ${ ui.get( 'surfaceColor' ) };
+-	color: ${ ui.color.text };
++	background-color: ${ CONFIG.surfaceColor };
++	color: ${ COLORS.black };
+ 	position: relative;
+ `;
+ 
+ export const background = css`
+-	background-color: ${ ui.get( 'surfaceBackgroundColor' ) };
++	background-color: ${ CONFIG.surfaceBackgroundColor };
+ `;
+ 
+ /**
+@@ -28,7 +34,7 @@ export function getBorders( {
+ 	borderRight,
+ 	borderTop,
+ } ) {
+-	const borderStyle = `1px solid ${ ui.get( 'surfaceBorderColor' ) }`;
++	const borderStyle = `1px solid ${ CONFIG.surfaceBorderColor }`;
+ 
+ 	return css( {
+ 		border: border ? borderStyle : undefined,
+@@ -42,54 +48,77 @@ export function getBorders( {
+ export const primary = css``;
+ 
+ export const secondary = css`
+-	background: ${ ui.get( 'surfaceBackgroundTintColor' ) };
++	background: ${ CONFIG.surfaceBackgroundTintColor };
+ `;
+ 
+ export const tertiary = css`
+-	background: ${ ui.get( 'surfaceBackgroundTertiaryColor' ) };
++	background: ${ CONFIG.surfaceBackgroundTertiaryColor };
+ `;
+ 
+-const customBackgroundSize = [
+-	ui.get( 'surfaceBackgroundSize' ),
+-	ui.get( 'surfaceBackgroundSize' ),
+-].join( ' ' );
++/**
++ * @param {string} surfaceBackgroundSize
++ */
++const customBackgroundSize = ( surfaceBackgroundSize ) =>
++	[ surfaceBackgroundSize, surfaceBackgroundSize ].join( ' ' );
+ 
+-const dottedBackground1 = [
+-	'90deg',
++/**
++ * @param {string} surfaceBackgroundSizeDotted
++ */
++const dottedBackground1 = ( surfaceBackgroundSizeDotted ) =>
+ 	[
+-		ui.get( 'surfaceBackgroundColor' ),
+-		ui.get( 'surfaceBackgroundSizeDotted' ),
+-	].join( ' ' ),
+-	'transparent 1%',
+-].join( ',' );
++		'90deg',
++		[ CONFIG.surfaceBackgroundColor, surfaceBackgroundSizeDotted ].join(
++			' '
++		),
++		'transparent 1%',
++	].join( ',' );
+ 
+-const dottedBackground2 = [
++/**
++ * @param {string} surfaceBackgroundSizeDotted
++ */
++const dottedBackground2 = ( surfaceBackgroundSizeDotted ) =>
+ 	[
+-		ui.get( 'surfaceBackgroundColor' ),
+-		ui.get( 'surfaceBackgroundSizeDotted' ),
+-	].join( ' ' ),
+-	'transparent 1%',
+-].join( ',' );
++		[ CONFIG.surfaceBackgroundColor, surfaceBackgroundSizeDotted ].join(
++			' '
++		),
++		'transparent 1%',
++	].join( ',' );
+ 
+-const dottedBackgroundCombined = [
+-	`linear-gradient( ${ dottedBackground1 } ) center`,
+-	`linear-gradient( ${ dottedBackground2 } ) center`,
+-	ui.get( 'surfaceBorderBoldColor' ),
+-].join( ',' );
++/**
++ * @param {string} surfaceBackgroundSizeDotted
++ */
++const dottedBackgroundCombined = ( surfaceBackgroundSizeDotted ) =>
++	[
++		`linear-gradient( ${ dottedBackground1(
++			surfaceBackgroundSizeDotted
++		) } ) center`,
++		`linear-gradient( ${ dottedBackground2(
++			surfaceBackgroundSizeDotted
++		) } ) center`,
++		CONFIG.surfaceBorderBoldColor,
++	].join( ',' );
+ 
+-export const dotted = css`
+-	background: ${ dottedBackgroundCombined };
+-	background-size: ${ customBackgroundSize };
++/**
++ *
++ * @param {string} surfaceBackgroundSize
++ * @param {string} surfaceBackgroundSizeDotted
++ */
++export const getDotted = (
++	surfaceBackgroundSize,
++	surfaceBackgroundSizeDotted
++) => css`
++	background: ${ dottedBackgroundCombined( surfaceBackgroundSizeDotted ) };
++	background-size: ${ customBackgroundSize( surfaceBackgroundSize ) };
+ `;
+ 
+ const gridBackground1 = [
+-	`${ ui.get( 'surfaceBorderSubtleColor' ) } 1px`,
++	`${ CONFIG.surfaceBorderSubtleColor } 1px`,
+ 	'transparent 1px',
+ ].join( ',' );
+ 
+ const gridBackground2 = [
+ 	'90deg',
+-	`${ ui.get( 'surfaceBorderSubtleColor' ) } 1px`,
++	`${ CONFIG.surfaceBorderSubtleColor } 1px`,
+ 	'transparent 1px',
+ ].join( ',' );
+ 
+@@ -98,8 +127,46 @@ const gridBackgroundCombined = [
+ 	`linear-gradient( ${ gridBackground2 } )`,
+ ].join( ',' );
+ 
+-export const grid = css`
+-	background: ${ ui.get( 'surfaceBackgroundColor' ) };
+-	background-image: ${ gridBackgroundCombined };
+-	background-size: ${ customBackgroundSize };
+-`;
++/**
++ * @param {string} surfaceBackgroundSize
++ * @return {string} CSS.
++ */
++export const getGrid = ( surfaceBackgroundSize ) => {
++	return css`
++		background: ${ CONFIG.surfaceBackgroundColor };
++		background-image: ${ gridBackgroundCombined };
++		background-size: ${ customBackgroundSize( surfaceBackgroundSize ) };
++	`;
++};
++
++/**
++ * @param {'dotted' | 'grid' | 'primary' | 'secondary' | 'tertiary'} variant
++ * @param {string} surfaceBackgroundSize
++ * @param {string} surfaceBackgroundSizeDotted
++ */
++export const getVariant = (
++	variant,
++	surfaceBackgroundSize,
++	surfaceBackgroundSizeDotted
++) => {
++	switch ( variant ) {
++		case 'dotted': {
++			return getDotted(
++				surfaceBackgroundSize,
++				surfaceBackgroundSizeDotted
++			);
++		}
++		case 'grid': {
++			return getGrid( surfaceBackgroundSize );
++		}
++		case 'primary': {
++			return primary;
++		}
++		case 'secondary': {
++			return secondary;
++		}
++		case 'tertiary': {
++			return tertiary;
++		}
++	}
++};
+diff --git a/packages/components/src/ui/surface/test/__snapshots__/index.js.snap b/packages/components/src/ui/surface/test/__snapshots__/index.js.snap
+index b2e1ca6dae0e39..e7511500f11d89 100644
+--- a/packages/components/src/ui/surface/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/surface/test/__snapshots__/index.js.snap
+@@ -6,8 +6,8 @@ Snapshot Diff:
+ + Second value
+ 
+   <div
+--   class="components-surface css-w8sz4c css-1mm2cvy-View egi4jkx0"
+-+   class="components-surface css-10jei3p css-1mm2cvy-View egi4jkx0"
++-   class="components-surface css-1xmxoxz-Surface-primary css-1mm2cvy-View egi4jkx0"
+++   class="components-surface css-asbdls-Surface-primary css-1mm2cvy-View egi4jkx0"
+     data-wp-c16t="true"
+     data-wp-component="Surface"
+   >
+@@ -21,8 +21,8 @@ Snapshot Diff:
+ + Second value
+ 
+   <div
+--   class="components-surface css-1rsk61w css-1mm2cvy-View egi4jkx0"
+-+   class="components-surface css-10jei3p css-1mm2cvy-View egi4jkx0"
++-   class="components-surface css-ttbcem-Surface-primary css-1mm2cvy-View egi4jkx0"
+++   class="components-surface css-asbdls-Surface-primary css-1mm2cvy-View egi4jkx0"
+     data-wp-c16t="true"
+     data-wp-component="Surface"
+   >
+@@ -36,8 +36,8 @@ Snapshot Diff:
+ + Second value
+ 
+   <div
+--   class="components-surface css-1k4iwhs css-1mm2cvy-View egi4jkx0"
+-+   class="components-surface css-10jei3p css-1mm2cvy-View egi4jkx0"
++-   class="components-surface css-xn6qe9-Surface-primary css-1mm2cvy-View egi4jkx0"
+++   class="components-surface css-asbdls-Surface-primary css-1mm2cvy-View egi4jkx0"
+     data-wp-c16t="true"
+     data-wp-component="Surface"
+   >
+@@ -51,8 +51,8 @@ Snapshot Diff:
+ + Second value
+ 
+   <div
+--   class="components-surface css-l7n8r9 css-1mm2cvy-View egi4jkx0"
+-+   class="components-surface css-10jei3p css-1mm2cvy-View egi4jkx0"
++-   class="components-surface css-1ql02am-Surface-primary css-1mm2cvy-View egi4jkx0"
+++   class="components-surface css-asbdls-Surface-primary css-1mm2cvy-View egi4jkx0"
+     data-wp-c16t="true"
+     data-wp-component="Surface"
+   >
+@@ -66,8 +66,8 @@ Snapshot Diff:
+ + Second value
+ 
+   <div
+--   class="components-surface css-1dxo3zh css-1mm2cvy-View egi4jkx0"
+-+   class="components-surface css-10jei3p css-1mm2cvy-View egi4jkx0"
++-   class="components-surface css-1fc5hvl-Surface-primary css-1mm2cvy-View egi4jkx0"
+++   class="components-surface css-asbdls-Surface-primary css-1mm2cvy-View egi4jkx0"
+     data-wp-c16t="true"
+     data-wp-component="Surface"
+   >
+@@ -76,14 +76,10 @@ Snapshot Diff:
+ `;
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+-  background-color: #ffffff;
+-  background-color: var(--wp-g2-surface-color);
+-  color: #1e1e1e;
+-  color: var(--wp-g2-color-text);
++.emotion-0 {
++  background-color: #fff;
++  color: #000;
+   position: relative;
+-  --wp-g2-surface-background-size: 12px;
+-  --wp-g2-surface-background-size-dotted: 11px;
+ }
+ 
+ <div
+@@ -101,8 +97,8 @@ Snapshot Diff:
+ + Second value
+ 
+   <div
+--   class="components-surface css-1dajkma css-1mm2cvy-View egi4jkx0"
+-+   class="components-surface css-10jei3p css-1mm2cvy-View egi4jkx0"
++-   class="components-surface css-1h2jxd6-Surface-secondary css-1mm2cvy-View egi4jkx0"
+++   class="components-surface css-asbdls-Surface-primary css-1mm2cvy-View egi4jkx0"
+     data-wp-c16t="true"
+     data-wp-component="Surface"
+   >
+diff --git a/packages/components/src/utils/config-values.js b/packages/components/src/utils/config-values.js
+index d969e7d603820c..9275354b8987e3 100644
+--- a/packages/components/src/utils/config-values.js
++++ b/packages/components/src/utils/config-values.js
+@@ -2,6 +2,7 @@
+  * Internal dependencies
+  */
+ import { space } from '../ui/utils/space';
++import { COLORS } from './colors-values';
+ 
+ const CONTROL_HEIGHT = '30px';
+ const CARD_PADDING_X = space( 3 );
+@@ -43,7 +44,14 @@ export default {
+ 	cardPadding: `${ CARD_PADDING_X } ${ CARD_PADDING_Y }`,
+ 	cardHeaderFooterPaddingY: space( 1 ),
+ 	cardHeaderHeight: '44px',
++	surfaceBackgroundColor: COLORS.white,
++	surfaceBackgroundSubtleColor: '#F3F3F3',
++	surfaceBackgroundTintColor: '#F5F5F5',
+ 	surfaceBorderColor: 'rgba(0, 0, 0, 0.1)',
++	surfaceBorderBoldColor: 'rgba(0, 0, 0, 0.15)',
++	surfaceBorderSubtleColor: 'rgba(0, 0, 0, 0.05)',
++	surfaceBackgroundTertiaryColor: COLORS.white,
++	surfaceColor: COLORS.white,
+ 	transitionDuration: '200ms',
+ 	transitionDurationFast: '160ms',
+ 	transitionDurationFaster: '120ms',

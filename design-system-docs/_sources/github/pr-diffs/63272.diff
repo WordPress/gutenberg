@@ -1,0 +1,38 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 01218a30c36e04..09d02bd95f0e36 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -21,6 +21,7 @@
+ -   `UnitControl`: Fix an issue where keyboard shortcuts unintentionally shift focus on Windows OS. ([#62988](https://github.com/WordPress/gutenberg/pull/62988))
+ -   Fix inaccessibly disabled `Button`s ([#62306](https://github.com/WordPress/gutenberg/pull/62306)).
+ -   `TimePicker`: Fix time zone overflow ([#63209](https://github.com/WordPress/gutenberg/pull/63209)).
++-   `Tabs`: Fix text-align when text wraps in vertical mode ([#63272](https://github.com/WordPress/gutenberg/pull/63272)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/tabs/styles.ts b/packages/components/src/tabs/styles.ts
+index bd33476a2ccd2a..ecc07b029e4bbe 100644
+--- a/packages/components/src/tabs/styles.ts
++++ b/packages/components/src/tabs/styles.ts
+@@ -15,9 +15,13 @@ export const TabListWrapper = styled.div`
+ 	display: flex;
+ 	align-items: stretch;
+ 	flex-direction: row;
++	text-align: center;
++
+ 	&[aria-orientation='vertical'] {
+ 		flex-direction: column;
++		text-align: start;
+ 	}
++
+ 	@media not ( prefers-reduced-motion: reduce ) {
+ 		&.is-animation-enabled::after {
+ 			transition-property: left, top, width, height;
+@@ -66,6 +70,7 @@ export const Tab = styled( Ariakit.Tab )`
+ 		padding: 3px ${ space( 4 ) }; // Use padding to offset the [aria-selected="true"] border, this benefits Windows High Contrast mode
+ 		margin-left: 0;
+ 		font-weight: 500;
++		text-align: inherit;
+ 
+ 		&[aria-disabled='true'] {
+ 			cursor: default;

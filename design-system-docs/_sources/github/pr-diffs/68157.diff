@@ -1,0 +1,37 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index db8b0f749217f4..e73d95eebae4bf 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancements
+ 
+ -   `BoxControl`: Add presets support ([#67688](https://github.com/WordPress/gutenberg/pull/67688)).
++-   `Navigation`: Upsize back buttons ([#68157](https://github.com/WordPress/gutenberg/pull/68157)).
+ 
+ ### Deprecations
+ 
+diff --git a/packages/components/src/navigation/back-button/index.tsx b/packages/components/src/navigation/back-button/index.tsx
+index 077e5a8dbdc6d4..ce4a90d9ae7a51 100644
+--- a/packages/components/src/navigation/back-button/index.tsx
++++ b/packages/components/src/navigation/back-button/index.tsx
+@@ -49,6 +49,7 @@ function UnforwardedNavigationBackButton(
+ 	const icon = isRTL() ? chevronRight : chevronLeft;
+ 	return (
+ 		<MenuBackButtonUI
++			__next40pxDefaultSize
+ 			className={ classes }
+ 			href={ href }
+ 			variant="tertiary"
+diff --git a/packages/components/src/navigation/item/index.tsx b/packages/components/src/navigation/item/index.tsx
+index 4f4cc2a5dc7a22..160ed36ac63680 100644
+--- a/packages/components/src/navigation/item/index.tsx
++++ b/packages/components/src/navigation/item/index.tsx
+@@ -79,6 +79,8 @@ export function NavigationItem( props: NavigationItemProps ) {
+ 		? restProps
+ 		: {
+ 				as: Button,
++				__next40pxDefaultSize:
++					'as' in restProps ? restProps.as === undefined : true,
+ 				href,
+ 				onClick: onItemClick,
+ 				'aria-current': isActive ? 'page' : undefined,

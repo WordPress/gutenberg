@@ -1,0 +1,29 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index be5608c72fc06d..fee3c9b8bf44a7 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   Make the `Popover.Slot` optional and render popovers at the bottom of the document's body by default. ([#53889](https://github.com/WordPress/gutenberg/pull/53889), [#53982](https://github.com/WordPress/gutenberg/pull/53982)).
+ 
++### Bug Fix
++
++-   `PaletteEdit`: Fix padding in RTL languages ([#54034](https://github.com/WordPress/gutenberg/pull/54034)).
++
+ ## 25.7.0 (2023-08-31)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/palette-edit/styles.js b/packages/components/src/palette-edit/styles.js
+index 72e6bff97e4a29..0c72493f465647 100644
+--- a/packages/components/src/palette-edit/styles.js
++++ b/packages/components/src/palette-edit/styles.js
+@@ -41,7 +41,8 @@ export const NameInputControl = styled( InputControl )`
+ `;
+ 
+ export const PaletteItem = styled( View )`
+-	padding: 3px 0 3px ${ space( 3 ) };
++	padding-block: 3px;
++	padding-inline-start: ${ space( 3 ) };
+ 	border: 1px solid ${ CONFIG.surfaceBorderColor };
+ 	border-bottom-color: transparent;
+ 	&:first-of-type {

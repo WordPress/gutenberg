@@ -1,0 +1,69 @@
+diff --git a/packages/components/src/snackbar/style.scss b/packages/components/src/snackbar/style.scss
+index d6613d013aba00..9ac246a36d75e1 100644
+--- a/packages/components/src/snackbar/style.scss
++++ b/packages/components/src/snackbar/style.scss
+@@ -1,16 +1,18 @@
+ .components-snackbar {
+ 	font-family: $default-font;
+-	font-size: $default-font-size;
++	font-size: $default-font-size * 1.6;
+ 	background: rgba($black, 0.85); // Emulates #1e1e1e closely.
+ 	backdrop-filter: blur($grid-unit-20) saturate(180%);
+ 	border-radius: $radius-medium;
+ 	box-shadow: $elevation-small;
+ 	color: $white;
+-	padding: $grid-unit-15 ($grid-unit-05 * 5);
++	padding: $grid-unit-15 ($grid-unit-05 * 6);
+ 	width: 100%;
+-	max-width: 600px;
++	max-width: 700px;
+ 	box-sizing: border-box;
+ 	cursor: pointer;
++	border-left: 3px solid #28a745;
++	padding-left: $grid-unit-30;
+ 
+ 	// Re-enable pointer events, which are disabled by the
+ 	// .components-snackbar-list styles.
+@@ -45,6 +47,11 @@
+ 	}
+ }
+ 
++.components-snackbar.is-success {
++	border-left: 2.5px solid #28a745;
++	padding-left: $grid-unit-30; // Optional: increase left padding so text doesn’t get too close
++}
++
+ .components-snackbar__action.components-button,
+ .components-snackbar__action.components-external-link {
+ 	margin-left: $grid-unit-40;
+diff --git a/packages/editor/src/components/post-publish-panel/postpublish.js b/packages/editor/src/components/post-publish-panel/postpublish.js
+index f3fd60417eb195..65b5ae078ebf51 100644
+--- a/packages/editor/src/components/post-publish-panel/postpublish.js
++++ b/packages/editor/src/components/post-publish-panel/postpublish.js
+@@ -123,7 +123,7 @@ export default function PostPublishPanelPostpublish( {
+ 	);
+ 
+ 	return (
+-		<div className="post-publish-panel__postpublish">
++		<div className="post-publish-panel__postpublish is-success">
+ 			<PanelBody className="post-publish-panel__postpublish-header">
+ 				<ExternalLink ref={ postLinkRef } href={ link }>
+ 					{ decodeEntities( post.title ) || __( '(no title)' ) }
+diff --git a/packages/editor/src/components/post-publish-panel/style.scss b/packages/editor/src/components/post-publish-panel/style.scss
+index ec6fbd01cb8520..4d6027fd9df7bb 100644
+--- a/packages/editor/src/components/post-publish-panel/style.scss
++++ b/packages/editor/src/components/post-publish-panel/style.scss
+@@ -132,6 +132,13 @@
+ 	word-break: break-word;
+ }
+ 
++.post-publish-panel__postpublish.is-success {
++	border-left: 2.5px;
++	border-style: solid;
++	border-color: #28a745;
++	padding-left: 12px;
++}
++
+ .post-publish-panel__postpublish-buttons {
+ 	display: flex;
+ 	align-content: space-between;

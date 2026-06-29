@@ -1,0 +1,175 @@
+diff --git a/package-lock.json b/package-lock.json
+index a40aa8aab49340..b37b6659d1bfa7 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -26631,11 +26631,6 @@
+ 			"integrity": "sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==",
+ 			"dev": true
+ 		},
+-		"node_modules/fast-memoize": {
+-			"version": "2.5.2",
+-			"resolved": "https://registry.npmjs.org/fast-memoize/-/fast-memoize-2.5.2.tgz",
+-			"integrity": "sha512-Ue0LwpDYErFbmNnZSF0UH6eImUwDmogUO1jyE+JbN2gsQz/jICm1Ve7t9QT0rNSsfJt+Hs4/S3GnsDVjL4HVrw=="
+-		},
+ 		"node_modules/fast-uri": {
+ 			"version": "3.0.1",
+ 			"resolved": "https://registry.npmjs.org/fast-uri/-/fast-uri-3.0.1.tgz",
+@@ -43034,18 +43029,6 @@
+ 				"node": ">=0.10.0"
+ 			}
+ 		},
+-		"node_modules/re-resizable": {
+-			"version": "6.9.0",
+-			"resolved": "https://registry.npmjs.org/re-resizable/-/re-resizable-6.9.0.tgz",
+-			"integrity": "sha512-3cUDG81ylyqI0Pdgle/RHwwRYq0ORZzsUaySOCO8IbEtNyaRtrIHYm/jMQ5pjcNiKCxR3vsSymIQZHwJq4gg2Q==",
+-			"dependencies": {
+-				"fast-memoize": "^2.5.1"
+-			},
+-			"peerDependencies": {
+-				"react": "^16.13.1 || ^17.0.0",
+-				"react-dom": "^16.13.1 || ^17.0.0"
+-			}
+-		},
+ 		"node_modules/react": {
+ 			"version": "18.3.1",
+ 			"resolved": "https://registry.npmjs.org/react/-/react-18.3.1.tgz",
+@@ -53214,7 +53197,7 @@
+ 				"is-plain-object": "^5.0.0",
+ 				"memize": "^2.1.0",
+ 				"path-to-regexp": "^6.2.1",
+-				"re-resizable": "^6.4.0",
++				"re-resizable": "^6.10.0",
+ 				"react-colorful": "^5.3.1",
+ 				"remove-accents": "^0.5.0",
+ 				"uuid": "^9.0.1"
+@@ -53280,6 +53263,16 @@
+ 			"resolved": "https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-6.2.2.tgz",
+ 			"integrity": "sha512-GQX3SSMokngb36+whdpRXE+3f9V8UzyAorlYvOGx87ufGHehNTn5lCxrKtLyZ4Yl/wEKnNnr98ZzOwwDZV5ogw=="
+ 		},
++		"packages/components/node_modules/re-resizable": {
++			"version": "6.10.0",
++			"resolved": "https://registry.npmjs.org/re-resizable/-/re-resizable-6.10.0.tgz",
++			"integrity": "sha512-hysSK0xmA5nz24HBVztlk4yCqCLCvS32E6ZpWxVKop9x3tqCa4yAj1++facrmkOf62JsJHjmjABdKxXofYioCw==",
++			"license": "MIT",
++			"peerDependencies": {
++				"react": "^16.13.1 || ^17.0.0 || ^18.0.0",
++				"react-dom": "^16.13.1 || ^17.0.0 || ^18.0.0"
++			}
++		},
+ 		"packages/components/node_modules/uuid": {
+ 			"version": "8.3.2",
+ 			"resolved": "https://registry.npmjs.org/uuid/-/uuid-8.3.2.tgz",
+@@ -68273,7 +68266,7 @@
+ 				"is-plain-object": "^5.0.0",
+ 				"memize": "^2.1.0",
+ 				"path-to-regexp": "^6.2.1",
+-				"re-resizable": "^6.4.0",
++				"re-resizable": "^6.10.0",
+ 				"react-colorful": "^5.3.1",
+ 				"remove-accents": "^0.5.0",
+ 				"uuid": "^9.0.1"
+@@ -68314,6 +68307,11 @@
+ 					"resolved": "https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-6.2.2.tgz",
+ 					"integrity": "sha512-GQX3SSMokngb36+whdpRXE+3f9V8UzyAorlYvOGx87ufGHehNTn5lCxrKtLyZ4Yl/wEKnNnr98ZzOwwDZV5ogw=="
+ 				},
++				"re-resizable": {
++					"version": "6.10.0",
++					"resolved": "https://registry.npmjs.org/re-resizable/-/re-resizable-6.10.0.tgz",
++					"integrity": "sha512-hysSK0xmA5nz24HBVztlk4yCqCLCvS32E6ZpWxVKop9x3tqCa4yAj1++facrmkOf62JsJHjmjABdKxXofYioCw=="
++				},
+ 				"uuid": {
+ 					"version": "https://registry.npmjs.org/uuid/-/uuid-8.3.2.tgz",
+ 					"integrity": "sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg=="
+@@ -77094,11 +77092,6 @@
+ 			"integrity": "sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==",
+ 			"dev": true
+ 		},
+-		"fast-memoize": {
+-			"version": "2.5.2",
+-			"resolved": "https://registry.npmjs.org/fast-memoize/-/fast-memoize-2.5.2.tgz",
+-			"integrity": "sha512-Ue0LwpDYErFbmNnZSF0UH6eImUwDmogUO1jyE+JbN2gsQz/jICm1Ve7t9QT0rNSsfJt+Hs4/S3GnsDVjL4HVrw=="
+-		},
+ 		"fast-uri": {
+ 			"version": "3.0.1",
+ 			"resolved": "https://registry.npmjs.org/fast-uri/-/fast-uri-3.0.1.tgz",
+@@ -89447,14 +89440,6 @@
+ 				}
+ 			}
+ 		},
+-		"re-resizable": {
+-			"version": "6.9.0",
+-			"resolved": "https://registry.npmjs.org/re-resizable/-/re-resizable-6.9.0.tgz",
+-			"integrity": "sha512-3cUDG81ylyqI0Pdgle/RHwwRYq0ORZzsUaySOCO8IbEtNyaRtrIHYm/jMQ5pjcNiKCxR3vsSymIQZHwJq4gg2Q==",
+-			"requires": {
+-				"fast-memoize": "^2.5.1"
+-			}
+-		},
+ 		"react": {
+ 			"version": "18.3.1",
+ 			"resolved": "https://registry.npmjs.org/react/-/react-18.3.1.tgz",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 71aa08d6934034..d23524587ed0e9 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,10 @@
+ 
+ -   `MenuGroup`: Simplify the MenuGroup styles within dropdown menus. ([#65561](https://github.com/WordPress/gutenberg/pull/65561)).
+ 
++### Internal
++
++-   Update `re-resizable` dependency to 6.10.0 ([#65637](https://github.com/WordPress/gutenberg/pull/65637)).
++
+ ## 28.8.0 (2024-09-19)
+ 
+ ### Bug Fixes
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 98eb4c5de0430d..4ad114dca728b0 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -72,7 +72,7 @@
+ 		"is-plain-object": "^5.0.0",
+ 		"memize": "^2.1.0",
+ 		"path-to-regexp": "^6.2.1",
+-		"re-resizable": "^6.4.0",
++		"re-resizable": "^6.10.0",
+ 		"react-colorful": "^5.3.1",
+ 		"remove-accents": "^0.5.0",
+ 		"uuid": "^9.0.1"
+diff --git a/packages/components/src/resizable-box/index.tsx b/packages/components/src/resizable-box/index.tsx
+index 1b05270ea0bf20..a0ba1d97f0dd54 100644
+--- a/packages/components/src/resizable-box/index.tsx
++++ b/packages/components/src/resizable-box/index.tsx
+@@ -87,6 +87,17 @@ const HANDLE_STYLES = {
+ 	bottomLeft: HANDLE_STYLES_OVERRIDES,
+ };
+ 
++const DEFAULT_ENABLE = {
++	top: false,
++	right: false,
++	bottom: false,
++	left: false,
++	topRight: false,
++	bottomRight: false,
++	bottomLeft: false,
++	topLeft: false,
++};
++
+ type ResizableBoxProps = ResizableProps & {
+ 	children: ReactNode;
+ 	showHandle?: boolean;
+@@ -101,6 +112,7 @@ function UnforwardedResizableBox(
+ 		showHandle = true,
+ 		__experimentalShowTooltip: showTooltip = false,
+ 		__experimentalTooltipProps: tooltipProps = {},
++		enable,
+ 		...props
+ 	}: ResizableBoxProps,
+ 	ref: ForwardedRef< Resizable >
+@@ -115,6 +127,7 @@ function UnforwardedResizableBox(
+ 			handleClasses={ HANDLE_CLASSES }
+ 			handleStyles={ HANDLE_STYLES }
+ 			ref={ ref }
++			enable={ { ...DEFAULT_ENABLE, ...enable } }
+ 			{ ...props }
+ 		>
+ 			{ children }

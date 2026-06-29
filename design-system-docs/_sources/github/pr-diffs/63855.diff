@@ -1,0 +1,60 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f6ac03e45d8138..aa11a7c90e2632 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ 
+ -   `ComboboxControl`: Fix ComboboxControl reset button when using the keyboard. ([#63410](https://github.com/WordPress/gutenberg/pull/63410))
+ -   `Button`: Never apply `aria-disabled` to anchor ([#63376](https://github.com/WordPress/gutenberg/pull/63376)).
++-   `SelectControl`: Fix hover/focus color in wp-admin ([#63855](https://github.com/WordPress/gutenberg/pull/63855)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+index 1d3cd12a2aa316..5990fbbd4a3f5f 100644
+--- a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
++++ b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+@@ -120,6 +120,7 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+   box-sizing: border-box;
+   border: none;
+   box-shadow: none!important;
++  color: currentColor;
+   cursor: inherit;
+   display: block;
+   font-family: inherit;
+@@ -405,6 +406,7 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
+   box-sizing: border-box;
+   border: none;
+   box-shadow: none!important;
++  color: currentColor;
+   cursor: inherit;
+   display: block;
+   font-family: inherit;
+@@ -700,6 +702,7 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`]
+   box-sizing: border-box;
+   border: none;
+   box-shadow: none!important;
++  color: currentColor;
+   cursor: inherit;
+   display: block;
+   font-family: inherit;
+@@ -1007,6 +1010,7 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
+   box-sizing: border-box;
+   border: none;
+   box-shadow: none!important;
++  color: currentColor;
+   cursor: inherit;
+   display: block;
+   font-family: inherit;
+diff --git a/packages/components/src/select-control/styles/select-control-styles.ts b/packages/components/src/select-control/styles/select-control-styles.ts
+index 989c5fa62ecff7..780334c67e85e6 100644
+--- a/packages/components/src/select-control/styles/select-control-styles.ts
++++ b/packages/components/src/select-control/styles/select-control-styles.ts
+@@ -158,6 +158,7 @@ export const Select = styled.select< SelectProps >`
+ 		box-sizing: border-box;
+ 		border: none;
+ 		box-shadow: none !important;
++		color: currentColor; // Overrides hover/focus styles in forms.css
+ 		cursor: inherit;
+ 		display: block;
+ 		font-family: inherit;

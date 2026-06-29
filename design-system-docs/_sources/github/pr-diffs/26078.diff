@@ -1,0 +1,471 @@
+diff --git a/package-lock.json b/package-lock.json
+index c29dbfc34e68ab..98658f4d034c4f 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -16969,6 +16969,12 @@
+ 				}
+ 			}
+ 		},
++		"@types/tinycolor2": {
++			"version": "1.4.2",
++			"resolved": "https://registry.npmjs.org/@types/tinycolor2/-/tinycolor2-1.4.2.tgz",
++			"integrity": "sha512-PeHg/AtdW6aaIO2a+98Xj7rWY4KC1E6yOy7AFknJQ7VXUGNrMlyxDFxJo7HqLtjQms/ZhhQX52mLVW/EX3JGOw==",
++			"dev": true
++		},
+ 		"@types/uglify-js": {
+ 			"version": "3.9.2",
+ 			"resolved": "https://registry.npmjs.org/@types/uglify-js/-/uglify-js-3.9.2.tgz",
+diff --git a/package.json b/package.json
+index d6bba0386e8f6c..8d6faa05138c9b 100644
+--- a/package.json
++++ b/package.json
+@@ -106,6 +106,7 @@
+ 		"@types/requestidlecallback": "0.3.1",
+ 		"@types/semver": "7.2.0",
+ 		"@types/sprintf-js": "1.1.2",
++		"@types/tinycolor2": "1.4.2",
+ 		"@types/uuid": "8.3.0",
+ 		"@types/webpack": "4.41.16",
+ 		"@types/webpack-sources": "0.1.7",
+diff --git a/packages/block-editor/src/components/responsive-block-control/test/__snapshots__/index.js.snap b/packages/block-editor/src/components/responsive-block-control/test/__snapshots__/index.js.snap
+index 027e4ad5973ede..5fe8cfae4ecc26 100644
+--- a/packages/block-editor/src/components/responsive-block-control/test/__snapshots__/index.js.snap
++++ b/packages/block-editor/src/components/responsive-block-control/test/__snapshots__/index.js.snap
+@@ -1,3 +1,3 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`Basic rendering should render with required props 1`] = `"<fieldset class=\\"block-editor-responsive-block-control\\"><legend class=\\"block-editor-responsive-block-control__title\\">Padding</legend><div class=\\"block-editor-responsive-block-control__inner\\"><div class=\\"components-base-control components-toggle-control block-editor-responsive-block-control__toggle css-wdf2ti-Wrapper e1puf3u0\\"><div class=\\"components-base-control__field css-11vcxb9-StyledField e1puf3u1\\"><span class=\\"components-form-toggle is-checked\\"><input class=\\"components-form-toggle__input\\" id=\\"inspector-toggle-control-0\\" type=\\"checkbox\\" aria-describedby=\\"inspector-toggle-control-0__help\\" checked=\\"\\"><span class=\\"components-form-toggle__track\\"></span><span class=\\"components-form-toggle__thumb\\"></span></span><label for=\\"inspector-toggle-control-0\\" class=\\"components-toggle-control__label\\">Use the same padding on all screensizes.</label></div><p id=\\"inspector-toggle-control-0__help\\" class=\\"components-base-control__help css-1wm1a55-StyledHelp e1puf3u3\\">Toggle between using the same value for all screen sizes or using a unique value per screen size.</p></div><div class=\\"block-editor-responsive-block-control__group\\"><div class=\\"components-base-control css-wdf2ti-Wrapper e1puf3u0\\"><div class=\\"components-base-control__field css-11vcxb9-StyledField e1puf3u1\\"><div class=\\"components-flex components-select-control e1cr7zh10 css-xnuudl-Flex-Root eboqfv50\\"><div class=\\"components-flex__item e1cr7zh14 css-d373l0-Item-LabelWrapper eboqfv51\\"><label for=\\"inspector-select-control-0\\" class=\\"components-input-control__label css-za86g6-Text-BaseLabel e1cr7zh13\\"><span aria-describedby=\\"rbc-desc-0\\">All</span><span class=\\"components-visually-hidden\\" id=\\"rbc-desc-0\\">Controls the padding property for All viewports.</span></label></div><div class=\\"components-input-control__container css-nj8rmx-Container e1cr7zh11\\"><select class=\\"components-select-control__input css-hwcz8s-Select e12x0a390\\" id=\\"inspector-select-control-0\\"><option value=\\"\\">Please select</option><option value=\\"small\\">Small</option><option value=\\"medium\\">Medium</option><option value=\\"large\\">Large</option></select><span class=\\"components-input-control__suffix css-1lym30p-Suffix e1cr7zh17\\"><div class=\\"css-s55r1c-DownArrowWrapper e12x0a391\\"><svg viewBox=\\"0 0 24 24\\" xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"18\\" height=\\"18\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M17.5 11.6L12 16l-5.5-4.4.9-1.2L12 14l4.5-3.6 1 1.2z\\"></path></svg></div></span><div aria-hidden=\\"true\\" class=\\"components-input-control__backdrop css-1s1n1to-BackdropUI e1cr7zh15\\"></div></div></div></div></div><p id=\\"all\\">All is used here for testing purposes to ensure we have access to details about the device.</p></div></div></fieldset>"`;
++exports[`Basic rendering should render with required props 1`] = `"<fieldset class=\\"block-editor-responsive-block-control\\"><legend class=\\"block-editor-responsive-block-control__title\\">Padding</legend><div class=\\"block-editor-responsive-block-control__inner\\"><div class=\\"components-base-control components-toggle-control block-editor-responsive-block-control__toggle css-wdf2ti-Wrapper e1puf3u0\\"><div class=\\"components-base-control__field css-11vcxb9-StyledField e1puf3u1\\"><span class=\\"components-form-toggle is-checked\\"><input class=\\"components-form-toggle__input\\" id=\\"inspector-toggle-control-0\\" type=\\"checkbox\\" aria-describedby=\\"inspector-toggle-control-0__help\\" checked=\\"\\"><span class=\\"components-form-toggle__track\\"></span><span class=\\"components-form-toggle__thumb\\"></span></span><label for=\\"inspector-toggle-control-0\\" class=\\"components-toggle-control__label\\">Use the same padding on all screensizes.</label></div><p id=\\"inspector-toggle-control-0__help\\" class=\\"components-base-control__help css-1wm1a55-StyledHelp e1puf3u3\\">Toggle between using the same value for all screen sizes or using a unique value per screen size.</p></div><div class=\\"block-editor-responsive-block-control__group\\"><div class=\\"components-base-control css-wdf2ti-Wrapper e1puf3u0\\"><div class=\\"components-base-control__field css-11vcxb9-StyledField e1puf3u1\\"><div class=\\"components-flex components-select-control e1cr7zh10 css-xnuudl-Flex-Root eboqfv50\\"><div class=\\"components-flex__item e1cr7zh14 css-d373l0-Item-LabelWrapper eboqfv51\\"><label for=\\"inspector-select-control-0\\" class=\\"components-input-control__label css-za86g6-Text-BaseLabel e1cr7zh13\\"><span aria-describedby=\\"rbc-desc-0\\">All</span><span class=\\"components-visually-hidden\\" id=\\"rbc-desc-0\\">Controls the padding property for All viewports.</span></label></div><div class=\\"components-input-control__container css-nj8rmx-Container e1cr7zh11\\"><select class=\\"components-select-control__input css-owzv2l-Select e12x0a390\\" id=\\"inspector-select-control-0\\"><option value=\\"\\">Please select</option><option value=\\"small\\">Small</option><option value=\\"medium\\">Medium</option><option value=\\"large\\">Large</option></select><span class=\\"components-input-control__suffix css-1lym30p-Suffix e1cr7zh17\\"><div class=\\"css-s55r1c-DownArrowWrapper e12x0a391\\"><svg viewBox=\\"0 0 24 24\\" xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"18\\" height=\\"18\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M17.5 11.6L12 16l-5.5-4.4.9-1.2L12 14l4.5-3.6 1 1.2z\\"></path></svg></div></span><div aria-hidden=\\"true\\" class=\\"components-input-control__backdrop css-1o1vxqx-BackdropUI e1cr7zh15\\"></div></div></div></div></div><p id=\\"all\\">All is used here for testing purposes to ensure we have access to details about the device.</p></div></div></fieldset>"`;
+diff --git a/packages/components/src/base-control/index.js b/packages/components/src/base-control/index.js
+index cf43dfe196c6f3..912a547591a405 100644
+--- a/packages/components/src/base-control/index.js
++++ b/packages/components/src/base-control/index.js
+@@ -14,6 +14,26 @@ import {
+ 	StyledHelp,
+ } from './styles/base-control-styles';
+ 
++/**
++ * @typedef Props
++ * @property {string} id The id of the element to which labels and help text are being generated.
++ *                       That element should be passed as a child.
++ * @property {import('react').ReactNode} help If this property is added, a help text will be
++ *                                            generated using help property as the content.
++ * @property {import('react').ReactNode} label If this property is added, a label will be generated
++ *                                             using label property as the content.
++ * @property {boolean} [hideLabelFromVision] If true, the label will only be visible to screen readers.
++ * @property {string} [className] The class that will be added with "components-base-control" to the
++ *                                classes of the wrapper div. If no className is passed only
++ *                                components-base-control is used.
++ * @property {import('react').ReactNode} [children] The content to be displayed within
++ *                                                  the BaseControl.
++ */
++
++/**
++ * @param {Props} props
++ * @return {JSX.Element} Element
++ */
+ function BaseControl( {
+ 	id,
+ 	label,
+@@ -64,6 +84,16 @@ function BaseControl( {
+ 	);
+ }
+ 
++/**
++ * @typedef VisualLabelProps
++ * @property {string} [className] Class name
++ * @property {import('react').ReactNode} [children] Children
++ */
++
++/**
++ * @param {VisualLabelProps} Props
++ * @return {JSX.Element} Element
++ */
+ BaseControl.VisualLabel = ( { className, children } ) => {
+ 	className = classnames( 'components-base-control__label', className );
+ 	return <span className={ className }>{ children }</span>;
+diff --git a/packages/components/src/utils/colors.js b/packages/components/src/utils/colors.js
+index 43518ce29de140..6815964f57a879 100644
+--- a/packages/components/src/utils/colors.js
++++ b/packages/components/src/utils/colors.js
+@@ -28,7 +28,7 @@ export function rgba( hexValue = '', alpha = 1 ) {
+ /**
+  * Retrieves a color from the color palette.
+  *
+- * @param {string} value The value to retrieve.
++ * @param {import('lodash').PropertyPath} value The value to retrieve.
+  * @return {string} The color (or fallback, if not found).
+  *
+  * @example
+diff --git a/packages/components/src/utils/hooks/use-controlled-state.js b/packages/components/src/utils/hooks/use-controlled-state.js
+index f07c916d7f1c23..774e5b15863c0f 100644
+--- a/packages/components/src/utils/hooks/use-controlled-state.js
++++ b/packages/components/src/utils/hooks/use-controlled-state.js
+@@ -8,6 +8,14 @@ import { useEffect, useState } from '@wordpress/element';
+  */
+ import { isValueDefined, getDefinedValue } from '../values';
+ 
++/**
++ * @template T
++ * @typedef Options
++ * @property {T | undefined} initial  Initial value
++ * @property {T | ""}        fallback Fallback value
++ */
++
++/** @type {Readonly<{ initial: undefined, fallback: '' }>} */
+ const defaultOptions = {
+ 	initial: undefined,
+ 	/**
+@@ -33,12 +41,12 @@ const defaultOptions = {
+  * Unlike the basic useState hook, useControlledState's state can
+  * be updated if a new incoming prop value is changed.
+  *
+- * @param {any} currentState The current value.
+- * @param {Object} options Additional options for the hook.
+- * @param {any} options.initial The initial state.
+- * @param {any} options.fallback The state to use when no state is defined.
++ * @template T
++ *
++ * @param {T | undefined} currentState The current value.
++ * @param {Options<T>} [options=defaultOptions] Additional options for the hook.
+  *
+- * @return {[*, Function]} The controlled value and the value setter.
++ * @return {[T | "", (nextState: T) => void]} The controlled value and the value setter.
+  */
+ function useControlledState( currentState, options = defaultOptions ) {
+ 	const { initial, fallback } = { ...defaultOptions, ...options };
+@@ -60,11 +68,14 @@ function useControlledState( currentState, options = defaultOptions ) {
+ 		fallback
+ 	);
+ 
++	/* eslint-disable jsdoc/no-undefined-types */
++	/** @type {(nextState: T) => void} */
+ 	const setState = ( nextState ) => {
+ 		if ( ! hasCurrentState ) {
+ 			setInternalState( nextState );
+ 		}
+ 	};
++	/* eslint-enable jsdoc/no-undefined-types */
+ 
+ 	return [ state, setState ];
+ }
+diff --git a/packages/components/src/utils/hooks/use-jump-step.js b/packages/components/src/utils/hooks/use-jump-step.js
+index f3ac123f6c8cfb..d241bfcdee5a4a 100644
+--- a/packages/components/src/utils/hooks/use-jump-step.js
++++ b/packages/components/src/utils/hooks/use-jump-step.js
+@@ -29,6 +29,7 @@ function useJumpStep( {
+ 	const [ isShiftKey, setIsShiftKey ] = useState( false );
+ 
+ 	useEffect( () => {
++		/** @type {(event: KeyboardEvent)=>void} */
+ 		const handleShiftKeyToggle = ( event ) => {
+ 			setIsShiftKey( event.shiftKey );
+ 		};
+diff --git a/packages/components/src/utils/hooks/use-update-effect.js b/packages/components/src/utils/hooks/use-update-effect.js
+index fa13e4f9d0d65b..724be8746ba272 100644
+--- a/packages/components/src/utils/hooks/use-update-effect.js
++++ b/packages/components/src/utils/hooks/use-update-effect.js
+@@ -3,10 +3,13 @@
+  */
+ import { useRef, useEffect } from '@wordpress/element';
+ 
+-/*
++/**
+  * A `React.useEffect` that will not run on the first render.
+  * Source:
+  * https://github.com/reakit/reakit/blob/master/packages/reakit-utils/src/useUpdateEffect.ts
++ *
++ * @param {import('react').EffectCallback} effect
++ * @param {import('react').DependencyList} deps
+  */
+ function useUpdateEffect( effect, deps ) {
+ 	const mounted = useRef( false );
+diff --git a/packages/components/src/utils/math.js b/packages/components/src/utils/math.js
+index dad8c508a21671..662010f0c1900d 100644
+--- a/packages/components/src/utils/math.js
++++ b/packages/components/src/utils/math.js
+@@ -6,7 +6,7 @@ import { clamp } from 'lodash';
+ /**
+  * Parses and retrieves a number value.
+  *
+- * @param {any} value The incoming value.
++ * @param {unknown} value The incoming value.
+  *
+  * @return {number} The parsed number value.
+  */
+@@ -19,26 +19,34 @@ export function getNumber( value ) {
+ /**
+  * Safely adds 2 values.
+  *
+- * @param {number|string} args Values to add together.
++ * @param {Array<number|string>} args Values to add together.
+  *
+  * @return {number} The sum of values.
+  */
+ export function add( ...args ) {
+-	return args.reduce( ( sum, arg ) => sum + getNumber( arg ), 0 );
++	return args.reduce(
++		/** @type {(sum:number, arg: number|string) => number} */
++		( sum, arg ) => sum + getNumber( arg ),
++		0
++	);
+ }
+ 
+ /**
+  * Safely subtracts 2 values.
+  *
+- * @param {number|string} args Values to subtract together.
++ * @param {Array<number|string>} args Values to subtract together.
+  *
+- * @return {number} The difference of the 2 values.
++ * @return {number} The difference of the values.
+  */
+ export function subtract( ...args ) {
+-	return args.reduce( ( diff, arg, index ) => {
+-		const value = getNumber( arg );
+-		return index === 0 ? value : diff - value;
+-	} );
++	return args.reduce(
++		/** @type {(diff:number, arg: number|string, index:number) => number} */
++		( diff, arg, index ) => {
++			const value = getNumber( arg );
++			return index === 0 ? value : diff - value;
++		},
++		0
++	);
+ }
+ 
+ /**
+@@ -84,12 +92,7 @@ export function roundClamp(
+  * Clamps a value based on a min/max range with rounding.
+  * Returns a string.
+  *
+- * @param {any} args Arguments for roundClamp().
+- * @property {number} value The value.
+- * @property {number} min The minimum range.
+- * @property {number} max The maximum range.
+- * @property {number} step A multiplier for the value.
+- *
++ * @param {Parameters<typeof roundClamp>} args Arguments for roundClamp().
+  * @return {string} The rounded and clamped value.
+  */
+ export function roundClampString( ...args ) {
+diff --git a/packages/components/src/utils/rtl.js b/packages/components/src/utils/rtl.js
+index 88a3f651af96c1..89fefa7508b65c 100644
+--- a/packages/components/src/utils/rtl.js
++++ b/packages/components/src/utils/rtl.js
+@@ -65,9 +65,9 @@ function getConvertedKey( key ) {
+ /**
+  * An incredibly basic ltr -> rtl converter for style properties
+  *
+- * @param {Object} ltrStyles
++ * @param {import('react').CSSProperties} ltrStyles
+  *
+- * @return {Object} Converted ltr -> rtl styles
++ * @return {import('react').CSSProperties} Converted ltr -> rtl styles
+  */
+ export const convertLTRToRTL = ( ltrStyles = {} ) => {
+ 	return mapKeys( ltrStyles, ( _value, key ) => getConvertedKey( key ) );
+@@ -76,8 +76,8 @@ export const convertLTRToRTL = ( ltrStyles = {} ) => {
+ /**
+  * A higher-order function that create an incredibly basic ltr -> rtl style converter for CSS objects.
+  *
+- * @param {Object} ltrStyles Ltr styles. Converts and renders from ltr -> rtl styles, if applicable.
+- * @param {null|Object} rtlStyles Rtl styles. Renders if provided.
++ * @param {import('react').CSSProperties} ltrStyles   Ltr styles. Converts and renders from ltr -> rtl styles, if applicable.
++ * @param {import('react').CSSProperties} [rtlStyles] Rtl styles. Renders if provided.
+  *
+  * @return {Function} A function to output CSS styles for Emotion's renderer
+  */
+@@ -86,9 +86,11 @@ export function rtl( ltrStyles = {}, rtlStyles ) {
+ 		const isRTL = getRTL();
+ 
+ 		if ( rtlStyles ) {
++			// @ts-ignore: `css` types are wrong, it can accept an object: https://emotion.sh/docs/object-styles#with-css
+ 			return isRTL ? css( rtlStyles ) : css( ltrStyles );
+ 		}
+ 
++		// @ts-ignore: `css` types are wrong, it can accept an object: https://emotion.sh/docs/object-styles#with-css
+ 		return isRTL ? css( convertLTRToRTL( ltrStyles ) ) : css( ltrStyles );
+ 	};
+ }
+diff --git a/packages/components/src/utils/space.js b/packages/components/src/utils/space.js
+index ecf7a64f069bae..cfe8d2f0488d59 100644
+--- a/packages/components/src/utils/space.js
++++ b/packages/components/src/utils/space.js
+@@ -3,7 +3,7 @@ const SPACE_GRID_BASE = 8;
+ /**
+  * Creates a spacing CSS value (px) based on grid system values.
+  *
+- * @param {number} value Multiplier against the grid base value (8)
++ * @param {number} [value=1] Multiplier against the grid base value (8)
+  * @return {string} The spacing value (px).
+  */
+ export function space( value = 1 ) {
+diff --git a/packages/components/src/utils/values.js b/packages/components/src/utils/values.js
+index d8d63750290276..5bf94b6ece8415 100644
+--- a/packages/components/src/utils/values.js
++++ b/packages/components/src/utils/values.js
+@@ -1,31 +1,41 @@
++/* eslint-disable jsdoc/valid-types */
+ /**
+  * Determines if a value is null or undefined.
+  *
+- * @param {any} value The value to check.
+- * @return {boolean} Whether value is null or undefined.
++ * @template T
++ *
++ * @param {T | null | undefined} value The value to check.
++ * @return {value is T} Whether value is not null or undefined.
+  */
+ export function isValueDefined( value ) {
+ 	return value !== undefined && value !== null;
+ }
++/* eslint-enable jsdoc/valid-types */
+ 
++/* eslint-disable jsdoc/valid-types */
+ /**
+  * Determines if a value is empty, null, or undefined.
+  *
+- * @param {any} value The value to check.
+- * @return {boolean} Whether value is empty.
++ * @template T
++ *
++ * @param {T | "" | null | undefined} value The value to check.
++ * @return {value is T} Whether value is empty.
+  */
+ export function isValueEmpty( value ) {
+ 	const isEmptyString = value === '';
+ 
+ 	return ! isValueDefined( value ) || isEmptyString;
+ }
++/* eslint-enable jsdoc/valid-types */
+ 
+ /**
+- * Attempts to get a defined/non-null value from a collection of arguments.
++ * Get the first defined/non-null value from an array.
++ *
++ * @template T
+  *
+- * @param {Array<any>} values Values to derive from.
+- * @param {any} fallbackValue Fallback value if there are no defined values.
+- * @return {any} A defined value or the fallback value.
++ * @param {Array<T | null | undefined>} values Values to derive from.
++ * @param {T} fallbackValue Fallback value if there are no defined values.
++ * @return {T} A defined value or the fallback value.
+  */
+ export function getDefinedValue( values = [], fallbackValue ) {
+ 	return values.find( isValueDefined ) ?? fallbackValue;
+diff --git a/packages/components/src/visually-hidden/index.js b/packages/components/src/visually-hidden/index.js
+index 727e958787c2da..5ce7e3ff6cca2e 100644
+--- a/packages/components/src/visually-hidden/index.js
++++ b/packages/components/src/visually-hidden/index.js
+@@ -8,13 +8,25 @@ import classnames from 'classnames';
+  */
+ import { renderAsRenderProps } from './utils';
+ 
++/**
++ * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T
++ * @typedef OwnProps
++ * @property {T} [as='div'] Component to render, e.g. `"div"` or `MyComponent`.
++ */
++
++/**
++ * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T
++ * @typedef {OwnProps<T> & import('react').ComponentProps<T>} Props
++ */
++
+ /**
+  * VisuallyHidden component to render text out non-visually
+  * for use in devices such as a screen reader.
+  *
+- * @param {Object}             props             Component props.
+- * @param {string|WPComponent} [props.as="div"]  A tag or component to render.
+- * @param {string}             [props.className] Class to set on the container.
++ * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T
++ *
++ * @param {Props<T>} props
++ * @return {JSX.Element} Element
+  */
+ function VisuallyHidden( { as = 'div', className, ...props } ) {
+ 	return renderAsRenderProps( {
+diff --git a/packages/components/src/visually-hidden/utils.js b/packages/components/src/visually-hidden/utils.js
+index 70bcfac3aeb7d7..d8be9e759c6145 100644
+--- a/packages/components/src/visually-hidden/utils.js
++++ b/packages/components/src/visually-hidden/utils.js
+@@ -1,5 +1,13 @@
+ /**
+- * Utility Functions
++ * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T
++ * @typedef OwnProps
++ * @property {T} [as='div'] Component to render
++ * @property {import('react').ReactNode | ((props: import('react').ComponentProps<T>) => JSX.Element) } [children] Children or render props function
++ */
++
++/**
++ * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T
++ * @typedef {OwnProps<T> & import('react').ComponentProps<T>} Props
+  */
+ 
+ /**
+@@ -9,8 +17,9 @@
+  *
+  * See VisuallyHidden hidden for example.
+  *
+- * @param {string|WPComponent} as A tag or component to render.
+- * @return {WPComponent} The rendered component.
++ * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T
++ * @param {Props<T>} props
++ * @return {JSX.Element} The rendered element.
+  */
+ function renderAsRenderProps( { as: Component = 'div', ...props } ) {
+ 	if ( typeof props.children === 'function' ) {
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 64398d2ccb7b42..013aa14f5af344 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -5,5 +5,19 @@
+ 		"declarationDir": "build-types"
+ 	},
+ 	"references": [ { "path": "../primitives" } ],
+-	"include": [ "src/dashicon/*", "src/tip/*" ]
++	"include": [
++		"src/base-control/**/*",
++		"src/dashicon/**/*",
++		"src/tip/**/*",
++		"src/utils/**/*",
++		"src/visually-hidden/**/*"
++	],
++	"exclude": [
++		"src/**/*.android.js",
++		"src/**/*.ios.js",
++		"src/**/*.native.js",
++		"src/**/react-native-*",
++		"src/**/stories",
++		"src/**/test"
++	]
+ }
+diff --git a/tsconfig.base.json b/tsconfig.base.json
+index c9c8269e1f6efb..fbaf60c3fdd529 100644
+--- a/tsconfig.base.json
++++ b/tsconfig.base.json
+@@ -33,14 +33,13 @@
+ 		"types": []
+ 	},
+ 	"exclude": [
+-		"**/benchmark",
+-		"**/test/**",
+-		"**/build/**",
+-		"**/build-*/**",
+ 		"**/*.android.js",
+ 		"**/*.ios.js",
+ 		"**/*.native.js",
+-		"packages/**/react-native-*/**",
+-		"packages/**/stories"
++		"**/benchmark",
++		"**/build-*/**",
++		"**/build/**",
++		"**/test/**",
++		"packages/**/react-native-*/**"
+ 	]
+ }

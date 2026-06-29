@@ -1,0 +1,92 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5fd48336f956c1..e680bd321f7edf 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ -   `Guide`: Use small size button for page controls ([#66607](https://github.com/WordPress/gutenberg/pull/66607)).
+ -   `PaletteEdit`: Add appropriate size props to Buttons ([#66590](https://github.com/WordPress/gutenberg/pull/66590)).
+ -   `Notice`: Add appropriate size props to Buttons ([#66593](https://github.com/WordPress/gutenberg/pull/66593)).
++-   `FormTokenField`: Fix token styles ([#66640](https://github.com/WordPress/gutenberg/pull/66640)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/form-token-field/style.scss b/packages/components/src/form-token-field/style.scss
+index 51f9e24ea0d4f2..d18ca274d76764 100644
+--- a/packages/components/src/form-token-field/style.scss
++++ b/packages/components/src/form-token-field/style.scss
+@@ -81,7 +81,12 @@
+ 
+ 		.components-form-token-field__token-text {
+ 			background: transparent;
+-			color: $components-color-accent;
++		}
++
++		&:not(.is-disabled) {
++			.components-form-token-field__token-text {
++				color: $components-color-accent;
++			}
+ 		}
+ 
+ 		.components-form-token-field__remove-token {
+@@ -90,7 +95,6 @@
+ 			position: absolute;
+ 			top: 1px;
+ 			right: 0;
+-			padding: 0;
+ 		}
+ 
+ 		&.is-success {
+@@ -112,18 +116,11 @@
+ 			}
+ 		}
+ 	}
+-
+-	&.is-disabled {
+-		.components-form-token-field__remove-token {
+-			cursor: default;
+-		}
+-	}
+ }
+ 
+ .components-form-token-field__token-text,
+ .components-form-token-field__remove-token.components-button {
+ 	display: inline-block;
+-	line-height: 24px;
+ 	height: auto;
+ 	background: $gray-300;
+ 	min-width: unset;
+@@ -134,20 +131,19 @@
+ .components-form-token-field__token-text {
+ 	border-radius: $radius-x-small 0 0 $radius-x-small;
+ 	padding: 0 0 0 8px;
++	line-height: 24px;
+ 	white-space: nowrap;
+ 	overflow: hidden;
+ 	text-overflow: ellipsis;
+ }
+ 
+ .components-form-token-field__remove-token.components-button {
+-	cursor: pointer;
+ 	border-radius: 0 $radius-x-small $radius-x-small 0;
+-	padding: 0 2px;
+ 	color: $gray-900;
+ 	line-height: 10px;
+ 	overflow: initial;
+ 
+-	&:hover {
++	&:hover:not(:disabled) {
+ 		color: $gray-900;
+ 	}
+ }
+diff --git a/packages/components/src/form-token-field/token.tsx b/packages/components/src/form-token-field/token.tsx
+index 3e723c2bd78fc2..0cfa14cc3e0218 100644
+--- a/packages/components/src/form-token-field/token.tsx
++++ b/packages/components/src/form-token-field/token.tsx
+@@ -72,6 +72,7 @@ export default function Token( {
+ 
+ 			<Button
+ 				className="components-form-token-field__remove-token"
++				size="small"
+ 				icon={ closeSmall }
+ 				onClick={ ! disabled ? onClick : undefined }
+ 				// Disable reason: Even when FormTokenField itself is accessibly disabled, token reset buttons shouldn't be in the tab sequence.

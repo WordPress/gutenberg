@@ -1,0 +1,2835 @@
+diff --git a/packages/components/src/base-field/hook.js b/packages/components/src/base-field/hook.js
+index 28f7a3b5e6aae0..14cb90c9e97eb5 100644
+--- a/packages/components/src/base-field/hook.js
++++ b/packages/components/src/base-field/hook.js
+@@ -1,11 +1,3 @@
+-/**
+- * External dependencies
+- */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { cx } from '@emotion/css';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -18,6 +10,7 @@ import { useContextSystem } from '../ui/context';
+ import { useControlGroupContext } from '../ui/control-group';
+ import { useFlex } from '../flex';
+ import * as styles from './styles';
++import { useCx } from '../utils/hooks/use-cx';
+ 
+ /**
+  * @typedef OwnProps
+@@ -45,6 +38,7 @@ export function useBaseField( props ) {
+ 	} = useContextSystem( props, 'BaseField' );
+ 
+ 	const { styles: controlGroupStyles } = useControlGroupContext();
++	const cx = useCx();
+ 
+ 	const classes = useMemo(
+ 		() =>
+diff --git a/packages/components/src/base-field/styles.js b/packages/components/src/base-field/styles.js
+index 9c9946b85caa21..e054dc2c6ed498 100644
+--- a/packages/components/src/base-field/styles.js
++++ b/packages/components/src/base-field/styles.js
+@@ -1,10 +1,7 @@
+ /**
+  * External dependencies
+  */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { css } from '@emotion/css';
++import { css } from '@emotion/react';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/base-field/test/__snapshots__/index.js.snap b/packages/components/src/base-field/test/__snapshots__/index.js.snap
+index 61b20cae1af63b..be055e19b1a607 100644
+--- a/packages/components/src/base-field/test/__snapshots__/index.js.snap
++++ b/packages/components/src/base-field/test/__snapshots__/index.js.snap
+@@ -25,7 +25,7 @@ Snapshot Diff:
+ - Received styles
+ + Base styles
+ 
+-@@ -14,19 +14,18 @@
++@@ -14,18 +14,17 @@
+       "background": "#fff",
+       "border": "1px solid",
+       "border-color": "#757575",
+@@ -45,7 +45,6 @@ Snapshot Diff:
+ -     "width": "auto",
+ +     "width": "100%",
+     },
+-    Object {},
+   ]
+ `;
+ 
+@@ -135,7 +134,7 @@ exports[`base field should render correctly 1`] = `
+ }
+ 
+ <div
+-  class="components-flex components-base-field emotion-0 emotion-1 emotion-2"
++  class="components-flex components-base-field emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="BaseField"
+ />
+diff --git a/packages/components/src/card/card-body/hook.js b/packages/components/src/card/card-body/hook.js
+index 3de530b38017b0..1aca7b8fd16b19 100644
+--- a/packages/components/src/card/card-body/hook.js
++++ b/packages/components/src/card/card-body/hook.js
+@@ -1,11 +1,3 @@
+-/**
+- * External dependencies
+- */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { cx } from '@emotion/css';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -16,6 +8,7 @@ import { useMemo } from '@wordpress/element';
+  */
+ import { useContextSystem } from '../../ui/context';
+ import * as styles from '../styles';
++import { useCx } from '../../utils/hooks/use-cx';
+ 
+ /**
+  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').BodyProps, 'div'>} props
+@@ -29,6 +22,8 @@ export function useCardBody( props ) {
+ 		...otherProps
+ 	} = useContextSystem( props, 'CardBody' );
+ 
++	const cx = useCx();
++
+ 	const classes = useMemo(
+ 		() =>
+ 			cx(
+diff --git a/packages/components/src/card/card-divider/hook.js b/packages/components/src/card/card-divider/hook.js
+index 3f05de00abc04e..06961607c78849 100644
+--- a/packages/components/src/card/card-divider/hook.js
++++ b/packages/components/src/card/card-divider/hook.js
+@@ -1,11 +1,3 @@
+-/**
+- * External dependencies
+- */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { cx } from '@emotion/css';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -16,6 +8,7 @@ import { useMemo } from '@wordpress/element';
+  */
+ import { useContextSystem } from '../../ui/context';
+ import * as styles from '../styles';
++import { useCx } from '../../utils/hooks/use-cx';
+ 
+ /**
+  * @param {import('../../ui/context').PolymorphicComponentProps<import('../../divider').DividerProps, 'hr', false>} props
+@@ -26,6 +19,8 @@ export function useCardDivider( props ) {
+ 		'CardDivider'
+ 	);
+ 
++	const cx = useCx();
++
+ 	const classes = useMemo(
+ 		() =>
+ 			cx(
+diff --git a/packages/components/src/card/card-footer/hook.js b/packages/components/src/card/card-footer/hook.js
+index bc1345ddff1105..772d0fc175b406 100644
+--- a/packages/components/src/card/card-footer/hook.js
++++ b/packages/components/src/card/card-footer/hook.js
+@@ -1,11 +1,3 @@
+-/**
+- * External dependencies
+- */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { cx } from '@emotion/css';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -16,6 +8,7 @@ import { useMemo } from '@wordpress/element';
+  */
+ import { useContextSystem } from '../../ui/context';
+ import * as styles from '../styles';
++import { useCx } from '../../utils/hooks/use-cx';
+ 
+ /**
+  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').FooterProps, 'div'>} props
+@@ -30,6 +23,8 @@ export function useCardFooter( props ) {
+ 		...otherProps
+ 	} = useContextSystem( props, 'CardFooter' );
+ 
++	const cx = useCx();
++
+ 	const classes = useMemo(
+ 		() =>
+ 			cx(
+diff --git a/packages/components/src/card/card-header/hook.js b/packages/components/src/card/card-header/hook.js
+index fa046ec316142b..56a9b99972cabf 100644
+--- a/packages/components/src/card/card-header/hook.js
++++ b/packages/components/src/card/card-header/hook.js
+@@ -1,11 +1,3 @@
+-/**
+- * External dependencies
+- */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { cx } from '@emotion/css';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -16,6 +8,7 @@ import { useMemo } from '@wordpress/element';
+  */
+ import { useContextSystem } from '../../ui/context';
+ import * as styles from '../styles';
++import { useCx } from '../../utils/hooks/use-cx';
+ 
+ /**
+  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').HeaderProps, 'div'>} props
+@@ -29,6 +22,8 @@ export function useCardHeader( props ) {
+ 		...otherProps
+ 	} = useContextSystem( props, 'CardHeader' );
+ 
++	const cx = useCx();
++
+ 	const classes = useMemo(
+ 		() =>
+ 			cx(
+diff --git a/packages/components/src/card/card-media/hook.js b/packages/components/src/card/card-media/hook.js
+index c0ade5fa2ffc26..266e112090af16 100644
+--- a/packages/components/src/card/card-media/hook.js
++++ b/packages/components/src/card/card-media/hook.js
+@@ -1,11 +1,3 @@
+-/**
+- * External dependencies
+- */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { cx } from '@emotion/css';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -16,6 +8,7 @@ import { useMemo } from '@wordpress/element';
+  */
+ import { useContextSystem } from '../../ui/context';
+ import * as styles from '../styles';
++import { useCx } from '../../utils/hooks/use-cx';
+ 
+ /**
+  * @param {import('../../ui/context').PolymorphicComponentProps<{ children: import('react').ReactNode }, 'div'>} props
+@@ -23,6 +16,8 @@ import * as styles from '../styles';
+ export function useCardMedia( props ) {
+ 	const { className, ...otherProps } = useContextSystem( props, 'CardMedia' );
+ 
++	const cx = useCx();
++
+ 	const classes = useMemo(
+ 		() =>
+ 			cx(
+diff --git a/packages/components/src/card/card/component.js b/packages/components/src/card/card/component.js
+index f49f67128883b5..9f8bcbde6d9bf1 100644
+--- a/packages/components/src/card/card/component.js
++++ b/packages/components/src/card/card/component.js
+@@ -1,10 +1,7 @@
+ /**
+  * External dependencies
+  */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { css } from '@emotion/css';
++import { css } from '@emotion/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -20,6 +17,7 @@ import { View } from '../../view';
+ import * as styles from '../styles';
+ import { useCard } from './hook';
+ import CONFIG from '../../utils/config-values';
++import { useCx } from '../../utils/hooks/use-cx';
+ 
+ /**
+  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div'>} props
+@@ -36,8 +34,10 @@ function Card( props, forwardedRef ) {
+ 	} = useCard( props );
+ 	const elevationBorderRadius = isRounded ? CONFIG.cardBorderRadius : 0;
+ 
++	const cx = useCx();
++
+ 	const elevationClassName = useMemo(
+-		() => css( { borderRadius: elevationBorderRadius } ),
++		() => cx( css( { borderRadius: elevationBorderRadius } ) ),
+ 		[ elevationBorderRadius ]
+ 	);
+ 
+@@ -56,7 +56,7 @@ function Card( props, forwardedRef ) {
+ 	return (
+ 		<ContextSystemProvider value={ contextProviderValue }>
+ 			<View { ...otherProps } ref={ forwardedRef }>
+-				<View className={ styles.Content }>{ children }</View>
++				<View className={ cx( styles.Content ) }>{ children }</View>
+ 				<Elevation
+ 					className={ elevationClassName }
+ 					isInteractive={ false }
+diff --git a/packages/components/src/card/card/hook.js b/packages/components/src/card/card/hook.js
+index ee3e66a22e98fb..b0e2d1a32325d5 100644
+--- a/packages/components/src/card/card/hook.js
++++ b/packages/components/src/card/card/hook.js
+@@ -1,11 +1,3 @@
+-/**
+- * External dependencies
+- */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { cx } from '@emotion/css';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -18,6 +10,7 @@ import { useMemo } from '@wordpress/element';
+ import { useContextSystem } from '../../ui/context';
+ import { useSurface } from '../../surface';
+ import * as styles from '../styles';
++import { useCx } from '../../utils/hooks/use-cx';
+ 
+ /**
+  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div'>} props
+@@ -59,6 +52,8 @@ export function useCard( props ) {
+ 		...otherProps
+ 	} = useContextSystem( useDeprecatedProps( props ), 'Card' );
+ 
++	const cx = useCx();
++
+ 	const classes = useMemo( () => {
+ 		return cx(
+ 			styles.Card,
+diff --git a/packages/components/src/card/styles.js b/packages/components/src/card/styles.js
+index d4ecdd89db176c..6b4285c093d4ea 100644
+--- a/packages/components/src/card/styles.js
++++ b/packages/components/src/card/styles.js
+@@ -1,10 +1,7 @@
+ /**
+  * External dependencies
+  */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { css } from '@emotion/css';
++import { css } from '@emotion/react';
+ 
+ /**
+  * Internal dependencies
+@@ -27,7 +24,7 @@ export const Header = css`
+ export const Footer = css`
+ 	border-top: 1px solid;
+ 
+-	&:first-child {
++	&:first-of-type {
+ 		border-top: none;
+ 	}
+ `;
+diff --git a/packages/components/src/card/test/__snapshots__/index.js.snap b/packages/components/src/card/test/__snapshots__/index.js.snap
+index ff86de24ccc4b6..0b8089ab3a73b1 100644
+--- a/packages/components/src/card/test/__snapshots__/index.js.snap
++++ b/packages/components/src/card/test/__snapshots__/index.js.snap
+@@ -8,8 +8,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-card__body components-card-body css-zj0paq-Body-borderRadius-medium css-1mm2cvy-View em57xhy0"
+-+     class="components-scrollable components-card__body components-card-body css-1x21s5j-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium css-1mm2cvy-View em57xhy0"
++-     class="components-card__body components-card-body css-1fyyxcx-View-Body-borderRadius-medium em57xhy0"
+++     class="components-scrollable components-card__body components-card-body css-q3qn5w-View-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="CardBody"
+     >
+@@ -25,8 +25,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-scrollable components-card__body components-card-body css-1x21s5j-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium css-1mm2cvy-View em57xhy0"
+-+     class="components-scrollable components-card__body components-card-body css-10o2gu-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium-shady css-1mm2cvy-View em57xhy0"
++-     class="components-scrollable components-card__body components-card-body css-q3qn5w-View-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium em57xhy0"
+++     class="components-scrollable components-card__body components-card-body css-172aszr-View-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium-shady em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="CardBody"
+     >
+@@ -42,8 +42,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-flex components-card__footer components-card-footer css-lb8psc-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium css-1mm2cvy-View em57xhy0"
+-+     class="components-flex components-card__footer components-card-footer css-1tnqn81-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium-shady css-1mm2cvy-View em57xhy0"
++-     class="components-flex components-card__footer components-card-footer css-1ma02pj-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium em57xhy0"
+++     class="components-flex components-card__footer components-card-footer css-1ma4att-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium-shady em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="CardFooter"
+     >
+@@ -59,8 +59,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-flex components-card__footer components-card-footer css-lb8psc-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium css-1mm2cvy-View em57xhy0"
+-+     class="components-flex components-card__footer components-card-footer css-16yvvsg-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium css-1mm2cvy-View em57xhy0"
++-     class="components-flex components-card__footer components-card-footer css-1ma02pj-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium em57xhy0"
+++     class="components-flex components-card__footer components-card-footer css-1hvr9sm-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="CardFooter"
+     >
+@@ -76,8 +76,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-flex components-card__header components-card-header css-1jn51k2-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-medium css-1mm2cvy-View em57xhy0"
+-+     class="components-flex components-card__header components-card-header css-l434mf-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-medium-shady css-1mm2cvy-View em57xhy0"
++-     class="components-flex components-card__header components-card-header css-1s7cf5l-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-medium em57xhy0"
+++     class="components-flex components-card__header components-card-header css-wk33sz-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-medium-shady em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="CardHeader"
+     >
+@@ -93,19 +93,19 @@ Snapshot Diff:
+ @@ -5,18 +5,18 @@
+   >
+     <div
+-      class="css-1ruapvy-Content css-1mm2cvy-View em57xhy0"
++      class="css-mgwsf4-View-Content em57xhy0"
+     >
+       <div
+--       class="components-flex components-card__header components-card-header css-1jn51k2-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-medium css-1mm2cvy-View em57xhy0"
+-+       class="components-flex components-card__header components-card-header css-1l3mima-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-large css-1mm2cvy-View em57xhy0"
++-       class="components-flex components-card__header components-card-header css-1s7cf5l-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-medium em57xhy0"
+++       class="components-flex components-card__header components-card-header css-1n33wp9-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-large em57xhy0"
+         data-wp-c16t="true"
+         data-wp-component="CardHeader"
+       >
+         Header
+       </div>
+       <div
+--       class="components-scrollable components-card__body components-card-body css-1x21s5j-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium css-1mm2cvy-View em57xhy0"
+-+       class="components-scrollable components-card__body components-card-body css-18jxdcm-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-large css-1mm2cvy-View em57xhy0"
++-       class="components-scrollable components-card__body components-card-body css-q3qn5w-View-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium em57xhy0"
+++       class="components-scrollable components-card__body components-card-body css-1507ng6-View-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-large em57xhy0"
+         data-wp-c16t="true"
+         data-wp-component="CardBody"
+       >
+@@ -121,27 +121,27 @@ Snapshot Diff:
+ @@ -6,25 +6,25 @@
+     >
+       <div
+-        class="css-1ruapvy-Content css-1mm2cvy-View em57xhy0"
++        class="css-mgwsf4-View-Content em57xhy0"
+       >
+         <div
+--         class="components-flex components-card__header components-card-header css-21ujqh-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-large-borderless css-1mm2cvy-View em57xhy0"
+-+         class="components-flex components-card__header components-card-header css-4jl13i-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-small css-1mm2cvy-View em57xhy0"
++-         class="components-flex components-card__header components-card-header css-atq4zi-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-large-borderless em57xhy0"
+++         class="components-flex components-card__header components-card-header css-1g7pztv-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-small em57xhy0"
+           data-wp-c16t="true"
+           data-wp-component="CardHeader"
+         >
+           Header
+         </div>
+         <div
+--         class="components-scrollable components-card__body components-card-body css-18jxdcm-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-large css-1mm2cvy-View em57xhy0"
+-+         class="components-scrollable components-card__body components-card-body css-1x21s5j-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium css-1mm2cvy-View em57xhy0"
++-         class="components-scrollable components-card__body components-card-body css-1507ng6-View-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-large em57xhy0"
+++         class="components-scrollable components-card__body components-card-body css-q3qn5w-View-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium em57xhy0"
+           data-wp-c16t="true"
+           data-wp-component="CardBody"
+         >
+           Body
+         </div>
+         <div
+--         class="components-flex components-card__footer components-card-footer css-ilxhwe-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-large-borderless css-1mm2cvy-View em57xhy0"
+-+         class="components-flex components-card__footer components-card-footer css-roislu-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-xSmall css-1mm2cvy-View em57xhy0"
++-         class="components-flex components-card__footer components-card-footer css-1bj5fkv-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-large-borderless em57xhy0"
+++         class="components-flex components-card__footer components-card-footer css-1jclf0-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-xSmall em57xhy0"
+           data-wp-c16t="true"
+           data-wp-component="CardFooter"
+         >
+@@ -157,33 +157,33 @@ Snapshot Diff:
+ @@ -1,30 +1,30 @@
+   <div>
+     <div
+--     class="components-surface components-card components-card css-1kp90ki-Surface-getBorders-primary-Card-boxShadowless-rounded css-1mm2cvy-View em57xhy0"
+-+     class="components-surface components-card components-card css-18qk96h-Surface-getBorders-primary-Card-rounded css-1mm2cvy-View em57xhy0"
++-     class="components-surface components-card components-card css-ssx2ib-View-Surface-getBorders-primary-Card-boxShadowless-rounded em57xhy0"
+++     class="components-surface components-card components-card css-1vyvcpq-View-Surface-getBorders-primary-Card-rounded em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="Card"
+     >
+       <div
+-        class="css-1ruapvy-Content css-1mm2cvy-View em57xhy0"
++        class="css-mgwsf4-View-Content em57xhy0"
+       >
+         <div
+--         class="components-flex components-card__header components-card-header css-21ujqh-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-large-borderless css-1mm2cvy-View em57xhy0"
+-+         class="components-flex components-card__header components-card-header css-4jl13i-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-small css-1mm2cvy-View em57xhy0"
++-         class="components-flex components-card__header components-card-header css-atq4zi-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-large-borderless em57xhy0"
+++         class="components-flex components-card__header components-card-header css-1g7pztv-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-small em57xhy0"
+           data-wp-c16t="true"
+           data-wp-component="CardHeader"
+         >
+           Header
+         </div>
+         <div
+--         class="components-scrollable components-card__body components-card-body css-18jxdcm-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-large css-1mm2cvy-View em57xhy0"
+-+         class="components-scrollable components-card__body components-card-body css-d23w1v-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-small css-1mm2cvy-View em57xhy0"
++-         class="components-scrollable components-card__body components-card-body css-1507ng6-View-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-large em57xhy0"
+++         class="components-scrollable components-card__body components-card-body css-1vtoa4y-View-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-small em57xhy0"
+           data-wp-c16t="true"
+           data-wp-component="CardBody"
+         >
+           Body
+         </div>
+         <div
+--         class="components-flex components-card__footer components-card-footer css-ilxhwe-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-large-borderless css-1mm2cvy-View em57xhy0"
+-+         class="components-flex components-card__footer components-card-footer css-r9u21d-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-small css-1mm2cvy-View em57xhy0"
++-         class="components-flex components-card__footer components-card-footer css-1bj5fkv-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-large-borderless em57xhy0"
+++         class="components-flex components-card__footer components-card-footer css-mflf6c-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-small em57xhy0"
+           data-wp-c16t="true"
+           data-wp-component="CardFooter"
+         >
+@@ -203,11 +203,11 @@ Object {
+   border-radius: 2px;
+ }
+ 
+-.emotion-3 {
++.emotion-2 {
+   height: 100%;
+ }
+ 
+-.emotion-6 {
++.emotion-4 {
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: -ms-flexbox;
+@@ -228,29 +228,29 @@ Object {
+   padding: calc(4px * 4) calc(4px * 6);
+ }
+ 
+-.emotion-6>*+*:not(marquee) {
++.emotion-4>*+*:not(marquee) {
+   margin-left: calc(4px * 2);
+ }
+ 
+-.emotion-6>* {
++.emotion-4>* {
+   min-width: 0;
+ }
+ 
+-.emotion-6:last-child {
++.emotion-4:last-child {
+   border-bottom: none;
+ }
+ 
+-.emotion-6:first-of-type {
++.emotion-4:first-of-type {
+   border-top-left-radius: 2px;
+   border-top-right-radius: 2px;
+ }
+ 
+-.emotion-6:last-of-type {
++.emotion-4:last-of-type {
+   border-bottom-left-radius: 2px;
+   border-bottom-right-radius: 2px;
+ }
+ 
+-.emotion-9 {
++.emotion-6 {
+   height: 100%;
+   overflow-x: hidden;
+   overflow-y: auto;
+@@ -260,21 +260,21 @@ Object {
+ }
+ 
+ @media only screen and ( min-device-width: 40em ) {
+-  .emotion-9::-webkit-scrollbar {
++  .emotion-6::-webkit-scrollbar {
+     height: 12px;
+     width: 12px;
+   }
+ 
+-  .emotion-9::-webkit-scrollbar-track {
++  .emotion-6::-webkit-scrollbar-track {
+     background-color: transparent;
+   }
+ 
+-  .emotion-9::-webkit-scrollbar-track {
++  .emotion-6::-webkit-scrollbar-track {
+     background: rgba(0, 0, 0, 0.04);
+     border-radius: 8px;
+   }
+ 
+-  .emotion-9::-webkit-scrollbar-thumb {
++  .emotion-6::-webkit-scrollbar-thumb {
+     -webkit-background-clip: padding-box;
+     background-clip: padding-box;
+     background-color: rgba(0, 0, 0, 0.2);
+@@ -282,60 +282,57 @@ Object {
+     border-radius: 7px;
+   }
+ 
+-  .emotion-9:hover::-webkit-scrollbar-thumb {
++  .emotion-6:hover::-webkit-scrollbar-thumb {
+     background-color: rgba(0, 0, 0, 0.5);
+   }
+ }
+ 
+-.emotion-9:first-of-type {
++.emotion-6:first-of-type {
+   border-top-left-radius: 2px;
+   border-top-right-radius: 2px;
+ }
+ 
+-.emotion-9:last-of-type {
++.emotion-6:last-of-type {
+   border-bottom-left-radius: 2px;
+   border-bottom-right-radius: 2px;
+ }
+ 
+-.emotion-15 {
+-  box-sizing: border-box;
+-  display: block;
+-  width: 100%;
+-  border-color: rgba(0, 0, 0, 0.1);
+-}
+-
+-.emotion-16 {
++.emotion-10 {
+   border-color: rgba(0, 0, 0, 0.1);
+   border-width: 0 0 1px 0;
+   height: 0;
+   margin: 0;
+   width: auto;
++  box-sizing: border-box;
++  display: block;
++  width: 100%;
++  border-color: rgba(0, 0, 0, 0.1);
+ }
+ 
+-.emotion-21 {
++.emotion-14 {
+   box-sizing: border-box;
+   overflow: hidden;
+ }
+ 
+-.emotion-21>img,
+-.emotion-21>iframe {
++.emotion-14>img,
++.emotion-14>iframe {
+   display: block;
+   height: auto;
+   max-width: 100%;
+   width: 100%;
+ }
+ 
+-.emotion-21:first-of-type {
++.emotion-14:first-of-type {
+   border-top-left-radius: 2px;
+   border-top-right-radius: 2px;
+ }
+ 
+-.emotion-21:last-of-type {
++.emotion-14:last-of-type {
+   border-bottom-left-radius: 2px;
+   border-bottom-right-radius: 2px;
+ }
+ 
+-.emotion-24 {
++.emotion-16 {
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: -ms-flexbox;
+@@ -356,29 +353,29 @@ Object {
+   padding: calc(4px * 4) calc(4px * 6);
+ }
+ 
+-.emotion-24>*+*:not(marquee) {
++.emotion-16>*+*:not(marquee) {
+   margin-left: calc(4px * 2);
+ }
+ 
+-.emotion-24>* {
++.emotion-16>* {
+   min-width: 0;
+ }
+ 
+-.emotion-24:first-child {
++.emotion-16:first-of-type {
+   border-top: none;
+ }
+ 
+-.emotion-24:first-of-type {
++.emotion-16:first-of-type {
+   border-top-left-radius: 2px;
+   border-top-right-radius: 2px;
+ }
+ 
+-.emotion-24:last-of-type {
++.emotion-16:last-of-type {
+   border-bottom-left-radius: 2px;
+   border-bottom-right-radius: 2px;
+ }
+ 
+-.emotion-27 {
++.emotion-18 {
+   background: transparent;
+   display: block;
+   margin: 0!important;
+@@ -400,29 +397,29 @@ Object {
+ <body>
+     <div>
+       <div
+-        class="components-surface components-card components-card emotion-0 emotion-1 emotion-2"
++        class="components-surface components-card components-card emotion-0 emotion-1"
+         data-wp-c16t="true"
+         data-wp-component="Card"
+       >
+         <div
+-          class="emotion-3 emotion-1 emotion-2"
++          class="emotion-2 emotion-1"
+         >
+           <div
+-            class="components-flex components-card__header components-card-header emotion-6 emotion-1 emotion-2"
++            class="components-flex components-card__header components-card-header emotion-4 emotion-1"
+             data-wp-c16t="true"
+             data-wp-component="CardHeader"
+           >
+             Card Header
+           </div>
+           <div
+-            class="components-scrollable components-card__body components-card-body emotion-9 emotion-1 emotion-2"
++            class="components-scrollable components-card__body components-card-body emotion-6 emotion-1"
+             data-wp-c16t="true"
+             data-wp-component="CardBody"
+           >
+             Card Body 1
+           </div>
+           <div
+-            class="components-scrollable components-card__body components-card-body emotion-9 emotion-1 emotion-2"
++            class="components-scrollable components-card__body components-card-body emotion-6 emotion-1"
+             data-wp-c16t="true"
+             data-wp-component="CardBody"
+           >
+@@ -430,20 +427,20 @@ Object {
+           </div>
+           <hr
+             aria-orientation="horizontal"
+-            class="components-divider components-card__divider components-card-divider emotion-15 emotion-16 emotion-17"
++            class="components-divider components-card__divider components-card-divider emotion-10 emotion-11"
+             data-wp-c16t="true"
+             data-wp-component="CardDivider"
+             role="separator"
+           />
+           <div
+-            class="components-scrollable components-card__body components-card-body emotion-9 emotion-1 emotion-2"
++            class="components-scrollable components-card__body components-card-body emotion-6 emotion-1"
+             data-wp-c16t="true"
+             data-wp-component="CardBody"
+           >
+             Card Body 3
+           </div>
+           <div
+-            class="components-card__media components-card-media emotion-21 emotion-1 emotion-2"
++            class="components-card__media components-card-media emotion-14 emotion-1"
+             data-wp-c16t="true"
+             data-wp-component="CardMedia"
+           >
+@@ -453,7 +450,7 @@ Object {
+             />
+           </div>
+           <div
+-            class="components-flex components-card__footer components-card-footer emotion-24 emotion-1 emotion-2"
++            class="components-flex components-card__footer components-card-footer emotion-16 emotion-1"
+             data-wp-c16t="true"
+             data-wp-component="CardFooter"
+           >
+@@ -462,13 +459,13 @@ Object {
+         </div>
+         <div
+           aria-hidden="true"
+-          class="components-elevation emotion-27 emotion-1 emotion-2"
++          class="components-elevation emotion-18 emotion-1"
+           data-wp-c16t="true"
+           data-wp-component="Elevation"
+         />
+         <div
+           aria-hidden="true"
+-          class="components-elevation emotion-27 emotion-1 emotion-2"
++          class="components-elevation emotion-18 emotion-1"
+           data-wp-c16t="true"
+           data-wp-component="Elevation"
+         />
+@@ -484,11 +481,11 @@ Object {
+   border-radius: 2px;
+ }
+ 
+-.emotion-3 {
++.emotion-2 {
+   height: 100%;
+ }
+ 
+-.emotion-6 {
++.emotion-4 {
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: -ms-flexbox;
+@@ -509,29 +506,29 @@ Object {
+   padding: calc(4px * 4) calc(4px * 6);
+ }
+ 
+-.emotion-6>*+*:not(marquee) {
++.emotion-4>*+*:not(marquee) {
+   margin-left: calc(4px * 2);
+ }
+ 
+-.emotion-6>* {
++.emotion-4>* {
+   min-width: 0;
+ }
+ 
+-.emotion-6:last-child {
++.emotion-4:last-child {
+   border-bottom: none;
+ }
+ 
+-.emotion-6:first-of-type {
++.emotion-4:first-of-type {
+   border-top-left-radius: 2px;
+   border-top-right-radius: 2px;
+ }
+ 
+-.emotion-6:last-of-type {
++.emotion-4:last-of-type {
+   border-bottom-left-radius: 2px;
+   border-bottom-right-radius: 2px;
+ }
+ 
+-.emotion-9 {
++.emotion-6 {
+   height: 100%;
+   overflow-x: hidden;
+   overflow-y: auto;
+@@ -541,21 +538,21 @@ Object {
+ }
+ 
+ @media only screen and ( min-device-width: 40em ) {
+-  .emotion-9::-webkit-scrollbar {
++  .emotion-6::-webkit-scrollbar {
+     height: 12px;
+     width: 12px;
+   }
+ 
+-  .emotion-9::-webkit-scrollbar-track {
++  .emotion-6::-webkit-scrollbar-track {
+     background-color: transparent;
+   }
+ 
+-  .emotion-9::-webkit-scrollbar-track {
++  .emotion-6::-webkit-scrollbar-track {
+     background: rgba(0, 0, 0, 0.04);
+     border-radius: 8px;
+   }
+ 
+-  .emotion-9::-webkit-scrollbar-thumb {
++  .emotion-6::-webkit-scrollbar-thumb {
+     -webkit-background-clip: padding-box;
+     background-clip: padding-box;
+     background-color: rgba(0, 0, 0, 0.2);
+@@ -563,60 +560,57 @@ Object {
+     border-radius: 7px;
+   }
+ 
+-  .emotion-9:hover::-webkit-scrollbar-thumb {
++  .emotion-6:hover::-webkit-scrollbar-thumb {
+     background-color: rgba(0, 0, 0, 0.5);
+   }
+ }
+ 
+-.emotion-9:first-of-type {
++.emotion-6:first-of-type {
+   border-top-left-radius: 2px;
+   border-top-right-radius: 2px;
+ }
+ 
+-.emotion-9:last-of-type {
++.emotion-6:last-of-type {
+   border-bottom-left-radius: 2px;
+   border-bottom-right-radius: 2px;
+ }
+ 
+-.emotion-15 {
+-  box-sizing: border-box;
+-  display: block;
+-  width: 100%;
+-  border-color: rgba(0, 0, 0, 0.1);
+-}
+-
+-.emotion-16 {
++.emotion-10 {
+   border-color: rgba(0, 0, 0, 0.1);
+   border-width: 0 0 1px 0;
+   height: 0;
+   margin: 0;
+   width: auto;
++  box-sizing: border-box;
++  display: block;
++  width: 100%;
++  border-color: rgba(0, 0, 0, 0.1);
+ }
+ 
+-.emotion-21 {
++.emotion-14 {
+   box-sizing: border-box;
+   overflow: hidden;
+ }
+ 
+-.emotion-21>img,
+-.emotion-21>iframe {
++.emotion-14>img,
++.emotion-14>iframe {
+   display: block;
+   height: auto;
+   max-width: 100%;
+   width: 100%;
+ }
+ 
+-.emotion-21:first-of-type {
++.emotion-14:first-of-type {
+   border-top-left-radius: 2px;
+   border-top-right-radius: 2px;
+ }
+ 
+-.emotion-21:last-of-type {
++.emotion-14:last-of-type {
+   border-bottom-left-radius: 2px;
+   border-bottom-right-radius: 2px;
+ }
+ 
+-.emotion-24 {
++.emotion-16 {
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: -ms-flexbox;
+@@ -637,29 +631,29 @@ Object {
+   padding: calc(4px * 4) calc(4px * 6);
+ }
+ 
+-.emotion-24>*+*:not(marquee) {
++.emotion-16>*+*:not(marquee) {
+   margin-left: calc(4px * 2);
+ }
+ 
+-.emotion-24>* {
++.emotion-16>* {
+   min-width: 0;
+ }
+ 
+-.emotion-24:first-child {
++.emotion-16:first-of-type {
+   border-top: none;
+ }
+ 
+-.emotion-24:first-of-type {
++.emotion-16:first-of-type {
+   border-top-left-radius: 2px;
+   border-top-right-radius: 2px;
+ }
+ 
+-.emotion-24:last-of-type {
++.emotion-16:last-of-type {
+   border-bottom-left-radius: 2px;
+   border-bottom-right-radius: 2px;
+ }
+ 
+-.emotion-27 {
++.emotion-18 {
+   background: transparent;
+   display: block;
+   margin: 0!important;
+@@ -680,29 +674,29 @@ Object {
+ 
+ <div>
+     <div
+-      class="components-surface components-card components-card emotion-0 emotion-1 emotion-2"
++      class="components-surface components-card components-card emotion-0 emotion-1"
+       data-wp-c16t="true"
+       data-wp-component="Card"
+     >
+       <div
+-        class="emotion-3 emotion-1 emotion-2"
++        class="emotion-2 emotion-1"
+       >
+         <div
+-          class="components-flex components-card__header components-card-header emotion-6 emotion-1 emotion-2"
++          class="components-flex components-card__header components-card-header emotion-4 emotion-1"
+           data-wp-c16t="true"
+           data-wp-component="CardHeader"
+         >
+           Card Header
+         </div>
+         <div
+-          class="components-scrollable components-card__body components-card-body emotion-9 emotion-1 emotion-2"
++          class="components-scrollable components-card__body components-card-body emotion-6 emotion-1"
+           data-wp-c16t="true"
+           data-wp-component="CardBody"
+         >
+           Card Body 1
+         </div>
+         <div
+-          class="components-scrollable components-card__body components-card-body emotion-9 emotion-1 emotion-2"
++          class="components-scrollable components-card__body components-card-body emotion-6 emotion-1"
+           data-wp-c16t="true"
+           data-wp-component="CardBody"
+         >
+@@ -710,20 +704,20 @@ Object {
+         </div>
+         <hr
+           aria-orientation="horizontal"
+-          class="components-divider components-card__divider components-card-divider emotion-15 emotion-16 emotion-17"
++          class="components-divider components-card__divider components-card-divider emotion-10 emotion-11"
+           data-wp-c16t="true"
+           data-wp-component="CardDivider"
+           role="separator"
+         />
+         <div
+-          class="components-scrollable components-card__body components-card-body emotion-9 emotion-1 emotion-2"
++          class="components-scrollable components-card__body components-card-body emotion-6 emotion-1"
+           data-wp-c16t="true"
+           data-wp-component="CardBody"
+         >
+           Card Body 3
+         </div>
+         <div
+-          class="components-card__media components-card-media emotion-21 emotion-1 emotion-2"
++          class="components-card__media components-card-media emotion-14 emotion-1"
+           data-wp-c16t="true"
+           data-wp-component="CardMedia"
+         >
+@@ -733,7 +727,7 @@ Object {
+           />
+         </div>
+         <div
+-          class="components-flex components-card__footer components-card-footer emotion-24 emotion-1 emotion-2"
++          class="components-flex components-card__footer components-card-footer emotion-16 emotion-1"
+           data-wp-c16t="true"
+           data-wp-component="CardFooter"
+         >
+@@ -742,13 +736,13 @@ Object {
+       </div>
+       <div
+         aria-hidden="true"
+-        class="components-elevation emotion-27 emotion-1 emotion-2"
++        class="components-elevation emotion-18 emotion-1"
+         data-wp-c16t="true"
+         data-wp-component="Elevation"
+       />
+       <div
+         aria-hidden="true"
+-        class="components-elevation emotion-27 emotion-1 emotion-2"
++        class="components-elevation emotion-18 emotion-1"
+         data-wp-c16t="true"
+         data-wp-component="Elevation"
+       />
+@@ -819,15 +813,15 @@ Snapshot Diff:
+     </div>
+     <div
+       aria-hidden="true"
+--     class="components-elevation css-1446wzr-Elevation-sx-Base-elevationClassName css-1mm2cvy-View em57xhy0"
+-+     class="components-elevation css-5n3i96-Elevation-sx-Base-elevationClassName css-1mm2cvy-View em57xhy0"
++-     class="components-elevation css-180mfx7-View-Elevation-sx-Base-elevationClassName em57xhy0"
+++     class="components-elevation css-19ozpqv-View-Elevation-sx-Base-elevationClassName em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="Elevation"
+     />
+     <div
+       aria-hidden="true"
+--     class="components-elevation css-na04cd-Elevation-sx-Base-elevationClassName css-1mm2cvy-View em57xhy0"
+-+     class="components-elevation css-5n3i96-Elevation-sx-Base-elevationClassName css-1mm2cvy-View em57xhy0"
++-     class="components-elevation css-179ju9e-View-Elevation-sx-Base-elevationClassName em57xhy0"
+++     class="components-elevation css-19ozpqv-View-Elevation-sx-Base-elevationClassName em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="Elevation"
+     />
+@@ -844,11 +838,11 @@ exports[`Card Card component should warn when the isElevated prop is passed 1`]
+   border-radius: 2px;
+ }
+ 
+-.emotion-3 {
++.emotion-2 {
+   height: 100%;
+ }
+ 
+-.emotion-6 {
++.emotion-4 {
+   background: transparent;
+   display: block;
+   margin: 0!important;
+@@ -867,7 +861,7 @@ exports[`Card Card component should warn when the isElevated prop is passed 1`]
+   border-radius: 2px;
+ }
+ 
+-.emotion-9 {
++.emotion-6 {
+   background: transparent;
+   display: block;
+   margin: 0!important;
+@@ -888,24 +882,24 @@ exports[`Card Card component should warn when the isElevated prop is passed 1`]
+ 
+ <div>
+   <div
+-    class="components-surface components-card components-card emotion-0 emotion-1 emotion-2"
++    class="components-surface components-card components-card emotion-0 emotion-1"
+     data-wp-c16t="true"
+     data-wp-component="Card"
+   >
+     <div
+-      class="emotion-3 emotion-1 emotion-2"
++      class="emotion-2 emotion-1"
+     >
+       Code is Poetry
+     </div>
+     <div
+       aria-hidden="true"
+-      class="components-elevation emotion-6 emotion-1 emotion-2"
++      class="components-elevation emotion-4 emotion-1"
+       data-wp-c16t="true"
+       data-wp-component="Elevation"
+     />
+     <div
+       aria-hidden="true"
+-      class="components-elevation emotion-9 emotion-1 emotion-2"
++      class="components-elevation emotion-6 emotion-1"
+       data-wp-c16t="true"
+       data-wp-component="Elevation"
+     />
+diff --git a/packages/components/src/elevation/hook.js b/packages/components/src/elevation/hook.js
+index 3f4d6c88dbedee..d65c3f545721b7 100644
+--- a/packages/components/src/elevation/hook.js
++++ b/packages/components/src/elevation/hook.js
+@@ -1,10 +1,7 @@
+ /**
+  * External dependencies
+  */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { css, cx } from '@emotion/css';
++import { css } from '@emotion/react';
+ import { isNil } from 'lodash';
+ 
+ /**
+@@ -18,6 +15,7 @@ import { useMemo } from '@wordpress/element';
+ import { useContextSystem } from '../ui/context';
+ import * as styles from './styles';
+ import CONFIG from '../utils/config-values';
++import { useCx } from '../utils/hooks/use-cx';
+ 
+ /**
+  * @param {number} value
+@@ -47,6 +45,8 @@ export function useElevation( props ) {
+ 		...otherProps
+ 	} = useContextSystem( props, 'Elevation' );
+ 
++	const cx = useCx();
++
+ 	const classes = useMemo( () => {
+ 		/** @type {number | undefined} */
+ 		let hoverValue = ! isNil( hover ) ? hover : value * 2;
+diff --git a/packages/components/src/elevation/styles.js b/packages/components/src/elevation/styles.js
+index 8199f1264023d2..9e37f904f8300b 100644
+--- a/packages/components/src/elevation/styles.js
++++ b/packages/components/src/elevation/styles.js
+@@ -1,10 +1,7 @@
+ /**
+  * External dependencies
+  */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { css } from '@emotion/css';
++import { css } from '@emotion/react';
+ 
+ export const Elevation = css`
+ 	background: transparent;
+diff --git a/packages/components/src/elevation/test/__snapshots__/index.js.snap b/packages/components/src/elevation/test/__snapshots__/index.js.snap
+index d00b77d5b52d68..ef08d989ad7bab 100644
+--- a/packages/components/src/elevation/test/__snapshots__/index.js.snap
++++ b/packages/components/src/elevation/test/__snapshots__/index.js.snap
+@@ -29,7 +29,7 @@ exports[`props should render active 1`] = `
+ 
+ <div
+   aria-hidden="true"
+-  class="components-elevation emotion-0 emotion-1 emotion-2"
++  class="components-elevation emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="Elevation"
+ />
+@@ -56,7 +56,7 @@ exports[`props should render correctly 1`] = `
+ 
+ <div
+   aria-hidden="true"
+-  class="components-elevation emotion-0 emotion-1 emotion-2"
++  class="components-elevation emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="Elevation"
+ />
+@@ -87,7 +87,7 @@ exports[`props should render hover 1`] = `
+ 
+ <div
+   aria-hidden="true"
+-  class="components-elevation emotion-0 emotion-1 emotion-2"
++  class="components-elevation emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="Elevation"
+ />
+@@ -122,7 +122,7 @@ exports[`props should render isInteractive 1`] = `
+ 
+ <div
+   aria-hidden="true"
+-  class="components-elevation emotion-0 emotion-1 emotion-2"
++  class="components-elevation emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="Elevation"
+ />
+@@ -157,7 +157,7 @@ exports[`props should render offset 1`] = `
+ 
+ <div
+   aria-hidden="true"
+-  class="components-elevation emotion-0 emotion-1 emotion-2"
++  class="components-elevation emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="Elevation"
+ />
+@@ -184,7 +184,7 @@ exports[`props should render value 1`] = `
+ 
+ <div
+   aria-hidden="true"
+-  class="components-elevation emotion-0 emotion-1 emotion-2"
++  class="components-elevation emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="Elevation"
+ />
+diff --git a/packages/components/src/flex/flex-item/hook.js b/packages/components/src/flex/flex-item/hook.js
+index 9ea9c077e7889c..136661aa7dcfbb 100644
+--- a/packages/components/src/flex/flex-item/hook.js
++++ b/packages/components/src/flex/flex-item/hook.js
+@@ -1,10 +1,7 @@
+ /**
+  * External dependencies
+  */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { css, cx } from '@emotion/css';
++import { css } from '@emotion/react';
+ 
+ /**
+  * Internal dependencies
+@@ -12,6 +9,7 @@ import { css, cx } from '@emotion/css';
+ import { useContextSystem } from '../../ui/context';
+ import { useFlexContext } from '../context';
+ import * as styles from '../styles';
++import { useCx } from '../../utils/hooks/use-cx';
+ 
+ /**
+  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').FlexItemProps, 'div'>} props
+@@ -31,6 +29,8 @@ export function useFlexItem( props ) {
+ 		display: displayProp || contextDisplay,
+ 	} );
+ 
++	const cx = useCx();
++
+ 	const classes = cx(
+ 		styles.Item,
+ 		sx.Base,
+diff --git a/packages/components/src/flex/flex/hook.js b/packages/components/src/flex/flex/hook.js
+index 1af2602a38255d..e85634f6c3c15d 100644
+--- a/packages/components/src/flex/flex/hook.js
++++ b/packages/components/src/flex/flex/hook.js
+@@ -1,10 +1,7 @@
+ /**
+  * External dependencies
+  */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { css, cx } from '@emotion/css';
++import { css } from '@emotion/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -19,6 +16,7 @@ import { useContextSystem } from '../../ui/context';
+ import { useResponsiveValue } from '../../ui/utils/use-responsive-value';
+ import { space } from '../../ui/utils/space';
+ import * as styles from '../styles';
++import { useCx } from '../../utils/hooks/use-cx';
+ 
+ /**
+  *
+@@ -65,6 +63,8 @@ export function useFlex( props ) {
+ 	const isReverse =
+ 		typeof direction === 'string' && direction.includes( 'reverse' );
+ 
++	const cx = useCx();
++
+ 	const classes = useMemo( () => {
+ 		const sx = {};
+ 
+diff --git a/packages/components/src/flex/styles.js b/packages/components/src/flex/styles.js
+index a1ca92db3afee6..2de12155210625 100644
+--- a/packages/components/src/flex/styles.js
++++ b/packages/components/src/flex/styles.js
+@@ -1,10 +1,7 @@
+ /**
+  * External dependencies
+  */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { css } from '@emotion/css';
++import { css } from '@emotion/react';
+ 
+ export const Flex = css`
+ 	display: flex;
+diff --git a/packages/components/src/flex/test/__snapshots__/index.js.snap b/packages/components/src/flex/test/__snapshots__/index.js.snap
+index 4eb89c8a5cbf42..936f33bcb1379d 100644
+--- a/packages/components/src/flex/test/__snapshots__/index.js.snap
++++ b/packages/components/src/flex/test/__snapshots__/index.js.snap
+@@ -6,7 +6,7 @@ Snapshot Diff:
+ + Second value
+ 
+ @@ -7,14 +7,10 @@
+-      class="components-flex-item css-1o3e1r5-Item-sx-Base css-1mm2cvy-View em57xhy0"
++      class="components-flex-item css-mw3lhz-View-Item-sx-Base em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="FlexItem"
+     />
+@@ -15,7 +15,7 @@ Snapshot Diff:
+ -   />
+ -   <div />
+ -   <div
+-      class="components-flex-item components-flex-block css-12rtc5p-Item-sx-Base-block css-1mm2cvy-View em57xhy0"
++      class="components-flex-item components-flex-block css-14wzr73-View-Item-sx-Base-block em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="FlexBlock"
+     />
+@@ -76,7 +76,7 @@ exports[`props should render correctly 1`] = `
+   min-width: 0;
+ }
+ 
+-.emotion-3 {
++.emotion-2 {
+   display: block;
+   max-height: 100%;
+   max-width: 100%;
+@@ -84,7 +84,7 @@ exports[`props should render correctly 1`] = `
+   min-width: 0;
+ }
+ 
+-.emotion-6 {
++.emotion-4 {
+   display: block;
+   max-height: 100%;
+   max-width: 100%;
+@@ -96,17 +96,17 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ <div
+-  class="components-flex emotion-0 emotion-1 emotion-2"
++  class="components-flex emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="Flex"
+ >
+   <div
+-    class="components-flex-item emotion-3 emotion-1 emotion-2"
++    class="components-flex-item emotion-2 emotion-1"
+     data-wp-c16t="true"
+     data-wp-component="FlexItem"
+   />
+   <div
+-    class="components-flex-item components-flex-block emotion-6 emotion-1 emotion-2"
++    class="components-flex-item components-flex-block emotion-4 emotion-1"
+     data-wp-c16t="true"
+     data-wp-component="FlexBlock"
+   />
+@@ -137,7 +137,6 @@ Snapshot Diff:
+ +     "justify-content": "space-between",
+       "width": "100%",
+     },
+-    Object {},
+   ]
+ `;
+ 
+diff --git a/packages/components/src/flyout/test/__snapshots__/index.js.snap b/packages/components/src/flyout/test/__snapshots__/index.js.snap
+index 9f2bbea548705c..eb1c35d15233ef 100644
+--- a/packages/components/src/flyout/test/__snapshots__/index.js.snap
++++ b/packages/components/src/flyout/test/__snapshots__/index.js.snap
+@@ -10,15 +10,15 @@ exports[`props should render correctly 1`] = `
+   border-radius: 2px;
+ }
+ 
+-.emotion-2 .components-card-body {
++.emotion-1 .components-card-body {
+   max-height: 80vh;
+ }
+ 
+-.emotion-4 {
++.emotion-3 {
+   height: 100%;
+ }
+ 
+-.emotion-7 {
++.emotion-5 {
+   height: 100%;
+   overflow-x: hidden;
+   overflow-y: auto;
+@@ -28,21 +28,21 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media only screen and ( min-device-width: 40em ) {
+-  .emotion-7::-webkit-scrollbar {
++  .emotion-5::-webkit-scrollbar {
+     height: 12px;
+     width: 12px;
+   }
+ 
+-  .emotion-7::-webkit-scrollbar-track {
++  .emotion-5::-webkit-scrollbar-track {
+     background-color: transparent;
+   }
+ 
+-  .emotion-7::-webkit-scrollbar-track {
++  .emotion-5::-webkit-scrollbar-track {
+     background: rgba(0, 0, 0, 0.04);
+     border-radius: 8px;
+   }
+ 
+-  .emotion-7::-webkit-scrollbar-thumb {
++  .emotion-5::-webkit-scrollbar-thumb {
+     -webkit-background-clip: padding-box;
+     background-clip: padding-box;
+     background-color: rgba(0, 0, 0, 0.2);
+@@ -50,22 +50,22 @@ exports[`props should render correctly 1`] = `
+     border-radius: 7px;
+   }
+ 
+-  .emotion-7:hover::-webkit-scrollbar-thumb {
++  .emotion-5:hover::-webkit-scrollbar-thumb {
+     background-color: rgba(0, 0, 0, 0.5);
+   }
+ }
+ 
+-.emotion-7:first-of-type {
++.emotion-5:first-of-type {
+   border-top-left-radius: 2px;
+   border-top-right-radius: 2px;
+ }
+ 
+-.emotion-7:last-of-type {
++.emotion-5:last-of-type {
+   border-bottom-left-radius: 2px;
+   border-bottom-right-radius: 2px;
+ }
+ 
+-.emotion-10 {
++.emotion-7 {
+   background: transparent;
+   display: block;
+   margin: 0!important;
+@@ -84,7 +84,7 @@ exports[`props should render correctly 1`] = `
+   border-radius: 2px;
+ }
+ 
+-.emotion-13 {
++.emotion-9 {
+   background: transparent;
+   display: block;
+   margin: 0!important;
+@@ -104,12 +104,12 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ <div
+-  class="components-surface components-card components-card emotion-0 emotion-1 emotion-2 emotion-3"
++  class="components-surface components-card components-card emotion-0 emotion-1 emotion-2"
+   data-wp-c16t="true"
+   data-wp-component="Card"
+ >
+   <div
+-    class="emotion-4 emotion-5 emotion-3"
++    class="emotion-3 emotion-2"
+   >
+     <iframe
+       aria-hidden="true"
+@@ -119,7 +119,7 @@ exports[`props should render correctly 1`] = `
+       tabindex="-1"
+     />
+     <div
+-      class="components-scrollable components-card__body components-card-body emotion-7 emotion-5 emotion-3"
++      class="components-scrollable components-card__body components-card-body emotion-5 emotion-2"
+       data-wp-c16t="true"
+       data-wp-component="CardBody"
+     >
+@@ -128,13 +128,13 @@ exports[`props should render correctly 1`] = `
+   </div>
+   <div
+     aria-hidden="true"
+-    class="components-elevation emotion-10 emotion-5 emotion-3"
++    class="components-elevation emotion-7 emotion-2"
+     data-wp-c16t="true"
+     data-wp-component="Elevation"
+   />
+   <div
+     aria-hidden="true"
+-    class="components-elevation emotion-13 emotion-5 emotion-3"
++    class="components-elevation emotion-9 emotion-2"
+     data-wp-c16t="true"
+     data-wp-component="Elevation"
+   />
+@@ -190,7 +190,7 @@ Snapshot Diff:
+           tabindex="-1"
+         />
+ +       <div
+-+         class="components-scrollable components-card__body components-card-body css-1x21s5j-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium css-1mm2cvy-View em57xhy0"
+++         class="components-scrollable components-card__body components-card-body css-q3qn5w-View-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium em57xhy0"
+ +         data-wp-c16t="true"
+ +         data-wp-component="CardBody"
+ +       >
+@@ -199,6 +199,6 @@ Snapshot Diff:
+       </div>
+       <div
+         aria-hidden="true"
+-        class="components-elevation css-1446wzr-Elevation-sx-Base-elevationClassName css-1mm2cvy-View em57xhy0"
++        class="components-elevation css-180mfx7-View-Elevation-sx-Base-elevationClassName em57xhy0"
+         data-wp-c16t="true"
+ `;
+diff --git a/packages/components/src/grid/hook.js b/packages/components/src/grid/hook.js
+index 69c1e74b4954d8..f2c80c49bd745a 100644
+--- a/packages/components/src/grid/hook.js
++++ b/packages/components/src/grid/hook.js
+@@ -1,10 +1,7 @@
+ /**
+  * External dependencies
+  */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { css, cx } from '@emotion/css';
++import { css } from '@emotion/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -18,6 +15,7 @@ import { useContextSystem } from '../ui/context';
+ import { getAlignmentProps } from './utils';
+ import { useResponsiveValue } from '../ui/utils/use-responsive-value';
+ import CONFIG from '../utils/config-values';
++import { useCx } from '../utils/hooks/use-cx';
+ 
+ /**
+  * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+@@ -49,6 +47,8 @@ export default function useGrid( props ) {
+ 	const gridTemplateRows =
+ 		templateRows || ( !! rows && `repeat( ${ row }, 1fr )` );
+ 
++	const cx = useCx();
++
+ 	const classes = useMemo( () => {
+ 		const alignmentProps = getAlignmentProps( alignment );
+ 
+diff --git a/packages/components/src/h-stack/test/__snapshots__/index.js.snap b/packages/components/src/h-stack/test/__snapshots__/index.js.snap
+index 2715a20ed13f53..86417e8afbec1d 100644
+--- a/packages/components/src/h-stack/test/__snapshots__/index.js.snap
++++ b/packages/components/src/h-stack/test/__snapshots__/index.js.snap
+@@ -29,15 +29,15 @@ exports[`props should render alignment 1`] = `
+ }
+ 
+ <div
+-  class="components-flex components-h-stack emotion-0 emotion-1 emotion-2"
++  class="components-flex components-h-stack emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="HStack"
+ >
+   <div
+-    class="emotion-1 emotion-2"
++    class="emotion-2 emotion-1"
+   />
+   <div
+-    class="emotion-1 emotion-2"
++    class="emotion-2 emotion-1"
+   />
+ </div>
+ `;
+@@ -70,15 +70,15 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ <div
+-  class="components-flex components-h-stack emotion-0 emotion-1 emotion-2"
++  class="components-flex components-h-stack emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="HStack"
+ >
+   <div
+-    class="emotion-1 emotion-2"
++    class="emotion-2 emotion-1"
+   />
+   <div
+-    class="emotion-1 emotion-2"
++    class="emotion-2 emotion-1"
+   />
+ </div>
+ `;
+@@ -111,15 +111,15 @@ exports[`props should render spacing 1`] = `
+ }
+ 
+ <div
+-  class="components-flex components-h-stack emotion-0 emotion-1 emotion-2"
++  class="components-flex components-h-stack emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="HStack"
+ >
+   <div
+-    class="emotion-1 emotion-2"
++    class="emotion-2 emotion-1"
+   />
+   <div
+-    class="emotion-1 emotion-2"
++    class="emotion-2 emotion-1"
+   />
+ </div>
+ `;
+diff --git a/packages/components/src/heading/test/__snapshots__/index.js.snap b/packages/components/src/heading/test/__snapshots__/index.js.snap
+index 910d5e6fcd4d9b..06d18dafe673e1 100644
+--- a/packages/components/src/heading/test/__snapshots__/index.js.snap
++++ b/packages/components/src/heading/test/__snapshots__/index.js.snap
+@@ -12,7 +12,7 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ <h2
+-  class="components-truncate components-text components-heading emotion-0 emotion-1 emotion-2"
++  class="components-truncate components-text components-heading emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="Heading"
+ >
+@@ -25,7 +25,6 @@ Snapshot Diff:
+ - Received styles
+ + Base styles
+ 
+-@@ -1,10 +1,10 @@
+   Array [
+     Object {
+       "color": "#050505",
+@@ -36,7 +35,7 @@ Snapshot Diff:
+       "line-height": "1.2",
+       "margin": "0",
+     },
+-    Object {},
++  ]
+ `;
+ 
+ exports[`props should render level as a string 1`] = `
+@@ -44,7 +43,6 @@ Snapshot Diff:
+ - Received styles
+ + Base styles
+ 
+-@@ -1,10 +1,10 @@
+   Array [
+     Object {
+       "color": "#050505",
+@@ -55,5 +53,5 @@ Snapshot Diff:
+       "line-height": "1.2",
+       "margin": "0",
+     },
+-    Object {},
++  ]
+ `;
+diff --git a/packages/components/src/scrollable/hook.js b/packages/components/src/scrollable/hook.js
+index db71d3dc158f9b..bcfab8ef7c9270 100644
+--- a/packages/components/src/scrollable/hook.js
++++ b/packages/components/src/scrollable/hook.js
+@@ -1,11 +1,3 @@
+-/**
+- * External dependencies
+- */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { cx } from '@emotion/css';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -16,6 +8,7 @@ import { useMemo } from '@wordpress/element';
+  */
+ import { useContextSystem } from '../ui/context';
+ import * as styles from './styles';
++import { useCx } from '../utils/hooks/use-cx';
+ 
+ /* eslint-disable jsdoc/valid-types */
+ /**
+@@ -30,6 +23,8 @@ export function useScrollable( props ) {
+ 		...otherProps
+ 	} = useContextSystem( props, 'Scrollable' );
+ 
++	const cx = useCx();
++
+ 	const classes = useMemo(
+ 		() =>
+ 			cx(
+diff --git a/packages/components/src/scrollable/styles.js b/packages/components/src/scrollable/styles.js
+index d9ae60f8f0396e..6280cd5ea4ae29 100644
+--- a/packages/components/src/scrollable/styles.js
++++ b/packages/components/src/scrollable/styles.js
+@@ -1,10 +1,7 @@
+ /**
+  * External dependencies
+  */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { css } from '@emotion/css';
++import { css } from '@emotion/react';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/scrollable/test/__snapshots__/index.js.snap b/packages/components/src/scrollable/test/__snapshots__/index.js.snap
+index 17f27dbbf43fcb..5a1dcc83ecbb05 100644
+--- a/packages/components/src/scrollable/test/__snapshots__/index.js.snap
++++ b/packages/components/src/scrollable/test/__snapshots__/index.js.snap
+@@ -36,7 +36,7 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ <div
+-  class="components-scrollable emotion-0 emotion-1 emotion-2"
++  class="components-scrollable emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="Scrollable"
+ >
+@@ -56,6 +56,5 @@ Snapshot Diff:
+       "overflow-y": "auto",
+ -     "scroll-behavior": "smooth",
+     },
+-    Object {},
+   ]
+ `;
+diff --git a/packages/components/src/spacer/hook.ts b/packages/components/src/spacer/hook.ts
+index 67e11f24e43885..a3560aade106fe 100644
+--- a/packages/components/src/spacer/hook.ts
++++ b/packages/components/src/spacer/hook.ts
+@@ -1,10 +1,7 @@
+ /**
+  * External dependencies
+  */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { css, cx } from '@emotion/css';
++import { css } from '@emotion/react';
+ 
+ /**
+  * Internal dependencies
+@@ -13,6 +10,7 @@ import { useContextSystem } from '../ui/context';
+ // eslint-disable-next-line no-duplicate-imports
+ import type { PolymorphicComponentProps } from '../ui/context';
+ import { space, SpaceInput } from '../ui/utils/space';
++import { useCx } from '../utils/hooks/use-cx';
+ 
+ const isDefined = < T >( o: T ): o is Exclude< T, null | undefined > =>
+ 	typeof o !== 'undefined' && o !== null;
+@@ -104,6 +102,8 @@ export function useSpacer(
+ 		...otherProps
+ 	} = useContextSystem( props, 'Spacer' );
+ 
++	const cx = useCx();
++
+ 	const classes = cx(
+ 		isDefined( marginTop ) &&
+ 			css`
+diff --git a/packages/components/src/spacer/test/__snapshots__/index.js.snap b/packages/components/src/spacer/test/__snapshots__/index.js.snap
+index efbb6cbd02d1df..b11a8cc37124e9 100644
+--- a/packages/components/src/spacer/test/__snapshots__/index.js.snap
++++ b/packages/components/src/spacer/test/__snapshots__/index.js.snap
+@@ -6,7 +6,7 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ <div
+-  class="emotion-0 components-spacer emotion-1 emotion-2"
++  class="components-spacer emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="Spacer"
+ />
+@@ -22,7 +22,6 @@ Snapshot Diff:
+ -     "margin": "calc(4px * 5)",
+       "margin-bottom": "calc(4px * 2)",
+     },
+-    Object {},
+   ]
+ `;
+ 
+@@ -36,7 +35,6 @@ Snapshot Diff:
+ -     "margin-bottom": "calc(4px * 5)",
+ +     "margin-bottom": "calc(4px * 2)",
+     },
+-    Object {},
+   ]
+ `;
+ 
+@@ -50,7 +48,6 @@ Snapshot Diff:
+       "margin-bottom": "calc(4px * 2)",
+ -     "margin-left": "calc(4px * 5)",
+     },
+-    Object {},
+   ]
+ `;
+ 
+@@ -64,7 +61,6 @@ Snapshot Diff:
+       "margin-bottom": "calc(4px * 2)",
+ -     "margin-right": "calc(4px * 5)",
+     },
+-    Object {},
+   ]
+ `;
+ 
+@@ -78,7 +74,6 @@ Snapshot Diff:
+       "margin-bottom": "calc(4px * 2)",
+ -     "margin-top": "calc(4px * 5)",
+     },
+-    Object {},
+   ]
+ `;
+ 
+@@ -93,7 +88,6 @@ Snapshot Diff:
+ -     "margin-left": "calc(4px * 5)",
+ -     "margin-right": "calc(4px * 5)",
+     },
+-    Object {},
+   ]
+ `;
+ 
+@@ -108,7 +102,6 @@ Snapshot Diff:
+ -     "margin-top": "calc(4px * 5)",
+ +     "margin-bottom": "calc(4px * 2)",
+     },
+-    Object {},
+   ]
+ `;
+ 
+@@ -122,7 +115,6 @@ Snapshot Diff:
+       "margin-bottom": "calc(4px * 2)",
+ -     "padding": "calc(4px * 5)",
+     },
+-    Object {},
+   ]
+ `;
+ 
+@@ -136,7 +128,6 @@ Snapshot Diff:
+       "margin-bottom": "calc(4px * 2)",
+ -     "padding-bottom": "calc(4px * 5)",
+     },
+-    Object {},
+   ]
+ `;
+ 
+@@ -150,7 +141,6 @@ Snapshot Diff:
+       "margin-bottom": "calc(4px * 2)",
+ -     "padding-left": "calc(4px * 5)",
+     },
+-    Object {},
+   ]
+ `;
+ 
+@@ -164,7 +154,6 @@ Snapshot Diff:
+       "margin-bottom": "calc(4px * 2)",
+ -     "padding-right": "calc(4px * 5)",
+     },
+-    Object {},
+   ]
+ `;
+ 
+@@ -178,7 +167,6 @@ Snapshot Diff:
+       "margin-bottom": "calc(4px * 2)",
+ -     "padding-top": "calc(4px * 5)",
+     },
+-    Object {},
+   ]
+ `;
+ 
+@@ -193,7 +181,6 @@ Snapshot Diff:
+ -     "padding-left": "calc(4px * 5)",
+ -     "padding-right": "calc(4px * 5)",
+     },
+-    Object {},
+   ]
+ `;
+ 
+@@ -208,6 +195,5 @@ Snapshot Diff:
+ -     "padding-bottom": "calc(4px * 5)",
+ -     "padding-top": "calc(4px * 5)",
+     },
+-    Object {},
+   ]
+ `;
+diff --git a/packages/components/src/surface/hook.js b/packages/components/src/surface/hook.js
+index 10b46a20aeb060..a25e6d118c6f30 100644
+--- a/packages/components/src/surface/hook.js
++++ b/packages/components/src/surface/hook.js
+@@ -1,11 +1,3 @@
+-/**
+- * External dependencies
+- */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { cx } from '@emotion/css';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -16,6 +8,7 @@ import { useMemo } from '@wordpress/element';
+  */
+ import { useContextSystem } from '../ui/context';
+ import * as styles from './styles';
++import { useCx } from '../utils/hooks/use-cx';
+ 
+ /**
+  * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+@@ -32,6 +25,8 @@ export function useSurface( props ) {
+ 		...otherProps
+ 	} = useContextSystem( props, 'Surface' );
+ 
++	const cx = useCx();
++
+ 	const classes = useMemo( () => {
+ 		const sx = {};
+ 
+diff --git a/packages/components/src/surface/styles.js b/packages/components/src/surface/styles.js
+index 093f96d68e8a63..1c54c45b69860e 100644
+--- a/packages/components/src/surface/styles.js
++++ b/packages/components/src/surface/styles.js
+@@ -1,10 +1,7 @@
+ /**
+  * External dependencies
+  */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { css } from '@emotion/css';
++import { css } from '@emotion/react';
+ 
+ /**
+  * Internal dependencies
+@@ -128,7 +125,7 @@ const gridBackgroundCombined = [
+ 
+ /**
+  * @param {string} surfaceBackgroundSize
+- * @return {string} CSS.
++ * @return {import('@emotion/react').SerializedStyles} CSS.
+  */
+ export const getGrid = ( surfaceBackgroundSize ) => {
+ 	return css`
+diff --git a/packages/components/src/surface/test/__snapshots__/index.js.snap b/packages/components/src/surface/test/__snapshots__/index.js.snap
+index 7d5303433de259..043575488d0e70 100644
+--- a/packages/components/src/surface/test/__snapshots__/index.js.snap
++++ b/packages/components/src/surface/test/__snapshots__/index.js.snap
+@@ -6,8 +6,8 @@ Snapshot Diff:
+ + Second value
+ 
+   <div
+--   class="components-surface css-1v0lads-Surface-getBorders-primary css-1mm2cvy-View em57xhy0"
+-+   class="components-surface css-s3w0k-Surface-getBorders-primary css-1mm2cvy-View em57xhy0"
++-   class="components-surface css-k1ws5-View-Surface-getBorders-primary em57xhy0"
+++   class="components-surface css-avigp2-View-Surface-getBorders-primary em57xhy0"
+     data-wp-c16t="true"
+     data-wp-component="Surface"
+   >
+@@ -21,8 +21,8 @@ Snapshot Diff:
+ + Second value
+ 
+   <div
+--   class="components-surface css-xbskxc-Surface-getBorders-primary css-1mm2cvy-View em57xhy0"
+-+   class="components-surface css-s3w0k-Surface-getBorders-primary css-1mm2cvy-View em57xhy0"
++-   class="components-surface css-gi9sau-View-Surface-getBorders-primary em57xhy0"
+++   class="components-surface css-avigp2-View-Surface-getBorders-primary em57xhy0"
+     data-wp-c16t="true"
+     data-wp-component="Surface"
+   >
+@@ -36,8 +36,8 @@ Snapshot Diff:
+ + Second value
+ 
+   <div
+--   class="components-surface css-pznwh2-Surface-getBorders-primary css-1mm2cvy-View em57xhy0"
+-+   class="components-surface css-s3w0k-Surface-getBorders-primary css-1mm2cvy-View em57xhy0"
++-   class="components-surface css-1lwskr8-View-Surface-getBorders-primary em57xhy0"
+++   class="components-surface css-avigp2-View-Surface-getBorders-primary em57xhy0"
+     data-wp-c16t="true"
+     data-wp-component="Surface"
+   >
+@@ -51,8 +51,8 @@ Snapshot Diff:
+ + Second value
+ 
+   <div
+--   class="components-surface css-17wbg6n-Surface-getBorders-primary css-1mm2cvy-View em57xhy0"
+-+   class="components-surface css-s3w0k-Surface-getBorders-primary css-1mm2cvy-View em57xhy0"
++-   class="components-surface css-sdy6q1-View-Surface-getBorders-primary em57xhy0"
+++   class="components-surface css-avigp2-View-Surface-getBorders-primary em57xhy0"
+     data-wp-c16t="true"
+     data-wp-component="Surface"
+   >
+@@ -68,7 +68,7 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ <div
+-  class="components-surface emotion-0 emotion-1 emotion-2"
++  class="components-surface emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="Surface"
+ >
+@@ -82,8 +82,8 @@ Snapshot Diff:
+ + Second value
+ 
+   <div
+--   class="components-surface css-rpogp2-Surface-getBorders-secondary css-1mm2cvy-View em57xhy0"
+-+   class="components-surface css-s3w0k-Surface-getBorders-primary css-1mm2cvy-View em57xhy0"
++-   class="components-surface css-jkj9zl-View-Surface-getBorders-secondary em57xhy0"
+++   class="components-surface css-avigp2-View-Surface-getBorders-primary em57xhy0"
+     data-wp-c16t="true"
+     data-wp-component="Surface"
+   >
+diff --git a/packages/components/src/text/hook.js b/packages/components/src/text/hook.js
+index 601f8139a9859e..8c3bb3f31521c3 100644
+--- a/packages/components/src/text/hook.js
++++ b/packages/components/src/text/hook.js
+@@ -1,10 +1,7 @@
+ /**
+  * External dependencies
+  */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { css, cx } from '@emotion/css';
++import { css } from '@emotion/react';
+ import { isPlainObject } from 'lodash';
+ 
+ /**
+@@ -23,6 +20,7 @@ import { createHighlighterText } from './utils';
+ import { getFontSize } from '../ui/utils/font-size';
+ import { CONFIG, COLORS } from '../utils';
+ import { getLineHeight } from './get-line-height';
++import { useCx } from '../utils/hooks/use-cx';
+ 
+ /**
+  * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'span'>} props
+@@ -76,6 +74,8 @@ export default function useText( props ) {
+ 		} );
+ 	}
+ 
++	const cx = useCx();
++
+ 	const classes = useMemo( () => {
+ 		const sx = {};
+ 
+diff --git a/packages/components/src/text/styles.js b/packages/components/src/text/styles.js
+index 3f8dc4dd3e2070..ac7db34c0aa0a1 100644
+--- a/packages/components/src/text/styles.js
++++ b/packages/components/src/text/styles.js
+@@ -1,10 +1,7 @@
+ /**
+  * External dependencies
+  */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { css } from '@emotion/css';
++import { css } from '@emotion/react';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/text/test/__snapshots__/index.js.snap b/packages/components/src/text/test/__snapshots__/index.js.snap
+index bead4384c3f1e3..41cdd09bfdf66d 100644
+--- a/packages/components/src/text/test/__snapshots__/index.js.snap
++++ b/packages/components/src/text/test/__snapshots__/index.js.snap
+@@ -16,7 +16,7 @@ exports[`Text should render highlighted words with highlightCaseSensitive 1`] =
+ }
+ 
+ <span
+-  class="components-truncate components-text emotion-0 emotion-1 emotion-2"
++  class="components-truncate components-text emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="Text"
+ >
+@@ -38,7 +38,7 @@ exports[`Text snapshot tests should render correctly 1`] = `
+ }
+ 
+ <span
+-  class="components-truncate components-text emotion-0 emotion-1 emotion-2"
++  class="components-truncate components-text emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="Text"
+ >
+diff --git a/packages/components/src/truncate/hook.js b/packages/components/src/truncate/hook.js
+index be990dd4fcc77f..cd9f313da0e95c 100644
+--- a/packages/components/src/truncate/hook.js
++++ b/packages/components/src/truncate/hook.js
+@@ -1,10 +1,7 @@
+ /**
+  * External dependencies
+  */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { css, cx } from '@emotion/css';
++import { css } from '@emotion/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -17,6 +14,7 @@ import { useMemo } from '@wordpress/element';
+ import { useContextSystem } from '../ui/context';
+ import * as styles from './styles';
+ import { TRUNCATE_ELLIPSIS, TRUNCATE_TYPE, truncateContent } from './utils';
++import { useCx } from '../utils/hooks/use-cx';
+ 
+ /**
+  * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'span'>} props
+@@ -32,6 +30,8 @@ export default function useTruncate( props ) {
+ 		...otherProps
+ 	} = useContextSystem( props, 'Truncate' );
+ 
++	const cx = useCx();
++
+ 	const truncatedContent = truncateContent(
+ 		typeof children === 'string' ? /** @type {string} */ ( children ) : '',
+ 		{
+diff --git a/packages/components/src/truncate/styles.js b/packages/components/src/truncate/styles.js
+index d49a3e3294630f..a4f3a962033dfc 100644
+--- a/packages/components/src/truncate/styles.js
++++ b/packages/components/src/truncate/styles.js
+@@ -1,10 +1,7 @@
+ /**
+  * External dependencies
+  */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { css } from '@emotion/css';
++import { css } from '@emotion/react';
+ 
+ export const Truncate = css`
+ 	display: block;
+diff --git a/packages/components/src/ui/context/use-context-system.js b/packages/components/src/ui/context/use-context-system.js
+index 5abbe63ef24457..4a842033a2a2f3 100644
+--- a/packages/components/src/ui/context/use-context-system.js
++++ b/packages/components/src/ui/context/use-context-system.js
+@@ -1,11 +1,3 @@
+-/**
+- * External dependencies
+- */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { cx } from '@emotion/css';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -17,6 +9,7 @@ import warn from '@wordpress/warning';
+ import { useComponentsContext } from './context-system-provider';
+ import { getNamespace, getConnectedNamespace } from './utils';
+ import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
++import { useCx } from '../../utils/hooks/use-cx';
+ 
+ /**
+  * @template TProps
+@@ -55,6 +48,8 @@ export function useContextSystem( props, namespace ) {
+ 		? Object.assign( {}, otherContextProps, props )
+ 		: props;
+ 
++	const cx = useCx();
++
+ 	const classes = cx(
+ 		getStyledClassNameFromKey( namespace ),
+ 		props.className
+diff --git a/packages/components/src/ui/control-group/hook.js b/packages/components/src/ui/control-group/hook.js
+index 1a94aced2f835d..a30b745f94b9a8 100644
+--- a/packages/components/src/ui/control-group/hook.js
++++ b/packages/components/src/ui/control-group/hook.js
+@@ -1,11 +1,3 @@
+-/**
+- * External dependencies
+- */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { cx } from '@emotion/css';
+-
+ /**
+  * Internal dependencies
+  */
+@@ -13,6 +5,7 @@ import { getValidChildren } from '../utils/get-valid-children';
+ import { useContextSystem } from '../context';
+ import { ControlGroupContext } from './context';
+ import * as styles from './styles';
++import { useCx } from '../../utils/hooks/use-cx';
+ 
+ /**
+  * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+@@ -30,6 +23,8 @@ export function useControlGroup( props ) {
+ 	const isVertical = direction === 'column';
+ 	const isGrid = !! templateColumns;
+ 
++	const cx = useCx();
++
+ 	const classes = cx(
+ 		styles.itemFocus,
+ 		isGrid && styles.itemGrid,
+@@ -47,7 +42,7 @@ export function useControlGroup( props ) {
+ 			// @ts-ignore
+ 			const _key = child?.key || index;
+ 
+-			/** @type {string | undefined} */
++			/** @type {import('@emotion/react').SerializedStyles | undefined} */
+ 			let first;
+ 			if ( isFirst ) {
+ 				if ( isVertical ) {
+@@ -57,7 +52,7 @@ export function useControlGroup( props ) {
+ 				}
+ 			}
+ 
+-			/** @type {string | undefined} */
++			/** @type {import('@emotion/react').SerializedStyles | undefined} */
+ 			let last;
+ 			if ( isLast ) {
+ 				if ( isVertical ) {
+diff --git a/packages/components/src/ui/control-group/styles.js b/packages/components/src/ui/control-group/styles.js
+index 2163aac28175c5..24f13a86ac0a2d 100644
+--- a/packages/components/src/ui/control-group/styles.js
++++ b/packages/components/src/ui/control-group/styles.js
+@@ -1,10 +1,7 @@
+ /**
+  * External dependencies
+  */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { css } from '@emotion/css';
++import { css } from '@emotion/react';
+ 
+ export const first = css`
+ 	border-bottom-right-radius: 0;
+diff --git a/packages/components/src/ui/control-group/test/__snapshots__/index.js.snap b/packages/components/src/ui/control-group/test/__snapshots__/index.js.snap
+index 394e2545be5641..482d428d0b0a3d 100644
+--- a/packages/components/src/ui/control-group/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/control-group/test/__snapshots__/index.js.snap
+@@ -32,7 +32,7 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ <div
+-  class="components-flex components-control-group emotion-0 emotion-1 emotion-2"
++  class="components-flex components-control-group emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="ControlGroup"
+ >
+diff --git a/packages/components/src/ui/control-label/hook.js b/packages/components/src/ui/control-label/hook.js
+index 66e0d7612ea769..e376cc18f726ca 100644
+--- a/packages/components/src/ui/control-label/hook.js
++++ b/packages/components/src/ui/control-label/hook.js
+@@ -1,11 +1,3 @@
+-/**
+- * External dependencies
+- */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { cx } from '@emotion/css';
+-
+ /**
+  * Internal dependencies
+  */
+@@ -13,6 +5,7 @@ import { useContextSystem } from '../context';
+ import { useFormGroupContextId } from '../form-group';
+ import { useText } from '../../text';
+ import * as styles from './styles';
++import { useCx } from '../../utils/hooks/use-cx';
+ 
+ /**
+  * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'label'>} props
+@@ -32,6 +25,8 @@ export function useControlLabel( props ) {
+ 		truncate,
+ 	} );
+ 
++	const cx = useCx();
++
+ 	const htmlFor = useFormGroupContextId( htmlForProp );
+ 	const classes = cx(
+ 		styles.ControlLabel,
+diff --git a/packages/components/src/ui/control-label/styles.js b/packages/components/src/ui/control-label/styles.js
+index 1a1afde87719b7..8f96e91d0ef3fb 100644
+--- a/packages/components/src/ui/control-label/styles.js
++++ b/packages/components/src/ui/control-label/styles.js
+@@ -1,10 +1,7 @@
+ /**
+  * External dependencies
+  */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { css } from '@emotion/css';
++import { css } from '@emotion/react';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/ui/control-label/test/__snapshots__/index.js.snap b/packages/components/src/ui/control-label/test/__snapshots__/index.js.snap
+index 4d4445451d1ae7..00a236bb88eefa 100644
+--- a/packages/components/src/ui/control-label/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/control-label/test/__snapshots__/index.js.snap
+@@ -38,7 +38,7 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ <label
+-  class="components-truncate components-text components-control-label emotion-0 emotion-1 emotion-2"
++  class="components-truncate components-text components-control-label emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="ControlLabel"
+ >
+@@ -80,7 +80,7 @@ exports[`props should render no truncate 1`] = `
+ }
+ 
+ <label
+-  class="components-truncate components-text components-control-label emotion-0 emotion-1 emotion-2"
++  class="components-truncate components-text components-control-label emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="ControlLabel"
+ >
+@@ -126,7 +126,7 @@ exports[`props should render size 1`] = `
+ }
+ 
+ <label
+-  class="components-truncate components-text components-control-label emotion-0 emotion-1 emotion-2"
++  class="components-truncate components-text components-control-label emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="ControlLabel"
+ >
+diff --git a/packages/components/src/ui/form-group/form-group-styles.js b/packages/components/src/ui/form-group/form-group-styles.js
+index c69bd8b1e43def..b675565d243562 100644
+--- a/packages/components/src/ui/form-group/form-group-styles.js
++++ b/packages/components/src/ui/form-group/form-group-styles.js
+@@ -1,10 +1,7 @@
+ /**
+  * External dependencies
+  */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { css } from '@emotion/css';
++import { css } from '@emotion/react';
+ 
+ export const FormGroup = css`
+ 	width: 100%;
+diff --git a/packages/components/src/ui/form-group/test/__snapshots__/index.js.snap b/packages/components/src/ui/form-group/test/__snapshots__/index.js.snap
+index 5a64ab4c2af0c0..d09136004a085b 100644
+--- a/packages/components/src/ui/form-group/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/form-group/test/__snapshots__/index.js.snap
+@@ -5,7 +5,7 @@ exports[`props should render alignLabel 1`] = `
+   width: 100%;
+ }
+ 
+-.emotion-3 {
++.emotion-2 {
+   display: inline-block;
+   line-height: calc(13px * 1.2);
+   margin: 0;
+@@ -24,7 +24,7 @@ exports[`props should render alignLabel 1`] = `
+   vertical-align: middle;
+ }
+ 
+-.emotion-3:active {
++.emotion-2:active {
+   -webkit-user-select: none;
+   -moz-user-select: none;
+   -ms-user-select: none;
+@@ -32,19 +32,19 @@ exports[`props should render alignLabel 1`] = `
+ }
+ 
+ @media ( -webkit-min-device-pixel-ratio: 1.25 ), ( min-resolution: 120dpi ) {
+-  .emotion-3>* {
++  .emotion-2>* {
+     position: relative;
+     top: 0.5px;
+   }
+ }
+ 
+ <div
+-  class="emotion-0 components-form-group emotion-1 emotion-2"
++  class="components-form-group emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="FormGroup"
+ >
+   <label
+-    class="components-truncate components-text components-control-label emotion-3 emotion-1 emotion-2"
++    class="components-truncate components-text components-control-label emotion-2 emotion-1"
+     data-wp-c16t="true"
+     data-wp-component="ControlLabel"
+     for="fname"
+@@ -63,7 +63,7 @@ exports[`props should render vertically 1`] = `
+   width: 100%;
+ }
+ 
+-.emotion-3 {
++.emotion-2 {
+   display: inline-block;
+   line-height: calc(13px * 1.2);
+   margin: 0;
+@@ -82,7 +82,7 @@ exports[`props should render vertically 1`] = `
+   vertical-align: middle;
+ }
+ 
+-.emotion-3:active {
++.emotion-2:active {
+   -webkit-user-select: none;
+   -moz-user-select: none;
+   -ms-user-select: none;
+@@ -90,19 +90,19 @@ exports[`props should render vertically 1`] = `
+ }
+ 
+ @media ( -webkit-min-device-pixel-ratio: 1.25 ), ( min-resolution: 120dpi ) {
+-  .emotion-3>* {
++  .emotion-2>* {
+     position: relative;
+     top: 0.5px;
+   }
+ }
+ 
+ <div
+-  class="emotion-0 components-form-group emotion-1 emotion-2"
++  class="components-form-group emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="FormGroup"
+ >
+   <label
+-    class="components-truncate components-text components-control-label emotion-3 emotion-1 emotion-2"
++    class="components-truncate components-text components-control-label emotion-2 emotion-1"
+     data-wp-c16t="true"
+     data-wp-component="ControlLabel"
+     for="fname"
+diff --git a/packages/components/src/ui/form-group/use-form-group.js b/packages/components/src/ui/form-group/use-form-group.js
+index b107b5cb95f988..3b73fc69f5f4ef 100644
+--- a/packages/components/src/ui/form-group/use-form-group.js
++++ b/packages/components/src/ui/form-group/use-form-group.js
+@@ -1,11 +1,3 @@
+-/**
+- * External dependencies
+- */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { cx } from '@emotion/css';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -16,6 +8,7 @@ import { useInstanceId } from '@wordpress/compose';
+  */
+ import { useContextSystem } from '../context';
+ import * as styles from './form-group-styles';
++import { useCx } from '../../utils/hooks/use-cx';
+ 
+ /**
+  * @param {import('../context').PolymorphicComponentProps<import('./types').FormGroupProps, 'div'>} props
+@@ -36,6 +29,8 @@ export function useFormGroup( props ) {
+ 
+ 	const id = useInstanceId( useFormGroup, 'form-group', idProp );
+ 
++	const cx = useCx();
++
+ 	const classes = cx( styles.FormGroup, className );
+ 
+ 	const contentProps = {
+diff --git a/packages/components/src/ui/item-group/stories/index.js b/packages/components/src/ui/item-group/stories/index.js
+index 620cd1179be539..47e69902735f2c 100644
+--- a/packages/components/src/ui/item-group/stories/index.js
++++ b/packages/components/src/ui/item-group/stories/index.js
+@@ -13,7 +13,7 @@ export default {
+ };
+ 
+ export const _default = () => (
+-	<ItemGroup css={ { width: '350px' } } bordered>
++	<ItemGroup style={ { width: '350px' } } bordered>
+ 		<Item action onClick={ () => alert( 'WordPress.org' ) }>
+ 			Code is Poetry — Click me!
+ 		</Item>
+@@ -31,10 +31,10 @@ export const _default = () => (
+ 
+ export const dropdown = () => (
+ 	<Flyout
+-		css={ { width: '350px' } }
++		style={ { width: '350px' } }
+ 		trigger={ <Button>Open Popover</Button> }
+ 	>
+-		<ItemGroup css={ { padding: 4 } }>
++		<ItemGroup style={ { padding: 4 } }>
+ 			<Item action onClick={ () => alert( 'WordPress.org' ) }>
+ 				Code is Poetry — Click me!
+ 			</Item>
+diff --git a/packages/components/src/ui/item-group/styles.ts b/packages/components/src/ui/item-group/styles.ts
+index a5efb4afa9cc3e..d6c5f2fdfcbc27 100644
+--- a/packages/components/src/ui/item-group/styles.ts
++++ b/packages/components/src/ui/item-group/styles.ts
+@@ -1,10 +1,7 @@
+ /**
+  * External dependencies
+  */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { css } from '@emotion/css';
++import { css } from '@emotion/react';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/ui/item-group/use-item-group.ts b/packages/components/src/ui/item-group/use-item-group.ts
+index a30dfdc2d9ce4f..346fd27a58c559 100644
+--- a/packages/components/src/ui/item-group/use-item-group.ts
++++ b/packages/components/src/ui/item-group/use-item-group.ts
+@@ -1,11 +1,3 @@
+-/**
+- * External dependencies
+- */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { cx } from '@emotion/css';
+-
+ /**
+  * Internal dependencies
+  */
+@@ -17,6 +9,7 @@ import type { PolymorphicComponentProps } from '../context';
+  * Internal dependencies
+  */
+ import * as styles from './styles';
++import { useCx } from '../../utils/hooks/use-cx';
+ 
+ export interface Props {
+ 	bordered?: boolean;
+@@ -37,6 +30,8 @@ export function useItemGroup(
+ 		...otherProps
+ 	} = useContextSystem( props, 'ItemGroup' );
+ 
++	const cx = useCx();
++
+ 	const classes = cx(
+ 		bordered && styles.bordered,
+ 		( bordered || separated ) && styles.separated,
+diff --git a/packages/components/src/ui/item-group/use-item.ts b/packages/components/src/ui/item-group/use-item.ts
+index f654a886d70a31..ae64a961019e2e 100644
+--- a/packages/components/src/ui/item-group/use-item.ts
++++ b/packages/components/src/ui/item-group/use-item.ts
+@@ -1,11 +1,3 @@
+-/**
+- * External dependencies
+- */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { cx } from '@emotion/css';
+-
+ /**
+  * Internal dependencies
+  */
+@@ -14,6 +6,7 @@ import { useContextSystem } from '../context';
+ import type { PolymorphicComponentProps } from '../context';
+ import * as styles from './styles';
+ import { useItemGroupContext } from './context';
++import { useCx } from '../../utils/hooks/use-cx';
+ 
+ export interface Props {
+ 	action?: boolean;
+@@ -36,6 +29,8 @@ export function useItem( props: PolymorphicComponentProps< Props, 'div' > ) {
+ 
+ 	const as = asProp || action ? 'button' : 'div';
+ 
++	const cx = useCx();
++
+ 	const classes = cx(
+ 		action && styles.unstyledButton,
+ 		styles.itemSizes[ size ] || styles.itemSizes.medium,
+diff --git a/packages/components/src/ui/tooltip/content.js b/packages/components/src/ui/tooltip/content.js
+index 4861941aa0552b..08c51288dae23f 100644
+--- a/packages/components/src/ui/tooltip/content.js
++++ b/packages/components/src/ui/tooltip/content.js
+@@ -1,10 +1,6 @@
+ /**
+  * External dependencies
+  */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { cx } from '@emotion/css';
+ // eslint-disable-next-line no-restricted-imports
+ import { Tooltip as ReakitTooltip } from 'reakit';
+ 
+@@ -15,6 +11,7 @@ import { contextConnect, useContextSystem } from '../context';
+ import { View } from '../../view';
+ import { useTooltipContext } from './context';
+ import * as styles from './styles';
++import { useCx } from '../../utils/hooks/use-cx';
+ 
+ const { TooltipPopoverView } = styles;
+ 
+@@ -29,6 +26,7 @@ function TooltipContent( props, forwardedRef ) {
+ 		'TooltipContent'
+ 	);
+ 	const { tooltip } = useTooltipContext();
++	const cx = useCx();
+ 	const classes = cx( styles.TooltipContent, className );
+ 
+ 	return (
+diff --git a/packages/components/src/ui/tooltip/styles.js b/packages/components/src/ui/tooltip/styles.js
+index 8e3d0fabb69d4a..f9c23215659441 100644
+--- a/packages/components/src/ui/tooltip/styles.js
++++ b/packages/components/src/ui/tooltip/styles.js
+@@ -1,10 +1,7 @@
+ /**
+  * External dependencies
+  */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { css } from '@emotion/css';
++import { css } from '@emotion/react';
+ import styled from '@emotion/styled';
+ 
+ /**
+diff --git a/packages/components/src/ui/tooltip/test/__snapshots__/index.js.snap b/packages/components/src/ui/tooltip/test/__snapshots__/index.js.snap
+index 815d61b2dfe5f8..0a0a7f694de74f 100644
+--- a/packages/components/src/ui/tooltip/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/tooltip/test/__snapshots__/index.js.snap
+@@ -15,7 +15,7 @@ exports[`props should render correctly 1`] = `
+   opacity: 1;
+ }
+ 
+-.emotion-3 {
++.emotion-2 {
+   background: rgba( 0, 0, 0, 0.8 );
+   border-radius: 6px;
+   box-shadow: 0 0 0 1px rgba( 255, 255, 255, 0.04 );
+@@ -24,7 +24,7 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ <div
+-  class="emotion-0 components-tooltip-content emotion-1 emotion-2"
++  class="components-tooltip-content emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="TooltipContent"
+   id="base-tooltip"
+@@ -32,7 +32,7 @@ exports[`props should render correctly 1`] = `
+   style="position: fixed; left: 100%; top: 100%; pointer-events: none;"
+ >
+   <div
+-    class="emotion-3 emotion-4"
++    class="emotion-2 emotion-3"
+   >
+     Code is Poetry
+   </div>
+diff --git a/packages/components/src/ui/utils/get-high-dpi.ts b/packages/components/src/ui/utils/get-high-dpi.ts
+index 15b0e2f0aae001..17e6ad2a2c0951 100644
+--- a/packages/components/src/ui/utils/get-high-dpi.ts
++++ b/packages/components/src/ui/utils/get-high-dpi.ts
+@@ -1,10 +1,9 @@
+ /**
+  * External dependencies
+  */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++import { css } from '@emotion/react';
+ // eslint-disable-next-line no-restricted-imports
+-import { css, CSSInterpolation } from '@emotion/css';
++import type { CSSInterpolation } from '@emotion/css';
+ 
+ export function getHighDpi(
+ 	strings: TemplateStringsArray,
+diff --git a/packages/components/src/ui/visually-hidden/hook.js b/packages/components/src/ui/visually-hidden/hook.js
+index a0d67887f10d72..4ec0c056d4b490 100644
+--- a/packages/components/src/ui/visually-hidden/hook.js
++++ b/packages/components/src/ui/visually-hidden/hook.js
+@@ -1,15 +1,8 @@
+-/**
+- * External dependencies
+- */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { cx } from '@emotion/css';
+-
+ /**
+  * Internal dependencies
+  */
+ import * as styles from './styles';
++import { useCx } from '../../utils/hooks/use-cx';
+ 
+ // duplicate this for the sake of being able to export it, it'll be removed when we replace VisuallyHidden in components/src anyway
+ /** @typedef {import('../context').PolymorphicComponentProps<{ children: import('react').ReactNode }, 'div'>} Props */
+@@ -19,6 +12,7 @@ import * as styles from './styles';
+  */
+ export function useVisuallyHidden( { className, ...props } ) {
+ 	// circumvent the context system and write the classnames ourselves
++	const cx = useCx();
+ 	const classes = cx(
+ 		'components-visually-hidden wp-components-visually-hidden',
+ 		className,
+diff --git a/packages/components/src/ui/visually-hidden/styles.js b/packages/components/src/ui/visually-hidden/styles.js
+index 972c5a65f6e4ba..2067f169aea909 100644
+--- a/packages/components/src/ui/visually-hidden/styles.js
++++ b/packages/components/src/ui/visually-hidden/styles.js
+@@ -1,10 +1,7 @@
+ /**
+  * External dependencies
+  */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { css } from '@emotion/css';
++import { css } from '@emotion/react';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/ui/visually-hidden/test/__snapshots__/index.js.snap b/packages/components/src/ui/visually-hidden/test/__snapshots__/index.js.snap
+index 9625c0ac2f00af..9e064e5e1fbe03 100644
+--- a/packages/components/src/ui/visually-hidden/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/visually-hidden/test/__snapshots__/index.js.snap
+@@ -36,7 +36,7 @@ exports[`VisuallyHidden should render correctly 1`] = `
+ }
+ 
+ <div
+-  class="components-visually-hidden wp-components-visually-hidden emotion-0 emotion-1 emotion-2"
++  class="components-visually-hidden wp-components-visually-hidden emotion-0 emotion-1"
+ >
+   This is hidden
+ </div>
+diff --git a/packages/components/src/ui/visually-hidden/test/index.js b/packages/components/src/ui/visually-hidden/test/index.js
+index 6925edbee9eefb..6fd0e2073c2e67 100644
+--- a/packages/components/src/ui/visually-hidden/test/index.js
++++ b/packages/components/src/ui/visually-hidden/test/index.js
+@@ -6,17 +6,7 @@ import { render } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import { VisuallyHidden, useVisuallyHidden } from '..';
+-
+-describe( 'useVisuallyHidden', () => {
+-	it( 'should apply the expected classnames', () => {
+-		const { className } = useVisuallyHidden( {
+-			className: 'my-custom-classname',
+-		} );
+-		expect( className ).toContain( 'my-custom-classname' );
+-		expect( className ).toContain( 'components-visually-hidden' );
+-	} );
+-} );
++import { VisuallyHidden } from '..';
+ 
+ describe( 'VisuallyHidden', () => {
+ 	it( 'should render correctly', () => {
+diff --git a/packages/components/src/utils/browsers.js b/packages/components/src/utils/browsers.js
+index 96008a62ac6a64..7c852465d5f1be 100644
+--- a/packages/components/src/utils/browsers.js
++++ b/packages/components/src/utils/browsers.js
+@@ -1,10 +1,7 @@
+ /**
+  * External dependencies
+  */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { css } from '@emotion/css';
++import { css } from '@emotion/react';
+ 
+ /* eslint-disable jsdoc/no-undefined-types */
+ /**
+diff --git a/packages/components/src/utils/hooks/use-cx.ts b/packages/components/src/utils/hooks/use-cx.ts
+index 0642745c743c6c..522b5cf4dc2485 100644
+--- a/packages/components/src/utils/hooks/use-cx.ts
++++ b/packages/components/src/utils/hooks/use-cx.ts
+@@ -20,6 +20,8 @@ const EmotionCacheContext: Context< EmotionCache > = CacheProvider._context;
+ const useEmotionCacheContext = () => useContext( EmotionCacheContext );
+ 
+ const isSerializedStyles = ( o: any ): o is SerializedStyles =>
++	// eslint-disable-next-line eqeqeq
++	o != null &&
+ 	[ 'name', 'styles' ].every( ( p ) => typeof o[ p ] !== 'undefined' );
+ 
+ /**
+diff --git a/packages/components/src/v-stack/test/__snapshots__/index.js.snap b/packages/components/src/v-stack/test/__snapshots__/index.js.snap
+index 97e51366d9b226..1637098afcd4df 100644
+--- a/packages/components/src/v-stack/test/__snapshots__/index.js.snap
++++ b/packages/components/src/v-stack/test/__snapshots__/index.js.snap
+@@ -28,15 +28,15 @@ exports[`props should render alignment 1`] = `
+ }
+ 
+ <div
+-  class="components-flex components-h-stack components-v-stack emotion-0 emotion-1 emotion-2"
++  class="components-flex components-h-stack components-v-stack emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="VStack"
+ >
+   <div
+-    class="emotion-1 emotion-2"
++    class="emotion-2 emotion-1"
+   />
+   <div
+-    class="emotion-1 emotion-2"
++    class="emotion-2 emotion-1"
+   />
+ </div>
+ `;
+@@ -68,15 +68,15 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ <div
+-  class="components-flex components-h-stack components-v-stack emotion-0 emotion-1 emotion-2"
++  class="components-flex components-h-stack components-v-stack emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="VStack"
+ >
+   <div
+-    class="emotion-1 emotion-2"
++    class="emotion-2 emotion-1"
+   />
+   <div
+-    class="emotion-1 emotion-2"
++    class="emotion-2 emotion-1"
+   />
+ </div>
+ `;
+@@ -108,15 +108,15 @@ exports[`props should render spacing 1`] = `
+ }
+ 
+ <div
+-  class="components-flex components-h-stack components-v-stack emotion-0 emotion-1 emotion-2"
++  class="components-flex components-h-stack components-v-stack emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="VStack"
+ >
+   <div
+-    class="emotion-1 emotion-2"
++    class="emotion-2 emotion-1"
+   />
+   <div
+-    class="emotion-1 emotion-2"
++    class="emotion-2 emotion-1"
+   />
+ </div>
+ `;

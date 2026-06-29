@@ -1,0 +1,183 @@
+diff --git a/packages/block-editor/src/components/font-appearance-control/index.js b/packages/block-editor/src/components/font-appearance-control/index.js
+index d4c9dc85715d23..b7cc441dc3c001 100644
+--- a/packages/block-editor/src/components/font-appearance-control/index.js
++++ b/packages/block-editor/src/components/font-appearance-control/index.js
+@@ -206,6 +206,7 @@ export default function FontAppearanceControl( props ) {
+ 		hasStylesOrWeights && (
+ 			<CustomSelectControl
+ 				className="components-font-appearance-control"
++				__unstableSize="large"
+ 				label={ label }
+ 				describedBy={ getDescribedBy() }
+ 				options={ selectOptions }
+diff --git a/packages/block-editor/src/hooks/font-size.js b/packages/block-editor/src/hooks/font-size.js
+index 3a2abfbb85f255..f4e4d1384971ea 100644
+--- a/packages/block-editor/src/hooks/font-size.js
++++ b/packages/block-editor/src/hooks/font-size.js
+@@ -142,6 +142,7 @@ export function FontSizeEdit( props ) {
+ 
+ 	return (
+ 		<FontSizePicker
++			__unstableSize="large"
+ 			onChange={ onChange }
+ 			value={ fontSizeValue }
+ 			withReset={ false }
+diff --git a/packages/components/src/custom-select-control/index.js b/packages/components/src/custom-select-control/index.js
+index 90b5bbf2115e20..3bfc07a0bf9a60 100644
+--- a/packages/components/src/custom-select-control/index.js
++++ b/packages/components/src/custom-select-control/index.js
+@@ -55,6 +55,7 @@ const stateReducer = (
+ };
+ export default function CustomSelectControl( {
+ 	className,
++	__unstableSize,
+ 	hideLabelFromVision,
+ 	label,
+ 	describedBy,
+@@ -130,8 +131,11 @@ export default function CustomSelectControl( {
+ 					// This is needed because some speech recognition software don't support `aria-labelledby`.
+ 					'aria-label': label,
+ 					'aria-labelledby': undefined,
+-					className: 'components-custom-select-control__button',
+-					isSmall: true,
++					className: classnames(
++						'components-custom-select-control__button',
++						{ 'is-unstable-size-large': __unstableSize === 'large' }
++					),
++					isSmall: __unstableSize !== 'large',
+ 					describedBy: getDescribedBy(),
+ 				} ) }
+ 			>
+diff --git a/packages/components/src/custom-select-control/stories/index.js b/packages/components/src/custom-select-control/stories/index.js
+index 7b8b07a2c7d007..430821074617e9 100644
+--- a/packages/components/src/custom-select-control/stories/index.js
++++ b/packages/components/src/custom-select-control/stories/index.js
+@@ -6,6 +6,12 @@ import CustomSelectControl from '../';
+ export default {
+ 	title: 'Components/CustomSelectControl',
+ 	component: CustomSelectControl,
++	argTypes: {
++		__unstableSize: {
++			options: [ 'default', 'large' ],
++			control: { type: 'select' },
++		},
++	},
+ };
+ 
+ const defaultOptions = [
+@@ -31,29 +37,31 @@ const defaultOptions = [
+ 		style: { fontSize: '300%' },
+ 	},
+ ];
+-export const _default = () => (
+-	<CustomSelectControl label="Font size" options={ defaultOptions } />
+-);
+ 
+-const longLabelOptions = [
+-	{
+-		key: 'reallylonglabel1',
+-		name: 'Really long labels are good for stress testing',
+-	},
+-	{
+-		key: 'reallylonglabel2',
+-		name: 'But they can take a long time to type.',
+-	},
+-	{
+-		key: 'reallylonglabel3',
+-		name:
+-			'That really is ok though because you should stress test your UIs.',
+-	},
+-];
++export const Default = CustomSelectControl.bind( {} );
++Default.args = {
++	hideLabelFromVision: false,
++	label: 'Font size',
++	options: defaultOptions,
++};
+ 
+-export const longLabels = () => (
+-	<CustomSelectControl
+-		label="Testing long labels"
+-		options={ longLabelOptions }
+-	/>
+-);
++export const LongLabels = CustomSelectControl.bind( {} );
++LongLabels.args = {
++	...Default.args,
++	label: 'Testing long labels',
++	options: [
++		{
++			key: 'reallylonglabel1',
++			name: 'Really long labels are good for stress testing',
++		},
++		{
++			key: 'reallylonglabel2',
++			name: 'But they can take a long time to type.',
++		},
++		{
++			key: 'reallylonglabel3',
++			name:
++				'That really is ok though because you should stress test your UIs.',
++		},
++	],
++};
+diff --git a/packages/components/src/custom-select-control/style.scss b/packages/components/src/custom-select-control/style.scss
+index f3175331336bfd..0033c00e0d0e39 100644
+--- a/packages/components/src/custom-select-control/style.scss
++++ b/packages/components/src/custom-select-control/style.scss
+@@ -15,6 +15,11 @@
+ 	position: relative;
+ 	text-align: left;
+ 
++	&.is-unstable-size-large {
++		min-height: 40px;
++		padding-left: 16px;
++	}
++
+ 	// For all button sizes allow sufficient space for the
+ 	// dropdown "arrow" icon to display.
+ 	&.components-custom-select-control__button {
+diff --git a/packages/components/src/font-size-picker/index.js b/packages/components/src/font-size-picker/index.js
+index 548eb2265f508f..572b376fb34e19 100644
+--- a/packages/components/src/font-size-picker/index.js
++++ b/packages/components/src/font-size-picker/index.js
+@@ -28,6 +28,7 @@ import {
+ 
+ function FontSizePicker(
+ 	{
++		__unstableSize,
+ 		fallbackFontSize,
+ 		fontSizes = [],
+ 		disableCustomFontSizes = false,
+@@ -148,6 +149,7 @@ function FontSizePicker(
+ 					shouldUseSelectControl &&
+ 					! showCustomValueControl && (
+ 						<CustomSelectControl
++							__unstableSize={ __unstableSize }
+ 							className={ `${ baseClassName }__select` }
+ 							label={ __( 'Font size' ) }
+ 							hideLabelFromVision
+diff --git a/packages/components/src/tools-panel/stories/typography-panel.js b/packages/components/src/tools-panel/stories/typography-panel.js
+index c57ac4c19e9d5d..a9660218ac3923 100644
+--- a/packages/components/src/tools-panel/stories/typography-panel.js
++++ b/packages/components/src/tools-panel/stories/typography-panel.js
+@@ -122,6 +122,7 @@ export const TypographyPanel = () => {
+ 							isShownByDefault={ true }
+ 						>
+ 							<FontSizePicker
++								__unstableSize="large"
+ 								value={ fontSize }
+ 								onChange={ setFontSize }
+ 								fontSizes={ fontSizes }
+diff --git a/packages/edit-site/src/components/global-styles/typography-panel.js b/packages/edit-site/src/components/global-styles/typography-panel.js
+index 9480748a902b1e..f6d8c149332edd 100644
+--- a/packages/edit-site/src/components/global-styles/typography-panel.js
++++ b/packages/edit-site/src/components/global-styles/typography-panel.js
+@@ -106,6 +106,7 @@ export default function TypographyPanel( { name } ) {
+ 			) }
+ 			{ supports.includes( 'fontSize' ) && (
+ 				<FontSizePicker
++					__unstableSize="large"
+ 					value={ fontSize }
+ 					onChange={ setFontSize }
+ 					fontSizes={ fontSizes }

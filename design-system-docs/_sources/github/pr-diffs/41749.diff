@@ -1,0 +1,97 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 791def47c89700..17f005c805cec6 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ -   `FormTokenField`: Do not suggest the selected one even if `{ value: string }` is passed ([#41216](https://github.com/WordPress/gutenberg/pull/41216)).
+ -   `CustomGradientBar`: Fix insertion and control point positioning to more closely follow cursor. ([#41492](https://github.com/WordPress/gutenberg/pull/41492))
+ -   `FormTokenField`: Added Padding to resolve close button overlap issue ([#41556](https://github.com/WordPress/gutenberg/pull/41556)).
++-   `Autocomplete`: Prevent autocompletion entries (such as user mentions) from breaking subsequent newlines in the same block ([#41749](https://github.com/WordPress/gutenberg/pull/41749)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/autocomplete/index.js b/packages/components/src/autocomplete/index.js
+index c2fefc6af7e136..670beb2ae8798c 100644
+--- a/packages/components/src/autocomplete/index.js
++++ b/packages/components/src/autocomplete/index.js
+@@ -12,6 +12,7 @@ import {
+ 	useState,
+ 	useRef,
+ 	useMemo,
++	useCallback,
+ } from '@wordpress/element';
+ import {
+ 	ENTER,
+@@ -183,40 +184,46 @@ function useAutocomplete( {
+ 		setAutocompleterUI( null );
+ 	}
+ 
+-	function announce( options ) {
+-		if ( ! debouncedSpeak ) {
+-			return;
+-		}
+-		if ( !! options.length ) {
+-			debouncedSpeak(
+-				sprintf(
+-					/* translators: %d: number of results. */
+-					_n(
+-						'%d result found, use up and down arrow keys to navigate.',
+-						'%d results found, use up and down arrow keys to navigate.',
++	const announce = useCallback(
++		( options ) => {
++			if ( ! debouncedSpeak ) {
++				return;
++			}
++			if ( !! options.length ) {
++				debouncedSpeak(
++					sprintf(
++						/* translators: %d: number of results. */
++						_n(
++							'%d result found, use up and down arrow keys to navigate.',
++							'%d results found, use up and down arrow keys to navigate.',
++							options.length
++						),
+ 						options.length
+ 					),
+-					options.length
+-				),
+-				'assertive'
+-			);
+-		} else {
+-			debouncedSpeak( __( 'No results.' ), 'assertive' );
+-		}
+-	}
++					'assertive'
++				);
++			} else {
++				debouncedSpeak( __( 'No results.' ), 'assertive' );
++			}
++		},
++		[ debouncedSpeak ]
++	);
+ 
+ 	/**
+ 	 * Load options for an autocompleter.
+ 	 *
+ 	 * @param {Array} options
+ 	 */
+-	function onChangeOptions( options ) {
+-		setSelectedIndex(
+-			options.length === filteredOptions.length ? selectedIndex : 0
+-		);
+-		setFilteredOptions( options );
+-		announce( options );
+-	}
++	const onChangeOptions = useCallback(
++		( options ) => {
++			setSelectedIndex(
++				options.length === filteredOptions.length ? selectedIndex : 0
++			);
++			setFilteredOptions( options );
++			announce( options );
++		},
++		[ announce, filteredOptions.length, selectedIndex ]
++	);
+ 
+ 	function handleKeyDown( event ) {
+ 		backspacing.current = event.keyCode === BACKSPACE;

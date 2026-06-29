@@ -1,0 +1,228 @@
+diff --git a/packages/block-editor/src/components/line-height-control/index.js b/packages/block-editor/src/components/line-height-control/index.js
+index 91c783fe47db03..86b603a80f7d3a 100644
+--- a/packages/block-editor/src/components/line-height-control/index.js
++++ b/packages/block-editor/src/components/line-height-control/index.js
+@@ -37,7 +37,7 @@ export default function LineHeightControl( {
+ 		 * Step up/down actions can be triggered by keydowns of the up/down arrow keys,
+ 		 * or by clicking the spin buttons.
+ 		 */
+-		switch ( nextValue ) {
++		switch ( `${ nextValue }` ) {
+ 			case `${ STEP }`:
+ 				// Increment by step value.
+ 				return BASE_DEFAULT_VALUE + STEP;
+@@ -63,8 +63,8 @@ export default function LineHeightControl( {
+ 		const wasTypedOrPasted = [ 'insertText', 'insertFromPaste' ].includes(
+ 			action.payload.event.nativeEvent?.inputType
+ 		);
+-		state.value = adjustNextValue( state.value, wasTypedOrPasted );
+-		return state;
++		const value = adjustNextValue( state.value, wasTypedOrPasted );
++		return { ...state, value };
+ 	};
+ 
+ 	const value = isDefined ? lineHeight : RESET_VALUE;
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e7f1702f686ef1..8d6f57a17e8a2b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -22,6 +22,10 @@
+ -   Fix input value selection of `InputControl`-based controls in Firefox and Safari with axial constraint of drag gesture ([#38968](https://github.com/WordPress/gutenberg/pull/38968)).
+ -   Fix `UnitControl`'s behavior around updating the unit when a new `value` is passed (i.e. in controlled mode). ([#39148](https://github.com/WordPress/gutenberg/pull/39148)).
+ 
++### Internal
++
++-   Delete the `composeStateReducers` utility function ([#39262](https://github.com/WordPress/gutenberg/pull/39262)).
++
+ ## 19.5.0 (2022-02-23)
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/input-control/reducer/reducer.ts b/packages/components/src/input-control/reducer/reducer.ts
+index 618cd5a7ca2345..d94da7e1042426 100644
+--- a/packages/components/src/input-control/reducer/reducer.ts
++++ b/packages/components/src/input-control/reducer/reducer.ts
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import { isEmpty } from 'lodash';
+ import type { SyntheticEvent } from 'react';
+ 
+ /**
+@@ -38,27 +37,6 @@ function mergeInitialState(
+ 	} as InputState;
+ }
+ 
+-/**
+- * Composes multiple stateReducers into a single stateReducer, building
+- * the pipeline to control the flow for state and actions.
+- *
+- * @param  fns State reducers.
+- * @return The single composed stateReducer.
+- */
+-export const composeStateReducers = (
+-	...fns: StateReducer[]
+-): StateReducer => {
+-	return ( ...args ) => {
+-		return fns.reduceRight( ( state, fn ) => {
+-			// TODO: Assess whether this can be replaced with a more standard `compose` implementation
+-			// like wp.data.compose() (aka lodash flowRight) or Redux compose().
+-			// The current implementation only works by functions mutating the original state object.
+-			const fnState = fn( ...args );
+-			return isEmpty( fnState ) ? state : { ...state, ...fnState };
+-		}, {} as InputState );
+-	};
+-};
+-
+ /**
+  * Creates a reducer that opens the channel for external state subscription
+  * and modification.
+diff --git a/packages/components/src/number-control/index.js b/packages/components/src/number-control/index.js
+index 5068715190c952..4d840682ecf418 100644
+--- a/packages/components/src/number-control/index.js
++++ b/packages/components/src/number-control/index.js
+@@ -15,13 +15,12 @@ import { isRTL } from '@wordpress/i18n';
+  */
+ import { Input } from './styles/number-control-styles';
+ import * as inputControlActionTypes from '../input-control/reducer/actions';
+-import { composeStateReducers } from '../input-control/reducer/reducer';
+ import { add, subtract, roundClamp } from '../utils/math';
+ import { isValueEmpty } from '../utils/values';
+ 
+ export function NumberControl(
+ 	{
+-		__unstableStateReducer: stateReducer = ( state ) => state,
++		__unstableStateReducer: stateReducerProp,
+ 		className,
+ 		dragDirection = 'n',
+ 		hideHTMLArrows = false,
+@@ -62,9 +61,11 @@ export function NumberControl(
+ 	 * @return {Object} The updated state to apply to InputControl
+ 	 */
+ 	const numberControlStateReducer = ( state, action ) => {
++		const nextState = { ...state };
++
+ 		const { type, payload } = action;
+ 		const event = payload?.event;
+-		const currentValue = state.value;
++		const currentValue = nextState.value;
+ 
+ 		/**
+ 		 * Handles custom UP and DOWN Keyboard events
+@@ -94,7 +95,7 @@ export function NumberControl(
+ 				nextValue = subtract( nextValue, incrementalValue );
+ 			}
+ 
+-			state.value = constrainValue(
++			nextState.value = constrainValue(
+ 				nextValue,
+ 				enableShift ? incrementalValue : null
+ 			);
+@@ -139,7 +140,7 @@ export function NumberControl(
+ 				delta = Math.ceil( Math.abs( delta ) ) * Math.sign( delta );
+ 				const distance = delta * modifier * directionModifier;
+ 
+-				state.value = constrainValue(
++				nextState.value = constrainValue(
+ 					add( currentValue, distance ),
+ 					enableShift ? modifier : null
+ 				);
+@@ -155,12 +156,12 @@ export function NumberControl(
+ 		) {
+ 			const applyEmptyValue = required === false && currentValue === '';
+ 
+-			state.value = applyEmptyValue
++			nextState.value = applyEmptyValue
+ 				? currentValue
+ 				: constrainValue( currentValue );
+ 		}
+ 
+-		return state;
++		return nextState;
+ 	};
+ 
+ 	return (
+@@ -180,10 +181,10 @@ export function NumberControl(
+ 			step={ step }
+ 			type={ typeProp }
+ 			value={ valueProp }
+-			__unstableStateReducer={ composeStateReducers(
+-				numberControlStateReducer,
+-				stateReducer
+-			) }
++			__unstableStateReducer={ ( state, action ) => {
++				const baseState = numberControlStateReducer( state, action );
++				return stateReducerProp?.( baseState, action ) ?? baseState;
++			} }
+ 		/>
+ 	);
+ }
+diff --git a/packages/components/src/unit-control/index.tsx b/packages/components/src/unit-control/index.tsx
+index a686efbb1a5f78..e9cafb69c6846a 100644
+--- a/packages/components/src/unit-control/index.tsx
++++ b/packages/components/src/unit-control/index.tsx
+@@ -23,7 +23,6 @@ import { ENTER } from '@wordpress/keycodes';
+  */
+ import type { WordPressComponentProps } from '../ui/context';
+ import * as inputControlActionTypes from '../input-control/reducer/actions';
+-import { composeStateReducers } from '../input-control/reducer/reducer';
+ import { Root, ValueInput } from './styles/unit-control-styles';
+ import UnitSelectControl from './unit-select-control';
+ import {
+@@ -38,7 +37,7 @@ import type { StateReducer } from '../input-control/reducer/state';
+ 
+ function UnitControl(
+ 	{
+-		__unstableStateReducer: stateReducer = ( state ) => state,
++		__unstableStateReducer: stateReducerProp,
+ 		autoComplete = 'off',
+ 		className,
+ 		disabled = false,
+@@ -186,6 +185,8 @@ function UnitControl(
+ 	 * @return The updated state to apply to InputControl
+ 	 */
+ 	const unitControlStateReducer: StateReducer = ( state, action ) => {
++		const nextState = { ...state };
++
+ 		/*
+ 		 * On commits (when pressing ENTER and on blur if
+ 		 * isPressEnterToChange is true), if a parse has been performed
+@@ -193,14 +194,24 @@ function UnitControl(
+ 		 */
+ 		if ( action.type === inputControlActionTypes.COMMIT ) {
+ 			if ( refParsedQuantity.current !== undefined ) {
+-				state.value = ( refParsedQuantity.current ?? '' ).toString();
++				nextState.value = (
++					refParsedQuantity.current ?? ''
++				).toString();
+ 				refParsedQuantity.current = undefined;
+ 			}
+ 		}
+ 
+-		return state;
++		return nextState;
+ 	};
+ 
++	let stateReducer: StateReducer = unitControlStateReducer;
++	if ( stateReducerProp ) {
++		stateReducer = ( state, action ) => {
++			const baseState = unitControlStateReducer( state, action );
++			return stateReducerProp( baseState, action );
++		};
++	}
++
+ 	const inputSuffix = ! disableUnits ? (
+ 		<UnitSelectControl
+ 			aria-label={ __( 'Select unit' ) }
+@@ -244,10 +255,7 @@ function UnitControl(
+ 				suffix={ inputSuffix }
+ 				value={ parsedQuantity ?? '' }
+ 				step={ step }
+-				__unstableStateReducer={ composeStateReducers(
+-					unitControlStateReducer,
+-					stateReducer
+-				) }
++				__unstableStateReducer={ stateReducer }
+ 			/>
+ 		</Root>
+ 	);

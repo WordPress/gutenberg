@@ -1,0 +1,119 @@
+diff --git a/packages/components/src/modal/README.md b/packages/components/src/modal/README.md
+index f3979663f78bde..3cf9a130abcf77 100644
+--- a/packages/components/src/modal/README.md
++++ b/packages/components/src/modal/README.md
+@@ -195,11 +195,13 @@ If this property is added, it will be added to the modal content `div` as `aria-
+ 
+ #### focusOnMount
+ 
+-If this property is true, it will focus the first tabbable element rendered in the modal.
++By default, the *first tabblable element* in the modal will receive focus when it mounts. This is the same as setting `focusOnMount` to `"firstElement"`. If you want to focus the container instead, you can set `focusOnMount` to `"container"` or true.
+ 
+--   Type: `boolean`
+--   Required: No
+--   Default: true
++Set this prop to `false` to not focus on mount.
++
++- Type: `String` or `Boolean`
++- Required: No
++- Default: `firstElement`
+ 
+ #### shouldCloseOnEsc
+ 
+diff --git a/packages/components/src/modal/frame.js b/packages/components/src/modal/frame.js
+index c1cbfd2d79a0b5..bb6d27b683557d 100644
+--- a/packages/components/src/modal/frame.js
++++ b/packages/components/src/modal/frame.js
+@@ -78,6 +78,52 @@ class ModalFrame extends Component {
+ 	constructor() {
+ 		super( ...arguments );
+ 		this.handleFocusOutside = this.handleFocusOutside.bind( this );
++<<<<<<< HEAD
++=======
++		this.focusFirstTabbable = this.focusFirstTabbable.bind( this );
++		this.focusOnMount = this.focusOnMount.bind( this );
++	}
++
++	/**
++	 * Focuses the container or first tabbable element based on props.focusOnMount.
++	 */
++	componentDidMount() {
++		// Focus on mount
++		if ( this.props.focusOnMount ) {
++			this.focusOnMount();
++		}
++	}
++
++	/**
++	 * Handle focus on mount.
++	 */
++	focusOnMount() {
++		if ( this.props.focusOnMount === 'firstElement' ) {
++			this.focusFirstTabbable();
++		}
++		if (
++			this.props.focusOnMount === 'container' ||
++			this.props.focusOnMount === true
++		) {
++			this.containerRef.current.focus();
++		}
++	}
++
++	/**
++	 * Focuses the first tabbable element.
++	 */
++	focusFirstTabbable() {
++		const tabbables = focus.tabbable.find( this.containerRef.current );
++		if ( tabbables.length ) {
++			tabbables[ 0 ].focus();
++		} else {
++			this.containerRef.current.focus();
++		}
++<<<<<<< HEAD
++		return true;
++>>>>>>> 93e0cff0be (Allow the focusOnMount prop to be either boolean or string)
++=======
++>>>>>>> d44204c5c8 (Remove added return from focusFirstTabbable)
+ 	}
+ 
+ 	/**
+diff --git a/packages/components/src/modal/index.js b/packages/components/src/modal/index.js
+index 2144972d42f187..d5ea4989bffd3a 100644
+--- a/packages/components/src/modal/index.js
++++ b/packages/components/src/modal/index.js
+@@ -159,7 +159,7 @@ Modal.defaultProps = {
+ 	bodyOpenClassName: 'modal-open',
+ 	role: 'dialog',
+ 	title: null,
+-	focusOnMount: true,
++	focusOnMount: 'firstElement',
+ 	shouldCloseOnEsc: true,
+ 	shouldCloseOnClickOutside: true,
+ 	isDismissible: true,
+diff --git a/packages/components/src/modal/stories/index.js b/packages/components/src/modal/stories/index.js
+index 1d6b4acc48d0be..fa1210913b7c99 100644
+--- a/packages/components/src/modal/stories/index.js
++++ b/packages/components/src/modal/stories/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { boolean, text } from '@storybook/addon-knobs';
++import { boolean, text, select } from '@storybook/addon-knobs';
+ 
+ /**
+  * Internal dependencies
+@@ -42,7 +42,12 @@ export const _default = () => {
+ 	const title = text( 'title', 'Title' );
+ 	const icon = text( 'icon', '' );
+ 	const isDismissible = boolean( 'isDismissible', true );
+-	const focusOnMount = boolean( 'focusOnMount', true );
++	const focusOnMount = select( 'focusOnMount', {
++		firstElement: 'firstElement',
++		container: 'container',
++		true: true,
++		false: false,
++	} );
+ 	const shouldCloseOnEsc = boolean( 'shouldCloseOnEsc', true );
+ 	const shouldCloseOnClickOutside = boolean(
+ 		'shouldCloseOnClickOutside',

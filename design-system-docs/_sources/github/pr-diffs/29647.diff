@@ -1,0 +1,79 @@
+diff --git a/package-lock.json b/package-lock.json
+index 861faf2969169b..270032fbba5c1d 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -12431,6 +12431,7 @@
+ 				"@wordpress/is-shallow-equal": "file:packages/is-shallow-equal",
+ 				"@wordpress/keycodes": "file:packages/keycodes",
+ 				"@wordpress/primitives": "file:packages/primitives",
++				"@wordpress/react-i18n": "file:packages/react-i18n",
+ 				"@wordpress/rich-text": "file:packages/rich-text",
+ 				"@wordpress/warning": "file:packages/warning",
+ 				"@wp-g2/components": "^0.0.159",
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 6aa31b82b386c6..01c9e2b9f24e67 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -43,6 +43,7 @@
+ 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
+ 		"@wordpress/keycodes": "file:../keycodes",
+ 		"@wordpress/primitives": "file:../primitives",
++		"@wordpress/react-i18n": "file:../react-i18n",
+ 		"@wordpress/rich-text": "file:../rich-text",
+ 		"@wordpress/warning": "file:../warning",
+ 		"@wp-g2/components": "^0.0.159",
+diff --git a/packages/components/src/date-time/index.js b/packages/components/src/date-time/index.js
+index fecc9e302f29e1..51804996f72f87 100644
+--- a/packages/components/src/date-time/index.js
++++ b/packages/components/src/date-time/index.js
+@@ -9,7 +9,7 @@ import 'react-dates/initialize';
+  * WordPress dependencies
+  */
+ import { useState, forwardRef } from '@wordpress/element';
+-import { __, _x } from '@wordpress/i18n';
++import { useI18n } from '@wordpress/react-i18n';
+ 
+ /**
+  * Internal dependencies
+@@ -31,6 +31,7 @@ function DateTimePicker(
+ 	},
+ 	ref
+ ) {
++	const { __, _x } = useI18n();
+ 	const [ calendarHelpIsVisible, setCalendarHelpIsVisible ] = useState(
+ 		false
+ 	);
+diff --git a/packages/components/src/ui/button-group/component.js b/packages/components/src/ui/button-group/component.js
+index dc18fba828db27..ecbb79f4362011 100644
+--- a/packages/components/src/ui/button-group/component.js
++++ b/packages/components/src/ui/button-group/component.js
+@@ -14,7 +14,7 @@ import { RadioGroup, useRadioState } from 'reakit';
+ /**
+  * WordPress dependencies
+  */
+-import { __ } from '@wordpress/i18n';
++import { useI18n } from '@wordpress/react-i18n';
+ import { useMemo } from '@wordpress/element';
+ 
+ /**
+@@ -29,6 +29,7 @@ import * as styles from './styles';
+  * @param {import('react').Ref<any>} forwardedRef
+  */
+ function ButtonGroup( props, forwardedRef ) {
++	const { __ } = useI18n();
+ 	const {
+ 		baseId,
+ 		className,
+diff --git a/test/unit/jest.config.js b/test/unit/jest.config.js
+index 70ae8191dc0d8d..346c2f288efd44 100644
+--- a/test/unit/jest.config.js
++++ b/test/unit/jest.config.js
+@@ -4,7 +4,7 @@
+ const glob = require( 'glob' ).sync;
+ 
+ // Finds all packages which are transpiled with Babel to force Jest to use their source code.
+-const transpiledPackageNames = glob( 'packages/*/src/index.js' ).map(
++const transpiledPackageNames = glob( 'packages/*/src/index.{js,ts,tsx}' ).map(
+ 	( fileName ) => fileName.split( '/' )[ 1 ]
+ );
+ 

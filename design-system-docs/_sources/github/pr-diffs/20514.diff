@@ -1,0 +1,268 @@
+diff --git a/packages/components/src/disabled/stories/index.js b/packages/components/src/disabled/stories/index.js
+new file mode 100644
+index 00000000000000..527c76899c6527
+--- /dev/null
++++ b/packages/components/src/disabled/stories/index.js
+@@ -0,0 +1,31 @@
++/**
++ * Internal dependencies
++ */
++import Disabled from '../';
++import SelectControl from '../../select-control/';
++import TextControl from '../../text-control/';
++import TextareaControl from '../../textarea-control/';
++
++export default {
++	title: 'Components/Disabled',
++	component: Disabled,
++};
++
++export const _default = () => {
++	return (
++		<Disabled>
++			<TextControl label="Text Control" />
++			<TextareaControl label="TextArea Control" />
++			<SelectControl
++				label="Select Control"
++				onChange={ () => {} }
++				options={ [
++					{ value: null, label: 'Select an option', disabled: true },
++					{ value: 'a', label: 'Option A' },
++					{ value: 'b', label: 'Option B' },
++					{ value: 'c', label: 'Option C' },
++				] }
++			/>
++		</Disabled>
++	);
++};
+diff --git a/storybook/test/__snapshots__/index.js.snap b/storybook/test/__snapshots__/index.js.snap
+index 58a2e69d136498..51813e68b7c3b5 100644
+--- a/storybook/test/__snapshots__/index.js.snap
++++ b/storybook/test/__snapshots__/index.js.snap
+@@ -2590,6 +2590,95 @@ exports[`Storyshots Components/Dashicon Default 1`] = `
+ </svg>
+ `;
+ 
++exports[`Storyshots Components/Disabled Default 1`] = `
++<div
++  className="components-disabled"
++>
++  <div
++    className="components-base-control"
++  >
++    <div
++      className="components-base-control__field"
++    >
++      <label
++        className="components-base-control__label"
++        htmlFor="inspector-text-control-2"
++      >
++        Text Control
++      </label>
++      <input
++        className="components-text-control__input"
++        id="inspector-text-control-2"
++        onChange={[Function]}
++        type="text"
++      />
++    </div>
++  </div>
++  <div
++    className="components-base-control"
++  >
++    <div
++      className="components-base-control__field"
++    >
++      <label
++        className="components-base-control__label"
++        htmlFor="inspector-textarea-control-0"
++      >
++        TextArea Control
++      </label>
++      <textarea
++        className="components-textarea-control__input"
++        id="inspector-textarea-control-0"
++        onChange={[Function]}
++        rows={4}
++      />
++    </div>
++  </div>
++  <div
++    className="components-base-control"
++  >
++    <div
++      className="components-base-control__field"
++    >
++      <label
++        className="components-base-control__label"
++        htmlFor="inspector-select-control-0"
++      >
++        Select Control
++      </label>
++      <select
++        className="components-select-control__input"
++        id="inspector-select-control-0"
++        multiple={false}
++        onChange={[Function]}
++      >
++        <option
++          disabled={true}
++          value={null}
++        >
++          Select an option
++        </option>
++        <option
++          value="a"
++        >
++          Option A
++        </option>
++        <option
++          value="b"
++        >
++          Option B
++        </option>
++        <option
++          value="c"
++        >
++          Option C
++        </option>
++      </select>
++    </div>
++  </div>
++</div>
++`;
++
+ exports[`Storyshots Components/Draggable Default 1`] = `
+ <div>
+   <p>
+@@ -4348,13 +4437,13 @@ exports[`Storyshots Components/Placeholder Default 1`] = `
+         >
+           <label
+             className="components-base-control__label"
+-            htmlFor="inspector-text-control-2"
++            htmlFor="inspector-text-control-3"
+           >
+             Sample Field
+           </label>
+           <input
+             className="components-text-control__input"
+-            id="inspector-text-control-2"
++            id="inspector-text-control-3"
+             onChange={[Function]}
+             placeholder="Enter something here"
+             type="text"
+@@ -7791,14 +7880,14 @@ exports[`Storyshots Components/SelectControl Default 1`] = `
+   >
+     <label
+       className="components-base-control__label"
+-      htmlFor="inspector-select-control-0"
++      htmlFor="inspector-select-control-1"
+     >
+       Label Text
+     </label>
+     <select
+-      aria-describedby="inspector-select-control-0__help"
++      aria-describedby="inspector-select-control-1__help"
+       className="components-select-control__input"
+-      id="inspector-select-control-0"
++      id="inspector-select-control-1"
+       multiple={false}
+       onChange={[Function]}
+     >
+@@ -7827,7 +7916,7 @@ exports[`Storyshots Components/SelectControl Default 1`] = `
+   </div>
+   <p
+     className="components-base-control__help"
+-    id="inspector-select-control-0__help"
++    id="inspector-select-control-1__help"
+   >
+     Help text to explain the select control.
+   </p>
+@@ -7939,21 +8028,21 @@ exports[`Storyshots Components/TextControl Default 1`] = `
+   >
+     <label
+       className="components-base-control__label"
+-      htmlFor="inspector-text-control-3"
++      htmlFor="inspector-text-control-4"
+     >
+       Label Text
+     </label>
+     <input
+-      aria-describedby="inspector-text-control-3__help"
++      aria-describedby="inspector-text-control-4__help"
+       className="components-text-control__input"
+-      id="inspector-text-control-3"
++      id="inspector-text-control-4"
+       onChange={[Function]}
+       type="text"
+     />
+   </div>
+   <p
+     className="components-base-control__help"
+-    id="inspector-text-control-3__help"
++    id="inspector-text-control-4__help"
+   >
+     Help text to explain the input.
+   </p>
+@@ -7979,21 +8068,21 @@ exports[`Storyshots Components/TextareaControl Default 1`] = `
+   >
+     <label
+       className="components-base-control__label"
+-      htmlFor="inspector-textarea-control-0"
++      htmlFor="inspector-textarea-control-1"
+     >
+       Label Text
+     </label>
+     <textarea
+-      aria-describedby="inspector-textarea-control-0__help"
++      aria-describedby="inspector-textarea-control-1__help"
+       className="components-textarea-control__input"
+-      id="inspector-textarea-control-0"
++      id="inspector-textarea-control-1"
+       onChange={[Function]}
+       rows={4}
+     />
+   </div>
+   <p
+     className="components-base-control__help"
+-    id="inspector-textarea-control-0__help"
++    id="inspector-textarea-control-1__help"
+   >
+     Help text to explain the textarea.
+   </p>
+diff --git a/storybook/test/index.js b/storybook/test/index.js
+index 8752847743e0b8..57f12195d4857b 100644
+--- a/storybook/test/index.js
++++ b/storybook/test/index.js
+@@ -6,6 +6,23 @@ import initStoryshots, {
+ } from '@storybook/addon-storyshots';
+ import path from 'path';
+ 
++// The current version of JSDOM doesn't support MutationObserver
++// This stub is needed to test the  Disabled component
++// Pending PR #20766 to update jest and JSDOM may make this unnecessary
++let MutationObserver;
++beforeAll( () => {
++	MutationObserver = window.MutationObserver;
++	window.MutationObserver = function() {};
++	window.MutationObserver.prototype = {
++		observe() {},
++		disconnect() {},
++	};
++} );
++
++afterAll( () => {
++	window.MutationObserver = MutationObserver;
++} );
++
+ initStoryshots( {
+ 	configPath: path.resolve( __dirname, '../' ),
+ 	test: snapshotWithOptions( ( story ) => ( {
+@@ -25,7 +42,6 @@ initStoryshots( {
+ 				const parentElement = document.createElement( 'div' );
+ 				parentElement.appendChild( currentElement );
+ 			}
+-
+ 			return currentElement;
+ 		},
+ 	} ) ),

@@ -1,0 +1,543 @@
+diff --git a/packages/block-editor/src/components/list-view/appender.js b/packages/block-editor/src/components/list-view/appender.js
+index 229a391856eecb..0788e5a2788179 100644
+--- a/packages/block-editor/src/components/list-view/appender.js
++++ b/packages/block-editor/src/components/list-view/appender.js
+@@ -6,7 +6,10 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
+-import { __experimentalTreeGridCell as TreeGridCell } from '@wordpress/components';
++import {
++	__experimentalTreeGridCell as TreeGridCell,
++	__experimentalTreeGridRow as TreeGridRow,
++} from '@wordpress/components';
+ import { useInstanceId } from '@wordpress/compose';
+ import { __, sprintf } from '@wordpress/i18n';
+ import { useSelect } from '@wordpress/data';
+@@ -14,7 +17,6 @@ import { useSelect } from '@wordpress/data';
+ /**
+  * Internal dependencies
+  */
+-import ListViewLeaf from './leaf';
+ import Inserter from '../inserter';
+ import { store as blockEditorStore } from '../../store';
+ 
+@@ -23,7 +25,6 @@ export default function ListViewAppender( {
+ 	position,
+ 	level,
+ 	rowCount,
+-	path,
+ } ) {
+ 	const isDragging = useSelect(
+ 		( select ) => {
+@@ -49,12 +50,13 @@ export default function ListViewAppender( {
+ 	);
+ 
+ 	return (
+-		<ListViewLeaf
+-			className={ classnames( { 'is-dragging': isDragging } ) }
++		<TreeGridRow
++			className={ classnames( 'block-editor-list-view-leaf', {
++				'is-dragging': isDragging,
++			} ) }
+ 			level={ level }
+-			position={ position }
+-			rowCount={ rowCount }
+-			path={ path }
++			positionInSet={ position }
++			setSize={ rowCount }
+ 		>
+ 			<TreeGridCell
+ 				className="block-editor-list-view-appender__cell"
+@@ -77,6 +79,6 @@ export default function ListViewAppender( {
+ 					</div>
+ 				) }
+ 			</TreeGridCell>
+-		</ListViewLeaf>
++		</TreeGridRow>
+ 	);
+ }
+diff --git a/packages/block-editor/src/components/list-view/block.js b/packages/block-editor/src/components/list-view/block.js
+index 43fec6cf549e78..0c9c61b9340910 100644
+--- a/packages/block-editor/src/components/list-view/block.js
++++ b/packages/block-editor/src/components/list-view/block.js
+@@ -9,6 +9,7 @@ import classnames from 'classnames';
+ import {
+ 	__experimentalTreeGridCell as TreeGridCell,
+ 	__experimentalTreeGridItem as TreeGridItem,
++	__experimentalTreeGridRow as TreeGridRow,
+ 	MenuGroup,
+ 	MenuItem,
+ } from '@wordpress/components';
+@@ -20,7 +21,6 @@ import { useDispatch, useSelect } from '@wordpress/data';
+ /**
+  * Internal dependencies
+  */
+-import ListViewLeaf from './leaf';
+ import {
+ 	BlockMoverUpButton,
+ 	BlockMoverDownButton,
+@@ -42,8 +42,8 @@ export default function ListViewBlock( {
+ 	rowCount,
+ 	siblingBlockCount,
+ 	showBlockMovers,
+-	path,
+ 	isExpanded,
++	animateToggleOpen,
+ } ) {
+ 	const cellRef = useRef( null );
+ 	const [ isHovered, setIsHovered ] = useState( false );
+@@ -81,6 +81,7 @@ export default function ListViewBlock( {
+ 		__experimentalFeatures: withExperimentalFeatures,
+ 		__experimentalPersistentListViewFeatures: withExperimentalPersistentListViewFeatures,
+ 		isTreeGridMounted,
++		animate,
+ 	} = useListViewContext();
+ 	const listViewBlockSettingsClassName = classnames(
+ 		'block-editor-list-view-block__menu-cell',
+@@ -122,6 +123,7 @@ export default function ListViewBlock( {
+ 	};
+ 
+ 	const classes = classnames( {
++		'block-editor-list-view-leaf': true,
+ 		'is-selected': isSelected,
+ 		'is-branch-selected':
+ 			withExperimentalPersistentListViewFeatures && isBranchSelected,
+@@ -132,19 +134,20 @@ export default function ListViewBlock( {
+ 	} );
+ 
+ 	return (
+-		<ListViewLeaf
++		<TreeGridRow
+ 			className={ classes }
+ 			onMouseEnter={ onMouseEnter }
+ 			onMouseLeave={ onMouseLeave }
+ 			onFocus={ onMouseEnter }
+ 			onBlur={ onMouseLeave }
+ 			level={ level }
+-			position={ position }
+-			rowCount={ rowCount }
+-			path={ path }
++			positionInSet={ position }
++			setSize={ rowCount }
+ 			id={ `list-view-block-${ clientId }` }
+ 			data-block={ clientId }
+ 			isExpanded={ isExpanded }
++			animate={ animate }
++			animateOnMount={ animateToggleOpen }
+ 		>
+ 			<TreeGridCell
+ 				className="block-editor-list-view-block__contents-cell"
+@@ -243,6 +246,6 @@ export default function ListViewBlock( {
+ 					) }
+ 				</TreeGridCell>
+ 			) }
+-		</ListViewLeaf>
++		</TreeGridRow>
+ 	);
+ }
+diff --git a/packages/block-editor/src/components/list-view/branch.js b/packages/block-editor/src/components/list-view/branch.js
+index fd6361d85ac7cc..23ba6919a99cb8 100644
+--- a/packages/block-editor/src/components/list-view/branch.js
++++ b/packages/block-editor/src/components/list-view/branch.js
+@@ -27,9 +27,9 @@ export default function ListViewBranch( props ) {
+ 		parentBlockClientId,
+ 		level = 1,
+ 		terminatedLevels = [],
+-		path = [],
+ 		isBranchSelected = false,
+ 		isLastOfBranch = false,
++		animateToggleOpen = false,
+ 	} = props;
+ 
+ 	const isTreeRoot = ! parentBlockClientId;
+@@ -44,7 +44,13 @@ export default function ListViewBranch( props ) {
+ 	const rowCount = hasAppender ? blockCount + 1 : blockCount;
+ 	const appenderPosition = rowCount;
+ 
+-	const { expandedState, expand, collapse } = useListViewContext();
++	const {
++		expandedState,
++		expand,
++		collapse,
++		isTreeGridMounted,
++		animate,
++	} = useListViewContext();
+ 
+ 	return (
+ 		<>
+@@ -55,7 +61,6 @@ export default function ListViewBranch( props ) {
+ 				const updatedTerminatedLevels = isLastRowAtLevel
+ 					? [ ...terminatedLevels, level ]
+ 					: terminatedLevels;
+-				const updatedPath = [ ...path, position ];
+ 				const hasNestedBlocks =
+ 					showNestedBlocks && !! innerBlocks && !! innerBlocks.length;
+ 				const hasNestedAppender = itemHasAppender( clientId );
+@@ -93,6 +98,13 @@ export default function ListViewBranch( props ) {
+ 					}
+ 				};
+ 
++				const animateToggle =
++					animate &&
++					( animateToggleOpen ||
++						( isExpanded &&
++							isTreeGridMounted &&
++							expandedState[ clientId ] !== undefined ) );
++
+ 				return (
+ 					<Fragment key={ clientId }>
+ 						<ListViewBlock
+@@ -108,8 +120,8 @@ export default function ListViewBranch( props ) {
+ 							siblingBlockCount={ blockCount }
+ 							showBlockMovers={ showBlockMovers }
+ 							terminatedLevels={ terminatedLevels }
+-							path={ updatedPath }
+ 							isExpanded={ isExpanded }
++							animateToggleOpen={ animateToggle }
+ 						/>
+ 						{ hasNestedBranch && isExpanded && (
+ 							<ListViewBranch
+@@ -126,7 +138,7 @@ export default function ListViewBranch( props ) {
+ 								parentBlockClientId={ clientId }
+ 								level={ level + 1 }
+ 								terminatedLevels={ updatedTerminatedLevels }
+-								path={ updatedPath }
++								animateToggleOpen={ animateToggle }
+ 							/>
+ 						) }
+ 					</Fragment>
+@@ -139,7 +151,6 @@ export default function ListViewBranch( props ) {
+ 					rowCount={ appenderPosition }
+ 					level={ level }
+ 					terminatedLevels={ terminatedLevels }
+-					path={ [ ...path, appenderPosition ] }
+ 				/>
+ 			) }
+ 		</>
+diff --git a/packages/block-editor/src/components/list-view/index.js b/packages/block-editor/src/components/list-view/index.js
+index 1fa3f75b64ced5..40531a169d50d8 100644
+--- a/packages/block-editor/src/components/list-view/index.js
++++ b/packages/block-editor/src/components/list-view/index.js
+@@ -2,7 +2,7 @@
+  * WordPress dependencies
+  */
+ 
+-import { useMergeRefs } from '@wordpress/compose';
++import { useMergeRefs, useReducedMotion } from '@wordpress/compose';
+ import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
+ import { useDispatch } from '@wordpress/data';
+ import {
+@@ -100,6 +100,8 @@ export default function ListView( {
+ 		collapse( row?.dataset?.block );
+ 	};
+ 
++	const animate = ! useReducedMotion();
++
+ 	const contextValue = useMemo(
+ 		() => ( {
+ 			__experimentalFeatures,
+@@ -108,6 +110,7 @@ export default function ListView( {
+ 			expandedState,
+ 			expand,
+ 			collapse,
++			animate,
+ 		} ),
+ 		[
+ 			__experimentalFeatures,
+@@ -116,6 +119,7 @@ export default function ListView( {
+ 			expandedState,
+ 			expand,
+ 			collapse,
++			animate,
+ 		]
+ 	);
+ 
+@@ -131,6 +135,7 @@ export default function ListView( {
+ 				ref={ treeGridRef }
+ 				onCollapseRow={ collapseRow }
+ 				onExpandRow={ expandRow }
++				animate={ animate }
+ 			>
+ 				<ListViewContext.Provider value={ contextValue }>
+ 					<ListViewBranch
+diff --git a/packages/block-editor/src/components/list-view/leaf.js b/packages/block-editor/src/components/list-view/leaf.js
+deleted file mode 100644
+index 9a2409d141e196..00000000000000
+--- a/packages/block-editor/src/components/list-view/leaf.js
++++ /dev/null
+@@ -1,48 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { animated } from 'react-spring/web.cjs';
+-import classnames from 'classnames';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { __experimentalTreeGridRow as TreeGridRow } from '@wordpress/components';
+-
+-/**
+- * Internal dependencies
+- */
+-import useMovingAnimation from '../use-moving-animation';
+-
+-const AnimatedTreeGridRow = animated( TreeGridRow );
+-
+-export default function ListViewLeaf( {
+-	isSelected,
+-	position,
+-	level,
+-	rowCount,
+-	children,
+-	className,
+-	path,
+-	...props
+-} ) {
+-	const ref = useMovingAnimation( {
+-		isSelected,
+-		adjustScrolling: false,
+-		enableAnimation: true,
+-		triggerAnimationOnChange: path.join( '_' ),
+-	} );
+-
+-	return (
+-		<AnimatedTreeGridRow
+-			ref={ ref }
+-			className={ classnames( 'block-editor-list-view-leaf', className ) }
+-			level={ level }
+-			positionInSet={ position }
+-			setSize={ rowCount }
+-			{ ...props }
+-		>
+-			{ children }
+-		</AnimatedTreeGridRow>
+-	);
+-}
+diff --git a/packages/block-editor/src/components/list-view/style.scss b/packages/block-editor/src/components/list-view/style.scss
+index a8f766af5bae47..86dbc1f28cae6f 100644
+--- a/packages/block-editor/src/components/list-view/style.scss
++++ b/packages/block-editor/src/components/list-view/style.scss
+@@ -269,9 +269,9 @@
+ 	width: $icon-size;
+ }
+ 
+-// First level of indentation is aria-level 2, max indent is 8.
++// First level of indentation is aria-level 2, max indent is 7.
+ // Indent is a full icon size, plus 4px which optically aligns child icons to the text label above.
+-$block-navigation-max-indent: 8;
++$block-navigation-max-indent: 7;
+ .block-editor-list-view-leaf[aria-level] .block-editor-list-view__expander {
+ 	margin-left: ( $icon-size ) * $block-navigation-max-indent + 4 * ( $block-navigation-max-indent - 1 );
+ }
+diff --git a/packages/components/src/tree-grid/index.js b/packages/components/src/tree-grid/index.js
+index 3f99e90e9cb896..f3433251a87c22 100644
+--- a/packages/components/src/tree-grid/index.js
++++ b/packages/components/src/tree-grid/index.js
+@@ -14,6 +14,10 @@ import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
+  * Internal dependencies
+  */
+ import RovingTabIndexContainer from './roving-tab-index';
++import {
++	__unstableMotion as motion,
++	__unstableAnimateSharedLayout as AnimateSharedLayout,
++} from '../animation';
+ 
+ /**
+  * Return focusables in a row element, excluding those from other branches
+@@ -43,10 +47,17 @@ function getRowFocusables( rowElement ) {
+  * @param {WPElement} props.children      Children to be rendered.
+  * @param {Function}  props.onExpandRow   Callback to fire when row is expanded.
+  * @param {Function}  props.onCollapseRow Callback to fire when row is collapsed.
++ * @param {boolean}   props.animate       Boolean layout animation is enabled when true.
+  * @param {Object}    ref                 A ref to the underlying DOM table element.
+  */
+ function TreeGrid(
+-	{ children, onExpandRow = () => {}, onCollapseRow = () => {}, ...props },
++	{
++		children,
++		onExpandRow = () => {},
++		onCollapseRow = () => {},
++		animate = false,
++		...props
++	},
+ 	ref
+ ) {
+ 	const onKeyDown = useCallback( ( event ) => {
+@@ -201,7 +212,11 @@ function TreeGrid(
+ 				onKeyDown={ onKeyDown }
+ 				ref={ ref }
+ 			>
+-				<tbody>{ children }</tbody>
++				<AnimateSharedLayout>
++					<motion.tbody layout={ animate ? 'position' : false }>
++						{ children }
++					</motion.tbody>
++				</AnimateSharedLayout>
+ 			</table>
+ 		</RovingTabIndexContainer>
+ 	);
+diff --git a/packages/components/src/tree-grid/row.js b/packages/components/src/tree-grid/row.js
+index 744055194ad226..87ef59a20337df 100644
+--- a/packages/components/src/tree-grid/row.js
++++ b/packages/components/src/tree-grid/row.js
+@@ -3,8 +3,33 @@
+  */
+ import { forwardRef } from '@wordpress/element';
+ 
++/**
++ * Internal dependencies
++ */
++import { __unstableMotion as motion } from '../animation';
++
++const TREE_GRID_ROW_VARIANTS = {
++	init: {
++		opacity: 0,
++	},
++	open: {
++		opacity: 1,
++	},
++};
++
++const NO_MOTION_VARIANTS = { init: false, open: false };
++
+ function TreeGridRow(
+-	{ children, level, positionInSet, setSize, isExpanded, ...props },
++	{
++		children,
++		level,
++		positionInSet,
++		setSize,
++		isExpanded,
++		animate = false,
++		animateOnMount = false,
++		...props
++	},
+ 	ref
+ ) {
+ 	return (
+@@ -14,7 +39,11 @@ function TreeGridRow(
+ 		// linting rule fails when validating this markup.
+ 		//
+ 		// eslint-disable-next-line jsx-a11y/role-supports-aria-props
+-		<tr
++		<motion.tr
++			layout={ animate ? 'position' : false }
++			initial={ animateOnMount ? 'init' : false }
++			animate={ 'open' }
++			variants={ animate ? TREE_GRID_ROW_VARIANTS : NO_MOTION_VARIANTS }
+ 			{ ...props }
+ 			ref={ ref }
+ 			role="row"
+@@ -24,7 +53,7 @@ function TreeGridRow(
+ 			aria-expanded={ isExpanded }
+ 		>
+ 			{ children }
+-		</tr>
++		</motion.tr>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/tree-grid/test/__snapshots__/cell.js.snap b/packages/components/src/tree-grid/test/__snapshots__/cell.js.snap
+index 23d0568807b04d..707d9a13412512 100644
+--- a/packages/components/src/tree-grid/test/__snapshots__/cell.js.snap
++++ b/packages/components/src/tree-grid/test/__snapshots__/cell.js.snap
+@@ -5,7 +5,9 @@ exports[`TreeGridCell uses a child render function to render children 1`] = `
+   onKeyDown={[Function]}
+   role="treegrid"
+ >
+-  <tbody>
++  <tbody
++    style={Object {}}
++  >
+     <tr>
+       <td
+         role="gridcell"
+diff --git a/packages/components/src/tree-grid/test/__snapshots__/index.js.snap b/packages/components/src/tree-grid/test/__snapshots__/index.js.snap
+index 538248d29845fa..e43a7eb4535f4c 100644
+--- a/packages/components/src/tree-grid/test/__snapshots__/index.js.snap
++++ b/packages/components/src/tree-grid/test/__snapshots__/index.js.snap
+@@ -5,7 +5,9 @@ exports[`TreeGrid renders a table, tbody and any child elements 1`] = `
+   onKeyDown={[Function]}
+   role="treegrid"
+ >
+-  <tbody>
++  <tbody
++    style={Object {}}
++  >
+     <tr>
+       <td>
+         Test
+diff --git a/packages/components/src/tree-grid/test/__snapshots__/row.js.snap b/packages/components/src/tree-grid/test/__snapshots__/row.js.snap
+index f27fe4977c1234..e066ef0330004a 100644
+--- a/packages/components/src/tree-grid/test/__snapshots__/row.js.snap
++++ b/packages/components/src/tree-grid/test/__snapshots__/row.js.snap
+@@ -8,6 +8,7 @@ exports[`TreeGridRow forwards other props to the rendered tr element 1`] = `
+     aria-setsize="1"
+     className="my-row"
+     role="row"
++    style={Object {}}
+   >
+     <td>
+       Test
+@@ -23,6 +24,7 @@ exports[`TreeGridRow renders a tr with support for level, positionInSet and setS
+     aria-posinset="1"
+     aria-setsize="1"
+     role="row"
++    style={Object {}}
+   >
+     <td>
+       Test
+diff --git a/packages/edit-post/src/components/secondary-sidebar/list-view-sidebar.js b/packages/edit-post/src/components/secondary-sidebar/list-view-sidebar.js
+index 617a22f9b76326..da93e77789cc43 100644
+--- a/packages/edit-post/src/components/secondary-sidebar/list-view-sidebar.js
++++ b/packages/edit-post/src/components/secondary-sidebar/list-view-sidebar.js
+@@ -6,6 +6,7 @@ import {
+ 	store as blockEditorStore,
+ } from '@wordpress/block-editor';
+ import { Button } from '@wordpress/components';
++import { memo } from '@wordpress/element';
+ import {
+ 	useFocusOnMount,
+ 	useFocusReturn,
+@@ -22,7 +23,7 @@ import { ESCAPE } from '@wordpress/keycodes';
+  */
+ import { store as editPostStore } from '../../store';
+ 
+-export default function ListViewSidebar() {
++function ListViewSidebar() {
+ 	const { setIsListViewOpened } = useDispatch( editPostStore );
+ 
+ 	const { clearSelectedBlock, selectBlock } = useDispatch( blockEditorStore );
+@@ -71,3 +72,4 @@ export default function ListViewSidebar() {
+ 		</div>
+ 	);
+ }
++export default memo( ListViewSidebar );
+diff --git a/packages/edit-site/src/components/secondary-sidebar/list-view-sidebar.js b/packages/edit-site/src/components/secondary-sidebar/list-view-sidebar.js
+index 469dabaff56198..d58100188c2602 100644
+--- a/packages/edit-site/src/components/secondary-sidebar/list-view-sidebar.js
++++ b/packages/edit-site/src/components/secondary-sidebar/list-view-sidebar.js
+@@ -12,6 +12,7 @@ import {
+ 	useInstanceId,
+ 	useMergeRefs,
+ } from '@wordpress/compose';
++import { memo } from '@wordpress/element';
+ import { useDispatch } from '@wordpress/data';
+ import { __ } from '@wordpress/i18n';
+ import { closeSmall } from '@wordpress/icons';
+@@ -22,7 +23,7 @@ import { ESCAPE } from '@wordpress/keycodes';
+  */
+ import { store as editSiteStore } from '../../store';
+ 
+-export default function ListViewSidebar() {
++function ListViewSidebar() {
+ 	const { setIsListViewOpened } = useDispatch( editSiteStore );
+ 
+ 	const { clearSelectedBlock, selectBlock } = useDispatch( blockEditorStore );
+@@ -70,3 +71,4 @@ export default function ListViewSidebar() {
+ 		</div>
+ 	);
+ }
++export default memo( ListViewSidebar );

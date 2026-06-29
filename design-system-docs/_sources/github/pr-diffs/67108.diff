@@ -1,0 +1,57 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b23d024a724dd1..0638842814a7d3 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,9 @@
+ 
+ -   `ToggleGroupControl`: Fix active background for `0` value ([#66855](https://github.com/WordPress/gutenberg/pull/66855)).
+ -   `SlotFill`: Fix a bug where a stale value of `fillProps` could be used ([#67000](https://github.com/WordPress/gutenberg/pull/67000)).
++-   `ColorPalette`: Disable `Clear` button if there's no color value. ([#67108](https://github.com/WordPress/gutenberg/pull/67108)).
++-   `GradientPicker`: Disable `Clear` button if there's no value. ([#67108](https://github.com/WordPress/gutenberg/pull/67108)).
++-   `DuotonePicker`: Disable `Clear` button if there's no value. ([#67108](https://github.com/WordPress/gutenberg/pull/67108)).
+ -   `ColorPicker`: Add accessible label for copy button ([#67094](https://github.com/WordPress/gutenberg/pull/67094)).
+ 
+ ### Enhancements
+diff --git a/packages/components/src/color-palette/index.tsx b/packages/components/src/color-palette/index.tsx
+index a65508d8278c5f..ed3e9039704179 100644
+--- a/packages/components/src/color-palette/index.tsx
++++ b/packages/components/src/color-palette/index.tsx
+@@ -249,7 +249,11 @@ function UnforwardedColorPalette(
+ 	};
+ 
+ 	const actions = !! clearable && (
+-		<CircularOptionPicker.ButtonAction onClick={ clearColor }>
++		<CircularOptionPicker.ButtonAction
++			onClick={ clearColor }
++			accessibleWhenDisabled
++			disabled={ ! value }
++		>
+ 			{ __( 'Clear' ) }
+ 		</CircularOptionPicker.ButtonAction>
+ 	);
+diff --git a/packages/components/src/duotone-picker/duotone-picker.tsx b/packages/components/src/duotone-picker/duotone-picker.tsx
+index ee54c9cdf4235e..8764b401c38296 100644
+--- a/packages/components/src/duotone-picker/duotone-picker.tsx
++++ b/packages/components/src/duotone-picker/duotone-picker.tsx
+@@ -168,6 +168,8 @@ function DuotonePicker( {
+ 				!! clearable && (
+ 					<CircularOptionPicker.ButtonAction
+ 						onClick={ () => onChange( undefined ) }
++						accessibleWhenDisabled
++						disabled={ ! value }
+ 					>
+ 						{ __( 'Clear' ) }
+ 					</CircularOptionPicker.ButtonAction>
+diff --git a/packages/components/src/gradient-picker/index.tsx b/packages/components/src/gradient-picker/index.tsx
+index 8368279b8afd70..f0607badd1b03a 100644
+--- a/packages/components/src/gradient-picker/index.tsx
++++ b/packages/components/src/gradient-picker/index.tsx
+@@ -247,6 +247,8 @@ export function GradientPicker( {
+ 						! disableCustomGradients && (
+ 							<CircularOptionPicker.ButtonAction
+ 								onClick={ clearGradient }
++								accessibleWhenDisabled
++								disabled={ ! value }
+ 							>
+ 								{ __( 'Clear' ) }
+ 							</CircularOptionPicker.ButtonAction>

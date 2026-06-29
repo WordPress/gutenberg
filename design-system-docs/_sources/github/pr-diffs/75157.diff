@@ -1,0 +1,179 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 50c96143bb4f0e..a96bfc3667a0d8 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ -   `Text`: Remove `text-wrap: balance` fallback. Only `text-wrap: pretty` is now used ([#75089](https://github.com/WordPress/gutenberg/pull/75089)).
+ -   `RangeControl`: support forced-colors mode ([#75165](https://github.com/WordPress/gutenberg/pull/75165)).
+ -   `ToggleControl`: Prevent `__nextHasNoMarginBottom` from logging a console warning ([#75296](https://github.com/WordPress/gutenberg/pull/75296)).
++-   `ColorPicker`: Preserve hue when the selected color becomes a-chromatic ([#75157](https://github.com/WordPress/gutenberg/pull/75157)).
+ -   `createSlotFill`: fix ref forwarding ([#75274](https://github.com/WordPress/gutenberg/pull/75274)).
+ -   `Button`: Fix native outline showing when focused and active ([#75346](https://github.com/WordPress/gutenberg/pull/75346)).
+ 
+diff --git a/packages/components/src/color-picker/picker.tsx b/packages/components/src/color-picker/picker.tsx
+index f2c068d8a46be2..c9eec357b74da7 100644
+--- a/packages/components/src/color-picker/picker.tsx
++++ b/packages/components/src/color-picker/picker.tsx
+@@ -1,29 +1,111 @@
+ /**
+  * External dependencies
+  */
+-import { RgbStringColorPicker, RgbaStringColorPicker } from 'react-colorful';
++import { HsvColorPicker, HsvaColorPicker } from 'react-colorful';
+ import { colord } from 'colord';
+ 
+ /**
+  * WordPress dependencies
+  */
+-import { useMemo } from '@wordpress/element';
++import { useMemo, useRef } from '@wordpress/element';
++
+ /**
+  * Internal dependencies
+  */
+ import type { PickerProps } from './types';
+ 
++/**
++ * Checks whether an HSV color carries meaningful chromatic information.
++ * Achromatic colors (very low saturation or value near zero) report
++ * hue as 0 after hex round-tripping, so their hue is unreliable.
++ */
++function isChromatic( hsv: { s: number; v: number } ): boolean {
++	return hsv.s >= 1 && hsv.v >= 1;
++}
++
+ export const Picker = ( { color, enableAlpha, onChange }: PickerProps ) => {
+-	const Component = enableAlpha
+-		? RgbaStringColorPicker
+-		: RgbStringColorPicker;
+-	const rgbColor = useMemo( () => color.toRgbString(), [ color ] );
++	const Component = enableAlpha ? HsvaColorPicker : HsvColorPicker;
++
++	// Preserve the last meaningful hue to prevent it resetting to 0 (red)
++	// when the color reaches achromatic points (pure black, white, or gray).
++	//
++	// This is needed because the parent component stores color as hex, which
++	// discards hue for achromatic colors (e.g. #000000 → hsv(0, 0%, 0%)).
++	// By feeding the preserved hue into react-colorful's HSV picker — which
++	// uses HSVA as its native model — the hue slider stays stable with no
++	// intermediate conversion.
++	//
++	// This is the standard approach used by Figma, Photoshop, react-colorful
++	// itself, and other professional color pickers.
++	const preservedHueRef = useRef( color.toHsv().h );
++
++	// Cache the last HSV we produced and the corresponding hex to avoid
++	// precision jitter during dragging. Without this, the HSV→hex→HSV
++	// round-trip through the parent can produce slightly different values,
++	// causing the thumb to shift on re-render.
++	const lastHsvRef = useRef< {
++		h: number;
++		s: number;
++		v: number;
++		a: number;
++	} | null >( null );
++	const lastHexRef = useRef( '' );
++
++	// Note: this useMemo intentionally reads and writes refs for hue
++	// preservation and jitter avoidance. This is an accepted trade-off
++	// since the ref updates are synchronous and idempotent — the same
++	// input color will always produce the same ref values.
++	const hsvColor = useMemo( () => {
++		const currentHex = color.toHex();
++
++		// If the hex matches what we last emitted, return the cached HSV
++		// to avoid floating-point precision drift from hex → HSV conversion.
++		if ( lastHsvRef.current && currentHex === lastHexRef.current ) {
++			return lastHsvRef.current;
++		}
++
++		// External change — parse from hex and preserve hue if chromatic.
++		const hsv = color.toHsv();
++
++		if ( isChromatic( hsv ) ) {
++			preservedHueRef.current = hsv.h;
++		}
++
++		const result = {
++			h: preservedHueRef.current,
++			s: hsv.s,
++			v: hsv.v,
++			a: hsv.a,
++		};
++
++		lastHsvRef.current = result;
++		lastHexRef.current = currentHex;
++
++		return result;
++	}, [ color ] );
+ 
+ 	return (
+ 		<Component
+-			color={ rgbColor }
+-			onChange={ ( nextColor ) => {
+-				onChange( colord( nextColor ) );
++			color={ hsvColor }
++			onChange={ ( nextHsv ) => {
++				const chromatic = isChromatic( nextHsv );
++
++				if ( chromatic ) {
++					preservedHueRef.current = nextHsv.h;
++				}
++
++				const nextColord = colord( nextHsv );
++
++				// Cache the HSV and hex to prevent jitter on re-render.
++				lastHsvRef.current = {
++					h: chromatic ? nextHsv.h : preservedHueRef.current,
++					s: nextHsv.s,
++					v: nextHsv.v,
++					a: 'a' in nextHsv ? nextHsv.a : 1,
++				};
++				lastHexRef.current = nextColord.toHex();
++
++				onChange( nextColord );
+ 			} }
+ 			// Pointer capture fortifies drag gestures so that they continue to
+ 			// work while dragging outside the component over objects like
+diff --git a/packages/components/src/color-picker/test/index.tsx b/packages/components/src/color-picker/test/index.tsx
+index c493a733dca1db..3e5e8bf58792d1 100644
+--- a/packages/components/src/color-picker/test/index.tsx
++++ b/packages/components/src/color-picker/test/index.tsx
+@@ -419,4 +419,37 @@ describe( 'ColorPicker', () => {
+ 			expect( alphaInput ).toHaveValue( 75 );
+ 		} );
+ 	} );
++
++	describe( 'Hue preservation', () => {
++		it( 'should preserve the picker hue when the color becomes achromatic', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<ControlledColorPicker
++					onChange={ jest.fn() }
++					enableAlpha={ false }
++					initialColor="#3366ff"
++				/>
++			);
++
++			const pickerHueSlider = screen.getByRole( 'slider', {
++				name: 'Hue',
++			} );
++
++			// Blue (#3366ff) has a hue of 225°.
++			expect( pickerHueSlider ).toHaveValue( 225 );
++
++			const hexInput = screen.getByRole( 'textbox' );
++			for await ( const achromaticColor of [ '000', 'fff', '999' ] ) {
++				// Change color via hex input.
++				await user.clear( hexInput );
++				await user.type( hexInput, achromaticColor );
++
++				// The picker hue should still be 225° (blue), not 0° (red).
++				await waitFor( () => {
++					expect( pickerHueSlider ).toHaveValue( 225 );
++				} );
++			}
++		} );
++	} );
+ } );

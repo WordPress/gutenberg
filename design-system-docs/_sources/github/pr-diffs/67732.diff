@@ -1,0 +1,43 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2d2761924fb633..047d190ee3c5d8 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,11 @@
+ -   `GradientPicker`: Add `enableAlpha` prop ([#66974](https://github.com/WordPress/gutenberg/pull/66974))
+ -   `CustomGradientPicker`: Add `enableAlpha` prop ([#66974](https://github.com/WordPress/gutenberg/pull/66974))
+ -   `RangeControl`: Update the design of the range control marks ([#67611](https://github.com/WordPress/gutenberg/pull/67611))
++-   `BorderBoxControl`: Reduce gap value when unlinked ([#67049](https://github.com/WordPress/gutenberg/pull/67049)).
++-   `DropdownMenu`: Increase option height to 40px ([#67435](https://github.com/WordPress/gutenberg/pull/67435)).
++-   `MenuItem`: Increase height to 40px ([#67435](https://github.com/WordPress/gutenberg/pull/67435)).
++-   `MenuItemsChoice`: Increase option height to 40px ([#67435](https://github.com/WordPress/gutenberg/pull/67435)).
++-   `Navigation`: Fix active item hover color ([#67732](https://github.com/WordPress/gutenberg/pull/67732)).
+ 
+ ### Deprecations
+ 
+@@ -22,14 +27,6 @@
+ -   `FormFileUpload`: Deprecate 36px default size ([#67438](https://github.com/WordPress/gutenberg/pull/67438)).
+ -   `FormTokenField`: Deprecate 36px default size ([#67454](https://github.com/WordPress/gutenberg/pull/67454)).
+ 
+-
+-### Enhancements
+-
+--   `BorderBoxControl`: Reduce gap value when unlinked ([#67049](https://github.com/WordPress/gutenberg/pull/67049)).
+--   `DropdownMenu`: Increase option height to 40px ([#67435](https://github.com/WordPress/gutenberg/pull/67435)).
+--   `MenuItem`: Increase height to 40px ([#67435](https://github.com/WordPress/gutenberg/pull/67435)).
+--   `MenuItemsChoice`: Increase option height to 40px ([#67435](https://github.com/WordPress/gutenberg/pull/67435)).
+-
+ ### Experimental
+ 
+ -   `Menu`: throw when subcomponents are not rendered inside top level `Menu` ([#67411](https://github.com/WordPress/gutenberg/pull/67411)).
+diff --git a/packages/components/src/navigation/styles/navigation-styles.tsx b/packages/components/src/navigation/styles/navigation-styles.tsx
+index 580c0eef4dba8f..71dbccd7717c49 100644
+--- a/packages/components/src/navigation/styles/navigation-styles.tsx
++++ b/packages/components/src/navigation/styles/navigation-styles.tsx
+@@ -137,6 +137,7 @@ export const ItemBaseUI = styled.li`
+ 		color: ${ COLORS.white };
+ 
+ 		> button,
++		.components-button:hover,
+ 		> a {
+ 			color: ${ COLORS.white };
+ 			opacity: 1;

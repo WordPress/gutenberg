@@ -1,0 +1,365 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6962ec83e1efe1..c933e05db3a146 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -22,6 +22,7 @@
+ 
+ -   `ResizableBox`: Make the `children` prop optional ([#79370](https://github.com/WordPress/gutenberg/pull/79370)).
+ -   Add documentation and lint guardrails for the ongoing Emotion migration ([#79442](https://github.com/WordPress/gutenberg/pull/79442)).
++-   `Divider`: Migrate styles from Emotion to SCSS Modules ([#79444](https://github.com/WordPress/gutenberg/pull/79444)).
+ -   Adopt `--wpds-dimension-size-*` design tokens [#79093](https://github.com/WordPress/gutenberg/pull/79093).
+ -   Point the legacy `--wp-components-*` color fallbacks at the design system tokens (`--wpds-*` / `--wp-admin-theme-color*`), so component styles get sensible defaults from the prebuilt token stylesheet without a runtime `<ThemeProvider>` ([#78664](https://github.com/WordPress/gutenberg/pull/78664)).
+ -   `withFallbackStyles`: Refactor from a class component to a function component with hooks ([#78837](https://github.com/WordPress/gutenberg/pull/78837)).
+diff --git a/packages/components/src/card/test/__snapshots__/index.tsx.snap b/packages/components/src/card/test/__snapshots__/index.tsx.snap
+index e824c78901d58e..1e3909c4bf47ca 100644
+--- a/packages/components/src/card/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/card/test/__snapshots__/index.tsx.snap
+@@ -281,14 +281,12 @@ exports[`Card Card component should render correctly 1`] = `
+ }
+ 
+ .emotion-10 {
+-  border: 0;
+-  margin: 0;
+-  border-bottom: 1px solid currentColor;
+-  height: 0;
+-  width: auto;
+   box-sizing: border-box;
+   display: block;
+   width: 100%;
++}
++
++.emotion-11 {
+   border-color: rgba(0, 0, 0, 0.1);
+ }
+ 
+@@ -412,7 +410,7 @@ exports[`Card Card component should render correctly 1`] = `
+       </div>
+       <hr
+         aria-orientation="horizontal"
+-        class="components-divider components-card__divider components-card-divider emotion-10 emotion-11"
++        class="components-divider emotion-10 emotion-11 components-card__divider components-card-divider"
+         data-wp-c16t="true"
+         data-wp-component="CardDivider"
+         role="separator"
+diff --git a/packages/components/src/divider/component.tsx b/packages/components/src/divider/component.tsx
+index 8d68f8a6326ac1..9c051cc2381e70 100644
+--- a/packages/components/src/divider/component.tsx
++++ b/packages/components/src/divider/component.tsx
+@@ -2,6 +2,7 @@
+  * External dependencies
+  */
+ import * as Ariakit from '@ariakit/react';
++import clsx from 'clsx';
+ import type { ForwardedRef } from 'react';
+ 
+ /**
+@@ -9,18 +10,41 @@ import type { ForwardedRef } from 'react';
+  */
+ import type { WordPressComponentProps } from '../context';
+ import { contextConnect, useContextSystem } from '../context';
+-import { DividerView } from './styles';
++import { space } from '../utils/space';
+ import type { DividerProps } from './types';
++import styles from './style.module.scss';
+ 
+ function UnconnectedDivider(
+ 	props: WordPressComponentProps< DividerProps, 'hr', false >,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+-	const contextProps = useContextSystem( props, 'Divider' );
++	const {
++		className,
++		margin,
++		marginEnd,
++		marginStart,
++		style,
++		...contextProps
++	} = useContextSystem( props, 'Divider' );
++
++	const dividerStyle = { ...style };
++	const resolvedMarginStart = space( marginStart ?? margin );
++	const resolvedMarginEnd = space( marginEnd ?? margin );
++
++	if ( resolvedMarginStart ) {
++		dividerStyle[ '--wp-components-divider-margin-start' ] =
++			resolvedMarginStart;
++	}
++
++	if ( resolvedMarginEnd ) {
++		dividerStyle[ '--wp-components-divider-margin-end' ] =
++			resolvedMarginEnd;
++	}
+ 
+ 	return (
+ 		<Ariakit.Separator
+-			render={ <DividerView /> }
++			className={ clsx( styles.divider, className ) }
++			style={ dividerStyle }
+ 			{ ...contextProps }
+ 			ref={ forwardedRef }
+ 		/>
+diff --git a/packages/components/src/divider/style.module.scss b/packages/components/src/divider/style.module.scss
+new file mode 100644
+index 00000000000000..33e6b5a77fc427
+--- /dev/null
++++ b/packages/components/src/divider/style.module.scss
+@@ -0,0 +1,21 @@
++.divider {
++	border: 0;
++	margin: 0;
++
++	&[aria-orientation="horizontal"] {
++		border-block-end: 1px solid currentColor;
++		block-size: 0;
++		inline-size: auto;
++		margin-block-start: var(--wp-components-divider-margin-start, 0);
++		margin-block-end: var(--wp-components-divider-margin-end, 0);
++	}
++
++	&[aria-orientation="vertical"] {
++		display: inline;
++		border-inline-end: 1px solid currentColor;
++		block-size: auto;
++		inline-size: 0;
++		margin-inline-start: var(--wp-components-divider-margin-start, 0);
++		margin-inline-end: var(--wp-components-divider-margin-end, 0);
++	}
++}
+diff --git a/packages/components/src/divider/styles.ts b/packages/components/src/divider/styles.ts
+deleted file mode 100644
+index 189f0a0223041e..00000000000000
+--- a/packages/components/src/divider/styles.ts
++++ /dev/null
+@@ -1,81 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import styled from '@emotion/styled';
+-import { css } from '@emotion/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import { space } from '../utils/space';
+-import { rtl } from '../utils';
+-import type { DividerProps } from './types';
+-
+-const MARGIN_DIRECTIONS: Record<
+-	NonNullable< DividerProps[ 'orientation' ] >,
+-	Record< 'start' | 'end', string >
+-> = {
+-	vertical: {
+-		start: 'marginLeft',
+-		end: 'marginRight',
+-	},
+-	horizontal: {
+-		start: 'marginTop',
+-		end: 'marginBottom',
+-	},
+-};
+-
+-// Renders the correct margins given the Divider's `orientation` and the writing direction.
+-// When both the generic `margin` and the specific `marginStart|marginEnd` props are defined,
+-// the latter will take priority.
+-const renderMargin = ( {
+-	'aria-orientation': orientation = 'horizontal',
+-	margin,
+-	marginStart,
+-	marginEnd,
+-}: DividerProps ) =>
+-	css(
+-		rtl( {
+-			[ MARGIN_DIRECTIONS[ orientation ].start ]: space(
+-				marginStart ?? margin
+-			),
+-			[ MARGIN_DIRECTIONS[ orientation ].end ]: space(
+-				marginEnd ?? margin
+-			),
+-		} )()
+-	);
+-
+-const renderDisplay = ( {
+-	'aria-orientation': orientation = 'horizontal',
+-}: DividerProps ) => {
+-	return orientation === 'vertical'
+-		? css( { display: 'inline' } )
+-		: undefined;
+-};
+-
+-const renderBorder = ( {
+-	'aria-orientation': orientation = 'horizontal',
+-}: DividerProps ) => {
+-	return css( {
+-		[ orientation === 'vertical' ? 'borderRight' : 'borderBottom' ]:
+-			'1px solid currentColor',
+-	} );
+-};
+-
+-const renderSize = ( {
+-	'aria-orientation': orientation = 'horizontal',
+-}: DividerProps ) =>
+-	css( {
+-		height: orientation === 'vertical' ? 'auto' : 0,
+-		width: orientation === 'vertical' ? 0 : 'auto',
+-	} );
+-
+-export const DividerView = styled.hr< DividerProps >`
+-	border: 0;
+-	margin: 0;
+-
+-	${ renderDisplay }
+-	${ renderBorder }
+-	${ renderSize }
+-	${ renderMargin }
+-`;
+diff --git a/packages/components/src/divider/test/__snapshots__/index.tsx.snap b/packages/components/src/divider/test/__snapshots__/index.tsx.snap
+deleted file mode 100644
+index b450d6cb546d31..00000000000000
+--- a/packages/components/src/divider/test/__snapshots__/index.tsx.snap
++++ /dev/null
+@@ -1,71 +0,0 @@
+-// Jest Snapshot v1, https://goo.gl/fbAQLP
+-
+-exports[`props should render correctly 1`] = `
+-.emotion-0 {
+-  border: 0;
+-  margin: 0;
+-  border-bottom: 1px solid currentColor;
+-  height: 0;
+-  width: auto;
+-}
+-
+-<hr
+-  aria-orientation="horizontal"
+-  class="components-divider emotion-0 emotion-1"
+-  data-wp-c16t="true"
+-  data-wp-component="Divider"
+-  role="separator"
+-/>
+-`;
+-
+-exports[`props should render margin 1`] = `
+-Snapshot Diff:
+-- Received styles
+-+ Base styles
+-
+-@@ -2,8 +2,10 @@
+-    Object {
+-      "border": "0",
+-      "border-bottom": "1px solid currentColor",
+-      "height": "0",
+-      "margin": "0",
+-+     "margin-bottom": "calc(4px * 7)",
+-+     "margin-top": "calc(4px * 7)",
+-      "width": "auto",
+-    },
+-  ]
+-`;
+-
+-exports[`props should render marginEnd 1`] = `
+-Snapshot Diff:
+-- Received styles
+-+ Base styles
+-
+-@@ -2,8 +2,9 @@
+-    Object {
+-      "border": "0",
+-      "border-bottom": "1px solid currentColor",
+-      "height": "0",
+-      "margin": "0",
+-+     "margin-bottom": "calc(4px * 5)",
+-      "width": "auto",
+-    },
+-  ]
+-`;
+-
+-exports[`props should render marginStart 1`] = `
+-Snapshot Diff:
+-- Received styles
+-+ Base styles
+-
+-@@ -2,8 +2,9 @@
+-    Object {
+-      "border": "0",
+-      "border-bottom": "1px solid currentColor",
+-      "height": "0",
+-      "margin": "0",
+-+     "margin-top": "calc(4px * 5)",
+-      "width": "auto",
+-    },
+-  ]
+-`;
+diff --git a/packages/components/src/divider/test/index.tsx b/packages/components/src/divider/test/index.tsx
+index b069f49dc3d58a..03137ae7162ab8 100644
+--- a/packages/components/src/divider/test/index.tsx
++++ b/packages/components/src/divider/test/index.tsx
+@@ -9,32 +9,42 @@ import { render, screen } from '@testing-library/react';
+ import { Divider } from '..';
+ 
+ describe( 'props', () => {
+-	test( 'should render correctly', () => {
++	test( 'should render a horizontal separator by default', () => {
+ 		render( <Divider /> );
+-		expect( screen.getByRole( 'separator' ) ).toMatchSnapshot();
++
++		const divider = screen.getByRole( 'separator' );
++		expect( divider ).toHaveAttribute( 'aria-orientation', 'horizontal' );
+ 	} );
+ 
+ 	test( 'should render marginStart', () => {
+-		render( <Divider /> );
+ 		render( <Divider marginStart={ 5 } /> );
+ 
+-		const dividers = screen.getAllByRole( 'separator' );
+-		expect( dividers[ 0 ] ).toMatchStyleDiffSnapshot( dividers[ 1 ] );
++		expect( screen.getByRole( 'separator' ) ).toHaveStyle( {
++			'--wp-components-divider-margin-start': 'calc(4px * 5)',
++		} );
+ 	} );
+ 
+ 	test( 'should render marginEnd', () => {
+-		render( <Divider /> );
+ 		render( <Divider marginEnd={ 5 } /> );
+ 
+-		const dividers = screen.getAllByRole( 'separator' );
+-		expect( dividers[ 0 ] ).toMatchStyleDiffSnapshot( dividers[ 1 ] );
++		expect( screen.getByRole( 'separator' ) ).toHaveStyle( {
++			'--wp-components-divider-margin-end': 'calc(4px * 5)',
++		} );
+ 	} );
+ 
+ 	test( 'should render margin', () => {
+-		render( <Divider /> );
+ 		render( <Divider margin={ 7 } /> );
+ 
+-		const dividers = screen.getAllByRole( 'separator' );
+-		expect( dividers[ 0 ] ).toMatchStyleDiffSnapshot( dividers[ 1 ] );
++		expect( screen.getByRole( 'separator' ) ).toHaveStyle( {
++			'--wp-components-divider-margin-start': 'calc(4px * 7)',
++			'--wp-components-divider-margin-end': 'calc(4px * 7)',
++		} );
++	} );
++
++	test( 'should render vertical orientation', () => {
++		render( <Divider orientation="vertical" /> );
++
++		const divider = screen.getByRole( 'separator' );
++		expect( divider ).toHaveAttribute( 'aria-orientation', 'vertical' );
+ 	} );
+ } );
+diff --git a/tools/eslint/suppressions.json b/tools/eslint/suppressions.json
+index 81bafa2447e7d6..8bd6b355f36f89 100644
+--- a/tools/eslint/suppressions.json
++++ b/tools/eslint/suppressions.json
+@@ -732,11 +732,6 @@
+ 			"count": 1
+ 		}
+ 	},
+-	"packages/components/src/divider/styles.ts": {
+-		"no-restricted-imports": {
+-			"count": 2
+-		}
+-	},
+ 	"packages/components/src/draggable/index.tsx": {
+ 		"react-hooks/refs": {
+ 			"count": 1

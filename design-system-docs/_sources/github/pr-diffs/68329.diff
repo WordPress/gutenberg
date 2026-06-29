@@ -1,0 +1,273 @@
+diff --git a/packages/block-editor/src/components/alignment-control/test/__snapshots__/index.js.snap b/packages/block-editor/src/components/alignment-control/test/__snapshots__/index.js.snap
+index c1383ae8ecc44a..8c51fb5f2ef291 100644
+--- a/packages/block-editor/src/components/alignment-control/test/__snapshots__/index.js.snap
++++ b/packages/block-editor/src/components/alignment-control/test/__snapshots__/index.js.snap
+@@ -67,7 +67,7 @@ exports[`AlignmentUI should match snapshot when controls are hidden 1`] = `
+       aria-expanded="false"
+       aria-haspopup="true"
+       aria-label="Align text"
+-      class="components-button components-dropdown-menu__toggle has-icon"
++      class="components-button components-dropdown-menu__toggle is-compact has-icon"
+       data-toolbar-item="true"
+       type="button"
+     >
+diff --git a/packages/block-editor/src/components/block-alignment-control/test/__snapshots__/index.js.snap b/packages/block-editor/src/components/block-alignment-control/test/__snapshots__/index.js.snap
+index 9e7e59c0c31447..10cc47af4af985 100644
+--- a/packages/block-editor/src/components/block-alignment-control/test/__snapshots__/index.js.snap
++++ b/packages/block-editor/src/components/block-alignment-control/test/__snapshots__/index.js.snap
+@@ -10,7 +10,7 @@ exports[`BlockAlignmentUI should match snapshot when controls are hidden 1`] = `
+       aria-expanded="false"
+       aria-haspopup="true"
+       aria-label="Align"
+-      class="components-button components-dropdown-menu__toggle has-icon"
++      class="components-button components-dropdown-menu__toggle is-compact has-icon"
+       data-toolbar-item="true"
+       type="button"
+     >
+diff --git a/packages/block-editor/src/components/block-settings-menu/index.js b/packages/block-editor/src/components/block-settings-menu/index.js
+index 1b96f30e130386..efff411f65437f 100644
+--- a/packages/block-editor/src/components/block-settings-menu/index.js
++++ b/packages/block-editor/src/components/block-settings-menu/index.js
+@@ -18,7 +18,7 @@ export function BlockSettingsMenu( { clientIds, ...props } ) {
+ 				{ ( toggleProps ) => (
+ 					<BlockSettingsDropdown
+ 						clientIds={ clientIds }
+-						toggleProps={ toggleProps }
++						toggleProps={ { ...toggleProps, size: 'compact' } }
+ 						{ ...props }
+ 					/>
+ 				) }
+diff --git a/packages/block-editor/src/components/block-switcher/index.js b/packages/block-editor/src/components/block-switcher/index.js
+index 285581578ead43..c04302e3b8da49 100644
+--- a/packages/block-editor/src/components/block-switcher/index.js
++++ b/packages/block-editor/src/components/block-switcher/index.js
+@@ -334,6 +334,7 @@ export const BlockSwitcher = ( { clientIds } ) => {
+ 						}
+ 						text={ blockIndicatorText }
+ 						toggleProps={ {
++							size: 'compact',
+ 							description: blockSwitcherDescription,
+ 							...toggleProps,
+ 						} }
+diff --git a/packages/block-editor/src/components/block-vertical-alignment-control/test/__snapshots__/index.js.snap b/packages/block-editor/src/components/block-vertical-alignment-control/test/__snapshots__/index.js.snap
+index e8ad6cddbba56e..e3c1d59b3b5206 100644
+--- a/packages/block-editor/src/components/block-vertical-alignment-control/test/__snapshots__/index.js.snap
++++ b/packages/block-editor/src/components/block-vertical-alignment-control/test/__snapshots__/index.js.snap
+@@ -10,7 +10,7 @@ exports[`BlockVerticalAlignmentUI should match snapshot when controls are hidden
+       aria-expanded="false"
+       aria-haspopup="true"
+       aria-label="Change vertical alignment"
+-      class="components-button components-dropdown-menu__toggle has-icon"
++      class="components-button components-dropdown-menu__toggle is-compact has-icon"
+       data-toolbar-item="true"
+       type="button"
+     >
+diff --git a/packages/block-editor/src/components/warning/index.js b/packages/block-editor/src/components/warning/index.js
+index 17a014107b43af..57bcf77840c8e1 100644
+--- a/packages/block-editor/src/components/warning/index.js
++++ b/packages/block-editor/src/components/warning/index.js
+@@ -40,6 +40,7 @@ function Warning( { className, actions, children, secondaryActions } ) {
+ 										className:
+ 											'block-editor-warning__dropdown',
+ 									} }
++									toggleProps={ { size: 'compact' } }
+ 									noIcons
+ 								>
+ 									{ () => (
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 7255888604ed12..90c0a22166cffe 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -15,6 +15,7 @@
+ -   `RadioGroup`: Log deprecation warning ([#68067](https://github.com/WordPress/gutenberg/pull/68067)).
+ -   Soft deprecate `ButtonGroup` component. Use `ToggleGroupControl` instead ([#65429](https://github.com/WordPress/gutenberg/pull/65429)).
+ -   `Navigation`: Log deprecation warning for removal in WP 7.1. Use `Navigator` instead ([#68158](https://github.com/WordPress/gutenberg/pull/68158)).
++-   `DropdownMenu`: Deprecate 36px default size for default toggle button ([#68329](https://github.com/WordPress/gutenberg/pull/68329)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/src/dropdown-menu/README.md b/packages/components/src/dropdown-menu/README.md
+index f1b664efc09a29..a3d3b75c91ccda 100644
+--- a/packages/components/src/dropdown-menu/README.md
++++ b/packages/components/src/dropdown-menu/README.md
+@@ -67,6 +67,7 @@ const MyDropdownMenu = () => (
+ 	<DropdownMenu
+ 		icon={ more }
+ 		label="Select a direction"
++		toggleProps={ { size: 'compact' } }
+ 		controls={ [
+ 			{
+ 				title: 'Up',
+@@ -100,7 +101,11 @@ import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
+ import { more, arrowUp, arrowDown, trash } from '@wordpress/icons';
+ 
+ const MyDropdownMenu = () => (
+-	<DropdownMenu icon={ more } label="Select a direction">
++	<DropdownMenu
++		icon={ more }
++		label="Select a direction"
++		toggleProps={ { size: 'compact' } }
++	>
+ 		{ ( { onClose } ) => (
+ 			<>
+ 				<MenuGroup>
+diff --git a/packages/components/src/dropdown-menu/index.tsx b/packages/components/src/dropdown-menu/index.tsx
+index 195595fb9dc0de..a71ac922591966 100644
+--- a/packages/components/src/dropdown-menu/index.tsx
++++ b/packages/components/src/dropdown-menu/index.tsx
+@@ -20,6 +20,7 @@ import type {
+ 	DropdownOption,
+ 	DropdownMenuInternalContext,
+ } from './types';
++import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
+ 
+ function mergeProps<
+ 	T extends { className?: string; [ key: string ]: unknown },
+@@ -82,6 +83,17 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
+ 		}
+ 	}
+ 
++	if ( toggleProps?.as === undefined ) {
++		maybeWarnDeprecated36pxSize( {
++			componentName: 'DropdownMenu',
++			__next40pxDefaultSize: toggleProps?.__next40pxDefaultSize,
++			size: toggleProps?.size,
++			feature:
++				'36px default size for default toggle button in wp.components.DropdownMenu',
++			hint: 'Set `toggleProps={ __next40pxDefaultSize: true }` to start opting into the new default size, which will become the default in a future version. For icon buttons, consider setting a non-default size like `toggleProps={ size: "compact" }`.',
++		} );
++	}
++
+ 	const mergedPopoverProps = mergeProps(
+ 		{
+ 			className: 'components-dropdown-menu__popover',
+@@ -120,6 +132,9 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
+ 				return (
+ 					<Toggle
+ 						{ ...mergedToggleProps }
++						{ ...( toggleProps?.as === undefined
++							? { __shouldNotWarnDeprecated36pxSize: true }
++							: {} ) }
+ 						icon={ icon }
+ 						onClick={
+ 							( ( event ) => {
+@@ -242,6 +257,7 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
+  * 	<DropdownMenu
+  * 		icon={ more }
+  * 		label="Select a direction"
++ * 		toggleProps={ { size: 'compact' } }
+  * 		controls={ [
+  * 			{
+  * 				title: 'Up',
+@@ -276,7 +292,11 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
+  * import { more, arrowUp, arrowDown, trash } from '@wordpress/icons';
+  *
+  * const MyDropdownMenu = () => (
+- * 	<DropdownMenu icon={ more } label="Select a direction">
++ * 	<DropdownMenu
++ * 		icon={ more }
++ * 		label="Select a direction"
++ * 		toggleProps={ { size: 'compact' } }
++ * 	>
+  * 		{ ( { onClose } ) => (
+  * 			<>
+  * 				<MenuGroup>
+diff --git a/packages/components/src/dropdown-menu/stories/index.story.tsx b/packages/components/src/dropdown-menu/stories/index.story.tsx
+index 7b06ae979de84a..0ff773f49e8076 100644
+--- a/packages/components/src/dropdown-menu/stories/index.story.tsx
++++ b/packages/components/src/dropdown-menu/stories/index.story.tsx
+@@ -47,6 +47,7 @@ export default meta;
+ export const Default: StoryObj< typeof DropdownMenu > = {
+ 	args: {
+ 		label: 'Select a direction.',
++		toggleProps: { size: 'compact' },
+ 		icon: menu,
+ 		controls: [
+ 			{
+@@ -72,7 +73,11 @@ export const WithChildren: StoryObj< typeof DropdownMenu > = {
+ 	parameters: {
+ 		docs: {
+ 			source: {
+-				code: `<DropdownMenu label="Select a direction." icon={ more }>
++				code: `<DropdownMenu
++  label="Select a direction."
++  icon={ more }
++  toggleProps={ { size: 'compact' } }
++>
+   <MenuGroup>
+     <MenuItem icon={ arrowUp } onClick={ onClose }>
+       Move Up
+@@ -94,6 +99,7 @@ export const WithChildren: StoryObj< typeof DropdownMenu > = {
+ 	},
+ 	args: {
+ 		label: 'Select a direction.',
++		toggleProps: { size: 'compact' },
+ 		icon: more,
+ 		children: ( { onClose } ) => (
+ 			<>
+diff --git a/packages/components/src/dropdown-menu/test/index.tsx b/packages/components/src/dropdown-menu/test/index.tsx
+index 9bee9f26605085..aea48ebc8f06ba 100644
+--- a/packages/components/src/dropdown-menu/test/index.tsx
++++ b/packages/components/src/dropdown-menu/test/index.tsx
+@@ -12,9 +12,19 @@ import { arrowLeft, arrowRight, arrowUp, arrowDown } from '@wordpress/icons';
+ /**
+  * Internal dependencies
+  */
+-import DropdownMenu from '..';
++import _DropdownMenu from '..';
+ import MenuItem from '../../menu-item';
+ 
++const DropdownMenu = ( {
++	toggleProps,
++	...restProps
++}: React.ComponentProps< typeof _DropdownMenu > ) => (
++	<_DropdownMenu
++		toggleProps={ { size: 'compact', ...toggleProps } }
++		{ ...restProps }
++	/>
++);
++
+ describe( 'DropdownMenu', () => {
+ 	it( 'should not render when neither controls nor children are assigned', () => {
+ 		render( <DropdownMenu label="Open dropdown" /> );
+diff --git a/packages/components/src/toolbar/stories/index.story.tsx b/packages/components/src/toolbar/stories/index.story.tsx
+index 8590c1ec8a2c6b..4a64947c62e5bb 100644
+--- a/packages/components/src/toolbar/stories/index.story.tsx
++++ b/packages/components/src/toolbar/stories/index.story.tsx
+@@ -109,7 +109,7 @@ Default.args = {
+ 									title: 'Align right',
+ 								},
+ 							] }
+-							toggleProps={ toggleProps }
++							toggleProps={ { ...toggleProps, size: 'compact' } }
+ 						/>
+ 					) }
+ 				</ToolbarItem>
+diff --git a/packages/components/src/toolbar/toolbar-dropdown-menu/index.tsx b/packages/components/src/toolbar/toolbar-dropdown-menu/index.tsx
+index 6dc5fd523ec2fa..55b72510f74172 100644
+--- a/packages/components/src/toolbar/toolbar-dropdown-menu/index.tsx
++++ b/packages/components/src/toolbar/toolbar-dropdown-menu/index.tsx
+@@ -37,7 +37,10 @@ function ToolbarDropdownMenu(
+ 					popoverProps={ {
+ 						...props.popoverProps,
+ 					} }
+-					toggleProps={ toolbarItemProps }
++					toggleProps={ {
++						size: 'compact',
++						...toolbarItemProps,
++					} }
+ 				/>
+ 			) }
+ 		</ToolbarItem>
+diff --git a/packages/components/src/toolbar/toolbar-group/toolbar-group-collapsed.tsx b/packages/components/src/toolbar/toolbar-group/toolbar-group-collapsed.tsx
+index a829aa3b001442..f3eaf2fa7ea879 100644
+--- a/packages/components/src/toolbar/toolbar-group/toolbar-group-collapsed.tsx
++++ b/packages/components/src/toolbar/toolbar-group/toolbar-group-collapsed.tsx
+@@ -28,6 +28,7 @@ function ToolbarGroupCollapsed( {
+ 			controls={ controls }
+ 			toggleProps={ {
+ 				...internalToggleProps,
++				size: 'compact',
+ 				'data-toolbar-item': true,
+ 			} }
+ 			{ ...props }

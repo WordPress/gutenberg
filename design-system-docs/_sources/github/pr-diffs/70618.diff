@@ -1,0 +1,1325 @@
+diff --git a/packages/components/src/angle-picker-control/angle-circle.tsx b/packages/components/src/angle-picker-control/angle-circle.tsx
+index 34a5726b4ff9aa..8671b47c4c1413 100644
+--- a/packages/components/src/angle-picker-control/angle-circle.tsx
++++ b/packages/components/src/angle-picker-control/angle-circle.tsx
+@@ -19,9 +19,9 @@ import type { AngleCircleProps } from './types';
+ 
+ type UseDraggingArgumentType = Parameters< typeof useDragging >[ 0 ];
+ type UseDraggingCallbackEvent =
+-	| Parameters< UseDraggingArgumentType[ 'onDragStart' ] >[ 0 ]
+-	| Parameters< UseDraggingArgumentType[ 'onDragMove' ] >[ 0 ]
+-	| Parameters< UseDraggingArgumentType[ 'onDragEnd' ] >[ 0 ];
++	| Parameters< NonNullable< UseDraggingArgumentType[ 'onDragStart' ] > >[ 0 ]
++	| Parameters< NonNullable< UseDraggingArgumentType[ 'onDragMove' ] > >[ 0 ]
++	| Parameters< NonNullable< UseDraggingArgumentType[ 'onDragEnd' ] > >[ 0 ];
+ 
+ function AngleCircle( {
+ 	value,
+diff --git a/packages/compose/README.md b/packages/compose/README.md
+index 7428c40abd9efd..24b9f4ce0cc4e5 100644
+--- a/packages/compose/README.md
++++ b/packages/compose/README.md
+@@ -198,23 +198,23 @@ In Dialogs/modals, the tabbing must be constrained to the content of the wrapper
+ 
+ _Usage_
+ 
+-```js
++```ts
+ import { useConstrainedTabbing } from '@wordpress/compose';
+ 
+ const ConstrainedTabbingExample = () => {
+-	const constrainedTabbingRef = useConstrainedTabbing();
+-	return (
+-		<div ref={ constrainedTabbingRef }>
+-			<Button />
+-			<Button />
+-		</div>
+-	);
+-};
++    const constrainedTabbingRef = useConstrainedTabbing()
++    return (
++        <div ref={ constrainedTabbingRef }>
++            <Button />
++            <Button />
++        </div>
++    );
++}
+ ```
+ 
+ _Returns_
+ 
+--   `React.RefCallback<Element>`: Element Ref.
++-   `React.RefCallback< Element >`: Element Ref.
+ 
+ ### useCopyOnClick
+ 
+@@ -256,12 +256,12 @@ _Related_
+ _Parameters_
+ 
+ -   _fn_ `TFunc`: The function to debounce.
+--   _wait_ `[number]`: The number of milliseconds to delay.
+--   _options_ `[import('../../utils/debounce').DebounceOptions]`: The options object.
++-   _wait_ `number`: The number of milliseconds to delay.
++-   _options_ `DebounceOptions`: The options object.
+ 
+ _Returns_
+ 
+--   `import('../../utils/debounce').DebouncedFunc<TFunc>`: Debounced function.
++-   `DebouncedFunc< TFunc >`: Debounced function.
+ 
+ ### useDebouncedInput
+ 
+@@ -374,27 +374,27 @@ Adds the unmount behavior of returning focus to the element which had it previou
+ 
+ _Usage_
+ 
+-```js
++```ts
+ import { useFocusReturn } from '@wordpress/compose';
+ 
+ const WithFocusReturn = () => {
+-	const ref = useFocusReturn();
+-	return (
+-		<div ref={ ref }>
+-			<Button />
+-			<Button />
+-		</div>
+-	);
+-};
++    const ref = useFocusReturn()
++    return (
++        <div ref={ ref }>
++            <Button />
++            <Button />
++        </div>
++    );
++}
+ ```
+ 
+ _Parameters_
+ 
+--   _onFocusReturn_ `[() => void]`: Overrides the default return behavior.
++-   _onFocusReturn_ `() => void`: Overrides the default return behavior.
+ 
+ _Returns_
+ 
+--   `React.RefCallback<HTMLElement>`: Element Ref.
++-   `React.RefCallback< HTMLElement >`: Element Ref.
+ 
+ ### useInstanceId
+ 
+@@ -424,9 +424,13 @@ _Related_
+ 
+ _Parameters_
+ 
+--   _shortcuts_ `string[]|string`: Keyboard Shortcuts.
+--   _callback_ `(e: Mousetrap.ExtendedKeyboardEvent, combo: string) => void`: Shortcut callback.
+--   _options_ `WPKeyboardShortcutConfig`: Shortcut options.
++-   _shortcuts_ `string[] | string`: Keyboard Shortcuts.
++-   _callback_ `( e: ExtendedKeyboardEvent, combo: string ) => void`: Shortcut callback.
++-   _options_ `Partial< KeyboardShortcutConfig >`: Shortcut options.
++-   _options.bindGlobal_ `Partial< KeyboardShortcutConfig >[ 'bindGlobal' ]`:
++-   _options.eventName_ `Partial< KeyboardShortcutConfig >[ 'eventName' ]`:
++-   _options.isDisabled_ `Partial< KeyboardShortcutConfig >[ 'isDisabled' ]`:
++-   _options.target_ `Partial< KeyboardShortcutConfig >[ 'target' ]`:
+ 
+ ### useMediaQuery
+ 
+@@ -575,12 +579,12 @@ _Related_
+ _Parameters_
+ 
+ -   _fn_ `TFunc`: The function to throttle.
+--   _wait_ `[number]`: The number of milliseconds to throttle invocations to.
+--   _options_ `[import('../../utils/throttle').ThrottleOptions]`: The options object. See linked documentation for details.
++-   _wait_ `number`: The number of milliseconds to throttle invocations to.
++-   _options_ `ThrottleOptions`: The options object.
+ 
+ _Returns_
+ 
+--   `import('../../utils/debounce').DebouncedFunc<TFunc>`: Throttled function.
++-   `DebouncedFunc< TFunc >`: Throttled function.
+ 
+ ### useViewportMatch
+ 
+@@ -588,16 +592,16 @@ Returns true if the viewport matches the given query, or false otherwise.
+ 
+ _Usage_
+ 
+-```js
++```ts
+ useViewportMatch( 'huge', '<' );
+ useViewportMatch( 'medium' );
+ ```
+ 
+ _Parameters_
+ 
+--   _breakpoint_ `WPBreakpoint`: Breakpoint size name.
+--   _operator_ `[WPViewportOperator]`: Viewport operator.
+--   _view_ `[Window|undefined]`: Window instance in which to perform viewport matching.
++-   _breakpoint_ `Breakpoint`: Breakpoint size name.
++-   _operator_ `ViewportOperator`: Viewport operator.
++-   _view_ `Window | undefined`: Window instance in which to perform viewport matching.
+ 
+ _Returns_
+ 
+@@ -605,12 +609,12 @@ _Returns_
+ 
+ ### useWarnOnChange
+ 
+-Hook that performs a shallow comparison between the preview value of an object and the new one, if there's a difference, it prints it to the console. this is useful in performance related work, to check why a component re-renders.
++Hook that performs a shallow comparison between the previous value of an object and the new one, if there's a difference, it prints it to the console. This is useful in performance related work, to check why a component re-renders.
+ 
+ _Usage_
+ 
+-```jsx
+-function MyComponent( props ) {
++```tsx
++function MyComponent( props: Record< string, any > ) {
+ 	useWarnOnChange( props );
+ 
+ 	return 'Something';
+@@ -619,7 +623,7 @@ function MyComponent( props ) {
+ 
+ _Parameters_
+ 
+--   _object_ `object`: Object which changes to compare.
++-   _object_ `Record< string, any > | any[]`: Object which changes to compare.
+ -   _prefix_ `string`: Just a prefix to show when console logging.
+ 
+ ### withGlobalEvents
+diff --git a/packages/compose/src/hooks/use-constrained-tabbing/index.js b/packages/compose/src/hooks/use-constrained-tabbing/index.ts
+similarity index 85%
+rename from packages/compose/src/hooks/use-constrained-tabbing/index.js
+rename to packages/compose/src/hooks/use-constrained-tabbing/index.ts
+index 6ea6a810a91ec7..92264c66351714 100644
+--- a/packages/compose/src/hooks/use-constrained-tabbing/index.js
++++ b/packages/compose/src/hooks/use-constrained-tabbing/index.ts
+@@ -12,10 +12,10 @@ import useRefEffect from '../use-ref-effect';
+  * In Dialogs/modals, the tabbing must be constrained to the content of
+  * the wrapper element. This hook adds the behavior to the returned ref.
+  *
+- * @return {React.RefCallback<Element>} Element Ref.
++ * @return Element Ref.
+  *
+  * @example
+- * ```js
++ * ```ts
+  * import { useConstrainedTabbing } from '@wordpress/compose';
+  *
+  * const ConstrainedTabbingExample = () => {
+@@ -29,9 +29,9 @@ import useRefEffect from '../use-ref-effect';
+  * }
+  * ```
+  */
+-function useConstrainedTabbing() {
+-	return useRefEffect( ( /** @type {HTMLElement} */ node ) => {
+-		function onKeyDown( /** @type {KeyboardEvent} */ event ) {
++function useConstrainedTabbing(): React.RefCallback< Element > {
++	return useRefEffect( ( node: HTMLElement ) => {
++		function onKeyDown( event: KeyboardEvent ): void {
+ 			const { key, shiftKey, target } = event;
+ 
+ 			if ( key !== 'Tab' ) {
+@@ -40,9 +40,7 @@ function useConstrainedTabbing() {
+ 
+ 			const action = shiftKey ? 'findPrevious' : 'findNext';
+ 			const nextElement =
+-				focus.tabbable[ action ](
+-					/** @type {HTMLElement} */ ( target )
+-				) || null;
++				focus.tabbable[ action ]( target as HTMLElement ) || null;
+ 
+ 			// When the target element contains the element that is about to
+ 			// receive focus, for example when the target is a tabbable
+@@ -50,9 +48,7 @@ function useConstrainedTabbing() {
+ 			// In this case we can't rely on native browsers behavior. We need
+ 			// to manage focus instead.
+ 			// See https://github.com/WordPress/gutenberg/issues/46041.
+-			if (
+-				/** @type {HTMLElement} */ ( target ).contains( nextElement )
+-			) {
++			if ( ( target as HTMLElement ).contains( nextElement ) ) {
+ 				event.preventDefault();
+ 				nextElement?.focus();
+ 				return;
+diff --git a/packages/compose/src/hooks/use-debounce/index.js b/packages/compose/src/hooks/use-debounce/index.ts
+similarity index 63%
+rename from packages/compose/src/hooks/use-debounce/index.js
+rename to packages/compose/src/hooks/use-debounce/index.ts
+index 2a31af6c123dd4..ff67c717a841db 100644
+--- a/packages/compose/src/hooks/use-debounce/index.js
++++ b/packages/compose/src/hooks/use-debounce/index.ts
+@@ -12,6 +12,7 @@ import { useEffect } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { debounce } from '../../utils/debounce';
++import type { DebounceOptions, DebouncedFunc } from '../../utils/debounce';
+ 
+ /**
+  * Debounces a function similar to Lodash's `debounce`. A new debounced function will
+@@ -21,14 +22,18 @@ import { debounce } from '../../utils/debounce';
+  *
+  * @see https://lodash.com/docs/4#debounce
+  *
+- * @template {(...args: any[]) => void} TFunc
++ * @template TFunc
+  *
+- * @param {TFunc}                                          fn        The function to debounce.
+- * @param {number}                                         [wait]    The number of milliseconds to delay.
+- * @param {import('../../utils/debounce').DebounceOptions} [options] The options object.
+- * @return {import('../../utils/debounce').DebouncedFunc<TFunc>} Debounced function.
++ * @param    fn      The function to debounce.
++ * @param    wait    The number of milliseconds to delay.
++ * @param    options The options object.
++ * @return          Debounced function.
+  */
+-export default function useDebounce( fn, wait, options ) {
++export default function useDebounce< TFunc extends ( ...args: any[] ) => void >(
++	fn: TFunc,
++	wait?: number,
++	options?: DebounceOptions
++): DebouncedFunc< TFunc > {
+ 	const debounced = useMemoOne(
+ 		() => debounce( fn, wait ?? 0, options ),
+ 		[ fn, wait, options?.leading, options?.trailing, options?.maxWait ]
+diff --git a/packages/compose/src/hooks/use-disabled/index.ts b/packages/compose/src/hooks/use-disabled/index.ts
+index e45d3b55e95e4d..74c7fbea77fda5 100644
+--- a/packages/compose/src/hooks/use-disabled/index.ts
++++ b/packages/compose/src/hooks/use-disabled/index.ts
+@@ -32,6 +32,8 @@ import useRefEffect from '../use-ref-effect';
+  */
+ export default function useDisabled( {
+ 	isDisabled: isDisabledProp = false,
++}: {
++	isDisabled?: boolean;
+ } = {} ) {
+ 	return useRefEffect(
+ 		( node ) => {
+@@ -45,7 +47,7 @@ export default function useDisabled( {
+ 			}
+ 
+ 			/** A variable keeping track of the previous updates in order to restore them. */
+-			const updates: Function[] = [];
++			const updates: ( () => void )[] = [];
+ 			const disable = () => {
+ 				node.childNodes.forEach( ( child ) => {
+ 					if ( ! ( child instanceof defaultView.HTMLElement ) ) {
+diff --git a/packages/compose/src/hooks/use-dragging/index.js b/packages/compose/src/hooks/use-dragging/index.js
+deleted file mode 100644
+index 6c6cd0724649f3..00000000000000
+--- a/packages/compose/src/hooks/use-dragging/index.js
++++ /dev/null
+@@ -1,74 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
+-
+-// Event handlers that are triggered from `document` listeners accept a MouseEvent,
+-// while those triggered from React listeners accept a React.MouseEvent.
+-/**
+- * @param {Object}                        props
+- * @param {(e: React.MouseEvent) => void} props.onDragStart
+- * @param {(e: MouseEvent) => void}       props.onDragMove
+- * @param {(e?: MouseEvent) => void}      props.onDragEnd
+- */
+-export default function useDragging( { onDragStart, onDragMove, onDragEnd } ) {
+-	const [ isDragging, setIsDragging ] = useState( false );
+-
+-	const eventsRef = useRef( {
+-		onDragStart,
+-		onDragMove,
+-		onDragEnd,
+-	} );
+-	useIsomorphicLayoutEffect( () => {
+-		eventsRef.current.onDragStart = onDragStart;
+-		eventsRef.current.onDragMove = onDragMove;
+-		eventsRef.current.onDragEnd = onDragEnd;
+-	}, [ onDragStart, onDragMove, onDragEnd ] );
+-
+-	/** @type {(e: MouseEvent) => void} */
+-	const onMouseMove = useCallback(
+-		( event ) =>
+-			eventsRef.current.onDragMove &&
+-			eventsRef.current.onDragMove( event ),
+-		[]
+-	);
+-	/** @type {(e?: MouseEvent) => void} */
+-	const endDrag = useCallback( ( event ) => {
+-		if ( eventsRef.current.onDragEnd ) {
+-			eventsRef.current.onDragEnd( event );
+-		}
+-		document.removeEventListener( 'mousemove', onMouseMove );
+-		document.removeEventListener( 'mouseup', endDrag );
+-		setIsDragging( false );
+-	}, [] );
+-	/** @type {(e: React.MouseEvent) => void} */
+-	const startDrag = useCallback( ( event ) => {
+-		if ( eventsRef.current.onDragStart ) {
+-			eventsRef.current.onDragStart( event );
+-		}
+-		document.addEventListener( 'mousemove', onMouseMove );
+-		document.addEventListener( 'mouseup', endDrag );
+-		setIsDragging( true );
+-	}, [] );
+-
+-	// Remove the global events when unmounting if needed.
+-	useEffect( () => {
+-		return () => {
+-			if ( isDragging ) {
+-				document.removeEventListener( 'mousemove', onMouseMove );
+-				document.removeEventListener( 'mouseup', endDrag );
+-			}
+-		};
+-	}, [ isDragging ] );
+-
+-	return {
+-		startDrag,
+-		endDrag,
+-		isDragging,
+-	};
+-}
+diff --git a/packages/compose/src/hooks/use-dragging/index.ts b/packages/compose/src/hooks/use-dragging/index.ts
+new file mode 100644
+index 00000000000000..1dadd0f4cfe95d
+--- /dev/null
++++ b/packages/compose/src/hooks/use-dragging/index.ts
+@@ -0,0 +1,78 @@
++/**
++ * WordPress dependencies
++ */
++import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
++import type { DraggingProps, DraggingReturn } from './types';
++
++/**
++ * Hook to manage drag events with proper event handling
++ *
++ * @param props             Drag handlers
++ * @param props.onDragStart
++ * @param props.onDragMove
++ * @param props.onDragEnd
++ * @return Drag state and handlers
++ */
++export default function useDragging( {
++	onDragStart,
++	onDragMove,
++	onDragEnd,
++}: DraggingProps ): DraggingReturn {
++	const [ isDragging, setIsDragging ] = useState( false );
++
++	const eventsRef = useRef< DraggingProps >( {
++		onDragStart,
++		onDragMove,
++		onDragEnd,
++	} );
++	useIsomorphicLayoutEffect( () => {
++		eventsRef.current.onDragStart = onDragStart;
++		eventsRef.current.onDragMove = onDragMove;
++		eventsRef.current.onDragEnd = onDragEnd;
++	}, [ onDragStart, onDragMove, onDragEnd ] );
++
++	const onMouseMove = useCallback( ( event: MouseEvent ): void => {
++		eventsRef.current.onDragMove?.( event );
++	}, [] );
++
++	const endDrag = useCallback(
++		function endDrag( event?: MouseEvent ): void {
++			eventsRef.current.onDragEnd?.( event );
++			document.removeEventListener( 'mousemove', onMouseMove );
++			document.removeEventListener( 'mouseup', endDrag );
++			setIsDragging( false );
++		},
++		[ onMouseMove ]
++	);
++
++	const startDrag = useCallback(
++		( event: React.MouseEvent ): void => {
++			eventsRef.current.onDragStart?.( event );
++			document.addEventListener( 'mousemove', onMouseMove );
++			document.addEventListener( 'mouseup', endDrag );
++			setIsDragging( true );
++		},
++		[ onMouseMove, endDrag ]
++	);
++
++	// Remove the global events when unmounting if needed.
++	useEffect( () => {
++		return () => {
++			if ( isDragging ) {
++				document.removeEventListener( 'mousemove', onMouseMove );
++				document.removeEventListener( 'mouseup', endDrag );
++			}
++		};
++	}, [ isDragging, onMouseMove, endDrag ] );
++
++	return {
++		startDrag,
++		endDrag,
++		isDragging,
++	};
++}
+diff --git a/packages/compose/src/hooks/use-dragging/types.ts b/packages/compose/src/hooks/use-dragging/types.ts
+new file mode 100644
+index 00000000000000..408c0ae2344c04
+--- /dev/null
++++ b/packages/compose/src/hooks/use-dragging/types.ts
+@@ -0,0 +1,11 @@
++export interface DraggingProps {
++	onDragStart?: ( e: React.MouseEvent ) => void;
++	onDragMove?: ( e: MouseEvent ) => void;
++	onDragEnd?: ( e?: MouseEvent ) => void;
++}
++
++export interface DraggingReturn {
++	startDrag: ( e: React.MouseEvent ) => void;
++	endDrag: ( e?: MouseEvent ) => void;
++	isDragging: boolean;
++}
+diff --git a/packages/compose/src/hooks/use-drop-zone/index.js b/packages/compose/src/hooks/use-drop-zone/index.ts
+similarity index 74%
+rename from packages/compose/src/hooks/use-drop-zone/index.js
+rename to packages/compose/src/hooks/use-drop-zone/index.ts
+index 8fa7799361e329..f111f496527977 100644
+--- a/packages/compose/src/hooks/use-drop-zone/index.js
++++ b/packages/compose/src/hooks/use-drop-zone/index.ts
+@@ -3,21 +3,13 @@
+  */
+ import useRefEffect from '../use-ref-effect';
+ import useEvent from '../use-event';
++import type { UseDropZoneProps } from './types';
+ 
+ /**
+  * A hook to facilitate drag and drop handling.
+  *
+- * @param {Object}                  props                   Named parameters.
+- * @param {?HTMLElement}            [props.dropZoneElement] Optional element to be used as the drop zone.
+- * @param {boolean}                 [props.isDisabled]      Whether or not to disable the drop zone.
+- * @param {(e: DragEvent) => void}  [props.onDragStart]     Called when dragging has started.
+- * @param {(e: DragEvent) => void}  [props.onDragEnter]     Called when the zone is entered.
+- * @param {(e: DragEvent) => void}  [props.onDragOver]      Called when the zone is moved within.
+- * @param {(e: DragEvent) => void}  [props.onDragLeave]     Called when the zone is left.
+- * @param {(e: MouseEvent) => void} [props.onDragEnd]       Called when dragging has ended.
+- * @param {(e: DragEvent) => void}  [props.onDrop]          Called when dropping in the zone.
+- *
+- * @return {React.RefCallback<HTMLElement>} Ref callback to be passed to the drop zone element.
++ * @param {UseDropZoneProps} props Hook options
++ * @return Ref callback to be passed to the drop zone element.
+  */
+ export default function useDropZone( {
+ 	dropZoneElement,
+@@ -28,7 +20,7 @@ export default function useDropZone( {
+ 	onDragLeave: _onDragLeave,
+ 	onDragEnd: _onDragEnd,
+ 	onDragOver: _onDragOver,
+-} ) {
++}: UseDropZoneProps ): React.RefCallback< HTMLElement > {
+ 	const onDropEvent = useEvent( _onDrop );
+ 	const onDragStartEvent = useEvent( _onDragStart );
+ 	const onDragEnterEvent = useEvent( _onDragEnter );
+@@ -37,7 +29,7 @@ export default function useDropZone( {
+ 	const onDragOverEvent = useEvent( _onDragOver );
+ 
+ 	return useRefEffect(
+-		( elem ) => {
++		( elem: HTMLElement ) => {
+ 			if ( isDisabled ) {
+ 				return;
+ 			}
+@@ -58,7 +50,9 @@ export default function useDropZone( {
+ 			 *
+ 			 * @return {boolean} True if in drop zone, false if not.
+ 			 */
+-			function isElementInZone( targetToCheck ) {
++			function isElementInZone(
++				targetToCheck: EventTarget | null
++			): boolean {
+ 				const { defaultView } = ownerDocument;
+ 
+ 				if (
+@@ -70,8 +64,7 @@ export default function useDropZone( {
+ 					return false;
+ 				}
+ 
+-				/** @type {HTMLElement|null} */
+-				let elementToCheck = targetToCheck;
++				let elementToCheck: HTMLElement | null = targetToCheck;
+ 
+ 				do {
+ 					if ( elementToCheck.dataset.isDropZone ) {
+@@ -82,7 +75,7 @@ export default function useDropZone( {
+ 				return false;
+ 			}
+ 
+-			function maybeDragStart( /** @type {DragEvent} */ event ) {
++			function maybeDragStart( event: DragEvent ): void {
+ 				if ( isDragging ) {
+ 					return;
+ 				}
+@@ -101,18 +94,14 @@ export default function useDropZone( {
+ 				}
+ 			}
+ 
+-			function onDragEnter( /** @type {DragEvent} */ event ) {
++			function onDragEnter( event: DragEvent ): void {
+ 				event.preventDefault();
+ 
+ 				// The `dragenter` event will also fire when entering child
+ 				// elements, but we only want to call `onDragEnter` when
+ 				// entering the drop zone, which means the `relatedTarget`
+ 				// (element that has been left) should be outside the drop zone.
+-				if (
+-					element.contains(
+-						/** @type {Node} */ ( event.relatedTarget )
+-					)
+-				) {
++				if ( element.contains( event.relatedTarget as Node ) ) {
+ 					return;
+ 				}
+ 
+@@ -121,18 +110,15 @@ export default function useDropZone( {
+ 				}
+ 			}
+ 
+-			function onDragOver( /** @type {DragEvent} */ event ) {
+-				// Only call onDragOver for the innermost hovered drop zones.
++			function onDragOver( event: DragEvent ): void {
+ 				if ( ! event.defaultPrevented && _onDragOver ) {
+ 					onDragOverEvent( event );
+ 				}
+ 
+-				// Prevent the browser default while also signalling to parent
+-				// drop zones that `onDragOver` is already handled.
+ 				event.preventDefault();
+ 			}
+ 
+-			function onDragLeave( /** @type {DragEvent} */ event ) {
++			function onDragLeave( event: DragEvent ): void {
+ 				// The `dragleave` event will also fire when leaving child
+ 				// elements, but we only want to call `onDragLeave` when
+ 				// leaving the drop zone, which means the `relatedTarget`
+@@ -150,7 +136,7 @@ export default function useDropZone( {
+ 				}
+ 			}
+ 
+-			function onDrop( /** @type {DragEvent} */ event ) {
++			function onDrop( event: DragEvent ): void {
+ 				// Don't handle drop if an inner drop zone already handled it.
+ 				if ( event.defaultPrevented ) {
+ 					return;
+@@ -173,7 +159,7 @@ export default function useDropZone( {
+ 				maybeDragEnd( event );
+ 			}
+ 
+-			function maybeDragEnd( /** @type {MouseEvent} */ event ) {
++			function maybeDragEnd( event: Event ): void {
+ 				if ( ! isDragging ) {
+ 					return;
+ 				}
+@@ -184,7 +170,7 @@ export default function useDropZone( {
+ 				ownerDocument.removeEventListener( 'mousemove', maybeDragEnd );
+ 
+ 				if ( _onDragEnd ) {
+-					onDragEndEvent( event );
++					onDragEndEvent( event as MouseEvent );
+ 				}
+ 			}
+ 
+diff --git a/packages/compose/src/hooks/use-drop-zone/types.ts b/packages/compose/src/hooks/use-drop-zone/types.ts
+new file mode 100644
+index 00000000000000..ae581579e6aca4
+--- /dev/null
++++ b/packages/compose/src/hooks/use-drop-zone/types.ts
+@@ -0,0 +1,34 @@
++export interface UseDropZoneProps {
++	/**
++	 * Optional element to be used as the drop zone.
++	 */
++	dropZoneElement?: HTMLElement | null;
++	/**
++	 * Whether or not to disable the drop zone.
++	 */
++	isDisabled?: boolean;
++	/**
++	 * Called when dragging has started.
++	 */
++	onDragStart?: ( e: DragEvent ) => void;
++	/**
++	 *  Called when the zone is entered.
++	 */
++	onDragEnter?: ( e: DragEvent ) => void;
++	/**
++	 * Called when the zone is moved within.
++	 */
++	onDragOver?: ( e: DragEvent ) => void;
++	/**
++	 * Called when the zone is left.
++	 */
++	onDragLeave?: ( e: DragEvent ) => void;
++	/**
++	 * Called when dragging has ended.
++	 */
++	onDragEnd?: ( e: MouseEvent ) => void;
++	/**
++	 * Called when dropping in the zone.
++	 */
++	onDrop?: ( e: DragEvent ) => void;
++}
+diff --git a/packages/compose/src/hooks/use-fixed-window-list/index.js b/packages/compose/src/hooks/use-fixed-window-list/index.ts
+similarity index 66%
+rename from packages/compose/src/hooks/use-fixed-window-list/index.js
+rename to packages/compose/src/hooks/use-fixed-window-list/index.ts
+index 145aeda7b548e8..e8aa698823157a 100644
+--- a/packages/compose/src/hooks/use-fixed-window-list/index.js
++++ b/packages/compose/src/hooks/use-fixed-window-list/index.ts
+@@ -12,49 +12,58 @@ import { debounce } from '../../utils/debounce';
+ 
+ const DEFAULT_INIT_WINDOW_SIZE = 30;
+ 
+-/**
+- * @typedef {Object} WPFixedWindowList
+- *
+- * @property {number}                  visibleItems Items visible in the current viewport
+- * @property {number}                  start        Start index of the window
+- * @property {number}                  end          End index of the window
+- * @property {(index:number)=>boolean} itemInView   Returns true if item is in the window
+- */
++interface FixedWindowList {
++	/** Items visible in the current viewport */
++	visibleItems: number;
++	/** Start index of the window */
++	start: number;
++	/** End index of the window */
++	end: number;
++	/** Returns true if item is in the window */
++	itemInView: ( index: number ) => boolean;
++}
+ 
+-/**
+- * @typedef {Object} WPFixedWindowListOptions
+- *
+- * @property {number}  [windowOverscan] Renders windowOverscan number of items before and after the calculated visible window.
+- * @property {boolean} [useWindowing]   When false avoids calculating the window size
+- * @property {number}  [initWindowSize] Initial window size to use on first render before we can calculate the window size.
+- * @property {any}     [expandedState]  Used to recalculate the window size when the expanded state of a list changes.
+- */
++interface FixedWindowListOptions {
++	/** Renders windowOverscan number of items before and after the calculated visible window. */
++	windowOverscan?: number;
++	/** When false avoids calculating the window size */
++	useWindowing?: boolean;
++	/** Initial window size to use on first render before we can calculate the window size. */
++	initWindowSize?: number;
++	/** Used to recalculate the window size when the expanded state of a list changes. */
++	expandedState?: any;
++}
+ 
+ /**
+  *
+- * @param {React.RefObject<HTMLElement>} elementRef Used to find the closest scroll container that contains element.
+- * @param { number }                     itemHeight Fixed item height in pixels
+- * @param { number }                     totalItems Total items in list
+- * @param { WPFixedWindowListOptions }   [options]  Options object
+- * @return {[ WPFixedWindowList, setFixedListWindow:(nextWindow:WPFixedWindowList)=>void]} Array with the fixed window list and setter
++ * @param elementRef Used to find the closest scroll container that contains element.
++ * @param itemHeight Fixed item height in pixels
++ * @param totalItems Total items in list
++ * @param [options]  Options object
++ * @return Array with the fixed window list and setter
+  */
+ export default function useFixedWindowList(
+-	elementRef,
+-	itemHeight,
+-	totalItems,
+-	options
+-) {
++	elementRef: React.RefObject< HTMLElement >,
++	itemHeight: number,
++	totalItems: number,
++	options?: FixedWindowListOptions
++): [
++	FixedWindowList,
++	React.Dispatch< React.SetStateAction< FixedWindowList > >,
++] {
+ 	const initWindowSize = options?.initWindowSize ?? DEFAULT_INIT_WINDOW_SIZE;
+ 	const useWindowing = options?.useWindowing ?? true;
+ 
+-	const [ fixedListWindow, setFixedListWindow ] = useState( {
+-		visibleItems: initWindowSize,
+-		start: 0,
+-		end: initWindowSize,
+-		itemInView: ( /** @type {number} */ index ) => {
+-			return index >= 0 && index <= initWindowSize;
+-		},
+-	} );
++	const [ fixedListWindow, setFixedListWindow ] = useState< FixedWindowList >(
++		{
++			visibleItems: initWindowSize,
++			start: 0,
++			end: initWindowSize,
++			itemInView: ( index: number ) => {
++				return index >= 0 && index <= initWindowSize;
++			},
++		}
++	);
+ 
+ 	useLayoutEffect( () => {
+ 		if ( ! useWindowing ) {
+@@ -67,7 +76,7 @@ export default function useFixedWindowList(
+ 		 * @param {boolean} [initRender] Indicates if this is the initial render
+ 		 * @return {void}
+ 		 */
+-		const measureWindow = ( initRender ) => {
++		const measureWindow = ( initRender?: boolean ) => {
+ 			if ( ! scrollContainer ) {
+ 				return;
+ 			}
+@@ -91,7 +100,7 @@ export default function useFixedWindowList(
+ 					visibleItems,
+ 					start,
+ 					end,
+-					itemInView: ( /** @type {number} */ index ) => {
++					itemInView: ( index: number ) => {
+ 						return start <= index && index <= end;
+ 					},
+ 				};
+@@ -144,7 +153,7 @@ export default function useFixedWindowList(
+ 			return;
+ 		}
+ 		const scrollContainer = getScrollContainer( elementRef.current );
+-		const handleKeyDown = ( /** @type {KeyboardEvent} */ event ) => {
++		const handleKeyDown = ( event: KeyboardEvent ) => {
+ 			switch ( event.keyCode ) {
+ 				case HOME: {
+ 					return scrollContainer?.scrollTo( { top: 0 } );
+diff --git a/packages/compose/src/hooks/use-focus-return/index.js b/packages/compose/src/hooks/use-focus-return/index.ts
+similarity index 60%
+rename from packages/compose/src/hooks/use-focus-return/index.js
+rename to packages/compose/src/hooks/use-focus-return/index.ts
+index 14f11d77906cb0..13afcae46a14ce 100644
+--- a/packages/compose/src/hooks/use-focus-return/index.js
++++ b/packages/compose/src/hooks/use-focus-return/index.ts
+@@ -3,18 +3,17 @@
+  */
+ import { useRef, useEffect, useCallback } from '@wordpress/element';
+ 
+-/** @type {Element|null} */
+-let origin = null;
++let origin: Element | null = null;
+ 
+ /**
+  * Adds the unmount behavior of returning focus to the element which had it
+  * previously as is expected for roles like menus or dialogs.
+  *
+- * @param {() => void} [onFocusReturn] Overrides the default return behavior.
+- * @return {React.RefCallback<HTMLElement>} Element Ref.
++ * @param onFocusReturn Overrides the default return behavior.
++ * @return Element Ref.
+  *
+  * @example
+- * ```js
++ * ```ts
+  * import { useFocusReturn } from '@wordpress/compose';
+  *
+  * const WithFocusReturn = () => {
+@@ -28,23 +27,26 @@ let origin = null;
+  * }
+  * ```
+  */
+-function useFocusReturn( onFocusReturn ) {
+-	/** @type {React.MutableRefObject<null | HTMLElement>} */
+-	const ref = useRef( null );
+-	/** @type {React.MutableRefObject<null | Element>} */
+-	const focusedBeforeMount = useRef( null );
+-	const onFocusReturnRef = useRef( onFocusReturn );
++function useFocusReturn(
++	onFocusReturn?: () => void
++): React.RefCallback< HTMLElement > {
++	const ref = useRef< HTMLElement | null >( null );
++	const focusedBeforeMountRef = useRef< Element | null >( null );
++	const onFocusReturnRef = useRef< ( () => void ) | undefined >(
++		onFocusReturn
++	);
++
+ 	useEffect( () => {
+ 		onFocusReturnRef.current = onFocusReturn;
+ 	}, [ onFocusReturn ] );
+ 
+-	return useCallback( ( node ) => {
++	return useCallback( ( node: HTMLElement | null ) => {
+ 		if ( node ) {
+ 			// Set ref to be used when unmounting.
+ 			ref.current = node;
+ 
+ 			// Only set when the node mounts.
+-			if ( focusedBeforeMount.current ) {
++			if ( focusedBeforeMountRef.current ) {
+ 				return;
+ 			}
+ 
+@@ -54,14 +56,15 @@ function useFocusReturn( onFocusReturn ) {
+ 					? node.ownerDocument.activeElement.contentDocument
+ 					: node.ownerDocument;
+ 
+-			focusedBeforeMount.current = activeDocument?.activeElement ?? null;
+-		} else if ( focusedBeforeMount.current ) {
++			focusedBeforeMountRef.current =
++				activeDocument?.activeElement ?? null;
++		} else if ( focusedBeforeMountRef.current ) {
+ 			const isFocused = ref.current?.contains(
+-				ref.current?.ownerDocument.activeElement
++				ref.current?.ownerDocument.activeElement ?? null
+ 			);
+ 
+ 			if ( ref.current?.isConnected && ! isFocused ) {
+-				origin ??= focusedBeforeMount.current;
++				origin ??= focusedBeforeMountRef.current;
+ 				return;
+ 			}
+ 
+@@ -72,11 +75,13 @@ function useFocusReturn( onFocusReturn ) {
+ 			if ( onFocusReturnRef.current ) {
+ 				onFocusReturnRef.current();
+ 			} else {
+-				/** @type {null|HTMLElement} */ (
+-					! focusedBeforeMount.current.isConnected
++				const elementToFocus = (
++					! focusedBeforeMountRef.current.isConnected
+ 						? origin
+-						: focusedBeforeMount.current
+-				)?.focus();
++						: focusedBeforeMountRef.current
++				) as HTMLElement | SVGElement | null;
++
++				elementToFocus?.focus();
+ 			}
+ 			origin = null;
+ 		}
+diff --git a/packages/compose/src/hooks/use-isomorphic-layout-effect/index.js b/packages/compose/src/hooks/use-isomorphic-layout-effect/index.ts
+similarity index 100%
+rename from packages/compose/src/hooks/use-isomorphic-layout-effect/index.js
+rename to packages/compose/src/hooks/use-isomorphic-layout-effect/index.ts
+diff --git a/packages/compose/src/hooks/use-keyboard-shortcut/index.js b/packages/compose/src/hooks/use-keyboard-shortcut/index.ts
+similarity index 53%
+rename from packages/compose/src/hooks/use-keyboard-shortcut/index.js
+rename to packages/compose/src/hooks/use-keyboard-shortcut/index.ts
+index f06b618f3486c8..fb8eba1875f0a4 100644
+--- a/packages/compose/src/hooks/use-keyboard-shortcut/index.js
++++ b/packages/compose/src/hooks/use-keyboard-shortcut/index.ts
+@@ -3,44 +3,59 @@
+  */
+ import Mousetrap from 'mousetrap';
+ import 'mousetrap/plugins/global-bind/mousetrap-global-bind.js';
++import type { ExtendedKeyboardEvent } from 'mousetrap';
+ 
+ /**
+  * WordPress dependencies
+  */
++import type { RefObject } from '@wordpress/element';
+ import { useEffect, useRef } from '@wordpress/element';
+ import { isAppleOS } from '@wordpress/keycodes';
+ 
+-/**
+- * A block selection object.
+- *
+- * @typedef {Object} WPKeyboardShortcutConfig
+- *
+- * @property {boolean}                             [bindGlobal] Handle keyboard events anywhere including inside textarea/input fields.
+- * @property {string}                              [eventName]  Event name used to trigger the handler, defaults to keydown.
+- * @property {boolean}                             [isDisabled] Disables the keyboard handler if the value is true.
+- * @property {React.RefObject<HTMLElement | null>} [target]     React reference to the DOM element used to catch the keyboard event.
+- */
++type KeyboardShortcutConfig = {
++	/**
++	 * Handle keyboard events anywhere including inside textarea/input fields.
++	 */
++	bindGlobal: boolean;
++	/**
++	 * Event name used to trigger the handler, defaults to keydown.
++	 */
++	eventName: string;
++	/**
++	 * Disables the keyboard handler if the value is true.
++	 */
++	isDisabled: boolean;
++	/**
++	 * React reference to the DOM element used to catch the keyboard event.
++	 */
++	target: RefObject< HTMLElement >;
++};
+ 
+ /**
+  * Attach a keyboard shortcut handler.
+  *
+  * @see https://craig.is/killing/mice#api.bind for information about the `callback` parameter.
+  *
+- * @param {string[]|string}                                             shortcuts Keyboard Shortcuts.
+- * @param {(e: Mousetrap.ExtendedKeyboardEvent, combo: string) => void} callback  Shortcut callback.
+- * @param {WPKeyboardShortcutConfig}                                    options   Shortcut options.
++ * @param shortcuts          Keyboard Shortcuts.
++ * @param callback           Shortcut callback.
++ * @param options            Shortcut options.
++ * @param options.bindGlobal
++ * @param options.eventName
++ * @param options.isDisabled
++ * @param options.target
+  */
+ function useKeyboardShortcut(
+-	shortcuts,
+-	callback,
++	shortcuts: string[] | string,
++	callback: ( e: ExtendedKeyboardEvent, combo: string ) => void,
+ 	{
+ 		bindGlobal = false,
+ 		eventName = 'keydown',
+-		isDisabled = false, // This is important for performance considerations.
++		isDisabled = false,
+ 		target,
+-	} = {}
++	}: Partial< KeyboardShortcutConfig > = {}
+ ) {
+ 	const currentCallbackRef = useRef( callback );
++
+ 	useEffect( () => {
+ 		currentCallbackRef.current = callback;
+ 	}, [ callback ] );
+@@ -49,29 +64,28 @@ function useKeyboardShortcut(
+ 		if ( isDisabled ) {
+ 			return;
+ 		}
++
+ 		const mousetrap = new Mousetrap(
+ 			target && target.current
+ 				? target.current
+ 				: // We were passing `document` here previously, so to successfully cast it to Element we must cast it first to `unknown`.
+ 				  // Not sure if this is a mistake but it was the behavior previous to the addition of types so we're just doing what's
+ 				  // necessary to maintain the existing behavior.
+-				  /** @type {Element} */ ( /** @type {unknown} */ ( document ) )
++				  ( document as unknown as Element )
+ 		);
++
+ 		const shortcutsArray = Array.isArray( shortcuts )
+ 			? shortcuts
+ 			: [ shortcuts ];
+-		shortcutsArray.forEach( ( shortcut ) => {
++
++		shortcutsArray.forEach( ( shortcut: string ) => {
+ 			const keys = shortcut.split( '+' );
+-			// Determines whether a key is a modifier by the length of the string.
+-			// E.g. if I add a pass a shortcut Shift+Cmd+M, it'll determine that
+-			// the modifiers are Shift and Cmd because they're not a single character.
+ 			const modifiers = new Set(
+ 				keys.filter( ( value ) => value.length > 1 )
+ 			);
+ 			const hasAlt = modifiers.has( 'alt' );
+ 			const hasShift = modifiers.has( 'shift' );
+ 
+-			// This should be better moved to the shortcut registration instead.
+ 			if (
+ 				isAppleOS() &&
+ 				( ( modifiers.size === 1 && hasAlt ) ||
+@@ -83,12 +97,13 @@ function useKeyboardShortcut(
+ 			}
+ 
+ 			const bindFn = bindGlobal ? 'bindGlobal' : 'bind';
+-			// @ts-ignore `bindGlobal` is an undocumented property
+-			mousetrap[ bindFn ](
++			// `@ts-expect-error` Mousetrap typings don’t include `bindGlobal`
++			// It exists at runtime via the plugin
++			// `any` is used here to allow dynamic access via `bindFn`
++			( mousetrap as any )[ bindFn ](
+ 				shortcut,
+-				(
+-					/** @type {[e: import('mousetrap').ExtendedKeyboardEvent, combo: string]} */ ...args
+-				) => currentCallbackRef.current( ...args ),
++				( ...args: [ Mousetrap.ExtendedKeyboardEvent, string ] ) =>
++					currentCallbackRef.current( ...args ),
+ 				eventName
+ 			);
+ 		} );
+diff --git a/packages/compose/src/hooks/use-reduced-motion/index.js b/packages/compose/src/hooks/use-reduced-motion/index.ts
+similarity index 74%
+rename from packages/compose/src/hooks/use-reduced-motion/index.js
+rename to packages/compose/src/hooks/use-reduced-motion/index.ts
+index 0fda4f80066b1e..ad3f599e85e8c9 100644
+--- a/packages/compose/src/hooks/use-reduced-motion/index.js
++++ b/packages/compose/src/hooks/use-reduced-motion/index.ts
+@@ -6,9 +6,9 @@ import useMediaQuery from '../use-media-query';
+ /**
+  * Hook returning whether the user has a preference for reduced motion.
+  *
+- * @return {boolean} Reduced motion preference value.
++ * @return Reduced motion preference value.
+  */
+-const useReducedMotion = () =>
++const useReducedMotion = (): boolean =>
+ 	useMediaQuery( '(prefers-reduced-motion: reduce)' );
+ 
+ export default useReducedMotion;
+diff --git a/packages/compose/src/hooks/use-throttle/index.js b/packages/compose/src/hooks/use-throttle/index.ts
+similarity index 59%
+rename from packages/compose/src/hooks/use-throttle/index.js
+rename to packages/compose/src/hooks/use-throttle/index.ts
+index 4bf6cc6e85555a..403a3a6ae967aa 100644
+--- a/packages/compose/src/hooks/use-throttle/index.js
++++ b/packages/compose/src/hooks/use-throttle/index.ts
+@@ -12,6 +12,8 @@ import { useEffect } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { throttle } from '../../utils/throttle';
++import type { ThrottleOptions } from '../../utils/throttle';
++import type { DebouncedFunc } from '../../utils/debounce';
+ 
+ /**
+  * Throttles a function similar to Lodash's `throttle`. A new throttled function will
+@@ -21,14 +23,18 @@ import { throttle } from '../../utils/throttle';
+  *
+  * @see https://lodash.com/docs/4#throttle
+  *
+- * @template {(...args: any[]) => void} TFunc
++ * @template TFunc
+  *
+- * @param {TFunc}                                          fn        The function to throttle.
+- * @param {number}                                         [wait]    The number of milliseconds to throttle invocations to.
+- * @param {import('../../utils/throttle').ThrottleOptions} [options] The options object. See linked documentation for details.
+- * @return {import('../../utils/debounce').DebouncedFunc<TFunc>} Throttled function.
++ * @param    fn      The function to throttle.
++ * @param    wait    The number of milliseconds to throttle invocations to.
++ * @param    options The options object.
++ * @return          Throttled function.
+  */
+-export default function useThrottle( fn, wait, options ) {
++export default function useThrottle< TFunc extends ( ...args: any[] ) => void >(
++	fn: TFunc,
++	wait?: number,
++	options?: ThrottleOptions
++): DebouncedFunc< TFunc > {
+ 	const throttled = useMemoOne(
+ 		() => throttle( fn, wait ?? 0, options ),
+ 		[ fn, wait, options ]
+diff --git a/packages/compose/src/hooks/use-viewport-match/index.js b/packages/compose/src/hooks/use-viewport-match/index.ts
+similarity index 60%
+rename from packages/compose/src/hooks/use-viewport-match/index.js
+rename to packages/compose/src/hooks/use-viewport-match/index.ts
+index 0b0195bc51f5ba..377b48c160490b 100644
+--- a/packages/compose/src/hooks/use-viewport-match/index.js
++++ b/packages/compose/src/hooks/use-viewport-match/index.ts
+@@ -8,18 +8,23 @@ import { createContext, useContext } from '@wordpress/element';
+  */
+ import useMediaQuery from '../use-media-query';
+ 
+-/**
+- * @typedef {"xhuge" | "huge" | "wide" | "xlarge" | "large" | "medium" | "small" | "mobile"} WPBreakpoint
+- */
++type Breakpoint =
++	| 'xhuge'
++	| 'huge'
++	| 'wide'
++	| 'xlarge'
++	| 'large'
++	| 'medium'
++	| 'small'
++	| 'mobile';
++type ViewportOperator = '>=' | '<';
+ 
+ /**
+  * Hash of breakpoint names with pixel width at which it becomes effective.
+  *
+  * @see _breakpoints.scss
+- *
+- * @type {Record<WPBreakpoint, number>}
+  */
+-const BREAKPOINTS = {
++const BREAKPOINTS: Record< Breakpoint, number > = {
+ 	xhuge: 1920,
+ 	huge: 1440,
+ 	wide: 1280,
+@@ -30,63 +35,59 @@ const BREAKPOINTS = {
+ 	mobile: 480,
+ };
+ 
+-/**
+- * @typedef {">=" | "<"} WPViewportOperator
+- */
+-
+ /**
+  * Object mapping media query operators to the condition to be used.
+- *
+- * @type {Record<WPViewportOperator, string>}
+  */
+-const CONDITIONS = {
++const CONDITIONS: Record< ViewportOperator, string > = {
+ 	'>=': 'min-width',
+ 	'<': 'max-width',
+ };
+ 
+ /**
+- * Object mapping media query operators to a function that given a breakpointValue and a width evaluates if the operator matches the values.
+- *
+- * @type {Record<WPViewportOperator, (breakpointValue: number, width: number) => boolean>}
++ * Object mapping media query operators to a function that evaluates if the operator matches.
+  */
+-const OPERATOR_EVALUATORS = {
++const OPERATOR_EVALUATORS: Record<
++	ViewportOperator,
++	( breakpointValue: number, width: number ) => boolean
++> = {
+ 	'>=': ( breakpointValue, width ) => width >= breakpointValue,
+ 	'<': ( breakpointValue, width ) => width < breakpointValue,
+ };
+ 
+-const ViewportMatchWidthContext = createContext(
+-	/** @type {null | number} */ ( null )
+-);
++const ViewportMatchWidthContext = createContext< number | null >( null );
+ ViewportMatchWidthContext.displayName = 'ViewportMatchWidthContext';
+ 
+ /**
+  * Returns true if the viewport matches the given query, or false otherwise.
+  *
+- * @param {WPBreakpoint}       breakpoint      Breakpoint size name.
+- * @param {WPViewportOperator} [operator=">="] Viewport operator.
+- * @param {Window|undefined}   [view=window]   Window instance in which to perform viewport matching.
++ * @param breakpoint Breakpoint size name.
++ * @param operator   Viewport operator.
++ * @param view       Window instance in which to perform viewport matching.
+  *
+  * @example
+  *
+- * ```js
++ * ```ts
+  * useViewportMatch( 'huge', '<' );
+  * useViewportMatch( 'medium' );
+  * ```
+  *
+- * @return {boolean} Whether viewport matches query.
++ * @return Whether viewport matches query.
+  */
+ const useViewportMatch = (
+-	breakpoint,
+-	operator = '>=',
++	breakpoint: Breakpoint,
++	operator: ViewportOperator = '>=',
+ 	// Resolve the default lazily so SSR (where `window` is undeclared) does not
+ 	// throw a ReferenceError when this default expression is evaluated.
+-	view = typeof window !== 'undefined' ? window : undefined
+-) => {
++	view: Window | undefined = typeof window !== 'undefined'
++		? window
++		: undefined
++): boolean => {
+ 	const simulatedWidth = useContext( ViewportMatchWidthContext );
+ 	const mediaQuery =
+ 		! simulatedWidth &&
+ 		`(${ CONDITIONS[ operator ] }: ${ BREAKPOINTS[ breakpoint ] }px)`;
+ 	const mediaQueryResult = useMediaQuery( mediaQuery || undefined, view );
++
+ 	if ( simulatedWidth ) {
+ 		return OPERATOR_EVALUATORS[ operator ](
+ 			BREAKPOINTS[ breakpoint ],
+diff --git a/packages/compose/src/hooks/use-warn-on-change/index.js b/packages/compose/src/hooks/use-warn-on-change/index.js
+deleted file mode 100644
+index e8a865902d70b7..00000000000000
+--- a/packages/compose/src/hooks/use-warn-on-change/index.js
++++ /dev/null
+@@ -1,43 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import usePrevious from '../use-previous';
+-
+-// Disable reason: Object and object are distinctly different types in TypeScript and we mean the lowercase object in this case
+-// but eslint wants to force us to use `Object`. See https://stackoverflow.com/questions/49464634/difference-between-object-and-object-in-typescript
+-/* eslint-disable jsdoc/check-types */
+-/**
+- * Hook that performs a shallow comparison between the preview value of an object
+- * and the new one, if there's a difference, it prints it to the console.
+- * this is useful in performance related work, to check why a component re-renders.
+- *
+- *  @example
+- *
+- * ```jsx
+- * function MyComponent(props) {
+- *    useWarnOnChange(props);
+- *
+- *    return "Something";
+- * }
+- * ```
+- *
+- * @param {object} object Object which changes to compare.
+- * @param {string} prefix Just a prefix to show when console logging.
+- */
+-function useWarnOnChange( object, prefix = 'Change detection' ) {
+-	const previousValues = usePrevious( object );
+-
+-	Object.entries( previousValues ?? [] ).forEach( ( [ key, value ] ) => {
+-		if ( value !== object[ /** @type {keyof typeof object} */ ( key ) ] ) {
+-			// eslint-disable-next-line no-console
+-			console.warn(
+-				`${ prefix }: ${ key } key changed:`,
+-				value,
+-				object[ /** @type {keyof typeof object} */ ( key ) ]
+-				/* eslint-enable jsdoc/check-types */
+-			);
+-		}
+-	} );
+-}
+-
+-export default useWarnOnChange;
+diff --git a/packages/compose/src/hooks/use-warn-on-change/index.ts b/packages/compose/src/hooks/use-warn-on-change/index.ts
+new file mode 100644
+index 00000000000000..866ce14ab3ef9e
+--- /dev/null
++++ b/packages/compose/src/hooks/use-warn-on-change/index.ts
+@@ -0,0 +1,42 @@
++/**
++ * Internal dependencies
++ */
++import usePrevious from '../use-previous';
++
++/**
++ * Hook that performs a shallow comparison between the previous value of an object
++ * and the new one, if there's a difference, it prints it to the console.
++ * This is useful in performance related work, to check why a component re-renders.
++ *
++ *  @example
++ *
++ * ```tsx
++ * function MyComponent(props: Record<string, any>) {
++ *    useWarnOnChange(props);
++ *
++ *    return "Something";
++ * }
++ * ```
++ *
++ * @param object Object which changes to compare.
++ * @param prefix Just a prefix to show when console logging.
++ */
++function useWarnOnChange(
++	object: Record< string, any > | any[],
++	prefix: string = 'Change detection'
++): void {
++	const previousValues = usePrevious( object );
++
++	Object.entries( previousValues ?? [] ).forEach( ( [ key, value ] ) => {
++		if ( value !== object[ key as keyof typeof object ] ) {
++			// eslint-disable-next-line no-console
++			console.warn(
++				`${ prefix }: ${ key } key changed:`,
++				value,
++				object[ key as keyof typeof object ]
++			);
++		}
++	} );
++}
++
++export default useWarnOnChange;

@@ -1,0 +1,73 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 388aef8d5a3df5..89ca95025c74f6 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -15,6 +15,7 @@
+ ### Bug Fix
+ 
+ -   `InputControl`: Fix focus style to support Windows High Contrast mode ([#50772](https://github.com/WordPress/gutenberg/pull/50772)).
++-   `ToggleGroupControl`: Fix focus and selected style to support Windows High Contrast mode ([#50785](https://github.com/WordPress/gutenberg/pull/50785)).
+ 
+ ## 24.0.0 (2023-05-10)
+ 
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index d9f173a571e48a..e5ea6c14f5ef65 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -67,8 +67,9 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+ .emotion-8:focus-within {
+   border-color: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6));
+   box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+-  outline: none;
+   z-index: 1;
++  outline: 2px solid transparent;
++  outline-offset: -2px;
+ }
+ 
+ .emotion-10 {
+@@ -81,6 +82,8 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+   -webkit-transition: -webkit-transform 160ms ease;
+   transition: transform 160ms ease;
+   z-index: 1;
++  outline: 2px solid transparent;
++  outline-offset: -3px;
+ }
+ 
+ @media ( prefers-reduced-motion: reduce ) {
+@@ -402,8 +405,9 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+ .emotion-8:focus-within {
+   border-color: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6));
+   box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+-  outline: none;
+   z-index: 1;
++  outline: 2px solid transparent;
++  outline-offset: -2px;
+ }
+ 
+ .emotion-10 {
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
+index b48826e8ccbe84..fa71cc317da489 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
+@@ -46,8 +46,10 @@ const enclosingBorders = ( isBlock: ToggleGroupControlProps[ 'isBlock' ] ) => {
+ 		&:focus-within {
+ 			border-color: ${ COLORS.ui.borderFocus };
+ 			box-shadow: ${ CONFIG.controlBoxShadowFocus };
+-			outline: none;
+ 			z-index: 1;
++			// Windows High Contrast mode will show this outline, but not the box-shadow.
++			outline: 2px solid transparent;
++			outline-offset: -2px;
+ 		}
+ 	`;
+ };
+@@ -80,6 +82,9 @@ export const BackdropView = styled.div`
+ 	transition: transform ${ CONFIG.transitionDurationFast } ease;
+ 	${ reduceMotion( 'transition' ) }
+ 	z-index: 1;
++	// Windows High Contrast mode will show this outline, but not the box-shadow.
++	outline: 2px solid transparent;
++	outline-offset: -3px;
+ `;
+ 
+ export const VisualLabelWrapper = styled.div`

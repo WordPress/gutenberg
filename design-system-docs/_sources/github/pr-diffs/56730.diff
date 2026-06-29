@@ -1,0 +1,89 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8a6d52e7582833..ed33677b55a82a 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ 
+ -   `ToggleGroupControl`: react correctly to external controlled updates ([#56678](https://github.com/WordPress/gutenberg/pull/56678)).
+ -   `ToolsPanel`: fix a performance issue ([#56770](https://github.com/WordPress/gutenberg/pull/56770)).
++-   `BorderControl`: adjust `BorderControlDropdown` Button size to fix misaligned border ([#56730](https://github.com/WordPress/gutenberg/pull/56730)).
+ 
+ ## 25.13.0 (2023-11-29)
+ 
+diff --git a/packages/components/src/border-control/border-control-dropdown/component.tsx b/packages/components/src/border-control/border-control-dropdown/component.tsx
+index 4f43a6ed0ce55d..3ee01bcda8f3b3 100644
+--- a/packages/components/src/border-control/border-control-dropdown/component.tsx
++++ b/packages/components/src/border-control/border-control-dropdown/component.tsx
+@@ -149,6 +149,7 @@ const BorderControlDropdown = (
+ 		popoverControlsClassName,
+ 		resetButtonClassName,
+ 		showDropdownHeader,
++		size,
+ 		__unstablePopoverProps,
+ 		...otherProps
+ 	} = useBorderControlDropdown( props );
+@@ -178,6 +179,7 @@ const BorderControlDropdown = (
+ 			tooltipPosition={ dropdownPosition }
+ 			label={ __( 'Border color and style picker' ) }
+ 			showTooltip={ true }
++			__next40pxDefaultSize={ size === '__unstable-large' ? true : false }
+ 		>
+ 			<span className={ indicatorWrapperClassName }>
+ 				<ColorIndicator
+@@ -198,7 +200,7 @@ const BorderControlDropdown = (
+ 						<HStack>
+ 							<StyledLabel>{ __( 'Border color' ) }</StyledLabel>
+ 							<Button
+-								isSmall
++								size="small"
+ 								label={ __( 'Close border color' ) }
+ 								icon={ closeSmall }
+ 								onClick={ onClose }
+diff --git a/packages/components/src/border-control/border-control-dropdown/hook.ts b/packages/components/src/border-control/border-control-dropdown/hook.ts
+index b60aa52a34e2eb..5366babc266c61 100644
+--- a/packages/components/src/border-control/border-control-dropdown/hook.ts
++++ b/packages/components/src/border-control/border-control-dropdown/hook.ts
+@@ -57,8 +57,8 @@ export function useBorderControlDropdown(
+ 	// Generate class names.
+ 	const cx = useCx();
+ 	const classes = useMemo( () => {
+-		return cx( styles.borderControlDropdown( size ), className );
+-	}, [ className, cx, size ] );
++		return cx( styles.borderControlDropdown, className );
++	}, [ className, cx ] );
+ 
+ 	const indicatorClassName = useMemo( () => {
+ 		return cx( styles.borderColorIndicator );
+@@ -95,6 +95,7 @@ export function useBorderControlDropdown(
+ 		popoverContentClassName,
+ 		popoverControlsClassName,
+ 		resetButtonClassName,
++		size,
+ 		__experimentalIsRenderedInSidebar,
+ 	};
+ }
+diff --git a/packages/components/src/border-control/styles.ts b/packages/components/src/border-control/styles.ts
+index 322e9563d58a4d..1a2263b9fb6ff2 100644
+--- a/packages/components/src/border-control/styles.ts
++++ b/packages/components/src/border-control/styles.ts
+@@ -59,18 +59,11 @@ export const wrapperHeight = ( size?: 'default' | '__unstable-large' ) => {
+ 	`;
+ };
+ 
+-export const borderControlDropdown = (
+-	size?: 'default' | '__unstable-large'
+-) => css`
++export const borderControlDropdown = css`
+ 	background: #fff;
+ 
+ 	&& > button {
+-		/*
+-		 * Override button component styles to fit within BorderControl
+-		 * regardless of size.
+-		 */
+-		height: ${ size === '__unstable-large' ? '40px' : '30px' };
+-		width: ${ size === '__unstable-large' ? '40px' : '30px' };
++		aspect-ratio: 1;
+ 		padding: 0;
+ 		display: flex;
+ 		align-items: center;

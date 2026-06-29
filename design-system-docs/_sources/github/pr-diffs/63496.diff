@@ -1,0 +1,38 @@
+diff --git a/packages/components/src/autocomplete/README.md b/packages/components/src/autocomplete/README.md
+index 42cadcbb06921c..e2bc93fc476e00 100644
+--- a/packages/components/src/autocomplete/README.md
++++ b/packages/components/src/autocomplete/README.md
+@@ -8,7 +8,7 @@ The following props are used to control the behavior of the component.
+ 
+ ### record
+ 
+-The rich text value object the autocomleter is being applied to.
++The rich text value object the autocompleter is being applied to.
+ 
+ -   Required: Yes
+ -   Type: `RichTextValue`
+@@ -50,7 +50,7 @@ A function that returns nodes to be rendered within the Autocomplete.
+ 
+ ### isSelected
+ 
+-Whether or not the Autocomplte componenet is selected, and if its `Popover` should be displayed.
++Whether or not the Autocomplete component is selected, and if its `Popover` should be displayed.
+ 
+ - Required: Yes
+ - Type: `Boolean`
+diff --git a/packages/components/src/autocomplete/types.ts b/packages/components/src/autocomplete/types.ts
+index ebe69648fc7e96..46f4a33d1401d3 100644
+--- a/packages/components/src/autocomplete/types.ts
++++ b/packages/components/src/autocomplete/types.ts
+@@ -200,9 +200,8 @@ export type AutocompleteProps = UseAutocompleteProps & {
+ 		props: Omit< ReturnType< typeof useAutocomplete >, 'popover' >
+ 	) => React.ReactNode;
+ 	/**
+-	 * Whether or not the Autocomplte componenet is selected, and if its
+-	 * `Popover`
+-	 * should be displayed.
++	 * Whether or not the Autocomplete component is selected, and if its
++	 * `Popover` should be displayed.
+ 	 */
+ 	isSelected: boolean;
+ };

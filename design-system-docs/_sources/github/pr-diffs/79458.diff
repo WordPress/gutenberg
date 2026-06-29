@@ -1,0 +1,59 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index f14e468d0b7378..c70b4a64afa45d 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ 
+ ### Bug Fixes
+ 
++-   Avoid React SSR warnings from layout effects in `@wordpress/ui` hooks and stories ([#79458](https://github.com/WordPress/gutenberg/pull/79458)).
+ -   `Popover`: Disable popup transitions when Base UI marks animations as instant ([#79432](https://github.com/WordPress/gutenberg/pull/79432)).
+ -   `Button`: Fix `loading` state in forced colors mode ([#78820](https://github.com/WordPress/gutenberg/pull/78820)).
+ -   `Button`: Fix `loading` prop affecting `unstyled` variant ([#78820](https://github.com/WordPress/gutenberg/pull/78820)).
+diff --git a/packages/ui/src/popover/stories/utils.tsx b/packages/ui/src/popover/stories/utils.tsx
+index 74ce43b01db24d..ca1c48ab90bd02 100644
+--- a/packages/ui/src/popover/stories/utils.tsx
++++ b/packages/ui/src/popover/stories/utils.tsx
+@@ -2,11 +2,10 @@ import {
+ 	createPortal,
+ 	forwardRef,
+ 	useCallback,
+-	useLayoutEffect,
+ 	useRef,
+ 	useState,
+ } from '@wordpress/element';
+-import { useMergeRefs } from '@wordpress/compose';
++import { useIsomorphicLayoutEffect, useMergeRefs } from '@wordpress/compose';
+ import type { RefCallback } from 'react';
+ 
+ /**
+@@ -23,7 +22,7 @@ export function useMeasure< TRef extends HTMLElement >() {
+ 		height: 0,
+ 	} );
+ 
+-	useLayoutEffect( () => {
++	useIsomorphicLayoutEffect( () => {
+ 		if ( ! element ) {
+ 			return;
+ 		}
+diff --git a/packages/ui/src/utils/use-overlay-scroll-state-attributes.ts b/packages/ui/src/utils/use-overlay-scroll-state-attributes.ts
+index f65b1ed67100d4..a19bed393c4053 100644
+--- a/packages/ui/src/utils/use-overlay-scroll-state-attributes.ts
++++ b/packages/ui/src/utils/use-overlay-scroll-state-attributes.ts
+@@ -1,5 +1,6 @@
+ import type { UIEvent, UIEventHandler } from 'react';
+-import { useCallback, useLayoutEffect, useState } from '@wordpress/element';
++import { useIsomorphicLayoutEffect } from '@wordpress/compose';
++import { useCallback, useState } from '@wordpress/element';
+ 
+ export const SCROLL_CONTAINER_ATTR = 'data-wp-ui-overlay-scroll-container';
+ const SCROLLED_FROM_TOP_ATTR = 'data-wp-ui-overlay-scrolled-from-top';
+@@ -198,7 +199,7 @@ export function useOverlayScrollStateAttributes<
+ 		setNode( el );
+ 	}, [] );
+ 
+-	useLayoutEffect( () => {
++	useIsomorphicLayoutEffect( () => {
+ 		if ( ! node ) {
+ 			return;
+ 		}

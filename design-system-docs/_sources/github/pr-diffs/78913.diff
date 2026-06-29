@@ -1,0 +1,216 @@
+diff --git a/packages/boot/src/components/root/style.scss b/packages/boot/src/components/root/style.scss
+index 49e48a8680f46a..abc0cafafe4e7e 100644
+--- a/packages/boot/src/components/root/style.scss
++++ b/packages/boot/src/components/root/style.scss
+@@ -111,7 +111,7 @@
+ 		position: static;
+ 		width: auto;
+ 		height: auto;
+-		border-radius: 8px;
++		border-radius: var(--wpds-border-radius-xl);
+ 		margin: 0;
+ 
+ 		.boot-layout--single-page & {
+@@ -167,7 +167,7 @@
+ 		position: static;
+ 		width: auto;
+ 		height: auto;
+-		border-radius: 8px;
++		border-radius: var(--wpds-border-radius-xl);
+ 		z-index: auto;
+ 
+ 		.boot-layout--single-page & {
+diff --git a/packages/boot/src/view-transitions.scss b/packages/boot/src/view-transitions.scss
+index fa67d66c9cdf6b..82e8ca881906f1 100644
+--- a/packages/boot/src/view-transitions.scss
++++ b/packages/boot/src/view-transitions.scss
+@@ -106,7 +106,7 @@
+ ::view-transition-new(boot--inspector),
+ ::view-transition-old(boot--inspector) {
+ 	background: colors.$white;
+-	border-radius: 8px;
++	border-radius: var(--wpds-border-radius-xl);
+ 	width: 100%;
+ 	height: 100%;
+ 	object-fit: none;
+diff --git a/packages/edit-site/src/components/layout/style.scss b/packages/edit-site/src/components/layout/style.scss
+index 4cb949ef0f8481..467b336fdb0c9b 100644
+--- a/packages/edit-site/src/components/layout/style.scss
++++ b/packages/edit-site/src/components/layout/style.scss
+@@ -135,7 +135,7 @@
+ 			}
+ 
+ 			.edit-site-layout:not(.is-full-canvas) & {
+-				border-radius: $radius-large;
++				border-radius: var(--wpds-border-radius-xl);
+ 			}
+ 
+ 			&:hover {
+@@ -271,7 +271,7 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
+ 	overflow: hidden;
+ 	box-shadow: $elevation-x-small;
+ 	@include break-medium() {
+-		border-radius: 8px;
++		border-radius: var(--wpds-border-radius-xl);
+ 		margin: $canvas-padding $canvas-padding $canvas-padding 0;
+ 	}
+ }
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index 0e96fdb95095c1..91030a40ee0ed3 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### New Features
++
++-   Add `--wpds-border-radius-xl` for page and app shell surfaces so nested cards and notices can stay on `--wpds-border-radius-lg` without matching the parent radius ([#78913](https://github.com/WordPress/gutenberg/pull/78913)).
++
+ ## 0.15.0 (2026-06-10)
+ 
+ ### New Features
+diff --git a/packages/theme/docs/tokens.md b/packages/theme/docs/tokens.md
+index d936e906315704..36f19061baf1f9 100644
+--- a/packages/theme/docs/tokens.md
++++ b/packages/theme/docs/tokens.md
+@@ -125,17 +125,18 @@ The interactive state of the element. The default (no modifier) is the idle stat
+ 
+ ### Border
+ 
+-| Variable name               | Description                 |
+-| --------------------------- | --------------------------- |
+-| `--wpds-border-radius-xs`   | Extra small radius          |
+-| `--wpds-border-radius-sm`   | Small radius                |
+-| `--wpds-border-radius-md`   | Medium radius               |
+-| `--wpds-border-radius-lg`   | Large radius                |
+-| `--wpds-border-width-xs`    | Extra small width           |
+-| `--wpds-border-width-sm`    | Small width                 |
+-| `--wpds-border-width-md`    | Medium width                |
+-| `--wpds-border-width-lg`    | Large width                 |
+-| `--wpds-border-width-focus` | Border width for focus ring |
++| Variable name               | Description                                                   |
++| --------------------------- | ------------------------------------------------------------- |
++| `--wpds-border-radius-xs`   | Buttons and other elements nested inside controls.            |
++| `--wpds-border-radius-sm`   | Standalone buttons, inputs, and compact controls.             |
++| `--wpds-border-radius-md`   | Menus, popovers, and other small portaled overlays.           |
++| `--wpds-border-radius-lg`   | Cards, dialogs, notices, and other larger content containers. |
++| `--wpds-border-radius-xl`   | Page and app shell surfaces.                                  |
++| `--wpds-border-width-xs`    | Extra small width                                             |
++| `--wpds-border-width-sm`    | Small width                                                   |
++| `--wpds-border-width-md`    | Medium width                                                  |
++| `--wpds-border-width-lg`    | Large width                                                   |
++| `--wpds-border-width-focus` | Border width for focus ring                                   |
+ 
+ ### Color
+ 
+diff --git a/packages/theme/src/prebuilt/css/design-tokens.css b/packages/theme/src/prebuilt/css/design-tokens.css
+index eb42ef5b595b67..f3b07dfe9c27f2 100644
+--- a/packages/theme/src/prebuilt/css/design-tokens.css
++++ b/packages/theme/src/prebuilt/css/design-tokens.css
+@@ -3,14 +3,16 @@
+  * ------------------------------------------- */
+ 
+ :root {
+-	/* Extra small radius */
++	/* Buttons and other elements nested inside controls. */
+ 	--wpds-border-radius-xs: 1px;
+-	/* Small radius */
++	/* Standalone buttons, inputs, and compact controls. */
+ 	--wpds-border-radius-sm: 2px;
+-	/* Medium radius */
++	/* Menus, popovers, and other small portaled overlays. */
+ 	--wpds-border-radius-md: 4px;
+-	/* Large radius */
++	/* Cards, dialogs, notices, and other larger content containers. */
+ 	--wpds-border-radius-lg: 8px;
++	/* Page and app shell surfaces. */
++	--wpds-border-radius-xl: 12px;
+ 	/* Extra small width */
+ 	--wpds-border-width-xs: 1px;
+ 	/* Small width */
+diff --git a/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs b/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
+index 333c0b0ec7b6ab..4833c5b955a801 100644
+--- a/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
++++ b/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
+@@ -7,6 +7,7 @@ export default {
+ 	'--wpds-border-radius-lg': '8px',
+ 	'--wpds-border-radius-md': '4px',
+ 	'--wpds-border-radius-sm': '2px',
++	'--wpds-border-radius-xl': '12px',
+ 	'--wpds-border-radius-xs': '1px',
+ 	'--wpds-border-width-focus': 'var(--wp-admin-border-width-focus, 2px)',
+ 	'--wpds-border-width-lg': '8px',
+diff --git a/packages/theme/src/prebuilt/js/design-tokens.mjs b/packages/theme/src/prebuilt/js/design-tokens.mjs
+index 9da5741598a5b1..3d57f91fcc1919 100644
+--- a/packages/theme/src/prebuilt/js/design-tokens.mjs
++++ b/packages/theme/src/prebuilt/js/design-tokens.mjs
+@@ -8,6 +8,7 @@ export default [
+ 	'--wpds-border-radius-sm',
+ 	'--wpds-border-radius-md',
+ 	'--wpds-border-radius-lg',
++	'--wpds-border-radius-xl',
+ 	'--wpds-border-width-xs',
+ 	'--wpds-border-width-sm',
+ 	'--wpds-border-width-md',
+diff --git a/packages/theme/src/prebuilt/ts/token-types.ts b/packages/theme/src/prebuilt/ts/token-types.ts
+index c9f1d49e687d8d..0bcd7990e63d25 100644
+--- a/packages/theme/src/prebuilt/ts/token-types.ts
++++ b/packages/theme/src/prebuilt/ts/token-types.ts
+@@ -44,7 +44,7 @@ export type Easing = 'subtle' | 'balanced' | 'expressive';
+ /**
+  * Size scale for border radius tokens.
+  */
+-export type BorderRadiusSize = 'xs' | 'sm' | 'md' | 'lg';
++export type BorderRadiusSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+ 
+ /**
+  * Size scale for border width tokens.
+diff --git a/packages/theme/tokens/border.json b/packages/theme/tokens/border.json
+index 32ad528543546a..c9065e9647acc3 100644
+--- a/packages/theme/tokens/border.json
++++ b/packages/theme/tokens/border.json
+@@ -2,21 +2,26 @@
+ 	"wpds-border": {
+ 		"$type": "dimension",
+ 		"radius": {
++			"$description": "Border radius scale for elegant hierarchical nesting. Outer surfaces use larger steps; nested elements use smaller ones so concentric corners stay visually harmonious.",
+ 			"xs": {
+ 				"$value": { "value": 1, "unit": "px" },
+-				"$description": "Extra small radius"
++				"$description": "Buttons and other elements nested inside controls."
+ 			},
+ 			"sm": {
+ 				"$value": { "value": 2, "unit": "px" },
+-				"$description": "Small radius"
++				"$description": "Standalone buttons, inputs, and compact controls."
+ 			},
+ 			"md": {
+ 				"$value": { "value": 4, "unit": "px" },
+-				"$description": "Medium radius"
++				"$description": "Menus, popovers, and other small portaled overlays."
+ 			},
+ 			"lg": {
+ 				"$value": { "value": 8, "unit": "px" },
+-				"$description": "Large radius"
++				"$description": "Cards, dialogs, notices, and other larger content containers."
++			},
++			"xl": {
++				"$value": { "value": 12, "unit": "px" },
++				"$description": "Page and app shell surfaces."
+ 			},
+ 			"$extensions": {
+ 				"com.figma.scopes": [ "CORNER_RADIUS" ]
+diff --git a/storybook/stories/design-system/theme-example-application.story.tsx b/storybook/stories/design-system/theme-example-application.story.tsx
+index f9b61f1af53ac5..5197ec8772ebf9 100644
+--- a/storybook/stories/design-system/theme-example-application.story.tsx
++++ b/storybook/stories/design-system/theme-example-application.story.tsx
+@@ -110,7 +110,7 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
+ 							gridTemplateColumns: '200px 1fr',
+ 							minHeight: '500px',
+ 							color: 'var(--wpds-color-fg-content-neutral)',
+-							borderRadius: 'var(--wpds-border-radius-lg)',
++							borderRadius: 'var(--wpds-border-radius-xl)',
+ 							border: 'var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak)',
+ 							overflow: 'hidden',
+ 						} }

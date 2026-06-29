@@ -1,0 +1,255 @@
+diff --git a/packages/components/src/box-control/README.md b/packages/components/src/box-control/README.md
+index 77176b49eeb6d8..ddadf938798ee9 100644
+--- a/packages/components/src/box-control/README.md
++++ b/packages/components/src/box-control/README.md
+@@ -1,106 +1,125 @@
+ # BoxControl
+ 
+-A control that lets users set values for top, right, bottom, and left. Can be used as an input control for values like `padding` or `margin`.
++<!-- This file is generated automatically and cannot be edited directly. Make edits via TypeScript types and TSDocs. -->
+ 
+-## Usage
++<p class="callout callout-info">See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-boxcontrol--docs">WordPress Storybook</a> for more detailed, interactive documentation.</p>
++
++A control that lets users set values for top, right, bottom, and left. Can be
++used as an input control for values like `padding` or `margin`.
+ 
+ ```jsx
+ import { useState } from 'react';
+ import { BoxControl } from '@wordpress/components';
+ 
+ function Example() {
+-	const [ values, setValues ] = useState( {
+-		top: '50px',
+-		left: '10%',
+-		right: '10%',
+-		bottom: '50px',
+-	} );
+-
+-	return (
+-		<BoxControl
+-			values={ values }
+-			onChange={ ( nextValues ) => setValues( nextValues ) }
+-		/>
+-	);
+-}
++  const [ values, setValues ] = useState( {
++    top: '50px',
++    left: '10%',
++    right: '10%',
++    bottom: '50px',
++  } );
++
++  return (
++    <BoxControl
++      values={ values }
++      onChange={ setValues }
++    />
++  );
++};
+ ```
+-
+ ## Props
+ 
+-### `allowReset`: `boolean`
++### `__next40pxDefaultSize`
++
++Start opting into the larger default height that will become the default size in a future version.
++
++ - Type: `boolean`
++ - Required: No
++ - Default: `false`
++
++### `allowReset`
+ 
+ If this property is true, a button to reset the box control is rendered.
+ 
+--   Required: No
+--   Default: `true`
++ - Type: `boolean`
++ - Required: No
++ - Default: `true`
+ 
+-### `splitOnAxis`: `boolean`
++### `id`
+ 
+-If this property is true, when the box control is unlinked, vertical and horizontal controls can be used instead of updating individual sides.
++The id to use as a base for the unique HTML id attribute of the control.
+ 
+--   Required: No
+--   Default: `false`
++ - Type: `string`
++ - Required: No
+ 
+-### `inputProps`: `object`
++### `inputProps`
+ 
+-Props for the internal [UnitControl](../unit-control) components.
++Props for the internal `UnitControl` components.
+ 
+--   Required: No
+--   Default: `{ min: 0 }`
++ - Type: `UnitControlPassthroughProps`
++ - Required: No
++ - Default: `{
++    	min: 0,
++    }`
+ 
+-### `label`: `string`
++### `label`
+ 
+ Heading label for the control.
+ 
+--   Required: No
+--   Default: `__( 'Box Control' )`
++ - Type: `string`
++ - Required: No
++ - Default: `__( 'Box Control' )`
+ 
+-### `onChange`: `(next: BoxControlValue) => void`
++### `onChange`
+ 
+ A callback function when an input value changes.
+ 
+--   Required: Yes
++ - Type: `(next: BoxControlValue) => void`
++ - Required: No
++ - Default: `() => {}`
+ 
+-### `resetValues`: `object`
++### `resetValues`
+ 
+ The `top`, `right`, `bottom`, and `left` box dimension values to use when the control is reset.
+ 
+--   Required: No
+--   Default: `{ top: undefined, right: undefined, bottom: undefined, left: undefined }`
+-
+-### `sides`: `string[]`
+-
+-Collection of sides to allow control of. If omitted or empty, all sides will be available. Allowed values are "top", "right", "bottom", "left", "vertical", and "horizontal".
+-
+--   Required: No
+-
+-### `units`: `WPUnitControlUnit[]`
+-
+-Collection of available units which are compatible with [UnitControl](../unit-control).
++ - Type: `BoxControlValue`
++ - Required: No
++ - Default: `{
++    	top: undefined,
++    	right: undefined,
++    	bottom: undefined,
++    	left: undefined,
++    }`
+ 
+--   Required: No
++### `sides`
+ 
+-### `values`: `object`
++Collection of sides to allow control of. If omitted or empty, all sides will be available.
+ 
+-The `top`, `right`, `bottom`, and `left` box dimension values.
++Allowed values are "top", "right", "bottom", "left", "vertical", and "horizontal".
+ 
+--   Required: No
++ - Type: `readonly (keyof BoxControlValue | "horizontal" | "vertical")[]`
++ - Required: No
+ 
+-### `onMouseOver`: `function`
++### `splitOnAxis`
+ 
+-A handler for onMouseOver events.
++If this property is true, when the box control is unlinked, vertical and horizontal controls
++can be used instead of updating individual sides.
+ 
+--   Required: No
++ - Type: `boolean`
++ - Required: No
++ - Default: `false`
+ 
+-### `onMouseOut`: `function`
++### `units`
+ 
+-A handler for onMouseOut events.
++Available units to select from.
+ 
+--   Required: No
++ - Type: `WPUnitControlUnit[]`
++ - Required: No
++ - Default: `CSS_UNITS`
+ 
+-### `__next40pxDefaultSize`: `boolean`
++### `values`
+ 
+-Start opting into the larger default size that will become the default size in a future version.
++The current values of the control, expressed as an object of `top`, `right`, `bottom`, and `left` values.
+ 
+--   Required: No
+--   Default: `false`
++ - Type: `BoxControlValue`
++ - Required: No
+diff --git a/packages/components/src/box-control/docs-manifest.json b/packages/components/src/box-control/docs-manifest.json
+new file mode 100644
+index 00000000000000..c506e7a9e27eef
+--- /dev/null
++++ b/packages/components/src/box-control/docs-manifest.json
+@@ -0,0 +1,5 @@
++{
++	"$schema": "../../schemas/docs-manifest.json",
++	"displayName": "BoxControl",
++	"filePath": "./index.tsx"
++}
+diff --git a/packages/components/src/box-control/index.tsx b/packages/components/src/box-control/index.tsx
+index 41e95aa88bea37..7f822f5f70e124 100644
+--- a/packages/components/src/box-control/index.tsx
++++ b/packages/components/src/box-control/index.tsx
+@@ -51,23 +51,23 @@ function useUniqueId( idProp?: string ) {
+  * used as an input control for values like `padding` or `margin`.
+  *
+  * ```jsx
++ * import { useState } from 'react';
+  * import { BoxControl } from '@wordpress/components';
+- * import { useState } from '@wordpress/element';
+  *
+  * function Example() {
+- * 	const [ values, setValues ] = useState( {
+- * 		top: '50px',
+- * 		left: '10%',
+- * 		right: '10%',
+- * 		bottom: '50px',
+- * 	} );
++ *   const [ values, setValues ] = useState( {
++ *     top: '50px',
++ *     left: '10%',
++ *     right: '10%',
++ *     bottom: '50px',
++ *   } );
+  *
+- * 	return (
+- * 		<BoxControl
+- * 			values={ values }
+- * 			onChange={ ( nextValues ) => setValues( nextValues ) }
+- * 		/>
+- * 	);
++ *   return (
++ *     <BoxControl
++ *       values={ values }
++ *       onChange={ setValues }
++ *     />
++ *   );
+  * };
+  * ```
+  */
+diff --git a/packages/components/src/box-control/types.ts b/packages/components/src/box-control/types.ts
+index 5f4071aeed88a7..2a47abbf11001e 100644
+--- a/packages/components/src/box-control/types.ts
++++ b/packages/components/src/box-control/types.ts
+@@ -58,6 +58,8 @@ export type BoxControlProps = Pick<
+ 	resetValues?: BoxControlValue;
+ 	/**
+ 	 * Collection of sides to allow control of. If omitted or empty, all sides will be available.
++	 *
++	 * Allowed values are "top", "right", "bottom", "left", "vertical", and "horizontal".
+ 	 */
+ 	sides?: readonly ( keyof BoxControlValue | 'horizontal' | 'vertical' )[];
+ 	/**

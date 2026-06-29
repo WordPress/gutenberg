@@ -1,0 +1,198 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0c542322d0cedd..99ee787584bce1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+     -   `BorderBoxControl` ([#79420](https://github.com/WordPress/gutenberg/pull/79420))
+     -   `BorderControl` ([#79418](https://github.com/WordPress/gutenberg/pull/79418))
+     -   `FontSizePicker` ([#79481](https://github.com/WordPress/gutenberg/pull/79481))
++    -   `TreeSelect` ([#79550](https://github.com/WordPress/gutenberg/pull/79550))
+ 
+ ### Documentation
+ 
+diff --git a/packages/components/src/query-controls/author-select.tsx b/packages/components/src/query-controls/author-select.tsx
+index af49e01a727fcd..452d0ff51c51cb 100644
+--- a/packages/components/src/query-controls/author-select.tsx
++++ b/packages/components/src/query-controls/author-select.tsx
+@@ -29,7 +29,6 @@ export default function AuthorSelect( {
+ 					? String( selectedAuthorId )
+ 					: undefined
+ 			}
+-			__next40pxDefaultSize
+ 		/>
+ 	);
+ }
+diff --git a/packages/components/src/query-controls/category-select.tsx b/packages/components/src/query-controls/category-select.tsx
+index 675e081740f753..b3945a57ae9a53 100644
+--- a/packages/components/src/query-controls/category-select.tsx
++++ b/packages/components/src/query-controls/category-select.tsx
+@@ -29,7 +29,6 @@ export default function CategorySelect( {
+ 					: undefined
+ 			}
+ 			{ ...props }
+-			__next40pxDefaultSize
+ 		/>
+ 	);
+ }
+diff --git a/packages/components/src/tree-select/README.md b/packages/components/src/tree-select/README.md
+index bfd0a5940fe2ff..bc7cd2c03334b5 100644
+--- a/packages/components/src/tree-select/README.md
++++ b/packages/components/src/tree-select/README.md
+@@ -15,7 +15,6 @@ const MyTreeSelect = () => {
+ 
+ 	return (
+ 		<TreeSelect
+-			__next40pxDefaultSize
+ 			label="Parent page"
+ 			noOptionLabel="No parent page"
+ 			onChange={ ( newPage ) => setPage( newPage ) }
+@@ -53,14 +52,6 @@ const MyTreeSelect = () => {
+ 
+ ## Props
+ 
+-### `__next40pxDefaultSize`
+-
+- - Type: `boolean`
+- - Required: No
+- - Default: `false`
+-
+-Start opting into the larger default height that will become the default size in a future version.
+-
+ ### `children`
+ 
+  - Type: `ReactNode`
+diff --git a/packages/components/src/tree-select/index.tsx b/packages/components/src/tree-select/index.tsx
+index 1068fbb67c7583..7ef1bc3adcae13 100644
+--- a/packages/components/src/tree-select/index.tsx
++++ b/packages/components/src/tree-select/index.tsx
+@@ -9,8 +9,6 @@ import { decodeEntities } from '@wordpress/html-entities';
+  */
+ import { SelectControl } from '../select-control';
+ import type { TreeSelectProps, Tree, Truthy } from './types';
+-import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+-import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
+ 
+ function getSelectOptions(
+ 	tree: Tree[],
+@@ -38,7 +36,6 @@ function getSelectOptions(
+  *
+  * 	return (
+  * 		<TreeSelect
+- * 			__next40pxDefaultSize
+  * 			label="Parent page"
+  * 			noOptionLabel="No parent page"
+  * 			onChange={ ( newPage ) => setPage( newPage ) }
+@@ -76,14 +73,16 @@ function getSelectOptions(
+  */
+ export function TreeSelect( props: TreeSelectProps ) {
+ 	const {
+-		__nextHasNoMarginBottom: _, // Prevent passing to internal component
++		// Prevent passing legacy props to internal component.
++		__nextHasNoMarginBottom: _,
++		__next40pxDefaultSize: _next40pxDefaultSize,
+ 		label,
+ 		noOptionLabel,
+ 		onChange,
+ 		selectedId,
+ 		tree = [],
+ 		...restProps
+-	} = useDeprecated36pxDefaultSizeProp( props );
++	} = props;
+ 
+ 	const options = useMemo( () => {
+ 		return [
+@@ -92,16 +91,9 @@ export function TreeSelect( props: TreeSelectProps ) {
+ 		].filter( < T, >( option: T ): option is Truthy< T > => !! option );
+ 	}, [ noOptionLabel, tree ] );
+ 
+-	maybeWarnDeprecated36pxSize( {
+-		componentName: 'TreeSelect',
+-		size: restProps.size,
+-		__next40pxDefaultSize: restProps.__next40pxDefaultSize,
+-	} );
+-
+ 	return (
+-		// Disable reason: the parent component already takes case of the `__next40pxDefaultSize` prop.
+-		// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
+ 		<SelectControl
++			__next40pxDefaultSize
+ 			__shouldNotWarnDeprecated36pxSize
+ 			{ ...{ label, options, onChange } }
+ 			value={ selectedId }
+diff --git a/packages/components/src/tree-select/stories/index.story.tsx b/packages/components/src/tree-select/stories/index.story.tsx
+index c69b4a5d79aeff..a825a419e13653 100644
+--- a/packages/components/src/tree-select/stories/index.story.tsx
++++ b/packages/components/src/tree-select/stories/index.story.tsx
+@@ -45,7 +45,6 @@ const TreeSelectWithState: StoryFn< typeof TreeSelect > = ( props ) => {
+ 
+ 	return (
+ 		<TreeSelect
+-			__next40pxDefaultSize
+ 			{ ...props }
+ 			onChange={ setSelection }
+ 			selectedId={ selection }
+@@ -55,7 +54,6 @@ const TreeSelectWithState: StoryFn< typeof TreeSelect > = ( props ) => {
+ 
+ export const Default = TreeSelectWithState.bind( {} );
+ Default.args = {
+-	__next40pxDefaultSize: true,
+ 	label: 'Label Text',
+ 	noOptionLabel: 'No parent page',
+ 	help: 'Help text to explain the select control.',
+diff --git a/packages/components/src/tree-select/types.ts b/packages/components/src/tree-select/types.ts
+index 59e8e173fab02f..00b72e3d5f2906 100644
+--- a/packages/components/src/tree-select/types.ts
++++ b/packages/components/src/tree-select/types.ts
+@@ -18,8 +18,15 @@ export interface Tree {
+ export interface TreeSelectProps
+ 	extends Omit<
+ 		SelectControlSingleSelectionProps,
+-		'value' | 'multiple' | 'onChange'
++		'value' | 'multiple' | 'onChange' | '__next40pxDefaultSize'
+ 	> {
++	/**
++	 * Start opting into the larger default height that will become the default size in a future version.
++	 *
++	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
++	 * @ignore
++	 */
++	__next40pxDefaultSize?: boolean;
+ 	/**
+ 	 * If this property is added, an option will be added with this label to represent empty selection.
+ 	 */
+diff --git a/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js b/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
+index b44f7d153cc866..7ec686815c5e02 100644
+--- a/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
++++ b/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
+@@ -469,7 +469,6 @@ export function HierarchicalTermSelector( { slug } ) {
+ 						/>
+ 						{ !! availableTerms.length && (
+ 							<TreeSelect
+-								__next40pxDefaultSize
+ 								label={ parentSelectLabel }
+ 								noOptionLabel={ noParentOption }
+ 								onChange={ onChangeFormParent }
+diff --git a/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js b/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js
+index ccda5a1395a147..d92c78e067f2cc 100644
+--- a/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js
++++ b/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js
+@@ -27,7 +27,6 @@ const COMPONENTS_REQUIRING_40PX = new Set( [
+ 	'Radio',
+ 	'RangeControl',
+ 	'SelectControl',
+-	'TreeSelect',
+ 	'ToggleGroupControl',
+ 	'UnitControl',
+ ] );
+diff --git a/tools/eslint/config.mjs b/tools/eslint/config.mjs
+index a553527691772c..af32581014eb25 100644
+--- a/tools/eslint/config.mjs
++++ b/tools/eslint/config.mjs
+@@ -178,6 +178,7 @@ const restrictedSyntax = [
+ 		'QueryControls',
+ 		'SearchControl',
+ 		'TextControl',
++		'TreeSelect',
+ 	].map( ( componentName ) => ( {
+ 		selector: `JSXElement[openingElement.name.name="${ componentName }"] JSXAttribute[name.name="__next40pxDefaultSize"]`,
+ 		message: `The \`__next40pxDefaultSize\` prop is no longer needed on \`${ componentName }\`.`,

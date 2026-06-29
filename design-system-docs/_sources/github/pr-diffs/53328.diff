@@ -1,0 +1,141 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 10e1d6d37d60ac..8ead400e0ed530 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ -   `Theme`: Expose via private APIs ([#53262](https://github.com/WordPress/gutenberg/pull/53262)).
+ -   `ProgressBar`: Use the theme system accent for indicator color ([#53347](https://github.com/WordPress/gutenberg/pull/53347)).
+ -   `ProgressBar`: Use gray 300 for track color ([#53349](https://github.com/WordPress/gutenberg/pull/53349)).
++-   `Modal`: add `headerActions` prop to render buttons in the header. ([#53328](https://github.com/WordPress/gutenberg/pull/53328)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/modal/README.md b/packages/components/src/modal/README.md
+index 8b0aa84750d16c..01cad7d6ff2e0f 100644
+--- a/packages/components/src/modal/README.md
++++ b/packages/components/src/modal/README.md
+@@ -194,6 +194,13 @@ If this property is true, it will focus the first tabbable element rendered in t
+ -   Required: No
+ -   Default: `true`
+ 
++#### headerActions
++
++An optional React node intended to contain additional actions or other elements related to the modal, for example, buttons. Content is rendered in the top right corner of the modal and to the left of the close button, if visible.
++
++-   Required: No
++-   Default: `null`
++
+ #### `isDismissible`: `boolean`
+ 
+ If this property is set to false, the modal will not display a close icon and cannot be dismissed.
+diff --git a/packages/components/src/modal/index.tsx b/packages/components/src/modal/index.tsx
+index 7667a815561a87..cdf374369270d9 100644
+--- a/packages/components/src/modal/index.tsx
++++ b/packages/components/src/modal/index.tsx
+@@ -66,6 +66,7 @@ function UnforwardedModal(
+ 		contentLabel,
+ 		onKeyDown,
+ 		isFullScreen = false,
++		headerActions = null,
+ 		__experimentalHideHeader = false,
+ 	} = props;
+ 
+@@ -257,6 +258,7 @@ function UnforwardedModal(
+ 										</h1>
+ 									) }
+ 								</div>
++								{ headerActions }
+ 								{ isDismissible && (
+ 									<Button
+ 										onClick={ onRequestClose }
+diff --git a/packages/components/src/modal/stories/index.tsx b/packages/components/src/modal/stories/index.tsx
+index 7f414d47c2d11c..96fae4ec9abee4 100644
+--- a/packages/components/src/modal/stories/index.tsx
++++ b/packages/components/src/modal/stories/index.tsx
+@@ -7,6 +7,7 @@ import type { ComponentStory, ComponentMeta } from '@storybook/react';
+  * WordPress dependencies
+  */
+ import { useState } from '@wordpress/element';
++import { starEmpty, starFilled } from '@wordpress/icons';
+ 
+ /**
+  * Internal dependencies
+@@ -35,6 +36,9 @@ const meta: ComponentMeta< typeof Modal > = {
+ 		onRequestClose: {
+ 			action: 'onRequestClose',
+ 		},
++		isDismissible: {
++			control: { type: 'boolean' },
++		},
+ 	},
+ 	parameters: {
+ 		controls: { expanded: true },
+@@ -98,3 +102,26 @@ Default.parameters = {
+ 		},
+ 	},
+ };
++
++const LikeButton = () => {
++	const [ isLiked, setIsLiked ] = useState( false );
++	return (
++		<Button
++			icon={ isLiked ? starFilled : starEmpty }
++			label="Like"
++			onClick={ () => setIsLiked( ! isLiked ) }
++		/>
++	);
++};
++
++export const WithHeaderActions: ComponentStory< typeof Modal > = Template.bind(
++	{}
++);
++WithHeaderActions.args = {
++	...Default.args,
++	headerActions: <LikeButton />,
++	isDismissible: false,
++};
++WithHeaderActions.parameters = {
++	...Default.parameters,
++};
+diff --git a/packages/components/src/modal/test/index.tsx b/packages/components/src/modal/test/index.tsx
+index 370a93cd04e76d..c2ab277f721570 100644
+--- a/packages/components/src/modal/test/index.tsx
++++ b/packages/components/src/modal/test/index.tsx
+@@ -115,4 +115,18 @@ describe( 'Modal', () => {
+ 		await user.click( modalFrame.parentElement! );
+ 		expect( opener ).toHaveFocus();
+ 	} );
++
++	it( 'should render `headerActions` React nodes', async () => {
++		render(
++			<Modal
++				headerActions={ <button>A sweet button</button> }
++				onRequestClose={ noop }
++			>
++				<p>Modal content</p>
++			</Modal>
++		);
++		expect(
++			screen.getByText( 'A sweet button', { selector: 'button' } )
++		).toBeInTheDocument();
++	} );
+ } );
+diff --git a/packages/components/src/modal/types.ts b/packages/components/src/modal/types.ts
+index 6169e42a8a2d4c..2106a6087e9943 100644
+--- a/packages/components/src/modal/types.ts
++++ b/packages/components/src/modal/types.ts
+@@ -69,6 +69,14 @@ export type ModalProps = {
+ 	 * @default true
+ 	 */
+ 	focusOnMount?: Parameters< typeof useFocusOnMount >[ 0 ];
++	/**
++	 * Elements that are injected into the modal header to the left of the close button (if rendered).
++	 * Hidden if `__experimentalHideHeader` is `true`.
++	 *
++	 * @default null
++	 */
++	headerActions?: ReactNode;
++
+ 	/**
+ 	 * If this property is added, an icon will be added before the title.
+ 	 */

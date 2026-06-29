@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/dashicon/index.js b/packages/components/src/dashicon/index.js
+index 9fc5fddae5b316..7bf76771f97038 100644
+--- a/packages/components/src/dashicon/index.js
++++ b/packages/components/src/dashicon/index.js
+@@ -3,7 +3,7 @@
+  *
+  * @property {import('./types').IconKey} icon        Icon name
+  * @property {string}                    [className] Class name
+- * @property {number}                    [size] Size of the icon
++ * @property {number}                    [size]      Size of the icon
+  */
+ /** @typedef {import('react').ComponentPropsWithoutRef<'span'> & OwnProps} Props */
+ 

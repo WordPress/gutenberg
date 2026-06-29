@@ -1,0 +1,272 @@
+diff --git a/packages/components/src/grid/README.md b/packages/components/src/grid/README.md
+index 85640de2868c40..15cd959e135bee 100644
+--- a/packages/components/src/grid/README.md
++++ b/packages/components/src/grid/README.md
+@@ -27,69 +27,69 @@ function Example() {
+ 
+ ## Props
+ 
+-##### `align`: `CSS['alignItems']`
++### `align`: `CSS['alignItems']`
+ 
+ Adjusts the block alignment of children.
+ 
+ -   Required: No
+ 
+-##### `alignment`: `GridAlignment`
++### `alignment`: `GridAlignment`
+ 
+ Adjusts the horizontal and vertical alignment of children.
+ 
+ -   Required: No
+ 
+-##### `columnGap`: `CSSProperties['gridColumnGap']`
++### `columnGap`: `CSSProperties['gridColumnGap']`
+ 
+ Adjusts the `grid-column-gap`.
+ 
+ -   Required: No
+ 
+-##### `columns`: `number`
++### `columns`: `number`
+ 
+ Adjusts the number of columns of the `Grid`.
+ 
+ -   Required: No
+ -   Default: `2`
+ 
+-##### `gap`: `number`
++### `gap`: `number`
+ 
+ Gap between each child.
+ 
+ -   Required: No
+ -   Default: `3`
+ 
+-##### `isInline`: `boolean`
++### `isInline`: `boolean`
+ 
+ Changes the CSS display from `grid` to `inline-grid`.
+ 
+ -   Required: No
+ 
+-##### `justify`: `CSS['justifyContent']`
++### `justify`: `CSS['justifyContent']`
+ 
+ Adjusts the inline alignment of children.
+ 
+ -   Required: No
+ 
+-##### `rowGap`: `CSSProperties['gridRowGap']`
++### `rowGap`: `CSSProperties['gridRowGap']`
+ 
+ Adjusts the `grid-row-gap`.
+ 
+ -   Required: No
+ 
+-##### `rows`: `number`
++### `rows`: `number`
+ 
+ Adjusts the number of rows of the `Grid`.
+ 
+ -   Required: No
+ 
+-##### `templateColumns`: `CSS['gridTemplateColumns']`
++### `templateColumns`: `CSS['gridTemplateColumns']`
+ 
+ Adjusts the CSS grid `template-columns`.
+ 
+ -   Required: No
+ 
+-##### `templateRows`: `CSS['gridTemplateRows']`
++### `templateRows`: `CSS['gridTemplateRows']`
+ 
+ Adjusts the CSS grid `template-rows`.
+ 
+diff --git a/packages/components/src/h-stack/README.md b/packages/components/src/h-stack/README.md
+index eb9db50aa5b41f..77e3c77b940f2a 100644
+--- a/packages/components/src/h-stack/README.md
++++ b/packages/components/src/h-stack/README.md
+@@ -29,7 +29,7 @@ function Example() {
+ 
+ ## Props
+ 
+-##### alignment
++### alignment
+ 
+ **Type**: `HStackAlignment` | `CSS[ 'alignItems' ]`
+ 
+@@ -47,33 +47,33 @@ Determines how the child elements are aligned.
+ -   `edge`: Justifies content to be evenly spread out up to the main axis edges of the container.
+ -   `stretch`: Stretches content to the cross axis edges of the container.
+ 
+-##### direction
++### direction
+ 
+ **Type**: `FlexDirection`
+ 
+ The direction flow of the children content can be adjusted with `direction`. `column` will align children vertically and `row` will align children horizontally.
+ 
+-##### expanded
++### expanded
+ 
+ **Type**: `boolean`
+ 
+ Expands to the maximum available width (if horizontal) or height (if vertical).
+ 
+-##### justify
++### justify
+ 
+ **Type**: `CSS['justifyContent']`
+ 
+ Horizontally aligns content if the `direction` is `row`, or vertically aligns content if the `direction` is `column`.
+ In the example below, `flex-start` will align the children content to the left.
+ 
+-##### spacing
++### spacing
+ 
+ **Type**: `CSS['width']`
+ 
+ The amount of space between each child element. Spacing in between each child can be adjusted by using `spacing`.
+ The value of `spacing` works as a multiplier to the library's grid system (base of `4px`).
+ 
+-##### wrap
++### wrap
+ 
+ **Type**: `boolean`
+ 
+diff --git a/packages/components/src/heading/README.md b/packages/components/src/heading/README.md
+index 5f7f41c0664698..a56e6e6ccd9321 100644
+--- a/packages/components/src/heading/README.md
++++ b/packages/components/src/heading/README.md
+@@ -25,7 +25,7 @@ function Example() {
+ 
+ For a complete list of those props, check out [`Text`](/packages/components/src/text/README.md#props).
+ 
+-##### `level`: `1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6'`
++### `level`: `1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6'`
+ 
+ Passing any of the heading levels to `level` will both render the correct typographic text size as well as the semantic element corresponding to the level (`h1` for `1` for example).
+ 
+diff --git a/packages/components/src/progress-bar/README.md b/packages/components/src/progress-bar/README.md
+index d0f62ce7e3be57..ad69ab54b098af 100644
+--- a/packages/components/src/progress-bar/README.md
++++ b/packages/components/src/progress-bar/README.md
+@@ -19,7 +19,7 @@ If a `value` is not specified, the progress bar will be considered indeterminate
+ 
+ -   Required: No
+ 
+-##### `className`: `string`
++#### `className`: `string`
+ 
+ A CSS class to apply to the underlying `div` element, serving as a progress bar track.
+ 
+diff --git a/packages/components/src/resizable-box/resize-tooltip/README.md b/packages/components/src/resizable-box/resize-tooltip/README.md
+index 513ed0d9fa83ce..1ed8ff5aaa5374 100644
+--- a/packages/components/src/resizable-box/resize-tooltip/README.md
++++ b/packages/components/src/resizable-box/resize-tooltip/README.md
+@@ -24,11 +24,11 @@ Be sure that the parent element containing `<ResizeTooltip />` has the `position
+ -   `bottom` (Default)
+ -   `corner`
+ 
+-##### `bottom`
++#### `bottom`
+ 
+ The `bottom` position (default) renders the dimensions label at the bottom-center of the (parent) element.
+ 
+-##### `corner`
++#### `corner`
+ 
+ The `corner` position renders the dimensions label in the top-right corner of the (parent) element.
+ 
+diff --git a/packages/components/src/truncate/README.md b/packages/components/src/truncate/README.md
+index 7665d82de0ba87..6d5285244078e5 100644
+--- a/packages/components/src/truncate/README.md
++++ b/packages/components/src/truncate/README.md
+@@ -24,7 +24,7 @@ function Example() {
+ 
+ ## Props
+ 
+-##### `children`: `ReactNode`
++### `children`: `ReactNode`
+ 
+ The children elements.
+ 
+@@ -32,14 +32,14 @@ Note: text truncation will be attempted only if the `children` are either of typ
+ 
+ -   Required: Yes
+ 
+-##### `ellipsis`: `string`
++### `ellipsis`: `string`
+ 
+ The ellipsis string when truncating the text by the `limit` prop's value.
+ 
+ -   Required: No
+ -   Default: `…`
+ 
+-##### `ellipsizeMode`: `'auto' | 'head' | 'tail' | 'middle' | 'none'`
++### `ellipsizeMode`: `'auto' | 'head' | 'tail' | 'middle' | 'none'`
+ 
+ Determines where to truncate. For example, we can truncate text right in the middle. To do this, we need to set `ellipsizeMode` to `middle` and a text `limit`.
+ 
+@@ -51,14 +51,14 @@ Determines where to truncate. For example, we can truncate text right in the mid
+ -   Required: No
+ -   Default: `auto`
+ 
+-##### `limit`: `number`
++### `limit`: `number`
+ 
+ Determines the max number of characters to be displayed before the rest of the text gets truncated. Requires `ellipsizeMode` to assume values different from `auto` and `none`.
+ 
+ -   Required: No
+ -   Default: `0`
+ 
+-##### `numberOfLines`: `number`
++### `numberOfLines`: `number`
+ 
+ Clamps the text content to the specified `numberOfLines`, adding an ellipsis at the end. Note: this feature ignores the value of the `ellipsis` prop and always displays the default `…` ellipsis.
+ 
+diff --git a/packages/components/src/v-stack/README.md b/packages/components/src/v-stack/README.md
+index c3ea4e4c0389ca..2f447b18015e51 100644
+--- a/packages/components/src/v-stack/README.md
++++ b/packages/components/src/v-stack/README.md
+@@ -29,7 +29,7 @@ function Example() {
+ 
+ ## Props
+ 
+-##### `alignment`: `HStackAlignment | CSSProperties['alignItems']`
++### `alignment`: `HStackAlignment | CSSProperties['alignItems']`
+ 
+ Determines how the child elements are aligned.
+ 
+@@ -45,25 +45,25 @@ Determines how the child elements are aligned.
+ -   `edge`: Justifies content to be evenly spread out up to the main axis edges of the container.
+ -   `stretch`: Stretches content to the cross axis edges of the container.
+ 
+-##### `direction`: `FlexDirection`
++### `direction`: `FlexDirection`
+ 
+ The direction flow of the children content can be adjusted with `direction`. `column` will align children vertically and `row` will align children horizontally.
+ 
+-##### `expanded`: `boolean`
++### `expanded`: `boolean`
+ 
+ Expands to the maximum available width (if horizontal) or height (if vertical).
+ 
+-##### `justify`: `CSSProperties['justifyContent']`
++### `justify`: `CSSProperties['justifyContent']`
+ 
+ Horizontally aligns content if the `direction` is `row`, or vertically aligns content if the `direction` is `column`.
+ In the example below, `flex-start` will align the children content to the left.
+ 
+-##### `spacing`: `CSSProperties['width']`
++### `spacing`: `CSSProperties['width']`
+ 
+ The amount of space between each child element. Spacing in between each child can be adjusted by using `spacing`.
+ The value of `spacing` works as a multiplier to the library's grid system (base of `4px`).
+ 
+-##### `wrap`: `boolean`
++### `wrap`: `boolean`
+ 
+ Determines if children should wrap.
+ 

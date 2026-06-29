@@ -1,0 +1,696 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e12081c7fe54eb..274e3765d60f7b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Documentation
+ 
++-   Storybook: Add search synonyms for `@wordpress/ui` design system components so sidebar search matches common terms (e.g. `modal` finds `Dialog`) ([#78951](https://github.com/WordPress/gutenberg/pull/78951)).
+ -   Fix documentation typos and grammar ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
+ 
+ ## 34.0.0 (2026-05-27)
+diff --git a/packages/theme/tsconfig.json b/packages/theme/tsconfig.json
+index b88eeb2f72c79f..c661dc7add47dd 100644
+--- a/packages/theme/tsconfig.json
++++ b/packages/theme/tsconfig.json
+@@ -6,7 +6,6 @@
+ 	"files": [],
+ 	"references": [
+ 		{ "path": "../style-runtime" },
+-		{ "path": "./tsconfig.src.json" },
+-		{ "path": "./tsconfig.bin.json" }
++		{ "path": "./tsconfig.src.json" }
+ 	]
+ }
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index fa921b0dc08716..04a54d420a28ca 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ 
+ ### Enhancements
+ 
++-   Storybook: Add `synonyms` on component story meta so design system components are discoverable by common search terms (e.g. `form` finds `Input`) ([#78951](https://github.com/WordPress/gutenberg/pull/78951)).
+ -   `Tooltip.Provider`: Widen the types to accept all props of the equivalent `Tooltip.Provider` from `@base-ui/react` (types-only change) ([#78642](https://github.com/WordPress/gutenberg/pull/78642)).
+ 
+ ## 0.14.0 (2026-05-27)
+diff --git a/packages/ui/CONTRIBUTING.md b/packages/ui/CONTRIBUTING.md
+index 6de37c3546c2e0..eba45a7f9f2cfc 100644
+--- a/packages/ui/CONTRIBUTING.md
++++ b/packages/ui/CONTRIBUTING.md
+@@ -91,6 +91,16 @@ const meta: Meta< typeof Button > = {
+ };
+ ```
+ 
++Add a `synonyms` array on the story meta so the component is discoverable in Storybook sidebar search (e.g. searching `form` finds `Input`):
++
++```ts
++const meta: Meta< typeof Input > = {
++	title: 'Design System/Components/Form/Primitives/Input',
++	synonyms: [ 'field', 'form', 'input', 'text', 'textbox' ],
++	component: Input,
++};
++```
++
+ ## `render` Prop and Ref Forwarding
+ 
+ All `@wordpress/ui` components support a `render` prop (via the `ComponentProps` utility type) that lets consumers swap the underlying HTML element. This section codifies the two canonical implementation patterns, the rules for handling `render`, and common anti-patterns to avoid.
+diff --git a/packages/ui/src/alert-dialog/stories/index.story.tsx b/packages/ui/src/alert-dialog/stories/index.story.tsx
+index bd8261723e1f58..7230d76c4e69d9 100644
+--- a/packages/ui/src/alert-dialog/stories/index.story.tsx
++++ b/packages/ui/src/alert-dialog/stories/index.story.tsx
+@@ -9,6 +9,7 @@ import { Text } from '../../text';
+ 
+ const meta: Meta< typeof AlertDialog.Root > = {
+ 	title: 'Design System/Components/AlertDialog',
++	synonyms: [ 'confirm', 'dialog', 'modal', 'popup' ],
+ 	component: AlertDialog.Root,
+ 	subcomponents: {
+ 		'AlertDialog.Trigger': AlertDialog.Trigger,
+diff --git a/packages/ui/src/badge/stories/choosing-intent.story.tsx b/packages/ui/src/badge/stories/choosing-intent.story.tsx
+index 9a54db2e5e9611..14086b1f431615 100644
+--- a/packages/ui/src/badge/stories/choosing-intent.story.tsx
++++ b/packages/ui/src/badge/stories/choosing-intent.story.tsx
+@@ -4,6 +4,7 @@ import { Stack } from '../../stack';
+ 
+ const meta: Meta< typeof Badge > = {
+ 	title: 'Design System/Components/Badge/Choosing intent',
++	synonyms: [ 'chip', 'intent', 'label', 'status', 'tag' ],
+ 	component: Badge,
+ 	decorators: [
+ 		( Story ) => (
+diff --git a/packages/ui/src/badge/stories/index.story.tsx b/packages/ui/src/badge/stories/index.story.tsx
+index 8167e2b2caacc4..7037a966f1f589 100644
+--- a/packages/ui/src/badge/stories/index.story.tsx
++++ b/packages/ui/src/badge/stories/index.story.tsx
+@@ -5,6 +5,7 @@ import { Badge } from '../index';
+ const meta: Meta< typeof Badge > = {
+ 	tags: [ 'manifest' ],
+ 	title: 'Design System/Components/Badge',
++	synonyms: [ 'chip', 'label', 'status', 'tag' ],
+ 	component: Badge,
+ 	parameters: {
+ 		componentStatus: {
+diff --git a/packages/ui/src/button/stories/index.story.tsx b/packages/ui/src/button/stories/index.story.tsx
+index b9b7c8476eadc5..ee9b910f7a5a98 100644
+--- a/packages/ui/src/button/stories/index.story.tsx
++++ b/packages/ui/src/button/stories/index.story.tsx
+@@ -5,6 +5,7 @@ import { Button } from '../index';
+ 
+ const meta: Meta< typeof Button > = {
+ 	title: 'Design System/Components/Button',
++	synonyms: [ 'action', 'cta', 'submit' ],
+ 	component: Button,
+ 	subcomponents: {
+ 		'Button.Icon': Button.Icon,
+diff --git a/packages/ui/src/card/stories/index.story.tsx b/packages/ui/src/card/stories/index.story.tsx
+index 5041ef0cbb3b2f..481ba97d442274 100644
+--- a/packages/ui/src/card/stories/index.story.tsx
++++ b/packages/ui/src/card/stories/index.story.tsx
+@@ -27,6 +27,7 @@ function Text( { children }: { children: React.ReactNode } ) {
+ const meta: Meta< typeof Card.Root > = {
+ 	tags: [ 'manifest' ],
+ 	title: 'Design System/Components/Card',
++	synonyms: [ 'container', 'panel', 'surface' ],
+ 	component: Card.Root,
+ 	subcomponents: {
+ 		'Card.Header': Card.Header,
+diff --git a/packages/ui/src/collapsible-card/stories/index.story.tsx b/packages/ui/src/collapsible-card/stories/index.story.tsx
+index 4e919811612179..ed182fc1cbf066 100644
+--- a/packages/ui/src/collapsible-card/stories/index.story.tsx
++++ b/packages/ui/src/collapsible-card/stories/index.story.tsx
+@@ -28,6 +28,7 @@ function Text( { children }: { children: React.ReactNode } ) {
+ const meta: Meta< typeof CollapsibleCard.Root > = {
+ 	tags: [ 'manifest' ],
+ 	title: 'Design System/Components/CollapsibleCard',
++	synonyms: [ 'accordion', 'card', 'expand' ],
+ 	component: CollapsibleCard.Root,
+ 	subcomponents: {
+ 		'CollapsibleCard.Header': CollapsibleCard.Header,
+diff --git a/packages/ui/src/collapsible/stories/index.story.tsx b/packages/ui/src/collapsible/stories/index.story.tsx
+index 730c583553daa9..9e6a4c36b9df9a 100644
+--- a/packages/ui/src/collapsible/stories/index.story.tsx
++++ b/packages/ui/src/collapsible/stories/index.story.tsx
+@@ -5,6 +5,7 @@ import * as Collapsible from '../index';
+ const meta: Meta< typeof Collapsible.Root > = {
+ 	tags: [ 'manifest' ],
+ 	title: 'Design System/Components/Collapsible',
++	synonyms: [ 'accordion', 'disclosure', 'expand' ],
+ 	component: Collapsible.Root,
+ 	subcomponents: {
+ 		'Collapsible.Trigger': Collapsible.Trigger,
+diff --git a/packages/ui/src/dialog/stories/index.story.tsx b/packages/ui/src/dialog/stories/index.story.tsx
+index 551c21739bc7d1..32c0f117cfb616 100644
+--- a/packages/ui/src/dialog/stories/index.story.tsx
++++ b/packages/ui/src/dialog/stories/index.story.tsx
+@@ -7,6 +7,7 @@ import * as Dialog from '../index';
+ 
+ const meta: Meta< typeof Dialog.Root > = {
+ 	title: 'Design System/Components/Dialog',
++	synonyms: [ 'modal', 'overlay', 'popup' ],
+ 	component: Dialog.Root,
+ 	subcomponents: {
+ 		'Dialog.Trigger': Dialog.Trigger,
+diff --git a/packages/ui/src/drawer/stories/index.story.tsx b/packages/ui/src/drawer/stories/index.story.tsx
+index 657fb35f64e06a..6b0a87a4b0d90b 100644
+--- a/packages/ui/src/drawer/stories/index.story.tsx
++++ b/packages/ui/src/drawer/stories/index.story.tsx
+@@ -6,6 +6,7 @@ import * as Drawer from '../index';
+ 
+ const meta: Meta< typeof Drawer.Root > = {
+ 	title: 'Design System/Components/Drawer',
++	synonyms: [ 'modal', 'overlay', 'panel', 'sheet' ],
+ 	component: Drawer.Root,
+ 	subcomponents: {
+ 		'Drawer.Trigger': Drawer.Trigger,
+diff --git a/packages/ui/src/empty-state/stories/index.story.tsx b/packages/ui/src/empty-state/stories/index.story.tsx
+index cd6ff2d5914569..c75d47e206eba0 100644
+--- a/packages/ui/src/empty-state/stories/index.story.tsx
++++ b/packages/ui/src/empty-state/stories/index.story.tsx
+@@ -6,6 +6,7 @@ import * as EmptyState from '../';
+ const meta: Meta< typeof EmptyState.Root > = {
+ 	tags: [ 'manifest' ],
+ 	title: 'Design System/Components/EmptyState',
++	synonyms: [ 'blank', 'no results', 'placeholder' ],
+ 	component: EmptyState.Root,
+ 	subcomponents: {
+ 		'EmptyState.Visual': EmptyState.Visual,
+diff --git a/packages/ui/src/form/input-control/stories/index.story.tsx b/packages/ui/src/form/input-control/stories/index.story.tsx
+index cf43702dc020d6..298ddc029c20bc 100644
+--- a/packages/ui/src/form/input-control/stories/index.story.tsx
++++ b/packages/ui/src/form/input-control/stories/index.story.tsx
+@@ -16,6 +16,7 @@ import {
+ 
+ const meta: Meta< typeof InputControl > = {
+ 	title: 'Design System/Components/Form/InputControl',
++	synonyms: [ 'field', 'form', 'input', 'label', 'text' ],
+ 	component: InputControl,
+ 	argTypes: {
+ 		defaultValue: { control: false },
+diff --git a/packages/ui/src/form/primitives/autocomplete/stories/index.story.tsx b/packages/ui/src/form/primitives/autocomplete/stories/index.story.tsx
+index 4a3253a385f5df..397e9ade19d38c 100644
+--- a/packages/ui/src/form/primitives/autocomplete/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/autocomplete/stories/index.story.tsx
+@@ -10,6 +10,7 @@ import { COMMANDS, URLS, USERS, type FixtureItem } from './fixtures';
+ 
+ const meta: Meta< typeof Autocomplete.Root > = {
+ 	title: 'Design System/Components/Form/Primitives/Autocomplete',
++	synonyms: [ 'combobox', 'field', 'form', 'search', 'typeahead' ],
+ 	component: Autocomplete.Root,
+ 	subcomponents: {
+ 		'Autocomplete.Portal': Autocomplete.Portal,
+diff --git a/packages/ui/src/form/primitives/combobox/stories/index.story.tsx b/packages/ui/src/form/primitives/combobox/stories/index.story.tsx
+index fd40d1ddf1005f..c9cd516c5a813c 100644
+--- a/packages/ui/src/form/primitives/combobox/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/combobox/stories/index.story.tsx
+@@ -5,6 +5,14 @@ import { ITEMS, type FixtureItem } from './fixtures';
+ 
+ const meta: Meta< typeof Combobox.Root > = {
+ 	title: 'Design System/Components/Form/Primitives/Combobox',
++	synonyms: [
++		'autocomplete',
++		'dropdown',
++		'field',
++		'form',
++		'search',
++		'select',
++	],
+ 	component: Combobox.Root,
+ 	subcomponents: {
+ 		'Combobox.Trigger': Combobox.Trigger,
+diff --git a/packages/ui/src/form/primitives/field/stories/index.story.tsx b/packages/ui/src/form/primitives/field/stories/index.story.tsx
+index 22d278501b12e9..36678e5850064f 100644
+--- a/packages/ui/src/form/primitives/field/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/field/stories/index.story.tsx
+@@ -5,6 +5,7 @@ import { DETAILS_EXAMPLE } from '../../../stories/shared';
+ 
+ const meta: Meta< typeof Field.Root > = {
+ 	title: 'Design System/Components/Form/Primitives/Field',
++	synonyms: [ 'field', 'form', 'label' ],
+ 	component: Field.Root,
+ 	subcomponents: {
+ 		'Field.Item': Field.Item,
+diff --git a/packages/ui/src/form/primitives/fieldset/stories/index.story.tsx b/packages/ui/src/form/primitives/fieldset/stories/index.story.tsx
+index 3ca119c6e69fcb..b8d9c8338a94e9 100644
+--- a/packages/ui/src/form/primitives/fieldset/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/fieldset/stories/index.story.tsx
+@@ -4,6 +4,7 @@ import { DETAILS_EXAMPLE } from '../../../stories/shared';
+ 
+ const meta: Meta< typeof Fieldset.Root > = {
+ 	title: 'Design System/Components/Form/Primitives/Fieldset',
++	synonyms: [ 'field', 'form', 'group' ],
+ 	component: Fieldset.Root,
+ 	subcomponents: {
+ 		'Fieldset.Legend': Fieldset.Legend,
+diff --git a/packages/ui/src/form/primitives/input-layout/stories/index.story.tsx b/packages/ui/src/form/primitives/input-layout/stories/index.story.tsx
+index b7dd1a964a9add..8377e0691bce54 100644
+--- a/packages/ui/src/form/primitives/input-layout/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/input-layout/stories/index.story.tsx
+@@ -5,6 +5,7 @@ import { IconButton } from '../../../../icon-button';
+ 
+ const meta: Meta< typeof InputLayout > = {
+ 	title: 'Design System/Components/Form/Primitives/InputLayout',
++	synonyms: [ 'affix', 'field', 'form', 'prefix', 'suffix' ],
+ 	component: InputLayout,
+ 	subcomponents: {
+ 		'InputLayout.Slot': InputLayout.Slot,
+diff --git a/packages/ui/src/form/primitives/input/stories/index.story.tsx b/packages/ui/src/form/primitives/input/stories/index.story.tsx
+index 0b8e61822d89af..2f21ad7c909c20 100644
+--- a/packages/ui/src/form/primitives/input/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/input/stories/index.story.tsx
+@@ -5,6 +5,7 @@ import { WithSuffixControl } from '../../input-layout/stories/index.story';
+ 
+ const meta: Meta< typeof Input > = {
+ 	title: 'Design System/Components/Form/Primitives/Input',
++	synonyms: [ 'field', 'form', 'input', 'text', 'textbox', 'text field' ],
+ 	component: Input,
+ 	argTypes: {
+ 		defaultValue: { control: false },
+diff --git a/packages/ui/src/form/primitives/select/stories/index.story.tsx b/packages/ui/src/form/primitives/select/stories/index.story.tsx
+index 7f71dfd86766ff..d2eca871ae00e6 100644
+--- a/packages/ui/src/form/primitives/select/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/select/stories/index.story.tsx
+@@ -3,6 +3,7 @@ import * as Select from '../';
+ 
+ const meta: Meta< typeof Select.Root > = {
+ 	title: 'Design System/Components/Form/Primitives/Select',
++	synonyms: [ 'dropdown', 'field', 'form', 'picker', 'select' ],
+ 	component: Select.Root,
+ 	subcomponents: {
+ 		'Select.Trigger': Select.Trigger,
+diff --git a/packages/ui/src/form/primitives/textarea/stories/index.story.tsx b/packages/ui/src/form/primitives/textarea/stories/index.story.tsx
+index 22f2deb991edc5..1fe69cb58ff509 100644
+--- a/packages/ui/src/form/primitives/textarea/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/textarea/stories/index.story.tsx
+@@ -3,6 +3,7 @@ import { Textarea } from '../index';
+ 
+ const meta: Meta< typeof Textarea > = {
+ 	title: 'Design System/Components/Form/Primitives/Textarea',
++	synonyms: [ 'field', 'form', 'multiline', 'text', 'textarea' ],
+ 	component: Textarea,
+ 	parameters: {
+ 		componentStatus: {
+diff --git a/packages/ui/src/form/select-control/stories/index.story.tsx b/packages/ui/src/form/select-control/stories/index.story.tsx
+index 93a3f0dccaebde..fb427cd35edf9a 100644
+--- a/packages/ui/src/form/select-control/stories/index.story.tsx
++++ b/packages/ui/src/form/select-control/stories/index.story.tsx
+@@ -7,6 +7,7 @@ import {
+ 
+ const meta: Meta< typeof SelectControl > = {
+ 	title: 'Design System/Components/Form/SelectControl',
++	synonyms: [ 'dropdown', 'field', 'form', 'label', 'select' ],
+ 	component: SelectControl,
+ 	subcomponents: {
+ 		'SelectControl.Item': SelectControl.Item,
+diff --git a/packages/ui/src/icon-button/stories/index.story.tsx b/packages/ui/src/icon-button/stories/index.story.tsx
+index 3eae2476cfc1b8..cce684273e91d1 100644
+--- a/packages/ui/src/icon-button/stories/index.story.tsx
++++ b/packages/ui/src/icon-button/stories/index.story.tsx
+@@ -15,6 +15,7 @@ import * as Tooltip from '../../tooltip';
+ 
+ const meta: Meta< typeof IconButton > = {
+ 	title: 'Design System/Components/IconButton',
++	synonyms: [ 'action', 'button', 'icon' ],
+ 	component: IconButton,
+ 	argTypes: {
+ 		'aria-pressed': {
+diff --git a/packages/ui/src/icon/stories/index.story.tsx b/packages/ui/src/icon/stories/index.story.tsx
+index e91387b257f8f2..3206a6941f78d0 100644
+--- a/packages/ui/src/icon/stories/index.story.tsx
++++ b/packages/ui/src/icon/stories/index.story.tsx
+@@ -4,6 +4,7 @@ import { Icon } from '../index';
+ 
+ const meta: Meta< typeof Icon > = {
+ 	title: 'Design System/Components/Icon',
++	synonyms: [ 'glyph', 'symbol', 'svg' ],
+ 	component: Icon,
+ 	tags: [ 'manifest' ],
+ 	decorators: [
+diff --git a/packages/ui/src/link/stories/index.story.tsx b/packages/ui/src/link/stories/index.story.tsx
+index 73bef5e2015197..76c4ac533d11ff 100644
+--- a/packages/ui/src/link/stories/index.story.tsx
++++ b/packages/ui/src/link/stories/index.story.tsx
+@@ -5,6 +5,7 @@ import { Text } from '../../text';
+ 
+ const meta: Meta< typeof Link > = {
+ 	title: 'Design System/Components/Link',
++	synonyms: [ 'anchor', 'hyperlink', 'navigation' ],
+ 	component: Link,
+ 	tags: [ 'manifest' ],
+ 	parameters: {
+diff --git a/packages/ui/src/notice/stories/index.story.tsx b/packages/ui/src/notice/stories/index.story.tsx
+index e047056accc67b..cbdb0f2a756a64 100644
+--- a/packages/ui/src/notice/stories/index.story.tsx
++++ b/packages/ui/src/notice/stories/index.story.tsx
+@@ -3,6 +3,7 @@ import * as Notice from '../index';
+ 
+ const meta: Meta< typeof Notice.Root > = {
+ 	title: 'Design System/Components/Notice',
++	synonyms: [ 'alert', 'banner', 'message', 'notification' ],
+ 	component: Notice.Root,
+ 	subcomponents: {
+ 		'Notice.Title': Notice.Title,
+diff --git a/packages/ui/src/popover/stories/index.story.tsx b/packages/ui/src/popover/stories/index.story.tsx
+index d10c3d47ba04b9..ea334aeb27090f 100644
+--- a/packages/ui/src/popover/stories/index.story.tsx
++++ b/packages/ui/src/popover/stories/index.story.tsx
+@@ -9,6 +9,7 @@ import { GenericIframe, useMeasure } from './utils';
+ 
+ const meta: Meta< typeof Popover.Root > = {
+ 	title: 'Design System/Components/Popover',
++	synonyms: [ 'dropdown', 'floating', 'overlay', 'popup' ],
+ 	component: Popover.Root,
+ 	subcomponents: {
+ 		'Popover.Trigger': Popover.Trigger,
+diff --git a/packages/ui/src/stack/stories/index.story.tsx b/packages/ui/src/stack/stories/index.story.tsx
+index 1624c9055ab083..d82f7adb3593cd 100644
+--- a/packages/ui/src/stack/stories/index.story.tsx
++++ b/packages/ui/src/stack/stories/index.story.tsx
+@@ -4,6 +4,7 @@ import { Stack } from '../index';
+ const meta: Meta< typeof Stack > = {
+ 	tags: [ 'manifest' ],
+ 	title: 'Design System/Components/Stack',
++	synonyms: [ 'flex', 'layout', 'spacing' ],
+ 	component: Stack,
+ 	parameters: {
+ 		componentStatus: {
+diff --git a/packages/ui/src/tabs/stories/index.story.tsx b/packages/ui/src/tabs/stories/index.story.tsx
+index 6af00adb79c2dc..a639e56f183b1c 100644
+--- a/packages/ui/src/tabs/stories/index.story.tsx
++++ b/packages/ui/src/tabs/stories/index.story.tsx
+@@ -6,6 +6,7 @@ import * as Tooltip from '../../tooltip';
+ 
+ const meta: Meta< typeof Tabs.Root > = {
+ 	title: 'Design System/Components/Tabs',
++	synonyms: [ 'navigation', 'switcher', 'tab' ],
+ 	component: Tabs.Root,
+ 	tags: [ 'manifest' ],
+ 	subcomponents: {
+diff --git a/packages/ui/src/text/stories/index.story.tsx b/packages/ui/src/text/stories/index.story.tsx
+index 158ad85cbedbe6..8f03be99fc9304 100644
+--- a/packages/ui/src/text/stories/index.story.tsx
++++ b/packages/ui/src/text/stories/index.story.tsx
+@@ -5,6 +5,7 @@ import { Stack } from '../../stack';
+ const meta: Meta< typeof Text > = {
+ 	tags: [ 'manifest' ],
+ 	title: 'Design System/Components/Text',
++	synonyms: [ 'label', 'paragraph', 'typography' ],
+ 	component: Text,
+ 	parameters: {
+ 		componentStatus: {
+diff --git a/packages/ui/src/tooltip/stories/index.story.tsx b/packages/ui/src/tooltip/stories/index.story.tsx
+index c73ffa4dd8f4b1..3cf3855bb1cc14 100644
+--- a/packages/ui/src/tooltip/stories/index.story.tsx
++++ b/packages/ui/src/tooltip/stories/index.story.tsx
+@@ -5,6 +5,7 @@ import * as Tooltip from '../';
+ 
+ const meta: Meta< typeof Tooltip.Root > = {
+ 	title: 'Design System/Components/Tooltip',
++	synonyms: [ 'help', 'hint', 'popup' ],
+ 	component: Tooltip.Root,
+ 	subcomponents: {
+ 		'Tooltip.Provider': Tooltip.Provider,
+diff --git a/packages/ui/src/tooltip/stories/usage-guidelines.story.tsx b/packages/ui/src/tooltip/stories/usage-guidelines.story.tsx
+index 26fe3d45d33a44..5dfcf41af44be4 100644
+--- a/packages/ui/src/tooltip/stories/usage-guidelines.story.tsx
++++ b/packages/ui/src/tooltip/stories/usage-guidelines.story.tsx
+@@ -13,6 +13,7 @@ import { VisuallyHidden } from '../../visually-hidden';
+ 
+ const meta: Meta = {
+ 	title: 'Design System/Components/Tooltip/Usage Guidelines',
++	synonyms: [ 'guidelines', 'help', 'hint' ],
+ 	parameters: {
+ 		controls: { disable: true },
+ 		componentStatus: {
+diff --git a/packages/ui/src/visually-hidden/stories/index.story.tsx b/packages/ui/src/visually-hidden/stories/index.story.tsx
+index f6ca16423a95e8..7137614bab5eb7 100644
+--- a/packages/ui/src/visually-hidden/stories/index.story.tsx
++++ b/packages/ui/src/visually-hidden/stories/index.story.tsx
+@@ -5,6 +5,7 @@ import { VisuallyHidden } from '../';
+ const meta: Meta< typeof VisuallyHidden > = {
+ 	tags: [ 'manifest' ],
+ 	title: 'Design System/Components/VisuallyHidden',
++	synonyms: [ 'a11y', 'accessibility', 'hidden', 'screen reader' ],
+ 	component: VisuallyHidden,
+ 	parameters: {
+ 		componentStatus: {
+diff --git a/packages/ui/storybook.d.ts b/packages/ui/storybook.d.ts
+new file mode 100644
+index 00000000000000..a9af9a3f289246
+--- /dev/null
++++ b/packages/ui/storybook.d.ts
+@@ -0,0 +1,10 @@
++export {};
++
++declare module 'storybook/internal/csf' {
++	interface ComponentAnnotations {
++		/**
++		 * Additional terms that match this component in Storybook sidebar search.
++		 */
++		synonyms?: string[];
++	}
++}
+diff --git a/packages/ui/tsconfig.json b/packages/ui/tsconfig.json
+index 4060c432adb43b..402ec79748aa48 100644
+--- a/packages/ui/tsconfig.json
++++ b/packages/ui/tsconfig.json
+@@ -21,6 +21,6 @@
+ 		{ "path": "../style-runtime" },
+ 		{ "path": "../theme" }
+ 	],
+-	"files": [ "global.d.ts" ],
++	"files": [ "global.d.ts", "storybook.d.ts" ],
+ 	"exclude": []
+ }
+diff --git a/storybook/README.md b/storybook/README.md
+index e24613a5555db5..1dce31209546d3 100644
+--- a/storybook/README.md
++++ b/storybook/README.md
+@@ -7,3 +7,5 @@ The Gutenberg project uses Storybook to view and work with the UI components dev
+ View online at: https://wordpress.github.io/gutenberg/
+ 
+ Run locally in your development environment running: `npm run storybook:dev` from the top-level Gutenberg directory.
++
++`@wordpress/ui` story files can declare `synonyms` on their CSF meta. The dev/build scripts collect those terms and patch Storybook's manager so sidebar search matches them.
+diff --git a/storybook/package.json b/storybook/package.json
+index 7ae1c447f1b610..c1f064ebc107c1 100644
+--- a/storybook/package.json
++++ b/storybook/package.json
+@@ -43,7 +43,7 @@
+ 		"access": "public"
+ 	},
+ 	"scripts": {
+-		"storybook:build": "NODE_OPTIONS=--max-old-space-size=8192 storybook build -c . -o ./build",
+-		"storybook:dev": "storybook dev -c . -p 50240"
++		"storybook:build": "NODE_OPTIONS=--max-old-space-size=8192 storybook build -c . -o ./build && node ./scripts/patch-manager-search.mjs ./build",
++		"storybook:dev": "node ./scripts/patch-manager-search.mjs && storybook dev -c . -p 50240"
+ 	}
+ }
+diff --git a/storybook/scripts/collect-ui-story-synonyms.mjs b/storybook/scripts/collect-ui-story-synonyms.mjs
+new file mode 100644
+index 00000000000000..9a4b5f4128fc0e
+--- /dev/null
++++ b/storybook/scripts/collect-ui-story-synonyms.mjs
+@@ -0,0 +1,77 @@
++/**
++ * Collects `synonyms` from `@wordpress/ui` Storybook CSF files for manager search.
++ */
++import { readdirSync, readFileSync } from 'node:fs';
++import { join, resolve } from 'node:path';
++import { fileURLToPath } from 'node:url';
++
++const __dirname = fileURLToPath( new URL( '.', import.meta.url ) );
++const uiStoriesRoot = resolve( __dirname, '../../packages/ui/src' );
++
++/**
++ * @param {string} dir Directory to scan.
++ * @return {Iterable<string>} Paths to story files.
++ */
++function* walkStoryFiles( dir ) {
++	for ( const entry of readdirSync( dir, { withFileTypes: true } ) ) {
++		const entryPath = join( dir, entry.name );
++
++		if ( entry.isDirectory() ) {
++			yield* walkStoryFiles( entryPath );
++			continue;
++		}
++
++		if ( entry.isFile() && entry.name.endsWith( '.story.tsx' ) ) {
++			yield entryPath;
++		}
++	}
++}
++
++/**
++ * @param {string} content Story file source.
++ * @return {{ title: string, synonyms: string[] } | null} Parsed title and synonyms.
++ */
++function parseStorySynonyms( content ) {
++	const titleMatch = content.match( /^\s*title:\s*['"]([^'"]+)['"]/m );
++
++	if ( ! titleMatch ) {
++		return null;
++	}
++
++	const synonymsMatch = content.match( /^\s*synonyms:\s*\[([\s\S]*?)\]/m );
++
++	if ( ! synonymsMatch ) {
++		return null;
++	}
++
++	const synonyms = [
++		...synonymsMatch[ 1 ].matchAll( /['"]([^'"]+)['"]/g ),
++	].map( ( match ) => match[ 1 ] );
++
++	if ( synonyms.length === 0 ) {
++		return null;
++	}
++
++	return {
++		title: titleMatch[ 1 ],
++		synonyms,
++	};
++}
++
++/**
++ * @return {Record<string, string[]>} Synonyms keyed by story `title`.
++ */
++export function collectUiStorySynonyms() {
++	/** @type {Record<string, string[]>} */
++	const byTitle = {};
++
++	for ( const filePath of walkStoryFiles( uiStoriesRoot ) ) {
++		const parsed = parseStorySynonyms( readFileSync( filePath, 'utf8' ) );
++
++		if ( parsed ) {
++			byTitle[ parsed.title ] = parsed.synonyms;
++		}
++	}
++
++	return byTitle;
++}
+diff --git a/storybook/scripts/patch-manager-search.mjs b/storybook/scripts/patch-manager-search.mjs
+new file mode 100644
+index 00000000000000..a12f9633d1b59f
+--- /dev/null
++++ b/storybook/scripts/patch-manager-search.mjs
+@@ -0,0 +1,101 @@
++/**
++ * Patches Storybook manager runtime so sidebar search includes design system synonyms.
++ */
++import { readFileSync, writeFileSync } from 'node:fs';
++import { dirname, join, resolve } from 'node:path';
++import { fileURLToPath } from 'node:url';
++import { collectUiStorySynonyms } from './collect-ui-story-synonyms.mjs';
++
++const DESIGN_SYSTEM_SYNONYMS = collectUiStorySynonyms();
++
++const __dirname = dirname( fileURLToPath( import.meta.url ) );
++const storybookRoot = resolve( __dirname, '..' );
++const repoRoot = resolve( storybookRoot, '..' );
++
++const SEARCH_ITEM_PATTERN =
++	/var searchItem = \(item, ref\) => \(\{ \.\.\.item, refId: ref\.id, path: getPath\(item, ref\) \}\);/;
++
++const SYNONYMS_BOOTSTRAP = `var DESIGN_SYSTEM_SYNONYMS = ${ JSON.stringify(
++	DESIGN_SYSTEM_SYNONYMS
++) };`;
++
++const SEARCH_ITEM_REPLACEMENT = `${ SYNONYMS_BOOTSTRAP }
++var getDesignSystemSearchSynonyms = (item) => {
++  if (!item?.title) {
++    return "";
++  }
++  const synonyms = DESIGN_SYSTEM_SYNONYMS[item.title];
++  return synonyms ? synonyms.join(" ") : "";
++};
++var searchItem = (item, ref) => ({
++  ...item,
++  refId: ref.id,
++  path: getPath(item, ref),
++  synonyms: getDesignSystemSearchSynonyms(item),
++});`;
++
++const FUSE_KEYS_PATTERN =
++	/keys: \[\s*\{ name: "name", weight: 0\.7 \},\s*\{ name: "path", weight: 0\.3 \}\s*\]/;
++
++// Fuse.js requires key weights to sum to at most 1.
++const FUSE_KEYS_REPLACEMENT = `keys: [
++    { name: "name", weight: 0.5 },
++    { name: "path", weight: 0.25 },
++    { name: "synonyms", weight: 0.25 },
++  ]`;
++
++const FUSE_KEYS_WITH_SYNONYMS_PATTERN =
++	/keys: \[\s*\{ name: "name", weight: [\d.]+ \},\s*\{ name: "path", weight: [\d.]+ \},\s*\{ name: "synonyms", weight: [\d.]+ \},?\s*\]/;
++
++function patchRuntime( filePath ) {
++	let code;
++
++	try {
++		code = readFileSync( filePath, 'utf8' );
++	} catch {
++		return false;
++	}
++
++	if ( code.includes( 'getDesignSystemSearchSynonyms' ) ) {
++		if ( FUSE_KEYS_WITH_SYNONYMS_PATTERN.test( code ) ) {
++			writeFileSync(
++				filePath,
++				code.replace(
++					FUSE_KEYS_WITH_SYNONYMS_PATTERN,
++					FUSE_KEYS_REPLACEMENT
++				)
++			);
++		}
++		return true;
++	}
++
++	if ( ! SEARCH_ITEM_PATTERN.test( code ) ) {
++		return false;
++	}
++
++	const patched = code
++		.replace( SEARCH_ITEM_PATTERN, SEARCH_ITEM_REPLACEMENT )
++		.replace( FUSE_KEYS_PATTERN, FUSE_KEYS_REPLACEMENT );
++
++	writeFileSync( filePath, patched );
++	return true;
++}
++
++const targets = [
++	join( repoRoot, 'node_modules/storybook/dist/manager/runtime.js' ),
++	process.argv[ 2 ] && resolve( process.argv[ 2 ], 'sb-manager/runtime.js' ),
++].filter( Boolean );
++
++let patchedAny = false;
++
++for ( const target of targets ) {
++	if ( patchRuntime( target ) ) {
++		patchedAny = true;
++	}
++}
++
++if ( ! patchedAny ) {
++	console.warn(
++		'[patch-manager-search] No Storybook manager runtime was patched.'
++	);
++}
+diff --git a/storybook/types.d.ts b/storybook/types.d.ts
+index d38d23e54d0dc4..444d709f5daf35 100644
+--- a/storybook/types.d.ts
++++ b/storybook/types.d.ts
+@@ -13,3 +13,12 @@ declare module 'storybook/internal/types' {
+ 		};
+ 	}
+ }
++
++declare module 'storybook/internal/csf' {
++	interface ComponentAnnotations {
++		/**
++		 * Additional terms that match this component in Storybook sidebar search.
++		 */
++		synonyms?: string[];
++	}
++}

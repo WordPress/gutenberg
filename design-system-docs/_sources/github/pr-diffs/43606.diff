@@ -1,0 +1,1166 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3ec19b12191d77..997f9a43969162 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -18,6 +18,7 @@
+ -   `Guide`: use `code` instead of `keyCode` for keyboard events ([#43604](https://github.com/WordPress/gutenberg/pull/43604/)).
+ -   `Navigation`: use `code` instead of `keyCode` for keyboard events ([#43644](https://github.com/WordPress/gutenberg/pull/43644/)).
+ -   `ComboboxControl`: Add unit tests ([#42403](https://github.com/WordPress/gutenberg/pull/42403)).
++-   `NavigableContainer`: use `code` instead of `keyCode` for keyboard events, rewrite tests using RTL and `user-event` ([#43606](https://github.com/WordPress/gutenberg/pull/43606/)).
+ -   `ComboboxControl`: updated to satisfy `react/exhuastive-deps` eslint rule ([#41417](https://github.com/WordPress/gutenberg/pull/41417))
+ 
+ ## 20.0.0 (2022-08-24)
+diff --git a/packages/components/src/navigable-container/README.md b/packages/components/src/navigable-container/README.md
+index 25a795c1ec0c7d..de6c1103ae6dea 100644
+--- a/packages/components/src/navigable-container/README.md
++++ b/packages/components/src/navigable-container/README.md
+@@ -39,6 +39,8 @@ The orientation of the menu. It could be "vertical", "horizontal" or "both"
+ 
+ A NavigableMenu allows movement up and down (or left and right) the component via the arrow keys. The `tab` key is not handled. The `orientation` prop is used to determine whether the arrow keys used are vertical, horizontal or both.
+ 
++The `NavigableMenu` by default has a `menu` role and therefore, in order to function as expected, the component expects its children elements to have one of the following roles: `'menuitem' | 'menuitemradio' | 'menuitemcheckbox'`.
++
+ ### TabbableContainer
+ 
+ A `TabbableContainer` will only be navigated using the `tab` key. Every intended tabstop must have a tabIndex `0`.
+diff --git a/packages/components/src/navigable-container/container.js b/packages/components/src/navigable-container/container.js
+index 13e7455abddb11..6c9de468f0c591 100644
+--- a/packages/components/src/navigable-container/container.js
++++ b/packages/components/src/navigable-container/container.js
+@@ -99,7 +99,14 @@ class NavigableContainer extends Component {
+ 			// 'handling' the event, as voiceover will try to use arrow keys
+ 			// for highlighting text.
+ 			const targetRole = event.target.getAttribute( 'role' );
+-			if ( MENU_ITEM_ROLES.includes( targetRole ) ) {
++			const targetHasMenuItemRole =
++				MENU_ITEM_ROLES.includes( targetRole );
++
++			// `preventDefault()` on tab to avoid having the browser move the focus
++			// after this component has already moved it.
++			const isTab = event.code === 'Tab';
++
++			if ( targetHasMenuItemRole || isTab ) {
+ 				event.preventDefault();
+ 			}
+ 		}
+diff --git a/packages/components/src/navigable-container/menu.js b/packages/components/src/navigable-container/menu.js
+index dbc6c695b2a974..cf19c23adcb9d8 100644
+--- a/packages/components/src/navigable-container/menu.js
++++ b/packages/components/src/navigable-container/menu.js
+@@ -4,7 +4,6 @@
+  * WordPress dependencies
+  */
+ import { forwardRef } from '@wordpress/element';
+-import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
+ 
+ /**
+  * Internal dependencies
+@@ -16,26 +15,30 @@ export function NavigableMenu(
+ 	ref
+ ) {
+ 	const eventToOffset = ( evt ) => {
+-		const { keyCode } = evt;
++		const { code } = evt;
+ 
+-		let next = [ DOWN ];
+-		let previous = [ UP ];
++		let next = [ 'ArrowDown' ];
++		let previous = [ 'ArrowUp' ];
+ 
+ 		if ( orientation === 'horizontal' ) {
+-			next = [ RIGHT ];
+-			previous = [ LEFT ];
++			next = [ 'ArrowRight' ];
++			previous = [ 'ArrowLeft' ];
+ 		}
+ 
+ 		if ( orientation === 'both' ) {
+-			next = [ RIGHT, DOWN ];
+-			previous = [ LEFT, UP ];
++			next = [ 'ArrowRight', 'ArrowDown' ];
++			previous = [ 'ArrowLeft', 'ArrowUp' ];
+ 		}
+ 
+-		if ( next.includes( keyCode ) ) {
++		if ( next.includes( code ) ) {
+ 			return 1;
+-		} else if ( previous.includes( keyCode ) ) {
++		} else if ( previous.includes( code ) ) {
+ 			return -1;
+-		} else if ( [ DOWN, UP, LEFT, RIGHT ].includes( keyCode ) ) {
++		} else if (
++			[ 'ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight' ].includes(
++				code
++			)
++		) {
+ 			// Key press should be handled, e.g. have event propagation and
+ 			// default behavior handled by NavigableContainer but not result
+ 			// in an offset.
+diff --git a/packages/components/src/navigable-container/stories/navigable-menu.js b/packages/components/src/navigable-container/stories/navigable-menu.js
+new file mode 100644
+index 00000000000000..af9b08fd9b032a
+--- /dev/null
++++ b/packages/components/src/navigable-container/stories/navigable-menu.js
+@@ -0,0 +1,49 @@
++/**
++ * Internal dependencies
++ */
++import { NavigableMenu } from '..';
++
++export default {
++	title: 'Components/NavigableMenu',
++	component: NavigableMenu,
++	argTypes: {
++		children: { type: null },
++		cycle: {
++			type: 'boolean',
++		},
++		onNavigate: { action: 'onNavigate' },
++		orientation: {
++			options: [ 'horizontal', 'vertical' ],
++			control: { type: 'radio' },
++		},
++	},
++};
++
++export const Default = ( args ) => {
++	return (
++		<>
++			<button>Before navigable menu</button>
++			<NavigableMenu
++				{ ...args }
++				style={ {
++					margin: '32px 0',
++					padding: '16px',
++					border: '1px solid black',
++				} }
++			>
++				<div role="menuitem">Item 1 (non-tabbable, non-focusable)</div>
++				<button role="menuitem">Item 2 (tabbable, focusable)</button>
++				<button role="menuitem" disabled>
++					Item 3 (disabled, therefore non-tabbable and not-focusable)
++				</button>
++				<span role="menuitem" tabIndex={ -1 }>
++					Item 4 (non-tabbable, non-focusable)
++				</span>
++				<div role="menuitem" tabIndex={ 0 }>
++					Item 5 (tabbable, focusable)
++				</div>
++			</NavigableMenu>
++			<button>After navigable menu</button>
++		</>
++	);
++};
+diff --git a/packages/components/src/navigable-container/stories/tabbable-container.js b/packages/components/src/navigable-container/stories/tabbable-container.js
+new file mode 100644
+index 00000000000000..3e12825189f1a7
+--- /dev/null
++++ b/packages/components/src/navigable-container/stories/tabbable-container.js
+@@ -0,0 +1,40 @@
++/**
++ * Internal dependencies
++ */
++import { TabbableContainer } from '..';
++
++export default {
++	title: 'Components/TabbableContainer',
++	component: TabbableContainer,
++	argTypes: {
++		children: { type: null },
++		cycle: {
++			type: 'boolean',
++		},
++		onNavigate: { action: 'onNavigate' },
++	},
++};
++
++export const Default = ( args ) => {
++	return (
++		<>
++			<button>Before tabbable container</button>
++			<TabbableContainer
++				{ ...args }
++				style={ {
++					margin: '32px 0',
++					padding: '16px',
++					border: '1px solid black',
++				} }
++			>
++				<button>Item 1</button>
++				<button>Item 2</button>
++				<button disabled>Item 3 (disabled)</button>
++				<button tabIndex={ -1 }>Item 4 (non-tabbable)</button>
++				<button tabIndex={ 0 }>Item 5</button>
++				<button>Item 6</button>
++			</TabbableContainer>
++			<button>After tabbable container</button>
++		</>
++	);
++};
+diff --git a/packages/components/src/navigable-container/tabbable.js b/packages/components/src/navigable-container/tabbable.js
+index b6b1a89fceb4d3..8f38970bf06700 100644
+--- a/packages/components/src/navigable-container/tabbable.js
++++ b/packages/components/src/navigable-container/tabbable.js
+@@ -3,7 +3,6 @@
+  * WordPress dependencies
+  */
+ import { forwardRef } from '@wordpress/element';
+-import { TAB } from '@wordpress/keycodes';
+ 
+ /**
+  * Internal dependencies
+@@ -12,8 +11,8 @@ import NavigableContainer from './container';
+ 
+ export function TabbableContainer( { eventToOffset, ...props }, ref ) {
+ 	const innerEventToOffset = ( evt ) => {
+-		const { keyCode, shiftKey } = evt;
+-		if ( TAB === keyCode ) {
++		const { code, shiftKey } = evt;
++		if ( 'Tab' === code ) {
+ 			return shiftKey ? -1 : 1;
+ 		}
+ 
+diff --git a/packages/components/src/navigable-container/test/menu.js b/packages/components/src/navigable-container/test/menu.js
+deleted file mode 100644
+index 64170432cb3739..00000000000000
+--- a/packages/components/src/navigable-container/test/menu.js
++++ /dev/null
+@@ -1,310 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { fireEvent, render, screen } from '@testing-library/react';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { UP, DOWN, LEFT, RIGHT, SPACE } from '@wordpress/keycodes';
+-
+-/**
+- * Internal dependencies
+- */
+-import { NavigableMenu } from '../menu';
+-
+-function simulateVisible( container, selector ) {
+-	const elements = container.querySelectorAll( selector );
+-	elements.forEach( ( elem ) => {
+-		elem.getClientRects = () => [
+-			'trick-jsdom-into-having-size-for-element-rect',
+-		];
+-	} );
+-}
+-
+-function fireKeyDown( node, keyCode, shiftKey ) {
+-	const interaction = {
+-		stopped: false,
+-	};
+-
+-	const event = new window.KeyboardEvent( 'keydown', {
+-		keyCode,
+-		shiftKey,
+-	} );
+-	event.stopImmediatePropagation = () => {
+-		interaction.stopped = true;
+-	};
+-	fireEvent( node, event );
+-
+-	return interaction;
+-}
+-
+-describe( 'NavigableMenu', () => {
+-	it( 'vertical: should navigate by up and down', () => {
+-		let currentIndex = 0;
+-		const { container } = render(
+-			/*
+-				Disabled because of our rule restricting literal IDs, preferring
+-				`withInstanceId`. In this case, it's fine to use literal IDs.
+-			*/
+-			/* eslint-disable no-restricted-syntax */
+-			<NavigableMenu
+-				orientation="vertical"
+-				onNavigate={ ( index ) => ( currentIndex = index ) }
+-			>
+-				<span tabIndex="-1" id="btn1">
+-					One
+-				</span>
+-				<span tabIndex="-1" id="btn2">
+-					Two
+-				</span>
+-				<span id="btn-deep-wrapper">
+-					<span id="btn-deep" tabIndex="-1">
+-						Deep
+-					</span>
+-				</span>
+-				<span tabIndex="-1" id="btn3">
+-					Three
+-				</span>
+-			</NavigableMenu>
+-			/* eslint-enable no-restricted-syntax */
+-		);
+-
+-		simulateVisible( container, '*' );
+-
+-		container.querySelector( '#btn1' ).focus();
+-
+-		// Navigate options.
+-		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
+-			const interaction = fireKeyDown(
+-				screen.getByRole( 'menu' ),
+-				keyCode,
+-				false
+-			);
+-			expect( currentIndex ).toBe( expectedActiveIndex );
+-			expect( interaction.stopped ).toBe( expectedStop );
+-		}
+-
+-		assertKeyDown( DOWN, 1, true );
+-		assertKeyDown( DOWN, 2, true );
+-		assertKeyDown( DOWN, 3, true );
+-		assertKeyDown( DOWN, 0, true );
+-		assertKeyDown( UP, 3, true );
+-		assertKeyDown( UP, 2, true );
+-		assertKeyDown( UP, 1, true );
+-		assertKeyDown( UP, 0, true );
+-		assertKeyDown( LEFT, 0, true );
+-		assertKeyDown( RIGHT, 0, true );
+-		assertKeyDown( SPACE, 0, false );
+-	} );
+-
+-	it( 'vertical: should navigate by up and down, and stop at edges', () => {
+-		let currentIndex = 0;
+-		const { container } = render(
+-			/*
+-				Disabled because of our rule restricting literal IDs, preferring
+-				`withInstanceId`. In this case, it's fine to use literal IDs.
+-			*/
+-			/* eslint-disable no-restricted-syntax */
+-			<NavigableMenu
+-				cycle={ false }
+-				orientation="vertical"
+-				onNavigate={ ( index ) => ( currentIndex = index ) }
+-			>
+-				<span tabIndex="-1" id="btn1">
+-					One
+-				</span>
+-				<span tabIndex="-1" id="btn2">
+-					Two
+-				</span>
+-				<span tabIndex="-1" id="btn3">
+-					Three
+-				</span>
+-			</NavigableMenu>
+-			/* eslint-enable no-restricted-syntax */
+-		);
+-
+-		simulateVisible( container, '*' );
+-
+-		container.querySelector( '#btn1' ).focus();
+-
+-		// Navigate options.
+-		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
+-			const interaction = fireKeyDown(
+-				screen.getByRole( 'menu' ),
+-				keyCode,
+-				false
+-			);
+-			expect( currentIndex ).toBe( expectedActiveIndex );
+-			expect( interaction.stopped ).toBe( expectedStop );
+-		}
+-
+-		assertKeyDown( DOWN, 1, true );
+-		assertKeyDown( DOWN, 2, true );
+-		assertKeyDown( DOWN, 2, true );
+-		assertKeyDown( UP, 1, true );
+-		assertKeyDown( UP, 0, true );
+-		assertKeyDown( UP, 0, true );
+-		assertKeyDown( LEFT, 0, true );
+-		assertKeyDown( RIGHT, 0, true );
+-		assertKeyDown( SPACE, 0, false );
+-	} );
+-
+-	it( 'horizontal: should navigate by left and right', () => {
+-		let currentIndex = 0;
+-		const { container } = render(
+-			/*
+-				Disabled because of our rule restricting literal IDs, preferring
+-				`withInstanceId`. In this case, it's fine to use literal IDs.
+-			*/
+-			/* eslint-disable no-restricted-syntax */
+-			<NavigableMenu
+-				orientation="horizontal"
+-				onNavigate={ ( index ) => ( currentIndex = index ) }
+-			>
+-				<span tabIndex="-1" id="btn1">
+-					One
+-				</span>
+-				<span tabIndex="-1" id="btn2">
+-					Two
+-				</span>
+-				<span id="btn-deep-wrapper">
+-					<span id="btn-deep" tabIndex="-1">
+-						Deep
+-					</span>
+-				</span>
+-				<span tabIndex="-1" id="btn3">
+-					Three
+-				</span>
+-			</NavigableMenu>
+-			/* eslint-enable no-restricted-syntax */
+-		);
+-
+-		simulateVisible( container, '*' );
+-
+-		container.querySelector( '#btn1' ).focus();
+-
+-		// Navigate options.
+-		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
+-			const interaction = fireKeyDown(
+-				screen.getByRole( 'menu' ),
+-				keyCode,
+-				false
+-			);
+-			expect( currentIndex ).toBe( expectedActiveIndex );
+-			expect( interaction.stopped ).toBe( expectedStop );
+-		}
+-
+-		assertKeyDown( RIGHT, 1, true );
+-		assertKeyDown( RIGHT, 2, true );
+-		assertKeyDown( RIGHT, 3, true );
+-		assertKeyDown( RIGHT, 0, true );
+-		assertKeyDown( LEFT, 3, true );
+-		assertKeyDown( LEFT, 2, true );
+-		assertKeyDown( LEFT, 1, true );
+-		assertKeyDown( LEFT, 0, true );
+-		assertKeyDown( UP, 0, true );
+-		assertKeyDown( DOWN, 0, true );
+-		assertKeyDown( SPACE, 0, false );
+-	} );
+-
+-	it( 'horizontal: should navigate by left and right, and stop at edges', () => {
+-		let currentIndex = 0;
+-		const { container } = render(
+-			/*
+-				Disabled because of our rule restricting literal IDs, preferring
+-				`withInstanceId`. In this case, it's fine to use literal IDs.
+-			*/
+-			/* eslint-disable no-restricted-syntax */
+-			<NavigableMenu
+-				cycle={ false }
+-				orientation="horizontal"
+-				onNavigate={ ( index ) => ( currentIndex = index ) }
+-			>
+-				<span tabIndex="-1" id="btn1">
+-					One
+-				</span>
+-				<span tabIndex="-1" id="btn2">
+-					Two
+-				</span>
+-				<span tabIndex="-1" id="btn3">
+-					Three
+-				</span>
+-			</NavigableMenu>
+-			/* eslint-enable no-restricted-syntax */
+-		);
+-
+-		simulateVisible( container, '*' );
+-
+-		container.querySelector( '#btn1' ).focus();
+-
+-		// Navigate options.
+-		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
+-			const interaction = fireKeyDown(
+-				screen.getByRole( 'menu' ),
+-				keyCode,
+-				false
+-			);
+-			expect( currentIndex ).toBe( expectedActiveIndex );
+-			expect( interaction.stopped ).toBe( expectedStop );
+-		}
+-
+-		assertKeyDown( RIGHT, 1, true );
+-		assertKeyDown( RIGHT, 2, true );
+-		assertKeyDown( RIGHT, 2, true );
+-		assertKeyDown( LEFT, 1, true );
+-		assertKeyDown( LEFT, 0, true );
+-		assertKeyDown( LEFT, 0, true );
+-		assertKeyDown( DOWN, 0, true );
+-		assertKeyDown( UP, 0, true );
+-		assertKeyDown( SPACE, 0, false );
+-	} );
+-
+-	it( 'both: should navigate by up/down and left/right', () => {
+-		let currentIndex = 0;
+-		const { container } = render(
+-			/*
+-				Disabled because of our rule restricting literal IDs, preferring
+-				`withInstanceId`. In this case, it's fine to use literal IDs.
+-			*/
+-			/* eslint-disable no-restricted-syntax */
+-			<NavigableMenu
+-				orientation="both"
+-				onNavigate={ ( index ) => ( currentIndex = index ) }
+-			>
+-				<button id="btn1">One</button>
+-				<button id="btn2">Two</button>
+-				<button id="btn3">Three</button>
+-			</NavigableMenu>
+-			/* eslint-enable no-restricted-syntax */
+-		);
+-
+-		simulateVisible( container, '*' );
+-
+-		container.querySelector( '#btn1' ).focus();
+-
+-		// Navigate options.
+-		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
+-			const interaction = fireKeyDown(
+-				screen.getByRole( 'menu' ),
+-				keyCode
+-			);
+-			expect( currentIndex ).toBe( expectedActiveIndex );
+-			expect( interaction.stopped ).toBe( expectedStop );
+-		}
+-
+-		assertKeyDown( DOWN, 1, true );
+-		assertKeyDown( DOWN, 2, true );
+-		assertKeyDown( DOWN, 0, true );
+-		assertKeyDown( RIGHT, 1, true );
+-		assertKeyDown( RIGHT, 2, true );
+-		assertKeyDown( RIGHT, 0, true );
+-		assertKeyDown( UP, 2, true );
+-		assertKeyDown( UP, 1, true );
+-		assertKeyDown( UP, 0, true );
+-		assertKeyDown( LEFT, 2, true );
+-		assertKeyDown( LEFT, 1, true );
+-		assertKeyDown( LEFT, 0, true );
+-		assertKeyDown( SPACE, 0, false );
+-	} );
+-} );
+diff --git a/packages/components/src/navigable-container/test/navigable-menu.js b/packages/components/src/navigable-container/test/navigable-menu.js
+new file mode 100644
+index 00000000000000..e50925a73c1d3b
+--- /dev/null
++++ b/packages/components/src/navigable-container/test/navigable-menu.js
+@@ -0,0 +1,277 @@
++/**
++ * External dependencies
++ */
++import { render, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++
++/**
++ * Internal dependencies
++ */
++import { NavigableMenu } from '../menu';
++
++const NavigableMenuTestCase = ( props ) => (
++	<NavigableMenu { ...props }>
++		<button>Item 1</button>
++		<span>
++			<span tabIndex={ -1 }>Item 2 (not tabbable)</span>
++		</span>
++		<p>I can not be focused</p>
++		<input type="text" disabled name="disabled-input" />
++		<a href="https://example.com">Item 4</a>
++	</NavigableMenu>
++);
++
++const getNavigableMenuFocusables = () => [
++	screen.getByRole( 'button', { name: 'Item 1' } ),
++	screen.getByText( 'Item 2 (not tabbable)' ),
++	screen.getByRole( 'link', { name: 'Item 4' } ),
++];
++
++const originalGetClientRects = window.HTMLElement.prototype.getClientRects;
++
++describe( 'NavigableMenu', () => {
++	beforeAll( () => {
++		// Mocking `getClientRects()` is necessary to pass a check performed by
++		// the `focus.tabbable.find()` and by the `focus.focusable.find()` functions
++		// from the `@wordpress/dom` package.
++		window.HTMLElement.prototype.getClientRects = function () {
++			return [ 'trick-jsdom-into-having-size-for-element-rect' ];
++		};
++	} );
++
++	afterAll( () => {
++		window.HTMLElement.prototype.getClientRects = originalGetClientRects;
++	} );
++
++	it( 'moves focus on its focusable children by using the up/down arrow keys', async () => {
++		const user = userEvent.setup( {
++			advanceTimers: jest.advanceTimersByTime,
++		} );
++
++		const onNavigateSpy = jest.fn();
++
++		render( <NavigableMenuTestCase onNavigate={ onNavigateSpy } /> );
++
++		const focusables = getNavigableMenuFocusables();
++
++		// Move focus to first item.
++		await user.tab();
++		expect( focusables[ 0 ] ).toHaveFocus();
++
++		// By default, up/down arrows are used to navigate.
++		await user.keyboard( '[ArrowDown]' );
++		expect( focusables[ 1 ] ).toHaveFocus();
++		expect( onNavigateSpy ).toHaveBeenCalledTimes( 1 );
++		expect( onNavigateSpy ).toHaveBeenLastCalledWith( 1, focusables[ 1 ] );
++
++		await user.keyboard( '[ArrowDown]' );
++		expect( focusables[ 2 ] ).toHaveFocus();
++		expect( onNavigateSpy ).toHaveBeenCalledTimes( 2 );
++		expect( onNavigateSpy ).toHaveBeenLastCalledWith( 2, focusables[ 2 ] );
++
++		await user.keyboard( '[ArrowUp]' );
++		expect( focusables[ 1 ] ).toHaveFocus();
++		expect( onNavigateSpy ).toHaveBeenCalledTimes( 3 );
++		expect( onNavigateSpy ).toHaveBeenLastCalledWith( 1, focusables[ 1 ] );
++
++		// Left/right arrows don't navigate.
++		await user.keyboard( '[ArrowLeft]' );
++		expect( focusables[ 1 ] ).toHaveFocus();
++		expect( onNavigateSpy ).toHaveBeenCalledTimes( 3 );
++
++		await user.keyboard( '[ArrowRight]' );
++		expect( focusables[ 1 ] ).toHaveFocus();
++		expect( onNavigateSpy ).toHaveBeenCalledTimes( 3 );
++	} );
++
++	it( 'moves focus on its focusable children by using the left/right arrow keys when the `orientation`prop is set to `horizontal', async () => {
++		const user = userEvent.setup( {
++			advanceTimers: jest.advanceTimersByTime,
++		} );
++
++		const onNavigateSpy = jest.fn();
++
++		render(
++			<NavigableMenuTestCase
++				orientation="horizontal"
++				onNavigate={ onNavigateSpy }
++			/>
++		);
++
++		const focusables = getNavigableMenuFocusables();
++
++		// Move focus to first item.
++		await user.tab();
++		expect( focusables[ 0 ] ).toHaveFocus();
++
++		// When `orientation="horizontal"`, left/right arrows are used to navigate.
++		await user.keyboard( '[ArrowRight]' );
++		expect( focusables[ 1 ] ).toHaveFocus();
++		expect( onNavigateSpy ).toHaveBeenCalledTimes( 1 );
++		expect( onNavigateSpy ).toHaveBeenLastCalledWith( 1, focusables[ 1 ] );
++
++		await user.keyboard( '[ArrowRight]' );
++		expect( focusables[ 2 ] ).toHaveFocus();
++		expect( onNavigateSpy ).toHaveBeenCalledTimes( 2 );
++		expect( onNavigateSpy ).toHaveBeenLastCalledWith( 2, focusables[ 2 ] );
++
++		await user.keyboard( '[ArrowLeft]' );
++		expect( focusables[ 1 ] ).toHaveFocus();
++		expect( onNavigateSpy ).toHaveBeenCalledTimes( 3 );
++		expect( onNavigateSpy ).toHaveBeenLastCalledWith( 1, focusables[ 1 ] );
++
++		// When `orientation="horizontal"`, up/down arrows don't navigate.
++		await user.keyboard( '[ArrowUp]' );
++		expect( focusables[ 1 ] ).toHaveFocus();
++		expect( onNavigateSpy ).toHaveBeenCalledTimes( 3 );
++
++		await user.keyboard( '[ArrowDown]' );
++		expect( focusables[ 1 ] ).toHaveFocus();
++		expect( onNavigateSpy ).toHaveBeenCalledTimes( 3 );
++	} );
++
++	it( 'should stop at the edges when the `cycle` prop is set to `false`', async () => {
++		const user = userEvent.setup( {
++			advanceTimers: jest.advanceTimersByTime,
++		} );
++
++		const onNavigateSpy = jest.fn();
++
++		const { rerender } = render(
++			<NavigableMenuTestCase onNavigate={ onNavigateSpy } />
++		);
++
++		const focusables = getNavigableMenuFocusables();
++		const firstFocusable = focusables[ 0 ];
++		const lastFocusableIndex = focusables.length - 1;
++		const lastFocusable = focusables[ lastFocusableIndex ];
++
++		// Move focus to first item.
++		await user.tab();
++		expect( firstFocusable ).toHaveFocus();
++
++		// By default, cycling from first to last and from last to first is allowed.
++		await user.keyboard( '[ArrowUp]' );
++		expect( lastFocusable ).toHaveFocus();
++		expect( onNavigateSpy ).toHaveBeenCalledTimes( 1 );
++		expect( onNavigateSpy ).toHaveBeenLastCalledWith(
++			lastFocusableIndex,
++			lastFocusable
++		);
++
++		await user.keyboard( '[ArrowDown]' );
++		expect( firstFocusable ).toHaveFocus();
++		expect( onNavigateSpy ).toHaveBeenCalledTimes( 2 );
++		expect( onNavigateSpy ).toHaveBeenLastCalledWith( 0, firstFocusable );
++
++		rerender(
++			<NavigableMenuTestCase
++				onNavigate={ onNavigateSpy }
++				cycle={ false }
++			/>
++		);
++
++		// With the `cycle` prop set to `false`, cycling is not allowed.
++		// By default, cycling from first to last and from last to first is allowed.
++		await user.keyboard( '[ArrowUp]' );
++		expect( firstFocusable ).toHaveFocus();
++		expect( onNavigateSpy ).toHaveBeenCalledTimes( 2 );
++
++		await user.keyboard( '[ArrowDown][ArrowDown]' );
++		expect( lastFocusable ).toHaveFocus();
++		expect( onNavigateSpy ).toHaveBeenCalledTimes( 4 );
++		expect( onNavigateSpy ).toHaveBeenLastCalledWith(
++			lastFocusableIndex,
++			lastFocusable
++		);
++
++		await user.keyboard( '[ArrowDown]' );
++		expect( lastFocusable ).toHaveFocus();
++		expect( onNavigateSpy ).toHaveBeenCalledTimes( 4 );
++	} );
++
++	it( 'stops keydown event propagation when arrow keys are pressed, regardless of the `orientation` prop', async () => {
++		const user = userEvent.setup( {
++			advanceTimers: jest.advanceTimersByTime,
++		} );
++
++		const externalWrapperOnKeyDownSpy = jest.fn();
++
++		render(
++			// Disable reason: this is only for test purposes.
++			// eslint-disable-next-line jsx-a11y/no-static-element-interactions
++			<div onKeyDown={ externalWrapperOnKeyDownSpy }>
++				<NavigableMenuTestCase />
++			</div>
++		);
++
++		const focusables = getNavigableMenuFocusables();
++
++		// Move focus to first item
++		await user.tab();
++		expect( focusables[ 0 ] ).toHaveFocus();
++
++		await user.keyboard( '[Space]' );
++		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 1 );
++
++		await user.keyboard( '[ArrowDown][ArrowUp][ArrowLeft][ArrowRight]' );
++		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 1 );
++
++		await user.keyboard( '[Escape]' );
++		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 2 );
++	} );
++
++	it( 'skips its internal logic when the tab key is pressed', async () => {
++		const user = userEvent.setup( {
++			advanceTimers: jest.advanceTimersByTime,
++		} );
++
++		render(
++			<>
++				<button>Before menu</button>
++				<NavigableMenuTestCase />
++				<button>After menu</button>
++			</>
++		);
++
++		const beforeFocusable = screen.getByRole( 'button', {
++			name: 'Before menu',
++		} );
++		const internalFocusables = getNavigableMenuFocusables();
++		const firstFocusable = internalFocusables[ 0 ];
++		const lastFocusableIndex = internalFocusables.length - 1;
++		const lastFocusable = internalFocusables[ lastFocusableIndex ];
++		const afterFocusable = screen.getByRole( 'button', {
++			name: 'After menu',
++		} );
++
++		// The 'tab' key is not handled by the component, which means that elements
++		// are focused following the standard browser behavior.
++		await user.tab();
++		expect( beforeFocusable ).toHaveFocus();
++
++		await user.tab();
++		expect( firstFocusable ).toHaveFocus();
++
++		// Note: the second element "internalFocusables" is not focused by default
++		// by the browser because it has `tabindex="-1"`
++
++		await user.tab();
++		expect( lastFocusable ).toHaveFocus();
++
++		await user.tab();
++		expect( afterFocusable ).toHaveFocus();
++
++		await user.tab( { shift: true } );
++		expect( lastFocusable ).toHaveFocus();
++
++		// Note: the second element "internalFocusables" is not focused by default
++		// by the browser because it has `tabindex="-1"`
++
++		await user.tab( { shift: true } );
++		expect( firstFocusable ).toHaveFocus();
++
++		await user.tab( { shift: true } );
++		expect( beforeFocusable ).toHaveFocus();
++	} );
++} );
+diff --git a/packages/components/src/navigable-container/test/tababble-container.js b/packages/components/src/navigable-container/test/tababble-container.js
+new file mode 100644
+index 00000000000000..593238578792f1
+--- /dev/null
++++ b/packages/components/src/navigable-container/test/tababble-container.js
+@@ -0,0 +1,175 @@
++/**
++ * External dependencies
++ */
++import { render, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++
++/**
++ * Internal dependencies
++ */
++import { TabbableContainer } from '../tabbable';
++
++const TabbableContainerTestCase = ( props ) => (
++	<TabbableContainer { ...props }>
++		<button>Item 1</button>
++		<span>
++			<span tabIndex={ -1 }>Item 2 (not tabbable)</span>
++		</span>
++		<span>
++			<span tabIndex={ 0 }>Item 3</span>
++		</span>
++		<p>I can not be tabbed</p>
++		<input type="text" disabled name="disabled-input" />
++		<a href="https://example.com">Item 4</a>
++	</TabbableContainer>
++);
++
++const getTabbableContainerTabbables = () => [
++	screen.getByRole( 'button', { name: 'Item 1' } ),
++	screen.getByText( 'Item 3' ),
++	screen.getByRole( 'link', { name: 'Item 4' } ),
++];
++
++const originalGetClientRects = window.HTMLElement.prototype.getClientRects;
++
++describe( 'TabbableContainer', () => {
++	beforeAll( () => {
++		// Mocking `getClientRects()` is necessary to pass a check performed by
++		// the `focus.tabbable.find()` and by the `focus.focusable.find()` functions
++		// from the `@wordpress/dom` package.
++		window.HTMLElement.prototype.getClientRects = function () {
++			return [ 'trick-jsdom-into-having-size-for-element-rect' ];
++		};
++	} );
++
++	afterAll( () => {
++		window.HTMLElement.prototype.getClientRects = originalGetClientRects;
++	} );
++
++	it( 'moves focus on its tabbable children by using the tab key', async () => {
++		const user = userEvent.setup( {
++			advanceTimers: jest.advanceTimersByTime,
++		} );
++
++		const onNavigateSpy = jest.fn();
++
++		render( <TabbableContainerTestCase onNavigate={ onNavigateSpy } /> );
++
++		const tabbables = getTabbableContainerTabbables();
++
++		// Move focus to first item.
++		await user.tab();
++		expect( tabbables[ 0 ] ).toHaveFocus();
++
++		await user.tab();
++		expect( tabbables[ 1 ] ).toHaveFocus();
++		expect( onNavigateSpy ).toHaveBeenCalledTimes( 1 );
++		expect( onNavigateSpy ).toHaveBeenLastCalledWith( 1, tabbables[ 1 ] );
++
++		await user.tab();
++		expect( tabbables[ 2 ] ).toHaveFocus();
++		expect( onNavigateSpy ).toHaveBeenCalledTimes( 2 );
++		expect( onNavigateSpy ).toHaveBeenLastCalledWith( 2, tabbables[ 2 ] );
++
++		await user.tab( { shift: true } );
++		expect( tabbables[ 1 ] ).toHaveFocus();
++		expect( onNavigateSpy ).toHaveBeenCalledTimes( 3 );
++		expect( onNavigateSpy ).toHaveBeenLastCalledWith( 1, tabbables[ 1 ] );
++	} );
++
++	it( 'should stop at the edges when the `cycle` prop is set to `false`', async () => {
++		const user = userEvent.setup( {
++			advanceTimers: jest.advanceTimersByTime,
++		} );
++
++		const onNavigateSpy = jest.fn();
++
++		const { rerender } = render(
++			<TabbableContainerTestCase onNavigate={ onNavigateSpy } />
++		);
++
++		const tabbables = getTabbableContainerTabbables();
++		const firstTabbable = tabbables[ 0 ];
++		const lastTabbableIndex = tabbables.length - 1;
++		const lastTabbable = tabbables[ lastTabbableIndex ];
++
++		// Move focus to first item.
++		await user.tab();
++		expect( firstTabbable ).toHaveFocus();
++
++		// By default, cycling from first to last and from last to first is allowed.
++		await user.tab( { shift: true } );
++		expect( lastTabbable ).toHaveFocus();
++		expect( onNavigateSpy ).toHaveBeenCalledTimes( 1 );
++		expect( onNavigateSpy ).toHaveBeenLastCalledWith(
++			lastTabbableIndex,
++			lastTabbable
++		);
++
++		await user.tab();
++		expect( firstTabbable ).toHaveFocus();
++		expect( onNavigateSpy ).toHaveBeenCalledTimes( 2 );
++		expect( onNavigateSpy ).toHaveBeenLastCalledWith( 0, firstTabbable );
++
++		rerender(
++			<TabbableContainerTestCase
++				onNavigate={ onNavigateSpy }
++				cycle={ false }
++			/>
++		);
++
++		// With the `cycle` prop set to `false`, cycling is not allowed.
++		// By default, cycling from first to last and from last to first is allowed.
++		await user.tab( { shift: true } );
++		expect( firstTabbable ).toHaveFocus();
++		expect( onNavigateSpy ).toHaveBeenCalledTimes( 2 );
++
++		await user.tab();
++		await user.tab();
++		expect( lastTabbable ).toHaveFocus();
++		expect( onNavigateSpy ).toHaveBeenCalledTimes( 4 );
++		expect( onNavigateSpy ).toHaveBeenLastCalledWith(
++			lastTabbableIndex,
++			lastTabbable
++		);
++
++		await user.tab();
++		expect( lastTabbable ).toHaveFocus();
++		expect( onNavigateSpy ).toHaveBeenCalledTimes( 4 );
++	} );
++
++	it( 'stops keydown event propagation when the tab key is pressed', async () => {
++		const user = userEvent.setup( {
++			advanceTimers: jest.advanceTimersByTime,
++		} );
++
++		const externalWrapperOnKeyDownSpy = jest.fn();
++
++		render(
++			// Disable reason: this is only for test purposes.
++			// eslint-disable-next-line jsx-a11y/no-static-element-interactions
++			<div onKeyDown={ externalWrapperOnKeyDownSpy }>
++				<TabbableContainerTestCase />
++			</div>
++		);
++
++		const tabbables = getTabbableContainerTabbables();
++
++		// Move focus to first item
++		await user.tab();
++		expect( tabbables[ 0 ] ).toHaveFocus();
++
++		await user.keyboard( '[Space]' );
++		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 1 );
++
++		await user.tab();
++		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 1 );
++		await user.tab( { shift: true } );
++		// This extra call is caused by the "shift" key being pressed
++		// on its own before "tab"
++		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 2 );
++
++		await user.keyboard( '[Escape]' );
++		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 3 );
++	} );
++} );
+diff --git a/packages/components/src/navigable-container/test/tabbable.js b/packages/components/src/navigable-container/test/tabbable.js
+deleted file mode 100644
+index e8b9a5b568cc6a..00000000000000
+--- a/packages/components/src/navigable-container/test/tabbable.js
++++ /dev/null
+@@ -1,158 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { fireEvent, render } from '@testing-library/react';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { TAB, SPACE } from '@wordpress/keycodes';
+-
+-/**
+- * Internal dependencies
+- */
+-import { TabbableContainer } from '../tabbable';
+-
+-function simulateVisible( container, selector ) {
+-	const elements = container.querySelectorAll( selector );
+-	elements.forEach( ( elem ) => {
+-		elem.getClientRects = () => [
+-			'trick-jsdom-into-having-size-for-element-rect',
+-		];
+-	} );
+-}
+-
+-function fireKeyDown( node, keyCode, shiftKey ) {
+-	const interaction = {
+-		stopped: false,
+-	};
+-
+-	const event = new window.KeyboardEvent( 'keydown', {
+-		keyCode,
+-		shiftKey,
+-	} );
+-	event.stopImmediatePropagation = () => {
+-		interaction.stopped = true;
+-	};
+-	fireEvent( node, event );
+-
+-	return interaction;
+-}
+-
+-describe( 'TabbableContainer', () => {
+-	it( 'should navigate by keypresses', () => {
+-		let currentIndex = 0;
+-		const { container } = render(
+-			/*
+-				Disabled because of our rule restricting literal IDs, preferring
+-				`withInstanceId`. In this case, it's fine to use literal IDs.
+-			*/
+-			/* eslint-disable no-restricted-syntax */
+-			<TabbableContainer
+-				className="wrapper"
+-				onNavigate={ ( index ) => ( currentIndex = index ) }
+-			>
+-				<div className="section" id="section1" tabIndex="0">
+-					Section One
+-				</div>
+-				<div className="section" id="section2" tabIndex="0">
+-					Section Two
+-				</div>
+-				<div className="deep-section-wrapper">
+-					<div className="section" id="section-deep" tabIndex="0">
+-						Section to <strong>not</strong> skip
+-					</div>
+-				</div>
+-				<div className="section" id="section3" tabIndex="0">
+-					Section Three
+-				</div>
+-			</TabbableContainer>
+-			/* eslint-enable no-restricted-syntax */
+-		);
+-
+-		simulateVisible( container, '*' );
+-
+-		container.querySelector( '#section1' ).focus();
+-
+-		// Navigate options.
+-		function assertKeyDown(
+-			keyCode,
+-			shiftKey,
+-			expectedActiveIndex,
+-			expectedStop
+-		) {
+-			const interaction = fireKeyDown(
+-				container.querySelector( '.wrapper' ),
+-				keyCode,
+-				shiftKey
+-			);
+-			expect( currentIndex ).toBe( expectedActiveIndex );
+-			expect( interaction.stopped ).toBe( expectedStop );
+-		}
+-
+-		assertKeyDown( TAB, false, 1, true );
+-		assertKeyDown( TAB, false, 2, true );
+-		assertKeyDown( TAB, false, 3, true );
+-		assertKeyDown( TAB, false, 0, true );
+-		assertKeyDown( TAB, true, 3, true );
+-		assertKeyDown( TAB, true, 2, true );
+-		assertKeyDown( TAB, true, 1, true );
+-		assertKeyDown( TAB, true, 0, true );
+-		assertKeyDown( SPACE, false, 0, false );
+-	} );
+-
+-	it( 'should navigate by keypresses and stop at edges', () => {
+-		let currentIndex = 0;
+-		const { container } = render(
+-			/*
+-				Disabled because of our rule restricting literal IDs, preferring
+-				`withInstanceId`. In this case, it's fine to use literal IDs.
+-			*/
+-			/* eslint-disable no-restricted-syntax */
+-			<TabbableContainer
+-				cycle={ false }
+-				className="wrapper"
+-				onNavigate={ ( index ) => ( currentIndex = index ) }
+-			>
+-				<div className="section" id="section1" tabIndex="0">
+-					Section One
+-				</div>
+-				<div className="section" id="section2" tabIndex="0">
+-					Section Two
+-				</div>
+-				<div className="section" id="section3" tabIndex="0">
+-					Section Three
+-				</div>
+-			</TabbableContainer>
+-			/* eslint-enable no-restricted-syntax */
+-		);
+-
+-		simulateVisible( container, '*' );
+-
+-		container.querySelector( '#section1' ).focus();
+-
+-		// Navigate options.
+-		function assertKeyDown(
+-			keyCode,
+-			shiftKey,
+-			expectedActiveIndex,
+-			expectedStop
+-		) {
+-			const interaction = fireKeyDown(
+-				container.querySelector( '.wrapper' ),
+-				keyCode,
+-				shiftKey
+-			);
+-			expect( currentIndex ).toBe( expectedActiveIndex );
+-			expect( interaction.stopped ).toBe( expectedStop );
+-		}
+-
+-		assertKeyDown( TAB, false, 1, true );
+-		assertKeyDown( TAB, false, 2, true );
+-		assertKeyDown( TAB, false, 2, true );
+-		assertKeyDown( TAB, true, 1, true );
+-		assertKeyDown( TAB, true, 0, true );
+-		assertKeyDown( TAB, true, 0, true );
+-		assertKeyDown( SPACE, false, 0, false );
+-	} );
+-} );

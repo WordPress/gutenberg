@@ -1,0 +1,13 @@
+diff --git a/packages/widgets/src/blocks/legacy-widget/editor.scss b/packages/widgets/src/blocks/legacy-widget/editor.scss
+index f8bb798d9dfda6..34dde5aba6c8d7 100644
+--- a/packages/widgets/src/blocks/legacy-widget/editor.scss
++++ b/packages/widgets/src/blocks/legacy-widget/editor.scss
+@@ -95,7 +95,7 @@
+ 
+ .wp-block-legacy-widget__edit-preview,
+ .wp-block-legacy-widget__edit-no-preview {
+-	cursor: pointer;
++	cursor: var(--wpds-cursor-control);
+ 
+ 	&:hover::after {
+ 		border-radius: $radius-small;

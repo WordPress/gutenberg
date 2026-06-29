@@ -1,0 +1,234 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d2da776b33961b..d6398cfd61efc3 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ -   `FontSizePicker`: Fix excessive margin between label and input ([#43304](https://github.com/WordPress/gutenberg/pull/43304)).
+ -   Ensure all dependencies allow version ranges ([#43355](https://github.com/WordPress/gutenberg/pull/43355)).
+ -   `Popover`: make sure offset middleware always applies the latest frame offset values ([#43329](https://github.com/WordPress/gutenberg/pull/43329/)).
++-   `Dropdown`: anchor popover to the dropdown wrapper (instead of the toggle) ([#43377](https://github.com/WordPress/gutenberg/pull/43377/)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/custom-gradient-bar/control-points.js b/packages/components/src/custom-gradient-bar/control-points.js
+index 44e31ef4f784ff..f617e067b19e0c 100644
+--- a/packages/components/src/custom-gradient-bar/control-points.js
++++ b/packages/components/src/custom-gradient-bar/control-points.js
+@@ -59,10 +59,6 @@ function ControlPointButton( { isOpen, position, color, ...additionalProps } ) {
+ 						'is-active': isOpen,
+ 					}
+ 				) }
+-				style={ {
+-					left: `${ position }%`,
+-					transform: 'translateX( -50% )',
+-				} }
+ 				{ ...additionalProps }
+ 			/>
+ 			<VisuallyHidden id={ descriptionId }>
+@@ -74,7 +70,11 @@ function ControlPointButton( { isOpen, position, color, ...additionalProps } ) {
+ 	);
+ }
+ 
+-function GradientColorPickerDropdown( { isRenderedInSidebar, ...props } ) {
++function GradientColorPickerDropdown( {
++	isRenderedInSidebar,
++	className,
++	...props
++} ) {
+ 	// Open the popover below the gradient control/insertion point
+ 	const popoverProps = useMemo(
+ 		() => ( {
+@@ -84,10 +84,16 @@ function GradientColorPickerDropdown( { isRenderedInSidebar, ...props } ) {
+ 		[]
+ 	);
+ 
++	const mergedClassName = classnames(
++		'components-custom-gradient-picker__control-point-dropdown',
++		className
++	);
++
+ 	return (
+ 		<CustomColorPickerDropdown
+ 			isRenderedInSidebar={ isRenderedInSidebar }
+ 			popoverProps={ popoverProps }
++			className={ mergedClassName }
+ 			{ ...props }
+ 		/>
+ 	);
+@@ -271,6 +277,10 @@ function ControlPoints( {
+ 							) }
+ 						</>
+ 					) }
++					style={ {
++						left: `${ point.position }%`,
++						transform: 'translateX( -50% )',
++					} }
+ 				/>
+ 			)
+ 		);
+@@ -307,16 +317,8 @@ function InsertPoint( {
+ 						}
+ 						onToggle();
+ 					} }
+-					className="components-custom-gradient-picker__insert-point"
++					className="components-custom-gradient-picker__insert-point-dropdown"
+ 					icon={ plus }
+-					style={
+-						insertPosition !== null
+-							? {
+-									left: `${ insertPosition }%`,
+-									transform: 'translateX( -50% )',
+-							  }
+-							: undefined
+-					}
+ 				/>
+ 			) }
+ 			renderContent={ () => (
+@@ -344,6 +346,14 @@ function InsertPoint( {
+ 					} }
+ 				/>
+ 			) }
++			style={
++				insertPosition !== null
++					? {
++							left: `${ insertPosition }%`,
++							transform: 'translateX( -50% )',
++					  }
++					: undefined
++			}
+ 		/>
+ 	);
+ }
+diff --git a/packages/components/src/custom-gradient-picker/style.scss b/packages/components/src/custom-gradient-picker/style.scss
+index 2b62dfcf7debe0..4fb7826f4602e8 100644
+--- a/packages/components/src/custom-gradient-picker/style.scss
++++ b/packages/components/src/custom-gradient-picker/style.scss
+@@ -18,15 +18,27 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
+ 		margin-right: auto;
+ 	}
+ 
+-	.components-custom-gradient-picker__insert-point {
++	.components-custom-gradient-picker__control-point-dropdown {
++		position: absolute;
++		height: $grid-unit-20;
++		width: $grid-unit-20;
++		top: $components-custom-gradient-picker__padding;
++		// Trim any internal white spacing that would be cause d by inline positioned elements
++		display: flex;
++	}
++
++	.components-custom-gradient-picker__insert-point-dropdown {
++		position: relative;
++
++		// Same size as the .components-custom-gradient-picker__control-point-dropdown parent
++		height: inherit;
++		width: inherit;
++		min-width: $grid-unit-20;
+ 		border-radius: 50%;
++
+ 		background: $white;
+ 		padding: 2px;
+-		top: $components-custom-gradient-picker__padding;
+-		min-width: $grid-unit-20;
+-		width: $grid-unit-20;
+-		height: $grid-unit-20;
+-		position: relative;
++
+ 		color: $gray-900;
+ 
+ 		svg {
+@@ -36,12 +48,11 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
+ 	}
+ 
+ 	.components-custom-gradient-picker__control-point-button {
++		// Same size as the .components-custom-gradient-picker__control-point-dropdown parent
++		height: inherit;
++		width: inherit;
+ 		border-radius: 50%;
+-		height: $grid-unit-20;
+-		width: $grid-unit-20;
+ 		padding: 0;
+-		position: absolute;
+-		top: $components-custom-gradient-picker__padding;
+ 
+ 		// Shadow and stroke.
+ 		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $white, 0 0 $border-width-focus 0 rgba($black, 0.25);
+@@ -66,7 +77,6 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
+ .components-custom-gradient-picker__inserter {
+ 	/*rtl:ignore*/
+ 	direction: ltr;
+-	width: 100%;
+ }
+ 
+ .components-custom-gradient-picker__liner-gradient-indicator {
+diff --git a/packages/components/src/dropdown-menu/stories/index.js b/packages/components/src/dropdown-menu/stories/index.js
+index a8a7769d522d3b..c70ef559387644 100644
+--- a/packages/components/src/dropdown-menu/stories/index.js
++++ b/packages/components/src/dropdown-menu/stories/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { text } from '@storybook/addon-knobs';
++import { text, boolean } from '@storybook/addon-knobs';
+ 
+ /**
+  * Internal dependencies
+@@ -25,6 +25,10 @@ export const _default = () => {
+ 	const label = text( 'Label', 'Select a direction.' );
+ 	const firstMenuItemLabel = text( 'First Menu Item Label', 'Up' );
+ 	const secondMenuItemLabel = text( 'First Menu Item Label', 'Down' );
++	const toggleButtonTootip = boolean(
++		'Show tooltip on a toggle button',
++		true
++	);
+ 
+ 	const controls = [
+ 		{
+@@ -37,5 +41,12 @@ export const _default = () => {
+ 		},
+ 	];
+ 
+-	return <DropdownMenu icon={ menu } label={ label } controls={ controls } />;
++	return (
++		<DropdownMenu
++			icon={ menu }
++			label={ label }
++			controls={ controls }
++			toggleProps={ { showTooltip: toggleButtonTootip } }
++		/>
++	);
+ };
+diff --git a/packages/components/src/dropdown/index.js b/packages/components/src/dropdown/index.js
+index 3e152cf6e7fe1f..c260d27ffee7df 100644
+--- a/packages/components/src/dropdown/index.js
++++ b/packages/components/src/dropdown/index.js
+@@ -40,6 +40,7 @@ export default function Dropdown( props ) {
+ 		popoverProps,
+ 		onClose,
+ 		onToggle,
++		style,
+ 	} = props;
+ 	const containerRef = useRef();
+ 	const [ isOpen, setIsOpen ] = useObservableState( false, onToggle );
+@@ -95,6 +96,7 @@ export default function Dropdown( props ) {
+ 			// clicked. Making this div focusable ensures such UAs will focus
+ 			// it and `closeIfFocusOutside` can tell if the toggle was clicked.
+ 			tabIndex="-1"
++			style={ style }
+ 		>
+ 			{ renderToggle( args ) }
+ 			{ isOpen && (
+@@ -108,11 +110,7 @@ export default function Dropdown( props ) {
+ 					// This value is used to ensure that the dropdowns
+ 					// align with the editor header by default.
+ 					offset={ 13 }
+-					anchorRef={
+-						! hasAnchorRef
+-							? containerRef?.current?.firstChild // Anchor to the rendered toggle.
+-							: undefined
+-					}
++					anchorRef={ ! hasAnchorRef ? containerRef : undefined }
+ 					{ ...popoverProps }
+ 					className={ classnames(
+ 						'components-dropdown__content',

@@ -1,0 +1,22 @@
+diff --git a/packages/components/src/combobox-control/README.md b/packages/components/src/combobox-control/README.md
+index 183ec98069d22a..e0d5a71ab14152 100644
+--- a/packages/components/src/combobox-control/README.md
++++ b/packages/components/src/combobox-control/README.md
+@@ -21,7 +21,7 @@ These are the same as [the ones for `SelectControl`s](/packages/components/src/s
+  * WordPress dependencies
+  */
+ import { ComboboxControl } from '@wordpress/components';
+-import { useState } from '@wordpress/compose';
++import { useState } from '@wordpress/element';
+ 
+ const options = [
+ 	{
+@@ -51,7 +51,7 @@ function MyComboboxControl() {
+ 			value={ fontSize }
+ 			onChange={ setFontSize }
+ 			options={ filteredOptions }
+-			onInputChange={ ( inputValue ) =>
++			onFilterValueChange={ ( inputValue ) =>
+ 				setFilteredOptions(
+ 					options.filter( ( option ) =>
+ 						option.label

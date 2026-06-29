@@ -1,0 +1,237 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index cbb12e0146b55c..9a3beb03423964 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,7 +12,6 @@
+ 
+ ### Internal
+ 
+--   `DropdownMenuV2`: add support for rendering in legacy popover slot ([#56342](https://github.com/WordPress/gutenberg/pull/56342)).
+ -   `Slot`: add `style` prop to `bubblesVirtually` version ([#56428](https://github.com/WordPress/gutenberg/pull/56428))
+ 
+ ## 25.12.0 (2023-11-16)
+diff --git a/packages/components/src/dropdown-menu-v2-ariakit/index.tsx b/packages/components/src/dropdown-menu-v2-ariakit/index.tsx
+index b992c7b4c7b5a9..10b93d8c552c13 100644
+--- a/packages/components/src/dropdown-menu-v2-ariakit/index.tsx
++++ b/packages/components/src/dropdown-menu-v2-ariakit/index.tsx
+@@ -26,11 +26,6 @@ import { SVG, Circle } from '@wordpress/primitives';
+ import { useContextSystem, contextConnect } from '../context';
+ import type { WordPressComponentProps } from '../context';
+ import Icon from '../icon';
+-import { useSlot } from '../slot-fill';
+-import {
+-	SLOT_NAME as POPOVER_DEFAULT_SLOT_NAME,
+-	slotNameContext,
+-} from '../popover';
+ import type {
+ 	DropdownMenuContext as DropdownMenuContextType,
+ 	DropdownMenuProps,
+@@ -187,9 +182,6 @@ const UnconnectedDropdownMenu = (
+ 		shift,
+ 		modal = true,
+ 
+-		// Other props
+-		slotName: slotNameProp = POPOVER_DEFAULT_SLOT_NAME,
+-
+ 		// From internal components context
+ 		variant,
+ 
+@@ -278,11 +270,6 @@ const UnconnectedDropdownMenu = (
+ 		[ computedDirection ]
+ 	);
+ 
+-	// Render the portal in the default slot used by the legacy Popover component.
+-	const slotName = useContext( slotNameContext ) || slotNameProp;
+-	const slot = useSlot( slotName );
+-	const portalContainer = slot.ref?.current;
+-
+ 	return (
+ 		<>
+ 			{ /* Menu trigger */ }
+@@ -318,7 +305,6 @@ const UnconnectedDropdownMenu = (
+ 				wrapperProps={ wrapperProps }
+ 				hideOnEscape={ hideOnEscape }
+ 				unmountOnHide
+-				portalElement={ portalContainer }
+ 			>
+ 				<DropdownMenuContext.Provider value={ contextValue }>
+ 					{ children }
+diff --git a/packages/components/src/dropdown-menu-v2-ariakit/stories/index.story.tsx b/packages/components/src/dropdown-menu-v2-ariakit/stories/index.story.tsx
+index 147de3861b1601..a6319c6cfdc932 100644
+--- a/packages/components/src/dropdown-menu-v2-ariakit/stories/index.story.tsx
++++ b/packages/components/src/dropdown-menu-v2-ariakit/stories/index.story.tsx
+@@ -28,7 +28,6 @@ import {
+ import Icon from '../../icon';
+ import Button from '../../button';
+ import Modal from '../../modal';
+-import Popover from '../../popover';
+ import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
+ import { ContextSystemProvider } from '../../context';
+ 
+@@ -502,68 +501,3 @@ InsideModal.parameters = {
+ 		source: { type: 'code' },
+ 	},
+ };
+-
+-export const WithDefaultSlotFill: StoryFn< typeof DropdownMenu > = (
+-	props
+-) => (
+-	<SlotFillProvider>
+-		{ /* @ts-expect-error Slot is not currently typed on Popover */ }
+-		<Popover.Slot />
+-		<DropdownMenu { ...props }>
+-			<DropdownMenuItem>Top level item</DropdownMenuItem>
+-			<DropdownMenu
+-				trigger={ <DropdownMenuItem>Open submenu</DropdownMenuItem> }
+-			>
+-				<DropdownMenuItem>Nested item</DropdownMenuItem>
+-			</DropdownMenu>
+-		</DropdownMenu>
+-	</SlotFillProvider>
+-);
+-WithDefaultSlotFill.args = {
+-	...Default.args,
+-};
+-
+-export const WithNamedSlotFill: StoryFn< typeof DropdownMenu > = ( props ) => (
+-	<SlotFillProvider>
+-		{ /* @ts-expect-error Slot is not currently typed on Popover */ }
+-		<Popover.Slot name="dropdown-menu-slot-with-name" />
+-		<DropdownMenu { ...props }>
+-			<DropdownMenuItem>Top level item</DropdownMenuItem>
+-			<DropdownMenu
+-				trigger={ <DropdownMenuItem>Open submenu</DropdownMenuItem> }
+-			>
+-				<DropdownMenuItem>Nested item</DropdownMenuItem>
+-			</DropdownMenu>
+-		</DropdownMenu>
+-	</SlotFillProvider>
+-);
+-WithNamedSlotFill.args = {
+-	...Default.args,
+-	slotName: 'dropdown-menu-slot-with-name',
+-};
+-
+-// @ts-expect-error __unstableSlotNameProvider is not currently typed on Popover
+-const SlotNameProvider = Popover.__unstableSlotNameProvider;
+-export const WithSlotFillViaContext: StoryFn< typeof DropdownMenu > = (
+-	props
+-) => (
+-	<SlotFillProvider>
+-		<SlotNameProvider value="dropdown-menu-slot-via-context">
+-			{ /* @ts-expect-error Slot is not currently typed on Popover */ }
+-			<Popover.Slot name="dropdown-menu-slot-via-context" />
+-			<DropdownMenu { ...props }>
+-				<DropdownMenuItem>Top level item</DropdownMenuItem>
+-				<DropdownMenu
+-					trigger={
+-						<DropdownMenuItem>Open submenu</DropdownMenuItem>
+-					}
+-				>
+-					<DropdownMenuItem>Nested item</DropdownMenuItem>
+-				</DropdownMenu>
+-			</DropdownMenu>
+-		</SlotNameProvider>
+-	</SlotFillProvider>
+-);
+-WithSlotFillViaContext.args = {
+-	...Default.args,
+-};
+diff --git a/packages/components/src/dropdown-menu-v2-ariakit/types.ts b/packages/components/src/dropdown-menu-v2-ariakit/types.ts
+index 64c7134d62bfff..27d3b1e8c43393 100644
+--- a/packages/components/src/dropdown-menu-v2-ariakit/types.ts
++++ b/packages/components/src/dropdown-menu-v2-ariakit/types.ts
+@@ -79,13 +79,6 @@ export interface DropdownMenuProps {
+ 		| ( (
+ 				event: KeyboardEvent | React.KeyboardEvent< Element >
+ 		  ) => boolean );
+-	/**
+-	 * The name of the Slot in which the popover should be rendered. It should
+-	 * be also passed to the corresponding `PopoverSlot` component.
+-	 *
+-	 * @default 'Popover'
+-	 */
+-	slotName?: string;
+ }
+ 
+ export interface DropdownMenuGroupProps {
+diff --git a/packages/components/src/dropdown-menu/stories/index.story.tsx b/packages/components/src/dropdown-menu/stories/index.story.tsx
+index e94b5199b2537a..d4b856380db92a 100644
+--- a/packages/components/src/dropdown-menu/stories/index.story.tsx
++++ b/packages/components/src/dropdown-menu/stories/index.story.tsx
+@@ -9,8 +9,6 @@ import type { Meta, StoryFn } from '@storybook/react';
+ import { DropdownMenu } from '..';
+ import MenuItem from '../../menu-item';
+ import MenuGroup from '../../menu-group';
+-import Popover from '../../popover';
+-import { Provider as SlotFillProvider } from '../../slot-fill';
+ 
+ /**
+  * WordPress dependencies
+@@ -118,53 +116,3 @@ WithChildren.args = {
+ 		</>
+ 	),
+ };
+-
+-export const WithDefaultSlotFill: StoryFn< typeof DropdownMenu > = (
+-	props
+-) => (
+-	<SlotFillProvider>
+-		<div style={ { height: 150 } }>
+-			{ /* @ts-expect-error Slot is not currently typed on Popover */ }
+-			<Popover.Slot />
+-			<DropdownMenu { ...props } />
+-		</div>
+-	</SlotFillProvider>
+-);
+-WithDefaultSlotFill.args = {
+-	...Default.args,
+-};
+-
+-export const WithNamedSlotFill: StoryFn< typeof DropdownMenu > = ( props ) => (
+-	<SlotFillProvider>
+-		<div style={ { height: 150 } }>
+-			{ /* @ts-expect-error Slot is not currently typed on Popover */ }
+-			<Popover.Slot name="dropdown-menu-slot-with-name" />
+-			<DropdownMenu { ...props } />
+-		</div>
+-	</SlotFillProvider>
+-);
+-WithNamedSlotFill.args = {
+-	...Default.args,
+-	popoverProps: {
+-		__unstableSlotName: 'dropdown-menu-slot-with-name',
+-	},
+-};
+-
+-// @ts-expect-error __unstableSlotNameProvider is not currently typed on Popover
+-const SlotNameProvider = Popover.__unstableSlotNameProvider;
+-export const WithSlotFillViaContext: StoryFn< typeof DropdownMenu > = (
+-	props
+-) => (
+-	<SlotFillProvider>
+-		<SlotNameProvider value="dropdown-menu-slot-via-context">
+-			{ /* @ts-expect-error Slot is not currently typed on Popover */ }
+-			<Popover.Slot name="dropdown-menu-slot-via-context" />
+-			<div style={ { height: 150 } }>
+-				<DropdownMenu { ...props } />
+-			</div>
+-		</SlotNameProvider>
+-	</SlotFillProvider>
+-);
+-WithSlotFillViaContext.args = {
+-	...Default.args,
+-};
+diff --git a/packages/components/src/popover/index.tsx b/packages/components/src/popover/index.tsx
+index ff67b65cf5b0de..709d4b9884b5ec 100644
+--- a/packages/components/src/popover/index.tsx
++++ b/packages/components/src/popover/index.tsx
+@@ -97,7 +97,7 @@ const ArrowTriangle = () => (
+ 	</SVG>
+ );
+ 
+-export const slotNameContext = createContext< string | undefined >( undefined );
++const slotNameContext = createContext< string | undefined >( undefined );
+ 
+ const fallbackContainerClassname = 'components-popover__fallback-container';
+ const getPopoverFallbackContainer = () => {

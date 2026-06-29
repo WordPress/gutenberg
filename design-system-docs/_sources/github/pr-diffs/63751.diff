@@ -1,0 +1,673 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 327f80ba2468ed..7cef1112b6a7c9 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,10 @@
+ -   `ColorPalette`: Remove extra bottom margin when `CircularOptionPicker` is unneeded ([#63961](https://github.com/WordPress/gutenberg/pull/63961)).
+ -   `CustomSelectControl`: Restore `describedBy` functionality ([#63957](https://github.com/WordPress/gutenberg/pull/63957)).
+ 
++### Enhancements
++
++-   `RadioControl`: add support for option help text ([#63751](https://github.com/WordPress/gutenberg/pull/63751)).
++
+ ### Internal
+ 
+ -   `DropdownMenuV2`: break menu item help text on multiple lines for better truncation. ([#63916](https://github.com/WordPress/gutenberg/pull/63916)).
+diff --git a/packages/components/src/radio-control/index.tsx b/packages/components/src/radio-control/index.tsx
+index 2a6f8e37cc8cb5..c574e5af539def 100644
+--- a/packages/components/src/radio-control/index.tsx
++++ b/packages/components/src/radio-control/index.tsx
+@@ -16,6 +16,16 @@ import BaseControl from '../base-control';
+ import type { WordPressComponentProps } from '../context';
+ import type { RadioControlProps } from './types';
+ import { VStack } from '../v-stack';
++import { useBaseControlProps } from '../base-control/hooks';
++import { StyledHelp } from '../base-control/styles/base-control-styles';
++
++function generateOptionDescriptionId( radioGroupId: string, index: number ) {
++	return `${ radioGroupId }-${ index }-option-description`;
++}
++
++function generateOptionId( radioGroupId: string, index: number ) {
++	return `${ radioGroupId }-${ index }`;
++}
+ 
+ /**
+  * Render a user interface to select the user type using radio inputs.
+@@ -53,13 +63,23 @@ export function RadioControl(
+ 		onChange,
+ 		hideLabelFromVision,
+ 		options = [],
++		id: preferredId,
+ 		...additionalProps
+ 	} = props;
+-	const instanceId = useInstanceId( RadioControl );
+-	const id = `inspector-radio-control-${ instanceId }`;
++	const id = useInstanceId(
++		RadioControl,
++		'inspector-radio-control',
++		preferredId
++	);
++
+ 	const onChangeValue = ( event: ChangeEvent< HTMLInputElement > ) =>
+ 		onChange( event.target.value );
+ 
++	// Use `useBaseControlProps` to get the id of the help text.
++	const {
++		controlProps: { 'aria-describedby': helpTextId },
++	} = useBaseControlProps( { id, help } );
++
+ 	if ( ! options?.length ) {
+ 		return null;
+ 	}
+@@ -73,14 +93,19 @@ export function RadioControl(
+ 			help={ help }
+ 			className={ clsx( className, 'components-radio-control' ) }
+ 		>
+-			<VStack spacing={ 2 }>
++			<VStack
++				spacing={ 3 }
++				className={ clsx( 'components-radio-control__group-wrapper', {
++					'has-help': !! help,
++				} ) }
++			>
+ 				{ options.map( ( option, index ) => (
+ 					<div
+-						key={ `${ id }-${ index }` }
++						key={ generateOptionId( id, index ) }
+ 						className="components-radio-control__option"
+ 					>
+ 						<input
+-							id={ `${ id }-${ index }` }
++							id={ generateOptionId( id, index ) }
+ 							className="components-radio-control__input"
+ 							type="radio"
+ 							name={ id }
+@@ -88,16 +113,32 @@ export function RadioControl(
+ 							onChange={ onChangeValue }
+ 							checked={ option.value === selected }
+ 							aria-describedby={
+-								!! help ? `${ id }__help` : undefined
++								clsx( [
++									!! option.description &&
++										generateOptionDescriptionId(
++											id,
++											index
++										),
++									helpTextId,
++								] ) || undefined
+ 							}
+ 							{ ...additionalProps }
+ 						/>
+ 						<label
+ 							className="components-radio-control__label"
+-							htmlFor={ `${ id }-${ index }` }
++							htmlFor={ generateOptionId( id, index ) }
+ 						>
+ 							{ option.label }
+ 						</label>
++						{ !! option.description ? (
++							<StyledHelp
++								__nextHasNoMarginBottom
++								id={ generateOptionDescriptionId( id, index ) }
++								className="components-radio-control__option-description"
++							>
++								{ option.description }
++							</StyledHelp>
++						) : null }
+ 					</div>
+ 				) ) }
+ 			</VStack>
+diff --git a/packages/components/src/radio-control/stories/index.story.tsx b/packages/components/src/radio-control/stories/index.story.tsx
+index 7be398e77e17c7..dae00e57962f47 100644
+--- a/packages/components/src/radio-control/stories/index.story.tsx
++++ b/packages/components/src/radio-control/stories/index.story.tsx
+@@ -68,3 +68,26 @@ Default.args = {
+ 		{ label: 'Password Protected', value: 'password' },
+ 	],
+ };
++
++export const WithOptionDescriptions: StoryFn< typeof RadioControl > =
++	Template.bind( {} );
++WithOptionDescriptions.args = {
++	...Default.args,
++	options: [
++		{
++			label: 'Public',
++			value: 'public',
++			description: 'Visible to everyone',
++		},
++		{
++			label: 'Private',
++			value: 'private',
++			description: 'Only visible to you',
++		},
++		{
++			label: 'Password Protected',
++			value: 'password',
++			description: 'Protected by a password',
++		},
++	],
++};
+diff --git a/packages/components/src/radio-control/style.scss b/packages/components/src/radio-control/style.scss
+index a3d4abeb630d0d..7444ea1343b842 100644
+--- a/packages/components/src/radio-control/style.scss
++++ b/packages/components/src/radio-control/style.scss
+@@ -1,13 +1,23 @@
++.components-radio-control__group-wrapper.has-help {
++	margin-block-end: $grid-unit-15;
++}
++
+ .components-radio-control__option {
+-	display: flex;
++	display: grid;
++	grid-template-columns: auto 1fr;
++	grid-template-rows: auto minmax(0, max-content);
++	column-gap: $grid-unit-10;
+ 	align-items: center;
+ }
+ 
+ .components-radio-control__input[type="radio"] {
++	grid-column: 1;
++	grid-row: 1;
++
+ 	@include radio-control;
+ 
+ 	display: inline-flex;
+-	margin: 0 $grid-unit-10 0 0;
++	margin: 0;
+ 	padding: 0;
+ 	appearance: none;
+ 	cursor: pointer;
+@@ -28,6 +38,9 @@
+ }
+ 
+ .components-radio-control__label {
++	grid-column: 2;
++	grid-row: 1;
++
+ 	cursor: pointer;
+ 	line-height: $radio-input-size-sm;
+ 
+@@ -35,3 +48,14 @@
+ 		line-height: $radio-input-size;
+ 	}
+ }
++
++.components-radio-control__option-description {
++	grid-column: 2;
++	grid-row: 2;
++
++	padding-block-start: $grid-unit-05;
++
++	// Override the top margin of the StyledHelp component from BaseControl.
++	// TODO: we should tweak the StyledHelp component to not have a top margin.
++	margin-top: 0;
++}
+diff --git a/packages/components/src/radio-control/test/index.tsx b/packages/components/src/radio-control/test/index.tsx
+new file mode 100644
+index 00000000000000..0be166513a9a4d
+--- /dev/null
++++ b/packages/components/src/radio-control/test/index.tsx
+@@ -0,0 +1,274 @@
++/**
++ * External dependencies
++ */
++import { render, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import RadioControl from '../';
++
++const ControlledRadioControl = ( {
++	...props
++}: React.ComponentProps< typeof RadioControl > ) => {
++	const [ option, setOption ] = useState( props.selected );
++
++	return (
++		<RadioControl
++			{ ...props }
++			onChange={ ( newValue ) => {
++				setOption( newValue );
++				props.onChange?.( newValue );
++			} }
++			selected={ option }
++		/>
++	);
++};
++
++const defaultProps = {
++	options: [
++		{ label: 'Mouse', value: 'mouse' },
++		{ label: 'Cat', value: 'cat' },
++		{ label: 'Dog', value: 'dog' },
++	],
++	label: 'Animal',
++};
++
++const defaultPropsWithDescriptions = {
++	...defaultProps,
++	options: defaultProps.options.map( ( option, index ) => ( {
++		...option,
++		description: `This is the option number ${ index + 1 }.`,
++	} ) ),
++};
++
++describe.each( [
++	// TODO: `RadioControl` doesn't currently support uncontrolled mode.
++	// [ 'uncontrolled', RadioControl ],
++	[ 'controlled', ControlledRadioControl ],
++] )( 'RadioControl %s', ( ...modeAndComponent ) => {
++	const [ , Component ] = modeAndComponent;
++
++	describe( 'semantics and labelling', () => {
++		it( 'should render radio inputs with accessible labels', () => {
++			const onChangeSpy = jest.fn();
++			render(
++				<Component { ...defaultProps } onChange={ onChangeSpy } />
++			);
++
++			for ( const option of defaultProps.options ) {
++				const optionEl = screen.getByRole( 'radio', {
++					name: option.label,
++				} );
++				expect( optionEl ).toBeVisible();
++				expect( optionEl ).not.toBeChecked();
++			}
++		} );
++
++		it( 'should not select have a selected value when the `selected` prop does not match any available options', () => {
++			const onChangeSpy = jest.fn();
++			render(
++				<Component { ...defaultProps } onChange={ onChangeSpy } />
++			);
++
++			expect(
++				screen.queryByRole( 'radio', {
++					checked: true,
++				} )
++			).not.toBeInTheDocument();
++		} );
++
++		it( 'should render mutually exclusive radio inputs', () => {
++			const onChangeSpy = jest.fn();
++			render(
++				<Component
++					{ ...defaultProps }
++					onChange={ onChangeSpy }
++					selected={ defaultProps.options[ 1 ].value }
++				/>
++			);
++
++			expect(
++				screen.getByRole( 'radio', {
++					checked: true,
++				} )
++			).toHaveAccessibleName( defaultProps.options[ 1 ].label );
++		} );
++
++		it( 'should use the group help text to describe individual options', () => {
++			const onChangeSpy = jest.fn();
++			render(
++				<Component
++					{ ...defaultProps }
++					onChange={ onChangeSpy }
++					selected={ defaultProps.options[ 1 ].value }
++					help="Select your favorite animal."
++				/>
++			);
++
++			for ( const option of defaultProps.options ) {
++				expect(
++					screen.getByRole( 'radio', { name: option.label } )
++				).toHaveAccessibleDescription( 'Select your favorite animal.' );
++			}
++		} );
++
++		it( 'should use the option description text to describe individual options', () => {
++			const onChangeSpy = jest.fn();
++			render(
++				<Component
++					{ ...defaultPropsWithDescriptions }
++					onChange={ onChangeSpy }
++					selected={ defaultProps.options[ 1 ].value }
++				/>
++			);
++
++			let index = 1;
++			for ( const option of defaultProps.options ) {
++				expect(
++					screen.getByRole( 'radio', { name: option.label } )
++				).toHaveAccessibleDescription(
++					`This is the option number ${ index }.`
++				);
++				index += 1;
++			}
++		} );
++
++		it( 'should use both the option description text and the group help text to describe individual options', () => {
++			const onChangeSpy = jest.fn();
++			render(
++				<Component
++					{ ...defaultPropsWithDescriptions }
++					onChange={ onChangeSpy }
++					selected={ defaultProps.options[ 1 ].value }
++					help="Select your favorite animal"
++				/>
++			);
++
++			let index = 1;
++			for ( const option of defaultProps.options ) {
++				expect(
++					screen.getByRole( 'radio', { name: option.label } )
++				).toHaveAccessibleDescription(
++					`This is the option number ${ index }. Select your favorite animal`
++				);
++				index += 1;
++			}
++		} );
++	} );
++
++	describe( 'interaction', () => {
++		it( 'should select a new value when clicking on the radio input', async () => {
++			const user = userEvent.setup();
++			const onChangeSpy = jest.fn();
++			render(
++				<Component { ...defaultProps } onChange={ onChangeSpy } />
++			);
++
++			// Click on the third radio, make sure it's selected.
++			await user.click(
++				screen.getByRole( 'radio', {
++					name: defaultProps.options[ 2 ].label,
++				} )
++			);
++			expect(
++				screen.getByRole( 'radio', {
++					checked: true,
++				} )
++			).toHaveAccessibleName( defaultProps.options[ 2 ].label );
++
++			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
++			expect( onChangeSpy ).toHaveBeenLastCalledWith(
++				defaultProps.options[ 2 ].value
++			);
++		} );
++
++		it( 'should select a new value when clicking on the radio label', async () => {
++			const user = userEvent.setup();
++			const onChangeSpy = jest.fn();
++			render(
++				<Component { ...defaultProps } onChange={ onChangeSpy } />
++			);
++
++			// Click on the second radio's label, make sure it selects the associated radio.
++			await user.click(
++				screen.getByText( defaultProps.options[ 1 ].label )
++			);
++			expect(
++				screen.getByRole( 'radio', {
++					checked: true,
++				} )
++			).toHaveAccessibleName( defaultProps.options[ 1 ].label );
++
++			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
++			expect( onChangeSpy ).toHaveBeenLastCalledWith(
++				defaultProps.options[ 1 ].value
++			);
++		} );
++
++		it( 'should select a new value when using the arrow keys', async () => {
++			const user = userEvent.setup();
++			const onChangeSpy = jest.fn();
++			render(
++				<Component { ...defaultProps } onChange={ onChangeSpy } />
++			);
++
++			await user.tab();
++
++			expect(
++				screen.getByRole( 'radio', {
++					name: defaultProps.options[ 0 ].label,
++				} )
++			).toHaveFocus();
++
++			await user.keyboard( '{ArrowDown}' );
++
++			expect(
++				screen.getByRole( 'radio', {
++					checked: true,
++					name: defaultProps.options[ 1 ].label,
++				} )
++			).toHaveFocus();
++			expect( onChangeSpy ).toHaveBeenCalledTimes( 2 );
++			expect( onChangeSpy ).toHaveBeenLastCalledWith(
++				defaultProps.options[ 1 ].value
++			);
++
++			await user.keyboard( '{ArrowDown}' );
++			await user.keyboard( '{ArrowDown}' );
++
++			// The selection wrap around.
++			expect(
++				screen.getByRole( 'radio', {
++					checked: true,
++					name: defaultProps.options[ 0 ].label,
++				} )
++			).toHaveFocus();
++			// TODO: why called twice for every interaction?
++			expect( onChangeSpy ).toHaveBeenCalledTimes( 6 );
++			expect( onChangeSpy ).toHaveBeenLastCalledWith(
++				defaultProps.options[ 0 ].value
++			);
++
++			await user.keyboard( '{ArrowUp}' );
++
++			expect(
++				screen.getByRole( 'radio', {
++					checked: true,
++					name: defaultProps.options[ 2 ].label,
++				} )
++			).toHaveFocus();
++
++			expect( onChangeSpy ).toHaveBeenCalledTimes( 8 );
++			expect( onChangeSpy ).toHaveBeenLastCalledWith(
++				defaultProps.options[ 2 ].value
++			);
++		} );
++	} );
++} );
+diff --git a/packages/components/src/radio-control/types.ts b/packages/components/src/radio-control/types.ts
+index 43c5e147f028d9..d1c3aa40d96481 100644
+--- a/packages/components/src/radio-control/types.ts
++++ b/packages/components/src/radio-control/types.ts
+@@ -24,6 +24,10 @@ export type RadioControlProps = Pick<
+ 		 * The internal value compared against select and passed to onChange
+ 		 */
+ 		value: string;
++		/**
++		 * Optional help text to be shown in addition the label.
++		 */
++		description?: string;
+ 	}[];
+ 	/**
+ 	 * The value property of the currently selected option.
+diff --git a/packages/editor/src/components/post-comments/index.js b/packages/editor/src/components/post-comments/index.js
+index c8fac57d00e09d..1d331811b46b26 100644
+--- a/packages/editor/src/components/post-comments/index.js
++++ b/packages/editor/src/components/post-comments/index.js
+@@ -4,7 +4,6 @@
+ import { __, _x } from '@wordpress/i18n';
+ import {
+ 	RadioControl,
+-	__experimentalText as Text,
+ 	__experimentalVStack as VStack,
+ } from '@wordpress/components';
+ import { useDispatch, useSelect } from '@wordpress/data';
+@@ -16,29 +15,17 @@ import { store as editorStore } from '../../store';
+ 
+ const COMMENT_OPTIONS = [
+ 	{
+-		label: (
+-			<>
+-				{ _x( 'Open', 'Adjective: e.g. "Comments are open"' ) }
+-				<Text variant="muted" size={ 12 }>
+-					{ __( 'Visitors can add new comments and replies.' ) }
+-				</Text>
+-			</>
+-		),
++		label: _x( 'Open', 'Adjective: e.g. "Comments are open"' ),
+ 		value: 'open',
++		description: __( 'Visitors can add new comments and replies.' ),
+ 	},
+ 	{
+-		label: (
+-			<>
+-				{ __( 'Closed' ) }
+-				<Text variant="muted" size={ 12 }>
+-					{ __( 'Visitors cannot add new comments or replies.' ) }
+-				</Text>
+-				<Text variant="muted" size={ 12 }>
+-					{ __( 'Existing comments remain visible.' ) }
+-				</Text>
+-			</>
+-		),
++		label: __( 'Closed' ),
+ 		value: 'closed',
++		description: [
++			__( 'Visitors cannot add new comments or replies.' ),
++			__( 'Existing comments remain visible.' ),
++		].join( ' ' ),
+ 	},
+ ];
+ 
+diff --git a/packages/editor/src/components/post-status/index.js b/packages/editor/src/components/post-status/index.js
+index 11b51bca80aa79..d0b5ac93977330 100644
+--- a/packages/editor/src/components/post-status/index.js
++++ b/packages/editor/src/components/post-status/index.js
+@@ -5,7 +5,6 @@ import {
+ 	Button,
+ 	CheckboxControl,
+ 	Dropdown,
+-	__experimentalText as Text,
+ 	__experimentalVStack as VStack,
+ 	TextControl,
+ 	RadioControl,
+@@ -49,59 +48,29 @@ const postStatusesInfo = {
+ 
+ export const STATUS_OPTIONS = [
+ 	{
+-		label: (
+-			<>
+-				{ __( 'Draft' ) }
+-				<Text variant="muted" size={ 12 }>
+-					{ __( 'Not ready to publish.' ) }
+-				</Text>
+-			</>
+-		),
++		label: __( 'Draft' ),
+ 		value: 'draft',
++		description: __( 'Not ready to publish.' ),
+ 	},
+ 	{
+-		label: (
+-			<>
+-				{ __( 'Pending' ) }
+-				<Text variant="muted" size={ 12 }>
+-					{ __( 'Waiting for review before publishing.' ) }
+-				</Text>
+-			</>
+-		),
++		label: __( 'Pending' ),
+ 		value: 'pending',
++		description: __( 'Waiting for review before publishing.' ),
+ 	},
+ 	{
+-		label: (
+-			<>
+-				{ __( 'Private' ) }
+-				<Text variant="muted" size={ 12 }>
+-					{ __( 'Only visible to site admins and editors.' ) }
+-				</Text>
+-			</>
+-		),
++		label: __( 'Private' ),
+ 		value: 'private',
++		description: __( 'Only visible to site admins and editors.' ),
+ 	},
+ 	{
+-		label: (
+-			<>
+-				{ __( 'Scheduled' ) }
+-				<Text variant="muted" size={ 12 }>
+-					{ __( 'Publish automatically on a chosen date.' ) }
+-				</Text>
+-			</>
+-		),
++		label: __( 'Scheduled' ),
+ 		value: 'future',
++		description: __( 'Publish automatically on a chosen date.' ),
+ 	},
+ 	{
+-		label: (
+-			<>
+-				{ __( 'Published' ) }
+-				<Text variant="muted" size={ 12 }>
+-					{ __( 'Visible to everyone.' ) }
+-				</Text>
+-			</>
+-		),
++		label: __( 'Published' ),
+ 		value: 'publish',
++		description: __( 'Visible to everyone.' ),
+ 	},
+ ];
+ 
+diff --git a/packages/editor/src/components/site-discussion/index.js b/packages/editor/src/components/site-discussion/index.js
+index b35ba9db476570..5b4d213148341d 100644
+--- a/packages/editor/src/components/site-discussion/index.js
++++ b/packages/editor/src/components/site-discussion/index.js
+@@ -23,29 +23,17 @@ import { store as editorStore } from '../../store';
+ 
+ const COMMENT_OPTIONS = [
+ 	{
+-		label: (
+-			<>
+-				{ _x( 'Open', 'Adjective: e.g. "Comments are open"' ) }
+-				<Text variant="muted" size={ 12 }>
+-					{ __( 'Visitors can add new comments and replies.' ) }
+-				</Text>
+-			</>
+-		),
++		label: _x( 'Open', 'Adjective: e.g. "Comments are open"' ),
+ 		value: 'open',
++		description: __( 'Visitors can add new comments and replies.' ),
+ 	},
+ 	{
+-		label: (
+-			<>
+-				{ __( 'Closed' ) }
+-				<Text variant="muted" size={ 12 }>
+-					{ __( 'Visitors cannot add new comments or replies.' ) }
+-				</Text>
+-				<Text variant="muted" size={ 12 }>
+-					{ __( 'Existing comments remain visible.' ) }
+-				</Text>
+-			</>
+-		),
++		label: __( 'Closed' ),
+ 		value: '',
++		description: [
++			__( 'Visitors cannot add new comments or replies.' ),
++			__( 'Existing comments remain visible.' ),
++		].join( ' ' ),
+ 	},
+ ];
+ 

@@ -1,0 +1,363 @@
+diff --git a/package-lock.json b/package-lock.json
+index 4ea4170f45c63b..9f944e4cc331ae 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -26,9 +26,9 @@
+ 				"@inquirer/prompts": "7.2.0",
+ 				"@octokit/rest": "16.26.0",
+ 				"@playwright/test": "1.57.0",
+-				"@testing-library/jest-dom": "^6.6.3",
+-				"@testing-library/react": "14.3.0",
+-				"@testing-library/user-event": "14.4.3",
++				"@testing-library/jest-dom": "6.9.1",
++				"@testing-library/react": "16.3.2",
++				"@testing-library/user-event": "14.6.1",
+ 				"@types/node": "^20.17.10",
+ 				"@types/prettier": "2.4.4",
+ 				"@types/react": "^18.3.27",
+@@ -17822,28 +17822,39 @@
+ 			"license": "MIT"
+ 		},
+ 		"node_modules/@testing-library/react": {
+-			"version": "14.3.0",
+-			"resolved": "https://registry.npmjs.org/@testing-library/react/-/react-14.3.0.tgz",
+-			"integrity": "sha512-AYJGvNFMbCa5vt1UtDCa/dcaABrXq8gph6VN+cffIx0UeA0qiGqS+sT60+sb+Gjc8tGXdECWYQgaF0khf8b+Lg==",
++			"version": "16.3.2",
++			"resolved": "https://registry.npmjs.org/@testing-library/react/-/react-16.3.2.tgz",
++			"integrity": "sha512-XU5/SytQM+ykqMnAnvB2umaJNIOsLF3PVv//1Ew4CTcpz0/BRyy/af40qqrt7SjKpDdT1saBMc42CUok5gaw+g==",
+ 			"dev": true,
++			"license": "MIT",
+ 			"dependencies": {
+-				"@babel/runtime": "^7.12.5",
+-				"@testing-library/dom": "^9.0.0",
+-				"@types/react-dom": "^18.0.0"
++				"@babel/runtime": "^7.12.5"
+ 			},
+ 			"engines": {
+-				"node": ">=14"
++				"node": ">=18"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^18.0.0",
+-				"react-dom": "^18.0.0"
++				"@testing-library/dom": "^10.0.0",
++				"@types/react": "^18.0.0 || ^19.0.0",
++				"@types/react-dom": "^18.0.0 || ^19.0.0",
++				"react": "^18.0.0 || ^19.0.0",
++				"react-dom": "^18.0.0 || ^19.0.0"
++			},
++			"peerDependenciesMeta": {
++				"@types/react": {
++					"optional": true
++				},
++				"@types/react-dom": {
++					"optional": true
++				}
+ 			}
+ 		},
+ 		"node_modules/@testing-library/user-event": {
+-			"version": "14.4.3",
+-			"resolved": "https://registry.npmjs.org/@testing-library/user-event/-/user-event-14.4.3.tgz",
+-			"integrity": "sha512-kCUc5MEwaEMakkO5x7aoD+DLi02ehmEM2QCGWvNqAS1dV/fAvORWEjnjsEIvml59M7Y5kCkWN6fCCyPOe8OL6Q==",
++			"version": "14.6.1",
++			"resolved": "https://registry.npmjs.org/@testing-library/user-event/-/user-event-14.6.1.tgz",
++			"integrity": "sha512-vq7fv0rnt+QTXgPxr5Hjc210p6YKq2kmdziLgnsZGgLJ9e6VAShx1pACLuRjd/AS/sr7phAR58OIIpf0LlmQNw==",
+ 			"dev": true,
++			"license": "MIT",
+ 			"engines": {
+ 				"node": ">=12",
+ 				"npm": ">=6"
+@@ -51205,20 +51216,6 @@
+ 				"storybook": "^10.0.0"
+ 			}
+ 		},
+-		"node_modules/storybook/node_modules/@testing-library/user-event": {
+-			"version": "14.6.1",
+-			"resolved": "https://registry.npmjs.org/@testing-library/user-event/-/user-event-14.6.1.tgz",
+-			"integrity": "sha512-vq7fv0rnt+QTXgPxr5Hjc210p6YKq2kmdziLgnsZGgLJ9e6VAShx1pACLuRjd/AS/sr7phAR58OIIpf0LlmQNw==",
+-			"dev": true,
+-			"license": "MIT",
+-			"engines": {
+-				"node": ">=12",
+-				"npm": ">=6"
+-			},
+-			"peerDependencies": {
+-				"@testing-library/dom": ">=7.21.4"
+-			}
+-		},
+ 		"node_modules/storybook/node_modules/bundle-name": {
+ 			"version": "4.1.0",
+ 			"resolved": "https://registry.npmjs.org/bundle-name/-/bundle-name-4.1.0.tgz",
+@@ -58116,7 +58113,7 @@
+ 				"@ariakit/test": "^0.4.7",
+ 				"@storybook/addon-docs": "^10.1.11",
+ 				"@storybook/react-vite": "^10.1.11",
+-				"@testing-library/jest-dom": "^6.6.3",
++				"@testing-library/jest-dom": "^6.9.1",
+ 				"@types/jest": "^29.5.14",
+ 				"@wordpress/jest-console": "file:../jest-console",
+ 				"snapshot-diff": "^0.10.0",
+@@ -59217,7 +59214,7 @@
+ 			"devDependencies": {
+ 				"@storybook/addon-docs": "^10.1.11",
+ 				"@storybook/react-vite": "^10.1.11",
+-				"@testing-library/jest-dom": "^6.6.3",
++				"@testing-library/jest-dom": "^6.9.1",
+ 				"@types/jest": "^29.5.14",
+ 				"esbuild": "^0.27.2",
+ 				"storybook": "^10.1.11"
+@@ -59887,7 +59884,7 @@
+ 				"memize": "^2.1.0"
+ 			},
+ 			"devDependencies": {
+-				"@testing-library/jest-dom": "^6.6.3",
++				"@testing-library/jest-dom": "^6.9.1",
+ 				"@types/jest": "^29.5.14"
+ 			},
+ 			"engines": {
+@@ -60089,7 +60086,7 @@
+ 				"jest-mock": "^29.6.2"
+ 			},
+ 			"devDependencies": {
+-				"@testing-library/jest-dom": "^6.6.3",
++				"@testing-library/jest-dom": "^6.9.1",
+ 				"@types/jest": "^29.5.14"
+ 			},
+ 			"engines": {
+@@ -60282,7 +60279,7 @@
+ 				"clsx": "2.1.1"
+ 			},
+ 			"devDependencies": {
+-				"@testing-library/jest-dom": "^6.6.3",
++				"@testing-library/jest-dom": "^6.9.1",
+ 				"@types/jest": "^29.5.14"
+ 			},
+ 			"engines": {
+@@ -62071,7 +62068,7 @@
+ 				"@terrazzo/cli": "^0.10.2",
+ 				"@terrazzo/plugin-css": "^0.10.2",
+ 				"@terrazzo/token-tools": "^0.10.2",
+-				"@testing-library/jest-dom": "^6.6.3",
++				"@testing-library/jest-dom": "^6.9.1",
+ 				"@types/jest": "^29.5.14",
+ 				"@types/node": "^20.17.10",
+ 				"esbuild": "^0.27.2",
+@@ -62132,7 +62129,7 @@
+ 			"devDependencies": {
+ 				"@storybook/addon-docs": "^10.1.11",
+ 				"@storybook/react-vite": "^10.1.11",
+-				"@testing-library/jest-dom": "^6.6.3",
++				"@testing-library/jest-dom": "^6.9.1",
+ 				"@types/jest": "^29.5.14",
+ 				"@types/node": "^20.17.10",
+ 				"storybook": "^10.1.11"
+diff --git a/package.json b/package.json
+index a5319feec07df7..1cc5d9fcfdffab 100644
+--- a/package.json
++++ b/package.json
+@@ -48,9 +48,9 @@
+ 		"@inquirer/prompts": "7.2.0",
+ 		"@octokit/rest": "16.26.0",
+ 		"@playwright/test": "1.57.0",
+-		"@testing-library/jest-dom": "^6.6.3",
+-		"@testing-library/react": "14.3.0",
+-		"@testing-library/user-event": "14.4.3",
++		"@testing-library/jest-dom": "6.9.1",
++		"@testing-library/react": "16.3.2",
++		"@testing-library/user-event": "14.6.1",
+ 		"@types/node": "^20.17.10",
+ 		"@types/prettier": "2.4.4",
+ 		"@types/react": "^18.3.27",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0012c14b6f64c8..7fb454e250df42 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -21,6 +21,7 @@
+ -   Expose `useDrag` from `@use-gesture/react` package via private API's ([#66735](https://github.com/WordPress/gutenberg/pull/66735)).
+ -   `Disabled`, `Modal`, `Popover`, `Tooltip`: Move context code to separate files to help docgen prop extraction ([#75316](https://github.com/WordPress/gutenberg/pull/75316)).
+ -   Update Emotion dependencies to ensure compatibility with React 19 ([#75324](https://github.com/WordPress/gutenberg/pull/75324)).
++-   Update Testing Library packages used in unit tests ([#75340](https://github.com/WordPress/gutenberg/pull/75340)).
+ 
+ ## 32.1.0 (2026-01-29)
+ 
+diff --git a/packages/components/package.json b/packages/components/package.json
+index e7b89a0aa157dd..5cd4d5c1407b47 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -105,7 +105,7 @@
+ 		"@ariakit/test": "^0.4.7",
+ 		"@storybook/addon-docs": "^10.1.11",
+ 		"@storybook/react-vite": "^10.1.11",
+-		"@testing-library/jest-dom": "^6.6.3",
++		"@testing-library/jest-dom": "^6.9.1",
+ 		"@types/jest": "^29.5.14",
+ 		"@wordpress/jest-console": "file:../jest-console",
+ 		"snapshot-diff": "^0.10.0",
+diff --git a/packages/components/src/radio-control/test/index.tsx b/packages/components/src/radio-control/test/index.tsx
+index 7e30744d96b826..46346a87b7ea16 100644
+--- a/packages/components/src/radio-control/test/index.tsx
++++ b/packages/components/src/radio-control/test/index.tsx
+@@ -238,7 +238,8 @@ describe.each( [
+ 					name: defaultProps.options[ 1 ].label,
+ 				} )
+ 			).toHaveFocus();
+-			expect( onChangeSpy ).toHaveBeenCalledTimes( 2 );
++
++			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
+ 			expect( onChangeSpy ).toHaveBeenLastCalledWith(
+ 				defaultProps.options[ 1 ].value
+ 			);
+@@ -253,8 +254,8 @@ describe.each( [
+ 					name: defaultProps.options[ 0 ].label,
+ 				} )
+ 			).toHaveFocus();
+-			// TODO: why called twice for every interaction?
+-			expect( onChangeSpy ).toHaveBeenCalledTimes( 6 );
++
++			expect( onChangeSpy ).toHaveBeenCalledTimes( 3 );
+ 			expect( onChangeSpy ).toHaveBeenLastCalledWith(
+ 				defaultProps.options[ 0 ].value
+ 			);
+@@ -268,7 +269,7 @@ describe.each( [
+ 				} )
+ 			).toHaveFocus();
+ 
+-			expect( onChangeSpy ).toHaveBeenCalledTimes( 8 );
++			expect( onChangeSpy ).toHaveBeenCalledTimes( 4 );
+ 			expect( onChangeSpy ).toHaveBeenLastCalledWith(
+ 				defaultProps.options[ 2 ].value
+ 			);
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index 1bd1ab61706297..d8aead1db5ad20 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -26,6 +26,7 @@
+ ### Internal
+ 
+ - DataForm: Use public `ColorPicker` component instead of internal `Picker` in color control. [#75394](https://github.com/WordPress/gutenberg/pull/75394)
++- Update Testing Library packages used in unit tests ([#75340](https://github.com/WordPress/gutenberg/pull/75340))
+ 
+ ## 11.3.0 (2026-01-29)
+ 
+diff --git a/packages/dataviews/package.json b/packages/dataviews/package.json
+index 7d698f5e289dc9..569ef7fa684e04 100644
+--- a/packages/dataviews/package.json
++++ b/packages/dataviews/package.json
+@@ -80,7 +80,7 @@
+ 	"devDependencies": {
+ 		"@storybook/addon-docs": "^10.1.11",
+ 		"@storybook/react-vite": "^10.1.11",
+-		"@testing-library/jest-dom": "^6.6.3",
++		"@testing-library/jest-dom": "^6.9.1",
+ 		"@types/jest": "^29.5.14",
+ 		"esbuild": "^0.27.2",
+ 		"storybook": "^10.1.11"
+diff --git a/packages/global-styles-engine/package.json b/packages/global-styles-engine/package.json
+index e8b1744deb71d7..baa02fd6203544 100644
+--- a/packages/global-styles-engine/package.json
++++ b/packages/global-styles-engine/package.json
+@@ -53,7 +53,7 @@
+ 		"memize": "^2.1.0"
+ 	},
+ 	"devDependencies": {
+-		"@testing-library/jest-dom": "^6.6.3",
++		"@testing-library/jest-dom": "^6.9.1",
+ 		"@types/jest": "^29.5.14"
+ 	},
+ 	"publishConfig": {
+diff --git a/packages/jest-console/package.json b/packages/jest-console/package.json
+index 10025dccc7f392..0fc68a73667698 100644
+--- a/packages/jest-console/package.json
++++ b/packages/jest-console/package.json
+@@ -45,7 +45,7 @@
+ 		"jest-mock": "^29.6.2"
+ 	},
+ 	"devDependencies": {
+-		"@testing-library/jest-dom": "^6.6.3",
++		"@testing-library/jest-dom": "^6.9.1",
+ 		"@types/jest": "^29.5.14"
+ 	},
+ 	"peerDependencies": {
+diff --git a/packages/media-fields/package.json b/packages/media-fields/package.json
+index 1555804442cd22..2ea2aa800793a7 100644
+--- a/packages/media-fields/package.json
++++ b/packages/media-fields/package.json
+@@ -64,7 +64,7 @@
+ 		"clsx": "2.1.1"
+ 	},
+ 	"devDependencies": {
+-		"@testing-library/jest-dom": "^6.6.3",
++		"@testing-library/jest-dom": "^6.9.1",
+ 		"@types/jest": "^29.5.14"
+ 	},
+ 	"peerDependencies": {
+diff --git a/packages/theme/package.json b/packages/theme/package.json
+index 01d28aa17e7995..31245cd25fdced 100644
+--- a/packages/theme/package.json
++++ b/packages/theme/package.json
+@@ -74,7 +74,7 @@
+ 		"@terrazzo/cli": "^0.10.2",
+ 		"@terrazzo/plugin-css": "^0.10.2",
+ 		"@terrazzo/token-tools": "^0.10.2",
+-		"@testing-library/jest-dom": "^6.6.3",
++		"@testing-library/jest-dom": "^6.9.1",
+ 		"@types/jest": "^29.5.14",
+ 		"@types/node": "^20.17.10",
+ 		"esbuild": "^0.27.2",
+diff --git a/packages/ui/package.json b/packages/ui/package.json
+index 71a6018176dc78..450386712b4f9a 100644
+--- a/packages/ui/package.json
++++ b/packages/ui/package.json
+@@ -58,7 +58,7 @@
+ 	"devDependencies": {
+ 		"@storybook/addon-docs": "^10.1.11",
+ 		"@storybook/react-vite": "^10.1.11",
+-		"@testing-library/jest-dom": "^6.6.3",
++		"@testing-library/jest-dom": "^6.9.1",
+ 		"@types/jest": "^29.5.14",
+ 		"@types/node": "^20.17.10",
+ 		"storybook": "^10.1.11"
+diff --git a/test/unit/config/global-mocks.js b/test/unit/config/global-mocks.js
+index 5a04f8cff351cf..4c05cdca5674a0 100644
+--- a/test/unit/config/global-mocks.js
++++ b/test/unit/config/global-mocks.js
+@@ -63,3 +63,39 @@ if ( ! global.TextEncoder ) {
+ // Override jsdom built-ins with native node implementation.
+ global.Blob = BlobPolyfill;
+ global.File = FilePolyfill;
++
++/**
++ * Mock `userEvent.setup()` to fix the `HTMLElement.prototype` properties
++ * that `@testing-library/user-event` makes non-writable, which breaks
++ * `@ariakit/test` and other code that tries to override `focus` and `blur`.
++ * @see https://github.com/testing-library/user-event/pull/1265
++ */
++jest.mock( '@testing-library/user-event', () => {
++	const actual = jest.requireActual( '@testing-library/user-event' );
++	const patchedUserEvent = {
++		...actual.userEvent,
++		setup( ...args ) {
++			const user = actual.userEvent.setup( ...args );
++			const { focus, blur } = global.HTMLElement.prototype;
++			Object.defineProperties( global.HTMLElement.prototype, {
++				focus: {
++					configurable: true,
++					value: focus,
++					writable: true,
++				},
++				blur: {
++					configurable: true,
++					value: blur,
++					writable: true,
++				},
++			} );
++			return user;
++		},
++	};
++	return {
++		...actual,
++		userEvent: patchedUserEvent,
++		default: patchedUserEvent,
++		__esModule: true,
++	};
++} );

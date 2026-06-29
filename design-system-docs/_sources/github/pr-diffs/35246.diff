@@ -1,0 +1,116 @@
+diff --git a/packages/components/src/tooltip/README.md b/packages/components/src/tooltip/README.md
+index 5bd7a4a276b03c..479240b5d05fff 100644
+--- a/packages/components/src/tooltip/README.md
++++ b/packages/components/src/tooltip/README.md
+@@ -46,6 +46,14 @@ The tooltip text to show on focus or hover.
+ -   Type: `String`
+ -   Required: No
+ 
++### delay (web only)
++
++Time in milliseconds to wait before showing tooltip after the tooltip's visibility is toggled. This prop is currently only available for the web platforms.
++
++-   Type: `Number`
++-   Required: No
++-   Default: 700
++
+ ### visible (native only)
+ 
+ Whether the tooltip should be displayed on initial render. This prop is currently only available for the native mobile app built with React Native.
+diff --git a/packages/components/src/tooltip/index.js b/packages/components/src/tooltip/index.js
+index 6ae8b56c95c200..c0a1373744d958 100644
+--- a/packages/components/src/tooltip/index.js
++++ b/packages/components/src/tooltip/index.js
+@@ -87,7 +87,13 @@ const emitToChild = ( children, eventName, event ) => {
+ 	}
+ };
+ 
+-function Tooltip( { children, position, text, shortcut } ) {
++function Tooltip( {
++	children,
++	position,
++	text,
++	shortcut,
++	delay = TOOLTIP_DELAY,
++} ) {
+ 	/**
+ 	 * Whether a mouse is currently pressed, used in determining whether
+ 	 * to handle a focus event as displaying the tooltip immediately.
+@@ -96,7 +102,7 @@ function Tooltip( { children, position, text, shortcut } ) {
+ 	 */
+ 	const [ isMouseDown, setIsMouseDown ] = useState( false );
+ 	const [ isOver, setIsOver ] = useState( false );
+-	const delayedSetIsOver = useDebounce( setIsOver, TOOLTIP_DELAY );
++	const delayedSetIsOver = useDebounce( setIsOver, delay );
+ 
+ 	const createMouseDown = ( event ) => {
+ 		// Preserve original child callback behavior
+diff --git a/packages/components/src/tooltip/stories/index.js b/packages/components/src/tooltip/stories/index.js
+index 8587aa18858a58..b121c09e7be506 100644
+--- a/packages/components/src/tooltip/stories/index.js
++++ b/packages/components/src/tooltip/stories/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { text, select } from '@storybook/addon-knobs';
++import { text, select, number } from '@storybook/addon-knobs';
+ 
+ /**
+  * Internal dependencies
+@@ -24,8 +24,9 @@ export const _default = () => {
+ 	};
+ 	const tooltipText = text( 'Text', 'More information' );
+ 	const position = select( 'Position', positionOptions, 'top center' );
++	const delay = number( 'Delay', 700 );
+ 	return (
+-		<Tooltip text={ tooltipText } position={ position }>
++		<Tooltip text={ tooltipText } position={ position } delay={ delay }>
+ 			<div
+ 				style={ {
+ 					margin: '50px auto',
+diff --git a/packages/components/src/tooltip/test/index.js b/packages/components/src/tooltip/test/index.js
+index b8906d952b2749..d3648904ef6586 100644
+--- a/packages/components/src/tooltip/test/index.js
++++ b/packages/components/src/tooltip/test/index.js
+@@ -152,6 +152,40 @@ describe( 'Tooltip', () => {
+ 			}, TOOLTIP_DELAY );
+ 		} );
+ 
++		it( 'should respect custom delay prop when showing popover', () => {
++			const originalMouseEnter = jest.fn();
++			jest.useFakeTimers();
++			const wrapper = mount(
++				<Tooltip text="Help text" delay={ 2000 }>
++					<button
++						onMouseEnter={ originalMouseEnter }
++						onFocus={ originalMouseEnter }
++					>
++						<span>Hover Me!</span>
++					</button>
++				</Tooltip>
++			);
++
++			const button = wrapper.find( 'button' );
++			button.simulate( 'mouseenter', { type: 'mouseenter' } );
++
++			const popoverBeforeTimeout = wrapper.find( 'Popover' );
++			expect( popoverBeforeTimeout ).toHaveLength( 0 );
++			expect( originalMouseEnter ).toHaveBeenCalledTimes( 1 );
++
++			// Popover does not yet exist after default delay, because custom delay is passed.
++			setTimeout( () => {
++				const popoverBetweenTimeout = wrapper.find( 'Popover' );
++				expect( popoverBetweenTimeout ).toHaveLength( 0 );
++			}, TOOLTIP_DELAY );
++
++			// Popover appears after custom delay.
++			setTimeout( () => {
++				const popoverAfterTimeout = wrapper.find( 'Popover' );
++				expect( popoverAfterTimeout ).toHaveLength( 1 );
++			}, 2000 );
++		} );
++
+ 		it( 'should show tooltip when an element is disabled', () => {
+ 			const wrapper = mount(
+ 				<Tooltip text="Show helpful text here">

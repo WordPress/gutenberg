@@ -1,0 +1,62 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 61fba6f264b52a..40bfc634e765ae 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,10 @@
+ 
+ -   `TextControl`: Add typings for `date`, `time` and `datetime-local` ([#59666](https://github.com/WordPress/gutenberg/pull/59666)).
+ 
++### Deprecation
++
++-   `isSmall` prop in `Button` component has been deprecated. Use `size="small"` prop instead ([#59734](https://github.com/WordPress/gutenberg/pull/59734)).
++
+ ### Internal
+ 
+ -   `Button`: Keep deprecated props in type definitions ([#59913](https://github.com/WordPress/gutenberg/pull/59913)).
+diff --git a/packages/components/src/button/test/index.tsx b/packages/components/src/button/test/index.tsx
+index 2b4a610c50bea0..9d8980e04c9313 100644
+--- a/packages/components/src/button/test/index.tsx
++++ b/packages/components/src/button/test/index.tsx
+@@ -43,7 +43,7 @@ describe( 'Button', () => {
+ 		} );
+ 
+ 		it( 'should render a button element with is-secondary and is-small class', () => {
+-			render( <Button variant="secondary" isSmall /> );
++			render( <Button variant="secondary" size="small" /> );
+ 			const button = screen.getByRole( 'button' );
+ 
+ 			expect( button ).toHaveClass( 'is-secondary' );
+diff --git a/packages/components/src/button/types.ts b/packages/components/src/button/types.ts
+index 447ad1de79e358..ce6db4b3e914bc 100644
+--- a/packages/components/src/button/types.ts
++++ b/packages/components/src/button/types.ts
+@@ -61,15 +61,6 @@ type BaseButtonProps = {
+ 	 * Renders a pressed button style.
+ 	 */
+ 	isPressed?: boolean;
+-	// TODO: Deprecate officially (add console warning and move to DeprecatedButtonProps).
+-	/**
+-	 * Decreases the size of the button.
+-	 *
+-	 * Deprecated in favor of the `size` prop. If both props are defined, the `size` prop will take precedence.
+-	 *
+-	 * @deprecated Use the `'small'` value on the `size` prop instead.
+-	 */
+-	isSmall?: boolean;
+ 	/**
+ 	 * Sets the `aria-label` of the component, if none is provided.
+ 	 * Sets the Tooltip content if `showTooltip` is provided.
+@@ -184,6 +175,13 @@ export type DeprecatedButtonProps = {
+ 	 * @ignore
+ 	 */
+ 	isTertiary?: boolean;
++	/**
++	 * Decreases the size of the button.
++	 *
++	 * @deprecated Use the `'small'` value on the `size` prop instead.
++	 * @ignore
++	 */
++	isSmall?: boolean;
+ };
+ 
+ export type DeprecatedIconButtonProps = {

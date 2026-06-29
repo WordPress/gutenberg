@@ -1,0 +1,436 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 799703d001b613..d5d8808b979920 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -3,11 +3,13 @@
+ ## Unreleased
+ 
+ ### Enhancements
++
+ -   `FontSizePicker`: Allow custom units for custom font size control ([#48468](https://github.com/WordPress/gutenberg/pull/48468)).
+ 
+ ### Internal
+ 
+ -   `Guide`: Convert to TypeScript ([#47493](https://github.com/WordPress/gutenberg/pull/47493)).
++-   `SelectControl`: improve prop types for single vs multiple selection ([#47390](https://github.com/WordPress/gutenberg/pull/47390)).
+ -   `PanelBody`: Convert to TypeScript ([#47702](https://github.com/WordPress/gutenberg/pull/47702)).
+ -   `withFallbackStyles` HOC: Convert to TypeScript ([#48720](https://github.com/WordPress/gutenberg/pull/48720)).
+ -   `navigateRegions` HOC: Convert to TypeScript ([#48632](https://github.com/WordPress/gutenberg/pull/48632)).
+diff --git a/packages/components/src/query-controls/author-select.tsx b/packages/components/src/query-controls/author-select.tsx
+index ebda05ffb9a365..cd4c6fd816c4cc 100644
+--- a/packages/components/src/query-controls/author-select.tsx
++++ b/packages/components/src/query-controls/author-select.tsx
+@@ -3,7 +3,6 @@
+  */
+ import { buildTermsTree } from './terms';
+ import TreeSelect from '../tree-select';
+-import type { TreeSelectProps } from '../tree-select/types';
+ import type { AuthorSelectProps } from './types';
+ 
+ export default function AuthorSelect( {
+@@ -20,11 +19,7 @@ export default function AuthorSelect( {
+ 			{ ...{
+ 				label,
+ 				noOptionLabel,
+-				// Since the `multiple` attribute is not passed to `TreeSelect`, it is
+-				// safe to assume that the argument of `onChange` cannot be `string[]`.
+-				// The correct solution would be to type `SelectControl` better, so that
+-				// the type of `value` and `onChange` vary depending on `multiple`.
+-				onChange: onChangeProp as TreeSelectProps[ 'onChange' ],
++				onChange: onChangeProp,
+ 			} }
+ 			tree={ termsTree }
+ 			selectedId={
+diff --git a/packages/components/src/query-controls/category-select.tsx b/packages/components/src/query-controls/category-select.tsx
+index 938dfe792de08f..fe12423946f82e 100644
+--- a/packages/components/src/query-controls/category-select.tsx
++++ b/packages/components/src/query-controls/category-select.tsx
+@@ -3,7 +3,6 @@
+  */
+ import { buildTermsTree } from './terms';
+ import TreeSelect from '../tree-select';
+-import type { TreeSelectProps } from '../tree-select/types';
+ 
+ /**
+  * WordPress dependencies
+@@ -28,11 +27,7 @@ export default function CategorySelect( {
+ 			{ ...{
+ 				label,
+ 				noOptionLabel,
+-				// Since the `multiple` attribute is not passed to `TreeSelect`, it is
+-				// safe to assume that the argument of `onChange` cannot be `string[]`.
+-				// The correct solution would be to type `SelectControl` better, so that
+-				// the type of `value` and `onChange` vary depending on `multiple`.
+-				onChange: onChangeProp as TreeSelectProps[ 'onChange' ],
++				onChange: onChangeProp,
+ 			} }
+ 			tree={ termsTree }
+ 			selectedId={
+diff --git a/packages/components/src/select-control/index.tsx b/packages/components/src/select-control/index.tsx
+index 75569dac80a169..57af9bee92b044 100644
+--- a/packages/components/src/select-control/index.tsx
++++ b/packages/components/src/select-control/index.tsx
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import classNames from 'classnames';
+-import type { ChangeEvent, FocusEvent, ForwardedRef } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -30,7 +29,10 @@ function useUniqueId( idProp?: string ) {
+ }
+ 
+ function UnforwardedSelectControl(
+-	{
++	props: WordPressComponentProps< SelectControlProps, 'select', false >,
++	ref: React.ForwardedRef< HTMLSelectElement >
++) {
++	const {
+ 		className,
+ 		disabled = false,
+ 		help,
+@@ -39,7 +41,7 @@ function UnforwardedSelectControl(
+ 		label,
+ 		multiple = false,
+ 		onBlur = noop,
+-		onChange = noop,
++		onChange,
+ 		onFocus = noop,
+ 		options = [],
+ 		size = 'default',
+@@ -50,10 +52,8 @@ function UnforwardedSelectControl(
+ 		suffix,
+ 		__next36pxDefaultSize = false,
+ 		__nextHasNoMarginBottom = false,
+-		...props
+-	}: WordPressComponentProps< SelectControlProps, 'select', false >,
+-	ref: ForwardedRef< HTMLSelectElement >
+-) {
++		...restProps
++	} = props;
+ 	const [ isFocused, setIsFocused ] = useState( false );
+ 	const id = useUniqueId( idProp );
+ 	const helpId = help ? `${ id }__help` : undefined;
+@@ -61,32 +61,33 @@ function UnforwardedSelectControl(
+ 	// Disable reason: A select with an onchange throws a warning.
+ 	if ( ! options?.length && ! children ) return null;
+ 
+-	const handleOnBlur = ( event: FocusEvent< HTMLSelectElement > ) => {
++	const handleOnBlur = ( event: React.FocusEvent< HTMLSelectElement > ) => {
+ 		onBlur( event );
+ 		setIsFocused( false );
+ 	};
+ 
+-	const handleOnFocus = ( event: FocusEvent< HTMLSelectElement > ) => {
++	const handleOnFocus = ( event: React.FocusEvent< HTMLSelectElement > ) => {
+ 		onFocus( event );
+ 		setIsFocused( true );
+ 	};
+ 
+-	const handleOnChange = ( event: ChangeEvent< HTMLSelectElement > ) => {
+-		if ( multiple ) {
++	const handleOnChange = (
++		event: React.ChangeEvent< HTMLSelectElement >
++	) => {
++		if ( props.multiple ) {
+ 			const selectedOptions = Array.from( event.target.options ).filter(
+ 				( { selected } ) => selected
+ 			);
+ 			const newValues = selectedOptions.map( ( { value } ) => value );
+-			onChange( newValues );
++			props.onChange?.( newValues, { event } );
+ 			return;
+ 		}
+ 
+-		onChange( event.target.value, { event } );
++		props.onChange?.( event.target.value, { event } );
+ 	};
+ 
+ 	const classes = classNames( 'components-select-control', className );
+ 
+-	/* eslint-disable jsx-a11y/no-onchange */
+ 	return (
+ 		<BaseControl
+ 			help={ help }
+@@ -109,7 +110,7 @@ function UnforwardedSelectControl(
+ 				__next36pxDefaultSize={ __next36pxDefaultSize }
+ 			>
+ 				<Select
+-					{ ...props }
++					{ ...restProps }
+ 					__next36pxDefaultSize={ __next36pxDefaultSize }
+ 					aria-describedby={ helpId }
+ 					className="components-select-control__input"
+@@ -143,7 +144,6 @@ function UnforwardedSelectControl(
+ 			</InputBase>
+ 		</BaseControl>
+ 	);
+-	/* eslint-enable jsx-a11y/no-onchange */
+ }
+ 
+ /**
+diff --git a/packages/components/src/select-control/stories/index.tsx b/packages/components/src/select-control/stories/index.tsx
+index a8cf1be478954a..8560ffe49fbabf 100644
+--- a/packages/components/src/select-control/stories/index.tsx
++++ b/packages/components/src/select-control/stories/index.tsx
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import type { ComponentMeta, ComponentStory } from '@storybook/react';
+-import type { ComponentProps } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -32,20 +31,33 @@ const meta: ComponentMeta< typeof SelectControl > = {
+ };
+ export default meta;
+ 
+-const SelectControlWithState: ComponentStory< typeof SelectControl > = ( {
+-	onChange,
+-	...args
+-} ) => {
+-	const [ selection, setSelection ] =
+-		useState< ComponentProps< typeof SelectControl >[ 'value' ] >();
++const SelectControlWithState: ComponentStory< typeof SelectControl > = (
++	props
++) => {
++	const [ selection, setSelection ] = useState< string[] >();
++
++	if ( props.multiple ) {
++		return (
++			<SelectControl
++				{ ...props }
++				multiple
++				value={ selection }
++				onChange={ ( value ) => {
++					setSelection( value );
++					props.onChange?.( value );
++				} }
++			/>
++		);
++	}
+ 
+ 	return (
+ 		<SelectControl
+-			{ ...args }
+-			value={ selection }
++			{ ...props }
++			multiple={ false }
++			value={ selection?.[ 0 ] }
+ 			onChange={ ( value ) => {
+-				setSelection( value );
+-				onChange?.( value );
++				setSelection( [ value ] );
++				props.onChange?.( value );
+ 			} }
+ 		/>
+ 	);
+@@ -70,7 +82,7 @@ WithLabelAndHelpText.args = {
+ 
+ /**
+  * As an alternative to the `options` prop, `optgroup`s and `options` can be
+- * passed in as `children` for more customizability.
++ * passed in as `children` for more customizeability.
+  */
+ export const WithCustomChildren: ComponentStory< typeof SelectControl > = (
+ 	args
+diff --git a/packages/components/src/select-control/types.ts b/packages/components/src/select-control/types.ts
+index 2b8d187d4031ea..d052f81203a7ef 100644
+--- a/packages/components/src/select-control/types.ts
++++ b/packages/components/src/select-control/types.ts
+@@ -9,19 +9,46 @@ import type { ChangeEvent, FocusEvent, ReactNode } from 'react';
+ import type { InputBaseProps } from '../input-control/types';
+ import type { BaseControlProps } from '../base-control/types';
+ 
+-export interface SelectControlProps
+-	extends Pick<
+-			InputBaseProps,
+-			| '__next36pxDefaultSize'
+-			| 'disabled'
+-			| 'hideLabelFromVision'
+-			| 'label'
+-			| 'labelPosition'
+-			| 'prefix'
+-			| 'size'
+-			| 'suffix'
+-		>,
+-		Pick< BaseControlProps, 'help' | '__nextHasNoMarginBottom' > {
++type SelectControlBaseProps = Pick<
++	InputBaseProps,
++	| '__next36pxDefaultSize'
++	| 'disabled'
++	| 'hideLabelFromVision'
++	| 'label'
++	| 'labelPosition'
++	| 'prefix'
++	| 'size'
++	| 'suffix'
++> &
++	Pick< BaseControlProps, 'help' | '__nextHasNoMarginBottom' > & {
++		onBlur?: ( event: FocusEvent< HTMLSelectElement > ) => void;
++		onFocus?: ( event: FocusEvent< HTMLSelectElement > ) => void;
++		options?: {
++			/**
++			 * The label to be shown to the user.
++			 */
++			label: string;
++			/**
++			 * The internal value used to choose the selected value.
++			 * This is also the value passed to `onChange` when the option is selected.
++			 */
++			value: string;
++			id?: string;
++			/**
++			 * Whether or not the option should have the disabled attribute.
++			 *
++			 * @default false
++			 */
++			disabled?: boolean;
++		}[];
++		/**
++		 * As an alternative to the `options` prop, `optgroup`s and `options` can be
++		 * passed in as `children` for more customizability.
++		 */
++		children?: ReactNode;
++	};
++
++export type SelectControlSingleSelectionProps = SelectControlBaseProps & {
+ 	/**
+ 	 * If this property is added, multiple values can be selected. The `value` passed should be an array.
+ 	 *
+@@ -29,9 +56,8 @@ export interface SelectControlProps
+ 	 *
+ 	 * @default false
+ 	 */
+-	multiple?: boolean;
+-	onBlur?: ( event: FocusEvent< HTMLSelectElement > ) => void;
+-	onFocus?: ( event: FocusEvent< HTMLSelectElement > ) => void;
++	multiple?: false;
++	value?: string;
+ 	/**
+ 	 * A function that receives the value of the new option that is being selected as input.
+ 	 *
+@@ -39,31 +65,33 @@ export interface SelectControlProps
+ 	 * Otherwise, the value received is a single value with the new selected value.
+ 	 */
+ 	onChange?: (
+-		value: string | string[],
++		value: string,
+ 		extra?: { event?: ChangeEvent< HTMLSelectElement > }
+ 	) => void;
+-	options?: {
+-		/**
+-		 * The label to be shown to the user.
+-		 */
+-		label: string;
+-		/**
+-		 * The internal value used to choose the selected value.
+-		 * This is also the value passed to `onChange` when the option is selected.
+-		 */
+-		value: string;
+-		id?: string;
+-		/**
+-		 * Whether or not the option should have the disabled attribute.
+-		 *
+-		 * @default false
+-		 */
+-		disabled?: boolean;
+-	}[];
+-	value?: string | string[];
++};
++
++export type SelectControlMultipleSelectionProps = SelectControlBaseProps & {
+ 	/**
+-	 * As an alternative to the `options` prop, `optgroup`s and `options` can be
+-	 * passed in as `children` for more customizability.
++	 * If this property is added, multiple values can be selected. The `value` passed should be an array.
++	 *
++	 * In most cases, it is preferable to use the `FormTokenField` or `CheckboxControl` components instead.
++	 *
++	 * @default false
++	 */
++	multiple: true;
++	value?: string[];
++	/**
++	 * A function that receives the value of the new option that is being selected as input.
++	 *
++	 * If `multiple` is `true`, the value received is an array of the selected value.
++	 * Otherwise, the value received is a single value with the new selected value.
+ 	 */
+-	children?: ReactNode;
+-}
++	onChange?: (
++		value: string[],
++		extra?: { event?: ChangeEvent< HTMLSelectElement > }
++	) => void;
++};
++
++export type SelectControlProps =
++	| SelectControlSingleSelectionProps
++	| SelectControlMultipleSelectionProps;
+diff --git a/packages/components/src/tree-select/index.tsx b/packages/components/src/tree-select/index.tsx
+index 13bf82790e3bde..0c247901f432f7 100644
+--- a/packages/components/src/tree-select/index.tsx
++++ b/packages/components/src/tree-select/index.tsx
+@@ -8,9 +8,12 @@ import { decodeEntities } from '@wordpress/html-entities';
+  * Internal dependencies
+  */
+ import { SelectControl } from '../select-control';
+-import type { TreeSelectProps, Tree, SelectOptions, Truthy } from './types';
++import type { TreeSelectProps, Tree, Truthy } from './types';
+ 
+-function getSelectOptions( tree: Tree[], level = 0 ): SelectOptions {
++function getSelectOptions(
++	tree: Tree[],
++	level = 0
++): NonNullable< TreeSelectProps[ 'options' ] > {
+ 	return tree.flatMap( ( treeNode ) => [
+ 		{
+ 			value: treeNode.id,
+diff --git a/packages/components/src/tree-select/types.ts b/packages/components/src/tree-select/types.ts
+index ba58244e13bd27..da90ece3a658e8 100644
+--- a/packages/components/src/tree-select/types.ts
++++ b/packages/components/src/tree-select/types.ts
+@@ -1,29 +1,22 @@
+-/**
+- * External dependencies
+- */
+-import type { ComponentProps } from 'react';
+-
+ /**
+  * Internal dependencies
+  */
+-import type SelectControl from '../select-control';
+-import type { SelectControlProps } from '../select-control/types';
++import type { SelectControlSingleSelectionProps } from '../select-control/types';
+ 
+ export type Truthy< T > = T extends false | '' | 0 | null | undefined
+ 	? never
+ 	: T;
+ 
+-export type SelectOptions = Required<
+-	ComponentProps< typeof SelectControl >
+->[ 'options' ];
+-
+ export interface Tree {
+ 	id: string;
+ 	name: string;
+ 	children?: Tree[];
+ }
+ 
+-export interface TreeSelectProps extends Omit< SelectControlProps, 'value' > {
++// `TreeSelect` inherits props from `SelectControl`, but only
++// in single selection mode (ie. when the `multiple` prop is not defined).
++export interface TreeSelectProps
++	extends Omit< SelectControlSingleSelectionProps, 'value' | 'multiple' > {
+ 	/**
+ 	 * If this property is added, an option will be added with this label to represent empty selection.
+ 	 */
+@@ -35,5 +28,5 @@ export interface TreeSelectProps extends Omit< SelectControlProps, 'value' > {
+ 	/**
+ 	 * The id of the currently selected node.
+ 	 */
+-	selectedId?: ComponentProps< typeof SelectControl >[ 'value' ];
++	selectedId?: SelectControlSingleSelectionProps[ 'value' ];
+ }

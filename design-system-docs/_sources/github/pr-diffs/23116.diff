@@ -1,0 +1,173 @@
+diff --git a/packages/block-library/src/more/test/__snapshots__/edit.js.snap b/packages/block-library/src/more/test/__snapshots__/edit.js.snap
+index dfc2104ff528e0..10b47a9f654220 100644
+--- a/packages/block-library/src/more/test/__snapshots__/edit.js.snap
++++ b/packages/block-library/src/more/test/__snapshots__/edit.js.snap
+@@ -4,7 +4,7 @@ exports[`core/more/edit should match snapshot when noTeaser is false 1`] = `
+ <React.Fragment>
+   <InspectorControls>
+     <ForwardRef(PanelBody)>
+-      <WithInstanceId(ToggleControl)
++      <ToggleControl
+         checked={false}
+         help={[Function]}
+         label="Hide the excerpt on the full content page"
+@@ -34,7 +34,7 @@ exports[`core/more/edit should match snapshot when noTeaser is true 1`] = `
+ <React.Fragment>
+   <InspectorControls>
+     <ForwardRef(PanelBody)>
+-      <WithInstanceId(ToggleControl)
++      <ToggleControl
+         checked={true}
+         help={[Function]}
+         label="Hide the excerpt on the full content page"
+diff --git a/packages/components/src/toggle-control/index.js b/packages/components/src/toggle-control/index.js
+index 785174a22811fd..159c920b156418 100644
+--- a/packages/components/src/toggle-control/index.js
++++ b/packages/components/src/toggle-control/index.js
+@@ -7,8 +7,7 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
+-import { Component } from '@wordpress/element';
+-import { withInstanceId } from '@wordpress/compose';
++import { useInstanceId } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+@@ -16,53 +15,40 @@ import { withInstanceId } from '@wordpress/compose';
+ import FormToggle from '../form-toggle';
+ import BaseControl from '../base-control';
+ 
+-class ToggleControl extends Component {
+-	constructor() {
+-		super( ...arguments );
+-
+-		this.onChange = this.onChange.bind( this );
++export default function ToggleControl( {
++	label,
++	checked,
++	help,
++	className,
++	onChange,
++} ) {
++	function onChangeToggle( event ) {
++		onChange( event.target.checked );
+ 	}
++	const instanceId = useInstanceId( ToggleControl );
++	const id = `inspector-toggle-control-${ instanceId }`;
+ 
+-	onChange( event ) {
+-		if ( this.props.onChange ) {
+-			this.props.onChange( event.target.checked );
+-		}
++	let describedBy, helpLabel;
++	if ( help ) {
++		describedBy = id + '__help';
++		helpLabel = isFunction( help ) ? help( checked ) : help;
+ 	}
+ 
+-	render() {
+-		const { label, checked, help, instanceId, className } = this.props;
+-		const id = `inspector-toggle-control-${ instanceId }`;
+-
+-		let describedBy, helpLabel;
+-		if ( help ) {
+-			describedBy = id + '__help';
+-			helpLabel = isFunction( help ) ? help( checked ) : help;
+-		}
+-
+-		return (
+-			<BaseControl
++	return (
++		<BaseControl
++			id={ id }
++			help={ helpLabel }
++			className={ classnames( 'components-toggle-control', className ) }
++		>
++			<FormToggle
+ 				id={ id }
+-				help={ helpLabel }
+-				className={ classnames(
+-					'components-toggle-control',
+-					className
+-				) }
+-			>
+-				<FormToggle
+-					id={ id }
+-					checked={ checked }
+-					onChange={ this.onChange }
+-					aria-describedby={ describedBy }
+-				/>
+-				<label
+-					htmlFor={ id }
+-					className="components-toggle-control__label"
+-				>
+-					{ label }
+-				</label>
+-			</BaseControl>
+-		);
+-	}
++				checked={ checked }
++				onChange={ onChangeToggle }
++				aria-describedby={ describedBy }
++			/>
++			<label htmlFor={ id } className="components-toggle-control__label">
++				{ label }
++			</label>
++		</BaseControl>
++	);
+ }
+-
+-export default withInstanceId( ToggleControl );
+diff --git a/packages/components/src/toggle-control/test/index.js b/packages/components/src/toggle-control/test/index.js
+index 346e57676dbc87..5f71de1db95e25 100644
+--- a/packages/components/src/toggle-control/test/index.js
++++ b/packages/components/src/toggle-control/test/index.js
+@@ -8,28 +8,12 @@ import renderer from 'react-test-renderer';
+  */
+ import ToggleControl from '../';
+ 
+-/**
+- * WordPress dependencies
+- */
+-import { Component } from '@wordpress/element';
+-
+-// this is needed because TestUtils does not accept a stateless component.
+-// anything run through a HOC ends up as a stateless component.
+-const getTestComponent = ( WrappedComponent, props ) => {
+-	class TestComponent extends Component {
+-		render() {
+-			return <WrappedComponent { ...this.props } />;
+-		}
+-	}
+-	return <TestComponent { ...props } />;
+-};
+-
+ describe( 'ToggleControl', () => {
+ 	it( 'triggers change callback with numeric value', () => {
+ 		// Mount: With shallow, cannot find input child of BaseControl
+ 		const onChange = jest.fn();
+ 		const wrapper = renderer.create(
+-			getTestComponent( ToggleControl, { onChange } )
++			<ToggleControl onChange={ onChange } />
+ 		);
+ 		wrapper.root
+ 			.findByType( 'input' )
+@@ -43,7 +27,7 @@ describe( 'ToggleControl', () => {
+ 			// Mount: With shallow, cannot find input child of BaseControl
+ 			const onChange = jest.fn();
+ 			const wrapper = renderer.create(
+-				getTestComponent( ToggleControl, { onChange } )
++				<ToggleControl onChange={ onChange } />
+ 			);
+ 
+ 			const input = wrapper.root.findByType( 'input' );
+@@ -55,7 +39,7 @@ describe( 'ToggleControl', () => {
+ 			// Mount: With shallow, cannot find input child of BaseControl
+ 			const onChange = jest.fn();
+ 			const wrapper = renderer.create(
+-				getTestComponent( ToggleControl, { help: true, onChange } )
++				<ToggleControl onChange={ onChange } help={ true } />
+ 			);
+ 
+ 			const input = wrapper.root.findByType( 'input' );

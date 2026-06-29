@@ -1,0 +1,92 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 594bb47e187d51..7b3a2aea460d9f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -19,13 +19,6 @@
+     -   `ToggleGroupControl`
+     -   `TreeSelect`
+ 
+-### New Features
+-
+--   `Composite`: add stable version of the component ([#63564](https://github.com/WordPress/gutenberg/pull/63564)).
+--   `Composite`: add `Hover` and `Typeahead` subcomponents ([#64399](https://github.com/WordPress/gutenberg/pull/64399)).
+--   `Composite`: export `useCompositeStore`, add focus-related props to `Composite`and`Composite.Item` subcomponents ([#64450](https://github.com/WordPress/gutenberg/pull/64450)).
+--   `Composite`: add `Context` subcomponent ([#64493](https://github.com/WordPress/gutenberg/pull/64493)).
+-
+ ### Enhancements
+ 
+ -   `Composite`: improve Storybook examples and add interactive controls ([#64397](https://github.com/WordPress/gutenberg/pull/64397)).
+@@ -34,6 +27,12 @@
+ -   `TimePicker`: add `hideLabelFromVision` prop ([#64267](https://github.com/WordPress/gutenberg/pull/64267)).
+ -   `DropdownMenuV2`: adopt elevation scale ([#64432](https://github.com/WordPress/gutenberg/pull/64432)).
+ 
++### Internal
++
++-   `Composite` v2: add `Hover` and `Typeahead` subcomponents ([#64399](https://github.com/WordPress/gutenberg/pull/64399)).
++-   `Composite` v2: add focus-related props to `Composite`and`Composite.Item` subcomponents ([#64450](https://github.com/WordPress/gutenberg/pull/64450)).
++-   `Composite` v2: add `Context` subcomponent ([#64493](https://github.com/WordPress/gutenberg/pull/64493)).
++
+ ## 28.5.0 (2024-08-07)
+ 
+ ### Bug Fixes
+diff --git a/packages/components/src/composite/README.md b/packages/components/src/composite/README.md
+index 76e345b16d13fa..35881d815cf1bc 100644
+--- a/packages/components/src/composite/README.md
++++ b/packages/components/src/composite/README.md
+@@ -1,5 +1,9 @@
+ # `Composite`
+ 
++<div class="callout callout-alert">
++This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
++</div>
++
+ `Composite` provides a single tab stop on the page and allows navigation through the focusable descendants with arrow keys. This abstract component is based on the [WAI-ARIA Composite Role⁠](https://w3c.github.io/aria/#composite).
+ 
+ ## Usage
+diff --git a/packages/components/src/composite/legacy/stories/index.story.tsx b/packages/components/src/composite/legacy/stories/index.story.tsx
+index 1b8e07e9bbf560..e46d656a16810e 100644
+--- a/packages/components/src/composite/legacy/stories/index.story.tsx
++++ b/packages/components/src/composite/legacy/stories/index.story.tsx
+@@ -15,8 +15,7 @@ import {
+ import { UseCompositeStatePlaceholder, transform } from './utils';
+ 
+ const meta: Meta< typeof UseCompositeStatePlaceholder > = {
+-	title: 'Components (Deprecated)/Composite (Unstable)',
+-	id: 'components-composite-unstable',
++	title: 'Components/Composite',
+ 	component: UseCompositeStatePlaceholder,
+ 	subcomponents: {
+ 		Composite,
+diff --git a/packages/components/src/composite/stories/index.story.tsx b/packages/components/src/composite/stories/index.story.tsx
+index 405962b92a761c..034e1d6721f7bd 100644
+--- a/packages/components/src/composite/stories/index.story.tsx
++++ b/packages/components/src/composite/stories/index.story.tsx
+@@ -15,7 +15,7 @@ import { Composite, useCompositeStore } from '..';
+ import { UseCompositeStorePlaceholder, transform } from './utils';
+ 
+ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
+-	title: 'Components/Composite',
++	title: 'Components/Composite (V2)',
+ 	component: UseCompositeStorePlaceholder,
+ 	subcomponents: {
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+@@ -50,6 +50,7 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
+ 			options: [ 'horizontal', 'vertical', 'both' ],
+ 		},
+ 	},
++	tags: [ 'status-private' ],
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: {
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index cd6d2a77db9cb6..6483e34dc222a8 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -62,7 +62,6 @@ export {
+ 	CompositeItem as __unstableCompositeItem,
+ 	useCompositeState as __unstableUseCompositeState,
+ } from './composite/legacy';
+-export { Composite, useCompositeStore } from './composite';
+ export { ConfirmDialog as __experimentalConfirmDialog } from './confirm-dialog';
+ export { default as CustomSelectControl } from './custom-select-control';
+ export { default as Dashicon } from './dashicon';

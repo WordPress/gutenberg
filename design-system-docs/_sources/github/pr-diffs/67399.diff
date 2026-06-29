@@ -1,0 +1,19 @@
+diff --git a/packages/components/src/clipboard-button/index.tsx b/packages/components/src/clipboard-button/index.tsx
+index 0bf7d177e251ef..492ab64b7290e2 100644
+--- a/packages/components/src/clipboard-button/index.tsx
++++ b/packages/components/src/clipboard-button/index.tsx
+@@ -45,9 +45,11 @@ export default function ClipboardButton( {
+ 	} );
+ 
+ 	useEffect( () => {
+-		if ( timeoutIdRef.current ) {
+-			clearTimeout( timeoutIdRef.current );
+-		}
++		return () => {
++			if ( timeoutIdRef.current ) {
++				clearTimeout( timeoutIdRef.current );
++			}
++		};
+ 	}, [] );
+ 
+ 	const classes = clsx( 'components-clipboard-button', className );

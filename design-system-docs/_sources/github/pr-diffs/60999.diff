@@ -1,0 +1,190 @@
+diff --git a/packages/components/src/popover/stories/index.story.tsx b/packages/components/src/popover/stories/index.story.tsx
+index 7f06045ac9b057..e0670ac275afaa 100644
+--- a/packages/components/src/popover/stories/index.story.tsx
++++ b/packages/components/src/popover/stories/index.story.tsx
+@@ -7,8 +7,6 @@ import type { StoryFn, Meta } from '@storybook/react';
+  * WordPress dependencies
+  */
+ import { useState, useRef, useEffect } from '@wordpress/element';
+-// @ts-expect-error The `@wordpress/block-editor` is not typed
+-import { __unstableIframe as Iframe } from '@wordpress/block-editor';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/utils/hooks/stories/use-cx.js b/packages/components/src/utils/hooks/stories/use-cx.js
+deleted file mode 100644
+index e7054a8f53952b..00000000000000
+--- a/packages/components/src/utils/hooks/stories/use-cx.js
++++ /dev/null
+@@ -1,157 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { css } from '@emotion/react';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { __unstableIframe as Iframe } from '@wordpress/block-editor';
+-import { useMemo } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { useCx } from '..';
+-import StyleProvider from '../../../style-provider';
+-import {
+-	createSlotFill,
+-	Provider as SlotFillProvider,
+-} from '../../../slot-fill';
+-
+-export default {
+-	title: 'Components (Experimental)/useCx',
+-};
+-
+-const Example = ( { serializedStyles, children } ) => {
+-	const cx = useCx();
+-	const classes = cx( serializedStyles );
+-	return <span className={ classes }>{ children }</span>;
+-};
+-
+-const ExampleWithUseMemoWrong = ( { serializedStyles, children } ) => {
+-	const cx = useCx();
+-	// Wrong: using 'useMemo' without adding 'cx' to the dependency list.
+-	const classes = useMemo(
+-		() => cx( serializedStyles ),
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
+-		[ serializedStyles ]
+-	);
+-	return <span className={ classes }>{ children }</span>;
+-};
+-
+-const ExampleWithUseMemoRight = ( { serializedStyles, children } ) => {
+-	const cx = useCx();
+-	// Right: using 'useMemo' with 'cx' listed as a dependency.
+-	const classes = useMemo(
+-		() => cx( serializedStyles ),
+-		[ cx, serializedStyles ]
+-	);
+-	return <span className={ classes }>{ children }</span>;
+-};
+-
+-export const _slotFill = () => {
+-	const { Fill, Slot } = createSlotFill( 'UseCxExampleSlot' );
+-
+-	const redText = css`
+-		color: red;
+-	`;
+-	const blueText = css`
+-		color: blue;
+-	`;
+-	const greenText = css`
+-		color: green;
+-	`;
+-
+-	return (
+-		<SlotFillProvider>
+-			<StyleProvider document={ document }>
+-				<Iframe>
+-					<Iframe>
+-						<Example serializedStyles={ redText }>
+-							This text is inside an iframe and should be red
+-						</Example>
+-						<Fill name="test-slot">
+-							<Example serializedStyles={ blueText }>
+-								This text is also inside the iframe, but is
+-								relocated by a slot/fill and should be blue
+-							</Example>
+-						</Fill>
+-						<Fill name="outside-frame">
+-							<Example serializedStyles={ greenText }>
+-								This text is also inside the iframe, but is
+-								relocated by a slot/fill and should be green
+-							</Example>
+-						</Fill>
+-					</Iframe>
+-					<StyleProvider document={ document }>
+-						<Slot bubblesVirtually name="test-slot" />
+-					</StyleProvider>
+-				</Iframe>
+-				<Slot bubblesVirtually name="outside-frame" />
+-			</StyleProvider>
+-		</SlotFillProvider>
+-	);
+-};
+-
+-export const _slotFillSimple = () => {
+-	const { Fill, Slot } = createSlotFill( 'UseCxExampleSlotTwo' );
+-
+-	const redText = css`
+-		color: red;
+-	`;
+-
+-	return (
+-		<SlotFillProvider>
+-			<Iframe>
+-				<Fill name="test-slot">
+-					<Example serializedStyles={ redText }>
+-						This text should be red
+-					</Example>
+-				</Fill>
+-			</Iframe>
+-			<Slot bubblesVirtually name="test-slot" />
+-		</SlotFillProvider>
+-	);
+-};
+-
+-export const _useMemoBadPractices = () => {
+-	const redText = css`
+-		color: red;
+-	`;
+-	const blueText = css`
+-		color: blue;
+-	`;
+-
+-	return (
+-		<>
+-			<Example serializedStyles={ redText }>
+-				This text should be red
+-			</Example>
+-			<ExampleWithUseMemoRight serializedStyles={ blueText }>
+-				This text should be blue
+-			</ExampleWithUseMemoRight>
+-			<Iframe>
+-				<Example serializedStyles={ redText }>
+-					This text should be red
+-				</Example>
+-				<ExampleWithUseMemoWrong serializedStyles={ blueText }>
+-					This text should be blue but it&apos;s not!
+-				</ExampleWithUseMemoWrong>
+-			</Iframe>
+-		</>
+-	);
+-};
+-
+-export const _default = () => {
+-	const redText = css`
+-		color: red;
+-	`;
+-	return (
+-		<Iframe>
+-			<Example serializedStyles={ redText }>
+-				This text is inside an iframe and is red!
+-			</Example>
+-		</Iframe>
+-	);
+-};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 51c3da801cafb6..81045d05c21fc5 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -12,8 +12,7 @@
+ 		],
+ 		// TODO: Remove `skipLibCheck` after resolving duplicate declaration of the `process` variable
+ 		// between `@types/webpack-env` (from @storybook packages) and `gutenberg-env`.
+-		"skipLibCheck": true,
+-		"strictNullChecks": true
++		"skipLibCheck": true
+ 	},
+ 	"references": [
+ 		{ "path": "../a11y" },

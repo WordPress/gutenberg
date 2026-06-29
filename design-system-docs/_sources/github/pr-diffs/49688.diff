@@ -1,0 +1,18 @@
+diff --git a/.github/workflows/check-components-changelog.yml b/.github/workflows/check-components-changelog.yml
+index 08f290b5a78fcf..c793337b3bcbed 100644
+--- a/.github/workflows/check-components-changelog.yml
++++ b/.github/workflows/check-components-changelog.yml
+@@ -6,7 +6,12 @@ on:
+         paths:
+             - 'packages/components/**'
+             - '!packages/components/src/**/stories/**'
+-            - '!packages/components/src**/test/**'
++            - '!packages/components/src/**/test/**'
++            - '!packages/components/src/**/*.android.js'
++            - '!packages/components/src/**/*.ios.js'
++            - '!packages/components/src/**/*.native.js'
++            - '!packages/components/src/**/*.native.scss'
++            - '!packages/components/src/**/react-native-*'
+ jobs:
+     check:
+         name: Check CHANGELOG diff

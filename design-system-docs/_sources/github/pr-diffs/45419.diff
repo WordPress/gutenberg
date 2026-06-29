@@ -1,0 +1,720 @@
+diff --git a/docs/contributors/code/testing-overview.md b/docs/contributors/code/testing-overview.md
+index fa17909b4cd376..f68469f6a893f4 100644
+--- a/docs/contributors/code/testing-overview.md
++++ b/docs/contributors/code/testing-overview.md
+@@ -367,13 +367,13 @@ describe( 'SolarSystem', () => {
+ 	test( 'should render', () => {
+ 		const { container } = render( <SolarSystem /> );
+ 
+-		expect( container.firstChild ).toMatchSnapshot();
++		expect( container ).toMatchSnapshot();
+ 	} );
+ 
+ 	test( 'should contain mars if planets is true', () => {
+ 		const { container } = render( <SolarSystem planets /> );
+ 
+-		expect( container.firstChild ).toMatchSnapshot();
++		expect( container ).toMatchSnapshot();
+ 		expect( screen.getByText( /mars/i ) ).toBeInTheDocument();
+ 	} );
+ } );
+@@ -422,7 +422,7 @@ test( 'should contain mars if planets is true', () => {
+ 	const { container } = render( <SolarSystem planets /> );
+ 
+ 	// Snapshot will catch unintended changes
+-	expect( container.firstChild ).toMatchSnapshot();
++	expect( container ).toMatchSnapshot();
+ 
+ 	// This is what we actually expect to find in our test
+ 	expect( screen.getByText( /mars/i ) ).toBeInTheDocument();
+@@ -447,8 +447,8 @@ Similarly, the `toMatchStyleDiffSnapshot` function allows to snapshot only the d
+ test( 'should render margin', () => {
+ 	const { container: spacer } = render( <Spacer /> );
+ 	const { container: spacerWithMargin } = render( <Spacer margin={ 5 } /> );
+-	expect( spacerWithMargin.firstChild ).toMatchStyleDiffSnapshot(
+-		spacer.firstChild
++	expect( spacerWithMargin ).toMatchStyleDiffSnapshot(
++		spacer
+ 	);
+ } );
+ ```
+diff --git a/packages/components/src/card/test/__snapshots__/index.tsx.snap b/packages/components/src/card/test/__snapshots__/index.tsx.snap
+index 2325e13746aa95..2abd66b0067eac 100644
+--- a/packages/components/src/card/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/card/test/__snapshots__/index.tsx.snap
+@@ -90,27 +90,27 @@ Snapshot Diff:
+ - First value
+ + Second value
+ 
+-@@ -5,18 +5,18 @@
+-  >
+-    <div
+-      class="css-mgwsf4-View-Content e19lxcc00"
++@@ -6,18 +6,18 @@
+     >
+       <div
+--       class="components-flex components-card__header components-card-header css-3fkkv8-View-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium e19lxcc00"
+-+       class="components-flex components-card__header components-card-header css-2feznw-View-Flex-base-ItemsRow-Header-borderRadius-borderColor-large e19lxcc00"
+-        data-wp-c16t="true"
+-        data-wp-component="CardHeader"
+-      >
+-        Header
+-      </div>
+-      <div
+--       class="components-card__body components-card-body css-1nwhnu3-View-Body-borderRadius-medium e19lxcc00"
+-+       class="components-card__body components-card-body css-1nonx1n-View-Body-borderRadius-large e19lxcc00"
+-        data-wp-c16t="true"
+-        data-wp-component="CardBody"
++        class="css-mgwsf4-View-Content e19lxcc00"
+       >
+-        Code is Poetry
+-      </div>
++        <div
++-         class="components-flex components-card__header components-card-header css-3fkkv8-View-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium e19lxcc00"
+++         class="components-flex components-card__header components-card-header css-2feznw-View-Flex-base-ItemsRow-Header-borderRadius-borderColor-large e19lxcc00"
++          data-wp-c16t="true"
++          data-wp-component="CardHeader"
++        >
++          Header
++        </div>
++        <div
++-         class="components-card__body components-card-body css-1nwhnu3-View-Body-borderRadius-medium e19lxcc00"
+++         class="components-card__body components-card-body css-1nonx1n-View-Body-borderRadius-large e19lxcc00"
++          data-wp-c16t="true"
++          data-wp-component="CardBody"
++        >
++          Code is Poetry
++        </div>
+ `;
+ 
+ exports[`Card Card component should add rounded border when the isRounded prop is true 1`] = `
+@@ -768,24 +768,25 @@ Snapshot Diff:
+ - First value
+ + Second value
+ 
+-@@ -8,16 +8,16 @@
+-    >
+-      Code is Poetry
++@@ -9,17 +9,17 @@
++      >
++        Code is Poetry
++      </div>
++      <div
++        aria-hidden="true"
++-       class="components-elevation css-1lsfy80-View-Elevation-sx-Base-elevationClassName e19lxcc00"
+++       class="components-elevation css-15t1t3g-View-Elevation-sx-Base-elevationClassName e19lxcc00"
++        data-wp-c16t="true"
++        data-wp-component="Elevation"
++      />
++      <div
++        aria-hidden="true"
++-       class="components-elevation css-18cl04p-View-Elevation-sx-Base-elevationClassName e19lxcc00"
+++       class="components-elevation css-15t1t3g-View-Elevation-sx-Base-elevationClassName e19lxcc00"
++        data-wp-c16t="true"
++        data-wp-component="Elevation"
++      />
+     </div>
+-    <div
+-      aria-hidden="true"
+--     class="components-elevation css-1lsfy80-View-Elevation-sx-Base-elevationClassName e19lxcc00"
+-+     class="components-elevation css-15t1t3g-View-Elevation-sx-Base-elevationClassName e19lxcc00"
+-      data-wp-c16t="true"
+-      data-wp-component="Elevation"
+-    />
+-    <div
+-      aria-hidden="true"
+--     class="components-elevation css-18cl04p-View-Elevation-sx-Base-elevationClassName e19lxcc00"
+-+     class="components-elevation css-15t1t3g-View-Elevation-sx-Base-elevationClassName e19lxcc00"
+-      data-wp-c16t="true"
+-      data-wp-component="Elevation"
+-    />
+   </div>
+ `;
+ 
+diff --git a/packages/components/src/card/test/index.tsx b/packages/components/src/card/test/index.tsx
+index d04559606047e3..7508a87e24d3c8 100644
+--- a/packages/components/src/card/test/index.tsx
++++ b/packages/components/src/card/test/index.tsx
+@@ -70,9 +70,7 @@ describe( 'Card', () => {
+ 				<Card>Code is Poetry</Card>
+ 			);
+ 
+-			expect( withElevation.firstChild ).toMatchDiffSnapshot(
+-				withoutElevation.firstChild
+-			);
++			expect( withElevation ).toMatchDiffSnapshot( withoutElevation );
+ 		} );
+ 
+ 		it( 'should add different amounts of white space when using the size prop', () => {
+@@ -90,9 +88,7 @@ describe( 'Card', () => {
+ 				</Card>
+ 			);
+ 
+-			expect( withSizeDefault.firstChild ).toMatchDiffSnapshot(
+-				withSizeLarge.firstChild
+-			);
++			expect( withSizeDefault ).toMatchDiffSnapshot( withSizeLarge );
+ 		} );
+ 
+ 		it( 'should warn when the isElevated prop is passed', () => {
+diff --git a/packages/components/src/item-group/test/__snapshots__/index.js.snap b/packages/components/src/item-group/test/__snapshots__/index.js.snap
+index 3758362b5a831a..112e119cd50f38 100644
+--- a/packages/components/src/item-group/test/__snapshots__/index.js.snap
++++ b/packages/components/src/item-group/test/__snapshots__/index.js.snap
+@@ -5,32 +5,32 @@ Snapshot Diff:
+ - First value
+ + Second value
+ 
+-@@ -7,11 +7,11 @@
+-    <div
+-      class="css-dcjs67-itemWrapper"
+-      role="listitem"
+-    >
++@@ -8,11 +8,11 @@
+       <div
+--       class="components-item css-1uo9kmu-View-medium-item-spacedAround e19lxcc00"
+-+       class="components-item css-10mizr-View-large-item-spacedAround e19lxcc00"
+-        data-wp-c16t="true"
+-        data-wp-component="Item"
++        class="css-dcjs67-itemWrapper"
++        role="listitem"
+       >
+-        Code
+-      </div>
+-@@ -19,11 +19,11 @@
+-    <div
+-      class="css-dcjs67-itemWrapper"
+-      role="listitem"
+-    >
++        <div
++-         class="components-item css-1uo9kmu-View-medium-item-spacedAround e19lxcc00"
+++         class="components-item css-10mizr-View-large-item-spacedAround e19lxcc00"
++          data-wp-c16t="true"
++          data-wp-component="Item"
++        >
++          Code
++        </div>
++@@ -20,11 +20,11 @@
+       <div
+--       class="components-item css-1uo9kmu-View-medium-item-spacedAround e19lxcc00"
+-+       class="components-item css-10mizr-View-large-item-spacedAround e19lxcc00"
+-        data-wp-c16t="true"
+-        data-wp-component="Item"
++        class="css-dcjs67-itemWrapper"
++        role="listitem"
+       >
+-        Is
+-      </div>
++        <div
++-         class="components-item css-1uo9kmu-View-medium-item-spacedAround e19lxcc00"
+++         class="components-item css-10mizr-View-large-item-spacedAround e19lxcc00"
++          data-wp-c16t="true"
++          data-wp-component="Item"
++        >
++          Is
++        </div>
+ `;
+ 
+ exports[`ItemGroup Item should use different amounts of padding depending on the value of the size prop 1`] = `
+@@ -38,19 +38,19 @@ Snapshot Diff:
+ - First value
+ + Second value
+ 
+-@@ -1,11 +1,11 @@
+-  <div
+-    class="css-dcjs67-itemWrapper"
+-    role="listitem"
+-  >
++@@ -2,11 +2,11 @@
+     <div
+--     class="components-item css-bsdqin-View-medium-item e19lxcc00"
+-+     class="components-item css-1ohjtsa-View-large-item e19lxcc00"
+-      data-wp-c16t="true"
+-      data-wp-component="Item"
++      class="css-dcjs67-itemWrapper"
++      role="listitem"
+     >
+-      Code is poetry
+-    </div>
++      <div
++-       class="components-item css-bsdqin-View-medium-item e19lxcc00"
+++       class="components-item css-1ohjtsa-View-large-item e19lxcc00"
++        data-wp-c16t="true"
++        data-wp-component="Item"
++      >
++        Code is poetry
++      </div>
+ `;
+ 
+ exports[`ItemGroup ItemGroup component should render correctly 1`] = `
+@@ -110,26 +110,27 @@ Snapshot Diff:
+ - First value
+ + Second value
+ 
+-@@ -1,17 +1,17 @@
+-  <div
+--   class="components-item-group css-kj8mvb-View-rounded e19lxcc00"
+-+   class="components-item-group css-18qvw1m-View-separated-rounded e19lxcc00"
+-    data-wp-c16t="true"
+-    data-wp-component="ItemGroup"
+-    role="list"
+-  >
++@@ -1,18 +1,18 @@
++  <div>
+     <div
+-      class="css-dcjs67-itemWrapper"
+-      role="listitem"
++-     class="components-item-group css-kj8mvb-View-rounded e19lxcc00"
+++     class="components-item-group css-18qvw1m-View-separated-rounded e19lxcc00"
++      data-wp-c16t="true"
++      data-wp-component="ItemGroup"
++      role="list"
+     >
+       <div
+--       class="components-item css-1uo9kmu-View-medium-item-spacedAround e19lxcc00"
+-+       class="components-item css-bsdqin-View-medium-item e19lxcc00"
+-        data-wp-c16t="true"
+-        data-wp-component="Item"
++        class="css-dcjs67-itemWrapper"
++        role="listitem"
+       >
+-        Code is poetry
+-      </div>
++        <div
++-         class="components-item css-1uo9kmu-View-medium-item-spacedAround e19lxcc00"
+++         class="components-item css-bsdqin-View-medium-item e19lxcc00"
++          data-wp-c16t="true"
++          data-wp-component="Item"
++        >
++          Code is poetry
++        </div>
+ `;
+ 
+ exports[`ItemGroup ItemGroup component should show borders when the isBordered prop is true 1`] = `
+@@ -137,26 +138,27 @@ Snapshot Diff:
+ - First value
+ + Second value
+ 
+-@@ -1,17 +1,17 @@
+-  <div
+--   class="components-item-group css-kj8mvb-View-rounded e19lxcc00"
+-+   class="components-item-group css-acyoj6-View-bordered-rounded e19lxcc00"
+-    data-wp-c16t="true"
+-    data-wp-component="ItemGroup"
+-    role="list"
+-  >
++@@ -1,18 +1,18 @@
++  <div>
+     <div
+-      class="css-dcjs67-itemWrapper"
+-      role="listitem"
++-     class="components-item-group css-kj8mvb-View-rounded e19lxcc00"
+++     class="components-item-group css-acyoj6-View-bordered-rounded e19lxcc00"
++      data-wp-c16t="true"
++      data-wp-component="ItemGroup"
++      role="list"
+     >
+       <div
+--       class="components-item css-1uo9kmu-View-medium-item-spacedAround e19lxcc00"
+-+       class="components-item css-bsdqin-View-medium-item e19lxcc00"
+-        data-wp-c16t="true"
+-        data-wp-component="Item"
++        class="css-dcjs67-itemWrapper"
++        role="listitem"
+       >
+-        Code is poetry
+-      </div>
++        <div
++-         class="components-item css-1uo9kmu-View-medium-item-spacedAround e19lxcc00"
+++         class="components-item css-bsdqin-View-medium-item e19lxcc00"
++          data-wp-c16t="true"
++          data-wp-component="Item"
++        >
++          Code is poetry
++        </div>
+ `;
+ 
+ exports[`ItemGroup ItemGroup component should show rounded corners when the isRounded prop is true 1`] = `
+@@ -164,13 +166,14 @@ Snapshot Diff:
+ - First value
+ + Second value
+ 
+-@@ -1,7 +1,7 @@
+-  <div
+--   class="components-item-group css-kj8mvb-View-rounded e19lxcc00"
+-+   class="components-item-group css-1mm2cvy-View e19lxcc00"
+-    data-wp-c16t="true"
+-    data-wp-component="ItemGroup"
+-    role="list"
+-  >
++@@ -1,8 +1,8 @@
++  <div>
+     <div
++-     class="components-item-group css-kj8mvb-View-rounded e19lxcc00"
+++     class="components-item-group css-1mm2cvy-View e19lxcc00"
++      data-wp-c16t="true"
++      data-wp-component="ItemGroup"
++      role="list"
++    >
++      <div
+ `;
+diff --git a/packages/components/src/item-group/test/index.js b/packages/components/src/item-group/test/index.js
+index c43e49ba1fa71c..e0471661c2c277 100644
+--- a/packages/components/src/item-group/test/index.js
++++ b/packages/components/src/item-group/test/index.js
+@@ -33,9 +33,7 @@ describe( 'ItemGroup', () => {
+ 				</ItemGroup>
+ 			);
+ 
+-			expect( noBorders.firstChild ).toMatchDiffSnapshot(
+-				withBorders.firstChild
+-			);
++			expect( noBorders ).toMatchDiffSnapshot( withBorders );
+ 		} );
+ 
+ 		it( 'should show rounded corners when the isRounded prop is true', () => {
+@@ -52,9 +50,7 @@ describe( 'ItemGroup', () => {
+ 				</ItemGroup>
+ 			);
+ 
+-			expect( roundCorners.firstChild ).toMatchDiffSnapshot(
+-				squaredCorners.firstChild
+-			);
++			expect( roundCorners ).toMatchDiffSnapshot( squaredCorners );
+ 		} );
+ 
+ 		it( 'should render items individually when the isSeparated prop is true', () => {
+@@ -71,9 +67,7 @@ describe( 'ItemGroup', () => {
+ 				</ItemGroup>
+ 			);
+ 
+-			expect( groupedItems.firstChild ).toMatchDiffSnapshot(
+-				separatedItems.firstChild
+-			);
++			expect( groupedItems ).toMatchDiffSnapshot( separatedItems );
+ 		} );
+ 	} );
+ 
+@@ -120,9 +114,7 @@ describe( 'ItemGroup', () => {
+ 				<Item size="large">Code is poetry</Item>
+ 			);
+ 
+-			expect( mediumSize.firstChild ).toMatchDiffSnapshot(
+-				largeSize.firstChild
+-			);
++			expect( mediumSize ).toMatchDiffSnapshot( largeSize );
+ 		} );
+ 
+ 		it( 'should read the value of the size prop from context when the prop is not defined', () => {
+@@ -145,9 +137,7 @@ describe( 'ItemGroup', () => {
+ 				</ItemGroup>
+ 			);
+ 
+-			expect( mediumSize.firstChild ).toMatchDiffSnapshot(
+-				largeSize.firstChild
+-			);
++			expect( mediumSize ).toMatchDiffSnapshot( largeSize );
+ 		} );
+ 	} );
+ } );
+diff --git a/packages/components/src/surface/test/__snapshots__/index.tsx.snap b/packages/components/src/surface/test/__snapshots__/index.tsx.snap
+index d394711944f645..200382f04ae5b6 100644
+--- a/packages/components/src/surface/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/surface/test/__snapshots__/index.tsx.snap
+@@ -5,14 +5,16 @@ Snapshot Diff:
+ - First value
+ + Second value
+ 
+-  <div
+--   class="components-surface css-pt58n0-View-Surface-getBorders-primary e19lxcc00"
+-+   class="components-surface css-soe81k-View-Surface-getBorders-primary e19lxcc00"
+-    data-wp-c16t="true"
+-    data-wp-component="Surface"
+-  >
+-    Surface
+-  </div>
++@@ -1,8 +1,8 @@
++  <div>
++    <div
++-     class="components-surface css-pt58n0-View-Surface-getBorders-primary e19lxcc00"
+++     class="components-surface css-soe81k-View-Surface-getBorders-primary e19lxcc00"
++      data-wp-c16t="true"
++      data-wp-component="Surface"
++    >
++      Surface
++    </div>
+ `;
+ 
+ exports[`props should render borderLeft 1`] = `
+@@ -20,14 +22,16 @@ Snapshot Diff:
+ - First value
+ + Second value
+ 
+-  <div
+--   class="components-surface css-1vckp4o-View-Surface-getBorders-primary e19lxcc00"
+-+   class="components-surface css-soe81k-View-Surface-getBorders-primary e19lxcc00"
+-    data-wp-c16t="true"
+-    data-wp-component="Surface"
+-  >
+-    Surface
+-  </div>
++@@ -1,8 +1,8 @@
++  <div>
++    <div
++-     class="components-surface css-1vckp4o-View-Surface-getBorders-primary e19lxcc00"
+++     class="components-surface css-soe81k-View-Surface-getBorders-primary e19lxcc00"
++      data-wp-c16t="true"
++      data-wp-component="Surface"
++    >
++      Surface
++    </div>
+ `;
+ 
+ exports[`props should render borderRight 1`] = `
+@@ -35,14 +39,16 @@ Snapshot Diff:
+ - First value
+ + Second value
+ 
+-  <div
+--   class="components-surface css-sw9dzi-View-Surface-getBorders-primary e19lxcc00"
+-+   class="components-surface css-soe81k-View-Surface-getBorders-primary e19lxcc00"
+-    data-wp-c16t="true"
+-    data-wp-component="Surface"
+-  >
+-    Surface
+-  </div>
++@@ -1,8 +1,8 @@
++  <div>
++    <div
++-     class="components-surface css-sw9dzi-View-Surface-getBorders-primary e19lxcc00"
+++     class="components-surface css-soe81k-View-Surface-getBorders-primary e19lxcc00"
++      data-wp-c16t="true"
++      data-wp-component="Surface"
++    >
++      Surface
++    </div>
+ `;
+ 
+ exports[`props should render borderTop 1`] = `
+@@ -50,14 +56,16 @@ Snapshot Diff:
+ - First value
+ + Second value
+ 
+-  <div
+--   class="components-surface css-123k66h-View-Surface-getBorders-primary e19lxcc00"
+-+   class="components-surface css-soe81k-View-Surface-getBorders-primary e19lxcc00"
+-    data-wp-c16t="true"
+-    data-wp-component="Surface"
+-  >
+-    Surface
+-  </div>
++@@ -1,8 +1,8 @@
++  <div>
++    <div
++-     class="components-surface css-123k66h-View-Surface-getBorders-primary e19lxcc00"
+++     class="components-surface css-soe81k-View-Surface-getBorders-primary e19lxcc00"
++      data-wp-c16t="true"
++      data-wp-component="Surface"
++    >
++      Surface
++    </div>
+ `;
+ 
+ exports[`props should render correctly 1`] = `
+@@ -67,12 +75,14 @@ exports[`props should render correctly 1`] = `
+   position: relative;
+ }
+ 
+-<div
+-  class="components-surface emotion-0 emotion-1"
+-  data-wp-c16t="true"
+-  data-wp-component="Surface"
+->
+-  Surface
++<div>
++  <div
++    class="components-surface emotion-0 emotion-1"
++    data-wp-c16t="true"
++    data-wp-component="Surface"
++  >
++    Surface
++  </div>
+ </div>
+ `;
+ 
+@@ -81,12 +91,14 @@ Snapshot Diff:
+ - First value
+ + Second value
+ 
+-  <div
+--   class="components-surface css-1m2pafr-View-Surface-getBorders-secondary e19lxcc00"
+-+   class="components-surface css-soe81k-View-Surface-getBorders-primary e19lxcc00"
+-    data-wp-c16t="true"
+-    data-wp-component="Surface"
+-  >
+-    Surface
+-  </div>
++@@ -1,8 +1,8 @@
++  <div>
++    <div
++-     class="components-surface css-1m2pafr-View-Surface-getBorders-secondary e19lxcc00"
+++     class="components-surface css-soe81k-View-Surface-getBorders-primary e19lxcc00"
++      data-wp-c16t="true"
++      data-wp-component="Surface"
++    >
++      Surface
++    </div>
+ `;
+diff --git a/packages/components/src/surface/test/index.tsx b/packages/components/src/surface/test/index.tsx
+index 44c2f1fac785e7..c9a4b0598e32aa 100644
+--- a/packages/components/src/surface/test/index.tsx
++++ b/packages/components/src/surface/test/index.tsx
+@@ -16,43 +16,33 @@ describe( 'props', () => {
+ 	} );
+ 
+ 	test( 'should render correctly', () => {
+-		expect( base.container.firstChild ).toMatchSnapshot();
++		expect( base.container ).toMatchSnapshot();
+ 	} );
+ 
+ 	test( 'should render variants', () => {
+ 		const { container } = render(
+ 			<Surface variant="secondary">Surface</Surface>
+ 		);
+-		expect( container.firstChild ).toMatchDiffSnapshot(
+-			base.container.firstChild
+-		);
++		expect( container ).toMatchDiffSnapshot( base.container );
+ 	} );
+ 
+ 	test( 'should render borderLeft', () => {
+ 		const { container } = render( <Surface borderLeft>Surface</Surface> );
+-		expect( container.firstChild ).toMatchDiffSnapshot(
+-			base.container.firstChild
+-		);
++		expect( container ).toMatchDiffSnapshot( base.container );
+ 	} );
+ 
+ 	test( 'should render borderRight', () => {
+ 		const { container } = render( <Surface borderRight>Surface</Surface> );
+-		expect( container.firstChild ).toMatchDiffSnapshot(
+-			base.container.firstChild
+-		);
++		expect( container ).toMatchDiffSnapshot( base.container );
+ 	} );
+ 
+ 	test( 'should render borderTop', () => {
+ 		const { container } = render( <Surface borderTop>Surface</Surface> );
+-		expect( container.firstChild ).toMatchDiffSnapshot(
+-			base.container.firstChild
+-		);
++		expect( container ).toMatchDiffSnapshot( base.container );
+ 	} );
+ 
+ 	test( 'should render borderBottom', () => {
+ 		const { container } = render( <Surface borderBottom>Surface</Surface> );
+-		expect( container.firstChild ).toMatchDiffSnapshot(
+-			base.container.firstChild
+-		);
++		expect( container ).toMatchDiffSnapshot( base.container );
+ 	} );
+ } );
+diff --git a/packages/components/src/ui/spinner/test/__snapshots__/index.js.snap b/packages/components/src/ui/spinner/test/__snapshots__/index.js.snap
+index a97207b549fd0f..70fd3df3a5b484 100644
+--- a/packages/components/src/ui/spinner/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/spinner/test/__snapshots__/index.js.snap
+@@ -5,19 +5,19 @@ Snapshot Diff:
+ - First value
+ + Second value
+ 
+-@@ -10,11 +10,11 @@
+-      class="css-1rq9ofd-BarsWrapperView e1s9yo7h1"
+-      style="transform: scale(0.4444444444444444);"
+-    >
+-      <div
+-        class="css-tada40-BarsView e1s9yo7h0"
+--       style="color: blue;"
+-+       style="color: rgb(30, 30, 30);"
++@@ -11,11 +11,11 @@
++        class="css-1rq9ofd-BarsWrapperView e1s9yo7h1"
++        style="transform: scale(0.4444444444444444);"
+       >
+         <div
+-          class="InnerBar1"
+-        />
+-        <div
++          class="css-tada40-BarsView e1s9yo7h0"
++-         style="color: blue;"
+++         style="color: rgb(30, 30, 30);"
++        >
++          <div
++            class="InnerBar1"
++          />
++          <div
+ `;
+ 
+ exports[`props should render correctly 1`] = `
+@@ -243,23 +243,23 @@ Snapshot Diff:
+ - First value
+ + Second value
+ 
+-@@ -1,16 +1,16 @@
+-  <div
+-    aria-busy="true"
+-    class="components-spinner css-14ywscc-ContainerView e1s9yo7h2"
+-    data-wp-c16t="true"
+-    data-wp-component="Spinner"
+--   style="height: 31px; width: 31px;"
+-+   style="height: 16px; width: 16px;"
+-  >
++@@ -2,16 +2,16 @@
+     <div
+-      aria-hidden="true"
+-      class="css-1rq9ofd-BarsWrapperView e1s9yo7h1"
+--     style="transform: scale(0.8611111111111112);"
+-+     style="transform: scale(0.4444444444444444);"
++      aria-busy="true"
++      class="components-spinner css-14ywscc-ContainerView e1s9yo7h2"
++      data-wp-c16t="true"
++      data-wp-component="Spinner"
++-     style="height: 31px; width: 31px;"
+++     style="height: 16px; width: 16px;"
+     >
+       <div
+-        class="css-tada40-BarsView e1s9yo7h0"
+-        style="color: rgb(30, 30, 30);"
++        aria-hidden="true"
++        class="css-1rq9ofd-BarsWrapperView e1s9yo7h1"
++-       style="transform: scale(0.8611111111111112);"
+++       style="transform: scale(0.4444444444444444);"
+       >
++        <div
++          class="css-tada40-BarsView e1s9yo7h0"
++          style="color: rgb(30, 30, 30);"
++        >
+ `;
+diff --git a/packages/components/src/ui/spinner/test/index.js b/packages/components/src/ui/spinner/test/index.js
+index 883d7a78917be3..aa9a4360fedff7 100644
+--- a/packages/components/src/ui/spinner/test/index.js
++++ b/packages/components/src/ui/spinner/test/index.js
+@@ -19,9 +19,7 @@ describe( 'props', () => {
+ 		const { container: secondRenderContainer } = render(
+ 			<Spinner color="blue" />
+ 		);
+-		expect( secondRenderContainer.firstChild ).toMatchDiffSnapshot(
+-			container.firstChild
+-		);
++		expect( secondRenderContainer ).toMatchDiffSnapshot( container );
+ 	} );
+ 
+ 	test( 'should render size', () => {
+@@ -29,8 +27,6 @@ describe( 'props', () => {
+ 		const { container: secondRenderContainer } = render(
+ 			<Spinner size={ 31 } />
+ 		);
+-		expect( secondRenderContainer.firstChild ).toMatchDiffSnapshot(
+-			container.firstChild
+-		);
++		expect( secondRenderContainer ).toMatchDiffSnapshot( container );
+ 	} );
+ } );

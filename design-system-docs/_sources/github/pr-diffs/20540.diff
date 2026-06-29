@@ -1,0 +1,37 @@
+diff --git a/packages/components/src/snackbar/index.js b/packages/components/src/snackbar/index.js
+index 45b8bd8e24a946..4c5ae0ac7e5b05 100644
+--- a/packages/components/src/snackbar/index.js
++++ b/packages/components/src/snackbar/index.js
+@@ -77,7 +77,7 @@ function Snackbar(
+ 			tabIndex="0"
+ 			role="button"
+ 			onKeyPress={ onRemove }
+-			label={ __( 'Dismiss this notice' ) }
++			aria-label={ __( 'Dismiss this notice' ) }
+ 		>
+ 			<div className="components-snackbar__content">
+ 				{ children }
+diff --git a/storybook/test/__snapshots__/index.js.snap b/storybook/test/__snapshots__/index.js.snap
+index b9f1491f1eb4f6..a517869d68fad6 100644
+--- a/storybook/test/__snapshots__/index.js.snap
++++ b/storybook/test/__snapshots__/index.js.snap
+@@ -7941,8 +7941,8 @@ exports[`Storyshots Components/SelectControl Default 1`] = `
+ 
+ exports[`Storyshots Components/Snackbar Default 1`] = `
+ <div
++  aria-label="Dismiss this notice"
+   className="components-snackbar"
+-  label="Dismiss this notice"
+   onClick={[Function]}
+   onKeyPress={[Function]}
+   role="button"
+@@ -7958,8 +7958,8 @@ exports[`Storyshots Components/Snackbar Default 1`] = `
+ 
+ exports[`Storyshots Components/Snackbar With Actions 1`] = `
+ <div
++  aria-label="Dismiss this notice"
+   className="components-snackbar"
+-  label="Dismiss this notice"
+   onClick={[Function]}
+   onKeyPress={[Function]}
+   role="button"

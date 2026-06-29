@@ -1,0 +1,187 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index aae03667f7607c..45e21e33dd821f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancement
++
++-   `Snackbar`: Add support to open links in a new tab ([#69905](https://github.com/WordPress/gutenberg/pull/69905)).
++
+ ## 29.9.0 (2025-05-07)
+ 
+ ### Enhancement
+diff --git a/packages/components/src/notice/README.md b/packages/components/src/notice/README.md
+index 0695f5d7ce3cf3..5dc95acd1e55d0 100644
+--- a/packages/components/src/notice/README.md
++++ b/packages/components/src/notice/README.md
+@@ -145,6 +145,7 @@ An array of notice actions. Each member object should contain:
+ 
+ - `label`: `string` containing the text of the button/link
+ - `url`: `string` OR `onClick`: `( event: SyntheticEvent ) => void` to specify what the action does.
++- `openInNewTab`: `boolean` (optional) When set to `true`, opens the URL in a new browser tab.
+ - `className`: `string` (optional) to add custom classes to the button styles.
+ - `noDefaultClasses`: `boolean` (optional) A value of `true` will remove all default styling.
+ - `variant`: `'primary' | 'secondary' | 'link'` (optional) You can denote a primary button action for a notice by passing a value of `primary`.
+diff --git a/packages/components/src/notice/types.ts b/packages/components/src/notice/types.ts
+index 8671f630643a6c..3edbeaa642c554 100644
+--- a/packages/components/src/notice/types.ts
++++ b/packages/components/src/notice/types.ts
+@@ -14,11 +14,13 @@ type CommonNoticeActionProps = {
+ // `onClick` will be ignored.
+ type NoticeActionWithURL = CommonNoticeActionProps & {
+ 	url: string;
++	openInNewTab?: boolean;
+ 	onClick?: never;
+ };
+ type NoticeActionWithOnClick = CommonNoticeActionProps & {
+ 	url?: never;
+-	onClick: MouseEventHandler< HTMLButtonElement >;
++	openInNewTab?: never;
++	onClick: MouseEventHandler< HTMLButtonElement | HTMLAnchorElement >;
+ };
+ 
+ export type NoticeAction = NoticeActionWithURL | NoticeActionWithOnClick;
+diff --git a/packages/components/src/snackbar/index.tsx b/packages/components/src/snackbar/index.tsx
+index dfcb0a6d8f2a84..97b09f9534c46a 100644
+--- a/packages/components/src/snackbar/index.tsx
++++ b/packages/components/src/snackbar/index.tsx
+@@ -22,6 +22,7 @@ import warning from '@wordpress/warning';
+  * Internal dependencies
+  */
+ import Button from '../button';
++import ExternalLink from '../external-link';
+ import type { SnackbarProps } from './types';
+ import type { NoticeAction } from '../notice/types';
+ import type { WordPressComponentProps } from '../context';
+@@ -80,7 +81,7 @@ function UnforwardedSnackbar(
+ 	}
+ 
+ 	function onActionClick(
+-		event: MouseEvent< HTMLButtonElement >,
++		event: MouseEvent< HTMLButtonElement | HTMLAnchorElement >,
+ 		onClick: NoticeAction[ 'onClick' ]
+ 	) {
+ 		event.stopPropagation();
+@@ -147,22 +148,34 @@ function UnforwardedSnackbar(
+ 					<div className="components-snackbar__icon">{ icon }</div>
+ 				) }
+ 				{ children }
+-				{ actions.map( ( { label, onClick, url }, index ) => {
+-					return (
+-						<Button
+-							__next40pxDefaultSize
+-							key={ index }
+-							href={ url }
+-							variant="link"
+-							onClick={ (
+-								event: MouseEvent< HTMLButtonElement >
+-							) => onActionClick( event, onClick ) }
+-							className="components-snackbar__action"
+-						>
+-							{ label }
+-						</Button>
+-					);
+-				} ) }
++				{ actions.map(
++					( { label, onClick, url, openInNewTab = false }, index ) =>
++						url !== undefined && openInNewTab ? (
++							<ExternalLink
++								key={ index }
++								href={ url }
++								onClick={ ( event ) =>
++									onActionClick( event, onClick )
++								}
++								className="components-snackbar__action"
++							>
++								{ label }
++							</ExternalLink>
++						) : (
++							<Button
++								__next40pxDefaultSize
++								key={ index }
++								href={ url }
++								variant="link"
++								onClick={ (
++									event: MouseEvent< HTMLButtonElement >
++								) => onActionClick( event, onClick ) }
++								className="components-snackbar__action"
++							>
++								{ label }
++							</Button>
++						)
++				) }
+ 				{ explicitDismiss && (
+ 					<span
+ 						role="button"
+diff --git a/packages/components/src/snackbar/style.scss b/packages/components/src/snackbar/style.scss
+index d1afd9b9f01e99..d6613d013aba00 100644
+--- a/packages/components/src/snackbar/style.scss
++++ b/packages/components/src/snackbar/style.scss
+@@ -45,7 +45,8 @@
+ 	}
+ }
+ 
+-.components-snackbar__action.components-button {
++.components-snackbar__action.components-button,
++.components-snackbar__action.components-external-link {
+ 	margin-left: $grid-unit-40;
+ 	color: $white;
+ 	flex-shrink: 0;
+diff --git a/packages/components/src/snackbar/types.ts b/packages/components/src/snackbar/types.ts
+index 13ed98ade8aa7a..b35466c439d0ff 100644
+--- a/packages/components/src/snackbar/types.ts
++++ b/packages/components/src/snackbar/types.ts
+@@ -56,7 +56,10 @@ export type SnackbarProps = Pick<
+ 		 *
+ 		 * @default []
+ 		 */
+-		actions?: Pick< NoticeAction, 'label' | 'url' | 'onClick' >[];
++		actions?: Pick<
++			NoticeAction,
++			'label' | 'url' | 'onClick' | 'openInNewTab'
++		>[];
+ 	};
+ 
+ export type SnackbarListProps = {
+diff --git a/packages/editor/src/store/private-actions.js b/packages/editor/src/store/private-actions.js
+index f1aa458fdab98c..b1aade42b64581 100644
+--- a/packages/editor/src/store/private-actions.js
++++ b/packages/editor/src/store/private-actions.js
+@@ -216,6 +216,7 @@ export const saveDirtyEntities =
+ 								{
+ 									label: __( 'View site' ),
+ 									url: homeUrl,
++									openInNewTab: true,
+ 								},
+ 							],
+ 						} );
+diff --git a/packages/editor/src/store/utils/notice-builder.js b/packages/editor/src/store/utils/notice-builder.js
+index 9e1230b2ea88c5..f0d1f4329540c8 100644
+--- a/packages/editor/src/store/utils/notice-builder.js
++++ b/packages/editor/src/store/utils/notice-builder.js
+@@ -58,6 +58,7 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
+ 		actions.push( {
+ 			label: isDraft ? __( 'View Preview' ) : postType.labels.view_item,
+ 			url: post.link,
++			openInNewTab: true,
+ 		} );
+ 	}
+ 	return [
+diff --git a/packages/editor/src/store/utils/test/notice-builder.js b/packages/editor/src/store/utils/test/notice-builder.js
+index d97ec0f9f9483b..dddbd0c18222e5 100644
+--- a/packages/editor/src/store/utils/test/notice-builder.js
++++ b/packages/editor/src/store/utils/test/notice-builder.js
+@@ -70,7 +70,9 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
+ 				'updated',
+ 				{
+ 					...defaultExpectedAction,
+-					actions: [ { label: 'view', url: 'some_link' } ],
++					actions: [
++						{ label: 'view', openInNewTab: true, url: 'some_link' },
++					],
+ 				},
+ 			],
+ 		],

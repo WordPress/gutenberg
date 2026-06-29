@@ -1,0 +1,479 @@
+diff --git a/packages/base-styles/_mixins.scss b/packages/base-styles/_mixins.scss
+index 814aba4c317590..8419cf35681c9b 100644
+--- a/packages/base-styles/_mixins.scss
++++ b/packages/base-styles/_mixins.scss
+@@ -159,6 +159,12 @@
+ 	border-color: $accent-color;
+ 	// Expand the default border focus style by .5px to be a total of 1.5px.
+ 	box-shadow: 0 0 0 0.5px $accent-color;
++
++	/* Integer fallback for 1x screens to prevent blurry rendering in Firefox */
++	@media (-webkit-max-device-pixel-ratio: 1), (max-resolution: 1dppx) {
++		box-shadow: 0 0 0 1px $accent-color;
++	}
++
+ 	// Windows High Contrast mode will show this outline, but not the box-shadow.
+ 	outline: 2px solid transparent;
+ }
+diff --git a/packages/block-editor/src/components/block-draggable/style.scss b/packages/block-editor/src/components/block-draggable/style.scss
+index f420251510ac64..fbdbcb5aa06cdb 100644
+--- a/packages/block-editor/src/components/block-draggable/style.scss
++++ b/packages/block-editor/src/components/block-draggable/style.scss
+@@ -67,6 +67,12 @@
+ 		width: $grid-unit-50 * 0.5;
+ 		height: $grid-unit-50 * 0.5;
+ 		box-shadow: inset 0 0 0 1.5px $white;
++
++		/* Integer fallback for 1x screens to prevent blurry rendering in Firefox */
++		@media (-webkit-max-device-pixel-ratio: 1), (max-resolution: 1dppx) {
++			box-shadow: inset 0 0 0 1px $white;
++		}
++
+ 		border-radius: 50%;
+ 		display: inline-block;
+ 		padding: 0;
+diff --git a/packages/components/src/border-control/styles.ts b/packages/components/src/border-control/styles.ts
+index 0109c0598e85b5..53b3beeb06cd0f 100644
+--- a/packages/components/src/border-control/styles.ts
++++ b/packages/components/src/border-control/styles.ts
+@@ -7,6 +7,7 @@ import { css } from '@emotion/react';
+  * Internal dependencies
+  */
+ import { COLORS, CONFIG, boxSizingReset, rtl } from '../utils';
++import { MEDIA_QUERY_1X } from '../utils/breakpoints';
+ import { space } from '../utils/space';
+ import { StyledLabel } from '../base-control/styles/base-control-styles';
+ import {
+@@ -18,6 +19,11 @@ import type { Border } from './types';
+ 
+ const focusBoxShadow = css`
+ 	box-shadow: inset ${ CONFIG.controlBoxShadowFocus };
++
++	/* Integer fallback for 1x screens to prevent blurry rendering in Firefox */
++	${ MEDIA_QUERY_1X } {
++		box-shadow: inset ${ CONFIG.controlBoxShadowFocus1x };
++	}
+ `;
+ 
+ export const borderControl = css`
+diff --git a/packages/components/src/color-picker/styles.ts b/packages/components/src/color-picker/styles.ts
+index 608d1cc7b0d7e6..adee0b53de48f1 100644
+--- a/packages/components/src/color-picker/styles.ts
++++ b/packages/components/src/color-picker/styles.ts
+@@ -14,6 +14,7 @@ import { boxSizingReset } from '../utils';
+ import { Flex } from '../flex';
+ import { HStack } from '../h-stack';
+ import CONFIG from '../utils/config-values';
++import { MEDIA_QUERY_1X } from '../utils/breakpoints';
+ 
+ export const NumberControlWrapper = styled( NumberControl )`
+ 	width: ${ space( 24 ) };
+@@ -100,11 +101,23 @@ export const ColorfulWrapper = styled.div`
+ 	.react-colorful__interactive:focus .react-colorful__pointer {
+ 		box-shadow: 0 0 0 ${ CONFIG.borderWidthFocus } ${ CONFIG.surfaceColor };
+ 		border: ${ CONFIG.borderWidthFocus } solid black;
++
++		/* Integer fallback for 1x screens to prevent blurry rendering in Firefox */
++		${ MEDIA_QUERY_1X } {
++			box-shadow: 0 0 0 ${ CONFIG.borderWidthFocus1x }
++				${ CONFIG.surfaceColor };
++		}
++
+ 		transform: translate( -50%, -50% ) scale( 1.5 );
+ 	}
+ 
+ 	.react-colorful__pointer-fill {
+ 		box-shadow: inset 0 0 0 ${ CONFIG.borderWidthFocus } #fff;
++
++		/* Integer fallback for 1x screens to prevent blurry rendering in Firefox */
++		${ MEDIA_QUERY_1X } {
++			box-shadow: inset 0 0 0 ${ CONFIG.borderWidthFocus1x } #fff;
++		}
+ 	}
+ 
+ 	${ interactiveHueStyles }
+diff --git a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+index 2d806859ac6757..26b7bec02fedd1 100644
+--- a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
++++ b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+@@ -52,6 +52,12 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+   outline-offset: -2px;
+ }
+ 
++@media (-webkit-max-device-pixel-ratio: 1), (max-resolution: 1dppx) {
++  .emotion-6:focus-within:not( :has( :is( .em5sgkm8, .emotion-19 ):focus-within ) ) .emotion-26 {
++    box-shadow: 0 0 0 1px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
++  }
++}
++
+ .emotion-9 {
+   display: block;
+   max-height: 100%;
+@@ -334,6 +340,12 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
+   outline-offset: -2px;
+ }
+ 
++@media (-webkit-max-device-pixel-ratio: 1), (max-resolution: 1dppx) {
++  .emotion-6:focus-within:not( :has( :is( .em5sgkm8, .emotion-19 ):focus-within ) ) .emotion-26 {
++    box-shadow: 0 0 0 1px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
++  }
++}
++
+ .emotion-9 {
+   display: block;
+   max-height: 100%;
+@@ -626,6 +638,12 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`]
+   outline-offset: -2px;
+ }
+ 
++@media (-webkit-max-device-pixel-ratio: 1), (max-resolution: 1dppx) {
++  .emotion-6:focus-within:not( :has( :is( .em5sgkm8, .emotion-19 ):focus-within ) ) .emotion-26 {
++    box-shadow: 0 0 0 1px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
++  }
++}
++
+ .emotion-9 {
+   display: block;
+   max-height: 100%;
+@@ -930,6 +948,12 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
+   outline-offset: -2px;
+ }
+ 
++@media (-webkit-max-device-pixel-ratio: 1), (max-resolution: 1dppx) {
++  .emotion-6:focus-within:not( :has( :is( .em5sgkm8, .emotion-19 ):focus-within ) ) .emotion-26 {
++    box-shadow: 0 0 0 1px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
++  }
++}
++
+ .emotion-9 {
+   display: block;
+   max-height: 100%;
+diff --git a/packages/components/src/input-control/styles/input-control-styles.tsx b/packages/components/src/input-control/styles/input-control-styles.tsx
+index 492c4bef0f4e20..9b667eabbde082 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.tsx
++++ b/packages/components/src/input-control/styles/input-control-styles.tsx
+@@ -13,6 +13,7 @@ import type { WordPressComponentProps } from '../../context';
+ import { Flex, FlexItem } from '../../flex';
+ import { Text } from '../../text';
+ import { baseLabelTypography, COLORS, CONFIG, rtl } from '../../utils';
++import { MEDIA_QUERY_1X } from '../../utils/breakpoints';
+ import type { LabelPosition, Size, PrefixSuffixWrapperProps } from '../types';
+ 
+ type ContainerProps = {
+@@ -85,6 +86,12 @@ export const Root = styled( Flex )`
+ 		${ BackdropUI } {
+ 			border-color: ${ COLORS.ui.borderFocus };
+ 			box-shadow: ${ CONFIG.controlBoxShadowFocus };
++
++			/* Integer fallback for 1x screens to prevent blurry rendering in Firefox */
++			${ MEDIA_QUERY_1X } {
++				box-shadow: ${ CONFIG.controlBoxShadowFocus1x };
++			}
++
+ 			// Windows High Contrast mode will show this outline, but not the box-shadow.
+ 			outline: 2px solid transparent;
+ 			outline-offset: -2px;
+diff --git a/packages/components/src/menu/styles.ts b/packages/components/src/menu/styles.ts
+index 1235d6ae7ec1b4..2400ef90b5faf3 100644
+--- a/packages/components/src/menu/styles.ts
++++ b/packages/components/src/menu/styles.ts
+@@ -9,6 +9,7 @@ import styled from '@emotion/styled';
+  * Internal dependencies
+  */
+ import { COLORS, font, rtl, CONFIG } from '../utils';
++import { MEDIA_QUERY_1X } from '../utils/breakpoints';
+ import { space } from '../utils/space';
+ import Icon from '../icon';
+ import { Truncate } from '../truncate';
+@@ -208,6 +209,11 @@ const baseItem = css`
+ 	&[data-focus-visible] {
+ 		box-shadow: 0 0 0 1.5px ${ COLORS.theme.accent };
+ 
++		/* Integer fallback for 1x screens to prevent blurry rendering in Firefox */
++		${ MEDIA_QUERY_1X } {
++			box-shadow: 0 0 0 1px ${ COLORS.theme.accent };
++		}
++
+ 		/* Only visible in Windows High Contrast mode */
+ 		outline: 2px solid transparent;
+ 	}
+diff --git a/packages/components/src/textarea-control/styles/textarea-control-styles.ts b/packages/components/src/textarea-control/styles/textarea-control-styles.ts
+index 3e76b2ef5d4c3f..47be38914b50d9 100644
+--- a/packages/components/src/textarea-control/styles/textarea-control-styles.ts
++++ b/packages/components/src/textarea-control/styles/textarea-control-styles.ts
+@@ -10,6 +10,7 @@ import { css } from '@emotion/react';
+ import { font } from '../../utils/font';
+ import { COLORS } from '../../utils/colors-values';
+ import { CONFIG } from '../../utils';
++import { MEDIA_QUERY_1X } from '../../utils/breakpoints';
+ import { breakpoint } from '../../utils/breakpoint';
+ 
+ const inputStyleNeutral = css`
+@@ -28,6 +29,13 @@ const inputStyleFocus = css`
+ 		calc( ${ CONFIG.borderWidthFocus } - ${ CONFIG.borderWidth } )
+ 		${ COLORS.theme.accent };
+ 
++	/* Integer fallback for 1x screens to prevent blurry rendering in Firefox */
++	${ MEDIA_QUERY_1X } {
++		box-shadow: 0 0 0
++			calc( ${ CONFIG.borderWidthFocus1x } - ${ CONFIG.borderWidth } )
++			${ COLORS.theme.accent };
++	}
++
+ 	// Windows High Contrast mode will show this outline, but not the box-shadow.
+ 	outline: 2px solid transparent;
+ `;
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index 18837ae79a325a..9ebe7177cc5f17 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -60,6 +60,12 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+   outline-offset: -2px;
+ }
+ 
++@media (-webkit-max-device-pixel-ratio: 1), (max-resolution: 1dppx) {
++  .emotion-8:focus-within {
++    box-shadow: 0 0 0 1px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
++  }
++}
++
+ @media not ( prefers-reduced-motion ) {
+   .emotion-8[data-indicator-animated]::before {
+     transition-property: transform,border-radius;
+@@ -425,6 +431,12 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+   outline-offset: -2px;
+ }
+ 
++@media (-webkit-max-device-pixel-ratio: 1), (max-resolution: 1dppx) {
++  .emotion-8:focus-within {
++    box-shadow: 0 0 0 1px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
++  }
++}
++
+ @media not ( prefers-reduced-motion ) {
+   .emotion-8[data-indicator-animated]::before {
+     transition-property: transform,border-radius;
+@@ -694,6 +706,12 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+   outline-offset: -2px;
+ }
+ 
++@media (-webkit-max-device-pixel-ratio: 1), (max-resolution: 1dppx) {
++  .emotion-8:focus-within {
++    box-shadow: 0 0 0 1px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
++  }
++}
++
+ @media not ( prefers-reduced-motion ) {
+   .emotion-8[data-indicator-animated]::before {
+     transition-property: transform,border-radius;
+@@ -1053,6 +1071,12 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
+   outline-offset: -2px;
+ }
+ 
++@media (-webkit-max-device-pixel-ratio: 1), (max-resolution: 1dppx) {
++  .emotion-8:focus-within {
++    box-shadow: 0 0 0 1px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
++  }
++}
++
+ @media not ( prefers-reduced-motion ) {
+   .emotion-8[data-indicator-animated]::before {
+     transition-property: transform,border-radius;
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
+index a53eced1219db4..58f94bc3f7feaa 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
+@@ -8,6 +8,7 @@ import styled from '@emotion/styled';
+  * Internal dependencies
+  */
+ import { CONFIG, COLORS } from '../../utils';
++import { MEDIA_QUERY_1X } from '../../utils/breakpoints';
+ import type {
+ 	ToggleGroupControlProps,
+ 	ToggleGroupControlOptionBaseProps,
+@@ -93,6 +94,14 @@ const deselectable = css`
+ 		box-shadow:
+ 			inset 0 0 0 1px ${ COLORS.ui.background },
+ 			0 0 0 ${ CONFIG.borderWidthFocus } ${ COLORS.theme.accent };
++
++		/* Integer fallback for 1x screens to prevent blurry rendering in Firefox */
++		${ MEDIA_QUERY_1X } {
++			box-shadow:
++				inset 0 0 0 1px ${ COLORS.ui.background },
++				0 0 0 ${ CONFIG.borderWidthFocus1x } ${ COLORS.theme.accent };
++		}
++
+ 		outline: 2px solid transparent;
+ 	}
+ `;
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
+index 8376b66a5a86cf..1bebd0f7e5350b 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
+@@ -8,6 +8,7 @@ import styled from '@emotion/styled';
+  * Internal dependencies
+  */
+ import { CONFIG, COLORS } from '../../utils';
++import { MEDIA_QUERY_1X } from '../../utils/breakpoints';
+ import type { ToggleGroupControlProps } from '../types';
+ 
+ export const toggleGroupControl = ( {
+@@ -84,6 +85,12 @@ const enclosingBorders = ( isBlock: ToggleGroupControlProps[ 'isBlock' ] ) => {
+ 		&:focus-within {
+ 			border-color: ${ COLORS.ui.borderFocus };
+ 			box-shadow: ${ CONFIG.controlBoxShadowFocus };
++
++			/* Integer fallback for 1x screens to prevent blurry rendering in Firefox */
++			${ MEDIA_QUERY_1X } {
++				box-shadow: ${ CONFIG.controlBoxShadowFocus1x };
++			}
++
+ 			z-index: 1;
+ 			// Windows High Contrast mode will show this outline, but not the box-shadow.
+ 			outline: 2px solid transparent;
+diff --git a/packages/components/src/unit-control/styles/unit-control-styles.ts b/packages/components/src/unit-control/styles/unit-control-styles.ts
+index 8ec575c8499ec2..1b22353a499c37 100644
+--- a/packages/components/src/unit-control/styles/unit-control-styles.ts
++++ b/packages/components/src/unit-control/styles/unit-control-styles.ts
+@@ -7,6 +7,7 @@ import styled from '@emotion/styled';
+  * Internal dependencies
+  */
+ import { COLORS, CONFIG, rtl } from '../../utils';
++import { MEDIA_QUERY_1X } from '../../utils/breakpoints';
+ import NumberControl from '../../number-control';
+ import { BackdropUI } from '../../input-control/styles/input-control-styles';
+ import type { SelectSize } from '../types';
+@@ -124,6 +125,14 @@ const unitSelectSizes = ( { selectSize = 'default' }: SelectProps ) => {
+ 				box-shadow: 0 0 0
+ 					${ CONFIG.borderWidthFocus + ' ' + COLORS.ui.borderFocus };
+ 				outline: ${ CONFIG.borderWidthFocus } solid transparent; // For High Contrast Mode
++
++				/* Integer fallback for 1x screens to prevent blurry rendering in Firefox */
++				${ MEDIA_QUERY_1X } {
++					box-shadow: 0 0 0
++						${ CONFIG.borderWidthFocus1x +
++						' ' +
++						COLORS.ui.borderFocus };
++				}
+ 			}
+ 		`,
+ 	};
+diff --git a/packages/components/src/utils/breakpoints.js b/packages/components/src/utils/breakpoints.js
+new file mode 100644
+index 00000000000000..eab6722cd57bcb
+--- /dev/null
++++ b/packages/components/src/utils/breakpoints.js
+@@ -0,0 +1,32 @@
++/**
++ * Media query utilities for handling different screen resolutions.
++ *
++ * On 1x screens (non-retina), decimal pixel values in box-shadow spread-radius
++ * can cause blurry rendering in Firefox. This provides utilities to apply
++ * integer pixel values for 1x screens while maintaining sub-pixel precision
++ * for higher resolution displays.
++ */
++
++/**
++ * Media query for 1x resolution screens (non-retina displays).
++ * Used to apply integer pixel values to prevent blurry rendering in Firefox.
++ */
++export const MEDIA_QUERY_1X =
++	'@media (-webkit-max-device-pixel-ratio: 1), (max-resolution: 1dppx)';
++
++/**
++ * CSS utility function to apply different values for 1x vs higher resolution screens.
++ *
++ * @param {string} defaultValue - The default value (for high-DPI screens).
++ * @param {string} oneXValue    - The value for 1x screens (should use integer pixels).
++ *
++ * @return {string} CSS with appropriate media queries.
++ */
++export function withOneXFallback( defaultValue, oneXValue ) {
++	return `
++		${ defaultValue };
++		${ MEDIA_QUERY_1X } {
++			${ oneXValue };
++		}
++	`;
++}
+diff --git a/packages/components/src/utils/config-values.js b/packages/components/src/utils/config-values.js
+index 13b704540e9c4c..a170c534da26d8 100644
+--- a/packages/components/src/utils/config-values.js
++++ b/packages/components/src/utils/config-values.js
+@@ -13,6 +13,8 @@ const CONTROL_PROPS = {
+ 	controlPaddingXLarge: 12 * 1.3334, // TODO: Deprecate
+ 
+ 	controlBoxShadowFocus: `0 0 0 0.5px ${ COLORS.theme.accent }`,
++	// Integer fallback for 1x screens to prevent blurry rendering in Firefox
++	controlBoxShadowFocus1x: `0 0 0 1px ${ COLORS.theme.accent }`,
+ 	controlHeight: CONTROL_HEIGHT,
+ 	controlHeightXSmall: `calc( ${ CONTROL_HEIGHT } * 0.6 )`,
+ 	controlHeightSmall: `calc( ${ CONTROL_HEIGHT } * 0.8 )`,
+@@ -36,6 +38,8 @@ export default Object.assign( {}, CONTROL_PROPS, {
+ 	radiusRound: '50%',
+ 	borderWidth: '1px',
+ 	borderWidthFocus: '1.5px',
++	// Integer fallback for 1x screens to prevent blurry rendering in Firefox
++	borderWidthFocus1x: '1px',
+ 	borderWidthTab: '4px',
+ 	spinnerSize: 16,
+ 	fontSize: '13px',
+diff --git a/packages/components/src/utils/index.js b/packages/components/src/utils/index.js
+index 94d8a67cc04607..bd6f9fe5cb7620 100644
+--- a/packages/components/src/utils/index.js
++++ b/packages/components/src/utils/index.js
+@@ -1,2 +1,3 @@
+ export * from './hooks';
+ export * from './style-mixins';
++export * from './breakpoints';
+diff --git a/packages/edit-site/src/components/page-patterns/style.scss b/packages/edit-site/src/components/page-patterns/style.scss
+index 14ad49415a56fe..0eef82feb70d3e 100644
+--- a/packages/edit-site/src/components/page-patterns/style.scss
++++ b/packages/edit-site/src/components/page-patterns/style.scss
+@@ -86,6 +86,12 @@
+ 		border-bottom-left-radius: $radius-small;
+ 		border-bottom-right-radius: $radius-small;
+ 		box-shadow: 0 0 0.5px 0.5px var(--wp-admin-theme-color);
++
++		/* Integer fallback for 1x screens to prevent blurry rendering in Firefox */
++		@media (-webkit-max-device-pixel-ratio: 1), (max-resolution: 1dppx) {
++			box-shadow: 0 0 1px 1px var(--wp-admin-theme-color);
++		}
++
+ 		box-sizing: border-box;
+ 		z-index: 1;
+ 		background-color: $white;
+diff --git a/packages/editor/src/components/header/style.scss b/packages/editor/src/components/header/style.scss
+index da08825ece3f23..5ab6e7943c0848 100644
+--- a/packages/editor/src/components/header/style.scss
++++ b/packages/editor/src/components/header/style.scss
+@@ -140,6 +140,12 @@
+ 	.is-tertiary {
+ 		&:active {
+ 			box-shadow: 0 0 0 1.5px var(--wp-admin-theme-color);
++
++			/* Integer fallback for 1x screens to prevent blurry rendering in Firefox */
++			@media (-webkit-max-device-pixel-ratio: 1), (max-resolution: 1dppx) {
++				box-shadow: 0 0 0 1px var(--wp-admin-theme-color);
++			}
++
+ 			background-color: transparent;
+ 		}
+ 	}
+diff --git a/packages/patterns/src/components/style.scss b/packages/patterns/src/components/style.scss
+index 1b053ab7ac2517..c4b0d5ce638390 100644
+--- a/packages/patterns/src/components/style.scss
++++ b/packages/patterns/src/components/style.scss
+@@ -16,6 +16,12 @@
+ 		border-bottom-left-radius: $radius-small;
+ 		border-bottom-right-radius: $radius-small;
+ 		box-shadow: 0 0 0.5px 0.5px var(--wp-admin-theme-color);
++
++		/* Integer fallback for 1x screens to prevent blurry rendering in Firefox */
++		@media (-webkit-max-device-pixel-ratio: 1), (max-resolution: 1dppx) {
++			box-shadow: 0 0 1px 1px var(--wp-admin-theme-color);
++		}
++
+ 		box-sizing: border-box;
+ 		z-index: 1;
+ 		background-color: $white;

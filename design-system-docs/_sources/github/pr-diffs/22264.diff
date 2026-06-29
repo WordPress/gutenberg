@@ -1,0 +1,29 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d9ada9d3a41eca..4be92dcf3872b5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,11 @@
+ 
+ ## Unreleased
+ 
++### Bug Fix
++
++- Fix and issue that would cause the `Popover` component to throw an error under certain
++  circumstances ([#22264](https://github.com/WordPress/gutenberg/pull/22264)).
++
+ ## 9.2.0 (2020-02-10)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/popover/index.js b/packages/components/src/popover/index.js
+index 13aa4b34dfe669..caebfcfe42784d 100644
+--- a/packages/components/src/popover/index.js
++++ b/packages/components/src/popover/index.js
+@@ -331,7 +331,7 @@ const Popover = ( {
+ 			if ( __unstableBoundaryParent ) {
+ 				boundaryElement = containerRef.current.closest(
+ 					'.popover-slot'
+-				).parentNode;
++				)?.parentNode;
+ 			}
+ 
+ 			const {

@@ -1,0 +1,136 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 0ee1dda90228f8..4f6c55ea70c34e 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fixes
++
++-   `Dialog`, `AlertDialog`, `Popover`, `Tooltip`, `Select`: Fix broken focus-trap caused by ThemeProvider's `display: contents` and Base UI's `checkVisibility()` ([#77381](https://github.com/WordPress/gutenberg/pull/77381)).
++
+ ## 0.11.0 (2026-04-15)
+ 
+ ### Breaking Changes
+diff --git a/packages/ui/src/dialog/style.module.css b/packages/ui/src/dialog/style.module.css
+index 1dd2e2706f8bca..f2e8ed65acd887 100644
+--- a/packages/ui/src/dialog/style.module.css
++++ b/packages/ui/src/dialog/style.module.css
+@@ -1,5 +1,17 @@
+ @layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+ 
++/*
++ * Temporary workaround for a Base UI tabbability regression with
++ * checkVisibility() and display: contents.
++ * See: https://github.com/mui/base-ui/issues/4622
++ *
++ * This must stay outside the CSS layers to override ThemeProvider's
++ * unlayered display: contents.
++ */
++[data-wpds-theme-provider-id]:has(> .popup) {
++	display: block;
++}
++
+ @layer wp-ui-components {
+ 	.backdrop {
+ 		position: fixed;
+diff --git a/packages/ui/src/popover/popup.tsx b/packages/ui/src/popover/popup.tsx
+index 4dabf05b2c1beb..39abe6dbdf7f2a 100644
+--- a/packages/ui/src/popover/popup.tsx
++++ b/packages/ui/src/popover/popup.tsx
+@@ -84,7 +84,10 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
+ 					ref={ mergedPopupRef }
+ 					initialFocus={ resolvedInitialFocus }
+ 					finalFocus={ finalFocus }
+-					className={ clsx( variant !== 'unstyled' && styles.popup ) }
++					className={ clsx(
++						styles.popup,
++						variant !== 'unstyled' && styles.default
++					) }
+ 					{ ...props }
+ 				>
+ 					<PopoverValidationProvider>
+diff --git a/packages/ui/src/popover/style.module.css b/packages/ui/src/popover/style.module.css
+index 150e9aff57c8d0..5ad128083f8809 100644
+--- a/packages/ui/src/popover/style.module.css
++++ b/packages/ui/src/popover/style.module.css
+@@ -1,11 +1,33 @@
+ @layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+ 
++/*
++ * Temporary workaround for a Base UI tabbability regression with
++ * checkVisibility() and display: contents.
++ * See: https://github.com/mui/base-ui/issues/4622
++ *
++ * This must stay outside the CSS layers to override ThemeProvider's
++ * unlayered display: contents.
++ */
++[data-wpds-theme-provider-id]:has(> .popup) {
++	display: block;
++}
++
+ @layer wp-ui-components {
+ 	.positioner {
+ 		z-index: var(--wp-ui-popover-z-index, initial);
+ 	}
+ 
+-	.popup {
++	/*
++	 * Structural marker; no visual styles. Always applied to the popup so
++	 * the ThemeProvider display workaround above matches regardless of
++	 * `variant`. Visuals live in `.default`.
++	 */
++	/* stylelint-disable-next-line block-no-empty -- structural marker for the
++	 * ThemeProvider display workaround above; kept class-based (not a data
++	 * attribute) so it is defined alongside the other component classes. */
++	.popup {}
++
++	.default {
+ 		background-color: var(--wpds-color-bg-surface-neutral-strong);
+ 		padding: var(--wpds-dimension-padding-lg);
+ 		border-radius: var(--wpds-border-radius-md);
+diff --git a/packages/ui/src/tooltip/style.module.css b/packages/ui/src/tooltip/style.module.css
+index 58a705a623d093..a23ca5abb1c349 100644
+--- a/packages/ui/src/tooltip/style.module.css
++++ b/packages/ui/src/tooltip/style.module.css
+@@ -1,5 +1,17 @@
+ @layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+ 
++/*
++ * Temporary workaround for a Base UI tabbability regression with
++ * checkVisibility() and display: contents.
++ * See: https://github.com/mui/base-ui/issues/4622
++ *
++ * This must stay outside the CSS layers to override ThemeProvider's
++ * unlayered display: contents.
++ */
++[data-wpds-theme-provider-id]:has(> .popup) {
++	display: block;
++}
++
+ @layer wp-ui-components {
+ 	.positioner {
+ 		z-index: var(--wp-ui-tooltip-z-index, initial);
+diff --git a/packages/ui/src/utils/css/item-popup.module.css b/packages/ui/src/utils/css/item-popup.module.css
+index 217bf45c176821..93a1c181c2e0ee 100644
+--- a/packages/ui/src/utils/css/item-popup.module.css
++++ b/packages/ui/src/utils/css/item-popup.module.css
+@@ -1,5 +1,17 @@
+ @layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+ 
++/*
++ * Temporary workaround for a Base UI tabbability regression with
++ * checkVisibility() and display: contents.
++ * See: https://github.com/mui/base-ui/issues/4622
++ *
++ * This must stay outside the CSS layers to override ThemeProvider's
++ * unlayered display: contents.
++ */
++[data-wpds-theme-provider-id]:has(> .popup) {
++	display: block;
++}
++
+ @layer wp-ui-utilities {
+ 	.popup {
+ 		composes: dropdown-motion from "./dropdown-motion.module.css";

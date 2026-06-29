@@ -1,0 +1,608 @@
+diff --git a/bin/api-docs/gen-components-docs/index.mjs b/bin/api-docs/gen-components-docs/index.mjs
+new file mode 100644
+index 00000000000000..e036995b4c4f74
+--- /dev/null
++++ b/bin/api-docs/gen-components-docs/index.mjs
+@@ -0,0 +1,112 @@
++/**
++ * External dependencies
++ */
++import docgen from 'react-docgen-typescript';
++import glob from 'glob';
++import fs from 'node:fs/promises';
++import path from 'path';
++
++/**
++ * Internal dependencies
++ */
++import { generateMarkdownDocs } from './markdown/index.mjs';
++
++const MANIFEST_GLOB = 'packages/components/src/**/docs-manifest.json';
++
++// For consistency, options should generally match the options used in Storybook.
++const OPTIONS = {
++	shouldExtractLiteralValuesFromEnum: true,
++	shouldRemoveUndefinedFromOptional: true,
++	propFilter: ( prop ) =>
++		prop.parent ? ! /node_modules/.test( prop.parent.fileName ) : true,
++	savePropValueAsString: true,
++};
++
++function getTypeDocsForComponent( {
++	manifestPath,
++	componentFilePath,
++	displayName,
++} ) {
++	const resolvedPath = path.resolve(
++		path.dirname( manifestPath ),
++		componentFilePath
++	);
++
++	const typeDocs = docgen.parse( resolvedPath, OPTIONS );
++
++	if ( typeDocs.length === 0 ) {
++		throw new Error(
++			`react-docgen-typescript could not generate any type docs from ${ resolvedPath }`
++		);
++	}
++
++	const matchingTypeDoc = typeDocs.find(
++		( obj ) => obj.displayName === displayName
++	);
++
++	if ( typeof matchingTypeDoc === 'undefined' ) {
++		const unmatchedTypeDocs = typeDocs
++			.map( ( obj ) => `\`${ obj.displayName }\`` )
++			.join( ', ' );
++
++		throw new Error(
++			`react-docgen-typescript could not find type docs for ${ displayName } in ${ resolvedPath }. (Found ${ unmatchedTypeDocs })`
++		);
++	}
++
++	return matchingTypeDoc;
++}
++
++async function parseManifest( manifestPath ) {
++	try {
++		return JSON.parse( await fs.readFile( manifestPath, 'utf8' ) );
++	} catch ( e ) {
++		throw new Error(
++			`Error parsing docs manifest at ${ manifestPath }: ${ e.message }`
++		);
++	}
++}
++
++const manifests = glob.sync( MANIFEST_GLOB );
++
++await Promise.all(
++	manifests.map( async ( manifestPath ) => {
++		const manifest = await parseManifest( manifestPath );
++
++		const typeDocs = getTypeDocsForComponent( {
++			manifestPath,
++			componentFilePath: manifest.filePath,
++			displayName: manifest.displayName,
++		} );
++
++		const subcomponentTypeDocs = manifest.subcomponents?.map(
++			( subcomponent ) => {
++				const docs = getTypeDocsForComponent( {
++					manifestPath,
++					componentFilePath: subcomponent.filePath,
++					displayName: subcomponent.displayName,
++				} );
++
++				if ( subcomponent.preferredDisplayName ) {
++					docs.displayName = subcomponent.preferredDisplayName;
++				}
++
++				return docs;
++			}
++		);
++		const docs = generateMarkdownDocs( { typeDocs, subcomponentTypeDocs } );
++		const outputFile = path.resolve(
++			path.dirname( manifestPath ),
++			'./README.md'
++		);
++
++		try {
++			console.log( `Writing docs to ${ outputFile }` );
++			return fs.writeFile( outputFile, docs );
++		} catch ( e ) {
++			throw new Error(
++				`Error writing docs to ${ outputFile }: ${ e.message }`
++			);
++		}
++	} )
++);
+diff --git a/bin/api-docs/gen-components-docs/markdown/index.mjs b/bin/api-docs/gen-components-docs/markdown/index.mjs
+new file mode 100644
+index 00000000000000..85655b89f08414
+--- /dev/null
++++ b/bin/api-docs/gen-components-docs/markdown/index.mjs
+@@ -0,0 +1,40 @@
++/**
++ * External dependencies
++ */
++import json2md from 'json2md';
++
++/**
++ * Internal dependencies
++ */
++import { generateMarkdownPropsJson } from './props.mjs';
++
++export function generateMarkdownDocs( { typeDocs, subcomponentTypeDocs } ) {
++	const mainDocsJson = [
++		'<!-- This file is generated automatically and cannot be edited directly. -->\n',
++		{ h1: typeDocs.displayName },
++		{
++			p: `<p class="callout callout-info">See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-${ typeDocs.displayName.toLowerCase() }--docs">WordPress Storybook</a> for more detailed, interactive documentation.</p>`,
++		},
++		typeDocs.description,
++		...generateMarkdownPropsJson( typeDocs.props ),
++	];
++
++	const subcomponentDocsJson = subcomponentTypeDocs?.length
++		? [
++				{ h2: 'Subcomponents' },
++				...subcomponentTypeDocs.flatMap( ( subcomponentTypeDoc ) => [
++					{
++						h3: subcomponentTypeDoc.displayName,
++					},
++					subcomponentTypeDoc.description,
++					...generateMarkdownPropsJson( subcomponentTypeDoc.props, {
++						headingLevel: 4,
++					} ),
++				] ),
++		  ]
++		: [];
++
++	return json2md(
++		[ ...mainDocsJson, ...subcomponentDocsJson ].filter( Boolean )
++	);
++}
+diff --git a/bin/api-docs/gen-components-docs/markdown/props.mjs b/bin/api-docs/gen-components-docs/markdown/props.mjs
+new file mode 100644
+index 00000000000000..9d019c4240f008
+--- /dev/null
++++ b/bin/api-docs/gen-components-docs/markdown/props.mjs
+@@ -0,0 +1,51 @@
++function renderPropType( type ) {
++	const MAX_ENUM_VALUES = 10;
++
++	switch ( type.name ) {
++		case 'enum': {
++			const string = type.value
++				.slice( 0, MAX_ENUM_VALUES )
++				.map( ( { value } ) => value )
++				.join( ' | ' );
++
++			if ( type.value.length > MAX_ENUM_VALUES ) {
++				return `${ string } | ...`;
++			}
++			return string;
++		}
++		default:
++			return type.name;
++	}
++}
++
++export function generateMarkdownPropsJson( props, { headingLevel = 2 } = {} ) {
++	const sortedKeys = Object.keys( props ).sort( ( [ a ], [ b ] ) =>
++		a.localeCompare( b )
++	);
++
++	const propsJson = sortedKeys
++		.flatMap( ( key ) => {
++			const prop = props[ key ];
++
++			if ( prop.description?.includes( '@ignore' ) ) {
++				return null;
++			}
++
++			return [
++				{ [ `h${ headingLevel + 1 }` ]: `\`${ key }\`` },
++				prop.description,
++				{
++					ul: [
++						`Type: \`${ renderPropType( prop.type ) }\``,
++						`Required: ${ prop.required ? 'Yes' : 'No' }`,
++						prop.defaultValue &&
++							`Default: \`${ prop.defaultValue.value }\``,
++					].filter( Boolean ),
++				},
++			];
++		} )
++		.filter( Boolean );
++
++	return [ { [ `h${ headingLevel }` ]: 'Props' }, ...propsJson ];
++}
++
+diff --git a/package-lock.json b/package-lock.json
+index c240bfd1784377..465dd3f6877f9d 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -204,6 +204,7 @@
+ 				"jest-junit": "13.0.0",
+ 				"jest-message-util": "29.6.2",
+ 				"jest-watch-typeahead": "2.2.2",
++				"json2md": "2.0.1",
+ 				"lerna": "7.1.4",
+ 				"lint-staged": "10.0.2",
+ 				"make-dir": "3.0.0",
+@@ -223,6 +224,7 @@
+ 				"progress": "2.0.3",
+ 				"puppeteer-core": "23.1.0",
+ 				"react": "18.3.1",
++				"react-docgen-typescript": "2.2.2",
+ 				"react-dom": "18.3.1",
+ 				"react-native": "0.73.3",
+ 				"react-native-url-polyfill": "1.1.2",
+@@ -29748,6 +29750,13 @@
+ 				"node": ">=4"
+ 			}
+ 		},
++		"node_modules/indento": {
++			"version": "1.1.13",
++			"resolved": "https://registry.npmjs.org/indento/-/indento-1.1.13.tgz",
++			"integrity": "sha512-YZWk3mreBEM7sBPddsiQnW9Z8SGg/gNpFfscJq00HCDS7pxcQWWWMSVKJU7YkTRyDu1Zv2s8zaK8gQWKmCXHlg==",
++			"dev": true,
++			"license": "MIT"
++		},
+ 		"node_modules/infer-owner": {
+ 			"version": "1.0.4",
+ 			"resolved": "https://registry.npmjs.org/infer-owner/-/infer-owner-1.0.4.tgz",
+@@ -32471,6 +32480,16 @@
+ 			"integrity": "sha512-ZClg6AaYvamvYEE82d3Iyd3vSSIjQ+odgjaTzRuO3s7toCdFKczob2i0zCh7JE8kWn17yvAWhUVxvqGwUalsRA==",
+ 			"dev": true
+ 		},
++		"node_modules/json2md": {
++			"version": "2.0.1",
++			"resolved": "https://registry.npmjs.org/json2md/-/json2md-2.0.1.tgz",
++			"integrity": "sha512-VbwmZ83qmUfKBS2pUOHlzNKEZFPBeJSbzEok3trMYyboZUgdHNn1XZfc1uT8UZs1GHCrmRUBXCfqw4YmmQuOhw==",
++			"dev": true,
++			"license": "MIT",
++			"dependencies": {
++				"indento": "^1.1.13"
++			}
++		},
+ 		"node_modules/json2php": {
+ 			"version": "0.0.7",
+ 			"resolved": "https://registry.npmjs.org/json2php/-/json2php-0.0.7.tgz",
+@@ -43165,6 +43184,7 @@
+ 			"resolved": "https://registry.npmjs.org/react-docgen-typescript/-/react-docgen-typescript-2.2.2.tgz",
+ 			"integrity": "sha512-tvg2ZtOpOi6QDwsb3GZhOjDkkX0h8Z2gipvTg6OVMUyoYoURhEiRNePT8NZItTVCDh39JJHnLdfCOkzoLbFnTg==",
+ 			"dev": true,
++			"license": "MIT",
+ 			"peerDependencies": {
+ 				"typescript": ">= 4.3.x"
+ 			}
+diff --git a/package.json b/package.json
+index 4c071bf746c159..14af2c94f62669 100644
+--- a/package.json
++++ b/package.json
+@@ -216,6 +216,7 @@
+ 		"jest-junit": "13.0.0",
+ 		"jest-message-util": "29.6.2",
+ 		"jest-watch-typeahead": "2.2.2",
++		"json2md": "2.0.1",
+ 		"lerna": "7.1.4",
+ 		"lint-staged": "10.0.2",
+ 		"make-dir": "3.0.0",
+@@ -235,6 +236,7 @@
+ 		"progress": "2.0.3",
+ 		"puppeteer-core": "23.1.0",
+ 		"react": "18.3.1",
++		"react-docgen-typescript": "2.2.2",
+ 		"react-dom": "18.3.1",
+ 		"react-native": "0.73.3",
+ 		"react-native-url-polyfill": "1.1.2",
+@@ -282,7 +284,8 @@
+ 		"distclean": "git clean --force -d -X",
+ 		"docs:api-ref": "node ./bin/api-docs/update-api-docs.js",
+ 		"docs:blocks": "node ./bin/api-docs/gen-block-lib-list.js",
+-		"docs:build": "npm-run-all docs:gen docs:blocks docs:api-ref docs:theme-ref",
++		"docs:build": "npm-run-all docs:components docs:gen docs:blocks docs:api-ref docs:theme-ref",
++		"docs:components": "node ./bin/api-docs/gen-components-docs/index.mjs",
+ 		"docs:gen": "node ./docs/tool/index.js",
+ 		"docs:theme-ref": "node ./bin/api-docs/gen-theme-reference.mjs",
+ 		"env": "wp-env",
+diff --git a/packages/components/schemas/docs-manifest.json b/packages/components/schemas/docs-manifest.json
+new file mode 100644
+index 00000000000000..7d1e40f4f696d7
+--- /dev/null
++++ b/packages/components/schemas/docs-manifest.json
+@@ -0,0 +1,38 @@
++{
++	"title": "JSON schema for @wordpress/components README manifests",
++	"$schema": "http://json-schema.org/draft-07/schema#",
++	"type": "object",
++	"properties": {
++		"displayName": {
++			"type": "string",
++			"description": "The `displayName` of the component, as determined in code. Used to identify the component in the specified source file."
++		},
++		"filePath": {
++			"type": "string",
++			"description": "The file path where the component is located."
++		},
++		"subcomponents": {
++			"type": "array",
++			"description": "List of subcomponents related to the component.",
++			"items": {
++				"type": "object",
++				"properties": {
++					"displayName": {
++						"type": "string",
++						"description": "The `displayName` of the subcomponent, as determined in code. Used to identify the component in the specified source file."
++					},
++					"preferredDisplayName": {
++						"type": "string",
++						"description": "The display name to use in the README, if it is different from the `displayName` as determined in code."
++					},
++					"filePath": {
++						"type": "string",
++						"description": "The file path where the subcomponent is located."
++					}
++				},
++				"required": [ "displayName", "filePath" ]
++			}
++		}
++	},
++	"required": [ "displayName", "filePath" ]
++}
+diff --git a/packages/components/src/alignment-matrix-control/README.md b/packages/components/src/alignment-matrix-control/README.md
+index 68ecab6b7adb47..8e6ef324ce8e60 100644
+--- a/packages/components/src/alignment-matrix-control/README.md
++++ b/packages/components/src/alignment-matrix-control/README.md
+@@ -1,12 +1,15 @@
++<!-- This file is generated automatically and cannot be edited directly. -->
++
+ # AlignmentMatrixControl
+ 
+-AlignmentMatrixControl components enable adjustments to horizontal and vertical alignments for UI.
+ 
+-## Usage
++<p class="callout callout-info">See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-alignmentmatrixcontrol--docs">WordPress Storybook</a> for more detailed, interactive documentation.</p>
++
++AlignmentMatrixControl components enable adjustments to horizontal and vertical alignments for UI.
+ 
+ ```jsx
+-import { useState } from 'react';
+ import { AlignmentMatrixControl } from '@wordpress/components';
++import { useState } from '@wordpress/element';
+ 
+ const Example = () => {
+ 	const [ alignment, setAlignment ] = useState( 'center center' );
+@@ -14,63 +17,70 @@ const Example = () => {
+ 	return (
+ 		<AlignmentMatrixControl
+ 			value={ alignment }
+-			onChange={ ( newAlignment ) => setAlignment( newAlignment ) }
++			onChange={ setAlignment }
+ 		/>
+ 	);
+ };
+ ```
+-
+ ## Props
+ 
+-The component accepts the following props:
++### `defaultValue`
+ 
+-### className
++If provided, sets the default alignment value.
+ 
+-The class that will be added to the classes of the underlying `grid` widget.
+--   Type: `string`
+--   Required: No
++ - Type: `"center" | "top left" | "top center" | "top right" | "center left" | "center center" | "center right" | "bottom left" | "bottom center" | "bottom right"`
++ - Required: No
++ - Default: `'center center'`
+ 
+-### id
++### `label`
+ 
+-Unique ID for the component.
++Accessible label. If provided, sets the `aria-label` attribute of the
++underlying `grid` widget.
+ 
+--  Type: `string`
+--  Required: No
++ - Type: `string`
++ - Required: No
++ - Default: `'Alignment Matrix Control'`
+ 
+-### label
++### `onChange`
+ 
+-Accessible label. If provided, sets the `aria-label` attribute of the underlying `grid` widget.
++A function that receives the updated alignment value.
+ 
+--   Type: `string`
+--   Required: No
+--   Default: `Alignment Matrix Control`
++ - Type: `(newValue: AlignmentMatrixControlValue) => void`
++ - Required: No
+ 
+-### defaultValue
++### `value`
+ 
+-If provided, sets the default alignment value.
++The current alignment value.
+ 
+-- Type: `AlignmentMatrixControlValue`
+-- Required: No
+-- Default: `center center`
++ - Type: `"center" | "top left" | "top center" | "top right" | "center left" | "center center" | "center right" | "bottom left" | "bottom center" | "bottom right"`
++ - Required: No
+ 
+-### value
++### `width`
+ 
+-The current alignment value.
++If provided, sets the width of the control.
+ 
+-- Type: `AlignmentMatrixControlValue`
+-- Required: No
++ - Type: `number`
++ - Required: No
++ - Default: `92`
+ 
+-### onChange
++## Subcomponents
+ 
+-A function that receives the updated alignment value.
++### AlignmentMatrixControl.Icon
+ 
+--   Type: `( newValue: AlignmentMatrixControlValue ) => void`
+--   Required: No
++#### Props
+ 
+-### width
++##### `disablePointerEvents`
+ 
+-If provided, sets the width of the control.
++If `true`, disables pointer events on the icon.
+ 
+- - Type: `number`
++ - Type: `boolean`
+  - Required: No
+- - Default: `92`
++ - Default: `true`
++
++##### `value`
++
++The current alignment value.
++
++ - Type: `"center" | "top left" | "top center" | "top right" | "center left" | "center center" | "center right" | "bottom left" | "bottom center" | "bottom right"`
++ - Required: No
++ - Default: `center`
+diff --git a/packages/components/src/alignment-matrix-control/docs-manifest.json b/packages/components/src/alignment-matrix-control/docs-manifest.json
+new file mode 100644
+index 00000000000000..82ee28f4840c49
+--- /dev/null
++++ b/packages/components/src/alignment-matrix-control/docs-manifest.json
+@@ -0,0 +1,12 @@
++{
++	"$schema": "../../schemas/docs-manifest.json",
++	"displayName": "AlignmentMatrixControl",
++	"filePath": "./index.tsx",
++	"subcomponents": [
++		{
++			"displayName": "AlignmentMatrixControlIcon",
++			"preferredDisplayName": "AlignmentMatrixControl.Icon",
++			"filePath": "./icon.tsx"
++		}
++	]
++}
+diff --git a/packages/components/src/alignment-matrix-control/types.ts b/packages/components/src/alignment-matrix-control/types.ts
+index 0f97c2df3b02bb..e93f412c1f4721 100644
+--- a/packages/components/src/alignment-matrix-control/types.ts
++++ b/packages/components/src/alignment-matrix-control/types.ts
+@@ -54,6 +54,8 @@ export type AlignmentMatrixControlIconProps = Pick<
+ 	 * component instead_
+ 	 *
+ 	 * The size of the icon.
++	 *
++	 * @deprecated
+ 	 * @ignore
+ 	 * @default 24
+ 	 */
+diff --git a/packages/components/src/angle-picker-control/README.md b/packages/components/src/angle-picker-control/README.md
+index deed41089fdc1d..f5f2627409e133 100644
+--- a/packages/components/src/angle-picker-control/README.md
++++ b/packages/components/src/angle-picker-control/README.md
+@@ -1,44 +1,57 @@
++<!-- This file is generated automatically and cannot be edited directly. -->
++
+ # AnglePickerControl
+ 
+-`AnglePickerControl` is a React component to render a UI that allows users to pick an angle.
+-Users can choose an angle in a visual UI with the mouse by dragging an angle indicator inside a circle or by directly inserting the desired angle in a text field.
+ 
+-## Usage
++<p class="callout callout-info">See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-anglepickercontrol--docs">WordPress Storybook</a> for more detailed, interactive documentation.</p>
++
++`AnglePickerControl` is a React component to render a UI that allows users to
++pick an angle. Users can choose an angle in a visual UI with the mouse by
++dragging an angle indicator inside a circle or by directly inserting the
++desired angle in a text field.
+ 
+ ```jsx
+-import { useState } from 'react';
++import { useState } from '@wordpress/element';
+ import { AnglePickerControl } from '@wordpress/components';
+ 
+ function Example() {
+-	const [ angle, setAngle ] = useState( 0 );
+-	return (
+-		<AnglePickerControl
+-			value={ angle }
+-			onChange={ setAngle }
+-		/>
+-	);
+-};
++  const [ angle, setAngle ] = useState( 0 );
++  return (
++    <AnglePickerControl
++      value={ angle }
++      onChange={ setAngle }
++    </>
++  );
++}
+ ```
+-
+ ## Props
+ 
+-The component accepts the following props.
++### `as`
++
++The HTML element or React component to render the component as.
+ 
+-### `label`: `string`
++ - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | ...`
++ - Required: No
++
++### `label`
+ 
+ Label to use for the angle picker.
+ 
+--   Required: No
+--   Default: `__( 'Angle' )`
++ - Type: `string`
++ - Required: No
++ - Default: `__( 'Angle' )`
+ 
+-### `value`: `number | string`
++### `onChange`
+ 
+-The current value of the input. The value represents an angle in degrees and should be a value between 0 and 360.
++A function that receives the new value of the input.
+ 
+--   Required: Yes
++ - Type: `(value: number) => void`
++ - Required: Yes
+ 
+-### `onChange`: `( value: number ) => void`
++### `value`
+ 
+-A function that receives the new value of the input.
++The current value of the input. The value represents an angle in degrees
++and should be a value between 0 and 360.
+ 
+--   Required: Yes
++ - Type: `string | number`
++ - Required: Yes
+diff --git a/packages/components/src/angle-picker-control/docs-manifest.json b/packages/components/src/angle-picker-control/docs-manifest.json
+new file mode 100644
+index 00000000000000..bcbfb353ac9e32
+--- /dev/null
++++ b/packages/components/src/angle-picker-control/docs-manifest.json
+@@ -0,0 +1,5 @@
++{
++	"$schema": "../../schemas/docs-manifest.json",
++	"displayName": "AnglePickerControl",
++	"filePath": "./index.tsx"
++}

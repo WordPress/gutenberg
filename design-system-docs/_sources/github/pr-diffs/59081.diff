@@ -1,0 +1,261 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 587b8d0fb7eb8e..b3bd5bfcf70f2f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ -   Add lint rules for theme color CSS var usage ([#59022](https://github.com/WordPress/gutenberg/pull/59022)).
+ -   `FormTokenField`: Use `Element.scrollIntoView()` instead of `dom-scroll-into-view` ([#59085](https://github.com/WordPress/gutenberg/pull/59085)).
+ -   Removing `dom-scroll-into-view` as a dependency of the components package ([#59085](https://github.com/WordPress/gutenberg/pull/59085)).
++-   Add higher-order function to ignore IME keydowns ([#59081](https://github.com/WordPress/gutenberg/pull/59081)).
+ 
+ ## 26.0.1 (2024-02-13)
+ 
+diff --git a/packages/components/src/autocomplete/index.tsx b/packages/components/src/autocomplete/index.tsx
+index b76e8548c08f23..944eebf83de068 100644
+--- a/packages/components/src/autocomplete/index.tsx
++++ b/packages/components/src/autocomplete/index.tsx
+@@ -30,6 +30,7 @@ import { isAppleOS } from '@wordpress/keycodes';
+  */
+ import { getAutoCompleterUI } from './autocompleter-ui';
+ import { escapeRegExp } from '../utils/strings';
++import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
+ import type {
+ 	AutocompleteProps,
+ 	AutocompleterUIProps,
+@@ -183,15 +184,7 @@ export function useAutocomplete( {
+ 			return;
+ 		}
+ 
+-		if (
+-			event.defaultPrevented ||
+-			// Ignore keydowns from IMEs
+-			event.isComposing ||
+-			// Workaround for Mac Safari where the final Enter/Backspace of an IME composition
+-			// is `isComposing=false`, even though it's technically still part of the composition.
+-			// These can only be detected by keyCode.
+-			event.keyCode === 229
+-		) {
++		if ( event.defaultPrevented ) {
+ 			return;
+ 		}
+ 
+@@ -390,7 +383,7 @@ export function useAutocomplete( {
+ 	return {
+ 		listBoxId,
+ 		activeId,
+-		onKeyDown: handleKeyDown,
++		onKeyDown: withIgnoreIMEEvents( handleKeyDown ),
+ 		popover: hasSelection && AutocompleterUI && (
+ 			<AutocompleterUI
+ 				className={ className }
+diff --git a/packages/components/src/combobox-control/index.tsx b/packages/components/src/combobox-control/index.tsx
+index 3baaf8a6f5db60..5ca4f4e0960f10 100644
+--- a/packages/components/src/combobox-control/index.tsx
++++ b/packages/components/src/combobox-control/index.tsx
+@@ -33,6 +33,7 @@ import { normalizeTextString } from '../utils/strings';
+ import type { ComboboxControlOption, ComboboxControlProps } from './types';
+ import type { TokenInputProps } from '../form-token-field/types';
+ import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
++import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
+ 
+ const noop = () => {};
+ 
+@@ -186,51 +187,42 @@ function ComboboxControl( props: ComboboxControlProps ) {
+ 		setIsExpanded( true );
+ 	};
+ 
+-	const onKeyDown: React.KeyboardEventHandler< HTMLDivElement > = (
+-		event
+-	) => {
+-		let preventDefault = false;
++	const onKeyDown: React.KeyboardEventHandler< HTMLDivElement > =
++		withIgnoreIMEEvents( ( event ) => {
++			let preventDefault = false;
+ 
+-		if (
+-			event.defaultPrevented ||
+-			// Ignore keydowns from IMEs
+-			event.nativeEvent.isComposing ||
+-			// Workaround for Mac Safari where the final Enter/Backspace of an IME composition
+-			// is `isComposing=false`, even though it's technically still part of the composition.
+-			// These can only be detected by keyCode.
+-			event.keyCode === 229
+-		) {
+-			return;
+-		}
++			if ( event.defaultPrevented ) {
++				return;
++			}
+ 
+-		switch ( event.code ) {
+-			case 'Enter':
+-				if ( selectedSuggestion ) {
+-					onSuggestionSelected( selectedSuggestion );
++			switch ( event.code ) {
++				case 'Enter':
++					if ( selectedSuggestion ) {
++						onSuggestionSelected( selectedSuggestion );
++						preventDefault = true;
++					}
++					break;
++				case 'ArrowUp':
++					handleArrowNavigation( -1 );
+ 					preventDefault = true;
+-				}
+-				break;
+-			case 'ArrowUp':
+-				handleArrowNavigation( -1 );
+-				preventDefault = true;
+-				break;
+-			case 'ArrowDown':
+-				handleArrowNavigation( 1 );
+-				preventDefault = true;
+-				break;
+-			case 'Escape':
+-				setIsExpanded( false );
+-				setSelectedSuggestion( null );
+-				preventDefault = true;
+-				break;
+-			default:
+-				break;
+-		}
++					break;
++				case 'ArrowDown':
++					handleArrowNavigation( 1 );
++					preventDefault = true;
++					break;
++				case 'Escape':
++					setIsExpanded( false );
++					setSelectedSuggestion( null );
++					preventDefault = true;
++					break;
++				default:
++					break;
++			}
+ 
+-		if ( preventDefault ) {
+-			event.preventDefault();
+-		}
+-	};
++			if ( preventDefault ) {
++				event.preventDefault();
++			}
++		} );
+ 
+ 	const onBlur = () => {
+ 		setInputHasFocus( false );
+diff --git a/packages/components/src/form-token-field/index.tsx b/packages/components/src/form-token-field/index.tsx
+index 2e7ada0dfe6566..1eb7ebc9ab4f46 100644
+--- a/packages/components/src/form-token-field/index.tsx
++++ b/packages/components/src/form-token-field/index.tsx
+@@ -28,6 +28,7 @@ import {
+ } from '../base-control/styles/base-control-styles';
+ import { Spacer } from '../spacer';
+ import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
++import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
+ 
+ const identity = ( value: string ) => value;
+ 
+@@ -194,15 +195,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 	function onKeyDown( event: KeyboardEvent ) {
+ 		let preventDefault = false;
+ 
+-		if (
+-			event.defaultPrevented ||
+-			// Ignore keydowns from IMEs
+-			event.nativeEvent.isComposing ||
+-			// Workaround for Mac Safari where the final Enter/Backspace of an IME composition
+-			// is `isComposing=false`, even though it's technically still part of the composition.
+-			// These can only be detected by keyCode.
+-			event.keyCode === 229
+-		) {
++		if ( event.defaultPrevented ) {
+ 			return;
+ 		}
+ 		switch ( event.key ) {
+@@ -689,7 +682,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 
+ 	if ( ! disabled ) {
+ 		tokenFieldProps = Object.assign( {}, tokenFieldProps, {
+-			onKeyDown,
++			onKeyDown: withIgnoreIMEEvents( onKeyDown ),
+ 			onKeyPress,
+ 			onFocus: onFocusHandler,
+ 		} );
+diff --git a/packages/components/src/modal/index.tsx b/packages/components/src/modal/index.tsx
+index 616539ed9b636f..653c6e7470b327 100644
+--- a/packages/components/src/modal/index.tsx
++++ b/packages/components/src/modal/index.tsx
+@@ -41,6 +41,7 @@ import * as ariaHelper from './aria-helper';
+ import Button from '../button';
+ import StyleProvider from '../style-provider';
+ import type { ModalProps } from './types';
++import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
+ 
+ // Used to track and dismiss the prior modal when another opens unless nested.
+ const ModalContext = createContext<
+@@ -196,17 +197,6 @@ function UnforwardedModal(
+ 	}, [ isContentScrollable, childrenContainerRef ] );
+ 
+ 	function handleEscapeKeyDown( event: KeyboardEvent< HTMLDivElement > ) {
+-		if (
+-			// Ignore keydowns from IMEs
+-			event.nativeEvent.isComposing ||
+-			// Workaround for Mac Safari where the final Enter/Backspace of an IME composition
+-			// is `isComposing=false`, even though it's technically still part of the composition.
+-			// These can only be detected by keyCode.
+-			event.keyCode === 229
+-		) {
+-			return;
+-		}
+-
+ 		if (
+ 			shouldCloseOnEsc &&
+ 			( event.code === 'Escape' || event.key === 'Escape' ) &&
+@@ -265,7 +255,7 @@ function UnforwardedModal(
+ 				'components-modal__screen-overlay',
+ 				overlayClassName
+ 			) }
+-			onKeyDown={ handleEscapeKeyDown }
++			onKeyDown={ withIgnoreIMEEvents( handleEscapeKeyDown ) }
+ 			{ ...( shouldCloseOnClickOutside ? overlayPressHandlers : {} ) }
+ 		>
+ 			<StyleProvider document={ document }>
+diff --git a/packages/components/src/utils/with-ignore-ime-events.ts b/packages/components/src/utils/with-ignore-ime-events.ts
+new file mode 100644
+index 00000000000000..26c5cd67b25397
+--- /dev/null
++++ b/packages/components/src/utils/with-ignore-ime-events.ts
+@@ -0,0 +1,32 @@
++/**
++ * A higher-order function that wraps a keydown event handler to ensure it is not an IME event.
++ *
++ * In CJK languages, an IME (Input Method Editor) is used to input complex characters.
++ * During an IME composition, keydown events (e.g. Enter or Escape) can be fired
++ * which are intended to control the IME and not the application.
++ * These events should be ignored by any application logic.
++ *
++ * @param keydownHandler The keydown event handler to execute after ensuring it was not an IME event.
++ *
++ * @return A wrapped version of the given event handler that ignores IME events.
++ */
++export function withIgnoreIMEEvents<
++	E extends React.KeyboardEvent | KeyboardEvent,
++>( keydownHandler: ( event: E ) => void ) {
++	return ( event: E ) => {
++		const { isComposing } =
++			'nativeEvent' in event ? event.nativeEvent : event;
++
++		if (
++			isComposing ||
++			// Workaround for Mac Safari where the final Enter/Backspace of an IME composition
++			// is `isComposing=false`, even though it's technically still part of the composition.
++			// These can only be detected by keyCode.
++			event.keyCode === 229
++		) {
++			return;
++		}
++
++		keydownHandler( event );
++	};
++}

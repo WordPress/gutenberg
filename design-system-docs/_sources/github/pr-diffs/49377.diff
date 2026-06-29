@@ -1,0 +1,814 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e0ca04d9d69aee..f94053214051ca 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   `NavigableContainer`: Convert to TypeScript ([#49377](https://github.com/WordPress/gutenberg/pull/49377)).
++
+ ## 23.9.0 (2023-04-26)
+ 
+ ### Internal
+diff --git a/packages/components/src/navigable-container/README.md b/packages/components/src/navigable-container/README.md
+index de6c1103ae6dea..a982219248f505 100644
+--- a/packages/components/src/navigable-container/README.md
++++ b/packages/components/src/navigable-container/README.md
+@@ -2,38 +2,49 @@
+ 
+ `NavigableContainer` is a React component to render a container navigable using the keyboard. Only things that are focusable can be navigated to. It will currently always be a `div`.
+ 
+-`NavigableContainer` is exported as two classes: `NavigableMenu` and `TabbableContainer`. `NavigableContainer` itself is **not** exported. `NavigableMenu` and `TabbableContainer` have the props listed below. Any other props will be passed through to the `div`.
++`NavigableContainer` is exported as two components: `NavigableMenu` and `TabbableContainer`. `NavigableContainer` itself is **not** exported. `NavigableMenu` and `TabbableContainer` have the props listed below. Any other props will be passed through to the `div`.
+ 
+ ---
+ 
+ ## Props
+ 
+-These are the props that `NavigableMenu` and `TabbableContainer`. Any props which are specific to one class are labelled appropriately.
++These are the props that `NavigableMenu` and `TabbableContainer`. Any props which are specific to one component are labelled appropriately.
+ 
+-### onNavigate
++### `cycle`: `boolean`
+ 
+-A callback invoked when the menu navigates to one of its children passing the index and child as an argument
++A boolean which tells the component whether or not to cycle from the end back to the beginning and vice versa.
+ 
+--   Type: `Function`
+ -   Required: No
++-   default: `true`
+ 
+-### cycle
++### `eventToOffset`: `( event: KeyboardEvent ) => -1 | 0 | 1 | undefined`
+ 
+-A boolean which tells the component whether or not to cycle from the end back to the beginning and vice versa.
++(TabbableContainer only)
++Gets an offset, given an event.
++
++-   Required: No
++
++### `onKeydown`: `( event: KeyboardEvent ) => void`
++
++A callback invoked on the keydown event.
++
++-   Required: No
++
++### `onNavigate`: `( index: number, focusable: HTMLElement ) => void`
++
++A callback invoked when the menu navigates to one of its children passing the index and child as an argument
+ 
+--   Type: `Boolean`
+ -   Required: No
+--   default: true
+ 
+-### orientation (NavigableMenu only)
++### `orientation`: `'vertical' | 'horizontal' | 'both'`
+ 
+-The orientation of the menu. It could be "vertical", "horizontal" or "both"
++(NavigableMenu only)
++The orientation of the menu. It could be "vertical", "horizontal", or "both".
+ 
+--   Type: `String`
+ -   Required: No
+ -   Default: `"vertical"`
+ 
+-## Classes
++## Components
+ 
+ ### NavigableMenu
+ 
+diff --git a/packages/components/src/navigable-container/container.js b/packages/components/src/navigable-container/container.tsx
+similarity index 73%
+rename from packages/components/src/navigable-container/container.js
+rename to packages/components/src/navigable-container/container.tsx
+index 6c9de468f0c591..f52754e06d61ab 100644
+--- a/packages/components/src/navigable-container/container.js
++++ b/packages/components/src/navigable-container/container.tsx
+@@ -1,14 +1,23 @@
+-// @ts-nocheck
++/**
++ * External dependencies
++ */
++import type { ForwardedRef } from 'react';
++
+ /**
+  * WordPress dependencies
+  */
+ import { Component, forwardRef } from '@wordpress/element';
+ import { focus } from '@wordpress/dom';
+ 
++/**
++ * Internal dependencies
++ */
++import type { NavigableContainerProps } from './types';
++
+ const noop = () => {};
+ const MENU_ITEM_ROLES = [ 'menuitem', 'menuitemradio', 'menuitemcheckbox' ];
+ 
+-function cycleValue( value, total, offset ) {
++function cycleValue( value: number, total: number, offset: number ) {
+ 	const nextValue = value + offset;
+ 	if ( nextValue < 0 ) {
+ 		return total + nextValue;
+@@ -19,9 +28,11 @@ function cycleValue( value, total, offset ) {
+ 	return nextValue;
+ }
+ 
+-class NavigableContainer extends Component {
+-	constructor() {
+-		super( ...arguments );
++class NavigableContainer extends Component< NavigableContainerProps > {
++	container?: HTMLDivElement;
++
++	constructor( args: NavigableContainerProps ) {
++		super( args );
+ 		this.onKeyDown = this.onKeyDown.bind( this );
+ 		this.bindContainer = this.bindContainer.bind( this );
+ 
+@@ -30,21 +41,27 @@ class NavigableContainer extends Component {
+ 	}
+ 
+ 	componentDidMount() {
++		if ( ! this.container ) {
++			return;
++		}
++
+ 		// We use DOM event listeners instead of React event listeners
+ 		// because we want to catch events from the underlying DOM tree
+ 		// The React Tree can be different from the DOM tree when using
+ 		// portals. Block Toolbars for instance are rendered in a separate
+ 		// React Trees.
+ 		this.container.addEventListener( 'keydown', this.onKeyDown );
+-		this.container.addEventListener( 'focus', this.onFocus );
+ 	}
+ 
+ 	componentWillUnmount() {
++		if ( ! this.container ) {
++			return;
++		}
++
+ 		this.container.removeEventListener( 'keydown', this.onKeyDown );
+-		this.container.removeEventListener( 'focus', this.onFocus );
+ 	}
+ 
+-	bindContainer( ref ) {
++	bindContainer( ref: HTMLDivElement ) {
+ 		const { forwardedRef } = this.props;
+ 		this.container = ref;
+ 
+@@ -55,10 +72,14 @@ class NavigableContainer extends Component {
+ 		}
+ 	}
+ 
+-	getFocusableContext( target ) {
++	getFocusableContext( target: Element ) {
++		if ( ! this.container ) {
++			return null;
++		}
++
+ 		const { onlyBrowserTabstops } = this.props;
+ 		const finder = onlyBrowserTabstops ? focus.tabbable : focus.focusable;
+-		const focusables = finder.find( this.container );
++		const focusables = finder.find( this.container ) as HTMLElement[];
+ 
+ 		const index = this.getFocusableIndex( focusables, target );
+ 		if ( index > -1 && target ) {
+@@ -67,14 +88,11 @@ class NavigableContainer extends Component {
+ 		return null;
+ 	}
+ 
+-	getFocusableIndex( focusables, target ) {
+-		const directIndex = focusables.indexOf( target );
+-		if ( directIndex !== -1 ) {
+-			return directIndex;
+-		}
++	getFocusableIndex( focusables: Element[], target: Element ) {
++		return focusables.indexOf( target );
+ 	}
+ 
+-	onKeyDown( event ) {
++	onKeyDown( event: KeyboardEvent ) {
+ 		if ( this.props.onKeyDown ) {
+ 			this.props.onKeyDown( event );
+ 		}
+@@ -98,9 +116,11 @@ class NavigableContainer extends Component {
+ 			// from scrolling. The preventDefault also prevents Voiceover from
+ 			// 'handling' the event, as voiceover will try to use arrow keys
+ 			// for highlighting text.
+-			const targetRole = event.target.getAttribute( 'role' );
++			const targetRole = (
++				event.target as HTMLDivElement | null
++			 )?.getAttribute( 'role' );
+ 			const targetHasMenuItemRole =
+-				MENU_ITEM_ROLES.includes( targetRole );
++				!! targetRole && MENU_ITEM_ROLES.includes( targetRole );
+ 
+ 			// `preventDefault()` on tab to avoid having the browser move the focus
+ 			// after this component has already moved it.
+@@ -115,9 +135,13 @@ class NavigableContainer extends Component {
+ 			return;
+ 		}
+ 
+-		const context = getFocusableContext(
+-			event.target.ownerDocument.activeElement
+-		);
++		const activeElement = ( event.target as HTMLElement | null )
++			?.ownerDocument?.activeElement;
++		if ( ! activeElement ) {
++			return;
++		}
++
++		const context = getFocusableContext( activeElement );
+ 		if ( ! context ) {
+ 			return;
+ 		}
+@@ -152,7 +176,10 @@ class NavigableContainer extends Component {
+ 	}
+ }
+ 
+-const forwardedNavigableContainer = ( props, ref ) => {
++const forwardedNavigableContainer = (
++	props: NavigableContainerProps,
++	ref: ForwardedRef< HTMLDivElement >
++) => {
+ 	return <NavigableContainer { ...props } forwardedRef={ ref } />;
+ };
+ forwardedNavigableContainer.displayName = 'NavigableContainer';
+diff --git a/packages/components/src/navigable-container/index.js b/packages/components/src/navigable-container/index.tsx
+similarity index 90%
+rename from packages/components/src/navigable-container/index.js
+rename to packages/components/src/navigable-container/index.tsx
+index b47667fd39cd7d..e98f1b1236d7b4 100644
+--- a/packages/components/src/navigable-container/index.js
++++ b/packages/components/src/navigable-container/index.tsx
+@@ -1,4 +1,3 @@
+-// @ts-nocheck
+ /**
+  * Internal Dependencies
+  */
+diff --git a/packages/components/src/navigable-container/menu.js b/packages/components/src/navigable-container/menu.js
+deleted file mode 100644
+index cf19c23adcb9d8..00000000000000
+--- a/packages/components/src/navigable-container/menu.js
++++ /dev/null
+@@ -1,62 +0,0 @@
+-// @ts-nocheck
+-
+-/**
+- * WordPress dependencies
+- */
+-import { forwardRef } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import NavigableContainer from './container';
+-
+-export function NavigableMenu(
+-	{ role = 'menu', orientation = 'vertical', ...rest },
+-	ref
+-) {
+-	const eventToOffset = ( evt ) => {
+-		const { code } = evt;
+-
+-		let next = [ 'ArrowDown' ];
+-		let previous = [ 'ArrowUp' ];
+-
+-		if ( orientation === 'horizontal' ) {
+-			next = [ 'ArrowRight' ];
+-			previous = [ 'ArrowLeft' ];
+-		}
+-
+-		if ( orientation === 'both' ) {
+-			next = [ 'ArrowRight', 'ArrowDown' ];
+-			previous = [ 'ArrowLeft', 'ArrowUp' ];
+-		}
+-
+-		if ( next.includes( code ) ) {
+-			return 1;
+-		} else if ( previous.includes( code ) ) {
+-			return -1;
+-		} else if (
+-			[ 'ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight' ].includes(
+-				code
+-			)
+-		) {
+-			// Key press should be handled, e.g. have event propagation and
+-			// default behavior handled by NavigableContainer but not result
+-			// in an offset.
+-			return 0;
+-		}
+-	};
+-
+-	return (
+-		<NavigableContainer
+-			ref={ ref }
+-			stopNavigationEvents
+-			onlyBrowserTabstops={ false }
+-			role={ role }
+-			aria-orientation={ role === 'presentation' ? null : orientation }
+-			eventToOffset={ eventToOffset }
+-			{ ...rest }
+-		/>
+-	);
+-}
+-
+-export default forwardRef( NavigableMenu );
+diff --git a/packages/components/src/navigable-container/menu.tsx b/packages/components/src/navigable-container/menu.tsx
+new file mode 100644
+index 00000000000000..ae865fe443aaec
+--- /dev/null
++++ b/packages/components/src/navigable-container/menu.tsx
+@@ -0,0 +1,100 @@
++/**
++ * External dependencies
++ */
++import type { ForwardedRef } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import NavigableContainer from './container';
++import type { NavigableMenuProps } from './types';
++
++export function UnforwardedNavigableMenu(
++	{ role = 'menu', orientation = 'vertical', ...rest }: NavigableMenuProps,
++	ref: ForwardedRef< any >
++) {
++	const eventToOffset = ( evt: KeyboardEvent ) => {
++		const { code } = evt;
++
++		let next = [ 'ArrowDown' ];
++		let previous = [ 'ArrowUp' ];
++
++		if ( orientation === 'horizontal' ) {
++			next = [ 'ArrowRight' ];
++			previous = [ 'ArrowLeft' ];
++		}
++
++		if ( orientation === 'both' ) {
++			next = [ 'ArrowRight', 'ArrowDown' ];
++			previous = [ 'ArrowLeft', 'ArrowUp' ];
++		}
++
++		if ( next.includes( code ) ) {
++			return 1;
++		} else if ( previous.includes( code ) ) {
++			return -1;
++		} else if (
++			[ 'ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight' ].includes(
++				code
++			)
++		) {
++			// Key press should be handled, e.g. have event propagation and
++			// default behavior handled by NavigableContainer but not result
++			// in an offset.
++			return 0;
++		}
++
++		return undefined;
++	};
++
++	return (
++		<NavigableContainer
++			ref={ ref }
++			stopNavigationEvents
++			onlyBrowserTabstops={ false }
++			role={ role }
++			aria-orientation={
++				role !== 'presentation' &&
++				( orientation === 'vertical' || orientation === 'horizontal' )
++					? orientation
++					: undefined
++			}
++			eventToOffset={ eventToOffset }
++			{ ...rest }
++		/>
++	);
++}
++
++/**
++ * A container for a navigable menu.
++ *
++ *  ```jsx
++ *  import {
++ *    NavigableMenu,
++ *    Button,
++ *  } from '@wordpress/components';
++ *
++ *  function onNavigate( index, target ) {
++ *    console.log( `Navigates to ${ index }`, target );
++ *  }
++ *
++ *  const MyNavigableContainer = () => (
++ *    <div>
++ *      <span>Navigable Menu:</span>
++ *      <NavigableMenu onNavigate={ onNavigate } orientation="horizontal">
++ *        <Button variant="secondary">Item 1</Button>
++ *        <Button variant="secondary">Item 2</Button>
++ *        <Button variant="secondary">Item 3</Button>
++ *      </NavigableMenu>
++ *    </div>
++ *  );
++ *  ```
++ */
++export const NavigableMenu = forwardRef( UnforwardedNavigableMenu );
++
++export default NavigableMenu;
+diff --git a/packages/components/src/navigable-container/stories/navigable-menu.js b/packages/components/src/navigable-container/stories/navigable-menu.tsx
+similarity index 66%
+rename from packages/components/src/navigable-container/stories/navigable-menu.js
+rename to packages/components/src/navigable-container/stories/navigable-menu.tsx
+index af9b08fd9b032a..5f8ee2e4e5d856 100644
+--- a/packages/components/src/navigable-container/stories/navigable-menu.js
++++ b/packages/components/src/navigable-container/stories/navigable-menu.tsx
+@@ -1,25 +1,30 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
+ /**
+  * Internal dependencies
+  */
+ import { NavigableMenu } from '..';
+ 
+-export default {
++const meta: ComponentMeta< typeof NavigableMenu > = {
+ 	title: 'Components/NavigableMenu',
+ 	component: NavigableMenu,
+ 	argTypes: {
+-		children: { type: null },
+-		cycle: {
+-			type: 'boolean',
+-		},
+-		onNavigate: { action: 'onNavigate' },
+-		orientation: {
+-			options: [ 'horizontal', 'vertical' ],
+-			control: { type: 'radio' },
++		children: { control: { type: null } },
++	},
++	parameters: {
++		actions: { argTypesRegex: '^on.*' },
++		controls: {
++			expanded: true,
+ 		},
++		docs: { source: { state: 'open' } },
+ 	},
+ };
++export default meta;
+ 
+-export const Default = ( args ) => {
++export const Default: ComponentStory< typeof NavigableMenu > = ( args ) => {
+ 	return (
+ 		<>
+ 			<button>Before navigable menu</button>
+diff --git a/packages/components/src/navigable-container/stories/tabbable-container.js b/packages/components/src/navigable-container/stories/tabbable-container.tsx
+similarity index 61%
+rename from packages/components/src/navigable-container/stories/tabbable-container.js
+rename to packages/components/src/navigable-container/stories/tabbable-container.tsx
+index 3e12825189f1a7..b517019e29571b 100644
+--- a/packages/components/src/navigable-container/stories/tabbable-container.js
++++ b/packages/components/src/navigable-container/stories/tabbable-container.tsx
+@@ -1,21 +1,30 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
+ /**
+  * Internal dependencies
+  */
+ import { TabbableContainer } from '..';
+ 
+-export default {
++const meta: ComponentMeta< typeof TabbableContainer > = {
+ 	title: 'Components/TabbableContainer',
+ 	component: TabbableContainer,
+ 	argTypes: {
+-		children: { type: null },
+-		cycle: {
+-			type: 'boolean',
++		children: { control: { type: null } },
++	},
++	parameters: {
++		actions: { argTypesRegex: '^on.*' },
++		controls: {
++			expanded: true,
+ 		},
+-		onNavigate: { action: 'onNavigate' },
++		docs: { source: { state: 'open' } },
+ 	},
+ };
++export default meta;
+ 
+-export const Default = ( args ) => {
++export const Default: ComponentStory< typeof TabbableContainer > = ( args ) => {
+ 	return (
+ 		<>
+ 			<button>Before tabbable container</button>
+diff --git a/packages/components/src/navigable-container/tabbable.js b/packages/components/src/navigable-container/tabbable.js
+deleted file mode 100644
+index 8f38970bf06700..00000000000000
+--- a/packages/components/src/navigable-container/tabbable.js
++++ /dev/null
+@@ -1,46 +0,0 @@
+-// @ts-nocheck
+-/**
+- * WordPress dependencies
+- */
+-import { forwardRef } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import NavigableContainer from './container';
+-
+-export function TabbableContainer( { eventToOffset, ...props }, ref ) {
+-	const innerEventToOffset = ( evt ) => {
+-		const { code, shiftKey } = evt;
+-		if ( 'Tab' === code ) {
+-			return shiftKey ? -1 : 1;
+-		}
+-
+-		// Allow custom handling of keys besides Tab.
+-		//
+-		// By default, TabbableContainer will move focus forward on Tab and
+-		// backward on Shift+Tab. The handler below will be used for all other
+-		// events. The semantics for `eventToOffset`'s return
+-		// values are the following:
+-		//
+-		// - +1: move focus forward
+-		// - -1: move focus backward
+-		// -  0: don't move focus, but acknowledge event and thus stop it
+-		// - undefined: do nothing, let the event propagate.
+-		if ( eventToOffset ) {
+-			return eventToOffset( evt );
+-		}
+-	};
+-
+-	return (
+-		<NavigableContainer
+-			ref={ ref }
+-			stopNavigationEvents
+-			onlyBrowserTabstops
+-			eventToOffset={ innerEventToOffset }
+-			{ ...props }
+-		/>
+-	);
+-}
+-
+-export default forwardRef( TabbableContainer );
+diff --git a/packages/components/src/navigable-container/tabbable.tsx b/packages/components/src/navigable-container/tabbable.tsx
+new file mode 100644
+index 00000000000000..565007bf62d831
+--- /dev/null
++++ b/packages/components/src/navigable-container/tabbable.tsx
+@@ -0,0 +1,92 @@
++/**
++ * External dependencies
++ */
++import type { ForwardedRef } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import NavigableContainer from './container';
++import type { TabbableContainerProps } from './types';
++
++export function UnforwardedTabbableContainer(
++	{ eventToOffset, ...props }: TabbableContainerProps,
++	ref: ForwardedRef< any >
++) {
++	const innerEventToOffset = ( evt: KeyboardEvent ) => {
++		const { code, shiftKey } = evt;
++		if ( 'Tab' === code ) {
++			return shiftKey ? -1 : 1;
++		}
++
++		// Allow custom handling of keys besides Tab.
++		//
++		// By default, TabbableContainer will move focus forward on Tab and
++		// backward on Shift+Tab. The handler below will be used for all other
++		// events. The semantics for `eventToOffset`'s return
++		// values are the following:
++		//
++		// - +1: move focus forward
++		// - -1: move focus backward
++		// -  0: don't move focus, but acknowledge event and thus stop it
++		// - undefined: do nothing, let the event propagate.
++		if ( eventToOffset ) {
++			return eventToOffset( evt );
++		}
++
++		return undefined;
++	};
++
++	return (
++		<NavigableContainer
++			ref={ ref }
++			stopNavigationEvents
++			onlyBrowserTabstops
++			eventToOffset={ innerEventToOffset }
++			{ ...props }
++		/>
++	);
++}
++
++/**
++ * A container for tabbable elements.
++ *
++ *  ```jsx
++ *  import {
++ *    TabbableContainer,
++ *    Button,
++ *  } from '@wordpress/components';
++ *
++ *  function onNavigate( index, target ) {
++ *    console.log( `Navigates to ${ index }`, target );
++ *  }
++ *
++ *  const MyTabbableContainer = () => (
++ *    <div>
++ *      <span>Tabbable Container:</span>
++ *      <TabbableContainer onNavigate={ onNavigate }>
++ *        <Button variant="secondary" tabIndex="0">
++ *          Section 1
++ *        </Button>
++ *        <Button variant="secondary" tabIndex="0">
++ *          Section 2
++ *        </Button>
++ *        <Button variant="secondary" tabIndex="0">
++ *          Section 3
++ *        </Button>
++ *        <Button variant="secondary" tabIndex="0">
++ *          Section 4
++ *        </Button>
++ *      </TabbableContainer>
++ *    </div>
++ *  );
++ *  ```
++ */
++export const TabbableContainer = forwardRef( UnforwardedTabbableContainer );
++
++export default TabbableContainer;
+diff --git a/packages/components/src/navigable-container/test/navigable-menu.js b/packages/components/src/navigable-container/test/navigable-menu.tsx
+similarity index 97%
+rename from packages/components/src/navigable-container/test/navigable-menu.js
+rename to packages/components/src/navigable-container/test/navigable-menu.tsx
+index 8152ca61ed73ce..a5ab228b0c2b20 100644
+--- a/packages/components/src/navigable-container/test/navigable-menu.js
++++ b/packages/components/src/navigable-container/test/navigable-menu.tsx
+@@ -8,8 +8,9 @@ import userEvent from '@testing-library/user-event';
+  * Internal dependencies
+  */
+ import { NavigableMenu } from '../menu';
++import type { NavigableMenuProps } from '../types';
+ 
+-const NavigableMenuTestCase = ( props ) => (
++const NavigableMenuTestCase = ( props: NavigableMenuProps ) => (
+ 	<NavigableMenu { ...props }>
+ 		<button>Item 1</button>
+ 		<span>
+@@ -34,6 +35,7 @@ describe( 'NavigableMenu', () => {
+ 		// Mocking `getClientRects()` is necessary to pass a check performed by
+ 		// the `focus.tabbable.find()` and by the `focus.focusable.find()` functions
+ 		// from the `@wordpress/dom` package.
++		// @ts-expect-error We're not trying to comply to the DOM spec, only mocking
+ 		window.HTMLElement.prototype.getClientRects = function () {
+ 			return [ 'trick-jsdom-into-having-size-for-element-rect' ];
+ 		};
+diff --git a/packages/components/src/navigable-container/test/tababble-container.js b/packages/components/src/navigable-container/test/tababble-container.tsx
+similarity index 96%
+rename from packages/components/src/navigable-container/test/tababble-container.js
+rename to packages/components/src/navigable-container/test/tababble-container.tsx
+index f514df39a50c86..88fc10bd98560f 100644
+--- a/packages/components/src/navigable-container/test/tababble-container.js
++++ b/packages/components/src/navigable-container/test/tababble-container.tsx
+@@ -8,8 +8,9 @@ import userEvent from '@testing-library/user-event';
+  * Internal dependencies
+  */
+ import { TabbableContainer } from '../tabbable';
++import type { TabbableContainerProps } from '../types';
+ 
+-const TabbableContainerTestCase = ( props ) => (
++const TabbableContainerTestCase = ( props: TabbableContainerProps ) => (
+ 	<TabbableContainer { ...props }>
+ 		<button>Item 1</button>
+ 		<span>
+@@ -37,6 +38,7 @@ describe( 'TabbableContainer', () => {
+ 		// Mocking `getClientRects()` is necessary to pass a check performed by
+ 		// the `focus.tabbable.find()` and by the `focus.focusable.find()` functions
+ 		// from the `@wordpress/dom` package.
++		// @ts-expect-error We're not trying to comply to the DOM spec, only mocking
+ 		window.HTMLElement.prototype.getClientRects = function () {
+ 			return [ 'trick-jsdom-into-having-size-for-element-rect' ];
+ 		};
+diff --git a/packages/components/src/navigable-container/types.ts b/packages/components/src/navigable-container/types.ts
+new file mode 100644
+index 00000000000000..e64ff575069acd
+--- /dev/null
++++ b/packages/components/src/navigable-container/types.ts
+@@ -0,0 +1,76 @@
++/**
++ * External dependencies
++ */
++import type { ForwardedRef, ReactNode } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import type { WordPressComponentProps } from '../ui/context';
++
++type BaseProps = {
++	/**
++	 * The component children.
++	 */
++	children?: ReactNode;
++	/**
++	 * A boolean which tells the component whether or not to cycle from the end back to the beginning and vice versa.
++	 *
++	 * @default true
++	 */
++	cycle?: boolean;
++	/**
++	 * A callback invoked on the keydown event.
++	 */
++	onKeyDown?: ( event: KeyboardEvent ) => void;
++	/**
++	 * A callback invoked when the menu navigates to one of its children passing the index and child as an argument
++	 */
++	onNavigate?: ( index: number, focusable: HTMLElement ) => void;
++};
++
++export type NavigableContainerProps = WordPressComponentProps<
++	BaseProps & {
++		/**
++		 * Gets an offset, given an event.
++		 */
++		eventToOffset: ( event: KeyboardEvent ) => -1 | 0 | 1 | undefined;
++		/**
++		 * The forwarded ref.
++		 */
++		forwardedRef?: ForwardedRef< any >;
++		/**
++		 * Whether to only consider browser tab stops.
++		 *
++		 * @default false
++		 */
++		onlyBrowserTabstops: boolean;
++		/**
++		 * Whether to stop navigation events.
++		 *
++		 * @default false
++		 */
++		stopNavigationEvents: boolean;
++	},
++	'div',
++	false
++>;
++
++export type NavigableMenuProps = WordPressComponentProps<
++	BaseProps & {
++		/**
++		 * The orientation of the menu.
++		 *
++		 * @default 'vertical'
++		 */
++		orientation?: 'vertical' | 'horizontal' | 'both';
++	},
++	'div',
++	false
++>;
++
++export type TabbableContainerProps = WordPressComponentProps<
++	BaseProps & Partial< Pick< NavigableContainerProps, 'eventToOffset' > >,
++	'div',
++	false
++>;
+diff --git a/packages/components/src/tab-panel/index.tsx b/packages/components/src/tab-panel/index.tsx
+index b2af12b90c85f5..4ed4dc76da22de 100644
+--- a/packages/components/src/tab-panel/index.tsx
++++ b/packages/components/src/tab-panel/index.tsx
+@@ -101,7 +101,7 @@ export function TabPanel( {
+ 	// to show the `tab-panel` associated with the clicked tab.
+ 	const activateTabAutomatically = (
+ 		_childIndex: number,
+-		child: HTMLButtonElement
++		child: HTMLElement
+ 	) => {
+ 		child.click();
+ 	};

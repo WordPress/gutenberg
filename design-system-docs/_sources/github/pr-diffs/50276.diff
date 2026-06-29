@@ -1,0 +1,24 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4b39d87de055f6..260c50887297d4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -3,6 +3,7 @@
+ ## Unreleased
+ 
+ -   `CheckboxControl`, `CustomGradientPicker`, `FormToggle`, : Refactor and correct the focus style for consistency ([#50127](https://github.com/WordPress/gutenberg/pull/50127)).
++-   `Button`, remove custom padding applied to `tertiary` variant. ([#50276](https://github.com/WordPress/gutenberg/pull/50276)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index e114756f9614f1..d7fe58d03775f9 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -160,7 +160,6 @@
+ 		white-space: nowrap;
+ 		color: $components-color-accent;
+ 		background: transparent;
+-		padding: $grid-unit-15 * 0.5; // This reduces the horizontal padding on tertiary/text buttons, so as to space them optically.
+ 
+ 		&:hover:not(:disabled) {
+ 			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);

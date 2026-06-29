@@ -1,0 +1,27 @@
+diff --git a/packages/components/src/ui/control-label/test/index.js b/packages/components/src/ui/control-label/test/index.js
+index 20a9c99c833b0a..4443457a566f9d 100644
+--- a/packages/components/src/ui/control-label/test/index.js
++++ b/packages/components/src/ui/control-label/test/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { render } from '@testing-library/react';
++import { render, screen } from '@testing-library/react';
+ 
+ /**
+  * Internal dependencies
+@@ -16,11 +16,9 @@ describe( 'props', () => {
+ 	} );
+ 
+ 	test( 'should render htmlFor', () => {
+-		const { container } = render(
+-			<ControlLabel htmlFor="Field">Label</ControlLabel>
+-		);
++		render( <ControlLabel htmlFor="Field">Label</ControlLabel> );
+ 
+-		expect( container.firstChild ).toHaveAttribute( 'for', 'Field' );
++		expect( screen.getByText( 'Label' ) ).toHaveAttribute( 'for', 'Field' );
+ 	} );
+ 
+ 	test( 'should render size', () => {

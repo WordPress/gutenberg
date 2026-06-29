@@ -1,0 +1,152 @@
+diff --git a/packages/block-editor/src/components/alignment-control/test/__snapshots__/index.js.snap b/packages/block-editor/src/components/alignment-control/test/__snapshots__/index.js.snap
+index f2915ead7417b1..c1383ae8ecc44a 100644
+--- a/packages/block-editor/src/components/alignment-control/test/__snapshots__/index.js.snap
++++ b/packages/block-editor/src/components/alignment-control/test/__snapshots__/index.js.snap
+@@ -12,7 +12,7 @@ exports[`AlignmentUI should allow custom alignment controls to be specified 1`]
+         align="custom-left"
+         aria-label="My custom left"
+         aria-pressed="false"
+-        class="components-button components-toolbar__control has-icon"
++        class="components-button components-toolbar__control is-compact has-icon"
+         data-toolbar-item="true"
+         type="button"
+       >
+@@ -35,7 +35,7 @@ exports[`AlignmentUI should allow custom alignment controls to be specified 1`]
+         align="custom-right"
+         aria-label="My custom right"
+         aria-pressed="true"
+-        class="components-button components-toolbar__control is-pressed has-icon"
++        class="components-button components-toolbar__control is-compact is-pressed has-icon"
+         data-toolbar-item="true"
+         type="button"
+       >
+@@ -100,7 +100,7 @@ exports[`AlignmentUI should match snapshot when controls are visible 1`] = `
+         align="left"
+         aria-label="Align text left"
+         aria-pressed="true"
+-        class="components-button components-toolbar__control is-pressed has-icon"
++        class="components-button components-toolbar__control is-compact is-pressed has-icon"
+         data-toolbar-item="true"
+         type="button"
+       >
+@@ -123,7 +123,7 @@ exports[`AlignmentUI should match snapshot when controls are visible 1`] = `
+         align="center"
+         aria-label="Align text center"
+         aria-pressed="false"
+-        class="components-button components-toolbar__control has-icon"
++        class="components-button components-toolbar__control is-compact has-icon"
+         data-toolbar-item="true"
+         type="button"
+       >
+@@ -146,7 +146,7 @@ exports[`AlignmentUI should match snapshot when controls are visible 1`] = `
+         align="right"
+         aria-label="Align text right"
+         aria-pressed="false"
+-        class="components-button components-toolbar__control has-icon"
++        class="components-button components-toolbar__control is-compact has-icon"
+         data-toolbar-item="true"
+         type="button"
+       >
+diff --git a/packages/block-editor/src/components/block-alignment-control/test/__snapshots__/index.js.snap b/packages/block-editor/src/components/block-alignment-control/test/__snapshots__/index.js.snap
+index 246e5dca2ae324..9e7e59c0c31447 100644
+--- a/packages/block-editor/src/components/block-alignment-control/test/__snapshots__/index.js.snap
++++ b/packages/block-editor/src/components/block-alignment-control/test/__snapshots__/index.js.snap
+@@ -42,7 +42,7 @@ exports[`BlockAlignmentUI should match snapshot when controls are visible 1`] =
+       <button
+         aria-label="None"
+         aria-pressed="false"
+-        class="components-button components-toolbar__control has-icon"
++        class="components-button components-toolbar__control is-compact has-icon"
+         data-toolbar-item="true"
+         type="button"
+       >
+@@ -64,7 +64,7 @@ exports[`BlockAlignmentUI should match snapshot when controls are visible 1`] =
+       <button
+         aria-label="Align left"
+         aria-pressed="true"
+-        class="components-button components-toolbar__control is-pressed has-icon"
++        class="components-button components-toolbar__control is-compact is-pressed has-icon"
+         data-toolbar-item="true"
+         type="button"
+       >
+@@ -86,7 +86,7 @@ exports[`BlockAlignmentUI should match snapshot when controls are visible 1`] =
+       <button
+         aria-label="Align center"
+         aria-pressed="false"
+-        class="components-button components-toolbar__control has-icon"
++        class="components-button components-toolbar__control is-compact has-icon"
+         data-toolbar-item="true"
+         type="button"
+       >
+@@ -108,7 +108,7 @@ exports[`BlockAlignmentUI should match snapshot when controls are visible 1`] =
+       <button
+         aria-label="Align right"
+         aria-pressed="false"
+-        class="components-button components-toolbar__control has-icon"
++        class="components-button components-toolbar__control is-compact has-icon"
+         data-toolbar-item="true"
+         type="button"
+       >
+diff --git a/packages/block-editor/src/components/block-vertical-alignment-control/test/__snapshots__/index.js.snap b/packages/block-editor/src/components/block-vertical-alignment-control/test/__snapshots__/index.js.snap
+index e58d9a264310a7..e8ad6cddbba56e 100644
+--- a/packages/block-editor/src/components/block-vertical-alignment-control/test/__snapshots__/index.js.snap
++++ b/packages/block-editor/src/components/block-vertical-alignment-control/test/__snapshots__/index.js.snap
+@@ -42,7 +42,7 @@ exports[`BlockVerticalAlignmentUI should match snapshot when controls are visibl
+       <button
+         aria-label="Align top"
+         aria-pressed="true"
+-        class="components-button components-toolbar__control is-pressed has-icon"
++        class="components-button components-toolbar__control is-compact is-pressed has-icon"
+         data-toolbar-item="true"
+         type="button"
+       >
+@@ -64,7 +64,7 @@ exports[`BlockVerticalAlignmentUI should match snapshot when controls are visibl
+       <button
+         aria-label="Align middle"
+         aria-pressed="false"
+-        class="components-button components-toolbar__control has-icon"
++        class="components-button components-toolbar__control is-compact has-icon"
+         data-toolbar-item="true"
+         type="button"
+       >
+@@ -86,7 +86,7 @@ exports[`BlockVerticalAlignmentUI should match snapshot when controls are visibl
+       <button
+         aria-label="Align bottom"
+         aria-pressed="false"
+-        class="components-button components-toolbar__control has-icon"
++        class="components-button components-toolbar__control is-compact has-icon"
+         data-toolbar-item="true"
+         type="button"
+       >
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f77065cdf7be23..fa4f83876a884d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -25,6 +25,7 @@
+ 
+ -   Upgraded `@ariakit/react` (v0.4.13) and `@ariakit/test` (v0.4.5) ([#65907](https://github.com/WordPress/gutenberg/pull/65907)).
+ -   Upgraded `@ariakit/react` (v0.4.15) and `@ariakit/test` (v0.4.7) ([#67404](https://github.com/WordPress/gutenberg/pull/67404)).
++-   `ToolbarButton`: Set size to "compact" ([#67440](https://github.com/WordPress/gutenberg/pull/67440)).
+ -   Exported the `WPCompleter` type as it was being used in block-editor/autocompleters ([#67410](https://github.com/WordPress/gutenberg/pull/67410)).
+ -   `SlotFill`: remove manual rerenders from the portal `Fill` component ([#67471](https://github.com/WordPress/gutenberg/pull/67471)).
+ 
+diff --git a/packages/components/src/toolbar/toolbar-button/index.tsx b/packages/components/src/toolbar/toolbar-button/index.tsx
+index bb591ff7b521c6..ae1f54acbfc14d 100644
+--- a/packages/components/src/toolbar/toolbar-button/index.tsx
++++ b/packages/components/src/toolbar/toolbar-button/index.tsx
+@@ -54,6 +54,7 @@ function UnforwardedToolbarButton(
+ 				<Button
+ 					ref={ ref }
+ 					icon={ restProps.icon }
++					size="compact"
+ 					label={ title }
+ 					shortcut={ restProps.shortcut }
+ 					data-subscript={ restProps.subscript }
+@@ -97,6 +98,7 @@ function UnforwardedToolbarButton(
+ 		>
+ 			{ ( toolbarItemProps ) => (
+ 				<Button
++					size="compact"
+ 					label={ title }
+ 					isPressed={ isActive }
+ 					{ ...toolbarItemProps }

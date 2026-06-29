@@ -1,0 +1,25 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1473cf5f5df40e..2f9f0fd03458ec 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `Tabs`: restore vertical indicator ([#65385](https://github.com/WordPress/gutenberg/pull/65385)).
+ -   `Tabs`: indicator positioning under RTL direction ([#64926](https://github.com/WordPress/gutenberg/pull/64926)).
+ -   `Popover`: Update `toolbar` variant radius to match block toolbar ([#65263](https://github.com/WordPress/gutenberg/pull/65263)).
+ 
+diff --git a/packages/components/src/tabs/styles.ts b/packages/components/src/tabs/styles.ts
+index a6425f9ab31e45..c00943b180f637 100644
+--- a/packages/components/src/tabs/styles.ts
++++ b/packages/components/src/tabs/styles.ts
+@@ -76,7 +76,7 @@ export const TabListWrapper = styled.div`
+ 		top: 0;
+ 		left: 0;
+ 		width: 100%;
+-		width: calc( var( --antialiasing-factor ) * 1px );
++		height: calc( var( --antialiasing-factor ) * 1px );
+ 		transform: translateY( calc( var( --indicator-top ) * 1px ) )
+ 			scaleY(
+ 				calc( var( --indicator-height ) / var( --antialiasing-factor ) )

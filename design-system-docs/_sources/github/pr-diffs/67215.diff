@@ -1,0 +1,68 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 29e746c905f8d4..55933e64d74b6c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -26,6 +26,7 @@
+ ### Enhancements
+ 
+ -   `ColorPicker`: Update sizes of color format select and copy button ([#67093](https://github.com/WordPress/gutenberg/pull/67093)).
++-   `ComboboxControl`: Update reset button size ([#67215](https://github.com/WordPress/gutenberg/pull/67215)).
+ -   `Autocomplete`: Increase option height ([#67214](https://github.com/WordPress/gutenberg/pull/67214)).
+ 
+ ### Experimental
+diff --git a/packages/components/src/combobox-control/index.tsx b/packages/components/src/combobox-control/index.tsx
+index 86fa4f4467318c..28510c8653d02e 100644
+--- a/packages/components/src/combobox-control/index.tsx
++++ b/packages/components/src/combobox-control/index.tsx
+@@ -26,7 +26,7 @@ import TokenInput from '../form-token-field/token-input';
+ import SuggestionsList from '../form-token-field/suggestions-list';
+ import BaseControl from '../base-control';
+ import Button from '../button';
+-import { FlexBlock, FlexItem } from '../flex';
++import { FlexBlock } from '../flex';
+ import withFocusOutside from '../higher-order/with-focus-outside';
+ import { useControlledValue } from '../utils/hooks';
+ import { normalizeTextString } from '../utils/strings';
+@@ -363,18 +363,16 @@ function ComboboxControl( props: ComboboxControlProps ) {
+ 							/>
+ 						</FlexBlock>
+ 						{ allowReset && (
+-							<FlexItem>
+-								<Button
+-									className="components-combobox-control__reset"
+-									icon={ closeSmall }
+-									// Disable reason: Focus returns to input field when reset is clicked.
+-									// eslint-disable-next-line no-restricted-syntax
+-									disabled={ ! value }
+-									onClick={ handleOnReset }
+-									onKeyDown={ handleResetStopPropagation }
+-									label={ __( 'Reset' ) }
+-								/>
+-							</FlexItem>
++							<Button
++								size="small"
++								icon={ closeSmall }
++								// Disable reason: Focus returns to input field when reset is clicked.
++								// eslint-disable-next-line no-restricted-syntax
++								disabled={ ! value }
++								onClick={ handleOnReset }
++								onKeyDown={ handleResetStopPropagation }
++								label={ __( 'Reset' ) }
++							/>
+ 						) }
+ 					</InputWrapperFlex>
+ 					{ isExpanded && (
+diff --git a/packages/components/src/combobox-control/style.scss b/packages/components/src/combobox-control/style.scss
+index 8bd4c2fb156a9f..c8fd8a168c0fb7 100644
+--- a/packages/components/src/combobox-control/style.scss
++++ b/packages/components/src/combobox-control/style.scss
+@@ -38,9 +38,3 @@ input.components-combobox-control__input[type="text"] {
+ 	}
+ }
+ 
+-.components-combobox-control__reset.components-button {
+-	display: flex;
+-	height: $grid-unit-20;
+-	min-width: $grid-unit-20;
+-	padding: 0;
+-}

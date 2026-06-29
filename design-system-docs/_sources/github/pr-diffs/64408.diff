@@ -1,0 +1,898 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 57ba69197cfa98..ebefd677ec151e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,23 @@
+ 
+ ## Unreleased
+ 
++### Deprecations
++
++-   Deprecate bottom margin on the following `BaseControl`-based components. Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version ([#64408](https://github.com/WordPress/gutenberg/pull/64408)).
++    -   `BaseControl`
++    -   `CheckboxControl`
++    -   `ComboboxControl`
++    -   `DimensionControl`
++    -   `FocalPointPicker`
++    -   `RangeControl`
++    -   `SearchControl`
++    -   `SelectControl`
++    -   `TextControl`
++    -   `TextareaControl`
++    -   `ToggleControl`
++    -   `ToggleGroupControl`
++    -   `TreeSelect`
++
+ ### New Features
+ 
+ -   `Composite`: add stable version of the component ([#63564](https://github.com/WordPress/gutenberg/pull/63564)).
+diff --git a/packages/components/src/base-control/index.tsx b/packages/components/src/base-control/index.tsx
+index 77899b6480daed..423636a92cd5f0 100644
+--- a/packages/components/src/base-control/index.tsx
++++ b/packages/components/src/base-control/index.tsx
+@@ -7,6 +7,7 @@ import type { ForwardedRef } from 'react';
+ /**
+  * WordPress dependencies
+  */
++import deprecated from '@wordpress/deprecated';
+ import { forwardRef } from '@wordpress/element';
+ 
+ /**
+@@ -31,6 +32,7 @@ const UnconnectedBaseControl = (
+ ) => {
+ 	const {
+ 		__nextHasNoMarginBottom = false,
++		__associatedWPComponentName = 'BaseControl',
+ 		id,
+ 		label,
+ 		hideLabelFromVision = false,
+@@ -39,6 +41,17 @@ const UnconnectedBaseControl = (
+ 		children,
+ 	} = useContextSystem( props, 'BaseControl' );
+ 
++	if ( ! __nextHasNoMarginBottom ) {
++		deprecated(
++			`Bottom margin styles for wp.components.${ __associatedWPComponentName }`,
++			{
++				since: '6.7',
++				version: '7.0',
++				hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version.',
++			}
++		);
++	}
++
+ 	return (
+ 		<Wrapper className={ className }>
+ 			<StyledField
+diff --git a/packages/components/src/base-control/types.ts b/packages/components/src/base-control/types.ts
+index 07a358d09c14b4..e4c838459209c4 100644
+--- a/packages/components/src/base-control/types.ts
++++ b/packages/components/src/base-control/types.ts
+@@ -10,6 +10,13 @@ export type BaseControlProps = {
+ 	 * @default false
+ 	 */
+ 	__nextHasNoMarginBottom?: boolean;
++	/**
++	 * Temporary private prop for showing better deprecation messages,
++	 * e.g. `Some feature from wp.components.${ __associatedWPControl } is deprecated`.
++	 *
++	 * @ignore
++	 */
++	__associatedWPComponentName?: string;
+ 	/**
+ 	 * The HTML `id` of the control element (passed in as a child to `BaseControl`) to which labels and help text are being generated.
+ 	 * This is necessary to accessibly associate the label with that element.
+diff --git a/packages/components/src/checkbox-control/index.tsx b/packages/components/src/checkbox-control/index.tsx
+index 51e232d97847a9..a24d1abaab45a7 100644
+--- a/packages/components/src/checkbox-control/index.tsx
++++ b/packages/components/src/checkbox-control/index.tsx
+@@ -95,6 +95,7 @@ export function CheckboxControl(
+ 	return (
+ 		<BaseControl
+ 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
++			__associatedWPComponentName="CheckboxControl"
+ 			label={ heading }
+ 			id={ id }
+ 			help={
+diff --git a/packages/components/src/checkbox-control/stories/index.story.tsx b/packages/components/src/checkbox-control/stories/index.story.tsx
+index 2dbc14c8cde111..3c55ba3192a3cf 100644
+--- a/packages/components/src/checkbox-control/stories/index.story.tsx
++++ b/packages/components/src/checkbox-control/stories/index.story.tsx
+@@ -59,6 +59,7 @@ export const Default: StoryFn< typeof CheckboxControl > = DefaultTemplate.bind(
+ 	{}
+ );
+ Default.args = {
++	__nextHasNoMarginBottom: true,
+ 	label: 'Is author',
+ 	help: 'Is the user an author or not?',
+ };
+diff --git a/packages/components/src/checkbox-control/test/index.tsx b/packages/components/src/checkbox-control/test/index.tsx
+index 899a9b100015b3..547f479184e862 100644
+--- a/packages/components/src/checkbox-control/test/index.tsx
++++ b/packages/components/src/checkbox-control/test/index.tsx
+@@ -20,13 +20,20 @@ const noop = () => {};
+ const getInput = () => screen.getByRole( 'checkbox' ) as HTMLInputElement;
+ 
+ const CheckboxControl = ( props: Omit< CheckboxControlProps, 'onChange' > ) => {
+-	return <BaseCheckboxControl onChange={ noop } { ...props } />;
++	return (
++		<BaseCheckboxControl
++			onChange={ noop }
++			{ ...props }
++			__nextHasNoMarginBottom
++		/>
++	);
+ };
+ 
+ const ControlledCheckboxControl = ( { onChange }: CheckboxControlProps ) => {
+ 	const [ isChecked, setChecked ] = useState( false );
+ 	return (
+ 		<BaseCheckboxControl
++			__nextHasNoMarginBottom
+ 			checked={ isChecked }
+ 			onChange={ ( value ) => {
+ 				setChecked( value );
+diff --git a/packages/components/src/combobox-control/index.tsx b/packages/components/src/combobox-control/index.tsx
+index e3b1434be8c7c2..fc3ecccf0b6599 100644
+--- a/packages/components/src/combobox-control/index.tsx
++++ b/packages/components/src/combobox-control/index.tsx
+@@ -320,6 +320,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
+ 		<DetectOutside onFocusOutside={ onFocusOutside }>
+ 			<BaseControl
+ 				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
++				__associatedWPComponentName="ComboboxControl"
+ 				className={ clsx( className, 'components-combobox-control' ) }
+ 				label={ label }
+ 				id={ `components-form-token-input-${ instanceId }` }
+diff --git a/packages/components/src/combobox-control/stories/index.story.tsx b/packages/components/src/combobox-control/stories/index.story.tsx
+index 0f45c8a54a2ee3..516cd262fd5aa6 100644
+--- a/packages/components/src/combobox-control/stories/index.story.tsx
++++ b/packages/components/src/combobox-control/stories/index.story.tsx
+@@ -76,6 +76,7 @@ const Template: StoryFn< typeof ComboboxControl > = ( {
+ };
+ export const Default = Template.bind( {} );
+ Default.args = {
++	__nextHasNoMarginBottom: true,
+ 	allowReset: false,
+ 	label: 'Select a country',
+ 	options: countryOptions,
+@@ -135,8 +136,7 @@ const optionsWithDisabledOptions = countryOptions.map( ( option, index ) => ( {
+ } ) );
+ 
+ WithDisabledOptions.args = {
+-	allowReset: false,
+-	label: 'Select a country',
++	...Default.args,
+ 	options: optionsWithDisabledOptions,
+ };
+ 
+@@ -148,8 +148,7 @@ WithDisabledOptions.args = {
+ export const NotExpandOnFocus = Template.bind( {} );
+ 
+ NotExpandOnFocus.args = {
+-	allowReset: false,
+-	label: 'Select a country',
++	...Default.args,
+ 	options: countryOptions,
+ 	expandOnFocus: false,
+ };
+diff --git a/packages/components/src/combobox-control/test/index.tsx b/packages/components/src/combobox-control/test/index.tsx
+index 76ce9cc4724c54..adc76590c24538 100644
+--- a/packages/components/src/combobox-control/test/index.tsx
++++ b/packages/components/src/combobox-control/test/index.tsx
+@@ -12,7 +12,7 @@ import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import ComboboxControl from '..';
++import _ComboboxControl from '..';
+ import type { ComboboxControlOption, ComboboxControlProps } from '../types';
+ 
+ const timezones = [
+@@ -57,6 +57,10 @@ const getAllOptions = () => screen.getAllByRole( 'option' );
+ const getOptionSearchString = ( option: ComboboxControlOption ) =>
+ 	option.label.substring( 0, 11 );
+ 
++const ComboboxControl = ( props: ComboboxControlProps ) => {
++	return <_ComboboxControl { ...props } __nextHasNoMarginBottom />;
++};
++
+ const ControlledComboboxControl = ( {
+ 	value: valueProp,
+ 	onChange,
+diff --git a/packages/components/src/dimension-control/index.tsx b/packages/components/src/dimension-control/index.tsx
+index 114ebe987dd35d..52662f31c3f24c 100644
+--- a/packages/components/src/dimension-control/index.tsx
++++ b/packages/components/src/dimension-control/index.tsx
+@@ -16,6 +16,15 @@ import SelectControl from '../select-control';
+ import sizesTable, { findSizeBySlug } from './sizes';
+ import type { DimensionControlProps, Size } from './types';
+ import type { SelectControlSingleSelectionProps } from '../select-control/types';
++import { ContextSystemProvider } from '../context';
++
++const CONTEXT_VALUE = {
++	BaseControl: {
++		// Temporary during deprecation grace period: Overrides the underlying `__associatedWPComponentName`
++		// via the context system to override the value set by SelectControl.
++		_overrides: { __associatedWPComponentName: 'DimensionControl' },
++	},
++};
+ 
+ /**
+  * `DimensionControl` is a component designed to provide a UI to control spacing and/or dimensions.
+@@ -87,16 +96,21 @@ export function DimensionControl( props: DimensionControlProps ) {
+ 	);
+ 
+ 	return (
+-		<SelectControl
+-			__next40pxDefaultSize={ __next40pxDefaultSize }
+-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+-			className={ clsx( className, 'block-editor-dimension-control' ) }
+-			label={ selectLabel }
+-			hideLabelFromVision={ false }
+-			value={ value }
+-			onChange={ onChangeSpacingSize }
+-			options={ formatSizesAsOptions( sizes ) }
+-		/>
++		<ContextSystemProvider value={ CONTEXT_VALUE }>
++			<SelectControl
++				__next40pxDefaultSize={ __next40pxDefaultSize }
++				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
++				className={ clsx(
++					className,
++					'block-editor-dimension-control'
++				) }
++				label={ selectLabel }
++				hideLabelFromVision={ false }
++				value={ value }
++				onChange={ onChangeSpacingSize }
++				options={ formatSizesAsOptions( sizes ) }
++			/>
++		</ContextSystemProvider>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/dimension-control/stories/index.story.tsx b/packages/components/src/dimension-control/stories/index.story.tsx
+index 33d5bad4ff4b19..3a6da44f461164 100644
+--- a/packages/components/src/dimension-control/stories/index.story.tsx
++++ b/packages/components/src/dimension-control/stories/index.story.tsx
+@@ -44,6 +44,7 @@ const Template: StoryFn< typeof DimensionControl > = ( args ) => (
+ export const Default = Template.bind( {} );
+ 
+ Default.args = {
++	__nextHasNoMarginBottom: true,
+ 	label: 'Please select a size',
+ 	sizes,
+ };
+diff --git a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+index 5990fbbd4a3f5f..658fe7febc02bc 100644
+--- a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
++++ b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+@@ -13,10 +13,6 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+   box-sizing: inherit;
+ }
+ 
+-.emotion-2 {
+-  margin-bottom: calc(4px * 2);
+-}
+-
+ .components-panel__row .emotion-2 {
+   margin-bottom: inherit;
+ }
+@@ -299,10 +295,6 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
+   box-sizing: inherit;
+ }
+ 
+-.emotion-2 {
+-  margin-bottom: calc(4px * 2);
+-}
+-
+ .components-panel__row .emotion-2 {
+   margin-bottom: inherit;
+ }
+@@ -595,10 +587,6 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`]
+   box-sizing: inherit;
+ }
+ 
+-.emotion-2 {
+-  margin-bottom: calc(4px * 2);
+-}
+-
+ .components-panel__row .emotion-2 {
+   margin-bottom: inherit;
+ }
+@@ -903,10 +891,6 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
+   box-sizing: inherit;
+ }
+ 
+-.emotion-2 {
+-  margin-bottom: calc(4px * 2);
+-}
+-
+ .components-panel__row .emotion-2 {
+   margin-bottom: inherit;
+ }
+diff --git a/packages/components/src/dimension-control/test/index.test.js b/packages/components/src/dimension-control/test/index.test.js
+index 1d65dd86c7e7c8..1b34d2983ad0f1 100644
+--- a/packages/components/src/dimension-control/test/index.test.js
++++ b/packages/components/src/dimension-control/test/index.test.js
+@@ -12,7 +12,11 @@ import { plus } from '@wordpress/icons';
+ /**
+  * Internal dependencies
+  */
+-import { DimensionControl } from '../';
++import { DimensionControl as _DimensionControl } from '../';
++
++const DimensionControl = ( props ) => {
++	return <_DimensionControl { ...props } __nextHasNoMarginBottom />;
++};
+ 
+ describe( 'DimensionControl', () => {
+ 	const onChangeHandler = jest.fn();
+diff --git a/packages/components/src/focal-point-picker/index.tsx b/packages/components/src/focal-point-picker/index.tsx
+index 4575108fe6a21d..8f299751be0d48 100644
+--- a/packages/components/src/focal-point-picker/index.tsx
++++ b/packages/components/src/focal-point-picker/index.tsx
+@@ -251,6 +251,7 @@ export function FocalPointPicker( {
+ 		<BaseControl
+ 			{ ...restProps }
+ 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
++			__associatedWPComponentName="FocalPointPicker"
+ 			label={ label }
+ 			id={ id }
+ 			help={ help }
+diff --git a/packages/components/src/focal-point-picker/stories/index.story.tsx b/packages/components/src/focal-point-picker/stories/index.story.tsx
+index ce93d3557060c9..42fd64b8e4d855 100644
+--- a/packages/components/src/focal-point-picker/stories/index.story.tsx
++++ b/packages/components/src/focal-point-picker/stories/index.story.tsx
+@@ -49,6 +49,9 @@ const Template: StoryFn< typeof FocalPointPicker > = ( {
+ };
+ 
+ export const Default = Template.bind( {} );
++Default.args = {
++	__nextHasNoMarginBottom: true,
++};
+ 
+ export const Image = Template.bind( {} );
+ Image.args = {
+diff --git a/packages/components/src/focal-point-picker/test/index.tsx b/packages/components/src/focal-point-picker/test/index.tsx
+index 1eccced32c70af..377ba6c4e9e6b3 100644
+--- a/packages/components/src/focal-point-picker/test/index.tsx
++++ b/packages/components/src/focal-point-picker/test/index.tsx
+@@ -7,12 +7,16 @@ import userEvent from '@testing-library/user-event';
+ /**
+  * Internal dependencies
+  */
+-import Picker from '..';
++import _Picker from '..';
+ import type { FocalPointPickerProps } from '../types';
+ 
+ type Log = { name: string; args: unknown[] };
+ type EventLogger = ( name: string, args: unknown[] ) => void;
+ 
++const Picker = ( props: React.ComponentProps< typeof _Picker > ) => {
++	return <_Picker { ...props } __nextHasNoMarginBottom />;
++};
++
+ const props: FocalPointPickerProps = {
+ 	onChange: jest.fn(),
+ 	url: 'test-url',
+diff --git a/packages/components/src/range-control/index.tsx b/packages/components/src/range-control/index.tsx
+index 5b4ecfa585679b..20d9712df9c251 100644
+--- a/packages/components/src/range-control/index.tsx
++++ b/packages/components/src/range-control/index.tsx
+@@ -213,6 +213,7 @@ function UnforwardedRangeControl(
+ 	return (
+ 		<BaseControl
+ 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
++			__associatedWPComponentName="RangeControl"
+ 			className={ classes }
+ 			label={ label }
+ 			hideLabelFromVision={ hideLabelFromVision }
+diff --git a/packages/components/src/range-control/stories/index.story.tsx b/packages/components/src/range-control/stories/index.story.tsx
+index 4e0c1f19e078b6..7775c364195722 100644
+--- a/packages/components/src/range-control/stories/index.story.tsx
++++ b/packages/components/src/range-control/stories/index.story.tsx
+@@ -70,6 +70,7 @@ const Template: StoryFn< typeof RangeControl > = ( { onChange, ...args } ) => {
+ 
+ export const Default: StoryFn< typeof RangeControl > = Template.bind( {} );
+ Default.args = {
++	__nextHasNoMarginBottom: true,
+ 	help: 'Please select how transparent you would like this.',
+ 	initialPosition: 50,
+ 	label: 'Opacity',
+@@ -104,6 +105,7 @@ export const WithAnyStep: StoryFn< typeof RangeControl > = ( {
+ 	);
+ };
+ WithAnyStep.args = {
++	__nextHasNoMarginBottom: true,
+ 	label: 'Brightness',
+ 	step: 'any',
+ };
+@@ -167,6 +169,7 @@ export const WithIntegerStepAndMarks: StoryFn< typeof RangeControl > =
+ 	MarkTemplate.bind( {} );
+ 
+ WithIntegerStepAndMarks.args = {
++	__nextHasNoMarginBottom: true,
+ 	label: 'Integer Step',
+ 	marks: marksBase,
+ 	max: 10,
+@@ -183,6 +186,7 @@ export const WithDecimalStepAndMarks: StoryFn< typeof RangeControl > =
+ 	MarkTemplate.bind( {} );
+ 
+ WithDecimalStepAndMarks.args = {
++	__nextHasNoMarginBottom: true,
+ 	marks: [
+ 		...marksBase,
+ 		{ value: 3.5, label: '3.5' },
+@@ -202,6 +206,7 @@ export const WithNegativeMinimumAndMarks: StoryFn< typeof RangeControl > =
+ 	MarkTemplate.bind( {} );
+ 
+ WithNegativeMinimumAndMarks.args = {
++	__nextHasNoMarginBottom: true,
+ 	marks: marksWithNegatives,
+ 	max: 10,
+ 	min: -10,
+@@ -217,6 +222,7 @@ export const WithNegativeRangeAndMarks: StoryFn< typeof RangeControl > =
+ 	MarkTemplate.bind( {} );
+ 
+ WithNegativeRangeAndMarks.args = {
++	__nextHasNoMarginBottom: true,
+ 	marks: marksWithNegatives,
+ 	max: -1,
+ 	min: -10,
+@@ -232,6 +238,7 @@ export const WithAnyStepAndMarks: StoryFn< typeof RangeControl > =
+ 	MarkTemplate.bind( {} );
+ 
+ WithAnyStepAndMarks.args = {
++	__nextHasNoMarginBottom: true,
+ 	marks: marksBase,
+ 	max: 10,
+ 	min: 0,
+diff --git a/packages/components/src/range-control/test/index.tsx b/packages/components/src/range-control/test/index.tsx
+index d843b615ed0078..a4c5d8c6f2bc7f 100644
+--- a/packages/components/src/range-control/test/index.tsx
++++ b/packages/components/src/range-control/test/index.tsx
+@@ -6,7 +6,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import RangeControl from '../';
++import _RangeControl from '../';
+ 
+ const getRangeInput = (): HTMLInputElement => screen.getByRole( 'slider' );
+ const getNumberInput = (): HTMLInputElement => screen.getByRole( 'spinbutton' );
+@@ -15,6 +15,12 @@ const getResetButton = (): HTMLButtonElement => screen.getByRole( 'button' );
+ const fireChangeEvent = ( input: HTMLInputElement, value?: number | string ) =>
+ 	fireEvent.change( input, { target: { value } } );
+ 
++const RangeControl = (
++	props: React.ComponentProps< typeof _RangeControl >
++) => {
++	return <_RangeControl { ...props } __nextHasNoMarginBottom />;
++};
++
+ describe( 'RangeControl', () => {
+ 	describe( '#render()', () => {
+ 		it( 'should trigger change callback with numeric value', () => {
+diff --git a/packages/components/src/search-control/index.tsx b/packages/components/src/search-control/index.tsx
+index 08cb3b065c904e..aac905e137e025 100644
+--- a/packages/components/src/search-control/index.tsx
++++ b/packages/components/src/search-control/index.tsx
+@@ -77,10 +77,13 @@ function UnforwardedSearchControl(
+ 
+ 	const contextValue = useMemo(
+ 		() => ( {
+-			// Overrides the underlying BaseControl `__nextHasNoMarginBottom` via the context system
+-			// to provide backwards compatibile margin for SearchControl.
+-			// (In a standard InputControl, the BaseControl `__nextHasNoMarginBottom` is always set to true.)
+-			BaseControl: { _overrides: { __nextHasNoMarginBottom } },
++			BaseControl: {
++				// Overrides the underlying BaseControl `__nextHasNoMarginBottom` via the context system
++				// to provide backwards compatibile margin for SearchControl.
++				// (In a standard InputControl, the BaseControl `__nextHasNoMarginBottom` is always set to true.)
++				_overrides: { __nextHasNoMarginBottom },
++				__associatedWPComponentName: 'SearchControl',
++			},
+ 			// `isBorderless` is still experimental and not a public prop for InputControl yet.
+ 			InputBase: { isBorderless: true },
+ 		} ),
+diff --git a/packages/components/src/search-control/stories/index.story.tsx b/packages/components/src/search-control/stories/index.story.tsx
+index 433d3eef655adf..215288bb67c9b6 100644
+--- a/packages/components/src/search-control/stories/index.story.tsx
++++ b/packages/components/src/search-control/stories/index.story.tsx
+@@ -48,6 +48,7 @@ const Template: StoryFn< typeof SearchControl > = ( {
+ export const Default = Template.bind( {} );
+ Default.args = {
+ 	help: 'Help text to explain the input.',
++	__nextHasNoMarginBottom: true,
+ };
+ 
+ /**
+diff --git a/packages/components/src/search-control/test/index.tsx b/packages/components/src/search-control/test/index.tsx
+index f130cab1b2a7cd..c6637945adcf63 100644
+--- a/packages/components/src/search-control/test/index.tsx
++++ b/packages/components/src/search-control/test/index.tsx
+@@ -23,6 +23,7 @@ function ControlledSearchControl( {
+ 	return (
+ 		<SearchControl
+ 			{ ...restProps }
++			__nextHasNoMarginBottom
+ 			value={ value }
+ 			onChange={ ( ...args ) => {
+ 				setValue( ...args );
+diff --git a/packages/components/src/select-control/index.tsx b/packages/components/src/select-control/index.tsx
+index ca9966fc675b86..3686661b8a58dc 100644
+--- a/packages/components/src/select-control/index.tsx
++++ b/packages/components/src/select-control/index.tsx
+@@ -99,6 +99,7 @@ function UnforwardedSelectControl< V extends string >(
+ 			help={ help }
+ 			id={ id }
+ 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
++			__associatedWPComponentName="SelectControl"
+ 		>
+ 			<StyledInputBase
+ 				className={ classes }
+diff --git a/packages/components/src/select-control/stories/index.story.tsx b/packages/components/src/select-control/stories/index.story.tsx
+index 11a63510d9337c..018f519e6b6d43 100644
+--- a/packages/components/src/select-control/stories/index.story.tsx
++++ b/packages/components/src/select-control/stories/index.story.tsx
+@@ -63,6 +63,7 @@ const SelectControlWithState: StoryFn< typeof SelectControl > = ( props ) => {
+ 
+ export const Default = SelectControlWithState.bind( {} );
+ Default.args = {
++	__nextHasNoMarginBottom: true,
+ 	options: [
+ 		{ value: '', label: 'Select an Option', disabled: true },
+ 		{ value: 'a', label: 'Option A' },
+@@ -82,9 +83,11 @@ WithLabelAndHelpText.args = {
+  * As an alternative to the `options` prop, `optgroup`s and `options` can be
+  * passed in as `children` for more customizeability.
+  */
+-export const WithCustomChildren: StoryFn< typeof SelectControl > = ( args ) => {
+-	return (
+-		<SelectControlWithState { ...args }>
++export const WithCustomChildren = SelectControlWithState.bind( {} );
++WithCustomChildren.args = {
++	__nextHasNoMarginBottom: true,
++	children: (
++		<>
+ 			<option value="option-1">Option 1</option>
+ 			<option value="option-2" disabled>
+ 				Option 2 - Disabled
+@@ -97,8 +100,8 @@ export const WithCustomChildren: StoryFn< typeof SelectControl > = ( args ) => {
+ 					Option Group 1 - Option 2 - Disabled
+ 				</option>
+ 			</optgroup>
+-		</SelectControlWithState>
+-	);
++		</>
++	),
+ };
+ 
+ export const Minimal = SelectControlWithState.bind( {} );
+diff --git a/packages/components/src/select-control/test/select-control.tsx b/packages/components/src/select-control/test/select-control.tsx
+index 0e8a6891087043..47b684cd20e280 100644
+--- a/packages/components/src/select-control/test/select-control.tsx
++++ b/packages/components/src/select-control/test/select-control.tsx
+@@ -7,7 +7,13 @@ import userEvent from '@testing-library/user-event';
+ /**
+  * Internal dependencies
+  */
+-import SelectControl from '..';
++import _SelectControl from '..';
++
++const SelectControl = (
++	props: React.ComponentProps< typeof _SelectControl >
++) => {
++	return <_SelectControl { ...props } __nextHasNoMarginBottom />;
++};
+ 
+ describe( 'SelectControl', () => {
+ 	it( 'should not render when no options or children are provided', () => {
+@@ -123,7 +129,7 @@ describe( 'SelectControl', () => {
+ 					onChange={ onChange }
+ 				/>;
+ 
+-				<SelectControl
++				<_SelectControl
+ 					// @ts-expect-error "string" is not "narrow" or "value"
+ 					value="string"
+ 					options={ [
+@@ -142,7 +148,7 @@ describe( 'SelectControl', () => {
+ 			} );
+ 
+ 			it( 'should accept an explicit type argument', () => {
+-				<SelectControl< 'narrow' | 'value' >
++				<_SelectControl< 'narrow' | 'value' >
+ 					// @ts-expect-error "string" is not "narrow" or "value"
+ 					value="string"
+ 					options={ [
+@@ -166,7 +172,7 @@ describe( 'SelectControl', () => {
+ 					value: ( 'foo' | 'bar' )[]
+ 				) => void = () => {};
+ 
+-				<SelectControl
++				<_SelectControl
+ 					multiple
+ 					value={ [ 'narrow' ] }
+ 					options={ [
+@@ -183,7 +189,7 @@ describe( 'SelectControl', () => {
+ 					onChange={ onChange }
+ 				/>;
+ 
+-				<SelectControl
++				<_SelectControl
+ 					multiple
+ 					// @ts-expect-error "string" is not "narrow" or "value"
+ 					value={ [ 'string' ] }
+@@ -205,7 +211,7 @@ describe( 'SelectControl', () => {
+ 			} );
+ 
+ 			it( 'should accept an explicit type argument', () => {
+-				<SelectControl< 'narrow' | 'value' >
++				<_SelectControl< 'narrow' | 'value' >
+ 					multiple
+ 					// @ts-expect-error "string" is not "narrow" or "value"
+ 					value={ [ 'string' ] }
+diff --git a/packages/components/src/text-control/index.tsx b/packages/components/src/text-control/index.tsx
+index 1643c5bc37c347..ea2d2c17bb9cf6 100644
+--- a/packages/components/src/text-control/index.tsx
++++ b/packages/components/src/text-control/index.tsx
+@@ -41,6 +41,7 @@ function UnforwardedTextControl(
+ 	return (
+ 		<BaseControl
+ 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
++			__associatedWPComponentName="TextControl"
+ 			label={ label }
+ 			hideLabelFromVision={ hideLabelFromVision }
+ 			id={ id }
+diff --git a/packages/components/src/text-control/stories/index.story.tsx b/packages/components/src/text-control/stories/index.story.tsx
+index ddc8af7a9f2b3a..bebdb2caf75f63 100644
+--- a/packages/components/src/text-control/stories/index.story.tsx
++++ b/packages/components/src/text-control/stories/index.story.tsx
+@@ -52,7 +52,9 @@ const DefaultTemplate: StoryFn< typeof TextControl > = ( {
+ export const Default: StoryFn< typeof TextControl > = DefaultTemplate.bind(
+ 	{}
+ );
+-Default.args = {};
++Default.args = {
++	__nextHasNoMarginBottom: true,
++};
+ 
+ export const WithLabelAndHelpText: StoryFn< typeof TextControl > =
+ 	DefaultTemplate.bind( {} );
+diff --git a/packages/components/src/text-control/test/text-control.tsx b/packages/components/src/text-control/test/text-control.tsx
+index fc048b93992f08..19b17cae443614 100644
+--- a/packages/components/src/text-control/test/text-control.tsx
++++ b/packages/components/src/text-control/test/text-control.tsx
+@@ -6,7 +6,11 @@ import { render, screen } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import TextControl from '..';
++import _TextControl from '..';
++
++const TextControl = ( props: React.ComponentProps< typeof _TextControl > ) => {
++	return <_TextControl { ...props } __nextHasNoMarginBottom />;
++};
+ 
+ const noop = () => {};
+ 
+diff --git a/packages/components/src/textarea-control/index.tsx b/packages/components/src/textarea-control/index.tsx
+index 3b96e11b0621b5..e7528510667b75 100644
+--- a/packages/components/src/textarea-control/index.tsx
++++ b/packages/components/src/textarea-control/index.tsx
+@@ -35,6 +35,7 @@ function UnforwardedTextareaControl(
+ 	return (
+ 		<BaseControl
+ 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
++			__associatedWPComponentName="TextareaControl"
+ 			label={ label }
+ 			hideLabelFromVision={ hideLabelFromVision }
+ 			id={ id }
+diff --git a/packages/components/src/textarea-control/stories/index.story.tsx b/packages/components/src/textarea-control/stories/index.story.tsx
+index e227519a069383..e8cb986a141325 100644
+--- a/packages/components/src/textarea-control/stories/index.story.tsx
++++ b/packages/components/src/textarea-control/stories/index.story.tsx
+@@ -51,6 +51,7 @@ const Template: StoryFn< typeof TextareaControl > = ( {
+ 
+ export const Default: StoryFn< typeof TextareaControl > = Template.bind( {} );
+ Default.args = {
++	__nextHasNoMarginBottom: true,
+ 	label: 'Text',
+ 	help: 'Enter some text',
+ };
+diff --git a/packages/components/src/toggle-control/index.tsx b/packages/components/src/toggle-control/index.tsx
+index 5c64d57d3d0249..d2ee234a9695f8 100644
+--- a/packages/components/src/toggle-control/index.tsx
++++ b/packages/components/src/toggle-control/index.tsx
+@@ -10,6 +10,7 @@ import clsx from 'clsx';
+  */
+ import { forwardRef } from '@wordpress/element';
+ import { useInstanceId } from '@wordpress/compose';
++import deprecated from '@wordpress/deprecated';
+ 
+ /**
+  * Internal dependencies
+@@ -48,6 +49,14 @@ function UnforwardedToggleControl(
+ 		! __nextHasNoMarginBottom && css( { marginBottom: space( 3 ) } )
+ 	);
+ 
++	if ( ! __nextHasNoMarginBottom ) {
++		deprecated( 'Bottom margin styles for wp.components.ToggleControl', {
++			since: '6.7',
++			version: '7.0',
++			hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version.',
++		} );
++	}
++
+ 	let describedBy, helpLabel;
+ 	if ( help ) {
+ 		if ( typeof help === 'function' ) {
+diff --git a/packages/components/src/toggle-control/stories/index.story.tsx b/packages/components/src/toggle-control/stories/index.story.tsx
+index b8043b8f48e523..97723aa207a394 100644
+--- a/packages/components/src/toggle-control/stories/index.story.tsx
++++ b/packages/components/src/toggle-control/stories/index.story.tsx
+@@ -48,6 +48,7 @@ const Template: StoryFn< typeof ToggleControl > = ( {
+ 
+ export const Default = Template.bind( {} );
+ Default.args = {
++	__nextHasNoMarginBottom: true,
+ 	label: 'Enable something',
+ };
+ 
+diff --git a/packages/components/src/toggle-control/test/index.tsx b/packages/components/src/toggle-control/test/index.tsx
+index cc89031d9affa3..b0eec2aca6663d 100644
+--- a/packages/components/src/toggle-control/test/index.tsx
++++ b/packages/components/src/toggle-control/test/index.tsx
+@@ -6,7 +6,13 @@ import { render, screen } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import ToggleControl from '..';
++import _ToggleControl from '..';
++
++const ToggleControl = (
++	props: React.ComponentProps< typeof _ToggleControl >
++) => {
++	return <_ToggleControl { ...props } __nextHasNoMarginBottom />;
++};
+ 
+ describe( 'ToggleControl', () => {
+ 	it( 'should label the toggle', () => {
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index 81afc7ac67b05f..d055ea5fcc9838 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -13,10 +13,6 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+   box-sizing: inherit;
+ }
+ 
+-.emotion-2 {
+-  margin-bottom: calc(4px * 2);
+-}
+-
+ .components-panel__row .emotion-2 {
+   margin-bottom: inherit;
+ }
+@@ -349,10 +345,6 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+   box-sizing: inherit;
+ }
+ 
+-.emotion-2 {
+-  margin-bottom: calc(4px * 2);
+-}
+-
+ .components-panel__row .emotion-2 {
+   margin-bottom: inherit;
+ }
+@@ -573,10 +565,6 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+   box-sizing: inherit;
+ }
+ 
+-.emotion-2 {
+-  margin-bottom: calc(4px * 2);
+-}
+-
+ .components-panel__row .emotion-2 {
+   margin-bottom: inherit;
+ }
+@@ -903,10 +891,6 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
+   box-sizing: inherit;
+ }
+ 
+-.emotion-2 {
+-  margin-bottom: calc(4px * 2);
+-}
+-
+ .components-panel__row .emotion-2 {
+   margin-bottom: inherit;
+ }
+diff --git a/packages/components/src/toggle-group-control/test/index.tsx b/packages/components/src/toggle-group-control/test/index.tsx
+index 661bbb9fc37bab..170db01ae523c2 100644
+--- a/packages/components/src/toggle-group-control/test/index.tsx
++++ b/packages/components/src/toggle-group-control/test/index.tsx
+@@ -15,7 +15,7 @@ import { formatLowercase, formatUppercase } from '@wordpress/icons';
+  */
+ import Button from '../../button';
+ import {
+-	ToggleGroupControl,
++	ToggleGroupControl as _ToggleGroupControl,
+ 	ToggleGroupControlOption,
+ 	ToggleGroupControlOptionIcon,
+ } from '../index';
+@@ -27,6 +27,10 @@ const hoverOutside = async () => {
+ 	await hover( document.body, { clientX: 10, clientY: 10 } );
+ };
+ 
++const ToggleGroupControl = ( props: ToggleGroupControlProps ) => {
++	return <_ToggleGroupControl { ...props } __nextHasNoMarginBottom />;
++};
++
+ const ControlledToggleGroupControl = ( {
+ 	value: valueProp,
+ 	onChange,
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index 8138b76505fe50..1c86c93548f6df 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -72,6 +72,7 @@ function UnconnectedToggleGroupControl(
+ 		<BaseControl
+ 			help={ help }
+ 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
++			__associatedWPComponentName="ToggleGroupControl"
+ 		>
+ 			{ ! hideLabelFromVision && (
+ 				<VisualLabelWrapper>
+diff --git a/packages/components/src/tree-select/index.tsx b/packages/components/src/tree-select/index.tsx
+index 599dee4402ec72..bd92807bff4cc9 100644
+--- a/packages/components/src/tree-select/index.tsx
++++ b/packages/components/src/tree-select/index.tsx
+@@ -10,6 +10,15 @@ import { decodeEntities } from '@wordpress/html-entities';
+ import { SelectControl } from '../select-control';
+ import type { TreeSelectProps, Tree, Truthy } from './types';
+ import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
++import { ContextSystemProvider } from '../context';
++
++const CONTEXT_VALUE = {
++	BaseControl: {
++		// Temporary during deprecation grace period: Overrides the underlying `__associatedWPComponentName`
++		// via the context system to override the value set by SelectControl.
++		_overrides: { __associatedWPComponentName: 'TreeSelect' },
++	},
++};
+ 
+ function getSelectOptions(
+ 	tree: Tree[],
+@@ -91,11 +100,13 @@ export function TreeSelect( props: TreeSelectProps ) {
+ 	}, [ noOptionLabel, tree ] );
+ 
+ 	return (
+-		<SelectControl
+-			{ ...{ label, options, onChange } }
+-			value={ selectedId }
+-			{ ...restProps }
+-		/>
++		<ContextSystemProvider value={ CONTEXT_VALUE }>
++			<SelectControl
++				{ ...{ label, options, onChange } }
++				value={ selectedId }
++				{ ...restProps }
++			/>
++		</ContextSystemProvider>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/tree-select/stories/index.story.tsx b/packages/components/src/tree-select/stories/index.story.tsx
+index 0a4212dc791227..33103786bbc541 100644
+--- a/packages/components/src/tree-select/stories/index.story.tsx
++++ b/packages/components/src/tree-select/stories/index.story.tsx
+@@ -48,6 +48,7 @@ const TreeSelectWithState: StoryFn< typeof TreeSelect > = ( props ) => {
+ 
+ export const Default = TreeSelectWithState.bind( {} );
+ Default.args = {
++	__nextHasNoMarginBottom: true,
+ 	label: 'Label Text',
+ 	noOptionLabel: 'No parent page',
+ 	help: 'Help text to explain the select control.',

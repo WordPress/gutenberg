@@ -1,0 +1,459 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 1615e2e80101ad..7415ab658f48bd 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -1139,6 +1139,12 @@
+ 		"markdown_source": "../packages/components/src/spinner/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "Surface",
++		"slug": "surface",
++		"markdown_source": "../packages/components/src/surface/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "TabPanel",
+ 		"slug": "tab-panel",
+diff --git a/packages/components/src/elevation/component.js b/packages/components/src/elevation/component.js
+index b4aa774ac0668d..a225e665a9ff67 100644
+--- a/packages/components/src/elevation/component.js
++++ b/packages/components/src/elevation/component.js
+@@ -11,7 +11,11 @@ import { createComponent } from '../ui/utils';
+  *
+  * @example
+  * ```jsx
+- * import { Elevation, Surface, Text, View } from `@wordpress/components`;
++ * import {
++ *	__experimentalElevation as Elevation,
++ *	__experimentalSurface as Surface,
++ *	__experimentalText as Text,
++ * } from '@wordpress/components';
+  *
+  * function Example() {
+  * 	return (
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index e2f72587dc60ae..40645afa401aa4 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -111,6 +111,7 @@ export { default as SnackbarList } from './snackbar/list';
+ export { Spacer as __experimentalSpacer } from './spacer';
+ export { Scrollable as __experimentalScrollable } from './scrollable';
+ export { default as Spinner } from './spinner';
++export { Surface as __experimentalSurface } from './surface';
+ export { default as TabPanel } from './tab-panel';
+ export { Text as __experimentalText } from './text';
+ export { default as TextControl } from './text-control';
+diff --git a/packages/components/src/ui/surface/README.md b/packages/components/src/surface/README.md
+similarity index 59%
+rename from packages/components/src/ui/surface/README.md
+rename to packages/components/src/surface/README.md
+index 3e82138864cf45..ac8f8a75190c18 100644
+--- a/packages/components/src/ui/surface/README.md
++++ b/packages/components/src/surface/README.md
+@@ -11,7 +11,10 @@ This feature is still experimental. “Experimental” means this is an early im
+ In the example below, notice how the `Surface` renders in white (or dark gray if in dark mode).
+ 
+ ```jsx
+-import { Surface, Text } from '@wordpress/components/ui';
++import {
++	__experimentalSurface as Surface,
++	__experimentalText as Text
++} from '@wordpress/components/ui';
+ 
+ function Example() {
+ 	return (
+@@ -24,48 +27,51 @@ function Example() {
+ 
+ ## Props
+ 
+-##### backgroundSize
++### `backgroundSize`: number
+ 
+-**Type**: `number`
++- Required: No
++- Default: `12`
+ 
+ Determines the grid size for "dotted" and "grid" variants.
+ 
+-##### border
++### `borderBottom`: `boolean`
+ 
+-**Type**: `boolean`
+-
+-Renders a border around the entire `Surface`.
+-
+-##### borderBottom
+-
+-**Type**: `boolean`
++- Required: No
++- Default: `false`
+ 
+ Renders a bottom border.
+ 
+-##### borderLeft
++### `borderLeft`: `boolean`
+ 
+-**Type**: `boolean`
++- Required: No
++- Default: `false`
+ 
+ Renders a left border.
+ 
+-##### borderRight
++### `borderRight`: `boolean`
+ 
+-**Type**: `boolean`
++- Required: No
++- Default: `false`
+ 
+ Renders a right border.
+ 
+-##### borderTop
++### `borderTop`: `boolean`
+ 
+-**Type**: `boolean`
++- Required: No
++- Default: `false`
+ 
+ Renders a top border.
+ 
+-##### variant
++### `variant`: `string`
+ 
+-**Type**: `"grid"`,`"primary"`,`"secondary"`,`"tertiary"`,`"dotted"`
++- Required: No
++- Default: `false`
++- Allowed values: `primary`, `secondary`, `tertiary`, `dotted`, `grid`
+ 
+ Modifies the background color of `Surface`.
+ 
+ -   `primary`: Used for almost all cases.
+ -   `secondary`: Used as a secondary background for inner `Surface` components.
+ -   `tertiary`: Used as the app/site wide background. Visible in **dark mode** only. Use case is rare.
++-   `grid`: Used to show a grid.
++-   `dotted`: Used to show a dots grid.
+diff --git a/packages/components/src/ui/surface/component.js b/packages/components/src/surface/component.js
+similarity index 74%
+rename from packages/components/src/ui/surface/component.js
+rename to packages/components/src/surface/component.js
+index b03a66e645494e..06c1ecb6ad3024 100644
+--- a/packages/components/src/ui/surface/component.js
++++ b/packages/components/src/surface/component.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { createComponent } from '../utils';
++import { createComponent } from '../ui/utils';
+ import { useSurface } from './hook';
+ 
+ /**
+@@ -10,7 +10,10 @@ import { useSurface } from './hook';
+  * In the example below, notice how the `Surface` renders in white (or dark gray if in dark mode).
+  *
+  * ```jsx
+- * import { Surface, Text } from `@wordpress/components/ui`;
++ * import {
++ *	__experimentalSurface as Surface,
++ *	__experimentalText as Text,
++ * } from '@wordpress/components';
+  *
+  * function Example() {
+  * 	return (
+diff --git a/packages/components/src/ui/surface/hook.js b/packages/components/src/surface/hook.js
+similarity index 78%
+rename from packages/components/src/ui/surface/hook.js
+rename to packages/components/src/surface/hook.js
+index cf69919b512f23..af4946cb343df9 100644
+--- a/packages/components/src/ui/surface/hook.js
++++ b/packages/components/src/surface/hook.js
+@@ -11,20 +11,19 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem } from '../context';
++import { useContextSystem } from '../ui/context';
+ import * as styles from './styles';
+ 
+ /**
+- * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
++ * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+  */
+ export function useSurface( props ) {
+ 	const {
+ 		backgroundSize = 12,
+-		border,
+-		borderBottom,
+-		borderLeft,
+-		borderRight,
+-		borderTop,
++		borderBottom = false,
++		borderLeft = false,
++		borderRight = false,
++		borderTop = false,
+ 		className,
+ 		variant = 'primary',
+ 		...otherProps
+@@ -34,7 +33,6 @@ export function useSurface( props ) {
+ 		const sx = {};
+ 
+ 		sx.borders = styles.getBorders( {
+-			border,
+ 			borderBottom,
+ 			borderLeft,
+ 			borderRight,
+@@ -53,7 +51,6 @@ export function useSurface( props ) {
+ 		);
+ 	}, [
+ 		backgroundSize,
+-		border,
+ 		borderBottom,
+ 		borderLeft,
+ 		borderRight,
+diff --git a/packages/components/src/ui/surface/index.js b/packages/components/src/surface/index.js
+similarity index 100%
+rename from packages/components/src/ui/surface/index.js
+rename to packages/components/src/surface/index.js
+diff --git a/packages/components/src/ui/surface/stories/index.js b/packages/components/src/surface/stories/index.js
+similarity index 83%
+rename from packages/components/src/ui/surface/stories/index.js
+rename to packages/components/src/surface/stories/index.js
+index 7ab5b68b329e8d..ae514113374a80 100644
+--- a/packages/components/src/ui/surface/stories/index.js
++++ b/packages/components/src/surface/stories/index.js
+@@ -6,12 +6,12 @@ import { boolean, number, select } from '@storybook/addon-knobs';
+ /**
+  * Internal dependencies
+  */
+-import { Surface } from '../index';
+-import { Text } from '../../../text';
++import { Surface } from '../';
++import { Text } from '../../text';
+ 
+ export default {
+ 	component: Surface,
+-	title: 'G2 Components (Experimental)/Surface',
++	title: 'Components (Experimental)/Surface',
+ };
+ 
+ const variantOptions = {
+@@ -25,7 +25,6 @@ const variantOptions = {
+ export const _default = () => {
+ 	const props = {
+ 		backgroundSize: number( 'backgroundSize', 12 ),
+-		border: boolean( 'border', false ),
+ 		borderTop: boolean( 'borderTop', false ),
+ 		borderBottom: boolean( 'borderBottom', false ),
+ 		borderLeft: boolean( 'borderLeft', false ),
+diff --git a/packages/components/src/ui/surface/styles.js b/packages/components/src/surface/styles.js
+similarity index 95%
+rename from packages/components/src/ui/surface/styles.js
+rename to packages/components/src/surface/styles.js
+index 3ab046562b5b81..133bc8451e9597 100644
+--- a/packages/components/src/ui/surface/styles.js
++++ b/packages/components/src/surface/styles.js
+@@ -6,8 +6,7 @@ import { css } from 'emotion';
+ /**
+  * Internal dependencies
+  */
+-import CONFIG from '../../utils/config-values';
+-import { COLORS } from '../../utils/colors-values';
++import { CONFIG, COLORS } from '../utils';
+ 
+ export const Surface = css`
+ 	background-color: ${ CONFIG.surfaceColor };
+@@ -21,14 +20,12 @@ export const background = css`
+ 
+ /**
+  * @param {Object} props
+- * @param {boolean} [props.border]
+  * @param {boolean} [props.borderBottom]
+  * @param {boolean} [props.borderLeft]
+  * @param {boolean} [props.borderRight]
+  * @param {boolean} [props.borderTop]
+  */
+ export function getBorders( {
+-	border,
+ 	borderBottom,
+ 	borderLeft,
+ 	borderRight,
+@@ -37,7 +34,6 @@ export function getBorders( {
+ 	const borderStyle = `1px solid ${ CONFIG.surfaceBorderColor }`;
+ 
+ 	return css( {
+-		border: border ? borderStyle : undefined,
+ 		borderBottom: borderBottom ? borderStyle : undefined,
+ 		borderLeft: borderLeft ? borderStyle : undefined,
+ 		borderRight: borderRight ? borderStyle : undefined,
+diff --git a/packages/components/src/ui/surface/test/__snapshots__/index.js.snap b/packages/components/src/surface/test/__snapshots__/index.js.snap
+similarity index 85%
+rename from packages/components/src/ui/surface/test/__snapshots__/index.js.snap
+rename to packages/components/src/surface/test/__snapshots__/index.js.snap
+index 7f538e2616db75..c5e547cfb2af45 100644
+--- a/packages/components/src/ui/surface/test/__snapshots__/index.js.snap
++++ b/packages/components/src/surface/test/__snapshots__/index.js.snap
+@@ -60,21 +60,6 @@ Snapshot Diff:
+   </div>
+ `;
+ 
+-exports[`props should render borders 1`] = `
+-Snapshot Diff:
+-- First value
+-+ Second value
+-
+-  <div
+--   class="components-surface css-1fc5hvl-Surface-primary css-1mm2cvy-View em57xhy0"
+-+   class="components-surface css-asbdls-Surface-primary css-1mm2cvy-View em57xhy0"
+-    data-wp-c16t="true"
+-    data-wp-component="Surface"
+-  >
+-    Surface
+-  </div>
+-`;
+-
+ exports[`props should render correctly 1`] = `
+ .emotion-0 {
+   background-color: #fff;
+diff --git a/packages/components/src/ui/surface/test/index.js b/packages/components/src/surface/test/index.js
+similarity index 87%
+rename from packages/components/src/ui/surface/test/index.js
+rename to packages/components/src/surface/test/index.js
+index 40fb3b01ff1524..fb2a4eaa9598d7 100644
+--- a/packages/components/src/ui/surface/test/index.js
++++ b/packages/components/src/surface/test/index.js
+@@ -27,13 +27,6 @@ describe( 'props', () => {
+ 		);
+ 	} );
+ 
+-	test( 'should render borders', () => {
+-		const { container } = render( <Surface border>Surface</Surface> );
+-		expect( container.firstChild ).toMatchDiffSnapshot(
+-			base.container.firstChild
+-		);
+-	} );
+-
+ 	test( 'should render borderLeft', () => {
+ 		const { container } = render( <Surface borderLeft>Surface</Surface> );
+ 		expect( container.firstChild ).toMatchDiffSnapshot(
+diff --git a/packages/components/src/ui/surface/types.ts b/packages/components/src/surface/types.ts
+similarity index 79%
+rename from packages/components/src/ui/surface/types.ts
+rename to packages/components/src/surface/types.ts
+index e00255581d69ab..2d7eece2e45b56 100644
+--- a/packages/components/src/ui/surface/types.ts
++++ b/packages/components/src/surface/types.ts
+@@ -8,26 +8,32 @@ export type SurfaceVariant =
+ export type Props = {
+ 	/**
+ 	 * Determines the grid size for "dotted" and "grid" variants.
++	 *
++	 * @default 12
+ 	 */
+ 	backgroundSize?: number;
+-	/**
+-	 * Renders a border around the entire `Surface`.
+-	 */
+-	border?: boolean;
+ 	/**
+ 	 * Renders a bottom border.
++	 *
++	 * @default false
+ 	 */
+ 	borderBottom?: boolean;
+ 	/**
+ 	 * Renders a left border.
++	 *
++	 * @default false
+ 	 */
+ 	borderLeft?: boolean;
+ 	/**
+ 	 * Renders a right border.
++	 *
++	 * @default false
+ 	 */
+ 	borderRight?: boolean;
+ 	/**
+ 	 * Renders a top border.
++	 *
++	 * @default false
+ 	 */
+ 	borderTop?: boolean;
+ 	/**
+@@ -36,6 +42,10 @@ export type Props = {
+ 	 * * `primary`: Used for almost all cases.
+ 	 * * `secondary`: Used as a secondary background for inner `Surface` components.
+ 	 * * `tertiary`: Used as the app/site wide background. Visible in **dark mode** only. Use case is rare.
++	 * * `grid`: Used to show a grid.
++	 * * `dotted`: Used to show a dots grid.
++	 *
++	 * @default 'primary'
+ 	 */
+ 	variant?: SurfaceVariant;
+ 	/**
+diff --git a/packages/components/src/text/stories/index.js b/packages/components/src/text/stories/index.js
+index 34e7e5c21459c7..a1cdf917b98c9e 100644
+--- a/packages/components/src/text/stories/index.js
++++ b/packages/components/src/text/stories/index.js
+@@ -5,7 +5,7 @@ import { Text } from '..';
+ 
+ export default {
+ 	component: Text,
+-	title: 'G2 Components (Experimental)/Text',
++	title: 'Components (Experimental)/Text',
+ };
+ 
+ export const _default = () => {
+diff --git a/packages/components/src/ui/__storybook-utils/example-grid.js b/packages/components/src/ui/__storybook-utils/example-grid.js
+index c0693b3268b482..4695fb7e5e1e0a 100644
+--- a/packages/components/src/ui/__storybook-utils/example-grid.js
++++ b/packages/components/src/ui/__storybook-utils/example-grid.js
+@@ -2,7 +2,7 @@
+  * Internal dependencies
+  */
+ import { Grid } from '../../grid';
+-import { Surface } from '../surface';
++import { Surface } from '../../surface';
+ import { Text } from '../../text';
+ import { View } from '../../view';
+ import { VStack } from '../../v-stack';
+diff --git a/packages/components/src/ui/card/hook.js b/packages/components/src/ui/card/hook.js
+index f434a3626a066e..6a367a51a102b1 100644
+--- a/packages/components/src/ui/card/hook.js
++++ b/packages/components/src/ui/card/hook.js
+@@ -12,7 +12,7 @@ import { useMemo } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { useContextSystem } from '../context';
+-import { useSurface } from '../surface';
++import { useSurface } from '../../surface';
+ import * as styles from './styles';
+ 
+ /**
+diff --git a/packages/components/src/ui/card/types.ts b/packages/components/src/ui/card/types.ts
+index b8794489bc266f..8ccad9bb864822 100644
+--- a/packages/components/src/ui/card/types.ts
++++ b/packages/components/src/ui/card/types.ts
+@@ -7,7 +7,7 @@ import type { CSSProperties } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { Props as SurfaceProps } from '../surface/types';
++import type { Props as SurfaceProps } from '../../surface/types';
+ 
+ export type CardProps = SurfaceProps & {
+ 	/**
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 9a14a339ec039c..3290c994ee3ea9 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -45,7 +45,8 @@
+ 		"src/v-stack/**/*",
+ 		"src/z-stack/**/*",
+ 		"src/view/**/*",
+-		"src/scrollable/**/*"
++		"src/scrollable/**/*",
++		"src/surface/**/*"
+ 	],
+ 	"exclude": [
+ 		"src/**/*.android.js",

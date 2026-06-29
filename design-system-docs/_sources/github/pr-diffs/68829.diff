@@ -1,0 +1,106 @@
+diff --git a/packages/components/src/combobox-control/README.md b/packages/components/src/combobox-control/README.md
+index 4089cf9c56e9b5..6439b15ccdf094 100644
+--- a/packages/components/src/combobox-control/README.md
++++ b/packages/components/src/combobox-control/README.md
+@@ -40,10 +40,13 @@ function MyComboboxControl() {
+ 			value={ fontSize }
+ 			onChange={ setFontSize }
+ 			options={ filteredOptions }
++			filterFields={ ['value', 'label'] }
+ 			onFilterValueChange={ ( inputValue ) =>
+ 				setFilteredOptions(
+ 					options.filter( ( option ) =>
+-						option.value === inputValue
++						['value', 'label'].some((key) =>
++							option[key]?.toLowerCase().includes(inputValue.toLowerCase())
++						)
+ 					)
+ 				)
+ 			}
+@@ -89,9 +92,17 @@ Function called when the control's search input value changes. The argument cont
+ -   Type: `( value: string ) => void`
+ -   Required: No
+ 
++#### filterFields
++
++The list of option properties that should be used for filtering the options.
++
++-   Type: `Array<string>`
++-   Required: No
++-   Default: `['value']`
++
+ #### onChange
+ 
+-Function called with the selected value changes.
++Function called when the selected value changes.
+ 
+ -   Type: `( value: string | null | undefined ) => void`
+ -   Required: No
+diff --git a/packages/components/src/combobox-control/index.tsx b/packages/components/src/combobox-control/index.tsx
+index 28510c8653d02e..dac21d2b2044b5 100644
+--- a/packages/components/src/combobox-control/index.tsx
++++ b/packages/components/src/combobox-control/index.tsx
+@@ -132,6 +132,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
+ 		__experimentalRenderItem,
+ 		expandOnFocus = true,
+ 		placeholder,
++		filterFields = 'label',
+ 	} = useDeprecated36pxDefaultSizeProp( props );
+ 
+ 	const [ value, setValue ] = useControlledValue( {
+@@ -157,17 +158,33 @@ function ComboboxControl( props: ComboboxControlProps ) {
+ 		const startsWithMatch: ComboboxControlOption[] = [];
+ 		const containsMatch: ComboboxControlOption[] = [];
+ 		const match = normalizeTextString( inputValue );
++		const searchFields = Array.isArray( filterFields )
++			? filterFields
++			: [ filterFields ];
++
+ 		options.forEach( ( option ) => {
+-			const index = normalizeTextString( option.label ).indexOf( match );
+-			if ( index === 0 ) {
+-				startsWithMatch.push( option );
+-			} else if ( index > 0 ) {
+-				containsMatch.push( option );
++			for ( const field of searchFields ) {
++				if ( ! option[ field ] ) {
++					continue;
++				}
++
++				const fieldValue = normalizeTextString(
++					String( option[ field ] )
++				);
++				const index = fieldValue.indexOf( match );
++
++				if ( index === 0 ) {
++					startsWithMatch.push( option );
++					break;
++				} else if ( index > 0 ) {
++					containsMatch.push( option );
++					break;
++				}
+ 			}
+ 		} );
+ 
+ 		return startsWithMatch.concat( containsMatch );
+-	}, [ inputValue, options ] );
++	}, [ inputValue, options, filterFields ] );
+ 
+ 	const onSuggestionSelected = (
+ 		newSelectedSuggestion: ComboboxControlOption
+diff --git a/packages/components/src/combobox-control/types.ts b/packages/components/src/combobox-control/types.ts
+index 470b38c35e2c8a..a28ddc52c1db39 100644
+--- a/packages/components/src/combobox-control/types.ts
++++ b/packages/components/src/combobox-control/types.ts
+@@ -86,4 +86,11 @@ export type ComboboxControlProps = Pick<
+ 	 * If passed, the combobox input will show a placeholder string if no values are present.
+ 	 */
+ 	placeholder?: string;
++
++	/**
++	 * Specify which option field(s) to use for filtering suggestions.
++	 * Can be a single field name or an array of field names.
++	 * @default 'label'
++	 */
++	filterFields?: string | string[];
+ };

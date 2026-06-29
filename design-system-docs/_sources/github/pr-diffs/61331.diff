@@ -1,0 +1,156 @@
+diff --git a/packages/edit-post/src/components/sidebar/style.scss b/packages/edit-post/src/components/sidebar/style.scss
+index 1921c5cfd7b312..7a20cc5f0f54ff 100644
+--- a/packages/edit-post/src/components/sidebar/style.scss
++++ b/packages/edit-post/src/components/sidebar/style.scss
+@@ -12,7 +12,3 @@
+ 		}
+ 	}
+ }
+-
+-.edit-post-sidebar__panel {
+-	margin-top: -1px;
+-}
+diff --git a/packages/edit-site/src/components/global-styles/ui.js b/packages/edit-site/src/components/global-styles/ui.js
+index b50e09550f7079..09c1a8b341f8fc 100644
+--- a/packages/edit-site/src/components/global-styles/ui.js
++++ b/packages/edit-site/src/components/global-styles/ui.js
+@@ -76,7 +76,11 @@ function GlobalStylesActionMenu() {
+ 
+ 	return (
+ 		<GlobalStylesMenuFill>
+-			<DropdownMenu icon={ moreVertical } label={ __( 'More' ) }>
++			<DropdownMenu
++				icon={ moreVertical }
++				label={ __( 'More' ) }
++				toggleProps={ { size: 'compact' } }
++			>
+ 				{ ( { onClose } ) => (
+ 					<>
+ 						<MenuGroup>
+diff --git a/packages/edit-site/src/components/sidebar-edit-mode/global-styles-sidebar.js b/packages/edit-site/src/components/sidebar-edit-mode/global-styles-sidebar.js
+index f339b347847416..3254f594632c4d 100644
+--- a/packages/edit-site/src/components/sidebar-edit-mode/global-styles-sidebar.js
++++ b/packages/edit-site/src/components/sidebar-edit-mode/global-styles-sidebar.js
+@@ -136,7 +136,10 @@ export default function GlobalStylesSidebar() {
+ 			closeLabel={ __( 'Close Styles' ) }
+ 			panelClassName="edit-site-global-styles-sidebar__panel"
+ 			header={
+-				<Flex className="edit-site-global-styles-sidebar__header">
++				<Flex
++					className="edit-site-global-styles-sidebar__header"
++					gap={ 1 }
++				>
+ 					<FlexBlock style={ { minWidth: 'min-content' } }>
+ 						<h2 className="edit-site-global-styles-sidebar__header-title">
+ 							{ __( 'Styles' ) }
+@@ -151,6 +154,7 @@ export default function GlobalStylesSidebar() {
+ 							}
+ 							disabled={ shouldClearCanvasContainerView }
+ 							onClick={ toggleStyleBook }
++							size="compact"
+ 						/>
+ 					</FlexItem>
+ 					<FlexItem>
+@@ -162,6 +166,7 @@ export default function GlobalStylesSidebar() {
+ 							isPressed={
+ 								isRevisionsOpened || isRevisionsStyleBookOpened
+ 							}
++							size="compact"
+ 						/>
+ 					</FlexItem>
+ 					<GlobalStylesMenuSlot />
+diff --git a/packages/edit-site/src/components/sidebar-edit-mode/settings-header/style.scss b/packages/edit-site/src/components/sidebar-edit-mode/settings-header/style.scss
+index d74432451e1d4c..c6157519526162 100644
+--- a/packages/edit-site/src/components/sidebar-edit-mode/settings-header/style.scss
++++ b/packages/edit-site/src/components/sidebar-edit-mode/settings-header/style.scss
+@@ -1,6 +1,5 @@
+ .components-panel__header.edit-site-sidebar-edit-mode__panel-tabs {
+ 	padding-left: 0;
+-	padding-right: $grid-unit-20;
+ 
+ 	.components-button.has-icon {
+ 		padding: 0;
+diff --git a/packages/edit-site/src/components/sidebar-edit-mode/style.scss b/packages/edit-site/src/components/sidebar-edit-mode/style.scss
+index 186908c88a54b2..1f631eb24057c9 100644
+--- a/packages/edit-site/src/components/sidebar-edit-mode/style.scss
++++ b/packages/edit-site/src/components/sidebar-edit-mode/style.scss
+@@ -38,14 +38,6 @@
+ 	margin: 0;
+ }
+ 
+-.edit-site-global-styles-sidebar .interface-complementary-area-header .components-button.has-icon {
+-	margin-left: 0;
+-}
+-
+-.edit-site-global-styles-sidebar__reset-button.components-button {
+-	margin-left: auto;
+-}
+-
+ .edit-site-global-styles-sidebar .components-navigation__menu-title-heading {
+ 	font-size: $default-font-size * 1.2;
+ 	font-weight: 500;
+@@ -104,6 +96,3 @@
+ 	}
+ }
+ 
+-.edit-site-sidebar__panel {
+-	margin-top: -1px;
+-}
+diff --git a/packages/interface/src/components/complementary-area-header/style.scss b/packages/interface/src/components/complementary-area-header/style.scss
+index 20fbe881d5694c..a6b9b532069602 100644
+--- a/packages/interface/src/components/complementary-area-header/style.scss
++++ b/packages/interface/src/components/complementary-area-header/style.scss
+@@ -17,7 +17,8 @@
+ 
+ .interface-complementary-area-header {
+ 	background: $white;
+-	padding-right: $grid-unit-05;
++	padding-right: $grid-unit-15; // Reduced padding to account for close buttons.
++	gap: $grid-unit-10; // Always ensure space between contents and close buttons.
+ 
+ 	.interface-complementary-area-header__title {
+ 		margin: 0;
+@@ -36,11 +37,3 @@
+ 		}
+ 	}
+ }
+-
+-// This overrides the negative margins between two consecutives panels.
+-// since the first panel is hidden.
+-.components-panel__header + .interface-complementary-area-header {
+-	@include break-medium() {
+-		margin-top: 0;
+-	}
+-}
+diff --git a/packages/interface/src/components/complementary-area/index.js b/packages/interface/src/components/complementary-area/index.js
+index ca80ae75e2e2f1..b37b8b7da33d02 100644
+--- a/packages/interface/src/components/complementary-area/index.js
++++ b/packages/interface/src/components/complementary-area/index.js
+@@ -302,6 +302,7 @@ function ComplementaryArea( {
+ 					smallScreenTitle={ smallScreenTitle }
+ 					toggleButtonProps={ {
+ 						label: closeLabel,
++						size: 'small',
+ 						shortcut: toggleShortcut,
+ 						scope,
+ 						identifier,
+@@ -329,6 +330,7 @@ function ComplementaryArea( {
+ 									}
+ 									isPressed={ isPinned }
+ 									aria-expanded={ isPinned }
++									size="compact"
+ 								/>
+ 							) }
+ 						</>
+diff --git a/packages/interface/src/components/complementary-area/style.scss b/packages/interface/src/components/complementary-area/style.scss
+index 143911c43ecc53..7cbad41fa9118d 100644
+--- a/packages/interface/src/components/complementary-area/style.scss
++++ b/packages/interface/src/components/complementary-area/style.scss
+@@ -39,6 +39,7 @@
+ 
+ 	h2 {
+ 		font-size: $default-font-size;
++		font-weight: 500;
+ 		color: $gray-900;
+ 		margin-bottom: 1.5em;
+ 	}

@@ -1,0 +1,157 @@
+diff --git a/packages/block-library/src/audio/edit.native.js b/packages/block-library/src/audio/edit.native.js
+index 30ee44ff3f9487..fbc39ba190d3e2 100644
+--- a/packages/block-library/src/audio/edit.native.js
++++ b/packages/block-library/src/audio/edit.native.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import { TouchableWithoutFeedback } from 'react-native';
+-import { isEmpty } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -228,7 +227,7 @@ function AudioEdit( {
+ 				<BlockCaption
+ 					accessible={ true }
+ 					accessibilityLabelCreator={ ( caption ) =>
+-						isEmpty( caption )
++						! caption
+ 							? /* translators: accessibility text. Empty Audio caption. */
+ 							  __( 'Audio caption. Empty' )
+ 							: sprintf(
+diff --git a/packages/block-library/src/embed/embed-preview.native.js b/packages/block-library/src/embed/embed-preview.native.js
+index bb8df663baf281..87abc38348d56a 100644
+--- a/packages/block-library/src/embed/embed-preview.native.js
++++ b/packages/block-library/src/embed/embed-preview.native.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import { TouchableWithoutFeedback } from 'react-native';
+-import { isEmpty } from 'lodash';
+ import classnames from 'classnames/dedupe';
+ 
+ /**
+@@ -52,7 +51,7 @@ const EmbedPreview = ( {
+ 		styles[ `embed-preview__sandbox--align-${ align }` ];
+ 
+ 	function accessibilityLabelCreator( caption ) {
+-		return isEmpty( caption )
++		return ! caption
+ 			? /* translators: accessibility text. Empty Embed caption. */
+ 			  __( 'Embed caption. Empty' )
+ 			: sprintf(
+diff --git a/packages/block-library/src/gallery/gallery.native.js b/packages/block-library/src/gallery/gallery.native.js
+index 16c504f6ccc19a..a5174d0215c424 100644
+--- a/packages/block-library/src/gallery/gallery.native.js
++++ b/packages/block-library/src/gallery/gallery.native.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import { View } from 'react-native';
+-import { isEmpty } from 'lodash';
+ 
+ /**
+  * Internal dependencies
+@@ -100,7 +99,7 @@ export const Gallery = ( props ) => {
+ 				isSelected={ isCaptionSelected }
+ 				accessible={ true }
+ 				accessibilityLabelCreator={ ( caption ) =>
+-					isEmpty( caption )
++					! caption
+ 						? /* translators: accessibility text. Empty gallery caption. */
+ 
+ 						  'Gallery caption. Empty'
+diff --git a/packages/block-library/src/gallery/v1/gallery.native.js b/packages/block-library/src/gallery/v1/gallery.native.js
+index 7908d17988a1a4..c1d13cb6313e06 100644
+--- a/packages/block-library/src/gallery/v1/gallery.native.js
++++ b/packages/block-library/src/gallery/v1/gallery.native.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import { View } from 'react-native';
+-import { isEmpty } from 'lodash';
+ 
+ /**
+  * Internal dependencies
+@@ -142,7 +141,7 @@ export const Gallery = ( props ) => {
+ 				isSelected={ isCaptionSelected }
+ 				accessible={ true }
+ 				accessibilityLabelCreator={ ( caption ) =>
+-					isEmpty( caption )
++					! caption
+ 						? /* translators: accessibility text. Empty gallery caption. */
+ 						  'Gallery caption. Empty'
+ 						: sprintf(
+diff --git a/packages/block-library/src/video/edit.native.js b/packages/block-library/src/video/edit.native.js
+index fb4937ce5da733..99225ba5d5c569 100644
+--- a/packages/block-library/src/video/edit.native.js
++++ b/packages/block-library/src/video/edit.native.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import { View, TouchableWithoutFeedback, Text } from 'react-native';
+-import { isEmpty } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -367,7 +366,7 @@ class VideoEdit extends Component {
+ 					<BlockCaption
+ 						accessible={ true }
+ 						accessibilityLabelCreator={ ( caption ) =>
+-							isEmpty( caption )
++							! caption
+ 								? /* translators: accessibility text. Empty video caption. */
+ 								  __( 'Video caption. Empty' )
+ 								: sprintf(
+diff --git a/packages/components/src/mobile/bottom-sheet/switch-cell.native.js b/packages/components/src/mobile/bottom-sheet/switch-cell.native.js
+index b49f03902ddb85..9dcaf794df750b 100644
+--- a/packages/components/src/mobile/bottom-sheet/switch-cell.native.js
++++ b/packages/components/src/mobile/bottom-sheet/switch-cell.native.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import { Switch } from 'react-native';
+-import { isEmpty } from 'lodash';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -20,7 +20,7 @@ export default function BottomSheetSwitchCell( props ) {
+ 	};
+ 
+ 	const getAccessibilityLabel = () => {
+-		if ( isEmpty( cellProps.help ) ) {
++		if ( ! cellProps.help ) {
+ 			return value
+ 				? sprintf(
+ 						/* translators: accessibility text. Switch setting ON state. %s: Switch title. */
+diff --git a/packages/editor/src/components/post-title/index.native.js b/packages/editor/src/components/post-title/index.native.js
+index 0d1d87c81e417e..4da9d8c308110b 100644
+--- a/packages/editor/src/components/post-title/index.native.js
++++ b/packages/editor/src/components/post-title/index.native.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import { View } from 'react-native';
+-import { isEmpty } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -80,7 +79,7 @@ class PostTitle extends Component {
+ 
+ 	getTitle( title, postType ) {
+ 		if ( 'page' === postType ) {
+-			return isEmpty( title )
++			return ! title
+ 				? /* translators: accessibility text. empty page title. */
+ 				  __( 'Page title. Empty' )
+ 				: sprintf(
+@@ -90,7 +89,7 @@ class PostTitle extends Component {
+ 				  );
+ 		}
+ 
+-		return isEmpty( title )
++		return ! title
+ 			? /* translators: accessibility text. empty post title. */
+ 			  __( 'Post title. Empty' )
+ 			: sprintf(

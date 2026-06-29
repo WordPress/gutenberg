@@ -1,0 +1,25 @@
+diff --git a/packages/theme/src/color-ramps/stories/index.story.tsx b/packages/theme/src/color-ramps/stories/index.story.tsx
+index efcf7c7f5ca512..98af596a664173 100644
+--- a/packages/theme/src/color-ramps/stories/index.story.tsx
++++ b/packages/theme/src/color-ramps/stories/index.story.tsx
+@@ -36,7 +36,6 @@ const meta: Meta< typeof ColorGen > = {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
+ 	},
+-	tags: [ 'status-experimental' ],
+ };
+ export default meta;
+ 
+diff --git a/packages/theme/src/stories/index.story.tsx b/packages/theme/src/stories/index.story.tsx
+index 3d354879067e87..419bdda86ebbb0 100644
+--- a/packages/theme/src/stories/index.story.tsx
++++ b/packages/theme/src/stories/index.story.tsx
+@@ -34,7 +34,7 @@ const meta: Meta< typeof ThemeProvider > = {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
+ 	},
+-	tags: [ 'status-experimental' ],
++	tags: [ 'status-private' ],
+ };
+ export default meta;
+ 

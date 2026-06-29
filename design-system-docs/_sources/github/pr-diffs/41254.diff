@@ -1,0 +1,138 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b81869c8e7cbe5..21613540005223 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `AlignmentMatrixControl` updated to satisfy `react/exhuastive-deps` eslint rule ([#41167](https://github.com/WordPress/gutenberg/pull/41167))
+ -   `CheckboxControl`: Add unit tests ([#41165](https://github.com/WordPress/gutenberg/pull/41165)).
++-   `BorderBoxControl`: fix some layout misalignments, especially for RTL users ([#41254](https://github.com/WordPress/gutenberg/pull/41254)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx b/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
+index af6249f7b4ca95..5d83b61424206d 100644
+--- a/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
+@@ -29,6 +29,7 @@ const BorderBoxControlSplitControls = (
+ 		onChange,
+ 		popoverPlacement,
+ 		popoverOffset,
++		rightAlignedClassName,
+ 		value,
+ 		__experimentalHasMultipleOrigins,
+ 		__experimentalIsRenderedInSidebar,
+@@ -80,6 +81,7 @@ const BorderBoxControlSplitControls = (
+ 				{ ...sharedBorderControlProps }
+ 			/>
+ 			<BorderControl
++				className={ rightAlignedClassName }
+ 				hideLabelFromVision={ true }
+ 				label={ __( 'Right border' ) }
+ 				onChange={ ( newBorder ) => onChange( newBorder, 'right' ) }
+diff --git a/packages/components/src/border-box-control/border-box-control-split-controls/hook.ts b/packages/components/src/border-box-control/border-box-control-split-controls/hook.ts
+index d7e018d7580ea0..a6ecb1ff726845 100644
+--- a/packages/components/src/border-box-control/border-box-control-split-controls/hook.ts
++++ b/packages/components/src/border-box-control/border-box-control-split-controls/hook.ts
+@@ -22,13 +22,27 @@ export function useBorderBoxControlSplitControls(
+ 
+ 	// Generate class names.
+ 	const cx = useCx();
++	const rtlWatchResult = rtl.watch();
+ 	const classes = useMemo( () => {
+-		return cx( styles.BorderBoxControlSplitControls, className );
+-	}, [ className, rtl.watch() ] );
++		return cx( styles.borderBoxControlSplitControls(), className );
++		// rtlWatchResult is needed to refresh styles when the writing direction changes
++		// eslint-disable-next-line react-hooks/exhaustive-deps
++	}, [ cx, className, rtlWatchResult ] );
+ 
+ 	const centeredClassName = useMemo( () => {
+ 		return cx( styles.CenteredBorderControl, className );
+-	}, [] );
++	}, [ cx, className ] );
+ 
+-	return { ...otherProps, centeredClassName, className: classes };
++	const rightAlignedClassName = useMemo( () => {
++		return cx( styles.rightBorderControl(), className );
++		// rtlWatchResult is needed to refresh styles when the writing direction changes
++		// eslint-disable-next-line react-hooks/exhaustive-deps
++	}, [ cx, className, rtlWatchResult ] );
++
++	return {
++		...otherProps,
++		centeredClassName,
++		className: classes,
++		rightAlignedClassName,
++	};
+ }
+diff --git a/packages/components/src/border-box-control/border-box-control-visualizer/hook.ts b/packages/components/src/border-box-control/border-box-control-visualizer/hook.ts
+index f1b91f3b943b92..75fc6a7a367776 100644
+--- a/packages/components/src/border-box-control/border-box-control-visualizer/hook.ts
++++ b/packages/components/src/border-box-control/border-box-control-visualizer/hook.ts
+@@ -24,12 +24,15 @@ export function useBorderBoxControlVisualizer(
+ 
+ 	// Generate class names.
+ 	const cx = useCx();
++	const rtlWatchResult = rtl.watch();
+ 	const classes = useMemo( () => {
+ 		return cx(
+-			styles.BorderBoxControlVisualizer( value, __next36pxDefaultSize ),
++			styles.borderBoxControlVisualizer( value, __next36pxDefaultSize ),
+ 			className
+ 		);
+-	}, [ className, value, __next36pxDefaultSize, rtl.watch() ] );
++		// rtlWatchResult is needed to refresh styles when the writing direction changes
++		// eslint-disable-next-line react-hooks/exhaustive-deps
++	}, [ cx, className, value, __next36pxDefaultSize, rtlWatchResult ] );
+ 
+ 	return { ...otherProps, className: classes, value };
+ }
+diff --git a/packages/components/src/border-box-control/border-box-control/hook.ts b/packages/components/src/border-box-control/border-box-control/hook.ts
+index f0071f0e87d29e..67e6b98d542a6d 100644
+--- a/packages/components/src/border-box-control/border-box-control/hook.ts
++++ b/packages/components/src/border-box-control/border-box-control/hook.ts
+@@ -98,11 +98,11 @@ export function useBorderBoxControl(
+ 	const cx = useCx();
+ 	const classes = useMemo( () => {
+ 		return cx( styles.BorderBoxControl, className );
+-	}, [ className ] );
++	}, [ cx, className ] );
+ 
+ 	const linkedControlClassName = useMemo( () => {
+ 		return cx( styles.LinkedBorderControl );
+-	}, [] );
++	}, [ cx ] );
+ 
+ 	return {
+ 		...otherProps,
+diff --git a/packages/components/src/border-box-control/styles.ts b/packages/components/src/border-box-control/styles.ts
+index eb9a141505e77c..5c49c51ae6ca51 100644
+--- a/packages/components/src/border-box-control/styles.ts
++++ b/packages/components/src/border-box-control/styles.ts
+@@ -43,7 +43,7 @@ const BorderBoxStyleWithFallback = ( border?: Border ) => {
+ 	return `${ color } ${ borderStyle } ${ clampedWidth }`;
+ };
+ 
+-export const BorderBoxControlVisualizer = (
++export const borderBoxControlVisualizer = (
+ 	borders?: Borders,
+ 	__next36pxDefaultSize?: boolean
+ ) => {
+@@ -64,7 +64,7 @@ export const BorderBoxControlVisualizer = (
+ 	`;
+ };
+ 
+-export const BorderBoxControlSplitControls = css`
++export const borderBoxControlSplitControls = () => css`
+ 	position: relative;
+ 	flex: 1;
+ 	${ rtl( { marginRight: space( 3 ) }, { marginLeft: space( 3 ) } )() }
+@@ -74,3 +74,7 @@ export const CenteredBorderControl = css`
+ 	grid-column: span 2;
+ 	margin: 0 auto;
+ `;
++
++export const rightBorderControl = () => css`
++	${ rtl( { marginLeft: 'auto' }, { marginRight: 'auto' } )() }
++`;

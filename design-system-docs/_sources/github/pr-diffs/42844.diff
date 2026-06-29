@@ -1,0 +1,62 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a68a1d7d39480a..337c864832357a 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `BorderControl`: Ensure box-sizing is reset for the control ([#42754](https://github.com/WordPress/gutenberg/pull/42754)).
+ -   `InputControl`: Fix acceptance of falsy values in controlled updates ([#42484](https://github.com/WordPress/gutenberg/pull/42484/)).
++-   `Tooltip (Experimental)`, `CustomSelectControl`, `TimePicker`: Add missing font-size styles which were necessary in non-WordPress contexts ([#42844](https://github.com/WordPress/gutenberg/pull/42844/)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/custom-select-control/style.scss b/packages/components/src/custom-select-control/style.scss
+index 1130763451a630..507983f20ee2c4 100644
+--- a/packages/components/src/custom-select-control/style.scss
++++ b/packages/components/src/custom-select-control/style.scss
+@@ -1,5 +1,6 @@
+ .components-custom-select-control {
+ 	position: relative;
++	font-size: $default-font-size;
+ }
+ 
+ .components-custom-select-control__label {
+diff --git a/packages/components/src/date-time/time/styles.ts b/packages/components/src/date-time/time/styles.ts
+index 7bd3377376d9f9..1e7de446bdc286 100644
+--- a/packages/components/src/date-time/time/styles.ts
++++ b/packages/components/src/date-time/time/styles.ts
+@@ -17,7 +17,9 @@ import NumberControl from '../../number-control';
+ import SelectControl from '../../select-control';
+ import { Select } from '../../select-control/styles/select-control-styles';
+ 
+-export const Wrapper = styled.div``;
++export const Wrapper = styled.div`
++	font-size: ${ CONFIG.fontSize };
++`;
+ 
+ export const Fieldset = styled.fieldset`
+ 	border: 0;
+diff --git a/packages/components/src/ui/tooltip/styles.js b/packages/components/src/ui/tooltip/styles.js
+index c1d535bb782927..fca4875a9d1c17 100644
+--- a/packages/components/src/ui/tooltip/styles.js
++++ b/packages/components/src/ui/tooltip/styles.js
+@@ -20,6 +20,7 @@ export const TooltipContent = css`
+ 	outline: none;
+ 	transform-origin: top center;
+ 	transition: opacity ${ CONFIG.transitionDurationFastest } ease;
++	font-size: ${ CONFIG.fontSize };
+ 
+ 	&[data-enter] {
+ 		opacity: 1;
+diff --git a/packages/components/src/ui/tooltip/test/__snapshots__/index.js.snap b/packages/components/src/ui/tooltip/test/__snapshots__/index.js.snap
+index 7e9248a65c04d4..60edeba1681a25 100644
+--- a/packages/components/src/ui/tooltip/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/tooltip/test/__snapshots__/index.js.snap
+@@ -9,6 +9,7 @@ exports[`props should render correctly 1`] = `
+   transform-origin: top center;
+   -webkit-transition: opacity 100ms ease;
+   transition: opacity 100ms ease;
++  font-size: 13px;
+ }
+ 
+ .emotion-0[data-enter] {

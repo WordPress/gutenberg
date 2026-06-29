@@ -1,0 +1,765 @@
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index cadc275817c8fd..d578b3453f57f7 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Breaking Changes
++
++-   Drop the experimental `density` support from `ThemeProvider`. The `density` prop has been removed, along with the related `data-wpds-density` attribute and the per-density overrides on `--wpds-dimension-padding-*` / `--wpds-dimension-gap-*` tokens ([#78741](https://github.com/WordPress/gutenberg/pull/78741)).
++
+ ## 0.14.0 (2026-05-27)
+ 
+ ### Breaking Changes
+diff --git a/packages/theme/README.md b/packages/theme/README.md
+index b71825d776cd59..2359d4c20d81e1 100644
+--- a/packages/theme/README.md
++++ b/packages/theme/README.md
+@@ -17,7 +17,7 @@ In the **[Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/t
+ 
+ Design tokens are delivered as CSS custom properties (e.g. `var(--wpds-color-fg-content-neutral)`). To use them, a stylesheet defining the token values must be loaded on the page.
+ 
+-The [`ThemeProvider`](#theme-provider) component can be used to customize token values like colors and density for a specific part of your application.
++The [`ThemeProvider`](#theme-provider) component can be used to customize token values like colors for a specific part of your application.
+ 
+ #### Within WordPress
+ 
+@@ -86,7 +86,7 @@ import { ThemeProvider } from '@wordpress/theme';
+ 
+ function App() {
+ 	return (
+-		<ThemeProvider color={ { primary: 'blue' } } density="compact">
++		<ThemeProvider color={ { primary: 'blue' } }>
+ 			{ /* Your app content */ }
+ 		</ThemeProvider>
+ 	);
+@@ -104,15 +104,7 @@ The `cursor` prop accepts an object with the following optional properties:
+ 
+ -   `control`: The cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles). Accepts `'default'` or `'pointer'` (default: `'pointer'`).
+ 
+-The `density` prop controls the spacing scale throughout the UI:
+-
+--   `'default'`: Standard spacing for general use.
+--   `'compact'`: Reduced spacing for information-dense interfaces like data tables or dashboards.
+--   `'comfortable'`: Increased spacing for focused experiences like modals, dialogs, or full-screen settings panels.
+-
+-The density setting adjusts dimension tokens like gaps and paddings to maintain consistent spacing throughout the UI. Changing the density automatically updates spacing of all components that use these tokens.
+-
+-When the `color`, `cursor`, or `density` prop is omitted, the theme inherits the value from the closest parent `ThemeProvider`, or uses the default value if none is inherited.
++When the `color` or `cursor` prop is omitted, the theme inherits the value from the closest parent `ThemeProvider`, or uses the default value if none is inherited.
+ 
+ ### Nesting Providers
+ 
+@@ -121,10 +113,10 @@ The provider can be used recursively to override or modify the theme for a speci
+ ```tsx
+ <ThemeProvider color={ { bg: 'white' } }>
+ 	{ /* light-themed UI components */ }
+-	<ThemeProvider color={ { bg: '#1e1e1e' } } density="compact">
+-		{ /* dark-themed UI components with compact spacing */ }
++	<ThemeProvider color={ { bg: '#1e1e1e' } }>
++		{ /* dark-themed UI components */ }
+ 		<ThemeProvider color={ { primary: 'red' } }>
+-			{ /* dark-themed with red accent, inheriting compact density */ }
++			{ /* dark-themed with red accent */ }
+ 		</ThemeProvider>
+ 	</ThemeProvider>
+ 	{ /* light-themed UI components */ }
+diff --git a/packages/theme/src/prebuilt/css/design-tokens.css b/packages/theme/src/prebuilt/css/design-tokens.css
+index 451b577fe68401..1f993bf5487644 100644
+--- a/packages/theme/src/prebuilt/css/design-tokens.css
++++ b/packages/theme/src/prebuilt/css/design-tokens.css
+@@ -309,113 +309,6 @@
+ 	--wpds-typography-font-weight-medium: 499;
+ }
+ 
+-[data-wpds-theme-provider-id][data-wpds-density='compact'] {
+-	/* Extra small padding */
+-	--wpds-dimension-padding-xs: 4px;
+-	/* Small padding */
+-	--wpds-dimension-padding-sm: 4px;
+-	/* Medium padding */
+-	--wpds-dimension-padding-md: 8px;
+-	/* Large padding */
+-	--wpds-dimension-padding-lg: 12px;
+-	/* Extra large padding */
+-	--wpds-dimension-padding-xl: 16px;
+-	/* 2x extra large padding */
+-	--wpds-dimension-padding-2xl: 20px;
+-	/* 3x extra large padding */
+-	--wpds-dimension-padding-3xl: 24px;
+-	/* Extra small gap */
+-	--wpds-dimension-gap-xs: 4px;
+-	/* Small gap */
+-	--wpds-dimension-gap-sm: 4px;
+-	/* Medium gap */
+-	--wpds-dimension-gap-md: 8px;
+-	/* Large gap */
+-	--wpds-dimension-gap-lg: 12px;
+-	/* Extra large gap */
+-	--wpds-dimension-gap-xl: 20px;
+-	/* 2x extra large gap */
+-	--wpds-dimension-gap-2xl: 24px;
+-	/* 3x extra large gap */
+-	--wpds-dimension-gap-3xl: 32px;
+-}
+-
+-[data-wpds-theme-provider-id][data-wpds-density='comfortable'] {
+-	/* Extra small padding */
+-	--wpds-dimension-padding-xs: 8px;
+-	/* Small padding */
+-	--wpds-dimension-padding-sm: 12px;
+-	/* Medium padding */
+-	--wpds-dimension-padding-md: 16px;
+-	/* Large padding */
+-	--wpds-dimension-padding-lg: 20px;
+-	/* Extra large padding */
+-	--wpds-dimension-padding-xl: 24px;
+-	/* 2x extra large padding */
+-	--wpds-dimension-padding-2xl: 32px;
+-	/* 3x extra large padding */
+-	--wpds-dimension-padding-3xl: 40px;
+-	/* Extra small gap */
+-	--wpds-dimension-gap-xs: 8px;
+-	/* Small gap */
+-	--wpds-dimension-gap-sm: 12px;
+-	/* Medium gap */
+-	--wpds-dimension-gap-md: 16px;
+-	/* Large gap */
+-	--wpds-dimension-gap-lg: 20px;
+-	/* Extra large gap */
+-	--wpds-dimension-gap-xl: 32px;
+-	/* 2x extra large gap */
+-	--wpds-dimension-gap-2xl: 40px;
+-	/* 3x extra large gap */
+-	--wpds-dimension-gap-3xl: 48px;
+-}
+-
+-[data-wpds-theme-provider-id][data-wpds-density='default'] {
+-	/* Base dimension unit */
+-	--wpds-dimension-base: 4px;
+-	/* Extra small padding */
+-	--wpds-dimension-padding-xs: 4px;
+-	/* Small padding */
+-	--wpds-dimension-padding-sm: 8px;
+-	/* Medium padding */
+-	--wpds-dimension-padding-md: 12px;
+-	/* Large padding */
+-	--wpds-dimension-padding-lg: 16px;
+-	/* Extra large padding */
+-	--wpds-dimension-padding-xl: 20px;
+-	/* 2x extra large padding */
+-	--wpds-dimension-padding-2xl: 24px;
+-	/* 3x extra large padding */
+-	--wpds-dimension-padding-3xl: 32px;
+-	/* Extra small gap */
+-	--wpds-dimension-gap-xs: 4px;
+-	/* Small gap */
+-	--wpds-dimension-gap-sm: 8px;
+-	/* Medium gap */
+-	--wpds-dimension-gap-md: 12px;
+-	/* Large gap */
+-	--wpds-dimension-gap-lg: 16px;
+-	/* Extra large gap */
+-	--wpds-dimension-gap-xl: 24px;
+-	/* 2x extra large gap */
+-	--wpds-dimension-gap-2xl: 32px;
+-	/* 3x extra large gap */
+-	--wpds-dimension-gap-3xl: 40px;
+-	/* Extra small surface width */
+-	--wpds-dimension-surface-width-xs: 240px;
+-	/* Small surface width */
+-	--wpds-dimension-surface-width-sm: 320px;
+-	/* Medium surface width */
+-	--wpds-dimension-surface-width-md: 400px;
+-	/* Large surface width */
+-	--wpds-dimension-surface-width-lg: 560px;
+-	/* Extra large surface width */
+-	--wpds-dimension-surface-width-xl: 720px;
+-	/* 2x extra large surface width */
+-	--wpds-dimension-surface-width-2xl: 960px;
+-}
+-
+ @media ( -webkit-min-device-pixel-ratio: 2 ), ( min-resolution: 192dpi ) {
+ 	:root {
+ 		/* Border width for focus ring */
+diff --git a/packages/theme/src/stories/index.story.tsx b/packages/theme/src/stories/index.story.tsx
+index 6e7d27fc372ece..addbd6f1601412 100644
+--- a/packages/theme/src/stories/index.story.tsx
++++ b/packages/theme/src/stories/index.story.tsx
+@@ -187,7 +187,7 @@ export const WithPicker: StoryObj< typeof ThemeProvider > = {
+ 	},
+ };
+ 
+-const NestingDebug = ( { bg = '', primary = '', density = '' } ) => (
++const NestingDebug = ( { bg = '', primary = '' } ) => (
+ 	<div
+ 		style={ {
+ 			padding: 'var(--wpds-dimension-padding-lg)',
+@@ -200,7 +200,7 @@ const NestingDebug = ( { bg = '', primary = '', density = '' } ) => (
+ 		} }
+ 	>
+ 		<pre style={ { margin: 0 } }>
+-			bg: { bg } | primary: { primary } | density: { density }
++			bg: { bg } | primary: { primary }
+ 		</pre>
+ 		<span
+ 			style={ {
+@@ -234,39 +234,27 @@ export const NestingAndInheriting: StoryObj< typeof ThemeProvider > = {
+ 	render: () => {
+ 		return (
+ 			<ThemeProvider>
+-				<NestingDebug
+-					bg="inherit (root)"
+-					primary="inherit (root)"
+-					density="inherit (root)"
+-				/>
++				<NestingDebug bg="inherit (root)" primary="inherit (root)" />
+ 				<div style={ { paddingInlineStart: '1rem' } }>
+ 					<ThemeProvider
+ 						color={ {
+ 							bg: '#1e1e1e',
+ 						} }
+-						density="compact"
+ 					>
+-						<NestingDebug
+-							bg="#1e1e1e"
+-							primary="inherit (root)"
+-							density="compact"
+-						/>
++						<NestingDebug bg="#1e1e1e" primary="inherit (root)" />
+ 						<div style={ { paddingInlineStart: '1rem' } }>
+ 							<ThemeProvider>
+ 								<NestingDebug
+ 									bg="inherit (#1e1e1e)"
+ 									primary="inherit (root)"
+-									density="inherit (compact)"
+ 								/>
+ 								<div style={ { paddingInlineStart: '1rem' } }>
+ 									<ThemeProvider
+ 										color={ { primary: 'hotpink' } }
+-										density="default"
+ 									>
+ 										<NestingDebug
+ 											bg="inherit (#1e1e1e)"
+ 											primary="hotpink"
+-											density="default"
+ 										/>
+ 										<div
+ 											style={ {
+@@ -279,7 +267,6 @@ export const NestingAndInheriting: StoryObj< typeof ThemeProvider > = {
+ 												<NestingDebug
+ 													bg="#f8f8f8"
+ 													primary="inherit (hotpink)"
+-													density="inherit (default)"
+ 												/>
+ 											</ThemeProvider>
+ 										</div>
+diff --git a/packages/theme/src/theme-provider.tsx b/packages/theme/src/theme-provider.tsx
+index a039e3aab416c9..9fbfb7607b842b 100644
+--- a/packages/theme/src/theme-provider.tsx
++++ b/packages/theme/src/theme-provider.tsx
+@@ -39,7 +39,6 @@ export const ThemeProvider = ( {
+ 	color = {},
+ 	cursor,
+ 	isRoot = false,
+-	density,
+ }: ThemeProviderProps ) => {
+ 	const instanceId = useId();
+ 
+@@ -68,7 +67,6 @@ export const ThemeProvider = ( {
+ 			<div
+ 				data-wpds-theme-provider-id={ instanceId }
+ 				data-wpds-root-provider={ isRoot }
+-				data-wpds-density={ density }
+ 				className={ styles.root }
+ 			>
+ 				<ThemeContext.Provider value={ contextValue }>
+diff --git a/packages/theme/src/types.ts b/packages/theme/src/types.ts
+index 22c6eda3f38763..fc46bf70ace713 100644
+--- a/packages/theme/src/types.ts
++++ b/packages/theme/src/types.ts
+@@ -36,15 +36,6 @@ export interface ThemeProviderSettings {
+ 		 */
+ 		control?: 'default' | 'pointer';
+ 	};
+-
+-	/**
+-	 * The density of the theme. If left unspecified, the theme inherits from
+-	 * the density of the closest `ThemeProvider`, or uses the default density
+-	 * if there is no inherited density.
+-	 *
+-	 * @default undefined
+-	 */
+-	density?: undefined | 'default' | 'compact' | 'comfortable';
+ }
+ 
+ export interface ThemeProviderProps extends ThemeProviderSettings {
+diff --git a/packages/theme/terrazzo.config.ts b/packages/theme/terrazzo.config.ts
+index e0e250b981cad3..5c07c14512cb41 100644
+--- a/packages/theme/terrazzo.config.ts
++++ b/packages/theme/terrazzo.config.ts
+@@ -63,27 +63,6 @@ const config: Config = {
+ 			},
+ 			baseSelector: ':root',
+ 			modeSelectors: [
+-				{
+-					tokens: [ 'wpds-dimension.**' ],
+-					mode: 'compact',
+-					selectors: [
+-						"[data-wpds-theme-provider-id][data-wpds-density='compact']",
+-					],
+-				},
+-				{
+-					tokens: [ 'wpds-dimension.**' ],
+-					mode: 'comfortable',
+-					selectors: [
+-						"[data-wpds-theme-provider-id][data-wpds-density='comfortable']",
+-					],
+-				},
+-				{
+-					tokens: [ 'wpds-dimension.**' ],
+-					mode: '.',
+-					selectors: [
+-						"[data-wpds-theme-provider-id][data-wpds-density='default']",
+-					],
+-				},
+ 				{
+ 					mode: 'high-dpi',
+ 					selectors: [
+diff --git a/packages/theme/tokens/dimension.json b/packages/theme/tokens/dimension.json
+index 7ae60c92b6c2aa..243486f001f69a 100644
+--- a/packages/theme/tokens/dimension.json
++++ b/packages/theme/tokens/dimension.json
+@@ -54,10 +54,6 @@
+ 				"$value": "{wpds-dimension.primitive.space.10}",
+ 				"$description": "Extra small padding",
+ 				"$extensions": {
+-					"mode": {
+-						"compact": "{wpds-dimension.primitive.space.10}",
+-						"comfortable": "{wpds-dimension.primitive.space.20}"
+-					},
+ 					"com.figma.scopes": [ "GAP" ]
+ 				}
+ 			},
+@@ -65,10 +61,6 @@
+ 				"$value": "{wpds-dimension.primitive.space.20}",
+ 				"$description": "Small padding",
+ 				"$extensions": {
+-					"mode": {
+-						"compact": "{wpds-dimension.primitive.space.10}",
+-						"comfortable": "{wpds-dimension.primitive.space.30}"
+-					},
+ 					"com.figma.scopes": [ "GAP" ]
+ 				}
+ 			},
+@@ -76,10 +68,6 @@
+ 				"$value": "{wpds-dimension.primitive.space.30}",
+ 				"$description": "Medium padding",
+ 				"$extensions": {
+-					"mode": {
+-						"compact": "{wpds-dimension.primitive.space.20}",
+-						"comfortable": "{wpds-dimension.primitive.space.40}"
+-					},
+ 					"com.figma.scopes": [ "GAP" ]
+ 				}
+ 			},
+@@ -87,10 +75,6 @@
+ 				"$value": "{wpds-dimension.primitive.space.40}",
+ 				"$description": "Large padding",
+ 				"$extensions": {
+-					"mode": {
+-						"compact": "{wpds-dimension.primitive.space.30}",
+-						"comfortable": "{wpds-dimension.primitive.space.50}"
+-					},
+ 					"com.figma.scopes": [ "GAP" ]
+ 				}
+ 			},
+@@ -98,10 +82,6 @@
+ 				"$value": "{wpds-dimension.primitive.space.50}",
+ 				"$description": "Extra large padding",
+ 				"$extensions": {
+-					"mode": {
+-						"compact": "{wpds-dimension.primitive.space.40}",
+-						"comfortable": "{wpds-dimension.primitive.space.60}"
+-					},
+ 					"com.figma.scopes": [ "GAP" ]
+ 				}
+ 			},
+@@ -109,10 +89,6 @@
+ 				"$value": "{wpds-dimension.primitive.space.60}",
+ 				"$description": "2x extra large padding",
+ 				"$extensions": {
+-					"mode": {
+-						"compact": "{wpds-dimension.primitive.space.50}",
+-						"comfortable": "{wpds-dimension.primitive.space.70}"
+-					},
+ 					"com.figma.scopes": [ "GAP" ]
+ 				}
+ 			},
+@@ -120,10 +96,6 @@
+ 				"$value": "{wpds-dimension.primitive.space.70}",
+ 				"$description": "3x extra large padding",
+ 				"$extensions": {
+-					"mode": {
+-						"compact": "{wpds-dimension.primitive.space.60}",
+-						"comfortable": "{wpds-dimension.primitive.space.80}"
+-					},
+ 					"com.figma.scopes": [ "GAP" ]
+ 				}
+ 			}
+@@ -133,10 +105,6 @@
+ 				"$value": "{wpds-dimension.primitive.space.10}",
+ 				"$description": "Extra small gap",
+ 				"$extensions": {
+-					"mode": {
+-						"compact": "{wpds-dimension.primitive.space.10}",
+-						"comfortable": "{wpds-dimension.primitive.space.20}"
+-					},
+ 					"com.figma.scopes": [ "GAP" ]
+ 				}
+ 			},
+@@ -144,10 +112,6 @@
+ 				"$value": "{wpds-dimension.primitive.space.20}",
+ 				"$description": "Small gap",
+ 				"$extensions": {
+-					"mode": {
+-						"compact": "{wpds-dimension.primitive.space.10}",
+-						"comfortable": "{wpds-dimension.primitive.space.30}"
+-					},
+ 					"com.figma.scopes": [ "GAP" ]
+ 				}
+ 			},
+@@ -155,10 +119,6 @@
+ 				"$value": "{wpds-dimension.primitive.space.30}",
+ 				"$description": "Medium gap",
+ 				"$extensions": {
+-					"mode": {
+-						"compact": "{wpds-dimension.primitive.space.20}",
+-						"comfortable": "{wpds-dimension.primitive.space.40}"
+-					},
+ 					"com.figma.scopes": [ "GAP" ]
+ 				}
+ 			},
+@@ -166,10 +126,6 @@
+ 				"$value": "{wpds-dimension.primitive.space.40}",
+ 				"$description": "Large gap",
+ 				"$extensions": {
+-					"mode": {
+-						"compact": "{wpds-dimension.primitive.space.30}",
+-						"comfortable": "{wpds-dimension.primitive.space.50}"
+-					},
+ 					"com.figma.scopes": [ "GAP" ]
+ 				}
+ 			},
+@@ -177,10 +133,6 @@
+ 				"$value": "{wpds-dimension.primitive.space.60}",
+ 				"$description": "Extra large gap",
+ 				"$extensions": {
+-					"mode": {
+-						"compact": "{wpds-dimension.primitive.space.50}",
+-						"comfortable": "{wpds-dimension.primitive.space.70}"
+-					},
+ 					"com.figma.scopes": [ "GAP" ]
+ 				}
+ 			},
+@@ -188,10 +140,6 @@
+ 				"$value": "{wpds-dimension.primitive.space.70}",
+ 				"$description": "2x extra large gap",
+ 				"$extensions": {
+-					"mode": {
+-						"compact": "{wpds-dimension.primitive.space.60}",
+-						"comfortable": "{wpds-dimension.primitive.space.80}"
+-					},
+ 					"com.figma.scopes": [ "GAP" ]
+ 				}
+ 			},
+@@ -199,10 +147,6 @@
+ 				"$value": "{wpds-dimension.primitive.space.80}",
+ 				"$description": "3x extra large gap",
+ 				"$extensions": {
+-					"mode": {
+-						"compact": "{wpds-dimension.primitive.space.70}",
+-						"comfortable": "{wpds-dimension.primitive.space.90}"
+-					},
+ 					"com.figma.scopes": [ "GAP" ]
+ 				}
+ 			}
+diff --git a/packages/theme/tokens/modes/dimension.comfortable.json b/packages/theme/tokens/modes/dimension.comfortable.json
+deleted file mode 100644
+index c2a8e3c0ee1c86..00000000000000
+--- a/packages/theme/tokens/modes/dimension.comfortable.json
++++ /dev/null
+@@ -1,64 +0,0 @@
+-{
+-	"wpds-dimension": {
+-		"padding": {
+-			"xs": {
+-				"$type": "dimension",
+-				"$value": "{wpds-dimension.primitive.space.20}"
+-			},
+-			"sm": {
+-				"$type": "dimension",
+-				"$value": "{wpds-dimension.primitive.space.30}"
+-			},
+-			"md": {
+-				"$type": "dimension",
+-				"$value": "{wpds-dimension.primitive.space.40}"
+-			},
+-			"lg": {
+-				"$type": "dimension",
+-				"$value": "{wpds-dimension.primitive.space.50}"
+-			},
+-			"xl": {
+-				"$type": "dimension",
+-				"$value": "{wpds-dimension.primitive.space.60}"
+-			},
+-			"2xl": {
+-				"$type": "dimension",
+-				"$value": "{wpds-dimension.primitive.space.70}"
+-			},
+-			"3xl": {
+-				"$type": "dimension",
+-				"$value": "{wpds-dimension.primitive.space.80}"
+-			}
+-		},
+-		"gap": {
+-			"xs": {
+-				"$type": "dimension",
+-				"$value": "{wpds-dimension.primitive.space.20}"
+-			},
+-			"sm": {
+-				"$type": "dimension",
+-				"$value": "{wpds-dimension.primitive.space.30}"
+-			},
+-			"md": {
+-				"$type": "dimension",
+-				"$value": "{wpds-dimension.primitive.space.40}"
+-			},
+-			"lg": {
+-				"$type": "dimension",
+-				"$value": "{wpds-dimension.primitive.space.50}"
+-			},
+-			"xl": {
+-				"$type": "dimension",
+-				"$value": "{wpds-dimension.primitive.space.70}"
+-			},
+-			"2xl": {
+-				"$type": "dimension",
+-				"$value": "{wpds-dimension.primitive.space.80}"
+-			},
+-			"3xl": {
+-				"$type": "dimension",
+-				"$value": "{wpds-dimension.primitive.space.90}"
+-			}
+-		}
+-	}
+-}
+diff --git a/packages/theme/tokens/modes/dimension.compact.json b/packages/theme/tokens/modes/dimension.compact.json
+deleted file mode 100644
+index a5410fe2f5c4fa..00000000000000
+--- a/packages/theme/tokens/modes/dimension.compact.json
++++ /dev/null
+@@ -1,64 +0,0 @@
+-{
+-	"wpds-dimension": {
+-		"padding": {
+-			"xs": {
+-				"$type": "dimension",
+-				"$value": "{wpds-dimension.primitive.space.10}"
+-			},
+-			"sm": {
+-				"$type": "dimension",
+-				"$value": "{wpds-dimension.primitive.space.10}"
+-			},
+-			"md": {
+-				"$type": "dimension",
+-				"$value": "{wpds-dimension.primitive.space.20}"
+-			},
+-			"lg": {
+-				"$type": "dimension",
+-				"$value": "{wpds-dimension.primitive.space.30}"
+-			},
+-			"xl": {
+-				"$type": "dimension",
+-				"$value": "{wpds-dimension.primitive.space.40}"
+-			},
+-			"2xl": {
+-				"$type": "dimension",
+-				"$value": "{wpds-dimension.primitive.space.50}"
+-			},
+-			"3xl": {
+-				"$type": "dimension",
+-				"$value": "{wpds-dimension.primitive.space.60}"
+-			}
+-		},
+-		"gap": {
+-			"xs": {
+-				"$type": "dimension",
+-				"$value": "{wpds-dimension.primitive.space.10}"
+-			},
+-			"sm": {
+-				"$type": "dimension",
+-				"$value": "{wpds-dimension.primitive.space.10}"
+-			},
+-			"md": {
+-				"$type": "dimension",
+-				"$value": "{wpds-dimension.primitive.space.20}"
+-			},
+-			"lg": {
+-				"$type": "dimension",
+-				"$value": "{wpds-dimension.primitive.space.30}"
+-			},
+-			"xl": {
+-				"$type": "dimension",
+-				"$value": "{wpds-dimension.primitive.space.50}"
+-			},
+-			"2xl": {
+-				"$type": "dimension",
+-				"$value": "{wpds-dimension.primitive.space.60}"
+-			},
+-			"3xl": {
+-				"$type": "dimension",
+-				"$value": "{wpds-dimension.primitive.space.70}"
+-			}
+-		}
+-	}
+-}
+diff --git a/storybook/addons/design-system-theme/manager.ts b/storybook/addons/design-system-theme/manager.ts
+index 9b750a27df23dc..909bd77f69b2c5 100644
+--- a/storybook/addons/design-system-theme/manager.ts
++++ b/storybook/addons/design-system-theme/manager.ts
+@@ -33,12 +33,6 @@ const CURSOR_CONTROL_OPTIONS: ThemeOption[] = [
+ 	{ id: 'pointer', title: 'Pointer' },
+ ];
+ 
+-const DENSITY_OPTIONS: ThemeOption[] = [
+-	{ id: 'compact', title: 'Compact' },
+-	{ id: '', title: 'Default' },
+-	{ id: 'comfortable', title: 'Comfortable' },
+-];
+-
+ function ThemeTooltipMessage( {
+ 	title,
+ 	globalName,
+@@ -66,11 +60,6 @@ const ThemeTool = () => {
+ 	const tooltip = createElement(
+ 		Fragment,
+ 		null,
+-		createElement( ThemeTooltipMessage, {
+-			title: 'Density',
+-			globalName: 'dsDensity',
+-			options: DENSITY_OPTIONS,
+-		} ),
+ 		createElement( ThemeTooltipMessage, {
+ 			title: 'Color',
+ 			globalName: 'dsColorTheme',
+diff --git a/storybook/decorators/with-design-system-theme.tsx b/storybook/decorators/with-design-system-theme.tsx
+index 4594d980278bbd..8bf231236db70d 100644
+--- a/storybook/decorators/with-design-system-theme.tsx
++++ b/storybook/decorators/with-design-system-theme.tsx
+@@ -30,7 +30,6 @@ export function WithDesignSystemTheme(
+ 
+ 	const colorTheme = context.globals.dsColorTheme;
+ 	const cursorControl = context.globals.dsCursorControl || undefined;
+-	const density = context.globals.dsDensity;
+ 
+ 	let color;
+ 	if ( colorTheme === 'dark' ) {
+@@ -41,7 +40,6 @@ export function WithDesignSystemTheme(
+ 		<ThemeProvider
+ 			color={ color }
+ 			cursor={ cursorControl ? { control: cursorControl } : undefined }
+-			density={ density }
+ 			isRoot
+ 		>
+ 			<div
+diff --git a/storybook/preview.jsx b/storybook/preview.jsx
+index 318e20b3138cd8..2b07d27bcc2e21 100644
+--- a/storybook/preview.jsx
++++ b/storybook/preview.jsx
+@@ -59,7 +59,6 @@ export const globalTypes = {
+ 	},
+ 	dsColorTheme: {},
+ 	dsCursorControl: {},
+-	dsDensity: {},
+ };
+ 
+ export const decorators = [
+diff --git a/storybook/stories/design-system/introduction.mdx b/storybook/stories/design-system/introduction.mdx
+index 595b863903768f..cdf157bcfb86ad 100644
+--- a/storybook/stories/design-system/introduction.mdx
++++ b/storybook/stories/design-system/introduction.mdx
+@@ -15,7 +15,7 @@ Rather than building UI elements from scratch each time, a design system provide
+ While similar in scope to the existing [`@wordpress/components`](https://github.com/WordPress/gutenberg/tree/trunk/packages/components) package, there are key differences:
+ 
+ -   **Cohesive by design**: Unlike `@wordpress/components`, which grew organically as a collection of unrelated UI elements, this design system guarantees user- and developer-facing cohesion through a unified token system and consistent component patterns.
+--   **Flexible theming**: Built from the ground up to support customizable color schemes, adjustable density, and user personalization—capabilities needed to support the [Phase 3 admin redesign initiative](https://github.com/WordPress/gutenberg/issues/71196).
++-   **Flexible theming**: Built from the ground up to support customizable color schemes and user personalization—capabilities needed to support the [Phase 3 admin redesign initiative](https://github.com/WordPress/gutenberg/issues/71196).
+ -   **Modern distribution**: Distributed as a versioned npm package following [semantic versioning](https://semver.org/), rather than being bundled as a WordPress script on the `window.wp` global.
+ -   **Composable architecture**: Components follow consistent patterns with proper composability, ref forwarding, and flexible rendering—avoiding the bloated abstractions that emerged from historical scope creep.
+ 
+diff --git a/storybook/stories/design-system/theme-example-application.story.tsx b/storybook/stories/design-system/theme-example-application.story.tsx
+index 76d49e7104d28f..cd90d2bd6b7eac 100644
+--- a/storybook/stories/design-system/theme-example-application.story.tsx
++++ b/storybook/stories/design-system/theme-example-application.story.tsx
+@@ -42,16 +42,13 @@ export default meta;
+ /**
+  * A mock application page demonstrating how `ThemeProvider` affects multiple
+  * `@wordpress/ui` components in concert. Use the inline controls to adjust
+- * the `primary` seed color, `bg` seed color, and `density`, and observe how
+- * every surface, text element, and interactive control adapts accordingly.
++ * the `primary` and `bg` seed colors, and observe how every surface, text
++ * element, and interactive control adapts accordingly.
+  */
+ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
+ 	render: () => {
+ 		const [ primary, setPrimary ] = useState< string | undefined >();
+ 		const [ bg, setBg ] = useState< string | undefined >();
+-		const [ density, setDensity ] = useState<
+-			'default' | 'compact' | 'comfortable' | undefined
+-		>();
+ 
+ 		return (
+ 			<div>
+@@ -97,38 +94,9 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
+ 							onChange={ ( e ) => setBg( e.target.value ) }
+ 						/>
+ 					</label>
+-					<label
+-						style={ {
+-							display: 'inline-flex',
+-							alignItems: 'center',
+-							gap: '6px',
+-						} }
+-					>
+-						Density
+-						<select
+-							value={ density ?? '' }
+-							onChange={ ( e ) =>
+-								setDensity(
+-									( e.target.value || undefined ) as
+-										| 'default'
+-										| 'compact'
+-										| 'comfortable'
+-										| undefined
+-								)
+-							}
+-						>
+-							<option value="">Default</option>
+-							<option value="compact">Compact</option>
+-							<option value="comfortable">Comfortable</option>
+-						</select>
+-					</label>
+ 					{ /* eslint-enable jsx-a11y/label-has-associated-control */ }
+ 				</div>
+-				<ThemeProvider
+-					color={ { primary, bg } }
+-					density={ density }
+-					isRoot
+-				>
++				<ThemeProvider color={ { primary, bg } } isRoot>
+ 					<div
+ 						style={ {
+ 							display: 'grid',

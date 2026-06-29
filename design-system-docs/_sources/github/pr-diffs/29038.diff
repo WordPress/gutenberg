@@ -1,0 +1,19 @@
+diff --git a/packages/components/src/scroll-lock/index.js b/packages/components/src/scroll-lock/index.js
+index 2808f434389a21..85613c86a05a0c 100644
+--- a/packages/components/src/scroll-lock/index.js
++++ b/packages/components/src/scroll-lock/index.js
+@@ -15,9 +15,13 @@ import { Component } from '@wordpress/element';
+  * @return {WPComponent} The bound ScrollLock component.
+  */
+ export function createScrollLockComponent( {
+-	htmlDocument = document,
++	htmlDocument,
+ 	className = 'lockscroll',
+ } = {} ) {
++	if ( ! htmlDocument && typeof document !== 'undefined' ) {
++		htmlDocument = document;
++	}
++
+ 	let lockCounter = 0;
+ 
+ 	/*

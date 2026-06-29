@@ -1,0 +1,40 @@
+diff --git a/packages/block-editor/src/components/image-size-control/index.js b/packages/block-editor/src/components/image-size-control/index.js
+index db2ad3c3de14f5..6fa1f5a4df9975 100644
+--- a/packages/block-editor/src/components/image-size-control/index.js
++++ b/packages/block-editor/src/components/image-size-control/index.js
+@@ -43,6 +43,7 @@ export default function ImageSizeControl( {
+ 					options={ imageSizeOptions }
+ 					onChange={ onChangeImage }
+ 					help={ imageSizeHelp }
++					size="__unstable-large"
+ 				/>
+ 			) }
+ 			{ isResizable && (
+@@ -58,6 +59,7 @@ export default function ImageSizeControl( {
+ 							onChange={ ( value ) =>
+ 								updateDimension( 'width', value )
+ 							}
++							size="__unstable-large"
+ 						/>
+ 						<NumberControl
+ 							className="block-editor-image-size-control__height"
+@@ -67,6 +69,7 @@ export default function ImageSizeControl( {
+ 							onChange={ ( value ) =>
+ 								updateDimension( 'height', value )
+ 							}
++							size="__unstable-large"
+ 						/>
+ 					</HStack>
+ 					<HStack>
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 07b3a96627fbd9..01b8e032ff4f1b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ 
+ -   `CustomGradientPicker`: improve initial state UI ([#49146](https://github.com/WordPress/gutenberg/pull/49146)).
+ -	`AnglePickerControl`: Style to better fit in narrow contexts and improve RTL layout ([#49046](https://github.com/WordPress/gutenberg/pull/49046)).
++-   `ImageSizeControl`: Use large 40px sizes ([#49113](https://github.com/WordPress/gutenberg/pull/49113)).
+ 
+ ### Bug Fix
+ 

@@ -1,0 +1,53 @@
+diff --git a/packages/components/src/autocomplete/index.js b/packages/components/src/autocomplete/index.js
+index af1b9a7c611b7f..40cd43bdf7a4e0 100644
+--- a/packages/components/src/autocomplete/index.js
++++ b/packages/components/src/autocomplete/index.js
+@@ -444,17 +444,21 @@ function Autocomplete( {
+ 					return false;
+ 				}
+ 
++				const textWithoutTrigger = text.slice(
++					index + triggerPrefix.length
++				);
++
+ 				if (
+ 					allowContext &&
+-					! allowContext( text.slice( 0, index ), textAfterSelection )
++					! allowContext(
++						text.slice( 0, index ),
++						textAfterSelection,
++						textWithoutTrigger
++					)
+ 				) {
+ 					return false;
+ 				}
+ 
+-				const textWithoutTrigger = text.slice(
+-					index + triggerPrefix.length
+-				);
+-
+ 				if (
+ 					/^\s/.test( textWithoutTrigger ) ||
+ 					/\s\s+$/.test( textWithoutTrigger )
+diff --git a/packages/editor/src/components/autocompleters/user.js b/packages/editor/src/components/autocompleters/user.js
+index 4b8c1f2dbcf374..9c4c9de6c5d35f 100644
+--- a/packages/editor/src/components/autocompleters/user.js
++++ b/packages/editor/src/components/autocompleters/user.js
+@@ -48,6 +48,17 @@ export default {
+ 			</span>,
+ 		];
+ 	},
++	allowContext( before, after, textWithoutTrigger ) {
++		// Escape hatch for inline completer triggers. Allows up to 3 words to
++		// be matched and will bail out on the 4th word onwards. An example is
++		// this "user" completer. Its trigger char isn't removed when completing
++		// is done, so it's always present on the page. Without this hatch, the
++		// autocompleter will keep trying to match everything from the trigger
++		// onwards, up to infinity, slowing down the editor.
++		const reachedWordLimit =
++			textWithoutTrigger.trim().split( /\s/ ).length >= 4;
++		return ! reachedWordLimit;
++	},
+ 	getOptionCompletion( user ) {
+ 		return `@${ user.slug }`;
+ 	},

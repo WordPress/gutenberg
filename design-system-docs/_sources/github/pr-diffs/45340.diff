@@ -1,0 +1,79 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 26173ee53bce7c..0bb03d5aeb0893 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -35,6 +35,7 @@
+ -   `FontSizePicker`: Fallback to font size `slug` if `name` is undefined ([#45041](https://github.com/WordPress/gutenberg/pull/45041)).
+ -   `AutocompleterUI`: fix issue where autocompleter UI would appear on top of other UI elements ([#44795](https://github.com/WordPress/gutenberg/pull/44795/))
+ -   `ExternalLink`: Fix to re-enable support for `onClick` event handler ([#45214](https://github.com/WordPress/gutenberg/pull/45214)).
++-   `InputControl`: Allow inline styles to be applied to the wrapper not inner input ([#45340](https://github.com/WordPress/gutenberg/pull/45340/))
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/input-control/index.tsx b/packages/components/src/input-control/index.tsx
+index 23fee2b813c6ac..ee6ab9e0d1334a 100644
+--- a/packages/components/src/input-control/index.tsx
++++ b/packages/components/src/input-control/index.tsx
+@@ -45,6 +45,7 @@ export function UnforwardedInputControl(
+ 		onKeyDown = noop,
+ 		prefix,
+ 		size = 'default',
++		style,
+ 		suffix,
+ 		value,
+ 		...props
+@@ -77,6 +78,7 @@ export function UnforwardedInputControl(
+ 			labelPosition={ labelPosition }
+ 			prefix={ prefix }
+ 			size={ size }
++			style={ style }
+ 			suffix={ suffix }
+ 		>
+ 			<InputField
+diff --git a/packages/components/src/input-control/input-base.tsx b/packages/components/src/input-control/input-base.tsx
+index 677bf35e61f446..3f520e279b8fab 100644
+--- a/packages/components/src/input-control/input-base.tsx
++++ b/packages/components/src/input-control/input-base.tsx
+@@ -22,7 +22,7 @@ import {
+ 	getSizeConfig,
+ } from './styles/input-control-styles';
+ import type { InputBaseProps, LabelPosition } from './types';
+-import { ContextSystemProvider } from '../ui/context';
++import { ContextSystemProvider, WordPressComponentProps } from '../ui/context';
+ 
+ function useUniqueId( idProp?: string ) {
+ 	const instanceId = useInstanceId( InputBase );
+@@ -31,7 +31,7 @@ function useUniqueId( idProp?: string ) {
+ 	return idProp || id;
+ }
+ 
+-// Adapter to map props for the new ui/flex compopnent.
++// Adapter to map props for the new ui/flex component.
+ function getUIFlexProps( labelPosition?: LabelPosition ) {
+ 	const props: { direction?: string; gap?: number; justify?: string } = {};
+ 	switch ( labelPosition ) {
+@@ -67,7 +67,7 @@ export function InputBase(
+ 		size = 'default',
+ 		suffix,
+ 		...props
+-	}: InputBaseProps,
++	}: WordPressComponentProps< InputBaseProps, 'div' >,
+ 	ref: ForwardedRef< HTMLDivElement >
+ ) {
+ 	const id = useUniqueId( idProp );
+diff --git a/packages/components/src/input-control/types.ts b/packages/components/src/input-control/types.ts
+index d179e9a7c26a6f..92972f18ee07b8 100644
+--- a/packages/components/src/input-control/types.ts
++++ b/packages/components/src/input-control/types.ts
+@@ -165,11 +165,6 @@ export interface InputBaseProps extends BaseProps, FlexProps {
+ 	 * @default false
+ 	 */
+ 	disabled?: boolean;
+-	/**
+-	 * The class name to be added to the wrapper element.
+-	 */
+-	className?: string;
+-	id?: string;
+ 	/**
+ 	 * If this property is added, a label will be generated using label property as the content.
+ 	 */

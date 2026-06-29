@@ -1,0 +1,33 @@
+diff --git a/bin/check-local-changes.js b/bin/check-local-changes.js
+index 03e4f475a5cdc4..57dc1d6a692ba8 100644
+--- a/bin/check-local-changes.js
++++ b/bin/check-local-changes.js
+@@ -41,7 +41,14 @@ SimpleGit()
+ 
+ 		if ( !! nonOptionalDiff ) {
+ 			console.error(
+-				"There are local uncommitted changes after one or both of 'npm install' or 'npm run docs:build'!\n"
++				`There are local changes after running one or more of the following commands:
++
++- npm install
++- npm run docs:build
++- npm run --workspace @wordpress/theme build
++
++Run these commands in your local environment and commit the resulting changes to resolve the issue.
++`
+ 			);
+ 			console.log( nonOptionalDiff );
+ 			process.exitCode = 1;
+diff --git a/package.json b/package.json
+index 5722f8727d6c60..cbbb4be5fabbd5 100644
+--- a/package.json
++++ b/package.json
+@@ -230,7 +230,7 @@
+ 		"native": "npm run --prefix packages/react-native-editor",
+ 		"other:changelog": "node ./bin/plugin/cli.js changelog",
+ 		"other:check-licenses": "concurrently \"node ./bin/check-licenses.mjs\" \"wp-scripts check-licenses --dev\"",
+-		"preother:check-local-changes": "npm run docs:build",
++		"preother:check-local-changes": "npm run docs:build && npm run --workspace @wordpress/theme build",
+ 		"other:check-local-changes": "node ./bin/check-local-changes.js",
+ 		"other:cherry-pick": "node ./bin/cherry-pick.mjs",
+ 		"other:generate-php-sync-issue": "node ./bin/generate-php-sync-issue.mjs",

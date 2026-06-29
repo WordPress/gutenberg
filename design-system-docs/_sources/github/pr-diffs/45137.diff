@@ -1,0 +1,479 @@
+diff --git a/packages/block-editor/src/components/alignment-control/ui.js b/packages/block-editor/src/components/alignment-control/ui.js
+index ed6c40f54b70b5..f50e69044f9e59 100644
+--- a/packages/block-editor/src/components/alignment-control/ui.js
++++ b/packages/block-editor/src/components/alignment-control/ui.js
+@@ -30,7 +30,7 @@ const DEFAULT_ALIGNMENT_CONTROLS = [
+ 
+ const POPOVER_PROPS = {
+ 	position: 'bottom right',
+-	isAlternate: true,
++	variant: 'toolbar',
+ };
+ 
+ function AlignmentUI( {
+diff --git a/packages/block-editor/src/components/block-alignment-control/constants.js b/packages/block-editor/src/components/block-alignment-control/constants.js
+index f32a815b02f678..2fa133740a4cfb 100644
+--- a/packages/block-editor/src/components/block-alignment-control/constants.js
++++ b/packages/block-editor/src/components/block-alignment-control/constants.js
+@@ -41,5 +41,5 @@ export const BLOCK_ALIGNMENTS_CONTROLS = {
+ export const DEFAULT_CONTROL = 'none';
+ 
+ export const POPOVER_PROPS = {
+-	isAlternate: true,
++	variant: 'toolbar',
+ };
+diff --git a/packages/block-editor/src/components/block-alignment-matrix-control/index.js b/packages/block-editor/src/components/block-alignment-matrix-control/index.js
+index 6e9ef0def5a5aa..6ea7b2a49c8a95 100644
+--- a/packages/block-editor/src/components/block-alignment-matrix-control/index.js
++++ b/packages/block-editor/src/components/block-alignment-matrix-control/index.js
+@@ -24,7 +24,7 @@ function BlockAlignmentMatrixControl( props ) {
+ 	return (
+ 		<Dropdown
+ 			position="bottom right"
+-			popoverProps={ { isAlternate: true } }
++			popoverProps={ { variant: 'toolbar' } }
+ 			renderToggle={ ( { onToggle, isOpen } ) => {
+ 				const openOnArrowDown = ( event ) => {
+ 					if ( ! isOpen && event.keyCode === DOWN ) {
+diff --git a/packages/block-editor/src/components/block-popover/inbetween.js b/packages/block-editor/src/components/block-popover/inbetween.js
+index ae8a3b32038000..9de5bd36637055 100644
+--- a/packages/block-editor/src/components/block-popover/inbetween.js
++++ b/packages/block-editor/src/components/block-popover/inbetween.js
+@@ -268,6 +268,7 @@ function BlockPopoverInbetween( {
+ 			resize={ false }
+ 			flip={ false }
+ 			placement="bottom-start"
++			variant="unstyled"
+ 		>
+ 			<div
+ 				className="block-editor-block-popover__inbetween-container"
+diff --git a/packages/block-editor/src/components/block-popover/index.js b/packages/block-editor/src/components/block-popover/index.js
+index 4cd29a99be62ad..5382949684abd9 100644
+--- a/packages/block-editor/src/components/block-popover/index.js
++++ b/packages/block-editor/src/components/block-popover/index.js
+@@ -173,6 +173,7 @@ function BlockPopover(
+ 				'block-editor-block-popover',
+ 				props.className
+ 			) }
++			variant="unstyled"
+ 		>
+ 			{ __unstableCoverTarget && <div style={ style }>{ children }</div> }
+ 			{ ! __unstableCoverTarget && children }
+diff --git a/packages/block-editor/src/components/block-popover/style.scss b/packages/block-editor/src/components/block-popover/style.scss
+index 1744506179e670..2ce92991c90541 100644
+--- a/packages/block-editor/src/components/block-popover/style.scss
++++ b/packages/block-editor/src/components/block-popover/style.scss
+@@ -13,10 +13,6 @@
+ 		margin: 0 !important;
+ 		min-width: auto;
+ 		width: max-content;
+-		background: none;
+-		border: none;
+-		outline: none;
+-		box-shadow: none;
+ 		overflow-y: visible;
+ 	}
+ 
+diff --git a/packages/block-editor/src/components/block-settings-menu/block-settings-dropdown.js b/packages/block-editor/src/components/block-settings-menu/block-settings-dropdown.js
+index 925198927780f6..87fc6bc5e0585e 100644
+--- a/packages/block-editor/src/components/block-settings-menu/block-settings-dropdown.js
++++ b/packages/block-editor/src/components/block-settings-menu/block-settings-dropdown.js
+@@ -36,7 +36,7 @@ const noop = () => {};
+ const POPOVER_PROPS = {
+ 	className: 'block-editor-block-settings-menu__popover',
+ 	position: 'bottom right',
+-	isAlternate: true,
++	variant: 'toolbar',
+ };
+ 
+ function CopyMenuItem( { blocks, onCopy } ) {
+diff --git a/packages/block-editor/src/components/block-switcher/index.js b/packages/block-editor/src/components/block-switcher/index.js
+index a60ced22f91598..462d94f40089c4 100644
+--- a/packages/block-editor/src/components/block-switcher/index.js
++++ b/packages/block-editor/src/components/block-switcher/index.js
+@@ -158,7 +158,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
+ 						label={ blockSwitcherLabel }
+ 						popoverProps={ {
+ 							position: 'bottom right',
+-							isAlternate: true,
++							variant: 'toolbar',
+ 							className: 'block-editor-block-switcher__popover',
+ 						} }
+ 						icon={
+diff --git a/packages/block-editor/src/components/block-vertical-alignment-control/ui.js b/packages/block-editor/src/components/block-vertical-alignment-control/ui.js
+index 00f4ff6fd993cf..3a243da1b95728 100644
+--- a/packages/block-editor/src/components/block-vertical-alignment-control/ui.js
++++ b/packages/block-editor/src/components/block-vertical-alignment-control/ui.js
+@@ -28,7 +28,7 @@ const DEFAULT_CONTROLS = [ 'top', 'center', 'bottom' ];
+ const DEFAULT_CONTROL = 'top';
+ 
+ const POPOVER_PROPS = {
+-	isAlternate: true,
++	variant: 'toolbar',
+ };
+ 
+ function BlockVerticalAlignmentUI( {
+diff --git a/packages/block-editor/src/components/duotone-control/index.js b/packages/block-editor/src/components/duotone-control/index.js
+index aeb67c8a9b878f..d27e6863fe0dfd 100644
+--- a/packages/block-editor/src/components/duotone-control/index.js
++++ b/packages/block-editor/src/components/duotone-control/index.js
+@@ -36,7 +36,7 @@ function DuotoneControl( {
+ 			popoverProps={ {
+ 				className: 'block-editor-duotone-control__popover',
+ 				headerTitle: __( 'Duotone' ),
+-				isAlternate: true,
++				variant: 'toolbar',
+ 			} }
+ 			renderToggle={ ( { isOpen, onToggle } ) => {
+ 				const openOnArrowDown = ( event ) => {
+diff --git a/packages/block-editor/src/components/image-editor/constants.js b/packages/block-editor/src/components/image-editor/constants.js
+index 0692a76895ca1f..b2419aa07b7ce7 100644
+--- a/packages/block-editor/src/components/image-editor/constants.js
++++ b/packages/block-editor/src/components/image-editor/constants.js
+@@ -2,5 +2,5 @@ export const MIN_ZOOM = 100;
+ export const MAX_ZOOM = 300;
+ export const POPOVER_PROPS = {
+ 	position: 'bottom right',
+-	isAlternate: true,
++	variant: 'toolbar',
+ };
+diff --git a/packages/block-editor/src/components/list-view/drop-indicator.js b/packages/block-editor/src/components/list-view/drop-indicator.js
+index 1500e2f887fada..1e8d51a73919ab 100644
+--- a/packages/block-editor/src/components/list-view/drop-indicator.js
++++ b/packages/block-editor/src/components/list-view/drop-indicator.js
+@@ -115,6 +115,7 @@ export default function ListViewDropIndicator( {
+ 			anchor={ popoverAnchor }
+ 			focusOnMount={ false }
+ 			className="block-editor-list-view-drop-indicator"
++			variant="unstyled"
+ 		>
+ 			<div
+ 				style={ style }
+diff --git a/packages/block-editor/src/components/list-view/style.scss b/packages/block-editor/src/components/list-view/style.scss
+index 377dee64759aba..9782dc7027bc7c 100644
+--- a/packages/block-editor/src/components/list-view/style.scss
++++ b/packages/block-editor/src/components/list-view/style.scss
+@@ -389,14 +389,6 @@ $block-navigation-max-indent: 8;
+ 	}
+ }
+ 
+-// Reset some popover defaults for the drop indicator.
+-.block-editor-list-view-drop-indicator > .components-popover__content {
+-	margin-left: 0;
+-	border: none;
+-	box-shadow: none;
+-	outline: none;
+-}
+-
+ .block-editor-list-view-placeholder {
+ 	padding: 0;
+ 	margin: 0;
+diff --git a/packages/block-editor/src/components/media-replace-flow/index.js b/packages/block-editor/src/components/media-replace-flow/index.js
+index 21478b517c5971..a2fb5f36036aaa 100644
+--- a/packages/block-editor/src/components/media-replace-flow/index.js
++++ b/packages/block-editor/src/components/media-replace-flow/index.js
+@@ -131,7 +131,7 @@ const MediaReplaceFlow = ( {
+ 	const gallery = multiple && onlyAllowsImages();
+ 
+ 	const POPOVER_PROPS = {
+-		isAlternate: true,
++		variant: 'toolbar',
+ 	};
+ 
+ 	return (
+diff --git a/packages/block-editor/src/components/rich-text/format-toolbar/index.js b/packages/block-editor/src/components/rich-text/format-toolbar/index.js
+index 42fa804f9297f6..12d14d24130685 100644
+--- a/packages/block-editor/src/components/rich-text/format-toolbar/index.js
++++ b/packages/block-editor/src/components/rich-text/format-toolbar/index.js
+@@ -15,7 +15,7 @@ import { chevronDown } from '@wordpress/icons';
+ 
+ const POPOVER_PROPS = {
+ 	position: 'bottom right',
+-	isAlternate: true,
++	variant: 'toolbar',
+ };
+ 
+ const FormatToolbar = () => {
+diff --git a/packages/block-editor/src/layouts/flex.js b/packages/block-editor/src/layouts/flex.js
+index 025da9fefe846a..57dbf1005d5283 100644
+--- a/packages/block-editor/src/layouts/flex.js
++++ b/packages/block-editor/src/layouts/flex.js
+@@ -257,7 +257,7 @@ function FlexLayoutJustifyContentControl( {
+ 				onChange={ onJustificationChange }
+ 				popoverProps={ {
+ 					position: 'bottom right',
+-					isAlternate: true,
++					variant: 'toolbar',
+ 				} }
+ 			/>
+ 		);
+diff --git a/packages/block-library/src/buttons/edit.native.js b/packages/block-library/src/buttons/edit.native.js
+index 9ce2abab8f3f2d..32e68fea98cb9a 100644
+--- a/packages/block-library/src/buttons/edit.native.js
++++ b/packages/block-library/src/buttons/edit.native.js
+@@ -139,7 +139,7 @@ export default function ButtonsEdit( {
+ 						}
+ 						popoverProps={ {
+ 							position: 'bottom right',
+-							isAlternate: true,
++							variant: 'toolbar',
+ 						} }
+ 					/>
+ 				</BlockControls>
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f9e3686bfde776..0df127db41185f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,10 +9,12 @@
+ ### Deprecations
+ 
+ -   `Popover`: the deprecation messages for anchor-related props (`anchorRef`, `anchorRect`, `getAnchorRect`) have been updated. ([#45195](https://github.com/WordPress/gutenberg/pull/45195)).
++-   `Popover`: The `isAlternate` prop has been replaced with a `variant` prop that can be called with the `'toolbar'` string ([#45137](https://github.com/WordPress/gutenberg/pull/45137)).
+ 
+ ### New Feature
+ 
+ -   `BoxControl` & `CustomSelectControl`: Add `onMouseOver` and `onMouseOut` callback props to allow handling of these events by parent components ([#44955](https://github.com/WordPress/gutenberg/pull/44955))
++-   `Popover`: A `variant` prop has been added to style popovers, with `'unstyled'` and `'toolbar'` possible values ([#45137](https://github.com/WordPress/gutenberg/pull/45137)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/popover/README.md b/packages/components/src/popover/README.md
+index 2e892cf2d0ea3a..e012dce41e9a90 100644
+--- a/packages/components/src/popover/README.md
++++ b/packages/components/src/popover/README.md
+@@ -171,6 +171,8 @@ Used to customize the header text shown when the popover is toggled to fullscree
+ 
+ ### `isAlternate`: `boolean`
+ 
++_Note: this prop is deprecated. Please use the `variant` prop with the `'toolbar'` values instead._
++
+ Used to enable a different visual style for the popover.
+ 
+ -   Required: No
+@@ -212,8 +214,7 @@ Possible values:
+ - `yAxis`: `'top' | 'middle' | 'bottom'`
+ - `xAxis`: `'left' | 'center' | 'right'`
+ - `corner`: `'top' | 'right' | 'bottom' | 'left'`
+-
+-
++<!-- Break into two separate lists using an HTML comment -->
+ -   Required: No
+ 
+ ### `resize`: `boolean`
+@@ -222,3 +223,13 @@ Adjusts the size of the popover to prevent its contents from going out of view w
+ 
+ -   Required: No
+ -   Default: `true`
++
++### `variant`: `'toolbar' | 'unstyled'`
++
++Specifies the popover's style.
++
++Leave undefined for the default style. Possible values are:
++-   `unstyled`:  The popover is essentially without any visible style, it has no background, border, outline or drop shadow, but the popover contents are still displayed.
++-   `toolbar`: A style that has no elevation, but a high contrast with other elements. This matches the style of the [`Toolbar` component](/packages/components/toolbar/README.md).
++<!-- Break into two separate lists using an HTML comment -->
++-   Required: No
+diff --git a/packages/components/src/popover/index.tsx b/packages/components/src/popover/index.tsx
+index 18d72d782558ba..b960edef57c3c6 100644
+--- a/packages/components/src/popover/index.tsx
++++ b/packages/components/src/popover/index.tsx
+@@ -169,7 +169,6 @@ const UnforwardedPopover = (
+ 		children,
+ 		className,
+ 		noArrow = true,
+-		isAlternate,
+ 		position,
+ 		placement: placementProp = 'bottom-start',
+ 		offset: offsetProp = 0,
+@@ -181,12 +180,14 @@ const UnforwardedPopover = (
+ 		flip = true,
+ 		resize = true,
+ 		shift = false,
++		variant,
+ 
+ 		// Deprecated props
+ 		__unstableForcePosition,
+ 		anchorRef,
+ 		anchorRect,
+ 		getAnchorRect,
++		isAlternate,
+ 
+ 		// Rest
+ 		...contentProps
+@@ -195,7 +196,7 @@ const UnforwardedPopover = (
+ 	let computedFlipProp = flip;
+ 	let computedResizeProp = resize;
+ 	if ( __unstableForcePosition !== undefined ) {
+-		deprecated( '`__unstableForcePosition` prop wp.components.Popover', {
++		deprecated( '`__unstableForcePosition` prop in wp.components.Popover', {
+ 			since: '6.1',
+ 			version: '6.3',
+ 			alternative: '`flip={ false }` and  `resize={ false }`',
+@@ -228,6 +229,14 @@ const UnforwardedPopover = (
+ 		} );
+ 	}
+ 
++	const computedVariant = isAlternate ? 'toolbar' : variant;
++	if ( isAlternate !== undefined ) {
++		deprecated( '`isAlternate` prop in wp.components.Popover', {
++			since: '6.2',
++			alternative: "`variant` prop with the `'toolbar'` value",
++		} );
++	}
++
+ 	const arrowRef = useRef< HTMLElement | null >( null );
+ 
+ 	const [ fallbackReferenceElement, setFallbackReferenceElement ] =
+@@ -452,7 +461,12 @@ const UnforwardedPopover = (
+ 			placement={ computedPlacement }
+ 			className={ classnames( 'components-popover', className, {
+ 				'is-expanded': isExpanded,
+-				'is-alternate': isAlternate,
++				// Use the 'alternate' classname for 'toolbar' variant for back compat.
++				[ `is-${
++					computedVariant === 'toolbar'
++						? 'alternate'
++						: computedVariant
++				}` ]: computedVariant,
+ 			} ) }
+ 			{ ...contentProps }
+ 			ref={ mergedFloatingRef }
+diff --git a/packages/components/src/popover/stories/index.tsx b/packages/components/src/popover/stories/index.tsx
+index 95284909b0a954..f5a8fab45d7fcf 100644
+--- a/packages/components/src/popover/stories/index.tsx
++++ b/packages/components/src/popover/stories/index.tsx
+@@ -80,7 +80,7 @@ const PopoverWithAnchor = ( args: PopoverProps ) => {
+ 	);
+ };
+ 
+-export const Default: ComponentStory< typeof Popover > = ( args ) => {
++const Template: ComponentStory< typeof Popover > = ( args ) => {
+ 	const [ isVisible, setIsVisible ] = useState( false );
+ 	const toggleVisible = () => {
+ 		setIsVisible( ( state ) => ! state );
+@@ -114,6 +114,8 @@ export const Default: ComponentStory< typeof Popover > = ( args ) => {
+ 		</div>
+ 	);
+ };
++
++export const Default: ComponentStory< typeof Popover > = Template.bind( {} );
+ Default.args = {
+ 	children: (
+ 		<div style={ { width: '280px', whiteSpace: 'normal' } }>
+@@ -125,6 +127,32 @@ Default.args = {
+ 	),
+ };
+ 
++export const Toolbar: ComponentStory< typeof Popover > = Template.bind( {} );
++Toolbar.args = {
++	children: (
++		<div style={ { width: '280px', whiteSpace: 'normal' } }>
++			Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
++			eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
++			ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
++			aliquip ex ea commodo consequat.
++		</div>
++	),
++	variant: 'toolbar',
++};
++
++export const Unstyled: ComponentStory< typeof Popover > = Template.bind( {} );
++Unstyled.args = {
++	children: (
++		<div style={ { width: '280px', whiteSpace: 'normal' } }>
++			Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
++			eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
++			ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
++			aliquip ex ea commodo consequat.
++		</div>
++	),
++	variant: 'unstyled',
++};
++
+ export const AllPlacements: ComponentStory< typeof Popover > = ( {
+ 	children,
+ 	...args
+diff --git a/packages/components/src/popover/style.scss b/packages/components/src/popover/style.scss
+index d8b57e50013766..a557454da6f139 100644
+--- a/packages/components/src/popover/style.scss
++++ b/packages/components/src/popover/style.scss
+@@ -29,6 +29,15 @@ $arrow-triangle-base-size: 14px;
+ 		box-shadow: none;
+ 	}
+ 
++	// A style that gives the popover no visible ui.
++	.is-unstyled & {
++		background: none;
++		border: none;
++		border-radius: 0;
++		outline: none;
++		box-shadow: none;
++	}
++
+ 	.components-popover.is-expanded & {
+ 		position: static;
+ 		height: calc(100% - #{ $panel-header-height });
+diff --git a/packages/components/src/popover/types.ts b/packages/components/src/popover/types.ts
+index 6407720f82f257..96cb7e5fd6f863 100644
+--- a/packages/components/src/popover/types.ts
++++ b/packages/components/src/popover/types.ts
+@@ -92,10 +92,6 @@ export type PopoverProps = {
+ 	 * fullscreen on mobile viewports (see the `expandOnMobile` prop).
+ 	 */
+ 	headerTitle?: string;
+-	/**
+-	 * Used to enable a different visual style for the popover.
+-	 */
+-	isAlternate?: boolean;
+ 	/**
+ 	 * Used to show/hide the arrow that points at the popover's anchor.
+ 	 *
+@@ -138,7 +134,20 @@ export type PopoverProps = {
+ 	 * @default false
+ 	 */
+ 	shift?: boolean;
+-
++	/**
++	 * Specifies the popover's style.
++	 *
++	 * Leave undefined for the default style. Other values are:
++	 * - 'unstyled':  The popover is essentially without any visible style, it
++	 *                has no background, border, outline or drop shadow, but
++	 *                the popover contents are still displayed.
++	 * - 'toolbar':   A style that has no elevation, but a high contrast with
++	 *                other elements. This is matches the style of the
++	 *                `Toolbar` component.
++	 *
++	 * @default undefined
++	 */
++	variant?: 'unstyled' | 'toolbar';
+ 	// Deprecated props
+ 	/**
+ 	 * Prevent the popover from flipping and resizing when meeting the viewport
+@@ -176,4 +185,12 @@ export type PopoverProps = {
+ 	getAnchorRect?: (
+ 		fallbackReferenceElement: Element | null
+ 	) => DomRectWithOwnerDocument;
++	/**
++	 * Used to enable a different visual style for the popover.
++	 * _Note: this prop is deprecated. Use the `variant` prop with the
++	 * 'toolbar' value instead._
++	 *
++	 * @deprecated
++	 */
++	isAlternate?: boolean;
+ };
+diff --git a/packages/components/src/toolbar-dropdown-menu/index.js b/packages/components/src/toolbar-dropdown-menu/index.js
+index d9cd11cf03cddb..10b73757057bd2 100644
+--- a/packages/components/src/toolbar-dropdown-menu/index.js
++++ b/packages/components/src/toolbar-dropdown-menu/index.js
+@@ -26,7 +26,7 @@ function ToolbarDropdownMenu( props, ref ) {
+ 				<DropdownMenu
+ 					{ ...props }
+ 					popoverProps={ {
+-						isAlternate: true,
++						variant: 'toolbar',
+ 						...props.popoverProps,
+ 					} }
+ 					toggleProps={ toolbarItemProps }

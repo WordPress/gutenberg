@@ -1,0 +1,96 @@
+diff --git a/packages/ui/src/box/box.tsx b/packages/ui/src/box/box.tsx
+index c1a139baae90f9..ef59fc38b94d57 100644
+--- a/packages/ui/src/box/box.tsx
++++ b/packages/ui/src/box/box.tsx
+@@ -84,9 +84,6 @@ export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
+ 		backgroundColor,
+ 		color,
+ 		padding,
+-		bg = backgroundColor,
+-		fg = color,
+-		p = padding,
+ 		render = DEFAULT_RENDER,
+ 		...props
+ 	},
+@@ -94,18 +91,18 @@ export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
+ ) {
+ 	const style: React.CSSProperties = {};
+ 
+-	if ( bg ) {
+-		style.backgroundColor = `var(--wpds-color-bg-${ target }-${ bg }, var(--wpds-color-bg-surface-${ bg }))`;
++	if ( backgroundColor ) {
++		style.backgroundColor = `var(--wpds-color-bg-${ target }-${ backgroundColor }, var(--wpds-color-bg-surface-${ backgroundColor }))`;
+ 	}
+ 
+-	if ( fg ) {
+-		style.color = `var(--wpds-color-fg-${ target }-${ fg }, var(--wpds-color-fg-content-${ fg }))`;
++	if ( color ) {
++		style.color = `var(--wpds-color-fg-${ target }-${ color }, var(--wpds-color-fg-content-${ color }))`;
+ 	}
+ 
+-	if ( p ) {
++	if ( padding ) {
+ 		Object.assign(
+ 			style,
+-			getDimensionVariantStyles( 'padding', target, p )
++			getDimensionVariantStyles( 'padding', target, padding )
+ 		);
+ 	}
+ 
+diff --git a/packages/ui/src/box/stories/index.story.tsx b/packages/ui/src/box/stories/index.story.tsx
+index 00ea84e8b33c2b..2c4180665e05bf 100644
+--- a/packages/ui/src/box/stories/index.story.tsx
++++ b/packages/ui/src/box/stories/index.story.tsx
+@@ -30,10 +30,6 @@ export const Default: Story = {
+ 		padding: 'sm',
+ 	},
+ 	argTypes: {
+-		p: {
+-			control: 'select',
+-			options: [ '2xs', 'xs', 'sm', 'md', 'lg', 1, 2, 3, 4 ],
+-		},
+ 		padding: {
+ 			control: 'select',
+ 			options: [ '2xs', 'xs', 'sm', 'md', 'lg', 1, 2, 3, 4 ],
+diff --git a/packages/ui/src/box/types.ts b/packages/ui/src/box/types.ts
+index f66226f7dbc217..e90ac472eccb75 100644
+--- a/packages/ui/src/box/types.ts
++++ b/packages/ui/src/box/types.ts
+@@ -52,37 +52,16 @@ export interface BoxProps extends ComponentProps< 'div' > {
+ 	 */
+ 	target?: string;
+ 
+-	/**
+-	 * The surface background design token for box background color.
+-	 *
+-	 * Shorthand for `backgroundColor`.
+-	 */
+-	bg?: BackgroundColor;
+-
+ 	/**
+ 	 * The surface background design token for box background color.
+ 	 */
+ 	backgroundColor?: BackgroundColor;
+ 
+-	/**
+-	 * The surface foreground design token for box text color.
+-	 *
+-	 * Shorthand for `color`.
+-	 */
+-	fg?: ForegroundColor;
+-
+ 	/**
+ 	 * The surface foreground design token for box text color.
+ 	 */
+ 	color?: ForegroundColor;
+ 
+-	/**
+-	 * The surface spacing design token or base unit multiplier for box padding.
+-	 *
+-	 * Shorthand for `padding`.
+-	 */
+-	p?: Size | DimensionVariant< Size >;
+-
+ 	/**
+ 	 * The surface spacing design token or base unit multiplier for box padding.
+ 	 */

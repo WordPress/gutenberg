@@ -1,0 +1,1171 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 1704e6d711510f..b483449872cc76 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -767,6 +767,12 @@
+ 		"markdown_source": "../packages/components/src/combobox-control/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "Composite",
++		"slug": "composite",
++		"markdown_source": "../packages/components/src/composite/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "ConfirmDialog",
+ 		"slug": "confirm-dialog",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 47afb0711090d8..dca5b6e03dedc3 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### New Features
++
++-   `Composite`: add stable version of the component ([#63564](https://github.com/WordPress/gutenberg/pull/63564)).
++
+ ### Enhancements
+ 
+ -   `TimePicker`: add `hideLabelFromVision` prop ([#64267](https://github.com/WordPress/gutenberg/pull/64267)).
+diff --git a/packages/components/src/alignment-matrix-control/cell.tsx b/packages/components/src/alignment-matrix-control/cell.tsx
+index 162ca879f1a7e5..6e045c26694f4e 100644
+--- a/packages/components/src/alignment-matrix-control/cell.tsx
++++ b/packages/components/src/alignment-matrix-control/cell.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { CompositeItem } from '../composite/v2';
++import { Composite } from '../composite';
+ import Tooltip from '../tooltip';
+ import { VisuallyHidden } from '../visually-hidden';
+ 
+@@ -26,7 +26,7 @@ export default function Cell( {
+ 
+ 	return (
+ 		<Tooltip text={ tooltipText }>
+-			<CompositeItem
++			<Composite.Item
+ 				id={ id }
+ 				render={ <CellView { ...props } role="gridcell" /> }
+ 			>
+@@ -35,7 +35,7 @@ export default function Cell( {
+ 			hidden element instead of aria-label. */ }
+ 				<VisuallyHidden>{ value }</VisuallyHidden>
+ 				<Point isActive={ isActive } role="presentation" />
+-			</CompositeItem>
++			</Composite.Item>
+ 		</Tooltip>
+ 	);
+ }
+diff --git a/packages/components/src/alignment-matrix-control/index.tsx b/packages/components/src/alignment-matrix-control/index.tsx
+index eaec8a285b0c57..1d22c3560625db 100644
+--- a/packages/components/src/alignment-matrix-control/index.tsx
++++ b/packages/components/src/alignment-matrix-control/index.tsx
+@@ -13,7 +13,7 @@ import { useInstanceId } from '@wordpress/compose';
+  * Internal dependencies
+  */
+ import Cell from './cell';
+-import { Composite, CompositeRow, useCompositeStore } from '../composite/v2';
++import { Composite, useCompositeStore } from '../composite';
+ import { Root, Row } from './styles/alignment-matrix-control-styles';
+ import AlignmentMatrixControlIcon from './icon';
+ import { GRID, getItemId, getItemValue } from './utils';
+@@ -87,7 +87,7 @@ export function AlignmentMatrixControl( {
+ 			}
+ 		>
+ 			{ GRID.map( ( cells, index ) => (
+-				<CompositeRow render={ <Row role="row" /> } key={ index }>
++				<Composite.Row render={ <Row role="row" /> } key={ index }>
+ 					{ cells.map( ( cell ) => {
+ 						const cellId = getItemId( baseId, cell );
+ 						const isActive = cellId === activeId;
+@@ -101,7 +101,7 @@ export function AlignmentMatrixControl( {
+ 							/>
+ 						);
+ 					} ) }
+-				</CompositeRow>
++				</Composite.Row>
+ 			) ) }
+ 		</Composite>
+ 	);
+diff --git a/packages/components/src/circular-option-picker/circular-option-picker-option.tsx b/packages/components/src/circular-option-picker/circular-option-picker-option.tsx
+index 6c00a0e5d0bf1a..35a2f427134f40 100644
+--- a/packages/components/src/circular-option-picker/circular-option-picker-option.tsx
++++ b/packages/components/src/circular-option-picker/circular-option-picker-option.tsx
+@@ -16,9 +16,9 @@ import { Icon, check } from '@wordpress/icons';
+  */
+ import { CircularOptionPickerContext } from './circular-option-picker-context';
+ import Button from '../button';
+-import { CompositeItem } from '../composite/v2';
++import { Composite } from '../composite';
+ import Tooltip from '../tooltip';
+-import type { OptionProps, CircularOptionPickerCompositeStore } from './types';
++import type { OptionProps } from './types';
+ 
+ function UnforwardedOptionAsButton(
+ 	props: {
+@@ -45,7 +45,9 @@ function UnforwardedOptionAsOption(
+ 		id: string;
+ 		className?: string;
+ 		isSelected?: boolean;
+-		compositeStore: CircularOptionPickerCompositeStore;
++		compositeStore: NonNullable<
++			React.ComponentProps< typeof Composite >[ 'store' ]
++		>;
+ 	},
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+@@ -57,7 +59,7 @@ function UnforwardedOptionAsOption(
+ 	}
+ 
+ 	return (
+-		<CompositeItem
++		<Composite.Item
+ 			render={
+ 				<Button
+ 					{ ...additionalProps }
+@@ -66,7 +68,6 @@ function UnforwardedOptionAsOption(
+ 					ref={ forwardedRef }
+ 				/>
+ 			}
+-			store={ compositeStore }
+ 			id={ id }
+ 		/>
+ 	);
+diff --git a/packages/components/src/circular-option-picker/circular-option-picker.tsx b/packages/components/src/circular-option-picker/circular-option-picker.tsx
+index cd2ddcf90d7ce0..c1e719f2d4f665 100644
+--- a/packages/components/src/circular-option-picker/circular-option-picker.tsx
++++ b/packages/components/src/circular-option-picker/circular-option-picker.tsx
+@@ -13,7 +13,7 @@ import { isRTL } from '@wordpress/i18n';
+  * Internal dependencies
+  */
+ import { CircularOptionPickerContext } from './circular-option-picker-context';
+-import { Composite, useCompositeStore } from '../composite/v2';
++import { Composite, useCompositeStore } from '../composite';
+ import type {
+ 	CircularOptionPickerProps,
+ 	ListboxCircularOptionPickerProps,
+diff --git a/packages/components/src/circular-option-picker/types.ts b/packages/components/src/circular-option-picker/types.ts
+index 519d81d5905107..e23ff4165f0580 100644
+--- a/packages/components/src/circular-option-picker/types.ts
++++ b/packages/components/src/circular-option-picker/types.ts
+@@ -14,7 +14,7 @@ import type { Icon } from '@wordpress/icons';
+ import type { ButtonAsButtonProps } from '../button/types';
+ import type { DropdownProps } from '../dropdown/types';
+ import type { WordPressComponentProps } from '../context';
+-import type { CompositeStore } from '../composite/v2';
++import type { Composite } from '../composite';
+ 
+ type CommonCircularOptionPickerProps = {
+ 	/**
+@@ -123,8 +123,7 @@ export type OptionProps = Omit<
+ 	>;
+ };
+ 
+-export type CircularOptionPickerCompositeStore = CompositeStore;
+ export type CircularOptionPickerContextProps = {
+ 	baseId?: string;
+-	compositeStore?: CircularOptionPickerCompositeStore;
++	compositeStore?: React.ComponentProps< typeof Composite >[ 'store' ];
+ };
+diff --git a/packages/components/src/composite/README.md b/packages/components/src/composite/README.md
+new file mode 100644
+index 00000000000000..59953f1273a054
+--- /dev/null
++++ b/packages/components/src/composite/README.md
+@@ -0,0 +1,176 @@
++# `Composite`
++
++`Composite` provides a single tab stop on the page and allows navigation through the focusable descendants with arrow keys. This abstract component is based on the [WAI-ARIA Composite Role⁠](https://w3c.github.io/aria/#composite).
++
++See the [Ariakit docs for the `Composite` component](https://ariakit.org/components/composite).
++
++## Usage
++
++```jsx
++const store = useCompositeStore();
++<Composite store={store}>
++  <Composite.Group>
++    <Composite.GroupLabel>Label</Composite.GroupLabel>
++    <Composite.Item>Item 1</Composite.Item>
++    <Composite.Item>Item 2</Composite.Item>
++  </CompositeGroup>
++</Composite>
++```
++
++## Hooks
++
++### `useCompositeStore`
++
++Creates a composite store.
++
++#### Props
++
++##### `activeId`: `string | null`
++
++The current active item id. The active item is the element within the composite widget that has either DOM or virtual focus.
++
++-   Required: no
++
++##### `defaultActiveId`: `string | null`
++
++The composite item id that should be active by default when the composite widget is rendered. If `null`, the composite element itself will have focus and users will be able to navigate to it using arrow keys. If `undefined`, the first enabled item will be focused.
++
++-   Required: no
++
++##### `setActiveId`: `((activeId: string | null | undefined) => void)`
++
++A callback that gets called when the activeId state changes.
++
++-   Required: no
++
++##### `focusLoop`: `boolean | 'horizontal' | 'vertical' | 'both'`
++
++Determines how the focus behaves when the user reaches the end of the composite widget.
++
++-   Required: no
++-   Default: `false`
++
++##### `focusShift`: `boolean`
++
++Works only on two-dimensional composite widgets. If enabled, moving up or down when there's no next item or when the next item is disabled will shift to the item right before it.
++
++-   Required: no
++-   Default: `false`
++
++##### `focusWrap`: `boolean`
++
++Works only on two-dimensional composite widgets. If enabled, moving to the next item from the last one in a row or column will focus on the first item in the next row or column and vice-versa.
++
++-   Required: no
++-   Default: `false`
++
++##### `virtualFocus`: `boolean`
++
++If enabled, the composite element will act as an aria-activedescendant⁠ container instead of roving tabindex⁠. DOM focus will remain on the composite element while its items receive virtual focus. In both scenarios, the item in focus will carry the data-active-item attribute.
++
++-   Required: no
++-   Default: `false`
++
++##### `orientation`: `'horizontal' | 'vertical' | 'both'`
++
++Defines the orientation of the composite widget. If the composite has a single row or column (one-dimensional), the orientation value determines which arrow keys can be used to move focus. It doesn't have any effect on two-dimensional composites.
++
++-   Required: no
++-   Default: `'both'`
++
++##### `rtl`: `boolean`
++
++Determines how the next and previous functions will behave. If rtl is set to true, they will be inverted. This only affects the composite widget behavior. You still need to set dir=`rtl` on HTML/CSS.
++
++-   Required: no
++-   Default: `false`
++
++## Components
++
++### `Composite`
++
++Renders a composite widget.
++
++#### Props
++
++##### `store`: `CompositeStore<CompositeStoreItem>`
++
++Object returned by the `useCompositeStore` hook.
++
++-   Required: yes
++
++##### `render`: `RenderProp<React.HTMLAttributes<any> & { ref?: React.Ref<any> | undefined; }> | React.ReactElement<any, string | React.JSXElementConstructor<any>>`
++
++Allows the component to be rendered as a different HTML element or React component. The value can be a React element or a function that takes in the original component props and gives back a React element with the props merged.
++
++-   Required: no
++
++##### `children`: `React.ReactNode`
++
++The contents of the component.
++
++-   Required: no
++
++### `Composite.Group`
++
++Renders a group element for composite items.
++
++##### `render`: `RenderProp<React.HTMLAttributes<any> & { ref?: React.Ref<any> | undefined; }> | React.ReactElement<any, string | React.JSXElementConstructor<any>>`
++
++Allows the component to be rendered as a different HTML element or React component. The value can be a React element or a function that takes in the original component props and gives back a React element with the props merged.
++
++-   Required: no
++
++##### `children`: `React.ReactNode`
++
++The contents of the component.
++
++-   Required: no
++
++### `Composite.GroupLabel`
++
++Renders a label in a composite group. This component must be wrapped with `Composite.Group` so the `aria-labelledby` prop is properly set on the composite group element.
++
++##### `render`: `RenderProp<React.HTMLAttributes<any> & { ref?: React.Ref<any> | undefined; }> | React.ReactElement<any, string | React.JSXElementConstructor<any>>`
++
++Allows the component to be rendered as a different HTML element or React component. The value can be a React element or a function that takes in the original component props and gives back a React element with the props merged.
++
++-   Required: no
++
++##### `children`: `React.ReactNode`
++
++The contents of the component.
++
++-   Required: no
++
++### `Composite.Item`
++
++Renders a composite item.
++
++##### `render`: `RenderProp<React.HTMLAttributes<any> & { ref?: React.Ref<any> | undefined; }> | React.ReactElement<any, string | React.JSXElementConstructor<any>>`
++
++Allows the component to be rendered as a different HTML element or React component. The value can be a React element or a function that takes in the original component props and gives back a React element with the props merged.
++
++-   Required: no
++
++##### `children`: `React.ReactNode`
++
++The contents of the component.
++
++-   Required: no
++
++### `Composite.Row`
++
++Renders a composite row. Wrapping `Composite.Item` elements within `Composite.Row` will create a two-dimensional composite widget, such as a grid.
++
++##### `render`: `RenderProp<React.HTMLAttributes<any> & { ref?: React.Ref<any> | undefined; }> | React.ReactElement<any, string | React.JSXElementConstructor<any>>`
++
++Allows the component to be rendered as a different HTML element or React component. The value can be a React element or a function that takes in the original component props and gives back a React element with the props merged.
++
++-   Required: no
++
++##### `children`: `React.ReactNode`
++
++The contents of the component.
++
++-   Required: no
+diff --git a/packages/components/src/composite/current/index.ts b/packages/components/src/composite/current/index.ts
+deleted file mode 100644
+index 96379f00296516..00000000000000
+--- a/packages/components/src/composite/current/index.ts
++++ /dev/null
+@@ -1,20 +0,0 @@
+-/**
+- * Composite is a component that may contain navigable items represented by
+- * CompositeItem. It's inspired by the WAI-ARIA Composite Role and implements
+- * all the keyboard navigation mechanisms to ensure that there's only one
+- * tab stop for the whole Composite element. This means that it can behave as
+- * a roving tabindex or aria-activedescendant container.
+- *
+- * @see https://ariakit.org/components/composite
+- */
+-
+-export {
+-	Composite,
+-	CompositeGroup,
+-	CompositeGroupLabel,
+-	CompositeItem,
+-	CompositeRow,
+-	useCompositeStore,
+-} from '@ariakit/react';
+-
+-export type { CompositeStore, CompositeStoreProps } from '@ariakit/react';
+diff --git a/packages/components/src/composite/current/stories/index.story.tsx b/packages/components/src/composite/current/stories/index.story.tsx
+deleted file mode 100644
+index 335ebc3244c918..00000000000000
+--- a/packages/components/src/composite/current/stories/index.story.tsx
++++ /dev/null
+@@ -1,86 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import type { Meta, StoryFn } from '@storybook/react';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { isRTL } from '@wordpress/i18n';
+-
+-/**
+- * Internal dependencies
+- */
+-import {
+-	Composite,
+-	CompositeGroup,
+-	CompositeRow,
+-	CompositeItem,
+-	useCompositeStore,
+-} from '..';
+-import { UseCompositeStorePlaceholder, transform } from './utils';
+-
+-const meta: Meta< typeof UseCompositeStorePlaceholder > = {
+-	title: 'Components/Composite (V2)',
+-	component: UseCompositeStorePlaceholder,
+-	subcomponents: {
+-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+-		Composite,
+-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+-		CompositeGroup,
+-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+-		CompositeRow,
+-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+-		CompositeItem,
+-	},
+-	tags: [ 'status-private' ],
+-	parameters: {
+-		docs: {
+-			canvas: { sourceState: 'shown' },
+-			source: { transform },
+-			extractArgTypes: ( component: React.FunctionComponent ) => {
+-				const name = component.displayName;
+-				const path = name
+-					?.replace(
+-						/([a-z])([A-Z])/g,
+-						( _, a, b ) => `${ a }-${ b.toLowerCase() }`
+-					)
+-					.toLowerCase();
+-				const url = `https://ariakit.org/reference/${ path }`;
+-				return {
+-					props: {
+-						name: 'Props',
+-						description: `See <a href="${ url }">Ariakit docs</a> for <code>${ name }</code>`,
+-						table: { type: { summary: undefined } },
+-					},
+-				};
+-			},
+-		},
+-	},
+-};
+-export default meta;
+-
+-export const Default: StoryFn< typeof Composite > = ( { ...initialState } ) => {
+-	const rtl = isRTL();
+-	const store = useCompositeStore( { rtl, ...initialState } );
+-
+-	return (
+-		<Composite role="grid" store={ store } aria-label="Ariakit Composite">
+-			<CompositeRow role="row">
+-				<CompositeItem role="gridcell">Item A1</CompositeItem>
+-				<CompositeItem role="gridcell">Item A2</CompositeItem>
+-				<CompositeItem role="gridcell">Item A3</CompositeItem>
+-			</CompositeRow>
+-			<CompositeRow role="row">
+-				<CompositeItem role="gridcell">Item B1</CompositeItem>
+-				<CompositeItem role="gridcell">Item B2</CompositeItem>
+-				<CompositeItem role="gridcell">Item B3</CompositeItem>
+-			</CompositeRow>
+-			<CompositeRow role="row">
+-				<CompositeItem role="gridcell">Item C1</CompositeItem>
+-				<CompositeItem role="gridcell">Item C2</CompositeItem>
+-				<CompositeItem role="gridcell">Item C3</CompositeItem>
+-			</CompositeRow>
+-		</Composite>
+-	);
+-};
+diff --git a/packages/components/src/composite/index.ts b/packages/components/src/composite/index.ts
+deleted file mode 100644
+index aa06a6adf36ef2..00000000000000
+--- a/packages/components/src/composite/index.ts
++++ /dev/null
+@@ -1,7 +0,0 @@
+-// Originally this pointed at a Reakit implementation of
+-// `Composite`, but we are removing Reakit entirely from the
+-// codebase. We will continue to support the Reakit API
+-// through the 'legacy' version, which uses Ariakit under
+-// the hood.
+-
+-export * from './legacy';
+diff --git a/packages/components/src/composite/index.tsx b/packages/components/src/composite/index.tsx
+new file mode 100644
+index 00000000000000..9496bdb9e98664
+--- /dev/null
++++ b/packages/components/src/composite/index.tsx
+@@ -0,0 +1,177 @@
++/**
++ * Composite is a component that may contain navigable items represented by
++ * Composite.Item. It's inspired by the WAI-ARIA Composite Role and implements
++ * all the keyboard navigation mechanisms to ensure that there's only one
++ * tab stop for the whole Composite element. This means that it can behave as
++ * a roving tabindex or aria-activedescendant container.
++ *
++ * @see https://ariakit.org/components/composite
++ */
++
++/**
++ * External dependencies
++ */
++import * as Ariakit from '@ariakit/react';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import type { WordPressComponentProps } from '../context';
++import type {
++	CompositeStoreProps,
++	CompositeProps,
++	CompositeGroupProps,
++	CompositeGroupLabelProps,
++	CompositeItemProps,
++	CompositeRowProps,
++} from './types';
++
++/**
++ * Creates a composite store.
++ * @param props
++ * @see https://ariakit.org/reference/use-composite-store
++ * @example
++ * ```jsx
++ * const store = useCompositeStore();
++ * <Composite store={store}>
++ *   <Composite.Item>Item</Composite.Item>
++ *   <Composite.Item>Item</Composite.Item>
++ *   <Composite.Item>Item</Composite.Item>
++ * </Composite>
++ * ```
++ */
++export function useCompositeStore( props: CompositeStoreProps ) {
++	return Ariakit.useCompositeStore( props );
++}
++
++const Group = forwardRef<
++	HTMLDivElement,
++	WordPressComponentProps< CompositeGroupProps, 'div', false >
++>( function CompositeGroup( props, ref ) {
++	return <Ariakit.CompositeGroup { ...props } ref={ ref } />;
++} );
++Group.displayName = 'Composite.Group';
++
++const GroupLabel = forwardRef<
++	HTMLDivElement,
++	WordPressComponentProps< CompositeGroupLabelProps, 'div', false >
++>( function CompositeGroupLabel( props, ref ) {
++	return <Ariakit.CompositeGroupLabel { ...props } ref={ ref } />;
++} );
++GroupLabel.displayName = 'Composite.GroupLabel';
++
++const Item = forwardRef<
++	HTMLButtonElement,
++	WordPressComponentProps< CompositeItemProps, 'button', false >
++>( function CompositeItem( props, ref ) {
++	return <Ariakit.CompositeItem { ...props } ref={ ref } />;
++} );
++Item.displayName = 'Composite.Item';
++
++const Row = forwardRef<
++	HTMLDivElement,
++	WordPressComponentProps< CompositeRowProps, 'div', false >
++>( function CompositeRow( props, ref ) {
++	return <Ariakit.CompositeRow { ...props } ref={ ref } />;
++} );
++Row.displayName = 'Composite.Row';
++
++/**
++ * Renders a composite widget.
++ * @see https://ariakit.org/reference/composite
++ * @example
++ * ```jsx
++ * const store = useCompositeStore();
++ * <Composite store={store}>
++ *   <Composite.Item>Item 1</Composite.Item>
++ *   <Composite.Item>Item 2</Composite.Item>
++ * </Composite>
++ * ```
++ */
++export const Composite = Object.assign(
++	forwardRef<
++		HTMLDivElement,
++		WordPressComponentProps< CompositeProps, 'div', false >
++	>( function CompositeRow( props, ref ) {
++		return <Ariakit.Composite { ...props } ref={ ref } />;
++	} ),
++	{
++		displayName: 'Composite',
++		/**
++		 * Renders a group element for composite items.
++		 * @see https://ariakit.org/reference/composite-group
++		 * @example
++		 * ```jsx
++		 * const store = useCompositeStore();
++		 * <Composite store={store}>
++		 *   <Composite.Group>
++		 *     <Composite.GroupLabel>Label</Composite.GroupLabel>
++		 *     <Composite.Item>Item 1</Composite.Item>
++		 *     <Composite.Item>Item 2</Composite.Item>
++		 *   </CompositeGroup>
++		 * </Composite>
++		 * ```
++		 */
++		Group,
++		/**
++		 * Renders a label in a composite group. This component must be wrapped with
++		 * `Composite.Group` so the `aria-labelledby` prop is properly set on the
++		 * composite group element.
++		 * @see https://ariakit.org/reference/composite-group-label
++		 * @example
++		 * ```jsx
++		 * const store = useCompositeStore();
++		 * <Composite store={store}>
++		 *   <Composite.Group>
++		 *     <Composite.GroupLabel>Label</Composite.GroupLabel>
++		 *     <Composite.Item>Item 1</Composite.Item>
++		 *     <Composite.Item>Item 2</Composite.Item>
++		 *   </CompositeGroup>
++		 * </Composite>
++		 * ```
++		 */
++		GroupLabel,
++		/**
++		 * Renders a composite item.
++		 * @see https://ariakit.org/reference/composite-item
++		 * @example
++		 * ```jsx
++		 * const store = useCompositeStore();
++		 * <Composite store={store}>
++		 *   <Composite.Item>Item 1</Composite.Item>
++		 *   <Composite.Item>Item 2</Composite.Item>
++		 *   <Composite.Item>Item 3</Composite.Item>
++		 * </Composite>
++		 * ```
++		 */
++		Item,
++		/**
++		 * Renders a composite row. Wrapping `Composite.Item` elements within
++		 * `Composite.Row` will create a two-dimensional composite widget, such as a
++		 * grid.
++		 * @see https://ariakit.org/reference/composite-row
++		 * @example
++		 * ```jsx
++		 * const store = useCompositeStore();
++		 * <Composite store={store}>
++		 *   <Composite.Row>
++		 *     <Composite.Item>Item 1.1</Composite.Item>
++		 *     <Composite.Item>Item 1.2</Composite.Item>
++		 *     <Composite.Item>Item 1.3</Composite.Item>
++		 *   </Composite.Row>
++		 *   <Composite.Row>
++		 *     <Composite.Item>Item 2.1</Composite.Item>
++		 *     <Composite.Item>Item 2.2</Composite.Item>
++		 *     <Composite.Item>Item 2.3</Composite.Item>
++		 *   </Composite.Row>
++		 * </Composite>
++		 * ```
++		 */
++		Row,
++	}
++);
+diff --git a/packages/components/src/composite/legacy/index.tsx b/packages/components/src/composite/legacy/index.tsx
+index 5c5c674b5086b8..dffdc1a2066d47 100644
+--- a/packages/components/src/composite/legacy/index.tsx
++++ b/packages/components/src/composite/legacy/index.tsx
+@@ -5,6 +5,11 @@
+  * tab stop for the whole Composite element. This means that it can behave as
+  * a roving tabindex or aria-activedescendant container.
+  *
++ * This file aims at providing components that are as close as possible to the
++ * original `reakit`-based implementation (which was removed from the codebase),
++ * although it is recommended that consumers of the package switch to the stable,
++ * un-prefixed, `ariakit`-based version of `Composite`.
++ *
+  * @see https://ariakit.org/components/composite
+  */
+ 
+@@ -16,7 +21,7 @@ import { forwardRef } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import * as Current from '../current';
++import { Composite as Current, useCompositeStore } from '..';
+ import { useInstanceId } from '@wordpress/compose';
+ 
+ type Orientation = 'horizontal' | 'vertical';
+@@ -73,7 +78,7 @@ export interface LegacyStateOptions {
+ 
+ type Component = React.FunctionComponent< any >;
+ 
+-type CompositeStore = ReturnType< typeof Current.useCompositeStore >;
++type CompositeStore = ReturnType< typeof useCompositeStore >;
+ type CompositeStoreState = { store: CompositeStore };
+ export type CompositeState = CompositeStoreState &
+ 	Required< Pick< LegacyStateOptions, 'baseId' > >;
+@@ -93,9 +98,9 @@ type CompositeComponent< C extends Component > = (
+ ) => React.ReactElement;
+ type CompositeComponentProps = CompositeState &
+ 	(
+-		| ComponentProps< typeof Current.CompositeGroup >
+-		| ComponentProps< typeof Current.CompositeItem >
+-		| ComponentProps< typeof Current.CompositeRow >
++		| ComponentProps< typeof Current.Group >
++		| ComponentProps< typeof Current.Item >
++		| ComponentProps< typeof Current.Row >
+ 	);
+ 
+ function mapLegacyStatePropsToComponentProps(
+@@ -145,19 +150,15 @@ function proxyComposite< C extends Component >(
+ // provided role, and returning the appropriate component.
+ const unproxiedCompositeGroup = forwardRef<
+ 	any,
+-	React.ComponentPropsWithoutRef<
+-		typeof Current.CompositeGroup | typeof Current.CompositeRow
+-	>
++	React.ComponentPropsWithoutRef< typeof Current.Group | typeof Current.Row >
+ >( ( { role, ...props }, ref ) => {
+-	const Component =
+-		role === 'row' ? Current.CompositeRow : Current.CompositeGroup;
++	const Component = role === 'row' ? Current.Row : Current.Group;
+ 	return <Component ref={ ref } role={ role } { ...props } />;
+ } );
+-unproxiedCompositeGroup.displayName = 'CompositeGroup';
+ 
+-export const Composite = proxyComposite( Current.Composite, { baseId: 'id' } );
++export const Composite = proxyComposite( Current, { baseId: 'id' } );
+ export const CompositeGroup = proxyComposite( unproxiedCompositeGroup );
+-export const CompositeItem = proxyComposite( Current.CompositeItem, {
++export const CompositeItem = proxyComposite( Current.Item, {
+ 	focusable: 'accessibleWhenDisabled',
+ } );
+ 
+@@ -178,7 +179,7 @@ export function useCompositeState(
+ 
+ 	return {
+ 		baseId: useInstanceId( Composite, 'composite', baseId ),
+-		store: Current.useCompositeStore( {
++		store: useCompositeStore( {
+ 			defaultActiveId,
+ 			rtl,
+ 			orientation,
+diff --git a/packages/components/src/composite/legacy/stories/index.story.tsx b/packages/components/src/composite/legacy/stories/index.story.tsx
+index e46d656a16810e..1b8e07e9bbf560 100644
+--- a/packages/components/src/composite/legacy/stories/index.story.tsx
++++ b/packages/components/src/composite/legacy/stories/index.story.tsx
+@@ -15,7 +15,8 @@ import {
+ import { UseCompositeStatePlaceholder, transform } from './utils';
+ 
+ const meta: Meta< typeof UseCompositeStatePlaceholder > = {
+-	title: 'Components/Composite',
++	title: 'Components (Deprecated)/Composite (Unstable)',
++	id: 'components-composite-unstable',
+ 	component: UseCompositeStatePlaceholder,
+ 	subcomponents: {
+ 		Composite,
+diff --git a/packages/components/src/composite/legacy/stories/utils.tsx b/packages/components/src/composite/legacy/stories/utils.tsx
+index 06edd348634695..2fb51c845f9fbe 100644
+--- a/packages/components/src/composite/legacy/stories/utils.tsx
++++ b/packages/components/src/composite/legacy/stories/utils.tsx
+@@ -8,6 +8,25 @@ import type { StoryContext } from '@storybook/react';
+  */
+ import type { LegacyStateOptions } from '..';
+ 
++/**
++ * Renders a composite widget.
++ *
++ * This unstable component is deprecated. Use `Composite` instead.
++ *
++ * ```jsx
++ * import {
++ * 	__unstableUseCompositeState as useCompositeState,
++ * 	__unstableComposite as Composite,
++ * 	__unstableCompositeItem as CompositeItem,
++ * } from '@wordpress/components';
++ *
++ * const state = useCompositeState();
++ * <Composite state={ state }>
++ * 	<CompositeItem>Item 1</CompositeItem>
++ * 	<CompositeItem>Item 2</CompositeItem>
++ * </Composite>;
++ * ```
++ */
+ export function UseCompositeStatePlaceholder( props: LegacyStateOptions ) {
+ 	return (
+ 		<dl>
+diff --git a/packages/components/src/composite/stories/index.story.tsx b/packages/components/src/composite/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..b143c1f7db05f7
+--- /dev/null
++++ b/packages/components/src/composite/stories/index.story.tsx
+@@ -0,0 +1,218 @@
++/**
++ * External dependencies
++ */
++import type { Meta, StoryFn } from '@storybook/react';
++
++/**
++ * WordPress dependencies
++ */
++import { isRTL } from '@wordpress/i18n';
++
++/**
++ * Internal dependencies
++ */
++import { Composite, useCompositeStore } from '..';
++import { UseCompositeStorePlaceholder, transform } from './utils';
++
++const meta: Meta< typeof UseCompositeStorePlaceholder > = {
++	title: 'Components/Composite',
++	component: UseCompositeStorePlaceholder,
++	subcomponents: {
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		Composite,
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		'Composite.Group': Composite.Group,
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		'Composite.GroupLabel': Composite.GroupLabel,
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		'Composite.Row': Composite.Row,
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		'Composite.Item': Composite.Item,
++	},
++	parameters: {
++		docs: {
++			canvas: { sourceState: 'shown' },
++			source: { transform },
++			extractArgTypes: ( component: React.FunctionComponent ) => {
++				const commonArgTypes = {
++					render: {
++						name: 'render',
++						description:
++							'Allows the component to be rendered as a different HTML element or React component. The value can be a React element or a function that takes in the original component props and gives back a React element with the props merged.',
++						table: {
++							type: {
++								summary:
++									'RenderProp<React.HTMLAttributes<any> & { ref?: React.Ref<any> | undefined; }> | React.ReactElement<any, string | React.JSXElementConstructor<any>>',
++							},
++						},
++					},
++					children: {
++						name: 'children',
++						description: 'The contents of the component.',
++						table: { type: { summary: 'React.ReactNode' } },
++					},
++				};
++				const argTypes = {
++					useCompositeStore: {
++						activeId: {
++							name: 'activeId',
++							description:
++								'The current active item id. The active item is the element within the composite widget that has either DOM or virtual focus.',
++							table: { type: { summary: 'string | null' } },
++						},
++						defaultActiveId: {
++							name: 'defaultActiveId',
++							description:
++								'The composite item id that should be active by default when the composite widget is rendered. If `null`, the composite element itself will have focus and users will be able to navigate to it using arrow keys. If `undefined`, the first enabled item will be focused.',
++							table: { type: { summary: 'string | null' } },
++						},
++						setActiveId: {
++							name: 'setActiveId',
++							description:
++								'A callback that gets called when the activeId state changes.',
++							table: {
++								type: {
++									summary:
++										'((activeId: string | null | undefined) => void)',
++								},
++							},
++						},
++						focusLoop: {
++							name: 'focusLoop',
++							description:
++								'Determines how the focus behaves when the user reaches the end of the composite widget.',
++							table: {
++								defaultValue: {
++									summary: 'false',
++								},
++								type: {
++									summary:
++										"boolean | 'horizontal' | 'vertical' | 'both'",
++								},
++							},
++						},
++						focusShift: {
++							name: 'focusShift',
++							description:
++								"Works only on two-dimensional composite widgets. If enabled, moving up or down when there's no next item or when the next item is disabled will shift to the item right before it.",
++							table: {
++								defaultValue: {
++									summary: 'false',
++								},
++								type: {
++									summary: 'boolean',
++								},
++							},
++						},
++						focusWrap: {
++							name: 'focusWrap',
++							description:
++								'Works only on two-dimensional composite widgets. If enabled, moving to the next item from the last one in a row or column will focus on the first item in the next row or column and vice-versa.',
++							table: {
++								defaultValue: {
++									summary: 'false',
++								},
++								type: {
++									summary: 'boolean',
++								},
++							},
++						},
++						virtualFocus: {
++							name: 'virtualFocus',
++							description:
++								'If enabled, the composite element will act as an aria-activedescendant⁠ container instead of roving tabindex⁠. DOM focus will remain on the composite element while its items receive virtual focus. In both scenarios, the item in focus will carry the data-active-item attribute.',
++							table: {
++								defaultValue: {
++									summary: 'false',
++								},
++								type: {
++									summary: 'boolean',
++								},
++							},
++						},
++						orientation: {
++							name: 'orientation',
++							description:
++								"Defines the orientation of the composite widget. If the composite has a single row or column (one-dimensional), the orientation value determines which arrow keys can be used to move focus. It doesn't have any effect on two-dimensional composites.",
++							table: {
++								defaultValue: {
++									summary: "'both'",
++								},
++								type: {
++									summary:
++										"'horizontal' | 'vertical' | 'both'",
++								},
++							},
++						},
++						rtl: {
++							name: 'rtl',
++							description:
++								'Determines how the next and previous functions will behave. If rtl is set to true, they will be inverted. This only affects the composite widget behavior. You still need to set dir="rtl" on HTML/CSS.',
++							table: {
++								defaultValue: {
++									summary: 'false',
++								},
++								type: {
++									summary: 'boolean',
++								},
++							},
++						},
++					},
++					Composite: {
++						...commonArgTypes,
++						store: {
++							name: 'store',
++							description:
++								'Object returned by the `useCompositeStore` hook.',
++							table: {
++								type: {
++									summary:
++										'CompositeStore<CompositeStoreItem>',
++								},
++							},
++							type: { required: true },
++						},
++					},
++					'Composite.Group': commonArgTypes,
++					'Composite.GroupLabel': commonArgTypes,
++					'Composite.Row': commonArgTypes,
++					'Composite.Item': commonArgTypes,
++				};
++
++				const name = component.displayName ?? '';
++
++				return name in argTypes
++					? argTypes[ name as keyof typeof argTypes ]
++					: {};
++			},
++		},
++	},
++};
++export default meta;
++
++export const Default: StoryFn< typeof UseCompositeStorePlaceholder > = (
++	storeProps
++) => {
++	const rtl = isRTL();
++	const store = useCompositeStore( { rtl, ...storeProps } );
++
++	return (
++		<Composite role="grid" store={ store } aria-label="Composite">
++			<Composite.Row role="row">
++				<Composite.Item role="gridcell">Item A1</Composite.Item>
++				<Composite.Item role="gridcell">Item A2</Composite.Item>
++				<Composite.Item role="gridcell">Item A3</Composite.Item>
++			</Composite.Row>
++			<Composite.Row role="row">
++				<Composite.Item role="gridcell">Item B1</Composite.Item>
++				<Composite.Item role="gridcell">Item B2</Composite.Item>
++				<Composite.Item role="gridcell">Item B3</Composite.Item>
++			</Composite.Row>
++			<Composite.Row role="row">
++				<Composite.Item role="gridcell">Item C1</Composite.Item>
++				<Composite.Item role="gridcell">Item C2</Composite.Item>
++				<Composite.Item role="gridcell">Item C3</Composite.Item>
++			</Composite.Row>
++		</Composite>
++	);
++};
+diff --git a/packages/components/src/composite/current/stories/utils.tsx b/packages/components/src/composite/stories/utils.tsx
+similarity index 86%
+rename from packages/components/src/composite/current/stories/utils.tsx
+rename to packages/components/src/composite/stories/utils.tsx
+index 4b2d1bba4b312b..425fb9a905bcff 100644
+--- a/packages/components/src/composite/current/stories/utils.tsx
++++ b/packages/components/src/composite/stories/utils.tsx
+@@ -6,8 +6,19 @@ import type { StoryContext } from '@storybook/react';
+ /**
+  * Internal dependencies
+  */
+-import type { CompositeStoreProps } from '..';
++import type { CompositeStoreProps } from '../types';
+ 
++/**
++ * Renders a composite widget.
++ *
++ * ```jsx
++ * const store = useCompositeStore();
++ * <Composite store={ store }>
++ *   <Composite.Item>Item 1</Composite.Item>
++ *   <Composite.Item>Item 2</Composite.Item>
++ * </Composite>
++ * ```
++ */
+ export function UseCompositeStorePlaceholder( props: CompositeStoreProps ) {
+ 	return (
+ 		<dl>
+diff --git a/packages/components/src/composite/types.ts b/packages/components/src/composite/types.ts
+new file mode 100644
+index 00000000000000..438d1caaa94f8a
+--- /dev/null
++++ b/packages/components/src/composite/types.ts
+@@ -0,0 +1,47 @@
++/**
++ * External dependencies
++ */
++import type * as Ariakit from '@ariakit/react';
++
++export type CompositeStoreProps = Pick<
++	Ariakit.CompositeStoreProps,
++	| 'activeId'
++	| 'defaultActiveId'
++	| 'setActiveId'
++	| 'focusLoop'
++	| 'focusShift'
++	| 'focusWrap'
++	| 'virtualFocus'
++	| 'orientation'
++	| 'rtl'
++>;
++
++export type CompositeProps = Pick<
++	Ariakit.CompositeProps,
++	'render' | 'children'
++> & {
++	/**
++	 * Object returned by the `useCompositeStore` hook.
++	 */
++	store: Ariakit.CompositeStore;
++};
++
++export type CompositeGroupProps = Pick<
++	Ariakit.CompositeGroupProps,
++	'render' | 'children'
++>;
++
++export type CompositeGroupLabelProps = Pick<
++	Ariakit.CompositeGroupLabelProps,
++	'render' | 'children'
++>;
++
++export type CompositeItemProps = Pick<
++	Ariakit.CompositeItemProps,
++	'render' | 'children'
++>;
++
++export type CompositeRowProps = Pick<
++	Ariakit.CompositeRowProps,
++	'render' | 'children'
++>;
+diff --git a/packages/components/src/composite/v2.ts b/packages/components/src/composite/v2.ts
+deleted file mode 100644
+index 38d3f628d368b6..00000000000000
+--- a/packages/components/src/composite/v2.ts
++++ /dev/null
+@@ -1,4 +0,0 @@
+-// Although we have migrated away from Reakit, the 'current'
+-// Ariakit implementation is still considered a v2.
+-
+-export * from './current';
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index f0ea4a4b7e86b8..4c724a461e6775 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -61,7 +61,8 @@ export {
+ 	CompositeGroup as __unstableCompositeGroup,
+ 	CompositeItem as __unstableCompositeItem,
+ 	useCompositeState as __unstableUseCompositeState,
+-} from './composite';
++} from './composite/legacy';
++export { Composite } from './composite';
+ export { ConfirmDialog as __experimentalConfirmDialog } from './confirm-dialog';
+ export { default as CustomSelectControl } from './custom-select-control';
+ export { default as Dashicon } from './dashicon';
+diff --git a/packages/components/src/private-apis.ts b/packages/components/src/private-apis.ts
+index 5ff39ba364a041..699911e5ba046b 100644
+--- a/packages/components/src/private-apis.ts
++++ b/packages/components/src/private-apis.ts
+@@ -1,13 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import {
+-	Composite as CompositeV2,
+-	CompositeGroup as CompositeGroupV2,
+-	CompositeItem as CompositeItemV2,
+-	CompositeRow as CompositeRowV2,
+-	useCompositeStore as useCompositeStoreV2,
+-} from './composite/v2';
++import { Composite, useCompositeStore } from './composite';
+ import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
+ import { createPrivateSlotFill } from './slot-fill';
+ import {
+@@ -28,11 +22,11 @@ import { lock } from './lock-unlock';
+ 
+ export const privateApis = {};
+ lock( privateApis, {
+-	CompositeV2,
+-	CompositeGroupV2,
+-	CompositeItemV2,
+-	CompositeRowV2,
+-	useCompositeStoreV2,
++	CompositeV2: Composite,
++	CompositeGroupV2: Composite.Group,
++	CompositeItemV2: Composite.Item,
++	CompositeRowV2: Composite.Row,
++	useCompositeStoreV2: useCompositeStore,
+ 	__experimentalPopoverLegacyPositionToPlacement,
+ 	createPrivateSlotFill,
+ 	ComponentsContext,
+diff --git a/packages/dataviews/src/dataviews-layouts/list/index.tsx b/packages/dataviews/src/dataviews-layouts/list/index.tsx
+index 00939a12984856..70eaf3af1cd619 100644
+--- a/packages/dataviews/src/dataviews-layouts/list/index.tsx
++++ b/packages/dataviews/src/dataviews-layouts/list/index.tsx
+@@ -2,6 +2,7 @@
+  * External dependencies
+  */
+ import clsx from 'clsx';
++// TODO: use the @wordpress/components one once public
+ // Import CompositeStore type, which is not exported from @wordpress/components.
+ // eslint-disable-next-line no-restricted-imports
+ import type { CompositeStore } from '@ariakit/react';

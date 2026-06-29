@@ -1,0 +1,120 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 87a98f5429d10b..aad17c0e14e115 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -166,6 +166,7 @@ module.exports = {
+ 							'uniqWith',
+ 							'upperFirst',
+ 							'values',
++							'without',
+ 							'xor',
+ 							'zip',
+ 						],
+diff --git a/packages/block-library/src/navigation-submenu/edit.js b/packages/block-library/src/navigation-submenu/edit.js
+index 77030e4ec47462..574b077998f521 100644
+--- a/packages/block-library/src/navigation-submenu/edit.js
++++ b/packages/block-library/src/navigation-submenu/edit.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { escape, without } from 'lodash';
++import { escape } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -486,7 +486,9 @@ export default function NavigationSubmenuEdit( {
+ 	const innerBlocksColors = getColors( context, true );
+ 
+ 	const allowedBlocks = isAtMaxNesting
+-		? without( ALLOWED_BLOCKS, 'core/navigation-submenu' )
++		? ALLOWED_BLOCKS.filter(
++				( blockName ) => blockName !== 'core/navigation-submenu'
++		  )
+ 		: ALLOWED_BLOCKS;
+ 
+ 	const innerBlocksProps = useInnerBlocksProps(
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3f7325870704ed..fe49e89ddcae7f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -24,6 +24,7 @@
+ -   `Sandbox`: Use `toString` to create observe and resize script string ([#42872](https://github.com/WordPress/gutenberg/pull/42872)).
+ -   `Navigator`: refactor unit tests to TypeScript and to `user-event` ([#44970](https://github.com/WordPress/gutenberg/pull/44970)).
+ -   `Navigator`: Refactor Storybook code to TypeScript and controls ([#44979](https://github.com/WordPress/gutenberg/pull/44979)).
++-   `withFilters`: Refactor away from `_.without()` ([#44980](https://github.com/WordPress/gutenberg/pull/44980/)).
+ -   `withFocusReturn`: Refactor tests to `@testing-library/react` ([#45012](https://github.com/WordPress/gutenberg/pull/45012)).
+ -   `ToolsPanel`: updated to satisfy `react/exhaustive-deps` eslint rule ([#45028](https://github.com/WordPress/gutenberg/pull/45028))
+ -   `Tooltip`: updated to ignore `react/exhaustive-deps` eslint rule ([#45043](https://github.com/WordPress/gutenberg/pull/45043))
+diff --git a/packages/components/src/higher-order/with-filters/index.js b/packages/components/src/higher-order/with-filters/index.js
+index b0b1b45e6bf0e1..9a65c7a5fff9d0 100644
+--- a/packages/components/src/higher-order/with-filters/index.js
++++ b/packages/components/src/higher-order/with-filters/index.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { without } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -64,10 +59,10 @@ export default function withFilters( hookName ) {
+ 			}
+ 
+ 			componentWillUnmount() {
+-				FilteredComponentRenderer.instances = without(
+-					FilteredComponentRenderer.instances,
+-					this
+-				);
++				FilteredComponentRenderer.instances =
++					FilteredComponentRenderer.instances.filter(
++						( instance ) => instance !== this
++					);
+ 
+ 				// If this was the last of the mounted components filtered on
+ 				// this hook, remove the hook handler.
+diff --git a/packages/customize-widgets/src/filters/move-to-sidebar.js b/packages/customize-widgets/src/filters/move-to-sidebar.js
+index 9e7910ce785a6a..7677a5e1726cfe 100644
+--- a/packages/customize-widgets/src/filters/move-to-sidebar.js
++++ b/packages/customize-widgets/src/filters/move-to-sidebar.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { without } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -63,7 +58,7 @@ const withMoveToSidebarToolbarItem = createHigherOrderComponent(
+ 				const oldSetting = activeSidebarControl.setting;
+ 				const newSetting = newSidebarControl.setting;
+ 
+-				oldSetting( without( oldSetting(), widgetId ) );
++				oldSetting( oldSetting().filter( ( id ) => id !== widgetId ) );
+ 				newSetting( [ ...newSetting(), widgetId ] );
+ 			} else {
+ 				/**
+diff --git a/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js b/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
+index 3597b755fc2219..213149b54bb9f1 100644
+--- a/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
++++ b/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { find, get, some, unescape as unescapeString, without } from 'lodash';
++import { find, get, some, unescape as unescapeString } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -258,7 +258,7 @@ export function HierarchicalTermSelector( { slug } ) {
+ 	const onChange = ( termId ) => {
+ 		const hasTerm = terms.includes( termId );
+ 		const newTerms = hasTerm
+-			? without( terms, termId )
++			? terms.filter( ( id ) => id !== termId )
+ 			: [ ...terms, termId ];
+ 		onUpdateTerms( newTerms );
+ 	};

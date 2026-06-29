@@ -1,0 +1,308 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9677144c3bc5d5..4269dc95fad469 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,10 +5,11 @@
+ ### Bug Fix
+ 
+ -   `FormTokenField`: Do not suggest the selected one even if `{ value: string }` is passed ([#41216](https://github.com/WordPress/gutenberg/pull/41216)).
++-   `CustomGradientBar`: Fix insertion and control point positioning to more closely follow cursor. ([#41492](https://github.com/WordPress/gutenberg/pull/41492))
+ 
+ ### Internal
+ 
+--   `FormTokenField`: Convert to TypeScirpt and refactor to functional component ([#41216](https://github.com/WordPress/gutenberg/pull/41216)).
++-   `FormTokenField`: Convert to TypeScript and refactor to functional component ([#41216](https://github.com/WordPress/gutenberg/pull/41216)).
+ 
+ ## 19.12.0 (2022-06-01)
+ 
+diff --git a/packages/components/src/custom-gradient-bar/constants.js b/packages/components/src/custom-gradient-bar/constants.js
+index 34f253dad5adbe..928cccc78ff2ab 100644
+--- a/packages/components/src/custom-gradient-bar/constants.js
++++ b/packages/components/src/custom-gradient-bar/constants.js
+@@ -1,6 +1,5 @@
+ export const GRADIENT_MARKERS_WIDTH = 16;
+ export const INSERT_POINT_WIDTH = 16;
+-export const MINIMUM_ABSOLUTE_LEFT_POSITION = 5;
+ export const MINIMUM_DISTANCE_BETWEEN_INSERTER_AND_POINT = 10;
+ export const MINIMUM_DISTANCE_BETWEEN_POINTS = 0;
+ export const MINIMUM_SIGNIFICANT_MOVE = 5;
+diff --git a/packages/components/src/custom-gradient-bar/control-points.js b/packages/components/src/custom-gradient-bar/control-points.js
+index 65c15567f72330..2c9de154bdb146 100644
+--- a/packages/components/src/custom-gradient-bar/control-points.js
++++ b/packages/components/src/custom-gradient-bar/control-points.js
+@@ -31,7 +31,6 @@ import {
+ 	getHorizontalRelativeGradientPosition,
+ } from './utils';
+ import {
+-	GRADIENT_MARKERS_WIDTH,
+ 	MINIMUM_SIGNIFICANT_MOVE,
+ 	KEYBOARD_CONTROL_POINT_VARIATION,
+ } from './constants';
+@@ -61,6 +60,7 @@ function ControlPointButton( { isOpen, position, color, ...additionalProps } ) {
+ 				) }
+ 				style={ {
+ 					left: `${ position }%`,
++					transform: 'translateX( -50% )',
+ 				} }
+ 				{ ...additionalProps }
+ 			/>
+@@ -115,8 +115,7 @@ function ControlPoints( {
+ 	const onMouseMove = ( event ) => {
+ 		const relativePosition = getHorizontalRelativeGradientPosition(
+ 			event.clientX,
+-			gradientPickerDomRef.current,
+-			GRADIENT_MARKERS_WIDTH
++			gradientPickerDomRef.current
+ 		);
+ 		const {
+ 			initialPosition,
+@@ -312,12 +311,14 @@ function InsertPoint( {
+ 					} }
+ 					className="components-custom-gradient-picker__insert-point"
+ 					icon={ plus }
+-					style={ {
+-						left:
+-							insertPosition !== null
+-								? `${ insertPosition }%`
+-								: undefined,
+-					} }
++					style={
++						insertPosition !== null
++							? {
++									left: `${ insertPosition }%`,
++									transform: 'translateX( -50% )',
++							  }
++							: undefined
++					}
+ 				/>
+ 			) }
+ 			renderContent={ () => (
+diff --git a/packages/components/src/custom-gradient-bar/index.js b/packages/components/src/custom-gradient-bar/index.js
+index 87b14cac434d67..088ccd994297a5 100644
+--- a/packages/components/src/custom-gradient-bar/index.js
++++ b/packages/components/src/custom-gradient-bar/index.js
+@@ -15,10 +15,7 @@ import { useRef, useReducer } from '@wordpress/element';
+  */
+ import ControlPoints from './control-points';
+ import { getHorizontalRelativeGradientPosition } from './utils';
+-import {
+-	INSERT_POINT_WIDTH,
+-	MINIMUM_DISTANCE_BETWEEN_INSERTER_AND_POINT,
+-} from './constants';
++import { MINIMUM_DISTANCE_BETWEEN_INSERTER_AND_POINT } from './constants';
+ 
+ function customGradientBarReducer( state, action ) {
+ 	switch ( action.type ) {
+@@ -80,7 +77,7 @@ export default function CustomGradientBar( {
+ 	disableAlpha = false,
+ 	__experimentalIsRenderedInSidebar,
+ } ) {
+-	const gradientPickerDomRef = useRef();
++	const gradientMarkersContainerDomRef = useRef();
+ 
+ 	const [ gradientBarState, gradientBarStateDispatch ] = useReducer(
+ 		customGradientBarReducer,
+@@ -89,8 +86,7 @@ export default function CustomGradientBar( {
+ 	const onMouseEnterAndMove = ( event ) => {
+ 		const insertPosition = getHorizontalRelativeGradientPosition(
+ 			event.clientX,
+-			gradientPickerDomRef.current,
+-			INSERT_POINT_WIDTH
++			gradientMarkersContainerDomRef.current
+ 		);
+ 
+ 		// If the insert point is close to an existing control point don't show it.
+@@ -121,7 +117,6 @@ export default function CustomGradientBar( {
+ 
+ 	return (
+ 		<div
+-			ref={ gradientPickerDomRef }
+ 			className={ classnames(
+ 				'components-custom-gradient-picker__gradient-bar',
+ 				{ 'has-gradient': hasGradient }
+@@ -131,14 +126,19 @@ export default function CustomGradientBar( {
+ 			style={ { background } }
+ 			onMouseLeave={ onMouseLeave }
+ 		>
+-			<div className="components-custom-gradient-picker__markers-container">
++			<div
++				ref={ gradientMarkersContainerDomRef }
++				className="components-custom-gradient-picker__markers-container"
++			>
+ 				{ ! disableInserter &&
+ 					( isMovingInserter || isInsertingControlPoint ) && (
+ 						<ControlPoints.InsertPoint
+ 							__experimentalIsRenderedInSidebar={
+ 								__experimentalIsRenderedInSidebar
+ 							}
+-							gradientPickerDomRef={ gradientPickerDomRef }
++							gradientPickerDomRef={
++								gradientMarkersContainerDomRef
++							}
+ 							disableAlpha={ disableAlpha }
+ 							insertPosition={ gradientBarState.insertPosition }
+ 							value={ controlPoints }
+@@ -161,7 +161,7 @@ export default function CustomGradientBar( {
+ 					}
+ 					disableAlpha={ disableAlpha }
+ 					disableRemove={ disableInserter }
+-					gradientPickerDomRef={ gradientPickerDomRef }
++					gradientPickerDomRef={ gradientMarkersContainerDomRef }
+ 					ignoreMarkerPosition={
+ 						isInsertingControlPoint
+ 							? gradientBarState.insertPosition
+diff --git a/packages/components/src/custom-gradient-bar/test/utils.js b/packages/components/src/custom-gradient-bar/test/utils.js
+new file mode 100644
+index 00000000000000..525d075a0fd0a7
+--- /dev/null
++++ b/packages/components/src/custom-gradient-bar/test/utils.js
+@@ -0,0 +1,79 @@
++/**
++ * Internal dependencies
++ */
++import { getHorizontalRelativeGradientPosition } from '../utils';
++
++describe( 'getHorizontalRelativeGradientPosition', () => {
++	it( 'should return relative percentage position', () => {
++		const containerElement = {
++			getBoundingClientRect: () => ( {
++				x: 0,
++				width: 1000,
++			} ),
++		};
++
++		expect(
++			getHorizontalRelativeGradientPosition( 500, containerElement )
++		).toBe( 50 );
++	} );
++
++	it( 'should subtract the x position of the container from the mouse position', () => {
++		const containerElement = {
++			getBoundingClientRect: () => ( {
++				x: 50,
++				width: 1000,
++			} ),
++		};
++
++		expect(
++			getHorizontalRelativeGradientPosition( 550, containerElement )
++		).toBe( 50 );
++	} );
++
++	it( 'should clamp to a whole percentage number', () => {
++		const containerElement = {
++			getBoundingClientRect: () => ( {
++				x: 0,
++				width: 1000,
++			} ),
++		};
++
++		expect(
++			getHorizontalRelativeGradientPosition( 333, containerElement )
++		).toBe( 33 );
++	} );
++
++	it( 'should clamp to zero when mouse position is less the x position', () => {
++		const containerElement = {
++			getBoundingClientRect: () => ( {
++				x: 50,
++				width: 1000,
++			} ),
++		};
++
++		expect(
++			getHorizontalRelativeGradientPosition( 2, containerElement )
++		).toBe( 0 );
++	} );
++
++	it( 'should clamp to 100 when mouse position is greater than width', () => {
++		const containerElement = {
++			getBoundingClientRect: () => ( {
++				x: 0,
++				width: 1000,
++			} ),
++		};
++
++		expect(
++			getHorizontalRelativeGradientPosition( 1500, containerElement )
++		).toBe( 100 );
++	} );
++
++	it( 'should return undefined if no containerElement is provided', () => {
++		const containerElement = undefined;
++
++		expect(
++			getHorizontalRelativeGradientPosition( 1500, containerElement )
++		).toBeUndefined();
++	} );
++} );
+diff --git a/packages/components/src/custom-gradient-bar/utils.js b/packages/components/src/custom-gradient-bar/utils.js
+index eb088b08ea0a55..95d8abd6e23299 100644
+--- a/packages/components/src/custom-gradient-bar/utils.js
++++ b/packages/components/src/custom-gradient-bar/utils.js
+@@ -1,11 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import {
+-	MINIMUM_DISTANCE_BETWEEN_POINTS,
+-	MINIMUM_ABSOLUTE_LEFT_POSITION,
+-	INSERT_POINT_WIDTH,
+-} from './constants';
++import { MINIMUM_DISTANCE_BETWEEN_POINTS } from './constants';
+ 
+ /**
+  * Control point for the gradient bar.
+@@ -171,29 +167,21 @@ export function updateControlPointColorByPosition(
+ /**
+  * Gets the horizontal coordinate when dragging a control point with the mouse.
+  *
+- * @param {number}  mouseXCoordinate       Horizontal coordinate of the mouse position.
+- * @param {Element} containerElement       Container for the gradient picker.
+- * @param {number}  positionedElementWidth Width of the positioned element.
++ * @param {number}  mouseXCoordinate Horizontal coordinate of the mouse position.
++ * @param {Element} containerElement Container for the gradient picker.
+  *
+  * @return {number} Whole number percentage from the left.
+  */
+ export function getHorizontalRelativeGradientPosition(
+ 	mouseXCoordinate,
+-	containerElement,
+-	positionedElementWidth
++	containerElement
+ ) {
+ 	if ( ! containerElement ) {
+ 		return;
+ 	}
+ 	const { x, width } = containerElement.getBoundingClientRect();
+-	const absolutePositionValue =
+-		mouseXCoordinate -
+-		x -
+-		MINIMUM_ABSOLUTE_LEFT_POSITION -
+-		positionedElementWidth / 2;
+-	const availableWidth =
+-		width - MINIMUM_ABSOLUTE_LEFT_POSITION - INSERT_POINT_WIDTH;
++	const absolutePositionValue = mouseXCoordinate - x;
+ 	return Math.round(
+-		clampPercent( ( absolutePositionValue * 100 ) / availableWidth )
++		clampPercent( ( absolutePositionValue * 100 ) / width )
+ 	);
+ }
+diff --git a/packages/components/src/custom-gradient-picker/style.scss b/packages/components/src/custom-gradient-picker/style.scss
+index 4d0a0ade3567b1..e2cf0f377d4b88 100644
+--- a/packages/components/src/custom-gradient-picker/style.scss
++++ b/packages/components/src/custom-gradient-picker/style.scss
+@@ -10,12 +10,10 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
+ 	width: 100%;
+ 	height: $grid-unit-60;
+ 	margin-bottom: $grid-unit-20+$grid-unit-05;
+-	/*rtl:ignore*/
+-	padding-right: $components-custom-gradient-picker__padding;
+ 
+ 	.components-custom-gradient-picker__markers-container {
+ 		position: relative;
+-		width: calc(100% - #{ $grid-unit-40 });
++		width: calc(100% - #{ $grid-unit-60 });
+ 		margin-left: auto;
+ 		margin-right: auto;
+ 	}

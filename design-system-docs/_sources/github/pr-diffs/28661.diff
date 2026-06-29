@@ -1,0 +1,268 @@
+diff --git a/packages/components/src/font-size-picker/next.js b/packages/components/src/font-size-picker/next.js
+index 2d3815661ba116..897cd643a8bb4b 100644
+--- a/packages/components/src/font-size-picker/next.js
++++ b/packages/components/src/font-size-picker/next.js
+@@ -4,22 +4,16 @@
+ import { withNext } from '../ui/context';
+ import { FontSizeControl } from '../ui/font-size-control';
+ 
+-const FontSizePicker =
+-	process.env.COMPONENT_SYSTEM_PHASE === 1
+-		? ( props, ref ) => {
+-				// @todo Wrapped with div.components-base-control for spacing reasons.
+-				// Remove this when the inner Typography Tools component uses VStack
+-				// to automatically space elements apart vertically.
+-				return (
+-					<div className="components-base-control">
+-						<FontSizeControl
+-							{ ...props }
+-							{ ...( ref ? {} : { ref } ) }
+-						/>
+-					</div>
+-				);
+-		  }
+-		: undefined;
++const FontSizePicker = ( props, ref ) => {
++	// @todo Wrapped with div.components-base-control for spacing reasons.
++	// Remove this when the inner Typography Tools component uses VStack
++	// to automatically space elements apart vertically.
++	return (
++		<div className="components-base-control">
++			<FontSizeControl { ...props } { ...( ref ? {} : { ref } ) } />
++		</div>
++	);
++};
+ 
+ export function withNextComponent( current ) {
+ 	return withNext( current, FontSizePicker, 'WPComponentsFontSizePicker' );
+diff --git a/packages/components/src/text/next.js b/packages/components/src/text/next.js
+index 04936258945912..22799ed6432d80 100644
+--- a/packages/components/src/text/next.js
++++ b/packages/components/src/text/next.js
+@@ -2,11 +2,9 @@
+  * Internal dependencies
+  */
+ import { withNext } from '../ui/context';
+-import { Text as NextText } from '../ui/text';
++import { Text } from '../ui/text';
+ import { text } from './styles/text-mixins';
+ 
+-const Text = process.env.COMPONENT_SYSTEM_PHASE === 1 ? NextText : undefined;
+-
+ /**
+  * @typedef AdaptedTextProps
+  * @property {keyof JSX.IntrinsicElements} as Styled components `as` prop.
+diff --git a/packages/components/src/ui/context/component-system-provider.js b/packages/components/src/ui/context/component-system-provider.js
+index 1ba31238c27b6a..4332f33e3da6dc 100644
+--- a/packages/components/src/ui/context/component-system-provider.js
++++ b/packages/components/src/ui/context/component-system-provider.js
+@@ -14,23 +14,19 @@ export function ComponentSystemProvider( {
+ 	children,
+ 	value = {},
+ } ) {
+-	if ( process.env.COMPONENT_SYSTEM_PHASE === 1 ) {
+-		const contextValue = { ...value };
++	const contextValue = { ...value };
+ 
+-		__unstableNextInclude.forEach( ( namespace ) => {
+-			const baseValue = contextValue[ namespace ] || {};
+-			contextValue[ namespace ] = {
+-				...baseValue,
+-				__unstableVersion: 'next',
+-			};
+-		} );
++	__unstableNextInclude.forEach( ( namespace ) => {
++		const baseValue = contextValue[ namespace ] || {};
++		contextValue[ namespace ] = {
++			...baseValue,
++			__unstableVersion: 'next',
++		};
++	} );
+ 
+-		return (
+-			<ContextSystemProvider value={ contextValue }>
+-				{ children }
+-			</ContextSystemProvider>
+-		);
+-	}
+-
+-	return children;
++	return (
++		<ContextSystemProvider value={ contextValue }>
++			{ children }
++		</ContextSystemProvider>
++	);
+ }
+diff --git a/packages/components/src/ui/context/with-next.js b/packages/components/src/ui/context/with-next.js
+index a0b7770f582be0..56768596f524c2 100644
+--- a/packages/components/src/ui/context/with-next.js
++++ b/packages/components/src/ui/context/with-next.js
+@@ -17,31 +17,27 @@ export function withNext(
+ 	namespace = 'Component',
+ 	adapter = ( p ) => /** @type {any} */ ( p )
+ ) {
+-	if ( process.env.COMPONENT_SYSTEM_PHASE === 1 ) {
+-		/* eslint-disable jsdoc/no-undefined-types */
+-		/**
+-		 * @param {TCurrentProps} props
+-		 * @param {import('react').Ref<any>} ref
+-		 */
+-		/* eslint-enable jsdoc/no-undefined-types */
+-		const WrappedComponent = ( props, ref ) => {
+-			// @ts-ignore
+-			const { __unstableVersion, ...otherProps } = useContextSystem(
+-				props,
+-				namespace
+-			);
+-
+-			if ( __unstableVersion === 'next' ) {
+-				// @ts-ignore
+-				const nextProps = adapter( otherProps );
+-				return <NextComponent { ...nextProps } ref={ ref } />;
+-			}
++	/* eslint-disable jsdoc/no-undefined-types */
++	/**
++	 * @param {TCurrentProps} props
++	 * @param {import('react').Ref<any>} ref
++	 */
++	/* eslint-enable jsdoc/no-undefined-types */
++	const WrappedComponent = ( props, ref ) => {
++		// @ts-ignore
++		const { __unstableVersion, ...otherProps } = useContextSystem(
++			props,
++			namespace
++		);
+ 
+-			return <CurrentComponent { ...props } ref={ ref } />;
+-		};
++		if ( __unstableVersion === 'next' ) {
++			// @ts-ignore
++			const nextProps = adapter( otherProps );
++			return <NextComponent { ...nextProps } ref={ ref } />;
++		}
+ 
+-		return contextConnect( WrappedComponent, namespace );
+-	}
++		return <CurrentComponent { ...props } ref={ ref } />;
++	};
+ 
+-	return CurrentComponent;
++	return contextConnect( WrappedComponent, namespace );
+ }
+diff --git a/packages/components/src/ui/index.js b/packages/components/src/ui/index.js
+index cddfa1a2e22a5e..600b1e04da8c65 100644
+--- a/packages/components/src/ui/index.js
++++ b/packages/components/src/ui/index.js
+@@ -1,4 +1,5 @@
+ export * from './grid';
++export * from './font-size-control';
+ export * from './text';
+ export * from './truncate';
+ export * from './view';
+diff --git a/packages/components/src/utils/types.ts b/packages/components/src/utils/types.ts
+deleted file mode 100644
+index 85f4c0fe5623d7..00000000000000
+--- a/packages/components/src/utils/types.ts
++++ /dev/null
+@@ -1,51 +0,0 @@
+-export type SizeRangeDefault =
+-	| 'xLarge'
+-	| 'large'
+-	| 'medium'
+-	| 'small'
+-	| 'xSmall';
+-
+-export type SizeRangeReduced = 'large' | 'medium' | 'small';
+-
+-export type FormElementProps<V> = {
+-	/**
+-	 * The default (initial) state to use if `value` is undefined.
+-	 */
+-	defaultValue?: V;
+-	/**
+-	 * Determines if element is disabled.
+-	 */
+-	disabled?: boolean;
+-	/**
+-	 * Label for the form element.
+-	 */
+-	label?: string;
+-};
+-
+-export type PopperPlacement =
+-	| 'auto'
+-	| 'auto-start'
+-	| 'auto-end'
+-	| 'top'
+-	| 'top-start'
+-	| 'top-end'
+-	| 'right'
+-	| 'right-start'
+-	| 'right-end'
+-	| 'bottom'
+-	| 'bottom-start'
+-	| 'bottom-end'
+-	| 'left'
+-	| 'left-start'
+-	| 'left-end';
+-
+-export type PopperProps = {
+-	/**
+-	 * Position of the popover element.
+-	 *
+-	 * @default 'auto'
+-	 *
+-	 * @see https://popper.js.org/docs/v1/#popperplacements--codeenumcode
+-	 */
+-	placement?: PopperPlacement;
+-};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 5d42b26b890f1d..a1060daeaf4073 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -15,13 +15,16 @@
+ 		"src/animate/**/*",
+ 		"src/base-control/**/*",
+ 		"src/dashicon/**/*",
++		"src/text/**/*",
+ 		"src/tip/**/*",
+-		"src/ui/**/*",
++		"src/ui/context/**/*",
++		"src/ui/grid/**/*",
++		"src/ui/text/**/*",
++		"src/ui/truncate/**/*",
++		"src/ui/utils/**/*",
++		"src/ui/view/**/*",
+ 		"src/utils/**/*",
+ 		"src/visually-hidden/**/*",
+-		"src/text/**/*",
+-		"src/grid/**/*",
+-		"src/__next/**/*"
+ 	],
+ 	"exclude": [
+ 		"src/**/*.android.js",
+@@ -30,6 +33,5 @@
+ 		"src/**/react-native-*",
+ 		"src/**/stories",
+ 		"src/**/test",
+-		"src/ui/font-size-control"
+ 	]
+ }
+diff --git a/webpack.config.js b/webpack.config.js
+index 29e5aceb9a87a8..4a553dab1af78e 100644
+--- a/webpack.config.js
++++ b/webpack.config.js
+@@ -123,13 +123,6 @@ module.exports = {
+ 					10
+ 				) || 1
+ 			),
+-			// Inject the `COMPONENT_SYSTEM_PHASE` global, used for controlling Component System roll-out.
+-			'process.env.COMPONENT_SYSTEM_PHASE': JSON.stringify(
+-				parseInt(
+-					process.env.npm_package_config_COMPONENT_SYSTEM_PHASE,
+-					10
+-				) || 1
+-			),
+ 			'process.env.FORCE_REDUCED_MOTION': JSON.stringify(
+ 				process.env.FORCE_REDUCED_MOTION
+ 			),

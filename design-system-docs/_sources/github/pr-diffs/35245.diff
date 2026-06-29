@@ -1,0 +1,197 @@
+diff --git a/packages/components/src/card/styles.js b/packages/components/src/card/styles.js
+index 4ecd3a09105d87..c8ce8f32b21f5b 100644
+--- a/packages/components/src/card/styles.js
++++ b/packages/components/src/card/styles.js
+@@ -9,8 +9,20 @@ import { css } from '@emotion/react';
+ import { COLORS, CONFIG } from '../utils';
+ 
+ export const Card = css`
+-	box-shadow: 0 0 0 1px ${ CONFIG.surfaceBorderColor };
+ 	outline: none;
++
++	&::before {
++		content: '';
++
++		box-shadow: inset 0 0 0 1px ${ CONFIG.surfaceBorderColor };
++		position: absolute;
++		top: 0;
++		right: 0;
++		bottom: 0;
++		left: 0;
++
++		pointer-events: none;
++	}
+ `;
+ 
+ export const Header = css`
+@@ -77,7 +89,9 @@ export const borderColor = css`
+ `;
+ 
+ export const boxShadowless = css`
+-	box-shadow: none;
++	&::before {
++		content: none;
++	}
+ `;
+ 
+ export const borderless = css`
+diff --git a/packages/components/src/card/test/__snapshots__/index.js.snap b/packages/components/src/card/test/__snapshots__/index.js.snap
+index adf11cff8056a3..8527ab716c4320 100644
+--- a/packages/components/src/card/test/__snapshots__/index.js.snap
++++ b/packages/components/src/card/test/__snapshots__/index.js.snap
+@@ -157,8 +157,8 @@ Snapshot Diff:
+ @@ -1,30 +1,30 @@
+   <div>
+     <div
+--     class="components-surface components-card css-ssx2ib-View-Surface-getBorders-primary-Card-boxShadowless-rounded em57xhy0"
+-+     class="components-surface components-card css-1vyvcpq-View-Surface-getBorders-primary-Card-rounded em57xhy0"
++-     class="components-surface components-card css-xq5dej-View-Surface-getBorders-primary-Card-boxShadowless-rounded em57xhy0"
+++     class="components-surface components-card css-hsug4u-View-Surface-getBorders-primary-Card-rounded em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="Card"
+     >
+@@ -191,6 +191,23 @@ Snapshot Diff:
+         </div>
+ `;
+ 
++exports[`Card Card component should remove borders when the isBorderless prop is true 1`] = `
++Snapshot Diff:
++- First value
+++ Second value
++
++@@ -1,8 +1,8 @@
++  <div>
++    <div
++-     class="components-surface components-card css-hsug4u-View-Surface-getBorders-primary-Card-rounded em57xhy0"
+++     class="components-surface components-card css-xq5dej-View-Surface-getBorders-primary-Card-boxShadowless-rounded em57xhy0"
++      data-wp-c16t="true"
++      data-wp-component="Card"
++    >
++      <div
++        class="css-mgwsf4-View-Content em57xhy0"
++`;
++
+ exports[`Card Card component should render correctly 1`] = `
+ Object {
+   "asFragment": [Function],
+@@ -198,11 +215,21 @@ Object {
+   background-color: #fff;
+   color: #000;
+   position: relative;
+-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+   outline: none;
+   border-radius: 2px;
+ }
+ 
++.emotion-0::before {
++  content: '';
++  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
++  position: absolute;
++  top: 0;
++  right: 0;
++  bottom: 0;
++  left: 0;
++  pointer-events: none;
++}
++
+ .emotion-2 {
+   height: 100%;
+ }
+@@ -454,11 +481,21 @@ Object {
+   background-color: #fff;
+   color: #000;
+   position: relative;
+-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+   outline: none;
+   border-radius: 2px;
+ }
+ 
++.emotion-0::before {
++  content: '';
++  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
++  position: absolute;
++  top: 0;
++  right: 0;
++  bottom: 0;
++  left: 0;
++  pointer-events: none;
++}
++
+ .emotion-2 {
+   height: 100%;
+ }
+@@ -789,11 +826,21 @@ exports[`Card Card component should warn when the isElevated prop is passed 1`]
+   background-color: #fff;
+   color: #000;
+   position: relative;
+-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+   outline: none;
+   border-radius: 2px;
+ }
+ 
++.emotion-0::before {
++  content: '';
++  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
++  position: absolute;
++  top: 0;
++  right: 0;
++  bottom: 0;
++  left: 0;
++  pointer-events: none;
++}
++
+ .emotion-2 {
+   height: 100%;
+ }
+diff --git a/packages/components/src/card/test/index.js b/packages/components/src/card/test/index.js
+index bc794ce9418b9d..b2bbd5ba2b732e 100644
+--- a/packages/components/src/card/test/index.js
++++ b/packages/components/src/card/test/index.js
+@@ -39,15 +39,15 @@ describe( 'Card', () => {
+ 		} );
+ 
+ 		it( 'should remove borders when the isBorderless prop is true', () => {
+-			const { rerender, container } = render(
++			const { container: withBorders } = render(
+ 				<Card>Code is Poetry</Card>
+ 			);
+-			expect( container.firstChild ).not.toHaveStyle(
+-				'box-shadow: none'
++
++			const { container: withoutBorders } = render(
++				<Card isBorderless>Code is Poetry</Card>
+ 			);
+ 
+-			rerender( <Card isBorderless={ true }>Code is Poetry</Card> );
+-			expect( container.firstChild ).toHaveStyle( 'box-shadow: none' );
++			expect( withBorders ).toMatchDiffSnapshot( withoutBorders );
+ 		} );
+ 
+ 		it( 'should add rounded border when the isRounded prop is true', () => {
+diff --git a/packages/components/src/flyout/test/__snapshots__/index.js.snap b/packages/components/src/flyout/test/__snapshots__/index.js.snap
+index 9aeeace655ce5e..6c883f1764a9a5 100644
+--- a/packages/components/src/flyout/test/__snapshots__/index.js.snap
++++ b/packages/components/src/flyout/test/__snapshots__/index.js.snap
+@@ -5,11 +5,21 @@ exports[`props should render correctly 1`] = `
+   background-color: #fff;
+   color: #000;
+   position: relative;
+-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+   outline: none;
+   border-radius: 2px;
+ }
+ 
++.emotion-1::before {
++  content: '';
++  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
++  position: absolute;
++  top: 0;
++  right: 0;
++  bottom: 0;
++  left: 0;
++  pointer-events: none;
++}
++
+ .emotion-1 .components-card-body {
+   max-height: 80vh;
+ }

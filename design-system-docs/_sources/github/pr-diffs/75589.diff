@@ -1,0 +1,338 @@
+diff --git a/package-lock.json b/package-lock.json
+index 84805c72ba8dc0..1186806b1381e9 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -63241,6 +63241,7 @@
+ 				"@storybook/addon-docs": "^10.1.11",
+ 				"@storybook/icons": "^2.0.1",
+ 				"@storybook/react-vite": "^10.1.11",
++				"@wordpress/theme": "file:../packages/theme",
+ 				"storybook": "^10.1.11",
+ 				"storybook-addon-tag-badges": "^3.0.4",
+ 				"terser": "^5.37.0"
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index 357ee51ab3ee2f..0a16fdcb2681eb 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### New Features
+ 
++-   Added PostCSS, esbuild, and Vite build plugins that inject fallback values for design system tokens (`--wpds-*`). Available as package exports: `@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks`, `@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks`, `@wordpress/theme/vite-plugins/vite-ds-token-fallbacks` ([#75589](https://github.com/WordPress/gutenberg/pull/75589)).
+ -   Add `--wpds-cursor-control` design token for interactive non-link elements ([#75697](https://github.com/WordPress/gutenberg/pull/75697)).
+ 
+ ## 0.7.0 (2026-02-18)
+diff --git a/packages/theme/package.json b/packages/theme/package.json
+index ed605e0e28ce29..6c98a837925753 100644
+--- a/packages/theme/package.json
++++ b/packages/theme/package.json
+@@ -43,6 +43,21 @@
+ 			"import": "./build-module/prebuilt/js/design-tokens.mjs",
+ 			"default": "./build/prebuilt/js/design-tokens.cjs"
+ 		},
++		"./postcss-plugins/postcss-ds-token-fallbacks": {
++			"types": "./src/postcss-plugins/postcss-ds-token-fallbacks.d.mts",
++			"import": "./src/postcss-plugins/postcss-ds-token-fallbacks.mjs",
++			"default": "./src/postcss-plugins/postcss-ds-token-fallbacks.mjs"
++		},
++		"./esbuild-plugins/esbuild-ds-token-fallbacks": {
++			"types": "./src/esbuild-plugins/esbuild-ds-token-fallbacks.d.mts",
++			"import": "./src/esbuild-plugins/esbuild-ds-token-fallbacks.mjs",
++			"default": "./src/esbuild-plugins/esbuild-ds-token-fallbacks.mjs"
++		},
++		"./vite-plugins/vite-ds-token-fallbacks": {
++			"types": "./src/vite-plugins/vite-ds-token-fallbacks.d.mts",
++			"import": "./src/vite-plugins/vite-ds-token-fallbacks.mjs",
++			"default": "./src/vite-plugins/vite-ds-token-fallbacks.mjs"
++		},
+ 		"./stylelint-plugins/no-unknown-ds-tokens": {
+ 			"types": "./build-types/stylelint-plugins/no-unknown-ds-tokens.d.ts",
+ 			"import": "./src/stylelint-plugins/no-unknown-ds-tokens.mjs",
+diff --git a/packages/theme/src/esbuild-plugins/esbuild-ds-token-fallbacks.d.mts b/packages/theme/src/esbuild-plugins/esbuild-ds-token-fallbacks.d.mts
+new file mode 100644
+index 00000000000000..72d3b6ad626419
+--- /dev/null
++++ b/packages/theme/src/esbuild-plugins/esbuild-ds-token-fallbacks.d.mts
+@@ -0,0 +1,2 @@
++declare const plugin: import('esbuild').Plugin;
++export default plugin;
+diff --git a/packages/theme/src/esbuild-plugins/esbuild-ds-token-fallbacks.mjs b/packages/theme/src/esbuild-plugins/esbuild-ds-token-fallbacks.mjs
+new file mode 100644
+index 00000000000000..20e7f264ac8d91
+--- /dev/null
++++ b/packages/theme/src/esbuild-plugins/esbuild-ds-token-fallbacks.mjs
+@@ -0,0 +1,47 @@
++import { readFile } from 'fs/promises';
++import { addFallbackToVar } from '../postcss-plugins/ds-token-fallbacks.mjs';
++
++const LOADER_MAP = {
++	'.js': 'jsx',
++	'.jsx': 'jsx',
++	'.ts': 'tsx',
++	'.tsx': 'tsx',
++	'.mjs': 'jsx',
++	'.mts': 'tsx',
++	'.cjs': 'jsx',
++	'.cts': 'tsx',
++};
++
++/**
++ * esbuild plugin that injects design-system token fallbacks into JS/TS files.
++ *
++ * Replaces bare `var(--wpds-*)` references in string literals with
++ * `var(--wpds-*, <fallback>)` so components render correctly without
++ * a ThemeProvider.
++ */
++const plugin = {
++	name: 'ds-token-fallbacks-js',
++	setup( build ) {
++		build.onLoad( { filter: /\.[mc]?[jt]sx?$/ }, async ( args ) => {
++			// Skip node_modules.
++			if ( args.path.includes( 'node_modules' ) ) {
++				return undefined;
++			}
++
++			const source = await readFile( args.path, 'utf8' );
++
++			if ( ! source.includes( '--wpds-' ) ) {
++				return undefined;
++			}
++
++			const ext = args.path.match( /(\.[^.]+)$/ )?.[ 1 ] || '.js';
++
++			return {
++				contents: addFallbackToVar( source ),
++				loader: LOADER_MAP[ ext ] || 'jsx',
++			};
++		} );
++	},
++};
++
++export default plugin;
+diff --git a/packages/theme/src/postcss-plugins/postcss-ds-token-fallbacks.d.mts b/packages/theme/src/postcss-plugins/postcss-ds-token-fallbacks.d.mts
+new file mode 100644
+index 00000000000000..50de671cf1e538
+--- /dev/null
++++ b/packages/theme/src/postcss-plugins/postcss-ds-token-fallbacks.d.mts
+@@ -0,0 +1,2 @@
++declare const plugin: import('postcss').PluginCreator< never >;
++export default plugin;
+diff --git a/packages/theme/src/postcss-plugins/postcss-ds-token-fallbacks.mjs b/packages/theme/src/postcss-plugins/postcss-ds-token-fallbacks.mjs
+new file mode 100644
+index 00000000000000..0936b8eac2ceb9
+--- /dev/null
++++ b/packages/theme/src/postcss-plugins/postcss-ds-token-fallbacks.mjs
+@@ -0,0 +1,16 @@
++import { addFallbackToVar } from './ds-token-fallbacks.mjs';
++
++const plugin = () => ( {
++	postcssPlugin: 'postcss-ds-token-fallbacks',
++	/** @param {import('postcss').Declaration} decl */
++	Declaration( decl ) {
++		const updated = addFallbackToVar( decl.value );
++		if ( updated !== decl.value ) {
++			decl.value = updated;
++		}
++	},
++} );
++
++plugin.postcss = true;
++
++export default plugin;
+diff --git a/packages/theme/src/vite-plugins/vite-ds-token-fallbacks.d.mts b/packages/theme/src/vite-plugins/vite-ds-token-fallbacks.d.mts
+new file mode 100644
+index 00000000000000..478baf3a283c18
+--- /dev/null
++++ b/packages/theme/src/vite-plugins/vite-ds-token-fallbacks.d.mts
+@@ -0,0 +1,2 @@
++declare const plugin: () => import('vite').Plugin;
++export default plugin;
+diff --git a/packages/theme/src/vite-plugins/vite-ds-token-fallbacks.mjs b/packages/theme/src/vite-plugins/vite-ds-token-fallbacks.mjs
+new file mode 100644
+index 00000000000000..e38a082f2e28bd
+--- /dev/null
++++ b/packages/theme/src/vite-plugins/vite-ds-token-fallbacks.mjs
+@@ -0,0 +1,28 @@
++import { addFallbackToVar } from '../postcss-plugins/ds-token-fallbacks.mjs';
++
++/**
++ * Vite plugin that injects design-system token fallbacks into JS/TS files.
++ *
++ * Replaces bare `var(--wpds-*)` references in string literals with
++ * `var(--wpds-*, <fallback>)` so components render correctly without
++ * a ThemeProvider.
++ */
++const plugin = () => ( {
++	name: 'ds-token-fallbacks-js',
++	transform( code, id ) {
++		if ( ! /\.[mc]?[jt]sx?$/.test( id ) ) {
++			return null;
++		}
++		if ( id.includes( 'node_modules' ) ) {
++			return null;
++		}
++		if ( ! code.includes( '--wpds-' ) ) {
++			return null;
++		}
++		// Sourcemap omitted: replacements are small, inline substitutions
++		// that preserve line structure, so the debugging impact is negligible.
++		return { code: addFallbackToVar( code ), map: null };
++	},
++} );
++
++export default plugin;
+diff --git a/packages/ui/src/stack/stack.tsx b/packages/ui/src/stack/stack.tsx
+index b339d5fa7ae28b..dd44ef7a980633 100644
+--- a/packages/ui/src/stack/stack.tsx
++++ b/packages/ui/src/stack/stack.tsx
+@@ -1,8 +1,21 @@
+ import { useRender, mergeProps } from '@base-ui/react';
+ import { forwardRef } from '@wordpress/element';
++import type { GapSize } from '@wordpress/theme';
+ import { type StackProps } from './types';
+ import styles from './style.module.css';
+ 
++// Static map so that the build-time token fallback plugin can inject fallback
++// values into each `var()` call.
++const gapTokens: Record< GapSize, string > = {
++	xs: 'var(--wpds-dimension-gap-xs)',
++	sm: 'var(--wpds-dimension-gap-sm)',
++	md: 'var(--wpds-dimension-gap-md)',
++	lg: 'var(--wpds-dimension-gap-lg)',
++	xl: 'var(--wpds-dimension-gap-xl)',
++	'2xl': 'var(--wpds-dimension-gap-2xl)',
++	'3xl': 'var(--wpds-dimension-gap-3xl)',
++};
++
+ /**
+  * A flexible layout component using CSS Flexbox for consistent spacing and alignment.
+  * Built on design tokens for predictable spacing values.
+@@ -12,7 +25,7 @@ export const Stack = forwardRef< HTMLDivElement, StackProps >( function Stack(
+ 	ref
+ ) {
+ 	const style: React.CSSProperties = {
+-		gap: gap && `var(--wpds-dimension-gap-${ gap })`,
++		gap: gap && gapTokens[ gap ],
+ 		alignItems: align,
+ 		justifyContent: justify,
+ 		flexDirection: direction,
+diff --git a/packages/wp-build/lib/build.mjs b/packages/wp-build/lib/build.mjs
+index b928ee7e2bfe0a..a338fa9636ca29 100755
+--- a/packages/wp-build/lib/build.mjs
++++ b/packages/wp-build/lib/build.mjs
+@@ -21,6 +21,26 @@ import babel from 'esbuild-plugin-babel';
+ import { camelCase } from 'change-case';
+ import { NodePackageImporter } from 'sass-embedded';
+ 
++// Optional dependency: @wordpress/theme provides plugins that inject fallback
++// values for design system tokens. Fails gracefully when the package is not
++// installed (it is an optional peerDependency).
++let dsTokenFallbacks;
++let dsTokenFallbacksJs;
++try {
++	const { default: postcssPlugin } = await import(
++		// eslint-disable-next-line import/no-unresolved
++		'@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks'
++	);
++	const { default: esbuildPlugin } = await import(
++		// eslint-disable-next-line import/no-unresolved
++		'@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks'
++	);
++	dsTokenFallbacks = postcssPlugin;
++	dsTokenFallbacksJs = esbuildPlugin;
++} catch {
++	// @wordpress/theme is optional; skip token fallbacks if not available.
++}
++
+ /**
+  * Internal dependencies
+  */
+@@ -150,8 +170,9 @@ function compileInlineStyle( { cssModules = false, minify = true } = {} ) {
+ 
+ 		let moduleExports = null;
+ 
+-		// Transform the code: CSS modules and minification.
++		// Transform the code: token fallbacks, CSS modules and minification.
+ 		const plugins = [
++			dsTokenFallbacks,
+ 			cssModules &&
+ 				postcssModules( {
+ 					generateScopedName: '[contenthash]__[local]',
+@@ -1251,6 +1272,11 @@ async function transpilePackage( packageName ) {
+ 		},
+ 	};
+ 	const plugins = [
++		// Note: dsTokenFallbacksJs and emotionPlugin both use esbuild's onLoad
++		// hook, which is non-composable — the first to return contents wins. If a
++		// file contains --wpds-* tokens, the Emotion transform will be skipped.
++		// Avoid using design tokens in Emotion styles until Emotion is removed.
++		dsTokenFallbacksJs,
+ 		needsEmotionPlugin && emotionPlugin,
+ 		wasmInlinePlugin,
+ 		externalizeAllExceptCssPlugin,
+@@ -1408,12 +1434,13 @@ async function compileStyles( packageName ) {
+ 						embedded: true,
+ 						...getSassOptions( packageDir ),
+ 						async transform( source ) {
+-							// Process with autoprefixer for LTR version
+-							const ltrResult = await postcss( [
+-								autoprefixer( { grid: true } ),
+-							] ).process( source, { from: undefined } );
++							const ltrResult = await postcss(
++								[
++									dsTokenFallbacks,
++									autoprefixer( { grid: true } ),
++								].filter( Boolean )
++							).process( source, { from: undefined } );
+ 
+-							// Process with rtlcss for RTL version
+ 							const rtlResult = await postcss( [
+ 								rtlcss(),
+ 							] ).process( ltrResult.css, { from: undefined } );
+diff --git a/storybook/main.ts b/storybook/main.ts
+index 9568efc2a8828b..e1cf8b226677e6 100644
+--- a/storybook/main.ts
++++ b/storybook/main.ts
+@@ -6,6 +6,8 @@ import {
+ } from 'vite';
+ import react from '@vitejs/plugin-react';
+ import type { StorybookConfig } from '@storybook/react-vite';
++import dsTokenFallbacks from '@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks';
++import dsTokenFallbacksJs from '@wordpress/theme/vite-plugins/vite-ds-token-fallbacks';
+ 
+ const { NODE_ENV = 'development' } = process.env;
+ 
+@@ -77,6 +79,7 @@ const config: StorybookConfig = {
+ 	viteFinal: async ( viteConfig ) => {
+ 		return mergeConfig( viteConfig, {
+ 			plugins: [
++				dsTokenFallbacksJs(),
+ 				react( {
+ 					jsxImportSource: '@emotion/react',
+ 					babel: {
+@@ -174,6 +177,13 @@ const config: StorybookConfig = {
+ 					NODE_ENV === 'development'
+ 				),
+ 			},
++			css: {
++				postcss: {
++					// Vite bundles its own PostCSS, creating a deep
++					// type incompatibility with the top-level PostCSS.
++					plugins: [ dsTokenFallbacks as any ],
++				},
++			},
+ 			optimizeDeps: {
+ 				esbuildOptions: {
+ 					loader: {
+diff --git a/storybook/package.json b/storybook/package.json
+index b4e7a07b3cb876..f2d434e295580a 100644
+--- a/storybook/package.json
++++ b/storybook/package.json
+@@ -24,6 +24,7 @@
+ 		"@storybook/addon-docs": "^10.1.11",
+ 		"@storybook/icons": "^2.0.1",
+ 		"@storybook/react-vite": "^10.1.11",
++		"@wordpress/theme": "file:../packages/theme",
+ 		"storybook": "^10.1.11",
+ 		"storybook-addon-tag-badges": "^3.0.4",
+ 		"terser": "^5.37.0"

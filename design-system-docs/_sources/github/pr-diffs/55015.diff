@@ -1,0 +1,118 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index addb5a4d9ec327..d451e638836dc4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ -   Allow using CSS level 4 viewport-relative units ([54415](https://github.com/WordPress/gutenberg/pull/54415))
+ -   `ToolsPanel`: do not apply the `className` to prop to `ToolsPanelItem` components when rendered as placeholders ([#55207](https://github.com/WordPress/gutenberg/pull/55207)).
+ -   `ColorPalette`/`ToggleGroupControl/ToggleGroupControlOptionBase`: add `type="button"` attribute to native `<button>`s ([#55125](https://github.com/WordPress/gutenberg/pull/55125)).
++-   `CustomSelectControl`: Add `itemToString` prop to allow passing custom react components instead of strings as dropdown options ([#55015](https://github.com/WordPress/gutenberg/pull/55015)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/custom-select-control/README.md b/packages/components/src/custom-select-control/README.md
+index 696fca338e465c..311cf44a5d6591 100644
+--- a/packages/components/src/custom-select-control/README.md
++++ b/packages/components/src/custom-select-control/README.md
+@@ -103,7 +103,7 @@ Pass in a description that will be shown to screen readers associated with the s
+ 
+ The options that can be chosen from.
+ 
+--   Type: `Array<{ key: String, name: String, style: ?{}, className: ?String, ...rest }>`
++-   Type: `Array<{ key: String, name: String | ReactNode, style: ?{}, className: ?String, ...rest }>`
+ -   Required: Yes
+ 
+ #### onChange
+@@ -156,6 +156,13 @@ A handler for onBlur events.
+ -   Type: `Function`
+ -   Required: No
+ 
++#### itemToString
++
++Function called with a given dropdown option. The return value will be used by aria live to inform users of updated selections and for selection/highlight by character keys
++
++-   Type: `Function`
++-   Required: No
++
+ ## Related components
+ 
+ -   Like this component, but implemented using a native `<select>` for when custom styling is not necessary, the `SelectControl` component.
+diff --git a/packages/components/src/custom-select-control/index.js b/packages/components/src/custom-select-control/index.js
+index ed9e73e525e449..e81ac457c66be6 100644
+--- a/packages/components/src/custom-select-control/index.js
++++ b/packages/components/src/custom-select-control/index.js
+@@ -23,7 +23,7 @@ import { InputBaseWithBackCompatMinWidth } from './styles';
+ import { StyledLabel } from '../base-control/styles/base-control-styles';
+ import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+ 
+-const itemToString = ( item ) => item?.name;
++const itemToStringDefault = ( item ) => item?.name;
+ // This is needed so that in Windows, where
+ // the menu does not necessarily open on
+ // key up/down, you can still switch between
+@@ -73,6 +73,7 @@ export default function CustomSelectControl( props ) {
+ 		hideLabelFromVision,
+ 		label,
+ 		describedBy,
++		itemToString = itemToStringDefault,
+ 		options: items,
+ 		onChange: onSelectedItemChange,
+ 		/** @type {import('../select-control/types').SelectControlProps.size} */
+@@ -211,7 +212,7 @@ export default function CustomSelectControl( props ) {
+ 						describedBy: getDescribedBy(),
+ 					} ) }
+ 				>
+-					{ itemToString( selectedItem ) }
++					{ selectedItem?.name }
+ 					{ __experimentalShowSelectedHint &&
+ 						selectedItem.__experimentalHint && (
+ 							<span className="components-custom-select-control__hint">
+diff --git a/packages/components/src/custom-select-control/stories/index.story.js b/packages/components/src/custom-select-control/stories/index.story.js
+index d8fea5c7baa003..379554e410912b 100644
+--- a/packages/components/src/custom-select-control/stories/index.story.js
++++ b/packages/components/src/custom-select-control/stories/index.story.js
+@@ -47,6 +47,44 @@ Default.args = {
+ 	],
+ };
+ 
++export const WithCustomOptions = CustomSelectControl.bind( {} );
++WithCustomOptions.args = {
++	...Default.args,
++	options: [
++		{
++			key: 'thumbnail',
++			name: (
++				<div>
++					<span className="title">Thumbnail </span>
++					<span clasName="size">50px </span>
++				</div>
++			),
++			selectionMessage: 'Thumbnail',
++		},
++		{
++			key: 'medium',
++			name: (
++				<div>
++					<span className="title">Medium </span>
++					<span clasName="size">100px</span>
++				</div>
++			),
++			selectionMessage: 'Medium',
++		},
++		{
++			key: 'large',
++			name: (
++				<div>
++					<span className="title">Large </span>
++					<span clasName="size">200px </span>
++				</div>
++			),
++			selectionMessage: 'Large',
++		},
++	],
++	itemToString: ( item ) => item.selectionMessage,
++};
++
+ export const WithLongLabels = CustomSelectControl.bind( {} );
+ WithLongLabels.args = {
+ 	...Default.args,

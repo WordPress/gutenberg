@@ -1,0 +1,67 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index bac27e61ad0e57..106683cf90b4fe 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -40,6 +40,7 @@
+ -   `RadioControl`: Refactor away from `_.isEmpty()` ([#42468](https://github.com/WordPress/gutenberg/pull/42468)).
+ -   `SelectControl`: Refactor away from `_.isEmpty()` ([#42468](https://github.com/WordPress/gutenberg/pull/42468)).
+ -   `ComboboxControl`: Replace `keyboardEvent.keyCode` with `keyboardEvent.code`([#42569](https://github.com/WordPress/gutenberg/pull/42569)).
++-   `ComboboxControl`: Add support for uncontrolled mode ([#42752](https://github.com/WordPress/gutenberg/pull/42752)).
+ 
+ ## 19.15.0 (2022-07-13)
+ 
+diff --git a/packages/components/src/combobox-control/index.js b/packages/components/src/combobox-control/index.js
+index 2440296865c746..f5f69bb0832dbb 100644
+--- a/packages/components/src/combobox-control/index.js
++++ b/packages/components/src/combobox-control/index.js
+@@ -29,6 +29,7 @@ import BaseControl from '../base-control';
+ import Button from '../button';
+ import { FlexBlock, FlexItem } from '../flex';
+ import withFocusOutside from '../higher-order/with-focus-outside';
++import { useControlledValue } from '../utils/hooks';
+ 
+ const noop = () => {};
+ 
+@@ -46,10 +47,10 @@ const DetectOutside = withFocusOutside(
+ 
+ function ComboboxControl( {
+ 	__next36pxDefaultSize,
+-	value,
++	value: valueProp,
+ 	label,
+ 	options,
+-	onChange,
++	onChange: onChangeProp,
+ 	onFilterValueChange = noop,
+ 	hideLabelFromVision,
+ 	help,
+@@ -59,6 +60,11 @@ function ComboboxControl( {
+ 		selected: __( 'Item selected.' ),
+ 	},
+ } ) {
++	const [ value, setValue ] = useControlledValue( {
++		value: valueProp,
++		onChange: onChangeProp,
++	} );
++
+ 	const currentOption = options.find( ( option ) => option.value === value );
+ 	const currentLabel = currentOption?.label ?? '';
+ 	// Use a custom prefix when generating the `instanceId` to avoid having
+@@ -92,7 +98,7 @@ function ComboboxControl( {
+ 	}, [ inputValue, options, value ] );
+ 
+ 	const onSuggestionSelected = ( newSelectedSuggestion ) => {
+-		onChange( newSelectedSuggestion.value );
++		setValue( newSelectedSuggestion.value );
+ 		speak( messages.selected, 'assertive' );
+ 		setSelectedSuggestion( newSelectedSuggestion );
+ 		setInputValue( '' );
+@@ -172,7 +178,7 @@ function ComboboxControl( {
+ 	};
+ 
+ 	const handleOnReset = () => {
+-		onChange( null );
++		setValue( null );
+ 		inputContainer.current.focus();
+ 	};
+ 

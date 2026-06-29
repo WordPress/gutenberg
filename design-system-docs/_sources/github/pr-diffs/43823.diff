@@ -1,0 +1,1584 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2992a438e61fb8..a7f2bcc429afb8 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -43,6 +43,8 @@
+ -   `NavigatorButton`: updated to satisfy `react/exhaustive-deps` eslint rule ([#42051](https://github.com/WordPress/gutenberg/pull/42051))
+ -   `TabPanel`: Refactor away from `_.partial()` ([#43895](https://github.com/WordPress/gutenberg/pull/43895/)).
+ -   `Panel`: Refactor tests to `@testing-library/react` ([#43896](https://github.com/WordPress/gutenberg/pull/43896)).
++-   `Popover`: refactor to TypeScript ([#43823](https://github.com/WordPress/gutenberg/pull/43823/)).
++-   `BorderControl` and `BorderBoxControl`: replace temporary types with `Popover`'s types ([#43823](https://github.com/WordPress/gutenberg/pull/43823/)).
+ 
+ ## 20.0.0 (2022-08-24)
+ 
+diff --git a/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx b/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
+index 777a36bb22a769..d5cf6e2ca33707 100644
+--- a/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
+@@ -1,3 +1,7 @@
++/**
++ * External dependencies
++ */
++import type { ComponentProps } from 'react';
+ /**
+  * WordPress dependencies
+  */
+@@ -38,7 +42,9 @@ const BorderBoxControlSplitControls = (
+ 	} = useBorderBoxControlSplitControls( props );
+ 	const containerRef = useRef();
+ 	const mergedRef = useMergeRefs( [ containerRef, forwardedRef ] );
+-	const popoverProps = popoverPlacement
++	const popoverProps: ComponentProps<
++		typeof BorderControl
++	>[ '__unstablePopoverProps' ] = popoverPlacement
+ 		? {
+ 				placement: popoverPlacement,
+ 				offset: popoverOffset,
+diff --git a/packages/components/src/border-box-control/border-box-control/component.tsx b/packages/components/src/border-box-control/border-box-control/component.tsx
+index a1e66d4c466874..19814d8cef7209 100644
+--- a/packages/components/src/border-box-control/border-box-control/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control/component.tsx
+@@ -1,3 +1,8 @@
++/**
++ * External dependencies
++ */
++import type { ComponentProps } from 'react';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -64,7 +69,9 @@ const BorderBoxControl = (
+ 	} = useBorderBoxControl( props );
+ 	const containerRef = useRef();
+ 	const mergedRef = useMergeRefs( [ containerRef, forwardedRef ] );
+-	const popoverProps = popoverPlacement
++	const popoverProps: ComponentProps<
++		typeof BorderControl
++	>[ '__unstablePopoverProps' ] = popoverPlacement
+ 		? {
+ 				placement: popoverPlacement,
+ 				offset: popoverOffset,
+diff --git a/packages/components/src/border-box-control/types.ts b/packages/components/src/border-box-control/types.ts
+index 08962f4dac291f..d852a5bd1e40ad 100644
+--- a/packages/components/src/border-box-control/types.ts
++++ b/packages/components/src/border-box-control/types.ts
+@@ -2,6 +2,7 @@
+  * Internal dependencies
+  */
+ import type { Border, ColorProps, LabelProps } from '../border-control/types';
++import type { PopoverProps } from '../popover/types';
+ 
+ export type Borders = {
+ 	top?: Border;
+@@ -29,11 +30,11 @@ export type BorderBoxControlProps = ColorProps &
+ 		/**
+ 		 * The position of the color popovers compared to the control wrapper.
+ 		 */
+-		popoverPlacement?: string;
++		popoverPlacement?: PopoverProps[ 'placement' ];
+ 		/**
+ 		 * The space between the popover and the control wrapper.
+ 		 */
+-		popoverOffset?: number;
++		popoverOffset?: PopoverProps[ 'offset' ];
+ 		/**
+ 		 * An object representing the current border configuration.
+ 		 *
+@@ -103,11 +104,11 @@ export type SplitControlsProps = ColorProps & {
+ 	/**
+ 	 * The position of the color popovers compared to the control wrapper.
+ 	 */
+-	popoverPlacement?: string;
++	popoverPlacement?: PopoverProps[ 'placement' ];
+ 	/**
+ 	 * The space between the popover and the control wrapper.
+ 	 */
+-	popoverOffset?: number;
++	popoverOffset?: PopoverProps[ 'offset' ];
+ 	/**
+ 	 * An object representing the current border configuration. It contains
+ 	 * properties for each side, with each side an object reflecting the border
+diff --git a/packages/components/src/border-control/border-control-dropdown/component.tsx b/packages/components/src/border-control/border-control-dropdown/component.tsx
+index 1886d1a73ce923..bfe442f4c65b29 100644
+--- a/packages/components/src/border-control/border-control-dropdown/component.tsx
++++ b/packages/components/src/border-control/border-control-dropdown/component.tsx
+@@ -24,13 +24,7 @@ import { useBorderControlDropdown } from './hook';
+ import { StyledLabel } from '../../base-control/styles/base-control-styles';
+ import DropdownContentWrapper from '../../dropdown/dropdown-content-wrapper';
+ 
+-import type {
+-	Color,
+-	ColorOrigin,
+-	Colors,
+-	DropdownProps,
+-	PopoverProps,
+-} from '../types';
++import type { Color, ColorOrigin, Colors, DropdownProps } from '../types';
+ 
+ const noop = () => undefined;
+ const getColorObject = (
+@@ -188,7 +182,8 @@ const BorderControlDropdown = (
+ 		</Button>
+ 	);
+ 
+-	const renderContent = ( { onClose }: PopoverProps ) => (
++	// TODO: update types once Dropdown component is refactored to TypeScript.
++	const renderContent = ( { onClose }: { onClose: () => void } ) => (
+ 		<>
+ 			<DropdownContentWrapper paddingSize="medium">
+ 				<VStack className={ popoverControlsClassName } spacing={ 6 }>
+diff --git a/packages/components/src/border-control/types.ts b/packages/components/src/border-control/types.ts
+index 0605b2e40fe413..20cef1e4f6be4f 100644
+--- a/packages/components/src/border-control/types.ts
++++ b/packages/components/src/border-control/types.ts
+@@ -3,6 +3,11 @@
+  */
+ import type { CSSProperties } from 'react';
+ 
++/**
++ * Internal dependencies
++ */
++import type { PopoverProps } from '../popover/types';
++
+ export type Border = {
+ 	color?: CSSProperties[ 'borderColor' ];
+ 	style?: CSSProperties[ 'borderStyle' ];
+@@ -83,7 +88,7 @@ export type BorderControlProps = ColorProps &
+ 		/**
+ 		 * An internal prop used to control the visibility of the dropdown.
+ 		 */
+-		__unstablePopoverProps?: Record< string, unknown >;
++		__unstablePopoverProps?: Omit< PopoverProps, 'children' >;
+ 		/**
+ 		 * If opted into, sanitizing the border means that if no width or color
+ 		 * have been selected, the border style is also cleared and `undefined`
+@@ -132,7 +137,7 @@ export type DropdownProps = ColorProps & {
+ 	/**
+ 	 * An internal prop used to control the visibility of the dropdown.
+ 	 */
+-	__unstablePopoverProps?: Record< string, unknown >;
++	__unstablePopoverProps?: Omit< PopoverProps, 'children' >;
+ 	/**
+ 	 * This controls whether to render border style options.
+ 	 *
+@@ -176,10 +181,3 @@ export type StylePickerProps = LabelProps & {
+ 	 */
+ 	value?: string;
+ };
+-
+-export type PopoverProps = {
+-	/**
+-	 * Callback function to invoke when closing the border dropdown's popover.
+-	 */
+-	onClose: () => void;
+-};
+diff --git a/packages/components/src/dropdown/README.md b/packages/components/src/dropdown/README.md
+index f9462dc18c3c03..c3ce8f42818fbe 100644
+--- a/packages/components/src/dropdown/README.md
++++ b/packages/components/src/dropdown/README.md
+@@ -1,6 +1,6 @@
+ # Dropdown
+ 
+-Dropdown is a React component to render a button that opens a floating content modal when clicked. 
++Dropdown is a React component to render a button that opens a floating content modal when clicked.
+ 
+ This component takes care of updating the state of the dropdown menu (opened/closed), handles closing the menu when clicking outside and uses render props to render the button and the content.
+ 
+@@ -91,11 +91,13 @@ Set this to customize the text that is shown in the dropdown's header when it is
+ 
+ ### focusOnMount
+ 
+-By default, the _first tabbable element_ in the popover will receive focus when it mounts. This is the same as setting `focusOnMount` to `"firstElement"`. If you want to focus the container instead, you can set `focusOnMount` to `"container"`.
++By default, the _first tabbable element_ in the popover will receive focus when it mounts. This is the same as setting this prop to `"firstElement"`.
+ 
+-Set this prop to `false` to disable focus switching entirely. This should only be set when an appropriately accessible substitute behavior exists.
++Specifying a `true` value will focus the container instead.
+ 
+--   Type: `String` or `Boolean`
++Specifying a `false` value disables the focus handling entirely (this should only be done when an appropriately accessible substitute behavior exists).
++
++-   Type: `'firstElement' | boolean`
+ -   Required: No
+ -   Default: `"firstElement"`
+ 
+diff --git a/packages/components/src/dropdown/stories/index.js b/packages/components/src/dropdown/stories/index.js
+index b58bce8b06322f..191b03bb07d8be 100644
+--- a/packages/components/src/dropdown/stories/index.js
++++ b/packages/components/src/dropdown/stories/index.js
+@@ -14,7 +14,7 @@ export default {
+ 		focusOnMount: {
+ 			control: {
+ 				type: 'radio',
+-				options: [ 'firstElement', 'container', false ],
++				options: [ 'firstElement', true, false ],
+ 			},
+ 		},
+ 		headerTitle: { control: { type: 'text' } },
+diff --git a/packages/components/src/popover/README.md b/packages/components/src/popover/README.md
+index b200e213846fff..1778690a08b146 100644
+--- a/packages/components/src/popover/README.md
++++ b/packages/components/src/popover/README.md
+@@ -1,6 +1,8 @@
+ # Popover
+ 
+-Popover is a React component to render a floating content modal. It is similar in purpose to a tooltip, but renders content of any sort, not only simple text. It anchors itself to its parent node, optionally by a specified direction. If the popover exceeds the bounds of the page in the direction it opens, its position will be flipped automatically.
++`Popover` renders its content in a floating modal. If no explicit anchor is passed via props, it anchors to its parent element by default.
++
++The behavior of the popover when it exceeds the viewport's edges can be controlled via its props.
+ 
+ ## Usage
+ 
+@@ -49,130 +51,135 @@ render(
+ 
+ The component accepts the following props. Props not included in this set will be applied to the element wrapping Popover content.
+ 
+-### focusOnMount
+-
+-By default, the _first tabblable element_ in the popover will receive focus when it mounts. This is the same as setting `focusOnMount` to `"firstElement"`. If you want to focus the container instead, you can set `focusOnMount` to `"container"`.
++### `anchorRect`: `DomRectWithOwnerDocument`
+ 
+-Set this prop to `false` to disable focus changing entirely. This should only be set when an appropriately accessible substitute behavior exists.
++An object extending a `DOMRect` with an additional optional `ownerDocument` property, used to specify a fixed popover position.
+ 
+--   Type: `String` or `Boolean`
+ -   Required: No
+--   Default: `"firstElement"`
+ 
+-### placement
++### `anchorRef`: `Element | PopoverAnchorRefReference | PopoverAnchorRefTopBottom | Range`
++
++Used to specify a fixed popover position. It can be an `Element`, a React reference to an `element`, an object with a `top` and a `bottom` properties (both pointing to elements), or a `range`.
+ 
+-The direction in which the popover should open relative to its parent node or anchor node.
++-   Required: No
+ 
+-The available base placements are 'top', 'right', 'bottom', 'left'.
++### `animate`: `boolean`
+ 
+-Each of these base placements has an alignment in the form -start and -end. For example, 'right-start', or 'bottom-end'. These allow you to align the tooltip to the edges of the button, rather than centering it.
++Whether the popover should animate when opening.
+ 
+--   Type: `String`
+ -   Required: No
+--   Default: `"bottom-start"`
++-   Default: `true`
++
++### `children`: `ReactNode`
+ 
+-### flip
++The `children` elements rendered as the popover's content.
+ 
+-Specifies whether the `Popover` should flip across its axis if there isn't space for it in the normal placement.
++-   Required: Yes
+ 
+-When the using a 'top' placement, the `Popover` will switch to a 'bottom' placement. When using a 'left' placement, the popover will switch to a 'right' placement.
++### `expandOnMobile`: `boolean`
+ 
+-The `Popover` will retain its alignment of 'start' or 'end' when flipping.
++Show the popover fullscreen on mobile viewports.
+ 
+--   Type: `Boolean`
+ -   Required: No
+--   Default: `true`
+ 
+-### resize
++### `flip`: `boolean`
++
++Specifies whether the popover should flip across its axis if there isn't space for it in the normal placement.
++
++When the using a 'top' placement, the popover will switch to a 'bottom' placement. When using a 'left' placement, the popover will switch to a `right' placement.
+ 
+-Adjusts the height of the `Popover` to prevent overflow.
++The popover will retain its alignment of 'start' or 'end' when flipping.
+ 
+--   Type: `Boolean`
+ -   Required: No
+ -   Default: `true`
+ 
+-### shift
++### `focusOnMount`: `'firstElement' | boolean`
+ 
+-Enables the `Popover` to shift in order to stay in view when meeting the viewport edges.
++By default, the _first tabbable element_ in the popover will receive focus when it mounts. This is the same as setting this prop to `"firstElement"`.
++
++Specifying a `true` value will focus the container instead.
++
++Specifying a `false` value disables the focus handling entirely (this should only be done when an appropriately accessible substitute behavior exists).
+ 
+--   Type: `Boolean`
+ -   Required: No
+--   Default: `false`
++-   Default: `"firstElement"`
++
++### `onFocusOutside`: `( event: SyntheticEvent ) => void`
+ 
+-### offset
++A callback invoked when the focus leaves the opened popover. This should only be provided in advanced use-cases when a popover should close under specific circumstances (for example, if the new `document.activeElement` is content of or otherwise controlling popover visibility).
+ 
+-The distance (in pixels) between the anchor and popover.
++When not provided, the `onClose` callback will be called instead.
+ 
+--   Type: `Number`
+ -   Required: No
+ 
+-### children
++### `getAnchorRect`: `( fallbackReferenceElement: Element | null ) => DomRectWithOwnerDocument`
+ 
+-The content to be displayed within the popover.
++A function returning the same value as the one expected by the `anchorRect` prop, used to specify a dynamic popover position.
+ 
+--   Type: `Element`
+--   Required: Yes
++-   Required: No
+ 
+-### className
++### `headerTitle`: `string`
+ 
+-An optional additional class name to apply to the rendered popover.
++Used to customize the header text shown when the popover is toggled to fullscreen on mobile viewports (see the `expandOnMobile` prop).
+ 
+--   Type: `String`
+ -   Required: No
+ 
+-### onClose
++### `isAlternate`: `boolean`
+ 
+-A callback invoked when the popover should be closed.
++Used to enable a different visual style for the popover.
+ 
+--   Type: `Function`
+ -   Required: No
+ 
+-### onFocusOutside
+-
+-A callback invoked when the focus leaves the opened popover. This should only be provided in advanced use-cases when a Popover should close under specific circumstances; for example, if the new `document.activeElement` is content of or otherwise controlling Popover visibility.
++### `noArrow`: `boolean`
+ 
+-Defaults to `onClose` when not provided.
++Used to show/hide the arrow that points at the popover's anchor.
+ 
+--   Type: `Function`
+ -   Required: No
++-   Default: `true`
+ 
+-### expandOnMobile
++### `offset`: `number`
+ 
+-Opt-in prop to show popovers fullscreen on mobile, pass `false` in this prop to avoid this behavior.
++The distance (in px) between the anchor and the popover.
+ 
+--   Type: `Boolean`
+ -   Required: No
+--   Default: `false`
+ 
+-### headerTitle
++### `onClose`: `() => void`
+ 
+-Set this to customize the text that is shown in popover's header when it is fullscreen on mobile.
++A callback invoked when the popover should be closed.
+ 
+--   Type: `String`
+ -   Required: No
+ 
+-### noArrow
++### `placement`: `'top' | 'top-start' | 'top-end' | 'right' | 'right-start' | 'right-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end'`
+ 
+-Set this to hide the arrow which visually indicates what the popover is anchored to. Note that the arrow will not display if `position` is set to `"middle center"`.
++Used to specify the popover's position with respect to its anchor.
+ 
+--   Type: `Boolean`
+ -   Required: No
+--   Default: `true`
++-   Default: `"bottom-start"`
+ 
+-### anchorRect
++### `position`: `[yAxis] [xAxis] [optionalCorner]`
++
++_Note: use the `placement` prop instead when possible._
++
++Legacy way to specify the popover's position with respect to its anchor.
++
++Possible values:
++
++- `yAxis`: `'top' | 'middle' | 'bottom'`
++- `xAxis`: `'left' | 'center' | 'right'`
++- `corner`: `'top' | 'right' | 'bottom' | 'left'`
+ 
+-A custom `DOMRect` object at which to position the popover. `anchorRect` is used when the position (custom `DOMRect` object) of the popover needs to be fixed at one location all the time.
+ 
+--   Type: `DOMRect`
+ -   Required: No
+ 
+-### getAnchorRect
++### `resize`: `boolean`
+ 
+-A callback function which is used to override the anchor value computation algorithm. `anchorRect` will take precedence over this prop, if both are passed together.
++Adjusts the size of the popover to prevent its contents from going out of view when meeting the viewport edges.
++
++-   Required: No
++-   Default: `true`
+ 
+-If you need the `DOMRect` object i.e., the position of popover to be calculated on every time, the popover re-renders, then use `getAnchorRect`.
++### `range`: `unknown`
+ 
+-`getAnchorRect` callback function receives a reference to the popover anchor element as a function parameter and it should return a `DOMRect` object. Noting that `getAnchorRect` can be called with `null`.
++_Note: this prop is deprecated and has no effect on the component._
+ 
+--   Type: `Function`
+ -   Required: No
+diff --git a/packages/components/src/popover/index.js b/packages/components/src/popover/index.tsx
+similarity index 69%
+rename from packages/components/src/popover/index.js
+rename to packages/components/src/popover/index.tsx
+index 16d47aeddb6016..a566e259a84f52 100644
+--- a/packages/components/src/popover/index.js
++++ b/packages/components/src/popover/index.tsx
+@@ -1,7 +1,7 @@
+-// @ts-nocheck
+ /**
+  * External dependencies
+  */
++import type { ForwardedRef, SyntheticEvent, RefCallback } from 'react';
+ import classnames from 'classnames';
+ import {
+ 	useFloating,
+@@ -12,9 +12,15 @@ import {
+ 	offset as offsetMiddleware,
+ 	limitShift,
+ 	size,
++	Middleware,
+ } from '@floating-ui/react-dom';
+ // eslint-disable-next-line no-restricted-imports
+-import { motion, useReducedMotion } from 'framer-motion';
++import {
++	motion,
++	useReducedMotion,
++	HTMLMotionProps,
++	MotionProps,
++} from 'framer-motion';
+ 
+ /**
+  * WordPress dependencies
+@@ -52,6 +58,13 @@ import {
+ 	getReferenceOwnerDocument,
+ 	getReferenceElement,
+ } from './utils';
++import type { WordPressComponentProps } from '../ui/context';
++import type {
++	PopoverProps,
++	AnimatedWrapperProps,
++	PopoverAnchorRefReference,
++	PopoverAnchorRefTopBottom,
++} from './types';
+ 
+ /**
+  * Name of slot in which popover should fill.
+@@ -64,9 +77,8 @@ const SLOT_NAME = 'Popover';
+ // color and bordered in such a way to create an arrow-like effect.
+ // Keeping the SVG's viewbox squared simplify the arrow positioning
+ // calculations.
+-const ArrowTriangle = ( props ) => (
++const ArrowTriangle = () => (
+ 	<SVG
+-		{ ...props }
+ 		xmlns="http://www.w3.org/2000/svg"
+ 		viewBox={ `0 0 100 100` }
+ 		className="components-popover__triangle"
+@@ -84,15 +96,15 @@ const ArrowTriangle = ( props ) => (
+ 	</SVG>
+ );
+ 
+-const MaybeAnimatedWrapper = forwardRef(
++const AnimatedWrapper = forwardRef(
+ 	(
+ 		{
+ 			style: receivedInlineStyles,
+ 			placement,
+ 			shouldAnimate = false,
+ 			...props
+-		},
+-		forwardedRef
++		}: HTMLMotionProps< 'div' > & AnimatedWrapperProps,
++		forwardedRef: ForwardedRef< any >
+ 	) => {
+ 		// When animating, animate only once (i.e. when the popover is opened), and
+ 		// do not animate on subsequent prop changes (as it conflicts with
+@@ -110,27 +122,27 @@ const MaybeAnimatedWrapper = forwardRef(
+ 			[]
+ 		);
+ 
+-		if ( shouldAnimate && ! shouldReduceMotion ) {
+-			return (
+-				<motion.div
+-					style={ {
+-						...motionInlineStyles,
+-						...receivedInlineStyles,
+-					} }
+-					{ ...otherMotionProps }
+-					onAnimationComplete={ onAnimationComplete }
+-					animate={
+-						hasAnimatedOnce ? false : otherMotionProps.animate
+-					}
+-					{ ...props }
+-					ref={ forwardedRef }
+-				/>
+-			);
+-		}
++		const computedAnimationProps: HTMLMotionProps< 'div' > =
++			shouldAnimate && ! shouldReduceMotion
++				? {
++						style: {
++							...motionInlineStyles,
++							...receivedInlineStyles,
++						},
++						...otherMotionProps,
++						onAnimationComplete,
++						animate: hasAnimatedOnce
++							? false
++							: otherMotionProps.animate,
++				  }
++				: {
++						animate: false,
++						style: receivedInlineStyles,
++				  };
+ 
+ 		return (
+-			<div
+-				style={ receivedInlineStyles }
++			<motion.div
++				{ ...computedAnimationProps }
+ 				{ ...props }
+ 				ref={ forwardedRef }
+ 			/>
+@@ -138,10 +150,19 @@ const MaybeAnimatedWrapper = forwardRef(
+ 	}
+ );
+ 
+-const slotNameContext = createContext();
+-
+-const Popover = (
+-	{
++const slotNameContext = createContext< string | undefined >( undefined );
++
++const UnforwardedPopover = (
++	props: Omit<
++		WordPressComponentProps< PopoverProps, 'div', false >,
++		// To avoid overlaps between the standard HTML attributes and the props
++		// expected by `framer-motion`, omit all framer motion props from popover
++		// props (except for `animate`, which is re-defined in `PopoverProps`).
++		keyof Omit< MotionProps, 'animate' >
++	>,
++	forwardedRef: ForwardedRef< any >
++) => {
++	const {
+ 		range,
+ 		animate = true,
+ 		headerTitle,
+@@ -166,9 +187,8 @@ const Popover = (
+ 		__unstableShift,
+ 		__unstableForcePosition,
+ 		...contentProps
+-	},
+-	forwardedRef
+-) => {
++	} = props;
++
+ 	if ( range ) {
+ 		deprecated( 'range prop in Popover component', {
+ 			since: '6.1',
+@@ -176,6 +196,8 @@ const Popover = (
+ 		} );
+ 	}
+ 
++	let computedFlipProp = flip;
++	let computedResizeProp = resize;
+ 	if ( __unstableForcePosition !== undefined ) {
+ 		deprecated( '__unstableForcePosition prop in Popover component', {
+ 			since: '6.1',
+@@ -185,8 +207,8 @@ const Popover = (
+ 
+ 		// Back-compat, set the `flip` and `resize` props
+ 		// to `false` to replicate `__unstableForcePosition`.
+-		flip = ! __unstableForcePosition;
+-		resize = ! __unstableForcePosition;
++		computedFlipProp = ! __unstableForcePosition;
++		computedResizeProp = ! __unstableForcePosition;
+ 	}
+ 
+ 	let shouldShift = shift;
+@@ -204,12 +226,17 @@ const Popover = (
+ 	const arrowRef = useRef( null );
+ 
+ 	const [ fallbackReferenceElement, setFallbackReferenceElement ] =
+-		useState();
+-	const [ referenceOwnerDocument, setReferenceOwnerDocument ] = useState();
++		useState< HTMLSpanElement | null >( null );
++	const [ referenceOwnerDocument, setReferenceOwnerDocument ] = useState<
++		Document | undefined
++	>();
+ 
+-	const anchorRefFallback = useCallback( ( node ) => {
+-		setFallbackReferenceElement( node );
+-	}, [] );
++	const anchorRefFallback: RefCallback< HTMLSpanElement > = useCallback(
++		( node ) => {
++			setFallbackReferenceElement( node );
++		},
++		[]
++	);
+ 
+ 	const isMobileViewport = useViewportMatch( 'medium', '<' );
+ 	const isExpanded = expandOnMobile && isMobileViewport;
+@@ -261,15 +288,20 @@ const Popover = (
+ 				crossAxis: frameOffsetRef.current[ crossAxis ],
+ 			};
+ 		} ),
+-		flip ? flipMiddleware() : undefined,
+-		resize
++		computedFlipProp ? flipMiddleware() : undefined,
++		computedResizeProp
+ 			? size( {
+ 					apply( sizeProps ) {
+-						const { availableHeight } = sizeProps;
+-						if ( ! refs.floating.current ) return;
++						const { firstElementChild } =
++							refs.floating.current ?? {};
++
++						// Only HTMLElement instances have the `style` property.
++						if ( ! ( firstElementChild instanceof HTMLElement ) )
++							return;
++
+ 						// Reduce the height of the popover to the available space.
+-						Object.assign( refs.floating.current.firstChild.style, {
+-							maxHeight: `${ availableHeight }px`,
++						Object.assign( firstElementChild.style, {
++							maxHeight: `${ sizeProps.availableHeight }px`,
+ 							overflow: 'auto',
+ 						} );
+ 					},
+@@ -283,14 +315,16 @@ const Popover = (
+ 			  } )
+ 			: undefined,
+ 		arrow( { element: arrowRef } ),
+-	].filter( ( m ) => !! m );
++	].filter(
++		( m: Middleware | undefined ): m is Middleware => m !== undefined
++	);
+ 	const slotName = useContext( slotNameContext ) || __unstableSlotName;
+ 	const slot = useSlot( slotName );
+ 
+ 	let onDialogClose;
+ 
+ 	if ( onClose || onFocusOutside ) {
+-		onDialogClose = ( type, event ) => {
++		onDialogClose = ( type: string | undefined, event: SyntheticEvent ) => {
+ 			// Ideally the popover should have just a single onClose prop and
+ 			// not three props that potentially do the same thing.
+ 			if ( type === 'focus-outside' && onFocusOutside ) {
+@@ -304,6 +338,7 @@ const Popover = (
+ 	const [ dialogRef, dialogProps ] = useDialog( {
+ 		focusOnMount,
+ 		__unstableOnClose: onDialogClose,
++		// @ts-expect-error The __unstableOnClose property needs to be deprecated first (see https://github.com/WordPress/gutenberg/pull/27675)
+ 		onClose: onDialogClose,
+ 	} );
+ 
+@@ -321,7 +356,7 @@ const Popover = (
+ 		strategy,
+ 		update,
+ 		placement: computedPlacement,
+-		middlewareData: { arrow: arrowData = {} },
++		middlewareData: { arrow: arrowData },
+ 	} = useFloating( {
+ 		placement: normalizedPlacementFromProps,
+ 		middleware,
+@@ -365,11 +400,11 @@ const Popover = (
+ 
+ 		setReferenceOwnerDocument( resultingReferenceOwnerDoc );
+ 	}, [
+-		anchorRef,
+-		anchorRef?.top,
+-		anchorRef?.bottom,
+-		anchorRef?.startContainer,
+-		anchorRef?.current,
++		anchorRef as Element | undefined,
++		( anchorRef as PopoverAnchorRefTopBottom | undefined )?.top,
++		( anchorRef as PopoverAnchorRefTopBottom | undefined )?.bottom,
++		( anchorRef as Range | undefined )?.startContainer,
++		( anchorRef as PopoverAnchorRefReference )?.current,
+ 		anchorRect,
+ 		getAnchorRect,
+ 		fallbackReferenceElement,
+@@ -380,12 +415,13 @@ const Popover = (
+ 	// we need to manually update the floating's position as the reference's owner
+ 	// document scrolls. Also update the frame offset if the view resizes.
+ 	useLayoutEffect( () => {
+-		const referenceAndFloatingAreInSameDocument =
+-			referenceOwnerDocument === document;
+-		const hasFrameElement =
+-			!! referenceOwnerDocument?.defaultView?.frameElement;
+-
+-		if ( referenceAndFloatingAreInSameDocument || ! hasFrameElement ) {
++		if (
++			// reference and floating are in the same document
++			referenceOwnerDocument === document ||
++			// the reference's document has a view (i.e. window)
++			// and a frame element (ie. it's an iframe)
++			! referenceOwnerDocument?.defaultView?.frameElement
++		) {
+ 			frameOffsetRef.current = undefined;
+ 			return;
+ 		}
+@@ -417,7 +453,7 @@ const Popover = (
+ 	let content = (
+ 		// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
+ 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+-		<MaybeAnimatedWrapper
++		<AnimatedWrapper
+ 			shouldAnimate={ animate && ! isExpanded }
+ 			placement={ computedPlacement }
+ 			className={ classnames( 'components-popover', className, {
+@@ -427,14 +463,14 @@ const Popover = (
+ 			{ ...contentProps }
+ 			ref={ mergedFloatingRef }
+ 			{ ...dialogProps }
+-			tabIndex="-1"
++			tabIndex={ -1 }
+ 			style={
+ 				isExpanded
+ 					? undefined
+ 					: {
+ 							position: strategy,
+-							left: Number.isNaN( x ) ? 0 : x,
+-							top: Number.isNaN( y ) ? 0 : y,
++							left: Number.isNaN( x ) ? 0 : x ?? undefined,
++							top: Number.isNaN( y ) ? 0 : y ?? undefined,
+ 					  }
+ 			}
+ 		>
+@@ -461,24 +497,28 @@ const Popover = (
+ 						`is-${ computedPlacement.split( '-' )[ 0 ] }`,
+ 					].join( ' ' ) }
+ 					style={ {
+-						left: Number.isFinite( arrowData?.x )
+-							? `${
+-									arrowData.x +
+-									( frameOffsetRef.current?.x ?? 0 )
+-							  }px`
+-							: '',
+-						top: Number.isFinite( arrowData?.y )
+-							? `${
+-									arrowData.y +
+-									( frameOffsetRef.current?.y ?? 0 )
+-							  }px`
+-							: '',
++						left:
++							typeof arrowData?.x !== 'undefined' &&
++							Number.isFinite( arrowData.x )
++								? `${
++										arrowData.x +
++										( frameOffsetRef.current?.x ?? 0 )
++								  }px`
++								: '',
++						top:
++							typeof arrowData?.y !== 'undefined' &&
++							Number.isFinite( arrowData.y )
++								? `${
++										arrowData.y +
++										( frameOffsetRef.current?.y ?? 0 )
++								  }px`
++								: '',
+ 					} }
+ 				>
+ 					<ArrowTriangle />
+ 				</div>
+ 			) }
+-		</MaybeAnimatedWrapper>
++		</AnimatedWrapper>
+ 	);
+ 
+ 	if ( slot.ref ) {
+@@ -492,11 +532,38 @@ const Popover = (
+ 	return <span ref={ anchorRefFallback }>{ content }</span>;
+ };
+ 
+-const PopoverContainer = forwardRef( Popover );
++/**
++ * `Popover` renders its content in a floating modal. If no explicit anchor is passed via props, it anchors to its parent element by default.
++ *
++ * ```jsx
++ * import { Button, Popover } from '@wordpress/components';
++ * import { useState } from '@wordpress/element';
++ *
++ * const MyPopover = () => {
++ * 	const [ isVisible, setIsVisible ] = useState( false );
++ * 	const toggleVisible = () => {
++ * 		setIsVisible( ( state ) => ! state );
++ * 	};
++ *
++ * 	return (
++ * 		<Button variant="secondary" onClick={ toggleVisible }>
++ * 			Toggle Popover!
++ * 			{ isVisible && <Popover>Popover is toggled!</Popover> }
++ * 		</Button>
++ * 	);
++ * };
++ * ```
++ *
++ */
++export const Popover = forwardRef( UnforwardedPopover );
+ 
+-function PopoverSlot( { name = SLOT_NAME }, ref ) {
++function PopoverSlot(
++	{ name = SLOT_NAME }: { name?: string },
++	ref: ForwardedRef< any >
++) {
+ 	return (
+ 		<Slot
++			// @ts-expect-error Need to type `SlotFill`
+ 			bubblesVirtually
+ 			name={ name }
+ 			className="popover-slot"
+@@ -505,7 +572,9 @@ function PopoverSlot( { name = SLOT_NAME }, ref ) {
+ 	);
+ }
+ 
+-PopoverContainer.Slot = forwardRef( PopoverSlot );
+-PopoverContainer.__unstableSlotNameProvider = slotNameContext.Provider;
++// @ts-expect-error For Legacy Reasons
++Popover.Slot = forwardRef( PopoverSlot );
++// @ts-expect-error For Legacy Reasons
++Popover.__unstableSlotNameProvider = slotNameContext.Provider;
+ 
+-export default PopoverContainer;
++export default Popover;
+diff --git a/packages/components/src/popover/stories/index.js b/packages/components/src/popover/stories/index.tsx
+similarity index 75%
+rename from packages/components/src/popover/stories/index.js
+rename to packages/components/src/popover/stories/index.tsx
+index e4f9c90a9c2e44..60743c885bd2ac 100644
+--- a/packages/components/src/popover/stories/index.js
++++ b/packages/components/src/popover/stories/index.tsx
+@@ -1,7 +1,13 @@
++/**
++ * External dependencies
++ */
++import type { ComponentStory, ComponentMeta } from '@storybook/react';
++
+ /**
+  * WordPress dependencies
+  */
+ import { useState, useRef, useEffect } from '@wordpress/element';
++// @ts-expect-error The `@wordpress/block-editor` is not typed
+ import { __unstableIframe as Iframe } from '@wordpress/block-editor';
+ 
+ /**
+@@ -9,26 +15,10 @@ import { __unstableIframe as Iframe } from '@wordpress/block-editor';
+  */
+ import Button from '../../button';
+ import { Provider as SlotFillProvider } from '../../slot-fill';
+-import Popover from '../';
++import { Popover } from '..';
++import type { PopoverProps } from '../types';
+ 
+-// Format: "[yAxis] [xAxis]"
+-// Valid yAxis values: 'top', 'middle', 'bottom'
+-// Valid xAxis values: 'left', 'center', 'right'
+-const AVAILABLE_POSITIONS = [
+-	'top left',
+-	'top center',
+-	'top right',
+-	'middle left',
+-	'middle center',
+-	'middle right',
+-	'bottom left',
+-	'bottom center',
+-	'bottom right',
+-];
+-
+-// Follows floating UI's conventions
+-// See https://floating-ui.com/docs/computePosition#placement
+-const AVAILABLE_PLACEMENTS = [
++const AVAILABLE_PLACEMENTS: PopoverProps[ 'placement' ][] = [
+ 	'top',
+ 	'top-start',
+ 	'top-end',
+@@ -43,43 +33,30 @@ const AVAILABLE_PLACEMENTS = [
+ 	'left-end',
+ ];
+ 
+-export default {
++const meta: ComponentMeta< typeof Popover > = {
+ 	title: 'Components/Popover',
+ 	component: Popover,
+ 	argTypes: {
+ 		anchorRef: { control: { type: null } },
+ 		anchorRect: { control: { type: null } },
+-		animate: { control: { type: 'boolean' } },
+ 		children: { control: { type: null } },
+-		className: { control: { type: 'text' } },
+-		expandOnMobile: { control: { type: 'boolean' } },
+ 		focusOnMount: {
+ 			control: { type: 'select' },
+-			options: [ 'firstElement', 'container', false ],
++			options: [ 'firstElement', true, false ],
+ 		},
+ 		getAnchorRect: { control: { type: null } },
+-		headerTitle: { control: { type: 'text' } },
+-		isAlternate: { control: { type: 'boolean' } },
+-		noArrow: { control: { type: 'boolean' } },
+-		onClose: { control: { type: null } },
+-		offset: { control: { type: 'number' } },
+-		onFocusOutside: { control: { type: null } },
+-		placement: {
+-			control: { type: 'select' },
+-			options: AVAILABLE_PLACEMENTS,
+-		},
+-		position: {
+-			control: { type: 'select' },
+-			options: AVAILABLE_POSITIONS,
+-		},
++		onClose: { action: 'onClose' },
++		onFocusOutside: { action: 'onFocusOutside' },
+ 		__unstableSlotName: { control: { type: null } },
+-		resize: { control: { type: 'boolean' } },
+-		flip: { control: { type: 'boolean' } },
+-		shift: { control: { type: 'boolean' } },
++	},
++	parameters: {
++		controls: { expanded: true },
+ 	},
+ };
+ 
+-const PopoverWithAnchor = ( args ) => {
++export default meta;
++
++const PopoverWithAnchor = ( args: PopoverProps ) => {
+ 	const anchorRef = useRef( null );
+ 
+ 	return (
+@@ -102,12 +79,12 @@ const PopoverWithAnchor = ( args ) => {
+ 	);
+ };
+ 
+-export const Default = ( args ) => {
++export const Default: ComponentStory< typeof Popover > = ( args ) => {
+ 	const [ isVisible, setIsVisible ] = useState( false );
+ 	const toggleVisible = () => {
+ 		setIsVisible( ( state ) => ! state );
+ 	};
+-	const buttonRef = useRef();
++	const buttonRef = useRef< HTMLButtonElement | undefined >();
+ 	useEffect( () => {
+ 		buttonRef.current?.scrollIntoView?.( {
+ 			block: 'center',
+@@ -147,11 +124,10 @@ Default.args = {
+ 	),
+ };
+ 
+-/**
+- * Resize / scroll the viewport to test the behavior of the popovers when they
+- * reach the viewport boundaries.
+- */
+-export const AllPlacements = ( { children, ...args } ) => (
++export const AllPlacements: ComponentStory< typeof Popover > = ( {
++	children,
++	...args
++} ) => (
+ 	<div
+ 		style={ {
+ 			minWidth: '600px',
+@@ -196,7 +172,10 @@ AllPlacements.args = {
+ 	flip: false,
+ };
+ 
+-export const DynamicHeight = ( { children, ...args } ) => {
++export const DynamicHeight: ComponentStory< typeof Popover > = ( {
++	children,
++	...args
++} ) => {
+ 	const [ height, setHeight ] = useState( 200 );
+ 	const increase = () => setHeight( height + 100 );
+ 	const decrease = () => setHeight( height - 100 );
+@@ -245,13 +224,16 @@ DynamicHeight.args = {
+ 	children: 'Content with dynamic height',
+ };
+ 
+-export const WithSlotOutsideIframe = ( args ) => {
++export const WithSlotOutsideIframe: ComponentStory< typeof Popover > = (
++	args
++) => {
+ 	const anchorRef = useRef( null );
+ 	const slotName = 'popover-with-slot-outside-iframe';
+ 
+ 	return (
+ 		<SlotFillProvider>
+ 			<div>
++				{ /* @ts-expect-error Slot is not currently typed on Popover */ }
+ 				<Popover.Slot name={ slotName } />
+ 				<Iframe
+ 					style={ {
+diff --git a/packages/components/src/popover/types.ts b/packages/components/src/popover/types.ts
+new file mode 100644
+index 00000000000000..e9b9a83bdcd17c
+--- /dev/null
++++ b/packages/components/src/popover/types.ts
+@@ -0,0 +1,173 @@
++/**
++ * External dependencies
++ */
++import type { ReactNode, MutableRefObject, SyntheticEvent } from 'react';
++import type { Placement } from '@floating-ui/react-dom';
++
++type PositionYAxis = 'top' | 'middle' | 'bottom';
++type PositionXAxis = 'left' | 'center' | 'right';
++type PositionCorner = 'top' | 'right' | 'bottom' | 'left';
++
++type DomRectWithOwnerDocument = DOMRect & {
++	ownerDocument?: Document;
++};
++
++export type AnimatedWrapperProps = {
++	placement: Placement;
++	shouldAnimate?: boolean;
++};
++
++export type PopoverAnchorRefReference = MutableRefObject<
++	Element | null | undefined
++>;
++export type PopoverAnchorRefTopBottom = { top: Element; bottom: Element };
++
++export type PopoverProps = {
++	/**
++	 * The name of the Slot in which the popover should be rendered. It should
++	 * be also passed to the corresponding `PopoverSlot` component.
++	 *
++	 * @default 'Popover'
++	 */
++	__unstableSlotName?: string;
++	/**
++	 * An object extending a `DOMRect` with an additional optional `ownerDocument`
++	 * property, used to specify a fixed popover position.
++	 */
++	anchorRect?: DomRectWithOwnerDocument;
++	/**
++	 * Used to specify a fixed popover position. It can be an `Element`, a React
++	 * reference to an `element`, an object with a `top` and a `bottom` properties
++	 * (both pointing to elements), or a `range`.
++	 */
++	anchorRef?:
++		| Element
++		| PopoverAnchorRefReference
++		| PopoverAnchorRefTopBottom
++		| Range;
++	/**
++	 * Whether the popover should animate when opening.
++	 *
++	 * @default true
++	 */
++	animate?: boolean;
++	/**
++	 * The `children` elements rendered as the popover's content.
++	 */
++	children: ReactNode;
++	/**
++	 * Show the popover fullscreen on mobile viewports.
++	 */
++	expandOnMobile?: boolean;
++	/**
++	 * Specifies whether the popover should flip across its axis if there isn't
++	 * space for it in the normal placement.
++	 * When the using a 'top' placement, the popover will switch to a 'bottom'
++	 * placement. When using a 'left' placement, the popover will switch to a
++	 * `right' placement.
++	 * The popover will retain its alignment of 'start' or 'end' when flipping.
++	 *
++	 * @default true
++	 */
++	flip?: boolean;
++	/**
++	 * By default, the _first tabbable element_ in the popover will receive focus
++	 * when it mounts. This is the same as setting this prop to `"firstElement"`.
++	 * Specifying a `false` value disables the focus handling entirely (this
++	 * should only be done when an appropriately accessible substitute behavior
++	 * exists).
++	 *
++	 * @default 'firstElement'
++	 */
++	focusOnMount?: 'firstElement' | boolean;
++	/**
++	 * A callback invoked when the focus leaves the opened popover. This should
++	 * only be provided in advanced use-cases when a popover should close under
++	 * specific circumstances (for example, if the new `document.activeElement`
++	 * is content of or otherwise controlling popover visibility).
++	 *
++	 * When not provided, the `onClose` callback will be called instead.
++	 */
++	onFocusOutside?: ( event: SyntheticEvent ) => void;
++	/**
++	 * A function returning the same value as the one expected by the `anchorRect`
++	 * prop, used to specify a dynamic popover position.
++	 */
++	getAnchorRect?: (
++		fallbackReferenceElement: Element | null
++	) => DomRectWithOwnerDocument;
++	/**
++	 * Used to customize the header text shown when the popover is toggled to
++	 * fullscreen on mobile viewports (see the `expandOnMobile` prop).
++	 */
++	headerTitle?: string;
++	/**
++	 * Used to enable a different visual style for the popover.
++	 */
++	isAlternate?: boolean;
++	/**
++	 * Used to show/hide the arrow that points at the popover's anchor.
++	 *
++	 * @default true
++	 */
++	noArrow?: boolean;
++	/**
++	 * The distance (in px) between the anchor and the popover.
++	 */
++	offset?: number;
++	/**
++	 * A callback invoked when the popover should be closed.
++	 */
++	onClose?: () => void;
++	/**
++	 * Used to specify the popover's position with respect to its anchor.
++	 *
++	 * @default 'bottom-start'
++	 */
++	placement?: Placement;
++	/**
++	 * Legacy way to specify the popover's position with respect to its anchor.
++	 * _Note: this prop is deprecated. Use the `placement` prop instead._
++	 */
++	position?:
++		| `${ PositionYAxis } ${ PositionXAxis }`
++		| `${ PositionYAxis } ${ PositionXAxis } ${ PositionCorner }`;
++	/**
++	 * Adjusts the size of the popover to prevent its contents from going out of
++	 * view when meeting the viewport edges.
++	 *
++	 * @default true
++	 */
++	resize?: boolean;
++	/**
++	 * Enables the `Popover` to shift in order to stay in view when meeting the
++	 * viewport edges.
++	 *
++	 * @default false
++	 */
++	shift?: boolean;
++
++	// Deprecated props
++	/**
++	 * Prevent the popover from flipping and resizing when meeting the viewport
++	 * edges. _Note: this prop is deprecated. Instead, provide use the individual
++	 * `flip` and `resize` props._
++	 *
++	 * @deprecated
++	 */
++	__unstableForcePosition?: boolean;
++	/**
++	 * Enables the `Popover` to shift in order to stay in view when meeting the
++	 * viewport edges.
++	 * _Note: this prop is deprecated. Use the `shift` prop instead._
++	 *
++	 * @deprecated
++	 */
++	__unstableShift?: boolean;
++	/**
++	 * _Note: this prop is deprecated and has no effect on the component._
++	 *
++	 * @deprecated
++	 */
++	range?: unknown;
++};
+diff --git a/packages/components/src/popover/utils.js b/packages/components/src/popover/utils.ts
+similarity index 62%
+rename from packages/components/src/popover/utils.js
+rename to packages/components/src/popover/utils.ts
+index c17fdd00623d23..6f838cb14d9c00 100644
+--- a/packages/components/src/popover/utils.js
++++ b/packages/components/src/popover/utils.ts
+@@ -1,17 +1,29 @@
+ /**
+- * @typedef {import('../animate').AppearOrigin} AppearOrigin
+- * @typedef {import('@floating-ui/react-dom').Placement} FloatingUIPlacement
+- * @typedef {	'top left' | 'top center' | 'top right' | 'middle left' | 'middle center' | 'middle right' | 'bottom left' | 'bottom center' | 'bottom right' | 'bottom left' | 'bottom center' | 'bottom right' } LegacyPosition
++ * External dependencies
+  */
++// eslint-disable-next-line no-restricted-imports
++import type { MotionProps } from 'framer-motion';
++import type { ReferenceType } from '@floating-ui/react-dom';
++
++/**
++ * Internal dependencies
++ */
++import type {
++	PopoverProps,
++	PopoverAnchorRefReference,
++	PopoverAnchorRefTopBottom,
++} from './types';
+ 
+ /**
+  * Converts the `Popover`'s legacy "position" prop to the new "placement" prop
+  * (used by `floating-ui`).
+  *
+- * @param {LegacyPosition} position The legacy position
+- * @return {FloatingUIPlacement} The corresponding placement
++ * @param  position The legacy position
++ * @return The corresponding placement
+  */
+-export const positionToPlacement = ( position ) => {
++export const positionToPlacement = (
++	position: NonNullable< PopoverProps[ 'position' ] >
++): NonNullable< PopoverProps[ 'placement' ] > => {
+ 	const [ x, y, z ] = position.split( ' ' );
+ 
+ 	if ( [ 'top', 'bottom' ].includes( x ) ) {
+@@ -22,12 +34,10 @@ export const positionToPlacement = ( position ) => {
+ 			suffix = '-end';
+ 		}
+ 
+-		// @ts-expect-error More TypeScript effort would be required to reconcile `string` and `Placement` types.
+-		return x + suffix;
++		return ( x + suffix ) as NonNullable< PopoverProps[ 'placement' ] >;
+ 	}
+ 
+-	// @ts-expect-error More TypeScript effort would be required to reconcile `string` and `Placement` types.
+-	return y;
++	return y as NonNullable< PopoverProps[ 'placement' ] >;
+ };
+ 
+ /**
+@@ -37,8 +47,10 @@ export const positionToPlacement = ( position ) => {
+  * @property {number} originY A number between 0 and 1 (0 is top, 0.5 is center, and 1 is bottom)
+  */
+ 
+-/** @type {Object.<FloatingUIPlacement, {originX: number, originY: number}>} */
+-const PLACEMENT_TO_ANIMATION_ORIGIN = {
++const PLACEMENT_TO_ANIMATION_ORIGIN: Record<
++	NonNullable< PopoverProps[ 'placement' ] >,
++	{ originX: number; originY: number }
++> = {
+ 	top: { originX: 0.5, originY: 1 }, // open from bottom, center
+ 	'top-start': { originX: 0, originY: 1 }, // open from bottom, left
+ 	'top-end': { originX: 1, originY: 1 }, // open from bottom, right
+@@ -57,10 +69,12 @@ const PLACEMENT_TO_ANIMATION_ORIGIN = {
+  * Given the floating-ui `placement`, compute the framer-motion props for the
+  * popover's entry animation.
+  *
+- * @param {FloatingUIPlacement} placement A placement string from floating ui
+- * @return {import('framer-motion').MotionProps} The object containing the motion props
++ * @param  placement A placement string from floating ui
++ * @return The object containing the motion props
+  */
+-export const placementToMotionAnimationProps = ( placement ) => {
++export const placementToMotionAnimationProps = (
++	placement: NonNullable< PopoverProps[ 'placement' ] >
++): MotionProps => {
+ 	const translateProp =
+ 		placement.startsWith( 'top' ) || placement.startsWith( 'bottom' )
+ 			? 'translateY'
+@@ -82,22 +96,17 @@ export const placementToMotionAnimationProps = ( placement ) => {
+ 	};
+ };
+ 
+-/**
+- * @typedef FrameOffset
+- * @type {Object}
+- * @property {number} x A numerical value representing the horizontal offset of the frame.
+- * @property {number} y A numerical value representing the vertical offset of the frame.
+- */
+-
+ /**
+  * Returns the offset of a document's frame element.
+  *
+- * @param {Document} document A document. This will usually be the document within an iframe.
++ * @param  document The iframe's owner document.
+  *
+- * @return {FrameOffset|undefined} The offset of the document's frame element,
+- *                                 or undefined if the document has no frame element.
++ * @return The offset of the document's frame element, or undefined if the
++ * document has no frame element.
+  */
+-export const getFrameOffset = ( document ) => {
++export const getFrameOffset = (
++	document?: Document
++): { x: number; y: number } | undefined => {
+ 	const frameElement = document?.defaultView?.frameElement;
+ 	if ( ! frameElement ) {
+ 		return;
+@@ -107,17 +116,15 @@ export const getFrameOffset = ( document ) => {
+ };
+ 
+ export const getReferenceOwnerDocument = ( {
+-	// @ts-ignore
+ 	anchorRef,
+-	// @ts-ignore
+ 	anchorRect,
+-	// @ts-ignore
+ 	getAnchorRect,
+-	// @ts-ignore
+ 	fallbackReferenceElement,
+-	// @ts-ignore
+ 	fallbackDocument,
+-} ) => {
++}: Pick< PopoverProps, 'anchorRef' | 'anchorRect' | 'getAnchorRect' > & {
++	fallbackReferenceElement: Element | null;
++	fallbackDocument: Document;
++} ): Document => {
+ 	// In floating-ui's terms:
+ 	// - "reference" refers to the popover's anchor element.
+ 	// - "floating" refers the floating popover's element.
+@@ -126,15 +133,21 @@ export const getReferenceOwnerDocument = ( {
+ 	// with the `getBoundingClientRect()` function (like real elements).
+ 	// See https://floating-ui.com/docs/virtual-elements for more info.
+ 	let resultingReferenceOwnerDoc;
+-	if ( anchorRef?.top ) {
+-		resultingReferenceOwnerDoc = anchorRef?.top.ownerDocument;
+-	} else if ( anchorRef?.startContainer ) {
+-		resultingReferenceOwnerDoc = anchorRef.startContainer.ownerDocument;
+-	} else if ( anchorRef?.current ) {
+-		resultingReferenceOwnerDoc = anchorRef.current.ownerDocument;
+-	} else if ( anchorRef ) {
++	if ( ( anchorRef as PopoverAnchorRefTopBottom | undefined )?.top ) {
++		resultingReferenceOwnerDoc = ( anchorRef as PopoverAnchorRefTopBottom )
++			?.top.ownerDocument;
++	} else if ( ( anchorRef as Range | undefined )?.startContainer ) {
++		resultingReferenceOwnerDoc = ( anchorRef as Range ).startContainer
++			.ownerDocument;
++	} else if (
++		( anchorRef as PopoverAnchorRefReference | undefined )?.current
++	) {
++		resultingReferenceOwnerDoc = (
++			( anchorRef as PopoverAnchorRefReference ).current as Element
++		 ).ownerDocument;
++	} else if ( anchorRef as Element | undefined ) {
+ 		// This one should be deprecated.
+-		resultingReferenceOwnerDoc = anchorRef.ownerDocument;
++		resultingReferenceOwnerDoc = ( anchorRef as Element ).ownerDocument;
+ 	} else if ( anchorRect && anchorRect?.ownerDocument ) {
+ 		resultingReferenceOwnerDoc = anchorRect.ownerDocument;
+ 	} else if ( getAnchorRect ) {
+@@ -147,27 +160,28 @@ export const getReferenceOwnerDocument = ( {
+ };
+ 
+ export const getReferenceElement = ( {
+-	// @ts-ignore
+ 	anchorRef,
+-	// @ts-ignore
+ 	anchorRect,
+-	// @ts-ignore
+ 	getAnchorRect,
+-	// @ts-ignore
+ 	fallbackReferenceElement,
+-} ) => {
+-	/** @type {import('@floating-ui/react-dom').ReferenceType | undefined} */
+-	let referenceElement;
++}: Pick< PopoverProps, 'anchorRef' | 'anchorRect' | 'getAnchorRect' > & {
++	fallbackReferenceElement: Element | null;
++} ): ReferenceType | null => {
++	let referenceElement = null;
+ 
+-	if ( anchorRef?.top ) {
++	if ( ( anchorRef as PopoverAnchorRefTopBottom | undefined )?.top ) {
+ 		// Create a virtual element for the ref. The expectation is that
+ 		// if anchorRef.top is defined, then anchorRef.bottom is defined too.
+ 		// Seems to be used by the block toolbar, when multiple blocks are selected
+ 		// (top and bottom blocks are used to calculate the resulting rect).
+ 		referenceElement = {
+ 			getBoundingClientRect() {
+-				const topRect = anchorRef.top.getBoundingClientRect();
+-				const bottomRect = anchorRef.bottom.getBoundingClientRect();
++				const topRect = (
++					anchorRef as PopoverAnchorRefTopBottom
++				 ).top.getBoundingClientRect();
++				const bottomRect = (
++					anchorRef as PopoverAnchorRefTopBottom
++				 ).bottom.getBoundingClientRect();
+ 				return new window.DOMRect(
+ 					topRect.x,
+ 					topRect.y,
+@@ -176,13 +190,15 @@ export const getReferenceElement = ( {
+ 				);
+ 			},
+ 		};
+-	} else if ( anchorRef?.current ) {
++	} else if (
++		( anchorRef as PopoverAnchorRefReference | undefined )?.current
++	) {
+ 		// Standard React ref.
+-		referenceElement = anchorRef.current;
+-	} else if ( anchorRef ) {
++		referenceElement = ( anchorRef as PopoverAnchorRefReference ).current;
++	} else if ( anchorRef as Element | undefined ) {
+ 		// If `anchorRef` holds directly the element's value (no `current` key)
+ 		// This is a weird scenario and should be deprecated.
+-		referenceElement = anchorRef;
++		referenceElement = anchorRef as Element;
+ 	} else if ( anchorRect ) {
+ 		// Create a virtual element for the ref.
+ 		referenceElement = {
+@@ -206,8 +222,9 @@ export const getReferenceElement = ( {
+ 	} else if ( fallbackReferenceElement ) {
+ 		// If no explicit ref is passed via props, fall back to
+ 		// anchoring to the popover's parent node.
+-		referenceElement = fallbackReferenceElement.parentNode;
++		referenceElement = fallbackReferenceElement.parentElement;
+ 	}
+ 
+-	return referenceElement;
++	// Convert any `undefined` value to `null`.
++	return referenceElement ?? null;
+ };
+diff --git a/packages/compose/CHANGELOG.md b/packages/compose/CHANGELOG.md
+index 96530b5162c846..ab31948d9a8dad 100644
+--- a/packages/compose/CHANGELOG.md
++++ b/packages/compose/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   `useDialog`: refactor to TypeScript ([#43823](https://github.com/WordPress/gutenberg/pull/43823)).
++
+ ## 5.14.0 (2022-08-24)
+ 
+ ## 5.13.0 (2022-08-10)
+diff --git a/packages/compose/src/hooks/use-dialog/index.js b/packages/compose/src/hooks/use-dialog/index.ts
+similarity index 63%
+rename from packages/compose/src/hooks/use-dialog/index.js
+rename to packages/compose/src/hooks/use-dialog/index.ts
+index a41e8ea9a3a396..28086799c0dede 100644
+--- a/packages/compose/src/hooks/use-dialog/index.js
++++ b/packages/compose/src/hooks/use-dialog/index.ts
+@@ -1,3 +1,8 @@
++/**
++ * External dependencies
++ */
++import type { KeyboardEvent, RefCallback, SyntheticEvent } from 'react';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -12,15 +17,26 @@ import useFocusOnMount from '../use-focus-on-mount';
+ import useFocusReturn from '../use-focus-return';
+ import useFocusOutside from '../use-focus-outside';
+ import useMergeRefs from '../use-merge-refs';
++import type { FocusOutsideReturnValue } from '../use-focus-outside';
+ 
+-/**
+- * @typedef {import('../use-focus-on-mount').default} useFocusOnMount
+- */
+-/**
+- * @typedef DialogOptions
+- * @property {Parameters<useFocusOnMount>[0]} focusOnMount Focus on mount arguments.
+- * @property {() => void}                     onClose      Function to call when the dialog is closed.
+- */
++type DialogOptions = {
++	focusOnMount?: Parameters< typeof useFocusOnMount >[ 0 ];
++	onClose?: () => void;
++	/**
++	 * Use the `onClose` prop instead.
++	 *
++	 * @deprecated
++	 */
++	__unstableOnClose?: (
++		type: string | undefined,
++		event: SyntheticEvent
++	) => void;
++};
++
++type useDialogReturn = [
++	RefCallback< HTMLElement >,
++	FocusOutsideReturnValue & Pick< HTMLElement, 'tabIndex' >
++];
+ 
+ /**
+  * Returns a ref and props to apply to a dialog wrapper to enable the following behaviors:
+@@ -29,13 +45,10 @@ import useMergeRefs from '../use-merge-refs';
+  *  - return focus on unmount.
+  *  - focus outside.
+  *
+- * @param {DialogOptions} options Dialog Options.
++ * @param  options Dialog Options.
+  */
+-function useDialog( options ) {
+-	/**
+-	 * @type {import('react').MutableRefObject<DialogOptions | undefined>}
+-	 */
+-	const currentOptions = useRef();
++function useDialog( options: DialogOptions ): useDialogReturn {
++	const currentOptions = useRef< DialogOptions | undefined >();
+ 	useEffect( () => {
+ 		currentOptions.current = options;
+ 	}, Object.values( options ) );
+@@ -45,9 +58,7 @@ function useDialog( options ) {
+ 	const focusOutsideProps = useFocusOutside( ( event ) => {
+ 		// This unstable prop  is here only to manage backward compatibility
+ 		// for the Popover component otherwise, the onClose should be enough.
+-		// @ts-ignore unstable property
+ 		if ( currentOptions.current?.__unstableOnClose ) {
+-			// @ts-ignore unstable property
+ 			currentOptions.current.__unstableOnClose( 'focus-outside', event );
+ 		} else if ( currentOptions.current?.onClose ) {
+ 			currentOptions.current.onClose();
+@@ -58,20 +69,17 @@ function useDialog( options ) {
+ 			return;
+ 		}
+ 
+-		node.addEventListener(
+-			'keydown',
+-			( /** @type {KeyboardEvent} */ event ) => {
+-				// Close on escape.
+-				if (
+-					event.keyCode === ESCAPE &&
+-					! event.defaultPrevented &&
+-					currentOptions.current?.onClose
+-				) {
+-					event.preventDefault();
+-					currentOptions.current.onClose();
+-				}
++		node.addEventListener( 'keydown', ( event: KeyboardEvent ) => {
++			// Close on escape.
++			if (
++				event.keyCode === ESCAPE &&
++				! event.defaultPrevented &&
++				currentOptions.current?.onClose
++			) {
++				event.preventDefault();
++				currentOptions.current.onClose();
+ 			}
+-		);
++		} );
+ 	}, [] );
+ 
+ 	return [
+@@ -83,7 +91,7 @@ function useDialog( options ) {
+ 		] ),
+ 		{
+ 			...focusOutsideProps,
+-			tabIndex: '-1',
++			tabIndex: -1,
+ 		},
+ 	];
+ }
+diff --git a/packages/nux/src/components/dot-tip/index.js b/packages/nux/src/components/dot-tip/index.js
+index 6f6f09bdf289c0..50de7ddb3be9df 100644
+--- a/packages/nux/src/components/dot-tip/index.js
++++ b/packages/nux/src/components/dot-tip/index.js
+@@ -48,7 +48,7 @@ export function DotTip( {
+ 		<Popover
+ 			className="nux-dot-tip"
+ 			position={ position }
+-			focusOnMount="container"
++			focusOnMount
+ 			role="dialog"
+ 			aria-label={ __( 'Editor tips' ) }
+ 			onClick={ onClick }

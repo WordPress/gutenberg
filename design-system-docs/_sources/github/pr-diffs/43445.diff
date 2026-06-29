@@ -1,0 +1,516 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0676541a232413..365f70fdc67fd1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -30,6 +30,7 @@
+ ### Internal
+ 
+ -   `Tooltip`: Refactor tests to `@testing-library/react` ([#43061](https://github.com/WordPress/gutenberg/pull/43061)).
++-   Clean up unused and duplicate `COLORS` values ([#43445](https://github.com/WordPress/gutenberg/pull/43445)).
+ -   Update `floating-ui` to the latest version ([#43206](https://github.com/WordPress/gutenberg/pull/43206)).
+ -   `DateTimePicker`, `TimePicker`, `DatePicker`: Switch from `moment` to `date-fns` ([#43005](https://github.com/WordPress/gutenberg/pull/43005)).
+ -   `DatePicker`: Switch from `react-dates` to `use-lilius` ([#43005](https://github.com/WordPress/gutenberg/pull/43005)).
+diff --git a/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-styles.js b/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-styles.js
+index 1e35a4195460c6..88ae648252aae2 100644
+--- a/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-styles.js
++++ b/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-styles.js
+@@ -45,9 +45,7 @@ export const Row = styled.div`
+ const pointActive = ( { isActive } ) => {
+ 	const boxShadow = isActive ? `0 0 0 2px ${ COLORS.gray[ 900 ] }` : null;
+ 	const pointColor = isActive ? COLORS.gray[ 900 ] : COLORS.lightGray[ 800 ];
+-	const pointColorHover = isActive
+-		? COLORS.gray[ 900 ]
+-		: COLORS.blue.medium.focus;
++	const pointColorHover = isActive ? COLORS.gray[ 900 ] : COLORS.ui.theme;
+ 
+ 	return css`
+ 		box-shadow: ${ boxShadow };
+diff --git a/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.js b/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.js
+index 7deb0c4645b474..1a7ed713d72f18 100644
+--- a/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.js
++++ b/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.js
+@@ -45,9 +45,9 @@ export const CircleIndicatorWrapper = styled.div`
+ `;
+ 
+ export const CircleIndicator = styled.div`
+-	background: ${ COLORS.admin.theme };
++	background: ${ COLORS.ui.theme };
+ 	border-radius: 50%;
+-	border: ${ INNER_CIRCLE_SIZE }px solid ${ COLORS.admin.theme };
++	border: ${ INNER_CIRCLE_SIZE }px solid ${ COLORS.ui.theme };
+ 	bottom: 0;
+ 	box-sizing: border-box;
+ 	display: block;
+diff --git a/packages/components/src/base-control/styles/base-control-styles.ts b/packages/components/src/base-control/styles/base-control-styles.ts
+index ca8c45159ecc8f..abd2f3affc45ae 100644
+--- a/packages/components/src/base-control/styles/base-control-styles.ts
++++ b/packages/components/src/base-control/styles/base-control-styles.ts
+@@ -64,7 +64,7 @@ export const StyledHelp = styled.p`
+ 	margin-bottom: 0;
+ 	font-size: ${ font( 'helpText.fontSize' ) };
+ 	font-style: normal;
+-	color: ${ COLORS.mediumGray.text };
++	color: ${ COLORS.gray[ 700 ] };
+ 
+ 	${ deprecatedMarginHelp }
+ `;
+diff --git a/packages/components/src/base-field/styles.js b/packages/components/src/base-field/styles.js
+index e054dc2c6ed498..30bd93cd41aa4b 100644
+--- a/packages/components/src/base-field/styles.js
++++ b/packages/components/src/base-field/styles.js
+@@ -35,7 +35,7 @@ export const BaseField = css`
+ 
+ 	&:focus,
+ 	&[data-focused='true'] {
+-		border-color: ${ COLORS.admin.theme };
++		border-color: ${ COLORS.ui.theme };
+ 		box-shadow: ${ CONFIG.controlBoxShadowFocus };
+ 	}
+ `;
+diff --git a/packages/components/src/base-field/test/__snapshots__/index.js.snap b/packages/components/src/base-field/test/__snapshots__/index.js.snap
+index 189db5c48bf126..bf844bf643de68 100644
+--- a/packages/components/src/base-field/test/__snapshots__/index.js.snap
++++ b/packages/components/src/base-field/test/__snapshots__/index.js.snap
+@@ -129,8 +129,8 @@ exports[`base field should render correctly 1`] = `
+ 
+ .emotion-0:focus,
+ .emotion-0[data-focused='true'] {
+-  border-color: var( --wp-admin-theme-color, #00669b);
+-  box-shadow: 0 0 0 0.5px var( --wp-admin-theme-color, #00669b);
++  border-color: var( --wp-admin-theme-color, #007cba);
++  box-shadow: 0 0 0 0.5px var( --wp-admin-theme-color, #007cba);
+ }
+ 
+ <div
+diff --git a/packages/components/src/box-control/styles/box-control-visualizer-styles.js b/packages/components/src/box-control/styles/box-control-visualizer-styles.js
+index 527daac217bab4..2a5c4fc8ec4702 100644
+--- a/packages/components/src/box-control/styles/box-control-visualizer-styles.js
++++ b/packages/components/src/box-control/styles/box-control-visualizer-styles.js
+@@ -31,7 +31,6 @@ export const Container = styled.div`
+ 
+ export const Side = styled.div`
+ 	box-sizing: border-box;
+-	background: ${ COLORS.blue.wordpress[ 700 ] };
+ 	background: ${ COLORS.ui.theme };
+ 	filter: brightness( 1 );
+ 	opacity: 0;
+diff --git a/packages/components/src/focal-point-picker/styles/focal-point-style.js b/packages/components/src/focal-point-picker/styles/focal-point-style.js
+index 80f724f64ece84..89e248c986962c 100644
+--- a/packages/components/src/focal-point-picker/styles/focal-point-style.js
++++ b/packages/components/src/focal-point-picker/styles/focal-point-style.js
+@@ -42,6 +42,5 @@ export const PointerIconPathOutline = styled( Path )`
+ `;
+ 
+ export const PointerIconPathFill = styled( Path )`
+-	fill: ${ COLORS.blue.wordpress[ 700 ] };
+ 	fill: ${ COLORS.ui.theme };
+ `;
+diff --git a/packages/components/src/item-group/styles.ts b/packages/components/src/item-group/styles.ts
+index cb2758752e6562..35bd50120033fc 100644
+--- a/packages/components/src/item-group/styles.ts
++++ b/packages/components/src/item-group/styles.ts
+@@ -16,13 +16,13 @@ export const unstyledButton = css`
+ 	text-align: left;
+ 
+ 	&:hover {
+-		color: ${ COLORS.admin.theme };
++		color: ${ COLORS.ui.theme };
+ 	}
+ 
+ 	&:focus {
+ 		background-color: transparent;
+-		color: ${ COLORS.admin.theme };
+-		border-color: ${ COLORS.admin.theme };
++		color: ${ COLORS.ui.theme };
++		border-color: ${ COLORS.ui.theme };
+ 		outline: 3px solid transparent;
+ 	}
+ `;
+diff --git a/packages/components/src/palette-edit/styles.js b/packages/components/src/palette-edit/styles.js
+index cca12006b91d64..e524f153f88482 100644
+--- a/packages/components/src/palette-edit/styles.js
++++ b/packages/components/src/palette-edit/styles.js
+@@ -29,7 +29,7 @@ export const IndicatorStyled = styled( CircularOptionPicker.Option )`
+ export const NameInputControl = styled( InputControl )`
+ 	${ InputControlContainer } {
+ 		background: ${ COLORS.gray[ 100 ] };
+-		border-radius: ${ CONFIG.controlBorderRadius }};
++		border-radius: ${ CONFIG.controlBorderRadius };
+ 		${ Input }${ Input }${ Input }${ Input } {
+ 			height: ${ space( 8 ) };
+ 		}
+@@ -58,7 +58,7 @@ export const PaletteItem = styled( View )`
+ 		border-top-color: transparent;
+ 	}
+ 	&.is-selected {
+-		border-color: ${ COLORS.blue.wordpress[ 700 ] };
++		border-color: ${ COLORS.ui.theme };
+ 	}
+ `;
+ 
+@@ -69,7 +69,7 @@ export const NameContainer = styled.div`
+ 	white-space: nowrap;
+ 	overflow: hidden;
+ 	${ PaletteItem }:hover & {
+-		color: var( --wp-admin-theme-color, ${ COLORS.blue.wordpress[ 700 ] } );
++		color: ${ COLORS.ui.theme };
+ 	}
+ `;
+ 
+@@ -95,8 +95,9 @@ export const PaletteHStackHeader = styled( HStack )`
+ export const PaletteEditStyles = styled( View )`
+ 	&&& {
+ 		.components-button.has-icon {
+-		min-width: 0;
+-		padding: 0;
++			min-width: 0;
++			padding: 0;
++		}
+ 	}
+ `;
+ 
+diff --git a/packages/components/src/range-control/styles/range-control-styles.ts b/packages/components/src/range-control/styles/range-control-styles.ts
+index b54cbcbc7412f3..c746bc9c72a6fb 100644
+--- a/packages/components/src/range-control/styles/range-control-styles.ts
++++ b/packages/components/src/range-control/styles/range-control-styles.ts
+@@ -48,7 +48,6 @@ const wrapperMargin = ( { marks, __nextHasNoMarginBottom }: WrapperProps ) => {
+ };
+ 
+ export const Wrapper = styled.div< WrapperProps >`
+-	color: ${ COLORS.blue.medium.focus };
+ 	display: block;
+ 	flex: 1;
+ 	position: relative;
+diff --git a/packages/components/src/text/styles.js b/packages/components/src/text/styles.js
+index 4d7990cd3f3f06..171e34fab9f46f 100644
+--- a/packages/components/src/text/styles.js
++++ b/packages/components/src/text/styles.js
+@@ -27,7 +27,7 @@ export const destructive = css`
+ `;
+ 
+ export const muted = css`
+-	color: ${ COLORS.mediumGray.text };
++	color: ${ COLORS.gray[ 700 ] };
+ `;
+ 
+ export const highlighterText = css`
+diff --git a/packages/components/src/text/test/index.tsx b/packages/components/src/text/test/index.tsx
+index c5dc40f0ae8958..2b4f4c4d6ae5df 100644
+--- a/packages/components/src/text/test/index.tsx
++++ b/packages/components/src/text/test/index.tsx
+@@ -53,7 +53,7 @@ describe( 'Text', () => {
+ 			<Text variant="muted">Lorem ipsum.</Text>
+ 		);
+ 		expect( container.firstChild ).toHaveStyle( {
+-			color: COLORS.mediumGray.text,
++			color: COLORS.gray[ 700 ],
+ 		} );
+ 	} );
+ 
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index 91fa420c5d078f..2ce03affa087fd 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -55,8 +55,8 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+ }
+ 
+ .emotion-6:focus-within {
+-  border-color: var( --wp-admin-theme-color-darker-10, #007cba);
+-  box-shadow: 0 0 0 0.5px var( --wp-admin-theme-color, #00669b);
++  border-color: var( --wp-admin-theme-color-darker-10, #006ba1);
++  box-shadow: 0 0 0 0.5px var( --wp-admin-theme-color, #007cba);
+   outline: none;
+   z-index: 1;
+ }
+@@ -326,8 +326,8 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+ }
+ 
+ .emotion-6:focus-within {
+-  border-color: var( --wp-admin-theme-color-darker-10, #007cba);
+-  box-shadow: 0 0 0 0.5px var( --wp-admin-theme-color, #00669b);
++  border-color: var( --wp-admin-theme-color-darker-10, #006ba1);
++  box-shadow: 0 0 0 0.5px var( --wp-admin-theme-color, #007cba);
+   outline: none;
+   z-index: 1;
+ }
+diff --git a/packages/components/src/utils/colors-values.js b/packages/components/src/utils/colors-values.js
+index e2be5b7d25bd06..00bfe83d65c3c1 100644
+--- a/packages/components/src/utils/colors-values.js
++++ b/packages/components/src/utils/colors-values.js
+@@ -1,180 +1,85 @@
+-/**
+- * External dependencies
+- */
+-import { merge } from 'lodash';
+-
+ /**
+  * Internal dependencies
+  */
+ import { rgba } from './colors';
+ 
+-const BASE = {
+-	black: '#000',
+-	white: '#fff',
+-};
++const white = '#fff';
+ 
+-const G2 = {
+-	blue: {
+-		medium: {
+-			focus: '#007cba',
+-			focusDark: '#fff',
+-		},
+-	},
+-	gray: {
+-		900: '#1e1e1e',
+-		700: '#757575', // Meets 4.6:1 text contrast against white.
+-		600: '#949494', // Meets 3:1 UI or large text contrast against white.
+-		400: '#ccc',
+-		300: '#ddd', // Used for most borders.
+-		200: '#e0e0e0', // Used sparingly for light borders.
+-		100: '#f0f0f0', // Used for light gray backgrounds.
+-	},
+-	mediumGray: {
+-		text: '#757575',
+-	},
+-	lightGray: {
+-		ui: '#949494',
+-		secondary: '#ccc',
+-		tertiary: '#e7e8e9',
+-	},
++// Matches the grays in @wordpress/base-styles
++const GRAY = {
++	900: '#1e1e1e',
++	800: '#2f2f2f',
++	/** Meets 4.6:1 text contrast against white. */
++	700: '#757575',
++	/** Meets 3:1 UI or large text contrast against white. */
++	600: '#949494',
++	400: '#ccc',
++	/** Used for most borders. */
++	300: '#ddd',
++	/** Used sparingly for light borders. */
++	200: '#e0e0e0',
++	/** Used for light gray backgrounds. */
++	100: '#f0f0f0',
+ };
+ 
+ const DARK_GRAY = {
+-	900: '#191e23',
+-	800: '#23282d',
+-	700: '#32373c',
+-	600: '#40464d',
+ 	500: '#555d66', // Use this most of the time for dark items.
+-	400: '#606a73',
+ 	300: '#6c7781', // Lightest gray that can be used for AA text contrast.
+-	200: '#7e8993',
+ 	150: '#8d96a0', // Lightest gray that can be used for AA non-text contrast.
+-	100: '#8f98a1',
+-	placeholder: rgba( G2.gray[ 900 ], 0.62 ),
+-};
+-
+-const DARK_OPACITY = {
+-	900: rgba( '#000510', 0.9 ),
+-	800: rgba( '#00000a', 0.85 ),
+-	700: rgba( '#06060b', 0.8 ),
+-	600: rgba( '#000913', 0.75 ),
+-	500: rgba( '#0a1829', 0.7 ),
+-	400: rgba( '#0a1829', 0.65 ),
+-	300: rgba( '#0e1c2e', 0.62 ),
+-	200: rgba( '#162435', 0.55 ),
+-	100: rgba( '#223443', 0.5 ),
+-	backgroundFill: rgba( DARK_GRAY[ 700 ], 0.7 ),
+-};
+-
+-const DARK_OPACITY_LIGHT = {
+-	900: rgba( '#304455', 0.45 ),
+-	800: rgba( '#425863', 0.4 ),
+-	700: rgba( '#667886', 0.35 ),
+-	600: rgba( '#7b86a2', 0.3 ),
+-	500: rgba( '#9197a2', 0.25 ),
+-	400: rgba( '#95959c', 0.2 ),
+-	300: rgba( '#829493', 0.15 ),
+-	200: rgba( '#8b8b96', 0.1 ),
+-	100: rgba( '#747474', 0.05 ),
+ };
+ 
+ const LIGHT_GRAY = {
+-	900: '#a2aab2',
+ 	800: '#b5bcc2',
+-	700: '#ccd0d4',
+ 	600: '#d7dade',
+-	500: '#e2e4e7', // Good for "grayed" items and borders.
+ 	400: '#e8eaeb', // Good for "readonly" input fields and special text selection.
+ 	300: '#edeff0',
+ 	200: '#f3f4f5',
+-	100: '#f8f9f9',
+-	placeholder: rgba( BASE.white, 0.65 ),
+-};
+-
+-const LIGHT_OPACITY_LIGHT = {
+-	900: rgba( BASE.white, 0.5 ),
+-	800: rgba( BASE.white, 0.45 ),
+-	700: rgba( BASE.white, 0.4 ),
+-	600: rgba( BASE.white, 0.35 ),
+-	500: rgba( BASE.white, 0.3 ),
+-	400: rgba( BASE.white, 0.25 ),
+-	300: rgba( BASE.white, 0.2 ),
+-	200: rgba( BASE.white, 0.15 ),
+-	100: rgba( BASE.white, 0.1 ),
+-	backgroundFill: rgba( LIGHT_GRAY[ 300 ], 0.8 ),
+-};
+-
+-// Additional colors.
+-// Some are from https://make.wordpress.org/design/handbook/foundations/colors/.
+-
+-const BLUE = {
+-	wordpress: {
+-		700: '#00669b',
+-	},
+-	dark: {
+-		900: '#0071a1',
+-	},
+-	medium: {
+-		900: '#006589',
+-		800: '#00739c',
+-		700: '#007fac',
+-		600: '#008dbe',
+-		500: '#00a0d2',
+-		400: '#33b3db',
+-		300: '#66c6e4',
+-		200: '#bfe7f3',
+-		100: '#e5f5fa',
+-		highlight: '#b3e7fe',
+-		focus: '#007cba',
+-	},
+ };
+ 
++// Matches @wordpress/base-styles
+ const ALERT = {
+ 	yellow: '#f0b849',
+ 	red: '#d94f4f',
+ 	green: '#4ab866',
+ };
+ 
++// Matches @wordpress/base-styles
+ const ADMIN = {
+-	theme: `var( --wp-admin-theme-color, ${ BLUE.wordpress[ 700 ] })`,
+-	themeDark10: `var( --wp-admin-theme-color-darker-10, ${ BLUE.medium.focus })`,
++	theme: 'var( --wp-admin-theme-color, #007cba)',
++	themeDark10: 'var( --wp-admin-theme-color-darker-10, #006ba1)',
+ };
+ 
+-// Namespaced values for raw colors hex codes.
+ const UI = {
+ 	theme: ADMIN.theme,
+-	background: BASE.white,
+-	backgroundDisabled: LIGHT_GRAY[ 200 ],
+-	border: G2.gray[ 700 ],
+-	borderHover: G2.gray[ 700 ],
++	background: white,
++	backgroundDisabled: LIGHT_GRAY[ 200 ], // TODO: Replace with WordPress gray
++	border: GRAY[ 700 ],
++	borderHover: GRAY[ 700 ],
+ 	borderFocus: ADMIN.themeDark10,
+-	borderDisabled: G2.gray[ 400 ],
+-	borderLight: G2.gray[ 300 ],
+-	label: DARK_GRAY[ 500 ],
+-	textDisabled: DARK_GRAY[ 150 ],
+-	textDark: BASE.white,
+-	textLight: BASE.black,
++	borderDisabled: GRAY[ 400 ],
++	textDisabled: DARK_GRAY[ 150 ], // TODO: Replace with WordPress gray
++	textDark: white,
++
++	// Matches @wordpress/base-styles
++	darkGrayPlaceholder: rgba( GRAY[ 900 ], 0.62 ),
++	lightGrayPlaceholder: rgba( white, 0.65 ),
+ };
+ 
+-// Using Object.assign instead of { ...spread } syntax helps TypeScript
+-// to extract the correct type defs here.
+-export const COLORS = Object.assign( {}, BASE, {
++export const COLORS = Object.freeze( {
++	/**
++	 * @deprecated Try to use `gray` instead.
++	 */
+ 	darkGray: DARK_GRAY,
+-	darkOpacity: DARK_OPACITY,
+-	darkOpacityLight: DARK_OPACITY_LIGHT,
+-	mediumGray: G2.mediumGray,
+ 	/**
+-	 * The main gray color object (since Apr 16, 2022).
+-	 *
+-	 * We are in the process of simplifying the colors in this file,
+-	 * please prefer this `gray` object in the meantime.
++	 * The main gray color object.
++	 */
++	gray: GRAY,
++	/**
++	 * @deprecated Try to use `gray` instead.
+ 	 */
+-	gray: G2.gray,
+-	lightGray: merge( {}, LIGHT_GRAY, G2.lightGray ),
+-	lightGrayLight: LIGHT_OPACITY_LIGHT,
+-	blue: merge( {}, BLUE, G2.blue ),
++	lightGray: LIGHT_GRAY,
++	white,
+ 	alert: ALERT,
+-	admin: ADMIN,
+ 	ui: UI,
+ } );
+ 
+diff --git a/packages/components/src/utils/config-values.js b/packages/components/src/utils/config-values.js
+index 8f3e044261d730..05364a34a5eed1 100644
+--- a/packages/components/src/utils/config-values.js
++++ b/packages/components/src/utils/config-values.js
+@@ -18,7 +18,7 @@ const CONTROL_PROPS = {
+ 	controlBorderColor: COLORS.gray[ 700 ],
+ 	controlBoxShadow: 'transparent',
+ 	controlBorderColorHover: COLORS.gray[ 700 ],
+-	controlBoxShadowFocus: `0 0 0 0.5px ${ COLORS.admin.theme }`,
++	controlBoxShadowFocus: `0 0 0 0.5px ${ COLORS.ui.theme }`,
+ 	controlDestructiveBorderColor: COLORS.alert.red,
+ 	controlHeight: CONTROL_HEIGHT,
+ 	controlHeightXSmall: `calc( ${ CONTROL_HEIGHT } * 0.6 )`,
+diff --git a/packages/components/src/utils/input/input-control.js b/packages/components/src/utils/input/input-control.js
+index 1a14aef8749ef7..c550a558d6d4e2 100644
+--- a/packages/components/src/utils/input/input-control.js
++++ b/packages/components/src/utils/input/input-control.js
+@@ -33,30 +33,30 @@ export const inputControl = css`
+ 
+ 	// Use opacity to work in various editor styles.
+ 	&::-webkit-input-placeholder {
+-		color: ${ COLORS.darkGray.placeholder };
++		color: ${ COLORS.ui.darkGrayPlaceholder };
+ 	}
+ 
+ 	&::-moz-placeholder {
+ 		opacity: 1; // Necessary because Firefox reduces this from 1.
+-		color: ${ COLORS.darkGray.placeholder };
++		color: ${ COLORS.ui.darkGrayPlaceholder };
+ 	}
+ 
+ 	&:-ms-input-placeholder {
+-		color: ${ COLORS.darkGray.placeholder };
++		color: ${ COLORS.ui.darkGrayPlaceholder };
+ 	}
+ 
+ 	.is-dark-theme & {
+ 		&::-webkit-input-placeholder {
+-			color: ${ COLORS.lightGray.placeholder };
++			color: ${ COLORS.ui.lightGrayPlaceholder };
+ 		}
+ 
+ 		&::-moz-placeholder {
+ 			opacity: 1; // Necessary because Firefox reduces this from 1.
+-			color: ${ COLORS.lightGray.placeholder };
++			color: ${ COLORS.ui.lightGrayPlaceholder };
+ 		}
+ 
+ 		&:-ms-input-placeholder {
+-			color: ${ COLORS.lightGray.placeholder };
++			color: ${ COLORS.ui.lightGrayPlaceholder };
+ 		}
+ 	}
+ `;

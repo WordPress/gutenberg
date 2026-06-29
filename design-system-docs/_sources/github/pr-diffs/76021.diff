@@ -1,0 +1,39 @@
+diff --git a/packages/components/src/tabs/tablist.tsx b/packages/components/src/tabs/tablist.tsx
+index b7cfef7e19a096..d41a9535c9359a 100644
+--- a/packages/components/src/tabs/tablist.tsx
++++ b/packages/components/src/tabs/tablist.tsx
+@@ -87,10 +87,34 @@ export const TabList = forwardRef<
+ 		renderedItems && selectedItem
+ 			? renderedItems.indexOf( selectedItem )
+ 			: -1;
++
++	// Track when any tab item resizes, so that the selected indicator
++	// position is recalculated even when a sibling tab changes size.
++	const [ tabsResizeCount, setTabsResizeCount ] = useState( 0 );
++	useLayoutEffect( () => {
++		if ( ! renderedItems?.length ) {
++			return;
++		}
++
++		const observer = new ResizeObserver( () => {
++			setTabsResizeCount( ( prev ) => prev + 1 );
++		} );
++
++		for ( const item of renderedItems ) {
++			if ( item.element ) {
++				observer.observe( item.element );
++			}
++		}
++
++		return () => observer.disconnect();
++	}, [ renderedItems ] );
++
+ 	// Use selectedItemIndex as a dependency to force recalculation when the
+ 	// selected item index changes (elements are swapped / added / removed).
++	// Use tabsResizeCount to force recalculation when any tab resizes.
+ 	const selectedRect = useTrackElementOffsetRect( selectedItem?.element, [
+ 		selectedItemIndex,
++		tabsResizeCount,
+ 	] );
+ 
+ 	// Track overflow to show scroll hints.

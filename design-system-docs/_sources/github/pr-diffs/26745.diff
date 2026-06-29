@@ -1,0 +1,227 @@
+diff --git a/packages/components/src/range-control/index.js b/packages/components/src/range-control/index.js
+index 90f55c3c0cd555..543d25accfcfbd 100644
+--- a/packages/components/src/range-control/index.js
++++ b/packages/components/src/range-control/index.js
+@@ -99,9 +99,7 @@ function RangeControl(
+ 
+ 	const inputSliderValue = isValueReset ? '' : currentValue;
+ 
+-	const rangeFillValue = isValueReset
+-		? floatClamp( max / 2, min, max )
+-		: value;
++	const rangeFillValue = isValueReset ? ( max - min ) / 2 + min : value;
+ 
+ 	const calculatedFillValue = ( ( value - min ) / ( max - min ) ) * 100;
+ 	const fillValue = isValueReset ? 50 : calculatedFillValue;
+diff --git a/packages/components/src/range-control/rail.js b/packages/components/src/range-control/rail.js
+index 93db3351c68121..51c188e8f46493 100644
+--- a/packages/components/src/range-control/rail.js
++++ b/packages/components/src/range-control/rail.js
+@@ -64,33 +64,33 @@ function useMarks( { marks, min = 0, max = 100, step = 1, value = 0 } ) {
+ 		return [];
+ 	}
+ 
+-	const isCustomMarks = Array.isArray( marks );
+-
+-	const markCount = Math.round( ( max - min ) / step );
+-	const marksArray = isCustomMarks
+-		? marks
+-		: [ ...Array( markCount + 1 ) ].map( ( _, index ) => ( {
+-				value: index,
+-		  } ) );
+-
+-	const enhancedMarks = marksArray.map( ( mark, index ) => {
+-		const markValue = mark.value !== undefined ? mark.value : value;
++	const range = max - min;
++	if ( ! Array.isArray( marks ) ) {
++		marks = [];
++		const count = 1 + Math.round( range / step );
++		while ( count > marks.push( { value: step * marks.length + min } ) );
++	}
+ 
++	const placedMarks = [];
++	marks.forEach( ( mark, index ) => {
++		if ( mark.value < min || mark.value > max ) {
++			return;
++		}
+ 		const key = `mark-${ index }`;
+-		const isFilled = markValue * step + min <= value;
+-		const offset = `${ ( markValue / markCount ) * 100 }%`;
++		const isFilled = mark.value <= value;
++		const offset = `${ ( ( mark.value - min ) / range ) * 100 }%`;
+ 
+ 		const offsetStyle = {
+ 			[ isRTL ? 'right' : 'left' ]: offset,
+ 		};
+ 
+-		return {
++		placedMarks.push( {
+ 			...mark,
+ 			isFilled,
+ 			key,
+ 			style: offsetStyle,
+-		};
++		} );
+ 	} );
+ 
+-	return enhancedMarks;
++	return placedMarks;
+ }
+diff --git a/packages/components/src/range-control/stories/index.js b/packages/components/src/range-control/stories/index.js
+index d3dca6a1ca1a35..e91fde04b8fbc3 100644
+--- a/packages/components/src/range-control/stories/index.js
++++ b/packages/components/src/range-control/stories/index.js
+@@ -75,6 +75,11 @@ const DefaultExample = () => {
+ 	);
+ };
+ 
++const RangeControlLabeledByMarksType = ( props ) => {
++	const label = Array.isArray( props.marks ) ? 'Custom' : 'Automatic';
++	return <RangeControl { ...{ ...props, label } } />;
++};
++
+ export const _default = () => {
+ 	return <DefaultExample />;
+ };
+@@ -131,33 +136,51 @@ export const withReset = () => {
+ 	return <RangeControlWithState label={ label } allowReset />;
+ };
+ 
+-export const customMarks = () => {
+-	const marks = [
+-		{
+-			value: 0,
+-			label: '0',
+-		},
+-		{
+-			value: 1,
+-			label: '1',
+-		},
+-		{
+-			value: 2,
+-			label: '2',
+-		},
+-		{
+-			value: 8,
+-			label: '8',
+-		},
+-		{
+-			value: 10,
+-			label: '10',
+-		},
++export const marks = () => {
++	const marksBase = [
++		{ value: 0, label: '0' },
++		{ value: 1, label: '1' },
++		{ value: 2, label: '2' },
++		{ value: 8, label: '8' },
++		{ value: 10, label: '10' },
++	];
++	const marksWithDecimal = [
++		...marksBase,
++		{ value: 3.5, label: '3.5' },
++		{ value: 5.8, label: '5.8' },
++	];
++	const marksWithNegatives = [
++		...marksBase,
++		{ value: -1, label: '-1' },
++		{ value: -2, label: '-2' },
++		{ value: -4, label: '-4' },
++		{ value: -8, label: '-8' },
+ 	];
++	const stepInteger = { min: 0, max: 10, step: 1 };
++	const stepDecimal = { min: 0, max: 10, step: 0.1 };
++	const minNegative = { min: -10, max: 10, step: 1 };
++	const rangeNegative = { min: -10, max: -1, step: 1 };
++
++	// use a short alias to keep formatting to fewer lines
++	const Range = RangeControlLabeledByMarksType;
+ 
+ 	return (
+ 		<Wrapper>
+-			<RangeControl marks={ marks } min={ 0 } max={ 10 } step={ 1 } />
++			<h2>Integer Step</h2>
++			<Range marks { ...stepInteger } />
++			<Range marks={ marksBase } { ...stepInteger } />
++
++			<h2>Decimal Step</h2>
++			<Range marks { ...stepDecimal } />
++			<Range marks={ marksWithDecimal } { ...stepDecimal } />
++
++			<h2>Negative Minimum</h2>
++			<Range marks { ...minNegative } />
++			<Range marks={ marksWithNegatives } { ...minNegative } />
++
++			<h2>Negative Range</h2>
++			<Range marks { ...rangeNegative } />
++			<Range marks={ marksWithNegatives } { ...rangeNegative } />
+ 		</Wrapper>
+ 	);
+ };
+diff --git a/packages/components/src/range-control/styles/range-control-styles.js b/packages/components/src/range-control/styles/range-control-styles.js
+index 0fa3fbbeb233d9..4f49803f81d945 100644
+--- a/packages/components/src/range-control/styles/range-control-styles.js
++++ b/packages/components/src/range-control/styles/range-control-styles.js
+@@ -11,11 +11,11 @@ import NumberControl from '../../number-control';
+ import { color, reduceMotion, rtl, space } from '../../utils/style-mixins';
+ 
+ const rangeHeight = () => css( { height: 30, minHeight: 30 } );
++const thumbSize = 20;
+ 
+ export const Root = styled.span`
+ 	-webkit-tap-highlight-color: transparent;
+ 	box-sizing: border-box;
+-	cursor: pointer;
+ 	align-items: flex-start;
+ 	display: inline-flex;
+ 	justify-content: flex-start;
+@@ -115,6 +115,7 @@ export const Track = styled.span`
+ export const MarksWrapper = styled.span`
+ 	box-sizing: border-box;
+ 	display: block;
++	pointer-events: none;
+ 	position: relative;
+ 	width: 100%;
+ 	user-select: none;
+@@ -166,7 +167,7 @@ export const ThumbWrapper = styled.span`
+ 	align-items: center;
+ 	box-sizing: border-box;
+ 	display: flex;
+-	height: 20px;
++	height: ${ thumbSize }px;
+ 	justify-content: center;
+ 	margin-top: 5px;
+ 	outline: 0;
+@@ -174,7 +175,7 @@ export const ThumbWrapper = styled.span`
+ 	position: absolute;
+ 	top: 0;
+ 	user-select: none;
+-	width: 20px;
++	width: ${ thumbSize }px;
+ 
+ 	${ rtl( { marginLeft: -10 } ) }
+ `;
+@@ -202,7 +203,6 @@ export const Thumb = styled.span`
+ 	box-sizing: border-box;
+ 	height: 100%;
+ 	outline: 0;
+-	pointer-events: none;
+ 	position: absolute;
+ 	user-select: none;
+ 	width: 100%;
+@@ -216,13 +216,13 @@ export const InputRange = styled.input`
+ 	display: block;
+ 	height: 100%;
+ 	left: 0;
+-	margin: 0;
++	margin: 0 -${ thumbSize / 2 }px;
+ 	opacity: 0;
+ 	outline: none;
+ 	position: absolute;
+ 	right: 0;
+ 	top: 0;
+-	width: 100%;
++	width: calc( 100% + ${ thumbSize }px );
+ `;
+ 
+ const tooltipShow = ( { show } ) => {

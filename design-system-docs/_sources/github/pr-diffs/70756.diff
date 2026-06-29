@@ -1,0 +1,36 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5da6bff0973f8c..9d76028769a3ca 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Breaking Changes
++
++-   `Icon`: Pass `size` prop value as `width`/`height` attributes when `icon` is a component that doesn't exactly match `SVG` ([#70756](https://github.com/WordPress/gutenberg/pull/70756)).
++
+ ### Internal
+ 
+ -   Add new validated form controls (work in progress, not exported): `ValidatedCheckboxControl`, `ValidatedInputControl`, `ValidatedNumberControl`, `ValidatedRadioControl`, `ValidatedRangeControl`, `ValidatedSelectControl`, `ValidatedTextControl`, `ValidatedTextareaControl`, `ValidatedToggleControl`, `ValidatedCustomSelectControl`, `ValidatedComboboxControl`, `ValidatedToggleGroupControl`, and `ControlWithError` for enhanced form validation capabilities ([#70620](https://github.com/WordPress/gutenberg/pull/70620)).
+@@ -13,6 +17,7 @@
+ -   `SelectControl`: Move classnames to the root ([#70643](https://github.com/WordPress/gutenberg/pull/70643)).
+ -   `Autocomplete`: Prevent text cursor position loss when clicking to insert an item ([#70660](https://github.com/WordPress/gutenberg/pull/70660)).
+ 
++
+ ### Internal
+ 
+ -   Add new private `DateCalendar` and `DateRangeCalendar` components ([#70578](https://github.com/WordPress/gutenberg/pull/70578), [#70681](https://github.com/WordPress/gutenberg/pull/70681)).
+diff --git a/packages/components/src/icon/index.tsx b/packages/components/src/icon/index.tsx
+index 283b9cd179cd1c..07ec786da7a9a0 100644
+--- a/packages/components/src/icon/index.tsx
++++ b/packages/components/src/icon/index.tsx
+@@ -107,6 +107,8 @@ function Icon( {
+ 		return cloneElement( icon, {
+ 			// @ts-ignore Just forwarding the size prop along
+ 			size,
++			width: size,
++			height: size,
+ 			...additionalProps,
+ 		} );
+ 	}

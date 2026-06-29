@@ -1,0 +1,202 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 57659cb0427e9a..5e9be2b5d76d67 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ -   `Spacer`: Complete TypeScript migration ([#42013](https://github.com/WordPress/gutenberg/pull/42013)).
+ -   `TreeSelect`: Refactor away from `_.repeat()` ([#42070](https://github.com/WordPress/gutenberg/pull/42070/)).
+ -   `FocalPointPicker` updated to satisfy `react/exhuastive-deps` eslint rule ([#41520](https://github.com/WordPress/gutenberg/pull/41520)).
++-   `ColorPicker` updated to satisfy `react/exhuastive-deps` eslint rule ([#41294](https://github.com/WordPress/gutenberg/pull/41294)).
+ 
+ ## 19.14.0 (2022-06-29)
+ 
+diff --git a/packages/components/src/color-picker/index.native.js b/packages/components/src/color-picker/index.native.js
+index ebc422a94ba616..1dfd2353cad1cc 100644
+--- a/packages/components/src/color-picker/index.native.js
++++ b/packages/components/src/color-picker/index.native.js
+@@ -8,7 +8,7 @@ import namesPlugin from 'colord/plugins/names';
+ /**
+  * WordPress dependencies
+  */
+-import { useState, useEffect, useRef } from '@wordpress/element';
++import { useState, useEffect } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+ import { BottomSheet } from '@wordpress/components';
+ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+@@ -33,7 +33,6 @@ function ColorPicker( {
+ 	onHandleHardwareButtonPress,
+ 	bottomLabelText,
+ } ) {
+-	const didMount = useRef( false );
+ 	const isIOS = Platform.OS === 'ios';
+ 	const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
+ 	const {
+@@ -77,19 +76,17 @@ function ColorPicker( {
+ 		styles.footerDark
+ 	);
+ 
+-	const currentColor = colord( {
+-		h: hue,
+-		s: sat * 100,
+-		v: val * 100,
+-	} ).toHex();
++	const combineToHex = ( h = hue, s = sat, v = val ) =>
++		colord( { h, s: s * 100, v: v * 100 } ).toHex();
+ 
+-	useEffect( () => {
+-		if ( ! didMount.current ) {
+-			didMount.current = true;
+-			return;
+-		}
+-		setColor( currentColor );
+-	}, [ currentColor ] );
++	const currentColor = combineToHex();
++
++	const updateColor = ( { hue: h, saturation: s, value: v } ) => {
++		if ( h !== undefined ) setHue( h );
++		if ( s !== undefined ) setSaturation( s );
++		if ( v !== undefined ) setValue( v );
++		setColor( combineToHex( h, s, v ) );
++	};
+ 
+ 	useEffect( () => {
+ 		shouldEnableBottomSheetMaxHeight( false );
+@@ -104,17 +101,13 @@ function ColorPicker( {
+ 		if ( onHandleHardwareButtonPress ) {
+ 			onHandleHardwareButtonPress( onButtonPress );
+ 		}
++		// TODO: Revisit this to discover if there's a good reason for omitting
++		// the hook’s dependencies and running it a single time. Ideally there
++		// may be a way to refactor and obviate the disabled lint rule. If not,
++		// this comment should be replaced by one that explains the reasoning.
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [] );
+ 
+-	function onHuePickerChange( { hue: h } ) {
+-		setHue( h );
+-	}
+-
+-	function onSatValPickerChange( { saturation: s, value: v } ) {
+-		setSaturation( s );
+-		setValue( v );
+-	}
+-
+ 	function onButtonPress( action ) {
+ 		onNavigationBack();
+ 		onHandleClosingBottomSheet( null );
+@@ -129,16 +122,16 @@ function ColorPicker( {
+ 		<>
+ 			<HsvColorPicker
+ 				huePickerHue={ hue }
+-				onHuePickerDragMove={ onHuePickerChange }
++				onHuePickerDragMove={ updateColor }
+ 				onHuePickerPress={
+-					! isBottomSheetContentScrolling && onHuePickerChange
++					! isBottomSheetContentScrolling && updateColor
+ 				}
+ 				satValPickerHue={ hue }
+ 				satValPickerSaturation={ sat }
+ 				satValPickerValue={ val }
+-				onSatValPickerDragMove={ onSatValPickerChange }
++				onSatValPickerDragMove={ updateColor }
+ 				onSatValPickerPress={
+-					! isBottomSheetContentScrolling && onSatValPickerChange
++					! isBottomSheetContentScrolling && updateColor
+ 				}
+ 				onSatValPickerDragStart={ () => {
+ 					shouldEnableBottomSheetScroll( false );
+diff --git a/packages/components/src/color-picker/use-deprecated-props.ts b/packages/components/src/color-picker/use-deprecated-props.ts
+index 49f00b7dd7f4cb..a2cae51d202f19 100644
+--- a/packages/components/src/color-picker/use-deprecated-props.ts
++++ b/packages/components/src/color-picker/use-deprecated-props.ts
+@@ -16,7 +16,7 @@ import memoize from 'memize';
+ /**
+  * WordPress dependencies
+  */
+-import { useCallback, useMemo } from '@wordpress/element';
++import { useCallback } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -73,16 +73,14 @@ function isLegacyProps( props: any ): props is LegacyProps {
+ 	);
+ }
+ 
+-function getColorFromLegacyProps( props: LegacyProps ): string | undefined {
+-	if ( typeof props?.color === 'undefined' ) {
+-		return undefined;
+-	}
+-	if ( typeof props.color === 'string' ) {
+-		return props.color;
+-	}
+-	if ( props.color.hex ) {
+-		return props.color.hex;
+-	}
++function getColorFromLegacyProps(
++	color: LegacyProps[ 'color' ]
++): string | undefined {
++	if ( color === undefined ) return;
++
++	if ( typeof color === 'string' ) return color;
++
++	if ( color.hex ) return color.hex;
+ 
+ 	return undefined;
+ }
+@@ -109,41 +107,24 @@ const transformColorStringToLegacyColor = memoize(
+ export function useDeprecatedProps(
+ 	props: LegacyProps | ColorPickerProps
+ ): ColorPickerProps {
+-	const onChange = useCallback(
++	const { onChangeComplete } = props as LegacyProps;
++	const legacyChangeHandler = useCallback(
+ 		( color: string ) => {
+-			if ( isLegacyProps( props ) ) {
+-				return props.onChangeComplete(
+-					transformColorStringToLegacyColor( color )
+-				);
+-			}
+-
+-			return props.onChange?.( color );
++			onChangeComplete( transformColorStringToLegacyColor( color ) );
+ 		},
+-		[
+-			( props as LegacyProps ).onChangeComplete,
+-			( props as ColorPickerProps ).onChange,
+-		]
++		[ onChangeComplete ]
+ 	);
+-
+-	const color = useMemo( () => {
+-		return isLegacyProps( props )
+-			? getColorFromLegacyProps( props )
+-			: props.color;
+-	}, [ props.color ] );
+-
+-	const enableAlpha = useMemo( () => {
+-		return isLegacyProps( props )
+-			? ! props.disableAlpha
+-			: props.enableAlpha;
+-	}, [
+-		( props as LegacyProps ).disableAlpha,
+-		( props as ColorPickerProps ).enableAlpha,
+-	] );
+-
++	if ( isLegacyProps( props ) ) {
++		return {
++			color: getColorFromLegacyProps( props.color ),
++			enableAlpha: ! props.disableAlpha,
++			onChange: legacyChangeHandler,
++		};
++	}
+ 	return {
+-		...( isLegacyProps( props ) ? {} : props ),
+-		onChange,
+-		color,
+-		enableAlpha,
++		...props,
++		color: props.color as ColorPickerProps[ 'color' ],
++		enableAlpha: ( props as ColorPickerProps ).enableAlpha,
++		onChange: ( props as ColorPickerProps ).onChange,
+ 	};
+ }

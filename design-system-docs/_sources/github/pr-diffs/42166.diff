@@ -1,0 +1,192 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c0295cfd63bac9..2210ddd89fe102 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `BoxControl`: Change ARIA role from `region` to `group` to avoid unwanted ARIA landmark regions ([#42094](https://github.com/WordPress/gutenberg/pull/42094)).
+ 
++### Enhancements
++
++-   `InputControl`: Ensure that the padding between a `prefix`/`suffix` and the text input stays at a reasonable 8px, even in larger size variants ([#42166](https://github.com/WordPress/gutenberg/pull/42166)).
++
+ ### Internal
+ 
+ -   `Grid`: Convert to TypeScript ([#41923](https://github.com/WordPress/gutenberg/pull/41923)).
+diff --git a/packages/components/src/input-control/index.tsx b/packages/components/src/input-control/index.tsx
+index ffec6a8a5a7f2b..73fb7dc4cab8f4 100644
+--- a/packages/components/src/input-control/index.tsx
++++ b/packages/components/src/input-control/index.tsx
+@@ -16,6 +16,7 @@ import { useState, forwardRef } from '@wordpress/element';
+ import InputBase from './input-base';
+ import InputField from './input-field';
+ import type { InputControlProps } from './types';
++import { space } from '../ui/utils/space';
+ import { useDraft } from './utils';
+ 
+ const noop = () => {};
+@@ -85,6 +86,8 @@ export function UnforwardedInputControl(
+ 				isPressEnterToChange={ isPressEnterToChange }
+ 				onKeyDown={ onKeyDown }
+ 				onValidate={ onValidate }
++				paddingInlineStart={ prefix ? space( 2 ) : undefined }
++				paddingInlineEnd={ suffix ? space( 2 ) : undefined }
+ 				ref={ ref }
+ 				setIsFocused={ setIsFocused }
+ 				size={ size }
+diff --git a/packages/components/src/input-control/stories/index.tsx b/packages/components/src/input-control/stories/index.tsx
+index 27ddb23262a0c6..2ae41172df0d2c 100644
+--- a/packages/components/src/input-control/stories/index.tsx
++++ b/packages/components/src/input-control/stories/index.tsx
+@@ -40,13 +40,13 @@ Default.args = {
+ export const WithPrefix = Template.bind( {} );
+ WithPrefix.args = {
+ 	...Default.args,
+-	prefix: <span style={ { paddingLeft: 8 } }>@</span>,
++	prefix: <span style={ { marginInlineStart: 8 } }>@</span>,
+ };
+ 
+ export const WithSuffix = Template.bind( {} );
+ WithSuffix.args = {
+ 	...Default.args,
+-	suffix: <button style={ { marginRight: 4 } }>Send</button>,
++	suffix: <button style={ { marginInlineEnd: 4 } }>Send</button>,
+ };
+ 
+ export const WithSideLabel = Template.bind( {} );
+diff --git a/packages/components/src/input-control/styles/input-control-styles.tsx b/packages/components/src/input-control/styles/input-control-styles.tsx
+index 1c8463675b39f2..943db6d0654246 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.tsx
++++ b/packages/components/src/input-control/styles/input-control-styles.tsx
+@@ -110,6 +110,8 @@ type InputProps = {
+ 	inputSize?: Size;
+ 	isDragging?: boolean;
+ 	dragCursor?: CSSProperties[ 'cursor' ];
++	paddingInlineStart?: CSSProperties[ 'paddingInlineStart' ];
++	paddingInlineEnd?: CSSProperties[ 'paddingInlineEnd' ];
+ };
+ 
+ const disabledStyles = ( { disabled }: InputProps ) => {
+@@ -145,6 +147,7 @@ const sizeStyles = ( {
+ 	inputSize: size,
+ 	__next36pxDefaultSize,
+ }: InputProps ) => {
++	// Paddings may be overridden by the custom paddings props.
+ 	const sizes = {
+ 		default: {
+ 			height: 36,
+@@ -184,6 +187,13 @@ const sizeStyles = ( {
+ 	return css( style );
+ };
+ 
++const customPaddings = ( {
++	paddingInlineStart,
++	paddingInlineEnd,
++}: InputProps ) => {
++	return css( { paddingInlineStart, paddingInlineEnd } );
++};
++
+ const dragStyles = ( { isDragging, dragCursor }: InputProps ) => {
+ 	let defaultArrowStyles: SerializedStyles | undefined;
+ 	let activeDragCursorStyles: SerializedStyles | undefined;
+@@ -235,6 +245,7 @@ export const Input = styled.input< InputProps >`
+ 		${ disabledStyles }
+ 		${ fontSizeStyles }
+ 		${ sizeStyles }
++		${ customPaddings }
+ 
+ 		&::-webkit-input-placeholder {
+ 			line-height: normal;
+diff --git a/packages/components/src/input-control/types.ts b/packages/components/src/input-control/types.ts
+index bdf0c33dfadf71..341d5fe51e3997 100644
+--- a/packages/components/src/input-control/types.ts
++++ b/packages/components/src/input-control/types.ts
+@@ -102,6 +102,8 @@ export interface InputFieldProps extends BaseProps {
+ 		nextValue: string,
+ 		event?: SyntheticEvent< HTMLInputElement >
+ 	) => void;
++	paddingInlineStart?: CSSProperties[ 'paddingInlineStart' ];
++	paddingInlineEnd?: CSSProperties[ 'paddingInlineEnd' ];
+ 	setIsFocused: ( isFocused: boolean ) => void;
+ 	stateReducer?: StateReducer;
+ 	/**
+@@ -152,12 +154,17 @@ export interface InputControlProps
+ 		 * be the only prefix prop. Otherwise it tries to do a union of the two prefix properties and you end up
+ 		 * with an unresolvable type.
+ 		 *
+-		 * `isFocused` and `setIsFocused` are managed internally by the InputControl, but the rest of the props
+-		 * for InputField are passed through.
++		 * `isFocused`, `setIsFocused`, `paddingInlineStart`, and `paddingInlineEnd` are managed internally by
++		 * the InputControl, but the rest of the props for InputField are passed through.
+ 		 */
+ 		Omit<
+ 			WordPressComponentProps< InputFieldProps, 'input', false >,
+-			'stateReducer' | 'prefix' | 'isFocused' | 'setIsFocused'
++			| 'stateReducer'
++			| 'prefix'
++			| 'isFocused'
++			| 'setIsFocused'
++			| 'paddingInlineStart'
++			| 'paddingInlineEnd'
+ 		> {
+ 	__unstableStateReducer?: InputFieldProps[ 'stateReducer' ];
+ }
+diff --git a/packages/components/src/unit-control/styles/unit-control-styles.ts b/packages/components/src/unit-control/styles/unit-control-styles.ts
+index 6085f1fe9cdf65..3e3521b418d74d 100644
+--- a/packages/components/src/unit-control/styles/unit-control-styles.ts
++++ b/packages/components/src/unit-control/styles/unit-control-styles.ts
+@@ -18,7 +18,6 @@ type SelectProps = {
+ 
+ type InputProps = {
+ 	disableUnits?: boolean;
+-	size: SelectSize;
+ };
+ 
+ export const Root = styled.div`
+@@ -26,14 +25,6 @@ export const Root = styled.div`
+ 	position: relative;
+ `;
+ 
+-const paddingStyles = ( { disableUnits }: InputProps ) => {
+-	if ( disableUnits ) return '';
+-
+-	return css`
+-		${ rtl( { paddingRight: 8 } )() };
+-	`;
+-};
+-
+ const arrowStyles = ( { disableUnits }: InputProps ) => {
+ 	if ( disableUnits ) return '';
+ 
+@@ -58,7 +49,6 @@ export const ValueInput = styled( NumberControl )`
+ 			width: 100%;
+ 
+ 			${ arrowStyles };
+-			${ paddingStyles };
+ 		}
+ 	}
+ `;
+diff --git a/packages/components/src/unit-control/test/__snapshots__/index.tsx.snap b/packages/components/src/unit-control/test/__snapshots__/index.tsx.snap
+index a723bc9f257d35..6b3f683f21308c 100644
+--- a/packages/components/src/unit-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/unit-control/test/__snapshots__/index.tsx.snap
+@@ -10,8 +10,8 @@ Snapshot Diff:
+     class="components-unit-control-wrapper css-aa2xc3-Root e1bagdl33"
+   >
+     <div
+--     class="components-flex components-input-control components-number-control components-unit-control e1bagdl32 ep48uk90 em5sgkm7 css-18wzek1-View-Flex-sx-Base-sx-Items-ItemsColumn-Root-rootLabelPositionStyles-Input-ValueInput-arrowStyles-paddingStyles em57xhy0"
+-+     class="components-flex components-input-control components-number-control components-unit-control hello e1bagdl32 ep48uk90 em5sgkm7 css-18wzek1-View-Flex-sx-Base-sx-Items-ItemsColumn-Root-rootLabelPositionStyles-Input-ValueInput-arrowStyles-paddingStyles em57xhy0"
++-     class="components-flex components-input-control components-number-control components-unit-control e1bagdl32 ep48uk90 em5sgkm7 css-1njfmeu-View-Flex-sx-Base-sx-Items-ItemsColumn-Root-rootLabelPositionStyles-Input-ValueInput-arrowStyles em57xhy0"
+++     class="components-flex components-input-control components-number-control components-unit-control hello e1bagdl32 ep48uk90 em5sgkm7 css-1njfmeu-View-Flex-sx-Base-sx-Items-ItemsColumn-Root-rootLabelPositionStyles-Input-ValueInput-arrowStyles em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="Flex"
+     >
+@@ -22,7 +22,7 @@ Snapshot Diff:
+       >
+         <input
+           autocomplete="off"
+-          class="components-input-control__input css-gzm6eu-Input-dragStyles-fontSizeStyles-sizeStyles em5sgkm5"
++          class="components-input-control__input css-1vhigq9-Input-dragStyles-fontSizeStyles-sizeStyles-customPaddings em5sgkm5"
+ -         id="inspector-input-control-1"
+ +         id="inspector-input-control-2"
+           inputmode="numeric"

@@ -1,0 +1,60 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f7df0f0bb9078d..38f4eb8859252f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `Popover`: fix limitShift logic by adding iframe offset correctly [#42950](https://github.com/WordPress/gutenberg/pull/42950)).
+ -   `Popover`: refine position-to-placement conversion logic, add tests ([#44377](https://github.com/WordPress/gutenberg/pull/44377)).
++-   `ToggleGroupControl`: adjust icon color when inactive, from `gray-700` to `gray-900` ([#44575](https://github.com/WordPress/gutenberg/pull/44575)).
+ -   `TokenInput`: improve logic around the `aria-activedescendant` attribute, which was causing unintended focus behavior for some screen readers ([#44526](https://github.com/WordPress/gutenberg/pull/44526)).
+ 
+ ### Internal
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index 519a7702985ce1..51b1f8b9100cf9 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -159,6 +159,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+ }
+ 
+ .emotion-15 {
++  color: #1e1e1e;
+   width: 30px;
+   padding-left: 0;
+   padding-right: 0;
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
+index da2cc709f50454..885ff171eb211f 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
+@@ -55,13 +55,6 @@ export const buttonView = css`
+ 	}
+ `;
+ 
+-export const buttonActive = css`
+-	color: ${ COLORS.white };
+-	&:active {
+-		background: transparent;
+-	}
+-`;
+-
+ export const ButtonContentView = styled.div`
+ 	font-size: ${ CONFIG.fontSize };
+ 	line-height: 1;
+@@ -82,8 +75,17 @@ export const isIcon = ( {
+ 	};
+ 
+ 	return css`
++		color: ${ COLORS.gray[ 900 ] };
+ 		width: ${ iconButtonSizes[ size ] };
+ 		padding-left: 0;
+ 		padding-right: 0;
+ 	`;
+ };
++
++export const buttonActive = css`
++	color: ${ COLORS.white };
++
++	&:active {
++		background: transparent;
++	}
++`;

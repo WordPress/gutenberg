@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
+index c0248f9b3f7f22..70372cc5934aba 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
+@@ -38,7 +38,7 @@ export const buttonView = ( {
+ 	background: transparent;
+ 	border: none;
+ 	border-radius: ${ CONFIG.radiusXSmall };
+-	color: ${ COLORS.gray[ 700 ] };
++	color: ${ COLORS.gray[ 900 ] };
+ 	fill: currentColor;
+ 	cursor: pointer;
+ 	display: flex;

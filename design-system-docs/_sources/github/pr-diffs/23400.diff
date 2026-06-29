@@ -1,0 +1,253 @@
+diff --git a/lib/compat.php b/lib/compat.php
+index 87ecee9f45a838..3f514a6559ee5e 100644
+--- a/lib/compat.php
++++ b/lib/compat.php
+@@ -333,6 +333,77 @@ function gutenberg_add_dom_rect_polyfill( $scripts ) {
+ }
+ add_action( 'wp_default_scripts', 'gutenberg_add_dom_rect_polyfill', 20 );
+ 
++/**
++ * Adds a wp.date.setSettings with timezone abbr parameter
++ *
++ * This can be removed when plugin support requires WordPress 5.6.0+.
++ *
++ * The script registration occurs in core wp-includes/script-loader.php
++ * wp_default_packages_inline_scripts()
++ *
++ * @since 8.6.0
++ *
++ * @param WP_Scripts $scripts WP_Scripts object.
++ */
++function gutenberg_add_date_settings_timezone( $scripts ) {
++	if ( ! did_action( 'init' ) ) {
++		return;
++	}
++
++	global $wp_locale;
++
++	// Calculate the timezone abbr (EDT, PST) if possible.
++	$timezone_string = get_option( 'timezone_string', 'UTC' );
++	$timezone_abbr   = '';
++
++	if ( ! empty( $timezone_string ) ) {
++		$timezone_date = new DateTime( null, new DateTimeZone( $timezone_string ) );
++		$timezone_abbr = $timezone_date->format( 'T' );
++	}
++
++	$scripts->add_inline_script(
++		'wp-date',
++		sprintf(
++			'wp.date.setSettings( %s );',
++			wp_json_encode(
++				array(
++					'l10n'     => array(
++						'locale'        => get_user_locale(),
++						'months'        => array_values( $wp_locale->month ),
++						'monthsShort'   => array_values( $wp_locale->month_abbrev ),
++						'weekdays'      => array_values( $wp_locale->weekday ),
++						'weekdaysShort' => array_values( $wp_locale->weekday_abbrev ),
++						'meridiem'      => (object) $wp_locale->meridiem,
++						'relative'      => array(
++							/* translators: %s: Duration. */
++							'future' => __( '%s from now', 'default' ),
++							/* translators: %s: Duration. */
++							'past'   => __( '%s ago', 'default' ),
++						),
++					),
++					'formats'  => array(
++						/* translators: Time format, see https://www.php.net/date */
++						'time'                => get_option( 'time_format', __( 'g:i a', 'default' ) ),
++						/* translators: Date format, see https://www.php.net/date */
++						'date'                => get_option( 'date_format', __( 'F j, Y', 'default' ) ),
++						/* translators: Date/Time format, see https://www.php.net/date */
++						'datetime'            => __( 'F j, Y g:i a', 'default' ),
++						/* translators: Abbreviated date/time format, see https://www.php.net/date */
++						'datetimeAbbreviated' => __( 'M j, Y g:i a', 'default' ),
++					),
++					'timezone' => array(
++						'offset' => get_option( 'gmt_offset', 0 ),
++						'string' => $timezone_string,
++						'abbr'   => $timezone_abbr,
++					),
++				)
++			)
++		),
++		'after'
++	);
++}
++add_action( 'wp_default_scripts', 'gutenberg_add_date_settings_timezone', 20 );
++
+ /**
+  * Filters default block categories to substitute legacy category names with new
+  * block categories.
+diff --git a/package-lock.json b/package-lock.json
+index b0cf3da793aa61..e7e53f1867935d 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -11099,6 +11099,7 @@
+ 				"@emotion/styled": "^10.0.23",
+ 				"@wordpress/a11y": "file:packages/a11y",
+ 				"@wordpress/compose": "file:packages/compose",
++				"@wordpress/date": "file:packages/date",
+ 				"@wordpress/deprecated": "file:packages/deprecated",
+ 				"@wordpress/dom": "file:packages/dom",
+ 				"@wordpress/element": "file:packages/element",
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 111b0e4dbe894e..23540d2d96bd15 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -32,6 +32,7 @@
+ 		"@emotion/styled": "^10.0.23",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/compose": "file:../compose",
++		"@wordpress/date": "file:../date",
+ 		"@wordpress/deprecated": "file:../deprecated",
+ 		"@wordpress/dom": "file:../dom",
+ 		"@wordpress/element": "file:../element",
+diff --git a/packages/components/src/date-time/style.scss b/packages/components/src/date-time/style.scss
+index 27a1fef8540fc8..ee46009e9afbc2 100644
+--- a/packages/components/src/date-time/style.scss
++++ b/packages/components/src/date-time/style.scss
+@@ -186,6 +186,13 @@
+ 	}
+ }
+ 
++.components-datetime__timezone {
++	color: $dark-gray-500;
++	line-height: 30px;
++	margin-left: $grid-unit-05;
++	text-decoration: underline dotted;
++}
++
+ .components-datetime__time-legend {
+ 	font-weight: 600;
+ 	margin-top: 0.5em;
+diff --git a/packages/components/src/date-time/test/__snapshots__/time.js.snap b/packages/components/src/date-time/test/__snapshots__/time.js.snap
+index b65d4fddd151c0..ae17692f74a5fb 100644
+--- a/packages/components/src/date-time/test/__snapshots__/time.js.snap
++++ b/packages/components/src/date-time/test/__snapshots__/time.js.snap
+@@ -156,6 +156,7 @@ exports[`TimePicker matches the snapshot when the is12hour prop is false 1`] = `
+           value="00"
+         />
+       </div>
++      <TimeZone />
+     </div>
+   </fieldset>
+ </div>
+@@ -337,6 +338,7 @@ exports[`TimePicker matches the snapshot when the is12hour prop is specified 1`]
+           PM
+         </ForwardRef(Button)>
+       </ForwardRef(ButtonGroup)>
++      <TimeZone />
+     </div>
+   </fieldset>
+ </div>
+@@ -518,6 +520,7 @@ exports[`TimePicker matches the snapshot when the is12hour prop is true 1`] = `
+           PM
+         </ForwardRef(Button)>
+       </ForwardRef(ButtonGroup)>
++      <TimeZone />
+     </div>
+   </fieldset>
+ </div>
+@@ -679,6 +682,7 @@ exports[`TimePicker matches the snapshot when the is12hour prop is undefined 1`]
+           value="00"
+         />
+       </div>
++      <TimeZone />
+     </div>
+   </fieldset>
+ </div>
+diff --git a/packages/components/src/date-time/time.js b/packages/components/src/date-time/time.js
+index 0d6254ff42dbad..b2f9c1e44785d5 100644
+--- a/packages/components/src/date-time/time.js
++++ b/packages/components/src/date-time/time.js
+@@ -16,6 +16,7 @@ import { __ } from '@wordpress/i18n';
+  */
+ import Button from '../button';
+ import ButtonGroup from '../button-group';
++import TimeZone from './timezone';
+ 
+ /**
+  * Module Constants
+@@ -277,6 +278,7 @@ class TimePicker extends Component {
+ 	render() {
+ 		const { is12Hour } = this.props;
+ 		const { year, minutes, hours, am } = this.state;
++
+ 		return (
+ 			<div className={ classnames( 'components-datetime__time' ) }>
+ 				<fieldset>
+@@ -353,6 +355,8 @@ class TimePicker extends Component {
+ 								</Button>
+ 							</ButtonGroup>
+ 						) }
++
++						<TimeZone />
+ 					</div>
+ 				</fieldset>
+ 			</div>
+diff --git a/packages/components/src/date-time/timezone.js b/packages/components/src/date-time/timezone.js
+new file mode 100644
+index 00000000000000..03bbedf3b45cde
+--- /dev/null
++++ b/packages/components/src/date-time/timezone.js
+@@ -0,0 +1,45 @@
++/**
++ * WordPress dependencies
++ */
++import { __ } from '@wordpress/i18n';
++import { __experimentalGetSettings as getDateSettings } from '@wordpress/date';
++
++/**
++ * Internal dependencies
++ */
++import Tooltip from '../tooltip';
++
++/**
++ * Displays timezone information when user timezone is different from site timezone.
++ */
++const TimeZone = () => {
++	const { timezone } = getDateSettings();
++
++	// Convert timezone offset to hours.
++	const userTimezoneOffset = -1 * ( new Date().getTimezoneOffset() / 60 );
++
++	// System timezone and user timezone match, nothing needed.
++	// Compare as numbers because it comes over as string.
++	if ( Number( timezone.offset ) === userTimezoneOffset ) {
++		return null;
++	}
++
++	const offsetSymbol = timezone.offset >= 0 ? '+' : '';
++	const zoneAbbr =
++		'' !== timezone.abbr && isNaN( timezone.abbr )
++			? timezone.abbr
++			: `UTC${ offsetSymbol }${ timezone.offset }`;
++
++	const timezoneDetail =
++		'UTC' === timezone.string
++			? __( 'Coordinated Universal Time' )
++			: `(${ zoneAbbr }) ${ timezone.string.replace( '_', ' ' ) }`;
++
++	return (
++		<Tooltip position="top center" text={ timezoneDetail }>
++			<div className="components-datetime__timezone">{ zoneAbbr }</div>
++		</Tooltip>
++	);
++};
++
++export default TimeZone;
+diff --git a/packages/date/src/index.js b/packages/date/src/index.js
+index 25697d8fadd596..4145e3fcd5223d 100644
+--- a/packages/date/src/index.js
++++ b/packages/date/src/index.js
+@@ -80,7 +80,7 @@ let settings = {
+ 		datetime: 'F j, Y g: i a',
+ 		datetimeAbbreviated: 'M j, Y g: i a',
+ 	},
+-	timezone: { offset: '0', string: '' },
++	timezone: { offset: '0', string: '', abbr: '' },
+ };
+ 
+ /**

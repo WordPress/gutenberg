@@ -1,0 +1,33 @@
+diff --git a/packages/components/src/number-control/index.tsx b/packages/components/src/number-control/index.tsx
+index 6dd1af4024af7f..b8175cdd2de1f7 100644
+--- a/packages/components/src/number-control/index.tsx
++++ b/packages/components/src/number-control/index.tsx
+@@ -30,6 +30,10 @@ import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
+ 
+ const noop = () => {};
+ 
++const isTouchDevice = () => {
++	return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
++};
++
+ function UnforwardedNumberControl(
+ 	props: WordPressComponentProps< NumberControlProps, 'input', false >,
+ 	forwardedRef: ForwardedRef< any >
+@@ -219,6 +223,8 @@ function UnforwardedNumberControl(
+ 				},
+ 			} );
+ 
++	const shouldEnableDrag = isDragEnabled && ! isTouchDevice();
++
+ 	return (
+ 		<Input
+ 			autoComplete={ autoComplete }
+@@ -227,7 +233,7 @@ function UnforwardedNumberControl(
+ 			className={ classes }
+ 			dragDirection={ dragDirection }
+ 			hideHTMLArrows={ spinControls !== 'native' }
+-			isDragEnabled={ isDragEnabled }
++			isDragEnabled={ shouldEnableDrag }
+ 			label={ label }
+ 			max={ max }
+ 			min={ min }

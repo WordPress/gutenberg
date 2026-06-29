@@ -1,0 +1,810 @@
+diff --git a/packages/block-editor/src/components/block-navigation/appender.js b/packages/block-editor/src/components/block-navigation/appender.js
+index f31b8e793c8a29..db359ca67d45d1 100644
+--- a/packages/block-editor/src/components/block-navigation/appender.js
++++ b/packages/block-editor/src/components/block-navigation/appender.js
+@@ -1,7 +1,10 @@
+ /**
+  * WordPress dependencies
+  */
+-import { __experimentalTreeGridCell as TreeGridCell } from '@wordpress/components';
++import {
++	__experimentalTreeGridCell as TreeGridCell,
++	__experimentalTreeGridItem as TreeGridItem,
++} from '@wordpress/components';
+ import { useInstanceId } from '@wordpress/compose';
+ import { __, sprintf } from '@wordpress/i18n';
+ 
+@@ -41,27 +44,25 @@ export default function BlockNavigationAppender( {
+ 				className="block-editor-block-navigation-appender__cell"
+ 				colSpan="3"
+ 			>
+-				{ ( props ) => (
+-					<div className="block-editor-block-navigation-appender__container">
+-						<DescenderLines
+-							level={ level }
+-							isLastRow={ position === rowCount }
+-							terminatedLevels={ terminatedLevels }
+-						/>
+-						<ButtonBlockAppender
+-							rootClientId={ parentBlockClientId }
+-							__experimentalSelectBlockOnInsert={ false }
+-							aria-describedby={ descriptionId }
+-							{ ...props }
+-						/>
+-						<div
+-							className="block-editor-block-navigation-appender__description"
+-							id={ descriptionId }
+-						>
+-							{ appenderPositionDescription }
+-						</div>
++				<div className="block-editor-block-navigation-appender__container">
++					<DescenderLines
++						level={ level }
++						isLastRow={ position === rowCount }
++						terminatedLevels={ terminatedLevels }
++					/>
++					<TreeGridItem
++						as={ ButtonBlockAppender }
++						rootClientId={ parentBlockClientId }
++						__experimentalSelectBlockOnInsert={ false }
++						aria-describedby={ descriptionId }
++					/>
++					<div
++						className="block-editor-block-navigation-appender__description"
++						id={ descriptionId }
++					>
++						{ appenderPositionDescription }
+ 					</div>
+-				) }
++				</div>
+ 			</TreeGridCell>
+ 		</BlockNavigationLeaf>
+ 	);
+diff --git a/packages/block-editor/src/components/block-navigation/block-select-button.js b/packages/block-editor/src/components/block-navigation/block-select-button.js
+index d7a91a53892c8b..68b48499eb1966 100644
+--- a/packages/block-editor/src/components/block-navigation/block-select-button.js
++++ b/packages/block-editor/src/components/block-navigation/block-select-button.js
+@@ -10,9 +10,12 @@ import {
+ 	__experimentalGetBlockLabel as getBlockLabel,
+ 	getBlockType,
+ } from '@wordpress/blocks';
+-import { Button, VisuallyHidden } from '@wordpress/components';
++import {
++	Button,
++	__experimentalTreeGridItem as TreeGridItem,
++	VisuallyHidden,
++} from '@wordpress/components';
+ import { useInstanceId } from '@wordpress/compose';
+-import { forwardRef } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+ 
+ /**
+@@ -21,20 +24,15 @@ import { __ } from '@wordpress/i18n';
+ import BlockIcon from '../block-icon';
+ import { getBlockPositionDescription } from './utils';
+ 
+-function BlockNavigationBlockSelectButton(
+-	{
+-		className,
+-		block,
+-		isSelected,
+-		onClick,
+-		position,
+-		siblingCount,
+-		level,
+-		tabIndex,
+-		onFocus,
+-	},
+-	ref
+-) {
++export default function BlockNavigationBlockSelectButton( {
++	className,
++	block,
++	isSelected,
++	onClick,
++	position,
++	siblingCount,
++	level,
++} ) {
+ 	const { name, attributes } = block;
+ 
+ 	const blockType = getBlockType( name );
+@@ -49,16 +47,14 @@ function BlockNavigationBlockSelectButton(
+ 
+ 	return (
+ 		<>
+-			<Button
++			<TreeGridItem
++				as={ Button }
+ 				className={ classnames(
+ 					'block-editor-block-navigation-block-select-button',
+ 					className
+ 				) }
+ 				onClick={ onClick }
+ 				aria-describedby={ descriptionId }
+-				ref={ ref }
+-				tabIndex={ tabIndex }
+-				onFocus={ onFocus }
+ 			>
+ 				<BlockIcon icon={ blockType.icon } showColors />
+ 				{ blockDisplayName }
+@@ -67,7 +63,7 @@ function BlockNavigationBlockSelectButton(
+ 						{ __( '(selected block)' ) }
+ 					</VisuallyHidden>
+ 				) }
+-			</Button>
++			</TreeGridItem>
+ 			<div
+ 				className="block-editor-block-navigation-block-select-button__description"
+ 				id={ descriptionId }
+@@ -77,5 +73,3 @@ function BlockNavigationBlockSelectButton(
+ 		</>
+ 	);
+ }
+-
+-export default forwardRef( BlockNavigationBlockSelectButton );
+diff --git a/packages/block-editor/src/components/block-navigation/block-slot.js b/packages/block-editor/src/components/block-navigation/block-slot.js
+index 1bcb52b9379588..ce5c6048732de6 100644
+--- a/packages/block-editor/src/components/block-navigation/block-slot.js
++++ b/packages/block-editor/src/components/block-navigation/block-slot.js
+@@ -9,12 +9,7 @@ import classnames from 'classnames';
+ import { getBlockType } from '@wordpress/blocks';
+ import { Fill, Slot, VisuallyHidden } from '@wordpress/components';
+ import { useInstanceId } from '@wordpress/compose';
+-import {
+-	Children,
+-	cloneElement,
+-	forwardRef,
+-	useContext,
+-} from '@wordpress/element';
++import { Children, cloneElement, useContext } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+ 
+ /**
+@@ -27,7 +22,7 @@ import { getBlockPositionDescription } from './utils';
+ 
+ const getSlotName = ( clientId ) => `BlockNavigationBlock-${ clientId }`;
+ 
+-function BlockNavigationBlockSlot( props, ref ) {
++export default function BlockNavigationBlockSlot( props ) {
+ 	const instanceId = useInstanceId( BlockNavigationBlockSlot );
+ 	const { clientId } = props.block;
+ 
+@@ -35,12 +30,7 @@ function BlockNavigationBlockSlot( props, ref ) {
+ 		<Slot name={ getSlotName( clientId ) }>
+ 			{ ( fills ) => {
+ 				if ( ! fills.length ) {
+-					return (
+-						<BlockNavigationBlockSelectButton
+-							ref={ ref }
+-							{ ...props }
+-						/>
+-					);
++					return <BlockNavigationBlockSelectButton { ...props } />;
+ 				}
+ 
+ 				const {
+@@ -50,8 +40,6 @@ function BlockNavigationBlockSlot( props, ref ) {
+ 					position,
+ 					siblingCount,
+ 					level,
+-					tabIndex,
+-					onFocus,
+ 				} = props;
+ 
+ 				const { name } = block;
+@@ -64,11 +52,6 @@ function BlockNavigationBlockSlot( props, ref ) {
+ 				);
+ 
+ 				const forwardedFillProps = {
+-					// Ensure that the component in the slot can receive
+-					// keyboard navigation.
+-					tabIndex,
+-					onFocus,
+-					ref,
+ 					// Give the element rendered in the slot a description
+ 					// that describes its position.
+ 					'aria-describedby': descriptionId,
+@@ -108,8 +91,6 @@ function BlockNavigationBlockSlot( props, ref ) {
+ 	);
+ }
+ 
+-export default forwardRef( BlockNavigationBlockSlot );
+-
+ export const BlockNavigationBlockFill = ( props ) => {
+ 	const { clientId } = useContext( BlockListBlockContext );
+ 	return <Fill { ...props } name={ getSlotName( clientId ) } />;
+diff --git a/packages/block-editor/src/components/block-navigation/block.js b/packages/block-editor/src/components/block-navigation/block.js
+index 50b8ad407c6b4a..63686238639d95 100644
+--- a/packages/block-editor/src/components/block-navigation/block.js
++++ b/packages/block-editor/src/components/block-navigation/block.js
+@@ -6,9 +6,13 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
+-import { __experimentalTreeGridCell as TreeGridCell } from '@wordpress/components';
+ import { moreVertical } from '@wordpress/icons';
+-import { useState } from '@wordpress/element';
++import {
++	__experimentalTreeGridCell as TreeGridCell,
++	__experimentalTreeGridItem as TreeGridItem,
++} from '@wordpress/components';
++
++import { forwardRef, useState } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -23,6 +27,14 @@ import BlockNavigationBlockContents from './block-contents';
+ import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdown';
+ import { useBlockNavigationContext } from './context';
+ 
++// Adapter component that makes `BlockSettingsDropdown` work with
++// `TreeGridItem` by forwarding its ref to the `toggleRef` prop.
++const BlockSettingsDropdownAdapter = forwardRef(
++	function BlockSettingsDropdownAdapter( props, ref ) {
++		return <BlockSettingsDropdown toggleRef={ ref } { ...props } />;
++	}
++);
++
+ export default function BlockNavigationBlock( {
+ 	block,
+ 	onClick,
+@@ -74,57 +86,48 @@ export default function BlockNavigationBlock( {
+ 				className="block-editor-block-navigation-block__contents-cell"
+ 				colSpan={ hasRenderedMovers ? undefined : 3 }
+ 			>
+-				{ ( props ) => (
+-					<div className="block-editor-block-navigation-block__contents-container">
+-						<DescenderLines
+-							level={ level }
+-							isLastRow={ position === rowCount }
+-							terminatedLevels={ terminatedLevels }
+-						/>
+-						<BlockNavigationBlockContents
+-							block={ block }
+-							onClick={ onClick }
+-							isSelected={ isSelected }
+-							position={ position }
+-							siblingCount={ siblingCount }
+-							level={ level }
+-							{ ...props }
+-						/>
+-					</div>
+-				) }
++				<div className="block-editor-block-navigation-block__contents-container">
++					<DescenderLines
++						level={ level }
++						isLastRow={ position === rowCount }
++						terminatedLevels={ terminatedLevels }
++					/>
++					<BlockNavigationBlockContents
++						block={ block }
++						onClick={ onClick }
++						isSelected={ isSelected }
++						position={ position }
++						siblingCount={ siblingCount }
++						level={ level }
++					/>
++				</div>
+ 			</TreeGridCell>
+ 			{ hasRenderedMovers && (
+ 				<>
+ 					<TreeGridCell className={ moverCellClassName }>
+-						{ ( props ) => (
+-							<BlockMoverUpButton
+-								__experimentalOrientation="vertical"
+-								clientIds={ [ clientId ] }
+-								{ ...props }
+-							/>
+-						) }
++						<TreeGridItem
++							as={ BlockMoverUpButton }
++							__experimentalOrientation="vertical"
++							clientIds={ [ clientId ] }
++						/>
+ 					</TreeGridCell>
+ 					<TreeGridCell className={ moverCellClassName }>
+-						{ ( props ) => (
+-							<BlockMoverDownButton
+-								__experimentalOrientation="vertical"
+-								clientIds={ [ clientId ] }
+-								{ ...props }
+-							/>
+-						) }
++						<TreeGridItem
++							as={ BlockMoverDownButton }
++							__experimentalOrientation="vertical"
++							clientIds={ [ clientId ] }
++						/>
+ 					</TreeGridCell>
+ 				</>
+ 			) }
+ 
+ 			{ withEllipsisMenu && level >= ellipsisMenuMinLevel && (
+ 				<TreeGridCell className={ ellipsisMenuClassName }>
+-					{ ( props ) => (
+-						<BlockSettingsDropdown
+-							clientIds={ [ clientId ] }
+-							icon={ moreVertical }
+-							{ ...props }
+-						/>
+-					) }
++					<TreeGridItem
++						as={ BlockSettingsDropdownAdapter }
++						clientIds={ [ clientId ] }
++						icon={ moreVertical }
++					/>
+ 				</TreeGridCell>
+ 			) }
+ 		</BlockNavigationLeaf>
+diff --git a/packages/components/src/dropdown-menu/index.js b/packages/components/src/dropdown-menu/index.js
+index 288ea6f72d9d41..cd91d3e29d3d02 100644
+--- a/packages/components/src/dropdown-menu/index.js
++++ b/packages/components/src/dropdown-menu/index.js
+@@ -46,6 +46,7 @@ function DropdownMenu( {
+ 	menuLabel,
+ 	position,
+ 	noIcons,
++	toggleRef,
+ } ) {
+ 	if ( menuLabel ) {
+ 		deprecated( '`menuLabel` prop in `DropdownComponent`', {
+@@ -124,6 +125,7 @@ function DropdownMenu( {
+ 						aria-haspopup="true"
+ 						aria-expanded={ isOpen }
+ 						label={ label }
++						ref={ toggleRef }
+ 						showTooltip
+ 					>
+ 						{ mergedToggleProps.children }
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 51208ec3582232..1923372bb60a7a 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -101,6 +101,8 @@ export {
+ 	default as __experimentalTreeGrid,
+ 	TreeGridRow as __experimentalTreeGridRow,
+ 	TreeGridCell as __experimentalTreeGridCell,
++	FocusableTreeGridCell as __experimentalFocusableTreeGridCell,
++	TreeGridItem as __experimentalTreeGridItem,
+ } from './tree-grid';
+ export { default as TreeSelect } from './tree-select';
+ export { default as __experimentalUnitControl } from './unit-control';
+diff --git a/packages/components/src/tree-grid/cell.js b/packages/components/src/tree-grid/cell.js
+index a804af0d501b8f..ce6e90f889d634 100644
+--- a/packages/components/src/tree-grid/cell.js
++++ b/packages/components/src/tree-grid/cell.js
+@@ -1,12 +1,10 @@
+ /**
+- * Internal dependencies
++ * WordPress dependencies
+  */
+-import RovingTabIndexItem from './roving-tab-index-item';
++import { forwardRef } from '@wordpress/element';
+ 
+-export default function TreeGridCell( { children, ...props } ) {
+-	return (
+-		<td { ...props } role="gridcell">
+-			<RovingTabIndexItem>{ children }</RovingTabIndexItem>
+-		</td>
+-	);
++function TreeGridCell( props, ref ) {
++	return <td role="gridcell" ref={ ref } { ...props } />;
+ }
++
++export default forwardRef( TreeGridCell );
+diff --git a/packages/components/src/tree-grid/context.js b/packages/components/src/tree-grid/context.js
+new file mode 100644
+index 00000000000000..21be32ec43b5b9
+--- /dev/null
++++ b/packages/components/src/tree-grid/context.js
+@@ -0,0 +1,8 @@
++/**
++ * WordPress dependencies
++ */
++import { createContext, useContext } from '@wordpress/element';
++
++const TreeGridContext = createContext();
++export default TreeGridContext;
++export const useTreeGridContext = () => useContext( TreeGridContext );
+diff --git a/packages/components/src/tree-grid/focusable-cell.js b/packages/components/src/tree-grid/focusable-cell.js
+new file mode 100644
+index 00000000000000..56cf41a66911e6
+--- /dev/null
++++ b/packages/components/src/tree-grid/focusable-cell.js
+@@ -0,0 +1,30 @@
++/**
++ * External dependencies
++ */
++import { unstable_CompositeItem as CompositeItem } from 'reakit/Composite';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { useTreeGridContext } from './context';
++import TreeGridCell from './cell';
++
++function FocusableTreeGridCell( props, ref ) {
++	const treeGridState = useTreeGridContext();
++
++	return (
++		<CompositeItem
++			{ ...treeGridState }
++			as={ TreeGridCell }
++			ref={ ref }
++			{ ...props }
++		/>
++	);
++}
++
++export default forwardRef( FocusableTreeGridCell );
+diff --git a/packages/components/src/tree-grid/index.js b/packages/components/src/tree-grid/index.js
+index e9e4feb57dacb8..ab0b28e0828605 100644
+--- a/packages/components/src/tree-grid/index.js
++++ b/packages/components/src/tree-grid/index.js
+@@ -1,157 +1,41 @@
+ /**
+  * External dependencies
+  */
+-import { includes } from 'lodash';
++import {
++	unstable_useCompositeState as useCompositeState,
++	unstable_Composite as Composite,
++} from 'reakit/Composite';
+ 
+ /**
+  * WordPress dependencies
+  */
+-import { focus } from '@wordpress/dom';
+-import { useCallback } from '@wordpress/element';
+-import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
++import { forwardRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+-import RovingTabIndexContainer from './roving-tab-index';
++import TreeGridContext from './context';
+ 
+-/**
+- * Return focusables in a row element, excluding those from other branches
+- * nested within the row.
+- *
+- * @param {Element} rowElement The DOM element representing the row.
+- *
+- * @return {?Array} The array of focusables in the row.
+- */
+-function getRowFocusables( rowElement ) {
+-	const focusablesInRow = focus.focusable.find( rowElement );
+-
+-	if ( ! focusablesInRow || ! focusablesInRow.length ) {
+-		return;
+-	}
+-
+-	return focusablesInRow.filter( ( focusable ) => {
+-		return focusable.closest( '[role="row"]' ) === rowElement;
+-	} );
+-}
+-
+-/**
+- * @see https://github.com/WordPress/gutenberg/blob/master/packages/components/src/tree-grid/README.md
+- */
+-export default function TreeGrid( { children, ...props } ) {
+-	const onKeyDown = useCallback( ( event ) => {
+-		const { keyCode, metaKey, ctrlKey, altKey, shiftKey } = event;
+-
+-		const hasModifierKeyPressed = metaKey || ctrlKey || altKey || shiftKey;
+-
+-		if (
+-			hasModifierKeyPressed ||
+-			! includes( [ UP, DOWN, LEFT, RIGHT ], keyCode )
+-		) {
+-			return;
+-		}
+-
+-		// The event will be handled, stop propagation.
+-		event.stopPropagation();
+-
+-		const { activeElement } = document;
+-		const { currentTarget: treeGridElement } = event;
+-		if ( ! treeGridElement.contains( activeElement ) ) {
+-			return;
+-		}
+-
+-		// Calculate the columnIndex of the active element.
+-		const activeRow = activeElement.closest( '[role="row"]' );
+-		const focusablesInRow = getRowFocusables( activeRow );
+-		const currentColumnIndex = focusablesInRow.indexOf( activeElement );
+-
+-		if ( includes( [ LEFT, RIGHT ], keyCode ) ) {
+-			// Calculate to the next element.
+-			let nextIndex;
+-			if ( keyCode === LEFT ) {
+-				nextIndex = Math.max( 0, currentColumnIndex - 1 );
+-			} else {
+-				nextIndex = Math.min(
+-					currentColumnIndex + 1,
+-					focusablesInRow.length - 1
+-				);
+-			}
+-
+-			// Focus is either at the left or right edge of the grid. Do nothing.
+-			if ( nextIndex === currentColumnIndex ) {
+-				// Prevent key use for anything else. For example, Voiceover
+-				// will start reading text on continued use of left/right arrow
+-				// keys.
+-				event.preventDefault();
+-				return;
+-			}
+-
+-			// Focus the next element.
+-			focusablesInRow[ nextIndex ].focus();
+-
+-			// Prevent key use for anything else. This ensures Voiceover
+-			// doesn't try to handle key navigation.
+-			event.preventDefault();
+-		} else if ( includes( [ UP, DOWN ], keyCode ) ) {
+-			// Calculate the rowIndex of the next row.
+-			const rows = Array.from(
+-				treeGridElement.querySelectorAll( '[role="row"]' )
+-			);
+-			const currentRowIndex = rows.indexOf( activeRow );
+-			let nextRowIndex;
+-
+-			if ( keyCode === UP ) {
+-				nextRowIndex = Math.max( 0, currentRowIndex - 1 );
+-			} else {
+-				nextRowIndex = Math.min( currentRowIndex + 1, rows.length - 1 );
+-			}
+-
+-			// Focus is either at the top or bottom edge of the grid. Do nothing.
+-			if ( nextRowIndex === currentRowIndex ) {
+-				// Prevent key use for anything else. For example, Voiceover
+-				// will start navigating horizontally when reaching the vertical
+-				// bounds of a table.
+-				event.preventDefault();
+-				return;
+-			}
+-
+-			// Get the focusables in the next row.
+-			const focusablesInNextRow = getRowFocusables(
+-				rows[ nextRowIndex ]
+-			);
+-
+-			// If for some reason there are no focusables in the next row, do nothing.
+-			if ( ! focusablesInNextRow || ! focusablesInNextRow.length ) {
+-				// Prevent key use for anything else. For example, Voiceover
+-				// will still focus text when using arrow keys, while this
+-				// component should limit navigation to focusables.
+-				event.preventDefault();
+-				return;
+-			}
+-
+-			// Try to focus the element in the next row that's at a similar column to the activeElement.
+-			const nextIndex = Math.min(
+-				currentColumnIndex,
+-				focusablesInNextRow.length - 1
+-			);
+-			focusablesInNextRow[ nextIndex ].focus();
+-
+-			// Prevent key use for anything else. This ensures Voiceover
+-			// doesn't try to handle key navigation.
+-			event.preventDefault();
+-		}
+-	}, [] );
++function TreeGrid( { children, ...props }, ref ) {
++	const treeGridState = useCompositeState();
+ 
+ 	return (
+-		<RovingTabIndexContainer>
+-			{ /* Disable reason: A treegrid is implemented using a table element. */ }
+-			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role */ }
+-			<table { ...props } role="treegrid" onKeyDown={ onKeyDown }>
++		<TreeGridContext.Provider value={ treeGridState }>
++			<Composite
++				{ ...treeGridState }
++				as="table"
++				role="treegrid"
++				ref={ ref }
++				{ ...props }
++			>
+ 				<tbody>{ children }</tbody>
+-			</table>
+-		</RovingTabIndexContainer>
++			</Composite>
++		</TreeGridContext.Provider>
+ 	);
+ }
+ 
++export default forwardRef( TreeGrid );
+ export { default as TreeGridRow } from './row';
+ export { default as TreeGridCell } from './cell';
++export { default as FocusableTreeGridCell } from './focusable-cell';
++export { default as TreeGridItem } from './item';
+diff --git a/packages/components/src/tree-grid/item.js b/packages/components/src/tree-grid/item.js
+new file mode 100644
+index 00000000000000..250dfb64e0a356
+--- /dev/null
++++ b/packages/components/src/tree-grid/item.js
+@@ -0,0 +1,22 @@
++/**
++ * External dependencies
++ */
++import { unstable_CompositeItem as CompositeItem } from 'reakit/Composite';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { useTreeGridContext } from './context';
++
++function TreeGridItem( props, ref ) {
++	const treeGridState = useTreeGridContext();
++
++	return <CompositeItem { ...treeGridState } ref={ ref } { ...props } />;
++}
++
++export default forwardRef( TreeGridItem );
+diff --git a/packages/components/src/tree-grid/roving-tab-index-context.js b/packages/components/src/tree-grid/roving-tab-index-context.js
+deleted file mode 100644
+index 90c3ca16704d74..00000000000000
+--- a/packages/components/src/tree-grid/roving-tab-index-context.js
++++ /dev/null
+@@ -1,9 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { createContext, useContext } from '@wordpress/element';
+-
+-const RovingTabIndexContext = createContext();
+-export const useRovingTabIndexContext = () =>
+-	useContext( RovingTabIndexContext );
+-export const RovingTabIndexProvider = RovingTabIndexContext.Provider;
+diff --git a/packages/components/src/tree-grid/roving-tab-index-item.js b/packages/components/src/tree-grid/roving-tab-index-item.js
+deleted file mode 100644
+index b876aa5be565bd..00000000000000
+--- a/packages/components/src/tree-grid/roving-tab-index-item.js
++++ /dev/null
+@@ -1,35 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useRef } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { useRovingTabIndexContext } from './roving-tab-index-context';
+-
+-export default function RovingTabIndexItem( {
+-	children,
+-	as: Component,
+-	...props
+-} ) {
+-	const ref = useRef();
+-	const {
+-		lastFocusedElement,
+-		setLastFocusedElement,
+-	} = useRovingTabIndexContext();
+-	let tabIndex;
+-
+-	if ( lastFocusedElement ) {
+-		tabIndex = lastFocusedElement === ref.current ? 0 : -1;
+-	}
+-
+-	const onFocus = ( event ) => setLastFocusedElement( event.target );
+-	const allProps = { ref, tabIndex, onFocus, ...props };
+-
+-	if ( typeof children === 'function' ) {
+-		return children( allProps );
+-	}
+-
+-	return <Component { ...allProps }>{ children }</Component>;
+-}
+diff --git a/packages/components/src/tree-grid/roving-tab-index.js b/packages/components/src/tree-grid/roving-tab-index.js
+deleted file mode 100644
+index 7a517b5e66cca0..00000000000000
+--- a/packages/components/src/tree-grid/roving-tab-index.js
++++ /dev/null
+@@ -1,30 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useState, useMemo } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { RovingTabIndexProvider } from './roving-tab-index-context';
+-
+-/**
+- * @see https://github.com/WordPress/gutenberg/blob/master/packages/components/src/roving-tab-index/README.md
+- */
+-export default function RovingTabIndex( { children } ) {
+-	const [ lastFocusedElement, setLastFocusedElement ] = useState();
+-
+-	// Use `useMemo` to avoid creation of a new object for the providerValue
+-	// on every render. Only create a new object when the `lastFocusedElement`
+-	// value changes.
+-	const providerValue = useMemo(
+-		() => ( { lastFocusedElement, setLastFocusedElement } ),
+-		[ lastFocusedElement ]
+-	);
+-
+-	return (
+-		<RovingTabIndexProvider value={ providerValue }>
+-			{ children }
+-		</RovingTabIndexProvider>
+-	);
+-}
+diff --git a/packages/components/src/tree-grid/row.js b/packages/components/src/tree-grid/row.js
+index 744055194ad226..56bd82d1b2b8d6 100644
+--- a/packages/components/src/tree-grid/row.js
++++ b/packages/components/src/tree-grid/row.js
+@@ -1,12 +1,31 @@
++/**
++ * External dependencies
++ */
++import {
++	unstable_CompositeGroup as CompositeGroup,
++	unstable_useCompositeItem as useCompositeItem,
++} from 'reakit/Composite';
++
+ /**
+  * WordPress dependencies
+  */
+ import { forwardRef } from '@wordpress/element';
+ 
++/**
++ * Internal dependencies
++ */
++import { useTreeGridContext } from './context';
++
+ function TreeGridRow(
+-	{ children, level, positionInSet, setSize, isExpanded, ...props },
++	{ level, positionInSet, setSize, isExpanded, ...props },
+ 	ref
+ ) {
++	const treeGridState = useTreeGridContext();
++
++	// Combine `useCompositeItem` with `CompositeGroup` to create a row
++	// that can be managed as part of the TreeGrid's roving tab index.
++	const htmlProps = useCompositeItem( treeGridState, { ref, ...props } );
++
+ 	return (
+ 		// Disable reason: Due to an error in the ARIA 1.1 specification, the
+ 		// aria-posinset and aria-setsize properties are not supported on row
+@@ -14,17 +33,16 @@ function TreeGridRow(
+ 		// linting rule fails when validating this markup.
+ 		//
+ 		// eslint-disable-next-line jsx-a11y/role-supports-aria-props
+-		<tr
+-			{ ...props }
+-			ref={ ref }
++		<CompositeGroup
++			{ ...treeGridState }
+ 			role="row"
++			as="tr"
++			aria-expanded={ isExpanded }
+ 			aria-level={ level }
+-			aria-posinset={ positionInSet }
+ 			aria-setsize={ setSize }
+-			aria-expanded={ isExpanded }
+-		>
+-			{ children }
+-		</tr>
++			aria-posinset={ positionInSet }
++			{ ...htmlProps }
++		/>
+ 	);
+ }
+ 

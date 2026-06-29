@@ -1,0 +1,601 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2b28fe3c41dede..f9815f1c761de8 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -15,6 +15,10 @@
+ 
+ -   `Button`: Hide focus outline on `:active` in High Contrast (forced colors) mode to provide visual click feedback ([#76833](https://github.com/WordPress/gutenberg/pull/76833)).
+ 
++### Internal
++
++-   `Autocomplete`: Extract matching logic into a standalone pure function ([#76957](https://github.com/WordPress/gutenberg/pull/76957)).
++
+ ## 32.4.0 (2026-03-18)
+ 
+ ### Bug Fixes
+diff --git a/packages/components/src/autocomplete/get-autocomplete-match.ts b/packages/components/src/autocomplete/get-autocomplete-match.ts
+new file mode 100644
+index 00000000000000..03d131e8fcbad5
+--- /dev/null
++++ b/packages/components/src/autocomplete/get-autocomplete-match.ts
+@@ -0,0 +1,102 @@
++/**
++ * External dependencies
++ */
++import removeAccents from 'remove-accents';
++
++/**
++ * Internal dependencies
++ */
++import type { WPCompleter } from './types';
++
++type AutocompleteMatch = {
++	completer: WPCompleter;
++	filterValue: string;
++};
++
++export function getAutocompleteMatch(
++	textContent: string,
++	completers: WPCompleter[],
++	filteredOptionsLength: number,
++	isBackspacing: boolean,
++	getTextAfterSelection: () => string
++): AutocompleteMatch | null {
++	if ( ! textContent ) {
++		return null;
++	}
++
++	// Find the completer with the highest triggerPrefix index in the
++	// textContent. Compute lastIndexOf once per completer to avoid
++	// redundant lookups in the reduce accumulator.
++	let completer: WPCompleter | null = null;
++	let triggerIndex = -1;
++
++	for ( const currentCompleter of completers ) {
++		const currentIndex = textContent.lastIndexOf(
++			currentCompleter.triggerPrefix
++		);
++		if ( currentIndex > triggerIndex ) {
++			completer = currentCompleter;
++			triggerIndex = currentIndex;
++		}
++	}
++
++	if ( ! completer ) {
++		return null;
++	}
++
++	const { allowContext, triggerPrefix } = completer;
++	const textWithoutTrigger = textContent.slice(
++		triggerIndex + triggerPrefix.length
++	);
++
++	// Prevent matching with an extremely long string, which causes
++	// the editor to slow-down significantly. This could happen, for
++	// example, if `matchingWhileBackspacing` is true and one of the
++	// "words" ends up being too long. Returning null here intentionally
++	// resets the autocompleter state in the caller.
++	if ( textWithoutTrigger.length > 50 ) {
++		return null;
++	}
++
++	const mismatch = filteredOptionsLength === 0;
++	const wordsFromTrigger = textWithoutTrigger.split( /\s/ );
++
++	// Allow matching when typing a trigger + the match string or when
++	// clicking in an existing trigger word on the page.
++	// E.g. "Some text @a" — "@a" is detected as a trigger word.
++	const hasOneTriggerWord = wordsFromTrigger.length === 1;
++
++	// Allow matching when backspacing near a trigger word (up to 3
++	// words from the trigger character). This lets us recover from a
++	// mismatch when backspacing while still imposing sane limits.
++	// E.g. "Some text @marcelo sekkkk" — backspacing "kkkk" re-shows
++	// the popup once the text matches again.
++	const matchingWhileBackspacing =
++		isBackspacing && wordsFromTrigger.length <= 3;
++
++	if ( mismatch && ! ( matchingWhileBackspacing || hasOneTriggerWord ) ) {
++		return null;
++	}
++
++	if (
++		allowContext &&
++		! allowContext(
++			textContent.slice( 0, triggerIndex ),
++			getTextAfterSelection()
++		)
++	) {
++		return null;
++	}
++
++	if (
++		/^\s/.test( textWithoutTrigger ) ||
++		/\s\s+$/.test( textWithoutTrigger )
++	) {
++		return null;
++	}
++
++	return {
++		completer,
++		filterValue: removeAccents( textWithoutTrigger ),
++	};
++}
+diff --git a/packages/components/src/autocomplete/index.tsx b/packages/components/src/autocomplete/index.tsx
+index 926a0df75f0d81..ce34be7f69be84 100644
+--- a/packages/components/src/autocomplete/index.tsx
++++ b/packages/components/src/autocomplete/index.tsx
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import removeAccents from 'remove-accents';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -28,7 +23,7 @@ import { isAppleOS } from '@wordpress/keycodes';
+  * Internal dependencies
+  */
+ import { getAutoCompleterUI } from './autocompleter-ui';
+-import { escapeRegExp } from '../utils/strings';
++import { getAutocompleteMatch } from './get-autocomplete-match';
+ import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
+ import type {
+ 	AutocompleteProps,
+@@ -230,124 +225,34 @@ export function useAutocomplete( {
+ 	}, [ record ] );
+ 
+ 	useEffect( () => {
+-		if ( ! textContent ) {
+-			if ( autocompleter ) {
+-				reset();
+-			}
+-			return;
+-		}
+-
+-		// Find the completer with the highest triggerPrefix index in the
+-		// textContent.
+-		const completer = completers.reduce< WPCompleter | null >(
+-			( lastTrigger, currentCompleter ) => {
+-				const triggerIndex = textContent.lastIndexOf(
+-					currentCompleter.triggerPrefix
+-				);
+-				const lastTriggerIndex =
+-					lastTrigger !== null
+-						? textContent.lastIndexOf( lastTrigger.triggerPrefix )
+-						: -1;
+-
+-				return triggerIndex > lastTriggerIndex
+-					? currentCompleter
+-					: lastTrigger;
+-			},
+-			null
+-		);
+-
+-		if ( ! completer ) {
+-			if ( autocompleter ) {
+-				reset();
+-			}
+-			return;
++		function getTextAfterSelection() {
++			return textContent
++				? getTextContent(
++						slice(
++							record,
++							undefined,
++							getTextContent( record ).length
++						)
++				  )
++				: '';
+ 		}
+ 
+-		const { allowContext, triggerPrefix } = completer;
+-		const triggerIndex = textContent.lastIndexOf( triggerPrefix );
+-		const textWithoutTrigger = textContent.slice(
+-			triggerIndex + triggerPrefix.length
++		const match = getAutocompleteMatch(
++			textContent,
++			completers,
++			filteredOptions.length,
++			backspacingRef.current,
++			getTextAfterSelection
+ 		);
+ 
+-		const tooDistantFromTrigger = textWithoutTrigger.length > 50; // 50 chars seems to be a good limit.
+-		// This is a final barrier to prevent the effect from completing with
+-		// an extremely long string, which causes the editor to slow-down
+-		// significantly. This could happen, for example, if `matchingWhileBackspacing`
+-		// is true and one of the "words" end up being too long. If that's the case,
+-		// it will be caught by this guard.
+-		if ( tooDistantFromTrigger ) {
+-			return;
+-		}
+-
+-		const mismatch = filteredOptions.length === 0;
+-		const wordsFromTrigger = textWithoutTrigger.split( /\s/ );
+-		// We need to allow the effect to run when not backspacing and if there
+-		// was a mismatch. i.e when typing a trigger + the match string or when
+-		// clicking in an existing trigger word on the page. We do that if we
+-		// detect that we have one word from trigger in the current textual context.
+-		//
+-		// Ex.: "Some text @a" <-- "@a" will be detected as the trigger word and
+-		// allow the effect to run. It will run until there's a mismatch.
+-		const hasOneTriggerWord = wordsFromTrigger.length === 1;
+-		// This is used to allow the effect to run when backspacing and if
+-		// "touching" a word that "belongs" to a trigger. We consider a "trigger
+-		// word" any word up to the limit of 3 from the trigger character.
+-		// Anything beyond that is ignored if there's a mismatch. This allows
+-		// us to "escape" a mismatch when backspacing, but still imposing some
+-		// sane limits.
+-		//
+-		// Ex: "Some text @marcelo sekkkk" <--- "kkkk" caused a mismatch, but
+-		// if the user presses backspace here, it will show the completion popup again.
+-		const matchingWhileBackspacing =
+-			backspacingRef.current && wordsFromTrigger.length <= 3;
+-
+-		if ( mismatch && ! ( matchingWhileBackspacing || hasOneTriggerWord ) ) {
+-			if ( autocompleter ) {
+-				reset();
+-			}
+-			return;
+-		}
+-
+-		const textAfterSelection = getTextContent(
+-			slice( record, undefined, getTextContent( record ).length )
+-		);
+-
+-		if (
+-			allowContext &&
+-			! allowContext(
+-				textContent.slice( 0, triggerIndex ),
+-				textAfterSelection
+-			)
+-		) {
+-			if ( autocompleter ) {
+-				reset();
+-			}
+-			return;
+-		}
+-
+-		if (
+-			/^\s/.test( textWithoutTrigger ) ||
+-			/\s\s+$/.test( textWithoutTrigger )
+-		) {
+-			if ( autocompleter ) {
+-				reset();
+-			}
+-			return;
+-		}
+-
+-		if ( ! /[\u0000-\uFFFF]*$/.test( textWithoutTrigger ) ) {
++		if ( ! match ) {
+ 			if ( autocompleter ) {
+ 				reset();
+ 			}
+ 			return;
+ 		}
+ 
+-		const safeTrigger = escapeRegExp( completer.triggerPrefix );
+-		const text = removeAccents( textContent );
+-		const match = text
+-			.slice( text.lastIndexOf( completer.triggerPrefix ) )
+-			.match( new RegExp( `${ safeTrigger }([\u0000-\uFFFF]*)$` ) );
+-		const query = match && match[ 1 ];
++		const { completer, filterValue: query } = match;
+ 
+ 		setAutocompleter( completer );
+ 		setAutocompleterUI( () =>
+@@ -355,7 +260,7 @@ export function useAutocomplete( {
+ 				? getAutoCompleterUI( completer )
+ 				: AutocompleterUI
+ 		);
+-		setFilterValue( query === null ? '' : query );
++		setFilterValue( query );
+ 		// We want to avoid introducing unexpected side effects.
+ 		// See https://github.com/WordPress/gutenberg/pull/41820
+ 	}, [ textContent ] );
+diff --git a/packages/components/src/autocomplete/test/get-autocomplete-match.ts b/packages/components/src/autocomplete/test/get-autocomplete-match.ts
+new file mode 100644
+index 00000000000000..33993fa24226d2
+--- /dev/null
++++ b/packages/components/src/autocomplete/test/get-autocomplete-match.ts
+@@ -0,0 +1,298 @@
++/**
++ * Internal dependencies
++ */
++import { getAutocompleteMatch } from '../get-autocomplete-match';
++import type { WPCompleter } from '../types';
++
++const createCompleter = (
++	overrides: Partial< WPCompleter > = {}
++): WPCompleter => ( {
++	name: 'test',
++	triggerPrefix: '/',
++	options: [],
++	getOptionLabel: ( option: any ) => option,
++	...overrides,
++} );
++
++describe( 'getAutocompleteMatch', () => {
++	it( 'should return null for empty text content', () => {
++		const completers = [ createCompleter() ];
++		expect(
++			getAutocompleteMatch( '', completers, 0, false, () => '' )
++		).toBeNull();
++	} );
++
++	it( 'should return null when no completers are provided', () => {
++		expect(
++			getAutocompleteMatch( 'some text /', [], 0, false, () => '' )
++		).toBeNull();
++	} );
++
++	it( 'should return null when trigger prefix is not found in text', () => {
++		const completers = [ createCompleter( { triggerPrefix: '@' } ) ];
++		expect(
++			getAutocompleteMatch(
++				'no trigger here',
++				completers,
++				1,
++				false,
++				() => ''
++			)
++		).toBeNull();
++	} );
++
++	it( 'should match a simple trigger prefix', () => {
++		const completers = [ createCompleter( { triggerPrefix: '/' } ) ];
++		const result = getAutocompleteMatch(
++			'some text /query',
++			completers,
++			1,
++			false,
++			() => ''
++		);
++		expect( result ).toEqual( {
++			completer: completers[ 0 ],
++			filterValue: 'query',
++		} );
++	} );
++
++	it( 'should return empty filterValue when only trigger is typed', () => {
++		const completers = [ createCompleter( { triggerPrefix: '@' } ) ];
++		const result = getAutocompleteMatch(
++			'hello @',
++			completers,
++			1,
++			false,
++			() => ''
++		);
++		expect( result ).toEqual( {
++			completer: completers[ 0 ],
++			filterValue: '',
++		} );
++	} );
++
++	it( 'should select the completer with the latest trigger index', () => {
++		const slashCompleter = createCompleter( {
++			name: 'slash',
++			triggerPrefix: '/',
++		} );
++		const atCompleter = createCompleter( {
++			name: 'at',
++			triggerPrefix: '@',
++		} );
++		const result = getAutocompleteMatch(
++			'/command some text @user',
++			[ slashCompleter, atCompleter ],
++			1,
++			false,
++			() => ''
++		);
++		expect( result?.completer.name ).toBe( 'at' );
++	} );
++
++	it( 'should return null when text after trigger is too long (>50 chars)', () => {
++		const completers = [ createCompleter( { triggerPrefix: '/' } ) ];
++		const longText = '/' + 'a'.repeat( 51 );
++		expect(
++			getAutocompleteMatch( longText, completers, 1, false, () => '' )
++		).toBeNull();
++	} );
++
++	it( 'should match when text after trigger is exactly 50 chars', () => {
++		const completers = [ createCompleter( { triggerPrefix: '/' } ) ];
++		const text = '/' + 'a'.repeat( 50 );
++		const result = getAutocompleteMatch(
++			text,
++			completers,
++			1,
++			false,
++			() => ''
++		);
++		expect( result ).not.toBeNull();
++		expect( result?.filterValue ).toBe( 'a'.repeat( 50 ) );
++	} );
++
++	it( 'should return null on mismatch with multiple words and no backspacing', () => {
++		const completers = [ createCompleter( { triggerPrefix: '@' } ) ];
++		// 4 words from trigger, mismatch (filteredOptionsLength=0), not backspacing
++		expect(
++			getAutocompleteMatch(
++				'text @one two three four',
++				completers,
++				0,
++				false,
++				() => ''
++			)
++		).toBeNull();
++	} );
++
++	it( 'should still match on mismatch when there is only one trigger word', () => {
++		const completers = [ createCompleter( { triggerPrefix: '@' } ) ];
++		const result = getAutocompleteMatch(
++			'text @xyz',
++			completers,
++			0,
++			false,
++			() => ''
++		);
++		expect( result ).not.toBeNull();
++		expect( result?.filterValue ).toBe( 'xyz' );
++	} );
++
++	it( 'should allow matching while backspacing within 3 words of trigger', () => {
++		const completers = [ createCompleter( { triggerPrefix: '@' } ) ];
++		const result = getAutocompleteMatch(
++			'text @one two three',
++			completers,
++			0,
++			true,
++			() => ''
++		);
++		expect( result ).not.toBeNull();
++	} );
++
++	it( 'should NOT match while backspacing if more than 3 words from trigger', () => {
++		const completers = [ createCompleter( { triggerPrefix: '@' } ) ];
++		expect(
++			getAutocompleteMatch(
++				'text @one two three four',
++				completers,
++				0,
++				true,
++				() => ''
++			)
++		).toBeNull();
++	} );
++
++	it( 'should return null when text after trigger starts with whitespace', () => {
++		const completers = [ createCompleter( { triggerPrefix: '/' } ) ];
++		expect(
++			getAutocompleteMatch( '/ query', completers, 1, false, () => '' )
++		).toBeNull();
++	} );
++
++	it( 'should return null when text after trigger ends with multiple spaces', () => {
++		const completers = [ createCompleter( { triggerPrefix: '/' } ) ];
++		expect(
++			getAutocompleteMatch( '/query  ', completers, 1, false, () => '' )
++		).toBeNull();
++	} );
++
++	it( 'should respect allowContext returning false', () => {
++		const completers = [
++			createCompleter( {
++				triggerPrefix: '@',
++				allowContext: () => false,
++			} ),
++		];
++		expect(
++			getAutocompleteMatch( 'text @user', completers, 1, false, () => '' )
++		).toBeNull();
++	} );
++
++	it( 'should pass correct before/after text to allowContext', () => {
++		const allowContext = jest.fn().mockReturnValue( true );
++		const completers = [
++			createCompleter( {
++				triggerPrefix: '@',
++				allowContext,
++			} ),
++		];
++		getAutocompleteMatch(
++			'before @user',
++			completers,
++			1,
++			false,
++			() => 'after'
++		);
++		expect( allowContext ).toHaveBeenCalledWith( 'before ', 'after' );
++	} );
++
++	it( 'should handle accented characters in filter value', () => {
++		const completers = [ createCompleter( { triggerPrefix: '@' } ) ];
++		const result = getAutocompleteMatch(
++			'text @café',
++			completers,
++			1,
++			false,
++			() => ''
++		);
++		expect( result ).not.toBeNull();
++		expect( result?.filterValue ).toBe( 'cafe' );
++	} );
++
++	it( 'should handle special regex characters in trigger prefix', () => {
++		const completers = [ createCompleter( { triggerPrefix: '$$' } ) ];
++		const result = getAutocompleteMatch(
++			'text $$query',
++			completers,
++			1,
++			false,
++			() => ''
++		);
++		expect( result ).not.toBeNull();
++		expect( result?.filterValue ).toBe( 'query' );
++	} );
++
++	it( 'should match with spaces in filter value (single space)', () => {
++		const completers = [ createCompleter( { triggerPrefix: '/' } ) ];
++		const result = getAutocompleteMatch(
++			'/hello world',
++			completers,
++			1,
++			false,
++			() => ''
++		);
++		expect( result ).not.toBeNull();
++		expect( result?.filterValue ).toBe( 'hello world' );
++	} );
++
++	it.each( [
++		{
++			text: 'café @user',
++			trigger: '@',
++			expected: 'user',
++			desc: 'accented text before trigger',
++		},
++		{
++			text: 'naïve /command',
++			trigger: '/',
++			expected: 'command',
++			desc: 'accented text before trigger (diaeresis)',
++		},
++		{
++			text: 'résumé @josé',
++			trigger: '@',
++			expected: 'jose',
++			desc: 'accents both before and after trigger',
++		},
++		{
++			text: '@café',
++			trigger: '@',
++			expected: 'cafe',
++			desc: 'accented text after trigger only',
++		},
++		{
++			text: 'a /héllo wörld',
++			trigger: '/',
++			expected: 'hello world',
++			desc: 'accented multi-word filter value',
++		},
++	] )(
++		'should handle accents correctly: $desc',
++		( { text, trigger, expected } ) => {
++			const completers = [
++				createCompleter( { triggerPrefix: trigger } ),
++			];
++			const result = getAutocompleteMatch(
++				text,
++				completers,
++				1,
++				false,
++				() => ''
++			);
++			expect( result ).not.toBeNull();
++			expect( result?.filterValue ).toBe( expected );
++		}
++	);
++} );

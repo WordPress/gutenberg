@@ -1,0 +1,127 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d49f137f467c84..6e46c3b70f495a 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   `Modal`: Remove children container's unused class name ([#50655](https://github.com/WordPress/gutenberg/pull/50655)).
++
+ ## 24.0.0 (2023-05-10)
+ 
+ ### Breaking Changes
+diff --git a/packages/components/src/modal/index.tsx b/packages/components/src/modal/index.tsx
+index a22dc2a4ec6713..d9c7b602b83920 100644
+--- a/packages/components/src/modal/index.tsx
++++ b/packages/components/src/modal/index.tsx
+@@ -252,12 +252,7 @@ function UnforwardedModal(
+ 								) }
+ 							</div>
+ 						) }
+-						<div
+-							ref={ childrenContainerRef }
+-							className="components-modal__children-container"
+-						>
+-							{ children }
+-						</div>
++						<div ref={ childrenContainerRef }>{ children }</div>
+ 					</div>
+ 				</div>
+ 			</StyleProvider>
+diff --git a/packages/edit-post/src/components/keyboard-shortcut-help-modal/test/__snapshots__/index.js.snap b/packages/edit-post/src/components/keyboard-shortcut-help-modal/test/__snapshots__/index.js.snap
+index 5311dfa07b5c4e..2ad8e457bae303 100644
+--- a/packages/edit-post/src/components/keyboard-shortcut-help-modal/test/__snapshots__/index.js.snap
++++ b/packages/edit-post/src/components/keyboard-shortcut-help-modal/test/__snapshots__/index.js.snap
+@@ -43,9 +43,7 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
+         </svg>
+       </button>
+     </div>
+-    <div
+-      class="components-modal__children-container"
+-    >
++    <div>
+       <section
+         class="edit-post-keyboard-shortcut-help-modal__section edit-post-keyboard-shortcut-help-modal__main-shortcuts"
+       >
+diff --git a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
+index 5a6ff1e5fffee4..2d43aa7922f361 100644
+--- a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
++++ b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
+@@ -102,9 +102,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
+         </svg>
+       </button>
+     </div>
+-    <div
+-      class="components-modal__children-container"
+-    >
++    <div>
+       <div
+         class="interface-preferences__tabs"
+       >
+@@ -725,9 +723,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
+         </svg>
+       </button>
+     </div>
+-    <div
+-      class="components-modal__children-container"
+-    >
++    <div>
+       <div
+         class="components-navigator-provider interface-preferences__provider emotion-0 emotion-1"
+         data-wp-c16t="true"
+diff --git a/packages/edit-site/src/components/start-template-options/style.scss b/packages/edit-site/src/components/start-template-options/style.scss
+index 715e829ecab3ac..7515861099b380 100644
+--- a/packages/edit-site/src/components/start-template-options/style.scss
++++ b/packages/edit-site/src/components/start-template-options/style.scss
+@@ -1,28 +1,27 @@
+-.edit-site-start-template-options__modal {
+-	.components-modal__content {
+-		padding-bottom: 0;
+-	}
++$actions-height: 92px;
+ 
+-	.components-modal__children-container {
+-		display: flex;
+-		height: 100%;
+-		flex-direction: column;
+-
+-		.edit-site-start-template-options__modal__actions {
+-			margin-top: auto;
+-			position: sticky;
+-			bottom: 0;
+-			background-color: $white;
+-			margin-left: - $grid-unit-40;
+-			margin-right: - $grid-unit-40;
+-			padding: $grid-unit-30 $grid-unit-40 $grid-unit-40;
+-			border-top: 1px solid $gray-300;
+-			z-index: z-index(".edit-site-start-template-options__modal__actions");
+-		}
++.edit-site-start-template-options__modal {
++	.edit-site-start-template-options__modal__actions {
++		position: absolute;
++		bottom: 0;
++		width: 100%;
++		height: $actions-height;
++		background-color: $white;
++		margin-left: - $grid-unit-40;
++		margin-right: - $grid-unit-40;
++		padding-left: $grid-unit-40;
++		padding-right: $grid-unit-40;
++		border-top: 1px solid $gray-300;
++		z-index: z-index(".edit-site-start-template-options__modal__actions");
+ 	}
+ 
+ 	.block-editor-block-patterns-list {
+-		padding-bottom: $grid-unit-40;
++		// Since the actions container is positioned absolutely,
++		// this padding bottom ensures that the content wrapper will properly
++		// detect overflowing content and start showing scrollbars at the right
++		// moment. Without this padding, the content would render under the actions
++		// bar without causing the wrapper to show a scrollbar.
++		padding-bottom: $actions-height;
+ 	}
+ }
+ 

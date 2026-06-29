@@ -1,0 +1,169 @@
+diff --git a/packages/theme/src/postcss-plugins/add-fallback-to-var.mjs b/packages/theme/src/postcss-plugins/add-fallback-to-var.mjs
+new file mode 100644
+index 00000000000000..3ae2d898aefd67
+--- /dev/null
++++ b/packages/theme/src/postcss-plugins/add-fallback-to-var.mjs
+@@ -0,0 +1,47 @@
++/**
++ * Replace bare `var(--wpds-*)` references in a CSS value string with
++ * `var(--wpds-*, <fallback>)` using the provided token fallback map.
++ *
++ * Existing fallbacks (i.e. `var()` calls that already contain a comma)
++ * are left untouched, making the function safe to run multiple times
++ * (idempotent).
++ *
++ * This is the generic, reusable implementation that takes the fallback
++ * map as an argument. For the variant prebound with the package's
++ * generated token fallback map, see `./ds-token-fallbacks.mjs`.
++ *
++ * @param {string}                 cssValue               A CSS declaration value.
++ * @param {Record<string, string>} tokenFallbacks         Map of CSS variable names to their fallback expressions.
++ * @param {Object}                 [options]              Options.
++ * @param {boolean}                [options.escapeQuotes] When true, escape `"` and `'` in fallback values.
++ *                                                        Use this when the input is JS/TS source so that
++ *                                                        injected quotes don't break string literals. JS
++ *                                                        will unescape them at parse time, so the browser's
++ *                                                        CSS engine still sees the correct value.
++ * @return {string} The value with fallbacks injected.
++ */
++export function addFallbackToVar(
++	cssValue,
++	tokenFallbacks,
++	{ escapeQuotes = false } = {}
++) {
++	return cssValue.replace(
++		/var\(\s*(--wpds-[\w-]+)\s*\)/g,
++		( match, tokenName ) => {
++			let fallback = tokenFallbacks[ tokenName ];
++			if ( fallback === undefined ) {
++				throw new Error(
++					`Unknown design token: ${ tokenName }. ` +
++						'This token is not in the design system. ' +
++						'If this token was recently renamed, update all references to use the new name.'
++				);
++			}
++			if ( escapeQuotes ) {
++				fallback = fallback
++					.replaceAll( '"', '\\"' )
++					.replaceAll( "'", "\\'" );
++			}
++			return `var(${ tokenName }, ${ fallback })`;
++		}
++	);
++}
+diff --git a/packages/theme/src/postcss-plugins/add-fallback-to-var.ts b/packages/theme/src/postcss-plugins/add-fallback-to-var.ts
+deleted file mode 100644
+index 8a517f393ea6ce..00000000000000
+--- a/packages/theme/src/postcss-plugins/add-fallback-to-var.ts
++++ /dev/null
+@@ -1,44 +0,0 @@
+-/**
+- * Replace bare `var(--wpds-*)` references in a CSS value string with
+- * `var(--wpds-*, <fallback>)` using the provided token fallback map.
+- *
+- * Existing fallbacks (i.e. `var()` calls that already contain a comma)
+- * are left untouched, making the function safe to run multiple times
+- * (idempotent).
+- *
+- * NOTE: The regex and replacement logic here is mirrored in
+- * `ds-token-fallbacks.mjs`. If you update one, update the other to match.
+- *
+- * @param cssValue             A CSS declaration value.
+- * @param tokenFallbacks       Map of CSS variable names to their fallback expressions.
+- * @param options              Options.
+- * @param options.escapeQuotes When true, escape `"` and `'` in fallback values.
+- *                             Use this when the input is JS/TS source so that
+- *                             injected quotes don't break string literals.
+- * @return                     The value with fallbacks injected.
+- */
+-export function addFallbackToVar(
+-	cssValue: string,
+-	tokenFallbacks: Record< string, string >,
+-	{ escapeQuotes = false }: { escapeQuotes?: boolean } = {}
+-): string {
+-	return cssValue.replace(
+-		/var\(\s*(--wpds-[\w-]+)\s*\)/g,
+-		( match, tokenName: string ) => {
+-			let fallback = tokenFallbacks[ tokenName ];
+-			if ( fallback === undefined ) {
+-				throw new Error(
+-					`Unknown design token: ${ tokenName }. ` +
+-						'This token is not in the design system. ' +
+-						'If this token was recently renamed, update all references to use the new name.'
+-				);
+-			}
+-			if ( escapeQuotes ) {
+-				fallback = fallback
+-					.replaceAll( '"', '\\"' )
+-					.replaceAll( "'", "\\'" );
+-			}
+-			return `var(${ tokenName }, ${ fallback })`;
+-		}
+-	);
+-}
+diff --git a/packages/theme/src/postcss-plugins/ds-token-fallbacks.mjs b/packages/theme/src/postcss-plugins/ds-token-fallbacks.mjs
+index 99b65a7e410920..ee959d6b76047a 100644
+--- a/packages/theme/src/postcss-plugins/ds-token-fallbacks.mjs
++++ b/packages/theme/src/postcss-plugins/ds-token-fallbacks.mjs
+@@ -1,17 +1,17 @@
+-import _tokenFallbacks from '../prebuilt/js/design-token-fallbacks.mjs';
+-
+-/** @type {Record<string, string>} */
+-const tokenFallbacks = _tokenFallbacks;
++import tokenFallbacks from '../prebuilt/js/design-token-fallbacks.mjs';
++import { addFallbackToVar as _addFallbackToVar } from './add-fallback-to-var.mjs';
+ 
+ /**
+  * Replace bare `var(--wpds-*)` references in a CSS value string with
+- * `var(--wpds-*, <fallback>)` using the generated token fallback map.
++ * `var(--wpds-*, <fallback>)` using the package's generated token
++ * fallback map.
+  *
+  * Existing fallbacks (i.e. var() calls that already contain a comma) are
+  * left untouched, making the function safe to run multiple times.
+  *
+- * NOTE: The regex and replacement logic here mirrors `add-fallback-to-var.ts`.
+- * If you update one, update the other to match.
++ * This is a thin wrapper around the generic `addFallbackToVar` helper in
++ * `./add-fallback-to-var.mjs`, prebound to the package's token fallback
++ * map. Update the regex/replacement logic in that file, not here.
+  *
+  * @param {string}  cssValue               A CSS declaration value.
+  * @param {Object}  [options]              Options.
+@@ -24,24 +24,6 @@ const tokenFallbacks = _tokenFallbacks;
+  *                                         engine still sees the correct value.
+  * @return {string}                        The value with fallbacks injected.
+  */
+-export function addFallbackToVar( cssValue, { escapeQuotes = false } = {} ) {
+-	return cssValue.replace(
+-		/var\(\s*(--wpds-[\w-]+)\s*\)/g,
+-		( match, tokenName ) => {
+-			let fallback = tokenFallbacks[ tokenName ];
+-			if ( fallback === undefined ) {
+-				throw new Error(
+-					`Unknown design token: ${ tokenName }. ` +
+-						'This token is not in the design system. ' +
+-						'If this token was recently renamed, update all references to use the new name.'
+-				);
+-			}
+-			if ( escapeQuotes ) {
+-				fallback = fallback
+-					.replaceAll( '"', '\\"' )
+-					.replaceAll( "'", "\\'" );
+-			}
+-			return `var(${ tokenName }, ${ fallback })`;
+-		}
+-	);
++export function addFallbackToVar( cssValue, options ) {
++	return _addFallbackToVar( cssValue, tokenFallbacks, options );
+ }
+diff --git a/packages/theme/src/postcss-plugins/test/add-fallback-to-var.test.ts b/packages/theme/src/postcss-plugins/test/add-fallback-to-var.test.ts
+index a3aff1d0bd0a70..8cd8d65e6d4135 100644
+--- a/packages/theme/src/postcss-plugins/test/add-fallback-to-var.test.ts
++++ b/packages/theme/src/postcss-plugins/test/add-fallback-to-var.test.ts
+@@ -1,4 +1,4 @@
+-import { addFallbackToVar } from '../add-fallback-to-var';
++import { addFallbackToVar } from '../add-fallback-to-var.mjs';
+ 
+ const mockFallbacks: Record< string, string > = {
+ 	'--wpds-border-radius-sm': '2px',

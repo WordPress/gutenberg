@@ -1,0 +1,291 @@
+diff --git a/packages/block-editor/src/autocompleters/block.js b/packages/block-editor/src/autocompleters/block.js
+index 6cd8e67a547bd0..f082e180bacaac 100644
+--- a/packages/block-editor/src/autocompleters/block.js
++++ b/packages/block-editor/src/autocompleters/block.js
+@@ -2,6 +2,7 @@
+  * WordPress dependencies
+  */
+ import { useSelect } from '@wordpress/data';
++import { __ } from '@wordpress/i18n';
+ import {
+ 	cloneBlock,
+ 	createBlock,
+@@ -70,6 +71,23 @@ function createBlockCompleter() {
+ 				noop,
+ 				true
+ 			);
++			const hasBlockReplacements = useMemo(
++				() => items.some( ( item ) => item.id !== selectedBlockId ),
++				[ items, selectedBlockId ]
++			);
++			const noBlockReplacementsMessage = useMemo(
++				() =>
++					hasBlockReplacements ? undefined : (
++						<>
++							<BlockIcon
++								key="icon"
++								icon={ { src: 'block-default' } }
++							/>
++							{ __( 'No other blocks are available here' ) }
++						</>
++					),
++				[ hasBlockReplacements ]
++			);
+ 
+ 			const filteredItems = useMemo( () => {
+ 				const initialFilteredItems = !! filterValue.trim()
+@@ -119,7 +137,7 @@ function createBlockCompleter() {
+ 				[ filteredItems ]
+ 			);
+ 
+-			return [ options ];
++			return [ options, noBlockReplacementsMessage ];
+ 		},
+ 		allowContext( before, after ) {
+ 			return ! ( /\S/.test( before ) || /\S/.test( after ) );
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f34ca0aa08a6cb..d66ff7f66c8337 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -28,6 +28,7 @@
+ 
+ ### Enhancements
+ 
++-   `Autocomplete`: Add support for rendering a custom empty-state message from completers ([#77052](https://github.com/WordPress/gutenberg/pull/77052)).
+ -   `StyleProvider`: Add support for injecting package CSS module styles into target documents ([#77965](https://github.com/WordPress/gutenberg/pull/77965)).
+ -   `Button`: Align `link` variant underline (offset and thickness) with `ExternalLink` and `Link` from `@wordpress/ui` ([#77842](https://github.com/WordPress/gutenberg/pull/77842)).
+ -   `Modal`: render as a bottom sheet on mobile so the height adapts to the content and CTAs stay within thumb reach ([#77956](https://github.com/WordPress/gutenberg/pull/77956)).
+diff --git a/packages/components/src/autocomplete/autocompleter-ui.tsx b/packages/components/src/autocomplete/autocompleter-ui.tsx
+index b2e742ba00bf41..588f6a5a94889f 100644
+--- a/packages/components/src/autocomplete/autocompleter-ui.tsx
++++ b/packages/components/src/autocomplete/autocompleter-ui.tsx
+@@ -25,6 +25,7 @@ import getDefaultUseItems from './get-default-use-items';
+ import Button from '../button';
+ import Popover from '../popover';
+ import { VisuallyHidden } from '../visually-hidden';
++import getNodeText from '../utils/get-node-text';
+ import type { AutocompleterUIProps, KeyedOption } from './types';
+ 
+ type ListBoxProps = {
+@@ -96,7 +97,7 @@ export function AutocompleterUI( {
+ 	// ensuring a fresh mount (and stable hook identity) when the completer changes.
+ 	const useItems =
+ 		autocompleter.useItems ?? getDefaultUseItems( autocompleter );
+-	const [ items ] = useItems( filterValue );
++	const [ items, noResultsMessage ] = useItems( filterValue );
+ 	const popoverAnchor = useAnchor( {
+ 		editableContentElement: contentRef.current,
+ 	} );
+@@ -127,7 +128,10 @@ export function AutocompleterUI( {
+ 
+ 	const debouncedSpeak = useDebounce( speak, 500 );
+ 
+-	function announce( options: Array< KeyedOption > ) {
++	function announce(
++		options: Array< KeyedOption >,
++		message?: React.ReactNode
++	) {
+ 		if ( ! debouncedSpeak ) {
+ 			return;
+ 		}
+@@ -160,18 +164,21 @@ export function AutocompleterUI( {
+ 				);
+ 			}
+ 		} else {
+-			debouncedSpeak( __( 'No results.' ), 'assertive' );
++			debouncedSpeak(
++				( message && getNodeText( message ) ) || __( 'No results.' ),
++				'assertive'
++			);
+ 		}
+ 	}
+ 
+ 	useLayoutEffect( () => {
+ 		onChangeOptions( items );
+-		announce( items );
++		announce( items, noResultsMessage );
+ 		// We want to avoid introducing unexpected side effects.
+ 		// See https://github.com/WordPress/gutenberg/pull/41820
+-	}, [ items ] );
++	}, [ items, noResultsMessage ] );
+ 
+-	if ( items.length === 0 ) {
++	if ( items.length === 0 && ! noResultsMessage ) {
+ 		return null;
+ 	}
+ 
+@@ -185,14 +192,25 @@ export function AutocompleterUI( {
+ 				anchor={ popoverAnchor }
+ 				ref={ popoverRefs }
+ 			>
+-				<ListBox
+-					items={ items }
+-					onSelect={ onSelect }
+-					selectedIndex={ selectedIndex }
+-					instanceId={ instanceId }
+-					listBoxId={ listBoxId }
+-					className={ className }
+-				/>
++				{ items.length ? (
++					<ListBox
++						items={ items }
++						onSelect={ onSelect }
++						selectedIndex={ selectedIndex }
++						instanceId={ instanceId }
++						listBoxId={ listBoxId }
++						className={ className }
++					/>
++				) : (
++					<div
++						className={ clsx(
++							'components-autocomplete__no-results',
++							className
++						) }
++					>
++						{ noResultsMessage }
++					</div>
++				) }
+ 			</Popover>
+ 			{ contentRef.current &&
+ 				needsA11yCompat &&
+diff --git a/packages/components/src/autocomplete/index.tsx b/packages/components/src/autocomplete/index.tsx
+index cfeeb0f58f426c..436afafd97889b 100644
+--- a/packages/components/src/autocomplete/index.tsx
++++ b/packages/components/src/autocomplete/index.tsx
+@@ -196,11 +196,18 @@ export function useAutocomplete( {
+ 		if ( ! autocompleter ) {
+ 			return;
+ 		}
+-		if ( filteredOptions.length === 0 ) {
++
++		if ( event.defaultPrevented ) {
+ 			return;
+ 		}
+ 
+-		if ( event.defaultPrevented ) {
++		if ( event.key === 'Escape' ) {
++			dispatch( { type: 'RESET' } );
++			event.preventDefault();
++			return;
++		}
++
++		if ( filteredOptions.length === 0 ) {
+ 			return;
+ 		}
+ 
+@@ -222,11 +229,6 @@ export function useAutocomplete( {
+ 				break;
+ 			}
+ 
+-			case 'Escape':
+-				dispatch( { type: 'RESET' } );
+-				event.preventDefault();
+-				break;
+-
+ 			case 'Enter':
+ 				select( filteredOptions[ selectedIndex ] );
+ 				break;
+diff --git a/packages/components/src/autocomplete/style.scss b/packages/components/src/autocomplete/style.scss
+index f5c1cacda1351d..114a4341712da0 100644
+--- a/packages/components/src/autocomplete/style.scss
++++ b/packages/components/src/autocomplete/style.scss
+@@ -17,3 +17,9 @@
+ 		@include block-toolbar-button-style__focus();
+ 	}
+ }
++
++.components-autocomplete__no-results {
++	align-items: center;
++	display: flex;
++	min-height: $button-size;
++}
+diff --git a/packages/components/src/autocomplete/test/index.tsx b/packages/components/src/autocomplete/test/index.tsx
+index 7c31487d639c95..6c458b3d0e1b93 100644
+--- a/packages/components/src/autocomplete/test/index.tsx
++++ b/packages/components/src/autocomplete/test/index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { render, screen, renderHook } from '@testing-library/react';
++import { render, screen, renderHook, waitFor } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+ 
+ /**
+@@ -126,6 +126,52 @@ describe( 'useLastDifferentValue', () => {
+ } );
+ 
+ describe( 'AutocompleterUI', () => {
++	it( 'should render the no results message returned by useItems', async () => {
++		const onChangeOptions = jest.fn();
++		const autocompleter = {
++			name: 'fruit',
++			options: [],
++			triggerPrefix: '~',
++			getOptionLabel: () => '',
++			useItems: () =>
++				[
++					[] as [],
++					<>
++						<span data-testid="no-results-icon" />
++						No other blocks are available here
++					</>,
++				] as const,
++		};
++
++		const Container = () => {
++			const contentRef = useRef< HTMLElement >( null );
++
++			return (
++				<AutocompleterUI
++					autocompleter={ autocompleter }
++					filterValue=""
++					instanceId={ 1 }
++					listBoxId={ undefined }
++					selectedIndex={ 0 }
++					onChangeOptions={ onChangeOptions }
++					onSelect={ () => {} }
++					contentRef={ contentRef }
++					reset={ () => {} }
++				/>
++			);
++		};
++
++		render( <Container /> );
++
++		await waitFor( () => {
++			expect(
++				screen.getByText( 'No other blocks are available here' )
++			).toBeVisible();
++			expect( screen.getByTestId( 'no-results-icon' ) ).toBeVisible();
++			expect( onChangeOptions ).toHaveBeenCalledWith( [] );
++		} );
++	} );
++
+ 	describe( 'click outside behavior', () => {
+ 		it( 'should call reset function when a click on another element occurs', async () => {
+ 			const user = userEvent.setup();
+diff --git a/packages/components/src/autocomplete/types.ts b/packages/components/src/autocomplete/types.ts
+index 52e9ed7ecbba35..6748e5f29ec191 100644
+--- a/packages/components/src/autocomplete/types.ts
++++ b/packages/components/src/autocomplete/types.ts
+@@ -32,6 +32,10 @@ export type KeyedOption = {
+ 	keywords: Array< string >;
+ 	isDisabled: boolean;
+ };
++type UseItemsResult = readonly [
++	items: Array< KeyedOption >,
++	noResultsMessage?: React.ReactNode,
++];
+ 
+ export type WPCompleter< TCompleterOption = any > = {
+ 	/**
+@@ -95,7 +99,7 @@ export type WPCompleter< TCompleterOption = any > = {
+ 	 * Autocomplete UI. These items have uniform shape and have been filtered by
+ 	 * `AutocompleterUIProps.filterValue`.
+ 	 */
+-	useItems?: ( filterValue: string ) => readonly [ Array< KeyedOption > ];
++	useItems?: ( filterValue: string ) => UseItemsResult;
+ 	/**
+ 	 * Whether or not changes to the `filterValue` should be debounced.
+ 	 */

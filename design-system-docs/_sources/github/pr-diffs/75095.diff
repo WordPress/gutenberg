@@ -1,0 +1,107 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index bf563f7a64b1b0..3304aefa4fe06c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Internal
+ 
+ -   Expose `useDrag` from `@use-gesture/react` package via private API's ([#66735](https://github.com/WordPress/gutenberg/pull/66735)).
++-   ValidatedToggleControl: Fix validation timing with callback ref. ([#75095](https://github.com/WordPress/gutenberg/pull/75095)).
+ 
+ ## 32.1.0 (2026-01-29)
+ 
+diff --git a/packages/components/src/validated-form-controls/components/test/index.tsx b/packages/components/src/validated-form-controls/components/test/index.tsx
+new file mode 100644
+index 00000000000000..a55defd24522b5
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/components/test/index.tsx
+@@ -0,0 +1,44 @@
++/**
++ * External dependencies
++ */
++import { render } from '@testing-library/react';
++
++/**
++ * WordPress dependencies
++ */
++import { useRef, useLayoutEffect } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { ValidatedToggleControl } from '../';
++
++describe( 'ValidatedToggleControl', () => {
++	it( 'should validate correctly when checkValidity is called before useEffect runs', () => {
++		// `useLayoutEffect` runs AFTER render but BEFORE `useEffect`.
++		// This simulates code that runs before useEffect, such as validation
++		// triggered immediately when a form card expands.
++		let validityResult: boolean | null = null;
++		function TestComponent() {
++			const ref = useRef< HTMLInputElement >( null );
++			useLayoutEffect( () => {
++				// This runs BEFORE useEffect would run
++				if ( ref.current ) {
++					validityResult = ref.current.checkValidity();
++				}
++			}, [] );
++			return (
++				<ValidatedToggleControl
++					ref={ ref }
++					label="Required toggle"
++					required
++					checked={ false }
++					onChange={ () => {} }
++				/>
++			);
++		}
++		render( <TestComponent /> );
++		// `required` is set synchronously, so unchecked box fails validation.
++		expect( validityResult ).toBe( false );
++	} );
++} );
+diff --git a/packages/components/src/validated-form-controls/components/toggle-control.tsx b/packages/components/src/validated-form-controls/components/toggle-control.tsx
+index 332b64e1e3214b..965e30b06c63bc 100644
+--- a/packages/components/src/validated-form-controls/components/toggle-control.tsx
++++ b/packages/components/src/validated-form-controls/components/toggle-control.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { forwardRef, useRef, useEffect } from '@wordpress/element';
++import { forwardRef, useRef, useCallback } from '@wordpress/element';
+ import { useMergeRefs } from '@wordpress/compose';
+ 
+ /**
+@@ -22,16 +22,22 @@ const UnforwardedValidatedToggleControl = (
+ 	}: React.ComponentProps< typeof ToggleControl > & ValidatedControlProps,
+ 	forwardedRef: React.ForwardedRef< HTMLInputElement >
+ ) => {
+-	const validityTargetRef = useRef< HTMLInputElement >( null );
+-	const mergedRefs = useMergeRefs( [ forwardedRef, validityTargetRef ] );
+-
++	const validityTargetRef = useRef< HTMLInputElement | null >( null );
+ 	// TODO: Upstream limitation - The `required` attribute is not passed down to the input,
+-	// so we need to set it manually.
+-	useEffect( () => {
+-		if ( validityTargetRef.current ) {
+-			validityTargetRef.current.required = required ?? false;
+-		}
+-	}, [ required ] );
++	// so we need to set it manually. Using a callback ref ensures `required` is set
++	// synchronously when the element mounts, before any validation effects run.
++	const setRequiredRef = useCallback(
++		( element: HTMLInputElement | null ) => {
++			if ( ! element ) {
++				return;
++			}
++			validityTargetRef.current = element;
++			element.required = required ?? false;
++		},
++		[ required ]
++	);
++
++	const mergedRefs = useMergeRefs( [ forwardedRef, setRequiredRef ] );
+ 
+ 	return (
+ 		<ControlWithError

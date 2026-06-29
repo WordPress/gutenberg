@@ -1,0 +1,275 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d7e8b191229893..02cf303bbba70e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fixes
++
++-   `ToolsPanel`: avoid paining intermediate unfinished states ([#65494](https://github.com/WordPress/gutenberg/pull/65494)).
++
+ ## 28.8.0 (2024-09-19)
+ 
+ ### Bug Fixes
+diff --git a/packages/components/src/tools-panel/tools-panel-item/hook.ts b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+index 1e33e7c6740ded..27a0ceb27e7ce7 100644
+--- a/packages/components/src/tools-panel/tools-panel-item/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+@@ -2,12 +2,7 @@
+  * WordPress dependencies
+  */
+ import { usePrevious } from '@wordpress/compose';
+-import {
+-	useCallback,
+-	useEffect,
+-	useLayoutEffect,
+-	useMemo,
+-} from '@wordpress/element';
++import { useCallback, useLayoutEffect, useMemo } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -101,7 +96,7 @@ export function useToolsPanelItem(
+ 		deregisterPanelItem,
+ 	] );
+ 
+-	useEffect( () => {
++	useLayoutEffect( () => {
+ 		if ( hasMatchingPanel ) {
+ 			registerResetAllFilter( resetAllFilterCallback );
+ 		}
+@@ -127,7 +122,7 @@ export function useToolsPanelItem(
+ 	const isValueSet = hasValue();
+ 	// Notify the panel when an item's value has changed except for optional
+ 	// items without value because the item should not cause itself to hide.
+-	useEffect( () => {
++	useLayoutEffect( () => {
+ 		if ( ! isShownByDefault && ! isValueSet ) {
+ 			return;
+ 		}
+@@ -143,7 +138,7 @@ export function useToolsPanelItem(
+ 
+ 	// Determine if the panel item's corresponding menu is being toggled and
+ 	// trigger appropriate callback if it is.
+-	useEffect( () => {
++	useLayoutEffect( () => {
+ 		// We check whether this item is currently registered as items rendered
+ 		// via fills can persist through the parent panel being remounted.
+ 		// See: https://github.com/WordPress/gutenberg/pull/45673
+diff --git a/packages/components/src/tools-panel/tools-panel/hook.ts b/packages/components/src/tools-panel/tools-panel/hook.ts
+index 931bf2494e6e34..d67d732d4df671 100644
+--- a/packages/components/src/tools-panel/tools-panel/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel/hook.ts
+@@ -3,7 +3,7 @@
+  */
+ import {
+ 	useCallback,
+-	useEffect,
++	useLayoutEffect,
+ 	useMemo,
+ 	useRef,
+ 	useState,
+@@ -101,7 +101,7 @@ export function useToolsPanel(
+ 	// the resetAll task. Without this, the flag is cleared after the first
+ 	// control updates and forces a rerender with subsequent controls then
+ 	// believing they need to reset, unfortunately using stale data.
+-	useEffect( () => {
++	useLayoutEffect( () => {
+ 		if ( wasResetting ) {
+ 			isResettingRef.current = false;
+ 		}
+@@ -114,76 +114,66 @@ export function useToolsPanel(
+ 		ResetAllFilter[]
+ 	>( [] );
+ 
+-	const registerPanelItem = useCallback(
+-		( item: ToolsPanelItem ) => {
+-			// Add item to panel items.
+-			setPanelItems( ( items ) => {
+-				const newItems = [ ...items ];
+-				// If an item with this label has already been registered, remove it
+-				// first. This can happen when an item is moved between the default
+-				// and optional groups.
+-				const existingIndex = newItems.findIndex(
+-					( oldItem ) => oldItem.label === item.label
+-				);
+-				if ( existingIndex !== -1 ) {
+-					newItems.splice( existingIndex, 1 );
+-				}
+-				return [ ...newItems, item ];
+-			} );
++	const registerPanelItem = useCallback( ( item: ToolsPanelItem ) => {
++		// Add item to panel items.
++		setPanelItems( ( items ) => {
++			const newItems = [ ...items ];
++			// If an item with this label has already been registered, remove it
++			// first. This can happen when an item is moved between the default
++			// and optional groups.
++			const existingIndex = newItems.findIndex(
++				( oldItem ) => oldItem.label === item.label
++			);
++			if ( existingIndex !== -1 ) {
++				newItems.splice( existingIndex, 1 );
++			}
++			return [ ...newItems, item ];
++		} );
+ 
+-			// Track the initial order of item registration. This is used for
+-			// maintaining menu item order later.
+-			setMenuItemOrder( ( items ) => {
+-				if ( items.includes( item.label ) ) {
+-					return items;
+-				}
++		// Track the initial order of item registration. This is used for
++		// maintaining menu item order later.
++		setMenuItemOrder( ( items ) => {
++			if ( items.includes( item.label ) ) {
++				return items;
++			}
+ 
+-				return [ ...items, item.label ];
+-			} );
+-		},
+-		[ setPanelItems, setMenuItemOrder ]
+-	);
++			return [ ...items, item.label ];
++		} );
++	}, [] );
+ 
+ 	// Panels need to deregister on unmount to avoid orphans in menu state.
+ 	// This is an issue when panel items are being injected via SlotFills.
+-	const deregisterPanelItem = useCallback(
+-		( label: string ) => {
+-			// When switching selections between components injecting matching
+-			// controls, e.g. both panels have a "padding" control, the
+-			// deregistration of the first panel doesn't occur until after the
+-			// registration of the next.
+-			setPanelItems( ( items ) => {
+-				const newItems = [ ...items ];
+-				const index = newItems.findIndex(
+-					( item ) => item.label === label
+-				);
+-				if ( index !== -1 ) {
+-					newItems.splice( index, 1 );
+-				}
+-				return newItems;
+-			} );
+-		},
+-		[ setPanelItems ]
+-	);
++	const deregisterPanelItem = useCallback( ( label: string ) => {
++		// When switching selections between components injecting matching
++		// controls, e.g. both panels have a "padding" control, the
++		// deregistration of the first panel doesn't occur until after the
++		// registration of the next.
++		setPanelItems( ( items ) => {
++			const newItems = [ ...items ];
++			const index = newItems.findIndex(
++				( item ) => item.label === label
++			);
++			if ( index !== -1 ) {
++				newItems.splice( index, 1 );
++			}
++			return newItems;
++		} );
++	}, [] );
+ 
+ 	const registerResetAllFilter = useCallback(
+ 		( newFilter: ResetAllFilter ) => {
+-			setResetAllFilters( ( filters ) => {
+-				return [ ...filters, newFilter ];
+-			} );
++			setResetAllFilters( ( filters ) => [ ...filters, newFilter ] );
+ 		},
+-		[ setResetAllFilters ]
++		[]
+ 	);
+ 
+ 	const deregisterResetAllFilter = useCallback(
+ 		( filterToRemove: ResetAllFilter ) => {
+-			setResetAllFilters( ( filters ) => {
+-				return filters.filter(
+-					( filter ) => filter !== filterToRemove
+-				);
+-			} );
++			setResetAllFilters( ( filters ) =>
++				filters.filter( ( filter ) => filter !== filterToRemove )
++			);
+ 		},
+-		[ setResetAllFilters ]
++		[]
+ 	);
+ 
+ 	// Manage and share display state of menu items representing child controls.
+@@ -193,17 +183,16 @@ export function useToolsPanel(
+ 	} );
+ 
+ 	// Setup menuItems state as panel items register themselves.
+-	useEffect( () => {
+-		setMenuItems( ( prevState ) => {
+-			const items = generateMenuItems( {
++	useLayoutEffect( () => {
++		setMenuItems( ( currentMenuItems ) =>
++			generateMenuItems( {
+ 				panelItems,
+ 				shouldReset: false,
+-				currentMenuItems: prevState,
++				currentMenuItems,
+ 				menuItemOrder,
+-			} );
+-			return items;
+-		} );
+-	}, [ panelItems, setMenuItems, menuItemOrder ] );
++			} )
++		);
++	}, [ panelItems, menuItemOrder ] );
+ 
+ 	// Updates the status of the panel’s menu items. For default items the
+ 	// value represents whether it differs from the default and for optional
+@@ -225,7 +214,7 @@ export function useToolsPanel(
+ 				return newState;
+ 			} );
+ 		},
+-		[ setMenuItems ]
++		[]
+ 	);
+ 
+ 	// Whether all optional menu items are hidden or not must be tracked
+@@ -235,7 +224,7 @@ export function useToolsPanel(
+ 	const [ areAllOptionalControlsHidden, setAreAllOptionalControlsHidden ] =
+ 		useState( false );
+ 
+-	useEffect( () => {
++	useLayoutEffect( () => {
+ 		if (
+ 			isMenuItemTypeEmpty( menuItems?.default ) &&
+ 			! isMenuItemTypeEmpty( menuItems?.optional )
+@@ -245,7 +234,7 @@ export function useToolsPanel(
+ 			).some( ( [ , isSelected ] ) => isSelected );
+ 			setAreAllOptionalControlsHidden( allControlsHidden );
+ 		}
+-	}, [ menuItems, setAreAllOptionalControlsHidden ] );
++	}, [ menuItems ] );
+ 
+ 	const cx = useCx();
+ 	const classes = useMemo( () => {
+@@ -297,7 +286,7 @@ export function useToolsPanel(
+ 
+ 			setMenuItems( newMenuItems );
+ 		},
+-		[ menuItems, panelItems, setMenuItems ]
++		[ menuItems, panelItems ]
+ 	);
+ 
+ 	// Resets display of children and executes resetAll callback if available.
+@@ -314,7 +303,7 @@ export function useToolsPanel(
+ 			shouldReset: true,
+ 		} );
+ 		setMenuItems( resetMenuItems );
+-	}, [ panelItems, resetAllFilters, resetAll, setMenuItems, menuItemOrder ] );
++	}, [ panelItems, resetAllFilters, resetAll, menuItemOrder ] );
+ 
+ 	// Assist ItemGroup styling when there are potentially hidden placeholder
+ 	// items by identifying first & last items that are toggled on for display.

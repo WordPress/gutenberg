@@ -1,0 +1,88 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index dbd1d09fbe690f..db8b0f749217f4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ -   `TreeSelect`: Deprecate 36px default size ([#67855](https://github.com/WordPress/gutenberg/pull/67855)).
+ -   `SelectControl`: Deprecate 36px default size ([#66898](https://github.com/WordPress/gutenberg/pull/66898)).
+ -   `InputControl`: Deprecate 36px default size ([#66897](https://github.com/WordPress/gutenberg/pull/66897)).
++-   `RadioGroup`: Log deprecation warning ([#68067](https://github.com/WordPress/gutenberg/pull/68067)).
+ -   Soft deprecate `ButtonGroup` component. Use `ToggleGroupControl` instead ([#65429](https://github.com/WordPress/gutenberg/pull/65429)).
+ 
+ ### Bug Fixes
+diff --git a/packages/components/src/button-group/index.tsx b/packages/components/src/button-group/index.tsx
+index 4bdf3a139188b5..e073b0c3b359b8 100644
+--- a/packages/components/src/button-group/index.tsx
++++ b/packages/components/src/button-group/index.tsx
+@@ -20,13 +20,15 @@ function UnforwardedButtonGroup(
+ 	props: WordPressComponentProps< ButtonGroupProps, 'div', false >,
+ 	ref: ForwardedRef< HTMLDivElement >
+ ) {
+-	const { className, ...restProps } = props;
++	const { className, __shouldNotWarnDeprecated, ...restProps } = props;
+ 	const classes = clsx( 'components-button-group', className );
+ 
+-	deprecated( 'wp.components.ButtonGroup', {
+-		since: '6.8',
+-		alternative: 'wp.components.ToggleGroupControl',
+-	} );
++	if ( ! __shouldNotWarnDeprecated ) {
++		deprecated( 'wp.components.ButtonGroup', {
++			since: '6.8',
++			alternative: 'wp.components.__experimentalToggleGroupControl',
++		} );
++	}
+ 
+ 	return (
+ 		<div ref={ ref } role="group" className={ classes } { ...restProps } />
+diff --git a/packages/components/src/button-group/types.ts b/packages/components/src/button-group/types.ts
+index 0bc162d5cf1c74..57388c7b5fc095 100644
+--- a/packages/components/src/button-group/types.ts
++++ b/packages/components/src/button-group/types.ts
+@@ -8,4 +8,11 @@ export type ButtonGroupProps = {
+ 	 * The children elements.
+ 	 */
+ 	children: ReactNode;
++	/**
++	 * Do not throw a warning for component deprecation.
++	 * For internal components of other components that already throw the warning.
++	 *
++	 * @ignore
++	 */
++	__shouldNotWarnDeprecated?: boolean;
+ };
+diff --git a/packages/components/src/radio-group/index.tsx b/packages/components/src/radio-group/index.tsx
+index e59775c00a8023..589d20ffdaae5b 100644
+--- a/packages/components/src/radio-group/index.tsx
++++ b/packages/components/src/radio-group/index.tsx
+@@ -6,6 +6,7 @@ import * as Ariakit from '@ariakit/react';
+ /**
+  * WordPress dependencies
+  */
++import deprecated from '@wordpress/deprecated';
+ import { useMemo, forwardRef } from '@wordpress/element';
+ import { isRTL } from '@wordpress/i18n';
+ 
+@@ -46,11 +47,21 @@ function UnforwardedRadioGroup(
+ 		[ radioStore, disabled ]
+ 	);
+ 
++	deprecated( 'wp.components.__experimentalRadioGroup', {
++		alternative:
++			'wp.components.RadioControl or wp.components.__experimentalToggleGroupControl',
++		since: '6.8',
++	} );
++
+ 	return (
+ 		<RadioGroupContext.Provider value={ contextValue }>
+ 			<Ariakit.RadioGroup
+ 				store={ radioStore }
+-				render={ <ButtonGroup>{ children }</ButtonGroup> }
++				render={
++					<ButtonGroup __shouldNotWarnDeprecated>
++						{ children }
++					</ButtonGroup>
++				}
+ 				aria-label={ label }
+ 				ref={ ref }
+ 				{ ...props }

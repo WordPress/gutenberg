@@ -1,0 +1,4 @@
+diff --git a/packages/components/src/animation/index.js b/packages/components/src/animation/index.tsx
+similarity index 100%
+rename from packages/components/src/animation/index.js
+rename to packages/components/src/animation/index.tsx

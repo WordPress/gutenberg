@@ -1,0 +1,56 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c6a32b22cdd6c9..9378ab8d342e30 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -25,6 +25,7 @@
+ 
+ ### Internal
+ 
++-   Remove CSS hack for Internet Explorer 11 ([#60727](https://github.com/WordPress/gutenberg/pull/60727)).
+ -   `CheckboxControl`: Streamline size styles ([#60475](https://github.com/WordPress/gutenberg/pull/60475)).
+ 
+ ## 27.3.0 (2024-04-03)
+diff --git a/packages/components/src/placeholder/style.scss b/packages/components/src/placeholder/style.scss
+index eda0dd3329d39c..fedf374063541b 100644
+--- a/packages/components/src/placeholder/style.scss
++++ b/packages/components/src/placeholder/style.scss
+@@ -8,18 +8,14 @@
+ 	text-align: left;
+ 	margin: 0;
+ 	color: $gray-900;
++	display: flex;
++	flex-direction: column;
++	align-items: flex-start;
+ 
+ 	// Some editor styles unset this.
+ 	-moz-font-smoothing: subpixel-antialiased;
+ 	-webkit-font-smoothing: subpixel-antialiased;
+ 
+-	// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
+-	@supports (position: sticky) {
+-		display: flex;
+-		flex-direction: column;
+-		justify-content: top;
+-		align-items: flex-start;
+-	}
+ 
+ 	// Block UI appearance.
+ 	border-radius: $radius-block-ui;
+diff --git a/packages/components/src/toolbar/toolbar-group/style.scss b/packages/components/src/toolbar/toolbar-group/style.scss
+index 487fd614045259..668968d40babbe 100644
+--- a/packages/components/src/toolbar/toolbar-group/style.scss
++++ b/packages/components/src/toolbar/toolbar-group/style.scss
+@@ -56,12 +56,7 @@
+ 
+ div.components-toolbar {
+ 	& > div {
+-		// IE11 does not support `position: sticky`, or Flex very well, so use block.
+-		display: block;
+-		@supports (position: sticky) {
+-			display: flex;
+-		}
+-
++		display: flex;
+ 		margin: 0;
+ 	}
+ 

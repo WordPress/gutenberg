@@ -1,0 +1,121 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2eb0b533f6fa20..76d38fbc86a53b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ -   `Button`: Remove obsolete Safari + VoiceOver workaround for visually hidden text ([#77107](https://github.com/WordPress/gutenberg/pull/77107)).
+ -   `BoxControl`: Remove unused state for icon side ([#77143](https://github.com/WordPress/gutenberg/pull/77143)).
+ -   `Autocomplete`: Remove `getAutoCompleterUI` factory pattern ([#77048](https://github.com/WordPress/gutenberg/pull/77048)).
++-   `CustomSelectControl`, `Sandbox`: Rename internal React function names ([#77148](https://github.com/WordPress/gutenberg/pull/77148)).
+ 
+ ## 32.5.0 (2026-04-01)
+ 
+diff --git a/packages/components/src/custom-select-control-v2/custom-select.tsx b/packages/components/src/custom-select-control-v2/custom-select.tsx
+index eaf445675a863b..546948d554c670 100644
+--- a/packages/components/src/custom-select-control-v2/custom-select.tsx
++++ b/packages/components/src/custom-select-control-v2/custom-select.tsx
+@@ -19,7 +19,7 @@ import type {
+ 	CustomSelectStore,
+ 	CustomSelectButtonProps,
+ 	CustomSelectButtonSize,
+-	_CustomSelectInternalProps,
++	CustomSelectInternalProps,
+ 	_CustomSelectProps,
+ } from './types';
+ import InputBase from '../input-control/input-base';
+@@ -85,8 +85,8 @@ const CustomSelectButton = ( {
+ 	);
+ };
+ 
+-function _CustomSelect(
+-	props: _CustomSelectInternalProps &
++function CustomSelect(
++	props: CustomSelectInternalProps &
+ 		_CustomSelectProps &
+ 		CustomSelectStore &
+ 		CustomSelectButtonSize
+@@ -161,4 +161,4 @@ function _CustomSelect(
+ 	);
+ }
+ 
+-export default _CustomSelect;
++export default CustomSelect;
+diff --git a/packages/components/src/custom-select-control-v2/index.tsx b/packages/components/src/custom-select-control-v2/index.tsx
+index 07d073caf920f9..3eaf36cca91b14 100644
+--- a/packages/components/src/custom-select-control-v2/index.tsx
++++ b/packages/components/src/custom-select-control-v2/index.tsx
+@@ -5,7 +5,7 @@ import * as Ariakit from '@ariakit/react';
+ /**
+  * Internal dependencies
+  */
+-import _CustomSelect from './custom-select';
++import CustomSelect from './custom-select';
+ import type { CustomSelectProps } from './types';
+ import type { WordPressComponentProps } from '../context';
+ import Item from './item';
+@@ -21,7 +21,7 @@ function CustomSelectControlV2(
+ 		value,
+ 	} );
+ 
+-	return <_CustomSelect { ...restProps } store={ store } />;
++	return <CustomSelect { ...restProps } store={ store } />;
+ }
+ 
+ CustomSelectControlV2.Item = Item;
+diff --git a/packages/components/src/custom-select-control-v2/types.ts b/packages/components/src/custom-select-control-v2/types.ts
+index 621319737207d1..5167c5ff38a740 100644
+--- a/packages/components/src/custom-select-control-v2/types.ts
++++ b/packages/components/src/custom-select-control-v2/types.ts
+@@ -50,7 +50,7 @@ export type CustomSelectButtonProps = {
+ };
+ 
+ // Props only exposed on the internal implementation
+-export type _CustomSelectInternalProps = {
++export type CustomSelectInternalProps = {
+ 	/**
+ 	 * True if the consumer is emulating the legacy component behavior and look
+ 	 */
+diff --git a/packages/components/src/custom-select-control/index.tsx b/packages/components/src/custom-select-control/index.tsx
+index d9c74bce79fcee..88c5e7b68ad66e 100644
+--- a/packages/components/src/custom-select-control/index.tsx
++++ b/packages/components/src/custom-select-control/index.tsx
+@@ -13,7 +13,7 @@ import { __, sprintf } from '@wordpress/i18n';
+ /**
+  * Internal dependencies
+  */
+-import _CustomSelect from '../custom-select-control-v2/custom-select';
++import CustomSelect from '../custom-select-control-v2/custom-select';
+ import CustomSelectItem from '../custom-select-control-v2/item';
+ import * as Styled from '../custom-select-control-v2/styles';
+ import type { CustomSelectProps, CustomSelectOption } from './types';
+@@ -189,7 +189,7 @@ function CustomSelectControl< T extends CustomSelectOption >(
+ 
+ 	return (
+ 		<>
+-			<_CustomSelect
++			<CustomSelect
+ 				aria-describedby={ descriptionId }
+ 				renderSelectedValue={ renderSelectedValue }
+ 				size={ translatedSize }
+@@ -203,7 +203,7 @@ function CustomSelectControl< T extends CustomSelectOption >(
+ 				{ ...restProps }
+ 			>
+ 				{ children }
+-			</_CustomSelect>
++			</CustomSelect>
+ 			<VisuallyHidden>
+ 				<span id={ descriptionId }>
+ 					{ getDescribedBy( selectedOption?.name, describedBy ) }
+diff --git a/packages/components/src/sandbox/index.native.js b/packages/components/src/sandbox/index.native.js
+index 9d04ed43b81e2b..549b402936368b 100644
+--- a/packages/components/src/sandbox/index.native.js
++++ b/packages/components/src/sandbox/index.native.js
+@@ -172,7 +172,7 @@ const style = `
+ 
+ const EMPTY_ARRAY = [];
+ 
+-const Sandbox = forwardRef( function Sandbox(
++const Sandbox = forwardRef( function UnforwardedSandbox(
+ 	{
+ 		containerStyle,
+ 		customJS,

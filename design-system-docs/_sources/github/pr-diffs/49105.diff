@@ -1,0 +1,181 @@
+diff --git a/packages/block-editor/src/components/block-inspector/style.scss b/packages/block-editor/src/components/block-inspector/style.scss
+index 5cf4a8b382f998..e57b54bd32c826 100644
+--- a/packages/block-editor/src/components/block-inspector/style.scss
++++ b/packages/block-editor/src/components/block-inspector/style.scss
+@@ -20,7 +20,8 @@
+ 
+ 	// Reset unwanted margin-bottom from being applied to BaseControls within certain components.
+ 	.components-focal-point-picker-control,
+-	.components-query-controls {
++	.components-query-controls,
++	.components-range-control {
+ 		.components-base-control {
+ 			margin-bottom: 0;
+ 		}
+diff --git a/packages/block-library/src/cover/edit/inspector-controls.js b/packages/block-library/src/cover/edit/inspector-controls.js
+index d5a692350993fd..e8f3683e4d95ff 100644
+--- a/packages/block-library/src/cover/edit/inspector-controls.js
++++ b/packages/block-library/src/cover/edit/inspector-controls.js
+@@ -303,6 +303,7 @@ export default function CoverInspectorControls( {
+ 							max={ 100 }
+ 							step={ 10 }
+ 							required
++							__next40pxDefaultSize
+ 						/>
+ 					</ToolsPanelItem>
+ 				</InspectorControls>
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6409ce7515646f..19182873e38282 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `SelectControl`: Added option to set hidden options. ([#51545](https://github.com/WordPress/gutenberg/pull/51545))
+ -   `UnitControl`: Revamp support for changing unit by typing ([#39303](https://github.com/WordPress/gutenberg/pull/39303)).
++-   `RangeControl`: Add `__next40pxDefaultSize` prop to opt into the new 40px default size ([#49105](https://github.com/WordPress/gutenberg/pull/49105)).
+ -   `Modal`: Update corner radius to be between buttons and the site view frame, in a 2-4-8 system. ([#51254](https://github.com/WordPress/gutenberg/pull/51254)).
+ -   `Button`: Introduce `size` prop with `default`, `compact`, and `small` variants ([#51842](https://github.com/WordPress/gutenberg/pull/51842)).
+ -   `ItemGroup`: Update button focus state styles to be inline with other button focus states in the editor. ([#51576](https://github.com/WordPress/gutenberg/pull/51576)).
+diff --git a/packages/components/src/number-control/index.tsx b/packages/components/src/number-control/index.tsx
+index b2ab417d18af21..d2ce9d8ed7d019 100644
+--- a/packages/components/src/number-control/index.tsx
++++ b/packages/components/src/number-control/index.tsx
+@@ -60,7 +60,6 @@ function UnforwardedNumberControl(
+ 		} );
+ 		spinControls = 'none';
+ 	}
+-
+ 	const inputRef = useRef< HTMLInputElement >();
+ 	const mergedRef = useMergeRefs( [ inputRef, forwardedRef ] );
+ 
+diff --git a/packages/components/src/range-control/index.tsx b/packages/components/src/range-control/index.tsx
+index 928595132e2540..19630e39f6bfe9 100644
+--- a/packages/components/src/range-control/index.tsx
++++ b/packages/components/src/range-control/index.tsx
+@@ -37,6 +37,7 @@ import {
+ 
+ import type { RangeControlProps } from './types';
+ import type { WordPressComponentProps } from '../ui/context';
++import { space } from '../ui/utils/space';
+ 
+ const noop = () => {};
+ 
+@@ -69,6 +70,7 @@ function UnforwardedRangeControl(
+ 		railColor,
+ 		renderTooltipContent = ( v ) => v,
+ 		resetFallbackValue,
++		__next40pxDefaultSize = false,
+ 		shiftStep = 10,
+ 		showTooltip: showTooltipProp,
+ 		step = 1,
+@@ -208,7 +210,6 @@ function UnforwardedRangeControl(
+ 	const offsetStyle = {
+ 		[ isRTL() ? 'right' : 'left' ]: fillValueOffset,
+ 	};
+-
+ 	return (
+ 		<BaseControl
+ 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+@@ -218,7 +219,10 @@ function UnforwardedRangeControl(
+ 			id={ `${ id }` }
+ 			help={ help }
+ 		>
+-			<Root className="components-range-control__root">
++			<Root
++				className="components-range-control__root"
++				__next40pxDefaultSize={ __next40pxDefaultSize }
++			>
+ 				{ beforeIcon && (
+ 					<BeforeIconWrapper>
+ 						<Icon icon={ beforeIcon } />
+@@ -305,6 +309,14 @@ function UnforwardedRangeControl(
+ 						onBlur={ handleOnInputNumberBlur }
+ 						onChange={ handleOnChange }
+ 						shiftStep={ shiftStep }
++						size={
++							__next40pxDefaultSize
++								? '__unstable-large'
++								: 'default'
++						}
++						__unstableInputWidth={
++							__next40pxDefaultSize ? space( 20 ) : space( 16 )
++						}
+ 						step={ step }
+ 						// @ts-expect-error TODO: Investigate if the `null` value is necessary
+ 						value={ inputSliderValue }
+diff --git a/packages/components/src/range-control/input-range.tsx b/packages/components/src/range-control/input-range.tsx
+index 3b663309918ae1..1daa351444686a 100644
+--- a/packages/components/src/range-control/input-range.tsx
++++ b/packages/components/src/range-control/input-range.tsx
+@@ -16,7 +16,6 @@ function InputRange(
+ 	ref: React.ForwardedRef< HTMLInputElement >
+ ) {
+ 	const { describedBy, label, value, ...otherProps } = props;
+-
+ 	return (
+ 		<BaseInputRange
+ 			{ ...otherProps }
+diff --git a/packages/components/src/range-control/styles/range-control-styles.ts b/packages/components/src/range-control/styles/range-control-styles.ts
+index a351a7db26bdd4..67bac2ec2994c5 100644
+--- a/packages/components/src/range-control/styles/range-control-styles.ts
++++ b/packages/components/src/range-control/styles/range-control-styles.ts
+@@ -18,6 +18,7 @@ import type {
+ 	TooltipProps,
+ 	TrackProps,
+ 	WrapperProps,
++	RangeControlProps,
+ } from '../types';
+ 
+ const rangeHeightValue = 30;
+@@ -26,15 +27,24 @@ const rangeHeight = () =>
+ 	css( { height: rangeHeightValue, minHeight: rangeHeightValue } );
+ const thumbSize = 12;
+ 
+-export const Root = styled.div`
++const deprecatedHeight = ( {
++	__next40pxDefaultSize,
++}: Pick< RangeControlProps, '__next40pxDefaultSize' > ) =>
++	! __next40pxDefaultSize && css( { minHeight: rangeHeightValue } );
++
++type RootProps = Pick< RangeControlProps, '__next40pxDefaultSize' >;
++export const Root = styled.div< RootProps >`
+ 	-webkit-tap-highlight-color: transparent;
+-	align-items: flex-start;
++	align-items: center;
+ 	display: flex;
+ 	justify-content: flex-start;
+ 	padding: 0;
+ 	position: relative;
+ 	touch-action: none;
+ 	width: 100%;
++	min-height: 40px;
++	/* TODO: remove after removing the __next40pxDefaultSize prop */
++	${ deprecatedHeight };
+ `;
+ 
+ const wrapperColor = ( { color = COLORS.ui.borderFocus }: WrapperProps ) =>
+@@ -296,7 +306,6 @@ export const InputNumber = styled( NumberControl )`
+ 	display: inline-block;
+ 	font-size: 13px;
+ 	margin-top: 0;
+-	width: ${ space( 16 ) } !important;
+ 
+ 	input[type='number']& {
+ 		${ rangeHeight };
+diff --git a/packages/components/src/range-control/types.ts b/packages/components/src/range-control/types.ts
+index 6d7d95a2e2bf41..4f7c5571fde9cf 100644
+--- a/packages/components/src/range-control/types.ts
++++ b/packages/components/src/range-control/types.ts
+@@ -203,6 +203,12 @@ export type RangeControlProps = Pick<
+ 		 * @default 10
+ 		 */
+ 		shiftStep?: number;
++		/**
++		 * Start opting into the larger default height that will become the default size in a future version.
++		 *
++		 * @default false
++		 */
++		__next40pxDefaultSize?: boolean;
+ 		/**
+ 		 * Forcing the Tooltip UI to show or hide. This is overridden to `false`
+ 		 * when `step` is set to the special string value `any`.

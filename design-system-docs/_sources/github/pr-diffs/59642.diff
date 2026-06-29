@@ -1,0 +1,87 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6cdde409cbd176..840a38334be78f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ -   `HStack`, `VStack`: Stop passing invalid props to underlying element ([#59416](https://github.com/WordPress/gutenberg/pull/59416)).
+ -   `Button`: Fix focus outline in disabled primary variant ([#59391](https://github.com/WordPress/gutenberg/pull/59391)).
+ -   `Button`: Place `children` before the icon when `iconPosition` is `right`  ([#59489](https://github.com/WordPress/gutenberg/pull/59489)).
++-   `ToggleGroupControl`: Fix unwanted backdrop vertical animation ([#59642](https://github.com/WordPress/gutenberg/pull/59642)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index d672cfa76a8c5b..5b4322102fa32d 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -276,11 +276,13 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+               </svg>
+             </div>
+           </button>
+-          <div
+-            class="emotion-15"
+-            role="presentation"
+-            style="opacity: 1;"
+-          />
++          <div>
++            <div
++              class="emotion-15"
++              role="presentation"
++              style="opacity: 1;"
++            />
++          </div>
+         </div>
+         <div
+           class="emotion-10 emotion-11"
+@@ -823,11 +825,13 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+               </svg>
+             </div>
+           </button>
+-          <div
+-            class="emotion-15"
+-            role="presentation"
+-            style="opacity: 1;"
+-          />
++          <div>
++            <div
++              class="emotion-15"
++              role="presentation"
++              style="opacity: 1;"
++            />
++          </div>
+         </div>
+         <div
+           class="emotion-10 emotion-11"
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+index d24201a7ab3377..3149a2d0464c8a 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+@@ -160,16 +160,18 @@ function ToggleGroupControlOptionBase(
+ 			</WithToolTip>
+ 			{ /* Animated backdrop using framer motion's shared layout animation */ }
+ 			{ isPressed ? (
+-				<motion.div
+-					className={ backdropClasses }
+-					transition={
+-						shouldReduceMotion
+-							? REDUCED_MOTION_TRANSITION_CONFIG
+-							: undefined
+-					}
+-					role="presentation"
+-					layoutId={ LAYOUT_ID }
+-				/>
++				<motion.div layout layoutRoot>
++					<motion.div
++						className={ backdropClasses }
++						transition={
++							shouldReduceMotion
++								? REDUCED_MOTION_TRANSITION_CONFIG
++								: undefined
++						}
++						role="presentation"
++						layoutId={ LAYOUT_ID }
++					/>
++				</motion.div>
+ 			) : null }
+ 		</LabelView>
+ 	);

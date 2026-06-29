@@ -1,0 +1,85 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e0b6a6d071e130..630b26bad2f797 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `Guide`: Use small size button for page controls ([#66607](https://github.com/WordPress/gutenberg/pull/66607)).
+ -   `PaletteEdit`: Add appropriate size props to Buttons ([#66590](https://github.com/WordPress/gutenberg/pull/66590)).
++-   `Notice`: Add appropriate size props to Buttons ([#66593](https://github.com/WordPress/gutenberg/pull/66593)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/notice/index.tsx b/packages/components/src/notice/index.tsx
+index 868576ecc9aa3f..6f3ca94d4f734a 100644
+--- a/packages/components/src/notice/index.tsx
++++ b/packages/components/src/notice/index.tsx
+@@ -142,6 +142,7 @@ function Notice( {
+ 
+ 							return (
+ 								<Button
++									__next40pxDefaultSize
+ 									key={ index }
+ 									href={ url }
+ 									variant={ computedVariant }
+@@ -160,6 +161,7 @@ function Notice( {
+ 			</div>
+ 			{ isDismissible && (
+ 				<Button
++					size="small"
+ 					className="components-notice__dismiss"
+ 					icon={ close }
+ 					label={ __( 'Close' ) }
+diff --git a/packages/components/src/notice/stories/index.story.tsx b/packages/components/src/notice/stories/index.story.tsx
+index 3314fc722af969..95bf82016c2b04 100644
+--- a/packages/components/src/notice/stories/index.story.tsx
++++ b/packages/components/src/notice/stories/index.story.tsx
+@@ -109,7 +109,11 @@ export const NoticeListSubcomponent: StoryFn< typeof NoticeList > = () => {
+ 	return (
+ 		<>
+ 			<NoticeList notices={ notices } onRemove={ removeNotice } />
+-			<Button variant="primary" onClick={ resetNotices }>
++			<Button
++				__next40pxDefaultSize
++				variant="primary"
++				onClick={ resetNotices }
++			>
+ 				Reset Notices
+ 			</Button>
+ 		</>
+diff --git a/packages/components/src/notice/test/__snapshots__/index.tsx.snap b/packages/components/src/notice/test/__snapshots__/index.tsx.snap
+index c74d6fdd0a6fc9..77abecf14264be 100644
+--- a/packages/components/src/notice/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/notice/test/__snapshots__/index.tsx.snap
+@@ -21,19 +21,19 @@ exports[`Notice should match snapshot 1`] = `
+         class="components-notice__actions"
+       >
+         <a
+-          class="components-button components-notice__action is-link"
++          class="components-button components-notice__action is-next-40px-default-size is-link"
+           href="https://example.com"
+         >
+           More information
+         </a>
+         <button
+-          class="components-button components-notice__action is-secondary"
++          class="components-button components-notice__action is-next-40px-default-size is-secondary"
+           type="button"
+         >
+           Cancel
+         </button>
+         <button
+-          class="components-button components-notice__action is-primary"
++          class="components-button components-notice__action is-next-40px-default-size is-primary"
+           type="button"
+         >
+           Submit
+@@ -42,7 +42,7 @@ exports[`Notice should match snapshot 1`] = `
+     </div>
+     <button
+       aria-label="Close"
+-      class="components-button components-notice__dismiss has-icon"
++      class="components-button components-notice__dismiss is-small has-icon"
+       type="button"
+     >
+       <svg

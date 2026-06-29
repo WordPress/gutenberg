@@ -1,0 +1,198 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d33e0c7bb25cc4..a36c5e1aaeff8d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -15,6 +15,7 @@
+ -   Ensure all dependencies allow version ranges ([#43355](https://github.com/WordPress/gutenberg/pull/43355)).
+ -   `Popover`: make sure offset middleware always applies the latest frame offset values ([#43329](https://github.com/WordPress/gutenberg/pull/43329/)).
+ -   `Dropdown`: anchor popover to the dropdown wrapper (instead of the toggle) ([#43377](https://github.com/WordPress/gutenberg/pull/43377/)).
++-   `Guide`: Fix error when rendering with no pages ([#43380](https://github.com/WordPress/gutenberg/pull/43380/)).
+ 
+ ### Enhancements
+ 
+@@ -37,6 +38,7 @@
+ -   `contextConnect`: Refactor away from `_.uniq()` ([#43330](https://github.com/WordPress/gutenberg/pull/43330/)).
+ -   `ColorPalette`: Refactor away from `_.uniq()` ([#43330](https://github.com/WordPress/gutenberg/pull/43330/)).
+ -   `Guide`: Refactor away from `_.times()` ([#43374](https://github.com/WordPress/gutenberg/pull/43374/)).
++-   `Guide`: Update tests to use `@testing-library/react` ([#43380](https://github.com/WordPress/gutenberg/pull/43380)).
+ -   `Modal`: use `KeyboardEvent.code` instead of deprecated `KeyboardEvent.keyCode`. improve unit tests ([#43429](https://github.com/WordPress/gutenberg/pull/43429/)).
+ 
+ ### Experimental
+diff --git a/packages/components/src/guide/index.js b/packages/components/src/guide/index.js
+index 32bd6cadaeae9a..91e4b0d147ff18 100644
+--- a/packages/components/src/guide/index.js
++++ b/packages/components/src/guide/index.js
+@@ -42,7 +42,9 @@ export default function Guide( {
+ 	useEffect( () => {
+ 		// Each time we change the current page, start from the first element of the page.
+ 		// This also solves any focus loss that can happen.
+-		focus.tabbable.find( guideContainer.current )?.[ 0 ]?.focus();
++		if ( guideContainer.current ) {
++			focus.tabbable.find( guideContainer.current )?.[ 0 ]?.focus();
++		}
+ 	}, [ currentPage ] );
+ 
+ 	if ( Children.count( children ) ) {
+diff --git a/packages/components/src/guide/test/index.js b/packages/components/src/guide/test/index.js
+index 0e38f63c20037e..bd36752959ff69 100644
+--- a/packages/components/src/guide/test/index.js
++++ b/packages/components/src/guide/test/index.js
+@@ -1,23 +1,22 @@
+ /**
+  * External dependencies
+  */
+-import { shallow } from 'enzyme';
++import { render, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
+ 
+ /**
+  * Internal dependencies
+  */
+ import Guide from '../';
+-import PageControl from '../page-control';
+-import Modal from '../../modal';
+ 
+ describe( 'Guide', () => {
+ 	it( 'renders nothing when there are no pages', () => {
+-		const wrapper = shallow( <Guide /> );
+-		expect( wrapper.isEmptyRender() ).toBe( true );
++		render( <Guide pages={ [] } /> );
++		expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+ 	} );
+ 
+ 	it( 'renders one page at a time', () => {
+-		const wrapper = shallow(
++		render(
+ 			<Guide
+ 				pages={ [
+ 					{ content: <p>Page 1</p> },
+@@ -25,11 +24,14 @@ describe( 'Guide', () => {
+ 				] }
+ 			/>
+ 		);
+-		expect( wrapper.find( 'p' ) ).toHaveLength( 1 );
++
++		expect( screen.queryByRole( 'dialog' ) ).toBeVisible();
++		expect( screen.queryByText( 'Page 1' ) ).toBeVisible();
++		expect( screen.queryByText( 'Page 2' ) ).not.toBeInTheDocument();
+ 	} );
+ 
+ 	it( 'hides back button and shows forward button on the first page', () => {
+-		const wrapper = shallow(
++		render(
+ 			<Guide
+ 				pages={ [
+ 					{ content: <p>Page 1</p> },
+@@ -37,20 +39,23 @@ describe( 'Guide', () => {
+ 				] }
+ 			/>
+ 		);
+-		expect( wrapper.find( PageControl ).prop( 'currentPage' ) ).toBe( 0 );
+-		expect( wrapper.find( '.components-guide__back-button' ) ).toHaveLength(
+-			0
+-		);
++
++		expect(
++			screen.queryByRole( 'button', { name: 'Previous' } )
++		).not.toBeInTheDocument();
+ 		expect(
+-			wrapper.find( '.components-guide__forward-button' )
+-		).toHaveLength( 1 );
++			screen.queryByRole( 'button', { name: 'Next' } )
++		).toBeVisible();
+ 		expect(
+-			wrapper.find( '.components-guide__finish-button' )
+-		).toHaveLength( 0 );
++			screen.queryByRole( 'button', { name: 'Finish' } )
++		).not.toBeInTheDocument();
+ 	} );
+ 
+-	it( 'shows back button and shows finish button on the last page', () => {
+-		const wrapper = shallow(
++	it( 'shows back button and shows finish button on the last page', async () => {
++		const user = userEvent.setup( {
++			advanceTimers: jest.advanceTimersByTime,
++		} );
++		render(
+ 			<Guide
+ 				pages={ [
+ 					{ content: <p>Page 1</p> },
+@@ -58,47 +63,59 @@ describe( 'Guide', () => {
+ 				] }
+ 			/>
+ 		);
+-		wrapper.find( '.components-guide__forward-button' ).simulate( 'click' );
+-		expect( wrapper.find( PageControl ).prop( 'currentPage' ) ).toBe( 1 );
+-		expect( wrapper.find( '.components-guide__back-button' ) ).toHaveLength(
+-			1
+-		);
++		await user.click( screen.getByRole( 'button', { name: 'Next' } ) );
++
++		expect( screen.queryByText( 'Page 1' ) ).not.toBeInTheDocument();
++		expect( screen.queryByText( 'Page 2' ) ).toBeVisible();
++
+ 		expect(
+-			wrapper.find( '.components-guide__forward-button' )
+-		).toHaveLength( 0 );
++			screen.queryByRole( 'button', { name: 'Previous' } )
++		).toBeVisible();
+ 		expect(
+-			wrapper.find( '.components-guide__finish-button' )
+-		).toHaveLength( 1 );
++			screen.queryByRole( 'button', { name: 'Next' } )
++		).not.toBeInTheDocument();
++		expect(
++			screen.queryByRole( 'button', { name: 'Finish' } )
++		).toBeVisible();
+ 	} );
+ 
+ 	it( "doesn't display the page control if there is only one page", () => {
+-		const wrapper = shallow(
+-			<Guide pages={ [ { content: <p>Page 1</p> } ] } />
+-		);
+-		expect( wrapper.find( PageControl ).exists() ).toBeFalsy();
++		render( <Guide pages={ [ { content: <p>Page 1</p> } ] } /> );
++		expect(
++			screen.queryByRole( 'list', { name: 'Guide controls' } )
++		).not.toBeInTheDocument();
+ 	} );
+ 
+-	it( 'calls onFinish when the finish button is clicked', () => {
++	it( 'calls onFinish when the finish button is clicked', async () => {
++		const user = userEvent.setup( {
++			advanceTimers: jest.advanceTimersByTime,
++		} );
+ 		const onFinish = jest.fn();
+-		const wrapper = shallow(
++		render(
+ 			<Guide
+ 				onFinish={ onFinish }
+ 				pages={ [ { content: <p>Page 1</p> } ] }
+ 			/>
+ 		);
+-		wrapper.find( '.components-guide__finish-button' ).simulate( 'click' );
++		await user.click( screen.getByRole( 'button', { name: 'Finish' } ) );
++
+ 		expect( onFinish ).toHaveBeenCalled();
+ 	} );
+ 
+-	it( 'calls onFinish when the modal is closed', () => {
++	it( 'calls onFinish when the modal is closed', async () => {
++		const user = userEvent.setup( {
++			advanceTimers: jest.advanceTimersByTime,
++		} );
+ 		const onFinish = jest.fn();
+-		const wrapper = shallow(
++		render(
+ 			<Guide
+ 				onFinish={ onFinish }
+ 				pages={ [ { content: <p>Page 1</p> } ] }
+ 			/>
+ 		);
+-		wrapper.find( Modal ).prop( 'onRequestClose' )();
++
++		await user.keyboard( '[Escape]' );
++
+ 		expect( onFinish ).toHaveBeenCalled();
+ 	} );
+ } );

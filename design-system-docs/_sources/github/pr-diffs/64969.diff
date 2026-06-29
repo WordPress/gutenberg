@@ -1,0 +1,71 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 00204111a1efd6..97b7724cee1ab9 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -60,6 +60,7 @@
+ ### Bug Fixes
+ 
+ -   `TimePicker`: use ToggleGroupControl for AM/PM toggle ([#64800](https://github.com/WordPress/gutenberg/pull/64800)).
++-   `ColorPalette` utils: do not normalize undefined color values ([#64969](https://github.com/WordPress/gutenberg/pull/64969)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/color-palette/test/utils.ts b/packages/components/src/color-palette/test/utils.ts
+index 65e829a58a06bd..56acec5416ecbd 100644
+--- a/packages/components/src/color-palette/test/utils.ts
++++ b/packages/components/src/color-palette/test/utils.ts
+@@ -26,18 +26,37 @@ describe( 'ColorPalette: Utils', () => {
+ 	} );
+ 
+ 	describe( 'normalizeColorValue', () => {
+-		test( 'should return the value as is if the color value is not a CSS variable', () => {
++		test( 'should return the value if the value argument is not a CSS variable', () => {
+ 			const element = document.createElement( 'div' );
+ 			expect( normalizeColorValue( '#ff0000', element ) ).toBe(
+ 				'#ff0000'
+ 			);
+ 		} );
+-		test( 'should return the background color computed from a element if the color value is a CSS variable', () => {
++		test( 'should return the background color computed from an element if the value argument is a CSS variable', () => {
+ 			const element = document.createElement( 'div' );
+ 			element.style.backgroundColor = '#ff0000';
+ 			expect( normalizeColorValue( 'var(--red)', element ) ).toBe(
+ 				'#ff0000'
+ 			);
+ 		} );
++		test( 'should return the background color computed from an element if the value argument is a color mix', () => {
++			const element = document.createElement( 'div' );
++			element.style.backgroundColor = '#ff0000';
++			expect(
++				normalizeColorValue(
++					'color-mix(in oklab, #a71e14, white)',
++					element
++				)
++			).toBe( '#ff0000' );
++		} );
++		test( 'should return the value if the value argument is undefined', () => {
++			const element = document.createElement( 'div' );
++			expect( normalizeColorValue( undefined, element ) ).toBe(
++				undefined
++			);
++		} );
++		test( 'should return the value if the element argument is null', () => {
++			expect( normalizeColorValue( '#ff0000', null ) ).toBe( '#ff0000' );
++		} );
+ 	} );
+ } );
+diff --git a/packages/components/src/color-palette/utils.ts b/packages/components/src/color-palette/utils.ts
+index cfe909c580f8bc..19fd4b7252f639 100644
+--- a/packages/components/src/color-palette/utils.ts
++++ b/packages/components/src/color-palette/utils.ts
+@@ -92,9 +92,7 @@ export const normalizeColorValue = (
+ 	value: string | undefined,
+ 	element: HTMLElement | null
+ ) => {
+-	const valueIsSimpleColor = value ? isSimpleCSSColor( value ) : false;
+-
+-	if ( valueIsSimpleColor || element === null ) {
++	if ( ! value || ! element || isSimpleCSSColor( value ) ) {
+ 		return value;
+ 	}
+ 

@@ -1,0 +1,115 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d8426b35ac264b..1abce5afdfac22 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -18,6 +18,9 @@
+ -   `TreeSelect`: Convert to TypeScript ([#41536](https://github.com/WordPress/gutenberg/pull/41536)).
+ -   `FontSizePicker`: updated to satisfy `react/exhuastive-deps` eslint rule ([#41600](https://github.com/WordPress/gutenberg/pull/41600)).
+ 
++### Enhancements
++
++-   `RadioControl`: add ref forwarding ([#41641](https://github.com/WordPress/gutenberg/pull/41641)).
+ 
+ ## 19.12.0 (2022-06-01)
+ 
+diff --git a/packages/components/src/radio-control/index.tsx b/packages/components/src/radio-control/index.tsx
+index 5a4ffe874dacf2..ab161947c6182e 100644
+--- a/packages/components/src/radio-control/index.tsx
++++ b/packages/components/src/radio-control/index.tsx
+@@ -3,12 +3,13 @@
+  */
+ import { isEmpty } from 'lodash';
+ import classnames from 'classnames';
+-import type { ChangeEvent } from 'react';
++import type { ChangeEvent, ForwardedRef } from 'react';
+ 
+ /**
+  * WordPress dependencies
+  */
+ import { useInstanceId } from '@wordpress/compose';
++import { forwardRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -17,38 +18,9 @@ import BaseControl from '../base-control';
+ import type { WordPressComponentProps } from '../ui/context';
+ import type { RadioControlProps } from './types';
+ 
+-/**
+- * Render a user interface to select the user type using radio inputs.
+- *
+- * ```jsx
+- * import { RadioControl } from '@wordpress/components';
+- * import { useState } from '@wordpress/element';
+- *
+- * const MyRadioControl = () => {
+- *   const [ option, setOption ] = useState( 'a' );
+- *
+- *   return (
+- *     <RadioControl
+- *       label="User type"
+- *       help="The type of the current user"
+- *       selected={ option }
+- *       options={ [
+- *         { label: 'Author', value: 'a' },
+- *         { label: 'Editor', value: 'e' },
+- *       ] }
+- *       onChange={ ( value ) => setOption( value ) }
+- *     />
+- *   );
+- * };
+- * ```
+- */
+-export function RadioControl(
+-	// ref is omitted until we have `WordPressComponentPropsWithoutRef` or add
+-	// ref forwarding to RadioControl.
+-	props: Omit<
+-		WordPressComponentProps< RadioControlProps, 'input', false >,
+-		'ref'
+-	>
++function UnforwardedRadioControl(
++	props: WordPressComponentProps< RadioControlProps, 'input', false >,
++	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const {
+ 		label,
+@@ -93,6 +65,7 @@ export function RadioControl(
+ 						aria-describedby={
+ 							!! help ? `${ id }__help` : undefined
+ 						}
++						ref={ forwardedRef }
+ 						{ ...additionalProps }
+ 					/>
+ 					<label htmlFor={ `${ id }-${ index }` }>
+@@ -104,4 +77,31 @@ export function RadioControl(
+ 	);
+ }
+ 
++/**
++ * Render a user interface to select the user type using radio inputs.
++ *
++ * ```jsx
++ * import { RadioControl } from '@wordpress/components';
++ * import { useState } from '@wordpress/element';
++ *
++ * const MyRadioControl = () => {
++ *   const [ option, setOption ] = useState( 'a' );
++ *
++ *   return (
++ *     <RadioControl
++ *       label="User type"
++ *       help="The type of the current user"
++ *       selected={ option }
++ *       options={ [
++ *         { label: 'Author', value: 'a' },
++ *         { label: 'Editor', value: 'e' },
++ *       ] }
++ *       onChange={ ( value ) => setOption( value ) }
++ *     />
++ *   );
++ * };
++ * ```
++ */
++export const RadioControl = forwardRef( UnforwardedRadioControl );
++
+ export default RadioControl;

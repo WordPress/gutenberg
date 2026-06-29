@@ -1,0 +1,162 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2b26f0498a914d..496b068e3b0ea0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Bug Fix
+ 
+ -   `FontSizePicker`: Ensure that fluid font size presets appear correctly in the UI controls ([#44791](https://github.com/WordPress/gutenberg/pull/44791)).
++-   `ToggleGroupControl`: Remove unsupported `disabled` prop from types, and correctly mark `label` prop as required ([#45114](https://github.com/WordPress/gutenberg/pull/45114)).
+ -   `Navigator`: prevent partially hiding focus ring styles, by removing unnecessary overflow rules on `NavigatorScreen` ([#44973](https://github.com/WordPress/gutenberg/pull/44973)).
+ -   `Navigator`: restore focus only once per location  ([#44972](https://github.com/WordPress/gutenberg/pull/44972)).
+ 
+diff --git a/packages/components/src/toggle-group-control/types.ts b/packages/components/src/toggle-group-control/types.ts
+index 70c759795d7553..758db0e58c427c 100644
+--- a/packages/components/src/toggle-group-control/types.ts
++++ b/packages/components/src/toggle-group-control/types.ts
+@@ -9,7 +9,6 @@ import type { RadioStateReturn } from 'reakit';
+  * Internal dependencies
+  */
+ import type { BaseControlProps } from '../base-control/types';
+-import type { FormElementProps } from '../utils/types';
+ 
+ export type ToggleGroupControlOptionBaseProps = {
+ 	children: ReactNode;
+@@ -72,59 +71,58 @@ export type WithToolTipProps = {
+ 	showTooltip?: boolean;
+ };
+ 
+-export type ToggleGroupControlProps = Omit<
+-	FormElementProps< any >,
+-	'defaultValue'
+-> &
+-	Pick< BaseControlProps, 'help' | '__nextHasNoMarginBottom' > & {
+-		/**
+-		 * Label for the form element.
+-		 */
+-		label: string;
+-		/**
+-		 * If true, the label will only be visible to screen readers.
+-		 *
+-		 * @default false
+-		 */
+-		hideLabelFromVision?: boolean;
+-		/**
+-		 * Determines if segments should be rendered with equal widths.
+-		 *
+-		 * @default false
+-		 */
+-		isAdaptiveWidth?: boolean;
+-		/**
+-		 * Renders `ToggleGroupControl` as a (CSS) block element.
+-		 *
+-		 * @default false
+-		 */
+-		isBlock?: boolean;
+-		/**
+-		 * Borderless style that may be preferred in some contexts.
+-		 *
+-		 * @default false
+-		 */
+-		__experimentalIsBorderless?: boolean;
+-		/**
+-		 * Callback when a segment is selected.
+-		 */
+-		onChange?: ( value: ReactText | undefined ) => void;
+-		/**
+-		 * The value of `ToggleGroupControl`
+-		 */
+-		value?: ReactText;
+-		/**
+-		 * The options to render in the `ToggleGroupControl`, using either the `ToggleGroupControlOption` or
+-		 * `ToggleGroupControlOptionIcon` components.
+-		 */
+-		children: ReactNode;
+-		/**
+-		 * The size variant of the control.
+-		 *
+-		 * @default 'default'
+-		 */
+-		size?: 'default' | '__unstable-large';
+-	};
++export type ToggleGroupControlProps = Pick<
++	BaseControlProps,
++	'help' | '__nextHasNoMarginBottom'
++> & {
++	/**
++	 * Label for the control.
++	 */
++	label: string;
++	/**
++	 * If true, the label will only be visible to screen readers.
++	 *
++	 * @default false
++	 */
++	hideLabelFromVision?: boolean;
++	/**
++	 * Determines if segments should be rendered with equal widths.
++	 *
++	 * @default false
++	 */
++	isAdaptiveWidth?: boolean;
++	/**
++	 * Renders `ToggleGroupControl` as a (CSS) block element.
++	 *
++	 * @default false
++	 */
++	isBlock?: boolean;
++	/**
++	 * Borderless style that may be preferred in some contexts.
++	 *
++	 * @default false
++	 */
++	__experimentalIsBorderless?: boolean;
++	/**
++	 * Callback when a segment is selected.
++	 */
++	onChange?: ( value: ReactText | undefined ) => void;
++	/**
++	 * The value of `ToggleGroupControl`
++	 */
++	value?: ReactText;
++	/**
++	 * The options to render in the `ToggleGroupControl`, using either the `ToggleGroupControlOption` or
++	 * `ToggleGroupControlOptionIcon` components.
++	 */
++	children: ReactNode;
++	/**
++	 * The size variant of the control.
++	 *
++	 * @default 'default'
++	 */
++	size?: 'default' | '__unstable-large';
++};
+ 
+ export type ToggleGroupControlContextProps = RadioStateReturn &
+ 	Pick< ToggleGroupControlProps, 'size' > & {
+diff --git a/packages/components/src/utils/types.ts b/packages/components/src/utils/types.ts
+index f33aa4b427d6d4..54fe75edaa306b 100644
+--- a/packages/components/src/utils/types.ts
++++ b/packages/components/src/utils/types.ts
+@@ -7,21 +7,6 @@ export type SizeRangeDefault =
+ 
+ export type SizeRangeReduced = 'large' | 'medium' | 'small';
+ 
+-export type FormElementProps< V > = {
+-	/**
+-	 * The default (initial) state to use if `value` is undefined.
+-	 */
+-	defaultValue?: V;
+-	/**
+-	 * Determines if element is disabled.
+-	 */
+-	disabled?: boolean;
+-	/**
+-	 * Label for the form element.
+-	 */
+-	label?: string;
+-};
+-
+ export type PopperPlacement =
+ 	| 'auto'
+ 	| 'auto-start'

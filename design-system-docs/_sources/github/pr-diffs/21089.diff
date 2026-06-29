@@ -1,0 +1,108 @@
+diff --git a/packages/components/src/angle-picker-control/stories/index.js b/packages/components/src/angle-picker-control/stories/index.js
+index 0c861f1b414d44..5d88c9be90d59c 100644
+--- a/packages/components/src/angle-picker-control/stories/index.js
++++ b/packages/components/src/angle-picker-control/stories/index.js
+@@ -9,7 +9,7 @@ import { useState } from '@wordpress/element';
+ import AnglePickerControl from '../';
+ 
+ export default {
+-	title: 'Components|AnglePickerControl',
++	title: 'Components/AnglePickerControl',
+ 	component: AnglePickerControl,
+ };
+ 
+diff --git a/storybook/test/__snapshots__/index.js.snap b/storybook/test/__snapshots__/index.js.snap
+index f358ac613196e7..7d2b0208c2cb8b 100644
+--- a/storybook/test/__snapshots__/index.js.snap
++++ b/storybook/test/__snapshots__/index.js.snap
+@@ -1,5 +1,44 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
++exports[`Storyshots Components/AnglePickerControl Default 1`] = `
++<div
++  className="components-base-control components-angle-picker-control"
++>
++  <div
++    className="components-base-control__field"
++  >
++    <label
++      className="components-base-control__label"
++      htmlFor="components-angle-picker-control__input-0"
++    >
++      Angle
++    </label>
++    <div
++      aria-hidden="true"
++      className="components-angle-picker-control__angle-circle"
++      onMouseDown={[Function]}
++    >
++      <div
++        className="components-angle-picker-control__angle-circle-indicator-wrapper"
++      >
++        <span
++          className="components-angle-picker-control__angle-circle-indicator"
++        />
++      </div>
++    </div>
++    <input
++      className="components-angle-picker-control__input-field"
++      id="components-angle-picker-control__input-0"
++      max={360}
++      min={0}
++      onChange={[Function]}
++      step="1"
++      type="number"
++    />
++  </div>
++</div>
++`;
++
+ exports[`Storyshots Components/Animate Appear Bottom Left 1`] = `
+ <div
+   className="components-animate__appear is-from-left is-from-bottom components-notice is-success is-dismissible"
+@@ -8913,45 +8952,6 @@ Array [
+ ]
+ `;
+ 
+-exports[`Storyshots Components|AnglePickerControl Default 1`] = `
+-<div
+-  className="components-base-control components-angle-picker-control"
+->
+-  <div
+-    className="components-base-control__field"
+-  >
+-    <label
+-      className="components-base-control__label"
+-      htmlFor="components-angle-picker-control__input-0"
+-    >
+-      Angle
+-    </label>
+-    <div
+-      aria-hidden="true"
+-      className="components-angle-picker-control__angle-circle"
+-      onMouseDown={[Function]}
+-    >
+-      <div
+-        className="components-angle-picker-control__angle-circle-indicator-wrapper"
+-      >
+-        <span
+-          className="components-angle-picker-control__angle-circle-indicator"
+-        />
+-      </div>
+-    </div>
+-    <input
+-      className="components-angle-picker-control__input-field"
+-      id="components-angle-picker-control__input-0"
+-      max={360}
+-      min={0}
+-      onChange={[Function]}
+-      step="1"
+-      type="number"
+-    />
+-  </div>
+-</div>
+-`;
+-
+ exports[`Storyshots Icons/Icon Default 1`] = `
+ Array [
+   <div>

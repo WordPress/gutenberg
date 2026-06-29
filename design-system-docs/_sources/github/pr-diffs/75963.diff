@@ -1,0 +1,196 @@
+diff --git a/package-lock.json b/package-lock.json
+index 641dafeec642c1..4f6d36b5ae3e28 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -57910,6 +57910,7 @@
+ 				"@wordpress/element": "file:../element",
+ 				"@wordpress/i18n": "file:../i18n",
+ 				"@wordpress/route": "file:../route",
++				"@wordpress/ui": "file:../ui",
+ 				"clsx": "^2.1.1"
+ 			},
+ 			"engines": {
+diff --git a/packages/admin-ui/package.json b/packages/admin-ui/package.json
+index c5ba516a64d4e0..42c7a6951bb155 100644
+--- a/packages/admin-ui/package.json
++++ b/packages/admin-ui/package.json
+@@ -50,6 +50,7 @@
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/i18n": "file:../i18n",
+ 		"@wordpress/route": "file:../route",
++		"@wordpress/ui": "file:../ui",
+ 		"clsx": "^2.1.1"
+ 	},
+ 	"peerDependencies": {
+diff --git a/packages/admin-ui/src/page/header.tsx b/packages/admin-ui/src/page/header.tsx
+index 7b4d0dede0dc16..e45e33f6fb245f 100644
+--- a/packages/admin-ui/src/page/header.tsx
++++ b/packages/admin-ui/src/page/header.tsx
+@@ -1,11 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import {
+-	__experimentalHeading as Heading,
+-	__experimentalHStack as HStack,
+-	__experimentalVStack as VStack,
+-} from '@wordpress/components';
++import { Stack } from '@wordpress/ui';
+ 
+ /**
+  * Internal dependencies
+@@ -28,9 +24,13 @@ export default function Header( {
+ 	showSidebarToggle?: boolean;
+ } ) {
+ 	return (
+-		<VStack className="admin-ui-page__header" as="header">
+-			<HStack justify="space-between" spacing={ 2 }>
+-				<HStack spacing={ 2 } justify="left">
++		<Stack
++			direction="column"
++			className="admin-ui-page__header"
++			render={ <header /> }
++		>
++			<Stack direction="row" justify="space-between" gap="sm">
++				<Stack direction="row" gap="sm" align="center" justify="start">
+ 					{ showSidebarToggle && (
+ 						<SidebarToggleSlot
+ 							bubblesVirtually
+@@ -38,24 +38,26 @@ export default function Header( {
+ 						/>
+ 					) }
+ 					{ title && (
+-						<Heading as="h2" level={ 3 } weight={ 500 } truncate>
++						<h2 className="admin-ui-page__header-title">
+ 							{ title }
+-						</Heading>
++						</h2>
+ 					) }
+ 					{ breadcrumbs }
+ 					{ badges }
+-				</HStack>
+-				<HStack
++				</Stack>
++				<Stack
++					direction="row"
++					gap="sm"
+ 					style={ { width: 'auto', flexShrink: 0 } }
+-					spacing={ 2 }
+ 					className="admin-ui-page__header-actions"
++					align="center"
+ 				>
+ 					{ actions }
+-				</HStack>
+-			</HStack>
++				</Stack>
++			</Stack>
+ 			{ subTitle && (
+ 				<p className="admin-ui-page__header-subtitle">{ subTitle }</p>
+ 			) }
+-		</VStack>
++		</Stack>
+ 	);
+ }
+diff --git a/packages/admin-ui/src/page/style.scss b/packages/admin-ui/src/page/style.scss
+index bda967412c8972..42f8aa4eff91e5 100644
+--- a/packages/admin-ui/src/page/style.scss
++++ b/packages/admin-ui/src/page/style.scss
+@@ -1,13 +1,8 @@
+-@use "@wordpress/base-styles/colors" as *;
+-@use "@wordpress/base-styles/variables" as *;
+-@use "@wordpress/base-styles/mixins" as *;
+-@use "@wordpress/base-styles/breakpoints" as *;
+-
+ .admin-ui-page {
+ 	display: flex;
+ 	height: 100%;
+-	background-color: $white;
+-	color: $gray-800;
++	background-color: var(--wpds-color-bg-surface-neutral-strong);
++	color: var(--wpds-color-fg-content-neutral);
+ 	position: relative;
+ 	z-index: 1;
+ 	flex-flow: column;
+@@ -15,22 +10,34 @@
+ }
+ 
+ .admin-ui-page__header {
+-	padding: $grid-unit-20 $grid-unit-30;
+-	border-bottom: 1px solid $gray-100;
+-	background: $white;
++	padding: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-2xl);
++	border-bottom: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
++	background: var(--wpds-color-bg-surface-neutral-strong);
+ 	position: sticky;
+ 	top: 0;
+ 	z-index: 1;
+ }
+ 
++.admin-ui-page__header-title {
++	font-family: var(--wpds-font-family-heading);
++	font-size: var(--wpds-font-size-xl);
++	font-weight: var(--wpds-font-weight-medium);
++	line-height: var(--wpds-font-line-height-xl);
++	margin: 0;
++	overflow: hidden;
++	text-overflow: ellipsis;
++	white-space: nowrap;
++}
++
+ .admin-ui-page__sidebar-toggle-slot:empty {
+ 	display: none;
+ }
+ 
+ .admin-ui-page__header-subtitle {
+-	padding-block-end: $grid-unit-10;
+-	color: $gray-700;
+-	@include body-medium();
++	padding-block-end: var(--wpds-dimension-padding-xs);
++	color: var(--wpds-color-fg-content-neutral-weak);
++	font-size: var(--wpds-font-size-md);
++	line-height: var(--wpds-font-line-height-md);
+ 	margin: 0;
+ }
+ 
+@@ -41,7 +48,7 @@
+ 	flex-direction: column;
+ 
+ 	&.has-padding {
+-		padding: $grid-unit-20 $grid-unit-30;
++		padding: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-2xl);
+ 	}
+ }
+ 
+@@ -50,7 +57,7 @@
+ 	.admin-ui-page__header-actions {
+ 		.components-button.has-icon {
+ 			width: auto;
+-			padding: 0 $grid-unit-10;
++			padding: 0 var(--wpds-dimension-padding-xs);
+ 
+ 			// Hide the button icons when labels are set to display...
+ 			svg {
+@@ -59,9 +66,8 @@
+ 			// ... and display labels.
+ 			&::after {
+ 				content: attr(aria-label);
+-				font-size: $helptext-font-size;
++				font-size: var(--wpds-font-size-sm);
+ 			}
+ 		}
+-
+ 	}
+ }
+diff --git a/packages/admin-ui/tsconfig.json b/packages/admin-ui/tsconfig.json
+index d2f537496e682f..4bc8c7cf87a6e6 100644
+--- a/packages/admin-ui/tsconfig.json
++++ b/packages/admin-ui/tsconfig.json
+@@ -5,6 +5,7 @@
+ 		{ "path": "../components" },
+ 		{ "path": "../element" },
+ 		{ "path": "../i18n" },
+-		{ "path": "../route" }
++		{ "path": "../route" },
++		{ "path": "../ui" }
+ 	]
+ }

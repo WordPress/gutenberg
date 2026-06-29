@@ -1,0 +1,1211 @@
+diff --git a/packages/components/src/range-control/README.md b/packages/components/src/range-control/README.md
+index a014b31d6ede9e..6ad8d39f8da445 100644
+--- a/packages/components/src/range-control/README.md
++++ b/packages/components/src/range-control/README.md
+@@ -245,6 +245,14 @@ const MyRangeControl() {
+ - Required: No
+ - Platform: Web
+ 
++#### resetFallbackValue
++
++The value to revert to if the Reset button is clicked (enabled by `allowReset`)
++
++- Type: `Number`
++- Required: No
++- Platform: Web
++
+ #### showTooltip
+ 
+ Forcing the Tooltip UI to show or hide.
+diff --git a/packages/components/src/range-control/index.js b/packages/components/src/range-control/index.js
+index d718dec1a229a0..c09a86b3cf6781 100644
+--- a/packages/components/src/range-control/index.js
++++ b/packages/components/src/range-control/index.js
+@@ -30,13 +30,13 @@ import {
+ 	AfterIconWrapper,
+ 	BeforeIconWrapper,
+ 	InputRange,
+-	InputNumber,
+ 	Root,
+ 	Track,
+ 	ThumbWrapper,
+ 	Thumb,
+ 	Wrapper,
+ } from './styles/range-control-styles';
++import InputField from './input-field';
+ import { useRtl } from '../utils/rtl';
+ 
+ const BaseRangeControl = forwardRef(
+@@ -61,6 +61,7 @@ const BaseRangeControl = forwardRef(
+ 			onFocus = noop,
+ 			onMouseMove = noop,
+ 			onMouseLeave = noop,
++			resetFallbackValue,
+ 			renderTooltipContent = ( v ) => v,
+ 			showTooltip: showTooltipProp,
+ 			step = 1,
+@@ -122,13 +123,6 @@ const BaseRangeControl = forwardRef(
+ 		const enableTooltip = showTooltipProp !== false && isFinite( value );
+ 
+ 		const handleOnChange = ( event ) => {
+-			if (
+-				event.target.checkValidity &&
+-				! event.target.checkValidity()
+-			) {
+-				return;
+-			}
+-
+ 			const nextValue = parseFloat( event.target.value );
+ 
+ 			if ( isNaN( nextValue ) ) {
+@@ -141,8 +135,30 @@ const BaseRangeControl = forwardRef(
+ 		};
+ 
+ 		const handleOnReset = () => {
+-			setValue( null );
+-			onChange( undefined );
++			let resetValue = parseFloat( resetFallbackValue );
++			let onChangeResetValue = resetValue;
++
++			if ( isNaN( resetValue ) ) {
++				resetValue = null;
++				onChangeResetValue = undefined;
++			}
++
++			setValue( resetValue );
++
++			/**
++			 * Previously, this callback would always receive undefined as
++			 * an argument. This behavior is unexpected, specifically
++			 * when resetFallbackValue is defined.
++			 *
++			 * The value of undefined is not ideal. Passing it through
++			 * to internal <input /> elements would change it from a
++			 * controlled component to an uncontrolled component.
++			 *
++			 * For now, to minimize unexpected regressions, we're going to
++			 * preserve the undefined callback argument, except when a
++			 * resetFallbackValue is defined.
++			 */
++			onChange( onChangeResetValue );
+ 		};
+ 
+ 		const handleShowTooltip = () => setShowTooltip( true );
+@@ -250,16 +266,14 @@ const BaseRangeControl = forwardRef(
+ 						</AfterIconWrapper>
+ 					) }
+ 					{ withInputField && (
+-						<InputNumber
+-							aria-label={ label }
+-							className="components-range-control__number"
++						<InputField
+ 							disabled={ disabled }
+-							inputMode="decimal"
++							label={ label }
+ 							max={ max }
+ 							min={ min }
+ 							onChange={ handleOnChange }
++							onReset={ handleOnReset }
+ 							step={ step }
+-							type="number"
+ 							value={ inputSliderValue }
+ 						/>
+ 					) }
+diff --git a/packages/components/src/range-control/input-field.js b/packages/components/src/range-control/input-field.js
+new file mode 100644
+index 00000000000000..9a908f98fc592a
+--- /dev/null
++++ b/packages/components/src/range-control/input-field.js
+@@ -0,0 +1,105 @@
++/**
++ * External dependencies
++ */
++import { noop } from 'lodash';
++
++/**
++ * WordPress dependencies
++ */
++import { ENTER } from '@wordpress/keycodes';
++
++/**
++ * Internal dependencies
++ */
++import { useControlledState } from '../utils/hooks';
++import { InputNumber } from './styles/range-control-styles';
++
++export default function InputField( {
++	label,
++	onBlur = noop,
++	onChange = noop,
++	onReset = noop,
++	onKeyDown = noop,
++	value: valueProp,
++	...props
++} ) {
++	/**
++	 * This component stores an internal (input) value state, derived from
++	 * the incoming value prop.
++	 *
++	 * This allows for the <input /> to be updated independently before the
++	 * value is applied and propagated. This independent updating action is
++	 * necessary to accommodate individual keystroke values that may not
++	 * be considered "valid" (e.g. within the min - max range).
++	 */
++	const [ value, setValue ] = useControlledState( valueProp );
++
++	const handleOnReset = ( event ) => {
++		onReset( event );
++		setValue( '' );
++	};
++
++	const handleOnCommit = ( event ) => {
++		const nextValue = parseFloat( event.target.value );
++
++		if ( isNaN( nextValue ) ) {
++			handleOnReset();
++			return;
++		}
++
++		// Only propagate the event if the value is valid.
++		if ( event.target.checkValidity && ! event.target.checkValidity() ) {
++			// Otherwise... reset to initial value
++			setValue( valueProp );
++			return;
++		}
++		onChange( event );
++	};
++
++	const handleOnBlur = ( event ) => {
++		onBlur( event );
++		handleOnCommit( event );
++	};
++
++	const handleOnChange = ( event ) => {
++		setValue( event.target.value );
++
++		/**
++		 * Prevent submitting if changes are invalid.
++		 * This only applies to values being entered via KEY_DOWN.
++		 *
++		 * Pressing the up/down arrows of the HTML input also triggers a
++		 * change event. However, those values will be (pre)validated by the
++		 * HTML input.
++		 */
++		if ( event.target.checkValidity && ! event.target.checkValidity() ) {
++			return;
++		}
++
++		handleOnCommit( event );
++	};
++
++	const handleOnKeyDown = ( event ) => {
++		const { keyCode } = event;
++		onKeyDown( event );
++
++		if ( keyCode === ENTER ) {
++			event.preventDefault();
++			handleOnCommit( event );
++		}
++	};
++
++	return (
++		<InputNumber
++			aria-label={ label }
++			className="components-range-control__number"
++			inputMode="decimal"
++			onBlur={ handleOnBlur }
++			onChange={ handleOnChange }
++			onKeyDown={ handleOnKeyDown }
++			type="number"
++			value={ value }
++			{ ...props }
++		/>
++	);
++}
+diff --git a/packages/components/src/range-control/rail.js b/packages/components/src/range-control/rail.js
+index 111cf8d96972d7..93db3351c68121 100644
+--- a/packages/components/src/range-control/rail.js
++++ b/packages/components/src/range-control/rail.js
+@@ -66,7 +66,7 @@ function useMarks( { marks, min = 0, max = 100, step = 1, value = 0 } ) {
+ 
+ 	const isCustomMarks = Array.isArray( marks );
+ 
+-	const markCount = ( max - min ) / step;
++	const markCount = Math.round( ( max - min ) / step );
+ 	const marksArray = isCustomMarks
+ 		? marks
+ 		: [ ...Array( markCount + 1 ) ].map( ( _, index ) => ( {
+@@ -77,7 +77,7 @@ function useMarks( { marks, min = 0, max = 100, step = 1, value = 0 } ) {
+ 		const markValue = mark.value !== undefined ? mark.value : value;
+ 
+ 		const key = `mark-${ index }`;
+-		const isFilled = markValue * step <= value;
++		const isFilled = markValue * step + min <= value;
+ 		const offset = `${ ( markValue / markCount ) * 100 }%`;
+ 
+ 		const offsetStyle = {
+diff --git a/packages/components/src/range-control/test/index.js b/packages/components/src/range-control/test/index.js
+index 31c72383a0271e..e0441f3b48845d 100644
+--- a/packages/components/src/range-control/test/index.js
++++ b/packages/components/src/range-control/test/index.js
+@@ -1,498 +1,355 @@
+ /**
+  * External dependencies
+  */
+-import { render, unmountComponentAtNode } from 'react-dom';
+-import TestUtils, { act, Simulate } from 'react-dom/test-utils';
++import { fireEvent, render } from '@testing-library/react';
+ 
+ /**
+  * Internal dependencies
+  */
+ import RangeControl from '../';
+ 
+-/**
+- * WordPress dependencies
+- */
+-import { Component } from '@wordpress/element';
+-import { Dashicon } from '@wordpress/components';
++const getRangeInput = ( container ) =>
++	container.querySelector( 'input[type="range"]' );
++const getNumberInput = ( container ) =>
++	container.querySelector( 'input[type="number"]' );
++const getResetButton = ( container ) =>
++	container.querySelector( '.components-range-control__reset' );
+ 
+-let container = null;
+-
+-beforeEach( () => {
+-	container = document.createElement( 'div' );
+-	document.body.appendChild( container );
+-} );
++describe( 'RangeControl', () => {
++	describe( '#render()', () => {
++		it( 'should trigger change callback with numeric value', () => {
++			const onChange = jest.fn();
+ 
+-afterEach( () => {
+-	unmountComponentAtNode( container );
+-	container.remove();
+-	container = null;
+-} );
++			const { container } = render(
++				<RangeControl onChange={ onChange } />
++			);
+ 
+-describe( 'RangeControl', () => {
+-	class TestWrapper extends Component {
+-		render() {
+-			return <RangeControl { ...this.props } />;
+-		}
+-	}
++			const rangeInput = getRangeInput( container );
++			const numberInput = getNumberInput( container );
+ 
+-	const getWrapper = ( props = {} ) =>
+-		TestUtils.renderIntoDocument( <TestWrapper { ...props } /> );
++			fireEvent.change( rangeInput, { target: { value: '5' } } );
+ 
+-	describe( '#render()', () => {
+-		it( 'triggers change callback with numeric value', () => {
+-			// Mount: With shallow, cannot find input child of BaseControl
+-			const onChange = jest.fn();
+-			const wrapper = getWrapper( { onChange } );
+-
+-			const rangeInputElement = () =>
+-				TestUtils.findRenderedDOMComponentWithClass(
+-					wrapper,
+-					'components-range-control__slider'
+-				);
+-			const numberInputElement = () =>
+-				TestUtils.findRenderedDOMComponentWithClass(
+-					wrapper,
+-					'components-range-control__number'
+-				);
+-			TestUtils.Simulate.change( rangeInputElement(), {
+-				target: {
+-					value: '5',
+-					checkValidity() {
+-						return true;
+-					},
+-				},
+-			} );
+-			TestUtils.Simulate.change( numberInputElement(), {
+-				target: {
+-					value: '10',
+-					checkValidity() {
+-						return true;
+-					},
+-				},
+-			} );
++			fireEvent.change( numberInput, { target: { value: '10' } } );
++			fireEvent.blur( numberInput );
+ 
+ 			expect( onChange ).toHaveBeenCalledWith( 5 );
+ 			expect( onChange ).toHaveBeenCalledWith( 10 );
+ 		} );
+ 
+-		it( 'renders with icons', () => {
+-			let wrapper, icons;
+-			const iconElements = ( component ) =>
+-				TestUtils.scryRenderedComponentsWithType( component, Dashicon );
+-			wrapper = getWrapper();
+-			icons = iconElements( wrapper );
+-			expect( icons ).toHaveLength( 0 );
+-
+-			wrapper = getWrapper( { beforeIcon: 'format-image' } );
+-			icons = iconElements( wrapper );
+-			expect( icons ).toHaveLength( 1 );
+-			expect( icons[ 0 ].props.icon ).toBe( 'format-image' );
+-
+-			wrapper = getWrapper( {
+-				beforeIcon: 'format-image',
+-				afterIcon: 'format-video',
+-			} );
+-			icons = iconElements( wrapper );
+-			expect( icons ).toHaveLength( 2 );
+-			expect( icons[ 0 ].props.icon ).toBe( 'format-image' );
+-			expect( icons[ 1 ].props.icon ).toBe( 'format-video' );
++		it( 'should not render with icons, by default', () => {
++			const { container } = render(
++				<RangeControl
++					beforeIcon="format-image"
++					afterIcon="format-video"
++				/>
++			);
++
++			const icon = container.querySelector( '.dashicons' );
++
++			expect( icon ).toBeFalsy();
++		} );
++
++		it( 'should render with icons', () => {
++			const { container } = render(
++				<RangeControl
++					beforeIcon="format-image"
++					afterIcon="format-video"
++				/>
++			);
++
++			const beforeIcon = container.querySelector(
++				'.dashicons-format-image'
++			);
++			const afterIcon = container.querySelector(
++				'.dashicons-format-image'
++			);
++
++			expect( beforeIcon ).toBeTruthy();
++			expect( afterIcon ).toBeTruthy();
+ 		} );
+ 	} );
+ 
+ 	describe( 'validation', () => {
+-		it( 'does not calls onChange if the new value is lower than minimum', () => {
+-			// Mount: With shallow, cannot find input child of BaseControl
++		it( 'should not call onChange if the new value is lower than minimum', () => {
+ 			const onChange = jest.fn();
+-			const wrapper = getWrapper( { onChange, min: 11, value: 12 } );
+-
+-			const numberInputElement = () =>
+-				TestUtils.findRenderedDOMComponentWithClass(
+-					wrapper,
+-					'components-range-control__number'
+-				);
+-
+-			TestUtils.Simulate.change( numberInputElement(), {
+-				target: {
+-					value: '10',
+-					checkValidity() {
+-						return false;
+-					},
+-				},
+-			} );
++			const { container } = render(
++				<RangeControl onChange={ onChange } min={ 11 } value={ 20 } />
++			);
++
++			const rangeInput = getRangeInput( container );
++			const numberInput = getNumberInput( container );
++
++			fireEvent.change( numberInput, { target: { value: '10' } } );
++			fireEvent.blur( numberInput );
+ 
+ 			expect( onChange ).not.toHaveBeenCalled();
++			expect( rangeInput.value ).toBe( '20' );
+ 		} );
+ 
+-		it( 'does not calls onChange if the new value is greater than maximum', () => {
+-			// Mount: With shallow, cannot find input child of BaseControl
++		it( 'should not call onChange if the new value is greater than maximum', () => {
+ 			const onChange = jest.fn();
+-			const wrapper = getWrapper( { onChange, max: 20, value: 12 } );
+-
+-			const numberInputElement = () =>
+-				TestUtils.findRenderedDOMComponentWithClass(
+-					wrapper,
+-					'components-range-control__number'
+-				);
+-
+-			TestUtils.Simulate.change( numberInputElement(), {
+-				target: {
+-					value: '21',
+-					checkValidity() {
+-						return false;
+-					},
+-				},
+-			} );
++			const { container } = render(
++				<RangeControl onChange={ onChange } max={ 20 } value={ 10 } />
++			);
++
++			const rangeInput = getRangeInput( container );
++			const numberInput = getNumberInput( container );
++
++			fireEvent.change( numberInput, { target: { value: '21' } } );
++			fireEvent.blur( numberInput );
+ 
+ 			expect( onChange ).not.toHaveBeenCalled();
++			expect( rangeInput.value ).toBe( '10' );
+ 		} );
+ 
+-		it( 'calls onChange after invalid inputs if the new input is valid', () => {
+-			// Mount: With shallow, cannot find input child of BaseControl
++		it( 'should call onChange if new value is valid', () => {
+ 			const onChange = jest.fn();
+-			const wrapper = getWrapper( {
+-				onChange,
+-				min: 11,
+-				max: 20,
+-				value: 12,
+-			} );
+-
+-			const numberInputElement = () =>
+-				TestUtils.findRenderedDOMComponentWithClass(
+-					wrapper,
+-					'components-range-control__number'
+-				);
+-
+-			TestUtils.Simulate.change( numberInputElement(), {
+-				target: {
+-					value: '10',
+-					checkValidity() {
+-						return false;
+-					},
+-				},
+-			} );
+-
+-			TestUtils.Simulate.change( numberInputElement(), {
+-				target: {
+-					value: '21',
+-					checkValidity() {
+-						return false;
+-					},
+-				},
+-			} );
++			const { container } = render(
++				<RangeControl
++					onChange={ onChange }
++					min={ 10 }
++					max={ 20 }
++					value={ 10 }
++				/>
++			);
+ 
+-			expect( onChange ).not.toHaveBeenCalled();
++			const rangeInput = getRangeInput( container );
++			const numberInput = getNumberInput( container );
+ 
+-			TestUtils.Simulate.change( numberInputElement(), {
+-				target: {
+-					value: '14',
+-					checkValidity() {
+-						return true;
+-					},
+-				},
+-			} );
++			fireEvent.change( numberInput, { target: { value: '15' } } );
++			fireEvent.blur( numberInput );
+ 
+-			expect( onChange ).toHaveBeenCalledWith( 14 );
++			expect( onChange ).toHaveBeenCalledWith( 15 );
++			expect( rangeInput.value ).toBe( '15' );
+ 		} );
+ 
+-		it( 'validates when provided a max or min of zero', () => {
++		it( 'should validate when provided a max or min of zero', () => {
+ 			const onChange = jest.fn();
+-			const wrapper = getWrapper( {
+-				onChange,
+-				min: -100,
+-				max: 0,
+-				value: 0,
+-			} );
+-
+-			const numberInputElement = () =>
+-				TestUtils.findRenderedDOMComponentWithClass(
+-					wrapper,
+-					'components-range-control__number'
+-				);
+-
+-			TestUtils.Simulate.change( numberInputElement(), {
+-				target: {
+-					value: '1',
+-					checkValidity() {
+-						return false;
+-					},
+-				},
+-			} );
++			const { container } = render(
++				<RangeControl
++					onChange={ onChange }
++					min={ -100 }
++					max={ 0 }
++					value={ 0 }
++				/>
++			);
++
++			const rangeInput = getRangeInput( container );
++			const numberInput = getNumberInput( container );
++
++			fireEvent.change( numberInput, { target: { value: '1' } } );
++			fireEvent.blur( numberInput );
+ 
+ 			expect( onChange ).not.toHaveBeenCalled();
++			expect( rangeInput.value ).toBe( '0' );
+ 		} );
+ 
+-		it( 'validates when min and max are negative', () => {
++		it( 'should validate when min and max are negative', () => {
+ 			const onChange = jest.fn();
+-			const wrapper = getWrapper( {
+-				onChange,
+-				min: -100,
+-				max: -50,
+-				value: -60,
+-			} );
+-
+-			const numberInputElement = () =>
+-				TestUtils.findRenderedDOMComponentWithClass(
+-					wrapper,
+-					'components-range-control__number'
+-				);
+-
+-			TestUtils.Simulate.change( numberInputElement(), {
+-				target: {
+-					value: '-101',
+-					checkValidity() {
+-						return false;
+-					},
+-				},
+-			} );
++			const { container } = render(
++				<RangeControl
++					onChange={ onChange }
++					min={ -100 }
++					max={ -50 }
++					value={ -60 }
++				/>
++			);
++
++			const rangeInput = getRangeInput( container );
++			const numberInput = getNumberInput( container );
++
++			fireEvent.change( numberInput, { target: { value: '-101' } } );
++			fireEvent.blur( numberInput );
+ 
+ 			expect( onChange ).not.toHaveBeenCalled();
++			expect( rangeInput.value ).toBe( '-60' );
+ 
+-			TestUtils.Simulate.change( numberInputElement(), {
+-				target: {
+-					value: '-49',
+-					checkValidity() {
+-						return false;
+-					},
+-				},
+-			} );
++			fireEvent.change( numberInput, { target: { value: '-49' } } );
++			fireEvent.blur( numberInput );
+ 
+ 			expect( onChange ).not.toHaveBeenCalled();
++			expect( rangeInput.value ).toBe( '-60' );
+ 
+-			TestUtils.Simulate.change( numberInputElement(), {
+-				target: {
+-					value: '-50',
+-					checkValidity() {
+-						return true;
+-					},
+-				},
+-			} );
++			fireEvent.change( numberInput, { target: { value: '-50' } } );
++			fireEvent.blur( numberInput );
+ 
+ 			expect( onChange ).toHaveBeenCalledWith( -50 );
++			expect( rangeInput.value ).toBe( '-50' );
+ 		} );
+-		it( 'takes into account the step starting from min', () => {
++
++		it( 'should take into account the step starting from min', () => {
+ 			const onChange = jest.fn();
+-			const wrapper = getWrapper( {
+-				onChange,
+-				min: 0.1,
+-				step: 0.125,
+-				value: 0.1,
+-			} );
+-
+-			const numberInputElement = () =>
+-				TestUtils.findRenderedDOMComponentWithClass(
+-					wrapper,
+-					'components-range-control__number'
+-				);
+-
+-			TestUtils.Simulate.change( numberInputElement(), {
+-				target: {
+-					value: '0.125',
+-					checkValidity() {
+-						return false;
+-					},
+-				},
+-			} );
++			const { container } = render(
++				<RangeControl
++					onChange={ onChange }
++					min={ 0.1 }
++					step={ 0.125 }
++					value={ 0.1 }
++				/>
++			);
++
++			const rangeInput = getRangeInput( container );
++			const numberInput = getNumberInput( container );
++
++			fireEvent.change( numberInput, { target: { value: '0.125' } } );
++			fireEvent.blur( numberInput );
+ 
+ 			expect( onChange ).not.toHaveBeenCalled();
++			expect( rangeInput.value ).toBe( '0.1' );
+ 
+-			TestUtils.Simulate.change( numberInputElement(), {
+-				target: {
+-					value: '0.225',
+-					checkValidity() {
+-						return true;
+-					},
+-				},
+-			} );
++			fireEvent.change( numberInput, { target: { value: '0.225' } } );
++			fireEvent.blur( numberInput );
+ 
+ 			expect( onChange ).toHaveBeenCalledWith( 0.225 );
++			expect( rangeInput.value ).toBe( '0.225' );
+ 		} );
+ 	} );
+ 
+ 	describe( 'initialPosition / value', () => {
+-		const getInputElement = ( wrapper ) =>
+-			TestUtils.findRenderedDOMComponentWithClass(
+-				wrapper,
+-				'components-range-control__slider'
++		it( 'should render initial rendered value of 50% of min/max, if no initialPosition or value is defined', () => {
++			const { container } = render(
++				<RangeControl min={ 0 } max={ 10 } />
+ 			);
+ 
+-		it( 'renders initial rendered value of 50% of min/max, if no initialPosition or value is defined', () => {
+-			const wrapper = getWrapper( { min: 0, max: 10 } );
+-			const inputElement = getInputElement( wrapper );
++			const rangeInput = getRangeInput( container );
+ 
+-			expect( inputElement.value ).toBe( '5' );
++			expect( rangeInput.value ).toBe( '5' );
+ 		} );
+ 
+-		it( 'renders initialPosition if no value is provided', () => {
+-			const wrapper = getWrapper( {
+-				initialPosition: 50,
+-				value: undefined,
+-			} );
+-			const inputElement = getInputElement( wrapper );
++		it( 'should render initialPosition if no value is provided', () => {
++			const { container } = render(
++				<RangeControl initialPosition={ 50 } />
++			);
++
++			const rangeInput = getRangeInput( container );
+ 
+-			expect( inputElement.value ).toBe( '50' );
++			expect( rangeInput.value ).toBe( '50' );
+ 		} );
+ 
+-		it( 'renders value instead of initialPosition is provided', () => {
+-			const wrapper = getWrapper( { initialPosition: 50, value: 10 } );
+-			const inputElement = getInputElement( wrapper );
++		it( 'should render value instead of initialPosition is provided', () => {
++			const { container } = render(
++				<RangeControl initialPosition={ 50 } value={ 10 } />
++			);
++
++			const rangeInput = getRangeInput( container );
+ 
+-			expect( inputElement.value ).toBe( '10' );
++			expect( rangeInput.value ).toBe( '10' );
+ 		} );
+ 	} );
+ 
+ 	describe( 'input field', () => {
+ 		it( 'should render an input field by default', () => {
+-			act( () => {
+-				render( <RangeControl />, container );
+-			} );
+-			const field = container.querySelector( 'input[type="number"]' );
++			const { container } = render( <RangeControl /> );
+ 
+-			expect( field ).toBeTruthy();
++			const numberInput = getNumberInput( container );
++
++			expect( numberInput ).toBeTruthy();
+ 		} );
+ 
+ 		it( 'should not render an input field, if disabled', () => {
+-			act( () => {
+-				render( <RangeControl withInputField={ false } />, container );
+-			} );
+-			const field = container.querySelector( 'input[type="number"]' );
++			const { container } = render(
++				<RangeControl withInputField={ false } />
++			);
+ 
+-			expect( field ).toBeFalsy();
++			const numberInput = getNumberInput( container );
++
++			expect( numberInput ).toBeFalsy();
+ 		} );
+ 
+ 		it( 'should render a zero value into input range and field', () => {
+-			act( () => {
+-				render( <RangeControl value={ 0 } />, container );
+-			} );
+-			const range = container.querySelector( 'input[type="range"]' );
+-			const field = container.querySelector( 'input[type="number"]' );
+-
+-			expect( range.value ).toBe( '0' );
+-			expect( field.value ).toBe( '0' );
++			const { container } = render( <RangeControl value={ 0 } /> );
++
++			const rangeInput = getRangeInput( container );
++			const numberInput = getNumberInput( container );
++
++			expect( rangeInput.value ).toBe( '0' );
++			expect( numberInput.value ).toBe( '0' );
+ 		} );
+ 
+ 		it( 'should update both field and range on change', () => {
+-			act( () => {
+-				render( <RangeControl value={ 0 } />, container );
+-			} );
+-			const range = container.querySelector( 'input[type="range"]' );
+-			const field = container.querySelector( 'input[type="number"]' );
++			const { container } = render( <RangeControl value={ 0 } /> );
+ 
+-			act( () => {
+-				Simulate.change( range, { target: { value: 13 } } );
+-			} );
++			const rangeInput = getRangeInput( container );
++			const numberInput = getNumberInput( container );
+ 
+-			expect( range.value ).toBe( '13' );
+-			expect( field.value ).toBe( '13' );
++			fireEvent.change( rangeInput, { target: { value: 13 } } );
+ 
+-			act( () => {
+-				Simulate.change( field, { target: { value: 7 } } );
+-			} );
++			expect( rangeInput.value ).toBe( '13' );
++			expect( numberInput.value ).toBe( '13' );
+ 
+-			expect( range.value ).toBe( '7' );
+-			expect( field.value ).toBe( '7' );
++			fireEvent.change( numberInput, { target: { value: 7 } } );
++			fireEvent.blur( numberInput );
++
++			expect( rangeInput.value ).toBe( '7' );
++			expect( numberInput.value ).toBe( '7' );
+ 		} );
+ 
+ 		it( 'should reset input values if next value is removed', () => {
+-			act( () => {
+-				render( <RangeControl value={ 13 } />, container );
+-			} );
+-			const range = container.querySelector( 'input[type="range"]' );
+-			const field = container.querySelector( 'input[type="number"]' );
++			const { container } = render( <RangeControl value={ 13 } /> );
++
++			const rangeInput = getRangeInput( container );
++			const numberInput = getNumberInput( container );
+ 
+-			expect( range.value ).toBe( '13' );
+-			expect( field.value ).toBe( '13' );
++			expect( rangeInput.value ).toBe( '13' );
++			expect( numberInput.value ).toBe( '13' );
+ 
+-			act( () => {
+-				Simulate.change( field, { target: { value: undefined } } );
+-			} );
++			fireEvent.change( numberInput, { target: { value: '' } } );
++			fireEvent.blur( numberInput );
+ 
+ 			// Reset to 50. Median value of min: 0, max: 100
+-			expect( range.value ).toBe( '50' );
++			expect( rangeInput.value ).toBe( '50' );
+ 			// Input field should be blank
+-			expect( field.value ).toBe( '' );
++			expect( numberInput.value ).toBe( '' );
+ 		} );
+ 	} );
+ 
+ 	describe( 'reset', () => {
+-		class StatefulTestWrapper extends Component {
+-			constructor( props ) {
+-				super( props );
+-				this.state = {
+-					value: undefined,
+-				};
+-				this.handleOnChange = this.handleOnChange.bind( this );
+-			}
+-
+-			handleOnChange( nextValue = this.props.resetFallbackValue ) {
+-				this.setState( { value: nextValue } );
+-			}
+-
+-			render() {
+-				return (
+-					<RangeControl
+-						{ ...this.props }
+-						value={ this.state.value }
+-						onChange={ this.handleOnChange }
+-					/>
+-				);
+-			}
+-		}
+-
+-		const getStatefulWrapper = ( props = {} ) =>
+-			TestUtils.renderIntoDocument(
+-				<StatefulTestWrapper { ...props } />
+-			);
+-
+-		const getInputElement = ( wrapper ) =>
+-			TestUtils.findRenderedDOMComponentWithClass(
+-				wrapper,
+-				'components-range-control__slider'
+-			);
+-
+-		it( 'resets to a custom fallback value, defined by a parent component', () => {
+-			const wrapper = getStatefulWrapper( {
+-				initialPosition: 50,
+-				value: 10,
+-				allowReset: true,
+-				resetFallbackValue: 33,
+-			} );
+-
+-			const resetButton = TestUtils.findRenderedDOMComponentWithClass(
+-				wrapper,
+-				'components-range-control__reset'
++		it( 'should reset to a custom fallback value, defined by a parent component', () => {
++			const spy = jest.fn();
++			const { container } = render(
++				<RangeControl
++					initialPosition={ 50 }
++					value={ 10 }
++					allowReset={ true }
++					onChange={ spy }
++					resetFallbackValue={ 33 }
++				/>
+ 			);
+ 
+-			act( () => {
+-				TestUtils.Simulate.click( resetButton );
+-			} );
++			const resetButton = getResetButton( container );
++			const rangeInput = getRangeInput( container );
++			const numberInput = getNumberInput( container );
+ 
+-			const inputElement = getInputElement( wrapper );
++			fireEvent.click( resetButton );
+ 
+-			expect( inputElement.value ).toBe( '33' );
++			expect( rangeInput.value ).toBe( '33' );
++			expect( numberInput.value ).toBe( '33' );
++			expect( spy ).toHaveBeenCalledWith( 33 );
+ 		} );
+ 
+-		it( 'resets to a 50% of min/max value, of no initialPosition or value is defined', () => {
+-			const wrapper = getStatefulWrapper( {
+-				initialPosition: undefined,
+-				value: 10,
+-				min: 0,
+-				max: 100,
+-				allowReset: true,
+-				resetFallbackValue: undefined,
+-			} );
+-
+-			const resetButton = TestUtils.findRenderedDOMComponentWithClass(
+-				wrapper,
+-				'components-range-control__reset'
++		it( 'should reset to a 50% of min/max value, of no initialPosition or value is defined', () => {
++			const spy = jest.fn();
++			const { container } = render(
++				<RangeControl
++					initialPosition={ undefined }
++					value={ 10 }
++					min={ 0 }
++					max={ 100 }
++					allowReset={ true }
++					onChange={ spy }
++					resetFallbackValue={ undefined }
++				/>
+ 			);
+ 
+-			act( () => {
+-				TestUtils.Simulate.click( resetButton );
+-			} );
++			const resetButton = getResetButton( container );
++			const rangeInput = getRangeInput( container );
++			const numberInput = getNumberInput( container );
+ 
+-			const inputElement = getInputElement( wrapper );
++			fireEvent.click( resetButton );
+ 
+-			expect( inputElement.value ).toBe( '50' );
++			expect( rangeInput.value ).toBe( '50' );
++			expect( numberInput.value ).toBe( '' );
++			expect( spy ).toHaveBeenCalledWith( undefined );
+ 		} );
+ 	} );
+ } );
+diff --git a/packages/components/src/range-control/utils.js b/packages/components/src/range-control/utils.js
+index 9d2aecfa5e7a70..444c7958e3ce79 100644
+--- a/packages/components/src/range-control/utils.js
++++ b/packages/components/src/range-control/utils.js
+@@ -8,6 +8,11 @@ import { clamp, noop } from 'lodash';
+  */
+ import { useCallback, useRef, useEffect, useState } from '@wordpress/element';
+ 
++/**
++ * Internal dependencies
++ */
++import { useControlledState } from '../utils/hooks';
++
+ /**
+  * A float supported clamp function for a specific value.
+  *
+@@ -29,24 +34,22 @@ export function floatClamp( value, min, max ) {
+  * Hook to store a clamped value, derived from props.
+  */
+ export function useControlledRangeValue( { min, max, value: valueProp } ) {
+-	const [ value, setValue ] = useState( floatClamp( valueProp, min, max ) );
+-	const valueRef = useRef( value );
++	const [ value, setValue ] = useControlledState(
++		floatClamp( valueProp, min, max )
++	);
+ 
+ 	const setClampValue = useCallback(
+ 		( nextValue ) => {
+-			setValue( floatClamp( nextValue, min, max ) );
++			if ( nextValue === null ) {
++				setValue( null );
++			} else {
++				setValue( floatClamp( nextValue, min, max ) );
++			}
+ 		},
+-		[ setValue, min, max ]
++		[ min, max ]
+ 	);
+ 
+-	useEffect( () => {
+-		if ( valueRef.current !== valueProp ) {
+-			setClampValue( valueProp );
+-			valueRef.current = valueProp;
+-		}
+-	}, [ valueProp, setValue ] );
+-
+-	return [ value, setValue ];
++	return [ value, setClampValue ];
+ }
+ 
+ /**
+diff --git a/packages/components/src/utils/hooks.js b/packages/components/src/utils/hooks.js
+new file mode 100644
+index 00000000000000..00c173219819dd
+--- /dev/null
++++ b/packages/components/src/utils/hooks.js
+@@ -0,0 +1,38 @@
++/**
++ * WordPress dependencies
++ */
++import { useEffect, useRef, useState } from '@wordpress/element';
++
++/**
++ * Custom hooks for "controlled" components to track and consolidate internal
++ * state and incoming values. This is useful for components that render
++ * `input`, `textarea`, or `select` HTML elements.
++ *
++ * https://reactjs.org/docs/forms.html#controlled-components
++ *
++ * At first, a component using useControlledState receives an initial prop
++ * value, which is used as initial internal state.
++ *
++ * This internal state can be maintained and updated without
++ * relying on new incoming prop values.
++ *
++ * Unlike the basic useState hook, useControlledState's state can
++ * be updated if a new incoming prop value is changed.
++ *
++ * @param {any} initialState The initial state value.
++ * @return {[*, Function]} The controlled value and the value setter.
++ */
++export function useControlledState( initialState ) {
++	const [ state, setState ] = useState( initialState );
++	const lastInitialStateRef = useRef( initialState );
++
++	useEffect( () => {
++		// Update the internal state if the incoming value changes.
++		if ( initialState !== lastInitialStateRef.current ) {
++			setState( initialState );
++			lastInitialStateRef.current = initialState;
++		}
++	}, [ initialState ] );
++
++	return [ state, setState ];
++}
+diff --git a/packages/components/src/utils/test/hooks.js b/packages/components/src/utils/test/hooks.js
+new file mode 100644
+index 00000000000000..32013c4f62d947
+--- /dev/null
++++ b/packages/components/src/utils/test/hooks.js
+@@ -0,0 +1,124 @@
++/**
++ * External dependencies
++ */
++import { render, fireEvent, screen } from '@testing-library/react';
++import { noop } from 'lodash';
++
++/**
++ * Internal dependencies
++ */
++import { useControlledState } from '../hooks';
++
++describe( 'hooks', () => {
++	const getInput = () => screen.getByTestId( 'input' );
++
++	describe( 'useControlledState', () => {
++		const Example = ( { value: valueProp, onChange = noop } ) => {
++			const [ state, setState ] = useControlledState( valueProp );
++
++			const handleOnChange = ( event ) => {
++				const nextValue = event.target.value;
++				setState( nextValue );
++				onChange( nextValue );
++			};
++
++			return (
++				<input
++					data-testid="input"
++					type="text"
++					value={ state }
++					onChange={ handleOnChange }
++				/>
++			);
++		};
++
++		it( 'should use incoming prop as state on initial render', () => {
++			const spy = jest.fn();
++			render( <Example value="Hello" onChange={ spy } /> );
++
++			const input = getInput();
++
++			expect( input.value ).toBe( 'Hello' );
++			expect( spy ).not.toHaveBeenCalled();
++		} );
++
++		it( 'should update rendered value onChange', () => {
++			const spy = jest.fn();
++			render( <Example value="Hello" onChange={ spy } /> );
++
++			const input = getInput();
++
++			fireEvent.change( input, { target: { value: 'There' } } );
++
++			expect( input.value ).toBe( 'There' );
++			expect( spy ).toHaveBeenCalledTimes( 1 );
++
++			fireEvent.change( input, { target: { value: 'Hello There' } } );
++
++			expect( input.value ).toBe( 'Hello There' );
++			expect( spy ).toHaveBeenCalledTimes( 2 );
++		} );
++
++		/**
++		 * This test demonstrates the primary feature of the useControlledState
++		 * hook. The <Example /> component receives an initial prop value
++		 * which is used as the initial internal state.
++		 *
++		 * This internal state can be maintained and updated without
++		 * relying on new incoming prop values.
++		 *
++		 * Unlike the basic useState hook, useControlledState's state can
++		 * be updated if a new incoming prop value is changed.
++		 */
++		it( 'should update changed value with new incoming prop value', () => {
++			const spy = jest.fn();
++
++			/**
++			 * The <input /> value starts with "Hello", since it is passed down
++			 * from props. The prop being rendered is the state provided by
++			 * useControlledState, rather than the value prop directly.
++			 */
++			const { rerender } = render(
++				<Example value="Hello" onChange={ spy } />
++			);
++
++			const input = getInput();
++
++			/**
++			 * When the <input /> changes, it updates the internal state value.
++			 */
++			fireEvent.change( input, { target: { value: 'There' } } );
++
++			expect( input.value ).toBe( 'There' );
++
++			/**
++			 * If a new value prop is passed down, it will update the
++			 * internal state value, which will be rerendered into
++			 * the <input />.
++			 */
++			rerender( <Example value="New Value" /> );
++
++			expect( input.value ).toBe( 'New Value' );
++			expect( spy ).toHaveBeenCalledTimes( 1 );
++		} );
++
++		it( 'should new incoming prop value with new change value', () => {
++			const spy = jest.fn();
++			const { rerender } = render(
++				<Example value="Hello" onChange={ spy } />
++			);
++			const input = getInput();
++
++			fireEvent.change( input, { target: { value: 'There' } } );
++
++			rerender( <Example value="New Value" /> );
++
++			fireEvent.change( input, {
++				target: { value: 'New Change Value' },
++			} );
++
++			expect( input.value ).toBe( 'New Change Value' );
++			expect( spy ).toHaveBeenCalledTimes( 1 );
++		} );
++	} );
++} );

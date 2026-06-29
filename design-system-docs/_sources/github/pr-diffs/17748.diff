@@ -1,0 +1,969 @@
+diff --git a/packages/base-styles/_z-index.scss b/packages/base-styles/_z-index.scss
+index 230c98893e1d07..9bdedb9fe09d17 100644
+--- a/packages/base-styles/_z-index.scss
++++ b/packages/base-styles/_z-index.scss
+@@ -121,9 +121,9 @@ $z-layers: (
+ 	// Needs to appear bellow other color circular picker related UI elements.
+ 	".components-circular-option-picker__option-wrapper::before": -1,
+ 
+-	".components-circular-option-picker__option.is-active": 1,
+-	// Needs to be higher than .components-circular-option-picker__option.is-active.
+-	".components-circular-option-picker__option.is-active + .dashicons-saved": 2
++	".components-circular-option-picker__option.is-pressed": 1,
++	// Needs to be higher than .components-circular-option-picker__option.is-pressed.
++	".components-circular-option-picker__option.is-pressed + .dashicons-saved": 2
+ );
+ 
+ @function z-index( $key ) {
+diff --git a/packages/block-editor/src/components/link-control/test/__snapshots__/index.js.snap b/packages/block-editor/src/components/link-control/test/__snapshots__/index.js.snap
+index a3c7de7bd7661f..e1dba581caf897 100644
+--- a/packages/block-editor/src/components/link-control/test/__snapshots__/index.js.snap
++++ b/packages/block-editor/src/components/link-control/test/__snapshots__/index.js.snap
+@@ -1,3 +1,3 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`Basic rendering should display with required props 1`] = `"<span><div tabindex=\\"-1\\"><div><div><div class=\\"components-popover block-editor-link-control\\"><div class=\\"components-popover__content\\" tabindex=\\"-1\\"><div class=\\"block-editor-link-control__popover-inner\\"><div class=\\"block-editor-link-control__search\\"><form><div class=\\"components-base-control editor-url-input block-editor-url-input block-editor-link-control__search-input\\"><div class=\\"components-base-control__field\\"><input type=\\"text\\" aria-label=\\"URL\\" required=\\"\\" placeholder=\\"Search or type url\\" role=\\"combobox\\" aria-expanded=\\"false\\" aria-autocomplete=\\"list\\" aria-owns=\\"block-editor-url-input-suggestions-0\\" value=\\"\\"></div></div><button type=\\"reset\\" disabled=\\"\\" aria-label=\\"Reset\\" class=\\"components-button components-icon-button block-editor-link-control__search-reset\\"><svg aria-hidden=\\"true\\" role=\\"img\\" focusable=\\"false\\" class=\\"dashicon dashicons-no-alt\\" xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"20\\" height=\\"20\\" viewBox=\\"0 0 20 20\\"><path d=\\"M14.95 6.46L11.41 10l3.54 3.54-1.41 1.41L10 11.42l-3.53 3.53-1.42-1.42L8.58 10 5.05 6.47l1.42-1.42L10 8.58l3.54-3.53z\\"></path></svg></button></form></div></div></div></div></div></div></div></span>"`;
++exports[`Basic rendering should display with required props 1`] = `"<span><div tabindex=\\"-1\\"><div><div><div class=\\"components-popover block-editor-link-control\\"><div class=\\"components-popover__content\\" tabindex=\\"-1\\"><div class=\\"block-editor-link-control__popover-inner\\"><div class=\\"block-editor-link-control__search\\"><form><div class=\\"components-base-control editor-url-input block-editor-url-input block-editor-link-control__search-input\\"><div class=\\"components-base-control__field\\"><input type=\\"text\\" aria-label=\\"URL\\" required=\\"\\" placeholder=\\"Search or type url\\" role=\\"combobox\\" aria-expanded=\\"false\\" aria-autocomplete=\\"list\\" aria-owns=\\"block-editor-url-input-suggestions-0\\" value=\\"\\"></div></div><button type=\\"reset\\" disabled=\\"\\" aria-label=\\"Reset\\" class=\\"components-button components-icon-button block-editor-link-control__search-reset\\"><svg aria-hidden=\\"true\\" role=\\"img\\" focusable=\\"false\\" xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"20\\" height=\\"20\\" viewBox=\\"0 0 20 20\\" class=\\"dashicon dashicons-no-alt\\"><path d=\\"M14.95 6.46L11.41 10l3.54 3.54-1.41 1.41L10 11.42l-3.53 3.53-1.42-1.42L8.58 10 5.05 6.47l1.42-1.42L10 8.58l3.54-3.53z\\"></path></svg></button></form></div></div></div></div></div></div></div></span>"`;
+diff --git a/packages/block-editor/src/components/media-placeholder/index.js b/packages/block-editor/src/components/media-placeholder/index.js
+index d4e98de6179b12..cb5fc3806f0301 100644
+--- a/packages/block-editor/src/components/media-placeholder/index.js
++++ b/packages/block-editor/src/components/media-placeholder/index.js
+@@ -272,7 +272,7 @@ export class MediaPlaceholder extends Component {
+ 				<Button
+ 					className="editor-media-placeholder__button block-editor-media-placeholder__button"
+ 					onClick={ this.openURLInput }
+-					isToggled={ isURLInputVisible }
++					isPressed={ isURLInputVisible }
+ 					isLarge
+ 				>
+ 					{ __( 'Insert from URL' ) }
+diff --git a/packages/block-editor/src/components/responsive-block-control/test/__snapshots__/index.js.snap b/packages/block-editor/src/components/responsive-block-control/test/__snapshots__/index.js.snap
+index d05674f87f31df..27b9533f39730c 100644
+--- a/packages/block-editor/src/components/responsive-block-control/test/__snapshots__/index.js.snap
++++ b/packages/block-editor/src/components/responsive-block-control/test/__snapshots__/index.js.snap
+@@ -1,3 +1,3 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`Basic rendering should render with required props 1`] = `"<fieldset class=\\"block-editor-responsive-block-control\\"><legend class=\\"block-editor-responsive-block-control__title\\">Padding</legend><div class=\\"block-editor-responsive-block-control__inner\\"><div class=\\"components-base-control components-toggle-control block-editor-responsive-block-control__toggle\\"><div class=\\"components-base-control__field\\"><span class=\\"components-form-toggle is-checked\\"><input class=\\"components-form-toggle__input\\" id=\\"inspector-toggle-control-0\\" type=\\"checkbox\\" aria-describedby=\\"inspector-toggle-control-0__help\\" checked=\\"\\"><span class=\\"components-form-toggle__track\\"></span><span class=\\"components-form-toggle__thumb\\"></span><svg class=\\"components-form-toggle__on\\" width=\\"2\\" height=\\"6\\" xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 2 6\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M0 0h2v6H0z\\"></path></svg></span><label for=\\"inspector-toggle-control-0\\" class=\\"components-toggle-control__label\\">Use the same padding on all screensizes.</label></div><p id=\\"inspector-toggle-control-0__help\\" class=\\"components-base-control__help\\">Toggle between using the same value for all screen sizes or using a unique value per screen size.</p></div><div class=\\"block-editor-responsive-block-control__group block-editor-responsive-block-control__group--default\\"><div class=\\"components-base-control\\"><div class=\\"components-base-control__field\\"><label class=\\"components-base-control__label\\" for=\\"inspector-select-control-0\\"><span aria-describedby=\\"rbc-desc-0\\">All</span><span class=\\"screen-reader-text\\" id=\\"rbc-desc-0\\">Controls the padding property for All viewports.</span></label><select id=\\"inspector-select-control-0\\" class=\\"components-select-control__input\\"><option value=\\"\\">Please select</option><option value=\\"small\\">Small</option><option value=\\"medium\\">Medium</option><option value=\\"large\\">Large</option></select></div></div><p id=\\"all\\">All is used here for testing purposes to ensure we have access to details about the device.</p></div></div></fieldset>"`;
++exports[`Basic rendering should render with required props 1`] = `"<fieldset class=\\"block-editor-responsive-block-control\\"><legend class=\\"block-editor-responsive-block-control__title\\">Padding</legend><div class=\\"block-editor-responsive-block-control__inner\\"><div class=\\"components-base-control components-toggle-control block-editor-responsive-block-control__toggle\\"><div class=\\"components-base-control__field\\"><span class=\\"components-form-toggle is-checked\\"><input class=\\"components-form-toggle__input\\" id=\\"inspector-toggle-control-0\\" type=\\"checkbox\\" aria-describedby=\\"inspector-toggle-control-0__help\\" checked=\\"\\"><span class=\\"components-form-toggle__track\\"></span><span class=\\"components-form-toggle__thumb\\"></span><svg width=\\"2\\" height=\\"6\\" xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 2 6\\" class=\\"components-form-toggle__on\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M0 0h2v6H0z\\"></path></svg></span><label for=\\"inspector-toggle-control-0\\" class=\\"components-toggle-control__label\\">Use the same padding on all screensizes.</label></div><p id=\\"inspector-toggle-control-0__help\\" class=\\"components-base-control__help\\">Toggle between using the same value for all screen sizes or using a unique value per screen size.</p></div><div class=\\"block-editor-responsive-block-control__group block-editor-responsive-block-control__group--default\\"><div class=\\"components-base-control\\"><div class=\\"components-base-control__field\\"><label class=\\"components-base-control__label\\" for=\\"inspector-select-control-0\\"><span aria-describedby=\\"rbc-desc-0\\">All</span><span class=\\"screen-reader-text\\" id=\\"rbc-desc-0\\">Controls the padding property for All viewports.</span></label><select id=\\"inspector-select-control-0\\" class=\\"components-select-control__input\\"><option value=\\"\\">Please select</option><option value=\\"small\\">Small</option><option value=\\"medium\\">Medium</option><option value=\\"large\\">Large</option></select></div></div><p id=\\"all\\">All is used here for testing purposes to ensure we have access to details about the device.</p></div></div></fieldset>"`;
+diff --git a/packages/block-editor/src/components/url-input/button.js b/packages/block-editor/src/components/url-input/button.js
+index 077decf42d6313..a1b57e5d3d6548 100644
+--- a/packages/block-editor/src/components/url-input/button.js
++++ b/packages/block-editor/src/components/url-input/button.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -45,9 +40,8 @@ class URLInputButton extends Component {
+ 					icon="admin-links"
+ 					label={ buttonLabel }
+ 					onClick={ this.toggle }
+-					className={ classnames( 'components-toolbar__control', {
+-						'is-active': url,
+-					} ) }
++					className="components-toolbar__control"
++					isPressed={ !! url }
+ 				/>
+ 				{ expanded &&
+ 					<form
+diff --git a/packages/block-editor/src/components/url-input/test/button.js b/packages/block-editor/src/components/url-input/test/button.js
+index 8088d61ea5016e..78a1e5f9fa562a 100644
+--- a/packages/block-editor/src/components/url-input/test/button.js
++++ b/packages/block-editor/src/components/url-input/test/button.js
+@@ -20,13 +20,13 @@ describe( 'URLInputButton', () => {
+ 		const wrapper = shallow( <URLInputButton /> );
+ 		expect( wrapper.hasClass( 'block-editor-url-input__button' ) ).toBe( true );
+ 	} );
+-	it( 'should not have is-active class when url prop not defined', () => {
++	it( 'should have isPressed props set to false when url prop not defined', () => {
+ 		const wrapper = shallow( <URLInputButton /> );
+-		expect( wrapper.find( 'ForwardRef(IconButton)' ).hasClass( 'is-active' ) ).toBe( false );
++		expect( wrapper.find( 'ForwardRef(IconButton)' ).prop( 'isPressed' ) ).toBe( false );
+ 	} );
+-	it( 'should have is-active class name if url prop defined', () => {
++	it( 'should have isPressed prop set to true if url prop defined', () => {
+ 		const wrapper = shallow( <URLInputButton url="https://example.com" /> );
+-		expect( wrapper.find( 'ForwardRef(IconButton)' ).hasClass( 'is-active' ) ).toBe( true );
++		expect( wrapper.find( 'ForwardRef(IconButton)' ).prop( 'isPressed' ) ).toBe( true );
+ 	} );
+ 	it( 'should have hidden form by default', () => {
+ 		const wrapper = shallow( <URLInputButton /> );
+diff --git a/packages/block-library/src/code/editor.scss b/packages/block-library/src/code/editor.scss
+index 5fb4e6e4682058..5a4d5ee76e1acc 100644
+--- a/packages/block-library/src/code/editor.scss
++++ b/packages/block-library/src/code/editor.scss
+@@ -12,57 +12,3 @@
+ 		box-shadow: none;
+ 	}
+ }
+-
+-// We should extract this to a separate components-toolbar
+-.components-tab-button {
+-	display: inline-flex;
+-	align-items: flex-end;
+-	margin: 0;
+-	padding: 3px;
+-	background: none;
+-	outline: none;
+-	color: $dark-gray-500;
+-	cursor: pointer;
+-	position: relative;
+-	height: $icon-button-size;
+-	font-family: $default-font;
+-	font-size: $default-font-size;
+-	font-weight: 500;
+-	border: 0;
+-
+-	&.is-active,
+-	&.is-active:hover {
+-		color: $white;
+-	}
+-
+-	&:disabled {
+-		cursor: default;
+-	}
+-
+-	& > span {
+-		border: $border-width solid transparent;
+-		padding: 0 6px;
+-		box-sizing: content-box;
+-		height: 28px;
+-		line-height: 28px;
+-	}
+-
+-	&:hover > span,
+-	&:focus > span {
+-		color: $dark-gray-500;
+-	}
+-
+-	&:not(:disabled) {
+-		&.is-active > span,
+-		&:hover > span,
+-		&:focus > span {
+-			border: $border-width solid $dark-gray-500;
+-		}
+-	}
+-
+-	&.is-active > span,
+-	&.is-active:hover > span {
+-		background-color: $dark-gray-500;
+-		color: $white;
+-	}
+-}
+diff --git a/packages/block-library/src/heading/heading-level-icon.js b/packages/block-library/src/heading/heading-level-icon.js
+index aa1e964f3ec417..4780430c3ffed1 100644
+--- a/packages/block-library/src/heading/heading-level-icon.js
++++ b/packages/block-library/src/heading/heading-level-icon.js
+@@ -3,7 +3,7 @@
+  */
+ import { Path, SVG } from '@wordpress/components';
+ 
+-export default function HeadingLevelIcon( { level, __unstableActive } ) {
++export default function HeadingLevelIcon( { level, isPressed = false } ) {
+ 	const levelToPath = {
+ 		1: 'M9 5h2v10H9v-4H5v4H3V5h2v4h4V5zm6.6 0c-.6.9-1.5 1.7-2.6 2v1h2v7h2V5h-1.4z',
+ 		2: 'M7 5h2v10H7v-4H3v4H1V5h2v4h4V5zm8 8c.5-.4.6-.6 1.1-1.1.4-.4.8-.8 1.2-1.3.3-.4.6-.8.9-1.3.2-.4.3-.8.3-1.3 0-.4-.1-.9-.3-1.3-.2-.4-.4-.7-.8-1-.3-.3-.7-.5-1.2-.6-.5-.2-1-.2-1.5-.2-.4 0-.7 0-1.1.1-.3.1-.7.2-1 .3-.3.1-.6.3-.9.5-.3.2-.6.4-.8.7l1.2 1.2c.3-.3.6-.5 1-.7.4-.2.7-.3 1.2-.3s.9.1 1.3.4c.3.3.5.7.5 1.1 0 .4-.1.8-.4 1.1-.3.5-.6.9-1 1.2-.4.4-1 .9-1.6 1.4-.6.5-1.4 1.1-2.2 1.6V15h8v-2H15z',
+@@ -17,7 +17,7 @@ export default function HeadingLevelIcon( { level, __unstableActive } ) {
+ 	}
+ 
+ 	return (
+-		<SVG width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" __unstableActive={ __unstableActive } >
++		<SVG width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" isPressed={ isPressed } >
+ 			<Path d={ levelToPath[ level ] } />
+ 		</SVG>
+ 	);
+diff --git a/packages/block-library/src/heading/heading-toolbar.js b/packages/block-library/src/heading/heading-toolbar.js
+index 330712435e6409..0d836193a33b9f 100644
+--- a/packages/block-library/src/heading/heading-toolbar.js
++++ b/packages/block-library/src/heading/heading-toolbar.js
+@@ -19,7 +19,7 @@ class HeadingToolbar extends Component {
+ 	createLevelControl( targetLevel, selectedLevel, onChange ) {
+ 		const isActive = targetLevel === selectedLevel;
+ 		return {
+-			icon: <HeadingLevelIcon level={ targetLevel } __unstableActive={ isActive } />,
++			icon: <HeadingLevelIcon level={ targetLevel } isPressed={ isActive } />,
+ 			// translators: %s: heading level e.g: "1", "2", "3"
+ 			title: sprintf( __( 'Heading %d' ), targetLevel ),
+ 			isActive,
+diff --git a/packages/block-library/src/html/edit.js b/packages/block-library/src/html/edit.js
+index 2e03b0a08886be..5f9d42c61baefa 100644
+--- a/packages/block-library/src/html/edit.js
++++ b/packages/block-library/src/html/edit.js
+@@ -64,13 +64,15 @@ class HTMLEdit extends Component {
+ 				<BlockControls>
+ 					<ToolbarGroup>
+ 						<Button
+-							className={ `components-tab-button ${ ! isPreview ? 'is-active' : '' }` }
++							className="components-tab-button"
++							isPressed={ ! isPreview }
+ 							onClick={ this.switchToHTML }
+ 						>
+ 							<span>HTML</span>
+ 						</Button>
+ 						<Button
+-							className={ `components-tab-button ${ isPreview ? 'is-active' : '' }` }
++							className="components-tab-button"
++							isPressed={ isPreview }
+ 							onClick={ this.switchToPreview }
+ 						>
+ 							<span>{ __( 'Preview' ) }</span>
+diff --git a/packages/block-library/src/image/edit.js b/packages/block-library/src/image/edit.js
+index 0214273dd1f2eb..651c348134af59 100644
+--- a/packages/block-library/src/image/edit.js
++++ b/packages/block-library/src/image/edit.js
+@@ -737,7 +737,7 @@ export class ImageEdit extends Component {
+ 													key={ scale }
+ 													isSmall
+ 													isPrimary={ isCurrent }
+-													aria-pressed={ isCurrent }
++													isPressed={ isCurrent }
+ 													onClick={ this.updateDimensions( scaledWidth, scaledHeight ) }
+ 												>
+ 													{ scale }%
+diff --git a/packages/block-library/src/legacy-widget/edit/index.js b/packages/block-library/src/legacy-widget/edit/index.js
+index caf47b96f595d9..fdcb51e092a993 100644
+--- a/packages/block-library/src/legacy-widget/edit/index.js
++++ b/packages/block-library/src/legacy-widget/edit/index.js
+@@ -99,13 +99,15 @@ class LegacyWidgetEdit extends Component {
+ 						{ hasEditForm && (
+ 							<>
+ 								<Button
+-									className={ `components-tab-button ${ ! isPreview ? 'is-active' : '' }` }
++									className="components-tab-button"
++									isPressed={ ! isPreview }
+ 									onClick={ this.switchToEdit }
+ 								>
+ 									<span>{ __( 'Edit' ) }</span>
+ 								</Button>
+ 								<Button
+-									className={ `components-tab-button ${ isPreview ? 'is-active' : '' }` }
++									className="components-tab-button"
++									isPressed={ isPreview }
+ 									onClick={ this.switchToPreview }
+ 								>
+ 									<span>{ __( 'Preview' ) }</span>
+diff --git a/packages/components/src/button/README.md b/packages/components/src/button/README.md
+index 722740d443af54..284f1fba6b0bd2 100644
+--- a/packages/components/src/button/README.md
++++ b/packages/components/src/button/README.md
+@@ -134,7 +134,7 @@ Name | Type | Default | Description
+ `isDestructive` | `bool` | `false` | Renders a red text-based button style to indicate destructive behavior.
+ `isLarge` | `bool` | `false` | Increases the size of the button.
+ `isSmall` | `bool` | `false` | Decreases the size of the button.
+-`isToggled` | `bool` | `false` | Renders a toggled button style.
++`isPressed` | `bool` | `false` | Renders a pressed button style.
+ `isBusy` | `bool` | `false` | Indicates activity while a action is being performed.
+ `isLink` | `bool` | `false` | Renders a button with an anchor style.
+ `focus` | `bool` | `false` | Whether the button is focused.
+diff --git a/packages/components/src/button/index.js b/packages/components/src/button/index.js
+index da3441e7f2982a..57de08de8bf79e 100644
+--- a/packages/components/src/button/index.js
++++ b/packages/components/src/button/index.js
+@@ -16,7 +16,7 @@ export function Button( props, ref ) {
+ 		isLarge,
+ 		isSmall,
+ 		isTertiary,
+-		isToggled,
++		isPressed,
+ 		isBusy,
+ 		isDefault,
+ 		isLink,
+@@ -33,14 +33,16 @@ export function Button( props, ref ) {
+ 		'is-large': isLarge,
+ 		'is-small': isSmall,
+ 		'is-tertiary': isTertiary,
+-		'is-toggled': isToggled,
++		'is-pressed': isPressed,
+ 		'is-busy': isBusy,
+ 		'is-link': isLink,
+ 		'is-destructive': isDestructive,
+ 	} );
+ 
+ 	const tag = href !== undefined && ! disabled ? 'a' : 'button';
+-	const tagProps = tag === 'a' ? { href, target } : { type: 'button', disabled };
++	const tagProps = tag === 'a' ?
++		{ href, target } :
++		{ type: 'button', disabled, 'aria-pressed': isPressed };
+ 
+ 	return createElement( tag, {
+ 		...tagProps,
+diff --git a/packages/components/src/button/index.native.js b/packages/components/src/button/index.native.js
+index e57cad3ec34d80..8d4ac26995c797 100644
+--- a/packages/components/src/button/index.native.js
++++ b/packages/components/src/button/index.native.js
+@@ -67,9 +67,9 @@ export function Button( props ) {
+ 		hint,
+ 		fixedRatio = true,
+ 		getStylesFromColorScheme,
++		isPressed,
+ 		'aria-disabled': ariaDisabled,
+ 		'aria-label': ariaLabel,
+-		'aria-pressed': ariaPressed,
+ 		'data-subscript': subscript,
+ 	} = props;
+ 
+@@ -78,11 +78,11 @@ export function Button( props ) {
+ 	const buttonViewStyle = {
+ 		opacity: isDisabled ? 0.3 : 1,
+ 		...( fixedRatio && styles.fixedRatio ),
+-		...( ariaPressed ? styles.buttonActive : styles.buttonInactive ),
++		...( isPressed ? styles.buttonActive : styles.buttonInactive ),
+ 	};
+ 
+ 	const states = [];
+-	if ( ariaPressed ) {
++	if ( isPressed ) {
+ 		states.push( 'selected' );
+ 	}
+ 
+@@ -93,7 +93,7 @@ export function Button( props ) {
+ 	const subscriptInactive = getStylesFromColorScheme( styles.subscriptInactive, styles.subscriptInactiveDark );
+ 
+ 	const newChildren = Children.map( children, ( child ) => {
+-		return child ? cloneElement( child, { colorScheme: props.preferredColorScheme, __unstableActive: ariaPressed } ) : child;
++		return child ? cloneElement( child, { colorScheme: props.preferredColorScheme, isPressed } ) : child;
+ 	} );
+ 
+ 	return (
+@@ -111,7 +111,7 @@ export function Button( props ) {
+ 			<View style={ buttonViewStyle }>
+ 				<View style={ { flexDirection: 'row' } }>
+ 					{ newChildren }
+-					{ subscript && ( <Text style={ ariaPressed ? styles.subscriptActive : subscriptInactive }>{ subscript }</Text> ) }
++					{ subscript && ( <Text style={ isPressed ? styles.subscriptActive : subscriptInactive }>{ subscript }</Text> ) }
+ 				</View>
+ 			</View>
+ 		</TouchableOpacity>
+diff --git a/packages/components/src/button/stories/index.js b/packages/components/src/button/stories/index.js
+index ee73df4a786e2d..5d60381ed1768f 100644
+--- a/packages/components/src/button/stories/index.js
++++ b/packages/components/src/button/stories/index.js
+@@ -50,11 +50,11 @@ export const small = () => {
+ 	);
+ };
+ 
+-export const toggled = () => {
+-	const label = text( 'Label', 'Toggled Button' );
++export const pressed = () => {
++	const label = text( 'Label', 'Pressed Button' );
+ 
+ 	return (
+-		<Button isToggled>{ label }</Button>
++		<Button isPressed>{ label }</Button>
+ 	);
+ };
+ 
+diff --git a/packages/components/src/button/test/index.js b/packages/components/src/button/test/index.js
+index 05e3580bfacbe6..27c5a24f490e87 100644
+--- a/packages/components/src/button/test/index.js
++++ b/packages/components/src/button/test/index.js
+@@ -21,7 +21,7 @@ describe( 'Button', () => {
+ 			expect( button.hasClass( 'components-button' ) ).toBe( true );
+ 			expect( button.hasClass( 'is-large' ) ).toBe( false );
+ 			expect( button.hasClass( 'is-primary' ) ).toBe( false );
+-			expect( button.hasClass( 'is-toggled' ) ).toBe( false );
++			expect( button.hasClass( 'is-pressed' ) ).toBe( false );
+ 			expect( button.prop( 'disabled' ) ).toBeUndefined();
+ 			expect( button.prop( 'type' ) ).toBe( 'button' );
+ 			expect( button.type() ).toBe( 'button' );
+@@ -56,10 +56,10 @@ describe( 'Button', () => {
+ 			expect( button.hasClass( 'is-primary' ) ).toBe( false );
+ 		} );
+ 
+-		it( 'should render a button element with is-toggled without button class', () => {
+-			const button = shallow( <Button isToggled /> );
++		it( 'should render a button element with is-pressed without button class', () => {
++			const button = shallow( <Button isPressed /> );
+ 			expect( button.hasClass( 'is-button' ) ).toBe( false );
+-			expect( button.hasClass( 'is-toggled' ) ).toBe( true );
++			expect( button.hasClass( 'is-pressed' ) ).toBe( true );
+ 		} );
+ 
+ 		it( 'should add a disabled prop to the button', () => {
+diff --git a/packages/components/src/circular-option-picker/index.js b/packages/components/src/circular-option-picker/index.js
+index 3f7bf209b6ac39..97e048b25ca7e6 100644
+--- a/packages/components/src/circular-option-picker/index.js
++++ b/packages/components/src/circular-option-picker/index.js
+@@ -19,11 +19,10 @@ function Option( {
+ } ) {
+ 	const optionButton = (
+ 		<Button
+-			aria-pressed={ isSelected }
++			isPressed={ isSelected }
+ 			className={ classnames(
+ 				className,
+ 				'components-circular-option-picker__option',
+-				{ 'is-active': isSelected }
+ 			) }
+ 			{ ...additionalProps }
+ 		/>
+diff --git a/packages/components/src/circular-option-picker/style.scss b/packages/components/src/circular-option-picker/style.scss
+index b567b376512371..deee7969feb612 100644
+--- a/packages/components/src/circular-option-picker/style.scss
++++ b/packages/components/src/circular-option-picker/style.scss
+@@ -66,17 +66,17 @@ $color-palette-circle-spacing: 12px;
+ 	@include reduce-motion("transition");
+ 	cursor: pointer;
+ 
+-	&.is-active {
++	&.is-pressed {
+ 		box-shadow: inset 0 0 0 4px;
+ 		position: relative;
+-		z-index: z-index(".components-circular-option-picker__option.is-active");
++		z-index: z-index(".components-circular-option-picker__option.is-pressed");
+ 
+ 		& + .dashicons-saved {
+ 			position: absolute;
+ 			left: 4px;
+ 			top: 4px;
+ 			border-radius: 50%;
+-			z-index: z-index(".components-circular-option-picker__option.is-active + .dashicons-saved");
++			z-index: z-index(".components-circular-option-picker__option.is-pressed + .dashicons-saved");
+ 			background: $white;
+ 			pointer-events: none;
+ 		}
+@@ -96,7 +96,6 @@ $color-palette-circle-spacing: 12px;
+ 	}
+ 
+ 	&:focus {
+-		outline: none;
+ 		&::after {
+ 			content: "";
+ 			border: #{ $border-width * 2 } solid $dark-gray-400;
+@@ -109,6 +108,12 @@ $color-palette-circle-spacing: 12px;
+ 			box-shadow: inset 0 0 0 2px $white;
+ 		}
+ 	}
++
++	&.components-button:focus {
++		background-color: transparent;
++		box-shadow: inset 0 0 0 ($color-palette-circle-size / 2);
++		outline: none;
++	}
+ }
+ 
+ .components-circular-option-picker__button-action .components-circular-option-picker__option {
+diff --git a/packages/components/src/color-palette/test/__snapshots__/index.js.snap b/packages/components/src/color-palette/test/__snapshots__/index.js.snap
+index ca1a02634de646..4f182217c8a13e 100644
+--- a/packages/components/src/color-palette/test/__snapshots__/index.js.snap
++++ b/packages/components/src/color-palette/test/__snapshots__/index.js.snap
+@@ -285,8 +285,8 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+           >
+             <ForwardRef(Button)
+               aria-label="Color: red"
+-              aria-pressed={true}
+-              className="components-circular-option-picker__option is-active"
++              className="components-circular-option-picker__option"
++              isPressed={true}
+               onBlur={[Function]}
+               onClick={[Function]}
+               onFocus={[Function]}
+@@ -302,7 +302,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+               <button
+                 aria-label="Color: red"
+                 aria-pressed={true}
+-                className="components-button components-circular-option-picker__option is-active"
++                className="components-button components-circular-option-picker__option is-pressed"
+                 onBlur={[Function]}
+                 onClick={[Function]}
+                 onFocus={[Function]}
+@@ -373,8 +373,8 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+           >
+             <ForwardRef(Button)
+               aria-label="Color: white"
+-              aria-pressed={false}
+               className="components-circular-option-picker__option"
++              isPressed={false}
+               onBlur={[Function]}
+               onClick={[Function]}
+               onFocus={[Function]}
+@@ -428,8 +428,8 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+           >
+             <ForwardRef(Button)
+               aria-label="Color: blue"
+-              aria-pressed={false}
+               className="components-circular-option-picker__option"
++              isPressed={false}
+               onBlur={[Function]}
+               onClick={[Function]}
+               onFocus={[Function]}
+diff --git a/packages/components/src/color-palette/test/index.js b/packages/components/src/color-palette/test/index.js
+index 241f048aae96d8..c4022ba48c4c7b 100644
+--- a/packages/components/src/color-palette/test/index.js
++++ b/packages/components/src/color-palette/test/index.js
+@@ -29,7 +29,7 @@ describe( 'ColorPalette', () => {
+ 	} );
+ 
+ 	test( 'should call onClick on an active button with undefined', () => {
+-		const activeButton = buttons.findWhere( ( button ) => button.hasClass( 'is-active' ) );
++		const activeButton = buttons.findWhere( ( button ) => button.hasClass( 'is-pressed' ) );
+ 		activeButton.simulate( 'click' );
+ 
+ 		expect( onChange ).toHaveBeenCalledTimes( 1 );
+@@ -37,7 +37,7 @@ describe( 'ColorPalette', () => {
+ 	} );
+ 
+ 	test( 'should call onClick on an inactive button', () => {
+-		const inactiveButton = buttons.findWhere( ( button ) => ! button.hasClass( 'is-active' ) ).first();
++		const inactiveButton = buttons.findWhere( ( button ) => ! button.hasClass( 'is-pressed' ) ).first();
+ 		inactiveButton.simulate( 'click' );
+ 
+ 		expect( onChange ).toHaveBeenCalledTimes( 1 );
+diff --git a/packages/components/src/date-time/style.scss b/packages/components/src/date-time/style.scss
+index 75100900d0ad03..d797a695f28e25 100644
+--- a/packages/components/src/date-time/style.scss
++++ b/packages/components/src/date-time/style.scss
+@@ -140,8 +140,8 @@
+ 			z-index: 1;
+ 		}
+ 
+-		.components-datetime__time-am-button.is-toggled,
+-		.components-datetime__time-pm-button.is-toggled {
++		.components-datetime__time-am-button.is-pressed,
++		.components-datetime__time-pm-button.is-pressed {
+ 			background: $light-gray-300;
+ 			border-color: $dark-gray-100;
+ 			box-shadow: inset 0 2px 5px -3px $dark-gray-500;
+diff --git a/packages/components/src/date-time/test/__snapshots__/time.js.snap b/packages/components/src/date-time/test/__snapshots__/time.js.snap
+index d67e11da54846e..b0e421cea3ff5f 100644
+--- a/packages/components/src/date-time/test/__snapshots__/time.js.snap
++++ b/packages/components/src/date-time/test/__snapshots__/time.js.snap
+@@ -321,19 +321,17 @@ exports[`TimePicker matches the snapshot when the is12hour prop is specified 1`]
+         className="components-datetime__time-field components-datetime__time-field-am-pm"
+       >
+         <ForwardRef(Button)
+-          aria-pressed={false}
+           className="components-datetime__time-am-button"
+           isDefault={true}
+-          isToggled={false}
++          isPressed={false}
+           onClick={[Function]}
+         >
+           AM
+         </ForwardRef(Button)>
+         <ForwardRef(Button)
+-          aria-pressed={true}
+           className="components-datetime__time-pm-button"
+           isDefault={true}
+-          isToggled={true}
++          isPressed={true}
+           onClick={[Function]}
+         >
+           PM
+@@ -504,19 +502,17 @@ exports[`TimePicker matches the snapshot when the is12hour prop is true 1`] = `
+         className="components-datetime__time-field components-datetime__time-field-am-pm"
+       >
+         <ForwardRef(Button)
+-          aria-pressed={false}
+           className="components-datetime__time-am-button"
+           isDefault={true}
+-          isToggled={false}
++          isPressed={false}
+           onClick={[Function]}
+         >
+           AM
+         </ForwardRef(Button)>
+         <ForwardRef(Button)
+-          aria-pressed={true}
+           className="components-datetime__time-pm-button"
+           isDefault={true}
+-          isToggled={true}
++          isPressed={true}
+           onClick={[Function]}
+         >
+           PM
+diff --git a/packages/components/src/date-time/time.js b/packages/components/src/date-time/time.js
+index 0cfc8c7dc8ea68..e2dc04386618e1 100644
+--- a/packages/components/src/date-time/time.js
++++ b/packages/components/src/date-time/time.js
+@@ -301,19 +301,17 @@ class TimePicker extends Component {
+ 						{ is12Hour && (
+ 							<div className="components-datetime__time-field components-datetime__time-field-am-pm">
+ 								<Button
+-									aria-pressed={ am === 'AM' }
+ 									isDefault
+ 									className="components-datetime__time-am-button"
+-									isToggled={ am === 'AM' }
++									isPressed={ am === 'AM' }
+ 									onClick={ this.updateAmPm( 'AM' ) }
+ 								>
+ 									{ __( 'AM' ) }
+ 								</Button>
+ 								<Button
+-									aria-pressed={ am === 'PM' }
+ 									isDefault
+ 									className="components-datetime__time-pm-button"
+-									isToggled={ am === 'PM' }
++									isPressed={ am === 'PM' }
+ 									onClick={ this.updateAmPm( 'PM' ) }
+ 								>
+ 									{ __( 'PM' ) }
+diff --git a/packages/components/src/primitives/svg/index.js b/packages/components/src/primitives/svg/index.js
+index 6aabda291fd88e..efebe49b2896b0 100644
+--- a/packages/components/src/primitives/svg/index.js
++++ b/packages/components/src/primitives/svg/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { omit } from 'lodash';
++import classnames from 'classnames';
+ 
+ /**
+  * WordPress dependencies
+@@ -14,9 +14,10 @@ export const Path = ( props ) => createElement( 'path', props );
+ export const Polygon = ( props ) => createElement( 'polygon', props );
+ export const Rect = ( props ) => createElement( 'rect', props );
+ 
+-export const SVG = ( props ) => {
++export const SVG = ( { className, isPressed, ...props } ) => {
+ 	const appliedProps = {
+ 		...props,
++		className: classnames( className, { 'is-pressed': isPressed } ) || undefined,
+ 		role: 'img',
+ 		'aria-hidden': 'true',
+ 		focusable: 'false',
+@@ -24,5 +25,5 @@ export const SVG = ( props ) => {
+ 
+ 	// Disable reason: We need to have a way to render HTML tag for web.
+ 	// eslint-disable-next-line react/forbid-elements
+-	return <svg { ...omit( appliedProps, '__unstableActive' ) } />;
++	return <svg { ...appliedProps } />;
+ };
+diff --git a/packages/components/src/primitives/svg/index.native.js b/packages/components/src/primitives/svg/index.native.js
+index 8cf9a2d7cee274..aa619dc61e4913 100644
+--- a/packages/components/src/primitives/svg/index.native.js
++++ b/packages/components/src/primitives/svg/index.native.js
+@@ -16,21 +16,21 @@ export {
+ 	Rect,
+ } from 'react-native-svg';
+ 
+-export const SVG = ( props ) => {
++export const SVG = ( { className = '', isPressed, ...props } ) => {
+ 	const colorScheme = props.colorScheme || 'light';
+-	const stylesFromClasses = ( props.className || '' ).split( ' ' ).map( ( element ) => styles[ element ] ).filter( Boolean );
+-	const defaultStyle = props.__unstableActive ? styles[ 'is-active' ] : styles[ 'components-toolbar__control-' + colorScheme ];
++	const stylesFromClasses = className.split( ' ' ).map( ( element ) => styles[ element ] ).filter( Boolean );
++	const defaultStyle = isPressed ? styles[ 'is-pressed' ] : styles[ 'components-toolbar__control-' + colorScheme ];
+ 	const styleValues = Object.assign( {}, props.style, defaultStyle, ...stylesFromClasses );
+ 
+-	const safeProps = { ...props, style: styleValues };
++	const appliedProps = { ...props, style: styleValues };
+ 
+ 	return (
+ 		<Svg
+ 			//We want to re-render when style color is changed
+-			key={ safeProps.style.color }
++			key={ appliedProps.style.color }
+ 			height="100%"
+ 			width="100%"
+-			{ ...safeProps }
++			{ ...appliedProps }
+ 		/>
+ 	);
+ };
+diff --git a/packages/components/src/primitives/svg/style.native.scss b/packages/components/src/primitives/svg/style.native.scss
+index b5216fa98040ce..674c01c3bea4c5 100644
+--- a/packages/components/src/primitives/svg/style.native.scss
++++ b/packages/components/src/primitives/svg/style.native.scss
+@@ -11,7 +11,7 @@
+ }
+ 
+ .dashicon-active,
+-.is-active {
++.is-pressed {
+ 	color: #fff;
+ 	fill: currentColor;
+ }
+diff --git a/packages/components/src/toolbar-button/index.js b/packages/components/src/toolbar-button/index.js
+index 0dd438b47260eb..2fb46662797ba5 100644
+--- a/packages/components/src/toolbar-button/index.js
++++ b/packages/components/src/toolbar-button/index.js
+@@ -48,9 +48,8 @@ function ToolbarButton( {
+ 			className={ classnames(
+ 				'components-toolbar__control',
+ 				className,
+-				{ 'is-active': isActive }
+ 			) }
+-			aria-pressed={ isActive }
++			isPressed={ isActive }
+ 			disabled={ isDisabled }
+ 			{ ...extraProps }
+ 		/>
+diff --git a/packages/components/src/toolbar-button/style.scss b/packages/components/src/toolbar-button/style.scss
+index bc14ce90e029e6..f73782b4bab4f3 100644
+--- a/packages/components/src/toolbar-button/style.scss
++++ b/packages/components/src/toolbar-button/style.scss
+@@ -18,16 +18,16 @@
+ 		bottom: 10px;
+ 	}
+ 
+-	&:not(:disabled).is-active[data-subscript]::after {
++	&:not(:disabled).is-pressed[data-subscript]::after {
+ 		color: $white;
+ 	}
+ 
+-	&.is-active {
++	&.is-pressed {
+ 		padding: 3px;
+ 		outline: none;
+ 	}
+ 
+-	&.is-active > svg {
++	&.is-pressed > svg {
+ 		padding: 5px;
+ 		border-radius: $radius-round-rectangle;
+ 		height: 30px;
+@@ -36,4 +36,3 @@
+ 		@include formatting-button-style__active;
+ 	}
+ }
+-
+diff --git a/packages/components/src/toolbar/style.scss b/packages/components/src/toolbar/style.scss
+index 2dc89b9b4e5f8f..29def9674f4854 100644
+--- a/packages/components/src/toolbar/style.scss
++++ b/packages/components/src/toolbar/style.scss
+@@ -9,3 +9,47 @@
+ 
+ 	flex-shrink: 0;
+ }
++
++// We should extract this to a separate component.
++.components-tab-button {
++	padding: 3px;
++	color: $dark-gray-500;
++	height: $icon-button-size;
++	font-weight: 500;
++
++	&.is-pressed,
++	&.is-pressed:hover {
++		color: $white;
++	}
++
++	&:disabled {
++		cursor: default;
++	}
++
++	& > span {
++		border: $border-width solid transparent;
++		padding: 0 6px;
++		box-sizing: content-box;
++		height: 28px;
++		line-height: 28px;
++	}
++
++	&:hover > span,
++	&:focus > span {
++		color: $dark-gray-500;
++	}
++
++	&:not(:disabled) {
++		&.is-pressed > span,
++		&:hover > span,
++		&:focus > span {
++			border: $border-width solid $dark-gray-500;
++		}
++	}
++
++	&.is-pressed > span,
++	&.is-pressed:hover > span {
++		background-color: $dark-gray-500;
++		color: $white;
++	}
++}
+diff --git a/packages/e2e-tests/specs/editor/plugins/__snapshots__/plugins-api.test.js.snap b/packages/e2e-tests/specs/editor/plugins/__snapshots__/plugins-api.test.js.snap
+index c2baa4270d086f..beb4e9b8a206e5 100644
+--- a/packages/e2e-tests/specs/editor/plugins/__snapshots__/plugins-api.test.js.snap
++++ b/packages/e2e-tests/specs/editor/plugins/__snapshots__/plugins-api.test.js.snap
+@@ -2,6 +2,6 @@
+ 
+ exports[`Using Plugins API Document Setting Custom Panel Should render a custom panel inside Document Setting sidebar 1`] = `"My Custom Panel"`;
+ 
+-exports[`Using Plugins API Sidebar Medium screen Should open plugins sidebar using More Menu item and render content 1`] = `"<div class=\\"components-panel__header edit-post-sidebar-header__small\\"><span class=\\"edit-post-sidebar-header__title\\">(no title)</span><button type=\\"button\\" aria-label=\\"Close plugin\\" class=\\"components-button components-icon-button\\"><svg aria-hidden=\\"true\\" role=\\"img\\" focusable=\\"false\\" class=\\"dashicon dashicons-no-alt\\" xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"20\\" height=\\"20\\" viewBox=\\"0 0 20 20\\"><path d=\\"M14.95 6.46L11.41 10l3.54 3.54-1.41 1.41L10 11.42l-3.53 3.53-1.42-1.42L8.58 10 5.05 6.47l1.42-1.42L10 8.58l3.54-3.53z\\"></path></svg></button></div><div class=\\"components-panel__header edit-post-sidebar-header\\"><strong>Sidebar title plugin</strong><button type=\\"button\\" aria-label=\\"Unpin from toolbar\\" aria-expanded=\\"true\\" class=\\"components-button components-icon-button is-toggled\\"><svg aria-hidden=\\"true\\" role=\\"img\\" focusable=\\"false\\" class=\\"dashicon dashicons-star-filled\\" xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"20\\" height=\\"20\\" viewBox=\\"0 0 20 20\\"><path d=\\"M10 1l3 6 6 .75-4.12 4.62L16 19l-6-3-6 3 1.13-6.63L1 7.75 7 7z\\"></path></svg></button><button type=\\"button\\" aria-label=\\"Close plugin\\" class=\\"components-button components-icon-button\\"><svg aria-hidden=\\"true\\" role=\\"img\\" focusable=\\"false\\" class=\\"dashicon dashicons-no-alt\\" xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"20\\" height=\\"20\\" viewBox=\\"0 0 20 20\\"><path d=\\"M14.95 6.46L11.41 10l3.54 3.54-1.41 1.41L10 11.42l-3.53 3.53-1.42-1.42L8.58 10 5.05 6.47l1.42-1.42L10 8.58l3.54-3.53z\\"></path></svg></button></div><div class=\\"components-panel\\"><div class=\\"components-panel__body is-opened\\"><div class=\\"components-panel__row\\"><label for=\\"title-plain-text\\">Title:</label><textarea class=\\"editor-plain-text block-editor-plain-text\\" id=\\"title-plain-text\\" placeholder=\\"(no title)\\" rows=\\"1\\" style=\\"overflow: hidden; overflow-wrap: break-word; resize: none; height: 18px;\\"></textarea></div><div class=\\"components-panel__row\\"><button type=\\"button\\" class=\\"components-button is-button is-primary\\">Reset</button></div></div></div>"`;
++exports[`Using Plugins API Sidebar Medium screen Should open plugins sidebar using More Menu item and render content 1`] = `"<div class=\\"components-panel__header edit-post-sidebar-header__small\\"><span class=\\"edit-post-sidebar-header__title\\">(no title)</span><button type=\\"button\\" aria-label=\\"Close plugin\\" class=\\"components-button components-icon-button\\"><svg aria-hidden=\\"true\\" role=\\"img\\" focusable=\\"false\\" xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"20\\" height=\\"20\\" viewBox=\\"0 0 20 20\\" class=\\"dashicon dashicons-no-alt\\"><path d=\\"M14.95 6.46L11.41 10l3.54 3.54-1.41 1.41L10 11.42l-3.53 3.53-1.42-1.42L8.58 10 5.05 6.47l1.42-1.42L10 8.58l3.54-3.53z\\"></path></svg></button></div><div class=\\"components-panel__header edit-post-sidebar-header\\"><strong>Sidebar title plugin</strong><button type=\\"button\\" aria-pressed=\\"true\\" aria-label=\\"Unpin from toolbar\\" aria-expanded=\\"true\\" class=\\"components-button components-icon-button is-pressed\\"><svg aria-hidden=\\"true\\" role=\\"img\\" focusable=\\"false\\" xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"20\\" height=\\"20\\" viewBox=\\"0 0 20 20\\" class=\\"dashicon dashicons-star-filled\\"><path d=\\"M10 1l3 6 6 .75-4.12 4.62L16 19l-6-3-6 3 1.13-6.63L1 7.75 7 7z\\"></path></svg></button><button type=\\"button\\" aria-label=\\"Close plugin\\" class=\\"components-button components-icon-button\\"><svg aria-hidden=\\"true\\" role=\\"img\\" focusable=\\"false\\" xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"20\\" height=\\"20\\" viewBox=\\"0 0 20 20\\" class=\\"dashicon dashicons-no-alt\\"><path d=\\"M14.95 6.46L11.41 10l3.54 3.54-1.41 1.41L10 11.42l-3.53 3.53-1.42-1.42L8.58 10 5.05 6.47l1.42-1.42L10 8.58l3.54-3.53z\\"></path></svg></button></div><div class=\\"components-panel\\"><div class=\\"components-panel__body is-opened\\"><div class=\\"components-panel__row\\"><label for=\\"title-plain-text\\">Title:</label><textarea class=\\"editor-plain-text block-editor-plain-text\\" id=\\"title-plain-text\\" placeholder=\\"(no title)\\" rows=\\"1\\" style=\\"overflow: hidden; overflow-wrap: break-word; resize: none; height: 18px;\\"></textarea></div><div class=\\"components-panel__row\\"><button type=\\"button\\" class=\\"components-button is-button is-primary\\">Reset</button></div></div></div>"`;
+ 
+-exports[`Using Plugins API Sidebar Should open plugins sidebar using More Menu item and render content 1`] = `"<div class=\\"components-panel__header edit-post-sidebar-header__small\\"><span class=\\"edit-post-sidebar-header__title\\">(no title)</span><button type=\\"button\\" aria-label=\\"Close plugin\\" class=\\"components-button components-icon-button\\"><svg aria-hidden=\\"true\\" role=\\"img\\" focusable=\\"false\\" class=\\"dashicon dashicons-no-alt\\" xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"20\\" height=\\"20\\" viewBox=\\"0 0 20 20\\"><path d=\\"M14.95 6.46L11.41 10l3.54 3.54-1.41 1.41L10 11.42l-3.53 3.53-1.42-1.42L8.58 10 5.05 6.47l1.42-1.42L10 8.58l3.54-3.53z\\"></path></svg></button></div><div class=\\"components-panel__header edit-post-sidebar-header\\"><strong>Sidebar title plugin</strong><button type=\\"button\\" aria-label=\\"Unpin from toolbar\\" aria-expanded=\\"true\\" class=\\"components-button components-icon-button is-toggled\\"><svg aria-hidden=\\"true\\" role=\\"img\\" focusable=\\"false\\" class=\\"dashicon dashicons-star-filled\\" xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"20\\" height=\\"20\\" viewBox=\\"0 0 20 20\\"><path d=\\"M10 1l3 6 6 .75-4.12 4.62L16 19l-6-3-6 3 1.13-6.63L1 7.75 7 7z\\"></path></svg></button><button type=\\"button\\" aria-label=\\"Close plugin\\" class=\\"components-button components-icon-button\\"><svg aria-hidden=\\"true\\" role=\\"img\\" focusable=\\"false\\" class=\\"dashicon dashicons-no-alt\\" xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"20\\" height=\\"20\\" viewBox=\\"0 0 20 20\\"><path d=\\"M14.95 6.46L11.41 10l3.54 3.54-1.41 1.41L10 11.42l-3.53 3.53-1.42-1.42L8.58 10 5.05 6.47l1.42-1.42L10 8.58l3.54-3.53z\\"></path></svg></button></div><div class=\\"components-panel\\"><div class=\\"components-panel__body is-opened\\"><div class=\\"components-panel__row\\"><label for=\\"title-plain-text\\">Title:</label><textarea class=\\"editor-plain-text block-editor-plain-text\\" id=\\"title-plain-text\\" placeholder=\\"(no title)\\" rows=\\"1\\" style=\\"overflow: hidden; overflow-wrap: break-word; resize: none; height: 18px;\\"></textarea></div><div class=\\"components-panel__row\\"><button type=\\"button\\" class=\\"components-button is-button is-primary\\">Reset</button></div></div></div>"`;
++exports[`Using Plugins API Sidebar Should open plugins sidebar using More Menu item and render content 1`] = `"<div class=\\"components-panel__header edit-post-sidebar-header__small\\"><span class=\\"edit-post-sidebar-header__title\\">(no title)</span><button type=\\"button\\" aria-label=\\"Close plugin\\" class=\\"components-button components-icon-button\\"><svg aria-hidden=\\"true\\" role=\\"img\\" focusable=\\"false\\" xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"20\\" height=\\"20\\" viewBox=\\"0 0 20 20\\" class=\\"dashicon dashicons-no-alt\\"><path d=\\"M14.95 6.46L11.41 10l3.54 3.54-1.41 1.41L10 11.42l-3.53 3.53-1.42-1.42L8.58 10 5.05 6.47l1.42-1.42L10 8.58l3.54-3.53z\\"></path></svg></button></div><div class=\\"components-panel__header edit-post-sidebar-header\\"><strong>Sidebar title plugin</strong><button type=\\"button\\" aria-pressed=\\"true\\" aria-label=\\"Unpin from toolbar\\" aria-expanded=\\"true\\" class=\\"components-button components-icon-button is-pressed\\"><svg aria-hidden=\\"true\\" role=\\"img\\" focusable=\\"false\\" xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"20\\" height=\\"20\\" viewBox=\\"0 0 20 20\\" class=\\"dashicon dashicons-star-filled\\"><path d=\\"M10 1l3 6 6 .75-4.12 4.62L16 19l-6-3-6 3 1.13-6.63L1 7.75 7 7z\\"></path></svg></button><button type=\\"button\\" aria-label=\\"Close plugin\\" class=\\"components-button components-icon-button\\"><svg aria-hidden=\\"true\\" role=\\"img\\" focusable=\\"false\\" xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"20\\" height=\\"20\\" viewBox=\\"0 0 20 20\\" class=\\"dashicon dashicons-no-alt\\"><path d=\\"M14.95 6.46L11.41 10l3.54 3.54-1.41 1.41L10 11.42l-3.53 3.53-1.42-1.42L8.58 10 5.05 6.47l1.42-1.42L10 8.58l3.54-3.53z\\"></path></svg></button></div><div class=\\"components-panel\\"><div class=\\"components-panel__body is-opened\\"><div class=\\"components-panel__row\\"><label for=\\"title-plain-text\\">Title:</label><textarea class=\\"editor-plain-text block-editor-plain-text\\" id=\\"title-plain-text\\" placeholder=\\"(no title)\\" rows=\\"1\\" style=\\"overflow: hidden; overflow-wrap: break-word; resize: none; height: 18px;\\"></textarea></div><div class=\\"components-panel__row\\"><button type=\\"button\\" class=\\"components-button is-button is-primary\\">Reset</button></div></div></div>"`;
+diff --git a/packages/edit-post/src/components/header/index.js b/packages/edit-post/src/components/header/index.js
+index 52d9245be0a157..26dd1812d6b5ea 100644
+--- a/packages/edit-post/src/components/header/index.js
++++ b/packages/edit-post/src/components/header/index.js
+@@ -60,7 +60,7 @@ function Header( {
+ 					icon="admin-generic"
+ 					label={ __( 'Settings' ) }
+ 					onClick={ toggleGeneralSidebar }
+-					isToggled={ isEditorSidebarOpened }
++					isPressed={ isEditorSidebarOpened }
+ 					aria-expanded={ isEditorSidebarOpened }
+ 					shortcut={ shortcuts.toggleSidebar }
+ 				/>
+diff --git a/packages/edit-post/src/components/header/pinned-plugins/style.scss b/packages/edit-post/src/components/header/pinned-plugins/style.scss
+index ea87a514227eaa..bd5268c0ea77c2 100644
+--- a/packages/edit-post/src/components/header/pinned-plugins/style.scss
++++ b/packages/edit-post/src/components/header/pinned-plugins/style.scss
+@@ -8,7 +8,7 @@
+ 	.components-icon-button {
+ 		margin-left: 4px;
+ 
+-		&.is-toggled {
++		&.is-pressed {
+ 			margin-left: 5px;
+ 		}
+ 
+@@ -19,18 +19,18 @@
+ 	}
+ 
+ 	// Colorize plugin icons to ensure contrast and cohesion, but allow plugin developers to override.
+-	.components-icon-button:not(.is-toggled) svg,
+-	.components-icon-button:not(.is-toggled) svg * {
++	.components-icon-button:not(.is-pressed) svg,
++	.components-icon-button:not(.is-pressed) svg * {
+ 		stroke: $dark-gray-500;
+ 		fill: $dark-gray-500;
+ 		stroke-width: 0; // !important is omitted here, so stroke-only icons can override easily.
+ 	}
+ 
+ 	// Forcefully colorize hover and toggled plugin icon states to ensure legibility and consistency.
+-	.components-icon-button.is-toggled svg,
+-	.components-icon-button.is-toggled svg *,
+-	.components-icon-button.is-toggled:hover svg,
+-	.components-icon-button.is-toggled:hover svg * {
++	.components-icon-button.is-pressed svg,
++	.components-icon-button.is-pressed svg *,
++	.components-icon-button.is-pressed:hover svg,
++	.components-icon-button.is-pressed:hover svg * {
+ 		stroke: $white !important;
+ 		fill: $white !important;
+ 		stroke-width: 0; // !important is omitted here, so stroke-only icons can override easily.
+diff --git a/packages/edit-post/src/components/header/style.scss b/packages/edit-post/src/components/header/style.scss
+index 1abac2f94eeabb..45e5eb1893b5b3 100644
+--- a/packages/edit-post/src/components/header/style.scss
++++ b/packages/edit-post/src/components/header/style.scss
+@@ -49,16 +49,14 @@
+ 
+ .edit-post-header .components-button {
+ 	// Header toggle buttons.
+-	&.is-toggled {
++	&.is-pressed {
+ 		color: $white;
+ 		background: $dark-gray-500;
+-		margin: 1px;
+-		padding: 7px;
+ 	}
+ 
+ 	// The !important in this ruleset need to override the pile of :not() selectors used in the icon-button.
+-	&.is-toggled:hover,
+-	&.is-toggled:focus {
++	&.is-pressed:hover,
++	&.is-pressed:focus {
+ 		box-shadow: 0 0 0 $border-width $dark-gray-500, inset 0 0 0 $border-width $white !important;
+ 		color: $white !important;
+ 		background: $dark-gray-500 !important;
+diff --git a/packages/edit-post/src/components/sidebar/plugin-post-publish-panel/test/__snapshots__/index.js.snap b/packages/edit-post/src/components/sidebar/plugin-post-publish-panel/test/__snapshots__/index.js.snap
+index 79459ca118d2f6..c4c84425a8ba53 100644
+--- a/packages/edit-post/src/components/sidebar/plugin-post-publish-panel/test/__snapshots__/index.js.snap
++++ b/packages/edit-post/src/components/sidebar/plugin-post-publish-panel/test/__snapshots__/index.js.snap
+@@ -1,3 +1,3 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`PluginPostPublishPanel renders fill properly 1`] = `"<div class=\\"components-panel__body my-plugin-post-publish-panel is-opened\\"><h2 class=\\"components-panel__body-title\\"><button type=\\"button\\" aria-expanded=\\"true\\" class=\\"components-button components-panel__body-toggle\\"><span aria-hidden=\\"true\\"><svg class=\\"components-panel__arrow\\" width=\\"24px\\" height=\\"24px\\" viewBox=\\"0 0 24 24\\" xmlns=\\"http://www.w3.org/2000/svg\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><g><path fill=\\"none\\" d=\\"M0,0h24v24H0V0z\\"></path></g><g><path d=\\"M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z\\"></path></g></svg></span>My panel title</button></h2>My panel content</div>"`;
++exports[`PluginPostPublishPanel renders fill properly 1`] = `"<div class=\\"components-panel__body my-plugin-post-publish-panel is-opened\\"><h2 class=\\"components-panel__body-title\\"><button type=\\"button\\" aria-expanded=\\"true\\" class=\\"components-button components-panel__body-toggle\\"><span aria-hidden=\\"true\\"><svg width=\\"24px\\" height=\\"24px\\" viewBox=\\"0 0 24 24\\" xmlns=\\"http://www.w3.org/2000/svg\\" class=\\"components-panel__arrow\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><g><path fill=\\"none\\" d=\\"M0,0h24v24H0V0z\\"></path></g><g><path d=\\"M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z\\"></path></g></svg></span>My panel title</button></h2>My panel content</div>"`;
+diff --git a/packages/edit-post/src/components/sidebar/plugin-pre-publish-panel/test/__snapshots__/index.js.snap b/packages/edit-post/src/components/sidebar/plugin-pre-publish-panel/test/__snapshots__/index.js.snap
+index df197d90cc84c8..9b509415dd4cd8 100644
+--- a/packages/edit-post/src/components/sidebar/plugin-pre-publish-panel/test/__snapshots__/index.js.snap
++++ b/packages/edit-post/src/components/sidebar/plugin-pre-publish-panel/test/__snapshots__/index.js.snap
+@@ -1,3 +1,3 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`PluginPrePublishPanel renders fill properly 1`] = `"<div class=\\"components-panel__body my-plugin-pre-publish-panel is-opened\\"><h2 class=\\"components-panel__body-title\\"><button type=\\"button\\" aria-expanded=\\"true\\" class=\\"components-button components-panel__body-toggle\\"><span aria-hidden=\\"true\\"><svg class=\\"components-panel__arrow\\" width=\\"24px\\" height=\\"24px\\" viewBox=\\"0 0 24 24\\" xmlns=\\"http://www.w3.org/2000/svg\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><g><path fill=\\"none\\" d=\\"M0,0h24v24H0V0z\\"></path></g><g><path d=\\"M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z\\"></path></g></svg></span>My panel title</button></h2>My panel content</div>"`;
++exports[`PluginPrePublishPanel renders fill properly 1`] = `"<div class=\\"components-panel__body my-plugin-pre-publish-panel is-opened\\"><h2 class=\\"components-panel__body-title\\"><button type=\\"button\\" aria-expanded=\\"true\\" class=\\"components-button components-panel__body-toggle\\"><span aria-hidden=\\"true\\"><svg width=\\"24px\\" height=\\"24px\\" viewBox=\\"0 0 24 24\\" xmlns=\\"http://www.w3.org/2000/svg\\" class=\\"components-panel__arrow\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><g><path fill=\\"none\\" d=\\"M0,0h24v24H0V0z\\"></path></g><g><path d=\\"M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z\\"></path></g></svg></span>My panel title</button></h2>My panel content</div>"`;
+diff --git a/packages/edit-post/src/components/sidebar/plugin-sidebar/index.js b/packages/edit-post/src/components/sidebar/plugin-sidebar/index.js
+index a112ea053b2df4..94754a4dc05405 100644
+--- a/packages/edit-post/src/components/sidebar/plugin-sidebar/index.js
++++ b/packages/edit-post/src/components/sidebar/plugin-sidebar/index.js
+@@ -36,7 +36,7 @@ function PluginSidebar( props ) {
+ 						icon={ icon }
+ 						label={ title }
+ 						onClick={ toggleSidebar }
+-						isToggled={ isActive }
++						isPressed={ isActive }
+ 						aria-expanded={ isActive }
+ 					/> }
+ 				</PinnedPlugins>
+@@ -51,7 +51,7 @@ function PluginSidebar( props ) {
+ 							icon={ isPinned ? 'star-filled' : 'star-empty' }
+ 							label={ isPinned ? __( 'Unpin from toolbar' ) : __( 'Pin to toolbar' ) }
+ 							onClick={ togglePin }
+-							isToggled={ isPinned }
++							isPressed={ isPinned }
+ 							aria-expanded={ isPinned }
+ 						/>
+ 					) }
+diff --git a/storybook/test/__snapshots__/index.js.snap b/storybook/test/__snapshots__/index.js.snap
+index 9d724a9324cb3e..707b97a8e35f95 100644
+--- a/storybook/test/__snapshots__/index.js.snap
++++ b/storybook/test/__snapshots__/index.js.snap
+@@ -336,30 +336,31 @@ exports[`Storyshots Components|Button Link 1`] = `
+ </a>
+ `;
+ 
+-exports[`Storyshots Components|Button Primary 1`] = `
++exports[`Storyshots Components|Button Pressed 1`] = `
+ <button
+-  className="components-button is-button is-primary"
++  aria-pressed={true}
++  className="components-button is-pressed"
+   type="button"
+ >
+-  Primary Button
++  Pressed Button
+ </button>
+ `;
+ 
+-exports[`Storyshots Components|Button Small 1`] = `
++exports[`Storyshots Components|Button Primary 1`] = `
+ <button
+-  className="components-button is-button is-default is-small"
++  className="components-button is-button is-primary"
+   type="button"
+ >
+-  Small Button
++  Primary Button
+ </button>
+ `;
+ 
+-exports[`Storyshots Components|Button Toggled 1`] = `
++exports[`Storyshots Components|Button Small 1`] = `
+ <button
+-  className="components-button is-toggled"
++  className="components-button is-button is-default is-small"
+   type="button"
+ >
+-  Toggled Button
++  Small Button
+ </button>
+ `;
+ 
+@@ -3727,7 +3728,7 @@ exports[`Storyshots Components|ToolbarGroup Default 1`] = `
+     <button
+       aria-label="Bold"
+       aria-pressed={true}
+-      className="components-button components-icon-button components-toolbar__control is-active"
++      className="components-button components-icon-button components-toolbar__control is-pressed"
+       onBlur={[Function]}
+       onClick={[Function]}
+       onFocus={[Function]}
+@@ -3821,7 +3822,7 @@ exports[`Storyshots Components|ToolbarGroup With Controls Prop 1`] = `
+     <button
+       aria-label="Bold"
+       aria-pressed={true}
+-      className="components-button components-icon-button components-toolbar__control is-active"
++      className="components-button components-icon-button components-toolbar__control is-pressed"
+       onBlur={[Function]}
+       onClick={[Function]}
+       onFocus={[Function]}

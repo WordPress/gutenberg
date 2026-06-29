@@ -1,0 +1,12 @@
+diff --git a/packages/block-editor/src/components/spacing-sizes-control/style.scss b/packages/block-editor/src/components/spacing-sizes-control/style.scss
+index cbcc8e30c58253..a387e5369d01ed 100644
+--- a/packages/block-editor/src/components/spacing-sizes-control/style.scss
++++ b/packages/block-editor/src/components/spacing-sizes-control/style.scss
+@@ -19,6 +19,7 @@
+ 	.spacing-sizes-control__range-control,
+ 	.spacing-sizes-control__custom-value-range {
+ 		flex: 1;
++		margin-bottom: 0; // Needed for some instances of the range control, such as the Spacer block.
+ 	}
+ 
+ 	.components-range-control__mark {

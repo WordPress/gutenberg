@@ -1,0 +1,326 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8e889473afb7de..bd3f519fb44d20 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ ### Internal
+ 
+ -   `NavigationMenu` updated to ignore `react/exhaustive-deps` eslint rule ([#44090](https://github.com/WordPress/gutenberg/pull/44090)).
++-   `Mobile` updated to ignore `react/exhaustive-deps` eslint rule ([#44207](https://github.com/WordPress/gutenberg/pull/44207)).
+ -   `RangeControl`: updated to pass `react/exhaustive-deps` eslint rule ([#44271](https://github.com/WordPress/gutenberg/pull/44271)).
+ -   `UnitControl` updated to pass the `react/exhaustive-deps` eslint rule ([#44161](https://github.com/WordPress/gutenberg/pull/44161)).
+ -   `Notice`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44157](https://github.com/WordPress/gutenberg/pull/44157))
+diff --git a/packages/components/src/mobile/bottom-sheet/bottom-sheet-navigation/navigation-container.native.js b/packages/components/src/mobile/bottom-sheet/bottom-sheet-navigation/navigation-container.native.js
+index ac1814e3a83f8e..69534681dfa051 100644
+--- a/packages/components/src/mobile/bottom-sheet/bottom-sheet-navigation/navigation-container.native.js
++++ b/packages/components/src/mobile/bottom-sheet/bottom-sheet-navigation/navigation-container.native.js
+@@ -112,6 +112,9 @@ function BottomSheetNavigationContainer( {
+ 				}
+ 			}
+ 		},
++		// Disable reason: deferring this refactor to the native team.
++		// see https://github.com/WordPress/gutenberg/pull/41166
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 		[ currentHeight ]
+ 	);
+ 
+@@ -133,6 +136,9 @@ function BottomSheetNavigationContainer( {
+ 				/>
+ 			);
+ 		} );
++		// Disable reason: deferring this refactor to the native team.
++		// see https://github.com/WordPress/gutenberg/pull/41166
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ children ] );
+ 
+ 	return useMemo( () => {
+@@ -158,6 +164,9 @@ function BottomSheetNavigationContainer( {
+ 				</BottomSheetNavigationProvider>
+ 			</View>
+ 		);
++		// Disable reason: deferring this refactor to the native team.
++		// see https://github.com/WordPress/gutenberg/pull/41166
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ currentHeight, _theme ] );
+ }
+ 
+diff --git a/packages/components/src/mobile/bottom-sheet/bottom-sheet-navigation/navigation-screen.native.js b/packages/components/src/mobile/bottom-sheet/bottom-sheet-navigation/navigation-screen.native.js
+index 1df6a50f036fc0..059adb42c7089a 100644
+--- a/packages/components/src/mobile/bottom-sheet/bottom-sheet-navigation/navigation-screen.native.js
++++ b/packages/components/src/mobile/bottom-sheet/bottom-sheet-navigation/navigation-screen.native.js
+@@ -41,6 +41,9 @@ const BottomSheetNavigationScreen = ( {
+ 
+ 	const { setHeight } = useContext( BottomSheetNavigationContext );
+ 
++	// Disable reason: deferring this refactor to the native team.
++	// see https://github.com/WordPress/gutenberg/pull/41166
++	// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	const setHeightDebounce = useCallback( debounce( setHeight, 10 ), [
+ 		setHeight,
+ 	] );
+@@ -70,6 +73,8 @@ const BottomSheetNavigationScreen = ( {
+ 			 *
+ 			 * Related: https://github.com/WordPress/gutenberg/pull/36328#discussion_r768897546
+ 			 */
++			// see https://github.com/WordPress/gutenberg/pull/41166
++			// eslint-disable-next-line react-hooks/exhaustive-deps
+ 		}, [] )
+ 	);
+ 
+@@ -83,6 +88,9 @@ const BottomSheetNavigationScreen = ( {
+ 				setHeight( heightRef.current.maxHeight );
+ 			}
+ 			return () => {};
++			// Disable reason: deferring this refactor to the native team.
++			// see https://github.com/WordPress/gutenberg/pull/41166
++			// eslint-disable-next-line react-hooks/exhaustive-deps
+ 		}, [ setHeight ] )
+ 	);
+ 
+@@ -127,6 +135,9 @@ const BottomSheetNavigationScreen = ( {
+ 				</TouchableHighlight>
+ 			</ScrollView>
+ 		);
++		// Disable reason: deferring this refactor to the native team.
++		// see https://github.com/WordPress/gutenberg/pull/41166
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [
+ 		children,
+ 		isFocused,
+diff --git a/packages/components/src/mobile/bottom-sheet/sub-sheet/index.native.js b/packages/components/src/mobile/bottom-sheet/sub-sheet/index.native.js
+index f51b07cffd9c14..64e3f609d167c3 100644
+--- a/packages/components/src/mobile/bottom-sheet/sub-sheet/index.native.js
++++ b/packages/components/src/mobile/bottom-sheet/sub-sheet/index.native.js
+@@ -23,6 +23,9 @@ const BottomSheetSubSheet = ( {
+ 		if ( showSheet ) {
+ 			setIsFullScreen( isFullScreen );
+ 		}
++		// Disable reason: deferring this refactor to the native team.
++		// see https://github.com/WordPress/gutenberg/pull/41166
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ showSheet, isFullScreen ] );
+ 
+ 	return (
+diff --git a/packages/components/src/mobile/color-settings/index.native.js b/packages/components/src/mobile/color-settings/index.native.js
+index 86afffa5ae96f5..171c4a011a7fe2 100644
+--- a/packages/components/src/mobile/color-settings/index.native.js
++++ b/packages/components/src/mobile/color-settings/index.native.js
+@@ -34,6 +34,9 @@ const ColorSettingsMemo = memo(
+ 		useEffect( () => {
+ 			shouldEnableBottomSheetMaxHeight( true );
+ 			onHandleClosingBottomSheet( null );
++			// Disable reason: deferring this refactor to the native team.
++			// see https://github.com/WordPress/gutenberg/pull/41166
++			// eslint-disable-next-line react-hooks/exhaustive-deps
+ 		}, [] );
+ 		return (
+ 			<BottomSheet.NavigationContainer>
+diff --git a/packages/components/src/mobile/color-settings/picker-screen.native.js b/packages/components/src/mobile/color-settings/picker-screen.native.js
+index 440abd7e8ed202..f8626a67338a42 100644
+--- a/packages/components/src/mobile/color-settings/picker-screen.native.js
++++ b/packages/components/src/mobile/color-settings/picker-screen.native.js
+@@ -43,6 +43,9 @@ const PickerScreen = () => {
+ 				onHandleHardwareButtonPress={ onHandleHardwareButtonPress }
+ 			/>
+ 		);
++		// Disable reason: deferring this refactor to the native team.
++		// see https://github.com/WordPress/gutenberg/pull/41166
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [
+ 		setColor,
+ 		currentValue,
+diff --git a/packages/components/src/mobile/image/index.native.js b/packages/components/src/mobile/image/index.native.js
+index 34f6557e8255e1..9d365763e027dd 100644
+--- a/packages/components/src/mobile/image/index.native.js
++++ b/packages/components/src/mobile/image/index.native.js
+@@ -82,6 +82,9 @@ const ImageComponent = ( {
+ 			} );
+ 		}
+ 		return () => ( isCurrent = false );
++		// Disable reason: deferring this refactor to the native team.
++		// see https://github.com/WordPress/gutenberg/pull/41166
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ url ] );
+ 
+ 	const onContainerLayout = ( event ) => {
+diff --git a/packages/components/src/mobile/keyboard-avoiding-view/index.ios.js b/packages/components/src/mobile/keyboard-avoiding-view/index.ios.js
+index 6fd716a527ee3b..f13e7d329874fd 100644
+--- a/packages/components/src/mobile/keyboard-avoiding-view/index.ios.js
++++ b/packages/components/src/mobile/keyboard-avoiding-view/index.ios.js
+@@ -69,6 +69,9 @@ export const KeyboardAvoidingView = ( {
+ 			keyboardShowSubscription.remove();
+ 			keyboardHideSubscription.remove();
+ 		};
++		// Disable reason: deferring this refactor to the native team.
++		// see https://github.com/WordPress/gutenberg/pull/41166
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [] );
+ 
+ 	function onSafeAreaInsetsUpdate( { safeAreaInsets } ) {
+diff --git a/packages/components/src/mobile/link-picker/index.native.js b/packages/components/src/mobile/link-picker/index.native.js
+index bf61bcddaa6154..ffde5b28c26171 100644
+--- a/packages/components/src/mobile/link-picker/index.native.js
++++ b/packages/components/src/mobile/link-picker/index.native.js
+@@ -91,6 +91,9 @@ export const LinkPicker = ( {
+ 		getURLFromClipboard()
+ 			.then( ( url ) => setValue( { value, clipboardUrl: url } ) )
+ 			.catch( () => setValue( { value, clipboardUrl: '' } ) );
++		// Disable reason: deferring this refactor to the native team.
++		// see https://github.com/WordPress/gutenberg/pull/41166
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [] );
+ 
+ 	// TODO: Localize the accessibility label.
+diff --git a/packages/components/src/mobile/link-picker/link-picker-results.native.js b/packages/components/src/mobile/link-picker/link-picker-results.native.js
+index 29e67a1827632d..a3a9c7e9e0a743 100644
+--- a/packages/components/src/mobile/link-picker/link-picker-results.native.js
++++ b/packages/components/src/mobile/link-picker/link-picker-results.native.js
+@@ -86,6 +86,9 @@ export default function LinkPickerResults( {
+ 		setHasAllSuggestions( false );
+ 		setLinks( [ directEntry ] );
+ 		fetchMoreSuggestions( { query, links: [ directEntry ] } );
++		// Disable reason: deferring this refactor to the native team.
++		// see https://github.com/WordPress/gutenberg/pull/41166
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ query ] );
+ 
+ 	const onEndReached = () => fetchMoreSuggestions( { query, links } );
+diff --git a/packages/components/src/mobile/link-picker/link-picker-screen.native.js b/packages/components/src/mobile/link-picker/link-picker-screen.native.js
+index f77cf4e18a1b07..7bc1dbd7009b62 100644
+--- a/packages/components/src/mobile/link-picker/link-picker-screen.native.js
++++ b/packages/components/src/mobile/link-picker/link-picker-screen.native.js
+@@ -53,6 +53,9 @@ const LinkPickerScreen = ( { returnScreenName } ) => {
+ 				onCancel={ onCancel }
+ 			/>
+ 		);
++		// Disable reason: deferring this refactor to the native team.
++		// see https://github.com/WordPress/gutenberg/pull/41166
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ inputValue ] );
+ };
+ 
+diff --git a/packages/components/src/mobile/link-settings/index.native.js b/packages/components/src/mobile/link-settings/index.native.js
+index 794650adefdd79..e80672a3103fa6 100644
+--- a/packages/components/src/mobile/link-settings/index.native.js
++++ b/packages/components/src/mobile/link-settings/index.native.js
+@@ -101,6 +101,9 @@ function LinkSettings( {
+ 		if ( onHandleClosingBottomSheet ) {
+ 			onHandleClosingBottomSheet( onCloseSettingsSheet );
+ 		}
++		// Disable reason: deferring this refactor to the native team.
++		// see https://github.com/WordPress/gutenberg/pull/41166
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ urlInputValue, labelInputValue, linkRelInputValue ] );
+ 
+ 	useEffect( () => {
+@@ -112,6 +115,9 @@ function LinkSettings( {
+ 		if ( url !== urlInputValue ) {
+ 			setUrlInputValue( url || '' );
+ 		}
++		// Disable reason: deferring this refactor to the native team.
++		// see https://github.com/WordPress/gutenberg/pull/41166
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ url ] );
+ 
+ 	useEffect( () => {
+@@ -135,6 +141,9 @@ function LinkSettings( {
+ 		if ( prevEditorSidebarOpened && ! editorSidebarOpened ) {
+ 			onSetAttributes();
+ 		}
++		// Disable reason: deferring this refactor to the native team.
++		// see https://github.com/WordPress/gutenberg/pull/41166
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ editorSidebarOpened, isVisible ] );
+ 
+ 	useEffect( () => {
+@@ -147,6 +156,9 @@ function LinkSettings( {
+ 				url: prependHTTP( urlValue ),
+ 			} );
+ 		}
++		// Disable reason: deferring this refactor to the native team.
++		// see https://github.com/WordPress/gutenberg/pull/41166
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ urlValue ] );
+ 
+ 	const onChangeURL = useCallback(
+@@ -176,6 +188,9 @@ function LinkSettings( {
+ 				rel: linkRelInputValue,
+ 			} );
+ 		}
++		// Disable reason: deferring this refactor to the native team.
++		// see https://github.com/WordPress/gutenberg/pull/41166
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ urlInputValue, labelInputValue, linkRelInputValue, setAttributes ] );
+ 
+ 	const onCloseSettingsSheet = useCallback( () => {
+@@ -208,6 +223,9 @@ function LinkSettings( {
+ 				rel: updatedRel,
+ 			} );
+ 		},
++		// Disable reason: deferring this refactor to the native team.
++		// see https://github.com/WordPress/gutenberg/pull/41166
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 		[ linkRelInputValue ]
+ 	);
+ 
+diff --git a/packages/components/src/mobile/link-settings/link-settings-screen.native.js b/packages/components/src/mobile/link-settings/link-settings-screen.native.js
+index 65c95187d2fcb8..d04bd0699b7a54 100644
+--- a/packages/components/src/mobile/link-settings/link-settings-screen.native.js
++++ b/packages/components/src/mobile/link-settings/link-settings-screen.native.js
+@@ -37,6 +37,9 @@ const LinkSettingsScreen = ( props ) => {
+ 				urlValue={ inputValue }
+ 			/>
+ 		);
++		// Disable reason: deferring this refactor to the native team.
++		// see https://github.com/WordPress/gutenberg/pull/41166
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ props, inputValue, navigation, route ] );
+ };
+ 
+diff --git a/packages/components/src/mobile/segmented-control/index.native.js b/packages/components/src/mobile/segmented-control/index.native.js
+index b34b8d158a0899..b3270e37120e3b 100644
+--- a/packages/components/src/mobile/segmented-control/index.native.js
++++ b/packages/components/src/mobile/segmented-control/index.native.js
+@@ -74,12 +74,18 @@ const SegmentedControls = ( {
+ 	useEffect( () => {
+ 		setActiveSegmentIndex( selectedSegmentIndex );
+ 		segmentHandler( segments[ selectedSegmentIndex ] );
++		// Disable reason: deferring this refactor to the native team.
++		// see https://github.com/WordPress/gutenberg/pull/41166
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [] );
+ 
+ 	useEffect( () => {
+ 		positionAnimationValue.setValue(
+ 			calculateEndValue( activeSegmentIndex )
+ 		);
++		// Disable reason: deferring this refactor to the native team.
++		// see https://github.com/WordPress/gutenberg/pull/41166
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ segmentsDimensions ] );
+ 
+ 	const containerStyle = usePreferredColorSchemeStyle(
+diff --git a/packages/components/src/mobile/utils/use-unit-converter-to-mobile.native.js b/packages/components/src/mobile/utils/use-unit-converter-to-mobile.native.js
+index 9e08b88f4f1c49..11d54f954215d4 100644
+--- a/packages/components/src/mobile/utils/use-unit-converter-to-mobile.native.js
++++ b/packages/components/src/mobile/utils/use-unit-converter-to-mobile.native.js
+@@ -78,6 +78,9 @@ const useConvertUnitToMobile = ( value, unit ) => {
+ 		return () => {
+ 			dimensionsChangeSubscription.remove();
+ 		};
++		// Disable reason: deferring this refactor to the native team.
++		// see https://github.com/WordPress/gutenberg/pull/41166
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [] );
+ 
+ 	const onDimensionsChange = useCallback( ( { window } ) => {
+@@ -94,6 +97,9 @@ const useConvertUnitToMobile = ( value, unit ) => {
+ 			valueToConvert,
+ 			valueUnit
+ 		);
++		// Disable reason: deferring this refactor to the native team.
++		// see https://github.com/WordPress/gutenberg/pull/41166
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ windowSizes, value, unit ] );
+ };
+ 

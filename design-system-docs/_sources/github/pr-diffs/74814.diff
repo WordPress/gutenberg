@@ -1,0 +1,1164 @@
+diff --git a/lib/compat/wordpress-6.9/entity-block-bindings.php b/lib/compat/wordpress-6.9/entity-block-bindings.php
+new file mode 100644
+index 00000000000000..81f24707173652
+--- /dev/null
++++ b/lib/compat/wordpress-6.9/entity-block-bindings.php
+@@ -0,0 +1,103 @@
++<?php
++/**
++ * Entity source for the block bindings (explicit entity args).
++ *
++ * @since 6.9.0
++ * @package gutenberg
++ * @subpackage Block Bindings
++ */
++
++/**
++ * Gets value for Entity source.
++ *
++ * This source is intentionally **not** tied to the current post context.
++ * Consumers must pass entity identifiers via `$source_args`.
++ *
++ * Supported args:
++ * - key: currently only supports `url`
++ * - kind: `post-type` | `taxonomy`
++ * - type: post type slug or taxonomy slug
++ * - id: entity ID
++ *
++ * @since 6.9.0
++ * @access private
++ *
++ * @param array    $source_args    Array containing source arguments used to look up the value.
++ * @param WP_Block $block_instance The block instance.
++ * @return mixed The value computed for the source.
++ */
++function gutenberg_block_bindings_entity_get_value( array $source_args, $block_instance ) {
++	if ( empty( $source_args['key'] ) || 'url' !== $source_args['key'] ) {
++		return null;
++	}
++	if ( empty( $source_args['kind'] ) || empty( $source_args['type'] ) || empty( $source_args['id'] ) ) {
++		return null;
++	}
++
++	$kind = (string) $source_args['kind'];
++	$type = (string) $source_args['type'];
++	$id   = (int) $source_args['id'];
++
++	if ( $id <= 0 ) {
++		return null;
++	}
++
++	if ( 'post-type' === $kind ) {
++		$post = get_post( $id );
++		if ( ! $post ) {
++			return null;
++		}
++		// Prevent unauthorized users from accessing non-public post data.
++		if ( ( ! is_post_publicly_viewable( $post ) && ! current_user_can( 'read_post', $id ) ) || post_password_required( $post ) ) {
++			return null;
++		}
++		$permalink = get_permalink( $id );
++		return false === $permalink ? null : esc_url( $permalink );
++	}
++
++	if ( 'taxonomy' === $kind ) {
++		// Map UI shorthand to taxonomy slug when using args.
++		$taxonomy = ( 'tag' === $type ) ? 'post_tag' : $type;
++
++		$term = get_term( $id, $taxonomy );
++		if ( is_wp_error( $term ) || ! $term ) {
++			return null;
++		}
++
++		$taxonomy_object = get_taxonomy( $taxonomy );
++		if ( ! $taxonomy_object || ! $taxonomy_object->publicly_queryable ) {
++			if ( ! current_user_can( 'read' ) ) {
++				return null;
++			}
++		}
++
++		$term_link = get_term_link( $term );
++		return is_wp_error( $term_link ) ? null : esc_url( $term_link );
++	}
++
++	return null;
++}
++
++/**
++ * Registers Entity source in the block bindings registry.
++ *
++ * @since 6.9.0
++ * @access private
++ */
++function gutenberg_register_block_bindings_entity_source() {
++	if ( get_block_bindings_source( 'core/entity' ) ) {
++		// The source is already registered.
++		return;
++	}
++
++	register_block_bindings_source(
++		'core/entity',
++		array(
++			'label'              => _x( 'Entity', 'block bindings source' ),
++			'get_value_callback' => 'gutenberg_block_bindings_entity_get_value',
++		)
++	);
++}
++
++add_action( 'init', 'gutenberg_register_block_bindings_entity_source' );
++
+diff --git a/lib/compat/wordpress-6.9/post-data-block-bindings.php b/lib/compat/wordpress-6.9/post-data-block-bindings.php
+index c941496b4bfb61..4c6f702c7c978f 100644
+--- a/lib/compat/wordpress-6.9/post-data-block-bindings.php
++++ b/lib/compat/wordpress-6.9/post-data-block-bindings.php
+@@ -101,3 +101,60 @@ function gutenberg_register_block_bindings_post_data_source() {
+ }
+ 
+ add_action( 'init', 'gutenberg_register_block_bindings_post_data_source' );
++
++/**
++ * Filters the value from the core/post-data source to add support for button block.
++ *
++ * Button block stores entity info (id, kind, type) in metadata, not in context or attributes.
++ * This filter intercepts the Core callback and adds button block support.
++ *
++ * @since 7.1.0
++ *
++ * @param mixed  $value          The computed value for the source.
++ * @param string $source_name    The name of the source.
++ * @param array  $source_args    The arguments for the source.
++ * @param mixed  $block_instance The block instance.
++ * @param string $attribute_name The name of the attribute.
++ * @return mixed The filtered value.
++ */
++function gutenberg_filter_block_bindings_post_data_value( $value, $source_name, $source_args, $block_instance, $attribute_name ) {
++	if ( 'core/post-data' !== $source_name ) {
++		return $value;
++	}
++
++	$block_name = $block_instance->name ?? '';
++
++	// Only handle button block - navigation blocks and others are handled by Core.
++	if ( 'core/button' !== $block_name ) {
++		return $value;
++	}
++
++	// Button block: read from metadata (id, kind, type stored in metadata).
++	$post_id = $block_instance->attributes['metadata']['id'] ?? null;
++	$kind    = $block_instance->attributes['metadata']['kind'] ?? null;
++
++	// Only handle post-type entities for post-data source.
++	if ( empty( $post_id ) || 'post-type' !== $kind ) {
++		return $value;
++	}
++
++	$field = $source_args['field'] ?? $source_args['key'] ?? null;
++	if ( empty( $field ) ) {
++		return $value;
++	}
++
++	// If a post isn't public, we need to prevent unauthorized users from accessing the post data.
++	$post = get_post( $post_id );
++	if ( ( ! is_post_publicly_viewable( $post ) && ! current_user_can( 'read_post', $post_id ) ) || post_password_required( $post ) ) {
++		return null;
++	}
++
++	if ( 'link' === $field ) {
++		$permalink = get_permalink( $post_id );
++		return false === $permalink ? null : esc_url( $permalink );
++	}
++
++	return $value;
++}
++
++add_filter( 'block_bindings_source_value', 'gutenberg_filter_block_bindings_post_data_value', 10, 5 );
+\ No newline at end of file
+diff --git a/lib/compat/wordpress-6.9/term-data-block-bindings.php b/lib/compat/wordpress-6.9/term-data-block-bindings.php
+index 88d47f4142dd72..72d9577a9fb5c7 100644
+--- a/lib/compat/wordpress-6.9/term-data-block-bindings.php
++++ b/lib/compat/wordpress-6.9/term-data-block-bindings.php
+@@ -117,3 +117,77 @@ function gutenberg_register_block_bindings_term_data_source() {
+ }
+ 
+ add_action( 'init', 'gutenberg_register_block_bindings_term_data_source' );
++
++/**
++* Filters the value from the core/term-data source to add support for button block.
++*
++* Button block stores entity info (id, kind, type) in metadata, not in context or attributes.
++* This filter intercepts the Core callback and adds button block support.
++*
++* @since 7.1.0
++*
++* @param mixed  $value          The computed value for the source.
++* @param string $source_name    The name of the source.
++* @param array  $source_args    The arguments for the source.
++* @param mixed  $block_instance The block instance.
++* @param string $attribute_name The name of the attribute.
++* @return mixed The filtered value.
++*/
++function gutenberg_filter_block_bindings_term_data_value( $value, $source_name, $source_args, $block_instance, $attribute_name ) {
++	if ( 'core/term-data' !== $source_name ) {
++		return $value;
++	}
++
++	$block_name = $block_instance->name ?? '';
++
++	// Only handle button block - navigation blocks and others are handled by Core.
++	if ( 'core/button' !== $block_name ) {
++		return $value;
++	}
++
++	// Button block: read from metadata (id, kind, type stored in metadata).
++	$term_id  = $block_instance->attributes['metadata']['id'] ?? null;
++	$kind     = $block_instance->attributes['metadata']['kind'] ?? null;
++	$type     = $block_instance->attributes['metadata']['type'] ?? '';
++
++	// Only handle taxonomy entities for term-data source.
++	if ( empty( $term_id ) || 'taxonomy' !== $kind ) {
++		return $value;
++	}
++
++	$field = $source_args['field'] ?? null;
++	if ( empty( $field ) ) {
++		return $value;
++	}
++
++	// Map UI shorthand to taxonomy slug when using metadata.
++	$taxonomy = ( 'tag' === $type ) ? 'post_tag' : $type;
++
++	// If we don't have required identifiers, bail early.
++	if ( empty( $term_id ) || empty( $taxonomy ) ) {
++		return $value;
++	}
++
++	// Get the term data.
++	$term = get_term( $term_id, $taxonomy );
++	if ( is_wp_error( $term ) || ! $term ) {
++		return $value;
++	}
++
++	// Check if taxonomy exists and is publicly queryable.
++	$taxonomy_object = get_taxonomy( $taxonomy );
++	if ( ! $taxonomy_object || ! $taxonomy_object->publicly_queryable ) {
++		if ( ! current_user_can( 'read' ) ) {
++			return $value;
++		}
++	}
++
++	if ( 'link' === $field ) {
++		$term_link = get_term_link( $term );
++		return is_wp_error( $term_link ) ? null : esc_url( $term_link );
++	}
++
++	return $value;
++}
++
++add_filter( 'block_bindings_source_value', 'gutenberg_filter_block_bindings_term_data_value', 10, 5 );
+diff --git a/packages/block-library/src/button/edit.js b/packages/block-library/src/button/edit.js
+index b89580164178f9..d58c0db8fd893b 100644
+--- a/packages/block-library/src/button/edit.js
++++ b/packages/block-library/src/button/edit.js
+@@ -5,13 +5,14 @@ import {
+ 	useState,
+ 	useRef,
+ 	useMemo,
++	useCallback,
+ 	createInterpolateElement,
+ } from '@wordpress/element';
+ import {
+-	TextControl,
+ 	ToolbarButton,
+ 	Popover,
+-	ExternalLink,
++	__experimentalToolsPanel as ToolsPanel,
++	__experimentalToolsPanelItem as ToolsPanelItem,
+ } from '@wordpress/components';
+ import {
+ 	BlockControls,
+@@ -41,14 +42,90 @@ import {
+ } from '@wordpress/blocks';
+ import { useMergeRefs, useRefEffect } from '@wordpress/compose';
+ import { useSelect, useDispatch } from '@wordpress/data';
++import { store as coreDataStore } from '@wordpress/core-data';
+ import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
+ import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
+ import removeAnchorTag from '../utils/remove-anchor-tag';
++import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+ import { unlock } from '../lock-unlock';
+ import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
+ import { getWidthClasses, isPercentageWidth } from './utils';
+ 
+-const { HTMLElementControl } = unlock( blockEditorPrivateApis );
++const { HTMLElementControl, LinkPicker } = unlock( blockEditorPrivateApis );
++
++/**
++ * Capitalize the first letter of a string.
++ *
++ * @param {string} str String to capitalize.
++ * @return {string} Capitalized string.
++ */
++function capitalize( str ) {
++	return str.charAt( 0 ).toUpperCase() + str.slice( 1 );
++}
++
++/**
++ * Compute preview URL for LinkPicker - strips site URL if internal.
++ *
++ * @param {string} url URL to process.
++ * @return {string} Display URL.
++ */
++function computePreviewUrl( url ) {
++	if ( ! url ) {
++		return '';
++	}
++
++	try {
++		const linkUrl = new URL( url );
++		const siteUrl = window.location.origin;
++		if ( linkUrl.origin === siteUrl ) {
++			let path = linkUrl.pathname + linkUrl.search + linkUrl.hash;
++			if ( path.endsWith( '/' ) && path.length > 1 ) {
++				path = path.slice( 0, -1 );
++			}
++			return path;
++		}
++	} catch ( e ) {
++		// fall through
++	}
++
++	return url;
++}
++
++/**
++ * Given a selected entity type/kind, return the query params for /wp/v2/search.
++ *
++ * @param {string} type Entity type.
++ * @param {string} kind Entity kind.
++ * @return {Object} Query params.
++ */
++function getSuggestionsQuery( type, kind ) {
++	switch ( type ) {
++		case 'post':
++		case 'page':
++			return { type: 'post', subtype: type };
++		case 'category':
++			return { type: 'term', subtype: 'category' };
++		case 'tag':
++			return { type: 'term', subtype: 'post_tag' };
++		case 'post_format':
++			return { type: 'post-format' };
++		default:
++			if ( kind === 'taxonomy' ) {
++				return { type: 'term', subtype: type };
++			}
++			if ( kind === 'post-type' ) {
++				return { type: 'post', subtype: type };
++			}
++			return {
++				// For custom link which has no type, always show pages as initial suggestions.
++				initialSuggestionsSearchOptions: {
++					type: 'post',
++					subtype: 'page',
++					perPage: 20,
++				},
++			};
++	}
++}
+ 
+ const LINK_SETTINGS = [
+ 	...LinkControl.DEFAULT_LINK_SETTINGS,
+@@ -114,6 +191,37 @@ function useEnter( props ) {
+ 	}, [] );
+ }
+ 
++function SettingsPanel( { linkPanel } ) {
++	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
++
++	return (
++		<ToolsPanel
++			label={ __( 'Settings' ) }
++			resetAll={ () => {
++				linkPanel?.onReset?.();
++			} }
++			dropdownMenuProps={ dropdownMenuProps }
++		>
++			{ linkPanel && (
++				<ToolsPanelItem
++					label={ __( 'Link to' ) }
++					hasValue={ linkPanel.hasValue }
++					onDeselect={ linkPanel.onDeselect }
++					isShownByDefault
++				>
++					<LinkPicker
++						preview={ linkPanel.preview }
++						onSelect={ linkPanel.onSelect }
++						suggestionsQuery={ linkPanel.suggestionsQuery }
++						label={ __( 'Link to' ) }
++						help={ linkPanel.help }
++					/>
++				</ToolsPanelItem>
++			) }
++		</ToolsPanel>
++	);
++}
++
+ function ButtonEdit( props ) {
+ 	const {
+ 		attributes,
+@@ -159,20 +267,131 @@ function ButtonEdit( props ) {
+ 	const spacingProps = useSpacingProps( attributes );
+ 	const shadowProps = useShadowProps( attributes );
+ 	const dimensionsProps = useDimensionsProps( attributes );
+-	const ref = useRef();
+ 	const richTextRef = useRef();
+ 	const blockProps = useBlockProps( {
+-		ref: useMergeRefs( [ setPopoverAnchor, ref ] ),
++		ref: useMergeRefs( [ setPopoverAnchor ] ),
+ 		onKeyDown,
+ 	} );
+ 	const blockEditingMode = useBlockEditingMode();
+ 
+ 	const [ isEditingURL, setIsEditingURL ] = useState( false );
+-	const isURLSet = !! url;
+ 	const opensInNewTab = linkTarget === NEW_TAB_TARGET;
+ 	const nofollow = !! rel?.includes( NOFOLLOW_REL );
+ 	const isLinkTag = 'a' === TagName;
+ 
++	// Entity binding uses core/post-data and core/term-data sources (like Navigation Link).
++	// Entity info (id, kind, type) is stored in metadata for Button block.
++	const urlBinding = metadata?.bindings?.url;
++	const isEntityUrlBinding =
++		urlBinding?.source === 'core/post-data' ||
++		urlBinding?.source === 'core/term-data';
++	const boundEntityId = metadata?.id;
++	const boundEntityKind = metadata?.kind;
++	const boundEntityType = metadata?.type;
++
++	const { resolvedEntityUrl } = useSelect(
++		( select ) => {
++			if (
++				! isEntityUrlBinding ||
++				! boundEntityId ||
++				! boundEntityKind ||
++				! boundEntityType
++			) {
++				return {
++					resolvedEntityUrl: '',
++				};
++			}
++
++			const { getEntityRecord } = select( coreDataStore );
++
++			if ( boundEntityKind === 'post-type' ) {
++				const record = getEntityRecord(
++					'postType',
++					boundEntityType,
++					boundEntityId
++				);
++				return {
++					resolvedEntityUrl: record?.link || '',
++				};
++			}
++
++			if ( boundEntityKind === 'taxonomy' ) {
++				const taxonomySlug =
++					boundEntityType === 'tag' ? 'post_tag' : boundEntityType;
++				const record = getEntityRecord(
++					'taxonomy',
++					taxonomySlug,
++					boundEntityId
++				);
++				return {
++					resolvedEntityUrl: record?.link || '',
++				};
++			}
++
++			return {
++				resolvedEntityUrl: '',
++			};
++		},
++		[ isEntityUrlBinding, boundEntityId, boundEntityKind, boundEntityType ]
++	);
++
++	// Consider a bound entity as "URL set" even while the URL is resolving.
++	const isURLSet = isEntityUrlBinding || !! url || !! resolvedEntityUrl;
++
++	const clearEntityUrlBinding = useCallback( () => {
++		if ( ! isEntityUrlBinding ) {
++			return;
++		}
++		// Clear binding and entity metadata
++		const { bindings, ...restMetadata } = metadata || {};
++		if ( bindings?.url ) {
++			const { url: _urlBinding, ...restBindings } = bindings;
++			if ( Object.keys( restBindings ).length > 0 ) {
++				setAttributes( {
++					metadata: {
++						...restMetadata,
++						bindings: restBindings,
++					},
++				} );
++			} else if ( Object.keys( restMetadata ).length > 0 ) {
++				setAttributes( { metadata: restMetadata } );
++			} else {
++				setAttributes( { metadata: undefined } );
++			}
++		}
++	}, [ isEntityUrlBinding, metadata, setAttributes ] );
++
++	const createEntityUrlBinding = useCallback(
++		( { id, kind, type } ) => {
++			if ( ! id || ! kind || ! type ) {
++				return;
++			}
++
++			const source =
++				kind === 'taxonomy' ? 'core/term-data' : 'core/post-data';
++
++			setAttributes( {
++				metadata: {
++					...metadata,
++					id,
++					kind,
++					type,
++					bindings: {
++						...metadata?.bindings,
++						url: {
++							source,
++							args: {
++								field: 'link',
++							},
++						},
++					},
++				},
++				url: undefined,
++			} );
++		},
++		[ metadata, setAttributes ]
++	);
++
+ 	const {
+ 		createPageEntity,
+ 		userCanCreatePages,
+@@ -185,14 +404,20 @@ function ButtonEdit( props ) {
+ 
+ 			const _settings = select( blockEditorStore ).getSettings();
+ 
+-			const blockBindingsSource = getBlockBindingsSource(
+-				metadata?.bindings?.url?.source
+-			);
++			const bindingSourceName = metadata?.bindings?.url?.source;
++			const blockBindingsSource =
++				getBlockBindingsSource( bindingSourceName );
++
++			// Entity bindings (core/post-data, core/term-data) should not lock controls
++			const isEntityBinding =
++				bindingSourceName === 'core/post-data' ||
++				bindingSourceName === 'core/term-data';
+ 
+ 			return {
+ 				createPageEntity: _settings.__experimentalCreatePageEntity,
+ 				userCanCreatePages: _settings.__experimentalUserCanCreatePages,
+ 				lockUrlControls:
++					! isEntityBinding &&
+ 					!! metadata?.bindings?.url &&
+ 					! blockBindingsSource?.canUserEditValue?.( {
+ 						select,
+@@ -235,14 +460,15 @@ function ButtonEdit( props ) {
+ 		setIsEditingURL( true );
+ 	}
+ 
+-	function unlink() {
++	const unlink = useCallback( () => {
++		clearEntityUrlBinding();
+ 		setAttributes( {
+ 			url: undefined,
+ 			linkTarget: undefined,
+ 			rel: undefined,
+ 		} );
+ 		setIsEditingURL( false );
+-	}
++	}, [ clearEntityUrlBinding, setAttributes ] );
+ 
+ 	useEffect( () => {
+ 		if ( ! isSelected ) {
+@@ -252,10 +478,33 @@ function ButtonEdit( props ) {
+ 
+ 	// Memoize link value to avoid overriding the LinkControl's internal state.
+ 	// This is a temporary fix. See https://github.com/WordPress/gutenberg/issues/51256.
+-	const linkValue = useMemo(
+-		() => ( { url, opensInNewTab, nofollow } ),
+-		[ url, opensInNewTab, nofollow ]
+-	);
++	const linkValue = useMemo( () => {
++		let entityValue = {};
++		if ( isEntityUrlBinding ) {
++			entityValue = {
++				id: boundEntityId,
++				kind: boundEntityKind,
++				type: boundEntityType,
++			};
++		}
++
++		return {
++			// For bound entities we rely on the dynamically resolved URL.
++			url: isEntityUrlBinding ? resolvedEntityUrl : url,
++			opensInNewTab,
++			nofollow,
++			...entityValue,
++		};
++	}, [
++		url,
++		resolvedEntityUrl,
++		opensInNewTab,
++		nofollow,
++		isEntityUrlBinding,
++		boundEntityId,
++		boundEntityKind,
++		boundEntityType,
++	] );
+ 
+ 	const useEnterRef = useEnter( { content: text, clientId } );
+ 	const mergedRef = useMergeRefs( [ useEnterRef, richTextRef ] );
+@@ -318,6 +567,100 @@ function ButtonEdit( props ) {
+ 		return dimensionsProps.style;
+ 	}, [ width, resolvedWidth, dimensionsProps.style ] );
+ 
++	const linkPanel = useMemo( () => {
++		const previewUrl = isEntityUrlBinding ? resolvedEntityUrl : url;
++		const title =
++			resolvedEntityUrl && boundEntityType
++				? capitalize( boundEntityType )
++				: '';
++
++		const badges = [];
++		if ( previewUrl ) {
++			if ( title ) {
++				badges.push( {
++					label: title,
++					intent: 'default',
++				} );
++			}
++		}
++		if ( ! previewUrl ) {
++			badges.push( { label: __( 'No link selected' ), intent: 'error' } );
++		}
++
++		const preview = {
++			title: previewUrl
++				? computePreviewUrl( previewUrl )
++				: __( 'Add link' ),
++			url: computePreviewUrl( previewUrl ),
++			image: null,
++			badges,
++		};
++
++		const help = isEntityUrlBinding
++			? sprintf(
++					/* translators: %s is the entity type (e.g., "page", "post", "category") */
++					__( 'Synced with the selected %s.' ),
++					boundEntityType || __( 'item' )
++			  )
++			: undefined;
++
++		return {
++			hasValue: () => isURLSet,
++			onDeselect: () => unlink(),
++			onReset: () => unlink(),
++			preview,
++			suggestionsQuery: getSuggestionsQuery(
++				boundEntityType,
++				boundEntityKind
++			),
++			help,
++			onSelect: ( updatedLink ) => {
++				if ( ! updatedLink ) {
++					return;
++				}
++
++				const hasEntitySelection = !! (
++					updatedLink.id &&
++					updatedLink.kind &&
++					updatedLink.type
++				);
++
++				if ( hasEntitySelection ) {
++					createEntityUrlBinding( {
++						id: updatedLink.id,
++						kind: updatedLink.kind,
++						type: updatedLink.type,
++					} );
++					return;
++				}
++
++				const updatedLinkAttributes = getUpdatedLinkAttributes( {
++					rel,
++					url: updatedLink.url,
++					opensInNewTab: updatedLink.opensInNewTab ?? opensInNewTab,
++					nofollow: updatedLink.nofollow ?? nofollow,
++				} );
++
++				clearEntityUrlBinding();
++				setAttributes( updatedLinkAttributes );
++			},
++		};
++	}, [
++		boundEntityKind,
++		boundEntityType,
++		clearEntityUrlBinding,
++		createEntityUrlBinding,
++		isEntityUrlBinding,
++		isURLSet,
++		nofollow,
++		opensInNewTab,
++		rel,
++		resolvedEntityUrl,
++		setAttributes,
++		unlink,
++		url,
++	] );
++
+ 	return (
+ 		<>
+ 			<div
+@@ -399,20 +742,44 @@ function ButtonEdit( props ) {
+ 					>
+ 						<LinkControl
+ 							value={ linkValue }
+-							onChange={ ( {
+-								url: newURL,
+-								opensInNewTab: newOpensInNewTab,
+-								nofollow: newNofollow,
+-							} ) =>
+-								setAttributes(
++							handleEntities
++							onChange={ ( nextValue ) => {
++								const {
++									url: newURL,
++									opensInNewTab: newOpensInNewTab,
++									nofollow: newNofollow,
++									id,
++									kind,
++									type,
++								} = nextValue || {};
++
++								const hasEntitySelection = !! (
++									id &&
++									kind &&
++									type
++								);
++
++								if ( hasEntitySelection ) {
++									createEntityUrlBinding( {
++										id,
++										kind,
++										type,
++									} );
++									return;
++								}
++
++								const updatedLinkAttributes =
+ 									getUpdatedLinkAttributes( {
+ 										rel,
+ 										url: newURL,
+-										opensInNewTab: newOpensInNewTab,
+-										nofollow: newNofollow,
+-									} )
+-								)
+-							}
++										opensInNewTab:
++											newOpensInNewTab ?? opensInNewTab,
++										nofollow: newNofollow ?? nofollow,
++									} );
++
++								clearEntityUrlBinding();
++								setAttributes( updatedLinkAttributes );
++							} }
+ 							onRemove={ () => {
+ 								unlink();
+ 								richTextRef.current?.focus();
+@@ -427,6 +794,9 @@ function ButtonEdit( props ) {
+ 						/>
+ 					</Popover>
+ 				) }
++			<InspectorControls>
++				<SettingsPanel linkPanel={ isLinkTag ? linkPanel : null } />
++			</InspectorControls>
+ 			<InspectorControls group="advanced">
+ 				<HTMLElementControl
+ 					tagName={ tagName }
+@@ -438,26 +808,6 @@ function ButtonEdit( props ) {
+ 						{ label: '<button>', value: 'button' },
+ 					] }
+ 				/>
+-				{ isLinkTag && (
+-					<TextControl
+-						__next40pxDefaultSize
+-						label={ __( 'Link relation' ) }
+-						help={ createInterpolateElement(
+-							__(
+-								'The <a>Link Relation</a> attribute defines the relationship between a linked resource and the current document.'
+-							),
+-							{
+-								a: (
+-									<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel" />
+-								),
+-							}
+-						) }
+-						value={ rel || '' }
+-						onChange={ ( newRel ) =>
+-							setAttributes( { rel: newRel } )
+-						}
+-					/>
+-				) }
+ 			</InspectorControls>
+ 		</>
+ 	);
+diff --git a/packages/block-library/src/button/test/entity-binding.test.js b/packages/block-library/src/button/test/entity-binding.test.js
+new file mode 100644
+index 00000000000000..1f07a6e7e4a87f
+--- /dev/null
++++ b/packages/block-library/src/button/test/entity-binding.test.js
+@@ -0,0 +1,234 @@
++/**
++ * @jest-environment jsdom
++ */
++
++/**
++ * Internal dependencies
++ */
++
++describe( 'Button Block Entity Binding', () => {
++	describe( 'Binding source selection', () => {
++		it( 'should use core/post-data source for post-type entities', () => {
++			// Test that when kind is 'post-type', source should be 'core/post-data'
++			const kind = 'post-type';
++			const expectedSource =
++				kind === 'taxonomy' ? 'core/term-data' : 'core/post-data';
++			expect( expectedSource ).toBe( 'core/post-data' );
++		} );
++
++		it( 'should use core/term-data source for taxonomy entities', () => {
++			// Test that when kind is 'taxonomy', source should be 'core/term-data'
++			const kind = 'taxonomy';
++			const expectedSource =
++				kind === 'taxonomy' ? 'core/term-data' : 'core/post-data';
++			expect( expectedSource ).toBe( 'core/term-data' );
++		} );
++	} );
++
++	describe( 'Entity binding detection', () => {
++		it( 'should detect post-data binding as entity binding', () => {
++			const metadata = {
++				id: 123,
++				kind: 'post-type',
++				type: 'page',
++				bindings: {
++					url: {
++						source: 'core/post-data',
++						args: { field: 'link' },
++					},
++				},
++			};
++
++			const urlBinding = metadata?.bindings?.url;
++			const isEntityUrlBinding =
++				urlBinding?.source === 'core/post-data' ||
++				urlBinding?.source === 'core/term-data';
++
++			expect( isEntityUrlBinding ).toBe( true );
++		} );
++
++		it( 'should detect term-data binding as entity binding', () => {
++			const metadata = {
++				id: 456,
++				kind: 'taxonomy',
++				type: 'category',
++				bindings: {
++					url: {
++						source: 'core/term-data',
++						args: { field: 'link' },
++					},
++				},
++			};
++
++			const urlBinding = metadata?.bindings?.url;
++			const isEntityUrlBinding =
++				urlBinding?.source === 'core/post-data' ||
++				urlBinding?.source === 'core/term-data';
++
++			expect( isEntityUrlBinding ).toBe( true );
++		} );
++
++		it( 'should not detect other bindings as entity bindings', () => {
++			const metadata = {
++				bindings: {
++					url: {
++						source: 'core/post-meta',
++						args: { key: 'custom_url' },
++					},
++				},
++			};
++
++			const urlBinding = metadata?.bindings?.url;
++			const isEntityUrlBinding =
++				urlBinding?.source === 'core/post-data' ||
++				urlBinding?.source === 'core/term-data';
++
++			expect( isEntityUrlBinding ).toBe( false );
++		} );
++	} );
++
++	describe( 'Binding metadata structure', () => {
++		it( 'should create correct metadata for post-type entity', () => {
++			const id = 123;
++			const kind = 'post-type';
++			const type = 'page';
++			const source =
++				kind === 'taxonomy' ? 'core/term-data' : 'core/post-data';
++
++			const metadata = {
++				id,
++				kind,
++				type,
++				bindings: {
++					url: {
++						source,
++						args: { field: 'link' },
++					},
++				},
++			};
++
++			expect( metadata.id ).toBe( 123 );
++			expect( metadata.kind ).toBe( 'post-type' );
++			expect( metadata.type ).toBe( 'page' );
++			expect( metadata.bindings.url.source ).toBe( 'core/post-data' );
++			expect( metadata.bindings.url.args.field ).toBe( 'link' );
++		} );
++
++		it( 'should create correct metadata for taxonomy entity', () => {
++			const id = 789;
++			const kind = 'taxonomy';
++			const type = 'category';
++			const source =
++				kind === 'taxonomy' ? 'core/term-data' : 'core/post-data';
++
++			const metadata = {
++				id,
++				kind,
++				type,
++				bindings: {
++					url: {
++						source,
++						args: { field: 'link' },
++					},
++				},
++			};
++
++			expect( metadata.id ).toBe( 789 );
++			expect( metadata.kind ).toBe( 'taxonomy' );
++			expect( metadata.type ).toBe( 'category' );
++			expect( metadata.bindings.url.source ).toBe( 'core/term-data' );
++			expect( metadata.bindings.url.args.field ).toBe( 'link' );
++		} );
++	} );
++
++	describe( 'Clearing entity binding', () => {
++		it( 'should clear binding metadata when clearing entity binding', () => {
++			const metadata = {
++				id: 123,
++				kind: 'post-type',
++				type: 'page',
++				bindings: {
++					url: {
++						source: 'core/post-data',
++						args: { field: 'link' },
++					},
++				},
++			};
++
++			// Simulate clearing the binding
++			const newMetadata = { ...metadata };
++			delete newMetadata.bindings?.url;
++			delete newMetadata.id;
++			delete newMetadata.kind;
++			delete newMetadata.type;
++
++			if (
++				newMetadata.bindings &&
++				Object.keys( newMetadata.bindings ).length === 0
++			) {
++				delete newMetadata.bindings;
++			}
++
++			expect( newMetadata.id ).toBeUndefined();
++			expect( newMetadata.kind ).toBeUndefined();
++			expect( newMetadata.type ).toBeUndefined();
++			expect( newMetadata.bindings ).toBeUndefined();
++		} );
++	} );
++
++	describe( 'Entity info extraction from metadata', () => {
++		it( 'should extract entity info from metadata for post-type', () => {
++			const metadata = {
++				id: 123,
++				kind: 'post-type',
++				type: 'page',
++				bindings: {
++					url: {
++						source: 'core/post-data',
++						args: { field: 'link' },
++					},
++				},
++			};
++
++			const boundEntityId = metadata?.id;
++			const boundEntityKind = metadata?.kind;
++			const boundEntityType = metadata?.type;
++			const urlBinding = metadata?.bindings?.url;
++			const isEntityUrlBinding =
++				urlBinding?.source === 'core/post-data' ||
++				urlBinding?.source === 'core/term-data';
++
++			expect( isEntityUrlBinding ).toBe( true );
++			expect( boundEntityId ).toBe( 123 );
++			expect( boundEntityKind ).toBe( 'post-type' );
++			expect( boundEntityType ).toBe( 'page' );
++		} );
++
++		it( 'should extract entity info from metadata for taxonomy', () => {
++			const metadata = {
++				id: 456,
++				kind: 'taxonomy',
++				type: 'category',
++				bindings: {
++					url: {
++						source: 'core/term-data',
++						args: { field: 'link' },
++					},
++				},
++			};
++
++			const boundEntityId = metadata?.id;
++			const boundEntityKind = metadata?.kind;
++			const boundEntityType = metadata?.type;
++			const urlBinding = metadata?.bindings?.url;
++			const isEntityUrlBinding =
++				urlBinding?.source === 'core/post-data' ||
++				urlBinding?.source === 'core/term-data';
++
++			expect( isEntityUrlBinding ).toBe( true );
++			expect( boundEntityId ).toBe( 456 );
++			expect( boundEntityKind ).toBe( 'taxonomy' );
++			expect( boundEntityType ).toBe( 'category' );
++		} );
++	} );
++} );
+diff --git a/packages/components/src/tools-panel/tools-panel-item/hook.ts b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+index e0a1f0139dcace..8cf5c746ce0eda 100644
+--- a/packages/components/src/tools-panel/tools-panel-item/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+@@ -150,11 +150,15 @@ export function useToolsPanelItem(
+ 		}
+ 
+ 		if ( isMenuItemChecked && ! isValueSet && ! wasMenuItemChecked ) {
+-			onSelect?.();
++			if ( typeof onSelect === 'function' ) {
++				onSelect();
++			}
+ 		}
+ 
+ 		if ( ! isMenuItemChecked && isValueSet && wasMenuItemChecked ) {
+-			onDeselect?.();
++			if ( typeof onDeselect === 'function' ) {
++				onDeselect();
++			}
+ 		}
+ 	}, [
+ 		hasMatchingPanel,
+diff --git a/packages/editor/src/bindings/api.js b/packages/editor/src/bindings/api.js
+index d25ac70d9b84a0..0a37da9b284fcc 100644
+--- a/packages/editor/src/bindings/api.js
++++ b/packages/editor/src/bindings/api.js
+@@ -7,6 +7,7 @@ import { registerBlockBindingsSource } from '@wordpress/blocks';
+  * Internal dependencies
+  */
+ import patternOverrides from './pattern-overrides';
++import entity from './entity';
+ import postData from './post-data';
+ import postMeta from './post-meta';
+ import termData from './term-data';
+@@ -23,6 +24,7 @@ import termData from './term-data';
+  */
+ export function registerCoreBlockBindingsSources() {
+ 	registerBlockBindingsSource( patternOverrides );
++	registerBlockBindingsSource( entity );
+ 	registerBlockBindingsSource( postData );
+ 	registerBlockBindingsSource( postMeta );
+ 	registerBlockBindingsSource( termData );
+diff --git a/packages/editor/src/bindings/entity.js b/packages/editor/src/bindings/entity.js
+new file mode 100644
+index 00000000000000..1c163396b0bff2
+--- /dev/null
++++ b/packages/editor/src/bindings/entity.js
+@@ -0,0 +1,59 @@
++/**
++ * WordPress dependencies
++ */
++import { __ } from '@wordpress/i18n';
++import { store as coreDataStore } from '@wordpress/core-data';
++
++/**
++ * Block bindings source for resolving entity properties from explicit entity args.
++ *
++ * This is intentionally **not** tied to the current editor context (e.g. the post being edited).
++ * Consumers must pass the entity identifiers via `args`.
++ *
++ * Supported args:
++ * - `key`: Currently only supports `url`
++ * - `kind`: `post-type` | `taxonomy`
++ * - `type`: post type slug (e.g. `page`) or taxonomy slug (e.g. `category`, `post_tag`)
++ * - `id`: entity ID
++ *
++ * @type {WPBlockBindingsSource}
++ */
++export default {
++	name: 'core/entity',
++	label: __( 'Entity' ),
++	getValues( { select, bindings } ) {
++		const entityBinding = bindings?.url;
++		const key = entityBinding?.args?.key;
++		const kind = entityBinding?.args?.kind;
++		const type = entityBinding?.args?.type;
++		const id = entityBinding?.args?.id;
++
++		// Validate required args.
++		if ( key !== 'url' || ! kind || ! type || ! id ) {
++			return {};
++		}
++
++		// Only support `post-type` and `taxonomy` for now.
++		if ( kind !== 'post-type' && kind !== 'taxonomy' ) {
++			return {};
++		}
++
++		const { getEntityRecord } = select( coreDataStore );
++
++		if ( kind === 'post-type' ) {
++			const post = getEntityRecord( 'postType', type, id );
++			const url = post?.link || '';
++			return url ? { url } : {};
++		}
++
++		// Taxonomy entities.
++		const taxonomySlug = type === 'tag' ? 'post_tag' : type;
++		const term = getEntityRecord( 'taxonomy', taxonomySlug, id );
++		const url = term?.link || '';
++		return url ? { url } : {};
++	},
++	canUserEditValue() {
++		// Read-only; the URL is derived from entity data.
++		return false;
++	},
++};

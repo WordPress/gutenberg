@@ -1,0 +1,376 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b98fda2e4373c1..3ed9ce23bed100 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Bug Fix
+ 
+ -   `FontSizePicker`: Ensure that fluid font size presets appear correctly in the UI controls ([#44791](https://github.com/WordPress/gutenberg/pull/44791)).
++-   `Navigator`: restore focus only once per location  ([#44972](https://github.com/WordPress/gutenberg/pull/44972)).
+ 
+ ### Documentation
+ 
+diff --git a/packages/components/src/navigator/navigator-provider/component.tsx b/packages/components/src/navigator/navigator-provider/component.tsx
+index 634c6f8204b10e..fc769f2f5736ca 100644
+--- a/packages/components/src/navigator/navigator-provider/component.tsx
++++ b/packages/components/src/navigator/navigator-provider/component.tsx
+@@ -49,6 +49,7 @@ function NavigatorProvider(
+ 					...options,
+ 					path,
+ 					isBack: false,
++					hasRestoredFocus: false,
+ 				},
+ 			] );
+ 		},
+@@ -62,6 +63,7 @@ function NavigatorProvider(
+ 				{
+ 					...locationHistory[ locationHistory.length - 2 ],
+ 					isBack: true,
++					hasRestoredFocus: false,
+ 				},
+ 			] );
+ 		}
+diff --git a/packages/components/src/navigator/navigator-screen/component.tsx b/packages/components/src/navigator/navigator-screen/component.tsx
+index 2c646f475b4220..1ce1f22c5dcecd 100644
+--- a/packages/components/src/navigator/navigator-screen/component.tsx
++++ b/packages/components/src/navigator/navigator-screen/component.tsx
+@@ -62,14 +62,20 @@ function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
+ 		// - if the current location is not the initial one (to avoid moving focus on page load)
+ 		// - when the screen becomes visible
+ 		// - if the wrapper ref has been assigned
+-		if ( isInitialLocation || ! isMatch || ! wrapperRef.current ) {
++		// - if focus hasn't already been restored for the current location
++		if (
++			isInitialLocation ||
++			! isMatch ||
++			! wrapperRef.current ||
++			location.hasRestoredFocus
++		) {
+ 			return;
+ 		}
+ 
+ 		const activeElement = wrapperRef.current.ownerDocument.activeElement;
+ 
+ 		// If an element is already focused within the wrapper do not focus the
+-		// element. This prevents inputs or buttons from losing focus unecessarily.
++		// element. This prevents inputs or buttons from losing focus unnecessarily.
+ 		if ( wrapperRef.current.contains( activeElement ) ) {
+ 			return;
+ 		}
+@@ -93,10 +99,12 @@ function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
+ 			elementToFocus = firstTabbable ?? wrapperRef.current;
+ 		}
+ 
++		location.hasRestoredFocus = true;
+ 		elementToFocus.focus();
+ 	}, [
+ 		isInitialLocation,
+ 		isMatch,
++		location.hasRestoredFocus,
+ 		location.isBack,
+ 		previousLocation?.focusTargetSelector,
+ 	] );
+diff --git a/packages/components/src/navigator/test/index.tsx b/packages/components/src/navigator/test/index.tsx
+index ffdaf0e2c19678..be836f0152fc20 100644
+--- a/packages/components/src/navigator/test/index.tsx
++++ b/packages/components/src/navigator/test/index.tsx
+@@ -141,71 +141,91 @@ const MyNavigation = ( {
+ 	initialPath?: string;
+ 	onNavigatorButtonClick?: CustomTestOnClickHandler;
+ } ) => {
+-	const [ inputValue, setInputValue ] = useState( '' );
++	const [ innerInputValue, setInnerInputValue ] = useState( '' );
++	const [ outerInputValue, setOuterInputValue ] = useState( '' );
+ 	return (
+-		<NavigatorProvider initialPath={ initialPath }>
+-			<NavigatorScreen path={ PATHS.HOME }>
+-				<p>{ SCREEN_TEXT.home }</p>
+-				<CustomNavigatorButton
+-					path={ PATHS.NOT_FOUND }
+-					onClick={ onNavigatorButtonClick }
+-				>
+-					{ BUTTON_TEXT.toNonExistingScreen }
+-				</CustomNavigatorButton>
+-				<CustomNavigatorButton
+-					path={ PATHS.CHILD }
+-					onClick={ onNavigatorButtonClick }
+-				>
+-					{ BUTTON_TEXT.toChildScreen }
+-				</CustomNavigatorButton>
+-				<CustomNavigatorButton
+-					path={ PATHS.INVALID_HTML_ATTRIBUTE }
+-					onClick={ onNavigatorButtonClick }
+-				>
+-					{ BUTTON_TEXT.toInvalidHtmlPathScreen }
+-				</CustomNavigatorButton>
+-			</NavigatorScreen>
+-
+-			<NavigatorScreen path={ PATHS.CHILD }>
+-				<p>{ SCREEN_TEXT.child }</p>
+-				<CustomNavigatorButtonWithFocusRestoration
+-					path={ PATHS.NESTED }
+-					onClick={ onNavigatorButtonClick }
+-				>
+-					{ BUTTON_TEXT.toNestedScreen }
+-				</CustomNavigatorButtonWithFocusRestoration>
+-				<CustomNavigatorBackButton onClick={ onNavigatorButtonClick }>
+-					{ BUTTON_TEXT.back }
+-				</CustomNavigatorBackButton>
+-
+-				<label htmlFor="test-input">This is a test input</label>
+-				<input
+-					name="test-input"
+-					// eslint-disable-next-line no-restricted-syntax
+-					id="test-input"
+-					onChange={ ( e ) => {
+-						setInputValue( e.target.value );
+-					} }
+-					value={ inputValue }
+-				/>
+-			</NavigatorScreen>
+-
+-			<NavigatorScreen path={ PATHS.NESTED }>
+-				<p>{ SCREEN_TEXT.nested }</p>
+-				<CustomNavigatorBackButton onClick={ onNavigatorButtonClick }>
+-					{ BUTTON_TEXT.back }
+-				</CustomNavigatorBackButton>
+-			</NavigatorScreen>
+-
+-			<NavigatorScreen path={ PATHS.INVALID_HTML_ATTRIBUTE }>
+-				<p>{ SCREEN_TEXT.invalidHtmlPath }</p>
+-				<CustomNavigatorBackButton onClick={ onNavigatorButtonClick }>
+-					{ BUTTON_TEXT.back }
+-				</CustomNavigatorBackButton>
+-			</NavigatorScreen>
+-
+-			{ /* A `NavigatorScreen` with `path={ PATHS.NOT_FOUND }` is purposefully not included. */ }
+-		</NavigatorProvider>
++		<>
++			<NavigatorProvider initialPath={ initialPath }>
++				<NavigatorScreen path={ PATHS.HOME }>
++					<p>{ SCREEN_TEXT.home }</p>
++					<CustomNavigatorButton
++						path={ PATHS.NOT_FOUND }
++						onClick={ onNavigatorButtonClick }
++					>
++						{ BUTTON_TEXT.toNonExistingScreen }
++					</CustomNavigatorButton>
++					<CustomNavigatorButton
++						path={ PATHS.CHILD }
++						onClick={ onNavigatorButtonClick }
++					>
++						{ BUTTON_TEXT.toChildScreen }
++					</CustomNavigatorButton>
++					<CustomNavigatorButton
++						path={ PATHS.INVALID_HTML_ATTRIBUTE }
++						onClick={ onNavigatorButtonClick }
++					>
++						{ BUTTON_TEXT.toInvalidHtmlPathScreen }
++					</CustomNavigatorButton>
++				</NavigatorScreen>
++
++				<NavigatorScreen path={ PATHS.CHILD }>
++					<p>{ SCREEN_TEXT.child }</p>
++					<CustomNavigatorButtonWithFocusRestoration
++						path={ PATHS.NESTED }
++						onClick={ onNavigatorButtonClick }
++					>
++						{ BUTTON_TEXT.toNestedScreen }
++					</CustomNavigatorButtonWithFocusRestoration>
++					<CustomNavigatorBackButton
++						onClick={ onNavigatorButtonClick }
++					>
++						{ BUTTON_TEXT.back }
++					</CustomNavigatorBackButton>
++
++					<label htmlFor="test-input-inner">Inner input</label>
++					<input
++						name="test-input-inner"
++						// eslint-disable-next-line no-restricted-syntax
++						id="test-input-inner"
++						onChange={ ( e ) => {
++							setInnerInputValue( e.target.value );
++						} }
++						value={ innerInputValue }
++					/>
++				</NavigatorScreen>
++
++				<NavigatorScreen path={ PATHS.NESTED }>
++					<p>{ SCREEN_TEXT.nested }</p>
++					<CustomNavigatorBackButton
++						onClick={ onNavigatorButtonClick }
++					>
++						{ BUTTON_TEXT.back }
++					</CustomNavigatorBackButton>
++				</NavigatorScreen>
++
++				<NavigatorScreen path={ PATHS.INVALID_HTML_ATTRIBUTE }>
++					<p>{ SCREEN_TEXT.invalidHtmlPath }</p>
++					<CustomNavigatorBackButton
++						onClick={ onNavigatorButtonClick }
++					>
++						{ BUTTON_TEXT.back }
++					</CustomNavigatorBackButton>
++				</NavigatorScreen>
++
++				{ /* A `NavigatorScreen` with `path={ PATHS.NOT_FOUND }` is purposefully not included. */ }
++			</NavigatorProvider>
++
++			<label htmlFor="test-input-outer">Outer input</label>
++			<input
++				name="test-input-outer"
++				// eslint-disable-next-line no-restricted-syntax
++				id="test-input-outer"
++				onChange={ ( e ) => {
++					setOuterInputValue( e.target.value );
++				} }
++				value={ outerInputValue }
++			/>
++		</>
+ 	);
+ };
+ 
+@@ -379,38 +399,6 @@ describe( 'Navigator', () => {
+ 		} );
+ 	} );
+ 
+-	it( 'should restore focus correctly', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
+-
+-		render( <MyNavigation /> );
+-
+-		expect( getScreen( 'home' ) ).toBeInTheDocument();
+-
+-		// Navigate to child screen.
+-		await user.click( getNavigationButton( 'toChildScreen' ) );
+-
+-		expect( getScreen( 'child' ) ).toBeInTheDocument();
+-
+-		// Navigate to nested screen.
+-		await user.click( getNavigationButton( 'toNestedScreen' ) );
+-
+-		expect( getScreen( 'nested' ) ).toBeInTheDocument();
+-
+-		// Navigate back to child screen, check that focus was correctly restored.
+-		await user.click( getNavigationButton( 'back' ) );
+-
+-		expect( getScreen( 'child' ) ).toBeInTheDocument();
+-		expect( getNavigationButton( 'toNestedScreen' ) ).toHaveFocus();
+-
+-		// Navigate back to home screen, check that focus was correctly restored.
+-		await user.click( getNavigationButton( 'back' ) );
+-
+-		expect( getScreen( 'home' ) ).toBeInTheDocument();
+-		expect( getNavigationButton( 'toChildScreen' ) ).toHaveFocus();
+-	} );
+-
+ 	it( 'should escape the value of the `path` prop', async () => {
+ 		const user = userEvent.setup( {
+ 			advanceTimers: jest.advanceTimersByTime,
+@@ -445,26 +433,77 @@ describe( 'Navigator', () => {
+ 		).toHaveFocus();
+ 	} );
+ 
+-	it( 'should keep focus on the element that is being interacted with, while re-rendering', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
++	describe( 'focus management', () => {
++		it( 'should restore focus correctly', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
++			render( <MyNavigation /> );
++
++			// Navigate to child screen.
++			await user.click( getNavigationButton( 'toChildScreen' ) );
++
++			// The first tabbable element receives focus.
++			expect( getNavigationButton( 'toNestedScreen' ) ).toHaveFocus();
++
++			// Navigate to nested screen.
++			await user.click( getNavigationButton( 'toNestedScreen' ) );
++
++			// The first tabbable element receives focus.
++			expect( getNavigationButton( 'back' ) ).toHaveFocus();
++
++			// Navigate back to child screen.
++			await user.click( getNavigationButton( 'back' ) );
++
++			// The first tabbable element receives focus.
++			expect( getNavigationButton( 'toNestedScreen' ) ).toHaveFocus();
++
++			// Navigate back to home screen, check that focus was correctly restored.
++			await user.click( getNavigationButton( 'back' ) );
++
++			// The first tabbable element receives focus.
++			expect( getNavigationButton( 'toChildScreen' ) ).toHaveFocus();
+ 		} );
+ 
+-		render( <MyNavigation /> );
++		it( 'should keep focus on an active element inside navigator, while re-rendering', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
+ 
+-		expect( getScreen( 'home' ) ).toBeInTheDocument();
+-		expect( getNavigationButton( 'toChildScreen' ) ).toBeInTheDocument();
++			render( <MyNavigation /> );
+ 
+-		// Navigate to child screen.
+-		await user.click( getNavigationButton( 'toChildScreen' ) );
++			// Navigate to child screen.
++			await user.click( getNavigationButton( 'toChildScreen' ) );
+ 
+-		expect( getScreen( 'child' ) ).toBeInTheDocument();
+-		expect( getNavigationButton( 'back' ) ).toBeInTheDocument();
+-		expect( getNavigationButton( 'toNestedScreen' ) ).toHaveFocus();
++			// The first tabbable element receives focus.
++			expect( getNavigationButton( 'toNestedScreen' ) ).toHaveFocus();
+ 
+-		// Interact with the input, the focus should stay on the input element.
+-		const input = screen.getByLabelText( 'This is a test input' );
+-		await user.type( input, 'd' );
+-		expect( input ).toHaveFocus();
++			// Interact with the inner input.
++			// The focus should stay on the input element.
++			const innerInput = screen.getByLabelText( 'Inner input' );
++			await user.type( innerInput, 'd' );
++			expect( innerInput ).toHaveFocus();
++		} );
++
++		it( 'should keep focus on an active element outside navigator, while re-rendering', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
++			render( <MyNavigation /> );
++
++			// Navigate to child screen.
++			await user.click( getNavigationButton( 'toChildScreen' ) );
++
++			// The first tabbable element receives focus.
++			expect( getNavigationButton( 'toNestedScreen' ) ).toHaveFocus();
++
++			// Interact with the outer input.
++			// The focus should stay on the input element.
++			const outerInput = screen.getByLabelText( 'Outer input' );
++			await user.type( outerInput, 'd' );
++			expect( outerInput ).toHaveFocus();
++		} );
+ 	} );
+ } );
+diff --git a/packages/components/src/navigator/types.ts b/packages/components/src/navigator/types.ts
+index edc80c356e18e5..217b9408923374 100644
+--- a/packages/components/src/navigator/types.ts
++++ b/packages/components/src/navigator/types.ts
+@@ -11,6 +11,7 @@ export type NavigatorLocation = NavigateOptions & {
+ 	isInitial?: boolean;
+ 	isBack?: boolean;
+ 	path?: string;
++	hasRestoredFocus?: boolean;
+ };
+ 
+ export type NavigatorContext = {

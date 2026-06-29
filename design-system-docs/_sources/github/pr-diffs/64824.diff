@@ -1,0 +1,392 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 693fcf71db183f..8c676c3334465c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -20,6 +20,7 @@
+ -   `TabPanel`: Remove radius applied to panel focus style ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
+ -   `Tabs`: Remove radius applied to panel focus style ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
+ -   `UnitControl`: Update unit select styles ([#64712](https://github.com/WordPress/gutenberg/pull/64712)).
++-   `InputControl`: Add variants to prefix/suffix wrappers ([#64824](https://github.com/WordPress/gutenberg/pull/64824)).
+ -   `Navigator`: remove location history, simplify internal logic ([#64675](https://github.com/WordPress/gutenberg/pull/64675)).
+ -   Decrease horizontal padding from 16px to 12px on the following components, when in the 40px default size ([#64708](https://github.com/WordPress/gutenberg/pull/64708)).
+     -   `AnglePickerControl`
+diff --git a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+index cb6fffb5aeff03..bd2c26d641fe72 100644
+--- a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
++++ b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+@@ -45,7 +45,7 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+   min-height: 0;
+ }
+ 
+-.emotion-6:focus-within:not( :has( :is( .em5sgkm7, .emotion-19 ):focus-within ) ) .emotion-26 {
++.emotion-6:focus-within:not( :has( :is( .em5sgkm8, .emotion-19 ):focus-within ) ) .emotion-26 {
+   border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+   box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+   outline: 2px solid transparent;
+@@ -157,8 +157,8 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+ }
+ 
+ .emotion-21 {
+-  margin-bottom: 0;
+-  padding-right: 8px;
++  -webkit-padding-end: 8px;
++  padding-inline-end: 8px;
+   position: absolute;
+   pointer-events: none;
+   right: 0;
+@@ -249,7 +249,7 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+             class="components-input-control__suffix emotion-18 emotion-19"
+           >
+             <div
+-              class="components-spacer components-input-control-suffix-wrapper emotion-20 emotion-21 emotion-7"
++              class="components-input-control-suffix-wrapper emotion-20 emotion-21 emotion-22"
+               data-wp-c16t="true"
+               data-wp-component="InputControlSuffixWrapper"
+             >
+@@ -327,7 +327,7 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
+   min-height: 0;
+ }
+ 
+-.emotion-6:focus-within:not( :has( :is( .em5sgkm7, .emotion-19 ):focus-within ) ) .emotion-26 {
++.emotion-6:focus-within:not( :has( :is( .em5sgkm8, .emotion-19 ):focus-within ) ) .emotion-26 {
+   border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+   box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+   outline: 2px solid transparent;
+@@ -439,8 +439,8 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
+ }
+ 
+ .emotion-21 {
+-  margin-bottom: 0;
+-  padding-right: 8px;
++  -webkit-padding-end: 8px;
++  padding-inline-end: 8px;
+   position: absolute;
+   pointer-events: none;
+   right: 0;
+@@ -541,7 +541,7 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
+             class="components-input-control__suffix emotion-18 emotion-19"
+           >
+             <div
+-              class="components-spacer components-input-control-suffix-wrapper emotion-20 emotion-21 emotion-7"
++              class="components-input-control-suffix-wrapper emotion-20 emotion-21 emotion-22"
+               data-wp-c16t="true"
+               data-wp-component="InputControlSuffixWrapper"
+             >
+@@ -619,7 +619,7 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`]
+   min-height: 0;
+ }
+ 
+-.emotion-6:focus-within:not( :has( :is( .em5sgkm7, .emotion-19 ):focus-within ) ) .emotion-26 {
++.emotion-6:focus-within:not( :has( :is( .em5sgkm8, .emotion-19 ):focus-within ) ) .emotion-26 {
+   border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+   box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+   outline: 2px solid transparent;
+@@ -731,8 +731,8 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`]
+ }
+ 
+ .emotion-21 {
+-  margin-bottom: 0;
+-  padding-right: 8px;
++  -webkit-padding-end: 8px;
++  padding-inline-end: 8px;
+   position: absolute;
+   pointer-events: none;
+   right: 0;
+@@ -845,7 +845,7 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`]
+             class="components-input-control__suffix emotion-18 emotion-19"
+           >
+             <div
+-              class="components-spacer components-input-control-suffix-wrapper emotion-20 emotion-21 emotion-7"
++              class="components-input-control-suffix-wrapper emotion-20 emotion-21 emotion-22"
+               data-wp-c16t="true"
+               data-wp-component="InputControlSuffixWrapper"
+             >
+@@ -923,7 +923,7 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
+   min-height: 0;
+ }
+ 
+-.emotion-6:focus-within:not( :has( :is( .em5sgkm7, .emotion-19 ):focus-within ) ) .emotion-26 {
++.emotion-6:focus-within:not( :has( :is( .em5sgkm8, .emotion-19 ):focus-within ) ) .emotion-26 {
+   border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+   box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+   outline: 2px solid transparent;
+@@ -1035,8 +1035,8 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
+ }
+ 
+ .emotion-21 {
+-  margin-bottom: 0;
+-  padding-right: 8px;
++  -webkit-padding-end: 8px;
++  padding-inline-end: 8px;
+   position: absolute;
+   pointer-events: none;
+   right: 0;
+@@ -1149,7 +1149,7 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
+             class="components-input-control__suffix emotion-18 emotion-19"
+           >
+             <div
+-              class="components-spacer components-input-control-suffix-wrapper emotion-20 emotion-21 emotion-7"
++              class="components-input-control-suffix-wrapper emotion-20 emotion-21 emotion-22"
+               data-wp-c16t="true"
+               data-wp-component="InputControlSuffixWrapper"
+             >
+diff --git a/packages/components/src/input-control/input-base.tsx b/packages/components/src/input-control/input-base.tsx
+index f59c2a411e05a5..f1b8227563cfdc 100644
+--- a/packages/components/src/input-control/input-base.tsx
++++ b/packages/components/src/input-control/input-base.tsx
+@@ -14,13 +14,7 @@ import { useMemo } from '@wordpress/element';
+  */
+ import Backdrop from './backdrop';
+ import Label from './label';
+-import {
+-	Container,
+-	Root,
+-	Prefix,
+-	Suffix,
+-	getSizeConfig,
+-} from './styles/input-control-styles';
++import { Container, Root, Prefix, Suffix } from './styles/input-control-styles';
+ import type { InputBaseProps, LabelPosition } from './types';
+ import type { WordPressComponentProps } from '../context';
+ import {
+@@ -90,16 +84,12 @@ function InputBase(
+ 	const id = useUniqueId( idProp );
+ 	const hideLabel = hideLabelFromVision || ! label;
+ 
+-	const { paddingLeft, paddingRight } = getSizeConfig( {
+-		inputSize: size,
+-		__next40pxDefaultSize,
+-	} );
+ 	const prefixSuffixContextValue = useMemo( () => {
+ 		return {
+-			InputControlPrefixWrapper: { paddingLeft: `${ paddingLeft }px` },
+-			InputControlSuffixWrapper: { paddingRight: `${ paddingRight }px` },
++			InputControlPrefixWrapper: { __next40pxDefaultSize, size },
++			InputControlSuffixWrapper: { __next40pxDefaultSize, size },
+ 		};
+-	}, [ paddingLeft, paddingRight ] );
++	}, [ __next40pxDefaultSize, size ] );
+ 
+ 	return (
+ 		// @ts-expect-error The `direction` prop from Flex (FlexDirection) conflicts with legacy SVGAttributes `direction` (string) that come from React intrinsic prop definitions.
+diff --git a/packages/components/src/input-control/input-prefix-wrapper.tsx b/packages/components/src/input-control/input-prefix-wrapper.tsx
+index 23d9e823da932d..c5232e4d9e6bbc 100644
+--- a/packages/components/src/input-control/input-prefix-wrapper.tsx
++++ b/packages/components/src/input-control/input-prefix-wrapper.tsx
+@@ -6,19 +6,23 @@ import type { ForwardedRef } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import { Spacer } from '../spacer';
+ import type { WordPressComponentProps } from '../context';
+ import { contextConnect, useContextSystem } from '../context';
+-import type { InputControlPrefixWrapperProps } from './types';
++import type { PrefixSuffixWrapperProps } from './types';
++import { PrefixSuffixWrapper } from './styles/input-control-styles';
+ 
+ function UnconnectedInputControlPrefixWrapper(
+-	props: WordPressComponentProps< InputControlPrefixWrapperProps, 'div' >,
++	props: WordPressComponentProps< PrefixSuffixWrapperProps, 'div' >,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const derivedProps = useContextSystem( props, 'InputControlPrefixWrapper' );
+ 
+ 	return (
+-		<Spacer marginBottom={ 0 } { ...derivedProps } ref={ forwardedRef } />
++		<PrefixSuffixWrapper
++			{ ...derivedProps }
++			isPrefix
++			ref={ forwardedRef }
++		/>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/input-control/input-suffix-wrapper.tsx b/packages/components/src/input-control/input-suffix-wrapper.tsx
+index 1be352f562e369..fb3ec4c6ae9be9 100644
+--- a/packages/components/src/input-control/input-suffix-wrapper.tsx
++++ b/packages/components/src/input-control/input-suffix-wrapper.tsx
+@@ -6,20 +6,18 @@ import type { ForwardedRef } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import { Spacer } from '../spacer';
+ import type { WordPressComponentProps } from '../context';
+ import { contextConnect, useContextSystem } from '../context';
+-import type { InputControlSuffixWrapperProps } from './types';
++import type { PrefixSuffixWrapperProps } from './types';
++import { PrefixSuffixWrapper } from './styles/input-control-styles';
+ 
+ function UnconnectedInputControlSuffixWrapper(
+-	props: WordPressComponentProps< InputControlSuffixWrapperProps, 'div' >,
++	props: WordPressComponentProps< PrefixSuffixWrapperProps, 'div' >,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const derivedProps = useContextSystem( props, 'InputControlSuffixWrapper' );
+ 
+-	return (
+-		<Spacer marginBottom={ 0 } { ...derivedProps } ref={ forwardedRef } />
+-	);
++	return <PrefixSuffixWrapper { ...derivedProps } ref={ forwardedRef } />;
+ }
+ 
+ /**
+diff --git a/packages/components/src/input-control/stories/index.story.tsx b/packages/components/src/input-control/stories/index.story.tsx
+index 6067c467f9fe68..1a9290e8e856ea 100644
+--- a/packages/components/src/input-control/stories/index.story.tsx
++++ b/packages/components/src/input-control/stories/index.story.tsx
+@@ -5,7 +5,7 @@ import type { Meta, StoryFn } from '@storybook/react';
+ /**
+  * WordPress dependencies
+  */
+-import { seen, unseen } from '@wordpress/icons';
++import { closeSmall, Icon, link, seen, unseen } from '@wordpress/icons';
+ import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+@@ -75,6 +75,29 @@ WithSuffix.args = {
+ 	suffix: <InputControlSuffixWrapper>%</InputControlSuffixWrapper>,
+ };
+ 
++/**
++ * `<InputControlPrefixWrapper>` and `<InputControlSuffixWrapper>` have a `variant` prop that can be used to
++ * adjust the wrapper based on the prefix or suffix content.
++ *
++ * - `'default'`: Standard padding for text content.
++ * - `'icon'`: For icons.
++ * - `'control'`: For controls, like buttons or selects.
++ */
++export const WithIconOrControl = Template.bind( {} );
++WithIconOrControl.args = {
++	...Default.args,
++	prefix: (
++		<InputControlPrefixWrapper variant="icon">
++			<Icon icon={ link } />
++		</InputControlPrefixWrapper>
++	),
++	suffix: (
++		<InputControlSuffixWrapper variant="control">
++			<Button icon={ closeSmall } size="small" label="Clear" />
++		</InputControlSuffixWrapper>
++	),
++};
++
+ export const WithSideLabel = Template.bind( {} );
+ WithSideLabel.args = {
+ 	...Default.args,
+@@ -95,17 +118,13 @@ export const ShowPassword: StoryFn< typeof InputControl > = ( args ) => {
+ 			type={ visible ? 'text' : 'password' }
+ 			label="Password"
+ 			suffix={
+-				<InputControlSuffixWrapper>
+-					<div style={ { display: 'flex' } }>
+-						<Button
+-							size="small"
+-							icon={ visible ? unseen : seen }
+-							onClick={ () => setVisible( ( value ) => ! value ) }
+-							label={
+-								visible ? 'Hide password' : 'Show password'
+-							}
+-						/>
+-					</div>
++				<InputControlSuffixWrapper variant="control">
++					<Button
++						size="small"
++						icon={ visible ? unseen : seen }
++						onClick={ () => setVisible( ( value ) => ! value ) }
++						label={ visible ? 'Hide password' : 'Show password' }
++					/>
+ 				</InputControlSuffixWrapper>
+ 			}
+ 			{ ...args }
+diff --git a/packages/components/src/input-control/styles/input-control-styles.tsx b/packages/components/src/input-control/styles/input-control-styles.tsx
+index c2be294424f50a..39eea8fdb029a1 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.tsx
++++ b/packages/components/src/input-control/styles/input-control-styles.tsx
+@@ -13,7 +13,7 @@ import type { WordPressComponentProps } from '../../context';
+ import { Flex, FlexItem } from '../../flex';
+ import { Text } from '../../text';
+ import { baseLabelTypography, COLORS, CONFIG, rtl } from '../../utils';
+-import type { LabelPosition, Size } from '../types';
++import type { LabelPosition, Size, PrefixSuffixWrapperProps } from '../types';
+ 
+ type ContainerProps = {
+ 	disabled?: boolean;
+@@ -318,3 +318,35 @@ export const Label = (
+ export const LabelWrapper = styled( FlexItem )`
+ 	max-width: calc( 100% - 10px );
+ `;
++
++const prefixSuffixWrapperStyles = ( {
++	variant = 'default',
++	size,
++	__next40pxDefaultSize,
++	isPrefix,
++}: PrefixSuffixWrapperProps & { isPrefix?: boolean } ) => {
++	const { paddingLeft: padding } = getSizeConfig( {
++		inputSize: size,
++		__next40pxDefaultSize,
++	} );
++
++	const paddingProperty = isPrefix
++		? 'paddingInlineStart'
++		: 'paddingInlineEnd';
++
++	if ( variant === 'default' ) {
++		return css( {
++			[ paddingProperty ]: padding,
++		} );
++	}
++
++	// If variant is 'icon' or 'control'
++	return css( {
++		display: 'flex',
++		[ paddingProperty ]: padding - 4,
++	} );
++};
++
++export const PrefixSuffixWrapper = styled.div`
++	${ prefixSuffixWrapperStyles }
++`;
+diff --git a/packages/components/src/input-control/types.ts b/packages/components/src/input-control/types.ts
+index 7d7a8267424b88..13f078cd89cc1f 100644
+--- a/packages/components/src/input-control/types.ts
++++ b/packages/components/src/input-control/types.ts
+@@ -209,16 +209,31 @@ export interface InputControlLabelProps {
+ 	size?: BaseProps[ 'size' ];
+ }
+ 
+-export type InputControlPrefixWrapperProps = {
++export type PrefixSuffixWrapperProps = {
+ 	/**
+-	 * The prefix to be inserted.
++	 * The content to be inserted.
+ 	 */
+ 	children: ReactNode;
+-};
+-
+-export type InputControlSuffixWrapperProps = {
+ 	/**
+-	 * The suffix to be inserted.
++	 * Internal prop used to control the padding size of the wrapper.
++	 *
++	 * @ignore
+ 	 */
+-	children: ReactNode;
++	size?: BaseProps[ 'size' ];
++	/**
++	 * Internal prop used to control the padding size of the wrapper.
++	 *
++	 * @ignore
++	 */
++	__next40pxDefaultSize?: BaseProps[ '__next40pxDefaultSize' ];
++	/**
++	 * Adjust the wrapper based on the prefix or suffix content.
++	 *
++	 * - `'default'`: Standard padding for text content.
++	 * - `'icon'`: For icons.
++	 * - `'control'`: For controls, like buttons or selects.
++	 *
++	 * @default 'default'
++	 */
++	variant?: 'default' | 'icon' | 'control';
+ };

@@ -1,0 +1,278 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 34e1c30eb12ec0..770a879d27d72f 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -86,6 +86,7 @@ module.exports = {
+ 							'countBy',
+ 							'defaults',
+ 							'defaultTo',
++							'delay',
+ 							'differenceWith',
+ 							'dropRight',
+ 							'each',
+diff --git a/packages/block-editor/src/components/inserter/index.native.js b/packages/block-editor/src/components/inserter/index.native.js
+index 8c7eac72aba25f..7dcc0fdbef0e13 100644
+--- a/packages/block-editor/src/components/inserter/index.native.js
++++ b/packages/block-editor/src/components/inserter/index.native.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import { AccessibilityInfo, Platform, Text } from 'react-native';
+-import { delay } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -80,6 +79,8 @@ const defaultRenderToggle = ( {
+ };
+ 
+ export class Inserter extends Component {
++	announcementTimeout;
++
+ 	constructor() {
+ 		super( ...arguments );
+ 
+@@ -88,6 +89,10 @@ export class Inserter extends Component {
+ 		this.renderContent = this.renderContent.bind( this );
+ 	}
+ 
++	componentWillUnmount() {
++		clearTimeout( this.announcementTimeout );
++	}
++
+ 	getInsertionOptions() {
+ 		const addBeforeOption = {
+ 			value: 'before',
+@@ -217,7 +222,7 @@ export class Inserter extends Component {
+ 				const announcement = isOpen
+ 					? __( 'Scrollable block menu opened. Select a block.' )
+ 					: __( 'Scrollable block menu closed.' );
+-				delay(
++				this.announcementTimeout = setTimeout(
+ 					() =>
+ 						AccessibilityInfo.announceForAccessibility(
+ 							announcement
+diff --git a/packages/block-editor/src/components/media-upload/index.native.js b/packages/block-editor/src/components/media-upload/index.native.js
+index d8303e44e39d3d..75bc716a3e1f69 100644
+--- a/packages/block-editor/src/components/media-upload/index.native.js
++++ b/packages/block-editor/src/components/media-upload/index.native.js
+@@ -3,8 +3,6 @@
+  */
+ import { Platform } from 'react-native';
+ 
+-import { delay } from 'lodash';
+-
+ import prompt from 'react-native-prompt-android';
+ 
+ /**
+@@ -46,6 +44,8 @@ const URL_MEDIA_SOURCE = 'URL';
+ const PICKER_OPENING_DELAY = 200;
+ 
+ export class MediaUpload extends Component {
++	pickerTimeout;
++
+ 	constructor( props ) {
+ 		super( props );
+ 		this.onPickerPresent = this.onPickerPresent.bind( this );
+@@ -78,6 +78,10 @@ export class MediaUpload extends Component {
+ 		}
+ 	}
+ 
++	componentWillUnmount() {
++		clearTimeout( this.pickerTimeout );
++	}
++
+ 	getAllSources() {
+ 		const { onSelectURL } = this.props;
+ 
+@@ -189,7 +193,7 @@ export class MediaUpload extends Component {
+ 			// the delay below is required because on iOS this action sheet gets dismissed by the close event of the Inserter
+ 			// so this delay allows the Inserter to be closed fully before presenting action sheet.
+ 			if ( autoOpen && isIOS ) {
+-				delay(
++				this.pickerTimeout = setTimeout(
+ 					() => this.picker.presentPicker(),
+ 					PICKER_OPENING_DELAY
+ 				);
+diff --git a/packages/block-library/src/columns/edit.native.js b/packages/block-library/src/columns/edit.native.js
+index 306ab96709df84..4f62e227d890e2 100644
+--- a/packages/block-library/src/columns/edit.native.js
++++ b/packages/block-library/src/columns/edit.native.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import { View, Dimensions } from 'react-native';
+-import { times, map, delay } from 'lodash';
++import { times, map } from 'lodash';
+ /**
+  * WordPress dependencies
+  */
+@@ -496,7 +496,9 @@ const ColumnsEdit = ( props ) => {
+ 
+ 	useEffect( () => {
+ 		if ( isSelected && isDefaultColumns ) {
+-			delay( () => setIsVisible( true ), 100 );
++			const revealTimeout = setTimeout( () => setIsVisible( true ), 100 );
++
++			return () => clearTimeout( revealTimeout );
+ 		}
+ 	}, [] );
+ 
+diff --git a/packages/block-library/src/image/test/edit.native.js b/packages/block-library/src/image/test/edit.native.js
+index e8b748e95e4302..323f46d8751a94 100644
+--- a/packages/block-library/src/image/test/edit.native.js
++++ b/packages/block-library/src/image/test/edit.native.js
+@@ -7,6 +7,7 @@ import {
+ 	initializeEditor,
+ 	getEditorHtml,
+ 	render,
++	waitFor,
+ } from 'test/helpers';
+ import { Image } from 'react-native';
+ import Clipboard from '@react-native-clipboard/clipboard';
+@@ -40,16 +41,6 @@ sendMediaUpload.mockImplementation( ( payload ) => {
+ 	uploadCallBack( payload );
+ } );
+ 
+-/**
+- * Immediately invoke delayed functions. A better alternative would be using
+- * fake timers and test the delay itself. However, fake timers does not work
+- * with our custom waitFor implementation.
+- */
+-jest.mock( 'lodash', () => {
+-	const actual = jest.requireActual( 'lodash' );
+-	return { ...actual, delay: ( cb ) => cb() };
+-} );
+-
+ function mockGetMedia( media ) {
+ 	jest.spyOn( select( coreStore ), 'getMedia' ).mockReturnValue( media );
+ }
+@@ -157,6 +148,9 @@ describe( 'Image Block', () => {
+ 			'wordpress.org'
+ 		);
+ 		fireEvent.press( screen.getByA11yLabel( 'Apply' ) );
++		await waitFor(
++			() => new Promise( ( resolve ) => setTimeout( resolve, 100 ) )
++		);
+ 
+ 		const expectedHtml = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"custom","className":"is-style-default"} -->
+ <figure class="wp-block-image size-large is-style-default"><a href="http://wordpress.org"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/></a><figcaption class="wp-element-caption">Mountain</figcaption></figure>
+@@ -183,6 +177,7 @@ describe( 'Image Block', () => {
+ 		);
+ 		fireEvent.press( screen.getByText( 'None' ) );
+ 		fireEvent.press( screen.getByText( 'Media File' ) );
++		await waitFor( () => screen.getByText( 'Custom URL' ) );
+ 		fireEvent.press( screen.getByText( 'Custom URL' ) );
+ 		// Await asynchronous fetch of clipboard
+ 		await act( () => clipboardPromise );
+@@ -191,6 +186,7 @@ describe( 'Image Block', () => {
+ 			'wordpress.org'
+ 		);
+ 		fireEvent.press( screen.getByA11yLabel( 'Apply' ) );
++		await waitFor( () => screen.getByText( 'Custom URL' ) );
+ 		fireEvent.press( screen.getByText( 'Custom URL' ) );
+ 		// Await asynchronous fetch of clipboard
+ 		await act( () => clipboardPromise );
+diff --git a/packages/components/src/mobile/link-picker/link-picker-screen.native.js b/packages/components/src/mobile/link-picker/link-picker-screen.native.js
+index feb6b3e2eafb21..f77cf4e18a1b07 100644
+--- a/packages/components/src/mobile/link-picker/link-picker-screen.native.js
++++ b/packages/components/src/mobile/link-picker/link-picker-screen.native.js
+@@ -3,12 +3,11 @@
+  */
+ import { Keyboard } from 'react-native';
+ import { useNavigation, useRoute } from '@react-navigation/native';
+-import { delay } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+  */
+-import { useMemo } from '@wordpress/element';
++import { useEffect, useMemo, useRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -18,10 +17,12 @@ import { LinkPicker } from './';
+ const LinkPickerScreen = ( { returnScreenName } ) => {
+ 	const navigation = useNavigation();
+ 	const route = useRoute();
++	const navigateToLinkTimeoutRef = useRef( null );
++	const navigateBackTimeoutRef = useRef( null );
+ 
+ 	const onLinkPicked = ( { url, title } ) => {
+ 		Keyboard.dismiss();
+-		delay( () => {
++		navigateToLinkTimeoutRef.current = setTimeout( () => {
+ 			navigation.navigate( returnScreenName, {
+ 				inputValue: url,
+ 				text: title,
+@@ -31,11 +32,18 @@ const LinkPickerScreen = ( { returnScreenName } ) => {
+ 
+ 	const onCancel = () => {
+ 		Keyboard.dismiss();
+-		delay( () => {
++		navigateBackTimeoutRef.current = setTimeout( () => {
+ 			navigation.goBack();
+ 		}, 100 );
+ 	};
+ 
++	useEffect( () => {
++		return () => {
++			clearTimeout( navigateToLinkTimeoutRef.current );
++			clearTimeout( navigateBackTimeoutRef.current );
++		};
++	}, [] );
++
+ 	const { inputValue } = route.params;
+ 	return useMemo( () => {
+ 		return (
+diff --git a/packages/format-library/src/link/modal-screens/link-picker-screen.native.js b/packages/format-library/src/link/modal-screens/link-picker-screen.native.js
+index a46eeaa400610b..bbd8503566b007 100644
+--- a/packages/format-library/src/link/modal-screens/link-picker-screen.native.js
++++ b/packages/format-library/src/link/modal-screens/link-picker-screen.native.js
+@@ -3,11 +3,11 @@
+  */
+ import { Keyboard } from 'react-native';
+ import { useNavigation, useRoute } from '@react-navigation/native';
+-import { delay } from 'lodash';
++
+ /**
+  * WordPress dependencies
+  */
+-import { useMemo } from '@wordpress/element';
++import { useEffect, useMemo, useRef } from '@wordpress/element';
+ 
+ import { LinkPicker } from '@wordpress/components';
+ 
+@@ -19,9 +19,12 @@ import linkSettingsScreens from './screens';
+ const LinkPickerScreen = () => {
+ 	const navigation = useNavigation();
+ 	const route = useRoute();
++	const navigateToLinkTimeoutRef = useRef( null );
++	const navigateBackTimeoutRef = useRef( null );
++
+ 	const onLinkPicked = ( { url, title } ) => {
+ 		Keyboard.dismiss();
+-		delay( () => {
++		navigateToLinkTimeoutRef.current = setTimeout( () => {
+ 			navigation.navigate( linkSettingsScreens.settings, {
+ 				inputValue: url,
+ 				text: title,
+@@ -31,11 +34,18 @@ const LinkPickerScreen = () => {
+ 
+ 	const onCancel = () => {
+ 		Keyboard.dismiss();
+-		delay( () => {
++		navigateBackTimeoutRef.current = setTimeout( () => {
+ 			navigation.goBack();
+ 		}, 100 );
+ 	};
+ 
++	useEffect( () => {
++		return () => {
++			clearTimeout( navigateToLinkTimeoutRef.current );
++			clearTimeout( navigateBackTimeoutRef.current );
++		};
++	}, [] );
++
+ 	const { inputValue } = route.params;
+ 	return useMemo( () => {
+ 		return (

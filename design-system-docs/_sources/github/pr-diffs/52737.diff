@@ -1,0 +1,113 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c903989f456288..2cfc0c1f5caeba 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancements
+ 
+ -   `ColorPalette`, `BorderControl`: Don't hyphenate hex value in `aria-label` ([#52932](https://github.com/WordPress/gutenberg/pull/52932)).
++-   `MenuItemsChoice`, `MenuItem`: Support a `disabled` prop on a menu item ([#52737](https://github.com/WordPress/gutenberg/pull/52737)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/menu-item/README.md b/packages/components/src/menu-item/README.md
+index 68affcd63b8bfd..8532e54d4132da 100644
+--- a/packages/components/src/menu-item/README.md
++++ b/packages/components/src/menu-item/README.md
+@@ -34,6 +34,13 @@ MenuItem supports the following props. Any additional props are passed through t
+ 
+ Element to render as child of button.
+ 
++### `disabled`
++
++-   Type: `boolean`
++-   Required: No
++
++Refer to documentation for [Button's `disabled` prop](/packages/components/src/button/README.md#disabled-boolean).
++
+ ### `info`
+ 
+ -   Type: `string`
+diff --git a/packages/components/src/menu-items-choice/index.tsx b/packages/components/src/menu-items-choice/index.tsx
+index 171e5fae72a60f..f909dceda22e9d 100644
+--- a/packages/components/src/menu-items-choice/index.tsx
++++ b/packages/components/src/menu-items-choice/index.tsx
+@@ -58,6 +58,7 @@ function MenuItemsChoice( {
+ 					<MenuItem
+ 						key={ item.value }
+ 						role="menuitemradio"
++						disabled={ item.disabled }
+ 						icon={ isSelected && check }
+ 						info={ item.info }
+ 						isSelected={ isSelected }
+diff --git a/packages/components/src/menu-items-choice/types.ts b/packages/components/src/menu-items-choice/types.ts
+index 9695c58e459838..87d8e7687a4fbd 100644
+--- a/packages/components/src/menu-items-choice/types.ts
++++ b/packages/components/src/menu-items-choice/types.ts
+@@ -2,6 +2,7 @@
+  * Internal dependencies
+  */
+ import type { ShortcutProps } from '../shortcut/types';
++import type { ButtonAsButtonProps } from '../button/types';
+ 
+ export type MenuItemsChoiceProps = {
+ 	/**
+@@ -38,6 +39,10 @@ export type MenuItemChoice = {
+ 	 * Unique value for choice.
+ 	 */
+ 	value: string;
++	/**
++	 * Whether the menu item is disabled.
++	 */
++	disabled?: ButtonAsButtonProps[ 'disabled' ];
+ 	/**
+ 	 * Additional information which will be rendered below the given label.
+ 	 */
+diff --git a/packages/edit-post/src/components/header/mode-switcher/index.js b/packages/edit-post/src/components/header/mode-switcher/index.js
+index 2b5344d930048a..b8d7f912180b60 100644
+--- a/packages/edit-post/src/components/header/mode-switcher/index.js
++++ b/packages/edit-post/src/components/header/mode-switcher/index.js
+@@ -55,12 +55,31 @@ function ModeSwitcher() {
+ 		return null;
+ 	}
+ 
+-	if ( ! isRichEditingEnabled || ! isCodeEditingEnabled ) {
+-		return null;
++	let selectedMode = mode;
++	if ( ! isRichEditingEnabled && mode === 'visual' ) {
++		selectedMode = 'text';
++	}
++	if ( ! isCodeEditingEnabled && mode === 'text' ) {
++		selectedMode = 'visual';
+ 	}
+ 
+ 	const choices = MODES.map( ( choice ) => {
+-		if ( choice.value !== mode ) {
++		if ( ! isCodeEditingEnabled && choice.value === 'text' ) {
++			choice = {
++				...choice,
++				disabled: true,
++			};
++		}
++		if ( ! isRichEditingEnabled && choice.value === 'visual' ) {
++			choice = {
++				...choice,
++				disabled: true,
++				info: __(
++					'You can enable the visual editor in your profile settings.'
++				),
++			};
++		}
++		if ( choice.value !== selectedMode && ! choice.disabled ) {
+ 			return { ...choice, shortcut };
+ 		}
+ 		return choice;
+@@ -70,7 +89,7 @@ function ModeSwitcher() {
+ 		<MenuGroup label={ __( 'Editor' ) }>
+ 			<MenuItemsChoice
+ 				choices={ choices }
+-				value={ mode }
++				value={ selectedMode }
+ 				onSelect={ switchEditorMode }
+ 			/>
+ 		</MenuGroup>

@@ -1,0 +1,263 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3cbc2b3159aac9..2412f931b7d8bc 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Deprecation
++
++-   `Navigator`: Remove "experimental" designation ([#60927](https://github.com/WordPress/gutenberg/pull/60927)).
++
+ ## 27.4.0 (2024-04-19)
+ 
+ ### Deprecation
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index a824162cb24129..58511524c606c6 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -116,12 +116,36 @@ export { default as __experimentalNavigationGroup } from './navigation/group';
+ export { default as __experimentalNavigationItem } from './navigation/item';
+ export { default as __experimentalNavigationMenu } from './navigation/menu';
+ export {
++	/**
++	 * @deprecated Import `NavigatorProvider` instead.
++	 */
+ 	NavigatorProvider as __experimentalNavigatorProvider,
++	/**
++	 * @deprecated Import `NavigatorScreen` instead.
++	 */
+ 	NavigatorScreen as __experimentalNavigatorScreen,
++	/**
++	 * @deprecated Import `NavigatorButton` instead.
++	 */
+ 	NavigatorButton as __experimentalNavigatorButton,
++	/**
++	 * @deprecated Import `NavigatorBackButton` instead.
++	 */
+ 	NavigatorBackButton as __experimentalNavigatorBackButton,
++	/**
++	 * @deprecated Import `NavigatorToParentButton` instead.
++	 */
+ 	NavigatorToParentButton as __experimentalNavigatorToParentButton,
++	/**
++	 * @deprecated Import `useNavigator` instead.
++	 */
+ 	useNavigator as __experimentalUseNavigator,
++	NavigatorProvider,
++	NavigatorScreen,
++	NavigatorButton,
++	NavigatorBackButton,
++	NavigatorToParentButton,
++	useNavigator,
+ } from './navigator';
+ export { default as Notice } from './notice';
+ export { default as __experimentalNumberControl } from './number-control';
+diff --git a/packages/components/src/navigator/navigator-back-button/README.md b/packages/components/src/navigator/navigator-back-button/README.md
+index 01d4221be536e5..65a1ac1e749aff 100644
+--- a/packages/components/src/navigator/navigator-back-button/README.md
++++ b/packages/components/src/navigator/navigator-back-button/README.md
+@@ -1,9 +1,5 @@
+ # `NavigatorBackButton`
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+ The `NavigatorBackButton` component can be used to navigate to a screen and should be used in combination with the [`NavigatorProvider`](/packages/components/src/navigator/navigator-provider/README.md), the [`NavigatorScreen`](/packages/components/src/navigator/navigator-screen/README.md) and the [`NavigatorButton`](/packages/components/src/navigator/navigator-button/README.md) components (or the `useNavigator` hook).
+ 
+ ## Usage
+diff --git a/packages/components/src/navigator/navigator-back-button/component.tsx b/packages/components/src/navigator/navigator-back-button/component.tsx
+index 71c5ac14cd00d9..b8f2febe59638b 100644
+--- a/packages/components/src/navigator/navigator-back-button/component.tsx
++++ b/packages/components/src/navigator/navigator-back-button/component.tsx
+@@ -30,10 +30,10 @@ function UnconnectedNavigatorBackButton(
+  * @example
+  * ```jsx
+  * import {
+- *   __experimentalNavigatorProvider as NavigatorProvider,
+- *   __experimentalNavigatorScreen as NavigatorScreen,
+- *   __experimentalNavigatorButton as NavigatorButton,
+- *   __experimentalNavigatorBackButton as NavigatorBackButton,
++ *   NavigatorProvider,
++ *   NavigatorScreen,
++ *   NavigatorButton,
++ *   NavigatorBackButton,
+  * } from '@wordpress/components';
+  *
+  * const MyNavigation = () => (
+diff --git a/packages/components/src/navigator/navigator-button/README.md b/packages/components/src/navigator/navigator-button/README.md
+index 72154ec317da44..695c08a450c157 100644
+--- a/packages/components/src/navigator/navigator-button/README.md
++++ b/packages/components/src/navigator/navigator-button/README.md
+@@ -1,9 +1,5 @@
+ # `NavigatorButton`
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+ The `NavigatorButton` component can be used to navigate to a screen and should be used in combination with the [`NavigatorProvider`](/packages/components/src/navigator/navigator-provider/README.md), the [`NavigatorScreen`](/packages/components/src/navigator/navigator-screen/README.md) and the [`NavigatorBackButton`](/packages/components/src/navigator/navigator-back-button/README.md) components (or the `useNavigator` hook).
+ 
+ ## Usage
+diff --git a/packages/components/src/navigator/navigator-button/component.tsx b/packages/components/src/navigator/navigator-button/component.tsx
+index 1b84a2315c04d3..c87738767c9233 100644
+--- a/packages/components/src/navigator/navigator-button/component.tsx
++++ b/packages/components/src/navigator/navigator-button/component.tsx
+@@ -29,10 +29,10 @@ function UnconnectedNavigatorButton(
+  * @example
+  * ```jsx
+  * import {
+- *   __experimentalNavigatorProvider as NavigatorProvider,
+- *   __experimentalNavigatorScreen as NavigatorScreen,
+- *   __experimentalNavigatorButton as NavigatorButton,
+- *   __experimentalNavigatorBackButton as NavigatorBackButton,
++ *   NavigatorProvider,
++ *   NavigatorScreen,
++ *   NavigatorButton,
++ *   NavigatorBackButton,
+  * } from '@wordpress/components';
+  *
+  * const MyNavigation = () => (
+diff --git a/packages/components/src/navigator/navigator-provider/README.md b/packages/components/src/navigator/navigator-provider/README.md
+index 8be27a65101843..5e5f3a0caaba3f 100644
+--- a/packages/components/src/navigator/navigator-provider/README.md
++++ b/packages/components/src/navigator/navigator-provider/README.md
+@@ -1,19 +1,15 @@
+ # `NavigatorProvider`
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+ The `NavigatorProvider` component allows rendering nested views/panels/menus (via the [`NavigatorScreen` component](/packages/components/src/navigator/navigator-screen/README.md)) and navigate between these different states (via the [`NavigatorButton`](/packages/components/src/navigator/navigator-button/README.md), [`NavigatorToParentButton`](/packages/components/src/navigator/navigator-to-parent-button/README.md) and [`NavigatorBackButton`](/packages/components/src/navigator/navigator-back-button/README.md) components or the `useNavigator` hook). The Global Styles sidebar is an example of this.
+ 
+ ## Usage
+ 
+ ```jsx
+ import {
+-  __experimentalNavigatorProvider as NavigatorProvider,
+-  __experimentalNavigatorScreen as NavigatorScreen,
+-  __experimentalNavigatorButton as NavigatorButton,
+-  __experimentalNavigatorToParentButton as NavigatorToParentButton,
++  NavigatorProvider,
++  NavigatorScreen,
++  NavigatorButton,
++  NavigatorToParentButton,
+ } from '@wordpress/components';
+ 
+ const MyNavigation = () => (
+diff --git a/packages/components/src/navigator/navigator-provider/component.tsx b/packages/components/src/navigator/navigator-provider/component.tsx
+index 15eb4d6bd3b1d3..5da1d02109bfc4 100644
+--- a/packages/components/src/navigator/navigator-provider/component.tsx
++++ b/packages/components/src/navigator/navigator-provider/component.tsx
+@@ -274,10 +274,10 @@ function UnconnectedNavigatorProvider(
+  *
+  * ```jsx
+  * import {
+- *   __experimentalNavigatorProvider as NavigatorProvider,
+- *   __experimentalNavigatorScreen as NavigatorScreen,
+- *   __experimentalNavigatorButton as NavigatorButton,
+- *   __experimentalNavigatorBackButton as NavigatorBackButton,
++ *   NavigatorProvider,
++ *   NavigatorScreen,
++ *   NavigatorButton,
++ *   NavigatorBackButton,
+  * } from '@wordpress/components';
+  *
+  * const MyNavigation = () => (
+diff --git a/packages/components/src/navigator/navigator-screen/README.md b/packages/components/src/navigator/navigator-screen/README.md
+index 5ba5af44fe8c1a..93e258a850327e 100644
+--- a/packages/components/src/navigator/navigator-screen/README.md
++++ b/packages/components/src/navigator/navigator-screen/README.md
+@@ -1,9 +1,5 @@
+ # `NavigatorScreen`
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+ The `NavigatorScreen` component represents a single view/screen/panel and should be used in combination with the [`NavigatorProvider`](/packages/components/src/navigator/navigator-provider/README.md), the [`NavigatorButton`](/packages/components/src/navigator/navigator-button/README.md) and the [`NavigatorBackButton`](/packages/components/src/navigator/navigator-back-button/README.md) components (or the `useNavigator` hook).
+ 
+ ## Usage
+diff --git a/packages/components/src/navigator/navigator-screen/component.tsx b/packages/components/src/navigator/navigator-screen/component.tsx
+index be5c4bfaf41ec4..ea7ec18c0f7e37 100644
+--- a/packages/components/src/navigator/navigator-screen/component.tsx
++++ b/packages/components/src/navigator/navigator-screen/component.tsx
+@@ -147,10 +147,10 @@ function UnconnectedNavigatorScreen(
+  * @example
+  * ```jsx
+  * import {
+- *   __experimentalNavigatorProvider as NavigatorProvider,
+- *   __experimentalNavigatorScreen as NavigatorScreen,
+- *   __experimentalNavigatorButton as NavigatorButton,
+- *   __experimentalNavigatorBackButton as NavigatorBackButton,
++ *   NavigatorProvider,
++ *   NavigatorScreen,
++ *   NavigatorButton,
++ *   NavigatorBackButton,
+  * } from '@wordpress/components';
+  *
+  * const MyNavigation = () => (
+diff --git a/packages/components/src/navigator/navigator-to-parent-button/README.md b/packages/components/src/navigator/navigator-to-parent-button/README.md
+index 62dacc3dfa4ea5..309f9eb0e2c336 100644
+--- a/packages/components/src/navigator/navigator-to-parent-button/README.md
++++ b/packages/components/src/navigator/navigator-to-parent-button/README.md
+@@ -1,9 +1,5 @@
+ # `NavigatorToParentButton`
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+ The `NavigatorToParentButton` component can be used to navigate to a screen and should be used in combination with the [`NavigatorProvider`](/packages/components/src/navigator/navigator-provider/README.md), the [`NavigatorScreen`](/packages/components/src/navigator/navigator-screen/README.md) and the [`NavigatorButton`](/packages/components/src/navigator/navigator-button/README.md) components (or the `useNavigator` hook).
+ 
+ ## Usage
+diff --git a/packages/components/src/navigator/navigator-to-parent-button/component.tsx b/packages/components/src/navigator/navigator-to-parent-button/component.tsx
+index e73a3619f3d494..126c9ee7f45dbd 100644
+--- a/packages/components/src/navigator/navigator-to-parent-button/component.tsx
++++ b/packages/components/src/navigator/navigator-to-parent-button/component.tsx
+@@ -33,10 +33,10 @@ function UnconnectedNavigatorToParentButton(
+  * @example
+  * ```jsx
+  * import {
+- *   __experimentalNavigatorProvider as NavigatorProvider,
+- *   __experimentalNavigatorScreen as NavigatorScreen,
+- *   __experimentalNavigatorButton as NavigatorButton,
+- *   __experimentalNavigatorToParentButton as NavigatorToParentButton,
++ *   NavigatorProvider,
++ *   NavigatorScreen,
++ *   NavigatorButton,
++ *   NavigatorToParentButton,
+  * } from '@wordpress/components';
+  *
+  * const MyNavigation = () => (
+diff --git a/packages/components/src/navigator/stories/index.story.tsx b/packages/components/src/navigator/stories/index.story.tsx
+index 5adeadcf7ac1d6..6e7096ac833faa 100644
+--- a/packages/components/src/navigator/stories/index.story.tsx
++++ b/packages/components/src/navigator/stories/index.story.tsx
+@@ -23,7 +23,7 @@ const meta: Meta< typeof NavigatorProvider > = {
+ 	component: NavigatorProvider,
+ 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+ 	subcomponents: { NavigatorScreen, NavigatorButton, NavigatorBackButton },
+-	title: 'Components (Experimental)/Navigator',
++	title: 'Components/Navigator',
+ 	argTypes: {
+ 		as: { control: { type: null } },
+ 		children: { control: { type: null } },
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 629f06bf98edf9..b0a5af3d78b46e 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -1,6 +1,9 @@
+ <script>
+ 	( function redirectIfStoryMoved() {
+-		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation' ];
++		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [
++			'navigation',
++			'navigator',
++		];
+ 		const REDIRECTS = [
+ 			{
+ 				from: /\/components-deprecated-/,

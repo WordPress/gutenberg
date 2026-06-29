@@ -1,0 +1,24 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5567b2b561155b..d10c1c63c95365 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `useAutocomplete`: Fix autocomple UI flicker when deleting trigger prefix ([#69562](https://github.com/WordPress/gutenberg/pull/69562)).
+ -   `FormTokenField`: Use `color-mix` for disabled option selection background ([#69621](https://github.com/WordPress/gutenberg/pull/69621)).
++-   `CustomSelectControl`: Fix check icon color to adapt with dark theme ([#69626](https://github.com/WordPress/gutenberg/pull/69626)).
+ 
+ ## 29.6.0 (2025-03-13)
+ 
+diff --git a/packages/components/src/custom-select-control-v2/styles.ts b/packages/components/src/custom-select-control-v2/styles.ts
+index 2b8bdb9946b7c9..9e5e40722c5b15 100644
+--- a/packages/components/src/custom-select-control-v2/styles.ts
++++ b/packages/components/src/custom-select-control-v2/styles.ts
+@@ -213,6 +213,7 @@ export const SelectedItemCheck = styled( Ariakit.SelectItemCheck )`
+ 	display: flex;
+ 	align-items: center;
+ 	margin-inline-start: ${ space( 2 ) };
++	fill: currentColor;
+ 
+ 	// Keep the checkmark vertically aligned at the top. Since the item text has a
+ 	// 28px line height and the checkmark is 24px tall, a (28-24)/2 = 2px margin

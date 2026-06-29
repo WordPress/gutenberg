@@ -1,0 +1,292 @@
+diff --git a/packages/block-library/src/rss/block.json b/packages/block-library/src/rss/block.json
+index e16c0c62881c90..e9e7e11049d56e 100644
+--- a/packages/block-library/src/rss/block.json
++++ b/packages/block-library/src/rss/block.json
+@@ -47,6 +47,10 @@
+ 		},
+ 		"rel": {
+ 			"type": "string"
++		},
++		"displayFeaturedImage": {
++			"type": "boolean",
++			"default": false
+ 		}
+ 	},
+ 	"supports": {
+diff --git a/packages/block-library/src/rss/edit.js b/packages/block-library/src/rss/edit.js
+index af2ffb40c8be60..a133ab6403c97a 100644
+--- a/packages/block-library/src/rss/edit.js
++++ b/packages/block-library/src/rss/edit.js
+@@ -44,6 +44,7 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
+ 		displayAuthor,
+ 		displayDate,
+ 		displayExcerpt,
++		displayFeaturedImage,
+ 		excerptLength,
+ 		feedURL,
+ 		itemsToShow,
+@@ -154,6 +155,7 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
+ 							displayAuthor: false,
+ 							displayDate: false,
+ 							displayExcerpt: false,
++							displayFeaturedImage: false,
+ 							excerptLength: 55,
+ 							columns: 2,
+ 							openInNewTab: false,
+@@ -180,6 +182,23 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
+ 						/>
+ 					</ToolsPanelItem>
+ 
++					<ToolsPanelItem
++						label={ __( 'Display featured image' ) }
++						hasValue={ () => !! displayFeaturedImage }
++						onDeselect={ () =>
++							setAttributes( { displayFeaturedImage: false } )
++						}
++						isShownByDefault
++					>
++						<ToggleControl
++							label={ __( 'Display featured image' ) }
++							checked={ displayFeaturedImage }
++							onChange={ toggleAttribute(
++								'displayFeaturedImage'
++							) }
++						/>
++					</ToolsPanelItem>
++
+ 					<ToolsPanelItem
+ 						label={ __( 'Display author' ) }
+ 						hasValue={ () => !! displayAuthor }
+diff --git a/packages/block-library/src/rss/index.php b/packages/block-library/src/rss/index.php
+index 5ab990bbcbcee9..8dd1d6fa635a5e 100644
+--- a/packages/block-library/src/rss/index.php
++++ b/packages/block-library/src/rss/index.php
+@@ -16,7 +16,7 @@
+  */
+ function render_block_core_rss( $attributes ) {
+ 	if ( in_array( untrailingslashit( $attributes['feedURL'] ), array( site_url(), home_url() ), true ) ) {
+-		return '<div class="components-placeholder"><div class="notice notice-error">' . __( 'Adding an RSS feed to this site’s homepage is not supported, as it could lead to a loop that slows down your site. Try using another block, like the <strong>Latest Posts</strong> block, to list posts from the site.' ) . '</div></div>';
++		return '<div class="components-placeholder"><div class="notice notice-error">' . __( 'Adding an RSS feed to this site\'s homepage is not supported, as it could lead to a loop that slows down your site. Try using another block, like the <strong>Latest Posts</strong> block, to list posts from the site.' ) . '</div></div>';
+ 	}
+ 
+ 	$rss = fetch_feed( $attributes['feedURL'] );
+@@ -104,7 +104,70 @@ function render_block_core_rss( $attributes ) {
+ 			$excerpt = '<div class="wp-block-rss__item-excerpt">' . esc_html( $excerpt ) . '</div>';
+ 		}
+ 
+-		$list_items .= "<li class='wp-block-rss__item'>{$title}{$date_markup}{$author}{$excerpt}</li>";
++		// Build featured image markup if the attribute is enabled.
++		$featured_image = '';
++		if ( ! empty( $attributes['displayFeaturedImage'] ) ) {
++			$image_url = '';
++
++			$enclosure = $item->get_enclosure();
++			if ( $enclosure ) {
++				$mime_type = (string) $enclosure->get_type();
++				$medium    = (string) $enclosure->get_medium();
++				if ( 'image' === $medium || str_starts_with( $mime_type, 'image/' ) ) {
++					$image_url = $enclosure->get_link();
++				}
++			}
++
++			if ( empty( $image_url ) ) {
++				$thumbnail = $item->get_thumbnail();
++				if ( ! empty( $thumbnail['url'] ) ) {
++					$image_url = $thumbnail['url'];
++				}
++			}
++
++			if ( empty( $image_url ) ) {
++				$content = $item->get_content();
++				if ( ! empty( $content ) ) {
++					if ( preg_match_all(
++						'/<img[^>]+src=[\'"]([^\'"]+)[\'"][^>]*>/i',
++						$content,
++						$matches,
++						PREG_SET_ORDER
++					) ) {
++						foreach ( $matches as $match ) {
++							$img_tag = $match[0];
++							$src     = $match[1];
++
++							$width  = 0;
++							$height = 0;
++							if ( preg_match( '/\bwidth=[\'"]?(\d+)[\'"]?/i', $img_tag, $w ) ) {
++								$width = (int) $w[1];
++							}
++							if ( preg_match( '/\bheight=[\'"]?(\d+)[\'"]?/i', $img_tag, $h ) ) {
++								$height = (int) $h[1];
++							}
++
++							if ( ( $width > 0 && $width <= 1 ) || ( $height > 0 && $height <= 1 ) ) {
++								continue;
++							}
++
++							$image_url = $src;
++							break;
++						}
++					}
++				}
++			}
++
++			if ( ! empty( $image_url ) ) {
++				$featured_image = sprintf(
++					'<div class="wp-block-rss__item-featured-image"><img src="%s" alt="%s" /></div>',
++					esc_url( $image_url ),
++					esc_attr( $title )
++				);
++			}
++		}
++
++		$list_items .= "<li class='wp-block-rss__item'>{$featured_image}{$title}{$date_markup}{$author}{$excerpt}</li>";
+ 	}
+ 
+ 	$classnames = array();
+@@ -123,6 +186,9 @@ function render_block_core_rss( $attributes ) {
+ 	if ( $attributes['displayExcerpt'] ) {
+ 		$classnames[] = 'has-excerpts';
+ 	}
++	if ( ! empty( $attributes['displayFeaturedImage'] ) ) {
++		$classnames[] = 'has-images';
++	}
+ 
+ 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classnames ) ) );
+ 
+diff --git a/packages/block-library/src/rss/style.scss b/packages/block-library/src/rss/style.scss
+index 022effa68f7bad..7ec8b3f247d728 100644
+--- a/packages/block-library/src/rss/style.scss
++++ b/packages/block-library/src/rss/style.scss
+@@ -41,3 +41,15 @@ ul.wp-block-rss { // The ul is needed for specificity to override the reset styl
+ 	list-style: none;
+ 	padding: 0;
+ }
++
++.wp-block-rss__item-featured-image {
++	display: block;
++	margin-bottom: 0.5em;
++
++	img {
++		display: block;
++		width: 100%;
++		height: auto;
++		max-width: 100%;
++	}
++}
+diff --git a/packages/components/src/form-file-upload/README.md b/packages/components/src/form-file-upload/README.md
+index ace5a9e8512def..d2952ed59d129e 100644
+--- a/packages/components/src/form-file-upload/README.md
++++ b/packages/components/src/form-file-upload/README.md
+@@ -65,7 +65,7 @@ Whether to allow multiple selection of files or not.
+ 
+ ### `onChange`
+ 
+- - Type: `ChangeEventHandler<HTMLInputElement> | undefined`
++ - Type: `ChangeEventHandler<HTMLInputElement, HTMLInputElement> | undefined`
+  - Required: Yes
+ 
+ Callback function passed directly to the `input` file element.
+diff --git a/packages/components/src/menu/README.md b/packages/components/src/menu/README.md
+index 4ed24d9c75448e..95055b859f5a08 100644
+--- a/packages/components/src/menu/README.md
++++ b/packages/components/src/menu/README.md
+@@ -120,7 +120,7 @@ make disabled elements still accessible via keyboard.
+ 
+ ##### `render`
+ 
+- - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
++ - Type: `ReactElement<unknown, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
+  - Required: No
+ 
+ Allows the component to be rendered as a different HTML element or React
+@@ -245,7 +245,7 @@ The contents of the menu item's prefix, such as an icon.
+ 
+ ##### `render`
+ 
+- - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
++ - Type: `ReactElement<unknown, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
+  - Required: No
+ 
+ Allows the component to be rendered as a different HTML element or React
+@@ -329,14 +329,14 @@ The radio item's name.
+ 
+ ##### `onChange`
+ 
+- - Type: `BivariantCallback<(event: ChangeEvent<HTMLInputElement>) => void>`
++ - Type: `BivariantCallback<(event: ChangeEvent<HTMLInputElement, Element>) => void>`
+  - Required: No
+ 
+ A function that is called when the checkbox's checked state changes.
+ 
+ ##### `render`
+ 
+- - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
++ - Type: `ReactElement<unknown, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
+  - Required: No
+ 
+ Allows the component to be rendered as a different HTML element or React
+@@ -427,14 +427,14 @@ The checkbox menu item's name.
+ 
+ ##### `onChange`
+ 
+- - Type: `ChangeEventHandler<HTMLInputElement>`
++ - Type: `ChangeEventHandler<HTMLInputElement, HTMLInputElement>`
+  - Required: No
+ 
+ A function that is called when the checkbox's checked state changes.
+ 
+ ##### `render`
+ 
+- - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
++ - Type: `ReactElement<unknown, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
+  - Required: No
+ 
+ Allows the component to be rendered as a different HTML element or React
+@@ -575,7 +575,7 @@ The contents of the menu item's prefix, such as an icon.
+ 
+ ##### `render`
+ 
+- - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
++ - Type: `ReactElement<unknown, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
+  - Required: No
+ 
+ Allows the component to be rendered as a different HTML element or React
+diff --git a/packages/components/src/tabs/README.md b/packages/components/src/tabs/README.md
+index 0307e76ae8d2fe..90be73eb8acc6e 100644
+--- a/packages/components/src/tabs/README.md
++++ b/packages/components/src/tabs/README.md
+@@ -164,7 +164,7 @@ still be accessed via the keyboard when navigating through the tablist.
+ 
+ ##### `render`
+ 
+- - Type: `RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }> | ReactElement<any, string | JSXElementConstructor<any>>`
++ - Type: `RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }> | ReactElement<unknown, string | JSXElementConstructor<any>>`
+  - Required: No
+ 
+ Allows the component to be rendered as a different HTML element or React
+diff --git a/packages/components/src/tree-select/README.md b/packages/components/src/tree-select/README.md
+index bfd0a5940fe2ff..1078b39f7514a6 100644
+--- a/packages/components/src/tree-select/README.md
++++ b/packages/components/src/tree-select/README.md
+@@ -118,7 +118,7 @@ If this property is added, an option will be added with this label to represent
+ 
+ ### `onChange`
+ 
+- - Type: `((value: string, extra?: { event?: ChangeEvent<HTMLSelectElement>; }) => void) | undefined`
++ - Type: `((value: string, extra?: { event?: ChangeEvent<HTMLSelectElement, Element>; }) => void) | undefined`
+  - Required: No
+ 
+ A function that receives the value of the new option that is being selected as input.
+diff --git a/test/integration/fixtures/blocks/core__rss.json b/test/integration/fixtures/blocks/core__rss.json
+index 6e004a6744fd81..8f920244d77ed3 100644
+--- a/test/integration/fixtures/blocks/core__rss.json
++++ b/test/integration/fixtures/blocks/core__rss.json
+@@ -11,7 +11,8 @@
+ 			"displayAuthor": true,
+ 			"displayDate": true,
+ 			"excerptLength": 20,
+-			"openInNewTab": false
++			"openInNewTab": false,
++			"displayFeaturedImage": false
+ 		},
+ 		"innerBlocks": []
+ 	}

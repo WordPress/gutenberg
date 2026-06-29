@@ -1,0 +1,52 @@
+diff --git a/packages/components/src/form-token-field/stories/index.js b/packages/components/src/form-token-field/stories/index.js
+new file mode 100644
+index 00000000000000..f371382a6e4636
+--- /dev/null
++++ b/packages/components/src/form-token-field/stories/index.js
+@@ -0,0 +1,34 @@
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import FormTokenField from '../';
++
++export default {
++	title: 'Components/FormTokenField',
++	component: FormTokenField,
++};
++
++const FormTokenFieldWithState = ( { initialValue, ...props } ) => {
++	const [ value, setValue ] = useState( initialValue );
++	return (
++		<FormTokenField
++			{ ...props }
++			value={ value }
++			suggestions={ [ 'Foo', 'Bar', 'Baz' ] }
++			onChange={ setValue }
++		/>
++	);
++};
++
++export const _default = () => {
++	return <FormTokenFieldWithState initialValue={ [ 'Foo' ] } />;
++};
++
++export const disabled = () => {
++	return <FormTokenFieldWithState initialValue={ [ 'Foo' ] } disabled />;
++};
+diff --git a/packages/components/src/form-token-field/token.js b/packages/components/src/form-token-field/token.js
+index 37fbf536369195..3d4e86808d51f1 100644
+--- a/packages/components/src/form-token-field/token.js
++++ b/packages/components/src/form-token-field/token.js
+@@ -72,6 +72,7 @@ export default function Token( {
+ 				className="components-form-token-field__remove-token"
+ 				icon={ closeCircleFilled }
+ 				onClick={ ! disabled && onClick }
++				disabled={ disabled }
+ 				label={ messages.remove }
+ 				aria-describedby={ `components-form-token-field__token-text-${ instanceId }` }
+ 			/>

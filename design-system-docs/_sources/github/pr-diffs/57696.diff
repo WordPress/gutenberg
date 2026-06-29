@@ -1,0 +1,312 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6080498d5e92ba..1a5fe64aafe3e5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -17,6 +17,7 @@
+ 
+ -   `Guide`, `Modal`: Restore accent color themability ([#58098](https://github.com/WordPress/gutenberg/pull/58098)).
+ -   `DropdownMenuV2`: Restore accent color themability ([#58130](https://github.com/WordPress/gutenberg/pull/58130)).
++-   `Tabs`: improve controlled mode focus handling and keyboard navigation ([#57696](https://github.com/WordPress/gutenberg/pull/57696)).
+ -   Expand theming support in the `COLORS` variable object ([#58097](https://github.com/WordPress/gutenberg/pull/58097)).
+ 
+ ## 25.16.0 (2024-01-24)
+diff --git a/packages/components/src/tabs/index.tsx b/packages/components/src/tabs/index.tsx
+index 7f738cb9f08a96..e8e9bff76b3e92 100644
+--- a/packages/components/src/tabs/index.tsx
++++ b/packages/components/src/tabs/index.tsx
+@@ -8,7 +8,12 @@ import * as Ariakit from '@ariakit/react';
+  * WordPress dependencies
+  */
+ import { useInstanceId } from '@wordpress/compose';
+-import { useLayoutEffect, useMemo, useRef } from '@wordpress/element';
++import {
++	useEffect,
++	useLayoutEffect,
++	useMemo,
++	useRef,
++} from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -44,8 +49,8 @@ function Tabs( {
+ 
+ 	const isControlled = selectedTabId !== undefined;
+ 
+-	const { items, selectedId } = store.useState();
+-	const { setSelectedId, move } = store;
++	const { items, selectedId, activeId } = store.useState();
++	const { setSelectedId, setActiveId } = store;
+ 
+ 	// Keep track of whether tabs have been populated. This is used to prevent
+ 	// certain effects from firing too early while tab data and relevant
+@@ -154,26 +159,29 @@ function Tabs( {
+ 		setSelectedId,
+ 	] );
+ 
+-	// In controlled mode, make sure browser focus follows the selected tab if
+-	// the selection is changed while a tab is already being focused.
+-	useLayoutEffect( () => {
+-		if ( ! isControlled || ! selectOnMove ) {
++	useEffect( () => {
++		if ( ! isControlled ) {
+ 			return;
+ 		}
+-		const currentItem = items.find( ( item ) => item.id === selectedId );
+-		const activeElement = currentItem?.element?.ownerDocument.activeElement;
+-		const tabsHasFocus = items.some( ( item ) => {
+-			return activeElement && activeElement === item.element;
+-		} );
++
++		const focusedElement =
++			items?.[ 0 ]?.element?.ownerDocument.activeElement;
+ 
+ 		if (
+-			activeElement &&
+-			tabsHasFocus &&
+-			selectedId !== activeElement.id
++			! focusedElement ||
++			! items.some( ( item ) => focusedElement === item.element )
+ 		) {
+-			move( selectedId );
++			return; // Return early if no tabs are focused.
++		}
++
++		// If, after ariakit re-computes the active tab, that tab doesn't match
++		// the currently focused tab, then we force an update to ariakit to avoid
++		// any mismatches, especially when navigating to previous/next tab with
++		// arrow keys.
++		if ( activeId !== focusedElement.id ) {
++			setActiveId( focusedElement.id );
+ 		}
+-	}, [ isControlled, items, move, selectOnMove, selectedId ] );
++	}, [ activeId, isControlled, items, setActiveId ] );
+ 
+ 	const contextValue = useMemo(
+ 		() => ( {
+diff --git a/packages/components/src/tabs/tablist.tsx b/packages/components/src/tabs/tablist.tsx
+index 7a53115910796c..afa2d8283e6d6c 100644
+--- a/packages/components/src/tabs/tablist.tsx
++++ b/packages/components/src/tabs/tablist.tsx
+@@ -28,11 +28,30 @@ export const TabList = forwardRef<
+ 		return null;
+ 	}
+ 	const { store } = context;
++
++	const { selectedId, activeId, selectOnMove } = store.useState();
++	const { setActiveId } = store;
++
++	const onBlur = () => {
++		if ( ! selectOnMove ) {
++			return;
++		}
++
++		// When automatic tab selection is on, make sure that the active tab is up
++		// to date with the selected tab when leaving the tablist. This makes sure
++		// that the selected tab will receive keyboard focus when tabbing back into
++		// the tablist.
++		if ( selectedId !== activeId ) {
++			setActiveId( selectedId );
++		}
++	};
++
+ 	return (
+ 		<Ariakit.TabList
+ 			ref={ ref }
+ 			store={ store }
+ 			render={ <TabListWrapper /> }
++			onBlur={ onBlur }
+ 			{ ...otherProps }
+ 		>
+ 			{ children }
+diff --git a/packages/components/src/tabs/test/index.tsx b/packages/components/src/tabs/test/index.tsx
+index 8c2c2d0fd2fa2a..ca9a01928e599c 100644
+--- a/packages/components/src/tabs/test/index.tsx
++++ b/packages/components/src/tabs/test/index.tsx
+@@ -1172,6 +1172,111 @@ describe( 'Tabs', () => {
+ 				).not.toBeInTheDocument();
+ 			} );
+ 		} );
++		describe( 'When `selectedId` is changed by the controlling component', () => {
++			describe.each( [ true, false ] )(
++				'and `selectOnMove` is %s',
++				( selectOnMove ) => {
++					it( 'should continue to handle arrow key navigation properly', async () => {
++						const { rerender } = render(
++							<ControlledTabs
++								tabs={ TABS }
++								selectedTabId="beta"
++								selectOnMove={ selectOnMove }
++							/>
++						);
++
++						// Tab key should focus the currently selected tab, which is Beta.
++						await press.Tab();
++						expect( await getSelectedTab() ).toHaveTextContent(
++							'Beta'
++						);
++						expect( await getSelectedTab() ).toHaveFocus();
++
++						rerender(
++							<ControlledTabs
++								tabs={ TABS }
++								selectedTabId="gamma"
++								selectOnMove={ selectOnMove }
++							/>
++						);
++
++						// When the selected tab is changed, it should not automatically receive focus.
++						expect( await getSelectedTab() ).toHaveTextContent(
++							'Gamma'
++						);
++						expect(
++							screen.getByRole( 'tab', { name: 'Beta' } )
++						).toHaveFocus();
++
++						// Arrow keys should move focus to the next tab, which is Gamma
++						await press.ArrowRight();
++						expect(
++							screen.getByRole( 'tab', { name: 'Gamma' } )
++						).toHaveFocus();
++					} );
++
++					it( 'should focus the correct tab when tabbing out and back into the tablist', async () => {
++						const { rerender } = render(
++							<>
++								<button>Focus me</button>
++								<ControlledTabs
++									tabs={ TABS }
++									selectedTabId="beta"
++									selectOnMove={ selectOnMove }
++								/>
++							</>
++						);
++
++						// Tab key should focus the currently selected tab, which is Beta.
++						await press.Tab();
++						await press.Tab();
++						expect( await getSelectedTab() ).toHaveTextContent(
++							'Beta'
++						);
++						expect( await getSelectedTab() ).toHaveFocus();
++
++						rerender(
++							<>
++								<button>Focus me</button>
++								<ControlledTabs
++									tabs={ TABS }
++									selectedTabId="gamma"
++									selectOnMove={ selectOnMove }
++								/>
++							</>
++						);
++
++						// When the selected tab is changed, it should not automatically receive focus.
++						expect( await getSelectedTab() ).toHaveTextContent(
++							'Gamma'
++						);
++						expect(
++							screen.getByRole( 'tab', { name: 'Beta' } )
++						).toHaveFocus();
++
++						// Press shift+tab, move focus to the button before Tabs
++						await press.ShiftTab();
++						expect(
++							screen.getByRole( 'button', { name: 'Focus me' } )
++						).toHaveFocus();
++
++						// Press tab, move focus back to the tablist
++						await press.Tab();
++
++						const betaTab = screen.getByRole( 'tab', {
++							name: 'Beta',
++						} );
++						const gammaTab = screen.getByRole( 'tab', {
++							name: 'Gamma',
++						} );
++
++						expect(
++							selectOnMove ? gammaTab : betaTab
++						).toHaveFocus();
++					} );
++				}
++			);
++		} );
+ 
+ 		describe( 'When `selectOnMove` is `true`', () => {
+ 			it( 'should automatically select a newly focused tab', async () => {
+@@ -1188,24 +1293,6 @@ describe( 'Tabs', () => {
+ 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
+ 				expect( await getSelectedTab() ).toHaveFocus();
+ 			} );
+-			it( 'should automatically update focus when the selected tab is changed by the controlling component', async () => {
+-				const { rerender } = render(
+-					<ControlledTabs tabs={ TABS } selectedTabId="beta" />
+-				);
+-
+-				// Tab key should focus the currently selected tab, which is Beta.
+-				await press.Tab();
+-				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
+-				expect( await getSelectedTab() ).toHaveFocus();
+-
+-				rerender(
+-					<ControlledTabs tabs={ TABS } selectedTabId="gamma" />
+-				);
+-
+-				// When the selected tab is changed, it should automatically receive focus.
+-				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
+-				expect( await getSelectedTab() ).toHaveFocus();
+-			} );
+ 		} );
+ 		describe( 'When `selectOnMove` is `false`', () => {
+ 			it( 'should apply focus without automatically changing the selected tab', async () => {
+@@ -1247,37 +1334,6 @@ describe( 'Tabs', () => {
+ 				await press.Enter();
+ 				expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
+ 			} );
+-			it( 'should not automatically update focus when the selected tab is changed by the controlling component', async () => {
+-				const { rerender } = render(
+-					<ControlledTabs
+-						tabs={ TABS }
+-						selectedTabId="beta"
+-						selectOnMove={ false }
+-					/>
+-				);
+-
+-				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
+-
+-				// Tab key should focus the currently selected tab, which is Beta.
+-				await press.Tab();
+-				await waitFor( async () =>
+-					expect( await getSelectedTab() ).toHaveFocus()
+-				);
+-
+-				rerender(
+-					<ControlledTabs
+-						tabs={ TABS }
+-						selectedTabId="gamma"
+-						selectOnMove={ false }
+-					/>
+-				);
+-
+-				// When the selected tab is changed, it should not automatically receive focus.
+-				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
+-				expect(
+-					screen.getByRole( 'tab', { name: 'Beta' } )
+-				).toHaveFocus();
+-			} );
+ 		} );
+ 	} );
+ 	it( 'should associate each `Tab` with the correct `TabPanel`, even if they are not rendered in the same order', async () => {
+diff --git a/test/e2e/specs/editor/various/keyboard-navigable-blocks.spec.js b/test/e2e/specs/editor/various/keyboard-navigable-blocks.spec.js
+index 84536c88227ce9..6b55f68897cbd0 100644
+--- a/test/e2e/specs/editor/various/keyboard-navigable-blocks.spec.js
++++ b/test/e2e/specs/editor/various/keyboard-navigable-blocks.spec.js
+@@ -75,7 +75,7 @@ test.describe( 'Order of block keyboard navigation', () => {
+ 		);
+ 
+ 		await page.keyboard.press( 'Tab' );
+-		await KeyboardNavigableBlocks.expectLabelToHaveFocus( 'Post' );
++		await KeyboardNavigableBlocks.expectLabelToHaveFocus( 'Block' );
+ 	} );
+ 
+ 	test( 'allows tabbing in navigation mode if no block is selected (reverse)', async ( {

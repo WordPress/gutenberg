@@ -1,0 +1,100 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 12277f793d2d92..c4648a191bb49d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++- `Truncate`: Remove "experimental" designation ([#61070](https://github.com/WordPress/gutenberg/pull/61070)).
++
+ ### Enhancements
+ 
+ -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index a824162cb24129..f379eb67e6f3a5 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -181,7 +181,13 @@ export {
+ 	TreeGridItem as __experimentalTreeGridItem,
+ } from './tree-grid';
+ export { default as TreeSelect } from './tree-select';
+-export { Truncate as __experimentalTruncate } from './truncate';
++export {
++	/**
++	 * @deprecated Import `Truncate` instead.
++	 */
++	Truncate as __experimentalTruncate,
++	Truncate,
++} from './truncate';
+ export {
+ 	default as __experimentalUnitControl,
+ 	useCustomUnits as __experimentalUseCustomUnits,
+diff --git a/packages/components/src/truncate/README.md b/packages/components/src/truncate/README.md
+index 6d5285244078e5..08b80190b7de8c 100644
+--- a/packages/components/src/truncate/README.md
++++ b/packages/components/src/truncate/README.md
+@@ -1,15 +1,11 @@
+ # Truncate
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+ `Truncate` is a typography primitive that trims text content. For almost all cases, it is recommended that `Text`, `Heading`, or `Subheading` is used to render text content. However, `Truncate` is available for custom implementations.
+ 
+ ## Usage
+ 
+ ```jsx
+-import { __experimentalTruncate as Truncate } from '@wordpress/components';
++import { Truncate } from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+@@ -66,7 +62,7 @@ Clamps the text content to the specified `numberOfLines`, adding an ellipsis at
+ -   Default: `0`
+ 
+ ```jsx
+-import { __experimentalTruncate as Truncate } from '@wordpress/components';
++import { Truncate } from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+diff --git a/packages/components/src/truncate/component.tsx b/packages/components/src/truncate/component.tsx
+index 4b6c721f92c70c..41752e06afa005 100644
+--- a/packages/components/src/truncate/component.tsx
++++ b/packages/components/src/truncate/component.tsx
+@@ -28,7 +28,7 @@ function UnconnectedTruncate(
+  * available for custom implementations.
+  *
+  * ```jsx
+- * import { __experimentalTruncate as Truncate } from `@wordpress/components`;
++ * import { Truncate } from `@wordpress/components`;
+  *
+  * function Example() {
+  * 	return (
+diff --git a/packages/components/src/truncate/stories/index.story.tsx b/packages/components/src/truncate/stories/index.story.tsx
+index 84eaf59edbb3e1..306915313af879 100644
+--- a/packages/components/src/truncate/stories/index.story.tsx
++++ b/packages/components/src/truncate/stories/index.story.tsx
+@@ -10,7 +10,7 @@ import { Truncate } from '..';
+ 
+ const meta: Meta< typeof Truncate > = {
+ 	component: Truncate,
+-	title: 'Components (Experimental)/Truncate',
++	title: 'Components/Truncate',
+ 	argTypes: {
+ 		children: { control: { type: 'text' } },
+ 		as: { control: { type: 'text' } },
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 629f06bf98edf9..f5b3d62d680a01 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -1,6 +1,6 @@
+ <script>
+ 	( function redirectIfStoryMoved() {
+-		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation' ];
++		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation', 'truncate' ];
+ 		const REDIRECTS = [
+ 			{
+ 				from: /\/components-deprecated-/,

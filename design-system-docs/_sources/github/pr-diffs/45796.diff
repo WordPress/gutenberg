@@ -1,0 +1,48 @@
+diff --git a/packages/block-library/src/avatar/user-control.js b/packages/block-library/src/avatar/user-control.js
+index 49370b39716eff..598c05011eaed7 100644
+--- a/packages/block-library/src/avatar/user-control.js
++++ b/packages/block-library/src/avatar/user-control.js
+@@ -33,6 +33,7 @@ function UserControl( { value, onChange } ) {
+ 
+ 	return (
+ 		<ComboboxControl
++			__nextHasNoMarginBottom
+ 			label={ __( 'User' ) }
+ 			help={ __(
+ 				'Select the avatar user to display, if it is blank it will use the post/page author.'
+diff --git a/packages/block-library/src/post-author/edit.js b/packages/block-library/src/post-author/edit.js
+index be92912e41db8a..b0a2fb2883f79a 100644
+--- a/packages/block-library/src/post-author/edit.js
++++ b/packages/block-library/src/post-author/edit.js
+@@ -103,6 +103,7 @@ function PostAuthorEdit( {
+ 						authorOptions.length &&
+ 						( ( showCombobox && (
+ 							<ComboboxControl
++								__nextHasNoMarginBottom
+ 								label={ __( 'Author' ) }
+ 								options={ authorOptions }
+ 								value={ authorId }
+diff --git a/packages/editor/src/components/page-attributes/parent.js b/packages/editor/src/components/page-attributes/parent.js
+index 339ef64285931a..4ee2491e17209b 100644
+--- a/packages/editor/src/components/page-attributes/parent.js
++++ b/packages/editor/src/components/page-attributes/parent.js
+@@ -158,6 +158,7 @@ export function PageAttributesParent() {
+ 
+ 	return (
+ 		<ComboboxControl
++			__nextHasNoMarginBottom
+ 			className="editor-page-attributes__parent"
+ 			label={ parentPageLabel }
+ 			value={ parentPostId }
+diff --git a/packages/editor/src/components/post-author/combobox.js b/packages/editor/src/components/post-author/combobox.js
+index c0ffdbbb26a0dc..422d5a4ba4f4b6 100644
+--- a/packages/editor/src/components/post-author/combobox.js
++++ b/packages/editor/src/components/post-author/combobox.js
+@@ -95,6 +95,7 @@ function PostAuthorCombobox() {
+ 
+ 	return (
+ 		<ComboboxControl
++			__nextHasNoMarginBottom
+ 			label={ __( 'Author' ) }
+ 			options={ authorOptions }
+ 			value={ authorId }

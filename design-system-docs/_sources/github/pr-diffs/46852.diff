@@ -1,0 +1,28 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b542190b19912d..4d1c56960c17ea 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,7 +8,7 @@
+ -   `Button`: improve padding for buttons with icon and text. ([46764](https://github.com/WordPress/gutenberg/pull/46764)).
+ 
+ ### Internal
+-
++-   `AlignmentMatrixControl`: Update center cell label to 'Center' instead of 'Center Center' ([#46852](https://github.com/WordPress/gutenberg/pull/46852)).
+ -   `Toolbar`: move all subcomponents under the same folder ([46951](https://github.com/WordPress/gutenberg/pull/46951)).
+ -   `Dashicon`: remove unnecessary type for `className` prop ([46849](https://github.com/WordPress/gutenberg/pull/46849)).
+ -   `ColorPicker` & `QueryControls`: Replace bottom margin overrides with `__nextHasNoMarginBottom` ([#46448](https://github.com/WordPress/gutenberg/pull/46448)).
+diff --git a/packages/components/src/alignment-matrix-control/utils.tsx b/packages/components/src/alignment-matrix-control/utils.tsx
+index a9fa7e57d67dbf..294f5b46d8e7d4 100644
+--- a/packages/components/src/alignment-matrix-control/utils.tsx
++++ b/packages/components/src/alignment-matrix-control/utils.tsx
+@@ -19,8 +19,8 @@ export const ALIGNMENT_LABEL: Record< AlignmentMatrixControlValue, string > = {
+ 	'top center': __( 'Top Center' ),
+ 	'top right': __( 'Top Right' ),
+ 	'center left': __( 'Center Left' ),
+-	'center center': __( 'Center Center' ),
+-	center: __( 'Center Center' ),
++	'center center': __( 'Center' ),
++	center: __( 'Center' ),
+ 	'center right': __( 'Center Right' ),
+ 	'bottom left': __( 'Bottom Left' ),
+ 	'bottom center': __( 'Bottom Center' ),

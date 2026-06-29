@@ -1,0 +1,449 @@
+diff --git a/packages/theme/docs/ds-tokens.md b/packages/theme/docs/ds-tokens.md
+index 6e65e4a376bec2..d26b4f16a7e4cb 100644
+--- a/packages/theme/docs/ds-tokens.md
++++ b/packages/theme/docs/ds-tokens.md
+@@ -57,6 +57,15 @@ Do not edit directly.
+ | `--wpds-color-bg-interactive-brand-weak`              | Background color for interactive elements with brand tone and weak emphasis.                                                                |
+ | `--wpds-color-bg-interactive-brand-weak-active`       | Background color for interactive elements with brand tone and weak emphasis that are hovered, focused, or active.                           |
+ | `--wpds-color-bg-interactive-brand-weak-disabled`     | Background color for interactive elements with brand tone and weak emphasis, in their disabled state.                                       |
++| `--wpds-color-bg-interactive-error`                   | Background color for interactive elements with error tone and normal emphasis.                                                              |
++| `--wpds-color-bg-interactive-error-active`            | Background color for interactive elements with error tone and normal emphasis that are hovered, focused, or active.                         |
++| `--wpds-color-bg-interactive-error-disabled`          | Background color for interactive elements with error tone and normal emphasis, in their disabled state.                                     |
++| `--wpds-color-bg-interactive-error-strong`            | Background color for interactive elements with error tone and strong emphasis.                                                              |
++| `--wpds-color-bg-interactive-error-strong-active`     | Background color for interactive elements with error tone and strong emphasis that are hovered, focused, or active.                         |
++| `--wpds-color-bg-interactive-error-strong-disabled`   | Background color for interactive elements with error tone and strong emphasis, in their disabled state.                                     |
++| `--wpds-color-bg-interactive-error-weak`              | Background color for interactive elements with error tone and weak emphasis.                                                                |
++| `--wpds-color-bg-interactive-error-weak-active`       | Background color for interactive elements with error tone and weak emphasis that are hovered, focused, or active.                           |
++| `--wpds-color-bg-interactive-error-weak-disabled`     | Background color for interactive elements with error tone and weak emphasis, in their disabled state.                                       |
+ | `--wpds-color-bg-track-neutral-weak`                  | Background color for tracks with a neutral tone and weak emphasis (eg. scrollbar track).                                                    |
+ | `--wpds-color-bg-track-neutral`                       | Background color for tracks with a neutral tone and normal emphasis (eg. slider or progressbar track).                                      |
+ | `--wpds-color-bg-thumb-neutral-weak`                  | Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb).                                                    |
+@@ -90,6 +99,12 @@ Do not edit directly.
+ | `--wpds-color-fg-interactive-brand-strong`            | Foreground color for interactive elements with brand tone and strong emphasis.                                                              |
+ | `--wpds-color-fg-interactive-brand-strong-active`     | Foreground color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active.                         |
+ | `--wpds-color-fg-interactive-brand-strong-disabled`   | Foreground color for interactive elements with brand tone and strong emphasis, in their disabled state.                                     |
++| `--wpds-color-fg-interactive-error`                   | Foreground color for interactive elements with error tone and normal emphasis.                                                              |
++| `--wpds-color-fg-interactive-error-active`            | Foreground color for interactive elements with error tone and normal emphasis that are hovered, focused, or active.                         |
++| `--wpds-color-fg-interactive-error-disabled`          | Foreground color for interactive elements with error tone and normal emphasis, in their disabled state.                                     |
++| `--wpds-color-fg-interactive-error-strong`            | Foreground color for interactive elements with error tone and strong emphasis.                                                              |
++| `--wpds-color-fg-interactive-error-strong-active`     | Foreground color for interactive elements with error tone and strong emphasis that are hovered, focused, or active.                         |
++| `--wpds-color-fg-interactive-error-strong-disabled`   | Foreground color for interactive elements with error tone and strong emphasis, in their disabled state.                                     |
+ | `--wpds-color-stroke-surface-neutral`                 | Decorative stroke color used to define neutrally-toned surface boundaries with normal emphasis.                                             |
+ | `--wpds-color-stroke-surface-neutral-weak`            | Decorative stroke color used to define neutrally-toned surface boundaries with weak emphasis.                                               |
+ | `--wpds-color-stroke-surface-neutral-strong`          | Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis.                                             |
+@@ -109,7 +124,8 @@ Do not edit directly.
+ | `--wpds-color-stroke-interactive-neutral-strong`      | Accessible stroke color used for interactive neutrally-toned elements with strong emphasis.                                                 |
+ | `--wpds-color-stroke-interactive-brand`               | Accessible stroke color used for interactive brand-toned elements with normal emphasis.                                                     |
+ | `--wpds-color-stroke-interactive-brand-active`        | Accessible stroke color used for interactive brand-toned elements with normal emphasis that are hovered, focused, or active.                |
+-| `--wpds-color-stroke-interactive-brand-disabled`      | Accessible stroke color used for interactive brand-toned elements with normal emphasis, in their disabled state.                            |
++| `--wpds-color-stroke-interactive-error`               | Accessible stroke color used for interactive error-toned elements with normal emphasis.                                                     |
++| `--wpds-color-stroke-interactive-error-active`        | Accessible stroke color used for interactive error-toned elements with normal emphasis that are hovered, focused, or active.                |
+ | `--wpds-color-stroke-interactive-error-strong`        | Accessible stroke color used for interactive error-toned elements with strong emphasis.                                                     |
+ | `--wpds-color-stroke-focus-brand`                     | Accessible stroke color applied to focus rings.                                                                                             |
+ 
+diff --git a/packages/theme/src/prebuilt/css/design-tokens.css b/packages/theme/src/prebuilt/css/design-tokens.css
+index b38396c49089c8..9853ab7e31bb49 100644
+--- a/packages/theme/src/prebuilt/css/design-tokens.css
++++ b/packages/theme/src/prebuilt/css/design-tokens.css
+@@ -21,6 +21,15 @@
+ 	--wpds-color-bg-interactive-brand-weak: #00000000; /* Background color for interactive elements with brand tone and weak emphasis. */
+ 	--wpds-color-bg-interactive-brand-weak-active: #e6eaf4; /* Background color for interactive elements with brand tone and weak emphasis that are hovered, focused, or active. */
+ 	--wpds-color-bg-interactive-brand-weak-disabled: #e2e2e2; /* Background color for interactive elements with brand tone and weak emphasis, in their disabled state. */
++	--wpds-color-bg-interactive-error: #00000000; /* Background color for interactive elements with error tone and normal emphasis. */
++	--wpds-color-bg-interactive-error-active: #fff6f4; /* Background color for interactive elements with error tone and normal emphasis that are hovered, focused, or active. */
++	--wpds-color-bg-interactive-error-disabled: #e2e2e2; /* Background color for interactive elements with error tone and normal emphasis, in their disabled state. */
++	--wpds-color-bg-interactive-error-strong: #cc1818; /* Background color for interactive elements with error tone and strong emphasis. */
++	--wpds-color-bg-interactive-error-strong-active: #b90000; /* Background color for interactive elements with error tone and strong emphasis that are hovered, focused, or active. */
++	--wpds-color-bg-interactive-error-strong-disabled: #d2d2d2; /* Background color for interactive elements with error tone and strong emphasis, in their disabled state. */
++	--wpds-color-bg-interactive-error-weak: #00000000; /* Background color for interactive elements with error tone and weak emphasis. */
++	--wpds-color-bg-interactive-error-weak-active: #f6e6e3; /* Background color for interactive elements with error tone and weak emphasis that are hovered, focused, or active. */
++	--wpds-color-bg-interactive-error-weak-disabled: #e2e2e2; /* Background color for interactive elements with error tone and weak emphasis, in their disabled state. */
+ 	--wpds-color-bg-interactive-neutral: #00000000; /* Background color for interactive elements with neutral tone and normal emphasis. */
+ 	--wpds-color-bg-interactive-neutral-active: #eaeaea; /* Background color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active. */
+ 	--wpds-color-bg-interactive-neutral-disabled: #e2e2e2; /* Background color for interactive elements with neutral tone and normal emphasis, in their disabled state. */
+@@ -69,6 +78,12 @@
+ 	--wpds-color-fg-interactive-brand-strong: #eff0f2; /* Foreground color for interactive elements with brand tone and strong emphasis. */
+ 	--wpds-color-fg-interactive-brand-strong-active: #eff0f2; /* Foreground color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active. */
+ 	--wpds-color-fg-interactive-brand-strong-disabled: #6d6d6d; /* Foreground color for interactive elements with brand tone and strong emphasis, in their disabled state. */
++	--wpds-color-fg-interactive-error: #cc1818; /* Foreground color for interactive elements with error tone and normal emphasis. */
++	--wpds-color-fg-interactive-error-active: #cc1818; /* Foreground color for interactive elements with error tone and normal emphasis that are hovered, focused, or active. */
++	--wpds-color-fg-interactive-error-disabled: #8a8a8a; /* Foreground color for interactive elements with error tone and normal emphasis, in their disabled state. */
++	--wpds-color-fg-interactive-error-strong: #f2efef; /* Foreground color for interactive elements with error tone and strong emphasis. */
++	--wpds-color-fg-interactive-error-strong-active: #f2efef; /* Foreground color for interactive elements with error tone and strong emphasis that are hovered, focused, or active. */
++	--wpds-color-fg-interactive-error-strong-disabled: #6d6d6d; /* Foreground color for interactive elements with error tone and strong emphasis, in their disabled state. */
+ 	--wpds-color-fg-interactive-neutral: #1e1e1e; /* Foreground color for interactive elements with neutral tone and normal emphasis. */
+ 	--wpds-color-fg-interactive-neutral-active: #1e1e1e; /* Foreground color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active. */
+ 	--wpds-color-fg-interactive-neutral-disabled: #8a8a8a; /* Foreground color for interactive elements with neutral tone and normal emphasis, in their disabled state. */
+@@ -80,7 +95,8 @@
+ 	--wpds-color-stroke-focus-brand: #3858e9; /* Accessible stroke color applied to focus rings. */
+ 	--wpds-color-stroke-interactive-brand: #3858e9; /* Accessible stroke color used for interactive brand-toned elements with normal emphasis. */
+ 	--wpds-color-stroke-interactive-brand-active: #2337c8; /* Accessible stroke color used for interactive brand-toned elements with normal emphasis that are hovered, focused, or active. */
+-	--wpds-color-stroke-interactive-brand-disabled: #d8d8d8; /* Accessible stroke color used for interactive brand-toned elements with normal emphasis, in their disabled state. */
++	--wpds-color-stroke-interactive-error: #cc1818; /* Accessible stroke color used for interactive error-toned elements with normal emphasis. */
++	--wpds-color-stroke-interactive-error-active: #9d0000; /* Accessible stroke color used for interactive error-toned elements with normal emphasis that are hovered, focused, or active. */
+ 	--wpds-color-stroke-interactive-error-strong: #cc1818; /* Accessible stroke color used for interactive error-toned elements with strong emphasis. */
+ 	--wpds-color-stroke-interactive-neutral: #8a8a8a; /* Accessible stroke color used for interactive neutrally-toned elements with normal emphasis. */
+ 	--wpds-color-stroke-interactive-neutral-active: #6c6c6c; /* Accessible stroke color used for interactive neutrally-toned elements with normal emphasis that are hovered, focused, or active. */
+diff --git a/packages/theme/src/prebuilt/js/design-tokens.js b/packages/theme/src/prebuilt/js/design-tokens.js
+index 2470adbcbb9096..795ded4e17ff58 100644
+--- a/packages/theme/src/prebuilt/js/design-tokens.js
++++ b/packages/theme/src/prebuilt/js/design-tokens.js
+@@ -45,6 +45,15 @@ export default [
+ 	'--wpds-color-bg-interactive-brand-weak',
+ 	'--wpds-color-bg-interactive-brand-weak-active',
+ 	'--wpds-color-bg-interactive-brand-weak-disabled',
++	'--wpds-color-bg-interactive-error',
++	'--wpds-color-bg-interactive-error-active',
++	'--wpds-color-bg-interactive-error-disabled',
++	'--wpds-color-bg-interactive-error-strong',
++	'--wpds-color-bg-interactive-error-strong-active',
++	'--wpds-color-bg-interactive-error-strong-disabled',
++	'--wpds-color-bg-interactive-error-weak',
++	'--wpds-color-bg-interactive-error-weak-active',
++	'--wpds-color-bg-interactive-error-weak-disabled',
+ 	'--wpds-color-bg-track-neutral-weak',
+ 	'--wpds-color-bg-track-neutral',
+ 	'--wpds-color-bg-thumb-neutral-weak',
+@@ -78,6 +87,12 @@ export default [
+ 	'--wpds-color-fg-interactive-brand-strong',
+ 	'--wpds-color-fg-interactive-brand-strong-active',
+ 	'--wpds-color-fg-interactive-brand-strong-disabled',
++	'--wpds-color-fg-interactive-error',
++	'--wpds-color-fg-interactive-error-active',
++	'--wpds-color-fg-interactive-error-disabled',
++	'--wpds-color-fg-interactive-error-strong',
++	'--wpds-color-fg-interactive-error-strong-active',
++	'--wpds-color-fg-interactive-error-strong-disabled',
+ 	'--wpds-color-stroke-surface-neutral',
+ 	'--wpds-color-stroke-surface-neutral-weak',
+ 	'--wpds-color-stroke-surface-neutral-strong',
+@@ -97,7 +112,8 @@ export default [
+ 	'--wpds-color-stroke-interactive-neutral-strong',
+ 	'--wpds-color-stroke-interactive-brand',
+ 	'--wpds-color-stroke-interactive-brand-active',
+-	'--wpds-color-stroke-interactive-brand-disabled',
++	'--wpds-color-stroke-interactive-error',
++	'--wpds-color-stroke-interactive-error-active',
+ 	'--wpds-color-stroke-interactive-error-strong',
+ 	'--wpds-color-stroke-focus-brand',
+ 	'--wpds-dimension-base',
+diff --git a/packages/theme/src/prebuilt/json/figma.json b/packages/theme/src/prebuilt/json/figma.json
+index 335afcc10d5cf4..0460fc1ddfa768 100644
+--- a/packages/theme/src/prebuilt/json/figma.json
++++ b/packages/theme/src/prebuilt/json/figma.json
+@@ -246,6 +246,60 @@
+ 		},
+ 		"description": "Background color for interactive elements with brand tone and weak emphasis, in their disabled state."
+ 	},
++	"Color/Semantic/Background/Error/bgInt-error": {
++		"value": {
++			".": "#0000"
++		},
++		"description": "Background color for interactive elements with error tone and normal emphasis."
++	},
++	"Color/Semantic/Background/Error/bgInt-error-active": {
++		"value": {
++			".": "#fff6f4"
++		},
++		"description": "Background color for interactive elements with error tone and normal emphasis that are hovered, focused, or active."
++	},
++	"Color/Semantic/Background/Error/bgInt-error-disabled": {
++		"value": {
++			".": "#e2e2e2"
++		},
++		"description": "Background color for interactive elements with error tone and normal emphasis, in their disabled state."
++	},
++	"Color/Semantic/Background/Error/bgInt-error-strong": {
++		"value": {
++			".": "#cc1818"
++		},
++		"description": "Background color for interactive elements with error tone and strong emphasis."
++	},
++	"Color/Semantic/Background/Error/bgInt-error-strong-active": {
++		"value": {
++			".": "#b90000"
++		},
++		"description": "Background color for interactive elements with error tone and strong emphasis that are hovered, focused, or active."
++	},
++	"Color/Semantic/Background/Error/bgInt-error-strong-disabled": {
++		"value": {
++			".": "#d2d2d2"
++		},
++		"description": "Background color for interactive elements with error tone and strong emphasis, in their disabled state."
++	},
++	"Color/Semantic/Background/Error/bgInt-error-weak": {
++		"value": {
++			".": "#0000"
++		},
++		"description": "Background color for interactive elements with error tone and weak emphasis."
++	},
++	"Color/Semantic/Background/Error/bgInt-error-weak-active": {
++		"value": {
++			".": "#f6e6e3"
++		},
++		"description": "Background color for interactive elements with error tone and weak emphasis that are hovered, focused, or active."
++	},
++	"Color/Semantic/Background/Error/bgInt-error-weak-disabled": {
++		"value": {
++			".": "#e2e2e2"
++		},
++		"description": "Background color for interactive elements with error tone and weak emphasis, in their disabled state."
++	},
+ 	"Color/Semantic/Background/Neutral/bgTra-neutral-weak": {
+ 		"value": {
+ 			".": "#e0e0e0"
+@@ -444,6 +498,42 @@
+ 		},
+ 		"description": "Foreground color for interactive elements with brand tone and strong emphasis, in their disabled state."
+ 	},
++	"Color/Semantic/Foreground/Error/fgInt-error": {
++		"value": {
++			".": "#cc1818"
++		},
++		"description": "Foreground color for interactive elements with error tone and normal emphasis."
++	},
++	"Color/Semantic/Foreground/Error/fgInt-error-active": {
++		"value": {
++			".": "#cc1818"
++		},
++		"description": "Foreground color for interactive elements with error tone and normal emphasis that are hovered, focused, or active."
++	},
++	"Color/Semantic/Foreground/Error/fgInt-error-disabled": {
++		"value": {
++			".": "#8a8a8a"
++		},
++		"description": "Foreground color for interactive elements with error tone and normal emphasis, in their disabled state."
++	},
++	"Color/Semantic/Foreground/Error/fgInt-error-strong": {
++		"value": {
++			".": "#f2efef"
++		},
++		"description": "Foreground color for interactive elements with error tone and strong emphasis."
++	},
++	"Color/Semantic/Foreground/Error/fgInt-error-strong-active": {
++		"value": {
++			".": "#f2efef"
++		},
++		"description": "Foreground color for interactive elements with error tone and strong emphasis that are hovered, focused, or active."
++	},
++	"Color/Semantic/Foreground/Error/fgInt-error-strong-disabled": {
++		"value": {
++			".": "#6d6d6d"
++		},
++		"description": "Foreground color for interactive elements with error tone and strong emphasis, in their disabled state."
++	},
+ 	"Color/Semantic/Stroke/Neutral/strokeSur-neutral": {
+ 		"value": {
+ 			".": "#d8d8d8"
+@@ -558,11 +648,17 @@
+ 		},
+ 		"description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis that are hovered, focused, or active."
+ 	},
+-	"Color/Semantic/Stroke/Brand/strokeInt-brand-disabled": {
++	"Color/Semantic/Stroke/Error/strokeInt-error": {
+ 		"value": {
+-			".": "#d8d8d8"
++			".": "#cc1818"
++		},
++		"description": "Accessible stroke color used for interactive error-toned elements with normal emphasis."
++	},
++	"Color/Semantic/Stroke/Error/strokeInt-error-active": {
++		"value": {
++			".": "#9d0000"
+ 		},
+-		"description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis, in their disabled state."
++		"description": "Accessible stroke color used for interactive error-toned elements with normal emphasis that are hovered, focused, or active."
+ 	},
+ 	"Color/Semantic/Stroke/Error/strokeInt-error-strong": {
+ 		"value": {
+diff --git a/packages/theme/src/prebuilt/ts/color-tokens.ts b/packages/theme/src/prebuilt/ts/color-tokens.ts
+index e648452f739831..4d4fad3e199da0 100644
+--- a/packages/theme/src/prebuilt/ts/color-tokens.ts
++++ b/packages/theme/src/prebuilt/ts/color-tokens.ts
+@@ -44,23 +44,44 @@ export default {
+ 	'warning-fgSurface3': [ 'fg-content-warning-weak' ],
+ 	'warning-stroke3': [ 'stroke-surface-warning-strong' ],
+ 	'warning-stroke1': [ 'stroke-surface-warning' ],
+-	'error-surface2': [ 'bg-surface-error-weak' ],
+-	'error-surface4': [ 'bg-surface-error' ],
++	'error-bgFill1': [ 'bg-interactive-error-strong' ],
++	'error-fgFill': [
++		'fg-interactive-error-strong-active',
++		'fg-interactive-error-strong',
++	],
++	'error-bgFill2': [ 'bg-interactive-error-strong-active' ],
++	'error-surface2': [
++		'bg-interactive-error-active',
++		'bg-surface-error-weak',
++	],
++	'error-surface4': [
++		'bg-interactive-error-weak-active',
++		'bg-surface-error',
++	],
+ 	'error-fgSurface4': [ 'fg-content-error' ],
+-	'error-fgSurface3': [ 'fg-content-error-weak' ],
++	'error-fgSurface3': [
++		'fg-content-error-weak',
++		'fg-interactive-error-active',
++		'fg-interactive-error',
++	],
+ 	'error-stroke3': [
++		'stroke-interactive-error',
+ 		'stroke-interactive-error-strong',
+ 		'stroke-surface-error-strong',
+ 	],
++	'error-stroke4': [ 'stroke-interactive-error-active' ],
+ 	'error-stroke1': [ 'stroke-surface-error' ],
+ 	'bg-surface2': [ 'bg-surface-neutral' ],
+ 	'bg-surface6': [
+ 		'bg-interactive-brand-strong-disabled',
++		'bg-interactive-error-strong-disabled',
+ 		'bg-interactive-neutral-strong-disabled',
+ 	],
+ 	'bg-surface5': [
+ 		'bg-interactive-brand-disabled',
+ 		'bg-interactive-brand-weak-disabled',
++		'bg-interactive-error-disabled',
++		'bg-interactive-error-weak-disabled',
+ 		'bg-interactive-neutral-disabled',
+ 		'bg-interactive-neutral-weak-disabled',
+ 	],
+@@ -77,11 +98,13 @@ export default {
+ 	'bg-fgSurface3': [
+ 		'fg-content-neutral-weak',
+ 		'fg-interactive-brand-strong-disabled',
++		'fg-interactive-error-strong-disabled',
+ 		'fg-interactive-neutral-strong-disabled',
+ 		'fg-interactive-neutral-weak',
+ 	],
+ 	'bg-fgSurface2': [
+ 		'fg-interactive-brand-disabled',
++		'fg-interactive-error-disabled',
+ 		'fg-interactive-neutral-disabled',
+ 		'fg-interactive-neutral-weak-disabled',
+ 	],
+@@ -98,7 +121,6 @@ export default {
+ 	'bg-stroke2': [
+ 		'bg-thumb-brand-disabled',
+ 		'bg-track-neutral',
+-		'stroke-interactive-brand-disabled',
+ 		'stroke-interactive-neutral-disabled',
+ 		'stroke-surface-neutral',
+ 	],
+diff --git a/packages/theme/tokens/color.json b/packages/theme/tokens/color.json
+index 93c234e72b8f44..6c385bdaa76c5d 100644
+--- a/packages/theme/tokens/color.json
++++ b/packages/theme/tokens/color.json
+@@ -668,6 +668,50 @@
+ 							"$description": "Background color for interactive elements with brand tone and weak emphasis, in their disabled state."
+ 						}
+ 					}
++				},
++				"error": {
++					"normal": {
++						"resting": {
++							"$value": "transparent",
++							"$description": "Background color for interactive elements with error tone and normal emphasis."
++						},
++						"active": {
++							"$value": "{color.primitive.error.surface2}",
++							"$description": "Background color for interactive elements with error tone and normal emphasis that are hovered, focused, or active."
++						},
++						"disabled": {
++							"$value": "{color.primitive.bg.surface5}",
++							"$description": "Background color for interactive elements with error tone and normal emphasis, in their disabled state."
++						}
++					},
++					"strong": {
++						"resting": {
++							"$value": "{color.primitive.error.bgFill1}",
++							"$description": "Background color for interactive elements with error tone and strong emphasis."
++						},
++						"active": {
++							"$value": "{color.primitive.error.bgFill2}",
++							"$description": "Background color for interactive elements with error tone and strong emphasis that are hovered, focused, or active."
++						},
++						"disabled": {
++							"$value": "{color.primitive.bg.surface6}",
++							"$description": "Background color for interactive elements with error tone and strong emphasis, in their disabled state."
++						}
++					},
++					"weak": {
++						"resting": {
++							"$value": "transparent",
++							"$description": "Background color for interactive elements with error tone and weak emphasis."
++						},
++						"active": {
++							"$value": "{color.primitive.error.surface4}",
++							"$description": "Background color for interactive elements with error tone and weak emphasis that are hovered, focused, or active."
++						},
++						"disabled": {
++							"$value": "{color.primitive.bg.surface5}",
++							"$description": "Background color for interactive elements with error tone and weak emphasis, in their disabled state."
++						}
++					}
+ 				}
+ 			},
+ 			"bg-track": {
+@@ -872,6 +916,36 @@
+ 							"$description": "Foreground color for interactive elements with brand tone and strong emphasis, in their disabled state."
+ 						}
+ 					}
++				},
++				"error": {
++					"normal": {
++						"resting": {
++							"$value": "{color.primitive.error.fgSurface3}",
++							"$description": "Foreground color for interactive elements with error tone and normal emphasis."
++						},
++						"active": {
++							"$value": "{color.primitive.error.fgSurface3}",
++							"$description": "Foreground color for interactive elements with error tone and normal emphasis that are hovered, focused, or active."
++						},
++						"disabled": {
++							"$value": "{color.primitive.bg.fgSurface2}",
++							"$description": "Foreground color for interactive elements with error tone and normal emphasis, in their disabled state."
++						}
++					},
++					"strong": {
++						"resting": {
++							"$value": "{color.primitive.error.fgFill}",
++							"$description": "Foreground color for interactive elements with error tone and strong emphasis."
++						},
++						"active": {
++							"$value": "{color.primitive.error.fgFill}",
++							"$description": "Foreground color for interactive elements with error tone and strong emphasis that are hovered, focused, or active."
++						},
++						"disabled": {
++							"$value": "{color.primitive.bg.fgSurface3}",
++							"$description": "Foreground color for interactive elements with error tone and strong emphasis, in their disabled state."
++						}
++					}
+ 				}
+ 			},
+ 			"stroke-surface": {
+@@ -998,14 +1072,20 @@
+ 						"active": {
+ 							"$value": "{color.primitive.primary.stroke4}",
+ 							"$description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis that are hovered, focused, or active."
+-						},
+-						"disabled": {
+-							"$value": "{color.primitive.bg.stroke2}",
+-							"$description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis, in their disabled state."
+ 						}
+ 					}
+ 				},
+ 				"error": {
++					"normal": {
++						"resting": {
++							"$value": "{color.primitive.error.stroke3}",
++							"$description": "Accessible stroke color used for interactive error-toned elements with normal emphasis."
++						},
++						"active": {
++							"$value": "{color.primitive.error.stroke4}",
++							"$description": "Accessible stroke color used for interactive error-toned elements with normal emphasis that are hovered, focused, or active."
++						}
++					},
+ 					"strong": {
+ 						"resting": {
+ 							"$value": "{color.primitive.error.stroke3}",

@@ -1,0 +1,102 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index c502acc39f5473..b2d085e377d31c 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -21,6 +21,8 @@
+ 
+ ### Enhancements
+ 
++-   `Dialog`: Update `Header` layout to support multiple trailing elements alongside the title ([#77161](https://github.com/WordPress/gutenberg/pull/77161)).
++-   `Dialog`: Use `Text` internally for `Dialog.Title`, adopting the `heading-xl` variant for consistent typography ([#77161](https://github.com/WordPress/gutenberg/pull/77161)).
+ -   Add defensive styles against global WordPress stylesheets like common.css and forms.css ([#76783](https://github.com/WordPress/gutenberg/pull/76783)).
+ 
+ ### Internal
+diff --git a/packages/ui/src/alert-dialog/popup.tsx b/packages/ui/src/alert-dialog/popup.tsx
+index e6bdf0e760f9f7..2eefc898292e6d 100644
+--- a/packages/ui/src/alert-dialog/popup.tsx
++++ b/packages/ui/src/alert-dialog/popup.tsx
+@@ -64,7 +64,6 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
+ 							<Text
+ 								variant="heading-xl"
+ 								render={ <_AlertDialog.Title /> }
+-								className={ dialogStyles.title }
+ 							>
+ 								{ title }
+ 							</Text>
+diff --git a/packages/ui/src/dialog/style.module.css b/packages/ui/src/dialog/style.module.css
+index c2dff0b2fd8d11..0ccca150eeef99 100644
+--- a/packages/ui/src/dialog/style.module.css
++++ b/packages/ui/src/dialog/style.module.css
+@@ -92,17 +92,18 @@
+ 
+ 	.header {
+ 		display: flex;
+-		justify-content: space-between;
+ 		align-items: center;
++		gap: var(--wpds-dimension-gap-sm);
+ 		margin-bottom: var(--wpds-dimension-gap-lg);
+ 	}
+ 
+ 	.title {
+-		margin: 0;
+-		font-size: var(--wpds-font-size-xl);
+-		font-weight: var(--wpds-font-weight-medium);
+-		line-height: var(--wpds-font-line-height-xl);
+-		color: var(--wpds-color-fg-content-neutral);
++		/* Workaround the higher specificity of the global CSS defense styles */
++		--_gcd-heading-margin: 0 auto 0 0;
++
++		&:dir(rtl) {
++			--_gcd-heading-margin: 0 0 0 auto;
++		}
+ 	}
+ 
+ 	.footer {
+diff --git a/packages/ui/src/dialog/title.tsx b/packages/ui/src/dialog/title.tsx
+index d5784b6f6da232..a51f5508ed66fc 100644
+--- a/packages/ui/src/dialog/title.tsx
++++ b/packages/ui/src/dialog/title.tsx
+@@ -1,7 +1,7 @@
+ import { Dialog as _Dialog } from '@base-ui/react/dialog';
+-import clsx from 'clsx';
+ import { useMergeRefs } from '@wordpress/compose';
+ import { forwardRef, useLayoutEffect, useRef } from '@wordpress/element';
++import { Text } from '../text';
+ import { useDialogValidationContext } from './context';
+ import styles from './style.module.css';
+ import type { TitleProps } from './types';
+@@ -11,11 +11,12 @@ import type { TitleProps } from './types';
+  * and serves as both the visible heading and the accessible label for
+  * the dialog.
+  *
+- * Base UI's Dialog.Title renders an `<h2>` by default. Use the `render` prop
++ * Uses the `heading-xl` text variant, matching Popover. Base UI's
++ * Dialog.Title renders an `<h2>` by default. Use the `render` prop
+  * to customize the element if needed.
+  */
+ const Title = forwardRef< HTMLHeadingElement, TitleProps >(
+-	function DialogTitle( { className, render, ...props }, forwardedRef ) {
++	function DialogTitle( { children, ...props }, forwardedRef ) {
+ 		const validationContext = useDialogValidationContext();
+ 		const internalRef = useRef< HTMLHeadingElement >( null );
+ 		const mergedRef = useMergeRefs( [ internalRef, forwardedRef ] );
+@@ -26,12 +27,14 @@ const Title = forwardRef< HTMLHeadingElement, TitleProps >(
+ 		}, [ validationContext ] );
+ 
+ 		return (
+-			<_Dialog.Title
++			<Text
+ 				ref={ mergedRef }
+-				className={ clsx( styles.title, className ) }
+-				render={ render }
+-				{ ...props }
+-			/>
++				variant="heading-xl"
++				render={ <_Dialog.Title { ...props } /> }
++				className={ styles.title }
++			>
++				{ children }
++			</Text>
+ 		);
+ 	}
+ );

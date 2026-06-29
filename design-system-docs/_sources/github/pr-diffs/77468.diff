@@ -1,0 +1,32 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index b43e70cf33b0e3..68ce7e0320a3d1 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ 
+ -   `Link`: Fix text decoration on the `unstyled` variant when `openInNewTab` is enabled, and simplify new-tab icon markup ([#77420](https://github.com/WordPress/gutenberg/pull/77420)).
+ -   `Dialog`, `AlertDialog`, `Popover`, `Tooltip`, `Select`: Fix broken focus-trap caused by ThemeProvider's `display: contents` and Base UI's `checkVisibility()` ([#77381](https://github.com/WordPress/gutenberg/pull/77381)).
++-   `CollapsibleCard`: Fix missing keyboard focus ring on the header chevron icon when rendered inside wp-admin ([#77468](https://github.com/WordPress/gutenberg/pull/77468)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/ui/src/collapsible-card/header.tsx b/packages/ui/src/collapsible-card/header.tsx
+index 230f05b2d9f654..8bbc249eb2d04e 100644
+--- a/packages/ui/src/collapsible-card/header.tsx
++++ b/packages/ui/src/collapsible-card/header.tsx
+@@ -5,6 +5,7 @@ import * as Card from '../card';
+ import * as Collapsible from '../collapsible';
+ import { Icon } from '../icon';
+ import styles from './style.module.css';
++import defenseStyles from '../utils/css/global-css-defense.module.css';
+ import focusStyles from '../utils/css/focus.module.css';
+ import { HeaderDescriptionIdContext } from './context';
+ import type { HeaderProps } from './types';
+@@ -55,6 +56,7 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
+ 						<div
+ 							className={ clsx(
+ 								styles[ 'header-trigger-wrapper' ],
++								defenseStyles.div,
+ 								// While the interactive trigger element is the whole header,
+ 								// the focus ring will be displayed only on the icon to visually
+ 								// emulate it being the button.

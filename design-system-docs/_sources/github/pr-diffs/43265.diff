@@ -1,0 +1,433 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e541f11cee70dd..864b1ee9e41db3 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Enhancements
+ 
++-   `ToggleGroupControl`: Improve TypeScript documentation ([#43265](https://github.com/WordPress/gutenberg/pull/43265)).
+ -   `ComboboxControl`: Normalize hyphen-like characters to an ASCII hyphen ([#42942](https://github.com/WordPress/gutenberg/pull/42942)).
+ 
+ ### Internal
+diff --git a/packages/components/src/toggle-group-control/stories/index.js b/packages/components/src/toggle-group-control/stories/index.js
+deleted file mode 100644
+index 13cb5829ea2577..00000000000000
+--- a/packages/components/src/toggle-group-control/stories/index.js
++++ /dev/null
+@@ -1,211 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { boolean, text } from '@storybook/addon-knobs';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-import { formatLowercase, formatUppercase } from '@wordpress/icons';
+-
+-/**
+- * Internal dependencies
+- */
+-import {
+-	ToggleGroupControl,
+-	ToggleGroupControlOption,
+-	ToggleGroupControlOptionIcon,
+-} from '../index';
+-import { View } from '../../view';
+-import { HStack } from '../../h-stack';
+-import Button from '../../button';
+-
+-export default {
+-	component: ToggleGroupControl,
+-	title: 'Components (Experimental)/ToggleGroupControl',
+-	subcomponents: { ToggleGroupControlOption, ToggleGroupControlOptionIcon },
+-	argTypes: {
+-		__experimentalIsIconGroup: { control: { type: 'boolean' } },
+-		__nextHasNoMarginBottom: { control: 'boolean' },
+-		size: {
+-			control: 'radio',
+-			options: [ 'default', '__unstable-large' ],
+-		},
+-	},
+-	parameters: {
+-		knobs: { disable: false },
+-	},
+-};
+-
+-const KNOBS_GROUPS = {
+-	ToggleGroupControl: 'ToggleGroupControl',
+-	ToggleGroupControlOption: 'ToggleGroupControlOption',
+-};
+-
+-const _default = ( { options, ...props } ) => {
+-	const [ value, setValue ] = useState( options[ 0 ].value );
+-	const label = text(
+-		`${ KNOBS_GROUPS.ToggleGroupControl }: label`,
+-		'Toggle Group Control',
+-		KNOBS_GROUPS.ToggleGroupControl
+-	);
+-
+-	const hideLabelFromVision = boolean(
+-		`${ KNOBS_GROUPS.ToggleGroupControl }: hideLabelFromVision`,
+-		false,
+-		KNOBS_GROUPS.ToggleGroupControl
+-	);
+-	const isBlock = boolean(
+-		`${ KNOBS_GROUPS.ToggleGroupControl }: isBlock (render as a css block element)`,
+-		false,
+-		KNOBS_GROUPS.ToggleGroupControl
+-	);
+-	const help = text(
+-		`${ KNOBS_GROUPS.ToggleGroupControl }: help`,
+-		undefined,
+-		KNOBS_GROUPS.ToggleGroupControl
+-	);
+-	const isAdaptiveWidth = boolean(
+-		`${ KNOBS_GROUPS.ToggleGroupControl }: isAdaptiveWidth`,
+-		false,
+-		KNOBS_GROUPS.ToggleGroupControl
+-	);
+-
+-	const controlOptions = options.map( ( option, index ) => (
+-		<ToggleGroupControlOption
+-			key={ option.value }
+-			value={ option.value }
+-			label={ text(
+-				`${ KNOBS_GROUPS.ToggleGroupControlOption }: label`,
+-				option.label,
+-				`${ KNOBS_GROUPS.ToggleGroupControlOption }-${ index + 1 }`
+-			) }
+-			aria-label={ text(
+-				`${ KNOBS_GROUPS.ToggleGroupControlOption }: aria-label`,
+-				option[ 'aria-label' ],
+-				`${ KNOBS_GROUPS.ToggleGroupControlOption }-${ index + 1 }`
+-			) }
+-			showTooltip={ boolean(
+-				`${ KNOBS_GROUPS.ToggleGroupControlOption }: showTooltip`,
+-				option.showTooltip,
+-				`${ KNOBS_GROUPS.ToggleGroupControlOption }-${ index + 1 }`
+-			) }
+-		/>
+-	) );
+-
+-	return (
+-		<View>
+-			<ToggleGroupControl
+-				{ ...props }
+-				onChange={ setValue }
+-				value={ value }
+-				label={ label }
+-				hideLabelFromVision={ hideLabelFromVision }
+-				help={ help }
+-				isBlock={ isBlock }
+-				isAdaptiveWidth={ isAdaptiveWidth }
+-			>
+-				{ controlOptions }
+-			</ToggleGroupControl>
+-		</View>
+-	);
+-};
+-
+-export const Default = _default.bind( {} );
+-Default.args = {
+-	options: [
+-		{ value: 'left', label: 'Left' },
+-		{ value: 'center', label: 'Center' },
+-		{ value: 'right', label: 'Right' },
+-		{ value: 'justify', label: 'Justify' },
+-	],
+-	size: 'default',
+-};
+-
+-export const WithTooltip = _default.bind( {} );
+-WithTooltip.args = {
+-	...Default.args,
+-	options: [
+-		{ value: 1, label: '1', showTooltip: true, 'aria-label': 'One' },
+-		{ value: 2, label: '2', showTooltip: true, 'aria-label': 'Two' },
+-		{ value: 3, label: '3', showTooltip: true, 'aria-label': 'Three' },
+-	],
+-};
+-
+-export const WithAriaLabel = _default.bind( {} );
+-WithAriaLabel.args = {
+-	...Default.args,
+-	options: [
+-		{ value: 'asc', label: 'A→Z', 'aria-label': 'Ascending' },
+-		{ value: 'desc', label: 'Z→A', 'aria-label': 'Descending' },
+-	],
+-};
+-
+-/**
+- * The `<ToggleGroupControlOptionIcon>` component can be used for icon options.
+- * In this case, the `__experimentalIsIconGroup` style is preferred.
+- */
+-export const WithIcons = ( props ) => {
+-	const [ state, setState ] = useState();
+-	return (
+-		<ToggleGroupControl
+-			{ ...props }
+-			onChange={ setState }
+-			value={ state }
+-			label={ 'With icons' }
+-			hideLabelFromVision
+-		>
+-			<ToggleGroupControlOptionIcon
+-				value="uppercase"
+-				icon={ formatUppercase }
+-				label="Uppercase"
+-			/>
+-			<ToggleGroupControlOptionIcon
+-				value="lowercase"
+-				icon={ formatLowercase }
+-				label="Lowercase"
+-			/>
+-		</ToggleGroupControl>
+-	);
+-};
+-WithIcons.args = {
+-	...Default.args,
+-	__experimentalIsIconGroup: true,
+-};
+-
+-export const WithReset = ( props ) => {
+-	const [ alignState, setAlignState ] = useState();
+-	const aligns = [ 'Left', 'Center', 'Right' ];
+-	const alignOptions = aligns.map( ( key, index ) => (
+-		<ToggleGroupControlOption
+-			key={ key }
+-			value={ key }
+-			label={ text(
+-				`${ KNOBS_GROUPS.ToggleGroupControlOption }: label`,
+-				key,
+-				`${ KNOBS_GROUPS.ToggleGroupControlOption }-${ index + 1 }`
+-			) }
+-		/>
+-	) );
+-	return (
+-		<HStack alignment="center" justify="flex-start">
+-			<ToggleGroupControl
+-				{ ...props }
+-				onChange={ setAlignState }
+-				value={ alignState }
+-				label={ 'Toggle Group Control' }
+-				hideLabelFromVision
+-			>
+-				{ alignOptions }
+-			</ToggleGroupControl>
+-			<Button onClick={ () => setAlignState( undefined ) } isTertiary>
+-				Reset
+-			</Button>
+-		</HStack>
+-	);
+-};
+-WithReset.args = {
+-	...Default.args,
+-	__nextHasNoMarginBottom: true,
+-};
+diff --git a/packages/components/src/toggle-group-control/stories/index.tsx b/packages/components/src/toggle-group-control/stories/index.tsx
+new file mode 100644
+index 00000000000000..e6f142c542a7c4
+--- /dev/null
++++ b/packages/components/src/toggle-group-control/stories/index.tsx
+@@ -0,0 +1,127 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++import { formatLowercase, formatUppercase } from '@wordpress/icons';
++
++/**
++ * Internal dependencies
++ */
++import {
++	ToggleGroupControl,
++	ToggleGroupControlOption,
++	ToggleGroupControlOptionIcon,
++} from '../index';
++import type {
++	ToggleGroupControlOptionProps,
++	ToggleGroupControlOptionIconProps,
++	ToggleGroupControlProps,
++} from '../types';
++
++const meta: ComponentMeta< typeof ToggleGroupControl > = {
++	component: ToggleGroupControl,
++	title: 'Components (Experimental)/ToggleGroupControl',
++	subcomponents: { ToggleGroupControlOption, ToggleGroupControlOptionIcon },
++	argTypes: {
++		help: { control: { type: 'text' } },
++		onChange: { action: 'onChange' },
++		value: { control: { type: null } },
++	},
++	parameters: {
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof ToggleGroupControl > = ( {
++	onChange,
++	...props
++} ) => {
++	const [ value, setValue ] =
++		useState< ToggleGroupControlProps[ 'value' ] >();
++
++	return (
++		<ToggleGroupControl
++			{ ...props }
++			onChange={ ( ...changeArgs ) => {
++				setValue( ...changeArgs );
++				onChange?.( ...changeArgs );
++			} }
++			value={ value }
++		/>
++	);
++};
++
++const mapPropsToOptionComponent = ( {
++	value,
++	...props
++}: ToggleGroupControlOptionProps ) => (
++	<ToggleGroupControlOption value={ value } key={ value } { ...props } />
++);
++
++const mapPropsToOptionIconComponent = ( {
++	value,
++	...props
++}: ToggleGroupControlOptionIconProps ) => (
++	<ToggleGroupControlOptionIcon value={ value } key={ value } { ...props } />
++);
++
++export const Default: ComponentStory< typeof ToggleGroupControl > =
++	Template.bind( {} );
++Default.args = {
++	children: [
++		{ value: 'left', label: 'Left' },
++		{ value: 'center', label: 'Center' },
++		{ value: 'right', label: 'Right' },
++		{ value: 'justify', label: 'Justify' },
++	].map( mapPropsToOptionComponent ),
++	label: 'Label',
++};
++
++/**
++ * A tooltip can be shown for each option by enabling the `showTooltip` prop.
++ * The `aria-label` will be used in the tooltip if provided. Otherwise, the
++ * `label` will be used.
++ */
++export const WithTooltip: ComponentStory< typeof ToggleGroupControl > =
++	Template.bind( {} );
++WithTooltip.args = {
++	...Default.args,
++	children: [
++		{
++			value: 'asc',
++			label: 'A→Z',
++			'aria-label': 'Ascending',
++			showTooltip: true,
++		},
++		{
++			value: 'desc',
++			label: 'Z→A',
++			'aria-label': 'Descending',
++			showTooltip: true,
++		},
++	].map( mapPropsToOptionComponent ),
++};
++
++/**
++ * The `ToggleGroupControlOptionIcon` component can be used for icon options. A `label` is required
++ * on each option for accessibility, which will be shown in a tooltip.
++ *
++ * When using icon options within `ToggleGroupControl`, the `__experimentalIsIconGroup` style is preferred.
++ */
++export const WithIcons: ComponentStory< typeof ToggleGroupControl > =
++	Template.bind( {} );
++WithIcons.args = {
++	...Default.args,
++	__experimentalIsIconGroup: true,
++	children: [
++		{ value: 'uppercase', label: 'Uppercase', icon: formatUppercase },
++		{ value: 'lowercase', label: 'Lowercase', icon: formatLowercase },
++	].map( mapPropsToOptionIconComponent ),
++};
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/README.md b/packages/components/src/toggle-group-control/toggle-group-control/README.md
+index cf15d479235247..cfbf6b12ed0b2d 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/README.md
++++ b/packages/components/src/toggle-group-control/toggle-group-control/README.md
+@@ -6,6 +6,8 @@ This feature is still experimental. “Experimental” means this is an early im
+ 
+ `ToggleGroupControl` is a form component that lets users choose options represented in horizontal segments. To render options for this control use [`ToggleGroupControlOption`](/packages/components/src/toggle-group-control/toggle-group-control-option/README.md) component.
+ 
++This component is intended for selecting a single persistent value from a set of options, similar to a how a radio button group would work. If you simply want a toggle to switch between views, use a [`TabPanel`](/packages/components/src/tab-panel/README.md) instead.
++
+ Only use this control when you know for sure the labels of items inside won't wrap. For items with longer labels, you can consider a [`SelectControl`](/packages/components/src/select-control/README.md) or a [`CustomSelectControl`](/packages/components/src/custom-select-control/README.md) component instead.
+ 
+ ## Usage
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index b17cadc6411c7d..05603a602ba067 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -35,8 +35,8 @@ import * as styles from './styles';
+ 
+ const noop = () => {};
+ 
+-function ToggleGroupControl(
+-	props: WordPressComponentProps< ToggleGroupControlProps, 'input' >,
++function UnconnectedToggleGroupControl(
++	props: WordPressComponentProps< ToggleGroupControlProps, 'input', false >,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const {
+@@ -135,11 +135,14 @@ function ToggleGroupControl(
+  * represented in horizontal segments. To render options for this control use
+  * `ToggleGroupControlOption` component.
+  *
++ * This component is intended for selecting a single persistent value from a set of options,
++ * similar to a how a radio button group would work. If you simply want a toggle to switch between views,
++ * use a `TabPanel` instead.
++ *
+  * Only use this control when you know for sure the labels of items inside won't
+  * wrap. For items with longer labels, you can consider a `SelectControl` or a
+  * `CustomSelectControl` component instead.
+  *
+- * @example
+  * ```jsx
+  * import {
+  *   __experimentalToggleGroupControl as ToggleGroupControl,
+@@ -156,9 +159,9 @@ function ToggleGroupControl(
+  * }
+  * ```
+  */
+-const ConnectedToggleGroupControl = contextConnect(
+-	ToggleGroupControl,
++export const ToggleGroupControl = contextConnect(
++	UnconnectedToggleGroupControl,
+ 	'ToggleGroupControl'
+ );
+ 
+-export default ConnectedToggleGroupControl;
++export default ToggleGroupControl;
+diff --git a/packages/components/src/toggle-group-control/types.ts b/packages/components/src/toggle-group-control/types.ts
+index f42ef84f83660b..525e0a4e4442e2 100644
+--- a/packages/components/src/toggle-group-control/types.ts
++++ b/packages/components/src/toggle-group-control/types.ts
+@@ -114,7 +114,8 @@ export type ToggleGroupControlProps = Omit<
+ 		 */
+ 		value?: ReactText;
+ 		/**
+-		 * React children
++		 * The options to render in the `ToggleGroupControl`, using either the `ToggleGroupControlOption` or
++		 * `ToggleGroupControlOptionIcon` components.
+ 		 */
+ 		children: ReactNode;
+ 		/**

@@ -1,0 +1,551 @@
+diff --git a/packages/block-editor/src/components/global-styles/border-panel.js b/packages/block-editor/src/components/global-styles/border-panel.js
+index 221b2b765ac508..9b5476af49ec9d 100644
+--- a/packages/block-editor/src/components/global-styles/border-panel.js
++++ b/packages/block-editor/src/components/global-styles/border-panel.js
+@@ -279,7 +279,6 @@ export default function BorderPanel( {
+ 						popoverPlacement="left-start"
+ 						value={ border }
+ 						__experimentalIsRenderedInSidebar
+-						size="__unstable-large"
+ 						hideLabelFromVision={ ! hasShadowControl }
+ 						label={ __( 'Border' ) }
+ 					/>
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3103ad1e1e9b67..36bc2ce0cb0d1c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,7 +4,8 @@
+ 
+ ### Breaking Changes
+ 
+--   The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed ([#79386](https://github.com/WordPress/gutenberg/pull/79386), [#79419](https://github.com/WordPress/gutenberg/pull/79419)):
++-   The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed ([#79386](https://github.com/WordPress/gutenberg/pull/79386), [#79419](https://github.com/WordPress/gutenberg/pull/79419), [#79420](https://github.com/WordPress/gutenberg/pull/79420)):
++    -   `BorderBoxControl`
+     -   `BoxControl`
+     -   `TextControl`
+ 
+diff --git a/packages/components/src/border-box-control/border-box-control-linked-button/hook.ts b/packages/components/src/border-box-control/border-box-control-linked-button/hook.ts
+index 3d535a6583a13c..b8d27193c56fa7 100644
+--- a/packages/components/src/border-box-control/border-box-control-linked-button/hook.ts
++++ b/packages/components/src/border-box-control/border-box-control-linked-button/hook.ts
+@@ -16,17 +16,16 @@ import type { LinkedButtonProps } from '../types';
+ export function useBorderBoxControlLinkedButton(
+ 	props: WordPressComponentProps< LinkedButtonProps, 'button' >
+ ) {
+-	const {
+-		className,
+-		size = 'default',
+-		...otherProps
+-	} = useContextSystem( props, 'BorderBoxControlLinkedButton' );
++	const { className, ...otherProps } = useContextSystem(
++		props,
++		'BorderBoxControlLinkedButton'
++	);
+ 
+ 	// Generate class names.
+ 	const cx = useCx();
+ 	const classes = useMemo( () => {
+-		return cx( styles.borderBoxControlLinkedButton( size ), className );
+-	}, [ className, cx, size ] );
++		return cx( styles.borderBoxControlLinkedButton, className );
++	}, [ className, cx ] );
+ 
+ 	return { ...otherProps, className: classes };
+ }
+diff --git a/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx b/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
+index 719ac2206ef657..6fa3a061ab0361 100644
+--- a/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
+@@ -32,7 +32,6 @@ const BorderBoxControlSplitControls = (
+ 		popoverPlacement,
+ 		popoverOffset,
+ 		rightAlignedClassName,
+-		size = 'default',
+ 		value,
+ 		__experimentalIsRenderedInSidebar,
+ 		...otherProps
+@@ -66,19 +65,16 @@ const BorderBoxControlSplitControls = (
+ 		enableStyle,
+ 		isCompact: true,
+ 		__experimentalIsRenderedInSidebar,
+-		size,
+-		__shouldNotWarnDeprecated36pxSize: true,
+ 	};
+ 
+ 	const mergedRef = useMergeRefs( [ setPopoverAnchor, forwardedRef ] );
+ 
+ 	return (
+ 		<Grid { ...otherProps } ref={ mergedRef } gap={ 3 }>
+-			<BorderBoxControlVisualizer value={ value } size={ size } />
++			<BorderBoxControlVisualizer value={ value } />
+ 
+-			{ /* Disable reason: BorderControl's size is being controlled via the `size` prop by the parent component  */ }
+-			{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */ }
+ 			<BorderControl
++				size="__unstable-large"
+ 				className={ centeredClassName }
+ 				hideLabelFromVision
+ 				label={ __( 'Top border' ) }
+@@ -87,9 +83,8 @@ const BorderBoxControlSplitControls = (
+ 				value={ value?.top }
+ 				{ ...sharedBorderControlProps }
+ 			/>
+-			{ /* Disable reason: BorderControl's size is being controlled via the `size` prop by the parent component  */ }
+-			{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */ }
+ 			<BorderControl
++				size="__unstable-large"
+ 				hideLabelFromVision
+ 				label={ __( 'Left border' ) }
+ 				onChange={ ( newBorder ) => onChange( newBorder, 'left' ) }
+@@ -97,9 +92,8 @@ const BorderBoxControlSplitControls = (
+ 				value={ value?.left }
+ 				{ ...sharedBorderControlProps }
+ 			/>
+-			{ /* Disable reason: BorderControl's size is being controlled via the `size` prop by the parent component  */ }
+-			{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */ }
+ 			<BorderControl
++				size="__unstable-large"
+ 				className={ rightAlignedClassName }
+ 				hideLabelFromVision
+ 				label={ __( 'Right border' ) }
+@@ -108,9 +102,8 @@ const BorderBoxControlSplitControls = (
+ 				value={ value?.right }
+ 				{ ...sharedBorderControlProps }
+ 			/>
+-			{ /* Disable reason: BorderControl's size is being controlled via the `size` prop by the parent component  */ }
+-			{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */ }
+ 			<BorderControl
++				size="__unstable-large"
+ 				className={ centeredClassName }
+ 				hideLabelFromVision
+ 				label={ __( 'Bottom border' ) }
+diff --git a/packages/components/src/border-box-control/border-box-control-split-controls/hook.ts b/packages/components/src/border-box-control/border-box-control-split-controls/hook.ts
+index 3a8194819ef0c8..a1bec7fd91c80e 100644
+--- a/packages/components/src/border-box-control/border-box-control-split-controls/hook.ts
++++ b/packages/components/src/border-box-control/border-box-control-split-controls/hook.ts
+@@ -21,7 +21,6 @@ export function useBorderBoxControlSplitControls(
+ 		colors = [],
+ 		enableAlpha = false,
+ 		enableStyle = true,
+-		size = 'default',
+ 		__experimentalIsRenderedInSidebar = false,
+ 		...otherProps
+ 	} = useContextSystem( props, 'BorderBoxControlSplitControls' );
+@@ -29,8 +28,8 @@ export function useBorderBoxControlSplitControls(
+ 	// Generate class names.
+ 	const cx = useCx();
+ 	const classes = useMemo( () => {
+-		return cx( styles.borderBoxControlSplitControls( size ), className );
+-	}, [ cx, className, size ] );
++		return cx( styles.borderBoxControlSplitControls, className );
++	}, [ cx, className ] );
+ 
+ 	const centeredClassName = useMemo( () => {
+ 		return cx( styles.centeredBorderControl, className );
+@@ -48,7 +47,6 @@ export function useBorderBoxControlSplitControls(
+ 		enableAlpha,
+ 		enableStyle,
+ 		rightAlignedClassName,
+-		size,
+ 		__experimentalIsRenderedInSidebar,
+ 	};
+ }
+diff --git a/packages/components/src/border-box-control/border-box-control-visualizer/hook.ts b/packages/components/src/border-box-control/border-box-control-visualizer/hook.ts
+index 8cc678c7e2708c..2618d45dda171f 100644
+--- a/packages/components/src/border-box-control/border-box-control-visualizer/hook.ts
++++ b/packages/components/src/border-box-control/border-box-control-visualizer/hook.ts
+@@ -16,21 +16,16 @@ import type { VisualizerProps } from '../types';
+ export function useBorderBoxControlVisualizer(
+ 	props: WordPressComponentProps< VisualizerProps, 'div' >
+ ) {
+-	const {
+-		className,
+-		value,
+-		size = 'default',
+-		...otherProps
+-	} = useContextSystem( props, 'BorderBoxControlVisualizer' );
++	const { className, value, ...otherProps } = useContextSystem(
++		props,
++		'BorderBoxControlVisualizer'
++	);
+ 
+ 	// Generate class names.
+ 	const cx = useCx();
+ 	const classes = useMemo( () => {
+-		return cx(
+-			styles.borderBoxControlVisualizer( value, size ),
+-			className
+-		);
+-	}, [ cx, className, value, size ] );
++		return cx( styles.borderBoxControlVisualizer( value ), className );
++	}, [ cx, className, value ] );
+ 
+ 	return { ...otherProps, className: classes, value };
+ }
+diff --git a/packages/components/src/border-box-control/border-box-control/README.md b/packages/components/src/border-box-control/border-box-control/README.md
+index 9d51be2901a2a3..08994a29bea164 100644
+--- a/packages/components/src/border-box-control/border-box-control/README.md
++++ b/packages/components/src/border-box-control/border-box-control/README.md
+@@ -47,7 +47,6 @@ const MyBorderBoxControl = () => {
+ 
+ 	return (
+ 		<BorderBoxControl
+-			__next40pxDefaultSize
+ 			colors={ colors }
+ 			label={ __( 'Borders' ) }
+ 			onChange={ onChange }
+@@ -137,14 +136,6 @@ The space between the popover and the control wrapper.
+ 
+ -   Required: No
+ 
+-### `size`: `string`
+-
+-Size of the control.
+-
+--   Required: No
+--   Default: `default`
+--   Allowed values: `default`, `__unstable-large`
+-
+ ### `value`: `Object`
+ 
+ An object representing the current border configuration.
+@@ -166,10 +157,3 @@ const splitBorders = {
+ ```
+ 
+ -   Required: No
+-
+-### `__next40pxDefaultSize`: `boolean`
+-
+-Start opting into the larger default height that will become the default size in a future version.
+-
+--   Required: No
+--   Default: `false`
+diff --git a/packages/components/src/border-box-control/border-box-control/component.tsx b/packages/components/src/border-box-control/border-box-control/component.tsx
+index 0e84c7b56ee483..2eee26889d5bbf 100644
+--- a/packages/components/src/border-box-control/border-box-control/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control/component.tsx
+@@ -59,7 +59,6 @@ const UnconnectedBorderBoxControl = (
+ 		onSplitChange,
+ 		popoverPlacement,
+ 		popoverOffset,
+-		size,
+ 		splitValue,
+ 		toggleLinked,
+ 		wrapperClassName,
+@@ -112,14 +111,11 @@ const UnconnectedBorderBoxControl = (
+ 						shouldSanitizeBorder={ false } // This component will handle that.
+ 						value={ linkedValue }
+ 						withSlider
+-						width={
+-							size === '__unstable-large' ? '116px' : '110px'
+-						}
++						width="116px"
++						size="__unstable-large"
+ 						__experimentalIsRenderedInSidebar={
+ 							__experimentalIsRenderedInSidebar
+ 						}
+-						__shouldNotWarnDeprecated36pxSize
+-						size={ size }
+ 					/>
+ 				) : (
+ 					<BorderBoxControlSplitControls
+@@ -134,13 +130,11 @@ const UnconnectedBorderBoxControl = (
+ 						__experimentalIsRenderedInSidebar={
+ 							__experimentalIsRenderedInSidebar
+ 						}
+-						size={ size }
+ 					/>
+ 				) }
+ 				<BorderBoxControlLinkedButton
+ 					onClick={ toggleLinked }
+ 					isLinked={ isLinked }
+-					size={ size }
+ 				/>
+ 			</View>
+ 		</View>
+@@ -176,7 +170,6 @@ const UnconnectedBorderBoxControl = (
+  *
+  * 	return (
+  * 		<BorderBoxControl
+- * 			__next40pxDefaultSize
+  * 			colors={ colors }
+  * 			label={ __( 'Borders' ) }
+  * 			onChange={ onChange }
+diff --git a/packages/components/src/border-box-control/border-box-control/hook.ts b/packages/components/src/border-box-control/border-box-control/hook.ts
+index 6ab30056665433..716484e5a84a33 100644
+--- a/packages/components/src/border-box-control/border-box-control/hook.ts
++++ b/packages/components/src/border-box-control/border-box-control/hook.ts
+@@ -19,7 +19,6 @@ import {
+ import type { WordPressComponentProps } from '../../context';
+ import { useContextSystem } from '../../context';
+ import { useCx } from '../../utils/hooks/use-cx';
+-import { maybeWarnDeprecated36pxSize } from '../../utils/deprecated-36px-size';
+ 
+ import type { Border } from '../../border-control/types';
+ import type { Borders, BorderSide, BorderBoxControlProps } from '../types';
+@@ -33,22 +32,14 @@ export function useBorderBoxControl(
+ 		onChange,
+ 		enableAlpha = false,
+ 		enableStyle = true,
+-		size = 'default',
+ 		value,
+ 		__experimentalIsRenderedInSidebar = false,
+-		__next40pxDefaultSize,
++		// Deprecated props, no longer used.
++		size: _size,
++		__next40pxDefaultSize: _next40pxDefaultSize,
+ 		...otherProps
+ 	} = useContextSystem( props, 'BorderBoxControl' );
+ 
+-	maybeWarnDeprecated36pxSize( {
+-		componentName: 'BorderBoxControl',
+-		__next40pxDefaultSize,
+-		size,
+-	} );
+-
+-	const computedSize =
+-		size === 'default' && __next40pxDefaultSize ? '__unstable-large' : size;
+-
+ 	const mixedBorders = hasMixedBorders( value );
+ 	const splitBorders = hasSplitBorders( value );
+ 
+@@ -144,7 +135,6 @@ export function useBorderBoxControl(
+ 		onSplitChange,
+ 		toggleLinked,
+ 		linkedValue,
+-		size: computedSize,
+ 		splitValue,
+ 		wrapperClassName,
+ 		__experimentalIsRenderedInSidebar,
+diff --git a/packages/components/src/border-box-control/stories/index.story.tsx b/packages/components/src/border-box-control/stories/index.story.tsx
+index 473e9b2af3ec53..e26f55fcf343f0 100644
+--- a/packages/components/src/border-box-control/stories/index.story.tsx
++++ b/packages/components/src/border-box-control/stories/index.story.tsx
+@@ -57,7 +57,6 @@ const Template: StoryFn< typeof BorderBoxControl > = ( props ) => {
+ 	return (
+ 		<>
+ 			<BorderBoxControl
+-				__next40pxDefaultSize
+ 				{ ...otherProps }
+ 				onChange={ onChangeMerged }
+ 				value={ borders }
+@@ -90,5 +89,4 @@ Default.args = {
+ 	colors,
+ 	label: 'Borders',
+ 	enableStyle: true,
+-	__next40pxDefaultSize: true,
+ };
+diff --git a/packages/components/src/border-box-control/styles.ts b/packages/components/src/border-box-control/styles.ts
+index 3fba981080a51f..eda53827ed82a6 100644
+--- a/packages/components/src/border-box-control/styles.ts
++++ b/packages/components/src/border-box-control/styles.ts
+@@ -22,16 +22,12 @@ export const wrapper = css`
+ 	position: relative;
+ `;
+ 
+-export const borderBoxControlLinkedButton = (
+-	size?: 'default' | '__unstable-large'
+-) => {
+-	return css`
+-		position: absolute;
+-		top: ${ size === '__unstable-large' ? '8px' : '3px' };
+-		${ rtl( { right: 0 } )() }
+-		line-height: 0;
+-	`;
+-};
++export const borderBoxControlLinkedButton = css`
++	position: absolute;
++	top: 8px;
++	${ rtl( { right: 0 } )() }
++	line-height: 0;
++`;
+ 
+ const borderBoxStyleWithFallback = ( border?: Border ) => {
+ 	const {
+@@ -48,33 +44,25 @@ const borderBoxStyleWithFallback = ( border?: Border ) => {
+ 	return `${ color } ${ borderStyle } ${ clampedWidth }`;
+ };
+ 
+-export const borderBoxControlVisualizer = (
+-	borders?: Borders,
+-	size?: 'default' | '__unstable-large'
+-) => {
+-	return css`
+-		position: absolute;
+-		top: ${ size === '__unstable-large' ? '20px' : '15px' };
+-		right: ${ size === '__unstable-large' ? '39px' : '29px' };
+-		bottom: ${ size === '__unstable-large' ? '20px' : '15px' };
+-		left: ${ size === '__unstable-large' ? '39px' : '29px' };
+-		border-top: ${ borderBoxStyleWithFallback( borders?.top ) };
+-		border-bottom: ${ borderBoxStyleWithFallback( borders?.bottom ) };
+-		${ rtl( {
+-			borderLeft: borderBoxStyleWithFallback( borders?.left ),
+-		} )() }
+-		${ rtl( {
+-			borderRight: borderBoxStyleWithFallback( borders?.right ),
+-		} )() }
+-	`;
+-};
++export const borderBoxControlVisualizer = ( borders?: Borders ) => css`
++	position: absolute;
++	top: 20px;
++	right: 39px;
++	bottom: 20px;
++	left: 39px;
++	border-top: ${ borderBoxStyleWithFallback( borders?.top ) };
++	border-bottom: ${ borderBoxStyleWithFallback( borders?.bottom ) };
++	${ rtl( {
++		borderLeft: borderBoxStyleWithFallback( borders?.left ),
++	} )() }
++	${ rtl( {
++		borderRight: borderBoxStyleWithFallback( borders?.right ),
++	} )() }
++`;
+ 
+-export const borderBoxControlSplitControls = (
+-	size?: 'default' | '__unstable-large'
+-) => css`
++export const borderBoxControlSplitControls = css`
+ 	position: relative;
+ 	flex: 1;
+-	width: ${ size === '__unstable-large' ? undefined : '80%' };
+ `;
+ 
+ export const centeredBorderControl = css`
+diff --git a/packages/components/src/border-box-control/test/index.tsx b/packages/components/src/border-box-control/test/index.tsx
+index 61d733cd3a812f..5e2a7212a785fb 100644
+--- a/packages/components/src/border-box-control/test/index.tsx
++++ b/packages/components/src/border-box-control/test/index.tsx
+@@ -53,9 +53,7 @@ const colorPickerRegex = /Border color picker/;
+ function TestBorderBoxControl(
+ 	restProps: ComponentProps< typeof BorderBoxControl >
+ ) {
+-	return (
+-		<BorderBoxControl __next40pxDefaultSize { ...props } { ...restProps } />
+-	);
++	return <BorderBoxControl { ...props } { ...restProps } />;
+ }
+ 
+ describe( 'BorderBoxControl', () => {
+diff --git a/packages/components/src/border-box-control/types.ts b/packages/components/src/border-box-control/types.ts
+index 283faf05014a03..93e585244a039e 100644
+--- a/packages/components/src/border-box-control/types.ts
++++ b/packages/components/src/border-box-control/types.ts
+@@ -22,7 +22,7 @@ export type BorderSide = keyof Borders;
+ 
+ export type BorderBoxControlProps = ColorProps &
+ 	LabelProps &
+-	Pick< BorderControlProps, 'enableStyle' | 'size' > & {
++	Pick< BorderControlProps, 'enableStyle' > & {
+ 		/**
+ 		 * A callback function invoked when any border value is changed. The value
+ 		 * received may be a "flat" border object, one that has properties defining
+@@ -45,15 +45,23 @@ export type BorderBoxControlProps = ColorProps &
+ 		 * properties but for each side; `top`, `right`, `bottom`, and `left`.
+ 		 */
+ 		value: AnyBorder;
++		/**
++		 * Size of the control.
++		 *
++		 * @deprecated This prop no longer has any effect.
++		 * @ignore
++		 */
++		size?: 'default' | '__unstable-large';
+ 		/**
+ 		 * Start opting into the larger default height that will become the default size in a future version.
+ 		 *
+-		 * @default false
++		 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
++		 * @ignore
+ 		 */
+ 		__next40pxDefaultSize?: boolean;
+ 	};
+ 
+-export type LinkedButtonProps = Pick< BorderBoxControlProps, 'size' > & {
++export type LinkedButtonProps = {
+ 	/**
+ 	 * This prop allows the `LinkedButton` to reflect whether the parent
+ 	 * `BorderBoxControl` is currently displaying "linked" or "unlinked"
+@@ -68,7 +76,7 @@ export type LinkedButtonProps = Pick< BorderBoxControlProps, 'size' > & {
+ 	onClick: () => void;
+ };
+ 
+-export type VisualizerProps = Pick< BorderBoxControlProps, 'size' > & {
++export type VisualizerProps = {
+ 	/**
+ 	 * An object representing the current border configuration. It contains
+ 	 * properties for each side, with each side an object reflecting the border
+@@ -78,7 +86,7 @@ export type VisualizerProps = Pick< BorderBoxControlProps, 'size' > & {
+ };
+ 
+ export type SplitControlsProps = ColorProps &
+-	Pick< BorderBoxControlProps, 'enableStyle' | 'size' > & {
++	Pick< BorderBoxControlProps, 'enableStyle' > & {
+ 		/**
+ 		 * A callback that is invoked whenever an individual side's border has
+ 		 * changed.
+diff --git a/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md b/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md
+index c97988576fe368..201dfc817e934c 100644
+--- a/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md
++++ b/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md
+@@ -8,7 +8,6 @@ This is a temporary rule to help migrate components to the new default size. Onc
+ 
+ The following components are checked by this rule:
+ 
+--   BorderBoxControl
+ -   BorderControl
+ -   Button
+ -   ComboboxControl
+diff --git a/packages/eslint-plugin/rules/__tests__/components-no-missing-40px-size-prop.js b/packages/eslint-plugin/rules/__tests__/components-no-missing-40px-size-prop.js
+index 45aaf74c18165b..25555a71311a95 100644
+--- a/packages/eslint-plugin/rules/__tests__/components-no-missing-40px-size-prop.js
++++ b/packages/eslint-plugin/rules/__tests__/components-no-missing-40px-size-prop.js
+@@ -110,7 +110,6 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
+ 		{
+ 			code: `
+ 				import {
+-					BorderBoxControl,
+ 					BorderControl,
+ 					ComboboxControl,
+ 					CustomSelectControl,
+@@ -128,7 +127,6 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
+ 					UnitControl,
+ 				} from '@wordpress/components';
+ 				<>
+-					<BorderBoxControl __next40pxDefaultSize />
+ 					<BorderControl __next40pxDefaultSize />
+ 					<ComboboxControl __next40pxDefaultSize />
+ 					<CustomSelectControl __next40pxDefaultSize />
+diff --git a/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js b/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js
+index b2edbcdf59e8b6..834da3b88e64aa 100644
+--- a/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js
++++ b/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js
+@@ -12,7 +12,6 @@ const { hasTruthyJsxAttribute } = require( '../utils' );
+  * These can be exempted if they have a non-default `size` prop.
+  */
+ const COMPONENTS_REQUIRING_40PX = new Set( [
+-	'BorderBoxControl',
+ 	'BorderControl',
+ 	'Button',
+ 	'ClipboardButton',
+diff --git a/tools/eslint/config.mjs b/tools/eslint/config.mjs
+index b287df218f97a8..4bdb76f4c40666 100644
+--- a/tools/eslint/config.mjs
++++ b/tools/eslint/config.mjs
+@@ -159,10 +159,12 @@ const restrictedSyntax = [
+ 		selector: 'JSXAttribute[name.name="__nextHasNoMarginBottom"]',
+ 		message: 'The `__nextHasNoMarginBottom` prop is no longer needed.',
+ 	},
+-	...[ 'BoxControl', 'TextControl' ].map( ( componentName ) => ( {
+-		selector: `JSXElement[openingElement.name.name="${ componentName }"] JSXAttribute[name.name="__next40pxDefaultSize"]`,
+-		message: `The \`__next40pxDefaultSize\` prop is no longer needed on \`${ componentName }\`.`,
+-	} ) ),
++	...[ 'BorderBoxControl', 'BoxControl', 'TextControl' ].map(
++		( componentName ) => ( {
++			selector: `JSXElement[openingElement.name.name="${ componentName }"] JSXAttribute[name.name="__next40pxDefaultSize"]`,
++			message: `The \`__next40pxDefaultSize\` prop is no longer needed on \`${ componentName }\`.`,
++		} )
++	),
+ 	{
+ 		selector:
+ 			'CallExpression[callee.name="withDispatch"] > :function > BlockStatement > :not(VariableDeclaration,ReturnStatement)',

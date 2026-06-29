@@ -1,0 +1,664 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 200215f1fffa35..a1641e852771f9 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -276,17 +276,14 @@ module.exports = {
+ 					...restrictedSyntax,
+ 					...restrictedSyntaxComponents,
+ 					// Temporary rules until we're ready to officially deprecate the bottom margins.
+-					...[
+-						'BaseControl',
+-						'RangeControl',
+-						'SearchControl',
+-						'SelectControl',
+-					].map( ( componentName ) => ( {
+-						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__nextHasNoMarginBottom"]))`,
+-						message:
+-							componentName +
+-							' should have the `__nextHasNoMarginBottom` prop to opt-in to the new margin-free styles.',
+-					} ) ),
++					...[ 'BaseControl', 'SearchControl', 'SelectControl' ].map(
++						( componentName ) => ( {
++							selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__nextHasNoMarginBottom"]))`,
++							message:
++								componentName +
++								' should have the `__nextHasNoMarginBottom` prop to opt-in to the new margin-free styles.',
++						} )
++					),
+ 					// Temporary rules until we're ready to officially default to the new size.
+ 					...[
+ 						'BorderBoxControl',
+diff --git a/packages/block-editor/src/components/height-control/index.js b/packages/block-editor/src/components/height-control/index.js
+index 1b4a461fb783dd..fdd7f47fe0b748 100644
+--- a/packages/block-editor/src/components/height-control/index.js
++++ b/packages/block-editor/src/components/height-control/index.js
+@@ -185,7 +185,6 @@ export default function HeightControl( {
+ 							}
+ 							withInputField={ false }
+ 							onChange={ handleSliderChange }
+-							__nextHasNoMarginBottom
+ 							label={ label }
+ 							hideLabelFromVision
+ 						/>
+diff --git a/packages/block-editor/src/components/image-editor/zoom-dropdown.js b/packages/block-editor/src/components/image-editor/zoom-dropdown.js
+index 0abe1bec96b224..cbcb61d628ef8c 100644
+--- a/packages/block-editor/src/components/image-editor/zoom-dropdown.js
++++ b/packages/block-editor/src/components/image-editor/zoom-dropdown.js
+@@ -35,7 +35,6 @@ export default function ZoomDropdown() {
+ 				<DropdownContentWrapper paddingSize="medium">
+ 					<RangeControl
+ 						__next40pxDefaultSize
+-						__nextHasNoMarginBottom
+ 						label={ __( 'Zoom' ) }
+ 						min={ MIN_ZOOM }
+ 						max={ MAX_ZOOM }
+diff --git a/packages/block-editor/src/components/preset-input-control/custom-value-controls.js b/packages/block-editor/src/components/preset-input-control/custom-value-controls.js
+index 489b4497dcd4e5..15c1b27128a716 100644
+--- a/packages/block-editor/src/components/preset-input-control/custom-value-controls.js
++++ b/packages/block-editor/src/components/preset-input-control/custom-value-controls.js
+@@ -121,7 +121,6 @@ export default function CustomValueControls( {
+ 				value={ parsedQuantity }
+ 				withInputField={ false }
+ 				__next40pxDefaultSize
+-				__nextHasNoMarginBottom
+ 			/>
+ 		</>
+ 	);
+diff --git a/packages/block-editor/src/layouts/grid.js b/packages/block-editor/src/layouts/grid.js
+index 713491b7d37e9a..e9199f6073850f 100644
+--- a/packages/block-editor/src/layouts/grid.js
++++ b/packages/block-editor/src/layouts/grid.js
+@@ -267,7 +267,6 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
+ 				<FlexItem isBlock>
+ 					<RangeControl
+ 						__next40pxDefaultSize
+-						__nextHasNoMarginBottom
+ 						onChange={ handleSliderChange }
+ 						value={ quantity || 0 }
+ 						min={ 0 }
+@@ -356,7 +355,6 @@ function GridLayoutColumnsAndRowsControl( {
+ 						) : (
+ 							<RangeControl
+ 								__next40pxDefaultSize
+-								__nextHasNoMarginBottom
+ 								value={ columnCount ?? 1 }
+ 								onChange={ ( value ) =>
+ 									onChange( {
+diff --git a/packages/block-library/src/avatar/edit.js b/packages/block-library/src/avatar/edit.js
+index 6f44addb4e4eab..6eddf24eb0727d 100644
+--- a/packages/block-library/src/avatar/edit.js
++++ b/packages/block-library/src/avatar/edit.js
+@@ -56,7 +56,6 @@ const AvatarInspectorControls = ( {
+ 					onDeselect={ () => setAttributes( { size: 96 } ) }
+ 				>
+ 					<RangeControl
+-						__nextHasNoMarginBottom
+ 						__next40pxDefaultSize
+ 						label={ __( 'Image size' ) }
+ 						onChange={ ( newSize ) =>
+diff --git a/packages/block-library/src/columns/edit.js b/packages/block-library/src/columns/edit.js
+index 3cbb90a97d2c07..aecbb84bd337fb 100644
+--- a/packages/block-library/src/columns/edit.js
++++ b/packages/block-library/src/columns/edit.js
+@@ -162,7 +162,6 @@ function ColumnInspectorControls( {
+ 			{ canInsertColumnBlock && (
+ 				<VStack spacing={ 4 } style={ { gridColumn: '1 / -1' } }>
+ 					<RangeControl
+-						__nextHasNoMarginBottom
+ 						__next40pxDefaultSize
+ 						label={ __( 'Columns' ) }
+ 						value={ count }
+diff --git a/packages/block-library/src/comment-author-avatar/edit.js b/packages/block-library/src/comment-author-avatar/edit.js
+index a51f2616f3453d..1d2cf835120520 100644
+--- a/packages/block-library/src/comment-author-avatar/edit.js
++++ b/packages/block-library/src/comment-author-avatar/edit.js
+@@ -51,7 +51,6 @@ export default function Edit( {
+ 		<InspectorControls>
+ 			<PanelBody title={ __( 'Settings' ) }>
+ 				<RangeControl
+-					__nextHasNoMarginBottom
+ 					__next40pxDefaultSize
+ 					label={ __( 'Image size' ) }
+ 					onChange={ ( newWidth ) =>
+diff --git a/packages/block-library/src/cover/edit/inspector-controls.js b/packages/block-library/src/cover/edit/inspector-controls.js
+index cbb0ef2d94a9fe..d42284cd85406c 100644
+--- a/packages/block-library/src/cover/edit/inspector-controls.js
++++ b/packages/block-library/src/cover/edit/inspector-controls.js
+@@ -374,7 +374,6 @@ export default function CoverInspectorControls( {
+ 						panelId={ clientId }
+ 					>
+ 						<RangeControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Overlay opacity' ) }
+ 							value={ dimRatio }
+ 							onChange={ ( newDimRatio ) =>
+diff --git a/packages/block-library/src/file/inspector.js b/packages/block-library/src/file/inspector.js
+index 7d743a0dcba8ae..58fc00fc62c70e 100644
+--- a/packages/block-library/src/file/inspector.js
++++ b/packages/block-library/src/file/inspector.js
+@@ -79,7 +79,6 @@ export default function FileBlockInspector( {
+ 								onDeselect={ () => changePreviewHeight( 600 ) }
+ 							>
+ 								<RangeControl
+-									__nextHasNoMarginBottom
+ 									__next40pxDefaultSize
+ 									label={ __( 'Height in pixels' ) }
+ 									min={ MIN_PREVIEW_HEIGHT }
+diff --git a/packages/block-library/src/gallery/edit.js b/packages/block-library/src/gallery/edit.js
+index 3046731b541bbb..0732f845dd13f7 100644
+--- a/packages/block-library/src/gallery/edit.js
++++ b/packages/block-library/src/gallery/edit.js
+@@ -673,7 +673,6 @@ export default function GalleryEdit( props ) {
+ 								}
+ 							>
+ 								<RangeControl
+-									__nextHasNoMarginBottom
+ 									label={ __( 'Columns' ) }
+ 									value={
+ 										columns
+@@ -788,7 +787,6 @@ export default function GalleryEdit( props ) {
+ 					<PanelBody title={ __( 'Settings' ) }>
+ 						{ images.length > 1 && (
+ 							<RangeControl
+-								__nextHasNoMarginBottom
+ 								label={ __( 'Columns' ) }
+ 								value={
+ 									columns
+diff --git a/packages/block-library/src/latest-comments/edit.js b/packages/block-library/src/latest-comments/edit.js
+index d0d1f438972e83..4d6bbbbf82180a 100644
+--- a/packages/block-library/src/latest-comments/edit.js
++++ b/packages/block-library/src/latest-comments/edit.js
+@@ -131,7 +131,6 @@ export default function LatestComments( { attributes, setAttributes } ) {
+ 						isShownByDefault
+ 					>
+ 						<RangeControl
+-							__nextHasNoMarginBottom
+ 							__next40pxDefaultSize
+ 							label={ __( 'Number of comments' ) }
+ 							value={ commentsToShow }
+diff --git a/packages/block-library/src/latest-posts/edit.js b/packages/block-library/src/latest-posts/edit.js
+index d6a49fbb1e708f..57f3355e1f6734 100644
+--- a/packages/block-library/src/latest-posts/edit.js
++++ b/packages/block-library/src/latest-posts/edit.js
+@@ -268,7 +268,6 @@ function Controls( { attributes, setAttributes, postCount } ) {
+ 							isShownByDefault
+ 						>
+ 							<RangeControl
+-								__nextHasNoMarginBottom
+ 								__next40pxDefaultSize
+ 								label={ __( 'Max number of words' ) }
+ 								value={ excerptLength }
+@@ -537,7 +536,6 @@ function Controls( { attributes, setAttributes, postCount } ) {
+ 						isShownByDefault
+ 					>
+ 						<RangeControl
+-							__nextHasNoMarginBottom
+ 							__next40pxDefaultSize
+ 							label={ __( 'Columns' ) }
+ 							value={ columns }
+diff --git a/packages/block-library/src/media-text/edit.js b/packages/block-library/src/media-text/edit.js
+index cddba39629f746..01d39ba1b3cee5 100644
+--- a/packages/block-library/src/media-text/edit.js
++++ b/packages/block-library/src/media-text/edit.js
+@@ -337,7 +337,6 @@ function MediaTextEdit( {
+ 				onDeselect={ () => setAttributes( { mediaWidth: 50 } ) }
+ 			>
+ 				<RangeControl
+-					__nextHasNoMarginBottom
+ 					__next40pxDefaultSize
+ 					label={ __( 'Media width' ) }
+ 					value={ temporaryMediaWidth || mediaWidth }
+diff --git a/packages/block-library/src/post-excerpt/edit.js b/packages/block-library/src/post-excerpt/edit.js
+index 1104d53a592302..58f5174f20d851 100644
+--- a/packages/block-library/src/post-excerpt/edit.js
++++ b/packages/block-library/src/post-excerpt/edit.js
+@@ -272,7 +272,6 @@ export default function PostExcerptEditor( {
+ 					>
+ 						<RangeControl
+ 							__next40pxDefaultSize
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Max number of words' ) }
+ 							value={ excerptLength }
+ 							onChange={ ( value ) => {
+diff --git a/packages/block-library/src/post-featured-image/overlay-controls.js b/packages/block-library/src/post-featured-image/overlay-controls.js
+index 8a38fe3e1acab1..b07a24a30a67b3 100644
+--- a/packages/block-library/src/post-featured-image/overlay-controls.js
++++ b/packages/block-library/src/post-featured-image/overlay-controls.js
+@@ -64,7 +64,6 @@ const Overlay = ( {
+ 				panelId={ clientId }
+ 			>
+ 				<RangeControl
+-					__nextHasNoMarginBottom
+ 					label={ __( 'Overlay opacity' ) }
+ 					value={ dimRatio }
+ 					onChange={ ( newDimRatio ) =>
+diff --git a/packages/block-library/src/query-pagination-numbers/edit.js b/packages/block-library/src/query-pagination-numbers/edit.js
+index a03ed8419bb086..1f77febd7703f2 100644
+--- a/packages/block-library/src/query-pagination-numbers/edit.js
++++ b/packages/block-library/src/query-pagination-numbers/edit.js
+@@ -73,7 +73,6 @@ export default function QueryPaginationNumbersEdit( {
+ 					>
+ 						<RangeControl
+ 							__next40pxDefaultSize
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Number of links' ) }
+ 							help={ __(
+ 								'Specify how many links can appear before and after the current page number. Links to the first, current and last page are always visible.'
+diff --git a/packages/block-library/src/query/edit/inspector-controls/per-page-control.js b/packages/block-library/src/query/edit/inspector-controls/per-page-control.js
+index 933bb0851e6257..97e3291927ca35 100644
+--- a/packages/block-library/src/query/edit/inspector-controls/per-page-control.js
++++ b/packages/block-library/src/query/edit/inspector-controls/per-page-control.js
+@@ -11,7 +11,6 @@ const PerPageControl = ( { perPage, offset = 0, onChange } ) => {
+ 	return (
+ 		<RangeControl
+ 			__next40pxDefaultSize
+-			__nextHasNoMarginBottom
+ 			label={ __( 'Items per page' ) }
+ 			min={ MIN_POSTS_PER_PAGE }
+ 			max={ MAX_POSTS_PER_PAGE }
+diff --git a/packages/block-library/src/rss/edit.js b/packages/block-library/src/rss/edit.js
+index 0d1472f88fb5bb..1bbd490c99d968 100644
+--- a/packages/block-library/src/rss/edit.js
++++ b/packages/block-library/src/rss/edit.js
+@@ -172,7 +172,6 @@ export default function RSSEdit( { attributes, setAttributes } ) {
+ 						isShownByDefault
+ 					>
+ 						<RangeControl
+-							__nextHasNoMarginBottom
+ 							__next40pxDefaultSize
+ 							label={ __( 'Number of items' ) }
+ 							value={ itemsToShow }
+@@ -240,7 +239,6 @@ export default function RSSEdit( { attributes, setAttributes } ) {
+ 							isShownByDefault
+ 						>
+ 							<RangeControl
+-								__nextHasNoMarginBottom
+ 								__next40pxDefaultSize
+ 								label={ __( 'Max number of words in excerpt' ) }
+ 								value={ excerptLength }
+@@ -262,7 +260,6 @@ export default function RSSEdit( { attributes, setAttributes } ) {
+ 							isShownByDefault
+ 						>
+ 							<RangeControl
+-								__nextHasNoMarginBottom
+ 								__next40pxDefaultSize
+ 								label={ __( 'Columns' ) }
+ 								value={ columns }
+diff --git a/packages/block-library/src/site-logo/edit.js b/packages/block-library/src/site-logo/edit.js
+index d5793615c382c4..7c5866cb6ca7fb 100644
+--- a/packages/block-library/src/site-logo/edit.js
++++ b/packages/block-library/src/site-logo/edit.js
+@@ -301,7 +301,6 @@ const SiteLogo = ( {
+ 						}
+ 					>
+ 						<RangeControl
+-							__nextHasNoMarginBottom
+ 							__next40pxDefaultSize
+ 							label={ __( 'Image width' ) }
+ 							onChange={ ( newWidth ) =>
+diff --git a/packages/block-library/src/tag-cloud/edit.js b/packages/block-library/src/tag-cloud/edit.js
+index 3fd14b823c5915..06f6b3e33b13c2 100644
+--- a/packages/block-library/src/tag-cloud/edit.js
++++ b/packages/block-library/src/tag-cloud/edit.js
+@@ -211,7 +211,6 @@ function TagCloudEdit( { attributes, setAttributes } ) {
+ 					isShownByDefault
+ 				>
+ 					<RangeControl
+-						__nextHasNoMarginBottom
+ 						__next40pxDefaultSize
+ 						label={ __( 'Number of tags' ) }
+ 						value={ numberOfTags }
+diff --git a/packages/block-library/src/terms-query/edit/inspector-controls/max-terms-control.js b/packages/block-library/src/terms-query/edit/inspector-controls/max-terms-control.js
+index 81f9246d2d25bf..963afc3f0bd565 100644
+--- a/packages/block-library/src/terms-query/edit/inspector-controls/max-terms-control.js
++++ b/packages/block-library/src/terms-query/edit/inspector-controls/max-terms-control.js
+@@ -7,7 +7,6 @@ import { RangeControl } from '@wordpress/components';
+ export default function MaxTermsControl( { value, onChange, ...props } ) {
+ 	return (
+ 		<RangeControl
+-			__nextHasNoMarginBottom
+ 			__next40pxDefaultSize
+ 			value={ value }
+ 			min={ 0 }
+diff --git a/packages/block-library/src/text-columns/edit.js b/packages/block-library/src/text-columns/edit.js
+index 761d047e90b1c9..759a684b4434ce 100644
+--- a/packages/block-library/src/text-columns/edit.js
++++ b/packages/block-library/src/text-columns/edit.js
+@@ -34,7 +34,6 @@ export default function TextColumnsEdit( { attributes, setAttributes } ) {
+ 			<InspectorControls>
+ 				<PanelBody>
+ 					<RangeControl
+-						__nextHasNoMarginBottom
+ 						__next40pxDefaultSize
+ 						label={ __( 'Columns' ) }
+ 						value={ columns }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 05679ccb0caa6a..d07969004dc8e0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ -   `ToggleGroupControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#74004](https://github.com/WordPress/gutenberg/pull/74004)).
+ -   `ToggleControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#74012](https://github.com/WordPress/gutenberg/pull/74012)).
+ -   `TreeSelect`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#74014](https://github.com/WordPress/gutenberg/pull/74014)).
++-   `RangeControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#74033](https://github.com/WordPress/gutenberg/pull/74033)).
+ -   `ComboboxControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#74034](https://github.com/WordPress/gutenberg/pull/74034)).
+ -   `DimensionControl`: Completely remove deprecated component ([#73944](https://github.com/WordPress/gutenberg/pull/73944)).
+ 
+diff --git a/packages/components/src/border-control/border-control/component.tsx b/packages/components/src/border-control/border-control/component.tsx
+index f71599b274778d..a16907dfe5981f 100644
+--- a/packages/components/src/border-control/border-control/component.tsx
++++ b/packages/components/src/border-control/border-control/component.tsx
+@@ -112,7 +112,6 @@ const UnconnectedBorderControl = (
+ 				/>
+ 				{ withSlider && (
+ 					<RangeControl
+-						__nextHasNoMarginBottom
+ 						label={ __( 'Border width' ) }
+ 						hideLabelFromVision
+ 						className={ sliderClassName }
+diff --git a/packages/components/src/color-picker/input-with-slider.tsx b/packages/components/src/color-picker/input-with-slider.tsx
+index 221a9289f7450e..bd294c7db5f9c7 100644
+--- a/packages/components/src/color-picker/input-with-slider.tsx
++++ b/packages/components/src/color-picker/input-with-slider.tsx
+@@ -48,7 +48,6 @@ export const InputWithSlider = ( {
+ 				spinControls="none"
+ 			/>
+ 			<RangeControl
+-				__nextHasNoMarginBottom
+ 				__next40pxDefaultSize
+ 				label={ label }
+ 				hideLabelFromVision
+diff --git a/packages/components/src/font-size-picker/index.tsx b/packages/components/src/font-size-picker/index.tsx
+index b2a6ad01ee1114..547180103721e7 100644
+--- a/packages/components/src/font-size-picker/index.tsx
++++ b/packages/components/src/font-size-picker/index.tsx
+@@ -235,7 +235,6 @@ const UnforwardedFontSizePicker = (
+ 							<FlexItem isBlock>
+ 								<Spacer marginX={ 2 } marginBottom={ 0 }>
+ 									<RangeControl
+-										__nextHasNoMarginBottom
+ 										__next40pxDefaultSize={
+ 											__next40pxDefaultSize
+ 										}
+diff --git a/packages/components/src/query-controls/index.tsx b/packages/components/src/query-controls/index.tsx
+index fd5f9b5579f0d3..f345cb469d89e6 100644
+--- a/packages/components/src/query-controls/index.tsx
++++ b/packages/components/src/query-controls/index.tsx
+@@ -187,7 +187,6 @@ export function QueryControls( {
+ 				),
+ 				onNumberOfItemsChange && (
+ 					<RangeControl
+-						__nextHasNoMarginBottom
+ 						__next40pxDefaultSize
+ 						key="query-controls-range-control"
+ 						label={ __( 'Number of items' ) }
+diff --git a/packages/components/src/range-control/README.md b/packages/components/src/range-control/README.md
+index f21285c5f26256..047e876cd28192 100644
+--- a/packages/components/src/range-control/README.md
++++ b/packages/components/src/range-control/README.md
+@@ -90,7 +90,6 @@ const MyRangeControl = () => {
+ 
+ 	return (
+ 		<RangeControl
+-			__nextHasNoMarginBottom
+ 			__next40pxDefaultSize
+ 			label="Columns"
+ 			value={ columns }
+@@ -370,13 +369,6 @@ Start opting into the larger default height that will become the default size in
+ -   Required: No
+ -   Default: `false`
+ 
+-### `__nextHasNoMarginBottom`: `boolean`
+-
+-Start opting into the new margin-free styles that will become the default in a future version.
+-
+--   Required: No
+--   Default: `false`
+-
+ ## Related components
+ 
+ -   To collect a numerical input in a text field, use the `TextControl` component.
+diff --git a/packages/components/src/range-control/index.tsx b/packages/components/src/range-control/index.tsx
+index deeb17738e5bc0..402dae36666ce3 100644
+--- a/packages/components/src/range-control/index.tsx
++++ b/packages/components/src/range-control/index.tsx
+@@ -66,7 +66,7 @@ function UnforwardedRangeControl(
+ 	forwardedRef: ForwardedRef< HTMLInputElement >
+ ) {
+ 	const {
+-		__nextHasNoMarginBottom = false,
++		__nextHasNoMarginBottom: _, // Prevent passing to internal component
+ 		afterIcon,
+ 		allowReset = false,
+ 		beforeIcon,
+@@ -241,13 +241,12 @@ function UnforwardedRangeControl(
+ 
+ 	return (
+ 		<BaseControl
+-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+-			__associatedWPComponentName="RangeControl"
+ 			className={ classes }
+ 			label={ label }
+ 			hideLabelFromVision={ hideLabelFromVision }
+ 			id={ `${ id }` }
+ 			help={ help }
++			__nextHasNoMarginBottom
+ 		>
+ 			<Root
+ 				className="components-range-control__root"
+@@ -259,7 +258,6 @@ function UnforwardedRangeControl(
+ 					</BeforeIconWrapper>
+ 				) }
+ 				<Wrapper
+-					__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+ 					className={ wrapperClasses }
+ 					color={ colorProp }
+ 					marks={ !! marks }
+@@ -394,7 +392,6 @@ function UnforwardedRangeControl(
+  *   const [ value, setValue ] = useState();
+  *   return (
+  *     <RangeControl
+- *       __nextHasNoMarginBottom
+  *       __next40pxDefaultSize
+  *       help="Please select how transparent you would like this."
+  *       initialPosition={ 50 }
+diff --git a/packages/components/src/range-control/stories/index.story.tsx b/packages/components/src/range-control/stories/index.story.tsx
+index 9228179a3e088b..a66d0cf9a8e9d4 100644
+--- a/packages/components/src/range-control/stories/index.story.tsx
++++ b/packages/components/src/range-control/stories/index.story.tsx
+@@ -78,7 +78,6 @@ const Template: StoryFn< typeof RangeControl > = ( { onChange, ...args } ) => {
+ 
+ export const Default: StoryFn< typeof RangeControl > = Template.bind( {} );
+ Default.args = {
+-	__nextHasNoMarginBottom: true,
+ 	__next40pxDefaultSize: true,
+ 	help: 'Please select how transparent you would like this.',
+ 	initialPosition: 50,
+@@ -114,7 +113,6 @@ export const WithAnyStep: StoryFn< typeof RangeControl > = ( {
+ 	);
+ };
+ WithAnyStep.args = {
+-	__nextHasNoMarginBottom: true,
+ 	__next40pxDefaultSize: true,
+ 	label: 'Brightness',
+ 	step: 'any',
+@@ -179,7 +177,6 @@ export const WithIntegerStepAndMarks: StoryFn< typeof RangeControl > =
+ 	MarkTemplate.bind( {} );
+ 
+ WithIntegerStepAndMarks.args = {
+-	__nextHasNoMarginBottom: true,
+ 	__next40pxDefaultSize: true,
+ 	label: 'Integer Step',
+ 	marks: marksBase,
+@@ -197,7 +194,6 @@ export const WithDecimalStepAndMarks: StoryFn< typeof RangeControl > =
+ 	MarkTemplate.bind( {} );
+ 
+ WithDecimalStepAndMarks.args = {
+-	__nextHasNoMarginBottom: true,
+ 	__next40pxDefaultSize: true,
+ 	marks: [
+ 		...marksBase,
+@@ -218,7 +214,6 @@ export const WithNegativeMinimumAndMarks: StoryFn< typeof RangeControl > =
+ 	MarkTemplate.bind( {} );
+ 
+ WithNegativeMinimumAndMarks.args = {
+-	__nextHasNoMarginBottom: true,
+ 	__next40pxDefaultSize: true,
+ 	marks: marksWithNegatives,
+ 	max: 10,
+@@ -235,7 +230,6 @@ export const WithNegativeRangeAndMarks: StoryFn< typeof RangeControl > =
+ 	MarkTemplate.bind( {} );
+ 
+ WithNegativeRangeAndMarks.args = {
+-	__nextHasNoMarginBottom: true,
+ 	__next40pxDefaultSize: true,
+ 	marks: marksWithNegatives,
+ 	max: -1,
+@@ -252,7 +246,6 @@ export const WithAnyStepAndMarks: StoryFn< typeof RangeControl > =
+ 	MarkTemplate.bind( {} );
+ 
+ WithAnyStepAndMarks.args = {
+-	__nextHasNoMarginBottom: true,
+ 	__next40pxDefaultSize: true,
+ 	marks: marksBase,
+ 	max: 10,
+diff --git a/packages/components/src/range-control/styles/range-control-styles.ts b/packages/components/src/range-control/styles/range-control-styles.ts
+index 36d48a6e90ea5e..0ad77f5f2f8686 100644
+--- a/packages/components/src/range-control/styles/range-control-styles.ts
++++ b/packages/components/src/range-control/styles/range-control-styles.ts
+@@ -50,16 +50,9 @@ export const Root = styled.div< RootProps >`
+ const wrapperColor = ( { color = COLORS.ui.borderFocus }: WrapperProps ) =>
+ 	css( { color } );
+ 
+-const wrapperMargin = ( { marks, __nextHasNoMarginBottom }: WrapperProps ) => {
+-	if ( ! __nextHasNoMarginBottom ) {
+-		return css( { marginBottom: marks ? 16 : undefined } );
+-	}
+-	return '';
+-};
+-
+ export const Wrapper = styled( 'div', {
+ 	shouldForwardProp: ( prop: string ) =>
+-		! [ 'color', '__nextHasNoMarginBottom', 'marks' ].includes( prop ),
++		! [ 'color', 'marks' ].includes( prop ),
+ } )< WrapperProps >`
+ 	display: block;
+ 	flex: 1;
+@@ -68,7 +61,6 @@ export const Wrapper = styled( 'div', {
+ 
+ 	${ wrapperColor };
+ 	${ rangeHeight };
+-	${ wrapperMargin };
+ `;
+ 
+ export const BeforeIconWrapper = styled.span`
+diff --git a/packages/components/src/range-control/test/index.tsx b/packages/components/src/range-control/test/index.tsx
+index 3d2db30eea186f..40f23eceed4f15 100644
+--- a/packages/components/src/range-control/test/index.tsx
++++ b/packages/components/src/range-control/test/index.tsx
+@@ -18,13 +18,7 @@ const fireChangeEvent = ( input: HTMLInputElement, value?: number | string ) =>
+ const RangeControl = (
+ 	props: React.ComponentProps< typeof _RangeControl >
+ ) => {
+-	return (
+-		<_RangeControl
+-			{ ...props }
+-			__nextHasNoMarginBottom
+-			__next40pxDefaultSize
+-		/>
+-	);
++	return <_RangeControl { ...props } __next40pxDefaultSize />;
+ };
+ 
+ describe( 'RangeControl', () => {
+diff --git a/packages/components/src/range-control/types.ts b/packages/components/src/range-control/types.ts
+index 33b8d7d6f23873..85ba4b5294a258 100644
+--- a/packages/components/src/range-control/types.ts
++++ b/packages/components/src/range-control/types.ts
+@@ -76,9 +76,16 @@ export type ControlledRangeValue = number | '' | null;
+ 
+ export type RangeControlProps = Pick<
+ 	BaseControlProps,
+-	'hideLabelFromVision' | 'help' | '__nextHasNoMarginBottom'
++	'hideLabelFromVision' | 'help'
+ > &
+ 	MarksProps & {
++		/**
++		 * Start opting into the new margin-free styles that will become the default in a future version.
++		 *
++		 * @deprecated Default behavior since WordPress 7.0. Prop can be safely removed.
++		 * @ignore
++		 */
++		__nextHasNoMarginBottom?: boolean;
+ 		/**
+ 		 * If this property is added, an Icon component will be rendered
+ 		 * after the slider with the icon equal to afterIcon.
+@@ -254,10 +261,7 @@ export type InputRangeProps = {
+ 	value?: number | '';
+ };
+ 
+-export type WrapperProps = Pick<
+-	BaseControlProps,
+-	'__nextHasNoMarginBottom'
+-> & {
++export type WrapperProps = {
+ 	color?: CSSProperties[ 'color' ];
+ 	marks?: RangeMarks;
+ };
+diff --git a/packages/components/src/validated-form-controls/components/range-control.tsx b/packages/components/src/validated-form-controls/components/range-control.tsx
+index 0a83edaf14642a..c0a82a5e42e674 100644
+--- a/packages/components/src/validated-form-controls/components/range-control.tsx
++++ b/packages/components/src/validated-form-controls/components/range-control.tsx
+@@ -19,7 +19,7 @@ const UnforwardedValidatedRangeControl = (
+ 		...restProps
+ 	}: Omit<
+ 		React.ComponentProps< typeof RangeControl >,
+-		'__next40pxDefaultSize' | '__nextHasNoMarginBottom'
++		'__next40pxDefaultSize'
+ 	> &
+ 		ValidatedControlProps,
+ 	forwardedRef: React.ForwardedRef< HTMLInputElement >
+@@ -36,7 +36,6 @@ const UnforwardedValidatedRangeControl = (
+ 		>
+ 			<RangeControl
+ 				__next40pxDefaultSize
+-				__nextHasNoMarginBottom
+ 				ref={ mergedRefs }
+ 				{ ...restProps }
+ 			/>
+diff --git a/packages/dataviews/src/dataviews-layouts/grid/preview-size-picker.tsx b/packages/dataviews/src/dataviews-layouts/grid/preview-size-picker.tsx
+index 6db871561e6867..0130e4ac003936 100644
+--- a/packages/dataviews/src/dataviews-layouts/grid/preview-size-picker.tsx
++++ b/packages/dataviews/src/dataviews-layouts/grid/preview-size-picker.tsx
+@@ -84,7 +84,6 @@ export default function PreviewSizePicker() {
+ 
+ 	return (
+ 		<RangeControl
+-			__nextHasNoMarginBottom
+ 			__next40pxDefaultSize
+ 			showTooltip={ false }
+ 			label={ __( 'Preview size' ) }
+diff --git a/packages/dataviews/src/dataviews-layouts/utils/preview-size-picker.tsx b/packages/dataviews/src/dataviews-layouts/utils/preview-size-picker.tsx
+index 8509aab8990932..56775671d492bd 100644
+--- a/packages/dataviews/src/dataviews-layouts/utils/preview-size-picker.tsx
++++ b/packages/dataviews/src/dataviews-layouts/utils/preview-size-picker.tsx
+@@ -63,7 +63,6 @@ export default function PreviewSizePicker() {
+ 
+ 	return (
+ 		<RangeControl
+-			__nextHasNoMarginBottom
+ 			__next40pxDefaultSize
+ 			showTooltip={ false }
+ 			label={ __( 'Preview size' ) }
+diff --git a/packages/global-styles-ui/src/size-control/index.tsx b/packages/global-styles-ui/src/size-control/index.tsx
+index 6765338c3fbd88..9b8a77e066aebd 100644
+--- a/packages/global-styles-ui/src/size-control/index.tsx
++++ b/packages/global-styles-ui/src/size-control/index.tsx
+@@ -75,7 +75,6 @@ function SizeControl( {
+ 					<Spacer marginX={ 2 } marginBottom={ 0 }>
+ 						<RangeControl
+ 							__next40pxDefaultSize
+-							__nextHasNoMarginBottom
+ 							label={ label }
+ 							hideLabelFromVision
+ 							value={ valueQuantity }

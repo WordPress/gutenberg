@@ -1,0 +1,592 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d63114769862cc..3df6b45ff655a1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -28,6 +28,7 @@
+ -   Update control labels to the new uppercase styles ([#42789](https://github.com/WordPress/gutenberg/pull/42789)).
+ -   `UnitControl`: Update unit dropdown design for the large size variant ([#42000](https://github.com/WordPress/gutenberg/pull/42000)).
+ -   `BaseControl`: Add `box-sizing` reset style ([#42889](https://github.com/WordPress/gutenberg/pull/42889)).
++-   `ToggleGroupControl`, `RangeControl`, `FontSizePicker`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([#43062](https://github.com/WordPress/gutenberg/pull/43062)).
+ -   `BoxControl`: Export `applyValueToSides` util function. ([#42733](https://github.com/WordPress/gutenberg/pull/42733/)).
+ 
+ ### Internal
+diff --git a/packages/components/src/font-size-picker/index.js b/packages/components/src/font-size-picker/index.js
+index 18f5a4e9093cd2..2eefe8107d946e 100644
+--- a/packages/components/src/font-size-picker/index.js
++++ b/packages/components/src/font-size-picker/index.js
+@@ -1,3 +1,8 @@
++/**
++ * External dependencies
++ */
++import classNames from 'classnames';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -26,9 +31,20 @@ import {
+ 	isSimpleCssValue,
+ 	CUSTOM_FONT_SIZE,
+ } from './utils';
++import { VStack } from '../v-stack';
++
++// This conditional is needed to maintain the spacing before the slider in the `withSlider` case.
++const MaybeVStack = ( { __nextHasNoMarginBottom, children } ) =>
++	! __nextHasNoMarginBottom ? (
++		children
++	) : (
++		<VStack spacing={ 6 } children={ children } />
++	);
+ 
+ function FontSizePicker(
+ 	{
++		/** Start opting into the new margin-free styles that will become the default in a future version. */
++		__nextHasNoMarginBottom = false,
+ 		fallbackFontSize,
+ 		fontSizes = [],
+ 		disableCustomFontSizes = false,
+@@ -165,119 +181,133 @@ function FontSizePicker(
+ 					</FlexItem>
+ 				) }
+ 			</Flex>
+-			<div className={ `${ baseClassName }__controls` }>
+-				{ !! fontSizes.length &&
+-					shouldUseSelectControl &&
+-					! showCustomValueControl && (
+-						<CustomSelectControl
+-							__nextUnconstrainedWidth
+-							className={ `${ baseClassName }__select` }
++			<MaybeVStack __nextHasNoMarginBottom={ __nextHasNoMarginBottom }>
++				<div
++					className={ classNames( `${ baseClassName }__controls`, {
++						'is-next-has-no-margin-bottom': __nextHasNoMarginBottom,
++					} ) }
++				>
++					{ !! fontSizes.length &&
++						shouldUseSelectControl &&
++						! showCustomValueControl && (
++							<CustomSelectControl
++								__nextUnconstrainedWidth
++								className={ `${ baseClassName }__select` }
++								label={ __( 'Font size' ) }
++								hideLabelFromVision
++								describedBy={ currentFontSizeSR }
++								options={ options }
++								value={ options.find(
++									( option ) =>
++										option.key === selectedOption.slug
++								) }
++								onChange={ ( { selectedItem } ) => {
++									onChange(
++										hasUnits
++											? selectedItem.size
++											: Number( selectedItem.size )
++									);
++									if (
++										selectedItem.key === CUSTOM_FONT_SIZE
++									) {
++										setShowCustomValueControl( true );
++									}
++								} }
++								size={ size }
++							/>
++						) }
++					{ ! shouldUseSelectControl && ! showCustomValueControl && (
++						<ToggleGroupControl
++							__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+ 							label={ __( 'Font size' ) }
+ 							hideLabelFromVision
+-							describedBy={ currentFontSizeSR }
+-							options={ options }
+-							value={ options.find(
+-								( option ) => option.key === selectedOption.slug
+-							) }
+-							onChange={ ( { selectedItem } ) => {
++							value={ value }
++							onChange={ ( newValue ) => {
+ 								onChange(
+-									hasUnits
+-										? selectedItem.size
+-										: Number( selectedItem.size )
++									hasUnits ? newValue : Number( newValue )
+ 								);
+-								if ( selectedItem.key === CUSTOM_FONT_SIZE ) {
+-									setShowCustomValueControl( true );
+-								}
+ 							} }
++							isBlock
+ 							size={ size }
+-						/>
+-					) }
+-				{ ! shouldUseSelectControl && ! showCustomValueControl && (
+-					<ToggleGroupControl
+-						label={ __( 'Font size' ) }
+-						hideLabelFromVision
+-						value={ value }
+-						onChange={ ( newValue ) => {
+-							onChange(
+-								hasUnits ? newValue : Number( newValue )
+-							);
+-						} }
+-						isBlock
+-						size={ size }
+-					>
+-						{ options.map( ( option ) => (
+-							<ToggleGroupControlOption
+-								key={ option.key }
+-								value={ option.value }
+-								label={ option.label }
+-								aria-label={ option.name }
+-								showTooltip={ true }
+-							/>
+-						) ) }
+-					</ToggleGroupControl>
+-				) }
+-				{ ! withSlider &&
+-					! disableCustomFontSizes &&
+-					showCustomValueControl && (
+-						<Flex
+-							justify="space-between"
+-							className={ `${ baseClassName }__custom-size-control` }
+ 						>
+-							<FlexItem isBlock>
+-								<UnitControl
+-									label={ __( 'Custom' ) }
+-									labelPosition="top"
+-									hideLabelFromVision
+-									value={ value }
+-									onChange={ ( nextSize ) => {
+-										if (
+-											0 === parseFloat( nextSize ) ||
+-											! nextSize
+-										) {
+-											onChange( undefined );
+-										} else {
+-											onChange(
+-												hasUnits
+-													? nextSize
+-													: parseInt( nextSize, 10 )
+-											);
+-										}
+-									} }
+-									size={ size }
+-									units={ hasUnits ? units : [] }
++							{ options.map( ( option ) => (
++								<ToggleGroupControlOption
++									key={ option.key }
++									value={ option.value }
++									label={ option.label }
++									aria-label={ option.name }
++									showTooltip={ true }
+ 								/>
+-							</FlexItem>
+-							{ withReset && (
++							) ) }
++						</ToggleGroupControl>
++					) }
++					{ ! withSlider &&
++						! disableCustomFontSizes &&
++						showCustomValueControl && (
++							<Flex
++								justify="space-between"
++								className={ `${ baseClassName }__custom-size-control` }
++							>
+ 								<FlexItem isBlock>
+-									<Button
+-										className="components-color-palette__clear"
+-										disabled={ value === undefined }
+-										onClick={ () => {
+-											onChange( undefined );
++									<UnitControl
++										label={ __( 'Custom' ) }
++										labelPosition="top"
++										hideLabelFromVision
++										value={ value }
++										onChange={ ( nextSize ) => {
++											if (
++												0 === parseFloat( nextSize ) ||
++												! nextSize
++											) {
++												onChange( undefined );
++											} else {
++												onChange(
++													hasUnits
++														? nextSize
++														: parseInt(
++																nextSize,
++																10
++														  )
++												);
++											}
+ 										} }
+-										isSmall
+-										variant="secondary"
+-									>
+-										{ __( 'Reset' ) }
+-									</Button>
++										size={ size }
++										units={ hasUnits ? units : [] }
++									/>
+ 								</FlexItem>
+-							) }
+-						</Flex>
+-					) }
+-			</div>
+-			{ withSlider && (
+-				<RangeControl
+-					className={ `${ baseClassName }__custom-input` }
+-					label={ __( 'Custom Size' ) }
+-					value={ ( isPixelValue && noUnitsValue ) || '' }
+-					initialPosition={ fallbackFontSize }
+-					onChange={ ( newValue ) => {
+-						onChange( hasUnits ? newValue + 'px' : newValue );
+-					} }
+-					min={ 12 }
+-					max={ 100 }
+-				/>
+-			) }
++								{ withReset && (
++									<FlexItem isBlock>
++										<Button
++											className="components-color-palette__clear"
++											disabled={ value === undefined }
++											onClick={ () => {
++												onChange( undefined );
++											} }
++											isSmall
++											variant="secondary"
++										>
++											{ __( 'Reset' ) }
++										</Button>
++									</FlexItem>
++								) }
++							</Flex>
++						) }
++				</div>
++				{ withSlider && (
++					<RangeControl
++						__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
++						className={ `${ baseClassName }__custom-input` }
++						label={ __( 'Custom Size' ) }
++						value={ ( isPixelValue && noUnitsValue ) || '' }
++						initialPosition={ fallbackFontSize }
++						onChange={ ( newValue ) => {
++							onChange( hasUnits ? newValue + 'px' : newValue );
++						} }
++						min={ 12 }
++						max={ 100 }
++					/>
++				) }
++			</MaybeVStack>
+ 		</fieldset>
+ 	);
+ }
+diff --git a/packages/components/src/font-size-picker/stories/index.js b/packages/components/src/font-size-picker/stories/index.js
+index 7f23a457992911..b86941e3d9836b 100644
+--- a/packages/components/src/font-size-picker/stories/index.js
++++ b/packages/components/src/font-size-picker/stories/index.js
+@@ -12,6 +12,7 @@ export default {
+ 	title: 'Components/FontSizePicker',
+ 	component: FontSizePicker,
+ 	argTypes: {
++		__nextHasNoMarginBottom: { control: { type: 'boolean' } },
+ 		initialValue: { table: { disable: true } }, // hide prop because it's not actually part of FontSizePicker
+ 		fallbackFontSize: {
+ 			description:
+diff --git a/packages/components/src/font-size-picker/style.scss b/packages/components/src/font-size-picker/style.scss
+index bf3965ab304cd3..90d7658330d04f 100644
+--- a/packages/components/src/font-size-picker/style.scss
++++ b/packages/components/src/font-size-picker/style.scss
+@@ -16,7 +16,10 @@
+ 	max-width: $sidebar-width - ( 2 * $grid-unit-20 );
+ 	align-items: center;
+ 	margin-top: $grid-unit-10;
+-	margin-bottom: $grid-unit-30;
++
++	&:not(.is-next-has-no-margin-bottom) {
++		margin-bottom: $grid-unit-30;
++	}
+ 
+ 	.components-unit-control-wrapper {
+ 		.components-input-control__label {
+diff --git a/packages/components/src/range-control/index.tsx b/packages/components/src/range-control/index.tsx
+index 3045b5c0283ddf..de3c60d9246273 100644
+--- a/packages/components/src/range-control/index.tsx
++++ b/packages/components/src/range-control/index.tsx
+@@ -49,6 +49,7 @@ function UnforwardedRangeControl< IconProps = unknown >(
+ 	forwardedRef: ForwardedRef< HTMLInputElement >
+ ) {
+ 	const {
++		__nextHasNoMarginBottom = false,
+ 		afterIcon,
+ 		allowReset = false,
+ 		beforeIcon,
+@@ -212,6 +213,7 @@ function UnforwardedRangeControl< IconProps = unknown >(
+ 
+ 	return (
+ 		<BaseControl
++			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+ 			className={ classes }
+ 			label={ label }
+ 			hideLabelFromVision={ hideLabelFromVision }
+@@ -225,6 +227,7 @@ function UnforwardedRangeControl< IconProps = unknown >(
+ 					</BeforeIconWrapper>
+ 				) }
+ 				<Wrapper
++					__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+ 					className={ wrapperClasses }
+ 					color={ colorProp }
+ 					marks={ !! marks }
+diff --git a/packages/components/src/range-control/styles/range-control-styles.ts b/packages/components/src/range-control/styles/range-control-styles.ts
+index 7f85c04c675db2..b54cbcbc7412f3 100644
+--- a/packages/components/src/range-control/styles/range-control-styles.ts
++++ b/packages/components/src/range-control/styles/range-control-styles.ts
+@@ -29,7 +29,7 @@ const thumbSize = 12;
+ export const Root = styled.div`
+ 	-webkit-tap-highlight-color: transparent;
+ 	align-items: flex-start;
+-	display: inline-flex;
++	display: flex;
+ 	justify-content: flex-start;
+ 	padding: 0;
+ 	position: relative;
+@@ -40,8 +40,12 @@ export const Root = styled.div`
+ const wrapperColor = ( { color = COLORS.ui.borderFocus }: WrapperProps ) =>
+ 	css( { color } );
+ 
+-const wrapperMargin = ( { marks }: WrapperProps ) =>
+-	css( { marginBottom: marks ? 16 : undefined } );
++const wrapperMargin = ( { marks, __nextHasNoMarginBottom }: WrapperProps ) => {
++	if ( ! __nextHasNoMarginBottom ) {
++		return css( { marginBottom: marks ? 16 : undefined } );
++	}
++	return '';
++};
+ 
+ export const Wrapper = styled.div< WrapperProps >`
+ 	color: ${ COLORS.blue.medium.focus };
+@@ -56,12 +60,14 @@ export const Wrapper = styled.div< WrapperProps >`
+ `;
+ 
+ export const BeforeIconWrapper = styled.span`
++	display: flex; // ensures the height isn't affected by line-height
+ 	margin-top: ${ railHeight }px;
+ 
+ 	${ rtl( { marginRight: 6 } ) }
+ `;
+ 
+ export const AfterIconWrapper = styled.span`
++	display: flex; // ensures the height isn't affected by line-height
+ 	margin-top: ${ railHeight }px;
+ 
+ 	${ rtl( { marginLeft: 6 } ) }
+diff --git a/packages/components/src/range-control/types.ts b/packages/components/src/range-control/types.ts
+index e59f240496c9d6..594ce7a77a4445 100644
+--- a/packages/components/src/range-control/types.ts
++++ b/packages/components/src/range-control/types.ts
+@@ -76,7 +76,7 @@ export type ControlledRangeValue = number | '' | null;
+ 
+ export type RangeControlProps< IconProps = unknown > = Pick<
+ 	BaseControlProps,
+-	'hideLabelFromVision' | 'help'
++	'hideLabelFromVision' | 'help' | '__nextHasNoMarginBottom'
+ > &
+ 	MarksProps & {
+ 		/**
+@@ -243,7 +243,10 @@ export type InputRangeProps = {
+ 	value?: number | '';
+ };
+ 
+-export type WrapperProps = {
++export type WrapperProps = Pick<
++	BaseControlProps,
++	'__nextHasNoMarginBottom'
++> & {
+ 	color?: CSSProperties[ 'color' ];
+ 	marks?: RangeMarks;
+ };
+diff --git a/packages/components/src/toggle-group-control/stories/index.js b/packages/components/src/toggle-group-control/stories/index.js
+index a16d094eae4cf8..13cb5829ea2577 100644
+--- a/packages/components/src/toggle-group-control/stories/index.js
++++ b/packages/components/src/toggle-group-control/stories/index.js
+@@ -18,6 +18,7 @@ import {
+ 	ToggleGroupControlOptionIcon,
+ } from '../index';
+ import { View } from '../../view';
++import { HStack } from '../../h-stack';
+ import Button from '../../button';
+ 
+ export default {
+@@ -26,6 +27,7 @@ export default {
+ 	subcomponents: { ToggleGroupControlOption, ToggleGroupControlOptionIcon },
+ 	argTypes: {
+ 		__experimentalIsIconGroup: { control: { type: 'boolean' } },
++		__nextHasNoMarginBottom: { control: 'boolean' },
+ 		size: {
+ 			control: 'radio',
+ 			options: [ 'default', '__unstable-large' ],
+@@ -187,7 +189,7 @@ export const WithReset = ( props ) => {
+ 		/>
+ 	) );
+ 	return (
+-		<View>
++		<HStack alignment="center" justify="flex-start">
+ 			<ToggleGroupControl
+ 				{ ...props }
+ 				onChange={ setAlignState }
+@@ -200,9 +202,10 @@ export const WithReset = ( props ) => {
+ 			<Button onClick={ () => setAlignState( undefined ) } isTertiary>
+ 				Reset
+ 			</Button>
+-		</View>
++		</HStack>
+ 	);
+ };
+ WithReset.args = {
+ 	...Default.args,
++	__nextHasNoMarginBottom: true,
+ };
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index 09ef6ea6925d90..b17cadc6411c7d 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -40,6 +40,7 @@ function ToggleGroupControl(
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const {
++		__nextHasNoMarginBottom = false,
+ 		className,
+ 		isAdaptiveWidth = false,
+ 		isBlock = false,
+@@ -93,7 +94,10 @@ function ToggleGroupControl(
+ 		[ className, cx, isBlock, __experimentalIsIconGroup, size ]
+ 	);
+ 	return (
+-		<BaseControl help={ help }>
++		<BaseControl
++			help={ help }
++			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
++		>
+ 			<ToggleGroupControlContext.Provider
+ 				value={ { ...radio, isBlock: ! isAdaptiveWidth, size } }
+ 			>
+diff --git a/packages/components/src/toggle-group-control/types.ts b/packages/components/src/toggle-group-control/types.ts
+index 66ad2b56338ab0..f42ef84f83660b 100644
+--- a/packages/components/src/toggle-group-control/types.ts
++++ b/packages/components/src/toggle-group-control/types.ts
+@@ -8,6 +8,7 @@ import type { RadioStateReturn } from 'reakit';
+ /**
+  * Internal dependencies
+  */
++import type { BaseControlProps } from '../base-control/types';
+ import type { FormElementProps } from '../utils/types';
+ 
+ export type ToggleGroupControlOptionBaseProps = {
+@@ -74,59 +75,55 @@ export type WithToolTipProps = {
+ export type ToggleGroupControlProps = Omit<
+ 	FormElementProps< any >,
+ 	'defaultValue'
+-> & {
+-	/**
+-	 * Label for the form element.
+-	 */
+-	label: string;
+-	/**
+-	 * If true, the label will only be visible to screen readers.
+-	 *
+-	 * @default false
+-	 */
+-	hideLabelFromVision?: boolean;
+-	/**
+-	 * Determines if segments should be rendered with equal widths.
+-	 *
+-	 * @default false
+-	 */
+-	isAdaptiveWidth?: boolean;
+-	/**
+-	 * Renders `ToggleGroupControl` as a (CSS) block element.
+-	 *
+-	 * @default false
+-	 */
+-	isBlock?: boolean;
+-	/**
+-	 * Style for use with `ToggleGroupControlOptionIcon`s.
+-	 *
+-	 * @default false
+-	 */
+-	__experimentalIsIconGroup?: boolean; // TODO: Refactor so this can be private
+-	/**
+-	 * Callback when a segment is selected.
+-	 */
+-	onChange?: ( value: ReactText | undefined ) => void;
+-	/**
+-	 * The value of `ToggleGroupControl`
+-	 */
+-	value?: ReactText;
+-	/**
+-	 * React children
+-	 */
+-	children: ReactNode;
+-	/**
+-	 * If this property is added, a help text will be generated
+-	 * using help property as the content.
+-	 */
+-	help?: ReactNode;
+-	/**
+-	 * The size variant of the control.
+-	 *
+-	 * @default 'default'
+-	 */
+-	size?: 'default' | '__unstable-large';
+-};
++> &
++	Pick< BaseControlProps, 'help' | '__nextHasNoMarginBottom' > & {
++		/**
++		 * Label for the form element.
++		 */
++		label: string;
++		/**
++		 * If true, the label will only be visible to screen readers.
++		 *
++		 * @default false
++		 */
++		hideLabelFromVision?: boolean;
++		/**
++		 * Determines if segments should be rendered with equal widths.
++		 *
++		 * @default false
++		 */
++		isAdaptiveWidth?: boolean;
++		/**
++		 * Renders `ToggleGroupControl` as a (CSS) block element.
++		 *
++		 * @default false
++		 */
++		isBlock?: boolean;
++		/**
++		 * Style for use with `ToggleGroupControlOptionIcon`s.
++		 *
++		 * @default false
++		 */
++		__experimentalIsIconGroup?: boolean; // TODO: Refactor so this can be private
++		/**
++		 * Callback when a segment is selected.
++		 */
++		onChange?: ( value: ReactText | undefined ) => void;
++		/**
++		 * The value of `ToggleGroupControl`
++		 */
++		value?: ReactText;
++		/**
++		 * React children
++		 */
++		children: ReactNode;
++		/**
++		 * The size variant of the control.
++		 *
++		 * @default 'default'
++		 */
++		size?: 'default' | '__unstable-large';
++	};
+ 
+ export type ToggleGroupControlContextProps = RadioStateReturn &
+ 	Pick< ToggleGroupControlProps, 'size' > & {

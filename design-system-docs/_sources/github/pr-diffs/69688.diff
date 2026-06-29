@@ -1,0 +1,110 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index bee17daddc3491..1f2dc95d649f54 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ 
+ ### Enhancement
+ 
++-   `Popover`: improve Storybook examples around onClose and onFocusOutside props. ([#69688](https://github.com/WordPress/gutenberg/pull/69688))
+ -   `FormTokenField`: Add theming support ([#69638](https://github.com/WordPress/gutenberg/pull/69638)).
+ -   `ComboboxControl`: Add theming support ([#69638](https://github.com/WordPress/gutenberg/pull/69638)).
+ 
+diff --git a/packages/components/src/popover/stories/index.story.tsx b/packages/components/src/popover/stories/index.story.tsx
+index 2496e4e5068067..685bf061bcb4bf 100644
+--- a/packages/components/src/popover/stories/index.story.tsx
++++ b/packages/components/src/popover/stories/index.story.tsx
+@@ -90,10 +90,13 @@ export const Default: StoryObj< typeof Popover > = {
+ 	decorators: [
+ 		( Story ) => {
+ 			const [ isVisible, setIsVisible ] = useState( false );
+-			const toggleVisible = () => {
++			const buttonRef = useRef< HTMLButtonElement | undefined >();
++			const toggleVisible = ( event: React.MouseEvent ) => {
++				if ( buttonRef.current && event.target !== buttonRef.current ) {
++					return;
++				}
+ 				setIsVisible( ( state ) => ! state );
+ 			};
+-			const buttonRef = useRef< HTMLButtonElement | undefined >();
+ 			useEffect( () => {
+ 				buttonRef.current?.scrollIntoView?.( {
+ 					block: 'center',
+@@ -259,3 +262,77 @@ export const WithSlotOutsideIframe: StoryObj< typeof Popover > = {
+ 		...Default.args,
+ 	},
+ };
++
++export const WithCloseHandlers: StoryObj< typeof Popover > = {
++	render: function WithCloseHandlersStory( args ) {
++		const [ isVisible, setIsVisible ] = useState( false );
++		const buttonRef = useRef< HTMLButtonElement >( null );
++
++		const toggleVisible = ( event: React.MouseEvent ) => {
++			if ( buttonRef.current && event.target !== buttonRef.current ) {
++				return;
++			}
++			setIsVisible( ( prev ) => ! prev );
++		};
++
++		const handleClose = () => {
++			args.onClose?.();
++			setIsVisible( false );
++		};
++
++		const handleFocusOutside = ( e: React.SyntheticEvent ) => {
++			args.onFocusOutside?.( e );
++			setIsVisible( false );
++		};
++
++		useEffect( () => {
++			buttonRef.current?.scrollIntoView( {
++				block: 'center',
++				inline: 'center',
++			} );
++		}, [] );
++
++		return (
++			<div
++				style={ {
++					width: '300vw',
++					height: '300vh',
++					display: 'flex',
++					alignItems: 'center',
++					justifyContent: 'center',
++				} }
++			>
++				<Button
++					variant="secondary"
++					onClick={ toggleVisible }
++					ref={ buttonRef }
++				>
++					Toggle Popover
++					{ isVisible && (
++						<Popover
++							{ ...args }
++							onClose={ handleClose }
++							onFocusOutside={ handleFocusOutside }
++						>
++							{ args.children }
++						</Popover>
++					) }
++				</Button>
++			</div>
++		);
++	},
++	args: {
++		...Default.args,
++		focusOnMount: true,
++		children: (
++			<div style={ { width: '280px', whiteSpace: 'normal' } }>
++				<p>
++					Clicking outside triggers the onFocusOutside callback prop.
++				</p>
++				<p>
++					Pressing the Escape key triggers the onClose callback prop.
++				</p>
++			</div>
++		),
++	},
++};

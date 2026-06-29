@@ -1,0 +1,356 @@
+diff --git a/packages/components/src/angle-picker-control/index.js b/packages/components/src/angle-picker-control/index.js
+index 3b089f1ccefcc7..842c6e6c6b9223 100644
+--- a/packages/components/src/angle-picker-control/index.js
++++ b/packages/components/src/angle-picker-control/index.js
+@@ -6,33 +6,25 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
+-import { useInstanceId } from '@wordpress/compose';
+ import { __ } from '@wordpress/i18n';
+ 
+ /**
+  * Internal dependencies
+  */
+-import BaseControl from '../base-control';
+ import { FlexBlock, FlexItem } from '../flex';
+-import NumberControl from '../number-control';
++import NumberControl from '../input-control';
+ import AngleCircle from './angle-circle';
+ import { Root } from './styles/angle-picker-control-styles';
++import { space } from '../ui/utils/space';
++import { Text } from '../text';
++import { Spacer } from '../spacer';
+ 
+ export default function AnglePickerControl( {
+ 	className,
+-	hideLabelFromVision,
+-	id: idProp,
+ 	label = __( 'Angle' ),
+ 	onChange,
+ 	value,
+-	...props
+ } ) {
+-	const instanceId = useInstanceId(
+-		AnglePickerControl,
+-		'components-angle-picker-control__input'
+-	);
+-	const id = idProp || instanceId;
+-
+ 	const handleOnNumberChange = ( unprocessedValue ) => {
+ 		const inputValue =
+ 			unprocessedValue !== '' ? parseInt( unprocessedValue, 10 ) : 0;
+@@ -42,33 +34,41 @@ export default function AnglePickerControl( {
+ 	const classes = classnames( 'components-angle-picker-control', className );
+ 
+ 	return (
+-		<BaseControl
+-			className={ classes }
+-			hideLabelFromVision={ hideLabelFromVision }
+-			id={ id }
+-			label={ label }
+-			{ ...props }
+-		>
+-			<Root>
+-				<FlexBlock>
+-					<NumberControl
+-						className="components-angle-picker-control__input-field"
+-						id={ id }
+-						max={ 360 }
+-						min={ 0 }
+-						onChange={ handleOnNumberChange }
+-						step="1"
+-						value={ value }
+-					/>
+-				</FlexBlock>
+-				<FlexItem>
+-					<AngleCircle
+-						aria-hidden="true"
+-						value={ value }
+-						onChange={ onChange }
+-					/>
+-				</FlexItem>
+-			</Root>
+-		</BaseControl>
++		<Root className={ classes }>
++			<FlexBlock>
++				<NumberControl
++					label={ label }
++					className="components-angle-picker-control__input-field"
++					max={ 360 }
++					min={ 0 }
++					onChange={ handleOnNumberChange }
++					step="1"
++					value={ value }
++					hideHTMLArrows
++					suffix={
++						<Spacer
++							as={ Text }
++							marginRight={ space( 3 ) }
++							color="blue"
++						>
++							°
++						</Spacer>
++					}
++				/>
++			</FlexBlock>
++			<FlexItem
++				style={ {
++					marginLeft: space( 4 ),
++					marginBottom: space( 1 ),
++					marginTop: 'auto',
++				} }
++			>
++				<AngleCircle
++					aria-hidden="true"
++					value={ value }
++					onChange={ onChange }
++				/>
++			</FlexItem>
++		</Root>
+ 	);
+ }
+diff --git a/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.js b/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.js
+index a59471277d5db8..9c9e0f720a69d8 100644
+--- a/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.js
++++ b/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.js
+@@ -8,16 +8,19 @@ import styled from '@emotion/styled';
+  */
+ import { Flex } from '../../flex';
+ import { COLORS } from '../../utils';
++import { space } from '../../ui/utils/space';
++import CONFIG from '../../utils/config-values';
+ 
+-const CIRCLE_SIZE = 30;
++const CIRCLE_SIZE = 32;
++const INNER_CIRCLE_SIZE = 3;
+ 
+ export const Root = styled( Flex )`
+-	max-width: 200px;
++	margin-bottom: ${ space( 2 ) };
+ `;
+ 
+ export const CircleRoot = styled.div`
+ 	border-radius: 50%;
+-	border: 1px solid ${ COLORS.ui.borderLight };
++	border: ${ CONFIG.borderWidth } solid ${ COLORS.ui.border };
+ 	box-sizing: border-box;
+ 	cursor: grab;
+ 	height: ${ CIRCLE_SIZE }px;
+@@ -33,17 +36,17 @@ export const CircleIndicatorWrapper = styled.div`
+ `;
+ 
+ export const CircleIndicator = styled.div`
+-	background: ${ COLORS.ui.border };
++	background: #3858e9;
+ 	border-radius: 50%;
+-	border: 3px solid ${ COLORS.ui.border };
++	border: ${ INNER_CIRCLE_SIZE }px solid #3858e9;
+ 	bottom: 0;
+ 	box-sizing: border-box;
+ 	display: block;
+-	height: 1px;
++	height: 0px;
+ 	left: 0;
+ 	margin: auto;
+ 	position: absolute;
+ 	right: 0;
+ 	top: -${ CIRCLE_SIZE / 2 }px;
+-	width: 1px;
++	width: 0px;
+ `;
+diff --git a/packages/components/src/custom-gradient-bar/constants.js b/packages/components/src/custom-gradient-bar/constants.js
+index d4236f1f4d817a..05f61b80a590b6 100644
+--- a/packages/components/src/custom-gradient-bar/constants.js
++++ b/packages/components/src/custom-gradient-bar/constants.js
+@@ -3,8 +3,8 @@ export const COLOR_POPOVER_PROPS = {
+ 	position: 'top',
+ };
+ 
+-export const GRADIENT_MARKERS_WIDTH = 18;
+-export const INSERT_POINT_WIDTH = 23;
++export const GRADIENT_MARKERS_WIDTH = 16;
++export const INSERT_POINT_WIDTH = 16;
+ export const MINIMUM_ABSOLUTE_LEFT_POSITION = 5;
+ export const MINIMUM_DISTANCE_BETWEEN_INSERTER_AND_POINT = 10;
+ export const MINIMUM_DISTANCE_BETWEEN_POINTS = 0;
+diff --git a/packages/components/src/custom-gradient-picker/index.js b/packages/components/src/custom-gradient-picker/index.js
+index 7d10440295afe9..251fc8ccec8166 100644
+--- a/packages/components/src/custom-gradient-picker/index.js
++++ b/packages/components/src/custom-gradient-picker/index.js
+@@ -17,7 +17,7 @@ import { Flex } from '../flex';
+ import SelectControl from '../select-control';
+ import {
+ 	getGradientAstWithDefault,
+-	getLinearGradientRepresentationOfARadial,
++	getLinearGradientRepresentation,
+ 	getGradientAstWithControlPoints,
+ 	getStopCssColor,
+ } from './utils';
+@@ -52,8 +52,8 @@ const GradientAnglePicker = ( { gradientAST, hasGradient, onChange } ) => {
+ 	};
+ 	return (
+ 		<AnglePickerControl
+-			hideLabelFromVision
+ 			onChange={ onAngleChange }
++			labelPosition="top"
+ 			value={ hasGradient ? angle : '' }
+ 		/>
+ 	);
+@@ -95,7 +95,7 @@ const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
+ 		<SelectControl
+ 			className="components-custom-gradient-picker__type-picker"
+ 			label={ __( 'Type' ) }
+-			labelPosition={ 'side' }
++			labelPosition="top"
+ 			onChange={ handleOnChange }
+ 			options={ GRADIENT_OPTIONS }
+ 			value={ hasGradient && type }
+@@ -107,10 +107,8 @@ export default function CustomGradientPicker( { value, onChange } ) {
+ 	const gradientAST = getGradientAstWithDefault( value );
+ 	// On radial gradients the bar should display a linear gradient.
+ 	// On radial gradients the bar represents a slice of the gradient from the center until the outside.
+-	const background =
+-		gradientAST.type === 'radial-gradient'
+-			? getLinearGradientRepresentationOfARadial( gradientAST )
+-			: gradientAST.value;
++	// On liner gradients the bar represents the color stops from left to right independently of the angle.
++	const background = getLinearGradientRepresentation( gradientAST );
+ 	const hasGradient = gradientAST.value !== DEFAULT_GRADIENT;
+ 	// Control points color option may be hex from presets, custom colors will be rgb.
+ 	// The position should always be a percentage.
+diff --git a/packages/components/src/custom-gradient-picker/style.scss b/packages/components/src/custom-gradient-picker/style.scss
+index 732fdef6a09b70..809a4f0ad29d73 100644
+--- a/packages/components/src/custom-gradient-picker/style.scss
++++ b/packages/components/src/custom-gradient-picker/style.scss
+@@ -1,22 +1,23 @@
+-$components-custom-gradient-picker__padding: 6px; // 36px container, 24px handles inside, that leaves 12px padding, half of which is 6.
++$components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 16px handles inside, that leaves 32px padding, half of which is 1å6.
+ 
+ .components-custom-gradient-picker__gradient-bar:not(.has-gradient) {
+ 	opacity: 0.4;
+ }
+ 
+ .components-custom-gradient-picker__gradient-bar {
++	border-radius: $radius-block-ui;
+ 	margin-top: $grid-unit-15;
+ 	width: 100%;
+-	height: $button-size;
+-	border-radius: $button-size;
+-	margin-bottom: $grid-unit-15;
++	height: $grid-unit-60;
++	margin-bottom: $grid-unit-20+$grid-unit-05;
+ 	/*rtl:ignore*/
+-	padding-left: $components-custom-gradient-picker__padding;
+-	/*rtl:ignore*/
+-	padding-right: $button-size - $components-custom-gradient-picker__padding;
++	padding-right: $components-custom-gradient-picker__padding;
+ 
+ 	.components-custom-gradient-picker__markers-container {
+ 		position: relative;
++		width: calc(100% - #{ $grid-unit-40 });
++		margin-left: auto;
++		margin-right: auto;
+ 	}
+ 
+ 	.components-custom-gradient-picker__insert-point {
+@@ -24,9 +25,9 @@ $components-custom-gradient-picker__padding: 6px; // 36px container, 24px handle
+ 		background: $white;
+ 		padding: 2px;
+ 		top: $components-custom-gradient-picker__padding;
+-		min-width: $button-size-small;
+-		width: $button-size-small;
+-		height: $button-size-small;
++		min-width: $grid-unit-20;
++		width: $grid-unit-20;
++		height: $grid-unit-20;
+ 		position: relative;
+ 		color: $gray-900;
+ 
+@@ -37,20 +38,25 @@ $components-custom-gradient-picker__padding: 6px; // 36px container, 24px handle
+ 	}
+ 
+ 	.components-custom-gradient-picker__control-point-button {
+-		border: 2px solid transparent;
+-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $white;
+ 		border-radius: 50%;
+-		height: $button-size-small;
+-		width: $button-size-small;
++		height: $grid-unit-20;
++		width: $grid-unit-20;
+ 		padding: 0;
+ 		position: absolute;
+ 		top: $components-custom-gradient-picker__padding;
+ 
++		// Shadow and stroke.
++		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $white, 0 0 $border-width-focus 0 rgba($black, 0.25);
++
++		// Windows High Contrast mode will show this outline, but not the box-shadow.
++		outline: 2px solid transparent;
++
+ 		&:focus,
+ 		&.is-active {
+-			box-shadow:
+-				0 0 0 1px $white,
+-				0 0 0 3px $gray-900;
++			box-shadow: inset 0 0 0 calc(var(--wp-admin-border-width-focus) * 2) $white, 0 0 $border-width-focus 0 rgba($black, 0.25);
++
++			// Windows High Contrast mode will show this outline, but not the box-shadow.
++			outline: $border-width-tab solid transparent;
+ 		}
+ 	}
+ }
+@@ -59,7 +65,7 @@ $components-custom-gradient-picker__padding: 6px; // 36px container, 24px handle
+ 	margin-left: auto;
+ 	margin-right: auto;
+ 	display: block;
+-	margin-bottom: 8px;
++	margin-bottom: $grid-unit-10;
+ }
+ 
+ .components-custom-gradient-picker__inserter {
+@@ -102,3 +108,20 @@ $components-custom-gradient-picker__padding: 6px; // 36px container, 24px handle
+ 		}
+ 	}
+ }
++
++// All these styles should be made generic and changed on the inputs for all components.
++.components-custom-gradient-picker {
++	.components-select-control__input,
++	.components-input-control__input {
++		height: 40px !important;
++	}
++	.components-input-control__label {
++		line-height: 1;
++		padding-bottom: $grid-unit-10 !important;
++	}
++	label {
++		text-transform: uppercase;
++		font-size: 11px;
++		font-weight: 500;
++	}
++}
+diff --git a/packages/components/src/custom-gradient-picker/styles/custom-gradient-picker-styles.js b/packages/components/src/custom-gradient-picker/styles/custom-gradient-picker-styles.js
+index f8c99b5a8800d6..30c16c1fbbfe2d 100644
+--- a/packages/components/src/custom-gradient-picker/styles/custom-gradient-picker-styles.js
++++ b/packages/components/src/custom-gradient-picker/styles/custom-gradient-picker-styles.js
+@@ -12,5 +12,5 @@ export const SelectWrapper = styled( FlexBlock )`
+ `;
+ 
+ export const AccessoryWrapper = styled( FlexBlock )`
+-	flex-grow: 4;
++	flex-grow: 5;
+ `;
+diff --git a/packages/components/src/custom-gradient-picker/utils.js b/packages/components/src/custom-gradient-picker/utils.js
+index d586f3effb9f70..0767f1e40a881b 100644
+--- a/packages/components/src/custom-gradient-picker/utils.js
++++ b/packages/components/src/custom-gradient-picker/utils.js
+@@ -14,7 +14,7 @@ import {
+ } from './constants';
+ import { serializeGradient } from './serializer';
+ 
+-export function getLinearGradientRepresentationOfARadial( gradientAST ) {
++export function getLinearGradientRepresentation( gradientAST ) {
+ 	return serializeGradient( {
+ 		type: 'linear-gradient',
+ 		orientation: HORIZONTAL_GRADIENT_ORIENTATION,

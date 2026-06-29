@@ -1,0 +1,25 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 427e5aa90759a2..11879149e231d0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ ### Bug Fixes
+ 
+ - Resolves a conflict where two instance of Slot would produce an inconsistent or duplicated rendering output.
++- Allow years between 0 and 1970 in DateTime component.
+ 
+ ### New Feature
+ 
+diff --git a/packages/components/src/date-time/time.js b/packages/components/src/date-time/time.js
+index 8cb80cdee21674..3d0092df6155fe 100644
+--- a/packages/components/src/date-time/time.js
++++ b/packages/components/src/date-time/time.js
+@@ -145,7 +145,7 @@ class TimePicker extends Component {
+ 		const { onChange } = this.props;
+ 		const { year, date } = this.state;
+ 		const value = parseInt( year, 10 );
+-		if ( ! isInteger( value ) || value < 1970 || value > 9999 ) {
++		if ( ! isInteger( value ) || value < 0 || value > 9999 ) {
+ 			this.syncState( this.props );
+ 			return;
+ 		}

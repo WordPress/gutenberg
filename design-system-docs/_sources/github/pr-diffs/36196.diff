@@ -1,0 +1,94 @@
+diff --git a/packages/block-editor/src/components/line-height-control/index.js b/packages/block-editor/src/components/line-height-control/index.js
+index f4b5261b40acee..e4e72e762b2bec 100644
+--- a/packages/block-editor/src/components/line-height-control/index.js
++++ b/packages/block-editor/src/components/line-height-control/index.js
+@@ -1,3 +1,8 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -15,7 +20,11 @@ import {
+ 	isLineHeightDefined,
+ } from './utils';
+ 
+-export default function LineHeightControl( { value: lineHeight, onChange } ) {
++export default function LineHeightControl( {
++	__unstableSize,
++	value: lineHeight,
++	onChange,
++} ) {
+ 	const isDefined = isLineHeightDefined( lineHeight );
+ 
+ 	const handleOnKeyDown = ( event ) => {
+@@ -64,7 +73,11 @@ export default function LineHeightControl( { value: lineHeight, onChange } ) {
+ 	const value = isDefined ? lineHeight : RESET_VALUE;
+ 
+ 	return (
+-		<div className="block-editor-line-height-control">
++		<div
++			className={ classnames( 'block-editor-line-height-control', {
++				'is-unstable-size-large': __unstableSize === 'large',
++			} ) }
++		>
+ 			<TextControl
+ 				autoComplete="off"
+ 				onKeyDown={ handleOnKeyDown }
+diff --git a/packages/block-editor/src/components/line-height-control/style.scss b/packages/block-editor/src/components/line-height-control/style.scss
+index ad98d76e4a2ed1..4623797cc85ab0 100644
+--- a/packages/block-editor/src/components/line-height-control/style.scss
++++ b/packages/block-editor/src/components/line-height-control/style.scss
+@@ -5,4 +5,14 @@
+ 		display: block;
+ 		max-width: 60px;
+ 	}
++
++	// TODO: This may be easier if we can replace TextControl with NumberControl and use prop `size="__unstable-large"`
++	&.is-unstable-size-large {
++		input {
++			max-width: none;
++			min-height: 40px;
++			padding-left: 16px;
++			padding-right: 16px;
++		}
++	}
+ }
+diff --git a/packages/block-editor/src/hooks/line-height.js b/packages/block-editor/src/hooks/line-height.js
+index e1b79c2d58c0c1..e0a0fcab082c34 100644
+--- a/packages/block-editor/src/hooks/line-height.js
++++ b/packages/block-editor/src/hooks/line-height.js
+@@ -38,6 +38,7 @@ export function LineHeightEdit( props ) {
+ 	};
+ 	return (
+ 		<LineHeightControl
++			__unstableSize="large"
+ 			value={ style?.typography?.lineHeight }
+ 			onChange={ onChange }
+ 		/>
+diff --git a/packages/components/src/tools-panel/stories/typography-panel.js b/packages/components/src/tools-panel/stories/typography-panel.js
+index c57ac4c19e9d5d..71ff3c9e0a4a15 100644
+--- a/packages/components/src/tools-panel/stories/typography-panel.js
++++ b/packages/components/src/tools-panel/stories/typography-panel.js
+@@ -159,6 +159,7 @@ export const TypographyPanel = () => {
+ 							isShownByDefault={ true }
+ 						>
+ 							<LineHeightControl
++								__unstableSize="large"
+ 								value={ lineHeight }
+ 								onChange={ setLineHeight }
+ 							/>
+diff --git a/packages/edit-site/src/components/global-styles/typography-panel.js b/packages/edit-site/src/components/global-styles/typography-panel.js
+index 85a990ccca290d..3dbb93718c99d2 100644
+--- a/packages/edit-site/src/components/global-styles/typography-panel.js
++++ b/packages/edit-site/src/components/global-styles/typography-panel.js
+@@ -114,6 +114,7 @@ export default function TypographyPanel( { name } ) {
+ 			) }
+ 			{ hasLineHeightEnabled && (
+ 				<LineHeightControl
++					__unstableSize="large"
+ 					value={ lineHeight }
+ 					onChange={ setLineHeight }
+ 				/>

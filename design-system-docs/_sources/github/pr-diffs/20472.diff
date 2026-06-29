@@ -1,0 +1,92 @@
+diff --git a/packages/components/src/textarea-control/stories/index.js b/packages/components/src/textarea-control/stories/index.js
+new file mode 100644
+index 00000000000000..64f0d140c6d7c0
+--- /dev/null
++++ b/packages/components/src/textarea-control/stories/index.js
+@@ -0,0 +1,45 @@
++/**
++ * External dependencies
++ */
++import { boolean, number, text } from '@storybook/addon-knobs';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import TextareaControl from '../';
++
++export default {
++	title: 'Components/TextareaControl',
++	component: TextareaControl,
++};
++
++const TextareaControlWithState = ( props ) => {
++	const [ value, setValue ] = useState();
++
++	return (
++		<TextareaControl { ...props } value={ value } onChange={ setValue } />
++	);
++};
++
++export const _default = () => {
++	const label = text( 'Label', 'Label Text' );
++	const hideLabelFromVision = boolean( 'Hide Label From Vision', false );
++	const help = text( 'Help Text', 'Help text to explain the textarea.' );
++	const rows = number( 'Rows', 4 );
++	const className = text( 'Class Name', '' );
++
++	return (
++		<TextareaControlWithState
++			label={ label }
++			hideLabelFromVision={ hideLabelFromVision }
++			help={ help }
++			rows={ rows }
++			className={ className }
++		/>
++	);
++};
+diff --git a/storybook/test/__snapshots__/index.js.snap b/storybook/test/__snapshots__/index.js.snap
+index d17f24d407078a..3aa1e80d2b0e3f 100644
+--- a/storybook/test/__snapshots__/index.js.snap
++++ b/storybook/test/__snapshots__/index.js.snap
+@@ -7993,6 +7993,36 @@ Array [
+ ]
+ `;
+ 
++exports[`Storyshots Components/TextareaControl Default 1`] = `
++<div
++  className="components-base-control"
++>
++  <div
++    className="components-base-control__field"
++  >
++    <label
++      className="components-base-control__label"
++      htmlFor="inspector-textarea-control-0"
++    >
++      Label Text
++    </label>
++    <textarea
++      aria-describedby="inspector-textarea-control-0__help"
++      className="components-textarea-control__input"
++      id="inspector-textarea-control-0"
++      onChange={[Function]}
++      rows={4}
++    />
++  </div>
++  <p
++    className="components-base-control__help"
++    id="inspector-textarea-control-0__help"
++  >
++    Help text to explain the textarea.
++  </p>
++</div>
++`;
++
+ exports[`Storyshots Components/Tip Default 1`] = `
+ <div
+   className="components-tip"

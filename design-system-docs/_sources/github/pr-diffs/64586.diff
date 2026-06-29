@@ -1,0 +1,227 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c03d2455962c99..6ce7d20961b36a 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -56,6 +56,7 @@
+ -   `UnitControl`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
+ -   `Popover`: allow `style` prop usage ([#64489](https://github.com/WordPress/gutenberg/pull/64489)).
+ -   `ToolsPanel`: sets column-gap to 16px for ToolsPanel grid ([#64497](https://github.com/WordPress/gutenberg/pull/64497)).
++-   `TextareaControl`: Update styles ([#64586](https://github.com/WordPress/gutenberg/pull/64586)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/src/textarea-control/stories/index.story.tsx b/packages/components/src/textarea-control/stories/index.story.tsx
+index e8cb986a141325..a8e5dc036248db 100644
+--- a/packages/components/src/textarea-control/stories/index.story.tsx
++++ b/packages/components/src/textarea-control/stories/index.story.tsx
+@@ -54,4 +54,5 @@ Default.args = {
+ 	__nextHasNoMarginBottom: true,
+ 	label: 'Text',
+ 	help: 'Enter some text',
++	placeholder: 'Placeholder',
+ };
+diff --git a/packages/components/src/textarea-control/styles/textarea-control-styles.ts b/packages/components/src/textarea-control/styles/textarea-control-styles.ts
+index 046e17816eff24..022ce3560ea3a5 100644
+--- a/packages/components/src/textarea-control/styles/textarea-control-styles.ts
++++ b/packages/components/src/textarea-control/styles/textarea-control-styles.ts
+@@ -2,13 +2,86 @@
+  * External dependencies
+  */
+ import styled from '@emotion/styled';
++import { css } from '@emotion/react';
+ 
+ /**
+  * Internal dependencies
+  */
+-import { inputControl } from '../../utils/input';
++import { font } from '../../utils/font';
++import { COLORS } from '../../utils/colors-values';
++import { CONFIG } from '../../utils';
++import { breakpoint } from '../../utils/breakpoint';
++
++const inputStyleNeutral = css`
++	box-shadow: 0 0 0 transparent;
++	border-radius: ${ CONFIG.radiusSmall };
++	border: ${ CONFIG.borderWidth } solid ${ COLORS.ui.border };
++
++	@media not ( prefers-reduced-motion ) {
++		transition: box-shadow 0.1s linear;
++	}
++`;
++
++const inputStyleFocus = css`
++	border-color: ${ COLORS.theme.accent };
++	box-shadow: 0 0 0
++		calc( ${ CONFIG.borderWidthFocus } - ${ CONFIG.borderWidth } )
++		${ COLORS.theme.accent };
++
++	// Windows High Contrast mode will show this outline, but not the box-shadow.
++	outline: 2px solid transparent;
++`;
+ 
+ export const StyledTextarea = styled.textarea`
+ 	width: 100%;
+-	${ inputControl }
++	display: block;
++	font-family: ${ font( 'default.fontFamily' ) };
++	line-height: 20px;
++
++	// Vertical padding is to match the standard 40px control height when rows=1,
++	// in conjunction with the 20px line-height.
++	// "Standard" metrics are 10px 12px, but subtracts 1px each to account for the border width.
++	padding: 9px 11px;
++
++	${ inputStyleNeutral };
++
++	/* Fonts smaller than 16px causes mobile safari to zoom. */
++	font-size: ${ font( 'mobileTextMinFontSize' ) };
++
++	${ breakpoint( 'small' ) } {
++		font-size: ${ font( 'default.fontSize' ) };
++	}
++
++	&:focus {
++		${ inputStyleFocus }
++	}
++
++	// Use opacity to work in various editor styles.
++	&::-webkit-input-placeholder {
++		color: ${ COLORS.ui.darkGrayPlaceholder };
++	}
++
++	&::-moz-placeholder {
++		opacity: 1; // Necessary because Firefox reduces this from 1.
++		color: ${ COLORS.ui.darkGrayPlaceholder };
++	}
++
++	&:-ms-input-placeholder {
++		color: ${ COLORS.ui.darkGrayPlaceholder };
++	}
++
++	.is-dark-theme & {
++		&::-webkit-input-placeholder {
++			color: ${ COLORS.ui.lightGrayPlaceholder };
++		}
++
++		&::-moz-placeholder {
++			opacity: 1; // Necessary because Firefox reduces this from 1.
++			color: ${ COLORS.ui.lightGrayPlaceholder };
++		}
++
++		&:-ms-input-placeholder {
++			color: ${ COLORS.ui.lightGrayPlaceholder };
++		}
++	}
+ `;
+diff --git a/packages/components/src/utils/input/base.js b/packages/components/src/utils/input/base.js
+deleted file mode 100644
+index 9eebd1c0bcea78..00000000000000
+--- a/packages/components/src/utils/input/base.js
++++ /dev/null
+@@ -1,30 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { css } from '@emotion/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import { COLORS } from '../colors-values';
+-import { CONFIG } from '../';
+-
+-export const inputStyleNeutral = css`
+-	box-shadow: 0 0 0 transparent;
+-	border-radius: ${ CONFIG.radiusSmall };
+-	border: ${ CONFIG.borderWidth } solid ${ COLORS.ui.border };
+-
+-	@media not ( prefers-reduced-motion ) {
+-		transition: box-shadow 0.1s linear;
+-	}
+-`;
+-
+-export const inputStyleFocus = css`
+-	border-color: ${ COLORS.theme.accent };
+-	box-shadow: 0 0 0
+-		calc( ${ CONFIG.borderWidthFocus } - ${ CONFIG.borderWidth } )
+-		${ COLORS.theme.accent };
+-
+-	// Windows High Contrast mode will show this outline, but not the box-shadow.
+-	outline: 2px solid transparent;
+-`;
+diff --git a/packages/components/src/utils/input/index.js b/packages/components/src/utils/input/index.js
+deleted file mode 100644
+index 23fd731db99d94..00000000000000
+--- a/packages/components/src/utils/input/index.js
++++ /dev/null
+@@ -1 +0,0 @@
+-export * from './input-control';
+diff --git a/packages/components/src/utils/input/input-control.js b/packages/components/src/utils/input/input-control.js
+deleted file mode 100644
+index 8af838247d9c25..00000000000000
+--- a/packages/components/src/utils/input/input-control.js
++++ /dev/null
+@@ -1,63 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { css } from '@emotion/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import { inputStyleNeutral, inputStyleFocus } from './base';
+-import { font } from '../font';
+-import { COLORS } from '../colors-values';
+-import { breakpoint } from '../breakpoint';
+-
+-export const inputControl = css`
+-	display: block;
+-	font-family: ${ font( 'default.fontFamily' ) };
+-	padding: 6px 8px;
+-	${ inputStyleNeutral };
+-
+-	/* Fonts smaller than 16px causes mobile safari to zoom. */
+-	font-size: ${ font( 'mobileTextMinFontSize' ) };
+-	/* Override core line-height. To be reviewed. */
+-	line-height: normal;
+-
+-	${ breakpoint( 'small' ) } {
+-		font-size: ${ font( 'default.fontSize' ) };
+-		/* Override core line-height. To be reviewed. */
+-		line-height: normal;
+-	}
+-
+-	&:focus {
+-		${ inputStyleFocus }
+-	}
+-
+-	// Use opacity to work in various editor styles.
+-	&::-webkit-input-placeholder {
+-		color: ${ COLORS.ui.darkGrayPlaceholder };
+-	}
+-
+-	&::-moz-placeholder {
+-		opacity: 1; // Necessary because Firefox reduces this from 1.
+-		color: ${ COLORS.ui.darkGrayPlaceholder };
+-	}
+-
+-	&:-ms-input-placeholder {
+-		color: ${ COLORS.ui.darkGrayPlaceholder };
+-	}
+-
+-	.is-dark-theme & {
+-		&::-webkit-input-placeholder {
+-			color: ${ COLORS.ui.lightGrayPlaceholder };
+-		}
+-
+-		&::-moz-placeholder {
+-			opacity: 1; // Necessary because Firefox reduces this from 1.
+-			color: ${ COLORS.ui.lightGrayPlaceholder };
+-		}
+-
+-		&:-ms-input-placeholder {
+-			color: ${ COLORS.ui.lightGrayPlaceholder };
+-		}
+-	}
+-`;

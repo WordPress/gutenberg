@@ -1,0 +1,221 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 09c6552f6bb9bb..5193a441ac5979 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ -   `ColorPalette`: refine custom color button's label. ([#39386](https://github.com/WordPress/gutenberg/pull/39386))
+ -   `FocalPointPicker`: stop using `UnitControl`'s deprecated `unit` prop ([#39504](https://github.com/WordPress/gutenberg/pull/39504)).
+ -   `CheckboxControl`: Add support for the `indeterminate` state ([#39462](https://github.com/WordPress/gutenberg/pull/39462)).
++-   `UnitControl`: add support for the `onBlur` prop ([#39589](https://github.com/WordPress/gutenberg/pull/39589)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/unit-control/README.md b/packages/components/src/unit-control/README.md
+index aae09f063d3c19..5999d905cb2943 100644
+--- a/packages/components/src/unit-control/README.md
++++ b/packages/components/src/unit-control/README.md
+@@ -61,6 +61,12 @@ The position of the label (`top`, `side`, `bottom`, or `edge`).
+ 
+ -   Required: No
+ 
++### `onBlur`: `FocusEventHandler< HTMLInputElement | HTMLSelectElement >`
++
++Callback invoked when either the quantity or unit inputs fire the `blur` event.
++
++-   Required: No
++
+ ### `onChange`: `UnitControlOnChangeCallback`
+ 
+ Callback when the `value` changes.
+diff --git a/packages/components/src/unit-control/index.tsx b/packages/components/src/unit-control/index.tsx
+index 471ff37c39b226..e97bc6ff955f6a 100644
+--- a/packages/components/src/unit-control/index.tsx
++++ b/packages/components/src/unit-control/index.tsx
+@@ -61,6 +61,7 @@ function UnforwardedUnitControl(
+ 		unit: unitProp,
+ 		units: unitsProp = CSS_UNITS,
+ 		value: valueProp,
++		onBlur: onBlurProp,
+ 		...props
+ 	} = unitControlProps;
+ 
+@@ -187,7 +188,10 @@ function UnforwardedUnitControl(
+ 		}
+ 	};
+ 
+-	const handleOnBlur: FocusEventHandler< HTMLInputElement > = mayUpdateUnit;
++	const handleOnBlur: FocusEventHandler< HTMLInputElement > = ( event ) => {
++		mayUpdateUnit( event );
++		onBlurProp?.( event );
++	};
+ 
+ 	const handleOnKeyDown = ( event: KeyboardEvent< HTMLInputElement > ) => {
+ 		const { key } = event;
+@@ -242,6 +246,7 @@ function UnforwardedUnitControl(
+ 			size={ size }
+ 			unit={ unit }
+ 			units={ units }
++			onBlur={ onBlurProp }
+ 		/>
+ 	) : null;
+ 
+diff --git a/packages/components/src/unit-control/test/index.js b/packages/components/src/unit-control/test/index.js
+index 8c3814f9e2d219..d595f6171076bd 100644
+--- a/packages/components/src/unit-control/test/index.js
++++ b/packages/components/src/unit-control/test/index.js
+@@ -220,6 +220,91 @@ describe( 'UnitControl', () => {
+ 			expect( input.value ).toBe( '50' );
+ 			expect( state ).toBe( 50 );
+ 		} );
++
++		it( 'should run onBlur callback when quantity input is blurred', async () => {
++			let state = '33%';
++			const onChangeSpy = jest.fn();
++			const onBlurSpy = jest.fn();
++			const setState = ( nextState ) => {
++				onChangeSpy( nextState );
++				state = nextState;
++			};
++
++			const { user } = render(
++				<>
++					<button>Click me</button>
++					<UnitControl
++						value={ state }
++						onChange={ setState }
++						onBlur={ onBlurSpy }
++					/>
++				</>
++			);
++
++			const input = getInput();
++			await user.clear( input );
++			await user.type( input, '41' );
++
++			await waitFor( () =>
++				expect( onChangeSpy ).toHaveBeenCalledTimes( 3 )
++			);
++			expect( onChangeSpy ).toHaveBeenLastCalledWith( '41%' );
++
++			// Clicking on the button should cause the `onBlur` callback to fire.
++			const button = screen.getByRole( 'button' );
++			await user.click( button );
++
++			await waitFor( () =>
++				expect( onBlurSpy ).toHaveBeenCalledTimes( 1 )
++			);
++		} );
++
++		it( 'should invoke onChange and onUnitChange callbacks when isPressEnterToChange is true and the component is blurred with an uncommitted value', async () => {
++			let state = '15px';
++
++			const onUnitChangeSpy = jest.fn();
++			const onChangeSpy = jest.fn();
++
++			const setState = ( nextState ) => {
++				onChangeSpy( nextState );
++				state = nextState;
++			};
++
++			const { user } = render(
++				<>
++					<button>Click me</button>
++					<UnitControl
++						value={ state }
++						onChange={ setState }
++						onUnitChange={ onUnitChangeSpy }
++						isPressEnterToChange
++					/>
++				</>
++			);
++
++			const input = getInput();
++			await user.clear( input );
++			await user.type( input, '41vh' );
++
++			// This is because `isPressEnterToChange` is `true`
++			expect( onChangeSpy ).not.toHaveBeenCalled();
++
++			// Clicking on the button should cause the `onBlur` callback to fire.
++			const button = screen.getByRole( 'button' );
++			await user.click( button );
++
++			await waitFor( () =>
++				expect( onChangeSpy ).toHaveBeenCalledTimes( 1 )
++			);
++
++			expect( onChangeSpy ).toHaveBeenLastCalledWith( '41vh' );
++
++			expect( onUnitChangeSpy ).toHaveBeenCalledTimes( 1 );
++			expect( onUnitChangeSpy ).toHaveBeenLastCalledWith(
++				'vh',
++				expect.anything()
++			);
++		} );
+ 	} );
+ 
+ 	describe( 'Unit', () => {
+@@ -384,6 +469,41 @@ describe( 'UnitControl', () => {
+ 
+ 			expect( select ).toHaveValue( 'vmax' );
+ 		} );
++
++		it( 'should run onBlur callback when the unit select is blurred', async () => {
++			const onUnitChangeSpy = jest.fn();
++			const onBlurSpy = jest.fn();
++
++			const { user } = render(
++				<>
++					<button>Click me</button>
++					<UnitControl
++						value="15px"
++						onUnitChange={ onUnitChangeSpy }
++						onBlur={ onBlurSpy }
++					/>
++				</>
++			);
++
++			const select = getSelect();
++			await user.selectOptions( select, [ 'em' ] );
++
++			await waitFor( () =>
++				expect( onUnitChangeSpy ).toHaveBeenCalledTimes( 1 )
++			);
++			expect( onUnitChangeSpy ).toHaveBeenLastCalledWith(
++				'em',
++				expect.anything()
++			);
++
++			// Clicking on the button should cause the `onBlur` callback to fire.
++			const button = screen.getByRole( 'button' );
++			await user.click( button );
++
++			await waitFor( () =>
++				expect( onBlurSpy ).toHaveBeenCalledTimes( 1 )
++			);
++		} );
+ 	} );
+ 
+ 	describe( 'Unit Parser', () => {
+diff --git a/packages/components/src/unit-control/types.ts b/packages/components/src/unit-control/types.ts
+index 2cd20462ed1d40..c48a230997ce8a 100644
+--- a/packages/components/src/unit-control/types.ts
++++ b/packages/components/src/unit-control/types.ts
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { CSSProperties, SyntheticEvent } from 'react';
++import type { CSSProperties, FocusEventHandler, SyntheticEvent } from 'react';
+ 
+ /**
+  * Internal dependencies
+@@ -131,4 +131,8 @@ export type UnitControlProps = Omit< UnitSelectControlProps, 'unit' > &
+ 		 * @default 10
+ 		 */
+ 		shiftStep?: number;
++		/**
++		 * Callback when either the quantity or the unit inputs lose focus.
++		 */
++		onBlur?: FocusEventHandler< HTMLInputElement | HTMLSelectElement >;
+ 	};

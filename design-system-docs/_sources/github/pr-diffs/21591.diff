@@ -1,0 +1,35 @@
+diff --git a/packages/components/src/custom-gradient-picker/stories/index.js b/packages/components/src/custom-gradient-picker/stories/index.js
+new file mode 100644
+index 00000000000000..e34cc07531af02
+--- /dev/null
++++ b/packages/components/src/custom-gradient-picker/stories/index.js
+@@ -0,0 +1,29 @@
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import CustomGradientPicker from '../';
++
++export default {
++	title: 'Components/CustomGradientPicker',
++	component: CustomGradientPicker,
++};
++
++const CustomGradientPickerWithState = ( props ) => {
++	const [ gradient, setGradient ] = useState();
++	return (
++		<CustomGradientPicker
++			{ ...props }
++			value={ gradient }
++			onChange={ setGradient }
++		/>
++	);
++};
++
++export const _default = () => {
++	return <CustomGradientPickerWithState />;
++};

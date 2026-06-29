@@ -1,0 +1,42 @@
+diff --git a/packages/components/src/date-time/stories/date-time.story.tsx b/packages/components/src/date-time/stories/date-time.story.tsx
+index 0c6af3f53fa195..e240b9da470563 100644
+--- a/packages/components/src/date-time/stories/date-time.story.tsx
++++ b/packages/components/src/date-time/stories/date-time.story.tsx
+@@ -51,6 +51,9 @@ const Template: StoryFn< typeof DateTimePicker > = ( {
+ };
+ 
+ export const Default: StoryFn< typeof DateTimePicker > = Template.bind( {} );
++Default.args = {
++	currentDate: new Date(),
++};
+ 
+ export const WithEvents: StoryFn< typeof DateTimePicker > = Template.bind( {} );
+ WithEvents.args = {
+diff --git a/packages/components/src/date-time/stories/date.story.tsx b/packages/components/src/date-time/stories/date.story.tsx
+index ae4816809f7865..d305edf7a29e1c 100644
+--- a/packages/components/src/date-time/stories/date.story.tsx
++++ b/packages/components/src/date-time/stories/date.story.tsx
+@@ -51,6 +51,9 @@ const Template: StoryFn< typeof DatePicker > = ( {
+ };
+ 
+ export const Default: StoryFn< typeof DatePicker > = Template.bind( {} );
++Default.args = {
++	currentDate: new Date(),
++};
+ 
+ export const WithEvents: StoryFn< typeof DatePicker > = Template.bind( {} );
+ WithEvents.args = {
+diff --git a/packages/components/src/date-time/stories/time.story.tsx b/packages/components/src/date-time/stories/time.story.tsx
+index 12e5574115a6c3..5497b1e84138c0 100644
+--- a/packages/components/src/date-time/stories/time.story.tsx
++++ b/packages/components/src/date-time/stories/time.story.tsx
+@@ -52,6 +52,9 @@ const Template: StoryFn< typeof TimePicker > = ( {
+ };
+ 
+ export const Default: StoryFn< typeof TimePicker > = Template.bind( {} );
++Default.args = {
++	currentTime: new Date(),
++};
+ 
+ const TimeInputTemplate: StoryFn< typeof TimePicker.TimeInput > = ( args ) => {
+ 	return <TimePicker.TimeInput { ...args } />;

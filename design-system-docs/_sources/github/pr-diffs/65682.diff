@@ -1,0 +1,36 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 73f005b653841a..d34b411833468f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -18,6 +18,7 @@
+ -   `DatePicker`: Use compact button size. ([#65653](https://github.com/WordPress/gutenberg/pull/65653)).
+ -   `Navigator`: add support for exit animation ([#64777](https://github.com/WordPress/gutenberg/pull/64777)).
+ -   `Guide`: Update finish button to use the new default size ([#65680](https://github.com/WordPress/gutenberg/pull/65680)).
++-   `BorderControl`: Use `__next40pxDefaultSize` prop for Reset button ([#65682](https://github.com/WordPress/gutenberg/pull/65682)).
+ 
+ ## 28.8.0 (2024-09-19)
+ 
+diff --git a/packages/components/src/border-control/border-control-dropdown/component.tsx b/packages/components/src/border-control/border-control-dropdown/component.tsx
+index b2951054e624e7..d84d6bea77335b 100644
+--- a/packages/components/src/border-control/border-control-dropdown/component.tsx
++++ b/packages/components/src/border-control/border-control-dropdown/component.tsx
+@@ -237,6 +237,7 @@ const BorderControlDropdown = (
+ 							onReset();
+ 							onClose();
+ 						} }
++						__next40pxDefaultSize
+ 					>
+ 						{ __( 'Reset' ) }
+ 					</Button>
+diff --git a/packages/components/src/border-control/styles.ts b/packages/components/src/border-control/styles.ts
+index 2c77a2d21465d6..a678b6f362308a 100644
+--- a/packages/components/src/border-control/styles.ts
++++ b/packages/components/src/border-control/styles.ts
+@@ -156,7 +156,6 @@ export const resetButton = css`
+ 		border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 400 ] };
+ 		border-top-left-radius: 0;
+ 		border-top-right-radius: 0;
+-		height: 40px;
+ 	}
+ `;
+ 

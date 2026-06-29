@@ -1,0 +1,247 @@
+diff --git a/packages/theme/README.md b/packages/theme/README.md
+index ab21a53d6aefb3..e855ffe53d9c48 100644
+--- a/packages/theme/README.md
++++ b/packages/theme/README.md
+@@ -11,14 +11,14 @@ A theming package that's part of the WordPress Design System. It has two parts:
+ 
+ ## Design Tokens
+ 
+-In the **[Design Tokens Reference](docs/ds-tokens.md)** document there is a complete reference of all available design tokens including colors, spacing, typography, and more.
++In the **[Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md)** document there is a complete reference of all available design tokens including colors, spacing, typography, and more.
+ 
+ ### Architecture
+ 
+ Internally, the design system uses a tiered token architecture:
+ 
+-- **Primitive tokens**: Raw values like hex colors or pixel dimensions which are what the browsers eventually interpret. These live in the `/tokens` directory as JSON source files and are an internal implementation detail.
+-- **Semantic tokens**: Purpose-driven tokens with meaningful names that reference primitives and describe their intended use. These are what get exported as CSS custom properties.
++-   **Primitive tokens**: Raw values like hex colors or pixel dimensions which are what the browsers eventually interpret. These live in the `/tokens` directory as JSON source files and are an internal implementation detail.
++-   **Semantic tokens**: Purpose-driven tokens with meaningful names that reference primitives and describe their intended use. These are what get exported as CSS custom properties.
+ 
+ This separation allows the design system to maintain consistency while providing flexibility, since primitive values can be updated without changing the semantic token names that developers use in their code.
+ 
+@@ -62,17 +62,17 @@ Semantic tokens follow a consistent naming pattern:
+ 
+ **Property** is the specific design property being defined.
+ 
+-| Value    | Description                        |
+-| -------- | ---------------------------------- |
+-| `bg`     | Background color                   |
+-| `fg`     | Foreground color (text and icons)  |
+-| `stroke` | Border and outline color           |
+-| `padding`| Internal spacing within an element |
+-| `gap`    | Spacing between elements           |
+-| `radius` | Border radius for rounded corners  |
+-| `width`  | Border width                       |
+-| `size`   | Font size                          |
+-| `family` | Font family                        |
++| Value     | Description                        |
++| --------- | ---------------------------------- |
++| `bg`      | Background color                   |
++| `fg`      | Foreground color (text and icons)  |
++| `stroke`  | Border and outline color           |
++| `padding` | Internal spacing within an element |
++| `gap`     | Spacing between elements           |
++| `radius`  | Border radius for rounded corners  |
++| `width`   | Border width                       |
++| `size`    | Font size                          |
++| `family`  | Font family                        |
+ 
+ **Target** is the component or element type the token applies to.
+ 
+@@ -117,10 +117,10 @@ Color tokens extend the base pattern with additional modifiers for tone, emphasi
+ 
+ **Emphasis** adjusts color strength relative to the base tone, if specified. The default is a normal emphasis.
+ 
+-| Value                | Description                                    |
+-| -------------------- | ---------------------------------------------- |
+-| `strong`             | Higher contrast and/or elevated emphasis       |
+-| `weak`               | Subtle variant for secondary or muted elements |
++| Value    | Description                                    |
++| -------- | ---------------------------------------------- |
++| `strong` | Higher contrast and/or elevated emphasis       |
++| `weak`   | Subtle variant for secondary or muted elements |
+ 
+ **State** represents the interactive state of the element, if specified. The default is an idle state.
+ 
+diff --git a/packages/theme/bin/terrazzo-plugin-ds-tokens-docs/index.ts b/packages/theme/bin/terrazzo-plugin-ds-tokens-docs/index.ts
+index 3a3450d86ac5ab..0e15c5a36a7283 100644
+--- a/packages/theme/bin/terrazzo-plugin-ds-tokens-docs/index.ts
++++ b/packages/theme/bin/terrazzo-plugin-ds-tokens-docs/index.ts
+@@ -71,7 +71,7 @@ export default function pluginDsTokenDocs( {
+ 					'Do not edit directly.',
+ 					'-->',
+ 					'',
+-					'# DS Tokens reference',
++					'# Design System Tokens reference',
+ 					'',
+ 					'## Semantic tokens',
+ 					'',
+diff --git a/packages/theme/docs/ds-tokens.md b/packages/theme/docs/tokens.md
+similarity index 99%
+rename from packages/theme/docs/ds-tokens.md
+rename to packages/theme/docs/tokens.md
+index 99927d40d38781..8aa840ab26047f 100644
+--- a/packages/theme/docs/ds-tokens.md
++++ b/packages/theme/docs/tokens.md
+@@ -3,7 +3,7 @@ This file is generated by @terrazzo/terrazzo-plugin-ds-tokens-docs.
+ Do not edit directly.
+ -->
+ 
+-# DS Tokens reference
++# Design System Tokens reference
+ 
+ ## Semantic tokens
+ 
+diff --git a/packages/theme/src/color-ramps/stories/index.story.tsx b/packages/theme/src/color-ramps/stories/index.story.tsx
+index 394935567c4fc6..2b3465258ec2b5 100644
+--- a/packages/theme/src/color-ramps/stories/index.story.tsx
++++ b/packages/theme/src/color-ramps/stories/index.story.tsx
+@@ -19,7 +19,7 @@ const ColorGen = ( props: {
+ };
+ 
+ const meta: Meta< typeof ColorGen > = {
+-	title: 'Design System/Theme Provider/Color Scales',
++	title: 'Design System/Theme/Theme Provider/Color Scales',
+ 	component: ColorGen,
+ 	argTypes: {
+ 		background: {
+diff --git a/packages/theme/src/stories/index.story.tsx b/packages/theme/src/stories/index.story.tsx
+index d2b0a20d334911..fcbfbde72af7af 100644
+--- a/packages/theme/src/stories/index.story.tsx
++++ b/packages/theme/src/stories/index.story.tsx
+@@ -21,7 +21,7 @@ import { ThemeProvider } from '../theme-provider';
+ import '../prebuilt/css/design-tokens.css';
+ 
+ const meta: Meta< typeof ThemeProvider > = {
+-	title: 'Design System/Theme Provider',
++	title: 'Design System/Theme/Theme Provider',
+ 	component: ThemeProvider,
+ 	args: {
+ 		isRoot: true,
+@@ -132,7 +132,7 @@ const DSTokensList = () => {
+ 
+ 	return (
+ 		<div style={ { color: 'var( --wpds-color-fg-content-neutral )' } }>
+-			<h1>DS Color tokens</h1>
++			<h1>Design System Color tokens</h1>
+ 			<h2>Semantic tokens (can be consumed directly)</h2>
+ 			<ColorTokenTable tokens={ props.semanticProps } />
+ 			<h2>Legacy tokens (should not be consumed directly)</h2>
+diff --git a/packages/theme/src/stories/introduction.mdx b/packages/theme/src/stories/introduction.mdx
+new file mode 100644
+index 00000000000000..2b06ce20a45b03
+--- /dev/null
++++ b/packages/theme/src/stories/introduction.mdx
+@@ -0,0 +1,6 @@
++import { Meta, Markdown } from '@storybook/addon-docs/blocks';
++import Readme from '../../README.md';
++
++<Meta title="Design System/Theme/Introduction" />
++
++<Markdown>{Readme}</Markdown>
+diff --git a/packages/theme/terrazzo.config.ts b/packages/theme/terrazzo.config.ts
+index 57e27b54783b4a..2ec387c8dc4e21 100644
+--- a/packages/theme/terrazzo.config.ts
++++ b/packages/theme/terrazzo.config.ts
+@@ -96,7 +96,7 @@ export default defineConfig( {
+ 			filename: 'js/design-tokens.mjs',
+ 		} ),
+ 		pluginDsTokenDocs( {
+-			filename: '../../docs/ds-tokens.md',
++			filename: '../../docs/tokens.md',
+ 		} ),
+ 		typescriptTypes( {
+ 			filename: 'ts/token-types.ts',
+diff --git a/packages/ui/src/stories/introduction.mdx b/packages/ui/src/stories/introduction.mdx
+new file mode 100644
+index 00000000000000..f0523adb86fecf
+--- /dev/null
++++ b/packages/ui/src/stories/introduction.mdx
+@@ -0,0 +1,6 @@
++import { Meta, Markdown } from '@storybook/addon-docs/blocks';
++import Readme from '../../README.md';
++
++<Meta title="Design System/Components/Introduction" />
++
++<Markdown>{Readme}</Markdown>
+diff --git a/storybook/main.js b/storybook/main.js
+index 8a891ab21e969a..8b851fd90962c2 100644
+--- a/storybook/main.js
++++ b/storybook/main.js
+@@ -38,9 +38,10 @@ const stories = [
+ 	'../packages/fields/src/**/stories/*.story.@(js|tsx|mdx)',
+ 	'../packages/image-cropper/src/**/stories/*.story.@(js|tsx|mdx)',
+ 	'../packages/media-fields/src/**/stories/*.story.@(js|tsx|mdx)',
++	'../packages/theme/src/**/stories/*.mdx',
+ 	'../packages/theme/src/**/stories/*.story.@(tsx|mdx)',
+-	'../packages/ui/src/**/stories/*.story.@(ts|tsx)',
+ 	'../packages/ui/src/**/stories/*.mdx',
++	'../packages/ui/src/**/stories/*.story.@(ts|tsx)',
+ ].filter( Boolean );
+ 
+ module.exports = {
+diff --git a/storybook/preview.jsx b/storybook/preview.jsx
+index e5d610ac3db1bc..91016e865475c8 100644
+--- a/storybook/preview.jsx
++++ b/storybook/preview.jsx
+@@ -131,6 +131,8 @@ export const parameters = {
+ 					'Typography',
+ 				],
+ 				'Icons',
++				'Design System',
++				[ 'Introduction', 'Theme', 'Components', [ 'Introduction' ] ],
+ 			],
+ 		},
+ 	},
+diff --git a/storybook/stories/design-system/introduction.mdx b/storybook/stories/design-system/introduction.mdx
+new file mode 100644
+index 00000000000000..e0e367e3b835e6
+--- /dev/null
++++ b/storybook/stories/design-system/introduction.mdx
+@@ -0,0 +1,45 @@
++import { Meta } from '@storybook/addon-docs/blocks';
++
++<Meta title="Design System/Introduction" />
++
++# WordPress Design System
++
++## What is a Design System?
++
++A design system is a collection of reusable components, design tokens, and guidelines that work together to create consistent, accessible user interfaces. It serves as a single source of truth that bridges design and development, ensuring cohesion across different parts of an application.
++
++Rather than building UI elements from scratch each time, a design system provides pre-built, themeable components built on a foundation of design tokens. Design tokens encode design decisions like colors, spacing, and typography and can be customized to match different contexts while maintaining consistency.
++
++## How is this different from existing components?
++
++While similar in scope to the existing [`@wordpress/components`](https://github.com/WordPress/gutenberg/tree/trunk/packages/components) package, there are key differences:
++
++-   **Cohesive by design**: Unlike `@wordpress/components`, which grew organically as a collection of unrelated UI elements, this design system guarantees user- and developer-facing cohesion through a unified token system and consistent component patterns.
++-   **Flexible theming**: Built from the ground up to support customizable color schemes, adjustable density, and user personalization—capabilities needed to support the [Phase 3 admin redesign initiative](https://github.com/WordPress/gutenberg/issues/71196).
++-   **Modern distribution**: Distributed as a versioned npm package following [semantic versioning](https://semver.org/), rather than being bundled as a WordPress script on the `window.wp` global.
++-   **Composable architecture**: Components follow consistent patterns with proper composability, ref forwarding, and flexible rendering—avoiding the bloated abstractions that emerged from historical scope creep.
++
++For more context on the motivations and goals behind this work, see the [Design System: Support for admin redesign](https://github.com/WordPress/gutenberg/issues/71196) overview issue.
++
++## What are the parts of the design system?
++
++The WordPress Design System consists of two complementary packages:
++
++### Theming (`@wordpress/theme`)
++
++The foundational layer that provides:
++
++-   **Design Tokens**: A comprehensive system of design tokens for colors, spacing, typography, shadows, and more.
++-   **Theme Provider**: A component that accepts seed values and automatically generates consistent, accessible color ramps and spacing scales.
++
++Explore the [Theme documentation](/story/design-system-theme-introduction--docs) to learn more about design tokens, the token architecture, and how to use `ThemeProvider`.
++
++### Components (`@wordpress/ui`)
++
++A library of React UI components built on the theme foundation:
++
++-   **Consistent patterns**: All components follow a consistent set of technical design principles to ensure that their usage is easy to understand and predictable.
++-   **Token-driven styling**: Components use design tokens for all visual properties, ensuring they automatically adapt to theme changes.
++-   **Accessible by default**: Built with WordPress accessibility coding standards in mind, including semantic markup, keyboard navigation, and proper color contrast.
++
++Explore the [Components documentation](/story/design-system-components-introduction--docs) to learn more about the component library and usage patterns.

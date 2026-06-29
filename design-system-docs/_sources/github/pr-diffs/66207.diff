@@ -1,0 +1,114 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index bd96eed8762b37..9b3c31814fc59a 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ -   `RadioGroup`: Fix arrow key navigation in RTL ([#66202](https://github.com/WordPress/gutenberg/pull/66202)).
+ -   `Tabs` and `TabPanel`: Fix arrow key navigation in RTL ([#66201](https://github.com/WordPress/gutenberg/pull/66201)).
+ -   `Tabs`: override tablist's tabindex only when necessary ([#66209](https://github.com/WordPress/gutenberg/pull/66209)).
++-   `Tabs`: update indicator more reactively ([#66207](https://github.com/WordPress/gutenberg/pull/66207)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/tabs/tablist.tsx b/packages/components/src/tabs/tablist.tsx
+index 998da5707aa071..181c705e7148cf 100644
+--- a/packages/components/src/tabs/tablist.tsx
++++ b/packages/components/src/tabs/tablist.tsx
+@@ -1,7 +1,8 @@
+ /**
+  * External dependencies
+  */
+-import { useStoreState } from '@ariakit/react';
++import * as Ariakit from '@ariakit/react';
++import clsx from 'clsx';
+ 
+ /**
+  * WordPress dependencies
+@@ -14,11 +15,10 @@ import { useMergeRefs } from '@wordpress/compose';
+  * Internal dependencies
+  */
+ import type { TabListProps } from './types';
+-import { useTabsContext } from './context';
+-import { StyledTabList } from './styles';
+ import type { WordPressComponentProps } from '../context';
+-import clsx from 'clsx';
+ import type { ElementOffsetRect } from '../utils/element-rect';
++import { useTabsContext } from './context';
++import { StyledTabList } from './styles';
+ import { useTrackElementOffsetRect } from '../utils/element-rect';
+ import { useTrackOverflow } from './use-track-overflow';
+ import { useAnimatedOffsetRect } from '../utils/hooks/use-animated-offset-rect';
+@@ -62,15 +62,25 @@ export const TabList = forwardRef<
+ >( function TabList( { children, ...otherProps }, ref ) {
+ 	const { store } = useTabsContext() ?? {};
+ 
+-	const selectedId = useStoreState( store, 'selectedId' );
+-	const activeId = useStoreState( store, 'activeId' );
+-	const selectOnMove = useStoreState( store, 'selectOnMove' );
+-	const items = useStoreState( store, 'items' );
++	const selectedId = Ariakit.useStoreState( store, 'selectedId' );
++	const activeId = Ariakit.useStoreState( store, 'activeId' );
++	const selectOnMove = Ariakit.useStoreState( store, 'selectOnMove' );
++	const items = Ariakit.useStoreState( store, 'items' );
+ 	const [ parent, setParent ] = useState< HTMLElement >();
+ 	const refs = useMergeRefs( [ ref, setParent ] );
+-	const selectedRect = useTrackElementOffsetRect(
+-		store?.item( selectedId )?.element
+-	);
++
++	const selectedItem = store?.item( selectedId );
++	const renderedItems = Ariakit.useStoreState( store, 'renderedItems' );
++
++	const selectedItemIndex =
++		renderedItems && selectedItem
++			? renderedItems.indexOf( selectedItem )
++			: -1;
++	// Use selectedItemIndex as a dependency to force recalculation when the
++	// selected item index changes (elements are swapped / added / removed).
++	const selectedRect = useTrackElementOffsetRect( selectedItem?.element, [
++		selectedItemIndex,
++	] );
+ 
+ 	// Track overflow to show scroll hints.
+ 	const overflow = useTrackOverflow( parent, {
+diff --git a/packages/components/src/utils/element-rect.ts b/packages/components/src/utils/element-rect.ts
+index 7c83db4428ca0f..7f9693ef9f7df2 100644
+--- a/packages/components/src/utils/element-rect.ts
++++ b/packages/components/src/utils/element-rect.ts
+@@ -134,14 +134,17 @@ const POLL_RATE = 100;
+  * milliseconds until it succeeds.
+  */
+ export function useTrackElementOffsetRect(
+-	targetElement: HTMLElement | undefined | null
++	targetElement: HTMLElement | undefined | null,
++	deps: unknown[] = []
+ ) {
+ 	const [ indicatorPosition, setIndicatorPosition ] =
+ 		useState< ElementOffsetRect >( NULL_ELEMENT_OFFSET_RECT );
+ 	const intervalRef = useRef< ReturnType< typeof setInterval > >();
+ 
+ 	const measure = useEvent( () => {
+-		if ( targetElement ) {
++		// Check that the targetElement is still attached to the DOM, in case
++		// it was removed since the last `measure` call.
++		if ( targetElement && targetElement.isConnected ) {
+ 			const elementOffsetRect = getElementOffsetRect( targetElement );
+ 			if ( elementOffsetRect ) {
+ 				setIndicatorPosition( elementOffsetRect );
+@@ -171,6 +174,16 @@ export function useTrackElementOffsetRect(
+ 		}
+ 	}, [ setElement, targetElement ] );
+ 
++	// Escape hatch to force a remeasurement when something else changes rather
++	// than the target elements' ref or size (for example, the target element
++	// can change its position within the tablist).
++	useLayoutEffect( () => {
++		measure();
++		// `measure` is a stable function, so it's safe to omit it from the deps array.
++		// deps can't be statically analyzed by ESLint
++		// eslint-disable-next-line react-hooks/exhaustive-deps
++	}, deps );
++
+ 	return indicatorPosition;
+ }
+ 
