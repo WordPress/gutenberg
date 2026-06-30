@@ -485,6 +485,9 @@ export function MediaPlaceholder( {
 					{ renderDropZone() }
 					<FormFileUpload
 						onChange={ onUpload }
+						onClick={ ( event ) => {
+							event.currentTarget.value = '';
+						} }
 						accept={ computedAccept }
 						multiple={ !! multiple }
 						render={ ( { openFileDialog } ) => {
@@ -533,6 +536,9 @@ export function MediaPlaceholder( {
 							</Button>
 						) }
 						onChange={ onUpload }
+						onClick={ ( event ) => {
+							event.currentTarget.value = '';
+						} }
 						accept={ computedAccept }
 						multiple={ !! multiple }
 					/>

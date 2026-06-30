@@ -352,6 +352,9 @@ export default function TracksEditor( { tracks = [], onChange } ) {
 									/>
 									<FormFileUpload
 										onChange={ uploadFiles }
+										onClick={ ( event ) => {
+											event.currentTarget.value = '';
+										} }
 										accept=".vtt,text/vtt"
 										multiple
 										render={ ( { openFileDialog } ) => {

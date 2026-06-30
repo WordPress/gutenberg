@@ -214,6 +214,9 @@ const MediaReplaceFlow = ( {
 								onChange={ ( event ) => {
 									uploadFiles( event, onClose );
 								} }
+								onClick={ ( event ) => {
+									event.currentTarget.value = '';
+								} }
 								accept={ computedAccept }
 								multiple={ !! multiple }
 								render={ ( { openFileDialog } ) => {
