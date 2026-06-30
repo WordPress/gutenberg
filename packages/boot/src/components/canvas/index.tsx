@@ -64,19 +64,6 @@ export default function Canvas( { canvas }: CanvasProps ) {
 		: undefined;
 
 	// Render the editor with canvas data
-	const settings: Record< string, unknown > = {
-		isPreviewMode: canvas.isPreview,
-	};
-	if ( canvas.isPreview ) {
-		settings.styles = [ { css: 'body{min-height:100vh;}' } ];
-	}
-
-	const editorKey = [
-		canvas.postType ?? 'site',
-		canvas.postId ?? 'site',
-		canvas.isPreview ? 'preview' : 'edit',
-	].join( ':' );
-
 	return (
 		<div style={ { height: '100%', position: 'relative' } }>
 			<div
@@ -85,10 +72,14 @@ export default function Canvas( { canvas }: CanvasProps ) {
 				inert={ canvas.isPreview ? 'true' : undefined }
 			>
 				<Editor
-					key={ editorKey }
 					postType={ canvas.postType }
 					postId={ canvas.postId }
-					settings={ settings }
+					settings={ {
+						isPreviewMode: canvas.isPreview,
+						styles: canvas.isPreview
+							? [ { css: 'body{min-height:100vh;}' } ]
+							: [],
+					} }
 					backButton={ backButton }
 				/>
 			</div>

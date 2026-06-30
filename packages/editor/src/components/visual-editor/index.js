@@ -97,7 +97,6 @@ function VisualEditor( {
 	iframeProps,
 	contentRef,
 	className,
-	editorSettings: currentEditorSettings,
 } ) {
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const {
@@ -110,8 +109,8 @@ function VisualEditor( {
 		isFocusedEntity,
 		isDesignPostType,
 		postType,
-		isPreview: storeIsPreview,
-		styles: storeStyles,
+		isPreview,
+		styles,
 		hasCanvasWidth,
 	} = useSelect( ( select ) => {
 		const {
@@ -166,8 +165,6 @@ function VisualEditor( {
 			hasCanvasWidth: getCanvasWidth() !== undefined,
 		};
 	}, [] );
-	const isPreview = currentEditorSettings?.isPreviewMode ?? storeIsPreview;
-	const styles = currentEditorSettings?.styles ?? storeStyles;
 	const { isCleanNewPost } = useSelect( editorStore );
 	const {
 		hasRootPaddingAwareAlignments,

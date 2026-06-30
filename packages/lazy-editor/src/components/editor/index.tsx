@@ -103,7 +103,7 @@ export function Editor( {
 		resolvedPostType,
 		resolvedPostId,
 		templateId,
-		finalSettings.isPreviewMode ? 'preview' : 'edit',
+		stylesId,
 	].join( ':' );
 
 	// Show loading spinner while assets or settings are loading

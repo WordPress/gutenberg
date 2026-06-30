@@ -116,7 +116,7 @@ function Editor( {
 					initialEdits={ initialEdits }
 					useSubRegistry={ false }
 				>
-					<EditorInterface { ...props } editorSettings={ settings }>
+					<EditorInterface { ...props }>
 						{ extraContent }
 					</EditorInterface>
 					{ children }
