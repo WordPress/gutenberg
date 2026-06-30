@@ -26,10 +26,6 @@ export {
 export { default as StateControl } from './state-control';
 export { default as StateControlBadges } from './state-control-badges';
 export {
-	buildInheritedValue,
-	buildInheritedValueMemoized,
-} from './build-inherited-value';
-export {
 	InheritedValueContext,
 	InheritedValueProvider,
 	useInheritedValue,

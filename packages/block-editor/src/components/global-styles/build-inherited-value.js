@@ -429,31 +429,9 @@ function getStateSlice( layerObject, selectedState ) {
 }
 
 /**
- * Compute the merged Global Styles payload for an inspector panel to use as
- * its `inheritedValue`.
- *
- * Layers are merged from low to high precedence: root styles, root element
- * styles, block styles, block element styles, block variation styles, and
- * block variation element styles.
- *
- * Preset strings are left raw so consumer panels can decode them at display
- * time and still access preset slugs for selector controls.
- *
- * @param {Object}  args
- * @param {string}  args.blockName       Block name (e.g. `core/heading`).
- * @param {?string} [args.element]       Element tag to fold (e.g. `h2`, `link`), or null for block-scope only.
- * @param {?string} [args.ownVariation]  Active block style variation slug, or null.
- * @param {Object}  [args.globalStyles]  The `settings[ globalStylesDataKey ]` payload.
- * @param {?Object} [args.selectedState] Selected block style state, or null for the default state.
- * @return {Object} Merged panel-scoped payload.
- */
-export function buildInheritedValue( args = {} ) {
-	return buildInheritedValueWithSources( args ).value;
-}
-
-/**
- * Compute the merged Global Styles payload and a source map describing which
- * Global Styles layer supplied each winning leaf.
+ * Internal, uncached merge. Computes the merged Global Styles payload and a
+ * source map describing which Global Styles layer supplied each winning leaf.
+ * `buildInheritedValue` is the public, memoized entry point.
  *
  * @param {Object}  args
  * @param {string}  args.blockName       Block name (e.g. `core/heading`).
@@ -464,7 +442,7 @@ export function buildInheritedValue( args = {} ) {
  * @param {?Object} [args.selectedState] Selected block style state, or null for the default state.
  * @return {{ value: Object, sources: Object }} Merged panel-scoped payload and source map.
  */
-export function buildInheritedValueWithSources( {
+function computeInheritedValue( {
 	blockName,
 	element = null,
 	ownVariation = null,
@@ -647,33 +625,25 @@ export function buildInheritedValueWithSources( {
 }
 
 /**
- * Shared memo for `buildInheritedValue`, keyed by Global Styles object
- * identity and a `(blockName, element, ownVariation)` composite.
+ * Shared memo for `buildInheritedValue`, keyed by Global
+ * Styles object identity and a `(blockName, element, ownVariation)` composite.
  *
  * @type {WeakMap<object, Map<string, Object>>}
  */
 const memo = new WeakMap();
 
 /**
- * Memoized variant of `buildInheritedValueWithSources`. Same signature.
+ * Public entry point. Builds the merged Global Styles payload and source map
+ * for a block (see `computeInheritedValue` for the argument shape), memoized by
+ * Global Styles object identity and a composite of the remaining arguments.
  *
  * @param {Object} args
  * @return {{ value: Object, sources: Object }} Merged panel-scoped payload and source map; may be a cache hit.
  */
-export function buildInheritedValueMemoized( args ) {
-	return buildInheritedValueWithSourcesMemoized( args ).value;
-}
-
-/**
- * Memoized variant of `buildInheritedValueWithSources`. Same signature.
- *
- * @param {Object} args
- * @return {{ value: Object, sources: Object }} Merged panel-scoped payload and source map; may be a cache hit.
- */
-export function buildInheritedValueWithSourcesMemoized( args ) {
+export function buildInheritedValue( args ) {
 	const gs = args?.globalStyles;
 	if ( ! gs || typeof gs !== 'object' ) {
-		return buildInheritedValueWithSources( args );
+		return computeInheritedValue( args );
 	}
 	let inner = memo.get( gs );
 	if ( ! inner ) {
@@ -701,7 +671,7 @@ export function buildInheritedValueWithSourcesMemoized( args ) {
 	if ( inner.has( key ) ) {
 		return inner.get( key );
 	}
-	const result = buildInheritedValueWithSources( args );
+	const result = computeInheritedValue( args );
 	inner.set( key, result );
 	return result;
 }
