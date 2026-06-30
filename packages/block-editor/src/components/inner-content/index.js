@@ -3,12 +3,13 @@
  */
 import {
 	createPortal,
+	useEffect,
 	useLayoutEffect,
 	useMemo,
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useRegistry } from '@wordpress/data';
 import { safeHTML } from '@wordpress/dom';
 
 /**
@@ -41,8 +42,14 @@ const LAYOUT = { type: 'default', alignments: [] };
  * @param {Object} props          Component props.
  * @param {string} props.clientId Client ID of the block whose inner content
  *                                should be rendered.
+ * @param {string} [props.html]   Slot-bearing markup to use verbatim instead of
+ *                                building it from the block's `innerContent`.
+ *                                The markup must already contain
+ *                                `<wp-inner-block-slot data-slot-index>` elements
+ *                                (e.g. a server-rendered shell). When omitted, the
+ *                                markup is derived from `innerContent` as usual.
  */
-export default function InnerContent( { clientId } ) {
+export default function InnerContent( { clientId, html: htmlProp } ) {
 	const { innerContent, order } = useSelect(
 		( select ) => {
 			const { getBlock, getBlockOrder } = select( blockEditorStore );
@@ -54,6 +61,11 @@ export default function InnerContent( { clientId } ) {
 		[ clientId ]
 	);
 	const html = useMemo( () => {
+		// An externally supplied shell (e.g. server-rendered) already carries its
+		// own slot placeholders, so it is used as-is.
+		if ( htmlProp !== undefined ) {
+			return htmlProp;
+		}
 		let slotIndex = 0;
 		return ( innerContent ?? [] )
 			.map( ( item ) =>
@@ -62,13 +74,24 @@ export default function InnerContent( { clientId } ) {
 					: item
 			)
 			.join( '' );
-	}, [ innerContent ] );
+	}, [ htmlProp, innerContent ] );
 
+	const registry = useRegistry();
 	const containerRef = useRef();
 	const [ slots, setSlots ] = useState( [] );
 
+	// When the markup changes (e.g. a re-rendered server shell), re-injecting it
+	// remounts the portalled inner blocks and drops DOM focus, even though the
+	// block selection survives in the store. Remember whether the caret was
+	// inside an island so it can be restored after the re-portal.
+	const restoreFocusRef = useRef( false );
+
 	useLayoutEffect( () => {
 		const container = containerRef.current;
+
+		restoreFocusRef.current = container.contains(
+			container.ownerDocument.activeElement
+		);
 
 		// Sanitize before injecting into the canvas: `safeHTML` removes
 		// `<script>` elements and inline event handlers, matching how block
@@ -83,6 +106,29 @@ export default function InnerContent( { clientId } ) {
 			)
 		);
 	}, [ html ] );
+
+	// After the inner blocks re-portal into the freshly injected slots, refocus
+	// the selected child's editable so RichText restores the caret from the
+	// store. Best effort: a no-op when the caret was not inside this block.
+	useEffect( () => {
+		if ( ! restoreFocusRef.current ) {
+			return;
+		}
+		restoreFocusRef.current = false;
+
+		const selectedClientId = registry
+			.select( blockEditorStore )
+			.getSelectedBlockClientId();
+		if ( ! selectedClientId ) {
+			return;
+		}
+
+		containerRef.current
+			?.querySelector(
+				`[data-block="${ selectedClientId }"] [contenteditable="true"]`
+			)
+			?.focus();
+	}, [ slots, registry ] );
 
 	return (
 		<LayoutProvider value={ LAYOUT }>
