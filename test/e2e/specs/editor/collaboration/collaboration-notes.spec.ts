@@ -143,89 +143,93 @@ test.describe( 'Collaboration - Notes Sync', () => {
 		).toBeVisible( { timeout: 10000 } );
 	} );
 
-	// Deferred: the reply form intentionally does not focus on mount so
-	// selecting a thread doesn't pull focus away from thread keyboard
-	// navigation. Wiring focus into the reply/skip-link flow is follow-up
-	// work tracked separately from this rich-text change.
-	test.fixme(
-		'Note with reply syncs between users',
-		async ( { collaborationUtils, requestUtils, editor, page } ) => {
-			const post = await requestUtils.createPost( {
-				title: 'Notes Reply Sync Test',
-				status: 'draft',
-				date_gmt: new Date().toISOString(),
-			} );
-			await collaborationUtils.openCollaborativeSession( post.id );
+	test( 'Note with reply syncs between users', async ( {
+		collaborationUtils,
+		requestUtils,
+		editor,
+		page,
+	} ) => {
+		const post = await requestUtils.createPost( {
+			title: 'Notes Reply Sync Test',
+			status: 'draft',
+			date_gmt: new Date().toISOString(),
+		} );
+		await collaborationUtils.openCollaborativeSession( post.id );
 
-			const { page2 } = collaborationUtils;
+		const { page2 } = collaborationUtils;
 
-			// User A inserts a block and adds a note with a reply.
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: 'Block for reply test' },
-			} );
+		// User A inserts a block and adds a note with a reply.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Block for reply test' },
+		} );
 
-			await editor.clickBlockOptionsMenuItem( 'Add note' );
-			await page
-				.getByRole( 'textbox', { name: 'New note', exact: true } )
-				.pressSequentially( 'Main note' );
-			await page
+		await editor.clickBlockOptionsMenuItem( 'Add note' );
+		await page
+			.getByRole( 'textbox', { name: 'New note', exact: true } )
+			.pressSequentially( 'Main note' );
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Add note', exact: true } )
+			.click();
+
+		// Wait for note to be saved before adding a reply.
+		await expect(
+			page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Add note', exact: true } )
-				.click();
+				.getByRole( 'treeitem', { name: 'Note: Main note' } )
+		).toBeVisible();
 
-			// Wait for note to be saved before adding a reply.
-			await expect(
-				page
-					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'treeitem', { name: 'Note: Main note' } )
-			).toBeVisible();
+		// The reply form deliberately does not focus on mount so that
+		// selecting a thread keeps focus on the thread for keyboard
+		// navigation. Confirm the field does not steal focus, then click into
+		// the contenteditable to place the caret before typing the reply.
+		// (The skip-link focus path is covered deterministically in the
+		// single-user block-notes spec.)
+		const replyTextbox = page.getByRole( 'textbox', {
+			name: 'Reply to',
+		} );
+		await expect( replyTextbox ).toBeVisible();
+		await expect( replyTextbox ).not.toBeFocused();
+		await replyTextbox.click();
+		await replyTextbox.pressSequentially( 'A reply to the note' );
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Reply', exact: true } )
+			.click();
 
-			// Add a reply.
-			await page
-				.getByRole( 'textbox', { name: 'Reply to' } )
-				.pressSequentially( 'A reply to the note' );
-			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Reply', exact: true } )
-				.click();
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Reply added.' } )
+		).toBeVisible();
 
-			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Reply added.' } )
-			).toBeVisible();
+		// Wait for sync cycles.
+		await collaborationUtils.waitForSyncCycle( page );
+		await collaborationUtils.waitForSyncCycle( page2 );
 
-			// Wait for sync cycles.
-			await collaborationUtils.waitForSyncCycle( page );
-			await collaborationUtils.waitForSyncCycle( page2 );
-
-			// Open notes sidebar on User B's page.
-			const toggleButton = page2
-				.getByRole( 'region', { name: 'Editor top bar' } )
-				.getByRole( 'button', { name: 'All notes', exact: true } );
-			await expect( toggleButton ).toBeVisible( { timeout: 10000 } );
-			const isExpanded =
-				await toggleButton.getAttribute( 'aria-expanded' );
-			if ( isExpanded === 'false' ) {
-				await toggleButton.click();
-			}
-
-			// User B should see the main note.
-			const thread = page2
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', { name: 'Note: Main note' } );
-			await expect( thread ).toBeVisible( { timeout: 10000 } );
-
-			// Expand the thread to see the reply.
-			await thread.click();
-
-			// User B should see both the main note content and the reply.
-			await expect(
-				page2
-					.locator( '.editor-collab-sidebar-panel__note-content' )
-					.last()
-			).toHaveText( 'A reply to the note', { timeout: 5000 } );
+		// Open notes sidebar on User B's page.
+		const toggleButton = page2
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'All notes', exact: true } );
+		await expect( toggleButton ).toBeVisible( { timeout: 10000 } );
+		const isExpanded = await toggleButton.getAttribute( 'aria-expanded' );
+		if ( isExpanded === 'false' ) {
+			await toggleButton.click();
 		}
-	);
+
+		// User B should see the main note.
+		const thread = page2
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'treeitem', { name: 'Note: Main note' } );
+		await expect( thread ).toBeVisible( { timeout: 10000 } );
+
+		// Expand the thread to see the reply.
+		await thread.click();
+
+		// User B should see both the main note content and the reply.
+		await expect(
+			page2.locator( '.editor-collab-sidebar-panel__note-content' ).last()
+		).toHaveText( 'A reply to the note', { timeout: 5000 } );
+	} );
 } );

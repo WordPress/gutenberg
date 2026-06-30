@@ -198,6 +198,38 @@ test.describe( 'Block Notes', () => {
 		).toBeVisible();
 	} );
 
+	test( 'selecting a note keeps focus on the thread, not the reply field', async ( {
+		page,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Focus behaviour host' },
+			comment: 'Focus test note',
+		} );
+
+		const thread = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'treeitem', { name: 'Note: Focus test note' } );
+		const replyTextbox = page.getByRole( 'textbox', { name: 'Reply to' } );
+
+		/*
+		 * Selecting a thread renders its reply field but deliberately keeps
+		 * focus on the thread itself so keyboard navigation between threads is
+		 * preserved. The reply field must be available without stealing focus.
+		 */
+		await expect( thread ).toBeFocused();
+		await expect( replyTextbox ).toBeVisible();
+		await expect( replyTextbox ).not.toBeFocused();
+
+		/*
+		 * The "Add new reply" skip link is the deliberate, accessible path
+		 * into the reply field; clicking it moves focus there.
+		 */
+		await thread.getByRole( 'button', { name: 'Add new reply' } ).click();
+		await expect( replyTextbox ).toBeFocused();
+	} );
+
 	test( 'can edit a block note', async ( { page, blockNoteUtils } ) => {
 		await blockNoteUtils.addBlockWithNote( {
 			type: 'core/heading',
@@ -289,53 +321,52 @@ test.describe( 'Block Notes', () => {
 		).toBeVisible();
 	} );
 
-	// Deferred: the reply form intentionally does not focus on mount so
-	// selecting a thread doesn't pull focus away from thread keyboard
-	// navigation. Wiring focus into the reply/skip-link flow is
-	// follow-up work tracked separately from this rich-text change.
-	test.fixme(
-		'can reopen a resolved note when adding a reply',
-		async ( { page, blockNoteUtils } ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/heading',
-				attributes: { content: 'Testing block comments' },
-				comment: 'Test comment to resolve.',
-			} );
+	test( 'can reopen a resolved note when adding a reply', async ( {
+		page,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/heading',
+			attributes: { content: 'Testing block comments' },
+			comment: 'Test comment to resolve.',
+		} );
 
-			const resolveButton = page.getByRole( 'button', {
-				name: 'Resolve',
-			} );
-			await resolveButton.click();
-			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Note marked as resolved.' } )
-			).toBeVisible();
+		const resolveButton = page.getByRole( 'button', {
+			name: 'Resolve',
+		} );
+		await resolveButton.click();
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Note marked as resolved.' } )
+		).toBeVisible();
 
-			await blockNoteUtils.openBlockNoteSidebar();
-			await page
-				.locator( '.editor-collab-sidebar-panel__thread' )
-				.click();
-			await expect( resolveButton ).toBeDisabled();
-			const commentForm = page.getByRole( 'textbox', {
-				name: 'Reply to',
-			} );
-			await commentForm.pressSequentially(
-				'Test reply that reopens the comment.'
-			);
-			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Reopen & Reply', exact: true } )
-				.click();
+		await blockNoteUtils.openBlockNoteSidebar();
+		await page.locator( '.editor-collab-sidebar-panel__thread' ).click();
+		await expect( resolveButton ).toBeDisabled();
+		const commentForm = page.getByRole( 'textbox', {
+			name: 'Reply to',
+		} );
+		/*
+		 * The reply form intentionally does not focus on mount, so click
+		 * into the contenteditable to place the caret before typing.
+		 */
+		await commentForm.click();
+		await commentForm.pressSequentially(
+			'Test reply that reopens the comment.'
+		);
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Reopen & Reply', exact: true } )
+			.click();
 
-			await expect( resolveButton ).toBeEnabled();
-			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Note reopened.' } )
-			).toBeVisible();
-		}
-	);
+		await expect( resolveButton ).toBeEnabled();
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Note reopened.' } )
+		).toBeVisible();
+	} );
 
 	test( 'selecting a block or note marks it as an active', async ( {
 		editor,
@@ -658,60 +689,61 @@ test.describe( 'Block Notes', () => {
 			await expect( thread ).toHaveAccessibleName( 'Note: Test comment' );
 		} );
 
-		// Deferred: the reply form intentionally does not focus on mount so
-		// selecting a thread doesn't pull focus away from thread keyboard
-		// navigation. Wiring focus into the reply/skip-link flow is
-		// follow-up work tracked separately from this rich-text change.
-		test.fixme(
-			'should expand and focus the thread after clicking the "x more replies" button',
-			async ( { editor, page, blockNoteUtils } ) => {
-				await blockNoteUtils.addBlockWithNote( {
-					type: 'core/paragraph',
-					attributes: { content: 'Testing block comments' },
-					comment: 'Test comment',
+		test( 'should expand and focus the thread after clicking the "x more replies" button', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing block comments' },
+				comment: 'Test comment',
+			} );
+			const replyForm = page.getByRole( 'textbox', {
+				name: 'Reply to',
+			} );
+			const replyButton = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Reply', exact: true } );
+
+			/*
+			 * The reply form intentionally does not focus on mount, so
+			 * click into the contenteditable to place the caret before
+			 * typing each reply.
+			 */
+			await replyForm.click();
+			await replyForm.pressSequentially( 'First reply' );
+			await replyButton.click();
+			await replyForm.click();
+			await replyForm.pressSequentially( 'Second reply' );
+			await replyButton.click();
+
+			// Check that two replies were added.
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Reply added.' } )
+			).toHaveCount( 2 );
+
+			// Click on the title field to deselect the block and the note.
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.focus();
+
+			const thread = page
+				.getByRole( 'region', {
+					name: 'Editor settings',
+				} )
+				.getByRole( 'treeitem', {
+					name: 'Note: Test comment',
 				} );
-				const replyForm = page.getByRole( 'textbox', {
-					name: 'Reply to',
-				} );
-				const replyButton = page
-					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'button', { name: 'Reply', exact: true } );
 
-				await replyForm.pressSequentially( 'First reply' );
-				await replyButton.click();
-				await replyForm.pressSequentially( 'Second reply' );
-				await replyButton.click();
-
-				// Check that two replies were added.
-				await expect(
-					page
-						.getByRole( 'button', { name: 'Dismiss this notice' } )
-						.filter( { hasText: 'Reply added.' } )
-				).toHaveCount( 2 );
-
-				// Click on the title field to deselect the block and the note.
-				await editor.canvas
-					.getByRole( 'textbox', { name: 'Add title' } )
-					.focus();
-
-				const thread = page
-					.getByRole( 'region', {
-						name: 'Editor settings',
-					} )
-					.getByRole( 'treeitem', {
-						name: 'Note: Test comment',
-					} );
-
-				await thread
-					.getByRole( 'button', { name: '1 more reply' } )
-					.click();
-				await expect( thread ).toHaveAttribute(
-					'aria-expanded',
-					'true'
-				);
-				await expect( thread ).toBeFocused();
-			}
-		);
+			await thread
+				.getByRole( 'button', { name: '1 more reply' } )
+				.click();
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+			await expect( thread ).toBeFocused();
+		} );
 
 		test( 'should focus appropriate element when note is deleted', async ( {
 			page,
@@ -788,83 +820,78 @@ test.describe( 'Block Notes', () => {
 			).toBeFocused();
 		} );
 
-		// Deferred: the reply form intentionally does not focus on mount so
-		// selecting a thread doesn't pull focus away from thread keyboard
-		// navigation. Wiring focus into the reply/skip-link flow is
-		// follow-up work tracked separately from this rich-text change.
-		test.fixme(
-			'should focus note thread when reply is deleted',
-			async ( { page, blockNoteUtils } ) => {
-				await blockNoteUtils.addBlockWithNote( {
-					type: 'core/paragraph',
-					attributes: { content: 'Testing block comments' },
-					comment: 'Test note',
+		test( 'should focus note thread when reply is deleted', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing block comments' },
+				comment: 'Test note',
+			} );
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing block comments' },
+				comment: 'Test comment',
+			} );
+			const commentForm = page.getByRole( 'textbox', {
+				name: 'Reply to',
+			} );
+			/*
+			 * The reply form intentionally does not focus on mount, so
+			 * click into the contenteditable to place the caret before
+			 * typing.
+			 */
+			await commentForm.click();
+			await commentForm.pressSequentially( 'Test reply' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Reply', exact: true } )
+				.click();
+			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Delete', 1 );
+			await page
+				.getByRole( 'dialog' )
+				.getByRole( 'button', { name: 'Delete' } )
+				.click();
+			const thread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', {
+					name: 'Note: Test comment',
 				} );
-				await blockNoteUtils.addBlockWithNote( {
-					type: 'core/paragraph',
-					attributes: { content: 'Testing block comments' },
-					comment: 'Test comment',
+
+			await expect( thread ).toBeFocused();
+		} );
+
+		test( 'should focus note form after clicking "Add new reply" skip link button', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing block comments' },
+				comment: 'Test comment',
+			} );
+			const thread = page
+				.getByRole( 'region', {
+					name: 'Editor settings',
+				} )
+				.getByRole( 'treeitem', {
+					name: 'Note: Test comment',
 				} );
-				const commentForm = page.getByRole( 'textbox', {
-					name: 'Reply to',
-				} );
-				await commentForm.pressSequentially( 'Test reply' );
-				await page
-					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'button', { name: 'Reply', exact: true } )
-					.click();
-				await blockNoteUtils.clickBlockNoteActionMenuItem(
-					'Delete',
-					1
-				);
-				await page
-					.getByRole( 'dialog' )
-					.getByRole( 'button', { name: 'Delete' } )
-					.click();
-				const thread = page
-					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'treeitem', {
-						name: 'Note: Test comment',
-					} );
+			const addNewCommentButton = thread.getByRole( 'button', {
+				name: 'Add new reply',
+			} );
+			await thread.focus();
+			await page.keyboard.press( 'Tab' );
 
-				await expect( thread ).toBeFocused();
-			}
-		);
+			await expect( addNewCommentButton ).toBeFocused();
 
-		// Deferred: the reply form intentionally does not focus on mount so
-		// selecting a thread doesn't pull focus away from thread keyboard
-		// navigation. Wiring focus into the reply/skip-link flow is
-		// follow-up work tracked separately from this rich-text change.
-		test.fixme(
-			'should focus note form after clicking "Add new reply" skip link button',
-			async ( { page, blockNoteUtils } ) => {
-				await blockNoteUtils.addBlockWithNote( {
-					type: 'core/paragraph',
-					attributes: { content: 'Testing block comments' },
-					comment: 'Test comment',
-				} );
-				const thread = page
-					.getByRole( 'region', {
-						name: 'Editor settings',
-					} )
-					.getByRole( 'treeitem', {
-						name: 'Note: Test comment',
-					} );
-				const addNewCommentButton = thread.getByRole( 'button', {
-					name: 'Add new reply',
-				} );
-				await thread.focus();
-				await page.keyboard.press( 'Tab' );
+			await page.keyboard.press( 'Enter' );
 
-				await expect( addNewCommentButton ).toBeFocused();
-
-				await page.keyboard.press( 'Enter' );
-
-				await expect(
-					page.getByRole( 'textbox', { name: 'Reply to' } )
-				).toBeFocused();
-			}
-		);
+			await expect(
+				page.getByRole( 'textbox', { name: 'Reply to' } )
+			).toBeFocused();
+		} );
 
 		test( 'should focus block after clicking "Back to block" skip link button', async ( {
 			editor,
