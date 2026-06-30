@@ -185,6 +185,7 @@ const restrictedSyntax = [
 		'FontFamilyControl',
 		'FontSizePicker',
 		'FormFileUpload',
+		'FormTokenField',
 		'LetterSpacingControl',
 		'LineHeightControl',
 		'QueryControls',

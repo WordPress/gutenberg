@@ -10,7 +10,6 @@ The following components are checked by this rule:
 
 -   Button
 -   CustomSelectControl
--   FormTokenField
 -   InputControl
 -   NumberControl
 -   SelectControl
