@@ -119,7 +119,6 @@ export type ToggleGroupControlProps = Pick<
 	/**
 	 * The size variant of the control.
 	 *
-	 * @default 'default'
 	 * @deprecated This prop no longer has any effect.
 	 * @ignore
 	 */
