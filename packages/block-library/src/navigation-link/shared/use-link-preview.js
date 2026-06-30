@@ -211,7 +211,6 @@ function getEntityTitle( entityRecord ) {
 
 	// Posts and pages expose `title` as a { raw, rendered } object.
 	if ( title && 'rendered' in title ) {
-		// translators: displayed when an entity has an empty title.
 		return title.rendered || __( '(no title)' );
 	}
 
