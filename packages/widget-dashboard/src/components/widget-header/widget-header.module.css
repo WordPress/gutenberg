@@ -1,0 +1,51 @@
+/**
+ * Tile header row: identity leads, toolbar trails, on one line.
+ */
+.widgetHeader {
+	display: flex;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-sm);
+}
+
+/**
+ * Identity and toolbar share one box so they stay aligned.
+ */
+.identity,
+.toolbar {
+	display: flex;
+	align-items: center;
+	height: var(--wpds-dimension-size-lg);
+}
+
+/**
+ * Shrink a long title instead of pushing the toolbar out.
+ */
+.identity {
+	min-width: 0;
+}
+
+.icon {
+	display: inline-flex;
+	color: var(--wpds-color-foreground-content-neutral);
+}
+
+.toolbar {
+	margin-inline-start: auto;
+}
+
+/**
+ * Floats over the tile, click-through except the toolbar; re-declares the card
+ * padding var (outside Card.Root).
+ */
+.overlay {
+	position: absolute;
+	inset-block-start: 0;
+	inset-inline: 0;
+	z-index: 1;
+	pointer-events: none;
+	--wp-ui-card-padding: var(--wpds-dimension-padding-2xl);
+}
+
+.overlay .toolbar {
+	pointer-events: auto;
+}

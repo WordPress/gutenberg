@@ -11,12 +11,13 @@ import { Spinner } from '@wordpress/components';
 import { Component, Suspense } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 // eslint-disable-next-line @wordpress/use-recommended-components
-import { Card, Icon, Notice, Stack, VisuallyHidden } from '@wordpress/ui';
+import { Card, Notice, Stack, VisuallyHidden } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
 
 /**
  * Internal dependencies
  */
+import { WidgetHeader } from '../widget-header';
 import { WidgetRender } from '../widget-render';
 import styles from './widget-frame.module.css';
 import type { DashboardWidget } from '../../types';
@@ -62,32 +63,6 @@ export function LoadingOverlay() {
 	);
 }
 
-interface HeaderProps {
-	titleId: string;
-	widgetType: WidgetType;
-}
-
-function Header( { titleId, widgetType }: HeaderProps ) {
-	if ( ! widgetType.title ) {
-		return null;
-	}
-
-	return (
-		<Card.Header>
-			<Stack direction="row" align="center" gap="sm">
-				{ widgetType.icon && (
-					<span className={ styles.headerIcon } aria-hidden="true">
-						<Icon icon={ widgetType.icon } />
-					</span>
-				) }
-				<Card.Title id={ titleId } render={ <h2 /> }>
-					{ widgetType.title }
-				</Card.Title>
-			</Stack>
-		</Card.Header>
-	);
-}
-
 export interface WidgetFrameProps {
 	widget: DashboardWidget< unknown >;
 	widgetType: WidgetType;
@@ -122,7 +97,11 @@ export function WidgetFrame( {
 	return (
 		<>
 			{ ! isHeaderHidden && (
-				<Header titleId={ titleId } widgetType={ widgetType } />
+				<WidgetHeader
+					showIdentity
+					widgetType={ widgetType }
+					titleId={ titleId }
+				/>
 			) }
 
 			<Card.Content
