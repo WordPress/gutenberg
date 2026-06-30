@@ -418,7 +418,7 @@ On the component's main named export, add a JSDoc comment that includes the main
 
 All new components should be styled using SCSS Modules.
 
-Place component-local styles in a `style.module.scss` file next to the component, import the module from JavaScript or TypeScript, and compose class names with `clsx`. Preserve existing public `components-*` class names where consumers may rely on them. For dynamic values, prefer inline CSS custom properties consumed by the SCSS module. For variants and state, prefer conditional module classes composed with `clsx`.
+Place component-local styles in a `style.module.scss` file next to the component, import the module from JavaScript or TypeScript, and compose class names with `clsx`. Preserve existing public `components-*` class names where consumers may rely on them. For dynamic values, prefer inline CSS custom properties consumed by the SCSS module. For variants and state, prefer conditional module classes composed with `clsx` object syntax, e.g. `{ [ styles.className ]: condition }`.
 
 Legacy components may still use Emotion while they are being migrated, but new Emotion usage should not be added.
 
@@ -445,9 +445,11 @@ function MyComponent( { __nextHasNoOuterMargins = false, className } ) {
 			className={ clsx(
 				'components-my-component',
 				styles.root,
-				! __nextHasNoOuterMargins &&
-					styles.deprecatedOuterMargins,
-				className
+				className,
+				{
+					[ styles.deprecatedOuterMargins ]:
+						! __nextHasNoOuterMargins,
+				}
 			) }
 		/>
 	);

@@ -23,14 +23,13 @@ test.describe( 'Site editor command palette', () => {
 	test( 'Open the command palette and navigate to the page create page', async ( {
 		editor,
 		page,
+		pageUtils,
 	} ) => {
 		await editor.setPreferences( 'core/edit-post', {
 			welcomeGuide: false,
 		} );
 
-		await page
-			.getByRole( 'button', { name: 'Open command palette' } )
-			.click();
+		await pageUtils.pressKeys( 'primary+k' );
 		await page
 			.getByRole( 'combobox', { name: 'Search commands and settings' } )
 			.fill( 'add page' );
@@ -49,10 +48,9 @@ test.describe( 'Site editor command palette', () => {
 
 	test( 'Open the command palette and navigate to a template', async ( {
 		page,
+		pageUtils,
 	} ) => {
-		await page
-			.getByRole( 'button', { name: 'Open command palette' } )
-			.click();
+		await pageUtils.pressKeys( 'primary+k' );
 		await page.keyboard.type( 'index' );
 		await page.getByRole( 'option', { name: 'index' } ).click();
 		await expect(
@@ -64,10 +62,9 @@ test.describe( 'Site editor command palette', () => {
 
 	test( 'Open the command palette and navigate to Customize CSS', async ( {
 		page,
+		pageUtils,
 	} ) => {
-		await page
-			.getByRole( 'button', { name: 'Open command palette' } )
-			.click();
+		await pageUtils.pressKeys( 'primary+k' );
 		await page.keyboard.type( 'custom CSS' );
 		await page.getByRole( 'option', { name: 'Open custom CSS' } ).click();
 		await expect( page.getByLabel( 'Additional CSS' ) ).toBeVisible();
@@ -75,10 +72,9 @@ test.describe( 'Site editor command palette', () => {
 
 	test( 'Suggestions section shows contextual commands on open', async ( {
 		page,
+		pageUtils,
 	} ) => {
-		await page
-			.getByRole( 'button', { name: 'Open command palette' } )
-			.click();
+		await pageUtils.pressKeys( 'primary+k' );
 
 		const list = page.getByRole( 'listbox', {
 			name: 'Command suggestions',
@@ -91,10 +87,11 @@ test.describe( 'Site editor command palette', () => {
 		).toBeVisible();
 	} );
 
-	test( 'Results section appears during search', async ( { page } ) => {
-		await page
-			.getByRole( 'button', { name: 'Open command palette' } )
-			.click();
+	test( 'Results section appears during search', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.pressKeys( 'primary+k' );
 		await page.keyboard.type( 'styles' );
 
 		const list = page.getByRole( 'listbox', {
@@ -109,11 +106,10 @@ test.describe( 'Site editor command palette', () => {
 	test( 'Recent commands show after using a command', async ( {
 		page,
 		admin,
+		pageUtils,
 	} ) => {
 		// Use a command first: navigate to a template via search.
-		await page
-			.getByRole( 'button', { name: 'Open command palette' } )
-			.click();
+		await pageUtils.pressKeys( 'primary+k' );
 		await page.keyboard.type( 'index' );
 		await page.getByRole( 'option', { name: 'index' } ).click();
 		await expect(
@@ -124,9 +120,7 @@ test.describe( 'Site editor command palette', () => {
 
 		// Go back to site editor root and reopen the palette.
 		await admin.visitSiteEditor();
-		await page
-			.getByRole( 'button', { name: 'Open command palette' } )
-			.click();
+		await pageUtils.pressKeys( 'primary+k' );
 
 		const list = page.getByRole( 'listbox', {
 			name: 'Command suggestions',

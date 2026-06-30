@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { useDispatch } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Keep the tab-list block's `tabs` attribute in sync with the tab-panel blocks.
@@ -19,8 +19,7 @@ import { useEffect, useRef } from '@wordpress/element';
 export default function useTabListItemsSync( { tabPanels, tabListClientId } ) {
 	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
-
-	const prevTabsRef = useRef( null );
+	const { getBlockAttributes } = useSelect( blockEditorStore );
 
 	useEffect( () => {
 		if ( ! tabListClientId ) {
@@ -31,18 +30,18 @@ export default function useTabListItemsSync( { tabPanels, tabListClientId } ) {
 			label: tab.attributes.label || '',
 		} ) );
 
-		// Only update if tabs actually changed to avoid unnecessary re-renders.
-		const serialized = JSON.stringify( newTabs );
-		if ( serialized === prevTabsRef.current ) {
+		// Skip the update when the stored tabs already match the derived ones.
+		const currentTabs = getBlockAttributes( tabListClientId )?.tabs ?? [];
+		if ( JSON.stringify( newTabs ) === JSON.stringify( currentTabs ) ) {
 			return;
 		}
-		prevTabsRef.current = serialized;
 
 		__unstableMarkNextChangeAsNotPersistent();
 		updateBlockAttributes( tabListClientId, { tabs: newTabs } );
 	}, [
 		tabPanels,
 		tabListClientId,
+		getBlockAttributes,
 		updateBlockAttributes,
 		__unstableMarkNextChangeAsNotPersistent,
 	] );

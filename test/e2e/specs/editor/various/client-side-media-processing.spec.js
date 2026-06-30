@@ -4,7 +4,7 @@
 const path = require( 'path' );
 const fs = require( 'fs/promises' );
 const os = require( 'os' );
-const { v4: uuid } = require( 'uuid' );
+const { randomUUID } = require( 'crypto' );
 
 /**
  * WordPress dependencies
@@ -69,7 +69,7 @@ class MediaProcessingUtils {
 		const tmpDirectory = await fs.mkdtemp(
 			path.join( os.tmpdir(), 'gutenberg-test-media-' )
 		);
-		const uniqueName = uuid();
+		const uniqueName = randomUUID();
 		const extension = path.extname( fileName );
 		const tmpFileName = path.join( tmpDirectory, uniqueName + extension );
 		await fs.copyFile( path.join( ASSETS_DIR, fileName ), tmpFileName );
@@ -402,7 +402,7 @@ test.describe( 'Client-side media processing', () => {
 		const tmpFiles = [];
 
 		for ( const file of files ) {
-			const uniqueName = uuid();
+			const uniqueName = randomUUID();
 			const ext = path.extname( file );
 			const tmpFile = path.join( tmpDirectory, uniqueName + ext );
 			await fs.copyFile( path.join( ASSETS_DIR, file ), tmpFile );

@@ -267,7 +267,6 @@ export default function PresetInputControl( {
 					step={ 1 }
 					value={ currentValue }
 					withInputField={ false }
-					__next40pxDefaultSize
 				/>
 			) }
 			{ hasPresets && ! showRangeControl && ! showCustomValueControl && (

@@ -247,6 +247,10 @@ const UnconnectedColorPicker = (
 	);
 };
 
+/**
+ * `ColorPicker` lets users select a color from a visual color surface, or by
+ * editing its hex, RGB, or HSL values.
+ */
 export const ColorPicker = contextConnect(
 	UnconnectedColorPicker,
 	'ColorPicker'

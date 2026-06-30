@@ -1,8 +1,4 @@
 /**
- * @jest-environment jsdom
- */
-
-/**
  * External dependencies
  */
 import { act, renderHook } from '@testing-library/react';
@@ -107,6 +103,25 @@ async function runModalUpdate( {
 describe( 'useOpenImageMediaEditorModal', () => {
 	beforeEach( () => {
 		jest.clearAllMocks();
+	} );
+
+	it( 'returns no opener when the media editor modal setting is unavailable', () => {
+		useRegistry.mockReturnValue( createRegistry() );
+		mockMediaEditorModalSetting( undefined );
+
+		const { result } = renderHook( () =>
+			useOpenImageMediaEditorModal( {
+				attributes: {
+					id: 1,
+					url: 'original.jpg',
+					alt: '',
+					caption: '',
+				},
+				setAttributes: jest.fn(),
+			} )
+		);
+
+		expect( result.current ).toBeUndefined();
 	} );
 
 	it( 'passes an onClose handler for returning focus when the media editor closes', async () => {
