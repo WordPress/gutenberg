@@ -30,3 +30,33 @@ export function useDebouncedRecompute(
 
 	return [ recomputeToken, rerenderAfterDelay ];
 }
+
+/**
+ * Returns a recompute token and a callback that bumps it on the next
+ * animation frame. Successive calls within the same frame are coalesced.
+ * Use this for resize-triggered recomputes so the DOM is measured after
+ * the browser has finished layout, without an arbitrary fixed delay.
+ *
+ * @return A tuple of [recomputeToken, rerenderOnNextFrame].
+ */
+export function useRafRecompute(): [ number, () => () => void ] {
+	const [ recomputeToken, setRecomputeToken ] = useState( 0 );
+	const rafRef = useRef< number | null >( null );
+
+	const rerenderOnNextFrame = useCallback( () => {
+		if ( rafRef.current !== null ) {
+			cancelAnimationFrame( rafRef.current );
+		}
+		rafRef.current = requestAnimationFrame( () => {
+			rafRef.current = null;
+			setRecomputeToken( ( t ) => t + 1 );
+		} );
+		return () => {
+			if ( rafRef.current !== null ) {
+				cancelAnimationFrame( rafRef.current );
+			}
+		};
+	}, [] );
+
+	return [ recomputeToken, rerenderOnNextFrame ];
+}
