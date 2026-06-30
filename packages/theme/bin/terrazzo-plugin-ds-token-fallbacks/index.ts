@@ -229,7 +229,7 @@ export function formatDesignTokenFallbacksScss(
 
 type PluginDsTokenFallbacksOptions = {
 	filename?: string;
-	scssFilename?: string;
+	scssFilename?: string | false;
 	additionalScssFilenames?: string[];
 };
 
@@ -344,11 +344,13 @@ export default function pluginDsTokenFallbacks( {
 					'\n'
 			);
 
-			const scss = formatDesignTokenFallbacksScss( sorted );
-			for ( const currentScssFilename of [
-				scssFilename,
+			const scssFilenames = [
+				...( scssFilename ? [ scssFilename ] : [] ),
 				...additionalScssFilenames,
-			] ) {
+			];
+
+			const scss = formatDesignTokenFallbacksScss( sorted );
+			for ( const currentScssFilename of scssFilenames ) {
 				outputFile( currentScssFilename, scss );
 			}
 		},
