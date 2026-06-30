@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/widget-dashboard",
-	"version": "0.1.0-prerelease",
+	"version": "0.1.0",
 	"description": "Stateless rendering engine for widget dashboards: the WidgetDashboard compound component and its grid-settings kit.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

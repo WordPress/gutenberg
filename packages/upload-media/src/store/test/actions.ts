@@ -33,8 +33,24 @@ jest.mock( '../utils', () => ( {
 	terminateVipsWorker: jest.fn(),
 } ) );
 
-// Import the mocked module to access the mock function.
+/*
+ * actions.ts transitively imports private-actions, which also pulls in
+ * convertGifToVideo / isUnsupportedConversionError, so the mock must cover the
+ * whole module surface. isUnsupportedConversionError is kept real.
+ */
+jest.mock( '../utils/video-conversion', () => {
+	const actual = jest.requireActual( '../utils/video-conversion' );
+	return {
+		convertGifToVideo: jest.fn(),
+		cancelGifToVideoOperations: jest.fn( () => Promise.resolve( true ) ),
+		terminateVideoConversionWorker: jest.fn(),
+		isUnsupportedConversionError: actual.isUnsupportedConversionError,
+	};
+} );
+
+// Import the mocked modules to access the mock functions.
 import { vipsCancelOperations } from '../utils';
+import { cancelGifToVideoOperations } from '../utils/video-conversion';
 
 function createRegistryWithStores() {
 	// Create a registry and register used stores.
@@ -567,6 +583,7 @@ describe( 'actions', () => {
 	describe( 'cancelItem', () => {
 		beforeEach( () => {
 			( vipsCancelOperations as jest.Mock ).mockClear();
+			( cancelGifToVideoOperations as jest.Mock ).mockClear();
 		} );
 
 		it( 'calls vipsCancelOperations when cancelling', async () => {
@@ -588,6 +605,30 @@ describe( 'actions', () => {
 
 			expect( vipsCancelOperations ).toHaveBeenCalledWith( item.id );
 			expect( consoleErrorSpy ).toHaveBeenCalled();
+
+			consoleErrorSpy.mockRestore();
+		} );
+
+		it( 'cancels any in-flight GIF-to-video conversion when cancelling', async () => {
+			// Suppress console.error that fires when there's no onError callback.
+			const consoleErrorSpy = jest
+				.spyOn( console, 'error' )
+				.mockImplementation( () => {} );
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await registry
+				.dispatch( uploadStore )
+				.cancelItem( item.id, new Error( 'User cancelled' ) );
+
+			expect( cancelGifToVideoOperations ).toHaveBeenCalledWith(
+				item.id
+			);
 
 			consoleErrorSpy.mockRestore();
 		} );
@@ -660,9 +701,11 @@ describe( 'actions', () => {
 			const setUpParentAndChild = ( {
 				parentSubSizes,
 				parentOnError,
+				imageSize = 'medium',
 			}: {
 				parentSubSizes?: { name: string; id: number }[];
 				parentOnError?: jest.Mock;
+				imageSize?: string;
 			} = {} ) => {
 				unlock( registry.dispatch( uploadStore ) ).addItem( {
 					file: jpegFile,
@@ -689,7 +732,7 @@ describe( 'actions', () => {
 				unlock( registry.dispatch( uploadStore ) ).addSideloadItem( {
 					file: jpegFile,
 					parentId: parent.id,
-					additionalData: { post: 42, image_size: 'medium' },
+					additionalData: { post: 42, image_size: imageSize },
 				} );
 
 				const child = unlock( registry.select( uploadStore ) )
@@ -831,6 +874,39 @@ describe( 'actions', () => {
 						message: 'The image could not be uploaded.',
 					} )
 				);
+			} );
+
+			it( 'keeps the parent GIF when its only child is a failed animated-video companion', async () => {
+				const mediaDelete = jest.fn().mockResolvedValue( undefined );
+				const parentOnError = jest.fn();
+				unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+					mediaDelete,
+				} );
+
+				// The converted video is the sole child of the GIF and has no
+				// accumulated sub-sizes — the pre-fix "total failure" case.
+				const { parent, child } = setUpParentAndChild( {
+					parentOnError,
+					imageSize: 'animated-video',
+				} );
+
+				await registry
+					.dispatch( uploadStore )
+					.cancelItem(
+						child!.id,
+						new Error( 'conversion failed' ),
+						true
+					);
+
+				// The optional companion failing must not delete or cancel the
+				// already-uploaded GIF attachment.
+				expect( mediaDelete ).not.toHaveBeenCalled();
+				expect( parentOnError ).not.toHaveBeenCalled();
+				expect(
+					unlock( registry.select( uploadStore ) ).getItem(
+						parent.id
+					)
+				).toBeDefined();
 			} );
 		} );
 	} );

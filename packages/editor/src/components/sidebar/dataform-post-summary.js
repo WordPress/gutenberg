@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { DataForm } from '@wordpress/dataviews';
 import { Stack } from '@wordpress/ui';
@@ -13,6 +13,7 @@ import { useViewConfig } from '@wordpress/views';
  * Internal dependencies
  */
 import PostCardPanel from '../post-card-panel';
+import PluginPostStatusInfo from '../plugin-post-status-info';
 import PostPanelSection from '../post-panel-section';
 import { store as editorStore } from '../../store';
 import PostTrash from '../post-trash';
@@ -22,6 +23,90 @@ import revisionsField from '../../dataviews/fields/revisions';
 
 const EMPTY_FORM = { layout: { type: 'panel' }, fields: [] };
 const VIEW_CONFIG_FIELDS = [ 'form' ];
+
+/**
+ * Bridges the legacy editor-panel visibility controls onto the DataForm summary,
+ * returning the form with the hidden fields removed. The new inspector has no
+ * concept of the Preferences → Panels switches or of `removeEditorPanel`, so we
+ * reproduce their effect on the form.
+ *
+ * @param {Object} form The DataForm summary form configuration.
+ * @return {Object} The form with the hidden fields removed.
+ */
+function useInspectorPanelVisibility( form ) {
+	const {
+		isPostStatusRemoved,
+		featuredImageEnabled,
+		excerptEnabled,
+		discussionEnabled,
+		pageAttributesEnabled,
+	} = useSelect( ( select ) => {
+		const { isEditorPanelRemoved, isEditorPanelEnabled } =
+			select( editorStore );
+		return {
+			isPostStatusRemoved: isEditorPanelRemoved( 'post-status' ),
+			featuredImageEnabled: isEditorPanelEnabled( 'featured-image' ),
+			excerptEnabled: isEditorPanelEnabled( 'post-excerpt' ),
+			discussionEnabled: isEditorPanelEnabled( 'discussion-panel' ),
+			pageAttributesEnabled: isEditorPanelEnabled( 'page-attributes' ),
+		};
+	}, [] );
+
+	const visibleForm = useMemo( () => {
+		if ( ! form.fields?.length ) {
+			return form;
+		}
+		// `featured_media`/`excerpt` are their own top-level panels and
+		// `post-content-info` is always shown, so they survive. Everything else
+		// belongs to the `post-status` summary panel: `discussion`/`parent` honor
+		// their own switch, but every one of them is hidden while the `post-status`
+		// panel is removed.
+		const visibilityById = {
+			featured_media: featuredImageEnabled,
+			excerpt: excerptEnabled,
+			'post-content-info': true,
+			discussion: discussionEnabled && ! isPostStatusRemoved,
+			parent: pageAttributesEnabled && ! isPostStatusRemoved,
+		};
+		const isFieldVisible = ( id ) =>
+			id in visibilityById ? visibilityById[ id ] : ! isPostStatusRemoved;
+		// Recurse into `children` so a panel-tied field is dropped wherever it
+		// sits in the form: the PHP view-config filter can nest such a field
+		// inside another field's group.
+		const filterFields = ( fields ) =>
+			fields.reduce( ( acc, field ) => {
+				const id = typeof field === 'string' ? field : field.id;
+				if ( ! isFieldVisible( id ) ) {
+					return acc;
+				}
+				if (
+					typeof field !== 'string' &&
+					Array.isArray( field.children )
+				) {
+					const children = filterFields( field.children );
+					// A group whose children were all removed would render as
+					// an empty panel, so drop it too.
+					if ( ! children.length ) {
+						return acc;
+					}
+					acc.push( { ...field, children } );
+					return acc;
+				}
+				acc.push( field );
+				return acc;
+			}, [] );
+		return { ...form, fields: filterFields( form.fields ) };
+	}, [
+		form,
+		isPostStatusRemoved,
+		featuredImageEnabled,
+		excerptEnabled,
+		discussionEnabled,
+		pageAttributesEnabled,
+	] );
+
+	return visibleForm;
+}
 
 // Some post types expose summary fields that edit entities other than the one
 // being edited. Keyed by the post type that needs them, the related records are
@@ -90,19 +175,34 @@ function bindFieldToNamespace( field, namespace, isVisible = () => true ) {
 }
 
 export default function DataFormPostSummary( { onActionPerformed } ) {
-	const { postType, postId } = useSelect( ( select ) => {
-		const { getCurrentPostType, getCurrentPostId } = select( editorStore );
-		return {
-			postType: getCurrentPostType(),
-			postId: getCurrentPostId(),
-		};
-	}, [] );
+	const { postType, postId, isPostStatusRemoved, availableTemplates } =
+		useSelect( ( select ) => {
+			const {
+				getCurrentPostType,
+				getCurrentPostId,
+				isEditorPanelRemoved,
+				getEditorSettings,
+			} = select( editorStore );
+			const _availableTemplates = select(
+				coreDataStore
+			).getCurrentTheme()?.is_block_theme
+				? null
+				: getEditorSettings().availableTemplates ?? null;
+			return {
+				postType: getCurrentPostType(),
+				postId: getCurrentPostId(),
+				isPostStatusRemoved: isEditorPanelRemoved( 'post-status' ),
+				availableTemplates: _availableTemplates,
+			};
+		}, [] );
 	const { form: formConfig } = useViewConfig( {
 		kind: 'postType',
 		name: postType,
 		fields: VIEW_CONFIG_FIELDS,
 	} );
-	const form = formConfig ?? EMPTY_FORM;
+	// Bridge the legacy editor-panel visibility (Preferences → Panels and
+	// programmatic panel removal) onto the form by dropping hidden fields.
+	const form = useInspectorPanelVisibility( formConfig ?? EMPTY_FORM );
 	const record = useSelect(
 		( select ) => {
 			if ( ! postType || ! postId ) {
@@ -119,27 +219,14 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 
 	const templatePanelMode = usePostTemplatePanelMode();
 
-	// Assemble every piece of supplementary data merged into the form `data`
-	// alongside the post record: read-only editor data that the post's own
-	// fields consume (e.g. the `template` field's `available_templates` in
-	// classic themes), and the records of other entities targeted by namespaced
-	// fields (keyed by `${ kind }_${ name }`) together with the id used to
-	// persist edits back to each one.
-	const { entityData, entityIds, availableTemplates } = useSelect(
+	const entityRecords = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, canUser, getCurrentTheme } =
-				select( coreDataStore );
+			const { getEditedEntityRecord, canUser } = select( coreDataStore );
 
-			const _availableTemplates = getCurrentTheme()?.is_block_theme
-				? null
-				: select( editorStore ).getEditorSettings()
-						.availableTemplates ?? {};
-
-			const extra = {};
-			const ids = {};
+			const records = {};
 
 			// Other entities the current post type needs merged into its form.
-			for ( const [ key, entity ] of Object.entries(
+			for ( const [ namespace, entity ] of Object.entries(
 				ENTITIES[ postType ] ?? {}
 			) ) {
 				if (
@@ -155,39 +242,32 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 				if ( entity.getId && ! id ) {
 					continue;
 				}
-				extra[ key ] = getEditedEntityRecord(
+				records[ namespace ] = getEditedEntityRecord(
 					entity.kind,
 					entity.name,
 					id
 				);
-				ids[ key ] = id;
 			}
 
-			return {
-				entityData: extra,
-				entityIds: ids,
-				availableTemplates: _availableTemplates,
-			};
+			return records;
 		},
 		[ postType ]
 	);
 
-	// Merge the supplementary data onto the record only when there is any.
+	// Merge the supplementary data onto the record.
 	const data = useMemo( () => {
 		if ( ! record ) {
 			return record;
 		}
-		const extra = { ...entityData };
+		const extra = { ...entityRecords };
 		if ( availableTemplates && Object.keys( availableTemplates ).length ) {
 			extra.available_templates = availableTemplates;
 		}
-		if ( ! Object.keys( extra ).length ) {
-			return record;
-		}
 		return { ...record, ...extra };
-	}, [ record, entityData, availableTemplates ] );
+	}, [ record, entityRecords, availableTemplates ] );
 
 	const { editEntityRecord } = useDispatch( coreDataStore );
+	const registry = useRegistry();
 
 	// Map of namespaced field id to the namespace key its entity is merged under.
 	const fieldNamespaces = useMemo( () => {
@@ -266,12 +346,13 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 		for ( const [ key, value ] of Object.entries( edits ) ) {
 			const entity = entities[ key ];
 			if ( entity ) {
-				editEntityRecord(
-					entity.kind,
-					entity.name,
-					entityIds[ key ],
-					value
-				);
+				// Resolve the id the same way it was resolved to read the
+				// record, so the save targets the right entity regardless of
+				// its key field (`undefined` for the `root/site` singleton).
+				const id = entity.getId
+					? entity.getId( registry.select )
+					: undefined;
+				editEntityRecord( entity.kind, entity.name, id, value );
 			} else {
 				baseEdits[ key ] = value;
 			}
@@ -313,7 +394,20 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 					form={ form }
 					onChange={ onChange }
 				/>
-				<PostTrash onActionPerformed={ onActionPerformed } />
+				{ ! isPostStatusRemoved && (
+					<>
+						<PluginPostStatusInfo.Slot>
+							{ ( fills ) =>
+								fills.length > 0 && (
+									<Stack direction="column" gap="xs">
+										{ fills }
+									</Stack>
+								)
+							}
+						</PluginPostStatusInfo.Slot>
+						<PostTrash onActionPerformed={ onActionPerformed } />
+					</>
+				) }
 			</Stack>
 		</PostPanelSection>
 	);

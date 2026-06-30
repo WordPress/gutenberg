@@ -39,9 +39,7 @@ export default function MissingEdit( { attributes, clientId } ) {
 	function convertToHTML() {
 		replaceBlock(
 			clientId,
-			createBlock( 'core/html', {
-				content: originalUndelimitedContent,
-			} )
+			createBlock( 'core/html', {}, [], [ originalUndelimitedContent ] )
 		);
 	}
 

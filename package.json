@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "23.4.0",
+	"version": "23.5.0-rc.2",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -32,6 +32,9 @@
 			},
 			{
 				"id": "dashboard",
+				"init": [
+					"@wordpress/dashboard-init"
+				],
 				"experimental": true
 			},
 			{

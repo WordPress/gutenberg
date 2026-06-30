@@ -2874,6 +2874,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/video-conversion",
+		"slug": "packages-video-conversion",
+		"markdown_source": "../packages/video-conversion/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/viewport",
 		"slug": "packages-viewport",
 		"markdown_source": "../packages/viewport/README.md",
