@@ -11,16 +11,6 @@ const meta: Meta< typeof Skeleton > = {
 			whereUsed: 'global',
 		},
 	},
-	argTypes: {
-		radius: {
-			control: 'select',
-			options: [ 'none', 'xs', 'sm', 'md', 'lg', 'xl', 'full' ],
-		},
-		animation: {
-			control: 'inline-radio',
-			options: [ 'pulse', 'none' ],
-		},
-	},
 };
 export default meta;
 
