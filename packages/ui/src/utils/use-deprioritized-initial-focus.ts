@@ -9,6 +9,11 @@ import { tabbable } from 'tabbable';
  */
 type InitialFocus = _Popover.Popup.Props[ 'initialFocus' ];
 
+type DeprioritizedInitialFocus = {
+	resolvedInitialFocus: InitialFocus;
+	popupRef: React.RefObject< HTMLDivElement >;
+};
+
 /**
  * Options matching Base UI's internal tabbable configuration.
  * @see https://github.com/floating-ui/floating-ui/blob/master/packages/react/src/utils/tabbable.ts
@@ -49,7 +54,7 @@ export function useDeprioritizedInitialFocus( {
 }: {
 	initialFocus: InitialFocus;
 	deprioritizedAttributes: string[];
-} ) {
+} ): DeprioritizedInitialFocus {
 	const popupRef = useRef< HTMLDivElement >( null );
 
 	// Returning a fresh callback on every render is intentional. Base UI
