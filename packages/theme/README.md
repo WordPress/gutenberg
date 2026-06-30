@@ -1,9 +1,5 @@
 # Theme
 
-<div class="callout callout-alert">
-This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
-
 A theming package that's part of the WordPress Design System. It has two parts:
 
 -   **Design Tokens**: A comprehensive system of design tokens for colors, spacing, typography, and more.
