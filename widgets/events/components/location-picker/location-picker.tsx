@@ -31,26 +31,46 @@ type LocationOption = {
 
 const DRAFT_DEBOUNCE_MS = 300;
 
-export function LocationPicker( {
-	onSubmit = () => {},
-	seedInput = '',
-	hideLabelFromVision = true,
-	selectButton = true,
-	onChange,
-}: {
-	onSubmit?: ( location: string ) => void;
+type LocationPickerProps = {
+	/**
+	 * The initial input value.
+	 */
 	seedInput?: string;
+	/**
+	 * Whether to hide the label from vision.
+	 */
 	hideLabelFromVision?: boolean;
+
+	/**
+	 * Show the input's help text. Defaults to true.
+	 */
+	showDescription?: boolean;
+
 	/**
 	 * Controls Select button visibility.
 	 */
 	selectButton?: boolean;
+
+	/**
+	 * Called when the user selects a location.
+	 */
+	onSubmit?: ( location: string ) => void;
+
 	/**
 	 * Called after the input value settles (debounced). Used when `selectButton`
 	 * is false to stage attribute updates before Save.
 	 */
 	onChange?: ( location: string ) => void;
-} ) {
+};
+
+export function LocationPicker( {
+	onSubmit = () => {},
+	seedInput = '',
+	hideLabelFromVision = true,
+	showDescription = true,
+	selectButton = true,
+	onChange,
+}: LocationPickerProps ) {
 	const locationInputId = useId();
 	const [ locationInput, setLocationInput ] = useState( seedInput );
 	const [ locationOptions, setLocationOptions ] = useState<
@@ -258,9 +278,13 @@ export function LocationPicker( {
 								label={ __( 'City' ) }
 								hideLabelFromVision={ hideLabelFromVision }
 								size="compact"
-								description={ __(
-									'Select a city to view upcoming events.'
-								) }
+								description={
+									showDescription
+										? __(
+												'Select a city to view upcoming events.'
+										  )
+										: undefined
+								}
 								onValueChange={ () => {} }
 								onBlur={
 									! selectButton
