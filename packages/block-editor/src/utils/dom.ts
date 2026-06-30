@@ -36,12 +36,15 @@ export function isInsideRootBlock( blockElement: Element, element: Element ) {
  * fully contained within one. The root element (an editable wrapper) does not
  * count as a containing editable element.
  *
- * @param {Selection} selection The selection.
- * @param {Element}   root      The editable wrapper element.
+ * @param selection The selection.
+ * @param root      The editable wrapper element.
  *
- * @return {Element|undefined} The editable element containing the selection.
+ * @return The editable element containing the selection.
  */
-export function getSelectionEditableElement( selection, root ) {
+export function getSelectionEditableElement(
+	selection: Selection,
+	root: Element
+) {
 	const { anchorNode, focusNode } = selection;
 
 	if ( ! anchorNode || ! focusNode ) {
@@ -50,7 +53,7 @@ export function getSelectionEditableElement( selection, root ) {
 
 	const element =
 		anchorNode.nodeType === anchorNode.ELEMENT_NODE
-			? /** @type {Element} */ ( anchorNode )
+			? ( anchorNode as Element )
 			: anchorNode.parentElement;
 	const editable = element?.closest( '[contenteditable="true"]' );
 
