@@ -115,7 +115,6 @@ export default {
 							panelId={ clientId }
 						>
 							<UnitControl
-								__next40pxDefaultSize
 								label={ __( 'Content width' ) }
 								labelPosition="top"
 								value={
@@ -151,7 +150,6 @@ export default {
 							panelId={ clientId }
 						>
 							<UnitControl
-								__next40pxDefaultSize
 								label={ __( 'Wide width' ) }
 								labelPosition="top"
 								value={

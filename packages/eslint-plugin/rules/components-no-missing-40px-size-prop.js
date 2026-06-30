@@ -22,7 +22,6 @@ const COMPONENTS_REQUIRING_40PX = new Set( [
 	'Radio',
 	'SelectControl',
 	'ToggleGroupControl',
-	'UnitControl',
 ] );
 
 module.exports = {

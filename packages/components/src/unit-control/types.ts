@@ -70,7 +70,14 @@ export type UnitSelectControlProps = {
 
 export type UnitControlProps = Pick< InputControlProps, 'size' > &
 	Omit< UnitSelectControlProps, 'size' | 'unit' > &
-	Omit< NumberControlProps, 'spinControls' | 'suffix' | 'type' > & {
+	Omit<
+		NumberControlProps,
+		| 'spinControls'
+		| 'suffix'
+		| 'type'
+		| '__next40pxDefaultSize'
+		| '__next36pxDefaultSize'
+	> & {
 		/**
 		 * If `true`, the unit `<select>` is hidden.
 		 *

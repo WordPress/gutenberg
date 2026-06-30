@@ -81,7 +81,6 @@ export const Default: StoryFn< typeof ToolsPanel > = ( {
 						isShownByDefault
 					>
 						<UnitControl
-							__next40pxDefaultSize
 							label="Width"
 							value={ width }
 							onChange={ ( next ) => setWidth( next ) }
@@ -94,7 +93,6 @@ export const Default: StoryFn< typeof ToolsPanel > = ( {
 						isShownByDefault
 					>
 						<UnitControl
-							__next40pxDefaultSize
 							label="Height"
 							value={ height }
 							onChange={ ( next ) => setHeight( next ) }
@@ -107,7 +105,6 @@ export const Default: StoryFn< typeof ToolsPanel > = ( {
 						isShownByDefault
 					>
 						<UnitControl
-							__next40pxDefaultSize
 							label="Minimum height"
 							value={ minHeight }
 							onChange={ ( next ) => setMinHeight( next ) }
@@ -176,7 +173,6 @@ export const WithNonToolsPanelItems: StoryFn< typeof ToolsPanel > = ( {
 						isShownByDefault
 					>
 						<UnitControl
-							__next40pxDefaultSize
 							label="Width"
 							value={ width }
 							onChange={ ( next ) => setWidth( next ) }
@@ -189,7 +185,6 @@ export const WithNonToolsPanelItems: StoryFn< typeof ToolsPanel > = ( {
 						isShownByDefault
 					>
 						<UnitControl
-							__next40pxDefaultSize
 							label="Height"
 							value={ height }
 							onChange={ ( next ) => setHeight( next ) }
@@ -248,7 +243,6 @@ export const WithOptionalItemsPlusIcon: StoryFn< typeof ToolsPanel > = ( {
 							}
 						>
 							<UnitControl
-								__next40pxDefaultSize
 								label="Minimum width"
 								value={ minWidth }
 								onChange={ ( next ) => setMinWidth( next ) }
@@ -261,7 +255,6 @@ export const WithOptionalItemsPlusIcon: StoryFn< typeof ToolsPanel > = ( {
 							isShownByDefault={ false }
 						>
 							<UnitControl
-								__next40pxDefaultSize
 								label="Width"
 								value={ width }
 								onChange={ ( next ) => setWidth( next ) }
@@ -274,7 +267,6 @@ export const WithOptionalItemsPlusIcon: StoryFn< typeof ToolsPanel > = ( {
 							isShownByDefault={ false }
 						>
 							<UnitControl
-								__next40pxDefaultSize
 								label="Height"
 								value={ height }
 								onChange={ ( next ) => setHeight( next ) }
@@ -355,7 +347,6 @@ export const WithSlotFillItems: StoryFn< typeof ToolsPanel > = ( {
 					panelId={ panelId }
 				>
 					<UnitControl
-						__next40pxDefaultSize
 						label="Injected Width"
 						value={ width }
 						onChange={ ( next ) =>
@@ -371,7 +362,6 @@ export const WithSlotFillItems: StoryFn< typeof ToolsPanel > = ( {
 					panelId={ panelId }
 				>
 					<UnitControl
-						__next40pxDefaultSize
 						label="Injected Height"
 						value={ height }
 						onChange={ ( next ) =>
@@ -457,7 +447,6 @@ export const WithConditionalDefaultControl: StoryFn< typeof ToolsPanel > = ( {
 					isShownByDefault
 				>
 					<UnitControl
-						__next40pxDefaultSize
 						label="Injected Height"
 						value={ height }
 						onChange={ ( next ) =>
@@ -557,7 +546,6 @@ export const WithConditionallyRenderedControl: StoryFn<
 					isShownByDefault
 				>
 					<UnitControl
-						__next40pxDefaultSize
 						label="Injected Height"
 						value={ height }
 						onChange={ ( next ) =>

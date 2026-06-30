@@ -15,7 +15,6 @@ The following components are checked by this rule:
 -   NumberControl
 -   SelectControl
 -   ToggleGroupControl
--   UnitControl
 
 Examples of **incorrect** code for this rule:
 
