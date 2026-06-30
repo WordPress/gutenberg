@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { isBlobURL } from '@wordpress/blob';
 import {
 	ExternalLink,
 	FocalPointPicker,
@@ -11,7 +10,6 @@ import {
 	TextControl,
 	CheckboxControl,
 	ToolbarButton,
-	ToolbarGroup,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUseCustomUnits as useCustomUnits,
@@ -50,7 +48,7 @@ import {
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
 import { getBlockBindingsSource, switchToBlockType } from '@wordpress/blocks';
-import { crop, overlayText, upload, chevronDown } from '@wordpress/icons';
+import { crop, overlayText, chevronDown } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -59,7 +57,6 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { unlock } from '../lock-unlock';
 import { createUpgradedEmbedBlock } from '../embed/util';
-import { isExternalImage } from './edit';
 import { Caption } from '../utils/caption';
 import { MediaControl } from '../utils/media-control';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
@@ -389,7 +386,7 @@ export default function Image( {
 		},
 		[ clientId ]
 	);
-	const { getBlock, getSettings } = useSelect( blockEditorStore );
+	const { getBlock } = useSelect( blockEditorStore );
 	const cropButtonRef = useRef();
 	const handleMediaEditorModalClose = useCallback(
 		() => cropButtonRef.current?.focus(),
@@ -406,8 +403,7 @@ export default function Image( {
 		toggleSelection,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
-	const { createErrorNotice, createSuccessNotice } =
-		useDispatch( noticesStore );
+	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { editEntityRecord } = useDispatch( coreStore );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -416,7 +412,6 @@ export default function Image( {
 		{ loadedNaturalWidth, loadedNaturalHeight },
 		setLoadedNaturalSize,
 	] = useState( {} );
-	const [ externalBlob, setExternalBlob ] = useState();
 	const [ hasImageErrored, setHasImageErrored ] = useState( false );
 	const hasNonContentControls = blockEditingMode === 'default';
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';
@@ -462,32 +457,6 @@ export default function Image( {
 		setAttributes,
 		__unstableMarkNextChangeAsNotPersistent,
 	] );
-
-	// If an image is externally hosted, try to fetch the image data. This may
-	// fail if the image host doesn't allow CORS with the domain. If it works,
-	// we can enable a button in the toolbar to upload the image.
-	useEffect( () => {
-		if (
-			! isExternalImage( id, url ) ||
-			! isSingleSelected ||
-			! getSettings().mediaUpload
-		) {
-			setExternalBlob();
-			return;
-		}
-
-		if ( externalBlob ) {
-			return;
-		}
-
-		window
-			// Avoid cache, which seems to help avoid CORS problems.
-			.fetch( url.includes( '?' ) ? url : url + '?' )
-			.then( ( response ) => response.blob() )
-			.then( ( blob ) => setExternalBlob( blob ) )
-			// Do nothing, cannot upload.
-			.catch( () => {} );
-	}, [ id, url, isSingleSelected, externalBlob, getSettings ] );
 
 	// Get naturalWidth and naturalHeight from image, and fall back to loaded natural
 	// width and height. This resolves an issue in Safari where the loaded natural
@@ -600,38 +569,6 @@ export default function Image( {
 		setAttributes( {
 			url: newUrl,
 			sizeSlug: newSizeSlug,
-		} );
-	}
-
-	function uploadExternal() {
-		const { mediaUpload } = getSettings();
-		if ( ! mediaUpload ) {
-			return;
-		}
-		let notified = false;
-		mediaUpload( {
-			filesList: [ externalBlob ],
-			onFileChange( [ img ] ) {
-				onSelectImage( img );
-
-				if ( isBlobURL( img.url ) ) {
-					return;
-				}
-
-				// With client-side media processing, onFileChange fires
-				// for each generated sub-size. Only show the notice once.
-				if ( ! notified ) {
-					notified = true;
-					setExternalBlob();
-					createSuccessNotice( __( 'Image uploaded.' ), {
-						type: 'snackbar',
-					} );
-				}
-			},
-			allowedTypes: ALLOWED_MEDIA_TYPES,
-			onError( message ) {
-				createErrorNotice( message, { type: 'snackbar' } );
-			},
 		} );
 	}
 
@@ -939,17 +876,6 @@ export default function Image( {
 							onClick={ switchToCover }
 						/>
 					) }
-				</BlockControls>
-			) }
-			{ isSingleSelected && externalBlob && (
-				<BlockControls>
-					<ToolbarGroup>
-						<ToolbarButton
-							onClick={ uploadExternal }
-							icon={ upload }
-							label={ __( 'Upload to Media Library' ) }
-						/>
-					</ToolbarGroup>
 				</BlockControls>
 			) }
 			{ isContentOnlyMode && (

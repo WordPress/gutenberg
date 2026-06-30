@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Post Publish Panel: Remove the "External media" upload suggestion. It relied on the browser fetching the remote bytes, which is subject to CORS and fails entirely once the editor is cross-origin isolated ([#PRNUMBER](https://github.com/WordPress/gutenberg/pull/PRNUMBER)).
+
 ## 14.49.0 (2026-06-24)
 
 ## 14.48.1 (2026-06-16)
