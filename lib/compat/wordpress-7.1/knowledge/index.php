@@ -1,6 +1,9 @@
 <?php
 /**
- * Knowledge experimental feature.
+ * Knowledge feature bootstrap.
+ *
+ * Loads the public API, the post type, and the REST controllers, then wires
+ * up the Settings → Guidelines admin page.
  *
  * @package gutenberg
  */
@@ -13,6 +16,7 @@ require_once __DIR__ . '/knowledge.php';
 require_once __DIR__ . '/class-gutenberg-knowledge-post-type.php';
 require_once __DIR__ . '/class-gutenberg-knowledge-rest-controller.php';
 require_once __DIR__ . '/class-gutenberg-guideline-scopes-rest-controller.php';
+require_once __DIR__ . '/guidelines-settings-page.php';
 
 /*
  * Register the knowledge post type.

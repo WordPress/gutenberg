@@ -124,6 +124,7 @@ require __DIR__ . '/compat/wordpress-7.1/media.php';
 require __DIR__ . '/compat/wordpress-7.1/preload.php';
 require __DIR__ . '/compat/wordpress-7.1/classic-block.php';
 require __DIR__ . '/compat/wordpress-7.1/icons.php';
+require __DIR__ . '/compat/wordpress-7.1/knowledge/index.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/omnibar/load.php';
@@ -215,12 +216,6 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigatio
 
 // Block patterns for navigation overlays.
 require __DIR__ . '/overlay-patterns.php';
-
-// Guidelines (only load when experiment is enabled).
-if ( gutenberg_is_experiment_enabled( 'gutenberg-guidelines' ) ) {
-	require __DIR__ . '/experimental/knowledge/load.php';
-	require __DIR__ . '/experimental/knowledge/index.php';
-}
 
 // Content types (only load when experiment is enabled).
 if ( gutenberg_is_experiment_enabled( 'gutenberg-content-types' ) ) {

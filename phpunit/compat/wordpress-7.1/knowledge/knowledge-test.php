@@ -1,7 +1,7 @@
 <?php
 /**
  * Tests for the public knowledge functions defined in
- * lib/experimental/knowledge/knowledge.php.
+ * lib/compat/wordpress-7.1/knowledge/knowledge.php.
  *
  * Covers the wp_knowledge_types() registry and its filter, plus the
  * wp_knowledge_maybe_map_term_label() label-mapping filter (both as a
