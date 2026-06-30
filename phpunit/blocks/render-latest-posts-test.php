@@ -41,7 +41,11 @@ class Tests_Blocks_RenderLatestPosts extends WP_UnitTestCase {
 		$file = DIR_TESTDATA . '/images/canola.jpg';
 
 		for ( $i = 0; $i < 5; $i++ ) {
-			self::$posts[ $i ]          = $factory->post->create_and_get();
+			self::$posts[ $i ]          = $factory->post->create_and_get(
+				array(
+					'post_date' => gmdate( 'Y-m-d H:i:s', time() - ( 5 - $i ) ),
+				)
+			);
 			self::$attachment_ids[ $i ] = $factory->attachment->create_upload_object( $file, self::$posts[ $i ]->ID );
 			set_post_thumbnail( self::$posts[ $i ], self::$attachment_ids[ $i ] );
 		}
@@ -149,7 +153,7 @@ class Tests_Blocks_RenderLatestPosts extends WP_UnitTestCase {
 			'addLinkToFeaturedImage' => false,
 		);
 
-		render_block_core_latest_posts( $attributes );
+		gutenberg_render_block_core_latest_posts( $attributes );
 		$args      = $action->get_args();
 		$last_args = end( $args );
 		$this->assertSameSets( self::$attachment_ids, $last_args[1] );
@@ -171,7 +175,7 @@ class Tests_Blocks_RenderLatestPosts extends WP_UnitTestCase {
 			'addLinkToFeaturedImage' => false,
 		);
 
-		render_block_core_latest_posts( $attributes );
+		gutenberg_render_block_core_latest_posts( $attributes );
 		$args      = $action->get_args();
 		$last_args = end( $args );
 		$this->assertContains( self::$posts[0]->ID, $last_args[1], 'Ensure that post is in array of post ids that are primed' );
