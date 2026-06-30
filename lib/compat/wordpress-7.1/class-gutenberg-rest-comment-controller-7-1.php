@@ -405,6 +405,10 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 			);
 		}
 
+		// The canonical reaction slug, populated once validated below so the
+		// stored content matches what was validated (not the raw input).
+		$reaction_slug = null;
+
 		// Validate reaction-specific requirements.
 		if ( ! empty( $request['type'] ) && 'reaction' === $request['type'] ) {
 			// Validate parent is a note.
@@ -451,6 +455,19 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 				$emoji_slug
 			);
 
+			// A hex-shaped slug must still be made of assignable Unicode code
+			// points: reject anything above U+10FFFF or in the UTF-16 surrogate
+			// range (U+D800–U+DFFF).
+			if ( $is_hex_key ) {
+				foreach ( explode( '-', $emoji_slug ) as $codepoint ) {
+					$value = hexdec( $codepoint );
+					if ( $value > 0x10FFFF || ( $value >= 0xD800 && $value <= 0xDFFF ) ) {
+						$is_hex_key = false;
+						break;
+					}
+				}
+			}
+
 			if ( ! $is_curated_slug && ! $is_hex_key ) {
 				return new WP_Error(
 					'rest_comment_invalid_reaction',
@@ -480,6 +497,8 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 					);
 				}
 			}
+
+			$reaction_slug = $emoji_slug;
 		}
 
 		$prepared_comment = $this->prepare_item_for_database( $request );
@@ -488,6 +507,13 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 		}
 
 		$prepared_comment['comment_type'] = $request['type'];
+
+		// Persist the validated, canonical reaction slug rather than the raw
+		// request content, so stored values stay consistent for grouping and
+		// counting (e.g. "<b>heart</b>" is stored as "heart").
+		if ( null !== $reaction_slug ) {
+			$prepared_comment['comment_content'] = $reaction_slug;
+		}
 
 		if ( ! isset( $prepared_comment['comment_content'] ) ) {
 			$prepared_comment['comment_content'] = '';
