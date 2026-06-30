@@ -14,8 +14,8 @@ type ViewProps< T extends React.ElementType > = WordPressComponentProps<
 	T
 > & {
 	/**
-	 * Legacy Emotion prop accepted by `View` so it does not leak to the
-	 * rendered element.
+	 * Legacy Emotion prop accepted as a no-op by `View` so it does not leak to
+	 * the rendered element.
 	 *
 	 * @deprecated This prop no longer has any effect.
 	 * @ignore
