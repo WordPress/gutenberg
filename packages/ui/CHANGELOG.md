@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.16.1 (2026-06-30)
+
 ### Internal
 
 -   Add a temporary `@wordpress/theme` `ThemeProvider` compatibility fallback for older WordPress runtimes ([#79620](https://github.com/WordPress/gutenberg/pull/79620)).
