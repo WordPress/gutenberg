@@ -1,3 +1,4 @@
+import type { BorderRadiusSize } from '@wordpress/theme';
 import { type ComponentProps } from '../utils/types';
 
 export interface SkeletonProps extends ComponentProps< 'div' > {
@@ -7,7 +8,7 @@ export interface SkeletonProps extends ComponentProps< 'div' > {
 	 *
 	 * @default 'md'
 	 */
-	radius?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
+	radius?: BorderRadiusSize | 'full' | 'none';
 
 	/**
 	 * The loading animation.
