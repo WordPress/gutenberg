@@ -12,7 +12,7 @@
     -   `FormFileUpload` ([#79655](https://github.com/WordPress/gutenberg/pull/79655))
     -   `RangeControl` ([#79590](https://github.com/WordPress/gutenberg/pull/79590))
     -   `TreeSelect` ([#79550](https://github.com/WordPress/gutenberg/pull/79550))
-    -   `UnitControl` ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD))
+    -   `UnitControl` ([#79721](https://github.com/WordPress/gutenberg/pull/79721))
 
 ### Documentation
 
