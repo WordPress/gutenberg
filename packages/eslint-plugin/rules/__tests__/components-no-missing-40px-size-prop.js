@@ -113,10 +113,8 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 					ComboboxControl,
 					CustomSelectControl,
 					FontAppearanceControl,
-					FontFamilyControl,
 					FormTokenField,
 					InputControl,
-					LineHeightControl,
 					NumberControl,
 					RangeControl,
 					SelectControl,
@@ -127,12 +125,10 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 					<ComboboxControl __next40pxDefaultSize />
 					<CustomSelectControl __next40pxDefaultSize />
 					<FontAppearanceControl __next40pxDefaultSize />
-					<FontFamilyControl __next40pxDefaultSize />
 					<FormTokenField __next40pxDefaultSize />
 					<InputControl __next40pxDefaultSize />
-					<LineHeightControl __next40pxDefaultSize />
 					<NumberControl __next40pxDefaultSize />
-					<RangeControl __next40pxDefaultSize />
+					<RangeControl />
 					<SelectControl __next40pxDefaultSize />
 					<ToggleGroupControl __next40pxDefaultSize />
 					<UnitControl __next40pxDefaultSize />

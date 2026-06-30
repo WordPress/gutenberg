@@ -69,7 +69,6 @@ function SizeControl( props: SizeControlProps ) {
 				<FlexItem isBlock>
 					<Spacer marginX={ 2 } marginBottom={ 0 }>
 						<RangeControl
-							__next40pxDefaultSize
 							label={ label }
 							hideLabelFromVision
 							value={ valueQuantity }

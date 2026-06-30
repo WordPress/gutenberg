@@ -14,31 +14,30 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
-import {
-	privateApis as blocksPrivateApis,
-	store as blocksStore,
-} from '@wordpress/blocks';
+import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-import { unlock } from '@wordpress/routes-lock-unlock';
 
 /**
  * Internal dependencies
  */
-import { saveGuidelines } from '../api';
-import { store as coreGuidelinesStore } from '../store';
+import { blockSlug, saveGuidelineRow, deleteGuidelineRow } from '../data';
+import type { ContentBlock, GuidelineRow, GuidelineQuery } from '../types';
 import './block-guideline-modal.scss';
-
-const { isContentBlock } = unlock( blocksPrivateApis );
 
 interface BlockGuidelineModalProps {
 	closeModal: () => void;
 	initialBlock?: string;
+	contentBlocks: ContentBlock[];
+	bySlug: Record< string, GuidelineRow >;
+	query: GuidelineQuery;
 }
 
 export default function BlockGuidelineModal( {
 	closeModal,
 	initialBlock,
+	contentBlocks,
+	bySlug,
+	query,
 }: BlockGuidelineModalProps ) {
 	const [ selectedBlock, setSelectedBlock ] = useState< string | undefined >(
 		initialBlock
@@ -49,50 +48,34 @@ export default function BlockGuidelineModal( {
 	const [ showRemoveConfirmation, setShowRemoveConfirmation ] =
 		useState( false );
 
-	const blockGuidelines = useSelect(
-		( select ) => select( coreGuidelinesStore ).getBlockGuidelines(),
-		[]
-	);
-
 	const isEditing = !! initialBlock;
 
-	const currentGuideline = blockGuidelines[ selectedBlock ] ?? '';
+	const currentGuideline = selectedBlock
+		? bySlug[ blockSlug( selectedBlock ) ]?.content ?? ''
+		: '';
 	const [ guidelineText, setGuidelineText ] = useState( currentGuideline );
 
-	const blockOptions = useSelect(
-		// @ts-ignore
-		( select ) => select( blocksStore ).getBlockTypes(),
-		[]
-	);
-
 	const availableBlockOptions = useMemo( () => {
-		const set = new Set( Object.keys( blockGuidelines ) );
-		if ( initialBlock ) {
-			set.delete( initialBlock );
-		}
-		if ( selectedBlock ) {
-			set.delete( selectedBlock );
-		}
-
-		return blockOptions
+		return contentBlocks
 			.filter(
 				( block ) =>
-					isContentBlock( block.name ) && ! set.has( block.name )
+					! bySlug[ blockSlug( block.name ) ] ||
+					block.name === selectedBlock
 			)
+			.filter( ( block ) => block.name !== initialBlock )
 			.map( ( block ) => ( {
 				value: block.name,
 				label: block.title,
 			} ) );
-	}, [ blockGuidelines, blockOptions, initialBlock, selectedBlock ] );
+	}, [ contentBlocks, bySlug, initialBlock, selectedBlock ] );
 
 	const selectedBlockLabel = useMemo(
 		() =>
-			blockOptions.find( ( block ) => block.name === selectedBlock )
+			contentBlocks.find( ( block ) => block.name === selectedBlock )
 				?.title || '',
-		[ blockOptions, selectedBlock ]
+		[ contentBlocks, selectedBlock ]
 	);
 
-	const { setBlockGuideline } = useDispatch( coreGuidelinesStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	const handleSave = ( value: string ) => {
@@ -102,9 +85,25 @@ export default function BlockGuidelineModal( {
 		}
 
 		setIsSaving( true );
-		const oldValue = blockGuidelines[ selectedBlock ];
-		setBlockGuideline( selectedBlock, value );
-		saveGuidelines()
+		const slug = blockSlug( selectedBlock );
+		const existingId = bySlug[ slug ]?.id;
+
+		let operation: Promise< void >;
+		if ( value ) {
+			operation = saveGuidelineRow(
+				slug,
+				selectedBlock,
+				value,
+				existingId,
+				query
+			);
+		} else if ( existingId ) {
+			operation = deleteGuidelineRow( existingId );
+		} else {
+			operation = Promise.resolve();
+		}
+
+		operation
 			.then( () => {
 				setError( null );
 				createSuccessNotice(
@@ -115,10 +114,7 @@ export default function BlockGuidelineModal( {
 				);
 				closeModal();
 			} )
-			.catch( ( e: Error ) => {
-				setError( e.message );
-				setBlockGuideline( selectedBlock, oldValue );
-			} )
+			.catch( ( e: Error ) => setError( e.message ) )
 			.finally( () => setIsSaving( false ) );
 	};
 
@@ -210,8 +206,6 @@ export default function BlockGuidelineModal( {
 				title={ __( 'Remove block guidelines' ) }
 				__experimentalHideHeader={ false }
 				onConfirm={ () => {
-					// We need to pass an empty string to remove the guideline.
-					// This is because the API will only remove the guideline if the value is an empty string.
 					handleSave( '' );
 					setShowRemoveConfirmation( false );
 				} }
@@ -223,7 +217,7 @@ export default function BlockGuidelineModal( {
 				{ sprintf(
 					/* translators: %s: Block name. */
 					__(
-						'You are about to remove the block guidelines for the %s block. This can be undone from revision history.'
+						'You are about to remove the block guidelines for the %s block.'
 					),
 					selectedBlockLabel
 				) }

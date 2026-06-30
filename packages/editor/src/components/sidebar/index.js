@@ -20,6 +20,7 @@ import PatternOverridesPanel from '../pattern-overrides-panel';
 import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
 import PluginSidebar from '../plugin-sidebar';
 import PostSummary from './post-summary';
+import DataFormPostSummary from './dataform-post-summary';
 import PostRevisionSummary from './post-revision-summary';
 import PostTaxonomiesPanel from '../post-taxonomies/panel';
 import PostTransformPanel from '../post-transform-panel';
@@ -32,11 +33,6 @@ import useAutoSwitchEditorSidebars from '../provider/use-auto-switch-editor-side
 import { sidebars } from './constants';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
-import {
-	NAVIGATION_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
-	TEMPLATE_POST_TYPE,
-} from '../../store/constants';
 
 const { Tabs } = unlock( componentsPrivateApis );
 
@@ -47,7 +43,6 @@ const SidebarContent = ( {
 	keyboardShortcut,
 	onActionPerformed,
 	extraPanels,
-	postType,
 } ) => {
 	const tabListRef = useRef( null );
 	// Because `PluginSidebar` renders a `ComplementaryArea`, we
@@ -89,15 +84,20 @@ const SidebarContent = ( {
 	if ( isRevisionsMode ) {
 		tabContent = <PostRevisionSummary />;
 	} else {
+		const isDataFormInspectorEnabled =
+			window?.__experimentalDataFormInspector;
 		tabContent = (
 			<>
-				<PostSummary onActionPerformed={ onActionPerformed } />
+				{ isDataFormInspectorEnabled ? (
+					<DataFormPostSummary
+						onActionPerformed={ onActionPerformed }
+					/>
+				) : (
+					<PostSummary onActionPerformed={ onActionPerformed } />
+				) }
 				<PluginDocumentSettingPanel.Slot />
 				<TemplateContentPanel />
-				{ window?.__experimentalDataFormInspector &&
-					[ 'page', 'post' ].includes( postType ) && (
-						<TemplateActionsPanel />
-					) }
+				{ isDataFormInspectorEnabled && <TemplateActionsPanel /> }
 				<TemplatePartContentPanel />
 				<PostTransformPanel />
 				<PostTaxonomiesPanel />
@@ -144,42 +144,29 @@ const SidebarContent = ( {
 
 const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 	useAutoSwitchEditorSidebars();
-	const { tabName, keyboardShortcut, showSummary, postType } = useSelect(
-		( select ) => {
-			const shortcut = select(
-				keyboardShortcutsStore
-			).getShortcutRepresentation( 'core/editor/toggle-sidebar' );
+	const { tabName, keyboardShortcut } = useSelect( ( select ) => {
+		const shortcut = select(
+			keyboardShortcutsStore
+		).getShortcutRepresentation( 'core/editor/toggle-sidebar' );
 
-			const sidebar =
-				select( interfaceStore ).getActiveComplementaryArea( 'core' );
-			const _isEditorSidebarOpened = [
-				sidebars.block,
-				sidebars.document,
-			].includes( sidebar );
-			let _tabName = sidebar;
-			if ( ! _isEditorSidebarOpened ) {
-				_tabName = !! select(
-					blockEditorStore
-				).getBlockSelectionStart()
-					? sidebars.block
-					: sidebars.document;
-			}
+		const sidebar =
+			select( interfaceStore ).getActiveComplementaryArea( 'core' );
+		const _isEditorSidebarOpened = [
+			sidebars.block,
+			sidebars.document,
+		].includes( sidebar );
+		let _tabName = sidebar;
+		if ( ! _isEditorSidebarOpened ) {
+			_tabName = !! select( blockEditorStore ).getBlockSelectionStart()
+				? sidebars.block
+				: sidebars.document;
+		}
 
-			const _postType = select( editorStore ).getCurrentPostType();
-
-			return {
-				tabName: _tabName,
-				keyboardShortcut: shortcut,
-				showSummary: ! [
-					TEMPLATE_POST_TYPE,
-					TEMPLATE_PART_POST_TYPE,
-					NAVIGATION_POST_TYPE,
-				].includes( _postType ),
-				postType: _postType,
-			};
-		},
-		[]
-	);
+		return {
+			tabName: _tabName,
+			keyboardShortcut: shortcut,
+		};
+	}, [] );
 
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
@@ -201,10 +188,8 @@ const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 			<SidebarContent
 				tabName={ tabName }
 				keyboardShortcut={ keyboardShortcut }
-				showSummary={ showSummary }
 				onActionPerformed={ onActionPerformed }
 				extraPanels={ extraPanels }
-				postType={ postType }
 			/>
 		</Tabs>
 	);

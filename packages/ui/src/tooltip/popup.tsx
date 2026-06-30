@@ -1,11 +1,11 @@
 import clsx from 'clsx';
 import { Tooltip as _Tooltip } from '@base-ui/react/tooltip';
 import { forwardRef } from '@wordpress/element';
-import { ThemeProvider } from '@wordpress/theme';
 import type { PopupProps } from './types';
 import { Portal } from './portal';
 import { Positioner } from './positioner';
 import { renderSlotWithChildren } from '../utils/render-slot-with-children';
+import { ThemeProvider } from '../utils/theme-provider';
 import styles from './style.module.css';
 
 /*

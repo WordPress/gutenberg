@@ -8228,7 +8228,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'to_prepend' => '.pre ',
 				'expected'   => '.pre .a ,.pre   .b ,.pre  .c',
 			),
-			'where with internal commas no top-level comma' => array(
+			'where with internal commas and no top-level comma' => array(
 				'selector'   => ':where(.a, .b)',
 				'to_prepend' => '.scope ',
 				'expected'   => '.scope :where(.a, .b)',

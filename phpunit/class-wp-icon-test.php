@@ -20,8 +20,9 @@ class Tests_Icons_WpGetIcon extends WP_UnitTestCase {
 
 	public function test_wp_get_icon_default_attributes() {
 		$output = wp_get_icon( 'core/plus' );
-		// WP_HTML_Tag_Processor lowercases attribute names.
-		$this->assertStringContainsString( 'viewbox="0 0 24 24"', $output );
+		// WP 7.0+ lowercases `viewBox` to `viewbox` via the HTML API in
+		// `wp_kses()`; older versions keep the original casing.
+		$this->assertStringContainsStringIgnoringCase( 'viewbox="0 0 24 24"', $output );
 		$this->assertStringContainsString( 'width="24"', $output );
 		$this->assertStringContainsString( 'height="24"', $output );
 		$this->assertStringContainsString( 'aria-hidden="true"', $output );
