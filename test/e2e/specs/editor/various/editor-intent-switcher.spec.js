@@ -10,8 +10,18 @@ async function openIntentSwitcher( page ) {
 }
 
 test.describe( 'Editor intent switcher', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.setGutenbergExperiments( [
+			'gutenberg-suggestion-mode',
+		] );
+	} );
+
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.setGutenbergExperiments( [] );
 	} );
 
 	test( 'defaults to Edit intent on every editor load', async ( {

@@ -46,12 +46,19 @@ async function waitForSuggestionSaved( page ) {
 }
 
 test.describe( 'Suggestion mode', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.setGutenbergExperiments( [
+			'gutenberg-suggestion-mode',
+		] );
+	} );
+
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllComments( 'note' );
+		await requestUtils.setGutenbergExperiments( [] );
 	} );
 
 	test( 'announces the mode change with a snackbar', async ( { page } ) => {
