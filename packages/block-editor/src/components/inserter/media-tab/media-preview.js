@@ -127,13 +127,13 @@ export function MediaPreview( { media, onClick, category } ) {
 		useState( false );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ isInserting, setIsInserting ] = useState( false );
+	const { getSettings, getBlock } = useSelect( blockEditorStore );
 	const [ block, preview ] = useMemo(
 		() => getBlockAndPreviewFromMedia( media, category.mediaType ),
 		[ media, category.mediaType ]
 	);
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
-	const { getSettings, getBlock } = useSelect( blockEditorStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const onMediaInsert = useCallback(
@@ -184,14 +184,38 @@ export function MediaPreview( { media, onClick, category } ) {
 
 							if ( ! getBlock( clonedBlock.clientId ) ) {
 								// Ensure the block is only inserted once.
-								onClick( {
-									...clonedBlock,
-									attributes: {
-										...clonedBlock.attributes,
-										id: img.id,
-										url: img.url,
-									},
-								} );
+								if (
+									clonedBlock.name === 'core/image' &&
+									img.media_type === 'image'
+								) {
+									const sizeSlug =
+										img.sizes?.[
+											settings.imageDefaultSize
+										] ||
+										img.media_details?.sizes?.[
+											settings.imageDefaultSize
+										]
+											? settings.imageDefaultSize
+											: 'full';
+									onClick( {
+										...clonedBlock,
+										attributes: {
+											...clonedBlock.attributes,
+											id: img.id,
+											url: img.url,
+											sizeSlug,
+										},
+									} );
+								} else {
+									onClick( {
+										...clonedBlock,
+										attributes: {
+											...clonedBlock.attributes,
+											id: img.id,
+											url: img.url,
+										},
+									} );
+								}
 
 								createSuccessNotice(
 									__( 'Image uploaded and inserted.' ),
@@ -205,7 +229,6 @@ export function MediaPreview( { media, onClick, category } ) {
 									url: img.url,
 								} );
 							}
-
 							setIsInserting( false );
 						},
 						allowedTypes: ALLOWED_MEDIA_TYPES,

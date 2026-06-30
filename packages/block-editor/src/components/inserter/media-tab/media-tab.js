@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { Button } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -15,8 +16,10 @@ import MediaUpload from '../../media-upload';
 import { useMediaCategories } from './hooks';
 import { getBlockAndPreviewFromMedia } from './utils';
 import MobileTabNavigation from '../mobile-tab-navigation';
+
 import CategoryTabs from '../category-tabs';
 import InserterNoResults from '../no-results';
+import { store as blockEditorStore } from '../../../store';
 
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video', 'audio' ];
 
@@ -30,6 +33,7 @@ function MediaTab( {
 	const mediaCategories = useMediaCategories( rootClientId );
 	const isMobile = useViewportMatch( 'medium', '<' );
 	const baseCssClass = 'block-editor-inserter__media-tabs';
+	const { getSettings } = useSelect( blockEditorStore );
 	const onSelectMedia = useCallback(
 		( media ) => {
 			if ( ! media?.url ) {
@@ -41,10 +45,16 @@ function MediaTab( {
 				window.__experimentalDataViewsMediaModal && media.mime_type
 					? media.mime_type.split( '/' )[ 0 ]
 					: media.type;
-			const [ block ] = getBlockAndPreviewFromMedia( media, mediaType );
+
+			const { imageDefaultSize } = getSettings();
+			const [ block ] = getBlockAndPreviewFromMedia(
+				media,
+				mediaType,
+				imageDefaultSize
+			);
 			onInsert( block );
 		},
-		[ onInsert ]
+		[ onInsert, getSettings ]
 	);
 	const categories = useMemo(
 		() =>
