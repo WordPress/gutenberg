@@ -1007,16 +1007,6 @@
 			"count": 1
 		}
 	},
-	"packages/compose/src/hooks/use-dragging/index.js": {
-		"react-hooks/immutability": {
-			"count": 1
-		}
-	},
-	"packages/compose/src/hooks/use-focus-return/index.js": {
-		"react-hooks/immutability": {
-			"count": 2
-		}
-	},
 	"packages/compose/src/hooks/use-merge-refs/index.ts": {
 		"react-hooks/refs": {
 			"count": 1
@@ -1343,11 +1333,6 @@
 	"packages/editor/src/components/post-publish-panel/postpublish.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
-		}
-	},
-	"packages/editor/src/components/post-revisions-panel/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
 		}
 	},
 	"packages/editor/src/components/post-status/index.js": {
