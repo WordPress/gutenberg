@@ -186,7 +186,14 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			// root-level entity in `postType`/`postId`. With "Show template" on,
 			// the root becomes the template (wp_template), but media still attaches
 			// to the page being edited.
-			const postTypeObject = getPostType( getCurrentPostType() );
+			//
+			// Guard on a truthy slug: `getPostType()` with no slug resolves the
+			// whole `/wp/v2/types` collection rather than the single, already
+			// fetched record for the current type.
+			const currentPostType = getCurrentPostType();
+			const postTypeObject = currentPostType
+				? getPostType( currentPostType )
+				: undefined;
 
 			function getSectionRootBlock() {
 				if ( renderingMode === 'template-locked' ) {
