@@ -10,7 +10,6 @@ type ActivityWidgetAttributes = {
 
 export default {
 	name: 'core/activity',
-	title: __( 'Activity' ),
 	attributes: [
 		{
 			id: 'perPage',

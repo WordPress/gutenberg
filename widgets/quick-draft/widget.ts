@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { drafts } from '@wordpress/icons';
 
 /*
@@ -9,6 +8,5 @@ import { drafts } from '@wordpress/icons';
  */
 export default {
 	name: 'core/quick-draft',
-	title: __( 'Quick draft' ),
 	icon: drafts,
 };

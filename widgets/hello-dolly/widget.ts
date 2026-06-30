@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { audio } from '@wordpress/icons';
 
 /**
@@ -9,6 +8,5 @@ import { audio } from '@wordpress/icons';
  */
 export default {
 	name: 'core/hello-dolly',
-	title: __( 'Hello Dolly' ),
 	icon: audio,
 };

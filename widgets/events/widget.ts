@@ -15,7 +15,6 @@ import {
 
 export default {
 	name: 'core/events',
-	title: __( 'WordPress events' ),
 	icon: calendar,
 	attributes: [
 		{
