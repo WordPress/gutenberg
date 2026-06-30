@@ -415,26 +415,30 @@ describe( 'Editor actions', () => {
 				category: 'text',
 				save: () => null,
 			} );
-			const post = {
-				id: postId,
-				type: 'post',
-				content: {
-					raw: '<!-- wp:test/block /-->',
-				},
-			};
 
-			registry
-				.dispatch( coreStore )
-				.receiveEntityRecords( 'postType', 'post', post );
-			registry.dispatch( editorStore ).setupEditor( post );
+			try {
+				const post = {
+					id: postId,
+					type: 'post',
+					content: {
+						raw: '<!-- wp:test/block /-->',
+					},
+				};
 
-			expect(
 				registry
-					.select( coreStore )
-					.getEditedEntityRecord( 'postType', 'post', postId )
-					.blocks.map( ( block ) => block.name )
-			).toEqual( [ 'test/block' ] );
-			unregisterBlockType( 'test/block' );
+					.dispatch( coreStore )
+					.receiveEntityRecords( 'postType', 'post', post );
+				registry.dispatch( editorStore ).setupEditor( post );
+
+				expect(
+					registry
+						.select( coreStore )
+						.getEditedEntityRecord( 'postType', 'post', postId )
+						.blocks.map( ( block ) => block.name )
+				).toEqual( [ 'test/block' ] );
+			} finally {
+				unregisterBlockType( 'test/block' );
+			}
 		} );
 	} );
 

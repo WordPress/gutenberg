@@ -426,6 +426,7 @@ export default function useBlockSync( {
 					if ( blocksChanged ) {
 						isPersistent = newIsPersistent;
 						blockHistoryMode = newBlockHistoryMode;
+						lastControlledBlocksRef.current = blocks;
 
 						// For inner block controllers (clientId is set), restore external IDs
 						// before passing blocks to the parent.
