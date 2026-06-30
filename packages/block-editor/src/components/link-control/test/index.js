@@ -69,6 +69,10 @@ jest.mock( '@wordpress/compose', () => ( {
 	useReducedMotion: jest.fn( () => true ),
 } ) );
 
+jest.mock( '@wordpress/a11y', () => ( {
+	speak: jest.fn(),
+} ) );
+
 beforeEach( () => {
 	// Setup a DOM element as a render target.
 	mockFetchSearchSuggestions.mockImplementation( fetchFauxEntitySuggestions );

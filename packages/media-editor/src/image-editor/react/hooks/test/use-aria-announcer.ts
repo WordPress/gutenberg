@@ -4,11 +4,20 @@
 import { act, renderHook } from '@testing-library/react';
 
 /**
+ * WordPress dependencies
+ */
+import { speak } from '@wordpress/a11y';
+
+/**
  * Internal dependencies
  */
 import { useAriaAnnouncer } from '../use-aria-announcer';
 import { DEFAULT_STATE } from '../../../core/constants';
 import type { CropperState } from '../../../core/types';
+
+jest.mock( '@wordpress/a11y', () => ( {
+	speak: jest.fn(),
+} ) );
 
 function makeState( overrides: Partial< CropperState > = {} ): CropperState {
 	return {
@@ -28,6 +37,7 @@ function makeState( overrides: Partial< CropperState > = {} ): CropperState {
 describe( 'useAriaAnnouncer', () => {
 	beforeEach( () => {
 		jest.useFakeTimers();
+		( speak as jest.Mock ).mockClear();
 	} );
 
 	afterEach( () => {
@@ -35,7 +45,7 @@ describe( 'useAriaAnnouncer', () => {
 	} );
 
 	it( 'announces horizontal flip changes', () => {
-		const { result, rerender } = renderHook(
+		const { rerender } = renderHook(
 			( { state } ) => useAriaAnnouncer( state ),
 			{ initialProps: { state: makeState() } }
 		);
@@ -49,7 +59,10 @@ describe( 'useAriaAnnouncer', () => {
 		} );
 		act( () => jest.advanceTimersByTime( 300 ) );
 
-		expect( result.current ).toBe( 'Flipped horizontally' );
+		expect( speak ).toHaveBeenCalledWith(
+			'Flipped horizontally',
+			'polite'
+		);
 
 		rerender( {
 			state: makeState( {
@@ -58,11 +71,11 @@ describe( 'useAriaAnnouncer', () => {
 		} );
 		act( () => jest.advanceTimersByTime( 300 ) );
 
-		expect( result.current ).toBe( 'Flip removed' );
+		expect( speak ).toHaveBeenCalledWith( 'Flip removed', 'polite' );
 	} );
 
 	it( 'announces combined flip state when both axes are active', () => {
-		const { result, rerender } = renderHook(
+		const { rerender } = renderHook(
 			( { state } ) => useAriaAnnouncer( state ),
 			{ initialProps: { state: makeState() } }
 		);
@@ -76,7 +89,10 @@ describe( 'useAriaAnnouncer', () => {
 		} );
 		act( () => jest.advanceTimersByTime( 300 ) );
 
-		expect( result.current ).toBe( 'Flipped horizontally and vertically' );
+		expect( speak ).toHaveBeenCalledWith(
+			'Flipped horizontally and vertically',
+			'polite'
+		);
 	} );
 
 	it( 'announces crop in pixels when image dimensions are available', () => {

@@ -2,6 +2,10 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ValidatedFormTokenField } from '../components';
 
+jest.mock( '@wordpress/a11y', () => ( {
+	speak: jest.fn(),
+} ) );
+
 describe( 'ValidatedFormTokenField', () => {
 	it( 'should preserve the built-in howto description', () => {
 		render(
