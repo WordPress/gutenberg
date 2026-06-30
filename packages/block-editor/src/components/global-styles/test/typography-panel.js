@@ -32,6 +32,62 @@ async function renderAndSettle( ui ) {
 }
 
 /**
+ * Renders `TypographyPanel` with sensible defaults so tests only pass the
+ * props they actually care about (usually `value` and `inheritedValue`).
+ *
+ * @param {Object} props Props to override the defaults.
+ * @return {ReturnType<typeof render>} The `render()` result.
+ */
+function renderPanel( props ) {
+	return render(
+		<TypographyPanel
+			value={ {} }
+			settings={ baseSettings }
+			onChange={ () => {} }
+			panelId="test-panel"
+			{ ...props }
+		/>
+	);
+}
+
+/**
+ * Async variant of `renderPanel` for controls (Ariakit-based) that need
+ * their effects flushed. See `renderAndSettle`.
+ *
+ * @param {Object} props Props to override the defaults.
+ * @return {Promise<ReturnType<typeof render>>} The settled `render()` result.
+ */
+function renderPanelAndSettle( props ) {
+	return renderAndSettle(
+		<TypographyPanel
+			value={ {} }
+			settings={ baseSettings }
+			onChange={ () => {} }
+			panelId="test-panel"
+			{ ...props }
+		/>
+	);
+}
+
+/**
+ * Asserts whether an input carries the at-rest inherited-value cue, i.e. the
+ * `is-inherited-from-global-styles` class hook applied to a wrapping element.
+ *
+ * @param {HTMLElement} input    The control input to check.
+ * @param {boolean}     expected Whether the cue is expected to be present.
+ */
+function expectInheritedCue( input, expected ) {
+	const wrapper =
+		// eslint-disable-next-line testing-library/no-node-access -- the cue is a class hook on a wrapper element with no role/label of its own.
+		input.closest( '.is-inherited-from-global-styles' );
+	if ( expected ) {
+		expect( wrapper ).not.toBeNull();
+	} else {
+		expect( wrapper ).toBeNull();
+	}
+}
+
+/**
  * Tests for inherited values in `TypographyPanel`.
  *
  * The tests intentionally target representative control paths rather than full
@@ -96,23 +152,12 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 			typography: { lineHeight: '1.7' },
 		};
 
-		render(
-			<TypographyPanel
-				value={ {} }
-				inheritedValue={ inheritedValue }
-				settings={ baseSettings }
-				onChange={ () => {} }
-				panelId="test-panel"
-			/>
-		);
+		renderPanel( { inheritedValue } );
 
 		const lineHeightInput = screen.getByLabelText( /line height/i );
 		expect( lineHeightInput ).toHaveValue( null );
 		expect( lineHeightInput ).toHaveAttribute( 'placeholder', '1.7' );
-		expect(
-			// eslint-disable-next-line testing-library/no-node-access
-			lineHeightInput.closest( '.is-inherited-from-global-styles' )
-		).not.toBeNull();
+		expectInheritedCue( lineHeightInput, true );
 	} );
 
 	it( 'renders an integer leaf from `inheritedValue` as placeholder when `value` is empty', () => {
@@ -124,15 +169,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 			typography: { textColumns: 3 },
 		};
 
-		render(
-			<TypographyPanel
-				value={ {} }
-				inheritedValue={ inheritedValue }
-				settings={ baseSettings }
-				onChange={ () => {} }
-				panelId="test-panel"
-			/>
-		);
+		renderPanel( { inheritedValue } );
 
 		const columnsInput = screen.getByLabelText( /columns/i );
 		// No locally-set value; the rendered value is empty.
@@ -146,10 +183,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 		// The className lives on a wrapper of the input by NumberControl
 		// design; verifying it requires walking up the DOM tree, which
 		// the testing-library/no-node-access rule warns against.
-		expect(
-			// eslint-disable-next-line testing-library/no-node-access
-			columnsInput.closest( '.is-inherited-from-global-styles' )
-		).not.toBeNull();
+		expectInheritedCue( columnsInput, true );
 	} );
 
 	it( 'renders a locally-set integer leaf as the value, with no placeholder, even when `inheritedValue` also defines it', () => {
@@ -163,46 +197,24 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 			typography: { textColumns: 5 },
 		};
 
-		render(
-			<TypographyPanel
-				value={ value }
-				inheritedValue={ inheritedValue }
-				settings={ baseSettings }
-				onChange={ () => {} }
-				panelId="test-panel"
-			/>
-		);
+		renderPanel( { value, inheritedValue } );
 
 		const columnsInput = screen.getByLabelText( /columns/i );
 		expect( columnsInput ).toHaveValue( 5 );
 		expect( columnsInput ).not.toHaveAttribute( 'placeholder' );
-		expect(
-			// eslint-disable-next-line testing-library/no-node-access
-			columnsInput.closest( '.is-inherited-from-global-styles' )
-		).toBeNull();
+		expectInheritedCue( columnsInput, false );
 	} );
 
 	it( 'shows no placeholder for an integer leaf when `inheritedValue` also omits it', () => {
 		// Without an inherited value, there is nothing to communicate
 		// as a placeholder; the input renders as an ordinary empty
 		// NumberControl.
-		render(
-			<TypographyPanel
-				value={ {} }
-				inheritedValue={ {} }
-				settings={ baseSettings }
-				onChange={ () => {} }
-				panelId="test-panel"
-			/>
-		);
+		renderPanel( { inheritedValue: {} } );
 
 		const columnsInput = screen.getByLabelText( /columns/i );
 		expect( columnsInput ).toHaveValue( null );
 		expect( columnsInput ).not.toHaveAttribute( 'placeholder' );
-		expect(
-			// eslint-disable-next-line testing-library/no-node-access
-			columnsInput.closest( '.is-inherited-from-global-styles' )
-		).toBeNull();
+		expectInheritedCue( columnsInput, false );
 	} );
 
 	it( 'commits a local override on user input without copying the inherited value into other paths', async () => {
@@ -214,15 +226,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 			typography: { textColumns: 3, lineHeight: '1.7' },
 		};
 
-		render(
-			<TypographyPanel
-				value={ {} }
-				inheritedValue={ inheritedValue }
-				settings={ baseSettings }
-				onChange={ onChange }
-				panelId="test-panel"
-			/>
-		);
+		renderPanel( { inheritedValue, onChange } );
 
 		const columnsInput = screen.getByLabelText( /columns/i );
 		await user.type( columnsInput, '2' );
@@ -254,15 +258,10 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 			typography: { textColumns: 3 },
 		};
 
-		const { rerender } = render(
-			<TypographyPanel
-				value={ { typography: { textColumns: 5 } } }
-				inheritedValue={ inheritedValue }
-				settings={ baseSettings }
-				onChange={ () => {} }
-				panelId="test-panel"
-			/>
-		);
+		const { rerender } = renderPanel( {
+			value: { typography: { textColumns: 5 } },
+			inheritedValue,
+		} );
 
 		// See locally-set value first.
 		expect( screen.getByLabelText( /columns/i ) ).toHaveValue( 5 );
@@ -285,10 +284,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 		const columnsInput = screen.getByLabelText( /columns/i );
 		expect( columnsInput ).toHaveValue( null );
 		expect( columnsInput ).toHaveAttribute( 'placeholder', '3' );
-		expect(
-			// eslint-disable-next-line testing-library/no-node-access
-			columnsInput.closest( '.is-inherited-from-global-styles' )
-		).not.toBeNull();
+		expectInheritedCue( columnsInput, true );
 	} );
 
 	it( 'renders a locally-set numeric leaf as the value, with no placeholder, even when `inheritedValue` also defines it', () => {
@@ -301,22 +297,11 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 			typography: { lineHeight: '1.4' },
 		};
 
-		render(
-			<TypographyPanel
-				value={ value }
-				inheritedValue={ inheritedValue }
-				settings={ baseSettings }
-				onChange={ () => {} }
-				panelId="test-panel"
-			/>
-		);
+		renderPanel( { value, inheritedValue } );
 
 		const lineHeightInput = screen.getByLabelText( /line height/i );
 		expect( lineHeightInput ).toHaveValue( 1.4 );
-		expect(
-			// eslint-disable-next-line testing-library/no-node-access
-			lineHeightInput.closest( '.is-inherited-from-global-styles' )
-		).toBeNull();
+		expectInheritedCue( lineHeightInput, false );
 	} );
 
 	it( 'renders a unit-string leaf from `inheritedValue` as placeholder when `value` is empty', () => {
@@ -328,23 +313,12 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 			typography: { letterSpacing: '0.5px' },
 		};
 
-		render(
-			<TypographyPanel
-				value={ {} }
-				inheritedValue={ inheritedValue }
-				settings={ baseSettings }
-				onChange={ () => {} }
-				panelId="test-panel"
-			/>
-		);
+		renderPanel( { inheritedValue } );
 
 		const letterSpacingInput = screen.getByLabelText( /letter spacing/i );
 		expect( letterSpacingInput ).toHaveValue( null );
 		expect( letterSpacingInput ).toHaveAttribute( 'placeholder', '0.5px' );
-		expect(
-			// eslint-disable-next-line testing-library/no-node-access
-			letterSpacingInput.closest( '.is-inherited-from-global-styles' )
-		).not.toBeNull();
+		expectInheritedCue( letterSpacingInput, true );
 	} );
 
 	it( 'renders a locally-set unit-string leaf as the value, with no placeholder, even when `inheritedValue` also defines it', () => {
@@ -355,23 +329,12 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 			typography: { letterSpacing: '2px' },
 		};
 
-		render(
-			<TypographyPanel
-				value={ value }
-				inheritedValue={ inheritedValue }
-				settings={ baseSettings }
-				onChange={ () => {} }
-				panelId="test-panel"
-			/>
-		);
+		renderPanel( { value, inheritedValue } );
 
 		const letterSpacingInput = screen.getByLabelText( /letter spacing/i );
 		expect( letterSpacingInput ).toHaveValue( 2 );
 		expect( letterSpacingInput ).not.toHaveAttribute( 'placeholder' );
-		expect(
-			// eslint-disable-next-line testing-library/no-node-access
-			letterSpacingInput.closest( '.is-inherited-from-global-styles' )
-		).toBeNull();
+		expectInheritedCue( letterSpacingInput, false );
 	} );
 
 	it( 'placeholder for one input does not leak when other inputs are committed', () => {
@@ -386,60 +349,31 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 			typography: { lineHeight: '1.4' },
 		};
 
-		render(
-			<TypographyPanel
-				value={ value }
-				inheritedValue={ inheritedValue }
-				settings={ baseSettings }
-				onChange={ () => {} }
-				panelId="test-panel"
-			/>
-		);
+		renderPanel( { value, inheritedValue } );
 
 		// lineHeight: locally-set, no placeholder.
 		const lineHeightInput = screen.getByLabelText( /line height/i );
 		expect( lineHeightInput ).toHaveValue( 1.4 );
-		expect(
-			// eslint-disable-next-line testing-library/no-node-access
-			lineHeightInput.closest( '.is-inherited-from-global-styles' )
-		).toBeNull();
+		expectInheritedCue( lineHeightInput, false );
 
 		// letterSpacing: not locally set, placeholder still active.
 		const letterSpacingInput = screen.getByLabelText( /letter spacing/i );
 		expect( letterSpacingInput ).toHaveValue( null );
 		expect( letterSpacingInput ).toHaveAttribute( 'placeholder', '0.5px' );
-		expect(
-			// eslint-disable-next-line testing-library/no-node-access
-			letterSpacingInput.closest( '.is-inherited-from-global-styles' )
-		).not.toBeNull();
+		expectInheritedCue( letterSpacingInput, true );
 	} );
 
 	it( 'falls back to `value` when `inheritedValue` is omitted (pre-feature behaviour is preserved)', () => {
 		// The `inheritedValue = value` default keeps call sites that
 		// have not yet opted into separate inherited data on the existing
 		// code path: no placeholder, no local-value regression.
-		render(
-			<TypographyPanel
-				value={ { typography: { lineHeight: '1.9' } } }
-				settings={ baseSettings }
-				onChange={ () => {} }
-				panelId="test-panel"
-			/>
-		);
+		renderPanel( { value: { typography: { lineHeight: '1.9' } } } );
 
 		expect( screen.getByLabelText( /line height/i ) ).toHaveValue( 1.9 );
 	} );
 
 	it( 'renders nothing for a leaf when both `value` and `inheritedValue` omit it', () => {
-		render(
-			<TypographyPanel
-				value={ {} }
-				inheritedValue={ {} }
-				settings={ baseSettings }
-				onChange={ () => {} }
-				panelId="test-panel"
-			/>
-		);
+		renderPanel( { inheritedValue: {} } );
 
 		// An empty NumberControl input has no `value` attribute applied;
 		// RTL returns `null` (not `0`, not the empty string) for that case.
@@ -458,15 +392,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 		};
 
 		expect( () => {
-			render(
-				<TypographyPanel
-					value={ {} }
-					inheritedValue={ inheritedValue }
-					settings={ baseSettings }
-					onChange={ () => {} }
-					panelId="test-panel"
-				/>
-			);
+			renderPanel( { inheritedValue } );
 		} ).not.toThrow();
 
 		// The Font size ToolsPanelItem label is rendered in the DOM.
@@ -481,15 +407,9 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 				typography: { textDecoration: 'underline' },
 			};
 
-			const { container } = await renderAndSettle(
-				<TypographyPanel
-					value={ {} }
-					inheritedValue={ inheritedValue }
-					settings={ baseSettings }
-					onChange={ () => {} }
-					panelId="test-panel"
-				/>
-			);
+			const { container } = await renderPanelAndSettle( {
+				inheritedValue,
+			} );
 
 			// The at-rest treatment is communicated via the
 			// `is-inherited-from-global-styles` class hook on the
@@ -524,15 +444,11 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 				},
 			};
 
-			await renderAndSettle(
-				<TypographyPanel
-					value={ {} }
-					inheritedValue={ inheritedValue }
-					settings={ settingsWithFonts }
-					onChange={ onChange }
-					panelId="test-panel"
-				/>
-			);
+			await renderPanelAndSettle( {
+				inheritedValue,
+				settings: settingsWithFonts,
+				onChange,
+			} );
 
 			expect( onChange ).not.toHaveBeenCalled();
 		} );
@@ -550,15 +466,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 				typography: { textDecoration: 'underline' },
 			};
 
-			await renderAndSettle(
-				<TypographyPanel
-					value={ {} }
-					inheritedValue={ inheritedValue }
-					settings={ baseSettings }
-					onChange={ onChange }
-					panelId="test-panel"
-				/>
-			);
+			await renderPanelAndSettle( { inheritedValue, onChange } );
 
 			// Click the already-preselected "Underline" option (a
 			// button under `isDeselectable` ToggleGroupControl).
@@ -587,15 +495,10 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 				typography: { textDecoration: 'line-through' },
 			};
 
-			const { container } = await renderAndSettle(
-				<TypographyPanel
-					value={ value }
-					inheritedValue={ inheritedValue }
-					settings={ baseSettings }
-					onChange={ () => {} }
-					panelId="test-panel"
-				/>
-			);
+			const { container } = await renderPanelAndSettle( {
+				value,
+				inheritedValue,
+			} );
 
 			// The locally-set option is the one currently pressed.
 			const pressed = screen.getByRole( 'button', {
@@ -618,15 +521,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 				typography: { textIndent: '2rem' },
 			};
 
-			await renderAndSettle(
-				<TypographyPanel
-					value={ {} }
-					inheritedValue={ inheritedValue }
-					settings={ baseSettings }
-					onChange={ () => {} }
-					panelId="test-panel"
-				/>
-			);
+			await renderPanelAndSettle( { inheritedValue } );
 
 			// `TextIndentControl` in `withSlider` mode renders both a
 			// UnitControl number input AND a RangeControl slider with
@@ -637,10 +532,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 			} );
 			expect( indentInput ).toHaveValue( null );
 			expect( indentInput ).toHaveAttribute( 'placeholder', '2rem' );
-			expect(
-				// eslint-disable-next-line testing-library/no-node-access
-				indentInput.closest( '.is-inherited-from-global-styles' )
-			).not.toBeNull();
+			expectInheritedCue( indentInput, true );
 		} );
 
 		it( 'renders a locally-set textIndent as the value, with no placeholder', async () => {
@@ -651,25 +543,14 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 				typography: { textIndent: '4rem' },
 			};
 
-			await renderAndSettle(
-				<TypographyPanel
-					value={ value }
-					inheritedValue={ inheritedValue }
-					settings={ baseSettings }
-					onChange={ () => {} }
-					panelId="test-panel"
-				/>
-			);
+			await renderPanelAndSettle( { value, inheritedValue } );
 
 			const indentInput = screen.getByRole( 'spinbutton', {
 				name: /line indent/i,
 			} );
 			expect( indentInput ).toHaveValue( 4 );
 			expect( indentInput ).not.toHaveAttribute( 'placeholder' );
-			expect(
-				// eslint-disable-next-line testing-library/no-node-access
-				indentInput.closest( '.is-inherited-from-global-styles' )
-			).toBeNull();
+			expectInheritedCue( indentInput, false );
 		} );
 	} );
 
@@ -680,15 +561,11 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 				typography: { fontStyle: 'italic', fontWeight: '700' },
 			};
 
-			await renderAndSettle(
-				<TypographyPanel
-					value={ {} }
-					inheritedValue={ inheritedValue }
-					settings={ settingsWithFonts }
-					onChange={ onChange }
-					panelId="test-panel"
-				/>
-			);
+			await renderPanelAndSettle( {
+				inheritedValue,
+				settings: settingsWithFonts,
+				onChange,
+			} );
 
 			expect( onChange ).not.toHaveBeenCalled();
 		} );
@@ -698,15 +575,10 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 				typography: { fontStyle: 'italic', fontWeight: '700' },
 			};
 
-			const { container } = await renderAndSettle(
-				<TypographyPanel
-					value={ {} }
-					inheritedValue={ inheritedValue }
-					settings={ settingsWithFonts }
-					onChange={ () => {} }
-					panelId="test-panel"
-				/>
-			);
+			const { container } = await renderPanelAndSettle( {
+				inheritedValue,
+				settings: settingsWithFonts,
+			} );
 
 			expect(
 				// eslint-disable-next-line testing-library/no-node-access, testing-library/no-container -- See class-hook rationale above.
@@ -721,15 +593,11 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 			};
 			const value = { typography: { fontStyle: 'normal' } };
 
-			const { container } = await renderAndSettle(
-				<TypographyPanel
-					value={ value }
-					inheritedValue={ inheritedValue }
-					settings={ settingsWithFonts }
-					onChange={ () => {} }
-					panelId="test-panel"
-				/>
-			);
+			const { container } = await renderPanelAndSettle( {
+				value,
+				inheritedValue,
+				settings: settingsWithFonts,
+			} );
 
 			// Local override → no placeholder treatment on the
 			// font-appearance wrapper.
@@ -757,15 +625,10 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 				typography: { fontFamily: 'Georgia, serif' },
 			};
 
-			const { container } = await renderAndSettle(
-				<TypographyPanel
-					value={ {} }
-					inheritedValue={ inheritedValue }
-					settings={ settingsWithFonts }
-					onChange={ () => {} }
-					panelId="test-panel"
-				/>
-			);
+			const { container } = await renderPanelAndSettle( {
+				inheritedValue,
+				settings: settingsWithFonts,
+			} );
 
 			// FontFamilyControl is a CustomSelectControl; the
 			// className is forwarded onto its trigger button wrapper.
@@ -782,15 +645,11 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 				typography: { fontFamily: 'Georgia, serif' },
 			};
 
-			await renderAndSettle(
-				<TypographyPanel
-					value={ {} }
-					inheritedValue={ inheritedValue }
-					settings={ settingsWithFonts }
-					onChange={ onChange }
-					panelId="test-panel"
-				/>
-			);
+			await renderPanelAndSettle( {
+				inheritedValue,
+				settings: settingsWithFonts,
+				onChange,
+			} );
 
 			expect( onChange ).not.toHaveBeenCalled();
 		} );
@@ -805,15 +664,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 				typography: { fontSize: 'var:preset|font-size|large' },
 			};
 
-			const { container } = render(
-				<TypographyPanel
-					value={ {} }
-					inheritedValue={ inheritedValue }
-					settings={ baseSettings }
-					onChange={ () => {} }
-					panelId="test-panel"
-				/>
-			);
+			const { container } = renderPanel( { inheritedValue } );
 
 			// The decoded human-readable value (`24px`, from the
 			// `large` preset in `baseSettings`) is what reaches the
@@ -846,15 +697,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 					typography: { lineHeight: emptyValue },
 				};
 
-				render(
-					<TypographyPanel
-						value={ {} }
-						inheritedValue={ inheritedValue }
-						settings={ baseSettings }
-						onChange={ () => {} }
-						panelId="test-panel"
-					/>
-				);
+				renderPanel( { inheritedValue } );
 
 				const lineHeightInput = screen.getByLabelText( /line height/i );
 				expect( lineHeightInput ).toHaveValue( null );
@@ -862,12 +705,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 				// because the inherited leaf is explicit-empty.
 				expect( lineHeightInput ).not.toHaveAttribute( 'placeholder' );
 				// And the at-rest className is not on the wrapper.
-				expect(
-					// eslint-disable-next-line testing-library/no-node-access
-					lineHeightInput.closest(
-						'.is-inherited-from-global-styles'
-					)
-				).toBeNull();
+				expectInheritedCue( lineHeightInput, false );
 			}
 		);
 	} );
@@ -878,15 +716,9 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 				typography: { fontSize: 'var:preset|font-size|large' },
 			};
 
-			const { container } = await renderAndSettle(
-				<TypographyPanel
-					value={ {} }
-					inheritedValue={ inheritedValue }
-					settings={ baseSettings }
-					onChange={ () => {} }
-					panelId="test-panel"
-				/>
-			);
+			const { container } = await renderPanelAndSettle( {
+				inheritedValue,
+			} );
 
 			// The at-rest treatment lives on the wrapper div around
 			// FontSizePicker; we look it up by class because there's
@@ -904,15 +736,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 				typography: { fontSize: 'var:preset|font-size|large' },
 			};
 
-			await renderAndSettle(
-				<TypographyPanel
-					value={ {} }
-					inheritedValue={ inheritedValue }
-					settings={ baseSettings }
-					onChange={ onChange }
-					panelId="test-panel"
-				/>
-			);
+			await renderPanelAndSettle( { inheritedValue, onChange } );
 
 			expect( onChange ).not.toHaveBeenCalled();
 		} );
@@ -925,15 +749,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 				typography: { fontSize: 'var:preset|font-size|huge' },
 			};
 
-			await renderAndSettle(
-				<TypographyPanel
-					value={ value }
-					inheritedValue={ inheritedValue }
-					settings={ baseSettings }
-					onChange={ () => {} }
-					panelId="test-panel"
-				/>
-			);
+			await renderPanelAndSettle( { value, inheritedValue } );
 
 			// Local override → no at-rest treatment around the
 			// FontSizePicker's wrapper. Other panel inputs may still
@@ -962,23 +778,12 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 			typography: { lineHeight: 0, textColumns: 0 },
 		};
 
-		render(
-			<TypographyPanel
-				value={ value }
-				inheritedValue={ inheritedValue }
-				settings={ baseSettings }
-				onChange={ () => {} }
-				panelId="test-panel"
-			/>
-		);
+		renderPanel( { value, inheritedValue } );
 
 		const lineHeightInput = screen.getByLabelText( /line height/i );
 		expect( lineHeightInput ).toHaveValue( 0 );
 		expect( lineHeightInput ).not.toHaveAttribute( 'placeholder' );
-		expect(
-			// eslint-disable-next-line testing-library/no-node-access
-			lineHeightInput.closest( '.is-inherited-from-global-styles' )
-		).toBeNull();
+		expectInheritedCue( lineHeightInput, false );
 		expect(
 			// eslint-disable-next-line testing-library/no-node-access
 			lineHeightInput.closest( '.has-local-override-from-global-styles' )
@@ -987,10 +792,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 		const columnsInput = screen.getByLabelText( /columns/i );
 		expect( columnsInput ).toHaveValue( 0 );
 		expect( columnsInput ).not.toHaveAttribute( 'placeholder' );
-		expect(
-			// eslint-disable-next-line testing-library/no-node-access
-			columnsInput.closest( '.is-inherited-from-global-styles' )
-		).toBeNull();
+		expectInheritedCue( columnsInput, false );
 		expect(
 			// eslint-disable-next-line testing-library/no-node-access
 			columnsInput.closest( '.has-local-override-from-global-styles' )
