@@ -288,11 +288,16 @@ export default function ReactionDisplay( {
  * dropdown (the 5-emoji quick row).
  *
  * @param {Object}   props                  Component props.
+ * @param {number}   props.noteId           The parent note comment ID.
  * @param {boolean}  props.disabled         Whether the button is disabled
  *                                          (e.g. on a resolved note thread).
  * @param {Function} props.onToggleReaction Callback to toggle a reaction.
  */
-export function AddReactionButton( { disabled = false, onToggleReaction } ) {
+export function AddReactionButton( {
+	noteId,
+	disabled = false,
+	onToggleReaction,
+} ) {
 	return (
 		<Dropdown
 			popoverProps={ POPOVER_PROPS }
@@ -314,6 +319,9 @@ export function AddReactionButton( { disabled = false, onToggleReaction } ) {
 				<ReactionEmojiPicker
 					onSelect={ ( slug ) => {
 						onClose();
+						// Invalidate cached tooltip names since adding this
+						// reaction changes the set of users for the slug.
+						delete reactionNamesCache[ `${ noteId }:${ slug }` ];
 						onToggleReaction( slug );
 					} }
 				/>
