@@ -203,8 +203,48 @@ export function scopeSelector( scope: string | undefined, selector: string ) {
 
 	const selectorsScoped: string[] = [];
 	scopes.forEach( ( outer ) => {
+		const trimmedOuter = outer.trim();
+		if ( ! trimmedOuter ) {
+			return;
+		}
+
+		// Find the last compound selector of the outer scope.
+		const lastMatch = trimmedOuter.match( /([^\s>+~]+)$/ );
+		const last = lastMatch ? lastMatch[ 0 ] : '';
+
+		// Determine if the last compound selector of the outer scope targets the same element
+		// as the element selectors. If one of the element selectors (inner) is a class/tag of `last`,
+		// then we assume they target the same element.
+		const isSameElement = selectors.some( ( inner ) => {
+			const trimmedInner = inner.trim();
+			if ( trimmedInner.startsWith( '.' ) ) {
+				const className = trimmedInner.split( /[:\s>+~]/ )[ 0 ];
+				const escaped = className.replace(
+					/[-\/\\^$*+?.()|[\]{}]/g,
+					'\\$&'
+				);
+				return new RegExp( escaped + '(?![a-zA-Z0-9_-])' ).test( last );
+			}
+			return false;
+		} );
+
 		selectors.forEach( ( inner ) => {
-			selectorsScoped.push( `${ outer.trim() } ${ inner.trim() }` );
+			const trimmedInner = inner.trim();
+			if ( ! trimmedInner ) {
+				return;
+			}
+
+			if ( isSameElement || trimmedInner.startsWith( ':' ) ) {
+				if ( trimmedOuter.includes( trimmedInner ) ) {
+					selectorsScoped.push( trimmedOuter );
+				} else {
+					selectorsScoped.push(
+						`${ trimmedOuter }${ trimmedInner }`
+					);
+				}
+			} else {
+				selectorsScoped.push( `${ trimmedOuter } ${ trimmedInner }` );
+			}
 		} );
 	} );
 

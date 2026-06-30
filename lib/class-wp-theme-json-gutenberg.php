@@ -2325,15 +2325,46 @@ class WP_Theme_JSON_Gutenberg {
 
 		$selectors_scoped = array();
 		foreach ( $scopes as $outer ) {
+			$outer = trim( $outer );
+			if ( empty( $outer ) ) {
+				continue;
+			}
+
+			// Find the last compound selector of the outer scope.
+			$last = '';
+			if ( preg_match( '/([^\s>+~]+)$/', $outer, $matches ) ) {
+				$last = $matches[1];
+			}
+
+			// Determine if they target the same element.
+			$is_same_element = false;
 			foreach ( $selectors as $inner ) {
-				$outer = trim( $outer );
 				$inner = trim( $inner );
-				if ( ! empty( $outer ) && ! empty( $inner ) ) {
+				if ( str_starts_with( $inner, '.' ) ) {
+					$parts      = preg_split( '/[:\s>+~]/', $inner );
+					$class_name = $parts[0];
+					$escaped    = preg_quote( $class_name, '/' );
+					if ( preg_match( '/' . $escaped . '(?![a-zA-Z0-9_-])/', $last ) ) {
+						$is_same_element = true;
+						break;
+					}
+				}
+			}
+
+			foreach ( $selectors as $inner ) {
+				$inner = trim( $inner );
+				if ( empty( $inner ) ) {
+					continue;
+				}
+
+				if ( $is_same_element || str_starts_with( $inner, ':' ) ) {
+					if ( str_contains( $outer, $inner ) ) {
+						$selectors_scoped[] = $outer;
+					} else {
+						$selectors_scoped[] = $outer . $inner;
+					}
+				} else {
 					$selectors_scoped[] = $outer . ' ' . $inner;
-				} elseif ( empty( $outer ) ) {
-					$selectors_scoped[] = $inner;
-				} elseif ( empty( $inner ) ) {
-					$selectors_scoped[] = $outer;
 				}
 			}
 		}
@@ -5237,7 +5268,7 @@ class WP_Theme_JSON_Gutenberg {
 					$element_selector = array( $el_selector );
 					break;
 				}
-				$element_selector[] = static::prepend_to_selector( $el_selector, $selector . ' ' );
+				$element_selector[] = static::scope_selector( $selector, $el_selector );
 			}
 			$element_selectors[ $el_name ] = implode( ',', $element_selector );
 		}

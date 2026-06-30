@@ -1109,6 +1109,7 @@ export const getNodesWithStyles = (
 										variationName
 								  ]
 								: undefined;
+
 						if (
 							variationSelector &&
 							typeof blockSelectors !== 'string'
@@ -1289,19 +1290,10 @@ export const getNodesWithStyles = (
 					) {
 						nodes.push( {
 							styles: value,
-							selector: blockSelectors[ blockName ]?.selector
-								.split( ',' )
-								.map( ( sel: string ) => {
-									const elementSelectors =
-										ELEMENTS[
-											elementName as ElementName
-										].split( ',' );
-									return elementSelectors.map(
-										( elementSelector: string ) =>
-											sel + ' ' + elementSelector
-									);
-								} )
-								.join( ',' ),
+							selector: scopeSelector(
+								blockSelectors[ blockName ]?.selector,
+								ELEMENTS[ elementName as ElementName ]
+							),
 							elementName,
 						} );
 					}
@@ -1574,6 +1566,7 @@ function renderStylesNode(
 		name,
 		variationName,
 	} = node;
+
 	let ruleset = '';
 	const effectiveSelector = selectorSuffix
 		? appendToSelector( selector, selectorSuffix )
@@ -1609,6 +1602,7 @@ function renderStylesNode(
 								featureSelector
 						  )
 						: featureSelector;
+
 					selectorForRule = selectorSuffix
 						? appendToSelector( selectorForRule, selectorSuffix )
 						: selectorForRule;
@@ -1659,6 +1653,7 @@ function renderStylesNode(
 		tree,
 		disableRootPadding
 	);
+
 	if ( styleDeclarations?.length ) {
 		const generalSelector = skipSelectorWrapper
 			? effectiveSelector
@@ -1761,7 +1756,7 @@ export const transformToStyles = (
 				...getPseudoStyleNodes( node ),
 				...responsiveNodes.flatMap( getPseudoStyleNodes ),
 			].forEach( ( expandedNode ) => {
-				ruleset += renderStylesNode( expandedNode, {
+				const css = renderStylesNode( expandedNode, {
 					tree,
 					useRootPaddingAlign,
 					disableLayoutStyles,
@@ -1769,6 +1764,8 @@ export const transformToStyles = (
 					hasFallbackGapSupport,
 					disableRootPadding,
 				} );
+
+				ruleset += css;
 			} );
 		} );
 	}

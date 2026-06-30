@@ -7607,7 +7607,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$expected = ':root :where(.wp-block-button .wp-block-button__link){background-color: blue;color: white;}:root :where(.wp-block-button .wp-block-button__link:hover){background-color: white;color: blue;}:root :where(.wp-block-button .wp-block-button__link .wp-element-button,.wp-block-button .wp-block-button__link  .wp-block-button__link){color: green;}:root :where(.wp-block-button .wp-block-button__link .wp-element-button:hover,.wp-block-button .wp-block-button__link  .wp-block-button__link:hover){color: orange;}';
+		$expected = ':root :where(.wp-block-button .wp-block-button__link){background-color: blue;color: white;}:root :where(.wp-block-button .wp-block-button__link:hover){background-color: white;color: blue;}:root :where(.wp-block-button .wp-block-button__link.wp-element-button,.wp-block-button .wp-block-button__link){color: green;}:root :where(.wp-block-button .wp-block-button__link.wp-element-button:hover,.wp-block-button .wp-block-button__link:hover){color: orange;}';
 		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
 	}
 
