@@ -1,0 +1,31 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.skeleton {
+			display: block;
+			background-color: var(--wpds-color-background-surface-neutral-weak);
+		}
+
+		.pulse {
+			@media not ( prefers-reduced-motion ) {
+				/*
+				 * 1.5s reads better for a pulse than the motion token scale,
+				 * which tops out at 400ms (--wpds-motion-duration-xl).
+				 */
+				animation: skeleton-pulse 1.5s ease-in-out infinite;
+			}
+		}
+
+		@keyframes skeleton-pulse {
+			0%,
+			100% {
+				opacity: 1;
+			}
+
+			50% {
+				opacity: 0.4;
+			}
+		}
+	}
+}
