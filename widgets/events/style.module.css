@@ -27,3 +27,7 @@
 	color: var(--wpds-color-foreground-content-neutral-weak);
 	margin: 0;
 }
+
+.noLocationSelected {
+	flex-grow: 1;
+}

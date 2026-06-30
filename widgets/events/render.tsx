@@ -7,14 +7,13 @@ import { store as coreStore } from '@wordpress/core-data';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { mapMarker } from '@wordpress/icons';
-import { Icon, Link, Stack, Text, Tooltip } from '@wordpress/ui';
+import { Icon, Link, Stack, Text, Tooltip, EmptyState } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
 import {
 	EventsList,
-	LocationPicker,
 	type EventsWidgetAttributes,
 	type WPEvent,
 } from './components';
@@ -60,13 +59,13 @@ function EventsListSection( {
 	);
 }
 
+type WordPressEventsProps = {
+	attributes?: EventsWidgetAttributes;
+};
+
 export default function WordPressEvents( {
 	attributes = {},
-	setAttributes,
-}: {
-	attributes?: EventsWidgetAttributes;
-	setAttributes?: ( next: Partial< EventsWidgetAttributes > ) => void;
-} ) {
+}: WordPressEventsProps ) {
 	const userLocale = useSelect(
 		( select ) =>
 			( ( select( coreStore ) as any ).getCurrentUser()
@@ -135,20 +134,21 @@ export default function WordPressEvents( {
 		>
 			{ ! hasSelectedLocation && (
 				<Stack
-					className={ styles.locationPickerInWidget }
-					direction="column"
 					align="center"
 					justify="center"
+					className={ styles.noLocationSelected }
 				>
-					<LocationPicker
-						onSubmit={ ( location ) => {
-							const next = location.trim();
-							setActiveLocation( next );
-							setAttributes?.( { location: next } );
-						} }
-						seedInput={ activeLocation }
-						hideLabelFromVision
-					/>
+					<EmptyState.Root>
+						<EmptyState.Visual>
+							<Icon icon={ mapMarker } />
+						</EmptyState.Visual>
+						<EmptyState.Title>
+							{ __( 'No location selected' ) }
+						</EmptyState.Title>
+						<EmptyState.Description>
+							{ __( 'Select a location to view events.' ) }
+						</EmptyState.Description>
+					</EmptyState.Root>
 				</Stack>
 			) }
 			{ hasSelectedLocation && eventsLoading && (
