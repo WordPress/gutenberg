@@ -170,7 +170,7 @@ function hasValue( value ) {
  * only — they are not CSS-inherited cascade properties, so descendant block
  * panels should not surface them as "inherited" placeholders.
  */
-const NON_CASCADING_ROOT_LAYERS = new Set( [ 'root', 'rootElement' ] );
+const NON_CASCADING_ROOT_LAYERS = new Set( [ 'root' ] );
 
 function isRootSourced( sources, pathKey ) {
 	return NON_CASCADING_ROOT_LAYERS.has( sources?.[ pathKey ]?.layer );

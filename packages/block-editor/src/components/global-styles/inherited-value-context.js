@@ -99,8 +99,7 @@ export function InheritedValueProvider( {
 
 /**
  * Hook: returns the merged `inheritedValue` payload and source map for a
- * panel. Call once per panel, passing the element tag (if any) the panel
- * folds.
+ * panel. Call once per panel.
  *
  * Before the Provider is mounted, or during hydration before the
  * `globalStylesDataKey` payload settles, the hook returns empty value and
@@ -108,13 +107,11 @@ export function InheritedValueProvider( {
  * then keeps pre-feature behavior after bridge components pass `.value`.
  *
  * The returned object identity is stable across renders when none of
- * `(globalStyles, blockName, element, ownVariation)` have changed.
+ * `(globalStyles, blockName, ownVariation)` have changed.
  *
- * @param {Object}  [args]
- * @param {?string} [args.element] Element tag to fold (e.g. `h2`, `link`).
  * @return {{ value: Object, sources: Object }} Merged panel-scoped payload and source map.
  */
-export function useInheritedValue( { element = null } = {} ) {
+export function useInheritedValue() {
 	const ctx = useContext( InheritedValueContext );
 	return useMemo( () => {
 		if ( ! ctx || ! ctx.blockName ) {
@@ -122,18 +119,16 @@ export function useInheritedValue( { element = null } = {} ) {
 		}
 		return buildInheritedValue( {
 			blockName: ctx.blockName,
-			element,
 			ownVariation: ctx.ownVariation,
 			globalStyles: ctx.globalStyles,
 			blockStyles: ctx.blockStyles,
 			selectedState: ctx.selectedState,
 		} );
-	}, [ ctx, element ] );
+	}, [ ctx ] );
 }
 
 export function useInheritedStyleValue( {
 	blockName,
-	element = null,
 	ownVariation = null,
 	selectedState = null,
 } ) {
@@ -145,20 +140,12 @@ export function useInheritedStyleValue( {
 		}
 		return buildInheritedValue( {
 			blockName,
-			element,
 			ownVariation,
 			globalStyles,
 			blockStyles,
 			selectedState,
 		} );
-	}, [
-		blockName,
-		element,
-		ownVariation,
-		globalStyles,
-		blockStyles,
-		selectedState,
-	] );
+	}, [ blockName, ownVariation, globalStyles, blockStyles, selectedState ] );
 }
 
 /**
