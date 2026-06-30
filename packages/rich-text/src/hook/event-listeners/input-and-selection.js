@@ -9,8 +9,6 @@ import { privateApis as composePrivateApis } from '@wordpress/compose';
 import { getActiveFormats } from '../../get-active-formats';
 import { isCollapsed } from '../../is-collapsed';
 import { updateFormats } from '../../update-formats';
-import { ownsSelection } from '../../owns-selection';
-import { subscribeOwnedListener } from '../../subscribe-owned-listener';
 import { unlock } from '../../lock-unlock';
 
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
@@ -131,13 +129,9 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		// Ensure the active element is the rich text element, or that the
-		// element owns the selection through a focused editing host (the
-		// editable block editor canvas wrapper).
-		if (
-			ownerDocument.activeElement !== element &&
-			! ownsSelection( element )
-		) {
+		// Ensure the active element is the rich text element. The listener
+		// stays subscribed but no-ops for instances that aren't focused.
+		if ( ownerDocument.activeElement !== element ) {
 			return;
 		}
 
@@ -195,11 +189,10 @@ export default ( props ) => ( element ) => {
 	}
 
 	function onCompositionStart() {
-		// Do not update the selection when characters are being composed as
-		// this rerenders the component and might destroy internal browser
-		// editing state. `handleSelectionChange` returns early while
-		// composing.
 		isComposing = true;
+		// `handleSelectionChange` returns early while composing, so the
+		// selection is not updated as characters are composed (which rerenders
+		// the component and might destroy internal browser editing state).
 		// Remove the placeholder. Since the rich text value doesn't update
 		// during composition, the placeholder doesn't get removed. There's no
 		// need to re-add it, when the value is updated on compositionend it
@@ -235,24 +228,8 @@ export default ( props ) => ( element ) => {
 			props.current;
 
 		// When the whole editor is editable, let writing flow handle
-		// selection state.
+		// selection.
 		if ( element.parentElement.closest( '[contenteditable="true"]' ) ) {
-			// A nested editable element does not receive a caret from being
-			// focused, unlike an editing host. When the element does not
-			// contain the selection, restore the internal record's selection,
-			// or match the editing host behavior for programmatic focus and
-			// place the caret at the start.
-			const selection = defaultView.getSelection();
-			if (
-				! selection.anchorNode ||
-				! element.contains( selection.anchorNode )
-			) {
-				if ( isSelected && record.current.start !== undefined ) {
-					applyRecord( record.current );
-				} else {
-					selection.collapse( element, 0 );
-				}
-			}
 			return;
 		}
 
@@ -280,63 +257,22 @@ export default ( props ) => ( element ) => {
 		window.queueMicrotask( handleSelectionChange );
 	}
 
-	/**
-	 * The native `selectionchange` event is asynchronous and may not have
-	 * been dispatched yet for a preceding selection change when the next
-	 * event arrives. Sync the record immediately so the handlers of the very
-	 * event being processed read a fresh record.
-	 */
-	function ensureSelectionSync() {
-		if ( ownerDocument.activeElement === element ) {
-			return;
-		}
-		if ( ! ownsSelection( element ) ) {
-			return;
-		}
-		handleSelectionChange();
-	}
-
 	// `input` and `compositionend` must run before block-editor's
 	// `input-rules.js` element-level listeners, which call `getValue()`
 	// reading `record.current` updated by our `onInput`. Use capture phase
 	// so we fire before any ancestor bubble handlers.
-	const unsubscribeInput = subscribeOwnedListener(
+	const unsubscribeInput = subscribeDelegatedListener(
 		element,
 		'input',
 		onInput,
 		true
 	);
-	// Bound to the document with capture so it runs before any other
-	// listener of the event. Subscribed for every event type whose handlers
-	// read the internal record.
-	const unsubscribeEnsureSelection = [
-		'keydown',
-		'beforeinput',
-		'copy',
-		'cut',
-		'paste',
-	].map( ( eventType ) =>
-		subscribeDelegatedListener(
-			ownerDocument,
-			eventType,
-			ensureSelectionSync,
-			true
-		)
-	);
-	// Permanently subscribed: `handleSelectionChange` checks whether the
-	// element has focus or owns the selection itself. The shared underlying
-	// delegated listener keeps the number of native listeners constant.
-	const unsubscribeSelectionChange = subscribeDelegatedListener(
-		ownerDocument,
-		'selectionchange',
-		handleSelectionChange
-	);
-	const unsubscribeCompositionStart = subscribeOwnedListener(
+	const unsubscribeCompositionStart = subscribeDelegatedListener(
 		element,
 		'compositionstart',
 		onCompositionStart
 	);
-	const unsubscribeCompositionEnd = subscribeOwnedListener(
+	const unsubscribeCompositionEnd = subscribeDelegatedListener(
 		element,
 		'compositionend',
 		onCompositionEnd,
@@ -347,13 +283,21 @@ export default ( props ) => ( element ) => {
 		'focusin',
 		onFocus
 	);
+	// Permanently subscribed rather than added on focus and removed on blur:
+	// `handleSelectionChange` checks whether the element is focused itself,
+	// and the shared underlying delegated listener keeps the number of native
+	// listeners constant.
+	const unsubscribeSelectionChange = subscribeDelegatedListener(
+		ownerDocument,
+		'selectionchange',
+		handleSelectionChange
+	);
 
 	return () => {
 		unsubscribeInput();
-		unsubscribeEnsureSelection.forEach( ( unsubscribe ) => unsubscribe() );
-		unsubscribeSelectionChange();
 		unsubscribeCompositionStart();
 		unsubscribeCompositionEnd();
 		unsubscribeFocus();
+		unsubscribeSelectionChange();
 	};
 };
