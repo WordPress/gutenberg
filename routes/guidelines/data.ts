@@ -2,25 +2,18 @@
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
-import { useSelect, dispatch, resolveSelect } from '@wordpress/data';
+import { dispatch, resolveSelect } from '@wordpress/data';
 import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
-import {
-	store as blocksStore,
-	privateApis as blocksPrivateApis,
-} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '@wordpress/routes-lock-unlock';
 import type {
 	Scope,
 	GuidelineRow,
 	ContentBlock,
 	GuidelineQuery,
 } from './types';
-
-const { isContentBlock } = unlock( blocksPrivateApis );
 
 export const KNOWLEDGE_KIND = 'postType';
 export const KNOWLEDGE_NAME = 'wp_knowledge';
@@ -55,19 +48,60 @@ export function blockSlug( blockName: string ): string {
 }
 
 /**
- * The content-role blocks from the client block registry — the authoritative
- * list of blocks that can carry guidelines.
+ * The subset of a `/wp/v2/block-types` record the Guidelines page reads.
+ */
+interface RestBlockType {
+	name: string;
+	title: string;
+	icon: string | null;
+	attributes?: Record< string, { role?: string } >;
+	supports?: { contentRole?: unknown };
+}
+
+/**
+ * Whether a REST block type carries editable content. Mirrors the
+ * `isContentBlock` private API from `@wordpress/blocks`, but reads the REST
+ * shape so the page does not have to load the client block registry. A block is
+ * a content block when it supports `contentRole`, or has at least one attribute
+ * with a `content` role. The server normalizes the legacy `__experimentalRole`
+ * to `role`, so only `role` is checked here.
+ *
+ * @param blockType A `/wp/v2/block-types` record.
+ */
+function isContentBlockType( blockType: RestBlockType ): boolean {
+	if ( blockType.supports?.contentRole ) {
+		return true;
+	}
+	if ( ! blockType.attributes ) {
+		return false;
+	}
+	return Object.values( blockType.attributes ).some(
+		( attribute ) => attribute?.role === 'content'
+	);
+}
+
+/**
+ * The content-role blocks from the server block registry, read over REST — the
+ * authoritative list of blocks that can carry guidelines. Reading
+ * `/wp/v2/block-types` (instead of registering Core blocks on the client) keeps
+ * `@wordpress/block-library` off this page, and also surfaces server-registered
+ * third-party blocks. Only the fields the filter and list need are requested.
  */
 export function useContentBlocks(): ContentBlock[] {
-	return useSelect(
-		( s ) =>
-			// @ts-ignore - getBlockTypes is untyped in this context.
-			s( blocksStore )
-				.getBlockTypes()
-				.filter( ( block: ContentBlock ) =>
-					isContentBlock( block.name )
-				),
-		[]
+	const { records } = useEntityRecords( 'root', 'blockType', {
+		_fields: 'name,title,icon,attributes,supports',
+	} );
+
+	return useMemo(
+		() =>
+			( ( records ?? [] ) as RestBlockType[] )
+				.filter( isContentBlockType )
+				.map( ( block ) => ( {
+					name: block.name,
+					title: block.title,
+					icon: block.icon ?? undefined,
+				} ) ),
+		[ records ]
 	);
 }
 

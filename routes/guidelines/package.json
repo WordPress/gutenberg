@@ -18,11 +18,8 @@
 		"@wordpress/element": "file:../../packages/element",
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/icons": "file:../../packages/icons",
-		"@wordpress/routes-lock-unlock": "file:../lock-unlock",
 		"@wordpress/dataviews": "file:../../packages/dataviews",
 		"@wordpress/notices": "file:../../packages/notices",
-		"@wordpress/block-library": "file:../../packages/block-library",
-		"@wordpress/blocks": "file:../../packages/blocks",
 		"@wordpress/ui": "file:../../packages/ui"
 	}
 }

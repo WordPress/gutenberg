@@ -100,7 +100,7 @@ export default function BlockGuidelines( {
 					label: block.title,
 					guidelines:
 						bySlug[ blockSlug( block.name ) ]?.content ?? '',
-					icon: block.icon?.src,
+					icon: block.icon,
 				} ) ),
 		[ contentBlocks, bySlug ]
 	);
