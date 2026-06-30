@@ -216,18 +216,13 @@ test.describe( 'Block Notes', () => {
 		/*
 		 * Selecting a thread renders its reply field but deliberately keeps
 		 * focus on the thread itself so keyboard navigation between threads is
-		 * preserved. The reply field must be available without stealing focus.
+		 * preserved. The reply field is available (the "Add new reply" skip
+		 * link moves focus into it, covered separately) but must not steal
+		 * focus on mount.
 		 */
 		await expect( thread ).toBeFocused();
 		await expect( replyTextbox ).toBeVisible();
 		await expect( replyTextbox ).not.toBeFocused();
-
-		/*
-		 * The "Add new reply" skip link is the deliberate, accessible path
-		 * into the reply field; clicking it moves focus there.
-		 */
-		await thread.getByRole( 'button', { name: 'Add new reply' } ).click();
-		await expect( replyTextbox ).toBeFocused();
 	} );
 
 	test( 'can edit a block note', async ( { page, blockNoteUtils } ) => {
