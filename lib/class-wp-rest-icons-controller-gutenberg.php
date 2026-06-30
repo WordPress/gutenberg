@@ -18,16 +18,47 @@ class WP_REST_Icons_Controller_Gutenberg extends WP_REST_Icons_Controller {
 
 	/**
 	 * Registers the routes for icons.
-	 *
-	 * Adds a collection-scoped route (`/icons/<namespace>`) in addition to
-	 * the base class's list and single-item routes.
 	 */
 	public function register_routes() {
-		parent::register_routes();
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base,
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_items' ),
+					'permission_callback' => array( $this, 'get_items_permissions_check' ),
+					'args'                => $this->get_collection_params(),
+				),
+				'schema' => array( $this, 'get_public_item_schema' ),
+			)
+		);
 
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/(?P<namespace>[a-z][a-z-]*)',
+			'/' . $this->rest_base . '/(?P<name>[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?/[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?)',
+			array(
+				'args'   => array(
+					'name' => array(
+						'description' => __( 'Icon name.', 'gutenberg' ),
+						'type'        => 'string',
+					),
+				),
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_item' ),
+					'permission_callback' => array( $this, 'get_item_permissions_check' ),
+					'args'                => array(
+						'context' => $this->get_context_param( array( 'default' => 'view' ) ),
+					),
+				),
+				'schema' => array( $this, 'get_public_item_schema' ),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<namespace>[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?)',
 			array(
 				array(
 					'methods'             => WP_REST_Server::READABLE,
@@ -54,7 +85,7 @@ class WP_REST_Icons_Controller_Gutenberg extends WP_REST_Icons_Controller {
 		$query_params['namespace'] = array(
 			'description' => __( 'Limit results to icons belonging to the given collection slug.', 'gutenberg' ),
 			'type'        => 'string',
-			'pattern'     => '^[a-z][a-z-]*$',
+			'pattern'     => '^[a-z0-9]([a-z0-9_-]*[a-z0-9])?$',
 		);
 		return $query_params;
 	}

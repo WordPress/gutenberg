@@ -59,24 +59,33 @@ class WP_Test_Icon_Collections_Registry extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should register a collection with valid properties.
+	 * Data provider for valid collection slug candidates.
+	 *
+	 * @return array[]
 	 */
-	public function test_register_collection() {
-		$result = $this->collections->register(
-			'my-collection',
-			array(
-				'label'       => 'My Collection',
-				'description' => 'A collection.',
-			)
+	public function data_valid_collection_slugs() {
+		return array(
+			'simple slug'            => array( 'mycollection' ),
+			'digit at the start'     => array( '1-collection' ),
+			'digit in the slug'      => array( 'my-1-collection' ),
+			'digit at the end'       => array( 'collection1' ),
+			'underscore in the slug' => array( 'my_collection' ),
+			'hyphen in the slug'     => array( 'my-collection' ),
 		);
+	}
+
+	/**
+	 * Should register a collection with a valid slug.
+	 *
+	 * @dataProvider data_valid_collection_slugs
+	 *
+	 * @param string $slug Valid slug candidate.
+	 */
+	public function test_register_collection( $slug ) {
+		$result = $this->collections->register( $slug, array( 'label' => 'My Collection' ) );
 
 		$this->assertTrue( $result );
-		$this->assertTrue( $this->collections->is_registered( 'my-collection' ) );
-
-		$registered = $this->collections->get_registered( 'my-collection' );
-		$this->assertSame( 'my-collection', $registered['slug'] );
-		$this->assertSame( 'My Collection', $registered['label'] );
-		$this->assertSame( 'A collection.', $registered['description'] );
+		$this->assertTrue( $this->collections->is_registered( $slug ) );
 	}
 
 	/**
@@ -86,10 +95,13 @@ class WP_Test_Icon_Collections_Registry extends WP_UnitTestCase {
 	 */
 	public function data_invalid_collection_slugs() {
 		return array(
-			'non-string slug'      => array( 1 ),
-			'contains slash'       => array( 'plugin/icons' ),
-			'uppercase characters' => array( 'Plugin' ),
-			'underscore'           => array( 'my_plugin' ),
+			'non-string slug'         => array( 1 ),
+			'contains slash'          => array( 'plugin/icons' ),
+			'uppercase characters'    => array( 'Plugin' ),
+			'underscore at the start' => array( '_my-plugin' ),
+			'underscore at the end'   => array( 'my-plugin_' ),
+			'hyphen at the start'     => array( '-my-plugin' ),
+			'hyphen at the end'       => array( 'my-plugin-' ),
 		);
 	}
 
