@@ -897,9 +897,9 @@ test.describe( 'Block Notes', () => {
 			).toBeVisible();
 
 			// Verify the reaction button appears with count.
-			const reactionButton = page.locator(
-				'.editor-collab-sidebar-panel__reaction-button'
-			);
+			const reactionButton = page.getByRole( 'button', {
+				name: /Heart/,
+			} );
 			await expect( reactionButton ).toBeVisible();
 			await expect( reactionButton ).toContainText( '1' );
 		} );
@@ -915,9 +915,9 @@ test.describe( 'Block Notes', () => {
 			} );
 
 			await blockNoteUtils.addReactionToComment( 'Heart' );
-			const reactionButton = page.locator(
-				'.editor-collab-sidebar-panel__reaction-button'
-			);
+			const reactionButton = page.getByRole( 'button', {
+				name: /Heart/,
+			} );
 			await expect( reactionButton ).toBeVisible();
 			await expect( reactionButton ).toContainText( '1' );
 
@@ -979,9 +979,9 @@ test.describe( 'Block Notes', () => {
 			).toBeVisible();
 
 			// Click the reaction to remove it.
-			const reactionButton = page.locator(
-				'.editor-collab-sidebar-panel__reaction-button'
-			);
+			const reactionButton = page.getByRole( 'button', {
+				name: /Heart/,
+			} );
 			await reactionButton.click();
 
 			await expect(
@@ -1013,9 +1013,9 @@ test.describe( 'Block Notes', () => {
 			).toBeVisible();
 
 			// Hover over the reaction button to trigger tooltip.
-			const reactionButton = page.locator(
-				'.editor-collab-sidebar-panel__reaction-button'
-			);
+			const reactionButton = page.getByRole( 'button', {
+				name: /Celebration/,
+			} );
 			await reactionButton.hover();
 
 			// Verify the tooltip is visible and contains expected text.
@@ -1089,10 +1089,12 @@ test.describe( 'Block Notes', () => {
 			).toBeVisible();
 
 			// Verify both reactions are visible.
-			const reactionButtons = page.locator(
-				'.editor-collab-sidebar-panel__reaction-button'
-			);
-			await expect( reactionButtons ).toHaveCount( 2 );
+			await expect(
+				page.getByRole( 'button', { name: /Smile/ } )
+			).toBeVisible();
+			await expect(
+				page.getByRole( 'button', { name: /Rocket/ } )
+			).toBeVisible();
 		} );
 
 		test( 'reaction picker portals outside the collab sidebar', async ( {
@@ -1838,5 +1840,4 @@ class BlockNoteUtils {
 			.getByRole( 'option', { name: new RegExp( emoji, 'i' ) } )
 			.click();
 	}
-
 }
