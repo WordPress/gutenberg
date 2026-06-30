@@ -14,7 +14,13 @@ import {
 } from '@wordpress/block-editor';
 
 export default function saveWithInnerBlocks( { attributes } ) {
-	const { caption, showNumbers, showTracklist, showArtists } = attributes;
+	const {
+		caption,
+		showNumbers,
+		showTracklist,
+		showArtists,
+		showTrackLength,
+	} = attributes;
 
 	const blockProps = useBlockProps.save();
 	const innerBlocksProps = useInnerBlocksProps.save( blockProps );
@@ -25,6 +31,8 @@ export default function saveWithInnerBlocks( { attributes } ) {
 					'wp-block-playlist__tracklist-is-hidden': ! showTracklist,
 					'wp-block-playlist__tracklist-artist-is-hidden':
 						! showArtists,
+					'wp-block-playlist__tracklist-length-is-hidden':
+						! showTrackLength,
 					'wp-block-playlist__tracklist-show-numbers': showNumbers,
 				} ) }
 			>
