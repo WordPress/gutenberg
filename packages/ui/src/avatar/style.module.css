@@ -1,0 +1,74 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.root {
+			--wp-ui-avatar-size: var(--wpds-dimension-size-md);
+
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			flex-shrink: 0;
+			width: var(--wp-ui-avatar-size);
+			height: var(--wp-ui-avatar-size);
+			border-radius: 50%;
+			overflow: hidden;
+			position: relative;
+			box-sizing: border-box;
+			background-color: var(
+				--wp-ui-avatar-fallback-background-color,
+				var(--wpds-color-background-interactive-brand-strong)
+			);
+		}
+
+		.is-sm-size {
+			--wp-ui-avatar-size: var(--wpds-dimension-size-sm);
+		}
+
+		.is-md-size {
+			--wp-ui-avatar-size: var(--wpds-dimension-size-md);
+		}
+
+		.is-lg-size {
+			--wp-ui-avatar-size: var(--wpds-dimension-size-lg);
+		}
+
+		.has-outline-color {
+			border: var(--wpds-border-width-focus) solid
+				var(--wp-ui-avatar-outline-color);
+			padding: var(--wpds-border-width-focus);
+			background-color: var(
+				--wpds-color-background-surface-neutral-strong,
+				#fff
+			);
+		}
+
+		.image {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+			border-radius: inherit;
+		}
+
+		.fallback {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 100%;
+			height: 100%;
+			font-family: var(--wpds-typography-font-family-body);
+			font-size: var(--wpds-typography-font-size-xs);
+			font-weight: var(--wpds-typography-font-weight-medium);
+			line-height: 1;
+			color: var(
+				--wp-ui-avatar-fallback-foreground-color,
+				#fff
+			);
+			text-transform: uppercase;
+			background-color: var(
+				--wp-ui-avatar-fallback-background-color,
+				var(--wp-ui-avatar-outline-color, var(--wpds-color-background-interactive-brand-strong))
+			);
+		}
+	}
+}

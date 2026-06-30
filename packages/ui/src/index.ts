@@ -1,3 +1,4 @@
+export * as Avatar from './avatar';
 export * from './badge';
 export * from './button';
 export * as Card from './card';

@@ -101,15 +101,6 @@
 	}
 }
 
-.editor-collab-sidebar-panel__user-avatar {
-	border-radius: $radius-round;
-	flex-shrink: 0;
-	border-width: var(--wp-admin-border-width-focus);
-	border-style: solid;
-	padding: var(--wp-admin-border-width-focus);
-	background: $white;
-}
-
 .editor-collab-sidebar-panel__note-actions {
 	margin-left: auto;
 
@@ -186,14 +177,7 @@
 }
 
 .editor-note-indicator__avatar {
-	width: $icon-size;
-	border-radius: $radius-round;
 	margin-left: -12px;
-	border-width: var(--wp-admin-border-width-focus);
-	border-style: solid;
-	padding: var(--wp-admin-border-width-focus);
-	background: $white;
-	box-sizing: border-box;
 
 	&:first-child {
 		margin-left: 0;

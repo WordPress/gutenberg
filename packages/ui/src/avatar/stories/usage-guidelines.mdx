@@ -1,0 +1,41 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as UsageGuidelinesStories from './usage-guidelines.story';
+
+<Meta of={ UsageGuidelinesStories } />
+
+# Avatar usage guidelines
+
+## Anatomy
+
+Compose an avatar from three parts:
+
+- `Avatar.Root` — the circular container and size/outline styling
+- `Avatar.Image` — the profile image
+- `Avatar.Fallback` — initials or other content shown while loading or when the image fails
+
+<Canvas of={ UsageGuidelinesStories.RecommendedUsage } />
+
+## Usage guidelines
+
+- **Always include a fallback.** Provide initials or another meaningful placeholder in `Avatar.Fallback` so the avatar remains recognizable while the image loads or if it fails.
+- **Use `alt` on `Avatar.Image`.** Set descriptive alternative text when the image conveys identity. For decorative avatars paired with visible names, an empty `alt` is acceptable.
+- **Use `outlineColor` to distinguish users.** In collaborative contexts such as notes, pass a per-user color to `Avatar.Root` so participants are visually distinct.
+- **Pick a size that matches the context.** Use `sm` (24px) for compact indicators, `md` (32px) for bylines and lists, and `lg` (40px) for larger profile displays.
+
+## Notes feature patterns
+
+### Byline
+
+Use `size="md"` alongside the author name and timestamp.
+
+<Canvas of={ UsageGuidelinesStories.NotesByline } />
+
+### Overlapping participants
+
+For compact participant stacks, use `size="sm"` and a negative inline margin on subsequent avatars.
+
+<Canvas of={ UsageGuidelinesStories.NotesIndicator } />
+
+## References
+
+- [Avatar component stories](?path=/docs/design-system-components-avatar--docs)

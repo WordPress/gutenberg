@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { ToolbarButton } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Avatar as AvatarComponent, Stack } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import {
@@ -15,7 +15,7 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { getAvatarBorderColor } from './utils';
+import { getAvatarBorderColor, getInitialsFromName } from './utils';
 
 const { NoteIconToolbarSlotFill } = unlock( blockEditorPrivateApis );
 
@@ -50,17 +50,28 @@ function ThreadParticipants( { participants } ) {
 
 	return (
 		<Stack direction="row" align="center" gap="xs">
-			{ visibleParticipants.map( ( participant ) => (
-				<img
-					key={ participant.id }
-					src={ participant.avatar || defaultAvatar }
-					alt={ participant.name }
-					className="editor-note-indicator__avatar"
-					style={ {
-						borderColor: getAvatarBorderColor( participant.id ),
-					} }
-				/>
-			) ) }
+			{ visibleParticipants.map( ( participant ) => {
+				const initials = getInitialsFromName( participant.name );
+
+				return (
+					<AvatarComponent.Root
+						key={ participant.id }
+						size="sm"
+						outlineColor={ getAvatarBorderColor( participant.id ) }
+						className="editor-note-indicator__avatar"
+					>
+						<AvatarComponent.Image
+							src={ participant.avatar || defaultAvatar }
+							alt={ participant.name }
+						/>
+						{ initials && (
+							<AvatarComponent.Fallback>
+								{ initials }
+							</AvatarComponent.Fallback>
+						) }
+					</AvatarComponent.Root>
+				);
+			} ) }
 			{ overflowCount > 0 && (
 				<span className="editor-note-indicator__overflow">
 					{ overflowText }

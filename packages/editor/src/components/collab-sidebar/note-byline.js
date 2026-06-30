@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Stack, Tooltip } from '@wordpress/ui';
+import { Avatar as AvatarComponent, Stack, Tooltip } from '@wordpress/ui';
 import { __, _x } from '@wordpress/i18n';
 import {
 	dateI18n,
@@ -16,7 +16,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import { getAvatarBorderColor } from './utils';
+import { getAvatarBorderColor, getInitialsFromName } from './utils';
 
 export function NoteByline( { avatar, name, date, userId } ) {
 	const hasAvatar = !! avatar;
@@ -74,21 +74,26 @@ export function NoteByline( { avatar, name, date, userId } ) {
 		date
 	);
 
+	const displayName = name ?? currentUserName;
+	const initials = getInitialsFromName( displayName );
+
 	return (
 		<>
-			<img
-				src={ avatar || currentUserAvatar }
-				className="editor-collab-sidebar-panel__user-avatar"
-				// translators: alt text for user avatar image
-				alt={ __( 'User avatar' ) }
-				width={ 32 }
-				height={ 32 }
-				style={ {
-					borderColor: getAvatarBorderColor(
-						userId ?? currentUserId
-					),
-				} }
-			/>
+			<AvatarComponent.Root
+				size="md"
+				outlineColor={ getAvatarBorderColor( userId ?? currentUserId ) }
+			>
+				<AvatarComponent.Image
+					src={ avatar || currentUserAvatar }
+					// translators: alt text for user avatar image
+					alt={ __( 'User avatar' ) }
+				/>
+				{ initials && (
+					<AvatarComponent.Fallback>
+						{ initials }
+					</AvatarComponent.Fallback>
+				) }
+			</AvatarComponent.Root>
 			<Stack direction="column">
 				<span className="editor-collab-sidebar-panel__user-name">
 					{ name ?? currentUserName }

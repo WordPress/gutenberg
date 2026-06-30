@@ -16,6 +16,7 @@ const {
 const ALLOWLIST = {
 	'@wordpress/ui': {
 		allowed: [
+			'Avatar',
 			'Badge',
 			'Card',
 			'Collapsible',

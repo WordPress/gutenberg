@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `Avatar`: Add compound avatar component.
+
 ### Bug Fixes
 
 -   `IconButton`: Restore the default tooltip delay on hover ([#79505](https://github.com/WordPress/gutenberg/pull/79505)).

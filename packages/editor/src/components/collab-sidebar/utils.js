@@ -33,6 +33,25 @@ const AVATAR_BORDER_COLORS = [
 ];
 
 /**
+ * Derives up to two uppercase initials from a display name.
+ *
+ * @param {string|undefined} name Display name.
+ * @return {string|undefined} Initials, or undefined when no name is provided.
+ */
+export function getInitialsFromName( name ) {
+	if ( ! name ) {
+		return undefined;
+	}
+
+	return name
+		.split( /\s+/ )
+		.slice( 0, 2 )
+		.map( ( word ) => word[ 0 ] )
+		.join( '' )
+		.toUpperCase();
+}
+
+/**
  * Gets the border color for an avatar based on the user ID.
  *
  * Always returns a 6-digit `#RRGGBB` hex string; callers (e.g. the highlight
