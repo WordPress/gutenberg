@@ -29,15 +29,18 @@ export const Skeleton = forwardRef< HTMLDivElement, SkeletonProps >(
 		return useRender( {
 			render,
 			ref,
-			props: mergeProps< 'div' >( props, {
-				style,
-				className: clsx( styles.skeleton, {
-					[ styles.pulse ]: animation === 'pulse',
-				} ),
-				// Decorative by default; consumers mark the loading region with
-				// aria-busy / role="status". Overridable via props.
-				'aria-hidden': true,
-			} ),
+			props: mergeProps< 'div' >(
+				{
+					style: { borderRadius: radiusTokens[ radius ] },
+					className: clsx( styles.skeleton, {
+						[ styles.pulse ]: animation === 'pulse',
+					} ),
+					// Decorative by default; consumers mark the loading
+					// region with aria-busy / role="status".
+					'aria-hidden': true,
+				},
+				props
+			),
 		} );
 	}
 );
