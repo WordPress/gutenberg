@@ -4,5 +4,6 @@
 }
 
 .elevated {
+	border: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
 	box-shadow: var(--wpds-elevation-xs);
 }
