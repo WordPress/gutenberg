@@ -83,12 +83,14 @@ const defaultView: View = {
 	showTitle: false,
 	titleField: 'title',
 	mediaField: 'media_thumbnail',
+	startPosition: 1,
 	perPage: 50,
 	filters: [],
 	layout: {
 		previewSize: 170,
 		density: 'compact',
 	},
+	infiniteScrollEnabled: true,
 };
 
 const defaultLayouts: SupportedLayouts = {
@@ -322,6 +324,22 @@ export function MediaUploadModal( {
 			}
 		}
 
+		// For infinite scroll, use offset-based pagination
+		// For regular pagination, use page-based pagination
+		if ( view.infiniteScrollEnabled && view.startPosition !== undefined ) {
+			return {
+				offset: view.startPosition - 1,
+				per_page: view.perPage || 20,
+				status: 'inherit',
+				order: view.sort?.direction,
+				orderby: view.sort?.field,
+				search: view.search,
+				...filters,
+			};
+		}
+
+		// Regular page-based pagination
+
 		return {
 			per_page: view.perPage || 20,
 			page: view.page || 1,
@@ -528,13 +546,16 @@ export function MediaUploadModal( {
 		[ allowedTypes, handleUpload, registerBatch ]
 	);
 
-	const paginationInfo = useMemo(
-		() => ( {
-			totalItems,
-			totalPages,
-		} ),
-		[ totalItems, totalPages ]
-	);
+	const prevPaginationInfoRef = useRef( { totalItems: 0, totalPages: 0 } );
+
+	const paginationInfo = useMemo( () => {
+		// Only update when we have valid values (not both 0)
+		// to avoid showing 0 values during data fetching
+		if ( totalItems > 0 || totalPages > 0 ) {
+			prevPaginationInfoRef.current = { totalItems, totalPages };
+		}
+		return prevPaginationInfoRef.current;
+	}, [ totalItems, totalPages ] );
 
 	// Build accept attribute from allowedTypes
 	const acceptTypes = useMemo( () => {
