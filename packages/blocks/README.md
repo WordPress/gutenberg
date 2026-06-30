@@ -45,6 +45,7 @@ _Parameters_
 -   _name_ `string`: Block name.
 -   _attributes_ `Record< string, unknown >`: Block attributes.
 -   _innerBlocks_ `Block[]`: Nested blocks.
+-   _innerContent_ `Array< string | null >`: Static HTML fragments interleaved with inner blocks, where `null` entries mark inner block positions. Only applies to the Custom HTML block.
 
 _Returns_
 

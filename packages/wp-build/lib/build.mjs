@@ -2016,7 +2016,7 @@ async function buildAllWidgets() {
  * Discover all widgets and collect their registry-facing data.
  * Widgets without a valid widget.json are skipped.
  *
- * @return {Array<{ name: string, dirName: string, hasRender: boolean, hasWidget: boolean, presentation: string | null }>} Array of widget objects.
+ * @return {Array<{ name: string, dirName: string, hasRender: boolean, hasWidget: boolean, presentation: string | null, category: string | null }>} Array of widget objects.
  */
 function collectWidgets() {
 	return getAllWidgets( ROOT_DIR ).flatMap( ( widgetName ) => {
@@ -2038,6 +2038,7 @@ function collectWidgets() {
 				hasRender: widgetFiles.hasRender,
 				hasWidget: widgetFiles.hasWidget,
 				presentation: metadata.presentation ?? null,
+				category: metadata.category ?? null,
 			},
 		];
 	} );
@@ -2066,12 +2067,16 @@ async function generateWidgetRegistry( widgets, replacements ) {
 			const presentationStr = widget.presentation
 				? `'${ widget.presentation }'`
 				: 'null';
+			const categoryStr = widget.category
+				? `'${ widget.category }'`
+				: 'null';
 			return `\tarray(
 		'name'         => '${ widget.name }',
 		'dir_name'     => '${ widget.dirName }',
 		'has_render'   => ${ hasRenderStr },
 		'has_widget'   => ${ hasWidgetStr },
 		'presentation' => ${ presentationStr },
+		'category'     => ${ categoryStr },
 	)`;
 		} )
 		.join( ',\n' );

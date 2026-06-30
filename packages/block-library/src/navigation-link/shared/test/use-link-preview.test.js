@@ -500,6 +500,23 @@ describe( 'useLinkPreview', () => {
 			expect( result.current.title ).toBe( 'Test Category' );
 		} );
 
+		it( 'should show "(no title)" for an untitled entity, not the title object', () => {
+			const { result } = renderHook( () =>
+				useLinkPreview( {
+					url: 'https://example.com/page',
+					// Untitled page: an empty `title.rendered` object.
+					entityRecord: { title: { raw: '', rendered: '' } },
+					type: 'page',
+					hasBinding: false,
+					isEntityAvailable: true,
+				} )
+			);
+
+			expect( result.current.title ).toBe( '(no title)' );
+			// Truthy title, so no rich URL fetch.
+			expect( mockUseRemoteUrlData ).toHaveBeenCalledWith( null );
+		} );
+
 		it( 'should use entityRecord.name for taxonomy terms', () => {
 			const { result } = renderHook( () =>
 				useLinkPreview( {

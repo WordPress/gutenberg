@@ -19,6 +19,12 @@ if ( ! gutenberg_is_client_side_media_processing_enabled() ) {
 	return;
 }
 
+// Animated GIF → video: clean up the sideloaded companion video and
+// poster when their GIF attachment is deleted. The GIF→video swap itself
+// happens in the editor (the converted block is a real core/video), so no
+// render-time filtering is needed.
+require_once __DIR__ . '/animated-gif-to-video.php';
+
 // ── Tier 1: HEIC infrastructure (always loaded) ─────────────────────
 
 /**
