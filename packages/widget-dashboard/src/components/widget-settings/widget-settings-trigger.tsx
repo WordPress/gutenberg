@@ -13,7 +13,6 @@ import type { WidgetType } from '@wordpress/widget-primitives';
  * Internal dependencies
  */
 import { useDashboardUIContext } from '../../context/ui-context';
-import { getAdminMenuInset } from './utils';
 import type { DashboardWidget } from '../../types';
 
 export interface WidgetSettingsTriggerProps {
@@ -41,42 +40,11 @@ export function WidgetSettingsTrigger( {
 	widget,
 	widgetType,
 }: WidgetSettingsTriggerProps ): React.ReactNode {
-	const {
-		setSettingsWidgetUuid,
-		setSettingsDrawerSide,
-		setSettingsDrawerInset,
-	} = useDashboardUIContext();
+	const { setSettingsWidgetUuid } = useDashboardUIContext();
 
 	const open = useCallback(
-		( event: React.MouseEvent< HTMLElement > ) => {
-			// Open the drawer on the side away from the widget: compare the
-			// tile's center against the midpoint of the usable content area
-			// (which starts after the admin menu). Past it opens left.
-			const adminMenuInset = getAdminMenuInset();
-			// The gear sits in the grid slot, outside the card, so reach the
-			// tile via the grid item's data hook.
-			const tile = event.currentTarget.closest(
-				'[data-wp-grid-item-key]'
-			);
-			const rect = (
-				tile ?? event.currentTarget
-			).getBoundingClientRect();
-			const widgetCenter = rect.left + rect.width / 2;
-			const contentCenter = ( adminMenuInset + window.innerWidth ) / 2;
-			const side = widgetCenter > contentCenter ? 'left' : 'right';
-
-			setSettingsDrawerSide( side );
-			// A left drawer would otherwise slide over the fixed admin menu;
-			// offset it by the menu width so it lands clear of it.
-			setSettingsDrawerInset( side === 'left' ? adminMenuInset : 0 );
-			setSettingsWidgetUuid( widget.uuid );
-		},
-		[
-			setSettingsDrawerSide,
-			setSettingsDrawerInset,
-			setSettingsWidgetUuid,
-			widget.uuid,
-		]
+		() => setSettingsWidgetUuid( widget.uuid ),
+		[ setSettingsWidgetUuid, widget.uuid ]
 	);
 
 	if ( ! widgetType.attributes?.length ) {
