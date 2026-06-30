@@ -180,17 +180,6 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 				label={ searchLabel }
 				placeholder={ searchLabel }
 			/>
-			{ category.description && (
-				<p className={ `${ baseCssClass }-description` }>
-					{ category.description }
-				</p>
-			) }
-			{ category.attach && (
-				<AttachImagesButton
-					mediaType={ category.mediaType }
-					onSelect={ handleAttach }
-				/>
-			) }
 			{ isLoading && ! mediaList?.length && (
 				<div className={ `${ baseCssClass }-spinner` }>
 					<Spinner />
@@ -227,6 +216,14 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 						category={ category }
 					/>
 				</div>
+			) }
+			{ category.attach && (
+				// Pinned to the bottom of the panel as a fixed footer so it lines
+				// up with the "Open Media Library" button in the adjacent column.
+				<AttachImagesButton
+					mediaType={ category.mediaType }
+					onSelect={ handleAttach }
+				/>
 			) }
 			{ mediaPendingDetach && (
 				// A plain `Modal` (not `ConfirmDialog`) so we can pass

@@ -41,7 +41,11 @@ function ScreenHeader( { title } ) {
 	);
 }
 
-export default function MobileTabNavigation( { categories, children } ) {
+export default function MobileTabNavigation( {
+	categories,
+	children,
+	screenClassName,
+} ) {
 	return (
 		<Navigator
 			initialPath="/"
@@ -71,6 +75,7 @@ export default function MobileTabNavigation( { categories, children } ) {
 			{ categories.map( ( category ) => (
 				<Navigator.Screen
 					key={ category.name }
+					className={ screenClassName }
 					path={ `/category/${ category.name }` }
 				>
 					<ScreenHeader title={ __( 'Back' ) } />

@@ -469,14 +469,31 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
+// On mobile the media category renders inside a `Navigator.Screen`. The screen
+// is a grid item the navigator aligns to the start (so it's content-height by
+// default); stretch it to full height and make it a flex column so the panel
+// below the back-button header fills the remaining space rather than overflowing.
+.block-editor-inserter__media-mobile-screen {
+	display: flex;
+	flex-direction: column;
+	align-self: stretch;
+}
+
 .block-editor-inserter__media-panel {
-	min-height: 100%;
 	padding: 0 $grid-unit-20;
 	display: flex;
 	flex-direction: column;
+	// Mobile: fill the height left below the screen's back-button header so the
+	// results scroll internally and the attach footer stays on-screen.
+	flex: 1;
+	min-height: 0;
 
 	@include break-medium {
 		padding: 0;
+		// Desktop: the panel lives in the absolutely-positioned category panel,
+		// so fill its height directly instead.
+		flex: 0 1 auto;
+		min-height: 100%;
 	}
 
 	.block-editor-inserter__media-panel-spinner {
@@ -495,22 +512,28 @@ $block-inserter-tabs-height: 44px;
 		}
 	}
 
-	.block-editor-inserter__media-panel-description {
-		margin: 0 0 $grid-unit-15;
-		color: $gray-700;
-		font-size: $helptext-font-size;
-		@include break-medium() {
-			margin: 0 $grid-unit-30 $grid-unit-15;
-		}
+	// The empty state grows to fill, alongside `-results`/`-spinner`, so the
+	// attach footer below stays pinned to the bottom in every state.
+	.block-editor-inserter__no-results {
+		flex-grow: 1;
 	}
 
 	.block-editor-inserter__media-panel-attach {
-		justify-content: center;
-		// Keep full height; as a flex child it would otherwise shrink to its content.
+		// Match the padding (and so the height) of the "Open Media Library"
+		// footer button in the adjacent column, so the two line up.
+		&.components-button {
+			justify-content: center;
+			padding: $grid-unit-20;
+		}
+		// Balanced breathing room above and below the footer button.
+		// `flex-shrink: 0` keeps it full height as a flex child rather than
+		// collapsing to its content.
 		flex-shrink: 0;
+		margin-top: $grid-unit-20;
 		margin-bottom: $grid-unit-20;
 		@include break-medium() {
-			margin: 0 $grid-unit-30 $grid-unit-20;
+			margin-left: $grid-unit-30;
+			margin-right: $grid-unit-30;
 		}
 	}
 

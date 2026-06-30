@@ -100,7 +100,10 @@ function MediaTab( {
 				</div>
 			) }
 			{ isMobile && (
-				<MobileTabNavigation categories={ categories }>
+				<MobileTabNavigation
+					categories={ categories }
+					screenClassName="block-editor-inserter__media-mobile-screen"
+				>
 					{ ( category ) => (
 						<MediaCategoryPanel
 							onInsert={ onInsert }

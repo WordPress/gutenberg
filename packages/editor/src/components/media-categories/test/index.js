@@ -128,15 +128,12 @@ describe( 'getInserterMediaCategories', () => {
 		expect( saveEntityRecord ).toHaveBeenCalledTimes( 3 );
 	} );
 
-	it( 'words the description and empty state from the post type label', () => {
+	it( 'words the empty state from the post type label', () => {
 		const [ attachedImagesCategory ] = getInserterMediaCategories(
 			42,
 			'Page'
 		);
 
-		expect( attachedImagesCategory.description ).toBe(
-			'Images attached to the current Page.'
-		);
 		expect( attachedImagesCategory.emptyMessage ).toBe(
 			'No images attached to this Page.'
 		);

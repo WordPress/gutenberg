@@ -216,15 +216,6 @@ const getAttachedImagesCategory = ( postId, typeLabel ) => ( {
 	// The post type's singular label (e.g. "Page"), threaded through so the
 	// shared panel can word its attach/detach copy for the current post type.
 	postTypeLabel: typeLabel,
-	// Helper text shown beneath the search field to clarify what this source is,
-	// since the label alone can read as ambiguous next to "Images".
-	description: typeLabel
-		? sprintf(
-				// translators: %s: Name of the post type e.g: "Page".
-				__( 'Images attached to the current %s.' ),
-				typeLabel
-		  )
-		: __( 'Images attached to the current post.' ),
 	// Empty-state message. Providing this also keeps the source in the tab list
 	// when it has no items, so it stays discoverable and the first image can be
 	// attached even with none yet.
