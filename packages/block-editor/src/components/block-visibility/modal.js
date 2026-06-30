@@ -37,6 +37,7 @@ import { cleanEmptyObject } from '../../hooks/utils';
 import {
 	getViewportCheckboxState,
 	getHideEverywhereCheckboxState,
+	getUserAuthCheckboxState,
 } from './utils';
 
 const DEFAULT_VIEWPORT_CHECKBOX_VALUES = {
@@ -80,6 +81,8 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 			return {
 				hideEverywhere: false,
 				viewportChecked: {},
+				hideFromLoggedOut: false,
+				hideFromLoggedIn: false,
 			};
 		}
 
@@ -92,6 +95,8 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 		return {
 			hideEverywhere: getHideEverywhereCheckboxState( blocks ),
 			viewportChecked: viewportValues,
+			hideFromLoggedOut: getUserAuthCheckboxState( blocks, 'loggedOut' ),
+			hideFromLoggedIn: getUserAuthCheckboxState( blocks, 'loggedIn' ),
 		};
 	}, [ blocks ] );
 
@@ -100,6 +105,12 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 	);
 	const [ hideEverywhere, setHideEverywhere ] = useState(
 		initialViewportValues?.hideEverywhere ?? false
+	);
+	const [ hideFromLoggedOut, setHideFromLoggedOut ] = useState(
+		initialViewportValues?.hideFromLoggedOut ?? false
+	);
+	const [ hideFromLoggedIn, setHideFromLoggedIn ] = useState(
+		initialViewportValues?.hideFromLoggedIn ?? false
 	);
 
 	const handleViewportCheckboxChange = useCallback(
@@ -149,41 +160,77 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 		if ( hideEverywhere !== initialViewportValues.hideEverywhere ) {
 			return true;
 		}
+		if (
+			hideFromLoggedOut !== initialViewportValues.hideFromLoggedOut ||
+			hideFromLoggedIn !== initialViewportValues.hideFromLoggedIn
+		) {
+			return true;
+		}
 		return BLOCK_VISIBILITY_VIEWPORT_ENTRIES.some(
 			( [ , { key } ] ) =>
 				viewportChecked[ key ] !==
 				initialViewportValues.viewportChecked[ key ]
 		);
-	}, [ hideEverywhere, viewportChecked, initialViewportValues ] );
+	}, [
+		hideEverywhere,
+		hideFromLoggedOut,
+		hideFromLoggedIn,
+		viewportChecked,
+		initialViewportValues,
+	] );
 
 	const hasIndeterminateValues = useMemo( () => {
 		if ( hideEverywhere === null ) {
 			return true;
 		}
+		if ( hideFromLoggedOut === null || hideFromLoggedIn === null ) {
+			return true;
+		}
 		return Object.values( viewportChecked ).some(
 			( checked ) => checked === null
 		);
-	}, [ hideEverywhere, viewportChecked ] );
+	}, [
+		hideEverywhere,
+		hideFromLoggedOut,
+		hideFromLoggedIn,
+		viewportChecked,
+	] );
 
 	const handleSubmit = useCallback(
 		( event ) => {
 			event.preventDefault();
-			const newVisibility = hideEverywhere
-				? false
-				: {
-						viewport: BLOCK_VISIBILITY_VIEWPORT_ENTRIES.reduce(
-							( acc, [ , { key } ] ) => {
-								if ( viewportChecked[ key ] ) {
-									// Values are inverted to hide the block on the selected viewport.
-									// In the UI, the checkbox is checked (true) when the block is hidden on the selected viewport,
-									// so 'false' means hide the block on the selected viewport.
-									acc[ key ] = false;
-								}
-								return acc;
-							},
-							{}
-						),
-				  };
+			let newVisibility;
+			if ( hideEverywhere ) {
+				newVisibility = false;
+			} else {
+				const viewport = BLOCK_VISIBILITY_VIEWPORT_ENTRIES.reduce(
+					( acc, [ , { key } ] ) => {
+						if ( viewportChecked[ key ] ) {
+							// Values are inverted to hide the block on the selected viewport.
+							// In the UI, the checkbox is checked (true) when the block is hidden on the selected viewport,
+							// so 'false' means hide the block on the selected viewport.
+							acc[ key ] = false;
+						}
+						return acc;
+					},
+					{}
+				);
+				const userAuthentication = {};
+				if ( hideFromLoggedOut ) {
+					userAuthentication.loggedOut = true;
+				}
+				if ( hideFromLoggedIn ) {
+					userAuthentication.loggedIn = true;
+				}
+				newVisibility = {
+					...( Object.keys( viewport ).length > 0 && {
+						viewport,
+					} ),
+					...( Object.keys( userAuthentication ).length > 0 && {
+						userAuthentication,
+					} ),
+				};
+			}
 			const attributesByClientId = Object.fromEntries(
 				blocks.map( ( { clientId, attributes } ) => [
 					clientId,
@@ -212,6 +259,8 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 			clientIds,
 			createSuccessNotice,
 			hideEverywhere,
+			hideFromLoggedOut,
+			hideFromLoggedIn,
 			noticeMessage,
 			onClose,
 			updateBlockAttributes,
@@ -302,6 +351,30 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 								</ul>
 							) }
 						</li>
+						{ hideEverywhere !== true && (
+							<li className="block-editor-block-visibility-modal__options-item">
+								<CheckboxControl
+									label={ __( 'Hide from logged out users' ) }
+									checked={ hideFromLoggedOut === true }
+									indeterminate={ hideFromLoggedOut === null }
+									onChange={ ( checked ) =>
+										setHideFromLoggedOut( checked )
+									}
+								/>
+							</li>
+						) }
+						{ hideEverywhere !== true && (
+							<li className="block-editor-block-visibility-modal__options-item">
+								<CheckboxControl
+									label={ __( 'Hide from logged in users' ) }
+									checked={ hideFromLoggedIn === true }
+									indeterminate={ hideFromLoggedIn === null }
+									onChange={ ( checked ) =>
+										setHideFromLoggedIn( checked )
+									}
+								/>
+							</li>
+						) }
 					</ul>
 					{ hasMultipleBlocks && hasIndeterminateValues && (
 						<p className="block-editor-block-visibility-modal__description">

@@ -34,6 +34,21 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 	}
 
 	if ( is_array( $block_visibility ) && ! empty( $block_visibility ) ) {
+		// Check user authentication visibility.
+		$user_auth_config = $block_visibility['userAuthentication'] ?? null;
+
+		if ( is_array( $user_auth_config ) && ! empty( $user_auth_config ) ) {
+			$is_logged_in = is_user_logged_in();
+
+			if ( ! empty( $user_auth_config['loggedOut'] ) && ! $is_logged_in ) {
+				return '';
+			}
+
+			if ( ! empty( $user_auth_config['loggedIn'] ) && $is_logged_in ) {
+				return '';
+			}
+		}
+
 		// Get viewport configuration from nested structure.
 		$viewport_config = $block_visibility['viewport'] ?? null;
 
