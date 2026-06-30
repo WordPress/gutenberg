@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Use a single root `ThemeProvider` for boot layouts so document-level design tokens match the boot layout theme context. ([#79679](https://github.com/WordPress/gutenberg/pull/79679))
+
 ## 0.16.0 (2026-06-24)
 
 ### Enhancements

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Use the boot layout background token for generated wp-admin page body backgrounds. ([#79679](https://github.com/WordPress/gutenberg/pull/79679))
+
 ## 0.17.0 (2026-06-24)
 
 ### Documentation
