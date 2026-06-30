@@ -8,12 +8,8 @@ import { paramCase as kebabCase } from 'change-case';
  */
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import {
-	Button,
-	TextControl,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { Button, TextControl } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 
 function AddCustomGenericTemplateModalContent( { createTemplate, onBack } ) {
 	const [ title, setTitle ] = useState( '' );
@@ -50,7 +46,7 @@ function AddCustomGenericTemplateModalContent( { createTemplate, onBack } ) {
 	}
 	return (
 		<form onSubmit={ onCreateTemplate }>
-			<VStack spacing={ 6 }>
+			<Stack direction="column" gap="xl">
 				<TextControl
 					label={ __( 'Name' ) }
 					value={ title }
@@ -63,7 +59,10 @@ function AddCustomGenericTemplateModalContent( { createTemplate, onBack } ) {
 						'Describe the template, e.g. "Post with sidebar". A custom template can be manually applied to any post or page.'
 					) }
 				/>
-				<HStack
+				<Stack
+					direction="row"
+					gap="sm"
+					align="center"
 					className="edit-site-custom-generic-template__modal-actions"
 					justify="right"
 				>
@@ -83,8 +82,8 @@ function AddCustomGenericTemplateModalContent( { createTemplate, onBack } ) {
 					>
 						{ __( 'Create' ) }
 					</Button>
-				</HStack>
-			</VStack>
+				</Stack>
+			</Stack>
 		</form>
 	);
 }
