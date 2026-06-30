@@ -50,13 +50,25 @@ import {
 	SuggestionOverlayProvider,
 	SuggestionAutoSave,
 	SuggestionStoreInterceptor,
+	SuggestionAnnotations,
+	SuggestionAuthorColors,
+	SuggestionDeletionKeyboard,
+	SuggestionAdditionKeyboard,
 	registerSuggestionOverlayFilter,
 } from '../suggestion-mode';
+import { registerSuggestionFormat } from '../inline-suggestions';
 
 // Register the `editor.BlockEdit` filter once when the editor provider module
 // loads. The filter is a no-op outside of the `suggest` intent, so it's safe
 // to register globally.
 registerSuggestionOverlayFilter();
+
+// Register the `core/suggestion` inline marker format so rich-text round-trips
+// suggestion markers in block content and the annotations API can decorate
+// them. The format is inert (no toolbar entry): suggestions are created by
+// editing in Suggest mode, not from a control. Idempotent, so it's safe
+// globally.
+registerSuggestionFormat();
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
@@ -468,6 +480,10 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 											<>
 												<SuggestionStoreInterceptor />
 												<SuggestionAutoSave />
+												<SuggestionAnnotations />
+												<SuggestionAuthorColors />
+												<SuggestionDeletionKeyboard />
+												<SuggestionAdditionKeyboard />
 											</>
 										) }
 										<MediaEditorModalMount />

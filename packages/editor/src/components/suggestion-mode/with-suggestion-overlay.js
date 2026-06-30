@@ -1,4 +1,28 @@
 /**
+ * Suggest-mode overlay HOC.
+ *
+ * Data flow while the editor is in `suggest` intent:
+ *
+ *   BlockEdit
+ *     └─ wrappedSetAttributes        ── strip suggestion marks RichText
+ *                                       round-tripped from a previous
+ *                                       render, then store the *clean*
+ *                                       proposed value in the overlay
+ *        └─ overlay (proposed clean)
+ *           └─ SuggestingBlockEdit   ── merge baseline + overlay
+ *              └─ markContentDiff    ── compute marked HTML on each render
+ *                 └─ BlockEdit       ── render with deletions/additions visible
+ *
+ * The block-editor store stays at the baseline value the entire time the
+ * suggestion is open; only the rendered `attributes` prop carries the
+ * marked diff, gated on `! isBlockSelected` so RichText's caret is not
+ * disrupted while the user is typing into the block. Accept/Reject runs
+ * against the clean overlay value via the existing `attribute-set` path —
+ * no marked-value persistence, no schema migration. See #77867 for the
+ * tradeoff vs. edit-time interception.
+ */
+
+/**
  * External dependencies
  */
 import clsx from 'clsx';
@@ -11,6 +35,7 @@ import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useCallback, useMemo, useRef } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
+import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { VisuallyHidden } from '@wordpress/ui';
 
@@ -19,8 +44,128 @@ import { VisuallyHidden } from '@wordpress/ui';
  */
 import { useSuggestionOverlay } from './overlay-context';
 import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';
+import { markContentDiff, stripSuggestionMarks } from './inline-formats';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 import SuggestionMoveGhost from './suggestion-move-ghost';
+
+const BLOCK_EDITOR_STORE_NAME = 'core/block-editor';
+
+/**
+ * Block attribute keys whose values are RichText content and therefore
+ * benefit from inline diff marking. Marking primitive attributes like
+ * `align: 'left'` would leak `<del>left</del><ins>right</ins>` into a
+ * className/string slot, so this set is intentionally narrow. Most of the
+ * golden-path scenarios this PR covers (paragraph text edits, heading
+ * text edits, bolding a word) live on the `content` attribute; richer
+ * block coverage lands in subsequent phases.
+ */
+const RICH_TEXT_ATTRIBUTE_KEYS = new Set( [ 'content' ] );
+
+/**
+ * True for plain strings and for objects that stringify to a meaningful HTML
+ * form (the rich-text package's `RichTextData` is the case we care about).
+ * Duck-typed against `toString` rather than `instanceof RichTextData` so we
+ * don't take a hard dependency on the rich-text package's internal class.
+ *
+ * @param {*} value Candidate attribute value.
+ * @return {boolean} True when `String( value )` will produce useful HTML.
+ */
+function isStringLike( value ) {
+	if ( typeof value === 'string' ) {
+		return true;
+	}
+	return (
+		value !== null &&
+		value !== undefined &&
+		typeof value.toString === 'function' &&
+		value.toString !== Object.prototype.toString
+	);
+}
+
+/**
+ * Walk the merged attribute set and replace each rich-text value with its
+ * baseline-vs-proposed marked diff. Skips attributes whose value matches
+ * the baseline (no change to mark) or whose baseline is missing (the
+ * suggestion has nothing to diff against).
+ *
+ * `authorColor` is forwarded to `markContentDiff` so each `<del>`/`<ins>`
+ * carries the suggester's avatar color as an inline custom property; the
+ * canvas CSS partial consumes the variable and falls back to the
+ * red/green default when this is null.
+ *
+ * @param {Object}      merged        Output of `mergeOverlayAttributes`.
+ * @param {Object}      baseline      Baseline attributes captured when the
+ *                                    suggestion began.
+ * @param {string|null} [authorColor] Optional suggester avatar color.
+ * @return {Object} `merged` with rich-text attributes replaced by marked
+ * HTML, or `merged` unchanged when nothing was eligible.
+ */
+function applyDiffMarks( merged, baseline, authorColor = null ) {
+	if ( ! merged || ! baseline ) {
+		return merged;
+	}
+	let result = null;
+	for ( const key of RICH_TEXT_ATTRIBUTE_KEYS ) {
+		if ( ! Object.prototype.hasOwnProperty.call( merged, key ) ) {
+			continue;
+		}
+		const proposed = merged[ key ];
+		const original = baseline[ key ];
+		if ( ! isStringLike( proposed ) || ! isStringLike( original ) ) {
+			continue;
+		}
+		const proposedStr = String( proposed );
+		const originalStr = String( original );
+		if ( proposedStr === originalStr ) {
+			continue;
+		}
+		if ( ! result ) {
+			result = { ...merged };
+		}
+		result[ key ] = markContentDiff(
+			originalStr,
+			proposedStr,
+			authorColor
+		);
+	}
+	return result ?? merged;
+}
+
+/**
+ * Strip suggestion marks from incoming `setAttributes` payloads. RichText
+ * round-trips its `value` prop through serialization on every keystroke,
+ * so a previously-marked render would otherwise come back into the overlay
+ * as marked HTML and the next mark pass would double up. Stripping at the
+ * intercept keeps the overlay holding the "proposed" value rather than the
+ * marked rendering.
+ *
+ * @param {Object} nextAttributes Incoming attribute payload.
+ * @return {Object} Payload with rich-text values normalized.
+ */
+function stripMarksFromIncoming( nextAttributes ) {
+	if ( ! nextAttributes ) {
+		return nextAttributes;
+	}
+	let result = null;
+	for ( const key of RICH_TEXT_ATTRIBUTE_KEYS ) {
+		if ( ! Object.prototype.hasOwnProperty.call( nextAttributes, key ) ) {
+			continue;
+		}
+		const value = nextAttributes[ key ];
+		if ( ! isStringLike( value ) ) {
+			continue;
+		}
+		const stripped = stripSuggestionMarks( String( value ) );
+		if ( stripped === String( value ) ) {
+			continue;
+		}
+		if ( ! result ) {
+			result = { ...nextAttributes };
+		}
+		result[ key ] = stripped;
+	}
+	return result ?? nextAttributes;
+}
 
 /**
  * Attribute keys whose values are known to be object-valued and therefore
@@ -30,6 +175,19 @@ import SuggestionMoveGhost from './suggestion-move-ghost';
  */
 const DEEP_MERGE_KEYS = new Set( [ 'style', 'metadata' ] );
 
+/**
+ * Apply an overlay attribute set on top of the block's real attributes for
+ * rendering. Keys in `DEEP_MERGE_KEYS` (currently `style` and `metadata`)
+ * are one-level-merged so a partial overlay payload — e.g. tweaking
+ * `style.color` while leaving `style.typography` alone — preserves the
+ * untouched fields. Every other key is replaced wholesale, matching
+ * `setAttributes` semantics for primitive and array values.
+ *
+ * @param {Object}      base    Block's real attributes from the block-editor store.
+ * @param {Object|null} overlay Pending overlay attributes; `null` is a no-op.
+ * @return {Object} Merged attributes for rendering. Returns `base` by reference
+ * when there is no overlay to apply, so React's prop-identity bail-out fires.
+ */
 function mergeOverlayAttributes( base, overlay ) {
 	if ( ! overlay ) {
 		return base;
@@ -77,29 +235,81 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 	const attributesRef = useRef( attributes );
 	attributesRef.current = attributes;
 
-	const overlayAttributes = entries[ clientId ]?.overlayAttributes ?? null;
+	const overlayEntry = entries[ clientId ];
+	const overlayAttributes = overlayEntry?.overlayAttributes ?? null;
+	const baselineAttributes = overlayEntry?.baselineAttributes ?? null;
+
+	// Whether this block is the currently selected one (skip marking while
+	// the user is typing into it) and the suggester's avatar color (paints
+	// the inline marks so two suggesters' edits read as different colors).
+	// Folded into a single `useSelect` so the HOC stays at one extra
+	// store-subscription per block in suggest mode. `isSelected` defaults
+	// to `true` so any environment without the block-editor store
+	// registered (unit tests of this HOC) skips marking too — production
+	// always has both stores. `authorColor` defaults to `null` for
+	// anonymous / pre-collab edits, in which case the canvas CSS falls
+	// through to the red/green pair.
+	const { isSelected, authorColor } = useSelect(
+		( select ) => {
+			const blockEditor = select( BLOCK_EDITOR_STORE_NAME );
+			const core = select( coreStore );
+			const userId = core?.getCurrentUser?.()?.id ?? null;
+			return {
+				isSelected: blockEditor?.isBlockSelected
+					? blockEditor.isBlockSelected( clientId )
+					: true,
+				authorColor:
+					userId !== null ? getAvatarBorderColor( userId ) : null,
+			};
+		},
+		[ clientId ]
+	);
 
 	// Does an overlay entry currently exist for this block? This is the
 	// source of truth; `captureBaseline` only creates an entry when there
 	// isn't one, so we can skip the dispatch when we already know there is.
 	// Relying on a local ref was fragile — it didn't reset after the entry
 	// was cleared (auto-save trash, orphan prune, intent-switch).
-	const entryExists = !! entries[ clientId ];
+	const entryExists = !! overlayEntry;
 
 	const wrappedSetAttributes = useCallback(
 		( nextAttributes ) => {
+			// First overlay write for this block snapshots the current
+			// attributes as the baseline; subsequent writes only record
+			// overlay deltas. This lets the diff renderer below compare
+			// "what the block looked like when the suggestion started"
+			// against "what the suggester is proposing now".
 			if ( ! entryExists ) {
 				captureBaseline( clientId, name, attributesRef.current );
 			}
-			setOverlayAttributes( clientId, nextAttributes );
+			// Strip any suggestion marks RichText round-tripped from a
+			// previously marked render before storing in the overlay; see
+			// `stripMarksFromIncoming` for the rationale.
+			setOverlayAttributes(
+				clientId,
+				stripMarksFromIncoming( nextAttributes )
+			);
 		},
 		[ clientId, name, captureBaseline, setOverlayAttributes, entryExists ]
 	);
 
-	const mergedAttributes = useMemo(
-		() => mergeOverlayAttributes( attributes, overlayAttributes ),
-		[ attributes, overlayAttributes ]
-	);
+	const mergedAttributes = useMemo( () => {
+		const merged = mergeOverlayAttributes( attributes, overlayAttributes );
+		// While the block is selected, hand back the plain proposed value so
+		// the user's caret doesn't fight RichText's value-prop reconciliation
+		// on every keystroke. The marks reappear as soon as focus moves away
+		// — see the `isSelected` `useSelect` above for the full rationale.
+		if ( isSelected ) {
+			return merged;
+		}
+		return applyDiffMarks( merged, baselineAttributes, authorColor );
+	}, [
+		attributes,
+		overlayAttributes,
+		baselineAttributes,
+		isSelected,
+		authorColor,
+	] );
 
 	return (
 		<BlockEdit
@@ -319,5 +529,5 @@ export function registerSuggestionOverlayFilter() {
 	);
 }
 
-export { mergeOverlayAttributes };
+export { mergeOverlayAttributes, applyDiffMarks, stripMarksFromIncoming };
 export default withSuggestionOverlay;

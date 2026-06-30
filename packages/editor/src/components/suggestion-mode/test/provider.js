@@ -9,6 +9,7 @@ import {
 	payloadByteLength,
 	PAYLOAD_MAX_BYTES,
 	findStructuralOp,
+	findInlineOp,
 	clearSuggestionMarkerAttributes,
 } from '../provider';
 
@@ -449,6 +450,33 @@ describe( 'findStructuralOp', () => {
 	it( 'returns null for non-array input', () => {
 		expect( findStructuralOp( null ) ).toBeNull();
 		expect( findStructuralOp( undefined ) ).toBeNull();
+	} );
+} );
+
+describe( 'findInlineOp', () => {
+	it( 'returns the inline-suggestion op when present', () => {
+		const op = findInlineOp( [
+			{ type: 'attribute-set', attribute: 'level', before: 2, after: 3 },
+			{
+				type: 'inline-suggestion',
+				attribute: 'content',
+				suggestionType: 'del',
+			},
+		] );
+		expect( op?.type ).toBe( 'inline-suggestion' );
+		expect( op?.attribute ).toBe( 'content' );
+	} );
+
+	it( 'returns null when there is no inline op', () => {
+		expect(
+			findInlineOp( [ { type: 'attribute-set', attribute: 'content' } ] )
+		).toBeNull();
+		expect( findInlineOp( [ { type: 'block-remove' } ] ) ).toBeNull();
+	} );
+
+	it( 'returns null for non-array input', () => {
+		expect( findInlineOp( null ) ).toBeNull();
+		expect( findInlineOp( undefined ) ).toBeNull();
 	} );
 } );
 

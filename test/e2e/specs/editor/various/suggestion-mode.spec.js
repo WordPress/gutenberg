@@ -91,19 +91,321 @@ test.describe( 'Suggestion mode', () => {
 		await page.keyboard.press( 'End' );
 		await page.keyboard.type( ' plus suggested' );
 
-		// Overlay reflects the proposed content, block store does not.
+		// Option B: the typed addition lives in content wrapped in a
+		// `wp-suggestion` add marker (stripped only at the front end until
+		// accepted), so it round-trips through the serialized post.
 		await expect( paragraph ).toContainText(
 			'Original content plus suggested'
 		);
+
+		// The addition's `data-suggestion-id` is minted by the note comment
+		// created during typing, and the marker is only written once that id
+		// resolves — so a populated id is race-free proof the suggestion
+		// auto-saved. (Unlike `waitForResponse`, which can't catch a POST that
+		// already landed while the text was being typed.) Typing routes
+		// through the inline-marker path, which bypasses the overlay, so the
+		// block doesn't take the overlay-only `is-suggestion-pending` bracket.
+		const marker = paragraph.locator(
+			'mark.wp-suggestion[data-suggestion-type="add"]'
+		);
+		await expect( marker ).toContainText( 'plus suggested' );
+		await expect( marker ).toHaveAttribute( 'data-suggestion-id', /\d/ );
+
 		const serialized = await editor.getEditedPostContent();
 		expect( serialized ).toContain( 'Original content' );
-		expect( serialized ).not.toContain( 'plus suggested' );
+		expect( serialized ).toContain( 'data-suggestion-type="add"' );
+		expect( serialized ).toContain( 'plus suggested' );
+	} );
 
-		// Auto-save fires after the debounce window.
+	test( 'add — golden path: typed text becomes an in-content add marker', async ( {
+		editor,
+		page,
+	} ) => {
+		// Golden-path text addition (Option B): typing in Suggest mode wraps
+		// the new run in an in-content `core/suggestion` add marker rather
+		// than diverting it to the overlay. The marker is visible immediately
+		// (no blur needed) and the proposed text lives in the serialized post
+		// content, stripped only at the front end until accepted.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' world' );
+
+		// The note is created asynchronously, then the marker is written.
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="add"]'
+			)
+		).toContainText( 'world' );
+
+		// The proposed text now lives in content as a marker (Option B), so
+		// it round-trips through the serialized post — unlike the old overlay.
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).toContain( 'data-suggestion-type="add"' );
+		expect( serialized ).toContain( 'Hello' );
+	} );
+
+	test( 'add — the note summarizes the addition as "Add: …", not "Format: content"', async ( {
+		editor,
+		page,
+	} ) => {
+		// Regression: an inline addition created by typing produces an
+		// `inline-suggestion` operation that carries no before/after text (the
+		// proposed words live in the in-content marker, not the payload). The
+		// sidebar summary used to fall through to the generic attribute branch
+		// and label the note "Format: content"; it should read like a Google
+		// Docs review note — Add: "new text".
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'This is your first post.' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		// Place the caret before "This" and type the suggested addition.
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.type( 'new text' );
+
+		// The addition is wrapped in an in-content add marker. Its
+		// `data-suggestion-id` is minted by the note comment created during
+		// typing, so reaching this point means the suggestion already exists —
+		// no separate auto-save wait is needed for the inline path.
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="add"]'
+			)
+		).toContainText( 'new text' );
+
+		// Open the notes sidebar and read the suggestion's summary line.
+		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
+		const allNotesToggle = topBar.getByRole( 'button', {
+			name: 'All notes',
+			exact: true,
+		} );
+		if (
+			( await allNotesToggle.getAttribute( 'aria-expanded' ) ) === 'false'
+		) {
+			await allNotesToggle.click();
+		}
+
+		const summary = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.locator( '.editor-collab-sidebar-panel__suggestion-summary' );
+		await expect( summary ).toBeVisible();
+		await expect( summary ).toContainText( 'Add:' );
+		await expect( summary ).toContainText( 'new text' );
+		await expect( summary ).not.toContainText( 'Format:' );
+	} );
+
+	test( 'add — a whitespace-only addition summarizes as "Add: …", not "Format: content"', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Regression: inserting only whitespace in Suggest mode resolves to a
+		// marker whose text is all spaces. The summary required the resolved
+		// text to survive a `trim()` (and then collapsed its whitespace), so a
+		// pure-whitespace edit fell back to "Format: content" instead of
+		// quoting the added spaces.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Wordone.' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		// Place the caret between "Word" and "one." and type only spaces.
+		await page.keyboard.press( 'Home' );
+		await pageUtils.pressKeys( 'ArrowRight', { times: 4 } );
+		await page.keyboard.type( '   ' );
+
+		// The spaces are wrapped in an in-content add marker whose
+		// `data-suggestion-id` is minted by the note comment created during
+		// typing — its presence proves the suggestion already saved.
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="add"]'
+			)
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+
+		// Open the notes sidebar and read the suggestion's summary line.
+		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
+		const allNotesToggle = topBar.getByRole( 'button', {
+			name: 'All notes',
+			exact: true,
+		} );
+		if (
+			( await allNotesToggle.getAttribute( 'aria-expanded' ) ) === 'false'
+		) {
+			await allNotesToggle.click();
+		}
+
+		const summary = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.locator( '.editor-collab-sidebar-panel__suggestion-summary' );
+		await expect( summary ).toBeVisible();
+		await expect( summary ).toContainText( 'Add:' );
+		await expect( summary ).not.toContainText( 'Format:' );
+	} );
+
+	test( 'delete — golden path: deleting a selection becomes an in-content del marker', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Golden-path text deletion (Option B): selecting a run and pressing
+		// Backspace wraps it in a `del` marker in content instead of removing
+		// it. The text survives (struck through) until the suggestion is
+		// accepted, and the marker is visible immediately.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		// Select "world" (five characters) then delete.
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		await page.keyboard.press( 'Backspace' );
+
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="del"]'
+			)
+		).toContainText( 'world' );
+
+		// Deletion keeps the text until the suggestion is accepted.
+		await expect( paragraph ).toContainText( 'Hello world' );
+	} );
+
+	test( 'type-over: replacing a selection becomes a del + add pair', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Typing over a selection proposes deleting the old text and adding
+		// the replacement, as two adjacent markers.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		await page.keyboard.type( 'planet' );
+
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="del"]'
+			)
+		).toContainText( 'world' );
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="add"]'
+			)
+		).toContainText( 'planet' );
+	} );
+
+	test( 'collapsed delete: Backspace at a caret marks the previous character', async ( {
+		editor,
+		page,
+	} ) => {
+		// Backspace with no selection marks the character before the caret
+		// for deletion instead of removing it.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'abcdef' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.press( 'Backspace' );
+
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="del"]'
+			)
+		).toContainText( 'f' );
+		// The character is kept until accepted.
+		await expect( paragraph ).toContainText( 'abcdef' );
+	} );
+
+	test( 'style — golden path: shows a newly bolded word wrapped in <ins> with <strong> preserved', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Golden-path inline-format change: select a word, press Cmd/Ctrl+B
+		// to bold it, and the suggestion preview should mark the run as
+		// added (so it reads as both bold AND highlighted) without losing
+		// the underlying <strong> markup. The diff sees the bare token
+		// replaced by the wrapped one, so it surfaces as a delete + insert
+		// pair around the styled run.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		await pageUtils.pressKeys( 'primary+b' );
+
 		await waitForSuggestionSaved( page );
+		await page.evaluate( () => {
+			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
+		} );
 
-		// Edited block picks up the pending-suggestion outline.
-		await expect( paragraph ).toHaveClass( /is-suggestion-pending/ );
+		// The bolded run is wrapped in `<ins>` so it picks up the addition
+		// color treatment, with `<strong>` preserved inside so it still
+		// renders as bold.
+		await expect(
+			paragraph.locator( 'ins.has-suggestion-addition strong' )
+		).toContainText( 'world' );
+
+		// And the bare-text version is shown as a deletion so the reviewer
+		// can see what the run looked like before the suggestion.
+		await expect(
+			paragraph.locator( 'del.has-suggestion-deletion' )
+		).toContainText( 'world' );
 	} );
 
 	test( 'captures a heading-level change made via the block-switcher variation picker', async ( {

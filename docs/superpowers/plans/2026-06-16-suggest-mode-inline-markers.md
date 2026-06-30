@@ -1,6 +1,7 @@
 # Plan: Inline Suggestions on the shared inline-marker primitive (PR #78218)
 
-- **Status:** Proposed (2026-06-16)
+- **Status:** Implemented through Phase 6 (2026-06-17) on review PR [#79282](https://github.com/WordPress/gutenberg/pull/79282) + combined testing PR [#78994](https://github.com/WordPress/gutenberg/pull/78994). Phases 0–4 complete; Phase 5 per-author tinting complete; Phase 6 docs + e2e complete. **Deferred follow-ups:** inline-formatting/IME/multi-line-paste as markers (still on overlay diff), Phase 5 visual alignment with the Revisions diff UI (open design), inverse marker-removal cleanup (must not race with the deliberate marker removal in accept/reject — needs coordination), and rigorous undo/RTC e2e (single-browser harness can't drive them).
+- **Status (original):** Proposed (2026-06-16)
 - **Decision:** Option B confirmed — suggested inline changes live as marked text in block content (not in an ephemeral overlay).
 - **Depends on:** [#78218](https://github.com/WordPress/gutenberg/pull/78218) "Notes: inline (partial-text) notes via hybrid marker + strip-on-render". (Its base is `trunk`; [#75147](https://github.com/WordPress/gutenberg/pull/75147) multiple-notes-per-block already merged.)
 - **Supersedes:** the bespoke inline-marking in [#77869](https://github.com/WordPress/gutenberg/pull/77869) (`suggestion-mode/inline-formats.js`).
