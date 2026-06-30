@@ -129,8 +129,8 @@ test.describe( 'Guidelines', () => {
 	} ) => {
 		await visitGuidelinesPage( page, admin );
 
-		// Sections come from the wp_guideline_scopes registry plus the Blocks
-		// section the client injects.
+		// Sections come from the wp_guideline_scopes registry, including the
+		// Blocks scope the client renders as the per-block section.
 		await expect( getSectionCard( page, 'Site' ) ).toBeVisible();
 		await expect( getSectionCard( page, 'Copy' ) ).toBeVisible();
 		await expect( getSectionCard( page, 'Images' ) ).toBeVisible();
@@ -385,5 +385,33 @@ test.describe( 'Guidelines', () => {
 		await expect(
 			copyCard.getByRole( 'textbox', { name: 'Copy guidelines' } )
 		).toHaveValue( copyText );
+	} );
+
+	test.describe( 'with the Blocks scope removed by a filter', () => {
+		// A plugin that removes the `blocks` entry from wp_guideline_scopes.
+		// The Blocks section is registry-driven, so dropping the scope must
+		// hide the whole section, not just its contents.
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin(
+				'gutenberg-test-guidelines-remove-blocks-scope'
+			);
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-guidelines-remove-blocks-scope'
+			);
+		} );
+
+		test( 'hides the entire Blocks section', async ( { page, admin } ) => {
+			await visitGuidelinesPage( page, admin );
+
+			// The remaining registry sections still render.
+			await expect( getSectionCard( page, 'Site' ) ).toBeVisible();
+			await expect( getSectionCard( page, 'Additional' ) ).toBeVisible();
+
+			// The Blocks section is gone: no card, no per-block UI.
+			await expect( getSectionCard( page, 'Blocks' ) ).toHaveCount( 0 );
+		} );
 	} );
 } );

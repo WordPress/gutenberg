@@ -76,6 +76,11 @@ if ( ! function_exists( 'wp_guideline_scopes' ) ) {
 	 * automatically. The registry carries identity and presentation only; rows
 	 * are created on first save.
 	 *
+	 * The `blocks` scope is the one exception: it has no single `guideline-blocks`
+	 * row. Its section lists per-block guidelines stored as `guideline-block-*`
+	 * rows. Removing it from this registry (via the filter) hides that section on
+	 * the Settings page.
+	 *
 	 * @return array {
 	 *     Slug-keyed map of guideline scopes.
 	 *
@@ -112,6 +117,11 @@ if ( ! function_exists( 'wp_guideline_scopes' ) ) {
 					'title'       => __( 'Images', 'gutenberg' ),
 					'description' => __( 'Outline your style, dimensions, formats, mood and aesthetic preferences.', 'gutenberg' ),
 					'order'       => 30,
+				),
+				'blocks'     => array(
+					'title'       => __( 'Blocks', 'gutenberg' ),
+					'description' => __( 'Create tailored guidelines for specific block types.', 'gutenberg' ),
+					'order'       => 40,
 				),
 				'additional' => array(
 					'title'       => __( 'Additional', 'gutenberg' ),
