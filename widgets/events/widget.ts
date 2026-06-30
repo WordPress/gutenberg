@@ -24,6 +24,7 @@ export default {
 			description: __(
 				'City or region for nearby events. Edits apply when you save this panel.'
 			),
+			relevance: 'high',
 			Edit: LocationSettingControl,
 		},
 	] satisfies WidgetAttributeField< EventsWidgetAttributes >[],
