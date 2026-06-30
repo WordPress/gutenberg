@@ -74,6 +74,7 @@ export function initializeEditor( id, settings ) {
 	dispatch( preferencesStore ).setDefaults( 'core', {
 		allowRightClickOverrides: true,
 		distractionFree: false,
+		editorIntent: 'edit',
 		editorMode: 'visual',
 		editorTool: 'edit',
 		fixedToolbar: false,

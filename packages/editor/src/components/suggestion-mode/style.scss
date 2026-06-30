@@ -1,0 +1,63 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+// Sidebar/chrome styles for the suggestion-mode UI. The canvas-targeted
+// visual treatments for `.block-editor-block-list__block.is-suggestion-*`
+// live in `block-editor/src/components/block-list/content-suggestion.scss`
+// because the editor canvas iframe loads `wp-block-editor-content` (compiled
+// from block-editor) but does NOT load the editor-package chrome stylesheet
+// — keeping the canvas rules over there is what makes them apply inside the
+// iframe.
+
+.editor-collab-sidebar-panel__suggestion-summary {
+	em {
+		font-style: italic;
+		color: $gray-700;
+	}
+}
+
+// Inline diff colors for the suggestion preview. Pulled from the design
+// system fallbacks so the rendering still degrades gracefully on themes
+// without `--wp-admin-theme-color` defined.
+.editor-collab-sidebar-panel__suggestion-text-diff {
+	del {
+		color: var(--wp-block-synced-color, #cc1818);
+		text-decoration: line-through;
+	}
+
+	ins {
+		color: var(--wp-admin-theme-color, #007017);
+		text-decoration: underline;
+	}
+}
+
+// Inline accept/reject buttons live in the note header, right-aligned next
+// to the author info. Force both icons to render at the same box so the
+// checkmark (a thin glyph) visually matches the close glyph next to it,
+// and thicken the check stroke so it reads at a similar visual weight to
+// the denser close glyph.
+.editor-collab-sidebar-panel__suggestion-header-actions {
+	margin-left: auto;
+
+	.components-button.has-icon {
+		width: $grid-unit-40;
+		height: $grid-unit-40;
+		min-width: $grid-unit-40;
+		padding: 0;
+
+		svg {
+			width: $grid-unit-40;
+			height: $grid-unit-40;
+		}
+
+		// The check path in @wordpress/icons is drawn with a lighter weight
+		// than the close glyph, so pair the filled path with a 1px stroke to
+		// lift it to the same visual density.
+		&[aria-label="Accept suggestion"] svg path {
+			stroke: currentColor;
+			stroke-width: 1;
+			stroke-linecap: round;
+			stroke-linejoin: round;
+		}
+	}
+}

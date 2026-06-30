@@ -32,6 +32,12 @@ function NoteFormatEdit( { value, isActive, activeAttributes } ) {
 	// Static selector getter: the active area is only read when the button is
 	// clicked, so there's no need to subscribe and re-render on its changes.
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
+	// Subscribe to the selected note so the button can render active while a
+	// new note/suggestion is being composed ( `selectedNote === 'new'` ).
+	const selectedNote = useSelect(
+		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
+		[]
+	);
 
 	// Toolbar button only relevant on an active selection or when standing on
 	// an existing inline note marker.
@@ -66,7 +72,7 @@ function NoteFormatEdit( { value, isActive, activeAttributes } ) {
 			icon={ commentIcon }
 			title={ __( 'Add note' ) }
 			onClick={ onClick }
-			isActive={ isActive }
+			isActive={ isActive || selectedNote === 'new' }
 		/>
 	);
 }

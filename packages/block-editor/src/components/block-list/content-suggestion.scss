@@ -1,0 +1,150 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+// Visual treatment for blocks tagged with a pending suggestion. The marker
+// itself lives in `metadata.suggestion` (set by the editor-package suggestion
+// system); this stylesheet only knows about the resulting class name. Lives in
+// `block-editor` because the canvas iframe loads `wp-block-editor-content`
+// (compiled from this package) but does NOT load the editor-package chrome
+// stylesheets — keeping these rules here is what makes them apply inside the
+// iframe.
+
+// Default suggestion color, used when the suggester's avatar color
+// can't be resolved (e.g., anonymous edits or pre-collab sessions).
+// `withSuggestionBlockClassName` writes the suggester's avatar color
+// into `--suggestion-author-color` on each pending-suggestion block,
+// so individual suggestions tint to their author's color the same way
+// live cursors do — Google Docs-style. Rules below consume the
+// variable with this green as the fallback.
+$suggestion-color: #188038;
+$suggestion-author-color: var(--suggestion-author-color, #{$suggestion-color});
+
+// Green "bracket" applied to any block with a pending attribute overlay
+// while the suggester is editing. Drawn with an outline so it layers above
+// block content without affecting layout.
+.block-editor-block-list__block.is-suggestion-pending {
+	position: relative;
+	outline: 2px solid $suggestion-author-color;
+	outline-offset: 2px;
+	border-radius: $radius-small;
+
+	&::before,
+	&::after {
+		content: "";
+		position: absolute;
+		width: $grid-unit-10;
+		height: $grid-unit-10;
+		border: 2px solid $suggestion-author-color;
+		pointer-events: none;
+	}
+
+	&::before {
+		top: -$grid-unit-05;
+		left: -$grid-unit-05;
+		border-right: 0;
+		border-bottom: 0;
+	}
+
+	&::after {
+		bottom: -$grid-unit-05;
+		right: -$grid-unit-05;
+		border-left: 0;
+		border-top: 0;
+	}
+}
+
+// Pending-remove: the block is still real (selection, focus, and toolbar
+// keep working) but the visual treatment communicates "proposed for
+// deletion". Strikethrough + suggestion-green text on every line so
+// multi-line paragraphs read clearly as "delete me", matching Google
+// Docs' suggesting-mode strike-through. The decoration is applied to
+// the wrapper and propagates to inline rich-text descendants.
+.block-editor-block-list__block.is-suggestion-pending-remove {
+	color: $suggestion-author-color;
+	text-decoration: line-through;
+	text-decoration-color: $suggestion-author-color;
+	text-decoration-thickness: 2px;
+}
+
+// Pending-insert: the block was inserted in Suggest mode but isn't yet
+// "real". A dashed green outline distinguishes it from the solid bracket
+// used by pending attribute edits, and the suggester's typed content
+// is rendered in suggestion green so the reviewer sees a green preview
+// of what's being added (matching Google Docs' suggesting-mode insert
+// treatment). Edits to a pending-insert block bypass the suggestion
+// overlay (see `with-suggestion-overlay.js`) so the content syncs and
+// shows up here.
+.block-editor-block-list__block.is-suggestion-pending-insert {
+	position: relative;
+	color: $suggestion-author-color;
+	outline: 2px dashed $suggestion-author-color;
+	outline-offset: 2px;
+	border-radius: $radius-small;
+}
+
+// Pending-move: the block has been dragged to a new position but the move
+// isn't yet committed. A dotted green outline distinguishes it from the
+// dashed pending-insert (the block existed before — only its position is
+// suggested). The "Suggested move" tab pinned to the top corner makes the
+// preview state unambiguous. The tab text comes from the
+// `data-suggestion-move-label` attribute (set by the editor-package HOC) so
+// it is translatable rather than a hardcoded English string baked into CSS.
+.block-editor-block-list__block.is-suggestion-pending-move {
+	position: relative;
+	opacity: 0.7;
+	outline: 2px dotted $suggestion-author-color;
+	outline-offset: 2px;
+	border-radius: $radius-small;
+
+	&::before {
+		content: attr(data-suggestion-move-label);
+		position: absolute;
+		top: -$grid-unit-20;
+		left: -$grid-unit-05;
+		padding: 0 $grid-unit-10;
+		background: $suggestion-author-color;
+		color: $white;
+		font-size: 11px;
+		font-weight: 500;
+		line-height: $grid-unit-20;
+		border-radius: $radius-small $radius-small 0 0;
+		pointer-events: none;
+		z-index: 1;
+	}
+}
+
+// Move ghost: a non-interactive placeholder rendered at a moved block's
+// original position (by the editor-package suggestion HOC) so a reviewer
+// can see where the block came from. Dimmed + struck-through, tinted with
+// the suggester's color (shared with the decorated block at the destination
+// via `--suggestion-author-color`), with a small "Moved from here" label so
+// the ghost reads as one half of a move pair.
+.is-suggestion-move-ghost {
+	display: block;
+	position: relative;
+	margin: $grid-unit-15 0;
+	padding: $grid-unit-15;
+	opacity: 0.6;
+	color: $suggestion-author-color;
+	border: 1px dotted $suggestion-author-color;
+	border-radius: $radius-small;
+	text-decoration: line-through;
+	text-decoration-color: $suggestion-author-color;
+	pointer-events: none;
+	user-select: none;
+
+	.is-suggestion-move-ghost__label {
+		display: inline-flex;
+		align-items: center;
+		gap: $grid-unit-05;
+		font-size: 11px;
+		font-weight: 500;
+		text-decoration: none;
+	}
+
+	.is-suggestion-move-ghost__excerpt {
+		display: block;
+		margin-top: $grid-unit-05;
+		font-size: 13px;
+	}
+}

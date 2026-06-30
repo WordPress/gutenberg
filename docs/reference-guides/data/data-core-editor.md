@@ -381,6 +381,22 @@ _Returns_
 
 -   `Array`: Block list.
 
+### getEditorIntent
+
+Returns the current editor intent. The intent represents the user's editing purpose — directly editing content (`edit`), suggesting changes that the author can apply or reject (`suggest`), or viewing the post in a read-only mode (`view`).
+
+The intent is orthogonal to the `editorMode` preference (visual vs. code).
+
+Storage: the value lives in the preferences store under (`core`, `editorIntent`). The per-app default is registered in `packages/edit-post/src/index.js` and `packages/edit-site/src/index.js`. If no value is set we fall back to `EDITOR_INTENT_EDIT` so callers can rely on a non-null result.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `string`: The current editor intent. One of `edit`, `suggest`, `view`.
+
 ### getEditorMode
 
 Returns the current editing mode.
@@ -1494,6 +1510,20 @@ _Parameters_
 _Returns_
 
 -   `Object`: Action object.
+
+### setEditorIntent
+
+Sets the current editor intent.
+
+The intent represents the user's editing purpose: directly editing content (`edit`), suggesting changes that the author can apply or reject (`suggest`), or viewing the post in a read-only mode (`view`). It is orthogonal to the `editorMode` preference (visual vs. code).
+
+The intent is _session-scoped_ — held in the editor reducer (not the preferences store), so reloading the editor always returns to `edit`. Persisting suggest/view across reloads surprises users who don't realize they left the editor in a non-default state.
+
+Unknown intents are silently rejected (no dispatch, no announcement) so typos from a bookmarklet, browser extension, or third-party plugin can't poison the editor state; valid values are listed in `EDITOR_INTENTS`.
+
+_Parameters_
+
+-   _intent_ `'edit'|'suggest'|'view'`: The editor intent to set.
 
 ### setIsInserterOpened
 

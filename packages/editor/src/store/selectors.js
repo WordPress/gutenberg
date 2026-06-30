@@ -24,6 +24,7 @@ import {
 	PERMALINK_POSTNAME_REGEX,
 	ONE_MINUTE_IN_MS,
 	AUTOSAVE_PROPERTIES,
+	EDITOR_INTENT_EDIT,
 } from './constants';
 import { getPostRawValue } from './reducer';
 import { getTemplatePartIcon } from '../utils/get-template-part-icon';
@@ -1391,6 +1392,28 @@ export const getEditorMode = createRegistrySelector(
 	( select ) => () =>
 		select( preferencesStore ).get( 'core', 'editorMode' ) ?? 'visual'
 );
+
+/**
+ * Returns the current editor intent. The intent represents the user's
+ * editing purpose — directly editing content (`edit`), suggesting changes
+ * that the author can apply or reject (`suggest`), or viewing the post in
+ * a read-only mode (`view`).
+ *
+ * The intent is orthogonal to the `editorMode` preference (visual vs. code).
+ *
+ * Storage: the value lives in the preferences store under
+ * (`core`, `editorIntent`). The per-app default is registered in
+ * `packages/edit-post/src/index.js` and `packages/edit-site/src/index.js`.
+ * If no value is set we fall back to `EDITOR_INTENT_EDIT` so callers can
+ * rely on a non-null result.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} The current editor intent. One of `edit`, `suggest`, `view`.
+ */
+export function getEditorIntent( state ) {
+	return state.editorIntent ?? EDITOR_INTENT_EDIT;
+}
 
 /*
  * Backward compatibility
