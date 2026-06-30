@@ -205,6 +205,43 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 		return true;
 	}
 
+	/**
+	 * Checks if the current user can read the comment.
+	 *
+	 * Core's implementation only excludes the 'note' type from the public read
+	 * path, where an approved comment on a readable post is world-readable.
+	 * Reactions are an internal comment type too, so without this override a
+	 * direct request such as GET /wp/v2/comments/{reaction_id} would expose
+	 * reaction rows - including the reacting user's identity - to any reader of
+	 * the post. Give reactions the same restriction core gives notes: never
+	 * public, readable only by their author or users who can edit the comment.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param WP_Comment      $comment Comment object.
+	 * @param WP_REST_Request $request Request data to check.
+	 * @return bool True if the user can read the comment, false otherwise.
+	 */
+	protected function check_read_permission( $comment, $request ) {
+		if ( 'reaction' === $comment->comment_type ) {
+			if ( 0 === get_current_user_id() ) {
+				return false;
+			}
+
+			if ( empty( $comment->comment_post_ID ) && ! current_user_can( 'moderate_comments' ) ) {
+				return false;
+			}
+
+			if ( ! empty( $comment->user_id ) && get_current_user_id() === (int) $comment->user_id ) {
+				return true;
+			}
+
+			return current_user_can( 'edit_comment', $comment->comment_ID );
+		}
+
+		return parent::check_read_permission( $comment, $request );
+	}
+
 	public function create_item_permissions_check( $request ) {
 		$is_note = ! empty( $request['type'] ) && $this->is_note_or_reaction( $request['type'] );
 

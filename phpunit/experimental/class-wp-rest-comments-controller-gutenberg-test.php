@@ -509,6 +509,56 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Reactions are an internal comment type and must not be world-readable,
+	 * even when approved on a public post. Only the reacting user or a user who
+	 * can edit the comment may read a reaction via GET /wp/v2/comments/{id}.
+	 */
+	public function test_reaction_not_publicly_readable() {
+		$post_id     = self::factory()->post->create(
+			array(
+				'post_status' => 'publish',
+				'post_author' => self::$editor_id,
+			)
+		);
+		$note_id     = $this->create_note( $post_id, self::$editor_id );
+		$reaction_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_type'     => 'reaction',
+				'comment_approved' => 1,
+				'comment_parent'   => $note_id,
+				'comment_content'  => 'heart',
+				'user_id'          => self::$editor_id,
+			)
+		);
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/comments/' . $reaction_id );
+
+		// Logged-out users cannot read the reaction.
+		wp_set_current_user( 0 );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_cannot_read', $response, 401 );
+
+		// A subscriber without edit access cannot read the reaction.
+		wp_set_current_user( self::$subscriber_id );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_cannot_read', $response, 403 );
+
+		// The reacting user can read their own reaction.
+		wp_set_current_user( self::$editor_id );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( $reaction_id, $response->get_data()['id'] );
+
+		// An administrator who can edit the comment can read the reaction.
+		wp_set_current_user( self::$admin_id );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 200, $response->get_status() );
+
+		wp_delete_post( $post_id, true );
+	}
+
+	/**
 	 * A reaction whose parent note belongs to a different post is rejected.
 	 */
 	public function test_cannot_create_reaction_on_note_from_different_post() {
