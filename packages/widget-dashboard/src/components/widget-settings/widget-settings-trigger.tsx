@@ -12,6 +12,7 @@ import type { WidgetType } from '@wordpress/widget-primitives';
 /**
  * Internal dependencies
  */
+import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';
 import type { DashboardWidget } from '../../types';
 
@@ -29,10 +30,11 @@ export interface WidgetSettingsTriggerProps {
 }
 
 /**
- * Per-instance gear that opens the shared settings drawer by writing the
+ * Per-instance gear that toggles the shared settings drawer by writing the
  * instance `uuid` to the UI context; the single `WidgetSettings` at the root
- * reacts to it. Returns `null` when the type declares no attributes, so chrome
- * can mount it unconditionally.
+ * reacts to it. Clicking the gear of the instance whose drawer is already
+ * open closes it. Returns `null` when the type declares no attributes, so
+ * chrome can mount it unconditionally.
  *
  * @param {WidgetSettingsTriggerProps} props Component props.
  */
@@ -40,12 +42,20 @@ export function WidgetSettingsTrigger( {
 	widget,
 	widgetType,
 }: WidgetSettingsTriggerProps ): React.ReactNode {
-	const { setSettingsWidgetUuid } = useDashboardUIContext();
+	const { settingsWidgetUuid, setSettingsWidgetUuid } =
+		useDashboardUIContext();
+	const { cancel } = useDashboardInternalContext();
 
-	const open = useCallback(
-		() => setSettingsWidgetUuid( widget.uuid ),
-		[ setSettingsWidgetUuid, widget.uuid ]
-	);
+	const toggle = useCallback( () => {
+		// Re-clicking the open instance's gear closes the drawer, discarding
+		// staged edits like any other non-Save exit.
+		if ( settingsWidgetUuid === widget.uuid ) {
+			cancel();
+			setSettingsWidgetUuid( null );
+			return;
+		}
+		setSettingsWidgetUuid( widget.uuid );
+	}, [ cancel, settingsWidgetUuid, setSettingsWidgetUuid, widget.uuid ] );
 
 	if ( ! widgetType.attributes?.length ) {
 		return null;
@@ -58,7 +68,7 @@ export function WidgetSettingsTrigger( {
 			variant="minimal"
 			tone="neutral"
 			size="compact"
-			onClick={ open }
+			onClick={ toggle }
 		/>
 	);
 }
