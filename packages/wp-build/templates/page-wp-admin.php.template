@@ -270,7 +270,7 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_render_page() {
 			overflow-y: auto;
 		}
 		body {
-			background: #fff;
+			background: var(--wpds-color-background-surface-neutral-weak);
 		}
 
 		/* Reset wp-admin padding */
@@ -320,4 +320,3 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_render_page() {
 
 // Hook the enqueue function to admin_enqueue_scripts
 add_action( 'admin_enqueue_scripts', '{{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts' );
-

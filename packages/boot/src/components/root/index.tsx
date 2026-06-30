@@ -63,143 +63,132 @@ export default function Root() {
 	return (
 		<SlotFillProvider>
 			<Tooltip.Provider>
-				<ThemeProvider
-					isRoot
-					color={ { ...themeColors, background: '#f8f8f8' } }
-				>
-					<ThemeProvider color={ themeColors }>
-						<div
-							className={ clsx( 'boot-layout', {
-								'has-canvas': !! canvas || canvas === null,
-								'has-full-canvas': isFullScreen,
-							} ) }
-						>
-							<SavePanel />
-							<SnackbarNotices className="boot-notices__snackbar" />
-							{ isMobileViewport && (
-								<Page.SidebarToggleFill>
-									<Button
-										icon={ menu }
+				<ThemeProvider isRoot color={ themeColors }>
+					<div
+						className={ clsx( 'boot-layout', {
+							'has-canvas': !! canvas || canvas === null,
+							'has-full-canvas': isFullScreen,
+						} ) }
+					>
+						<SavePanel />
+						<SnackbarNotices className="boot-notices__snackbar" />
+						{ isMobileViewport && (
+							<Page.SidebarToggleFill>
+								<Button
+									icon={ menu }
+									onClick={ () =>
+										setIsMobileSidebarOpen( true )
+									}
+									label={ __( 'Open navigation panel' ) }
+									size="compact"
+								/>
+							</Page.SidebarToggleFill>
+						) }
+						{ /* Mobile Sidebar Backdrop */ }
+						<AnimatePresence>
+							{ isMobileViewport &&
+								isMobileSidebarOpen &&
+								! isFullScreen && (
+									<motion.div
+										initial={ { opacity: 0 } }
+										animate={ { opacity: 1 } }
+										exit={ { opacity: 0 } }
+										transition={ {
+											type: 'tween',
+											duration: disableMotion ? 0 : 0.2,
+											ease: 'easeOut',
+										} }
+										className="boot-layout__sidebar-backdrop"
 										onClick={ () =>
-											setIsMobileSidebarOpen( true )
+											setIsMobileSidebarOpen( false )
 										}
-										label={ __( 'Open navigation panel' ) }
-										size="compact"
-									/>
-								</Page.SidebarToggleFill>
-							) }
-							{ /* Mobile Sidebar Backdrop */ }
-							<AnimatePresence>
-								{ isMobileViewport &&
-									isMobileSidebarOpen &&
-									! isFullScreen && (
-										<motion.div
-											initial={ { opacity: 0 } }
-											animate={ { opacity: 1 } }
-											exit={ { opacity: 0 } }
-											transition={ {
-												type: 'tween',
-												duration: disableMotion
-													? 0
-													: 0.2,
-												ease: 'easeOut',
-											} }
-											className="boot-layout__sidebar-backdrop"
-											onClick={ () =>
-												setIsMobileSidebarOpen( false )
+										onKeyDown={ ( event ) => {
+											if ( event.key === 'Escape' ) {
+												setIsMobileSidebarOpen( false );
 											}
-											onKeyDown={ ( event ) => {
-												if ( event.key === 'Escape' ) {
-													setIsMobileSidebarOpen(
-														false
-													);
-												}
-											} }
-											role="button"
-											tabIndex={ -1 }
-											aria-label={ __(
-												'Close navigation panel'
-											) }
-										/>
-									) }
-							</AnimatePresence>
-							{ /* Mobile Sidebar */ }
-							<AnimatePresence>
-								{ isMobileViewport &&
-									isMobileSidebarOpen &&
-									! isFullScreen && (
-										<motion.div
-											initial={ { x: '-100%' } }
-											animate={ { x: 0 } }
-											exit={ { x: '-100%' } }
-											transition={ {
-												type: 'tween',
-												duration: disableMotion
-													? 0
-													: 0.2,
-												ease: 'easeOut',
-											} }
-											className="boot-layout__sidebar is-mobile"
-										>
-											<Sidebar />
-										</motion.div>
-									) }
-							</AnimatePresence>
-							{ /* Desktop Sidebar */ }
-							{ ! isMobileViewport && ! isFullScreen && (
-								<div className="boot-layout__sidebar">
-									<Sidebar />
-								</div>
-							) }
-							<div className="boot-layout__surfaces">
-								<ThemeProvider
-									color={ {
-										...themeColors,
-										background: '#ffffff',
-									} }
-								>
-									<Outlet />
-									{ /* Render Canvas in Root to prevent remounting on route changes */ }
-									{ ( canvas || canvas === null ) && (
-										<div
-											className={ clsx(
-												'boot-layout__canvas',
-												{
-													'has-mobile-drawer':
-														canvas?.isPreview &&
-														isMobileViewport,
-												}
-											) }
-										>
-											{ canvas?.isPreview &&
-												isMobileViewport && (
-													<div className="boot-layout__mobile-sidebar-drawer">
-														<Button
-															icon={ menu }
-															onClick={ () =>
-																setIsMobileSidebarOpen(
-																	true
-																)
-															}
-															label={ __(
-																'Open navigation panel'
-															) }
-															size="compact"
-														/>
-													</div>
-												) }
-											<CanvasRenderer
-												canvas={ canvas }
-												routeContentModule={
-													routeContentModule
-												}
-											/>
-										</div>
-									) }
-								</ThemeProvider>
+										} }
+										role="button"
+										tabIndex={ -1 }
+										aria-label={ __(
+											'Close navigation panel'
+										) }
+									/>
+								) }
+						</AnimatePresence>
+						{ /* Mobile Sidebar */ }
+						<AnimatePresence>
+							{ isMobileViewport &&
+								isMobileSidebarOpen &&
+								! isFullScreen && (
+									<motion.div
+										initial={ { x: '-100%' } }
+										animate={ { x: 0 } }
+										exit={ { x: '-100%' } }
+										transition={ {
+											type: 'tween',
+											duration: disableMotion ? 0 : 0.2,
+											ease: 'easeOut',
+										} }
+										className="boot-layout__sidebar is-mobile"
+									>
+										<Sidebar />
+									</motion.div>
+								) }
+						</AnimatePresence>
+						{ /* Desktop Sidebar */ }
+						{ ! isMobileViewport && ! isFullScreen && (
+							<div className="boot-layout__sidebar">
+								<Sidebar />
 							</div>
+						) }
+						<div className="boot-layout__surfaces">
+							<ThemeProvider
+								color={ {
+									...themeColors,
+									background: '#ffffff',
+								} }
+							>
+								<Outlet />
+								{ /* Render Canvas in Root to prevent remounting on route changes */ }
+								{ ( canvas || canvas === null ) && (
+									<div
+										className={ clsx(
+											'boot-layout__canvas',
+											{
+												'has-mobile-drawer':
+													canvas?.isPreview &&
+													isMobileViewport,
+											}
+										) }
+									>
+										{ canvas?.isPreview &&
+											isMobileViewport && (
+												<div className="boot-layout__mobile-sidebar-drawer">
+													<Button
+														icon={ menu }
+														onClick={ () =>
+															setIsMobileSidebarOpen(
+																true
+															)
+														}
+														label={ __(
+															'Open navigation panel'
+														) }
+														size="compact"
+													/>
+												</div>
+											) }
+										<CanvasRenderer
+											canvas={ canvas }
+											routeContentModule={
+												routeContentModule
+											}
+										/>
+									</div>
+								) }
+							</ThemeProvider>
 						</div>
-					</ThemeProvider>
+					</div>
 				</ThemeProvider>
 			</Tooltip.Provider>
 		</SlotFillProvider>

@@ -46,45 +46,37 @@ export default function RootSinglePage() {
 
 	return (
 		<SlotFillProvider>
-			<ThemeProvider
-				isRoot
-				color={ { ...themeColors, background: '#f8f8f8' } }
-			>
-				<ThemeProvider color={ themeColors }>
-					<div
-						className={ clsx(
-							'boot-layout boot-layout--single-page',
-							{
-								'has-canvas': !! canvas || canvas === null,
-								'has-full-canvas': isFullScreen,
-							}
-						) }
-					>
-						<SavePanel />
-						<SnackbarNotices className="boot-notices__snackbar" />
-						<div className="boot-layout__surfaces">
-							<ThemeProvider
-								color={ {
-									...themeColors,
-									background: '#ffffff',
-								} }
-							>
-								<Outlet />
-								{ /* Render Canvas in Root to prevent remounting on route changes */ }
-								{ ( canvas || canvas === null ) && (
-									<div className="boot-layout__canvas">
-										<CanvasRenderer
-											canvas={ canvas }
-											routeContentModule={
-												routeContentModule
-											}
-										/>
-									</div>
-								) }
-							</ThemeProvider>
-						</div>
+			<ThemeProvider isRoot color={ themeColors }>
+				<div
+					className={ clsx( 'boot-layout boot-layout--single-page', {
+						'has-canvas': !! canvas || canvas === null,
+						'has-full-canvas': isFullScreen,
+					} ) }
+				>
+					<SavePanel />
+					<SnackbarNotices className="boot-notices__snackbar" />
+					<div className="boot-layout__surfaces">
+						<ThemeProvider
+							color={ {
+								...themeColors,
+								background: '#ffffff',
+							} }
+						>
+							<Outlet />
+							{ /* Render Canvas in Root to prevent remounting on route changes */ }
+							{ ( canvas || canvas === null ) && (
+								<div className="boot-layout__canvas">
+									<CanvasRenderer
+										canvas={ canvas }
+										routeContentModule={
+											routeContentModule
+										}
+									/>
+								</div>
+							) }
+						</ThemeProvider>
 					</div>
-				</ThemeProvider>
+				</div>
 			</ThemeProvider>
 		</SlotFillProvider>
 	);
