@@ -921,6 +921,17 @@ test.describe( 'Block Notes', () => {
 			await expect( reactionButton ).toBeVisible();
 			await expect( reactionButton ).toContainText( '1' );
 
+			// The initial add must surface a success snackbar. Dismiss it so
+			// the re-add assertion below checks the re-add's own snackbar,
+			// rather than relying on both being present at once (snackbars
+			// auto-dismiss, which makes a cumulative count flaky).
+			const addedNotice = page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Reaction added.' } );
+			await expect( addedNotice ).toBeVisible();
+			await addedNotice.click();
+			await expect( addedNotice ).toBeHidden();
+
 			// Remove the reaction.
 			await reactionButton.click();
 			await expect( reactionButton ).toBeHidden();
@@ -944,15 +955,11 @@ test.describe( 'Block Notes', () => {
 			await expect( reactionButton ).toContainText( '❤' );
 			await expect( reactionButton ).toContainText( '1' );
 
-			// Both adds must have surfaced a success snackbar (initial
-			// add + re-add), and the duplicate-reaction error must
-			// never appear — pins both fixes (client refetch + server
-			// status='approve' query) against regression.
-			await expect(
-				page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Reaction added.' } )
-			).toHaveCount( 2 );
+			// The re-add must surface its own success snackbar, and the
+			// duplicate-reaction error must never appear — pins both fixes
+			// (client refetch + server status='approve' query) against
+			// regression.
+			await expect( addedNotice ).toBeVisible();
 			await expect(
 				page.locator( '.components-snackbar__content', {
 					hasText: /already reacted/i,
