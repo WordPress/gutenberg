@@ -38,7 +38,6 @@ import {
 import type { RangeControlProps } from './types';
 import type { WordPressComponentProps } from '../context';
 import { space } from '../utils/space';
-import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 const noop = () => {};
 
@@ -66,7 +65,10 @@ function UnforwardedRangeControl(
 	forwardedRef: ForwardedRef< HTMLInputElement >
 ) {
 	const {
-		__nextHasNoMarginBottom: _, // Prevent passing to internal component
+		// Prevent passing legacy props to internal component.
+		__nextHasNoMarginBottom: _,
+		__next40pxDefaultSize: _next40pxDefaultSize,
+		__shouldNotWarnDeprecated36pxSize: _shouldNotWarnDeprecated36pxSize,
 		afterIcon,
 		allowReset = false,
 		beforeIcon,
@@ -90,14 +92,12 @@ function UnforwardedRangeControl(
 		railColor,
 		renderTooltipContent = ( v ) => v,
 		resetFallbackValue,
-		__next40pxDefaultSize = false,
 		shiftStep = 10,
 		showTooltip: showTooltipProp,
 		step = 1,
 		trackColor,
 		value: valueProp,
 		withInputField = true,
-		__shouldNotWarnDeprecated36pxSize,
 		...otherProps
 	} = props;
 
@@ -231,14 +231,6 @@ function UnforwardedRangeControl(
 		[ isRTL() ? 'right' : 'left' ]: fillValueOffset,
 	};
 
-	// Add default size deprecation warning.
-	maybeWarnDeprecated36pxSize( {
-		componentName: 'RangeControl',
-		__next40pxDefaultSize,
-		size: undefined,
-		__shouldNotWarnDeprecated36pxSize,
-	} );
-
 	return (
 		<BaseControl
 			className={ classes }
@@ -247,10 +239,7 @@ function UnforwardedRangeControl(
 			id={ `${ id }` }
 			help={ help }
 		>
-			<Root
-				className="components-range-control__root"
-				__next40pxDefaultSize={ __next40pxDefaultSize }
-			>
+			<Root className="components-range-control__root">
 				{ beforeIcon && (
 					<BeforeIconWrapper>
 						<Icon icon={ beforeIcon } />
@@ -336,18 +325,11 @@ function UnforwardedRangeControl(
 						onBlur={ handleOnInputNumberBlur }
 						onChange={ handleOnChange }
 						shiftStep={ shiftStep }
-						size={
-							__next40pxDefaultSize
-								? '__unstable-large'
-								: 'default'
-						}
-						__unstableInputWidth={
-							__next40pxDefaultSize ? space( 20 ) : space( 16 )
-						}
+						__unstableInputWidth={ space( 20 ) }
+						__next40pxDefaultSize
 						step={ step }
 						// @ts-expect-error TODO: Investigate if the `null` value is necessary
 						value={ inputSliderValue }
-						__shouldNotWarnDeprecated36pxSize
 					/>
 				) }
 				{ allowReset && (
@@ -391,7 +373,6 @@ function UnforwardedRangeControl(
  *   const [ value, setValue ] = useState();
  *   return (
  *     <RangeControl
- *       __next40pxDefaultSize
  *       help="Please select how transparent you would like this."
  *       initialPosition={ 50 }
  *       label="Opacity"

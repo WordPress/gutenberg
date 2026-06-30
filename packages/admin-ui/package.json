@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/admin-ui",
-	"version": "2.2.0",
+	"version": "2.4.0",
 	"description": "Generic components to be used in the Admin UI.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -39,7 +39,6 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"types": "build-types",
 	"sideEffects": [
 		"src/**/*.module.css"
@@ -54,8 +53,18 @@
 		"@wordpress/ui": "file:../ui",
 		"clsx": "^2.1.1"
 	},
+	"devDependencies": {
+		"@testing-library/dom": "^10.4.1",
+		"@testing-library/react": "^16.3.2"
+	},
 	"peerDependencies": {
-		"react": "^19.2.4"
+		"@types/react": "^18.3.27",
+		"react": "^18.0.0"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

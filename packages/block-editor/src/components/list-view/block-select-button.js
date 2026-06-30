@@ -12,17 +12,9 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
-import {
-	Icon,
-	lockSmall as lock,
-	pinSmall,
-	unseen,
-	symbol,
-} from '@wordpress/icons';
+import { Icon, lockSmall as lock, pinSmall, unseen } from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
-import { useSelect } from '@wordpress/data';
 
-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
 import { Tooltip } from '@wordpress/ui';
 
 /**
@@ -34,7 +26,6 @@ import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import ListViewExpander from './expander';
 import { useBlockLock } from '../block-lock';
 import useListViewImages from './use-list-view-images';
-import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 const { Badge: WCBadge } = unlock( componentsPrivateApis );
@@ -55,6 +46,7 @@ function ListViewBlockSelectButton(
 		isExpanded,
 		ariaDescribedBy,
 		visibilityLabel,
+		isDisabled = false,
 	},
 	ref
 ) {
@@ -64,13 +56,6 @@ function ListViewBlockSelectButton(
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
-	const hasPatternName = useSelect(
-		( select ) => {
-			const { getBlockAttributes } = unlock( select( blockEditorStore ) );
-			return !! getBlockAttributes( clientId )?.metadata?.patternName;
-		},
-		[ clientId ]
-	);
 
 	const shouldShowLockIcon = isLocked;
 	const isSticky = blockInformation?.positionType === 'sticky';
@@ -95,6 +80,8 @@ function ListViewBlockSelectButton(
 	}
 
 	return (
+		// Disabled list view items intentionally omit href so TreeGrid skips them.
+		// eslint-disable-next-line jsx-a11y/anchor-is-valid
 		<a
 			className={ clsx(
 				'block-editor-list-view-block-select-button',
@@ -110,13 +97,14 @@ function ListViewBlockSelectButton(
 			onDragStart={ onDragStartHandler }
 			onDragEnd={ onDragEnd }
 			draggable={ draggable }
-			href={ `#block-${ clientId }` }
+			href={ isDisabled ? undefined : `#block-${ clientId }` }
+			aria-disabled={ isDisabled ? true : undefined }
 			aria-describedby={ ariaDescribedBy }
 			aria-expanded={ isExpanded }
 		>
 			<ListViewExpander onClick={ onToggleExpanded } />
 			<BlockIcon
-				icon={ hasPatternName ? symbol : blockInformation?.icon }
+				icon={ blockInformation?.icon }
 				showColors
 				context="list-view"
 			/>

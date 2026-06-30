@@ -4,7 +4,6 @@
 import { useMemo } from '@wordpress/element';
 import { getFilename } from '@wordpress/url';
 import type { DataViewRenderFieldProps } from '@wordpress/dataviews';
-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
 import { Tooltip } from '@wordpress/ui';
 
 /**
@@ -37,11 +36,10 @@ export default function FileNameView( {
 		);
 	}
 
-	// The Tooltip exposes the full filename on hover when the cell is
-	// visually truncated by CSS (see `TRUNCATE_LENGTH` above). No extra AT
-	// plumbing is needed — the full filename is already in the DOM inside
-	// the `<span>`, so assistive technology reading the row gets the
-	// complete name.
+	// The full filename is always in the DOM, so assistive tech gets it
+	// regardless. The Tooltip aids mouse users where the cell visually clips
+	// (DataViews layouts); in a non-truncating context like the DataForm the
+	// name wraps in full, making it redundant but harmless.
 	return (
 		<Tooltip.Root>
 			<Tooltip.Trigger

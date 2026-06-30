@@ -52,8 +52,8 @@ const layoutBlockSupportKey = 'layout';
 // Keep in sync with WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS and
 // packages/global-styles-engine/src/core/render.tsx.
 const RESPONSIVE_BREAKPOINTS = {
-	mobile: '@media (width <= 480px)',
-	tablet: '@media (480px < width <= 782px)',
+	'@mobile': '@media (width <= 480px)',
+	'@tablet': '@media (480px < width <= 782px)',
 };
 const CHILD_LAYOUT_KEYS = [
 	'selfStretch',
@@ -85,7 +85,7 @@ export function getResetLayout( layoutBlockSupport = {}, blockVariation ) {
 	} );
 }
 
-function getLayoutStateOverrides(
+export function getLayoutStateOverrides(
 	layout = {},
 	baseLayout = {},
 	existingLayout = {}
@@ -98,11 +98,13 @@ function getLayoutStateOverrides(
 	);
 
 	Object.entries( layout || {} ).forEach( ( [ key, value ] ) => {
+		const baseHasValue = Object.hasOwn( baseLayout || {}, key );
 		if (
 			! CHILD_LAYOUT_KEYS.includes( key ) &&
 			value !== baseLayout?.[ key ]
 		) {
-			overrides[ key ] = value;
+			overrides[ key ] =
+				value === undefined && baseHasValue ? null : value;
 		}
 	} );
 
@@ -252,7 +254,10 @@ export function getResponsiveLayoutStyles( {
 } ) {
 	return Object.entries( RESPONSIVE_BREAKPOINTS )
 		.map( ( [ viewport, mediaQuery ] ) => {
-			const viewportStyle = attributes?.style?.[ viewport ];
+			const viewportStyle = getStyleForState( attributes?.style, {
+				viewport,
+				pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
+			} );
 			const viewportLayout = getLayoutContainerValues(
 				viewportStyle?.layout
 			);
@@ -463,7 +468,7 @@ function LayoutPanelPure( {
 			const nextStateStyle = cleanEmptyObject( {
 				...stateStyle,
 				layout: getLayoutStateOverrides(
-					cleanEmptyObject( newLayout ),
+					newLayout,
 					baseLayout,
 					stateStyle?.layout
 				),

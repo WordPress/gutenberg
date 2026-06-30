@@ -104,7 +104,7 @@ function useDeprecatedProps( {
  * );
  * ```
  */
-export function UnforwardedButton(
+export const Button = forwardRef( function UnforwardedButton(
 	props: ButtonProps & DeprecatedButtonProps,
 	ref: ForwardedRef< any >
 ) {
@@ -301,8 +301,6 @@ export function UnforwardedButton(
 			) }
 		</>
 	);
-}
+} );
 
-export const Button = forwardRef( UnforwardedButton );
-Button.displayName = 'Button';
 export default Button;

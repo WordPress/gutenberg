@@ -2,14 +2,9 @@
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
-import { __, sprintf } from '@wordpress/i18n';
-import { useEffect, useState } from '@wordpress/element';
-import {
-	Spinner,
-	Navigator,
-	Notice,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import { useEffect, useMemo, useState } from '@wordpress/element';
+import { Spinner, __experimentalVStack as VStack } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -17,75 +12,45 @@ import {
 import './style.scss';
 import GuidelineAccordion from './components/guideline-accordion';
 import GuidelineAccordionForm from './components/guideline-accordion-form';
-import { fetchGuidelines } from './api';
 import BlockGuidelines from './components/block-guidelines';
 import GuidelineActionsSection from './components/guideline-actions-section';
-import RevisionHistory from './components/revision-history';
+import { useGuidelineData, scopeSlug } from './data';
 
-const GUIDELINE_ITEMS = [
-	{
-		title: __( 'Site' ),
-		description: __(
-			"Describe your site's purpose, goals, and primary audience."
-		),
-
-		slug: 'site',
-	},
-	{
-		title: __( 'Copy' ),
-		description: __(
-			'Set your writing standards for tone, voice, style, and formatting.'
-		),
-
-		slug: 'copy',
-	},
-	{
-		title: __( 'Images' ),
-		description: __(
-			'Outline your style, dimensions, formats, mood and aesthetic preferences.'
-		),
-
-		slug: 'images',
-	},
-	{
-		title: __( 'Blocks' ),
-		description: __(
-			'Create tailored guidelines for specific block types.'
-		),
-		slug: 'blocks',
-	},
-	{
-		title: __( 'Additional' ),
-		description: __( 'Add additional guidelines.' ),
-		slug: 'additional',
-	},
-];
-
-const KNOWN_VIEWS = [ 'revision-history' ];
-
-function getInitialNavigatorPath() {
-	if ( window?.location?.href ) {
-		const url = new URL( window.location.href );
-		const view = url.searchParams.get( 'view' ) ?? '';
-		if ( KNOWN_VIEWS.includes( view ) ) {
-			return `/${ view }`;
-		}
-	}
-
-	return '/';
-}
+// The Blocks section is not a registry scope; it renders the per-block rows.
+// Placed between Images (30) and Additional (50) to keep the historical order.
+const BLOCKS_ORDER = 40;
 
 function GuidelinesPage() {
-	const [ loading, setLoading ] = useState( true );
-	const [ error, setError ] = useState< string | null >( null );
+	const { scopes, contentBlocks, bySlug, query, isLoading } =
+		useGuidelineData();
 
+	// Only show the spinner on the first load. Later refetches (e.g. after a
+	// save re-resolves the collection) must not unmount the sections, or the
+	// accordions would collapse and lose any in-progress edits.
+	const [ hasLoaded, setHasLoaded ] = useState( false );
 	useEffect( () => {
-		// Populate the store with the guidelines.
-		fetchGuidelines()
-			.then( () => setError( null ) )
-			.catch( ( e: Error ) => setError( e.message ) )
-			.finally( () => setLoading( false ) );
-	}, [] );
+		if ( ! isLoading ) {
+			setHasLoaded( true );
+		}
+	}, [ isLoading ] );
+
+	const sections = useMemo( () => {
+		const scopeSections = scopes.map( ( scope ) => ( {
+			key: scope.slug,
+			order: scope.order,
+			scope,
+		} ) );
+
+		const blocksSection = {
+			key: 'blocks',
+			order: BLOCKS_ORDER,
+			scope: null,
+		};
+
+		return [ ...scopeSections, blocksSection ].sort(
+			( a, b ) => a.order - b.order
+		);
+	}, [ scopes ] );
 
 	return (
 		<Page
@@ -94,69 +59,81 @@ function GuidelinesPage() {
 				"Set content standards that guide your team, inform plugins, and help AI tools generate content that matches your site's voice and requirements."
 			) }
 		>
-			{ error && (
-				<div className="guidelines__content">
-					<Notice status="error" isDismissible={ false }>
-						<strong>
-							{ sprintf(
-								/* translators: %s: Error message. */
-								__( 'Error loading guidelines: %s' ),
-								error
-							) }
-						</strong>
-						<p className="guidelines__error-description">
-							{ __(
-								'Please try again. If the problem persists, contact support.'
-							) }
-						</p>
-					</Notice>
-				</div>
-			) }
-			{ loading ? (
+			{ ! hasLoaded ? (
 				<div className="guidelines__loading">
 					<Spinner />
 				</div>
 			) : (
-				! error && (
-					<Navigator initialPath={ getInitialNavigatorPath() }>
-						<Navigator.Screen path="/">
-							<VStack className="guidelines__content">
-								{ /*
-								 * Disable reason: The `list` ARIA role is redundant but
-								 * Safari+VoiceOver won't announce the list otherwise.
-								 */
-								/* eslint-disable jsx-a11y/no-redundant-roles */ }
-								<ul role="list" className="guidelines__list">
-									{ GUIDELINE_ITEMS.map( ( item ) => (
-										<li
-											key={ item.slug }
-											className="guidelines__list-item"
-											data-slug={ item.slug }
-										>
-											<GuidelineAccordion
-												title={ item.title }
-												description={ item.description }
-											>
-												{ item.slug === 'blocks' ? (
-													<BlockGuidelines />
-												) : (
-													<GuidelineAccordionForm
-														slug={ item.slug }
-													/>
-												) }
-											</GuidelineAccordion>
-										</li>
-									) ) }
-								</ul>
-								{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
-								<GuidelineActionsSection />
-							</VStack>
-						</Navigator.Screen>
-						<Navigator.Screen path="/revision-history">
-							<RevisionHistory />
-						</Navigator.Screen>
-					</Navigator>
-				)
+				<VStack className="guidelines__content">
+					{ /*
+					 * Disable reason: The `list` ARIA role is redundant but
+					 * Safari+VoiceOver won't announce the list otherwise.
+					 */
+					/* eslint-disable jsx-a11y/no-redundant-roles */ }
+					<ul role="list" className="guidelines__list">
+						{ sections.map( ( section ) =>
+							section.scope ? (
+								<li
+									key={ section.key }
+									className="guidelines__list-item"
+									data-slug={ section.key }
+								>
+									<GuidelineAccordion
+										title={ section.scope.title }
+										description={
+											section.scope.description
+										}
+									>
+										<GuidelineAccordionForm
+											scope={ section.scope }
+											existingId={
+												bySlug[
+													scopeSlug(
+														section.scope.slug
+													)
+												]?.id
+											}
+											content={
+												bySlug[
+													scopeSlug(
+														section.scope.slug
+													)
+												]?.content ?? ''
+											}
+											query={ query }
+										/>
+									</GuidelineAccordion>
+								</li>
+							) : (
+								<li
+									key={ section.key }
+									className="guidelines__list-item"
+									data-slug="blocks"
+								>
+									<GuidelineAccordion
+										title={ __( 'Blocks' ) }
+										description={ __(
+											'Create tailored guidelines for specific block types.'
+										) }
+									>
+										<BlockGuidelines
+											contentBlocks={ contentBlocks }
+											bySlug={ bySlug }
+											query={ query }
+										/>
+									</GuidelineAccordion>
+								</li>
+							)
+						) }
+					</ul>
+					{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
+					<GuidelineActionsSection
+						scopes={ scopes }
+						contentBlocks={ contentBlocks }
+						bySlug={ bySlug }
+						query={ query }
+					/>
+				</VStack>
 			) }
 		</Page>
 	);
