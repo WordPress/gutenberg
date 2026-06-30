@@ -89,7 +89,13 @@ export interface BasePostWithEmbeddedFeaturedMedia extends BasePost {
 	_embedded: EmbeddedFeaturedMedia;
 }
 
-export interface Template extends CommonPost {
+interface TemplateAuthorFields {
+	author?: number;
+	author_text: string;
+	original_source?: 'theme' | 'plugin' | 'site' | 'user';
+}
+
+export interface Template extends CommonPost, TemplateAuthorFields {
 	type: 'wp_template';
 	is_custom: boolean;
 	source: string;
@@ -100,7 +106,7 @@ export interface Template extends CommonPost {
 	description?: string;
 }
 
-export interface TemplatePart extends CommonPost {
+export interface TemplatePart extends CommonPost, TemplateAuthorFields {
 	type: 'wp_template_part';
 	source: string;
 	origin: string;
@@ -113,7 +119,9 @@ export interface TemplatePart extends CommonPost {
 export interface Pattern extends CommonPost {
 	slug: string;
 	title: { raw: string };
-	wp_pattern_sync_status: string;
+	excerpt?: string | { raw: string; rendered: string };
+	meta?: Record< string, any >;
+	wp_pattern_sync_status?: string;
 }
 
 export interface SiteSettings {

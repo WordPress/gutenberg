@@ -1,8 +1,4 @@
 /**
- * @jest-environment jsdom
- */
-
-/**
  * External dependencies
  */
 import { act, renderHook } from '@testing-library/react';
@@ -45,8 +41,7 @@ jest.mock( '../../lock-unlock', () => ( {
 
 function createRegistry( {
 	getEditedEntityRecord = () => false,
-	getEntityRecord = () => undefined,
-	resolveGetEntityRecord = getEntityRecord,
+	resolveGetEntityRecord = () => undefined,
 } = {} ) {
 	const actions = {
 		invalidateResolution: jest.fn(),
@@ -54,7 +49,6 @@ function createRegistry( {
 	return {
 		select: jest.fn( () => ( {
 			getEditedEntityRecord,
-			getEntityRecord,
 		} ) ),
 		dispatch: jest.fn( () => actions ),
 		resolveSelect: jest.fn( () => ( {
@@ -109,6 +103,25 @@ async function runModalUpdate( {
 describe( 'useOpenImageMediaEditorModal', () => {
 	beforeEach( () => {
 		jest.clearAllMocks();
+	} );
+
+	it( 'returns no opener when the media editor modal setting is unavailable', () => {
+		useRegistry.mockReturnValue( createRegistry() );
+		mockMediaEditorModalSetting( undefined );
+
+		const { result } = renderHook( () =>
+			useOpenImageMediaEditorModal( {
+				attributes: {
+					id: 1,
+					url: 'original.jpg',
+					alt: '',
+					caption: '',
+				},
+				setAttributes: jest.fn(),
+			} )
+		);
+
+		expect( result.current ).toBeUndefined();
 	} );
 
 	it( 'passes an onClose handler for returning focus when the media editor closes', async () => {
@@ -169,11 +182,8 @@ describe( 'useOpenImageMediaEditorModal', () => {
 				caption: 'Original caption',
 			},
 			registryOptions: {
-				getEntityRecord: () => originalAttachment,
-				resolveGetEntityRecord: ( kind, name, attachmentId, query ) =>
-					query?.context === 'edit'
-						? updatedAttachment
-						: originalAttachment,
+				getEditedEntityRecord: () => originalAttachment,
+				resolveGetEntityRecord: () => updatedAttachment,
 			},
 		} );
 
@@ -181,13 +191,15 @@ describe( 'useOpenImageMediaEditorModal', () => {
 			alt: 'Updated alt',
 			caption: 'Updated caption',
 		} );
-		expect( registry.actions.invalidateResolution ).toHaveBeenCalledWith(
-			'getEntityRecord',
-			[ 'postType', 'attachment', 1 ]
+		// A single, query-less resolution is invalidated: the hook reads,
+		// resolves, and invalidates the attachment through the entity's default
+		// (edit) context rather than an explicitly-keyed query.
+		expect( registry.actions.invalidateResolution ).toHaveBeenCalledTimes(
+			1
 		);
 		expect( registry.actions.invalidateResolution ).toHaveBeenCalledWith(
 			'getEntityRecord',
-			[ 'postType', 'attachment', 1, { context: 'edit' } ]
+			[ 'postType', 'attachment', 1 ]
 		);
 	} );
 
@@ -220,8 +232,7 @@ describe( 'useOpenImageMediaEditorModal', () => {
 			1,
 			'postType',
 			'attachment',
-			1,
-			{ context: 'edit' }
+			1
 		);
 		expect( openMediaEditorModal ).toHaveBeenCalledWith( {
 			id: 1,
@@ -263,8 +274,7 @@ describe( 'useOpenImageMediaEditorModal', () => {
 			1,
 			'postType',
 			'attachment',
-			1,
-			{ context: 'edit' }
+			1
 		);
 		expect( openMediaEditorModal ).toHaveBeenCalledWith( {
 			id: 1,
@@ -299,7 +309,7 @@ describe( 'useOpenImageMediaEditorModal', () => {
 				caption: undefined,
 			},
 			registryOptions: {
-				getEntityRecord: () => ( {
+				getEditedEntityRecord: () => ( {
 					id: 1,
 					alt_text: '',
 					caption: {
@@ -314,8 +324,7 @@ describe( 'useOpenImageMediaEditorModal', () => {
 			1,
 			'postType',
 			'attachment',
-			1,
-			{ context: 'edit' }
+			1
 		);
 		expect( setAttributes ).toHaveBeenCalledWith( {
 			caption: 'Updated attachment caption',
@@ -341,7 +350,7 @@ describe( 'useOpenImageMediaEditorModal', () => {
 				caption: '',
 			},
 			registryOptions: {
-				getEntityRecord: ( kind, name, attachmentId ) =>
+				getEditedEntityRecord: ( kind, name, attachmentId ) =>
 					attachmentId === 1 ? originalAttachment : undefined,
 				resolveGetEntityRecord: ( kind, name, attachmentId ) =>
 					attachmentId === 2 ? updatedAttachment : undefined,
@@ -371,7 +380,7 @@ describe( 'useOpenImageMediaEditorModal', () => {
 		};
 		const deferredAttachment = createDeferred();
 		const registry = createRegistry( {
-			getEntityRecord: ( kind, name, attachmentId ) =>
+			getEditedEntityRecord: ( kind, name, attachmentId ) =>
 				attachmentId === 1 ? originalAttachment : undefined,
 			resolveGetEntityRecord: ( kind, name, attachmentId ) =>
 				attachmentId === 2 ? deferredAttachment.promise : undefined,
@@ -437,7 +446,7 @@ describe( 'useOpenImageMediaEditorModal', () => {
 				caption: '',
 			},
 			registryOptions: {
-				getEntityRecord: ( kind, name, attachmentId ) =>
+				getEditedEntityRecord: ( kind, name, attachmentId ) =>
 					attachmentId === 1
 						? originalAttachment
 						: {
@@ -469,7 +478,7 @@ describe( 'useOpenImageMediaEditorModal', () => {
 				caption: undefined,
 			},
 			registryOptions: {
-				getEntityRecord: () => ( {
+				getEditedEntityRecord: () => ( {
 					id: 1,
 					alt_text: '',
 					caption: { raw: 'Existing caption' },
@@ -526,7 +535,7 @@ describe( 'useOpenImageMediaEditorModal', () => {
 				caption: undefined,
 			},
 			registryOptions: {
-				getEntityRecord: () => ( {
+				getEditedEntityRecord: () => ( {
 					id: 1,
 					alt_text: 'Original alt',
 					caption: { raw: 'Existing caption' },
@@ -556,7 +565,7 @@ describe( 'useOpenImageMediaEditorModal', () => {
 				caption: { toString: () => '' },
 			},
 			registryOptions: {
-				getEntityRecord: () => ( {
+				getEditedEntityRecord: () => ( {
 					id: 1,
 					alt_text: 'Original alt',
 					caption: { raw: 'Existing caption' },
@@ -603,7 +612,7 @@ describe( 'useOpenImageMediaEditorModal', () => {
 		};
 		const deferredAttachment = createDeferred();
 		const registry = createRegistry( {
-			getEntityRecord: () => ( {
+			getEditedEntityRecord: () => ( {
 				id: 1,
 				alt_text: '',
 				caption: { raw: '' },

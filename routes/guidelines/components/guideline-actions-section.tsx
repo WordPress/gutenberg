@@ -5,7 +5,6 @@ import {
 	Card,
 	__experimentalConfirmDialog as ConfirmDialog,
 	Notice,
-	useNavigator,
 	__experimentalVStack as VStack,
 	__experimentalHeading as Heading,
 } from '@wordpress/components';
@@ -16,16 +15,32 @@ import { useRef, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import './guideline-actions-section.scss';
-import { importGuidelines, exportGuidelines } from '../api';
+import { exportGuidelines, importGuidelines } from '../import-export';
 import ActionItem from './action-item';
+import type {
+	Scope,
+	GuidelineRow,
+	ContentBlock,
+	GuidelineQuery,
+} from '../types';
 
-function getErrorMessage( err: any ) {
+function getErrorMessage( err: unknown ) {
 	return err instanceof Error ? err.message : __( 'Unknown error' );
 }
 
-export default function GuidelineActionsSection() {
-	const { goTo } = useNavigator();
+interface GuidelineActionsSectionProps {
+	scopes: Scope[];
+	contentBlocks: ContentBlock[];
+	bySlug: Record< string, GuidelineRow >;
+	query: GuidelineQuery;
+}
 
+export default function GuidelineActionsSection( {
+	scopes,
+	contentBlocks,
+	bySlug,
+	query,
+}: GuidelineActionsSectionProps ) {
 	const fileInputRef = useRef< HTMLInputElement >( null );
 	const [ isImporting, setIsImporting ] = useState( false );
 	const [ error, setError ] = useState< string | null >( null );
@@ -52,7 +67,13 @@ export default function GuidelineActionsSection() {
 		setPendingImport( null );
 		setIsImporting( true );
 		try {
-			await importGuidelines( file );
+			await importGuidelines(
+				file,
+				scopes,
+				bySlug,
+				contentBlocks,
+				query
+			);
 			setError( null );
 		} catch ( err ) {
 			setError(
@@ -67,9 +88,9 @@ export default function GuidelineActionsSection() {
 		}
 	}
 
-	async function handleExportClick() {
+	function handleExportClick() {
 		try {
-			exportGuidelines();
+			exportGuidelines( scopes, bySlug, contentBlocks );
 			setError( null );
 		} catch ( err ) {
 			setError(
@@ -80,16 +101,6 @@ export default function GuidelineActionsSection() {
 				)
 			);
 		}
-	}
-
-	function navigateToRevisionHistory() {
-		if ( window?.location?.href ) {
-			const url = new URL( window.location.href );
-			url.searchParams.set( 'view', 'revision-history' );
-			window.history.replaceState( {}, '', url.toString() );
-		}
-
-		goTo( '/revision-history' );
 	}
 
 	const ACTIONS = [
@@ -110,14 +121,6 @@ export default function GuidelineActionsSection() {
 			buttonLabel: __( 'Download' ),
 			ariaLabel: __( 'Export guidelines' ),
 			onClick: handleExportClick,
-		},
-		{
-			slug: 'revert',
-			title: __( 'Revert' ),
-			description: __( 'Use a previous version of your guidelines.' ),
-			buttonLabel: __( 'View history' ),
-			ariaLabel: __( 'View history of guidelines' ),
-			onClick: navigateToRevisionHistory,
 		},
 	];
 
@@ -171,7 +174,7 @@ export default function GuidelineActionsSection() {
 				size="small"
 			>
 				{ __(
-					'Importing new guidelines will replace your current guidelines. This can be undone from revision history.'
+					'Importing new guidelines will replace your current guidelines.'
 				) }
 			</ConfirmDialog>
 		</VStack>

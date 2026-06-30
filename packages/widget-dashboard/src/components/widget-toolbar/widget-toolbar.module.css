@@ -1,12 +1,40 @@
-/*
- * Per-tile toolbar shell: anchored top-right (the grid item is the positioned
- * ancestor) with the shared padding and radius. Variants add the background.
+/**
+ * Toolbar chip holding the active mode's controls.
  */
 .widgetToolbar {
-	position: absolute;
-	inset-block-start: var(--wpds-dimension-padding-sm);
-	inset-inline-end: var(--wpds-dimension-padding-sm);
-	z-index: 1;
 	padding: var(--wpds-dimension-padding-xs);
 	border-radius: var(--wpds-border-radius-md);
+}
+
+/**
+ * Customize: solid, always visible.
+ */
+.solid {
+	background: var(--wpds-color-background-surface-neutral-strong);
+	border: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
+	box-shadow: var(--wpds-elevation-xs);
+}
+
+/**
+ * Normal: faint, revealed on tile hover/focus. Opacity (not display) keeps it
+ * tab-reachable.
+ */
+.subtle {
+	background: color-mix(in srgb, var(--wpds-color-background-surface-neutral) 40%, transparent);
+	opacity: 0;
+	pointer-events: none;
+}
+
+:global([data-wp-grid-item-key]):hover .subtle,
+:global([data-wp-grid-item-key]):focus-within .subtle {
+	opacity: 1;
+	pointer-events: auto;
+}
+
+@media not (prefers-reduced-motion) {
+	.subtle {
+		transition:
+			opacity var(--wpds-motion-duration-sm)
+			var(--wpds-motion-easing-subtle);
+	}
 }

@@ -145,7 +145,7 @@ test.describe( 'Navigating the block hierarchy', () => {
 		const slider = page.getByRole( 'slider', { name: 'Columns' } );
 		// Ensure the block is selected and slider control is visible in the inspector.
 		await expect( slider ).toBeVisible();
-		await pageUtils.pressKeys( 'Tab', { times: 6 } );
+		await pageUtils.pressKeys( 'Tab', { times: 5 } );
 		await expect( slider ).toBeFocused();
 		await page.keyboard.press( 'ArrowRight' );
 

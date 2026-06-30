@@ -28,23 +28,7 @@ const getNavigableMenuFocusables = () => [
 	screen.getByRole( 'link', { name: 'Item 4' } ),
 ];
 
-const originalGetClientRects = window.HTMLElement.prototype.getClientRects;
-
 describe( 'NavigableMenu', () => {
-	beforeAll( () => {
-		// Mocking `getClientRects()` is necessary to pass a check performed by
-		// the `focus.tabbable.find()` and by the `focus.focusable.find()` functions
-		// from the `@wordpress/dom` package.
-		// @ts-expect-error We're not trying to comply to the DOM spec, only mocking
-		window.HTMLElement.prototype.getClientRects = function () {
-			return [ 'trick-jsdom-into-having-size-for-element-rect' ];
-		};
-	} );
-
-	afterAll( () => {
-		window.HTMLElement.prototype.getClientRects = originalGetClientRects;
-	} );
-
 	it( 'moves focus on its focusable children by using the up/down arrow keys', async () => {
 		const user = userEvent.setup();
 

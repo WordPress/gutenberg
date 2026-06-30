@@ -32,7 +32,7 @@ export default function Edit( { attributes, context, clientId, isSelected } ) {
 		[ clientId, isSelected, openByDefault ]
 	);
 	const blockProps = useBlockProps( {
-		'aria-hidden': ! hasSelection,
+		hidden: ! hasSelection,
 		role: 'region',
 	} );
 
