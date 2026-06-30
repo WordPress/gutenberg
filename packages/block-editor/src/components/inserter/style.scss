@@ -560,6 +560,13 @@ $block-inserter-tabs-height: 44px;
 			}
 		}
 	}
+
+	// When the attach footer is present it supplies the breathing room beneath
+	// the grid, so drop the list's own bottom padding — otherwise scrolling to
+	// the end leaves a doubled gap before the footer.
+	&.has-attach-footer .block-editor-inserter__media-list {
+		padding-bottom: 0;
+	}
 }
 
 @keyframes inserter-media-panel-pulse {

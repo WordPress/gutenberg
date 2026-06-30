@@ -172,7 +172,13 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 	const baseCssClass = 'block-editor-inserter__media-panel';
 	const searchLabel = category.labels.search_items || __( 'Search' );
 	return (
-		<div className={ baseCssClass }>
+		<div
+			className={ clsx( baseCssClass, {
+				// The attach footer supplies the breathing room beneath the
+				// grid, so the list drops its own bottom padding (see styles).
+				'has-attach-footer': !! category.attach,
+			} ) }
+		>
 			<SearchControl
 				className={ `${ baseCssClass }-search` }
 				onChange={ setSearch }
