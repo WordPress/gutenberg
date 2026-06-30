@@ -192,7 +192,7 @@ const restrictedSyntax = [
 		'TextIndentControl',
 		'TreeSelect',
 	].map( ( componentName ) => ( {
-		selector: `JSXElement[openingElement.name.name="${ componentName }"] JSXAttribute[name.name="__next40pxDefaultSize"]`,
+		selector: `JSXOpeningElement[name.name="${ componentName }"] > JSXAttribute[name.name="__next40pxDefaultSize"]`,
 		message: `The \`__next40pxDefaultSize\` prop is no longer needed on \`${ componentName }\`.`,
 	} ) ),
 	{
