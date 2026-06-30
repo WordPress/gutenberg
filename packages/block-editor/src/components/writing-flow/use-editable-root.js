@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { hasBlockSupport } from '@wordpress/blocks';
@@ -76,6 +77,13 @@ export default function useEditableRoot() {
 					}
 				}
 
+				// Expose the host as a named multiline textbox so it has a
+				// role and accessible name once it takes focus. The label is
+				// generic because the host can span several blocks.
+				node.setAttribute( 'role', 'textbox' );
+				node.setAttribute( 'aria-multiline', 'true' );
+				node.setAttribute( 'aria-label', __( 'Editor canvas' ) );
+
 				// Move focus from the block's editable element to the
 				// wrapper, but only when an editable element belonging to
 				// the selected block has focus. Never steal focus from other
@@ -110,6 +118,9 @@ export default function useEditableRoot() {
 				! isMultiSelecting()
 			) {
 				node.setAttribute( 'contenteditable', 'false' );
+				node.removeAttribute( 'role' );
+				node.removeAttribute( 'aria-multiline' );
+				node.removeAttribute( 'aria-label' );
 
 				// If the wrapper held focus, return focus to the editable
 				// element containing the selection, which is focusable again
