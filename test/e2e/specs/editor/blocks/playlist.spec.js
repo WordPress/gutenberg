@@ -86,21 +86,21 @@ test.describe( 'Playlist block', () => {
 
 		const seekControl = page.getByRole( 'slider', { name: trackTitle } );
 		await expect( seekControl ).toBeVisible();
-		await expect( seekControl ).toHaveJSProperty( 'tagName', 'INPUT' );
-		await expect( seekControl ).toHaveAttribute( 'type', 'range' );
+		await expect( seekControl ).toHaveJSProperty( 'tagName', 'DIV' );
+		await expect( seekControl ).toHaveAttribute(
+			'class',
+			/waveform-container/
+		);
+		await expect( seekControl ).toHaveAttribute( 'tabindex', '0' );
+		await expect( seekControl ).toHaveAttribute( 'aria-valuemin', '0' );
+		await expect( seekControl ).toHaveAttribute( 'aria-valuenow', '0' );
 		await expect
 			.poll( async () =>
-				Number( await seekControl.getAttribute( 'max' ) )
+				Number( await seekControl.getAttribute( 'aria-valuemax' ) )
 			)
 			.toBeGreaterThan( 0 );
 
-		const waveformContainer = seekControl.locator( '..' );
-		await expect( waveformContainer ).not.toHaveAttribute( 'role', /.*/ );
-		await expect( waveformContainer ).not.toHaveAttribute(
-			'tabindex',
-			/.*/
-		);
-		await expect( waveformContainer.locator( 'canvas' ) ).toHaveAttribute(
+		await expect( seekControl.locator( 'canvas' ) ).toHaveAttribute(
 			'aria-hidden',
 			'true'
 		);
