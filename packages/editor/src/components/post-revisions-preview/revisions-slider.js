@@ -9,6 +9,7 @@ import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
 import { useMemo } from '@wordpress/element';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { Stack } from '@wordpress/ui';
+import { useFocusOnMount } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -63,6 +64,8 @@ function RevisionsSlider() {
 	const { setCurrentRevisionId, setRevisionPage } = unlock(
 		useDispatch( editorStore )
 	);
+
+	const focusOnMountRef = useFocusOnMount( true );
 
 	const isLoading = ! rawRevisions;
 	const totalPages = Math.ceil( totalRevisions / perPage ) || 1;
@@ -132,6 +135,7 @@ function RevisionsSlider() {
 			<Spinner />
 		) : (
 			<RangeControl
+				ref={ focusOnMountRef }
 				aria-valuetext={ renderTooltipContent( selectedIndex ) }
 				className="editor-revisions-header__slider"
 				hideLabelFromVision
