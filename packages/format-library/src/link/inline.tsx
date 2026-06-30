@@ -24,7 +24,7 @@ import type { RichTextValue } from '@wordpress/rich-text';
 import { createLinkFormat, isValidHref, getFormatBoundary } from './utils';
 import { link as settings } from './index';
 import CSSClassesSettingComponent from './css-classes-setting';
-import type { InlineLinkUIProps, LinkValue, LinkFormat } from '../types';
+import type { InlineLinkUIProps, LinkValue } from '../types';
 
 const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,
@@ -142,7 +142,7 @@ function InlineLinkUI( {
 
 			newValue = applyFormat(
 				inserted,
-				linkFormat as LinkFormat,
+				linkFormat as any,
 				value.start,
 				value.start + newText.length
 			);
