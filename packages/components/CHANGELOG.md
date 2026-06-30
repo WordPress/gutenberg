@@ -10,7 +10,7 @@
     -   `ComboboxControl` ([#79636](https://github.com/WordPress/gutenberg/pull/79636)).
     -   `FontSizePicker` ([#79481](https://github.com/WordPress/gutenberg/pull/79481))
     -   `FormFileUpload` ([#79655](https://github.com/WordPress/gutenberg/pull/79655))
-    -   `FormTokenField`
+    -   `FormTokenField` ([#79720](https://github.com/WordPress/gutenberg/pull/79720))
     -   `RangeControl` ([#79590](https://github.com/WordPress/gutenberg/pull/79590))
     -   `TreeSelect` ([#79550](https://github.com/WordPress/gutenberg/pull/79550))
 
