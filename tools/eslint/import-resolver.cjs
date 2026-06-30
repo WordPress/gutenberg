@@ -107,7 +107,7 @@ exports.resolve = function ( source, file, config ) {
 			const exportPath = getResolvedExport( subpath, manifest.exports );
 
 			const sourcePath = exportPath
-				.replace( /build(-module?)/, 'src' )
+				.replace( /build(-module)?/, 'src' )
 				.replace( /\.[cm]?js$/, '.js' );
 
 			return resolve( path.join( packagePath, sourcePath ) );
