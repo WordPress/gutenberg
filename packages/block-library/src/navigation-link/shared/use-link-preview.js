@@ -204,14 +204,18 @@ export function computeBadges( {
 function getEntityTitle( entityRecord ) {
 	const title = entityRecord?.title;
 
-	// Posts and pages expose `title` as a { raw, rendered } object; some entity
-	// types use a plain string.
-	if ( title && typeof title === 'object' ) {
+	// Some entity types use a plain string for the title.
+	if ( typeof title === 'string' ) {
+		return title;
+	}
+
+	// Posts and pages expose `title` as a { raw, rendered } object.
+	if ( title && 'rendered' in title ) {
 		// translators: displayed when an entity has an empty title.
 		return title.rendered || __( '(no title)' );
 	}
 
-	return title || entityRecord?.name;
+	return entityRecord?.name;
 }
 
 /**
