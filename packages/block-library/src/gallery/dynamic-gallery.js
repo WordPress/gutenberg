@@ -338,7 +338,7 @@ export function GalleryDynamicView( {
 						// stays focusable when disabled by default.)
 						disabled={ isResolvingDynamic }
 					>
-						{ __( 'Edit images' ) }
+						{ __( 'Convert to images' ) }
 					</ToolbarButton>
 				</BlockControls>
 			) }

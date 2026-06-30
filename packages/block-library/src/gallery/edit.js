@@ -703,7 +703,7 @@ export default function GalleryEdit( props ) {
 							variant="secondary"
 							onClick={ dynamic.enableDynamicMode }
 						>
-							{ __( 'Use images attached to the post' ) }
+							{ __( 'Attached images' ) }
 						</Button>
 					) }
 				</MediaPlaceholder>
