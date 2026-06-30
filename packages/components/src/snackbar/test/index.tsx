@@ -219,6 +219,75 @@ describe( 'Snackbar', () => {
 			} );
 			expect( link ).toBeVisible();
 		} );
+
+		it( 'should use the action label as the accessible label for the snackbar when a single action is present', () => {
+			render(
+				<Snackbar
+					actions={ [
+						{ label: 'View Preview', url: 'https://example.com' },
+					] }
+				>
+					Draft saved.
+				</Snackbar>
+			);
+
+			const snackbar = screen.getByTestId( testId );
+			expect( snackbar ).toHaveAttribute( 'aria-label', 'View Preview' );
+		} );
+
+		it( 'should call window.open with the action url when clicking the snackbar body (outside the action element)', async () => {
+			const openSpy = jest
+				.spyOn( window, 'open' )
+				.mockImplementation( () => null );
+			const onRemove = jest.fn();
+
+			render(
+				<Snackbar
+					onRemove={ onRemove }
+					actions={ [
+						{
+							label: 'View Preview',
+							url: 'https://example.com/preview',
+							openInNewTab: true,
+						},
+					] }
+				>
+					Draft saved.
+				</Snackbar>
+			);
+
+			// Click the snackbar wrapper itself (not the action link inside it).
+			const snackbar = screen.getByTestId( testId );
+			await click( snackbar );
+
+			expect( openSpy ).toHaveBeenCalledWith(
+				'https://example.com/preview',
+				'_blank'
+			);
+			expect( onRemove ).toHaveBeenCalledTimes( 1 );
+
+			openSpy.mockRestore();
+		} );
+
+		it( 'should call the action onClick when clicking the snackbar body (outside the action element)', async () => {
+			const onClick = jest.fn();
+			const onRemove = jest.fn();
+
+			render(
+				<Snackbar
+					onRemove={ onRemove }
+					actions={ [ { label: 'Undo', onClick } ] }
+				>
+					Post trashed.
+				</Snackbar>
+			);
+
+			const snackbar = screen.getByTestId( testId );
+			await click( snackbar );
+
+			expect( onClick ).toHaveBeenCalledTimes( 1 );
+			expect( onRemove ).toHaveBeenCalledTimes( 1 );
+		} );
 	} );
 
 	describe( 'useSpokenMessage', () => {
