@@ -990,6 +990,10 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 * filter, the jpeg_quality filter for JPEG output, then resets non-numeric
 	 * or out-of-range values to the default and squashes 0 to 1.
 	 *
+	 * wp_get_image_encode_quality() is proposed for WordPress core in
+	 * https://github.com/WordPress/wordpress-develop/pull/11856; until it lands
+	 * the function_exists() guard falls back to the inline implementation below.
+	 *
 	 * @param string $output_mime The output image MIME type, e.g. 'image/jpeg'.
 	 * @param array  $size        Dimensions ('width', 'height') for the wp_editor_set_quality filter.
 	 * @return int Encode quality between 1 and 100.
