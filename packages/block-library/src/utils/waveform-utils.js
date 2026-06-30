@@ -17,10 +17,6 @@ const DEFAULT_WAVEFORM_HEIGHT = 100;
 const DEFAULT_SEEK_LABEL = 'Seek';
 const DEFAULT_SEEK_VALUE_TEXT = '%1$s of %2$s';
 const DEFAULT_WAVEFORM_BACKGROUND_COLOR = '#ffffff';
-const SEEK_STEP_SECONDS = 5;
-const SEEK_LARGE_STEP_SECONDS = 10;
-const VOLUME_STEP = 0.1;
-const VOLUME_LARGE_STEP = 0.2;
 
 /**
  * Get computed style for an element, using ownerDocument for iframe compatibility.
@@ -82,6 +78,7 @@ export function getWaveformColors( element ) {
  * @param {string} options.progressColor   - The progress indicator color.
  * @param {string} options.buttonColor     - The play button color.
  * @param {string} options.backgroundColor - The waveform background color.
+ * @param {string} options.seekLabel       - Accessible label for the seek control.
  * @param {number} options.height          - The waveform height in pixels.
  * @param {string} options.waveformStyle   - The visualization style (bars, mirror, line, blocks, dots, seekbar).
  * @return {Element} The configured container element.
@@ -95,6 +92,7 @@ export function createWaveformContainer( {
 	progressColor,
 	buttonColor,
 	backgroundColor = DEFAULT_WAVEFORM_BACKGROUND_COLOR,
+	seekLabel,
 	height = DEFAULT_WAVEFORM_HEIGHT,
 	waveformStyle = 'bars',
 } ) {
@@ -107,6 +105,10 @@ export function createWaveformContainer( {
 	container.setAttribute( 'data-progress-color', progressColor );
 	container.setAttribute( 'data-button-color', buttonColor );
 	container.setAttribute( 'data-background-color', backgroundColor );
+	container.setAttribute(
+		'data-seek-label',
+		getSeekControlLabel( seekLabel )
+	);
 	container.setAttribute( 'data-text-color', buttonColor );
 	container.setAttribute( 'data-text-secondary-color', buttonColor );
 	container.style.setProperty(
@@ -256,23 +258,20 @@ function formatSeekValueText( template, currentTime, duration ) {
 }
 
 /**
- * Set up waveform seek control accessibility.
+ * Localize the library-owned waveform seek control.
  *
- * This is a shim over `@arraypress/waveform-player`, which does not expose a
- * keyboard-operable seek slider. We add a native range input over the waveform
- * and mirror the bundled keyboard shortcuts while focus is on that slider,
- * adding common slider shortcuts as well. Once the library exposes this
- * natively, this can be reduced to just localizing the accessible name.
- * See https://github.com/arraypress/waveform-player/issues/8.
+ * `@arraypress/waveform-player` exposes `.waveform-container` as a keyboard
+ * operable ARIA slider. Gutenberg only layers on translation support for the
+ * accessible label and value text.
  *
  * @param {Element} container         - The waveform player container element.
  * @param {Object}  instance          - The WaveformPlayer instance.
- * @param {Object}  options           - Accessibility options.
+ * @param {Object}  options           - Localization options.
  * @param {string}  options.label     - Accessible label for the seek control.
  * @param {string}  options.valueText - Accessible value text template.
  * @return {Function|undefined} Cleanup function.
  */
-export function setupSeekControlAccessibility(
+export function setupSeekControlLocalization(
 	container,
 	instance,
 	{ label, valueText } = {}
@@ -280,325 +279,47 @@ export function setupSeekControlAccessibility(
 	const seekControl = container.querySelector( '.waveform-container' );
 	const { audio } = instance;
 
-	if ( ! seekControl || ! audio ) {
+	if ( ! seekControl ) {
 		return;
 	}
 
-	seekControl.removeAttribute( 'tabindex' );
-	seekControl.removeAttribute( 'role' );
-	seekControl.removeAttribute( 'aria-label' );
-	seekControl.removeAttribute( 'aria-valuemin' );
-	seekControl.removeAttribute( 'aria-valuemax' );
-	seekControl.removeAttribute( 'aria-valuenow' );
-	seekControl.removeAttribute( 'aria-valuetext' );
-
-	const waveformCanvas = seekControl.querySelector( 'canvas' );
-	const previousCanvasAriaHidden =
-		waveformCanvas?.getAttribute( 'aria-hidden' );
-	waveformCanvas?.setAttribute( 'aria-hidden', 'true' );
-
-	const seekInput = seekControl.ownerDocument.createElement( 'input' );
-	seekInput.className = 'waveform-seek-control';
-	seekInput.type = 'range';
-	seekInput.min = '0';
-	seekInput.step = 'any';
-	seekInput.setAttribute( 'aria-label', getSeekControlLabel( label ) );
-	seekControl.appendChild( seekInput );
-
-	// Position overlays. The playhead marks the current position while the
-	// slider has keyboard focus; the hover indicator previews the spot a click
-	// would seek to. Visibility is driven by CSS (`:focus-visible` and the
-	// `is-seek-hovering` class) — here we only build and position them.
-	const createOverlay = ( className ) => {
-		const bar = seekControl.ownerDocument.createElement( 'div' );
-		bar.className = className;
-		bar.setAttribute( 'aria-hidden', 'true' );
-		const tooltip = seekControl.ownerDocument.createElement( 'span' );
-		tooltip.className = 'waveform-seek-tooltip';
-		bar.appendChild( tooltip );
-		seekControl.appendChild( bar );
-		return { bar, tooltip };
-	};
-	const playhead = createOverlay( 'waveform-seek-playhead' );
-	const hover = createOverlay( 'waveform-seek-hover' );
-	let isPlaying = ! audio.paused;
-	let playheadTime = getFiniteTime( audio.currentTime );
-	let shouldRedirectContainerFocus = false;
-
-	const positionOverlay = ( overlay, seconds, duration ) => {
-		const ratio = duration
-			? Math.min( 1, Math.max( 0, seconds ) / duration )
-			: 0;
-		overlay.bar.style.left = `${ ratio * 100 }%`;
-		overlay.tooltip.textContent = formatTimestamp( seconds );
-	};
-
-	// Browser focus can linger on the slider after a screen reader's virtual
-	// cursor moves away, and any value change on a *focused* slider gets
-	// announced. So the native slider value and aria-valuetext track playback
-	// only while the slider is unfocused — silent updates that keep it current
-	// — and freeze while focused, refreshing once on focus and on each user
-	// seek.
-	const hasFocus = () => seekInput.ownerDocument.activeElement === seekInput;
-
-	const updateSeekControl = ( {
-		syncPlayhead = isPlaying,
-		currentTimeOverride,
-		syncAria = true,
-	} = {} ) => {
-		const duration = getFiniteTime( audio.duration );
+	const updateSeekValueText = ( currentTimeOverride, durationOverride ) => {
+		const duration = getFiniteTime( durationOverride ?? audio?.duration );
 		const currentTime = Math.min(
-			getFiniteTime( currentTimeOverride ?? audio.currentTime ),
+			getFiniteTime( currentTimeOverride ?? audio?.currentTime ),
 			duration
 		);
-		if ( syncPlayhead ) {
-			playheadTime = currentTime;
-		}
-
-		if ( syncAria ) {
-			// Round to whole seconds so the numeric attributes match the
-			// rounded aria-valuetext; the precise values still drive the
-			// visual overlay below.
-			seekInput.max = String( Math.round( duration ) );
-			seekInput.value = String( Math.round( currentTime ) );
-			seekInput.setAttribute(
-				'aria-valuetext',
-				formatSeekValueText(
-					valueText,
-					formatTimestamp( currentTime ),
-					formatTimestamp( duration )
-				)
-			);
-		}
-
-		positionOverlay( playhead, playheadTime, duration );
+		seekControl.setAttribute(
+			'aria-valuetext',
+			formatSeekValueText(
+				valueText,
+				formatTimestamp( currentTime ),
+				formatTimestamp( duration )
+			)
+		);
 	};
 
-	updateSeekControl();
+	updateSeekControlLabel( instance, label );
+	updateSeekValueText();
 
 	const originalOnTimeUpdate = instance.options.onTimeUpdate;
 	const onTimeUpdate = ( currentTime, duration, player ) => {
-		updateSeekControl( {
-			syncPlayhead: true,
-			currentTimeOverride: currentTime,
-			// Keep the value current during playback, but only while unfocused
-			// so it never announces; while focused it freezes (see hasFocus).
-			syncAria: ! hasFocus(),
-		} );
+		updateSeekValueText( currentTime, duration );
 		originalOnTimeUpdate?.( currentTime, duration, player );
 	};
 	instance.options.onTimeUpdate = onTimeUpdate;
 
-	// Refresh the announced value when focus lands on the slider, so a screen
-	// reader reads the live position rather than a stale one left over from
-	// before playback advanced while unfocused.
-	const onSeekFocus = () => {
-		updateSeekControl( { syncPlayhead: false } );
-	};
-	const onSeekBlur = () => {
-		updateSeekControl( { syncPlayhead: false } );
-	};
+	const onMetadataChange = () => updateSeekValueText();
+	const onEnded = () => updateSeekValueText( 0, audio?.duration );
 
-	const seekTo = ( seconds ) => {
-		playheadTime = Math.max(
-			0,
-			Math.min( getFiniteTime( audio.duration ), seconds )
-		);
-		instance.seekTo( playheadTime );
-		updateSeekControl( {
-			syncPlayhead: false,
-			currentTimeOverride: playheadTime,
-		} );
-	};
-
-	const seekToPercent = ( percent ) => {
-		const normalizedPercent = Math.min( 1, Math.max( 0, percent ) );
-		playheadTime = getFiniteTime( audio.duration ) * normalizedPercent;
-		instance.seekToPercent?.( normalizedPercent );
-		updateSeekControl( {
-			syncPlayhead: false,
-			currentTimeOverride: playheadTime,
-		} );
-	};
-
-	const onInput = () => {
-		seekTo( Number( seekInput.value ) );
-	};
-
-	const onKeyDown = ( event ) => {
-		const currentTime = isPlaying
-			? getFiniteTime( audio.currentTime )
-			: getFiniteTime( Number( seekInput.value ) );
-		const duration = getFiniteTime( audio.duration );
-		const seekStep = event.shiftKey
-			? SEEK_LARGE_STEP_SECONDS
-			: SEEK_STEP_SECONDS;
-		const volumeStep = event.shiftKey ? VOLUME_LARGE_STEP : VOLUME_STEP;
-		const actions = {
-			// Mirror the bundled WaveformPlayer keyboard shortcuts when focus is
-			// on our slider instead of the wrapper the library listens to.
-			' ': () => instance.togglePlay?.(),
-			ArrowLeft: () => seekTo( currentTime - seekStep ),
-			ArrowRight: () => seekTo( currentTime + seekStep ),
-			ArrowUp: () =>
-				instance.setVolume?.(
-					Math.min( 1, audio.volume + volumeStep )
-				),
-			ArrowDown: () =>
-				instance.setVolume?.(
-					Math.max( 0, audio.volume - volumeStep )
-				),
-			m: () => {
-				audio.muted = ! audio.muted;
-			},
-			M: () => {
-				audio.muted = ! audio.muted;
-			},
-			// Add standard slider shortcuts that the bundled player lacks.
-			PageDown: () => seekTo( currentTime - SEEK_LARGE_STEP_SECONDS ),
-			PageUp: () => seekTo( currentTime + SEEK_LARGE_STEP_SECONDS ),
-			Home: () => seekTo( 0 ),
-			End: () => seekTo( duration ),
-		};
-
-		if ( event.key >= '0' && event.key <= '9' ) {
-			event.preventDefault();
-			seekToPercent( parseInt( event.key, 10 ) / 10 );
-			return;
-		}
-
-		if ( ! actions[ event.key ] ) {
-			return;
-		}
-
-		event.preventDefault();
-		actions[ event.key ]();
-	};
-
-	const onContainerClickCapture = ( event ) => {
-		shouldRedirectContainerFocus =
-			event.target === seekInput || seekControl.contains( event.target );
-	};
-
-	const onContainerClick = ( event ) => {
-		container.setAttribute( 'tabindex', '-1' );
-
-		if ( ! seekControl.contains( event.target ) ) {
-			shouldRedirectContainerFocus = false;
-			return;
-		}
-
-		seekInput.focus();
-
-		const seconds = getPointedSeconds( event );
-		if ( seconds !== undefined ) {
-			seekTo( seconds );
-		}
-		shouldRedirectContainerFocus = false;
-	};
-
-	// The library focuses the outer wrapper on click and can leave it in the
-	// tab order. Redirect focus onto the accessible slider only when the click
-	// that caused wrapper focus originated in the waveform seek control.
-	const onContainerFocusIn = ( event ) => {
-		if ( event.target === container && shouldRedirectContainerFocus ) {
-			seekInput.focus();
-			shouldRedirectContainerFocus = false;
-		}
-	};
-
-	const getPointedSeconds = ( event ) => {
-		const rect = seekControl.getBoundingClientRect();
-		if ( ! rect.width ) {
-			return;
-		}
-		const duration = getFiniteTime( audio.duration );
-		const ratio = Math.min(
-			1,
-			Math.max( 0, ( event.clientX - rect.left ) / rect.width )
-		);
-		return ratio * duration;
-	};
-
-	const onPointerMove = ( event ) => {
-		const seconds = getPointedSeconds( event );
-		if ( seconds === undefined ) {
-			return;
-		}
-		const duration = getFiniteTime( audio.duration );
-		positionOverlay( hover, seconds, duration );
-		seekControl.classList.add( 'is-seek-hovering' );
-	};
-
-	const onPointerLeave = () => {
-		seekControl.classList.remove( 'is-seek-hovering' );
-	};
-
-	const onPlay = () => {
-		isPlaying = true;
-		// Refresh the value (silently while unfocused; frozen while focused).
-		updateSeekControl( { syncAria: ! hasFocus() } );
-	};
-	const onPause = () => {
-		isPlaying = false;
-		// Playback is no longer advancing, so refresh even a focused slider.
-		// This keeps the next keyboard seek anchored to the paused media time.
-		updateSeekControl( {
-			syncPlayhead: true,
-			currentTimeOverride: audio.currentTime,
-		} );
-	};
-	const onEnded = () => {
-		isPlaying = false;
-		playheadTime = 0;
-		updateSeekControl( {
-			syncPlayhead: false,
-			currentTimeOverride: playheadTime,
-			syncAria: ! hasFocus(),
-		} );
-	};
-
-	seekInput.addEventListener( 'input', onInput );
-	seekInput.addEventListener( 'keydown', onKeyDown, true );
-	seekInput.addEventListener( 'focus', onSeekFocus );
-	seekInput.addEventListener( 'blur', onSeekBlur );
-	container.addEventListener( 'click', onContainerClickCapture, true );
-	container.addEventListener( 'click', onContainerClick );
-	container.addEventListener( 'focusin', onContainerFocusIn );
-	seekControl.addEventListener( 'pointermove', onPointerMove );
-	seekControl.addEventListener( 'pointerleave', onPointerLeave );
-	container.addEventListener( 'waveformplayer:play', onPlay );
-	container.addEventListener( 'waveformplayer:pause', onPause );
+	audio?.addEventListener( 'durationchange', onMetadataChange );
+	audio?.addEventListener( 'loadedmetadata', onMetadataChange );
 	container.addEventListener( 'waveformplayer:ended', onEnded );
-	audio.addEventListener( 'durationchange', updateSeekControl );
-	audio.addEventListener( 'loadedmetadata', updateSeekControl );
 
 	return () => {
-		seekInput.removeEventListener( 'input', onInput );
-		seekInput.removeEventListener( 'keydown', onKeyDown, true );
-		seekInput.removeEventListener( 'focus', onSeekFocus );
-		seekInput.removeEventListener( 'blur', onSeekBlur );
-		container.removeEventListener( 'click', onContainerClickCapture, true );
-		container.removeEventListener( 'click', onContainerClick );
-		container.removeEventListener( 'focusin', onContainerFocusIn );
-		seekControl.removeEventListener( 'pointermove', onPointerMove );
-		seekControl.removeEventListener( 'pointerleave', onPointerLeave );
-		container.removeEventListener( 'waveformplayer:play', onPlay );
-		container.removeEventListener( 'waveformplayer:pause', onPause );
+		audio?.removeEventListener( 'durationchange', onMetadataChange );
+		audio?.removeEventListener( 'loadedmetadata', onMetadataChange );
 		container.removeEventListener( 'waveformplayer:ended', onEnded );
-		audio.removeEventListener( 'durationchange', updateSeekControl );
-		audio.removeEventListener( 'loadedmetadata', updateSeekControl );
-		playhead.bar.remove();
-		hover.bar.remove();
-		seekInput.remove();
-		if ( previousCanvasAriaHidden === null ) {
-			waveformCanvas?.removeAttribute( 'aria-hidden' );
-		} else {
-			waveformCanvas?.setAttribute(
-				'aria-hidden',
-				previousCanvasAriaHidden
-			);
-		}
 		if ( instance.options.onTimeUpdate === onTimeUpdate ) {
 			instance.options.onTimeUpdate = originalOnTimeUpdate;
 		}
@@ -612,12 +333,16 @@ export function setupSeekControlAccessibility(
  * @param {string} label    - Accessible label for the seek control.
  */
 export function updateSeekControlLabel( instance, label ) {
+	const seekLabel = getSeekControlLabel( label );
+	instance.options.seekLabel = seekLabel;
+	instance.applySeekLabel?.( seekLabel );
+
 	const seekControl = instance?.container?.querySelector(
-		'.waveform-seek-control'
+		'.waveform-container'
 	);
 
 	if ( seekControl ) {
-		seekControl.setAttribute( 'aria-label', getSeekControlLabel( label ) );
+		seekControl.setAttribute( 'aria-label', seekLabel );
 	}
 }
 
@@ -673,6 +398,7 @@ export function initWaveformPlayer(
 		progressColor,
 		buttonColor: textColor,
 		backgroundColor,
+		seekLabel: title || labels?.seek,
 		waveformStyle,
 	} );
 	element.appendChild( container );
@@ -681,11 +407,11 @@ export function initWaveformPlayer(
 	const instance = new WaveformPlayerLib( container );
 
 	// Set up event handlers.
-	const cleanupSeekControlAccessibility = setupSeekControlAccessibility(
+	const cleanupSeekControlLocalization = setupSeekControlLocalization(
 		container,
 		instance,
 		{
-			label: labels?.seek || title,
+			label: title || labels?.seek,
 			valueText: labels?.seekValueText,
 		}
 	);
@@ -713,7 +439,7 @@ export function initWaveformPlayer(
 		container,
 		destroy: () => {
 			cleanupPlayButtonAccessibility?.();
-			cleanupSeekControlAccessibility?.();
+			cleanupSeekControlLocalization?.();
 			container.removeEventListener(
 				'waveformplayer:ready',
 				handlers.ready

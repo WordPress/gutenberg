@@ -15,7 +15,7 @@ import {
 	getWaveformColors,
 	styleSvgIcons,
 	setupPlayButtonAccessibility,
-	setupSeekControlAccessibility,
+	setupSeekControlLocalization,
 	updateSeekControlLabel,
 	logPlayError,
 } from '../waveform-utils';
@@ -61,6 +61,7 @@ describe( 'Waveform utilities', () => {
 				'data-background-color',
 				'#ffffff'
 			);
+			expect( container ).toHaveAttribute( 'data-seek-label', 'Seek' );
 			expect( container ).toHaveStyle( {
 				'--wp--playlist--waveform-bar-color': 'rgba(0, 0, 0, 0.3)',
 				'--wp--playlist--waveform-background-color': '#ffffff',
@@ -75,6 +76,7 @@ describe( 'Waveform utilities', () => {
 				title: 'My Song',
 				artist: 'The Artist',
 				artwork: 'https://example.com/cover.jpg',
+				seekLabel: 'My Song',
 			} );
 
 			expect( container ).toHaveAttribute( 'data-title', 'My Song' );
@@ -86,6 +88,7 @@ describe( 'Waveform utilities', () => {
 				'data-artwork',
 				'https://example.com/cover.jpg'
 			);
+			expect( container ).toHaveAttribute( 'data-seek-label', 'My Song' );
 		} );
 
 		it( 'should not set optional attributes when not provided', () => {
@@ -247,18 +250,18 @@ describe( 'Waveform utilities', () => {
 		} );
 	} );
 
-	describe( 'setupSeekControlAccessibility', () => {
+	describe( 'setupSeekControlLocalization', () => {
 		function createSeekControlFixture( {
 			duration = 180,
 			currentTime = 45,
 		} = {} ) {
 			const container = document.createElement( 'div' );
 			const seekControl = document.createElement( 'div' );
-			const canvas = document.createElement( 'canvas' );
 			const audio = document.createElement( 'audio' );
 
 			seekControl.className = 'waveform-container';
-			seekControl.appendChild( canvas );
+			seekControl.setAttribute( 'role', 'slider' );
+			seekControl.setAttribute( 'tabindex', '0' );
 			container.appendChild( seekControl );
 			document.body.appendChild( container );
 
@@ -277,87 +280,56 @@ describe( 'Waveform utilities', () => {
 				audio,
 				container,
 				options: {},
-				seekTo: jest.fn( ( seconds ) => {
-					audio.currentTime = seconds;
+				applySeekLabel: jest.fn( ( label ) => {
+					seekControl.setAttribute( 'aria-label', label );
 				} ),
-				seekToPercent: jest.fn( ( percent ) => {
-					audio.currentTime = audio.duration * percent;
-				} ),
-				setVolume: jest.fn( ( volume ) => {
-					audio.volume = volume;
-				} ),
-				togglePlay: jest.fn(),
 			};
 
 			return { audio, container, instance, seekControl };
-		}
-
-		function getSeekInput( seekControl ) {
-			return seekControl.querySelector( '.waveform-seek-control' );
 		}
 
 		afterEach( () => {
 			document.body.innerHTML = '';
 		} );
 
-		it( 'sets slider semantics and current time attributes', () => {
+		it( 'sets the localized seek label on the library slider', () => {
 			const { container, instance, seekControl } =
 				createSeekControlFixture();
 
-			setupSeekControlAccessibility( container, instance, {
+			setupSeekControlLocalization( container, instance, {
 				label: 'My Song',
 			} );
 
-			const seekInput = getSeekInput( seekControl );
-			const canvas = seekControl.querySelector( 'canvas' );
-			expect( seekInput ).toHaveAttribute( 'type', 'range' );
-			expect( seekInput ).toHaveAttribute( 'aria-label', 'My Song' );
-			expect( seekInput ).toHaveAttribute( 'min', '0' );
-			expect( seekInput ).toHaveAttribute( 'step', 'any' );
-			expect( seekInput ).toHaveAttribute( 'max', '180' );
-			expect( seekInput.value ).toBe( '45' );
-			expect( seekInput ).toHaveAttribute(
-				'aria-valuetext',
-				'0:45 of 3:00'
-			);
-			expect( seekControl ).not.toHaveAttribute( 'role' );
-			expect( seekControl ).not.toHaveAttribute( 'tabindex' );
-			expect( canvas ).toHaveAttribute( 'aria-hidden', 'true' );
+			expect( instance.options.seekLabel ).toBe( 'My Song' );
+			expect( instance.applySeekLabel ).toHaveBeenCalledWith( 'My Song' );
+			expect( seekControl ).toHaveAttribute( 'aria-label', 'My Song' );
 		} );
 
-		it( 'rounds the numeric value attributes to match the announced text', () => {
-			// Media times are fractional; the numeric attributes must round
-			// the same way aria-valuetext does, or the native slider value can
-			// disagree with the announced text.
+		it( 'localizes the seek value text', () => {
 			const { container, instance, seekControl } =
 				createSeekControlFixture( {
 					duration: 180.6,
 					currentTime: 45.731,
 				} );
 
-			setupSeekControlAccessibility( container, instance );
+			setupSeekControlLocalization( container, instance, {
+				valueText: '%1$s of %2$s',
+			} );
 
-			const seekInput = getSeekInput( seekControl );
-			expect( seekInput.value ).toBe( '46' );
-			expect( seekInput ).toHaveAttribute( 'max', '181' );
-			expect( seekInput ).toHaveAttribute(
+			expect( seekControl ).toHaveAttribute(
 				'aria-valuetext',
 				'0:46 of 3:01'
 			);
 		} );
 
 		it( 'substitutes non-positional and repeated value-text placeholders', () => {
-			// Translators may localize the "%1$s of %2$s" template using
-			// non-positional ("%s of %s") or repeated placeholders, both of
-			// which PHP sprintf accepts. Every placeholder must still resolve,
-			// or the raw "%s"/"%1$s" leaks into the announced value text.
 			const nonPositional = createSeekControlFixture();
-			setupSeekControlAccessibility(
+			setupSeekControlLocalization(
 				nonPositional.container,
 				nonPositional.instance,
 				{ valueText: '%s of %s' }
 			);
-			expect( getSeekInput( nonPositional.seekControl ) ).toHaveAttribute(
+			expect( nonPositional.seekControl ).toHaveAttribute(
 				'aria-valuetext',
 				'0:45 of 3:00'
 			);
@@ -365,587 +337,57 @@ describe( 'Waveform utilities', () => {
 			document.body.innerHTML = '';
 
 			const repeated = createSeekControlFixture();
-			setupSeekControlAccessibility(
+			setupSeekControlLocalization(
 				repeated.container,
 				repeated.instance,
 				{ valueText: '%1$s / %1$s of %2$s' }
 			);
-			expect( getSeekInput( repeated.seekControl ) ).toHaveAttribute(
+			expect( repeated.seekControl ).toHaveAttribute(
 				'aria-valuetext',
 				'0:45 / 0:45 of 3:00'
 			);
 		} );
 
-		it( 'tracks playback while unfocused but freezes the value while focused', () => {
-			const { audio, container, instance, seekControl } =
-				createSeekControlFixture( { duration: 180, currentTime: 0 } );
-
-			setupSeekControlAccessibility( container, instance );
-			const seekInput = getSeekInput( seekControl );
-			expect( seekInput.value ).toBe( '0' );
-
-			// While unfocused the value tracks playback (silently — an
-			// unfocused slider's attribute changes are not announced) so it
-			// stays current.
-			audio.currentTime = 30;
-			instance.options.onTimeUpdate( 30, 180, instance );
-			expect( seekInput.value ).toBe( '30' );
-
-			// Once focused it freezes: browser focus lingers on the slider
-			// after a screen reader's virtual cursor moves away, so further
-			// playback ticks (and play/ended) must not change the value or it
-			// announces every tick.
-			seekInput.focus();
-			audio.currentTime = 90;
-			instance.options.onTimeUpdate( 90, 180, instance );
-			expect( seekInput.value ).toBe( '30' );
-
-			container.dispatchEvent( new CustomEvent( 'waveformplayer:play' ) );
-			audio.currentTime = 120;
-			instance.options.onTimeUpdate( 120, 180, instance );
-			container.dispatchEvent(
-				new CustomEvent( 'waveformplayer:ended' )
-			);
-			expect( seekInput.value ).toBe( '30' );
-		} );
-
-		it( 'updates the announced value on metadata change but not playback', () => {
-			const { audio, container, instance, seekControl } =
-				createSeekControlFixture( {
-					duration: 60,
-					currentTime: 0,
-				} );
-
-			setupSeekControlAccessibility( container, instance );
-
-			// Metadata (duration) changes update the baseline value.
-			audio.duration = 90;
-			audio.currentTime = 30;
-			audio.dispatchEvent( new Event( 'durationchange' ) );
-
-			const seekInput = getSeekInput( seekControl );
-			expect( seekInput ).toHaveAttribute( 'max', '90' );
-			expect( seekInput.value ).toBe( '30' );
-			expect( seekInput ).toHaveAttribute(
-				'aria-valuetext',
-				'0:30 of 1:30'
-			);
-
-			// A playback tick leaves the announced value alone, even focused.
-			seekInput.focus();
-			audio.currentTime = 45;
-			instance.options.onTimeUpdate( 45, 90, instance );
-
-			expect( seekInput.value ).toBe( '30' );
-		} );
-
-		it( 'keeps the bundled arrow seek shortcut available on the seek control', () => {
+		it( 'keeps localized value text in sync with playback updates', () => {
 			const { container, instance, seekControl } =
-				createSeekControlFixture( {
-					duration: 60,
-					currentTime: 10,
-				} );
+				createSeekControlFixture( { duration: 180, currentTime: 45 } );
 
-			setupSeekControlAccessibility( container, instance );
-			const seekInput = getSeekInput( seekControl );
-
-			container.addEventListener( 'keydown', () => {
-				if ( document.activeElement !== container ) {
-					return;
-				}
-				instance.seekTo( 20 );
+			setupSeekControlLocalization( container, instance, {
+				valueText: '%1$s of %2$s',
 			} );
-			seekInput.focus();
-			seekInput.dispatchEvent(
-				new window.KeyboardEvent( 'keydown', {
-					key: 'ArrowRight',
-					bubbles: true,
-					cancelable: true,
-				} )
-			);
+			instance.options.onTimeUpdate( 90, 180, instance );
 
-			expect( instance.seekTo ).toHaveBeenCalledTimes( 1 );
-			expect( instance.seekTo ).toHaveBeenCalledWith( 15 );
+			expect( seekControl ).toHaveAttribute(
+				'aria-valuetext',
+				'1:30 of 3:00'
+			);
 		} );
 
-		it( 'seeks from the current media time while playing', () => {
-			const { container, instance, seekControl } =
-				createSeekControlFixture( {
-					duration: 60,
-					currentTime: 10,
-				} );
+		it( 'restores the original time update handler on cleanup', () => {
+			const { container, instance } = createSeekControlFixture();
+			const originalOnTimeUpdate = jest.fn();
+			instance.options.onTimeUpdate = originalOnTimeUpdate;
 
-			setupSeekControlAccessibility( container, instance );
-			const seekInput = getSeekInput( seekControl );
+			const cleanup = setupSeekControlLocalization( container, instance );
 
-			container.dispatchEvent( new CustomEvent( 'waveformplayer:play' ) );
-			seekInput.dispatchEvent(
-				new window.KeyboardEvent( 'keydown', {
-					key: 'ArrowRight',
-					bubbles: true,
-					cancelable: true,
-				} )
+			expect( instance.options.onTimeUpdate ).not.toBe(
+				originalOnTimeUpdate
 			);
-
-			expect( instance.seekTo ).toHaveBeenCalledWith( 15 );
-		} );
-
-		it( 'seeks from the paused media time after focused playback stops', () => {
-			const { audio, container, instance, seekControl } =
-				createSeekControlFixture( {
-					duration: 60,
-					currentTime: 10,
-				} );
-
-			setupSeekControlAccessibility( container, instance );
-			const seekInput = getSeekInput( seekControl );
-
-			seekInput.focus();
-			container.dispatchEvent( new CustomEvent( 'waveformplayer:play' ) );
-			audio.currentTime = 30;
-			instance.options.onTimeUpdate( 30, 60, instance );
-
-			expect( seekInput.value ).toBe( '10' );
-
-			container.dispatchEvent(
-				new CustomEvent( 'waveformplayer:pause' )
+			cleanup();
+			expect( instance.options.onTimeUpdate ).toBe(
+				originalOnTimeUpdate
 			);
-			seekInput.dispatchEvent(
-				new window.KeyboardEvent( 'keydown', {
-					key: 'ArrowRight',
-					bubbles: true,
-					cancelable: true,
-				} )
-			);
-
-			expect( instance.seekTo ).toHaveBeenCalledWith( 35 );
-		} );
-
-		it( 'seeks from the latest reported media time after an external paused seek', () => {
-			const { audio, container, instance, seekControl } =
-				createSeekControlFixture( {
-					duration: 60,
-					currentTime: 10,
-				} );
-
-			setupSeekControlAccessibility( container, instance );
-			const seekInput = getSeekInput( seekControl );
-
-			audio.currentTime = 30;
-			instance.options.onTimeUpdate( 30, 60, instance );
-			seekInput.dispatchEvent(
-				new window.KeyboardEvent( 'keydown', {
-					key: 'ArrowRight',
-					bubbles: true,
-					cancelable: true,
-				} )
-			);
-
-			expect( instance.seekTo ).toHaveBeenCalledWith( 35 );
-		} );
-
-		it( 'keeps the bundled vertical arrow volume shortcuts', () => {
-			const { audio, container, instance, seekControl } =
-				createSeekControlFixture( {
-					duration: 60,
-					currentTime: 10,
-				} );
-			audio.volume = 0.5;
-
-			setupSeekControlAccessibility( container, instance );
-			const seekInput = getSeekInput( seekControl );
-
-			seekInput.dispatchEvent(
-				new window.KeyboardEvent( 'keydown', {
-					key: 'ArrowUp',
-					bubbles: true,
-					cancelable: true,
-				} )
-			);
-			expect( instance.setVolume ).toHaveBeenLastCalledWith( 0.6 );
-
-			seekInput.dispatchEvent(
-				new window.KeyboardEvent( 'keydown', {
-					key: 'ArrowDown',
-					bubbles: true,
-					cancelable: true,
-				} )
-			);
-			expect( instance.setVolume ).toHaveBeenLastCalledWith( 0.5 );
-		} );
-
-		it( 'uses larger steps for shift arrow shortcuts', () => {
-			const { audio, container, instance, seekControl } =
-				createSeekControlFixture( {
-					duration: 60,
-					currentTime: 10,
-				} );
-			audio.volume = 0.5;
-
-			setupSeekControlAccessibility( container, instance );
-			const seekInput = getSeekInput( seekControl );
-
-			seekInput.dispatchEvent(
-				new window.KeyboardEvent( 'keydown', {
-					key: 'ArrowRight',
-					shiftKey: true,
-					bubbles: true,
-					cancelable: true,
-				} )
-			);
-			expect( instance.seekTo ).toHaveBeenLastCalledWith( 20 );
-
-			seekInput.dispatchEvent(
-				new window.KeyboardEvent( 'keydown', {
-					key: 'ArrowLeft',
-					shiftKey: true,
-					bubbles: true,
-					cancelable: true,
-				} )
-			);
-			expect( instance.seekTo ).toHaveBeenLastCalledWith( 10 );
-
-			seekInput.dispatchEvent(
-				new window.KeyboardEvent( 'keydown', {
-					key: 'ArrowUp',
-					shiftKey: true,
-					bubbles: true,
-					cancelable: true,
-				} )
-			);
-			expect( instance.setVolume ).toHaveBeenLastCalledWith( 0.7 );
-
-			seekInput.dispatchEvent(
-				new window.KeyboardEvent( 'keydown', {
-					key: 'ArrowDown',
-					shiftKey: true,
-					bubbles: true,
-					cancelable: true,
-				} )
-			);
-			expect( instance.setVolume.mock.lastCall[ 0 ] ).toBeCloseTo( 0.5 );
-		} );
-
-		it( 'keeps the bundled mute, playback, and number key shortcuts', () => {
-			const { audio, container, instance, seekControl } =
-				createSeekControlFixture( {
-					duration: 60,
-					currentTime: 10,
-				} );
-
-			setupSeekControlAccessibility( container, instance );
-			const seekInput = getSeekInput( seekControl );
-
-			seekInput.dispatchEvent(
-				new window.KeyboardEvent( 'keydown', {
-					key: ' ',
-					bubbles: true,
-					cancelable: true,
-				} )
-			);
-			expect( instance.togglePlay ).toHaveBeenCalledTimes( 1 );
-
-			seekInput.dispatchEvent(
-				new window.KeyboardEvent( 'keydown', {
-					key: 'm',
-					bubbles: true,
-					cancelable: true,
-				} )
-			);
-			expect( audio.muted ).toBe( true );
-
-			seekInput.dispatchEvent(
-				new window.KeyboardEvent( 'keydown', {
-					key: '3',
-					bubbles: true,
-					cancelable: true,
-				} )
-			);
-			expect( instance.seekToPercent ).toHaveBeenLastCalledWith( 0.3 );
-		} );
-
-		it( 'adds page, home, and end slider shortcuts', () => {
-			const { container, instance, seekControl } =
-				createSeekControlFixture( {
-					duration: 60,
-					currentTime: 10,
-				} );
-
-			setupSeekControlAccessibility( container, instance );
-			const seekInput = getSeekInput( seekControl );
-
-			seekInput.dispatchEvent(
-				new window.KeyboardEvent( 'keydown', {
-					key: 'PageUp',
-					bubbles: true,
-					cancelable: true,
-				} )
-			);
-			expect( instance.seekTo ).toHaveBeenLastCalledWith( 20 );
-
-			seekInput.dispatchEvent(
-				new window.KeyboardEvent( 'keydown', {
-					key: 'PageDown',
-					bubbles: true,
-					cancelable: true,
-				} )
-			);
-			expect( instance.seekTo ).toHaveBeenLastCalledWith( 10 );
-
-			seekInput.dispatchEvent(
-				new window.KeyboardEvent( 'keydown', {
-					key: 'End',
-					bubbles: true,
-					cancelable: true,
-				} )
-			);
-			expect( instance.seekTo ).toHaveBeenLastCalledWith( 60 );
-
-			seekInput.dispatchEvent(
-				new window.KeyboardEvent( 'keydown', {
-					key: 'Home',
-					bubbles: true,
-					cancelable: true,
-				} )
-			);
-			expect( instance.seekTo ).toHaveBeenLastCalledWith( 0 );
-		} );
-
-		it( 'seeks when the native range input value changes', () => {
-			const { container, instance, seekControl } =
-				createSeekControlFixture( {
-					duration: 60,
-					currentTime: 10,
-				} );
-
-			setupSeekControlAccessibility( container, instance );
-			const seekInput = getSeekInput( seekControl );
-
-			seekInput.value = '42';
-			seekInput.dispatchEvent(
-				new window.Event( 'input', { bubbles: true } )
-			);
-
-			expect( instance.seekTo ).toHaveBeenCalledWith( 42 );
-			expect( seekInput.value ).toBe( '42' );
 		} );
 
 		it( 'updates the seek control label', () => {
-			const { container, instance, seekControl } =
-				createSeekControlFixture();
+			const { instance, seekControl } = createSeekControlFixture();
 
-			setupSeekControlAccessibility( container, instance );
 			updateSeekControlLabel( instance, 'Updated Song' );
 
-			expect( getSeekInput( seekControl ) ).toHaveAttribute(
+			expect( instance.options.seekLabel ).toBe( 'Updated Song' );
+			expect( seekControl ).toHaveAttribute(
 				'aria-label',
 				'Updated Song'
-			);
-		} );
-
-		it( 'redirects focus from the player wrapper to the slider after waveform clicks', () => {
-			const { container, instance, seekControl } =
-				createSeekControlFixture();
-
-			container.addEventListener( 'click', () => {
-				container.setAttribute( 'tabindex', '0' );
-				container.focus();
-			} );
-			setupSeekControlAccessibility( container, instance );
-
-			seekControl.dispatchEvent(
-				new window.MouseEvent( 'click', {
-					bubbles: true,
-					clientX: 0,
-				} )
-			);
-
-			expect( getSeekInput( seekControl ) ).toHaveFocus();
-		} );
-
-		it( 'does not redirect play button activation to the slider', () => {
-			const { container, instance, seekControl } =
-				createSeekControlFixture();
-			const playButton = document.createElement( 'button' );
-			container.prepend( playButton );
-
-			container.addEventListener( 'click', () => {
-				container.setAttribute( 'tabindex', '0' );
-				container.focus();
-			} );
-			setupSeekControlAccessibility( container, instance );
-
-			playButton.dispatchEvent(
-				new window.MouseEvent( 'click', { bubbles: true } )
-			);
-
-			expect( container ).toHaveFocus();
-			expect( getSeekInput( seekControl ) ).not.toHaveFocus();
-		} );
-
-		it( 'renders the initial focus playhead at the current time', () => {
-			const { container, instance, seekControl } =
-				createSeekControlFixture( { duration: 180, currentTime: 45 } );
-
-			setupSeekControlAccessibility( container, instance );
-
-			const playhead = seekControl.querySelector(
-				'.waveform-seek-playhead'
-			);
-			expect( playhead ).not.toBeNull();
-			expect( playhead ).toHaveStyle( { left: '25%' } );
-			expect( playhead ).toHaveTextContent( '0:45' );
-		} );
-
-		it( 'moves the playhead as the current time changes while playing', () => {
-			const { audio, container, instance, seekControl } =
-				createSeekControlFixture( { duration: 180, currentTime: 45 } );
-
-			setupSeekControlAccessibility( container, instance );
-
-			container.dispatchEvent( new CustomEvent( 'waveformplayer:play' ) );
-			audio.currentTime = 90;
-			instance.options.onTimeUpdate( 90, 180, instance );
-
-			const playhead = seekControl.querySelector(
-				'.waveform-seek-playhead'
-			);
-			expect( playhead ).toHaveStyle( { left: '50%' } );
-			expect( playhead ).toHaveTextContent( '1:30' );
-		} );
-
-		it( 'resets the focus playhead when playback ends', () => {
-			const { audio, container, instance, seekControl } =
-				createSeekControlFixture( { duration: 180, currentTime: 45 } );
-
-			setupSeekControlAccessibility( container, instance );
-
-			container.dispatchEvent( new CustomEvent( 'waveformplayer:play' ) );
-			audio.currentTime = 90;
-			instance.options.onTimeUpdate( 90, 180, instance );
-			container.dispatchEvent(
-				new CustomEvent( 'waveformplayer:ended' )
-			);
-
-			const playhead = seekControl.querySelector(
-				'.waveform-seek-playhead'
-			);
-			expect( playhead ).toHaveStyle( { left: '0%' } );
-			expect( playhead ).toHaveTextContent( '0:00' );
-		} );
-
-		it( 'moves the focus playhead to the clicked position while stopped', () => {
-			const { container, instance, seekControl } =
-				createSeekControlFixture( { duration: 180, currentTime: 0 } );
-			seekControl.getBoundingClientRect = () => ( {
-				left: 0,
-				width: 200,
-				top: 0,
-				right: 200,
-				bottom: 100,
-				height: 100,
-			} );
-
-			setupSeekControlAccessibility( container, instance );
-
-			seekControl.dispatchEvent(
-				new window.MouseEvent( 'click', {
-					bubbles: true,
-					clientX: 100,
-				} )
-			);
-
-			const playhead = seekControl.querySelector(
-				'.waveform-seek-playhead'
-			);
-			expect( playhead ).toHaveStyle( { left: '50%' } );
-			expect( playhead ).toHaveTextContent( '1:30' );
-			expect( getSeekInput( seekControl ).value ).toBe( '90' );
-			expect( instance.seekTo ).toHaveBeenCalledWith( 90 );
-		} );
-
-		it( 'seeks when clicking the transparent range input while stopped', () => {
-			const { container, instance, seekControl } =
-				createSeekControlFixture( { duration: 180, currentTime: 0 } );
-			seekControl.getBoundingClientRect = () => ( {
-				left: 0,
-				width: 200,
-				top: 0,
-				right: 200,
-				bottom: 100,
-				height: 100,
-			} );
-
-			setupSeekControlAccessibility( container, instance );
-			const seekInput = getSeekInput( seekControl );
-
-			seekInput.dispatchEvent(
-				new window.MouseEvent( 'click', {
-					bubbles: true,
-					clientX: 100,
-				} )
-			);
-
-			const playhead = seekControl.querySelector(
-				'.waveform-seek-playhead'
-			);
-			expect( instance.seekTo ).toHaveBeenCalledWith( 90 );
-			expect( seekInput.value ).toBe( '90' );
-			expect( playhead ).toHaveStyle( { left: '50%' } );
-			expect( playhead ).toHaveTextContent( '1:30' );
-		} );
-
-		it( 'shows a hover indicator and timestamp at the pointed position', () => {
-			const { container, instance, seekControl } =
-				createSeekControlFixture( { duration: 180, currentTime: 0 } );
-			seekControl.getBoundingClientRect = () => ( {
-				left: 0,
-				width: 200,
-				top: 0,
-				right: 200,
-				bottom: 100,
-				height: 100,
-			} );
-
-			setupSeekControlAccessibility( container, instance );
-
-			seekControl.dispatchEvent(
-				new window.MouseEvent( 'pointermove', {
-					bubbles: true,
-					clientX: 100,
-				} )
-			);
-
-			const hover = seekControl.querySelector( '.waveform-seek-hover' );
-			expect( seekControl ).toHaveClass( 'is-seek-hovering' );
-			expect( hover ).toHaveStyle( { left: '50%' } );
-			expect( hover ).toHaveTextContent( '1:30' );
-
-			seekControl.dispatchEvent(
-				new window.MouseEvent( 'pointerleave', { bubbles: true } )
-			);
-			expect( seekControl ).not.toHaveClass( 'is-seek-hovering' );
-		} );
-
-		it( 'removes seek overlays on cleanup', () => {
-			const { container, instance, seekControl } =
-				createSeekControlFixture();
-
-			const cleanup = setupSeekControlAccessibility(
-				container,
-				instance
-			);
-			cleanup();
-
-			expect(
-				seekControl.querySelector( '.waveform-seek-playhead' )
-			).toBeNull();
-			expect(
-				seekControl.querySelector( '.waveform-seek-hover' )
-			).toBeNull();
-			expect( getSeekInput( seekControl ) ).toBeNull();
-			expect( seekControl.querySelector( 'canvas' ) ).not.toHaveAttribute(
-				'aria-hidden'
 			);
 		} );
 	} );

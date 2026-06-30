@@ -3,25 +3,6 @@
 // Waveform player dimensions.
 $waveform-player-height: 100px;
 
-// The native range input overlaying the waveform is fully transparent; its
-// track and thumb pseudo-elements are reset per vendor. They can't share a
-// selector list — an unrecognized vendor pseudo-element invalidates the whole
-// rule in that browser — so the declarations are shared via mixins instead.
-@mixin waveform-seek-track {
-	appearance: none;
-	width: 100%;
-	height: 100%;
-	background: transparent;
-	border: 0;
-}
-
-@mixin waveform-seek-thumb {
-	appearance: none;
-	width: 1px;
-	height: 100%;
-	background: transparent;
-}
-
 .wp-block-playlist {
 	// Main waveform player container.
 	.wp-block-playlist__waveform-player {
@@ -34,101 +15,6 @@ $waveform-player-height: 100px;
 	.waveform-track {
 		height: $waveform-player-height;
 		gap: 0;
-	}
-
-	.waveform-container {
-		position: relative;
-		cursor: default;
-
-		// The playhead (vertical bar + timestamp) is the seek focus indicator,
-		// so no separate outline is needed.
-		.waveform-seek-control:focus {
-			outline: none;
-		}
-
-		.waveform-seek-control:focus ~ .waveform-seek-playhead {
-			display: block;
-		}
-
-		// The hover preview is shown only while pointing at the waveform.
-		&.is-seek-hovering .waveform-seek-hover {
-			display: block;
-		}
-	}
-
-	.waveform-seek-control {
-		appearance: none;
-		position: absolute;
-		inset: 0;
-		z-index: 3;
-		width: 100%;
-		height: 100%;
-		margin: 0;
-		padding: 0;
-		border: 0;
-		background: transparent;
-		color: inherit;
-		cursor: pointer;
-		opacity: 0;
-	}
-
-	.waveform-seek-control::-webkit-slider-runnable-track {
-		@include waveform-seek-track;
-	}
-
-	.waveform-seek-control::-moz-range-track {
-		@include waveform-seek-track;
-	}
-
-	.waveform-seek-control::-webkit-slider-thumb {
-		@include waveform-seek-thumb;
-	}
-
-	.waveform-seek-control::-moz-range-thumb {
-		@include waveform-seek-thumb;
-	}
-
-	// Vertical position indicators overlaid on the waveform. The playhead marks
-	// the current position for keyboard users; the hover indicator previews the
-	// spot a click would seek to. Both are hidden until activated above.
-	.waveform-seek-playhead,
-	.waveform-seek-hover {
-		position: absolute;
-		top: 0;
-		bottom: 0;
-		z-index: 2;
-		display: none;
-		pointer-events: none;
-
-		// The visible bar, centered on the position.
-		&::before {
-			content: "";
-			position: absolute;
-			background: currentColor;
-			inset-block: 0;
-			inset-inline-start: 0;
-			width: 2px;
-			transform: translateX(-50%);
-		}
-	}
-
-	// Darken the spot a click would seek to.
-	.waveform-seek-hover::before {
-		opacity: 0.25;
-	}
-
-	.waveform-seek-tooltip {
-		position: absolute;
-		top: 4px;
-		inset-inline-start: 0;
-		transform: translateX(-50%);
-		padding: 2px 6px;
-		border-radius: 2px;
-		background: var(--wp--playlist--waveform-button-background-color, #1e1e1e);
-		color: var(--wp--playlist--waveform-button-icon-color, #fff);
-		font-size: 11px;
-		line-height: 1.5;
-		white-space: nowrap;
 	}
 
 	// WaveformPlayer button styling.
