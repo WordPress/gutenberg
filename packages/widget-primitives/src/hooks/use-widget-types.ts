@@ -68,6 +68,13 @@ export function useWidgetTypes(
 						...( record.category
 							? { category: record.category }
 							: {} ),
+						...( record.title ? { title: record.title } : {} ),
+						...( record.description
+							? { description: record.description }
+							: {} ),
+						...( record.keywords
+							? { keywords: record.keywords }
+							: {} ),
 					} as WidgetType;
 				} catch {
 					return null;
