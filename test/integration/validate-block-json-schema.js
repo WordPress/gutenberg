@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * Validates all block.json files in the repo against the block.json schema.
  *
@@ -22,22 +21,11 @@ for ( const f of files ) {
 	try {
 		const meta = require( f );
 		if ( ! ajv.validate( schema, meta ) ) {
-			console.log(
-				'FAIL:',
-				path.relative( ROOT_DIR, f ),
-				JSON.stringify( ajv.errors )
-			);
 			failed++;
 		}
 	} catch ( e ) {
-		console.log( 'ERROR:', path.relative( ROOT_DIR, f ), e.message );
 		failed++;
 	}
 }
 
-console.log(
-	`\nResults: ${ files.length } files found, ${ failed } failed, ${
-		files.length - failed
-	} passed.`
-);
 process.exit( failed > 0 ? 1 : 0 );
