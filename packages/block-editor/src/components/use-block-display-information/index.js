@@ -15,6 +15,7 @@ import { symbol } from '@wordpress/icons';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 /** @typedef {import('@wordpress/blocks').WPIcon} WPIcon */
 
@@ -72,11 +73,12 @@ export default function useBlockDisplayInformation( clientId ) {
 			if ( ! clientId ) {
 				return null;
 			}
+			const blockEditorSelect = select( blockEditorStore );
 			const {
 				getBlockName,
 				getBlockAttributes,
 				__experimentalGetParsedPattern,
-			} = select( blockEditorStore );
+			} = blockEditorSelect;
 			const { getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
 			const blockName = getBlockName( clientId );
@@ -85,11 +87,12 @@ export default function useBlockDisplayInformation( clientId ) {
 				return null;
 			}
 			const attributes = getBlockAttributes( clientId );
+			const { isSectionBlock } = unlock( blockEditorSelect );
 
 			// Check if this block is a pattern
 			const patternName = attributes?.metadata?.patternName;
 
-			if ( patternName ) {
+			if ( patternName && isSectionBlock( clientId ) ) {
 				const pattern = __experimentalGetParsedPattern( patternName );
 				const positionLabel = getPositionTypeLabel( attributes );
 				return {

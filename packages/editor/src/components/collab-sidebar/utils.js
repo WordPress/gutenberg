@@ -2,9 +2,10 @@
  * WordPress dependencies
  */
 import { _x } from '@wordpress/i18n';
+import { create, RichTextData } from '@wordpress/rich-text';
 
 /**
- * Sanitizes a note string by removing non-printable ASCII characters.
+ * Sanitizes a note string by trimming leading and trailing whitespace.
  *
  * @param {string} str - The note string to sanitize.
  * @return {string} - The sanitized note string.
@@ -34,8 +35,11 @@ const AVATAR_BORDER_COLORS = [
 /**
  * Gets the border color for an avatar based on the user ID.
  *
+ * Always returns a 6-digit `#RRGGBB` hex string; callers (e.g. the highlight
+ * styles) rely on this format to append alpha suffixes.
+ *
  * @param {number} userId - The user ID.
- * @return {string} - The border color.
+ * @return {string} - The border color as a `#RRGGBB` hex string.
  */
 export function getAvatarBorderColor( userId ) {
 	return AVATAR_BORDER_COLORS[ userId % AVATAR_BORDER_COLORS.length ];
@@ -127,6 +131,225 @@ export function addNoteIdToMetadata( metadata, noteId ) {
 	}
 	ids.add( id );
 	return { ...metadata, noteId: [ ...ids ] };
+}
+
+const NOTE_FORMAT_TYPE = 'core/note';
+
+/**
+ * Search a rich-text value for a `core/note` marker matching `noteId` and
+ * return its character range. Used to derive an inline note's anchor from
+ * the in-content marker (resilient to edits) rather than stale offset meta.
+ *
+ * @param {*}             value  Block attribute value (RichTextData, string, or other).
+ * @param {number|string} noteId Note id to search for.
+ * @return {?{start: number, end: number}} Range or null when no marker is found.
+ */
+export function findNoteRange( value, noteId ) {
+	if ( noteId === undefined || noteId === null ) {
+		return null;
+	}
+	let html = null;
+	if ( value instanceof RichTextData ) {
+		html = value.toHTMLString();
+	} else if ( typeof value === 'string' ) {
+		html = value;
+	}
+	if ( ! html || html.indexOf( 'wp-note' ) === -1 ) {
+		return null;
+	}
+	const target = String( noteId );
+	const record = create( { html } );
+	const formats = record.formats;
+	let start = -1;
+	for ( let i = 0; i < formats.length; i++ ) {
+		const stack = formats[ i ];
+		const hit = stack?.find(
+			( f ) =>
+				f.type === NOTE_FORMAT_TYPE &&
+				f.attributes &&
+				f.attributes[ 'data-id' ] === target
+		);
+		if ( hit ) {
+			if ( start === -1 ) {
+				start = i;
+			}
+		} else if ( start !== -1 ) {
+			return { start, end: i };
+		}
+	}
+	if ( start !== -1 ) {
+		return { start, end: formats.length };
+	}
+	return null;
+}
+
+/**
+ * Locate a note's in-content `core/note` marker across all of a block's
+ * attributes. The marker (carrying `data-id`) is the single source of truth for
+ * an inline note's anchor: a note is inline iff a marker with its id exists in
+ * the block, and the attribute that holds it is discovered here rather than
+ * stored separately. Returns the matching attribute key and the marker range.
+ *
+ * @param {?Object}       attributes Block attributes, or null/undefined when unloaded.
+ * @param {number|string} noteId     Note id to search for.
+ * @return {?{attributeKey: string, start: number, end: number}} Anchor or null when no marker is found.
+ */
+export function findNoteInBlock( attributes, noteId ) {
+	if ( ! attributes ) {
+		return null;
+	}
+	for ( const attributeKey of Object.keys( attributes ) ) {
+		const range = findNoteRange( attributes[ attributeKey ], noteId );
+		if ( range ) {
+			return { attributeKey, start: range.start, end: range.end };
+		}
+	}
+	return null;
+}
+
+// Sentinel that sorts a block-level (whole-block) note before any inline note
+// within the same block. Negative so any real character offset (>= 0) ranks
+// after it. Number.NEGATIVE_INFINITY would work too; -1 is enough and keeps
+// the diff arithmetic in safe integers.
+export const BLOCK_LEVEL_NOTE_START = -1;
+
+/**
+ * Resolve an inline note's character offset in its block so threads can be
+ * sorted by reading order. A note is inline iff an in-content `core/note`
+ * marker carries its id; block-level notes (no marker) sort first within their
+ * block via a sentinel.
+ *
+ * @param {Object}  thread     Materialized thread record (with `.id`).
+ * @param {?Object} attributes Block attributes for the thread's block.
+ * @return {number} Marker start offset, or `BLOCK_LEVEL_NOTE_START` when there is no inline anchor.
+ */
+export function getInlineMarkerStart( thread, attributes ) {
+	const found = findNoteInBlock( attributes, thread?.id );
+	return found ? found.start : BLOCK_LEVEL_NOTE_START;
+}
+
+/**
+ * Apply a `core/note` marker across `[start, end)` without removing notes
+ * already present in that range.
+ *
+ * Rich-text's `applyFormat` strips any existing format of the same type before
+ * applying, so two `core/note` markers can't coexist - a note drawn over an
+ * existing one would wipe it in the overlap. This keeps every overlapping note
+ * and orders the markers outermost-first by span, so a note fully contained in
+ * another nests inside it (`<mark><mark>…</mark></mark>`). Crossing (partial)
+ * overlaps can't nest in HTML and serialize as split runs, but each note keeps
+ * its full range. The returned record is not normalised; callers should
+ * round-trip it (e.g. through `RichTextData`) before storing.
+ *
+ * @param {Object} record A rich-text record (`{ text, formats, … }`).
+ * @param {Object} format The `core/note` format to add (`{ type, attributes }`).
+ * @param {number} start  Range start (inclusive).
+ * @param {number} end    Range end (exclusive).
+ * @return {Object} A new record with the note applied.
+ */
+export function applyNoteFormat( record, format, start, end ) {
+	const formats = record.formats.slice();
+	for ( let i = start; i < end; i++ ) {
+		const stack = formats[ i ] ? formats[ i ].slice() : [];
+		stack.push( format );
+		formats[ i ] = stack;
+	}
+
+	// Measure each note's full span so containment can order the markers.
+	const spans = new Map();
+	for ( let i = 0; i < formats.length; i++ ) {
+		const stack = formats[ i ];
+		if ( ! stack ) {
+			continue;
+		}
+		for ( const fmt of stack ) {
+			if ( fmt.type !== NOTE_FORMAT_TYPE ) {
+				continue;
+			}
+			const id = fmt.attributes?.[ 'data-id' ];
+			const span = spans.get( id );
+			if ( span ) {
+				span.end = i;
+			} else {
+				spans.set( id, { start: i, end: i } );
+			}
+		}
+	}
+	const sizeOf = ( id ) => {
+		const span = spans.get( id );
+		return span ? span.end - span.start : 0;
+	};
+
+	// Order markers outermost-first (widest span) so `toTree` nests them rather
+	// than splitting an outer note around an inner one. Notes sort ahead of
+	// other formats so a note wraps the formatted text it spans.
+	for ( let i = 0; i < formats.length; i++ ) {
+		const stack = formats[ i ];
+		if ( ! stack || stack.length < 2 ) {
+			continue;
+		}
+		const notes = stack.filter( ( fmt ) => fmt.type === NOTE_FORMAT_TYPE );
+		if ( notes.length === 0 ) {
+			continue;
+		}
+		if ( notes.length > 1 ) {
+			notes.sort(
+				( a, b ) =>
+					sizeOf( b.attributes?.[ 'data-id' ] ) -
+					sizeOf( a.attributes?.[ 'data-id' ] )
+			);
+		}
+		const others = stack.filter( ( fmt ) => fmt.type !== NOTE_FORMAT_TYPE );
+		formats[ i ] = [ ...notes, ...others ];
+	}
+
+	return { ...record, formats };
+}
+
+/**
+ * Remove a single note's `core/note` marker from a rich-text value, leaving any
+ * other notes nested or overlapping with it intact. Used when a note is deleted
+ * or resolved so its highlight does not linger in the content.
+ *
+ * Rich-text's `removeFormat` strips every `core/note` marker in a range, so it
+ * would wipe co-located notes; this filters by `data-id` to drop only the target
+ * marker.
+ *
+ * @param {*}             value  Block attribute value (RichTextData or other).
+ * @param {number|string} noteId Note id whose marker should be removed.
+ * @return {?RichTextData} A new value with the marker removed, or null when the
+ *                         attribute isn't rich text or carries no such marker.
+ */
+export function removeNoteFormat( value, noteId ) {
+	if ( ! ( value instanceof RichTextData ) ) {
+		return null;
+	}
+	const target = String( noteId );
+	const record = create( { html: value.toHTMLString() } );
+	let changed = false;
+	const formats = record.formats.map( ( stack ) => {
+		if ( ! stack ) {
+			return stack;
+		}
+		const filtered = stack.filter(
+			( format ) =>
+				! (
+					format.type === NOTE_FORMAT_TYPE &&
+					format.attributes?.[ 'data-id' ] === target
+				)
+		);
+		if ( filtered.length === stack.length ) {
+			return stack;
+		}
+		changed = true;
+		return filtered.length ? filtered : undefined;
+	} );
+	// Round-trip through HTML so the stored value matches a fresh reload.
+	return changed
+		? RichTextData.fromHTMLString(
+				new RichTextData( { ...record, formats } ).toHTMLString()
+		  )
+		: null;
 }
 
 /**

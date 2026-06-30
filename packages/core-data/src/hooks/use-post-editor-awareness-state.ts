@@ -171,8 +171,8 @@ export function useIsDisconnected(
 
 /**
  * Hook that subscribes to the CRDT state map and returns the most recent
- * save event (timestamp + client ID). The state map is updated by
- * `markEntityAsSaved` in `@wordpress/sync`
+ * user-facing post save event (timestamp + client ID). The state map is
+ * updated by `markEntityAsSaved` in `@wordpress/sync`.
  *
  * @param postId   The ID of the post.
  * @param postType The type of the post.

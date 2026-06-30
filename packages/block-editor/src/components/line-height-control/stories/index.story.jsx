@@ -22,7 +22,6 @@ const Template = ( props ) => {
 
 export const Default = Template.bind( {} );
 Default.args = {
-	__next40pxDefaultSize: true,
 	__unstableInputWidth: '100px',
 };
 

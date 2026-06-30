@@ -26,6 +26,7 @@ import {
 	unregisterBlockType,
 	setGroupingBlockName,
 } from '../registration';
+import { logged as warningLoggedSet } from '../../../../warning/src/utils';
 
 const noop = () => {};
 
@@ -45,6 +46,11 @@ describe( 'block factory', () => {
 	beforeAll( () => {
 		// Load blocks store.
 		require( '../../store' );
+	} );
+
+	beforeEach( () => {
+		// Reset warning logging so deduped warnings fire within each test.
+		warningLoggedSet.clear();
 	} );
 
 	afterEach( () => {
@@ -180,6 +186,28 @@ describe( 'block factory', () => {
 			} );
 
 			expect( block.attributes ).toEqual( {} );
+		} );
+
+		it( 'should attach innerContent for the Custom HTML block', () => {
+			registerBlockType( 'core/html', defaultBlockSettings );
+
+			const block = createBlock( 'core/html', {}, [], [ '<div></div>' ] );
+
+			expect( block.innerContent ).toEqual( [ '<div></div>' ] );
+		} );
+
+		it( 'should ignore innerContent and warn for other blocks', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+
+			const block = createBlock(
+				'core/test-block',
+				{},
+				[],
+				[ '<div></div>' ]
+			);
+
+			expect( block.innerContent ).toBeUndefined();
+			expect( console ).toHaveWarned();
 		} );
 	} );
 

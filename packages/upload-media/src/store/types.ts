@@ -32,6 +32,11 @@ export interface QueueItem {
 	// as the attachment's "original_image" after the converted JPEG is
 	// uploaded. Not set for non-HEIC items.
 	originalHeicFile?: File;
+	// Original animated GIF, kept separately so it can be transcoded to a
+	// video and sideloaded as a companion file of the GIF image attachment
+	// (recorded in attachment metadata as `animated_video`). Not set for
+	// non-animated-GIF items.
+	animatedGifFile?: File;
 	poster?: File;
 	attachment?: Partial< Attachment >;
 	status: ItemStatus;
@@ -44,6 +49,7 @@ export interface QueueItem {
 	operations?: Operation[];
 	error?: Error;
 	retryCount?: number;
+	nextRetryTimestamp?: number;
 	progress?: number;
 	batchId?: string;
 	sourceUrl?: string;
@@ -67,6 +73,7 @@ export enum Type {
 	Cancel = 'CANCEL_ITEM',
 	Remove = 'REMOVE_ITEM',
 	RetryItem = 'RETRY_ITEM',
+	ScheduleRetry = 'SCHEDULE_RETRY',
 	PauseItem = 'PAUSE_ITEM',
 	ResumeItem = 'RESUME_ITEM',
 	PauseQueue = 'PAUSE_QUEUE',
@@ -113,6 +120,15 @@ export type CancelAction = Action<
 	{ id: QueueItemId; error: Error }
 >;
 export type RetryItemAction = Action< Type.RetryItem, { id: QueueItemId } >;
+export type ScheduleRetryAction = Action<
+	Type.ScheduleRetry,
+	{
+		id: QueueItemId;
+		error: Error;
+		retryCount: number;
+		nextRetryTimestamp: number;
+	}
+>;
 export type PauseItemAction = Action< Type.PauseItem, { id: QueueItemId } >;
 export type ResumeItemAction = Action< Type.ResumeItem, { id: QueueItemId } >;
 export type PauseQueueAction = Action< Type.PauseQueue >;
@@ -210,6 +226,15 @@ export interface Settings {
 		id: number,
 		subSizes: SubSizeData[]
 	) => Promise< Partial< Attachment > | void >;
+	// Whether to convert animated GIFs to video (MP4/WebM) during upload.
+	// When enabled, animated GIFs are transcoded to video for smaller file sizes.
+	// Default is true.
+	gifConvert?: boolean;
+	// Output format for GIF-to-video conversion.
+	// Accepts 'video/mp4' or 'video/webm'. Default is 'video/mp4'.
+	videoOutputFormat?: 'video/mp4' | 'video/webm';
+	// Retry settings for automatic retry on failure.
+	retry?: RetrySettings;
 	// Function for deleting an attachment from the server. Used to clean up
 	// the parent attachment when client-side sub-size processing fails after
 	// the parent file has already been uploaded.
@@ -230,6 +255,11 @@ export interface Attachment {
 	featured_media?: number;
 	missing_image_sizes?: string[];
 	poster?: string;
+	meta?:
+		| []
+		| {
+				[ k: string ]: unknown;
+		  };
 	/**
 	 * EXIF orientation value from the original image.
 	 * Values 1-8 follow the EXIF specification.
@@ -261,6 +291,7 @@ export enum ItemStatus {
 	Queued = 'QUEUED',
 	Processing = 'PROCESSING',
 	Paused = 'PAUSED',
+	PendingRetry = 'PENDING_RETRY',
 	Uploaded = 'UPLOADED',
 	Error = 'ERROR',
 }
@@ -271,8 +302,11 @@ export enum OperationType {
 	ResizeCrop = 'RESIZE_CROP',
 	Rotate = 'ROTATE',
 	TranscodeImage = 'TRANSCODE_IMAGE',
+	TranscodeGif = 'TRANSCODE_GIF',
 	ThumbnailGeneration = 'THUMBNAIL_GENERATION',
 	Finalize = 'FINALIZE',
+	// UltraHDR operations
+	DetectUltraHdr = 'DETECT_ULTRAHDR',
 }
 
 /**
@@ -320,6 +354,10 @@ export interface OperationArgs {
 		/** Whether to use interlaced encoding. */
 		interlaced: boolean;
 	};
+	[ OperationType.TranscodeGif ]: {
+		/** Video output format: 'mp4' or 'webm'. */
+		outputFormat: 'mp4' | 'webm';
+	};
 }
 
 type OperationWithArgs< T extends keyof OperationArgs = keyof OperationArgs > =
@@ -343,3 +381,19 @@ export interface SideloadAdditionalData extends AdditionalData {
 }
 
 export type ImageFormat = 'jpeg' | 'webp' | 'avif' | 'png' | 'gif';
+
+/**
+ * Configuration for automatic retry behavior on upload failures.
+ */
+export interface RetrySettings {
+	/** Maximum number of retry attempts before giving up. */
+	maxRetryAttempts: number;
+	/** Initial delay in milliseconds before the first retry. */
+	initialRetryDelayMs: number;
+	/** Maximum delay in milliseconds (cap for exponential growth). */
+	maxRetryDelayMs: number;
+	/** Multiplier for exponential backoff (e.g., 2 means double each time). */
+	backoffMultiplier: number;
+	/** Jitter factor (0-1) to add randomness and prevent thundering herd. */
+	retryJitter: number;
+}

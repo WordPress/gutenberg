@@ -18,6 +18,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { getScrollContainer } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as interfaceStore } from '@wordpress/interface';
+import { RichTextData, create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -26,10 +27,15 @@ import { store as editorStore } from '../../store';
 import { FLOATING_NOTES_SIDEBAR } from './constants';
 import { unlock } from '../../lock-unlock';
 import { createBoardStore } from './board-store';
+import { NOTE_FORMAT_NAME } from './format';
 import {
+	applyNoteFormat,
 	calculateNotePositions,
+	findNoteInBlock,
+	getInlineMarkerStart,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
+	removeNoteFormat,
 	removeNoteIdFromMetadata,
 } from './utils';
 
@@ -110,16 +116,36 @@ export function useNoteThreads( postId ) {
 			return { notes: [], unresolvedNotes: [] };
 		}
 
-		// Single partition over notes-in-block-order. Each block can have
-		// multiple note IDs, so iterate the flattened list.
+		// Order within a block: block-level notes (no inline anchor) come
+		// first as the "overall comment", then inline notes ascending by
+		// marker start offset. Ties (rare; two markers at the same offset)
+		// fall back to creation order via thread id. Blocks themselves are
+		// already iterated in document order above.
 		const unresolved = [];
 		const resolved = [];
-		for ( const noteIds of Object.values( blocksWithNotes ) ) {
-			for ( const noteId of noteIds ) {
-				const thread = threadsById.get( noteId );
-				if ( ! thread ) {
-					continue;
-				}
+		for ( const [ clientId, noteIds ] of Object.entries(
+			blocksWithNotes
+		) ) {
+			const attributes = getBlockAttributes( clientId );
+			const orderedThreads = noteIds
+				.map( ( noteId ) => {
+					const thread = threadsById.get( noteId );
+					if ( ! thread ) {
+						return null;
+					}
+					return {
+						thread,
+						start: getInlineMarkerStart( thread, attributes ),
+					};
+				} )
+				.filter( Boolean )
+				.sort( ( a, b ) => {
+					if ( a.start !== b.start ) {
+						return a.start - b.start;
+					}
+					return a.thread.id - b.thread.id;
+				} );
+			for ( const { thread } of orderedThreads ) {
 				if ( thread.status === 'hold' ) {
 					unresolved.push( thread );
 				} else if ( thread.status === 'approved' ) {
@@ -145,12 +171,115 @@ export function useNoteThreads( postId ) {
 	};
 }
 
+/**
+ * Read an inline selection from block-editor selection state, returning
+ * normalized anchor data when a non-collapsed selection sits inside a single
+ * rich-text attribute. Returns null for block-level or collapsed selections.
+ *
+ * @param {Function} getSelectionStart Block-editor selector.
+ * @param {Function} getSelectionEnd   Block-editor selector.
+ * @return {?Object} { clientId, attributeKey, start, end } or null.
+ */
+function readInlineSelection( getSelectionStart, getSelectionEnd ) {
+	const start = getSelectionStart();
+	const end = getSelectionEnd();
+	if (
+		! start?.clientId ||
+		start.clientId !== end.clientId ||
+		! start.attributeKey ||
+		start.offset === undefined ||
+		end.offset === undefined ||
+		start.offset === end.offset
+	) {
+		return null;
+	}
+	// Normalize direction so callers don't have to think about reversed ranges.
+	const [ startOffset, endOffset ] =
+		start.offset < end.offset
+			? [ start.offset, end.offset ]
+			: [ end.offset, start.offset ];
+	return {
+		clientId: start.clientId,
+		attributeKey: start.attributeKey,
+		start: startOffset,
+		end: endOffset,
+	};
+}
+
+/**
+ * Wrap a rich-text range with a core/note marker. Returns a new
+ * RichTextData ready to write back into block attributes, or null when the
+ * incoming value isn't a rich-text instance (legacy/string attributes).
+ *
+ * @param {*}      value Existing block attribute value.
+ * @param {number} id    New note id to embed as `data-id`.
+ * @param {number} start Range start offset.
+ * @param {number} end   Range end offset.
+ * @return {?RichTextData} Wrapped value or null when the attribute isn't rich text.
+ */
+function wrapInlineNote( value, id, start, end ) {
+	if ( ! ( value instanceof RichTextData ) ) {
+		return null;
+	}
+	const record = applyNoteFormat(
+		create( { html: value.toHTMLString() } ),
+		{ type: NOTE_FORMAT_NAME, attributes: { 'data-id': String( id ) } },
+		start,
+		end
+	);
+	// Round-trip through HTML to normalise format references (applyNoteFormat
+	// leaves them un-normalised) so the stored value matches a fresh reload.
+	return RichTextData.fromHTMLString(
+		new RichTextData( record ).toHTMLString()
+	);
+}
+
+/**
+ * Strip a note's inline `core/note` marker from whichever block holds it, if
+ * any, so a deleted or resolved note's highlight does not linger in the content.
+ * No-op for block-level notes (those carry no marker). Used by the resolve path,
+ * which only knows the note id; the delete path strips the marker inline since
+ * it already has the block.
+ *
+ * @param {number}   noteId                      Note id whose marker to remove.
+ * @param {Function} getClientIdsWithDescendants Block-editor selector.
+ * @param {Function} getBlockAttributes          Block-editor selector.
+ * @param {Function} updateBlockAttributes       Block-editor action.
+ */
+function clearInlineNoteMarker(
+	noteId,
+	getClientIdsWithDescendants,
+	getBlockAttributes,
+	updateBlockAttributes
+) {
+	for ( const clientId of getClientIdsWithDescendants() ) {
+		const attributes = getBlockAttributes( clientId );
+		const found = findNoteInBlock( attributes, noteId );
+		if ( ! found ) {
+			continue;
+		}
+		const next = removeNoteFormat(
+			attributes[ found.attributeKey ],
+			noteId
+		);
+		if ( next ) {
+			updateBlockAttributes( clientId, { [ found.attributeKey ]: next } );
+		}
+		return;
+	}
+}
+
 export function useNoteActions() {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { getCurrentPostId } = useSelect( editorStore );
-	const { getBlockAttributes, getSelectedBlockClientId } =
-		useSelect( blockEditorStore );
+	const {
+		getBlockAttributes,
+		getClientIdsWithDescendants,
+		getSelectedBlockClientId,
+		getSelectionStart,
+		getSelectionEnd,
+	} = useSelect( blockEditorStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const onError = ( error ) => {
@@ -166,6 +295,14 @@ export function useNoteActions() {
 
 	const onCreate = async ( { content, parent } ) => {
 		try {
+			// Capture inline selection *before* the async save: focus may shift
+			// during the round-trip and the editor's stored selection can
+			// collapse if the user clicks elsewhere. The selection drives the
+			// in-content marker written below, which is the note's only anchor.
+			const inlineSelection = ! parent
+				? readInlineSelection( getSelectionStart, getSelectionEnd )
+				: null;
+
 			const savedRecord = await saveEntityRecord(
 				'root',
 				'comment',
@@ -185,18 +322,36 @@ export function useNoteActions() {
 			// a 2-element array and the later write wins, dropping the other
 			// id. Tracking issue: https://github.com/WordPress/gutenberg/issues/74751.
 			if ( ! parent && savedRecord?.id ) {
-				const clientId = getSelectedBlockClientId();
+				const clientId =
+					inlineSelection?.clientId || getSelectedBlockClientId();
 				if ( ! clientId ) {
 					return savedRecord;
 				}
-				const metadata = getBlockAttributes( clientId )?.metadata;
+				const attributes = getBlockAttributes( clientId );
+				const metadata = attributes?.metadata;
 				const updatedMetadata = addNoteIdToMetadata(
 					metadata,
 					savedRecord.id
 				);
-				updateBlockAttributes( clientId, {
+				const newAttributes = {
 					metadata: cleanEmptyObject( updatedMetadata ),
-				} );
+				};
+
+				// Inline path: also wrap the selected text with a core/note
+				// marker so the anchor survives later edits.
+				if ( inlineSelection ) {
+					const wrapped = wrapInlineNote(
+						attributes?.[ inlineSelection.attributeKey ],
+						savedRecord.id,
+						inlineSelection.start,
+						inlineSelection.end
+					);
+					if ( wrapped ) {
+						newAttributes[ inlineSelection.attributeKey ] = wrapped;
+					}
+				}
+
+				updateBlockAttributes( clientId, newAttributes );
 			}
 
 			createNotice(
@@ -253,6 +408,17 @@ export function useNoteActions() {
 				await saveEntityRecord( 'root', 'comment', newNoteData, {
 					throwOnError: true,
 				} );
+
+				// Resolving a note drops its inline highlight: strip the marker
+				// so the note falls back to a block-level note in the content.
+				if ( status === 'approved' ) {
+					clearInlineNoteMarker(
+						id,
+						getClientIdsWithDescendants,
+						getBlockAttributes,
+						updateBlockAttributes
+					);
+				}
 			} else {
 				const updateData = {
 					id,
@@ -291,14 +457,29 @@ export function useNoteActions() {
 				if ( ! clientId ) {
 					return;
 				}
-				const metadata = getBlockAttributes( clientId )?.metadata;
-				const updatedMetadata = removeNoteIdFromMetadata(
-					metadata,
-					note.id
-				);
-				updateBlockAttributes( clientId, {
-					metadata: cleanEmptyObject( updatedMetadata ),
-				} );
+				const attributes = getBlockAttributes( clientId );
+				const newAttributes = {
+					metadata: cleanEmptyObject(
+						removeNoteIdFromMetadata(
+							attributes?.metadata,
+							note.id
+						)
+					),
+				};
+				// Strip the inline marker too (if any) so the deleted note's
+				// highlight doesn't linger in the content. Folded into the same
+				// attribute update so it's a single undo step.
+				const found = findNoteInBlock( attributes, note.id );
+				if ( found ) {
+					const next = removeNoteFormat(
+						attributes[ found.attributeKey ],
+						note.id
+					);
+					if ( next ) {
+						newAttributes[ found.attributeKey ] = next;
+					}
+				}
+				updateBlockAttributes( clientId, newAttributes );
 			}
 
 			createNotice( 'snackbar', __( 'Note deleted.' ), {

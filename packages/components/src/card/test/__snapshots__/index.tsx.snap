@@ -26,7 +26,7 @@ Snapshot Diff:
   <div>
     <div
 -     class="components-card__body components-card-body css-1gg1viu-PolymorphicDiv-Body-borderRadius-medium e19lxcc00"
-+     class="components-card__body components-card-body css-p7byxx-PolymorphicDiv-Body-borderRadius-medium-shady e19lxcc00"
++     class="components-card__body components-card-body css-1jxruy0-PolymorphicDiv-Body-borderRadius-medium-shady e19lxcc00"
       data-wp-c16t="true"
       data-wp-component="CardBody"
     >
@@ -43,7 +43,7 @@ Snapshot Diff:
   <div>
     <div
 -     class="components-flex components-card__footer components-card-footer css-1s5uzde-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium e19lxcc00"
-+     class="components-flex components-card__footer components-card-footer css-12kx59h-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium-shady e19lxcc00"
++     class="components-flex components-card__footer components-card-footer css-1nz7z3h-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium-shady e19lxcc00"
       data-wp-c16t="true"
       data-wp-component="CardFooter"
     >
@@ -77,7 +77,7 @@ Snapshot Diff:
   <div>
     <div
 -     class="components-flex components-card__header components-card-header css-1hlwlpa-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium e19lxcc00"
-+     class="components-flex components-card__header components-card-header css-lljjlu-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium-shady e19lxcc00"
++     class="components-flex components-card__header components-card-header css-zom6gv-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium-shady e19lxcc00"
       data-wp-c16t="true"
       data-wp-component="CardHeader"
     >
@@ -118,16 +118,13 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-@@ -1,9 +1,8 @@
   Array [
     Object {
-      "background-color": "#fff",
 -     "border-radius": "calc(8px - 1px)",
       "box-shadow": "0 0 0 1px rgba(0, 0, 0, 0.1)",
-      "color": "#1e1e1e",
       "outline": "none",
-      "position": "relative",
     },
+  ]
 `;
 
 exports[`Card Card component should get the isBorderless and isSize props (passed from its context) overriddenwhen the same props is specified directly on the component 1`] = `
@@ -174,8 +171,8 @@ Snapshot Diff:
 @@ -1,30 +1,30 @@
   <div>
     <div
--     class="components-surface components-card css-y9at7f-PolymorphicDiv-Surface-getBorders-primary-Card-boxShadowless-rounded e19lxcc00"
-+     class="components-surface components-card css-1dj5kxo-PolymorphicDiv-Surface-getBorders-primary-Card-rounded e19lxcc00"
+-     class="style-surface components-surface components-card css-1hgll2p-PolymorphicDiv-Card-boxShadowless-rounded e19lxcc00"
++     class="style-surface components-surface components-card css-11ld97d-PolymorphicDiv-Card-rounded e19lxcc00"
       data-wp-c16t="true"
       data-wp-component="Card"
     >
@@ -210,9 +207,6 @@ Snapshot Diff:
 
 exports[`Card Card component should render correctly 1`] = `
 .emotion-0 {
-  background-color: #fff;
-  color: #1e1e1e;
-  position: relative;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
   outline: none;
   border-radius: calc(8px - 1px);
@@ -281,14 +275,12 @@ exports[`Card Card component should render correctly 1`] = `
 }
 
 .emotion-10 {
-  border: 0;
-  margin: 0;
-  border-bottom: 1px solid currentColor;
-  height: 0;
-  width: auto;
   box-sizing: border-box;
   display: block;
   width: 100%;
+}
+
+.emotion-11 {
   border-color: rgba(0, 0, 0, 0.1);
 }
 
@@ -382,7 +374,7 @@ exports[`Card Card component should render correctly 1`] = `
 
 <div>
   <div
-    class="components-surface components-card emotion-0 emotion-1"
+    class="style-surface components-surface components-card emotion-0 emotion-1"
     data-wp-c16t="true"
     data-wp-component="Card"
   >
@@ -412,7 +404,7 @@ exports[`Card Card component should render correctly 1`] = `
       </div>
       <hr
         aria-orientation="horizontal"
-        class="components-divider components-card__divider components-card-divider emotion-10 emotion-11"
+        class="style-divider components-divider emotion-10 emotion-11 components-card__divider components-card-divider"
         data-wp-c16t="true"
         data-wp-component="CardDivider"
         role="separator"
@@ -492,9 +484,6 @@ Compared values have no visual difference.
 
 exports[`Card Card component should warn when the isElevated prop is passed 1`] = `
 .emotion-0 {
-  background-color: #fff;
-  color: #1e1e1e;
-  position: relative;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
   outline: none;
   border-radius: calc(8px - 1px);
@@ -554,7 +543,7 @@ exports[`Card Card component should warn when the isElevated prop is passed 1`] 
 
 <div>
   <div
-    class="components-surface components-card emotion-0 emotion-1"
+    class="style-surface components-surface components-card emotion-0 emotion-1"
     data-wp-c16t="true"
     data-wp-component="Card"
   >

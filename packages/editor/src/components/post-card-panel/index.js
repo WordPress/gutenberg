@@ -168,7 +168,7 @@ export default function PostCardPanel( {
 					{ sprintf(
 						// translators: %s: Name of the plural post type e.g: "Posts".
 						__( 'Changes will be applied to all selected %s.' ),
-						labels?.name.toLowerCase()
+						labels?.name?.toLowerCase()
 					) }
 				</WCText>
 			) }

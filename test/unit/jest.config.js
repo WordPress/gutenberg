@@ -4,6 +4,15 @@
 const path = require( 'path' );
 const glob = require( 'glob' ).sync;
 
+/*
+ * Resolve the directory of `@wordpress/jest-preset-default` from this
+ * workspace's `node_modules`. Jest's `preset` option expects a directory
+ * containing a `jest-preset.js` or `jest-preset.json` file.
+ */
+const jestPresetDefaultDir = path.dirname(
+	require.resolve( '@wordpress/jest-preset-default/jest-preset.js' )
+);
+
 /**
  * Path to root project directory.
  */
@@ -31,13 +40,17 @@ module.exports = {
 		// The worker-code.ts file is auto-generated during full builds and is gitignored.
 		'@wordpress/vips/worker':
 			'<rootDir>/test/unit/config/vips-worker-code-stub.js',
+		// Mock @wordpress/video-conversion/worker before the general pattern so it doesn't try to load the real file.
+		// The worker-code.ts file is auto-generated during full builds and is gitignored.
+		'@wordpress/video-conversion/worker':
+			'<rootDir>/test/unit/config/video-conversion-worker-code-stub.js',
 		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })$` ]:
 			'packages/$1/src',
 		'@wordpress/theme/design-tokens.js':
 			'<rootDir>/packages/theme/src/prebuilt/js/design-tokens.mjs',
 		'.+\\.wasm$': '<rootDir>/test/unit/config/wasm-stub.js',
 	},
-	preset: '@wordpress/jest-preset-default',
+	preset: jestPresetDefaultDir,
 	setupFiles: [
 		'<rootDir>/test/unit/config/global-mocks.js',
 		'<rootDir>/test/unit/config/gutenberg-env.js',
@@ -49,6 +62,7 @@ module.exports = {
 	testEnvironmentOptions: {
 		url: 'http://localhost/',
 	},
+	testLocationInResults: true,
 	testPathIgnorePatterns: [
 		'/.git/',
 		'/node_modules/',
@@ -58,31 +72,38 @@ module.exports = {
 		'<rootDir>/.*/build-module/',
 		'<rootDir>/.*/build-types/',
 		'<rootDir>/.+.d.ts$',
-		'<rootDir>/.+.native.js$',
-		'/packages/react-native-*',
 	],
 	resolver: '<rootDir>/test/unit/scripts/resolver.js',
 	transform: {
 		'^.+\\.m?[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
 	},
 	transformIgnorePatterns: [
-		'/node_modules/(?!(docker-compose|yaml|preact|@preact|parsel-js|comctx|uuid)/)',
+		'/node_modules/(?!(docker-compose|yaml|preact|@preact|parsel-js|comctx|uuid|marked)/)',
 		'\\.pnp\\.[^\\/]+$',
 	],
 	snapshotSerializers: [
-		'@emotion/jest/serializer',
-		'snapshot-diff/serializer',
+		require.resolve( '@emotion/jest/serializer' ),
+		require.resolve( 'snapshot-diff/serializer' ),
 	],
 	snapshotFormat: {
 		escapeString: false,
 		printBasicPrototype: false,
 	},
 	watchPlugins: [
-		'jest-watch-typeahead/filename',
-		'jest-watch-typeahead/testname',
+		require.resolve( 'jest-watch-typeahead/filename' ),
+		require.resolve( 'jest-watch-typeahead/testname' ),
 	],
 	reporters: [
 		'default',
 		'<rootDir>packages/scripts/config/jest-github-actions-reporter/index.js',
-	],
+		process.env.CI
+			? [
+					'@flakiness/jest',
+					{
+						flakinessProject: 'WordPress/gutenberg',
+						duplicates: 'rename',
+					},
+			  ]
+			: undefined,
+	].filter( Boolean ),
 };

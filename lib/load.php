@@ -55,15 +55,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-block-editor-settings-controller.php';
 	}
 
-	// WordPress 6.9 compat.
-	require __DIR__ . '/compat/wordpress-6.9/class-gutenberg-rest-attachments-controller-6-9.php';
-	require __DIR__ . '/compat/wordpress-6.9/block-bindings.php';
-	require __DIR__ . '/compat/wordpress-6.9/post-data-block-bindings.php';
-	require __DIR__ . '/compat/wordpress-6.9/term-data-block-bindings.php';
-	require __DIR__ . '/compat/wordpress-6.9/rest-api.php';
-	require __DIR__ . '/compat/wordpress-6.9/block-comments.php';
-	require __DIR__ . '/compat/wordpress-6.9/class-gutenberg-rest-comment-controller-6-9.php';
-
 	// WordPress 7.0 compat.
 	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-autosaves-controller.php';
 	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-revisions-controller.php';
@@ -77,9 +68,14 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.0/global-styles.php';
 
 	// WordPress 7.1 compat.
+	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-attachments-controller-7-1.php';
+	require __DIR__ . '/compat/wordpress-7.1/view-config-api.php';
 	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-view-config-controller-7-1.php';
+	require __DIR__ . '/compat/wordpress-7.1/class-wp-icon-collections-registry.php';
 	require __DIR__ . '/compat/wordpress-7.1/rest-api.php';
 	require __DIR__ . '/compat/wordpress-7.1/collaboration.php';
+	require __DIR__ . '/compat/wordpress-7.1/block-bindings.php';
+	require __DIR__ . '/compat/wordpress-7.1/block-comments.php';
 
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
@@ -103,20 +99,14 @@ require_once __DIR__ . '/experimental/rest-api-overrides.php';
 // Gutenberg plugin compat.
 require __DIR__ . '/compat/plugin/edit-site-routes-backwards-compat.php';
 require __DIR__ . '/compat/plugin/fonts.php';
+require __DIR__ . '/compat/plugin/style-state-aliases.php';
 
-
-// WordPress 6.9 compat.
-require __DIR__ . '/compat/wordpress-6.9/customizer-preview-custom-css.php';
-require __DIR__ . '/compat/wordpress-6.9/command-palette.php';
-require __DIR__ . '/compat/wordpress-6.9/client-assets.php';
-require __DIR__ . '/compat/wordpress-6.9/preload.php';
 
 // WordPress 7.0 compat.
 require __DIR__ . '/compat/wordpress-7.0/preload.php';
 require __DIR__ . '/compat/wordpress-7.0/auto-register.php';
 require __DIR__ . '/compat/wordpress-7.0/blocks.php';
 require __DIR__ . '/compat/wordpress-7.0/kses.php';
-require __DIR__ . '/compat/wordpress-7.0/media.php';
 require __DIR__ . '/compat/wordpress-7.0/command-palette.php';
 require __DIR__ . '/compat/wordpress-7.0/meta-box-rtc-compat.php';
 require __DIR__ . '/compat/wordpress-7.0/script-modules.php';
@@ -129,10 +119,14 @@ if ( class_exists( '\WordPress\AiClient\AiClient' ) ) {
 }
 
 // WordPress 7.1 compat.
+require __DIR__ . '/compat/wordpress-7.1/kses.php';
+require __DIR__ . '/compat/wordpress-7.1/media.php';
+require __DIR__ . '/compat/wordpress-7.1/preload.php';
 require __DIR__ . '/compat/wordpress-7.1/classic-block.php';
+require __DIR__ . '/compat/wordpress-7.1/icons.php';
 
 // Experimental features.
-require __DIR__ . '/experimental/admin-bar-in-editor/load.php';
+require __DIR__ . '/experimental/omnibar/load.php';
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
@@ -224,8 +218,8 @@ require __DIR__ . '/overlay-patterns.php';
 
 // Guidelines (only load when experiment is enabled).
 if ( gutenberg_is_experiment_enabled( 'gutenberg-guidelines' ) ) {
-	require __DIR__ . '/experimental/guidelines/load.php';
-	require __DIR__ . '/experimental/guidelines/index.php';
+	require __DIR__ . '/experimental/knowledge/load.php';
+	require __DIR__ . '/experimental/knowledge/index.php';
 }
 
 // Content types (only load when experiment is enabled).

@@ -49,6 +49,7 @@ const normalizeParsedBlocks = ( blocks ) =>
 		isValid: block.isValid,
 		attributes: JSON.parse( JSON.stringify( block.attributes ) ),
 		innerBlocks: normalizeParsedBlocks( block.innerBlocks ),
+		...( block.innerContent ? { innerContent: block.innerContent } : {} ),
 	} ) );
 
 describe( 'full post content fixture', () => {

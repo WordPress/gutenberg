@@ -13,6 +13,60 @@
  */
 class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controller {
 	/**
+	 * Image size token for the source-format original preserved alongside a
+	 * client-generated derivative (e.g. the HEIC file kept next to its JPEG).
+	 *
+	 * Used both in the `/sideload` route schema and when dispatching the
+	 * sideloaded file to its metadata key, so the two never drift apart.
+	 *
+	 * @var string
+	 */
+	const IMAGE_SIZE_SOURCE_ORIGINAL = 'original-heic';
+
+	/**
+	 * Metadata key holding the basename of the source-format original.
+	 *
+	 * Deliberately specific so it never collides with the generic `original`
+	 * or `original_image` keys other flows write to.
+	 *
+	 * @var string
+	 */
+	const META_KEY_SOURCE_IMAGE = 'source_image';
+
+	/**
+	 * Image size token for the video transcoded from an animated GIF, sideloaded
+	 * as a companion of the GIF attachment.
+	 *
+	 * Paired with META_KEY_ANIMATED_VIDEO: used both in the `/sideload` route
+	 * and when writing the sideloaded file to its metadata key, so the
+	 * hyphenated size token and the underscored meta key never drift apart.
+	 *
+	 * @var string
+	 */
+	const IMAGE_SIZE_ANIMATED_VIDEO = 'animated-video';
+
+	/**
+	 * Image size token for the static first-frame poster of a converted GIF.
+	 *
+	 * @var string
+	 */
+	const IMAGE_SIZE_ANIMATED_VIDEO_POSTER = 'animated-video-poster';
+
+	/**
+	 * Metadata key holding the basename of the converted animated-GIF video.
+	 *
+	 * @var string
+	 */
+	const META_KEY_ANIMATED_VIDEO = 'animated_video';
+
+	/**
+	 * Metadata key holding the basename of the converted GIF's poster image.
+	 *
+	 * @var string
+	 */
+	const META_KEY_ANIMATED_VIDEO_POSTER = 'animated_video_poster';
+
+	/**
 	 * Registers the routes for attachments.
 	 *
 	 * @see register_rest_route()
@@ -50,7 +104,9 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 							'validate_callback' => static function ( $value, $request, $param ) {
 								$valid_sizes   = array_keys( wp_get_registered_image_subsizes() );
 								$valid_sizes[] = 'original';
-								$valid_sizes[] = 'original-heic';
+								$valid_sizes[] = self::IMAGE_SIZE_SOURCE_ORIGINAL;
+								$valid_sizes[] = self::IMAGE_SIZE_ANIMATED_VIDEO;
+								$valid_sizes[] = self::IMAGE_SIZE_ANIMATED_VIDEO_POSTER;
 								$valid_sizes[] = 'scaled';
 								$valid_sizes[] = 'full';
 
@@ -484,13 +540,24 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 			if ( 'original' === $image_size ) {
 				$metadata['original_image'] = $sub_size['file'];
-			} elseif ( 'original-heic' === $image_size ) {
-				// HEIC companion original: stored under its own meta key so
-				// the scaled-sideload flow (which writes 'original_image')
-				// cannot clobber it. 'original_image' keeps pointing at the
+			} elseif ( self::IMAGE_SIZE_SOURCE_ORIGINAL === $image_size ) {
+				// Source-format original: stored under its own meta key so the
+				// scaled-sideload flow (which writes 'original_image') cannot
+				// clobber it. 'original_image' keeps pointing at the
 				// web-viewable JPEG derivative. Cleanup on attachment delete
 				// is handled by a delete_attachment hook that reads this key.
-				$metadata['original'] = $sub_size['file'];
+				$metadata[ self::META_KEY_SOURCE_IMAGE ] = $sub_size['file'];
+			} elseif ( self::IMAGE_SIZE_ANIMATED_VIDEO === $image_size ) {
+				// Converted video companion of an animated GIF. Stored
+				// under its own key; the GIF stays the attachment. The
+				// editor reads this key to switch the block to a video;
+				// companion cleanup lives in lib/media/animated-gif-to-video.php.
+				$metadata[ self::META_KEY_ANIMATED_VIDEO ] = $sub_size['file'];
+			} elseif ( self::IMAGE_SIZE_ANIMATED_VIDEO_POSTER === $image_size ) {
+				// Static first-frame poster for the converted video. Used as
+				// the video block's poster and deleted alongside the video.
+				// See lib/media/animated-gif-to-video.php.
+				$metadata[ self::META_KEY_ANIMATED_VIDEO_POSTER ] = $sub_size['file'];
 			} elseif ( 'scaled' === $image_size ) {
 				if ( ! empty( $sub_size['original_image'] ) ) {
 					$metadata['original_image'] = $sub_size['original_image'];
@@ -611,6 +678,13 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 * @return true|WP_Error True if valid, WP_Error if invalid.
 	 */
 	private function validate_image_dimensions( int $width, int $height, $image_size, int $attachment_id ) {
+		// 'animated-video' companion file: video, not an image. Skip *all*
+		// dimension checks (the caller passes (0, 0) for this case so the
+		// positive-dimension assertion below would otherwise fire).
+		if ( self::IMAGE_SIZE_ANIMATED_VIDEO === $image_size ) {
+			return true;
+		}
+
 		// Dimensions must be positive for all sizes.
 		if ( $width <= 0 || $height <= 0 ) {
 			return new WP_Error(
@@ -632,8 +706,15 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			return true;
 		}
 
-		// 'original-heic' companion file: no dimension constraint.
-		if ( 'original-heic' === $image_size ) {
+		// Source-format original companion file: no dimension constraint.
+		if ( self::IMAGE_SIZE_SOURCE_ORIGINAL === $image_size ) {
+			return true;
+		}
+
+		// 'animated-video-poster' companion: a static poster image for the
+		// converted video. It is a real image (so it has positive dimensions)
+		// but is not a registered sub-size, so it has no dimension constraint.
+		if ( self::IMAGE_SIZE_ANIMATED_VIDEO_POSTER === $image_size ) {
 			return true;
 		}
 
@@ -809,7 +890,12 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		// (corrupted/unsupported files) and for populating the sub-size payload
 		// below. Scalar 'original' is a byte-only passthrough and does not need
 		// dimensions, but reading them here is harmless.
-		$size = wp_getimagesize( $path );
+		//
+		// 'animated-video' companions are video files (MP4/WebM); the image
+		// helpers can't read their dimensions and would falsely report the
+		// upload as "corrupted or unsupported". Skip the read for this case;
+		// validate_image_dimensions() also short-circuits it below.
+		$size = self::IMAGE_SIZE_ANIMATED_VIDEO === $image_size ? array( 0, 0 ) : wp_getimagesize( $path );
 
 		if ( ! $size ) {
 			// Could not determine dimensions (corrupted file, unsupported format).
@@ -833,7 +919,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		// `image_size` may be a single string or an array of names that share the
 		// same dimensions and therefore reuse a single sideloaded file. Arrays
 		// only carry regular sub-sizes; the special keys below ('original',
-		// 'scaled', 'original-heic') are always scalar strings.
+		// 'scaled', and the source-format original) are always scalar strings.
 		$sub_size_data = array(
 			'image_size' => $image_size,
 		);
@@ -846,11 +932,23 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			$sub_size_data['filesize']  = wp_filesize( $path );
 		} elseif ( 'original' === $image_size ) {
 			$sub_size_data['file'] = wp_basename( $path );
-		} elseif ( 'original-heic' === $image_size ) {
-			// HEIC companion original. finalize_item() writes the filename to
-			// $metadata['original'] (separate from 'original_image', which the
-			// scaled-sideload flow owns). Cleanup on attachment delete is
-			// handled by a delete_attachment hook that reads this key.
+		} elseif ( self::IMAGE_SIZE_SOURCE_ORIGINAL === $image_size ) {
+			// Source-format original. finalize_item() writes the filename to
+			// $metadata[ self::META_KEY_SOURCE_IMAGE ] (separate from
+			// 'original_image', which the scaled-sideload flow owns). Cleanup on
+			// attachment delete is handled by a delete_attachment hook that reads
+			// this key.
+			$sub_size_data['file'] = wp_basename( $path );
+		} elseif ( self::IMAGE_SIZE_ANIMATED_VIDEO === $image_size ) {
+			// Converted animated-GIF video companion. finalize_item()
+			// writes the filename to $metadata['animated_video']; the editor
+			// reads it to switch the block to a video, and a delete_attachment
+			// hook removes it. See lib/media/animated-gif-to-video.php.
+			$sub_size_data['file'] = wp_basename( $path );
+		} elseif ( self::IMAGE_SIZE_ANIMATED_VIDEO_POSTER === $image_size ) {
+			// Static poster for the converted video. finalize_item() writes
+			// the filename to $metadata['animated_video_poster']; used as the
+			// video block's poster and deleted with the video.
 			$sub_size_data['file'] = wp_basename( $path );
 		} elseif ( 'scaled' === $image_size ) {
 			// Record the current attached file as the original.

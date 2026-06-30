@@ -378,4 +378,78 @@ describe( 'Autocomplete', () => {
 			expect( screen.queryByRole( 'tooltip' ) ).not.toBeInTheDocument();
 		} );
 	} );
+
+	describe( 'grouped items', () => {
+		const GROUPED_ITEMS = [
+			{
+				label: 'Group 1',
+				items: [
+					{ id: '1', value: 'Item 1' },
+					{ id: '2', value: 'Item 2' },
+				],
+			},
+			{
+				label: 'Group 2',
+				items: [ { id: '3', value: 'Item 3' } ],
+			},
+		];
+
+		it( 'forwards refs', async () => {
+			const user = userEvent.setup();
+			const groupRef = createRef< HTMLDivElement >();
+			const groupLabelRef = createRef< HTMLDivElement >();
+
+			render(
+				<Autocomplete.Root items={ GROUPED_ITEMS }>
+					<Autocomplete.Input placeholder="Search" />
+					<Autocomplete.Popup>
+						<Autocomplete.List>
+							<Autocomplete.ListBody>
+								<Autocomplete.Collection>
+									{ ( group ) => (
+										<Autocomplete.Group
+											key={ group.label }
+											ref={
+												group.label === 'Group 1'
+													? groupRef
+													: undefined
+											}
+											items={ group.items }
+										>
+											<Autocomplete.GroupLabel
+												ref={
+													group.label === 'Group 1'
+														? groupLabelRef
+														: undefined
+												}
+											>
+												{ group.label }
+											</Autocomplete.GroupLabel>
+											<Autocomplete.Collection>
+												{ ( item ) => (
+													<Autocomplete.Item
+														key={ item.id }
+														value={ item }
+													>
+														{ item.value }
+													</Autocomplete.Item>
+												) }
+											</Autocomplete.Collection>
+										</Autocomplete.Group>
+									) }
+								</Autocomplete.Collection>
+							</Autocomplete.ListBody>
+						</Autocomplete.List>
+					</Autocomplete.Popup>
+				</Autocomplete.Root>
+			);
+
+			await user.type( screen.getByRole( 'combobox' ), 'Item' );
+
+			await waitFor( () => {
+				expect( groupRef.current ).toBeInstanceOf( HTMLDivElement );
+			} );
+			expect( groupLabelRef.current ).toBeInstanceOf( HTMLDivElement );
+		} );
+	} );
 } );

@@ -180,6 +180,9 @@ export async function buildWorkers(
 						`${ workerOutputName }.mjs`
 					),
 					bundle: true,
+					// Emit UTF-8 so binary-encoded inlined WASM stays compact
+					// (ASCII output would escape high bytes as \uXXXX).
+					charset: 'utf8',
 					format: 'esm',
 					platform: 'browser',
 					target,
@@ -216,6 +219,9 @@ export async function buildWorkers(
 					entryPoints: [ workerEntryPoint ],
 					outfile: path.join( buildDir, `${ workerOutputName }.cjs` ),
 					bundle: true,
+					// Emit UTF-8 so binary-encoded inlined WASM stays compact
+					// (ASCII output would escape high bytes as \uXXXX).
+					charset: 'utf8',
 					format: 'cjs',
 					platform: 'node',
 					target,
@@ -322,6 +328,9 @@ export const workerCode = ${ JSON.stringify( workerContent ) };
 				outbase: srcDir,
 				outExtension: { '.js': '.mjs' },
 				bundle: true,
+				// Emit UTF-8 so binary-encoded inlined WASM stays compact
+				// (ASCII output would escape high bytes as \uXXXX).
+				charset: 'utf8',
 				platform: 'neutral',
 				format: 'esm',
 				sourcemap: true,
@@ -342,6 +351,9 @@ export const workerCode = ${ JSON.stringify( workerContent ) };
 				outbase: srcDir,
 				outExtension: { '.js': '.cjs' },
 				bundle: true,
+				// Emit UTF-8 so binary-encoded inlined WASM stays compact
+				// (ASCII output would escape high bytes as \uXXXX).
+				charset: 'utf8',
 				platform: 'node',
 				format: 'cjs',
 				sourcemap: true,
