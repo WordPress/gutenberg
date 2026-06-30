@@ -10,7 +10,7 @@ import { store as blocksStore } from '@wordpress/blocks';
  */
 import { store as blockEditorStore } from '../../store';
 import { globalStylesDataKey } from '../../store/private-keys';
-import { buildInheritedValueWithSourcesMemoized } from './build-inherited-value';
+import { buildInheritedValue } from './build-inherited-value';
 import { getVariationNameFromClass } from '../../hooks/block-style-variation';
 
 /**
@@ -120,7 +120,7 @@ export function useInheritedValue( { element = null } = {} ) {
 		if ( ! ctx || ! ctx.blockName ) {
 			return { value: {}, sources: {} };
 		}
-		return buildInheritedValueWithSourcesMemoized( {
+		return buildInheritedValue( {
 			blockName: ctx.blockName,
 			element,
 			ownVariation: ctx.ownVariation,
@@ -143,7 +143,7 @@ export function useInheritedStyleValue( {
 		if ( ! blockName ) {
 			return { value: {}, sources: {} };
 		}
-		return buildInheritedValueWithSourcesMemoized( {
+		return buildInheritedValue( {
 			blockName,
 			element,
 			ownVariation,

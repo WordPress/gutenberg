@@ -71,7 +71,7 @@ function getTranslatedBreadcrumb( source, blockStyles ) {
  * @param {Array}   blockStyles Registered styles for the block type.
  * @return {string|undefined} Tooltip text, or undefined when no source exists.
  */
-export function getInheritanceTooltipText( source, blockStyles ) {
+function getInheritanceTooltipText( source, blockStyles ) {
 	const breadcrumb = source?.breadcrumb;
 	if ( ! Array.isArray( breadcrumb ) || breadcrumb.length === 0 ) {
 		return undefined;
