@@ -135,8 +135,8 @@ export const TextOnlyBadges: Story = {
 	render: () => (
 		<>
 			<Badge intent="stable">Active</Badge>
-			<Badge intent="none">Inactive</Badge>
-			<Badge intent="draft">Draft</Badge>
+			<Badge intent="medium">Review needed</Badge>
+			<Badge intent="high">Payment declined</Badge>
 		</>
 	),
 };
@@ -151,7 +151,7 @@ export const WithAdjacentContentIcon: Story = {
 			</Stack>
 			<Stack direction="row" gap="sm" align="center">
 				<Icon icon={ plugins } size={ 24 } />
-				<Text variant="body-md">Akismet</Text>
+				<Text variant="body-md">My Plugin</Text>
 				<Badge intent="stable">Active</Badge>
 			</Stack>
 		</Stack>
