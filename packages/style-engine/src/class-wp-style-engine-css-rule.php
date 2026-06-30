@@ -77,7 +77,7 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rule' ) ) {
 		public function add_declarations( $declarations ) {
 			$is_declarations_object = ! is_array( $declarations );
 			$declarations_array     = $is_declarations_object ? $declarations->get_declarations() : $declarations;
-			$important_declarations = $is_declarations_object ? $declarations->get_important_declarations() : array();
+			$declaration_options    = $is_declarations_object ? $declarations->get_declaration_options() : array();
 
 			if ( null === $this->declarations ) {
 				if ( $is_declarations_object ) {
@@ -91,9 +91,7 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rule' ) ) {
 				$this->declarations->add_declaration(
 					$property,
 					$value,
-					array(
-						'important' => ! empty( $important_declarations[ $property ] ),
-					)
+					$declaration_options[ $property ] ?? array()
 				);
 			}
 

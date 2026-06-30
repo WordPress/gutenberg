@@ -23,11 +23,11 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 		protected $declarations = array();
 
 		/**
-		 * CSS properties whose declarations should be output with !important.
+		 * CSS declaration options keyed by property name.
 		 *
 		 * @var array
 		 */
-		protected $important_declarations = array();
+		protected $declaration_options = array();
 
 		/**
 		 * Constructor for this object.
@@ -78,12 +78,14 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 				)
 			);
 
+			$options = array_filter( $options );
+
 			// Adds the declaration property/value pair.
 			$this->declarations[ $property ] = $value;
-			if ( ! empty( $options['important'] ) ) {
-				$this->important_declarations[ $property ] = true;
+			if ( $options ) {
+				$this->declaration_options[ $property ] = $options;
 			} else {
-				unset( $this->important_declarations[ $property ] );
+				unset( $this->declaration_options[ $property ] );
 			}
 
 			return $this;
@@ -98,7 +100,7 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 		 */
 		public function remove_declaration( $property ) {
 			unset( $this->declarations[ $property ] );
-			unset( $this->important_declarations[ $property ] );
+			unset( $this->declaration_options[ $property ] );
 			return $this;
 		}
 
@@ -140,12 +142,12 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 		}
 
 		/**
-		 * Gets the important declarations array.
+		 * Gets declaration options keyed by property name.
 		 *
 		 * @return array
 		 */
-		public function get_important_declarations() {
-			return $this->important_declarations;
+		public function get_declaration_options() {
+			return $this->declaration_options;
 		}
 
 		/**
@@ -205,9 +207,7 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 					$property,
 					$value,
 					$spacer,
-					array(
-						'important' => ! empty( $this->important_declarations[ $property ] ),
-					)
+					$this->declaration_options[ $property ] ?? array()
 				);
 				if ( $filtered_declaration ) {
 					$declarations_output .= "{$indent}{$filtered_declaration};$suffix";
