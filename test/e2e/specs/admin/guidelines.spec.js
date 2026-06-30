@@ -52,10 +52,10 @@ async function waitForGuidelinesApp( page ) {
 		page
 			.locator( '#guidelines-wp-admin-app' )
 			.getByRole( 'heading', { name: 'Guidelines', level: 1 } )
-	).toBeVisible( { timeout: 30_000 } );
+	).toBeVisible( { timeout: 10_000 } );
 
 	await expect( getSectionCard( page, 'Copy' ) ).toBeVisible( {
-		timeout: 30_000,
+		timeout: 10_000,
 	} );
 }
 
