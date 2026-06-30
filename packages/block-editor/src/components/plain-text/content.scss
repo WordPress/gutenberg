@@ -1,11 +1,27 @@
-.block-editor-plain-text {
+.block-library-html__edit .block-editor-plain-text.components-base-control {
+	padding: 0 !important;
+}
+
+.block-editor-plain-text textarea {
 	box-shadow: none;
 	font-family: inherit;
 	font-size: inherit;
 	color: inherit;
 	line-height: inherit;
 	border: none;
-	padding: 0;
+	padding: 12px;
 	margin: 0;
 	width: 100%;
+	max-height: 248px; // 250, minus the top and bottom border (1px each)
+	/* stylelint-disable-next-line property-no-unknown -- TODO: Update stylelint to support a fresh list of https://github.com/known-css/known-css-properties */
+	field-sizing: content;
+
+	&:focus {
+		border-color: var(--wp-admin-theme-color);
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+		// Elevate the z-index on focus so the focus style is uncropped.
+		position: relative;
+	}
+
 }

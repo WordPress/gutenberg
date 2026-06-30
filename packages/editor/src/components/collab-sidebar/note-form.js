@@ -1,15 +1,11 @@
 /**
- * External dependencies
- */
-import TextareaAutosize from 'react-autosize-textarea';
-
-/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
 import {
 	__experimentalTruncate as Truncate,
 	Button,
+	TextareaControl,
 } from '@wordpress/components';
 import { Stack, VisuallyHidden } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
@@ -47,20 +43,17 @@ export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 			<VisuallyHidden render={ <label htmlFor={ inputId } /> }>
 				{ labels?.input ?? __( 'Note' ) }
 			</VisuallyHidden>
-			<TextareaAutosize
+			<TextareaControl
 				id={ inputId }
 				value={ inputComment ?? '' }
-				onChange={ ( comment ) =>
-					setInputComment( comment.target.value )
-				}
+				onChange={ setInputComment }
 				rows={ 1 }
-				maxRows={ 20 }
 				onKeyDown={ ( event ) => {
 					if (
 						isKeyboardEvent.primary( event, 'Enter' ) &&
 						! isDisabled
 					) {
-						event.target.parentNode.requestSubmit();
+						event.target.form?.requestSubmit();
 					}
 
 					if ( event.key === 'Escape' ) {
