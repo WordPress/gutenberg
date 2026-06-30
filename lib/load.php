@@ -75,6 +75,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.1/rest-api.php';
 	require __DIR__ . '/compat/wordpress-7.1/collaboration.php';
 	require __DIR__ . '/compat/wordpress-7.1/block-bindings.php';
+	require __DIR__ . '/compat/wordpress-7.1/block-comments.php';
 
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
