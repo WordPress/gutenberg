@@ -507,9 +507,19 @@ export const inspector = () => <div>Inspector</div>;
 export const canvas = () => <div>Custom Canvas</div>;
 ```
 
-The canvas is a full-screen area typically used for editor previews. You can provide a custom canvas component that will be conditionally rendered based on the `canvas()` function's return value in `route.tsx`.
+The canvas is a full-screen area typically used for editor previews. To use a custom canvas, export it from `canvas.tsx` and return `null` from `route.canvas()`.
 
-**route.tsx** - Lifecycle hooks (optional):
+### Lifecycle hooks (`route.tsx`)
+
+Export a `route` object with optional hooks. Each hook receives `{ params, search }` — path parameters and query string values from the URL.
+
+- **`beforeLoad`** — Runs before navigation completes. Use for auth checks, validation, or redirects. Throw `redirect()` or `notFound()` from `@wordpress/route` to abort navigation.
+- **`loader`** — Runs while the route is loading. Use to preload data (for example, `resolveSelect` from `@wordpress/data`) so `stage` components can read from the store without a loading state. May return an object whose properties are merged into the route's loader data. For data that must be available before the SPA loads, use [`rest_preload_api_request()`](https://developer.wordpress.org/reference/functions/rest_preload_api_request/) in your page's PHP render callback instead.
+- **`canvas`** — Runs in parallel with `loader`. Controls which canvas is rendered depending on return values:
+    - `CanvasData` (`{ postType, postId, isPreview?, editLink? }`) → default WordPress editor canvas
+    - `null` → custom `canvas.tsx` component (if provided)
+    - `undefined` or omitted → no canvas
+
 ```tsx
 export const route = {
 	beforeLoad: ({ params, search }) => {
@@ -521,9 +531,10 @@ export const route = {
 	canvas: ({ params, search }) => {
 		// Return CanvasData to use default canvas (editor)
 		return {
-			postType: 'post',
-			postId: '123',
-			isPreview: true
+			postType: params.type,
+			postId: params.id,
+			isPreview: true,
+			editLink: `/types/${ params.type }/edit/${ params.id }`,
 		};
 
 		// Return null to use custom canvas.tsx component
@@ -534,11 +545,6 @@ export const route = {
 	}
 };
 ```
-
-The `canvas()` function controls which canvas is rendered:
-- Returns `CanvasData` object (`{ postType, postId, isPreview? }`) → Renders the default WordPress editor canvas
-- Returns `null` → Renders the custom canvas component from `canvas.tsx` (if provided)
-- Returns `undefined` or is omitted → No canvas is rendered
 
 ### Routes build output
 
