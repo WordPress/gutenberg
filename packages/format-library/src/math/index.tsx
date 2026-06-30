@@ -13,37 +13,14 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { math as icon } from '@wordpress/icons';
-import type { RichTextValue } from '@wordpress/rich-text';
 import { unlock } from '../lock-unlock';
+import type { InlineUIProps, EditMathProps } from '../types';
 
 const { ValidatedInputControl } = unlock( componentsPrivateApis );
 
 const name = 'core/math';
 const title = __( 'Math' );
 
-interface InlineUIProps {
-	value: RichTextValue;
-	onChange: ( value: RichTextValue ) => void;
-	activeAttributes: Record< string, string > | null;
-	contentRef: React.RefObject< HTMLElement >;
-	latexToMathML: (
-		latex: string,
-		options?: { displayMode?: boolean }
-	) => string;
-}
-
-interface EditProps {
-	isObjectActive: boolean;
-	activeObjectAttributes: Record< string, string > | null;
-	value: RichTextValue;
-	onChange: ( value: RichTextValue ) => void;
-	onFocus: () => void;
-	contentRef: React.RefObject< HTMLElement >;
-	latexToMathML: (
-		latex: string,
-		options?: { displayMode?: boolean }
-	) => string;
-}
 const RichTextToolbarButtonUnsafe =
 	RichTextToolbarButton as React.ComponentType< any >;
 
@@ -61,7 +38,6 @@ function InlineUI( {
 	const formRef = useRef();
 
 	const popoverAnchor = useAnchor( {
-		// eslint-disable-next-line react-hooks/refs
 		editableContentElement: contentRef.current as HTMLElement | null,
 		settings: math,
 	} );
@@ -132,15 +108,6 @@ function InlineUI( {
 	);
 }
 
-interface EditProps {
-	value: RichTextValue;
-	onChange: ( value: RichTextValue ) => void;
-	onFocus: () => void;
-	isObjectActive: boolean;
-	activeObjectAttributes: Record< string, string > | null;
-	contentRef: React.RefObject< HTMLElement >;
-}
-
 function Edit( {
 	value,
 	onChange,
@@ -148,7 +115,7 @@ function Edit( {
 	isObjectActive,
 	activeObjectAttributes,
 	contentRef,
-}: EditProps ) {
+}: EditMathProps ) {
 	const [ latexToMathML, setLatexToMathML ] =
 		useState<
 			( latex: string, options?: { displayMode?: boolean } ) => string

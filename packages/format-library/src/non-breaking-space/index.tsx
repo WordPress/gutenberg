@@ -1,15 +1,14 @@
 import { __ } from '@wordpress/i18n';
-import type { RichTextValue } from '@wordpress/rich-text';
 import { insert } from '@wordpress/rich-text';
 import { RichTextShortcut } from '@wordpress/block-editor';
 
+/**
+ * Internal dependencies
+ */
+import type { NonBreakingSpaceEditProps } from '../types';
+
 const name = 'core/non-breaking-space';
 const title = __( 'Non breaking space' );
-
-export interface NonBreakingSpaceEditProps {
-	value: RichTextValue;
-	onChange: ( value: RichTextValue ) => void;
-}
 
 export const nonBreakingSpace = {
 	name,

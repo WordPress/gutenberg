@@ -8,7 +8,7 @@ export type RichTextFormat = {
 	type:
 		| 'core/bold'
 		| 'core/italic'
-		| 'core/link '
+		| 'core/link'
 		| 'core/strikethrough'
 		| 'core/image'
 		| string;

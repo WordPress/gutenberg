@@ -13,6 +13,10 @@ import {
 import type { RichTextValue, RichTextFormat } from '@wordpress/rich-text';
 
 /**
+ * Internal dependencies
+ */
+import type { LinkFormat, LinkFormatOptions } from '../types';
+/**
  * Check for issues with the provided href.
  *
  * @param href The href.
@@ -75,41 +79,6 @@ export function isValidHref( href: string ): boolean {
 	return true;
 }
 
-/**
- * Generates the format object that will be applied to the link text.
- *
- * @param {Object}  options
- * @param {string}  options.url              The href of the link.
- * @param {string}  options.type             The type of the link.
- * @param {string}  options.id               The ID of the link.
- * @param {boolean} options.opensInNewWindow Whether this link will open in a new window.
- * @param {boolean} options.nofollow         Whether this link is marked as no follow relationship.
- * @param {string}  options.cssClasses       The CSS classes to apply to the link.
- * @return {Object} The final format object.
- */
-
-interface LinkFormatOptions {
-	url: string;
-	type?: string;
-	id?: string;
-	opensInNewWindow?: boolean;
-	nofollow?: boolean;
-	cssClasses?: string;
-}
-
-interface LinkFormatAttributes {
-	url: string;
-	type?: string;
-	id?: string;
-	target?: string;
-	rel?: string;
-	class?: string;
-}
-
-interface LinkFormat {
-	type: 'core/link';
-	attributes: LinkFormatAttributes;
-}
 export function createLinkFormat( {
 	url,
 	type,

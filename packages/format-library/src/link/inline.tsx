@@ -24,6 +24,7 @@ import type { RichTextValue } from '@wordpress/rich-text';
 import { createLinkFormat, isValidHref, getFormatBoundary } from './utils';
 import { link as settings } from './index';
 import CSSClassesSettingComponent from './css-classes-setting';
+import type { InlineLinkUIProps, LinkValue, LinkFormat } from '../types';
 
 const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,
@@ -48,34 +49,6 @@ const LINK_SETTINGS = [
 	},
 ];
 
-interface LinkValue {
-	url?: string;
-	type?: string;
-	id?: string | number;
-	opensInNewTab?: boolean;
-	nofollow?: boolean;
-	title?: string;
-	cssClasses?: string;
-}
-
-interface InlineLinkUIProps {
-	isActive: boolean;
-	activeAttributes: {
-		url: string;
-		type?: string;
-		id?: string;
-		target?: string;
-		rel?: string;
-
-		class?: string;
-	};
-	value: RichTextValue;
-	onChange: ( newValue: RichTextValue ) => void;
-	onFocusOutside: () => void;
-	stopAddingLink: () => void;
-	contentRef: React.RefObject< HTMLElement >;
-	focusOnMount?: 'firstElement' | 'container' | false;
-}
 function InlineLinkUI( {
 	isActive,
 	activeAttributes,
@@ -169,7 +142,7 @@ function InlineLinkUI( {
 
 			newValue = applyFormat(
 				inserted,
-				linkFormat as any,
+				linkFormat as LinkFormat,
 				value.start,
 				value.start + newText.length
 			);

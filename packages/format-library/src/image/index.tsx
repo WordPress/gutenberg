@@ -8,7 +8,6 @@ import { inlineImage } from '@wordpress/icons';
 import { Link, Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
-import type { RichTextValue } from '@wordpress/rich-text';
 import { insertObject, useAnchor } from '@wordpress/rich-text';
 import {
 	MediaUpload,
@@ -21,20 +20,6 @@ const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const name = 'core/image';
 const title = __( 'Inline image' );
 
-export interface EditProps {
-	value: RichTextValue;
-	onChange: ( value: RichTextValue ) => void;
-	onFocus?: () => void;
-	isObjectActive?: boolean;
-	activeObjectAttributes: {
-		style?: string;
-		alt?: string | undefined;
-		className?: string;
-		url?: string;
-	} | null;
-	contentRef: React.RefObject< HTMLElement >;
-}
-
 const RichTextToolbarButtonUnsafe =
 	RichTextToolbarButton as React.ComponentType< any >;
 
@@ -45,7 +30,7 @@ const RichTextToolbarButtonUnsafe =
  * @return {number|undefined} The extracted image ID or undefined if not found.
  */
 function getCurrentImageId(
-	activeObjectAttributes: EditProps[ 'activeObjectAttributes' ]
+	activeObjectAttributes: EditImageProps[ 'activeObjectAttributes' ]
 ) {
 	if ( ! activeObjectAttributes?.className ) {
 		return undefined;
@@ -78,7 +63,7 @@ function InlineUI( {
 	onChange,
 	activeObjectAttributes,
 	contentRef,
-}: EditProps ) {
+}: EditImageProps ) {
 	const style = activeObjectAttributes?.style;
 	const alt = activeObjectAttributes?.alt;
 
@@ -181,7 +166,7 @@ function Edit( {
 	isObjectActive,
 	activeObjectAttributes,
 	contentRef,
-}: EditProps ) {
+}: EditImageProps ) {
 	return (
 		<MediaUploadCheck>
 			<MediaUpload
