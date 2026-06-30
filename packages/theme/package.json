@@ -24,22 +24,7 @@
 	},
 	"files": [
 		"build-module",
-		"build-types/index.d.ts",
-		"build-types/index.d.ts.map",
-		"build-types/prebuilt/js/design-tokens.d.mts",
-		"build-types/prebuilt/js/design-tokens.d.mts.map",
-		"build-types/prebuilt/ts/token-types.d.ts",
-		"build-types/prebuilt/ts/token-types.d.ts.map",
-		"build-types/stylelint-plugins/no-setting-wpds-custom-properties.d.mts",
-		"build-types/stylelint-plugins/no-setting-wpds-custom-properties.d.mts.map",
-		"build-types/stylelint-plugins/no-token-fallback-values.d.mts",
-		"build-types/stylelint-plugins/no-token-fallback-values.d.mts.map",
-		"build-types/stylelint-plugins/no-unknown-ds-tokens.d.mts",
-		"build-types/stylelint-plugins/no-unknown-ds-tokens.d.mts.map",
-		"build-types/theme-provider.d.ts",
-		"build-types/theme-provider.d.ts.map",
-		"build-types/types.d.ts",
-		"build-types/types.d.ts.map",
+		"build-package-types/**",
 		"src/*-plugins/**",
 		"src/prebuilt/css",
 		"src/prebuilt/js/*.mjs",
@@ -54,7 +39,7 @@
 	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
-			"types": "./build-types/index.d.ts",
+			"types": "./build-package-types/package-types.d.ts",
 			"default": "./build-module/index.mjs"
 		},
 		"./design-tokens.css": "./src/prebuilt/css/design-tokens.css",
@@ -62,7 +47,7 @@
 			"sass": "./utils.scss"
 		},
 		"./design-tokens.js": {
-			"types": "./build-types/prebuilt/js/design-tokens.d.mts",
+			"types": "./build-package-types/prebuilt/js/design-tokens.d.mts",
 			"default": "./src/prebuilt/js/design-tokens.mjs"
 		},
 		"./postcss-plugins/postcss-ds-token-fallbacks": {
@@ -78,21 +63,21 @@
 			"default": "./src/vite-plugins/vite-ds-token-fallbacks.mjs"
 		},
 		"./stylelint-plugins/no-unknown-ds-tokens": {
-			"types": "./build-types/stylelint-plugins/no-unknown-ds-tokens.d.mts",
+			"types": "./build-package-types/stylelint-plugins/no-unknown-ds-tokens.d.mts",
 			"default": "./src/stylelint-plugins/no-unknown-ds-tokens.mjs"
 		},
 		"./stylelint-plugins/no-setting-wpds-custom-properties": {
-			"types": "./build-types/stylelint-plugins/no-setting-wpds-custom-properties.d.mts",
+			"types": "./build-package-types/stylelint-plugins/no-setting-wpds-custom-properties.d.mts",
 			"default": "./src/stylelint-plugins/no-setting-wpds-custom-properties.mjs"
 		},
 		"./stylelint-plugins/no-token-fallback-values": {
-			"types": "./build-types/stylelint-plugins/no-token-fallback-values.d.mts",
+			"types": "./build-package-types/stylelint-plugins/no-token-fallback-values.d.mts",
 			"default": "./src/stylelint-plugins/no-token-fallback-values.mjs"
 		},
 		"./package.json": "./package.json"
 	},
 	"wpScript": true,
-	"types": "build-types",
+	"types": "build-package-types/package-types.d.ts",
 	"sideEffects": [
 		"src/prebuilt/css/design-tokens.css"
 	],
@@ -152,10 +137,13 @@
 		"access": "public"
 	},
 	"scripts": {
+		"build:package-types": "rimraf build-package-types tsconfig.package-types.tsbuildinfo && tsgo --build tsconfig.package-types.json",
 		"build:default-ramps": "node --import=esbuild-esm-loader/register bin/generate-default-ramps/index.ts",
 		"build:tokens": "node --import=esbuild-esm-loader/register bin/generate-primitive-tokens/index.ts && node --import=esbuild-esm-loader/register bin/build-design-tokens/index.ts",
 		"build": "npm run build:tokens && npm run build:default-ramps",
 		"postbuild": "prettier --write tokens/color.json tokens/modes src/prebuilt src/color-ramps/lib/default-ramps.ts docs ../base-styles/internal/_wpds-token-fallbacks.scss",
-		"validate:package-contents": "node ../../tools/validation/validate-package-contents.mjs . --attw-profile node16 --attw-exclude-entrypoint ./design-tokens.css --attw-exclude-entrypoint ./utils --attw-ignore-rule false-cjs --attw-ignore-rule false-esm --attw-ignore-rule cjs-resolves-to-esm"
+		"prevalidate:package-contents": "npm run build:package-types && npm run validate:package-types",
+		"validate:package-types": "node bin/validate-package-types/index.mjs",
+		"validate:package-contents": "node ../../tools/validation/validate-package-contents.mjs . --attw-profile node16 --attw-exclude-entrypoint ./design-tokens.css --attw-exclude-entrypoint ./utils"
 	}
 }
