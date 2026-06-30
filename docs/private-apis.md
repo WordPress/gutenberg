@@ -31,30 +31,27 @@ When a bundled package currently uses `unlock( privateApis )` against an externa
 
 #### 1. Add a runtime fallback for supporting multiple WordPress versions
 
-Bundled packages must work on WordPress versions that only expose the API privately. Resolve it at runtime instead of picking one approach at build time:
+Bundled packages must work on WordPress versions that only expose the API privately. Resolve it at runtime instead of picking one approach at build time. Use a namespace import so a missing export does not break the module at load time:
 
-```js
-import {
-	ThemeProvider as PublicThemeProvider,
-	privateApis as themePrivateApis,
-} from '@wordpress/theme';
+```ts
+import * as theme from '@wordpress/theme';
 import { unlock } from '../lock-unlock';
 
 function getThemeProvider() {
-	if ( PublicThemeProvider ) {
-		return PublicThemeProvider;
+	if ( theme.ThemeProvider ) {
+		return theme.ThemeProvider;
 	}
 
-	try {
-		return unlock( themePrivateApis ).ThemeProvider;
-	} catch {
+	if ( ! theme.privateApis ) {
 		throw new Error(
 			'ThemeProvider is not available. Update WordPress or the Gutenberg plugin.'
 		);
 	}
+
+	return unlock( theme.privateApis ).ThemeProvider;
 }
 
-const ThemeProvider = getThemeProvider();
+export const ThemeProvider = getThemeProvider();
 ```
 
 Use this pattern to help consumers support both a WordPress release that only has the private export and a newer release with the public export.
