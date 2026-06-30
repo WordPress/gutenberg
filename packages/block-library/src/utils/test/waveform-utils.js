@@ -280,6 +280,14 @@ describe( 'Waveform utilities', () => {
 				audio,
 				container,
 				options: {},
+				getSeekDuration: jest.fn( () => audio.duration ),
+				getSeekCurrentTime: jest.fn( () => audio.currentTime ),
+				updateSeekAccessibility: jest.fn( () => {
+					seekControl.setAttribute(
+						'aria-valuetext',
+						`${ audio.currentTime } of ${ audio.duration }`
+					);
+				} ),
 				applySeekLabel: jest.fn( ( label ) => {
 					seekControl.setAttribute( 'aria-label', label );
 				} ),
@@ -363,9 +371,28 @@ describe( 'Waveform utilities', () => {
 			);
 		} );
 
-		it( 'restores the original time update handler on cleanup', () => {
+		it( 'keeps localized value text after the library refreshes seek accessibility', () => {
+			const { audio, container, instance, seekControl } =
+				createSeekControlFixture( { duration: 180, currentTime: 45 } );
+
+			setupSeekControlLocalization( container, instance, {
+				valueText: '%1$s sur %2$s',
+			} );
+			audio.currentTime = 90;
+			instance.options.onTimeUpdate( 90, 180, instance );
+			instance.updateSeekAccessibility();
+
+			expect( seekControl ).toHaveAttribute(
+				'aria-valuetext',
+				'1:30 sur 3:00'
+			);
+		} );
+
+		it( 'restores the original handlers on cleanup', () => {
 			const { container, instance } = createSeekControlFixture();
 			const originalOnTimeUpdate = jest.fn();
+			const originalUpdateSeekAccessibility =
+				instance.updateSeekAccessibility;
 			instance.options.onTimeUpdate = originalOnTimeUpdate;
 
 			const cleanup = setupSeekControlLocalization( container, instance );
@@ -373,9 +400,15 @@ describe( 'Waveform utilities', () => {
 			expect( instance.options.onTimeUpdate ).not.toBe(
 				originalOnTimeUpdate
 			);
+			expect( instance.updateSeekAccessibility ).not.toBe(
+				originalUpdateSeekAccessibility
+			);
 			cleanup();
 			expect( instance.options.onTimeUpdate ).toBe(
 				originalOnTimeUpdate
+			);
+			expect( instance.updateSeekAccessibility ).toBe(
+				originalUpdateSeekAccessibility
 			);
 		} );
 

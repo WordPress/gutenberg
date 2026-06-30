@@ -284,9 +284,15 @@ export function setupSeekControlLocalization(
 	}
 
 	const updateSeekValueText = ( currentTimeOverride, durationOverride ) => {
-		const duration = getFiniteTime( durationOverride ?? audio?.duration );
+		const duration = getFiniteTime(
+			durationOverride ?? instance.getSeekDuration?.() ?? audio?.duration
+		);
 		const currentTime = Math.min(
-			getFiniteTime( currentTimeOverride ?? audio?.currentTime ),
+			getFiniteTime(
+				currentTimeOverride ??
+					instance.getSeekCurrentTime?.() ??
+					audio?.currentTime
+			),
 			duration
 		);
 		seekControl.setAttribute(
@@ -301,6 +307,25 @@ export function setupSeekControlLocalization(
 
 	updateSeekControlLabel( instance, label );
 	updateSeekValueText();
+
+	const originalUpdateSeekAccessibility = instance.updateSeekAccessibility;
+	const updateSeekAccessibility =
+		typeof originalUpdateSeekAccessibility === 'function'
+			? function ( ...args ) {
+					const result = originalUpdateSeekAccessibility.apply(
+						this,
+						args
+					);
+					updateSeekValueText();
+					return result;
+			  }
+			: undefined;
+
+	// The library refreshes `aria-valuetext` after `onTimeUpdate`.
+	// Apply Gutenberg's localized value after that default refresh.
+	if ( updateSeekAccessibility ) {
+		instance.updateSeekAccessibility = updateSeekAccessibility;
+	}
 
 	const originalOnTimeUpdate = instance.options.onTimeUpdate;
 	const onTimeUpdate = ( currentTime, duration, player ) => {
@@ -322,6 +347,12 @@ export function setupSeekControlLocalization(
 		container.removeEventListener( 'waveformplayer:ended', onEnded );
 		if ( instance.options.onTimeUpdate === onTimeUpdate ) {
 			instance.options.onTimeUpdate = originalOnTimeUpdate;
+		}
+		if (
+			updateSeekAccessibility &&
+			instance.updateSeekAccessibility === updateSeekAccessibility
+		) {
+			instance.updateSeekAccessibility = originalUpdateSeekAccessibility;
 		}
 	};
 }
