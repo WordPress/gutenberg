@@ -24,27 +24,28 @@ import InserterNoResults from '../no-results';
 
 const INITIAL_MEDIA_ITEMS_PER_PAGE = 10;
 
+// The attach flow is image-only, so the picker is constrained to images.
+const ATTACH_ALLOWED_TYPES = [ 'image' ];
+
 /**
  * Opens the Media Library to attach images to the current post. Only rendered
- * for media categories that expose an `attach` capability (i.e. the
- * "Attachments" source); other sources render the panel exactly as before.
+ * for media categories that expose an `attach` capability (i.e. the "Attached
+ * images" source); other sources render the panel exactly as before.
  *
  * The picker opens fresh each time with no pre-selected value, so it is purely
  * additive: selecting images attaches them, and it does not imply that
  * deselecting would detach. Detaching is a separate, explicit per-item action.
  *
  * @param {Object}   props
- * @param {string}   props.mediaType The category's media type, used to constrain the picker.
- * @param {Function} props.onSelect  Called with the selected media items.
+ * @param {Function} props.onSelect Called with the selected media items.
  */
-function AttachImagesButton( { mediaType, onSelect } ) {
-	const allowedTypes = useMemo( () => [ mediaType ], [ mediaType ] );
+function AttachImagesButton( { onSelect } ) {
 	return (
 		<MediaUploadCheck>
 			<MediaUpload
 				multiple="add"
 				onSelect={ onSelect }
-				allowedTypes={ allowedTypes }
+				allowedTypes={ ATTACH_ALLOWED_TYPES }
 				title={ __( 'Attach images' ) }
 				render={ ( { open } ) => (
 					<Button
@@ -226,10 +227,7 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 			{ category.attach && (
 				// Pinned to the bottom of the panel as a fixed footer so it lines
 				// up with the "Open Media Library" button in the adjacent column.
-				<AttachImagesButton
-					mediaType={ category.mediaType }
-					onSelect={ handleAttach }
-				/>
+				<AttachImagesButton onSelect={ handleAttach } />
 			) }
 			{ mediaPendingDetach && (
 				// A plain `Modal` (not `ConfirmDialog`) so we can pass
