@@ -90,9 +90,11 @@ describe( 'getInserterMediaCategories', () => {
 			'Post'
 		);
 		const attachedCount = await attachedImagesCategory.attach( [
-			{ id: 10 },
-			{ id: 11 },
-			{ id: 10 },
+			{ id: 10, type: 'image' },
+			{ id: 11, type: 'image' },
+			{ id: 10, type: 'image' },
+			// Non-image (e.g. a PDF uploaded via the picker) is skipped.
+			{ id: 12, type: 'application' },
 			{},
 		] );
 		await attachedImagesCategory.detach( { id: 11 } );
@@ -124,6 +126,12 @@ describe( 'getInserterMediaCategories', () => {
 				post: 0,
 			},
 			{ throwOnError: true }
+		);
+		expect( saveEntityRecord ).not.toHaveBeenCalledWith(
+			'postType',
+			'attachment',
+			expect.objectContaining( { id: 12 } ),
+			expect.anything()
 		);
 		expect( saveEntityRecord ).toHaveBeenCalledTimes( 3 );
 	} );

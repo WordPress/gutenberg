@@ -81,7 +81,7 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 		query,
 		refreshKey
 	);
-	const { createErrorNotice, createSuccessNotice } =
+	const { createErrorNotice, createSuccessNotice, createWarningNotice } =
 		useDispatch( noticesStore );
 	// Dim (rather than blank) the populated grid while a refetch is in flight,
 	// but only once it has run long enough to be worth signalling — quick
@@ -99,33 +99,42 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 		async ( selectedMedia ) => {
 			try {
 				const attachedCount = await category.attach( selectedMedia );
-				refresh();
 
-				if ( attachedCount ) {
-					createSuccessNotice(
-						category.postTypeLabel
-							? sprintf(
-									/* translators: %1$d: Number of images attached. %2$s: Name of the post type e.g: "Page". */
-									_n(
-										'%1$d image attached to %2$s.',
-										'%1$d images attached to %2$s.',
-										attachedCount
-									),
-									attachedCount,
-									category.postTypeLabel
-							  )
-							: sprintf(
-									/* translators: %d: Number of images attached to the post. */
-									_n(
-										'%d image attached to post.',
-										'%d images attached to post.',
-										attachedCount
-									),
-									attachedCount
-							  ),
-						{ type: 'snackbar', id: 'inserter-notice' }
-					);
+				if ( ! attachedCount ) {
+					// This source only attaches images (the picker's "Upload
+					// files" tab otherwise accepts any file type), so a selection
+					// with no images attaches nothing.
+					createWarningNotice( __( 'No images were attached.' ), {
+						type: 'snackbar',
+						id: 'inserter-notice',
+					} );
+					return;
 				}
+
+				refresh();
+				createSuccessNotice(
+					category.postTypeLabel
+						? sprintf(
+								/* translators: %1$d: Number of images attached. %2$s: Name of the post type e.g: "Page". */
+								_n(
+									'%1$d image attached to %2$s.',
+									'%1$d images attached to %2$s.',
+									attachedCount
+								),
+								attachedCount,
+								category.postTypeLabel
+						  )
+						: sprintf(
+								/* translators: %d: Number of images attached to the post. */
+								_n(
+									'%d image attached to post.',
+									'%d images attached to post.',
+									attachedCount
+								),
+								attachedCount
+						  ),
+					{ type: 'snackbar', id: 'inserter-notice' }
+				);
 			} catch {
 				createErrorNotice( __( 'Could not attach images.' ), {
 					type: 'snackbar',
@@ -133,7 +142,13 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 				} );
 			}
 		},
-		[ category, refresh, createErrorNotice, createSuccessNotice ]
+		[
+			category,
+			refresh,
+			createErrorNotice,
+			createSuccessNotice,
+			createWarningNotice,
+		]
 	);
 
 	const handleDetach = useCallback(

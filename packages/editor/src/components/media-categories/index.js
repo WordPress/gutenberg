@@ -172,9 +172,14 @@ const saveAttachmentParent = ( attachmentId, postId ) =>
 		{ throwOnError: true }
 	);
 
-const getAttachmentIds = ( mediaItems ) => [
+// The picker's "Upload files" tab accepts any file type, so the selection can
+// include non-images. Gate to images only: a non-image would be reparented to
+// the post but never appear in the image-filtered grid, and would wrongly count
+// toward the "images attached" notice.
+const getImageAttachmentIds = ( mediaItems ) => [
 	...new Set(
 		( Array.isArray( mediaItems ) ? mediaItems : [ mediaItems ] )
+			.filter( ( mediaItem ) => mediaItem?.type === 'image' )
 			.map( ( mediaItem ) => mediaItem?.id )
 			.filter( Boolean )
 	),
@@ -230,7 +235,7 @@ const getAttachedImagesCategory = ( postId, typeLabel ) => ( {
 		return coreMediaFetch( getAttachedImagesQuery( postId, query ) );
 	},
 	async attach( mediaItems ) {
-		const attachmentIds = getAttachmentIds( mediaItems );
+		const attachmentIds = getImageAttachmentIds( mediaItems );
 
 		await Promise.all(
 			attachmentIds.map( ( attachmentId ) =>
