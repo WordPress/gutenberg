@@ -23,7 +23,7 @@ for ( const f of files ) {
 		if ( ! ajv.validate( schema, meta ) ) {
 			failed++;
 		}
-	} catch ( e ) {
+	} catch {
 		failed++;
 	}
 }
