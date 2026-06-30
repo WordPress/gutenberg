@@ -2,6 +2,7 @@ import { __ } from '@wordpress/i18n';
 import { toggleFormat } from '@wordpress/rich-text';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { subscript as subscriptIcon } from '@wordpress/icons';
+import type { SubscriptEditProps } from '../types';
 
 const name = 'core/subscript';
 const title = __( 'Subscript' );
@@ -9,12 +10,6 @@ const title = __( 'Subscript' );
 const RichTextToolbarButtonUnsafe =
 	RichTextToolbarButton as React.ComponentType< any >;
 
-export interface SubscriptEditProps {
-	isActive: boolean;
-	value: any;
-	onChange: ( value: any ) => void;
-	onFocus: () => void;
-}
 export const subscript = {
 	name,
 	title,

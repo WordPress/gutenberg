@@ -10,10 +10,6 @@ import { Stack } from '@wordpress/ui';
 import { useState } from '@wordpress/element';
 import { applyFormat, removeFormat, useAnchor } from '@wordpress/rich-text';
 import { language as languageIcon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import type { LanguageEditProps, InlineLanguageUIProps } from '../types';
 
 const RichTextToolbarButtonUnsafe =

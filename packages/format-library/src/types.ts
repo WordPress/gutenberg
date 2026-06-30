@@ -2,19 +2,16 @@
  * WordPress dependencies
  */
 import type { RichTextValue } from '@wordpress/rich-text';
-export interface BoldEditProps {
-	isActive: boolean;
-	value: RichTextValue;
-	onChange: ( value: RichTextValue ) => void;
-	onFocus: () => void;
-	isVisible?: boolean;
-}
-export interface CodeEditProps {
+
+interface BaseFormatEditProps {
 	isActive: boolean;
 	value: RichTextValue;
 	onChange: ( value: RichTextValue ) => void;
 	onFocus: () => void;
 }
+
+export type BoldEditProps = BaseFormatEditProps & { isVisible?: boolean };
+
 export interface LanguageEditProps {
 	isActive: boolean;
 	value: RichTextValue;
@@ -28,3 +25,11 @@ export interface InlineLanguageUIProps {
 	onChange: ( value: RichTextValue ) => void;
 	onClose: () => void;
 }
+
+export type {
+	BaseFormatEditProps as CodeEditProps,
+	BaseFormatEditProps as StrikethroughEditProps,
+	BaseFormatEditProps as SubscriptEditProps,
+	BaseFormatEditProps as SuperscriptEditProps,
+	BaseFormatEditProps as UnknownEditProps,
+};

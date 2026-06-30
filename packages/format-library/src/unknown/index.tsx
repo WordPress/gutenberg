@@ -7,13 +7,6 @@ import type { RichTextValue } from '@wordpress/rich-text';
 const name = 'core/unknown';
 const title = __( 'Clear Unknown Formatting' );
 
-export interface UnknownEditProps {
-	isActive: boolean;
-	value: RichTextValue;
-	onChange: ( value: RichTextValue ) => void;
-	onFocus: () => void;
-}
-
 const RichTextToolbarButtonUnsafe =
 	RichTextToolbarButton as React.ComponentType< any >;
 

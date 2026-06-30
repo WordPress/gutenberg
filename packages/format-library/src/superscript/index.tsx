@@ -2,17 +2,11 @@ import { __ } from '@wordpress/i18n';
 import { toggleFormat } from '@wordpress/rich-text';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { superscript as superscriptIcon } from '@wordpress/icons';
-import type { RichTextValue } from '@wordpress/rich-text';
+import type { SuperscriptEditProps } from '../types';
 
 const name = 'core/superscript';
 const title = __( 'Superscript' );
 
-export interface SuperscriptEditProps {
-	isActive: boolean;
-	value: RichTextValue;
-	onChange: ( value: any ) => void;
-	onFocus: () => void;
-}
 const RichTextToolbarButtonUnsafe =
 	RichTextToolbarButton as React.ComponentType< any >;
 

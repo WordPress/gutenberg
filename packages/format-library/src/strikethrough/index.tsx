@@ -1,18 +1,11 @@
 import { __ } from '@wordpress/i18n';
-import type { RichTextValue } from '@wordpress/rich-text';
 import { toggleFormat } from '@wordpress/rich-text';
 import {
 	RichTextToolbarButton,
 	RichTextShortcut,
 } from '@wordpress/block-editor';
 import { formatStrikethrough } from '@wordpress/icons';
-
-export interface StrikethroughEditProps {
-	value: RichTextValue;
-	onChange: ( value: RichTextValue ) => void;
-	isActive: boolean;
-	onFocus: () => void;
-}
+import type { StrikethroughEditProps } from '../types';
 
 const name = 'core/strikethrough';
 const title = __( 'Strikethrough' );
