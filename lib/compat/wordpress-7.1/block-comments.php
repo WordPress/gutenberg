@@ -191,11 +191,19 @@ add_action( 'comments_clauses', 'gutenberg_exclude_block_comments_from_admin_7_1
  */
 function gutenberg_filter_comment_count_query_exclude_block_comments_7_1( $query ) {
 	if ( str_starts_with( $query, 'SELECT comment_post_ID, COUNT(comment_ID) as num_comments FROM' ) && str_contains( $query, 'comment_approved' ) ) {
-		if ( ! str_contains( $query, "comment_type != 'note'" ) ) {
-			$type_clauses = array();
-			foreach ( gutenberg_get_internal_comment_types() as $internal_type ) {
-				$type_clauses[] = "comment_type != '" . esc_sql( $internal_type ) . "'";
+		// Add an exclusion clause for each internal type not already present.
+		// Core (and older versions of this filter) may have already injected
+		// the note-only exclusion, so expanding per type - rather than bailing
+		// when any exclusion exists - ensures reactions are excluded too and
+		// keeps the filter idempotent if it runs more than once.
+		$type_clauses = array();
+		foreach ( gutenberg_get_internal_comment_types() as $internal_type ) {
+			$clause = "comment_type != '" . esc_sql( $internal_type ) . "'";
+			if ( ! str_contains( $query, $clause ) ) {
+				$type_clauses[] = $clause;
 			}
+		}
+		if ( ! empty( $type_clauses ) ) {
 			$query = str_replace( 'comment_approved', implode( ' AND ', $type_clauses ) . ' AND comment_approved', $query );
 		}
 	}
