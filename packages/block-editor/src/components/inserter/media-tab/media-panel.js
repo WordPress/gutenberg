@@ -102,15 +102,26 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 
 				if ( attachedCount ) {
 					createSuccessNotice(
-						sprintf(
-							/* translators: %d: Number of images attached to the post. */
-							_n(
-								'%d image attached to post.',
-								'%d images attached to post.',
-								attachedCount
-							),
-							attachedCount
-						),
+						category.postTypeLabel
+							? sprintf(
+									/* translators: %1$d: Number of images attached. %2$s: Name of the post type e.g: "Page". */
+									_n(
+										'%1$d image attached to %2$s.',
+										'%1$d images attached to %2$s.',
+										attachedCount
+									),
+									attachedCount,
+									category.postTypeLabel
+							  )
+							: sprintf(
+									/* translators: %d: Number of images attached to the post. */
+									_n(
+										'%d image attached to post.',
+										'%d images attached to post.',
+										attachedCount
+									),
+									attachedCount
+							  ),
 						{ type: 'snackbar', id: 'inserter-notice' }
 					);
 				}
@@ -129,10 +140,16 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 			try {
 				await category.detach( media );
 				refresh();
-				createSuccessNotice( __( 'Image detached from post.' ), {
-					type: 'snackbar',
-					id: 'inserter-notice',
-				} );
+				createSuccessNotice(
+					category.postTypeLabel
+						? sprintf(
+								/* translators: %s: Name of the post type e.g: "Page". */
+								__( 'Image detached from %s.' ),
+								category.postTypeLabel
+						  )
+						: __( 'Image detached from post.' ),
+					{ type: 'snackbar', id: 'inserter-notice' }
+				);
 			} catch {
 				createErrorNotice( __( 'Could not detach image.' ), {
 					type: 'snackbar',
@@ -221,9 +238,17 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 					overlayClassName={ `${ baseCssClass }-detach-modal` }
 				>
 					<p>
-						{ __(
-							'Detach this image from the current post? The image will remain in the Media Library.'
-						) }
+						{ category.postTypeLabel
+							? sprintf(
+									/* translators: %s: Name of the post type e.g: "Page". */
+									__(
+										'Detach this image from the current %s? The image will remain in the Media Library.'
+									),
+									category.postTypeLabel
+							  )
+							: __(
+									'Detach this image from the current post? The image will remain in the Media Library.'
+							  ) }
 					</p>
 					<div className={ `${ baseCssClass }-detach-actions` }>
 						<Button

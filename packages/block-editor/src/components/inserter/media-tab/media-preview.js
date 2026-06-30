@@ -76,7 +76,13 @@ function MediaPreviewOptions( { category, media, onDetach } ) {
 							onClick={ () => onDetach( media ) }
 							icon={ linkOff }
 						>
-							{ __( 'Detach from post' ) }
+							{ category.postTypeLabel
+								? sprintf(
+										/* translators: %s: Name of the post type e.g: "Page". */
+										__( 'Detach from %s' ),
+										category.postTypeLabel
+								  )
+								: __( 'Detach from post' ) }
 						</MenuItem>
 					) }
 				</MenuGroup>

@@ -1516,9 +1516,6 @@ _Properties_
 -   _isExternalResource_ `[boolean]`: If the media category is an external resource, this should be set to true. This is used to avoid making a request to the external resource when the user
 -   _description_ `[string]`: Optional help text shown beneath the search field to describe the source.
 -   _emptyMessage_ `[string]`: Optional message shown in place of the generic "No results found." when the source has no items and there is no active search. Providing it also keeps the source in the tab list while empty, so the message stays reachable.
--   _attach_ `[Function]`: Internal (first-party only): attaches the selected media items to the current post. Not part of the supported public extension API.
--   _detach_ `[Function]`: Internal (first-party only): detaches a media item from the current post. Not part of the supported public extension API.
--   _invalidate_ `[Function]`: Internal (first-party only): invalidates cached results after an attach/detach so the grid refetches.
 
 ### removeBlock
 

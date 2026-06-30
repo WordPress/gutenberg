@@ -213,6 +213,9 @@ const getAttachedImagesCategory = ( postId, typeLabel ) => ( {
 		search_items: __( 'Search attachments' ),
 	},
 	mediaType: 'image',
+	// The post type's singular label (e.g. "Page"), threaded through so the
+	// shared panel can word its attach/detach copy for the current post type.
+	postTypeLabel: typeLabel,
 	// Helper text shown beneath the search field to clarify what this source is,
 	// since the label alone can read as ambiguous next to "Images".
 	description: typeLabel
