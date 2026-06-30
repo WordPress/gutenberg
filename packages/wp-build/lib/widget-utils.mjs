@@ -30,6 +30,8 @@ export function getAllWidgets( rootDir ) {
  * @property {string}                                    [description]  Short description.
  * @property {string}                                    [category]     Grouping category.
  * @property {'framed' | 'content-bleed' | 'full-bleed'} [presentation] Authoring intent about how the widget wants to render.
+ * @property {string[]}                                  [keywords]     Search aliases used to match the widget.
+ * @property {string}                                    [textdomain]   Gettext text domain for translations.
  */
 
 /**
