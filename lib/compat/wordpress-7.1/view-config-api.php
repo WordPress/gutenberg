@@ -10,10 +10,11 @@
  */
 
 /**
- * Builds the default `form` configuration shared by every post type entity.
+ * Builds the default `form` configuration for post types that don't provide their own.
  *
- * This is the single `form` consumed today; it is a sensible default for `post`,
- * `page`, and custom post types alike rather than being tailored per type.
+ * It is a sensible default for `post`, `page`, and custom post types alike rather
+ * than being tailored per type. Post types that need a different shape can replace
+ * it entirely with a dedicated `form` through their own filter callback.
  *
  * It is intentionally NOT gated by `supports`. The registered fields are the
  * single source of truth for what applies: each field is registered for a post
@@ -739,7 +740,7 @@ function _gutenberg_get_entity_view_config_post_type_wp_template( $config ) {
  * and installs its own `_gutenberg_*` callbacks instead.
  *
  * Post types without a dedicated `_gutenberg_*` callback (e.g. `post`) still have
- * the core callback removed so they fall back to the supports-derived default
+ * the core callback removed so they fall back to the default configuration
  * built in gutenberg_get_entity_view_config().
  *
  * This runs on `init` rather than at file include time so that the core
