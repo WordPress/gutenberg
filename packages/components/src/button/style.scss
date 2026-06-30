@@ -68,10 +68,6 @@
 		&[aria-disabled="true"],
 		&[aria-disabled="true"]:enabled, // This catches a situation where a Button is aria-disabled, but not disabled.
 		&[aria-disabled="true"]:active:enabled {
-			&:focus:enabled {
-				@include mixins.outset-ring__focus();
-			}
-
 			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
 			color: rgba($white, 0.4);
 			background: $components-color-accent;
@@ -127,21 +123,18 @@
 
 	&.is-secondary {
 		@media not ( prefers-reduced-motion ) {
-			transition:
-				box-shadow 0.1s linear,
-				background 0.1s linear,
-				color 0.1s linear;
+			transition: box-shadow 0.1s linear;
 		}
 
 		box-shadow:
-			inset 0 0 0 $border-width var(--wpds-color-stroke-interactive-brand),
+			inset 0 0 0 $border-width $components-color-accent,
 			0 0 0 currentColor;
 		white-space: nowrap;
 		color: $components-color-accent;
 		background: transparent;
 
 		&:hover:not(:disabled, [aria-disabled="true"], .is-pressed) {
-			box-shadow: inset 0 0 0 $border-width var(--wpds-color-stroke-interactive-brand-active);
+			box-shadow: inset 0 0 0 $border-width $components-color-accent-darker-20;
 			color: $components-color-accent-darker-20;
 			background: color-mix(in srgb, $components-color-accent 4%, transparent);
 		}
@@ -205,16 +198,6 @@
 			&:disabled,
 			&[aria-disabled="true"] {
 				color: $gray-600;
-			}
-		}
-
-		&.is-secondary {
-			box-shadow:
-				inset 0 0 0 $border-width $components-color-accent,
-				0 0 0 currentColor;
-
-			&:hover:not(:disabled, [aria-disabled="true"]) {
-				box-shadow: inset 0 0 0 $border-width $components-color-accent-darker-20;
 			}
 		}
 
