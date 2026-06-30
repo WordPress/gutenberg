@@ -17,6 +17,7 @@ import {
 import {
 	BlockEditorProvider,
 	BlockContextProvider,
+	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
@@ -64,6 +65,8 @@ const NON_CONTEXTUAL_POST_TYPES = [
 	'wp_template_part',
 ];
 
+const ISOLATED_POST_TYPES = NON_CONTEXTUAL_POST_TYPES;
+
 /**
  * Depending on the post, template and template mode,
  * returns the appropriate blocks and change handlers for the block editor provider.
@@ -71,6 +74,7 @@ const NON_CONTEXTUAL_POST_TYPES = [
  * @param {Array}   post     Block list.
  * @param {boolean} template Whether the page content has focus (and the surrounding template is inert). If `true` return page content blocks. Default `false`.
  * @param {string}  mode     Rendering mode.
+ * @param {Object}  settings Editor settings.
  *
  * @example
  * ```jsx
@@ -79,7 +83,7 @@ const NON_CONTEXTUAL_POST_TYPES = [
  *
  * @return {Array} Block editor props.
  */
-function useBlockEditorProps( post, template, mode ) {
+function useBlockEditorProps( post, template, mode, settings ) {
 	const revisionBlocks = useRevisionBlocks();
 	const rootLevelPost = mode === 'template-locked' ? 'template' : 'post';
 	const [ postBlocks, onInput, onChange ] = useEntityBlockEditor(
@@ -127,8 +131,14 @@ function useBlockEditorProps( post, template, mode ) {
 	// Handle fallback to postBlocks outside of the above useMemo, to ensure
 	// that constructed block templates that call `createBlock` are not generated
 	// too frequently. This ensures that clientIds are stable.
+	const allowUniversalCanvasTemplateChanges =
+		settings.__experimentalUniversalCanvas &&
+		!! template &&
+		mode === 'template-locked';
 	const disableRootLevelChanges =
-		( !! template && mode === 'template-locked' ) ||
+		( !! template &&
+			mode === 'template-locked' &&
+			! allowUniversalCanvasTemplateChanges ) ||
 		post.type === 'wp_navigation';
 	if ( disableRootLevelChanges ) {
 		return [ blocks, noop, noop ];
@@ -201,7 +211,17 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					select( coreStore );
 
 				const _mode = getRenderingMode();
-				const _defaultMode = getDefaultRenderingMode( post.type );
+				let _defaultMode;
+				if ( ISOLATED_POST_TYPES.includes( post.type ) ) {
+					_defaultMode = 'post-only';
+				} else if (
+					settings.__experimentalForceTemplateVisibleOnMount &&
+					settings.__experimentalUniversalCanvas
+				) {
+					_defaultMode = 'template-locked';
+				} else {
+					_defaultMode = getDefaultRenderingMode( post.type );
+				}
 				/**
 				 * To avoid content "flash", wait until rendering mode has been resolved.
 				 * This is important for the initial render of the editor.
@@ -240,7 +260,13 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					currentRevisionId: _getCurrentRevisionId(),
 				};
 			},
-			[ post.type, post.id, hasTemplate ]
+			[
+				post.type,
+				post.id,
+				hasTemplate,
+				settings.__experimentalForceTemplateVisibleOnMount,
+				settings.__experimentalUniversalCanvas,
+			]
 		);
 
 		const shouldRenderTemplate = hasTemplate && mode !== 'post-only';
@@ -296,11 +322,6 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			id,
 			mode
 		);
-		const [ blocks, onInput, onChange ] = useBlockEditorProps(
-			post,
-			template,
-			mode
-		);
 
 		const {
 			updatePostLock,
@@ -310,7 +331,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			setEditedPost,
 			setRenderingMode,
 		} = unlock( useDispatch( editorStore ) );
-		const { editEntityRecord } = useDispatch( coreStore );
+		const { editEntityRecord, saveEditedEntityRecord } =
+			useDispatch( coreStore );
 		const registry = useRegistry();
 
 		const onChangeSelection = useCallback(
@@ -325,8 +347,92 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			},
 			[ editEntityRecord, post.type, post.id ]
 		);
-		const { createWarningNotice, removeNotice } =
-			useDispatch( noticesStore );
+		const {
+			createWarningNotice,
+			createSuccessNotice,
+			createErrorNotice,
+			removeNotice,
+		} = useDispatch( noticesStore );
+
+		const saveGlobalCanvasSection = useCallback(
+			async ( clientId ) => {
+				const { getBlockName, getBlockAttributes } =
+					registry.select( blockEditorStore );
+				const blockName = getBlockName( clientId );
+				const attributes = getBlockAttributes( clientId );
+
+				let entityType = 'wp_template';
+				let entityId = template?.id;
+
+				if ( blockName === 'core/template-part' ) {
+					const currentTheme = registry
+						.select( coreStore )
+						.getCurrentTheme()?.stylesheet;
+					entityType = 'wp_template_part';
+					entityId =
+						( attributes?.theme || currentTheme ) &&
+						attributes?.slug
+							? `${ attributes.theme || currentTheme }//${
+									attributes.slug
+							  }`
+							: undefined;
+				}
+
+				if ( ! entityId ) {
+					createErrorNotice( __( 'Could not save changes.' ), {
+						type: 'snackbar',
+					} );
+					return;
+				}
+
+				try {
+					await saveEditedEntityRecord(
+						'postType',
+						entityType,
+						entityId
+					);
+					createSuccessNotice( __( 'Changes saved.' ), {
+						type: 'snackbar',
+					} );
+				} catch ( error ) {
+					createErrorNotice( __( 'Could not save changes.' ), {
+						type: 'snackbar',
+					} );
+					throw error;
+				}
+			},
+			[
+				registry,
+				template?.id,
+				saveEditedEntityRecord,
+				createSuccessNotice,
+				createErrorNotice,
+			]
+		);
+
+		const universalCanvasBlockEditorSettings = useMemo(
+			() =>
+				settings.__experimentalUniversalCanvas
+					? {
+							...blockEditorSettings,
+							__experimentalUniversalCanvas: true,
+							__experimentalOnSaveGlobalSection:
+								saveGlobalCanvasSection,
+					  }
+					: blockEditorSettings,
+			[
+				blockEditorSettings,
+				saveGlobalCanvasSection,
+				settings.__experimentalUniversalCanvas,
+			]
+		);
+
+		const [ blocks, onInput, onChange ] = useBlockEditorProps(
+			post,
+			template,
+			mode,
+			settings
+		);
 
 		// Ideally this should be synced on each change and not just something you do once.
 		useLayoutEffect( () => {
@@ -363,6 +469,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			// The dependencies of the hook are omitted deliberately
 			// We only want to run setupEditor (with initialEdits) only once per post.
 			// A better solution in the future would be to split this effect into multiple ones.
+			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, [] );
 
 		// Synchronizes the active post with the state
@@ -431,7 +538,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							onChangeSelection={
 								isInRevisionsMode ? noop : onChangeSelection
 							}
-							settings={ blockEditorSettings }
+							settings={ universalCanvasBlockEditorSettings }
 							useSubRegistry={ false }
 						>
 							{ children }
@@ -448,7 +555,9 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 									<EditorKeyboardShortcuts />
 									<KeyboardShortcutHelpModal />
 									<BlockRemovalWarnings />
-									<StartPageOptions />
+									{ ! settings.disableStartPageOptions && (
+										<StartPageOptions />
+									) }
 									<StartTemplateOptions />
 									<PatternRenameModal />
 									<PatternDuplicateModal />

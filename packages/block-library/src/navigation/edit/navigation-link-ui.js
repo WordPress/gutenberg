@@ -18,7 +18,14 @@ const BLOCKS_WITH_LINK_UI_SUPPORT = [
 	'core/navigation-submenu',
 ];
 
-export function NavigationLinkUI( { block, insertedBlock, setInsertedBlock } ) {
+export function NavigationLinkUI( {
+	block,
+	insertedBlock,
+	setInsertedBlock,
+	showBlockInserter,
+	onComplete,
+	onCancel,
+} ) {
 	const { updateBlockAttributes, removeBlock } =
 		useDispatch( blockEditorStore );
 
@@ -55,6 +62,7 @@ export function NavigationLinkUI( { block, insertedBlock, setInsertedBlock } ) {
 			// Remove the block entirely to avoid poor UX
 			// This matches the Navigation Link block's behavior
 			removeBlock( insertedBlock.clientId, shouldAutoSelectBlock );
+			onCancel?.( insertedBlock );
 		}
 		setInsertedBlock( null );
 	};
@@ -85,6 +93,7 @@ export function NavigationLinkUI( { block, insertedBlock, setInsertedBlock } ) {
 		<LinkUI
 			clientId={ insertedBlock?.clientId }
 			link={ insertedBlock?.attributes }
+			showBlockInserter={ showBlockInserter }
 			onBlockInsert={ handleSetInsertedBlock }
 			onClose={ () => {
 				// Use cleanup function
@@ -109,6 +118,7 @@ export function NavigationLinkUI( { block, insertedBlock, setInsertedBlock } ) {
 				}
 
 				setInsertedBlock( null );
+				onComplete?.( insertedBlock, updatedAttributes );
 			} }
 		/>
 	);

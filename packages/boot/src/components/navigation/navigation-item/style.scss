@@ -50,3 +50,36 @@
 		padding-right: variables.$grid-unit-20;
 	}
 }
+
+.boot-navigation-item__container {
+	position: relative;
+
+	.boot-navigation-item {
+		padding-inline-end: variables.$grid-unit-40;
+	}
+}
+
+.boot-navigation-item__action {
+	align-items: center;
+	display: flex;
+	inset-block: 0;
+	inset-inline-end: variables.$grid-unit-15;
+	opacity: 0;
+	pointer-events: none;
+	position: absolute;
+	transition: opacity 0.12s ease;
+
+	.boot-navigation-item__container:hover &,
+	.boot-navigation-item__container:focus-within & {
+		opacity: 1;
+		pointer-events: auto;
+	}
+
+	.components-button {
+		color: var(--wpds-color-foreground-interactive-neutral);
+
+		&:hover:not(:disabled) {
+			color: var(--wpds-color-foreground-interactive-brand-active);
+		}
+	}
+}

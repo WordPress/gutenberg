@@ -7,18 +7,31 @@ import {
 	BlockPreview,
 	// @ts-ignore
 } from '@wordpress/block-editor';
+import { parse } from '@wordpress/blocks';
 import type { BasePost } from '@wordpress/fields';
 import { useSelect } from '@wordpress/data';
-import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
+import { useMemo } from '@wordpress/element';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { EditorProvider } from '../../../components/provider';
 import { useStyle } from '../../../components/global-styles';
+import { useGlobalStylesOutput } from '../../../hooks/use-global-styles-output';
 import { unlock } from '../../../lock-unlock';
 // @ts-ignore
 import { store as editorStore } from '../../../store';
+
+const UntypedBlockPreview = BlockPreview as any;
+const AsyncBlockPreview = UntypedBlockPreview.Async;
+
+type EditorSettings = Record< string, unknown > & {
+	styles?: Array< {
+		isGlobalStyles?: boolean;
+		[ key: string ]: unknown;
+	} >;
+};
 
 function PostPreviewContainer( {
 	template,
@@ -27,18 +40,16 @@ function PostPreviewContainer( {
 	template: any;
 	post: any;
 } ) {
-	const [ backgroundColor = 'white' ] = useStyle( 'color.background' );
-	const [ postBlocks ] = useEntityBlockEditor( 'postType', post.type, {
-		id: post.id,
-	} );
-	const [ templateBlocks ] = useEntityBlockEditor(
-		'postType',
-		template?.type,
-		{
-			id: template?.id,
+	const backgroundColor = useStyle( 'color.background' ) || 'white';
+	const blocks = useMemo( () => {
+		const content = template?.content?.raw || post?.content?.raw;
+
+		if ( ! content ) {
+			return [];
 		}
-	);
-	const blocks = template && templateBlocks ? templateBlocks : postBlocks;
+
+		return parse( content );
+	}, [ post?.content?.raw, template?.content?.raw ] );
 	const isEmpty = ! blocks?.length;
 	return (
 		<div
@@ -53,15 +64,16 @@ function PostPreviewContainer( {
 				</span>
 			) }
 			{ ! isEmpty && (
-				<BlockPreview.Async>
-					<BlockPreview blocks={ blocks } />
-				</BlockPreview.Async>
+				<AsyncBlockPreview>
+					<UntypedBlockPreview blocks={ blocks } />
+				</AsyncBlockPreview>
 			) }
 		</div>
 	);
 }
 
 export default function PostPreviewView( { item }: { item: BasePost } ) {
+	const [ globalStyles, globalStyleSettings ] = useGlobalStylesOutput();
 	const { settings, template } = useSelect(
 		( select ) => {
 			const { canUser, getPostType, getTemplateId, getEntityRecord } =
@@ -70,13 +82,13 @@ export default function PostPreviewView( { item }: { item: BasePost } ) {
 				kind: 'postType',
 				name: 'wp_template',
 			} );
-			const _settings = select( editorStore ).getEditorSettings();
-			// @ts-ignore
-			const supportsTemplateMode = _settings.supportsTemplateMode;
+			const _settings = select(
+				editorStore
+			).getEditorSettings() as EditorSettings;
 			const isViewable = getPostType( item.type )?.viewable ?? false;
 
 			const templateId =
-				supportsTemplateMode && isViewable && canViewTemplate
+				isViewable && canViewTemplate
 					? getTemplateId( item.type, item.id )
 					: null;
 			return {
@@ -88,6 +100,20 @@ export default function PostPreviewView( { item }: { item: BasePost } ) {
 		},
 		[ item.type, item.id ]
 	);
+
+	const previewSettings = useMemo( () => {
+		const nonGlobalStyles = ( settings?.styles ?? [] ).filter(
+			( style ) => ! style.isGlobalStyles
+		);
+
+		return {
+			...( settings ?? {} ),
+			isPreviewMode: true,
+			styles: [ ...nonGlobalStyles, ...globalStyles ],
+			__experimentalFeatures: globalStyleSettings,
+		};
+	}, [ globalStyleSettings, globalStyles, settings ] );
+
 	// Wrap everything in a block editor provider to ensure 'styles' that are needed
 	// for the previews are synced between the site editor store and the block editor store.
 	// Additionally we need to have the `__experimentalBlockPatterns` setting in order to
@@ -97,8 +123,9 @@ export default function PostPreviewView( { item }: { item: BasePost } ) {
 	// Explore how we can solve this in a better way.
 	return (
 		<EditorProvider
+			key="assets-ready"
 			post={ item }
-			settings={ settings }
+			settings={ previewSettings }
 			__unstableTemplate={ template }
 		>
 			<PostPreviewContainer template={ template } post={ item } />

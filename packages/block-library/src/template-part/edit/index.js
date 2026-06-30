@@ -12,15 +12,8 @@ import {
 	useHasRecursion,
 	InspectorControls,
 	__experimentalBlockPatternsList as BlockPatternsList,
-	BlockControls,
 } from '@wordpress/block-editor';
-import {
-	PanelBody,
-	Spinner,
-	Modal,
-	MenuItem,
-	ToolbarButton,
-} from '@wordpress/components';
+import { PanelBody, Spinner, Modal, MenuItem } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState } from '@wordpress/element';
@@ -125,7 +118,6 @@ export default function TemplatePartEdit( {
 		hasInnerBlocks,
 		isMissing,
 		area,
-		onNavigateToEntityRecord,
 		title,
 		canUserEdit,
 		canUserEditBlock,
@@ -133,8 +125,7 @@ export default function TemplatePartEdit( {
 		( select ) => {
 			const { getEditedEntityRecord, hasFinishedResolution } =
 				select( coreStore );
-			const { getBlockCount, getSettings, canEditBlock } =
-				select( blockEditorStore );
+			const { getBlockCount, canEditBlock } = select( blockEditorStore );
 
 			const getEntityArgs = [
 				'postType',
@@ -168,8 +159,6 @@ export default function TemplatePartEdit( {
 					( ! entityRecord ||
 						Object.keys( entityRecord ).length === 0 ),
 				area: _area,
-				onNavigateToEntityRecord:
-					getSettings().onNavigateToEntityRecord,
 				title: entityRecord?.title,
 				canUserEdit: !! _canUserEdit,
 				canUserEditBlock: canEditBlock( clientId ),
@@ -240,22 +229,6 @@ export default function TemplatePartEdit( {
 	return (
 		<>
 			<RecursionProvider uniqueId={ templatePartId }>
-				{ isEntityAvailable &&
-					onNavigateToEntityRecord &&
-					canUserEdit && (
-						<BlockControls group="other">
-							<ToolbarButton
-								onClick={ () => {
-									onNavigateToEntityRecord( {
-										postId: templatePartId,
-										postType: 'wp_template_part',
-									} );
-								} }
-							>
-								{ __( 'Edit original' ) }
-							</ToolbarButton>
-						</BlockControls>
-					) }
 				{ canUserEdit && (
 					<InspectorControls group="advanced">
 						<TemplatePartAdvancedControls

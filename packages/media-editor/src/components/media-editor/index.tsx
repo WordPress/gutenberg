@@ -35,7 +35,7 @@ import {
 	InterfaceSkeleton,
 	PinnedItems,
 	// No type declarations available for @wordpress/interface.
-	// @ts-expect-error
+	// @ts-ignore
 } from '@wordpress/interface';
 import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react';
 
@@ -127,7 +127,7 @@ function MediaEditorSidebar( { tabs }: { tabs: EditorTab[] } ) {
 			className="media-editor__sidebar"
 			panelClassName="media-editor__sidebar-panel"
 			headerClassName="media-editor__sidebar-header"
-			closeLabel={ __( 'Close media panel' ) }
+			closeLabel={ __( 'Close media panel' ) as any }
 			header={
 				<Tabs.Context.Provider value={ tabsContextValue }>
 					<Tabs.TabList>
@@ -184,7 +184,10 @@ function HeaderActions( {
 					onClick={ () => setIsShortcutsModalOpen( true ) }
 				/>
 			) }
-			<PinnedItems.Slot scope="media-editor" />
+			<PinnedItems.Slot
+				scope="media-editor"
+				className="media-editor__pinned-items"
+			/>
 			{ showCloseButton && (
 				<Button
 					size="compact"
@@ -593,6 +596,12 @@ function MediaEditorContent( {
 						</Tabs>
 						<InterfaceSkeleton
 							className="media-editor__skeleton"
+							actions={ undefined }
+							editorNotices={ undefined }
+							footer={ undefined }
+							header={ undefined }
+							isDistractionFree={ false }
+							secondarySidebar={ undefined }
 							labels={ {
 								body: isImage
 									? __( 'Image editor' )

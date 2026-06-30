@@ -98,15 +98,30 @@ export default function EditContents( { clientId } ) {
 		stopEditingContentOnlySection,
 	} = useContentOnlySectionEdit( clientId );
 
-	const { block, onNavigateToEntityRecord, canEdit } = useSelect(
+	const {
+		block,
+		onNavigateToEntityRecord,
+		canEdit,
+		isUniversalCanvas,
+		isUniversalCanvasTemplateSection,
+	} = useSelect(
 		( select ) => {
-			const { getBlock, getSettings, canEditBlock } =
-				select( blockEditorStore );
+			const {
+				getBlock,
+				getBlockListSettings,
+				getSettings,
+				canEditBlock,
+			} = select( blockEditorStore );
+			const settings = getSettings();
 			return {
 				block: getBlock( clientId ),
-				onNavigateToEntityRecord:
-					getSettings().onNavigateToEntityRecord,
+				onNavigateToEntityRecord: settings.onNavigateToEntityRecord,
 				canEdit: canEditBlock( clientId ),
+				isUniversalCanvas: settings.__experimentalUniversalCanvas,
+				isUniversalCanvasTemplateSection:
+					settings.__experimentalUniversalCanvas &&
+					getBlockListSettings( clientId )?.templateLock ===
+						'contentOnly',
 			};
 		},
 		[ clientId ]
@@ -116,10 +131,23 @@ export default function EditContents( { clientId } ) {
 		return null;
 	}
 
-	const isSyncedPattern = isReusableBlock( block );
 	const isTemplatePartBlock = isTemplatePart( block );
+	const isNavigationOverlayTemplatePart =
+		block?.attributes?.area === 'navigation-overlay' ||
+		block?.attributes?.slug === 'overlay' ||
+		block?.attributes?.slug?.includes( 'overlay' );
+	const shouldEditTemplatePartInline =
+		isUniversalCanvas &&
+		isTemplatePartBlock &&
+		! isNavigationOverlayTemplatePart;
+	if ( shouldEditTemplatePartInline || isUniversalCanvasTemplateSection ) {
+		return null;
+	}
+	const isSyncedPattern = isReusableBlock( block );
 	const shouldUseIsolatedEditor =
-		( isSyncedPattern || isTemplatePartBlock ) && onNavigateToEntityRecord;
+		( isSyncedPattern ||
+			( isTemplatePartBlock && ! shouldEditTemplatePartInline ) ) &&
+		onNavigateToEntityRecord;
 
 	if ( shouldUseIsolatedEditor ) {
 		return (

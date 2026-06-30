@@ -11,8 +11,8 @@
 		position: sticky;
 		top: 0;
 		padding: $grid-unit-20 0;
-		transform: translateY(- $grid-unit-05); // Offsets the top padding on the modal content container
-		margin-bottom: - $grid-unit-05;
+		transform: translateY(-$grid-unit-05); // Offsets the top padding on the modal content container
+		margin-bottom: -$grid-unit-05;
 		z-index: 2; // Above the BlockPreview z-index: 1 overlay in the scrolling list.
 	}
 }
@@ -54,4 +54,87 @@
 
 .editor-post-template__classic-theme-dropdown {
 	padding: $grid-unit-10;
+}
+
+.editor-page-layout-panel {
+	display: flex;
+	flex-direction: column;
+	gap: $grid-unit-15;
+
+	&__options {
+		display: flex;
+		flex-direction: column;
+		gap: $grid-unit-15;
+	}
+
+	&__option {
+		display: grid;
+		gap: $grid-unit-10;
+		align-items: start;
+		padding: $grid-unit-10;
+		border: $border-width solid transparent;
+		border-radius: $radius-medium;
+		cursor: var(--wpds-cursor-control);
+
+		input {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			margin: -1px;
+			overflow: hidden;
+			clip: rect(0, 0, 0, 0);
+			white-space: nowrap;
+			border: 0;
+		}
+
+		&.is-selected {
+			border-color: var(--wp-admin-theme-color);
+			background: $gray-100;
+		}
+
+		&.is-selected .editor-page-layout-panel__preview {
+			border-color: var(--wp-admin-theme-color);
+			box-shadow:
+				0 0 0 var(--wp-admin-border-width-focus)
+				var(--wp-admin-theme-color);
+		}
+	}
+
+	&__preview {
+		aspect-ratio: 4 / 3;
+		overflow: hidden;
+		border: $border-width solid $gray-300;
+		border-radius: $radius-small;
+		background: $gray-100;
+
+		.block-editor-block-preview__container {
+			min-height: 100%;
+		}
+	}
+
+	&__empty-preview {
+		width: 100%;
+		height: 100%;
+		background: linear-gradient(135deg, $gray-100 0%, $gray-100 50%, $gray-200 50%, $gray-200 100%);
+	}
+
+	&__label {
+		display: flex;
+		gap: $grid-unit-10;
+		align-items: center;
+		justify-content: space-between;
+		font-size: $default-font-size;
+		font-weight: 500;
+	}
+
+	&__current-badge {
+		flex-shrink: 0;
+		border-radius: $radius-small;
+		background: $gray-100;
+		color: $gray-700;
+		font-size: $helptext-font-size;
+		font-weight: 400;
+		line-height: 1;
+		padding: $grid-unit-05 $grid-unit-10;
+	}
 }

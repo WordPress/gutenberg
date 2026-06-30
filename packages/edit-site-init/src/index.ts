@@ -2,15 +2,20 @@
  * WordPress dependencies
  */
 import {
+	brush,
+	cog,
 	home,
-	styles,
+	layout,
 	navigation,
 	page,
+	post,
+	postList,
+	siteLogo,
+	styles,
 	symbol,
 	symbolFilled,
-	layout,
 } from '@wordpress/icons';
-import { dispatch } from '@wordpress/data';
+import { dispatch, select } from '@wordpress/data';
 import { store as bootStore } from '@wordpress/boot';
 
 /**
@@ -21,11 +26,15 @@ export async function init() {
 	// Define icons for menu items
 	const menuIcons: Record< string, { icon: React.ReactElement } > = {
 		home: { icon: home },
-		styles: { icon: styles },
-		navigation: { icon: navigation },
 		pages: { icon: page },
-		templateParts: { icon: symbolFilled },
+		content: { icon: postList },
+		navigation: { icon: navigation },
+		design: { icon: brush },
+		styles: { icon: styles },
+		identity: { icon: siteLogo },
+		advanced: { icon: cog },
 		patterns: { icon: symbol },
+		templateParts: { icon: symbolFilled },
 		templates: { icon: layout },
 	};
 
@@ -33,4 +42,14 @@ export async function init() {
 	Object.entries( menuIcons ).forEach( ( [ id, { icon } ] ) => {
 		dispatch( bootStore ).updateMenuItem( id, { icon } );
 	} );
+
+	( select( bootStore ).getMenuItems() as Array< { id: string } > ).forEach(
+		( menuItem ) => {
+			if ( menuItem.id.startsWith( 'content-' ) ) {
+				dispatch( bootStore ).updateMenuItem( menuItem.id, {
+					icon: post,
+				} );
+			}
+		}
+	);
 }

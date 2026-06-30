@@ -1,5 +1,44 @@
 @use "@wordpress/base-styles/variables" as *;
 
+.editor-editor-interface.is-global-editor-color-scheme {
+	--wp-admin-theme-color: var(--wp-block-synced-color);
+	--wp-admin-theme-color--rgb: var(--wp-block-synced-color--rgb);
+	--wp-admin-theme-color-darker-10: #6700bd;
+	--wp-admin-theme-color-darker-20: #540099;
+	--wp-components-color-accent: var(--wp-block-synced-color);
+	--wp-components-color-accent-darker-10: #6700bd;
+	--wp-components-color-accent-darker-20: #540099;
+
+	.editor-document-bar {
+		background: rgba(var(--wp-block-synced-color--rgb), 0.08);
+
+		&:hover {
+			background: rgba(var(--wp-block-synced-color--rgb), 0.12);
+		}
+	}
+
+	.block-editor-block-toolbar__block-icon,
+	.editor-document-tools__inserter-toggle.components-button.has-icon,
+	.editor-document-tools__document-overview-toggle.components-button.has-icon {
+		color: var(--wp-block-synced-color);
+	}
+
+	.editor-document-tools__inserter-toggle.components-button.has-icon.is-primary {
+		color: #fff;
+	}
+
+	.editor-document-tools__inserter-toggle.components-button.has-icon.is-pressed,
+	.editor-document-tools__inserter-toggle.components-button.has-icon[aria-pressed="true"] {
+		color: #fff;
+	}
+
+	.block-editor-block-toolbar .components-button.is-pressed,
+	.block-editor-block-toolbar .components-button[aria-pressed="true"] {
+		background: rgba(var(--wp-block-synced-color--rgb), 0.08);
+		color: var(--wp-block-synced-color);
+	}
+}
+
 .editor-editor-interface .entities-saved-states__panel-header {
 	height: $header-height + $border-width;
 }

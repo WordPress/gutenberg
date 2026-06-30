@@ -3,6 +3,7 @@
 .boot-navigation-screen {
 	// Avoid cutting off focus ring of the last menu item
 	padding-block-end: variables.$grid-unit-05;
+	height: 100%;
 }
 
 .boot-navigation-screen .components-text {

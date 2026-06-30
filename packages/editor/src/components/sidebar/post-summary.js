@@ -36,7 +36,11 @@ import PostTrash from '../post-trash';
  */
 const PANEL_NAME = 'post-status';
 
-export default function PostSummary( { onActionPerformed } ) {
+export default function PostSummary( {
+	onActionPerformed,
+	hidePostCard = false,
+	excludedFieldIds = [],
+} ) {
 	const postType = useSelect(
 		( select ) => select( editorStore ).getCurrentPostType(),
 		[]
@@ -51,12 +55,28 @@ export default function PostSummary( { onActionPerformed } ) {
 			'wp_template_part',
 		].includes( postType )
 	) {
-		return <DataFormPostSummary onActionPerformed={ onActionPerformed } />;
+		return (
+			<DataFormPostSummary
+				onActionPerformed={ onActionPerformed }
+				hidePostCard={ hidePostCard }
+				excludedFieldIds={ excludedFieldIds }
+			/>
+		);
 	}
-	return <ClassicPostSummary onActionPerformed={ onActionPerformed } />;
+	return (
+		<ClassicPostSummary
+			onActionPerformed={ onActionPerformed }
+			hidePostCard={ hidePostCard }
+			excludedFieldIds={ excludedFieldIds }
+		/>
+	);
 }
 
-function ClassicPostSummary( { onActionPerformed } ) {
+function ClassicPostSummary( {
+	onActionPerformed,
+	hidePostCard = false,
+	excludedFieldIds = [],
+} ) {
 	const { isRemovedPostStatusPanel, postType, postId } = useSelect(
 		( select ) => {
 			// We use isEditorPanelRemoved to hide the panel if it was programmatically removed. We do
@@ -80,11 +100,13 @@ function ClassicPostSummary( { onActionPerformed } ) {
 				{ ( fills ) => (
 					<>
 						<Stack direction="column" gap="lg">
-							<PostCardPanel
-								postType={ postType }
-								postId={ postId }
-								onActionPerformed={ onActionPerformed }
-							/>
+							{ ! hidePostCard && (
+								<PostCardPanel
+									postType={ postType }
+									postId={ postId }
+									onActionPerformed={ onActionPerformed }
+								/>
+							) }
 							<PostFeaturedImagePanel withPanelBody={ false } />
 							<PostExcerptPanel />
 							<Stack direction="column" gap="xs">
@@ -94,7 +116,9 @@ function ClassicPostSummary( { onActionPerformed } ) {
 							{ ! isRemovedPostStatusPanel && (
 								<Stack direction="column" gap="lg">
 									<Stack direction="column" gap="xs">
-										<PostStatusPanel />
+										{ ! excludedFieldIds.includes(
+											'status'
+										) && <PostStatusPanel /> }
 										<PostSchedulePanel />
 										<PostURLPanel />
 										<PostAuthorPanel />

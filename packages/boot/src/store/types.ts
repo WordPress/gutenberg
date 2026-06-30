@@ -56,11 +56,65 @@ export interface CanvasData {
 	 * Indicates if the canvas is in preview mode.
 	 */
 	isPreview?: boolean;
+
+	/**
+	 * Whether to render the route's custom canvas surface instead of the default
+	 * editor canvas.
+	 */
+	customCanvas?: boolean;
 	/**
 	 * Optional edit link for click-to-edit navigation.
-	 * When provided with isPreview: true, clicking the canvas navigates to this URL.
+	 * When provided with isPreview: true, the preview can expose an edit action.
 	 */
 	editLink?: string;
+
+	/**
+	 * Optional label for the document being previewed.
+	 */
+	previewLabel?: string;
+
+	/**
+	 * Optional icon for the document being previewed.
+	 */
+	previewIcon?: IconType;
+
+	/**
+	 * Optional status label for the document being previewed.
+	 */
+	previewStatusLabel?: string;
+
+	/**
+	 * Optional status slug for the document being previewed.
+	 */
+	previewStatus?: string;
+
+	/**
+	 * Optional label for the preview edit action.
+	 */
+	previewEditLabel?: string;
+
+	/**
+	 * Whether the current user can edit the previewed entity.
+	 * When explicitly false, preview chrome must disable the edit action even
+	 * if a route-like edit link is present.
+	 */
+	previewCanEdit?: boolean;
+
+	/**
+	 * Optional visual tone for the preview chrome.
+	 */
+	previewTone?: 'default' | 'global';
+
+	/**
+	 * Optional frontend URL to render in preview mode.
+	 * When omitted, preview mode falls back to the editor preview canvas.
+	 */
+	previewUrl?: string;
+
+	/**
+	 * Whether the editor should skip the starter page pattern chooser.
+	 */
+	skipStartPageOptions?: boolean;
 }
 
 /**

@@ -14,6 +14,11 @@ interface CanvasRendererProps {
 	routeContentModule?: string;
 }
 
+interface LoadedCustomCanvas {
+	routeContentModule: string;
+	CustomCanvas: any;
+}
+
 /**
  * CanvasRenderer handles rendering of both default and custom canvas components.
  * The logic here would have been way simpler if we just render the canvas within
@@ -37,21 +42,36 @@ export default function CanvasRenderer( {
 	canvas,
 	routeContentModule,
 }: CanvasRendererProps ) {
-	const [ CustomCanvas, setCustomCanvas ] = useState< any >( null );
+	const [ loadedCustomCanvas, setLoadedCustomCanvas ] =
+		useState< LoadedCustomCanvas | null >( null );
 
 	useEffect( () => {
-		if ( canvas === null && routeContentModule ) {
+		if (
+			( canvas === null || canvas?.customCanvas ) &&
+			routeContentModule
+		) {
+			let isCurrent = true;
 			import( routeContentModule )
 				.then( ( module ) => {
-					setCustomCanvas( () => module.canvas );
+					if ( isCurrent ) {
+						setLoadedCustomCanvas( {
+							routeContentModule,
+							CustomCanvas: module.canvas,
+						} );
+					}
 				} )
 				.catch( ( error ) => {
 					// eslint-disable-next-line no-console
 					console.error( 'Failed to load custom canvas:', error );
 				} );
-		} else {
-			setCustomCanvas( null );
+
+			return () => {
+				isCurrent = false;
+			};
 		}
+
+		setLoadedCustomCanvas( null );
+		return undefined;
 	}, [ canvas, routeContentModule ] );
 
 	// No canvas
@@ -60,10 +80,14 @@ export default function CanvasRenderer( {
 	}
 
 	// Custom canvas
-	if ( canvas === null ) {
-		if ( ! CustomCanvas ) {
+	if ( canvas === null || canvas.customCanvas ) {
+		if (
+			! routeContentModule ||
+			loadedCustomCanvas?.routeContentModule !== routeContentModule
+		) {
 			return null; // Still loading
 		}
+		const { CustomCanvas } = loadedCustomCanvas;
 		return <CustomCanvas />;
 	}
 

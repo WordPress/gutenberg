@@ -3,6 +3,7 @@
  */
 import apiFetch from '@wordpress/api-fetch';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { createRegistry } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -404,6 +405,36 @@ describe( 'Editor actions', () => {
 			expect( registry.select( editorStore ).getCurrentPostId() ).toBe(
 				10
 			);
+		} );
+
+		it( 'should initialize blocks from existing post content', () => {
+			const registry = createRegistryWithStores();
+			registerBlockType( 'test/block', {
+				apiVersion: 3,
+				title: 'Test block',
+				category: 'text',
+				save: () => null,
+			} );
+			const post = {
+				id: postId,
+				type: 'post',
+				content: {
+					raw: '<!-- wp:test/block /-->',
+				},
+			};
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post );
+
+			expect(
+				registry
+					.select( coreStore )
+					.getEditedEntityRecord( 'postType', 'post', postId )
+					.blocks.map( ( block ) => block.name )
+			).toEqual( [ 'test/block' ] );
+			unregisterBlockType( 'test/block' );
 		} );
 	} );
 

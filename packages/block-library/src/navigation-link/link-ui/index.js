@@ -85,6 +85,9 @@ function UnforwardedLinkUI( props, ref ) {
 
 	const { clientId } = props;
 	const postType = type || 'page';
+	const showBlockInserter = props.showBlockInserter ?? true;
+	const isCustomLink =
+		kind === 'custom' || type === 'custom' || ( ! kind && ! type );
 
 	const [ addingBlock, setAddingBlock ] = useState( false );
 	const [ addingPage, setAddingPage ] = useState( false );
@@ -215,7 +218,14 @@ function UnforwardedLinkUI( props, ref ) {
 						hasTextControl
 						hasRichPreviews
 						value={ link }
-						showInitialSuggestions
+						showInitialSuggestions={ ! isCustomLink }
+						searchInputPlaceholder={
+							isCustomLink
+								? __(
+										'Enter your URL (e.g. www.wordpress.org)'
+								  )
+								: undefined
+						}
 						withCreateSuggestion={ false }
 						noDirectEntry={ !! type }
 						noURLSuggestion={ !! type }
@@ -252,6 +262,7 @@ function UnforwardedLinkUI( props, ref ) {
 										type === 'page'
 									}
 									canAddBlock={
+										showBlockInserter &&
 										blockEditingMode === 'default'
 									}
 								/>

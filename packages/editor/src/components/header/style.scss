@@ -6,16 +6,21 @@
 
 .editor-header {
 	@include reset;
+	--editor-header-back-button-column-width: #{$button-size-compact};
+
 	height: $header-height;
 	background: $white;
 	display: grid;
 	grid-auto-flow: row;
-	grid-template: auto / $button-size-compact minmax(0, max-content) minmax(min-content, 1fr) $header-height;
+	grid-template: auto / var(--editor-header-back-button-column-width) minmax(0, max-content) minmax(min-content, 1fr) $header-height;
 	&:has(> .editor-header__center) {
-		grid-template: auto / $button-size-compact min-content 1fr min-content $header-height;
+		grid-template: auto / var(--editor-header-back-button-column-width) min-content 1fr min-content $header-height;
 		@include break-medium {
-			grid-template: auto / $button-size-compact minmax(min-content, 2fr) 2.5fr minmax(min-content, 2fr) $header-height;
+			grid-template: auto / var(--editor-header-back-button-column-width) minmax(min-content, 2fr) 2.5fr minmax(min-content, 2fr) $header-height;
 		}
+	}
+	&:has(.boot-canvas-back-button) {
+		--editor-header-back-button-column-width: #{$header-height};
 	}
 	@include break-mobile {
 		gap: $grid-unit-20;
@@ -29,10 +34,29 @@
 	@include break-zoomed-in {
 		flex-wrap: nowrap;
 	}
+
+	&.is-editing-global-section {
+		--wp-admin-theme-color: var(--wp-block-synced-color);
+		--wp-admin-theme-color--rgb: var(--wp-block-synced-color--rgb);
+
+		.editor-document-bar {
+			background: rgba(var(--wp-block-synced-color--rgb), 0.08);
+
+			&:hover {
+				background: rgba(var(--wp-block-synced-color--rgb), 0.12);
+			}
+		}
+	}
 }
 
 .editor-header__back-button {
 	padding-left: $grid-unit;
+
+	&:has(.boot-canvas-back-button) {
+		align-self: stretch;
+		padding-left: 0;
+		position: relative;
+	}
 }
 
 .editor-header__toolbar {

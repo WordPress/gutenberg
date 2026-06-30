@@ -13,6 +13,8 @@ import { DataViews } from '@wordpress/dataviews';
 import { Button } from '@wordpress/components';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { unlock } from '@wordpress/routes-lock-unlock';
+import { navigation as navigationIcon } from '@wordpress/icons';
+import { EmptyState } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -20,6 +22,8 @@ import { unlock } from '@wordpress/routes-lock-unlock';
 import { getDefaultView } from './view-utils';
 import { useEditNavigationAction } from './actions/edit-navigation';
 import { AddNavigationModal } from './add-navigation';
+import useNavigationLocations from '../navigation/use-navigation-locations';
+import { createLocationsField } from './fields/usage';
 
 /**
  * Style dependencies
@@ -86,6 +90,20 @@ function NavigationList() {
 	const fields = usePostFields( {
 		postType: NAVIGATION_POST_TYPE,
 	} );
+	const { locationsMap, isResolving: isResolvingLocations } =
+		useNavigationLocations();
+	const locationsField = useMemo(
+		() =>
+			createLocationsField( {
+				locationsMap,
+				isResolving: isResolvingLocations,
+			} ),
+		[ locationsMap, isResolvingLocations ]
+	);
+	const navigationFields = useMemo(
+		() => ( fields ? [ ...fields, locationsField ] : fields ),
+		[ fields, locationsField ]
+	);
 	const [ showAddModal, setShowAddModal ] = useState( false );
 
 	const editAction = useEditNavigationAction();
@@ -110,6 +128,29 @@ function NavigationList() {
 
 	const selection =
 		( searchParams.ids ?? [] ).map( ( id: number ) => id.toString() ) ?? [];
+	const emptyState =
+		! isResolving && totalItems === 0 ? (
+			<EmptyState.Root>
+				<EmptyState.Icon icon={ navigationIcon } />
+				<EmptyState.Title>
+					{ __( 'No navigation menus yet' ) }
+				</EmptyState.Title>
+				<EmptyState.Description>
+					{ __(
+						'Create your first menu to start adding links to your site navigation.'
+					) }
+				</EmptyState.Description>
+				<EmptyState.Actions>
+					<Button
+						variant="primary"
+						onClick={ () => setShowAddModal( true ) }
+						__next40pxDefaultSize
+					>
+						{ __( 'Add your first menu' ) }
+					</Button>
+				</EmptyState.Actions>
+			</EmptyState.Root>
+		) : undefined;
 
 	// Get the first navigation from the canvas loader if no selection
 	const firstNavigationId = useMemo( () => {
@@ -146,10 +187,10 @@ function NavigationList() {
 			>
 				<DataViews
 					data={ navigationMenus }
-					fields={ fields }
+					fields={ navigationFields }
 					view={ view }
 					onChangeView={ updateView }
-					isLoading={ isResolving || ! fields }
+					isLoading={ isResolving || ! navigationFields }
 					actions={ actions }
 					paginationInfo={ {
 						totalItems,
@@ -158,6 +199,7 @@ function NavigationList() {
 					defaultLayouts={ {
 						list: true,
 					} }
+					empty={ emptyState }
 					getItemId={ getItemId }
 					selection={ selection }
 					onReset={ isModified ? resetToDefault : false }

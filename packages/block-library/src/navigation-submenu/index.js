@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { page, addSubmenu } from '@wordpress/icons';
+import { addSubmenu } from '@wordpress/icons';
 import { _x, __ } from '@wordpress/i18n';
 import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
 
@@ -22,12 +22,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	icon: ( { context } ) => {
-		if ( context === 'list-view' ) {
-			return page;
-		}
-		return addSubmenu;
-	},
+	icon: addSubmenu,
 	__experimentalLabel( attributes, { context } ) {
 		const { label } = attributes;
 

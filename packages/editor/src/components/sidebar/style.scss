@@ -19,6 +19,18 @@
 	display: none;
 }
 
+.editor-sidebar__page-overview {
+	display: flex;
+	flex-direction: column;
+	gap: $grid-unit-20;
+}
+
+.editor-sidebar__details-panel {
+	.editor-post-panel__section {
+		padding: 0;
+	}
+}
+
 .editor-sidebar {
 	@include reset;
 

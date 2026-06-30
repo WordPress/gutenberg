@@ -576,11 +576,6 @@
 			"count": 1
 		}
 	},
-	"packages/boot/src/components/sidebar/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
 	"packages/boot/src/index.tsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 2
@@ -1007,16 +1002,6 @@
 			"count": 1
 		}
 	},
-	"packages/compose/src/hooks/use-dragging/index.js": {
-		"react-hooks/immutability": {
-			"count": 1
-		}
-	},
-	"packages/compose/src/hooks/use-focus-return/index.js": {
-		"react-hooks/immutability": {
-			"count": 2
-		}
-	},
 	"packages/compose/src/hooks/use-merge-refs/index.ts": {
 		"react-hooks/refs": {
 			"count": 1
@@ -1343,11 +1328,6 @@
 	"packages/editor/src/components/post-publish-panel/postpublish.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
-		}
-	},
-	"packages/editor/src/components/post-revisions-panel/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
 		}
 	},
 	"packages/editor/src/components/post-status/index.js": {
@@ -1933,11 +1913,6 @@
 			"count": 1
 		}
 	},
-	"routes/navigation-edit/editor/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
 	"routes/navigation-list/add-navigation.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
@@ -1957,14 +1932,6 @@
 		}
 	},
 	"routes/post-list/quick-edit-modal.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"routes/post-list/stage.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		},
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		}

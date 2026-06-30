@@ -79,6 +79,7 @@ export function PrivateBlockToolbar( {
 		showSwitchSectionStyleButton,
 		areSelectedBlocksHiddenOnViewport,
 		canEdit,
+		isUniversalCanvasGlobalSection,
 	} = useSelect( ( select ) => {
 		const { canEditBlock } = select( blockEditorStore );
 		const {
@@ -89,6 +90,7 @@ export function PrivateBlockToolbar( {
 			isBlockValid,
 			getBlockEditingMode,
 			getBlockAttributes,
+			getBlockListSettings,
 			getSettings,
 			getTemplateLock,
 			getParentSectionBlock,
@@ -116,6 +118,11 @@ export function PrivateBlockToolbar( {
 			( clientId ) =>
 				!! getBlockAttributes( clientId )?.metadata?.bindings
 		);
+		const _isUniversalCanvasGlobalSection =
+			getSettings().__experimentalUniversalCanvas &&
+			( getBlockListSettings( selectedBlockClientId )?.templateLock ===
+				'contentOnly' ||
+				_blockName === 'core/template-part' );
 
 		// If one or more selected blocks are locked, do not show the BlockGroupToolbar.
 		const _hasTemplateLock = selectedBlockClientIds.some(
@@ -166,6 +173,7 @@ export function PrivateBlockToolbar( {
 			areSelectedBlocksHiddenOnViewport:
 				_areSelectedBlocksHiddenOnViewport,
 			canEdit: _canEditBlock,
+			isUniversalCanvasGlobalSection: _isUniversalCanvasGlobalSection,
 		};
 	}, [] );
 
@@ -187,7 +195,9 @@ export function PrivateBlockToolbar( {
 
 	const isMultiToolbar = blockClientIds.length > 1;
 	const isSynced =
-		isReusableBlock( blockType ) || isTemplatePart( blockType );
+		isReusableBlock( blockType ) ||
+		isTemplatePart( blockType ) ||
+		isUniversalCanvasGlobalSection;
 
 	// Shifts the toolbar to make room for the parent block selector.
 	const classes = clsx( 'block-editor-block-contextual-toolbar', {

@@ -9,9 +9,17 @@ import {
 	__unstableBlockToolbarLastItem as BlockToolbarLastItem,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
+import {
+	MenuGroup,
+	MenuItem,
+	ToolbarButton,
+	ToolbarDropdownMenu,
+	ToolbarGroup,
+} from '@wordpress/components';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as coreStore } from '@wordpress/core-data';
+import { moreVertical } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -25,6 +33,56 @@ const TEMPLATE_PART_BLOCK_NAME = 'core/template-part';
 // Complementary area identifier for the block inspector
 const BLOCK_INSPECTOR_AREA = 'edit-post/block';
 
+function getTemplatePartId( attributes, currentTheme ) {
+	const theme = attributes?.theme || currentTheme?.stylesheet;
+	return theme && attributes?.slug
+		? `${ theme }//${ attributes.slug }`
+		: undefined;
+}
+
+function TemplatePartOptionsMenu( { attributes } ) {
+	const { templatePartId, onNavigateToEntityRecord } = useSelect(
+		( select ) => {
+			const currentTheme = select( coreStore ).getCurrentTheme();
+			const { getSettings } = select( blockEditorStore );
+			return {
+				templatePartId: getTemplatePartId( attributes, currentTheme ),
+				onNavigateToEntityRecord:
+					getSettings().onNavigateToEntityRecord,
+			};
+		},
+		[ attributes ]
+	);
+
+	if ( ! templatePartId || ! onNavigateToEntityRecord ) {
+		return null;
+	}
+
+	return (
+		<ToolbarDropdownMenu
+			icon={ moreVertical }
+			label={ __( 'Template part options' ) }
+			popoverProps={ { placement: 'bottom-start' } }
+		>
+			{ ( { onClose } ) => (
+				<MenuGroup>
+					<MenuItem
+						onClick={ () => {
+							onNavigateToEntityRecord( {
+								postId: templatePartId,
+								postType: 'wp_template_part',
+							} );
+							onClose();
+						} }
+					>
+						{ __( 'Edit in isolation' ) }
+					</MenuItem>
+				</MenuGroup>
+			) }
+		</ToolbarDropdownMenu>
+	);
+}
+
 /**
  * Component that renders the "Edit navigation" button for template parts
  * that contain navigation blocks.
@@ -36,7 +94,9 @@ const BLOCK_INSPECTOR_AREA = 'edit-post/block';
 function TemplatePartNavigationEditButton( { clientId } ) {
 	const registry = useRegistry();
 	const { selectBlock, flashBlock } = useDispatch( blockEditorStore );
-	const { requestInspectorTab } = unlock( useDispatch( blockEditorStore ) );
+	const { editContentOnlySection, requestInspectorTab } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
 	const {
@@ -81,6 +141,7 @@ function TemplatePartNavigationEditButton( { clientId } ) {
 			// InspectorControlsTabs mounts. Without this, the Content tab flashes
 			// before animating to List View.
 			registry.batch( () => {
+				editContentOnlySection( clientId );
 				selectBlock( firstNavigationBlockId );
 				flashBlock( firstNavigationBlockId, 500 );
 				enableComplementaryArea( 'core', BLOCK_INSPECTOR_AREA );
@@ -91,7 +152,9 @@ function TemplatePartNavigationEditButton( { clientId } ) {
 		}
 	}, [
 		firstNavigationBlockId,
+		clientId,
 		registry,
+		editContentOnlySection,
 		selectBlock,
 		flashBlock,
 		enableComplementaryArea,
@@ -104,16 +167,12 @@ function TemplatePartNavigationEditButton( { clientId } ) {
 	}
 
 	return (
-		<BlockToolbarLastItem>
-			<ToolbarGroup>
-				<ToolbarButton
-					label={ __( 'Edit navigation' ) }
-					onClick={ onEditNavigation }
-				>
-					{ __( 'Edit navigation' ) }
-				</ToolbarButton>
-			</ToolbarGroup>
-		</BlockToolbarLastItem>
+		<ToolbarButton
+			label={ __( 'Edit navigation' ) }
+			onClick={ onEditNavigation }
+		>
+			{ __( 'Edit navigation' ) }
+		</ToolbarButton>
 	);
 }
 
@@ -128,9 +187,16 @@ const withTemplatePartNavigationEditButton = createHigherOrderComponent(
 			<>
 				<BlockEdit key="edit" { ...props } />
 				{ props.isSelected && isTemplatePart && (
-					<TemplatePartNavigationEditButton
-						clientId={ props.clientId }
-					/>
+					<BlockToolbarLastItem>
+						<ToolbarGroup>
+							<TemplatePartOptionsMenu
+								attributes={ props.attributes }
+							/>
+							<TemplatePartNavigationEditButton
+								clientId={ props.clientId }
+							/>
+						</ToolbarGroup>
+					</BlockToolbarLastItem>
 				) }
 			</>
 		);

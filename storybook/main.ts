@@ -12,6 +12,26 @@ import dsTokenFallbacksJs from '@wordpress/theme/vite-plugins/vite-ds-token-fall
 
 const { NODE_ENV = 'development' } = process.env;
 
+type GutenbergStorybookFeatures = NonNullable<
+	StorybookConfig[ 'features' ]
+> & {
+	componentsManifest?: boolean;
+};
+
+const features: GutenbergStorybookFeatures = {
+	componentsManifest: NODE_ENV !== 'development',
+	// Use experimental TypeScript LanguageService prop extractor for the
+	// components manifest to improve performance and accuracy.
+	//
+	// This only applies to the components manifest and not the Storybook
+	// UI. Storybook describes this extractor as the "successor" of both
+	// `react-docgen` and `react-docgen-typescript`, but it currently only
+	// applies to the manifest.
+	//
+	// See: https://github.com/storybookjs/storybook/issues/34824
+	experimentalReactComponentMeta: true,
+};
+
 const stories = [
 	'./stories/playground/**/*.story.@(jsx|tsx)',
 	'./stories/**/*.mdx',
@@ -55,19 +75,7 @@ const config: StorybookConfig = {
 		import.meta.resolve( './addons/design-system-theme/preset.ts' ),
 	],
 	framework: '@storybook/react-vite',
-	features: {
-		componentsManifest: NODE_ENV !== 'development',
-		// Use experimental TypeScript LanguageService prop extractor for the
-		// components manifest to improve performance and accuracy.
-		//
-		// This only applies to the components manifest and not the Storybook
-		// UI. Storybook describes this extractor as the "successor" of both
-		// `react-docgen` and `react-docgen-typescript`, but it currently only
-		// applies to the manifest.
-		//
-		// See: https://github.com/storybookjs/storybook/issues/34824
-		experimentalReactComponentMeta: true,
-	},
+	features,
 	typescript: {
 		reactDocgen: 'react-docgen-typescript',
 		// Should match defaults in Storybook except for the propFilter.

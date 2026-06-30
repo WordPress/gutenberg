@@ -1,7 +1,8 @@
 @use "@wordpress/base-styles/variables";
+@use "@wordpress/base-styles/mixins";
 
 .boot-sidebar__scrollable {
-	overflow: auto;
+	overflow: hidden;
 	height: 100%;
 	position: relative;
 	display: flex;
@@ -10,14 +11,153 @@
 
 .boot-sidebar__content {
 	flex-grow: 1;
+	min-height: 0;
 	contain: content;
 	position: relative;
 }
 
 .boot-sidebar__footer {
-	padding: variables.$grid-unit-20 variables.$grid-unit-10 variables.$grid-unit-10 variables.$grid-unit-20;
+	border-top: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
+	padding: variables.$grid-unit-10 variables.$grid-unit-15;
+	flex-shrink: 0;
 }
 
-.boot-sidebar__back-button {
-	margin: variables.$grid-unit-20 variables.$grid-unit-15 variables.$grid-unit-10 variables.$grid-unit-15;
+.boot-sidebar__footer-content {
+	display: flex;
+	flex-direction: column;
+	gap: variables.$grid-unit-05;
+	align-items: stretch;
+}
+
+.boot-sidebar__footer-navigation {
+	display: flex;
+	gap: variables.$grid-unit-05;
+	align-items: center;
+	justify-content: space-between;
+
+	.components-button {
+		color: var(--wpds-color-foreground-interactive-neutral);
+
+		&:hover,
+		&:focus {
+			color: var(--wpds-color-foreground-interactive-neutral);
+		}
+	}
+}
+
+.boot-sidebar__wp-admin-button.components-button {
+	justify-content: flex-start;
+	flex-grow: 1;
+}
+
+.boot-sidebar__save-button {
+	display: flex;
+	justify-content: flex-end;
+}
+
+.boot-sidebar__footer-actions {
+	display: flex;
+	justify-content: space-between;
+	gap: variables.$grid-unit-10;
+}
+
+.boot-sidebar__top-spacer {
+	flex-shrink: 0;
+	height: variables.$grid-unit-30;
+}
+
+.boot-sidebar-customize {
+	display: flex;
+	flex-direction: column;
+	gap: variables.$grid-unit-15;
+	height: 100%;
+	min-height: 0;
+	overflow: hidden;
+	padding: variables.$grid-unit-15;
+}
+
+.boot-sidebar-customize__heading {
+	color: var(--wpds-color-foreground-content-neutral);
+	font-weight: variables.$font-weight-medium;
+	@include mixins.heading-medium();
+}
+
+.boot-sidebar-customize__sections {
+	display: flex;
+	flex-direction: column;
+	gap: variables.$grid-unit-15;
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow-y: auto;
+	padding-block-end: variables.$grid-unit-40;
+}
+
+.boot-sidebar-customize__section {
+	border: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
+	border-radius: var(--wpds-border-radius-sm);
+	background: var(--wpds-color-background-surface-neutral);
+	flex-shrink: 0;
+	overflow: hidden;
+
+	&.is-hidden {
+		opacity: 0.7;
+	}
+}
+
+.boot-sidebar-customize__section-header,
+.boot-sidebar-customize__item {
+	display: flex;
+	align-items: center;
+	gap: variables.$grid-unit-05;
+}
+
+.boot-sidebar-customize__section-header {
+	min-height: variables.$grid-unit-50;
+	padding: variables.$grid-unit-05 variables.$grid-unit-10;
+	border-bottom: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
+}
+
+.boot-sidebar-customize__section-title {
+	color: var(--wpds-color-foreground-content-neutral);
+	font-weight: variables.$font-weight-medium;
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.boot-sidebar-customize__section-items {
+	display: flex;
+	flex-direction: column;
+	padding-block: variables.$grid-unit-05;
+}
+
+.boot-sidebar-customize__item {
+	min-height: variables.$grid-unit-30;
+	padding: 0 variables.$grid-unit-10;
+
+	&.is-hidden {
+		opacity: 0.55;
+	}
+}
+
+.boot-sidebar-customize__drag-handle.components-button {
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	flex-shrink: 0;
+}
+
+.boot-sidebar-customize__item-label {
+	color: var(--wpds-color-foreground-content-neutral);
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.boot-sidebar-customize__empty-section {
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	padding: variables.$grid-unit-10 variables.$grid-unit-20;
+	@include mixins.caption-style();
 }

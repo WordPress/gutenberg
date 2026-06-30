@@ -19,18 +19,26 @@ import { unlock } from '../lock-unlock';
  * @param {string} [props.stylesId] - The ID of the user's global styles to use.
  * @return Editor settings.
  */
-export function useEditorSettings( { stylesId }: { stylesId: string } ) {
-	const { editorSettings } = useSelect(
-		( select ) => ( {
-			editorSettings: unlock(
-				select( coreDataStore )
-			).getEditorSettings(),
-		} ),
-		[]
-	);
+export function useEditorSettings( {
+	stylesId,
+}: {
+	stylesId?: string;
+} = {} ) {
+	const { editorSettings, globalStylesId } = useSelect( ( select ) => {
+		const coreDataSelect = unlock( select( coreDataStore ) );
+		return {
+			editorSettings: coreDataSelect.getEditorSettings(),
+			globalStylesId:
+				coreDataSelect.__experimentalGetCurrentGlobalStylesId(),
+		};
+	}, [] );
 
-	const { user: globalStyles } = useUserGlobalStyles( stylesId );
-	const [ globalStylesCSS ] = generateGlobalStyles( globalStyles );
+	const { user: globalStyles } = useUserGlobalStyles(
+		stylesId || globalStylesId
+	);
+	const [ globalStylesCSS = [] ] = globalStyles
+		? generateGlobalStyles( globalStyles )
+		: [];
 
 	const hasEditorSettings = !! editorSettings;
 	const styles = useMemo( () => {

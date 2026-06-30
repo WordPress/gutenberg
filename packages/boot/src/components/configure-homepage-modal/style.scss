@@ -1,0 +1,31 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
+.configure-homepage-modal__body {
+	display: flex;
+	flex-direction: column;
+	gap: $grid-unit-30;
+}
+
+.configure-homepage-modal__intro {
+	color: $gray-700;
+	margin: 0;
+}
+
+.configure-homepage-modal__static-fields {
+	display: flex;
+	flex-direction: column;
+	gap: $grid-unit-20;
+}
+
+.configure-homepage-modal__static-fields .components-base-control {
+	margin-bottom: 0;
+}
+
+.configure-homepage-modal__footer {
+	align-items: center;
+	display: flex;
+	gap: $grid-unit-10;
+	justify-content: flex-end;
+	margin-top: $grid-unit-30;
+}

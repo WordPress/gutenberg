@@ -137,6 +137,60 @@ export function useAvailableTemplates() {
 	);
 }
 
+export function usePageLayoutTemplates() {
+	const { postType, postId } = useEditedPostContext();
+	const [ postSlug ] = useEntityProp( 'postType', postType, 'slug', postId );
+	const allowSwitchingTemplate = useAllowSwitchingTemplates();
+	const templates = useTemplates( postType );
+	const defaultTemplate = useSelect(
+		( select ) => {
+			if ( postType !== 'page' ) {
+				return null;
+			}
+			const { getDefaultTemplateId, getEntityRecord } =
+				select( coreStore );
+			const slug = postSlug ? `page-${ postSlug }` : 'page';
+			const templateId =
+				getDefaultTemplateId( { slug } ) ||
+				getDefaultTemplateId( { slug: 'page' } );
+			if ( ! templateId ) {
+				return null;
+			}
+			return getEntityRecord( 'postType', 'wp_template', templateId );
+		},
+		[ postSlug, postType ]
+	);
+
+	return useMemo( () => {
+		if ( postType !== 'page' || ! allowSwitchingTemplate ) {
+			return [];
+		}
+
+		return [
+			defaultTemplate && {
+				...defaultTemplate,
+				isDefault: true,
+				layoutValue: '',
+				title: {
+					rendered: __( 'Default layout' ),
+				},
+			},
+			...( templates || [] )
+				.filter(
+					( template ) =>
+						template.is_custom &&
+						!! template.content?.raw &&
+						template.id !== defaultTemplate?.id &&
+						template.slug !== defaultTemplate?.slug
+				)
+				.map( ( template ) => ( {
+					...template,
+					layoutValue: template.slug,
+				} ) ),
+		].filter( Boolean );
+	}, [ allowSwitchingTemplate, defaultTemplate, postType, templates ] );
+}
+
 export function usePostTemplatePanelMode() {
 	return useSelect( ( select ) => {
 		const { getEditorSettings, getCurrentTemplateId, getCurrentPostType } =

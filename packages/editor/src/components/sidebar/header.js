@@ -16,7 +16,7 @@ import { sidebars } from './constants';
 
 const { Tabs } = unlock( componentsPrivateApis );
 
-const SidebarHeader = ( _, ref ) => {
+const SidebarHeader = ( { documentLabel: documentLabelOverride }, ref ) => {
 	const { postTypeLabel, isRevisionsMode } = useSelect( ( select ) => {
 		const { getPostTypeLabel } = select( editorStore );
 		const { isRevisionsMode: _isRevisionsMode } = unlock(
@@ -31,6 +31,8 @@ const SidebarHeader = ( _, ref ) => {
 	let documentLabel;
 	if ( isRevisionsMode ) {
 		documentLabel = __( 'Revision' );
+	} else if ( documentLabelOverride ) {
+		documentLabel = documentLabelOverride;
 	} else if ( postTypeLabel ) {
 		documentLabel = decodeEntities( postTypeLabel );
 	} else {

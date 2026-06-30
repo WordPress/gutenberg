@@ -10,7 +10,10 @@ import { useCallback, useContext, useEffect, useRef } from '@wordpress/element';
 import { isRTL, __, _x } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import {
+	PanelBody,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { store as interfaceStore } from '@wordpress/interface';
 
 /**
@@ -21,6 +24,11 @@ import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
 import PluginSidebar from '../plugin-sidebar';
 import PostSummary from './post-summary';
 import PostRevisionSummary from './post-revision-summary';
+import InlineTemplatePartSummary from './inline-template-part-summary';
+import PageLayoutPanel from '../post-template/page-layout-panel';
+import PostCardPanel from '../post-card-panel';
+import PostPanelSection from '../post-panel-section';
+import PostStatusPanel from '../post-status';
 import PostTaxonomiesPanel from '../post-taxonomies/panel';
 import PostTransformPanel from '../post-transform-panel';
 import SidebarHeader from './header';
@@ -32,6 +40,7 @@ import useAutoSwitchEditorSidebars from '../provider/use-auto-switch-editor-side
 import { sidebars } from './constants';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
+import useActiveEditorEntity from '../use-active-editor-entity';
 import {
 	NAVIGATION_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
@@ -41,6 +50,32 @@ import {
 const { Tabs } = unlock( componentsPrivateApis );
 
 const SIDEBAR_ACTIVE_BY_DEFAULT = true;
+const PAGE_DETAILS_EXCLUDED_FIELD_IDS = [ 'status' ];
+
+const PageSidebarOverview = ( { onActionPerformed } ) => {
+	const { postType, postId } = useSelect( ( select ) => {
+		const { getCurrentPostType, getCurrentPostId } = select( editorStore );
+		return {
+			postType: getCurrentPostType(),
+			postId: getCurrentPostId(),
+		};
+	}, [] );
+
+	if ( postType !== 'page' ) {
+		return null;
+	}
+
+	return (
+		<PostPanelSection className="editor-sidebar__page-overview">
+			<PostCardPanel
+				postType={ postType }
+				postId={ postId }
+				onActionPerformed={ onActionPerformed }
+			/>
+			<PostStatusPanel />
+		</PostPanelSection>
+	);
+};
 
 const SidebarContent = ( {
 	tabName,
@@ -48,6 +83,7 @@ const SidebarContent = ( {
 	onActionPerformed,
 	extraPanels,
 	postType,
+	activeEntity,
 } ) => {
 	const tabListRef = useRef( null );
 	// Because `PluginSidebar` renders a `ComplementaryArea`, we
@@ -88,12 +124,46 @@ const SidebarContent = ( {
 	let tabContent;
 	if ( isRevisionsMode ) {
 		tabContent = <PostRevisionSummary />;
-	} else {
+	} else if ( activeEntity.isInlineTemplatePart ) {
 		tabContent = (
 			<>
-				<PostSummary onActionPerformed={ onActionPerformed } />
-				<PluginDocumentSettingPanel.Slot />
+				<InlineTemplatePartSummary
+					activeEntity={ activeEntity }
+					onActionPerformed={ onActionPerformed }
+				/>
+				<TemplatePartContentPanel postType={ activeEntity.postType } />
+			</>
+		);
+	} else {
+		const isPageEntity = postType === 'page';
+		const postSummary = (
+			<PostSummary onActionPerformed={ onActionPerformed } />
+		);
+		const pageDetailsPanel = (
+			<PanelBody
+				title={ __( 'Details' ) }
+				initialOpen={ false }
+				className="editor-sidebar__details-panel"
+			>
+				<PostSummary
+					onActionPerformed={ onActionPerformed }
+					hidePostCard
+					excludedFieldIds={ PAGE_DETAILS_EXCLUDED_FIELD_IDS }
+				/>
+			</PanelBody>
+		);
+		tabContent = (
+			<>
+				{ isPageEntity ? (
+					<PageSidebarOverview
+						onActionPerformed={ onActionPerformed }
+					/>
+				) : (
+					postSummary
+				) }
+				{ isPageEntity && <PageLayoutPanel /> }
 				<TemplateContentPanel />
+				<PluginDocumentSettingPanel.Slot />
 				{ window?.__experimentalDataFormInspector &&
 					[ 'page', 'post' ].includes( postType ) && (
 						<TemplateActionsPanel />
@@ -103,6 +173,7 @@ const SidebarContent = ( {
 				<PostTaxonomiesPanel />
 				<PatternOverridesPanel />
 				{ extraPanels }
+				{ isPageEntity && pageDetailsPanel }
 			</>
 		);
 	}
@@ -112,7 +183,10 @@ const SidebarContent = ( {
 			identifier={ tabName }
 			header={
 				<Tabs.Context.Provider value={ tabsContextValue }>
-					<SidebarHeader ref={ tabListRef } />
+					<SidebarHeader
+						ref={ tabListRef }
+						documentLabel={ activeEntity.postTypeLabel }
+					/>
 				</Tabs.Context.Provider>
 			}
 			closeLabel={ __( 'Close Settings' ) }
@@ -144,6 +218,7 @@ const SidebarContent = ( {
 
 const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 	useAutoSwitchEditorSidebars();
+	const activeEntity = useActiveEditorEntity();
 	const { tabName, keyboardShortcut, showSummary, postType } = useSelect(
 		( select ) => {
 			const shortcut = select(
@@ -165,8 +240,6 @@ const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 					: sidebars.document;
 			}
 
-			const _postType = select( editorStore ).getCurrentPostType();
-
 			return {
 				tabName: _tabName,
 				keyboardShortcut: shortcut,
@@ -174,11 +247,11 @@ const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 					TEMPLATE_POST_TYPE,
 					TEMPLATE_PART_POST_TYPE,
 					NAVIGATION_POST_TYPE,
-				].includes( _postType ),
-				postType: _postType,
+				].includes( activeEntity.postType ),
+				postType: activeEntity.postType,
 			};
 		},
-		[]
+		[ activeEntity.postType ]
 	);
 
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
@@ -205,6 +278,7 @@ const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 				onActionPerformed={ onActionPerformed }
 				extraPanels={ extraPanels }
 				postType={ postType }
+				activeEntity={ activeEntity }
 			/>
 		</Tabs>
 	);

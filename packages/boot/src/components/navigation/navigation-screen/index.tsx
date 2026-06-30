@@ -101,6 +101,9 @@ export default function NavigationScreen( {
 					} }
 					style={ {
 						width: '100%',
+						height: '100%',
+						display: 'flex',
+						flexDirection: 'column',
 						gridColumn: '1',
 						gridRow: '1',
 					} }
