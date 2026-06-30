@@ -98,6 +98,12 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	keywords?: string[];
 
 	/**
+	 * Whether the widget render component supplies the section heading that
+	 * labels its host chrome.
+	 */
+	hasOwnHeading?: boolean;
+
+	/**
 	 * Widget version, used for asset cache invalidation.
 	 */
 	version?: string;
@@ -156,6 +162,11 @@ export interface WidgetRenderProps< Item = unknown > {
 	 * User-configured attributes for this widget instance.
 	 */
 	attributes: Item;
+
+	/**
+	 * Id for the widget's section heading when the widget owns that heading.
+	 */
+	titleId?: string;
 
 	/**
 	 * Updates the attributes of this instance. Optional because some

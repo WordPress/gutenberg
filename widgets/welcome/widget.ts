@@ -12,6 +12,7 @@ const widget = {
 	),
 	icon: 'wordpress',
 	category: 'dashboard',
+	hasOwnHeading: true,
 };
 
 export default widget;

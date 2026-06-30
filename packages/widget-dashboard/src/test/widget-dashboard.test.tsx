@@ -40,6 +40,10 @@ function TestWidget( {
 	);
 }
 
+function OwnHeadingWidget( { titleId }: WidgetRenderProps ) {
+	return <h2 id={ titleId }>Howdy, admin</h2>;
+}
+
 const widgetTypes: WidgetType[] = [
 	{
 		apiVersion: 1,
@@ -47,12 +51,27 @@ const widgetTypes: WidgetType[] = [
 		title: 'Greet',
 		renderModule: 'test-greet-module',
 	},
+	{
+		apiVersion: 1,
+		name: 'test/own-heading',
+		title: 'Welcome',
+		renderModule: 'test-own-heading-module',
+		presentation: 'full-bleed',
+		hasOwnHeading: true,
+	},
 ];
 
 const resolveWidgetModule: ResolveWidgetModule = async ( id ) => {
 	if ( id === 'test-greet-module' ) {
 		return {
 			default: TestWidget as ComponentType<
+				WidgetRenderProps< unknown >
+			>,
+		};
+	}
+	if ( id === 'test-own-heading-module' ) {
+		return {
+			default: OwnHeadingWidget as ComponentType<
 				WidgetRenderProps< unknown >
 			>,
 		};
@@ -182,6 +201,36 @@ describe( 'WidgetDashboard', () => {
 		expect( screen.getByText( 'does/not-exist' ) ).toBeInTheDocument();
 		expect(
 			screen.queryByRole( 'heading', { level: 2 } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'allows a full-bleed widget to provide the heading for its region', async () => {
+		render(
+			<WidgetDashboard
+				layout={ [
+					{
+						uuid: 'w1',
+						type: 'test/own-heading',
+						placement: { width: 1, height: 1 },
+					},
+				] }
+				onLayoutChange={ () => {} }
+				widgetTypes={ widgetTypes }
+				resolveWidgetModule={ resolveWidgetModule }
+			/>
+		);
+
+		expect(
+			await screen.findByRole( 'heading', {
+				level: 2,
+				name: 'Howdy, admin',
+			} )
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'region', { name: 'Howdy, admin' } )
+		).toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'heading', { name: 'Welcome' } )
 		).not.toBeInTheDocument();
 	} );
 
