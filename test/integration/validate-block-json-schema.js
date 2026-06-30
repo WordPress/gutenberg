@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Validates all block.json files in the repo against the block.json schema.
  *
@@ -34,5 +35,9 @@ for ( const f of files ) {
 	}
 }
 
-console.log( `\nResults: ${ files.length } files found, ${ failed } failed, ${ files.length - failed } passed.` );
+console.log(
+	`\nResults: ${ files.length } files found, ${ failed } failed, ${
+		files.length - failed
+	} passed.`
+);
 process.exit( failed > 0 ? 1 : 0 );
