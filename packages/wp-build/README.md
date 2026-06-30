@@ -514,7 +514,7 @@ The canvas is a full-screen area typically used for editor previews. To use a cu
 Export a `route` object with optional hooks. Each hook receives `{ params, search }` — path parameters and query string values from the URL.
 
 - **`beforeLoad`** — Runs before navigation completes. Use for auth checks, validation, or redirects. Throw `redirect()` or `notFound()` from `@wordpress/route` to abort navigation.
-- **`loader`** — Runs while the route is loading. Use to preload data (for example, `resolveSelect` from `@wordpress/data`) so `stage` components can read from the store without a loading state. May return an object whose properties are merged into the route's loader data. For data that must be available before the SPA loads, use [`rest_preload_api_request()`](https://developer.wordpress.org/reference/functions/rest_preload_api_request/) in your page's PHP render callback instead.
+- **`loader`** — Runs while the route is loading. Use to preload data (for example, `resolveSelect` from `@wordpress/data`) so `stage` components can read from the store without a loading state. May return an object whose properties are merged into the route's loader data. For data that must be available before the JavaScript application loads, use [`rest_preload_api_request()`](https://developer.wordpress.org/reference/functions/rest_preload_api_request/) in your page's PHP render callback instead.
 - **`canvas`** — Runs in parallel with `loader`. Controls which canvas is rendered depending on return values:
     - `CanvasData` (`{ postType, postId, isPreview?, editLink? }`) → default WordPress editor canvas
     - `null` → custom `canvas.tsx` component (if provided)
