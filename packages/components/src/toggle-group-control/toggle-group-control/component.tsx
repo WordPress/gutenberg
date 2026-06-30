@@ -22,12 +22,15 @@ import { ToggleGroupControlAsRadioGroup } from './as-radio-group';
 import { ToggleGroupControlAsButtonGroup } from './as-button-group';
 import { useTrackElementOffsetRect } from '../../utils/element-rect';
 import { useAnimatedOffsetRect } from '../../utils/hooks/use-animated-offset-rect';
+
 function UnconnectedToggleGroupControl(
 	props: WordPressComponentProps< ToggleGroupControlProps, 'div', false >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {
-		__nextHasNoMarginBottom: _, // Prevent passing this to the internal component
+		// Prevent passing legacy props to internal component.
+		__nextHasNoMarginBottom: _,
+		size: _size,
 		__next40pxDefaultSize: _next40pxDefaultSize,
 		__shouldNotWarnDeprecated36pxSize: _shouldNotWarnDeprecated36pxSize,
 		className,
@@ -39,7 +42,6 @@ function UnconnectedToggleGroupControl(
 		hideLabelFromVision = false,
 		help,
 		onChange,
-		size = 'default',
 		value,
 		children,
 		...otherProps
@@ -51,8 +53,6 @@ function UnconnectedToggleGroupControl(
 		label,
 		hideLabelFromVision,
 	} );
-
-	const normalizedSize = size === 'default' ? '__unstable-large' : size;
 
 	const [ selectedElement, setSelectedElement ] = useState< HTMLElement >();
 	const [ controlElement, setControlElement ] = useState< HTMLElement >();
@@ -75,12 +75,11 @@ function UnconnectedToggleGroupControl(
 				styles.toggleGroupControl( {
 					isBlock,
 					isDeselectable,
-					size: normalizedSize,
 				} ),
 				isBlock && styles.block,
 				className
 			),
-		[ className, cx, isBlock, isDeselectable, normalizedSize ]
+		[ className, cx, isBlock, isDeselectable ]
 	);
 
 	const MainControl = isDeselectable
@@ -100,7 +99,6 @@ function UnconnectedToggleGroupControl(
 				label={ label }
 				onChange={ onChange }
 				ref={ refs }
-				size={ normalizedSize }
 				value={ value }
 			>
 				{ children }
