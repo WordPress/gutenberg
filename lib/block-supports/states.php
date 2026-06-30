@@ -658,7 +658,7 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 				)
 			);
 		}
-		$selector   = gutenberg_build_state_selector(
+		$selector             = gutenberg_build_state_selector(
 			".$unique_class",
 			$rule['selector'],
 			$rule['state']
