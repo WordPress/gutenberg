@@ -1,7 +1,5 @@
 /**
  * Validates all block.json files in the repo against the block.json schema.
- *
- * Usage: node test/integration/validate-block-json-schema.js
  */
 const Ajv = require( 'ajv' );
 const glob = require( 'fast-glob' );
