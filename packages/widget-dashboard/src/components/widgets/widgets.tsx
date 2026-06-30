@@ -135,10 +135,8 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 			);
 			const hasSettings = !! widgetType?.attributes?.length;
 
-			// The grid lifts this into a sibling slot outside the card's
-			// edit-mode `inert`, so it stays interactive. The header overlay
-			// holds the toolbar with the active mode's controls: layout while
-			// customizing, the settings gear otherwise.
+			// Grid-slot overlay (outside the card's `inert`) with the active
+			// mode's controls: layout while customizing, the gear otherwise.
 			let controls: React.ReactNode;
 			if ( editMode ) {
 				controls = <WidgetLayoutControls widget={ widget } />;

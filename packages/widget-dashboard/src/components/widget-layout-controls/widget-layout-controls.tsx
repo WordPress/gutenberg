@@ -22,14 +22,14 @@ type NamedGridWidth = Exclude<
 >;
 
 export interface WidgetLayoutControlsProps {
-	/** The instance these controls manage within the layout. */
+	/**
+	 * The instance these controls manage within the layout.
+	 */
 	widget: DashboardWidget< unknown >;
 }
 
 /**
- * Customize-mode controls: a width menu and removal, editing the widget's place
- * in the layout. Rendered inside the toolbar; the `WidgetHeader` overlay keeps
- * them interactive while the card is `inert`.
+ * Customize-mode controls: width menu and removal.
  *
  * @param {WidgetLayoutControlsProps} props Component props.
  */

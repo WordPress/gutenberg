@@ -1,24 +1,23 @@
-/*
- * The per-tile toolbar chip holds the active mode's controls; the `WidgetHeader`
- * overlay positions it on the tile.
+/**
+ * Toolbar chip holding the active mode's controls.
  */
 .widgetToolbar {
 	padding: var(--wpds-dimension-padding-xs);
 	border-radius: var(--wpds-border-radius-md);
 }
 
-/* Customize: a solid surface, visible for the whole session. */
+/**
+ * Customize: solid, always visible.
+ */
 .solid {
 	background: var(--wpds-color-background-surface-neutral-strong);
 	border: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
 	box-shadow: var(--wpds-elevation-xs);
 }
 
-/*
- * Normal: a faint surface, hidden until the tile is hovered or focused, the way
- * the gear reveals on trunk. Hidden via opacity (not display) so it stays
- * tab-reachable; the matched ancestor is the grid item shared by the slot and
- * the card.
+/**
+ * Normal: faint, revealed on tile hover/focus. Opacity (not display) keeps it
+ * tab-reachable.
  */
 .subtle {
 	background: color-mix(in srgb, var(--wpds-color-background-surface-neutral) 40%, transparent);

@@ -15,23 +15,20 @@ import { Stack } from '@wordpress/ui';
 import styles from './widget-toolbar.module.css';
 
 export interface WidgetToolbarProps {
-	/** The active mode's controls. */
+	/**
+	 * The active mode's controls.
+	 */
 	children: ReactNode;
 
 	/**
-	 * Use the subtle surface revealed on tile hover/focus (normal mode).
-	 * Defaults to the solid surface that stays visible (customize mode).
+	 * Subtle hover-revealed surface (normal) vs solid always-visible (customize).
 	 */
 	revealOnHover?: boolean;
 }
 
 /**
- * The single per-tile toolbar: a chip that holds the active mode's controls
- * (layout while customizing, the settings gear otherwise). The `WidgetHeader`
- * overlay positions it on the tile; this provides the chip surface and the
- * controls row. The solid surface stays visible through a customize session;
- * the subtle surface is revealed on tile hover, the way the gear behaves in
- * normal mode.
+ * The per-tile toolbar chip holding the active mode's controls. Solid and always
+ * visible while customizing; subtle and revealed on hover in normal mode.
  *
  * @param {WidgetToolbarProps} props Component props.
  */
