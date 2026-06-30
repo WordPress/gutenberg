@@ -145,3 +145,11 @@ export const WithIcon: Story = {
 		),
 	},
 };
+
+export const OpenInNewTab: Story = {
+	args: {
+		children: 'Get started',
+		href: 'https://make.wordpress.org/',
+		openInNewTab: true,
+	},
+};

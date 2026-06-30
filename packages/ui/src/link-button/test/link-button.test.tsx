@@ -35,4 +35,55 @@ describe( 'LinkButton', () => {
 			screen.getByRole( 'link', { name: 'Go to example' } )
 		).toHaveClass( customClass );
 	} );
+
+	describe( 'openInNewTab', () => {
+		it( 'sets target="_blank" when true', () => {
+			render(
+				<LinkButton href="https://example.com" openInNewTab>
+					External
+				</LinkButton>
+			);
+
+			expect( screen.getByRole( 'link' ) ).toHaveAttribute(
+				'target',
+				'_blank'
+			);
+		} );
+
+		it( 'does not set target="_blank" when false', () => {
+			render(
+				<LinkButton href="https://example.com">External</LinkButton>
+			);
+
+			expect( screen.getByRole( 'link' ) ).not.toHaveAttribute(
+				'target'
+			);
+		} );
+
+		it( 'renders an accessible arrow indicator', () => {
+			render(
+				<LinkButton href="https://example.com" openInNewTab>
+					External
+				</LinkButton>
+			);
+
+			expect(
+				screen.getByLabelText( '(opens in a new tab)' )
+			).toBeVisible();
+		} );
+
+		it( 'includes the new tab notice in the link name', () => {
+			render(
+				<LinkButton href="https://example.com" openInNewTab>
+					External
+				</LinkButton>
+			);
+
+			expect(
+				screen.getByRole( 'link', {
+					name: 'External (opens in a new tab)',
+				} )
+			).toBeVisible();
+		} );
+	} );
 } );

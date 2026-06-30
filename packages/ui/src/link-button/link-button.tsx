@@ -1,11 +1,9 @@
-import { useRender, mergeProps } from '@base-ui/react';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
+import { Link } from '../link';
 import { type LinkButtonProps } from './types';
 import buttonStyles from '../button/style.module.css';
-import resetStyles from '../utils/css/resets.module.css';
 import focusStyles from '../utils/css/focus.module.css';
-import defenseStyles from '../utils/css/global-css-defense.module.css';
 import styles from './style.module.css';
 
 /**
@@ -23,33 +21,31 @@ export const LinkButton = forwardRef< HTMLAnchorElement, LinkButtonProps >(
 			size = 'default',
 			className,
 			children,
+			openInNewTab = false,
 			render,
 			...props
 		},
 		ref
 	) {
-		const mergedClassName = clsx(
-			defenseStyles.a,
-			styles[ 'link-button' ],
-			resetStyles[ 'box-sizing' ],
-			focusStyles[ 'outset-ring--focus-except-active' ],
-			variant !== 'unstyled' && buttonStyles.button,
-			buttonStyles[ `is-${ tone }` ],
-			buttonStyles[ `is-${ variant }` ],
-			buttonStyles[ `is-${ size }` ],
-			className
+		return (
+			<Link
+				ref={ ref }
+				variant="unstyled"
+				openInNewTab={ openInNewTab }
+				render={ render }
+				className={ clsx(
+					styles[ 'link-button' ],
+					focusStyles[ 'outset-ring--focus-except-active' ],
+					variant !== 'unstyled' && buttonStyles.button,
+					buttonStyles[ `is-${ tone }` ],
+					buttonStyles[ `is-${ variant }` ],
+					buttonStyles[ `is-${ size }` ],
+					className
+				) }
+				{ ...props }
+			>
+				{ children }
+			</Link>
 		);
-
-		const element = useRender( {
-			render,
-			defaultTagName: 'a',
-			ref,
-			props: mergeProps< 'a' >( props, {
-				className: mergedClassName,
-				children,
-			} ),
-		} );
-
-		return element;
 	}
 );

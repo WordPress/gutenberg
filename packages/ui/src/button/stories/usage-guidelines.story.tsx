@@ -79,7 +79,7 @@ export const UseLinkButtonForNavigation: Story = {
 				button styling matches the surrounding UI.
 			</Text>
 			<div>
-				<LinkButton href="https://make.wordpress.org/">
+				<LinkButton href="https://make.wordpress.org/" openInNewTab>
 					Get started
 				</LinkButton>
 			</div>
