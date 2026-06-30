@@ -27,6 +27,8 @@ export function useHasEditableRoot() {
 			getBlockName,
 			getBlockEditingMode,
 			getBlockMode,
+			getBlockRootClientId,
+			getBlockOrder,
 		} = select( blockEditorStore );
 		const clientId = getSelectedBlockClientId();
 		return {
@@ -42,7 +44,12 @@ export function useHasEditableRoot() {
 					getBlockName( clientId ),
 					'editableRoot',
 					false
-				),
+				) &&
+				// Only host when the block has sibling blocks for a native
+				// selection to extend into. A lone block (e.g. a single
+				// paragraph nested in an HTML block) is edited on its own
+				// element, not through a canvas-wide editing host.
+				getBlockOrder( getBlockRootClientId( clientId ) ).length > 1,
 		};
 	}, [] );
 }

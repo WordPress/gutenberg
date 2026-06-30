@@ -141,6 +141,8 @@ export default function useSelectionObserver() {
 		getSelectionStart,
 		getSelectionEnd,
 		getSelectedBlockClientId,
+		getBlockRootClientId,
+		getBlockOrder,
 	} = useSelect( blockEditorStore );
 	return useRefEffect(
 		( node ) => {
@@ -209,7 +211,13 @@ export default function useSelectionObserver() {
 							getBlockName( collapsedClientId ),
 							'editableRoot',
 							false
-						)
+						) &&
+						// Only host when the block has sibling blocks for a
+						// native selection to extend into; a lone block is
+						// edited on its own element.
+						getBlockOrder(
+							getBlockRootClientId( collapsedClientId )
+						).length > 1
 					) {
 						setContentEditableWrapper( node, true );
 
