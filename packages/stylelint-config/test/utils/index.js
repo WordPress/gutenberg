@@ -28,26 +28,19 @@ const generateStylelintCommand = ( filename ) =>
 	' --ignore-path ' +
 	path.resolve( __dirname, '../', './.stylelintignore' );
 
-/*
- * Stylelint writes its JSON report to stderr as the final line; earlier lines
- * may carry plugin deprecation warnings.
- */
-const parseResults = ( stderr ) =>
-	JSON.parse( stderr.trim().split( /\r?\n/ ).at( -1 ) );
-
 module.exports = {
 	getStylelintResult: ( filename ) =>
 		execute( generateStylelintCommand( filename ) )
 			.then( ( { stderr } ) => {
 				return {
 					errored: false,
-					results: parseResults( stderr ),
+					results: JSON.parse( stderr ),
 				};
 			} )
 			.catch( ( { stderr } ) => {
 				return {
 					errored: true,
-					results: parseResults( stderr ),
+					results: JSON.parse( stderr ),
 				};
 			} ),
 };
