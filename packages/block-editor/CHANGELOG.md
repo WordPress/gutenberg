@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Writing Flow: Clamp the selection end offset to the rich text content length when a forward selection overshoots past the element, so a single-block selection no longer collapses to its start ([#79704](https://github.com/WordPress/gutenberg/pull/79704)).
 -   `useTypingObserver`: Capture the window reference at mount and reuse it during cleanup so the ref cleanup no longer reads `node.ownerDocument.defaultView` (which is `null` once the iframe-hosted editor has been detached from its window) and throws, which was also leaking the `removeEventListener` calls that follow it ([#78772](https://github.com/WordPress/gutenberg/pull/78772)).
 
 ### Breaking Changes
