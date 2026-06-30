@@ -247,7 +247,14 @@ export default function useSelectionObserver() {
 									attributeKey:
 										richTextElement.dataset
 											.wpBlockAttributeKey,
-									offset: richTextData.end,
+									// A forward selection can overshoot past the
+									// element (e.g. ending at offset 0 of the next
+									// block), leaving the end undefined. That means
+									// the selection reaches through the end of this
+									// element's content; clamp it like the start.
+									offset:
+										richTextData.end ??
+										richTextData.text.length,
 								},
 							} );
 						} else {
