@@ -3,6 +3,7 @@ import { toggleFormat } from '@wordpress/rich-text';
 import {
 	RichTextToolbarButton,
 	RichTextShortcut,
+	// @ts-ignore
 } from '@wordpress/block-editor';
 import { formatStrikethrough } from '@wordpress/icons';
 import type { StrikethroughEditProps } from '../types';

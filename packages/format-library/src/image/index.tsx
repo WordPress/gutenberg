@@ -13,8 +13,13 @@ import {
 	MediaUpload,
 	RichTextToolbarButton,
 	MediaUploadCheck,
+	// @ts-ignore
 } from '@wordpress/block-editor';
 
+/**
+ * Internal dependencies
+ */
+import type { EditImageProps } from '../types';
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 const name = 'core/image';
@@ -26,12 +31,12 @@ const RichTextToolbarButtonUnsafe =
 /**
  * Extracts the image ID from the className attribute.
  *
- * @param {Object} activeObjectAttributes The attributes of the active object.
- * @return {number|undefined} The extracted image ID or undefined if not found.
+ * @param activeObjectAttributes The attributes of the active object.
+ * @return The extracted image ID or undefined if not found.
  */
 function getCurrentImageId(
 	activeObjectAttributes: EditImageProps[ 'activeObjectAttributes' ]
-) {
+): number | undefined {
 	if ( ! activeObjectAttributes?.className ) {
 		return undefined;
 	}

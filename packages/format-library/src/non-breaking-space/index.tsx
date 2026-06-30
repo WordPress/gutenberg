@@ -1,5 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { insert } from '@wordpress/rich-text';
+// @ts-ignore
 import { RichTextShortcut } from '@wordpress/block-editor';
 
 /**

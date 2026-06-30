@@ -18,6 +18,7 @@ import {
 import {
 	LinkControl,
 	store as blockEditorStore,
+	// @ts-ignore
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import type { RichTextValue } from '@wordpress/rich-text';

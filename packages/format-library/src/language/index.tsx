@@ -1,4 +1,5 @@
 import { __ } from '@wordpress/i18n';
+// @ts-ignore
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import {
 	TextControl,

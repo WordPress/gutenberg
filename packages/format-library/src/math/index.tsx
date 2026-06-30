@@ -7,6 +7,7 @@ import {
 	getTextContent,
 	useAnchor,
 } from '@wordpress/rich-text';
+// @ts-ignore
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import {
 	Popover,

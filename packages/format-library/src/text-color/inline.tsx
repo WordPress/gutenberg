@@ -12,6 +12,7 @@ import {
 	getColorObjectByColorValue,
 	getColorObjectByAttributeValues,
 	store as blockEditorStore,
+	// @ts-ignore
 } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
 import { Tabs } from '@wordpress/ui';

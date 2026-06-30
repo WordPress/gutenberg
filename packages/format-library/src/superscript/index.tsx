@@ -1,5 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { toggleFormat } from '@wordpress/rich-text';
+// @ts-ignore
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { superscript as superscriptIcon } from '@wordpress/icons';
 import type { SuperscriptEditProps } from '../types';

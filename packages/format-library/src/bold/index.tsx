@@ -4,6 +4,7 @@ import {
 	RichTextToolbarButton,
 	RichTextShortcut,
 	__unstableRichTextInputEvent,
+	// @ts-ignore
 } from '@wordpress/block-editor';
 import { formatBold } from '@wordpress/icons';
 
