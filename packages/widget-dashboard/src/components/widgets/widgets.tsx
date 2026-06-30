@@ -134,13 +134,11 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 				( type ) => type.name === widget.type
 			);
 			const hasSettings = !! widgetType?.attributes?.length;
-			const hasHighRelevanceAttributes = !! widgetType?.attributes?.some(
-				( attribute ) => attribute.relevance === 'high'
-			);
+			const isFullBleed = widgetType?.presentation === 'full-bleed';
 
-			// Grid-slot overlay (outside the card's `inert`) with the active
-			// mode's controls: layout while customizing, the attribute
-			// controls (high-relevance fields plus the gear) otherwise.
+			// The active mode's controls: layout while customizing, the
+			// attribute controls (high-relevance fields plus the gear)
+			// otherwise.
 			let controls: React.ReactNode;
 			if ( editMode ) {
 				controls = <WidgetLayoutControls widget={ widget } />;
@@ -153,17 +151,22 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 				);
 			}
 
-			const actionableArea = controls ? (
-				<WidgetHeader overlay>
-					<WidgetToolbar
-						revealOnHover={
-							! editMode && ! hasHighRelevanceAttributes
-						}
-					>
-						{ controls }
-					</WidgetToolbar>
-				</WidgetHeader>
+			const toolbar = controls ? (
+				<WidgetToolbar editMode={ editMode }>
+					{ controls }
+				</WidgetToolbar>
 			) : undefined;
+
+			// Normal mode hosts the toolbar in the in-card header, beside the
+			// identity. Customize controls and full-bleed widgets need it in
+			// the grid's actionable-area slot instead: the slot sits outside
+			// the draggable card, so the controls stay clickable (in-card they
+			// would be captured by the drag listeners).
+			const inSlot = editMode || isFullBleed;
+			const actionableArea =
+				inSlot && toolbar ? (
+					<WidgetHeader overlay>{ toolbar }</WidgetHeader>
+				) : undefined;
 
 			return (
 				<WidgetChrome
@@ -174,6 +177,7 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 						[ styles.tileEditMode ]: editMode,
 					} ) }
 					actionableArea={ actionableArea }
+					headerToolbar={ ! inSlot ? toolbar : undefined }
 				/>
 			);
 		} );
