@@ -1317,6 +1317,11 @@
 		"filePath": "library/repeat.svg"
 	},
 	{
+		"slug": "repeat-all",
+		"label": "Repeat All",
+		"filePath": "library/repeat-all.svg"
+	},
+	{
 		"slug": "replay",
 		"label": "Replay",
 		"filePath": "library/replay.svg"
