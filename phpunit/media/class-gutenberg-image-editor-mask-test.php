@@ -255,6 +255,48 @@ class Gutenberg_Image_Editor_Mask_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * When the site's output-format filter targets an alpha-capable format
+	 * (e.g. WebP), a masked edit should honor it rather than forcing PNG.
+	 */
+	public function test_edit_media_item_with_mask_honors_alpha_capable_output_format() {
+		$editor = $this->get_mask_editor( DIR_TESTDATA . '/images/canola.jpg' );
+		if ( is_wp_error( $editor ) || ! $editor->supports_mime_type( 'image/webp' ) ) {
+			$this->markTestSkipped( 'The image editor cannot output WebP.' );
+		}
+
+		wp_set_current_user( self::$admin_id );
+
+		$attachment_id = self::factory()->attachment->create_upload_object( DIR_TESTDATA . '/images/canola.jpg' );
+
+		$to_webp = static function () {
+			return array( 'image/jpeg' => 'image/webp' );
+		};
+		add_filter( 'image_editor_output_format', $to_webp );
+
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/edit" );
+		$request->set_body_params(
+			array(
+				'src'       => wp_get_attachment_image_url( $attachment_id, 'full' ),
+				'modifiers' => array(
+					array(
+						'type' => 'mask',
+						'args' => array( 'shape' => 'circle' ),
+					),
+				),
+			)
+		);
+
+		$response = rest_do_request( $request );
+
+		remove_filter( 'image_editor_output_format', $to_webp );
+
+		$data = $response->get_data();
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertSame( 'image/webp', $data['mime_type'] );
+		$this->assertStringEndsWith( '.webp', $data['source_url'] );
+	}
+
+	/**
 	 * Regression guard: an edit request without a mask modifier must delegate to
 	 * Core and keep the original (non-PNG) output format.
 	 */

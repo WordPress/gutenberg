@@ -19,10 +19,11 @@
  * - Non-mask edits keep using Core's `/edit` implementation.
  * - Mask edits use an adapted copy of Core's edit flow so the plugin can run
  *   on older WordPress versions without depending on native Core mask support.
- * - The circular PNG is created before the new attachment is inserted, so the
- *   request creates one attachment and one metadata set. This keeps the MVP
- *   close to the eventual Core shape while the implementation remains
- *   self-contained in Gutenberg.
+ * - The masked image is created in an alpha-capable format (honoring the
+ *   site's `image_editor_output_format`, falling back to PNG) before the new
+ *   attachment is inserted, so the request creates one attachment and one
+ *   metadata set. This keeps the MVP close to the eventual Core shape while the
+ *   implementation remains self-contained in Gutenberg.
  *
  * @see WP_REST_Attachments_Controller
  */
@@ -170,9 +171,8 @@ class Gutenberg_REST_Attachments_Controller_With_Mask extends WP_REST_Attachment
 		$image_editor = wp_get_image_editor(
 			$image_file_to_edit,
 			array(
-				'methods'          => array( 'mask' ),
-				'mime_type'        => $mime_type,
-				'output_mime_type' => 'image/png',
+				'methods'   => array( 'mask' ),
+				'mime_type' => $mime_type,
 			)
 		);
 		remove_filter( 'wp_image_editors', 'gutenberg_register_mask_image_editors' );
@@ -268,6 +268,27 @@ class Gutenberg_REST_Attachments_Controller_With_Mask extends WP_REST_Attachment
 			);
 		}
 
+		/*
+		 * Masking introduces transparency, so the saved image must use an
+		 * alpha-capable format. Honor the site's `image_editor_output_format`
+		 * choice when it can hold an alpha channel (e.g. WebP or AVIF), and
+		 * fall back to PNG otherwise (e.g. for JPEG, GIF, or the default
+		 * HEIC/HEIF -> JPEG mapping). The chosen format is forced for the save
+		 * below so a site filter cannot remap it back to an opaque format.
+		 */
+		$alpha_capable_mime_types = array( 'image/png', 'image/webp', 'image/avif' );
+		$output_format            = wp_get_image_editor_output_format( $image_file, $mime_type );
+		$output_mime_type         = $output_format[ $mime_type ] ?? $mime_type;
+
+		if (
+			! in_array( $output_mime_type, $alpha_capable_mime_types, true ) ||
+			! $image_editor->supports_mime_type( $output_mime_type )
+		) {
+			$output_mime_type = 'image/png';
+		}
+
+		$output_extension = wp_get_default_extension_for_mime_type( $output_mime_type );
+
 		// Calculate the file name.
 		$image_ext  = pathinfo( $image_file, PATHINFO_EXTENSION );
 		$image_name = wp_basename( $image_file, ".{$image_ext}" );
@@ -284,7 +305,7 @@ class Gutenberg_REST_Attachments_Controller_With_Mask extends WP_REST_Attachment
 			$image_name .= '-edited';
 		}
 
-		$filename = "{$image_name}.png";
+		$filename = "{$image_name}.{$output_extension}";
 
 		// Create the uploads subdirectory if needed.
 		$uploads = wp_upload_dir();
@@ -292,14 +313,18 @@ class Gutenberg_REST_Attachments_Controller_With_Mask extends WP_REST_Attachment
 		// Make the file name unique in the (new) upload directory.
 		$filename = wp_unique_filename( $uploads['path'], $filename );
 
-		// Save to disk as PNG so the circle mask can preserve transparency.
-		$saved = $image_editor->save( $uploads['path'] . "/$filename", 'image/png' );
+		/*
+		 * Save to disk in the negotiated alpha-capable format. Suppress the
+		 * output-format filter during the save so it cannot remap the chosen
+		 * format back to an opaque one, which would discard the mask.
+		 */
+		add_filter( 'image_editor_output_format', '__return_empty_array', 100 );
+		$saved = $image_editor->save( $uploads['path'] . "/$filename", $output_mime_type );
+		remove_filter( 'image_editor_output_format', '__return_empty_array', 100 );
 
 		if ( is_wp_error( $saved ) ) {
 			return $saved;
 		}
-
-		$saved['mime-type'] = 'image/png';
 
 		// Grab original attachment post so we can use it to set defaults.
 		$original_attachment_post = get_post( $attachment_id );
