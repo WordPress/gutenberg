@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Image: Remove the "Upload to Media Library" toolbar action for externally hosted (URL-inserted) images. It relied on the browser fetching the remote bytes, which is subject to CORS and fails entirely once the editor is cross-origin isolated ([#PRNUMBER](https://github.com/WordPress/gutenberg/pull/PRNUMBER)).
+-   Image: Remove the "Upload to Media Library" toolbar action for externally hosted (URL-inserted) images. It relied on the browser fetching the remote bytes, which is subject to CORS and fails entirely once the editor is cross-origin isolated ([#79717](https://github.com/WordPress/gutenberg/pull/79717)).
 
 ## 10.0.0 (2026-06-24)
 
