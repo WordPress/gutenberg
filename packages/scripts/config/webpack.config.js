@@ -375,10 +375,37 @@ const scriptConfig = {
 										iconPath.replace( 'file:', '' )
 									);
 									if ( existsSync( resolved ) ) {
-										return readFileSync( resolved, 'utf8' );
+										return sanitizeSvgContent(
+											readFileSync( resolved, 'utf8' )
+										);
 									}
 								}
 								return iconPath;
+							};
+
+							/**
+							 * Sanitize SVG content to remove dangerous elements.
+							 * Strips scripts, event handlers, and javascript: URLs.
+							 *
+							 * @param {string} svg Raw SVG content.
+							 * @return {string} Sanitized SVG content.
+							 */
+							const sanitizeSvgContent = ( svg ) => {
+								return svg
+									.replace( /<\?xml[^>]*\?>\s*/gi, '' )
+									.replace(
+										/<script[\s\S]*?<\/script>/gi,
+										''
+									)
+									.replace(
+										/\s+on\w+\s*=\s*["'][^"']*["']/gi,
+										''
+									)
+									.replace(
+										/\bhref\s*=\s*["']\s*javascript:/gi,
+										'href=""'
+									)
+									.trim();
 							};
 
 							if ( blockJson.icon ) {

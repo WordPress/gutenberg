@@ -16,7 +16,12 @@ import warning from '@wordpress/warning';
 /**
  * Internal dependencies
  */
-import { isValidIcon, normalizeIconObject, omit } from '../api/utils';
+import {
+	convertSvgStringToIconElement,
+	isValidIcon,
+	normalizeIconObject,
+	omit,
+} from '../api/utils';
 import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from '../api/constants';
 import type { BlockType, BlockCategory, BlockVariation } from '../types';
 
@@ -224,6 +229,9 @@ export const processBlockType =
 		}
 
 		settings.icon = normalizeIconObject( settings.icon );
+		settings.icon.src = convertSvgStringToIconElement(
+			settings.icon.src
+		) as typeof settings.icon.src;
 		if ( ! isValidIcon( settings.icon.src ) ) {
 			warning(
 				'The icon passed is invalid. ' +

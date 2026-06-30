@@ -21,7 +21,6 @@ import type { IconKey as DashiconIconKey } from '../dashicon/types';
 
 export type IconType =
 	| DashiconIconKey
-	| string
 	| ComponentType< { size?: number } >
 	| ( ( props: { size?: number } ) => React.JSX.Element )
 	| React.JSX.Element;
@@ -30,7 +29,7 @@ type AdditionalProps< T > = T extends ComponentType< infer U >
 	? U
 	: T extends DashiconIconKey
 	? SVGProps< SVGSVGElement >
-	: SVGProps< SVGSVGElement >;
+	: {};
 
 export type Props = {
 	/**
@@ -71,23 +70,9 @@ function Icon( {
 	...additionalProps
 }: Props ) {
 	if ( 'string' === typeof icon ) {
-		// Render SVG markup strings directly.
-		if ( icon.startsWith( '<svg' ) || icon.startsWith( '<?xml' ) ) {
-			const svg = icon.replace(
-				/<svg\s/i,
-				`<svg width="${ size }" height="${ size }" `
-			);
-			return (
-				<span
-					dangerouslySetInnerHTML={ { __html: svg } }
-					{ ...( additionalProps as HTMLProps< HTMLSpanElement > ) }
-				/>
-			);
-		}
-
 		return (
 			<Dashicon
-				icon={ icon as DashiconIconKey }
+				icon={ icon }
 				size={ size }
 				{ ...( additionalProps as HTMLProps< HTMLSpanElement > ) }
 			/>

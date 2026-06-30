@@ -106,41 +106,4 @@ describe( 'Icon', () => {
 
 		expect( screen.getByTestId( testId ) ).toHaveClass( className );
 	} );
-
-	it( 'renders an inline SVG string', () => {
-		const svgString =
-			'<svg viewBox="0 0 24 24"><path d="M5 4v3h5.5v12h3V7H19V4z"/></svg>';
-		render( <Icon data-testid={ testId } icon={ svgString } /> );
-
-		const wrapper = screen.getByTestId( testId );
-		expect( wrapper ).toBeVisible();
-		expect( wrapper ).toContainHTML(
-			'<svg width="20" height="20" viewBox="0 0 24 24"'
-		);
-	} );
-
-	it( 'renders an inline SVG string with custom size', () => {
-		const svgString =
-			'<svg viewBox="0 0 24 24"><path d="M5 4v3h5.5v12h3V7H19V4z"/></svg>';
-		render(
-			<Icon data-testid={ testId } icon={ svgString } size={ 32 } />
-		);
-
-		const wrapper = screen.getByTestId( testId );
-		expect( wrapper ).toContainHTML(
-			'<svg width="32" height="32" viewBox="0 0 24 24"'
-		);
-	} );
-
-	it( 'renders an SVG string with xml declaration', () => {
-		const svgString =
-			'<?xml version="1.0"?><svg viewBox="0 0 24 24"><path d="M5 4v3h5.5v12h3V7H19V4z"/></svg>';
-		render( <Icon data-testid={ testId } icon={ svgString } /> );
-
-		const wrapper = screen.getByTestId( testId );
-		expect( wrapper ).toBeVisible();
-		expect( wrapper ).toContainHTML(
-			'<svg width="20" height="20" viewBox="0 0 24 24"'
-		);
-	} );
 } );

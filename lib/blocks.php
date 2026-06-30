@@ -388,6 +388,110 @@ add_action( 'set_current_user', '_gutenberg_footnotes_kses_init' );
 add_filter( 'force_filtered_html_on_import', '_gutenberg_footnotes_force_filtered_html_on_import_filter', 999 );
 
 /**
+ * Returns the allowed SVG tags and attributes for icon sanitization.
+ *
+ * @since 7.2.0
+ *
+ * @return array<string, array<string, bool>> Associative array of allowed SVG elements and their attributes.
+ */
+function gutenberg_get_allowed_svg_icon_tags() {
+	$svg_attributes = array(
+		'xmlns'               => true,
+		'viewBox'             => true,
+		'preserveAspectRatio' => true,
+		'width'               => true,
+		'height'              => true,
+		'fill'                => true,
+		'fill-opacity'        => true,
+		'stroke'              => true,
+		'stroke-width'        => true,
+		'stroke-linecap'      => true,
+		'stroke-linejoin'     => true,
+		'opacity'             => true,
+		'transform'           => true,
+		'cx'                  => true,
+		'cy'                  => true,
+		'r'                   => true,
+		'rx'                  => true,
+		'ry'                  => true,
+		'x'                   => true,
+		'y'                   => true,
+		'd'                   => true,
+		'clip-rule'           => true,
+		'fill-rule'           => true,
+		'points'              => true,
+		'type'                => true,
+		'id'                  => true,
+		'offset'              => true,
+		'stop-color'          => true,
+		'stop-opacity'        => true,
+		'gradientUnits'       => true,
+		'gradientTransform'   => true,
+		'x1'                  => true,
+		'y1'                  => true,
+		'x2'                  => true,
+		'y2'                  => true,
+	);
+
+	$allowed_tags = array(
+		'svg'            => $svg_attributes,
+		'path'           => $svg_attributes,
+		'circle'         => $svg_attributes,
+		'rect'           => $svg_attributes,
+		'line'           => $svg_attributes,
+		'polyline'       => $svg_attributes,
+		'polygon'        => $svg_attributes,
+		'ellipse'        => $svg_attributes,
+		'g'              => $svg_attributes,
+		'defs'           => $svg_attributes,
+		'use'            => $svg_attributes,
+		'stop'           => $svg_attributes,
+		'linearGradient' => $svg_attributes,
+		'radialGradient' => $svg_attributes,
+		'title'          => $svg_attributes,
+		'desc'           => $svg_attributes,
+		'symbol'         => $svg_attributes,
+		'clipPath'       => $svg_attributes,
+		'mask'           => $svg_attributes,
+		'filter'         => $svg_attributes,
+		'feGaussianBlur' => $svg_attributes,
+		'feColorMatrix'  => $svg_attributes,
+		'feBlend'        => $svg_attributes,
+		'feComposite'    => $svg_attributes,
+		'feFlood'        => $svg_attributes,
+		'feMerge'        => $svg_attributes,
+		'feMergeNode'    => $svg_attributes,
+		'feOffset'       => $svg_attributes,
+		'feImage'        => $svg_attributes,
+	);
+
+	return $allowed_tags;
+}
+
+/**
+ * Sanitizes SVG content for safe use as a block icon.
+ *
+ * Strips dangerous elements and attributes (scripts, event handlers, etc.)
+ * while preserving valid SVG structure.
+ *
+ * @since 7.2.0
+ *
+ * @param string $svg_content Raw SVG content.
+ * @return string Sanitized SVG content.
+ */
+function gutenberg_sanitize_svg_icon( $svg_content ) {
+	$svg_element = wp_kses(
+		$svg_content,
+		gutenberg_get_allowed_svg_icon_tags()
+	);
+
+	// Remove XML declaration if present.
+	$svg_element = preg_replace( '/^<\?xml[^>]*\?>\s*/', '', $svg_element );
+
+	return trim( $svg_element );
+}
+
+/**
  * Resolves file: prefix for the icon in block.json metadata.
  *
  * Allows block authors to use a file path (e.g., "file:./assets/icon.svg")
@@ -423,7 +527,8 @@ function gutenberg_resolve_block_icon_path( $metadata ) {
 			);
 			return $path;
 		}
-		return file_get_contents( $full_path );
+		$svg_content = file_get_contents( $full_path );
+		return gutenberg_sanitize_svg_icon( $svg_content );
 	};
 
 	if ( is_string( $metadata['icon'] ) ) {
