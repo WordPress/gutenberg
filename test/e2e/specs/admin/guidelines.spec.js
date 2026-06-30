@@ -44,6 +44,26 @@ function getSectionCard( page, title ) {
 	} );
 }
 
+// Wait for the Guidelines React app to mount and finish its first data load.
+// The native wp-admin wrapper is hidden by the boot layout, and the app boots
+// asynchronously after visitAdminPage() has resolved.
+async function waitForGuidelinesApp( page ) {
+	await expect(
+		page
+			.locator( '#guidelines-wp-admin-app' )
+			.getByRole( 'heading', { name: 'Guidelines', level: 1 } )
+	).toBeVisible( { timeout: 10_000 } );
+
+	await expect( getSectionCard( page, 'Copy' ) ).toBeVisible( {
+		timeout: 10_000,
+	} );
+}
+
+async function visitGuidelinesPage( page, admin ) {
+	await admin.visitAdminPage( SETTINGS_PAGE_PATH, GUIDELINES_PAGE_QUERY );
+	await waitForGuidelinesApp( page );
+}
+
 // Expand a section accordion and fill its textarea, then click Save and
 // wait for the success snackbar.
 async function saveSectionGuidelines( page, title, text ) {
@@ -107,11 +127,7 @@ test.describe( 'Guidelines', () => {
 		page,
 		admin,
 	} ) => {
-		await admin.visitAdminPage( SETTINGS_PAGE_PATH, GUIDELINES_PAGE_QUERY );
-
-		await expect(
-			page.getByRole( 'heading', { name: 'Guidelines', level: 1 } )
-		).toBeVisible();
+		await visitGuidelinesPage( page, admin );
 
 		// Sections come from the wp_guideline_scopes registry plus the Blocks
 		// section the client injects.
@@ -123,8 +139,7 @@ test.describe( 'Guidelines', () => {
 	} );
 
 	test( 'does not expose revision history', async ( { page, admin } ) => {
-		await admin.visitAdminPage( SETTINGS_PAGE_PATH, GUIDELINES_PAGE_QUERY );
-		await expect( getSectionCard( page, 'Copy' ) ).toBeVisible();
+		await visitGuidelinesPage( page, admin );
 
 		// The Actions card offers Import and Export, but not Revert / history.
 		await expect(
@@ -146,14 +161,13 @@ test.describe( 'Guidelines', () => {
 		const copyText = 'Use plain, active language.';
 		const imagesText = 'Always include descriptive alt text.';
 
-		await admin.visitAdminPage( SETTINGS_PAGE_PATH, GUIDELINES_PAGE_QUERY );
-		await expect( getSectionCard( page, 'Copy' ) ).toBeVisible();
+		await visitGuidelinesPage( page, admin );
 
 		await saveSectionGuidelines( page, 'Copy', copyText );
 		await saveSectionGuidelines( page, 'Images', imagesText );
 
 		await page.reload();
-		await expect( getSectionCard( page, 'Copy' ) ).toBeVisible();
+		await waitForGuidelinesApp( page );
 
 		// Reading back from the UI verifies the full round trip: a per-scope
 		// wp_knowledge row was created, the standard collection served it, and
@@ -179,8 +193,7 @@ test.describe( 'Guidelines', () => {
 		page,
 		admin,
 	} ) => {
-		await admin.visitAdminPage( SETTINGS_PAGE_PATH, GUIDELINES_PAGE_QUERY );
-		await expect( getSectionCard( page, 'Copy' ) ).toBeVisible();
+		await visitGuidelinesPage( page, admin );
 
 		// Create the row in this session.
 		await saveSectionGuidelines( page, 'Copy', 'First version.' );
@@ -189,11 +202,12 @@ test.describe( 'Guidelines', () => {
 		// (edit context via the entity's baseURLParams). Editing it must still
 		// work — a regression guard for reading the wrong cache bucket.
 		await page.reload();
-		await expect( getSectionCard( page, 'Copy' ) ).toBeVisible();
+		await waitForGuidelinesApp( page );
 
 		await saveSectionGuidelines( page, 'Copy', 'Second version.' );
 
 		await page.reload();
+		await waitForGuidelinesApp( page );
 		const copyCard = getSectionCard( page, 'Copy' );
 		await copyCard
 			.getByRole( 'button', { name: 'Copy', exact: true } )
@@ -220,7 +234,7 @@ test.describe( 'Guidelines', () => {
 			},
 		} );
 
-		await admin.visitAdminPage( SETTINGS_PAGE_PATH, GUIDELINES_PAGE_QUERY );
+		await visitGuidelinesPage( page, admin );
 		const copyCard = getSectionCard( page, 'Copy' );
 		await copyCard
 			.getByRole( 'button', { name: 'Copy', exact: true } )
@@ -248,8 +262,7 @@ test.describe( 'Guidelines', () => {
 	} );
 
 	test( 'clears a scope guideline', async ( { page, admin } ) => {
-		await admin.visitAdminPage( SETTINGS_PAGE_PATH, GUIDELINES_PAGE_QUERY );
-		await expect( getSectionCard( page, 'Copy' ) ).toBeVisible();
+		await visitGuidelinesPage( page, admin );
 
 		await saveSectionGuidelines( page, 'Copy', 'Temporary copy guidance.' );
 
@@ -271,6 +284,7 @@ test.describe( 'Guidelines', () => {
 		).toBeVisible();
 
 		await page.reload();
+		await waitForGuidelinesApp( page );
 		const reopened = getSectionCard( page, 'Copy' );
 		await reopened
 			.getByRole( 'button', { name: 'Copy', exact: true } )
@@ -281,7 +295,7 @@ test.describe( 'Guidelines', () => {
 	} );
 
 	test( 'adds a block guideline', async ( { page, admin } ) => {
-		await admin.visitAdminPage( SETTINGS_PAGE_PATH, GUIDELINES_PAGE_QUERY );
+		await visitGuidelinesPage( page, admin );
 
 		const blocksCard = getSectionCard( page, 'Blocks' );
 		await blocksCard
@@ -322,8 +336,7 @@ test.describe( 'Guidelines', () => {
 	test( 'exports and re-imports guidelines', async ( { page, admin } ) => {
 		const copyText = 'Round-trip copy guidance.';
 
-		await admin.visitAdminPage( SETTINGS_PAGE_PATH, GUIDELINES_PAGE_QUERY );
-		await expect( getSectionCard( page, 'Copy' ) ).toBeVisible();
+		await visitGuidelinesPage( page, admin );
 		await saveSectionGuidelines( page, 'Copy', copyText );
 
 		// Export and capture the downloaded file.
@@ -347,7 +360,7 @@ test.describe( 'Guidelines', () => {
 			}
 		} );
 		await page.reload();
-		await expect( getSectionCard( page, 'Copy' ) ).toBeVisible();
+		await waitForGuidelinesApp( page );
 
 		const fileChooserPromise = page.waitForEvent( 'filechooser' );
 		await page.getByRole( 'button', { name: 'Import guidelines' } ).click();

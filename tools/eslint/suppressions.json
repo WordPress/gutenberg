@@ -1764,11 +1764,6 @@
 			"count": 1
 		}
 	},
-	"packages/media-editor/src/components/media-editor/index.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/media-editor/src/components/media-form/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1

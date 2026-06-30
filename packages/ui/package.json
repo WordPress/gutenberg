@@ -66,6 +66,7 @@
 		"@testing-library/user-event": "^14.6.1",
 		"@types/jest": "^29.5.14",
 		"@types/node": "^20.19.39",
+		"fast-glob": "^3.2.7",
 		"storybook": "^10.4.3"
 	},
 	"peerDependencies": {

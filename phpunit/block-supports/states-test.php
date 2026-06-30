@@ -139,7 +139,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 		$this->assertSame(
 			array(
 				'background-color' => '#ff0000 !important',
-				'background-image' => 'unset !important',
+				'background-image' => 'unset',
 			),
 			$actual
 		);
@@ -1005,6 +1005,43 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 
 		$this->assertStringContainsString(
 			'@media (width <= 480px){.' . $matches[0] . ' .wp-block-button__link:hover{background-color:#ff00d0 !important;background-image:unset !important;}}',
+			$actual_stylesheet
+		);
+	}
+
+	/**
+	 * Tests that a responsive background gradient generates media-query scoped CSS.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_responsive_background_gradient_generates_media_query_scoped_css() {
+		$this->ensure_block_registered( 'core/group' );
+
+		$block_content = '<div class="wp-block-group">Hello</div>';
+		$block         = array(
+			'blockName' => 'core/group',
+			'attrs'     => array(
+				'style' => array(
+					'@tablet' => array(
+						'background' => array(
+							'gradient' => 'linear-gradient(135deg,rgb(119,255,112) 0%,rgb(253,254,215) 99%)',
+						),
+					),
+				),
+			),
+		);
+
+		$actual = gutenberg_render_block_states_support( $block_content, $block );
+
+		$this->assertMatchesRegularExpression(
+			'/^<div class="wp-block-group (wp-states-[a-f0-9]{8})">Hello<\/div>$/',
+			$actual
+		);
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'@media (480px < width <= 782px){.' . $matches[0] . '{background-image:linear-gradient(135deg,rgb(119,255,112) 0%,rgb(253,254,215) 99%) !important;}}',
 			$actual_stylesheet
 		);
 	}

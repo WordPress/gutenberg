@@ -81,7 +81,7 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   token: ${{ secrets.GUTENBERG_TOKEN }}
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
@@ -196,7 +196,7 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   ref: ${{ needs.bump-version.outputs.release_branch || github.ref }}
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
@@ -354,7 +354,7 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   fetch-depth: 2
                   ref: ${{ needs.bump-version.outputs.release_branch }}
@@ -455,7 +455,7 @@ jobs:
         if: ${{ endsWith( needs.bump-version.outputs.new_version, '-rc.1' ) }}
         steps:
             - name: Checkout (for CLI)
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   path: main
                   ref: trunk
@@ -463,7 +463,7 @@ jobs:
                   persist-credentials: false
 
             - name: Checkout (for publishing)
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   path: publish
                   # Later, we switch this branch in the script that publishes packages.

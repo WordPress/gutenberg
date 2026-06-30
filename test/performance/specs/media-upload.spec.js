@@ -4,7 +4,7 @@
 const path = require( 'path' );
 const fs = require( 'fs/promises' );
 const os = require( 'os' );
-const { v4: uuid } = require( 'uuid' );
+const { randomUUID } = require( 'crypto' );
 
 /**
  * WordPress dependencies
@@ -36,7 +36,7 @@ async function createTempImage( sourceFile, ext ) {
 	const tmpDirectory = await fs.mkdtemp(
 		path.join( os.tmpdir(), 'gutenberg-perf-media-' )
 	);
-	const tmpFileName = path.join( tmpDirectory, uuid() + ext );
+	const tmpFileName = path.join( tmpDirectory, randomUUID() + ext );
 	await fs.copyFile( path.join( E2E_ASSETS_PATH, sourceFile ), tmpFileName );
 	return { tmpFileName, tmpDirectory };
 }
@@ -218,7 +218,7 @@ test.describe( 'Media Upload Performance', () => {
 				for ( let j = 0; j < 5; j++ ) {
 					const tmpFileName = path.join(
 						tmpDirectory,
-						uuid() + '.jpeg'
+						randomUUID() + '.jpeg'
 					);
 					await fs.copyFile(
 						path.join(

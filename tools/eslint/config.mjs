@@ -180,6 +180,7 @@ const restrictedSyntax = [
 		'BorderControl',
 		'BoxControl',
 		'FocalPointPicker',
+		'FontAppearanceControl',
 		'FontFamilyControl',
 		'FontSizePicker',
 		'FormFileUpload',
@@ -516,6 +517,14 @@ export default dedupePlugins( [
 		rules: {
 			'@wordpress/no-global-active-element': 'off',
 			'@wordpress/no-global-get-selection': 'off',
+			'no-restricted-imports': [
+				'error',
+				{
+					name: 'uuid',
+					message:
+						'`uuid` is ESM-only and breaks `require()` call sites (see #77960). Use the built-in `crypto.randomUUID()` instead.',
+				},
+			],
 			'no-restricted-syntax': [
 				'error',
 				{
@@ -531,6 +540,12 @@ export default dedupePlugins( [
 					selector:
 						'CallExpression[callee.object.name="page"][callee.property.name="waitForTimeout"]',
 					message: 'Prefer page.locator instead.',
+				},
+				{
+					selector:
+						'CallExpression[callee.name="require"][arguments.0.value="uuid"]',
+					message:
+						'`uuid` is ESM-only and breaks `require()` call sites (see #77960). Use the built-in `crypto.randomUUID()` instead.',
 				},
 			],
 			'playwright/no-conditional-in-test': 'off',

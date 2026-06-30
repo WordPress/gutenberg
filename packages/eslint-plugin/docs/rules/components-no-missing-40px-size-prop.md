@@ -11,7 +11,6 @@ The following components are checked by this rule:
 -   Button
 -   ComboboxControl
 -   CustomSelectControl
--   FontAppearanceControl
 -   FormTokenField
 -   InputControl
 -   NumberControl
