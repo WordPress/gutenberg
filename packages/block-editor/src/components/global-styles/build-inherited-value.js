@@ -88,13 +88,6 @@ const SOURCE_DESCRIPTORS = {
 		breadcrumb: [ SOURCE_BREADCRUMB_PARTS.styles ],
 		layer: 'root',
 	},
-	rootElement: {
-		breadcrumb: [
-			SOURCE_BREADCRUMB_PARTS.styles,
-			SOURCE_BREADCRUMB_PARTS.elements,
-		],
-		layer: 'rootElement',
-	},
 	block: {
 		breadcrumb: [
 			SOURCE_BREADCRUMB_PARTS.styles,
@@ -102,15 +95,6 @@ const SOURCE_DESCRIPTORS = {
 			SOURCE_BREADCRUMB_PARTS.blockName,
 		],
 		layer: 'block',
-	},
-	blockElement: {
-		breadcrumb: [
-			SOURCE_BREADCRUMB_PARTS.styles,
-			SOURCE_BREADCRUMB_PARTS.blocks,
-			SOURCE_BREADCRUMB_PARTS.blockName,
-			SOURCE_BREADCRUMB_PARTS.elements,
-		],
-		layer: 'blockElement',
 	},
 	blockVariation: {
 		breadcrumb: [
@@ -122,22 +106,11 @@ const SOURCE_DESCRIPTORS = {
 		],
 		layer: 'blockVariation',
 	},
-	blockVariationElement: {
-		breadcrumb: [
-			SOURCE_BREADCRUMB_PARTS.styles,
-			SOURCE_BREADCRUMB_PARTS.blocks,
-			SOURCE_BREADCRUMB_PARTS.blockName,
-			SOURCE_BREADCRUMB_PARTS.variations,
-			SOURCE_BREADCRUMB_PARTS.variationName,
-			SOURCE_BREADCRUMB_PARTS.elements,
-		],
-		layer: 'blockVariationElement',
-	},
 };
 
 function createSourceDescriptor(
 	type,
-	{ blockName, variation, element, blockStyles } = {}
+	{ blockName, variation, blockStyles } = {}
 ) {
 	const descriptor = SOURCE_DESCRIPTORS[ type ];
 	if ( ! descriptor ) {
@@ -145,15 +118,12 @@ function createSourceDescriptor(
 	}
 	return {
 		...descriptor,
-		breadcrumb: element
-			? [ ...descriptor.breadcrumb, element ]
-			: [ ...descriptor.breadcrumb ],
+		breadcrumb: [ ...descriptor.breadcrumb ],
 		blockName: blockName ?? null,
 		variation: variation ?? null,
 		variationTitle:
 			blockStyles?.find( ( style ) => style.name === variation )?.label ??
 			null,
-		element: element ?? null,
 	};
 }
 
@@ -236,8 +206,7 @@ function isRefObject( v ) {
  * leaves and sub-trees that are not tree-structural and not the
  * `elements` sub-tree itself. The `elements` sub-tree IS preserved as a
  * passthrough on the final payload so panels that read e.g.
- * `inheritedValue.elements.link.color.text` keep working; it just does
- * not participate in the element-scoped fold.
+ * `inheritedValue.elements.link.color.text` keep working.
  *
  * Does not recurse or clone; the returned contribution references the
  * original layer's sub-objects. The deep-merge step copies them into a
@@ -265,37 +234,6 @@ function pickLayerRootContribution( layer ) {
 			continue;
 		}
 		contribution[ key ] = layer[ key ];
-	}
-	return Object.keys( contribution ).length === 0 ? null : contribution;
-}
-
-/**
- * Pick the element-scope contribution from `layer.elements[element]`.
- * Returns a plain-object "layer-shaped" contribution — same top-level
- * keys as a normal layer — so it can be merged in the same pipeline as
- * root-scope contributions, inheriting deep-merge semantics.
- *
- * @param {Object}  layer   Raw styles layer.
- * @param {?string} element Element tag (e.g. `h2`, `link`).
- * @return {Object|null} Element-scope contribution, or `null` when no leaves contribute.
- */
-function pickLayerElementContribution( layer, element ) {
-	if ( ! element || ! layer || ! layer.elements ) {
-		return null;
-	}
-	const folded = layer.elements[ element ];
-	if ( ! folded || typeof folded !== 'object' || Array.isArray( folded ) ) {
-		return null;
-	}
-	const contribution = {};
-	for ( const key of Object.keys( folded ) ) {
-		if ( TREE_STRUCTURAL_KEYS.has( key ) || key === 'elements' ) {
-			continue;
-		}
-		if ( isExplicitEmpty( folded[ key ] ) ) {
-			continue;
-		}
-		contribution[ key ] = folded[ key ];
 	}
 	return Object.keys( contribution ).length === 0 ? null : contribution;
 }
@@ -380,22 +318,6 @@ function deepMergeDroppingEmpties(
 }
 
 /**
- * Read a layer's `elements[ element ]` sub-object, guarding against
- * non-object values.
- *
- * @param {?Object} layer   Raw styles layer.
- * @param {?string} element Element tag (e.g. `h2`, `link`, `button`).
- * @return {Object|null} The element sub-object, or `null`.
- */
-function getElementObject( layer, element ) {
-	if ( ! layer || ! element ) {
-		return null;
-	}
-	const el = layer.elements?.[ element ];
-	return el && typeof el === 'object' && ! Array.isArray( el ) ? el : null;
-}
-
-/**
  * Resolve the state-scoped slice of a layer-shaped object for the selected
  * block style state, guarding against nullish inputs.
  *
@@ -420,7 +342,6 @@ function getStateSlice( layerObject, selectedState ) {
  *
  * @param {Object}  args
  * @param {string}  args.blockName       Block name (e.g. `core/heading`).
- * @param {?string} [args.element]       Element tag to fold (e.g. `h2`, `link`), or null for block-scope only.
  * @param {?string} [args.ownVariation]  Active block style variation slug, or null.
  * @param {Object}  [args.globalStyles]  The `settings[ globalStylesDataKey ]` payload.
  * @param {Array}   [args.blockStyles]   Registered styles for the block type.
@@ -429,7 +350,6 @@ function getStateSlice( layerObject, selectedState ) {
  */
 function computeInheritedValue( {
 	blockName,
-	element = null,
 	ownVariation = null,
 	globalStyles,
 	blockStyles = [],
@@ -455,33 +375,19 @@ function computeInheritedValue( {
 		  ) ?? null
 		: null;
 
-	// Layers are ordered from low to high precedence. Root-scope and
-	// element-scope contributions are merged separately so element
-	// overrides can replace specific leaves without dropping sibling values.
+	// Layers are ordered from low to high precedence: root defaults, the
+	// block's own defaults, then the active block style variation. Each
+	// layer's `elements` sub-tree is preserved as a passthrough so panels
+	// can read element styles (e.g. `inheritedValue.elements.link`).
 	const contributions = [
 		createContribution(
 			pickLayerRootContribution( root ),
 			createSourceDescriptor( 'root' )
 		),
-		element
-			? createContribution(
-					pickLayerElementContribution( root, element ),
-					createSourceDescriptor( 'rootElement', { element } )
-			  )
-			: null,
 		block
 			? createContribution(
 					pickLayerRootContribution( block ),
 					createSourceDescriptor( 'block', { blockName } )
-			  )
-			: null,
-		block && element
-			? createContribution(
-					pickLayerElementContribution( block, element ),
-					createSourceDescriptor( 'blockElement', {
-						blockName,
-						element,
-					} )
 			  )
 			: null,
 		variation
@@ -491,17 +397,6 @@ function computeInheritedValue( {
 						blockName,
 						variation: ownVariation,
 						blockStyles,
-					} )
-			  )
-			: null,
-		variation && element
-			? createContribution(
-					pickLayerElementContribution( variation, element ),
-					createSourceDescriptor( 'blockVariationElement', {
-						blockName,
-						variation: ownVariation,
-						blockStyles,
-						element,
 					} )
 			  )
 			: null,
@@ -523,37 +418,12 @@ function computeInheritedValue( {
 				),
 				createSourceDescriptor( 'root' )
 			),
-			element
-				? createContribution(
-						pickLayerRootContribution(
-							getStateSlice(
-								getElementObject( root, element ),
-								selectedState
-							)
-						),
-						createSourceDescriptor( 'rootElement', { element } )
-				  )
-				: null,
 			block
 				? createContribution(
 						pickLayerRootContribution(
 							getStateSlice( block, selectedState )
 						),
 						createSourceDescriptor( 'block', { blockName } )
-				  )
-				: null,
-			block && element
-				? createContribution(
-						pickLayerRootContribution(
-							getStateSlice(
-								getElementObject( block, element ),
-								selectedState
-							)
-						),
-						createSourceDescriptor( 'blockElement', {
-							blockName,
-							element,
-						} )
 				  )
 				: null,
 			variation
@@ -565,22 +435,6 @@ function computeInheritedValue( {
 							blockName,
 							variation: ownVariation,
 							blockStyles,
-						} )
-				  )
-				: null,
-			variation && element
-				? createContribution(
-						pickLayerRootContribution(
-							getStateSlice(
-								getElementObject( variation, element ),
-								selectedState
-							)
-						),
-						createSourceDescriptor( 'blockVariationElement', {
-							blockName,
-							variation: ownVariation,
-							blockStyles,
-							element,
 						} )
 				  )
 				: null
@@ -611,7 +465,7 @@ function computeInheritedValue( {
 
 /**
  * Shared memo for `buildInheritedValue`, keyed by Global
- * Styles object identity and a `(blockName, element, ownVariation)` composite.
+ * Styles object identity and a `(blockName, ownVariation)` composite.
  *
  * @type {WeakMap<object, Map<string, Object>>}
  */
@@ -646,8 +500,6 @@ export function buildInheritedValue( args ) {
 	const key =
 		( args.blockName || '' ) +
 		'\u0001' +
-		( args.element || '' ) +
-		'\u0001' +
 		( args.ownVariation || '' ) +
 		'\u0001' +
 		blockStylesKey +
@@ -667,6 +519,5 @@ export const __unstable = {
 	isExplicitEmpty,
 	isRefObject,
 	pickLayerRootContribution,
-	pickLayerElementContribution,
 	deepMergeDroppingEmpties,
 };

@@ -26,7 +26,6 @@ const {
 	isExplicitEmpty,
 	isRefObject,
 	pickLayerRootContribution,
-	pickLayerElementContribution,
 	deepMergeDroppingEmpties,
 } = __unstable;
 
@@ -103,19 +102,6 @@ describe( 'buildInheritedValue – merged output', () => {
 			expect( isRefObject( 'var:preset|color|red' ) ).toBe( false );
 		} );
 
-		test( 'pickLayerElementContribution folds element-tag branch', () => {
-			const layer = {
-				typography: { lineHeight: '1.2' },
-				elements: {
-					h2: { typography: { fontSize: '32px' } },
-				},
-			};
-			const out = pickLayerElementContribution( layer, 'h2' );
-			expect( out ).toEqual( {
-				typography: { fontSize: '32px' },
-			} );
-		} );
-
 		test( 'pickLayerRootContribution preserves elements sub-tree passthrough', () => {
 			const layer = {
 				typography: { lineHeight: '1.2' },
@@ -132,17 +118,6 @@ describe( 'buildInheritedValue – merged output', () => {
 			expect( pickLayerRootContribution( null ) ).toBeNull();
 			expect( pickLayerRootContribution( {} ) ).toBeNull();
 			expect( pickLayerRootContribution( [] ) ).toBeNull();
-		} );
-
-		test( 'pickLayerElementContribution returns null when no element present', () => {
-			expect(
-				pickLayerElementContribution(
-					{ typography: { lineHeight: '1.2' } },
-					'h2'
-				)
-			).toBeNull();
-			expect( pickLayerElementContribution( null, 'h2' ) ).toBeNull();
-			expect( pickLayerElementContribution( {}, null ) ).toBeNull();
 		} );
 
 		test( 'deepMergeDroppingEmpties resolves refs inline', () => {
@@ -214,16 +189,6 @@ describe( 'buildInheritedValue – merged output', () => {
 			expect( out.typography.lineHeight ).toBe( '1.5' );
 		} );
 
-		test( 'element layer (layer 2) overrides root for shared leaf', () => {
-			const { value: out } = buildInheritedValue( {
-				blockName: 'core/paragraph',
-				element: 'h2',
-				globalStyles: gs,
-			} );
-			expect( out.typography.fontSize ).toBe( '24px' );
-			expect( out.typography.lineHeight ).toBe( '1.5' );
-		} );
-
 		test( 'block-default (layer 3) overrides element + root', () => {
 			const { value: out } = buildInheritedValue( {
 				blockName: 'core/heading',
@@ -231,15 +196,6 @@ describe( 'buildInheritedValue – merged output', () => {
 			} );
 			expect( out.typography.fontSize ).toBe( '28px' );
 			expect( out.typography.lineHeight ).toBe( '1.5' );
-		} );
-
-		test( "block-element (layer 3') overrides block-default", () => {
-			const { value: out } = buildInheritedValue( {
-				blockName: 'core/heading',
-				element: 'h2',
-				globalStyles: gs,
-			} );
-			expect( out.typography.fontSize ).toBe( '32px' );
 		} );
 
 		test( 'own-variation (layer 4b) wins', () => {
@@ -263,12 +219,6 @@ describe( 'buildInheritedValue – merged output', () => {
 		const gs = {
 			styles: {
 				color: { text: 'rootText' },
-				elements: {
-					button: {
-						color: { text: 'elBtnBase' },
-						':hover': { color: { text: 'elBtnHover' } },
-					},
-				},
 				blocks: {
 					'core/button': {
 						color: { text: 'buttonBase' },
@@ -282,7 +232,6 @@ describe( 'buildInheritedValue – merged output', () => {
 		test( 'no selectedState behaves as the default state (base value)', () => {
 			const { value: out } = buildInheritedValue( {
 				blockName: 'core/button',
-				element: 'button',
 				globalStyles: gs,
 			} );
 			expect( out.color.text ).toBe( 'buttonBase' );
@@ -291,7 +240,6 @@ describe( 'buildInheritedValue – merged output', () => {
 		test( 'explicit default selectedState is identical to base', () => {
 			const { value: out } = buildInheritedValue( {
 				blockName: 'core/button',
-				element: 'button',
 				globalStyles: gs,
 				selectedState: DEFAULT_STATE,
 			} );
@@ -301,42 +249,16 @@ describe( 'buildInheritedValue – merged output', () => {
 		test( 'pseudo state layers the block `:hover` slice over base', () => {
 			const { value: out } = buildInheritedValue( {
 				blockName: 'core/button',
-				element: 'button',
 				globalStyles: gs,
 				selectedState: HOVER_STATE,
 			} );
-			// Block-level `:hover` (higher scope) wins over the element-level
-			// `:hover`, and both win over the base color.
+			// Block-level `:hover` wins over the base color.
 			expect( out.color.text ).toBe( 'buttonHover' );
-		} );
-
-		test( 'pseudo state element slice applies when no block-level state exists', () => {
-			const elementOnly = {
-				styles: {
-					elements: {
-						button: {
-							color: { text: 'elBtnBase' },
-							':hover': { color: { text: 'elBtnHover' } },
-						},
-					},
-					blocks: {
-						'core/button': { color: { text: 'buttonBase' } },
-					},
-				},
-			};
-			const { value: out } = buildInheritedValue( {
-				blockName: 'core/button',
-				element: 'button',
-				globalStyles: elementOnly,
-				selectedState: HOVER_STATE,
-			} );
-			expect( out.color.text ).toBe( 'elBtnHover' );
 		} );
 
 		test( 'base-only leaves still inherit under a selected state (CSS cascade)', () => {
 			const { value: out } = buildInheritedValue( {
 				blockName: 'core/button',
-				element: 'button',
 				globalStyles: gs,
 				selectedState: HOVER_STATE,
 			} );
@@ -347,7 +269,6 @@ describe( 'buildInheritedValue – merged output', () => {
 		test( 'responsive state with no Global Styles slice falls back to base', () => {
 			const { value: out } = buildInheritedValue( {
 				blockName: 'core/button',
-				element: 'button',
 				globalStyles: gs,
 				selectedState: MOBILE_STATE,
 			} );
@@ -373,7 +294,6 @@ describe( 'buildInheritedValue – merged output', () => {
 			};
 			const { value: out } = buildInheritedValue( {
 				blockName: 'core/button',
-				element: 'button',
 				globalStyles: responsiveGs,
 				selectedState: MOBILE_STATE,
 			} );
@@ -387,7 +307,6 @@ describe( 'buildInheritedValue – merged output', () => {
 		test( 'source map attributes a state-won leaf to its originating layer', () => {
 			const { value, sources } = buildInheritedValue( {
 				blockName: 'core/button',
-				element: 'button',
 				globalStyles: gs,
 				selectedState: HOVER_STATE,
 			} );
@@ -398,13 +317,11 @@ describe( 'buildInheritedValue – merged output', () => {
 		test( 'memoized variant keys distinct states separately', () => {
 			const { value: base } = buildInheritedValue( {
 				blockName: 'core/button',
-				element: 'button',
 				globalStyles: gs,
 				selectedState: DEFAULT_STATE,
 			} );
 			const { value: hover } = buildInheritedValue( {
 				blockName: 'core/button',
-				element: 'button',
 				globalStyles: gs,
 				selectedState: HOVER_STATE,
 			} );
@@ -668,31 +585,6 @@ describe( 'buildInheritedValue – merged output', () => {
 			} );
 		} );
 
-		test( 'records element-folded winning source breadcrumbs', () => {
-			const { value, sources } = buildInheritedValue( {
-				blockName: 'core/heading',
-				element: 'h2',
-				ownVariation: 'plain',
-				blockStyles: [ { name: 'plain', label: 'Plain' } ],
-				globalStyles: gs,
-			} );
-			expect( value.typography.fontSize ).toBe( '18px' );
-			expect( sources[ 'typography.fontSize' ] ).toMatchObject( {
-				breadcrumb: [
-					'styles',
-					'blocks',
-					'blockName',
-					'variations',
-					'variationName',
-					'elements',
-					'h2',
-				],
-				layer: 'blockVariationElement',
-				variationTitle: 'Plain',
-				element: 'h2',
-			} );
-		} );
-
 		test( 'records preserved element sub-tree source paths', () => {
 			const { sources } = buildInheritedValue( {
 				blockName: 'core/paragraph',
@@ -729,16 +621,17 @@ describe( 'buildInheritedValue – memoization', () => {
 		const gs = {
 			styles: {
 				typography: { fontSize: '16px' },
-				elements: { h2: { typography: { fontSize: '24px' } } },
+				blocks: {
+					'core/heading': { typography: { fontSize: '24px' } },
+				},
 			},
 		};
 		const { value: a } = buildInheritedValue( {
-			blockName: 'core/heading',
+			blockName: 'core/paragraph',
 			globalStyles: gs,
 		} );
 		const { value: b } = buildInheritedValue( {
 			blockName: 'core/heading',
-			element: 'h2',
 			globalStyles: gs,
 		} );
 		expect( a.typography.fontSize ).toBe( '16px' );
@@ -776,8 +669,8 @@ describe( 'useInheritedValue / InheritedValueProvider', () => {
 		useSelect.mockReset();
 	} );
 
-	function Probe( { element } ) {
-		const v = useInheritedValue( element ? { element } : undefined );
+	function Probe() {
+		const v = useInheritedValue();
 		return <div data-testid="probe">{ JSON.stringify( v ) }</div>;
 	}
 
@@ -810,7 +703,7 @@ describe( 'useInheritedValue / InheritedValueProvider', () => {
 		// Provider runs once; the Probes consume context only.
 		render(
 			<InheritedValueProvider blockName="core/heading">
-				<Probe element="h2" />
+				<Probe />
 				<Probe />
 			</InheritedValueProvider>
 		);
@@ -818,7 +711,7 @@ describe( 'useInheritedValue / InheritedValueProvider', () => {
 		expect( useSelect ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	test( 'hook returns element-folded payload when element is supplied', () => {
+	test( 'hook reads the block element passthrough from context', () => {
 		const rawGlobalStyles = {
 			typography: { fontSize: '16px' },
 			elements: { h2: { typography: { fontSize: '24px' } } },
@@ -832,16 +725,16 @@ describe( 'useInheritedValue / InheritedValueProvider', () => {
 		);
 		render(
 			<InheritedValueProvider blockName="core/heading">
-				<Probe element="h2" />
+				<Probe />
 			</InheritedValueProvider>
 		);
 		const parsed = JSON.parse( screen.getByTestId( 'probe' ).textContent );
-		expect( parsed.value.typography.fontSize ).toBe( '24px' );
-		expect( parsed.sources[ 'typography.fontSize' ].breadcrumb ).toEqual( [
-			'styles',
-			'elements',
-			'h2',
-		] );
+		// The h2 element styles are preserved under the nested
+		// `elements` passthrough, not folded up to the top level.
+		expect( parsed.value.elements.h2.typography.fontSize ).toBe( '24px' );
+		expect(
+			parsed.sources[ 'elements.h2.typography.fontSize' ].breadcrumb
+		).toEqual( [ 'styles', 'elements', 'h2' ] );
 	} );
 
 	test( 'hook returns { value, sources } during hydration', () => {
@@ -890,10 +783,8 @@ describe( 'Provider integration: production bare-tree shape', () => {
 		useSelect.mockReset();
 	} );
 
-	function Probe( { element } ) {
-		const { value } = useInheritedValue(
-			element ? { element } : undefined
-		);
+	function Probe() {
+		const { value } = useInheritedValue();
 		return <div data-testid="probe">{ JSON.stringify( value ) }</div>;
 	}
 
@@ -977,16 +868,18 @@ describe( 'Provider integration: production bare-tree shape', () => {
 		} );
 	} );
 
-	test( 'element-folded read sees the h2-specific override + root passthrough', () => {
+	test( 'block element override is preserved under the elements passthrough', () => {
 		mountWithFixture(
 			<InheritedValueProvider blockName="core/heading">
-				<Probe element="h2" />
+				<Probe />
 			</InheritedValueProvider>
 		);
 		const parsed = JSON.parse( screen.getByTestId( 'probe' ).textContent );
-		expect( parsed.typography.fontSize ).toBe( '28px' ); // h2 override wins
-		expect( parsed.typography.lineHeight ).toBe( '1.6' ); // root passthrough
-		expect( parsed.color.text ).toBe( '#444444' ); // h2 override wins over root
+		// Block-level h2 override stays nested under `elements.h2`.
+		expect( parsed.elements.h2.typography.fontSize ).toBe( '28px' );
+		expect( parsed.elements.h2.color.text ).toBe( '#444444' );
+		// Root + block overrides still merge at the top level.
+		expect( parsed.typography.lineHeight ).toBe( '1.6' );
 	} );
 
 	test( 'variation override layers on top of block override', () => {
@@ -1014,13 +907,13 @@ describe( 'Provider integration: production bare-tree shape', () => {
 	test( 'block with no overrides still inherits root + element layers', () => {
 		mountWithFixture(
 			<InheritedValueProvider blockName="core/paragraph">
-				<Probe element="link" />
+				<Probe />
 			</InheritedValueProvider>
 		);
 		const parsed = JSON.parse( screen.getByTestId( 'probe' ).textContent );
 		expect( parsed.typography.lineHeight ).toBe( '1.6' );
-		// element fold for `link` brings in the root.elements.link override.
-		expect( parsed.color.text ).toBe( '#0073aa' );
+		// The root link element styles stay nested under `elements.link`.
+		expect( parsed.elements.link.color.text ).toBe( '#0073aa' );
 	} );
 
 	test( 'panel-readable keys are absent when the producer accidentally double-wraps the data', () => {
