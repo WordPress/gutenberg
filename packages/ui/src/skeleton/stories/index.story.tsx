@@ -28,18 +28,15 @@ type Story = StoryObj< typeof Skeleton >;
 
 export const Default: Story = {
 	args: {
-		width: 240,
-		height: 16,
+		style: { width: 240, height: 16 },
 		radius: 'md',
 		animation: 'pulse',
 	},
 };
 
 export const Circle: Story = {
-	...Default,
 	args: {
-		width: 48,
-		height: 48,
+		style: { width: 48, height: 48 },
 		radius: 'full',
 	},
 };
@@ -53,9 +50,9 @@ export const TextLines: Story = {
 				gap: '0.5rem',
 			} }
 		>
-			<Skeleton { ...args } width="100%" height={ 16 } />
-			<Skeleton { ...args } width="100%" height={ 16 } />
-			<Skeleton { ...args } width="60%" height={ 16 } />
+			<Skeleton { ...args } style={ { width: '100%', height: 16 } } />
+			<Skeleton { ...args } style={ { width: '100%', height: 16 } } />
+			<Skeleton { ...args } style={ { width: '60%', height: 16 } } />
 		</div>
 	),
 	args: {
@@ -74,7 +71,11 @@ export const CardPlaceholder: Story = {
 				maxWidth: 320,
 			} }
 		>
-			<Skeleton { ...args } width={ 48 } height={ 48 } radius="full" />
+			<Skeleton
+				{ ...args }
+				style={ { width: 48, height: 48 } }
+				radius="full"
+			/>
 			<div
 				style={ {
 					display: 'flex',
@@ -83,8 +84,8 @@ export const CardPlaceholder: Story = {
 					flex: 1,
 				} }
 			>
-				<Skeleton { ...args } width="80%" height={ 16 } />
-				<Skeleton { ...args } width="50%" height={ 16 } />
+				<Skeleton { ...args } style={ { width: '80%', height: 16 } } />
+				<Skeleton { ...args } style={ { width: '50%', height: 16 } } />
 			</div>
 		</div>
 	),

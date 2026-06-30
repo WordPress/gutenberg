@@ -18,23 +18,14 @@ const radiusTokens: Record<
 	full: '9999px',
 };
 
-const toDimension = ( value?: number | string ) =>
-	typeof value === 'number' ? `${ value }px` : value;
-
 /**
  * A placeholder shown while content is loading.
  */
 export const Skeleton = forwardRef< HTMLDivElement, SkeletonProps >(
 	function Skeleton(
-		{ width, height, radius = 'md', animation = 'pulse', render, ...props },
+		{ radius = 'md', animation = 'pulse', render, ...props },
 		ref
 	) {
-		const style: React.CSSProperties = {
-			width: toDimension( width ),
-			height: toDimension( height ),
-			borderRadius: radiusTokens[ radius ],
-		};
-
 		return useRender( {
 			render,
 			ref,
