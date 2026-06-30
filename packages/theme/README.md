@@ -230,8 +230,6 @@ This rule reports an error when a CSS declaration sets (defines) a custom proper
 
 This rule reports an error when a `var()` call for a `--wpds-*` token includes a manual fallback value. In CSS processed by the [build plugins](#build-plugins), fallback values are injected automatically, so manual fallbacks in `var(--wpds-*)` references are redundant and can drift out of sync with the token definitions.
 
-For Sass sources, use `@wordpress/build`, route the compiled CSS through the build plugins, or load the design tokens stylesheet instead of writing manual fallback values.
-
 ```css
 /* ✗ Error: Do not add a fallback value for Design System token '--wpds-color-foreground-content-neutral' */
 .example {
