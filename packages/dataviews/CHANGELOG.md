@@ -16,6 +16,10 @@
 
 ## 17.1.0 (2026-07-01)
 
+### Enhancements
+
+- `ValidatedDateControl`: Update validation error message to be announced by screen readers using `speak` instead of an inline `aria-live` region ([#79530](https://github.com/WordPress/gutenberg/pull/79530))
+
 ## 17.0.0 (2026-06-24)
 
 ### Breaking Changes

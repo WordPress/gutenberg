@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `ControlWithError`: Update validation error message to be announced by screen readers using `speak` instead of an inline `aria-live` region ([#79530](https://github.com/WordPress/gutenberg/pull/79530)).
+
 ### Breaking Changes
 
 -   `ExternalLink`: No longer sets the `rel` attribute by default. Consumers relying on the previous behavior should pass `rel` explicitly ([#79743](https://github.com/WordPress/gutenberg/pull/79743)).
