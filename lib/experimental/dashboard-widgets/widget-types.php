@@ -35,6 +35,33 @@ function gutenberg_get_widget_metadata_i18n_schema() {
 }
 
 /**
+ * Translates a widget's user-facing metadata strings.
+ *
+ * Runs `title`, `description`, and `keywords` through the widget i18n schema
+ * using the widget's `textdomain`, leaving every other key untouched. A no-op
+ * when the widget declares no `textdomain`.
+ *
+ * @param array $widget Widget data from the build manifest.
+ * @return array Widget data with its translatable strings localized.
+ */
+function gutenberg_translate_widget_metadata( $widget ) {
+	$textdomain = $widget['textdomain'] ?? null;
+	if ( ! $textdomain ) {
+		return $widget;
+	}
+
+	$i18n_schema = gutenberg_get_widget_metadata_i18n_schema();
+
+	foreach ( array( 'title', 'description', 'keywords' ) as $field ) {
+		if ( isset( $widget[ $field ], $i18n_schema[ $field ] ) ) {
+			$widget[ $field ] = translate_settings_using_i18n_schema( $i18n_schema[ $field ], $widget[ $field ], $textdomain );
+		}
+	}
+
+	return $widget;
+}
+
+/**
  * Hydrates the widget type registry from the build manifest.
  *
  * Iterates the widgets discovered by the build pipeline (via
@@ -48,32 +75,14 @@ function gutenberg_register_widget_types() {
 		return;
 	}
 
-	$registry    = WP_Widget_Type_Registry::get_instance();
-	$i18n_schema = gutenberg_get_widget_metadata_i18n_schema();
+	$registry = WP_Widget_Type_Registry::get_instance();
 
 	foreach ( gutenberg_get_registered_widget_modules() as $widget ) {
 		if ( empty( $widget['name'] ) || $registry->is_registered( $widget['name'] ) ) {
 			continue;
 		}
 
-		$textdomain  = $widget['textdomain'] ?? null;
-		$title       = $widget['title'] ?? null;
-		$description = $widget['description'] ?? null;
-		$keywords    = $widget['keywords'] ?? null;
-
-		// Translate the user-facing strings declared in widget.json with the
-		// widget's text domain, so consumers receive localized values.
-		if ( $textdomain ) {
-			if ( null !== $title && isset( $i18n_schema['title'] ) ) {
-				$title = translate_settings_using_i18n_schema( $i18n_schema['title'], $title, $textdomain );
-			}
-			if ( null !== $description && isset( $i18n_schema['description'] ) ) {
-				$description = translate_settings_using_i18n_schema( $i18n_schema['description'], $description, $textdomain );
-			}
-			if ( null !== $keywords && isset( $i18n_schema['keywords'] ) ) {
-				$keywords = translate_settings_using_i18n_schema( $i18n_schema['keywords'], $keywords, $textdomain );
-			}
-		}
+		$widget = gutenberg_translate_widget_metadata( $widget );
 
 		$registry->register(
 			$widget['name'],
@@ -82,9 +91,9 @@ function gutenberg_register_widget_types() {
 				'widget_module' => $widget['widget_module'] ?? null,
 				'presentation'  => $widget['presentation'] ?? null,
 				'category'      => $widget['category'] ?? null,
-				'title'         => $title,
-				'description'   => $description,
-				'keywords'      => $keywords,
+				'title'         => $widget['title'] ?? null,
+				'description'   => $widget['description'] ?? null,
+				'keywords'      => $widget['keywords'] ?? null,
 			)
 		);
 	}
