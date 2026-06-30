@@ -18,7 +18,7 @@ const meta: Meta< typeof Badge > = {
 	parameters: {
 		controls: { disable: true },
 	},
-	tags: [ '!dev' /* Hide individual story pages from sidebar */, 'manifest' ],
+	tags: [ '!dev' /* Hide individual story pages from sidebar */ ],
 };
 export default meta;
 
