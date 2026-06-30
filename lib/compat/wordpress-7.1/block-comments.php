@@ -57,21 +57,12 @@ function gutenberg_strip_inline_note_markers( $block_content ) {
 	// phpcs:disable Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames.FunctionNotGuardedAgainstRedeclaration
 	$processor = new class( $block_content ) extends WP_HTML_Tag_Processor {
 		/**
-		 * Gets the span for the current token.
-		 *
-		 * @return WP_HTML_Span Current token span.
-		 */
-		private function get_span() {
-			// Always called after next_tag() returned true, so the bookmark is set.
-			$this->set_bookmark( 'here' );
-			return $this->bookmarks['here'];
-		}
-
-		/**
 		 * Removes the current token, keeping any text it wraps.
 		 */
-		public function remove_token() {
-			$span = $this->get_span();
+		public function remove_token(): void {
+			// Always called after next_tag() returned true, so the bookmark is set.
+			$this->set_bookmark( 'here' );
+			$span = $this->bookmarks['here'];
 
 			$this->lexical_updates[] = new WP_HTML_Text_Replacement( $span->start, $span->length, '' );
 		}
