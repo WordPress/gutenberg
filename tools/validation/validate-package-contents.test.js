@@ -1,14 +1,14 @@
-import assert from 'node:assert/strict';
-import { spawnSync } from 'node:child_process';
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { dirname, join } from 'node:path';
-import { afterEach, test } from 'node:test';
-import { fileURLToPath } from 'node:url';
+/* global afterEach, expect, test */
 
-const validatorPath = fileURLToPath(
-	new URL( './validate-package-contents.mjs', import.meta.url )
-);
+/**
+ * External dependencies
+ */
+const { spawnSync } = require( 'node:child_process' );
+const { mkdtempSync, mkdirSync, rmSync, writeFileSync } = require( 'node:fs' );
+const { tmpdir } = require( 'node:os' );
+const { dirname, join } = require( 'node:path' );
+
+const validatorPath = join( __dirname, 'validate-package-contents.mjs' );
 const temporaryRoots = [];
 
 afterEach( () => {
@@ -81,9 +81,8 @@ test( 'passes for a package with clean packed contents and resolvable types', ()
 
 	const result = runValidator( packageRoot );
 
-	assert.equal( result.status, 0, result.stderr );
-	assert.match(
-		result.stdout,
+	expect( result.status ).toBe( 0 );
+	expect( result.stdout ).toMatch(
 		/Validated \d+ packed files for test-package\./
 	);
 } );
@@ -110,9 +109,8 @@ test( 'fails when packed contents include test files', () => {
 
 	const result = runValidator( packageRoot );
 
-	assert.notEqual( result.status, 0 );
-	assert.match(
-		result.stderr,
+	expect( result.status ).not.toBe( 0 );
+	expect( result.stderr ).toMatch(
 		/The package tarball includes disallowed files:\n- index\.test\.js/
 	);
 } );
@@ -142,9 +140,8 @@ test( 'fails when an entry point excluded from attw has a missing package target
 		'./styles.css',
 	] );
 
-	assert.notEqual( result.status, 0 );
-	assert.match(
-		result.stderr,
+	expect( result.status ).not.toBe( 0 );
+	expect( result.stderr ).toMatch(
 		/The package tarball is missing targets for entry points excluded from attw:\n- styles\.css/
 	);
 } );
@@ -190,7 +187,7 @@ test( 'fails when an exported types target is missing from the packed package', 
 		'cjs-resolves-to-esm',
 	] );
 
-	assert.notEqual( result.status, 0 );
-	assert.match( result.stderr, /Resolution failed/ );
-	assert.match( result.stderr, /Used fallback condition/ );
+	expect( result.status ).not.toBe( 0 );
+	expect( result.stderr ).toMatch( /Resolution failed/ );
+	expect( result.stderr ).toMatch( /Used fallback condition/ );
 } );
