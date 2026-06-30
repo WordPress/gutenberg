@@ -835,6 +835,47 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		] );
 	} );
 
+	test( 'should select a single paragraph on triple click', async ( {
+		page,
+		editor,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'One two three' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second' },
+		} );
+
+		// Move the caret into the first paragraph so its block toolbar
+		// repositions above it and stops overlapping the text.
+		await page.keyboard.press( 'ArrowUp' );
+
+		// Triple click selects the paragraph. The browser extends the forward
+		// selection into the next block at offset 0; that overshoot must not
+		// collapse the selection or extend it into the next block.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first()
+			.click( { clickCount: 3 } );
+
+		// Only the first paragraph is selected, not a multi-block selection
+		// reaching into the second.
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedBlocks )
+			.toMatchObject( [ { name: 'core/paragraph' } ] );
+
+		// The whole paragraph is selected (not collapsed), so typing replaces
+		// its content.
+		await page.keyboard.type( 'a' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'a' } },
+			{ name: 'core/paragraph', attributes: { content: 'Second' } },
+		] );
+	} );
+
 	test( 'should gradually multi-select', async ( {
 		page,
 		editor,
