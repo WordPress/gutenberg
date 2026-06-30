@@ -1127,17 +1127,7 @@
 			"count": 2
 		}
 	},
-	"packages/edit-site/src/components/add-new-template-legacy/add-custom-template-modal-content.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
 	"packages/edit-site/src/components/add-new-template/add-custom-generic-template-modal-content.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
-	"packages/edit-site/src/components/add-new-template/add-custom-template-modal-content.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
 		}

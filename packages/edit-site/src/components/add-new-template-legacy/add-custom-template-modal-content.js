@@ -10,14 +10,13 @@ import {
 	SearchControl,
 	TextHighlight,
 	Composite,
-	__experimentalText as WCText,
-	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useDebouncedInput } from '@wordpress/compose';
 import { focus } from '@wordpress/dom';
 import { safeDecodeURI } from '@wordpress/url';
+import { Stack, Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -51,25 +50,16 @@ function SuggestionListItem( {
 				/>
 			}
 		>
-			<WCText
-				size="body"
-				lineHeight={ 1.53846153846 } // 20px
-				weight={ 500 }
-				className={ `${ baseCssClass }__title` }
-			>
+			<Text variant="heading-md" className={ `${ baseCssClass }__title` }>
 				<TextHighlight
 					text={ decodeEntities( suggestion.name ) }
 					highlight={ search }
 				/>
-			</WCText>
+			</Text>
 			{ suggestion.link && (
-				<WCText
-					size="body"
-					lineHeight={ 1.53846153846 } // 20px
-					className={ `${ baseCssClass }__info` }
-				>
+				<Text variant="body-md" className={ `${ baseCssClass }__info` }>
 					{ safeDecodeURI( suggestion.link ) }
-				</WCText>
+				</Text>
 			) }
 		</Composite.Item>
 	);
@@ -155,12 +145,13 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 				</Composite>
 			) }
 			{ debouncedSearch && ! suggestions?.length && (
-				<WCText
-					as="p"
+				<Text
+					variant="body-md"
+					render={ <p /> }
 					className="edit-site-custom-template-modal__no-results"
 				>
 					{ labels.not_found }
-				</WCText>
+				</Text>
 			) }
 		</>
 	);
@@ -188,18 +179,19 @@ function AddCustomTemplateModalContent( {
 	}, [ showSearchEntities ] );
 
 	return (
-		<VStack
-			spacing={ 4 }
+		<Stack
+			direction="column"
+			gap="lg"
 			className="edit-site-custom-template-modal__contents-wrapper"
-			alignment="left"
+			align="flex-start"
 		>
 			{ ! showSearchEntities && (
 				<>
-					<WCText as="p">
+					<Text variant="body-md" render={ <p /> }>
 						{ __(
 							'Select whether to create a single template for all items or a specific one.'
 						) }
-					</WCText>
+					</Text>
 					<Flex
 						className="edit-site-custom-template-modal__contents"
 						gap="4"
@@ -223,22 +215,15 @@ function AddCustomTemplateModalContent( {
 								} );
 							} }
 						>
-							<WCText
-								as="span"
-								weight={ 500 }
-								lineHeight={ 1.53846153846 } // 20px
-							>
+							<Text variant="heading-md">
 								{ entityForSuggestions.labels.all_items }
-							</WCText>
-							<WCText
-								as="span"
-								lineHeight={ 1.53846153846 } // 20px
-							>
+							</Text>
+							<Text variant="body-md">
 								{
 									// translators: The user is given the choice to set up a template for all items of a post type or taxonomy, or just a specific one.
 									__( 'For all items' )
 								}
-							</WCText>
+							</Text>
 						</FlexItem>
 						<FlexItem
 							isBlock
@@ -247,22 +232,15 @@ function AddCustomTemplateModalContent( {
 								setShowSearchEntities( true );
 							} }
 						>
-							<WCText
-								as="span"
-								weight={ 500 }
-								lineHeight={ 1.53846153846 } // 20px
-							>
+							<Text variant="heading-md">
 								{ entityForSuggestions.labels.singular_name }
-							</WCText>
-							<WCText
-								as="span"
-								lineHeight={ 1.53846153846 } // 20px
-							>
+							</Text>
+							<Text variant="body-md">
 								{
 									// translators: The user is given the choice to set up a template for all items of a post type or taxonomy, or just a specific one.
 									__( 'For a specific item' )
 								}
-							</WCText>
+							</Text>
 						</FlexItem>
 					</Flex>
 					<Flex justify="right">
@@ -278,11 +256,11 @@ function AddCustomTemplateModalContent( {
 			) }
 			{ showSearchEntities && (
 				<>
-					<WCText as="p">
+					<Text variant="body-md" render={ <p /> }>
 						{ __(
 							'This template will be used only for the specific item chosen.'
 						) }
-					</WCText>
+					</Text>
 					<SuggestionList
 						entityForSuggestions={ entityForSuggestions }
 						onSelect={ onSelect }
@@ -306,7 +284,7 @@ function AddCustomTemplateModalContent( {
 					</Flex>
 				</>
 			) }
-		</VStack>
+		</Stack>
 	);
 }
 
