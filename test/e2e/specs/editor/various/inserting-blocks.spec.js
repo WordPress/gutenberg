@@ -785,7 +785,9 @@ test.describe( 'insert media from inserter', () => {
 
 		await page.getByLabel( 'Block Inserter' ).click();
 		await page.getByRole( 'tab', { name: 'Media' } ).click();
-		await page.getByRole( 'tab', { name: 'Images' } ).click();
+		// `exact` so this matches only the "Images" source and not the new
+		// "Attached images" source, which also contains "Images".
+		await page.getByRole( 'tab', { name: 'Images', exact: true } ).click();
 		await page.getByLabel( uploadedMedia.title.raw ).click();
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:image {"id":${ uploadedMedia.id }} -->
