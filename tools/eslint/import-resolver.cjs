@@ -104,9 +104,22 @@ exports.resolve = function ( source, file, config ) {
 			if ( pathParts.length > 0 ) {
 				subpath += '/' + pathParts.join( '/' );
 			}
+
+			// Storybook uses the React Vite builder, and Vite supports
+			// importing assets as strings by appending `?raw`. Ignore this
+			// and other querystrings in the path when resolving the export.
+			//
+			// See: https://vite.dev/guide/assets#importing-asset-as-string
+			subpath = subpath.split( '?' )[ 0 ];
+
 			const exportPath = getResolvedExport( subpath, manifest.exports );
 
 			const sourcePath = exportPath
+				// Remap build-style CSS files to src SCSS files. By default,
+				// wp-build emits a CSS file for each SCSS file in src. This is
+				// controlled by wpStyleEntryPoints which we don't fully
+				// recreate here (yet), but generally we don't override this.
+				.replace( /build-style\/(.+?)\.css/, 'src/$1.scss' )
 				.replace( /build(-module)?/, 'src' )
 				.replace( /\.[cm]?js$/, '.js' );
 
