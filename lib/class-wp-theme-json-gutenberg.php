@@ -1299,7 +1299,7 @@ class WP_Theme_JSON_Gutenberg {
 		 * @see https://www.w3.org/TR/css-syntax-3/#parse-comma-separated-list-of-component-values
 		 */
 		if ( strlen( $selector ) === strcspn( $selector, '/\'"(<\\' ) ) {
-			return $to_append . str_replace( ',', ',' . $to_append, $selector );
+			return str_replace( ',', $to_append . ',', $selector ) . $to_append;
 		}
 
 		$new_selectors = array();
