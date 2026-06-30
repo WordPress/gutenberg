@@ -42,6 +42,7 @@ class Gutenberg_REST_Attachments_Controller_With_Mask extends WP_REST_Attachment
 		if ( isset( $args['modifiers']['items']['oneOf'] ) && is_array( $args['modifiers']['items']['oneOf'] ) ) {
 			$args['modifiers']['items']['oneOf'][] = array(
 				'title'      => __( 'Mask', 'gutenberg' ),
+				'type'       => 'object',
 				'properties' => array(
 					'type' => array(
 						'description' => __( 'Mask type.', 'gutenberg' ),
