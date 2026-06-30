@@ -9,7 +9,7 @@
  * @since   7.1.0
  */
 
-class Gutenberg_REST_Comment_Controller_7_1 extends Gutenberg_REST_Comment_Controller_6_9 {
+class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller {
 
 	/**
 	 * Retrieves the comment schema, adding reaction_summary.
@@ -59,6 +59,32 @@ class Gutenberg_REST_Comment_Controller_7_1 extends Gutenberg_REST_Comment_Contr
 	 */
 	protected function is_note_or_reaction( $type ) {
 		return in_array( $type, gutenberg_get_internal_comment_types(), true );
+	}
+
+	/**
+	 * Checks whether a post type supports notes.
+	 *
+	 * The core comment controller (WordPress 6.9) declares this check as a
+	 * private method, so it cannot be reused from this subclass. The logic is
+	 * mirrored here to keep the note permission checks working.
+	 *
+	 * @param string $post_type Post type name.
+	 * @return bool True if the post type supports notes, false otherwise.
+	 */
+	protected function check_post_type_supports_notes( $post_type ) {
+		$supports = get_all_post_type_supports( $post_type );
+		if ( ! isset( $supports['editor'] ) ) {
+			return false;
+		}
+		if ( ! is_array( $supports['editor'] ) ) {
+			return false;
+		}
+		foreach ( $supports['editor'] as $item ) {
+			if ( ! empty( $item['notes'] ) ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public function get_items_permissions_check( $request ) {
@@ -804,5 +830,4 @@ function gutenberg_register_comment_controller_7_1() {
 	$controller = new Gutenberg_REST_Comment_Controller_7_1();
 	$controller->register_routes();
 }
-remove_action( 'rest_api_init', 'gutenberg_register_comment_controller_6_9' );
 add_action( 'rest_api_init', 'gutenberg_register_comment_controller_7_1' );
