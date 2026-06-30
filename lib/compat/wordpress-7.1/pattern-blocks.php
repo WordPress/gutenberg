@@ -36,12 +36,15 @@ function gutenberg_enqueue_auto_register_pattern_blocks() {
 		if ( empty( $block_type->supports['autoRegister'] ) || empty( $block_type->pattern ) || ! is_string( $block_type->pattern ) ) {
 			continue;
 		}
-		// Opt into an SSR preview instead of canvas editing; falls through to the
-		// SSR registration (needs a render_callback).
+		// `patternEditorPreview: 'ssr'` opts into SSR-islands mode: the editor
+		// renders the PHP `render_callback` shell server-side and portals the
+		// editable pattern blocks into its slots (WYSIWYG). It needs a
+		// render_callback to produce that shell; otherwise it edits the pattern
+		// blocks directly in the canvas.
 		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- camelCase matches sibling block-registration args like supports.autoRegister.
-		if ( isset( $block_type->patternEditorPreview ) && 'ssr' === $block_type->patternEditorPreview ) {
-			continue;
-		}
+		$wants_ssr_islands = isset( $block_type->patternEditorPreview ) && 'ssr' === $block_type->patternEditorPreview;
+		$editor_mode       = ( $wants_ssr_islands && ! empty( $block_type->render_callback ) ) ? 'ssr-islands' : 'canvas';
+
 		// `lock` mode: 'contentOnly' (default) locks tightly but its section UI
 		// hides the generated controls; `false` keeps them visible with a softer
 		// lock (`'patternLock' => false`).
@@ -52,6 +55,7 @@ function gutenberg_enqueue_auto_register_pattern_blocks() {
 			'markup'            => $block_type->pattern,
 			'lock'              => $lock,
 			'hasRenderCallback' => ! empty( $block_type->render_callback ),
+			'editorMode'        => $editor_mode,
 		);
 	}
 

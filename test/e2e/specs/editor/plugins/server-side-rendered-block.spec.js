@@ -333,3 +333,66 @@ test.describe( 'PHP-only auto-register blocks', () => {
 		} );
 	} );
 } );
+
+test.describe( 'PHP-only pattern blocks (SSR-islands)', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activatePlugin(
+			'gutenberg-test-server-side-rendered-block'
+		);
+		await requestUtils.setGutenbergExperiments( [
+			'gutenberg-pattern-blocks',
+		] );
+	} );
+
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-server-side-rendered-block'
+		);
+		await requestUtils.setGutenbergExperiments( [] );
+	} );
+
+	test( 'renders the PHP shell in the editor with editable islands, keeps controls, and saves clean inner blocks', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'test/php-only-pattern-ssr' } );
+
+		// The server-rendered PHP shell is shown in the canvas, with the
+		// pattern's editable blocks portalled in place inside it (WYSIWYG). In the
+		// editor the heading/paragraph are editable RichText (role `textbox`), so
+		// assert on their text being inside the shell.
+		const shell = editor.canvas.locator( '.pattern-block-demo' );
+		await expect( shell ).toBeVisible();
+		await expect( shell ).toContainText( 'Title' );
+		await expect( shell ).toContainText( 'Body text' );
+
+		// Unlike a content-only section, the auto-generated controls stay
+		// visible — SSR-islands needs them to drive the re-fetch.
+		await editor.openDocumentSettingsSidebar();
+		await expect( page.getByLabel( 'Variant' ) ).toBeVisible();
+		const featured = page.getByLabel( 'Featured' );
+		await expect( featured ).toBeVisible();
+
+		// Toggling an attribute re-renders the shell server-side: the ribbon the
+		// render_callback adds for `featured` appears, and the island survives.
+		await featured.check();
+		await expect(
+			shell.locator( '.pattern-block-demo__ribbon' )
+		).toBeVisible();
+		await expect( shell ).toContainText( 'Title' );
+
+		// The PHP wrapper is editor-only: the block saves just the inner blocks,
+		// which the render_callback wraps on the frontend.
+		const content = await editor.getEditedPostContent();
+		// Opening delimiter carries the toggled attributes, so match its prefix.
+		expect( content ).toContain( '<!-- wp:test/php-only-pattern-ssr' );
+		expect( content ).toContain(
+			'<h2 class="wp-block-heading">Title</h2>'
+		);
+		expect( content ).not.toContain( 'pattern-block-demo' );
+	} );
+} );

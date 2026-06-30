@@ -196,10 +196,22 @@ add_action(
 			),
 		);
 
-		// $content is the rendered inner blocks (empty for the SSR preview, which
-		// falls back to the pattern). `variant` sets a class, `featured` a ribbon.
+		// $content is the rendered inner blocks. It is empty in the editor SSR
+		// context (the block-renderer REST endpoint builds the block with no inner
+		// content): there, SSR-islands mode emits a slot placeholder so the editor
+		// can portal the editable islands into the shell. One slot per top-level
+		// pattern block; this pattern is a single group, so one slot at index 0.
+		// On the frontend (not a REST request) an empty block falls back to the
+		// pattern, so the raw slot never leaks. `variant` sets a class, `featured`
+		// a ribbon.
 		$render_pattern_block = static function ( $attributes, $content ) use ( $pattern_markup ) {
-			$body     = ( '' !== trim( (string) $content ) ) ? $content : do_blocks( $pattern_markup );
+			if ( '' !== trim( (string) $content ) ) {
+				$body = $content;
+			} elseif ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+				$body = '<wp-inner-block-slot data-slot-index="0" style="display:contents"></wp-inner-block-slot>';
+			} else {
+				$body = do_blocks( $pattern_markup );
+			}
 			$variant  = isset( $attributes['variant'] ) ? sanitize_html_class( $attributes['variant'] ) : 'default';
 			$featured = ! empty( $attributes['featured'] );
 			$classes  = 'pattern-block-demo is-variant-' . $variant . ( $featured ? ' is-featured' : '' );
@@ -256,15 +268,17 @@ add_action(
 			)
 		);
 
-		// Block 3 - SSR (`patternEditorPreview => 'ssr'`): control changes preview
-		// live in the editor, but the content is not editable in the canvas.
+		// Block 3 - SSR-islands (`patternEditorPreview => 'ssr'`): the editor renders
+		// the PHP render_callback shell server-side and portals the editable pattern
+		// blocks into its slots, so the editor matches the frontend (WYSIWYG) while
+		// the islands stay editable in the canvas.
 		register_block_type(
 			'test/php-only-pattern-ssr',
 			array(
-				'title'                => 'PHP-only pattern: SSR (controls live, no inline edit)',
+				'title'                => 'PHP-only pattern: SSR-islands (WYSIWYG, editable)',
 				'icon'                 => 'layout',
 				'category'             => 'widgets',
-				'description'          => 'Pattern content previewed with ServerSideRender. Controls update the rendered output in the editor, but there is no in-canvas editing.',
+				'description'          => 'The PHP wrapper is rendered server-side in the editor with the editable pattern blocks portalled into it, so the editor matches the frontend while the content stays editable in the canvas.',
 				'keywords'             => array( 'pattern', 'autotest' ),
 				'attributes'           => $pattern_attributes,
 				'supports'             => array(
