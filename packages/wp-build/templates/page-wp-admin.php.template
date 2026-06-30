@@ -272,14 +272,12 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_render_page() {
 		}
 		body {
 			/*
-			 * Match the body background to the boot layout's dark neutral colour.
+			 * Match the body background to the boot layout's neutral surface colour.
 			 * macOS elastic scroll bounce reveals the body background behind the
-			 * rounded surfaces, so this prevents a jarring white flash when
-			 * bouncing. Falls back to the equivalent literal value for browsers
-			 * that don't support custom properties.
+			 * rounded surfaces, so this prevents a jarring flash when bouncing.
 			 * See https://github.com/WordPress/gutenberg/issues/78564
 			 */
-			background: var(--wpds-color-foreground-content-neutral);
+			background: var(--wpds-color-background-surface-neutral-weak);
 		}
 
 		/* Reset wp-admin padding */
