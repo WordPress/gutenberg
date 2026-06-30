@@ -112,7 +112,6 @@ export interface InlineLinkUIProps {
 		id?: string;
 		target?: string;
 		rel?: string;
-
 		class?: string;
 	};
 	value: RichTextValue;
@@ -120,7 +119,7 @@ export interface InlineLinkUIProps {
 	onFocusOutside: () => void;
 	stopAddingLink: () => void;
 	contentRef: React.RefObject< HTMLElement >;
-	focusOnMount?: 'firstElement' | 'container' | false;
+	focusOnMount?: 'firstElement' | false;
 }
 
 /**

@@ -1,6 +1,11 @@
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
-import { RichTextToolbarButton, useSettings } from '@wordpress/block-editor';
+
+import {
+	RichTextToolbarButton,
+	useSettings,
+	// @ts-ignore
+} from '@wordpress/block-editor';
 import {
 	Icon,
 	color as colorIcon,

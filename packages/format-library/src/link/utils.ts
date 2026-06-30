@@ -190,13 +190,11 @@ export function getFormatBoundary(
 
 	const index = newFormats[ initialIndex ].indexOf( targetFormat );
 
-	const walkingArgs = [ newFormats, initialIndex, targetFormat, index ];
-
 	// Walk the startIndex "backwards" to the leading "edge" of the matching format.
-	startIndex = walkToStart( ...walkingArgs );
+	startIndex = walkToStart( newFormats, initialIndex, targetFormat, index );
 
 	// Walk the endIndex "forwards" until the trailing "edge" of the matching format.
-	endIndex = walkToEnd( ...walkingArgs );
+	endIndex = walkToEnd( newFormats, initialIndex, targetFormat, index );
 
 	// Safe guard: start index cannot be less than 0.
 	startIndex = startIndex < 0 ? 0 : startIndex;
@@ -256,7 +254,10 @@ function walkToBoundary(
 }
 
 type WalkFn = (
-	...args: Parameters< typeof walkToBoundary >
+	formats: RichTextFormat[][],
+	initialIndex: number,
+	targetFormatRef: RichTextFormat,
+	formatIndex: number
 ) => ReturnType< typeof walkToBoundary >;
 
 const partialRight =
