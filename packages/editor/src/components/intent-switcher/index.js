@@ -37,19 +37,19 @@ import PostTypeSupportCheck from '../post-type-support-check';
 const INTENTS = [
 	{
 		value: EDITOR_INTENT_EDIT,
-		label: __( 'Edit' ),
+		label: __( 'Editing' ),
 		info: __( 'Edit content directly.' ),
 		shortcut: displayShortcut.secondary( 'z' ),
 	},
 	{
 		value: EDITOR_INTENT_SUGGEST,
-		label: __( 'Suggest' ),
+		label: __( 'Suggesting' ),
 		info: __( 'Propose changes the author can apply or reject.' ),
 		shortcut: displayShortcut.secondary( 'x' ),
 	},
 	{
 		value: EDITOR_INTENT_VIEW,
-		label: __( 'View' ),
+		label: __( 'Viewing' ),
 		info: __( 'Read-only preview of the content.' ),
 		shortcut: displayShortcut.secondary( 'c' ),
 	},

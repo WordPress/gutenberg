@@ -67,12 +67,12 @@ test.describe( 'Suggestion mode', () => {
 		// strict-mode match on both the snackbar and the live region.
 		const snackbarList = page.locator( '.components-snackbar-list' );
 
-		await switchIntent( page, 'Suggest' );
+		await switchIntent( page, 'Suggesting' );
 		await expect(
 			snackbarList.getByText( "You're suggesting" )
 		).toBeVisible();
 
-		await switchIntent( page, 'Edit' );
+		await switchIntent( page, 'Editing' );
 		await expect(
 			snackbarList.getByText( "You're editing" )
 		).toBeVisible();
@@ -87,7 +87,7 @@ test.describe( 'Suggestion mode', () => {
 			attributes: { content: 'Original content' },
 		} );
 
-		await switchIntent( page, 'Suggest' );
+		await switchIntent( page, 'Suggesting' );
 
 		const paragraph = editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
@@ -126,7 +126,7 @@ test.describe( 'Suggestion mode', () => {
 			attributes: { content: 'Hello' },
 		} );
 
-		await switchIntent( page, 'Suggest' );
+		await switchIntent( page, 'Suggesting' );
 
 		const paragraph = editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
@@ -168,7 +168,7 @@ test.describe( 'Suggestion mode', () => {
 			attributes: { content: 'Hello world' },
 		} );
 
-		await switchIntent( page, 'Suggest' );
+		await switchIntent( page, 'Suggesting' );
 
 		const paragraph = editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
@@ -209,7 +209,7 @@ test.describe( 'Suggestion mode', () => {
 			attributes: { content: 'Hello world' },
 		} );
 
-		await switchIntent( page, 'Suggest' );
+		await switchIntent( page, 'Suggesting' );
 
 		const paragraph = editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
@@ -252,7 +252,7 @@ test.describe( 'Suggestion mode', () => {
 			attributes: { content: 'My Heading', level: 2 },
 		} );
 
-		await switchIntent( page, 'Suggest' );
+		await switchIntent( page, 'Suggesting' );
 
 		const heading = editor.canvas
 			.getByRole( 'document', { name: 'Block: Heading' } )
@@ -294,7 +294,7 @@ test.describe( 'Suggestion mode', () => {
 		// become an "Insert block" suggestion on its own — the suggestion
 		// should only appear once the user types content into it. See the
 		// store interceptor's new-block branch.
-		await switchIntent( page, 'Suggest' );
+		await switchIntent( page, 'Suggesting' );
 
 		// Click the default block appender to insert an empty paragraph —
 		// the same path as clicking the empty space below the last block.
