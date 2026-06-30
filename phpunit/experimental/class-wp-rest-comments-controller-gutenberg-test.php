@@ -697,6 +697,78 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$this->assertErrorResponse( 'rest_comment_duplicate_reaction', $response, 409 );
 	}
 
+	/**
+	 * The pre-insert uniqueness check is not atomic. Simulate a concurrent
+	 * request winning the race - inserting the same reaction after this
+	 * request's check but before its own insert - and assert the post-insert
+	 * cleanup converges on a single surviving row.
+	 */
+	public function test_concurrent_duplicate_reaction_converges_to_single_row() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+
+		// Insert a competing reaction while the request is mid-flight (after
+		// its pre-insert check, before its own insert).
+		$injected = false;
+		$inject   = function ( $prepared ) use ( $note_id, $post_id, &$injected ) {
+			if ( ! $injected && isset( $prepared['comment_type'] ) && 'reaction' === $prepared['comment_type'] ) {
+				$injected = true;
+				wp_insert_comment(
+					array(
+						'comment_post_ID'  => $post_id,
+						'comment_parent'   => $note_id,
+						'comment_type'     => 'reaction',
+						'comment_content'  => 'heart',
+						'comment_approved' => 1,
+						'user_id'          => self::$editor_id,
+					)
+				);
+			}
+			return $prepared;
+		};
+		add_filter( 'rest_pre_insert_comment', $inject );
+
+		try {
+			$params  = array(
+				'post'    => $post_id,
+				'type'    => 'reaction',
+				'parent'  => $note_id,
+				'content' => 'heart',
+				'author'  => self::$editor_id,
+			);
+			$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+			$request->add_header( 'Content-Type', 'application/json' );
+			$request->set_body( wp_json_encode( $params ) );
+			$response = rest_get_server()->dispatch( $request );
+			$this->assertSame( 201, $response->get_status() );
+		} finally {
+			remove_filter( 'rest_pre_insert_comment', $inject );
+		}
+
+		// Exactly one approved heart reaction should remain for this user/note.
+		$remaining = get_comments(
+			array(
+				'parent'  => $note_id,
+				'user_id' => self::$editor_id,
+				'type'    => 'reaction',
+				'status'  => 'approve',
+			)
+		);
+		$hearts    = array_values(
+			array_filter(
+				$remaining,
+				function ( $comment ) {
+					return 'heart' === wp_strip_all_tags( $comment->comment_content );
+				}
+			)
+		);
+		$this->assertCount( 1, $hearts, 'Concurrent duplicate reactions should converge to a single row.' );
+
+		// The response must reference the surviving (earliest) row.
+		$this->assertSame( (int) $hearts[0]->comment_ID, $response->get_data()['id'] );
+	}
+
 	public function test_can_create_different_reactions_on_same_note() {
 		wp_set_current_user( self::$editor_id );
 		$post_id = self::factory()->post->create();

@@ -631,6 +631,40 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 			);
 		}
 
+		// The pre-insert uniqueness check is not atomic, so two concurrent
+		// requests for the same user/note/emoji can both insert an approved
+		// row. Converge on a single row deterministically: keep the earliest
+		// matching reaction (lowest comment ID) and delete any later
+		// duplicates. Every concurrent request applies the same rule, so they
+		// all settle on the same surviving row. If this request's own row lost
+		// the race, repoint the response to the survivor.
+		if ( null !== $reaction_slug ) {
+			$matching   = get_comments(
+				array(
+					'parent'  => $request['parent'],
+					'user_id' => get_current_user_id(),
+					'type'    => 'reaction',
+					'status'  => 'approve',
+					'orderby' => 'comment_ID',
+					'order'   => 'ASC',
+				)
+			);
+			$duplicates = array();
+			foreach ( $matching as $candidate ) {
+				if ( wp_strip_all_tags( $candidate->comment_content ) === $reaction_slug ) {
+					$duplicates[] = (int) $candidate->comment_ID;
+				}
+			}
+
+			if ( count( $duplicates ) > 1 ) {
+				$survivor_id = array_shift( $duplicates );
+				foreach ( $duplicates as $duplicate_id ) {
+					wp_delete_comment( $duplicate_id, true );
+				}
+				$comment_id = $survivor_id;
+			}
+		}
+
 		if ( isset( $request['status'] ) ) {
 			$this->handle_status_param( $request['status'], $comment_id );
 		}
