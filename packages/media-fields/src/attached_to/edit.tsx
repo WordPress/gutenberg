@@ -170,7 +170,6 @@ export default function MediaAttachedToEdit( {
 	return (
 		<ComboboxControl
 			className="dataviews-media-field__attached-to"
-			__next40pxDefaultSize
 			isLoading={ isLoading }
 			label={ __( 'Attached to' ) }
 			help={ help }

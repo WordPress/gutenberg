@@ -14,9 +14,7 @@ const { hasTruthyJsxAttribute } = require( '../utils' );
 const COMPONENTS_REQUIRING_40PX = new Set( [
 	'Button',
 	'ClipboardButton',
-	'ComboboxControl',
 	'CustomSelectControl',
-	'FontAppearanceControl',
 	'FormTokenField',
 	'IconButton',
 	'InputControl',
@@ -25,19 +23,6 @@ const COMPONENTS_REQUIRING_40PX = new Set( [
 	'SelectControl',
 	'ToggleGroupControl',
 	'UnitControl',
-] );
-
-/**
- * Components that can use the `render` prop as an alternative to __next40pxDefaultSize.
- */
-const COMPONENTS_WITH_RENDER_EXEMPTION = new Set( [ 'FormFileUpload' ] );
-
-/**
- * All tracked component names for path-based detection.
- */
-const ALL_TRACKED_COMPONENTS = new Set( [
-	...COMPONENTS_REQUIRING_40PX,
-	...COMPONENTS_WITH_RENDER_EXEMPTION,
 ] );
 
 module.exports = {
@@ -59,8 +44,6 @@ module.exports = {
 		messages: {
 			missingProp:
 				'{{ component }} should have the `__next40pxDefaultSize` prop when using the default size.',
-			missingPropFormFileUpload:
-				'FormFileUpload should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
 		},
 	},
 	create( context ) {
@@ -113,7 +96,7 @@ module.exports = {
 				.join( '' );
 
 			// Check if it's one of our tracked components
-			if ( ALL_TRACKED_COMPONENTS.has( pascalCase ) ) {
+			if ( COMPONENTS_REQUIRING_40PX.has( pascalCase ) ) {
 				return pascalCase;
 			}
 
@@ -156,21 +139,6 @@ module.exports = {
 			}
 
 			return false;
-		}
-
-		/**
-		 * Check if the `render` prop exists.
-		 *
-		 * @param {Array} attributes - JSX attributes array
-		 * @return {boolean} Whether render prop exists
-		 */
-		function hasRenderProp( attributes ) {
-			return attributes.some(
-				( a ) =>
-					a.type === 'JSXAttribute' &&
-					a.name &&
-					a.name.name === 'render'
-			);
 		}
 
 		/**
@@ -222,10 +190,7 @@ module.exports = {
 					const localName = specifier.local.name;
 
 					// Track components that require the prop
-					if (
-						COMPONENTS_REQUIRING_40PX.has( importedName ) ||
-						COMPONENTS_WITH_RENDER_EXEMPTION.has( importedName )
-					) {
+					if ( COMPONENTS_REQUIRING_40PX.has( importedName ) ) {
 						trackedImports.set( localName, importedName );
 					}
 				} );
@@ -246,7 +211,7 @@ module.exports = {
 							// Support patterns like `import ClipboardButton from '.';`
 							// (common in component folder examples/tests).
 							// If the local name matches a tracked component, treat it as such.
-							if ( ALL_TRACKED_COMPONENTS.has( localName ) ) {
+							if ( COMPONENTS_REQUIRING_40PX.has( localName ) ) {
 								trackedImports.set( localName, localName );
 							}
 						}
@@ -274,20 +239,6 @@ module.exports = {
 				if (
 					hasTruthyJsxAttribute( attributes, '__next40pxDefaultSize' )
 				) {
-					return;
-				}
-
-				// Handle FormFileUpload special case
-				if ( COMPONENTS_WITH_RENDER_EXEMPTION.has( importedName ) ) {
-					// FormFileUpload is valid if it has a `render` prop
-					if ( hasRenderProp( attributes ) ) {
-						return;
-					}
-
-					context.report( {
-						node,
-						messageId: 'missingPropFormFileUpload',
-					} );
 					return;
 				}
 

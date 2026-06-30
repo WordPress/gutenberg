@@ -195,6 +195,29 @@ export function computeBadges( {
 }
 
 /**
+ * Returns an entity record's display title: the rendered title, "(no title)"
+ * for an untitled entity, or the record's name.
+ *
+ * @param {Object} entityRecord The entity record.
+ * @return {string|undefined} The display title.
+ */
+function getEntityTitle( entityRecord ) {
+	const title = entityRecord?.title;
+
+	// Some entity types use a plain string for the title.
+	if ( typeof title === 'string' ) {
+		return title;
+	}
+
+	// Posts and pages expose `title` as a { raw, rendered } object.
+	if ( title && 'rendered' in title ) {
+		return title.rendered || __( '(no title)' );
+	}
+
+	return entityRecord?.name;
+}
+
+/**
  * Hook to compute link preview data for display.
  *
  * This hook takes raw link data and entity information and computes
@@ -223,10 +246,7 @@ export function useLinkPreview( {
 		)?.home;
 	}, [] );
 
-	const title =
-		entityRecord?.title?.rendered ||
-		entityRecord?.title ||
-		entityRecord?.name;
+	const title = getEntityTitle( entityRecord );
 
 	// Fetch rich URL data if we don't have a title. Internal links should have passed a title.
 	const { richData } = useRemoteUrlData( title ? null : url );

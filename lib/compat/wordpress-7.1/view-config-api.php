@@ -10,6 +10,87 @@
  */
 
 /**
+ * Builds the default `form` configuration for post types that don't provide their own.
+ *
+ * It is a sensible default for `post`, `page`, and custom post types alike rather
+ * than being tailored per type. Post types that need a different shape can replace
+ * it entirely with a dedicated `form` through their own filter callback.
+ *
+ * It is intentionally NOT gated by `supports`. The registered fields are the
+ * single source of truth for what applies: each field is registered for a post
+ * type based on its `supports` (and related flags such as `theme_supports`), and
+ * the editor drops any form field whose definition is absent or whose `isVisible`
+ * returns `false`.
+ *
+ * @return array The default form configuration.
+ */
+function _gutenberg_get_default_post_type_form() {
+	return array(
+		'layout' => array( 'type' => 'panel' ),
+		'fields' => array(
+			array(
+				'id'     => 'featured_media',
+				'layout' => array(
+					'type'          => 'regular',
+					'labelPosition' => 'none',
+				),
+			),
+			array(
+				'id'     => 'post-content-info',
+				'layout' => array(
+					'type'          => 'regular',
+					'labelPosition' => 'none',
+				),
+			),
+			array(
+				'id'     => 'excerpt',
+				'layout' => array(
+					'type'          => 'panel',
+					'labelPosition' => 'top',
+				),
+			),
+			array(
+				'id'       => 'status',
+				'label'    => __( 'Status', 'gutenberg' ),
+				'children' => array(
+					array(
+						'id'     => 'status',
+						'layout' => array(
+							'type'          => 'regular',
+							'labelPosition' => 'none',
+						),
+					),
+					'scheduled_date',
+					'password',
+					'sticky',
+				),
+			),
+			'date',
+			'slug',
+			'author',
+			'template',
+			array(
+				'id'       => 'discussion',
+				'label'    => __( 'Discussion', 'gutenberg' ),
+				'children' => array(
+					array(
+						'id'     => 'comment_status',
+						'layout' => array(
+							'type'          => 'regular',
+							'labelPosition' => 'none',
+						),
+					),
+					'ping_status',
+				),
+			),
+			'parent',
+			'format',
+			'revisions',
+		),
+	);
+}
+
+/**
  * Returns the view configuration for the given entity.
  *
  * Builds the default configuration shared by all entities and then exposes it
@@ -62,7 +143,7 @@ function gutenberg_get_entity_view_config( $kind, $name ) {
 		'default_view'    => $default_view,
 		'default_layouts' => $default_layouts,
 		'view_list'       => $view_list,
-		'form'            => array(),
+		'form'            => 'postType' === $kind ? _gutenberg_get_default_post_type_form() : array(),
 	);
 
 	/**
@@ -231,146 +312,6 @@ function _gutenberg_get_entity_view_config_post_type_page( $config ) {
 					),
 				),
 			),
-		),
-	);
-
-	$config['form'] = array(
-		'layout' => array( 'type' => 'panel' ),
-		'fields' => array(
-			array(
-				'id'     => 'featured_media',
-				'layout' => array(
-					'type'          => 'regular',
-					'labelPosition' => 'none',
-				),
-			),
-			array(
-				'id'     => 'post-content-info',
-				'layout' => array(
-					'type'          => 'regular',
-					'labelPosition' => 'none',
-				),
-			),
-			array(
-				'id'     => 'excerpt',
-				'layout' => array(
-					'type'          => 'panel',
-					'labelPosition' => 'top',
-				),
-			),
-			array(
-				'id'       => 'status',
-				'label'    => __( 'Status', 'gutenberg' ),
-				'children' => array(
-					array(
-						'id'     => 'status',
-						'layout' => array(
-							'type'          => 'regular',
-							'labelPosition' => 'none',
-						),
-					),
-					'scheduled_date',
-					'password',
-					'sticky',
-				),
-			),
-			'date',
-			'slug',
-			'author',
-			'template',
-			array(
-				'id'       => 'discussion',
-				'label'    => __( 'Discussion', 'gutenberg' ),
-				'children' => array(
-					array(
-						'id'     => 'comment_status',
-						'layout' => array(
-							'type'          => 'regular',
-							'labelPosition' => 'none',
-						),
-					),
-					'ping_status',
-				),
-			),
-			'parent',
-			'format',
-			'revisions',
-		),
-	);
-
-	return $config;
-}
-
-/**
- * Provides the view configuration for the `post` post type.
- *
- * @param array $config {
- *     The view configuration for the entity.
- * }
- * @return array The filtered view configuration.
- */
-function _gutenberg_get_entity_view_config_post_type_post( $config ) {
-	$config['form'] = array(
-		'layout' => array( 'type' => 'panel' ),
-		'fields' => array(
-			array(
-				'id'     => 'featured_media',
-				'layout' => array(
-					'type'          => 'regular',
-					'labelPosition' => 'none',
-				),
-			),
-			array(
-				'id'     => 'post-content-info',
-				'layout' => array(
-					'type'          => 'regular',
-					'labelPosition' => 'none',
-				),
-			),
-			array(
-				'id'     => 'excerpt',
-				'layout' => array(
-					'type'          => 'panel',
-					'labelPosition' => 'top',
-				),
-			),
-			array(
-				'id'       => 'status',
-				'label'    => __( 'Status', 'gutenberg' ),
-				'children' => array(
-					array(
-						'id'     => 'status',
-						'layout' => array(
-							'type'          => 'regular',
-							'labelPosition' => 'none',
-						),
-					),
-					'scheduled_date',
-					'password',
-					'sticky',
-				),
-			),
-			'date',
-			'slug',
-			'author',
-			'template',
-			array(
-				'id'       => 'discussion',
-				'label'    => __( 'Discussion', 'gutenberg' ),
-				'children' => array(
-					array(
-						'id'     => 'comment_status',
-						'layout' => array(
-							'type'          => 'regular',
-							'labelPosition' => 'none',
-						),
-					),
-					'ping_status',
-				),
-			),
-			'parent',
-			'format',
-			'revisions',
 		),
 	);
 
@@ -798,6 +739,10 @@ function _gutenberg_get_entity_view_config_post_type_wp_template( $config ) {
  * plugin always ships the newest configuration, so it removes the core defaults
  * and installs its own `_gutenberg_*` callbacks instead.
  *
+ * Post types without a dedicated `_gutenberg_*` callback (e.g. `post`) still have
+ * the core callback removed so they fall back to the default configuration
+ * built in gutenberg_get_entity_view_config().
+ *
  * This runs on `init` rather than at file include time so that the core
  * defaults are guaranteed to be registered first, regardless of whether core
  * registers them at include time or lazily on a hook.
@@ -813,7 +758,9 @@ function gutenberg_register_entity_view_config_filters() {
 		if ( has_filter( $hook, $wp_callback ) ) {
 			remove_filter( $hook, $wp_callback );
 		}
-		add_filter( $hook, $gb_callback, 10, 1 );
+		if ( function_exists( $gb_callback ) ) {
+			add_filter( $hook, $gb_callback, 10, 1 );
+		}
 	}
 }
 add_action( 'init', 'gutenberg_register_entity_view_config_filters' );

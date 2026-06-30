@@ -52,7 +52,7 @@ const UnforwardedValidatedComboboxControl = (
 				)
 			}
 		>
-			<ComboboxControl __next40pxDefaultSize { ...restProps } />
+			<ComboboxControl { ...restProps } />
 		</ControlWithError>
 	);
 };
