@@ -125,5 +125,7 @@ jobs:
                   npm ci
                   npx lerna publish patch --dist-tag "wp-$WP_VERSION" --no-private --yes --no-verify-access
               env:
+                  GIT_TRACE: '1'
+                  GIT_CURL_VERBOSE: '1'
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
                   WP_VERSION: ${{ github.event.inputs.wp_version }}
