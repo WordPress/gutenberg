@@ -145,17 +145,6 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		// When this element is itself focused but nested inside another
-		// editing host (e.g. an HTML block's static inner blocks), writing
-		// flow owns its selection; don't self-sync. The editable root host
-		// case is different: the host holds focus, not this element.
-		if (
-			ownerDocument.activeElement === element &&
-			element.parentElement.closest( '[contenteditable="true"]' )
-		) {
-			return;
-		}
-
 		// In case of a keyboard event, ignore selection changes during
 		// composition.
 		if ( isComposing ) {
