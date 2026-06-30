@@ -57,7 +57,6 @@ export function WidgetHeader( {
 			{ showIdentity && widgetType?.title && (
 				<Stack
 					direction="row"
-					justify="space-between"
 					align="center"
 					gap="sm"
 					className={ styles.identity }

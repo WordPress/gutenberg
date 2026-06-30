@@ -22,9 +22,7 @@ type NamedGridWidth = Exclude<
 >;
 
 export interface WidgetLayoutControlsProps {
-	/*
-	 * The instance these controls manage within the layout.
-	 */
+	/** The instance these controls manage within the layout. */
 	widget: DashboardWidget< unknown >;
 }
 

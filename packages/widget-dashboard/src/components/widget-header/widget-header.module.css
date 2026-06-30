@@ -14,8 +14,7 @@
 /* Let a long title shrink and ellipsize instead of pushing the toolbar out. */
 .identity {
 	min-width: 0;
-	height: 40px;
-
+	height: var(--wpds-dimension-size-lg);
 }
 
 .icon {
