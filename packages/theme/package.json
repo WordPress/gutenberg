@@ -45,13 +45,9 @@
 		"src/prebuilt/js/*.mjs",
 		"utils.scss",
 		"*.md",
-		"!**/__snapshots__",
 		"!**/__snapshots__/**",
-		"!**/fixtures",
 		"!**/fixtures/**",
-		"!**/stories",
 		"!**/stories/**",
-		"!**/test",
 		"!**/test/**"
 	],
 	"type": "module",

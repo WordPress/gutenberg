@@ -5,19 +5,45 @@ import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
+import { parseArgs } from 'node:util';
 
-const [ packagePath, ...args ] = process.argv.slice( 2 );
+const usage = [
+	'Usage: node tools/validation/validate-package-contents.mjs <package-directory> [options]',
+	'Options:',
+	'  --attw-profile <profile>',
+	'  --attw-exclude-entrypoint <entrypoint>',
+	'  --attw-ignore-rule <rule>',
+].join( '\n' );
 
-if ( ! packagePath ) {
-	console.error(
-		[
-			'Usage: node tools/validation/validate-package-contents.mjs <package-directory> [options]',
-			'Options:',
-			'  --attw-profile <profile>',
-			'  --attw-exclude-entrypoint <entrypoint>',
-			'  --attw-ignore-rule <rule>',
-		].join( '\n' )
-	);
+let parsedArgs;
+
+try {
+	parsedArgs = parseArgs( {
+		allowPositionals: true,
+		options: {
+			'attw-profile': {
+				type: 'string',
+			},
+			'attw-exclude-entrypoint': {
+				multiple: true,
+				type: 'string',
+			},
+			'attw-ignore-rule': {
+				multiple: true,
+				type: 'string',
+			},
+		},
+	} );
+} catch ( error ) {
+	console.error( error.message );
+	console.error( usage );
+	process.exit( 1 );
+}
+
+const [ packagePath, ...extraPositionals ] = parsedArgs.positionals;
+
+if ( ! packagePath || extraPositionals.length ) {
+	console.error( usage );
 	process.exit( 1 );
 }
 
@@ -27,9 +53,9 @@ const attwPackagePath = require.resolve( '@arethetypeswrong/cli/package.json' );
 const attwCliPath = join( dirname( attwPackagePath ), 'dist/index.js' );
 
 const attwOptions = {
-	profile: 'strict',
-	excludedEntryPoints: [],
-	ignoredRules: [],
+	profile: parsedArgs.values[ 'attw-profile' ] ?? 'strict',
+	excludedEntryPoints: parsedArgs.values[ 'attw-exclude-entrypoint' ] ?? [],
+	ignoredRules: parsedArgs.values[ 'attw-ignore-rule' ] ?? [],
 };
 
 const disallowedPathPatterns = [
@@ -44,33 +70,6 @@ const disallowedPathPatterns = [
 const packageJson = JSON.parse(
 	readFileSync( join( packageRoot, 'package.json' ), 'utf8' )
 );
-
-for ( let index = 0; index < args.length; index++ ) {
-	const arg = args[ index ];
-	const value = args[ index + 1 ];
-
-	if ( ! value || value.startsWith( '--' ) ) {
-		console.error( `Missing value for ${ arg }.` );
-		process.exit( 1 );
-	}
-
-	switch ( arg ) {
-		case '--attw-profile':
-			attwOptions.profile = value;
-			break;
-		case '--attw-exclude-entrypoint':
-			attwOptions.excludedEntryPoints.push( value );
-			break;
-		case '--attw-ignore-rule':
-			attwOptions.ignoredRules.push( value );
-			break;
-		default:
-			console.error( `Unknown option: ${ arg }.` );
-			process.exit( 1 );
-	}
-
-	index++;
-}
 
 /**
  * @param {unknown} value Export map value.
@@ -104,7 +103,6 @@ const env = {
 	...process.env,
 	npm_config_cache:
 		process.env.WORDPRESS_PACKAGE_NPM_CACHE ??
-		process.env.WORDPRESS_THEME_NPM_CACHE ??
 		join( tmpdir(), 'wordpress-package-npm-cache' ),
 };
 
