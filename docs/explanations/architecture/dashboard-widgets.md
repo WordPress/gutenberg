@@ -47,13 +47,13 @@ export default function HelloWorld( { attributes } ) { ... }
 
 ## The server registry
 
-`WP_Widget_Type_Registry` (`lib/experimental/dashboard-widgets/`) is a singleton, hydrated at `init` from the manifest. Each entry becomes a `WP_Widget_Type` with `name`, `render_module`, `widget_module`, and `presentation`.
+`WP_Widget_Type_Registry` (`lib/experimental/dashboard-widgets/`) is a singleton, hydrated at `init` from the manifest. Each entry becomes a `WP_Widget_Type` with `name`, `render_module`, `widget_module`, `presentation`, and `category`.
 
 The hydration is a deterministic copy, with no filters in between. The `widgets/` folder is the single source of widget authorship in this codebase.
 
 The registry is the server's authoritative list of widget types for the site. Two consumers read it:
 
--   The REST controller (`WP_REST_Widget_Modules_Controller`) exposes it at `/wp/v2/widget-modules`, returning `{ name, render_module, widget_module, presentation }` per record.
+-   The REST controller (`WP_REST_Widget_Modules_Controller`) exposes it at `/wp/v2/widget-modules`, returning `{ name, render_module, widget_module, presentation, category }` per record.
 -   The dashboard page hooks its `dashboard-wp-admin_boot_dependencies` filter, a per-page instance of the generic `{page-slug}-wp-admin_boot_dependencies`, and adds every registered module to its import map as a `dynamic` dependency. A dynamic dependency is reachable by `import()` but never executed eagerly.
 
 Registration only makes the modules known to WordPress; loading them is a separate, per-host decision. Dynamic `import()` against the import map is how the dashboard loads widgets today. A host can load them another way: enqueue a module eagerly (`wp_enqueue_script_module()`), declare it as a `static` dependency of its own module, or, outside WordPress, skip the import map and resolve modules through its own `ResolveWidgetModule`.
@@ -64,7 +64,7 @@ The registry exists as a class, rather than having REST read the manifest direct
 
 Everything after the REST record is the job of [`@wordpress/widget-primitives`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/widget-primitives), the contract both widget authors and hosts share. Its full surface (the contract types, the discovery hook, and the render component) is covered in the _Widget Primitives / Introduction_ story. In the pipeline it does two things.
 
-`useWidgetTypes( records )` takes the host-supplied records, imports each record's `widget_module` for the live metadata, and merges it with the record into `WidgetType[]`. The record's `presentation`, sourced from `widget.json`, wins over the module's value. The hook reaches for no store or endpoint; the dashboard, for instance, reads its own `widgetModule` core-data entity (backed by `/wp/v2/widget-modules`) and passes the records in.
+`useWidgetTypes( records )` takes the host-supplied records, imports each record's `widget_module` for the live metadata, and merges it with the record into `WidgetType[]`. The record's `presentation` and `category`, both sourced from `widget.json`, win over the module's value. The hook reaches for no store or endpoint; the dashboard, for instance, reads its own `widgetModule` core-data entity (backed by `/wp/v2/widget-modules`) and passes the records in.
 
 `<WidgetRender>` then resolves a `WidgetType.renderModule` through a host-provided `ResolveWidgetModule` and mounts the component with the `attributes` / `setAttributes` contract. On a WordPress page the resolver can be as simple as `( id ) => import( id )`; hosts with other loading strategies supply their own.
 

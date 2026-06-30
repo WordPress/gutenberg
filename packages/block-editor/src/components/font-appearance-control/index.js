@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { CustomSelectControl } from '@wordpress/components';
-import deprecated from '@wordpress/deprecated';
 import { useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -40,8 +39,12 @@ const getFontAppearanceLabel = ( hasFontStyles, hasFontWeights ) => {
  */
 export default function FontAppearanceControl( props ) {
 	const {
-		/** Start opting into the larger default height that will become the default size in a future version. */
-		__next40pxDefaultSize = false,
+		/**
+		 * Start opting into the larger default height that will become the default size in a future version.
+		 *
+		 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
+		 */
+		__next40pxDefaultSize: _next40pxDefaultSize,
 		onChange,
 		hasFontStyles = true,
 		hasFontWeights = true,
@@ -148,27 +151,12 @@ export default function FontAppearanceControl( props ) {
 		);
 	};
 
-	if (
-		! __next40pxDefaultSize &&
-		( otherProps.size === undefined || otherProps.size === 'default' )
-	) {
-		deprecated(
-			`36px default size for wp.blockEditor.__experimentalFontAppearanceControl`,
-			{
-				since: '6.8',
-				version: '7.1',
-				hint: 'Set the `__next40pxDefaultSize` prop to true to start opting into the new default size, which will become the default in a future version.',
-			}
-		);
-	}
-
 	return (
 		hasStylesOrWeights && (
 			<CustomSelectControl
 				{ ...otherProps }
+				__next40pxDefaultSize
 				className="components-font-appearance-control"
-				__next40pxDefaultSize={ __next40pxDefaultSize }
-				__shouldNotWarnDeprecated36pxSize
 				label={ label }
 				describedBy={ getDescribedBy() }
 				options={ selectOptions }

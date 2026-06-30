@@ -7,7 +7,6 @@
  * window.__gutenbergTestWebSocketSync.rooms that the Playwright fixtures poll.
  */
 
-// eslint-disable-next-line import/no-extraneous-dependencies -- declared in test/e2e/package.json, only loaded by the WS e2e harness.
 import { WebsocketProvider } from 'y-websocket';
 
 const TEST_PROVIDER_NAMESPACE = 'gutenberg-test/rtc-websocket-provider';

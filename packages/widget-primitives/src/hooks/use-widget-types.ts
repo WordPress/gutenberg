@@ -65,6 +65,9 @@ export function useWidgetTypes(
 						...( record.presentation
 							? { presentation: record.presentation }
 							: {} ),
+						...( record.category
+							? { category: record.category }
+							: {} ),
 					} as WidgetType;
 				} catch {
 					return null;

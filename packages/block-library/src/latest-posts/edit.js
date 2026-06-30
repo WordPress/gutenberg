@@ -265,7 +265,6 @@ function Controls( { attributes, setAttributes } ) {
 							isShownByDefault
 						>
 							<RangeControl
-								__next40pxDefaultSize
 								label={ __( 'Max number of words' ) }
 								value={ excerptLength }
 								onChange={ ( value ) =>
