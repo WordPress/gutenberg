@@ -92,6 +92,12 @@ function Edit( {
 
 		const focusButtonAt = ( index ) => {
 			window.requestAnimationFrame( () => {
+				// Only move focus if the editor canvas currently has focus,
+				// preventing focus theft from external UI like the revisions slider.
+				if ( ! menuRef.current?.ownerDocument.hasFocus() ) {
+					return;
+				}
+
 				const buttons = menuRef.current?.querySelectorAll( 'button' );
 				const target = buttons?.[ index ];
 				if ( ! target ) {
