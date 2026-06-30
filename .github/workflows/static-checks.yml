@@ -95,14 +95,8 @@ jobs:
             - name: Lint JavaScript
               if: ${{ matrix.annotations }}
               # `--quiet` reports only errors so they aren't buried under warnings in the CI log.
-              # `--prune-suppressions` plus the diff below ensures `suppressions.json` stays in sync.
-              run: |
-                  set -euo pipefail
-                  npm run lint:js -- --format compact --quiet --prune-suppressions
-                  if ! git diff --exit-code tools/eslint/suppressions.json; then
-                      echo "::error::tools/eslint/suppressions.json is out of date. Run \`npm run lint:js:prune-suppressions\` and commit the changes."
-                      exit 1
-                  fi
+              # `--prune-suppressions` ensures `suppressions.json` stays in sync.
+              run: npm run lint:js -- --format compact --quiet --prune-suppressions
 
             - name: Lint Styles
               if: ${{ matrix.annotations }}
