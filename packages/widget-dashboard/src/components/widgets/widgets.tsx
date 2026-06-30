@@ -21,10 +21,10 @@ import type { WidgetName } from '@wordpress/widget-primitives';
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardContainerColumnCount } from '../../hooks/use-dashboard-container-column-count';
+import { WidgetAttributeControls } from '../widget-attribute-controls';
 import { WidgetChrome } from '../widget-chrome';
 import { WidgetHeader } from '../widget-header';
 import { WidgetLayoutControls } from '../widget-layout-controls';
-import { WidgetSettingsTrigger } from '../widget-settings';
 import { WidgetToolbar } from '../widget-toolbar';
 import { WidgetResizeHandle } from './widget-resize-handle';
 import styles from './widgets.module.css';
@@ -134,15 +134,19 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 				( type ) => type.name === widget.type
 			);
 			const hasSettings = !! widgetType?.attributes?.length;
+			const hasHighRelevanceAttributes = !! widgetType?.attributes?.some(
+				( attribute ) => attribute.relevance === 'high'
+			);
 
 			// Grid-slot overlay (outside the card's `inert`) with the active
-			// mode's controls: layout while customizing, the gear otherwise.
+			// mode's controls: layout while customizing, the attribute
+			// controls (high-relevance fields plus the gear) otherwise.
 			let controls: React.ReactNode;
 			if ( editMode ) {
 				controls = <WidgetLayoutControls widget={ widget } />;
 			} else if ( hasSettings && widgetType ) {
 				controls = (
-					<WidgetSettingsTrigger
+					<WidgetAttributeControls
 						widget={ widget }
 						widgetType={ widgetType }
 					/>
@@ -151,7 +155,11 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 
 			const actionableArea = controls ? (
 				<WidgetHeader overlay>
-					<WidgetToolbar revealOnHover={ ! editMode }>
+					<WidgetToolbar
+						revealOnHover={
+							! editMode && ! hasHighRelevanceAttributes
+						}
+					>
 						{ controls }
 					</WidgetToolbar>
 				</WidgetHeader>
