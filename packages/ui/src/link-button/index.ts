@@ -10,7 +10,7 @@ LinkButtonIcon.displayName = 'LinkButton.Icon';
  * button prominence is intentional.
  *
  * See the [Usage Guidelines](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-button-usage-guidelines--docs)
- * for when to use `Button`, `Link`, or `LinkButton`.
+ * for when to use `Button`, `IconButton`, `Link`, or `LinkButton`.
  */
 export const LinkButton = Object.assign( _LinkButton, {
 	/**

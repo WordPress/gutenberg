@@ -1,10 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { createInterpolateElement } from '@wordpress/element';
+import { cog } from '@wordpress/icons';
 import { Button } from '../index';
+import { IconButton } from '../../icon-button';
 import { Link } from '../../link';
 import { LinkButton } from '../../link-button';
 import { Stack } from '../../stack';
 import { Text } from '../../text';
+import * as Tooltip from '../../tooltip';
 
 const meta: Meta = {
 	title: 'Design System/Components/Button/Usage Guidelines',
@@ -18,18 +21,26 @@ export default meta;
 type Story = StoryObj;
 
 /**
- * Use `Button` for actions on the current view: submitting a form, opening a
- * dialog, toggling UI, or running JavaScript. It renders a `<button>` and
- * supports loading and pressed states.
+ * Use `Button` or `IconButton` for actions on the current view: submitting a
+ * form, opening a dialog, toggling UI, or running JavaScript. Both render a
+ * `<button>` and support loading and pressed states.
  */
 export const UseButtonForActions: Story = {
 	render: () => (
-		<Stack direction="row" gap="sm" wrap="wrap">
-			<Button type="submit">Save changes</Button>
-			<Button variant="outline" onClick={ () => {} }>
-				Open settings
-			</Button>
-		</Stack>
+		<Tooltip.Provider delay={ 0 }>
+			<Stack direction="row" gap="sm" wrap="wrap" align="center">
+				<Button type="submit">Save changes</Button>
+				<Button variant="outline" onClick={ () => {} }>
+					Settings
+				</Button>
+				<IconButton
+					icon={ cog }
+					label="Settings"
+					variant="outline"
+					onClick={ () => {} }
+				/>
+			</Stack>
+		</Tooltip.Provider>
 	),
 };
 

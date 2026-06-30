@@ -13,7 +13,7 @@ import defenseStyles from '../utils/css/global-css-defense.module.css';
  * unstyled escape hatch.
  *
  * See the [Usage Guidelines](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-button-usage-guidelines--docs)
- * for when to use `Button`, `Link`, or `LinkButton`.
+ * for when to use `Button`, `IconButton`, `Link`, or `LinkButton`.
  */
 export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
 	{
