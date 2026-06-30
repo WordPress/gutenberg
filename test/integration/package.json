@@ -28,6 +28,7 @@
 		"@wordpress/blocks": "file:../../packages/blocks",
 		"@wordpress/data": "file:../../packages/data",
 		"@wordpress/element": "file:../../packages/element",
+		"@wordpress/format-library": "file:../../packages/format-library",
 		"@wordpress/prettier-config": "file:../../packages/prettier-config",
 		"@wordpress/rich-text": "file:../../packages/rich-text",
 		"ajv": "^8.17.1",

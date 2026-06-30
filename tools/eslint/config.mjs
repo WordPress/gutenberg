@@ -373,10 +373,18 @@ export default dedupePlugins( [
 		files: developmentFiles,
 		rules: {
 			'import/default': 'off',
-			'import/no-extraneous-dependencies': 'off',
 			'import/no-unresolved': 'off',
 			'import/named': 'off',
 			'@wordpress/data-no-store-string-literals': 'off',
+		},
+	},
+
+	// Override: Fixture files are usually not run as real code and instead
+	// analyzed statically, so validating dependencies is unnecessary.
+	{
+		files: [ '**/fixtures/**' ],
+		rules: {
+			'import/no-extraneous-dependencies': 'off',
 		},
 	},
 
