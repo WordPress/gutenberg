@@ -3,5 +3,6 @@
 	"title": "Quick draft",
 	"description": "Quickly draft a new post.",
 	"category": "dashboard",
-	"presentation": "content-bleed"
+	"presentation": "content-bleed",
+	"textdomain": "default"
 }

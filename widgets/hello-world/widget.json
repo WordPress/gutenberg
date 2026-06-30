@@ -3,5 +3,6 @@
 	"title": "Hello World",
 	"description": "A minimal example widget.",
 	"category": "demo",
-	"presentation": "full-bleed"
+	"presentation": "full-bleed",
+	"textdomain": "default"
 }
