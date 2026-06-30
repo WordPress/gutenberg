@@ -163,7 +163,7 @@ export const IncorrectBadgeWithIcon: Story = {
 		<>
 			{ /* @ts-expect-error Demonstrating incorrect Badge usage with icon children. */ }
 			<Badge intent="stable">
-				<Stack direction="row" gap="xs" align="center">
+				<Stack direction="row" gap="xs" align="center" render={ <span /> }>
 					<Icon icon={ published } size={ 16 } />
 					Active
 				</Stack>
