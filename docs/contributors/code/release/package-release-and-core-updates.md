@@ -130,6 +130,10 @@ Behind the scenes, the rest of the process is automated with `npm exec --no rele
     - If the publishing process ends up incomplete (perhaps because it timed-out or a bad OTP was introduced) you can resume it via [`npx lerna publish from-package`](https://lerna.js.org/docs/features/version-and-publish#from-package).
 6. Finally, now that the npm packages are published, cherry-pick the commits created by lerna ("Publish" and the CHANGELOG update) into the `trunk` branch of Gutenberg.
 
+If the standalone bugfix release bumps a package version that is also present on an active `wp/X.Y` branch, backport the package version bump to that branch as well. This keeps the WordPress release branch aligned with versions already published to npm. Otherwise, a later publish from `wp/X.Y` may try to publish the same next patch version, which npm rejects because package versions are global across dist-tags.
+
+For example, if `wp/latest` publishes `@wordpress/block-directory@5.40.1` and `wp/7.0` still contains `@wordpress/block-directory@5.40.0`, backport the `5.40.1` version bump to `wp/7.0`. The next `wp-7.0` publish will then bump to `5.40.2` instead of attempting to republish `5.40.1`.
+
 ## Development releases
 
 As noted in the [Synchronizing Gutenberg Plugin](#synchronizing-the-gutenberg-plugin) section, packages publishing happens every two weeks from the `wp/latest` branch. It's also possible to use the development release to test the upcoming changes present in the `trunk` branch at any time. We are taking advantage of [package distribution tags](https://docs.npmjs.com/cli/v7/commands/npm-dist-tag) that make it possible to consume the future version of the codebase according to npm guidelines:
