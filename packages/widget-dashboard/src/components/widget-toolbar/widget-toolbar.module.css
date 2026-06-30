@@ -1,17 +1,8 @@
-/**
- * Toolbar chip holding the active mode's controls. Always visible; lifted with
- * a shadow only while customizing.
- */
 .widgetToolbar {
 	padding: var(--wpds-dimension-padding-xs);
-	border-radius: var(--wpds-border-radius-md);
 	background: var(--wpds-color-background-surface-neutral-strong);
-	border: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
 }
 
-/**
- * Customize: lifted off the tile.
- */
 .elevated {
 	box-shadow: var(--wpds-elevation-xs);
 }
