@@ -6,6 +6,11 @@
 
 -   `WidgetAttributeField< Item >`: authoring helper narrowing a DataViews
     `Field.id` to the widget's attribute keys.
+
+### Enhancements
+
+-   `WidgetAttributeField`: add optional `relevance` hint (`'high' | 'low'`)
+    marking attributes a host may promote to a prominent surface.
 -   `WidgetModuleRecord`: add optional `category`, overlaid onto the
     metadata module's value.
 -   `WidgetModuleRecord`: add optional `title`, `description`, and
