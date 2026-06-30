@@ -76,6 +76,29 @@ describe( 'InnerContent', () => {
 		expect( root.querySelector( '[onclick]' ) ).toBeNull();
 		expect( root.querySelector( 'button' ) ).toHaveTextContent( 'Click' );
 	} );
+
+	it( 'uses the `html` prop verbatim instead of building from innerContent', () => {
+		const block = createBlock(
+			BLOCK_NAME,
+			{},
+			[],
+			[ '<p class="from-inner-content">derived</p>' ]
+		);
+		const shell =
+			'<div class="ssr-shell"><wp-inner-block-slot data-slot-index="0"></wp-inner-block-slot></div>';
+		const { container } = render(
+			<BlockEditorProvider value={ [ block ] }>
+				<InnerContent clientId={ block.clientId } html={ shell } />
+			</BlockEditorProvider>
+		);
+		const root = container.querySelector( '.block-editor-inner-content' );
+
+		// The provided shell (and its slot) is injected as-is...
+		expect( root.querySelector( '.ssr-shell' ) ).not.toBeNull();
+		expect( root.querySelector( 'wp-inner-block-slot' ) ).not.toBeNull();
+		// ...and the innerContent-derived markup is ignored.
+		expect( root.querySelector( '.from-inner-content' ) ).toBeNull();
+	} );
 } );
 
 /* eslint-enable testing-library/no-node-access, testing-library/no-container, testing-library/render-result-naming-convention */
