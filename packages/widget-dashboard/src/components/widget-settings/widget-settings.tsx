@@ -23,8 +23,8 @@ type WidgetAttributes = Record< string, unknown >;
  * Side drawer that edits one instance's attributes, mounted once at the
  * dashboard root. It resolves the active instance from `settingsWidgetUuid`
  * in the UI context (set by the per-instance gear), renders the type's
- * declarative `attributes` through `DataForm`, and enters from the edge away
- * from the widget.
+ * declarative `attributes` through `DataForm`, and enters from the
+ * inline-end edge.
  *
  * Edits write to the staging layer, so they preview live behind the drawer
  * and are published on Save or reverted on any other exit. Available in
@@ -39,12 +39,8 @@ export function WidgetSettings(): React.ReactNode {
 		cancel: cancelStaging,
 		hasUncommittedChanges,
 	} = useDashboardInternalContext();
-	const {
-		settingsWidgetUuid,
-		setSettingsWidgetUuid,
-		settingsDrawerSide,
-		settingsDrawerInset,
-	} = useDashboardUIContext();
+	const { settingsWidgetUuid, setSettingsWidgetUuid } =
+		useDashboardUIContext();
 
 	const open = settingsWidgetUuid !== null;
 
@@ -126,17 +122,6 @@ export function WidgetSettings(): React.ReactNode {
 		[ cancelStaging, close ]
 	);
 
-	// For a left drawer, clear the fixed admin menu on the inline-start
-	// edge so the drawer lands beside it. The admin bar at the top is
-	// cleared in the CSS module.
-	const popupStyle = useMemo< React.CSSProperties >(
-		() =>
-			settingsDrawerSide === 'left' && settingsDrawerInset > 0
-				? { marginLeft: settingsDrawerInset }
-				: {},
-		[ settingsDrawerSide, settingsDrawerInset ]
-	);
-
 	const hasForm = !! widget && !! widgetType && fields.length > 0;
 
 	if ( ! hasForm ) {
@@ -152,15 +137,11 @@ export function WidgetSettings(): React.ReactNode {
 		<Drawer.Root
 			open={ open }
 			onOpenChange={ handleOpenChange }
-			swipeDirection={ settingsDrawerSide }
+			swipeDirection="right"
 			modal={ false }
 			disablePointerDismissal
 		>
-			<Drawer.Popup
-				size="medium"
-				className={ styles.popup }
-				style={ popupStyle }
-			>
+			<Drawer.Popup size="medium" className={ styles.popup }>
 				<Drawer.Header>
 					<Drawer.Title>{ title }</Drawer.Title>
 					<Drawer.CloseIcon />

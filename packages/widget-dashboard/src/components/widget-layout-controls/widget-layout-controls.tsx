@@ -4,7 +4,6 @@
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { moreVertical, trash } from '@wordpress/icons';
-// Dashboard is still experimental.
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { IconButton } from '@wordpress/ui';
 
@@ -13,8 +12,6 @@ import { IconButton } from '@wordpress/ui';
  */
 import { unlock } from '../../lock-unlock';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
-import { WidgetToolbar } from '../widget-toolbar';
-import styles from './widget-layout-toolbar.module.css';
 import type { DashboardWidget, GridTilePlacement } from '../../types';
 
 const { Menu } = unlock( componentsPrivateApis );
@@ -24,21 +21,21 @@ type NamedGridWidth = Exclude<
 	number
 >;
 
-export interface WidgetLayoutToolbarProps {
-	/** The instance this toolbar manages within the layout. */
+export interface WidgetLayoutControlsProps {
+	/**
+	 * The instance these controls manage within the layout.
+	 */
 	widget: DashboardWidget< unknown >;
 }
 
 /**
- * Customize-mode per-tile toolbar: a width menu and removal, editing the
- * widget's place in the layout. Lives in the grid's `actionableArea` slot, so
- * it stays interactive while the card is `inert`.
+ * Customize-mode controls: width menu and removal.
  *
- * @param {WidgetLayoutToolbarProps} props Component props.
+ * @param {WidgetLayoutControlsProps} props Component props.
  */
-export function WidgetLayoutToolbar( {
+export function WidgetLayoutControls( {
 	widget,
-}: WidgetLayoutToolbarProps ): React.ReactNode {
+}: WidgetLayoutControlsProps ): React.ReactNode {
 	const { layout, onLayoutChange } = useDashboardInternalContext();
 	const width = widget.placement?.width;
 
@@ -70,7 +67,7 @@ export function WidgetLayoutToolbar( {
 	};
 
 	return (
-		<WidgetToolbar className={ styles.widgetLayoutToolbar }>
+		<>
 			<Menu>
 				<Menu.TriggerButton
 					render={
@@ -83,6 +80,7 @@ export function WidgetLayoutToolbar( {
 						/>
 					}
 				/>
+
 				<Menu.Popover>
 					<Menu.Group>
 						<Menu.GroupLabel>{ __( 'Width' ) }</Menu.GroupLabel>
@@ -105,6 +103,7 @@ export function WidgetLayoutToolbar( {
 					</Menu.Group>
 				</Menu.Popover>
 			</Menu>
+
 			<IconButton
 				icon={ trash }
 				label={ __( 'Remove' ) }
@@ -113,6 +112,6 @@ export function WidgetLayoutToolbar( {
 				tone="neutral"
 				onClick={ onRemove }
 			/>
-		</WidgetToolbar>
+		</>
 	);
 }
