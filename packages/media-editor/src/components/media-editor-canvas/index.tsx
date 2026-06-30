@@ -50,13 +50,11 @@ export default function MediaEditorCanvas( {
 	// Resolved aspect ratio is derived from the preset key + the
 	// loaded image (for the "Original" preset). The reducer doesn't
 	// store this number — only the preset key — so it's a render-time
-	// derivation here.
+	// derivation here. Circle crops force a 1:1 ratio inside `Cropper`
+	// via `stencilShape`, so no shape branch is needed here.
 	const aspectRatio = useMemo(
-		() =>
-			cropShape === 'circle'
-				? 1
-				: resolveAspectRatio( aspectRatioValue, cropperImage ),
-		[ aspectRatioValue, cropShape, cropperImage ]
+		() => resolveAspectRatio( aspectRatioValue, cropperImage ),
+		[ aspectRatioValue, cropperImage ]
 	);
 
 	const handleGestureStart = useCallback( () => {

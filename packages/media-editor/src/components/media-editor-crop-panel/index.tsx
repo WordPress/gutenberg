@@ -66,7 +66,7 @@ export default function MediaEditorCropPanel( {
 				help={
 					cropShape === 'circle'
 						? __(
-								'Circle crops will be saved as PNG files to preserve transparency.'
+								'Circle crops are saved as PNG files to preserve transparency, but may result in larger file sizes.'
 						  )
 						: undefined
 				}

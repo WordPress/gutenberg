@@ -8,6 +8,11 @@
 /**
  * Registers Gutenberg image editors that include MVP mask support.
  *
+ * This is not registered on `wp_image_editors` globally. The attachment
+ * controller adds it as a filter only around the editor selection for a mask
+ * request and removes it immediately after, so the site's default image editor
+ * is left untouched for all other image operations.
+ *
  * @param string[] $editors Image editor class names.
  * @return string[] Filtered image editor class names.
  */
@@ -28,4 +33,3 @@ function gutenberg_register_mask_image_editors( $editors ) {
 
 	return array_values( array_unique( array_merge( $mask_editors, $editors ) ) );
 }
-add_filter( 'wp_image_editors', 'gutenberg_register_mask_image_editors' );

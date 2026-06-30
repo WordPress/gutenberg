@@ -94,7 +94,7 @@ class Gutenberg_Image_Editor_Imagick extends WP_Image_Editor_Imagick {
 			return new WP_Error(
 				'image_mask_error',
 				$e->getMessage(),
-				$this->file
+				array( 'status' => 500 )
 			);
 		}
 

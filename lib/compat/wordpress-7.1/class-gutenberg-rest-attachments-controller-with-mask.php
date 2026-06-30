@@ -5,8 +5,6 @@
  * @package gutenberg
  */
 
-require_once __DIR__ . '/image-editor-mask.php';
-
 /**
  * Attachment controller base class with experimental mask modifier support.
  *
@@ -80,7 +78,22 @@ class Gutenberg_REST_Attachments_Controller_With_Mask extends WP_REST_Attachment
 	 * @return WP_REST_Response|WP_Error Response object on success, WP_Error object on failure.
 	 */
 	public function edit_media_item( $request ) {
-		if ( ! $this->gutenberg_has_circle_mask_modifier( $request ) ) {
+		$has_circle_mask = false;
+
+		if ( ! empty( $request['modifiers'] ) && is_array( $request['modifiers'] ) ) {
+			foreach ( $request['modifiers'] as $modifier ) {
+				if (
+					is_array( $modifier ) &&
+					'mask' === ( $modifier['type'] ?? null ) &&
+					'circle' === ( $modifier['args']['shape'] ?? null )
+				) {
+					$has_circle_mask = true;
+					break;
+				}
+			}
+		}
+
+		if ( ! $has_circle_mask ) {
 			return parent::edit_media_item( $request );
 		}
 
@@ -130,55 +143,13 @@ class Gutenberg_REST_Attachments_Controller_With_Mask extends WP_REST_Attachment
 			);
 		}
 
-		// The `modifiers` param takes precedence over the older format.
-		if ( isset( $request['modifiers'] ) ) {
-			$modifiers = $request['modifiers'];
-		} else {
-			$modifiers = array();
-
-			if ( isset( $request['flip']['horizontal'] ) || isset( $request['flip']['vertical'] ) ) {
-				$flip_args = array(
-					'vertical'   => isset( $request['flip']['vertical'] ) ? (bool) $request['flip']['vertical'] : false,
-					'horizontal' => isset( $request['flip']['horizontal'] ) ? (bool) $request['flip']['horizontal'] : false,
-				);
-
-				$modifiers[] = array(
-					'type' => 'flip',
-					'args' => array(
-						'flip' => $flip_args,
-					),
-				);
-			}
-
-			if ( ! empty( $request['rotation'] ) ) {
-				$modifiers[] = array(
-					'type' => 'rotate',
-					'args' => array(
-						'angle' => $request['rotation'],
-					),
-				);
-			}
-
-			if ( isset( $request['x'], $request['y'], $request['width'], $request['height'] ) ) {
-				$modifiers[] = array(
-					'type' => 'crop',
-					'args' => array(
-						'left'   => $request['x'],
-						'top'    => $request['y'],
-						'width'  => $request['width'],
-						'height' => $request['height'],
-					),
-				);
-			}
-
-			if ( 0 === count( $modifiers ) ) {
-				return new WP_Error(
-					'rest_image_not_edited',
-					__( 'The image was not edited. Edit the image before applying the changes.', 'gutenberg' ),
-					array( 'status' => 400 )
-				);
-			}
-		}
+		/*
+		 * This method only runs for requests that include a `mask` modifier,
+		 * so the `modifiers` param is always present here. The older
+		 * flip/rotate/crop request format does not support masks and is left
+		 * to Core's `edit_media_item()` via the parent delegation above.
+		 */
+		$modifiers = $request['modifiers'];
 
 		/*
 		 * If the file doesn't exist, attempt a URL fopen on the src link.
@@ -190,6 +161,12 @@ class Gutenberg_REST_Attachments_Controller_With_Mask extends WP_REST_Attachment
 			$image_file_to_edit = _load_image_to_edit_path( $attachment_id );
 		}
 
+		/*
+		 * Register the Gutenberg mask-capable image editors only for this
+		 * editor selection, so the global image editor is not swapped for
+		 * unrelated image operations elsewhere on the site.
+		 */
+		add_filter( 'wp_image_editors', 'gutenberg_register_mask_image_editors' );
 		$image_editor = wp_get_image_editor(
 			$image_file_to_edit,
 			array(
@@ -198,6 +175,7 @@ class Gutenberg_REST_Attachments_Controller_With_Mask extends WP_REST_Attachment
 				'output_mime_type' => 'image/png',
 			)
 		);
+		remove_filter( 'wp_image_editors', 'gutenberg_register_mask_image_editors' );
 
 		if ( is_wp_error( $image_editor ) ) {
 			return new WP_Error(
@@ -420,29 +398,5 @@ class Gutenberg_REST_Attachments_Controller_With_Mask extends WP_REST_Attachment
 		$response->header( 'Location', rest_url( sprintf( '%s/%s/%s', $this->namespace, $this->rest_base, $new_attachment_id ) ) );
 
 		return $response;
-	}
-
-	/**
-	 * Checks whether a request contains the experimental circle mask modifier.
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return bool Whether the request has a circle mask modifier.
-	 */
-	protected function gutenberg_has_circle_mask_modifier( $request ) {
-		if ( empty( $request['modifiers'] ) || ! is_array( $request['modifiers'] ) ) {
-			return false;
-		}
-
-		foreach ( $request['modifiers'] as $modifier ) {
-			if (
-				is_array( $modifier ) &&
-				'mask' === ( $modifier['type'] ?? null ) &&
-				'circle' === ( $modifier['args']['shape'] ?? null )
-			) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 }

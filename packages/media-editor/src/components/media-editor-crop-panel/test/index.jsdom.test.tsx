@@ -63,7 +63,7 @@ describe( 'MediaEditorCropPanel', () => {
 		expect( screen.getByRole( 'radio', { name: 'Circle' } ) ).toBeChecked();
 		expect(
 			screen.getByText(
-				'Circle crops will be saved as PNG files to preserve transparency.'
+				'Circle crops are saved as PNG files to preserve transparency, but may result in larger file sizes.'
 			)
 		).toBeInTheDocument();
 	} );
@@ -73,7 +73,7 @@ describe( 'MediaEditorCropPanel', () => {
 
 		expect(
 			screen.queryByText(
-				'Circle crops will be saved as PNG files to preserve transparency.'
+				'Circle crops are saved as PNG files to preserve transparency, but may result in larger file sizes.'
 			)
 		).not.toBeInTheDocument();
 	} );
