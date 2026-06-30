@@ -159,7 +159,6 @@ async function build() {
 			env: { ...process.env, NODE_ENV: 'production' },
 		} );
 
-		// Step 7.5: Build blocks manifests
 		console.log( '\n📦 Building blocks manifests...' );
 		const blocksDirs = [
 			{
