@@ -8,21 +8,14 @@ This is a temporary rule to help migrate components to the new default size. Onc
 
 The following components are checked by this rule:
 
--   BorderBoxControl
--   BorderControl
 -   Button
 -   ComboboxControl
 -   CustomSelectControl
 -   FontAppearanceControl
--   FontFamilyControl
--   FontSizePicker
 -   FormFileUpload (special case - see below)
 -   FormTokenField
 -   InputControl
--   LetterSpacingControl
--   LineHeightControl
 -   NumberControl
--   RangeControl
 -   SelectControl
 -   ToggleGroupControl
 -   UnitControl

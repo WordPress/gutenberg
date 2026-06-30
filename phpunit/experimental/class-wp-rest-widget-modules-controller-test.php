@@ -59,6 +59,7 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 			array(
 				'render_module' => 'wp/widgets/widget-a/render',
 				'widget_module' => 'wp/widgets/widget-a/widget',
+				'category'      => 'dashboard',
 			)
 		);
 
@@ -124,6 +125,7 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 		$this->assertSame( 'test-plugin/widget-a', $data['name'] );
 		$this->assertSame( 'wp/widgets/widget-a/render', $data['render_module'] );
 		$this->assertSame( 'wp/widgets/widget-a/widget', $data['widget_module'] );
+		$this->assertSame( 'dashboard', $data['category'] );
 	}
 
 	public function test_get_item_returns_404_for_unknown_name() {
@@ -169,8 +171,10 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'name', $properties );
 		$this->assertArrayHasKey( 'render_module', $properties );
 		$this->assertArrayHasKey( 'widget_module', $properties );
+		$this->assertArrayHasKey( 'category', $properties );
 		$this->assertSame( 'string', $properties['name']['type'] );
 		$this->assertSame( array( 'string', 'null' ), $properties['render_module']['type'] );
 		$this->assertSame( array( 'string', 'null' ), $properties['widget_module']['type'] );
+		$this->assertSame( array( 'string', 'null' ), $properties['category']['type'] );
 	}
 }

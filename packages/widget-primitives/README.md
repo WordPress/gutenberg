@@ -4,9 +4,9 @@
 This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-The host-agnostic toolkit for dashboard widgets: the contract types that define
-what a widget is, plus the runtime to discover the registered widget types and
-resolve their render modules.
+The host-agnostic toolkit for widgets: the contract types that define what a
+widget is, plus the runtime to discover widget types and resolve their render
+modules.
 
 ## Installation
 
@@ -36,23 +36,29 @@ endpoint, exposed while the `gutenberg-dashboard-widgets` experiment is
 enabled. The dashboard reads it through a `@wordpress/core-data` entity and
 passes the records to the hook.
 
-With no records, or an empty list, `useWidgetTypes()` returns an empty list.
+An empty list of records resolves to an empty `widgetTypes` with
+`isResolvingWidgetTypes` set to `false`. Passing `null` (or `undefined`) keeps
+the hook in its loading state: `widgetTypes` is empty and
+`isResolvingWidgetTypes` stays `true`.
 
 ## Public API
 
--   `<WidgetRender>`: canonical entry point for any host that mounts a widget.
-    Resolves the widget's render module via a host-provided `resolveWidgetModule`
-    and mounts the resulting component with the standard `attributes` plus
-    `setAttributes` render contract. Suspense, error handling, and chrome are
-    host concerns.
+-   `<WidgetRender>`: entry point for any host that mounts a widget. It
+    resolves the widget's render module via a host-provided
+    `resolveWidgetModule` and mounts the resulting component with the
+    `attributes` / `setAttributes` render contract. Error handling and chrome
+    stay with the host, which wraps the lazy render in a `Suspense` boundary.
 -   `useWidgetTypes( records )` → `[ widgetTypes, isResolvingWidgetTypes ]`:
     takes host-supplied records (`WidgetModuleRecord[]`, or `null` while
-    loading), imports each record's metadata, and returns the resolved
-    `WidgetType[]` plus a flag that is true while they are still resolving.
+    loading) and imports each record's metadata module;
+    `isResolvingWidgetTypes` stays `true` until they resolve.
 -   Contract types: `WidgetType`, `WidgetName`, `WidgetIcon`,
     `WidgetRenderProps`, `ResolveWidgetModule`, `WidgetModuleRecord`.
     `WidgetIcon` is a rendered SVG element; hosts pass it to their icon
     primitive as is.
+-   `WidgetAttributeField< Item >`: authoring helper. It is a DataViews
+    `Field` whose `id` is narrowed to the keys of the widget's attribute
+    object.
 
 ## Architecture
 

@@ -194,8 +194,13 @@ export const getEntityRecord =
 					} );
 				}
 
+				const syncManager =
+					select?.isCollaborationSupported?.() === false
+						? undefined
+						: getSyncManager();
+
 				// Load the entity record for syncing. Do not await promise.
-				void getSyncManager()?.load(
+				void syncManager?.load(
 					entityConfig.syncConfig,
 					objectType,
 					objectId,

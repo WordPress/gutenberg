@@ -6,13 +6,16 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, useRef, useCallback } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useRef, useCallback, useState } from '@wordpress/element';
 import { ResizableBox } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import ResizeHandle from './resize-handle';
+import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 // Removes the inline styles in the drag handles.
 const HANDLE_STYLES_OVERRIDE = {
@@ -27,28 +30,87 @@ const HANDLE_STYLES_OVERRIDE = {
 	left: undefined,
 };
 
+/**
+ * Checks if the current width is at the max width.
+ *
+ * @param {number} currentWidth   - The current width of the editor.
+ * @param {number} containerWidth - The width of the container.
+ * @param {number} tolerance      - The tolerance for the max width in pixels.
+ * @return {boolean} - True if the current width is at the max width, false otherwise.
+ */
+function isAtMaxWidth( currentWidth, containerWidth, tolerance = 0 ) {
+	return containerWidth > 0 && currentWidth >= containerWidth - tolerance;
+}
+
 function ResizableEditor( { className, enableResizing, height, children } ) {
-	const [ width, setWidth ] = useState( '100%' );
+	const [ isResizing, setIsResizing ] = useState( false );
+	const { setCanvasWidth } = unlock( useDispatch( editorStore ) );
+	const canvasWidth = useSelect(
+		( select ) => {
+			if ( ! enableResizing ) {
+				return undefined;
+			}
+			const { getCanvasWidth } = unlock( select( editorStore ) );
+			return getCanvasWidth();
+		},
+		[ enableResizing ]
+	);
+
 	const resizableRef = useRef();
-	const resizeWidthBy = useCallback( ( deltaPixels ) => {
-		if ( resizableRef.current ) {
-			setWidth( resizableRef.current.offsetWidth + deltaPixels );
-		}
-	}, [] );
+	const resizeWidthBy = useCallback(
+		( deltaPixels ) => {
+			if ( resizableRef.current ) {
+				const _isAtMaxWidth = isAtMaxWidth(
+					resizableRef.current.offsetWidth + deltaPixels,
+					resizableRef.current.parentElement?.offsetWidth ?? 0,
+					80
+				);
+				setCanvasWidth(
+					_isAtMaxWidth
+						? undefined
+						: resizableRef.current.offsetWidth + deltaPixels
+				);
+			}
+		},
+		[ setCanvasWidth ]
+	);
+
+	const updateCanvasWidth = useCallback(
+		( element ) => {
+			const currentWidth = element.offsetWidth;
+			const containerWidth = element.parentElement?.offsetWidth ?? 0;
+			setCanvasWidth(
+				isAtMaxWidth( currentWidth, containerWidth, 80 )
+					? undefined
+					: currentWidth
+			);
+		},
+		[ setCanvasWidth ]
+	);
+
 	return (
 		<ResizableBox
 			className={ clsx( 'editor-resizable-editor', className, {
 				'is-resizable': enableResizing,
+				'is-resizing': isResizing,
 			} ) }
 			ref={ ( api ) => {
 				resizableRef.current = api?.resizable;
 			} }
 			size={ {
-				width: enableResizing ? width : '100%',
+				width:
+					enableResizing && canvasWidth ? canvasWidth + 'px' : '100%',
 				height: enableResizing && height ? height : '100%',
 			} }
+			onResizeStart={ () => {
+				setIsResizing( true );
+			} }
+			onResize={ ( event, direction, element ) => {
+				updateCanvasWidth( element );
+			} }
 			onResizeStop={ ( event, direction, element ) => {
-				setWidth( element.style.width );
+				setIsResizing( false );
+				updateCanvasWidth( element );
 			} }
 			minWidth={ 300 }
 			maxWidth="100%"

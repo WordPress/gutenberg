@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.92.0 (2026-06-24)
+
 ### Documentation
 
 -   Fix `thats` typo to `that` in external template documentation. ([#79331](https://github.com/WordPress/gutenberg/pull/79331))

@@ -1692,6 +1692,12 @@ const canInsertBlockTypeUnmemoized = (
 		return false;
 	}
 
+	// No insertion within static inner content: the inner blocks are fixed
+	// at their placeholder positions within the static markup.
+	if ( isInnerContentRoot( state, rootClientId ) ) {
+		return false;
+	}
+
 	const blockEditingMode = getBlockEditingMode( state, rootClientId ?? '' );
 
 	// Compute section context early so the disabled check below can use it.
@@ -1900,6 +1906,24 @@ export function canInsertBlocks( state, clientIds, rootClientId = null ) {
 }
 
 /**
+ * Returns whether the given root block keeps its markup as static inner
+ * content (the Custom HTML block). Its inner blocks are fixed at their
+ * positions within the static markup: they can be edited in place, but not
+ * moved or removed, and no blocks can be inserted alongside them. This only
+ * applies to the direct children; deeper descendants are unaffected.
+ *
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Root block client ID.
+ *
+ * @return {boolean} Whether the root block uses static inner content.
+ */
+function isInnerContentRoot( state, rootClientId ) {
+	return (
+		!! rootClientId && getBlockName( state, rootClientId ) === 'core/html'
+	);
+}
+
+/**
  * Determines if the given block is allowed to be deleted.
  *
  * @param {Object} state    Editor state.
@@ -1910,6 +1934,14 @@ export function canInsertBlocks( state, clientIds, rootClientId = null ) {
 export function canRemoveBlock( state, clientId ) {
 	// Disable removal in preview mode.
 	if ( state.settings.isPreviewMode ) {
+		return false;
+	}
+
+	// Blocks within static inner content are fixed in place; a `lock`
+	// attribute can't override the structural constraint.
+	if (
+		isInnerContentRoot( state, getBlockRootClientId( state, clientId ) )
+	) {
 		return false;
 	}
 
@@ -2011,6 +2043,14 @@ export function canRemoveBlocks( state, clientIds ) {
 export function canMoveBlock( state, clientId ) {
 	// Disable moving in preview mode.
 	if ( state.settings.isPreviewMode ) {
+		return false;
+	}
+
+	// Blocks within static inner content are fixed in place; a `lock`
+	// attribute can't override the structural constraint.
+	if (
+		isInnerContentRoot( state, getBlockRootClientId( state, clientId ) )
+	) {
 		return false;
 	}
 

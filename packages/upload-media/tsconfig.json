@@ -14,6 +14,7 @@
 		{ "path": "../preferences" },
 		{ "path": "../private-apis" },
 		{ "path": "../url" },
-		{ "path": "../vips" }
+		{ "path": "../vips" },
+		{ "path": "../video-conversion" }
 	]
 }

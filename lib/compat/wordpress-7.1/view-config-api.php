@@ -462,6 +462,28 @@ function _gutenberg_get_entity_view_config_post_type_wp_block( $config ) {
 
 	$config['view_list'] = $view_list;
 
+	$config['form'] = array(
+		'layout' => array( 'type' => 'panel' ),
+		'fields' => array(
+			array(
+				'id'     => 'excerpt',
+				'layout' => array(
+					'type'          => 'panel',
+					'labelPosition' => 'top',
+				),
+			),
+			array(
+				'id'     => 'post-content-info',
+				'layout' => array(
+					'type'          => 'regular',
+					'labelPosition' => 'none',
+				),
+			),
+			'sync-status',
+			'revisions',
+		),
+	);
+
 	return $config;
 }
 
