@@ -114,6 +114,7 @@ function gutenberg_initialize_experiments_settings() {
 					'id'          => 'gutenberg-guidelines',
 					'label'       => __( 'Guidelines', 'gutenberg' ),
 					'description' => __( 'Enables the Guidelines page under Settings and the experimental knowledge storage (wp_knowledge).', 'gutenberg' ),
+				),
 				array(
 					'id'          => 'gutenberg-content-types',
 					'label'       => __( 'Content types', 'gutenberg' ),
