@@ -13,7 +13,7 @@
 
 ### Enhancements
 
--   Global Styles inheritance: the local-override dot in inspector control labels is now a direct reset control — it shows a reset icon on hover/focus and clears the override on click — and no longer offers a per-control "push to Global Styles" action ([#PENDING](https://github.com/WordPress/gutenberg/pull/PENDING)).
+-   Global Styles inheritance: the local-override dot in inspector control labels is now a direct reset control — it shows a reset icon on hover/focus and clears the override on click — and no longer offers a per-control "push to Global Styles" action ([#79719](https://github.com/WordPress/gutenberg/pull/79719)).
 
 ## 15.22.0 (2026-06-24)
 

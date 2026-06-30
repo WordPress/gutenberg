@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   "Apply globally" (block Advanced controls) now opens a review modal that lists each changed style, so individual changes can be deselected before they are applied to all blocks of the type, instead of pushing every change at once ([#PENDING](https://github.com/WordPress/gutenberg/pull/PENDING)).
+-   "Apply globally" (block Advanced controls) now opens a review modal that lists each changed style, so individual changes can be deselected before they are applied to all blocks of the type, instead of pushing every change at once ([#79719](https://github.com/WordPress/gutenberg/pull/79719)).
 
 ## 14.49.0 (2026-06-24)
 
