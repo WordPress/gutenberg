@@ -17,6 +17,7 @@ import {
 	isShuffleCycleComplete,
 	getNextRepeatMode,
 	getPlaylistPlaybackAction,
+	replayWaveformPlayerTrack,
 	refreshWaveformPlayerColors,
 	setupPlaylistControls,
 } from '../waveform-utils';
@@ -651,10 +652,23 @@ describe( 'Waveform utilities', () => {
 			} );
 		} );
 
-		it( 'loads the next track in order when repeat-one is active and skip is pressed', () => {
+		it( 'replays the current track when repeat-one is active and skip is pressed', () => {
 			expect(
 				getPlaylistPlaybackAction( [ 'a', 'b', 'c' ], 'b', {
 					repeatMode: 'one',
+					isUserInitiated: true,
+				} )
+			).toEqual( {
+				action: 'repeat',
+				nextId: 'b',
+				playedIds: [],
+			} );
+		} );
+
+		it( 'loads the next track in order when repeat-playlist is active and skip is pressed', () => {
+			expect(
+				getPlaylistPlaybackAction( [ 'a', 'b', 'c' ], 'b', {
+					repeatMode: 'all',
 					isUserInitiated: true,
 				} )
 			).toEqual( {
@@ -715,6 +729,20 @@ describe( 'Waveform utilities', () => {
 			} );
 		} );
 
+		it( 'loads a shuffled track when repeat-playlist and shuffle are active and skip is pressed', () => {
+			expect(
+				getPlaylistPlaybackAction( [ 'a', 'b', 'c' ], 'a', {
+					repeatMode: 'all',
+					isShuffled: true,
+					isUserInitiated: true,
+				} )
+			).toEqual( {
+				action: 'advance',
+				nextId: 'b',
+				playedIds: [ 'a', 'b' ],
+			} );
+		} );
+
 		it( 'replays the current track when repeat-one and shuffle are active and a track ends', () => {
 			expect(
 				getPlaylistPlaybackAction( [ 'a', 'b', 'c' ], 'b', {
@@ -729,16 +757,17 @@ describe( 'Waveform utilities', () => {
 			} );
 		} );
 
-		it( 'loads a shuffled track when repeat-one and shuffle are active and skip is pressed', () => {
+		it( 'replays the current track when repeat-one and shuffle are active and skip is pressed', () => {
 			expect(
 				getPlaylistPlaybackAction( [ 'a', 'b', 'c' ], 'a', {
 					repeatMode: 'one',
 					isShuffled: true,
+					playedTracks: [ 'a', 'b' ],
 					isUserInitiated: true,
 				} )
 			).toEqual( {
-				action: 'advance',
-				nextId: 'b',
+				action: 'repeat',
+				nextId: 'a',
 				playedIds: [ 'a', 'b' ],
 			} );
 		} );
@@ -837,6 +866,7 @@ describe( 'Waveform utilities', () => {
 			);
 			expect( repeatBtn ).toHaveAttribute( 'aria-label', 'Repeat off' );
 			expect( repeatBtn ).toHaveAttribute( 'aria-pressed', 'false' );
+			const repeatAllIcon = repeatBtn.innerHTML;
 
 			repeatBtn.click();
 			expect( repeatBtn ).toHaveAttribute(
@@ -845,6 +875,7 @@ describe( 'Waveform utilities', () => {
 			);
 			expect( repeatBtn ).toHaveAttribute( 'aria-pressed', 'true' );
 			expect( repeatBtn ).toHaveAttribute( 'data-repeat-mode', 'all' );
+			expect( repeatBtn.innerHTML ).toBe( repeatAllIcon );
 			expect( onRepeatToggle ).toHaveBeenLastCalledWith( 'all' );
 
 			repeatBtn.click();
@@ -854,14 +885,30 @@ describe( 'Waveform utilities', () => {
 			);
 			expect( repeatBtn ).toHaveAttribute( 'aria-pressed', 'true' );
 			expect( repeatBtn ).toHaveAttribute( 'data-repeat-mode', 'one' );
+			expect( repeatBtn.innerHTML ).not.toBe( repeatAllIcon );
 			expect( onRepeatToggle ).toHaveBeenLastCalledWith( 'one' );
 
 			repeatBtn.click();
 			expect( repeatBtn ).toHaveAttribute( 'aria-label', 'Repeat off' );
 			expect( repeatBtn ).toHaveAttribute( 'aria-pressed', 'false' );
 			expect( repeatBtn ).toHaveAttribute( 'data-repeat-mode', 'none' );
+			expect( repeatBtn.innerHTML ).toBe( repeatAllIcon );
 			expect( onRepeatToggle ).toHaveBeenLastCalledWith( 'none' );
 			expect( onRepeatToggle ).toHaveBeenCalledTimes( 3 );
+		} );
+	} );
+
+	describe( 'replayWaveformPlayerTrack', () => {
+		it( 'seeks to the start of the current track and plays it', () => {
+			const instance = {
+				seekTo: jest.fn(),
+				play: jest.fn().mockReturnValue( Promise.resolve() ),
+			};
+
+			replayWaveformPlayerTrack( instance );
+
+			expect( instance.seekTo ).toHaveBeenCalledWith( 0 );
+			expect( instance.play ).toHaveBeenCalled();
 		} );
 	} );
 

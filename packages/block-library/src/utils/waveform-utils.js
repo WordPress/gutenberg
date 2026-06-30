@@ -102,9 +102,9 @@ export function isShuffleCycleComplete( trackIds, currentId, playedIds = [] ) {
 /**
  * Get the next playlist playback action for track end or skip controls.
  *
- * Repeat-one only applies when a track ends. User-initiated skip controls still
- * advance through the playlist, using shuffle when it is active. Repeat-all
- * wraps to the start of the playlist, or starts a new shuffle cycle.
+ * Repeat-one replays the current track on track end or skip. Repeat-all
+ * advances through the playlist, wrapping to the start or starting a new
+ * shuffle cycle when needed.
  *
  * @param {string[]} trackIds                - All track IDs, in playlist order.
  * @param {string}   currentId               - The current track ID.
@@ -135,7 +135,7 @@ export function getPlaylistPlaybackAction(
 		repeatMode ?? ( isRepeating ? REPEAT_MODE_ONE : REPEAT_MODE_NONE )
 	);
 
-	if ( mode === REPEAT_MODE_ONE && ! isUserInitiated ) {
+	if ( mode === REPEAT_MODE_ONE ) {
 		return { action: 'repeat', nextId: currentId, playedIds: playedTracks };
 	}
 
@@ -175,6 +175,16 @@ export function getPlaylistPlaybackAction(
 	}
 
 	return { action: 'stop', nextId: undefined, playedIds: playedTracks };
+}
+
+/**
+ * Restart the current waveform player track and begin playback.
+ *
+ * @param {Object} instance - The WaveformPlayer library instance.
+ */
+export function replayWaveformPlayerTrack( instance ) {
+	instance?.seekTo?.( 0 );
+	instance?.play()?.catch( logPlayError );
 }
 
 /**
@@ -507,7 +517,9 @@ const ICON_NEXT =
 	'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m15.5 12-9 6V6zm2 5.5H16v-11h1.5z" /></svg>';
 const ICON_SHUFFLE =
 	'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M17.192 6.75L15.47 5.03l1.06-1.06 3.537 3.53-3.537 3.53-1.06-1.06 1.723-1.72h-3.19c-.602 0-.993.202-1.28.498-.309.319-.538.792-.695 1.383-.13.488-.222 1.023-.296 1.508-.034.664-.116 1.413-.303 2.117-.193.721-.513 1.467-1.068 2.04-.575.594-1.359.954-2.357.954H4v-1.5h4.003c.601 0 .993-.202 1.28-.498.308-.319.538-.792.695-1.383.149-.557.216-1.093.288-1.662l.039-.31a9.653 9.653 0 0 1 .272-1.653c.193-.722.513-1.467 1.067-2.04.576-.594 1.36-.954 2.358-.954h3.19zM8.004 6.75c.8 0 1.46.23 1.988.628a6.24 6.24 0 0 0-.684 1.396 1.725 1.725 0 0 0-.024-.026c-.287-.296-.679-.498-1.28-.498H4v-1.5h4.003zM12.699 14.726c-.161.459-.38.94-.684 1.396.527.397 1.188.628 1.988.628h3.19l-1.722 1.72 1.06 1.06L20.067 16l-3.537-3.53-1.06 1.06 1.723 1.72h-3.19c-.602 0-.993-.202-1.28-.498a1.96 1.96 0 0 1-.024-.026z" /></svg>';
-const ICON_REPEAT =
+const ICON_REPEAT_ALL =
+	'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 7a1.75 1.75 0 0 0-1.75 1.75v4.44l-1.72-1.72-1.06 1.06L6 16.06l3.53-3.53-1.06-1.06-1.72 1.72V8.75A.25.25 0 0 1 7 8.5h10a.25.25 0 0 1 .25.25v6.5a.25.25 0 0 1-.25.25h-6.379l-1.5 1.5H17a1.75 1.75 0 0 0 1.75-1.75v-6.5A1.75 1.75 0 0 0 17 7z" /></svg>';
+const ICON_REPEAT_ONE =
 	'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m14.47 11.47 1.06 1.061 1.72-1.72v4.439a.25.25 0 0 1-.25.25h-6.379l-1.5 1.5H17a1.75 1.75 0 0 0 1.75-1.75v-4.438l1.72 1.72 1.06-1.061L18 7.94zM7 7a1.75 1.75 0 0 0-1.75 1.75v4.44l-1.72-1.72-1.06 1.06L6 16.06l3.53-3.53-1.06-1.06-1.72 1.72V8.75A.25.25 0 0 1 7 8.5h6.379l1.5-1.5z" /></svg>';
 
 /**
@@ -656,10 +668,13 @@ export function setupPlaylistControls(
 	const repeatBtn = doc.createElement( 'button' );
 	repeatBtn.type = 'button';
 	repeatBtn.className = 'wp-block-playlist__control-btn';
-	repeatBtn.innerHTML = ICON_REPEAT;
 	const updateRepeatButton = ( mode ) => {
 		currentRepeatMode = normalizeRepeatMode( mode );
 		const label = getRepeatLabel( currentRepeatMode );
+		repeatBtn.innerHTML =
+			currentRepeatMode === REPEAT_MODE_ONE
+				? ICON_REPEAT_ONE
+				: ICON_REPEAT_ALL;
 		repeatBtn.dataset.repeatMode = currentRepeatMode;
 		repeatBtn.setAttribute(
 			'aria-pressed',
@@ -745,8 +760,8 @@ export function setupPlaylistControls(
  * @param {Function} options.onEnded         - Callback when track ends.
  * @param {Object}   options.labels          - Translated button labels.
  * @param {string}   options.waveformStyle   - Waveform style (bars, mirror, line, blocks, dots, seekbar).
- * @param {Function} options.onPrev          - Callback for previous track.
- * @param {Function} options.onNext          - Callback for next track.
+ * @param {Function} options.onPrev          - Callback for previous track; receives the player instance.
+ * @param {Function} options.onNext          - Callback for next track; receives the player instance.
  * @param {Function} options.onShuffleToggle - Callback for shuffle toggle.
  * @param {Function} options.onRepeatToggle  - Callback for repeat toggle.
  * @param {boolean}  options.isShuffled      - Initial shuffle state.
@@ -824,7 +839,12 @@ export function initWaveformPlayer(
 			if ( onPrev || onNext || onShuffleToggle || onRepeatToggle ) {
 				const controls = setupPlaylistControls(
 					container,
-					{ onPrev, onNext, onShuffleToggle, onRepeatToggle },
+					{
+						onPrev: () => onPrev?.( instance ),
+						onNext: () => onNext?.( instance ),
+						onShuffleToggle,
+						onRepeatToggle,
+					},
 					isShuffled,
 					repeatMode,
 					labels

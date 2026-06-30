@@ -39,9 +39,9 @@ import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { WaveformPlayer } from '../utils/waveform-player';
 import { PlaylistContext } from './context';
 import {
-	logPlayError,
 	getPlaylistPlaybackAction,
 	getNextRepeatMode,
+	replayWaveformPlayerTrack,
 } from '../utils/waveform-utils';
 import { getTrackAttributes } from './utils';
 
@@ -173,7 +173,7 @@ const PlaylistEdit = ( {
 			);
 			setPlayedTracks( playedIds );
 			if ( action === 'repeat' ) {
-				playerInstance?.play()?.catch( logPlayError );
+				replayWaveformPlayerTrack( playerInstance );
 				return;
 			}
 			if ( nextId ) {
@@ -201,24 +201,31 @@ const PlaylistEdit = ( {
 		}
 	}, [ currentTrackClientId, setCurrentTrackClientId, tracks ] );
 
-	const onNext = useCallback( () => {
-		const { nextId, playedIds } = getPlaylistPlaybackAction(
-			tracks.map( ( track ) => track.clientId ),
+	const onNext = useCallback(
+		( playerInstance ) => {
+			const { action, nextId, playedIds } = getPlaylistPlaybackAction(
+				tracks.map( ( track ) => track.clientId ),
+				currentTrackClientId,
+				{ repeatMode, isShuffled, playedTracks, isUserInitiated: true }
+			);
+			setPlayedTracks( playedIds );
+			if ( action === 'repeat' ) {
+				replayWaveformPlayerTrack( playerInstance );
+				return;
+			}
+			if ( nextId ) {
+				setCurrentTrackClientId( nextId );
+			}
+		},
+		[
 			currentTrackClientId,
-			{ repeatMode, isShuffled, playedTracks, isUserInitiated: true }
-		);
-		setPlayedTracks( playedIds );
-		if ( nextId ) {
-			setCurrentTrackClientId( nextId );
-		}
-	}, [
-		currentTrackClientId,
-		isShuffled,
-		playedTracks,
-		repeatMode,
-		setCurrentTrackClientId,
-		tracks,
-	] );
+			isShuffled,
+			playedTracks,
+			repeatMode,
+			setCurrentTrackClientId,
+			tracks,
+		]
+	);
 
 	const onShuffleToggle = useCallback( () => {
 		setIsShuffled( ( prev ) => ! prev );

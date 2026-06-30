@@ -66,7 +66,7 @@ function updatePlayerMetadata( instance, { title, artist, image, imageAlt } ) {
  * @param {string}   props.waveformStyle   - Waveform style (bars, mirror, etc).
  * @param {Function} props.onEnded         - Callback when the track finishes playing.
  * @param {Function} props.onPrev          - Callback for previous track.
- * @param {Function} props.onNext          - Callback for next track.
+ * @param {Function} props.onNext          - Callback for next track; receives the player instance.
  * @param {Function} props.onShuffleToggle - Callback for shuffle toggle.
  * @param {Function} props.onRepeatToggle  - Callback for repeat toggle.
  * @param {boolean}  props.isShuffled      - Whether shuffle is active.
@@ -138,8 +138,12 @@ export function WaveformPlayer( {
 
 	// Wrap callbacks and state reads in stable event handlers so the player
 	// isn't recreated when they change, while always seeing the latest value.
-	const onPrevEvent = useEvent( () => onPrev?.() );
-	const onNextEvent = useEvent( () => onNext?.() );
+	const onPrevEvent = useEvent( ( playerInstance ) =>
+		onPrev?.( playerInstance )
+	);
+	const onNextEvent = useEvent( ( playerInstance ) =>
+		onNext?.( playerInstance )
+	);
 	const onShuffleToggleEvent = useEvent( () => onShuffleToggle?.() );
 	const onRepeatToggleEvent = useEvent( ( nextMode ) =>
 		onRepeatToggle?.( nextMode )

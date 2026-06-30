@@ -38,6 +38,12 @@ $playlist-control-size: 24px;
 			transform: none;
 		}
 
+		&:focus,
+		&:focus-visible {
+			box-shadow: none;
+			outline: none;
+		}
+
 		svg {
 			width: 40px;
 			height: 40px;
@@ -127,6 +133,12 @@ $playlist-control-size: 24px;
 			opacity: 0.8;
 		}
 
+		&:focus,
+		&:focus-visible {
+			box-shadow: none;
+			outline: none;
+		}
+
 		// Toggled-on state (shuffle/repeat): invert to a solid text-color
 		// background with a contrasting icon so it reads clearly at a glance.
 		// aria-pressed is the single source of truth for the toggle state.
@@ -152,18 +164,6 @@ $playlist-control-size: 24px;
 
 		svg path {
 			fill: currentColor;
-		}
-
-		&[data-repeat-mode='one']::after {
-			position: absolute;
-			inset-block-start: 50%;
-			inset-inline-start: 50%;
-			color: var( --wp-playlist-active-icon-color, #fff );
-			content: '1';
-			font-size: 8px;
-			font-weight: 600;
-			line-height: 1;
-			transform: translate( -50%, -50% );
 		}
 	}
 

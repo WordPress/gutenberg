@@ -170,6 +170,20 @@ describe( 'WaveformPlayer', () => {
 		);
 	} );
 
+	it( 'passes the player instance through next callbacks', () => {
+		const onNext = jest.fn();
+		render( <WaveformPlayer { ...baseProps } onNext={ onNext } /> );
+
+		act( () => {
+			jest.advanceTimersByTime( 100 );
+		} );
+
+		const playerInstance = { id: 'player' };
+		initWaveformPlayer.mock.calls[ 0 ][ 1 ].onNext( playerInstance );
+
+		expect( onNext ).toHaveBeenCalledWith( playerInstance );
+	} );
+
 	it( 'recreates the player when the src changes', () => {
 		const { rerender } = render( <WaveformPlayer { ...baseProps } /> );
 
