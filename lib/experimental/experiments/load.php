@@ -92,6 +92,17 @@ function gutenberg_initialize_experiments_settings() {
 			),
 		),
 		array(
+			'slug'  => 'collaboration',
+			'label' => _x( 'Collaboration', 'experiments group name', 'gutenberg' ),
+			'items' => array(
+				array(
+					'id'          => 'gutenberg-suggestion-mode',
+					'label'       => __( 'Suggestion Mode', 'gutenberg' ),
+					'description' => __( 'Enables an Edit / Suggest / View intent switcher in the editor. In Suggest mode, edits are captured as proposed changes (inline and structural) that other users can apply or reject, similar to suggesting changes in a document.', 'gutenberg' ),
+				),
+			),
+		),
+		array(
 			'slug'  => 'other',
 			'label' => _x( 'Other', 'experiments group name', 'gutenberg' ),
 			'items' => array(

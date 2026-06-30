@@ -107,16 +107,25 @@ export default function EditorKeyboardShortcuts() {
 	} );
 
 	useShortcut( 'core/editor/intent-edit', ( event ) => {
+		if ( ! window?.__experimentalSuggestionMode ) {
+			return;
+		}
 		event.preventDefault();
 		setEditorIntent( EDITOR_INTENT_EDIT );
 	} );
 
 	useShortcut( 'core/editor/intent-suggest', ( event ) => {
+		if ( ! window?.__experimentalSuggestionMode ) {
+			return;
+		}
 		event.preventDefault();
 		setEditorIntent( EDITOR_INTENT_SUGGEST );
 	} );
 
 	useShortcut( 'core/editor/intent-view', ( event ) => {
+		if ( ! window?.__experimentalSuggestionMode ) {
+			return;
+		}
 		event.preventDefault();
 		setEditorIntent( EDITOR_INTENT_VIEW );
 	} );

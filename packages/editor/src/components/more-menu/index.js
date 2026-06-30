@@ -107,7 +107,9 @@ export default function MoreMenu( { disabled = false } ) {
 							/>
 							<ViewMoreMenuGroup.Slot fillProps={ { onClose } } />
 						</MenuGroup>
-						<IntentSwitcher />
+						{ window?.__experimentalSuggestionMode && (
+							<IntentSwitcher />
+						) }
 						<ModeSwitcher />
 						<ActionItem.Slot
 							name="core/plugin-more-menu"

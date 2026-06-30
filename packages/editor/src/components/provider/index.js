@@ -464,8 +464,12 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 										<StartTemplateOptions />
 										<PatternRenameModal />
 										<PatternDuplicateModal />
-										<SuggestionStoreInterceptor />
-										<SuggestionAutoSave />
+										{ window?.__experimentalSuggestionMode && (
+											<>
+												<SuggestionStoreInterceptor />
+												<SuggestionAutoSave />
+											</>
+										) }
 										<MediaEditorModalMount />
 									</>
 								) }
