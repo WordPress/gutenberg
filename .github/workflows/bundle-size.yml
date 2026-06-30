@@ -62,7 +62,7 @@ jobs:
                   check-latest: true
                   cache: npm
 
-            - uses: preactjs/compressed-size-action@66325aad6443cb7cf89c4bfcd414aea2367cda94 # v2.9.1
+            - uses: preactjs/compressed-size-action@f322c295dde06a1cb7ccaef105732dd8a726d1d9 # v2.10.0
               with:
                   omit-unchanged: true
                   repo-token: '${{ secrets.GITHUB_TOKEN }}'
