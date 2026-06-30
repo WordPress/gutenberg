@@ -199,9 +199,18 @@ function InlineLinkUI( {
 			// the second half of the split value is split at the format's
 			// start boundary and avoids relying on the value's "end" property
 			// which may not correspond correctly.
-			const splitValue =
-				split( value, boundary.start ?? 0, boundary.start ?? 0 ) ?? [];
-			const [ valBefore, valAfter ] = splitValue;
+			// `split`'s exported TS signature only declares (value, string), but at
+			// runtime it forwards extra args to `splitAtSelection`, which supports the
+			// (value, startIndex, endIndex) form used here. Cast to reflect that.
+			const splitValue = (
+				split as (
+					value: RichTextValue,
+					startIndex?: number,
+					endIndex?: number
+				) => RichTextValue[] | undefined
+			 )( value, boundary.start ?? 0, boundary.start ?? 0 );
+
+			const [ valBefore, valAfter ] = splitValue ?? [];
 
 			// Update the original (full) RichTextValue replacing the
 			// target text with the *new* RichTextValue containing:
