@@ -374,9 +374,6 @@ export default dedupePlugins( [
 	{
 		files: developmentFiles,
 		rules: {
-			'import/default': 'off',
-			'import/no-unresolved': 'off',
-			'import/named': 'off',
 			'@wordpress/data-no-store-string-literals': 'off',
 		},
 	},
@@ -387,6 +384,7 @@ export default dedupePlugins( [
 		files: [ '**/fixtures/**' ],
 		rules: {
 			'import/no-extraneous-dependencies': 'off',
+			'import/no-unresolved': 'off',
 		},
 	},
 

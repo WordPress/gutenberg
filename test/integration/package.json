@@ -16,6 +16,9 @@
 		"url": "git+https://github.com/WordPress/gutenberg.git",
 		"directory": "test/integration"
 	},
+	"exports": {
+		"./helpers/integration-test-editor": "./helpers/integration-test-editor.js"
+	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
