@@ -11,6 +11,10 @@
 
 -   Soft-deprecate the `__experimentalImageEditor` component. The Media Editor modal is now the default crop experience for core blocks ([#78654](https://github.com/WordPress/gutenberg/pull/78654)).
 
+### Enhancements
+
+-   Global Styles inheritance: the local-override dot in inspector control labels is now a direct reset control — it shows a reset icon on hover/focus and clears the override on click — and no longer offers a per-control "push to Global Styles" action ([#PENDING](https://github.com/WordPress/gutenberg/pull/PENDING)).
+
 ## 15.22.0 (2026-06-24)
 
 ### Enhancements

@@ -10,67 +10,51 @@ import { click } from '@ariakit/test';
 import { getInheritanceProps, InheritanceActionsDropdown } from '../';
 
 describe( 'InheritanceActionsDropdown', () => {
-	async function openMenu() {
-		await click(
-			screen.getByRole( 'button', { name: 'Local override options' } )
-		);
-	}
-
-	test( 'shows only the reset action when no push handler is provided', async () => {
+	test( 'renders a reset control labelled "Reset to inherited value"', () => {
 		render(
 			<InheritanceActionsDropdown onResetToInherited={ () => {} } />
 		);
-		await openMenu();
 		expect(
-			screen.getByRole( 'menuitem', { name: 'Reset to inherited value' } )
+			screen.getByRole( 'button', { name: 'Reset to inherited value' } )
 		).toBeVisible();
-		expect(
-			screen.queryByRole( 'menuitem', { name: /Make default/ } )
-		).not.toBeInTheDocument();
 	} );
 
-	test( 'shows and invokes the push action when a handler is provided', async () => {
-		const onPushToGlobalStyles = jest.fn();
+	test( 'resets directly on click, with no intermediate menu', async () => {
 		const onResetToInherited = jest.fn();
 		render(
 			<InheritanceActionsDropdown
 				onResetToInherited={ onResetToInherited }
-				onPushToGlobalStyles={ onPushToGlobalStyles }
 			/>
 		);
-		await openMenu();
-		await click( screen.getByRole( 'menuitem', { name: 'Make default' } ) );
-		expect( onPushToGlobalStyles ).toHaveBeenCalledTimes( 1 );
-		expect( onResetToInherited ).not.toHaveBeenCalled();
-	} );
 
-	test( 'lists reset before the make-default action', async () => {
-		render(
-			<InheritanceActionsDropdown
-				onResetToInherited={ () => {} }
-				onPushToGlobalStyles={ () => {} }
-			/>
-		);
-		await openMenu();
-		const items = screen.getAllByRole( 'menuitem' );
-		expect( items[ 0 ] ).toHaveTextContent( 'Reset to inherited value' );
-		expect( items[ 1 ] ).toHaveTextContent( 'Make default' );
-	} );
-
-	test( 'renders the push help text as the make-default action info', async () => {
-		render(
-			<InheritanceActionsDropdown
-				onResetToInherited={ () => {} }
-				onPushToGlobalStyles={ () => {} }
-				pushHelpText="Update default for Styles > Blocks > Heading"
-			/>
-		);
-		await openMenu();
+		// The control is a direct-action button, not a dropdown: there is no
+		// menu to open, and clicking it invokes the reset immediately.
+		expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
 		expect(
-			screen.getByRole( 'menuitem', {
-				name: /Update default for Styles > Blocks > Heading/,
-			} )
-		).toBeVisible();
+			screen.queryByRole( 'menuitem', { name: /Make default/ } )
+		).not.toBeInTheDocument();
+
+		await click(
+			screen.getByRole( 'button', { name: 'Reset to inherited value' } )
+		);
+		expect( onResetToInherited ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	test( 'forwards a custom className to the wrapper', () => {
+		const { container } = render(
+			<InheritanceActionsDropdown
+				onResetToInherited={ () => {} }
+				className="custom-reset"
+			/>
+		);
+		// The wrapper is a presentational span with no semantic role, so a
+		// class-based lookup is the only way to assert the className is merged.
+		expect(
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			container.querySelector(
+				'.has-local-override-from-global-styles__menu.custom-reset'
+			)
+		).toBeInTheDocument();
 	} );
 } );
 

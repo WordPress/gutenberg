@@ -619,9 +619,8 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			aspectSelect.closest( '.is-inherited-from-global-styles' )
 		).toBeNull();
 		// A local override now gets the same local-override flag as every
-		// other control, so the inline override menu (Reset / Make default)
-		// can attach. The menu itself is portaled and covered by the
-		// InheritanceActionsDropdown unit tests.
+		// other control, so the inline reset dot can attach. The dot itself is
+		// portaled and covered by the InheritanceActionsDropdown unit tests.
 		expect(
 			// eslint-disable-next-line testing-library/no-node-access
 			aspectSelect.closest( '.has-local-override-from-global-styles' )

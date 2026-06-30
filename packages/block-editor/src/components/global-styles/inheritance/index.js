@@ -8,12 +8,9 @@ import clsx from 'clsx';
  */
 import {
 	Button,
-	Dropdown,
-	MenuGroup,
-	MenuItem,
-	NavigableMenu,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import { Icon, lineSolid } from '@wordpress/icons';
 import { Tooltip } from '@wordpress/ui';
 import {
 	createPortal,
@@ -22,12 +19,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { getBlockType } from '@wordpress/blocks';
-import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import { usePushDestination } from '../inherited-value-context';
+import { __ } from '@wordpress/i18n';
 
 const GENERIC_INHERITANCE_TOOLTIP_TEXT = __( 'Default inherited from:' );
 const INHERITANCE_TOOLTIP_LINE_SEPARATOR = '\n';
@@ -69,42 +61,6 @@ function getTranslatedBreadcrumb( source, blockStyles ) {
 		} )
 		.filter( Boolean );
 	return parts.join( ' > ' );
-}
-
-/**
- * Builds the help text shown under the "Make default" action, naming the Global
- * Styles location the override will be written to.
- *
- * The breadcrumb mirrors the push destination (block, plus the active variation
- * when one is being edited) so the copy stays in lockstep with where the value
- * actually lands. Returns undefined when there is no block context to describe.
- *
- * @param {Object}  destination              Push destination context.
- * @param {?string} destination.blockName    Block name (e.g. `core/heading`).
- * @param {?string} destination.ownVariation Active block style variation slug.
- * @param {Array}   destination.blockStyles  Registered styles for the block.
- * @return {string|undefined} Help text, or undefined when no block context exists.
- */
-function getPushDestinationHelpText( {
-	blockName,
-	ownVariation,
-	blockStyles,
-} ) {
-	if ( ! blockName ) {
-		return undefined;
-	}
-	const breadcrumb = ownVariation
-		? [ 'styles', 'blocks', 'blockName', 'variations', 'variationName' ]
-		: [ 'styles', 'blocks', 'blockName' ];
-	const path = getTranslatedBreadcrumb(
-		{ breadcrumb, blockName, variation: ownVariation },
-		blockStyles
-	);
-	return sprintf(
-		/* translators: %s: Global Styles location the default is updated, e.g. "Styles > Blocks > Heading". */
-		__( 'Update default for %s' ),
-		path
-	);
 }
 
 /**
@@ -186,8 +142,8 @@ export function getCommonInheritanceTooltipText( sources, paths, blockStyles ) {
  * label text is tinted and the wrapped control receives the standard
  * "Default inherited from:" tooltip.
  *
- * When `hasLocalOverride` is true, a small dropdown trigger is portaled
- * into the visible label and exposes a "Reset to inherited value" action.
+ * When `hasLocalOverride` is true, a small reset dot is portaled into the
+ * visible label; clicking it resets to the inherited value.
  *
  * The two states are mutually exclusive at the source. If both are passed,
  * only the local-override class is returned.
@@ -228,93 +184,70 @@ export function getInheritanceProps(
 }
 
 /**
- * Renders the small blue-dot toggle and its dropdown menu. Used by
- * `<InheritanceToolsPanelItem>` and not exported standalone.
+ * Renders the small blue override dot as a direct reset control. At rest the
+ * dot marks a local override of an inherited value; on hover/focus it swaps to
+ * a minus icon and clicking it resets to the inherited value (the same effect
+ * as the control's ToolsPanel reset). Used by `<InheritanceToolsPanelItem>` and
+ * the colour/background-image controls.
  *
- * Built on the lower-level `<Dropdown>` rather than `<DropdownMenu>`
- * so we have complete control over the trigger markup. The trigger
- * is a `<Button>` with the dot `<span>` as its only child — no
- * `icon` prop is set, so `Button` does not interfere with the
- * rendered children.
+ * The trigger is a `<Button>` whose only children are the dot and the reset
+ * icon — no `icon` prop is set, so `Button` does not interfere with the
+ * rendered children. A native tooltip is provided via `label`.
  *
- * @param {Object}    props
- * @param {Function}  props.onResetToInherited     Reset handler.
- * @param {?Function} [props.onPushToGlobalStyles] Push-to-Global-Styles handler.
- *                                                 When provided, a "Make default"
- *                                                 action is added to the menu.
- * @param {string}    [props.pushHelpText]         Secondary text describing the
- *                                                 Global Styles location the
- *                                                 "Make default" action updates.
- * @param {string}    [props.className]            Optional className for the
- *                                                 dropdown wrapper.
+ * @param {Object}   props
+ * @param {Function} props.onResetToInherited Reset handler.
+ * @param {string}   [props.className]        Optional className for the wrapper.
  *
- * @return {Element} The dot menu.
+ * @return {Element} The reset dot.
  */
 export function InheritanceActionsDropdown( {
 	onResetToInherited,
-	onPushToGlobalStyles,
-	pushHelpText,
 	className,
 } ) {
 	return (
-		<Dropdown
+		<span
 			className={ clsx(
 				'has-local-override-from-global-styles__menu',
 				className
 			) }
-			contentClassName="has-local-override-from-global-styles__menu-content"
-			popoverProps={ { placement: 'bottom-start' } }
-			renderToggle={ ( { isOpen, onToggle } ) => (
-				// Intentionally small (14×14) circular trigger; exempt
-				// from the 40px default-size enforcement rule.
-				// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
-				<Button
-					__next40pxDefaultSize={ false }
-					aria-haspopup="menu"
-					aria-expanded={ isOpen }
-					aria-label={ __( 'Local override options' ) }
-					className="has-local-override-from-global-styles__toggle"
-					onClick={ ( event ) => {
-						// Prevent the click from reaching any wrapping
-						// `<label htmlFor>` association, which would
-						// otherwise focus/activate the inner control.
-						event.preventDefault();
-						event.stopPropagation();
-						onToggle();
-					} }
-				>
-					<span
-						aria-hidden="true"
-						className="has-local-override-from-global-styles__dot"
-					/>
-				</Button>
-			) }
-			renderContent={ ( { onClose } ) => (
-				<NavigableMenu role="menu">
-					<MenuGroup>
-						<MenuItem
-							onClick={ () => {
-								onClose();
-								onResetToInherited?.();
-							} }
-						>
-							{ __( 'Reset to inherited value' ) }
-						</MenuItem>
-						{ onPushToGlobalStyles && (
-							<MenuItem
-								info={ pushHelpText }
-								onClick={ () => {
-									onClose();
-									onPushToGlobalStyles();
-								} }
-							>
-								{ __( 'Make default' ) }
-							</MenuItem>
-						) }
-					</MenuGroup>
-				</NavigableMenu>
-			) }
-		/>
+		>
+			{ /*
+			 * A single direct-action control. The dot marks a local override
+			 * at rest; on hover/focus it swaps to a minus icon, and clicking it
+			 * resets to the inherited value — the same effect as the control's
+			 * ToolsPanel reset. Pushing to Global Styles is intentionally not
+			 * offered here; that happens via the block's Advanced → "Apply
+			 * globally" review modal.
+			 *
+			 * Intentionally small (14×14) circular trigger; exempt from the
+			 * 40px default-size enforcement rule.
+			 */ }
+			{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */ }
+			<Button
+				__next40pxDefaultSize={ false }
+				label={ __( 'Reset to inherited value' ) }
+				showTooltip
+				className="has-local-override-from-global-styles__toggle"
+				onClick={ ( event ) => {
+					// Prevent the click from reaching any wrapping
+					// `<label htmlFor>` association, which would otherwise
+					// focus/activate the inner control.
+					event.preventDefault();
+					event.stopPropagation();
+					onResetToInherited?.();
+				} }
+			>
+				<span
+					aria-hidden="true"
+					className="has-local-override-from-global-styles__dot"
+				/>
+				<Icon
+					className="has-local-override-from-global-styles__reset-icon"
+					icon={ lineSolid }
+					size={ 14 }
+				/>
+			</Button>
+		</span>
 	);
 }
 
@@ -332,30 +265,23 @@ export function InheritanceActionsDropdown( {
  * (referential equality through `Object.is`, so React skips the
  * re-render when stable).
  *
- * @param {Object}    props
- * @param {Function}  props.onResetToInherited     Reset handler forwarded to the
- *                                                 dot menu.
- * @param {?Function} props.onPushToGlobalStyles   Push-to-Global-Styles handler
- *                                                 forwarded to the dot menu.
- * @param {boolean}   props.isInherited            Whether to attach the inherited
- *                                                 tooltip to the label.
- * @param {string}    props.inheritanceTooltipText Tooltip text for inherited
- *                                                 controls.
+ * @param {Object}   props
+ * @param {Function} props.onResetToInherited     Reset handler forwarded to the
+ *                                                reset dot.
+ * @param {boolean}  props.isInherited            Whether to attach the inherited
+ *                                                tooltip to the label.
+ * @param {string}   props.inheritanceTooltipText Tooltip text for inherited
+ *                                                controls.
  *
  * @return {Element} The sentinel span plus portaled inheritance UI.
  */
 function PortaledInheritanceControls( {
 	onResetToInherited,
-	onPushToGlobalStyles,
 	isInherited,
 	inheritanceTooltipText,
 } ) {
 	const sentinelRef = useRef( null );
 	const [ labelEl, setLabelEl ] = useState( null );
-	const pushDestination = usePushDestination();
-	const pushHelpText = onPushToGlobalStyles
-		? getPushDestinationHelpText( pushDestination )
-		: undefined;
 
 	useLayoutEffect( () => {
 		const sentinel = sentinelRef.current;
@@ -421,8 +347,6 @@ function PortaledInheritanceControls( {
 						{ onResetToInherited && (
 							<InheritanceActionsDropdown
 								onResetToInherited={ onResetToInherited }
-								onPushToGlobalStyles={ onPushToGlobalStyles }
-								pushHelpText={ pushHelpText }
 							/>
 						) }
 					</>,
@@ -438,6 +362,12 @@ export function InheritanceToolsPanelItem( {
 	hasLocalOverride,
 	label,
 	onDeselect,
+	// Per-control pushing to Global Styles is disabled; pushing now happens
+	// deliberately and granularly via the block's Advanced → "Apply globally"
+	// review modal. The panels still pass `onPushToGlobalStyles`, so it is
+	// destructured here (kept out of `...rest`, which would otherwise spread it
+	// onto `ToolsPanelItem`) but intentionally not forwarded. The push plumbing
+	// is left dormant so this remains a small, reversible change.
 	onPushToGlobalStyles,
 	showLocalOverrideActionsInLabel = true,
 	inheritanceTooltipText,
@@ -460,11 +390,6 @@ export function InheritanceToolsPanelItem( {
 					isInherited={ isInherited }
 					onResetToInherited={
 						showLocalOverrideActions ? onDeselect : undefined
-					}
-					onPushToGlobalStyles={
-						showLocalOverrideActions
-							? onPushToGlobalStyles
-							: undefined
 					}
 				/>
 			) }

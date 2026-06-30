@@ -28,7 +28,7 @@ async function setUserGlobalStyles( requestUtils, styles ) {
 	} );
 }
 
-test.describe( 'Push individual style to Global Styles', () => {
+test.describe( 'Apply styles globally (site editor)', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
@@ -37,16 +37,7 @@ test.describe( 'Push individual style to Global Styles', () => {
 		// Clear any user-saved templates so the index template this spec edits
 		// and saves cannot leak into other specs sharing the database.
 		await requestUtils.deleteAllTemplates( 'wp_template' );
-
-		// Seed an inherited block-level value so the instance override below
-		// produces a local override (which is what surfaces the dot menu).
-		await setUserGlobalStyles( requestUtils, {
-			blocks: {
-				'core/heading': {
-					typography: { fontSize: '11px' },
-				},
-			},
-		} );
+		await setUserGlobalStyles( requestUtils, {} );
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
@@ -60,7 +51,7 @@ test.describe( 'Push individual style to Global Styles', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test( 'persists the pushed value to the user Global Styles record', async ( {
+	test( 'persists the applied value to the user Global Styles record', async ( {
 		admin,
 		editor,
 		page,
@@ -72,8 +63,6 @@ test.describe( 'Push individual style to Global Styles', () => {
 			canvas: 'edit',
 		} );
 
-		// A heading instance whose local font size overrides the inherited
-		// Global Styles value seeded above.
 		await editor.insertBlock( {
 			name: 'core/heading',
 			attributes: {
@@ -83,27 +72,31 @@ test.describe( 'Push individual style to Global Styles', () => {
 			},
 		} );
 
-		// Open the block inspector.
 		await editor.openDocumentSettingsSidebar();
 		const settings = page.getByRole( 'region', {
 			name: 'Editor settings',
 		} );
 
-		// The font size control is overriding an inherited value, so its
-		// local-override dot menu is shown.
+		// Open the block's Advanced panel and launch the review modal.
+		const advanced = settings.getByRole( 'button', { name: 'Advanced' } );
+		if ( ( await advanced.getAttribute( 'aria-expanded' ) ) === 'false' ) {
+			await advanced.click();
+		}
 		await settings
-			.getByRole( 'button', { name: 'Local override options' } )
+			.getByRole( 'button', { name: 'Apply globally' } )
 			.click();
-		await page
-			.getByRole( 'menuitem', { name: 'Make default', exact: false } )
-			.click();
+
+		const dialog = page.getByRole( 'dialog', {
+			name: /Apply .* styles globally/,
+		} );
+		await dialog.getByRole( 'button', { name: 'Apply' } ).click();
 
 		// Persist all dirty entities (template + global styles).
 		await editor.saveSiteEditorEntities( {
 			isOnlyCurrentEntityDirty: false,
 		} );
 
-		// The pushed value must be persisted to the user Global Styles record,
+		// The applied value must be persisted to the user Global Styles record,
 		// and the now-redundant local override removed from the block markup.
 		const styles = await getUserGlobalStyles( requestUtils );
 		expect( styles?.blocks?.[ 'core/heading' ]?.typography?.fontSize ).toBe(

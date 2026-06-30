@@ -111,14 +111,23 @@
 	height: 8px;
 	background-color: var(--wp-admin-theme-color, #007cba);
 	border-radius: 50%;
-	transition: transform 0.1s ease-out;
 }
 
-.has-local-override-from-global-styles__toggle:hover
-.has-local-override-from-global-styles__dot,
-.has-local-override-from-global-styles__toggle:focus
-.has-local-override-from-global-styles__dot,
-.has-local-override-from-global-styles__toggle[aria-expanded="true"]
-.has-local-override-from-global-styles__dot {
-	transform: scale(1.2);
+// The reset (minus) icon is hidden at rest and revealed in place of the dot
+// on hover/focus, signalling that activating the control resets the override.
+// `Icon` applies the className directly to the rendered `<svg>`.
+.has-local-override-from-global-styles__reset-icon {
+	display: none;
+	fill: var(--wp-admin-theme-color, #007cba);
+}
+
+.has-local-override-from-global-styles__toggle:hover,
+.has-local-override-from-global-styles__toggle:focus {
+	.has-local-override-from-global-styles__dot {
+		display: none;
+	}
+
+	.has-local-override-from-global-styles__reset-icon {
+		display: block;
+	}
 }
