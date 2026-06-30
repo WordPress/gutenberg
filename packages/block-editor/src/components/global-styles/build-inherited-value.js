@@ -4,12 +4,8 @@
 import { getValueFromObjectPath } from '../../utils/object';
 import { getVariationStylesWithRefValues } from '../../hooks/block-style-variation';
 
-/**
- * Default block-style-state value. Kept in sync with
- * `hooks/block-style-state.js`; inlined here (rather than imported) to keep
- * this builder free of that module's heavy transitive dependency chain so it
- * stays pure and isolated-testable.
- */
+// Inlined from `hooks/block-style-state.js` to keep this builder free of that
+// module's dependency chain so it stays pure and easy to test.
 const DEFAULT_STATE_VALUE = 'default';
 
 /**
@@ -161,14 +157,8 @@ function createSourceDescriptor(
 	};
 }
 
-/**
- * Create a merge contribution with the source metadata that applies to all
- * leaves in its style object.
- *
- * @param {?Object} styles Style contribution for one inheritance layer.
- * @param {?Object} source Source metadata for the contribution.
- * @return {?Object} Merge contribution, or null when styles/source is empty.
- */
+// Pair a layer's style object with the source metadata for all of its leaves.
+// Returns null when either side is empty.
 function createContribution( styles, source ) {
 	if ( ! styles || ! source ) {
 		return null;
@@ -176,12 +166,7 @@ function createContribution( styles, source ) {
 	return { styles, source };
 }
 
-/**
- * Build a dot-path key for a style leaf.
- *
- * @param {Array} path Path segments.
- * @return {string} Dot path.
- */
+// Build a dot-path key for a style leaf.
 function getPathKey( path ) {
 	return path.join( '.' );
 }
