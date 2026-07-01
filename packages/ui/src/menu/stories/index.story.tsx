@@ -70,7 +70,8 @@ export const Default: Story = {
 						prefix={
 							<Icon icon={ archive } size={ 24 } aria-hidden />
 						}
-						suffix="⌘S"
+						aria-keyshortcuts={ ariaKeyShortcut.primary( 's' ) }
+						suffix={ displayShortcut.primary( 's' ) }
 					>
 						Save
 					</Menu.Item>
@@ -102,7 +103,8 @@ export const Default: Story = {
 						<Menu.CheckboxItem
 							checked={ downloads }
 							onCheckedChange={ setDownloads }
-							suffix="⌘D"
+							aria-keyshortcuts={ ariaKeyShortcut.primary( 'd' ) }
+							suffix={ displayShortcut.primary( 'd' ) }
 						>
 							<Menu.ItemLabel>Downloads</Menu.ItemLabel>
 							<Menu.ItemDescription>
@@ -148,7 +150,10 @@ export const Default: Story = {
 					</Menu.RadioGroup>
 					<Menu.Separator />
 					<Menu.SubmenuRoot>
-						<Menu.SubmenuTrigger suffix="⌘M">
+						<Menu.SubmenuTrigger
+							aria-keyshortcuts={ ariaKeyShortcut.primary( 'm' ) }
+							suffix={ displayShortcut.primary( 'm' ) }
+						>
 							<Menu.ItemLabel>Move to</Menu.ItemLabel>
 							<Menu.ItemDescription>
 								Choose another collection.
@@ -202,7 +207,8 @@ export const LinkItem: Story = {
 					<Menu.LinkItem
 						href="https://developer.wordpress.org"
 						openInNewTab
-						suffix="⌘D"
+						aria-keyshortcuts={ ariaKeyShortcut.primary( 'd' ) }
+						suffix={ displayShortcut.primary( 'd' ) }
 					>
 						<Menu.ItemLabel>
 							WordPress developer resources
@@ -275,14 +281,19 @@ export const RichItems: Story = {
 						prefix={
 							<Icon icon={ archive } size={ 24 } aria-hidden />
 						}
-						suffix="⌘S"
+						aria-keyshortcuts={ ariaKeyShortcut.primary( 's' ) }
+						suffix={ displayShortcut.primary( 's' ) }
 					>
 						<Menu.ItemLabel>With prefix and suffix</Menu.ItemLabel>
 						<Menu.ItemDescription>
 							Description text keeps the same highlighted area.
 						</Menu.ItemDescription>
 					</Menu.Item>
-					<Menu.Item disabled suffix="⌘D">
+					<Menu.Item
+						disabled
+						aria-keyshortcuts={ ariaKeyShortcut.primary( 'd' ) }
+						suffix={ displayShortcut.primary( 'd' ) }
+					>
 						<Menu.ItemLabel>Disabled item</Menu.ItemLabel>
 						<Menu.ItemDescription>
 							Disabled foreground treatment applies to all item
@@ -303,7 +314,10 @@ export const Submenu: Story = {
 				<Menu.Popup>
 					<Menu.Item>Rename</Menu.Item>
 					<Menu.SubmenuRoot>
-						<Menu.SubmenuTrigger suffix="⌘M">
+						<Menu.SubmenuTrigger
+							aria-keyshortcuts={ ariaKeyShortcut.primary( 'm' ) }
+							suffix={ displayShortcut.primary( 'm' ) }
+						>
 							<Menu.ItemLabel>
 								Move to another collection
 							</Menu.ItemLabel>
@@ -356,7 +370,8 @@ export const CheckboxItems: Story = {
 						<Menu.CheckboxItem
 							checked={ downloads }
 							onCheckedChange={ setDownloads }
-							suffix="⌘D"
+							aria-keyshortcuts={ ariaKeyShortcut.primary( 'd' ) }
+							suffix={ displayShortcut.primary( 'd' ) }
 						>
 							<Menu.ItemLabel>Downloads</Menu.ItemLabel>
 							<Menu.ItemDescription>
@@ -393,7 +408,10 @@ export const CheckboxItems: Story = {
 									aria-hidden
 								/>
 							}
-							suffix="⌘⇧S"
+							aria-keyshortcuts={ ariaKeyShortcut.primaryShift(
+								's'
+							) }
+							suffix={ displayShortcut.primaryShift( 's' ) }
 						>
 							<Menu.ItemLabel>Shared</Menu.ItemLabel>
 							<Menu.ItemDescription>
@@ -470,7 +488,10 @@ export const RadioItems: Story = {
 										aria-hidden
 									/>
 								}
-								suffix="⌘2"
+								aria-keyshortcuts={ ariaKeyShortcut.primary(
+									'2'
+								) }
+								suffix={ displayShortcut.primary( '2' ) }
 							>
 								<Menu.ItemLabel>Comfortable</Menu.ItemLabel>
 								<Menu.ItemDescription>
