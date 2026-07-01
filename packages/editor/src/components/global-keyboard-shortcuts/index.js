@@ -15,6 +15,7 @@ import {
 	EDITOR_INTENT_SUGGEST,
 	EDITOR_INTENT_VIEW,
 } from '../../store/constants';
+import { unlock } from '../../lock-unlock';
 import { useCanSuggest } from '../suggestion-mode/gate';
 
 /**
@@ -41,8 +42,9 @@ export default function EditorKeyboardShortcuts() {
 		setIsListViewOpened,
 		switchEditorMode,
 		toggleDistractionFree,
-		setEditorIntent,
 	} = useDispatch( editorStore );
+	// The intent API is private while Suggest mode is experimental.
+	const { setEditorIntent } = unlock( useDispatch( editorStore ) );
 	const {
 		isEditedPostDirty,
 		isPostSavingLocked,

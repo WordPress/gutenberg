@@ -54,6 +54,7 @@ import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { useSuggestionOverlay } from './overlay-context';
 import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';
 import { parseSuggestionPayload } from './provider';
+import { unlock } from '../../lock-unlock';
 
 const BLOCK_EDITOR_STORE_NAME = 'core/block-editor';
 
@@ -639,7 +640,9 @@ export default function SuggestionStoreInterceptor() {
 
 	const isSuggestMode = useSelect(
 		( select ) =>
-			select( EDITOR_STORE_NAME ).getEditorIntent() === SUGGEST_INTENT,
+			// `getEditorIntent` is private while Suggest mode is experimental.
+			unlock( select( EDITOR_STORE_NAME ) ).getEditorIntent() ===
+			SUGGEST_INTENT,
 		[]
 	);
 

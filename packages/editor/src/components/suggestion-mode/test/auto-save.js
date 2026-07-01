@@ -19,6 +19,7 @@ import {
 	useSuggestionOverlay,
 } from '../overlay-context';
 import { store as editorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 
 // jest.mock factories may only reference variables prefixed with `mock`.
 const mockCreateSuggestion = jest.fn();
@@ -57,7 +58,7 @@ function renderInSuggestMode( ui ) {
 	registry.register( noticesStore );
 	registry.register( coreStore );
 	registry.register( editorStore );
-	registry.dispatch( editorStore ).setEditorIntent( 'suggest' );
+	unlock( registry.dispatch( editorStore ) ).setEditorIntent( 'suggest' );
 
 	const wrapper = ( { children } ) => (
 		<RegistryProvider value={ registry }>
@@ -409,7 +410,7 @@ describe( 'SuggestionAutoSave', () => {
 		const registry = createRegistry();
 		registry.register( noticesStore );
 		registry.register( editorStore );
-		registry.dispatch( editorStore ).setEditorIntent( 'edit' );
+		unlock( registry.dispatch( editorStore ) ).setEditorIntent( 'edit' );
 
 		const wrapper = ( { children } ) => (
 			<RegistryProvider value={ registry }>

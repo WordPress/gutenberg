@@ -19,6 +19,7 @@ import { VisuallyHidden } from '@wordpress/ui';
  */
 import { useSuggestionOverlay } from './overlay-context';
 import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';
+import { unlock } from '../../lock-unlock';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 import SuggestionMoveGhost from './suggestion-move-ghost';
 
@@ -126,7 +127,9 @@ const withSuggestionOverlay = createHigherOrderComponent(
 			const { clientId } = props;
 			const isSuggestMode = useSelect(
 				( select ) =>
-					select( EDITOR_STORE_NAME ).getEditorIntent() ===
+					// `getEditorIntent` is private while Suggest mode is
+					// experimental.
+					unlock( select( EDITOR_STORE_NAME ) ).getEditorIntent() ===
 					SUGGEST_INTENT,
 				[]
 			);
@@ -204,7 +207,7 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 				( ghostsInside && ghostsInside.length > 0 );
 			const { isSuggestMode, structuralClass, authorId } = useSelect(
 				( select ) => {
-					const editor = select( EDITOR_STORE_NAME );
+					const editor = unlock( select( EDITOR_STORE_NAME ) );
 					const blockEditor = select( blockEditorStore );
 					const marker =
 						blockEditor?.getBlockAttributes?.( clientId )?.metadata

@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { speak } from '@wordpress/a11y';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -17,6 +18,12 @@ import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
  */
 import isTemplateRevertable from './utils/is-template-revertable';
 import { buildRevisionsPageQuery } from './private-selectors';
+import {
+	EDITOR_INTENTS,
+	EDITOR_INTENT_EDIT,
+	EDITOR_INTENT_SUGGEST,
+	EDITOR_INTENT_VIEW,
+} from './constants';
 import {
 	getDeviceTypeByCanvasWidth,
 	VIEWPORT_STATE_BY_DEVICE_TYPE,
@@ -766,3 +773,62 @@ export function selectNote( noteId, options = { focus: false } ) {
 		options,
 	};
 }
+
+/**
+ * Sets the current editor intent.
+ *
+ * The intent represents the user's editing purpose: directly editing content
+ * (`edit`), suggesting changes that the author can apply or reject
+ * (`suggest`), or viewing the post in a read-only mode (`view`). It is
+ * orthogonal to the `editorMode` preference (visual vs. code).
+ *
+ * The intent is *session-scoped* — held in the editor reducer (not the
+ * preferences store), so reloading the editor always returns to `edit`.
+ * Persisting suggest/view across reloads surprises users who don't realize
+ * they left the editor in a non-default state.
+ *
+ * Unknown intents are silently rejected (no dispatch, no announcement) so
+ * typos from a bookmarklet, browser extension, or third-party plugin can't
+ * poison the editor state; valid values are listed in `EDITOR_INTENTS`.
+ *
+ * @param {'edit'|'suggest'|'view'} intent The editor intent to set.
+ */
+export const setEditorIntent =
+	( intent ) =>
+	( { select, dispatch, registry } ) => {
+		if ( ! EDITOR_INTENTS.includes( intent ) ) {
+			return;
+		}
+
+		const previousIntent = select.getEditorIntent();
+
+		dispatch( { type: 'SET_EDITOR_INTENT', intent } );
+
+		// Skip the snackbar/announcement on the initial set (when there is no
+		// previous intent, e.g. during editor boot) so the user isn't greeted
+		// with a mode notice they didn't trigger.
+		if ( previousIntent === intent || previousIntent === undefined ) {
+			return;
+		}
+
+		let label;
+		if ( intent === EDITOR_INTENT_EDIT ) {
+			label = __( "You're editing" );
+		} else if ( intent === EDITOR_INTENT_SUGGEST ) {
+			label = __( "You're suggesting" );
+		} else if ( intent === EDITOR_INTENT_VIEW ) {
+			label = __( "You're viewing" );
+		}
+
+		if ( label ) {
+			speak( label, 'assertive' );
+			// Reuse the same notice id across mode changes so rapid keyboard
+			// cycling doesn't pile up multiple snackbars — the new notice
+			// replaces the old one.
+			registry.dispatch( noticesStore ).createNotice( 'info', label, {
+				id: 'editor-intent-mode',
+				type: 'snackbar',
+				isDismissible: true,
+			} );
+		}
+	};

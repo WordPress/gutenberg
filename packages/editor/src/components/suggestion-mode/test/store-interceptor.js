@@ -35,6 +35,7 @@ import {
 	useSuggestionOverlay,
 } from '../overlay-context';
 import { store as editorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 
 describe( 'shallowAttributeEquals', () => {
 	it( 'treats reference-equal values as equal', () => {
@@ -184,7 +185,7 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		registry.register( preferencesStore );
 		registry.register( blockEditorStore );
 		registry.register( editorStore );
-		registry.dispatch( editorStore ).setEditorIntent( 'suggest' );
+		unlock( registry.dispatch( editorStore ) ).setEditorIntent( 'suggest' );
 
 		const block =
 			initialBlocks?.[ 0 ] ??
