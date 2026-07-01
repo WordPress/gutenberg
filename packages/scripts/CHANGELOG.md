@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Update `stylelint` to `^16.26.1` ([#79648](https://github.com/WordPress/gutenberg/pull/79648)).
+-   Widen the `@playwright/test` peer dependency to `>=1` and mark it optional, so consumers aren't forced to bump Playwright or satisfy it under strict peer deps ([#78632](https://github.com/WordPress/gutenberg/pull/78632)).
 
 ## 32.5.0 (2026-06-24)
 
