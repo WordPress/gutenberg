@@ -1060,6 +1060,72 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Test that a field smuggled in as a QUERY parameter alongside a
+	 * lifecycle-only body does not take the lifecycle shortcut. Core's
+	 * `update_item` reads `$request['content']` from the merged param view
+	 * (JSON > POST > GET > URL), so `PUT /wp/v2/comments/<id>?content=x`
+	 * with a lifecycle-only JSON body would rewrite the note while a
+	 * body-only allowlist still classified it as a lifecycle update.
+	 */
+	public function test_lifecycle_update_rejects_query_param_content_rewrite() {
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/1' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_query_params( array( 'content' => 'rewritten via query param' ) );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'status' => 'approved',
+					'meta'   => array(
+						'_wp_suggestion_status' => 'applied',
+					),
+				)
+			)
+		);
+
+		$reflection = new ReflectionMethod(
+			'Gutenberg_REST_Comment_Controller_7_1',
+			'is_suggestion_lifecycle_update'
+		);
+		if ( PHP_VERSION_ID < 80100 ) {
+			$reflection->setAccessible( true );
+		}
+		$this->assertFalse(
+			$reflection->invoke( null, $request ),
+			'A content rewrite via query parameter must not take the lifecycle shortcut.'
+		);
+	}
+
+	/**
+	 * Test that REST meta-parameters that ride on every editor request
+	 * (api-fetch appends `_locale=user`) do not disqualify an otherwise
+	 * lifecycle-only update from the shortcut.
+	 */
+	public function test_lifecycle_update_ignores_rest_meta_query_params() {
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/1' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_query_params( array( '_locale' => 'user' ) );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'status' => 'approved',
+					'meta'   => array(
+						'_wp_suggestion_status' => 'applied',
+					),
+				)
+			)
+		);
+
+		$reflection = new ReflectionMethod(
+			'Gutenberg_REST_Comment_Controller_7_1',
+			'is_suggestion_lifecycle_update'
+		);
+		if ( PHP_VERSION_ID < 80100 ) {
+			$reflection->setAccessible( true );
+		}
+		$this->assertTrue( $reflection->invoke( null, $request ) );
+	}
+
+	/**
 	 * Test that the lifecycle helper also accepts form-encoded request
 	 * bodies, not only JSON. Custom integrations may issue updates with
 	 * `application/x-www-form-urlencoded` and should benefit from the
