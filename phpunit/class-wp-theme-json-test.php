@@ -8141,17 +8141,17 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'two comma-separated selectors without spaces' => array(
 				'selector'   => 'h1,h2',
 				'to_prepend' => '.wrapper ',
-				'expected'   => '.wrapper h1,.wrapper h2',
+				'expected'   => '.wrapper h1, .wrapper h2',
 			),
 			'three comma-separated selectors without spaces' => array(
 				'selector'   => 'h1,h2,h3',
 				'to_prepend' => '.some-class ',
-				'expected'   => '.some-class h1,.some-class h2,.some-class h3',
+				'expected'   => '.some-class h1, .some-class h2, .some-class h3',
 			),
 			'comma-separated class selectors without spaces' => array(
 				'selector'   => '.foo,.bar',
 				'to_prepend' => '.prefix ',
-				'expected'   => '.prefix .foo,.prefix .bar',
+				'expected'   => '.prefix .foo, .prefix .bar',
 			),
 			'prepend without trailing space'               => array(
 				'selector'   => '.child',
@@ -8161,7 +8161,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'compound selector without trailing space no comma spaces' => array(
 				'selector'   => '.a,.b',
 				'to_prepend' => '.parent',
-				'expected'   => '.parent.a,.parent.b',
+				'expected'   => '.parent.a, .parent.b',
 			),
 			'descendant selector prepended'                => array(
 				'selector'   => '.block .inner',
@@ -8171,7 +8171,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'descendant selectors comma-separated without spaces' => array(
 				'selector'   => '.block .inner,.block .alt',
 				'to_prepend' => '.scope ',
-				'expected'   => '.scope .block .inner,.scope .block .alt',
+				'expected'   => '.scope .block .inner, .scope .block .alt',
 			),
 			'empty selector'                               => array(
 				'selector'   => '',
@@ -8201,7 +8201,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'many comma-separated selectors without spaces' => array(
 				'selector'   => 'h1,h2,h3,h4,h5,h6',
 				'to_prepend' => '.content ',
-				'expected'   => '.content h1,.content h2,.content h3,.content h4,.content h5,.content h6',
+				'expected'   => '.content h1, .content h2, .content h3, .content h4, .content h5, .content h6',
 			),
 			'real world block element selector'            => array(
 				'selector'   => 'p',
@@ -8211,22 +8211,22 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'real world compound block element selectors'  => array(
 				'selector'   => 'a,.wp-element-button',
 				'to_prepend' => '.wp-block-group ',
-				'expected'   => '.wp-block-group a,.wp-block-group .wp-element-button',
+				'expected'   => '.wp-block-group a, .wp-block-group .wp-element-button',
 			),
-			'spaces after commas are preserved'            => array(
+			'spaces after commas are normalized'            => array(
 				'selector'   => 'h1, h2, h3',
 				'to_prepend' => '.some-class ',
-				'expected'   => '.some-class h1,.some-class  h2,.some-class  h3',
+				'expected'   => '.some-class h1, .some-class  h2, .some-class  h3',
 			),
-			'spaces after commas preserved with class selectors' => array(
+			'spaces after commas normalized with class selectors' => array(
 				'selector'   => '.foo, .bar',
 				'to_prepend' => '.prefix ',
-				'expected'   => '.prefix .foo,.prefix  .bar',
+				'expected'   => '.prefix .foo, .prefix  .bar',
 			),
-			'mixed whitespace around commas preserved'     => array(
+			'mixed whitespace around commas trimmed'     => array(
 				'selector'   => '.a ,  .b , .c',
 				'to_prepend' => '.pre ',
-				'expected'   => '.pre .a ,.pre   .b ,.pre  .c',
+				'expected'   => '.pre .a, .pre   .b, .pre  .c',
 			),
 			'where with internal commas and no top-level comma' => array(
 				'selector'   => ':where(.a, .b)',
