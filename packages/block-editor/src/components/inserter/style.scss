@@ -614,7 +614,15 @@ $block-inserter-tabs-height: 44px;
 		.block-editor-inserter__media-list__item-preview > * {
 			outline-color: rgba($black, 0.3);
 		}
+	}
 
+	// Reveal the per-item options button on hover, and — so keyboard users can
+	// reach it — whenever focus is within the item (e.g. its preview is
+	// focused). The button is `display: none` by default, which can never
+	// receive focus, so without `:focus-within` the detach/report action is
+	// unreachable by keyboard.
+	&.is-hovered,
+	&:focus-within {
 		.block-editor-inserter__media-list__item-preview-options > button {
 			display: block;
 		}
