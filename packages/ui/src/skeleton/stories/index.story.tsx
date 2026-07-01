@@ -16,16 +16,25 @@ export default meta;
 
 type Story = StoryObj< typeof Skeleton >;
 
+// A single line of body text is 16px tall (--wpds-typography-line-height-xs).
+const textLineHeight = 'var(--wpds-typography-line-height-xs)';
+
 export const Default: Story = {
 	args: {
-		style: { width: 240, height: 16 },
+		style: {
+			width: 'var(--wpds-dimension-surface-width-xs)',
+			height: textLineHeight,
+		},
 		radius: 'md',
 	},
 };
 
 export const Circle: Story = {
 	args: {
-		style: { width: 48, height: 48 },
+		style: {
+			width: 'var(--wpds-dimension-size-lg)',
+			height: 'var(--wpds-dimension-size-lg)',
+		},
 		radius: 'full',
 	},
 };
@@ -39,9 +48,18 @@ export const TextLines: Story = {
 				gap: '0.5rem',
 			} }
 		>
-			<Skeleton { ...args } style={ { width: '100%', height: 16 } } />
-			<Skeleton { ...args } style={ { width: '100%', height: 16 } } />
-			<Skeleton { ...args } style={ { width: '60%', height: 16 } } />
+			<Skeleton
+				{ ...args }
+				style={ { width: '100%', height: textLineHeight } }
+			/>
+			<Skeleton
+				{ ...args }
+				style={ { width: '100%', height: textLineHeight } }
+			/>
+			<Skeleton
+				{ ...args }
+				style={ { width: '60%', height: textLineHeight } }
+			/>
 		</div>
 	),
 	args: {
@@ -61,7 +79,10 @@ export const CardPlaceholder: Story = {
 		>
 			<Skeleton
 				{ ...args }
-				style={ { width: 48, height: 48 } }
+				style={ {
+					width: 'var(--wpds-dimension-size-lg)',
+					height: 'var(--wpds-dimension-size-lg)',
+				} }
 				radius="full"
 			/>
 			<div
@@ -72,8 +93,14 @@ export const CardPlaceholder: Story = {
 					flex: 1,
 				} }
 			>
-				<Skeleton { ...args } style={ { width: '80%', height: 16 } } />
-				<Skeleton { ...args } style={ { width: '50%', height: 16 } } />
+				<Skeleton
+					{ ...args }
+					style={ { width: '80%', height: textLineHeight } }
+				/>
+				<Skeleton
+					{ ...args }
+					style={ { width: '50%', height: textLineHeight } }
+				/>
 			</div>
 		</div>
 	),
