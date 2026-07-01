@@ -30,13 +30,17 @@ import {
 	getCandidateDocuments,
 	isEventTargetSelectedRichText,
 } from './keyboard-target';
+import {
+	previousGraphemeBoundary,
+	nextGraphemeBoundary,
+} from './grapheme-boundaries';
 
 /**
- * Read a rich-text value's plain-text length and its per-character format
- * stacks, tolerating plain strings and other non-rich values.
+ * Read a rich-text value's plain text and its per-character format stacks,
+ * tolerating plain strings and other non-rich values.
  *
  * @param {*} value Block attribute value.
- * @return {{ length: number, formats: Array }} Parsed text metrics.
+ * @return {{ text: string, length: number, formats: Array }} Parsed text metrics.
  */
 function readValueMetrics( value ) {
 	let html = null;
@@ -46,10 +50,14 @@ function readValueMetrics( value ) {
 		html = value;
 	}
 	if ( html === null ) {
-		return { length: 0, formats: [] };
+		return { text: '', length: 0, formats: [] };
 	}
 	const record = create( { html } );
-	return { length: record.text.length, formats: record.formats ?? [] };
+	return {
+		text: record.text,
+		length: record.text.length,
+		formats: record.formats ?? [],
+	};
 }
 
 /**
@@ -188,9 +196,13 @@ export default function SuggestionDeletionKeyboard() {
 		[ openDeletionNote, writeDeletion, resetRun ]
 	);
 
-	// Collapsed-cursor delete: mark one character and grow on repeats.
+	// Collapsed-cursor delete: mark one character and grow on repeats. All
+	// range arithmetic snaps to grapheme boundaries so surrogate pairs, ZWJ
+	// sequences, and combining marks are marked whole — a code-unit step would
+	// split them and serialize a lone surrogate (rendered as U+FFFD).
 	const deleteCharacter = useCallback(
-		async ( clientId, attributeKey, pos, isBackward, textLength ) => {
+		async ( clientId, attributeKey, pos, isBackward, text ) => {
+			const textLength = text.length;
 			const run = runRef.current;
 			const isContiguous =
 				run &&
@@ -207,13 +219,13 @@ export default function SuggestionDeletionKeyboard() {
 					if ( run.start <= 0 ) {
 						return;
 					}
-					run.start -= 1;
+					run.start = previousGraphemeBoundary( text, run.start );
 					run.caret = run.start;
 				} else {
 					if ( run.end >= textLength ) {
 						return;
 					}
-					run.end += 1;
+					run.end = nextGraphemeBoundary( text, run.end );
 				}
 				writeDeletion(
 					clientId,
@@ -232,9 +244,11 @@ export default function SuggestionDeletionKeyboard() {
 				return;
 			}
 
-			// New run. Anchor the initial single-character range.
-			const start = isBackward ? pos - 1 : pos;
-			const end = isBackward ? pos : pos + 1;
+			// New run. Anchor the initial single-grapheme range.
+			const start = isBackward
+				? previousGraphemeBoundary( text, pos )
+				: pos;
+			const end = isBackward ? pos : nextGraphemeBoundary( text, pos );
 			const newRun = {
 				clientId,
 				attributeKey,
@@ -256,14 +270,20 @@ export default function SuggestionDeletionKeyboard() {
 					return;
 				}
 				newRun.id = id;
-				// Expand by any repeats buffered during creation, clamped to the
-				// value's bounds.
-				const extra = newRun.steps - 1;
+				// Expand by any repeats buffered during creation, one grapheme
+				// per repeat (the boundary helpers clamp at the value's edges).
+				for ( let step = newRun.steps - 1; step > 0; step-- ) {
+					if ( isBackward ) {
+						newRun.start = previousGraphemeBoundary(
+							text,
+							newRun.start
+						);
+					} else {
+						newRun.end = nextGraphemeBoundary( text, newRun.end );
+					}
+				}
 				if ( isBackward ) {
-					newRun.start = Math.max( 0, newRun.start - extra );
 					newRun.caret = newRun.start;
-				} else {
-					newRun.end = Math.min( textLength, newRun.end + extra );
 				}
 				writeDeletion(
 					clientId,
@@ -346,7 +366,7 @@ export default function SuggestionDeletionKeyboard() {
 				return;
 			}
 			const { clientId, attributeKey, start: pos } = caret;
-			const { length, formats } =
+			const { text, length, formats } =
 				readValueMetrics(
 					getBlockAttributes( clientId )?.[ attributeKey ]
 				) ?? {};
@@ -359,21 +379,23 @@ export default function SuggestionDeletionKeyboard() {
 				return;
 			}
 			// Leave edits inside an existing suggestion marker to the default
-			// path rather than nesting marks.
-			const targetIndex = isBackward ? pos - 1 : pos;
+			// path rather than nesting marks. The target is the whole
+			// grapheme next to the caret, not a single code unit.
+			const targetStart = isBackward
+				? previousGraphemeBoundary( text, pos )
+				: pos;
+			const targetEnd = isBackward
+				? pos
+				: nextGraphemeBoundary( text, pos );
 			if (
-				formatsRangeHasSuggestion(
-					formats,
-					targetIndex,
-					targetIndex + 1
-				)
+				formatsRangeHasSuggestion( formats, targetStart, targetEnd )
 			) {
 				resetRun();
 				return;
 			}
 
 			event.preventDefault();
-			deleteCharacter( clientId, attributeKey, pos, isBackward, length );
+			deleteCharacter( clientId, attributeKey, pos, isBackward, text );
 		},
 		[
 			getSelectionStart,
