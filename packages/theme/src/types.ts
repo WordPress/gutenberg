@@ -59,6 +59,13 @@ export interface ThemeProviderSettings {
 	cornerRadius?: CornerRadiusPreset;
 }
 
+/**
+ * Props for the `ThemeProvider` component.
+ *
+ * The provider's wrapper element is intentionally not customizable and does
+ * not accept props such as `className`, `style`, `as`, `render`, or `ref`.
+ * The wrapper is an implementation detail used to scope CSS custom properties.
+ */
 export interface ThemeProviderProps extends ThemeProviderSettings {
 	/**
 	 * The children to render.
