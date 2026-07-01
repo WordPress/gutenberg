@@ -52,7 +52,13 @@ export const Default: Story = {
 			<Menu.Root>
 				<Menu.Trigger>Open menu</Menu.Trigger>
 				<Menu.Popup>
-					<Menu.Item>Rename</Menu.Item>
+					<Menu.Item
+						prefix={
+							<Icon icon={ archive } size={ 24 } aria-hidden />
+						}
+					>
+						Rename
+					</Menu.Item>
 					<Menu.Item
 						prefix={
 							<Icon icon={ archive } size={ 24 } aria-hidden />
@@ -60,7 +66,14 @@ export const Default: Story = {
 					>
 						Archive
 					</Menu.Item>
-					<Menu.Item suffix="⌘S">Save</Menu.Item>
+					<Menu.Item
+						prefix={
+							<Icon icon={ archive } size={ 24 } aria-hidden />
+						}
+						suffix="⌘S"
+					>
+						Save
+					</Menu.Item>
 					<Menu.Separator />
 					<Menu.Group>
 						<Menu.GroupLabel>Links</Menu.GroupLabel>
@@ -70,7 +83,6 @@ export const Default: Story = {
 						<Menu.LinkItem
 							href="https://wordpress.org"
 							openInNewTab
-							suffix="WP"
 						>
 							WordPress.org
 						</Menu.LinkItem>
