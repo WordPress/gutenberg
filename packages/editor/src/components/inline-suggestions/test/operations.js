@@ -3,6 +3,7 @@
  */
 import {
 	RichTextData,
+	registerFormatType,
 	store as richTextStore,
 	unregisterFormatType,
 } from '@wordpress/rich-text';
@@ -16,6 +17,8 @@ import {
 	rejectInlineDeletion,
 	acceptInlineAddition,
 	rejectInlineAddition,
+	acceptInlineFormat,
+	rejectInlineFormat,
 	insertInlineAddition,
 	growInlineAddition,
 	buildSuggestionMarkerAttributes,
@@ -29,6 +32,9 @@ const del = ( id, text ) =>
 
 const add = ( id, text ) =>
 	`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="add">${ text }</mark>`;
+
+const fmt = ( id, inner ) =>
+	`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="format">${ inner }</mark>`;
 
 describe( 'inline deletion operations', () => {
 	beforeAll( () => {
@@ -400,5 +406,91 @@ describe( 'buildSuggestionMarkerAttributes', () => {
 				authorId: null,
 			} )
 		).not.toHaveProperty( 'data-author' );
+	} );
+} );
+
+describe( 'inline format operations', () => {
+	beforeAll( () => {
+		registerSuggestionFormat();
+		if ( ! getFormatType( 'test/bold' ) ) {
+			registerFormatType( 'test/bold', {
+				title: 'Bold',
+				tagName: 'strong',
+				className: null,
+				edit: () => null,
+			} );
+		}
+	} );
+
+	afterAll( () => {
+		if ( getFormatType( 'test/bold' ) ) {
+			unregisterFormatType( 'test/bold' );
+		}
+		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
+			unregisterFormatType( SUGGESTION_FORMAT_NAME );
+		}
+	} );
+
+	describe( 'acceptInlineFormat', () => {
+		it( 'keeps the proposed formatting and drops the marker', () => {
+			const value = RichTextData.fromHTMLString(
+				`keep ${ fmt( 5, '<strong>word</strong>' ) } tail`
+			);
+			const result = acceptInlineFormat( value, 5 );
+			const html = result.toHTMLString();
+			expect( html ).toBe( 'keep <strong>word</strong> tail' );
+			expect( html ).not.toContain( 'wp-suggestion' );
+		} );
+
+		it( 'returns a non-rich-text value unchanged', () => {
+			expect( acceptInlineFormat( 'plain', 5 ) ).toBe( 'plain' );
+		} );
+	} );
+
+	describe( 'rejectInlineFormat', () => {
+		it( 'restores the original run from beforeHTML, dropping the marker', () => {
+			const value = RichTextData.fromHTMLString(
+				`keep ${ fmt( 5, '<strong>word</strong>' ) } tail`
+			);
+			const result = rejectInlineFormat( value, 5, 'word' );
+			const html = result.toHTMLString();
+			expect( html ).toBe( 'keep word tail' );
+			expect( html ).not.toContain( '<strong>' );
+			expect( html ).not.toContain( 'wp-suggestion' );
+		} );
+
+		it( 'restores an original that itself carried formatting (unbold case)', () => {
+			// Proposed = plain "word"; original was bold. Reject brings bold back.
+			const value = RichTextData.fromHTMLString(
+				`a ${ fmt( 6, 'word' ) } b`
+			);
+			const result = rejectInlineFormat(
+				value,
+				6,
+				'<strong>word</strong>'
+			);
+			expect( result.toHTMLString() ).toBe( 'a <strong>word</strong> b' );
+		} );
+
+		it( 'leaves an unrelated marker intact', () => {
+			const value = RichTextData.fromHTMLString(
+				`${ fmt( 1, '<strong>one</strong>' ) } and ${ add( 2, 'two' ) }`
+			);
+			const result = rejectInlineFormat( value, 1, 'one' );
+			const html = result.toHTMLString();
+			expect( html ).toContain( 'data-suggestion-id="2"' );
+			expect( html ).not.toContain( 'data-suggestion-id="1"' );
+		} );
+
+		it( 'returns the value unchanged when the marker is absent', () => {
+			const value = RichTextData.fromHTMLString( 'no markers here' );
+			expect( rejectInlineFormat( value, 99, 'x' ).toHTMLString() ).toBe(
+				'no markers here'
+			);
+		} );
+
+		it( 'returns a non-rich-text value unchanged', () => {
+			expect( rejectInlineFormat( 'plain', 5, 'x' ) ).toBe( 'plain' );
+		} );
 	} );
 } );
