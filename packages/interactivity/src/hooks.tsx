@@ -94,7 +94,7 @@ interface DirectiveOptions {
 }
 
 export interface Evaluate {
-	( entry: DirectiveEntry, ...args: any[] ): any;
+	( entry: DirectiveEntry ): any;
 }
 
 interface GetEvaluate {
@@ -258,8 +258,7 @@ export const splitStatements = ( expr: string ): string[] | null => {
 // Generate the evaluate function.
 export const getEvaluate: GetEvaluate =
 	( { scope } ) =>
-	// TODO: When removing the temporarily remaining `value( ...args )` call below, remove the `...args` parameter too.
-	( entry, ...args ) => {
+	( entry ) => {
 		let { value: path, namespace } = entry;
 		if ( typeof path !== 'string' ) {
 			throw new Error( 'The `value` prop should be a string path' );
@@ -278,16 +277,13 @@ export const getEvaluate: GetEvaluate =
 			const value = resolve( path, namespace );
 			// Functions are returned without invoking them.
 			if ( typeof value === 'function' ) {
-				// Except if they have a negation operator present, for backward compatibility.
-				// This pattern is strongly discouraged and deprecated, and it will be removed in a near future release.
-				// TODO: Remove this condition to effectively ignore negation operator when provided with a function.
+				// When used with a negation operator, ignore the negation —
+				// using `!` on a function reference is an antipattern;
+				// use derived state instead.
 				if ( hasNegationOperator ) {
 					warn(
-						'Using a function with a negation operator is deprecated and will stop working in WordPress 6.9. Please use derived state instead.'
+						'Using a function with a negation operator is deprecated and will stop working in WordPress 7.1. Please use derived state instead.'
 					);
-					const functionResult = ! value( ...args );
-					resetScope();
-					return functionResult;
 				}
 				// Reset scope before return and wrap the function so it will still run within the correct scope.
 				resetScope();
