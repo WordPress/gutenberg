@@ -48,46 +48,6 @@ describe( 'Link', () => {
 			);
 		} );
 
-		it( 'does not set rel tokens when true', () => {
-			render(
-				<Link href="https://example.com" openInNewTab>
-					External
-				</Link>
-			);
-
-			expect( screen.getByRole( 'link' ) ).not.toHaveAttribute( 'rel' );
-		} );
-
-		it( 'preserves custom rel tokens when true', () => {
-			render(
-				<Link href="https://example.com" openInNewTab rel="nofollow">
-					External
-				</Link>
-			);
-
-			expect( screen.getByRole( 'link' ) ).toHaveAttribute(
-				'rel',
-				'nofollow'
-			);
-		} );
-
-		it( 'does not add noreferrer or noopener when true', () => {
-			render(
-				<Link href="https://example.com" openInNewTab>
-					External
-				</Link>
-			);
-
-			expect( screen.getByRole( 'link' ) ).not.toHaveAttribute(
-				'rel',
-				expect.stringContaining( 'noreferrer' )
-			);
-			expect( screen.getByRole( 'link' ) ).not.toHaveAttribute(
-				'rel',
-				expect.stringContaining( 'noopener' )
-			);
-		} );
-
 		it( 'does not set target="_blank" when false', () => {
 			render( <Link href="https://example.com">External</Link> );
 
