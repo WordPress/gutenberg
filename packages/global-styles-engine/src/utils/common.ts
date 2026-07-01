@@ -176,6 +176,12 @@ export const STYLE_PATH_TO_CSS_VAR_INFIX: Record< string, string > = {
 	'typography.fontFamily': 'font-family',
 };
 
+function getLastCompoundSelector( selector: string ) {
+	const trimmed = selector.trim();
+	const match = trimmed.match( /([^\s>+~]+)$/ );
+	return match ? match[ 0 ] : '';
+}
+
 /**
  * Function that scopes a selector with another one. This works a bit like
  * SCSS nesting except the `&` operator isn't supported.
@@ -209,13 +215,12 @@ export function scopeSelector( scope: string | undefined, selector: string ) {
 		}
 
 		// Find the last compound selector of the outer scope.
-		const lastMatch = trimmedOuter.match( /([^\s>+~]+)$/ );
-		const last = lastMatch ? lastMatch[ 0 ] : '';
+		const last = getLastCompoundSelector( trimmedOuter );
 
-		// Determine if the last compound selector of the outer scope targets the same element
-		// as the element selectors. If one of the element selectors (inner) is a class/tag of `last`,
-		// then we assume they target the same element.
-		const isSameElement = selectors.some( ( inner ) => {
+		// Determine if the outer scope targets the same element as the element selectors.
+		// If the outer scope ends with any class in the element's selectors list, then
+		// the scope is already at the target element level.
+		const targetsSameElement = selectors.some( ( inner ) => {
 			const trimmedInner = inner.trim();
 			if ( trimmedInner.startsWith( '.' ) ) {
 				const className = trimmedInner.split( /[:\s>+~]/ )[ 0 ];
@@ -237,7 +242,7 @@ export function scopeSelector( scope: string | undefined, selector: string ) {
 			const isClass = trimmedInner.startsWith( '.' );
 			const isPseudo = trimmedInner.startsWith( ':' );
 
-			if ( ( isSameElement && isClass ) || isPseudo ) {
+			if ( ( targetsSameElement && isClass ) || isPseudo ) {
 				const escapedInner = trimmedInner.replace(
 					/[-\/\\^$*+?.()|[\]{}]/g,
 					'\\$&'
