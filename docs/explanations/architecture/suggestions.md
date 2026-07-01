@@ -59,7 +59,7 @@ When the intent is `suggest`, an `editor.BlockEdit` filter (`withSuggestionOverl
 
 A companion `editor.BlockListBlock` filter tags each block with a pending change so it is discoverable without relying on the selected-block toolbar. Attribute edits get an `is-suggestion-pending` class (the bracket/outline treatment); pending structural changes get `is-suggestion-pending-remove` (strikethrough/dim), `is-suggestion-pending-insert`, or `is-suggestion-pending-move`, mapped from the block's `metadata.suggestion` marker.
 
-Because the store is never touched, autosave, undo/redo, and RTC sync stay at the real baseline.
+For **attribute suggestions** the store is never touched, so autosave, undo/redo, and RTC sync stay at the real baseline. **Structural suggestions** are different: their pending state (the `metadata.suggestion` markers, and pending-insert blocks themselves) lives in the real block tree, so serializing the post would leak it into `post_content`. While any pending structural state exists, `SuggestionSaveLock` holds the editor's save and autosave locks (`lockPostSaving` / `lockPostAutosaving`), releasing them once every structural suggestion has been applied or rejected.
 
 ### Inline preview marks
 

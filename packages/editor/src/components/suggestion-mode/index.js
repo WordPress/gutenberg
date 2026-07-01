@@ -8,6 +8,7 @@ export {
 	registerSuggestionOverlayFilter,
 } from './with-suggestion-overlay';
 export { default as SuggestionAutoSave } from './auto-save';
+export { default as SuggestionSaveLock } from './save-lock';
 export { default as SuggestionStoreInterceptor } from './store-interceptor';
 export {
 	useSuggestionsProvider,

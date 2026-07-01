@@ -49,6 +49,7 @@ import MediaEditorModalMount from '../media/media-editor-modal';
 import {
 	SuggestionOverlayProvider,
 	SuggestionAutoSave,
+	SuggestionSaveLock,
 	SuggestionStoreInterceptor,
 	registerSuggestionOverlayFilter,
 } from '../suggestion-mode';
@@ -468,6 +469,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 											<>
 												<SuggestionStoreInterceptor />
 												<SuggestionAutoSave />
+												<SuggestionSaveLock />
 											</>
 										) }
 										<MediaEditorModalMount />

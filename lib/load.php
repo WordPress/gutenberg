@@ -76,11 +76,12 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.1/collaboration.php';
 	require __DIR__ . '/compat/wordpress-7.1/block-bindings.php';
 	require __DIR__ . '/compat/wordpress-7.1/block-comments.php';
-	// The suggestion REST controller and front-end marker strip are always
-	// loaded: both are inert without suggestion data (which only the
-	// experiment-gated editor UI creates), and keeping the strip active means
-	// any un-accepted markers are never exposed on the front end even if the
-	// experiment is later disabled. The user-facing feature is gated in JS.
+	// The suggestion meta registration and REST controller are always loaded:
+	// both are inert without suggestion data, which only the experiment-gated
+	// editor UI creates. The user-facing feature is gated in JS. Note there is
+	// no front-end strip in this layer — pending structural suggestion state
+	// is kept out of saved content by an editor-side save lock instead (see
+	// packages/editor/src/components/suggestion-mode/save-lock.js).
 	require __DIR__ . '/compat/wordpress-7.1/block-suggestions.php';
 	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-comment-controller-7-1.php';
 
