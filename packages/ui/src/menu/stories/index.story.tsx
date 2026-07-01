@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
 import { archive } from '@wordpress/icons';
+import { ariaKeyShortcut, displayShortcut } from '@wordpress/keycodes';
 import { Icon } from '../../icon';
 import * as Menu from '../';
 
@@ -32,7 +33,7 @@ const meta: Meta< typeof Menu.Root > = {
 		componentStatus: {
 			status: 'use-with-caution',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of overlays compatibility. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
+			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components` and overlays compatibility. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };
@@ -40,6 +41,11 @@ const meta: Meta< typeof Menu.Root > = {
 export default meta;
 
 type Story = StoryObj< typeof Menu.Root >;
+
+const SAVE_SHORTCUT = {
+	displayShortcut: displayShortcut.primary( 's' ),
+	ariaKeyShortcut: ariaKeyShortcut.primary( 's' ),
+};
 
 export const Default: Story = {
 	args: {
@@ -67,6 +73,62 @@ export const Default: Story = {
 						WordPress.org
 					</Menu.LinkItem>
 					<Menu.Item disabled>Unavailable action</Menu.Item>
+				</Menu.Popup>
+			</>
+		),
+	},
+};
+
+export const LinkItem: Story = {
+	args: {
+		children: (
+			<>
+				<Menu.Trigger>Open menu</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.LinkItem
+						href="https://wordpress.org"
+						target="_blank"
+						rel="noreferrer noopener"
+					>
+						<Menu.ItemLabel>WordPress.org</Menu.ItemLabel>
+						<Menu.ItemDescription>
+							Open the WordPress project website.
+						</Menu.ItemDescription>
+					</Menu.LinkItem>
+					<Menu.LinkItem href="#menu-link-item-example">
+						<Menu.ItemLabel>In-page destination</Menu.ItemLabel>
+						<Menu.ItemDescription>
+							Navigate with a regular anchor target.
+						</Menu.ItemDescription>
+					</Menu.LinkItem>
+				</Menu.Popup>
+			</>
+		),
+	},
+};
+
+/**
+ * Use `ariaKeyShortcut` for the `aria-keyshortcuts` value, and keep the suffix
+ * as the visual shortcut label.
+ */
+export const KeyboardShortcuts: Story = {
+	args: {
+		children: (
+			<>
+				<Menu.Trigger>Open menu</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.Item
+						aria-keyshortcuts={ SAVE_SHORTCUT.ariaKeyShortcut }
+						suffix={ SAVE_SHORTCUT.displayShortcut }
+					>
+						Save
+					</Menu.Item>
+					<Menu.Item
+						aria-keyshortcuts={ ariaKeyShortcut.primary( 'k' ) }
+						suffix={ displayShortcut.primary( 'k' ) }
+					>
+						Open command palette
+					</Menu.Item>
 				</Menu.Popup>
 			</>
 		),
