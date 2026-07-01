@@ -8,14 +8,6 @@ import focusStyles from '../utils/css/focus.module.css';
 import styles from './style.module.css';
 import defenseStyles from '../utils/css/global-css-defense.module.css';
 
-function getOpenInNewTabRel( rel: LinkProps[ 'rel' ] ) {
-	const values = new Set( rel?.split( /\s+/ ).filter( Boolean ) );
-
-	values.add( 'noopener' );
-
-	return Array.from( values ).join( ' ' );
-}
-
 /**
  * A styled anchor element with support for semantic color tones and an
  * unstyled escape hatch.
@@ -28,7 +20,6 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
 		openInNewTab = false,
 		render,
 		className,
-		rel,
 		...props
 	},
 	ref
@@ -47,7 +38,6 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
 				variant === 'unstyled' && styles[ 'is-unstyled' ],
 				className
 			),
-			rel: openInNewTab ? getOpenInNewTabRel( rel ) : rel,
 			target: openInNewTab ? '_blank' : undefined,
 			children: (
 				<>
