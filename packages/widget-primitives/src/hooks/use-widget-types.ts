@@ -58,17 +58,25 @@ export function useWidgetTypes(
 						return null;
 					}
 
+					const metadata = module.default as Partial< WidgetType >;
+
 					return {
-						...( module.default as Partial< WidgetType > ),
+						...metadata,
 						name: record.name as WidgetName,
 						renderModule: record.render_module ?? '',
+						/*
+						 * `title` is required:
+						 * - Server-side title wins
+						 * - Then the module's title
+						 * - Then the record's name as fallback
+						 */
+						title: record.title ?? metadata.title ?? record.name,
 						...( record.presentation
 							? { presentation: record.presentation }
 							: {} ),
 						...( record.category
 							? { category: record.category }
 							: {} ),
-						...( record.title ? { title: record.title } : {} ),
 						...( record.description
 							? { description: record.description }
 							: {} ),
