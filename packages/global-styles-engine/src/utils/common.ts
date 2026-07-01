@@ -234,8 +234,18 @@ export function scopeSelector( scope: string | undefined, selector: string ) {
 				return;
 			}
 
-			if ( isSameElement || trimmedInner.startsWith( ':' ) ) {
-				if ( trimmedOuter.includes( trimmedInner ) ) {
+			const isClass = trimmedInner.startsWith( '.' );
+			const isPseudo = trimmedInner.startsWith( ':' );
+
+			if ( ( isSameElement && isClass ) || isPseudo ) {
+				const escapedInner = trimmedInner.replace(
+					/[-\/\\^$*+?.()|[\]{}]/g,
+					'\\$&'
+				);
+				const hasDuplicate = new RegExp(
+					escapedInner + '(?![a-zA-Z0-9_-])'
+				).test( last );
+				if ( hasDuplicate ) {
 					selectorsScoped.push( trimmedOuter );
 				} else {
 					selectorsScoped.push(
