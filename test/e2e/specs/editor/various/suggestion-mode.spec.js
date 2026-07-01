@@ -159,6 +159,60 @@ test.describe( 'Suggestion mode', () => {
 		expect( serialized ).toContain( 'Hello' );
 	} );
 
+	test( 'add — undo removes the typed marker and redo restores it', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		/*
+		 * Typing in Suggest mode writes the add marker via
+		 * updateBlockAttributes, so it participates in the editor undo stack
+		 * like any attribute edit. Undo must remove the marker (and its
+		 * proposed text) from content without crashing the editor; redo must
+		 * bring it back.
+		 *
+		 * TODO: undo leaves the backing note comment in place — an orphaned
+		 * note with no marker. Reconciling orphaned notes/markers is a
+		 * pending design discussion; see the "Known limitations" section of
+		 * docs/explanations/architecture/suggestions.md.
+		 */
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		// A single character keeps the marker write to one attribute update.
+		await page.keyboard.type( '!' );
+
+		const marker = paragraph.locator(
+			'mark.wp-suggestion[data-suggestion-type="add"]'
+		);
+		// The marker is only written once the async note id resolves, so a
+		// populated id means the write (the undo step under test) landed.
+		await expect( marker ).toHaveAttribute( 'data-suggestion-id', /\d/ );
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		// The marker and its proposed text are gone from content…
+		await expect( marker ).toHaveCount( 0 );
+		await expect( paragraph ).toHaveText( 'Hello' );
+		const serializedAfterUndo = await editor.getEditedPostContent();
+		expect( serializedAfterUndo ).not.toContain( 'data-suggestion-id' );
+
+		await pageUtils.pressKeys( 'primaryShift+z' );
+
+		// …and redo restores the marker with its id and text intact.
+		await expect( marker ).toHaveAttribute( 'data-suggestion-id', /\d/ );
+		await expect( marker ).toContainText( '!' );
+	} );
+
 	test( 'add — the note summarizes the addition as "Add: …", not "Format: content"', async ( {
 		editor,
 		page,
