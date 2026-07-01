@@ -494,7 +494,6 @@ function ShadowPopover( { shadowObj, onChange }: ShadowPopoverProps ) {
 					onShadowChange( 'inset', value === 'inset' )
 				}
 				hideLabelFromVision
-				__next40pxDefaultSize
 			>
 				<ToggleGroupControlOption
 					value="outset"

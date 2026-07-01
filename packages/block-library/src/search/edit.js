@@ -472,7 +472,6 @@ export default function SearchEdit( {
 									} );
 								} }
 								isBlock
-								__next40pxDefaultSize
 							>
 								{ PERCENTAGE_WIDTHS.map( ( widthValue ) => {
 									return (

@@ -189,9 +189,11 @@ const restrictedSyntax = [
 		'LineHeightControl',
 		'QueryControls',
 		'RangeControl',
+		'Radio',
 		'SearchControl',
 		'TextControl',
 		'TextIndentControl',
+		'ToggleGroupControl',
 		'TreeSelect',
 		'UnitControl',
 	].map( ( componentName ) => ( {
