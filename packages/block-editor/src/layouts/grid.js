@@ -589,7 +589,6 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 
 	return (
 		<ToggleGroupControl
-			__next40pxDefaultSize
 			label={ __( 'Grid item position' ) }
 			value={ gridPlacement }
 			onChange={ onChangeType }

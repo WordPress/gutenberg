@@ -145,7 +145,6 @@ export default function PostNavigationLinkEdit( {
 						onDeselect={ () => setAttributes( { arrow: 'none' } ) }
 					>
 						<ToggleGroupControl
-							__next40pxDefaultSize
 							label={ __( 'Arrow' ) }
 							value={ arrow }
 							onChange={ ( value ) => {
