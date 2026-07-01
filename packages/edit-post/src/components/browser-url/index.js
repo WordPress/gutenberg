@@ -19,24 +19,25 @@ export function getPostEditURL( postId ) {
 
 export default function BrowserURL() {
 	const [ historyId, setHistoryId ] = useState( null );
-	const { postId, postStatus } = useSelect( ( select ) => {
+	const { postId, postStatus, isTemplate } = useSelect( ( select ) => {
 		const { getCurrentPost } = select( editorStore );
 		const post = getCurrentPost();
-		let { id, status, type } = post;
-		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
-			type
-		);
-		if ( isTemplate ) {
-			id = post.wp_id;
-		}
+		const { id, status } = post;
 
 		return {
 			postId: id,
 			postStatus: status,
+			isTemplate: [ 'wp_template', 'wp_template_part' ].includes(
+				post.type
+			),
 		};
 	}, [] );
 
 	useEffect( () => {
+		if ( isTemplate ) {
+			return;
+		}
+
 		if ( postId && postId !== historyId && postStatus !== 'auto-draft' ) {
 			window.history.replaceState(
 				{ id: postId },
@@ -45,7 +46,7 @@ export default function BrowserURL() {
 			);
 			setHistoryId( postId );
 		}
-	}, [ postId, postStatus, historyId ] );
+	}, [ postId, postStatus, historyId, isTemplate ] );
 
 	return null;
 }
