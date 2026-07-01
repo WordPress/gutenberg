@@ -22,14 +22,12 @@ export default function BrowserURL() {
 	const { postId, postStatus, isTemplate } = useSelect( ( select ) => {
 		const { getCurrentPost } = select( editorStore );
 		const post = getCurrentPost();
-		const { id, status } = post;
+		const { id, status, type } = post;
 
 		return {
 			postId: id,
 			postStatus: status,
-			isTemplate: [ 'wp_template', 'wp_template_part' ].includes(
-				post.type
-			),
+			isTemplate: [ 'wp_template', 'wp_template_part' ].includes( type ),
 		};
 	}, [] );
 
