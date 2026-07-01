@@ -255,17 +255,21 @@ const PlaylistTrackEdit = ( {
 							withoutInteractiveFormatting
 						/>
 						{ showArtists && (
-							<RichText
-								tagName="span"
-								className="wp-block-playlist-track__artist"
-								value={ artist }
-								placeholder={ __( 'Add artist' ) }
-								onChange={ ( value ) =>
-									setAttributes( { artist: value } )
-								}
-								allowedFormats={ [] }
-								withoutInteractiveFormatting
-							/>
+							<>
+								<span className="screen-reader-text">,</span>
+								<RichText
+									tagName="span"
+									className="wp-block-playlist-track__artist"
+									value={ artist }
+									placeholder={ __( 'Add artist' ) }
+									onChange={ ( value ) =>
+										setAttributes( { artist: value } )
+									}
+									allowedFormats={ [] }
+									withoutInteractiveFormatting
+								/>
+								<span className="screen-reader-text">,</span>
+							</>
 						) }
 					</span>
 					<span className="wp-block-playlist-track__length">
@@ -279,6 +283,7 @@ const PlaylistTrackEdit = ( {
 						) }
 						{ length }
 					</span>
+					<span className="screen-reader-text">.</span>
 					<span className="screen-reader-text">
 						{ __( 'Select to play this track' ) }
 					</span>
