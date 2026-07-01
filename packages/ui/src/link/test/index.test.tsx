@@ -48,7 +48,7 @@ describe( 'Link', () => {
 			);
 		} );
 
-		it( 'sets security rel tokens when true', () => {
+		it( 'sets noopener rel token when true', () => {
 			render(
 				<Link href="https://example.com" openInNewTab>
 					External
@@ -57,7 +57,7 @@ describe( 'Link', () => {
 
 			expect( screen.getByRole( 'link' ) ).toHaveAttribute(
 				'rel',
-				'noreferrer noopener'
+				'noopener'
 			);
 		} );
 
@@ -70,7 +70,20 @@ describe( 'Link', () => {
 
 			expect( screen.getByRole( 'link' ) ).toHaveAttribute(
 				'rel',
-				'nofollow noreferrer noopener'
+				'nofollow noopener'
+			);
+		} );
+
+		it( 'does not add noreferrer when true', () => {
+			render(
+				<Link href="https://example.com" openInNewTab>
+					External
+				</Link>
+			);
+
+			expect( screen.getByRole( 'link' ) ).not.toHaveAttribute(
+				'rel',
+				expect.stringContaining( 'noreferrer' )
 			);
 		} );
 
