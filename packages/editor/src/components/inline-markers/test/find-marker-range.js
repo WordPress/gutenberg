@@ -144,6 +144,35 @@ describe( 'findMarkerRange', () => {
 			end: 13,
 		} );
 	} );
+
+	it( 'spans a split (non-contiguous) run of the same id', () => {
+		// An edit inside the run can leave the same id in two separate marks.
+		// The range must span first -> last hit, not stop at the first gap,
+		// or accept/reject would only resolve the first fragment.
+		const value = RichTextData.fromHTMLString(
+			'<mark class="wp-marker" data-id="7">AB</mark>XY' +
+				'<mark class="wp-marker" data-id="7">CD</mark>'
+		);
+		expect( findMarkerRange( value, { ...options, id: 7 } ) ).toEqual( {
+			start: 0,
+			end: 6,
+		} );
+	} );
+
+	it( 'does not merge distinct marker ids that share the value', () => {
+		const value = RichTextData.fromHTMLString(
+			'<mark class="wp-marker" data-id="7">AB</mark>XY' +
+				'<mark class="wp-marker" data-id="8">CD</mark>'
+		);
+		expect( findMarkerRange( value, { ...options, id: 7 } ) ).toEqual( {
+			start: 0,
+			end: 2,
+		} );
+		expect( findMarkerRange( value, { ...options, id: 8 } ) ).toEqual( {
+			start: 4,
+			end: 6,
+		} );
+	} );
 } );
 
 describe( 'findMarkerText', () => {

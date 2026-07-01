@@ -39,6 +39,13 @@ function parseMarkerValue( value, { id, quickReject } ) {
  * Find the character range of the marker matching `id` within an already-parsed
  * rich-text record.
  *
+ * The range spans from the first to the last character carrying the id, so a
+ * marker that rich-text split into non-contiguous runs for the same id (an edit
+ * inside the run, a nested-format grow, a serialization quirk) still resolves as
+ * one range. Returning only the first contiguous run — as an earlier version did
+ * — truncated accept/reject to a fragment of the marker. Any short gap between
+ * fragments is the suggester's own run and belongs to the suggestion.
+ *
  * @param {Object}        record      Rich-text record.
  * @param {string}        formatType  Rich-text format type to match.
  * @param {string}        idAttribute Marker attribute holding the id.
@@ -49,6 +56,7 @@ function rangeInRecord( record, formatType, idAttribute, id ) {
 	const target = String( id );
 	const formats = record.formats;
 	let start = -1;
+	let end = -1;
 	for ( let i = 0; i < formats.length; i++ ) {
 		const stack = formats[ i ];
 		const hit = stack?.find(
@@ -61,14 +69,13 @@ function rangeInRecord( record, formatType, idAttribute, id ) {
 			if ( start === -1 ) {
 				start = i;
 			}
-		} else if ( start !== -1 ) {
-			return { start, end: i };
+			end = i + 1;
 		}
 	}
-	if ( start !== -1 ) {
-		return { start, end: formats.length };
+	if ( start === -1 ) {
+		return null;
 	}
-	return null;
+	return { start, end };
 }
 
 /**
