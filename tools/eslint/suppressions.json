@@ -336,11 +336,6 @@
 			"count": 2
 		}
 	},
-	"packages/block-library/src/embed/embed-placeholder.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
 	"packages/block-library/src/form-input/edit.js": {
 		"react-hooks/refs": {
 			"count": 3
