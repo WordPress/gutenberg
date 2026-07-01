@@ -24,6 +24,16 @@ $suggestion-deletion-color: #cc1818;
 $suggestion-addition-color: #007017;
 $suggestion-author-color: var(--suggestion-author-color, #{$suggestion-color});
 
+// Text-safe variants: the author palette (AVATAR_BORDER_COLORS) is chosen for
+// 3:1 borders, and several entries sit near 2.7-3.3:1 on white — a WCAG AA
+// fail for TEXT. Mixing 40% black brings every palette entry above the 4.5:1
+// text threshold on light backgrounds. Use these wherever the author color
+// paints text or a line-through (which crosses text); keep the raw color for
+// non-text uses (borders, outlines, underline decoration, backgrounds).
+$suggestion-author-text-color: color-mix(in srgb, #{$suggestion-author-color} 60%, #000);
+$suggestion-deletion-text-color: color-mix(in srgb, var(--suggestion-author-color, #{$suggestion-deletion-color}) 60%, #000);
+$suggestion-addition-text-color: color-mix(in srgb, var(--suggestion-author-color, #{$suggestion-addition-color}) 60%, #000);
+
 // Green "bracket" applied to any block with a pending attribute overlay
 // while the suggester is editing. Drawn with an outline so it layers above
 // block content without affecting layout.
@@ -65,9 +75,9 @@ $suggestion-author-color: var(--suggestion-author-color, #{$suggestion-color});
 // Docs' suggesting-mode strike-through. The decoration is applied to
 // the wrapper and propagates to inline rich-text descendants.
 .block-editor-block-list__block.is-suggestion-pending-remove {
-	color: $suggestion-author-color;
+	color: $suggestion-author-text-color;
 	text-decoration: line-through;
-	text-decoration-color: $suggestion-author-color;
+	text-decoration-color: $suggestion-author-text-color;
 	text-decoration-thickness: 2px;
 }
 
@@ -81,7 +91,7 @@ $suggestion-author-color: var(--suggestion-author-color, #{$suggestion-color});
 // shows up here.
 .block-editor-block-list__block.is-suggestion-pending-insert {
 	position: relative;
-	color: $suggestion-author-color;
+	color: $suggestion-author-text-color;
 	outline: 2px dashed $suggestion-author-color;
 	outline-offset: 2px;
 	border-radius: $radius-small;
@@ -120,13 +130,13 @@ $suggestion-author-color: var(--suggestion-author-color, #{$suggestion-color});
 
 // Inline RichText runs marked as deleted/added in a pending suggestion.
 .has-suggestion-deletion {
-	color: var(--suggestion-author-color, #{$suggestion-deletion-color});
+	color: $suggestion-deletion-text-color;
 	text-decoration: line-through;
-	text-decoration-color: var(--suggestion-author-color, #{$suggestion-deletion-color});
+	text-decoration-color: $suggestion-deletion-text-color;
 }
 
 .has-suggestion-addition {
-	color: var(--suggestion-author-color, #{$suggestion-addition-color});
+	color: $suggestion-addition-text-color;
 	text-decoration: underline;
 	text-decoration-color: var(--suggestion-author-color, #{$suggestion-addition-color});
 	box-shadow:
@@ -158,13 +168,13 @@ $suggestion-author-color: var(--suggestion-author-color, #{$suggestion-color});
 	}
 
 	&[data-suggestion-type="del"] {
-		color: var(--suggestion-author-color, #{$suggestion-deletion-color});
+		color: $suggestion-deletion-text-color;
 		text-decoration: line-through;
-		text-decoration-color: var(--suggestion-author-color, #{$suggestion-deletion-color});
+		text-decoration-color: $suggestion-deletion-text-color;
 	}
 
 	&[data-suggestion-type="add"] {
-		color: var(--suggestion-author-color, #{$suggestion-addition-color});
+		color: $suggestion-addition-text-color;
 		text-decoration: underline;
 		text-decoration-color: var(--suggestion-author-color, #{$suggestion-addition-color});
 	}
@@ -182,11 +192,11 @@ $suggestion-author-color: var(--suggestion-author-color, #{$suggestion-color});
 	margin: $grid-unit-15 0;
 	padding: $grid-unit-15;
 	opacity: 0.6;
-	color: $suggestion-author-color;
+	color: $suggestion-author-text-color;
 	border: 1px dotted $suggestion-author-color;
 	border-radius: $radius-small;
 	text-decoration: line-through;
-	text-decoration-color: $suggestion-author-color;
+	text-decoration-color: $suggestion-author-text-color;
 	pointer-events: none;
 	user-select: none;
 
