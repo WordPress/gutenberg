@@ -32,6 +32,7 @@
 		"scss-stylistic.js",
 		"stylistic.js"
 	],
+	"type": "module",
 	"main": "index.js",
 	"exports": {
 		".": "./index.js",

@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Update `@stylistic/stylelint-plugin` to `^3.1.3` ([#79648](https://github.com/WordPress/gutenberg/pull/79648)).
+-   Convert configuration to ESM.
 
 ## 23.41.0 (2026-06-24)
 
