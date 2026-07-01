@@ -1,9 +1,13 @@
 import clsx from 'clsx';
 import { Menu as _Menu } from '@base-ui/react/menu';
 import { forwardRef } from '@wordpress/element';
-import { ITEM_POPUP_POSITIONER_PROPS } from '../form/primitives/constants';
+import {
+	MENU_POPUP_POSITIONER_PROPS,
+	MENU_SUBMENU_POPUP_POSITIONER_PROPS,
+} from '../form/primitives/constants';
 import resetStyles from '../utils/css/resets.module.css';
 import styles from './style.module.css';
+import { useMenuContext } from './context';
 import type { PositionerProps } from './types';
 
 /**
@@ -11,18 +15,22 @@ import type { PositionerProps } from './types';
  */
 const Positioner = forwardRef< HTMLDivElement, PositionerProps >(
 	function MenuPositioner(
-		{
-			className,
-			sideOffset = ITEM_POPUP_POSITIONER_PROPS.sideOffset,
-			collisionPadding = ITEM_POPUP_POSITIONER_PROPS.collisionPadding,
-			...props
-		},
+		{ className, side, align, sideOffset, collisionPadding, ...props },
 		ref
 	) {
+		const { isSubmenu } = useMenuContext();
+		const defaultProps = isSubmenu
+			? MENU_SUBMENU_POPUP_POSITIONER_PROPS
+			: MENU_POPUP_POSITIONER_PROPS;
+
 		return (
 			<_Menu.Positioner
-				sideOffset={ sideOffset }
-				collisionPadding={ collisionPadding }
+				side={ side ?? defaultProps.side }
+				align={ align ?? defaultProps.align }
+				sideOffset={ sideOffset ?? defaultProps.sideOffset }
+				collisionPadding={
+					collisionPadding ?? defaultProps.collisionPadding
+				}
 				{ ...props }
 				ref={ ref }
 				className={ clsx(

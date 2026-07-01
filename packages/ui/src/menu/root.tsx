@@ -1,4 +1,5 @@
 import { Menu as _Menu } from '@base-ui/react/menu';
+import { MenuContext } from './context';
 import type { RootProps } from './types';
 
 /**
@@ -19,7 +20,11 @@ import type { RootProps } from './types';
  * ```
  */
 function Root< Payload = unknown >( props: RootProps< Payload > ) {
-	return <_Menu.Root< Payload > { ...props } />;
+	return (
+		<MenuContext.Provider value={ { isSubmenu: false } }>
+			<_Menu.Root< Payload > { ...props } />
+		</MenuContext.Provider>
+	);
 }
 
 export { Root };
