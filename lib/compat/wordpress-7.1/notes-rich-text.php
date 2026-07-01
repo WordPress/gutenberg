@@ -116,6 +116,21 @@ if ( ! function_exists( 'gutenberg_maybe_install_note_kses' ) ) {
 			return $result;
 		}
 
+		/*
+		 * Snapshot the current pre_comment_content kses filters and their
+		 * priorities so the exact prior state can be restored after dispatch.
+		 * has_filter() returns the priority when hooked, or false when not, so
+		 * this captures what was really registered for the current user rather
+		 * than assuming core's defaults. Notably, users with `unfiltered_html`
+		 * have no kses filter on pre_comment_content at all (see kses_init()),
+		 * so restoring a hardcoded filter would change state instead of
+		 * returning it to where it started.
+		 */
+		$GLOBALS['gutenberg_note_kses_restore'] = array(
+			'wp_filter_kses'      => has_filter( 'pre_comment_content', 'wp_filter_kses' ),
+			'wp_filter_post_kses' => has_filter( 'pre_comment_content', 'wp_filter_post_kses' ),
+		);
+
 		// Replace the standard comment kses filters with the note-specific one.
 		remove_filter( 'pre_comment_content', 'wp_filter_kses' );
 		remove_filter( 'pre_comment_content', 'wp_filter_post_kses' );
@@ -130,7 +145,11 @@ if ( ! function_exists( 'gutenberg_maybe_install_note_kses' ) ) {
 
 if ( ! function_exists( 'gutenberg_uninstall_note_kses' ) ) {
 	/**
-	 * Restores the standard comment kses filters after a note REST dispatch.
+	 * Restores the pre_comment_content kses filters after a note REST dispatch.
+	 *
+	 * Re-adds exactly the filters that were present before the note-specific
+	 * filter was installed, at their original priorities, so the swap leaves no
+	 * lasting change to the filter chain for any user.
 	 *
 	 * @param WP_REST_Response $response The outgoing response.
 	 * @param WP_REST_Server   $server   Server instance.
@@ -142,11 +161,18 @@ if ( ! function_exists( 'gutenberg_uninstall_note_kses' ) ) {
 
 		remove_filter( 'pre_comment_content', 'gutenberg_note_content_pre_filter' );
 
-		if ( ! current_user_can( 'unfiltered_html' ) ) {
-			add_filter( 'pre_comment_content', 'wp_filter_kses' );
-		} else {
-			add_filter( 'pre_comment_content', 'wp_filter_post_kses' );
+		$restore = isset( $GLOBALS['gutenberg_note_kses_restore'] )
+			? $GLOBALS['gutenberg_note_kses_restore']
+			: array();
+
+		if ( isset( $restore['wp_filter_kses'] ) && false !== $restore['wp_filter_kses'] ) {
+			add_filter( 'pre_comment_content', 'wp_filter_kses', $restore['wp_filter_kses'] );
 		}
+		if ( isset( $restore['wp_filter_post_kses'] ) && false !== $restore['wp_filter_post_kses'] ) {
+			add_filter( 'pre_comment_content', 'wp_filter_post_kses', $restore['wp_filter_post_kses'] );
+		}
+
+		unset( $GLOBALS['gutenberg_note_kses_restore'] );
 
 		remove_filter( 'rest_post_dispatch', 'gutenberg_uninstall_note_kses', 10 );
 
