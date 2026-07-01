@@ -42,11 +42,6 @@ export default meta;
 
 type Story = StoryObj< typeof Menu.Root >;
 
-const SAVE_SHORTCUT = {
-	displayShortcut: displayShortcut.primary( 's' ),
-	ariaKeyShortcut: ariaKeyShortcut.primary( 's' ),
-};
-
 export const Default: Story = {
 	args: {
 		children: (
@@ -118,8 +113,8 @@ export const KeyboardShortcuts: Story = {
 				<Menu.Trigger>Open menu</Menu.Trigger>
 				<Menu.Popup>
 					<Menu.Item
-						aria-keyshortcuts={ SAVE_SHORTCUT.ariaKeyShortcut }
-						suffix={ SAVE_SHORTCUT.displayShortcut }
+						aria-keyshortcuts={ ariaKeyShortcut.primary( 's' ) }
+						suffix={ displayShortcut.primary( 's' ) }
 					>
 						Save
 					</Menu.Item>
