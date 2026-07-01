@@ -47,11 +47,7 @@ const identity = ( value: string ) => value;
  * The `value` property is handled in a manner similar to controlled form components.
  * See [Forms](https://react.dev/reference/react-dom/components#form-components) in the React Documentation for more information.
  */
-export function FormTokenField( {
-	__next40pxDefaultSize,
-	__next36pxDefaultSize,
-	...props
-}: FormTokenFieldProps ) {
+export function FormTokenField( props: FormTokenFieldProps ) {
 	const {
 		autoCapitalize,
 		autoComplete,
