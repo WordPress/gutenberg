@@ -109,9 +109,7 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 			await waitForSuggestionSaved( page );
 			await deselect( page );
 
-			const hasMark = await paragraph
-				.locator( SUGGESTION_MARK )
-				.count();
+			const hasMark = await paragraph.locator( SUGGESTION_MARK ).count();
 			const hasOverlayDiff =
 				( await paragraph.locator( OVERLAY_ADD ).count() ) +
 				( await paragraph.locator( OVERLAY_DEL ).count() );
@@ -123,36 +121,40 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 
 	// --- Seams (close in Phase 1) -----------------------------------------
 
-	test.fixme(
-		'seam: deleting a word backward becomes a deletion marker',
-		async ( { editor, page } ) => {
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: 'Hello world' },
-			} );
+	test( 'seam: deleting a word backward becomes a deletion marker', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
 
-			await switchIntent( page, 'Suggesting' );
+		await switchIntent( page, 'Suggesting' );
 
-			const paragraph = editor.canvas
-				.getByRole( 'document', { name: 'Block: Paragraph' } )
-				.first();
-			await paragraph.click();
-			await page.keyboard.press( 'End' );
-			// deleteWordBackward (Ctrl+Backspace on the Linux CI runner).
-			await page.keyboard.press( 'Control+Backspace' );
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		// Fire `deleteWordBackward`. The chord differs by platform: macOS
+		// maps it to Option+Backspace, Windows/Linux (the CI runner) to
+		// Ctrl+Backspace.
+		await page.keyboard.press(
+			process.platform === 'darwin'
+				? 'Alt+Backspace'
+				: 'Control+Backspace'
+		);
 
-			await waitForSuggestionSaved( page );
-			await deselect( page );
+		await waitForSuggestionSaved( page );
+		await deselect( page );
 
-			await expect(
-				paragraph
-					.locator(
-						`${ SUGGESTION_MARK }[data-suggestion-type="del"]`
-					)
-					.filter( { hasText: 'world' } )
-			).toBeVisible();
-		}
-	);
+		await expect(
+			paragraph
+				.locator( `${ SUGGESTION_MARK }[data-suggestion-type="del"]` )
+				.filter( { hasText: 'world' } )
+		).toBeVisible();
+	} );
 
 	test.fixme(
 		'seam: cutting a selection becomes a deletion marker',
@@ -201,7 +203,7 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 			await paragraph.click();
 			await page.keyboard.press( 'End' );
 
-			await pageUtils.setClipboardData( { plainText: ' one two three' } );
+			pageUtils.setClipboardData( { plainText: ' one two three' } );
 			await pageUtils.pressKeys( 'primary+v' );
 
 			await waitForSuggestionSaved( page );
