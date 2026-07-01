@@ -68,7 +68,6 @@ const SiteLogo = ( {
 	const isResizable = ! isWideAligned && isLargeViewport;
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
-	const cropButtonRef = useRef();
 	const { toggleSelection, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
