@@ -1,8 +1,4 @@
 /**
- * @jest-environment jsdom
- */
-
-/**
  * Internal dependencies
  */
 import { getTrackAttributes } from '../utils';
