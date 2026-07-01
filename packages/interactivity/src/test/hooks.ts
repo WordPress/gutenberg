@@ -346,22 +346,19 @@ describe( 'Interactivity API', () => {
 			expect( evaluateExpr( 'context.isPinned && state.flag' ) ).toBe( true );
 		} );
 
-		it( 'should evaluate ! on a function reference via hasNegationOperator', () => {
+		it( 'should evaluate ! on a function reference (negation ignored)', () => {
 			// After ! is stripped and whitespace is trimStart()'d, the path
 			// `actions.increment` matches the legacy path regex, so it goes
-			// through the legacy path where hasNegationOperator calls the
-			// function immediately (with ...args) and negates its return
-			// value. actions.increment returns undefined, so !undefined === true.
-			// This test documents the pre-removal behavior; after removing
-			// the function+negation hack, the result will be a wrapped
-			// function instead.
+			// through the legacy path. The hasNegationOperator flag is set,
+			// but the negation is ignored for functions — the deprecation
+			// warning fires, then the function is wrapped and returned
+			// without being called. The caller (e.g. the `on` directive) is
+			// responsible for invoking the returned function.
 			const legacyRe = /^[a-zA-Z_$][\w.]*$/;
 			expect( legacyRe.test( 'actions.increment' ) ).toBe( true );
 			const result = evaluateExpr( '!actions.increment' );
-			// Acknowledge the deprecation warning so the afterEach console
-			// assertion passes, then assert the value.
 			expect( console ).toHaveWarned();
-			expect( result ).toBe( true );
+			expect( typeof result ).toBe( 'function' );
 		} );
 
 		it( 'should support complex boolean precedence and grouping', () => {
