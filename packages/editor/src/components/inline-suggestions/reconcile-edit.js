@@ -6,13 +6,21 @@ import { RichTextData, create } from '@wordpress/rich-text';
 /**
  * Internal dependencies
  */
+import { wrapInlineMarker } from '../inline-markers';
 import {
 	SUGGESTION_FORMAT_NAME,
 	SUGGESTION_ID_ATTRIBUTE,
 	SUGGESTION_TYPE_ATTRIBUTE,
 	SUGGESTION_TYPE_ADDITION,
 	SUGGESTION_TYPE_DELETION,
+	findSuggestionRange,
 } from './format';
+import {
+	buildSuggestionMarkerAttributes,
+	insertInlineAddition,
+	growInlineAddition,
+	rejectInlineAddition,
+} from './operations';
 
 /**
  * Phase 1 of the overlay-retirement work (#73411): derive a suggestion edit
@@ -334,4 +342,83 @@ export function planEditMarkers( prevValue, nextValue, { authorId } = {} ) {
 		};
 	}
 	return { kind: 'replace', actions: [] };
+}
+
+/**
+ * Execute a marker plan against a value, returning the marked value. Pure: the
+ * caller resolves note ids (creating one note per `newNote` action) and passes
+ * them in `ids`, in the same order the actions appear; this only writes markers.
+ *
+ * `wrap-del` before `insert-add` in a replace is order-safe: wrapping existing
+ * text doesn't change the value length, so a later action's offset stays valid.
+ *
+ * @param {*}                    value              Block attribute value to mark (RichTextData or other).
+ * @param {MarkerAction[]}       actions            Plan from `planEditMarkers`.
+ * @param {Object}               [options]
+ * @param {number|string}        [options.authorId] Author id stamped on new markers.
+ * @param {Array<number|string>} [options.ids]      Note ids for the `newNote` actions, in order.
+ * @return {*} The value with markers applied (unchanged when nothing applies).
+ */
+export function applyEditPlan( value, actions, { authorId, ids = [] } = {} ) {
+	let result = value;
+	let idIndex = 0;
+
+	for ( const action of actions ) {
+		switch ( action.type ) {
+			case 'insert-add': {
+				const id = ids[ idIndex++ ];
+				result = insertInlineAddition( result, {
+					text: action.text,
+					attributes: buildSuggestionMarkerAttributes( {
+						id,
+						type: SUGGESTION_TYPE_ADDITION,
+						authorId,
+					} ),
+					start: action.at,
+					end: action.at,
+				} );
+				break;
+			}
+			case 'grow-add': {
+				const range = findSuggestionRange( result, action.id );
+				if ( ! range ) {
+					break;
+				}
+				result = growInlineAddition( result, {
+					text: action.text,
+					attributes: buildSuggestionMarkerAttributes( {
+						id: action.id,
+						type: SUGGESTION_TYPE_ADDITION,
+						authorId,
+					} ),
+					markerStart: range.start,
+					markerEnd: range.end,
+				} );
+				break;
+			}
+			case 'wrap-del': {
+				const id = ids[ idIndex++ ];
+				const wrapped = wrapInlineMarker( result, {
+					formatType: SUGGESTION_FORMAT_NAME,
+					attributes: buildSuggestionMarkerAttributes( {
+						id,
+						type: SUGGESTION_TYPE_DELETION,
+						authorId,
+					} ),
+					start: action.start,
+					end: action.end,
+				} );
+				if ( wrapped ) {
+					result = wrapped;
+				}
+				break;
+			}
+			case 'remove-add': {
+				result = rejectInlineAddition( result, action.id );
+				break;
+			}
+		}
+	}
+
+	return result;
 }

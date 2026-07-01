@@ -11,8 +11,17 @@ import { select } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { analyzeTextEdit, planEditMarkers } from '../reconcile-edit';
-import { registerSuggestionFormat, SUGGESTION_FORMAT_NAME } from '../format';
+import {
+	analyzeTextEdit,
+	planEditMarkers,
+	applyEditPlan,
+} from '../reconcile-edit';
+import {
+	registerSuggestionFormat,
+	findSuggestionText,
+	findSuggestionRange,
+	SUGGESTION_FORMAT_NAME,
+} from '../format';
 
 const getFormatType = ( name ) => select( richTextStore ).getFormatType( name );
 
@@ -218,5 +227,83 @@ describe( 'planEditMarkers', () => {
 				},
 			],
 		} );
+	} );
+} );
+
+describe( 'applyEditPlan', () => {
+	beforeAll( () => {
+		registerSuggestionFormat();
+	} );
+
+	afterAll( () => {
+		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
+			unregisterFormatType( SUGGESTION_FORMAT_NAME );
+		}
+	} );
+
+	it( 'wraps an insert-add in a new marker with the supplied id', () => {
+		const { actions } = planEditMarkers(
+			rtd( 'Hello' ),
+			rtd( 'Hello world' )
+		);
+		const result = applyEditPlan( rtd( 'Hello' ), actions, {
+			authorId: 2,
+			ids: [ 10 ],
+		} );
+		const html = result.toHTMLString();
+		expect( html ).toContain( 'data-suggestion-id="10"' );
+		expect( html ).toContain( 'data-suggestion-type="add"' );
+		expect( findSuggestionText( result, 10 ) ).toBe( ' world' );
+	} );
+
+	it( 'grows an existing add marker without a new id', () => {
+		const prev = rtd( add( 7, 'new', 2 ) );
+		const { actions } = planEditMarkers(
+			prev,
+			rtd( add( 7, 'new', 2 ) + 's' ),
+			{ authorId: 2 }
+		);
+		const result = applyEditPlan( prev, actions, {
+			authorId: 2,
+			ids: [],
+		} );
+		expect( findSuggestionText( result, 7 ) ).toBe( 'news' );
+	} );
+
+	it( 'wraps a deletion, keeping the text struck through', () => {
+		const prev = rtd( 'Hello world' );
+		const { actions } = planEditMarkers( prev, rtd( 'Hello' ) );
+		const result = applyEditPlan( prev, actions, {
+			authorId: 2,
+			ids: [ 20 ],
+		} );
+		const html = result.toHTMLString();
+		expect( html ).toContain( 'data-suggestion-type="del"' );
+		expect( findSuggestionText( result, 20 ) ).toBe( ' world' );
+		// The removed text survives (it is proposed for deletion, not gone).
+		expect( result.toHTMLString() ).toContain( 'world' );
+	} );
+
+	it( 'removes the author own pending addition', () => {
+		const prev = rtd( 'keep ' + add( 8, 'gone', 2 ) );
+		// The author deletes their own pending addition, so the text loses 'gone'.
+		const { actions } = planEditMarkers( prev, rtd( 'keep ' ), {
+			authorId: 2,
+		} );
+		// The plan for deleting an own addition is a remove-add.
+		const result = applyEditPlan( prev, actions, { authorId: 2 } );
+		expect( findSuggestionRange( result, 8 ) ).toBeNull();
+		expect( result.toHTMLString() ).not.toContain( 'gone' );
+	} );
+
+	it( 'applies a type-over as a del + add pair', () => {
+		const prev = rtd( 'Hello world' );
+		const { actions } = planEditMarkers( prev, rtd( 'Hello there' ) );
+		const result = applyEditPlan( prev, actions, {
+			authorId: 2,
+			ids: [ 30, 31 ],
+		} );
+		expect( findSuggestionText( result, 30 ) ).toBe( 'world' );
+		expect( findSuggestionText( result, 31 ) ).toBe( 'there' );
 	} );
 } );
