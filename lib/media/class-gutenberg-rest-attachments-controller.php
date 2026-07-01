@@ -83,11 +83,11 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 					'callback'            => array( $this, 'sideload_item' ),
 					'permission_callback' => array( $this, 'sideload_item_permissions_check' ),
 					'args'                => array(
-						'id'                 => array(
+						'id'             => array(
 							'description' => __( 'Unique identifier for the attachment.', 'gutenberg' ),
 							'type'        => 'integer',
 						),
-						'image_size'         => array(
+						'image_size'     => array(
 							'description'       => __( 'Image size. Can be a single size name or an array of size names to register the same file under multiple sizes.', 'gutenberg' ),
 							'type'              => array( 'string', 'array' ),
 							'items'             => array(
@@ -132,12 +132,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 								return true;
 							},
 						),
-						'generate_sub_sizes' => array(
-							'description' => __( 'Whether to generate image sub sizes from the sideloaded file.', 'gutenberg' ),
-							'type'        => 'boolean',
-							'default'     => false,
-						),
-						'convert_format'     => array(
+						'convert_format' => array(
 							'description' => __( 'Whether to convert image formats.', 'gutenberg' ),
 							'type'        => 'boolean',
 							'default'     => true,

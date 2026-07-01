@@ -929,6 +929,28 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
+	 * Verifies that the sideload route does not advertise a generate_sub_sizes arg.
+	 *
+	 * sideload_item() never reads generate_sub_sizes, so advertising it on the
+	 * route would silently mislead clients into expecting server-side sub-size
+	 * generation. That arg only does real work on create_item() (POST /wp/v2/media).
+	 *
+	 * @covers ::register_routes
+	 */
+	public function test_sideload_route_omits_generate_sub_sizes() {
+		$routes = rest_get_server()->get_routes();
+		$this->assertArrayHasKey( '/wp/v2/media/(?P<id>[\d]+)/sideload', $routes );
+
+		foreach ( $routes['/wp/v2/media/(?P<id>[\d]+)/sideload'] as $route ) {
+			$this->assertArrayNotHasKey(
+				'generate_sub_sizes',
+				$route['args'],
+				'Sideload route should not advertise the unused generate_sub_sizes arg.'
+			);
+		}
+	}
+
+	/**
 	 * Verifies that sideloading with `convert_format=false` (as a string, matching
 	 * multipart/form-data semantics) suppresses the alt-extension collision check
 	 * inside `wp_unique_filename()`, so a companion file that shares the attachment's
