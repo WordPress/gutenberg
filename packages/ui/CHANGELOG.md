@@ -6,6 +6,7 @@
 
 -   `IconButton`: Restore the default tooltip delay on hover ([#79505](https://github.com/WordPress/gutenberg/pull/79505)).
 -   `Button`: Fix corner artifacts by using `background-clip: border-box` ([#79524](https://github.com/WordPress/gutenberg/pull/79524))
+-   `Link`: Add security `rel` tokens to links that open in a new tab ([#79743](https://github.com/WordPress/gutenberg/pull/79743)).
 
 ### Internal
 
