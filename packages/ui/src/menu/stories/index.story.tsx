@@ -102,7 +102,16 @@ export const Default: Story = {
 					<Menu.RadioGroup value={ view } onValueChange={ setView }>
 						<Menu.Group>
 							<Menu.GroupLabel>View</Menu.GroupLabel>
-							<Menu.RadioItem value="list">
+							<Menu.RadioItem
+								value="list"
+								prefix={
+									<Icon
+										icon={ archive }
+										size={ 24 }
+										aria-hidden
+									/>
+								}
+							>
 								<Menu.ItemLabel>List</Menu.ItemLabel>
 								<Menu.ItemDescription>
 									Show compact rows.
@@ -335,13 +344,6 @@ export const CheckboxItems: Story = {
 						<Menu.CheckboxItem
 							checked={ downloads }
 							onCheckedChange={ setDownloads }
-							prefix={
-								<Icon
-									icon={ archive }
-									size={ 24 }
-									aria-hidden
-								/>
-							}
 							suffix="⌘D"
 						>
 							<Menu.ItemLabel>Downloads</Menu.ItemLabel>
