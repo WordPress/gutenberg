@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
  * WordPress dependencies
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -37,7 +32,7 @@ export default function useTabListItemsSync( { tabPanels, tabListClientId } ) {
 
 		// Skip the update when the stored tabs already match the derived ones.
 		const currentTabs = getBlockAttributes( tabListClientId )?.tabs ?? [];
-		if ( fastDeepEqual( newTabs, currentTabs ) ) {
+		if ( JSON.stringify( newTabs ) === JSON.stringify( currentTabs ) ) {
 			return;
 		}
 

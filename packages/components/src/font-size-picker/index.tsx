@@ -220,7 +220,6 @@ const UnforwardedFontSizePicker = (
 							<FlexItem isBlock>
 								<Spacer marginX={ 2 } marginBottom={ 0 }>
 									<RangeControl
-										__next40pxDefaultSize
 										className="components-font-size-picker__custom-input"
 										label={ __( 'Font size' ) }
 										hideLabelFromVision

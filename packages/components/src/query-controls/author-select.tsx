@@ -29,7 +29,6 @@ export default function AuthorSelect( {
 					? String( selectedAuthorId )
 					: undefined
 			}
-			__next40pxDefaultSize
 		/>
 	);
 }

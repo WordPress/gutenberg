@@ -67,7 +67,7 @@
 
 .edit-site-page-patterns-dataviews {
 	.dataviews-view-grid__badge-fields {
-		.dataviews-view-grid__field-value:has(.edit-site-patterns__field-sync-status-fully) {
+		.dataviews-view-grid__field-value:has(.fields-field__pattern-sync-status-fully) {
 			background: rgba(var(--wp-block-synced-color--rgb), 0.04);
 			color: var(--wp-block-synced-color);
 		}

@@ -1,7 +1,33 @@
 /**
+ * External dependencies
+ */
+import { render, screen } from '@testing-library/react';
+
+/**
+ * WordPress dependencies
+ */
+import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
+
+/**
  * Internal dependencies
  */
 import grid from '../grid';
+
+const GridLayoutInspectorControls = grid.inspectorControls;
+const PANEL_ID = 'test-panel';
+
+function renderInspectorControls( props = {} ) {
+	return render(
+		<ToolsPanel label="Layout" resetAll={ jest.fn() } panelId={ PANEL_ID }>
+			<GridLayoutInspectorControls
+				clientId={ PANEL_ID }
+				layout={ {} }
+				onChange={ jest.fn() }
+				{ ...props }
+			/>
+		</ToolsPanel>
+	);
+}
 
 describe( 'getLayoutStyle', () => {
 	it( 'should return only `grid-template-columns` and `container-type` properties if no non-default params are provided', () => {
@@ -77,5 +103,18 @@ describe( 'getLayoutStyle', () => {
 		} );
 
 		expect( result ).toBe( expected );
+	} );
+} );
+
+describe( 'GridLayoutInspectorControls', () => {
+	it( 'renders an unset column count as an empty control value', () => {
+		renderInspectorControls( {
+			layout: { type: 'grid', columnCount: null },
+			resetLayout: { type: 'grid', columnCount: 3 },
+		} );
+
+		expect(
+			screen.getByRole( 'spinbutton', { name: 'Columns' } )
+		).toHaveDisplayValue( '' );
 	} );
 } );

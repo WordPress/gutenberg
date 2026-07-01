@@ -284,17 +284,17 @@
 	/* 2x extra large surface width */
 	--wpds-dimension-surface-width-2xl: 960px;
 	/* For sections and containers that group related content and controls, which may overlap other content. Example: Preview Frame. */
-	--wpds-elevation-xs: 0 1px 1px 0 #00000008, 0 1px 2px 0 #00000005,
-		0 3px 3px 0 #00000005, 0 4px 4px 0 #00000003;
+	--wpds-elevation-xs: 0px 1px 1px 0px #00000008, 0px 1px 2px 0px #00000005,
+		0px 3px 3px 0px #00000005, 0px 4px 4px 0px #00000003;
 	/* For components that provide contextual feedback without being intrusive. Generally non-interruptive. Example: Tooltips, Snackbar. */
-	--wpds-elevation-sm: 0 1px 2px 0 #0000000d, 0 2px 3px 0 #0000000a,
-		0 6px 6px 0 #00000008, 0 8px 8px 0 #00000005;
+	--wpds-elevation-sm: 0px 1px 2px 0px #0000000d, 0px 2px 3px 0px #0000000a,
+		0px 6px 6px 0px #00000008, 0px 8px 8px 0px #00000005;
 	/* For components that offer additional actions. Example: Menus, Command Palette */
-	--wpds-elevation-md: 0 2px 3px 0 #0000000d, 0 4px 5px 0 #0000000a,
-		0 12px 12px 0 #00000008, 0 16px 16px 0 #00000005;
+	--wpds-elevation-md: 0px 2px 3px 0px #0000000d, 0px 4px 5px 0px #0000000a,
+		0px 12px 12px 0px #00000008, 0px 16px 16px 0px #00000005;
 	/* For components that confirm decisions or handle necessary interruptions. Example: Modals. */
-	--wpds-elevation-lg: 0 5px 15px 0 #00000014, 0 15px 27px 0 #00000012,
-		0 30px 36px 0 #0000000a, 0 50px 43px 0 #00000005;
+	--wpds-elevation-lg: 0px 5px 15px 0px #00000014, 0px 15px 27px 0px #00000012,
+		0px 30px 36px 0px #0000000a, 0px 50px 43px 0px #00000005;
 	/* Micro-delays and transition offsets */
 	--wpds-motion-duration-xs: 50ms;
 	/* Micro-interactions like focus rings and state changes */
@@ -361,15 +361,15 @@
 [data-wpds-corner-radius='none'],
 :root:has( [data-wpds-root-provider='true'][data-wpds-corner-radius='none'] ) {
 	/* Buttons and other elements nested inside controls. */
-	--wpds-border-radius-xs: 0;
+	--wpds-border-radius-xs: 0px;
 	/* Standalone buttons, inputs, and compact controls. */
-	--wpds-border-radius-sm: 0;
+	--wpds-border-radius-sm: 0px;
 	/* Menus, popovers, and other small portaled overlays. */
-	--wpds-border-radius-md: 0;
+	--wpds-border-radius-md: 0px;
 	/* Cards, dialogs, notices, and other larger content containers. */
-	--wpds-border-radius-lg: 0;
+	--wpds-border-radius-lg: 0px;
 	/* Page and app shell surfaces. */
-	--wpds-border-radius-xl: 0;
+	--wpds-border-radius-xl: 0px;
 }
 
 [data-wpds-corner-radius='subtle'],

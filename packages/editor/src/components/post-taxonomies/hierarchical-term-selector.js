@@ -469,7 +469,6 @@ export function HierarchicalTermSelector( { slug } ) {
 						/>
 						{ !! availableTerms.length && (
 							<TreeSelect
-								__next40pxDefaultSize
 								label={ parentSelectLabel }
 								noOptionLabel={ noParentOption }
 								onChange={ onChangeFormParent }
