@@ -58,6 +58,7 @@
 			grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
 			gap: 0;
 			justify-content: stretch;
+			padding-inline-start: var(--wp-ui-popup-item-padding-inline);
 			text-decoration: none;
 
 			@supports ( grid-template-columns: subgrid ) {
