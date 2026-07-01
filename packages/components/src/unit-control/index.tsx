@@ -216,7 +216,6 @@ function UnforwardedUnitControl(
 		<ValueInput
 			{ ...props }
 			__next40pxDefaultSize
-			__shouldNotWarnDeprecated36pxSize
 			autoComplete={ autoComplete }
 			className={ classes }
 			disabled={ disabled }
