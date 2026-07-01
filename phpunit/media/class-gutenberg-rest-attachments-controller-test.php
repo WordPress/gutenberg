@@ -1643,6 +1643,116 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
+	 * Verifies that sideloading the 'original' size rejects an image whose
+	 * dimensions do not match the original attachment dimensions.
+	 *
+	 * @covers ::sideload_item
+	 * @covers ::validate_image_dimensions
+	 */
+	public function test_sideload_item_rejects_original_dimension_mismatch() {
+		wp_set_current_user( self::$admin_id );
+
+		$attachment_id = self::factory()->attachment->create_object(
+			DIR_TESTDATA . '/images/canola.jpg',
+			0,
+			array(
+				'post_mime_type' => 'image/jpeg',
+			)
+		);
+
+		wp_update_attachment_metadata(
+			$attachment_id,
+			wp_generate_attachment_metadata( $attachment_id, DIR_TESTDATA . '/images/canola.jpg' )
+		);
+
+		// Sideload a 50x50 image as the original; it does not match canola.jpg.
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=canola.jpg' );
+		$request->set_param( 'image_size', 'original' );
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/test-image.jpg' ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 400, $response->get_status(), 'Mismatched original sideload should be rejected.' );
+		$this->assertSame( 'rest_upload_dimension_mismatch', $response->get_data()['code'] );
+	}
+
+	/**
+	 * Verifies that sideloading the 'original' size accepts an image whose
+	 * dimensions match the original attachment dimensions.
+	 *
+	 * @covers ::sideload_item
+	 * @covers ::validate_image_dimensions
+	 */
+	public function test_sideload_item_accepts_matching_original_dimensions() {
+		wp_set_current_user( self::$admin_id );
+
+		$attachment_id = self::factory()->attachment->create_object(
+			DIR_TESTDATA . '/images/canola.jpg',
+			0,
+			array(
+				'post_mime_type' => 'image/jpeg',
+			)
+		);
+
+		wp_update_attachment_metadata(
+			$attachment_id,
+			wp_generate_attachment_metadata( $attachment_id, DIR_TESTDATA . '/images/canola.jpg' )
+		);
+
+		// Sideload the same image as the original; dimensions match.
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=canola-original.jpg' );
+		$request->set_param( 'image_size', 'original' );
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status(), 'Matching original sideload should succeed.' );
+	}
+
+	/**
+	 * Verifies that sideloading a file whose dimensions cannot be read is
+	 * rejected rather than stored with zero dimensions.
+	 *
+	 * The body is a JFIF header with no frame data: its magic bytes identify it
+	 * as a JPEG so the upload itself succeeds, but wp_getimagesize() cannot
+	 * determine dimensions, which is the corrupted/unsupported-format case.
+	 *
+	 * @covers ::sideload_item
+	 */
+	public function test_sideload_item_rejects_unreadable_image() {
+		wp_set_current_user( self::$admin_id );
+
+		$attachment_id = self::factory()->attachment->create_object(
+			DIR_TESTDATA . '/images/canola.jpg',
+			0,
+			array(
+				'post_mime_type' => 'image/jpeg',
+			)
+		);
+
+		wp_update_attachment_metadata(
+			$attachment_id,
+			wp_generate_attachment_metadata( $attachment_id, DIR_TESTDATA . '/images/canola.jpg' )
+		);
+
+		// A JPEG SOI + JFIF APP0 marker followed immediately by EOI: valid magic
+		// bytes, but no SOF marker, so wp_getimagesize() returns false.
+		$unreadable = "\xFF\xD8\xFF\xE0\x00\x10JFIF\x00\x01\x01\x00\x00\x01\x00\x01\x00\x00\xFF\xD9";
+
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=canola-thumbnail.jpg' );
+		$request->set_param( 'image_size', 'thumbnail' );
+		$request->set_body( $unreadable );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 400, $response->get_status(), 'Unreadable image sideload should be rejected.' );
+		$this->assertSame( 'rest_upload_invalid_image', $response->get_data()['code'] );
+	}
+
+	/**
 	 * Verifies that image_output_format and image_save_progressive are in the schema.
 	 *
 	 * @covers ::get_item_schema
