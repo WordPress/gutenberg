@@ -110,6 +110,32 @@ describe( 'Menu', () => {
 		);
 	} );
 
+	it( 'uses item descriptions as accessible descriptions', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.Item>
+						<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+						<Menu.ItemDescription>
+							Create a separate copy.
+						</Menu.ItemDescription>
+					</Menu.Item>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+
+		const item = await screen.findByRole( 'menuitem', {
+			name: 'Duplicate',
+		} );
+
+		expect( item ).toHaveAccessibleDescription( 'Create a separate copy.' );
+	} );
+
 	it( 'supports custom portal and positioner elements', async () => {
 		const user = userEvent.setup();
 		const containerRef = createRef< HTMLDivElement >();

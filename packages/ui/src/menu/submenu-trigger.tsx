@@ -6,7 +6,8 @@ import { Icon } from '../icon';
 import itemPopupStyles from '../utils/css/item-popup.module.css';
 import resetStyles from '../utils/css/resets.module.css';
 import styles from './style.module.css';
-import { ItemContent } from './item';
+import { MenuItemContentContext } from './context';
+import { ItemContent, useItemContent } from './item';
 import type { SubmenuTriggerProps } from './types';
 
 /**
@@ -14,12 +15,31 @@ import type { SubmenuTriggerProps } from './types';
  */
 const SubmenuTrigger = forwardRef< HTMLDivElement, SubmenuTriggerProps >(
 	function MenuSubmenuTrigger(
-		{ children, className, prefix, suffix, ...props },
+		{
+			children,
+			className,
+			prefix,
+			suffix,
+			'aria-describedby': ariaDescribedBy,
+			'aria-label': ariaLabel,
+			'aria-labelledby': ariaLabelledBy,
+			...props
+		},
 		ref
 	) {
+		const { contentContextValue, itemAriaProps } = useItemContent(
+			children,
+			{
+				'aria-describedby': ariaDescribedBy,
+				'aria-label': ariaLabel,
+				'aria-labelledby': ariaLabelledBy,
+			}
+		);
+
 		return (
 			<_Menu.SubmenuTrigger
 				ref={ ref }
+				{ ...itemAriaProps }
 				className={ clsx(
 					resetStyles[ 'box-sizing' ],
 					itemPopupStyles.item,
@@ -28,21 +48,23 @@ const SubmenuTrigger = forwardRef< HTMLDivElement, SubmenuTriggerProps >(
 				) }
 				{ ...props }
 			>
-				<ItemContent
-					prefix={ prefix }
-					suffix={
-						<>
-							{ suffix }
-							<Icon
-								icon={ chevronRightSmall }
-								size={ 24 }
-								aria-hidden="true"
-							/>
-						</>
-					}
-				>
-					{ children }
-				</ItemContent>
+				<MenuItemContentContext.Provider value={ contentContextValue }>
+					<ItemContent
+						prefix={ prefix }
+						suffix={
+							<>
+								{ suffix }
+								<Icon
+									icon={ chevronRightSmall }
+									size={ 24 }
+									aria-hidden="true"
+								/>
+							</>
+						}
+					>
+						{ children }
+					</ItemContent>
+				</MenuItemContentContext.Provider>
 			</_Menu.SubmenuTrigger>
 		);
 	}

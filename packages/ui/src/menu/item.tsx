@@ -1,19 +1,68 @@
 import { Menu as _Menu } from '@base-ui/react/menu';
 import clsx from 'clsx';
-import { Children, forwardRef, isValidElement } from '@wordpress/element';
+import {
+	Children,
+	forwardRef,
+	isValidElement,
+	useId,
+} from '@wordpress/element';
 import itemPopupStyles from '../utils/css/item-popup.module.css';
 import resetStyles from '../utils/css/resets.module.css';
 import styles from './style.module.css';
+import { MenuItemContentContext } from './context';
 import { ItemDescription } from './item-description';
 import { ItemLabel } from './item-label';
 import type { ItemProps } from './types';
 
-function hasStructuredItemContent( children: ItemProps[ 'children' ] ) {
-	return Children.toArray( children ).some(
-		( child ) =>
-			isValidElement( child ) &&
-			( child.type === ItemLabel || child.type === ItemDescription )
-	);
+type ItemAriaProps = Pick<
+	ItemProps,
+	'aria-describedby' | 'aria-label' | 'aria-labelledby'
+>;
+
+function getStructuredItemContent( children: ItemProps[ 'children' ] ) {
+	const childArray = Children.toArray( children );
+
+	return {
+		hasDescription: childArray.some(
+			( child ) =>
+				isValidElement( child ) && child.type === ItemDescription
+		),
+		hasStructuredContent: childArray.some(
+			( child ) =>
+				isValidElement( child ) &&
+				( child.type === ItemLabel || child.type === ItemDescription )
+		),
+	};
+}
+
+function useItemContent(
+	children: ItemProps[ 'children' ],
+	{
+		'aria-describedby': ariaDescribedBy,
+		'aria-label': ariaLabel,
+		'aria-labelledby': ariaLabelledBy,
+	}: ItemAriaProps
+) {
+	const labelId = useId();
+	const descriptionId = useId();
+	const { hasDescription } = getStructuredItemContent( children );
+
+	const describedBy = [ ariaDescribedBy, hasDescription && descriptionId ]
+		.filter( Boolean )
+		.join( ' ' );
+
+	return {
+		contentContextValue: {
+			labelId,
+			descriptionId,
+		},
+		itemAriaProps: {
+			'aria-describedby': describedBy || undefined,
+			'aria-label': ariaLabel,
+			'aria-labelledby':
+				ariaLabel || ariaLabelledBy ? ariaLabelledBy : labelId,
+		},
+	};
 }
 
 function ItemContent( {
@@ -21,7 +70,8 @@ function ItemContent( {
 	prefix,
 	suffix,
 }: Pick< ItemProps, 'children' | 'prefix' | 'suffix' > ) {
-	const itemChildren = hasStructuredItemContent( children ) ? (
+	const itemChildren = getStructuredItemContent( children )
+		.hasStructuredContent ? (
 		children
 	) : (
 		<ItemLabel>{ children }</ItemLabel>
@@ -48,12 +98,28 @@ function ItemContent( {
  * Renders an individual menu item.
  */
 const Item = forwardRef< HTMLDivElement, ItemProps >( function MenuItem(
-	{ children, className, prefix, suffix, ...props },
+	{
+		children,
+		className,
+		prefix,
+		suffix,
+		'aria-describedby': ariaDescribedBy,
+		'aria-label': ariaLabel,
+		'aria-labelledby': ariaLabelledBy,
+		...props
+	},
 	ref
 ) {
+	const { contentContextValue, itemAriaProps } = useItemContent( children, {
+		'aria-describedby': ariaDescribedBy,
+		'aria-label': ariaLabel,
+		'aria-labelledby': ariaLabelledBy,
+	} );
+
 	return (
 		<_Menu.Item
 			ref={ ref }
+			{ ...itemAriaProps }
 			className={ clsx(
 				resetStyles[ 'box-sizing' ],
 				itemPopupStyles.item,
@@ -62,11 +128,13 @@ const Item = forwardRef< HTMLDivElement, ItemProps >( function MenuItem(
 			) }
 			{ ...props }
 		>
-			<ItemContent prefix={ prefix } suffix={ suffix }>
-				{ children }
-			</ItemContent>
+			<MenuItemContentContext.Provider value={ contentContextValue }>
+				<ItemContent prefix={ prefix } suffix={ suffix }>
+					{ children }
+				</ItemContent>
+			</MenuItemContentContext.Provider>
 		</_Menu.Item>
 	);
 } );
 
-export { Item, ItemContent };
+export { Item, ItemContent, useItemContent };
