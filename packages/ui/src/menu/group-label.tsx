@@ -1,6 +1,7 @@
 import { Menu as _Menu } from '@base-ui/react/menu';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
+import itemPopupStyles from '../utils/css/item-popup.module.css';
 import styles from './style.module.css';
 import type { GroupLabelProps } from './types';
 
@@ -12,7 +13,11 @@ const GroupLabel = forwardRef< HTMLDivElement, GroupLabelProps >(
 		return (
 			<_Menu.GroupLabel
 				ref={ ref }
-				className={ clsx( styles[ 'group-label' ], className ) }
+				className={ clsx(
+					itemPopupStyles[ 'group-label' ],
+					styles[ 'group-label' ],
+					className
+				) }
 				{ ...props }
 			/>
 		);

@@ -30,11 +30,14 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function MenuPopup(
 				<div
 					/*
 					 * `styles.list` flattens this wrapper so menu items can
-					 * participate in the popup's shared grid. Keep
-					 * `itemPopupStyles.list` for inherited typography only;
-					 * scroll behavior lives on the popup.
+					 * participate in the popup's shared grid. Use only the
+					 * shared typography utility here because the default
+					 * item-popup list layout would conflict with that grid.
 					 */
-					className={ clsx( itemPopupStyles.list, styles.list ) }
+					className={ clsx(
+						itemPopupStyles[ 'list-typography' ],
+						styles.list
+					) }
 				>
 					{ children }
 				</div>

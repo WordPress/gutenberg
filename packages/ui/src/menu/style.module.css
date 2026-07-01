@@ -31,17 +31,12 @@
 		}
 
 		.group-label {
-			display: flex;
 			grid-column: 1 / -1;
-			align-items: center;
-			min-height: var(--wpds-dimension-size-md);
 			padding-block: var(--wpds-dimension-padding-xs);
-			padding-inline: var(--wpds-dimension-padding-md);
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-xs);
 			font-weight: var(--wpds-typography-font-weight-medium);
 			line-height: var(--wpds-typography-line-height-sm);
-			color: var(--wpds-color-foreground-content-neutral-weak);
 			text-transform: uppercase;
 		}
 
@@ -61,6 +56,8 @@
 			display: grid;
 			grid-column: 1 / -1;
 			grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
+			gap: 0;
+			justify-content: stretch;
 			text-decoration: none;
 
 			@supports ( grid-template-columns: subgrid ) {
@@ -112,11 +109,6 @@
 			white-space: nowrap;
 		}
 
-		.item-description {
-			color: var(--wpds-color-foreground-content-neutral-weak);
-			overflow-wrap: anywhere;
-		}
-
 		.item-suffix {
 			flex-shrink: 0;
 			display: flex;
@@ -127,10 +119,8 @@
 
 		.item[data-highlighted]:not([aria-disabled="true"]) .item-prefix,
 		.item[data-highlighted]:not([aria-disabled="true"]) .item-suffix,
-		.item[data-highlighted]:not([aria-disabled="true"]) .item-description,
 		.item[aria-disabled="true"] .item-prefix,
-		.item[aria-disabled="true"] .item-suffix,
-		.item[aria-disabled="true"] .item-description {
+		.item[aria-disabled="true"] .item-suffix {
 			color: inherit;
 		}
 
