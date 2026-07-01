@@ -1,3 +1,4 @@
+export { isSuggestionModeEnabled, useCanSuggest } from './gate';
 export {
 	SuggestionOverlayProvider,
 	useSuggestionOverlay,
