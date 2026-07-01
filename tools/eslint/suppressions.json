@@ -661,7 +661,7 @@
 	},
 	"packages/components/src/combobox-control/styles.ts": {
 		"no-restricted-imports": {
-			"count": 2
+			"count": 1
 		}
 	},
 	"packages/components/src/confirm-dialog/styles.ts": {

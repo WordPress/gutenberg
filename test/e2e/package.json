@@ -22,7 +22,7 @@
 	},
 	"devDependencies": {
 		"@flakiness/playwright": "^1.14.0",
-		"@playwright/test": "^1.58.2",
+		"@playwright/test": "^1.61.1",
 		"@types/node": "^20.19.39",
 		"@wordpress/e2e-test-utils-playwright": "file:../../packages/e2e-test-utils-playwright",
 		"@wordpress/scripts": "file:../../packages/scripts",
