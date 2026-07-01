@@ -2,15 +2,15 @@
  * Phase 2 of the overlay-retirement work (#73411): inline formatting -> marks.
  *
  * A format-only edit (bold/italic/link toggled over a run, the text itself
- * unchanged) is modelled as a paired suggestion, the same shape a type-over
- * uses for text: the prior run is wrapped in a `del` marker (kept, struck
- * through) and a copy carrying the new format is inserted right after it as an
- * `add` marker. Accepting removes the `del` text and unwraps the `add`
- * (formatted run stays); rejecting unwraps the `del` (original stays) and drops
- * the `add`.
+ * unchanged) is modelled as a single `format` marker wrapping the run — the
+ * Google Docs model: the text is shown once, in place, carrying the *proposed*
+ * formatting, never duplicated. The original run is captured separately so a
+ * reject can restore it (the caller persists it on the suggestion note).
+ * Accepting unwraps the marker (proposed formatting stays); rejecting replaces
+ * the run with the captured original.
  *
  * This module is the pure engine only: it detects the format delta and plans /
- * applies the markers against rich-text values. It does not touch the store or
+ * applies the marker against rich-text values. It does not touch the store or
  * create notes — the caller wires those, exactly as `reconcile-edit.js` is
  * wired for text edits. `analyzeTextEdit` sees no text change for a format-only
  * edit, so format detection needs this separate pass.
@@ -18,23 +18,26 @@
 /**
  * WordPress dependencies
  */
-import {
-	RichTextData,
-	create,
-	slice,
-	insert,
-	applyFormat,
-} from '@wordpress/rich-text';
+import { RichTextData, create, slice, applyFormat } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
-import {
-	SUGGESTION_FORMAT_NAME,
-	SUGGESTION_TYPE_DELETION,
-	SUGGESTION_TYPE_ADDITION,
-} from './format';
+import { SUGGESTION_FORMAT_NAME, SUGGESTION_TYPE_FORMAT } from './format';
 import { buildSuggestionMarkerAttributes } from './operations';
+
+/**
+ * Serialize a rich-text record range to an HTML string, for capturing the
+ * original run so a reject can restore it.
+ *
+ * @param {Object} record Rich-text record.
+ * @param {number} start  Range start.
+ * @param {number} end    Range end.
+ * @return {string} HTML of the sliced run.
+ */
+function sliceToHTML( record, start, end ) {
+	return new RichTextData( slice( record, start, end ) ).toHTMLString();
+}
 
 /**
  * Parse a block attribute value into a rich-text record, tolerating plain
@@ -160,12 +163,14 @@ function overlapsExistingMarker( prev, next, start, end ) {
 }
 
 /**
- * Plan the markers for a format-only edit. Two notes are needed (a `del` for the
- * prior run and an `add` for the reformatted run), mirroring a text type-over.
+ * Plan the marker for a format-only edit. One `format` marker wraps the run; the
+ * plan also carries the original and proposed run HTML so the caller can persist
+ * the original on the note (for reject) and summarize the change.
  *
  * @param {*} prevValue Value before the edit.
  * @param {*} nextValue Value after the edit.
- * @return {{ kind: 'format'|'none', range?: {start:number, end:number} }} Plan.
+ * @return {{ kind: 'format'|'none', range?: {start:number, end:number},
+ *           beforeHTML?: string, afterHTML?: string }} Plan.
  */
 export function planFormatMarkers( prevValue, nextValue ) {
 	const prev = toRecord( prevValue );
@@ -180,72 +185,49 @@ export function planFormatMarkers( prevValue, nextValue ) {
 	if ( overlapsExistingMarker( prev, next, range.start, range.end ) ) {
 		return { kind: 'none' };
 	}
-	return { kind: 'format', range };
+	return {
+		kind: 'format',
+		range,
+		beforeHTML: sliceToHTML( prev, range.start, range.end ),
+		afterHTML: sliceToHTML( next, range.start, range.end ),
+	};
 }
 
 /**
- * Apply a format plan, producing the marked value: the prior run wrapped in a
- * `del` marker, followed by a copy of the reformatted run wrapped in an `add`
- * marker. Ids for the two markers are supplied by the caller (their created
- * note ids).
+ * Apply a format plan, producing the marked value: the reformatted run (from the
+ * next value, carrying the proposed formatting) wrapped in a single `format`
+ * marker. The marker id is the caller's created note id. The text is unchanged,
+ * so no duplication — the run is shown once with the proposed formatting.
  *
- * @param {*}      prevValue          Value before the edit (source of the del run).
- * @param {*}      nextValue          Value after the edit (source of the reformatted run).
- * @param {Object} plan               Plan from `planFormatMarkers`.
- * @param {Object} options
- * @param {Object} options.ids        `{ delId, addId }` marker ids.
- * @param {number} [options.authorId] Author id stamped on both markers.
- * @return {*} New RichTextData with the paired markers, or `prevValue` unchanged.
+ * @param {*}             nextValue          Value after the edit (source of the reformatted run).
+ * @param {Object}        plan               Plan from `planFormatMarkers`.
+ * @param {Object}        options
+ * @param {number|string} options.id         Marker (note) id.
+ * @param {number}        [options.authorId] Author id stamped on the marker.
+ * @return {*} New RichTextData with the format marker, or `nextValue` unchanged.
  */
-export function applyFormatPlan(
-	prevValue,
-	nextValue,
-	plan,
-	{ ids, authorId } = {}
-) {
-	if ( ! plan || plan.kind !== 'format' || ! ids ) {
-		return prevValue;
+export function applyFormatPlan( nextValue, plan, { id, authorId } = {} ) {
+	if ( ! plan || plan.kind !== 'format' || id === undefined || id === null ) {
+		return nextValue;
 	}
-	const prev = toRecord( prevValue );
 	const next = toRecord( nextValue );
-	if ( ! prev || ! next ) {
-		return prevValue;
+	if ( ! next ) {
+		return nextValue;
 	}
 	const { start, end } = plan.range;
 
-	// Wrap the original run in a `del` marker (text kept, struck through).
-	const withDel = applyFormat(
-		prev,
+	const marked = applyFormat(
+		next,
 		{
 			type: SUGGESTION_FORMAT_NAME,
 			attributes: buildSuggestionMarkerAttributes( {
-				id: ids.delId,
-				type: SUGGESTION_TYPE_DELETION,
+				id,
+				type: SUGGESTION_TYPE_FORMAT,
 				authorId,
 			} ),
 		},
 		start,
 		end
 	);
-
-	// Take the reformatted run from `next` and wrap it in an `add` marker.
-	const addRun = slice( next, start, end );
-	const markedAddRun = applyFormat(
-		addRun,
-		{
-			type: SUGGESTION_FORMAT_NAME,
-			attributes: buildSuggestionMarkerAttributes( {
-				id: ids.addId,
-				type: SUGGESTION_TYPE_ADDITION,
-				authorId,
-			} ),
-		},
-		0,
-		addRun.text.length
-	);
-
-	// Insert the marked `add` run immediately after the `del` run. The del wrap
-	// doesn't change text length, so `end` is still the right insertion point.
-	const combined = insert( withDel, markedAddRun, end, end );
-	return new RichTextData( combined );
+	return new RichTextData( marked );
 }

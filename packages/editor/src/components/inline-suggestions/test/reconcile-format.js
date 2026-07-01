@@ -122,13 +122,16 @@ describe( 'analyzeFormatEdit', () => {
 } );
 
 describe( 'planFormatMarkers', () => {
-	it( 'plans a format change as kind "format" with the changed range', () => {
-		expect(
-			planFormatMarkers(
-				rtd( 'Hello world' ),
-				rtd( 'Hello <strong>world</strong>' )
-			)
-		).toEqual( { kind: 'format', range: { start: 6, end: 11 } } );
+	it( 'plans a format change as kind "format" with the range and before/after HTML', () => {
+		const plan = planFormatMarkers(
+			rtd( 'Hello world' ),
+			rtd( 'Hello <strong>world</strong>' )
+		);
+		expect( plan.kind ).toBe( 'format' );
+		expect( plan.range ).toEqual( { start: 6, end: 11 } );
+		// The original run (for reject) is plain; the proposed run is bold.
+		expect( plan.beforeHTML ).toBe( 'world' );
+		expect( plan.afterHTML ).toBe( '<strong>world</strong>' );
 	} );
 
 	it( 'returns kind "none" when there is no format change', () => {
@@ -150,69 +153,46 @@ describe( 'planFormatMarkers', () => {
 } );
 
 describe( 'applyFormatPlan', () => {
-	it( 'returns the value unchanged for a non-format plan or missing ids', () => {
-		const value = rtd( 'Hello world' );
-		expect( applyFormatPlan( value, value, { kind: 'none' } ) ).toBe(
-			value
-		);
+	it( 'returns the value unchanged for a non-format plan or missing id', () => {
+		const next = rtd( 'Hello <strong>world</strong>' );
+		expect( applyFormatPlan( next, { kind: 'none' } ) ).toBe( next );
 		expect(
-			applyFormatPlan( value, rtd( 'Hello <strong>world</strong>' ), {
+			applyFormatPlan( next, {
 				kind: 'format',
 				range: { start: 6, end: 11 },
 			} )
-		).toBe( value );
+		).toBe( next );
 	} );
 
-	it( 'wraps the old run in a del marker and inserts a formatted add run', () => {
+	it( 'wraps the reformatted run in a single format marker (no duplication)', () => {
 		const prev = rtd( 'Hello world' );
 		const next = rtd( 'Hello <strong>world</strong>' );
 		const plan = planFormatMarkers( prev, next );
-		const result = applyFormatPlan( prev, next, plan, {
-			ids: { delId: 10, addId: 11 },
-			authorId: 7,
-		} );
+		const result = applyFormatPlan( next, plan, { id: 10, authorId: 7 } );
 
-		// Both markers resolve.
-		expect( findSuggestionRange( result, 10 ) ).not.toBeNull();
-		expect( findSuggestionRange( result, 11 ) ).not.toBeNull();
+		// One marker, resolving to the reformatted run.
+		expect( findSuggestionRange( result, 10 ) ).toEqual( {
+			start: 6,
+			end: 11,
+		} );
 
 		const html = result.toHTMLString();
-		// The del marker wraps the original (plain) run.
-		expect( html ).toContain(
-			'data-suggestion-id="10" data-suggestion-type="del"'
-		);
-		// The add marker wraps the reformatted run, preserving the bold format
-		// (serialized as <strong> around the nested add mark).
-		expect( html ).toContain(
-			'data-suggestion-id="11" data-suggestion-type="add"'
-		);
-		expect( html ).toContain( '<strong>' );
-		expect( html ).toMatch(
-			/<strong><mark[^>]*data-suggestion-type="add"[^>]*>world<\/mark><\/strong>/
-		);
-		// Author stamped on both.
+		expect( html ).toContain( 'data-suggestion-type="format"' );
+		expect( html ).toContain( 'data-suggestion-id="10"' );
 		expect( html ).toContain( 'data-author="7"' );
+		// The proposed formatting is carried in place; the text appears once.
+		expect( html ).toContain( '<strong>' );
+		expect( html.match( /world/g ) ).toHaveLength( 1 );
 	} );
 
-	it( 'keeps both runs so accept/reject can resolve either end', () => {
-		const prev = rtd( 'Hello world' );
-		const next = rtd( 'Hello <strong>world</strong>' );
-		const plan = planFormatMarkers( prev, next );
-		const result = applyFormatPlan( prev, next, plan, {
-			ids: { delId: 1, addId: 2 },
-		} );
-		// The del run keeps the original text; the add run carries the copy, so
-		// the visible text is "world" twice (struck original + formatted new).
-		expect( result.toHTMLString().match( /world/g ) ).toHaveLength( 2 );
-	} );
-
-	it( 'preserves a link (format attributes) in the add run', () => {
+	it( 'preserves a link (format attributes) in the marked run', () => {
 		const prev = rtd( 'see docs' );
 		const next = rtd( 'see <a href="https://w.org">docs</a>' );
 		const plan = planFormatMarkers( prev, next );
-		const result = applyFormatPlan( prev, next, plan, {
-			ids: { delId: 3, addId: 4 },
-		} );
-		expect( result.toHTMLString() ).toContain( 'href="https://w.org"' );
+		const result = applyFormatPlan( next, plan, { id: 4 } );
+		const html = result.toHTMLString();
+		expect( html ).toContain( 'href="https://w.org"' );
+		expect( html ).toContain( 'data-suggestion-type="format"' );
+		expect( html.match( /docs/g ) ).toHaveLength( 1 );
 	} );
 } );

@@ -46,6 +46,17 @@ export const SUGGESTION_TYPE_DELETION = 'del';
 export const SUGGESTION_TYPE_ADDITION = 'add';
 
 /**
+ * Suggested formatting change: the wrapped run's *text* is unchanged, but its
+ * formatting (bold/italic/link/...) is proposed to change. The marked run holds
+ * the proposed formatting so the editor shows it in place (single run, no
+ * duplicated text — the Google Docs model); the original run is recorded on the
+ * suggestion note so a reject can restore it. Rendered output strips the wrapper
+ * and keeps the text (same as a deletion: the words are already public, only
+ * their styling is proposed).
+ */
+export const SUGGESTION_TYPE_FORMAT = 'format';
+
+/**
  * Rich-text format for an inline suggestion marker. Serializes as
  * `<mark class="wp-suggestion" data-suggestion-id data-suggestion-type data-author>`.
  *

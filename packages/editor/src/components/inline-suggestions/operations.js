@@ -28,10 +28,10 @@ import {
  * attribution survives reload and reviewer view. The author attribute is
  * omitted when no author id is known.
  *
- * @param {Object}        options
- * @param {number|string} options.id         Suggestion (comment) id.
- * @param {'del'|'add'}   options.type       Marker kind.
- * @param {number|string} [options.authorId] Author user id.
+ * @param {Object}               options
+ * @param {number|string}        options.id         Suggestion (comment) id.
+ * @param {'del'|'add'|'format'} options.type       Marker kind.
+ * @param {number|string}        [options.authorId] Author user id.
  * @return {Object} Marker attributes for `wrapInlineMarker`.
  */
 export function buildSuggestionMarkerAttributes( { id, type, authorId } ) {
