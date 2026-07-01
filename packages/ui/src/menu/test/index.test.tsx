@@ -142,13 +142,17 @@ describe( 'Menu', () => {
 		);
 	} );
 
-	it( 'preserves Base UI nested menu placement defaults', async () => {
+	it( 'uses Menu placement defaults from @wordpress/components', async () => {
 		const user = userEvent.setup();
 
 		render(
 			<Menu.Root>
 				<Menu.Trigger>Actions</Menu.Trigger>
-				<Menu.Popup>
+				<Menu.Popup
+					positioner={
+						<Menu.Positioner data-testid="root-positioner" />
+					}
+				>
 					<Menu.Item>Duplicate</Menu.Item>
 					<Menu.SubmenuRoot>
 						<Menu.SubmenuTrigger openOnHover={ false }>
@@ -174,9 +178,21 @@ describe( 'Menu', () => {
 		expect(
 			await screen.findByRole( 'menuitem', { name: 'Archive' } )
 		).toBeVisible();
+		expect( screen.getByTestId( 'root-positioner' ) ).toHaveAttribute(
+			'data-side',
+			'bottom'
+		);
+		expect( screen.getByTestId( 'root-positioner' ) ).toHaveAttribute(
+			'data-align',
+			'start'
+		);
 		expect( screen.getByTestId( 'submenu-positioner' ) ).toHaveAttribute(
 			'data-side',
 			expect.stringMatching( /^inline-/ )
+		);
+		expect( screen.getByTestId( 'submenu-positioner' ) ).toHaveAttribute(
+			'data-align',
+			'start'
 		);
 	} );
 
