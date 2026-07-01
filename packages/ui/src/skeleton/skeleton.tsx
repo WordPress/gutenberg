@@ -22,19 +22,14 @@ const radiusTokens: Record<
  * A placeholder shown while content is loading.
  */
 export const Skeleton = forwardRef< HTMLDivElement, SkeletonProps >(
-	function Skeleton(
-		{ radius = 'md', animation = 'pulse', render, ...props },
-		ref
-	) {
+	function Skeleton( { radius = 'md', render, ...props }, ref ) {
 		return useRender( {
 			render,
 			ref,
 			props: mergeProps< 'div' >(
 				{
 					style: { borderRadius: radiusTokens[ radius ] },
-					className: clsx( styles.skeleton, {
-						[ styles.pulse ]: animation === 'pulse',
-					} ),
+					className: clsx( styles.skeleton, styles.pulse ),
 					// Decorative by default; consumers mark the loading
 					// region with aria-busy / role="status".
 					'aria-hidden': true,

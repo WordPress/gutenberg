@@ -9,11 +9,4 @@ export interface SkeletonProps extends ComponentProps< 'div' > {
 	 * @default 'md'
 	 */
 	radius?: BorderRadiusSize | 'full' | 'none';
-
-	/**
-	 * The loading animation.
-	 *
-	 * @default 'pulse'
-	 */
-	animation?: 'pulse' | 'none';
 }

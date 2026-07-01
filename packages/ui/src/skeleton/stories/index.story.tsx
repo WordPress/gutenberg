@@ -20,7 +20,6 @@ export const Default: Story = {
 	args: {
 		style: { width: 240, height: 16 },
 		radius: 'md',
-		animation: 'pulse',
 	},
 };
 
@@ -47,7 +46,6 @@ export const TextLines: Story = {
 	),
 	args: {
 		radius: 'md',
-		animation: 'pulse',
 	},
 };
 
@@ -79,7 +77,4 @@ export const CardPlaceholder: Story = {
 			</div>
 		</div>
 	),
-	args: {
-		animation: 'pulse',
-	},
 };
