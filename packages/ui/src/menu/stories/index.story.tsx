@@ -43,12 +43,16 @@ export default meta;
 type Story = StoryObj< typeof Menu.Root >;
 
 export const Default: Story = {
-	args: {
-		children: (
-			<>
+	render: function Render() {
+		const [ bookmarks, setBookmarks ] = useState( true );
+		const [ downloads, setDownloads ] = useState( false );
+		const [ view, setView ] = useState( 'list' );
+
+		return (
+			<Menu.Root>
 				<Menu.Trigger>Open menu</Menu.Trigger>
 				<Menu.Popup>
-					<Menu.Item>Add to library</Menu.Item>
+					<Menu.Item>Rename</Menu.Item>
 					<Menu.Item
 						prefix={
 							<Icon icon={ archive } size={ 24 } aria-hidden />
@@ -59,18 +63,106 @@ export const Default: Story = {
 					<Menu.Item suffix="⌘S">Save</Menu.Item>
 					<Menu.Separator />
 					<Menu.Group>
-						<Menu.GroupLabel>Playback</Menu.GroupLabel>
-						<Menu.Item>Play next</Menu.Item>
-						<Menu.Item>Play last</Menu.Item>
+						<Menu.GroupLabel>Links</Menu.GroupLabel>
+						<Menu.LinkItem href="#menu-default-example">
+							View details
+						</Menu.LinkItem>
+						<Menu.LinkItem
+							href="https://wordpress.org"
+							openInNewTab
+							suffix="WP"
+						>
+							WordPress.org
+						</Menu.LinkItem>
 					</Menu.Group>
 					<Menu.Separator />
-					<Menu.LinkItem href="https://wordpress.org">
-						WordPress.org
-					</Menu.LinkItem>
+					<Menu.Group>
+						<Menu.GroupLabel>Visible columns</Menu.GroupLabel>
+						<Menu.CheckboxItem
+							checked={ bookmarks }
+							onCheckedChange={ setBookmarks }
+						>
+							<Menu.ItemLabel>Bookmarks</Menu.ItemLabel>
+							<Menu.ItemDescription>
+								Show saved pages in the table.
+							</Menu.ItemDescription>
+						</Menu.CheckboxItem>
+						<Menu.CheckboxItem
+							checked={ downloads }
+							onCheckedChange={ setDownloads }
+							suffix="⌘D"
+						>
+							<Menu.ItemLabel>Downloads</Menu.ItemLabel>
+							<Menu.ItemDescription>
+								Show downloaded files in the table.
+							</Menu.ItemDescription>
+						</Menu.CheckboxItem>
+					</Menu.Group>
+					<Menu.Separator />
+					<Menu.RadioGroup value={ view } onValueChange={ setView }>
+						<Menu.Group>
+							<Menu.GroupLabel>View</Menu.GroupLabel>
+							<Menu.RadioItem value="list">
+								<Menu.ItemLabel>List</Menu.ItemLabel>
+								<Menu.ItemDescription>
+									Show compact rows.
+								</Menu.ItemDescription>
+							</Menu.RadioItem>
+							<Menu.RadioItem
+								value="grid"
+								prefix={
+									<Icon
+										icon={ archive }
+										size={ 24 }
+										aria-hidden
+									/>
+								}
+							>
+								<Menu.ItemLabel>Grid</Menu.ItemLabel>
+								<Menu.ItemDescription>
+									Show larger preview tiles.
+								</Menu.ItemDescription>
+							</Menu.RadioItem>
+						</Menu.Group>
+					</Menu.RadioGroup>
+					<Menu.Separator />
+					<Menu.SubmenuRoot>
+						<Menu.SubmenuTrigger suffix="⌘M">
+							<Menu.ItemLabel>Move to</Menu.ItemLabel>
+							<Menu.ItemDescription>
+								Choose another collection.
+							</Menu.ItemDescription>
+						</Menu.SubmenuTrigger>
+						<Menu.Popup>
+							<Menu.Item>Favorites</Menu.Item>
+							<Menu.Item
+								prefix={
+									<Icon
+										icon={ archive }
+										size={ 24 }
+										aria-hidden
+									/>
+								}
+							>
+								Archive
+							</Menu.Item>
+							<Menu.SubmenuRoot>
+								<Menu.SubmenuTrigger>
+									<Menu.ItemLabel>
+										More destinations
+									</Menu.ItemLabel>
+								</Menu.SubmenuTrigger>
+								<Menu.Popup>
+									<Menu.Item>Reviewed</Menu.Item>
+									<Menu.Item>Shared</Menu.Item>
+								</Menu.Popup>
+							</Menu.SubmenuRoot>
+						</Menu.Popup>
+					</Menu.SubmenuRoot>
 					<Menu.Item disabled>Unavailable action</Menu.Item>
 				</Menu.Popup>
-			</>
-		),
+			</Menu.Root>
+		);
 	},
 };
 
@@ -222,6 +314,8 @@ export const CheckboxItems: Story = {
 	render: function Render() {
 		const [ bookmarks, setBookmarks ] = useState( true );
 		const [ downloads, setDownloads ] = useState( false );
+		const [ archived, setArchived ] = useState( true );
+		const [ shared, setShared ] = useState( false );
 
 		return (
 			<Menu.Root>
@@ -256,6 +350,43 @@ export const CheckboxItems: Story = {
 							</Menu.ItemDescription>
 						</Menu.CheckboxItem>
 					</Menu.Group>
+					<Menu.Separator />
+					<Menu.Group>
+						<Menu.GroupLabel>Saved areas</Menu.GroupLabel>
+						<Menu.CheckboxItem
+							checked={ archived }
+							onCheckedChange={ setArchived }
+							prefix={
+								<Icon
+									icon={ archive }
+									size={ 24 }
+									aria-hidden
+								/>
+							}
+						>
+							<Menu.ItemLabel>Archived</Menu.ItemLabel>
+							<Menu.ItemDescription>
+								Include archived records.
+							</Menu.ItemDescription>
+						</Menu.CheckboxItem>
+						<Menu.CheckboxItem
+							checked={ shared }
+							onCheckedChange={ setShared }
+							prefix={
+								<Icon
+									icon={ archive }
+									size={ 24 }
+									aria-hidden
+								/>
+							}
+							suffix="⌘⇧S"
+						>
+							<Menu.ItemLabel>Shared</Menu.ItemLabel>
+							<Menu.ItemDescription>
+								Include shared records.
+							</Menu.ItemDescription>
+						</Menu.CheckboxItem>
+					</Menu.Group>
 				</Menu.Popup>
 			</Menu.Root>
 		);
@@ -264,13 +395,14 @@ export const CheckboxItems: Story = {
 
 export const RadioItems: Story = {
 	render: function Render() {
-		const [ value, setValue ] = useState( 'name' );
+		const [ sort, setSort ] = useState( 'name' );
+		const [ density, setDensity ] = useState( 'comfortable' );
 
 		return (
 			<Menu.Root>
 				<Menu.Trigger>Sort</Menu.Trigger>
 				<Menu.Popup>
-					<Menu.RadioGroup value={ value } onValueChange={ setValue }>
+					<Menu.RadioGroup value={ sort } onValueChange={ setSort }>
 						<Menu.Group>
 							<Menu.GroupLabel>Sort by</Menu.GroupLabel>
 							<Menu.RadioItem value="name">
@@ -279,16 +411,7 @@ export const RadioItems: Story = {
 									Sort alphabetically.
 								</Menu.ItemDescription>
 							</Menu.RadioItem>
-							<Menu.RadioItem
-								value="date"
-								prefix={
-									<Icon
-										icon={ archive }
-										size={ 24 }
-										aria-hidden
-									/>
-								}
-							>
+							<Menu.RadioItem value="date">
 								<Menu.ItemLabel>Date</Menu.ItemLabel>
 								<Menu.ItemDescription>
 									Sort by most recent activity.
@@ -298,6 +421,61 @@ export const RadioItems: Story = {
 								<Menu.ItemLabel>Manual</Menu.ItemLabel>
 								<Menu.ItemDescription>
 									Keep the current custom order.
+								</Menu.ItemDescription>
+							</Menu.RadioItem>
+						</Menu.Group>
+					</Menu.RadioGroup>
+					<Menu.Separator />
+					<Menu.RadioGroup
+						value={ density }
+						onValueChange={ setDensity }
+					>
+						<Menu.Group>
+							<Menu.GroupLabel>Density</Menu.GroupLabel>
+							<Menu.RadioItem
+								value="compact"
+								prefix={
+									<Icon
+										icon={ archive }
+										size={ 24 }
+										aria-hidden
+									/>
+								}
+							>
+								<Menu.ItemLabel>Compact</Menu.ItemLabel>
+								<Menu.ItemDescription>
+									Show shorter rows.
+								</Menu.ItemDescription>
+							</Menu.RadioItem>
+							<Menu.RadioItem
+								value="comfortable"
+								prefix={
+									<Icon
+										icon={ archive }
+										size={ 24 }
+										aria-hidden
+									/>
+								}
+								suffix="⌘2"
+							>
+								<Menu.ItemLabel>Comfortable</Menu.ItemLabel>
+								<Menu.ItemDescription>
+									Show more spacing between rows.
+								</Menu.ItemDescription>
+							</Menu.RadioItem>
+							<Menu.RadioItem
+								value="spacious"
+								prefix={
+									<Icon
+										icon={ archive }
+										size={ 24 }
+										aria-hidden
+									/>
+								}
+							>
+								<Menu.ItemLabel>Spacious</Menu.ItemLabel>
+								<Menu.ItemDescription>
+									Show the largest row spacing.
 								</Menu.ItemDescription>
 							</Menu.RadioItem>
 						</Menu.Group>
