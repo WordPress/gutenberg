@@ -7,6 +7,9 @@
 		}
 
 		.popup {
+			composes: dropdown-motion from "../utils/css/dropdown-motion.module.css";
+
+			--wp-ui-popup-padding: var(--wpds-dimension-padding-xs);
 			--wp-ui-menu-min-width: 160px;
 			--wp-ui-menu-max-width: var(--wpds-dimension-surface-width-md);
 
@@ -14,16 +17,25 @@
 			grid-template-areas: none;
 			grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
 			grid-template-rows: auto;
+			max-height: min(var(--available-height), 480px, 60dvh);
 			min-width: max(var(--anchor-width, 0px), var(--wp-ui-menu-min-width));
 			max-width: min(var(--available-width), var(--wp-ui-menu-max-width));
 			overflow-block: auto;
 			overscroll-behavior: contain;
 			padding-block: var(--wp-ui-popup-padding);
 			scroll-padding-block: var(--wp-ui-popup-padding);
+			border-radius: var(--wpds-border-radius-md);
+			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+			box-shadow: var(--wpds-elevation-md);
+			background-color: var(--wpds-color-background-surface-neutral-strong);
 		}
 
 		.list {
 			display: contents;
+			font-family: var(--wpds-typography-font-family-body);
+			font-size: var(--wpds-typography-font-size-md);
+			line-height: var(--wpds-typography-line-height-sm);
+			color: var(--wpds-color-foreground-interactive-neutral);
 		}
 
 		.group {
@@ -32,12 +44,16 @@
 
 		.group-label {
 			grid-column: 1 / -1;
+			display: flex;
+			align-items: center;
+			min-height: var(--wpds-dimension-size-md);
 			padding-block: var(--wpds-dimension-padding-xs);
 			padding-inline: var(--wpds-dimension-padding-md);
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-xs);
 			font-weight: var(--wpds-typography-font-weight-medium);
 			line-height: var(--wpds-typography-line-height-sm);
+			color: var(--wpds-color-foreground-content-neutral-weak);
 			text-transform: uppercase;
 		}
 
@@ -155,6 +171,20 @@
 			overflow: hidden;
 			text-overflow: ellipsis;
 			white-space: nowrap;
+			font-family: var(--wpds-typography-font-family-body);
+			font-size: var(--wpds-typography-font-size-md);
+			line-height: var(--wpds-typography-line-height-sm);
+			font-weight: var(--wpds-typography-font-weight-regular);
+			color: inherit;
+		}
+
+		.item-description {
+			font-family: var(--wpds-typography-font-family-body);
+			font-size: var(--wpds-typography-font-size-sm);
+			line-height: var(--wpds-typography-line-height-xs);
+			font-weight: var(--wpds-typography-font-weight-regular);
+			color: var(--wpds-color-foreground-content-neutral-weak);
+			overflow-wrap: anywhere;
 		}
 
 		.item-suffix {
@@ -183,9 +213,11 @@
 		}
 
 		.item[data-highlighted]:not([aria-disabled="true"]) .item-prefix,
+		.item[data-highlighted]:not([aria-disabled="true"]) .item-description,
 		.item[data-highlighted]:not([aria-disabled="true"]) .item-suffix,
 		.item[data-highlighted]:not([aria-disabled="true"]) .item-selection-indicator,
 		.item[aria-disabled="true"] .item-prefix,
+		.item[aria-disabled="true"] .item-description,
 		.item[aria-disabled="true"] .item-suffix,
 		.item[aria-disabled="true"] .item-selection-indicator {
 			color: inherit;
