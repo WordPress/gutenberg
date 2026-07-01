@@ -233,6 +233,22 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				'format'            => 'uri',
 				'description'       => __( 'URL of an external image to sideload into the media library, instead of uploading a file.', 'gutenberg' ),
 				'sanitize_callback' => 'sanitize_url',
+				'validate_callback' => static function ( $url ) {
+					/*
+					 * Reject URLs that are not safe to request server-side. wp_http_validate_url()
+					 * enforces an HTTP(S) scheme and blocks private, local, and otherwise
+					 * disallowed hosts, guarding the sideload against SSRF.
+					 */
+					if ( ! is_string( $url ) || false === wp_http_validate_url( $url ) ) {
+						return new WP_Error(
+							'rest_invalid_url',
+							__( 'Invalid URL. Provide a valid, publicly reachable HTTP or HTTPS image URL.', 'gutenberg' ),
+							array( 'status' => 400 )
+						);
+					}
+
+					return true;
+				},
 			);
 		}
 
@@ -544,10 +560,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		 * media_handle_sideload() fires the standard insert hooks (including
 		 * wp_after_insert_post), but not the REST-specific action, so fire it
 		 * here for parity with the uploaded-file path in create_item().
-		 *
-		 * This action is documented in
-		 * wp-includes/rest-api/endpoints/class-wp-rest-attachments-controller.php
 		 */
+		/** This action is documented in wp-includes/rest-api/endpoints/class-wp-rest-attachments-controller.php */
 		do_action( 'rest_after_insert_attachment', $attachment, $request, true );
 
 		$response = $this->prepare_item_for_response( $attachment, $request );
