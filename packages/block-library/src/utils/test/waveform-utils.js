@@ -8,7 +8,6 @@ import '@testing-library/jest-dom';
  */
 import {
 	createWaveformContainer,
-	getWaveformColors,
 	styleSvgIcons,
 	setupPlayButtonAccessibility,
 	setupSeekControlLocalization,
@@ -22,7 +21,6 @@ const basePlayerData = {
 	waveformColor: 'rgba(0, 0, 0, 0.3)',
 	progressColor: 'rgba(0, 0, 0, 0.6)',
 	buttonColor: '#000000',
-	backgroundColor: '#ffffff',
 };
 
 describe( 'Waveform utilities', () => {
@@ -53,14 +51,9 @@ describe( 'Waveform utilities', () => {
 				'data-button-color',
 				'#000000'
 			);
-			expect( container ).toHaveAttribute(
-				'data-background-color',
-				'#ffffff'
-			);
 			expect( container ).toHaveAttribute( 'data-seek-label', 'Seek' );
 			expect( container ).toHaveStyle( {
 				'--wp--playlist--waveform-bar-color': 'rgba(0, 0, 0, 0.3)',
-				'--wp--playlist--waveform-background-color': '#ffffff',
 				'--wp--playlist--waveform-button-background-color': '#000000',
 				'--wp--playlist--waveform-button-icon-color': '#ffffff',
 			} );
@@ -102,38 +95,6 @@ describe( 'Waveform utilities', () => {
 			} );
 
 			expect( container ).toHaveAttribute( 'data-height', '150' );
-		} );
-	} );
-
-	describe( 'getWaveformColors', () => {
-		it( 'should derive waveform colors from text and background colors', () => {
-			const element = document.createElement( 'div' );
-			element.style.color = '#000000';
-			element.style.backgroundColor = '#ffffff';
-			document.body.appendChild( element );
-
-			expect( getWaveformColors( element ) ).toEqual( {
-				textColor: 'rgb(0, 0, 0)',
-				waveformColor: 'rgba(0, 0, 0, 0.3)',
-				progressColor: 'rgba(0, 0, 0, 0.6)',
-				backgroundColor: 'rgb(255, 255, 255)',
-			} );
-
-			element.remove();
-		} );
-
-		it( 'should use the parent background when the player background is transparent', () => {
-			const parent = document.createElement( 'div' );
-			const element = document.createElement( 'div' );
-			parent.style.backgroundColor = '#f0f0f0';
-			parent.appendChild( element );
-			document.body.appendChild( parent );
-
-			expect( getWaveformColors( element ).backgroundColor ).toBe(
-				'rgb(240, 240, 240)'
-			);
-
-			parent.remove();
 		} );
 	} );
 
