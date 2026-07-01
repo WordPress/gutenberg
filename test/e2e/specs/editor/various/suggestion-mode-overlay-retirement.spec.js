@@ -7,10 +7,11 @@
  *
  *   1. INVARIANT - the end-state property the migration establishes: a single
  *      block never carries both an inline `<mark class="wp-suggestion">` marker
- *      AND an overlay `<del>/<ins class="has-suggestion-*">` diff. The clean
- *      case (a lone formatting change) holds now that Phase 2 moved formatting
- *      to markers; the combined case (a formatting change on a block that
- *      already carries a marker) is the remaining gap and stays `test.fixme`.
+ *      AND an overlay `<del>/<ins class="has-suggestion-*">` diff. This holds
+ *      now that Phase 2 moved formatting to markers, including when a formatting
+ *      change and a text addition coexist on one block (non-overlapping runs).
+ *      A formatting change whose run overlaps an existing marker still declines
+ *      to the overlay; that narrower case is not yet exercised here.
  *
  *   2. SEAMS - edits that used to fall through to the overlay diff path instead
  *      of producing a marker, because marker creation keys off a narrow set of
@@ -84,60 +85,61 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 
 	// --- Invariant ---------------------------------------------------------
 
-	// The clean-block form of this invariant — a lone formatting change becomes a
-	// `format` marker with no overlay `<ins>/<del>` diff — is the passing "style
-	// golden path" in suggestion-mode.spec.js, the oracle this spec's header
-	// designates for formatting.
-	//
-	// This combined form (a text addition AND a formatting change on the SAME
-	// block) is the remaining gap: `planFormatMarkers` declines whenever the
-	// block already carries any pending suggestion marker — not only on true
-	// run overlap — so the second, formatting suggestion falls back to the
-	// overlay diff path. Un-fixme once the format path tolerates a co-existing
-	// marker elsewhere in the block (and, ultimately, the overlapping-run case).
-	test.fixme(
-		'invariant: a block never carries both an inline marker and an overlay diff',
-		async ( { editor, page, pageUtils } ) => {
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: 'Hello world' },
-			} );
+	// Two independent inline suggestions coexist on the SAME block: a formatting
+	// change on one word and a text addition on another. Before Phase 2 the
+	// formatting change took the overlay diff path, so the block carried both a
+	// marker and an overlay diff; after Phase 2 the formatting change is its own
+	// `format` marker, so the block carries only markers. `planFormatMarkers`
+	// only declines when the changed run overlaps an existing marker, so a
+	// formatting change on a non-overlapping word succeeds alongside an addition.
+	test( 'invariant: a block never carries both an inline marker and an overlay diff', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
 
-			await switchIntent( page, 'Suggesting' );
+		await switchIntent( page, 'Suggesting' );
 
-			const paragraph = editor.canvas
-				.getByRole( 'document', { name: 'Block: Paragraph' } )
-				.first();
-			await paragraph.click();
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
 
-			// Addition marker: append at the end of the paragraph.
-			await page.keyboard.press( 'End' );
-			await page.keyboard.type( ' more' );
-			await expect(
-				paragraph.locator(
-					`${ SUGGESTION_MARK }[data-suggestion-type="add"]`
-				)
-			).toBeVisible();
+		// Format marker: bold "world" (the trailing word), the proven
+		// golden-path selection. The note is created asynchronously, so wait
+		// on the marker landing rather than a single save response.
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		await pageUtils.pressKeys( 'primary+b' );
+		await expect(
+			paragraph.locator(
+				`${ SUGGESTION_MARK }[data-suggestion-type="format"]`
+			)
+		).toContainText( 'world' );
 
-			// Formatting change on the leading (non-overlapping) word.
-			await page.keyboard.press( 'Home' );
-			await pageUtils.pressKeys( 'shift+ArrowRight', { times: 5 } ); // "Hello"
-			await pageUtils.pressKeys( 'primary+b' );
-			await expect(
-				paragraph.locator(
-					`${ SUGGESTION_MARK }[data-suggestion-type="format"]`
-				)
-			).toBeVisible();
+		// Addition marker: append at the end, past the formatted run, so the
+		// two suggestions do not overlap.
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' more' );
+		await expect(
+			paragraph.locator(
+				`${ SUGGESTION_MARK }[data-suggestion-type="add"]`
+			)
+		).toBeVisible();
 
-			await deselect( page );
+		await deselect( page );
 
-			// The invariant: inline markers, but never an overlay diff.
-			const overlayDiff =
-				( await paragraph.locator( OVERLAY_ADD ).count() ) +
-				( await paragraph.locator( OVERLAY_DEL ).count() );
-			expect( overlayDiff ).toBe( 0 );
-		}
-	);
+		// The invariant: the block carries inline markers but no overlay
+		// `<ins>`/`<del>` diff.
+		const overlayDiff =
+			( await paragraph.locator( OVERLAY_ADD ).count() ) +
+			( await paragraph.locator( OVERLAY_DEL ).count() );
+		expect( overlayDiff ).toBe( 0 );
+	} );
 
 	// --- Seams (close in Phase 1) -----------------------------------------
 
