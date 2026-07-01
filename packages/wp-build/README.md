@@ -583,12 +583,12 @@ Widgets use a dual-entry pattern, similar in spirit to how blocks split metadata
 | Concern | Lives in | Reason |
 | --- | --- | --- |
 | Identity (`name`) | both (must match) | server needs it to register; client uses it to resolve the runtime entry |
-| Static metadata (`title`, `description`, `category`) | `widget.json` | plain JSON the host can read without a JS runtime |
-| Translated title / labels (`__()`) | `widget.ts` | i18n calls need a JS runtime; JSON can only carry static strings |
-| Attribute schema (types, options) | `widget.ts` | needs TypeScript coupling with `render` props; may include translated `elements`/labels |
-| `example` | `widget.ts` | co-located with the attribute schema it shapes |
+| Translatable metadata (`title`, `description`, `keywords`) | `widget.json` | translated server-side via `textdomain`, so the host receives localized strings without a JS runtime |
+| Framing (`category`, `presentation`) | `widget.json` | plain JSON the host reads without a JS runtime |
+| Attribute schema (types, options, labels) | `widget.ts` | needs TypeScript coupling with `render` props; labels are translated with `__()` |
+| Icon and `example` | `widget.ts` | runtime values co-located with the attribute schema |
 
-Rule of thumb: anything expressible as plain JSON goes in `widget.json`. Anything that needs types, i18n, or runtime logic goes in `widget.ts`. The generated `build/widgets/registry.php` currently exposes only `name`, `dir_name`, and which entry files exist; forwarding the rest of `widget.json` to PHP is a follow-up.
+Rule of thumb: anything the host needs before loading a widget's module — identity, translatable copy, framing — goes in `widget.json`, which the build forwards to `build/widgets/registry.php` and exposes through the REST API. Anything that needs TypeScript or runtime values (attribute schema, icon, `example`) goes in `widget.ts`.
 
 ### `widget.json` — static discovery metadata
 
@@ -597,20 +597,24 @@ Rule of thumb: anything expressible as plain JSON goes in `widget.json`. Anythin
 	"name": "my-plugin/hello-world",
 	"title": "Hello World",
 	"description": "A simple example widget.",
-	"category": "demo"
+	"category": "demo",
+	"textdomain": "my-plugin"
 }
 ```
 
 **Fields:**
 
 - **`name`** (required): Namespaced identifier (e.g., `"my-plugin/hello-world"`)
-- **`title`** (optional): Human-readable title
-- **`description`** (optional): Short description for listings
+- **`title`** (optional): Human-readable title. Translated server-side using `textdomain`.
+- **`description`** (optional): Short description. Translated server-side using `textdomain`.
+- **`keywords`** (optional): Search aliases. Translated server-side using `textdomain`.
 - **`category`** (optional): Grouping category for filtering
+- **`presentation`** (optional): Rendering intent (`framed`, `content-bleed`, `full-bleed`)
+- **`textdomain`** (optional): Gettext text domain for translating `title`, `description`, and `keywords`
 
 ### `widget.ts` — runtime schema
 
-Exports a default object that describes the widget's runtime contract: typed attributes, translated labels, example data. The build system injects the `render_module` handle at registration time, so authors don't need to declare it.
+Exports a default object with the widget's runtime contract: typed attributes (with translated labels), icon, and example data. Identity and translatable copy (`title`, `description`, `keywords`) live in `widget.json`. The build system injects the `render_module` handle at registration time, so authors don't need to declare it.
 
 ```ts
 import { wordpress } from '@wordpress/icons';
@@ -623,7 +627,6 @@ type HelloWorldAttributes = {
 
 const widget = {
 	name: 'my-plugin/hello-world',
-	title: __( 'Hello World', 'my-plugin' ),
 	icon: wordpress,
 	attributes: [
 		{

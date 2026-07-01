@@ -98,12 +98,15 @@
 		"rimraf": "^5.0.10"
 	},
 	"peerDependencies": {
-		"@playwright/test": "^1.58.2",
+		"@playwright/test": ">=1",
 		"@wordpress/env": ">=10.0.0",
 		"react": "^18.0.0",
 		"react-dom": "^18.0.0"
 	},
 	"peerDependenciesMeta": {
+		"@playwright/test": {
+			"optional": true
+		},
 		"@wordpress/env": {
 			"optional": true
 		}

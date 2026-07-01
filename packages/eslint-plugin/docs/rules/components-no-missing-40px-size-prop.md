@@ -14,7 +14,6 @@ The following components are checked by this rule:
 -   InputControl
 -   NumberControl
 -   SelectControl
--   ToggleGroupControl
 -   UnitControl
 
 Examples of **incorrect** code for this rule:

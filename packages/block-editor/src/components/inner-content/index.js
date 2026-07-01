@@ -8,7 +8,7 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import { safeHTML } from '@wordpress/dom';
 
 /**
@@ -43,12 +43,14 @@ const LAYOUT = { type: 'default', alignments: [] };
  *                                should be rendered.
  */
 export default function InnerContent( { clientId } ) {
-	const { innerContent, order } = useSelect(
+	const { innerContent, order, selectedClientIds } = useSelect(
 		( select ) => {
-			const { getBlock, getBlockOrder } = select( blockEditorStore );
+			const { getBlock, getBlockOrder, getSelectedBlockClientIds } =
+				select( blockEditorStore );
 			return {
 				innerContent: getBlock( clientId )?.innerContent,
 				order: getBlockOrder( clientId ),
+				selectedClientIds: getSelectedBlockClientIds(),
 			};
 		},
 		[ clientId ]
@@ -94,10 +96,19 @@ export default function InnerContent( { clientId } ) {
 			{ order.map( ( childClientId, index ) =>
 				slots[ index ]
 					? createPortal(
-							<BlockListBlock
-								rootClientId={ clientId }
-								clientId={ childClientId }
-							/>,
+							// Render the selected block synchronously, as the block list does.
+							<AsyncModeProvider
+								value={
+									! selectedClientIds.includes(
+										childClientId
+									)
+								}
+							>
+								<BlockListBlock
+									rootClientId={ clientId }
+									clientId={ childClientId }
+								/>
+							</AsyncModeProvider>,
 							slots[ index ],
 							childClientId
 					  )

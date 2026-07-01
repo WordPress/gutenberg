@@ -27,7 +27,6 @@
 		"build",
 		"build-module",
 		"build-types",
-		"utils.scss",
 		"*.md"
 	],
 	"main": "build/index.cjs",
@@ -39,9 +38,6 @@
 			"default": "./build/index.cjs"
 		},
 		"./design-tokens.css": "./src/prebuilt/css/design-tokens.css",
-		"./utils": {
-			"sass": "./utils.scss"
-		},
 		"./design-tokens.js": {
 			"types": "./build-types/prebuilt/js/design-tokens.d.ts",
 			"import": "./build-module/prebuilt/js/design-tokens.mjs",
@@ -143,6 +139,6 @@
 		"build:default-ramps": "node --import=esbuild-esm-loader/register bin/generate-default-ramps/index.ts",
 		"build:tokens": "node --import=esbuild-esm-loader/register bin/generate-primitive-tokens/index.ts && node --import=esbuild-esm-loader/register bin/build-design-tokens/index.ts",
 		"build": "npm run build:tokens && npm run build:default-ramps && npm run prelint:js",
-		"postbuild": "prettier --write tokens/color.json tokens/modes src/prebuilt src/color-ramps/lib/default-ramps.ts docs"
+		"postbuild": "prettier --write tokens/color.json tokens/modes src/prebuilt src/color-ramps/lib/default-ramps.ts docs ../base-styles/internal/_wpds-token-fallbacks.scss"
 	}
 }

@@ -127,7 +127,6 @@ export default function ImageSizeControl( {
 						onChange={ handleUpdateDimensions }
 						value={ selectedValue }
 						isBlock
-						__next40pxDefaultSize
 					>
 						{ IMAGE_SIZE_PRESETS.map( ( scale ) => {
 							return (
