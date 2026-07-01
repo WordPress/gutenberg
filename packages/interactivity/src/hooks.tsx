@@ -287,7 +287,9 @@ export const getEvaluate: GetEvaluate =
 				}
 				// Reset scope before return and wrap the function so it will still run within the correct scope.
 				resetScope();
-				const wrappedFunction: Function = ( ...functionArgs: any[] ) => {
+				const wrappedFunction: Function = (
+					...functionArgs: any[]
+				) => {
 					setScope( scope );
 					const functionResult = value( ...functionArgs );
 					resetScope();
@@ -295,7 +297,8 @@ export const getEvaluate: GetEvaluate =
 				};
 				// Preserve the sync property from the original function
 				if ( value.sync ) {
-					const syncAwareFunction = wrappedFunction as SyncAwareFunction;
+					const syncAwareFunction =
+						wrappedFunction as SyncAwareFunction;
 					syncAwareFunction.sync = true;
 				}
 				return wrappedFunction;
@@ -327,7 +330,9 @@ export const getEvaluate: GetEvaluate =
 			const state = resolvedStore ? resolvedStore.state : undefined;
 			const ctx = getScope().context[ namespace ];
 			const actions = resolvedStore ? resolvedStore.actions : undefined;
-			const callbacks = resolvedStore ? resolvedStore.callbacks : undefined;
+			const callbacks = resolvedStore
+				? resolvedStore.callbacks
+				: undefined;
 			const statements = splitStatements( path );
 			let expression: string;
 			if ( statements ) {
@@ -389,6 +394,7 @@ const Directives = ( {
 	// level because each level has a different context, but they share the same
 	// element ref, state and props.
 	const scope = useRef< Scope >( {} as Scope ).current;
+
 	scope.evaluate = useCallback( getEvaluate( { scope } ), [] );
 	const { client, server } = useContext( context );
 	scope.context = client;

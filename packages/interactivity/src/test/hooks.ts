@@ -80,35 +80,23 @@ describe( 'Interactivity API', () => {
 
 		it( 'should not split on semicolons inside IIFEs', () => {
 			expect(
-				splitStatements(
-					'a; (() => { const x = 1; return x; })(); b'
-				)
-			).toEqual( [
-				'a',
-				' (() => { const x = 1; return x; })()',
-				' b',
-			] );
+				splitStatements( 'a; (() => { const x = 1; return x; })(); b' )
+			).toEqual( [ 'a', ' (() => { const x = 1; return x; })()', ' b' ] );
 		} );
 
 		it( 'should handle escaped quotes inside strings', () => {
-			expect(
-				splitStatements( '"a\\"b;c"; d' )
-			).toEqual( [
+			expect( splitStatements( '"a\\"b;c"; d' ) ).toEqual( [
 				'"a\\"b;c"',
 				' d',
 			] );
-			expect(
-				splitStatements( "'a\\'b;c'; d" )
-			).toEqual( [
+			expect( splitStatements( "'a\\'b;c'; d" ) ).toEqual( [
 				"'a\\'b;c'",
 				' d',
 			] );
 		} );
 
 		it( 'should handle escaped quotes inside template literals', () => {
-			expect(
-				splitStatements( '`a\\`b;c`; d' )
-			).toEqual( [
+			expect( splitStatements( '`a\\`b;c`; d' ) ).toEqual( [
 				'`a\\`b;c`',
 				' d',
 			] );
@@ -116,10 +104,7 @@ describe( 'Interactivity API', () => {
 
 		it( 'should handle expression-like content with division not mistaken for regex', () => {
 			// a/2 is division, not the start of a regex literal.
-			expect( splitStatements( 'a/2; b' ) ).toEqual( [
-				'a/2',
-				' b',
-			] );
+			expect( splitStatements( 'a/2; b' ) ).toEqual( [ 'a/2', ' b' ] );
 			// a/b/g could be regex /b/g or division a/b/g, but there is
 			// no closing '/', so it falls through to [^;] matching.
 			expect( splitStatements( 'a/b/g; c' ) ).toEqual( [
@@ -212,10 +197,10 @@ describe( 'Interactivity API', () => {
 			// Ensure scope is always reset after each test.
 			try {
 				resetScope();
-			} catch ( _ ) {}
+			} catch {}
 			try {
 				resetNamespace();
-			} catch ( _ ) {}
+			} catch {}
 		} );
 
 		const evaluateExpr = ( expr: string ) => {
@@ -301,7 +286,9 @@ describe( 'Interactivity API', () => {
 				'context.currentUserId = context.authorId; context.currentUserId === context.authorId'
 			);
 			expect( result ).toBe( true );
-			expect( testScope.context[ testNamespace ].currentUserId ).toBe( 6 );
+			expect( testScope.context[ testNamespace ].currentUserId ).toBe(
+				6
+			);
 		} );
 
 		it( 'should return undefined for invalid expressions', () => {
@@ -343,7 +330,9 @@ describe( 'Interactivity API', () => {
 			expect( legacyRe.test( 'a; b' ) ).toBe( false );
 			// Verify they still evaluate correctly via the full-expression path
 			expect( evaluateExpr( 'state.count > 0' ) ).toBe( true );
-			expect( evaluateExpr( 'context.isPinned && state.flag' ) ).toBe( true );
+			expect( evaluateExpr( 'context.isPinned && state.flag' ) ).toBe(
+				true
+			);
 		} );
 
 		it( 'should evaluate ! on a function reference (negation ignored)', () => {
@@ -367,16 +356,22 @@ describe( 'Interactivity API', () => {
 			);
 			expect( result ).toBe( true );
 			expect(
-				evaluateExpr( '(context.x || context.y) && (context.c || context.d)' )
+				evaluateExpr(
+					'(context.x || context.y) && (context.c || context.d)'
+				)
 			).toBe( true );
 			expect(
-				evaluateExpr( '(context.x || context.y) && (context.d && context.y)' )
+				evaluateExpr(
+					'(context.x || context.y) && (context.d && context.y)'
+				)
 			).toBe( false );
 		} );
 
 		it( 'should support nested ternaries', () => {
 			expect(
-				evaluateExpr( 'state.count > 10 ? "big" : state.flag ? "mid" : "small"' )
+				evaluateExpr(
+					'state.count > 10 ? "big" : state.flag ? "mid" : "small"'
+				)
 			).toBe( 'mid' );
 		} );
 
@@ -391,36 +386,62 @@ describe( 'Interactivity API', () => {
 		} );
 
 		it( 'should follow JS truthiness for empty arrays, empty objects, and the string 0', () => {
-			expect( evaluateExpr( 'state.emptyArray ? "yes" : "no"' ) ).toBe( 'yes' );
-			expect( evaluateExpr( 'state.emptyObject ? "yes" : "no"' ) ).toBe( 'yes' );
-			expect( evaluateExpr( 'state.zeroString ? "yes" : "no"' ) ).toBe( 'yes' );
-			expect( evaluateExpr( 'state.emptyString ? "yes" : "no"' ) ).toBe( 'no' );
+			expect( evaluateExpr( 'state.emptyArray ? "yes" : "no"' ) ).toBe(
+				'yes'
+			);
+			expect( evaluateExpr( 'state.emptyObject ? "yes" : "no"' ) ).toBe(
+				'yes'
+			);
+			expect( evaluateExpr( 'state.zeroString ? "yes" : "no"' ) ).toBe(
+				'yes'
+			);
+			expect( evaluateExpr( 'state.emptyString ? "yes" : "no"' ) ).toBe(
+				'no'
+			);
 			expect( evaluateExpr( '!state.emptyArray' ) ).toBe( false );
 			expect( evaluateExpr( '!state.zeroString' ) ).toBe( false );
-			expect( evaluateExpr( 'state.emptyArray && state.flag' ) ).toBe( true );
-			expect( evaluateExpr( 'state.emptyArray || state.flag' ) ).toEqual( [] );
-			expect( evaluateExpr( 'state.zeroString && state.flag' ) ).toBe( true );
+			expect( evaluateExpr( 'state.emptyArray && state.flag' ) ).toBe(
+				true
+			);
+			expect( evaluateExpr( 'state.emptyArray || state.flag' ) ).toEqual(
+				[]
+			);
+			expect( evaluateExpr( 'state.zeroString && state.flag' ) ).toBe(
+				true
+			);
 		} );
 
 		it( 'should follow JS loose vs strict equality semantics for primitive coercion', () => {
-			expect( evaluateExpr( 'state.stringNumber == state.count' ) ).toBe( true );
-			expect( evaluateExpr( 'state.stringNumber === state.count' ) ).toBe( false );
+			expect( evaluateExpr( 'state.stringNumber == state.count' ) ).toBe(
+				true
+			);
+			expect( evaluateExpr( 'state.stringNumber === state.count' ) ).toBe(
+				false
+			);
 			expect( evaluateExpr( 'state.emptyString == 0' ) ).toBe( true );
 			expect( evaluateExpr( 'state.nullish == false' ) ).toBe( false );
 			expect( evaluateExpr( 'state.missing == null' ) ).toBe( true );
 			expect( evaluateExpr( 'state.missing === null' ) ).toBe( false );
-			expect( evaluateExpr( 'typeof state.missing === "undefined"' ) ).toBe( true );
+			expect(
+				evaluateExpr( 'typeof state.missing === "undefined"' )
+			).toBe( true );
 		} );
 
 		it( 'should treat zero and empty string as valid left operands for ??', () => {
 			expect( evaluateExpr( 'state.zero ?? 7' ) ).toBe( 0 );
-			expect( evaluateExpr( 'state.emptyString ?? "fallback"' ) ).toBe( '' );
-			expect( evaluateExpr( 'state.nullish ?? "fallback"' ) ).toBe( 'fallback' );
+			expect( evaluateExpr( 'state.emptyString ?? "fallback"' ) ).toBe(
+				''
+			);
+			expect( evaluateExpr( 'state.nullish ?? "fallback"' ) ).toBe(
+				'fallback'
+			);
 		} );
 
 		it( 'should concatenate strings with + using JS semantics', () => {
 			expect( evaluateExpr( 'state.name + context.n' ) ).toBe( 'bob42' );
-			expect( evaluateExpr( 'state.zeroString + context.n' ) ).toBe( '042' );
+			expect( evaluateExpr( 'state.zeroString + context.n' ) ).toBe(
+				'042'
+			);
 		} );
 	} );
 } );
