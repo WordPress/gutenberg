@@ -1,8 +1,8 @@
 import { Menu as _Menu } from '@base-ui/react/menu';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
-import { ThemeProvider } from '@wordpress/theme';
 import { renderSlotWithChildren } from '../utils/render-slot-with-children';
+import { ThemeProvider } from '../utils/theme-provider';
 import itemPopupStyles from '../utils/css/item-popup.module.css';
 import styles from './style.module.css';
 import { Portal } from './portal';
