@@ -5,6 +5,7 @@
  */
 import { execSync, spawn } from 'child_process';
 import { fileURLToPath } from 'url';
+import { parseArgs } from 'util';
 import path from 'path';
 import fs from 'fs';
 
@@ -114,7 +115,13 @@ const readyMarkerFile = {
  * Main dev orchestration function.
  */
 async function dev() {
-	const skipTypes = process.argv.includes( '--skip-types' );
+	const { values } = parseArgs( {
+		options: {
+			'skip-types': { type: 'boolean', default: false },
+		},
+		strict: false,
+	} );
+	const skipTypes = values[ 'skip-types' ];
 
 	console.log( '🔨 Starting development build...\n' );
 
