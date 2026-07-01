@@ -185,7 +185,12 @@ function block_core_gallery_render_dynamic_image( $attachment_id, $attributes, $
 
 	$img_attr = array( 'class' => 'wp-image-' . $attachment_id );
 	if ( $aspect_ratio && 'auto' !== $aspect_ratio ) {
-		$img_attr['style'] = sprintf( 'aspect-ratio:%s;object-fit:cover;', $aspect_ratio );
+		// Run the aspect ratio through the same sanitization used for every other
+		// block inline style, so an unsafe value can't break out of the style
+		// attribute or inject additional markup.
+		$img_attr['style'] = safecss_filter_attr(
+			sprintf( 'aspect-ratio:%s;object-fit:cover;', $aspect_ratio )
+		);
 	}
 
 	$image_markup = wp_get_attachment_image( $attachment_id, $size_slug, false, $img_attr );

@@ -159,6 +159,36 @@ class Tests_Blocks_Render_Gallery extends WP_UnitTestCase {
 		$this->assertSame( '', trim( $output ) );
 	}
 
+	public function test_dynamic_gallery_sanitizes_image_aspect_ratio_style() {
+		$valid_output = $this->render_in_loop(
+			'<!-- wp:gallery {"dynamicContent":{"source":"core/attached-media"},"aspectRatio":"16/9"} /-->'
+		);
+
+		$this->assertStringContainsString(
+			'style="aspect-ratio:16/9;object-fit:cover"',
+			$valid_output,
+			'A valid aspect ratio should be rendered as an image style.'
+		);
+
+		// A value that tries to break out of the style attribute is run through
+		// `safecss_filter_attr` and escaped on output, so it cannot introduce an
+		// event handler or extra markup.
+		$malicious_output = $this->render_in_loop(
+			'<!-- wp:gallery {"dynamicContent":{"source":"core/attached-media"},"aspectRatio":"16/9\" onload=\"alert(1)"} /-->'
+		);
+
+		$this->assertStringNotContainsString(
+			'onload="alert(1)',
+			$malicious_output,
+			'A malicious aspect ratio must not break out of the style attribute.'
+		);
+		$this->assertStringNotContainsString(
+			'<script',
+			$malicious_output,
+			'A malicious aspect ratio must not inject markup.'
+		);
+	}
+
 	public function test_dynamic_gallery_renders_saved_caption_after_images() {
 		// In dynamic mode `save.js` persists only the gallery-level caption, so the
 		// saved content is a bare `<figcaption>`. The render callback builds the
