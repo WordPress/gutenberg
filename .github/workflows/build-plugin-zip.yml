@@ -433,6 +433,7 @@ jobs:
                   RELEASE_NAME: ${{ steps.get_release_version.outputs.version }}
                   VERSION: ${{ needs.bump-version.outputs.new_version }}
               with:
+                  github-token: ${{ secrets.GUTENBERG_TOKEN }}
                   script: |
                       const fs = require('fs');
 
