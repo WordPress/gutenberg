@@ -4,6 +4,7 @@
 
 ### Breaking Changes
 
+-   `ExternalLink`: No longer sets the `rel` attribute by default. Consumers relying on the previous behavior should pass `rel` explicitly ([#79743](https://github.com/WordPress/gutenberg/pull/79743)).
 -   The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed from the following:
     -   `BorderBoxControl` ([#79420](https://github.com/WordPress/gutenberg/pull/79420))
     -   `BorderControl` ([#79418](https://github.com/WordPress/gutenberg/pull/79418))
@@ -17,6 +18,7 @@
 
 ### Enhancements
 
+-   `Button`: Align focus rings with the design system ([#78646](https://github.com/WordPress/gutenberg/pull/78646)).
 -   The `size` prop no longer has any effect and can be safely removed from the following:
     -   `BorderBoxControl` ([#79420](https://github.com/WordPress/gutenberg/pull/79420))
     -   `BorderControl` ([#79418](https://github.com/WordPress/gutenberg/pull/79418))
