@@ -736,7 +736,7 @@
 	},
 	"packages/components/src/flex/flex-item/hook.ts": {
 		"no-restricted-imports": {
-			"count": 2
+			"count": 1
 		}
 	},
 	"packages/components/src/flex/flex/hook.ts": {
@@ -992,7 +992,7 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/view/component.tsx": {
+	"packages/components/src/utils/test/polymorphic-element.tsx": {
 		"no-restricted-imports": {
 			"count": 1
 		}

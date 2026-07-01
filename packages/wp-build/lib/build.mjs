@@ -2016,7 +2016,7 @@ async function buildAllWidgets() {
  * Discover all widgets and collect their registry-facing data.
  * Widgets without a valid widget.json are skipped.
  *
- * @return {Array<{ name: string, dirName: string, hasRender: boolean, hasWidget: boolean, presentation: string | null, category: string | null }>} Array of widget objects.
+ * @return {Array<{ name: string, dirName: string, title: string | null, description: string | null, hasRender: boolean, hasWidget: boolean, presentation: string | null, category: string | null, keywords: string[] | null, textdomain: string | null }>} Array of widget objects.
  */
 function collectWidgets() {
 	return getAllWidgets( ROOT_DIR ).flatMap( ( widgetName ) => {
@@ -2035,13 +2035,49 @@ function collectWidgets() {
 			{
 				name: metadata.name,
 				dirName: widgetName,
+				title: metadata.title ?? null,
+				description: metadata.description ?? null,
 				hasRender: widgetFiles.hasRender,
 				hasWidget: widgetFiles.hasWidget,
 				presentation: metadata.presentation ?? null,
 				category: metadata.category ?? null,
+				keywords: metadata.keywords ?? null,
+				textdomain: metadata.textdomain ?? null,
 			},
 		];
 	} );
+}
+
+/**
+ * Format a value as a single-quoted PHP string literal, escaping backslashes
+ * and single quotes. Returns the PHP literal `null` for empty values so
+ * optional manifest fields stay valid.
+ *
+ * @param {string|null|undefined} value Source value.
+ * @return {string} PHP string literal, or `null`.
+ */
+function toPhpStringLiteral( value ) {
+	if ( value === null || value === undefined || value === '' ) {
+		return 'null';
+	}
+	const escaped = String( value )
+		.replace( /\\/g, '\\\\' )
+		.replace( /'/g, "\\'" );
+	return `'${ escaped }'`;
+}
+
+/**
+ * Format a list of strings as a PHP `array( ... )` of string literals.
+ * Returns the PHP literal `null` when the list is empty or missing.
+ *
+ * @param {string[]|null|undefined} values Source values.
+ * @return {string} PHP array literal, or `null`.
+ */
+function toPhpStringArrayLiteral( values ) {
+	if ( ! Array.isArray( values ) || values.length === 0 ) {
+		return 'null';
+	}
+	return `array( ${ values.map( toPhpStringLiteral ).join( ', ' ) } )`;
 }
 
 /**
@@ -2064,19 +2100,23 @@ async function generateWidgetRegistry( widgets, replacements ) {
 		.map( ( widget ) => {
 			const hasRenderStr = widget.hasRender ? 'true' : 'false';
 			const hasWidgetStr = widget.hasWidget ? 'true' : 'false';
-			const presentationStr = widget.presentation
-				? `'${ widget.presentation }'`
-				: 'null';
-			const categoryStr = widget.category
-				? `'${ widget.category }'`
-				: 'null';
+			const presentationStr = toPhpStringLiteral( widget.presentation );
+			const categoryStr = toPhpStringLiteral( widget.category );
+			const titleStr = toPhpStringLiteral( widget.title );
+			const descriptionStr = toPhpStringLiteral( widget.description );
+			const keywordsStr = toPhpStringArrayLiteral( widget.keywords );
+			const textdomainStr = toPhpStringLiteral( widget.textdomain );
 			return `\tarray(
 		'name'         => '${ widget.name }',
 		'dir_name'     => '${ widget.dirName }',
+		'title'        => ${ titleStr },
+		'description'  => ${ descriptionStr },
 		'has_render'   => ${ hasRenderStr },
 		'has_widget'   => ${ hasWidgetStr },
 		'presentation' => ${ presentationStr },
 		'category'     => ${ categoryStr },
+		'keywords'     => ${ keywordsStr },
+		'textdomain'   => ${ textdomainStr },
 	)`;
 		} )
 		.join( ',\n' );

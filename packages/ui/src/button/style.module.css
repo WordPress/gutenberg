@@ -146,7 +146,7 @@
 		}
 
 		.is-small {
-			--wp-ui-button-padding-block: 0;
+			--wp-ui-button-padding-block: 0px;
 			--wp-ui-button-padding-inline: var(--wpds-dimension-padding-sm);
 			--wp-ui-button-height: var(--wpds-dimension-size-sm);
 		}

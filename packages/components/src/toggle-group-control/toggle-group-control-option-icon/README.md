@@ -17,7 +17,7 @@ import { formatLowercase, formatUppercase } from '@wordpress/icons';
 
 function Example() {
 	return (
-		<ToggleGroupControl __next40pxDefaultSize>
+		<ToggleGroupControl>
 			<ToggleGroupControlOptionIcon
 				value="uppercase"
 				icon={ formatUppercase }
