@@ -7,8 +7,8 @@
 		}
 
 		.popup {
-			--wp-ui-menu-min-width: calc(var(--wpds-dimension-size-lg) * 4);
-			--wp-ui-menu-max-width: calc(var(--wpds-dimension-size-lg) * 8);
+			--wp-ui-menu-min-width: var(--wpds-dimension-surface-width-xs);
+			--wp-ui-menu-max-width: var(--wpds-dimension-surface-width-sm);
 
 			display: grid;
 			grid-template-areas: none;
