@@ -11,6 +11,7 @@ import { Icon, wordpress } from '@wordpress/icons';
  */
 import Page from '..';
 import Breadcrumbs from '../../breadcrumbs';
+import Navigation from '../../navigation';
 import { withRouter } from '../../stories/with-router';
 
 const meta: Meta< typeof Page > = {
@@ -187,6 +188,55 @@ export const WithActions: Story = {
 	},
 };
 
+export const WithNavigation: Story = {
+	args: {
+		title: 'Analytics',
+		showSidebarToggle: false,
+		navigation: (
+			<Navigation
+				items={ [
+					{ label: 'Overview', to: '/overview', active: true },
+					{ label: 'Products', to: '/products' },
+					{ label: 'Orders', to: '/orders' },
+					{ label: 'Customers', to: '/customers' },
+				] }
+			/>
+		),
+		hasPadding: true,
+		children: <Text>Page content here</Text>,
+	},
+};
+
+export const WithNavigationAndActions: Story = {
+	args: {
+		title: 'Analytics',
+		subTitle: 'Review key metrics to understand performance.',
+		actions: (
+			<>
+				<Button size="compact" variant="outline">
+					Export
+				</Button>
+				<Button size="compact" variant="solid">
+					Add widget
+				</Button>
+			</>
+		),
+		navigation: (
+			<Navigation
+				items={ [
+					{ label: 'Overview', to: '/overview', active: true },
+					{ label: 'Products', to: '/products' },
+					{ label: 'Orders', to: '/orders' },
+					{ label: 'Customers', to: '/customers' },
+				] }
+			/>
+		),
+		showSidebarToggle: false,
+		hasPadding: true,
+		children: <Text>Page content here</Text>,
+	},
+};
+
 export const FullHeader: Story = {
 	args: {
 		visual: <Icon icon={ wordpress } size={ 24 } />,
@@ -200,6 +250,16 @@ export const FullHeader: Story = {
 			/>
 		),
 		badges: <Badge intent="informational">Status</Badge>,
+		navigation: (
+			<Navigation
+				items={ [
+					{ label: 'Overview', to: '/overview', active: true },
+					{ label: 'Products', to: '/products' },
+					{ label: 'Orders', to: '/orders' },
+					{ label: 'Customers', to: '/customers' },
+				] }
+			/>
+		),
 		actions: (
 			<>
 				<Button size="compact" variant="outline">

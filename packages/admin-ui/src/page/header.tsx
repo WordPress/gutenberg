@@ -17,6 +17,7 @@ export default function Header( {
 	title,
 	subTitle,
 	actions,
+	navigation,
 	showSidebarToggle = true,
 }: {
 	headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
@@ -26,6 +27,7 @@ export default function Header( {
 	title?: React.ReactNode;
 	subTitle: React.ReactNode;
 	actions?: React.ReactNode;
+	navigation?: React.ReactNode;
 	showSidebarToggle?: boolean;
 } ) {
 	const HeadingTag = `h${ headingLevel }` as const;
@@ -83,6 +85,11 @@ export default function Header( {
 				>
 					{ subTitle }
 				</Text>
+			) }
+			{ navigation && (
+				<div className={ styles[ 'header-navigation' ] }>
+					{ navigation }
+				</div>
 			) }
 		</Stack>
 	);

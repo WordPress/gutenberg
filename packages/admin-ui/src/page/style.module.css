@@ -58,6 +58,10 @@
 	color: var(--wpds-color-foreground-content-neutral-weak);
 }
 
+.header-navigation {
+	padding-block-start: var(--wpds-dimension-padding-sm);
+}
+
 .content {
 	flex-grow: 1;
 	overflow: auto;

@@ -21,6 +21,7 @@ function Page( {
 	children,
 	className,
 	actions,
+	navigation,
 	ariaLabel,
 	hasPadding = false,
 	showSidebarToggle = true,
@@ -45,6 +46,11 @@ function Page( {
 	children: React.ReactNode;
 	className?: string;
 	actions?: React.ReactNode;
+	/**
+	 * Section navigation shown in the page header. Pass a `<Navigation>` with
+	 * the section links.
+	 */
+	navigation?: React.ReactNode;
 	ariaLabel?: string;
 	hasPadding?: boolean;
 	showSidebarToggle?: boolean;
@@ -55,7 +61,12 @@ function Page( {
 
 	return (
 		<NavigableRegion className={ classes } ariaLabel={ effectiveAriaLabel }>
-			{ ( title || breadcrumbs || badges || actions || visual ) && (
+			{ ( title ||
+				breadcrumbs ||
+				badges ||
+				actions ||
+				visual ||
+				navigation ) && (
 				<Header
 					headingLevel={ headingLevel }
 					breadcrumbs={ breadcrumbs }
@@ -64,6 +75,7 @@ function Page( {
 					title={ title }
 					subTitle={ subTitle }
 					actions={ actions }
+					navigation={ navigation }
 					showSidebarToggle={ showSidebarToggle }
 				/>
 			) }
