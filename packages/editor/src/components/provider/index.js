@@ -54,6 +54,7 @@ import {
 	SuggestionAuthorColors,
 	SuggestionDeletionKeyboard,
 	SuggestionAdditionKeyboard,
+	SuggestionFormatKeyboard,
 	registerSuggestionOverlayFilter,
 } from '../suggestion-mode';
 import { registerSuggestionFormat } from '../inline-suggestions';
@@ -484,6 +485,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 												<SuggestionAuthorColors />
 												<SuggestionDeletionKeyboard />
 												<SuggestionAdditionKeyboard />
+												<SuggestionFormatKeyboard />
 											</>
 										) }
 										<MediaEditorModalMount />

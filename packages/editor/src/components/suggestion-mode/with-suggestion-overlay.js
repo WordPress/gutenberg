@@ -48,6 +48,7 @@ import { markContentDiff, stripSuggestionMarks } from './inline-formats';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 import SuggestionMoveGhost from './suggestion-move-ghost';
 import useMoveGhosts from './use-move-ghosts';
+import { planFormatMarkers } from '../inline-suggestions';
 
 const BLOCK_EDITOR_STORE_NAME = 'core/block-editor';
 
@@ -227,8 +228,12 @@ function mergeOverlayAttributes( base, overlay ) {
  */
 function SuggestingBlockEdit( { BlockEdit, props } ) {
 	const { clientId, name, attributes } = props;
-	const { entries, captureBaseline, setOverlayAttributes } =
-		useSuggestionOverlay();
+	const {
+		entries,
+		captureBaseline,
+		setOverlayAttributes,
+		requestFormatSuggestion,
+	} = useSuggestionOverlay();
 
 	// Track the latest attributes via a ref so the wrapped `setAttributes`
 	// callback remains stable. Blocks sometimes invoke `setAttributes` from
@@ -273,8 +278,63 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 	// was cleared (auto-save trash, orphan prune, intent-switch).
 	const entryExists = !! overlayEntry;
 
+	// Detect a formatting-only edit (bold/italic/link toggled over a run, the
+	// text unchanged) and hand it to the single-mount format handler, which
+	// creates the note and writes a `format` marker to the live block instead
+	// of routing the edit into the overlay diff. A format toggle arrives here
+	// as a fresh `content` value with no earlier DOM event to intercept
+	// (unlike typing, which the addition keyboard catches on `beforeinput`),
+	// so this per-block `setAttributes` seam is the one point that covers every
+	// source — toolbar button, keyboard shortcut, and the link popover alike.
+	// Returns true only when the handler took ownership; with no handler
+	// registered (isolated unit tests) it returns false and the edit falls
+	// through to the overlay path.
+	const maybeHandleFormatEdit = useCallback(
+		( nextAttributes, prevAttributes ) => {
+			if (
+				! nextAttributes ||
+				! Object.prototype.hasOwnProperty.call(
+					nextAttributes,
+					'content'
+				)
+			) {
+				return false;
+			}
+			const prevContent = prevAttributes?.content;
+			const nextContent = nextAttributes.content;
+			if (
+				! isStringLike( prevContent ) ||
+				! isStringLike( nextContent )
+			) {
+				return false;
+			}
+			const plan = planFormatMarkers( prevContent, nextContent );
+			if ( plan.kind !== 'format' ) {
+				return false;
+			}
+			return requestFormatSuggestion( {
+				clientId,
+				blockName: name,
+				nextContent,
+				plan,
+			} );
+		},
+		[ clientId, name, requestFormatSuggestion ]
+	);
+
 	const wrappedSetAttributes = useCallback(
 		( nextAttributes ) => {
+			// A formatting-only change becomes a live `format` marker rather
+			// than an overlay diff; everything else (text edits, primitive
+			// attribute changes) still routes to the overlay below.
+			// The block-editor store holds the live value RichText renders (a
+			// format-suggestion block keeps no overlay entry), so the block's
+			// current attributes are the "before" side of the format diff.
+			if (
+				maybeHandleFormatEdit( nextAttributes, attributesRef.current )
+			) {
+				return;
+			}
 			// First overlay write for this block snapshots the current
 			// attributes as the baseline; subsequent writes only record
 			// overlay deltas. This lets the diff renderer below compare
@@ -291,7 +351,14 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 				stripMarksFromIncoming( nextAttributes )
 			);
 		},
-		[ clientId, name, captureBaseline, setOverlayAttributes, entryExists ]
+		[
+			clientId,
+			name,
+			captureBaseline,
+			setOverlayAttributes,
+			entryExists,
+			maybeHandleFormatEdit,
+		]
 	);
 
 	const mergedAttributes = useMemo( () => {

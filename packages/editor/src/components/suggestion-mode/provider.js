@@ -22,6 +22,8 @@ import {
 	rejectInlineDeletion,
 	acceptInlineAddition,
 	rejectInlineAddition,
+	acceptInlineFormat,
+	rejectInlineFormat,
 } from '../inline-suggestions';
 
 /**
@@ -31,9 +33,14 @@ import {
  *                                                                                                                   Phase 2; the structural variants ship in Phase 6 (issue #77434).
  * @property {string}                                                                               [attribute]      The attribute being changed (`attribute-set`) or
  *                                                                                                                   carrying the marker (`inline-suggestion`).
- * @property {'del'|'add'}                                                                          [suggestionType] Inline marker kind (`inline-suggestion` only): `del`
+ * @property {'del'|'add'|'format'}                                                                 [suggestionType] Inline marker kind (`inline-suggestion` only): `del`
  *                                                                                                                   wraps existing text proposed for removal, `add` wraps proposed
- *                                                                                                                   new text.
+ *                                                                                                                   new text, `format` wraps a run whose formatting changed (text
+ *                                                                                                                   unchanged).
+ * @property {string}                                                                               [beforeHTML]     Original run HTML captured for a `format` suggestion, so a
+ *                                                                                                                   reject can restore the pre-suggestion formatting.
+ * @property {string}                                                                               [afterHTML]      Proposed run HTML for a `format` suggestion, used to
+ *                                                                                                                   summarize which formats changed.
  * @property {*}                                                                                    [before]         The baseline value (`attribute-set`).
  * @property {*}                                                                                    [after]          The proposed value (`attribute-set`).
  */
@@ -683,10 +690,23 @@ export function useSuggestionsProvider() {
 				const attributeKey = inlineOp.attribute;
 				const originalValue =
 					selectBlockAttributes( targetClientId )?.[ attributeKey ];
-				const nextValue =
-					inlineOp.suggestionType === 'add'
-						? acceptInlineAddition( originalValue, commentId )
-						: acceptInlineDeletion( originalValue, commentId );
+				let nextValue;
+				if ( inlineOp.suggestionType === 'add' ) {
+					nextValue = acceptInlineAddition(
+						originalValue,
+						commentId
+					);
+				} else if ( inlineOp.suggestionType === 'format' ) {
+					// Accepting a format suggestion unwraps the marker, leaving
+					// the proposed formatting (already carried on the run) in
+					// place — the same shape as accepting an addition.
+					nextValue = acceptInlineFormat( originalValue, commentId );
+				} else {
+					nextValue = acceptInlineDeletion(
+						originalValue,
+						commentId
+					);
+				}
 				try {
 					requestInterceptorBypass( targetClientId );
 					clearOverlay( targetClientId );
@@ -992,10 +1012,21 @@ export function useSuggestionsProvider() {
 						selectBlockAttributes( targetClientId )?.[
 							attributeKey
 						];
-					const nextValue =
-						inlineOp.suggestionType === 'add'
-							? rejectInlineAddition( value, commentId )
-							: rejectInlineDeletion( value, commentId );
+					let nextValue;
+					if ( inlineOp.suggestionType === 'add' ) {
+						nextValue = rejectInlineAddition( value, commentId );
+					} else if ( inlineOp.suggestionType === 'format' ) {
+						// Rejecting a format suggestion restores the original run
+						// captured at suggest-time (`beforeHTML`), discarding both
+						// the proposed formatting and the marker.
+						nextValue = rejectInlineFormat(
+							value,
+							commentId,
+							inlineOp.beforeHTML
+						);
+					} else {
+						nextValue = rejectInlineDeletion( value, commentId );
+					}
 					requestInterceptorBypass( targetClientId );
 					clearOverlay( targetClientId );
 					updateBlockAttributes( targetClientId, {

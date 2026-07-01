@@ -286,6 +286,21 @@ export function summarizeOperations( operations ) {
 		// Add:/Delete: line. With no resolvable text (marker edited away) fall
 		// through to the generic attribute label rather than an empty quote.
 		if ( op.type === 'inline-suggestion' ) {
+			// A format suggestion changes only the run's markup, so surface
+			// which formats changed ("Formatting: bold") from the captured
+			// before/after HTML rather than quoting the (unchanged) text.
+			if ( op.suggestionType === 'format' ) {
+				const changedFormats = diffInlineFormats(
+					op.beforeHTML ?? '',
+					op.afterHTML ?? ''
+				);
+				if ( changedFormats.length > 0 ) {
+					formattingLabels.push( ...changedFormats );
+				} else {
+					attributeLabels.push( op.attribute );
+				}
+				continue;
+			}
 			// The marker stores the proposed text verbatim, so render it as-is
 			// — including pure-whitespace edits such as a typed space — instead
 			// of collapsing it the way the word-diff path does. Only fall back

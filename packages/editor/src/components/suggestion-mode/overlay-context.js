@@ -83,6 +83,8 @@ const OverlayContext = createContext( {
 	hasOverlay: () => false,
 	requestInterceptorBypass: () => {},
 	consumeInterceptorBypass: () => false,
+	registerFormatHandler: () => () => {},
+	requestFormatSuggestion: () => false,
 } );
 
 /**
@@ -299,6 +301,33 @@ export function SuggestionOverlayProvider( { children } ) {
 		return true;
 	}, [] );
 
+	// Single slot for the format-suggestion handler. The per-block overlay HOC
+	// only *detects* a formatting-only edit (cheap, no store access); the
+	// actual note creation + marker write lives in one mounted component
+	// (`SuggestionFormatKeyboard`) that registers its handler here. Keeping the
+	// heavy `useSuggestionsProvider` out of every block's render is why this is
+	// a singleton rather than a per-block hook. A ref (not state) so
+	// registering doesn't re-render every subscribed block.
+	const formatHandlerRef = useRef( null );
+
+	const registerFormatHandler = useCallback( ( handler ) => {
+		formatHandlerRef.current = handler;
+		return () => {
+			if ( formatHandlerRef.current === handler ) {
+				formatHandlerRef.current = null;
+			}
+		};
+	}, [] );
+
+	const requestFormatSuggestion = useCallback( ( request ) => {
+		const handler = formatHandlerRef.current;
+		if ( ! handler ) {
+			return false;
+		}
+		handler( request );
+		return true;
+	}, [] );
+
 	// Prune overlay entries whose block was removed from the editor. This
 	// prevents stale baselines from persisting after a block is deleted.
 	// The block-count subscription only runs when there are entries to
@@ -346,6 +375,8 @@ export function SuggestionOverlayProvider( { children } ) {
 			hasOverlay,
 			requestInterceptorBypass,
 			consumeInterceptorBypass,
+			registerFormatHandler,
+			requestFormatSuggestion,
 		} ),
 		[
 			entries,
@@ -358,6 +389,8 @@ export function SuggestionOverlayProvider( { children } ) {
 			hasOverlay,
 			requestInterceptorBypass,
 			consumeInterceptorBypass,
+			registerFormatHandler,
+			requestFormatSuggestion,
 		]
 	);
 
