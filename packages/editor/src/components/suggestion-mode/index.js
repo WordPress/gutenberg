@@ -44,7 +44,6 @@ export {
 	PAYLOAD_MAX_BYTES,
 	SCHEMA_VERSION,
 } from './provider';
-export { default as SuggestionDiff } from './suggestion-diff';
 export { wordDiff } from './word-diff';
 export {
 	default as SuggestionSummary,

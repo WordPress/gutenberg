@@ -1,10 +1,9 @@
 /**
  * Word-level text diff used by the suggestion sidebar summary.
  *
- * Extracted from the overlay-era `suggestion-diff.js` so that file (an overlay
- * render component slated for removal in the overlay-retirement work, #73411)
- * can be deleted without taking `wordDiff` with it. `wordDiff` remains needed by
- * `suggestion-summary.js`, which stays.
+ * Extracted from the overlay-era `suggestion-diff.js` (an overlay render
+ * component removed in the overlay-retirement work, #73411) so `wordDiff` could
+ * survive that file's deletion. `wordDiff` is consumed by `suggestion-summary.js`.
  */
 
 /**

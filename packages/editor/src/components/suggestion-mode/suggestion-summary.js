@@ -1,10 +1,9 @@
 /**
  * Sidebar summary of a suggestion's operations.
  *
- * Companion to `suggestion-diff.js` — where SuggestionDiff is a full inline
- * diff (used in the comment thread body), SuggestionSummary is a one-or-two
- * line precis suitable for the collapsed sidebar list. It produces three
- * line categories from the operations array:
+ * SuggestionSummary is a one-or-two line precis of a suggestion's operations,
+ * suitable for the collapsed sidebar list. It produces three line categories
+ * from the operations array:
  *
  *   - **Add: …**       — new text inserted by the suggestion. For text-valued
  *                        attributes the inserted words are extracted from the
