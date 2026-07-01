@@ -196,7 +196,6 @@ test.describe( 'Image', () => {
 
 	test( 'should drag and drop files into media placeholder', async ( {
 		editor,
-		page,
 		imageBlockUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
@@ -208,32 +207,9 @@ test.describe( 'Image', () => {
 			name: 'This image has an empty alt attribute',
 		} );
 
-		const tmpInput = await page.evaluateHandle( () => {
-			const input = document.createElement( 'input' );
-			input.type = 'file';
-			return input;
+		await imageBlock.drop( {
+			files: [ imageBlockUtils.TEST_IMAGE_FILE_PATH ],
 		} );
-
-		await imageBlockUtils.upload( tmpInput );
-
-		const paragraphRect = await imageBlock.boundingBox();
-		const pX = paragraphRect.x + paragraphRect.width / 2;
-		const pY = paragraphRect.y + paragraphRect.height / 3;
-
-		await imageBlock.evaluate(
-			( element, [ input, clientX, clientY ] ) => {
-				const dataTransfer = new window.DataTransfer();
-				dataTransfer.items.add( input.files[ 0 ] );
-				const event = new window.DragEvent( 'drop', {
-					bubbles: true,
-					clientX,
-					clientY,
-					dataTransfer,
-				} );
-				element.dispatchEvent( event );
-			},
-			[ tmpInput, pX, pY ]
-		);
 
 		// Wait for upload to complete (includes client-side media processing time).
 		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
