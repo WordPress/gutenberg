@@ -558,6 +558,12 @@ export default dedupePlugins( [
 					message:
 						'`uuid` is ESM-only and breaks `require()` call sites (see #77960). Use the built-in `crypto.randomUUID()` instead.',
 				},
+				{
+					selector:
+						'CallExpression[callee.property.name="waitForFunction"][arguments.length=2] > ObjectExpression.arguments:has(Property[key.name=/^(timeout|polling)$/])',
+					message:
+						'`waitForFunction( fn, arg, options )`: options is the third argument. Pass `undefined` as the second arg, otherwise `timeout`/`polling` is ignored and falls back to `actionTimeout`.',
+				},
 			],
 			'playwright/no-conditional-in-test': 'off',
 			// Playwright fixtures use `use()` which is not a React hook.
