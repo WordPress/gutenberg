@@ -184,4 +184,26 @@ class Gutenberg_Guideline_Reservation_Test extends WP_Test_REST_TestCase {
 		$this->assertStringNotContainsString( '<script', $content );
 		$this->assertLessThanOrEqual( 5000, mb_strlen( $content, 'UTF-8' ) );
 	}
+
+	/**
+	 * A `guideline-` slug that is not a registered scope is left untouched by the
+	 * guard: its content is neither sanitized nor capped, so a long plain-text
+	 * body is stored in full rather than truncated to the guideline length.
+	 */
+	public function test_unrecognized_slug_row_is_not_shaped() {
+		wp_set_current_user( self::$admin_id );
+
+		$long = str_repeat( 'a', 6000 );
+
+		$response = $this->create_row(
+			array(
+				'slug'    => 'guideline-nope',
+				'content' => $long,
+				'status'  => 'publish',
+			)
+		);
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertSame( 6000, mb_strlen( get_post( $response->get_data()['id'] )->post_content, 'UTF-8' ) );
+	}
 }
