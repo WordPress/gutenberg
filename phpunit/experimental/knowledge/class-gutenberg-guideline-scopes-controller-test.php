@@ -102,16 +102,16 @@ class Gutenberg_Guideline_Scopes_Controller_Test extends WP_Test_REST_TestCase {
 	public function test_filter_removes_scope() {
 		wp_set_current_user( self::$admin_id );
 
-		$callback = static function ( $scopes ) {
-			unset( $scopes['blocks'] );
-			return $scopes;
-		};
-		add_filter( 'wp_guideline_scopes', $callback );
+		add_filter(
+			'wp_guideline_scopes',
+			static function ( $scopes ) {
+				unset( $scopes['blocks'] );
+				return $scopes;
+			}
+		);
 
 		$data  = rest_get_server()->dispatch( new WP_REST_Request( 'GET', '/wp/v2/knowledge/guideline-scopes' ) )->get_data();
 		$slugs = wp_list_pluck( $data, 'slug' );
-
-		remove_filter( 'wp_guideline_scopes', $callback );
 
 		$this->assertNotContains( 'blocks', $slugs );
 	}
