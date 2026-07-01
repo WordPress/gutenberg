@@ -12,11 +12,6 @@ interface SiteEditorOptions {
 	showWelcomeGuide?: boolean;
 }
 
-interface CanvasReadyWaitArgs {
-	canvasLoaderSelector: string;
-	readySelector: string;
-}
-
 /**
  * Visits the Site Editor main page.
  *
@@ -64,100 +59,32 @@ export async function visitSiteEditor(
 	 * loading is done.
 	 */
 	if ( ! query.size || postId || canvas === 'edit' ) {
-		const canvasLoaderSelector =
+		const canvasLoader = this.page.locator(
 			// Spinner was used instead of the progress bar in an earlier
 			// version of the site editor.
-			'.edit-site-canvas-loader, .edit-site-canvas-spinner';
-		const readySelector = [
-			'.edit-site-editor__editor-interface',
-			'iframe[src*="wp_site_preview=1"]',
-		].join( ', ' );
-		// Larger timeout is needed for large entities, like the Large Post HTML
-		// fixture that we load for performance tests.
-		const canvasLoadTimeout = 60_000;
-
-		// The loader can finish before this helper starts waiting. Wait for
-		// either the loader or a ready canvas state, then verify the loader is gone.
-		await this.page.waitForFunction(
-			( {
-				canvasLoaderSelector: loader,
-				readySelector: ready,
-			}: CanvasReadyWaitArgs ) => {
-				const isVisibleElement = ( element: Element ) => {
-					if ( ! element.getClientRects().length ) {
-						return false;
-					}
-					const style = window.getComputedStyle( element );
-					return (
-						style.display !== 'none' &&
-						style.visibility !== 'hidden'
-					);
-				};
-
-				const isReadyElement = ( element: Element ) => {
-					if ( ! isVisibleElement( element ) ) {
-						return false;
-					}
-					if ( element instanceof HTMLIFrameElement ) {
-						return (
-							element.contentDocument?.readyState === 'complete'
-						);
-					}
-					return true;
-				};
-
-				return (
-					Array.from( document.querySelectorAll( loader ) ).some(
-						isVisibleElement
-					) ||
-					Array.from( document.querySelectorAll( ready ) ).some(
-						isReadyElement
-					)
-				);
-			},
-			{ canvasLoaderSelector, readySelector },
-			{ timeout: canvasLoadTimeout }
+			'.edit-site-canvas-loader, .edit-site-canvas-spinner'
 		);
 
-		await this.page.waitForFunction(
-			( {
-				canvasLoaderSelector: loader,
-				readySelector: ready,
-			}: CanvasReadyWaitArgs ) => {
-				const isVisibleElement = ( element: Element ) => {
-					if ( ! element.getClientRects().length ) {
-						return false;
-					}
-					const style = window.getComputedStyle( element );
-					return (
-						style.display !== 'none' &&
-						style.visibility !== 'hidden'
-					);
-				};
-
-				const isReadyElement = ( element: Element ) => {
-					if ( ! isVisibleElement( element ) ) {
-						return false;
-					}
-					if ( element instanceof HTMLIFrameElement ) {
-						return (
-							element.contentDocument?.readyState === 'complete'
-						);
-					}
-					return true;
-				};
-
-				return (
-					! Array.from( document.querySelectorAll( loader ) ).some(
-						isVisibleElement
-					) &&
-					Array.from( document.querySelectorAll( ready ) ).some(
-						isReadyElement
-					)
-				);
-			},
-			{ canvasLoaderSelector, readySelector },
-			{ timeout: canvasLoadTimeout }
-		);
+		try {
+			// Wait for the canvas loader to appear first, so that the locator that
+			// waits for the hidden state doesn't resolve prematurely. The loader
+			// either renders within a tick or it is skipped entirely (when the
+			// editor finishes resolving inside the artificial-delay window in
+			// `useIsSiteEditorLoading`), so a long visible-state timeout is just
+			// wasted wall clock when the loader never shows up.
+			await canvasLoader.waitFor( { state: 'visible', timeout: 3_000 } );
+			await canvasLoader.waitFor( {
+				state: 'hidden',
+				// Bigger timeout is needed for larger entities, like the Large Post
+				// HTML fixture that we load for performance tests, which often
+				// doesn't make it under the default timeout value.
+				timeout: 60_000,
+			} );
+		} catch {
+			// If the canvas loader is already disappeared, skip the waiting.
+			await this.page
+				.getByRole( 'region', { name: 'Editor content' } )
+				.waitFor();
+		}
 	}
 }
