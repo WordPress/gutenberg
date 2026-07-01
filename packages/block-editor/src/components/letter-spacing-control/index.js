@@ -37,7 +37,6 @@ export default function LetterSpacingControl( {
 
 	return (
 		<UnitControl
-			__shouldNotWarnDeprecated36pxSize
 			{ ...otherProps }
 			label={ __( 'Letter spacing' ) }
 			value={ value }
