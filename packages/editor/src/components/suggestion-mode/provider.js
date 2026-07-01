@@ -996,19 +996,54 @@ export function useSuggestionsProvider() {
 				}
 				if ( targetClientId ) {
 					const attributeKey = inlineOp.attribute;
-					const value =
+					const originalValue =
 						selectBlockAttributes( targetClientId )?.[
 							attributeKey
 						];
 					const nextValue =
 						inlineOp.suggestionType === 'add'
-							? rejectInlineAddition( value, commentId )
-							: rejectInlineDeletion( value, commentId );
-					requestInterceptorBypass( targetClientId );
-					clearOverlay( targetClientId );
-					updateBlockAttributes( targetClientId, {
-						[ attributeKey ]: nextValue,
-					} );
+							? rejectInlineAddition( originalValue, commentId )
+							: rejectInlineDeletion( originalValue, commentId );
+					try {
+						requestInterceptorBypass( targetClientId );
+						clearOverlay( targetClientId );
+						updateBlockAttributes( targetClientId, {
+							[ attributeKey ]: nextValue,
+						} );
+
+						await saveEntityRecord(
+							'root',
+							'comment',
+							{
+								id: commentId,
+								status: 'approved',
+								meta: { _wp_suggestion_status: 'rejected' },
+							},
+							{ throwOnError: true }
+						);
+
+						createNotice(
+							'snackbar',
+							__( 'Suggestion rejected.' ),
+							{ type: 'snackbar', isDismissible: true }
+						);
+					} catch ( error ) {
+						// Roll the attribute back so the content isn't left
+						// inconsistent with a still-pending comment if the
+						// server rejected the status update. Mirrors the
+						// apply-path rollback.
+						requestInterceptorBypass( targetClientId );
+						updateBlockAttributes( targetClientId, {
+							[ attributeKey ]: originalValue,
+						} );
+						createNotice(
+							'error',
+							error?.message ||
+								__( 'Failed to reject suggestion.' ),
+							{ type: 'snackbar', isDismissible: true }
+						);
+					}
+					return;
 				}
 			}
 
