@@ -44,7 +44,7 @@ sequenceDiagram
 
 ## Editor Intent
 
-An `editorIntent` preference (orthogonal to the visual/code `editorMode`) controls the editing purpose:
+A session-scoped `editorIntent` state (orthogonal to the visual/code `editorMode` preference) controls the editing purpose:
 
 | Intent    | Behaviour |
 |-----------|-----------|
@@ -52,7 +52,7 @@ An `editorIntent` preference (orthogonal to the visual/code `editorMode`) contro
 | `suggest` | Edits are diverted into an in-memory overlay; the block-editor store is never mutated. |
 | `view`    | Read-only preview via `isPreviewMode`. |
 
-The intent is stored in the preferences store under `core.editorIntent` and surfaced as an **Edit / Suggest / View** menu in the editor's "Options" kebab, gated behind the `editor.notes` post-type support flag.
+The intent lives in the `core/editor` store's reducer (not the preferences store), so reloading the editor always returns to `edit`. It is surfaced as an **Edit / Suggest / View** menu in the editor's "Options" kebab, gated behind the `editor.notes` post-type support flag; the `setEditorIntent` / `getEditorIntent` store APIs are private while Suggest mode is experimental.
 
 ## Suggestion Overlay
 
@@ -64,7 +64,7 @@ When the intent is `suggest`, an `editor.BlockEdit` filter (`withSuggestionOverl
 
 A companion `editor.BlockListBlock` filter tags each block with a pending change so it is discoverable without relying on the selected-block toolbar. Attribute edits get an `is-suggestion-pending` class (the bracket/outline treatment); pending structural changes get `is-suggestion-pending-remove` (strikethrough/dim), `is-suggestion-pending-insert`, or `is-suggestion-pending-move`, mapped from the block's `metadata.suggestion` marker.
 
-Because the store is never touched, autosave, undo/redo, and RTC sync stay at the real baseline.
+For **attribute suggestions** the store is never touched, so autosave, undo/redo, and RTC sync stay at the real baseline. **Structural suggestions** are different: their pending state (the `metadata.suggestion` markers, and pending-insert blocks themselves) lives in the real block tree, so serializing the post would leak it into `post_content`. While any pending structural state exists, `SuggestionSaveLock` holds the editor's save and autosave locks (`lockPostSaving` / `lockPostAutosaving`), releasing them once every structural suggestion has been applied or rejected.
 
 ### Inline text changes (Option B: marks in content)
 

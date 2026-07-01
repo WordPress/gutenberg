@@ -29,6 +29,7 @@ import { default as mediaSideload } from '../../utils/media-sideload';
 import { default as mediaFinalize } from '../../utils/media-finalize';
 import { default as mediaDelete } from '../../utils/media-delete';
 import { store as editorStore } from '../../store';
+import { EDITOR_INTENT_VIEW } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 import { useGlobalStyles } from '../global-styles';
 
@@ -211,7 +212,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					get( 'core', 'fixedToolbar' ) || ! isLargeViewport,
 				hiddenBlockTypes: get( 'core', 'hiddenBlockTypes' ),
 				isDistractionFree: get( 'core', 'distractionFree' ),
-				isViewIntent: getEditorIntent() === 'view',
+				isViewIntent: getEditorIntent() === EDITOR_INTENT_VIEW,
 				keepCaretInsideBlock: get( 'core', 'keepCaretInsideBlock' ),
 				hasUploadPermissions:
 					canUser( 'create', {

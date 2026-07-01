@@ -9,6 +9,11 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { isAppleOS } from '@wordpress/keycodes';
 
 /**
+ * Internal dependencies
+ */
+import { isSuggestionModeEnabled } from '../suggestion-mode/gate';
+
+/**
  * Component for registering editor keyboard shortcuts.
  *
  * @return {Element} The component to be rendered.
@@ -119,35 +124,43 @@ function EditorKeyboardShortcutsRegister() {
 			},
 		} );
 
-		registerShortcut( {
-			name: 'core/editor/intent-edit',
-			category: 'global',
-			description: __( 'Switch to Edit mode.' ),
-			keyCombination: {
-				modifier: 'secondary',
-				character: 'z',
-			},
-		} );
+		/*
+		 * Only register the intent shortcuts when the Suggestion Mode
+		 * experiment is on — registration alone lists them in the Keyboard
+		 * Shortcuts help modal, which would advertise a feature the
+		 * handlers refuse to run.
+		 */
+		if ( isSuggestionModeEnabled() ) {
+			registerShortcut( {
+				name: 'core/editor/intent-edit',
+				category: 'global',
+				description: __( 'Switch to Edit mode.' ),
+				keyCombination: {
+					modifier: 'secondary',
+					character: 'z',
+				},
+			} );
 
-		registerShortcut( {
-			name: 'core/editor/intent-suggest',
-			category: 'global',
-			description: __( 'Switch to Suggest mode.' ),
-			keyCombination: {
-				modifier: 'secondary',
-				character: 'x',
-			},
-		} );
+			registerShortcut( {
+				name: 'core/editor/intent-suggest',
+				category: 'global',
+				description: __( 'Switch to Suggest mode.' ),
+				keyCombination: {
+					modifier: 'secondary',
+					character: 'x',
+				},
+			} );
 
-		registerShortcut( {
-			name: 'core/editor/intent-view',
-			category: 'global',
-			description: __( 'Switch to View mode.' ),
-			keyCombination: {
-				modifier: 'secondary',
-				character: 'c',
-			},
-		} );
+			registerShortcut( {
+				name: 'core/editor/intent-view',
+				category: 'global',
+				description: __( 'Switch to View mode.' ),
+				keyCombination: {
+					modifier: 'secondary',
+					character: 'c',
+				},
+			} );
+		}
 
 		registerShortcut( {
 			name: 'core/editor/next-region',

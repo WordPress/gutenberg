@@ -10,6 +10,7 @@ import { displayShortcut } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 import {
 	EDITOR_INTENT_EDIT,
 	EDITOR_INTENT_SUGGEST,
@@ -61,11 +62,12 @@ const INTENTS = [
  * types that declare the `editor.notes` support.
  */
 function IntentSwitcher() {
+	// The intent API is private while Suggest mode is experimental.
 	const intent = useSelect(
-		( select ) => select( editorStore ).getEditorIntent(),
+		( select ) => unlock( select( editorStore ) ).getEditorIntent(),
 		[]
 	);
-	const { setEditorIntent } = useDispatch( editorStore );
+	const { setEditorIntent } = unlock( useDispatch( editorStore ) );
 
 	return (
 		<PostTypeSupportCheck supportKeys="editor.notes">

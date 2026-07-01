@@ -34,7 +34,7 @@ import { __unstableStripHTML as wpStripHTML } from '@wordpress/dom';
 /**
  * Internal dependencies
  */
-import { wordDiff } from './suggestion-diff';
+import { wordDiff, MAX_DIFF_LENGTH } from './suggestion-diff';
 
 /**
  * Cap on how much text we'll render inline in a summary. Longer insertions
@@ -311,8 +311,18 @@ export function summarizeOperations( operations ) {
 		}
 
 		const isContent = op.attribute === 'content';
+		/*
+		 * The word diff below is O(m*n); cap the input the same way
+		 * DiffForOperation does so a payload approaching the 64KB limit
+		 * can't freeze the sidebar. Oversized content changes fall back to
+		 * the attribute-level "Format: content" line.
+		 */
 		const canTextDiff =
-			isContent && isTextLike( op.before ) && isTextLike( op.after );
+			isContent &&
+			isTextLike( op.before ) &&
+			isTextLike( op.after ) &&
+			( op.before?.length ?? 0 ) <= MAX_DIFF_LENGTH &&
+			( op.after?.length ?? 0 ) <= MAX_DIFF_LENGTH;
 
 		if ( ! canTextDiff ) {
 			attributeLabels.push( op.attribute );

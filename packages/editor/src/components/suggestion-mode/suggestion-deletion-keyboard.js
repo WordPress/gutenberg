@@ -10,6 +10,7 @@ import { create } from '@wordpress/rich-text';
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';
 import { INLINE_OP_TYPE, useSuggestionsProvider } from './provider';
 import { useSuggestionOverlay } from './overlay-context';
@@ -123,7 +124,9 @@ function hasSuggestionFormatAt( formats, index ) {
 export default function SuggestionDeletionKeyboard() {
 	const isSuggestMode = useSelect(
 		( select ) =>
-			select( EDITOR_STORE_NAME ).getEditorIntent() === SUGGEST_INTENT,
+			// `getEditorIntent` is private while Suggest mode is experimental.
+			unlock( select( EDITOR_STORE_NAME ) ).getEditorIntent() ===
+			SUGGEST_INTENT,
 		[]
 	);
 	const selectedBlockClientId = useSelect(

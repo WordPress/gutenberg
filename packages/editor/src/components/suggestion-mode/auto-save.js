@@ -47,6 +47,7 @@ import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { useSuggestionOverlay } from './overlay-context';
 import { operationsFromOverlay, useSuggestionsProvider } from './provider';
 import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';
+import { unlock } from '../../lock-unlock';
 
 const AUTOSAVE_DEBOUNCE_MS = 1500;
 
@@ -112,7 +113,9 @@ export default function SuggestionAutoSave() {
 
 	const isSuggestMode = useSelect(
 		( select ) =>
-			select( EDITOR_STORE_NAME ).getEditorIntent() === SUGGEST_INTENT,
+			// `getEditorIntent` is private while Suggest mode is experimental.
+			unlock( select( EDITOR_STORE_NAME ) ).getEditorIntent() ===
+			SUGGEST_INTENT,
 		[]
 	);
 

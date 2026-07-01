@@ -42,6 +42,7 @@ import {
 	useSuggestionOverlay,
 } from '../overlay-context';
 import { store as editorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 
 function renderWithProviders( ui, { intent = 'edit', blocks = null } = {} ) {
 	const registry = createRegistry();
@@ -63,7 +64,7 @@ function renderWithProviders( ui, { intent = 'edit', blocks = null } = {} ) {
 		registry.register( blockEditorStore );
 		registry.dispatch( blockEditorStore ).resetBlocks( blocks );
 	}
-	registry.dispatch( editorStore ).setEditorIntent( intent );
+	unlock( registry.dispatch( editorStore ) ).setEditorIntent( intent );
 
 	const wrapper = ( { children } ) => (
 		<RegistryProvider value={ registry }>
@@ -407,7 +408,7 @@ describe( 'withSuggestionBlockClassName', () => {
 		registry.register( preferencesStore );
 		registry.register( blockEditorStore );
 		registry.register( editorStore );
-		registry.dispatch( editorStore ).setEditorIntent( intent );
+		unlock( registry.dispatch( editorStore ) ).setEditorIntent( intent );
 
 		const block = createBlock( TEST_BLOCK_NAME, {
 			content: 'Hello',
@@ -508,7 +509,7 @@ describe( 'withSuggestionBlockClassName', () => {
 		registry.register( preferencesStore );
 		registry.register( blockEditorStore );
 		registry.register( editorStore );
-		registry.dispatch( editorStore ).setEditorIntent( 'edit' );
+		unlock( registry.dispatch( editorStore ) ).setEditorIntent( 'edit' );
 
 		const anchor = createBlock( TEST_BLOCK_NAME, { content: 'Anchor' } );
 		const moved = createBlock( TEST_BLOCK_NAME, {
@@ -562,7 +563,7 @@ describe( 'withSuggestionBlockClassName', () => {
 		registry.register( preferencesStore );
 		registry.register( blockEditorStore );
 		registry.register( editorStore );
-		registry.dispatch( editorStore ).setEditorIntent( 'edit' );
+		unlock( registry.dispatch( editorStore ) ).setEditorIntent( 'edit' );
 
 		// The block's only child has moved out, leaving the parent empty;
 		// the moved block now sits at the root as the parent's sibling.

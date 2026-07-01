@@ -9,6 +9,7 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';
 import { INLINE_OP_TYPE, useSuggestionsProvider } from './provider';
 import { useSuggestionOverlay } from './overlay-context';
@@ -82,7 +83,9 @@ function getCandidateDocuments() {
 export default function SuggestionAdditionKeyboard() {
 	const isSuggestMode = useSelect(
 		( select ) =>
-			select( EDITOR_STORE_NAME ).getEditorIntent() === SUGGEST_INTENT,
+			// `getEditorIntent` is private while Suggest mode is experimental.
+			unlock( select( EDITOR_STORE_NAME ) ).getEditorIntent() ===
+			SUGGEST_INTENT,
 		[]
 	);
 	const selectedBlockClientId = useSelect(

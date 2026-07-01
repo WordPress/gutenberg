@@ -54,6 +54,7 @@ import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { useSuggestionOverlay } from './overlay-context';
 import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';
 import { parseSuggestionPayload } from './provider';
+import { unlock } from '../../lock-unlock';
 
 const BLOCK_EDITOR_STORE_NAME = 'core/block-editor';
 
@@ -639,7 +640,9 @@ export default function SuggestionStoreInterceptor() {
 
 	const isSuggestMode = useSelect(
 		( select ) =>
-			select( EDITOR_STORE_NAME ).getEditorIntent() === SUGGEST_INTENT,
+			// `getEditorIntent` is private while Suggest mode is experimental.
+			unlock( select( EDITOR_STORE_NAME ) ).getEditorIntent() ===
+			SUGGEST_INTENT,
 		[]
 	);
 
@@ -782,6 +785,12 @@ export default function SuggestionStoreInterceptor() {
 
 					isReverting = true;
 					try {
+						/*
+						 * Interceptor-originated writes must not create undo
+						 * levels: Ctrl+Z after a marker write would strip the
+						 * pending marker while the overlay still holds the op.
+						 */
+						blockEditorDispatch.__unstableMarkNextChangeAsNotPersistent();
 						blockEditorDispatch.updateBlockAttributes( clientId, {
 							metadata: withSuggestionMarker( current?.metadata, {
 								type: 'pending-insert',
@@ -866,6 +875,13 @@ export default function SuggestionStoreInterceptor() {
 
 				isReverting = true;
 				try {
+					/*
+					 * The revert is a programmatic write, not a user edit:
+					 * marking it non-persistent keeps it off the undo stack,
+					 * where Ctrl+Z would otherwise re-apply the suggested
+					 * change to the real content.
+					 */
+					blockEditorDispatch.__unstableMarkNextChangeAsNotPersistent();
 					blockEditorDispatch.updateBlockAttributes(
 						clientId,
 						delta.restore
@@ -896,15 +912,38 @@ export default function SuggestionStoreInterceptor() {
 				if ( ! block ) {
 					continue;
 				}
+				/*
+				 * A block that is moved AGAIN while already carrying a
+				 * pending-move marker must keep its ORIGINAL from* fields.
+				 * `detectMovedBlocks` diffs against the previous tick, so its
+				 * from* values describe the intermediate position — writing
+				 * those would make Reject restore the block to a spot that
+				 * was itself only ever a pending suggestion.
+				 */
+				const existingMarker = currentAttrs.metadata?.suggestion;
+				const from =
+					existingMarker?.type === 'pending-move'
+						? {
+								fromAnchorClientId:
+									existingMarker.fromAnchorClientId ?? null,
+								fromParentClientId:
+									existingMarker.fromParentClientId ?? null,
+								fromIndex: existingMarker.fromIndex ?? 0,
+						  }
+						: {
+								fromAnchorClientId: move.fromAnchorClientId,
+								fromParentClientId: move.fromParentClientId,
+								fromIndex: move.fromIndex,
+						  };
 				isReverting = true;
 				try {
+					// Programmatic marker write — keep it off the undo stack.
+					blockEditorDispatch.__unstableMarkNextChangeAsNotPersistent();
 					blockEditorDispatch.updateBlockAttributes( move.clientId, {
 						metadata: withSuggestionMarker( currentAttrs.metadata, {
 							type: 'pending-move',
 							authorId: currentUserId,
-							fromAnchorClientId: move.fromAnchorClientId,
-							fromParentClientId: move.fromParentClientId,
-							fromIndex: move.fromIndex,
+							...from,
 						} ),
 					} );
 				} finally {
@@ -914,9 +953,7 @@ export default function SuggestionStoreInterceptor() {
 					type: 'block-move',
 					clientId: move.clientId,
 					blockName: block.name,
-					fromAnchorClientId: move.fromAnchorClientId,
-					fromParentClientId: move.fromParentClientId,
-					fromIndex: move.fromIndex,
+					...from,
 					toAnchorClientId: move.toAnchorClientId,
 					toParentClientId: move.toParentClientId,
 				} );
@@ -986,6 +1023,11 @@ export default function SuggestionStoreInterceptor() {
 						if ( ! block ) {
 							continue;
 						}
+						/*
+						 * Programmatic re-insert — undoing it via Ctrl+Z
+						 * would perform the suggested removal for real.
+						 */
+						blockEditorDispatch.__unstableMarkNextChangeAsNotPersistent();
 						blockEditorDispatch.insertBlock(
 							block,
 							index,
@@ -1012,6 +1054,9 @@ export default function SuggestionStoreInterceptor() {
 					const block = tree.blocksByClientId.get( clientId );
 					isReverting = true;
 					try {
+						// Programmatic marker write — keep it off the undo
+						// stack.
+						blockEditorDispatch.__unstableMarkNextChangeAsNotPersistent();
 						blockEditorDispatch.updateBlockAttributes( clientId, {
 							metadata: withSuggestionMarker(
 								currentAttrs.metadata,

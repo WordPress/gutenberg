@@ -286,8 +286,11 @@ function BlockInsertDiff( { operation } ) {
 	const blockName = operation.blockName ?? operation.block?.name ?? '';
 	const innerText = collectBlockText( operation.block );
 	const fallbackLabel = blockName
-		? // translators: %s: block name (e.g. "core/paragraph").
-		  __( 'New block: %s' ).replace( '%s', blockName )
+		? sprintf(
+				/* translators: %s: block name (e.g. "core/paragraph"). */
+				__( 'New block: %s' ),
+				blockName
+		  )
 		: __( 'New block proposed.' );
 	return (
 		<WCText
@@ -450,4 +453,4 @@ function collectBlockText( block ) {
 		: joined;
 }
 
-export { collectBlockText };
+export { collectBlockText, MAX_DIFF_LENGTH };

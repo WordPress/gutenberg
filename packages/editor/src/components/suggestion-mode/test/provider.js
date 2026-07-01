@@ -1,4 +1,26 @@
 /**
+ * External dependencies
+ */
+import { render, act } from '@testing-library/react';
+
+/**
+ * WordPress dependencies
+ */
+import {
+	createRegistry,
+	createReduxStore,
+	RegistryProvider,
+} from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as noticesStore } from '@wordpress/notices';
+import {
+	createBlock,
+	registerBlockType,
+	unregisterBlockType,
+	getBlockTypes,
+} from '@wordpress/blocks';
+
+/**
  * Internal dependencies
  */
 import {
@@ -11,6 +33,7 @@ import {
 	findStructuralOp,
 	findInlineOp,
 	clearSuggestionMarkerAttributes,
+	useSuggestionsProvider,
 } from '../provider';
 
 describe( 'operationsFromOverlay', () => {
@@ -495,5 +518,169 @@ describe( 'clearSuggestionMarkerAttributes', () => {
 				metadata: { noteId: 7, suggestion: { type: 'pending-remove' } },
 			} )
 		).toEqual( { metadata: { noteId: 7 } } );
+	} );
+} );
+
+describe( 'rejectSuggestion (block-move)', () => {
+	const PARAGRAPH = 'core/test-move-paragraph';
+	const GROUP = 'core/test-move-group';
+
+	beforeAll( () => {
+		registerBlockType( PARAGRAPH, {
+			apiVersion: 3,
+			attributes: {
+				content: { type: 'string', default: '' },
+				metadata: { type: 'object' },
+			},
+			save: () => null,
+			category: 'text',
+			title: 'Test Move Paragraph',
+		} );
+		registerBlockType( GROUP, {
+			apiVersion: 3,
+			attributes: {
+				metadata: { type: 'object' },
+			},
+			save: () => null,
+			category: 'design',
+			title: 'Test Move Group',
+		} );
+	} );
+
+	afterAll( () => {
+		getBlockTypes().forEach( ( block ) =>
+			unregisterBlockType( block.name )
+		);
+	} );
+
+	/*
+	 * The provider persists lifecycle updates through core-data's
+	 * `saveEntityRecord`. A stub registered under the same store name keeps
+	 * the reject flow synchronous and network-free — the assertions here are
+	 * about the block tree, not the REST round-trip.
+	 */
+	function createStubCoreStore() {
+		return createReduxStore( 'core', {
+			reducer: ( state = {} ) => state,
+			actions: {
+				saveEntityRecord: () => ( { type: 'SAVE_ENTITY_RECORD' } ),
+			},
+			selectors: {
+				getEditedEntityRecord: () => null,
+				getEntityRecord: () => null,
+				getCurrentUser: () => null,
+			},
+		} );
+	}
+
+	function setup( initialBlocks ) {
+		const registry = createRegistry();
+		registry.register( noticesStore );
+		registry.register( blockEditorStore );
+		registry.register( createStubCoreStore() );
+		registry.dispatch( blockEditorStore ).resetBlocks( initialBlocks );
+
+		let providerHandle;
+		function CaptureProvider() {
+			providerHandle = useSuggestionsProvider();
+			return null;
+		}
+
+		render(
+			<RegistryProvider value={ registry }>
+				<CaptureProvider />
+			</RegistryProvider>
+		);
+
+		return { registry, getProvider: () => providerHandle };
+	}
+
+	function movePayload( structuralOp ) {
+		return {
+			schemaVersion: 2,
+			blockName: PARAGRAPH,
+			baseRevision: null,
+			operations: [ structuralOp ],
+		};
+	}
+
+	it( 'restores a cross-parent move back to the original parent', async () => {
+		// Current state: the block was suggested-moved from the root (index
+		// 0) INTO the group. Reject must restore it to the root.
+		const moved = createBlock( PARAGRAPH, {
+			content: 'Moved',
+			metadata: { suggestion: { type: 'pending-move' } },
+		} );
+		const sibling = createBlock( PARAGRAPH, { content: 'Sibling' } );
+		const group = createBlock( GROUP, {}, [
+			createBlock( PARAGRAPH, { content: 'Child' } ),
+			moved,
+		] );
+
+		const { registry, getProvider } = setup( [ sibling, group ] );
+
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 1,
+				clientId: moved.clientId,
+				payload: movePayload( {
+					type: 'block-move',
+					clientId: moved.clientId,
+					blockName: PARAGRAPH,
+					fromParentClientId: null,
+					fromIndex: 0,
+					toParentClientId: group.clientId,
+				} ),
+			} );
+		} );
+
+		const blockEditor = registry.select( blockEditorStore );
+		// The block is back at the ROOT (its original parent), not stuck
+		// inside the group. Before the fix, `moveBlockToPosition` received
+		// the original parent as both from- and to-root, missed the block in
+		// the destination parent, and silently left the tree unchanged.
+		expect( blockEditor.getBlockRootClientId( moved.clientId ) || '' ).toBe(
+			''
+		);
+		expect( blockEditor.getBlockIndex( moved.clientId ) ).toBe( 0 );
+		// The pending-move marker is cleared.
+		expect(
+			blockEditor.getBlockAttributes( moved.clientId )?.metadata
+				?.suggestion
+		).toBeUndefined();
+	} );
+
+	it( 'restores a same-parent move back to its original index', async () => {
+		const a = createBlock( PARAGRAPH, { content: 'A' } );
+		const moved = createBlock( PARAGRAPH, {
+			content: 'Moved',
+			metadata: { suggestion: { type: 'pending-move' } },
+		} );
+		const b = createBlock( PARAGRAPH, { content: 'B' } );
+
+		// Current order: [A, B, Moved] — the block was suggested-moved from
+		// index 0 to the end of the root.
+		const { registry, getProvider } = setup( [ a, b, moved ] );
+
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 2,
+				clientId: moved.clientId,
+				payload: movePayload( {
+					type: 'block-move',
+					clientId: moved.clientId,
+					blockName: PARAGRAPH,
+					fromParentClientId: null,
+					fromIndex: 0,
+					toParentClientId: null,
+				} ),
+			} );
+		} );
+
+		const blockEditor = registry.select( blockEditorStore );
+		expect( blockEditor.getBlockIndex( moved.clientId ) ).toBe( 0 );
+		expect( blockEditor.getBlockRootClientId( moved.clientId ) || '' ).toBe(
+			''
+		);
 	} );
 } );

@@ -35,6 +35,7 @@ import {
 	useSuggestionOverlay,
 } from '../overlay-context';
 import { store as editorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 
 describe( 'shallowAttributeEquals', () => {
 	it( 'treats reference-equal values as equal', () => {
@@ -184,7 +185,7 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		registry.register( preferencesStore );
 		registry.register( blockEditorStore );
 		registry.register( editorStore );
-		registry.dispatch( editorStore ).setEditorIntent( 'suggest' );
+		unlock( registry.dispatch( editorStore ) ).setEditorIntent( 'suggest' );
 
 		const block =
 			initialBlocks?.[ 0 ] ??
@@ -727,6 +728,58 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		} );
 	} );
 
+	it( 'preserves the ORIGINAL from-position when a pending-move block is moved again', async () => {
+		// Reject must restore the true baseline. If a second move
+		// overwrote the marker with the intermediate position, rejecting
+		// the suggestion would "restore" the block to a spot it only ever
+		// occupied as a pending suggestion.
+		const a = createBlock( TEST_BLOCK_NAME, { content: 'A' } );
+		const b = createBlock( TEST_BLOCK_NAME, { content: 'B' } );
+		const c = createBlock( TEST_BLOCK_NAME, { content: 'C' } );
+		const d = createBlock( TEST_BLOCK_NAME, { content: 'D' } );
+		const { registry, getOverlay } = setup( {
+			initialBlocks: [ a, b, c, d ],
+		} );
+
+		// First move: B from index 1 to index 3.
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.moveBlockToPosition( b.clientId, '', '', 3 );
+		} );
+		await flushSubscribers();
+
+		// Second move: B from index 3 back up to index 2.
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.moveBlockToPosition( b.clientId, '', '', 2 );
+		} );
+		await flushSubscribers();
+
+		const marker = registry
+			.select( blockEditorStore )
+			.getBlockAttributes( b.clientId )?.metadata?.suggestion;
+		expect( marker ).toMatchObject( {
+			type: 'pending-move',
+			// The baseline position from BEFORE the first move — not the
+			// intermediate index 3.
+			fromIndex: 1,
+			fromAnchorClientId: a.clientId,
+			fromParentClientId: null,
+		} );
+
+		expect(
+			getOverlay().entries[ b.clientId ]?.structuralOp
+		).toMatchObject( {
+			type: 'block-move',
+			clientId: b.clientId,
+			fromIndex: 1,
+			fromAnchorClientId: a.clientId,
+			fromParentClientId: null,
+		} );
+	} );
+
 	it( 'tags only the top-level new block when an inserted subtree contains nested children', async () => {
 		// A Group block with a child paragraph dispatches both as new in
 		// the same tick. The interceptor must tag only the top-level
@@ -759,6 +812,73 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		expect(
 			insertedChild?.attributes?.metadata?.suggestion
 		).toBeUndefined();
+	} );
+
+	it( 'marks the attribute revert as non-persistent so it creates no undo level', async () => {
+		// Without the mark, Ctrl+Z after an intercepted edit would undo the
+		// REVERT — re-applying the suggested change to the real content.
+		const { registry, clientId } = setup();
+
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( clientId, { content: 'Edited' } );
+		} );
+		await flushSubscribers();
+
+		// Sanity: the interceptor reverted the store to the baseline.
+		expect(
+			registry.select( blockEditorStore ).getBlockAttributes( clientId )
+				?.content
+		).toBe( 'Hello' );
+		// The revert was the last block change and must not be persistent —
+		// the editor's undo machinery only cuts an undo level for persistent
+		// changes.
+		expect(
+			registry.select( blockEditorStore ).isLastBlockChangePersistent()
+		).toBe( false );
+	} );
+
+	it( 'marks the pending-remove re-insert and marker write as non-persistent', async () => {
+		const { registry, clientId } = setup();
+
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).removeBlock( clientId );
+		} );
+		await flushSubscribers();
+
+		// Sanity: the apply-and-tag flow re-inserted and tagged the block.
+		expect(
+			registry.select( blockEditorStore ).getBlockAttributes( clientId )
+				?.metadata?.suggestion?.type
+		).toBe( 'pending-remove' );
+		expect(
+			registry.select( blockEditorStore ).isLastBlockChangePersistent()
+		).toBe( false );
+	} );
+
+	it( 'marks the pending-insert marker write as non-persistent', async () => {
+		const { registry } = setup();
+
+		const inserted = createBlock( TEST_BLOCK_NAME, {
+			content: 'Suggested insertion',
+		} );
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.insertBlock( inserted, 1, undefined, false );
+		} );
+		await flushSubscribers();
+
+		expect(
+			registry
+				.select( blockEditorStore )
+				.getBlockAttributes( inserted.clientId )?.metadata?.suggestion
+				?.type
+		).toBe( 'pending-insert' );
+		expect(
+			registry.select( blockEditorStore ).isLastBlockChangePersistent()
+		).toBe( false );
 	} );
 } );
 

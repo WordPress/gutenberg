@@ -9,6 +9,7 @@ export {
 	SUGGESTED_ADDITION_FORMAT,
 	registerSuggestionFormats,
 } from './inline-formats';
+export { isSuggestionModeEnabled, useCanSuggest } from './gate';
 export {
 	SuggestionOverlayProvider,
 	useSuggestionOverlay,
@@ -19,6 +20,7 @@ export {
 	registerSuggestionOverlayFilter,
 } from './with-suggestion-overlay';
 export { default as SuggestionAutoSave } from './auto-save';
+export { default as SuggestionSaveLock } from './save-lock';
 export { default as SuggestionStoreInterceptor } from './store-interceptor';
 export { default as SuggestionDeletionKeyboard } from './suggestion-deletion-keyboard';
 export { default as SuggestionAdditionKeyboard } from './suggestion-addition-keyboard';

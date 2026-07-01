@@ -427,6 +427,7 @@ export function useSuggestionsProvider() {
 		useDispatch( blockEditorStore );
 	const {
 		getBlockAttributes: selectBlockAttributes,
+		getBlockRootClientId: selectBlockRootClientId,
 		getClientIdsWithDescendants: selectClientIdsWithDescendants,
 	} = useSelect( blockEditorStore );
 	const { requestInterceptorBypass, clearOverlay } = useSuggestionOverlay();
@@ -944,9 +945,16 @@ export function useSuggestionsProvider() {
 					clearOverlay( clientId );
 					moveBlockToPosition(
 						clientId,
-						// `moveBlockToPosition` expects '' (not null) for
-						// the root.
-						structuralOp.fromParentClientId ?? '',
+						/*
+						 * `fromRootClientId` must be the block's CURRENT
+						 * parent: after a cross-parent move the block lives
+						 * in the destination parent, and the reducer looks
+						 * the block up there. Passing the original parent
+						 * for both roots made cross-parent rejects silently
+						 * no-op. `moveBlockToPosition` expects '' (not null)
+						 * for the root.
+						 */
+						selectBlockRootClientId( clientId ) ?? '',
 						structuralOp.fromParentClientId ?? '',
 						structuralOp.fromIndex ?? 0
 					);
@@ -1033,6 +1041,7 @@ export function useSuggestionsProvider() {
 			createNotice,
 			selectBlockAttributes,
 			selectClientIdsWithDescendants,
+			selectBlockRootClientId,
 			updateBlockAttributes,
 			removeBlock,
 			moveBlockToPosition,
