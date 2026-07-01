@@ -179,19 +179,24 @@ const restrictedSyntax = [
 		'BorderBoxControl',
 		'BorderControl',
 		'BoxControl',
+		'ComboboxControl',
 		'FocalPointPicker',
+		'FontAppearanceControl',
 		'FontFamilyControl',
 		'FontSizePicker',
+		'FormFileUpload',
 		'LetterSpacingControl',
 		'LineHeightControl',
 		'QueryControls',
 		'RangeControl',
+		'Radio',
 		'SearchControl',
 		'TextControl',
 		'TextIndentControl',
+		'ToggleGroupControl',
 		'TreeSelect',
 	].map( ( componentName ) => ( {
-		selector: `JSXElement[openingElement.name.name="${ componentName }"] JSXAttribute[name.name="__next40pxDefaultSize"]`,
+		selector: `JSXOpeningElement[name.name="${ componentName }"] > JSXAttribute[name.name="__next40pxDefaultSize"]`,
 		message: `The \`__next40pxDefaultSize\` prop is no longer needed on \`${ componentName }\`.`,
 	} ) ),
 	{
@@ -372,10 +377,18 @@ export default dedupePlugins( [
 		files: developmentFiles,
 		rules: {
 			'import/default': 'off',
-			'import/no-extraneous-dependencies': 'off',
 			'import/no-unresolved': 'off',
 			'import/named': 'off',
 			'@wordpress/data-no-store-string-literals': 'off',
+		},
+	},
+
+	// Override: Fixture files are usually not run as real code and instead
+	// analyzed statically, so validating dependencies is unnecessary.
+	{
+		files: [ '**/fixtures/**' ],
+		rules: {
+			'import/no-extraneous-dependencies': 'off',
 		},
 	},
 
