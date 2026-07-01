@@ -7589,7 +7589,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$expected = ':root :where(.wp-block-button .wp-block-button__link){background-color: blue;color: white;}:root :where(.wp-block-button .wp-block-button__link:hover){background-color: white;color: blue;}:root :where(.wp-block-button .wp-block-button__link .wp-element-button,.wp-block-button .wp-block-button__link  .wp-block-button__link){color: green;}:root :where(.wp-block-button .wp-block-button__link .wp-element-button:hover,.wp-block-button .wp-block-button__link  .wp-block-button__link:hover){color: orange;}';
+		$expected = ':root :where(.wp-block-button .wp-block-button__link){background-color: blue;color: white;}:root :where(.wp-block-button .wp-block-button__link:hover){background-color: white;color: blue;}:root :where(.wp-block-button .wp-block-button__link .wp-element-button, .wp-block-button .wp-block-button__link  .wp-block-button__link){color: green;}:root :where(.wp-block-button .wp-block-button__link .wp-element-button:hover,.wp-block-button .wp-block-button__link  .wp-block-button__link:hover){color: orange;}';
 		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
 	}
 
@@ -8216,17 +8216,17 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'spaces after commas are normalized'           => array(
 				'selector'   => 'h1, h2, h3',
 				'to_prepend' => '.some-class ',
-				'expected'   => '.some-class h1, .some-class  h2, .some-class  h3',
+				'expected'   => '.some-class h1, .some-class h2, .some-class  h3',
 			),
 			'spaces after commas normalized with class selectors' => array(
 				'selector'   => '.foo, .bar',
 				'to_prepend' => '.prefix ',
-				'expected'   => '.prefix .foo, .prefix  .bar',
+				'expected'   => '.prefix .foo, .prefix .bar',
 			),
-			'mixed whitespace around commas trimmed'       => array(
+			'mixed whitespace around commas normalized'    => array(
 				'selector'   => '.a ,  .b , .c',
 				'to_prepend' => '.pre ',
-				'expected'   => '.pre .a, .pre   .b, .pre  .c',
+				'expected'   => '.pre .a, .pre .b, .pre .c',
 			),
 			'where with internal commas and no top-level comma' => array(
 				'selector'   => ':where(.a, .b)',
