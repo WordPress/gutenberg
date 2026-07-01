@@ -2100,12 +2100,8 @@ async function generateWidgetRegistry( widgets, replacements ) {
 		.map( ( widget ) => {
 			const hasRenderStr = widget.hasRender ? 'true' : 'false';
 			const hasWidgetStr = widget.hasWidget ? 'true' : 'false';
-			const presentationStr = widget.presentation
-				? `'${ widget.presentation }'`
-				: 'null';
-			const categoryStr = widget.category
-				? `'${ widget.category }'`
-				: 'null';
+			const presentationStr = toPhpStringLiteral( widget.presentation );
+			const categoryStr = toPhpStringLiteral( widget.category );
 			const titleStr = toPhpStringLiteral( widget.title );
 			const descriptionStr = toPhpStringLiteral( widget.description );
 			const keywordsStr = toPhpStringArrayLiteral( widget.keywords );
