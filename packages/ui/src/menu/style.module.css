@@ -67,16 +67,12 @@
 
 		.has-selection-indicator {
 			--wp-ui-menu-selection-indicator-size: var(--wpds-dimension-size-sm);
-
-			position: relative;
-			padding-inline-start: calc(var(--wp-ui-popup-item-padding-inline) + var(--wp-ui-menu-selection-indicator-size));
 		}
 
 		.item-selection-indicator {
-			position: absolute;
-			inset-block-start: 50%;
-			inset-inline-start: calc(var(--wp-ui-popup-item-padding-inline) - var(--wpds-dimension-padding-xs));
-			translate: 0 -50%;
+			grid-column: 1;
+			align-self: center;
+			justify-self: center;
 			display: flex;
 			align-items: center;
 			justify-content: center;
@@ -91,24 +87,20 @@
 		}
 
 		.item-prefix {
-			grid-column: 1;
+			flex-shrink: 0;
 			display: flex;
 			align-items: center;
 			justify-content: center;
 			gap: var(--wpds-dimension-gap-xs);
-			color: var(--wpds-color-foreground-content-neutral-weak);
-		}
-
-		.item-prefix:not(:empty) {
 			margin-inline-end: var(--wpds-dimension-gap-sm);
+			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
 		.item-content {
 			grid-column: 2;
 			display: flex;
 			align-items: center;
-			justify-content: space-between;
-			gap: var(--wpds-dimension-gap-md);
+			justify-content: flex-start;
 			min-width: 0;
 			/* Keep clicks on presentational labels and suffixes routed to the menu item. */
 			pointer-events: none;
@@ -133,6 +125,7 @@
 			flex-shrink: 0;
 			display: flex;
 			align-items: center;
+			margin-inline-start: var(--wpds-dimension-gap-md);
 			gap: var(--wpds-dimension-gap-xs);
 			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
