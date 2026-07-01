@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createRef } from '@wordpress/element';
+import { createRef, useId } from '@wordpress/element';
 import * as Menu from '../index';
 
 describe( 'Menu', () => {
@@ -134,6 +134,54 @@ describe( 'Menu', () => {
 		} );
 
 		expect( item ).toHaveAccessibleDescription( 'Create a separate copy.' );
+	} );
+
+	it( 'uses custom item label and description ids for generated aria relationships', async () => {
+		const user = userEvent.setup();
+
+		function MenuWithCustomTextIds() {
+			const externalDescriptionId = useId();
+			const labelId = useId();
+			const descriptionId = useId();
+
+			return (
+				<Menu.Root>
+					<Menu.Trigger>Actions</Menu.Trigger>
+					<Menu.Popup>
+						<span id={ externalDescriptionId }>
+							Available offline.
+						</span>
+						<Menu.Item aria-describedby={ externalDescriptionId }>
+							<Menu.ItemLabel id={ labelId }>
+								Download
+							</Menu.ItemLabel>
+							<Menu.ItemDescription id={ descriptionId }>
+								Save a local copy.
+							</Menu.ItemDescription>
+						</Menu.Item>
+					</Menu.Popup>
+				</Menu.Root>
+			);
+		}
+
+		render( <MenuWithCustomTextIds /> );
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+		await screen.findByRole( 'menu' );
+
+		const label = screen.getByText( 'Download' );
+		const externalDescription = screen.getByText( 'Available offline.' );
+		const description = screen.getByText( 'Save a local copy.' );
+		const item = await screen.findByRole( 'menuitem', {
+			name: 'Download',
+			description: 'Available offline. Save a local copy.',
+		} );
+
+		expect( item ).toHaveAttribute( 'aria-labelledby', label.id );
+		expect( item ).toHaveAttribute(
+			'aria-describedby',
+			`${ externalDescription.id } ${ description.id }`
+		);
 	} );
 
 	it( 'does not generate a label relationship when an explicit aria-label is provided', async () => {

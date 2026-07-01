@@ -14,7 +14,7 @@ const ItemDescription = forwardRef< HTMLSpanElement, ItemDescriptionProps >(
 		return (
 			<span
 				ref={ ref }
-				id={ itemContentContext?.descriptionId ?? id }
+				id={ id ?? itemContentContext?.descriptionId }
 				className={ clsx(
 					itemPopupStyles[ 'item-description' ],
 					className

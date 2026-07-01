@@ -15,7 +15,7 @@ const ItemLabel = forwardRef< HTMLSpanElement, ItemLabelProps >(
 		return (
 			<span
 				ref={ ref }
-				id={ itemContentContext?.labelId ?? id }
+				id={ id ?? itemContentContext?.labelId }
 				className={ clsx(
 					itemPopupStyles[ 'item-label' ],
 					styles[ 'item-label' ],

@@ -21,17 +21,31 @@ type ItemAriaProps = Pick<
 
 function getStructuredItemContent( children: ItemProps[ 'children' ] ) {
 	const childArray = Children.toArray( children );
+	const label = childArray.find(
+		( child ) =>
+			isValidElement< { id?: string } >( child ) &&
+			child.type === ItemLabel
+	);
+	const description = childArray.find(
+		( child ) =>
+			isValidElement< { id?: string } >( child ) &&
+			child.type === ItemDescription
+	);
 
 	return {
-		hasDescription: childArray.some(
-			( child ) =>
-				isValidElement( child ) && child.type === ItemDescription
-		),
+		descriptionId: isValidElement< { id?: string } >( description )
+			? description.props.id
+			: undefined,
+		hasDescription: !! description,
+		hasLabel: !! label,
 		hasStructuredContent: childArray.some(
 			( child ) =>
 				isValidElement( child ) &&
 				( child.type === ItemLabel || child.type === ItemDescription )
 		),
+		labelId: isValidElement< { id?: string } >( label )
+			? label.props.id
+			: undefined,
 	};
 }
 
@@ -43,11 +57,24 @@ function useItemContent(
 		'aria-labelledby': ariaLabelledBy,
 	}: ItemAriaProps
 ) {
-	const labelId = useId();
-	const descriptionId = useId();
-	const { hasDescription } = getStructuredItemContent( children );
+	const generatedLabelId = useId();
+	const generatedDescriptionId = useId();
+	const {
+		descriptionId,
+		hasDescription,
+		hasLabel,
+		hasStructuredContent,
+		labelId,
+	} = getStructuredItemContent( children );
+	const resolvedLabelId =
+		labelId ??
+		( hasLabel || ! hasStructuredContent ? generatedLabelId : undefined );
+	const resolvedDescriptionId = descriptionId ?? generatedDescriptionId;
 
-	const describedBy = [ ariaDescribedBy, hasDescription && descriptionId ]
+	const describedBy = [
+		ariaDescribedBy,
+		hasDescription && resolvedDescriptionId,
+	]
 		.filter( Boolean )
 		.join( ' ' );
 	/*
@@ -55,12 +82,13 @@ function useItemContent(
 	 * name algorithm. Only provide our generated label relationship when the
 	 * consumer has not supplied either explicit naming prop.
 	 */
-	const labelledBy = ariaLabelledBy ?? ( ariaLabel ? undefined : labelId );
+	const labelledBy =
+		ariaLabelledBy ?? ( ariaLabel ? undefined : resolvedLabelId );
 
 	return {
 		contentContextValue: {
-			labelId,
-			descriptionId,
+			descriptionId: resolvedDescriptionId,
+			labelId: resolvedLabelId,
 		},
 		itemAriaProps: {
 			'aria-describedby': describedBy || undefined,
