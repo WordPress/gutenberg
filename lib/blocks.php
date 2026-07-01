@@ -406,7 +406,6 @@ add_filter( 'force_filtered_html_on_import', '_gutenberg_footnotes_force_filtere
  * and an ID. When provided, the ID is added to the array before do_blocks()
  * and removed after, preventing infinite loops when content references itself.
  *
- * @since 19.9.0
  * @access private
  *
  * @param string      $content  The content to process.

@@ -55,6 +55,11 @@ class Tests_Blocks_RenderLatestPosts extends WP_UnitTestCase {
 		foreach ( self::$attachment_ids as $attachment_id ) {
 			wp_delete_post( $attachment_id, true );
 		}
+		foreach ( self::$posts as $post ) {
+			wp_delete_post( $post->ID, true );
+		}
+		unstick_post( self::$sticky_post->ID );
+		wp_delete_post( self::$sticky_post->ID, true );
 	}
 
 	public function set_up() {
@@ -307,13 +312,7 @@ class Tests_Blocks_RenderLatestPosts extends WP_UnitTestCase {
 			'Paragraph block should be parsed and rendered'
 		);
 
-		// Verify that recursion protection works correctly.
-		// The nested Latest Posts block will render its wrapper, but the recursive post's content
-		// should be empty. We verify this by checking that the post content div for the recursive
-		// post is present but empty (or contains only the nested block wrapper without nested content).
-
-		// The key assertion: no infinite recursion occurred (test completes without memory exhaustion).
-		// Additionally, verify that the nested Latest Posts block was parsed (not raw markup).
+		// Verify that the nested Latest Posts block was parsed (not raw markup).
 		// The block markup comment should not appear in the output since do_blocks() parses it.
 		$this->assertStringNotContainsString(
 			'<!-- wp:latest-posts',
@@ -321,34 +320,20 @@ class Tests_Blocks_RenderLatestPosts extends WP_UnitTestCase {
 			'Nested Latest Posts block markup should be parsed by do_blocks(), not present as raw markup'
 		);
 
-		// Verify that the recursive post's full content div exists but the nested block's
-		// recursive post content is empty (prevented by recursion protection).
-		// Extract the post content for the post containing the Latest Posts block.
-		$post_content_pattern = '/<div class="wp-block-latest-posts__post-full-content">(.*?)<\/div>/s';
-		preg_match_all( $post_content_pattern, $output, $matches );
-
-		// Find the post content div that contains the nested Latest Posts block.
-		// The nested block will render its wrapper, but when it tries to render the recursive post,
-		// that post's content will be empty due to recursion protection.
-		$found_nested_block = false;
-		foreach ( $matches[1] as $content ) {
-			if ( strpos( $content, 'wp-block-latest-posts__list' ) !== false ) {
-				$found_nested_block = true;
-				// The nested block's list should exist, but verify recursion protection worked
-				// by checking that we don't have infinite nesting (more than 2 levels).
-				$nested_list_count = substr_count( $content, 'wp-block-latest-posts__list' );
-				$this->assertLessThanOrEqual(
-					1,
-					$nested_list_count,
-					'Nested Latest Posts block should not contain further nested blocks (recursion protection prevents infinite nesting)'
-				);
-				break;
-			}
-		}
-
-		$this->assertTrue(
-			$found_nested_block,
-			'Nested Latest Posts block should be rendered (parsed by do_blocks())'
+		// Verify recursion protection: the nested block renders once (producing a second
+		// wp-block-latest-posts__list wrapper) but does not trigger further recursive rendering.
+		// Counting occurrences of the list class is robust to changes in inner HTML structure.
+		// Infinite recursion would produce far more than 3 occurrences.
+		$list_count = substr_count( $output, 'wp-block-latest-posts__list' );
+		$this->assertGreaterThanOrEqual(
+			2,
+			$list_count,
+			'Output should contain at least 2 list wrappers: the outer block and the nested block'
+		);
+		$this->assertLessThanOrEqual(
+			3,
+			$list_count,
+			'Recursion protection should prevent more than one level of nesting'
 		);
 	}
 
