@@ -1,19 +1,19 @@
 <?php
 
 /**
- * Controller which provides REST endpoint for registered icons.
+ * Controller which provides REST endpoint for registered icon collections.
  *
  * @package gutenberg
  */
 
-if ( ! class_exists( 'WP_REST_Icons_Controller' ) ) {
-	class WP_REST_Icons_Controller extends WP_REST_Controller {
+if ( ! class_exists( 'WP_REST_Icon_Collections_Controller' ) ) {
+	class WP_REST_Icon_Collections_Controller extends WP_REST_Controller {
 		/**
 		 * Constructs the controller.
 		 */
 		public function __construct() {
 			$this->namespace = 'wp/v2';
-			$this->rest_base = 'icons';
+			$this->rest_base = 'icon-collections';
 		}
 
 		/**
@@ -36,11 +36,11 @@ if ( ! class_exists( 'WP_REST_Icons_Controller' ) ) {
 
 			register_rest_route(
 				$this->namespace,
-				'/' . $this->rest_base . '/(?P<name>[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?/[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?)',
+				'/' . $this->rest_base . '/(?P<slug>[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?)',
 				array(
 					'args'   => array(
-						'name' => array(
-							'description' => __( 'Icon name.', 'gutenberg' ),
+						'slug' => array(
+							'description' => __( 'Icon collection slug.', 'gutenberg' ),
 							'type'        => 'string',
 						),
 					),
@@ -58,7 +58,7 @@ if ( ! class_exists( 'WP_REST_Icons_Controller' ) ) {
 		}
 
 		/**
-		 * Checks whether a given request has permission to read icons.
+		 * Checks whether a given request has permission to read icon collections.
 		 *
 		 * @param WP_REST_Request $_request Full details about the request.
 		 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
@@ -79,13 +79,13 @@ if ( ! class_exists( 'WP_REST_Icons_Controller' ) ) {
 
 			return new WP_Error(
 				'rest_cannot_view',
-				__( 'Sorry, you are not allowed to view the registered icons.', 'gutenberg' ),
+				__( 'Sorry, you are not allowed to view the registered icon collections.', 'gutenberg' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
 
 		/**
-		 * Checks if a given request has access to read a specific icon.
+		 * Checks if a given request has access to read a specific icon collection.
 		 *
 		 * @param WP_REST_Request $request Full details about the request.
 		 * @return true|WP_Error True if the request has read access for the item, WP_Error object otherwise.
@@ -100,76 +100,60 @@ if ( ! class_exists( 'WP_REST_Icons_Controller' ) ) {
 		}
 
 		/**
-		 * Retrieves all icons.
+		 * Retrieves all icon collections.
 		 *
 		 * @param WP_REST_Request $request Full details about the request.
 		 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 		 */
 		public function get_items( $request ) {
-			$response = array();
-			$search   = $request->get_param( 'search' );
-			$icons    = WP_Icons_Registry::get_instance()->get_registered_icons( $search );
-			foreach ( $icons as $icon ) {
-				$prepared_icon = $this->prepare_item_for_response( $icon, $request );
-				$response[]    = $this->prepare_response_for_collection( $prepared_icon );
+			$response    = array();
+			$collections = WP_Icon_Collections_Registry::get_instance()->get_all_registered();
+			foreach ( $collections as $collection ) {
+				$prepared_collection = $this->prepare_item_for_response( $collection, $request );
+				$response[]          = $this->prepare_response_for_collection( $prepared_collection );
 			}
 			return rest_ensure_response( $response );
 		}
 
 		/**
-		 * Retrieves a specific icon.
+		 * Retrieves a specific icon collection.
 		 *
 		 * @param WP_REST_Request $request Full details about the request.
 		 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 		 */
 		public function get_item( $request ) {
-			$icon = $this->get_icon( $request['name'] );
-			if ( is_wp_error( $icon ) ) {
-				return $icon;
-			}
+			$registry   = WP_Icon_Collections_Registry::get_instance();
+			$collection = $registry->get_registered( $request['slug'] );
 
-			$data = $this->prepare_item_for_response( $icon, $request );
-			return rest_ensure_response( $data );
-		}
-
-		/**
-		 * Retrieves a specific icon from the registry.
-		 *
-		 * @param string $name Icon name.
-		 * @return array|WP_Error Icon data on success, or WP_Error object on failure.
-		 */
-		public function get_icon( $name ) {
-			$registry = WP_Icons_Registry::get_instance();
-			$icon     = $registry->get_registered_icon( $name );
-
-			if ( null === $icon ) {
+			if ( null === $collection ) {
 				return new WP_Error(
-					'rest_icon_not_found',
+					'rest_icon_collection_not_found',
 					sprintf(
-						// translators: %s is the name of any user-provided name
-						__( 'Icon not found: "%s".', 'gutenberg' ),
-						$name
+						/* translators: %s: Icon collection slug. */
+						__( 'Icon collection not found: "%s".', 'gutenberg' ),
+						$request['slug']
 					),
 					array( 'status' => 404 )
 				);
 			}
 
-			return $icon;
+			$data = $this->prepare_item_for_response( $collection, $request );
+			return rest_ensure_response( $data );
 		}
 
 		/**
-		 * Prepare a raw icon before it gets output in a REST API response.
+		 * Prepare a raw icon collection before it gets output in a REST API response.
 		 *
-		 * @param array           $item    Raw icon as registered, before any changes.
+		 * @param array           $item    Raw icon collection as registered, before any changes.
 		 * @param WP_REST_Request $request Request object.
 		 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 		 */
 		public function prepare_item_for_response( $item, $request ) {
 			$fields = $this->get_fields_for_response( $request );
 			$keys   = array(
-				'name'    => 'name',
-				'label'   => 'label',
-				'content' => 'content',
+				'slug'        => 'slug',
+				'label'       => 'label',
+				'description' => 'description',
 			);
 			$data   = array();
 			foreach ( $keys as $item_key => $rest_key ) {
@@ -185,7 +169,7 @@ if ( ! class_exists( 'WP_REST_Icons_Controller' ) ) {
 		}
 
 		/**
-		 * Retrieves the icon schema, conforming to JSON Schema.
+		 * Retrieves the icon collection schema, conforming to JSON Schema.
 		 *
 		 * @return array Item schema data.
 		 */
@@ -196,23 +180,23 @@ if ( ! class_exists( 'WP_REST_Icons_Controller' ) ) {
 
 			$schema = array(
 				'$schema'    => 'http://json-schema.org/draft-04/schema#',
-				'title'      => 'icon',
+				'title'      => 'icon-collection',
 				'type'       => 'object',
 				'properties' => array(
-					'name'    => array(
-						'description' => __( 'The icon name.', 'gutenberg' ),
+					'slug'        => array(
+						'description' => __( 'The icon collection slug.', 'gutenberg' ),
 						'type'        => 'string',
 						'readonly'    => true,
 						'context'     => array( 'view', 'edit', 'embed' ),
 					),
-					'label'   => array(
-						'description' => __( 'The icon label.', 'gutenberg' ),
+					'label'       => array(
+						'description' => __( 'The icon collection label.', 'gutenberg' ),
 						'type'        => 'string',
 						'readonly'    => true,
 						'context'     => array( 'view', 'edit', 'embed' ),
 					),
-					'content' => array(
-						'description' => __( 'The icon content (SVG markup).', 'gutenberg' ),
+					'description' => array(
+						'description' => __( 'The icon collection description.', 'gutenberg' ),
 						'type'        => 'string',
 						'readonly'    => true,
 						'context'     => array( 'view', 'edit', 'embed' ),
@@ -226,7 +210,7 @@ if ( ! class_exists( 'WP_REST_Icons_Controller' ) ) {
 		}
 
 		/**
-		 * Retrieves the query params for the icons collection.
+		 * Retrieves the query params for the icon collections collection.
 		 *
 		 * @return array Collection parameters.
 		 */

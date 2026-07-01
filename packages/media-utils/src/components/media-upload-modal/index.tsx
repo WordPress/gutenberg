@@ -77,6 +77,21 @@ const defaultQueryParams: ViewQueryParams = {
 	search: '',
 };
 
+/**
+ * Derives the selection (attachment IDs as strings) from the `value` prop, which
+ * may be a single id, an array of ids, or undefined.
+ *
+ * @param value The currently selected media item(s).
+ */
+function getSelectionFromValue(
+	value: number | number[] | undefined
+): string[] {
+	if ( ! value ) {
+		return [];
+	}
+	return Array.isArray( value ) ? value.map( String ) : [ String( value ) ];
+}
+
 const defaultView: View = {
 	type: LAYOUT_PICKER_GRID,
 	fields: [],
@@ -125,8 +140,9 @@ interface MediaUploadModalProps {
 	multiple?: boolean;
 
 	/**
-	 * The currently selected media item(s).
-	 * Can be a single ID number or array of IDs for multiple selection.
+	 * Media item(s) to pre-select — a single ID or an array of IDs. Seeds the
+	 * selection each time the modal opens (so an external change is picked up on
+	 * the next open); changes while the modal is open are not tracked.
 	 */
 	value?: number | number[];
 
@@ -222,14 +238,9 @@ export function MediaUploadModal( {
 	search = true,
 	searchLabel = __( 'Search media' ),
 }: MediaUploadModalProps ) {
-	const [ selection, setSelection ] = useState< string[] >( () => {
-		if ( ! value ) {
-			return [];
-		}
-		return Array.isArray( value )
-			? value.map( String )
-			: [ String( value ) ];
-	} );
+	const [ selection, setSelection ] = useState< string[] >( () =>
+		getSelectionFromValue( value )
+	);
 
 	const { createSuccessNotice, removeAllNotices } =
 		useDispatch( noticesStore );
@@ -466,8 +477,24 @@ export function MediaUploadModal( {
 		onClose?.();
 	}, [ removeAllNotices, onClose ] );
 
+	// Keep the latest `value` in a ref so the open effect can read it without
+	// depending on it. Not depending on `value` means a change while the modal is
+	// open won't discard the user's in-progress selection, and an unstable array
+	// prop can't retrigger the effect.
+	const valueRef = useRef( value );
 	useEffect( () => {
-		if ( ! isOpen ) {
+		valueRef.current = value;
+	}, [ value ] );
+
+	useEffect( () => {
+		if ( isOpen ) {
+			// The modal instance stays mounted between opens, so re-seed the
+			// selection from the current `value` each time it opens. This clears
+			// a previous session's selection and picks up any change to `value`
+			// made while the modal was closed.
+			setSelection( getSelectionFromValue( valueRef.current ) );
+		} else {
+			// Reset the view (page/search) on close, as before.
 			setQueryParams( defaultQueryParams );
 		}
 	}, [ isOpen ] );
