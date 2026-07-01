@@ -13,7 +13,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
 import { useMemo } from '@wordpress/element';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
-import { Stack } from '@wordpress/ui';
 import { useFocusOnMount } from '@wordpress/compose';
 
 /**
