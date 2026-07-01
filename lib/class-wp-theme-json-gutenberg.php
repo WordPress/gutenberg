@@ -1275,7 +1275,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string The new selector.
 	 */
 	protected static function append_to_selector( $selector, $to_append ) {
-			if ( ! str_contains( $selector, ',' ) ) {
+		if ( ! str_contains( $selector, ',' ) ) {
 			return trim( $selector, " \t\n" ) . $to_append;
 		}
 

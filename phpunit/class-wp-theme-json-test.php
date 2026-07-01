@@ -8213,7 +8213,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'to_prepend' => '.wp-block-group ',
 				'expected'   => '.wp-block-group a, .wp-block-group .wp-element-button',
 			),
-			'spaces after commas are normalized'            => array(
+			'spaces after commas are normalized'           => array(
 				'selector'   => 'h1, h2, h3',
 				'to_prepend' => '.some-class ',
 				'expected'   => '.some-class h1, .some-class  h2, .some-class  h3',
@@ -8223,7 +8223,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'to_prepend' => '.prefix ',
 				'expected'   => '.prefix .foo, .prefix  .bar',
 			),
-			'mixed whitespace around commas trimmed'     => array(
+			'mixed whitespace around commas trimmed'       => array(
 				'selector'   => '.a ,  .b , .c',
 				'to_prepend' => '.pre ',
 				'expected'   => '.pre .a, .pre   .b, .pre  .c',
