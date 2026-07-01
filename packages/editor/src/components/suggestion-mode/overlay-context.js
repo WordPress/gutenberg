@@ -48,11 +48,6 @@ import { useRegistry, useSelect } from '@wordpress/data';
 const BLOCK_EDITOR_STORE_NAME = 'core/block-editor';
 
 /**
- * Internal dependencies
- */
-import { buildMoveGhostIndex } from './move-ghost-index';
-
-/**
  * @typedef {Object} OverlayEntry
  * @property {string} blockName          The block name at the time the
  *                                       overlay was opened.
@@ -65,28 +60,20 @@ import { buildMoveGhostIndex } from './move-ghost-index';
 
 /**
  * @typedef {Object} OverlayContextValue
- * @property {Object.<string,OverlayEntry>}            entries              Per-clientId entries.
- * @property {Function}                                captureBaseline      Store a baseline for a
- *                                                                          block if one isn't set.
- * @property {Function}                                setOverlayAttributes Merge overlay attributes
- *                                                                          onto an entry.
- * @property {Function}                                clearOverlay         Remove the entry.
- * @property {Function}                                hasOverlay           Check if an entry has any
- *                                                                          overlay attributes.
- * @property {{after:Map,before:Map,insideParent:Map}} moveGhosts           Anchor → ghost index for pending moves.
+ * @property {Object.<string,OverlayEntry>} entries              Per-clientId entries.
+ * @property {Function}                     captureBaseline      Store a baseline for a
+ *                                                               block if one isn't set.
+ * @property {Function}                     setOverlayAttributes Merge overlay attributes
+ *                                                               onto an entry.
+ * @property {Function}                     clearOverlay         Remove the entry.
+ * @property {Function}                     hasOverlay           Check if an entry has any
+ *                                                               overlay attributes.
  */
 
 const EMPTY_ENTRIES = Object.freeze( {} );
 
-const EMPTY_GHOSTS = Object.freeze( {
-	after: new Map(),
-	before: new Map(),
-	insideParent: new Map(),
-} );
-
 const OverlayContext = createContext( {
 	entries: EMPTY_ENTRIES,
-	moveGhosts: EMPTY_GHOSTS,
 	captureBaseline: () => {},
 	setOverlayAttributes: () => {},
 	clearOverlay: () => {},
@@ -347,108 +334,9 @@ export function SuggestionOverlayProvider( { children } ) {
 		}
 	}, [ hasEntries, blockCount, entries, registry ] );
 
-	// Single O(n) scan for pending-move markers, shared by every block via
-	// context — avoids an O(n^2) per-block scan in the rendering HOC.
-	//
-	// `useSelect` must return a referentially stable value when state is
-	// unchanged (otherwise `@wordpress/data` warns about wasted re-renders),
-	// so it returns a primitive signature string that fully determines ghost
-	// placement (clientId, old index/anchor/parent, whether the anchor still
-	// exists, and the old parent's current first non-self sibling). The
-	// index itself is rebuilt only when that signature changes.
-	const moveSignature = useSelect( ( select ) => {
-		const blockEditor = select( BLOCK_EDITOR_STORE_NAME );
-		const ids = blockEditor?.getClientIdsWithDescendants?.() ?? [];
-		// Collect the pending-move set first so anchor/sibling resolution in
-		// the fingerprint matches `buildMoveGhostIndex`: a block that is
-		// itself pending-moved can't anchor a ghost (it would drag the ghost
-		// to its destination), so it must be treated as unusable here too —
-		// otherwise the memo could miss a recompute when an anchor's
-		// moved-state is the only thing that changed.
-		const movedIds = new Set();
-		for ( const clientId of ids ) {
-			if (
-				blockEditor.getBlockAttributes( clientId )?.metadata?.suggestion
-					?.type === 'pending-move'
-			) {
-				movedIds.add( clientId );
-			}
-		}
-		let signature = '';
-		for ( const clientId of ids ) {
-			const marker =
-				blockEditor.getBlockAttributes( clientId )?.metadata
-					?.suggestion;
-			if ( marker?.type !== 'pending-move' ) {
-				continue;
-			}
-			const fromParent = marker.fromParentClientId ?? '';
-			const fromAnchor = marker.fromAnchorClientId ?? '';
-			const anchorUsable =
-				fromAnchor &&
-				blockEditor.getBlockName( fromAnchor ) &&
-				! movedIds.has( fromAnchor )
-					? 1
-					: 0;
-			const firstSibling =
-				blockEditor
-					.getBlockOrder( fromParent )
-					.find(
-						( id ) => id !== clientId && ! movedIds.has( id )
-					) ?? '';
-			// Whether the old parent can host an inside-parent fallback ghost
-			// (block existed, not root, not itself moved) — keeps the memo in
-			// sync when only the parent's existence/moved-state changes.
-			const parentUsable =
-				fromParent &&
-				blockEditor.getBlockName( fromParent ) &&
-				! movedIds.has( fromParent )
-					? 1
-					: 0;
-			signature += `${ clientId }:${
-				marker.fromIndex ?? 0
-			}:${ fromAnchor }:${ fromParent }:${ anchorUsable }:${ firstSibling }:${ parentUsable }|`;
-		}
-		return signature;
-	}, [] );
-
-	const moveGhosts = useMemo( () => {
-		if ( ! moveSignature ) {
-			return EMPTY_GHOSTS;
-		}
-		const blockEditor = registry.select( BLOCK_EDITOR_STORE_NAME );
-		if ( ! blockEditor?.getClientIdsWithDescendants ) {
-			return EMPTY_GHOSTS;
-		}
-		const moved = [];
-		for ( const clientId of blockEditor.getClientIdsWithDescendants() ) {
-			const marker =
-				blockEditor.getBlockAttributes( clientId )?.metadata
-					?.suggestion;
-			if ( marker?.type === 'pending-move' ) {
-				moved.push( {
-					clientId,
-					name: blockEditor.getBlockName( clientId ),
-					authorId: marker.authorId ?? null,
-					fromAnchorClientId: marker.fromAnchorClientId ?? null,
-					fromParentClientId: marker.fromParentClientId ?? '',
-					fromIndex: marker.fromIndex ?? 0,
-				} );
-			}
-		}
-		if ( moved.length === 0 ) {
-			return EMPTY_GHOSTS;
-		}
-		return buildMoveGhostIndex( moved, {
-			blockExists: ( id ) => !! blockEditor.getBlockName( id ),
-			getSiblings: ( parentId ) => blockEditor.getBlockOrder( parentId ),
-		} );
-	}, [ moveSignature, registry ] );
-
 	const value = useMemo(
 		() => ( {
 			entries,
-			moveGhosts,
 			captureBaseline,
 			setOverlayAttributes,
 			clearOverlay,
@@ -461,7 +349,6 @@ export function SuggestionOverlayProvider( { children } ) {
 		} ),
 		[
 			entries,
-			moveGhosts,
 			captureBaseline,
 			setOverlayAttributes,
 			clearOverlay,

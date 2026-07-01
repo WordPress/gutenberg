@@ -47,6 +47,7 @@ import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';
 import { markContentDiff, stripSuggestionMarks } from './inline-formats';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 import SuggestionMoveGhost from './suggestion-move-ghost';
+import useMoveGhosts from './use-move-ghosts';
 
 const BLOCK_EDITOR_STORE_NAME = 'core/block-editor';
 
@@ -404,7 +405,8 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 	( BlockListBlock ) =>
 		function BlockListBlockWithSuggestionClass( props ) {
 			const { clientId } = props;
-			const { entries, moveGhosts } = useSuggestionOverlay();
+			const { entries } = useSuggestionOverlay();
+			const moveGhosts = useMoveGhosts();
 			const ghostsAfter = moveGhosts?.after?.get( clientId );
 			const ghostsBefore = moveGhosts?.before?.get( clientId );
 			const ghostsInside = moveGhosts?.insideParent?.get( clientId );
