@@ -136,6 +136,29 @@ describe( 'Menu', () => {
 		expect( item ).toHaveAccessibleDescription( 'Create a separate copy.' );
 	} );
 
+	it( 'does not generate a label relationship when an explicit aria-label is provided', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.Item aria-label="Archive current item">
+						<Menu.ItemLabel>Archive</Menu.ItemLabel>
+					</Menu.Item>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+
+		expect(
+			await screen.findByRole( 'menuitem', {
+				name: 'Archive current item',
+			} )
+		).not.toHaveAttribute( 'aria-labelledby' );
+	} );
+
 	it( 'supports custom portal and positioner elements', async () => {
 		const user = userEvent.setup();
 		const containerRef = createRef< HTMLDivElement >();

@@ -50,6 +50,12 @@ function useItemContent(
 	const describedBy = [ ariaDescribedBy, hasDescription && descriptionId ]
 		.filter( Boolean )
 		.join( ' ' );
+	/*
+	 * `aria-labelledby` takes precedence over `aria-label` in the accessible
+	 * name algorithm. Only provide our generated label relationship when the
+	 * consumer has not supplied either explicit naming prop.
+	 */
+	const labelledBy = ariaLabelledBy ?? ( ariaLabel ? undefined : labelId );
 
 	return {
 		contentContextValue: {
@@ -59,8 +65,7 @@ function useItemContent(
 		itemAriaProps: {
 			'aria-describedby': describedBy || undefined,
 			'aria-label': ariaLabel,
-			'aria-labelledby':
-				ariaLabel || ariaLabelledBy ? ariaLabelledBy : labelId,
+			'aria-labelledby': labelledBy,
 		},
 	};
 }
