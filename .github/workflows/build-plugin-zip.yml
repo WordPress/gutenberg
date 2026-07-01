@@ -403,7 +403,7 @@ jobs:
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: write
-
+            workflows: write
         steps:
             - name: Set Release Version
               id: get_release_version
