@@ -5,6 +5,7 @@
 ### Breaking Changes
 
 -   Rename `--wpds-color-background-thumb-neutral-disabled` to `--wpds-color-background-thumb-neutral-weak-disabled` so the disabled token belongs to the existing neutral weak thumb family ([#79770](https://github.com/WordPress/gutenberg/pull/79770)).
+-   `ThemeProvider`: reject partially transparent and `transparent` seed colors. `color.primary` and `color.background` now only accept fully opaque seed colors ([#79773](https://github.com/WordPress/gutenberg/pull/79773)).
 
 ### Bug Fixes
 
