@@ -952,11 +952,6 @@
 			"count": 2
 		}
 	},
-	"packages/components/src/utils/test/polymorphic-element.tsx": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/tree-grid/cell.tsx": {
 		"react-hooks/refs": {
 			"count": 1
@@ -993,6 +988,11 @@
 		}
 	},
 	"packages/components/src/utils/rtl.js": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/utils/test/polymorphic-element.tsx": {
 		"no-restricted-imports": {
 			"count": 1
 		}
