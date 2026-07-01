@@ -62,6 +62,22 @@ For the best development experience, we recommend configuring the [Stylelint rul
 
 If you reference `--wpds-*` tokens in CSS or JS/TS source, use the [build plugins](#build-plugins) to inject fallback values at build time so components render correctly even when the tokens stylesheet is not loaded. If you use `@wordpress/build`, these plugins are already enabled by default when `@wordpress/theme` is installed.
 
+## Public API Boundary
+
+The semver-protected public API is limited to the package root and documented subpath imports:
+
+-   `@wordpress/theme` — the `ThemeProvider` React component and the generated design token TypeScript types exported from the package root. The `ThemeProvider` props are part of the component API, but their internal type names, such as `ThemeProviderProps` and `ThemeProviderSettings`, are not standalone public exports. If you need the prop type in TypeScript, derive it from `ThemeProvider` instead of importing an internal type.
+-   `@wordpress/theme/design-tokens.css` — the stylesheet that defines the default `--wpds-*` CSS custom properties.
+-   `@wordpress/theme/design-tokens.js` — the generated list of known `--wpds-*` CSS custom properties.
+-   `@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks`, `@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks`, and `@wordpress/theme/vite-plugins/vite-ds-token-fallbacks` — build plugins for injecting token fallback values.
+-   `@wordpress/theme/stylelint-plugins/no-unknown-ds-tokens`, `@wordpress/theme/stylelint-plugins/no-setting-wpds-custom-properties`, and `@wordpress/theme/stylelint-plugins/no-token-fallback-values` — Stylelint plugins for enforcing token usage.
+
+The deprecated `privateApis` root export is not public API. It exists only as a temporary migration path for WordPress internals and is not semver-protected.
+
+Do not import from repository or build-output paths such as `@wordpress/theme/src/*`, `@wordpress/theme/build/*`, `@wordpress/theme/build-module/*`, `@wordpress/theme/build-types/*`, `@wordpress/theme/tokens/*`, or other files that are not listed above. Those files are implementation details and may change without notice.
+
+Some public subpaths are generated from internal token sources. The generated values exposed by the public imports are part of the supported contract; the generator configuration, raw token JSON files, intermediate TypeScript, and emitted file locations are implementation details.
+
 ## Theme Provider
 
 The `ThemeProvider` is a React component that should wrap your application to provide design tokens and theme context to the child UI components. It accepts a set of customizable seed values and automatically generates a set of design tokens, which are exposed as CSS custom properties for use throughout the application.
