@@ -62,6 +62,13 @@ $waveform-player-height: 100px;
 			}
 		}
 
+		&.wp-block-playlist__tracklist-length-is-hidden {
+			// Hide the track length, which is in the playlist-track block.
+			.wp-block-playlist-track__length {
+				display: none;
+			}
+		}
+
 		&.wp-block-playlist__tracklist-show-numbers {
 			counter-reset: playlist-track;
 		}

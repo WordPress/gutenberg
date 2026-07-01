@@ -100,6 +100,45 @@ function bul( items: string[] ): string {
 	return `<!-- wp:list -->\n<ul class="wp-block-list">${ inner }</ul>\n<!-- /wp:list -->`;
 }
 
+async function getRenderedListItems( editor: Editor ) {
+	const blocks = await editor.getBlocks();
+	const listBlock = blocks.find( ( block ) => block.name === 'core/list' );
+
+	if ( ! listBlock ) {
+		throw new Error( 'Expected a list block.' );
+	}
+
+	return listBlock.innerBlocks.map( ( item ) => {
+		const listItem = item as typeof item & { clientId: string };
+
+		return {
+			clientId: listItem.clientId,
+			content: String( listItem.attributes.content ),
+		};
+	} );
+}
+
+async function expectSharedListReady(
+	editors: Editor[],
+	expectedOrder: string[]
+) {
+	const renderedItems = await Promise.all(
+		editors.map( ( ed ) => getRenderedListItems( ed ) )
+	);
+	for ( const items of renderedItems ) {
+		expect( items.map( ( item ) => item.content ) ).toEqual(
+			expectedOrder
+		);
+	}
+
+	const firstClientIds = renderedItems[ 0 ].map( ( item ) => item.clientId );
+	for ( const items of renderedItems.slice( 1 ) ) {
+		expect( items.map( ( item ) => item.clientId ) ).toEqual(
+			firstClientIds
+		);
+	}
+}
+
 function bol( items: string[] ): string {
 	const inner = items
 		.map(
@@ -558,6 +597,18 @@ test.describe( 'Collaboration - Stress Test', () => {
 		const { page: page2, editor: editor2 } =
 			await collaborationUtils.joinUser( post.id, STRESS_USERS[ 0 ] );
 		await collaborationUtils.waitForMutualDiscovery();
+
+		await expectSharedListReady(
+			[ editor, editor2 ],
+			[
+				'Item Alpha',
+				'Item Beta',
+				'Item Gamma',
+				'Item Delta',
+				'Item Epsilon',
+				'Item Zeta',
+			]
+		);
 
 		// ── Phase 2 — Concurrent list-item moves ────────────────
 		// User 1 moves "Item Beta" down; User 2 moves "Item Epsilon" up.

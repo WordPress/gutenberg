@@ -1,0 +1,7 @@
+{
+	"name": "core/activity",
+	"title": "Activity",
+	"description": "Displays recently published posts, scheduled posts, and recent comments.",
+	"category": "dashboard",
+	"presentation": "content-bleed"
+}

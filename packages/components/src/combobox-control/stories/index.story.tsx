@@ -50,7 +50,7 @@ const meta: Meta< typeof ComboboxControl > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 			notes: 'Will be superseded by `SearchableSelectControl` in `@wordpress/ui`, but continue using for now.',
 		},
@@ -75,7 +75,6 @@ const Template: StoryFn< typeof ComboboxControl > = ( {
 	return (
 		<>
 			<ComboboxControl
-				__next40pxDefaultSize
 				{ ...args }
 				value={ value }
 				onChange={ ( ...changeArgs ) => {
@@ -88,7 +87,6 @@ const Template: StoryFn< typeof ComboboxControl > = ( {
 };
 export const Default = Template.bind( {} );
 Default.args = {
-	__next40pxDefaultSize: true,
 	label: 'Country',
 	options: countryOptions,
 	help: 'Help text to describe the control.',

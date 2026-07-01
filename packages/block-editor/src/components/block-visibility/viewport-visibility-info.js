@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	Icon,
+	Icon as WCIcon,
 	__experimentalText as WCText,
 	__experimentalHStack as HStack,
 	privateApis as componentsPrivateApis,
@@ -130,7 +130,7 @@ export default function ViewportVisibilityInfo( { clientId } ) {
 	return (
 		<WCBadge className="block-editor-block-visibility-info">
 			<HStack spacing={ 2 } justify="start">
-				<Icon icon={ unseen } />
+				<WCIcon icon={ unseen } />
 				<WCText>{ label }</WCText>
 			</HStack>
 		</WCBadge>

@@ -1,0 +1,41 @@
+.root {
+	flex: 1;
+	min-width: 0;
+	min-height: 0;
+	overflow: hidden;
+}
+
+.listArea {
+	flex: 1;
+	min-width: 0;
+	min-height: 0;
+	overflow: hidden;
+}
+
+.eventIcon {
+	height: 100%;
+	background-color: var(--wpds-color-background-track-neutral-weak);
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+.titleLink {
+	min-width: 0;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.meta {
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+.emptyState {
+	margin-block: var(--wpds-dimension-padding-2xl);
+}
+
+.eventNone {
+	flex-shrink: 0;
+	padding-block: var(--wpds-dimension-padding-md);
+	padding-inline: var(--wpds-dimension-padding-2xl);
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}

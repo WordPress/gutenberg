@@ -80,6 +80,22 @@ function gutenberg_apply_dimensions_support( $block_type, $block_attributes ) {
 }
 
 /**
+ * Checks whether an aspectRatio block-support value is explicitly set.
+ *
+ * @param mixed $aspect_ratio Aspect-ratio value.
+ * @return bool Whether the value is an explicit aspect ratio.
+ */
+function gutenberg_is_explicit_aspect_ratio_value( $aspect_ratio ) {
+	if ( ! is_string( $aspect_ratio ) && ! is_numeric( $aspect_ratio ) ) {
+		return false;
+	}
+
+	$aspect_ratio = strtolower( trim( (string) $aspect_ratio ) );
+
+	return '' !== $aspect_ratio && 'auto' !== $aspect_ratio;
+}
+
+/**
  * Renders server-side dimensions styles to the block wrapper.
  * This block support uses the `render_block` hook to ensure that
  * it is also applied to non-server-rendered blocks.
@@ -105,7 +121,7 @@ function gutenberg_render_dimensions_support( $block_content, $block ) {
 
 	// To ensure the aspect ratio does not get overridden by `minHeight` or `height` unset any existing rule.
 	if (
-		isset( $dimensions_block_styles['aspectRatio'] )
+		gutenberg_is_explicit_aspect_ratio_value( $dimensions_block_styles['aspectRatio'] )
 	) {
 		$dimensions_block_styles['minHeight'] = 'unset';
 		$dimensions_block_styles['height']    = 'unset';
@@ -142,7 +158,7 @@ function gutenberg_render_dimensions_support( $block_content, $block ) {
 				foreach ( explode( ' ', $styles['classnames'] ) as $class_name ) {
 					if (
 						str_contains( $class_name, 'aspect-ratio' ) &&
-						! isset( $block_attributes['style']['dimensions']['aspectRatio'] )
+						! gutenberg_is_explicit_aspect_ratio_value( $block_attributes['style']['dimensions']['aspectRatio'] ?? null )
 					) {
 						continue;
 					}

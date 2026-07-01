@@ -10,6 +10,7 @@ import {
 	forwardRef,
 	useState,
 	useCallback,
+	useEffect,
 	useMemo,
 	useRef,
 	useLayoutEffect,
@@ -169,6 +170,30 @@ function InserterMenu(
 
 	const showMediaPanel = selectedTab === 'media' && !! selectedMediaCategory;
 
+	const [ isScrolled, setIsScrolled ] = useState( false );
+	const blocksPanelRef = useRef( null );
+	const patternsPanelRef = useRef( null );
+	const mediaPanelRef = useRef( null );
+	useEffect( () => {
+		const handleScroll = ( event ) => {
+			setIsScrolled( event.currentTarget.scrollTop > 0 );
+		};
+		const panels = [
+			blocksPanelRef.current,
+			patternsPanelRef.current,
+			mediaPanelRef.current,
+		].filter( Boolean );
+		panels.forEach( ( panel ) =>
+			panel.addEventListener( 'scroll', handleScroll )
+		);
+
+		return () => {
+			panels.forEach( ( panel ) =>
+				panel.removeEventListener( 'scroll', handleScroll )
+			);
+		};
+	}, [] );
+
 	const inserterSearch = useMemo( () => {
 		if ( selectedTab === 'media' ) {
 			return null;
@@ -177,7 +202,9 @@ function InserterMenu(
 		return (
 			<>
 				<SearchControl
-					className="block-editor-inserter__search"
+					className={ clsx( 'block-editor-inserter__search', {
+						'is-scrolled': isScrolled,
+					} ) }
 					onChange={ ( value ) => {
 						if ( hoveredItem ) {
 							setHoveredItem( null );
@@ -220,6 +247,7 @@ function InserterMenu(
 		rootClientId,
 		__experimentalInsertionIndex,
 		isAppender,
+		isScrolled,
 	] );
 
 	const blocksTab = useMemo( () => {
@@ -344,6 +372,7 @@ function InserterMenu(
 						{
 							name: 'blocks',
 							title: __( 'Blocks' ),
+							panelRef: blocksPanelRef,
 							panel: (
 								<>
 									{ inserterSearch }
@@ -356,6 +385,7 @@ function InserterMenu(
 						{
 							name: 'patterns',
 							title: __( 'Patterns' ),
+							panelRef: patternsPanelRef,
 							panel: (
 								<>
 									{ inserterSearch }
@@ -368,6 +398,7 @@ function InserterMenu(
 						{
 							name: 'media',
 							title: __( 'Media' ),
+							panelRef: mediaPanelRef,
 							panel: (
 								<>
 									{ inserterSearch }

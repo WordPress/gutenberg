@@ -1,28 +1,16 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
-import { __experimentalHStack as HStack } from '@wordpress/components';
-import { __, _x } from '@wordpress/i18n';
-import { useState, useMemo, useId } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { useMemo, useId } from '@wordpress/element';
 import { BlockPreview } from '@wordpress/block-editor';
-import { Icon } from '@wordpress/icons';
 import { parse } from '@wordpress/blocks';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import {
-	TEMPLATE_PART_POST_TYPE,
-	PATTERN_SYNC_TYPES,
-	OPERATOR_IS,
-} from '../../utils/constants';
-import { useAddedBy } from '../page-templates/hooks';
+import { TEMPLATE_PART_POST_TYPE } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 
 const { useStyle } = unlock( editorPrivateApis );
@@ -72,87 +60,4 @@ export const previewField = {
 	id: 'preview',
 	render: PreviewField,
 	enableSorting: false,
-};
-
-const SYNC_FILTERS = [
-	{
-		value: PATTERN_SYNC_TYPES.full,
-		label: _x( 'Synced', 'pattern (singular)' ),
-		description: __( 'Patterns that are kept in sync across the site.' ),
-	},
-	{
-		value: PATTERN_SYNC_TYPES.unsynced,
-		label: _x( 'Not synced', 'pattern (singular)' ),
-		description: __(
-			'Patterns that can be changed freely without affecting the site.'
-		),
-	},
-];
-
-export const patternStatusField = {
-	label: __( 'Sync status' ),
-	id: 'sync-status',
-	render: ( { item } ) => {
-		const syncStatus =
-			'wp_pattern_sync_status' in item
-				? item.wp_pattern_sync_status || PATTERN_SYNC_TYPES.full
-				: PATTERN_SYNC_TYPES.unsynced;
-		// User patterns can have their sync statuses checked directly.
-		// Non-user patterns are all unsynced for the time being.
-		return (
-			<span
-				className={ `edit-site-patterns__field-sync-status-${ syncStatus }` }
-			>
-				{
-					SYNC_FILTERS.find( ( { value } ) => value === syncStatus )
-						.label
-				}
-			</span>
-		);
-	},
-	elements: SYNC_FILTERS,
-	filterBy: {
-		operators: [ OPERATOR_IS ],
-		isPrimary: true,
-	},
-	enableSorting: false,
-};
-
-function AuthorField( { item } ) {
-	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
-	const { text, icon, imageUrl } = useAddedBy( item.type, item.id );
-
-	return (
-		<HStack alignment="left" spacing={ 0 }>
-			{ imageUrl && (
-				<div
-					className={ clsx( 'fields-controls__author-avatar', {
-						'is-loaded': isImageLoaded,
-					} ) }
-				>
-					<img
-						onLoad={ () => setIsImageLoaded( true ) }
-						alt=""
-						src={ imageUrl }
-					/>
-				</div>
-			) }
-			{ ! imageUrl && (
-				<div className="fields-controls__author-icon">
-					<Icon icon={ icon } />
-				</div>
-			) }
-			<span className="fields-controls__author-name">{ text }</span>
-		</HStack>
-	);
-}
-
-export const templatePartAuthorField = {
-	label: __( 'Author' ),
-	id: 'author',
-	getValue: ( { item } ) => item.author_text,
-	render: AuthorField,
-	filterBy: {
-		isPrimary: true,
-	},
 };

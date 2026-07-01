@@ -4,7 +4,7 @@
 import {
 	Button,
 	CustomSelectControl,
-	Icon,
+	Icon as WCIcon,
 	RangeControl,
 	__experimentalHStack as HStack,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
@@ -208,7 +208,7 @@ export default function PresetInputControl( {
 			className={ `preset-input-control__wrapper ${ className }__wrapper` }
 		>
 			{ icon && (
-				<Icon
+				<WCIcon
 					className="preset-input-control__icon"
 					icon={ icon }
 					size={ ICON_SIZE }
@@ -267,7 +267,6 @@ export default function PresetInputControl( {
 					step={ 1 }
 					value={ currentValue }
 					withInputField={ false }
-					__next40pxDefaultSize
 				/>
 			) }
 			{ hasPresets && ! showRangeControl && ! showCustomValueControl && (

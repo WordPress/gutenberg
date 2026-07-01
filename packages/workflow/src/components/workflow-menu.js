@@ -21,6 +21,7 @@ import {
 } from '@wordpress/keyboard-shortcuts';
 import { Icon, search as inputIcon } from '@wordpress/icons';
 import { executeAbility, store as abilitiesStore } from '@wordpress/abilities';
+import { initialize as initializeCoreAbilities } from '@wordpress/core-abilities';
 
 /**
  * Internal dependencies
@@ -124,6 +125,12 @@ export function WorkflowMenu() {
 			bindGlobal: true,
 		}
 	);
+
+	useEffect( () => {
+		if ( isOpen ) {
+			initializeCoreAbilities();
+		}
+	}, [ isOpen ] );
 
 	const closeAndReset = () => {
 		setSearch( '' );

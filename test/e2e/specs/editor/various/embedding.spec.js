@@ -87,7 +87,7 @@ test.describe( 'Embedding content', () => {
 			'https://twitter.com/notnownikki': MOCK_EMBED_RICH_SUCCESS_RESPONSE,
 			'https://twitter.com/wooyaygutenberg123454312':
 				MOCK_CANT_EMBED_RESPONSE,
-			'https://wordpress.org/gutenberg/handbook/':
+			'https://wordpress.org/gutenberg/handbook':
 				MOCK_BAD_WORDPRESS_RESPONSE,
 			'https://twitter.com/thatbunty': MOCK_BAD_EMBED_PROVIDER_RESPONSE,
 			'https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/':
@@ -117,7 +117,7 @@ test.describe( 'Embedding content', () => {
 		).toHaveValue( 'https://twitter.com/wooyaygutenberg123454312' );
 
 		await embedUtils.insertEmbed(
-			'https://wordpress.org/gutenberg/handbook/'
+			'https://wordpress.org/gutenberg/handbook'
 		);
 		await expect(
 			currentEmbedBlock.getByRole( 'textbox', { name: 'Embed URL' } ),

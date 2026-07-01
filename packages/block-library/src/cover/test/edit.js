@@ -39,6 +39,50 @@ const disabledColorSettings = {
 	disableCustomGradients: true,
 };
 
+/**
+ * Runs `callback` with `requestAnimationFrame` callbacks flushed on a microtask
+ * ahead of any pending `setTimeout( 0 )` timers, then restores the original.
+ *
+ * In a browser, Ariakit normalizes the matrix's roving tabindex in a
+ * `requestAnimationFrame` before `useFocusOnMount`'s `setTimeout( 0 )` focuses
+ * the active (center) cell, so opening the dropdown leaves the content position
+ * untouched. JSDOM implements `requestAnimationFrame` as a ~16ms timer, which
+ * inverts the ordering and would otherwise focus and select the first DOM cell.
+ *
+ * @param {() => ( Promise< unknown > | unknown )} callback
+ * @return {Promise< unknown >} Resolves with the callback's return value.
+ */
+async function withAnimationFramesBeforeTimers( callback ) {
+	const originalRequestAnimationFrame = global.requestAnimationFrame;
+
+	let flushing = false;
+	global.requestAnimationFrame = ( frameCallback ) => {
+		// Frames scheduled while flushing fall back to the real implementation
+		// so self-rescheduling loops (e.g. Popover's Floating UI `autoUpdate`)
+		// don't spin forever on the microtask queue.
+		if ( flushing ) {
+			return originalRequestAnimationFrame( frameCallback );
+		}
+
+		queueMicrotask( () => {
+			flushing = true;
+			try {
+				frameCallback( performance.now() );
+			} finally {
+				flushing = false;
+			}
+		} );
+
+		return 0;
+	};
+
+	try {
+		return await callback();
+	} finally {
+		global.requestAnimationFrame = originalRequestAnimationFrame;
+	}
+}
+
 async function setup( attributes, useCoreBlocks, customSettings ) {
 	const testBlock = { name: 'core/cover', attributes };
 	const settings = customSettings || defaultSettings;
@@ -52,6 +96,16 @@ async function createAndSelectBlock() {
 		} )
 	);
 	await selectBlock( 'Block: Cover' );
+}
+
+async function openStylesTabIfAvailable() {
+	const stylesTab = screen.queryByRole( 'tab', {
+		name: 'Styles',
+	} );
+
+	if ( stylesTab ) {
+		await userEvent.click( stylesTab );
+	}
 }
 
 describe( 'Cover block', () => {
@@ -126,8 +180,13 @@ describe( 'Cover block', () => {
 			await setup();
 			await createAndSelectBlock();
 
-			await userEvent.click(
-				screen.getByLabelText( 'Change content position' )
+			// Open the matrix dropdown with browser-like frame ordering so
+			// focus-on-mount lands on the active cell instead of dirtying the
+			// content position.
+			await withAnimationFramesBeforeTimers( () =>
+				userEvent.click(
+					screen.getByLabelText( 'Change content position' )
+				)
 			);
 
 			expect( screen.getByLabelText( 'Block: Cover' ) ).not.toHaveClass(
@@ -158,7 +217,7 @@ describe( 'Cover block', () => {
 			await selectBlock( 'Block: Cover' );
 			expect(
 				within( screen.getByLabelText( 'Block: Cover' ) ).getByRole(
-					'img'
+					'presentation'
 				)
 			).toBeInTheDocument();
 
@@ -173,7 +232,7 @@ describe( 'Cover block', () => {
 
 			expect(
 				within( screen.getByLabelText( 'Block: Cover' ) ).queryByRole(
-					'img'
+					'presentation'
 				)
 			).not.toBeInTheDocument();
 		} );
@@ -188,6 +247,21 @@ describe( 'Cover block', () => {
 						name: 'Settings',
 					} )
 				).not.toBeInTheDocument();
+			} );
+			test( 'does not display settings tab when media settings are empty', async () => {
+				await setup();
+				await createAndSelectBlock();
+
+				expect(
+					screen.queryByRole( 'tab', {
+						name: 'Settings',
+					} )
+				).not.toBeInTheDocument();
+				expect(
+					screen.getByRole( 'button', {
+						name: 'Advanced',
+					} )
+				).toBeInTheDocument();
 			} );
 			test( 'displays media settings panel if url is set', async () => {
 				await setup( {
@@ -244,7 +318,7 @@ describe( 'Cover block', () => {
 
 			expect(
 				within( screen.getByLabelText( 'Block: Cover' ) ).getByRole(
-					'img'
+					'presentation'
 				)
 			).toHaveStyle( 'object-position: 100% 50%;' );
 		} );
@@ -275,11 +349,7 @@ describe( 'Cover block', () => {
 
 				expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-100' );
 
-				await userEvent.click(
-					screen.getByRole( 'tab', {
-						name: 'Styles',
-					} )
-				);
+				await openStylesTabIfAvailable();
 				// Need act here as the isDark method is async.
 				// eslint-disable-next-line testing-library/no-unnecessary-act
 				await act( async () => {
@@ -308,11 +378,7 @@ describe( 'Cover block', () => {
 
 				expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-100' );
 
-				await userEvent.click(
-					screen.getByRole( 'tab', {
-						name: 'Styles',
-					} )
-				);
+				await openStylesTabIfAvailable();
 
 				// Need act here as the isDark method is async.
 				// eslint-disable-next-line testing-library/no-unnecessary-act
@@ -332,9 +398,7 @@ describe( 'Cover block', () => {
 				test( 'does not render overlay control', async () => {
 					await setup( undefined, true, disabledColorSettings );
 					await selectBlock( 'Block: Cover' );
-					await userEvent.click(
-						screen.getByRole( 'tab', { name: 'Styles' } )
-					);
+					await openStylesTabIfAvailable();
 
 					const overlayControl = screen.queryByRole( 'button', {
 						name: 'Overlay',
@@ -345,9 +409,7 @@ describe( 'Cover block', () => {
 				test( 'does not render opacity control', async () => {
 					await setup( undefined, true, disabledColorSettings );
 					await selectBlock( 'Block: Cover' );
-					await userEvent.click(
-						screen.getByRole( 'tab', { name: 'Styles' } )
-					);
+					await openStylesTabIfAvailable();
 
 					const opacityControl = screen.queryByRole( 'slider', {
 						name: 'Overlay opacity',
@@ -362,11 +424,7 @@ describe( 'Cover block', () => {
 			test( 'sets minHeight attribute when number control value changed', async () => {
 				await setup();
 				await createAndSelectBlock();
-				await userEvent.click(
-					screen.getByRole( 'tab', {
-						name: 'Styles',
-					} )
-				);
+				await openStylesTabIfAvailable();
 				await userEvent.clear(
 					screen.getByLabelText( 'Minimum height' )
 				);
@@ -395,11 +453,7 @@ describe( 'Cover block', () => {
 			expect( coverBlock ).toHaveClass( 'is-light' );
 
 			await selectBlock( 'Block: Cover' );
-			await userEvent.click(
-				screen.getByRole( 'tab', {
-					name: 'Styles',
-				} )
-			);
+			await openStylesTabIfAvailable();
 			await userEvent.click( screen.getByText( 'Overlay' ) );
 			const popupColorPicker = screen.getByRole( 'option', {
 				name: 'Black',
@@ -416,11 +470,7 @@ describe( 'Cover block', () => {
 			const coverBlock = screen.getByLabelText( 'Block: Cover' );
 			expect( coverBlock ).toHaveClass( 'is-light' );
 			await selectBlock( 'Block: Cover' );
-			await userEvent.click(
-				screen.getByRole( 'tab', {
-					name: 'Styles',
-				} )
-			);
+			await openStylesTabIfAvailable();
 			await userEvent.click( screen.getByText( 'Overlay' ) );
 			// The default color is black, so clicking the black color button will remove the background color,
 			// which should remove the isDark setting and assign the is-light class.

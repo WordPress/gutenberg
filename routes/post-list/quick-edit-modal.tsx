@@ -13,11 +13,7 @@ import {
 } from '@wordpress/components';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../lock-unlock';
+import { unlock } from '@wordpress/routes-lock-unlock';
 
 const { usePostFields, PostCardPanel } = unlock( editorPrivateApis );
 
@@ -213,7 +209,6 @@ export function QuickEditModal( {
 				<PostCardPanel
 					postType={ postType }
 					postId={ postId }
-					onClose={ closeModal }
 					hideActions
 				/>
 			</div>

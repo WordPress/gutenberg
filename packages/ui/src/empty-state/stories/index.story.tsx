@@ -4,6 +4,7 @@ import { Button } from '../../button';
 import * as EmptyState from '../';
 
 const meta: Meta< typeof EmptyState.Root > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/EmptyState',
 	component: EmptyState.Root,
 	subcomponents: {
@@ -12,6 +13,17 @@ const meta: Meta< typeof EmptyState.Root > = {
 		'EmptyState.Title': EmptyState.Title,
 		'EmptyState.Description': EmptyState.Description,
 		'EmptyState.Actions': EmptyState.Actions,
+	},
+	// Temporary: Due to an upstream bug, render the root explicitly so the
+	// components manifest extractor can resolve props from the JSX.
+	//
+	// See: https://github.com/storybookjs/storybook/issues/34877
+	render: ( args ) => <EmptyState.Root { ...args } />,
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;

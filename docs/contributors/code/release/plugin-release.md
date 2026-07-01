@@ -25,6 +25,8 @@
 -   When the release draft is generated in [GitHub Releases](https://github.com/WordPress/gutenberg/releases), publish it for the workflow to continue
 -   For RC1 releases only: get team approval to publish @wordpress packages to npm - ask in [#core-editor](https://wordpress.slack.com/messages/C02QB2JS7) if needed ([see details](#publishing-the-wordpress-packages-to-npm))
 -   For stable releases only: wait for team approval to upload to WordPress.org - this is the last step of the workflow for the plugin to be deployed to the plugin directory ([example](https://github.com/WordPress/gutenberg/actions/runs/18559811968))
+-   If you are able to approve the release yourself, go to the [Update Changelog and upload Gutenberg plugin to WordPress.org plugin repo](https://github.com/WordPress/gutenberg/actions/workflows/upload-release-to-plugin-repo.yml) action in order to do so. Click into the pending workflow and approve it.
+- Once that workflow completes successfully, go to the [plugin directory](https://wordpress.org/plugins/developers/releases/) to approve the release.
 
 #### Step 3: Edit the Release Notes
 
@@ -122,7 +124,7 @@ All PRs should have a label prefixed by `[Type]` as well as labels for sub-categ
 Update the labels on each PR as needed. You can continue generating the changelog until you are comfortable proceeding. Now you are ready to start the release candidate workflow.
 
 <div class="callout callout-tip">
-You can see how the changelog is generated from the PR labels in the <a href="https://github.com/WordPress/gutenberg/blob/trunk/bin/plugin/commands/changelog.js">changelog.js</a> file.
+You can see how the changelog is generated from the PR labels in the <a href="https://github.com/WordPress/gutenberg/blob/trunk/tools/release/commands/changelog.js">changelog.js</a> file.
 </div>
 
 ### Running the release workflow
@@ -413,7 +415,7 @@ The minor release should only contain the _specific commits_ required. To do thi
 If an RC already exists for a new version, you <strong>need</strong> to cherry-pick the same commits in the respective release branch, as they will not be included automatically. E.g.: If you're about to release a new minor release for 12.5 and just cherry-picked into <code>release/12.5</code>, but 12.6.0-rc.1 is already out, then you need to cherry-pick the same commits into the <code>release/12.6</code> branch, or they won't be included in subsequent releases for 12.6! Usually it's best to coordinate this process with the release coordinator for the next release.
 </div>
 
-The cherry-picking process can be automated with the [`npm run cherry-pick`](/docs/contributors/code/auto-cherry-picking.md) script, but be sure to use the `Backport to Gutenberg Minor Release` label when running the script.
+The cherry-picking process can be automated with the [`npm run other:cherry-pick`](/docs/contributors/code/auto-cherry-picking.md) script, but be sure to use the `Backport to Gutenberg Minor Release` label when running the script.
 
 You must also ensure that all PRs being included are assigned to the GitHub Milestone on which the minor release is based. Bear in mind, that when PRs are _merged_ they are automatically assigned a milestone for the next _stable_ release. Therefore you will need to go back through each PR in GitHub and re-assign the Milestone.
 

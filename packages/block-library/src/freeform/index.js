@@ -22,13 +22,11 @@ export const settings = {
 };
 
 export const init = () => {
-	// When the "Disable Classic block" experiment is enabled, only expose the
-	// block in the inserter if the current post actually needs a classic block.
+	// Only expose the block in the inserter if the current post actually needs
+	// a classic block.
 	const supports = {
 		...metadata.supports,
-		inserter:
-			! window?.__experimentalDisableTinymce ||
-			!! window?.wp?.needsClassicBlock,
+		inserter: !! window?.__needsClassicBlock,
 	};
 	return initBlock( { name, metadata, settings: { ...settings, supports } } );
 };

@@ -814,6 +814,22 @@ test.describe( 'Copy/cut/paste', () => {
 		] );
 	} );
 
+	// See https://github.com/WordPress/gutenberg/issues/28149
+	test( 'should not convert pasted date string into an ordered list', async ( {
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		pageUtils.setClipboardData( { plainText: '4. May 2026' } );
+		await pageUtils.pressKeys( 'primary+v' );
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '4. May 2026' },
+			},
+		] );
+	} );
+
 	test( 'should replace the default block on paste when the content is unmodified', async ( {
 		editor,
 		pageUtils,

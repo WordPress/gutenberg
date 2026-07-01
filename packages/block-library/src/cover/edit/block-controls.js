@@ -11,8 +11,8 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { MenuItem } from '@wordpress/components';
-import { link } from '@wordpress/icons';
+import { MenuItem, ToolbarButton } from '@wordpress/components';
+import { crop, link } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -31,6 +31,9 @@ export default function CoverBlockControls( {
 	toggleUseFeaturedImage,
 	onClearMedia,
 	onSelectEmbedUrl,
+	onEditMedia,
+	editMediaButtonRef,
+	showEditMediaButton,
 	blockEditingMode,
 } ) {
 	const {
@@ -106,6 +109,15 @@ export default function CoverBlockControls( {
 						onToggle={ toggleMinFullHeight }
 						isDisabled={ ! hasInnerBlocks }
 					/>
+					{ showEditMediaButton && (
+						<ToolbarButton
+							ref={ editMediaButtonRef }
+							icon={ crop }
+							label={ __( 'Crop background image' ) }
+							onClick={ onEditMedia }
+							aria-haspopup="dialog"
+						/>
+					) }
 				</BlockControls>
 			) }
 			<BlockControls group="other">

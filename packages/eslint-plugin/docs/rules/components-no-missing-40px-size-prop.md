@@ -8,25 +8,12 @@ This is a temporary rule to help migrate components to the new default size. Onc
 
 The following components are checked by this rule:
 
--   BorderBoxControl
--   BorderControl
--   BoxControl
 -   Button
--   ComboboxControl
 -   CustomSelectControl
--   FontAppearanceControl
--   FontFamilyControl
--   FontSizePicker
--   FormFileUpload (special case - see below)
 -   FormTokenField
 -   InputControl
--   LetterSpacingControl
--   LineHeightControl
 -   NumberControl
--   RangeControl
 -   SelectControl
--   TextControl
--   ToggleGroupControl
 -   UnitControl
 
 Examples of **incorrect** code for this rule:
@@ -50,18 +37,6 @@ import { Button, InputControl } from '@wordpress/components';
 <InputControl __next40pxDefaultSize value={value} onChange={onChange} />
 <Button size="small">Click me</Button>
 <Button size="compact">Click me</Button>
-```
-
-## FormFileUpload special case
-
-`FormFileUpload` can use either the `__next40pxDefaultSize` prop or the `render` prop to be considered valid:
-
-```jsx
-import { FormFileUpload } from '@wordpress/components';
-
-// Both are valid:
-<FormFileUpload __next40pxDefaultSize />
-<FormFileUpload render={({ open }) => <button onClick={open}>Upload</button>} />
 ```
 
 ## Options

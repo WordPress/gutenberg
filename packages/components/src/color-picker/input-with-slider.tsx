@@ -48,7 +48,6 @@ export const InputWithSlider = ( {
 				spinControls="none"
 			/>
 			<RangeControl
-				__next40pxDefaultSize
 				label={ label }
 				hideLabelFromVision
 				min={ min }

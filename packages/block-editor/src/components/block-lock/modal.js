@@ -8,7 +8,7 @@ import {
 	CheckboxControl,
 	Flex,
 	FlexItem,
-	Icon,
+	Icon as WCIcon,
 	Modal,
 	ToggleControl,
 } from '@wordpress/components';
@@ -153,7 +153,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 												} ) )
 											}
 										/>
-										<Icon
+										<WCIcon
 											className="block-editor-block-lock-modal__lock-icon"
 											icon={
 												lock.edit
@@ -174,7 +174,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 											} ) )
 										}
 									/>
-									<Icon
+									<WCIcon
 										className="block-editor-block-lock-modal__lock-icon"
 										icon={
 											lock.move ? lockIcon : unlockIcon
@@ -192,7 +192,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 											} ) )
 										}
 									/>
-									<Icon
+									<WCIcon
 										className="block-editor-block-lock-modal__lock-icon"
 										icon={
 											lock.remove ? lockIcon : unlockIcon

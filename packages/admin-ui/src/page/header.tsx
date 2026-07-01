@@ -30,11 +30,7 @@ export default function Header( {
 } ) {
 	const HeadingTag = `h${ headingLevel }` as const;
 	return (
-		<Stack
-			direction="column"
-			className={ styles.header }
-			render={ <header /> }
-		>
+		<Stack direction="column" className={ styles.header }>
 			<Stack
 				className={ styles[ 'header-content' ] }
 				direction="row"

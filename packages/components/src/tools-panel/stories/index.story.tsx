@@ -46,7 +46,7 @@ const meta: Meta< typeof ToolsPanel > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'editor',
 		},
 	},
@@ -119,7 +119,6 @@ export const Default: StoryFn< typeof ToolsPanel > = ( {
 						onDeselect={ () => setScale( undefined ) }
 					>
 						<ToggleGroupControl
-							__next40pxDefaultSize
 							label="Scale"
 							value={ scale }
 							onChange={ ( next ) => setScale( next ) }
@@ -474,7 +473,6 @@ export const WithConditionalDefaultControl: StoryFn< typeof ToolsPanel > = ( {
 					isShownByDefault={ !! height }
 				>
 					<ToggleGroupControl
-						__next40pxDefaultSize
 						label="Scale"
 						value={ scale }
 						onChange={ ( next ) =>
@@ -577,7 +575,6 @@ export const WithConditionallyRenderedControl: StoryFn<
 						isShownByDefault
 					>
 						<ToggleGroupControl
-							__next40pxDefaultSize
 							label="Scale"
 							value={ scale }
 							onChange={ ( next ) =>

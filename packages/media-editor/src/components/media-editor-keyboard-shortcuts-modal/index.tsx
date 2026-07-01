@@ -10,11 +10,6 @@ import {
 	type WPKeycodeModifier,
 } from '@wordpress/keycodes';
 
-/**
- * Internal dependencies
- */
-import './style.scss';
-
 interface KeyCombination {
 	/** Modifier for cross-platform display (e.g. 'primary', 'primaryShift', 'shift'). */
 	modifier?: WPKeycodeModifier;

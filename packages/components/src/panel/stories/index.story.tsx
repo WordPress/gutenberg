@@ -17,7 +17,6 @@ import PanelBody from '../body';
 import InputControl from '../../input-control';
 
 const meta: Meta< typeof Panel > = {
-	tags: [ 'manifest' ],
 	title: 'Components/Containers/Panel',
 	id: 'components-panel',
 	component: Panel,
@@ -29,8 +28,9 @@ const meta: Meta< typeof Panel > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
-			whereUsed: 'global',
+			status: 'recommended',
+			whereUsed: 'editor',
+			notes: 'Intended for the block inspector sidebar. For collapsible sections elsewhere, use `CollapsibleCard` from `@wordpress/ui` instead.',
 		},
 	},
 };

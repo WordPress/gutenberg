@@ -9,6 +9,8 @@ import { fn } from 'storybook/test';
 import BlockPatternsList from '../';
 import { ExperimentalBlockEditorProvider } from '../../provider';
 import patterns from './fixtures';
+// Reason: Styles are contained in ExperimentalBlockEditorProvider iframe.
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import blockLibraryStyles from '../../../../../block-library/build-style/style.css?raw';
 
 const blockEditorSettings = {

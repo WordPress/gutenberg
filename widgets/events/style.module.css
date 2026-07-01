@@ -1,0 +1,29 @@
+.container {
+	block-size: 100%;
+	min-height: 200px;
+}
+
+.locationPickerInWidget {
+	flex-grow: 1;
+	padding: var(--wpds-dimension-padding-2xl);
+}
+
+.footer {
+	border-block-start: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+	padding-block: var(--wpds-dimension-padding-lg);
+	padding-inline: var(--wpds-dimension-padding-2xl);
+}
+
+.footerLocation {
+	margin-inline-start: auto;
+}
+
+.locationSummary {
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+.statusText {
+	padding-inline: var(--wpds-dimension-padding-2xl);
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	margin: 0;
+}

@@ -19,14 +19,14 @@ const { state } = store(
 		state: {
 			playlists: {},
 			get isCurrentTrack() {
-				const { currentId, uniqueId } = getContext();
-				return currentId === uniqueId;
+				const { currentId, trackId } = getContext();
+				return currentId === trackId;
 			},
 		},
 		actions: {
 			changeTrack() {
 				const context = getContext();
-				context.currentId = context.uniqueId;
+				context.currentId = context.trackId;
 			},
 		},
 		callbacks: {
@@ -105,10 +105,11 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 		image: track.image,
 		autoPlay: shouldAutoPlay,
 		labels,
+		waveformStyle: context.waveformStyle,
 		onEnded: () => {
 			// Advance to next track (autoPlay handles playback).
 			const currentIndex = context.tracks.findIndex(
-				( uniqueId ) => uniqueId === context.currentId
+				( trackId ) => trackId === context.currentId
 			);
 			const nextTrack = context.tracks[ currentIndex + 1 ];
 			if ( nextTrack ) {

@@ -47,18 +47,28 @@ export default function MediaForm( {
 		);
 	}
 
+	// Fields that use a regular (non-panel) layout, rendered at the top.
+	const regularFieldIds = [ 'title', 'alt_text', 'caption', 'description' ];
+
+	// Place the non-panel (regular layout) fields at the top of the array,
+	// with the remaining panel fields below.
+	const sortedFields = [
+		...fields.filter( ( field: Field< Media > ) =>
+			regularFieldIds.includes( field.id )
+		),
+		...fields.filter(
+			( field: Field< Media > ) => ! regularFieldIds.includes( field.id )
+		),
+	];
+
 	// Default form structure with panel layout
 	const defaultForm: Form = {
 		layout: {
 			type: 'panel',
 		},
-		fields: fields.map( ( field: Field< Media > ) => {
+		fields: sortedFields.map( ( field: Field< Media > ) => {
 			// Use regular layout for main editable fields
-			if (
-				[ 'title', 'alt_text', 'caption', 'description' ].includes(
-					field.id
-				)
-			) {
+			if ( regularFieldIds.includes( field.id ) ) {
 				return {
 					id: field.id,
 					layout: {

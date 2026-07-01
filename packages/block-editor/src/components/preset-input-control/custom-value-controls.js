@@ -3,9 +3,10 @@
  */
 import {
 	RangeControl,
-	Tooltip,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
+
+import { Tooltip } from '@wordpress/ui';
 
 /**
  * CustomValueControls component for handling custom value input.
@@ -93,11 +94,16 @@ export default function CustomValueControls( {
 	);
 
 	const wrappedUnitControl = showTooltip ? (
-		<Tooltip text={ ariaLabel } placement="top">
-			<div className="preset-input-control__tooltip-wrapper">
-				{ unitControl }
-			</div>
-		</Tooltip>
+		<Tooltip.Root>
+			<Tooltip.Trigger
+				render={
+					<div className="preset-input-control__tooltip-wrapper">
+						{ unitControl }
+					</div>
+				}
+			/>
+			<Tooltip.Popup>{ ariaLabel }</Tooltip.Popup>
+		</Tooltip.Root>
 	) : (
 		unitControl
 	);
@@ -120,7 +126,6 @@ export default function CustomValueControls( {
 				step={ step }
 				value={ parsedQuantity }
 				withInputField={ false }
-				__next40pxDefaultSize
 			/>
 		</>
 	);

@@ -7,7 +7,6 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import {
-	Tooltip,
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
@@ -27,6 +26,8 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { isBlobURL } from '@wordpress/blob';
 import { getFilename } from '@wordpress/url';
+
+import { Tooltip } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -261,27 +262,34 @@ export function MediaPreview( { media, onClick, category } ) {
 							onMouseEnter={ onMouseEnter }
 							onMouseLeave={ onMouseLeave }
 						>
-							<Tooltip text={ title }>
-								<Composite.Item
+							<Tooltip.Root>
+								<Tooltip.Trigger
 									render={
-										<div
-											aria-label={ title }
-											role="option"
-											className="block-editor-inserter__media-list__item"
-										/>
-									}
-									onClick={ () => onMediaInsert( block ) }
-								>
-									<div className="block-editor-inserter__media-list__item-preview">
-										{ preview }
-										{ isInserting && (
-											<div className="block-editor-inserter__media-list__item-preview-spinner">
-												<Spinner />
+										<Composite.Item
+											render={
+												<div
+													aria-label={ title }
+													role="option"
+													className="block-editor-inserter__media-list__item"
+												/>
+											}
+											onClick={ () =>
+												onMediaInsert( block )
+											}
+										>
+											<div className="block-editor-inserter__media-list__item-preview">
+												{ preview }
+												{ isInserting && (
+													<div className="block-editor-inserter__media-list__item-preview-spinner">
+														<Spinner />
+													</div>
+												) }
 											</div>
-										) }
-									</div>
-								</Composite.Item>
-							</Tooltip>
+										</Composite.Item>
+									}
+								/>
+								<Tooltip.Popup>{ title }</Tooltip.Popup>
+							</Tooltip.Root>
 							{ ! isInserting && (
 								<MediaPreviewOptions
 									category={ category }

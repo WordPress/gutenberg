@@ -10,9 +10,15 @@ import warning from '@wordpress/warning';
  */
 import { CONFIG } from '../utils';
 
-// Animation duration (ms) extracted to JS in order to be used on a setTimeout.
-const FRAME_ANIMATION_DURATION = CONFIG.transitionDuration;
-const FRAME_ANIMATION_DURATION_NUMBER = Number.parseInt(
+/**
+ * Milliseconds used as a fallback when racing `animationend` against a timeout.
+ *
+ * Sourced from `CONFIG.transitionDuration`. This value is implicitly coupled to
+ * the modal frame’s CSS `animation-duration` in `style.scss`, which uses the
+ * WPDS `motion-duration-md` token. If either the token, the SCSS, or
+ * `CONFIG.transitionDuration` changes, keep them aligned so exit timing stays correct.
+ */
+const FRAME_ANIMATION_DURATION_MS = Number.parseInt(
 	CONFIG.transitionDuration
 );
 
@@ -68,7 +74,7 @@ export function useModalExitAnimation() {
 							// Allow an extra 20% of the animation duration for the
 							// animationend event to fire, in case the animation frame is
 							// slightly delayes by some other events in the event loop.
-							FRAME_ANIMATION_DURATION_NUMBER * 1.2
+							FRAME_ANIMATION_DURATION_MS * 1.2
 						);
 					} );
 
@@ -91,9 +97,6 @@ export function useModalExitAnimation() {
 	return {
 		overlayClassname: isAnimatingOut ? 'is-animating-out' : undefined,
 		frameRef,
-		frameStyle: {
-			'--modal-frame-animation-duration': `${ FRAME_ANIMATION_DURATION }`,
-		},
 		closeModal,
 	};
 }

@@ -20,24 +20,12 @@ function Example() {
   } );
 
   return (
-    <BoxControl
-      __next40pxDefaultSize
-      values={ values }
-      onChange={ setValues }
-    />
+    <BoxControl values={ values } onChange={ setValues } />
   );
 };
 ```
 
 ## Props
-
-### `__next40pxDefaultSize`
-
- - Type: `boolean`
- - Required: No
- - Default: `false`
-
-Start opting into the larger default height that will become the default size in a future version.
 
 ### `allowReset`
 

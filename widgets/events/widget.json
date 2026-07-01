@@ -1,0 +1,7 @@
+{
+	"name": "core/events",
+	"title": "WordPress events",
+	"description": "Displays upcoming WordPress community events.",
+	"category": "dashboard",
+	"presentation": "content-bleed"
+}
