@@ -73,4 +73,4 @@ See [LinkButton](?path=/docs/design-system-components-linkbutton--docs) for API 
 
 -   **`Button` or `IconButton` + `onClick` for navigation** — Prefer `Link` with a real `href` so keyboard, assistive technology, and browser link affordances stay correct.
 -   **`LinkButton` when `Link` would work** — Default to `Link` for navigation; button styling can obscure that the control goes elsewhere.
--   **`LinkButton` for submit or toggle actions** — Use `Button`; only `Button` supports loading and pressed toggle styling.
+-   **`LinkButton` for submit or toggle actions** — Use `Button` or `IconButton`, depending on whether the control needs a visible text label or is icon-only; `LinkButton` does not support loading or pressed toggle styling.
