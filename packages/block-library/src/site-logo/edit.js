@@ -265,7 +265,6 @@ const SiteLogo = ( {
 						}
 					>
 						<RangeControl
-							__next40pxDefaultSize
 							label={ __( 'Image width' ) }
 							onChange={ ( newWidth ) =>
 								setAttributes( { width: newWidth } )

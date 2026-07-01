@@ -7,11 +7,25 @@
 -   The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed from the following:
     -   `BorderBoxControl` ([#79420](https://github.com/WordPress/gutenberg/pull/79420))
     -   `BorderControl` ([#79418](https://github.com/WordPress/gutenberg/pull/79418))
+    -   `ComboboxControl` ([#79636](https://github.com/WordPress/gutenberg/pull/79636)).
     -   `FontSizePicker` ([#79481](https://github.com/WordPress/gutenberg/pull/79481))
+    -   `FormFileUpload` ([#79655](https://github.com/WordPress/gutenberg/pull/79655))
+    -   `RangeControl` ([#79590](https://github.com/WordPress/gutenberg/pull/79590))
+    -   `Radio` ([#79657](https://github.com/WordPress/gutenberg/pull/79657))
+    -   `ToggleGroupControl` ([#79656](https://github.com/WordPress/gutenberg/pull/79656))
+    -   `TreeSelect` ([#79550](https://github.com/WordPress/gutenberg/pull/79550))
+
+### Enhancements
+
+-   The `size` prop no longer has any effect and can be safely removed from the following:
+    -   `BorderBoxControl` ([#79420](https://github.com/WordPress/gutenberg/pull/79420))
+    -   `BorderControl` ([#79418](https://github.com/WordPress/gutenberg/pull/79418))
+    -   `FontSizePicker` ([#79481](https://github.com/WordPress/gutenberg/pull/79481))
+    -   `ToggleGroupControl` ([#79656](https://github.com/WordPress/gutenberg/pull/79656))
 
 ### Documentation
 
--   Document the safe `clsx` pattern for conditional CSS Module classes ([#79490](https://github.com/WordPress/gutenberg/pull/79490)).
+-   Document `clsx` object syntax for conditional CSS Module classes ([#79490](https://github.com/WordPress/gutenberg/pull/79490), [#79535](https://github.com/WordPress/gutenberg/pull/79535)).
 
 ### Bug Fixes
 

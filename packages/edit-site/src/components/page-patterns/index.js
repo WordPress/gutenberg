@@ -26,12 +26,11 @@ import { unlock } from '../../lock-unlock';
 import usePatterns, { useAugmentPatternsWithPermissions } from './use-patterns';
 import PatternsActions from './actions';
 import { useEditPostAction } from '../dataviews-actions';
-import { patternStatusField, previewField } from './fields';
+import { previewField } from './fields';
 import usePatternCategories from '../sidebar-navigation-screen-patterns/use-pattern-categories';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
-const { usePostActions, usePostFields, patternTitleField } =
-	unlock( editorPrivateApis );
+const { usePostActions, usePostFields } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
@@ -104,27 +103,10 @@ export default function DataviewsPatterns() {
 		syncStatus: viewSyncStatus,
 	} );
 
-	const templatePartFields = usePostFields( {
-		postType: TEMPLATE_PART_POST_TYPE,
-	} );
-	const templatePartAuthorField = templatePartFields.find(
-		( field ) => field.id === 'author'
-	);
-
+	const postTypeFields = usePostFields( { postType } );
 	const fields = useMemo( () => {
-		const _fields = [ previewField, patternTitleField ];
-
-		if ( postType === PATTERN_TYPES.user ) {
-			_fields.push( patternStatusField );
-		} else if (
-			postType === TEMPLATE_PART_POST_TYPE &&
-			templatePartAuthorField
-		) {
-			_fields.push( templatePartAuthorField );
-		}
-
-		return _fields;
-	}, [ postType, templatePartAuthorField ] );
+		return [ previewField, ...( postTypeFields || [] ) ];
+	}, [ postTypeFields ] );
 
 	const { data, paginationInfo } = useMemo( () => {
 		// Search is managed server-side as well as filters for patterns.

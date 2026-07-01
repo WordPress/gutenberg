@@ -68,6 +68,16 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 		public $presentation = null;
 
 		/**
+		 * Widget types are grouped into categories to help users browse and
+		 * discover them. Static and declarative; not a user-editable attribute.
+		 *
+		 * Null when the widget did not declare the field.
+		 *
+		 * @var string|null
+		 */
+		public $category = null;
+
+		/**
 		 * Constructor.
 		 *
 		 * @param string $name Widget type name including namespace.

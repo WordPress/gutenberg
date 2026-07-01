@@ -54,9 +54,9 @@ If your application renders React content into additional documents (an iframe, 
 
 ### Developer Tools
 
-For the best development experience, we recommend configuring the [build plugins](#build-plugins) and [Stylelint rules](#stylelint-plugins) provided by this package. The build plugins automatically inject fallback values into `var(--wpds-*)` references so components render correctly even when the tokens stylesheet is not yet loaded, and will raise an error if a reference does not match a known token. The Stylelint rules catch typos, unknown tokens, and other discouraged patterns during development.
+For the best development experience, we recommend configuring the [Stylelint rules](#stylelint-plugins) provided by this package. The Stylelint rules catch typos, unknown tokens, and other discouraged patterns during development.
 
-If you use `@wordpress/build` to build your scripts, the build plugins are already enabled by default.
+If you reference `--wpds-*` tokens in CSS or JS/TS source, use the [build plugins](#build-plugins) to inject fallback values at build time so components render correctly even when the tokens stylesheet is not loaded. If you use `@wordpress/build`, these plugins are already enabled by default when `@wordpress/theme` is installed.
 
 ## Theme Provider
 
@@ -228,7 +228,7 @@ This rule reports an error when a CSS declaration sets (defines) a custom proper
 
 ### `plugin-wpds/no-token-fallback-values`
 
-This rule reports an error when a `var()` call for a `--wpds-*` token includes a manual fallback value. Fallback values for design tokens are injected automatically at build time by the [build plugins](#build-plugins), so manual fallbacks in source are redundant and can drift out of sync with the token definitions.
+This rule reports an error when a `var()` call for a `--wpds-*` token includes a manual fallback value. In CSS processed by the [build plugins](#build-plugins), fallback values are injected automatically, so manual fallbacks in `var(--wpds-*)` references are redundant and can drift out of sync with the token definitions.
 
 ```css
 /* ✗ Error: Do not add a fallback value for Design System token '--wpds-color-foreground-content-neutral' */
