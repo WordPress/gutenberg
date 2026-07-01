@@ -687,6 +687,13 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			return true;
 		}
 
+		// Source-format original companion file: no dimension constraint, and
+		// the caller passes (0, 0) because the source format (e.g. HEIC) may
+		// not be readable by wp_getimagesize() at all.
+		if ( self::IMAGE_SIZE_SOURCE_ORIGINAL === $image_size ) {
+			return true;
+		}
+
 		// Dimensions must be positive for all sizes.
 		if ( $width <= 0 || $height <= 0 ) {
 			return new WP_Error(
@@ -705,11 +712,6 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 					return $result;
 				}
 			}
-			return true;
-		}
-
-		// Source-format original companion file: no dimension constraint.
-		if ( self::IMAGE_SIZE_SOURCE_ORIGINAL === $image_size ) {
 			return true;
 		}
 
@@ -895,9 +897,18 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		//
 		// 'animated_video' companions are video files (MP4/WebM); the image
 		// helpers can't read their dimensions and would falsely report the
-		// upload as "corrupted or unsupported". Skip the read for this case;
-		// validate_image_dimensions() also short-circuits it below.
-		$size = self::IMAGE_SIZE_ANIMATED_VIDEO === $image_size ? array( 0, 0 ) : wp_getimagesize( $path );
+		// upload as "corrupted or unsupported". Source-format originals
+		// ('source_original', e.g. the HEIC kept next to its JPEG derivative)
+		// are exempt for the same reason: their dimensions are neither
+		// validated nor recorded, and wp_getimagesize() may not be able to
+		// read the source format at all on servers without HEIC/HEIF support.
+		// Skip the read for both cases; validate_image_dimensions() also
+		// short-circuits them below.
+		$skip_dimension_read =
+			self::IMAGE_SIZE_ANIMATED_VIDEO === $image_size ||
+			self::IMAGE_SIZE_SOURCE_ORIGINAL === $image_size;
+
+		$size = $skip_dimension_read ? array( 0, 0 ) : wp_getimagesize( $path );
 
 		if ( ! $size ) {
 			// Could not determine dimensions (corrupted file, unsupported format).

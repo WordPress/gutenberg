@@ -996,6 +996,58 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
+	 * Verifies that a source-format original sideload succeeds even when
+	 * wp_getimagesize() cannot read the file's dimensions.
+	 *
+	 * The `source_original` companion (e.g. the HEIC kept next to its JPEG
+	 * derivative) is stored byte-for-byte: its dimensions are neither validated
+	 * nor recorded, and servers without HEIC/HEIF support cannot read them at
+	 * all. The dimension read must therefore be skipped entirely - running it
+	 * would reject the companion as "corrupted or unsupported" on exactly the
+	 * servers the client-side flow is designed to help.
+	 *
+	 * @covers ::sideload_item
+	 * @covers ::validate_image_dimensions
+	 */
+	public function test_sideload_source_original_skips_dimension_read() {
+		if ( ! file_exists( DIR_TESTDATA . '/images/test-image.heic' ) ) {
+			$this->markTestSkipped( 'The HEIC test fixture is not available.' );
+		}
+
+		wp_set_current_user( self::$admin_id );
+
+		// Upload the JPEG derivative the way client-side uploads do.
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=heic-source.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+
+		$response      = rest_get_server()->dispatch( $request );
+		$attachment_id = $response->get_data()['id'];
+		$this->assertSame( 201, $response->get_status() );
+
+		// Sideload the real HEIC companion. On servers without HEIC support
+		// wp_getimagesize() returns false for this file, so the sideload only
+		// succeeds when the dimension read is skipped for source originals.
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
+		$request->set_header( 'Content-Type', 'image/heic' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=heic-source.heic' );
+		$request->set_param( 'image_size', Gutenberg_REST_Attachments_Controller::IMAGE_SIZE_SOURCE_ORIGINAL );
+		$request->set_param( 'convert_format', false );
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/test-image.heic' ) );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status(), 'Sideloading a source-format original should succeed regardless of server-side HEIC support.' );
+
+		$data = $response->get_data();
+		$this->assertSame( Gutenberg_REST_Attachments_Controller::IMAGE_SIZE_SOURCE_ORIGINAL, $data['image_size'], 'Response should echo the image_size.' );
+		$this->assertMatchesRegularExpression( '/heic-source.*\.heic$/', $data['file'], 'Response file should reference the HEIC filename.' );
+		$this->assertArrayNotHasKey( 'width', $data, 'Source originals should not record dimensions.' );
+	}
+
+	/**
 	 * Verifies that sideloading with an array of size names returns the array
 	 * preserved in the sub_size response, and that finalize registers the same
 	 * file under every name.
