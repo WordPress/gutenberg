@@ -32,8 +32,10 @@ export type WidgetIcon = ReactElement< ComponentProps< 'svg' > >;
  * whose `id` is narrowed to the keys of the widget's attribute object (`Item`).
  */
 export type WidgetAttributeField< Item > = Field< Item > & {
-	// `& string` drops the number/symbol keys `keyof` can yield; `Field.id`
-	// is a string.
+	/*
+	 * `& string` drops the number/symbol keys `keyof` can yield; `Field.id`
+	 * is a string.
+	 */
 	id: keyof Item & string;
 };
 
@@ -56,12 +58,13 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	name: WidgetName;
 
 	/**
-	 * Display title; hosts surface it in pickers and chrome.
+	 * Human-readable title that names the widget type. Translatable.
 	 */
 	title: string;
 
 	/**
-	 * Short description; hosts surface it in pickers and help panels.
+	 * Human-readable description of what the widget type does.
+	 * Translatable.
 	 */
 	description?: string;
 
@@ -91,7 +94,8 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	presentation?: 'framed' | 'content-bleed' | 'full-bleed';
 
 	/**
-	 * Search aliases hosts use to match the widget in their pickers.
+	 * Alternative terms used to match the widget type when searching,
+	 * e.g. `calendar` for an events widget. Translatable.
 	 */
 	keywords?: string[];
 
@@ -203,4 +207,24 @@ export interface WidgetModuleRecord {
 	 * Authoring presentation hint; overrides the metadata module's value.
 	 */
 	presentation?: WidgetTypeMetadata[ 'presentation' ] | null;
+
+	/**
+	 * Grouping category; overrides the metadata module's value.
+	 */
+	category?: WidgetTypeMetadata[ 'category' ] | null;
+
+	/**
+	 * Translated title; overrides the metadata module's value.
+	 */
+	title?: WidgetTypeMetadata[ 'title' ] | null;
+
+	/**
+	 * Translated description; overrides the metadata module's value.
+	 */
+	description?: WidgetTypeMetadata[ 'description' ] | null;
+
+	/**
+	 * Translated search aliases; override the metadata module's value.
+	 */
+	keywords?: WidgetTypeMetadata[ 'keywords' ] | null;
 }

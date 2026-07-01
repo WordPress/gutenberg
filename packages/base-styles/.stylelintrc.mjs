@@ -18,7 +18,7 @@ export default {
 			{
 				message: ( property, value ) => {
 					if ( /var\(\s*--wpds-/.test( value ) ) {
-						return 'To ensure proper fallbacks, `@use "@wordpress/theme/utils" as wpds` and use `wpds.var()` instead of direct `var(--wpds-*)` references.';
+						return 'To ensure proper fallbacks, use the local `wpds.var()` helper instead of direct `var(--wpds-*)` references.';
 					}
 					return disallowedValueMessages.message( property, value );
 				},
