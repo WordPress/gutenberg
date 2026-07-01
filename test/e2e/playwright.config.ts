@@ -24,7 +24,15 @@ const config = defineConfig( {
 		command: 'npm run --prefix ../.. wp-env-test -- start',
 	},
 	reporter: process.env.CI
-		? [ [ 'github' ], [ './config/flaky-tests-reporter.ts' ], [ 'blob' ] ]
+		? [
+				[ 'github' ],
+				[ './config/flaky-tests-reporter.ts' ],
+				[ 'blob' ],
+				[
+					'@flakiness/playwright',
+					{ flakinessProject: 'WordPress/gutenberg' },
+				],
+		  ]
 		: 'list',
 	workers: 1,
 	globalSetup: fileURLToPath(

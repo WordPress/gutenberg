@@ -79,6 +79,7 @@ _Defined via the [`styles`](https://developer.wordpress.org/block-editor/referen
 
 _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
 
+- **dimensions**: `.wp-block-image img`
 - **border**: `.wp-block-image img, .wp-block-image .wp-block-image__crop-area, .wp-block-image .components-placeholder`
 - **shadow**: `.wp-block-image img, .wp-block-image .wp-block-image__crop-area, .wp-block-image .components-placeholder`
 - **filter**:

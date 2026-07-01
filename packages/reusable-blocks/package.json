@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/reusable-blocks",
-	"version": "5.48.0",
+	"version": "5.49.1",
 	"description": "Reusable blocks utilities.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -61,6 +61,10 @@
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/url": "file:../url"
+	},
+	"devDependencies": {
+		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/preferences": "file:../preferences"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

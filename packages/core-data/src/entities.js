@@ -464,6 +464,11 @@ async function loadPostTypeEntities() {
 					null
 				);
 			},
+			shouldSync: () =>
+				! (
+					Array.isArray( window._wpCollaborationDisabledPostTypes ) &&
+					window._wpCollaborationDisabledPostTypes.includes( name )
+				),
 		};
 
 		return entity;

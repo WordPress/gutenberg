@@ -19,6 +19,7 @@ exports[`PluginPostPublishPanel renders fill properly 1`] = `
           <svg
             aria-hidden="true"
             class="components-panel__arrow"
+            fill="currentColor"
             focusable="false"
             height="24"
             viewBox="0 0 24 24"

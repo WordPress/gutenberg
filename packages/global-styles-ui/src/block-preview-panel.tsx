@@ -24,8 +24,8 @@ interface BlockPreviewPanelProps {
 // Keep in sync with responsive breakpoint media queries in the global styles engine.
 const PREVIEW_WIDTH_BY_VIEWPORT: Record< string, number > = {
 	default: 783,
-	tablet: 600,
-	mobile: 480,
+	'@tablet': 600,
+	'@mobile': 480,
 };
 
 const BlockPreviewPanel = ( {

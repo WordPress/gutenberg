@@ -6,7 +6,13 @@ import { mat2d, vec2 } from 'gl-matrix';
 /**
  * Internal dependencies
  */
-import type { CropperState, NormalizedPoint, Size, Camera } from './types';
+import type {
+	CropperState,
+	NormalizedPoint,
+	NormalizedRect,
+	Size,
+	Camera,
+} from './types';
 import { degreesToRadians } from './math/rotation';
 import {
 	isSafeNumber,
@@ -109,6 +115,59 @@ export function getImageFit(
 		elementSize: { width: renderedW, height: renderedH },
 		visualSize,
 	};
+}
+
+/**
+ * Resolve the presentational view magnification that makes the crop fill the
+ * canvas.
+ *
+ * The crop overlay is laid out as `cropRect * visualSize` (the contain-fit
+ * footprint, with no zoom), so its on-screen size is capped by that footprint.
+ * When a crop's aspect differs from the image's, it can be much smaller than
+ * the canvas could show (e.g. a square crop in a tall image is bound by the
+ * footprint's narrow axis). Scaling `elementSize` and `visualSize` together by
+ * the returned factor uniformly magnifies the whole scene — image, crop
+ * overlay, and overlays — so the crop reaches `targetFill` of its constraining
+ * canvas axis, with the image bleeding past the canvas (clipped by the host).
+ *
+ * Purely presentational: it does not touch `zoom`/`pan`/`cropRect`/`rotation`,
+ * so the framed source region — and therefore the export — is unchanged.
+ *
+ * @param cropRect   The crop rectangle, normalized to the footprint.
+ * @param canvasSize The canvas size in pixels.
+ * @param visualSize The contain-fit (rotated) image footprint in pixels.
+ * @param targetFill Fraction of the constraining canvas axis to fill (0–1].
+ * @param maxScale   Upper bound on the magnification.
+ * @return A magnification factor in [1, maxScale]; 1 when none is needed.
+ */
+export function getViewScale(
+	cropRect: NormalizedRect,
+	canvasSize: Size,
+	visualSize: Size,
+	targetFill: number,
+	maxScale: number
+): number {
+	const cropScreenW = cropRect.width * visualSize.width;
+	const cropScreenH = cropRect.height * visualSize.height;
+	// `> 0` comparisons (rather than `<= 0`) reject NaN as well as zero and
+	// negatives, so a non-finite rect/dimension/scale can't propagate to a
+	// `scale(NaN)`. `isValidSize` already guards finiteness of the sizes.
+	if (
+		! isValidSize( canvasSize ) ||
+		! isValidSize( visualSize ) ||
+		! ( cropScreenW > 0 ) ||
+		! ( cropScreenH > 0 ) ||
+		! Number.isFinite( targetFill ) ||
+		! Number.isFinite( maxScale ) ||
+		! ( targetFill > 0 ) ||
+		! ( maxScale >= 1 )
+	) {
+		return 1;
+	}
+	const kW = ( targetFill * canvasSize.width ) / cropScreenW;
+	const kH = ( targetFill * canvasSize.height ) / cropScreenH;
+	const k = Math.min( kW, kH );
+	return Math.min( maxScale, Math.max( 1, k ) );
 }
 
 /**

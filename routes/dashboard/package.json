@@ -13,32 +13,22 @@
 		"@wordpress/api-fetch": "file:../../packages/api-fetch",
 		"@wordpress/base-styles": "file:../../packages/base-styles",
 		"@wordpress/core-data": "file:../../packages/core-data",
-		"@wordpress/commands": "file:../../packages/commands",
-		"@wordpress/components": "file:../../packages/components",
-		"@wordpress/compose": "file:../../packages/compose",
 		"@wordpress/data": "file:../../packages/data",
-		"@wordpress/dataviews": "file:../../packages/dataviews",
 		"@wordpress/element": "file:../../packages/element",
-		"@wordpress/grid": "file:../../packages/grid",
 		"@wordpress/hooks": "file:../../packages/hooks",
 		"@wordpress/i18n": "file:../../packages/i18n",
-		"@wordpress/icons": "file:../../packages/icons",
 		"@wordpress/notices": "file:../../packages/notices",
 		"@wordpress/preferences": "file:../../packages/preferences",
-		"@wordpress/primitives": "file:../../packages/primitives",
-		"@wordpress/private-apis": "file:../../packages/private-apis",
-		"@wordpress/ui": "file:../../packages/ui",
 		"@wordpress/viewport": "file:../../packages/viewport",
 		"@wordpress/warning": "file:../../packages/warning",
-		"clsx": "^2.1.1",
-		"fast-deep-equal": "^3.1.3",
-		"uuid": "^14.0.0"
+		"@wordpress/widget-dashboard": "file:../../packages/widget-dashboard",
+		"@wordpress/widget-primitives": "file:../../packages/widget-primitives",
+		"fast-deep-equal": "^3.1.3"
 	},
 	"devDependencies": {
 		"@testing-library/dom": "^10.4.1",
 		"@testing-library/jest-dom": "^6.9.1",
-		"@testing-library/react": "^16.3.2",
-		"@testing-library/user-event": "^14.6.1"
+		"@testing-library/react": "^16.3.2"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0"

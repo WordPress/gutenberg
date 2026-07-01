@@ -3,10 +3,10 @@
  */
 import Vips from 'wasm-vips';
 
-// @ts-expect-error - WASM files are inlined as base64 data URLs at build time
+// @ts-expect-error - WASM files are inlined as Uint8Array at build time.
 import VipsModule from 'wasm-vips/vips.wasm';
 
-// @ts-expect-error - WASM files are inlined as base64 data URLs at build time
+// @ts-expect-error - WASM files are inlined as Uint8Array at build time.
 import VipsHeifModule from 'wasm-vips/vips-heif.wasm';
 
 /**
@@ -31,6 +31,32 @@ let cleanup: () => void;
 let vipsPromise: Promise< typeof Vips > | undefined;
 
 /**
+ * Caches Blob URLs created for inlined WASM binaries.
+ *
+ * The WASM binaries are inlined as `Uint8Array` values at build time. wasm-vips
+ * loads them (including the HEIF dynamic library) by fetching a URL, so the
+ * bytes are wrapped in a Blob URL the first time each is requested.
+ */
+const wasmUrls = new WeakMap< Uint8Array< ArrayBuffer >, string >();
+
+/**
+ * Returns a Blob URL for an inlined WASM binary, creating it on first use.
+ *
+ * @param bytes The inlined WASM binary.
+ * @return A Blob URL pointing at the binary.
+ */
+function getWasmUrl( bytes: Uint8Array< ArrayBuffer > ): string {
+	let url = wasmUrls.get( bytes );
+	if ( ! url ) {
+		url = URL.createObjectURL(
+			new Blob( [ bytes ], { type: 'application/wasm' } )
+		);
+		wasmUrls.set( bytes, url );
+	}
+	return url;
+}
+
+/**
  * Instantiates and returns a new vips instance.
  *
  * Reuses any existing instance.
@@ -46,13 +72,15 @@ async function getVips(): Promise< typeof Vips > {
 		// It can be re-added when Core adds JXL support.
 		dynamicLibraries: [ 'vips-heif.wasm' ],
 		locateFile: ( fileName: string ) => {
-			// WASM files are inlined as base64 data URLs at build time,
-			// eliminating the need for separate file downloads and avoiding
-			// issues with hosts not serving WASM files with correct MIME types.
+			// WASM files are inlined as a Uint8Array at build time and exposed
+			// here as Blob URLs. This eliminates the need for separate file
+			// downloads and avoids issues with hosts not serving WASM files
+			// with correct MIME types, while keeping the inlined bytes
+			// compressible (see the build-time binary encoding).
 			if ( fileName.endsWith( 'vips.wasm' ) ) {
-				return VipsModule;
+				return getWasmUrl( VipsModule );
 			} else if ( fileName.endsWith( 'vips-heif.wasm' ) ) {
-				return VipsHeifModule;
+				return getWasmUrl( VipsHeifModule );
 			}
 			return fileName;
 		},
@@ -639,21 +667,41 @@ export async function rotateImage(
 }
 
 /**
- * Determines whether an image has an alpha channel.
+ * Determines whether an image has visible transparency.
+ *
+ * Channel presence alone is not enough: PNG encoders often retain an alpha
+ * channel even when every pixel is fully opaque, and animated GIFs declare
+ * a transparent color index for disposal-method frame compositing without
+ * ever rendering a visibly transparent pixel. This check loads the first
+ * frame (any transparency there is visible — there is no previous frame to
+ * inherit from) and samples the alpha channel for an actually-transparent
+ * pixel.
  *
  * @param buffer Original file object.
- * @return Whether the image has an alpha channel.
+ * @return Whether any pixel in the image is partially or fully transparent.
  */
 export async function hasTransparency(
 	buffer: ArrayBuffer
 ): Promise< boolean > {
 	const vips = await getVips();
 	const image = vips.Image.newFromBuffer( buffer );
-	const hasAlpha = image.hasAlpha();
+
+	if ( ! image.hasAlpha() ) {
+		cleanup?.();
+		return false;
+	}
+
+	// `min()` on the alpha band is one read of a single channel of frame 0.
+	// For uchar (GIF/8-bit PNG) the opaque value is 255; 16-bit PNGs (rare
+	// inputs here) use 65535. Anything lower means at least one pixel is
+	// transparent.
+	const alpha = image.extractBand( image.bands - 1 );
+	const minAlpha = alpha.min();
+	const opaqueValue = image.format === 'ushort' ? 65535 : 255;
 
 	cleanup?.();
 
-	return hasAlpha;
+	return minAlpha < opaqueValue;
 }
 
 // Re-export with vips prefix for worker module compatibility.

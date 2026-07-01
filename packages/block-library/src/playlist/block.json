@@ -10,9 +10,6 @@
 	"textdomain": "default",
 	"allowedBlocks": [ "core/playlist-track" ],
 	"attributes": {
-		"currentTrack": {
-			"type": "string"
-		},
 		"type": {
 			"type": "string",
 			"default": "audio"
@@ -46,8 +43,7 @@
 		}
 	},
 	"providesContext": {
-		"showArtists": "showArtists",
-		"currentTrack": "currentTrack"
+		"showArtists": "showArtists"
 	},
 	"supports": {
 		"anchor": true,
