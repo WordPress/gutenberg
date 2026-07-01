@@ -80,11 +80,7 @@ export const LinkItem: Story = {
 			<>
 				<Menu.Trigger>Open menu</Menu.Trigger>
 				<Menu.Popup>
-					<Menu.LinkItem
-						href="https://wordpress.org"
-						target="_blank"
-						rel="noreferrer noopener"
-					>
+					<Menu.LinkItem href="https://wordpress.org" openInNewTab>
 						<Menu.ItemLabel>WordPress.org</Menu.ItemLabel>
 						<Menu.ItemDescription>
 							Open the WordPress project website.

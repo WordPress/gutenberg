@@ -1,6 +1,7 @@
 import { Menu as _Menu } from '@base-ui/react/menu';
 import clsx from 'clsx';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useId } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import itemPopupStyles from '../utils/css/item-popup.module.css';
 import defenseStyles from '../utils/css/global-css-defense.module.css';
 import resetStyles from '../utils/css/resets.module.css';
@@ -9,6 +10,15 @@ import { MenuItemContentContext } from './context';
 import { ItemContent, useItemContent } from './item';
 import type { LinkItemProps } from './types';
 
+function getOpenInNewTabRel( rel: LinkItemProps[ 'rel' ] ) {
+	const values = new Set( rel?.split( /\s+/ ).filter( Boolean ) );
+
+	values.add( 'noreferrer' );
+	values.add( 'noopener' );
+
+	return Array.from( values ).join( ' ' );
+}
+
 /**
  * Renders a menu item that navigates to a link target.
  */
@@ -16,25 +26,51 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 	{
 		children,
 		className,
+		openInNewTab = false,
 		prefix,
 		suffix,
 		'aria-describedby': ariaDescribedBy,
 		'aria-label': ariaLabel,
 		'aria-labelledby': ariaLabelledBy,
+		rel,
 		...props
 	},
 	ref
 ) {
+	const externalLinkIndicatorId = useId();
+	const externalLinkIndicator = openInNewTab ? (
+		<span
+			id={ externalLinkIndicatorId }
+			className={ styles[ 'external-link-indicator' ] }
+			role="img"
+			aria-label={
+				/* translators: accessibility text appended to link text */
+				__( '(opens in a new tab)' )
+			}
+		/>
+	) : null;
+	const itemSuffix = externalLinkIndicator ? (
+		<>
+			{ suffix }
+			{ externalLinkIndicator }
+		</>
+	) : (
+		suffix
+	);
 	const { contentContextValue, itemAriaProps } = useItemContent( children, {
 		'aria-describedby': ariaDescribedBy,
 		'aria-label': ariaLabel,
 		'aria-labelledby': ariaLabelledBy,
+		labelledBy: openInNewTab ? externalLinkIndicatorId : undefined,
 	} );
 
 	return (
 		<_Menu.LinkItem
 			ref={ ref }
+			{ ...props }
 			{ ...itemAriaProps }
+			rel={ openInNewTab ? getOpenInNewTabRel( rel ) : rel }
+			target={ openInNewTab ? '_blank' : undefined }
 			className={ clsx(
 				defenseStyles.a,
 				resetStyles[ 'box-sizing' ],
@@ -42,10 +78,9 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 				styles.item,
 				className
 			) }
-			{ ...props }
 		>
 			<MenuItemContentContext.Provider value={ contentContextValue }>
-				<ItemContent prefix={ prefix } suffix={ suffix }>
+				<ItemContent prefix={ prefix } suffix={ itemSuffix }>
 					{ children }
 				</ItemContent>
 			</MenuItemContentContext.Provider>

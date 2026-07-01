@@ -117,6 +117,22 @@
 			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
+		.external-link-indicator {
+			display: inline-block;
+			line-height: 1;
+			margin-inline-start: 0;
+			font-weight: var(--wpds-typography-font-weight-regular);
+			text-decoration: none;
+		}
+
+		.external-link-indicator::after {
+			content: "\2197";
+		}
+
+		.external-link-indicator:dir(rtl)::after {
+			content: "\2196";
+		}
+
 		.item[data-highlighted]:not([aria-disabled="true"]) .item-prefix,
 		.item[data-highlighted]:not([aria-disabled="true"]) .item-suffix,
 		.item[aria-disabled="true"] .item-prefix,

@@ -18,6 +18,9 @@ type ItemAriaProps = Pick<
 	ItemProps,
 	'aria-describedby' | 'aria-label' | 'aria-labelledby'
 >;
+type UseItemContentOptions = ItemAriaProps & {
+	labelledBy?: string;
+};
 
 function getStructuredItemContent( children: ItemProps[ 'children' ] ) {
 	const childArray = Children.toArray( children );
@@ -55,7 +58,8 @@ function useItemContent(
 		'aria-describedby': ariaDescribedBy,
 		'aria-label': ariaLabel,
 		'aria-labelledby': ariaLabelledBy,
-	}: ItemAriaProps
+		labelledBy: additionalLabelledBy,
+	}: UseItemContentOptions
 ) {
 	const generatedLabelId = useId();
 	const generatedDescriptionId = useId();
@@ -80,10 +84,17 @@ function useItemContent(
 	/*
 	 * `aria-labelledby` takes precedence over `aria-label` in the accessible
 	 * name algorithm. Only provide our generated label relationship when the
-	 * consumer has not supplied either explicit naming prop.
+	 * consumer has not supplied either explicit naming prop. Additional labels
+	 * are only appended to that generated relationship, so explicit naming stays
+	 * fully consumer-controlled.
 	 */
 	const labelledBy =
-		ariaLabelledBy ?? ( ariaLabel ? undefined : resolvedLabelId );
+		ariaLabelledBy ??
+		( ariaLabel
+			? undefined
+			: [ resolvedLabelId, additionalLabelledBy ]
+					.filter( Boolean )
+					.join( ' ' ) || undefined );
 
 	return {
 		contentContextValue: {

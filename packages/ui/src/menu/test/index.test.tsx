@@ -136,6 +136,55 @@ describe( 'Menu', () => {
 		expect( item ).toHaveAccessibleDescription( 'Create a separate copy.' );
 	} );
 
+	it( 'supports link items that open in a new tab', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.LinkItem href="https://wordpress.org" openInNewTab>
+						WordPress.org
+					</Menu.LinkItem>
+					<Menu.LinkItem
+						href="https://developer.wordpress.org"
+						openInNewTab
+						rel="nofollow"
+					>
+						Developer resources
+					</Menu.LinkItem>
+					<Menu.LinkItem
+						aria-label="WordPress project"
+						href="https://make.wordpress.org"
+						openInNewTab
+					>
+						Make WordPress
+					</Menu.LinkItem>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+
+		const item = await screen.findByRole( 'menuitem', {
+			name: 'WordPress.org (opens in a new tab)',
+		} );
+
+		expect( item ).toHaveAttribute( 'target', '_blank' );
+		expect( item ).toHaveAttribute( 'rel', 'noreferrer noopener' );
+		expect(
+			screen.getAllByLabelText( '(opens in a new tab)' )
+		).toHaveLength( 3 );
+		expect(
+			screen.getByRole( 'menuitem', {
+				name: 'Developer resources (opens in a new tab)',
+			} )
+		).toHaveAttribute( 'rel', 'nofollow noreferrer noopener' );
+		expect(
+			screen.getByRole( 'menuitem', { name: 'WordPress project' } )
+		).not.toHaveAttribute( 'aria-labelledby' );
+	} );
+
 	it( 'uses custom item label and description ids for generated aria relationships', async () => {
 		const user = userEvent.setup();
 
