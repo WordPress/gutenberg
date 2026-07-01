@@ -56,6 +56,8 @@ function Edit( {
 		},
 		[ clientId ]
 	);
+	const { isBlockSelected, hasSelectedInnerBlock } =
+		useSelect( blockEditorStore );
 	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 	const { insertTab, removeTab } = useTabActions( tabsClientId );
@@ -90,6 +92,14 @@ function Edit( {
 			return;
 		}
 
+		// Only move focus during active editing, not external data changes.
+		if (
+			! isBlockSelected( tabsClientId ) &&
+			! hasSelectedInnerBlock( tabsClientId, true )
+		) {
+			return;
+		}
+
 		const focusButtonAt = ( index ) => {
 			window.requestAnimationFrame( () => {
 				const buttons = menuRef.current?.querySelectorAll( 'button' );
@@ -107,7 +117,13 @@ function Edit( {
 		};
 
 		focusButtonAt( effectiveActiveIndex );
-	}, [ tabsList.length, effectiveActiveIndex ] );
+	}, [
+		effectiveActiveIndex,
+		hasSelectedInnerBlock,
+		isBlockSelected,
+		tabsClientId,
+		tabsList.length,
+	] );
 
 	const blockProps = useBlockProps( {
 		role: 'tablist',
