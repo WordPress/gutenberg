@@ -91,7 +91,9 @@ async function validateCollection() {
 
 		const svgContent = await readFile( svgPath, 'utf8' );
 		if ( ! svgContent.includes( 'currentColor' ) ) {
-			problems.push( `- Icon ${ svgPath } must include currentColor` );
+			problems.push(
+				`- Icon ${ svgPath } must set fill="currentColor" or stroke="currentColor" so the icon inherits text color`
+			);
 		}
 	}
 
