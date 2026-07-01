@@ -171,7 +171,7 @@ describe( 'Menu', () => {
 		} );
 
 		expect( item ).toHaveAttribute( 'target', '_blank' );
-		expect( item ).toHaveAttribute( 'rel', 'noreferrer noopener' );
+		expect( item ).toHaveAttribute( 'rel', 'noopener' );
 		expect(
 			screen.getAllByLabelText( '(opens in a new tab)' )
 		).toHaveLength( 3 );
@@ -179,7 +179,7 @@ describe( 'Menu', () => {
 			screen.getByRole( 'menuitem', {
 				name: 'Developer resources (opens in a new tab)',
 			} )
-		).toHaveAttribute( 'rel', 'nofollow noreferrer noopener' );
+		).toHaveAttribute( 'rel', 'nofollow noopener' );
 		expect(
 			screen.getByRole( 'menuitem', { name: 'WordPress project' } )
 		).not.toHaveAttribute( 'aria-labelledby' );
