@@ -144,6 +144,19 @@ export default function SuggestionAutoSave() {
 	// no duplicate POSTs, and no dropped work when the user keeps typing
 	// during a slow network call.
 	const queuesRef = useRef( new Map() );
+	// Synchronous mirror of each block's last-known comment id. `setCommentId`
+	// updates React state, which only reaches `entriesRef` on the next render
+	// commit; a save queued immediately after a `create` resolves would run
+	// before that commit and read a stale `entry.commentId` of null, POSTing a
+	// duplicate note. This ref is written the instant a create resolves (and on
+	// every rotation/clear), so the queued save sees the fresh id without waiting
+	// for React. A `null` value is a deliberate "known to have no note" marker,
+	// distinct from "no entry yet" (fall back to `entry.commentId`).
+	const commentIdsRef = useRef( new Map() );
+	const writeCommentId = useCallback( ( clientId, id ) => {
+		commentIdsRef.current.set( clientId, id );
+		setCommentIdRef.current( clientId, id );
+	}, [] );
 
 	const syncOnce = useCallback(
 		async ( clientId ) => {
@@ -166,14 +179,20 @@ export default function SuggestionAutoSave() {
 			// the next save creates a fresh note that coexists with the
 			// resolved one — this only works because PR #75147 lets a block
 			// hold multiple note ids in `metadata.noteId`.
-			let commentId = entry.commentId;
+			// Prefer the synchronous mirror over `entry.commentId`: it reflects
+			// a create that resolved after this entry snapshot was taken but
+			// before React re-rendered, which is exactly the create->update
+			// window a duplicate note would slip through.
+			let commentId = commentIdsRef.current.has( clientId )
+				? commentIdsRef.current.get( clientId )
+				: entry.commentId;
 			if ( commentId ) {
 				const linkedComment = registry
 					.select( coreStore )
 					.getEntityRecord( 'root', 'comment', commentId );
 				if ( linkedComment && linkedComment.status !== 'hold' ) {
 					commentId = null;
-					setCommentIdRef.current( clientId, null );
+					writeCommentId( clientId, null );
 				}
 			}
 
@@ -181,7 +200,7 @@ export default function SuggestionAutoSave() {
 				if ( operations.length === 0 ) {
 					if ( commentId ) {
 						await deleteRef.current( { commentId } );
-						setCommentIdRef.current( clientId, null );
+						writeCommentId( clientId, null );
 					}
 				} else if ( commentId ) {
 					await updateRef.current( {
@@ -196,7 +215,7 @@ export default function SuggestionAutoSave() {
 						operations,
 					} );
 					if ( saved?.id ) {
-						setCommentIdRef.current( clientId, saved.id );
+						writeCommentId( clientId, saved.id );
 					}
 				}
 				setSyncedOpsKeyRef.current( clientId, fingerprint );
@@ -206,7 +225,7 @@ export default function SuggestionAutoSave() {
 				// on their own.
 			}
 		},
-		[ registry ]
+		[ registry, writeCommentId ]
 	);
 
 	const enqueueSync = useCallback(
