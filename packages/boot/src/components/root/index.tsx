@@ -63,7 +63,10 @@ export default function Root() {
 	return (
 		<SlotFillProvider>
 			<Tooltip.Provider>
-				<ThemeProvider isRoot color={ themeColors }>
+				<ThemeProvider
+					isRoot
+					color={ { ...themeColors, background: '#f8f8f8' } }
+				>
 					<ThemeProvider color={ themeColors }>
 						<div
 							className={ clsx( 'boot-layout', {

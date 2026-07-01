@@ -46,7 +46,10 @@ export default function RootSinglePage() {
 
 	return (
 		<SlotFillProvider>
-			<ThemeProvider isRoot color={ themeColors }>
+			<ThemeProvider
+				isRoot
+				color={ { ...themeColors, background: '#f8f8f8' } }
+			>
 				<ThemeProvider color={ themeColors }>
 					<div
 						className={ clsx(
