@@ -41,6 +41,7 @@ import type {
 	ActionModal as ActionModalType,
 } from '../../../types';
 import getDataByGroup from '../utils/get-data-by-group';
+import { useIntersectionObserver } from '../utils/use-infinite-scroll';
 
 interface ListViewItemProps< Item > {
 	view: ViewListType;
@@ -161,6 +162,7 @@ function ListItem< Item >( {
 	const itemRef = useRef< HTMLDivElement >( null );
 	const labelId = `${ idPrefix }-label`;
 	const descriptionId = `${ idPrefix }-description`;
+	useIntersectionObserver( itemRef, posinset );
 
 	const registry = useRegistry();
 	const [ isHovered, setIsHovered ] = useState( false );
@@ -642,8 +644,9 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 					! isInfiniteScroll && !! isLoading ? 'true' : undefined
 				}
 			>
-				{ data.map( ( item, index ) => {
+				{ data.map( ( item ) => {
 					const id = generateCompositeItemIdPrefix( item );
+					const posinset = ( item as { position?: number } ).position;
 					return (
 						<ListItem
 							key={ id }
@@ -660,11 +663,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 							onDropdownTriggerKeyDown={
 								onDropdownTriggerKeyDown
 							}
-							posinset={
-								view.infiniteScrollEnabled
-									? index + 1
-									: undefined
-							}
+							posinset={ isInfiniteScroll ? posinset : undefined }
 						/>
 					);
 				} ) }
