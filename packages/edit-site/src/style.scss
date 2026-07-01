@@ -59,7 +59,7 @@ body.js.site-editor-php {
 
 	@include break-medium {
 		&:has(.editor-editor-interface.is-distraction-free) {
-			--wp-admin--admin-bar--height: 0;
+			--wp-admin--admin-bar--height: 0px;
 
 			#wpadminbar {
 				display: none;
@@ -78,7 +78,7 @@ body.js.site-editor-php {
 	@include break-small {
 		bottom: 0;
 		left: 0;
-		height: calc(100vh - var(--wp-admin--admin-bar--height, 0));
+		height: calc(100vh - var(--wp-admin--admin-bar--height, 0px));
 		padding-top: 0;
 		position: fixed;
 		right: 0;
