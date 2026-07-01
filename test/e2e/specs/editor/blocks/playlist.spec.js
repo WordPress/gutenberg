@@ -34,6 +34,7 @@ test.describe( 'Playlist block', () => {
 		page,
 		requestUtils,
 	} ) => {
+		// Move page creation to its own Before ALL step?
 		await page.addInitScript( () => {
 			const descriptor = Object.getOwnPropertyDescriptor(
 				HTMLMediaElement.prototype,
@@ -84,49 +85,88 @@ test.describe( 'Playlist block', () => {
 
 		await page.goto( post.link );
 
+		// `exact` avoids matching the track button, whose accessible name
+		// includes the "Select to play this track" screen-reader text.
+		const playButton = page.getByRole( 'button', {
+			name: 'Play',
+			exact: true,
+		} );
+		const pauseButton = page.getByRole( 'button', {
+			name: 'Pause',
+			exact: true,
+		} );
 		const seekControl = page.getByRole( 'slider', { name: trackTitle } );
-		await expect( seekControl ).toBeVisible();
-		await expect( seekControl ).toHaveJSProperty( 'tagName', 'DIV' );
-		await expect( seekControl ).toHaveAttribute(
-			'class',
-			/waveform-container/
-		);
-		await expect( seekControl ).toHaveAttribute( 'tabindex', '0' );
-		await expect( seekControl ).toHaveAttribute( 'aria-valuemin', '0' );
-		await expect( seekControl ).toHaveAttribute( 'aria-valuenow', '0' );
+
+		// Wait for the player to finish initializing: the seek control gains a
+		// real duration once the audio metadata has loaded.
+		await expect( playButton ).toBeVisible();
 		await expect
 			.poll( async () =>
 				Number( await seekControl.getAttribute( 'aria-valuemax' ) )
 			)
 			.toBeGreaterThan( 0 );
 
-		await expect( seekControl.locator( 'canvas' ) ).toHaveAttribute(
-			'aria-hidden',
-			'true'
+		// The server renders the seek value text as a translation template with
+		// printf-style placeholders; the live values are interpolated
+		// client-side into the slider's aria-valuetext, not this data attribute.
+		await expect(
+			page.locator( '.wp-block-playlist__waveform-player' )
+		).toHaveAttribute( 'data-label-seek-value', '%1$s of %2$s' );
+
+		// Before playback, the interpolated accessible value reads "0:00 of
+		// <duration>" — the placeholders are filled in, not left as "%1$s".
+		await expect( seekControl ).toHaveAttribute(
+			'aria-valuetext',
+			/^0:00 of \d+:\d{2}$/
 		);
 
-		for ( let i = 0; i < 50; i++ ) {
-			if (
-				await seekControl.evaluate(
-					( element ) => element === document.activeElement
-				)
-			) {
-				break;
-			}
-			await page.keyboard.press( 'Tab' );
-		}
+		// Click Play to start playing. Clicking the button also focuses it.
+		await playButton.click();
 
+		// Audio should start playing. expect will allow up to 5000ms for the
+		// condition to be met, so we should reach 0:01 within that timeframe
+		await expect( seekControl ).toHaveAttribute(
+			'aria-valuetext',
+			/^0:01 of \d+:\d{2}$/
+		);
+
+		// Focus should still be on the play/pause button (now labelled "Pause").
+		await expect( pauseButton ).toBeFocused();
+
+		// Press Spacebar to pause the player
+		await page.keyboard.press( 'Space' );
+
+		// Audio should stop playing: the accessible name toggles back to "Play".
+		await expect( playButton ).toBeVisible();
+
+		// Focus should still be on the play/pause button.
+		await expect( playButton ).toBeFocused();
+
+		// Time elapsed should still be 0:01
+		await expect( seekControl ).toHaveAttribute(
+			'aria-valuetext',
+			/^0:01 of \d+:\d{2}$/
+		);
+
+		// Press Tab.
+		await page.keyboard.press( 'Tab' );
+
+		// Focus should move to the Seek control.
+		await expect( seekControl ).toBeVisible();
 		await expect( seekControl ).toBeFocused();
-		const currentTime = await page.evaluate(
-			() => window.__playlistLastAudioCurrentTime ?? 0
-		);
 
+		// The interceptor only records seeks, so establish a tracked baseline
+		// with a first ArrowRight before measuring the step.
 		await page.keyboard.press( 'ArrowRight' );
 
-		await expect
-			.poll( () =>
-				page.evaluate( () => window.__playlistLastAudioCurrentTime )
-			)
-			.toBeGreaterThan( currentTime );
+		// The accessible value text reflects the new position after seeking
+		// (still interpolated, and no longer at 0:00).
+		await expect( seekControl ).toHaveAttribute(
+			'aria-valuetext',
+			/^0:06 of \d+:\d{2}$/
+		);
+
+		// Focus should still be on the slider after seeking.
+		await expect( seekControl ).toBeFocused();
 	} );
 } );
