@@ -9,6 +9,22 @@ A theming package that's part of the WordPress Design System. It has two parts:
 -   **Design Tokens**: A comprehensive system of design tokens for colors, spacing, typography, and more.
 -   **Theme System**: A flexible theming provider for consistent theming across applications.
 
+## Stability and Semver
+
+Once this package is marked stable, the public API is governed by the Gutenberg project's [backward compatibility policy](https://developer.wordpress.org/block-editor/contributors/code/backward-compatibility/) and by the semver categories described in the [packages contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs).
+
+The public API includes:
+
+-   Documented root package exports, such as `ThemeProvider` and the exported design token types.
+-   Public package subpath exports declared in `package.json`, including `@wordpress/theme/design-tokens.css`, `@wordpress/theme/design-tokens.js`, the build plugins, and the Stylelint plugins.
+-   Semantic `--wpds-*` CSS custom properties documented in the [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md).
+
+Generated implementation files are not public API unless they are reachable through a documented package export. Source token JSON files, primitive tokens, generated fallback data, package-internal build artifacts, and private APIs exposed only for migration can change as implementation details.
+
+Semantic token removals or renames are breaking changes. Token additions are new features. Token value changes are usually non-breaking when the token's documented purpose stays the same, but they should still be called out when they can affect visual output. Avoid replacing a token with another token of a different semantic purpose; add a new token when a new meaning is needed.
+
+The build plugins and Stylelint plugins are public tooling APIs. Removing an exported plugin, changing its configuration contract, or introducing new default behavior that can fail previously valid code is a breaking change unless the previous behavior was an implementation bug. Bug fixes and support for additional syntax or file types should remain backward-compatible whenever possible.
+
 ## Design Tokens
 
 Design tokens are the visual design atoms of a design system. They are named entities that store visual design attributes like colors, spacing, typography, and shadows. They serve as a single source of truth that bridges design and development, ensuring consistency across platforms and making it easy to maintain and evolve the visual language of an application.
