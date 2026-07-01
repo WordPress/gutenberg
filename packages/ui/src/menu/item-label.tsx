@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
-import itemPopupStyles from '../utils/css/item-popup.module.css';
 import { useMenuItemContentContext } from './context';
 import styles from './style.module.css';
 import type { ItemLabelProps } from './types';
@@ -16,11 +15,7 @@ const ItemLabel = forwardRef< HTMLSpanElement, ItemLabelProps >(
 			<span
 				ref={ ref }
 				id={ id ?? itemContentContext?.labelId }
-				className={ clsx(
-					itemPopupStyles[ 'item-label' ],
-					styles[ 'item-label' ],
-					className
-				) }
+				className={ clsx( styles[ 'item-label' ], className ) }
 				{ ...props }
 			/>
 		);
