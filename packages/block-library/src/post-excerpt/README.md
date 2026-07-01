@@ -35,7 +35,6 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - [`lineHeight`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
   - [`textAlign`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-textalign): `true`
   - `textColumns`: `true`
-  - `textIndent`: `true`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
 
@@ -48,13 +47,6 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 - `postId`
 - `postType`
 - `queryId`
-
-## CSS Selectors
-
-_Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
-
-- **typography**:
-  - textIndent: `.wp-block-post-excerpt > :where(p:first-of-type)`
 
 ## Block Markup
 
