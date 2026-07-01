@@ -16,10 +16,9 @@ interface WidgetRenderProps< Item = unknown > {
 }
 
 /*
- * Host-agnostic render entry point for any widget type. Resolves the
- * widget's `renderModule` through the host-provided
- * `resolveWidgetModule` and mounts the resulting component with the
- * standard `attributes` plus `setAttributes` render contract.
+ * Resolves a widget type's `renderModule` via `resolveWidgetModule` and
+ * mounts the resulting component with the `attributes`/`setAttributes`
+ * render contract.
  */
 export function WidgetRender< Item = unknown >( {
 	widgetType,
@@ -34,7 +33,7 @@ export function WidgetRender< Item = unknown >( {
 
 	return (
 		<>
-			{ /* WidgetComponent is a cached `lazy()` keyed by renderModule, so its identity stays stable across renders. */ }
+			{ /* Cached `lazy()` keyed by renderModule; identity is stable across renders. */ }
 			{ /* eslint-disable-next-line react-hooks/static-components */ }
 			<WidgetComponent
 				attributes={ attributes }

@@ -19,6 +19,7 @@ import {
 	useResizeObserver,
 	usePrevious,
 } from '@wordpress/compose';
+import { focus } from '@wordpress/dom';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useRef, useEffect, useMemo } from '@wordpress/element';
 import {
@@ -27,7 +28,7 @@ import {
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { privateApis as themePrivateApis } from '@wordpress/theme';
+import { ThemeProvider } from '@wordpress/theme';
 import { PluginArea } from '@wordpress/plugins';
 import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -37,7 +38,7 @@ import { Tooltip } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import { default as SiteHub, SiteHubMobile } from '../site-hub';
+import { SiteHubMobile } from '../site-hub';
 import ResizableFrame from '../resizable-frame';
 import { unlock } from '../../lock-unlock';
 import SaveKeyboardShortcut from '../save-keyboard-shortcut';
@@ -49,7 +50,6 @@ import SavePanel from '../save-panel';
 
 const { useLocation } = unlock( routerPrivateApis );
 const { useStyle, UploadProgressSnackbar } = unlock( editorPrivateApis );
-const { ThemeProvider } = unlock( themePrivateApis );
 
 const ANIMATION_DURATION = 0.3;
 const CONTENT_COLOR = { background: '#ffffff' };
@@ -58,13 +58,12 @@ function Layout() {
 	const { query, name: routeKey, areas, widths } = useLocation();
 	// Force canvas to 'view' on notfound route to show the error message and allow navigation.
 	const canvas = routeKey === 'notfound' ? 'view' : query?.canvas ?? 'view';
-	const hasAdminBarInEditor = window.__experimentalAdminBarInEditor;
-	const showDesktopSiteHub = ! hasAdminBarInEditor;
-	const showMobileSiteHub = ! hasAdminBarInEditor || routeKey !== 'home';
+	const showMobileSiteHub = !! areas.mobileContent;
 	const hasMobileAreas =
 		areas.mobileSidebar || areas.mobileContent || areas.preview;
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const toggleRef = useRef();
+	const mobileToggleRef = useRef();
+	const sidebarRegionRef = useRef();
 	const navigateRegionsProps = useNavigateRegions();
 	const disableMotion = useReducedMotion();
 	const [ canvasResizer, canvasSize ] = useResizeObserver();
@@ -89,7 +88,11 @@ function Layout() {
 	const previousCanvaMode = usePrevious( canvas );
 	useEffect( () => {
 		if ( previousCanvaMode === 'edit' ) {
-			toggleRef.current?.focus();
+			const desktopToggle = sidebarRegionRef.current
+				? // We're typically expecting the `<DashboardBackButton />` component as the first tabbable element.
+				  focus.tabbable.find( sidebarRegionRef.current )[ 0 ]
+				: undefined;
+			( desktopToggle ?? mobileToggleRef.current )?.focus();
 		}
 		// Should not depend on the previous canvas mode value but the next.
 	}, [ canvas ] );
@@ -117,6 +120,7 @@ function Layout() {
 					*/ }
 					{ ( ! isMobileViewport || ! hasMobileAreas ) && (
 						<NavigableRegion
+							ref={ sidebarRegionRef }
 							ariaLabel={ __( 'Navigation' ) }
 							className="edit-site-layout__sidebar-region"
 						>
@@ -138,14 +142,6 @@ function Layout() {
 										} }
 										className="edit-site-layout__sidebar"
 									>
-										{ showDesktopSiteHub && (
-											<SiteHub
-												ref={ toggleRef }
-												isTransparent={
-													isResizableFrameOversized
-												}
-											/>
-										) }
 										<SidebarNavigationProvider>
 											<SidebarContent
 												shouldAnimate={
@@ -177,7 +173,7 @@ function Layout() {
 									<>
 										{ showMobileSiteHub && (
 											<SiteHubMobile
-												ref={ toggleRef }
+												ref={ mobileToggleRef }
 												isTransparent={
 													isResizableFrameOversized
 												}

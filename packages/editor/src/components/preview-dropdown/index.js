@@ -28,6 +28,7 @@ import { VisuallyHidden } from '@wordpress/ui';
  */
 import { store as editorStore } from '../../store';
 import PostPreviewButton from '../post-preview-button';
+import { VIEWPORT_STATE_BY_DEVICE_TYPE } from '../../utils/device-type';
 import { unlock } from '../../lock-unlock';
 
 export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
@@ -39,13 +40,17 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		showIconLabels,
 		isTemplateHidden,
 		templateId,
+		isResponsiveEditing,
 	} = useSelect( ( select ) => {
 		const {
-			getDeviceType,
 			getCurrentPostType,
 			getCurrentTemplateId,
 			getRenderingMode,
-		} = select( editorStore );
+			getDeviceType,
+		} = unlock( select( editorStore ) );
+		const { isResponsiveEditing: _isResponsiveEditing } = unlock(
+			select( blockEditorStore )
+		);
 		const { getEntityRecord, getPostType } = select( coreStore );
 		const { get } = select( preferencesStore );
 		const _currentPostType = getCurrentPostType();
@@ -57,16 +62,28 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			isTemplateHidden: getRenderingMode() === 'post-only',
 			templateId: getCurrentTemplateId(),
+			isResponsiveEditing: _isResponsiveEditing(),
 		};
 	}, [] );
 	const { setDeviceType, setRenderingMode, setDefaultRenderingMode } = unlock(
 		useDispatch( editorStore )
 	);
-	const { resetZoomLevel } = unlock( useDispatch( blockEditorStore ) );
+	const { resetZoomLevel, setStyleStateViewport, setResponsiveEditing } =
+		unlock( useDispatch( blockEditorStore ) );
 
 	const handleDevicePreviewChange = ( newDeviceType ) => {
 		setDeviceType( newDeviceType );
 		resetZoomLevel();
+	};
+
+	const handleResponsiveEditingChange = () => {
+		const newIsResponsiveEditing = ! isResponsiveEditing;
+		setResponsiveEditing( newIsResponsiveEditing );
+		setStyleStateViewport(
+			newIsResponsiveEditing
+				? VIEWPORT_STATE_BY_DEVICE_TYPE[ deviceType ] ?? 'default'
+				: 'default'
+		);
 	};
 
 	const isMobile = useViewportMatch( 'medium', '<' );
@@ -107,16 +124,25 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			value: 'Desktop',
 			label: __( 'Desktop' ),
 			icon: desktop,
+			info: isResponsiveEditing
+				? __( 'Edit across all breakpoints.' )
+				: __( 'Preview desktop viewport.' ),
 		},
 		{
 			value: 'Tablet',
 			label: __( 'Tablet' ),
 			icon: tablet,
+			info: isResponsiveEditing
+				? __( 'Make tablet exclusive changes.' )
+				: __( 'Preview tablet viewport.' ),
 		},
 		{
 			value: 'Mobile',
 			label: __( 'Mobile' ),
 			icon: mobile,
+			info: isResponsiveEditing
+				? __( 'Make mobile exclusive changes.' )
+				: __( 'Preview mobile viewport.' ),
 		},
 	];
 
@@ -141,6 +167,19 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 							value={ deviceType }
 							onSelect={ handleDevicePreviewChange }
 						/>
+					</MenuGroup>
+					<MenuGroup>
+						<MenuItem
+							icon={ isResponsiveEditing ? check : undefined }
+							isSelected={ isResponsiveEditing }
+							role="menuitemcheckbox"
+							onClick={ handleResponsiveEditingChange }
+							info={ __(
+								'Edits apply only to the current state.'
+							) }
+						>
+							{ __( 'Responsive editing' ) }
+						</MenuItem>
 					</MenuGroup>
 					{ isTemplate && (
 						<MenuGroup>

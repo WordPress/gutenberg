@@ -42,7 +42,7 @@
   <!-- Station 5: the package -->
   <rect x="216" y="454" width="480" height="66" rx="9" fill="#d7f0ea" stroke="#2b8d79" stroke-width="1.5"/>
   <text x="240" y="481" font-family="ui-monospace, SFMono-Regular, monospace" font-size="13" font-weight="700" fill="#1d6b5a">@wordpress/widget-primitives</text>
-  <text x="240" y="502" font-family="-apple-system, system-ui, sans-serif" font-size="11.5" fill="#1d6b5a" opacity="0.9">useWidgetTypes() → WidgetType[] · WidgetRender mounts one</text>
+  <text x="240" y="502" font-family="-apple-system, system-ui, sans-serif" font-size="11.5" fill="#1d6b5a" opacity="0.9">useWidgetTypes( records ) → WidgetType[] · WidgetRender mounts one</text>
 
   <line x1="456" y1="520" x2="456" y2="558" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
 

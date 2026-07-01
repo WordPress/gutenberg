@@ -58,6 +58,19 @@ import { VISUALLY_HIDDEN_STYLE } from '../visually-hidden-style';
 const CROP_RECT_EPSILON = 1e-6;
 /** Threshold for deciding whether rotation is at a 90-degree stop. */
 const CARDINAL_ROTATION_EPSILON = 1e-6;
+/** Duration of the settle transform transition after resize end. */
+const SETTLE_TRANSITION_DURATION_MS = 200;
+// Fallback timer for when the computed transform is unchanged and no
+// `transitionend` fires. Sits past the CSS duration so it only wins the race
+// when the transition genuinely never runs.
+const SETTLE_TRANSITION_FALLBACK_MS = SETTLE_TRANSITION_DURATION_MS + 100;
+const SETTLE_TRANSFORM_TRANSITION = `transform ${ SETTLE_TRANSITION_DURATION_MS }ms ease-out`;
+const SETTLE_STENCIL_TRANSITION = [
+	`left ${ SETTLE_TRANSITION_DURATION_MS }ms ease-out`,
+	`top ${ SETTLE_TRANSITION_DURATION_MS }ms ease-out`,
+	`width ${ SETTLE_TRANSITION_DURATION_MS }ms ease-out`,
+	`height ${ SETTLE_TRANSITION_DURATION_MS }ms ease-out`,
+].join( ', ' );
 
 /**
  * Props for the Cropper component.
@@ -379,6 +392,12 @@ function CropperInner(
 	const [ isResizing, setIsResizing ] = useState( false );
 	const isResizingRef = useRef( false );
 	const isSettlingRef = useRef( false );
+	const [ isTouchPinching, setIsTouchPinchingState ] = useState( false );
+	const isTouchPinchingRef = useRef( false );
+	const setTouchPinching = useCallback( ( isPinching: boolean ) => {
+		isTouchPinchingRef.current = isPinching;
+		setIsTouchPinchingState( isPinching );
+	}, [] );
 	// Direction of the handle the user is currently resizing — pointer or
 	// keyboard. `null` outside of an active resize. Drives the live
 	// dimensions tooltip overlay.
@@ -593,6 +612,26 @@ function CropperInner(
 		onPointerDownCapture: () => {
 			setIsFocusVisible( false );
 		},
+		onTouchStartCapture: ( event: React.TouchEvent< HTMLDivElement > ) => {
+			if ( event.touches.length > 1 ) {
+				setTouchPinching( true );
+			}
+		},
+		onTouchMoveCapture: ( event: React.TouchEvent< HTMLDivElement > ) => {
+			if ( event.touches.length > 1 ) {
+				setTouchPinching( true );
+			}
+		},
+		onTouchEndCapture: ( event: React.TouchEvent< HTMLDivElement > ) => {
+			if ( event.touches.length === 0 ) {
+				setTouchPinching( false );
+			}
+		},
+		onTouchCancelCapture: ( event: React.TouchEvent< HTMLDivElement > ) => {
+			if ( event.touches.length === 0 ) {
+				setTouchPinching( false );
+			}
+		},
 		onKeyDownCapture: ( event: React.KeyboardEvent< HTMLDivElement > ) => {
 			// Modifier-only keypresses precede another key rather than
 			// indicating deliberate keyboard interaction on their own.
@@ -603,6 +642,14 @@ function CropperInner(
 			}
 		},
 		onPointerDown: ( event: React.PointerEvent< HTMLDivElement > ) => {
+			if (
+				isResizingRef.current ||
+				isTouchPinchingRef.current ||
+				( event.pointerType === 'touch' && event.isPrimary === false )
+			) {
+				event.preventDefault();
+				return;
+			}
 			handlers.onPointerDown?.( event );
 			// Re-assert false after handlers run — el.focus() inside the
 			// handler fires onFocus, which may otherwise set it back to true.
@@ -667,6 +714,9 @@ function CropperInner(
 
 	const handleCropChange = useCallback(
 		( rect: NormalizedRect ) => {
+			if ( isTouchPinchingRef.current ) {
+				return;
+			}
 			setCropRect( rect );
 			// During a resize drag, pan the viewport so the handle stays
 			// visible even when the crop extends beyond the canvas edge.
@@ -708,9 +758,14 @@ function CropperInner(
 		[ setCropRect, setViewportPan, canvasSize, scaledVisualSize ]
 	);
 
-	// Settling animation: brief linear transition after resize end.
+	// Settling animation: brief transition after resize end.
 	const [ settling, setSettling ] = useState( false );
 	const settleTimerRef = useRef< ReturnType< typeof setTimeout > >();
+	const finishSettling = useCallback( () => {
+		clearTimeout( settleTimerRef.current );
+		isSettlingRef.current = false;
+		setSettling( false );
+	}, [] );
 
 	// Clear the pending settle timer on unmount so it can't fire a
 	// state update on an unmounted component.
@@ -752,6 +807,9 @@ function CropperInner(
 
 	const handleResizeStart = useCallback(
 		( handle?: HandlePosition ) => {
+			if ( isTouchPinchingRef.current ) {
+				return;
+			}
 			// Freeze the magnification at its current value so grabbing a
 			// handle doesn't reset the zoom; it holds for the whole drag.
 			setFrozenViewScale( viewScaleRest );
@@ -761,13 +819,11 @@ function CropperInner(
 			// Clear any in-flight settle so transitions don't apply during the
 			// new drag (rapid successive resizes would otherwise inherit the
 			// previous settle animation).
-			clearTimeout( settleTimerRef.current );
-			isSettlingRef.current = false;
-			setSettling( false );
+			finishSettling();
 			resetViewport();
 			onGestureStart?.();
 		},
-		[ onGestureStart, resetViewport, viewScaleRest ]
+		[ finishSettling, onGestureStart, resetViewport, viewScaleRest ]
 	);
 
 	/**
@@ -775,9 +831,24 @@ function CropperInner(
 	 * and reset the viewport pan back to neutral.
 	 */
 	const handleResizeEnd = useCallback( () => {
+		const isCancellingForPinch = isTouchPinchingRef.current;
 		isResizingRef.current = false;
 		setIsResizing( false );
 		setActiveHandle( null );
+		clearTimeout( settleTimerRef.current );
+
+		if ( isCancellingForPinch ) {
+			// A pinch took over mid-resize. Tear down resize UI without
+			// settling or firing onGestureEnd: the pinch owns the gesture
+			// boundary and fires the end on its own touchend. The resize and
+			// the pinch therefore collapse into a single undo step, since
+			// `beginGesture` is idempotent and the snapshot captured at resize
+			// start is flushed by the pinch's `endGesture`.
+			finishSettling();
+			resetViewport();
+			return;
+		}
+
 		isSettlingRef.current = true;
 		setSettling( true );
 		// Reset viewport pan first so it transitions back to zero in sync
@@ -785,21 +856,44 @@ function CropperInner(
 		resetViewport();
 		settleCrop();
 		onGestureEnd?.();
-		clearTimeout( settleTimerRef.current );
-		settleTimerRef.current = setTimeout( () => {
-			isSettlingRef.current = false;
-			setSettling( false );
-		}, 200 );
-	}, [ settleCrop, onGestureEnd, resetViewport ] );
+		// Normal completion is driven by transitionend so settling cannot clear
+		// before the browser has actually finished animating. Keep a fallback for
+		// cases where the computed transform is unchanged and no event fires.
+		settleTimerRef.current = setTimeout(
+			finishSettling,
+			SETTLE_TRANSITION_FALLBACK_MS
+		);
+	}, [ finishSettling, settleCrop, onGestureEnd, resetViewport ] );
+
+	/**
+	 * Finish settling when the settle transform transition actually completes.
+	 * The handler lives on the stage, but in the common (un-panned) case the
+	 * transform transition runs on the image layer and its `transitionend`
+	 * bubbles up to here. Other transitionend events (stencil left/top/width/
+	 * height) also bubble up, so only the transform transition should clear the
+	 * settle state.
+	 */
+	const handleSettleTransitionEnd = useCallback(
+		( event: React.TransitionEvent< HTMLDivElement > ) => {
+			if (
+				! isSettlingRef.current ||
+				event.propertyName !== 'transform'
+			) {
+				return;
+			}
+			finishSettling();
+		},
+		[ finishSettling ]
+	);
 
 	let imageTransition: string | undefined;
 	if ( settling ) {
-		imageTransition = 'transform 200ms ease-out';
+		imageTransition = SETTLE_TRANSFORM_TRANSITION;
 	} else if ( isZooming ) {
 		imageTransition = 'transform 150ms linear';
 	}
 	const settleStencilTransition = settling
-		? 'left 200ms ease-out, top 200ms ease-out, width 200ms ease-out, height 200ms ease-out'
+		? SETTLE_STENCIL_TRANSITION
 		: undefined;
 
 	// Compute the image's CSS style. The element keeps its contain-fit box; the
@@ -848,7 +942,7 @@ function CropperInner(
 	// Transitions back to zero during the settle animation.
 	// will-change promotes the stage to its own compositor layer while the
 	// transform is active, keeping per-frame pan updates off the main thread.
-	const settleTransition = settling ? 'transform 200ms ease-out' : undefined;
+	const settleTransition = settling ? SETTLE_TRANSFORM_TRANSITION : undefined;
 	const willChange = isResizing || settling ? 'transform' : undefined;
 	let stageStyle: React.CSSProperties | undefined;
 	if ( viewportState.pan.x !== 0 || viewportState.pan.y !== 0 ) {
@@ -950,6 +1044,7 @@ function CropperInner(
 					className="wp-media-editor-image-editor__stage"
 					data-testid="cropper-stage"
 					style={ stageStyle }
+					onTransitionEnd={ handleSettleTransitionEnd }
 				>
 					{ /* The image layer */ }
 					<img
@@ -983,6 +1078,7 @@ function CropperInner(
 						onEscape={ handleEscape }
 						aspectRatio={ aspectRatio }
 						freeformCrop={ freeformCrop }
+						isResizeDisabled={ isTouchPinching }
 						stencilTransition={ settleStencilTransition }
 						cropBounds={ cropBounds }
 						minCropSize={ minCropSize }

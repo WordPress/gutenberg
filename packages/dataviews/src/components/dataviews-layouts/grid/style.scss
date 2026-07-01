@@ -147,7 +147,13 @@
 		.dataviews-view-grid__field-value:not(:empty) {
 			min-height: var(--wpds-dimension-size-sm);
 			line-height: var(--wpds-typography-line-height-sm);
-			padding-top: calc(var(--wpds-dimension-base) / 2);
+			// Top half of the slack between the row height and the line box,
+			// optically centering a single line within the row.
+			padding-top:
+				calc((
+					var(--wpds-dimension-size-sm) -
+					var(--wpds-typography-line-height-sm)
+				) / 2);
 		}
 
 		.dataviews-view-grid__field {

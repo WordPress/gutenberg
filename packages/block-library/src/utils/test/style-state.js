@@ -18,7 +18,7 @@ describe( 'style state dimension utilities', () => {
 				aspectRatio: '1',
 				minHeight: '40px',
 			},
-			mobile: {
+			'@mobile': {
 				dimensions: {
 					aspectRatio: '2',
 				},
@@ -29,7 +29,7 @@ describe( 'style state dimension utilities', () => {
 			dimensions: {
 				minHeight: '40px',
 			},
-			mobile: {
+			'@mobile': {
 				dimensions: {
 					aspectRatio: '2',
 				},
@@ -42,13 +42,13 @@ describe( 'style state dimension utilities', () => {
 			dimensions: {
 				aspectRatio: '1',
 			},
-			mobile: {
+			'@mobile': {
 				dimensions: {
 					aspectRatio: '2',
 					width: '200px',
 				},
 			},
-			tablet: {
+			'@tablet': {
 				dimensions: {
 					aspectRatio: '3',
 				},
@@ -58,19 +58,19 @@ describe( 'style state dimension utilities', () => {
 		expect(
 			resetStateDimensions(
 				style,
-				{ viewport: 'mobile', pseudo: 'default' },
+				{ viewport: '@mobile', pseudo: 'default' },
 				[ 'aspectRatio' ]
 			)
 		).toEqual( {
 			dimensions: {
 				aspectRatio: '1',
 			},
-			mobile: {
+			'@mobile': {
 				dimensions: {
 					width: '200px',
 				},
 			},
-			tablet: {
+			'@tablet': {
 				dimensions: {
 					aspectRatio: '3',
 				},
@@ -80,12 +80,12 @@ describe( 'style state dimension utilities', () => {
 
 	it( 'sets dimensions only for the selected viewport state', () => {
 		const style = {
-			mobile: {
+			'@mobile': {
 				dimensions: {
 					width: '200px',
 				},
 			},
-			tablet: {
+			'@tablet': {
 				dimensions: {
 					width: '300px',
 				},
@@ -95,17 +95,17 @@ describe( 'style state dimension utilities', () => {
 		expect(
 			setStateDimensions(
 				style,
-				{ viewport: 'mobile', pseudo: 'default' },
+				{ viewport: '@mobile', pseudo: 'default' },
 				{ height: '100px' }
 			)
 		).toEqual( {
-			mobile: {
+			'@mobile': {
 				dimensions: {
 					height: '100px',
 					width: '200px',
 				},
 			},
-			tablet: {
+			'@tablet': {
 				dimensions: {
 					width: '300px',
 				},
@@ -115,8 +115,8 @@ describe( 'style state dimension utilities', () => {
 
 	it( 'generates a stable key for selected style states', () => {
 		expect(
-			getStyleStateKey( { viewport: 'mobile', pseudo: ':hover' } )
-		).toBe( 'mobile::hover' );
+			getStyleStateKey( { viewport: '@mobile', pseudo: ':hover' } )
+		).toBe( '@mobile::hover' );
 		expect( getStyleStateKey( undefined ) ).toBe( 'default:default' );
 	} );
 
@@ -138,14 +138,14 @@ describe( 'style state dimension utilities', () => {
 				attributes: {
 					scale: 'cover',
 					style: {
-						mobile: {
+						'@mobile': {
 							dimensions: {
 								objectFit: 'contain',
 							},
 						},
 					},
 				},
-				selectedState: { viewport: 'mobile', pseudo: 'default' },
+				selectedState: { viewport: '@mobile', pseudo: 'default' },
 				hasSelectedStyleState: true,
 				attributeKey: 'scale',
 				styleKey: 'objectFit',
@@ -157,13 +157,13 @@ describe( 'style state dimension utilities', () => {
 		expect(
 			getDimensionUpdateAttributes( {
 				style: {
-					mobile: {
+					'@mobile': {
 						dimensions: {
 							width: '200px',
 						},
 					},
 				},
-				selectedState: { viewport: 'mobile', pseudo: 'default' },
+				selectedState: { viewport: '@mobile', pseudo: 'default' },
 				hasSelectedStyleState: true,
 				nextDimensions: {
 					scale: 'contain',
@@ -174,7 +174,7 @@ describe( 'style state dimension utilities', () => {
 			} )
 		).toEqual( {
 			style: {
-				mobile: {
+				'@mobile': {
 					dimensions: {
 						objectFit: 'contain',
 						width: '200px',
@@ -207,14 +207,14 @@ describe( 'style state dimension utilities', () => {
 		expect(
 			getDimensionUpdateAttributes( {
 				style: {
-					mobile: {
+					'@mobile': {
 						dimensions: {
 							height: '100px',
 							width: '200px',
 						},
 					},
 				},
-				selectedState: { viewport: 'mobile', pseudo: 'default' },
+				selectedState: { viewport: '@mobile', pseudo: 'default' },
 				hasSelectedStyleState: true,
 				nextDimensions: {
 					aspectRatio: '16/9',
@@ -228,7 +228,7 @@ describe( 'style state dimension utilities', () => {
 			} )
 		).toEqual( {
 			style: {
-				mobile: {
+				'@mobile': {
 					dimensions: {
 						aspectRatio: '16/9',
 						objectFit: 'cover',
@@ -248,14 +248,14 @@ describe( 'style state dimension utilities', () => {
 						dimensions: {
 							width: '300px',
 						},
-						mobile: {
+						'@mobile': {
 							dimensions: {
 								width: '400px',
 							},
 						},
 					},
 				},
-				selectedState: { viewport: 'mobile', pseudo: 'default' },
+				selectedState: { viewport: '@mobile', pseudo: 'default' },
 				hasSelectedStyleState: true,
 				keys: [ 'width' ],
 				defaultAttributes: {
@@ -280,7 +280,7 @@ describe( 'style state dimension utilities', () => {
 						dimensions: {
 							width: '300px',
 						},
-						mobile: {
+						'@mobile': {
 							dimensions: {
 								width: '400px',
 							},
@@ -296,7 +296,7 @@ describe( 'style state dimension utilities', () => {
 		).toEqual( {
 			width: undefined,
 			style: {
-				mobile: {
+				'@mobile': {
 					dimensions: {
 						width: '400px',
 					},

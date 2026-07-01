@@ -26,12 +26,10 @@
 @use "./components/sidebar-navigation-screen-templates-browse/style.scss" as *;
 @use "./components/sidebar-dataviews/style.scss" as *;
 @use "./components/site-hub/style.scss" as *;
-@use "./components/site-icon/style.scss" as *;
 @use "./components/post-list/style.scss" as *;
 @use "./components/resizable-frame/style.scss" as *;
 @use "./components/pagination/style.scss" as *;
 @use "./components/sidebar-global-styles/style.scss" as *;
-@use "./experimental-omnibar.scss" as *;
 
 /* stylelint-disable -- Disable reason: View Transitions not supported properly by stylelint. */
 ::view-transition-image-pair(root) {
@@ -47,10 +45,6 @@
 
 /* stylelint-enable */
 
-body.js #wpadminbar {
-	display: none;
-}
-
 body.js #wpbody {
 	padding-top: 0;
 }
@@ -62,10 +56,21 @@ body.js.site-editor-php {
 
 body.js.site-editor-php {
 	background: var(--wpds-color-background-surface-neutral-weak);
+
+	@include break-medium {
+		&:has(.editor-editor-interface.is-distraction-free) {
+			--wp-admin--admin-bar--height: 0;
+
+			#wpadminbar {
+				display: none;
+			}
+		}
+	}
 }
 
 .edit-site {
 	@include reset;
+	padding-top: var(--wp-admin--admin-bar--height, 0);
 	height: 100vh;
 
 	// On mobile the main content area has to scroll, otherwise you can invoke
@@ -73,10 +78,11 @@ body.js.site-editor-php {
 	@include break-small {
 		bottom: 0;
 		left: 0;
-		min-height: 100vh;
+		height: calc(100vh - var(--wp-admin--admin-bar--height, 0));
+		padding-top: 0;
 		position: fixed;
 		right: 0;
-		top: 0;
+		top: var(--wp-admin--admin-bar--height, 0);
 	}
 
 	.no-js & {

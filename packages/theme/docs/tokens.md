@@ -254,7 +254,6 @@ The interactive state of the element. The default (no modifier) is the idle stat
 
 | Variable name                        | Description                                                              |
 | ------------------------------------ | ------------------------------------------------------------------------ |
-| `--wpds-dimension-base`              | Base dimension unit                                                      |
 | `--wpds-dimension-padding-xs`        | Extra small padding                                                      |
 | `--wpds-dimension-padding-sm`        | Small padding                                                            |
 | `--wpds-dimension-padding-md`        | Medium padding                                                           |

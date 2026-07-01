@@ -50,13 +50,6 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
   padding: 0;
 }
 
-.emotion-8 {
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 <div>
   <div
     class="components-base-control block-editor-color-gradient-control emotion-0 emotion-1"
@@ -87,6 +80,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
             class="block-editor-color-gradient-control__panel"
           >
             <div
+              class="style-stack"
               style="gap: var(--wpds-dimension-gap-md); flex-direction: column;"
             >
               <div
@@ -94,7 +88,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
                 tabindex="-1"
               >
                 <div
-                  class="components-color-palette__custom-color-wrapper"
+                  class="style-stack components-color-palette__custom-color-wrapper"
                   style="flex-direction: column;"
                 >
                   <button
@@ -106,19 +100,19 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
                     type="button"
                   />
                   <div
-                    class="components-color-palette__custom-color-text-wrapper"
+                    class="style-stack components-color-palette__custom-color-text-wrapper"
                     style="gap: var(--wpds-dimension-gap-xs); flex-direction: column;"
                   >
                     <div
-                      class="components-color-palette__info-row"
+                      class="style-stack components-color-palette__info-row"
                       style="gap: var(--wpds-dimension-gap-sm); align-items: center; flex-direction: row;"
                     >
                       <div
-                        class="components-color-palette__info-row-text"
+                        class="style-stack components-color-palette__info-row-text"
                         style="gap: var(--wpds-dimension-gap-xs); flex-direction: column;"
                       >
                         <span
-                          class="components-truncate components-color-palette__custom-color-name emotion-8 emotion-5"
+                          class="style-truncate components-truncate components-color-palette__custom-color-name emotion-8 emotion-5"
                           data-wp-c16t="true"
                           data-wp-component="Truncate"
                           title="red"
@@ -126,7 +120,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
                           red
                         </span>
                         <span
-                          class="components-truncate components-color-palette__custom-color-value components-color-palette__custom-color-value--is-hex emotion-8 emotion-5"
+                          class="style-truncate components-truncate components-color-palette__custom-color-value components-color-palette__custom-color-value--is-hex emotion-8 emotion-5"
                           data-wp-c16t="true"
                           data-wp-component="Truncate"
                           title="#f00"

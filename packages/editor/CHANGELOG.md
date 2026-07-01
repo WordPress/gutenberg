@@ -6,6 +6,12 @@
 
 -   Edit palette colors from the block inspector: Change values for theme and default swatches. Add, rename, and delete for custom colors. Changes are saved to global styles ([#79266](https://github.com/WordPress/gutenberg/pull/79266)).
 
+### New Features
+
+-   Add an "Attachments" source to the block inserter's Media tab, listing images attached to the current post with the ability to attach and detach them ([#79336](https://github.com/WordPress/gutenberg/pull/79336)).
+
+## 14.49.0 (2026-06-24)
+
 ## 14.48.1 (2026-06-16)
 
 ## 14.48.0 (2026-06-10)
