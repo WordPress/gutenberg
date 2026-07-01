@@ -35,29 +35,41 @@ export function useMediaResults( category, query = {}, refreshKey ) {
 	// for this to `core-data` package.
 	const lastRequestRef = useRef();
 	const lastQueryKeyRef = useRef();
+	const lastFetchRef = useRef();
 	useEffect( () => {
 		( async () => {
 			const key = JSON.stringify( {
 				category: category.name,
 				...query,
 			} );
-			lastRequestRef.current = key;
+			// Unique token so identical-query refreshes can't apply stale results.
+			const request = {};
+			lastRequestRef.current = request;
 			setIsLoading( true );
-			// Only clear the previous results when the category or query changes,
-			// not on a manual refresh (a `refreshKey` bump after attach/detach).
-			// Keeping them lets the panel dim the existing grid during the
-			// refetch instead of blanking it.
-			if ( lastQueryKeyRef.current !== key ) {
+			// Only clear the previous results when the category source or query
+			// changes, not on a manual refresh (a `refreshKey` bump after
+			// attach/detach). Keeping them lets the panel dim the existing grid
+			// during the refetch instead of blanking it.
+			if (
+				lastQueryKeyRef.current !== key ||
+				lastFetchRef.current !== category.fetch
+			) {
 				setMediaList( [] );
 			}
 			lastQueryKeyRef.current = key;
+			lastFetchRef.current = category.fetch;
 			const _media = await category.fetch?.( query );
-			if ( key === lastRequestRef.current ) {
+			if ( request === lastRequestRef.current ) {
 				setMediaList( _media );
 				setIsLoading( false );
 			}
 		} )();
-	}, [ category.name, ...Object.values( query ), refreshKey ] );
+	}, [
+		category.name,
+		category.fetch,
+		...Object.values( query ),
+		refreshKey,
+	] );
 	return { mediaList, isLoading };
 }
 

@@ -135,4 +135,70 @@ describe( 'useMediaResults', () => {
 		} );
 		expect( result.current.mediaList ).toEqual( [ { id: 2 } ] );
 	} );
+
+	it( 'clears and refetches when the category source changes with the same name and query', async () => {
+		const firstCategory = createCategory( 'attached-images', [
+			{ id: 1 },
+		] );
+		const { result, rerender } = renderHook(
+			( { category } ) => useMediaResults( category, { search: '' }, 0 ),
+			{ initialProps: { category: firstCategory } }
+		);
+		await waitFor( () =>
+			expect( result.current.mediaList ).toEqual( [ { id: 1 } ] )
+		);
+
+		let resolveFetch;
+		const secondCategory = {
+			name: 'attached-images',
+			fetch: jest.fn(
+				() =>
+					new Promise( ( resolve ) => {
+						resolveFetch = resolve;
+					} )
+			),
+		};
+		rerender( { category: secondCategory } );
+
+		await waitFor( () =>
+			expect( secondCategory.fetch ).toHaveBeenCalledWith( {
+				search: '',
+			} )
+		);
+		expect( result.current.mediaList ).toEqual( [] );
+		expect( result.current.isLoading ).toBe( true );
+
+		await act( async () => {
+			resolveFetch( [ { id: 2 } ] );
+		} );
+		expect( result.current.mediaList ).toEqual( [ { id: 2 } ] );
+	} );
+
+	it( 'does not refetch when only the category wrapper changes', async () => {
+		const fetch = jest.fn( async () => [ { id: 1 } ] );
+		const { result, rerender } = renderHook(
+			( { category } ) => useMediaResults( category, { search: '' }, 0 ),
+			{
+				initialProps: {
+					category: {
+						name: 'images',
+						fetch,
+					},
+				},
+			}
+		);
+		await waitFor( () =>
+			expect( result.current.mediaList ).toEqual( [ { id: 1 } ] )
+		);
+
+		rerender( {
+			category: {
+				name: 'images',
+				fetch,
+			},
+		} );
+
+		expect( fetch ).toHaveBeenCalledTimes( 1 );
+		expect( result.current.mediaList ).toEqual( [ { id: 1 } ] );
+	} );
 } );
