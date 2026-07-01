@@ -9,13 +9,12 @@
 //
 // - Block-level classes (`is-suggestion-pending*`) are set by the editor
 //   suggestion system via `metadata.suggestion`.
-// - Inline classes (`.has-suggestion-deletion` / `.has-suggestion-addition`)
-//   are applied by the editor-package overlay HOC (`markContentDiff`) to
-//   <del>/<ins> RichText runs.
+// - Inline `.wp-suggestion` markers live in block content (Option B) and are
+//   tinted by their `data-suggestion-type` (del/add/format).
 //
-// Both consume `--suggestion-author-color`, which the overlay HOC writes
-// from the suggester's avatar color — so individual suggestions tint to
-// their author the same way live cursors do.
+// Both consume `--suggestion-author-color`, which the suggestion system writes
+// from the suggester's avatar color — so individual suggestions tint to their
+// author the same way live cursors do.
 
 // Default suggestion colors, used when the suggester's avatar color
 // can't be resolved (e.g., anonymous edits or pre-collab sessions).
@@ -116,22 +115,6 @@ $suggestion-author-color: var(--suggestion-author-color, #{$suggestion-color});
 		pointer-events: none;
 		z-index: 1;
 	}
-}
-
-// Inline RichText runs marked as deleted/added in a pending suggestion.
-.has-suggestion-deletion {
-	color: var(--suggestion-author-color, #{$suggestion-deletion-color});
-	text-decoration: line-through;
-	text-decoration-color: var(--suggestion-author-color, #{$suggestion-deletion-color});
-}
-
-.has-suggestion-addition {
-	color: var(--suggestion-author-color, #{$suggestion-addition-color});
-	text-decoration: underline;
-	text-decoration-color: var(--suggestion-author-color, #{$suggestion-addition-color});
-	box-shadow:
-		-1px 0 0 0 var(--suggestion-author-color, #{$suggestion-addition-color}),
-		1px 0 0 0 var(--suggestion-author-color, #{$suggestion-addition-color});
 }
 
 // Inline `core/suggestion` markers that live in block content (Option B). The
