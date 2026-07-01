@@ -21,6 +21,7 @@
 -   Clarify the design token documentation entry points and keep the generated token guidance source internal ([#79829](https://github.com/WordPress/gutenberg/pull/79829)).
 -   Document intentional design token omissions in the design system tokens reference ([#79770](https://github.com/WordPress/gutenberg/pull/79770)).
 -   Clarify that `--wpds-color-stroke-focus` is a standalone exception to the normal color token naming pattern ([#79764](https://github.com/WordPress/gutenberg/pull/79764)).
+-   Document the design token naming grammar in the token reference ([#79769](https://github.com/WordPress/gutenberg/pull/79769)).
 
 ## 0.17.0 (2026-06-30)
 
