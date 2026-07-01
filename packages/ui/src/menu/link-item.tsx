@@ -10,14 +10,6 @@ import { MenuItemContentContext } from './context';
 import { ItemContent, useItemContent } from './item';
 import type { LinkItemProps } from './types';
 
-function getOpenInNewTabRel( rel: LinkItemProps[ 'rel' ] ) {
-	const values = new Set( rel?.split( /\s+/ ).filter( Boolean ) );
-
-	values.add( 'noopener' );
-
-	return Array.from( values ).join( ' ' );
-}
-
 /**
  * Renders a menu item that navigates to a link target.
  */
@@ -68,7 +60,7 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 			ref={ ref }
 			{ ...props }
 			{ ...itemAriaProps }
-			rel={ openInNewTab ? getOpenInNewTabRel( rel ) : rel }
+			rel={ rel }
 			target={ openInNewTab ? '_blank' : undefined }
 			className={ clsx(
 				defenseStyles.a,
