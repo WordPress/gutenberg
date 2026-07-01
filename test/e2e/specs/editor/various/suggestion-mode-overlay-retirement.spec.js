@@ -7,14 +7,17 @@
  *
  *   1. INVARIANT - the end-state property the migration establishes: a single
  *      block never carries both an inline `<mark class="wp-suggestion">` marker
- *      AND an overlay `<del>/<ins class="has-suggestion-*">` diff. Today the
- *      two inline systems coexist, so this can be violated; it is marked
- *      `test.fixme` until Phase 2 (inline formatting moves to markers).
+ *      AND an overlay `<del>/<ins class="has-suggestion-*">` diff. The clean
+ *      case (a lone formatting change) holds now that Phase 2 moved formatting
+ *      to markers; the combined case (a formatting change on a block that
+ *      already carries a marker) is the remaining gap and stays `test.fixme`.
  *
- *   2. SEAMS - edits that currently fall through to the overlay diff path
- *      instead of producing a marker, because marker creation keys off a narrow
- *      set of input events. Each must end on a marker once Phase 1 lands the
- *      `onChange` diff->marker converter, so they are `test.fixme` until then.
+ *   2. SEAMS - edits that used to fall through to the overlay diff path instead
+ *      of producing a marker, because marker creation keys off a narrow set of
+ *      input events. Word/line delete, cut, and single-line paste now produce
+ *      markers via the deletion/addition keyboards; the lower-level seams (IME,
+ *      autocorrect, drag) remain and are validated by the reconcile-edit unit
+ *      tests rather than e2e.
  *
  * The `fixme`s are the executable checklist: un-fixme each as its phase lands.
  * Formatting and block-attribute characterization already live in
@@ -81,13 +84,20 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 
 	// --- Invariant ---------------------------------------------------------
 
-	test(
+	// The clean-block form of this invariant — a lone formatting change becomes a
+	// `format` marker with no overlay `<ins>/<del>` diff — is the passing "style
+	// golden path" in suggestion-mode.spec.js, the oracle this spec's header
+	// designates for formatting.
+	//
+	// This combined form (a text addition AND a formatting change on the SAME
+	// block) is the remaining gap: `planFormatMarkers` declines whenever the
+	// block already carries any pending suggestion marker — not only on true
+	// run overlap — so the second, formatting suggestion falls back to the
+	// overlay diff path. Un-fixme once the format path tolerates a co-existing
+	// marker elsewhere in the block (and, ultimately, the overlapping-run case).
+	test.fixme(
 		'invariant: a block never carries both an inline marker and an overlay diff',
 		async ( { editor, page, pageUtils } ) => {
-			// Combine a text addition (marker path) with an inline-format change
-			// (overlay diff path) on the SAME block. Today the block ends up
-			// with both representations; after Phase 2 the format change is a
-			// marker too, so only `<mark>` is present.
 			await editor.insertBlock( {
 				name: 'core/paragraph',
 				attributes: { content: 'Hello world' },
@@ -99,23 +109,33 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 				.getByRole( 'document', { name: 'Block: Paragraph' } )
 				.first();
 			await paragraph.click();
+
+			// Addition marker: append at the end of the paragraph.
 			await page.keyboard.press( 'End' );
-			await page.keyboard.type( ' more' ); // addition -> marker
+			await page.keyboard.type( ' more' );
+			await expect(
+				paragraph.locator(
+					`${ SUGGESTION_MARK }[data-suggestion-type="add"]`
+				)
+			).toBeVisible();
 
-			// Bold "world" -> currently the overlay diff path.
-			await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 9 } );
+			// Formatting change on the leading (non-overlapping) word.
+			await page.keyboard.press( 'Home' );
+			await pageUtils.pressKeys( 'shift+ArrowRight', { times: 5 } ); // "Hello"
 			await pageUtils.pressKeys( 'primary+b' );
+			await expect(
+				paragraph.locator(
+					`${ SUGGESTION_MARK }[data-suggestion-type="format"]`
+				)
+			).toBeVisible();
 
-			await waitForSuggestionSaved( page );
 			await deselect( page );
 
-			const hasMark = await paragraph.locator( SUGGESTION_MARK ).count();
-			const hasOverlayDiff =
+			// The invariant: inline markers, but never an overlay diff.
+			const overlayDiff =
 				( await paragraph.locator( OVERLAY_ADD ).count() ) +
 				( await paragraph.locator( OVERLAY_DEL ).count() );
-
-			// The invariant: not both at once.
-			expect( hasMark > 0 && hasOverlayDiff > 0 ).toBe( false );
+			expect( overlayDiff ).toBe( 0 );
 		}
 	);
 
@@ -156,66 +176,66 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 		).toBeVisible();
 	} );
 
-	test.fixme(
-		'seam: cutting a selection becomes a deletion marker',
-		async ( { editor, page, pageUtils } ) => {
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: 'Hello world' },
-			} );
+	test( 'seam: cutting a selection becomes a deletion marker', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
 
-			await switchIntent( page, 'Suggesting' );
+		await switchIntent( page, 'Suggesting' );
 
-			const paragraph = editor.canvas
-				.getByRole( 'document', { name: 'Block: Paragraph' } )
-				.first();
-			await paragraph.click();
-			await page.keyboard.press( 'End' );
-			await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
-			await pageUtils.pressKeys( 'primary+x' ); // deleteByCut
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		await pageUtils.pressKeys( 'primary+x' ); // deleteByCut
 
-			await waitForSuggestionSaved( page );
-			await deselect( page );
+		await waitForSuggestionSaved( page );
+		await deselect( page );
 
-			await expect(
-				paragraph
-					.locator(
-						`${ SUGGESTION_MARK }[data-suggestion-type="del"]`
-					)
-					.filter( { hasText: 'world' } )
-			).toBeVisible();
-		}
-	);
+		await expect(
+			paragraph
+				.locator( `${ SUGGESTION_MARK }[data-suggestion-type="del"]` )
+				.filter( { hasText: 'world' } )
+		).toBeVisible();
+	} );
 
-	test.fixme(
-		'seam: pasting multi-line text becomes addition markers',
-		async ( { editor, page, pageUtils } ) => {
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: 'Start' },
-			} );
+	test( 'seam: pasting multi-line text becomes addition markers', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Start' },
+		} );
 
-			await switchIntent( page, 'Suggesting' );
+		await switchIntent( page, 'Suggesting' );
 
-			const paragraph = editor.canvas
-				.getByRole( 'document', { name: 'Block: Paragraph' } )
-				.first();
-			await paragraph.click();
-			await page.keyboard.press( 'End' );
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
 
-			pageUtils.setClipboardData( { plainText: ' one two three' } );
-			await pageUtils.pressKeys( 'primary+v' );
+		pageUtils.setClipboardData( { plainText: ' one two three' } );
+		await pageUtils.pressKeys( 'primary+v' );
 
-			await waitForSuggestionSaved( page );
-			await deselect( page );
+		await waitForSuggestionSaved( page );
+		await deselect( page );
 
-			await expect(
-				paragraph.locator(
-					`${ SUGGESTION_MARK }[data-suggestion-type="add"]`
-				)
-			).toBeVisible();
-		}
-	);
+		await expect(
+			paragraph.locator(
+				`${ SUGGESTION_MARK }[data-suggestion-type="add"]`
+			)
+		).toBeVisible();
+	} );
 
 	/*
 	 * Further seams that need lower-level input injection than Playwright's

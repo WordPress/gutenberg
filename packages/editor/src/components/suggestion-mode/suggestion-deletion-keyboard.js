@@ -424,6 +424,59 @@ export default function SuggestionDeletionKeyboard() {
 		]
 	);
 
+	// Cut (Cmd/Ctrl+X). `preventDefault` on the `deleteByCut` `beforeinput` does
+	// not reliably cancel the removal in Chromium — the `cut` event drives it —
+	// so cut is handled on the `cut` event, mirroring how the addition keyboard
+	// owns `paste`. The copy half is preserved by writing the selected text to
+	// the clipboard ourselves; the delete half becomes a `del` marker instead of
+	// removing the text. `cut` fires ahead of the `beforeinput`, so cancelling
+	// here stops the `deleteByCut` from also firing (no double-marking).
+	const onCut = useCallback(
+		( event ) => {
+			if ( ! event.target?.isContentEditable ) {
+				return;
+			}
+			const selection = readInlineSelection(
+				getSelectionStart,
+				getSelectionEnd
+			);
+			if ( ! selection ) {
+				// Collapsed caret: nothing selected to cut.
+				resetRun();
+				return;
+			}
+			const { clientId, attributeKey, start, end } = selection;
+			const { formats, text } = readValueMetrics(
+				getBlockAttributes( clientId )?.[ attributeKey ]
+			);
+			// Leave a selection overlapping an existing suggestion marker to the
+			// default path rather than nesting marks.
+			for ( let i = start; i < end; i++ ) {
+				if ( hasSuggestionFormatAt( formats, i ) ) {
+					resetRun();
+					return;
+				}
+			}
+			// Preserve the copy half of cut: put the selected text on the
+			// clipboard, then cancel the browser's delete so the text is marked
+			// for deletion instead of removed.
+			event.clipboardData?.setData?.(
+				'text/plain',
+				text.slice( start, end )
+			);
+			event.preventDefault();
+			event.stopImmediatePropagation();
+			deleteSelection( selection );
+		},
+		[
+			getSelectionStart,
+			getSelectionEnd,
+			getBlockAttributes,
+			deleteSelection,
+			resetRun,
+		]
+	);
+
 	useEffect( () => {
 		if ( ! isSuggestMode ) {
 			resetRun();
@@ -431,18 +484,27 @@ export default function SuggestionDeletionKeyboard() {
 		}
 		const docs = getCandidateDocuments();
 		const listener = ( event ) => onBeforeInput( event );
+		const cutListener = ( event ) => onCut( event );
 		// Capture phase so we cancel the edit before RichText/the browser apply
 		// it. `selectedBlockClientId` is in the deps so the listener re-attaches
 		// once the canvas iframe (and its document) has mounted.
 		for ( const doc of docs ) {
 			doc.addEventListener( 'beforeinput', listener, true );
+			doc.addEventListener( 'cut', cutListener, true );
 		}
 		return () => {
 			for ( const doc of docs ) {
 				doc.removeEventListener( 'beforeinput', listener, true );
+				doc.removeEventListener( 'cut', cutListener, true );
 			}
 		};
-	}, [ isSuggestMode, selectedBlockClientId, onBeforeInput, resetRun ] );
+	}, [
+		isSuggestMode,
+		selectedBlockClientId,
+		onBeforeInput,
+		onCut,
+		resetRun,
+	] );
 
 	return null;
 }
