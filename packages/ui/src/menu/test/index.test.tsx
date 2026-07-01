@@ -3,6 +3,12 @@ import userEvent from '@testing-library/user-event';
 import { createRef, useId } from '@wordpress/element';
 import * as Menu from '../index';
 
+// The prefix slot is presentational, so this structural regression is not
+// observable through Testing Library's semantic queries.
+function queryItemPrefix( item: HTMLElement ) {
+	return item.querySelector( '.style-item-prefix' );
+}
+
 describe( 'Menu', () => {
 	it( 'opens from the trigger and exposes menu semantics', async () => {
 		const user = userEvent.setup();
@@ -142,6 +148,34 @@ describe( 'Menu', () => {
 		} );
 
 		expect( item ).toHaveAccessibleDescription( 'Create a separate copy.' );
+	} );
+
+	it( 'does not render empty prefix slots', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.Item>No prefix</Menu.Item>
+					<Menu.Item prefix="Prefix">With prefix</Menu.Item>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+
+		const itemWithoutPrefix = await screen.findByRole( 'menuitem', {
+			name: 'No prefix',
+		} );
+		const itemWithPrefix = screen.getByRole( 'menuitem', {
+			name: 'With prefix',
+		} );
+
+		expect( queryItemPrefix( itemWithoutPrefix ) ).not.toBeInTheDocument();
+		expect( queryItemPrefix( itemWithPrefix ) ).toHaveTextContent(
+			'Prefix'
+		);
 	} );
 
 	it( 'supports link items that open in a new tab', async () => {
