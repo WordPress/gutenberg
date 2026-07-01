@@ -44,30 +44,19 @@ const CheckboxItem = forwardRef< HTMLDivElement, CheckboxItemProps >(
 					resetStyles[ 'box-sizing' ],
 					itemPopupStyles.item,
 					styles.item,
-					styles[ 'has-indicator' ],
+					styles[ 'has-selection-indicator' ],
 					className
 				) }
 				{ ...props }
 			>
+				<_Menu.CheckboxItemIndicator
+					keepMounted
+					className={ styles[ 'item-selection-indicator' ] }
+				>
+					<Icon icon={ check } size={ 24 } aria-hidden="true" />
+				</_Menu.CheckboxItemIndicator>
 				<MenuItemContentContext.Provider value={ contentContextValue }>
-					<ItemContent
-						prefix={
-							<>
-								<_Menu.CheckboxItemIndicator
-									keepMounted
-									className={ styles[ 'item-indicator' ] }
-								>
-									<Icon
-										icon={ check }
-										size={ 24 }
-										aria-hidden="true"
-									/>
-								</_Menu.CheckboxItemIndicator>
-								{ prefix }
-							</>
-						}
-						suffix={ suffix }
-					>
+					<ItemContent prefix={ prefix } suffix={ suffix }>
 						{ children }
 					</ItemContent>
 				</MenuItemContentContext.Provider>

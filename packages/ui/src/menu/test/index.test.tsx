@@ -75,6 +75,7 @@ describe( 'Menu', () => {
 					<Menu.CheckboxItem
 						checked
 						onCheckedChange={ onCheckedChange }
+						prefix="Checkbox prefix"
 					>
 						Show sidebar
 					</Menu.CheckboxItem>
@@ -83,7 +84,10 @@ describe( 'Menu', () => {
 						onValueChange={ onValueChange }
 					>
 						<Menu.RadioItem value="compact">Compact</Menu.RadioItem>
-						<Menu.RadioItem value="comfortable">
+						<Menu.RadioItem
+							value="comfortable"
+							prefix="Radio prefix"
+						>
 							Comfortable
 						</Menu.RadioItem>
 					</Menu.RadioGroup>
@@ -102,6 +106,10 @@ describe( 'Menu', () => {
 
 		expect( checkbox ).toBeChecked();
 		expect( radio ).toBeChecked();
+		expect( checkbox ).toHaveAccessibleName( 'Show sidebar' );
+		expect( radio ).toHaveAccessibleName( 'Comfortable' );
+		expect( screen.getByText( 'Checkbox prefix' ) ).toBeVisible();
+		expect( screen.getByText( 'Radio prefix' ) ).toBeVisible();
 
 		await user.click( checkbox );
 		expect( onCheckedChange ).toHaveBeenCalledWith(
