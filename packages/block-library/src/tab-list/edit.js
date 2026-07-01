@@ -102,17 +102,11 @@ function Edit( {
 
 		const focusButtonAt = ( index ) => {
 			window.requestAnimationFrame( () => {
-				const buttons = menuRef.current?.querySelectorAll( 'button' );
-				const target = buttons?.[ index ];
-				if ( ! target ) {
-					return;
-				}
-				const richText = target.querySelector( '[contenteditable]' );
-				if ( richText ) {
-					richText.focus();
-				} else {
-					target.focus();
-				}
+				const button =
+					menuRef.current?.querySelectorAll( 'button' )?.[ index ];
+				(
+					button?.querySelector( '[contenteditable]' ) ?? button
+				)?.focus();
 			} );
 		};
 
