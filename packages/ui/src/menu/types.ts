@@ -94,8 +94,19 @@ export type ItemProps = MenuItemComponentProps< typeof _Menu.Item > &
 		children?: ReactNode;
 	};
 
-export type LinkItemProps = MenuItemComponentProps< typeof _Menu.LinkItem > &
+export type LinkItemProps = Omit<
+	MenuItemComponentProps< typeof _Menu.LinkItem >,
+	'target'
+> &
 	MenuItemLayoutProps & {
+		/**
+		 * Whether to open the link in a new browser tab.
+		 * When true, sets `target="_blank"` and appends a visual arrow indicator.
+		 *
+		 * @default false
+		 */
+		openInNewTab?: boolean;
+
 		/**
 		 * The content to be rendered inside the link menu item.
 		 */
