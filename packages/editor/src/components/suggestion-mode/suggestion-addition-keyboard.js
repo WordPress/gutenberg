@@ -227,10 +227,17 @@ export default function SuggestionAdditionKeyboard() {
 		]
 	);
 
-	// Route a unit of inserted text (a typed character or a pasted run) to the
-	// right place: buffer it while a note request is in flight, grow the open
-	// marker when the caret is still at its trailing edge, or start a new run.
-	// `allowGrow` is false for paste so a pasted run is always its own marker.
+	/*
+	 * Route a unit of inserted text (a typed character or a pasted run) to the
+	 * right place: buffer it while a note request is in flight, grow the open
+	 * marker when the caret is still at its trailing edge, or start a new run.
+	 * `allowGrow` is false for paste so a pasted run is always its own marker.
+	 *
+	 * Returns whether the input was consumed. Callers must only cancel the
+	 * native edit when this returns true — when no valid single-attribute
+	 * anchor exists the input has to fall through to the native/overlay path
+	 * rather than being swallowed.
+	 */
 	const insertText = useCallback(
 		( text, allowGrow ) => {
 			const inFlight = runRef.current;
@@ -239,13 +246,13 @@ export default function SuggestionAdditionKeyboard() {
 				// the caret reads now (during a type-over the selection hasn't
 				// collapsed yet) and let the flush apply it.
 				inFlight.pending += text;
-				return;
+				return true;
 			}
 			const caret = readInlineCaret( getSelectionStart, getSelectionEnd );
 			if ( ! caret ) {
 				// Block-level / cross-attribute selection: nothing to anchor to.
 				resetRun();
-				return;
+				return false;
 			}
 			const { clientId, attributeKey, start, end } = caret;
 			const run = runRef.current;
@@ -272,10 +279,11 @@ export default function SuggestionAdditionKeyboard() {
 				} );
 				run.end += text.length;
 				commit( clientId, attributeKey, grown, run.end );
-				return;
+				return true;
 			}
 
 			beginInsertion( clientId, attributeKey, start, end, text );
+			return true;
 		},
 		[
 			getSelectionStart,
@@ -314,9 +322,15 @@ export default function SuggestionAdditionKeyboard() {
 				resetRun();
 				return;
 			}
-			// We own insertion in Suggest mode — cancel the native edit.
-			event.preventDefault();
-			insertText( text, true );
+			/*
+			 * We own insertion in Suggest mode, but only cancel the native
+			 * edit once the caret resolved to a valid single-attribute anchor
+			 * — a preventDefault without a subsequent write would silently
+			 * drop the typed character.
+			 */
+			if ( insertText( text, true ) ) {
+				event.preventDefault();
+			}
 		},
 		[ getSelectionStart, insertText, resetRun ]
 	);
@@ -339,12 +353,17 @@ export default function SuggestionAdditionKeyboard() {
 				resetRun();
 				return;
 			}
-			// Stop the editor's own paste handling so this paste becomes a
-			// suggestion marker instead of permanent content. `paste` fires
-			// ahead of `beforeinput`, so cancelling here is the reliable point.
-			event.preventDefault();
-			event.stopImmediatePropagation();
-			insertText( plain, false );
+			/*
+			 * Stop the editor's own paste handling so this paste becomes a
+			 * suggestion marker instead of permanent content. `paste` fires
+			 * ahead of `beforeinput`, so cancelling here is the reliable
+			 * point — but only once the caret resolved to a valid anchor;
+			 * otherwise let the editor's paste pipeline have it.
+			 */
+			if ( insertText( plain, false ) ) {
+				event.preventDefault();
+				event.stopImmediatePropagation();
+			}
 		},
 		[ getSelectionStart, insertText, resetRun ]
 	);
