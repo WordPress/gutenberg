@@ -13,7 +13,6 @@ import type { LinkItemProps } from './types';
 function getOpenInNewTabRel( rel: LinkItemProps[ 'rel' ] ) {
 	const values = new Set( rel?.split( /\s+/ ).filter( Boolean ) );
 
-	values.add( 'noreferrer' );
 	values.add( 'noopener' );
 
 	return Array.from( values ).join( ' ' );
