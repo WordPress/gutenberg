@@ -29,8 +29,8 @@ type WidgetAttributeControlsProps = {
 
 /**
  * Normal-mode controls: the `relevance: 'high'` attributes inline, plus the
- * gear that opens the full settings drawer. The gear shows whenever the type
- * declares attributes; the inline controls appear only for the high ones.
+ * settings trigger that opens the full settings drawer when needed.
+ * Inline controls appear only for the high-relevance fields.
  * Inline edits publish immediately, so they need no Save affordance.
  *
  * @param {WidgetAttributeControlsProps} props Component props.
