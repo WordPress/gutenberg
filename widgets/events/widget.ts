@@ -1,9 +1,9 @@
 /**
  * WordPress dependencies
  */
-import type { Field } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
 import { calendar } from '@wordpress/icons';
+import type { WidgetAttributeField } from '@wordpress/widget-primitives';
 
 /**
  * Internal dependencies
@@ -15,7 +15,6 @@ import {
 
 export default {
 	name: 'core/events',
-	title: __( 'WordPress events' ),
 	icon: calendar,
 	attributes: [
 		{
@@ -27,5 +26,5 @@ export default {
 			),
 			Edit: LocationSettingControl,
 		},
-	] satisfies Field< EventsWidgetAttributes >[],
+	] satisfies WidgetAttributeField< EventsWidgetAttributes >[],
 };

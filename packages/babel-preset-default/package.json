@@ -46,7 +46,7 @@
 		"@babel/preset-typescript": "^7.25.7",
 		"@wordpress/browserslist-config": "file:../browserslist-config",
 		"@wordpress/warning": "file:../warning",
-		"browserslist": "^4.21.10",
+		"browserslist": "^4.28.4",
 		"core-js": "^3.31.0",
 		"react": "^18.3.1"
 	},

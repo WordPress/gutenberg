@@ -53,9 +53,6 @@ The following snippet explains how the Gutenberg repository is structured omitti
     ├── gutenberg.php
     │   Entry point of the Gutenberg plugin.
     │
-    ├── post-content.php
-    │   Demo post content used on the Gutenberg plugin to showcase the editor.
-    │
     ├── .github/*
     │   Config of the different GitHub features (issues and PR templates, CI, owners).
     │

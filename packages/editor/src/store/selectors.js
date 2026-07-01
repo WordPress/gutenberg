@@ -29,6 +29,7 @@ import { getPostRawValue } from './reducer';
 import { getTemplatePartIcon } from '../utils/get-template-part-icon';
 import { unlock } from '../lock-unlock';
 import { getTemplateInfo } from '../utils/get-template-info';
+import { getDeviceTypeByCanvasWidth } from '../utils/device-type';
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -1352,7 +1353,8 @@ export const getDeviceType = createRegistrySelector(
 		if ( isZoomOut ) {
 			return 'Desktop';
 		}
-		return state.deviceType;
+		const canvasWidth = state.canvasWidth;
+		return getDeviceTypeByCanvasWidth( canvasWidth );
 	}
 );
 

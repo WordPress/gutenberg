@@ -35,9 +35,9 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
   display: inline-flex;
+  height: 40px;
   min-width: 0;
   position: relative;
-  height: 40px;
 }
 
 .emotion-6:hover {
@@ -370,9 +370,9 @@ exports[`ToggleGroupControl controlled should render correctly with text options
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
   display: inline-flex;
+  height: 40px;
   min-width: 0;
   position: relative;
-  height: 40px;
 }
 
 .emotion-6:hover {
@@ -611,9 +611,9 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
   display: inline-flex;
+  height: 40px;
   min-width: 0;
   position: relative;
-  height: 40px;
 }
 
 .emotion-6:hover {
@@ -940,9 +940,9 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
   display: inline-flex;
+  height: 40px;
   min-width: 0;
   position: relative;
-  height: 40px;
 }
 
 .emotion-6:hover {

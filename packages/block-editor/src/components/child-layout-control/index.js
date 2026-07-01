@@ -178,7 +178,6 @@ function FlexControls( {
 			panelId={ panelId }
 		>
 			<ToggleGroupControl
-				size="__unstable-large"
 				label={ childLayoutOrientation( parentLayout ) }
 				value={ flexControlValue }
 				help={ helpText( flexControlValue, parentLayout ) }
