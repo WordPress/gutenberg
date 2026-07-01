@@ -7,3 +7,6 @@
 	background: var(--wpds-made-up-color);
 }
 
+.starts-with-bare-token {
+	color: --wpds-invalid-token;
+}

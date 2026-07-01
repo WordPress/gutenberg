@@ -20,5 +20,14 @@ exports[`flags warnings with invalid wpds tokens css snapshot matches warnings 1
     "severity": "error",
     "text": "The following CSS variables are not valid Design System tokens: '--wpds-made-up-color' (plugin-wpds/no-unknown-ds-tokens)",
   },
+  {
+    "column": 2,
+    "endColumn": 30,
+    "endLine": 11,
+    "line": 11,
+    "rule": "plugin-wpds/no-unknown-ds-tokens",
+    "severity": "error",
+    "text": "The following CSS variables are not valid Design System tokens: '--wpds-invalid-token' (plugin-wpds/no-unknown-ds-tokens)",
+  },
 ]
 `;

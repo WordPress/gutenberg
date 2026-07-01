@@ -37,7 +37,7 @@ function extractCSSVariables( value, prefix = '' ) {
 }
 
 const knownTokens = new Set( tokenList );
-const wpdsTokensRegex = new RegExp( `[^\\w]--${ DS_TOKEN_PREFIX }`, 'i' );
+const wpdsTokenPrefix = `--${ DS_TOKEN_PREFIX }`;
 
 const {
 	createPlugin,
@@ -66,7 +66,7 @@ const ruleFunction = ( primary ) => {
 		root.walkDecls( ( ruleNode ) => {
 			const { value } = ruleNode;
 			// Early match for WPDS tokens to avoid unnecessary processing.
-			if ( wpdsTokensRegex.test( value ) ) {
+			if ( value.includes( wpdsTokenPrefix ) ) {
 				const usedTokens = extractCSSVariables(
 					value,
 					DS_TOKEN_PREFIX
