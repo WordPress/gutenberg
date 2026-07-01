@@ -20,7 +20,7 @@ import { useState, useEffect, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Page, getAdminThemeColors } from '@wordpress/admin-ui';
 import { Tooltip } from '@wordpress/ui';
-import { privateApis as themePrivateApis } from '@wordpress/theme';
+import { ThemeProvider } from '@wordpress/theme';
 
 /**
  * Internal dependencies
@@ -34,7 +34,6 @@ import type { CanvasData } from '../../store/types';
 import './style.scss';
 
 const { useLocation, useMatches, Outlet } = unlock( routePrivateApis );
-const { ThemeProvider } = unlock( themePrivateApis );
 
 export default function Root() {
 	const matches = useMatches();

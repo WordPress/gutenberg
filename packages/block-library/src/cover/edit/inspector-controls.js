@@ -476,7 +476,6 @@ export default function CoverInspectorControls( {
 							max={ 100 }
 							step={ 10 }
 							required
-							__next40pxDefaultSize
 						/>
 					</ToolsPanelItem>
 				</InspectorControls>

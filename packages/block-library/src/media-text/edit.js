@@ -366,7 +366,6 @@ function MediaTextEdit( {
 				onDeselect={ () => setAttributes( { mediaWidth: 50 } ) }
 			>
 				<RangeControl
-					__next40pxDefaultSize
 					label={ __( 'Media width' ) }
 					value={ temporaryMediaWidth || mediaWidth }
 					onChange={ commitWidthChange }

@@ -1,8 +1,4 @@
 /**
- * @jest-environment jsdom
- */
-
-/**
  * External dependencies
  */
 import { render, act, screen } from '@testing-library/react';

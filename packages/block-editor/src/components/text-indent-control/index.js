@@ -101,7 +101,6 @@ export default function TextIndentControl( {
 					<FlexItem isBlock>
 						<Spacer marginX={ 2 } marginBottom={ 0 }>
 							<RangeControl
-								__next40pxDefaultSize
 								label={ __( 'Line indent' ) }
 								hideLabelFromVision
 								value={ valueQuantity }

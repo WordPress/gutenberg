@@ -26,11 +26,7 @@ import { parseContent, serializeContent } from './utils';
 
 const { Tabs } = unlock( componentsPrivateApis );
 
-export default function HTMLEditModal( {
-	onRequestClose,
-	content,
-	setAttributes,
-} ) {
+export default function HTMLEditModal( { onRequestClose, content, onUpdate } ) {
 	// Parse content into separate sections and use as initial state
 	const { html, css, js } = parseContent( content );
 	const [ editedHtml, setEditedHtml ] = useState( html );
@@ -56,13 +52,13 @@ export default function HTMLEditModal( {
 	const handleUpdate = () => {
 		// For users without unfiltered_html capability, strip CSS and JS content
 		// to prevent kses from leaving broken content
-		setAttributes( {
-			content: serializeContent( {
+		onUpdate(
+			serializeContent( {
 				html: editedHtml,
 				css: canUserUseUnfilteredHTML ? editedCss : '',
 				js: canUserUseUnfilteredHTML ? editedJs : '',
-			} ),
-		} );
+			} )
+		);
 	};
 	const handleUpdateAndClose = () => {
 		handleUpdate();
