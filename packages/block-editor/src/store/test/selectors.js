@@ -7,6 +7,8 @@ import {
 	setFreeformContentHandlerName,
 	setDefaultBlockName,
 	getDefaultBlockName,
+	createBlock,
+	createBlocksFromInnerBlocksTemplate,
 } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
 import { symbol } from '@wordpress/icons';
@@ -3683,6 +3685,24 @@ describe( 'selectors', () => {
 				null,
 				'</div>',
 			] );
+
+			// Replicate how `useBlockTypesState` builds the block on insert,
+			// to guard the full path from variation to created block.
+			const block = createBlock(
+				variationItem.name,
+				variationItem.initialAttributes,
+				createBlocksFromInnerBlocksTemplate(
+					variationItem.innerBlocks
+				),
+				variationItem.innerContent
+			);
+			expect( block.innerContent ).toEqual( [
+				'<div class="card">',
+				null,
+				'</div>',
+			] );
+			expect( block.innerBlocks ).toHaveLength( 1 );
+			expect( block.innerBlocks[ 0 ].name ).toBe( 'core/test-block-a' );
 
 			unregisterBlockType( 'core/html' );
 		} );
