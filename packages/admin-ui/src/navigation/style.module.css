@@ -1,0 +1,28 @@
+.list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	/**
+	 * Scroll horizontally rather than wrap or shrink when items overflow.
+	 */
+	overflow-x: auto;
+}
+
+.list > li {
+	flex-shrink: 0;
+}
+
+.list .item {
+	color: var(--wpds-color-foreground-interactive-neutral-weak);
+	font-weight: var(--wpds-typography-font-weight-regular);
+	text-decoration: none;
+}
+
+.list .item:hover {
+	color: var(--wpds-color-foreground-interactive-neutral-active);
+}
+
+.list .item.active {
+	color: var(--wpds-color-foreground-interactive-neutral-active);
+	font-weight: var(--wpds-typography-font-weight-medium);
+}

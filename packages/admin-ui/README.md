@@ -74,6 +74,25 @@ _Returns_
 
 Undocumented declaration.
 
+### Navigation
+
+Renders a horizontal list of links for navigating between the sections of a screen. The active item is marked with `aria-current="page"`. Routing is composed in through each item's `to` and/or `search`, and the consumer decides which item is `active`.
+
+_Usage_
+
+```jsx
+<Navigation
+	items={ [
+		{ label: 'Overview', to: '/overview', active: true },
+		{ label: 'Products', to: '/products' },
+	] }
+/>
+```
+
+_Parameters_
+
+-   _props_ `NavigationProps`:
+
 ### Page
 
 Undocumented declaration.
