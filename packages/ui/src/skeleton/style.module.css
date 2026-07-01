@@ -5,6 +5,16 @@
 		.skeleton {
 			display: block;
 			background-color: var(--wpds-color-background-surface-neutral-weak);
+
+			/*
+			 * Forced-colors mode substitutes `background-color` with
+			 * `Canvas` (the page background), so a plain fill loses its
+			 * boundary entirely. Add a visible border so the placeholder
+			 * shape survives.
+			 */
+			@media ( forced-colors: active ) {
+				border: var(--wpds-border-width-xs) solid CanvasText;
+			}
 		}
 
 		.pulse {

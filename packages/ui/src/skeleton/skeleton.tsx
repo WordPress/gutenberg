@@ -2,6 +2,7 @@ import { useRender, mergeProps } from '@base-ui/react';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { type SkeletonProps } from './types';
+import resetStyles from '../utils/css/resets.module.css';
 import styles from './style.module.css';
 
 // Static map so the build-time token-fallback plugin can inject fallbacks.
@@ -29,7 +30,11 @@ export const Skeleton = forwardRef< HTMLDivElement, SkeletonProps >(
 			props: mergeProps< 'div' >(
 				{
 					style: { borderRadius: radiusTokens[ radius ] },
-					className: clsx( styles.skeleton, styles.pulse ),
+					className: clsx(
+						styles.skeleton,
+						styles.pulse,
+						resetStyles[ 'box-sizing' ]
+					),
 					// Decorative by default; consumers mark the loading
 					// region with aria-busy / role="status".
 					'aria-hidden': true,
