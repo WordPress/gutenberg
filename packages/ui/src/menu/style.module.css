@@ -12,7 +12,7 @@
 
 			display: grid;
 			grid-template-areas: none;
-			grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
+			grid-template-columns: minmax(0, 1fr);
 			grid-template-rows: auto;
 			min-width: max(var(--anchor-width, 0px), var(--wp-ui-menu-min-width));
 			max-width: min(var(--available-width), var(--wp-ui-menu-max-width));
@@ -20,6 +20,10 @@
 			overscroll-behavior: contain;
 			padding-block: var(--wp-ui-popup-padding);
 			scroll-padding-block: var(--wp-ui-popup-padding);
+		}
+
+		.popup:has(.has-selection-indicator) {
+			grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
 		}
 
 		.list {
@@ -55,7 +59,7 @@
 		.item {
 			display: grid;
 			grid-column: 1 / -1;
-			grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
+			grid-template-columns: minmax(0, 1fr);
 			gap: 0;
 			justify-content: stretch;
 			padding-inline-start: var(--wp-ui-popup-item-padding-inline);
@@ -64,6 +68,10 @@
 			@supports ( grid-template-columns: subgrid ) {
 				grid-template-columns: subgrid;
 			}
+		}
+
+		.popup:has(.has-selection-indicator) .item {
+			grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
 		}
 
 		.has-selection-indicator {
@@ -100,13 +108,17 @@
 		}
 
 		.item-content {
-			grid-column: 2;
+			grid-column: 1;
 			display: flex;
 			align-items: center;
 			justify-content: flex-start;
 			min-width: 0;
 			/* Keep clicks on presentational labels and suffixes routed to the menu item. */
 			pointer-events: none;
+		}
+
+		.popup:has(.has-selection-indicator) .item-content {
+			grid-column: 2;
 		}
 
 		.item-children {
