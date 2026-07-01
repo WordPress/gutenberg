@@ -217,13 +217,37 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 * Checks if a given request has access to create an attachment.
 	 *
 	 * Skips the server-side image type support check when the client
-	 * will handle image processing (generate_sub_sizes is false).
+	 * will handle image processing (generate_sub_sizes is false). Still
+	 * HEIC/HEIF uploads always skip the check, since the browser's canvas
+	 * fallback can decode them even when the server cannot.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has access to create items, WP_Error object otherwise.
 	 */
 	public function create_item_permissions_check( $request ) {
 		$bypass_mime_check = false === $request['generate_sub_sizes'];
+
+		/*
+		 * Always allow still HEIC/HEIF uploads through even if the server's
+		 * image editor doesn't support them. The client-side canvas fallback
+		 * handles processing using the browser's native HEVC decoder.
+		 *
+		 * The '-sequence' variants (multi-frame Live Photos) are deliberately
+		 * excluded: neither the server nor the browser fallback can process
+		 * them yet, so they should fall through to the standard unsupported
+		 * mime-type error rather than be stored unprocessable.
+		 */
+		if ( ! $bypass_mime_check ) {
+			$still_heic_mime_types = array( 'image/heic', 'image/heif' );
+			$files                 = $request->get_file_params();
+
+			if (
+				! empty( $files['file']['type'] ) &&
+				in_array( $files['file']['type'], $still_heic_mime_types, true )
+			) {
+				$bypass_mime_check = true;
+			}
+		}
 
 		if ( $bypass_mime_check ) {
 			add_filter( 'wp_prevent_unsupported_mime_type_uploads', '__return_false' );
