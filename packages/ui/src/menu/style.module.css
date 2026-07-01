@@ -67,7 +67,6 @@
 			min-height: var(--wp-ui-popup-item-height);
 			margin-inline: var(--wp-ui-popup-padding);
 			padding-block: var(--wp-ui-popup-item-padding-block);
-			padding-inline: var(--wp-ui-popup-item-padding-inline);
 			border-radius: var(--wpds-border-radius-sm);
 			text-decoration: none;
 			user-select: none;
@@ -136,7 +135,9 @@
 			display: flex;
 			align-items: center;
 			justify-content: flex-start;
+			box-sizing: border-box;
 			min-width: 0;
+			padding-inline: var(--wp-ui-popup-item-padding-inline);
 			/* Keep clicks on presentational labels and suffixes routed to the menu item. */
 			pointer-events: none;
 		}
