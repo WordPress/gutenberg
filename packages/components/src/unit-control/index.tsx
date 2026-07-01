@@ -56,7 +56,6 @@ function UnforwardedUnitControl(
 		onFocus: onFocusProp,
 		// Prevent passing legacy props to internal `NumberControl`.
 		__next40pxDefaultSize: _next40pxDefaultSize,
-		__next36pxDefaultSize: _next36pxDefaultSize,
 		__shouldNotWarnDeprecated36pxSize: _shouldNotWarnDeprecated36pxSize,
 		...props
 	} = unitControlProps;

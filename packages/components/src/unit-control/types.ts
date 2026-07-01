@@ -72,11 +72,7 @@ export type UnitControlProps = Pick< InputControlProps, 'size' > &
 	Omit< UnitSelectControlProps, 'size' | 'unit' > &
 	Omit<
 		NumberControlProps,
-		| 'spinControls'
-		| 'suffix'
-		| 'type'
-		| '__next40pxDefaultSize'
-		| '__next36pxDefaultSize'
+		'spinControls' | 'suffix' | 'type' | '__next40pxDefaultSize'
 	> & {
 		/**
 		 * If `true`, the unit `<select>` is hidden.
@@ -121,14 +117,6 @@ export type UnitControlProps = Pick< InputControlProps, 'size' > &
 		 * @ignore
 		 */
 		__shouldNotWarnDeprecated36pxSize?: boolean;
-		/**
-		 * Deprecated. Use `__next40pxDefaultSize` instead.
-		 *
-		 * @default false
-		 * @deprecated
-		 * @ignore
-		 */
-		__next36pxDefaultSize?: boolean;
 		/**
 		 * Start opting into the larger default height that will become the default size in a future version.
 		 *
