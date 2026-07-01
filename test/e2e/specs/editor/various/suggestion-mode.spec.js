@@ -363,17 +363,17 @@ test.describe( 'Suggestion mode', () => {
 		await expect( paragraph ).toContainText( 'abcdef' );
 	} );
 
-	test( 'style — golden path: shows a newly bolded word wrapped in <ins> with <strong> preserved', async ( {
+	test( 'style — golden path: bolding a word wraps the run in one format marker (no duplication)', async ( {
 		editor,
 		page,
 		pageUtils,
 	} ) => {
-		// Golden-path inline-format change: select a word, press Cmd/Ctrl+B
-		// to bold it, and the suggestion preview should mark the run as
-		// added (so it reads as both bold AND highlighted) without losing
-		// the underlying <strong> markup. The diff sees the bare token
-		// replaced by the wrapped one, so it surfaces as a delete + insert
-		// pair around the styled run.
+		// Golden-path inline-format change (Option B, Google Docs model):
+		// select a word and press Cmd/Ctrl+B, and the run is wrapped in a
+		// single in-content `core/suggestion` `format` marker carrying the
+		// proposed `<strong>`. The text is shown once — not duplicated into a
+		// paired del/ins overlay diff — and lives in the serialized post
+		// content, stripped only at the front end until accepted.
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'Hello world' },
@@ -389,23 +389,50 @@ test.describe( 'Suggestion mode', () => {
 		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
 		await pageUtils.pressKeys( 'primary+b' );
 
-		await waitForSuggestionSaved( page );
-		await page.evaluate( () => {
-			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
-		} );
+		// The note is created asynchronously, then the marker is written over
+		// the reformatted run. Its presence proves the whole flow completed.
+		const marker = paragraph.locator(
+			'mark.wp-suggestion[data-suggestion-type="format"]'
+		);
+		await expect( marker ).toContainText( 'world' );
 
-		// The bolded run is wrapped in `<ins>` so it picks up the addition
-		// color treatment, with `<strong>` preserved inside so it still
-		// renders as bold.
-		await expect(
-			paragraph.locator( 'ins.has-suggestion-addition strong' )
-		).toContainText( 'world' );
+		// The proposed bold is preserved inside the marker; the run is shown
+		// once (the text is "Hello world", not "Hello worldworld").
+		await expect( paragraph.locator( 'strong' ) ).toContainText( 'world' );
+		await expect( paragraph ).toHaveText( 'Hello world' );
 
-		// And the bare-text version is shown as a deletion so the reviewer
-		// can see what the run looked like before the suggestion.
+		// No overlay diff: the format change lives entirely as a mark, so the
+		// old paired `<del>`/`<ins>` treatment never appears.
 		await expect(
 			paragraph.locator( 'del.has-suggestion-deletion' )
-		).toContainText( 'world' );
+		).toHaveCount( 0 );
+		await expect(
+			paragraph.locator( 'ins.has-suggestion-addition' )
+		).toHaveCount( 0 );
+
+		// The proposed formatting round-trips through the serialized post as a
+		// format marker (unlike the old render-only overlay).
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).toContain( 'data-suggestion-type="format"' );
+		expect( serialized ).toContain( '<strong>' );
+
+		// The sidebar reads the change as "Formatting: bold", not a text edit.
+		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
+		const allNotesToggle = topBar.getByRole( 'button', {
+			name: 'All notes',
+			exact: true,
+		} );
+		if (
+			( await allNotesToggle.getAttribute( 'aria-expanded' ) ) === 'false'
+		) {
+			await allNotesToggle.click();
+		}
+		const summary = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.locator( '.editor-collab-sidebar-panel__suggestion-summary' );
+		await expect( summary ).toBeVisible();
+		await expect( summary ).toContainText( 'Formatting:' );
+		await expect( summary ).toContainText( 'bold' );
 	} );
 
 	test( 'captures a heading-level change made via the block-switcher variation picker', async ( {

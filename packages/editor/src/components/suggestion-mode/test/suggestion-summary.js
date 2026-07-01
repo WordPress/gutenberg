@@ -229,6 +229,35 @@ describe( 'summarizeOperations', () => {
 		] );
 	} );
 
+	it( 'summarizes an inline-suggestion format op as "Formatting: <format>"', () => {
+		// A format suggestion changes only markup, so it surfaces which
+		// formats changed (from the captured before/after run HTML) rather
+		// than quoting the unchanged text.
+		const lines = summarizeOperations( [
+			{
+				type: 'inline-suggestion',
+				attribute: 'content',
+				suggestionType: 'format',
+				beforeHTML: 'world',
+				afterHTML: '<strong>world</strong>',
+			},
+		] );
+		expect( lines ).toEqual( [ { label: 'Formatting:', value: 'bold' } ] );
+	} );
+
+	it( 'falls back to the attribute label for a format op with no HTML delta', () => {
+		// No detectable markup change (e.g. the captured HTML is missing):
+		// degrade to the generic attribute label rather than an empty line.
+		const lines = summarizeOperations( [
+			{
+				type: 'inline-suggestion',
+				attribute: 'content',
+				suggestionType: 'format',
+			},
+		] );
+		expect( lines ).toEqual( [ { label: 'Format:', value: 'content' } ] );
+	} );
+
 	it( 'quotes a whitespace-only inline-suggestion add verbatim', () => {
 		// Regression: typing only whitespace in Suggest mode resolves to a
 		// marker whose text is all spaces. The summary used to require
