@@ -250,6 +250,12 @@ export interface BlockType<
 	example?: Partial< BlockType > & {
 		innerBlocks?: BlockExampleInnerBlock[];
 		/**
+		 * Static HTML fragments interleaved with inner blocks, where `null`
+		 * entries mark inner block positions. Only applies to the Custom HTML
+		 * block.
+		 */
+		innerContent?: Array< string | null >;
+		/**
 		 * The width of the preview container in pixels.
 		 */
 		viewportWidth?: number;
