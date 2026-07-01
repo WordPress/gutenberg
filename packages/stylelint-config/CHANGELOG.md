@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Update `@stylistic/stylelint-plugin` to `^3.1.3` ([#79648](https://github.com/WordPress/gutenberg/pull/79648)).
+
+## 23.41.0 (2026-06-24)
+
 ## 23.40.1 (2026-06-16)
 
 ## 23.40.0 (2026-06-10)

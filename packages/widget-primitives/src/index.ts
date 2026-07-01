@@ -15,6 +15,8 @@ export type {
 	WidgetName,
 	WidgetIcon,
 	WidgetType,
+	WidgetAttributeField,
 	WidgetRenderProps,
 	ResolveWidgetModule,
+	WidgetModuleRecord,
 } from './types';

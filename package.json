@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "23.4.0",
+	"version": "23.5.0",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -32,6 +32,9 @@
 			},
 			{
 				"id": "dashboard",
+				"init": [
+					"@wordpress/dashboard-init"
+				],
 				"experimental": true
 			},
 			{
@@ -62,7 +65,7 @@
 		"IS_GUTENBERG_PLUGIN": true
 	},
 	"devDependencies": {
-		"@playwright/test": "^1.58.2",
+		"@playwright/test": "^1.61.1",
 		"@types/react": "^18.3.27",
 		"@types/react-dom": "^18.3.1",
 		"@typescript/native-preview": "^7.0.0-dev.20260423.1",
@@ -123,6 +126,7 @@
 		"prelint:php": "npm run other:update-packages:php",
 		"lint:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script lint",
 		"lint:pkg-json": "wp-scripts lint-pkg-json . 'packages/*/package.json'",
+		"lint:published-deps": "npm run --workspace @wordpress/validation-tools dependency-audit --",
 		"other:changelog": "npm exec --no release-cli -- changelog",
 		"other:check-licenses": "concurrently \"npm run --workspace @wordpress/validation-tools check-licenses --\" \"wp-scripts check-licenses --dev\"",
 		"preother:check-local-changes": "npm run docs:build && npm run --workspace @wordpress/theme build",

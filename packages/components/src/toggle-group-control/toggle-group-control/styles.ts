@@ -12,18 +12,15 @@ import type { ToggleGroupControlProps } from '../types';
 export const toggleGroupControl = ( {
 	isBlock,
 	isDeselectable,
-	size,
-}: Pick< ToggleGroupControlProps, 'isBlock' | 'isDeselectable' > & {
-	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
-} ) => css`
+}: Pick< ToggleGroupControlProps, 'isBlock' | 'isDeselectable' > ) => css`
 	background: ${ COLORS.ui.background };
 	border: 1px solid transparent;
 	border-radius: ${ CONFIG.radiusSmall };
 	display: inline-flex;
+	height: 40px;
 	min-width: 0;
 	position: relative;
 
-	${ toggleGroupControlSize( size ) }
 	${ ! isDeselectable && enclosingBorders( isBlock ) }
 
 	@media not ( prefers-reduced-motion ) {
@@ -78,21 +75,6 @@ const enclosingBorders = ( isBlock: ToggleGroupControlProps[ 'isBlock' ] ) => {
 			outline-offset: 1px;
 		}
 	`;
-};
-
-export const toggleGroupControlSize = (
-	size: NonNullable< ToggleGroupControlProps[ 'size' ] >
-) => {
-	const styles = {
-		default: css`
-			height: 36px;
-		`,
-		'__unstable-large': css`
-			height: 40px;
-		`,
-	};
-
-	return styles[ size ];
 };
 
 export const block = css`

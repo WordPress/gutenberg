@@ -2874,6 +2874,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/video-conversion",
+		"slug": "packages-video-conversion",
+		"markdown_source": "../packages/video-conversion/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/viewport",
 		"slug": "packages-viewport",
 		"markdown_source": "../packages/viewport/README.md",
@@ -2895,6 +2901,12 @@
 		"title": "@wordpress/warning",
 		"slug": "packages-warning",
 		"markdown_source": "../packages/warning/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/widget-dashboard",
+		"slug": "packages-widget-dashboard",
+		"markdown_source": "../packages/widget-dashboard/README.md",
 		"parent": "packages"
 	},
 	{

@@ -77,7 +77,7 @@ const getWidthInput = () => {
 };
 
 function TestBorderControl( restProps ) {
-	return <BorderControl __next40pxDefaultSize { ...restProps } />;
+	return <BorderControl { ...restProps } />;
 }
 
 describe( 'BorderControl', () => {

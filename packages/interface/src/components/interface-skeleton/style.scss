@@ -36,7 +36,7 @@ html.interface-interface-skeleton__html-container {
 		top: $admin-bar-height;
 
 		.is-fullscreen-mode & {
-			top: 0;
+			top: var(--wp-admin--admin-bar--height, 0);
 		}
 	}
 }
@@ -209,7 +209,7 @@ html.interface-interface-skeleton__html-container {
 				top: $admin-bar-height;
 
 				.is-fullscreen-mode & {
-					top: 0;
+					top: var(--wp-admin--admin-bar--height, 0);
 				}
 			}
 		}

@@ -356,7 +356,6 @@ export default function PostFeaturedImageEdit( {
 								}
 							>
 								<TextControl
-									__next40pxDefaultSize
 									label={ __( 'Link relation' ) }
 									help={ createInterpolateElement(
 										__(

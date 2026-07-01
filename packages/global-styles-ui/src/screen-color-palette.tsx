@@ -2,8 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-// @ts-ignore - WordPress private APIs
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import { Tabs } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -11,13 +10,6 @@ import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { ScreenHeader } from './screen-header';
 import ColorPalettePanel from './color-palette-panel';
 import GradientPalettePanel from './gradients-palette-panel';
-
-/**
- * External dependencies
- */
-import { unlock } from './lock-unlock';
-
-const { Tabs } = unlock( componentsPrivateApis );
 
 function ScreenColorPalette( { name }: { name?: string } ) {
 	return (
@@ -28,18 +20,22 @@ function ScreenColorPalette( { name }: { name?: string } ) {
 					'The combination of colors used across the site and in color pickers.'
 				) }
 			/>
-			<Tabs>
-				<Tabs.TabList>
-					<Tabs.Tab tabId="color">{ __( 'Color' ) }</Tabs.Tab>
-					<Tabs.Tab tabId="gradient">{ __( 'Gradient' ) }</Tabs.Tab>
-				</Tabs.TabList>
-				<Tabs.TabPanel tabId="color" focusable={ false }>
+			<Tabs.Root defaultValue="color">
+				<div className="global-styles-ui-color-palette__tablist-container">
+					<Tabs.List className="global-styles-ui-color-palette__tablist">
+						<Tabs.Tab value="color">{ __( 'Color' ) }</Tabs.Tab>
+						<Tabs.Tab value="gradient">
+							{ __( 'Gradient' ) }
+						</Tabs.Tab>
+					</Tabs.List>
+				</div>
+				<Tabs.Panel value="color" tabIndex={ -1 }>
 					<ColorPalettePanel name={ name } />
-				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId="gradient" focusable={ false }>
+				</Tabs.Panel>
+				<Tabs.Panel value="gradient" tabIndex={ -1 }>
 					<GradientPalettePanel name={ name } />
-				</Tabs.TabPanel>
-			</Tabs>
+				</Tabs.Panel>
+			</Tabs.Root>
 		</>
 	);
 }

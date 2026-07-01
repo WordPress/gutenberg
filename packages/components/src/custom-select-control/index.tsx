@@ -52,6 +52,11 @@ function getDescribedBy( currentName: string, describedBy?: string ) {
 	return sprintf( __( 'Currently selected: %s' ), currentName );
 }
 
+/**
+ * `CustomSelectControl` is a dropdown for selecting a single option from a
+ * list, with support for custom styling. Use it instead of the `SelectControl`
+ * when options need richer markup (e.g. per-option styles or hints).
+ */
 function CustomSelectControl< T extends CustomSelectOption >(
 	props: CustomSelectProps< T >
 ) {

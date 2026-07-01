@@ -682,7 +682,7 @@ describe( 'global styles renderer', () => {
 													text: 'blue',
 												},
 											},
-											mobile: {
+											'@mobile': {
 												color: {
 													text: 'green',
 												},
@@ -790,7 +790,7 @@ describe( 'global styles renderer', () => {
 									text: 'blue',
 								},
 							},
-							mobile: {
+							'@mobile': {
 								color: {
 									text: 'red',
 								},
@@ -832,7 +832,7 @@ describe( 'global styles renderer', () => {
 							text: 'blue',
 						},
 					},
-					mobile: {
+					'@mobile': {
 						color: {
 							text: 'green',
 						},
@@ -945,7 +945,7 @@ describe( 'global styles renderer', () => {
 											width: '20rem',
 										},
 									},
-									tablet: {
+									'@tablet': {
 										color: {
 											text: 'red',
 										},
@@ -1009,6 +1009,45 @@ describe( 'global styles renderer', () => {
 							color: {
 								text: 'red',
 							},
+							'@mobile': {
+								color: {
+									text: 'blue',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				':root :where(.wp-block-button){color: red;}@media (width <= 480px){:root :where(.wp-block-button){color: blue;}}'
+			);
+		} );
+
+		it( 'handles legacy responsive block styles', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/button': {
+							color: {
+								text: 'red',
+							},
 							mobile: {
 								color: {
 									text: 'blue',
@@ -1050,7 +1089,7 @@ describe( 'global styles renderer', () => {
 									text: 'blue',
 								},
 							},
-							mobile: {
+							'@mobile': {
 								color: {
 									text: 'red',
 								},
@@ -1095,7 +1134,7 @@ describe( 'global styles renderer', () => {
 							dimensions: {
 								width: '25%',
 							},
-							mobile: {
+							'@mobile': {
 								dimensions: {
 									width: '50%',
 								},
@@ -1140,7 +1179,7 @@ describe( 'global styles renderer', () => {
 							color: {
 								text: 'blue',
 							},
-							mobile: {
+							'@mobile': {
 								color: {
 									text: 'red',
 								},
@@ -1180,7 +1219,7 @@ describe( 'global styles renderer', () => {
 									color: {
 										text: 'green',
 									},
-									mobile: {
+									'@mobile': {
 										color: {
 											text: 'yellow',
 										},

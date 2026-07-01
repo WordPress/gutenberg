@@ -57,7 +57,6 @@ export function TemplatePartAdvancedControls( {
 			{ isEntityAvailable && (
 				<>
 					<TextControl
-						__next40pxDefaultSize
 						label={ __( 'Title' ) }
 						value={ title }
 						onChange={ ( value ) => {

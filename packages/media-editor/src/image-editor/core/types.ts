@@ -193,6 +193,8 @@ export interface StencilProps {
 	aspectRatio?: number;
 	/** Whether the crop handles are shown for freeform resizing. */
 	freeformCrop?: boolean;
+	/** Whether resize handles should ignore pointer and keyboard input. */
+	isResizeDisabled?: boolean;
 	/** CSS transition string for settle animation. */
 	stencilTransition?: string;
 	/** Maximum crop rect bounds based on current zoom/rotation. */

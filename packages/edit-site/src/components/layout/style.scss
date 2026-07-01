@@ -17,6 +17,7 @@
 
 .edit-site-layout__content {
 	height: 100%;
+	min-height: 0;
 	flex-grow: 1;
 	display: flex;
 }
@@ -33,15 +34,16 @@
 	// This is only necessary for the exit animation
 	.edit-site-layout.is-full-canvas & {
 		position: fixed !important;
-		height: 100vh;
+		height: calc(100vh - var(--wp-admin--admin-bar--height, 0));
 		left: 0;
-		top: 0;
+		top: var(--wp-admin--admin-bar--height, 0);
 	}
 
 	.edit-site-layout__sidebar {
 		display: flex;
 		flex-direction: column;
 		height: 100%;
+		min-height: 0;
 	}
 
 	.resizable-editor__drag-handle {
@@ -254,7 +256,7 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	&.is-entity-save-view-open {
 		&:focus,
 		&:focus-within {
-			top: 0;
+			top: var(--wp-admin--admin-bar--height, 0);
 		}
 	}
 

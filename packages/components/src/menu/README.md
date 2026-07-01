@@ -306,7 +306,7 @@ that don't support the native `disabled` attribute.
 The checked state of the radio menu item when it is initially rendered.
 Use when not wanting to control its checked state.
 
-Note: this prop will be overriden by the `checked` prop, if it is defined.
+Note: this prop will be overridden by the `checked` prop, if it is defined.
 
 ##### `hideOnClick`
 
@@ -404,7 +404,7 @@ that don't support the native `disabled` attribute.
 The checked state of the checkbox menu item when it is initially rendered.
 Use when not wanting to control its checked state.
 
-Note: this prop will be overriden by the `checked` prop, if it is defined.
+Note: this prop will be overridden by the `checked` prop, if it is defined.
 
 ##### `hideOnClick`
 

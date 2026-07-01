@@ -11,7 +11,7 @@ import { SnackbarNotices } from '@wordpress/notices';
 import { SlotFillProvider } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { getAdminThemeColors } from '@wordpress/admin-ui';
-import { privateApis as themePrivateApis } from '@wordpress/theme';
+import { ThemeProvider } from '@wordpress/theme';
 
 /**
  * Internal dependencies
@@ -24,7 +24,6 @@ import './style.scss';
 import useRouteTitle from '../app/use-route-title';
 
 const { useMatches, Outlet } = unlock( routePrivateApis );
-const { ThemeProvider } = unlock( themePrivateApis );
 
 /**
  * Root component for single page mode (no sidebar).

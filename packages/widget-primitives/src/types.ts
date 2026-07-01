@@ -4,9 +4,9 @@
  * Canonical home for widget identity types consumed by the registry and
  * hosts that render widgets.
  *
- * Each type is generic over the widget's attribute object (`Item`) so a
- * widget binds its own attribute shape once and gets typed `attributes`,
- * `example`, and `setAttributes` throughout the framework.
+ * Each type is generic over the widget's attribute object (`Item`), so a
+ * widget binds its attribute shape once and gets typed `attributes`,
+ * `example`, and `setAttributes`.
  */
 
 /**
@@ -23,20 +23,28 @@ export type WidgetName = `${ string }/${ string }`;
 
 /**
  * Icon for a widget type: a rendered SVG element, typically one from
- * `@wordpress/icons`. Hosts pass it to their icon primitive as is.
+ * `@wordpress/icons`.
  */
 export type WidgetIcon = ReactElement< ComponentProps< 'svg' > >;
+
+/**
+ * Authoring helper for a widget's `attributes` schema: a DataViews `Field`
+ * whose `id` is narrowed to the keys of the widget's attribute object (`Item`).
+ */
+export type WidgetAttributeField< Item > = Field< Item > & {
+	/*
+	 * `& string` drops the number/symbol keys `keyof` can yield; `Field.id`
+	 * is a string.
+	 */
+	id: keyof Item & string;
+};
 
 /**
  * Literal contents of a widget's `widget.json` metadata file.
  *
  * Captures the *authoring* shape only; module entry points and style
- * assets are discovered by convention from the widget directory
- * (`render.*`, `widget.*`, `render.scss`), not declared here.
- *
- * Hosts that render widgets consume the richer `WidgetType` below,
- * which extends this shape with runtime-only fields produced by the
- * build manifest.
+ * assets are discovered by convention from the widget directory, not
+ * declared here.
  */
 export interface WidgetTypeMetadata< Item = unknown > {
 	/**
@@ -45,17 +53,18 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	apiVersion: number;
 
 	/**
-	 * Stable type identifier. See `WidgetName` for the shape.
+	 * Stable type identifier.
 	 */
 	name: WidgetName;
 
 	/**
-	 * Display title; hosts surface it in pickers and chrome.
+	 * Human-readable title that names the widget type. Translatable.
 	 */
 	title: string;
 
 	/**
-	 * Short description; hosts surface it in pickers and help panels.
+	 * Human-readable description of what the widget type does.
+	 * Translatable.
 	 */
 	description?: string;
 
@@ -72,8 +81,8 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	category?: string;
 
 	/**
-	 * Authoring intent about how the widget wants to render. Static
-	 * and declarative; not a user-editable attribute.
+	 * Authoring intent about how the widget renders. Not a user-editable
+	 * attribute.
 	 *
 	 * - `'framed'` (default when absent): the widget renders its
 	 *   content only.
@@ -85,7 +94,8 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	presentation?: 'framed' | 'content-bleed' | 'full-bleed';
 
 	/**
-	 * Search aliases hosts use to match the widget in their pickers.
+	 * Alternative terms used to match the widget type when searching,
+	 * e.g. `calendar` for an events widget. Translatable.
 	 */
 	keywords?: string[];
 
@@ -124,31 +134,24 @@ export interface WidgetTypeMetadata< Item = unknown > {
 /**
  * Runtime widget type consumed by hosts.
  *
- * Extends `WidgetTypeMetadata` (the authoring shape of `widget.json`) with
- * runtime-only fields produced by the build pipeline. Notably
- * `renderModule`, which maps each widget to its discovered script-module
- * entry point.
- *
- * The PHP layer (`widget-types.php`) emits this data in snake_case
- * (`render_module`). The `useWidgetTypes` hook is the single boundary
- * that maps it to the camelCase shape consumed throughout JS/TS.
+ * Extends `WidgetTypeMetadata` with runtime-only fields, notably
+ * `renderModule`. Hosts supply the raw records in snake_case
+ * (`WidgetModuleRecord`); `useWidgetTypes` is the single boundary that
+ * resolves them into this camelCase shape.
  */
 export interface WidgetType< Item = unknown >
 	extends WidgetTypeMetadata< Item > {
 	/**
 	 * Script-module identifier resolved to a React component at render
-	 * time. Produced by the build pipeline from the conventional
-	 * `render.*` entry point; not declared in `widget.json`.
+	 * time, produced from the conventional `render.*` entry point.
 	 */
 	renderModule: string;
 }
 
 /**
- * Props passed to a widget's render component by the consuming host.
- *
- * Bound over `Item` so the destructured `attributes` and any
- * `setAttributes` payload are typed against the widget's attribute
- * object.
+ * Props passed to a widget's render component by the host, bound over
+ * `Item` so `attributes` and `setAttributes` are typed against the
+ * widget's attribute object.
  */
 export interface WidgetRenderProps< Item = unknown > {
 	/**
@@ -178,3 +181,50 @@ export interface WidgetModule {
 export type ResolveWidgetModule = (
 	moduleId: string
 ) => Promise< WidgetModule >;
+
+/**
+ * Per-widget record a host feeds to `useWidgetTypes`, in snake_case wire
+ * format. The host fetches these however it likes; only the field shape is
+ * part of the contract.
+ */
+export interface WidgetModuleRecord {
+	/**
+	 * Stable widget type identifier.
+	 */
+	name: string;
+
+	/**
+	 * Script-module id resolved to the render component at render time.
+	 */
+	render_module?: string | null;
+
+	/**
+	 * Script-module id dynamically imported for the widget's live metadata.
+	 */
+	widget_module?: string | null;
+
+	/**
+	 * Authoring presentation hint; overrides the metadata module's value.
+	 */
+	presentation?: WidgetTypeMetadata[ 'presentation' ] | null;
+
+	/**
+	 * Grouping category; overrides the metadata module's value.
+	 */
+	category?: WidgetTypeMetadata[ 'category' ] | null;
+
+	/**
+	 * Translated title; overrides the metadata module's value.
+	 */
+	title?: WidgetTypeMetadata[ 'title' ] | null;
+
+	/**
+	 * Translated description; overrides the metadata module's value.
+	 */
+	description?: WidgetTypeMetadata[ 'description' ] | null;
+
+	/**
+	 * Translated search aliases; override the metadata module's value.
+	 */
+	keywords?: WidgetTypeMetadata[ 'keywords' ] | null;
+}
