@@ -10,13 +10,34 @@
 // The resolved values of the semantic `--wpds-*` tokens are covered by the
 // `ThemeProvider` tests (which read them as computed CSS custom properties).
 
-import { renderHook } from '@testing-library/react';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import { type ReactNode } from 'react';
+import { renderHook } from '@testing-library/react';
 import { ThemeProvider } from '../theme-provider';
 import { useThemeProviderStyles } from '../use-theme-provider-styles';
 import { DEFAULT_SEED_COLORS } from '../color-ramps';
 
 describe( 'useThemeProviderStyles', () => {
+	describe( 'generated legacy CSS aliases', () => {
+		it( 'defines static wp-components aliases in the prebuilt root CSS', () => {
+			const prebuiltCSS = readFileSync(
+				join(
+					import.meta.dirname,
+					'../prebuilt/css/design-tokens.css'
+				),
+				'utf8'
+			);
+
+			expect( prebuiltCSS ).toMatch(
+				/--wp-components-color-accent:\s*var\(\s*--wp-admin-theme-color\s*,\s*#3858e9\s*\);/
+			);
+			expect( prebuiltCSS ).toMatch(
+				/--wp-components-color-background:\s*var\(\s*--wpds-color-background-surface-neutral-strong\s*\);/
+			);
+		} );
+	} );
+
 	describe( 'resolvedSettings', () => {
 		it( 'falls back to the default seed colors and no cursor', () => {
 			const { result } = renderHook( () => useThemeProviderStyles() );
@@ -108,6 +129,16 @@ describe( 'useThemeProviderStyles', () => {
 	} );
 
 	describe( 'legacy wp-admin / wp-components bridge', () => {
+		it( 'does not emit default legacy color variables at runtime', () => {
+			const { result } = renderHook( () => useThemeProviderStyles() );
+			const styles = result.current.themeProviderStyles;
+
+			expect( styles ).not.toHaveProperty( '--wp-admin-theme-color' );
+			expect( styles ).not.toHaveProperty(
+				'--wp-components-color-accent'
+			);
+		} );
+
 		it( 'derives the wp-admin theme color from the primary seed', () => {
 			const { result } = renderHook( () =>
 				useThemeProviderStyles( { color: { primary: '#1e90ff' } } )
@@ -120,19 +151,18 @@ describe( 'useThemeProviderStyles', () => {
 			);
 		} );
 
-		it( 'aliases the wp-components colors onto the wp-admin and semantic tokens', () => {
-			const { result } = renderHook( () => useThemeProviderStyles() );
+		it( 'keeps inherited custom wp-admin theme colors active', () => {
+			const wrapper = ( { children }: { children: ReactNode } ) => (
+				<ThemeProvider color={ { primary: '#1e90ff' } }>
+					{ children }
+				</ThemeProvider>
+			);
+			const { result } = renderHook( () => useThemeProviderStyles(), {
+				wrapper,
+			} );
 			const styles = result.current.themeProviderStyles;
 
-			expect( styles[ '--wp-components-color-accent' ] ).toBe(
-				'var(--wp-admin-theme-color)'
-			);
-			expect( styles[ '--wp-components-color-accent-inverted' ] ).toBe(
-				'var(--wpds-color-foreground-interactive-brand-strong)'
-			);
-			expect( styles[ '--wp-components-color-background' ] ).toBe(
-				'var(--wpds-color-background-surface-neutral-strong)'
-			);
+			expect( styles[ '--wp-admin-theme-color' ] ).toBe( '#1e90ff' );
 		} );
 	} );
 

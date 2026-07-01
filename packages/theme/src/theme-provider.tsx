@@ -22,19 +22,21 @@ export const ThemeProvider = ( {
 	cornerRadius,
 	isRoot = false,
 }: ThemeProviderProps ) => {
-	const { themeProviderStyles, resolvedSettings } = useThemeProviderStyles( {
-		color,
-		cursor,
-		cornerRadius,
-	} );
+	const { themeProviderStyles, resolvedSettings, hasCustomPrimary } =
+		useThemeProviderStyles( {
+			color,
+			cursor,
+			cornerRadius,
+		} );
 
 	const cornerRadiusPreset = resolvedSettings.cornerRadius ?? 'subtle';
 
 	const contextValue = useMemo(
 		() => ( {
 			resolvedSettings,
+			hasCustomPrimary,
 		} ),
-		[ resolvedSettings ]
+		[ resolvedSettings, hasCustomPrimary ]
 	);
 
 	const wrapperRef = useRef< HTMLDivElement >( null );
