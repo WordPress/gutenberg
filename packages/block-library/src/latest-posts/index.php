@@ -187,7 +187,7 @@ function render_block_core_latest_posts( $attributes ) {
 				$post_content = __( 'This content is password protected.' );
 			} else {
 				$post_id      = get_the_ID();
-				$post_content = get_post_field( 'post_content', $post_id );
+				$post_content = get_post_field( 'post_content', $post_id, 'raw' );
 				// Check if we're already rendering this post to prevent infinite recursion.
 				if ( in_array( $post_id, $rendering_stack, true ) ) {
 					$post_content = '';
