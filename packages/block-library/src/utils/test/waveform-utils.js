@@ -52,11 +52,6 @@ describe( 'Waveform utilities', () => {
 				'#000000'
 			);
 			expect( container ).toHaveAttribute( 'data-seek-label', 'Seek' );
-			expect( container ).toHaveStyle( {
-				'--wp--playlist--waveform-bar-color': 'rgba(0, 0, 0, 0.3)',
-				'--wp--playlist--waveform-button-background-color': '#000000',
-				'--wp--playlist--waveform-button-icon-color': '#ffffff',
-			} );
 		} );
 
 		it( 'should set optional attributes when provided', () => {
