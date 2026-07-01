@@ -245,16 +245,25 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 		return $block_content;
 	}
 
-	// Flag the suggestion markers with a sentinel attribute carrying the strip
-	// mode so the offset pass below can classify them without re-parsing.
+	/*
+	 * Flag the suggestion markers with a sentinel attribute carrying the strip
+	 * mode so the offset pass below can classify them without re-parsing. Every
+	 * tag that is NOT a genuine suggestion marker has any pre-existing
+	 * `data-wp-suggestion-strip` attribute removed first: a user-planted
+	 * sentinel (data-* attributes pass KSES, so no special capability is
+	 * needed to store one) must be able neither to influence the offset pass
+	 * nor to leak into public output.
+	 */
 	$processor = new WP_HTML_Tag_Processor( $block_content );
 	$found     = false;
-	while ( $processor->next_tag( 'MARK' ) ) {
-		if ( ! $processor->has_class( 'wp-suggestion' ) ) {
+	while ( $processor->next_tag() ) {
+		if ( 'MARK' !== $processor->get_tag() || ! $processor->has_class( 'wp-suggestion' ) ) {
+			$processor->remove_attribute( 'data-wp-suggestion-strip' );
 			continue;
 		}
 		// An unknown or missing type defaults to deletion (unwrap, keep text)
-		// so a malformed marker never silently drops content.
+		// so a malformed marker never silently drops content. A planted
+		// sentinel on a genuine marker is overwritten with the derived mode.
 		$mode = ( 'add' === $processor->get_attribute( 'data-suggestion-type' ) )
 			? 'add'
 			: 'del';
@@ -262,75 +271,97 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 		$found = true;
 	}
 
+	// Return the updated HTML even when no marker was found — planted
+	// sentinels may have been removed above.
+	$block_content = $processor->get_updated_html();
+
 	if ( ! $found ) {
 		return $block_content;
 	}
 
-	$block_content = $processor->get_updated_html();
+	/*
+	 * Known limitation: this pass tokenizes `<mark …>` / `</mark>` with a
+	 * regex, so a literal `</mark>` (or a sentinel look-alike) inside an
+	 * attribute VALUE would be miscounted. Storing such a value requires
+	 * `unfiltered_html` — KSES rejects it for everyone else. Replacing the
+	 * regex pass with tag-processor bookmarks once the HTML API can remove a
+	 * tag together with its closer is the planned fix (see the docblock).
+	 */
+	if ( preg_match_all( '~</?mark\b[^>]*>~i', $block_content, $tags, PREG_OFFSET_CAPTURE ) ) {
+		// Pair each flagged opener with its matching closer via a nesting
+		// stack. Collect half-open byte ranges to remove: for a deletion the
+		// opener and closer tags only (text kept); for an addition the whole
+		// span.
+		$open_stack = array();
+		$removals   = array();
+		foreach ( $tags[0] as $tag ) {
+			$html   = $tag[0];
+			$offset = $tag[1];
+			$length = strlen( $html );
 
-	if ( ! preg_match_all( '~</?mark\b[^>]*>~i', $block_content, $tags, PREG_OFFSET_CAPTURE ) ) {
-		return $block_content;
-	}
-
-	// Pair each flagged opener with its matching closer via a nesting stack.
-	// Collect half-open byte ranges to remove: for a deletion the opener and
-	// closer tags only (text kept); for an addition the whole span.
-	$open_stack = array();
-	$removals   = array();
-	foreach ( $tags[0] as $tag ) {
-		$html   = $tag[0];
-		$offset = $tag[1];
-		$length = strlen( $html );
-
-		if ( '/' === $html[1] ) {
-			$open = array_pop( $open_stack );
-			if ( null === $open || 'none' === $open['mode'] ) {
+			if ( '/' === $html[1] ) {
+				$open = array_pop( $open_stack );
+				if ( null === $open || 'none' === $open['mode'] ) {
+					continue;
+				}
+				if ( 'add' === $open['mode'] ) {
+					$removals[] = array( $open['start'], $offset + $length );
+				} else {
+					$removals[] = array( $open['start'], $open['end'] );
+					$removals[] = array( $offset, $offset + $length );
+				}
 				continue;
 			}
-			if ( 'add' === $open['mode'] ) {
-				$removals[] = array( $open['start'], $offset + $length );
-			} else {
-				$removals[] = array( $open['start'], $open['end'] );
-				$removals[] = array( $offset, $offset + $length );
+
+			$mode = 'none';
+			if ( false !== strpos( $html, 'data-wp-suggestion-strip="add"' ) ) {
+				$mode = 'add';
+			} elseif ( false !== strpos( $html, 'data-wp-suggestion-strip="del"' ) ) {
+				$mode = 'del';
 			}
-			continue;
+			$open_stack[] = array(
+				'start' => $offset,
+				'end'   => $offset + $length,
+				'mode'  => $mode,
+			);
 		}
 
-		$mode = 'none';
-		if ( false !== strpos( $html, 'data-wp-suggestion-strip="add"' ) ) {
-			$mode = 'add';
-		} elseif ( false !== strpos( $html, 'data-wp-suggestion-strip="del"' ) ) {
-			$mode = 'del';
-		}
-		$open_stack[] = array(
-			'start' => $offset,
-			'end'   => $offset + $length,
-			'mode'  => $mode,
-		);
-	}
-
-	if ( empty( $removals ) ) {
-		return $block_content;
-	}
-
-	// Merge overlapping/adjacent ranges so a deletion nested inside an addition
-	// (already wholly removed) doesn't double-remove and corrupt offsets.
-	sort( $removals );
-	$merged = array();
-	foreach ( $removals as $range ) {
-		$last = count( $merged ) - 1;
-		if ( $last >= 0 && $range[0] <= $merged[ $last ][1] ) {
-			if ( $range[1] > $merged[ $last ][1] ) {
-				$merged[ $last ][1] = $range[1];
+		if ( ! empty( $removals ) ) {
+			// Merge overlapping/adjacent ranges so a deletion nested inside an
+			// addition (already wholly removed) doesn't double-remove and
+			// corrupt offsets.
+			sort( $removals );
+			$merged = array();
+			foreach ( $removals as $range ) {
+				$last = count( $merged ) - 1;
+				if ( $last >= 0 && $range[0] <= $merged[ $last ][1] ) {
+					if ( $range[1] > $merged[ $last ][1] ) {
+						$merged[ $last ][1] = $range[1];
+					}
+				} else {
+					$merged[] = $range;
+				}
 			}
-		} else {
-			$merged[] = $range;
+
+			// Remove from the end so earlier offsets remain valid.
+			for ( $i = count( $merged ) - 1; $i >= 0; $i-- ) {
+				$block_content = substr_replace( $block_content, '', $merged[ $i ][0], $merged[ $i ][1] - $merged[ $i ][0] );
+			}
 		}
 	}
 
-	// Remove from the end so earlier offsets remain valid.
-	for ( $i = count( $merged ) - 1; $i >= 0; $i-- ) {
-		$block_content = substr_replace( $block_content, '', $merged[ $i ][0], $merged[ $i ][1] - $merged[ $i ][0] );
+	/*
+	 * The sentinel is an internal implementation detail and must never reach
+	 * public output. A flagged opener whose closer was never found (malformed
+	 * or truncated markup) survives the offset pass with the sentinel still
+	 * attached — strip any remainder.
+	 */
+	if ( false !== strpos( $block_content, 'data-wp-suggestion-strip' ) ) {
+		$cleanup = new WP_HTML_Tag_Processor( $block_content );
+		while ( $cleanup->next_tag() ) {
+			$cleanup->remove_attribute( 'data-wp-suggestion-strip' );
+		}
+		$block_content = $cleanup->get_updated_html();
 	}
 
 	return $block_content;
