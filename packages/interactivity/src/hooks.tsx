@@ -266,14 +266,14 @@ export const getEvaluate: GetEvaluate =
 		}
 		// If path starts with !, remove it and save a flag.
 		const hasNegationOperator =
-			path[ 0 ] === '!' && !! ( path = path.slice( 1 ) );
+			path[ 0 ] === '!' && !! ( path = path.slice( 1 ).trimStart() );
 		setScope( scope );
 
-		// Fast path: simple dotted path — use resolve() which handles
-		// function wrapping for scope management (required for
+		// Legacy path: simple dotted path reference — use resolve() which
+		// handles function wrapping for scope management (required for
 		// data-wp-on--click="actions.toggleOptionsMenu" etc.).
-		// Complex expressions (operators, comparisons, semicolons)
-		// fall through to the full-expression path below.
+		// Complex expressions (operators, comparisons, semicolons) fall
+		// through to the full-expression path below.
 		if ( /^[a-zA-Z_$][\w.]*$/.test( path ) ) {
 			const value = resolve( path, namespace );
 			// Functions are returned without invoking them.

@@ -248,7 +248,10 @@ describe( 'Interactivity API', () => {
 		} );
 
 		it( 'should evaluate negation with ! operator', () => {
-			const result = evaluateExpr( '! context.isPinned' );
+			// The ! operator inside a full expression (not just as a prefix)
+			// is handled by the full-expression path because the legacy path
+			// regex /^[a-zA-Z_$][\w.]*$/ does not match '&&' or spaces.
+			const result = evaluateExpr( 'context.isPinned && !state.flag' );
 			expect( result ).toBe( false );
 		} );
 
@@ -306,18 +309,59 @@ describe( 'Interactivity API', () => {
 			expect( result ).toBeUndefined();
 		} );
 
-		it( 'should resolve simple dotted paths via fast path (backward compat)', () => {
-			// Simple dotted paths like state.count should use the fast path
+		it( 'should resolve simple dotted paths via legacy path (backward compat)', () => {
+			// Simple dotted paths like state.count match the legacy path regex
+			// /^[a-zA-Z_$][\w.]*$/ so they go through the legacy path
 			// (resolve()) and return the expected value.
+			const legacyRe = /^[a-zA-Z_$][\w.]*$/;
+			expect( legacyRe.test( 'state.count' ) ).toBe( true );
 			const result = evaluateExpr( 'state.count' );
 			expect( result ).toBe( 5 );
 		} );
 
-		it( 'should resolve negated simple paths via full-expression path', () => {
-			// Simple paths starting with ! fall through to the full-expression
-			// path where ! is handled naturally in the JS expression.
-			const result = evaluateExpr( '! context.isPinned' );
-			expect( result ).toBe( false );
+		it( 'should resolve negated simple paths via legacy path', () => {
+			// After ! is stripped and whitespace is trimStart()'d, these
+			// paths become simple dotted paths that match the legacy path
+			// regex, so hasNegationOperator handles the negation in the
+			// legacy path rather than falling through to full-expression.
+			const legacyRe = /^[a-zA-Z_$][\w.]*$/;
+			expect( legacyRe.test( 'state.flag' ) ).toBe( true );
+			expect( legacyRe.test( 'context.isPinned' ) ).toBe( true );
+			expect( legacyRe.test( 'state.count' ) ).toBe( true );
+			expect( evaluateExpr( '!state.flag' ) ).toBe( false );
+			expect( evaluateExpr( '! context.isPinned' ) ).toBe( false );
+			expect( evaluateExpr( '!  state.count' ) ).toBe( false );
+		} );
+
+		it( 'should route complex expressions through the full-expression path', () => {
+			// Expressions containing operators, comparisons, spaces, etc. do
+			// NOT match the legacy path regex and fall through to the
+			// full-expression path which uses new Function().
+			const legacyRe = /^[a-zA-Z_$][\w.]*$/;
+			expect( legacyRe.test( 'state.count > 0' ) ).toBe( false );
+			expect( legacyRe.test( 'context.a && context.b' ) ).toBe( false );
+			expect( legacyRe.test( 'a; b' ) ).toBe( false );
+			// Verify they still evaluate correctly via the full-expression path
+			expect( evaluateExpr( 'state.count > 0' ) ).toBe( true );
+			expect( evaluateExpr( 'context.isPinned && state.flag' ) ).toBe( true );
+		} );
+
+		it( 'should evaluate ! on a function reference via hasNegationOperator', () => {
+			// After ! is stripped and whitespace is trimStart()'d, the path
+			// `actions.increment` matches the legacy path regex, so it goes
+			// through the legacy path where hasNegationOperator calls the
+			// function immediately (with ...args) and negates its return
+			// value. actions.increment returns undefined, so !undefined === true.
+			// This test documents the pre-removal behavior; after removing
+			// the function+negation hack, the result will be a wrapped
+			// function instead.
+			const legacyRe = /^[a-zA-Z_$][\w.]*$/;
+			expect( legacyRe.test( 'actions.increment' ) ).toBe( true );
+			const result = evaluateExpr( '!actions.increment' );
+			// Acknowledge the deprecation warning so the afterEach console
+			// assertion passes, then assert the value.
+			expect( console ).toHaveWarned();
+			expect( result ).toBe( true );
 		} );
 
 		it( 'should support complex boolean precedence and grouping', () => {
