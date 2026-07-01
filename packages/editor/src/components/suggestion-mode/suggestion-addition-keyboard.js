@@ -142,6 +142,25 @@ export default function SuggestionAdditionKeyboard() {
 				pending: text,
 			};
 			runRef.current = run;
+			/*
+			 * Whether the live caret still reads the run's block and
+			 * attribute. Checked after every await: if the user relocated
+			 * during the note round trip the run is abandoned — writing the
+			 * buffered characters into the old location would materialize
+			 * text where the user no longer is. (The already-created note is
+			 * left behind; see the orphaned-note known limitation.)
+			 */
+			const caretStillAnchored = () => {
+				const live = readInlineCaret(
+					getSelectionStart,
+					getSelectionEnd
+				);
+				return (
+					!! live &&
+					live.clientId === clientId &&
+					live.attributeKey === attributeKey
+				);
+			};
 			try {
 				if ( isTypeOver ) {
 					const baseValue =
@@ -154,7 +173,7 @@ export default function SuggestionAdditionKeyboard() {
 					if ( runRef.current !== run ) {
 						return;
 					}
-					if ( ! delId ) {
+					if ( ! delId || ! caretStillAnchored() ) {
 						resetRun();
 						return;
 					}
@@ -181,12 +200,12 @@ export default function SuggestionAdditionKeyboard() {
 					attributeKey,
 					SUGGESTION_TYPE_ADDITION
 				);
-				// The run may have been abandoned (caret moved, mode change)
-				// while the request was in flight.
+				// The run may have been abandoned (mode change) or the caret
+				// may have relocated while the request was in flight.
 				if ( runRef.current !== run ) {
 					return;
 				}
-				if ( ! addId ) {
+				if ( ! addId || ! caretStillAnchored() ) {
 					resetRun();
 					return;
 				}
@@ -219,6 +238,8 @@ export default function SuggestionAdditionKeyboard() {
 		},
 		[
 			getBlockAttributes,
+			getSelectionStart,
+			getSelectionEnd,
 			openInlineNote,
 			updateBlockAttributes,
 			requestInterceptorBypass,
@@ -241,15 +262,30 @@ export default function SuggestionAdditionKeyboard() {
 	 */
 	const insertText = useCallback(
 		( text, allowGrow ) => {
+			const caret = readInlineCaret( getSelectionStart, getSelectionEnd );
 			const inFlight = runRef.current;
 			if ( inFlight && inFlight.id === null ) {
-				// A note request is still in flight: buffer regardless of where
-				// the caret reads now (during a type-over the selection hasn't
-				// collapsed yet) and let the flush apply it.
-				inFlight.pending += text;
-				return true;
+				/*
+				 * A note request is still in flight. Buffer as long as the
+				 * caret still reads the run's block and attribute — offsets
+				 * are ignored because during a type-over the selection hasn't
+				 * collapsed yet. If the user clicked into a different block or
+				 * attribute during the round trip, abandon the run instead:
+				 * the buffered characters were never rendered (their edits
+				 * were cancelled), so flushing them would materialize text at
+				 * a place the user has already left. The current keystroke
+				 * then starts a fresh run at the new caret below.
+				 */
+				if (
+					caret &&
+					caret.clientId === inFlight.clientId &&
+					caret.attributeKey === inFlight.attributeKey
+				) {
+					inFlight.pending += text;
+					return true;
+				}
+				resetRun();
 			}
-			const caret = readInlineCaret( getSelectionStart, getSelectionEnd );
 			if ( ! caret ) {
 				// Block-level / cross-attribute selection: nothing to anchor to.
 				resetRun();
