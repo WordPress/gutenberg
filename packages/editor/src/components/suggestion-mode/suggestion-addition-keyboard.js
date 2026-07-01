@@ -21,6 +21,7 @@ import {
 	buildSuggestionMarkerAttributes,
 	insertInlineAddition,
 	growInlineAddition,
+	valueRangeHasSuggestion,
 } from '../inline-suggestions';
 import {
 	getCandidateDocuments,
@@ -255,6 +256,24 @@ export default function SuggestionAdditionKeyboard() {
 				return false;
 			}
 			const { clientId, attributeKey, start, end } = caret;
+			if (
+				start !== end &&
+				valueRangeHasSuggestion(
+					getBlockAttributes( clientId )?.[ attributeKey ],
+					start,
+					end
+				)
+			) {
+				/*
+				 * Type-over of a selection that overlaps an existing
+				 * suggestion marker: wrapping it in the `del` marker would
+				 * re-attribute part of that marker to the new id (see
+				 * `formatsRangeHasSuggestion`). Fall through to the
+				 * native/overlay path instead of intercepting.
+				 */
+				resetRun();
+				return false;
+			}
 			const run = runRef.current;
 			const isContiguous =
 				allowGrow &&

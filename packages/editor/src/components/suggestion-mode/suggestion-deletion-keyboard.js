@@ -23,6 +23,8 @@ import {
 	SUGGESTION_FORMAT_NAME,
 	SUGGESTION_TYPE_DELETION,
 	buildSuggestionMarkerAttributes,
+	formatsRangeHasSuggestion,
+	valueRangeHasSuggestion,
 } from '../inline-suggestions';
 import {
 	getCandidateDocuments,
@@ -48,23 +50,6 @@ function readValueMetrics( value ) {
 	}
 	const record = create( { html } );
 	return { length: record.text.length, formats: record.formats ?? [] };
-}
-
-/**
- * Whether the character at `index` already carries a `core/suggestion` marker.
- * Used to leave edits inside an existing suggestion to the default path rather
- * than nesting a deletion mark inside another suggestion.
- *
- * @param {Array}  formats Per-character format stacks.
- * @param {number} index   Character index.
- * @return {boolean} True when a suggestion format covers the character.
- */
-function hasSuggestionFormatAt( formats, index ) {
-	const stack = formats[ index ];
-	return (
-		Array.isArray( stack ) &&
-		stack.some( ( f ) => f.type === SUGGESTION_FORMAT_NAME )
-	);
 }
 
 /**
@@ -324,6 +309,24 @@ export default function SuggestionDeletionKeyboard() {
 				getSelectionEnd
 			);
 			if ( selection ) {
+				/*
+				 * Leave a selection that overlaps an existing suggestion
+				 * marker to the default path: `applyFormat` over the range
+				 * would re-attribute part of that marker to the new id and
+				 * its accept/reject would then act on a partial range.
+				 */
+				if (
+					valueRangeHasSuggestion(
+						getBlockAttributes( selection.clientId )?.[
+							selection.attributeKey
+						],
+						selection.start,
+						selection.end
+					)
+				) {
+					resetRun();
+					return;
+				}
 				event.preventDefault();
 				deleteSelection( selection );
 				return;
@@ -358,7 +361,13 @@ export default function SuggestionDeletionKeyboard() {
 			// Leave edits inside an existing suggestion marker to the default
 			// path rather than nesting marks.
 			const targetIndex = isBackward ? pos - 1 : pos;
-			if ( hasSuggestionFormatAt( formats, targetIndex ) ) {
+			if (
+				formatsRangeHasSuggestion(
+					formats,
+					targetIndex,
+					targetIndex + 1
+				)
+			) {
 				resetRun();
 				return;
 			}

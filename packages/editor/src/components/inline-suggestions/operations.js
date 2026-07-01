@@ -45,6 +45,65 @@ export function buildSuggestionMarkerAttributes( { id, type, authorId } ) {
 }
 
 /**
+ * Whether any character in `[start, end)` of a per-character format-stack array
+ * already carries a `core/suggestion` marker.
+ *
+ * Interception paths use this to leave edits that touch an existing suggestion
+ * to the default path: `applyFormat` over a non-collapsed range REMOVES other
+ * formats of the same type inside it, so wrapping a range that overlaps another
+ * suggestion's marker would silently re-attribute part of that marker to the
+ * new id — and the damaged marker's accept/reject would then act on a partial
+ * range.
+ *
+ * @param {Array}  formats Per-character format stacks (from `create()`).
+ * @param {number} start   Range start (inclusive).
+ * @param {number} end     Range end (exclusive).
+ * @return {boolean} True when a suggestion format covers any character in range.
+ */
+export function formatsRangeHasSuggestion( formats, start, end ) {
+	if ( ! Array.isArray( formats ) ) {
+		return false;
+	}
+	const from = Math.max( 0, start );
+	const to = Math.min( end, formats.length );
+	for ( let i = from; i < to; i++ ) {
+		const stack = formats[ i ];
+		if (
+			Array.isArray( stack ) &&
+			stack.some( ( f ) => f.type === SUGGESTION_FORMAT_NAME )
+		) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
+ * Whether any character in `[start, end)` of a block attribute value already
+ * carries a `core/suggestion` marker. Value-level convenience wrapper around
+ * `formatsRangeHasSuggestion` tolerating plain strings and non-rich values.
+ *
+ * @param {*}      value Block attribute value (RichTextData, string, or other).
+ * @param {number} start Range start (inclusive).
+ * @param {number} end   Range end (exclusive).
+ * @return {boolean} True when a suggestion format covers any character in range.
+ */
+export function valueRangeHasSuggestion( value, start, end ) {
+	let html = null;
+	if ( value && typeof value.toHTMLString === 'function' ) {
+		html = value.toHTMLString();
+	} else if ( typeof value === 'string' ) {
+		html = value;
+	}
+	if ( html === null || false === html.includes( 'wp-suggestion' ) ) {
+		// Quick reject: no marker markup, nothing to overlap.
+		return false;
+	}
+	const record = create( { html } );
+	return formatsRangeHasSuggestion( record.formats, start, end );
+}
+
+/**
  * Remove a suggestion marker's text *and* its marker, by id. The proposed-for-
  * removal text disappears (accepting a deletion) or the proposed-new text is
  * discarded (rejecting an addition) — the two ends of a suggestion that resolve

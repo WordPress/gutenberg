@@ -36,4 +36,6 @@ export {
 	insertInlineAddition,
 	growInlineAddition,
 	buildSuggestionMarkerAttributes,
+	formatsRangeHasSuggestion,
+	valueRangeHasSuggestion,
 } from './operations';
