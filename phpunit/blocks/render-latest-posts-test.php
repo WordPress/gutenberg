@@ -353,6 +353,86 @@ class Tests_Blocks_RenderLatestPosts extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that nested Latest Posts blocks restore the outer post context.
+	 *
+	 * @covers ::render_block_core_latest_posts
+	 */
+	public function test_render_block_core_latest_posts_restores_outer_context_after_nested_render() {
+		$block_name = 'test/current-post-title';
+
+		if ( WP_Block_Type_Registry::get_instance()->is_registered( $block_name ) ) {
+			unregister_block_type( $block_name );
+		}
+
+		register_block_type(
+			$block_name,
+			array(
+				'render_callback' => static function () {
+					return sprintf(
+						'<span class="latest-posts-current-title">%s</span>',
+						esc_html( get_the_title() )
+					);
+				},
+			)
+		);
+
+		try {
+			$main_post = self::factory()->post->create_and_get(
+				array(
+					'post_title'  => 'Main query post',
+					'post_status' => 'publish',
+				)
+			);
+			$this->go_to( get_permalink( $main_post ) );
+
+			$category_id      = self::factory()->category->create();
+			$latest_posts_att = array(
+				'postsToShow'             => 1,
+				'orderBy'                 => 'date',
+				'order'                   => 'DESC',
+				'excerptLength'           => 55,
+				'displayFeaturedImage'    => false,
+				'displayPostContent'      => true,
+				'displayPostContentRadio' => 'full_post',
+				'categories'              => array(
+					array(
+						'id' => $category_id,
+					),
+				),
+			);
+
+			$nested_latest_posts_block = sprintf(
+				'<!-- wp:latest-posts %s /-->',
+				wp_json_encode( $latest_posts_att )
+			);
+
+			self::factory()->post->create_and_get(
+				array(
+					'post_title'    => 'Outer latest posts item',
+					'post_content'  => $nested_latest_posts_block . "\n\n<!-- wp:test/current-post-title /-->",
+					'post_status'   => 'publish',
+					'post_category' => array( $category_id ),
+				)
+			);
+
+			$output = gutenberg_render_block_core_latest_posts( $latest_posts_att );
+
+			$this->assertStringContainsString(
+				'<span class="latest-posts-current-title">Outer latest posts item</span>',
+				$output,
+				'Blocks rendered after a nested Latest Posts block should use the outer post context.'
+			);
+			$this->assertStringNotContainsString(
+				'<span class="latest-posts-current-title">Main query post</span>',
+				$output,
+				'Nested Latest Posts blocks should not reset later sibling blocks to the main query context.'
+			);
+		} finally {
+			unregister_block_type( $block_name );
+		}
+	}
+
+	/**
 	 * Tests that blocks are parsed when "Show full post" is enabled.
 	 *
 	 * When the Latest Posts block displays full post content, ALL blocks

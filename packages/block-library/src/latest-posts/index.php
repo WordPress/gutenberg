@@ -35,14 +35,15 @@ function block_core_latest_posts_get_excerpt_length() {
  *
  * @since 5.0.0
  *
- * @global int $block_core_latest_posts_excerpt_length Excerpt length set by the Latest Posts core block.
+ * @global WP_Post $post                                   Global post object.
+ * @global int     $block_core_latest_posts_excerpt_length Excerpt length set by the Latest Posts core block.
  *
  * @param array $attributes The block attributes.
  *
  * @return string Returns the post content with latest posts added.
  */
 function render_block_core_latest_posts( $attributes ) {
-	global $block_core_latest_posts_excerpt_length;
+	global $post, $block_core_latest_posts_excerpt_length;
 	static $rendering_stack = array();
 
 	$args = array(
@@ -71,6 +72,7 @@ function render_block_core_latest_posts( $attributes ) {
 	}
 
 	$list_items_markup = '';
+	$previous_post     = $post ?? null;
 
 	while ( $query->have_posts() ) {
 		$query->the_post();
@@ -213,12 +215,11 @@ function render_block_core_latest_posts( $attributes ) {
 		$list_items_markup .= "</li>\n";
 	}
 
-	/*
-	 * Use this function to restore the context of the template tags
-	 * from a secondary query loop back to the main query loop.
-	 * Since we use a custom loop, it's safest to always restore.
-	 */
-	wp_reset_postdata();
+	// Restore the post context that was active before this secondary query.
+	$post = $previous_post;
+	if ( $previous_post instanceof WP_Post ) {
+		setup_postdata( $previous_post );
+	}
 
 	remove_filter( 'excerpt_length', 'block_core_latest_posts_get_excerpt_length', 20 );
 
