@@ -17,6 +17,29 @@ This README is the entry point for package consumers. It covers how to load desi
 -   To pick the right design token or browse every available token, see the generated [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md).
 -   To edit token source files, see the [Design Tokens Maintainer's Guide](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/tokens/README.md).
 
+## Public API Boundary
+
+The supported external API is limited to the package root and documented subpath imports:
+
+-   `@wordpress/theme` — the `ThemeProvider` React component and the generated design token TypeScript types exported from the package root. The `ThemeProvider` props are part of the component API, but their internal type names, such as `ThemeProviderProps` and `ThemeProviderSettings`, are not standalone public exports. If you need the prop type in TypeScript, derive it from `ThemeProvider` instead of importing an internal type.
+-   `@wordpress/theme/design-tokens.css` — the stylesheet that defines the default `--wpds-*` CSS custom properties.
+-   `@wordpress/theme/design-tokens.js` — the generated list of known `--wpds-*` CSS custom properties.
+-   `@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks`, `@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks`, and `@wordpress/theme/vite-plugins/vite-ds-token-fallbacks` — build plugins for injecting token fallback values.
+-   `@wordpress/theme/stylelint-plugins/no-unknown-ds-tokens`, `@wordpress/theme/stylelint-plugins/no-setting-wpds-custom-properties`, and `@wordpress/theme/stylelint-plugins/no-token-fallback-values` — Stylelint plugins for enforcing token usage.
+
+The deprecated `privateApis` root export is not public API. It exists only as a temporary migration path for WordPress internals and is not covered by the supported external API boundary.
+
+Do not import from repository or build-output paths such as `@wordpress/theme/src/*`, `@wordpress/theme/build/*`, `@wordpress/theme/build-module/*`, `@wordpress/theme/build-types/*`, `@wordpress/theme/tokens/*`, or other files that are not listed above. Those files are implementation details and may change without notice.
+
+Some public subpaths are generated from internal token sources. The generated values exposed by the public imports are part of the supported contract; the generator configuration, raw token JSON files, intermediate TypeScript, and emitted file locations are implementation details.
+
+Compatibility expectations depend on how the package is consumed:
+
+-   Runtime exports exposed through WordPress follow Gutenberg and WordPress backward compatibility expectations, not practical npm semver negotiation.
+-   Package semver still matters for published npm releases, especially tooling subpaths consumed directly from npm.
+-   Build plugins and Stylelint plugins are public tooling APIs; removing an exported plugin or changing its configuration or failure contract should be treated as breaking.
+-   Semantic `--wpds-*` token removals and renames are compatibility breaks. Additions are safe. Value changes are usually compatible when the token purpose is unchanged, but should be documented when visually meaningful.
+
 ## Design Tokens
 
 Design tokens are named values that describe the visual purpose of a value. Rather than hardcoding values like `#3858e9` or `16px`, use semantic custom properties like `--wpds-color-background-interactive-brand-strong` or `--wpds-dimension-padding-2xl`.
@@ -61,22 +84,6 @@ If your application renders React content into additional documents (an iframe, 
 For the best development experience, we recommend configuring the [Stylelint rules](#stylelint-plugins) provided by this package. The Stylelint rules catch typos, unknown tokens, and other discouraged patterns during development.
 
 If you reference `--wpds-*` tokens in CSS or JS/TS source, use the [build plugins](#build-plugins) to inject fallback values at build time so components render correctly even when the tokens stylesheet is not loaded. If you use `@wordpress/build`, these plugins are already enabled by default when `@wordpress/theme` is installed.
-
-## Public API Boundary
-
-The supported external API is limited to the package root and documented subpath imports:
-
--   `@wordpress/theme` — the `ThemeProvider` React component and the generated design token TypeScript types exported from the package root. The `ThemeProvider` props are part of the component API, but their internal type names, such as `ThemeProviderProps` and `ThemeProviderSettings`, are not standalone public exports. If you need the prop type in TypeScript, derive it from `ThemeProvider` instead of importing an internal type.
--   `@wordpress/theme/design-tokens.css` — the stylesheet that defines the default `--wpds-*` CSS custom properties.
--   `@wordpress/theme/design-tokens.js` — the generated list of known `--wpds-*` CSS custom properties.
--   `@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks`, `@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks`, and `@wordpress/theme/vite-plugins/vite-ds-token-fallbacks` — build plugins for injecting token fallback values.
--   `@wordpress/theme/stylelint-plugins/no-unknown-ds-tokens`, `@wordpress/theme/stylelint-plugins/no-setting-wpds-custom-properties`, and `@wordpress/theme/stylelint-plugins/no-token-fallback-values` — Stylelint plugins for enforcing token usage.
-
-The deprecated `privateApis` root export is not public API. It exists only as a temporary migration path for WordPress internals and is not covered by the supported external API boundary.
-
-Do not import from repository or build-output paths such as `@wordpress/theme/src/*`, `@wordpress/theme/build/*`, `@wordpress/theme/build-module/*`, `@wordpress/theme/build-types/*`, `@wordpress/theme/tokens/*`, or other files that are not listed above. Those files are implementation details and may change without notice.
-
-Some public subpaths are generated from internal token sources. The generated values exposed by the public imports are part of the supported contract; the generator configuration, raw token JSON files, intermediate TypeScript, and emitted file locations are implementation details.
 
 ## Theme Provider
 
