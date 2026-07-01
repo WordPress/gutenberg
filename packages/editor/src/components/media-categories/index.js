@@ -172,6 +172,18 @@ const saveAttachmentParent = ( attachmentId, postId ) =>
 		{ throwOnError: true }
 	);
 
+// A selected media item's coarse type is exposed differently by each picker.
+// The classic media modal puts the media type directly on `type` (e.g. 'image').
+// The DataViews-driven modal passes REST attachment records, where `type` is the
+// *post* type ('attachment') and the media type lives in `media_type`
+// ('image'|'file') / `mime_type`. So the REST fields must be read first, with
+// `type` as the classic-modal fallback — otherwise a REST image reads as
+// 'attachment' and gets gated out.
+const getMediaItemType = ( mediaItem ) =>
+	mediaItem?.media_type ||
+	mediaItem?.mime_type?.split( '/' )[ 0 ] ||
+	mediaItem?.type;
+
 // The picker's "Upload files" tab accepts any file type, so the selection can
 // include non-images. Gate to images only: a non-image would be reparented to
 // the post but never appear in the image-filtered grid, and would wrongly count
@@ -179,7 +191,9 @@ const saveAttachmentParent = ( attachmentId, postId ) =>
 const getImageAttachmentIds = ( mediaItems ) => [
 	...new Set(
 		( Array.isArray( mediaItems ) ? mediaItems : [ mediaItems ] )
-			.filter( ( mediaItem ) => mediaItem?.type === 'image' )
+			.filter(
+				( mediaItem ) => getMediaItemType( mediaItem ) === 'image'
+			)
 			.map( ( mediaItem ) => mediaItem?.id )
 			.filter( Boolean )
 	),

@@ -90,16 +90,33 @@ describe( 'getInserterMediaCategories', () => {
 			'Post'
 		);
 		const attachedCount = await attachedImagesCategory.attach( [
+			// Classic media modal items expose `type`.
 			{ id: 10, type: 'image' },
 			{ id: 11, type: 'image' },
 			{ id: 10, type: 'image' },
 			// Non-image (e.g. a PDF uploaded via the picker) is skipped.
 			{ id: 12, type: 'application' },
 			{},
+			// DataViews-driven modal items are REST attachments: `type` is the
+			// post type ('attachment'), and the media type lives in
+			// `media_type`/`mime_type`. These must still gate to images.
+			{
+				id: 13,
+				type: 'attachment',
+				media_type: 'image',
+				mime_type: 'image/png',
+			},
+			{ id: 14, type: 'attachment', mime_type: 'image/jpeg' },
+			{
+				id: 15,
+				type: 'attachment',
+				media_type: 'file',
+				mime_type: 'application/pdf',
+			},
 		] );
 		await attachedImagesCategory.detach( { id: 11 } );
 
-		expect( attachedCount ).toBe( 2 );
+		expect( attachedCount ).toBe( 4 );
 		expect( saveEntityRecord ).toHaveBeenCalledWith(
 			'postType',
 			'attachment',
@@ -127,13 +144,37 @@ describe( 'getInserterMediaCategories', () => {
 			},
 			{ throwOnError: true }
 		);
+		expect( saveEntityRecord ).toHaveBeenCalledWith(
+			'postType',
+			'attachment',
+			{
+				id: 13,
+				post: 42,
+			},
+			{ throwOnError: true }
+		);
+		expect( saveEntityRecord ).toHaveBeenCalledWith(
+			'postType',
+			'attachment',
+			{
+				id: 14,
+				post: 42,
+			},
+			{ throwOnError: true }
+		);
 		expect( saveEntityRecord ).not.toHaveBeenCalledWith(
 			'postType',
 			'attachment',
 			expect.objectContaining( { id: 12 } ),
 			expect.anything()
 		);
-		expect( saveEntityRecord ).toHaveBeenCalledTimes( 3 );
+		expect( saveEntityRecord ).not.toHaveBeenCalledWith(
+			'postType',
+			'attachment',
+			expect.objectContaining( { id: 15 } ),
+			expect.anything()
+		);
+		expect( saveEntityRecord ).toHaveBeenCalledTimes( 5 );
 	} );
 
 	it( 'words the empty state from the post type label', () => {
