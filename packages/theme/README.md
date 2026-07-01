@@ -64,7 +64,7 @@ If you reference `--wpds-*` tokens in CSS or JS/TS source, use the [build plugin
 
 ## Public API Boundary
 
-The semver-protected public API is limited to the package root and documented subpath imports:
+The supported external API is limited to the package root and documented subpath imports:
 
 -   `@wordpress/theme` — the `ThemeProvider` React component and the generated design token TypeScript types exported from the package root. The `ThemeProvider` props are part of the component API, but their internal type names, such as `ThemeProviderProps` and `ThemeProviderSettings`, are not standalone public exports. If you need the prop type in TypeScript, derive it from `ThemeProvider` instead of importing an internal type.
 -   `@wordpress/theme/design-tokens.css` — the stylesheet that defines the default `--wpds-*` CSS custom properties.
@@ -72,7 +72,7 @@ The semver-protected public API is limited to the package root and documented su
 -   `@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks`, `@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks`, and `@wordpress/theme/vite-plugins/vite-ds-token-fallbacks` — build plugins for injecting token fallback values.
 -   `@wordpress/theme/stylelint-plugins/no-unknown-ds-tokens`, `@wordpress/theme/stylelint-plugins/no-setting-wpds-custom-properties`, and `@wordpress/theme/stylelint-plugins/no-token-fallback-values` — Stylelint plugins for enforcing token usage.
 
-The deprecated `privateApis` root export is not public API. It exists only as a temporary migration path for WordPress internals and is not semver-protected.
+The deprecated `privateApis` root export is not public API. It exists only as a temporary migration path for WordPress internals and is not covered by the supported external API boundary.
 
 Do not import from repository or build-output paths such as `@wordpress/theme/src/*`, `@wordpress/theme/build/*`, `@wordpress/theme/build-module/*`, `@wordpress/theme/build-types/*`, `@wordpress/theme/tokens/*`, or other files that are not listed above. Those files are implementation details and may change without notice.
 
