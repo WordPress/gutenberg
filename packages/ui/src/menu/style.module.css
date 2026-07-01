@@ -9,7 +9,7 @@
 		.popup {
 			composes: dropdown-motion from "../utils/css/dropdown-motion.module.css";
 
-			--wp-ui-popup-padding: var(--wpds-dimension-padding-xs);
+			--wp-ui-menu-popup-padding: var(--wpds-dimension-padding-xs);
 			--wp-ui-menu-min-width: 160px;
 			--wp-ui-menu-max-width: var(--wpds-dimension-surface-width-md);
 
@@ -22,8 +22,8 @@
 			max-width: min(var(--available-width), var(--wp-ui-menu-max-width));
 			overflow-block: auto;
 			overscroll-behavior: contain;
-			padding-block: var(--wp-ui-popup-padding);
-			scroll-padding-block: var(--wp-ui-popup-padding);
+			padding-block: var(--wp-ui-menu-popup-padding);
+			scroll-padding-block: var(--wp-ui-menu-popup-padding);
 			border-radius: var(--wpds-border-radius-md);
 			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 			box-shadow: var(--wpds-elevation-md);
@@ -70,9 +70,9 @@
 		}
 
 		.item {
-			--wp-ui-popup-item-height: var(--wpds-dimension-size-lg);
-			--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-md);
-			--wp-ui-popup-item-padding-block: var(--wpds-dimension-padding-xs);
+			--wp-ui-menu-item-height: var(--wpds-dimension-size-lg);
+			--wp-ui-menu-item-padding-inline: var(--wpds-dimension-padding-md);
+			--wp-ui-menu-item-padding-block: var(--wpds-dimension-padding-xs);
 
 			display: grid;
 			grid-column: 1 / -1;
@@ -80,16 +80,16 @@
 			gap: 0;
 			align-items: center;
 			justify-content: stretch;
-			min-height: var(--wp-ui-popup-item-height);
-			margin-inline: var(--wp-ui-popup-padding);
-			padding-block: var(--wp-ui-popup-item-padding-block);
+			min-height: var(--wp-ui-menu-item-height);
+			margin-inline: var(--wp-ui-menu-popup-padding);
+			padding-block: var(--wp-ui-menu-item-padding-block);
 			border-radius: var(--wpds-border-radius-sm);
 			text-decoration: none;
 			user-select: none;
 
 			/* Optically adjust the prefix icon to a more balanced position. */
-			padding-inline-start: calc(var(--wp-ui-popup-item-padding-inline) - var(--wpds-dimension-padding-xs));
-			padding-inline-end: var(--wp-ui-popup-item-padding-inline);
+			padding-inline-start: calc(var(--wp-ui-menu-item-padding-inline) - var(--wpds-dimension-padding-xs));
+			padding-inline-end: var(--wp-ui-menu-item-padding-inline);
 
 			&:not([data-disabled]) {
 				cursor: var(--wpds-cursor-control);
@@ -123,7 +123,7 @@
 			--wp-ui-menu-selection-indicator-size: var(--wpds-dimension-size-sm);
 
 			grid-column: 1;
-			margin-inline: calc(-1 * var(--wp-ui-popup-padding));
+			margin-inline: calc(-1 * var(--wp-ui-menu-popup-padding));
 			align-self: center;
 			justify-self: center;
 			display: flex;
@@ -156,7 +156,7 @@
 			justify-content: flex-start;
 			box-sizing: border-box;
 			min-width: 0;
-			padding-inline-start: var(--wp-ui-popup-item-padding-inline);
+			padding-inline-start: var(--wp-ui-menu-item-padding-inline);
 			/* Keep clicks on presentational labels and suffixes routed to the menu item. */
 			pointer-events: none;
 		}
