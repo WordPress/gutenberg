@@ -1415,11 +1415,6 @@
 			"count": 5
 		}
 	},
-	"packages/editor/src/components/suggestion-mode/suggestion-diff.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/editor/src/components/suggestion-mode/suggestion-summary.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -1427,16 +1422,6 @@
 	},
 	"packages/editor/src/components/suggestion-mode/test/auto-save.js": {
 		"react-hooks/globals": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/suggestion-mode/test/with-suggestion-overlay.js": {
-		"react-hooks/globals": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/suggestion-mode/with-suggestion-overlay.js": {
-		"react-hooks/refs": {
 			"count": 1
 		}
 	},
