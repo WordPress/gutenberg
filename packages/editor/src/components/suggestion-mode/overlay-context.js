@@ -85,6 +85,8 @@ const OverlayContext = createContext( {
 	consumeInterceptorBypass: () => false,
 	registerFormatHandler: () => () => {},
 	requestFormatSuggestion: () => false,
+	registerContentHandler: () => () => {},
+	requestContentSuggestion: () => false,
 } );
 
 /**
@@ -328,6 +330,32 @@ export function SuggestionOverlayProvider( { children } ) {
 		return true;
 	}, [] );
 
+	// Single slot for the content-reconciliation handler, the twin of the format
+	// handler above for text edits that reach the block as a whole new `content`
+	// value rather than a `beforeinput` the keyboards intercept (a committed IME
+	// composition, autocorrect, a drag-drop, a multi-line paste). The per-block
+	// HOC runs the cheap diff and hands a ready marker plan here; this single
+	// mounted component owns note creation and the marker write.
+	const contentHandlerRef = useRef( null );
+
+	const registerContentHandler = useCallback( ( handler ) => {
+		contentHandlerRef.current = handler;
+		return () => {
+			if ( contentHandlerRef.current === handler ) {
+				contentHandlerRef.current = null;
+			}
+		};
+	}, [] );
+
+	const requestContentSuggestion = useCallback( ( request ) => {
+		const handler = contentHandlerRef.current;
+		if ( ! handler ) {
+			return false;
+		}
+		handler( request );
+		return true;
+	}, [] );
+
 	// Prune overlay entries whose block was removed from the editor. This
 	// prevents stale baselines from persisting after a block is deleted.
 	// The block-count subscription only runs when there are entries to
@@ -377,6 +405,8 @@ export function SuggestionOverlayProvider( { children } ) {
 			consumeInterceptorBypass,
 			registerFormatHandler,
 			requestFormatSuggestion,
+			registerContentHandler,
+			requestContentSuggestion,
 		} ),
 		[
 			entries,
@@ -391,6 +421,8 @@ export function SuggestionOverlayProvider( { children } ) {
 			consumeInterceptorBypass,
 			registerFormatHandler,
 			requestFormatSuggestion,
+			registerContentHandler,
+			requestContentSuggestion,
 		]
 	);
 

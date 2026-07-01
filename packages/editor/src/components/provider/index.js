@@ -55,6 +55,7 @@ import {
 	SuggestionDeletionKeyboard,
 	SuggestionAdditionKeyboard,
 	SuggestionFormatKeyboard,
+	SuggestionContentReconciler,
 	registerSuggestionOverlayFilter,
 } from '../suggestion-mode';
 import { registerSuggestionFormat } from '../inline-suggestions';
@@ -486,6 +487,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 												<SuggestionDeletionKeyboard />
 												<SuggestionAdditionKeyboard />
 												<SuggestionFormatKeyboard />
+												<SuggestionContentReconciler />
 											</>
 										) }
 										<MediaEditorModalMount />

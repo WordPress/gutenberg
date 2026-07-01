@@ -26,6 +26,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createBlock, registerBlockType } from '@wordpress/blocks';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -135,6 +136,59 @@ describe( 'withSuggestionOverlay', () => {
 		expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
 			'proposed'
 		);
+	} );
+
+	it( 'hands a text edit off to the content reconciler instead of the overlay', () => {
+		const setAttributes = jest.fn();
+		const handler = jest.fn();
+
+		// Registers a content handler so `requestContentSuggestion` takes
+		// ownership of the edit, standing in for the mounted reconciler.
+		function RegisterContentHandler() {
+			const { registerContentHandler } = useSuggestionOverlay();
+			useEffect(
+				() => registerContentHandler( handler ),
+				[ registerContentHandler ]
+			);
+			return null;
+		}
+
+		renderWithProviders(
+			<>
+				<RegisterContentHandler />
+				<Wrapped
+					clientId="a"
+					name="core/paragraph"
+					attributes={ { content: 'Hello' } }
+					setAttributes={ setAttributes }
+				/>
+			</>,
+			{ intent: 'suggest' }
+		);
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
+
+		// The reconciler receives the block, the pre-edit value, and a marker
+		// plan whose actions all open a fresh note.
+		expect( handler ).toHaveBeenCalledTimes( 1 );
+		const request = handler.mock.calls[ 0 ][ 0 ];
+		expect( request ).toEqual(
+			expect.objectContaining( {
+				clientId: 'a',
+				blockName: 'core/paragraph',
+				prevContent: 'Hello',
+			} )
+		);
+		expect( request.plan.actions.length ).toBeGreaterThan( 0 );
+		expect(
+			request.plan.actions.every( ( action ) => action.newNote )
+		).toBe( true );
+
+		// The reconciler took ownership: the edit is neither written through
+		// nor diverted into the overlay, so the block still shows its original
+		// value (the reconciler writes the marker itself, out of band).
+		expect( setAttributes ).not.toHaveBeenCalled();
+		expect( screen.getByTestId( 'content' ) ).toHaveTextContent( 'Hello' );
 	} );
 
 	it( 'writes setAttributes through (no overlay) for a pending-insert block in Suggest intent', () => {

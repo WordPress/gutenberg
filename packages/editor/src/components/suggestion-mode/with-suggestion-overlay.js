@@ -48,7 +48,7 @@ import { markContentDiff, stripSuggestionMarks } from './inline-formats';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 import SuggestionMoveGhost from './suggestion-move-ghost';
 import useMoveGhosts from './use-move-ghosts';
-import { planFormatMarkers } from '../inline-suggestions';
+import { planFormatMarkers, planEditMarkers } from '../inline-suggestions';
 
 const BLOCK_EDITOR_STORE_NAME = 'core/block-editor';
 
@@ -233,6 +233,7 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 		captureBaseline,
 		setOverlayAttributes,
 		requestFormatSuggestion,
+		requestContentSuggestion,
 	} = useSuggestionOverlay();
 
 	// Track the latest attributes via a ref so the wrapped `setAttributes`
@@ -255,7 +256,7 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 	// always has both stores. `authorColor` defaults to `null` for
 	// anonymous / pre-collab edits, in which case the canvas CSS falls
 	// through to the red/green pair.
-	const { isSelected, authorColor } = useSelect(
+	const { isSelected, authorColor, authorId } = useSelect(
 		( select ) => {
 			const blockEditor = select( BLOCK_EDITOR_STORE_NAME );
 			const core = select( coreStore );
@@ -266,6 +267,7 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 					: true,
 				authorColor:
 					userId !== null ? getAvatarBorderColor( userId ) : null,
+				authorId: userId,
 			};
 		},
 		[ clientId ]
@@ -322,6 +324,56 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 		[ clientId, name, requestFormatSuggestion ]
 	);
 
+	// Detect a text edit that reaches the block as a whole new `content` value
+	// with no `beforeinput` for the typing/deletion keyboards to catch (a
+	// committed IME composition, autocorrect, drag-drop, multi-line paste) and
+	// hand it to the single-mount content reconciler, which turns it into inline
+	// markers instead of an overlay diff. Only plans this converter can fully
+	// execute — every action opens a fresh note (`insert-add`/`wrap-del`) — are
+	// handed off; edits that grow or remove an existing marker, or that the diff
+	// can't resolve unambiguously, return false and fall through to the overlay
+	// path below. Returns true only when the reconciler took ownership; with no
+	// handler registered (isolated unit tests) `requestContentSuggestion` returns
+	// false and the edit falls through.
+	const maybeHandleContentEdit = useCallback(
+		( nextAttributes, prevAttributes ) => {
+			if (
+				! nextAttributes ||
+				! Object.prototype.hasOwnProperty.call(
+					nextAttributes,
+					'content'
+				)
+			) {
+				return false;
+			}
+			const prevContent = prevAttributes?.content;
+			const nextContent = nextAttributes.content;
+			if (
+				! isStringLike( prevContent ) ||
+				! isStringLike( nextContent )
+			) {
+				return false;
+			}
+			const plan = planEditMarkers( prevContent, nextContent, {
+				authorId,
+			} );
+			const actions = plan?.actions ?? [];
+			if ( actions.length === 0 ) {
+				return false;
+			}
+			if ( ! actions.every( ( action ) => action.newNote ) ) {
+				return false;
+			}
+			return requestContentSuggestion( {
+				clientId,
+				blockName: name,
+				prevContent,
+				plan,
+			} );
+		},
+		[ clientId, name, authorId, requestContentSuggestion ]
+	);
+
 	const wrappedSetAttributes = useCallback(
 		( nextAttributes ) => {
 			// A formatting-only change becomes a live `format` marker rather
@@ -332,6 +384,14 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 			// current attributes are the "before" side of the format diff.
 			if (
 				maybeHandleFormatEdit( nextAttributes, attributesRef.current )
+			) {
+				return;
+			}
+			// A text edit that surfaced as a fresh `content` value (not caught
+			// by the typing/deletion keyboards) becomes inline markers too, so
+			// it never reaches the overlay diff path.
+			if (
+				maybeHandleContentEdit( nextAttributes, attributesRef.current )
 			) {
 				return;
 			}
@@ -358,6 +418,7 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 			setOverlayAttributes,
 			entryExists,
 			maybeHandleFormatEdit,
+			maybeHandleContentEdit,
 		]
 	);
 

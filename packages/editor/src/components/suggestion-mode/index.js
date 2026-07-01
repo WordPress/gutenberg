@@ -23,6 +23,7 @@ export { default as SuggestionStoreInterceptor } from './store-interceptor';
 export { default as SuggestionDeletionKeyboard } from './suggestion-deletion-keyboard';
 export { default as SuggestionAdditionKeyboard } from './suggestion-addition-keyboard';
 export { default as SuggestionFormatKeyboard } from './suggestion-format-keyboard';
+export { default as SuggestionContentReconciler } from './suggestion-content-reconciler';
 export {
 	default as SuggestionAnnotations,
 	suggestionAnnotations,
