@@ -1261,7 +1261,9 @@ export function generateThumbnails( id: QueueItemId ) {
 		// sideload flow owns. The HEIC was kept on item.originalHeicFile;
 		// the uploaded file is a JPEG conversion. parentId guarantees
 		// processItem routes this to the sideload endpoint, never the main
-		// create endpoint.
+		// create endpoint. The `source_original` image_size token is
+		// format-agnostic (it also covers HEIF) and matches the server-side
+		// WP_REST_Attachments_Controller::IMAGE_SIZE_SOURCE_ORIGINAL constant.
 		if ( item.originalHeicFile && attachment.id ) {
 			dispatch.addSideloadItem( {
 				file: item.originalHeicFile,
@@ -1269,7 +1271,7 @@ export function generateThumbnails( id: QueueItemId ) {
 				parentId: item.id,
 				additionalData: {
 					post: attachment.id,
-					image_size: 'original-heic',
+					image_size: 'source_original',
 					convert_format: false,
 				},
 				operations: [ OperationType.Upload ],
