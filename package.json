@@ -113,7 +113,7 @@
 		"format:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script format",
 		"prelint:js": "npm run --if-present --workspaces prelint:js",
 		"lint": "concurrently \"npm run lint:lockfile\" \"npm run lint:tsconfig\" \"npm run lint:js\" \"npm run lint:pkg-json\" \"npm run lint:deps\" \"npm run lint:css\"",
-		"lint:css": "wp-scripts lint-style \"**/*.scss\" \"**/*.module.css\" --report-needless-disables",
+		"lint:css": "wp-scripts lint-style \"**/*.scss\" \"**/*.module.css\"",
 		"lint:css:fix": "npm run lint:css -- --fix",
 		"lint:deps": "syncpack lint",
 		"lint:deps:fix": "syncpack fix",
