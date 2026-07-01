@@ -43,3 +43,8 @@ export {
 	planEditMarkers,
 	applyEditPlan,
 } from './reconcile-edit';
+export {
+	analyzeFormatEdit,
+	planFormatMarkers,
+	applyFormatPlan,
+} from './reconcile-format';
