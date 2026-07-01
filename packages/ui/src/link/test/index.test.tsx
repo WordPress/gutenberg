@@ -48,6 +48,32 @@ describe( 'Link', () => {
 			);
 		} );
 
+		it( 'sets security rel tokens when true', () => {
+			render(
+				<Link href="https://example.com" openInNewTab>
+					External
+				</Link>
+			);
+
+			expect( screen.getByRole( 'link' ) ).toHaveAttribute(
+				'rel',
+				'noreferrer noopener'
+			);
+		} );
+
+		it( 'preserves custom rel tokens when true', () => {
+			render(
+				<Link href="https://example.com" openInNewTab rel="nofollow">
+					External
+				</Link>
+			);
+
+			expect( screen.getByRole( 'link' ) ).toHaveAttribute(
+				'rel',
+				'nofollow noreferrer noopener'
+			);
+		} );
+
 		it( 'does not set target="_blank" when false', () => {
 			render( <Link href="https://example.com">External</Link> );
 
