@@ -761,6 +761,73 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 			insertedChild?.attributes?.metadata?.suggestion
 		).toBeUndefined();
 	} );
+
+	it( 'marks the attribute revert as non-persistent so it creates no undo level', async () => {
+		// Without the mark, Ctrl+Z after an intercepted edit would undo the
+		// REVERT — re-applying the suggested change to the real content.
+		const { registry, clientId } = setup();
+
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( clientId, { content: 'Edited' } );
+		} );
+		await flushSubscribers();
+
+		// Sanity: the interceptor reverted the store to the baseline.
+		expect(
+			registry.select( blockEditorStore ).getBlockAttributes( clientId )
+				?.content
+		).toBe( 'Hello' );
+		// The revert was the last block change and must not be persistent —
+		// the editor's undo machinery only cuts an undo level for persistent
+		// changes.
+		expect(
+			registry.select( blockEditorStore ).isLastBlockChangePersistent()
+		).toBe( false );
+	} );
+
+	it( 'marks the pending-remove re-insert and marker write as non-persistent', async () => {
+		const { registry, clientId } = setup();
+
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).removeBlock( clientId );
+		} );
+		await flushSubscribers();
+
+		// Sanity: the apply-and-tag flow re-inserted and tagged the block.
+		expect(
+			registry.select( blockEditorStore ).getBlockAttributes( clientId )
+				?.metadata?.suggestion?.type
+		).toBe( 'pending-remove' );
+		expect(
+			registry.select( blockEditorStore ).isLastBlockChangePersistent()
+		).toBe( false );
+	} );
+
+	it( 'marks the pending-insert marker write as non-persistent', async () => {
+		const { registry } = setup();
+
+		const inserted = createBlock( TEST_BLOCK_NAME, {
+			content: 'Suggested insertion',
+		} );
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.insertBlock( inserted, 1, undefined, false );
+		} );
+		await flushSubscribers();
+
+		expect(
+			registry
+				.select( blockEditorStore )
+				.getBlockAttributes( inserted.clientId )?.metadata?.suggestion
+				?.type
+		).toBe( 'pending-insert' );
+		expect(
+			registry.select( blockEditorStore ).isLastBlockChangePersistent()
+		).toBe( false );
+	} );
 } );
 
 describe( 'isAcceptedSuggestionChange', () => {

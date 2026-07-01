@@ -785,6 +785,12 @@ export default function SuggestionStoreInterceptor() {
 
 					isReverting = true;
 					try {
+						/*
+						 * Interceptor-originated writes must not create undo
+						 * levels: Ctrl+Z after a marker write would strip the
+						 * pending marker while the overlay still holds the op.
+						 */
+						blockEditorDispatch.__unstableMarkNextChangeAsNotPersistent();
 						blockEditorDispatch.updateBlockAttributes( clientId, {
 							metadata: withSuggestionMarker( current?.metadata, {
 								type: 'pending-insert',
@@ -869,6 +875,13 @@ export default function SuggestionStoreInterceptor() {
 
 				isReverting = true;
 				try {
+					/*
+					 * The revert is a programmatic write, not a user edit:
+					 * marking it non-persistent keeps it off the undo stack,
+					 * where Ctrl+Z would otherwise re-apply the suggested
+					 * change to the real content.
+					 */
+					blockEditorDispatch.__unstableMarkNextChangeAsNotPersistent();
 					blockEditorDispatch.updateBlockAttributes(
 						clientId,
 						delta.restore
@@ -901,6 +914,8 @@ export default function SuggestionStoreInterceptor() {
 				}
 				isReverting = true;
 				try {
+					// Programmatic marker write — keep it off the undo stack.
+					blockEditorDispatch.__unstableMarkNextChangeAsNotPersistent();
 					blockEditorDispatch.updateBlockAttributes( move.clientId, {
 						metadata: withSuggestionMarker( currentAttrs.metadata, {
 							type: 'pending-move',
@@ -989,6 +1004,11 @@ export default function SuggestionStoreInterceptor() {
 						if ( ! block ) {
 							continue;
 						}
+						/*
+						 * Programmatic re-insert — undoing it via Ctrl+Z
+						 * would perform the suggested removal for real.
+						 */
+						blockEditorDispatch.__unstableMarkNextChangeAsNotPersistent();
 						blockEditorDispatch.insertBlock(
 							block,
 							index,
@@ -1015,6 +1035,9 @@ export default function SuggestionStoreInterceptor() {
 					const block = tree.blocksByClientId.get( clientId );
 					isReverting = true;
 					try {
+						// Programmatic marker write — keep it off the undo
+						// stack.
+						blockEditorDispatch.__unstableMarkNextChangeAsNotPersistent();
 						blockEditorDispatch.updateBlockAttributes( clientId, {
 							metadata: withSuggestionMarker(
 								currentAttrs.metadata,
