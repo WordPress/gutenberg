@@ -58,7 +58,7 @@ type LocationPickerProps = {
 
 	/**
 	 * Called after the input value settles (debounced). Used when `selectButton`
-	 * is false to stage attribute updates before Save.
+	 * is false to stage attribute updates before they are persisted by the host.
 	 */
 	onChange?: ( location: string ) => void;
 };
