@@ -39,7 +39,7 @@ sequenceDiagram
 
 ## Editor Intent
 
-An `editorIntent` preference (orthogonal to the visual/code `editorMode`) controls the editing purpose:
+A session-scoped `editorIntent` state (orthogonal to the visual/code `editorMode` preference) controls the editing purpose:
 
 | Intent    | Behaviour |
 |-----------|-----------|
@@ -47,7 +47,7 @@ An `editorIntent` preference (orthogonal to the visual/code `editorMode`) contro
 | `suggest` | Edits are diverted into an in-memory overlay; the block-editor store is never mutated. |
 | `view`    | Read-only preview via `isPreviewMode`. |
 
-The intent is stored in the preferences store under `core.editorIntent` and surfaced as an **Edit / Suggest / View** menu in the editor's "Options" kebab, gated behind the `editor.notes` post-type support flag.
+The intent lives in the `core/editor` store's reducer (not the preferences store), so reloading the editor always returns to `edit`. It is surfaced as an **Edit / Suggest / View** menu in the editor's "Options" kebab, gated behind the `editor.notes` post-type support flag; the `setEditorIntent` / `getEditorIntent` store APIs are private while Suggest mode is experimental.
 
 ## Suggestion Overlay
 
