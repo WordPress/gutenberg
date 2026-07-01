@@ -77,11 +77,93 @@ export const suggestionFormat = {
 	edit: () => null,
 };
 
+export const SUGGESTION_A11Y_FORMAT_NAME = 'core/suggestion-a11y';
+
+/**
+ * Editor-only decoration pass that gives suggestion markers screen-reader
+ * semantics. A bare `<mark class="wp-suggestion">` is invisible to assistive
+ * technology — a suggested deletion reads as normal text. For each rich-text
+ * run covered by a `core/suggestion` format, nest a `core/suggestion-a11y`
+ * format carrying `role="insertion"` (add markers) or `role="deletion"` (del
+ * markers), which ARIA maps to `<ins>`/`<del>` semantics.
+ *
+ * The role must never serialize into post content, so it cannot live on the
+ * marker format itself (reading the editable DOM back would absorb it). It is
+ * applied here, at editable-tree preparation time only: formats added by a
+ * `__experimentalCreatePrepareEditableTree` handler render into the editable
+ * DOM but are ignored when the DOM is parsed back into a value (see
+ * `toFormat` in `@wordpress/rich-text`), exactly like `core/annotation`.
+ *
+ * One decoration object is reused across each contiguous marker run
+ * (rich-text merges adjacent identical format references into a single
+ * element), so a marker gains exactly one nested role element.
+ *
+ * @param {Array} formats Per-character format stacks.
+ * @return {Array} Format stacks with role decorations added.
+ */
+export function addSuggestionRoleFormats( formats ) {
+	if ( ! formats || formats.length === 0 ) {
+		return formats;
+	}
+	let out = null;
+	let lastSuggestion = null;
+	let lastDecoration = null;
+	for ( let i = 0; i < formats.length; i++ ) {
+		const stack = formats[ i ];
+		const suggestion = Array.isArray( stack )
+			? stack.find( ( f ) => f.type === SUGGESTION_FORMAT_NAME )
+			: undefined;
+		if ( ! suggestion ) {
+			lastSuggestion = null;
+			lastDecoration = null;
+			continue;
+		}
+		if ( ! out ) {
+			out = formats.slice();
+		}
+		if ( suggestion !== lastSuggestion ) {
+			lastSuggestion = suggestion;
+			lastDecoration = {
+				type: SUGGESTION_A11Y_FORMAT_NAME,
+				attributes: {
+					role:
+						suggestion.attributes?.[ SUGGESTION_TYPE_ATTRIBUTE ] ===
+						SUGGESTION_TYPE_ADDITION
+							? 'insertion'
+							: 'deletion',
+				},
+			};
+		}
+		out[ i ] = [ ...stack, lastDecoration ];
+	}
+	return out ?? formats;
+}
+
+/**
+ * Editor-only rich-text format that renders the screen-reader role element
+ * inside a suggestion marker. Never parsed back into values (it declares
+ * `__experimentalCreatePrepareEditableTree` without a change handler, which
+ * `toFormat` treats as editor-only), so the role never reaches post content.
+ */
+export const suggestionA11yFormat = {
+	title: __( 'Suggestion accessibility decoration' ),
+	tagName: 'span',
+	className: 'wp-suggestion-a11y',
+	attributes: {
+		role: 'role',
+	},
+	interactive: false,
+	edit: () => null,
+	__experimentalCreatePrepareEditableTree: () => addSuggestionRoleFormats,
+};
+
 /**
  * Idempotently register the `core/suggestion` marker format so rich-text can
  * round-trip a suggestion `<mark>` in block content and the annotations API can
  * decorate it. Guarded against duplicate registration (HMR, repeated editor
- * bootstrap, tests) the same way `core/note` is registered.
+ * bootstrap, tests) the same way `core/note` is registered. Also registers the
+ * editor-only `core/suggestion-a11y` decoration format that gives markers
+ * screen-reader `role="insertion"`/`role="deletion"` semantics at render time.
  *
  * The format itself is generic (inert `edit`); a consumer that owns the
  * suggesting UI — i.e. suggest mode — passes its own `edit` so the
@@ -90,6 +172,11 @@ export const suggestionFormat = {
  * @param {Function} [edit] Optional rich-text format `edit` component.
  */
 export function registerSuggestionFormat( edit ) {
+	if (
+		! select( richTextStore ).getFormatType( SUGGESTION_A11Y_FORMAT_NAME )
+	) {
+		registerFormatType( SUGGESTION_A11Y_FORMAT_NAME, suggestionA11yFormat );
+	}
 	if ( select( richTextStore ).getFormatType( SUGGESTION_FORMAT_NAME ) ) {
 		return;
 	}

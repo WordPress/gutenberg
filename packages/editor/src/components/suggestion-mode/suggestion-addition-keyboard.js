@@ -9,6 +9,7 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';
 import { INLINE_OP_TYPE, useSuggestionsProvider } from './provider';
 import { useSuggestionOverlay } from './overlay-context';
@@ -20,34 +21,12 @@ import {
 	buildSuggestionMarkerAttributes,
 	insertInlineAddition,
 	growInlineAddition,
+	valueRangeHasSuggestion,
 } from '../inline-suggestions';
-
-/**
- * Collect every document the editor canvas might live in: the top document and
- * the contents of each (same-origin) iframe. The canvas is usually iframed and
- * native input events don't cross that boundary, so the listener has to be
- * attached to the canvas document directly. The handler's own guards keep it
- * from acting on edits outside a block's rich text, so attaching broadly is
- * safe.
- *
- * @return {Document[]} Candidate documents.
- */
-function getCandidateDocuments() {
-	const docs = [ document ];
-	for ( const iframe of document.querySelectorAll( 'iframe' ) ) {
-		let doc = null;
-		try {
-			doc = iframe.contentDocument;
-		} catch {
-			// Cross-origin iframe — not the editor canvas; skip.
-			doc = null;
-		}
-		if ( doc && ! docs.includes( doc ) ) {
-			docs.push( doc );
-		}
-	}
-	return docs;
-}
+import {
+	getCandidateDocuments,
+	isEventTargetSelectedRichText,
+} from './keyboard-target';
 
 /**
  * Turn typing (and simple paste) in Suggest mode into an inline addition
@@ -82,7 +61,9 @@ function getCandidateDocuments() {
 export default function SuggestionAdditionKeyboard() {
 	const isSuggestMode = useSelect(
 		( select ) =>
-			select( EDITOR_STORE_NAME ).getEditorIntent() === SUGGEST_INTENT,
+			// `getEditorIntent` is private while Suggest mode is experimental.
+			unlock( select( EDITOR_STORE_NAME ) ).getEditorIntent() ===
+			SUGGEST_INTENT,
 		[]
 	);
 	const selectedBlockClientId = useSelect(
@@ -161,6 +142,25 @@ export default function SuggestionAdditionKeyboard() {
 				pending: text,
 			};
 			runRef.current = run;
+			/*
+			 * Whether the live caret still reads the run's block and
+			 * attribute. Checked after every await: if the user relocated
+			 * during the note round trip the run is abandoned — writing the
+			 * buffered characters into the old location would materialize
+			 * text where the user no longer is. (The already-created note is
+			 * left behind; see the orphaned-note known limitation.)
+			 */
+			const caretStillAnchored = () => {
+				const live = readInlineCaret(
+					getSelectionStart,
+					getSelectionEnd
+				);
+				return (
+					!! live &&
+					live.clientId === clientId &&
+					live.attributeKey === attributeKey
+				);
+			};
 			try {
 				if ( isTypeOver ) {
 					const baseValue =
@@ -173,7 +173,7 @@ export default function SuggestionAdditionKeyboard() {
 					if ( runRef.current !== run ) {
 						return;
 					}
-					if ( ! delId ) {
+					if ( ! delId || ! caretStillAnchored() ) {
 						resetRun();
 						return;
 					}
@@ -200,12 +200,12 @@ export default function SuggestionAdditionKeyboard() {
 					attributeKey,
 					SUGGESTION_TYPE_ADDITION
 				);
-				// The run may have been abandoned (caret moved, mode change)
-				// while the request was in flight.
+				// The run may have been abandoned (mode change) or the caret
+				// may have relocated while the request was in flight.
 				if ( runRef.current !== run ) {
 					return;
 				}
-				if ( ! addId ) {
+				if ( ! addId || ! caretStillAnchored() ) {
 					resetRun();
 					return;
 				}
@@ -238,6 +238,8 @@ export default function SuggestionAdditionKeyboard() {
 		},
 		[
 			getBlockAttributes,
+			getSelectionStart,
+			getSelectionEnd,
 			openInlineNote,
 			updateBlockAttributes,
 			requestInterceptorBypass,
@@ -247,27 +249,67 @@ export default function SuggestionAdditionKeyboard() {
 		]
 	);
 
-	// Route a unit of inserted text (a typed character or a pasted run) to the
-	// right place: buffer it while a note request is in flight, grow the open
-	// marker when the caret is still at its trailing edge, or start a new run.
-	// `allowGrow` is false for paste so a pasted run is always its own marker.
+	/*
+	 * Route a unit of inserted text (a typed character or a pasted run) to the
+	 * right place: buffer it while a note request is in flight, grow the open
+	 * marker when the caret is still at its trailing edge, or start a new run.
+	 * `allowGrow` is false for paste so a pasted run is always its own marker.
+	 *
+	 * Returns whether the input was consumed. Callers must only cancel the
+	 * native edit when this returns true — when no valid single-attribute
+	 * anchor exists the input has to fall through to the native/overlay path
+	 * rather than being swallowed.
+	 */
 	const insertText = useCallback(
 		( text, allowGrow ) => {
+			const caret = readInlineCaret( getSelectionStart, getSelectionEnd );
 			const inFlight = runRef.current;
 			if ( inFlight && inFlight.id === null ) {
-				// A note request is still in flight: buffer regardless of where
-				// the caret reads now (during a type-over the selection hasn't
-				// collapsed yet) and let the flush apply it.
-				inFlight.pending += text;
-				return;
+				/*
+				 * A note request is still in flight. Buffer as long as the
+				 * caret still reads the run's block and attribute — offsets
+				 * are ignored because during a type-over the selection hasn't
+				 * collapsed yet. If the user clicked into a different block or
+				 * attribute during the round trip, abandon the run instead:
+				 * the buffered characters were never rendered (their edits
+				 * were cancelled), so flushing them would materialize text at
+				 * a place the user has already left. The current keystroke
+				 * then starts a fresh run at the new caret below.
+				 */
+				if (
+					caret &&
+					caret.clientId === inFlight.clientId &&
+					caret.attributeKey === inFlight.attributeKey
+				) {
+					inFlight.pending += text;
+					return true;
+				}
+				resetRun();
 			}
-			const caret = readInlineCaret( getSelectionStart, getSelectionEnd );
 			if ( ! caret ) {
 				// Block-level / cross-attribute selection: nothing to anchor to.
 				resetRun();
-				return;
+				return false;
 			}
 			const { clientId, attributeKey, start, end } = caret;
+			if (
+				start !== end &&
+				valueRangeHasSuggestion(
+					getBlockAttributes( clientId )?.[ attributeKey ],
+					start,
+					end
+				)
+			) {
+				/*
+				 * Type-over of a selection that overlaps an existing
+				 * suggestion marker: wrapping it in the `del` marker would
+				 * re-attribute part of that marker to the new id (see
+				 * `formatsRangeHasSuggestion`). Fall through to the
+				 * native/overlay path instead of intercepting.
+				 */
+				resetRun();
+				return false;
+			}
 			const run = runRef.current;
 			const isContiguous =
 				allowGrow &&
@@ -292,10 +334,11 @@ export default function SuggestionAdditionKeyboard() {
 				} );
 				run.end += text.length;
 				commit( clientId, attributeKey, grown, run.end );
-				return;
+				return true;
 			}
 
 			beginInsertion( clientId, attributeKey, start, end, text );
+			return true;
 		},
 		[
 			getSelectionStart,
@@ -320,20 +363,40 @@ export default function SuggestionAdditionKeyboard() {
 			if ( ! text ) {
 				return;
 			}
-			if ( ! event.target?.isContentEditable ) {
+			/*
+			 * Only intercept input aimed at the rich text the block-editor
+			 * selection points at. The capture listeners see every
+			 * contentEditable on the page (sidebar note composer, plugin
+			 * editables) while a canvas block can still be "selected", so
+			 * anything else must fall through natively — without a
+			 * preventDefault.
+			 */
+			if (
+				! isEventTargetSelectedRichText( event, getSelectionStart() )
+			) {
 				resetRun();
 				return;
 			}
-			// We own insertion in Suggest mode — cancel the native edit.
-			event.preventDefault();
-			insertText( text, true );
+			/*
+			 * We own insertion in Suggest mode, but only cancel the native
+			 * edit once the caret resolved to a valid single-attribute anchor
+			 * — a preventDefault without a subsequent write would silently
+			 * drop the typed character.
+			 */
+			if ( insertText( text, true ) ) {
+				event.preventDefault();
+			}
 		},
-		[ insertText, resetRun ]
+		[ getSelectionStart, insertText, resetRun ]
 	);
 
 	const onPaste = useCallback(
 		( event ) => {
-			if ( ! event.target?.isContentEditable ) {
+			// See `onBeforeInput`: never touch paste aimed at an editable
+			// other than the selected block's rich text.
+			if (
+				! isEventTargetSelectedRichText( event, getSelectionStart() )
+			) {
 				return;
 			}
 			const plain = event.clipboardData?.getData?.( 'text/plain' ) ?? '';
@@ -345,14 +408,19 @@ export default function SuggestionAdditionKeyboard() {
 				resetRun();
 				return;
 			}
-			// Stop the editor's own paste handling so this paste becomes a
-			// suggestion marker instead of permanent content. `paste` fires
-			// ahead of `beforeinput`, so cancelling here is the reliable point.
-			event.preventDefault();
-			event.stopImmediatePropagation();
-			insertText( plain, false );
+			/*
+			 * Stop the editor's own paste handling so this paste becomes a
+			 * suggestion marker instead of permanent content. `paste` fires
+			 * ahead of `beforeinput`, so cancelling here is the reliable
+			 * point — but only once the caret resolved to a valid anchor;
+			 * otherwise let the editor's paste pipeline have it.
+			 */
+			if ( insertText( plain, false ) ) {
+				event.preventDefault();
+				event.stopImmediatePropagation();
+			}
 		},
-		[ insertText, resetRun ]
+		[ getSelectionStart, insertText, resetRun ]
 	);
 
 	useEffect( () => {

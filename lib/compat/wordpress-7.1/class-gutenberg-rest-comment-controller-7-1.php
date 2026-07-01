@@ -16,16 +16,20 @@
  * suggestions:
  *
  *   - `update_item_permissions_check`: post editors can apply or reject
- *     suggestions on notes they did not author, but only via
- *     `is_suggestion_lifecycle_update()` - a strict allowlist limited to
- *     `status` and `meta._wp_suggestion_status`. Any other field forces
- *     fallback to the core `edit_comment` check, so the apply/reject path can
- *     never be used to rewrite another user's note.
- *   - `prepare_item_for_database`: enforces server-side payload-size validation
+ *     suggestions on notes they did not author via
+ *     `is_suggestion_lifecycle_update()` - an allowlist limited to `status`
+ *     and `meta._wp_suggestion_status`. The shortcut only WIDENS access for
+ *     lifecycle-field-only updates; any other field falls back to core's
+ *     `edit_comment` check. Note that core maps `edit_comment` to
+ *     `edit_post` on the comment's parent post, so post editors already
+ *     hold full note-edit permission through that fallback - the allowlist
+ *     limits what this subclass's shortcut grants, it is not a guarantee
+ *     that notes can't be rewritten by post editors.
+ *   - `prepare_item_for_database`: enforces server-side payload validation
  *     (a `_wp_suggestion` larger than `GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES`
- *     is rejected with HTTP 413 before the meta sanitize_callback can silently
- *     truncate it) and surfaces the suggestion payload to the content-allowed
- *     check below.
+ *     is rejected with HTTP 413, and a payload that isn't a valid JSON object
+ *     is rejected with HTTP 400, before any storage happens) and surfaces the
+ *     suggestion payload to the content-allowed check below.
  *   - `check_is_comment_content_allowed`: a note may have empty
  *     `comment_content` when it carries only a proposed edit.
  *
@@ -40,14 +44,19 @@ if ( class_exists( 'WP_REST_Comments_Controller' ) && ! class_exists( 'Gutenberg
 	class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller {
 
 		/**
-		 * Validates that an incoming request's `_wp_suggestion` meta is within
-		 * the allowed byte budget. Truncating arbitrary JSON corrupts the
-		 * payload, so we reject before any storage happens.
+		 * Validates an incoming request's `_wp_suggestion` meta before any
+		 * storage happens:
+		 *
+		 *  - The payload must be within the allowed byte budget. Truncating
+		 *    arbitrary JSON corrupts the payload, so we reject with a 413.
+		 *  - The payload must decode to a JSON object. Storing garbage would
+		 *    make `parseSuggestionPayload` return null on the client and the
+		 *    suggestion would silently disappear, so we reject with a 400.
 		 *
 		 * @param WP_REST_Request $request Full details about the request.
-		 * @return true|WP_Error True if no payload or within bounds, WP_Error otherwise.
+		 * @return true|WP_Error True if no payload or valid, WP_Error otherwise.
 		 */
-		protected static function validate_suggestion_payload_size( $request ) {
+		protected static function validate_suggestion_payload( $request ) {
 			$meta = $request['meta'] ?? null;
 			if ( ! is_array( $meta ) || ! isset( $meta['_wp_suggestion'] ) ) {
 				return true;
@@ -67,6 +76,18 @@ if ( class_exists( 'WP_REST_Comments_Controller' ) && ! class_exists( 'Gutenberg
 					array( 'status' => 413 )
 				);
 			}
+			// An empty string is the documented "no suggestion" value; anything
+			// else must decode to a JSON object carrying the payload fields.
+			if ( '' !== $value ) {
+				$decoded = json_decode( $value, true );
+				if ( ! is_array( $decoded ) ) {
+					return new WP_Error(
+						'rest_suggestion_invalid_json',
+						__( 'Suggestion payload must be a valid JSON object.', 'gutenberg' ),
+						array( 'status' => 400 )
+					);
+				}
+			}
 			return true;
 		}
 
@@ -78,29 +99,64 @@ if ( class_exists( 'WP_REST_Comments_Controller' ) && ! class_exists( 'Gutenberg
 		 *  - `status` (limited to `approved` or `hold`)
 		 *  - `meta._wp_suggestion_status`
 		 *
-		 * Any other field present in the request body disqualifies the request
-		 * from the `edit_post` shortcut, forcing it through core's edit_comment
-		 * check instead.
+		 * Any other field present in the request disqualifies it from the
+		 * `edit_post` shortcut, forcing it through core's `edit_comment` check
+		 * instead. Core's `update_item` reads `$request['content']` etc. from
+		 * the MERGED param view (JSON > POST > GET > URL), so the inspected
+		 * key set is built from every client-supplied channel — a field
+		 * smuggled in as a query parameter (`?content=rewritten`) alongside a
+		 * lifecycle-only body cannot slip past the allowlist. Server-injected
+		 * schema defaults (`post`, `parent`) are excluded: the client didn't
+		 * send them and they don't rewrite anything.
+		 *
+		 * Note this method is a scope limiter, not an authorization boundary:
+		 * see `update_item_permissions_check` for what the shortcut does and
+		 * does not protect against.
 		 *
 		 * @param WP_REST_Request $request Full details about the request.
 		 * @return bool
 		 */
 		private static function is_suggestion_lifecycle_update( $request ) {
-			// Accept either a JSON body (the block editor client) or a form-
-			// encoded body (custom integrations / curl scripts). Either way the
-			// shortcut is gated by the same allowlist below - query/URL params
-			// are intentionally excluded so the body is the source of truth for
-			// what's being written.
-			$params = $request->get_json_params();
-			if ( ! is_array( $params ) ) {
-				$params = $request->get_body_params();
+			// Union of every client-supplied parameter channel, mirroring the
+			// precedence core uses when reading `$request[ $key ]`.
+			$params = array();
+			foreach ( array(
+				$request->get_url_params(),
+				$request->get_query_params(),
+				$request->get_body_params(),
+				$request->get_json_params(),
+			) as $channel ) {
+				if ( is_array( $channel ) ) {
+					$params = array_merge( $params, $channel );
+				}
 			}
-			if ( ! is_array( $params ) || empty( $params ) ) {
+			if ( empty( $params ) ) {
 				return false;
 			}
 
-			$allowed_keys = array( 'id', 'status', 'meta' );
-			foreach ( array_keys( $params ) as $key ) {
+			/*
+			 * Keys that are always present or can't write comment fields:
+			 * `id` comes from the route; the underscore-prefixed keys are
+			 * REST meta-parameters (`_locale` is added by api-fetch on every
+			 * editor request); `context` shapes the response, not the write.
+			 */
+			$ignored_keys = array(
+				'id',
+				'context',
+				'_locale',
+				'_fields',
+				'_embed',
+				'_envelope',
+				'_jsonp',
+				'_method',
+			);
+
+			$allowed_keys = array( 'status', 'meta' );
+			$inspected    = array_diff( array_keys( $params ), $ignored_keys );
+			if ( empty( $inspected ) ) {
+				return false;
+			}
+			foreach ( $inspected as $key ) {
 				if ( ! in_array( $key, $allowed_keys, true ) ) {
 					return false;
 				}
@@ -132,12 +188,18 @@ if ( class_exists( 'WP_REST_Comments_Controller' ) && ! class_exists( 'Gutenberg
 		 * Checks if a given request has access to update a comment.
 		 *
 		 * Extends core's check so that users who can `edit_post` on the parent
-		 * post are also allowed to update note-type comments - but only for
-		 * suggestion-lifecycle fields (status and `_wp_suggestion_status` meta).
-		 * This unblocks the suggestion workflow where a post editor applies or
-		 * rejects a suggestion authored by someone else, without granting them
-		 * the ability to rewrite the note's content, reassign authorship, or
-		 * otherwise modify another user's comment.
+		 * post are also allowed to update note-type comments for
+		 * suggestion-lifecycle fields (status and `_wp_suggestion_status`
+		 * meta). This unblocks the suggestion workflow where a post editor
+		 * applies or rejects a suggestion authored by someone else.
+		 *
+		 * Scope note: the lifecycle allowlist limits what THIS shortcut
+		 * grants; it does not (and cannot) prevent note rewrites in general.
+		 * Requests that touch other fields fall through to core's
+		 * `edit_comment` check, and core's `map_meta_cap` resolves
+		 * `edit_comment` to `edit_post` on the comment's parent post - so a
+		 * post editor already holds full edit permission over notes on their
+		 * posts through the core fallback.
 		 *
 		 * @param WP_REST_Request $request Full details about the request.
 		 * @return true|WP_Error True if the request has access, WP_Error otherwise.
@@ -169,8 +231,9 @@ if ( class_exists( 'WP_REST_Comments_Controller' ) && ! class_exists( 'Gutenberg
 		 *
 		 * Wraps core's preparation with two suggestion-specific concerns:
 		 *
-		 *  - Rejects oversized `_wp_suggestion` payloads with a clean 413 before
-		 *    any storage happens (both create and update call this and return
+		 *  - Rejects oversized `_wp_suggestion` payloads with a clean 413, and
+		 *    payloads that aren't valid JSON objects with a 400, before any
+		 *    storage happens (both create and update call this and return
 		 *    its WP_Error).
 		 *  - Surfaces the `_wp_suggestion` payload in the prepared `meta` so the
 		 *    content-allowed check can recognize a payload-only note, mirroring
@@ -180,9 +243,9 @@ if ( class_exists( 'WP_REST_Comments_Controller' ) && ! class_exists( 'Gutenberg
 		 * @return array|WP_Error Prepared comment, or WP_Error.
 		 */
 		protected function prepare_item_for_database( $request ) {
-			$size_check = self::validate_suggestion_payload_size( $request );
-			if ( is_wp_error( $size_check ) ) {
-				return $size_check;
+			$payload_check = self::validate_suggestion_payload( $request );
+			if ( is_wp_error( $payload_check ) ) {
+				return $payload_check;
 			}
 
 			$prepared_comment = parent::prepare_item_for_database( $request );

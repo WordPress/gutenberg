@@ -44,7 +44,7 @@ sequenceDiagram
 
 ## Editor Intent
 
-An `editorIntent` preference (orthogonal to the visual/code `editorMode`) controls the editing purpose:
+A session-scoped `editorIntent` state (orthogonal to the visual/code `editorMode` preference) controls the editing purpose:
 
 | Intent    | Behaviour |
 |-----------|-----------|
@@ -52,7 +52,7 @@ An `editorIntent` preference (orthogonal to the visual/code `editorMode`) contro
 | `suggest` | Edits are diverted into an in-memory overlay; the block-editor store is never mutated. |
 | `view`    | Read-only preview via `isPreviewMode`. |
 
-The intent is stored in the preferences store under `core.editorIntent` and surfaced as an **Edit / Suggest / View** menu in the editor's "Options" kebab, gated behind the `editor.notes` post-type support flag.
+The intent lives in the `core/editor` store's reducer (not the preferences store), so reloading the editor always returns to `edit`. It is surfaced as an **Edit / Suggest / View** menu in the editor's "Options" kebab, gated behind the `editor.notes` post-type support flag; the `setEditorIntent` / `getEditorIntent` store APIs are private while Suggest mode is experimental.
 
 ## Suggestion Overlay
 
@@ -64,7 +64,7 @@ When the intent is `suggest`, an `editor.BlockEdit` filter (`withSuggestionOverl
 
 A companion `editor.BlockListBlock` filter tags each block with a pending change so it is discoverable without relying on the selected-block toolbar. Attribute edits get an `is-suggestion-pending` class (the bracket/outline treatment); pending structural changes get `is-suggestion-pending-remove` (strikethrough/dim), `is-suggestion-pending-insert`, or `is-suggestion-pending-move`, mapped from the block's `metadata.suggestion` marker.
 
-Because the store is never touched, autosave, undo/redo, and RTC sync stay at the real baseline.
+For **attribute suggestions** the store is never touched, so autosave, undo/redo, and RTC sync stay at the real baseline. **Structural suggestions** are different: their pending state (the `metadata.suggestion` markers, and pending-insert blocks themselves) lives in the real block tree, so serializing the post would leak it into `post_content`. While any pending structural state exists, `SuggestionSaveLock` holds the editor's save and autosave locks (`lockPostSaving` / `lockPostAutosaving`), releasing them once every structural suggestion has been applied or rejected.
 
 ### Inline text changes (Option B: marks in content)
 
@@ -286,3 +286,4 @@ These are non-obvious quirks reviewers should keep in mind when reading the code
 - **Permissions**: the Gutenberg REST comment controller overrides `update_item_permissions_check` so users with `edit_post` on the parent can update note comments — **but only for suggestion-lifecycle fields** (`status` limited to `approved`/`hold`, plus `meta._wp_suggestion_status`). Any other field in the update body falls back to core's `edit_comment` check, preventing post editors from rewriting another user's note content. The `_wp_suggestion` and `_wp_suggestion_status` meta `auth_callback`s follow the same `edit_post`-on-parent pattern.
 - **Payload size**: `_wp_suggestion` meta is capped at 64 KB via a `sanitize_callback`. Requests exceeding that limit are rejected (the callback returns an empty string), not truncated — mid-string truncation would produce invalid JSON that `parseSuggestionPayload` would silently drop.
 - **Rich-text format fidelity**: the word-level diff operates on the serialized HTML string, which may produce noisy diffs when formatting (bold, links) changes. Progressive enhancement planned.
+- **Orphaned notes and markers (no garbage collection yet)**: an inline marker and its backing note comment can drift apart. Deleting the backing comment leaves an orphaned marker in content — an orphaned `add` marker keeps hiding its text on the front end until the marker is removed manually. Conversely, undoing (or otherwise reverting) the content edit that wrote a marker leaves an orphaned note with no marker to resolve. Copying marked text also duplicates its `data-suggestion-id`, so two markers can point at one note. Reconciling these (marker/note garbage collection) is a pending design discussion.

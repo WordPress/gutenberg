@@ -15,6 +15,7 @@
 
 export {
 	SUGGESTION_FORMAT_NAME,
+	SUGGESTION_A11Y_FORMAT_NAME,
 	SUGGESTION_CLASS,
 	SUGGESTION_ANNOTATION_SOURCE,
 	SUGGESTION_ID_ATTRIBUTE,
@@ -24,6 +25,8 @@ export {
 	SUGGESTION_TYPE_ADDITION,
 	SUGGESTION_TYPE_FORMAT,
 	suggestionFormat,
+	suggestionA11yFormat,
+	addSuggestionRoleFormats,
 	registerSuggestionFormat,
 	findSuggestionRange,
 	findSuggestionText,
@@ -39,6 +42,8 @@ export {
 	insertInlineAddition,
 	growInlineAddition,
 	buildSuggestionMarkerAttributes,
+	formatsRangeHasSuggestion,
+	valueRangeHasSuggestion,
 } from './operations';
 export { computeDeleteRange } from './delete-range';
 export {

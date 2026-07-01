@@ -1,6 +1,39 @@
 /**
+ * External dependencies
+ */
+import { render, act } from '@testing-library/react';
+
+/**
+ * WordPress dependencies
+ */
+import {
+	createRegistry,
+	createReduxStore,
+	RegistryProvider,
+	select,
+} from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as noticesStore } from '@wordpress/notices';
+import {
+	createBlock,
+	registerBlockType,
+	unregisterBlockType,
+	getBlockTypes,
+} from '@wordpress/blocks';
+import {
+	RichTextData,
+	registerFormatType,
+	unregisterFormatType,
+	store as richTextStore,
+} from '@wordpress/rich-text';
+
+/**
  * Internal dependencies
  */
+import {
+	SUGGESTION_FORMAT_NAME,
+	suggestionFormat,
+} from '../../inline-suggestions';
 import {
 	operationsFromOverlay,
 	applyOperations,
@@ -11,6 +44,7 @@ import {
 	findStructuralOp,
 	findInlineOp,
 	clearSuggestionMarkerAttributes,
+	useSuggestionsProvider,
 } from '../provider';
 
 describe( 'operationsFromOverlay', () => {
@@ -495,5 +529,320 @@ describe( 'clearSuggestionMarkerAttributes', () => {
 				metadata: { noteId: 7, suggestion: { type: 'pending-remove' } },
 			} )
 		).toEqual( { metadata: { noteId: 7 } } );
+	} );
+} );
+
+describe( 'rejectSuggestion (block-move)', () => {
+	const PARAGRAPH = 'core/test-move-paragraph';
+	const GROUP = 'core/test-move-group';
+
+	beforeAll( () => {
+		registerBlockType( PARAGRAPH, {
+			apiVersion: 3,
+			attributes: {
+				content: { type: 'string', default: '' },
+				metadata: { type: 'object' },
+			},
+			save: () => null,
+			category: 'text',
+			title: 'Test Move Paragraph',
+		} );
+		registerBlockType( GROUP, {
+			apiVersion: 3,
+			attributes: {
+				metadata: { type: 'object' },
+			},
+			save: () => null,
+			category: 'design',
+			title: 'Test Move Group',
+		} );
+	} );
+
+	afterAll( () => {
+		getBlockTypes().forEach( ( block ) =>
+			unregisterBlockType( block.name )
+		);
+	} );
+
+	/*
+	 * The provider persists lifecycle updates through core-data's
+	 * `saveEntityRecord`. A stub registered under the same store name keeps
+	 * the reject flow synchronous and network-free — the assertions here are
+	 * about the block tree, not the REST round-trip.
+	 */
+	function createStubCoreStore() {
+		return createReduxStore( 'core', {
+			reducer: ( state = {} ) => state,
+			actions: {
+				saveEntityRecord: () => ( { type: 'SAVE_ENTITY_RECORD' } ),
+			},
+			selectors: {
+				getEditedEntityRecord: () => null,
+				getEntityRecord: () => null,
+				getCurrentUser: () => null,
+			},
+		} );
+	}
+
+	function setup( initialBlocks ) {
+		const registry = createRegistry();
+		registry.register( noticesStore );
+		registry.register( blockEditorStore );
+		registry.register( createStubCoreStore() );
+		registry.dispatch( blockEditorStore ).resetBlocks( initialBlocks );
+
+		let providerHandle;
+		function CaptureProvider() {
+			providerHandle = useSuggestionsProvider();
+			return null;
+		}
+
+		render(
+			<RegistryProvider value={ registry }>
+				<CaptureProvider />
+			</RegistryProvider>
+		);
+
+		return { registry, getProvider: () => providerHandle };
+	}
+
+	function movePayload( structuralOp ) {
+		return {
+			schemaVersion: 2,
+			blockName: PARAGRAPH,
+			baseRevision: null,
+			operations: [ structuralOp ],
+		};
+	}
+
+	it( 'restores a cross-parent move back to the original parent', async () => {
+		// Current state: the block was suggested-moved from the root (index
+		// 0) INTO the group. Reject must restore it to the root.
+		const moved = createBlock( PARAGRAPH, {
+			content: 'Moved',
+			metadata: { suggestion: { type: 'pending-move' } },
+		} );
+		const sibling = createBlock( PARAGRAPH, { content: 'Sibling' } );
+		const group = createBlock( GROUP, {}, [
+			createBlock( PARAGRAPH, { content: 'Child' } ),
+			moved,
+		] );
+
+		const { registry, getProvider } = setup( [ sibling, group ] );
+
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 1,
+				clientId: moved.clientId,
+				payload: movePayload( {
+					type: 'block-move',
+					clientId: moved.clientId,
+					blockName: PARAGRAPH,
+					fromParentClientId: null,
+					fromIndex: 0,
+					toParentClientId: group.clientId,
+				} ),
+			} );
+		} );
+
+		const blockEditor = registry.select( blockEditorStore );
+		// The block is back at the ROOT (its original parent), not stuck
+		// inside the group. Before the fix, `moveBlockToPosition` received
+		// the original parent as both from- and to-root, missed the block in
+		// the destination parent, and silently left the tree unchanged.
+		expect( blockEditor.getBlockRootClientId( moved.clientId ) || '' ).toBe(
+			''
+		);
+		expect( blockEditor.getBlockIndex( moved.clientId ) ).toBe( 0 );
+		// The pending-move marker is cleared.
+		expect(
+			blockEditor.getBlockAttributes( moved.clientId )?.metadata
+				?.suggestion
+		).toBeUndefined();
+	} );
+
+	it( 'restores a same-parent move back to its original index', async () => {
+		const a = createBlock( PARAGRAPH, { content: 'A' } );
+		const moved = createBlock( PARAGRAPH, {
+			content: 'Moved',
+			metadata: { suggestion: { type: 'pending-move' } },
+		} );
+		const b = createBlock( PARAGRAPH, { content: 'B' } );
+
+		// Current order: [A, B, Moved] — the block was suggested-moved from
+		// index 0 to the end of the root.
+		const { registry, getProvider } = setup( [ a, b, moved ] );
+
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 2,
+				clientId: moved.clientId,
+				payload: movePayload( {
+					type: 'block-move',
+					clientId: moved.clientId,
+					blockName: PARAGRAPH,
+					fromParentClientId: null,
+					fromIndex: 0,
+					toParentClientId: null,
+				} ),
+			} );
+		} );
+
+		const blockEditor = registry.select( blockEditorStore );
+		expect( blockEditor.getBlockIndex( moved.clientId ) ).toBe( 0 );
+		expect( blockEditor.getBlockRootClientId( moved.clientId ) || '' ).toBe(
+			''
+		);
+	} );
+} );
+
+describe( 'rejectSuggestion (inline marker)', () => {
+	const PARAGRAPH = 'core/test-inline-paragraph';
+
+	beforeAll( () => {
+		if (
+			! select( richTextStore ).getFormatType( SUGGESTION_FORMAT_NAME )
+		) {
+			registerFormatType( SUGGESTION_FORMAT_NAME, suggestionFormat );
+		}
+		registerBlockType( PARAGRAPH, {
+			apiVersion: 3,
+			attributes: {
+				content: { type: 'string', default: '' },
+				metadata: { type: 'object' },
+			},
+			save: () => null,
+			category: 'text',
+			title: 'Test Inline Paragraph',
+		} );
+	} );
+
+	afterAll( () => {
+		if ( select( richTextStore ).getFormatType( SUGGESTION_FORMAT_NAME ) ) {
+			unregisterFormatType( SUGGESTION_FORMAT_NAME );
+		}
+		getBlockTypes().forEach( ( block ) =>
+			unregisterBlockType( block.name )
+		);
+	} );
+
+	/*
+	 * Stub core store whose `saveEntityRecord` is a thunk that resolves or
+	 * rejects on demand, so the comment-status round-trip can be failed
+	 * deterministically.
+	 */
+	function createStubCoreStore( { failSave } ) {
+		return createReduxStore( 'core', {
+			reducer: ( state = {} ) => state,
+			actions: {
+				saveEntityRecord: () => async () => {
+					if ( failSave ) {
+						throw new Error( 'save failed' );
+					}
+					return { id: 9 };
+				},
+			},
+			selectors: {
+				getEditedEntityRecord: () => null,
+				getEntityRecord: () => null,
+				getCurrentUser: () => null,
+			},
+		} );
+	}
+
+	function setup( { failSave = false } = {} ) {
+		const registry = createRegistry();
+		registry.register( noticesStore );
+		registry.register( blockEditorStore );
+		registry.register( createStubCoreStore( { failSave } ) );
+
+		const block = createBlock( PARAGRAPH );
+		registry.dispatch( blockEditorStore ).resetBlocks( [ block ] );
+		// Write the marked value directly so the attribute is a real
+		// RichTextData (as in the editor), bypassing string sanitization.
+		const markedValue = RichTextData.fromHTMLString(
+			'Hello <mark class="wp-suggestion" data-suggestion-id="9" data-suggestion-type="add">world</mark>'
+		);
+		registry
+			.dispatch( blockEditorStore )
+			.updateBlockAttributes( block.clientId, {
+				content: markedValue,
+			} );
+
+		let providerHandle;
+		function CaptureProvider() {
+			providerHandle = useSuggestionsProvider();
+			return null;
+		}
+
+		render(
+			<RegistryProvider value={ registry }>
+				<CaptureProvider />
+			</RegistryProvider>
+		);
+
+		return { registry, block, getProvider: () => providerHandle };
+	}
+
+	const inlinePayload = {
+		schemaVersion: 2,
+		blockName: PARAGRAPH,
+		baseRevision: null,
+		operations: [
+			{
+				type: 'inline-suggestion',
+				attribute: 'content',
+				suggestionType: 'add',
+			},
+		],
+	};
+
+	it( 'strips the marker and its text when the status save succeeds', async () => {
+		const { registry, block, getProvider } = setup();
+
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 9,
+				clientId: block.clientId,
+				payload: inlinePayload,
+			} );
+		} );
+
+		const content = registry
+			.select( blockEditorStore )
+			.getBlockAttributes( block.clientId )?.content;
+		expect( content.toHTMLString() ).toBe( 'Hello ' );
+	} );
+
+	it( 'rolls the attribute back when the status save fails', async () => {
+		// Before the fix, reject rewrote the attribute BEFORE the comment
+		// save; a server failure then left the marker stripped from content
+		// while the comment stayed unresolved ('hold') — the suggestion
+		// silently vanished for every viewer but still counted as pending.
+		const { registry, block, getProvider } = setup( { failSave: true } );
+		const before = registry
+			.select( blockEditorStore )
+			.getBlockAttributes( block.clientId )
+			?.content.toHTMLString();
+
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 9,
+				clientId: block.clientId,
+				payload: inlinePayload,
+			} );
+		} );
+
+		const content = registry
+			.select( blockEditorStore )
+			.getBlockAttributes( block.clientId )?.content;
+		// The marker (and its proposed text) is restored.
+		expect( content.toHTMLString() ).toBe( before );
+		expect( content.toHTMLString() ).toContain( 'data-suggestion-id="9"' );
+		// And the failure is surfaced.
+		const notices = registry.select( noticesStore ).getNotices();
+		expect( notices.some( ( notice ) => notice.status === 'error' ) ).toBe(
+			true
+		);
 	} );
 } );

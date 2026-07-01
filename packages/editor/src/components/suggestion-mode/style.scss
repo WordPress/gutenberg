@@ -52,8 +52,10 @@
 
 		// The check path in @wordpress/icons is drawn with a lighter weight
 		// than the close glyph, so pair the filled path with a 1px stroke to
-		// lift it to the same visual density.
-		&[aria-label="Accept suggestion"] svg path {
+		// lift it to the same visual density. Target the button's class, not
+		// its aria-label: the label is translated and the selector would
+		// silently stop matching in non-English locales.
+		&.editor-collab-sidebar-panel__suggestion-accept svg path {
 			stroke: currentColor;
 			stroke-width: 1;
 			stroke-linecap: round;

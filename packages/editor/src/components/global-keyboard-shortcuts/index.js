@@ -15,6 +15,8 @@ import {
 	EDITOR_INTENT_SUGGEST,
 	EDITOR_INTENT_VIEW,
 } from '../../store/constants';
+import { unlock } from '../../lock-unlock';
+import { useCanSuggest } from '../suggestion-mode/gate';
 
 /**
  * Handles the keyboard shortcuts for the editor.
@@ -40,8 +42,9 @@ export default function EditorKeyboardShortcuts() {
 		setIsListViewOpened,
 		switchEditorMode,
 		toggleDistractionFree,
-		setEditorIntent,
 	} = useDispatch( editorStore );
+	// The intent API is private while Suggest mode is experimental.
+	const { setEditorIntent } = unlock( useDispatch( editorStore ) );
 	const {
 		isEditedPostDirty,
 		isPostSavingLocked,
@@ -106,8 +109,16 @@ export default function EditorKeyboardShortcuts() {
 		}
 	} );
 
+	/*
+	 * The intent shortcuts share the gate the intent menu uses: Suggestion
+	 * Mode experiment on AND the current post type supports `editor.notes`.
+	 * Without the support check the shortcut could switch intent on post
+	 * types where the menu never offers it.
+	 */
+	const canSuggest = useCanSuggest();
+
 	useShortcut( 'core/editor/intent-edit', ( event ) => {
-		if ( ! window?.__experimentalSuggestionMode ) {
+		if ( ! canSuggest ) {
 			return;
 		}
 		event.preventDefault();
@@ -115,7 +126,7 @@ export default function EditorKeyboardShortcuts() {
 	} );
 
 	useShortcut( 'core/editor/intent-suggest', ( event ) => {
-		if ( ! window?.__experimentalSuggestionMode ) {
+		if ( ! canSuggest ) {
 			return;
 		}
 		event.preventDefault();
@@ -123,7 +134,7 @@ export default function EditorKeyboardShortcuts() {
 	} );
 
 	useShortcut( 'core/editor/intent-view', ( event ) => {
-		if ( ! window?.__experimentalSuggestionMode ) {
+		if ( ! canSuggest ) {
 			return;
 		}
 		event.preventDefault();

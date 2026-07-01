@@ -434,6 +434,7 @@ export function useSuggestionsProvider() {
 		useDispatch( blockEditorStore );
 	const {
 		getBlockAttributes: selectBlockAttributes,
+		getBlockRootClientId: selectBlockRootClientId,
 		getClientIdsWithDescendants: selectClientIdsWithDescendants,
 	} = useSelect( blockEditorStore );
 	const { requestInterceptorBypass, clearOverlay } = useSuggestionOverlay();
@@ -964,9 +965,16 @@ export function useSuggestionsProvider() {
 					clearOverlay( clientId );
 					moveBlockToPosition(
 						clientId,
-						// `moveBlockToPosition` expects '' (not null) for
-						// the root.
-						structuralOp.fromParentClientId ?? '',
+						/*
+						 * `fromRootClientId` must be the block's CURRENT
+						 * parent: after a cross-parent move the block lives
+						 * in the destination parent, and the reducer looks
+						 * the block up there. Passing the original parent
+						 * for both roots made cross-parent rejects silently
+						 * no-op. `moveBlockToPosition` expects '' (not null)
+						 * for the root.
+						 */
+						selectBlockRootClientId( clientId ) ?? '',
 						structuralOp.fromParentClientId ?? '',
 						structuralOp.fromIndex ?? 0
 					);
@@ -1008,30 +1016,74 @@ export function useSuggestionsProvider() {
 				}
 				if ( targetClientId ) {
 					const attributeKey = inlineOp.attribute;
-					const value =
+					const originalValue =
 						selectBlockAttributes( targetClientId )?.[
 							attributeKey
 						];
 					let nextValue;
 					if ( inlineOp.suggestionType === 'add' ) {
-						nextValue = rejectInlineAddition( value, commentId );
+						nextValue = rejectInlineAddition(
+							originalValue,
+							commentId
+						);
 					} else if ( inlineOp.suggestionType === 'format' ) {
-						// Rejecting a format suggestion restores the original run
-						// captured at suggest-time (`beforeHTML`), discarding both
-						// the proposed formatting and the marker.
+						/*
+						 * Rejecting a format suggestion restores the original
+						 * run captured at suggest-time (`beforeHTML`),
+						 * discarding both the proposed formatting and the
+						 * marker.
+						 */
 						nextValue = rejectInlineFormat(
-							value,
+							originalValue,
 							commentId,
 							inlineOp.beforeHTML
 						);
 					} else {
-						nextValue = rejectInlineDeletion( value, commentId );
+						nextValue = rejectInlineDeletion(
+							originalValue,
+							commentId
+						);
 					}
-					requestInterceptorBypass( targetClientId );
-					clearOverlay( targetClientId );
-					updateBlockAttributes( targetClientId, {
-						[ attributeKey ]: nextValue,
-					} );
+					try {
+						requestInterceptorBypass( targetClientId );
+						clearOverlay( targetClientId );
+						updateBlockAttributes( targetClientId, {
+							[ attributeKey ]: nextValue,
+						} );
+
+						await saveEntityRecord(
+							'root',
+							'comment',
+							{
+								id: commentId,
+								status: 'approved',
+								meta: { _wp_suggestion_status: 'rejected' },
+							},
+							{ throwOnError: true }
+						);
+
+						createNotice(
+							'snackbar',
+							__( 'Suggestion rejected.' ),
+							{ type: 'snackbar', isDismissible: true }
+						);
+					} catch ( error ) {
+						// Roll the attribute back so the content isn't left
+						// inconsistent with a still-pending comment if the
+						// server rejected the status update. Mirrors the
+						// apply-path rollback.
+						requestInterceptorBypass( targetClientId );
+						updateBlockAttributes( targetClientId, {
+							[ attributeKey ]: originalValue,
+						} );
+						createNotice(
+							'error',
+							error?.message ||
+								__( 'Failed to reject suggestion.' ),
+							{ type: 'snackbar', isDismissible: true }
+						);
+					}
+					return;
 				}
 			}
 
@@ -1064,6 +1116,7 @@ export function useSuggestionsProvider() {
 			createNotice,
 			selectBlockAttributes,
 			selectClientIdsWithDescendants,
+			selectBlockRootClientId,
 			updateBlockAttributes,
 			removeBlock,
 			moveBlockToPosition,

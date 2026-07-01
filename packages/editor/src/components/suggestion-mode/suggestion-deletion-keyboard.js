@@ -10,6 +10,7 @@ import { create } from '@wordpress/rich-text';
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';
 import { INLINE_OP_TYPE, useSuggestionsProvider } from './provider';
 import { useSuggestionOverlay } from './overlay-context';
@@ -23,41 +24,24 @@ import {
 	SUGGESTION_TYPE_DELETION,
 	buildSuggestionMarkerAttributes,
 	computeDeleteRange,
+	formatsRangeHasSuggestion,
+	valueRangeHasSuggestion,
 } from '../inline-suggestions';
+import {
+	getCandidateDocuments,
+	isEventTargetSelectedRichText,
+} from './keyboard-target';
+import {
+	previousGraphemeBoundary,
+	nextGraphemeBoundary,
+} from './grapheme-boundaries';
 
 /**
- * Collect every document the editor canvas might live in: the top document and
- * the contents of each (same-origin) iframe. The canvas is usually iframed and
- * native input events don't cross that boundary, so the listener has to be
- * attached to the canvas document directly. The handler's own guards keep it
- * from acting on edits outside a block's rich text, so attaching broadly is
- * safe.
- *
- * @return {Document[]} Candidate documents.
- */
-function getCandidateDocuments() {
-	const docs = [ document ];
-	for ( const iframe of document.querySelectorAll( 'iframe' ) ) {
-		let doc = null;
-		try {
-			doc = iframe.contentDocument;
-		} catch {
-			// Cross-origin iframe — not the editor canvas; skip.
-			doc = null;
-		}
-		if ( doc && ! docs.includes( doc ) ) {
-			docs.push( doc );
-		}
-	}
-	return docs;
-}
-
-/**
- * Read a rich-text value's plain-text length and its per-character format
- * stacks, tolerating plain strings and other non-rich values.
+ * Read a rich-text value's plain text and its per-character format stacks,
+ * tolerating plain strings and other non-rich values.
  *
  * @param {*} value Block attribute value.
- * @return {{ length: number, formats: Array, text: string }} Parsed text metrics.
+ * @return {{ text: string, length: number, formats: Array }} Parsed text metrics.
  */
 function readValueMetrics( value ) {
 	let html = null;
@@ -67,31 +51,14 @@ function readValueMetrics( value ) {
 		html = value;
 	}
 	if ( html === null ) {
-		return { length: 0, formats: [], text: '' };
+		return { text: '', length: 0, formats: [] };
 	}
 	const record = create( { html } );
 	return {
+		text: record.text,
 		length: record.text.length,
 		formats: record.formats ?? [],
-		text: record.text,
 	};
-}
-
-/**
- * Whether the character at `index` already carries a `core/suggestion` marker.
- * Used to leave edits inside an existing suggestion to the default path rather
- * than nesting a deletion mark inside another suggestion.
- *
- * @param {Array}  formats Per-character format stacks.
- * @param {number} index   Character index.
- * @return {boolean} True when a suggestion format covers the character.
- */
-function hasSuggestionFormatAt( formats, index ) {
-	const stack = formats[ index ];
-	return (
-		Array.isArray( stack ) &&
-		stack.some( ( f ) => f.type === SUGGESTION_FORMAT_NAME )
-	);
 }
 
 /**
@@ -131,7 +98,9 @@ function hasSuggestionFormatAt( formats, index ) {
 export default function SuggestionDeletionKeyboard() {
 	const isSuggestMode = useSelect(
 		( select ) =>
-			select( EDITOR_STORE_NAME ).getEditorIntent() === SUGGEST_INTENT,
+			// `getEditorIntent` is private while Suggest mode is experimental.
+			unlock( select( EDITOR_STORE_NAME ) ).getEditorIntent() ===
+			SUGGEST_INTENT,
 		[]
 	);
 	const selectedBlockClientId = useSelect(
@@ -231,9 +200,13 @@ export default function SuggestionDeletionKeyboard() {
 		[ openDeletionNote, writeDeletion, resetRun ]
 	);
 
-	// Collapsed-cursor delete: mark one character and grow on repeats.
+	// Collapsed-cursor delete: mark one character and grow on repeats. All
+	// range arithmetic snaps to grapheme boundaries so surrogate pairs, ZWJ
+	// sequences, and combining marks are marked whole — a code-unit step would
+	// split them and serialize a lone surrogate (rendered as U+FFFD).
 	const deleteCharacter = useCallback(
-		async ( clientId, attributeKey, pos, isBackward, textLength ) => {
+		async ( clientId, attributeKey, pos, isBackward, text ) => {
+			const textLength = text.length;
 			const run = runRef.current;
 			const isContiguous =
 				run &&
@@ -250,13 +223,13 @@ export default function SuggestionDeletionKeyboard() {
 					if ( run.start <= 0 ) {
 						return;
 					}
-					run.start -= 1;
+					run.start = previousGraphemeBoundary( text, run.start );
 					run.caret = run.start;
 				} else {
 					if ( run.end >= textLength ) {
 						return;
 					}
-					run.end += 1;
+					run.end = nextGraphemeBoundary( text, run.end );
 				}
 				writeDeletion(
 					clientId,
@@ -275,9 +248,11 @@ export default function SuggestionDeletionKeyboard() {
 				return;
 			}
 
-			// New run. Anchor the initial single-character range.
-			const start = isBackward ? pos - 1 : pos;
-			const end = isBackward ? pos : pos + 1;
+			// New run. Anchor the initial single-grapheme range.
+			const start = isBackward
+				? previousGraphemeBoundary( text, pos )
+				: pos;
+			const end = isBackward ? pos : nextGraphemeBoundary( text, pos );
 			const newRun = {
 				clientId,
 				attributeKey,
@@ -299,14 +274,20 @@ export default function SuggestionDeletionKeyboard() {
 					return;
 				}
 				newRun.id = id;
-				// Expand by any repeats buffered during creation, clamped to the
-				// value's bounds.
-				const extra = newRun.steps - 1;
+				// Expand by any repeats buffered during creation, one grapheme
+				// per repeat (the boundary helpers clamp at the value's edges).
+				for ( let step = newRun.steps - 1; step > 0; step-- ) {
+					if ( isBackward ) {
+						newRun.start = previousGraphemeBoundary(
+							text,
+							newRun.start
+						);
+					} else {
+						newRun.end = nextGraphemeBoundary( text, newRun.end );
+					}
+				}
 				if ( isBackward ) {
-					newRun.start = Math.max( 0, newRun.start - extra );
 					newRun.caret = newRun.start;
-				} else {
-					newRun.end = Math.min( textLength, newRun.end + extra );
 				}
 				writeDeletion(
 					clientId,
@@ -331,7 +312,17 @@ export default function SuggestionDeletionKeyboard() {
 				resetRun();
 				return;
 			}
-			if ( ! event.target?.isContentEditable ) {
+			/*
+			 * Only intercept deletion aimed at the rich text the block-editor
+			 * selection points at. The capture listeners see every
+			 * contentEditable on the page (sidebar note composer, plugin
+			 * editables) while a canvas block can still be "selected", so
+			 * anything else must fall through natively — without a
+			 * preventDefault.
+			 */
+			if (
+				! isEventTargetSelectedRichText( event, getSelectionStart() )
+			) {
 				resetRun();
 				return;
 			}
@@ -342,6 +333,24 @@ export default function SuggestionDeletionKeyboard() {
 				getSelectionEnd
 			);
 			if ( selection ) {
+				/*
+				 * Leave a selection that overlaps an existing suggestion
+				 * marker to the default path: `applyFormat` over the range
+				 * would re-attribute part of that marker to the new id and
+				 * its accept/reject would then act on a partial range.
+				 */
+				if (
+					valueRangeHasSuggestion(
+						getBlockAttributes( selection.clientId )?.[
+							selection.attributeKey
+						],
+						selection.start,
+						selection.end
+					)
+				) {
+					resetRun();
+					return;
+				}
 				event.preventDefault();
 				deleteSelection( selection );
 				return;
@@ -354,7 +363,7 @@ export default function SuggestionDeletionKeyboard() {
 				return;
 			}
 			const { clientId, attributeKey, start: pos } = caret;
-			const { length, formats, text } =
+			const { text, length, formats } =
 				readValueMetrics(
 					getBlockAttributes( clientId )?.[ attributeKey ]
 				) ?? {};
@@ -372,10 +381,20 @@ export default function SuggestionDeletionKeyboard() {
 					resetRun();
 					return;
 				}
-				// Leave edits inside an existing suggestion marker to the
-				// default path rather than nesting marks.
-				const targetIndex = isBackward ? pos - 1 : pos;
-				if ( hasSuggestionFormatAt( formats, targetIndex ) ) {
+				/*
+				 * Leave edits inside an existing suggestion marker to the
+				 * default path rather than nesting marks. The target is the
+				 * whole grapheme next to the caret, not a single code unit.
+				 */
+				const targetStart = isBackward
+					? previousGraphemeBoundary( text, pos )
+					: pos;
+				const targetEnd = isBackward
+					? pos
+					: nextGraphemeBoundary( text, pos );
+				if (
+					formatsRangeHasSuggestion( formats, targetStart, targetEnd )
+				) {
 					resetRun();
 					return;
 				}
@@ -385,7 +404,7 @@ export default function SuggestionDeletionKeyboard() {
 					attributeKey,
 					pos,
 					isBackward,
-					length
+					text
 				);
 				return;
 			}
@@ -400,11 +419,11 @@ export default function SuggestionDeletionKeyboard() {
 			}
 			// Leave a range overlapping an existing suggestion marker to the
 			// default path rather than nesting marks.
-			for ( let i = range.start; i < range.end; i++ ) {
-				if ( hasSuggestionFormatAt( formats, i ) ) {
-					resetRun();
-					return;
-				}
+			if (
+				formatsRangeHasSuggestion( formats, range.start, range.end )
+			) {
+				resetRun();
+				return;
 			}
 			event.preventDefault();
 			deleteSelection( {
@@ -433,7 +452,15 @@ export default function SuggestionDeletionKeyboard() {
 	// here stops the `deleteByCut` from also firing (no double-marking).
 	const onCut = useCallback(
 		( event ) => {
-			if ( ! event.target?.isContentEditable ) {
+			/*
+			 * Only intercept a cut aimed at the rich text the block-editor
+			 * selection points at — the capture listener sees every
+			 * contentEditable on the page (sidebar note composer, plugin
+			 * editables); anything else must fall through natively.
+			 */
+			if (
+				! isEventTargetSelectedRichText( event, getSelectionStart() )
+			) {
 				return;
 			}
 			const selection = readInlineSelection(
@@ -451,11 +478,9 @@ export default function SuggestionDeletionKeyboard() {
 			);
 			// Leave a selection overlapping an existing suggestion marker to the
 			// default path rather than nesting marks.
-			for ( let i = start; i < end; i++ ) {
-				if ( hasSuggestionFormatAt( formats, i ) ) {
-					resetRun();
-					return;
-				}
+			if ( formatsRangeHasSuggestion( formats, start, end ) ) {
+				resetRun();
+				return;
 			}
 			// Preserve the copy half of cut: put the selected text on the
 			// clipboard, then cancel the browser's delete so the text is marked

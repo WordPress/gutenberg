@@ -554,6 +554,211 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Test that a user without `unfiltered_html` has script markup stripped
+	 * from the applied fields of a suggestion payload at write time. The
+	 * `after` value is what a reviewer's accept writes into block attributes,
+	 * so it must be limited to what the suggester could publish directly.
+	 */
+	public function test_suggestion_payload_is_ksesed_for_user_without_unfiltered_html() {
+		wp_set_current_user( self::$author_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$author_id ) );
+
+		$payload = wp_json_encode(
+			array(
+				'schemaVersion' => 2,
+				'blockName'     => 'core/paragraph',
+				'baseRevision'  => null,
+				'operations'    => array(
+					array(
+						'type'      => 'attribute-set',
+						'attribute' => 'content',
+						'before'    => 'Hello',
+						'after'     => 'Hello <script>alert(1)</script><em>world</em>',
+					),
+				),
+			)
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'content' => '',
+					'type'    => 'note',
+					'author'  => self::$author_id,
+					'meta'    => array(
+						'_wp_suggestion' => $payload,
+					),
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 201, $response->get_status() );
+
+		$data    = $response->get_data();
+		$stored  = get_comment_meta( $data['id'], '_wp_suggestion', true );
+		$decoded = json_decode( $stored, true );
+		$after   = $decoded['operations'][0]['after'] ?? '';
+
+		$this->assertStringNotContainsString( '<script>', $after, 'Script markup must be stripped from `after`.' );
+		$this->assertStringContainsString( '<em>world</em>', $after, 'Allowed markup must survive KSES.' );
+	}
+
+	/**
+	 * Test that a user WITH `unfiltered_html` keeps their markup verbatim —
+	 * the same freedom they have in post content.
+	 */
+	public function test_suggestion_payload_keeps_markup_for_user_with_unfiltered_html() {
+		if ( is_multisite() ) {
+			grant_super_admin( self::$admin_id );
+		}
+		wp_set_current_user( self::$admin_id );
+		$this->assertTrue(
+			current_user_can( 'unfiltered_html' ),
+			'Precondition: the acting user must have unfiltered_html.'
+		);
+
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$admin_id ) );
+
+		$payload = wp_json_encode(
+			array(
+				'schemaVersion' => 2,
+				'blockName'     => 'core/html',
+				'baseRevision'  => null,
+				'operations'    => array(
+					array(
+						'type'      => 'attribute-set',
+						'attribute' => 'content',
+						'before'    => '',
+						'after'     => '<script>console.log("intentional");</script>',
+					),
+				),
+			)
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'content' => '',
+					'type'    => 'note',
+					'author'  => self::$admin_id,
+					'meta'    => array(
+						'_wp_suggestion' => $payload,
+					),
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 201, $response->get_status() );
+
+		$data    = $response->get_data();
+		$stored  = get_comment_meta( $data['id'], '_wp_suggestion', true );
+		$decoded = json_decode( $stored, true );
+
+		$this->assertStringContainsString(
+			'<script>',
+			$decoded['operations'][0]['after'] ?? '',
+			'Users with unfiltered_html keep their markup as-is.'
+		);
+
+		if ( is_multisite() ) {
+			revoke_super_admin( self::$admin_id );
+		}
+	}
+
+	/**
+	 * Test that the `before` field is left untouched by the KSES pass. It is
+	 * only compared for conflict detection, never applied — filtering it would
+	 * cause false staleness warnings when the live content is unfiltered.
+	 */
+	public function test_suggestion_payload_before_field_is_not_ksesed() {
+		wp_set_current_user( self::$author_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$author_id ) );
+
+		// Deliberately contains markup KSES would strip: `before` is a
+		// comparison baseline that must round-trip byte-for-byte.
+		$before_value = 'Existing <script>window.baseline</script> content';
+		$payload      = wp_json_encode(
+			array(
+				'schemaVersion' => 2,
+				'blockName'     => 'core/paragraph',
+				'baseRevision'  => null,
+				'operations'    => array(
+					array(
+						'type'      => 'attribute-set',
+						'attribute' => 'content',
+						'before'    => $before_value,
+						'after'     => 'Plain replacement',
+					),
+				),
+			)
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'content' => '',
+					'type'    => 'note',
+					'author'  => self::$author_id,
+					'meta'    => array(
+						'_wp_suggestion' => $payload,
+					),
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 201, $response->get_status() );
+
+		$data    = $response->get_data();
+		$stored  = get_comment_meta( $data['id'], '_wp_suggestion', true );
+		$decoded = json_decode( $stored, true );
+
+		$this->assertSame(
+			$before_value,
+			$decoded['operations'][0]['before'] ?? null,
+			'The `before` baseline must be stored verbatim for conflict detection.'
+		);
+	}
+
+	/**
+	 * Test that a payload that isn't valid JSON is rejected with a 400 rather
+	 * than stored as garbage the client would silently null out.
+	 */
+	public function test_create_rejects_invalid_json_suggestion_payload() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'content' => '',
+					'type'    => 'note',
+					'meta'    => array(
+						'_wp_suggestion' => 'this is {not valid json',
+					),
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_suggestion_invalid_json', $response, 400 );
+	}
+
+	/**
 	 * Test that an editor can update a note they did not author (edit_post check).
 	 */
 	public function test_editor_can_update_note_on_own_post() {
@@ -852,6 +1057,72 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 				"Lifecycle shortcut expectation mismatched for: {$label}"
 			);
 		}
+	}
+
+	/**
+	 * Test that a field smuggled in as a QUERY parameter alongside a
+	 * lifecycle-only body does not take the lifecycle shortcut. Core's
+	 * `update_item` reads `$request['content']` from the merged param view
+	 * (JSON > POST > GET > URL), so `PUT /wp/v2/comments/<id>?content=x`
+	 * with a lifecycle-only JSON body would rewrite the note while a
+	 * body-only allowlist still classified it as a lifecycle update.
+	 */
+	public function test_lifecycle_update_rejects_query_param_content_rewrite() {
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/1' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_query_params( array( 'content' => 'rewritten via query param' ) );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'status' => 'approved',
+					'meta'   => array(
+						'_wp_suggestion_status' => 'applied',
+					),
+				)
+			)
+		);
+
+		$reflection = new ReflectionMethod(
+			'Gutenberg_REST_Comment_Controller_7_1',
+			'is_suggestion_lifecycle_update'
+		);
+		if ( PHP_VERSION_ID < 80100 ) {
+			$reflection->setAccessible( true );
+		}
+		$this->assertFalse(
+			$reflection->invoke( null, $request ),
+			'A content rewrite via query parameter must not take the lifecycle shortcut.'
+		);
+	}
+
+	/**
+	 * Test that REST meta-parameters that ride on every editor request
+	 * (api-fetch appends `_locale=user`) do not disqualify an otherwise
+	 * lifecycle-only update from the shortcut.
+	 */
+	public function test_lifecycle_update_ignores_rest_meta_query_params() {
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/1' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_query_params( array( '_locale' => 'user' ) );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'status' => 'approved',
+					'meta'   => array(
+						'_wp_suggestion_status' => 'applied',
+					),
+				)
+			)
+		);
+
+		$reflection = new ReflectionMethod(
+			'Gutenberg_REST_Comment_Controller_7_1',
+			'is_suggestion_lifecycle_update'
+		);
+		if ( PHP_VERSION_ID < 80100 ) {
+			$reflection->setAccessible( true );
+		}
+		$this->assertTrue( $reflection->invoke( null, $request ) );
 	}
 
 	/**

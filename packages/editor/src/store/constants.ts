@@ -91,12 +91,12 @@ export const DEVICE_TYPES: Record<
  * be in `suggest` intent in either visual or code mode.
  *
  * Storage and defaults:
- *   - Persisted via `@wordpress/preferences` under (`core`, `editorIntent`),
- *     so the intent survives reloads.
- *   - The per-app default is registered in `packages/edit-post/src/index.js`
- *     and `packages/edit-site/src/index.js` (both default to `'edit'`).
- *   - `getEditorIntent` falls back to `EDITOR_INTENT_EDIT` when no value
- *     is set, so consumers can rely on a non-null result.
+ *   - Session-scoped: held in the editor store's reducer, not the
+ *     preferences store, so reloading the editor always returns to the
+ *     default `edit` intent.
+ *   - The private `getEditorIntent` selector falls back to
+ *     `EDITOR_INTENT_EDIT` when no value is set, so consumers can rely on
+ *     a non-null result.
  *
  * Suggest Mode context:
  * Phase 1 of the Suggest Mode feature only wires the intent state and the

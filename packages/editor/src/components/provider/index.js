@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	Fragment,
 	useCallback,
 	useEffect,
 	useLayoutEffect,
@@ -49,6 +50,7 @@ import MediaEditorModalMount from '../media/media-editor-modal';
 import {
 	SuggestionOverlayProvider,
 	SuggestionAutoSave,
+	SuggestionSaveLock,
 	SuggestionStoreInterceptor,
 	SuggestionAnnotations,
 	SuggestionAuthorColors,
@@ -57,13 +59,20 @@ import {
 	SuggestionFormatKeyboard,
 	SuggestionContentReconciler,
 	registerSuggestionOverlayFilter,
+	isSuggestionModeEnabled,
 } from '../suggestion-mode';
 import { registerSuggestionFormat } from '../inline-suggestions';
 
-// Register the `editor.BlockEdit` filter once when the editor provider module
-// loads. The filter is a no-op outside of the `suggest` intent, so it's safe
-// to register globally.
-registerSuggestionOverlayFilter();
+/*
+ * Register the suggestion overlay filters once when the editor provider
+ * module loads, but only when the Suggestion Mode experiment is on — the
+ * filters add per-block work (context lookups, store subscriptions) for
+ * every user otherwise. The flag is written by PHP before any editor script
+ * evaluates, so a module-scope check is safe.
+ */
+if ( isSuggestionModeEnabled() ) {
+	registerSuggestionOverlayFilter();
+}
 
 // Register the `core/suggestion` inline marker format so rich-text round-trips
 // suggestion markers in block content and the annotations API can decorate
@@ -74,6 +83,15 @@ registerSuggestionFormat();
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
+
+/*
+ * With the experiment off the overlay context (and its block-tree
+ * subscriptions) never mounts; consumers fall back to the context default,
+ * which is inert.
+ */
+const MaybeSuggestionOverlayProvider = isSuggestionModeEnabled()
+	? SuggestionOverlayProvider
+	: Fragment;
 
 const noop = () => {};
 
@@ -459,7 +477,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							settings={ blockEditorSettings }
 							useSubRegistry={ false }
 						>
-							<SuggestionOverlayProvider>
+							<MaybeSuggestionOverlayProvider>
 								{ children }
 								{ ! settings.isPreviewMode && (
 									<>
@@ -478,10 +496,11 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 										<StartTemplateOptions />
 										<PatternRenameModal />
 										<PatternDuplicateModal />
-										{ window?.__experimentalSuggestionMode && (
+										{ isSuggestionModeEnabled() && (
 											<>
 												<SuggestionStoreInterceptor />
 												<SuggestionAutoSave />
+												<SuggestionSaveLock />
 												<SuggestionAnnotations />
 												<SuggestionAuthorColors />
 												<SuggestionDeletionKeyboard />
@@ -493,7 +512,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 										<MediaEditorModalMount />
 									</>
 								) }
-							</SuggestionOverlayProvider>
+							</MaybeSuggestionOverlayProvider>
 						</BlockEditorProviderComponent>
 					</BlockContextProvider>
 				</EntityProvider>

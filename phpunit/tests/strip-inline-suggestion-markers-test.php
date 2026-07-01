@@ -106,6 +106,48 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 		$this->assertSame( '<p>keep  end</p>', $stripped );
 	}
 
+	public function test_planted_sentinel_on_plain_mark_is_ignored_and_removed() {
+		// A user-planted `data-wp-suggestion-strip` sentinel on a non-suggestion
+		// <mark> must neither influence the offset pass (the text is kept) nor
+		// survive into public output.
+		$html     = '<p><mark data-wp-suggestion-strip="add">keep me</mark> tail</p>';
+		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
+
+		$this->assertStringContainsString( 'keep me', $stripped );
+		$this->assertStringNotContainsString( 'data-wp-suggestion-strip', $stripped );
+	}
+
+	public function test_planted_sentinel_does_not_affect_a_genuine_marker_pass() {
+		// The planted "add" sentinel on the first (plain) mark is defused, so
+		// its text survives; the genuine deletion marker still unwraps.
+		$html     = '<p><mark data-wp-suggestion-strip="add">safe</mark><mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="del">old</mark></p>';
+		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
+
+		$this->assertStringContainsString( 'safe', $stripped );
+		$this->assertStringContainsString( 'old', $stripped );
+		$this->assertStringNotContainsString( 'data-wp-suggestion-strip', $stripped );
+		$this->assertStringNotContainsString( 'wp-suggestion"', $stripped );
+	}
+
+	public function test_planted_sentinel_on_non_mark_tag_is_removed() {
+		$html     = '<p><span data-wp-suggestion-strip="del">x</span> ok</p>';
+		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
+
+		$this->assertStringContainsString( 'x</span> ok', $stripped );
+		$this->assertStringNotContainsString( 'data-wp-suggestion-strip', $stripped );
+	}
+
+	public function test_unpaired_flagged_opener_leaks_no_sentinel() {
+		// A suggestion opener with no closer can't be paired by the offset
+		// pass; the marker stays (defaulting safe: text kept) but the internal
+		// sentinel must not leak into public output.
+		$html     = '<p><mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add">oops</p>';
+		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
+
+		$this->assertStringContainsString( 'oops', $stripped );
+		$this->assertStringNotContainsString( 'data-wp-suggestion-strip', $stripped );
+	}
+
 	public function test_filter_is_registered_on_render_block() {
 		$this->assertNotFalse(
 			has_filter( 'render_block', 'gutenberg_strip_inline_suggestion_markers' )

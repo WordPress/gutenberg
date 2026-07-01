@@ -598,38 +598,50 @@ describe( 'Editor actions', () => {
 		} );
 
 		it( 'defaults to edit', () => {
-			expect( registry.select( editorStore ).getEditorIntent() ).toEqual(
-				'edit'
-			);
+			expect(
+				unlock( registry.select( editorStore ) ).getEditorIntent()
+			).toEqual( 'edit' );
 		} );
 
 		it( 'switches between edit, suggest, and view', () => {
-			registry.dispatch( editorStore ).setEditorIntent( 'suggest' );
-			expect( registry.select( editorStore ).getEditorIntent() ).toEqual(
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
 				'suggest'
 			);
+			expect(
+				unlock( registry.select( editorStore ) ).getEditorIntent()
+			).toEqual( 'suggest' );
 
-			registry.dispatch( editorStore ).setEditorIntent( 'view' );
-			expect( registry.select( editorStore ).getEditorIntent() ).toEqual(
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
 				'view'
 			);
+			expect(
+				unlock( registry.select( editorStore ) ).getEditorIntent()
+			).toEqual( 'view' );
 
-			registry.dispatch( editorStore ).setEditorIntent( 'edit' );
-			expect( registry.select( editorStore ).getEditorIntent() ).toEqual(
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
 				'edit'
 			);
+			expect(
+				unlock( registry.select( editorStore ) ).getEditorIntent()
+			).toEqual( 'edit' );
 		} );
 
 		it( 'ignores unknown intents', () => {
-			registry.dispatch( editorStore ).setEditorIntent( 'suggest' );
-			registry.dispatch( editorStore ).setEditorIntent( 'bogus' );
-			expect( registry.select( editorStore ).getEditorIntent() ).toEqual(
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
 				'suggest'
 			);
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'bogus'
+			);
+			expect(
+				unlock( registry.select( editorStore ) ).getEditorIntent()
+			).toEqual( 'suggest' );
 		} );
 
 		it( 'does not write to the preferences store (session-scoped only)', () => {
-			registry.dispatch( editorStore ).setEditorIntent( 'view' );
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'view'
+			);
 			expect(
 				registry
 					.select( preferencesStore )
