@@ -11,7 +11,7 @@ const MenuContext = createContext< MenuContextValue >( {
 const useMenuContext = () => useContext( MenuContext );
 
 type MenuItemContentContextValue = {
-	labelId: string;
+	labelId?: string;
 	descriptionId: string;
 };
 
