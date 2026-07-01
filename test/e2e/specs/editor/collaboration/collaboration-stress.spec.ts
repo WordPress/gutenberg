@@ -427,22 +427,24 @@ test.describe( 'Collaboration - Stress Test', () => {
 		await collaborationUtils.waitForMutualDiscovery();
 
 		// ── Phase 4 — Two users type in the same paragraph ──────
-		// Uses insertText (single input event) instead of keyboard.type
-		// (character-by-character) to avoid CRDT character interleaving.
+		// The two users edit distinct ends of the paragraph: Admin appends
+		// at the end, Editor prepends at the start.
 		await Promise.all( [
 			( async () => {
 				await editor.canvas
 					.getByText( 'shared editing target' )
 					.click();
-				await page.keyboard.press( 'End' );
-				await page.keyboard.insertText( ' — Admin was here.' );
+				await page.keyboard.press( 'ControlOrMeta+a' );
+				await page.keyboard.press( 'ArrowRight' );
+				await page.keyboard.insertText( '- Admin was here.' );
 			} )(),
 			( async () => {
 				await editor2.canvas
 					.getByText( 'shared editing target' )
 					.click();
-				await page2.keyboard.press( 'End' );
-				await page2.keyboard.insertText( ' — Editor was here.' );
+				await page2.keyboard.press( 'ControlOrMeta+a' );
+				await page2.keyboard.press( 'ArrowLeft' );
+				await page2.keyboard.insertText( 'Editor was here -' );
 			} )(),
 		] );
 
