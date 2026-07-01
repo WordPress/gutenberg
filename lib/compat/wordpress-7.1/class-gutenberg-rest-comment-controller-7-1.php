@@ -21,11 +21,11 @@
  *     `status` and `meta._wp_suggestion_status`. Any other field forces
  *     fallback to the core `edit_comment` check, so the apply/reject path can
  *     never be used to rewrite another user's note.
- *   - `prepare_item_for_database`: enforces server-side payload-size validation
+ *   - `prepare_item_for_database`: enforces server-side payload validation
  *     (a `_wp_suggestion` larger than `GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES`
- *     is rejected with HTTP 413 before the meta sanitize_callback can silently
- *     truncate it) and surfaces the suggestion payload to the content-allowed
- *     check below.
+ *     is rejected with HTTP 413, and a payload that isn't a valid JSON object
+ *     is rejected with HTTP 400, before any storage happens) and surfaces the
+ *     suggestion payload to the content-allowed check below.
  *   - `check_is_comment_content_allowed`: a note may have empty
  *     `comment_content` when it carries only a proposed edit.
  *
@@ -40,14 +40,19 @@ if ( class_exists( 'WP_REST_Comments_Controller' ) && ! class_exists( 'Gutenberg
 	class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller {
 
 		/**
-		 * Validates that an incoming request's `_wp_suggestion` meta is within
-		 * the allowed byte budget. Truncating arbitrary JSON corrupts the
-		 * payload, so we reject before any storage happens.
+		 * Validates an incoming request's `_wp_suggestion` meta before any
+		 * storage happens:
+		 *
+		 *  - The payload must be within the allowed byte budget. Truncating
+		 *    arbitrary JSON corrupts the payload, so we reject with a 413.
+		 *  - The payload must decode to a JSON object. Storing garbage would
+		 *    make `parseSuggestionPayload` return null on the client and the
+		 *    suggestion would silently disappear, so we reject with a 400.
 		 *
 		 * @param WP_REST_Request $request Full details about the request.
-		 * @return true|WP_Error True if no payload or within bounds, WP_Error otherwise.
+		 * @return true|WP_Error True if no payload or valid, WP_Error otherwise.
 		 */
-		protected static function validate_suggestion_payload_size( $request ) {
+		protected static function validate_suggestion_payload( $request ) {
 			$meta = $request['meta'] ?? null;
 			if ( ! is_array( $meta ) || ! isset( $meta['_wp_suggestion'] ) ) {
 				return true;
@@ -66,6 +71,18 @@ if ( class_exists( 'WP_REST_Comments_Controller' ) && ! class_exists( 'Gutenberg
 					),
 					array( 'status' => 413 )
 				);
+			}
+			// An empty string is the documented "no suggestion" value; anything
+			// else must decode to a JSON object carrying the payload fields.
+			if ( '' !== $value ) {
+				$decoded = json_decode( $value, true );
+				if ( ! is_array( $decoded ) ) {
+					return new WP_Error(
+						'rest_suggestion_invalid_json',
+						__( 'Suggestion payload must be a valid JSON object.', 'gutenberg' ),
+						array( 'status' => 400 )
+					);
+				}
 			}
 			return true;
 		}
@@ -169,8 +186,9 @@ if ( class_exists( 'WP_REST_Comments_Controller' ) && ! class_exists( 'Gutenberg
 		 *
 		 * Wraps core's preparation with two suggestion-specific concerns:
 		 *
-		 *  - Rejects oversized `_wp_suggestion` payloads with a clean 413 before
-		 *    any storage happens (both create and update call this and return
+		 *  - Rejects oversized `_wp_suggestion` payloads with a clean 413, and
+		 *    payloads that aren't valid JSON objects with a 400, before any
+		 *    storage happens (both create and update call this and return
 		 *    its WP_Error).
 		 *  - Surfaces the `_wp_suggestion` payload in the prepared `meta` so the
 		 *    content-allowed check can recognize a payload-only note, mirroring
@@ -180,9 +198,9 @@ if ( class_exists( 'WP_REST_Comments_Controller' ) && ! class_exists( 'Gutenberg
 		 * @return array|WP_Error Prepared comment, or WP_Error.
 		 */
 		protected function prepare_item_for_database( $request ) {
-			$size_check = self::validate_suggestion_payload_size( $request );
-			if ( is_wp_error( $size_check ) ) {
-				return $size_check;
+			$payload_check = self::validate_suggestion_payload( $request );
+			if ( is_wp_error( $payload_check ) ) {
+				return $payload_check;
 			}
 
 			$prepared_comment = parent::prepare_item_for_database( $request );
