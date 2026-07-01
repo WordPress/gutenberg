@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
-import { Text } from '../text';
 import itemPopupStyles from '../utils/css/item-popup.module.css';
 import { useMenuItemContentContext } from './context';
 import styles from './style.module.css';
@@ -14,10 +13,9 @@ const ItemLabel = forwardRef< HTMLSpanElement, ItemLabelProps >(
 		const itemContentContext = useMenuItemContentContext();
 
 		return (
-			<Text
+			<span
 				ref={ ref }
 				id={ itemContentContext?.labelId ?? id }
-				variant="body-md"
 				className={ clsx(
 					itemPopupStyles[ 'item-label' ],
 					styles[ 'item-label' ],

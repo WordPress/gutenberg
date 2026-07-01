@@ -140,10 +140,14 @@
 		}
 
 		.item-label {
+			composes: body-md from "../../text/style.module.css";
+
 			color: inherit;
 		}
 
 		.item-description {
+			composes: body-sm from "../../text/style.module.css";
+
 			color: var(--wpds-color-foreground-content-neutral-weak);
 			overflow-wrap: anywhere;
 		}
