@@ -81,7 +81,7 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 
 	// --- Invariant ---------------------------------------------------------
 
-	test.fixme(
+	test(
 		'invariant: a block never carries both an inline marker and an overlay diff',
 		async ( { editor, page, pageUtils } ) => {
 			// Combine a text addition (marker path) with an inline-format change
