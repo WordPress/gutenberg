@@ -86,6 +86,19 @@ export const LinkItem: Story = {
 							Open the WordPress project website.
 						</Menu.ItemDescription>
 					</Menu.LinkItem>
+					<Menu.LinkItem
+						href="https://developer.wordpress.org"
+						openInNewTab
+						suffix="⌘D"
+					>
+						<Menu.ItemLabel>
+							WordPress developer resources
+						</Menu.ItemLabel>
+						<Menu.ItemDescription>
+							Open docs with a visible suffix and external
+							indicator.
+						</Menu.ItemDescription>
+					</Menu.LinkItem>
 					<Menu.LinkItem href="#menu-link-item-example">
 						<Menu.ItemLabel>In-page destination</Menu.ItemLabel>
 						<Menu.ItemDescription>
