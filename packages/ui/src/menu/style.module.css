@@ -70,7 +70,9 @@
 		}
 
 		.item-selection-indicator {
+			position: relative;
 			grid-column: 1;
+			inset-inline-start: calc(-1 * var(--wp-ui-popup-padding));
 			align-self: center;
 			justify-self: center;
 			display: flex;
