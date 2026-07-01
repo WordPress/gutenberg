@@ -16,13 +16,19 @@ jest.mock( '@wordpress/route', () => ( {
 		...props
 	}: {
 		to?: string;
-		search?: Record< string, string >;
+		search?:
+			| Record< string, string >
+			| ( (
+					previous: Record< string, string >
+			  ) => Record< string, string > );
 		children: React.ReactNode;
 	} ) => {
+		// The router resolves the `search` reducer against the current params.
+		const resolved = typeof search === 'function' ? search( {} ) : search;
 		const href =
 			to ??
-			( search
-				? `?${ new URLSearchParams( search ).toString() }`
+			( resolved
+				? `?${ new URLSearchParams( resolved ).toString() }`
 				: undefined );
 		return (
 			<a href={ href } { ...props }>
