@@ -6,7 +6,6 @@ import {
 	isValidElement,
 	useId,
 } from '@wordpress/element';
-import itemPopupStyles from '../utils/css/item-popup.module.css';
 import resetStyles from '../utils/css/resets.module.css';
 import styles from './style.module.css';
 import { MenuItemContentContext } from './context';
@@ -170,7 +169,6 @@ const Item = forwardRef< HTMLDivElement, ItemProps >( function MenuItem(
 			{ ...itemAriaProps }
 			className={ clsx(
 				resetStyles[ 'box-sizing' ],
-				itemPopupStyles.item,
 				styles.item,
 				className
 			) }

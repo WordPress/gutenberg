@@ -2,7 +2,6 @@ import { Menu as _Menu } from '@base-ui/react/menu';
 import clsx from 'clsx';
 import { forwardRef, useId } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import itemPopupStyles from '../utils/css/item-popup.module.css';
 import defenseStyles from '../utils/css/global-css-defense.module.css';
 import resetStyles from '../utils/css/resets.module.css';
 import styles from './style.module.css';
@@ -65,7 +64,6 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 			className={ clsx(
 				defenseStyles.a,
 				resetStyles[ 'box-sizing' ],
-				itemPopupStyles.item,
 				styles.item,
 				className
 			) }

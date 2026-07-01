@@ -3,7 +3,6 @@ import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { chevronRightSmall } from '@wordpress/icons';
 import { Icon } from '../icon';
-import itemPopupStyles from '../utils/css/item-popup.module.css';
 import resetStyles from '../utils/css/resets.module.css';
 import styles from './style.module.css';
 import { MenuItemContentContext } from './context';
@@ -42,7 +41,6 @@ const SubmenuTrigger = forwardRef< HTMLDivElement, SubmenuTriggerProps >(
 				{ ...itemAriaProps }
 				className={ clsx(
 					resetStyles[ 'box-sizing' ],
-					itemPopupStyles.item,
 					styles.item,
 					className
 				) }
