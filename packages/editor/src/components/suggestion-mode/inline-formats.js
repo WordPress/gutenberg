@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { wordDiff } from './suggestion-diff';
+import { wordDiff } from './word-diff';
 
 /**
  * Inline RichText format types used by Suggest mode to render proposed text

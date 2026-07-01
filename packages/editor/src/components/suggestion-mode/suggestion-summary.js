@@ -34,7 +34,7 @@ import { __unstableStripHTML as wpStripHTML } from '@wordpress/dom';
 /**
  * Internal dependencies
  */
-import { wordDiff } from './suggestion-diff';
+import { wordDiff } from './word-diff';
 
 /**
  * Cap on how much text we'll render inline in a summary. Longer insertions
