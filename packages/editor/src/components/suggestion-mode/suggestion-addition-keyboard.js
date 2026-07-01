@@ -22,7 +22,10 @@ import {
 	insertInlineAddition,
 	growInlineAddition,
 } from '../inline-suggestions';
-import { getCandidateDocuments } from './keyboard-target';
+import {
+	getCandidateDocuments,
+	isEventTargetSelectedRichText,
+} from './keyboard-target';
 
 /**
  * Turn typing (and simple paste) in Suggest mode into an inline addition
@@ -297,7 +300,17 @@ export default function SuggestionAdditionKeyboard() {
 			if ( ! text ) {
 				return;
 			}
-			if ( ! event.target?.isContentEditable ) {
+			/*
+			 * Only intercept input aimed at the rich text the block-editor
+			 * selection points at. The capture listeners see every
+			 * contentEditable on the page (sidebar note composer, plugin
+			 * editables) while a canvas block can still be "selected", so
+			 * anything else must fall through natively — without a
+			 * preventDefault.
+			 */
+			if (
+				! isEventTargetSelectedRichText( event, getSelectionStart() )
+			) {
 				resetRun();
 				return;
 			}
@@ -305,12 +318,16 @@ export default function SuggestionAdditionKeyboard() {
 			event.preventDefault();
 			insertText( text, true );
 		},
-		[ insertText, resetRun ]
+		[ getSelectionStart, insertText, resetRun ]
 	);
 
 	const onPaste = useCallback(
 		( event ) => {
-			if ( ! event.target?.isContentEditable ) {
+			// See `onBeforeInput`: never touch paste aimed at an editable
+			// other than the selected block's rich text.
+			if (
+				! isEventTargetSelectedRichText( event, getSelectionStart() )
+			) {
 				return;
 			}
 			const plain = event.clipboardData?.getData?.( 'text/plain' ) ?? '';
@@ -329,7 +346,7 @@ export default function SuggestionAdditionKeyboard() {
 			event.stopImmediatePropagation();
 			insertText( plain, false );
 		},
-		[ insertText, resetRun ]
+		[ getSelectionStart, insertText, resetRun ]
 	);
 
 	useEffect( () => {

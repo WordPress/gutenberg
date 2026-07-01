@@ -24,7 +24,10 @@ import {
 	SUGGESTION_TYPE_DELETION,
 	buildSuggestionMarkerAttributes,
 } from '../inline-suggestions';
-import { getCandidateDocuments } from './keyboard-target';
+import {
+	getCandidateDocuments,
+	isEventTargetSelectedRichText,
+} from './keyboard-target';
 
 /**
  * Read a rich-text value's plain-text length and its per-character format
@@ -300,7 +303,17 @@ export default function SuggestionDeletionKeyboard() {
 				resetRun();
 				return;
 			}
-			if ( ! event.target?.isContentEditable ) {
+			/*
+			 * Only intercept deletion aimed at the rich text the block-editor
+			 * selection points at. The capture listeners see every
+			 * contentEditable on the page (sidebar note composer, plugin
+			 * editables) while a canvas block can still be "selected", so
+			 * anything else must fall through natively — without a
+			 * preventDefault.
+			 */
+			if (
+				! isEventTargetSelectedRichText( event, getSelectionStart() )
+			) {
 				resetRun();
 				return;
 			}
