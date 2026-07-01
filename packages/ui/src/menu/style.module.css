@@ -87,6 +87,10 @@
 			text-decoration: none;
 			user-select: none;
 
+			/* Optically adjust the prefix icon to a more balanced position. */
+			padding-inline-start: calc(var(--wp-ui-popup-item-padding-inline) - var(--wpds-dimension-padding-xs));
+			padding-inline-end: var(--wp-ui-popup-item-padding-inline);
+
 			&:not([data-disabled]) {
 				cursor: var(--wpds-cursor-control);
 			}
@@ -118,9 +122,8 @@
 		.item-selection-indicator {
 			--wp-ui-menu-selection-indicator-size: var(--wpds-dimension-size-sm);
 
-			position: relative;
 			grid-column: 1;
-			inset-inline-start: calc(-1 * var(--wp-ui-popup-padding));
+			margin-inline: calc(-1 * var(--wp-ui-popup-padding));
 			align-self: center;
 			justify-self: center;
 			display: flex;
@@ -153,7 +156,7 @@
 			justify-content: flex-start;
 			box-sizing: border-box;
 			min-width: 0;
-			padding-inline: var(--wp-ui-popup-item-padding-inline);
+			padding-inline-start: var(--wp-ui-popup-item-padding-inline);
 			/* Keep clicks on presentational labels and suffixes routed to the menu item. */
 			pointer-events: none;
 		}
@@ -185,6 +188,8 @@
 			font-weight: var(--wpds-typography-font-weight-regular);
 			color: var(--wpds-color-foreground-content-neutral-weak);
 			overflow-wrap: anywhere;
+			/* For better optical alignment and spacing */
+			padding-block-end: var(--wpds-dimension-padding-xs);
 		}
 
 		.item-suffix {
@@ -194,6 +199,10 @@
 			margin-inline-start: var(--wpds-dimension-gap-md);
 			gap: var(--wpds-dimension-gap-xs);
 			color: var(--wpds-color-foreground-content-neutral-weak);
+		}
+
+		.submenu-chevron {
+			margin-inline-end: calc(-1 * var(--wpds-dimension-gap-sm));
 		}
 
 		.external-link-indicator {
