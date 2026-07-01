@@ -912,6 +912,29 @@ export default function SuggestionStoreInterceptor() {
 				if ( ! block ) {
 					continue;
 				}
+				/*
+				 * A block that is moved AGAIN while already carrying a
+				 * pending-move marker must keep its ORIGINAL from* fields.
+				 * `detectMovedBlocks` diffs against the previous tick, so its
+				 * from* values describe the intermediate position — writing
+				 * those would make Reject restore the block to a spot that
+				 * was itself only ever a pending suggestion.
+				 */
+				const existingMarker = currentAttrs.metadata?.suggestion;
+				const from =
+					existingMarker?.type === 'pending-move'
+						? {
+								fromAnchorClientId:
+									existingMarker.fromAnchorClientId ?? null,
+								fromParentClientId:
+									existingMarker.fromParentClientId ?? null,
+								fromIndex: existingMarker.fromIndex ?? 0,
+						  }
+						: {
+								fromAnchorClientId: move.fromAnchorClientId,
+								fromParentClientId: move.fromParentClientId,
+								fromIndex: move.fromIndex,
+						  };
 				isReverting = true;
 				try {
 					// Programmatic marker write — keep it off the undo stack.
@@ -920,9 +943,7 @@ export default function SuggestionStoreInterceptor() {
 						metadata: withSuggestionMarker( currentAttrs.metadata, {
 							type: 'pending-move',
 							authorId: currentUserId,
-							fromAnchorClientId: move.fromAnchorClientId,
-							fromParentClientId: move.fromParentClientId,
-							fromIndex: move.fromIndex,
+							...from,
 						} ),
 					} );
 				} finally {
@@ -932,9 +953,7 @@ export default function SuggestionStoreInterceptor() {
 					type: 'block-move',
 					clientId: move.clientId,
 					blockName: block.name,
-					fromAnchorClientId: move.fromAnchorClientId,
-					fromParentClientId: move.fromParentClientId,
-					fromIndex: move.fromIndex,
+					...from,
 					toAnchorClientId: move.toAnchorClientId,
 					toParentClientId: move.toParentClientId,
 				} );

@@ -728,6 +728,58 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		} );
 	} );
 
+	it( 'preserves the ORIGINAL from-position when a pending-move block is moved again', async () => {
+		// Reject must restore the true baseline. If a second move
+		// overwrote the marker with the intermediate position, rejecting
+		// the suggestion would "restore" the block to a spot it only ever
+		// occupied as a pending suggestion.
+		const a = createBlock( TEST_BLOCK_NAME, { content: 'A' } );
+		const b = createBlock( TEST_BLOCK_NAME, { content: 'B' } );
+		const c = createBlock( TEST_BLOCK_NAME, { content: 'C' } );
+		const d = createBlock( TEST_BLOCK_NAME, { content: 'D' } );
+		const { registry, getOverlay } = setup( {
+			initialBlocks: [ a, b, c, d ],
+		} );
+
+		// First move: B from index 1 to index 3.
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.moveBlockToPosition( b.clientId, '', '', 3 );
+		} );
+		await flushSubscribers();
+
+		// Second move: B from index 3 back up to index 2.
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.moveBlockToPosition( b.clientId, '', '', 2 );
+		} );
+		await flushSubscribers();
+
+		const marker = registry
+			.select( blockEditorStore )
+			.getBlockAttributes( b.clientId )?.metadata?.suggestion;
+		expect( marker ).toMatchObject( {
+			type: 'pending-move',
+			// The baseline position from BEFORE the first move — not the
+			// intermediate index 3.
+			fromIndex: 1,
+			fromAnchorClientId: a.clientId,
+			fromParentClientId: null,
+		} );
+
+		expect(
+			getOverlay().entries[ b.clientId ]?.structuralOp
+		).toMatchObject( {
+			type: 'block-move',
+			clientId: b.clientId,
+			fromIndex: 1,
+			fromAnchorClientId: a.clientId,
+			fromParentClientId: null,
+		} );
+	} );
+
 	it( 'tags only the top-level new block when an inserted subtree contains nested children', async () => {
 		// A Group block with a child paragraph dispatches both as new in
 		// the same tick. The interceptor must tag only the top-level

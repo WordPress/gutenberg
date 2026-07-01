@@ -30,9 +30,14 @@ async function switchIntent( page, intentLabel ) {
 	await page.keyboard.press( 'Escape' );
 }
 
-async function waitForSuggestionSaved( page ) {
-	// Auto-save is debounced; wait for the REST call to land.
-	await page.waitForResponse(
+/*
+ * Returns a promise for the debounced suggestion auto-save REST call. Call
+ * this BEFORE performing the edit that triggers the auto-save: creating the
+ * listener after the edit races the debounce on slow CI — the response can
+ * land before `waitForResponse` attaches and the wait then times out.
+ */
+function suggestionSavedPromise( page ) {
+	return page.waitForResponse(
 		( response ) =>
 			/\/wp\/v2\/comments(\?|$|\/)/.test( response.url() ) &&
 			[ 'POST', 'PUT' ].includes( response.request().method() ) &&
@@ -89,6 +94,8 @@ test.describe( 'Suggestion mode', () => {
 			.first();
 		await paragraph.click();
 		await page.keyboard.press( 'End' );
+		// Attach the auto-save listener before typing starts the debounce.
+		const suggestionSaved = suggestionSavedPromise( page );
 		await page.keyboard.type( ' plus suggested' );
 
 		// Overlay reflects the proposed content, block store does not.
@@ -100,7 +107,7 @@ test.describe( 'Suggestion mode', () => {
 		expect( serialized ).not.toContain( 'plus suggested' );
 
 		// Auto-save fires after the debounce window.
-		await waitForSuggestionSaved( page );
+		await suggestionSaved;
 
 		// Edited block picks up the pending-suggestion outline.
 		await expect( paragraph ).toHaveClass( /is-suggestion-pending/ );
@@ -134,6 +141,8 @@ test.describe( 'Suggestion mode', () => {
 			.getByRole( 'toolbar', { name: 'Block tools' } )
 			.getByRole( 'button', { name: /^Heading 2$/ } )
 			.click();
+		// Attach the auto-save listener before the edit starts the debounce.
+		const suggestionSaved = suggestionSavedPromise( page );
 		await page.getByRole( 'menuitem', { name: /^Heading 3/ } ).click();
 
 		// Overlay reflects the user's change in the rendered DOM. The
@@ -148,7 +157,7 @@ test.describe( 'Suggestion mode', () => {
 		expect( serialized ).not.toContain( '"level":3' );
 
 		// Auto-save persists the suggestion to a note comment.
-		await waitForSuggestionSaved( page );
+		await suggestionSaved;
 		await expect( heading ).toHaveClass( /is-suggestion-pending/ );
 	} );
 

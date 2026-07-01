@@ -121,8 +121,12 @@ function useSuggestionDecision( thread ) {
 		}
 	};
 
-	const applyDisabled = busy || ( thread?.blockClientId && ! blockExists );
-	const applyDisabledReason = ! blockExists
+	// Derive the disabled state and its reason from ONE predicate so the
+	// button and the explanatory text can't disagree. A thread without a
+	// resolved blockClientId has no live target either.
+	const isTargetMissing = ! thread?.blockClientId || ! blockExists;
+	const applyDisabled = busy || isTargetMissing;
+	const applyDisabledReason = isTargetMissing
 		? __( 'Target block has been deleted.' )
 		: undefined;
 
@@ -173,6 +177,7 @@ export function SuggestionActionButtons( { thread } ) {
 		>
 			<Button
 				size="compact"
+				className="editor-collab-sidebar-panel__suggestion-accept"
 				icon={ check }
 				iconSize={ 24 }
 				label={ __( 'Accept suggestion' ) }
