@@ -343,7 +343,6 @@ export function ColorEditForm( {
 				<Stack direction="column" gap="xs">
 					{ canRename ? (
 						<TextControl
-							__next40pxDefaultSize
 							ref={ inputRef }
 							type="text"
 							className="components-color-palette__edit-form-input"
