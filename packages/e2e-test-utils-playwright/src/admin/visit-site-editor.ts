@@ -12,26 +12,17 @@ interface SiteEditorOptions {
 	showWelcomeGuide?: boolean;
 }
 
-/**
- * Returns whether the editor canvas is loaded in the given state.
- *
- * When the editor canvas loads, there are races with the loading spinner
- * and with the test assertions. This function examines the combination of
- * the canvas and the loading spinner to determine the loading state, and
- * indicates if it matches the requested state.
- *
- * @param state 'loading-or-ready' will match once the editor has started
- *              to load as well as once it has fully loaded. 'loaded' only
- *              matches once the spinner is gone and the canvas is visible.
- * @return Whether the given state matches the current editor canvas loading state.
- */
-function isCanvasReadyState( state: 'loading-or-ready' | 'loaded' ): boolean {
-	// Spinner was used instead of the progress bar in an earlier
-	// version of the site editor.
-	const loader = '.edit-site-canvas-loader, .edit-site-canvas-spinner';
-	const ready =
-		'.edit-site-editor__editor-interface, iframe[src*="wp_site_preview=1"]';
+interface CanvasReadyWaitArgs {
+	canvasLoaderSelector: string;
+	readySelector: string;
+	state: 'loading-or-ready' | 'loaded';
+}
 
+function isCanvasReadyState( {
+	canvasLoaderSelector: loader,
+	readySelector: ready,
+	state,
+}: CanvasReadyWaitArgs ) {
 	const isVisibleElement = ( element: Element ) => {
 		if ( ! element.getClientRects().length ) {
 			return false;
@@ -57,7 +48,9 @@ function isCanvasReadyState( state: 'loading-or-ready' | 'loaded' ): boolean {
 		document.querySelectorAll( ready )
 	).some( isReadyElement );
 
-	return hasVisibleLoader ? 'loading-or-ready' === state : hasReadyCanvas;
+	return state === 'loading-or-ready'
+		? hasVisibleLoader || hasReadyCanvas
+		: ! hasVisibleLoader && hasReadyCanvas;
 }
 
 /**
@@ -100,12 +93,21 @@ export async function visitSiteEditor(
 		} );
 	}
 
-	/*
-	 * It’s necessary here to wait not only until the editor canvas has loaded,
-	 * but also until the loading spinner is hidden. Ideally, the content underneath
-	 * the loading overlay should be marked inert until the loading is done.
+	/**
+	 * @todo This is a workaround for the fact that the editor canvas is seen as
+	 * ready and visible before the loading spinner is hidden. Ideally, the
+	 * content underneath the loading overlay should be marked inert until the
+	 * loading is done.
 	 */
 	if ( ! query.size || postId || canvas === 'edit' ) {
+		const canvasLoaderSelector =
+			// Spinner was used instead of the progress bar in an earlier
+			// version of the site editor.
+			'.edit-site-canvas-loader, .edit-site-canvas-spinner';
+		const readySelector = [
+			'.edit-site-editor__editor-interface',
+			'iframe[src*="wp_site_preview=1"]',
+		].join( ', ' );
 		// Larger timeout is needed for large entities, like the Large Post HTML
 		// fixture that we load for performance tests.
 		const canvasLoadTimeout = 60_000;
@@ -114,13 +116,21 @@ export async function visitSiteEditor(
 		// either the loader or a ready canvas state, then verify the loader is gone.
 		await this.page.waitForFunction(
 			isCanvasReadyState,
-			'loading-or-ready' as const,
+			{
+				canvasLoaderSelector,
+				readySelector,
+				state: 'loading-or-ready',
+			} satisfies CanvasReadyWaitArgs,
 			{ timeout: canvasLoadTimeout }
 		);
 
 		await this.page.waitForFunction(
 			isCanvasReadyState,
-			'loaded' as const,
+			{
+				canvasLoaderSelector,
+				readySelector,
+				state: 'loaded',
+			} satisfies CanvasReadyWaitArgs,
 			{ timeout: canvasLoadTimeout }
 		);
 	}
