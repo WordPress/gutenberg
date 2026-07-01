@@ -977,7 +977,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
 		$request->set_header( 'Content-Type', 'image/png' );
 		$request->set_header( 'Content-Disposition', 'attachment; filename=heic-companion.png' );
-		$request->set_param( 'image_size', 'original-heic' );
+		$request->set_param( 'image_size', Gutenberg_REST_Attachments_Controller::IMAGE_SIZE_SOURCE_ORIGINAL );
 		$request->set_param( 'convert_format', 'false' );
 		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/one-blue-pixel-100x100.png' ) );
 

@@ -21,7 +21,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 *
 	 * @var string
 	 */
-	const IMAGE_SIZE_SOURCE_ORIGINAL = 'original-heic';
+	const IMAGE_SIZE_SOURCE_ORIGINAL = 'source_original';
 
 	/**
 	 * Metadata key holding the basename of the source-format original.
@@ -38,19 +38,19 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 * as a companion of the GIF attachment.
 	 *
 	 * Paired with META_KEY_ANIMATED_VIDEO: used both in the `/sideload` route
-	 * and when writing the sideloaded file to its metadata key, so the
-	 * hyphenated size token and the underscored meta key never drift apart.
+	 * and when writing the sideloaded file to its metadata key. Both use the
+	 * underscore convention so the size token and meta key stay consistent.
 	 *
 	 * @var string
 	 */
-	const IMAGE_SIZE_ANIMATED_VIDEO = 'animated-video';
+	const IMAGE_SIZE_ANIMATED_VIDEO = 'animated_video';
 
 	/**
 	 * Image size token for the static first-frame poster of a converted GIF.
 	 *
 	 * @var string
 	 */
-	const IMAGE_SIZE_ANIMATED_VIDEO_POSTER = 'animated-video-poster';
+	const IMAGE_SIZE_ANIMATED_VIDEO_POSTER = 'animated_video_poster';
 
 	/**
 	 * Metadata key holding the basename of the converted animated-GIF video.
@@ -680,7 +680,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 * @return true|WP_Error True if valid, WP_Error if invalid.
 	 */
 	private function validate_image_dimensions( int $width, int $height, $image_size, int $attachment_id ) {
-		// 'animated-video' companion file: video, not an image. Skip *all*
+		// 'animated_video' companion file: video, not an image. Skip *all*
 		// dimension checks (the caller passes (0, 0) for this case so the
 		// positive-dimension assertion below would otherwise fire).
 		if ( self::IMAGE_SIZE_ANIMATED_VIDEO === $image_size ) {
@@ -713,7 +713,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			return true;
 		}
 
-		// 'animated-video-poster' companion: a static poster image for the
+		// 'animated_video_poster' companion: a static poster image for the
 		// converted video. It is a real image (so it has positive dimensions)
 		// but is not a registered sub-size, so it has no dimension constraint.
 		if ( self::IMAGE_SIZE_ANIMATED_VIDEO_POSTER === $image_size ) {
@@ -893,7 +893,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		// below. Scalar 'original' is a byte-only passthrough and does not need
 		// dimensions, but reading them here is harmless.
 		//
-		// 'animated-video' companions are video files (MP4/WebM); the image
+		// 'animated_video' companions are video files (MP4/WebM); the image
 		// helpers can't read their dimensions and would falsely report the
 		// upload as "corrupted or unsupported". Skip the read for this case;
 		// validate_image_dimensions() also short-circuits it below.
