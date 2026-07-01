@@ -561,7 +561,6 @@ export function MediaUploadModal( {
 					accept={ acceptTypes }
 					multiple
 					onChange={ handleFileSelect }
-					__next40pxDefaultSize
 					render={ ( { openFileDialog } ) => (
 						<Button
 							onClick={ openFileDialog }

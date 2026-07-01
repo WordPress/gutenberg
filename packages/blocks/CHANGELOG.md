@@ -25,6 +25,7 @@
 ### Bug Fix
 
 - Fix `mergeSchemas` in `getBlockContentSchemaFromTransforms` to preserve array values (e.g. `classes`) instead of converting them to objects with numeric string keys when merging schemas ([#70615](https://github.com/WordPress/gutenberg/pull/70615)).
+- Paste: Move leading and trailing spaces out of inline formatting elements (such as links) so the formatting wraps only its meaningful content. This corrects markup from editors like Google Docs that place the separating space inside the link.
 
 ## 15.19.0 (2026-05-14)
 

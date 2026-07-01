@@ -16,11 +16,14 @@
 		padding-right: 0;
 
 		.global-styles-ui-sidebar__navigator-screen {
-			padding-top: $grid-unit-15;
-			padding-left: $grid-unit-15;
-			padding-right: $grid-unit-15;
-			padding-bottom: $grid-unit-15;
+			padding: $grid-unit-15;
 			outline: none;
+
+			.global-styles-ui-color-palette__tablist-container {
+				margin-inline: -$grid-unit-15;
+				width: calc(100% + #{$grid-unit-15 * 2});
+				padding-inline: $grid-unit-15;
+			}
 		}
 	}
 	.edit-site-sidebar-button {

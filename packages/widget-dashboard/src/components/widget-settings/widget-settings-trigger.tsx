@@ -12,8 +12,8 @@ import type { WidgetType } from '@wordpress/widget-primitives';
 /**
  * Internal dependencies
  */
+import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';
-import { getAdminMenuInset } from './utils';
 import type { DashboardWidget } from '../../types';
 
 export interface WidgetSettingsTriggerProps {
@@ -30,10 +30,11 @@ export interface WidgetSettingsTriggerProps {
 }
 
 /**
- * Per-instance gear that opens the shared settings drawer by writing the
+ * Per-instance gear that toggles the shared settings drawer by writing the
  * instance `uuid` to the UI context; the single `WidgetSettings` at the root
- * reacts to it. Returns `null` when the type declares no attributes, so chrome
- * can mount it unconditionally.
+ * reacts to it. Clicking the gear of the instance whose drawer is already
+ * open closes it. Returns `null` when the type declares no attributes, so
+ * chrome can mount it unconditionally.
  *
  * @param {WidgetSettingsTriggerProps} props Component props.
  */
@@ -41,43 +42,20 @@ export function WidgetSettingsTrigger( {
 	widget,
 	widgetType,
 }: WidgetSettingsTriggerProps ): React.ReactNode {
-	const {
-		setSettingsWidgetUuid,
-		setSettingsDrawerSide,
-		setSettingsDrawerInset,
-	} = useDashboardUIContext();
+	const { settingsWidgetUuid, setSettingsWidgetUuid } =
+		useDashboardUIContext();
+	const { cancel } = useDashboardInternalContext();
 
-	const open = useCallback(
-		( event: React.MouseEvent< HTMLElement > ) => {
-			// Open the drawer on the side away from the widget: compare the
-			// tile's center against the midpoint of the usable content area
-			// (which starts after the admin menu). Past it opens left.
-			const adminMenuInset = getAdminMenuInset();
-			// The gear sits in the grid slot, outside the card, so reach the
-			// tile via the grid item's data hook.
-			const tile = event.currentTarget.closest(
-				'[data-wp-grid-item-key]'
-			);
-			const rect = (
-				tile ?? event.currentTarget
-			).getBoundingClientRect();
-			const widgetCenter = rect.left + rect.width / 2;
-			const contentCenter = ( adminMenuInset + window.innerWidth ) / 2;
-			const side = widgetCenter > contentCenter ? 'left' : 'right';
-
-			setSettingsDrawerSide( side );
-			// A left drawer would otherwise slide over the fixed admin menu;
-			// offset it by the menu width so it lands clear of it.
-			setSettingsDrawerInset( side === 'left' ? adminMenuInset : 0 );
-			setSettingsWidgetUuid( widget.uuid );
-		},
-		[
-			setSettingsDrawerSide,
-			setSettingsDrawerInset,
-			setSettingsWidgetUuid,
-			widget.uuid,
-		]
-	);
+	const toggle = useCallback( () => {
+		// Re-clicking the open instance's gear closes the drawer, discarding
+		// staged edits like any other non-Save exit.
+		if ( settingsWidgetUuid === widget.uuid ) {
+			cancel();
+			setSettingsWidgetUuid( null );
+			return;
+		}
+		setSettingsWidgetUuid( widget.uuid );
+	}, [ cancel, settingsWidgetUuid, setSettingsWidgetUuid, widget.uuid ] );
 
 	if ( ! widgetType.attributes?.length ) {
 		return null;
@@ -90,7 +68,7 @@ export function WidgetSettingsTrigger( {
 			variant="minimal"
 			tone="neutral"
 			size="compact"
-			onClick={ open }
+			onClick={ toggle }
 		/>
 	);
 }

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/theme",
-	"version": "0.16.0",
+	"version": "0.17.0",
 	"description": "Theme and context provider for the WordPress Design System.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -77,19 +77,23 @@
 	},
 	"wpScript": true,
 	"types": "build-types",
-	"sideEffects": false,
+	"sideEffects": [
+		"src/prebuilt/css/design-tokens.css"
+	],
 	"dependencies": {
 		"@wordpress/compose": "file:../compose",
+		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/element": "file:../element",
+		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/style-runtime": "file:../style-runtime",
 		"colorjs.io": "^0.6.0",
 		"memize": "^2.1.0"
 	},
 	"devDependencies": {
 		"@storybook/react-vite": "^10.4.3",
-		"@terrazzo/parser": "^2.0.3",
-		"@terrazzo/plugin-css": "^2.0.3",
-		"@terrazzo/token-tools": "^2.0.3",
+		"@terrazzo/parser": "^2.4.0",
+		"@terrazzo/plugin-css": "^2.4.0",
+		"@terrazzo/token-tools": "^2.4.0",
 		"@testing-library/dom": "^10.4.1",
 		"@testing-library/jest-dom": "^6.9.1",
 		"@testing-library/react": "^16.3.2",
@@ -99,7 +103,7 @@
 		"esbuild-esm-loader": "^0.3.3",
 		"prettier": "npm:wp-prettier@^3.0.3",
 		"storybook": "^10.4.3",
-		"stylelint": "^16.8.2"
+		"stylelint": "^16.26.1"
 	},
 	"peerDependencies": {
 		"@types/react": "^18.3.27",
@@ -135,6 +139,6 @@
 		"build:default-ramps": "node --import=esbuild-esm-loader/register bin/generate-default-ramps/index.ts",
 		"build:tokens": "node --import=esbuild-esm-loader/register bin/generate-primitive-tokens/index.ts && node --import=esbuild-esm-loader/register bin/build-design-tokens/index.ts",
 		"build": "npm run build:tokens && npm run build:default-ramps && npm run prelint:js",
-		"postbuild": "prettier --write tokens/color.json tokens/modes src/prebuilt src/color-ramps/lib/default-ramps.ts docs"
+		"postbuild": "prettier --write tokens/color.json tokens/modes src/prebuilt src/color-ramps/lib/default-ramps.ts docs ../base-styles/internal/_wpds-token-fallbacks.scss"
 	}
 }

@@ -28,6 +28,18 @@ export type WidgetName = `${ string }/${ string }`;
 export type WidgetIcon = ReactElement< ComponentProps< 'svg' > >;
 
 /**
+ * Authoring helper for a widget's `attributes` schema: a DataViews `Field`
+ * whose `id` is narrowed to the keys of the widget's attribute object (`Item`).
+ */
+export type WidgetAttributeField< Item > = Field< Item > & {
+	/*
+	 * `& string` drops the number/symbol keys `keyof` can yield; `Field.id`
+	 * is a string.
+	 */
+	id: keyof Item & string;
+};
+
+/**
  * Literal contents of a widget's `widget.json` metadata file.
  *
  * Captures the *authoring* shape only; module entry points and style
@@ -193,4 +205,9 @@ export interface WidgetModuleRecord {
 	 * Authoring presentation hint; overrides the metadata module's value.
 	 */
 	presentation?: WidgetTypeMetadata[ 'presentation' ] | null;
+
+	/**
+	 * Grouping category; overrides the metadata module's value.
+	 */
+	category?: WidgetTypeMetadata[ 'category' ] | null;
 }

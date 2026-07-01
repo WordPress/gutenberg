@@ -271,7 +271,7 @@ export const WithSettings: StoryObj = {
 		docs: {
 			description: {
 				story: `
-Where Default lets the widget ask for changes, here the host edits the values itself. A widget type declares its settings as a dataviews \`Field[]\` under \`attributes\`, and that single declaration is enough for a host to build a settings UI:
+Where Default lets the widget ask for changes, here the host edits the values itself. A widget type declares its settings as a DataViews \`Field[]\` under \`attributes\`, and that single declaration is enough for a host to build a settings UI:
 
 - The \`DataForm\` on the right is mounted straight from the schema, with no per-widget form wiring.
 - Validation comes from the same source: the \`greeting\` field is marked as required, and \`useFormValidity\` surfaces the result in the form.

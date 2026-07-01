@@ -1,5 +1,30 @@
 == Changelog ==
 
+= 23.5.0-rc.3 =
+
+## Changelog
+
+### Bug Fixes
+
+#### Site Editor
+- Theme: Revert ThemeProvider stable API. ([79594](https://github.com/WordPress/gutenberg/pull/79594))
+
+
+### Code Quality
+
+#### Site Editor
+- Theme: Restore public ThemeProvider export. ([79620](https://github.com/WordPress/gutenberg/pull/79620))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@ciampo 
+
+
 = 23.5.0-rc.2 =
 
 

@@ -114,6 +114,10 @@ const config: Config = {
 		} ),
 		pluginDsTokenFallbacks( {
 			filename: 'js/design-token-fallbacks.mjs',
+			scssFilename: false,
+			additionalScssFilenames: [
+				'../../../base-styles/internal/_wpds-token-fallbacks.scss',
+			],
 		} ),
 		pluginDsTokenDocs( {
 			filename: '../../docs/tokens.md',

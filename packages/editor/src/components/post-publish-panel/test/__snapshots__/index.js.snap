@@ -163,6 +163,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
               target="_blank"
             >
               <span
+                class="style-visually-hidden"
                 data-visually-hidden=""
               >
                 (opens in a new tab)
