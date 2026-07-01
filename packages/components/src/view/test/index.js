@@ -71,7 +71,7 @@ describe( 'props', () => {
 		expect( svgView ).toHaveAttribute( 'viewBox', '0 0 24 24' );
 	} );
 
-	test( 'should render with custom styles (string)', () => {
+	test( 'should ignore legacy css prop styles (string)', () => {
 		const { container } = render(
 			<View
 				as="p"
@@ -89,7 +89,7 @@ describe( 'props', () => {
 		).not.toHaveAttribute( 'css' );
 	} );
 
-	test( 'should render with custom styles (object)', () => {
+	test( 'should ignore legacy css prop styles (object)', () => {
 		const { container } = render(
 			<View
 				as="p"
@@ -107,7 +107,7 @@ describe( 'props', () => {
 		).not.toHaveAttribute( 'css' );
 	} );
 
-	test( 'should render with custom styles (Array)', () => {
+	test( 'should ignore legacy css prop styles (array)', () => {
 		const { container } = render(
 			<View
 				as="p"

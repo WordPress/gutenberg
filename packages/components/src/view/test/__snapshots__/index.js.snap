@@ -1,5 +1,35 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`props should ignore legacy css prop styles (array) 1`] = `
+<div>
+  <p
+    data-testid="custom-css-array-view"
+  >
+    <span />
+  </p>
+</div>
+`;
+
+exports[`props should ignore legacy css prop styles (object) 1`] = `
+<div>
+  <p
+    data-testid="custom-css-object-view"
+  >
+    <span />
+  </p>
+</div>
+`;
+
+exports[`props should ignore legacy css prop styles (string) 1`] = `
+<div>
+  <p
+    data-testid="custom-css-string-view"
+  >
+    <span />
+  </p>
+</div>
+`;
+
 exports[`props should render as a custom component 1`] = `
 <div>
   <section
@@ -25,35 +55,5 @@ exports[`props should render correctly 1`] = `
   <div>
     <span />
   </div>
-</div>
-`;
-
-exports[`props should render with custom styles (Array) 1`] = `
-<div>
-  <p
-    data-testid="custom-css-array-view"
-  >
-    <span />
-  </p>
-</div>
-`;
-
-exports[`props should render with custom styles (object) 1`] = `
-<div>
-  <p
-    data-testid="custom-css-object-view"
-  >
-    <span />
-  </p>
-</div>
-`;
-
-exports[`props should render with custom styles (string) 1`] = `
-<div>
-  <p
-    data-testid="custom-css-string-view"
-  >
-    <span />
-  </p>
 </div>
 `;
