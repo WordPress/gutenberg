@@ -122,24 +122,8 @@ if ( ! class_exists( 'WP_REST_Icon_Collections_Controller' ) ) {
 		 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 		 */
 		public function get_item( $request ) {
-			$collection = $this->get_icon_collection( $request['slug'] );
-			if ( is_wp_error( $collection ) ) {
-				return $collection;
-			}
-
-			$data = $this->prepare_item_for_response( $collection, $request );
-			return rest_ensure_response( $data );
-		}
-
-		/**
-		 * Retrieves a specific icon collection from the registry.
-		 *
-		 * @param string $slug Icon collection slug.
-		 * @return array|WP_Error Icon collection data on success, or WP_Error object on failure.
-		 */
-		public function get_icon_collection( $slug ) {
 			$registry   = WP_Icon_Collections_Registry::get_instance();
-			$collection = $registry->get_registered( $slug );
+			$collection = $registry->get_registered( $request['slug'] );
 
 			if ( null === $collection ) {
 				return new WP_Error(
@@ -147,13 +131,14 @@ if ( ! class_exists( 'WP_REST_Icon_Collections_Controller' ) ) {
 					sprintf(
 						/* translators: %s: Icon collection slug. */
 						__( 'Icon collection not found: "%s".', 'gutenberg' ),
-						$slug
+						$request['slug']
 					),
 					array( 'status' => 404 )
 				);
 			}
 
-			return $collection;
+			$data = $this->prepare_item_for_response( $collection, $request );
+			return rest_ensure_response( $data );
 		}
 
 		/**
