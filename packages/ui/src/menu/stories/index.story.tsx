@@ -228,6 +228,13 @@ export const CheckboxItems: Story = {
 						<Menu.CheckboxItem
 							checked={ downloads }
 							onCheckedChange={ setDownloads }
+							prefix={
+								<Icon
+									icon={ archive }
+									size={ 24 }
+									aria-hidden
+								/>
+							}
 							suffix="⌘D"
 						>
 							<Menu.ItemLabel>Downloads</Menu.ItemLabel>
@@ -259,7 +266,16 @@ export const RadioItems: Story = {
 									Sort alphabetically.
 								</Menu.ItemDescription>
 							</Menu.RadioItem>
-							<Menu.RadioItem value="date">
+							<Menu.RadioItem
+								value="date"
+								prefix={
+									<Icon
+										icon={ archive }
+										size={ 24 }
+										aria-hidden
+									/>
+								}
+							>
 								<Menu.ItemLabel>Date</Menu.ItemLabel>
 								<Menu.ItemDescription>
 									Sort by most recent activity.
