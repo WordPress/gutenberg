@@ -119,6 +119,14 @@ The interactive state of the element. The default (no modifier) is the idle stat
 | `active`   | Hovered, pressed, or selected state |
 | `disabled` | Unavailable or inoperable state     |
 
+## Intentional omissions
+
+The semantic token set is not a complete matrix of every property, target, tone, emphasis, and state combination. Omitted combinations are intentional when they do not map to a supported design-system role.
+
+-   Do not create a new token only to fill a missing slot in the naming pattern. Add a token when there is a documented role and a concrete component need.
+-   Use the existing neutral disabled tokens for track-and-thumb controls when the disabled state should be tone-agnostic, such as `--wpds-color-background-thumb-neutral-disabled`.
+-   Use the normal-emphasis stroke tokens for brand or error interactive borders unless a component specifically needs a distinct strong stroke role, such as `--wpds-color-stroke-interactive-brand` or `--wpds-color-stroke-interactive-error`.
+
 <!-- START GENERATED TOKEN TABLES: Do not edit this section directly. -->
 
 ## Semantic tokens
