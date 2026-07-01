@@ -37,3 +37,9 @@ export {
 	growInlineAddition,
 	buildSuggestionMarkerAttributes,
 } from './operations';
+export { computeDeleteRange } from './delete-range';
+export {
+	analyzeTextEdit,
+	planEditMarkers,
+	applyEditPlan,
+} from './reconcile-edit';

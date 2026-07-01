@@ -22,6 +22,7 @@ import {
 	SUGGESTION_FORMAT_NAME,
 	SUGGESTION_TYPE_DELETION,
 	buildSuggestionMarkerAttributes,
+	computeDeleteRange,
 } from '../inline-suggestions';
 
 /**
@@ -56,7 +57,7 @@ function getCandidateDocuments() {
  * stacks, tolerating plain strings and other non-rich values.
  *
  * @param {*} value Block attribute value.
- * @return {{ length: number, formats: Array }} Parsed text metrics.
+ * @return {{ length: number, formats: Array, text: string }} Parsed text metrics.
  */
 function readValueMetrics( value ) {
 	let html = null;
@@ -66,10 +67,14 @@ function readValueMetrics( value ) {
 		html = value;
 	}
 	if ( html === null ) {
-		return { length: 0, formats: [] };
+		return { length: 0, formats: [], text: '' };
 	}
 	const record = create( { html } );
-	return { length: record.text.length, formats: record.formats ?? [] };
+	return {
+		length: record.text.length,
+		formats: record.formats ?? [],
+		text: record.text,
+	};
 }
 
 /**
@@ -108,6 +113,10 @@ function hasSuggestionFormatAt( formats, index ) {
  *   single marker (the first keystroke opens the note; keystrokes during that
  *   window are counted and applied on flush). A target character already inside
  *   a suggestion marker is left to the default path.
+ * - **Word / line delete** — a word- or line-delete at a collapsed caret
+ *   (`deleteWordBackward`, `deleteHardLineForward`, ...) resolves the range it
+ *   would remove (`computeDeleteRange`) and marks that whole range as one
+ *   deletion, so these no longer fall through to the overlay diff path.
  *
  * `beforeinput` (rather than `keydown`) is the reliable interception point:
  * browsers apply deletion through `beforeinput`, and `preventDefault` there
@@ -115,8 +124,7 @@ function hasSuggestionFormatAt( formats, index ) {
  * partial-selection delete, which would let it fall through to the old overlay
  * path.
  *
- * Out of scope for now: word/line deletes at a collapsed cursor
- * (`deleteWordBackward` etc.) and IME composition.
+ * Out of scope for now: IME composition.
  *
  * @return {null} Renders nothing.
  */
@@ -339,42 +347,72 @@ export default function SuggestionDeletionKeyboard() {
 				return;
 			}
 
-			// Collapsed-cursor delete: only the single-character backward /
-			// forward variants. Word/line deletes fall through for now.
-			const isBackward = event.inputType === 'deleteContentBackward';
-			const isForward = event.inputType === 'deleteContentForward';
-			if ( ! isBackward && ! isForward ) {
-				resetRun();
-				return;
-			}
+			// Collapsed-cursor delete.
 			const caret = readInlineCaret( getSelectionStart, getSelectionEnd );
 			if ( ! caret || caret.start !== caret.end ) {
 				resetRun();
 				return;
 			}
 			const { clientId, attributeKey, start: pos } = caret;
-			const { length, formats } =
+			const { length, formats, text } =
 				readValueMetrics(
 					getBlockAttributes( clientId )?.[ attributeKey ]
 				) ?? {};
-			// Nothing to delete at the document edge.
-			if (
-				( isBackward && pos <= 0 ) ||
-				( isForward && pos >= length )
-			) {
-				resetRun();
-				return;
-			}
-			// Leave edits inside an existing suggestion marker to the default
-			// path rather than nesting marks.
-			const targetIndex = isBackward ? pos - 1 : pos;
-			if ( hasSuggestionFormatAt( formats, targetIndex ) ) {
-				resetRun();
+
+			const isBackward = event.inputType === 'deleteContentBackward';
+			const isForward = event.inputType === 'deleteContentForward';
+
+			// Single-character delete: mark one character and grow on repeats.
+			if ( isBackward || isForward ) {
+				// Nothing to delete at the document edge.
+				if (
+					( isBackward && pos <= 0 ) ||
+					( isForward && pos >= length )
+				) {
+					resetRun();
+					return;
+				}
+				// Leave edits inside an existing suggestion marker to the
+				// default path rather than nesting marks.
+				const targetIndex = isBackward ? pos - 1 : pos;
+				if ( hasSuggestionFormatAt( formats, targetIndex ) ) {
+					resetRun();
+					return;
+				}
+				event.preventDefault();
+				deleteCharacter(
+					clientId,
+					attributeKey,
+					pos,
+					isBackward,
+					length
+				);
 				return;
 			}
 
+			// Word / line delete: resolve the exact range the delete would
+			// remove and mark it as one deletion. Closes the seam where these
+			// used to fall through to the overlay diff path.
+			const range = computeDeleteRange( text, pos, event.inputType );
+			if ( ! range ) {
+				resetRun();
+				return;
+			}
+			// Leave a range overlapping an existing suggestion marker to the
+			// default path rather than nesting marks.
+			for ( let i = range.start; i < range.end; i++ ) {
+				if ( hasSuggestionFormatAt( formats, i ) ) {
+					resetRun();
+					return;
+				}
+			}
 			event.preventDefault();
-			deleteCharacter( clientId, attributeKey, pos, isBackward, length );
+			deleteSelection( {
+				clientId,
+				attributeKey,
+				start: range.start,
+				end: range.end,
+			} );
 		},
 		[
 			getSelectionStart,
