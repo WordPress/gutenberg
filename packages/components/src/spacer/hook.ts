@@ -13,21 +13,6 @@ import { space } from '../utils/space';
 import type { SpacerProps } from './types';
 import styles from './style.module.scss';
 
-type SpacerCustomProperty =
-	| '--wp-components-spacer-margin'
-	| '--wp-components-spacer-margin-block-start'
-	| '--wp-components-spacer-margin-block-end'
-	| '--wp-components-spacer-margin-inline-start'
-	| '--wp-components-spacer-margin-inline-end'
-	| '--wp-components-spacer-padding'
-	| '--wp-components-spacer-padding-block-start'
-	| '--wp-components-spacer-padding-block-end'
-	| '--wp-components-spacer-padding-inline-start'
-	| '--wp-components-spacer-padding-inline-end';
-
-type SpacerStyle = CSSProperties &
-	Partial< Record< SpacerCustomProperty, string > >;
-
 function isDefined< T >( o: T ): o is Exclude< T, null | undefined > {
 	return typeof o !== 'undefined' && o !== null;
 }
@@ -55,7 +40,7 @@ export function useSpacer(
 		...otherProps
 	} = useContextSystem( props, 'Spacer' );
 
-	const spacingStyle: SpacerStyle = {};
+	const spacingStyle: CSSProperties = {};
 
 	if ( isDefined( margin ) ) {
 		spacingStyle[ '--wp-components-spacer-margin' ] = space( margin );
@@ -133,7 +118,7 @@ export function useSpacer(
 			space( paddingRight );
 	}
 
-	const spacerStyle: SpacerStyle = {
+	const spacerStyle: CSSProperties = {
 		...spacingStyle,
 		...style,
 	};
