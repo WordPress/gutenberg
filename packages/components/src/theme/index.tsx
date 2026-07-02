@@ -18,24 +18,8 @@ import { generateThemeVariables } from './color-algorithms';
 import styles from './style.module.scss';
 import { PolymorphicElement } from '../utils/polymorphic-element';
 
-type ThemeGrayKey = keyof NonNullable<
-	ThemeOutputValues[ 'colors' ][ 'gray' ]
->;
-type ThemeColorVariable =
-	| '--wp-components-color-accent'
-	| '--wp-components-color-accent-darker-10'
-	| '--wp-components-color-accent-darker-20'
-	| '--wp-components-color-accent-inverted'
-	| '--wp-components-color-background'
-	| '--wp-components-color-foreground'
-	| '--wp-components-color-foreground-inverted'
-	| `--wp-components-color-gray-${ ThemeGrayKey }`;
-
-type ThemeStyle = CSSProperties &
-	Partial< Record< ThemeColorVariable, string > >;
-
 const getColorVariables = ( { colors }: ThemeOutputValues ) => {
-	const style: ThemeStyle = {};
+	const style: CSSProperties = {};
 
 	if ( colors.accent ) {
 		style[ '--wp-components-color-accent' ] = colors.accent;
@@ -70,8 +54,8 @@ const getColorVariables = ( { colors }: ThemeOutputValues ) => {
 	}
 
 	Object.entries( colors.gray || {} ).forEach( ( [ key, value ] ) => {
-		style[ `--wp-components-color-gray-${ key }` as ThemeColorVariable ] =
-			value;
+		const customProperty = `--wp-components-color-gray-${ key }` as const;
+		style[ customProperty ] = value;
 	} );
 
 	return style;
