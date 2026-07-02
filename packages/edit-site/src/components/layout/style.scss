@@ -34,7 +34,7 @@
 	// This is only necessary for the exit animation
 	.edit-site-layout.is-full-canvas & {
 		position: fixed !important;
-		height: calc(100vh - var(--wp-admin--admin-bar--height, 0));
+		height: calc(100vh - var(--wp-admin--admin-bar--height, 0px));
 		left: 0;
 		top: var(--wp-admin--admin-bar--height, 0);
 	}
