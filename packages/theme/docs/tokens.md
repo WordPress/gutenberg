@@ -13,7 +13,7 @@ Each segment of a token name answers one question about the value being applied:
 
 -   **Type** identifies the kind of value, like `color` or `dimension`. It is usually determined by the CSS property being set.
 -   **Property** describes which aspect of the element the token applies to, such as `background`, `foreground`, `stroke`, `padding`, or `gap`.
--   **Target** describes the kind of element the token applies to, such as a `surface`, an `interactive` control, static `content`, a `track` or `thumb`, or a `focus` indicator.
+-   **Target** describes the kind of element the token applies to, such as a `surface`, an `interactive` control, static `content`, or a `track` or `thumb`. The standalone focus-ring color token is documented below as an exception.
 -   **Tone** describes the semantic intent of a color, such as `neutral`, `brand`, `success`, or `error`.
 -   **Emphasis** and **state** are modifiers that adjust strength and reflect interactive states.
 
@@ -21,7 +21,7 @@ Each segment of a token name answers one question about the value being applied:
 
 Semantic tokens follow a consistent naming pattern:
 
-```
+```text
 --wpds-<type>-<property>-<target>[-<modifier>]
 ```
 
@@ -69,7 +69,6 @@ The component or element type the token applies to.
 | `content`     | Static content like body text and icons. Use for foreground colors where there is no interactive behavior.                                    |
 | `track`       | The non-moving rail of a track-and-thumb control (scrollbar track, slider track, progressbar track).                                          |
 | `thumb`       | The moving indicator of a track-and-thumb control (scrollbar thumb, slider handle, filled progress).                                          |
-| `focus`       | Focus indicators and rings.                                                                                                                   |
 
 ### Modifier
 
@@ -81,11 +80,13 @@ An optional size or intensity modifier.
 
 ## Color token modifiers
 
-Color tokens extend the base pattern with additional modifiers for tone, emphasis, and state:
+Most color tokens extend the base pattern with additional modifiers for tone, emphasis, and state:
 
-```
+```text
 --wpds-color-<property>-<target>-<tone>[-<emphasis>][-<state>]
 ```
+
+`--wpds-color-stroke-focus` is the only color token that does not follow this target/tone grammar. Its `focus` segment describes the focus-ring purpose directly, and the token intentionally applies across tones.
 
 ### Tone
 

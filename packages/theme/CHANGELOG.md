@@ -6,6 +6,10 @@
 
 -   Mark the published `design-tokens.css` file as side-effectful so downstream bundlers preserve the documented CSS import ([#79551](https://github.com/WordPress/gutenberg/pull/79551)).
 
+### Documentation
+
+-   Clarify that `--wpds-color-stroke-focus` is a standalone exception to the normal color token naming pattern ([#79764](https://github.com/WordPress/gutenberg/pull/79764)).
+
 ## 0.17.0 (2026-06-30)
 
 ### Breaking Changes
