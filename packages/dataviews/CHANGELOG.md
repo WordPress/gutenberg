@@ -2,15 +2,15 @@
 
 ## Unreleased
 
+### New Features
+
+- DataForms: Add a `richtext` control, backed by `@wordpress/rich-text-control`, selectable via `Edit: 'richtext'` (or an `EditConfig` with `control: 'richtext'`). [#78471](https://github.com/WordPress/gutenberg/pull/78471)
+
 ## 17.0.0 (2026-06-24)
 
 ### Breaking Changes
 
 - `DataViewsPicker`: `DataViewsPicker.BulkActionToolbar` now renders only the bulk-selection info and action buttons, without pagination, matching `DataViews.BulkActionToolbar`. The full footer it previously rendered (including pagination) is now exposed as `DataViewsPicker.Footer`, matching `DataViews.Footer`. [#79180](https://github.com/WordPress/gutenberg/pull/79180)
-
-### New Features
-
-- DataForms: Add a `richtext` control, backed by `@wordpress/rich-text-control`, selectable via `Edit: 'richtext'` (or an `EditConfig` with `control: 'richtext'`). [#78471](https://github.com/WordPress/gutenberg/pull/78471)
 
 ### Bug Fix
 
