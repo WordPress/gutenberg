@@ -17,7 +17,7 @@
     -   `ComboboxControl` ([#79636](https://github.com/WordPress/gutenberg/pull/79636)).
     -   `FontSizePicker` ([#79481](https://github.com/WordPress/gutenberg/pull/79481))
     -   `FormFileUpload` ([#79655](https://github.com/WordPress/gutenberg/pull/79655))
-    -   `SelectControl`
+    -   `SelectControl` ([#79797](https://github.com/WordPress/gutenberg/pull/79797))
     -   `RangeControl` ([#79590](https://github.com/WordPress/gutenberg/pull/79590))
     -   `Radio` ([#79657](https://github.com/WordPress/gutenberg/pull/79657))
     -   `ToggleGroupControl` ([#79656](https://github.com/WordPress/gutenberg/pull/79656))
