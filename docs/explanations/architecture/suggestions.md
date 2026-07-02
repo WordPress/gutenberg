@@ -6,8 +6,8 @@ Suggestions extend the Notes feature (block-level comments) to support proposed 
 
 There are two complementary mechanisms, by change type:
 
-- **Inline text changes** (typing, deleting, type-over, paste) live as anchored `core/suggestion` `<mark>` markers **in block content** (Option B), re-resolved on read — edit-resilient and per-author. See [Inline suggestion markers](#inline-suggestion-markers).
-- **Non-text attribute changes** (alignment, color, inline formatting) and **structural changes** (insert / remove / move blocks) are captured as versioned operation payloads on a note comment via an in-memory **overlay**, auto-saved in the background after a short idle window.
+- **Inline text and formatting changes** (typing, deleting, type-over, paste, bold/italic/link toggles, and the residual `onChange` seams — IME commits, autocorrect, drag-drop, multi-line paste) live as anchored `core/suggestion` `<mark>` markers **in block content** (Option B), re-resolved on read — edit-resilient and per-author. See [Inline suggestion markers](#inline-suggestion-markers).
+- **Non-text attribute changes** (alignment, heading level, color) and **structural changes** (insert / remove / move blocks) are captured as versioned operation payloads on a note comment via an in-memory **overlay**, auto-saved in the background after a short idle window. The overlay's remaining role is this attribute-only revert shim — it never renders inline content diffs anymore.
 
 The feature is designed around a swappable provider interface so the storage backend can evolve from comment-meta (today) to Yjs `AttributionManager` (future) without changing the UI or accept/reject logic.
 
@@ -66,11 +66,15 @@ A companion `editor.BlockListBlock` filter tags each block with a pending change
 
 For **attribute suggestions** the store is never touched, so autosave, undo/redo, and RTC sync stay at the real baseline. **Structural suggestions** are different: their pending state (the `metadata.suggestion` markers, and pending-insert blocks themselves) lives in the real block tree, so serializing the post would leak it into `post_content`. While any pending structural state exists, `SuggestionSaveLock` holds the editor's save and autosave locks (`lockPostSaving` / `lockPostAutosaving`), releasing them once every structural suggestion has been applied or rejected.
 
-### Inline text changes (Option B: marks in content)
+### Inline text and formatting changes (Option B: marks in content)
 
-Inline **text** changes — typing, deleting a selection, type-over, single-line paste, and single-character Backspace/Delete — do **not** flow through the overlay. They live as marked text directly in block content (Option B), anchored to the #78218 inline-`<mark>` marker primitive. This is the edit-resilient model Riad asked for ([#73411](https://github.com/WordPress/gutenberg/issues/73411)): a suggestion is "this anchored range is proposed for deletion / this inserted run is proposed for addition", re-resolved against current content on read, rather than a whole-attribute before/after snapshot. It also makes concurrent per-author inline suggestions on one block work for free, dissolving [#79220](https://github.com/WordPress/gutenberg/issues/79220).
+Inline **text** changes — typing, deleting (character, word, or line), type-over, cut, and single-line paste — do **not** flow through the overlay. They live as marked text directly in block content (Option B), anchored to the #78218 inline-`<mark>` marker primitive. This is the edit-resilient model Riad asked for ([#73411](https://github.com/WordPress/gutenberg/issues/73411)): a suggestion is "this anchored range is proposed for deletion / this inserted run is proposed for addition", re-resolved against current content on read, rather than a whole-attribute before/after snapshot. It also makes concurrent per-author inline suggestions on one block work for free, dissolving [#79220](https://github.com/WordPress/gutenberg/issues/79220).
 
-See [Inline suggestion markers](#inline-suggestion-markers) below for the full model. The overlay path described in this section still handles **non-text** attribute suggestions (alignment, color, etc.) and **inline formatting** changes (bold / italic / link) — those change a *property* of existing text rather than adding or removing it, so they don't fit the add/del marker model and keep using the `markContentDiff` word-diff into `<del class="has-suggestion-deletion">` / `<ins class="has-suggestion-addition">` runs (gated on `! isBlockSelected` so the marks never fight the caret). Incoming `setAttributes` payloads are passed through `stripSuggestionMarks` first so the overlay stores the *clean* proposed value. The two display-only format types (`gutenberg/suggested-deletion`, `gutenberg/suggested-addition`) live in `inline-formats.js`.
+Inline **formatting** changes (bold / italic / link toggled over a run, the text unchanged) are markers too: the reformatted run is wrapped in a single `format`-type marker carrying the *proposed* formatting — the Google Docs model, the text shown once and never duplicated into a paired del/ins diff. The overlay HOC's `setAttributes` seam detects the format-only diff (`planFormatMarkers`) and hands it to the singleton `SuggestionFormatKeyboard`, which opens the note (recording the original run as `beforeHTML` so a reject can restore it) and writes the marker.
+
+Text edits that reach a block as a whole new `content` value with no interceptable input event — a committed IME composition, autocorrect (`insertReplacementText`), drag-drop, multi-line paste — are diffed into markers by the singleton content reconciler (`SuggestionContentReconciler`): the HOC plans the edit against the previous value (`planEditMarkers`) and, when every planned action opens a fresh note, the reconciler executes it. Both singletons serialize their note-then-marker writes per block through a shared write queue and re-validate the live content around the async note POST, abandoning (and trashing the note of) a plan the content has moved past.
+
+See [Inline suggestion markers](#inline-suggestion-markers) below for the full model. The overlay path described in this section handles what's left: **non-text attribute** suggestions (alignment, heading level, color) and inline edits the marker planners decline (an edit straddling an existing marker, a format toggle overlapping one). Values captured into the overlay — baseline and proposed alike — are stripped of live `core/suggestion` markers first (`stripSuggestionMarkers`), so accepting an attribute suggestion later can never replay (and resurrect) a marker whose suggestion was resolved in the interim. By construction the overlay no longer renders inline content diffs — the old `<del>`/`<ins>` preview and its display-only format types are gone.
 
 ### Auto-save
 
@@ -84,7 +88,7 @@ The HOC only catches edits that flow through a block's own `setAttributes` prop.
 
 1. On Suggest activation it snapshots every block's attributes.
 2. It subscribes to the data registry. On every store update it diffs the live attributes against the snapshot.
-3. For drift on a tracked block it routes the changed attributes into the overlay and dispatches a revert that restores the snapshot. An `isReverting` flag suppresses the recursive subscribe fire that the revert itself triggers.
+3. For drift on a tracked block it routes the changed attributes into the overlay and dispatches a revert that restores the snapshot. A reentrancy gate (`isDispatchingOwnWrite`) suppresses the synchronous subscribe fire the revert itself triggers, while per-revert identity tokens (`createRevertGuard`, in `attribute-suggestions/revert-guard.js`) recognize revert echoes that arrive later — a batched or deferred dispatch — by matching the exact restored values instead of swallowing everything inside a time window.
 4. Structural mutations (a block inserted, removed, or moved) are captured too — see [Structural suggestions](#structural-suggestions) below.
 5. System-managed metadata (`metadata.noteId` written by the suggestion provider after creating a note comment) is folded into the snapshot before diffing so it's invisible to the diff and never leaks into the user-pending overlay.
 
@@ -117,28 +121,32 @@ Inline text suggestions are built on a shared, format-agnostic marker primitive 
 **Marker.** A suggested inline change serializes as
 
 ```html
-<mark class="wp-suggestion" data-suggestion-id="N" data-suggestion-type="del|add" data-author="A">…</mark>
+<mark class="wp-suggestion" data-suggestion-id="N" data-suggestion-type="del|add|format" data-author="A">…</mark>
 ```
 
-where `data-suggestion-id` is the linked note's comment id, `data-suggestion-type` is `del` (existing text proposed for removal) or `add` (proposed new text), and `data-author` tags the suggester. **Offsets are never stored** — `findMarkerRange` re-scans the rich-text `formats` array for the marker by id on every read, so a marker survives unrelated edits elsewhere in the same attribute. This is the single offset-resolution chokepoint and the intended Yjs `AttributionManager` swap point.
+where `data-suggestion-id` is the linked note's comment id, `data-suggestion-type` is `del` (existing text proposed for removal), `add` (proposed new text), or `format` (a run whose formatting change is proposed — the run carries the proposed formatting, the note's `beforeHTML` holds the original), and `data-author` tags the suggester. **Offsets are never stored** — `findMarkerRange` re-scans the rich-text `formats` array for the marker by id on every read, so a marker survives unrelated edits elsewhere in the same attribute. This is the single offset-resolution chokepoint and the intended Yjs `AttributionManager` swap point.
 
-**Edit-driven creation.** In Suggest mode every edit is a suggestion, so there are no toolbar buttons — the act of editing produces the marker. Two `beforeinput`-capture components own this (plus a `paste`-capture handler), cancelling the native edit and writing the marker instead, keyed to a freshly created `note` comment, bypassing the store interceptor so the marker lands in content:
+**Edit-driven creation.** In Suggest mode every edit is a suggestion, so there are no toolbar buttons — the act of editing produces the marker. Two `beforeinput`-capture keyboards own the input-event paths (plus `paste`/`cut`-capture handlers), cancelling the native edit and writing the marker instead; two singleton `onChange`-side components (the format keyboard and the content reconciler) own edits that surface only as a fresh `content` value. All of them key the marker to a freshly created `note` comment and bypass the store interceptor so the marker lands in content:
 
 | User action | Result |
 |-------------|--------|
 | Select text + Delete/Backspace | `del` marker over the selection |
-| Backspace / Delete at a caret | `del` marker on the adjacent character; repeating in one direction grows a single marker |
+| Backspace / Delete at a caret | `del` marker on the adjacent grapheme; repeating in one direction grows a single marker |
+| Word / line delete (`deleteWordBackward`, `deleteHardLineForward`, …) | `del` marker over the exact range the delete would remove (`computeDeleteRange`) |
+| Cut (Cmd/Ctrl+X) | `del` marker over the selection; the cut run is written to the clipboard as both `text/plain` and `text/html` |
 | Type at a caret | `add` marker; contiguous typing grows one marker (the whole span is re-stamped so it stays a single `<mark>`) |
 | Type over a selection | `del` marker on the old text + an `add` run for the replacement (two notes) |
 | Single-line paste | `add` marker (handled on the `paste` event, ahead of the editor's paste pipeline) |
+| Bold / italic / link toggle | single `format` marker wrapping the reformatted run (via `SuggestionFormatKeyboard`) |
+| IME commit, autocorrect, drag-drop, multi-line paste | diffed into `add`/`del` markers by `SuggestionContentReconciler` |
 
-The first keystroke of a run opens the note asynchronously; keystrokes during that window are buffered (typing) or counted (deletion) and applied when the comment id resolves.
+The first keystroke of a run opens the note asynchronously; keystrokes during that window are buffered (typing) or counted (deletion) and applied when the comment id resolves. Edits whose range overlaps an existing suggestion marker are left alone (guarded by `formatsRangeHasSuggestion` / `valueRangeHasSuggestion`) rather than nesting or re-attributing another suggestion's marker.
 
-**Decoration.** `SuggestionAnnotations` re-derives each pending marker's live range (`findSuggestionRange`) and decorates it through the annotations API at runtime — nothing is written back to content. `content-suggestion.scss` keys the visual off `data-suggestion-type` (`del` → strikethrough, `add` → underline) and consumes `--suggestion-author-color`; `SuggestionAuthorColors` injects one `.wp-suggestion[data-author="N"]{--suggestion-author-color:…}` rule per author so the **decoration conveys del-vs-add while the color conveys who** (Google-Docs model). The redundant per-thread annotation highlight is neutralized for suggestion markers.
+**Decoration.** `SuggestionAnnotations` re-derives each pending marker's live range (`findSuggestionRange`) and decorates it through the annotations API at runtime — nothing is written back to content. `content-suggestion.scss` keys the visual off `data-suggestion-type` (`del` → strikethrough, `add` → underline, `format` → dotted underline marking the already-visible proposed formatting as provisional) and consumes `--suggestion-author-color`; `SuggestionAuthorColors` injects one `.wp-suggestion[data-author="N"]{--suggestion-author-color:…}` rule per author so the **decoration conveys del-vs-add while the color conveys who** (Google-Docs model). The redundant per-thread annotation highlight is neutralized for suggestion markers.
 
-**Render strip (PHP).** `gutenberg_strip_inline_suggestion_markers` (a `render_block` filter in `lib/compat/wordpress-7.1/block-suggestions.php`) is type-aware: a `del` marker has its **wrapper stripped but text kept** (the text is real until the suggestion is accepted); an `add` marker has its **wrapper and text both stripped** (proposed additions never reach the published front-end until accepted). The raw `post_content` / REST `raw` / revisions keep the markers.
+**Render strip (PHP).** `gutenberg_strip_inline_suggestion_markers` (a `render_block` filter in `lib/compat/wordpress-7.1/block-suggestions.php`) is type-aware: a `del` marker has its **wrapper stripped but text kept** (the text is real until the suggestion is accepted); an `add` marker has its **wrapper and text both stripped** (proposed additions never reach the published front-end until accepted). A `format` marker is treated like `del` — wrapper stripped, text kept — which means the run's *proposed* formatting (carried on the text itself) currently renders on the front end before the suggestion is resolved; see Known Limitations. The raw `post_content` / REST `raw` / revisions keep the markers.
 
-**Accept / reject.** Resolved by id against the live marker range: accept `del` removes text + marker; reject `del` drops the marker (text stays); accept `add` unwraps the marker (text becomes permanent); reject `add` removes text + marker. The inline op records only which attribute carries the marker and the marker kind — the range is always re-derived.
+**Accept / reject.** Resolved by id against the live marker range: accept `del` removes text + marker; reject `del` drops the marker (text stays); accept `add` unwraps the marker (text becomes permanent); reject `add` removes text + marker; accept `format` unwraps the marker (the proposed formatting, already on the run, becomes permanent); reject `format` restores the original run captured on the note as `beforeHTML`. The inline op records only which attribute carries the marker, the marker kind, and (for `format`) the before/after run HTML — the range is always re-derived. Removal-type resolutions delete only the characters actually carrying the marker's id, so another suggestion's marker interleaved inside a fragmented run survives.
 
 ### Implementation files
 
@@ -146,18 +154,25 @@ The Suggest-mode subsystem lives in `packages/editor/src/components/suggestion-m
 
 | File | Role |
 |------|------|
-| `index.js`                  | Barrel that re-exports the subsystem's public surface and registers the inline format types on import. |
+| `index.js`                  | Barrel that re-exports the subsystem's public surface. |
 | `constants.js`              | Shared constants (`EDITOR_STORE_NAME`, `SUGGEST_INTENT`) referenced by name to avoid a module cycle with the editor store. |
-| `overlay-context.js`        | `SuggestionOverlayProvider`, `useSuggestionOverlay`. The in-memory overlay store and bypass refs. |
-| `with-suggestion-overlay.js`| `editor.BlockEdit` HOC that diverts `setAttributes` into the overlay; renders inline `<del>`/`<ins>` marks for text attributes and the `editor.BlockListBlock` filter for pending-state classes. |
-| `inline-formats.js`         | Registers the `gutenberg/suggested-deletion` / `gutenberg/suggested-addition` RichText formats; `markContentDiff` / `stripSuggestionMarks` for the inline preview. |
-| `store-interceptor.js`      | Snapshot/diff/revert subscriber for store-level mutations (attribute and structural); multi-peer accept logic. |
+| `gate.js`                   | `isSuggestionModeEnabled()` / `useCanSuggest` — the single feature-gating predicate for the Suggestion Mode experiment. |
+| `overlay-context.js`        | `SuggestionOverlayProvider`, `useSuggestionOverlay`. The in-memory overlay store, interceptor-bypass refs, the format/content handler slots, and the shared per-block suggestion write queue. |
+| `suggestion-write-queue.js` | Per-block serial queue shared by the format keyboard and the content reconciler, so their note-then-marker flights can't interleave on one block. |
+| `with-suggestion-overlay.js`| `editor.BlockEdit` HOC that detects format-only / reconcilable content edits and hands them to the marker singletons, diverting everything else into the overlay (marker-stripped); plus the `editor.BlockListBlock` filter for pending-state classes and move ghosts. |
+| `store-interceptor.js`      | Snapshot/diff/revert subscriber for store-level mutations (attribute and structural); multi-peer accept logic; revert-echo identity tokens. |
 | `provider.js`               | `useSuggestionsProvider` — the `createSuggestion` / `applySuggestion` / `rejectSuggestion` API. Owns `operationsFromOverlay`, `applyOperations`, `hasAttributeConflict`, `findStructuralOp`, `clearSuggestionMarkerAttributes`, `parseSuggestionPayload`, and the wrapper-aware equality check. |
-| `suggestion-diff.js`        | Inline diff preview rendered in a comment thread (word-level for text attributes, label fallback otherwise). |
-| `suggestion-summary.js`     | Compact sidebar summary ("Add: …", "Delete: …", "Format: …") used in collapsed thread lists. |
+| `suggestion-summary.js`     | Compact sidebar summary ("Add: …", "Delete: …", "Formatting: …") used in thread lists — the sole suggestion renderer in the sidebar. |
+| `word-diff.js`              | `wordDiff` — the word-level LCS behind the summary, bounded by `MAX_DIFF_LENGTH` (characters, applied by callers) and `MAX_DIFF_TOKENS` (tokens, applied internally). |
 | `auto-save.js`              | Debounced background persistence of pending overlays as note comments (replaces the explicit "Submit" affordance from earlier phases). |
-| `suggestion-deletion-keyboard.js` | `beforeinput`-capture handler turning selection / collapsed-cursor deletes into `del` markers. |
+| `save-lock.js`              | `SuggestionSaveLock` — holds the editor save/autosave locks while structural suggestions are pending in the live tree. |
+| `suggestion-deletion-keyboard.js` | `beforeinput`/`cut`-capture handler turning selection, collapsed-cursor, word/line deletes and cut into `del` markers. |
 | `suggestion-addition-keyboard.js` | `beforeinput`/`paste`-capture handler turning typing, type-over, and single-line paste into `add` markers (and the `del` half of a type-over). |
+| `suggestion-format-keyboard.js` | Singleton owning the write side of `format` markers: opens the note (with `beforeHTML`/`afterHTML`) and writes the reformatted run wrapped in one marker. |
+| `suggestion-content-reconciler.js` | Singleton executing marker plans for `onChange`-only text edits (IME commit, autocorrect, drag-drop, multi-line paste). |
+| `keyboard-target.js`        | Shared DOM-target guards (`isEventTargetSelectedRichText`, `getCandidateDocuments`) keeping the capture keyboards off sidebar/plugin editables. |
+| `grapheme-boundaries.js`    | Grapheme-safe range stepping for collapsed deletes (surrogate pairs, ZWJ sequences, combining marks). |
+| `use-move-ghosts.js`        | `MoveGhostsProvider` — computes the document-wide pending-move ghost index once and shares it over context; per-block `useMoveGhosts()` is a plain context read. |
 | `annotate-suggestions.js`   | `SuggestionAnnotations` — re-derives each pending marker's range and decorates it via the annotations API (runtime-only). |
 | `suggestion-author-colors.js` | `SuggestionAuthorColors` — injects per-author `--suggestion-author-color` rules keyed on the marker's `data-author`. |
 
@@ -166,7 +181,8 @@ The shared inline-marker primitive and the suggestion format live alongside, con
 | Directory | Role |
 |-----------|------|
 | `inline-markers/`    | Format-agnostic primitive: `findMarkerRange` (sole offset resolver / CRDT swap point), `wrapInlineMarker`, `readInlineSelection`, `readInlineCaret`, `reconcileMarkerRemoval`, `useAnnotateRanges`. |
-| `inline-suggestions/`| The `core/suggestion` (`wp-suggestion`) marker format, `findSuggestionRange`, and the accept/reject/insert/grow operations (`acceptInlineDeletion` etc.). |
+| `inline-suggestions/`| The `core/suggestion` (`wp-suggestion`) marker format and everything that plans or executes marker changes: accept/reject/insert/grow operations and overlap guards (`operations.js`), `delete-range.js` (word/line delete ranges), `reconcile-edit.js` (`planEditMarkers`/`applyEditPlan`), `reconcile-format.js` (`planFormatMarkers`/`applyFormatPlan`), and `strip-markers.js` (marker stripping for overlay captures). |
+| `attribute-suggestions/` | `revert-guard.js` — identity tokens the store interceptor uses to recognize its own revert echoes (bounded FIFO queue per block). |
 
 REST/PHP surface lives in `lib/compat/wordpress-6.9/` and `lib/compat/wordpress-7.1/`:
 
@@ -255,9 +271,8 @@ The current implementation (`provider.js`) uses comment meta. A future Yjs-backe
 
 In the notes sidebar, a suggestion thread renders:
 
-- **`SuggestionSummary`** — a Docs-style "Add: …", "Delete: …", "Format: …" summary derived from the operations.
+- **`SuggestionSummary`** — a Docs-style "Add: …", "Delete: …", "Formatting: …" summary derived from the operations. It is the sidebar's sole suggestion renderer; the old full-diff `SuggestionDiff` component was deleted with the overlay retirement (its `wordDiff` engine lives on in `word-diff.js`, capped by `MAX_DIFF_LENGTH`/`MAX_DIFF_TOKENS` so a large payload can't freeze the sidebar).
 - **Accept / Reject icon buttons** — checkmark and close icons that trigger the provider's apply/reject flows.
-- **`SuggestionDiff`** (still available) — the full word-level diff preview for when a more detailed view is needed.
 
 ## Yjs v2 Migration Path
 
@@ -281,8 +296,9 @@ These are non-obvious quirks reviewers should keep in mind when reading the code
 
 ## Known Limitations
 
-- **Sub-attribute anchoring**: resolved for inline **text** changes — these are now edit-resilient `core/suggestion` markers anchored in content and re-resolved on read (see [Inline suggestion markers](#inline-suggestion-markers)), so an unrelated edit elsewhere in the attribute no longer invalidates them. It still applies to **non-text attribute** suggestions (alignment, color) and **inline formatting** changes, which remain whole-attribute overlay diffs: if the author edits the same attribute while one is pending, the captured `before` no longer matches and Apply overwrites the interim edit (after a staleness confirmation) rather than merging it.
-- **Inline formatting / IME / multi-line paste**: changing a property of existing text (bold, italic, link), IME composition, and multi-line or block-level paste are not yet marker-driven — they fall through to the whole-attribute overlay diff path. Follow-ups.
+- **Sub-attribute anchoring**: resolved for inline **text and formatting** changes — these are now edit-resilient `core/suggestion` markers anchored in content and re-resolved on read (see [Inline suggestion markers](#inline-suggestion-markers)), so an unrelated edit elsewhere in the attribute no longer invalidates them. It still applies to **non-text attribute** suggestions (alignment, color), which remain whole-attribute overlay captures: if the author edits the same attribute while one is pending, the captured `before` no longer matches and Apply overwrites the interim edit (after a staleness confirmation) rather than merging it.
+- **Marker-planner declines**: an edit that straddles an existing marker, a format toggle whose run overlaps one, or a text diff the planner can't resolve unambiguously falls back to the whole-attribute overlay path (captured marker-stripped). Live IME composition itself is not intercepted — only the committed composition is reconciled into markers.
+- **Format markers on the front end**: the render strip treats a `format` marker like `del` (wrapper stripped, text kept), and the run carries the *proposed* formatting inline — so a pending bold/italic renders formatted on the published front end until the suggestion is resolved. Tightening the strip to restore `beforeHTML` is a follow-up.
 - **Permissions**: the Gutenberg REST comment controller overrides `update_item_permissions_check` so users with `edit_post` on the parent can update note comments — **but only for suggestion-lifecycle fields** (`status` limited to `approved`/`hold`, plus `meta._wp_suggestion_status`). Any other field in the update body falls back to core's `edit_comment` check, preventing post editors from rewriting another user's note content. The `_wp_suggestion` and `_wp_suggestion_status` meta `auth_callback`s follow the same `edit_post`-on-parent pattern.
 - **Payload size**: `_wp_suggestion` meta is capped at 64 KB via a `sanitize_callback`. Requests exceeding that limit are rejected (the callback returns an empty string), not truncated — mid-string truncation would produce invalid JSON that `parseSuggestionPayload` would silently drop.
 - **Rich-text format fidelity**: the word-level diff operates on the serialized HTML string, which may produce noisy diffs when formatting (bold, links) changes. Progressive enhancement planned.
