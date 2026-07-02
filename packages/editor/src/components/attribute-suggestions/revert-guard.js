@@ -23,7 +23,25 @@
  * Pure and store-free: the caller supplies the equality function (so this
  * doesn't depend on the interceptor's attribute comparison) and drives
  * `expect` / `isEcho` from its own subscribe loop.
+ *
+ * Known limitation: echo recognition is value matching, not event identity.
+ * A legitimate concurrent edit that happens to set exactly the values a
+ * pending revert was going to restore is indistinguishable from the revert's
+ * echo and will consume the token (the edit is then treated as the shim's own
+ * write and skipped). The caller narrows the exposure by consuming tokens as
+ * soon as the echo is observed and by the bounded per-block queue below —
+ * a token that never sees its echo is evicted FIFO once the queue exceeds
+ * `MAX_PENDING_TOKENS`, so it can't linger forever waiting to misclassify a
+ * future same-value edit.
  */
+
+/**
+ * Per-block cap on pending revert tokens. Echoes normally arrive within the
+ * same dispatch (or the next batched flush), so more than a handful of
+ * outstanding tokens for one block means echoes are never arriving — evicting
+ * the oldest keeps a stuck token from poisoning future matches.
+ */
+export const MAX_PENDING_TOKENS = 20;
 
 /**
  * Strict-equality fallback used when the caller doesn't supply a comparison.
@@ -115,6 +133,12 @@ export function createRevertGuard( equals = strictEquals ) {
 		const list = pending.get( clientId );
 		if ( list ) {
 			list.push( token );
+			// Bounded queue: a token whose echo never arrives must not sit
+			// forever waiting to misclassify a future same-value edit. Evict
+			// the oldest (FIFO) once the block exceeds the cap.
+			while ( list.length > MAX_PENDING_TOKENS ) {
+				list.shift();
+			}
 		} else {
 			pending.set( clientId, [ token ] );
 		}

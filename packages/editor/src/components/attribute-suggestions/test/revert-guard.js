@@ -5,6 +5,7 @@ import {
 	createRevertToken,
 	matchesRevertToken,
 	createRevertGuard,
+	MAX_PENDING_TOKENS,
 } from '../revert-guard';
 
 /**
@@ -147,5 +148,30 @@ describe( 'createRevertGuard', () => {
 		guard.clear();
 		expect( guard.size() ).toBe( 0 );
 		expect( guard.isEcho( 'a', { level: 2 } ) ).toBe( false );
+	} );
+
+	it( 'caps pending tokens per block, evicting the oldest (FIFO)', () => {
+		const guard = createRevertGuard( valueEquals );
+		for ( let i = 0; i <= MAX_PENDING_TOKENS; i++ ) {
+			guard.expect( 'a', { level: i } );
+		}
+		// One over the cap: the oldest token (level 0) was evicted.
+		expect( guard.pending( 'a' ) ).toBe( MAX_PENDING_TOKENS );
+		expect( guard.isEcho( 'a', { level: 0 } ) ).toBe( false );
+		// The newest survives.
+		expect( guard.isEcho( 'a', { level: MAX_PENDING_TOKENS } ) ).toBe(
+			true
+		);
+	} );
+
+	it( 'keeps the cap per block, not global', () => {
+		const guard = createRevertGuard( valueEquals );
+		for ( let i = 0; i <= MAX_PENDING_TOKENS; i++ ) {
+			guard.expect( 'a', { level: i } );
+		}
+		guard.expect( 'b', { align: 'left' } );
+		// Block b is unaffected by block a's eviction pressure.
+		expect( guard.pending( 'b' ) ).toBe( 1 );
+		expect( guard.isEcho( 'b', { align: 'left' } ) ).toBe( true );
 	} );
 } );
