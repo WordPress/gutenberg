@@ -19,13 +19,18 @@
 	margin: 0 var(--wpds-dimension-padding-2xl) var(--wpds-dimension-padding-2xl);
 }
 
+.root .sectionHeading {
+	padding: 0 var(--wpds-dimension-padding-2xl);
+	margin: 0 var(--wpds-dimension-padding-2xl);
+}
+
 @container (max-width: 420px) {
 	.columns {
 		padding: var(--wpds-dimension-padding-lg);
 		margin: 0;
 	}
-}
-
-.sectionHeading {
-	padding-inline: var(--wpds-dimension-padding-2xl);
+	.root .sectionHeading {
+		padding: 0 var(--wpds-dimension-padding-lg);
+		margin: 0;
+	}
 }
