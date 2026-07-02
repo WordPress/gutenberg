@@ -863,17 +863,19 @@
 			"type": "object",
 			"properties": {
 				"viewport": {
-					"description": "Viewport breakpoint settings used for responsive block styles and block visibility.",
+					"description": "Viewport breakpoint settings used for responsive block styles and block visibility. Invalid breakpoint values are ignored. If only one valid breakpoint is declared, that value is used as `mobile`. If neither breakpoint is valid, the default breakpoints are used. If `mobile` is greater than or equal to `tablet`, only the `mobile` breakpoint is used.",
 					"type": "object",
 					"properties": {
 						"mobile": {
 							"description": "Maximum viewport width for mobile styles.",
 							"type": "string",
+							"default": "480px",
 							"pattern": "^(?:\\d+|\\d*\\.\\d+)(?:px|em|rem)$"
 						},
 						"tablet": {
 							"description": "Maximum viewport width for tablet styles. Tablet styles apply above the mobile width and up to this width.",
 							"type": "string",
+							"default": "782px",
 							"pattern": "^(?:\\d+|\\d*\\.\\d+)(?:px|em|rem)$"
 						}
 					},
