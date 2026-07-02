@@ -117,15 +117,17 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * The dynamic filter receives the default config and the entity descriptor.
+	 * The dynamic filter receives the data container and the entity descriptor.
 	 */
-	public function test_filter_receives_config_and_entity() {
+	public function test_filter_receives_data_and_entity() {
 		$received_entity = null;
+		$received_data   = null;
 		add_filter(
 			'get_entity_view_config_custom_kind_custom_name',
-			function ( $config, $entity ) use ( &$received_entity ) {
+			function ( $data, $entity ) use ( &$received_entity, &$received_data ) {
 				$received_entity = $entity;
-				return $config;
+				$received_data   = $data;
+				return $data;
 			},
 			10,
 			2
@@ -133,6 +135,7 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 
 		gutenberg_get_entity_view_config( 'custom_kind', 'custom_name' );
 
+		$this->assertInstanceOf( 'Gutenberg_View_Config_Data', $received_data );
 		$this->assertSame(
 			array(
 				'kind' => 'custom_kind',
@@ -143,14 +146,16 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A filter can override the configuration values.
+	 * A filter can override configuration values through update_with().
 	 */
-	public function test_filter_can_override_config() {
+	public function test_filter_update_with_overrides_config() {
 		add_filter(
 			'get_entity_view_config_custom_kind_custom_name',
-			function ( $config ) {
-				$config['default_view']['type'] = 'grid';
-				return $config;
+			function ( $data ) {
+				return $data->update_with(
+					array( 'default_view' => array( 'type' => 'grid' ) ),
+					1
+				);
 			}
 		);
 
@@ -160,37 +165,70 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Dropped keys are backfilled with their defaults.
+	 * A filter can replace a whole key through set().
 	 */
-	public function test_filter_dropped_keys_are_backfilled() {
+	public function test_filter_set_replaces_key() {
 		add_filter(
 			'get_entity_view_config_custom_kind_custom_name',
-			function () {
-				// Return a config that is missing most of the documented keys.
-				return array( 'form' => array( 'custom' => true ) );
+			function ( $data ) {
+				return $data->set( 'form', array( 'custom' => true ) );
 			}
 		);
 
 		$config = gutenberg_get_entity_view_config( 'custom_kind', 'custom_name' );
 
-		$this->assertSameSets( self::CONFIG_KEYS, array_keys( $config ) );
 		$this->assertSame( array( 'custom' => true ), $config['form'] );
-		// Backfilled from defaults.
-		$this->assertSameSets( self::CONFIG_KEYS, array_keys( $config ) );
+		// Untouched keys keep their defaults.
 		$this->assertSame( self::DEFAULT_VIEW, $config['default_view'] );
-		$this->assertSame( self::DEFAULT_LAYOUTS, $config['default_layouts'] );
-		$this->assertSame( self::DEFAULT_VIEW_LIST, $config['view_list'] );
 	}
 
 	/**
-	 * Keys introduced by a filter that are not part of the documented shape are discarded.
+	 * Successive filters share the same container, so their patches compose and
+	 * a later remove_fields() reaches a member contributed by an earlier filter.
+	 */
+	public function test_filters_compose_across_the_chain() {
+		add_filter(
+			'get_entity_view_config_custom_kind_custom_name',
+			function ( $data ) {
+				return $data->set(
+					'form',
+					array(
+						'fields' => array(
+							array(
+								'id'       => 'discussion',
+								'children' => array( 'comment_status', 'ping_status' ),
+							),
+						),
+					)
+				);
+			},
+			9
+		);
+		add_filter(
+			'get_entity_view_config_custom_kind_custom_name',
+			function ( $data ) {
+				return $data->remove_fields( 'ping_status' );
+			},
+			11
+		);
+
+		$config = gutenberg_get_entity_view_config( 'custom_kind', 'custom_name' );
+
+		$this->assertSame(
+			array( 'comment_status' ),
+			$config['form']['fields'][0]['children']
+		);
+	}
+
+	/**
+	 * Keys introduced through the container that are not part of the documented
+	 * shape are discarded.
 	 */
 	public function test_filter_unknown_keys_are_discarded() {
 		add_filter(
 			'get_entity_view_config_custom_kind_custom_name',
-			function ( $config ) {
-				$config['not_a_real_key'] = 'nope';
-				return $config;
+			function ( $data ) {
+				return $data->update_with( array( 'not_a_real_key' => 'nope' ), 1 );
 			}
 		);
 
@@ -201,13 +239,63 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A non-array filter return falls back to the default config.
+	 * A filter that returns its own off-shape container has the result normalized:
+	 * undocumented keys are dropped and dropped documented keys are backfilled
+	 * from the defaults.
 	 */
-	public function test_non_array_filter_return_falls_back_to_default() {
+	public function test_off_shape_container_return_is_normalized() {
 		add_filter(
 			'get_entity_view_config_custom_kind_custom_name',
 			function () {
-				return 'not an array';
+				return new Gutenberg_View_Config_Data(
+					array(
+						'default_view'   => array( 'type' => 'grid' ),
+						'not_a_real_key' => 'nope',
+					)
+				);
+			}
+		);
+
+		$config = gutenberg_get_entity_view_config( 'custom_kind', 'custom_name' );
+
+		// Undocumented key dropped; shape is exactly the documented keys.
+		$this->assertSameSets( self::CONFIG_KEYS, array_keys( $config ) );
+		// The container's own value is respected.
+		$this->assertSame( array( 'type' => 'grid' ), $config['default_view'] );
+		// Documented keys the container omitted are backfilled from the defaults.
+		$this->assertSame( self::DEFAULT_LAYOUTS, $config['default_layouts'] );
+		$this->assertSame( self::DEFAULT_VIEW_LIST, $config['view_list'] );
+		$this->assertSame( self::DEFAULT_FORM, $config['form'] );
+	}
+
+	/**
+	 * A documented key dropped through a null patch value is backfilled from
+	 * the defaults, so a null never reaches the response.
+	 */
+	public function test_filter_null_reset_is_backfilled_from_defaults() {
+		add_filter(
+			'get_entity_view_config_custom_kind_custom_name',
+			function ( $data ) {
+				return $data->update_with( array( 'default_view' => null ), 1 );
+			}
+		);
+
+		$config = gutenberg_get_entity_view_config( 'custom_kind', 'custom_name' );
+
+		$this->assertSame( self::DEFAULT_VIEW, $config['default_view'] );
+	}
+
+	/**
+	 * A filter that returns something other than the container falls back to the
+	 * default config.
+	 */
+	public function test_non_object_filter_return_falls_back_to_default() {
+		$this->setExpectedIncorrectUsage( 'gutenberg_get_entity_view_config' );
+
+		add_filter(
+			'get_entity_view_config_custom_kind_custom_name',
+			function () {
+				return 'not the container';
 			}
 		);
 
