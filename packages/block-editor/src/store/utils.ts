@@ -3,6 +3,8 @@
  */
 import { parse } from '@wordpress/blocks';
 import { parse as grammarParse } from '@wordpress/block-serialization-default-parser';
+import type { Block } from '@wordpress/blocks';
+import type { select as globalSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -20,14 +22,17 @@ import {
 } from './private-selectors';
 import { getBlockEditingMode } from './selectors';
 import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
+import type { State, EditorSettings, UserPattern, UserPatternCategory, Pattern, GrammarBlock } from './types';
+
+// ─── Pattern types ────────────────────────────────────────────────────────────
 
 export const isFiltered = Symbol( 'isFiltered' );
 const parsedPatternCache = new WeakMap();
 const grammarMapCache = new WeakMap();
 
 export function mapUserPattern(
-	userPattern,
-	__experimentalUserPatternCategories = []
+	userPattern: UserPattern,
+	__experimentalUserPatternCategories: UserPatternCategory[] = []
 ) {
 	return {
 		name: `core/block/${ userPattern.id }`,
@@ -45,8 +50,8 @@ export function mapUserPattern(
 	};
 }
 
-function parsePattern( pattern ) {
-	const blocks = parse( pattern.content, {
+function parsePattern( pattern: Pattern ) {
+	const blocks = parse( pattern.content ?? '', {
 		__unstableSkipMigrationLogs: true,
 	} );
 	if ( blocks.length === 1 ) {
@@ -56,6 +61,7 @@ function parsePattern( pattern ) {
 				...( blocks[ 0 ].attributes.metadata || {} ),
 				categories: pattern.categories,
 				patternName: pattern.name,
+				// @ts-ignore - Remove this later
 				name: blocks[ 0 ].attributes.metadata?.name || pattern.title,
 			},
 		};
@@ -66,7 +72,9 @@ function parsePattern( pattern ) {
 	};
 }
 
-export function getParsedPattern( pattern ) {
+export function getParsedPattern(
+	pattern: Pattern
+): Pattern & { blocks: Block[] } {
 	let parsedPattern = parsedPatternCache.get( pattern );
 	if ( ! parsedPattern ) {
 		parsedPattern = parsePattern( pattern );
@@ -75,18 +83,24 @@ export function getParsedPattern( pattern ) {
 	return parsedPattern;
 }
 
-export function getGrammar( pattern ) {
+export function getGrammar( pattern: Pattern ): GrammarBlock[] {
 	let grammarMap = grammarMapCache.get( pattern );
 	if ( ! grammarMap ) {
-		grammarMap = grammarParse( pattern.content );
+		grammarMap = grammarParse( pattern.content ?? '' );
 		// Block names are null only at the top level for whitespace.
-		grammarMap = grammarMap.filter( ( block ) => block.blockName !== null );
+		grammarMap = grammarMap.filter(
+			( block: GrammarBlock ) => block.blockName !== null
+		);
 		grammarMapCache.set( pattern, grammarMap );
 	}
 	return grammarMap;
 }
 
-export const checkAllowList = ( list, item, defaultResult = null ) => {
+export const checkAllowList = (
+	list: boolean | string[],
+	item: string | null,
+	defaultResult: boolean | null = null
+): boolean | null => {
 	if ( typeof list === 'boolean' ) {
 		return list;
 	}
@@ -97,12 +111,15 @@ export const checkAllowList = ( list, item, defaultResult = null ) => {
 		if ( list.includes( 'core/post-content' ) && item === null ) {
 			return true;
 		}
-		return list.includes( item );
+		return list.includes( item as string );
 	}
 	return defaultResult;
 };
 
-export const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
+export const checkAllowListRecursive = (
+	blocks: Array< GrammarBlock | Block >,
+	allowedBlockTypes: EditorSettings[ 'allowedBlockTypes' ]
+) => {
 	if ( typeof allowedBlockTypes === 'boolean' ) {
 		return allowedBlockTypes;
 	}
@@ -112,15 +129,15 @@ export const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
 		const block = blocksQueue.shift();
 
 		const isAllowed = checkAllowList(
-			allowedBlockTypes,
-			block.name || block.blockName,
+			allowedBlockTypes as string[],
+			( block as Block ).name || ( block as GrammarBlock ).blockName,
 			true
 		);
 		if ( ! isAllowed ) {
 			return false;
 		}
 
-		block.innerBlocks?.forEach( ( innerBlock ) => {
+		( block as Block ).innerBlocks?.forEach( ( innerBlock ) => {
 			blocksQueue.push( innerBlock );
 		} );
 	}
@@ -128,28 +145,32 @@ export const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
 	return true;
 };
 
-export const getAllPatternsDependants = ( select ) => ( state ) => {
-	return [
-		state.settings.__experimentalBlockPatterns,
-		state.settings[ userPatternCategoriesSelectKey ]?.( select ) ??
-			state.settings.__experimentalUserPatternCategories,
-		state.settings.__experimentalReusableBlocks,
-		state.settings[ selectBlockPatternsKey ]?.( select ),
-		state.blockPatterns,
-		unlock( select( STORE_NAME ) ).getReusableBlocks(),
-	];
-};
+export const getAllPatternsDependants =
+	( select: typeof globalSelect ) =>
+	( state: State ): unknown[] => {
+		return [
+			state.settings.__experimentalBlockPatterns,
+			state.settings[ userPatternCategoriesSelectKey ]?.( select ) ??
+				state.settings.__experimentalUserPatternCategories,
+			state.settings.__experimentalReusableBlocks,
+			state.settings[ selectBlockPatternsKey ]?.( select ),
+			state.blockPatterns,
+			unlock( select( STORE_NAME ) ).getReusableBlocks(),
+		];
+	};
 
-export const getInsertBlockTypeDependants = () => ( state, rootClientId ) => {
-	return [
-		state.blockListSettings.get( rootClientId ),
-		state.blocks.byClientId.get( rootClientId ),
-		state.blocks.order.get( rootClientId || '' ),
-		state.settings.allowedBlockTypes,
-		state.settings.templateLock,
-		getBlockEditingMode( state, rootClientId ),
-		getSectionRootClientId( state ),
-		isSectionBlock( state, rootClientId ),
-		getParentSectionBlock( state, rootClientId ),
-	];
-};
+export const getInsertBlockTypeDependants =
+	() =>
+	( state: State, rootClientId: string ): unknown[] => {
+		return [
+			state.blockListSettings.get( rootClientId ),
+			state.blocks.byClientId.get( rootClientId ),
+			state.blocks.order.get( rootClientId || '' ),
+			state.settings.allowedBlockTypes,
+			state.settings.templateLock,
+			getBlockEditingMode( state, rootClientId ),
+			getSectionRootClientId( state ),
+			isSectionBlock( state, rootClientId ),
+			getParentSectionBlock( state, rootClientId ),
+		];
+	};

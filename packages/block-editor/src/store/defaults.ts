@@ -7,34 +7,152 @@ export const PREFERENCES_DEFAULTS = {
 	insertUsage: {},
 };
 
-/**
- * The default editor settings
- *
- * @typedef {Object} SETTINGS_DEFAULT
- * @property {boolean}       alignWide                              Enable/Disable Wide/Full Alignments
- * @property {boolean}       supportsLayout                         Enable/disable layouts support in container blocks.
- * @property {boolean}       imageEditing                           Image Editing settings set to false to disable.
- * @property {Array}         imageSizes                             Available image sizes
- * @property {number}        maxWidth                               Max width to constraint resizing
- * @property {boolean|Array} allowedBlockTypes                      Allowed block types
- * @property {boolean}       hasFixedToolbar                        Whether or not the editor toolbar is fixed
- * @property {boolean}       distractionFree                        Whether or not the editor UI is distraction free
- * @property {boolean}       focusMode                              Whether the focus mode is enabled or not
- * @property {Array}         styles                                 Editor Styles
- * @property {boolean}       keepCaretInsideBlock                   Whether caret should move between blocks in edit mode
- * @property {string}        bodyPlaceholder                        Empty post placeholder
- * @property {string}        titlePlaceholder                       Empty title placeholder
- * @property {boolean}       canLockBlocks                          Whether the user can manage Block Lock state
- * @property {boolean}       codeEditingEnabled                     Whether or not the user can switch to the code editor
- * @property {boolean}       generateAnchors                        Enable/Disable auto anchor generation for Heading blocks
- * @property {boolean}       enableOpenverseMediaCategory           Enable/Disable the Openverse media category in the inserter.
- * @property {boolean}       clearBlockSelection                    Whether the block editor should clear selection on mousedown when a block is not clicked.
- * @property {boolean}       __experimentalCanUserUseUnfilteredHTML Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
- * @property {boolean}       __experimentalBlockDirectory           Whether the user has enabled the Block Directory
- * @property {Array}         __experimentalBlockPatterns            Array of objects representing the block patterns
- * @property {Array}         __experimentalBlockPatternCategories   Array of objects representing the block pattern categories
- */
-export const SETTINGS_DEFAULTS = {
+interface SETTINGS_DEFAULT {
+	/**
+	 * Enable/Disable Wide/Full Alignments
+	 */
+	alignWide: boolean;
+
+	/**
+	 * Enable/disable layouts support in container blocks.
+	 */
+	supportsLayout: boolean;
+
+	/**
+	 * Editor color palette
+	 */
+	colors: Array< {
+		name: string;
+		slug: string;
+		color: string;
+	} >;
+
+	/**
+	 * Available font sizes
+	 */
+	fontSizes: Array< {
+		name: string;
+		size: number;
+		slug: string;
+	} >;
+
+	/**
+	 * Default image size used in the editor
+	 */
+	imageDefaultSize: string;
+
+	/**
+	 * Available image sizes
+	 */
+	imageSizes: Array< {
+		slug: string;
+		name: string;
+	} >;
+
+	/**
+	 * Enable/disable image editing features
+	 */
+	imageEditing: boolean;
+
+	/**
+	 * Max width constraint for resizing content
+	 */
+	maxWidth: number;
+
+	/**
+	 * Allowed block types (or false to allow all)
+	 */
+	allowedBlockTypes: boolean | Array< string >;
+
+	/**
+	 * Maximum upload file size (bytes)
+	 */
+	maxUploadFileSize: number;
+
+	/**
+	 * Allowed MIME types for uploads
+	 */
+	allowedMimeTypes: null | Array< string >;
+
+	/**
+	 * Whether the user can manage block lock state
+	 */
+	canLockBlocks: boolean;
+
+	/**
+	 * Whether the user can edit custom CSS
+	 */
+	canEditCSS: boolean;
+
+	/**
+	 * Enable Openverse media category in inserter
+	 */
+	enableOpenverseMediaCategory: boolean;
+
+	/**
+	 * Clear block selection when clicking outside blocks
+	 */
+	clearBlockSelection: boolean;
+
+	/**
+	 * Whether user can use unfiltered HTML (unsafe HTML allowed)
+	 */
+	__experimentalCanUserUseUnfilteredHTML: boolean;
+
+	/**
+	 * Enable Block Directory feature
+	 */
+	__experimentalBlockDirectory: boolean;
+
+	/**
+	 * Enable page templates on mobile devices
+	 */
+	__mobileEnablePageTemplates: boolean;
+
+	/**
+	 * Registered block patterns
+	 */
+	__experimentalBlockPatterns: Array< any >;
+
+	/**
+	 * Block pattern categories
+	 */
+	__experimentalBlockPatternCategories: Array< any >;
+
+	/**
+	 * Whether editor is in preview mode
+	 */
+	isPreviewMode: boolean;
+
+	/**
+	 * Block inspector animation config
+	 */
+	blockInspectorAnimation: Record< string, any >;
+
+	/**
+	 * Auto-generate anchor links for heading blocks
+	 */
+	generateAnchors: boolean;
+
+	/**
+	 * Available gradient presets
+	 */
+	gradients: Array< {
+		name: string;
+		gradient: string;
+		slug: string;
+	} >;
+
+	/**
+	 * Resolved editor assets (styles/scripts)
+	 */
+	__unstableResolvedAssets: {
+		styles: Array< any >;
+		scripts: Array< any >;
+	};
+}
+
+export const SETTINGS_DEFAULTS: SETTINGS_DEFAULT = {
 	alignWide: false,
 	supportsLayout: true,
 

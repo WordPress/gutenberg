@@ -12,6 +12,7 @@ import { applyFilters } from '@wordpress/hooks';
  */
 import { getValueFromObjectPath } from '../utils/object';
 import { getBlockName, getSettings, getBlockAttributes } from './selectors';
+import type { State, EditorSettings } from './types';
 
 const blockedPaths = [
 	'color',
@@ -21,7 +22,9 @@ const blockedPaths = [
 	'spacing',
 ];
 
-const deprecatedFlags = {
+type DeprecatedFlagHandler = ( settings: EditorSettings ) => unknown;
+
+const deprecatedFlags: Record< string, DeprecatedFlagHandler > = {
 	'color.palette': ( settings ) => settings.colors,
 	'color.gradients': ( settings ) => settings.gradients,
 	'color.custom': ( settings ) =>
@@ -52,7 +55,7 @@ const deprecatedFlags = {
 	'spacing.padding': ( settings ) => settings.enableCustomSpacing,
 };
 
-const prefixedFlags = {
+const prefixedFlags: Record< string, string > = {
 	/*
 	 * These were only available in the plugin
 	 * and can be removed when the minimum WordPress version
@@ -84,19 +87,23 @@ const prefixedFlags = {
  *
  * @see https://github.com/WordPress/gutenberg/pull/34485
  *
- * @param {string} path Path to desired value in settings.
- * @return {string}     The value for defined setting.
+ * @param path Path to desired value in settings.
+ * @return      The value for defined setting.
  */
-const removeCustomPrefixes = ( path ) => {
+const removeCustomPrefixes = ( path: string ): string => {
 	return prefixedFlags[ path ] || path;
 };
 
-export function getBlockSettings( state, clientId, ...paths ) {
+export function getBlockSettings(
+	state: State,
+	clientId: string,
+	...paths: string[]
+): unknown[] {
 	const blockName = getBlockName( state, clientId );
-	const candidates = [];
+	const candidates: string[] = [];
 
 	if ( clientId ) {
-		let id = clientId;
+		let id: string | undefined = clientId;
 		do {
 			const name = getBlockName( state, id );
 			if ( hasBlockSupport( name, '__experimentalSettings', false ) ) {
@@ -115,7 +122,7 @@ export function getBlockSettings( state, clientId, ...paths ) {
 		}
 
 		// 0. Allow third parties to filter the block's settings at runtime.
-		let result = applyFilters(
+		let result: unknown = applyFilters(
 			'blockEditor.useSetting.before',
 			undefined,
 			path,
@@ -135,7 +142,7 @@ export function getBlockSettings( state, clientId, ...paths ) {
 			const candidateAtts = getBlockAttributes(
 				state,
 				candidateClientId
-			);
+			) as Record< string, any >;
 			result =
 				getValueFromObjectPath(
 					candidateAtts.settings?.blocks?.[ blockName ],
@@ -152,10 +159,23 @@ export function getBlockSettings( state, clientId, ...paths ) {
 		}
 
 		// 2. Fall back to the settings from the block editor store (__experimentalFeatures).
-		const settings = getSettings( state );
+		const settings = getSettings( state ) as EditorSettings & {
+			__experimentalFeatures?: Record< string, unknown >;
+			disableCustomColors?: boolean;
+			disableCustomGradients?: boolean;
+			disableCustomFontSizes?: boolean;
+			enableCustomLineHeight?: boolean;
+			enableCustomUnits?: boolean | string[];
+			enableCustomSpacing?: boolean;
+		};
 		if ( result === undefined && blockName ) {
 			result = getValueFromObjectPath(
-				settings.__experimentalFeatures?.blocks?.[ blockName ],
+				(
+					settings.__experimentalFeatures?.blocks as Record<
+						string,
+						Record< string, unknown >
+					>
+				 )?.[ blockName ],
 				normalizedPath
 			);
 		}
@@ -169,8 +189,17 @@ export function getBlockSettings( state, clientId, ...paths ) {
 
 		// Return if the setting was found in either the block instance or the store.
 		if ( result !== undefined ) {
-			if ( PATHS_WITH_OVERRIDE[ normalizedPath ] ) {
-				return result.custom ?? result.theme ?? result.default;
+			if (
+				( PATHS_WITH_OVERRIDE as Record< string, boolean > )[
+					normalizedPath
+				]
+			) {
+				const override = result as {
+					custom?: unknown;
+					theme?: unknown;
+					default?: unknown;
+				};
+				return override.custom ?? override.theme ?? override.default;
 			}
 			return result;
 		}

@@ -873,36 +873,7 @@ Undocumented declaration.
 
 ### SETTINGS_DEFAULTS
 
-The default editor settings
-
-_Type Definition_
-
--   _SETTINGS_DEFAULT_ `Object`
-
-_Properties_
-
--   _alignWide_ `boolean`: Enable/Disable Wide/Full Alignments
--   _supportsLayout_ `boolean`: Enable/disable layouts support in container blocks.
--   _imageEditing_ `boolean`: Image Editing settings set to false to disable.
--   _imageSizes_ `Array`: Available image sizes
--   _maxWidth_ `number`: Max width to constraint resizing
--   _allowedBlockTypes_ `boolean|Array`: Allowed block types
--   _hasFixedToolbar_ `boolean`: Whether or not the editor toolbar is fixed
--   _distractionFree_ `boolean`: Whether or not the editor UI is distraction free
--   _focusMode_ `boolean`: Whether the focus mode is enabled or not
--   _styles_ `Array`: Editor Styles
--   _keepCaretInsideBlock_ `boolean`: Whether caret should move between blocks in edit mode
--   _bodyPlaceholder_ `string`: Empty post placeholder
--   _titlePlaceholder_ `string`: Empty title placeholder
--   _canLockBlocks_ `boolean`: Whether the user can manage Block Lock state
--   _codeEditingEnabled_ `boolean`: Whether or not the user can switch to the code editor
--   _generateAnchors_ `boolean`: Enable/Disable auto anchor generation for Heading blocks
--   _enableOpenverseMediaCategory_ `boolean`: Enable/Disable the Openverse media category in the inserter.
--   _clearBlockSelection_ `boolean`: Whether the block editor should clear selection on mousedown when a block is not clicked.
--   _\_\_experimentalCanUserUseUnfilteredHTML_ `boolean`: Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
--   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
--   _\_\_experimentalBlockPatterns_ `Array`: Array of objects representing the block patterns
--   _\_\_experimentalBlockPatternCategories_ `Array`: Array of objects representing the block pattern categories
+Undocumented declaration.
 
 ### SkipToSelectedBlock
 

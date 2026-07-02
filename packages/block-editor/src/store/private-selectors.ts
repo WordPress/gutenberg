@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import type { select as globalSelect } from '@wordpress/data';
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import {
 	hasBlockSupport,
@@ -40,6 +41,16 @@ import {
 	isIsolatedEditorKey,
 } from './private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
+import type {
+	BlockAttributes,
+	EditorSettings,
+	State,
+	UserPattern,
+	Pattern,
+	InserterMediaCategory,
+	ClientIdTree,
+	BlockListSettings,
+} from './types';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
 
@@ -48,25 +59,27 @@ export { getBlockSettings } from './get-block-settings';
 /**
  * Returns true if the block interface is hidden, or false otherwise.
  *
- * @param {Object} state Global application state.
+ * @param state Global application state.
  *
- * @return {boolean} Whether the block toolbar is hidden.
+ * @return Whether the block toolbar is hidden.
  */
-export function isBlockInterfaceHidden( state ) {
+export function isBlockInterfaceHidden( state: State ): boolean {
 	return state.isBlockInterfaceHidden;
 }
 
 /**
  * Gets the client ids of the last inserted blocks.
  *
- * @param {Object} state Global application state.
- * @return {Array|undefined} Client Ids of the last inserted block(s).
+ * @param state Global application state.
+ * @return Client Ids of the last inserted block(s).
  */
-export function getLastInsertedBlocksClientIds( state ) {
+export function getLastInsertedBlocksClientIds(
+	state: State
+): string[] | undefined {
 	return state?.lastBlockInserted?.clientIds;
 }
 
-export function getBlockWithoutAttributes( state, clientId ) {
+export function getBlockWithoutAttributes( state: State, clientId: string ) {
 	return state.blocks.byClientId.get( clientId );
 }
 
@@ -74,13 +87,16 @@ export function getBlockWithoutAttributes( state, clientId ) {
  * Returns true if all of the descendants of a block with the given client ID
  * have an editing mode of 'disabled', or false otherwise.
  *
- * @param {Object} state    Global application state.
- * @param {string} clientId The block client ID.
+ * @param state    Global application state.
+ * @param clientId The block client ID.
  *
- * @return {boolean} Whether the block descendants are disabled.
+ * @return  Whether the block descendants are disabled.
  */
-export const isBlockSubtreeDisabled = ( state, clientId ) => {
-	const isChildSubtreeDisabled = ( childClientId ) => {
+export const isBlockSubtreeDisabled = (
+	state: State,
+	clientId: string
+): boolean => {
+	const isChildSubtreeDisabled = ( childClientId: string ): boolean => {
 		return (
 			getBlockEditingMode( state, childClientId ) === 'disabled' &&
 			getBlockOrder( state, childClientId ).every(
@@ -94,16 +110,16 @@ export const isBlockSubtreeDisabled = ( state, clientId ) => {
 /**
  * Determines if a container (clientId) allows insertion of blocks, considering contentOnly mode restrictions.
  *
- * @param {Object} state        Editor state.
- * @param {string} blockName    The block name to insert.
- * @param {string} rootClientId The client ID of the root container block.
- * @return {boolean} Whether the container allows insertion.
+ * @param state        Editor state.
+ * @param blockName    The block name to insert.
+ * @param rootClientId The client ID of the root container block.
+ * @return  Whether the container allows insertion.
  */
 export function isContainerInsertableToInContentOnlyMode(
-	state,
-	blockName,
-	rootClientId
-) {
+	state: State,
+	blockName: string,
+	rootClientId: string
+): boolean {
 	const isBlockContentBlock = isContentBlock( blockName );
 	const rootBlockName = getBlockName( state, rootClientId );
 	const isContainerContentBlock = isContentBlock( rootBlockName );
@@ -117,14 +133,20 @@ export function isContainerInsertableToInContentOnlyMode(
 	);
 }
 
-function getClientIdWithClientIdsTreeUnmemoized( state, clientId ) {
+function getClientIdWithClientIdsTreeUnmemoized(
+	state: State,
+	clientId: string
+) {
 	return {
 		clientId,
 		innerBlocks: getClientIdsTreeUnmemoized( state, clientId ),
 	};
 }
 
-function getClientIdsTreeUnmemoized( state, rootClientId = '' ) {
+function getClientIdsTreeUnmemoized(
+	state: State,
+	rootClientId = ''
+): ClientIdTree[] {
 	return getBlockOrder( state, rootClientId ).map( ( clientId ) =>
 		getClientIdWithClientIdsTreeUnmemoized( state, clientId )
 	);
@@ -134,10 +156,10 @@ function getClientIdsTreeUnmemoized( state, rootClientId = '' ) {
  * Returns a stripped down block object containing only its client ID,
  * and its inner blocks' client IDs.
  *
- * @param {Object} state    Editor state.
- * @param {string} clientId Client ID of the block to get.
+ * @param state    Editor state.
+ * @param clientId Client ID of the block to get.
  *
- * @return {Object} Client IDs of the post blocks.
+ * @return Client IDs of the post blocks.
  */
 export const getClientIdWithClientIdsTree = createSelector(
 	getClientIdWithClientIdsTreeUnmemoized,
@@ -149,10 +171,10 @@ export const getClientIdWithClientIdsTree = createSelector(
  * given root, consisting of stripped down block objects containing only
  * their client IDs, and their inner blocks' client IDs.
  *
- * @param {Object}  state        Editor state.
- * @param {?string} rootClientId Optional root client ID of block list.
+ * @param state        Editor state.
+ * @param rootClientId Optional root client ID of block list.
  *
- * @return {Object[]} Client IDs of the post blocks.
+ * @return  Client IDs of the post blocks.
  */
 export const getClientIdsTree = createSelector(
 	getClientIdsTreeUnmemoized,
@@ -163,19 +185,19 @@ export const getClientIdsTree = createSelector(
  * Returns a tree of block objects filtered by a block inclusion callback.
  * Excluded blocks are replaced by any included descendants.
  *
- * @param {Object}   state         Global application state.
- * @param {?string}  rootClientId  Optional root client ID of block list.
- * @param {Function} includesBlock Callback that returns whether to include a block.
+ * @param state         Global application state.
+ * @param rootClientId  Optional root client ID of block list.
+ * @param includesBlock Callback that returns whether to include a block.
  *
- * @return {Object[]} Tree of block objects with only clientID and innerBlocks set.
+ * @return Tree of block objects with only clientID and innerBlocks set.
  */
 function getFilteredClientIdsTreeUnmemoized(
-	state,
-	rootClientId,
-	includesBlock
-) {
+	state: State,
+	rootClientId: string,
+	includesBlock: ( state: State, clientId: string ) => boolean
+): ClientIdTree[] {
 	const blockOrder = getBlockOrder( state, rootClientId );
-	const result = [];
+	const result: ClientIdTree[] = [];
 
 	for ( const clientId of blockOrder ) {
 		const innerBlocks = getFilteredClientIdsTreeUnmemoized(
@@ -193,7 +215,10 @@ function getFilteredClientIdsTreeUnmemoized(
 	return result;
 }
 
-function getEnabledClientIdsTreeUnmemoized( state, rootClientId ) {
+function getEnabledClientIdsTreeUnmemoized(
+	state: State,
+	rootClientId: string
+) {
 	return getFilteredClientIdsTreeUnmemoized(
 		state,
 		rootClientId,
@@ -206,13 +231,13 @@ function getEnabledClientIdsTreeUnmemoized( state, rootClientId ) {
  * Returns whether the nearest explicit block editing mode in the block's
  * ancestry is disabled.
  *
- * @param {Object} state    Global application state.
- * @param {string} clientId The block client ID.
+ * @param state    Global application state.
+ * @param clientId The block client ID.
  *
- * @return {boolean} Whether an explicit parent block editing mode disables this
+ * @return  Whether an explicit parent block editing mode disables this
  *                   block.
  */
-function hasExplicitDisabledParent( state, clientId ) {
+function hasExplicitDisabledParent( state: State, clientId: string ): boolean {
 	let parent = state.blocks.parents.get( clientId );
 
 	while ( parent !== undefined ) {
@@ -232,12 +257,15 @@ function hasExplicitDisabledParent( state, clientId ) {
 /**
  * Returns the block tree displayed by List View.
  *
- * @param {Object}  state        Global application state.
- * @param {?string} rootClientId Optional root client ID of block list.
+ * @param state        Global application state.
+ * @param rootClientId Optional root client ID of block list.
  *
- * @return {Object[]} Tree of block objects with only clientID and innerBlocks set.
+ * @return Tree of block objects with only clientID and innerBlocks set.
  */
-function getListViewClientIdsTreeUnmemoized( state, rootClientId ) {
+function getListViewClientIdsTreeUnmemoized(
+	state: State,
+	rootClientId: string
+) {
 	return getFilteredClientIdsTreeUnmemoized(
 		state,
 		rootClientId,
@@ -291,10 +319,10 @@ function getListViewClientIdsTreeUnmemoized( state, rootClientId ) {
  * Returns a tree of block objects with only clientID and innerBlocks set.
  * Blocks with a 'disabled' editing mode are not included.
  *
- * @param {Object}  state        Global application state.
- * @param {?string} rootClientId Optional root client ID of block list.
+ * @param state        Global application state.
+ * @param rootClientId Optional root client ID of block list.
  *
- * @return {Object[]} Tree of block objects with only clientID and innerBlocks set.
+ * @return Tree of block objects with only clientID and innerBlocks set.
  */
 export const getEnabledClientIdsTree = createRegistrySelector( () =>
 	createSelector( getEnabledClientIdsTreeUnmemoized, ( state ) => [
@@ -313,10 +341,10 @@ export const getEnabledClientIdsTree = createRegistrySelector( () =>
  * hidden because they are non-content blocks inside another content-only section
  * remain hidden.
  *
- * @param {Object}  state        Global application state.
- * @param {?string} rootClientId Optional root client ID of block list.
+ * @param state        Global application state.
+ * @param rootClientId Optional root client ID of block list.
  *
- * @return {Object[]} Tree of block objects with only clientID and innerBlocks set.
+ * @return Tree of block objects with only clientID and innerBlocks set.
  */
 export const getListViewClientIdsTree = createRegistrySelector( () =>
 	createSelector( getListViewClientIdsTreeUnmemoized, ( state ) => [
@@ -338,10 +366,10 @@ export const getListViewClientIdsTree = createRegistrySelector( () =>
  *
  * @see getBlockParents
  *
- * @param {Object}  state     Global application state.
- * @param {string}  clientId  The block client ID.
- * @param {boolean} ascending Order results from bottom to top (true) or top
- *                            to bottom (false).
+ * @param state     Global application state.
+ * @param clientId  The block client ID.
+ * @param ascending Order results from bottom to top (true) or top
+ *                  to bottom (false).
  */
 export const getEnabledBlockParents = createSelector(
 	( state, clientId, ascending = false ) => {
@@ -361,22 +389,22 @@ export const getEnabledBlockParents = createSelector(
  * Selector that returns the data needed to display a prompt when certain
  * blocks are removed, or `false` if no such prompt is requested.
  *
- * @param {Object} state Global application state.
+ * @param state Global application state.
  *
- * @return {Object|false} Data for removal prompt display, if any.
+ * @return  Data for removal prompt display, if any.
  */
-export function getRemovalPromptData( state ) {
+export function getRemovalPromptData( state: State ) {
 	return state.removalPromptData;
 }
 
 /**
  * Returns true if removal prompt exists, or false otherwise.
  *
- * @param {Object} state Global application state.
+ * @param state Global application state.
  *
- * @return {boolean} Whether removal prompt exists.
+ * @return Whether removal prompt exists.
  */
-export function getBlockRemovalRules( state ) {
+export function getBlockRemovalRules( state: State ) {
 	return state.blockRemovalRules;
 }
 
@@ -386,9 +414,9 @@ export function getBlockRemovalRules( state ) {
  * Overrides are sorted to match the order of the blocks they relate to. This
  * is useful to maintain correct CSS cascade order.
  *
- * @param {Object} state Global application state.
+ * @param state Global application state.
  *
- * @return {Array} An array of style ID to style override pairs.
+ * @return An array of style ID to style override pairs.
  */
 export const getStyleOverrides = createSelector(
 	( state ) => {
@@ -418,11 +446,11 @@ export const getStyleOverrides = createSelector(
 /**
  * Returns the registered inserter media categories through the public API.
  *
- * @param {Object} state Editor state.
+ * @param {State} state Editor state.
  *
  * @return {InserterMediaCategory[]} Inserter media categories.
  */
-export function getRegisteredInserterMediaCategories( state ) {
+export function getRegisteredInserterMediaCategories( state: State ) {
 	return state.registeredInserterMediaCategories;
 }
 
@@ -432,9 +460,9 @@ export function getRegisteredInserterMediaCategories( state ) {
  * core ones. It also takes into account the allowed `mime_types`, which
  * can be altered by `upload_mimes` filter and restrict some of them.
  *
- * @param {Object} state Global application state.
+ * @param state Global application state.
  *
- * @return {InserterMediaCategory[]} Client IDs of descendants.
+ * @return Allowed inserter media categories.
  */
 export const getInserterMediaCategories = createSelector(
 	( state ) => {
@@ -456,12 +484,15 @@ export const getInserterMediaCategories = createSelector(
 		) {
 			return;
 		}
-		const coreInserterMediaCategoriesNames =
-			inserterMediaCategories?.map( ( { name } ) => name ) || [];
-		const mergedCategories = [
+		const coreInserterMediaCategoriesNames: string[] =
+			inserterMediaCategories?.map(
+				( { name }: InserterMediaCategory ) => name
+			) || [];
+
+		const mergedCategories: InserterMediaCategory[] = [
 			...( inserterMediaCategories || [] ),
 			...( registeredInserterMediaCategories || [] ).filter(
-				( { name } ) =>
+				( { name }: InserterMediaCategory ) =>
 					! coreInserterMediaCategoriesNames.includes( name )
 			),
 		];
@@ -474,7 +505,7 @@ export const getInserterMediaCategories = createSelector(
 				return false;
 			}
 			return Object.values( allowedMimeTypes ).some( ( mimeType ) =>
-				mimeType.startsWith( `${ category.mediaType }/` )
+				( mimeType as string ).startsWith( `${ category.mediaType }/` )
 			);
 		} );
 	},
@@ -490,36 +521,42 @@ export const getInserterMediaCategories = createSelector(
  * Returns whether there is at least one allowed pattern for inner blocks children.
  * This is useful for deferring the parsing of all patterns until needed.
  *
- * @param {Object} state               Editor state.
- * @param {string} [rootClientId=null] Target root client ID.
+ * @param state               Editor state.
+ * @param [rootClientId=null] Target root client ID.
  *
- * @return {boolean} If there is at least one allowed pattern.
+ * @return  If there is at least one allowed pattern.
  */
-export const hasAllowedPatterns = createRegistrySelector( ( select ) =>
-	createSelector(
-		( state, rootClientId = null ) => {
-			const { getAllPatterns } = unlock( select( STORE_NAME ) );
-			const patterns = getAllPatterns();
-			const { allowedBlockTypes } = getSettings( state );
-			return patterns.some( ( pattern ) => {
-				const { inserter = true } = pattern;
-				if ( ! inserter ) {
-					return false;
-				}
-				const grammar = getGrammar( pattern );
-				return (
-					checkAllowListRecursive( grammar, allowedBlockTypes ) &&
-					grammar.every( ( { name: blockName } ) =>
-						canInsertBlockType( state, blockName, rootClientId )
-					)
-				);
-			} );
-		},
-		( state, rootClientId ) => [
-			...getAllPatternsDependants( select )( state ),
-			...getInsertBlockTypeDependants( select )( state, rootClientId ),
-		]
-	)
+export const hasAllowedPatterns = createRegistrySelector(
+	( select: typeof globalSelect ) =>
+		createSelector(
+			( state, rootClientId = null ) => {
+				const { getAllPatterns } = unlock( select( STORE_NAME ) );
+				const patterns = getAllPatterns();
+				const { allowedBlockTypes } = getSettings(
+					state
+				) as EditorSettings;
+				return patterns.some( ( pattern: Pattern ) => {
+					const { inserter = true } = pattern;
+					if ( ! inserter ) {
+						return false;
+					}
+					const grammar = getGrammar( pattern );
+					return (
+						checkAllowListRecursive( grammar, allowedBlockTypes ) &&
+						grammar.every( ( { name: blockName } ) =>
+							canInsertBlockType( state, blockName, rootClientId )
+						)
+					);
+				} );
+			},
+			( state: State, rootClientId: string ) => [
+				...getAllPatternsDependants( select )( state ),
+				...getInsertBlockTypeDependants()(
+					state,
+					rootClientId ?? undefined
+				),
+			]
+		)
 );
 
 export const getPatternBySlug = createRegistrySelector( ( select ) =>
@@ -534,7 +571,7 @@ export const getPatternBySlug = createRegistrySelector( ( select ) =>
 				);
 				const block = unlock( select( STORE_NAME ) )
 					.getReusableBlocks()
-					.find( ( { id } ) => id === _id );
+					.find( ( { id }: { id: unknown } ) => id === _id );
 
 				if ( ! block ) {
 					return null;
@@ -573,7 +610,7 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 		return [
 			...unlock( select( STORE_NAME ) )
 				.getReusableBlocks()
-				.map( ( userPattern ) =>
+				.map( ( userPattern: UserPattern ) =>
 					mapUserPattern(
 						userPattern,
 						state.settings[ userPatternCategoriesSelectKey ]?.(
@@ -591,7 +628,7 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 	}, getAllPatternsDependants( select ) )
 );
 
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY: readonly unknown[] = [];
 
 export const getReusableBlocks = createRegistrySelector(
 	( select ) => ( state ) => {
@@ -607,11 +644,11 @@ export const getReusableBlocks = createRegistrySelector(
 /**
  * Returns the element of the last element that had focus when focus left the editor canvas.
  *
- * @param {Object} state Block editor state.
+ * @param state Block editor state.
  *
- * @return {Object} Element.
+ * @return  Element.
  */
-export function getLastFocus( state ) {
+export function getLastFocus( state: State ) {
 	return state.lastFocus;
 }
 
@@ -620,22 +657,22 @@ export function getLastFocus( state ) {
  * user to be dragging data from outside of the editor, so this selector is separate from
  * the `isDraggingBlocks` selector which only returns true if the user is dragging blocks.
  *
- * @param {Object} state Global application state.
+ * @param state Global application state.
  *
- * @return {boolean} Whether user is dragging.
+ * @return Whether user is dragging.
  */
-export function isDragging( state ) {
+export function isDragging( state: State ) {
 	return state.isDragging;
 }
 
 /**
  * Retrieves the expanded block from the state.
  *
- * @param {Object} state Block editor state.
+ * @param state Block editor state.
  *
- * @return {string|null} The client ID of the expanded block, if set.
+ * @return The client ID of the expanded block, if set.
  */
-export function getExpandedBlock( state ) {
+export function getExpandedBlock( state: State ) {
 	return state.expandedBlock;
 }
 
@@ -643,13 +680,13 @@ export function getExpandedBlock( state ) {
  * Retrieves the client ID of the ancestor block that is content locking the block
  * with the provided client ID.
  *
- * @param {Object} state    Global application state.
- * @param {string} clientId Client Id of the block.
+ * @param state    Global application state.
+ * @param clientId Client Id of the block.
  *
- * @return {?string} Client ID of the ancestor block that is content locking the block.
+ * @return  Client ID of the ancestor block that is content locking the block.
  */
-export const getContentLockingParent = ( state, clientId ) => {
-	let current = clientId;
+export const getContentLockingParent = ( state: State, clientId: string ) => {
+	let current: string | undefined = clientId;
 	let result;
 	while ( ! result && ( current = state.blocks.parents.get( current ) ) ) {
 		if ( getTemplateLock( state, current ) === 'contentOnly' ) {
@@ -665,18 +702,18 @@ export const getContentLockingParent = ( state, clientId ) => {
  * content-only section. Used internally by `isSectionBlock` and
  * `getParentSectionBlock` to avoid circular calls between them.
  *
- * @param {Object} state    Global application state.
- * @param {string} clientId Client Id of the block.
+ * @param state    Global application state.
+ * @param clientId Client Id of the block.
  *
- * @return {boolean} Whether the block is a candidate section block.
+ * @return Whether the block is a candidate section block.
  */
-function isSectionBlockCandidate( state, clientId ) {
+function isSectionBlockCandidate( state: State, clientId: string ) {
 	const blockName = getBlockName( state, clientId );
 	if ( blockName === 'core/block' ) {
 		return true;
 	}
 
-	const attributes = getBlockAttributes( state, clientId );
+	const attributes = getBlockAttributes( state, clientId ) as BlockAttributes;
 	const isTemplatePart = blockName === 'core/template-part';
 
 	// When in an isolated editing context (e.g., editing a template part or pattern directly),
@@ -716,19 +753,19 @@ function isSectionBlockCandidate( state, clientId ) {
 /**
  * Retrieves the client ID of the parent section block.
  *
- * @param {Object} state    Global application state.
- * @param {string} clientId Client Id of the block.
+ * @param state    Global application state.
+ * @param clientId Client Id of the block.
  *
- * @return {?string} Client ID of the ancestor block that is a contentOnly section.
+ * @return  Client ID of the ancestor block that is a contentOnly section, or undefined if none exists.
  */
-export const getParentSectionBlock = ( state, clientId ) => {
+export const getParentSectionBlock = ( state: State, clientId: string ) => {
 	// If this block is within the edited content-only section,
 	// it has no parent section — it's temporarily fully editable.
 	if ( isWithinEditedContentOnlySection( state, clientId ) ) {
 		return undefined;
 	}
 
-	let current = clientId;
+	let current: string | undefined = clientId;
 	let result;
 
 	// If sections are nested, return the top level section block.
@@ -744,12 +781,12 @@ export const getParentSectionBlock = ( state, clientId ) => {
 /**
  * Returns whether the block is a contentOnly section.
  *
- * @param {Object} state    Global application state.
- * @param {string} clientId Client Id of the block.
+ * @param state    Global application state.
+ * @param clientId Client Id of the block.
  *
- * @return {boolean} Whether the block is a contentOnly section.
+ * @return  Whether the block is a contentOnly section.
  */
-export function isSectionBlock( state, clientId ) {
+export function isSectionBlock( state: State, clientId: string ) {
 	// isWithinEditedContentOnlySection -
 	// If the section is being edited or a parent section is being edited,
 	// this block is temporarily not considered a section.
@@ -771,15 +808,18 @@ export function isSectionBlock( state, clientId ) {
  * Retrieves the client ID of the block that is a contentOnly section but is
  * currently being temporarily edited (contentOnly is deactivated).
  *
- * @param {Object} state Global application state.
+ * @param state Global application state.
  *
- * @return {?string} The client ID of the block being temporarily edited.
+ * @return  The client ID of the block being temporarily edited.
  */
-export function getEditedContentOnlySection( state ) {
+export function getEditedContentOnlySection( state: State ) {
 	return state.editedContentOnlySection;
 }
 
-export function isWithinEditedContentOnlySection( state, clientId ) {
+export function isWithinEditedContentOnlySection(
+	state: State,
+	clientId: string
+) {
 	if ( ! state.editedContentOnlySection ) {
 		return false;
 	}
@@ -788,7 +828,7 @@ export function isWithinEditedContentOnlySection( state, clientId ) {
 		return true;
 	}
 
-	let current = clientId;
+	let current: string | undefined = clientId;
 	while ( ( current = state.blocks.parents.get( current ) ) ) {
 		if ( state.editedContentOnlySection === current ) {
 			return true;
@@ -800,20 +840,25 @@ export function isWithinEditedContentOnlySection( state, clientId ) {
 /**
  * Returns the style attributes of multiple blocks.
  *
- * @param {Object}   state     Global application state.
- * @param {string[]} clientIds An array of block client IDs.
+ * @param state     Global application state.
+ * @param clientIds An array of block client IDs.
  *
- * @return {Object} An object where keys are client IDs and values are the corresponding block styles or undefined.
+ * @return  An object where keys are client IDs and values are the corresponding block styles or undefined.
  */
 export const getBlockStyles = createSelector(
 	( state, clientIds ) =>
-		clientIds.reduce( ( styles, clientId ) => {
-			styles[ clientId ] = state.blocks.attributes.get( clientId )?.style;
-			return styles;
-		}, {} ),
-	( state, clientIds ) => [
+		clientIds.reduce(
+			( styles: Record< string, any >, clientId: string ) => {
+				styles[ clientId ] =
+					state.blocks.attributes.get( clientId )?.style;
+				return styles;
+			},
+			{}
+		),
+	( state: State, clientIds: string[] ) => [
 		...clientIds.map(
-			( clientId ) => state.blocks.attributes.get( clientId )?.style
+			( clientId: string ) =>
+				state.blocks.attributes.get( clientId )?.style
 		),
 	]
 );
@@ -823,46 +868,50 @@ export const getBlockStyles = createSelector(
  * acting as "sections" in the editor. This is typically the "main content"
  * of the template/post.
  *
- * @param {Object} state Editor state.
+ * @param state Editor state.
  *
- * @return {string|undefined} The section root client ID or undefined if not set.
+ * @return  The section root client ID or undefined if not set.
  */
-export function getSectionRootClientId( state ) {
+export function getSectionRootClientId( state: State ) {
 	return state.settings?.[ sectionRootClientIdKey ];
 }
 
 /**
  * Returns whether the editor is considered zoomed out.
  *
- * @param {Object} state Global application state.
- * @return {boolean} Whether the editor is zoomed.
+ * @param state Global application state.
+ * @return Whether the editor is zoomed.
  */
-export function isZoomOut( state ) {
+export function isZoomOut( state: State ) {
 	return state.zoomLevel === 'auto-scaled' || state.zoomLevel < 100;
 }
 
 /**
  * Returns whether the zoom level.
  *
- * @param {Object} state Global application state.
- * @return {number|"auto-scaled"} Zoom level.
+ * @param state Global application state.
+ * @return Zoom level.
  */
-export function getZoomLevel( state ) {
+export function getZoomLevel( state: State ) {
 	return state.zoomLevel;
 }
 
 /**
  * Finds the closest block where the block is allowed to be inserted.
  *
- * @param {Object}            state    Editor state.
- * @param {string[] | string} name     Block name or names.
- * @param {string}            clientId Default insertion point.
+ * @param state    Editor state.
+ * @param name     Block name or names.
+ * @param clientId Default insertion point.
  *
- * @return {string} clientID of the closest container when the block name can be inserted.
+ * @return clientID of the closest container when the block name can be inserted.
  */
-export function getClosestAllowedInsertionPoint( state, name, clientId = '' ) {
+export function getClosestAllowedInsertionPoint(
+	state: State,
+	name: string[] | string,
+	clientId = ''
+) {
 	const blockNames = Array.isArray( name ) ? name : [ name ];
-	const areBlockNamesAllowedInClientId = ( id ) =>
+	const areBlockNamesAllowedInClientId = ( id: string ) =>
 		blockNames.every( ( currentName ) =>
 			canInsertBlockType( state, currentName, id )
 		);
@@ -887,7 +936,7 @@ export function getClosestAllowedInsertionPoint( state, name, clientId = '' ) {
 	// Traverse the block tree up until we find a place where we can insert.
 	let current = clientId;
 	while ( current !== null && ! areBlockNamesAllowedInClientId( current ) ) {
-		const parentClientId = getBlockRootClientId( state, current );
+		const parentClientId = getBlockRootClientId( state, current ) as string;
 		current = parentClientId;
 	}
 
@@ -895,11 +944,11 @@ export function getClosestAllowedInsertionPoint( state, name, clientId = '' ) {
 }
 
 export function getClosestAllowedInsertionPointForPattern(
-	state,
-	pattern,
-	clientId
+	state: State,
+	pattern: Pattern,
+	clientId: string
 ) {
-	const { allowedBlockTypes } = getSettings( state );
+	const { allowedBlockTypes } = getSettings( state ) as EditorSettings;
 	const isAllowed = checkAllowListRecursive(
 		getGrammar( pattern ),
 		allowedBlockTypes
@@ -907,17 +956,19 @@ export function getClosestAllowedInsertionPointForPattern(
 	if ( ! isAllowed ) {
 		return null;
 	}
-	const names = getGrammar( pattern ).map( ( { blockName: name } ) => name );
+	const names = getGrammar( pattern )
+		.map( ( { blockName: name } ) => name )
+		.filter( ( name ): name is string => name !== null );
 	return getClosestAllowedInsertionPoint( state, names, clientId );
 }
 
 /**
  * Where the point where the next block will be inserted into.
  *
- * @param {Object} state
- * @return {Object} where the insertion point in the block editor is or null if none is set.
+ * @param state
+ * @return  where the insertion point in the block editor is or null if none is set.
  */
-export function getInsertionPoint( state ) {
+export function getInsertionPoint( state: State ) {
 	return state.insertionPoint;
 }
 
@@ -932,17 +983,19 @@ export function getInsertionPoint( state ) {
  * - blockVisibility is false (hidden everywhere)
  * - blockVisibility.viewport has any viewport set to false (hidden at specific screen sizes)
  *
- * @param {Object} state    Global application state.
- * @param {string} clientId Client ID of the block.
+ * @param state    Global application state.
+ * @param clientId Client ID of the block.
  *
- * @return {boolean} Whether the block is hidden anywhere.
+ * @return  Whether the block is hidden anywhere.
  */
-export const isBlockHiddenAnywhere = ( state, clientId ) => {
+export const isBlockHiddenAnywhere = ( state: State, clientId: string ) => {
 	const blockName = getBlockName( state, clientId );
 	if ( ! hasBlockSupport( blockName, 'visibility', true ) ) {
 		return false;
 	}
-	const attributes = state.blocks.attributes.get( clientId );
+	const attributes = state.blocks.attributes.get( clientId ) as
+		| BlockAttributes
+		| undefined;
 	const blockVisibility = attributes?.metadata?.blockVisibility;
 
 	if ( blockVisibility === false ) {
@@ -968,17 +1021,19 @@ export const isBlockHiddenAnywhere = ( state, clientId ) => {
  * A block is considered hidden everywhere when blockVisibility is explicitly
  * set to false, which means it's hidden on all viewports.
  *
- * @param {Object} state    Global application state.
- * @param {string} clientId Client ID of the block.
+ * @param state    Global application state.
+ * @param clientId Client ID of the block.
  *
- * @return {boolean} Whether the block is hidden everywhere.
+ * @return  Whether the block is hidden everywhere.
  */
-export const isBlockHiddenEverywhere = ( state, clientId ) => {
+export const isBlockHiddenEverywhere = ( state: State, clientId: string ) => {
 	const blockName = getBlockName( state, clientId );
 	if ( ! hasBlockSupport( blockName, 'visibility', true ) ) {
 		return false;
 	}
-	const attributes = state.blocks.attributes.get( clientId );
+	const attributes = state.blocks.attributes.get( clientId ) as
+		| BlockAttributes
+		| undefined;
 	const blockVisibility = attributes?.metadata?.blockVisibility;
 
 	if ( blockVisibility === false ) {
@@ -993,12 +1048,15 @@ export const isBlockHiddenEverywhere = ( state, clientId ) => {
  * Checks all parent blocks in the hierarchy and returns true if any of them
  * is hidden everywhere.
  *
- * @param {Object} state    Global application state.
- * @param {string} clientId Client ID of the block.
+ * @param state    Global application state.
+ * @param clientId Client ID of the block.
  *
- * @return {boolean} Whether any parent block is hidden everywhere.
+ * @return  Whether any parent block is hidden everywhere.
  */
-export const isBlockParentHiddenEverywhere = ( state, clientId ) => {
+export const isBlockParentHiddenEverywhere = (
+	state: State,
+	clientId: string
+) => {
 	const parents = getBlockParents( state, clientId );
 	return parents.some( ( parentId ) =>
 		isBlockHiddenEverywhere( state, parentId )
@@ -1012,20 +1070,30 @@ export const isBlockParentHiddenEverywhere = ( state, clientId ) => {
  * - blockVisibility is false (hidden everywhere)
  * - blockVisibility is an object with the specified viewport set to false
  *
- * @param {Object} state    Global application state.
- * @param {string} clientId Client ID of the block.
- * @param {string} viewport Viewport to check ('desktop', 'tablet', 'mobile').
+ * @param state    Global application state.
+ * @param clientId Client ID of the block.
+ * @param viewport Viewport to check ('desktop', 'tablet', 'mobile').
  *
- * @return {boolean} Whether the block is hidden at the viewport.
+ * @return  Whether the block is hidden at the viewport.
  */
-export const isBlockHiddenAtViewport = ( state, clientId, viewport ) => {
+export const isBlockHiddenAtViewport = (
+	state: State,
+	clientId: string,
+	viewport: string
+) => {
 	if ( isBlockHiddenEverywhere( state, clientId ) ) {
 		return true;
 	}
 
-	const attributes = state.blocks.attributes.get( clientId );
+	const attributes = state.blocks.attributes.get(
+		clientId
+	) as BlockAttributes;
+	const blockVisibility = attributes?.metadata?.blockVisibility;
+
 	const blockVisibilityViewport =
-		attributes?.metadata?.blockVisibility?.viewport;
+		blockVisibility && typeof blockVisibility === 'object'
+			? blockVisibility.viewport
+			: undefined;
 	if (
 		typeof blockVisibilityViewport === 'object' &&
 		blockVisibilityViewport !== null &&
@@ -1042,13 +1110,17 @@ export const isBlockHiddenAtViewport = ( state, clientId, viewport ) => {
  * Checks all parent blocks in the hierarchy and returns true if any of them
  * is hidden at the specified viewport.
  *
- * @param {Object} state    Global application state.
- * @param {string} clientId Client ID of the block.
- * @param {string} viewport Viewport to check ('desktop', 'tablet', 'mobile').
+ * @param state    Global application state.
+ * @param clientId Client ID of the block.
+ * @param viewport Viewport to check ('desktop', 'tablet', 'mobile').
  *
- * @return {boolean} Whether any parent block is hidden at the viewport.
+ * @return  Whether any parent block is hidden at the viewport.
  */
-export const isBlockParentHiddenAtViewport = ( state, clientId, viewport ) => {
+export const isBlockParentHiddenAtViewport = (
+	state: State,
+	clientId: string,
+	viewport: string
+) => {
 	const parents = getBlockParents( state, clientId );
 	return parents.some( ( parentId ) =>
 		isBlockHiddenAtViewport( state, parentId, viewport )
@@ -1061,11 +1133,10 @@ export const isBlockParentHiddenAtViewport = ( state, clientId, viewport ) => {
  * The spotlight is also active when a contentOnly section is being edited, the selector
  * also returns true if this is the case.
  *
- * @param {Object} state Global application state.
- *
- * @return {boolean} Whether the block is currently spotlighted.
+ * @param state Global application state.
+ * @return  Whether the block is currently sptlighted.
  */
-export function hasBlockSpotlight( state ) {
+export function hasBlockSpotlight( state: State ) {
 	return !! state.hasBlockSpotlight || !! state.editedContentOnlySection;
 }
 
@@ -1080,13 +1151,13 @@ export function hasBlockSpotlight( state ) {
  * that a user interacts with. `blockEditingModes` aren't included as a user can't change
  * them.
  *
- * @param {Object} state    Global application state.
- * @param {string} clientId ClientId of the block.
+ * @param state    Global application state.
+ * @param clientId ClientId of the block.
  *
- * @return {boolean} Whether the block is currently locked.
+ * @return  Whether the block is currently locked.
  */
-export function isEditLockedBlock( state, clientId ) {
-	const attributes = getBlockAttributes( state, clientId );
+export function isEditLockedBlock( state: State, clientId: string ) {
+	const attributes = getBlockAttributes( state, clientId ) as BlockAttributes;
 	return !! attributes?.lock?.edit;
 }
 
@@ -1100,13 +1171,13 @@ export function isEditLockedBlock( state, clientId ) {
  * that a user interacts with. `blockEditingModes` are excluded as a user can't change
  * them.
  *
- * @param {Object} state    Global application state.
- * @param {string} clientId ClientId of the block.
+ * @param state    Global application state.
+ * @param clientId ClientId of the block.
  *
- * @return {boolean} Whether the block is currently locked.
+ * @return  Whether the block is currently locked.
  */
-export function isMoveLockedBlock( state, clientId ) {
-	const attributes = getBlockAttributes( state, clientId );
+export function isMoveLockedBlock( state: State, clientId: string ) {
+	const attributes = getBlockAttributes( state, clientId ) as BlockAttributes;
 	// If a block explicitly has `move` set to `false`, it turns off
 	// any locking that might be inherited from a parent.
 	if ( attributes?.lock?.move !== undefined ) {
@@ -1137,8 +1208,8 @@ export function isMoveLockedBlock( state, clientId ) {
  *
  * @return {boolean} Whether the block is currently locked.
  */
-export function isRemoveLockedBlock( state, clientId ) {
-	const attributes = getBlockAttributes( state, clientId );
+export function isRemoveLockedBlock( state: State, clientId: string ) {
+	const attributes = getBlockAttributes( state, clientId ) as BlockAttributes;
 	if ( attributes?.lock?.remove !== undefined ) {
 		return !! attributes?.lock?.remove;
 	}
@@ -1162,12 +1233,12 @@ export function isRemoveLockedBlock( state, clientId ) {
  * that a user interacts with. `blockEditingModes` are excluded as a user can't change
  * them.
  *
- * @param {Object} state    Global application state.
- * @param {string} clientId ClientId of the block.
+ * @param state    Global application state.
+ * @param clientId ClientId of the block.
  *
- * @return {boolean} Whether the block is currently locked.
+ * @return Whether the block is currently locked.
  */
-export function isLockedBlock( state, clientId ) {
+export function isLockedBlock( state: State, clientId: string ) {
 	return (
 		isEditLockedBlock( state, clientId ) ||
 		isMoveLockedBlock( state, clientId ) ||
@@ -1178,23 +1249,23 @@ export function isLockedBlock( state, clientId ) {
 /**
  * Returns whether the list view content panel popover is open.
  *
- * @param {Object} state Global application state.
+ * @param state Global application state.
  *
- * @return {boolean} Whether the popover is open.
+ * @return Whether the popover is open.
  */
-export function isListViewContentPanelOpen( state ) {
+export function isListViewContentPanelOpen( state: State ) {
 	return state.listViewContentPanelOpen;
 }
 
 /**
  * Returns whether a List View panel is opened.
  *
- * @param {Object} state    Global application state.
- * @param {string} clientId Client ID of the block.
+ * @param state    Global application state.
+ * @param clientId Client ID of the block.
  *
- * @return {boolean} Whether the panel is opened.
+ * @return Whether the panel is opened.
  */
-export function isListViewPanelOpened( state, clientId ) {
+export function isListViewPanelOpened( state: State, clientId: string ) {
 	// If allOpen flag is set, all panels are open
 	if ( state.openedListViewPanels?.allOpen ) {
 		return true;
@@ -1207,11 +1278,11 @@ export function isListViewPanelOpened( state, clientId ) {
  *
  * This counter is used in the ListView component's key prop to force remounting.
  *
- * @param {Object} state Global application state.
+ * @param state Global application state.
  *
- * @return {number} The expand revision number.
+ * @return The expand revision number.
  */
-export function getListViewExpandRevision( state ) {
+export function getListViewExpandRevision( state: State ) {
 	return state.listViewExpandRevision || 0;
 }
 
@@ -1229,12 +1300,12 @@ export function getListViewExpandRevision( state ) {
  * that edge case is accepted to keep the check cheap. Keeping the read internal
  * lets this computation evolve without a back-compat commitment.
  *
- * @param {Object} state    Global application state.
- * @param {string} clientId Client ID of the block.
+ * @param state    Global application state.
+ * @param clientId Client ID of the block.
  *
- * @return {boolean} Whether the block participates in List View-specific UI.
+ * @return Whether the block participates in List View-specific UI.
  */
-export function shouldRenderBlockListView( state, clientId ) {
+export function shouldRenderBlockListView( state: State, clientId: string ) {
 	const blockName = getBlockName( state, clientId );
 
 	// The navigation block always participates; its List View is core to how it
@@ -1249,10 +1320,10 @@ export function shouldRenderBlockListView( state, clientId ) {
 
 	// `allowedBlocks` permits no block when it is `[]` or `false`; an unset value
 	// is unrestricted and is intentionally not matched.
-	const allowedBlocks = getBlockListSettings(
-		state,
-		clientId
-	)?.allowedBlocks;
+	const allowedBlocks = (
+		getBlockListSettings( state, clientId ) as BlockListSettings
+	 )?.allowedBlocks;
+
 	const isEmptyAndNoAllowedBlocks =
 		getBlockOrder( state, clientId ).length === 0 &&
 		( allowedBlocks === false ||
@@ -1265,22 +1336,22 @@ export function shouldRenderBlockListView( state, clientId ) {
  * Returns the client IDs for the viewport modal, or null if
  * the modal is not open.
  *
- * @param {Object} state Global application state.
+ * @param state Global application state.
  *
- * @return {string[]|null} Client IDs for the visibility modal, or null.
+ * @return Client IDs for the visibility modal, or null.
  */
-export function getViewportModalClientIds( state ) {
+export function getViewportModalClientIds( state: State ) {
 	return state.viewportModalClientIds;
 }
 
 /**
  * Returns the requested inspector tab state, if any.
  *
- * @param {Object} state Global application state.
+ * @param state Global application state.
  *
- * @return {Object|null} The requested tab state with tabName and options, or null if no request is pending.
+ * @return The requested tab state with tabName and options, or null if no request is pending.
  */
-export function getRequestedInspectorTab( state ) {
+export function getRequestedInspectorTab( state: State ) {
 	return state.requestedInspectorTab;
 }
 
@@ -1293,11 +1364,11 @@ const DEFAULT_BLOCK_STYLE_STATE = {
  * Returns the globally selected viewport style state. When set to a value other
  * than 'default', block style edits in the inspector apply to that viewport.
  *
- * @param {Object} state Global application state.
+ * @param state Global application state.
  *
- * @return {string} The selected viewport style state.
+ * @return The selected viewport style state.
  */
-export function getStyleStateViewport( state ) {
+export function getStyleStateViewport( state: State ) {
 	return state.styleStateViewport ?? DEFAULT_BLOCK_STYLE_STATE.viewport;
 }
 
@@ -1305,21 +1376,21 @@ export function getStyleStateViewport( state ) {
  * Returns whether Responsive editing is enabled. When enabled, the device
  * preview also drives which viewport block style edits are applied to.
  *
- * @param {Object} state Global application state.
+ * @param state Global application state.
  *
- * @return {boolean} Whether Responsive editing is enabled.
+ * @return Whether Responsive editing is enabled.
  */
-export function isResponsiveEditing( state ) {
+export function isResponsiveEditing( state: State ) {
 	return state.isResponsiveEditing;
 }
 
 /**
  * Returns the selected style state for a block's style controls.
  *
- * @param {Object} state    Global application state.
- * @param {string} clientId The block client ID.
+ * @param state    Global application state.
+ * @param clientId The block client ID.
  *
- * @return {Object} The selected block style state.
+ * @return The selected block style state.
  */
 export const getSelectedBlockStyleState = createSelector(
 	( state, clientId ) => {
@@ -1344,12 +1415,12 @@ export const getSelectedBlockStyleState = createSelector(
 /**
  * Returns whether a non-default style state is selected for a block.
  *
- * @param {Object} state    Global application state.
- * @param {string} clientId The block client ID.
+ * @param state    Global application state.
+ * @param clientId The block client ID.
  *
- * @return {boolean} Whether a non-default block style state is selected.
+ * @return Whether a non-default block style state is selected.
  */
-export function hasSelectedStyleState( state, clientId ) {
+export function hasSelectedStyleState( state: State, clientId: string ) {
 	const selectedState = getSelectedBlockStyleState( state, clientId );
 
 	return (
@@ -1361,12 +1432,15 @@ export function hasSelectedStyleState( state, clientId ) {
 /**
  * Returns whether the selected style state is shown on the canvas.
  *
- * @param {Object} state    Global application state.
- * @param {string} clientId The block client ID.
+ * @param state    Global application state.
+ * @param clientId The block client ID.
  *
- * @return {boolean} Whether the selected style state is shown on the canvas.
+ * @return Whether the selected style state is shown on the canvas.
  */
-export function isSelectedBlockStyleStateShownOnCanvas( state, clientId ) {
+export function isSelectedBlockStyleStateShownOnCanvas(
+	state: State,
+	clientId: string
+) {
 	if ( state.selectedBlockStyleState?.clientId !== clientId ) {
 		return true;
 	}
