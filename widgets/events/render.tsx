@@ -143,10 +143,10 @@ export default function WordPressEvents( {
 							<Icon icon={ mapMarker } />
 						</EmptyState.Visual>
 						<EmptyState.Title>
-							{ __( 'No location selected' ) }
+							{ __( 'Attend an upcoming event near you.' ) }
 						</EmptyState.Title>
 						<EmptyState.Description>
-							{ __( 'Select a location to view events.' ) }
+							{ __( 'Select a city to view events.' ) }
 						</EmptyState.Description>
 					</EmptyState.Root>
 				</Stack>
