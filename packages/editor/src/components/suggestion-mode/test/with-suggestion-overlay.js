@@ -25,6 +25,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createBlock, registerBlockType } from '@wordpress/blocks';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useEffect } from '@wordpress/element';
+import { unregisterFormatType } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -38,6 +39,10 @@ import {
 	SuggestionOverlayProvider,
 	useSuggestionOverlay,
 } from '../overlay-context';
+import {
+	registerSuggestionFormat,
+	SUGGESTION_FORMAT_NAME,
+} from '../../inline-suggestions';
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -186,6 +191,54 @@ describe( 'withSuggestionOverlay', () => {
 		// value (the reconciler writes the marker itself, out of band).
 		expect( setAttributes ).not.toHaveBeenCalled();
 		expect( screen.getByTestId( 'content' ) ).toHaveTextContent( 'Hello' );
+	} );
+
+	it( 'strips live suggestion markers from overlay baseline and after snapshots', () => {
+		// Another author's pending marker lives in the block content. When an
+		// edit falls through to the attribute overlay, neither the baseline
+		// nor the proposed value may capture that marker - replaying `after`
+		// on accept would otherwise resurrect a marker whose suggestion was
+		// resolved in the interim.
+		registerSuggestionFormat();
+		try {
+			const marked =
+				'Hello <mark class="wp-suggestion" data-suggestion-id="9" data-suggestion-type="del">doomed</mark>';
+			let overlayHandle;
+			function CaptureOverlay() {
+				const overlay = useSuggestionOverlay();
+				useEffect( () => {
+					overlayHandle = overlay;
+				}, [ overlay ] );
+				return null;
+			}
+
+			renderWithProviders(
+				<>
+					<CaptureOverlay />
+					<Wrapped
+						clientId="a"
+						name="core/paragraph"
+						attributes={ { content: marked } }
+						setAttributes={ jest.fn() }
+					/>
+				</>,
+				{ intent: 'suggest' }
+			);
+
+			fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
+
+			const entry = overlayHandle.entries.a;
+			expect( entry ).toBeDefined();
+			// Baseline keeps the marked run's text but not the marker.
+			expect( entry.baselineAttributes.content ).toBe( 'Hello doomed' );
+			expect( entry.baselineAttributes.content ).not.toContain(
+				'wp-suggestion'
+			);
+			// The proposed value is clean too.
+			expect( entry.overlayAttributes.content ).toBe( 'proposed' );
+		} finally {
+			unregisterFormatType( SUGGESTION_FORMAT_NAME );
+		}
 	} );
 
 	it( 'writes setAttributes through (no overlay) for a pending-insert block in Suggest intent', () => {

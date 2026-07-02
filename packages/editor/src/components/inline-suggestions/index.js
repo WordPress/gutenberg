@@ -56,3 +56,7 @@ export {
 	planFormatMarkers,
 	applyFormatPlan,
 } from './reconcile-format';
+export {
+	stripSuggestionMarkers,
+	stripSuggestionMarkersFromAttributes,
+} from './strip-markers';
