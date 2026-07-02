@@ -2,16 +2,16 @@
  * E2E coverage for the Suggest mode review cycle (#73411): the full loop of
  * making a suggestion, then accepting or rejecting it from the notes sidebar.
  *
- * Capture-side basics (the mode snackbar, content-edit capture, the
- * block-switcher attribute capture, and the empty-inserted-block guard) live
- * in `suggestion-mode.spec.js`; this spec picks up where those leave off —
- * the block-remove and block-move structural captures, and the accept/reject
- * decision for every suggestion kind this layer ships:
+ * Capture-side golden paths (typing, deleting, formatting, block insertion)
+ * live in `suggestion-mode.spec.js`; this spec picks up where those leave
+ * off — the block-remove and block-move structural captures, and the
+ * accept/reject decision for every suggestion kind:
  *
  *   - attribute-set   (heading level via the block switcher)
  *   - block-remove    (delete a block)
  *   - block-insert    (add a block)
  *   - block-move      (reorder blocks)
+ *   - inline add/del/format markers (typed text, deletions, bold)
  *
  * Reviews happen in Editing intent: structural markers are persisted on the
  * live block, so a post author sees the pending treatment and the sidebar
@@ -541,6 +541,267 @@ test.describe( 'Suggestion mode review flows', () => {
 		expect( serialized.indexOf( 'First paragraph' ) ).toBeLessThan(
 			serialized.indexOf( 'Second paragraph' )
 		);
+
+		await expect(
+			sidebar.getByText( 'Rejected', { exact: true } )
+		).toBeVisible();
+	} );
+
+	// --- Review: inline markers (add / del / format) --------------------------
+
+	test( 'accept — an accepted addition unwraps the marker and keeps the text', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' world' );
+
+		// A populated id proves the note comment saved (see
+		// suggestion-mode.spec.js for the rationale).
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="add"]'
+			)
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+
+		await switchIntent( page, 'Editing' );
+		const sidebar = await decideSuggestion( page, 'Accept' );
+
+		// The proposed text is now permanent content, marker gone.
+		await expect( paragraph ).toHaveText( 'Hello world' );
+		await expect( paragraph.locator( 'mark.wp-suggestion' ) ).toHaveCount(
+			0
+		);
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).toContain( 'Hello world' );
+		expect( serialized ).not.toContain( 'data-suggestion' );
+
+		await expect(
+			sidebar.getByText( 'Applied', { exact: true } )
+		).toBeVisible();
+	} );
+
+	test( 'reject — a rejected addition removes the proposed text', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' world' );
+
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="add"]'
+			)
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+
+		await switchIntent( page, 'Editing' );
+		const sidebar = await decideSuggestion( page, 'Reject' );
+
+		// The block reads exactly as it did before the suggestion.
+		await expect( paragraph ).toHaveText( 'Hello' );
+		await expect( paragraph.locator( 'mark.wp-suggestion' ) ).toHaveCount(
+			0
+		);
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).not.toContain( 'world' );
+		expect( serialized ).not.toContain( 'data-suggestion' );
+
+		await expect(
+			sidebar.getByText( 'Rejected', { exact: true } )
+		).toBeVisible();
+	} );
+
+	test( 'accept — an accepted deletion removes the marked text', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		await page.keyboard.press( 'Backspace' );
+
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="del"]'
+			)
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+
+		await switchIntent( page, 'Editing' );
+		const sidebar = await decideSuggestion( page, 'Accept' );
+
+		// The struck-through text is finally removed.
+		await expect( paragraph ).not.toContainText( 'world' );
+		await expect( paragraph ).toContainText( 'Hello' );
+		await expect( paragraph.locator( 'mark.wp-suggestion' ) ).toHaveCount(
+			0
+		);
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).not.toContain( 'world' );
+		expect( serialized ).not.toContain( 'data-suggestion' );
+
+		await expect(
+			sidebar.getByText( 'Applied', { exact: true } )
+		).toBeVisible();
+	} );
+
+	test( 'reject — a rejected deletion keeps the text and drops the marker', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		await page.keyboard.press( 'Backspace' );
+
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="del"]'
+			)
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+
+		await switchIntent( page, 'Editing' );
+		const sidebar = await decideSuggestion( page, 'Reject' );
+
+		// The text survives, back to plain content.
+		await expect( paragraph ).toHaveText( 'Hello world' );
+		await expect( paragraph.locator( 'mark.wp-suggestion' ) ).toHaveCount(
+			0
+		);
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).toContain( 'Hello world' );
+		expect( serialized ).not.toContain( 'data-suggestion' );
+
+		await expect(
+			sidebar.getByText( 'Rejected', { exact: true } )
+		).toBeVisible();
+	} );
+
+	test( 'accept — an accepted format suggestion keeps the proposed formatting', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		await pageUtils.pressKeys( 'primary+b' );
+
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="format"]'
+			)
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+
+		await switchIntent( page, 'Editing' );
+		const sidebar = await decideSuggestion( page, 'Accept' );
+
+		// The bold survives as regular formatting; the marker is unwrapped.
+		await expect( paragraph.locator( 'strong' ) ).toContainText( 'world' );
+		await expect( paragraph ).toHaveText( 'Hello world' );
+		await expect( paragraph.locator( 'mark.wp-suggestion' ) ).toHaveCount(
+			0
+		);
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).toContain( '<strong>' );
+		expect( serialized ).not.toContain( 'data-suggestion' );
+
+		await expect(
+			sidebar.getByText( 'Applied', { exact: true } )
+		).toBeVisible();
+	} );
+
+	test( 'reject — a rejected format suggestion restores the original run', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		await pageUtils.pressKeys( 'primary+b' );
+
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="format"]'
+			)
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+
+		await switchIntent( page, 'Editing' );
+		const sidebar = await decideSuggestion( page, 'Reject' );
+
+		// Text intact, no bold, no marker — as if nothing was proposed.
+		await expect( paragraph ).toHaveText( 'Hello world' );
+		await expect( paragraph.locator( 'strong' ) ).toHaveCount( 0 );
+		await expect( paragraph.locator( 'mark.wp-suggestion' ) ).toHaveCount(
+			0
+		);
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).not.toContain( '<strong>' );
+		expect( serialized ).not.toContain( 'data-suggestion' );
 
 		await expect(
 			sidebar.getByText( 'Rejected', { exact: true } )
