@@ -191,6 +191,7 @@ const restrictedSyntax = [
 		'FontFamilyControl',
 		'FontSizePicker',
 		'FormFileUpload',
+		'FormTokenField',
 		'LetterSpacingControl',
 		'LineHeightControl',
 		'QueryControls',
@@ -201,6 +202,7 @@ const restrictedSyntax = [
 		'TextIndentControl',
 		'ToggleGroupControl',
 		'TreeSelect',
+		'UnitControl',
 	].map( ( componentName ) => ( {
 		selector: `JSXOpeningElement[name.name="${ componentName }"] > JSXAttribute[name.name="__next40pxDefaultSize"]`,
 		message: `The \`__next40pxDefaultSize\` prop is no longer needed on \`${ componentName }\`.`,

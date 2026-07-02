@@ -391,7 +391,6 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 			<Flex gap={ 4 }>
 				<FlexItem isBlock>
 					<UnitControl
-						size="__unstable-large"
 						onChange={ ( newValue ) => {
 							onChange( {
 								...layout,

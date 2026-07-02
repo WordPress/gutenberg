@@ -17,6 +17,8 @@
     `keywords`, overlaid onto the metadata module's values. Lets a host
     supply metadata translated server-side.
 
+## 0.2.0 (2026-07-01)
+
 ## 0.1.0 (2026-06-24)
 
 ### New Features

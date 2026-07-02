@@ -19,6 +19,8 @@
 -   Update `@base-ui/react` from `1.5.0` to [`1.6.0`](https://github.com/mui/base-ui/releases/tag/v1.6.0) ([#79408](https://github.com/WordPress/gutenberg/pull/79408)).
 -   Update `--wp-ui-button-padding-block` CSS property to avoid using unitless values, which are incompatible when used in `calc` math functions ([#79786](https://github.com/WordPress/gutenberg/pull/79786)).
 
+## 0.17.0 (2026-07-01)
+
 ## 0.16.1 (2026-06-30)
 
 ### Internal
