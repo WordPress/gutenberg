@@ -4,6 +4,10 @@ inputs:
     node-version:
         description: 'Optional. The Node.js version to use. When not specified, the version specified in .nvmrc will be used.'
         required: false
+    enable-caching:
+        description: 'Whether to enable and configure caching for npm.'
+        required: true
+        default: 'true'
 
 runs:
     using: 'composite'
@@ -13,6 +17,7 @@ runs:
           with:
               node-version-file: ${{ inputs.node-version == '' && '.nvmrc' || '' }}
               node-version: ${{ inputs.node-version }}
+              package-manager-cache: ${{ inputs.enable-caching == 'false' && 'false' || 'true' }}
               check-latest: true
               cache: npm
 
@@ -44,7 +49,7 @@ runs:
         # On cache hit, we run the post-install script to match the native `npm ci` behavior.
         # An example of this is to patch `node_modules` using patch-package.
         - name: Post-install
-          if: ${{ steps.cache-node_modules.outputs.cache-hit == 'true' }}
+          if: ${{ inputs.enable-caching == 'true' && steps.cache-node_modules.outputs.cache-hit == 'true' }}
           run: |
               # Run the post-install script for the root project.
               npm run postinstall
