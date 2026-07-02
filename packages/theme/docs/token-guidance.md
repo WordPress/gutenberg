@@ -1,3 +1,5 @@
+# Design Token Guidance
+
 Design tokens are named values. They encode design decisions which describe the visual purpose of a value. Rather than referencing a raw value like `#3858e9`, a token like `--wpds-color-background-interactive-brand-strong` describes what the value is for. Tokens are delivered as CSS custom properties and consumed with `var( --wpds-* )`.
 
 ## How to pick a token
@@ -55,13 +57,13 @@ The specific design property being defined.
 
 The component or element type the token applies to.
 
-| Value         | Description                                                                                                                       |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `surface`     | Backgrounds and borders of containers, cards, panels, message bubbles, and other static layout elements. Not for clickable parts. |
+| Value         | Description                                                                                                                                   |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `surface`     | Backgrounds and borders of containers, cards, panels, message bubbles, and other static layout elements. Not for clickable parts.             |
 | `interactive` | Elements the user directly interacts with: buttons, inputs, links, checkboxes, toggles, menu items. Implies a clickable/focusable affordance. |
-| `content`     | Static content like body text and icons. Use for foreground colors where there is no interactive behavior.                        |
-| `track`       | The non-moving rail of a track-and-thumb control (scrollbar track, slider track, progressbar track).                              |
-| `thumb`       | The moving indicator of a track-and-thumb control (scrollbar thumb, slider handle, filled progress).                              |
+| `content`     | Static content like body text and icons. Use for foreground colors where there is no interactive behavior.                                    |
+| `track`       | The non-moving rail of a track-and-thumb control (scrollbar track, slider track, progressbar track).                                          |
+| `thumb`       | The moving indicator of a track-and-thumb control (scrollbar thumb, slider handle, filled progress).                                          |
 
 ### Modifier
 

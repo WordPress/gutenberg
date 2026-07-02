@@ -3,14 +3,16 @@ import { readFileSync } from 'node:fs';
 import { FORMAT_ID } from '@terrazzo/plugin-css';
 import type { Plugin } from '@terrazzo/parser';
 
+const TOKEN_GUIDANCE = readFileSync(
+	new URL( '../../docs/token-guidance.md', import.meta.url ),
+	'utf8'
+)
+	.replace( /^# .+\n+/, '' )
+	.trimEnd();
+
 function titleCase( str: string ) {
 	return str[ 0 ].toUpperCase() + str.slice( 1 );
 }
-
-const STATIC_PREAMBLE = readFileSync(
-	new URL( './preamble.md', import.meta.url ),
-	'utf8'
-).trimEnd();
 
 type TokensMap = Record< string, Record< string, string > >;
 
@@ -77,7 +79,7 @@ export default function pluginDsTokenDocs( {
 					'',
 					'# Design System Tokens reference',
 					'',
-					STATIC_PREAMBLE,
+					TOKEN_GUIDANCE,
 					'',
 					'## Semantic tokens',
 					'',
