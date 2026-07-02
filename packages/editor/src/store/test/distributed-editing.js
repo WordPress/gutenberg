@@ -2603,6 +2603,68 @@ describe( 'distributed editing session state', () => {
 		);
 	} );
 
+	it( 'clears remote avatars and pending previews when the server culls stale presence rows', () => {
+		const culledSnapshot =
+			getDistributedEditingSessionStateForPresenceSnapshotRefreshResult(
+				{
+					result: 'presence_roster_snapshot',
+					presenceRoster: {
+						status: 'recent',
+						entries: [],
+						totalKnownCount: 1,
+						hiddenCount: 0,
+						expiredCount: 0,
+						culling: {
+							applied: true,
+							deleteOnRead: true,
+							mutatesPresenceStorage: true,
+							deletedCount: 1,
+							deletedPendingPreviewCount: 1,
+						},
+					},
+				},
+				{
+					presenceRosterEntries: [
+						{
+							key: 'presence-mira',
+							displayName: 'Mira',
+							identityVisibility: 'named',
+							relationship: 'other_user',
+							freshness: 'current',
+							pendingPreview: {
+								available: true,
+								items: [
+									{
+										previewId: 'pending-preview-mira',
+										blockPath: [ 0 ],
+										changeKind: 'added_block',
+										blockName: 'core/paragraph',
+										safePreviewText: 'Remote ghost',
+									},
+								],
+							},
+						},
+					],
+					presenceRosterEmptySnapshotPreservedEntries: false,
+				}
+			);
+
+		expect( culledSnapshot ).toMatchObject( {
+			presenceRosterStatus:
+				DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.RECENT,
+			presenceRosterVisibleCount: 0,
+			presenceRosterEntries: [],
+			presenceRosterEmptySnapshotPreservedEntries: false,
+			presenceRosterCullingApplied: true,
+			presenceRosterCullingDeletedCount: 1,
+			presenceRosterCullingDeletesPresenceRows: true,
+			presenceRosterCullingMutatesPresenceStorage: true,
+		} );
+		expect( JSON.stringify( culledSnapshot ) ).not.toMatch(
+			/Remote ghost|pending-preview-mira/
+		);
+	} );
+
 	it( 'keeps protected local changes when presence heartbeat storage is unavailable', () => {
 		const normalized =
 			getDistributedEditingSessionStateForPresenceHeartbeatResult(

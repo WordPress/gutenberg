@@ -1070,6 +1070,10 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	presenceRosterTotalKnownCount: 0,
 	presenceRosterHiddenCount: 0,
 	presenceRosterExpiredCount: 0,
+	presenceRosterCullingApplied: false,
+	presenceRosterCullingDeletedCount: 0,
+	presenceRosterCullingDeletesPresenceRows: false,
+	presenceRosterCullingMutatesPresenceStorage: false,
 	presenceRosterExpiredEvidenceCarriedForward: false,
 	presenceRosterEmptySnapshotPreservedEntries: false,
 	presenceRosterRefreshStatus:
@@ -3290,6 +3294,12 @@ function normalizeDistributedEditingPresenceRosterFields( sessionState = {} ) {
 		sessionState.presenceRosterStatus,
 		sessionState.distributedEditingPresenceRoster?.status
 	);
+	const culling = normalizeObject(
+		getFirstDefined(
+			sessionState.presenceRosterCulling,
+			sessionState.distributedEditingPresenceRoster?.culling
+		)
+	);
 	let status = VALID_DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.has(
 		explicitStatus
 	)
@@ -3357,6 +3367,32 @@ function normalizeDistributedEditingPresenceRosterFields( sessionState = {} ) {
 				sessionState.distributedEditingPresenceRoster?.expired_count
 			)
 		),
+		presenceRosterCullingApplied:
+			normalizeDistributedEditingBooleanValue( culling.applied ) ||
+			Boolean( sessionState.presenceRosterCullingApplied ),
+		presenceRosterCullingDeletedCount: normalizeCount(
+			getFirstDefined(
+				culling.deletedCount,
+				culling.deleted_count,
+				sessionState.presenceRosterCullingDeletedCount
+			)
+		),
+		presenceRosterCullingDeletesPresenceRows:
+			normalizeDistributedEditingBooleanValue(
+				getFirstDefined(
+					culling.deleteOnRead,
+					culling.delete_on_read,
+					sessionState.presenceRosterCullingDeletesPresenceRows
+				)
+			),
+		presenceRosterCullingMutatesPresenceStorage:
+			normalizeDistributedEditingBooleanValue(
+				getFirstDefined(
+					culling.mutatesPresenceStorage,
+					culling.mutates_presence_storage,
+					sessionState.presenceRosterCullingMutatesPresenceStorage
+				)
+			),
 		presenceRosterExpiredEvidenceCarriedForward: Boolean(
 			getFirstDefined(
 				sessionState.presenceRosterExpiredEvidenceCarriedForward,
@@ -4717,6 +4753,10 @@ export function getDistributedEditingSessionStateForPresenceSnapshotRefreshResul
 	const rosterExpiredCount = normalizeCount(
 		getFirstDefined( roster.expiredCount, roster.expired_count )
 	);
+	const rosterCulling = normalizeObject( roster.culling );
+	const rosterCullingApplied =
+		refreshed &&
+		normalizeDistributedEditingBooleanValue( rosterCulling.applied );
 	const hasIncomingCurrentTabRosterEntry =
 		normalizedIncomingRosterEntries.some(
 			isDistributedEditingLocalHeartbeatRosterEntry
@@ -4748,6 +4788,7 @@ export function getDistributedEditingSessionStateForPresenceSnapshotRefreshResul
 	const shouldPreserveTransientEmptySnapshotEntries =
 		refreshed &&
 		rosterEntries.length === 0 &&
+		! rosterCullingApplied &&
 		preservedTransientEmptySnapshotEntries.length > 0 &&
 		! currentRosterFields.presenceRosterEmptySnapshotPreservedEntries;
 	const shouldMergeLocalHeartbeatEntryWithIncomingRoster =
@@ -4808,6 +4849,28 @@ export function getDistributedEditingSessionStateForPresenceSnapshotRefreshResul
 		presenceRosterRefreshExposesSelection: false,
 		presenceRosterExpiredEvidenceCarriedForward:
 			shouldCarryForwardExpiredRosterEvidence,
+		presenceRosterCulling: rosterCulling,
+		presenceRosterCullingApplied: rosterCullingApplied,
+		presenceRosterCullingDeletedCount: normalizeCount(
+			getFirstDefined(
+				rosterCulling.deletedCount,
+				rosterCulling.deleted_count
+			)
+		),
+		presenceRosterCullingDeletesPresenceRows:
+			normalizeDistributedEditingBooleanValue(
+				getFirstDefined(
+					rosterCulling.deleteOnRead,
+					rosterCulling.delete_on_read
+				)
+			),
+		presenceRosterCullingMutatesPresenceStorage:
+			normalizeDistributedEditingBooleanValue(
+				getFirstDefined(
+					rosterCulling.mutatesPresenceStorage,
+					rosterCulling.mutates_presence_storage
+				)
+			),
 		presenceRosterReadContractSource: normalizeNullableString(
 			getFirstDefined( readContract.source, readContract.contractSource )
 		),
