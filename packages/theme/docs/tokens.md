@@ -5,6 +5,8 @@ Do not edit directly.
 
 # Design System Tokens reference
 
+This consumer-facing guide explains how to choose semantic WordPress Design System tokens. For token source-file maintenance, see the [Design Tokens Maintainer's Guide](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/tokens/README.md).
+
 Design tokens are named values. They encode design decisions which describe the visual purpose of a value. Rather than referencing a raw value like `#3858e9`, a token like `--wpds-color-background-interactive-brand-strong` describes what the value is for. Tokens are delivered as CSS custom properties and consumed with `var( --wpds-* )`.
 
 ## How to pick a token
