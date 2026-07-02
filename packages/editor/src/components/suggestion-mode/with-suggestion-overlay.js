@@ -31,7 +31,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { useRegistry, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useCallback, useMemo, useRef } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
@@ -48,6 +48,7 @@ import { markContentDiff, stripSuggestionMarks } from './inline-formats';
 import { unlock } from '../../lock-unlock';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 import SuggestionMoveGhost from './suggestion-move-ghost';
+import { isPartOfPendingInsertion } from './store-interceptor';
 
 const BLOCK_EDITOR_STORE_NAME = 'core/block-editor';
 
@@ -226,9 +227,21 @@ function mergeOverlayAttributes( base, overlay ) {
  * @param {Object}                        args.props     Props to forward to `BlockEdit`.
  */
 function SuggestingBlockEdit( { BlockEdit, props } ) {
-	const { clientId, name, attributes } = props;
-	const { entries, captureBaseline, setOverlayAttributes } =
-		useSuggestionOverlay();
+	const { clientId, name, attributes, setAttributes } = props;
+	const {
+		entries,
+		captureBaseline,
+		setOverlayAttributes,
+		isDeferredInsertion,
+	} = useSuggestionOverlay();
+
+	// Registry handle for the write-through check below; the live block
+	// state is read at call time, not render time, so a block that was
+	// tagged `pending-insert` a moment ago is honored even before the outer
+	// wrapper's `useSelect` has re-rendered it into the pass-through branch.
+	// Optional-chained because tests mount the HOC without a block-editor
+	// store.
+	const registry = useRegistry();
 
 	// Track the latest attributes via a ref so the wrapped `setAttributes`
 	// callback remains stable. Blocks sometimes invoke `setAttributes` from
@@ -275,6 +288,28 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 
 	const wrappedSetAttributes = useCallback(
 		( nextAttributes ) => {
+			/*
+			 * Edits inside a block that IS the suggestion write through to
+			 * the real attributes instead of the overlay:
+			 * - A deferred insertion (an empty default block the interceptor
+			 *   hasn't registered yet) receives its first content this way,
+			 *   which is what triggers the interceptor to register the whole
+			 *   block as a single `block-insert-after` suggestion.
+			 * - A block tagged `pending-insert` (or nested inside one) has no
+			 *   "before" state to preserve; the interceptor adopts the change
+			 *   as the block's new baseline. Checked against the live store
+			 *   because the outer pass-through branch only catches up after
+			 *   its `useSelect` re-renders.
+			 */
+			const blockEditor = registry?.select?.( blockEditorStore );
+			if (
+				isDeferredInsertion( clientId ) ||
+				( blockEditor &&
+					isPartOfPendingInsertion( blockEditor, clientId ) )
+			) {
+				setAttributes( nextAttributes );
+				return;
+			}
 			// First overlay write for this block snapshots the current
 			// attributes as the baseline; subsequent writes only record
 			// overlay deltas. This lets the diff renderer below compare
@@ -291,7 +326,16 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 				stripMarksFromIncoming( nextAttributes )
 			);
 		},
-		[ clientId, name, captureBaseline, setOverlayAttributes, entryExists ]
+		[
+			clientId,
+			name,
+			captureBaseline,
+			setOverlayAttributes,
+			entryExists,
+			isDeferredInsertion,
+			setAttributes,
+			registry,
+		]
 	);
 
 	const mergedAttributes = useMemo( () => {
@@ -345,17 +389,21 @@ const withSuggestionOverlay = createHigherOrderComponent(
 			);
 			const isPendingInsert = useSelect(
 				( select ) =>
-					select( blockEditorStore )?.getBlockAttributes?.( clientId )
-						?.metadata?.suggestion?.type === 'pending-insert',
+					isPartOfPendingInsertion(
+						select( blockEditorStore ),
+						clientId
+					),
 				[ clientId ]
 			);
 
 			// A pending-insert block has no "before" state to preserve — the
-			// block itself is the suggestion. Edits to it write through to
-			// the real attributes (skipping the overlay) so the content
-			// syncs via CRDT and renders on the reviewer's canvas as part
-			// of the preview, instead of being trapped in the suggester's
-			// local overlay.
+			// block itself is the suggestion. Edits to it (and to blocks
+			// nested inside it — the children of a suggested-in Group are
+			// part of the Group's insertion) write through to the real
+			// attributes (skipping the overlay) so the content syncs via
+			// CRDT and renders on the reviewer's canvas as part of the
+			// preview, instead of being trapped in the suggester's local
+			// overlay.
 			if ( ! isSuggestMode || isPendingInsert ) {
 				return <BlockEdit { ...props } />;
 			}

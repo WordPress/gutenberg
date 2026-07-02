@@ -424,6 +424,34 @@ function withSuggestionMarker( currentMetadata, marker ) {
 }
 
 /**
+ * Whether a block is part of a pending block-insertion suggestion: either the
+ * block itself carries a `pending-insert` marker, or one of its ancestors
+ * does (the children of a suggested-in Group are part of the Group's
+ * insertion, not suggestions of their own).
+ *
+ * Edits inside such a block are part of the insertion — the block has no
+ * "before" state to preserve — so callers let them write through to the real
+ * attributes instead of opening a separate suggestion.
+ *
+ * @param {Object} blockEditor Block-editor selectors (anything exposing
+ *                             `getBlockAttributes` and `getBlockParents`).
+ * @param {string} clientId    Block client ID.
+ * @return {boolean} True when the block or an ancestor is a pending insert.
+ */
+function isPartOfPendingInsertion( blockEditor, clientId ) {
+	if ( ! blockEditor ) {
+		return false;
+	}
+	const markerType = ( id ) =>
+		blockEditor.getBlockAttributes?.( id )?.metadata?.suggestion?.type;
+	if ( markerType( clientId ) === 'pending-insert' ) {
+		return true;
+	}
+	const parents = blockEditor.getBlockParents?.( clientId ) ?? [];
+	return parents.some( ( id ) => markerType( id ) === 'pending-insert' );
+}
+
+/**
  * Filter a list of removed clientIds down to the topmost ancestors — the
  * parents whose subtree contains the rest. Re-inserting a top-level removed
  * block restores its descendants automatically; re-inserting both a parent
@@ -635,6 +663,10 @@ export default function SuggestionStoreInterceptor() {
 		setOverlayAttributes,
 		setStructuralOp,
 		consumeInterceptorBypass,
+		markDeferredInsertion,
+		unmarkDeferredInsertion,
+		isDeferredInsertion,
+		clearDeferredInsertions,
 	} = useSuggestionOverlay();
 	const registry = useRegistry();
 
@@ -663,6 +695,18 @@ export default function SuggestionStoreInterceptor() {
 	const consumeInterceptorBypassRef = useRef( consumeInterceptorBypass );
 	consumeInterceptorBypassRef.current = consumeInterceptorBypass;
 
+	const markDeferredInsertionRef = useRef( markDeferredInsertion );
+	markDeferredInsertionRef.current = markDeferredInsertion;
+
+	const unmarkDeferredInsertionRef = useRef( unmarkDeferredInsertion );
+	unmarkDeferredInsertionRef.current = unmarkDeferredInsertion;
+
+	const isDeferredInsertionRef = useRef( isDeferredInsertion );
+	isDeferredInsertionRef.current = isDeferredInsertion;
+
+	const clearDeferredInsertionsRef = useRef( clearDeferredInsertions );
+	clearDeferredInsertionsRef.current = clearDeferredInsertions;
+
 	useEffect( () => {
 		if ( ! isSuggestMode ) {
 			return undefined;
@@ -686,6 +730,11 @@ export default function SuggestionStoreInterceptor() {
 		// for collaborator presence. `null` for anonymous / unresolved
 		// users falls back to the suggestion-green default in CSS.
 		const currentUserId = coreSelect?.getCurrentUser?.()?.id ?? null;
+
+		// A block deferred in a previous Suggest session is seeded into the
+		// snapshot below like any other pre-existing block, so stale entries
+		// must not survive into this session.
+		clearDeferredInsertionsRef.current?.();
 
 		// Snapshot of every block's attributes at the moment Suggest mode
 		// activated. New blocks added during the session are slotted in as
@@ -756,12 +805,18 @@ export default function SuggestionStoreInterceptor() {
 					// empty block the user hasn't put anything into is not a
 					// suggestion yet. Skip WITHOUT recording a snapshot so the
 					// next fire — once the block has content — re-enters this
-					// branch and registers the insertion.
+					// branch and registers the insertion. The deferral is
+					// published so the overlay HOC (and the inline suggestion
+					// keyboards) route the block's first edit through to the
+					// real attributes instead of opening a separate
+					// suggestion for it.
 					if ( block && isUnmodifiedDefaultBlock( block ) ) {
+						markDeferredInsertionRef.current?.( clientId );
 						continue;
 					}
 
 					snapshot.set( clientId, current );
+					unmarkDeferredInsertionRef.current?.( clientId );
 					const parentClientId =
 						blockEditor.getBlockRootClientId?.( clientId ) || null;
 					const parentExisted =
@@ -833,6 +888,19 @@ export default function SuggestionStoreInterceptor() {
 
 				const delta = diffAttributes( previous, current );
 				if ( ! delta ) {
+					snapshot.set( clientId, current );
+					continue;
+				}
+
+				// Edits inside a block that is itself a pending insertion —
+				// or inside a descendant of one — are part of the insertion
+				// suggestion, not a suggestion of their own: the block has
+				// no "before" state to preserve. Adopt the change as the new
+				// baseline so the content writes through (and syncs to
+				// collaborators) instead of being diverted into the overlay,
+				// where it would surface as a second note next to the
+				// "Insert block" one.
+				if ( isPartOfPendingInsertion( blockEditor, clientId ) ) {
 					snapshot.set( clientId, current );
 					continue;
 				}
@@ -970,6 +1038,14 @@ export default function SuggestionStoreInterceptor() {
 			const removedIds = [];
 			for ( const clientId of tree.blocksByClientId.keys() ) {
 				if ( ! live.has( clientId ) ) {
+					// A deferred empty placeholder (see the new-block branch)
+					// was never registered as a suggestion, so its removal
+					// isn't one either — deleting an empty just-added
+					// paragraph must not propose removing it. Forget it.
+					if ( isDeferredInsertionRef.current?.( clientId ) ) {
+						unmarkDeferredInsertionRef.current?.( clientId );
+						continue;
+					}
 					// "Apply / reject landing": when another client
 					// accepts a `pending-remove` — or rejects a
 					// `pending-insert`, which also dispatches
@@ -1120,6 +1196,7 @@ export {
 	adoptSystemMetadata,
 	stripSystemMetadata,
 	isAcceptedSuggestionChange,
+	isPartOfPendingInsertion,
 	captureTreeSnapshot,
 	topLevelRemoved,
 	withSuggestionMarker,
