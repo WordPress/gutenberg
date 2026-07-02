@@ -174,5 +174,91 @@ add_action(
 				),
 			)
 		);
+
+		// The three pattern blocks below share content/attributes/render_callback
+		// and differ only in how the editor locks and previews the structure.
+		$pattern_markup = '<!-- wp:group {"layout":{"type":"constrained"}} --><div class="wp-block-group">'
+			. '<!-- wp:heading --><h2 class="wp-block-heading">Title</h2><!-- /wp:heading -->'
+			. '<!-- wp:paragraph --><p>Body text.</p><!-- /wp:paragraph -->'
+			. '</div><!-- /wp:group -->';
+
+		$pattern_attributes = array(
+			'variant'  => array(
+				'type'    => 'string',
+				'enum'    => array( 'default', 'highlight' ),
+				'default' => 'default',
+				'label'   => 'Variant',
+			),
+			'featured' => array(
+				'type'    => 'boolean',
+				'default' => false,
+				'label'   => 'Featured',
+			),
+		);
+
+		// $content is the rendered inner blocks. It is empty in the editor SSR
+		// context (the block-renderer REST endpoint builds the block with no inner
+		// content): there, SSR-islands mode emits a slot placeholder so the editor
+		// can portal the editable islands into the shell. One slot per top-level
+		// pattern block; this pattern is a single group, so one slot at index 0.
+		// On the frontend (not a REST request) an empty block falls back to the
+		// pattern, so the raw slot never leaks. `variant` sets a class, `featured`
+		// a ribbon.
+		$render_pattern_block = static function ( $attributes, $content ) use ( $pattern_markup ) {
+			if ( '' !== trim( (string) $content ) ) {
+				$body = $content;
+			} elseif ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+				$body = '<wp-inner-block-slot data-slot-index="0" style="display:contents"></wp-inner-block-slot>';
+			} else {
+				$body = do_blocks( $pattern_markup );
+			}
+			$variant  = isset( $attributes['variant'] ) ? sanitize_html_class( $attributes['variant'] ) : 'default';
+			$featured = ! empty( $attributes['featured'] );
+			$classes  = 'pattern-block-demo is-variant-' . $variant . ( $featured ? ' is-featured' : '' );
+			$wrapper  = get_block_wrapper_attributes( array( 'class' => $classes ) );
+			$ribbon   = $featured ? '<p class="pattern-block-demo__ribbon"><strong>Featured</strong></p>' : '';
+
+			return sprintf( '<div %1$s>%2$s%3$s</div>', $wrapper, $ribbon, $body );
+		};
+
+		// SSR-islands: a pattern block with a render_callback renders its PHP shell
+		// server-side in the editor and portals the editable pattern blocks into its
+		// slots, so the editor matches the frontend (WYSIWYG) while the islands stay
+		// editable in the canvas.
+		register_block_type(
+			'test/php-only-pattern-ssr',
+			array(
+				'title'           => 'PHP-only pattern: SSR-islands (WYSIWYG, editable)',
+				'icon'            => 'layout',
+				'category'        => 'widgets',
+				'description'     => 'The PHP wrapper is rendered server-side in the editor with the editable pattern blocks portalled into it, so the editor matches the frontend while the content stays editable in the canvas.',
+				'keywords'        => array( 'pattern', 'autotest' ),
+				'attributes'      => $pattern_attributes,
+				'supports'        => array(
+					'autoRegister' => true,
+					'color'        => array(
+						'background' => true,
+						'text'       => true,
+					),
+				),
+				'pattern'         => $pattern_markup,
+				'render_callback' => $render_pattern_block,
+			)
+		);
+
+		// Demo styles for the `variant`/`featured` output, in editor and frontend.
+		add_action(
+			'enqueue_block_assets',
+			static function () {
+				wp_register_style( 'pattern-block-demo', false );
+				wp_enqueue_style( 'pattern-block-demo' );
+				wp_add_inline_style(
+					'pattern-block-demo',
+					'.pattern-block-demo.is-variant-highlight{background:#fffbe6;border:2px solid #f0b849;padding:1em;}'
+					. '.pattern-block-demo.is-featured{box-shadow:0 0 0 3px #3858e9;}'
+					. '.pattern-block-demo__ribbon{margin:0 0 .5em;color:#3858e9;}'
+				);
+			}
+		);
 	}
 );
