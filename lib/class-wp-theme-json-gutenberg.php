@@ -1278,12 +1278,36 @@ class WP_Theme_JSON_Gutenberg {
 		if ( ! str_contains( $selector, ',' ) ) {
 			return $selector . $to_append;
 		}
+
+		/**
+		 * Check for an opportunity to skip the more-costly selector splitting.
+		 * This should be possible if there are no comments, strings, functions,
+		 * URLs, escapes, or comment declaration openers (CDOs).
+		 *
+		 * Note that this means the fast-path will not apply for selectors like
+		 * the following incomplete list:
+		 *
+		 *  - `[class ~= "wide"]`
+		 *  - `.wp-block:is(.is-style-a, .is-style-b)`
+		 *  - `:nth-child(1)`
+		 *
+		 * These syntax forms all present opportunities where a comma may not
+		 * separate selectors. If none of the start characters are present,
+		 * there should be no way for a comma to mean anything other than a
+		 * comma token. The exception are syntax errors, which are not handled here.
+		 *
+		 * @see https://www.w3.org/TR/css-syntax-3/#parse-comma-separated-list-of-component-values
+		 */
+		if ( strlen( $selector ) === strcspn( $selector, '/\'"(<\\' ) ) {
+			return str_replace( ',', $to_append . ',', $selector ) . $to_append;
+		}
+
 		$new_selectors = array();
 		$selectors     = static::split_selector_list( $selector );
 		foreach ( $selectors as $sel ) {
 			$new_selectors[] = $sel . $to_append;
 		}
-		return implode( ',', $new_selectors );
+		return implode( ', ', $new_selectors );
 	}
 
 	/**
@@ -1304,8 +1328,26 @@ class WP_Theme_JSON_Gutenberg {
 			return $to_prepend . $selector;
 		}
 
-		// Gate fast path, won't work for all selectors
-		if ( ! str_contains( $selector, '(' ) ) {
+		/**
+		 * Check for an opportunity to skip the more-costly selector splitting.
+		 * This should be possible if there are no comments, strings, functions,
+		 * URLs, escapes, or comment declaration openers (CDOs).
+		 *
+		 * Note that this means the fast-path will not apply for selectors like
+		 * the following incomplete list:
+		 *
+		 *  - `[class ~= "wide"]`
+		 *  - `.wp-block:is(.is-style-a, .is-style-b)`
+		 *  - `:nth-child(1)`
+		 *
+		 * These syntax forms all present opportunities where a comma may not
+		 * separate selectors. If none of the start characters are present,
+		 * there should be no way for a comma to mean anything other than a
+		 * comma token. The exception are syntax errors, which are not handled here.
+		 *
+		 * @see https://www.w3.org/TR/css-syntax-3/#parse-comma-separated-list-of-component-values
+		 */
+		if ( strlen( $selector ) === strcspn( $selector, '/\'"(<\\' ) ) {
 			return $to_prepend . str_replace( ',', ',' . $to_prepend, $selector );
 		}
 
@@ -1315,42 +1357,162 @@ class WP_Theme_JSON_Gutenberg {
 			$new_selectors[] = $to_prepend . $sel;
 		}
 
-		return implode( ',', $new_selectors );
+		return implode( ', ', $new_selectors );
 	}
 
 	/**
-	 * Splits a selector list by top-level commas.
+	 * Splits a selector list into separate selectors.
+	 *
+	 * While selectors are joined by commas, not all commas separate top-level selectors.
+	 * This method only separates top-level selectors, so some commas may appear inside
+	 * strings, nested selectors, and comments. Leading and trailing CSS whitespace is
+	 * trimmed from the returned list items.
+	 *
+	 * Non-selector content, such as comments, are retained in the list in the same item
+	 * as the selector content they follow.
+	 *
+	 * Example:
+	 *
+	 *     array( '.wp-block' )    === self::split_selector_list( '.wp-block' );
+	 *     array( '.one', '.two' ) === self::split_selector_list( '.one, .two' );
+	 *
+	 *     // Nested selector lists are retained within their containing selector.
+	 *     array( ':is(.a, .b)', 'c' ) === self::split_selector_list( ':is(.a, .b), .c' );
+	 *
+	 *     // Commas within strings do not separate selectors.
+	 *     $selectors   = self::split_selector_list( '[data-label="Save, continue"],.fallback' );
+	 *     $selectors === array( '[data-label="Save, continue"]', '.fallback' )
+	 *
+	 *     array( 'lang(zh, "*-hant")', '.foo' ) === self::split_selector_list( 'lang(zh, "*-hant"), .foo' );
+	 *
+	 *     // Identifiers may contain escaped commas.
+	 *     array( '.foo\,bar', '.baz' ) === self::split_selector_list( '.foo\,bar,.baz' );
+	 *
+	 *     // Comments stay with the selector they follow.
+	 *     array( '.a /* a, the first *\/', '.b' ) === self::split_selector_list( '.a /* a, the first *\/,.b' );
+	 *
+	 * @see https://www.w3.org/TR/selectors/#parse-selector
+	 * @see https://www.w3.org/TR/css-syntax-3/
 	 *
 	 * @param string $selector CSS selector list.
 	 * @return string[] Selectors.
 	 */
-	protected static function split_selector_list( $selector ) {
+	protected static function split_selector_list( $selector ): array {
 		if ( ! str_contains( $selector, ',' ) ) {
-			return array( $selector );
+			// See note on trimming CSS whitespace in main loop.
+			return array( trim( $selector, " \t\n" ) );
 		}
 
 		$selectors         = array();
-		$current_selector  = '';
-		$parentheses_depth = 0;
 		$selector_length   = strlen( $selector );
+		$parentheses_depth = 0;
+		$at                = 0;
+		$was_at            = 0;
 
-		for ( $i = 0; $i < $selector_length; $i++ ) {
-			$char = $selector[ $i ];
+		while ( $at < $selector_length ) {
+			$next_at = $at + strcspn( $selector, '/,\'"()<-\\', $at );
+			if ( $next_at >= $selector_length ) {
+				break;
+			}
 
-			if ( '(' === $char ) {
-				++$parentheses_depth;
-			} elseif ( ')' === $char && $parentheses_depth > 0 ) {
-				--$parentheses_depth;
-			} elseif ( ',' === $char && 0 === $parentheses_depth ) {
-				$selectors[]      = $current_selector;
-				$current_selector = '';
+			$next_cp = $selector[ $next_at ];
+
+			// Escaped syntax characters do not act as delimiters.
+			if ( '\\' === $next_cp ) {
+				$at = min( $next_at + 2, $selector_length );
 				continue;
 			}
 
-			$current_selector .= $char;
+			/*
+			 * Start of a parenthesized expression, which maintains a stack of parentheses.
+			 * For the sake of this function, no selector list will be split inside parentheses.
+			 * Therefore it’s possible to jump ahead until this list completes.
+			 */
+			if ( '(' === $next_cp || ')' === $next_cp ) {
+				$parentheses_depth += '(' === $next_cp ? 1 : -1;
+				$at                 = $next_at + 1;
+				continue;
+			}
+
+			// Start of a string, which will be incorporated into the selector in which it’s found.
+			if ( "'" === $next_cp || '"' === $next_cp ) {
+				$end_of_string = $next_at + 1;
+				while ( $end_of_string < $selector_length ) {
+					$end_of_string += strcspn( $selector, "{$next_cp}\\", $end_of_string );
+					if ( $end_of_string >= $selector_length ) {
+						break;
+					}
+
+					$end_cp = $selector[ $end_of_string ];
+
+					// Skip escaped characters.
+					if ( '\\' === $end_cp ) {
+						$end_of_string = $end_of_string + 2;
+						continue;
+					}
+
+					if ( $next_cp === $end_cp ) {
+						++$end_of_string;
+						break;
+					}
+
+					++$end_of_string;
+				}
+
+				$at = $end_of_string;
+				continue;
+			}
+
+			// Start of a comment, which will be incorporated into the selector in which it’s found.
+			if ( '/' === $next_cp && ( $next_at + 1 ) < $selector_length && '*' === $selector[ $next_at + 1 ] ) {
+				$comment_end_at = strpos( $selector, '*/', $next_at + 1 );
+				$is_terminated  = false !== $comment_end_at;
+				$after_comment  = $is_terminated ? $comment_end_at + 2 : strlen( $selector );
+				$at             = $after_comment;
+				continue;
+			}
+
+			// Start of a CDO or CDC, which will be incorporated into the selector in which it’s found.
+			if (
+				( '<' === $next_cp && 0 === substr_compare( $selector, '<!--', $next_at, 4 ) ) ||
+				( '-' === $next_cp && 0 === substr_compare( $selector, '-->', $next_at, 3 ) )
+			) {
+				$at = $next_at + ( '<' === $next_cp ? 4 : 3 );
+				continue;
+			}
+
+			// Everything else is either a comma token or part of a selector.
+			if ( ',' === $next_cp && 0 === $parentheses_depth ) {
+				/**
+				 * Trim each selector so that downstream code doesn’t see whitespace
+				 * as the first character in a selector and get confused.
+				 *
+				 * There is inconsistency in this because comments and other syntax
+				 * are included which are also not part of the selector itself, but
+				 * a tradeoff is made between removing common syntax which carries
+				 * no meaning and rarer syntax which leaves auxiliary information.
+				 *
+				 * > A newline, U+0009 CHARACTER TABULATION, or U+0020 SPACE.
+				 * > Note that U+000D CARRIAGE RETURN and U+000C FORM FEED are
+				 * > not included in this definition, as they are converted
+				 * > to U+000A LINE FEED during preprocessing.
+				 *
+				 * @see https://www.w3.org/TR/css-syntax/#whitespace
+				 * @see https://www.w3.org/TR/css-syntax/#newline
+				 */
+				$selectors[] = trim( substr( $selector, $was_at, $next_at - $was_at ), " \t\n" );
+				$at          = $next_at + 1;
+				$was_at      = $at;
+				continue;
+			}
+
+			$at = $next_at + 1;
 		}
 
-		$selectors[] = $current_selector;
+		if ( $was_at < $selector_length ) {
+			// See note on trimming CSS whitespace in main loop.
+			$selectors[] = trim( substr( $selector, $was_at ), " \t\n" );
+		}
 
 		return $selectors;
 	}
@@ -2338,8 +2500,6 @@ class WP_Theme_JSON_Gutenberg {
 		$selectors_scoped = array();
 		foreach ( $scopes as $outer ) {
 			foreach ( $selectors as $inner ) {
-				$outer = trim( $outer );
-				$inner = trim( $inner );
 				if ( ! empty( $outer ) && ! empty( $inner ) ) {
 					$selectors_scoped[] = $outer . ' ' . $inner;
 				} elseif ( empty( $outer ) ) {
@@ -5461,7 +5621,7 @@ class WP_Theme_JSON_Gutenberg {
 			);
 		}
 
-		return implode( ',', $result );
+		return implode( ', ', $result );
 	}
 
 	/**
@@ -5490,8 +5650,7 @@ class WP_Theme_JSON_Gutenberg {
 		$selector_parts  = static::split_selector_list( $feature_selector );
 		$selector_parts  = array_map(
 			static function ( $selector ) use ( $variation_class ) {
-				$selector = trim( $selector );
-				$prefix   = $variation_class . ' ';
+				$prefix = $variation_class . ' ';
 
 				if ( str_starts_with( $selector, $prefix ) ) {
 					return substr( $selector, strlen( $prefix ) );
@@ -5504,7 +5663,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		return static::get_block_style_variation_selector(
 			$variation_name,
-			implode( ',', $selector_parts )
+			implode( ', ', $selector_parts )
 		);
 	}
 

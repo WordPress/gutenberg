@@ -7,7 +7,6 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import DataFormPostSummary from './dataform-post-summary';
 import PluginPostStatusInfo from '../plugin-post-status-info';
 import PostAuthorPanel from '../post-author/panel';
 import PostCardPanel from '../post-card-panel';
@@ -37,26 +36,6 @@ import PostTrash from '../post-trash';
 const PANEL_NAME = 'post-status';
 
 export default function PostSummary( { onActionPerformed } ) {
-	const postType = useSelect(
-		( select ) => select( editorStore ).getCurrentPostType(),
-		[]
-	);
-	if (
-		window?.__experimentalDataFormInspector &&
-		[
-			'page',
-			'post',
-			'wp_block',
-			'wp_template',
-			'wp_template_part',
-		].includes( postType )
-	) {
-		return <DataFormPostSummary onActionPerformed={ onActionPerformed } />;
-	}
-	return <ClassicPostSummary onActionPerformed={ onActionPerformed } />;
-}
-
-function ClassicPostSummary( { onActionPerformed } ) {
 	const { isRemovedPostStatusPanel, postType, postId } = useSelect(
 		( select ) => {
 			// We use isEditorPanelRemoved to hide the panel if it was programmatically removed. We do

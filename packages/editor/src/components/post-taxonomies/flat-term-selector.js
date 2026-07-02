@@ -279,7 +279,6 @@ export function FlatTermSelector( { slug } ) {
 	return (
 		<Stack direction="column" gap="lg">
 			<FormTokenField
-				__next40pxDefaultSize
 				value={ values }
 				suggestions={ suggestions }
 				onChange={ onChange }

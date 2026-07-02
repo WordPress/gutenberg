@@ -47,7 +47,7 @@ function gutenberg_site_editor_enable_admin_bar() {
 
 	$admin_color = get_user_option( 'admin_color' );
 	if ( empty( $admin_color ) ) {
-		$admin_color = 'fresh';
+		$admin_color = 'modern';
 	}
 	$admin_color_class = 'admin-color-' . sanitize_html_class( $admin_color );
 
