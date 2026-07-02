@@ -12,12 +12,14 @@ describe( 'Interactivity API', () => {
 			expect( splitStatements( '' ) ).toBeNull();
 		} );
 
-		it( 'should return null for strings without semicolons', () => {
-			expect( splitStatements( 'abc' ) ).toBeNull();
-			expect( splitStatements( 'context.isPinned' ) ).toBeNull();
+		it( 'should return the expression as a single statement when there are no semicolons', () => {
+			expect( splitStatements( 'abc' ) ).toEqual( [ 'abc' ] );
+			expect( splitStatements( 'context.isPinned' ) ).toEqual( [
+				'context.isPinned',
+			] );
 			expect(
 				splitStatements( 'context.currentUserId !== context.authorId' )
-			).toBeNull();
+			).toEqual( [ 'context.currentUserId !== context.authorId' ] );
 		} );
 
 		it( 'should split simple semicolon-delimited statements', () => {
