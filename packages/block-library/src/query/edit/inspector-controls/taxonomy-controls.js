@@ -4,10 +4,11 @@
 import {
 	FormTokenField,
 	__experimentalVStack as VStack,
+	ToggleControl,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { useState, useEffect, Fragment } from '@wordpress/element';
+import { useState, useEffect, Fragment, useMemo } from '@wordpress/element';
 import { useDebounce } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
 import { sprintf, __ } from '@wordpress/i18n';
@@ -48,16 +49,146 @@ const getTermIdByTermValue = ( terms, termValue ) => {
 	)?.id;
 };
 
-export function TaxonomyControls( { onChange, query } ) {
+export function TaxonomyControls( { onChange, query, context } ) {
 	const { postType, taxQuery } = query;
-
+	const { postId } = context;
 	const taxonomies = useTaxonomies( postType );
+
+	const currentPost = useSelect(
+		( select ) => {
+			if ( ! postId ) {
+				return null;
+			}
+			select( coreStore ).getEditedEntityRecord(
+				'postType',
+				postType,
+				postId
+			);
+		},
+		[ postType, postId ]
+	);
+
+	const postTypeObject = useSelect(
+		( select ) => select( coreStore ).getPostType( postType ),
+		[ postType ]
+	);
+
+	const CurrentPostTerms = useMemo(
+		() =>
+			( taxonomies || [] ).reduce( ( termsByTaxonomy, taxonomy ) => {
+				const restBase = taxonomy.rest_base || taxonomy.slug;
+				termsByTaxonomy[ taxonomy.slug ] =
+					currentPost?.[ restBase ] || [];
+				return termsByTaxonomy;
+			}, {} ),
+		[ currentPost, taxonomies ]
+	);
+
+	useEffect( () => {
+		if (
+			! postId ||
+			! taxQuery?.__experimentalSameTerm ||
+			! taxonomies?.length
+		) {
+			return;
+		}
+
+		const nextInclude = {
+			...taxQuery?.include,
+		};
+
+		let hasChanged = false;
+
+		const nextQueryUpdates = {};
+
+		for ( const taxonomy of taxonomies ) {
+			const termIds = CurrentPostTerms?.[ taxonomy.slug ] || [];
+
+			const existingIds = taxQuery?.include?.[ taxonomy.slug ] || [];
+
+			const isSame =
+				existingIds.length === termIds.length &&
+				existingIds.every( ( id ) => termIds.includes( id ) );
+
+			if ( isSame ) {
+				continue;
+			}
+
+			if ( termIds?.length ) {
+				nextInclude[ taxonomy.slug ] = termIds;
+			} else {
+				delete nextInclude[ taxonomy.slug ];
+			}
+			hasChanged = true;
+
+			const restBase = taxonomy.rest_base || taxonomy.slug;
+
+			if ( termIds.length ) {
+				nextQueryUpdates[ restBase ] = termIds;
+			} else {
+				nextQueryUpdates[ restBase ] = [];
+			}
+		}
+
+		if ( ! hasChanged ) {
+			return;
+		}
+
+		const nextExclude = query.exclude?.includes( postId )
+			? query.exclude
+			: [ ...( query.exclude || [] ), postId ];
+
+		onChange( {
+			...nextQueryUpdates,
+			exclude: nextExclude,
+			taxQuery: {
+				...taxQuery,
+				include: nextInclude,
+				__experimentalSameTerm: true,
+			},
+		} );
+	}, [ CurrentPostTerms, onChange, postId, taxQuery, taxonomies ] );
+
 	if ( ! taxonomies?.length ) {
 		return null;
 	}
-
+	const label = sprintf(
+		/* translators: %s: Post type plural name */
+		__( 'Show related %s' ),
+		postTypeObject.labels.name.toLowerCase()
+	);
 	return (
 		<VStack spacing={ 4 }>
+			<ToggleControl
+				label={ label }
+				checked={ !! taxQuery?.__experimentalSameTerm }
+				onChange={ ( value ) => {
+					onChange(
+						value
+							? {
+									taxQuery: {
+										...taxQuery,
+										__experimentalSameTerm: true,
+									},
+							  }
+							: {
+									taxQuery: undefined,
+									exclude: ( query.exclude || [] ).filter(
+										( id ) => id !== postId
+									),
+									...Object.fromEntries(
+										( taxonomies || [] ).map(
+											( taxonomy ) => [
+												taxonomy.rest_base ||
+													taxonomy.slug,
+												[],
+											]
+										)
+									),
+							  }
+					);
+				} }
+			/>
 			{ taxonomies.map( ( taxonomy ) => {
 				const includeTermIds =
 					taxQuery?.include?.[ taxonomy.slug ] || [];
@@ -100,6 +231,7 @@ export function TaxonomyControls( { onChange, query } ) {
 								onChangeTaxQuery( value, 'include' )
 							}
 							label={ taxonomy.name }
+							isSameTerm={ !! taxQuery?.__experimentalSameTerm }
 						/>
 						<TaxonomyItem
 							taxonomy={ taxonomy }
@@ -112,6 +244,7 @@ export function TaxonomyControls( { onChange, query } ) {
 								/* translators: %s: taxonomy name */
 								sprintf( __( 'Exclude: %s' ), taxonomy.name )
 							}
+							isSameTerm={ !! taxQuery?.__experimentalSameTerm }
 						/>
 					</Fragment>
 				);
@@ -129,6 +262,7 @@ export function TaxonomyControls( { onChange, query } ) {
  * @param {number[]} props.oppositeTermIds An array with the opposite control's term ids (to exclude from suggestions).
  * @param {Function} props.onChange        Callback `onChange` function.
  * @param {string}   props.label           Label of the control.
+ * @param {boolean}  props.isSameTerm      Whether to show related posts.
  * @return {React.JSX.Element} The rendered component.
  */
 function TaxonomyItem( {
@@ -137,6 +271,7 @@ function TaxonomyItem( {
 	oppositeTermIds,
 	onChange,
 	label,
+	isSameTerm,
 } ) {
 	const [ search, setSearch ] = useState( '' );
 	const [ value, setValue ] = useState( EMPTY_ARRAY );
@@ -244,6 +379,7 @@ function TaxonomyItem( {
 				onChange={ onTermsChange }
 				help=""
 				__next40pxDefaultSize
+				disabled={ isSameTerm }
 			/>
 		</div>
 	);

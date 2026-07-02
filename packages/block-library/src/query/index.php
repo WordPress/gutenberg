@@ -150,3 +150,66 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 }
 
 add_filter( 'render_block_data', 'block_core_query_disable_enhanced_pagination', 10, 1 );
+
+/**
+ * Modify a Query block's query to include posts sharing the same terms
+ * (categories, or tags) as the current post.
+ *
+ * When `__experimentalSameTerm` is enabled in the block's `taxQuery` context,
+ * this function adds a `tax_query` so the Query block fetches only posts
+ * that share terms with the current post. This allows editors and theme authors
+ * to implement “Related Posts” functionality directly in the editor without
+ * manually specifying terms.
+ *
+ * @since 23.0.0
+ *
+ * @param array $query The original query arguments for the Query block.
+ * @param object $block The parsed block object, containing context and attributes.
+ * @return array Returns the modified query with `tax_query` applied if needed.
+ */
+function block_core_query_use_same_term( $query, $block ) {
+
+	if (
+		empty( $block->context['query']['taxQuery']['__experimentalSameTerm'] )
+	) {
+		return $query;
+	}
+
+	if ( ! is_singular() ) {
+		return $query;
+	}
+
+	$post_id = get_the_ID();
+
+	$tax_query = array();
+
+	$taxonomies = get_object_taxonomies( get_post_type( $post_id ) );
+
+	foreach ( $taxonomies as $taxonomy ) {
+		$terms = wp_get_post_terms(
+			$post_id,
+			$taxonomy,
+			array(
+				'fields' => 'ids',
+			)
+		);
+
+		if ( empty( $terms ) ) {
+			continue;
+		}
+
+		$tax_query[] = array(
+			'taxonomy' => $taxonomy,
+			'field'    => 'term_id',
+			'terms'    => $terms,
+		);
+	}
+
+	if ( ! empty( $tax_query ) ) {
+		$query['tax_query'] = $tax_query;
+	}
+
+	return $query;
+}
+
+add_filter( 'query_loop_block_query_vars', 'block_core_query_use_same_term', 10, 2 );

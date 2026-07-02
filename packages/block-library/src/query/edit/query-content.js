@@ -150,6 +150,7 @@ export default function QueryContent( {
 					setAttributes={ setAttributes }
 					clientId={ clientId }
 					isSingular={ isSingular }
+					context={ context }
 				/>
 			</InspectorControls>
 			<InspectorControls group="advanced">
