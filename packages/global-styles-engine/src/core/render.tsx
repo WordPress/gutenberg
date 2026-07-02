@@ -48,19 +48,19 @@ import { normalizeStyleStateAliases } from '../style-state-back-compat';
 interface PresetMetadata {
 	path: string[];
 	valueKey?: string;
-	valueFunc?: (preset: any, settings: any) => string | number | null;
+	valueFunc?: ( preset: any, settings: any ) => string | number | null;
 	cssVarInfix: string;
-	classes?: Array<{
+	classes?: Array< {
 		classSuffix: string;
 		propertyName: string;
-	}>;
+	} >;
 }
 
 /**
  * Preset collection by origin
  */
 interface PresetsByOrigin {
-	[origin: string]: any[];
+	[ origin: string ]: any[];
 }
 
 /**
@@ -76,7 +76,7 @@ interface CSSClassConfig {
  */
 interface StylePropertyConfig {
 	value: string[];
-	properties?: Record<string, string>;
+	properties?: Record< string, string >;
 	useEngine?: boolean;
 	rootOnly?: boolean;
 }
@@ -88,14 +88,14 @@ interface LayoutDefinition {
 	className: string;
 	name: string;
 	displayMode?: string;
-	spacingStyles?: Array<{
+	spacingStyles?: Array< {
 		selector?: string;
-		rules?: Record<string, any>;
-	}>;
-	baseStyles?: Array<{
+		rules?: Record< string, any >;
+	} >;
+	baseStyles?: Array< {
 		selector?: string;
-		rules?: Record<string, any>;
-	}>;
+		rules?: Record< string, any >;
+	} >;
 }
 
 /**
@@ -111,18 +111,18 @@ interface CSSRule {
  */
 interface BlockVariation {
 	css?: string;
-	elements?: Record<string, any>;
-	blocks?: Record<string, any>;
-	[key: string]: any; // For additional style properties
+	elements?: Record< string, any >;
+	blocks?: Record< string, any >;
+	[ key: string ]: any; // For additional style properties
 }
 
 /**
  * Block node in theme.json
  */
 interface BlockNode {
-	variations?: Record<string, BlockVariation>;
-	elements?: Record<string, any>;
-	[key: string]: any; // For additional style properties
+	variations?: Record< string, BlockVariation >;
+	elements?: Record< string, any >;
+	[ key: string ]: any; // For additional style properties
 }
 
 export type BlockSelectors = Record<
@@ -133,10 +133,10 @@ export type BlockSelectors = Record<
 		fallbackGapValue?: string;
 		hasLayoutSupport?: boolean;
 		featureSelectors?:
-		| string
-		| Record<string, string | Record<string, string>>;
+			| string
+			| Record< string, string | Record< string, string > >;
 		name?: string;
-		styleVariationSelectors?: Record<string, string>;
+		styleVariationSelectors?: Record< string, string >;
 	}
 >;
 
@@ -168,8 +168,8 @@ interface StylesNode {
 	skipSelectorWrapper?: boolean;
 	duotoneSelector?: string;
 	featureSelectors?:
-	| string
-	| Record<string, string | Record<string, string>>;
+		| string
+		| Record< string, string | Record< string, string > >;
 	fallbackGapValue?: string;
 	hasLayoutSupport?: boolean;
 	isStyleVariation?: boolean;
@@ -200,14 +200,14 @@ const BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS = {
 
 // The valid pseudo-selectors that can be used for blocks.
 // Keep in sync with WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS.
-const VALID_BLOCK_PSEUDO_SELECTORS: Record<string, string[]> = {
-	'core/button': [':hover', ':focus', ':focus-visible', ':active'],
-	'core/navigation-link': [':hover', ':focus', ':focus-visible', ':active'],
+const VALID_BLOCK_PSEUDO_SELECTORS: Record< string, string[] > = {
+	'core/button': [ ':hover', ':focus', ':focus-visible', ':active' ],
+	'core/navigation-link': [ ':hover', ':focus', ':focus-visible', ':active' ],
 };
 
 // The valid pseudo-selectors that can be used for elements.
 // Keep in sync with WP_Theme_JSON_Gutenberg::VALID_ELEMENT_PSEUDO_SELECTORS.
-const VALID_ELEMENT_PSEUDO_SELECTORS: Record<string, string[]> = {
+const VALID_ELEMENT_PSEUDO_SELECTORS: Record< string, string[] > = {
 	link: [
 		':link',
 		':any-link',
@@ -232,7 +232,7 @@ const VALID_ELEMENT_PSEUDO_SELECTORS: Record<string, string[]> = {
  * Responsive breakpoint state keys and their corresponding CSS media queries.
  * Keep in sync with WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS.
  */
-const RESPONSIVE_BREAKPOINTS: Record<string, string> = {
+const RESPONSIVE_BREAKPOINTS: Record< string, string > = {
 	'@mobile': '@media (width <= 480px)',
 	'@tablet': '@media (480px < width <= 782px)',
 };
@@ -246,14 +246,14 @@ const RESPONSIVE_BREAKPOINTS: Record<string, string> = {
  */
 function getPresetsClasses(
 	blockSelector: string = '*',
-	blockPresets: Record<string, any> = {}
+	blockPresets: Record< string, any > = {}
 ): string {
 	return PRESET_METADATA.reduce(
 		(
 			declarations: string,
 			{ path, cssVarInfix, classes }: PresetMetadata
 		) => {
-			if (!classes) {
+			if ( ! classes ) {
 				return declarations;
 			}
 
@@ -262,35 +262,35 @@ function getPresetsClasses(
 				path,
 				[]
 			) as PresetsByOrigin;
-			['default', 'theme', 'custom'].forEach((origin) => {
-				if (presetByOrigin[origin]) {
-					presetByOrigin[origin].forEach(
-						({ slug }: { slug: string }) => {
+			[ 'default', 'theme', 'custom' ].forEach( ( origin ) => {
+				if ( presetByOrigin[ origin ] ) {
+					presetByOrigin[ origin ].forEach(
+						( { slug }: { slug: string } ) => {
 							classes!.forEach(
-								({
+								( {
 									classSuffix,
 									propertyName,
-								}: CSSClassConfig) => {
-									const classSelectorToUse = `.has-${kebabCase(
+								}: CSSClassConfig ) => {
+									const classSelectorToUse = `.has-${ kebabCase(
 										slug
-									)}-${classSuffix}`;
+									) }-${ classSuffix }`;
 									const selectorToUse = blockSelector
-										.split(',') // Selector can be "h1, h2, h3"
+										.split( ',' ) // Selector can be "h1, h2, h3"
 										.map(
-											(selector) =>
-												`${selector}${classSelectorToUse}`
+											( selector ) =>
+												`${ selector }${ classSelectorToUse }`
 										)
-										.join(',');
-									const value = `var(--wp--preset--${cssVarInfix}--${kebabCase(
+										.join( ',' );
+									const value = `var(--wp--preset--${ cssVarInfix }--${ kebabCase(
 										slug
-									)})`;
-									declarations += `${selectorToUse}{${propertyName}: ${value} !important;}`;
+									) })`;
+									declarations += `${ selectorToUse }{${ propertyName }: ${ value } !important;}`;
 								}
 							);
 						}
 					);
 				}
-			});
+			} );
 			return declarations;
 		},
 		''
@@ -298,29 +298,29 @@ function getPresetsClasses(
 }
 
 function getPresetsSvgFilters(
-	blockPresets: Record<string, any> = {}
+	blockPresets: Record< string, any > = {}
 ): string[] {
 	return PRESET_METADATA.filter(
 		// Duotone are the only type of filters for now.
-		(metadata: PresetMetadata) => metadata.path.at(-1) === 'duotone'
-	).flatMap((metadata: PresetMetadata) => {
+		( metadata: PresetMetadata ) => metadata.path.at( -1 ) === 'duotone'
+	).flatMap( ( metadata: PresetMetadata ) => {
 		const presetByOrigin = getValueFromObjectPath(
 			blockPresets,
 			metadata.path,
 			{}
 		) as PresetsByOrigin;
-		return ['default', 'theme']
-			.filter((origin) => presetByOrigin[origin])
-			.flatMap((origin) =>
-				presetByOrigin[origin].map((preset: any) =>
+		return [ 'default', 'theme' ]
+			.filter( ( origin ) => presetByOrigin[ origin ] )
+			.flatMap( ( origin ) =>
+				presetByOrigin[ origin ].map( ( preset: any ) =>
 					getDuotoneFilter(
-						`wp-duotone-${preset.slug}`,
+						`wp-duotone-${ preset.slug }`,
 						preset.colors
 					)
 				)
 			)
-			.join('');
-	});
+			.join( '' );
+	} );
 }
 
 function flattenTree(
@@ -329,17 +329,17 @@ function flattenTree(
 	token: string
 ): string[] {
 	let result: string[] = [];
-	Object.keys(input).forEach((key) => {
-		const newKey = prefix + kebabCase(key.replace('/', '-'));
-		const newLeaf = input[key];
+	Object.keys( input ).forEach( ( key ) => {
+		const newKey = prefix + kebabCase( key.replace( '/', '-' ) );
+		const newLeaf = input[ key ];
 
-		if (newLeaf instanceof Object) {
+		if ( newLeaf instanceof Object ) {
 			const newPrefix = newKey + token;
-			result = [...result, ...flattenTree(newLeaf, newPrefix, token)];
+			result = [ ...result, ...flattenTree( newLeaf, newPrefix, token ) ];
 		} else {
-			result.push(`${newKey}: ${newLeaf}`);
+			result.push( `${ newKey }: ${ newLeaf }` );
 		}
-	});
+	} );
 	return result;
 }
 
@@ -356,22 +356,22 @@ function flattenTree(
  * @return Updated feature declarations
  */
 const updateParagraphTextIndentSelector = (
-	featureDeclarations: Record<string, string[]>,
-	settings: Record<string, any> | undefined,
+	featureDeclarations: Record< string, string[] >,
+	settings: Record< string, any > | undefined,
 	blockName: string | undefined
-): Record<string, string[]> => {
-	if (blockName !== 'core/paragraph') {
+): Record< string, string[] > => {
+	if ( blockName !== 'core/paragraph' ) {
 		return featureDeclarations;
 	}
 
 	// Check block-level settings first, then fall back to global settings.
-	const blockSettings = settings?.blocks?.['core/paragraph'];
+	const blockSettings = settings?.blocks?.[ 'core/paragraph' ];
 	const textIndentSetting =
 		blockSettings?.typography?.textIndent ??
 		settings?.typography?.textIndent ??
 		'subsequent';
 
-	if (textIndentSetting !== 'all') {
+	if ( textIndentSetting !== 'all' ) {
 		return featureDeclarations;
 	}
 
@@ -379,11 +379,11 @@ const updateParagraphTextIndentSelector = (
 	const oldSelector = '.wp-block-paragraph + .wp-block-paragraph';
 	const newSelector = '.wp-block-paragraph';
 
-	if (oldSelector in featureDeclarations) {
-		const declarations = featureDeclarations[oldSelector];
+	if ( oldSelector in featureDeclarations ) {
+		const declarations = featureDeclarations[ oldSelector ];
 		const updated = { ...featureDeclarations };
-		delete updated[oldSelector];
-		updated[newSelector] = declarations;
+		delete updated[ oldSelector ];
+		updated[ newSelector ] = declarations;
 		return updated;
 	}
 
@@ -405,39 +405,39 @@ const updateParagraphTextIndentSelector = (
  * @return Updated feature declarations.
  */
 const updateButtonWidthDeclarations = (
-	featureDeclarations: Record<string, string[]>,
-	settings: Record<string, any> | undefined
-): Record<string, string[]> => {
+	featureDeclarations: Record< string, string[] >,
+	settings: Record< string, any > | undefined
+): Record< string, string[] > => {
 	const buttonSelector = '.wp-block-button';
-	if (!(buttonSelector in featureDeclarations)) {
+	if ( ! ( buttonSelector in featureDeclarations ) ) {
 		return featureDeclarations;
 	}
 
 	const updated = { ...featureDeclarations };
-	updated[buttonSelector] = updated[buttonSelector].map(
-		(declaration) => {
+	updated[ buttonSelector ] = updated[ buttonSelector ].map(
+		( declaration ) => {
 			// Match "width: <value>" declarations.
-			const match = declaration.match(/^width:\s*(.+)$/);
-			if (!match) {
+			const match = declaration.match( /^width:\s*(.+)$/ );
+			if ( ! match ) {
 				return declaration;
 			}
 
-			const value = match[1];
+			const value = match[ 1 ];
 			let percentage: number | null = null;
 
 			// Case 1: Direct percentage value e.g. "25%".
-			if (value.endsWith('%')) {
-				percentage = parseFloat(value);
+			if ( value.endsWith( '%' ) ) {
+				percentage = parseFloat( value );
 			}
 
 			// Case 2: Preset CSS var e.g. "var(--wp--preset--dimension--50)".
 			const presetPrefix = 'var(--wp--preset--dimension--';
 			if (
 				percentage === null &&
-				value.startsWith(presetPrefix) &&
-				value.endsWith(')')
+				value.startsWith( presetPrefix ) &&
+				value.endsWith( ')' )
 			) {
-				const slug = value.slice(presetPrefix.length, -1);
+				const slug = value.slice( presetPrefix.length, -1 );
 
 				/*
 				 * Look up the preset size across all origins.
@@ -445,31 +445,31 @@ const updateButtonWidthDeclarations = (
 				 * Spread block-level entries first so they take precedence.
 				 */
 				const dimensionSizes = {
-					...(settings?.dimensions?.dimensionSizes ?? {}),
-					...(settings?.blocks?.['core/button']?.dimensions
-						?.dimensionSizes ?? {}),
+					...( settings?.dimensions?.dimensionSizes ?? {} ),
+					...( settings?.blocks?.[ 'core/button' ]?.dimensions
+						?.dimensionSizes ?? {} ),
 				};
-				for (const origin of Object.values(dimensionSizes)) {
-					if (!Array.isArray(origin)) {
+				for ( const origin of Object.values( dimensionSizes ) ) {
+					if ( ! Array.isArray( origin ) ) {
 						continue;
 					}
-					for (const preset of origin) {
+					for ( const preset of origin ) {
 						if (
 							preset.slug === slug &&
 							typeof preset.size === 'string' &&
-							preset.size.endsWith('%')
+							preset.size.endsWith( '%' )
 						) {
-							percentage = parseFloat(preset.size);
+							percentage = parseFloat( preset.size );
 							break;
 						}
 					}
-					if (percentage !== null) {
+					if ( percentage !== null ) {
 						break;
 					}
 				}
 			}
 
-			if (percentage === null || isNaN(percentage)) {
+			if ( percentage === null || isNaN( percentage ) ) {
 				return declaration;
 			}
 
@@ -479,7 +479,7 @@ const updateButtonWidthDeclarations = (
 			 * - Multiplied by 1% to get the percentage width.
 			 * - Divided by 100 to calculate the gap adjustment proportion.
 			 */
-			return `width: calc(${percentage} * 1% - (var(--wp--style--block-gap, 0.5em) * (1 - ${percentage} / 100)))`;
+			return `width: calc(${ percentage } * 1% - (var(--wp--style--block-gap, 0.5em) * (1 - ${ percentage } / 100)))`;
 		}
 	);
 
@@ -497,14 +497,14 @@ const updateButtonWidthDeclarations = (
  * @return Style declarations
  */
 const getFeatureDeclarations = (
-	selectors: Record<string, any>,
-	styles: Record<string, any>
-): Record<string, string[]> => {
-	const declarations: Record<string, string[]> = {};
+	selectors: Record< string, any >,
+	styles: Record< string, any >
+): Record< string, string[] > => {
+	const declarations: Record< string, string[] > = {};
 
-	Object.entries(selectors).forEach(([feature, selector]) => {
+	Object.entries( selectors ).forEach( ( [ feature, selector ] ) => {
 		// We're only processing features/subfeatures that have styles.
-		if (feature === 'root' || !styles?.[feature]) {
+		if ( feature === 'root' || ! styles?.[ feature ] ) {
 			return;
 		}
 
@@ -512,17 +512,17 @@ const getFeatureDeclarations = (
 
 		// If we have a selector object instead of shorthand process it.
 		if (
-			!isShorthand &&
+			! isShorthand &&
 			typeof selector === 'object' &&
 			selector !== null
 		) {
-			Object.entries(selector as Record<string, string>).forEach(
-				([subfeature, subfeatureSelector]) => {
+			Object.entries( selector as Record< string, string > ).forEach(
+				( [ subfeature, subfeatureSelector ] ) => {
 					// Don't process root feature selector yet or any
 					// subfeature that doesn't have a style.
 					if (
 						subfeature === 'root' ||
-						!styles?.[feature][subfeature]
+						! styles?.[ feature ][ subfeature ]
 					) {
 						return;
 					}
@@ -530,23 +530,23 @@ const getFeatureDeclarations = (
 					// Create a temporary styles object and build
 					// declarations for subfeature.
 					const subfeatureStyles = {
-						[feature]: {
-							[subfeature]: styles[feature][subfeature],
+						[ feature ]: {
+							[ subfeature ]: styles[ feature ][ subfeature ],
 						},
 					};
 					const newDeclarations =
-						getStylesDeclarations(subfeatureStyles);
+						getStylesDeclarations( subfeatureStyles );
 
 					// Merge new declarations in with any others that
 					// share the same selector.
-					declarations[subfeatureSelector] = [
-						...(declarations[subfeatureSelector] || []),
+					declarations[ subfeatureSelector ] = [
+						...( declarations[ subfeatureSelector ] || [] ),
 						...newDeclarations,
 					];
 
 					// Remove the subfeature's style now it will be
 					// included under its own selector not the block's.
-					delete styles[feature][subfeature];
+					delete styles[ feature ][ subfeature ];
 				}
 			);
 		}
@@ -555,29 +555,29 @@ const getFeatureDeclarations = (
 		// process root, or shorthand, feature selectors.
 		if (
 			isShorthand ||
-			(typeof selector === 'object' &&
+			( typeof selector === 'object' &&
 				selector !== null &&
-				'root' in selector)
+				'root' in selector )
 		) {
 			const featureSelector = isShorthand
-				? (selector as string)
-				: (selector as any).root;
+				? ( selector as string )
+				: ( selector as any ).root;
 
 			// Create temporary style object and build declarations for feature.
-			const featureStyles = { [feature]: styles[feature] };
-			const newDeclarations = getStylesDeclarations(featureStyles);
+			const featureStyles = { [ feature ]: styles[ feature ] };
+			const newDeclarations = getStylesDeclarations( featureStyles );
 
 			// Merge new declarations with any others that share the selector.
-			declarations[featureSelector] = [
-				...(declarations[featureSelector] || []),
+			declarations[ featureSelector ] = [
+				...( declarations[ featureSelector ] || [] ),
 				...newDeclarations,
 			];
 
 			// Remove the feature from the block's styles now as it will be
 			// included under its own selector not the block's.
-			delete styles[feature];
+			delete styles[ feature ];
 		}
-	});
+	} );
 
 	return declarations;
 };
@@ -601,20 +601,20 @@ export function getStylesDeclarations(
 ): string[] {
 	const isRoot = ROOT_BLOCK_SELECTOR === selector;
 	const output = Object.entries(
-		STYLE_PROPERTY as Record<string, StylePropertyConfig>
+		STYLE_PROPERTY as Record< string, StylePropertyConfig >
 	).reduce(
 		(
 			declarations: string[],
-			[key, { value, properties, useEngine, rootOnly }]: [
+			[ key, { value, properties, useEngine, rootOnly } ]: [
 				string,
 				StylePropertyConfig,
 			]
 		) => {
-			if (rootOnly && !isRoot) {
+			if ( rootOnly && ! isRoot ) {
 				return declarations;
 			}
 			const pathToValue = value;
-			if (pathToValue[0] === 'elements' || useEngine) {
+			if ( pathToValue[ 0 ] === 'elements' || useEngine ) {
 				return declarations;
 			}
 
@@ -627,42 +627,42 @@ export function getStylesDeclarations(
 			// This may change: https://github.com/WordPress/gutenberg/issues/40132.
 			if (
 				key === '--wp--style--root--padding' &&
-				(typeof styleValue === 'string' || !useRootPaddingAlign)
+				( typeof styleValue === 'string' || ! useRootPaddingAlign )
 			) {
 				return declarations;
 			}
 
-			if (properties && typeof styleValue !== 'string') {
-				Object.entries(properties).forEach((entry) => {
-					const [name, prop] = entry;
+			if ( properties && typeof styleValue !== 'string' ) {
+				Object.entries( properties ).forEach( ( entry ) => {
+					const [ name, prop ] = entry;
 
 					if (
-						!getValueFromObjectPath(styleValue, [prop], false)
+						! getValueFromObjectPath( styleValue, [ prop ], false )
 					) {
 						// Do not create a declaration
 						// for sub-properties that don't have any value.
 						return;
 					}
 
-					const cssProperty = name.startsWith('--')
+					const cssProperty = name.startsWith( '--' )
 						? name
-						: kebabCase(name);
+						: kebabCase( name );
 					declarations.push(
-						`${cssProperty}: ${getCSSValueFromRawStyle(
-							getValueFromObjectPath(styleValue, [prop])
-						)}`
+						`${ cssProperty }: ${ getCSSValueFromRawStyle(
+							getValueFromObjectPath( styleValue, [ prop ] )
+						) }`
 					);
-				});
+				} );
 			} else if (
-				getValueFromObjectPath(blockStyles, pathToValue, false)
+				getValueFromObjectPath( blockStyles, pathToValue, false )
 			) {
-				const cssProperty = key.startsWith('--')
+				const cssProperty = key.startsWith( '--' )
 					? key
-					: kebabCase(key);
+					: kebabCase( key );
 				declarations.push(
-					`${cssProperty}: ${getCSSValueFromRawStyle(
-						getValueFromObjectPath(blockStyles, pathToValue)
-					)}`
+					`${ cssProperty }: ${ getCSSValueFromRawStyle(
+						getValueFromObjectPath( blockStyles, pathToValue )
+					) }`
 				);
 			}
 
@@ -679,12 +679,12 @@ export function getStylesDeclarations(
 	 * via a public util used internally and externally. Theme.json tree and defaults could be passed
 	 * as options.
 	 */
-	if (!!blockStyles.background) {
+	if ( !! blockStyles.background ) {
 		/*
 		 * Resolve dynamic values before they are compiled by the style engine,
 		 * which doesn't (yet) resolve dynamic values.
 		 */
-		if (blockStyles.background?.backgroundImage) {
+		if ( blockStyles.background?.backgroundImage ) {
 			blockStyles.background.backgroundImage = getResolvedValue(
 				blockStyles.background.backgroundImage,
 				tree
@@ -695,35 +695,35 @@ export function getStylesDeclarations(
 		 * Set default values for block background styles.
 		 * Top-level styles are an exception as they are applied to the body.
 		 */
-		if (!isRoot && !!blockStyles.background?.backgroundImage?.id) {
+		if ( ! isRoot && !! blockStyles.background?.backgroundImage?.id ) {
 			blockStyles = {
 				...blockStyles,
 				background: {
 					...blockStyles.background,
-					...setBackgroundStyleDefaults(blockStyles.background),
+					...setBackgroundStyleDefaults( blockStyles.background ),
 				},
 			};
 		}
 	}
 
-	const extraRules = getCSSRules(blockStyles);
-	extraRules.forEach((rule: CSSRule) => {
+	const extraRules = getCSSRules( blockStyles );
+	extraRules.forEach( ( rule: CSSRule ) => {
 		// Don't output padding properties if padding variables are set or if we're not editing a full template.
 		if (
 			isRoot &&
-			(useRootPaddingAlign || disableRootPadding) &&
-			rule.key.startsWith('padding')
+			( useRootPaddingAlign || disableRootPadding ) &&
+			rule.key.startsWith( 'padding' )
 		) {
 			return;
 		}
-		const cssProperty = rule.key.startsWith('--')
+		const cssProperty = rule.key.startsWith( '--' )
 			? rule.key
-			: kebabCase(rule.key);
+			: kebabCase( rule.key );
 
-		let ruleValue = getResolvedValue(rule.value, tree);
+		let ruleValue = getResolvedValue( rule.value, tree );
 
 		// Calculate fluid typography rules where available.
-		if (cssProperty === 'font-size') {
+		if ( cssProperty === 'font-size' ) {
 			/*
 			 * getTypographyFontSizeValue() will check
 			 * if fluid typography has been activated and also
@@ -739,12 +739,12 @@ export function getStylesDeclarations(
 
 		// For aspect ratio to work, other dimensions rules (and Cover block defaults) must be unset.
 		// This ensures that a fixed height does not override the aspect ratio.
-		if (cssProperty === 'aspect-ratio') {
-			output.push('min-height: unset');
+		if ( cssProperty === 'aspect-ratio' ) {
+			output.push( 'min-height: unset' );
 		}
 
-		output.push(`${cssProperty}: ${ruleValue}`);
-	});
+		output.push( `${ cssProperty }: ${ ruleValue }` );
+	} );
 
 	return output;
 }
@@ -763,7 +763,7 @@ export function getStylesDeclarations(
  *
  * @return Generated CSS rules for the layout styles
  */
-export function getLayoutStyles({
+export function getLayoutStyles( {
 	layoutDefinitions = LAYOUT_DEFINITIONS,
 	style,
 	selector,
@@ -771,122 +771,128 @@ export function getLayoutStyles({
 	hasFallbackGapSupport,
 	fallbackGapValue,
 }: {
-	layoutDefinitions?: Record<string, LayoutDefinition>;
+	layoutDefinitions?: Record< string, LayoutDefinition >;
 	style?: GlobalStylesStyles;
 	selector?: string;
 	hasBlockGapSupport?: boolean;
 	hasFallbackGapSupport?: boolean;
 	fallbackGapValue?: string;
-}): string {
+} ): string {
 	let ruleset = '';
 	let gapValue = hasBlockGapSupport
-		? getGapCSSValue(style?.spacing?.blockGap)
+		? getGapCSSValue( style?.spacing?.blockGap )
 		: '';
 
 	// Ensure a fallback gap value for the root layout definitions,
 	// and use a fallback value if one is provided for the current block.
-	if (hasFallbackGapSupport) {
-		if (selector === ROOT_BLOCK_SELECTOR) {
-			gapValue = !gapValue ? '0.5em' : gapValue;
-		} else if (!hasBlockGapSupport && fallbackGapValue) {
+	if ( hasFallbackGapSupport ) {
+		if ( selector === ROOT_BLOCK_SELECTOR ) {
+			gapValue = ! gapValue ? '0.5em' : gapValue;
+		} else if ( ! hasBlockGapSupport && fallbackGapValue ) {
 			gapValue = fallbackGapValue;
 		}
 	}
 
-	if (gapValue && layoutDefinitions) {
-		Object.values(layoutDefinitions).forEach(
-			({ className, name, spacingStyles }) => {
+	if ( gapValue && layoutDefinitions ) {
+		Object.values( layoutDefinitions ).forEach(
+			( { className, name, spacingStyles } ) => {
 				// Allow outputting fallback gap styles for flex layout type when block gap support isn't available.
 				if (
-					!hasBlockGapSupport &&
+					! hasBlockGapSupport &&
 					'flex' !== name &&
 					'grid' !== name
 				) {
 					return;
 				}
 
-				if (spacingStyles?.length) {
-					spacingStyles.forEach((spacingStyle: any) => {
+				if ( spacingStyles?.length ) {
+					spacingStyles.forEach( ( spacingStyle: any ) => {
 						const declarations: string[] = [];
 
-						if (spacingStyle.rules) {
-							Object.entries(spacingStyle.rules).forEach(
-								([cssProperty, cssValue]) => {
+						if ( spacingStyle.rules ) {
+							Object.entries( spacingStyle.rules ).forEach(
+								( [ cssProperty, cssValue ] ) => {
 									declarations.push(
-										`${cssProperty}: ${cssValue ? cssValue : gapValue
+										`${ cssProperty }: ${
+											cssValue ? cssValue : gapValue
 										}`
 									);
 								}
 							);
 						}
 
-						if (declarations.length) {
+						if ( declarations.length ) {
 							let combinedSelector = '';
 
-							if (!hasBlockGapSupport) {
+							if ( ! hasBlockGapSupport ) {
 								// For fallback gap styles, use lower specificity, to ensure styles do not unintentionally override theme styles.
 								combinedSelector =
 									selector === ROOT_BLOCK_SELECTOR
-										? `:where(.${className}${spacingStyle?.selector || ''
-										})`
-										: `:where(${selector}.${className}${spacingStyle?.selector || ''
-										})`;
+										? `:where(.${ className }${
+												spacingStyle?.selector || ''
+										  })`
+										: `:where(${ selector }.${ className }${
+												spacingStyle?.selector || ''
+										  })`;
 							} else {
 								combinedSelector =
 									selector === ROOT_BLOCK_SELECTOR
-										? `:root :where(.${className})${spacingStyle?.selector || ''
-										}`
-										: `:root :where(${selector}-${className})${spacingStyle?.selector || ''
-										}`;
+										? `:root :where(.${ className })${
+												spacingStyle?.selector || ''
+										  }`
+										: `:root :where(${ selector }-${ className })${
+												spacingStyle?.selector || ''
+										  }`;
 							}
-							ruleset += `${combinedSelector} { ${declarations.join(
+							ruleset += `${ combinedSelector } { ${ declarations.join(
 								'; '
-							)}; }`;
+							) }; }`;
 						}
-					});
+					} );
 				}
 			}
 		);
 		// For backwards compatibility, ensure the legacy block gap CSS variable is still available.
-		if (selector === ROOT_BLOCK_SELECTOR && hasBlockGapSupport) {
-			ruleset += `${ROOT_CSS_PROPERTIES_SELECTOR} { --wp--style--block-gap: ${gapValue}; }`;
+		if ( selector === ROOT_BLOCK_SELECTOR && hasBlockGapSupport ) {
+			ruleset += `${ ROOT_CSS_PROPERTIES_SELECTOR } { --wp--style--block-gap: ${ gapValue }; }`;
 		}
 	}
 
 	// Output base styles
-	if (selector === ROOT_BLOCK_SELECTOR && layoutDefinitions) {
-		const validDisplayModes = ['block', 'flex', 'grid'];
-		Object.values(layoutDefinitions).forEach(
-			({ className, displayMode, baseStyles }: LayoutDefinition) => {
+	if ( selector === ROOT_BLOCK_SELECTOR && layoutDefinitions ) {
+		const validDisplayModes = [ 'block', 'flex', 'grid' ];
+		Object.values( layoutDefinitions ).forEach(
+			( { className, displayMode, baseStyles }: LayoutDefinition ) => {
 				if (
 					displayMode &&
-					validDisplayModes.includes(displayMode)
+					validDisplayModes.includes( displayMode )
 				) {
-					ruleset += `${selector} .${className} { display:${displayMode}; }`;
+					ruleset += `${ selector } .${ className } { display:${ displayMode }; }`;
 				}
 
-				if (baseStyles?.length) {
-					baseStyles.forEach((baseStyle: any) => {
+				if ( baseStyles?.length ) {
+					baseStyles.forEach( ( baseStyle: any ) => {
 						const declarations: string[] = [];
 
-						if (baseStyle.rules) {
-							Object.entries(baseStyle.rules).forEach(
-								([cssProperty, cssValue]) => {
+						if ( baseStyle.rules ) {
+							Object.entries( baseStyle.rules ).forEach(
+								( [ cssProperty, cssValue ] ) => {
 									declarations.push(
-										`${cssProperty}: ${cssValue}`
+										`${ cssProperty }: ${ cssValue }`
 									);
 								}
 							);
 						}
 
-						if (declarations.length) {
-							const combinedSelector = `.${className}${baseStyle?.selector || ''
-								}`;
-							ruleset += `${combinedSelector} { ${declarations.join(
+						if ( declarations.length ) {
+							const combinedSelector = `.${ className }${
+								baseStyle?.selector || ''
+							}`;
+							ruleset += `${ combinedSelector } { ${ declarations.join(
 								'; '
-							)}; }`;
+							) }; }`;
 						}
-					});
+					} );
 				}
 			}
 		);
@@ -907,34 +913,34 @@ const STYLE_KEYS = [
 	'background',
 ];
 
-function pickStyleKeys(treeToPickFrom: any): any {
-	return pickStyleAndPseudoKeys(treeToPickFrom);
+function pickStyleKeys( treeToPickFrom: any ): any {
+	return pickStyleAndPseudoKeys( treeToPickFrom );
 }
 
 function pickStyleAndPseudoKeys(
 	treeToPickFrom: any,
 	blockName?: string
 ): any {
-	if (!treeToPickFrom) {
+	if ( ! treeToPickFrom ) {
 		return {};
 	}
-	const entries = Object.entries(treeToPickFrom);
+	const entries = Object.entries( treeToPickFrom );
 	const allowedPseudoSelectors = blockName
-		? VALID_BLOCK_PSEUDO_SELECTORS[blockName] ?? []
+		? VALID_BLOCK_PSEUDO_SELECTORS[ blockName ] ?? []
 		: [];
 
 	const pickedEntries = entries.filter(
-		([key]) =>
-			STYLE_KEYS.includes(key) ||
-			allowedPseudoSelectors.includes(key) ||
-			RESPONSIVE_BREAKPOINTS[key]
+		( [ key ] ) =>
+			STYLE_KEYS.includes( key ) ||
+			allowedPseudoSelectors.includes( key ) ||
+			RESPONSIVE_BREAKPOINTS[ key ]
 	);
 	// clone the style objects so that `getFeatureDeclarations` can remove consumed keys from it
-	const clonedEntries = pickedEntries.map(([key, style]) => [
+	const clonedEntries = pickedEntries.map( ( [ key, style ] ) => [
 		key,
-		JSON.parse(JSON.stringify(style)),
-	]);
-	return Object.fromEntries(clonedEntries);
+		JSON.parse( JSON.stringify( style ) ),
+	] );
+	return Object.fromEntries( clonedEntries );
 }
 
 /**
@@ -947,7 +953,7 @@ function pickStyleAndPseudoKeys(
  * @param node Style node that may contain configured pseudo styles.
  * @return Style nodes for the configured pseudo states.
  */
-function getPseudoStyleNodes(node: StylesNode): StylesNode[] {
+function getPseudoStyleNodes( node: StylesNode ): StylesNode[] {
 	const {
 		styles,
 		selector,
@@ -958,22 +964,22 @@ function getPseudoStyleNodes(node: StylesNode): StylesNode[] {
 		variationName,
 	} = node;
 	const pseudoSelectors = name
-		? VALID_BLOCK_PSEUDO_SELECTORS[name] ?? []
-		: VALID_ELEMENT_PSEUDO_SELECTORS[elementName ?? ''] ?? [];
+		? VALID_BLOCK_PSEUDO_SELECTORS[ name ] ?? []
+		: VALID_ELEMENT_PSEUDO_SELECTORS[ elementName ?? '' ] ?? [];
 
-	if (!pseudoSelectors.length) {
+	if ( ! pseudoSelectors.length ) {
 		return [];
 	}
 
-	return pseudoSelectors.flatMap((pseudoSelector) => {
-		const pseudoStyles = styles?.[pseudoSelector];
-		if (!pseudoStyles || typeof pseudoStyles !== 'object') {
+	return pseudoSelectors.flatMap( ( pseudoSelector ) => {
+		const pseudoStyles = styles?.[ pseudoSelector ];
+		if ( ! pseudoStyles || typeof pseudoStyles !== 'object' ) {
 			return [];
 		}
 
 		return [
 			{
-				styles: JSON.parse(JSON.stringify(pseudoStyles)),
+				styles: JSON.parse( JSON.stringify( pseudoStyles ) ),
 				selector,
 				selectorSuffix: pseudoSelector,
 				mediaQuery,
@@ -986,7 +992,7 @@ function getPseudoStyleNodes(node: StylesNode): StylesNode[] {
 				variationName,
 			},
 		];
-	});
+	} );
 }
 
 /**
@@ -998,7 +1004,7 @@ function getPseudoStyleNodes(node: StylesNode): StylesNode[] {
  * @param node Style node that may contain configured responsive state styles.
  * @return Responsive style nodes in configured breakpoint order.
  */
-function getResponsiveStyleNodes(node: StylesNode): StylesNode[] {
+function getResponsiveStyleNodes( node: StylesNode ): StylesNode[] {
 	const {
 		styles,
 		selector,
@@ -1009,20 +1015,20 @@ function getResponsiveStyleNodes(node: StylesNode): StylesNode[] {
 		variationName,
 	} = node;
 
-	if (!name && !elementName) {
+	if ( ! name && ! elementName ) {
 		return [];
 	}
 
-	return Object.entries(RESPONSIVE_BREAKPOINTS).flatMap(
-		([breakpointKey, mediaQuery]) => {
-			const breakpointStyles = styles?.[breakpointKey];
-			if (!breakpointStyles || typeof breakpointStyles !== 'object') {
+	return Object.entries( RESPONSIVE_BREAKPOINTS ).flatMap(
+		( [ breakpointKey, mediaQuery ] ) => {
+			const breakpointStyles = styles?.[ breakpointKey ];
+			if ( ! breakpointStyles || typeof breakpointStyles !== 'object' ) {
 				return [];
 			}
 
 			return [
 				{
-					styles: JSON.parse(JSON.stringify(breakpointStyles)),
+					styles: JSON.parse( JSON.stringify( breakpointStyles ) ),
 					selector,
 					mediaQuery,
 					featureSelectors:
@@ -1045,72 +1051,72 @@ export const getNodesWithStyles = (
 ): any[] => {
 	const nodes: StylesNode[] = [];
 
-	if (!tree?.styles) {
+	if ( ! tree?.styles ) {
 		return nodes;
 	}
 
 	// Top-level.
-	const styles = pickStyleKeys(tree.styles);
-	if (styles) {
-		nodes.push({
+	const styles = pickStyleKeys( tree.styles );
+	if ( styles ) {
+		nodes.push( {
 			styles,
 			selector: ROOT_BLOCK_SELECTOR,
 			// Root selector (body) styles should not be wrapped in `:root where()` to keep
 			// specificity at (0,0,1) and maintain backwards compatibility.
 			skipSelectorWrapper: true,
-		});
+		} );
 	}
 
-	Object.entries(ELEMENTS).forEach(([name, selector]) => {
-		if (tree.styles?.elements?.[name]) {
-			nodes.push({
-				styles: tree.styles?.elements?.[name] ?? {},
+	Object.entries( ELEMENTS ).forEach( ( [ name, selector ] ) => {
+		if ( tree.styles?.elements?.[ name ] ) {
+			nodes.push( {
+				styles: tree.styles?.elements?.[ name ] ?? {},
 				selector: selector as string,
 				elementName: name,
 				// Top level elements that don't use a class name should not receive the
 				// `:root :where()` wrapper to maintain backwards compatibility.
-				skipSelectorWrapper: !(
-					ELEMENT_CLASS_NAMES as Record<string, string>
-				)[name],
-			});
+				skipSelectorWrapper: ! (
+					ELEMENT_CLASS_NAMES as Record< string, string >
+				 )[ name ],
+			} );
 		}
-	});
+	} );
 
 	// Iterate over blocks: they can have styles & elements.
-	Object.entries(tree.styles?.blocks ?? {}).forEach(
-		([blockName, node]) => {
-			const blockStyles = pickStyleAndPseudoKeys(node, blockName);
+	Object.entries( tree.styles?.blocks ?? {} ).forEach(
+		( [ blockName, node ] ) => {
+			const blockStyles = pickStyleAndPseudoKeys( node, blockName );
 			const typedNode = node as BlockNode;
 
 			// Store variation child nodes so they can be inserted after the block's own elements.
 			const variationNodesToAdd: typeof nodes = [];
 			const variationStyleNodesToAdd: typeof nodes = [];
 
-			if (typedNode?.variations) {
-				Object.entries(typedNode.variations).forEach(
-					([variationName, variation]) => {
+			if ( typedNode?.variations ) {
+				Object.entries( typedNode.variations ).forEach(
+					( [ variationName, variation ] ) => {
 						const typedVariation = variation as BlockVariation;
 						const variationStyles = pickStyleAndPseudoKeys(
 							typedVariation,
 							blockName
 						);
-						if (typedVariation?.css) {
+						if ( typedVariation?.css ) {
 							variationStyles.css = typedVariation.css;
 						}
 						const variationSelector =
 							typeof blockSelectors !== 'string'
-								? blockSelectors[blockName]
-									?.styleVariationSelectors?.[
-								variationName
-								]
+								? blockSelectors[ blockName ]
+										?.styleVariationSelectors?.[
+										variationName
+								  ]
 								: undefined;
 
 						if (
 							variationSelector &&
 							typeof blockSelectors !== 'string'
 						) {
-							const blockSelector = blockSelectors[blockName];
-							variationStyleNodesToAdd.push({
+							const blockSelector = blockSelectors[ blockName ];
+							variationStyleNodesToAdd.push( {
 								styles: variationStyles,
 								selector: variationSelector,
 								featureSelectors:
@@ -1125,7 +1131,7 @@ export const getNodesWithStyles = (
 									variationSelector + blockSelector.selector,
 								layoutHasBlockGapSupport: true,
 								name: blockName,
-							});
+							} );
 						}
 
 						// Process the variation's inner element styles.
@@ -1134,55 +1140,55 @@ export const getNodesWithStyles = (
 						// precedence over these.
 						Object.entries(
 							typedVariation?.elements ?? {}
-						).forEach(([element, elementStyles]) => {
+						).forEach( ( [ element, elementStyles ] ) => {
 							if (
 								elementStyles &&
-								ELEMENTS[element as ElementName]
+								ELEMENTS[ element as ElementName ]
 							) {
-								variationNodesToAdd.push({
+								variationNodesToAdd.push( {
 									styles: elementStyles,
 									selector: scopeSelector(
 										variationSelector,
-										ELEMENTS[element as ElementName]
+										ELEMENTS[ element as ElementName ]
 									),
 									elementName: element,
 									isStyleVariation: true,
-								});
+								} );
 							}
-						});
+						} );
 
 						// Process the variations inner block type styles.
-						Object.entries(typedVariation?.blocks ?? {}).forEach(
-							([
+						Object.entries( typedVariation?.blocks ?? {} ).forEach(
+							( [
 								variationBlockName,
 								variationBlockStyles,
-							]) => {
+							] ) => {
 								const variationBlockSelector =
 									typeof blockSelectors !== 'string'
 										? scopeSelector(
-											variationSelector,
-											blockSelectors[
-												variationBlockName
-											]?.selector
-										)
+												variationSelector,
+												blockSelectors[
+													variationBlockName
+												]?.selector
+										  )
 										: undefined;
 								const variationDuotoneSelector =
 									typeof blockSelectors !== 'string'
 										? scopeSelector(
-											variationSelector,
-											blockSelectors[
-												variationBlockName
-											]?.duotoneSelector as string
-										)
+												variationSelector,
+												blockSelectors[
+													variationBlockName
+												]?.duotoneSelector as string
+										  )
 										: undefined;
 								const variationFeatureSelectors =
 									typeof blockSelectors !== 'string'
 										? scopeFeatureSelectors(
-											variationSelector,
-											blockSelectors[
-												variationBlockName
-											]?.featureSelectors ?? {}
-										)
+												variationSelector,
+												blockSelectors[
+													variationBlockName
+												]?.featureSelectors ?? {}
+										  )
 										: undefined;
 
 								const variationBlockStyleNodes =
@@ -1191,60 +1197,60 @@ export const getNodesWithStyles = (
 										variationBlockName
 									);
 
-								if (variationBlockStyles?.css) {
+								if ( variationBlockStyles?.css ) {
 									variationBlockStyleNodes.css =
 										variationBlockStyles.css;
 								}
 
 								if (
-									!variationBlockSelector ||
+									! variationBlockSelector ||
 									typeof blockSelectors === 'string'
 								) {
 									return;
 								}
 
-								variationNodesToAdd.push({
+								variationNodesToAdd.push( {
 									selector: variationBlockSelector,
 									name: variationBlockName,
 									isStyleVariation: true,
 									duotoneSelector: variationDuotoneSelector,
 									featureSelectors: variationFeatureSelectors,
 									fallbackGapValue:
-										blockSelectors[variationBlockName]
+										blockSelectors[ variationBlockName ]
 											?.fallbackGapValue,
 									hasLayoutSupport:
-										blockSelectors[variationBlockName]
+										blockSelectors[ variationBlockName ]
 											?.hasLayoutSupport,
 									styles: variationBlockStyleNodes,
-								});
+								} );
 
 								// Process element styles for the inner blocks
 								// of the variation.
 								Object.entries(
 									variationBlockStyles.elements ?? {}
 								).forEach(
-									([
+									( [
 										variationBlockElement,
 										variationBlockElementStyles,
-									]) => {
+									] ) => {
 										if (
 											variationBlockElementStyles &&
 											ELEMENTS[
-											variationBlockElement as ElementName
+												variationBlockElement as ElementName
 											]
 										) {
-											variationNodesToAdd.push({
+											variationNodesToAdd.push( {
 												styles: variationBlockElementStyles,
 												selector: scopeSelector(
 													variationBlockSelector,
 													ELEMENTS[
-													variationBlockElement as ElementName
+														variationBlockElement as ElementName
 													]
 												),
 												elementName:
 													variationBlockElement,
 												isStyleVariation: true,
-											});
+											} );
 										}
 									}
 								);
@@ -1256,48 +1262,48 @@ export const getNodesWithStyles = (
 
 			if (
 				typeof blockSelectors !== 'string' &&
-				blockSelectors?.[blockName]?.selector
+				blockSelectors?.[ blockName ]?.selector
 			) {
-				nodes.push({
+				nodes.push( {
 					duotoneSelector:
-						blockSelectors[blockName].duotoneSelector,
+						blockSelectors[ blockName ].duotoneSelector,
 					fallbackGapValue:
-						blockSelectors[blockName].fallbackGapValue,
+						blockSelectors[ blockName ].fallbackGapValue,
 					hasLayoutSupport:
-						blockSelectors[blockName].hasLayoutSupport,
-					selector: blockSelectors[blockName].selector,
+						blockSelectors[ blockName ].hasLayoutSupport,
+					selector: blockSelectors[ blockName ].selector,
 					styles: blockStyles,
 					featureSelectors:
-						blockSelectors[blockName].featureSelectors,
+						blockSelectors[ blockName ].featureSelectors,
 					name: blockName,
-				});
+				} );
 			}
 
-			nodes.push(...variationStyleNodesToAdd);
+			nodes.push( ...variationStyleNodesToAdd );
 
-			Object.entries(typedNode?.elements ?? {}).forEach(
-				([elementName, value]) => {
+			Object.entries( typedNode?.elements ?? {} ).forEach(
+				( [ elementName, value ] ) => {
 					if (
 						typeof blockSelectors !== 'string' &&
 						value &&
-						blockSelectors?.[blockName] &&
-						ELEMENTS[elementName as ElementName]
+						blockSelectors?.[ blockName ] &&
+						ELEMENTS[ elementName as ElementName ]
 					) {
-						nodes.push({
+						nodes.push( {
 							styles: value,
 							selector: scopeSelector(
-								blockSelectors[blockName]?.selector,
-								ELEMENTS[elementName as ElementName]
+								blockSelectors[ blockName ]?.selector,
+								ELEMENTS[ elementName as ElementName ]
 							),
 							elementName,
-						});
+						} );
 					}
 				}
 			);
 
 			// Add variation nodes AFTER the main block and its elements
 			// to match PHP processing order.
-			nodes.push(...variationNodesToAdd);
+			nodes.push( ...variationNodesToAdd );
 		}
 	);
 
@@ -1309,63 +1315,63 @@ export const getNodesWithSettings = (
 	blockSelectors: string | BlockSelectors
 ): any[] => {
 	const nodes: {
-		presets: Record<string, any>;
-		custom?: Record<string, any>;
+		presets: Record< string, any >;
+		custom?: Record< string, any >;
 		selector?: string;
 		duotoneSelector?: string;
 		fallbackGapValue?: string;
 		hasLayoutSupport?: boolean;
 		featureSelectors?:
-		| string
-		| Record<string, string | Record<string, string>>;
-		styleVariationSelectors?: Record<string, string>;
+			| string
+			| Record< string, string | Record< string, string > >;
+		styleVariationSelectors?: Record< string, string >;
 	}[] = [];
 
-	if (!tree?.settings) {
+	if ( ! tree?.settings ) {
 		return nodes;
 	}
 
-	const pickPresets = (treeToPickFrom: any): any => {
+	const pickPresets = ( treeToPickFrom: any ): any => {
 		let presets = {};
-		PRESET_METADATA.forEach(({ path }) => {
-			const value = getValueFromObjectPath(treeToPickFrom, path, false);
-			if (value !== false) {
-				presets = setImmutably(presets, path, value);
+		PRESET_METADATA.forEach( ( { path } ) => {
+			const value = getValueFromObjectPath( treeToPickFrom, path, false );
+			if ( value !== false ) {
+				presets = setImmutably( presets, path, value );
 			}
-		});
+		} );
 		return presets;
 	};
 
 	// Top-level.
-	const presets = pickPresets(tree.settings);
+	const presets = pickPresets( tree.settings );
 	const custom = tree.settings?.custom;
-	if (Object.keys(presets).length > 0 || custom) {
-		nodes.push({
+	if ( Object.keys( presets ).length > 0 || custom ) {
+		nodes.push( {
 			presets,
 			custom,
 			selector: ROOT_CSS_PROPERTIES_SELECTOR,
-		});
+		} );
 	}
 
 	// Blocks.
-	Object.entries(tree.settings?.blocks ?? {}).forEach(
-		([blockName, node]) => {
+	Object.entries( tree.settings?.blocks ?? {} ).forEach(
+		( [ blockName, node ] ) => {
 			const blockCustom = node.custom;
 			if (
 				typeof blockSelectors === 'string' ||
-				!blockSelectors[blockName]
+				! blockSelectors[ blockName ]
 			) {
 				return;
 			}
-			const blockPresets = pickPresets(node);
-			if (Object.keys(blockPresets).length > 0 || blockCustom) {
-				nodes.push({
+			const blockPresets = pickPresets( node );
+			if ( Object.keys( blockPresets ).length > 0 || blockCustom ) {
+				nodes.push( {
 					presets: blockPresets,
 					custom: blockCustom,
-					selector: blockSelectors[blockName]?.selector,
+					selector: blockSelectors[ blockName ]?.selector,
 					featureSelectors:
-						blockSelectors[blockName]?.featureSelectors,
-				});
+						blockSelectors[ blockName ]?.featureSelectors,
+				} );
 			}
 		}
 	);
@@ -1388,20 +1394,20 @@ export const getNodesWithSettings = (
 function resolveFeatureSelector(
 	featureSelectors:
 		| string
-		| Record<string, string | Record<string, string>>
+		| Record< string, string | Record< string, string > >
 		| undefined,
 	featureKey: string,
 	fallback: string
 ): string {
-	if (!featureSelectors || typeof featureSelectors === 'string') {
+	if ( ! featureSelectors || typeof featureSelectors === 'string' ) {
 		return fallback;
 	}
 
-	const feature = featureSelectors[featureKey];
-	if (typeof feature === 'string') {
+	const feature = featureSelectors[ featureKey ];
+	if ( typeof feature === 'string' ) {
 		return feature;
 	}
-	if (typeof feature === 'object' && feature.root) {
+	if ( typeof feature === 'object' && feature.root ) {
 		return feature.root;
 	}
 	return fallback;
@@ -1417,8 +1423,8 @@ function resolveFeatureSelector(
  * @return {string[]} The CSS variable declarations.
  */
 function getPresetVarDeclarations(
-	presets: Record<string, any>,
-	mergedSettings: GlobalStylesConfig['settings'],
+	presets: Record< string, any >,
+	mergedSettings: GlobalStylesConfig[ 'settings' ],
 	{ path, valueKey, valueFunc, cssVarInfix }: PresetMetadata
 ): string[] {
 	const presetByOrigin = getValueFromObjectPath(
@@ -1428,22 +1434,22 @@ function getPresetVarDeclarations(
 	) as PresetsByOrigin;
 
 	const declarations: string[] = [];
-	for (const origin of ['default', 'theme', 'custom']) {
-		if (!presetByOrigin[origin]) {
+	for ( const origin of [ 'default', 'theme', 'custom' ] ) {
+		if ( ! presetByOrigin[ origin ] ) {
 			continue;
 		}
-		for (const value of presetByOrigin[origin]) {
-			const slug = kebabCase(value.slug);
-			if (valueKey && !valueFunc) {
+		for ( const value of presetByOrigin[ origin ] ) {
+			const slug = kebabCase( value.slug );
+			if ( valueKey && ! valueFunc ) {
 				declarations.push(
-					`--wp--preset--${cssVarInfix}--${slug}: ${value[valueKey]}`
+					`--wp--preset--${ cssVarInfix }--${ slug }: ${ value[ valueKey ] }`
 				);
-			} else if (valueFunc && typeof valueFunc === 'function') {
+			} else if ( valueFunc && typeof valueFunc === 'function' ) {
 				declarations.push(
-					`--wp--preset--${cssVarInfix}--${slug}: ${valueFunc(
+					`--wp--preset--${ cssVarInfix }--${ slug }: ${ valueFunc(
 						value,
 						mergedSettings
-					)}`
+					) }`
 				);
 			}
 		}
@@ -1455,10 +1461,10 @@ export const generateCustomProperties = (
 	tree: GlobalStylesConfig,
 	blockSelectors: BlockSelectors
 ): string => {
-	const nodes = getNodesWithSettings(tree, blockSelectors);
+	const nodes = getNodesWithSettings( tree, blockSelectors );
 	let ruleset = '';
 
-	for (const { presets, custom, selector, featureSelectors } of nodes) {
+	for ( const { presets, custom, selector, featureSelectors } of nodes ) {
 		const defaultSelector = selector as string;
 
 		/*
@@ -1466,44 +1472,44 @@ export const generateCustomProperties = (
 		 * feature-level selectors need their preset CSS variables output
 		 * under that feature selector instead of the block's root selector.
 		 */
-		const varsBySelector: Record<string, string[]> = {
-			[defaultSelector]: [],
+		const varsBySelector: Record< string, string[] > = {
+			[ defaultSelector ]: [],
 		};
 
-		if (tree?.settings) {
-			for (const metadata of PRESET_METADATA) {
+		if ( tree?.settings ) {
+			for ( const metadata of PRESET_METADATA ) {
 				const declarations = getPresetVarDeclarations(
 					presets,
 					tree.settings,
 					metadata
 				);
-				if (declarations.length === 0) {
+				if ( declarations.length === 0 ) {
 					continue;
 				}
 
 				const target = resolveFeatureSelector(
 					featureSelectors,
-					metadata.path[0],
+					metadata.path[ 0 ],
 					defaultSelector
 				);
-				if (!varsBySelector[target]) {
-					varsBySelector[target] = [];
+				if ( ! varsBySelector[ target ] ) {
+					varsBySelector[ target ] = [];
 				}
-				varsBySelector[target].push(...declarations);
+				varsBySelector[ target ].push( ...declarations );
 			}
 		}
 
 		// Custom properties always use the block's default selector.
-		const customProps = flattenTree(custom, '--wp--custom--', '--');
-		if (customProps.length > 0) {
-			varsBySelector[defaultSelector].push(...customProps);
+		const customProps = flattenTree( custom, '--wp--custom--', '--' );
+		if ( customProps.length > 0 ) {
+			varsBySelector[ defaultSelector ].push( ...customProps );
 		}
 
-		for (const [ruleSelector, declarations] of Object.entries(
+		for ( const [ ruleSelector, declarations ] of Object.entries(
 			varsBySelector
-		)) {
-			if (declarations.length > 0) {
-				ruleset += `${ruleSelector}{${declarations.join(';')};}`;
+		) ) {
+			if ( declarations.length > 0 ) {
+				ruleset += `${ ruleSelector }{${ declarations.join( ';' ) };}`;
 			}
 		}
 	}
@@ -1564,12 +1570,12 @@ function renderStylesNode(
 
 	let ruleset = '';
 	const effectiveSelector = selectorSuffix
-		? appendToSelector(selector, selectorSuffix)
+		? appendToSelector( selector, selectorSuffix )
 		: selector;
 
 	// Process styles for block support features with custom feature level
 	// CSS selectors set.
-	if (featureSelectors && typeof featureSelectors !== 'string') {
+	if ( featureSelectors && typeof featureSelectors !== 'string' ) {
 		let featureDeclarations = getFeatureDeclarations(
 			featureSelectors,
 			styles
@@ -1588,38 +1594,38 @@ function renderStylesNode(
 			tree.settings
 		);
 
-		Object.entries(featureDeclarations).forEach(
-			([featureSelector, declarations]) => {
-				if (declarations.length) {
+		Object.entries( featureDeclarations ).forEach(
+			( [ featureSelector, declarations ] ) => {
+				if ( declarations.length ) {
 					let selectorForRule = variationName
 						? getBlockStyleVariationFeatureSelector(
-							variationName,
-							featureSelector
-						)
+								variationName,
+								featureSelector
+						  )
 						: featureSelector;
 
 					selectorForRule = selectorSuffix
-						? appendToSelector(selectorForRule, selectorSuffix)
+						? appendToSelector( selectorForRule, selectorSuffix )
 						: selectorForRule;
-					const rules = declarations.join(';');
-					ruleset += `:root :where(${selectorForRule}){${rules};}`;
+					const rules = declarations.join( ';' );
+					ruleset += `:root :where(${ selectorForRule }){${ rules };}`;
 				}
 			}
 		);
 	}
 
 	// Process duotone styles.
-	if (duotoneSelector) {
+	if ( duotoneSelector ) {
 		const duotoneStyles: any = {};
-		if (styles?.filter) {
+		if ( styles?.filter ) {
 			duotoneStyles.filter = styles.filter;
 			delete styles.filter;
 		}
-		const duotoneDeclarations = getStylesDeclarations(duotoneStyles);
-		if (duotoneDeclarations.length) {
-			ruleset += `${duotoneSelector}{${duotoneDeclarations.join(
+		const duotoneDeclarations = getStylesDeclarations( duotoneStyles );
+		if ( duotoneDeclarations.length ) {
+			ruleset += `${ duotoneSelector }{${ duotoneDeclarations.join(
 				';'
-			)};}`;
+			) };}`;
 		}
 	}
 
@@ -1628,16 +1634,16 @@ function renderStylesNode(
 	const hasBlockGapSupportForLayout =
 		layoutHasBlockGapSupport ?? hasBlockGapSupport;
 	if (
-		!disableLayoutStyles &&
-		(ROOT_BLOCK_SELECTOR === selectorForLayout || hasLayoutSupport)
+		! disableLayoutStyles &&
+		( ROOT_BLOCK_SELECTOR === selectorForLayout || hasLayoutSupport )
 	) {
-		ruleset += getLayoutStyles({
+		ruleset += getLayoutStyles( {
 			style: styles,
 			selector: selectorForLayout,
 			hasBlockGapSupport: hasBlockGapSupportForLayout,
 			hasFallbackGapSupport,
 			fallbackGapValue,
-		});
+		} );
 	}
 
 	// Process the remaining block styles (they use either normal block class or __experimentalSelector).
@@ -1649,21 +1655,21 @@ function renderStylesNode(
 		disableRootPadding
 	);
 
-	if (styleDeclarations?.length) {
+	if ( styleDeclarations?.length ) {
 		const generalSelector = skipSelectorWrapper
 			? effectiveSelector
-			: `:root :where(${effectiveSelector})`;
-		ruleset += `${generalSelector}{${styleDeclarations.join(';')};}`;
+			: `:root :where(${ effectiveSelector })`;
+		ruleset += `${ generalSelector }{${ styleDeclarations.join( ';' ) };}`;
 	}
-	if (styles?.css) {
+	if ( styles?.css ) {
 		ruleset += processCSSNesting(
 			styles.css,
-			`:root :where(${effectiveSelector})`
+			`:root :where(${ effectiveSelector })`
 		);
 	}
 
-	if (mediaQuery && ruleset) {
-		return `${mediaQuery}{${ruleset}}`;
+	if ( mediaQuery && ruleset ) {
+		return `${ mediaQuery }{${ ruleset }}`;
 	}
 
 	return ruleset;
@@ -1676,7 +1682,7 @@ export const transformToStyles = (
 	hasFallbackGapSupport?: boolean,
 	disableLayoutStyles: boolean = false,
 	disableRootPadding: boolean = false,
-	styleOptions: Record<string, boolean> = {}
+	styleOptions: Record< string, boolean > = {}
 ): string => {
 	// These allow opting out of certain sets of styles.
 	const options = {
@@ -1689,7 +1695,7 @@ export const transformToStyles = (
 		variationStyles: false,
 		...styleOptions,
 	};
-	const normalizedTree = normalizeStyleStateAliases(tree);
+	const normalizedTree = normalizeStyleStateAliases( tree );
 	const nodesWithStyles = getNodesWithStyles(
 		normalizedTree,
 		blockSelectors
@@ -1706,18 +1712,18 @@ export const transformToStyles = (
 
 	let ruleset = '';
 
-	if (options.presets && (contentSize || wideSize)) {
-		ruleset += `${ROOT_CSS_PROPERTIES_SELECTOR} {`;
+	if ( options.presets && ( contentSize || wideSize ) ) {
+		ruleset += `${ ROOT_CSS_PROPERTIES_SELECTOR } {`;
 		ruleset = contentSize
-			? ruleset + ` --wp--style--global--content-size: ${contentSize};`
+			? ruleset + ` --wp--style--global--content-size: ${ contentSize };`
 			: ruleset;
 		ruleset = wideSize
-			? ruleset + ` --wp--style--global--wide-size: ${wideSize};`
+			? ruleset + ` --wp--style--global--wide-size: ${ wideSize };`
 			: ruleset;
 		ruleset += '}';
 	}
 
-	if (hasBodyStyles) {
+	if ( hasBodyStyles ) {
 		/*
 		 * Reset default browser margin on the body element.
 		 * This is set on the body selector **before** generating the ruleset
@@ -1729,7 +1735,7 @@ export const transformToStyles = (
 		ruleset += ':where(body) {margin: 0;';
 
 		// Root padding styles should be output for full templates, patterns and template parts.
-		if (options.rootPadding && useRootPaddingAlign) {
+		if ( options.rootPadding && useRootPaddingAlign ) {
 			/*
 			 * These rules reproduce the ones from https://github.com/WordPress/gutenberg/blob/79103f124925d1f457f627e154f52a56228ed5ad/lib/class-wp-theme-json-gutenberg.php#L2508
 			 * almost exactly, but for the selectors that target block wrappers in the front end. This code only runs in the editor, so it doesn't need those selectors.
@@ -1745,33 +1751,33 @@ export const transformToStyles = (
 		ruleset += '}';
 	}
 
-	if (options.blockStyles) {
-		nodesWithStyles.forEach((node) => {
-			if (node.isStyleVariation && !options.variationStyles) {
+	if ( options.blockStyles ) {
+		nodesWithStyles.forEach( ( node ) => {
+			if ( node.isStyleVariation && ! options.variationStyles ) {
 				return;
 			}
 
-			const responsiveNodes = getResponsiveStyleNodes(node);
+			const responsiveNodes = getResponsiveStyleNodes( node );
 			// Match PHP node order: base, responsive base, pseudo, responsive pseudo.
 			[
 				node,
 				...responsiveNodes,
-				...getPseudoStyleNodes(node),
-				...responsiveNodes.flatMap(getPseudoStyleNodes),
-			].forEach((expandedNode) => {
-				ruleset += renderStylesNode(expandedNode, {
+				...getPseudoStyleNodes( node ),
+				...responsiveNodes.flatMap( getPseudoStyleNodes ),
+			].forEach( ( expandedNode ) => {
+				ruleset += renderStylesNode( expandedNode, {
 					tree: normalizedTree,
 					useRootPaddingAlign,
 					disableLayoutStyles,
 					hasBlockGapSupport,
 					hasFallbackGapSupport,
 					disableRootPadding,
-				});
-			});
-		});
+				} );
+			} );
+		} );
 	}
 
-	if (options.layoutStyles) {
+	if ( options.layoutStyles ) {
 		/* Add alignment / layout styles */
 		ruleset =
 			ruleset +
@@ -1784,14 +1790,14 @@ export const transformToStyles = (
 			'.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
 	}
 
-	if (options.blockGap && hasBlockGapSupport) {
+	if ( options.blockGap && hasBlockGapSupport ) {
 		// Use fallback of `0.5em` just in case, however if there is blockGap support, there should nearly always be a real value.
 		const gapValue =
-			getGapCSSValue(normalizedTree?.styles?.spacing?.blockGap) ||
+			getGapCSSValue( normalizedTree?.styles?.spacing?.blockGap ) ||
 			'0.5em';
 		ruleset =
 			ruleset +
-			`:root :where(.wp-site-blocks) > * { margin-block-start: ${gapValue}; margin-block-end: 0; }`;
+			`:root :where(.wp-site-blocks) > * { margin-block-start: ${ gapValue }; margin-block-end: 0; }`;
 		ruleset =
 			ruleset +
 			':root :where(.wp-site-blocks) > :first-child { margin-block-start: 0; }';
@@ -1800,8 +1806,8 @@ export const transformToStyles = (
 			':root :where(.wp-site-blocks) > :last-child { margin-block-end: 0; }';
 	}
 
-	if (options.presets) {
-		nodesWithSettings.forEach(({ selector, presets }) => {
+	if ( options.presets ) {
+		nodesWithSettings.forEach( ( { selector, presets } ) => {
 			if (
 				ROOT_BLOCK_SELECTOR === selector ||
 				ROOT_CSS_PROPERTIES_SELECTOR === selector
@@ -1810,11 +1816,11 @@ export const transformToStyles = (
 				selector = '';
 			}
 
-			const classes = getPresetsClasses(selector, presets);
-			if (classes.length > 0) {
+			const classes = getPresetsClasses( selector, presets );
+			if ( classes.length > 0 ) {
 				ruleset += classes;
 			}
-		});
+		} );
 	}
 
 	return ruleset;
@@ -1824,29 +1830,29 @@ export function generateSvgFilters(
 	tree: GlobalStylesConfig,
 	blockSelectors: BlockSelectors
 ): string[] {
-	const nodesWithSettings = getNodesWithSettings(tree, blockSelectors);
-	return nodesWithSettings.flatMap(({ presets }) => {
-		return getPresetsSvgFilters(presets);
-	});
+	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
+	return nodesWithSettings.flatMap( ( { presets } ) => {
+		return getPresetsSvgFilters( presets );
+	} );
 }
 
-const getSelectorsConfig = (blockType: BlockType, rootSelector: string) => {
+const getSelectorsConfig = ( blockType: BlockType, rootSelector: string ) => {
 	if (
 		blockType?.selectors &&
-		Object.keys(blockType.selectors).length > 0
+		Object.keys( blockType.selectors ).length > 0
 	) {
 		return blockType.selectors;
 	}
 
-	const config: Record<string, string> = {
+	const config: Record< string, string > = {
 		root: rootSelector,
 	};
-	Object.entries(BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS).forEach(
-		([featureKey, featureName]) => {
-			const featureSelector = getBlockSelector(blockType, featureKey);
+	Object.entries( BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS ).forEach(
+		( [ featureKey, featureName ] ) => {
+			const featureSelector = getBlockSelector( blockType, featureKey );
 
-			if (featureSelector) {
-				config[featureName] = featureSelector;
+			if ( featureSelector ) {
+				config[ featureName ] = featureSelector;
 			}
 		}
 	);
@@ -1858,58 +1864,58 @@ export const getBlockSelectors = (
 	blockTypes: BlockType[],
 	variationInstanceId?: string
 ) => {
-	const { getBlockStyles } = select(blocksStore);
+	const { getBlockStyles } = select( blocksStore );
 	const result: BlockSelectors = {};
-	blockTypes.forEach((blockType) => {
+	blockTypes.forEach( ( blockType ) => {
 		const name = blockType.name;
-		const selector = getBlockSelector(blockType);
+		const selector = getBlockSelector( blockType );
 
-		if (!selector) {
+		if ( ! selector ) {
 			return; // Skip blocks without valid selectors
 		}
-		let duotoneSelector = getBlockSelector(blockType, 'filter.duotone');
+		let duotoneSelector = getBlockSelector( blockType, 'filter.duotone' );
 		// Keep backwards compatibility for support.color.__experimentalDuotone.
-		if (!duotoneSelector) {
-			const rootSelector = getBlockSelector(blockType);
+		if ( ! duotoneSelector ) {
+			const rootSelector = getBlockSelector( blockType );
 			const duotoneSupport = getBlockSupport(
 				blockType,
 				'color.__experimentalDuotone',
 				false
 			);
-			if (typeof duotoneSupport === 'string' && rootSelector) {
-				duotoneSelector = scopeSelector(rootSelector, duotoneSupport);
+			if ( typeof duotoneSupport === 'string' && rootSelector ) {
+				duotoneSelector = scopeSelector( rootSelector, duotoneSupport );
 			}
 		}
 
 		const hasLayoutSupport =
-			!!blockType?.supports?.layout ||
-			!!blockType?.supports?.__experimentalLayout;
+			!! blockType?.supports?.layout ||
+			!! blockType?.supports?.__experimentalLayout;
 		const fallbackGapValue =
 			// @ts-expect-error
 			blockType?.supports?.spacing?.blockGap?.__experimentalDefault;
 
-		const blockStyleVariations = getBlockStyles(name);
-		const styleVariationSelectors: Record<string, string> = {};
-		blockStyleVariations?.forEach((variation) => {
+		const blockStyleVariations = getBlockStyles( name );
+		const styleVariationSelectors: Record< string, string > = {};
+		blockStyleVariations?.forEach( ( variation ) => {
 			const variationSuffix = variationInstanceId
-				? `-${variationInstanceId}`
+				? `-${ variationInstanceId }`
 				: '';
-			const variationName = `${variation.name}${variationSuffix}`;
+			const variationName = `${ variation.name }${ variationSuffix }`;
 			const styleVariationSelector = getBlockStyleVariationSelector(
 				variationName,
 				selector
 			);
 
-			styleVariationSelectors[variationName] = styleVariationSelector;
-		});
+			styleVariationSelectors[ variationName ] = styleVariationSelector;
+		} );
 
 		// For each block support feature add any custom selectors.
-		const featureSelectors = getSelectorsConfig(blockType, selector);
+		const featureSelectors = getSelectorsConfig( blockType, selector );
 
-		result[name] = {
+		result[ name ] = {
 			duotoneSelector: duotoneSelector ?? undefined,
 			fallbackGapValue,
-			featureSelectors: Object.keys(featureSelectors).length
+			featureSelectors: Object.keys( featureSelectors ).length
 				? featureSelectors
 				: undefined,
 			hasLayoutSupport,
@@ -1919,7 +1925,7 @@ export const getBlockSelectors = (
 				? styleVariationSelectors
 				: undefined,
 		};
-	});
+	} );
 
 	return result;
 };
@@ -1935,13 +1941,13 @@ function updateConfigWithSeparator(
 	config: GlobalStylesConfig
 ): GlobalStylesConfig {
 	const blocks = config.styles?.blocks;
-	const separatorBlock = blocks?.['core/separator'];
+	const separatorBlock = blocks?.[ 'core/separator' ];
 	const needsSeparatorStyleUpdate =
 		separatorBlock &&
 		separatorBlock.color?.background &&
-		!separatorBlock.color?.text &&
-		!separatorBlock.border?.color;
-	if (needsSeparatorStyleUpdate) {
+		! separatorBlock.color?.text &&
+		! separatorBlock.border?.color;
+	if ( needsSeparatorStyleUpdate ) {
 		return {
 			...config,
 			styles: {
@@ -1962,60 +1968,60 @@ function updateConfigWithSeparator(
 	return config;
 }
 
-export function processCSSNesting(css: string, blockSelector: string) {
+export function processCSSNesting( css: string, blockSelector: string ) {
 	let processedCSS = '';
 
-	if (!css || css.trim() === '') {
+	if ( ! css || css.trim() === '' ) {
 		return processedCSS;
 	}
 
 	// Split CSS nested rules.
-	const parts = css.split('&');
-	parts.forEach((part: string) => {
-		if (!part || part.trim() === '') {
+	const parts = css.split( '&' );
+	parts.forEach( ( part: string ) => {
+		if ( ! part || part.trim() === '' ) {
 			return;
 		}
 
-		const isRootCss = !part.includes('{');
-		if (isRootCss) {
+		const isRootCss = ! part.includes( '{' );
+		if ( isRootCss ) {
 			// If the part doesn't contain braces, it applies to the root level.
-			processedCSS += `:root :where(${blockSelector}){${part.trim()}}`;
+			processedCSS += `:root :where(${ blockSelector }){${ part.trim() }}`;
 		} else {
 			// If the part contains braces, it's a nested CSS rule.
-			const splitPart = part.replace('}', '').split('{');
-			if (splitPart.length !== 2) {
+			const splitPart = part.replace( '}', '' ).split( '{' );
+			if ( splitPart.length !== 2 ) {
 				return;
 			}
 
-			const [nestedSelector, cssValue] = splitPart;
+			const [ nestedSelector, cssValue ] = splitPart;
 
 			// Handle pseudo elements such as ::before, ::after, etc. Regex will also
 			// capture any leading combinator such as >, +, or ~, as well as spaces.
 			// This allows pseudo elements as descendants e.g. `.parent ::before`.
-			const matches = nestedSelector.match(/([>+~\s]*::[a-zA-Z-]+)/);
-			const pseudoPart = matches ? matches[1] : '';
+			const matches = nestedSelector.match( /([>+~\s]*::[a-zA-Z-]+)/ );
+			const pseudoPart = matches ? matches[ 1 ] : '';
 			const withoutPseudoElement = matches
-				? nestedSelector.replace(pseudoPart, '').trim()
+				? nestedSelector.replace( pseudoPart, '' ).trim()
 				: nestedSelector.trim();
 
 			let combinedSelector;
-			if (withoutPseudoElement === '') {
+			if ( withoutPseudoElement === '' ) {
 				// Only contained a pseudo element to use the block selector to form
 				// the final `:root :where()` selector.
 				combinedSelector = blockSelector;
 			} else {
 				// If the nested selector is a descendant of the block scope it with the
 				// block selector. Otherwise append it to the block selector.
-				combinedSelector = nestedSelector.startsWith(' ')
-					? scopeSelector(blockSelector, withoutPseudoElement)
-					: appendToSelector(blockSelector, withoutPseudoElement);
+				combinedSelector = nestedSelector.startsWith( ' ' )
+					? scopeSelector( blockSelector, withoutPseudoElement )
+					: appendToSelector( blockSelector, withoutPseudoElement );
 			}
 
 			// Build final rule, re-adding any pseudo element outside the `:where()`
 			// to maintain valid CSS selector.
-			processedCSS += `:root :where(${combinedSelector})${pseudoPart}{${cssValue.trim()}}`;
+			processedCSS += `:root :where(${ combinedSelector })${ pseudoPart }{${ cssValue.trim() }}`;
 		}
-	});
+	} );
 	return processedCSS;
 }
 
@@ -2024,8 +2030,8 @@ export interface GlobalStylesRenderOptions {
 	hasFallbackGapSupport?: boolean;
 	disableLayoutStyles?: boolean;
 	disableRootPadding?: boolean;
-	getBlockStyles?: (blockName: string) => any[];
-	styleOptions?: Record<string, boolean>;
+	getBlockStyles?: ( blockName: string ) => any[];
+	styleOptions?: Record< string, boolean >;
 }
 
 /**
@@ -2040,7 +2046,7 @@ export function generateGlobalStyles(
 	config: GlobalStylesConfig | undefined = {},
 	blockTypes: any[] = [],
 	options: GlobalStylesRenderOptions = {}
-): [any[], any] {
+): [ any[], any ] {
 	const {
 		hasBlockGapSupport: hasBlockGapSupportOption,
 		hasFallbackGapSupport: hasFallbackGapSupportOption,
@@ -2052,16 +2058,16 @@ export function generateGlobalStyles(
 	// Use provided block types or fall back to getBlockTypes()
 	const blocks = blockTypes.length > 0 ? blockTypes : getBlockTypes();
 
-	const blockGap = getSetting(config, 'spacing.blockGap');
+	const blockGap = getSetting( config, 'spacing.blockGap' );
 	const hasBlockGapSupport = hasBlockGapSupportOption ?? blockGap !== null;
 	const hasFallbackGapSupport =
-		hasFallbackGapSupportOption ?? !hasBlockGapSupport;
+		hasFallbackGapSupportOption ?? ! hasBlockGapSupport;
 
-	if (!config?.styles || !config?.settings) {
-		return [[], {}];
+	if ( ! config?.styles || ! config?.settings ) {
+		return [ [], {} ];
 	}
-	const updatedConfig = updateConfigWithSeparator(config);
-	const blockSelectors = getBlockSelectors(blocks);
+	const updatedConfig = updateConfigWithSeparator( config );
+	const blockSelectors = getBlockSelectors( blocks );
 	const customProperties = generateCustomProperties(
 		updatedConfig,
 		blockSelectors
@@ -2075,7 +2081,7 @@ export function generateGlobalStyles(
 		disableRootPadding,
 		styleOptions
 	);
-	const svgs = generateSvgFilters(updatedConfig, blockSelectors);
+	const svgs = generateSvgFilters( updatedConfig, blockSelectors );
 	const styles = [
 		{
 			css: customProperties,
@@ -2100,31 +2106,31 @@ export function generateGlobalStyles(
 	// Loop through the blocks to check if there are custom CSS values.
 	// If there are, get the block selector and push the selector together with
 	// the CSS value to the 'stylesheets' array.
-	blocks.forEach((blockType: BlockType) => {
-		const blockStyles = updatedConfig?.styles?.blocks?.[blockType.name];
-		if (blockStyles?.css) {
-			const { featureSelectors } = blockSelectors[blockType.name];
+	blocks.forEach( ( blockType: BlockType ) => {
+		const blockStyles = updatedConfig?.styles?.blocks?.[ blockType.name ];
+		if ( blockStyles?.css ) {
+			const { featureSelectors } = blockSelectors[ blockType.name ];
 			const cssFeatureSelector =
 				typeof featureSelectors === 'object'
 					? featureSelectors?.css
 					: undefined;
 			let resolvedCssSelector: string | undefined;
-			if (typeof cssFeatureSelector === 'string') {
+			if ( typeof cssFeatureSelector === 'string' ) {
 				resolvedCssSelector = cssFeatureSelector;
-			} else if (typeof cssFeatureSelector === 'object') {
+			} else if ( typeof cssFeatureSelector === 'object' ) {
 				resolvedCssSelector = (
-					cssFeatureSelector as Record<string, string>
-				)?.root;
+					cssFeatureSelector as Record< string, string >
+				 )?.root;
 			}
 			const selector =
 				resolvedCssSelector ??
-				blockSelectors[blockType.name].selector;
-			styles.push({
-				css: processCSSNesting(blockStyles.css, selector),
+				blockSelectors[ blockType.name ].selector;
+			styles.push( {
+				css: processCSSNesting( blockStyles.css, selector ),
 				isGlobalStyles: true,
-			});
+			} );
 		}
-	});
+	} );
 
-	return [styles, updatedConfig.settings];
+	return [ styles, updatedConfig.settings ];
 }

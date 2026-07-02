@@ -2550,7 +2550,7 @@ class WP_Theme_JSON_Gutenberg {
 				$is_pseudo = str_starts_with( $inner, ':' );
 
 				if ( ( $targets_same_element && $is_class ) || $is_pseudo ) {
-					$escaped        = preg_quote( $inner, '/' );
+					$escaped       = preg_quote( $inner, '/' );
 					$has_duplicate = preg_match( '/' . $escaped . '(?![a-zA-Z0-9_-])/', $last );
 					if ( $has_duplicate ) {
 						$selectors_scoped[] = $outer;
