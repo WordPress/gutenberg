@@ -4,9 +4,9 @@
  * content edit as a suggestion, routing of block-switcher mutations through
  * the store interceptor, and the empty-inserted-block guard.
  *
- * The inline diff-rendering "golden paths" (text wrapped in
- * `<ins class="has-suggestion-addition">` / `<del class="has-suggestion-deletion">`)
- * live with the inline-suggestions layer, which renders those marks.
+ * The inline "golden paths" (typed/deleted text rendered as in-content
+ * `<mark class="wp-suggestion">` markers) live with the inline-suggestions
+ * layer, which owns that rendering.
  */
 
 /**

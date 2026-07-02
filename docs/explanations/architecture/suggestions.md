@@ -62,7 +62,7 @@ When the intent is `suggest`, an `editor.BlockEdit` filter (`withSuggestionOverl
 2. **Diversion** — `setAttributes` writes to a React-context-backed overlay (`SuggestionOverlayProvider`) keyed by `clientId`, not the block-editor store.
 3. **Merge for render** — the block receives `{ ...realAttributes, ...overlayAttributes }` so the user sees their in-progress change live.
 
-A companion `editor.BlockListBlock` filter tags each block with a pending change so it is discoverable without relying on the selected-block toolbar. Attribute edits get an `is-suggestion-pending` class (the bracket/outline treatment); pending structural changes get `is-suggestion-pending-remove` (strikethrough/dim), `is-suggestion-pending-insert`, or `is-suggestion-pending-move`, mapped from the block's `metadata.suggestion` marker.
+A companion `editor.BlockListBlock` filter tags each block with a pending change so it is discoverable without relying on the selected-block toolbar. Attribute edits get an `is-suggestion-pending` class (the bracket/outline treatment); pending structural changes get `is-suggestion-pending-remove` (strikethrough/dim), `is-suggestion-pending-insert`, or `is-suggestion-pending-move`, mapped from the block's `metadata.suggestion` marker. When the suggester's user id is known, `getAvatarBorderColor` resolves their avatar color and it rides on the block wrapper as an inline `style="--suggestion-author-color: …"`, so two suggesters' pending treatments are distinguishable at a glance.
 
 For **attribute suggestions** the store is never touched, so autosave, undo/redo, and RTC sync stay at the real baseline. **Structural suggestions** are different: their pending state (the `metadata.suggestion` markers, and pending-insert blocks themselves) lives in the real block tree, so serializing the post would leak it into `post_content`. While any pending structural state exists, `SuggestionSaveLock` holds the editor's save and autosave locks (`lockPostSaving` / `lockPostAutosaving`), releasing them once every structural suggestion has been applied or rejected.
 
@@ -272,7 +272,7 @@ The current implementation (`provider.js`) uses comment meta. A future Yjs-backe
 
 In the notes sidebar, a suggestion thread renders:
 
-- **`SuggestionSummary`** — a Docs-style "Add: …", "Delete: …", "Formatting: …" summary derived from the operations. It is the sidebar's sole suggestion renderer; the old full-diff `SuggestionDiff` component was deleted with the overlay retirement (its `wordDiff` engine lives on in `word-diff.js`, capped by `MAX_DIFF_LENGTH`/`MAX_DIFF_TOKENS` so a large payload can't freeze the sidebar).
+- **`SuggestionSummary`** — a Docs-style "Add: …", "Delete: …", "Format: …" summary derived from the operations. It is the sidebar's sole suggestion renderer; its `wordDiff` engine lives in `word-diff.js`, capped by `MAX_DIFF_LENGTH`/`MAX_DIFF_TOKENS` so a large payload can't freeze the sidebar.
 - **Accept / Reject icon buttons** — checkmark and close icons that trigger the provider's apply/reject flows.
 
 ## Yjs v2 Migration Path
