@@ -48,6 +48,8 @@
 -   `Truncate`: Migrate styles from Emotion to SCSS Modules ([#79446](https://github.com/WordPress/gutenberg/pull/79446)).
 -   `View`: Migrate away from Emotion while preserving polymorphic `as` behavior and style cascade order ([#79443](https://github.com/WordPress/gutenberg/pull/79443)).
 
+## 36.1.0 (2026-07-01)
+
 ## 36.0.0 (2026-06-24)
 
 ### Breaking Changes
