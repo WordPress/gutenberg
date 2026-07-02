@@ -43,7 +43,7 @@ function gutenberg_get_block_editor_settings( $settings ) {
 
 	$block_classes = array(
 		'css'            => 'styles',
-		'__unstableType' => 'theme',
+		'__unstableType' => wp_theme_has_theme_json() ? 'theme' : 'base-layout',
 		'isGlobalStyles' => true,
 	);
 	$actual_css    = gutenberg_get_global_stylesheet( array( $block_classes['css'] ) );
