@@ -24,7 +24,8 @@
 	min-width: 0;
 }
 
-.icon {
+.icon,
+.info {
 	display: inline-flex;
 	color: var(--wpds-color-foreground-content-neutral);
 }

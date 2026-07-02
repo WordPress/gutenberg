@@ -8,9 +8,7 @@ import type { ReactNode } from 'react';
  * WordPress dependencies
  */
 import { info } from '@wordpress/icons';
-// Dashboard is still experimental.
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Card, Icon, IconButton, Stack } from '@wordpress/ui';
+import { Card, Icon, Stack, Tooltip, VisuallyHidden } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
 
 /**
@@ -89,16 +87,26 @@ export function WidgetHeader( {
 					</Card.Title>
 
 					{ widgetType.info && (
-						<IconButton
-							icon={ info }
-							label={ widgetType.info }
-							variant="minimal"
-							tone="neutral"
-							size="compact"
-						/>
+						<Tooltip.Root>
+							<Tooltip.Trigger
+								render={
+									<span className={ styles.info }>
+										<Icon
+											icon={ info }
+											aria-hidden="true"
+										/>
+										<VisuallyHidden>
+											{ widgetType.info }
+										</VisuallyHidden>
+									</span>
+								}
+							/>
+							<Tooltip.Popup>{ widgetType.info }</Tooltip.Popup>
+						</Tooltip.Root>
 					) }
 				</Stack>
 			) }
+
 			{ children && <div className={ styles.toolbar }>{ children }</div> }
 		</Card.Header>
 	);
