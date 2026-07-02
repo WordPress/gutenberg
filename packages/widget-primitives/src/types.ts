@@ -78,6 +78,12 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	description?: string;
 
 	/**
+	 * Brief contextual note about the widget type, meant for compact
+	 * surfaces such as tooltips. Translatable.
+	 */
+	info?: string;
+
+	/**
 	 * Visual identifier for the widget type; hosts decide where, and
 	 * whether, to render it.
 	 */
@@ -232,6 +238,11 @@ export interface WidgetModuleRecord {
 	 * Translated description; overrides the metadata module's value.
 	 */
 	description?: WidgetTypeMetadata[ 'description' ] | null;
+
+	/**
+	 * Translated info note; overrides the metadata module's value.
+	 */
+	info?: WidgetTypeMetadata[ 'info' ] | null;
 
 	/**
 	 * Translated search aliases; override the metadata module's value.

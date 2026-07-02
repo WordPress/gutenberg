@@ -22,6 +22,7 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 
 		$this->assertSame( 'widget title', $schema['title'] );
 		$this->assertSame( 'widget description', $schema['description'] );
+		$this->assertSame( 'widget info', $schema['info'] );
 		$this->assertSame( array( 'widget keyword' ), $schema['keywords'] );
 	}
 
@@ -37,6 +38,7 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 				'name'        => 'core/welcome',
 				'title'       => 'Welcome',
 				'description' => 'Displays a welcome panel.',
+				'info'        => 'Welcome at a glance.',
 				'keywords'    => array( 'start' ),
 				'category'    => 'dashboard',
 				'textdomain'  => 'default',
@@ -45,6 +47,7 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 
 		$this->assertSame( 'Bienvenido', $widget['title'] );
 		$this->assertSame( 'Muestra un panel de bienvenida.', $widget['description'] );
+		$this->assertSame( 'Bienvenida de un vistazo.', $widget['info'] );
 		$this->assertSame( array( 'inicio' ), $widget['keywords'] );
 		$this->assertSame( 'dashboard', $widget['category'] );
 	}
@@ -78,6 +81,7 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 		$messages = array(
 			'widget title'       => array( 'Welcome' => 'Bienvenido' ),
 			'widget description' => array( 'Displays a welcome panel.' => 'Muestra un panel de bienvenida.' ),
+			'widget info'        => array( 'Welcome at a glance.' => 'Bienvenida de un vistazo.' ),
 			'widget keyword'     => array( 'start' => 'inicio' ),
 		);
 

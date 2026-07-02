@@ -98,6 +98,17 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 		public $description = null;
 
 		/**
+		 * Brief contextual note about the widget type, meant for compact
+		 * surfaces such as tooltips. Translated at registration time using
+		 * the widget's text domain.
+		 *
+		 * Null when the widget did not declare the field.
+		 *
+		 * @var string|null
+		 */
+		public $info = null;
+
+		/**
 		 * Alternative terms used to match the widget type when searching,
 		 * e.g. "calendar" for an events widget. Translated at registration
 		 * time using the widget's text domain.

@@ -80,6 +80,7 @@ export function useWidgetTypes(
 						...( record.description
 							? { description: record.description }
 							: {} ),
+						...( record.info ? { info: record.info } : {} ),
 						...( record.keywords
 							? { keywords: record.keywords }
 							: {} ),

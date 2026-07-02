@@ -207,6 +207,10 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 				$data['description'] = $widget_type->description;
 			}
 
+			if ( rest_is_field_included( 'info', $fields ) ) {
+				$data['info'] = $widget_type->info;
+			}
+
 			if ( rest_is_field_included( 'keywords', $fields ) ) {
 				$data['keywords'] = $widget_type->keywords;
 			}
@@ -278,6 +282,13 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 
 					'description'   => array(
 						'description' => __( 'Human-readable description of what the widget type does. Translatable.', 'gutenberg' ),
+						'type'        => array( 'string', 'null' ),
+						'context'     => array( 'view', 'edit', 'embed' ),
+						'readonly'    => true,
+					),
+
+					'info'          => array(
+						'description' => __( 'Brief contextual note about the widget type, meant for compact surfaces such as tooltips. Translatable.', 'gutenberg' ),
 						'type'        => array( 'string', 'null' ),
 						'context'     => array( 'view', 'edit', 'embed' ),
 						'readonly'    => true,

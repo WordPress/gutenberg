@@ -62,6 +62,7 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 				'category'      => 'dashboard',
 				'title'         => 'Widget A',
 				'description'   => 'The first test widget.',
+				'info'          => 'Everything about A, briefly.',
 				'keywords'      => array( 'alpha', 'first' ),
 			)
 		);
@@ -131,6 +132,7 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 		$this->assertSame( 'dashboard', $data['category'] );
 		$this->assertSame( 'Widget A', $data['title'] );
 		$this->assertSame( 'The first test widget.', $data['description'] );
+		$this->assertSame( 'Everything about A, briefly.', $data['info'] );
 		$this->assertSame( array( 'alpha', 'first' ), $data['keywords'] );
 	}
 
@@ -180,6 +182,7 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'category', $properties );
 		$this->assertArrayHasKey( 'title', $properties );
 		$this->assertArrayHasKey( 'description', $properties );
+		$this->assertArrayHasKey( 'info', $properties );
 		$this->assertArrayHasKey( 'keywords', $properties );
 		$this->assertSame( 'string', $properties['name']['type'] );
 		$this->assertSame( array( 'string', 'null' ), $properties['render_module']['type'] );
@@ -187,6 +190,7 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 		$this->assertSame( array( 'string', 'null' ), $properties['category']['type'] );
 		$this->assertSame( array( 'string', 'null' ), $properties['title']['type'] );
 		$this->assertSame( array( 'string', 'null' ), $properties['description']['type'] );
+		$this->assertSame( array( 'string', 'null' ), $properties['info']['type'] );
 		$this->assertSame( array( 'array', 'null' ), $properties['keywords']['type'] );
 	}
 }

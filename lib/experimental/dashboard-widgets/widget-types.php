@@ -37,9 +37,9 @@ function gutenberg_get_widget_metadata_i18n_schema() {
 /**
  * Translates a widget's user-facing metadata strings.
  *
- * Runs `title`, `description`, and `keywords` through the widget i18n schema
- * using the widget's `textdomain`, leaving every other key untouched. A no-op
- * when the widget declares no `textdomain`.
+ * Runs `title`, `description`, `info`, and `keywords` through the widget
+ * i18n schema using the widget's `textdomain`, leaving every other key
+ * untouched. A no-op when the widget declares no `textdomain`.
  *
  * @param array $widget Widget data from the build manifest.
  * @return array Widget data with its translatable strings localized.
@@ -52,7 +52,7 @@ function gutenberg_translate_widget_metadata( $widget ) {
 
 	$i18n_schema = gutenberg_get_widget_metadata_i18n_schema();
 
-	foreach ( array( 'title', 'description', 'keywords' ) as $field ) {
+	foreach ( array( 'title', 'description', 'info', 'keywords' ) as $field ) {
 		if ( isset( $widget[ $field ], $i18n_schema[ $field ] ) ) {
 			$widget[ $field ] = translate_settings_using_i18n_schema( $i18n_schema[ $field ], $widget[ $field ], $textdomain );
 		}
@@ -93,6 +93,7 @@ function gutenberg_register_widget_types() {
 				'category'      => $widget['category'] ?? null,
 				'title'         => $widget['title'] ?? null,
 				'description'   => $widget['description'] ?? null,
+				'info'          => $widget['info'] ?? null,
 				'keywords'      => $widget['keywords'] ?? null,
 			)
 		);

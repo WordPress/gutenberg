@@ -1,5 +1,6 @@
 {
 	"title": "widget title",
 	"description": "widget description",
+	"info": "widget info",
 	"keywords": [ "widget keyword" ]
 }

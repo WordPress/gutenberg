@@ -16,6 +16,9 @@
 -   `WidgetModuleRecord`: add optional `title`, `description`, and
     `keywords`, overlaid onto the metadata module's values. Lets a host
     supply metadata translated server-side.
+-   `WidgetTypeMetadata`: add optional `info`, a brief contextual note
+    meant for compact surfaces such as tooltips. Also carried by
+    `WidgetModuleRecord`, overlaid onto the metadata module's value.
 
 ## 0.2.0 (2026-07-01)
 
