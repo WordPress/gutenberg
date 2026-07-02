@@ -36,6 +36,33 @@ const EMPTY_ARRAY = [];
 // rather than a long list of radio menu items.
 const PRESETS_SELECT_THRESHOLD = 7;
 
+/**
+ * Extracts the preset slug from a raw text shadow value.
+ *
+ * @param {string} [rawValue] The stored text shadow value.
+ * @return {string|undefined} The preset slug, or undefined for custom values.
+ */
+function getTextShadowPresetSlug( rawValue ) {
+	if ( ! rawValue || typeof rawValue !== 'string' ) {
+		return undefined;
+	}
+
+	// Block supports use the `var:preset|text-shadow|slug` format.
+	if ( rawValue.startsWith( 'var:preset|text-shadow|' ) ) {
+		return rawValue.replace( 'var:preset|text-shadow|', '' );
+	}
+
+	// Global styles data uses the `var(--wp--preset--text-shadow--slug)` format.
+	const cssVarMatch = rawValue.match(
+		/^var\(--wp--preset--text-shadow--([^)]+)\)$/
+	);
+	if ( cssVarMatch ) {
+		return cssVarMatch[ 1 ];
+	}
+
+	return undefined;
+}
+
 export function TextShadowPopover( { textShadow, onChange } ) {
 	const popoverProps = {
 		placement: 'left-start',
@@ -96,12 +123,13 @@ function TextShadowControl( { textShadow, onChange } ) {
 		} ) ),
 	];
 
-	const activeSlug = presets.find(
-		( preset ) => preset.textShadow === textShadow
-	)?.slug;
+	const activeSlug = getTextShadowPresetSlug( textShadow );
 	const activeValue = activeSlug
 		? `var:preset|text-shadow|${ activeSlug }`
 		: textShadow ?? '';
+	const previewValue = activeSlug
+		? presets.find( ( preset ) => preset.slug === activeSlug )?.textShadow
+		: textShadow;
 
 	return (
 		<Stack
@@ -112,7 +140,7 @@ function TextShadowControl( { textShadow, onChange } ) {
 			<MenuGroup label={ __( 'Text shadow' ) }>
 				<div
 					className="block-editor-global-styles__text-shadow-preview"
-					style={ { textShadow } }
+					style={ { textShadow: previewValue } }
 				>
 					{ __( 'Code is poetry' ) }
 				</div>

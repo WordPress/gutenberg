@@ -548,7 +548,7 @@ export default function TypographyPanel( {
 
 	// Text Shadow
 	const hasTextShadowControl = useHasTextShadowControl( settings );
-	const textShadow = decodeValue( inheritedValue?.typography?.textShadow );
+	const textShadow = inheritedValue?.typography?.textShadow;
 	const setTextShadow = ( newValue ) => {
 		onChange(
 			setImmutably(
