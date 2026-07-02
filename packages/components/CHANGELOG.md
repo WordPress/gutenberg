@@ -15,7 +15,7 @@
     -   `BorderBoxControl` ([#79420](https://github.com/WordPress/gutenberg/pull/79420))
     -   `BorderControl` ([#79418](https://github.com/WordPress/gutenberg/pull/79418))
     -   `ComboboxControl` ([#79636](https://github.com/WordPress/gutenberg/pull/79636)).
-    -   `CustomSelectControl`.
+    -   `CustomSelectControl` ([#79796](https://github.com/WordPress/gutenberg/pull/79796)).
     -   `FontSizePicker` ([#79481](https://github.com/WordPress/gutenberg/pull/79481))
     -   `FormFileUpload` ([#79655](https://github.com/WordPress/gutenberg/pull/79655))
     -   `RangeControl` ([#79590](https://github.com/WordPress/gutenberg/pull/79590))
