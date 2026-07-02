@@ -33,10 +33,13 @@ function gutenberg_admin_bar_site_icon( WP_Admin_Bar $wp_admin_bar ): void {
 		return;
 	}
 
-	$site_icon = sprintf(
-		'<img class="site-icon" src="%s" srcset="%s 2x" alt="" width="20" height="20" />',
-		esc_url( get_site_icon_url( 32 ) ),
-		esc_url( get_site_icon_url( 64 ) )
+	$site_icon_url    = get_site_icon_url( 32 );
+	$site_icon_url_2x = get_site_icon_url( 64 );
+	$srcset           = ( $site_icon_url_2x && $site_icon_url !== $site_icon_url_2x ) ? sprintf( ' srcset="%s 2x"', esc_url( $site_icon_url_2x ) ) : '';
+	$site_icon        = sprintf(
+		'<img class="site-icon" src="%s"%s alt="" width="20" height="20" />',
+		esc_url( $site_icon_url ),
+		$srcset
 	);
 
 	$wp_admin_bar->add_node(
