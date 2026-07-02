@@ -199,11 +199,29 @@ export type ResolveWidgetModule = (
 ) => Promise< WidgetModule >;
 
 /**
+ * The `WidgetTypeMetadata` subset a record may carry, resolved server-side
+ * (already translated) and overriding the metadata module's values. Every
+ * field is optional and nullable; `null`/absent means the module's value
+ * stands.
+ */
+type WidgetModuleRecordOverrides = {
+	[ K in keyof Pick<
+		WidgetTypeMetadata,
+		| 'title'
+		| 'description'
+		| 'info'
+		| 'category'
+		| 'presentation'
+		| 'keywords'
+	> ]?: WidgetTypeMetadata[ K ] | null;
+};
+
+/**
  * Per-widget record a host feeds to `useWidgetTypes`, in snake_case wire
  * format. The host fetches these however it likes; only the field shape is
  * part of the contract.
  */
-export interface WidgetModuleRecord {
+export interface WidgetModuleRecord extends WidgetModuleRecordOverrides {
 	/**
 	 * Stable widget type identifier.
 	 */
@@ -218,34 +236,4 @@ export interface WidgetModuleRecord {
 	 * Script-module id dynamically imported for the widget's live metadata.
 	 */
 	widget_module?: string | null;
-
-	/**
-	 * Authoring presentation hint; overrides the metadata module's value.
-	 */
-	presentation?: WidgetTypeMetadata[ 'presentation' ] | null;
-
-	/**
-	 * Grouping category; overrides the metadata module's value.
-	 */
-	category?: WidgetTypeMetadata[ 'category' ] | null;
-
-	/**
-	 * Translated title; overrides the metadata module's value.
-	 */
-	title?: WidgetTypeMetadata[ 'title' ] | null;
-
-	/**
-	 * Translated description; overrides the metadata module's value.
-	 */
-	description?: WidgetTypeMetadata[ 'description' ] | null;
-
-	/**
-	 * Translated info note; overrides the metadata module's value.
-	 */
-	info?: WidgetTypeMetadata[ 'info' ] | null;
-
-	/**
-	 * Translated search aliases; override the metadata module's value.
-	 */
-	keywords?: WidgetTypeMetadata[ 'keywords' ] | null;
 }
