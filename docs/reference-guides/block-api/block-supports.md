@@ -1234,7 +1234,20 @@ supports: {
 }
 ```
 
-When the block declares support for `textShadow`, the attributes definition is extended to include a new attribute `style` of `object` type with no default assigned. It stores the custom value set by the user. The block can apply a default style by specifying its own `style` attribute with a default. For example:
+When the block declares support for `textShadow`, the attributes definition is extended to include two new attributes: `textShadow` and `style`:
+
+-   `textShadow`: an attribute of `string` type with no default assigned. It stores any preset value selected by the user. The block can apply a default preset text shadow by specifying its own `textShadow` attribute with a default. For example:
+
+```js
+attributes: {
+    textShadow: {
+        type: 'string',
+        default: 'some-value',
+    }
+}
+```
+
+-   `style`: an attribute of `object` type with no default assigned. It stores the custom value set by the user and is shared with other block supports such as color. The block can apply a default style by specifying its own `style` attribute with a default. For example:
 
 ```js
 attributes: {
