@@ -1,7 +1,3 @@
-/**
- * External dependencies
- */
-import type { SerializedStyles } from '@emotion/react';
 import { css } from '@emotion/react';
 
 /**
@@ -24,24 +20,17 @@ export function useFlexItem(
 		...otherProps
 	} = useContextSystem( props, 'FlexItem' );
 
-	const sx: {
-		Base?: SerializedStyles;
-	} = {};
-
 	const contextDisplay = useFlexContext().flexItemDisplay;
 
-	sx.Base = css( {
+	const base = css( {
 		display: displayProp || contextDisplay,
 	} );
 
 	const cx = useCx();
 
-	const classes = cx(
-		styles.Item,
-		sx.Base,
-		isBlock && styles.block,
-		className
-	);
+	const itemStyles = css( styles.Item, base, isBlock && styles.block );
+
+	const classes = cx( itemStyles, className );
 
 	return {
 		...otherProps,

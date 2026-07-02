@@ -227,10 +227,17 @@ export function formatDesignTokenFallbacksScss(
 	].join( '\n' );
 }
 
+type PluginDsTokenFallbacksOptions = {
+	filename?: string;
+	scssFilename?: string | false;
+	additionalScssFilenames?: string[];
+};
+
 export default function pluginDsTokenFallbacks( {
 	filename = 'js/design-token-fallbacks.mjs',
 	scssFilename = 'scss/design-token-fallbacks.scss',
-} = {} ): Plugin {
+	additionalScssFilenames = [],
+}: PluginDsTokenFallbacksOptions = {} ): Plugin {
 	return {
 		name: '@wordpress/terrazzo-plugin-ds-token-fallbacks',
 		async build( { getTransforms, outputFile } ) {
@@ -337,10 +344,15 @@ export default function pluginDsTokenFallbacks( {
 					'\n'
 			);
 
-			outputFile(
-				scssFilename,
-				formatDesignTokenFallbacksScss( sorted )
-			);
+			const scssFilenames = [
+				...( scssFilename ? [ scssFilename ] : [] ),
+				...additionalScssFilenames,
+			];
+
+			const scss = formatDesignTokenFallbacksScss( sorted );
+			for ( const currentScssFilename of scssFilenames ) {
+				outputFile( currentScssFilename, scss );
+			}
 		},
 	};
 }
