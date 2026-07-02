@@ -11,25 +11,10 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import PostTypeSupportCheck from '../post-type-support-check';
 import useInterval from './use-interval';
 
-/**
- * Monitors the changes made to the edited post and triggers autosave if necessary.
- *
- * The post is checked every `interval` seconds and autosaved when there is something new to save.
- *
- * @param {Object}   props            The component props.
- * @param {number}   [props.interval] Time in seconds between checks. Defaults to the editor's
- *                                    `autosaveInterval` setting.
- * @param {Function} [props.autosave] Function to call when changes need to be saved. Defaults to the
- *                                    editor store's `autosave` action.
- *
- * @example
- * ```jsx
- * <AutosaveMonitor interval={ 30 } />
- * ```
- */
-export default function AutosaveMonitor( { interval, autosave } ) {
+function AutosaveMonitorInner( { interval, autosave } ) {
 	const { autosave: autosaveAction } = useDispatch( editorStore );
 	const { createWarningNotice } = useDispatch( noticesStore );
 	const triggerAutosave = autosave ?? autosaveAction;
@@ -99,4 +84,29 @@ export default function AutosaveMonitor( { interval, autosave } ) {
 	}, autosaveInterval );
 
 	return null;
+}
+
+/**
+ * Monitors the changes made to the edited post and triggers autosave if necessary.
+ *
+ * The post is checked every `interval` seconds and autosaved when there is something new to save.
+ * Renders nothing when the post type doesn't support autosaves.
+ *
+ * @param {Object}   props            The component props.
+ * @param {number}   [props.interval] Time in seconds between checks. Defaults to the editor's
+ *                                    `autosaveInterval` setting.
+ * @param {Function} [props.autosave] Function to call when changes need to be saved. Defaults to the
+ *                                    editor store's `autosave` action.
+ *
+ * @example
+ * ```jsx
+ * <AutosaveMonitor interval={ 30 } />
+ * ```
+ */
+export default function AutosaveMonitor( props ) {
+	return (
+		<PostTypeSupportCheck supportKeys="autosave">
+			<AutosaveMonitorInner { ...props } />
+		</PostTypeSupportCheck>
+	);
 }

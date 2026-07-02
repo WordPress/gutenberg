@@ -130,7 +130,7 @@ Example:
 
 Monitors the changes made to the edited post and triggers autosave if necessary.
 
-The post is checked every `interval` seconds and autosaved when there is something new to save.
+The post is checked every `interval` seconds and autosaved when there is something new to save. Renders nothing when the post type doesn't support autosaves.
 
 _Usage_
 

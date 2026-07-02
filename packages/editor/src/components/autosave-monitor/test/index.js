@@ -34,6 +34,7 @@ function setState( overrides = {} ) {
 		isAutosaving: false,
 		autosaveInterval: 10,
 		existingAutosave: undefined,
+		supportsAutosave: true,
 		...overrides,
 	};
 }
@@ -50,6 +51,10 @@ describe( 'AutosaveMonitor', () => {
 		useSelect.mockImplementation( ( mapSelectOrStore ) => {
 			const selectors = {
 				getReferenceByDistinctEdits: () => state.editsReference,
+				getEditedPostAttribute: () => 'post',
+				getPostType: () => ( {
+					supports: { autosave: state.supportsAutosave },
+				} ),
 				isEditedPostDirty: () => state.isDirty,
 				isEditedPostAutosaveable: () => state.isAutosaveable,
 				isAutosavingPost: () => state.isAutosaving,
@@ -82,6 +87,13 @@ describe( 'AutosaveMonitor', () => {
 		render( <AutosaveMonitor /> );
 
 		expect( setInterval ).toHaveBeenCalled();
+	} );
+
+	it( 'should not start the autosave timer when the post type does not support autosaves', () => {
+		setState( { supportsAutosave: false } );
+		render( <AutosaveMonitor /> );
+
+		expect( setInterval ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should clear the autosave timer after being unmounted', () => {

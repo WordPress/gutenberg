@@ -17,6 +17,7 @@ import {
 	localAutosaveClear,
 } from '../../store/local-autosave';
 import { store as editorStore } from '../../store';
+import PostTypeSupportCheck from '../post-type-support-check';
 import useInterval from './use-interval';
 
 const requestIdleCallback = window.requestIdleCallback
@@ -163,18 +164,17 @@ function useAutosavePurge() {
 	}, [ isEditedPostNew, postId ] );
 }
 
-function LocalAutosaveMonitor() {
+function LocalAutosaveMonitorInner() {
 	const { autosave } = useDispatch( editorStore );
 	const {
 		getCurrentPostId,
-		getCurrentPostType,
 		isEditedPostNew,
 		isEditedPostSaveable,
 		isEditedPostDirty,
 		isPostAutosavingLocked,
 		getEditedPostAttribute,
 	} = useSelect( editorStore );
-	const { getReferenceByDistinctEdits, getPostType } = useSelect( coreStore );
+	const { getReferenceByDistinctEdits } = useSelect( coreStore );
 
 	useAutosaveNotice();
 	useAutosavePurge();
@@ -191,15 +191,9 @@ function LocalAutosaveMonitor() {
 	const lastEditsReferenceRef = useRef();
 
 	useInterval( () => {
-		// Base autosave eligibility, shared with the remote monitor: the post
-		// has saveable content, autosaving isn't locked, and the post type
-		// supports autosaves. Unlike `isEditedPostAutosaveable()`, this neither
-		// waits for nor compares against the *server* autosave — a
-		// sessionStorage backup depends on neither.
+		// Not `isEditedPostAutosaveable()`: a sessionStorage backup must not
+		// wait for or compare against the *server* autosave.
 		if ( ! isEditedPostSaveable() || isPostAutosavingLocked() ) {
-			return;
-		}
-		if ( ! getPostType( getCurrentPostType() )?.supports?.autosave ) {
 			return;
 		}
 
@@ -230,6 +224,14 @@ function LocalAutosaveMonitor() {
 	}, localAutosaveInterval );
 
 	return null;
+}
+
+function LocalAutosaveMonitor() {
+	return (
+		<PostTypeSupportCheck supportKeys="autosave">
+			<LocalAutosaveMonitorInner />
+		</PostTypeSupportCheck>
+	);
 }
 
 /**
