@@ -579,4 +579,71 @@ test.describe( 'Suggestion mode', () => {
 		await page.keyboard.type( 'Newly added text' );
 		await expect( block ).toHaveClass( /is-suggestion-pending-insert/ );
 	} );
+
+	test( 'insert — typing into a new paragraph yields ONE "Insert block" note, not an extra "Add" note', async ( {
+		editor,
+		page,
+	} ) => {
+		// Regression: the inline addition keyboard used to intercept the
+		// first keystroke inside a freshly-inserted empty paragraph and open
+		// its own "Add: …" note; the note's metadata.noteId write then made
+		// the deferred empty block look modified, so the interceptor
+		// registered a second, structural "Insert block" note for the same
+		// action. Typing inside a pending/deferred insertion must fall
+		// through natively and stay part of the single insertion suggestion.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Existing paragraph' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+
+		// Attach the auto-save listener before the edit starts the debounce.
+		const suggestionSaved = suggestionSavedPromise( page );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Massa praesent interdum' );
+
+		const newParagraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.nth( 1 );
+		await expect( newParagraph ).toContainText( 'Massa praesent interdum' );
+		await expect( newParagraph ).toHaveClass(
+			/is-suggestion-pending-insert/
+		);
+		// The typed text is plain content of the inserted block — NOT wrapped
+		// in an inline add marker (that would be the second suggestion).
+		await expect(
+			newParagraph.locator( 'mark.wp-suggestion' )
+		).toHaveCount( 0 );
+
+		// The pre-existing paragraph is untouched.
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).not.toContain( 'data-suggestion-type' );
+
+		await suggestionSaved;
+
+		// Exactly one note — the block insertion — and no "Add" note.
+		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
+		const allNotesToggle = topBar.getByRole( 'button', {
+			name: 'All notes',
+			exact: true,
+		} );
+		if (
+			( await allNotesToggle.getAttribute( 'aria-expanded' ) ) === 'false'
+		) {
+			await allNotesToggle.click();
+		}
+		const summaries = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.locator( '.editor-collab-sidebar-panel__suggestion-summary' );
+		await expect( summaries ).toHaveCount( 1 );
+		await expect( summaries ).toContainText( 'Insert block:' );
+		await expect( summaries ).not.toContainText( 'Add:' );
+	} );
 } );

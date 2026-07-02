@@ -94,6 +94,10 @@ const OverlayContext = createContext( {
 	requestContentSuggestion: () => false,
 	// Standalone default (no provider mounted): run the task immediately.
 	enqueueSuggestionWrite: ( clientId, task ) => task(),
+	markDeferredInsertion: () => {},
+	unmarkDeferredInsertion: () => {},
+	isDeferredInsertion: () => false,
+	clearDeferredInsertions: () => {},
 } );
 
 /**
@@ -384,6 +388,41 @@ export function SuggestionOverlayProvider( { children } ) {
 		[]
 	);
 
+	// Tracks new blocks whose registration as an insertion suggestion the
+	// store interceptor has DEFERRED: an unmodified default block inserted in
+	// Suggest mode (clicking the appender) is not a suggestion until the user
+	// puts something into it. The overlay HOC and the inline suggestion
+	// keyboards consult this set so the first edit inside such a block falls
+	// through to the real attributes — letting the interceptor register the
+	// whole block as a single `block-insert-after` suggestion — instead of
+	// opening a separate inline/overlay suggestion next to the insertion.
+	// A ref-set for the same reason as the bypass set above: it is written
+	// from inside `registry.subscribe` and read synchronously during event
+	// handling, neither of which can wait on React state.
+	const deferredInsertionsRef = useRef( new Set() );
+
+	const markDeferredInsertion = useCallback( ( clientId ) => {
+		if ( clientId ) {
+			deferredInsertionsRef.current.add( clientId );
+		}
+	}, [] );
+
+	const unmarkDeferredInsertion = useCallback( ( clientId ) => {
+		deferredInsertionsRef.current.delete( clientId );
+	}, [] );
+
+	const isDeferredInsertion = useCallback(
+		( clientId ) => deferredInsertionsRef.current.has( clientId ),
+		[]
+	);
+
+	// Reset when a Suggest session starts: a block deferred in a previous
+	// session is seeded into the interceptor's snapshot like any other
+	// pre-existing block, so a stale entry would wrongly write edits through.
+	const clearDeferredInsertions = useCallback( () => {
+		deferredInsertionsRef.current.clear();
+	}, [] );
+
 	// Prune overlay entries whose block was removed from the editor. This
 	// prevents stale baselines from persisting after a block is deleted.
 	// The block-count subscription only runs when there are entries to
@@ -436,6 +475,10 @@ export function SuggestionOverlayProvider( { children } ) {
 			registerContentHandler,
 			requestContentSuggestion,
 			enqueueSuggestionWrite,
+			markDeferredInsertion,
+			unmarkDeferredInsertion,
+			isDeferredInsertion,
+			clearDeferredInsertions,
 		} ),
 		[
 			entries,
@@ -453,6 +496,10 @@ export function SuggestionOverlayProvider( { children } ) {
 			registerContentHandler,
 			requestContentSuggestion,
 			enqueueSuggestionWrite,
+			markDeferredInsertion,
+			unmarkDeferredInsertion,
+			isDeferredInsertion,
+			clearDeferredInsertions,
 		]
 	);
 

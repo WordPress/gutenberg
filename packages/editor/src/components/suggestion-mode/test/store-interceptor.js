@@ -15,6 +15,7 @@ import {
 	registerBlockType,
 	unregisterBlockType,
 	getBlockTypes,
+	setDefaultBlockName,
 } from '@wordpress/blocks';
 
 /**
@@ -26,6 +27,7 @@ import SuggestionStoreInterceptor, {
 	adoptSystemMetadata,
 	stripSystemMetadata,
 	isAcceptedSuggestionChange,
+	isPartOfPendingInsertion,
 	topLevelRemoved,
 	withSuggestionMarker,
 	lcsClientIds,
@@ -167,6 +169,12 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 			category: 'text',
 			title: 'Test Suggestion Block',
 		} );
+	} );
+
+	afterEach( () => {
+		// The deferral tests below set a default block name; reset it so the
+		// removal tests keep their no-auto-inserted-default-block setup.
+		setDefaultBlockName( null );
 	} );
 
 	afterAll( () => {
@@ -594,6 +602,148 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 			anchorClientId: clientId,
 			parentClientId: null,
 		} );
+	} );
+
+	it( 'defers an empty default block, then registers a single insertion once it gains content', async () => {
+		// Regression: typing into a freshly-appended empty paragraph must
+		// produce ONE suggestion (the block insertion, content included) —
+		// not an "Insert block" suggestion plus a separate content one. The
+		// first content write lands on the real block (the overlay HOC and
+		// the inline keyboards consult `isDeferredInsertion` to fall
+		// through), and the interceptor registers the insertion from it.
+		// The empty-placeholder deferral only applies to the DEFAULT block
+		// type (an unmodified default block is what the appender inserts).
+		setDefaultBlockName( TEST_BLOCK_NAME );
+		const { registry, getOverlay } = setup();
+
+		const inserted = createBlock( TEST_BLOCK_NAME );
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.insertBlock( inserted, 1, undefined, false );
+		} );
+		await flushSubscribers();
+
+		// Still empty: not a suggestion yet, but published as deferred.
+		let attributes = registry
+			.select( blockEditorStore )
+			.getBlockAttributes( inserted.clientId );
+		expect( attributes?.metadata?.suggestion ).toBeUndefined();
+		expect( getOverlay().entries[ inserted.clientId ] ).toBeUndefined();
+		expect( getOverlay().isDeferredInsertion( inserted.clientId ) ).toBe(
+			true
+		);
+
+		// First content write (what native typing lands via write-through).
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( inserted.clientId, {
+					content: 'Typed',
+				} );
+		} );
+		await flushSubscribers();
+
+		attributes = registry
+			.select( blockEditorStore )
+			.getBlockAttributes( inserted.clientId );
+		// The content stays on the live block — no overlay divert, no revert.
+		expect( attributes?.content ).toBe( 'Typed' );
+		expect( attributes?.metadata?.suggestion ).toEqual( {
+			type: 'pending-insert',
+			authorId: null,
+		} );
+		expect(
+			getOverlay().entries[ inserted.clientId ]?.structuralOp
+		).toMatchObject( {
+			type: 'block-insert-after',
+			clientId: inserted.clientId,
+			blockName: TEST_BLOCK_NAME,
+		} );
+		expect(
+			getOverlay().entries[ inserted.clientId ]?.overlayAttributes
+				?.content
+		).toBeUndefined();
+		expect( getOverlay().isDeferredInsertion( inserted.clientId ) ).toBe(
+			false
+		);
+	} );
+
+	it( 'adopts follow-up edits on a pending-insert block instead of reverting them into the overlay', async () => {
+		// Continued typing inside a block that IS the insertion suggestion
+		// grows the insertion; it must not be reverted to the registration
+		// snapshot nor surface as a second (attribute/content) suggestion.
+		// The empty-placeholder deferral only applies to the DEFAULT block
+		// type (an unmodified default block is what the appender inserts).
+		setDefaultBlockName( TEST_BLOCK_NAME );
+		const { registry, getOverlay } = setup();
+
+		const inserted = createBlock( TEST_BLOCK_NAME, { content: 'New' } );
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.insertBlock( inserted, 1, undefined, false );
+		} );
+		await flushSubscribers();
+
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( inserted.clientId, {
+					content: 'New words',
+				} );
+		} );
+		await flushSubscribers();
+
+		const attributes = registry
+			.select( blockEditorStore )
+			.getBlockAttributes( inserted.clientId );
+		expect( attributes?.content ).toBe( 'New words' );
+		expect( attributes?.metadata?.suggestion?.type ).toBe(
+			'pending-insert'
+		);
+		expect(
+			getOverlay().entries[ inserted.clientId ]?.structuralOp?.type
+		).toBe( 'block-insert-after' );
+		expect(
+			getOverlay().entries[ inserted.clientId ]?.overlayAttributes
+				?.content
+		).toBeUndefined();
+	} );
+
+	it( 'forgets a deferred empty block that is deleted before gaining content (no pending-remove)', async () => {
+		// Deleting an empty just-appended paragraph is not a removal
+		// suggestion — the block was never registered as an insertion, so
+		// the interceptor must not re-insert it with a pending-remove tag.
+		// The empty-placeholder deferral only applies to the DEFAULT block
+		// type (an unmodified default block is what the appender inserts).
+		setDefaultBlockName( TEST_BLOCK_NAME );
+		const { registry, getOverlay } = setup();
+
+		const inserted = createBlock( TEST_BLOCK_NAME );
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.insertBlock( inserted, 1, undefined, false );
+		} );
+		await flushSubscribers();
+
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.removeBlock( inserted.clientId );
+		} );
+		await flushSubscribers();
+
+		const liveBlocks = registry.select( blockEditorStore ).getBlocks();
+		expect( liveBlocks ).toHaveLength( 1 );
+		expect(
+			liveBlocks.some( ( block ) => block.clientId === inserted.clientId )
+		).toBe( false );
+		expect( getOverlay().entries[ inserted.clientId ] ).toBeUndefined();
+		expect( getOverlay().isDeferredInsertion( inserted.clientId ) ).toBe(
+			false
+		);
 	} );
 
 	it( 'adopts a removal that arrives bundled with its marker-clear (reject of pending-insert via sync)', async () => {
@@ -1166,5 +1316,46 @@ describe( 'lcsClientIds', () => {
 	it( 'returns an empty set when either side is empty', () => {
 		expect( lcsClientIds( [], [ 'a' ] ).size ).toBe( 0 );
 		expect( lcsClientIds( [ 'a' ], [] ).size ).toBe( 0 );
+	} );
+} );
+
+describe( 'isPartOfPendingInsertion', () => {
+	const buildSelectors = ( { markers = {}, parents = {} } = {} ) => ( {
+		getBlockAttributes: ( id ) =>
+			markers[ id ]
+				? { metadata: { suggestion: { type: markers[ id ] } } }
+				: {},
+		getBlockParents: ( id ) => parents[ id ] ?? [],
+	} );
+
+	it( 'returns true when the block itself is pending-insert', () => {
+		const selectors = buildSelectors( {
+			markers: { a: 'pending-insert' },
+		} );
+		expect( isPartOfPendingInsertion( selectors, 'a' ) ).toBe( true );
+	} );
+
+	it( 'returns true when an ancestor is pending-insert', () => {
+		const selectors = buildSelectors( {
+			markers: { group: 'pending-insert' },
+			parents: { child: [ 'group' ] },
+		} );
+		expect( isPartOfPendingInsertion( selectors, 'child' ) ).toBe( true );
+	} );
+
+	it( 'returns false for other marker types and unmarked blocks', () => {
+		const selectors = buildSelectors( {
+			markers: { a: 'pending-remove', b: 'pending-move' },
+			parents: { c: [ 'a' ] },
+		} );
+		expect( isPartOfPendingInsertion( selectors, 'b' ) ).toBe( false );
+		expect( isPartOfPendingInsertion( selectors, 'c' ) ).toBe( false );
+		expect( isPartOfPendingInsertion( selectors, 'unknown' ) ).toBe(
+			false
+		);
+	} );
+
+	it( 'returns false when selectors are unavailable', () => {
+		expect( isPartOfPendingInsertion( undefined, 'a' ) ).toBe( false );
 	} );
 } );

@@ -284,6 +284,100 @@ describe( 'withSuggestionOverlay', () => {
 		} );
 	} );
 
+	it( 'writes setAttributes through for a block nested inside a pending-insert block', () => {
+		// The children of a Group that is itself a suggested insertion are
+		// part of the Group's insertion — their edits must write through
+		// (and stay inside the single "Insert block" suggestion) rather
+		// than opening a separate overlay suggestion per child.
+		registerBlockType( 'core/test-insert-container', {
+			apiVersion: 3,
+			title: 'Test Container',
+			category: 'text',
+			attributes: {
+				content: { type: 'string', default: '' },
+				metadata: { type: 'object' },
+			},
+			save() {
+				return null;
+			},
+		} );
+		const child = createBlock( 'core/test-insert-container', {
+			content: 'Child',
+		} );
+		const parent = createBlock(
+			'core/test-insert-container',
+			{
+				content: 'Parent',
+				metadata: { suggestion: { type: 'pending-insert' } },
+			},
+			[ child ]
+		);
+
+		const setAttributes = jest.fn();
+		renderWithProviders(
+			<Wrapped
+				clientId={ child.clientId }
+				name="core/test-insert-container"
+				attributes={ child.attributes }
+				setAttributes={ setAttributes }
+			/>,
+			{ intent: 'suggest', blocks: [ parent ] }
+		);
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
+
+		expect( setAttributes ).toHaveBeenCalledWith( {
+			content: 'proposed',
+		} );
+	} );
+
+	it( 'writes setAttributes through while the block is a deferred insertion', () => {
+		// An empty default block appended in Suggest mode is not registered
+		// as a suggestion until it gains content (the interceptor defers it
+		// and publishes the deferral). Its first edit must land on the real
+		// attributes so the interceptor can register the WHOLE block as one
+		// insertion — not divert into the overlay as a content suggestion.
+		let overlayHandle;
+		function CaptureOverlay() {
+			overlayHandle = useSuggestionOverlay();
+			return null;
+		}
+
+		const setAttributes = jest.fn();
+		renderWithProviders(
+			<>
+				<CaptureOverlay />
+				<Wrapped
+					clientId="deferred"
+					name="core/paragraph"
+					attributes={ { content: '' } }
+					setAttributes={ setAttributes }
+				/>
+			</>,
+			{ intent: 'suggest' }
+		);
+
+		act( () => {
+			overlayHandle.markDeferredInsertion( 'deferred' );
+		} );
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
+		expect( setAttributes ).toHaveBeenCalledWith( {
+			content: 'proposed',
+		} );
+
+		// Once the deferral is lifted (and absent a pending-insert marker),
+		// edits divert into the overlay again.
+		act( () => {
+			overlayHandle.unmarkDeferredInsertion( 'deferred' );
+		} );
+		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
+		expect( setAttributes ).toHaveBeenCalledTimes( 1 );
+		expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
+			'proposed'
+		);
+	} );
+
 	it( 'merges overlay on top of real attributes for rendering', () => {
 		const setAttributes = jest.fn();
 		const { rerender } = renderWithProviders(
