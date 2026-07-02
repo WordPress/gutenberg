@@ -100,6 +100,49 @@ describe( 'RichTextControl', () => {
 		);
 	} );
 
+	it( 'uses a consumer-supplied `id` for the textbox and label', () => {
+		const { container } = render(
+			<RichTextControl
+				label="Custom id"
+				value=""
+				onChange={ () => {} }
+				// eslint-disable-next-line no-restricted-syntax
+				id="my-custom-id"
+			/>
+		);
+
+		const textbox = getTextbox( container );
+		expect( textbox ).toHaveAttribute( 'id', 'my-custom-id' );
+		expect( screen.getByText( 'Custom id' ) ).toHaveAttribute(
+			'for',
+			'my-custom-id'
+		);
+	} );
+
+	it( 'blocks Enter from inserting line breaks when `disableLineBreaks` is set', () => {
+		const { container, rerender } = render(
+			<RichTextControl
+				label="Single line"
+				value=""
+				onChange={ () => {} }
+				disableLineBreaks
+			/>
+		);
+		const textbox = getTextbox( container );
+
+		// `fireEvent` returns `false` when `preventDefault()` was called.
+		expect( fireEvent.keyDown( textbox, { key: 'Enter' } ) ).toBe( false );
+
+		rerender(
+			<RichTextControl
+				label="Single line"
+				value=""
+				onChange={ () => {} }
+			/>
+		);
+		expect( fireEvent.keyDown( textbox, { key: 'Enter' } ) ).toBe( true );
+	} );
+
 	it( 'merges a consumer-supplied className with the control class', () => {
 		const { container } = render(
 			<RichTextControl
@@ -346,6 +389,45 @@ describe( 'RichTextControl', () => {
 
 			dispatchPrimaryB( textbox );
 			expect( currentOnUse ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'deselects once focus leaves the control popover for elsewhere', async () => {
+			const { container } = render(
+				<>
+					<RichTextControl
+						label="Shortcut popover exit"
+						value=""
+						onChange={ () => {} }
+					/>
+					<div data-rich-text-control-popover-slot>
+						<button type="button">Inside popover</button>
+					</div>
+					<button type="button">Outside</button>
+				</>
+			);
+			const textbox = getTextbox( container );
+			const popoverButton = screen.getByRole( 'button', {
+				name: 'Inside popover',
+			} );
+
+			await blurWithFocusInPopover( textbox, popoverButton );
+
+			/*
+			 * Focus now leaves the popover for an element that belongs to
+			 * neither the field nor its popovers. The field's own `onBlur`
+			 * already fired, so this exercises the document-level focus
+			 * tracking that takes over during the popover excursion.
+			 */
+			screen.getByRole( 'button', { name: 'Outside' } ).focus();
+			fireEvent.focusOut( popoverButton );
+			await act( async () => {
+				await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+			} );
+
+			// The field deselected, so `FormatEdit` unmounted and the
+			// shortcut no longer fires.
+			dispatchPrimaryB( textbox );
+			expect( currentOnUse ).not.toHaveBeenCalled();
 		} );
 
 		it( 'deselects when focus moves to an unrelated popover', async () => {

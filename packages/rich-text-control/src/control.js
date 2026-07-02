@@ -40,6 +40,12 @@ import inputEventsListener from './event-listeners/input-events';
 const { useRichText, keyboardShortcutContext, inputEventContext } =
 	unlock( richTextPrivateApis );
 
+// Popovers opened by this control's format types land either in the control's
+// own portaled slot (see `SlotFillProvider` below) or, for popovers already
+// migrated to `@wordpress/ui`, in the shared compat overlay slot.
+const OWNED_POPOVER_SELECTOR =
+	'[data-rich-text-control-popover-slot],[data-wp-compat-overlay-slot]';
+
 /**
  * A rich text control component that provides a contenteditable field with
  * formatting capabilities.
@@ -116,6 +122,42 @@ export default function RichTextControl( {
 	const blurDeselectTimeoutRef = useRef( undefined );
 	useEffect( () => () => clearTimeout( blurDeselectTimeoutRef.current ), [] );
 
+	/*
+	 * Once focus moves into one of the control's own popovers, the field has
+	 * already blurred and its `onBlur` will not fire again when focus later
+	 * leaves that popover. Watch document-level `focusout` for the duration
+	 * of the popover excursion so the control still deselects (and tears down
+	 * its format UI) once focus settles outside both the field and its
+	 * popovers.
+	 */
+	const stopPopoverFocusTrackingRef = useRef( undefined );
+	useEffect( () => () => stopPopoverFocusTrackingRef.current?.(), [] );
+
+	function trackPopoverFocusOut( ownerDocument ) {
+		stopPopoverFocusTrackingRef.current?.();
+
+		function onDocumentFocusOut() {
+			clearTimeout( blurDeselectTimeoutRef.current );
+			blurDeselectTimeoutRef.current = setTimeout( () => {
+				const active = ownerDocument.activeElement;
+				if (
+					anchorRef.current?.contains( active ) ||
+					( active && active.closest( OWNED_POPOVER_SELECTOR ) )
+				) {
+					return;
+				}
+				stopPopoverFocusTrackingRef.current?.();
+				setIsSelected( false );
+			}, 0 );
+		}
+
+		ownerDocument.addEventListener( 'focusout', onDocumentFocusOut );
+		stopPopoverFocusTrackingRef.current = () => {
+			ownerDocument.removeEventListener( 'focusout', onDocumentFocusOut );
+			stopPopoverFocusTrackingRef.current = undefined;
+		};
+	}
+
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
 		disableFormats,
@@ -149,6 +191,7 @@ export default function RichTextControl( {
 	} );
 
 	const { baseControlProps, controlProps } = useBaseControlProps( {
+		id,
 		hideLabelFromVision,
 		label,
 	} );
@@ -167,6 +210,27 @@ export default function RichTextControl( {
 			}
 		},
 		[ focusOnMount ]
+	);
+
+	/*
+	 * The rich-text hook has no Enter handling of its own, so without this
+	 * the browser would insert a line break even though `aria-multiline`
+	 * advertises single-line semantics when `disableLineBreaks` is set.
+	 */
+	const disableLineBreaksRef = useRefEffect(
+		( element ) => {
+			if ( ! disableLineBreaks ) {
+				return;
+			}
+			function onKeyDown( event ) {
+				if ( event.key === 'Enter' ) {
+					event.preventDefault();
+				}
+			}
+			element.addEventListener( 'keydown', onKeyDown );
+			return () => element.removeEventListener( 'keydown', onKeyDown );
+		},
+		[ disableLineBreaks ]
 	);
 
 	// Wire registered format keyboard shortcuts (e.g. Cmd+B, Cmd+I, Cmd+K)
@@ -286,10 +350,14 @@ export default function RichTextControl( {
 						anchorRef,
 						eventListenersRef,
 						focusOnMountRef,
+						disableLineBreaksRef,
 						popoverSlotContainerRef,
 					] ) }
 					onFocus={ () => {
 						clearTimeout( blurDeselectTimeoutRef.current );
+						// Focus is back in the field, so its own blur handling
+						// takes over from the popover focus tracking again.
+						stopPopoverFocusTrackingRef.current?.();
 						setIsSelected( true );
 					} }
 					onBlur={ ( event ) => {
@@ -310,10 +378,9 @@ export default function RichTextControl( {
 							const active = ownerDocument.activeElement;
 							if (
 								active &&
-								active.closest(
-									'[data-rich-text-control-popover-slot],[data-wp-compat-overlay-slot]'
-								)
+								active.closest( OWNED_POPOVER_SELECTOR )
 							) {
+								trackPopoverFocusOut( ownerDocument );
 								return;
 							}
 							setIsSelected( false );
