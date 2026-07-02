@@ -110,5 +110,60 @@ test.describe( 'Revision block diff aria-labels', () => {
 				} )
 				.filter( { hasText: 'Unchanged paragraph' } )
 		).toBeVisible();
+
+		// Nested unchanged blocks don't inherit an ancestor's diff label.
+		await expect(
+			editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Paragraph',
+					exact: true,
+				} )
+				.filter( { hasText: 'Inside the row' } )
+		).toBeVisible();
+
+		const showChangesButton = page.getByRole( 'button', {
+			name: 'Show changes',
+		} );
+		await expect( showChangesButton ).toHaveAttribute(
+			'aria-pressed',
+			'true'
+		);
+
+		await showChangesButton.click();
+		await expect( showChangesButton ).toHaveAttribute(
+			'aria-pressed',
+			'false'
+		);
+
+		// Disabling diff highlighting removes diff-specific labels.
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Modified Block: Paragraph',
+			} )
+		).toHaveCount( 0 );
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Removed Block: Heading',
+			} )
+		).toHaveCount( 0 );
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Added Block: Poetry',
+			} )
+		).toHaveCount( 0 );
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Added Block: Row',
+			} )
+		).toHaveCount( 0 );
+
+		await expect(
+			editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Paragraph',
+					exact: true,
+				} )
+				.filter( { hasText: 'Paragraph after modification' } )
+		).toBeVisible();
 	} );
 } );

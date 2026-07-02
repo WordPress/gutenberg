@@ -1554,11 +1554,6 @@
 			"count": 1
 		}
 	},
-	"packages/media-editor/src/image-editor/react/hooks/use-cropper-state.ts": {
-		"react-hooks/refs": {
-			"count": 2
-		}
-	},
 	"packages/media-editor/src/image-editor/react/hooks/use-interaction.ts": {
 		"react-hooks/refs": {
 			"count": 5

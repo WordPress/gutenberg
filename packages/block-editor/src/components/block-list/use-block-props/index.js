@@ -17,7 +17,6 @@ import warning from '@wordpress/warning';
  */
 import useMovingAnimation from '../../use-moving-animation';
 import { PrivateBlockContext } from '../private-block-context';
-import { BlockAriaLabelOverrideContext } from '../block-aria-label-context';
 import { useFocusFirstElement } from './use-focus-first-element';
 import { useIsHovered } from './use-is-hovered';
 import {
@@ -106,6 +105,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		canMove,
 		blockVisibility,
 		deviceType,
+		ariaLabel,
 	} = useContext( PrivateBlockContext );
 
 	const defaultViewRef = useRefEffect( ( element ) => {
@@ -116,7 +116,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		}
 	}, [] );
 
-	const ariaLabelOverride = useContext( BlockAriaLabelOverrideContext );
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
@@ -183,7 +182,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		ref: mergedRefs,
 		id: `block-${ clientId }${ htmlSuffix }`,
 		role: 'document',
-		'aria-label': ariaLabelOverride ?? blockLabel,
+		'aria-label': ariaLabel ?? blockLabel,
 		'data-block': clientId,
 		'data-type': name,
 		'data-title': blockTitle,

@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { Spinner } from '@wordpress/components';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { select as globalSelect, useSelect } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useContext, useEffect } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { sprintf, __ } from '@wordpress/i18n';
@@ -26,7 +26,7 @@ import {
 } from './diff-format-types';
 import { useDiffMarkers } from './diff-markers';
 
-const { usePrivateStyleOverride, BlockAriaLabelOverrideContext } = unlock(
+const { usePrivateStyleOverride, PrivateBlockContext } = unlock(
 	blockEditorPrivateApis
 );
 
@@ -124,21 +124,25 @@ function getDiffStatusLabel( status, blockTitle ) {
  * @return {Function} Enhanced component with diff status classes.
  */
 function withRevisionDiffClasses( BlockListBlock ) {
-	return ( props ) => {
-		const { block, className } = props;
+	return function WithRevisionDiffClasses( props ) {
+		const { block, className, name, attributes } = props;
+		const context = useContext( PrivateBlockContext );
 		const diffStatus = block?.__revisionDiffStatus?.status;
 
 		let diffLabel;
 		if ( diffStatus ) {
-			// Resolve the variation-aware title (e.g. "YouTube", "Row") so
-			// blocks are announced by the name users know them as. The
-			// canvas's default wrapper labels can't be reused here: in
-			// preview mode they intentionally skip variation matching.
+			const blockName = name ?? block.name;
+			const blockAttributes = attributes ?? block.attributes;
+
+			// Resolve the variation-aware title (e.g. "Row" instead of
+			// "Group") so blocks are announced by the name users know them
+			// as. The canvas's default wrapper labels can't be reused here:
+			// in preview mode they intentionally skip variation matching.
 			const blockTitle =
 				globalSelect( blocksStore ).getActiveBlockVariation(
-					block.name,
-					block.attributes
-				)?.title ?? getBlockType( block.name )?.title;
+					blockName,
+					blockAttributes
+				)?.title ?? getBlockType( blockName )?.title;
 			if ( blockTitle ) {
 				diffLabel = getDiffStatusLabel( diffStatus, blockTitle );
 			}
@@ -150,14 +154,15 @@ function withRevisionDiffClasses( BlockListBlock ) {
 			'is-revision-modified': diffStatus === 'modified',
 		} );
 
-		// The provider is always rendered — even with an undefined label —
-		// so the element tree keeps its shape when a diff status appears or
-		// disappears (a conditional wrapper would remount the whole block
-		// subtree), and so nested blocks don't inherit an ancestor's label.
 		return (
-			<BlockAriaLabelOverrideContext.Provider value={ diffLabel }>
+			<PrivateBlockContext.Provider
+				value={ {
+					...context,
+					ariaLabel: diffLabel,
+				} }
+			>
 				<BlockListBlock { ...props } className={ enhancedClassName } />
-			</BlockAriaLabelOverrideContext.Provider>
+			</PrivateBlockContext.Provider>
 		);
 	};
 }
