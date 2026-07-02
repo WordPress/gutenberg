@@ -17,11 +17,13 @@
     -   `ComboboxControl` ([#79636](https://github.com/WordPress/gutenberg/pull/79636)).
     -   `FontSizePicker` ([#79481](https://github.com/WordPress/gutenberg/pull/79481))
     -   `FormFileUpload` ([#79655](https://github.com/WordPress/gutenberg/pull/79655))
-    -   `SelectControl` ([#79797](https://github.com/WordPress/gutenberg/pull/79797))
+    -   `FormTokenField` ([#79720](https://github.com/WordPress/gutenberg/pull/79720))
     -   `RangeControl` ([#79590](https://github.com/WordPress/gutenberg/pull/79590))
     -   `Radio` ([#79657](https://github.com/WordPress/gutenberg/pull/79657))
+    -   `SelectControl` ([#79797](https://github.com/WordPress/gutenberg/pull/79797))
     -   `ToggleGroupControl` ([#79656](https://github.com/WordPress/gutenberg/pull/79656))
     -   `TreeSelect` ([#79550](https://github.com/WordPress/gutenberg/pull/79550))
+    -   `UnitControl` ([#79721](https://github.com/WordPress/gutenberg/pull/79721))
 
 ### Enhancements
 
@@ -46,6 +48,8 @@
 -   `Surface`: Migrate styles from Emotion to SCSS Modules and use WPDS tokens for migrated visual values ([#79445](https://github.com/WordPress/gutenberg/pull/79445)).
 -   `Truncate`: Migrate styles from Emotion to SCSS Modules ([#79446](https://github.com/WordPress/gutenberg/pull/79446)).
 -   `View`: Migrate away from Emotion while preserving polymorphic `as` behavior and style cascade order ([#79443](https://github.com/WordPress/gutenberg/pull/79443)).
+
+## 36.1.0 (2026-07-01)
 
 ## 36.0.0 (2026-06-24)
 
