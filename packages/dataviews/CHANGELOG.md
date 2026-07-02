@@ -1,6 +1,7 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+* Fix horizontal alignment in list layout when only a single property is visible. ([#75932](https://github.com/WordPress/gutenberg/pull/75932))
 
 ## 17.0.0 (2026-06-24)
 

@@ -308,7 +308,9 @@ function ListItem< Item >( {
 					<Composite.Item
 						id={ generateItemWrapperCompositeId( idPrefix ) }
 						aria-pressed={ isSelected }
-						aria-labelledby={ labelId }
+						aria-labelledby={
+							renderedTitleField ? labelId : undefined
+						}
 						aria-describedby={ descriptionId }
 						className="dataviews-view-list__item"
 						onClick={ () => onSelect( item ) }
@@ -328,12 +330,14 @@ function ListItem< Item >( {
 						className="dataviews-view-list__field-wrapper"
 					>
 						<Stack direction="row" align="center">
-							<div
-								className="dataviews-title-field dataviews-view-list__title-field"
-								id={ labelId }
-							>
-								{ renderedTitleField }
-							</div>
+							{ renderedTitleField && (
+								<div
+									className="dataviews-title-field dataviews-view-list__title-field"
+									id={ labelId }
+								>
+									{ renderedTitleField }
+								</div>
+							) }
 							{ usedActions }
 						</Stack>
 						{ renderDescription && (
