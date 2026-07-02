@@ -21,8 +21,6 @@ export const LinkButton = forwardRef< HTMLAnchorElement, LinkButtonProps >(
 			size = 'default',
 			className,
 			children,
-			openInNewTab = false,
-			render,
 			...props
 		},
 		ref
@@ -31,8 +29,6 @@ export const LinkButton = forwardRef< HTMLAnchorElement, LinkButtonProps >(
 			<Link
 				ref={ ref }
 				variant="unstyled"
-				openInNewTab={ openInNewTab }
-				render={ render }
 				className={ clsx(
 					styles[ 'link-button' ],
 					focusStyles[ 'outset-ring--focus-except-active' ],
