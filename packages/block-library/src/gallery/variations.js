@@ -3,6 +3,11 @@
  */
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import { ATTACHED_MEDIA } from './dynamic-source';
+
 const variations = [
 	{
 		name: 'dynamic-gallery',
@@ -11,7 +16,7 @@ const variations = [
 			'Display images from a source, such as those attached to the current post.'
 		),
 		attributes: {
-			dynamicContent: { source: 'core/attached-media' },
+			dynamicContent: { source: ATTACHED_MEDIA },
 		},
 		// Match any gallery that has a dynamic source configured, regardless of
 		// the specific source or options, so the variation's title and

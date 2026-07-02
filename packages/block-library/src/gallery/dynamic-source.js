@@ -4,6 +4,14 @@
 import { __ } from '@wordpress/i18n';
 
 /**
+ * Source discriminator for "images attached to the post" — the only dynamic
+ * source implemented so far. Kept as a named constant since it's referenced from
+ * several call sites (the query builder, the descriptor, and the entry points
+ * that switch a gallery into dynamic mode).
+ */
+export const ATTACHED_MEDIA = 'core/attached-media';
+
+/**
  * Default ordering for a dynamic source. `menu_order` (the manual media-library
  * order) is intentionally not used: it isn't a valid `orderby` value on the
  * media REST endpoint, so the editor preview couldn't reproduce it. Both the
@@ -12,6 +20,37 @@ import { __ } from '@wordpress/i18n';
  */
 export const DEFAULT_ORDERBY = 'date';
 export const DEFAULT_ORDER = 'desc';
+
+/**
+ * Per-source copy, keyed by the `source` discriminator in a gallery's
+ * `dynamicContent`. Adding a dynamic source means adding an entry here; the
+ * editor components read these strings instead of hardcoding source-specific
+ * wording. The fields also map onto a future "Choose source" control: `title`
+ * becomes an option label, `description` its help text, and `emptyMessage` the
+ * canvas preview when the source resolves to nothing.
+ */
+const DYNAMIC_SOURCES = {
+	[ ATTACHED_MEDIA ]: {
+		// Short label for the entry affordance / future source chooser. Mirrors
+		// the "Attached images" media inserter category name.
+		title: __( 'Attached images' ),
+		// Help text shown beneath the Source controls.
+		description: __( 'Images attached to the post.' ),
+		// Empty-state copy for the canvas preview.
+		emptyMessage: __( 'Images attached to the post will appear here.' ),
+	},
+};
+
+/**
+ * Returns the descriptor for a dynamic source, or `undefined` for an unknown or
+ * not-yet-implemented source.
+ *
+ * @param {?string} source The `dynamicContent.source` discriminator.
+ * @return {?Object} The source descriptor (`title`, `description`, `emptyMessage`).
+ */
+export function getDynamicSource( source ) {
+	return DYNAMIC_SOURCES[ source ];
+}
 
 /**
  * Upper bound on the number of images a dynamic source resolves, so the editor
@@ -45,7 +84,7 @@ export function getSourceQuery( dynamicContent, { postId } ) {
 	const { source, args = {} } = dynamicContent ?? {};
 
 	switch ( source ) {
-		case 'core/attached-media':
+		case ATTACHED_MEDIA:
 			if ( ! postId ) {
 				return null;
 			}
@@ -66,20 +105,4 @@ export function getSourceQuery( dynamicContent, { postId } ) {
 
 	// Unknown or not-yet-implemented source.
 	return null;
-}
-
-/**
- * Returns a sentence describing a `dynamicContent`, for use as help text beneath
- * the Source controls.
- *
- * @param {Object} dynamicContent The gallery's `dynamicContent` attribute.
- * @return {string} A translated description.
- */
-export function getSourceDescription( dynamicContent ) {
-	switch ( dynamicContent?.source ) {
-		case 'core/attached-media':
-			return __( 'Images attached to the post.' );
-	}
-
-	return __( 'Dynamic images.' );
 }

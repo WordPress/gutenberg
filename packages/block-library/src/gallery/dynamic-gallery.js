@@ -27,12 +27,7 @@ import {
  */
 import { sharedIcon } from './shared-icon';
 import { Caption } from '../utils/caption';
-import {
-	getSourceDescription,
-	DEFAULT_ORDERBY,
-	DEFAULT_ORDER,
-	MAX_IMAGES,
-} from './dynamic-source';
+import { DEFAULT_ORDERBY, DEFAULT_ORDER, MAX_IMAGES } from './dynamic-source';
 
 /**
  * Ordering options for a dynamic gallery source. Each value is a composite
@@ -102,6 +97,7 @@ export function GallerySourcePanel( {
 	const {
 		dynamicContent,
 		canUseDynamicSource,
+		sourceDescriptor,
 		sourceOrderby,
 		sourceOrder,
 		setSourceOrder,
@@ -135,7 +131,8 @@ export function GallerySourcePanel( {
 			>
 				<div className="wp-block-gallery__source-settings">
 					<p className="wp-block-gallery__source-description">
-						{ getSourceDescription( dynamicContent ) }
+						{ sourceDescriptor?.description ??
+							__( 'Dynamic images.' ) }
 					</p>
 					<Button
 						__next40pxDefaultSize
@@ -157,9 +154,9 @@ export function GallerySourcePanel( {
 						isDismissible={ false }
 					>
 						{ sprintf(
-							/* translators: 1: number of images shown. 2: total number of attached images. */
+							/* translators: 1: number of images shown. 2: total number of matching images. */
 							__(
-								'Only the first %1$d of %2$d attached images will be displayed.'
+								'Only the first %1$d of %2$d images will be displayed.'
 							),
 							MAX_IMAGES,
 							dynamicMediaTotal
@@ -199,6 +196,13 @@ export function GallerySourcePanel( {
 		<>
 			<PanelBody title={ __( 'Source' ) }>
 				<div className="wp-block-gallery__source-settings">
+					{ /*
+					 * Hardcoded on purpose: this single-source entry button (and
+					 * its confirm dialog below) is temporary. Once more sources
+					 * exist it becomes a "Choose source" select whose options read
+					 * from each source descriptor's `title`, with help text
+					 * carrying the per-source explanation this string does today.
+					 */ }
 					<Button
 						__next40pxDefaultSize
 						variant="secondary"
@@ -296,11 +300,11 @@ export function GalleryDynamicView( {
 	multiGallerySelection,
 } ) {
 	const {
+		sourceDescriptor,
 		dynamicImageBlocks,
 		galleryContext,
 		isResolvingDynamic,
 		convertToStatic,
-		hasCurrentPost,
 	} = dynamic;
 
 	// Converting to a static gallery materializes editable inner blocks, which
@@ -310,20 +314,15 @@ export function GalleryDynamicView( {
 	// hidden and the conversion shouldn't be possible.
 	const blockEditingMode = useBlockEditingMode();
 
-	// Empty-state copy for the preview. With a concrete post, an empty result
-	// genuinely means the post has no attached images. While editing a post-bound
-	// template there's no post to preview yet, so frame the empty preview as
-	// resolving at render time rather than as a missing-images problem.
-	let emptyInstructions;
-	if ( isResolvingDynamic ) {
-		emptyInstructions = __( 'Loading attached images…' );
-	} else if ( hasCurrentPost ) {
-		emptyInstructions = __( 'No images are attached to the post yet.' );
-	} else {
-		emptyInstructions = __(
-			'Images attached to the post will appear here when this template is viewed.'
-		);
-	}
+	// Empty-state copy for the preview. Framed as forward-looking ("… will appear
+	// here") rather than as an error, since the same empty result covers both a
+	// post with no matching images and a template with no post in context yet —
+	// in either case the source simply resolves to nothing right now. The per-
+	// source wording comes from the source descriptor.
+	const emptyInstructions = isResolvingDynamic
+		? __( 'Loading images…' )
+		: sourceDescriptor?.emptyMessage ??
+		  __( 'Dynamic images will appear here.' );
 
 	return (
 		<>

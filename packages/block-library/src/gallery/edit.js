@@ -69,6 +69,7 @@ import useGetMedia from './use-get-media';
 import GapStyles from './gap-styles';
 import useDynamicGallery from './use-dynamic-gallery';
 import { GallerySourcePanel, GalleryDynamicView } from './dynamic-gallery';
+import { getDynamicSource, ATTACHED_MEDIA } from './dynamic-source';
 
 const MAX_COLUMNS = 8;
 const LINK_OPTIONS = [
@@ -713,7 +714,7 @@ export default function GalleryEdit( props ) {
 							variant="secondary"
 							onClick={ dynamic.enableDynamicMode }
 						>
-							{ __( 'Attached images' ) }
+							{ getDynamicSource( ATTACHED_MEDIA ).title }
 						</Button>
 					) }
 				</MediaPlaceholder>

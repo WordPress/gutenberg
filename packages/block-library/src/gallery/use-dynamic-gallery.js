@@ -15,6 +15,8 @@ import { getHrefAndDestination } from './utils';
 import { getUpdatedLinkTargetSettings } from '../image/utils';
 import {
 	getSourceQuery,
+	getDynamicSource,
+	ATTACHED_MEDIA,
 	DEFAULT_ORDERBY,
 	DEFAULT_ORDER,
 	MAX_IMAGES,
@@ -111,10 +113,10 @@ export default function useDynamicGallery( {
 	// template) there's no post to attach to, so the source can never resolve.
 	const canUseDynamicSource = !! postType;
 
-	// Whether there's a concrete post to preview against right now. False while
-	// editing a post-bound template, where images only resolve once the template
-	// renders a real post.
-	const hasCurrentPost = !! postId;
+	// The descriptor for the configured source (its `title`/`description`/
+	// `emptyMessage`), resolved once here so consumers read the copy without
+	// re-deriving it from `dynamicContent`. `undefined` for an unknown source.
+	const sourceDescriptor = getDynamicSource( dynamicContent?.source );
 
 	// Current source ordering, falling back to the shared defaults when unset.
 	const sourceOrderby = dynamicContent?.args?.orderBy ?? DEFAULT_ORDERBY;
@@ -202,7 +204,7 @@ export default function useDynamicGallery( {
 	// Switches the gallery into dynamic mode, displaying images attached to the
 	// current post. Any manually-added image blocks are removed.
 	function enableDynamicMode() {
-		setAttributes( { dynamicContent: { source: 'core/attached-media' } } );
+		setAttributes( { dynamicContent: { source: ATTACHED_MEDIA } } );
 		replaceInnerBlocks( clientId, [] );
 	}
 
@@ -252,7 +254,7 @@ export default function useDynamicGallery( {
 	return {
 		dynamicContent,
 		canUseDynamicSource,
-		hasCurrentPost,
+		sourceDescriptor,
 		hasMoreImagesThanCap,
 		dynamicMediaTotal,
 		sourceOrderby,
