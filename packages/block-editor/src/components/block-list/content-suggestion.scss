@@ -161,6 +161,20 @@ $suggestion-addition-text-color: color-mix(in srgb, var(--suggestion-author-colo
 		text-decoration: underline;
 		text-decoration-color: var(--suggestion-author-color, #{$suggestion-addition-color});
 	}
+
+	// A pending formatting change (bold/italic/link toggled over a run): the
+	// run already renders WITH the proposed formatting, so without a cue it
+	// reads as committed. A dotted underline in the author color marks it as
+	// provisional while staying visually lighter than the solid `add`
+	// underline (the text itself isn't new). The fuller treatment (per-author
+	// tinting alignment with the Revisions diff UI) still lands with the
+	// Phase 5 visual work.
+	&[data-suggestion-type="format"] {
+		text-decoration: underline dotted;
+		text-decoration-color: var(--suggestion-author-color, #{$suggestion-color});
+		text-decoration-thickness: 2px;
+		text-underline-offset: 2px;
+	}
 }
 
 // Move ghost: a non-interactive placeholder rendered at a moved block's
