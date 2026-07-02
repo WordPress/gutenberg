@@ -4,12 +4,12 @@
 
 ### Breaking Changes
 
--   Increase the minimum required Node.js version to 20.19.0 || 22.13.0, i.e. versions supporting require(esm).
+-   Increase the minimum required Node.js version to 20.19.0 || 22.13.0, i.e. versions supporting require(esm) ([#79755](https://github.com/WordPress/gutenberg/pull/79755)).
 
 ### Enhancements
 
 -   Update `@stylistic/stylelint-plugin` to `^3.1.3` ([#79648](https://github.com/WordPress/gutenberg/pull/79648)).
--   Convert configuration to ESM.
+-   Convert configuration to ESM ([#79755](https://github.com/WordPress/gutenberg/pull/79755)).
 
 ## 23.41.0 (2026-06-24)
 
