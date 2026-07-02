@@ -34,7 +34,7 @@ jobs:
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
-        if: ${{ github.repository == 'WordPress/gutenberg' }}
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         env:
             WP_ARTIFACTS_PATH: ${{ github.workspace }}/artifacts
 

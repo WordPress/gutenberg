@@ -77,7 +77,11 @@ jobs:
 
     merge-artifacts:
         name: Merge Artifacts
-        if: ${{ !cancelled() }}
+        if: |
+            ! cancelled() && (
+              github.repository == 'WordPress/gutenberg' ||
+              github.event_name == 'pull_request'
+            )
         needs: [e2e-playwright]
         runs-on: 'ubuntu-24.04'
         permissions:
@@ -132,7 +136,7 @@ jobs:
     report-to-issues:
         name: Report to GitHub
         needs: [merge-artifacts]
-        if: ${{ needs.merge-artifacts.outputs.has-flaky-test-report == 'true' }}
+        if: ${{ github.repository == 'WordPress/gutenberg' && needs.merge-artifacts.outputs.has-flaky-test-report == 'true' }}
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
