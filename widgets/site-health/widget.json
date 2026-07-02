@@ -2,6 +2,7 @@
 	"name": "core/site-health",
 	"title": "Site Health Status",
 	"description": "Shows an overview of your site health and any issues that need attention.",
+	"info": "Results come from your site's latest health checks.",
 	"category": "site",
 	"presentation": "framed",
 	"textdomain": "default"

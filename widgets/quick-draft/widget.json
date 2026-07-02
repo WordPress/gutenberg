@@ -2,6 +2,7 @@
 	"name": "core/quick-draft",
 	"title": "Quick draft",
 	"description": "Quickly draft a new post.",
+	"info": "Drafts saved here are private until you publish them.",
 	"category": "dashboard",
 	"presentation": "content-bleed",
 	"textdomain": "default"
