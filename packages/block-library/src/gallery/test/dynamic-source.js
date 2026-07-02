@@ -49,6 +49,26 @@ describe( 'getSourceQuery', () => {
 		} );
 	} );
 
+	it( 'coerces unexpected ordering values back to the defaults', () => {
+		// Only reachable via hand-edited markup; mirrors the server resolver's
+		// allow list so the preview never issues an invalid REST query.
+		expect(
+			getSourceQuery(
+				{
+					source: 'core/attached-media',
+					args: { orderBy: 'menu_order', order: 'sideways' },
+				},
+				{ postId: 7 }
+			)
+		).toEqual( {
+			parent: 7,
+			per_page: 100,
+			media_type: 'image',
+			orderby: 'date',
+			order: 'desc',
+		} );
+	} );
+
 	it( 'returns null when there is no post to anchor to', () => {
 		expect(
 			getSourceQuery(

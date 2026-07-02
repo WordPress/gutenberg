@@ -97,9 +97,18 @@ export function getSourceQuery( dynamicContent, { postId } ) {
 				// that also have non-image attachments.
 				media_type: 'image',
 				// Map the camelCase `args` to the REST-named media collection
-				// params, falling back to the shared defaults.
-				orderby: args.orderBy ?? DEFAULT_ORDERBY,
-				order: args.order ?? DEFAULT_ORDER,
+				// params. Unexpected values (only reachable via hand-edited
+				// markup) are coerced back to the defaults — mirroring the server
+				// resolver's allow list — so the editor preview stays in step with
+				// the frontend instead of issuing an invalid REST query.
+				orderby:
+					args.orderBy === 'date' || args.orderBy === 'title'
+						? args.orderBy
+						: DEFAULT_ORDERBY,
+				order:
+					args.order === 'asc' || args.order === 'desc'
+						? args.order
+						: DEFAULT_ORDER,
 			};
 	}
 
