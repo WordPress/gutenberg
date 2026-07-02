@@ -146,19 +146,22 @@ describe( 'AutosaveMonitor', () => {
 		expect( autosave ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it( 'should not autosave when the post is not dirty', () => {
+	it.each( [
+		{
+			scenario: 'the post is not dirty',
+			overrides: { isDirty: false, isAutosaveable: true },
+		},
+		{
+			scenario: 'an autosave is already in progress',
+			overrides: {
+				isDirty: true,
+				isAutosaveable: true,
+				isAutosaving: true,
+			},
+		},
+	] )( 'should not autosave when $scenario', ( { overrides } ) => {
 		const autosave = jest.fn();
-		setState( { isDirty: false, isAutosaveable: true } );
-		render( <AutosaveMonitor autosave={ autosave } interval={ 5 } /> );
-
-		jest.advanceTimersByTime( 5000 );
-
-		expect( autosave ).not.toHaveBeenCalled();
-	} );
-
-	it( 'should not autosave while an autosave is already in progress', () => {
-		const autosave = jest.fn();
-		setState( { isDirty: true, isAutosaveable: true, isAutosaving: true } );
+		setState( overrides );
 		render( <AutosaveMonitor autosave={ autosave } interval={ 5 } /> );
 
 		jest.advanceTimersByTime( 5000 );
