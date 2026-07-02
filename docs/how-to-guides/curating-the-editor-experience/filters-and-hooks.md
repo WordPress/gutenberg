@@ -85,11 +85,13 @@ DataViews-powered screens (such as the Pages list and its Quick Edit form) build
 
 The configuration has four keys: `default_view`, `default_layouts`, `view_list` (the saved views shown in the list), and `form` (the DataForm used by consumers like Quick Edit).
 
-In the following example, a custom saved view is added to the `page` list and the Trash view is removed from it, the `grid` layout option is unset, and `slug` and `author` fields are removed from the form.
+In the following example, a custom saved view is added to the `page` list, the existing Drafts view is retitled, the Trash view is removed, the `grid` layout option is unset, and `slug` and `author` fields are removed from the form.
 
 ```php
 function example_filter_page_view_config( $data ) {
-    // Merge a partial configuration: add a saved view to the list.
+    // Merge a partial configuration: add a saved view to the list, and
+    // retitle the existing Drafts view — matched by slug, only the given
+    // keys change.
     $data->update_with(
         array(
             'view_list' => array(
@@ -106,6 +108,10 @@ function example_filter_page_view_config( $data ) {
                             ),
                         ),
                     ),
+                ),
+                array(
+                    'slug'  => 'drafts',
+                    'title' => __( 'In progress', 'example' ),
                 ),
             ),
         ),
