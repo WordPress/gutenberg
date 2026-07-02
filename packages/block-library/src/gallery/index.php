@@ -281,6 +281,16 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 			return '';
 		}
 
+		// The source query only fetched IDs (`fields => ids`), which skips
+		// WP_Query's cache priming. Each image rendered below reads the
+		// attachment post and its meta (via `wp_get_attachment_image()`,
+		// `get_post()`, etc.), so warm the post and meta caches in a single pair
+		// of queries up front instead of paying ~two queries per attachment.
+		// Term cache is left cold: the render path doesn't read attachment terms.
+		if ( count( $attachment_ids ) > 1 ) {
+			_prime_post_caches( $attachment_ids, false, true );
+		}
+
 		// Expose the gallery's provided context (plus galleryId/postId/postType)
 		// to each image block, since these images are rendered outside the
 		// gallery's real inner-block tree.
