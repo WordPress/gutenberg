@@ -37,6 +37,11 @@ export interface WidgetHeaderProps {
 	overlay?: boolean;
 
 	/**
+	 * Inert the identity while customizing, so it does not capture interaction.
+	 */
+	editMode?: boolean;
+
+	/**
 	 * Toolbar placed on the trailing edge.
 	 */
 	children?: ReactNode;
@@ -44,8 +49,8 @@ export interface WidgetHeaderProps {
 
 /**
  * Tile header row: identity (icon + title) and a toolbar on one line. Rendered
- * as a `base` in the card flow and as an `overlay` in the grid slot (outside the
- * card's `inert`) so the toolbar stays interactive.
+ * in the card flow, or as an `overlay` in the grid slot for full-bleed widgets
+ * that have no in-card header.
  *
  * @param {WidgetHeaderProps} props Component props.
  */
@@ -54,6 +59,7 @@ export function WidgetHeader( {
 	titleId,
 	showIdentity = false,
 	overlay = false,
+	editMode = false,
 	children,
 }: WidgetHeaderProps ): React.ReactNode {
 	return (
@@ -66,6 +72,7 @@ export function WidgetHeader( {
 					align="center"
 					gap="sm"
 					className={ styles.identity }
+					{ ...( editMode ? { inert: 'true' } : {} ) }
 				>
 					{ widgetType.icon && (
 						<span className={ styles.icon } aria-hidden="true">

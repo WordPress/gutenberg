@@ -4,7 +4,6 @@
 	@layer compositions {
 		.icon-button {
 			--wp-ui-button-aspect-ratio: 1;
-			/* stylelint-disable-next-line length-zero-no-unit -- This custom property is reused in Button's min-width calc(), where a unitless zero is invalid. */
 			--wp-ui-button-padding-inline: 0px;
 			--wp-ui-button-min-width: unset;
 		}
