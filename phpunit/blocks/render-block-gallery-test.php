@@ -159,6 +159,32 @@ class Tests_Blocks_Render_Gallery extends WP_UnitTestCase {
 		$this->assertSame( '', trim( $output ) );
 	}
 
+	public function test_dynamic_gallery_ignores_malformed_dynamic_content() {
+		// A `dynamicContent` that isn't the expected `{ source, args }` object
+		// (e.g. corrupted or hand-edited markup) resolves to no source and renders
+		// nothing, without reading array offsets off a non-array value.
+		$non_object = $this->render_in_loop(
+			'<!-- wp:gallery {"dynamicContent":"not-an-object"} /-->'
+		);
+		$this->assertSame(
+			'',
+			trim( $non_object ),
+			'A non-object dynamicContent should resolve to no source and render nothing.'
+		);
+
+		// A valid source with a malformed (non-array) `args` falls back to the
+		// default ordering and still renders the attached images, again without
+		// indexing a non-array.
+		$malformed_args = $this->render_in_loop(
+			'<!-- wp:gallery {"dynamicContent":{"source":"core/attached-media","args":"oops"}} /-->'
+		);
+		$this->assertSame(
+			count( self::$attachment_ids ),
+			substr_count( $malformed_args, 'wp-block-image' ),
+			'A gallery with malformed args should still render the attached images using the default ordering.'
+		);
+	}
+
 	public function test_dynamic_gallery_sanitizes_image_aspect_ratio_style() {
 		$valid_output = $this->render_in_loop(
 			'<!-- wp:gallery {"dynamicContent":{"source":"core/attached-media"},"aspectRatio":"16/9"} /-->'

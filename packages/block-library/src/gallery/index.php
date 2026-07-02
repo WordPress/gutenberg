@@ -71,8 +71,12 @@ add_filter( 'render_block_context', 'block_core_gallery_render_context', 10, 2 )
  * @return int[] Ordered list of image attachment IDs.
  */
 function block_core_gallery_resolve_dynamic_source( $source, $block ) {
+	if ( ! is_array( $source ) ) {
+		return array();
+	}
+
 	$source_name = $source['source'] ?? null;
-	$args        = $source['args'] ?? array();
+	$args        = isset( $source['args'] ) && is_array( $source['args'] ) ? $source['args'] : array();
 
 	switch ( $source_name ) {
 		case 'core/attached-media':
