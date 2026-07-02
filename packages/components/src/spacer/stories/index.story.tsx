@@ -1,11 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 
-/**
- * Internal dependencies
- */
 import { Spacer } from '..';
 
 const controls = [

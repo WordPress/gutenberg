@@ -1,12 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { CSSProperties } from 'react';
 
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import { useContextSystem } from '../context';
 import { space } from '../utils/space';

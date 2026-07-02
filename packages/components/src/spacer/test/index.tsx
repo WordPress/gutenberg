@@ -1,11 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 
-/**
- * Internal dependencies
- */
 import { Spacer } from '../index';
 
 describe( 'props', () => {
