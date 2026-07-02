@@ -64,7 +64,7 @@
 	},
 	"devDependencies": {
 		"@types/eslint": "^9",
-		"@types/estree": "^1.0.5",
+		"@types/estree": "^1.0.8",
 		"@typescript-eslint/parser": "^8.57.1",
 		"eslint": "^10.0.0"
 	},
