@@ -4,7 +4,7 @@
 
 ### Bug Fix
 
-- DataViews: Stop the infinite-scroll list from jumping while pages load asynchronously. The scroll-anchor restoration no longer discards scrolling the user did during the load, and the footer no longer mounts mid-load (resizing the scroll container) when there are no bulk actions to show. [#79546](https://github.com/WordPress/gutenberg/pull/79546)
+- DataViews: Stop the infinite-scroll list from jumping while pages load asynchronously. The scroll-anchor restoration no longer discards scrolling the user did during the load, and the footer's visibility no longer depends on the loading state, so it no longer mounts mid-load (resizing the scroll container). [#79546](https://github.com/WordPress/gutenberg/pull/79546)
 
 ## 17.1.0 (2026-07-01)
 
