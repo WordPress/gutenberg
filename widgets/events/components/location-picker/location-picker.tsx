@@ -30,6 +30,7 @@ type LocationOption = {
 };
 
 const DRAFT_DEBOUNCE_MS = 300;
+const SEARCH_DEBOUNCE_MS = 500;
 
 type LocationPickerProps = {
 	/**
@@ -246,7 +247,7 @@ export function LocationPicker( {
 				}
 				setLocationOptions( [] );
 			}
-		}, 200 );
+		}, SEARCH_DEBOUNCE_MS );
 
 		return () => {
 			clearTimeout( timeoutId );
