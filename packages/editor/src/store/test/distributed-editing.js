@@ -7198,8 +7198,8 @@ describe( 'distributed editing session state', () => {
 							blockName: 'core/html',
 							blockLabel: 'Rejected HTML',
 							blockPath: [ 1 ],
-							changeKind: 'deleted_block',
-							riskReason: 'unfiltered_html_block_deleted',
+							changeKind: 'modified_block',
+							riskReason: 'kses_would_remove_script',
 							baseContentHash: rejectedBaseHash,
 							proposedContentHash: rejectedHash,
 							rawContent: `<script>${ rawContentToken }</script>`,
@@ -7236,7 +7236,7 @@ describe( 'distributed editing session state', () => {
 				{
 					reviewItemId: 'fresh-review-pre-publish-reject',
 					decision: 'rejected',
-					rejectionReason: 'reviewer_rejected_deleted_block',
+					rejectionReason: 'reviewer_rejected_modified_block',
 				}
 			);
 		const resolvedPrePublishState =
@@ -7969,7 +7969,7 @@ describe( 'distributed editing session state', () => {
 				supportsCompare: true,
 				canApprove: true,
 				canReject: false,
-				rejectionReason: 'reviewer_rejected_deleted_block',
+				rejectionReason: 'reviewer_rejected_modified_block',
 			} ),
 		] );
 		expect( requestedPrePublishState.actionKeys ).toEqual( [
@@ -9813,13 +9813,13 @@ describe( 'distributed editing session state', () => {
 							review_status: 'pending_review',
 						},
 						{
-							id: 'risk-deleted',
+							id: 'risk-modified',
 							block_client_id: 'server-block-1',
 							block_name: 'core/html',
 							block_label: 'HTML',
 							block_path: [ 1 ],
-							change_kind: 'deleted_block',
-							risk_reason: 'unfiltered_html_block_deleted',
+							change_kind: 'modified_block',
+							risk_reason: 'kses_would_remove_script',
 							base_content_hash:
 								'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd',
 							proposed_content_hash:
@@ -9845,10 +9845,10 @@ describe( 'distributed editing session state', () => {
 			getDistributedEditingSessionStateForRiskyBlockReviewItemResolution(
 				approved,
 				{
-					reviewItemId: 'risk-deleted',
-					decision: 'rejected',
+					reviewItemId: 'risk-modified',
+					decision: 'approved',
 					reviewerId: 1,
-					rejectionReason: 'reviewer_rejected',
+					approvalProofHash: 'sha256:risk-modified:approval-proof',
 				}
 			);
 		const stale = getDistributedEditingSessionStateForStaleRiskyBlockReview(
@@ -9876,12 +9876,12 @@ describe( 'distributed editing session state', () => {
 		expect( resolvedReviewState ).toMatchObject( {
 			status: DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_RESOLVED,
 			pendingReviewItemCount: 0,
-			approvedReviewItemCount: 1,
-			rejectedReviewItemCount: 1,
+			approvedReviewItemCount: 2,
+			rejectedReviewItemCount: 0,
 			hasPendingReviewItems: false,
 			prePublishPanelRequired: false,
 			saveClickAction:
-				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_SAVE,
 			canExportLocalUpdates: false,
 			reviewItems: [
 				expect.objectContaining( {
@@ -9893,11 +9893,11 @@ describe( 'distributed editing session state', () => {
 					rawContentIncluded: false,
 				} ),
 				expect.objectContaining( {
-					id: 'risk-deleted',
+					id: 'risk-modified',
 					reviewStatus:
-						DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.REJECTED,
+						DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.APPROVED_FOR_RETRY_SAVE,
 					reviewerId: 1,
-					rejectionReason: 'reviewer_rejected',
+					approvalProofHash: 'sha256:risk-modified:approval-proof',
 					rawContentIncluded: false,
 				} ),
 			],
@@ -9929,12 +9929,28 @@ describe( 'distributed editing session state', () => {
 				rawContentIncluded: false,
 				exposesRawContent: false,
 			} ),
+			expect.objectContaining( {
+				id: 'risk-modified',
+				blockClientId: 'server-block-1',
+				proposedContentHash:
+					'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+				reviewedProposedContentHash:
+					'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+				ksesFilteredContentHash:
+					'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
+				reviewStatus:
+					DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.APPROVED_FOR_RETRY_SAVE,
+				reviewEvidenceType: 'kses_block_hash_only_change',
+				contentReviewPolicy: 'kses',
+				rawContentIncluded: false,
+				exposesRawContent: false,
+			} ),
 		] );
 		expect( JSON.stringify( reviewedBlockItems ) ).not.toContain(
 			'raw-risky-html'
 		);
 		expect( staleReviewState ).toMatchObject( {
-			status: DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.STALE_AFTER_REVIEW,
+			status: DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_RESOLVED,
 			reasonCode:
 				DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
 			pendingReviewItemCount: 0,
