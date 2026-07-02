@@ -1,4 +1,25 @@
+@use "@wordpress/base-styles/colors" as *;
+
 .editor-push-changes-to-global-styles-control .components-button {
 	justify-content: center;
 	width: 100%;
+}
+
+.editor-push-changes-to-global-styles-modal p {
+	margin-top: 0;
+}
+
+.editor-push-changes-to-global-styles-modal {
+	.dataviews-layout__container {
+		overflow-x: hidden;
+	}
+}
+
+.editor-push-changes-to-global-styles-modal__arrow {
+	fill: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+.editor-push-changes-to-global-styles-modal__value {
+	color: $gray-900;
+	overflow-wrap: anywhere;
 }
