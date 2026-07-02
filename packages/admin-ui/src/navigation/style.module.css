@@ -22,7 +22,7 @@
 	color: var(--wpds-color-foreground-interactive-neutral-active);
 }
 
-.list .item.active {
+.list .item[aria-current="page"] {
 	color: var(--wpds-color-foreground-interactive-neutral-active);
 	font-weight: var(--wpds-typography-font-weight-medium);
 }

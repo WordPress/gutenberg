@@ -6,6 +6,8 @@ import { Stack, Text } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
+import Navigation from '../navigation';
+import type { NavigationProps } from '../navigation/types';
 import { SidebarToggleSlot } from './sidebar-toggle-slot';
 import styles from './style.module.css';
 
@@ -27,7 +29,7 @@ export default function Header( {
 	title?: React.ReactNode;
 	subTitle: React.ReactNode;
 	actions?: React.ReactNode;
-	navigation?: React.ReactNode;
+	navigation?: NavigationProps;
 	showSidebarToggle?: boolean;
 } ) {
 	const HeadingTag = `h${ headingLevel }` as const;
@@ -86,11 +88,12 @@ export default function Header( {
 					{ subTitle }
 				</Text>
 			) }
-			{ navigation && (
+
+			{ navigation?.items?.length ? (
 				<div className={ styles[ 'header-navigation' ] }>
-					{ navigation }
+					<Navigation { ...navigation } />
 				</div>
-			) }
+			) : null }
 		</Stack>
 	);
 }

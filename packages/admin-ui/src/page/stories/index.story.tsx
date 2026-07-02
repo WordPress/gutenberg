@@ -11,7 +11,6 @@ import { Icon, wordpress } from '@wordpress/icons';
  */
 import Page from '..';
 import Breadcrumbs from '../../breadcrumbs';
-import Navigation from '../../navigation';
 import { withRouter } from '../../stories/with-router';
 
 const meta: Meta< typeof Page > = {
@@ -192,16 +191,15 @@ export const WithNavigation: Story = {
 	args: {
 		title: 'Analytics',
 		showSidebarToggle: false,
-		navigation: (
-			<Navigation
-				items={ [
-					{ label: 'Overview', to: '/overview', active: true },
-					{ label: 'Products', to: '/products' },
-					{ label: 'Orders', to: '/orders' },
-					{ label: 'Customers', to: '/customers' },
-				] }
-			/>
-		),
+		navigation: {
+			items: [
+				{ label: 'Overview', href: '/overview' },
+				{ label: 'Products', href: '/products' },
+				{ label: 'Orders', href: '/orders' },
+				{ label: 'Customers', href: '/customers' },
+			],
+			selected: '/overview',
+		},
 		hasPadding: true,
 		children: <Text>Page content here</Text>,
 	},
@@ -221,16 +219,15 @@ export const WithNavigationAndActions: Story = {
 				</Button>
 			</>
 		),
-		navigation: (
-			<Navigation
-				items={ [
-					{ label: 'Overview', to: '/overview', active: true },
-					{ label: 'Products', to: '/products' },
-					{ label: 'Orders', to: '/orders' },
-					{ label: 'Customers', to: '/customers' },
-				] }
-			/>
-		),
+		navigation: {
+			items: [
+				{ label: 'Overview', href: '/overview' },
+				{ label: 'Products', href: '/products' },
+				{ label: 'Orders', href: '/orders' },
+				{ label: 'Customers', href: '/customers' },
+			],
+			selected: '/overview',
+		},
 		showSidebarToggle: false,
 		hasPadding: true,
 		children: <Text>Page content here</Text>,
@@ -250,16 +247,15 @@ export const FullHeader: Story = {
 			/>
 		),
 		badges: <Badge intent="informational">Status</Badge>,
-		navigation: (
-			<Navigation
-				items={ [
-					{ label: 'Overview', to: '/overview', active: true },
-					{ label: 'Products', to: '/products' },
-					{ label: 'Orders', to: '/orders' },
-					{ label: 'Customers', to: '/customers' },
-				] }
-			/>
-		),
+		navigation: {
+			items: [
+				{ label: 'Overview', href: '/overview' },
+				{ label: 'Products', href: '/products' },
+				{ label: 'Orders', href: '/orders' },
+				{ label: 'Customers', href: '/customers' },
+			],
+			selected: '/overview',
+		},
 		actions: (
 			<>
 				<Button size="compact" variant="outline">

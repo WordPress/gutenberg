@@ -8,74 +8,29 @@ import { render, screen } from '@testing-library/react';
  */
 import { Navigation } from '..';
 
-jest.mock( '@wordpress/route', () => ( {
-	Link: ( {
-		to,
-		search,
-		children,
-		...props
-	}: {
-		to?: string;
-		search?:
-			| Record< string, string >
-			| ( (
-					previous: Record< string, string >
-			  ) => Record< string, string > );
-		children: React.ReactNode;
-	} ) => {
-		// The router resolves the `search` reducer against the current params.
-		const resolved = typeof search === 'function' ? search( {} ) : search;
-		const href =
-			to ??
-			( resolved
-				? `?${ new URLSearchParams( resolved ).toString() }`
-				: undefined );
-		return (
-			<a href={ href } { ...props }>
-				{ children }
-			</a>
-		);
-	},
-} ) );
-
 describe( 'Navigation', () => {
 	describe( 'validation', () => {
-		it( 'should throw when an item has neither `to` nor `search`', () => {
+		it( 'should throw when an item is missing `href`', () => {
 			expect( () =>
 				render(
 					<Navigation
 						items={ [
-							{ label: 'Overview', to: '/overview' },
-							{ label: 'Products' },
+							{ label: 'Overview', href: '/overview' },
+							{ label: 'Products' } as never,
 						] }
 					/>
 				)
-			).toThrow( /item "Products" must have a `to` or `search` prop/ );
+			).toThrow( /item "Products" is missing an `href` prop/ );
 			expect( console ).toHaveErrored();
 		} );
 
-		it( 'should not throw when all items have `to`', () => {
+		it( 'should not throw when all items have `href`', () => {
 			expect( () =>
 				render(
 					<Navigation
 						items={ [
-							{ label: 'Overview', to: '/overview' },
-							{ label: 'Products', to: '/products' },
-						] }
-					/>
-				)
-			).not.toThrow();
-		} );
-
-		it( 'should not throw when an item provides only `search`', () => {
-			expect( () =>
-				render(
-					<Navigation
-						items={ [
-							{
-								label: 'Overview',
-								search: { section: 'overview' },
-							},
+							{ label: 'Overview', href: '/overview' },
+							{ label: 'Products', href: '/products' },
 						] }
 					/>
 				)
@@ -96,7 +51,7 @@ describe( 'Navigation', () => {
 		it( 'should render inside a nav with a default accessible label', () => {
 			render(
 				<Navigation
-					items={ [ { label: 'Overview', to: '/overview' } ] }
+					items={ [ { label: 'Overview', href: '/overview' } ] }
 				/>
 			);
 
@@ -107,12 +62,12 @@ describe( 'Navigation', () => {
 			).toBeInTheDocument();
 		} );
 
-		it( 'should render each item as a link with its `to` as href', () => {
+		it( 'should render each item as a link with its `href`', () => {
 			render(
 				<Navigation
 					items={ [
-						{ label: 'Overview', to: '/overview' },
-						{ label: 'Products', to: '/products' },
+						{ label: 'Overview', href: '/overview' },
+						{ label: 'Products', href: '/products' },
 					] }
 				/>
 			);
@@ -125,27 +80,14 @@ describe( 'Navigation', () => {
 			expect( links[ 1 ] ).toHaveAttribute( 'href', '/products' );
 		} );
 
-		it( 'should build an href from `search` when `to` is omitted', () => {
+		it( 'should mark the item matching `selected` with aria-current="page"', () => {
 			render(
 				<Navigation
 					items={ [
-						{ label: 'Overview', search: { section: 'overview' } },
+						{ label: 'Overview', href: '/overview' },
+						{ label: 'Products', href: '/products' },
 					] }
-				/>
-			);
-
-			expect(
-				screen.getByRole( 'link', { name: 'Overview' } )
-			).toHaveAttribute( 'href', '?section=overview' );
-		} );
-
-		it( 'should mark only the active item with aria-current="page"', () => {
-			render(
-				<Navigation
-					items={ [
-						{ label: 'Overview', to: '/overview', active: true },
-						{ label: 'Products', to: '/products' },
-					] }
+					selected="/overview"
 				/>
 			);
 

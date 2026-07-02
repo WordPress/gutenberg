@@ -5,28 +5,20 @@ export interface NavigationItem {
 	label: string;
 
 	/**
-	 * The router path to link to. Optional when linking within the current
-	 * route via `search`.
+	 * The URL the item links to.
 	 */
-	to?: string;
-
-	/**
-	 * Query params to merge into the link. The current params are preserved
-	 * and these are applied on top.
-	 */
-	search?: Record< string, unknown >;
-
-	/**
-	 * Whether this item points to the current location. It's rendered with
-	 * `aria-current="page"` and a distinct visual treatment.
-	 */
-	active?: boolean;
+	href: string;
 }
 
-export interface NavigationProps extends React.HTMLAttributes< HTMLElement > {
+export interface NavigationProps {
 	/**
-	 * An array of items to display as navigation links. Every item links via
-	 * `to` and/or `search`; mark the current one with `active`.
+	 * The navigation items to display.
 	 */
 	items: NavigationItem[];
+
+	/**
+	 * The `href` of the currently selected item. The matching item is rendered
+	 * with `aria-current="page"` and a distinct visual treatment.
+	 */
+	selected?: string;
 }

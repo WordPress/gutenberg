@@ -6,6 +6,7 @@ import clsx from 'clsx';
 /**
  * Internal dependencies
  */
+import type { NavigationProps } from '../navigation/types';
 import Header from './header';
 import NavigableRegion from '../navigable-region';
 import { SidebarToggleFill } from './sidebar-toggle-slot';
@@ -47,10 +48,10 @@ function Page( {
 	className?: string;
 	actions?: React.ReactNode;
 	/**
-	 * Section navigation shown in the page header. Pass a `<Navigation>` with
-	 * the section links.
+	 * Section navigation shown in the page header: the list of links and the
+	 * `href` of the selected one.
 	 */
-	navigation?: React.ReactNode;
+	navigation?: NavigationProps;
 	ariaLabel?: string;
 	hasPadding?: boolean;
 	showSidebarToggle?: boolean;
@@ -66,7 +67,7 @@ function Page( {
 				badges ||
 				actions ||
 				visual ||
-				navigation ) && (
+				navigation?.items?.length ) && (
 				<Header
 					headingLevel={ headingLevel }
 					breadcrumbs={ breadcrumbs }
