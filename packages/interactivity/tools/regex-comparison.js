@@ -17,9 +17,9 @@
  */
 
 const tsRe =
-	/(\/(?:\\\/|[^/])*\/|"(?:\\"|[^"])*"|'(?:\\'|[^'])*'|`(?:\\`|[^`])*`|\(\s*((?:function)\s*\(\s*\)|(?:\(\s*\))\s*=>)\s*(?:\{[\s\S]*?\}|[^;){]*)\s*\)\s*\(\s*\)|[^;])+/gm;
+	/(?:\/(?:\\\/|[^/])*\/|"(?:\\"|[^"])*"|'(?:\\'|[^'])*'|`(?:\\`|[^`])*`|\(\s*(?:(?:function)\s*\(\s*\)|(?:\(\s*\))\s*=>)\s*(?:\{[\s\S]*?\}|[^;){]*)\s*\)\s*\(\s*\)|[^;])+/gm;
 const phpRe =
-	/(\/(?:\\\\\/|[^\/])*\/|"(?:\\\\"|[^"])*"|\'(?:\\\\\'|[^\'])*\'|`(?:\\\\`|[^`])*`|\(\s*((?:function)\s*\(\s*\)|(?:\(\s*\))\s*=>)\s*(?:\{[\s\S]*?\}|[^;){]*)\s*\)\s*\(\s*\)|[^;])+/gm;
+	/(?:\/(?:\\\\\/|[^\/])*\/|"(?:\\\\"|[^"])*"|\'(?:\\\\\'|[^\'])*\'|`(?:\\\\`|[^`])*`|\(\s*(?:(?:function)\s*\(\s*\)|(?:\(\s*\))\s*=>)\s*(?:\{[\s\S]*?\}|[^;){]*)\s*\)\s*\(\s*\)|[^;])+/gm;
 const ITER = 100000;
 
 function compare( input ) {
@@ -129,56 +129,5 @@ const pct4 = ( ( ( phpTime - tsTime ) / tsTime ) * 100 ).toFixed( 1 );
 console.log(
 	`Delta: ${ pct4 }% (${
 		phpTime > tsTime ? 'PHP-style slower' : 'PHP-style faster'
-	})`
-);
-
-/* ───────────────────────────────────────────────────────────
- * Test 5: Non-capturing (?:...) vs capturing (...) groups
- *
- * The Datastar original uses (...) for inner alternations.
- * Since match() with the /g flag ignores capture groups the
- * output is identical, but skipping the capture bookkeeping
- * is measurably faster. ──────────────────────────────────── */
-console.log( '\n=== Non-capturing vs capturing groups ===' );
-const dstarOriginal =
-	/(\/(\\\/|[^/])*\/|"(\\"|[^"])*"|'(\\'|[^'])*'|`(\\`|[^`])*`|\(\s*((function)\s*\(\s*\)|(\(\s*\))\s*=>)\s*(?:\{[\s\S]*?\}|[^;){]*)\s*\)\s*\(\s*\)|[^;])+/gm;
-const ourOptimized =
-	/(\/(?:\\\/|[^/])*\/|"(?:\\"|[^"])*"|'(?:\\'|[^'])*'|`(?:\\`|[^`])*`|\(\s*((?:function)\s*\(\s*\)|(?:\(\s*\))\s*=>)\s*(?:\{[\s\S]*?\}|[^;){]*)\s*\)\s*\(\s*\)|[^;])+/gm;
-const ourOptimize2 =
-	/(\/(?:\\.|[^\\/])*\/|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`|\(\s*(?:function\s*\(\s*\)|\(\s*\)\s*=>)\s*(?:\{[\s\S]*?\}|[^;){]*)\s*\)\s*\(\s*\)|[^;])+/gm;
-
-let ok = true;
-for ( const expr of [ ...common, ...edge ] ) {
-	const a = ( expr.match( dstarOriginal ) || [] ).join( '|' );
-	const b = ( expr.match( ourOptimized ) || [] ).join( '|' );
-	const c = ( expr.match( ourOptimize2 ) || [] ).join( '|' );
-	if ( a !== b || a !== c ) {
-		ok = false;
-		console.log( 'MISMATCH:', expr, a, b, c );
-	}
-}
-console.log( 'Same output?', ok ? 'yes' : 'NO' );
-
-const dstarTime = bench(
-	'Datastar original (capturing)',
-	dstarOriginal,
-	perfInput
-);
-const ourTime = bench( 'Our version (non-capturing)', ourOptimized, perfInput );
-const ourTime2 = bench(
-	'Our version2 (non-capturing)',
-	ourOptimize2,
-	perfInput
-);
-const pct5 = ( ( ( ourTime - dstarTime ) / dstarTime ) * 100 ).toFixed( 1 );
-const pct6 = ( ( ( ourTime2 - dstarTime ) / dstarTime ) * 100 ).toFixed( 1 );
-console.log(
-	`Delta: ${ pct5 }% (${
-		ourTime < dstarTime ? '(?:) faster' : '(?:) slower'
-	})`
-);
-console.log(
-	`Delta: ${ pct6 }% (${
-		ourTime2 < dstarTime ? '(?:) faster' : '(?:) slower'
 	})`
 );
