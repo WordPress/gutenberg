@@ -92,7 +92,7 @@ test.describe( 'Block Notes', () => {
 			} );
 			await textbox.click();
 			await page.keyboard.type( 'hello world' );
-			// Select "hello" and toggle bold.
+			// Select all text and toggle bold.
 			await pageUtils.pressKeys( 'primary+a' );
 			await pageUtils.pressKeys( 'primary+b' );
 			await expect(

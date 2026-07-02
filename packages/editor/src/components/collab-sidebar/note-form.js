@@ -29,18 +29,35 @@ export function NoteForm( { onSubmit, onCancel, note, labels, focusOnMount } ) {
 	const [ inputComment, setInputComment ] = useState(
 		note?.content?.raw ?? ''
 	);
+	const [ isSubmitting, setIsSubmitting ] = useState( false );
 
 	const inputId = useInstanceId( NoteForm, 'comment-input' );
 	const trimmedPlainText = sanitizeNoteContent( stripHTML( inputComment ) );
 	const isDisabled =
-		inputComment === note?.content?.raw || ! trimmedPlainText.length;
+		isSubmitting ||
+		inputComment === note?.content?.raw ||
+		! trimmedPlainText.length;
 
-	function submit() {
+	async function submit() {
 		if ( isDisabled ) {
 			return;
 		}
-		onSubmit( inputComment );
-		setInputComment( '' );
+		setIsSubmitting( true );
+		try {
+			/*
+			 * The note actions resolve with the saved record on success and
+			 * `undefined` on failure (they surface their own error notice),
+			 * so only discard the draft once the save actually succeeded.
+			 */
+			const result = await onSubmit( inputComment );
+			if ( result !== undefined ) {
+				setInputComment( '' );
+			}
+		} catch {
+			// Keep the draft so the user can retry.
+		} finally {
+			setIsSubmitting( false );
+		}
 	}
 
 	return (

@@ -305,18 +305,17 @@ export function NoteThread( {
 						onSubmit={ ( inputComment ) => {
 							if ( 'approved' === note.status ) {
 								// For reopening, include the content in the reopen action.
-								onEditNote( {
+								return onEditNote( {
 									id: note.id,
 									status: 'hold',
 									content: inputComment,
 								} );
-							} else {
-								// For regular replies, add as separate comment.
-								onAddReply( {
-									content: inputComment,
-									parent: note.id,
-								} );
 							}
+							// For regular replies, add as separate comment.
+							return onAddReply( {
+								content: inputComment,
+								parent: note.id,
+							} );
 						} }
 						onCancel={ ( event ) => {
 							// Prevent the parent onClick from being triggered.
