@@ -9,8 +9,7 @@ import clsx from 'clsx';
 import { privateApis as routePrivateApis } from '@wordpress/route';
 import { SnackbarNotices } from '@wordpress/notices';
 import { SlotFillProvider } from '@wordpress/components';
-import { useIsomorphicLayoutEffect } from '@wordpress/compose';
-import { useMemo, useRef } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { getAdminThemeColors } from '@wordpress/admin-ui';
 import { ThemeProvider } from '@wordpress/theme';
 
@@ -21,6 +20,7 @@ import SavePanel from '../save-panel';
 import CanvasRenderer from '../canvas-renderer';
 import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
+import useSyncBodyBackground from './use-sync-body-background';
 import './style.scss';
 import useRouteTitle from '../app/use-route-title';
 
@@ -45,25 +45,7 @@ export default function RootSinglePage() {
 
 	const themeColors = useMemo( getAdminThemeColors, [] );
 
-	// Sync body background to the layout surface to avoid a jarring flash on
-	// macOS elastic-scroll bounce. See https://github.com/WordPress/gutenberg/issues/78564
-	const layoutRef = useRef< HTMLDivElement | null >( null );
-	useIsomorphicLayoutEffect( () => {
-		if ( ! layoutRef.current ) {
-			return;
-		}
-
-		const bg = getComputedStyle( layoutRef.current ).backgroundColor;
-		if ( ! bg ) {
-			return;
-		}
-
-		document.body.style.setProperty( 'background', bg );
-
-		return () => {
-			document.body.style.removeProperty( 'background' );
-		};
-	}, [] );
+	const layoutRef = useSyncBodyBackground();
 
 	return (
 		<SlotFillProvider>

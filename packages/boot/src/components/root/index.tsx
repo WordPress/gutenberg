@@ -8,11 +8,7 @@ import clsx from 'clsx';
  */
 import { privateApis as routePrivateApis } from '@wordpress/route';
 import { SnackbarNotices } from '@wordpress/notices';
-import {
-	useViewportMatch,
-	useReducedMotion,
-	useIsomorphicLayoutEffect,
-} from '@wordpress/compose';
+import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
 import {
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
@@ -20,7 +16,7 @@ import {
 	SlotFillProvider,
 } from '@wordpress/components';
 import { menu } from '@wordpress/icons';
-import { useState, useEffect, useRef, useMemo } from '@wordpress/element';
+import { useState, useEffect, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Page, getAdminThemeColors } from '@wordpress/admin-ui';
 import { Tooltip } from '@wordpress/ui';
@@ -35,6 +31,7 @@ import CanvasRenderer from '../canvas-renderer';
 import useRouteTitle from '../app/use-route-title';
 import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
+import useSyncBodyBackground from './use-sync-body-background';
 import './style.scss';
 
 const { useLocation, useMatches, Outlet } = unlock( routePrivateApis );
@@ -64,25 +61,7 @@ export default function Root() {
 
 	const themeColors = useMemo( getAdminThemeColors, [] );
 
-	// Sync body background to the layout surface to avoid a jarring flash on
-	// macOS elastic-scroll bounce. See https://github.com/WordPress/gutenberg/issues/78564
-	const layoutRef = useRef< HTMLDivElement | null >( null );
-	useIsomorphicLayoutEffect( () => {
-		if ( ! layoutRef.current ) {
-			return;
-		}
-
-		const bg = getComputedStyle( layoutRef.current ).backgroundColor;
-		if ( ! bg ) {
-			return;
-		}
-
-		document.body.style.setProperty( 'background', bg );
-
-		return () => {
-			document.body.style.removeProperty( 'background' );
-		};
-	}, [] );
+	const layoutRef = useSyncBodyBackground();
 
 	return (
 		<SlotFillProvider>
