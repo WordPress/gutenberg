@@ -257,6 +257,11 @@ export const splitStatements = ( expr: string ): string[] | null => {
 	return expr.trim().match( re );
 };
 
+// Cache for compiled full-expression functions, keyed by expression string.
+// The compiled functions are pure (all runtime data flows through arguments),
+// so the same Function object can be reused across all scopes and evaluations.
+const fnCache = new Map< string, Function >();
+
 // Generate the evaluate function.
 export const getEvaluate: GetEvaluate =
 	( { scope } ) =>
@@ -350,14 +355,9 @@ export const getEvaluate: GetEvaluate =
 			} else {
 				expression = `return (${ path });`;
 			}
-			const fn = new Function(
-				'state',
-				'context',
-				'actions',
-				'callbacks',
-				expression
-			);
-			const result = fn( state, ctx, actions, callbacks );
+			const el = scope.ref?.current ?? null;
+			let fn = fnCache.get( expression );
+			if ( ! fn ) {
 				fn = new Function(
 					'state',
 					'context',
@@ -367,6 +367,8 @@ export const getEvaluate: GetEvaluate =
 					'evt',
 					expression
 				);
+				fnCache.set( expression, fn );
+			}
 			const result = fn( state, ctx, actions, callbacks, el, evt );
 			resetScope();
 			return result;
