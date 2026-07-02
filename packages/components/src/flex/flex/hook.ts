@@ -1,12 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import deprecated from '@wordpress/deprecated';
 
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import { useResponsiveValue } from '../../utils/use-responsive-value';

@@ -1,11 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import { useFlexContext } from '../context';
