@@ -697,6 +697,16 @@ export default function GalleryEdit( props ) {
 					onError={ onUploadError }
 					{ ...mediaPlaceholderProps }
 				>
+					{ /*
+					 * Entry into dynamic mode. Gated on the editing mode so it's
+					 * hidden in content-only editing (where this structural change
+					 * isn't allowed), but intentionally not hidden by
+					 * `canUseDynamicSource` the way the inspector is (see
+					 * `dynamic-gallery.js`): even with no
+					 * post type to preview against, the source still resolves at
+					 * render time via `get_the_ID()` (see `index.php`) — e.g. in a
+					 * template part or pattern shown on a singular page.
+					 */ }
 					{ blockEditingMode === 'default' && (
 						<Button
 							__next40pxDefaultSize

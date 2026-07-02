@@ -187,11 +187,10 @@ export function GallerySourcePanel( {
 		);
 	}
 
-	// In static mode the panel only offers a way into dynamic mode, so hide it
-	// where the context has no post type to resolve against. This is stricter
-	// than the placeholder's entry button (see `edit.js`) on purpose: the
-	// placeholder keeps dynamic mode *possible* anywhere editable, while the
-	// inspector keeps it *easy and obvious* where a concrete post is in context.
+	// In static mode this panel is just an entry into dynamic mode, so hide it
+	// when there's no post type to preview against. This is intentionally
+	// stricter than the placeholder's entry button (see `edit.js`), which stays
+	// available anywhere because the source resolves at render time.
 	if ( ! canUseDynamicSource ) {
 		return null;
 	}
