@@ -103,7 +103,6 @@ export function QueryControls( {
 			{ [
 				onOrderChange && onOrderByChange && (
 					<SelectControl
-						__next40pxDefaultSize
 						key="query-controls-order-select"
 						label={ __( 'Order by' ) }
 						value={

@@ -19,7 +19,6 @@ const COMPONENTS_REQUIRING_40PX = new Set( [
 	'IconButton',
 	'InputControl',
 	'NumberControl',
-	'SelectControl',
 	'UnitControl',
 ] );
 

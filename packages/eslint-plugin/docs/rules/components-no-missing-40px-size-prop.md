@@ -13,7 +13,6 @@ The following components are checked by this rule:
 -   FormTokenField
 -   InputControl
 -   NumberControl
--   SelectControl
 -   UnitControl
 
 Examples of **incorrect** code for this rule:
