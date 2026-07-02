@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { wordDiff } from '../word-diff';
+import { wordDiff, MAX_DIFF_TOKENS } from '../word-diff';
 
 describe( 'wordDiff', () => {
 	it( 'returns equal segments for identical strings', () => {
@@ -69,5 +69,50 @@ describe( 'wordDiff', () => {
 				expect.objectContaining( { type: 'insert', value: 'x' } ),
 			] )
 		);
+	} );
+
+	describe( 'token cap', () => {
+		// A text of `n` distinct words tokenizes to n word tokens plus the
+		// separating spaces (2n - 1 tokens total).
+		const words = ( n, prefix = 'w' ) =>
+			Array.from( { length: n }, ( _, i ) => `${ prefix }${ i }` ).join(
+				' '
+			);
+
+		it( 'degrades to a coarse whole-run replace beyond the cap', () => {
+			const big = words( MAX_DIFF_TOKENS ); // ~2n-1 tokens > cap
+			const after = `${ big } tail`;
+			const result = wordDiff( big, after );
+			expect( result ).toEqual( [
+				{ type: 'delete', value: big },
+				{ type: 'insert', value: after },
+			] );
+		} );
+
+		it( 'applies the cap when only one side is oversized', () => {
+			const big = words( MAX_DIFF_TOKENS );
+			const result = wordDiff( 'small', big );
+			expect( result ).toEqual( [
+				{ type: 'delete', value: 'small' },
+				{ type: 'insert', value: big },
+			] );
+		} );
+
+		it( 'omits empty sides from the coarse result', () => {
+			const big = words( MAX_DIFF_TOKENS );
+			expect( wordDiff( '', big ) ).toEqual( [
+				{ type: 'insert', value: big },
+			] );
+			expect( wordDiff( big, '' ) ).toEqual( [
+				{ type: 'delete', value: big },
+			] );
+		} );
+
+		it( 'still word-diffs inputs at or under the cap', () => {
+			// 750 words = 1499 tokens with separators: just under the cap.
+			const base = words( 750 );
+			const result = wordDiff( base, base );
+			expect( result.every( ( s ) => s.type === 'equal' ) ).toBe( true );
+		} );
 	} );
 } );

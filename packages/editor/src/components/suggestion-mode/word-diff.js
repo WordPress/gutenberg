@@ -15,8 +15,27 @@
 export const MAX_DIFF_LENGTH = 2000;
 
 /**
+ * Upper bound on LCS input size in TOKENS per side. The exact LCS below
+ * allocates an (m+1)×(n+1) DP table — O(m·n) time and memory — and runs in
+ * sidebar summary renders, so it must be bounded inside this module and not
+ * only by what callers happen to pass. Composes with `MAX_DIFF_LENGTH`:
+ * consumers apply the character cap before calling (falling back to an
+ * attribute label), while this cap guards the DP table itself for any caller.
+ */
+export const MAX_DIFF_TOKENS = 1500;
+
+/**
  * Compute a word-level diff between two strings, returning an array of
  * segments tagged as `equal`, `insert`, or `delete`.
+ *
+ * Inputs whose token count exceeds `MAX_DIFF_TOKENS` on either side degrade
+ * to a coarse whole-run replace (one `delete` segment for the old text, one
+ * `insert` for the new), which callers already render as a generic change.
+ *
+ * Note: tokenization is whitespace-based (`\S+|\s+`), so text without word
+ * separators — CJK prose in particular — arrives as a few giant tokens and
+ * effectively degrades to the same whole-run replace rather than a
+ * word-level diff.
  *
  * @param {string} before Original text.
  * @param {string} after  Proposed text.
@@ -25,6 +44,18 @@ export const MAX_DIFF_LENGTH = 2000;
 export function wordDiff( before, after ) {
 	const a = tokenize( before );
 	const b = tokenize( after );
+
+	if ( a.length > MAX_DIFF_TOKENS || b.length > MAX_DIFF_TOKENS ) {
+		const coarse = [];
+		if ( a.length > 0 ) {
+			coarse.push( { type: 'delete', value: a.join( '' ) } );
+		}
+		if ( b.length > 0 ) {
+			coarse.push( { type: 'insert', value: b.join( '' ) } );
+		}
+		return coarse;
+	}
+
 	const lcs = longestCommonSubsequence( a, b );
 
 	const result = [];

@@ -326,10 +326,12 @@ export function summarizeOperations( operations ) {
 
 		const isContent = op.attribute === 'content';
 		/*
-		 * The word diff below is O(m*n); cap the input the same way
-		 * DiffForOperation does so a payload approaching the 64KB limit
-		 * can't freeze the sidebar. Oversized content changes fall back to
-		 * the attribute-level "Format: content" line.
+		 * The word diff below is O(m*n); cap the input length so a payload
+		 * approaching the 64KB limit can't freeze the sidebar. Oversized
+		 * content changes fall back to the attribute-level "Format: content"
+		 * line. This character cap composes with `wordDiff`'s own
+		 * MAX_DIFF_TOKENS guard, which bounds the LCS table itself for any
+		 * input that passes here but tokenizes pathologically.
 		 */
 		const canTextDiff =
 			isContent &&
