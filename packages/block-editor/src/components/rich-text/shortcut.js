@@ -1,32 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { isKeyboardEvent } from '@wordpress/keycodes';
-import { useEffect, useContext, useRef } from '@wordpress/element';
+import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
-import { keyboardShortcutContext } from './';
+import { unlock } from '../../lock-unlock';
 
-export function RichTextShortcut( { character, type, onUse } ) {
-	const keyboardShortcuts = useContext( keyboardShortcutContext );
-	const onUseRef = useRef();
-	onUseRef.current = onUse;
-
-	useEffect( () => {
-		function callback( event ) {
-			if ( isKeyboardEvent[ type ]( event, character ) ) {
-				onUseRef.current();
-				event.preventDefault();
-			}
-		}
-
-		keyboardShortcuts.current.add( callback );
-		return () => {
-			keyboardShortcuts.current.delete( callback );
-		};
-	}, [ character, type ] );
-
-	return null;
-}
+// `RichTextShortcut` now lives in `@wordpress/rich-text` so it shares the
+// `keyboardShortcutContext` with standalone rich text fields. Re-exported here
+// for back-compat (e.g. `@wordpress/format-library` imports it from
+// `@wordpress/block-editor`).
+export const { RichTextShortcut } = unlock( richTextPrivateApis );

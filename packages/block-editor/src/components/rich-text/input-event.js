@@ -1,31 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useContext, useRef } from '@wordpress/element';
+import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
-import { inputEventContext } from './';
+import { unlock } from '../../lock-unlock';
 
-export function RichTextInputEvent( { inputType, onInput } ) {
-	const callbacks = useContext( inputEventContext );
-	const onInputRef = useRef();
-	onInputRef.current = onInput;
-
-	useEffect( () => {
-		function callback( event ) {
-			if ( event.inputType === inputType ) {
-				onInputRef.current();
-				event.preventDefault();
-			}
-		}
-
-		callbacks.current.add( callback );
-		return () => {
-			callbacks.current.delete( callback );
-		};
-	}, [ inputType ] );
-
-	return null;
-}
+// `RichTextInputEvent` now lives in `@wordpress/rich-text` so it shares the
+// `inputEventContext` with standalone rich text fields. Re-exported here for
+// back-compat (e.g. `@wordpress/format-library` imports it, aliased as
+// `__unstableRichTextInputEvent`, from `@wordpress/block-editor`).
+export const { RichTextInputEvent } = unlock( richTextPrivateApis );

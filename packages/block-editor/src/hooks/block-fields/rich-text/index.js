@@ -13,13 +13,10 @@ import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import { getAllowedFormats } from '../../../components/rich-text/utils';
 import { useEventListeners } from '../../../components/rich-text/event-listeners';
 import FormatEdit from '../../../components/rich-text/format-edit';
-import {
-	keyboardShortcutContext,
-	inputEventContext,
-} from '../../../components/rich-text';
 import { unlock } from '../../../lock-unlock';
 
-const { useRichText } = unlock( richTextPrivateApis );
+const { useRichText, keyboardShortcutContext, inputEventContext } =
+	unlock( richTextPrivateApis );
 
 export default function RichTextControl( {
 	data,

@@ -13,7 +13,6 @@ import {
 	useCallback,
 	useMemo,
 	forwardRef,
-	createContext,
 	useContext,
 } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
@@ -41,13 +40,8 @@ import { withDeprecations } from './with-deprecations';
 import BlockContext from '../block-context';
 import { unlock } from '../../lock-unlock';
 
-const { useRichText } = unlock( richTextPrivateApis );
-
-export const keyboardShortcutContext = createContext();
-keyboardShortcutContext.displayName = 'keyboardShortcutContext';
-
-export const inputEventContext = createContext();
-inputEventContext.displayName = 'inputEventContext';
+const { useRichText, keyboardShortcutContext, inputEventContext } =
+	unlock( richTextPrivateApis );
 
 const instanceIdKey = Symbol( 'instanceId' );
 

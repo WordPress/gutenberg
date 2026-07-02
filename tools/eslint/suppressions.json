@@ -260,16 +260,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/rich-text/input-event.js": {
-		"react-hooks/refs": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/rich-text/shortcut.js": {
-		"react-hooks/refs": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/spacing-sizes-control/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
