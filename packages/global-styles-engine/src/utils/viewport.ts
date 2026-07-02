@@ -43,6 +43,15 @@ function isValidViewportSize( value: unknown ): value is string {
 	);
 }
 
+/**
+ * Converts a viewport breakpoint value to pixels.
+ *
+ * Numeric values are returned as-is. CSS length values are only supported when
+ * expressed in px, em, or rem units.
+ *
+ * @param value Breakpoint value as a number or CSS length.
+ * @return The breakpoint value in pixels, or undefined when invalid.
+ */
 export function getViewportBreakpointValueInPixels(
 	value: number | string | undefined
 ): number | undefined {
@@ -62,9 +71,25 @@ export function getViewportBreakpointValueInPixels(
 	const numericValue = Number.parseFloat( match[ 1 ] );
 	const unit = match[ 2 ];
 
+	// Use the most common browser default font size as the base for em/rem
+	// media query conversions. This pixel value is used to compare breakpoint
+	// order and calculate preview sizes; generated media queries keep the
+	// original units.
 	return unit === 'px' ? numericValue : numericValue * DEFAULT_FONT_SIZE;
 }
 
+/**
+ * Returns sanitized viewport breakpoints from a global styles config or
+ * viewport settings object.
+ *
+ * Falls back to default breakpoints when no valid values are provided. If the
+ * mobile breakpoint is missing, a valid tablet breakpoint is used as mobile. If
+ * the tablet breakpoint is missing, invalid, or not larger than the mobile
+ * breakpoint, the result only includes a mobile breakpoint.
+ *
+ * @param configOrSettings Global styles config or viewport settings.
+ * @return Sanitized viewport breakpoints.
+ */
 export function getViewportBreakpoints(
 	configOrSettings?: GlobalStylesConfig | ViewportSettings
 ): ViewportBreakpoints {
@@ -112,6 +137,13 @@ export function getViewportBreakpoints(
 	};
 }
 
+/**
+ * Returns responsive media query aliases for the configured viewport
+ * breakpoints.
+ *
+ * @param configOrSettings Global styles config or viewport settings.
+ * @return Responsive media queries keyed by alias.
+ */
 export function getResponsiveMediaQueries(
 	configOrSettings?: GlobalStylesConfig | ViewportSettings
 ): Record< string, string > {

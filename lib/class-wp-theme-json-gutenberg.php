@@ -767,6 +767,11 @@ class WP_Theme_JSON_Gutenberg {
 		$number = (float) $matches[1];
 		$unit   = $matches[2];
 
+		/*
+		 * Use the most common browser default font size as the base for em/rem
+		 * media query conversions. This pixel value is only used to compare
+		 * breakpoint order; generated media queries keep the original units.
+		 */
 		return 'px' === $unit ? $number : $number * 16;
 	}
 
