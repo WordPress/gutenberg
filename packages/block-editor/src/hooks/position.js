@@ -268,7 +268,6 @@ export function PositionPanelPure( {
 		<InspectorControls group="position">
 			<BaseControl help={ stickyHelpText }>
 				<CustomSelectControl
-					__next40pxDefaultSize
 					label={ __( 'Position' ) }
 					hideLabelFromVision
 					describedBy={ sprintf(
