@@ -336,11 +336,6 @@
 			"count": 2
 		}
 	},
-	"packages/block-library/src/embed/embed-placeholder.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
 	"packages/block-library/src/form-input/edit.js": {
 		"react-hooks/refs": {
 			"count": 3
@@ -736,7 +731,7 @@
 	},
 	"packages/components/src/flex/flex-item/hook.ts": {
 		"no-restricted-imports": {
-			"count": 2
+			"count": 1
 		}
 	},
 	"packages/components/src/flex/flex/hook.ts": {
@@ -992,7 +987,7 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/view/component.tsx": {
+	"packages/components/src/utils/test/polymorphic-element.tsx": {
 		"no-restricted-imports": {
 			"count": 1
 		}

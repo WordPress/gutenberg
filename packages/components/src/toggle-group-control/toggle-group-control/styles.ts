@@ -9,6 +9,11 @@ import { css } from '@emotion/react';
 import { CONFIG, COLORS } from '../../utils';
 import type { ToggleGroupControlProps } from '../types';
 
+export const block = css`
+	display: flex;
+	width: 100%;
+`;
+
 export const toggleGroupControl = ( {
 	isBlock,
 	isDeselectable,
@@ -22,6 +27,7 @@ export const toggleGroupControl = ( {
 	position: relative;
 
 	${ ! isDeselectable && enclosingBorders( isBlock ) }
+	${ isBlock && block }
 
 	@media not ( prefers-reduced-motion ) {
 		&[data-indicator-animated]::before {
@@ -76,8 +82,3 @@ const enclosingBorders = ( isBlock: ToggleGroupControlProps[ 'isBlock' ] ) => {
 		}
 	`;
 };
-
-export const block = css`
-	display: flex;
-	width: 100%;
-`;

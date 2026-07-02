@@ -32,6 +32,9 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+}
+
+.emotion-11 {
   -webkit-align-items: flex-start;
   -webkit-box-align: flex-start;
   -ms-flex-align: flex-start;
@@ -47,7 +50,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
   width: 100%;
 }
 
-.emotion-10>* {
+.emotion-12>* {
   min-width: 0;
 }
 
@@ -199,7 +202,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
           class="components-base-control__field emotion-2 emotion-3"
         >
           <div
-            class="components-flex components-h-stack emotion-10 emotion-11"
+            class="emotion-10 emotion-11 emotion-12 components-flex components-h-stack"
             data-wp-c16t="true"
             data-wp-component="HStack"
           >
@@ -259,6 +262,9 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+}
+
+.emotion-11 {
   -webkit-align-items: flex-start;
   -webkit-box-align: flex-start;
   -ms-flex-align: flex-start;
@@ -274,7 +280,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
   width: 100%;
 }
 
-.emotion-10>* {
+.emotion-12>* {
   min-width: 0;
 }
 
@@ -404,7 +410,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
           class="components-base-control__field emotion-2 emotion-3"
         >
           <div
-            class="components-flex components-h-stack emotion-10 emotion-11"
+            class="emotion-10 emotion-11 emotion-12 components-flex components-h-stack"
             data-wp-c16t="true"
             data-wp-component="HStack"
           >
@@ -454,6 +460,9 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+}
+
+.emotion-5 {
   -webkit-align-items: flex-start;
   -webkit-box-align: flex-start;
   -ms-flex-align: flex-start;
@@ -469,7 +478,7 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
   width: 100%;
 }
 
-.emotion-4>* {
+.emotion-6>* {
   min-width: 0;
 }
 
@@ -559,7 +568,7 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
           class="components-base-control__field emotion-2 emotion-3"
         >
           <div
-            class="components-flex components-h-stack emotion-4 emotion-5"
+            class="emotion-4 emotion-5 emotion-6 components-flex components-h-stack"
             data-wp-c16t="true"
             data-wp-component="HStack"
           >
@@ -609,6 +618,9 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+}
+
+.emotion-5 {
   -webkit-align-items: flex-start;
   -webkit-box-align: flex-start;
   -ms-flex-align: flex-start;
@@ -624,7 +636,7 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
   width: 100%;
 }
 
-.emotion-4>* {
+.emotion-6>* {
   min-width: 0;
 }
 
@@ -714,7 +726,7 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
           class="components-base-control__field emotion-2 emotion-3"
         >
           <div
-            class="components-flex components-h-stack emotion-4 emotion-5"
+            class="emotion-4 emotion-5 emotion-6 components-flex components-h-stack"
             data-wp-c16t="true"
             data-wp-component="HStack"
           >
@@ -808,6 +820,9 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+}
+
+.emotion-11 {
   -webkit-align-items: flex-start;
   -webkit-box-align: flex-start;
   -ms-flex-align: flex-start;
@@ -823,7 +838,7 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
   width: 100%;
 }
 
-.emotion-10>* {
+.emotion-12>* {
   min-width: 0;
 }
 
@@ -893,7 +908,7 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
           class="components-base-control__field emotion-8 emotion-9"
         >
           <div
-            class="components-flex components-h-stack emotion-10 emotion-11"
+            class="emotion-10 emotion-11 emotion-12 components-flex components-h-stack"
             data-wp-c16t="true"
             data-wp-component="HStack"
           >

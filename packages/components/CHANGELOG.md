@@ -5,6 +5,12 @@
 ### Breaking Changes
 
 -   `ExternalLink`: No longer sets the `rel` attribute by default. Consumers relying on the previous behavior should pass `rel` explicitly ([#79743](https://github.com/WordPress/gutenberg/pull/79743)).
+-   `View`: The legacy Emotion `css` prop no longer applies styles and is now accepted as a no-op for compatibility. Use `style` for inline styles or `className` for CSS-based styling instead ([#79443](https://github.com/WordPress/gutenberg/pull/79443)).
+-   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
+    -   `Truncate` ([#79446](https://github.com/WordPress/gutenberg/pull/79446))
+    -   `Divider` ([#79444](https://github.com/WordPress/gutenberg/pull/79444))
+    -   `Surface` ([#79445](https://github.com/WordPress/gutenberg/pull/79445))
+    -   `View` ([#79443](https://github.com/WordPress/gutenberg/pull/79443))
 -   The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed from the following:
     -   `BorderBoxControl` ([#79420](https://github.com/WordPress/gutenberg/pull/79420))
     -   `BorderControl` ([#79418](https://github.com/WordPress/gutenberg/pull/79418))
@@ -38,6 +44,7 @@
 -   Enforce CSS Module class selector naming for component-library packages ([#79504](https://github.com/WordPress/gutenberg/pull/79504)).
 -   `Surface`: Migrate styles from Emotion to SCSS Modules and use WPDS tokens for migrated visual values ([#79445](https://github.com/WordPress/gutenberg/pull/79445)).
 -   `Truncate`: Migrate styles from Emotion to SCSS Modules ([#79446](https://github.com/WordPress/gutenberg/pull/79446)).
+-   `View`: Migrate away from Emotion while preserving polymorphic `as` behavior and style cascade order ([#79443](https://github.com/WordPress/gutenberg/pull/79443)).
 
 ## 36.0.0 (2026-06-24)
 
