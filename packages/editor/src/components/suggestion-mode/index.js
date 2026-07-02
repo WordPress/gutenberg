@@ -8,6 +8,7 @@ export {
 	default as withSuggestionOverlay,
 	registerSuggestionOverlayFilter,
 } from './with-suggestion-overlay';
+export { MoveGhostsProvider } from './use-move-ghosts';
 export { default as SuggestionAutoSave } from './auto-save';
 export { default as SuggestionSaveLock } from './save-lock';
 export { default as SuggestionStoreInterceptor } from './store-interceptor';

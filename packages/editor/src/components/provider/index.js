@@ -60,6 +60,7 @@ import {
 	SuggestionContentReconciler,
 	registerSuggestionOverlayFilter,
 	isSuggestionModeEnabled,
+	MoveGhostsProvider,
 } from '../suggestion-mode';
 import { registerSuggestionFormat } from '../inline-suggestions';
 
@@ -91,6 +92,16 @@ const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
  */
 const MaybeSuggestionOverlayProvider = isSuggestionModeEnabled()
 	? SuggestionOverlayProvider
+	: Fragment;
+
+/*
+ * Computes the document-wide pending-move ghost index once per store change
+ * and shares it over context, so the per-block class-name HOC reads its slice
+ * instead of every block scanning the whole tree (N x O(N)). Move ghosts
+ * render in every intent, so this is gated on the experiment only.
+ */
+const MaybeMoveGhostsProvider = isSuggestionModeEnabled()
+	? MoveGhostsProvider
 	: Fragment;
 
 const noop = () => {};
@@ -478,40 +489,42 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							useSubRegistry={ false }
 						>
 							<MaybeSuggestionOverlayProvider>
-								{ children }
-								{ ! settings.isPreviewMode && (
-									<>
-										<PatternsMenuItems />
-										<TemplatePartMenuItems />
-										{ mode === 'template-locked' && (
-											<DisableNonPageContentBlocks />
-										) }
-										{ type === 'wp_navigation' && (
-											<NavigationBlockEditingMode />
-										) }
-										<EditorKeyboardShortcuts />
-										<KeyboardShortcutHelpModal />
-										<BlockRemovalWarnings />
-										<StartPageOptions />
-										<StartTemplateOptions />
-										<PatternRenameModal />
-										<PatternDuplicateModal />
-										{ isSuggestionModeEnabled() && (
-											<>
-												<SuggestionStoreInterceptor />
-												<SuggestionAutoSave />
-												<SuggestionSaveLock />
-												<SuggestionAnnotations />
-												<SuggestionAuthorColors />
-												<SuggestionDeletionKeyboard />
-												<SuggestionAdditionKeyboard />
-												<SuggestionFormatKeyboard />
-												<SuggestionContentReconciler />
-											</>
-										) }
-										<MediaEditorModalMount />
-									</>
-								) }
+								<MaybeMoveGhostsProvider>
+									{ children }
+									{ ! settings.isPreviewMode && (
+										<>
+											<PatternsMenuItems />
+											<TemplatePartMenuItems />
+											{ mode === 'template-locked' && (
+												<DisableNonPageContentBlocks />
+											) }
+											{ type === 'wp_navigation' && (
+												<NavigationBlockEditingMode />
+											) }
+											<EditorKeyboardShortcuts />
+											<KeyboardShortcutHelpModal />
+											<BlockRemovalWarnings />
+											<StartPageOptions />
+											<StartTemplateOptions />
+											<PatternRenameModal />
+											<PatternDuplicateModal />
+											{ isSuggestionModeEnabled() && (
+												<>
+													<SuggestionStoreInterceptor />
+													<SuggestionAutoSave />
+													<SuggestionSaveLock />
+													<SuggestionAnnotations />
+													<SuggestionAuthorColors />
+													<SuggestionDeletionKeyboard />
+													<SuggestionAdditionKeyboard />
+													<SuggestionFormatKeyboard />
+													<SuggestionContentReconciler />
+												</>
+											) }
+											<MediaEditorModalMount />
+										</>
+									) }
+								</MaybeMoveGhostsProvider>
 							</MaybeSuggestionOverlayProvider>
 						</BlockEditorProviderComponent>
 					</BlockContextProvider>

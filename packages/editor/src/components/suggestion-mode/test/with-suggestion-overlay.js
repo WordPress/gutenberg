@@ -35,6 +35,7 @@ import withSuggestionOverlay, {
 	structuralMarkerClass,
 	withSuggestionBlockClassName,
 } from '../with-suggestion-overlay';
+import { MoveGhostsProvider } from '../use-move-ghosts';
 import {
 	SuggestionOverlayProvider,
 	useSuggestionOverlay,
@@ -636,7 +637,7 @@ describe( 'withSuggestionBlockClassName', () => {
 		const wrapper = ( { children } ) => (
 			<RegistryProvider value={ registry }>
 				<SuggestionOverlayProvider>
-					{ children }
+					<MoveGhostsProvider>{ children }</MoveGhostsProvider>
 				</SuggestionOverlayProvider>
 			</RegistryProvider>
 		);
@@ -690,7 +691,7 @@ describe( 'withSuggestionBlockClassName', () => {
 		const wrapper = ( { children } ) => (
 			<RegistryProvider value={ registry }>
 				<SuggestionOverlayProvider>
-					{ children }
+					<MoveGhostsProvider>{ children }</MoveGhostsProvider>
 				</SuggestionOverlayProvider>
 			</RegistryProvider>
 		);
