@@ -27,7 +27,7 @@ export function useFlexItem(
 	const display = displayProp || contextDisplay;
 
 	const itemStyle = {
-		...( display && { '--wp-components-flex-item-display': display } ),
+		'--wp-components-flex-item-display': display || 'block',
 		...style,
 	};
 

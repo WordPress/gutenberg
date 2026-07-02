@@ -21,7 +21,7 @@ describe( 'props', () => {
 		expect( screen.getByTestId( 'base-flex' ) ).toMatchSnapshot();
 	} );
 
-	test( 'should render + wrap non Flex children', () => {
+	test( 'should render non Flex children', () => {
 		render(
 			<Flex data-testid="flex">
 				<FlexItem>Item</FlexItem>

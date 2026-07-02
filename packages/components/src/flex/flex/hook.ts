@@ -58,7 +58,7 @@ export function useFlex( props: WordPressComponentProps< FlexProps, 'div' > ) {
 		'--wp-components-flex-align':
 			align ?? ( isColumn ? 'normal' : 'center' ),
 		'--wp-components-flex-direction': direction,
-		...( wrap && { '--wp-components-flex-wrap': 'wrap' } ),
+		'--wp-components-flex-wrap': wrap ? 'wrap' : 'nowrap',
 		'--wp-components-flex-gap': space( gap ),
 		'--wp-components-flex-justify': justify,
 		...style,
