@@ -34,6 +34,20 @@ describe( 'Theme', () => {
 		);
 	} );
 
+	it( 'lets user styles override generated theme variables', () => {
+		render(
+			<Theme
+				accent="#123abc"
+				style={ { '--wp-components-color-accent': '#654321' } }
+				data-testid="theme"
+			/>
+		);
+
+		expect( screen.getByTestId( 'theme' ) ).toHaveStyle( {
+			'--wp-components-color-accent': '#654321',
+		} );
+	} );
+
 	describe( 'accent color', () => {
 		it( 'does not define the accent color (and its variations) as a CSS variable when the `accent` prop is undefined', () => {
 			render(
