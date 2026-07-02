@@ -62,6 +62,18 @@ describe( 'viewport utils', () => {
 			} );
 		} );
 
+		it( 'uses a valid custom breakpoint without merging defaults', () => {
+			const viewportSettings = {
+				mobile: ' 640px ',
+				tablet: 'calc(100% - 1rem)',
+				desktop: '1200px',
+			};
+
+			expect( getViewportBreakpoints( viewportSettings ) ).toEqual( {
+				mobile: '640px',
+			} );
+		} );
+
 		it( 'uses a single valid custom breakpoint as mobile-only', () => {
 			expect(
 				getViewportBreakpoints( {
@@ -85,6 +97,41 @@ describe( 'viewport utils', () => {
 	} );
 
 	describe( 'getResponsiveMediaQueries', () => {
+		it( 'returns custom media queries when viewport breakpoints are ordered', () => {
+			expect(
+				getResponsiveMediaQueries( {
+					mobile: '640px',
+					tablet: '960px',
+				} )
+			).toEqual( {
+				'@mobile': '@media (width <= 640px)',
+				'@tablet': '@media (640px < width <= 960px)',
+			} );
+		} );
+
+		it( 'returns default media queries when no custom breakpoints are valid', () => {
+			expect(
+				getResponsiveMediaQueries( {
+					mobile: '100%',
+					tablet: 'auto',
+				} )
+			).toEqual( {
+				'@mobile': '@media (width <= 480px)',
+				'@tablet': '@media (480px < width <= 782px)',
+			} );
+		} );
+
+		it( 'uses a valid custom media query without merging defaults', () => {
+			expect(
+				getResponsiveMediaQueries( {
+					mobile: ' 640px ',
+					tablet: 'calc(100% - 1rem)',
+				} )
+			).toEqual( {
+				'@mobile': '@media (width <= 640px)',
+			} );
+		} );
+
 		it( 'omits the tablet media query when the tablet breakpoint is not larger than mobile', () => {
 			expect(
 				getResponsiveMediaQueries( {

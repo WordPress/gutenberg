@@ -1063,6 +1063,24 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_get_viewport_media_queries_uses_valid_tablet_breakpoint_as_mobile_when_mobile_is_invalid() {
+		$this->assertSame(
+			array(
+				'mobile'  => '@media (width <= 64rem)',
+				'desktop' => '@media (width > 64rem)',
+			),
+			WP_Theme_JSON_Gutenberg::get_viewport_media_queries(
+				array(
+					'mobile' => '100%',
+					'tablet' => '64rem',
+				),
+				array(
+					'include_desktop' => true,
+				)
+			)
+		);
+	}
+
 	public function test_viewport_settings_use_defaults_when_no_custom_breakpoints_are_valid() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
