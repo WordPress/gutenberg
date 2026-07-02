@@ -5,9 +5,19 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
+ * WordPress dependencies
+ */
+import { resetQueue } from '@wordpress/a11y';
+
+/**
  * Internal dependencies
  */
 import { ToolsPanel, ToolsPanelContext, ToolsPanelItem } from '../';
+
+afterEach( () => {
+	jest.clearAllTimers();
+	resetQueue();
+} );
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 import * as styles from '../styles';
 import { useCx } from '../../utils/hooks/use-cx';

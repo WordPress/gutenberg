@@ -18,11 +18,17 @@ import type { ComponentProps } from 'react';
  */
 import { useState } from '@wordpress/element';
 import { logged } from '@wordpress/deprecated';
+import { resetQueue } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
 import _FormTokenField from '../';
+
+afterEach( () => {
+	jest.clearAllTimers();
+	resetQueue();
+} );
 
 const FormTokenField = ( props: ComponentProps< typeof _FormTokenField > ) => (
 	<_FormTokenField __next40pxDefaultSize { ...props } />
@@ -2316,10 +2322,9 @@ describe( 'FormTokenField', () => {
 			// Add 'cat' token, check that the aria-live region has been updated.
 			await user.type( input, 'cat[Enter]' );
 
-			expect( screen.getByText( defaultMessages.added ) ).toHaveAttribute(
-				'aria-live',
-				'assertive'
-			);
+			expect(
+				screen.getByText( defaultMessages.added )
+			).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
 		it( 'should announce to assistive technology the addition of a new token with a custom message', async () => {
@@ -2332,10 +2337,9 @@ describe( 'FormTokenField', () => {
 			// Add 'dog' token, check that the aria-live region has been updated.
 			await user.type( input, 'dog[Enter]' );
 
-			expect( screen.getByText( customMessages.added ) ).toHaveAttribute(
-				'aria-live',
-				'assertive'
-			);
+			expect(
+				screen.getByText( customMessages.added )
+			).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
 		it( 'should announce to assistive technology the removal of a token', async () => {

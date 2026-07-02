@@ -1,8 +1,8 @@
 /**
  * Internal dependencies
  */
-import clear from './clear';
 import filterMessage from './filter-message';
+import { enqueuePolite } from './queue';
 
 /**
  * Allows you to easily announce dynamic interface updates to screen readers using ARIA live regions.
@@ -26,31 +26,31 @@ export function speak(
 	message: string,
 	ariaLive?: 'polite' | 'assertive'
 ): void {
-	/*
-	 * Clear previous messages to allow repeated strings being read out and hide
-	 * the explanatory text from assistive technologies.
-	 */
-	clear();
-
 	message = filterMessage( message );
 
-	const introText = document.getElementById( 'a11y-speak-intro-text' );
-	const containerAssertive = document.getElementById(
-		'a11y-speak-assertive'
-	);
-	const containerPolite = document.getElementById( 'a11y-speak-polite' );
+	if ( ariaLive === 'assertive' ) {
+		/*
+		 * Assertive announcements are written synchronously so screen readers
+		 * interrupt immediately. The polite queue is deliberately left
+		 * untouched so queued polite messages are not lost.
+		 */
+		const assertive = document.getElementById( 'a11y-speak-assertive' );
+		const polite = document.getElementById( 'a11y-speak-polite' );
+		const introText = document.getElementById( 'a11y-speak-intro-text' );
+		const dest = assertive ?? polite;
 
-	if ( containerAssertive && ariaLive === 'assertive' ) {
-		containerAssertive.textContent = message;
-	} else if ( containerPolite ) {
-		containerPolite.textContent = message;
-	}
+		if ( dest ) {
+			dest.textContent = message;
+		}
 
-	/*
-	 * Make the explanatory text available to assistive technologies by removing
-	 * the 'hidden' HTML attribute.
-	 */
-	if ( introText ) {
-		introText.removeAttribute( 'hidden' );
+		if ( introText ) {
+			introText.removeAttribute( 'hidden' );
+		}
+	} else {
+		/*
+		 * Polite messages are serialised through a queue. The queue owns
+		 * the clear-fill cycle so rapid speak() calls do not drop messages.
+		 */
+		enqueuePolite( message );
 	}
 }
