@@ -28,6 +28,7 @@ import {
 	isEventTargetSelectedRichText,
 	readEventRange,
 } from './keyboard-target';
+import { isPartOfPendingInsertion } from './store-interceptor';
 
 /**
  * Turn typing (and simple paste) in Suggest mode into an inline addition
@@ -75,13 +76,18 @@ export default function SuggestionAdditionKeyboard() {
 		( select ) => select( coreStore ).getCurrentUser()?.id ?? null,
 		[]
 	);
-	const { getSelectionStart, getSelectionEnd, getBlockAttributes } =
-		useSelect( blockEditorStore );
+	const {
+		getSelectionStart,
+		getSelectionEnd,
+		getBlockAttributes,
+		getBlockParents,
+	} = useSelect( blockEditorStore );
 	const { updateBlockAttributes, selectionChange } =
 		useDispatch( blockEditorStore );
 	const { createSuggestion } = useSuggestionsProvider();
 	const { getBlockName } = useSelect( blockEditorStore );
-	const { requestInterceptorBypass } = useSuggestionOverlay();
+	const { requestInterceptorBypass, isDeferredInsertion } =
+		useSuggestionOverlay();
 
 	// The in-progress addition run. `id` is null while the suggestion note is
 	// being created; characters entered in that window queue in `pending` and
@@ -298,6 +304,25 @@ export default function SuggestionAdditionKeyboard() {
 			}
 			const { clientId, attributeKey } = caret;
 			/*
+			 * Typing inside a block that is itself a pending insertion — or a
+			 * deferred empty placeholder about to become one — is part of the
+			 * block-insert suggestion, not an inline suggestion of its own.
+			 * Fall through to the native edit: it writes through to the real
+			 * block (the overlay HOC passes it along and the interceptor
+			 * registers/adopts it), so the whole block stays ONE
+			 * "Insert block" note instead of gaining a separate "Add" note.
+			 */
+			if (
+				isDeferredInsertion( clientId ) ||
+				isPartOfPendingInsertion(
+					{ getBlockAttributes, getBlockParents },
+					clientId
+				)
+			) {
+				resetRun();
+				return false;
+			}
+			/*
 			 * Offsets come from the DOM truth at input time when available.
 			 * The store's selection offsets are synced asynchronously and lag
 			 * the DOM caret after a marker write re-rendered RichText — a fast
@@ -358,6 +383,8 @@ export default function SuggestionAdditionKeyboard() {
 			getSelectionStart,
 			getSelectionEnd,
 			getBlockAttributes,
+			getBlockParents,
+			isDeferredInsertion,
 			beginInsertion,
 			commit,
 			resetRun,

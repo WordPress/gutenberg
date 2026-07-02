@@ -31,6 +31,7 @@ import {
 	previousGraphemeBoundary,
 	nextGraphemeBoundary,
 } from './grapheme-boundaries';
+import { isPartOfPendingInsertion } from './store-interceptor';
 
 /**
  * Read a rich-text value's plain text and its per-character format stacks,
@@ -109,11 +110,13 @@ export default function SuggestionDeletionKeyboard() {
 		getSelectionEnd,
 		getBlockAttributes,
 		getBlockName,
+		getBlockParents,
 	} = useSelect( blockEditorStore );
 	const { updateBlockAttributes, selectionChange } =
 		useDispatch( blockEditorStore );
 	const { createSuggestion } = useSuggestionsProvider();
-	const { requestInterceptorBypass } = useSuggestionOverlay();
+	const { requestInterceptorBypass, isDeferredInsertion } =
+		useSuggestionOverlay();
 
 	// The in-progress collapsed-cursor deletion run. `id` is null while the note
 	// is being created; repeats in that window accumulate in `steps`. `start`/
@@ -341,10 +344,27 @@ export default function SuggestionDeletionKeyboard() {
 				resetRun();
 				return;
 			}
+			const { clientId, attributeKey } = anchor;
+			/*
+			 * Deleting inside a block that is itself a pending insertion — or
+			 * a deferred empty placeholder — shrinks the proposed insertion,
+			 * it is not a deletion suggestion of its own. Fall through to the
+			 * native delete so it writes through to the real block and the
+			 * whole block stays ONE "Insert block" note.
+			 */
+			if (
+				isDeferredInsertion( clientId ) ||
+				isPartOfPendingInsertion(
+					{ getBlockAttributes, getBlockParents },
+					clientId
+				)
+			) {
+				resetRun();
+				return;
+			}
 			const domRange = readEventRange( event, {
 				preferTargetRanges: false,
 			} );
-			const { clientId, attributeKey } = anchor;
 			const start = domRange ? domRange.start : anchor.start;
 			const end = domRange ? domRange.end : anchor.end;
 
@@ -415,6 +435,8 @@ export default function SuggestionDeletionKeyboard() {
 			getSelectionStart,
 			getSelectionEnd,
 			getBlockAttributes,
+			getBlockParents,
+			isDeferredInsertion,
 			deleteSelection,
 			deleteCharacter,
 			resetRun,
