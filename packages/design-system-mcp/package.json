@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/design-system-mcp",
-	"version": "0.6.0",
+	"version": "0.7.0",
 	"description": "MCP server for the WordPress Design System.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -46,7 +46,8 @@
 		"zod": "^4.3.6"
 	},
 	"devDependencies": {
-		"@types/jest": "^29.5.14"
+		"@types/jest": "^29.5.14",
+		"@types/node": "^20.19.39"
 	},
 	"publishConfig": {
 		"access": "public"

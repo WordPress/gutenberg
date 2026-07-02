@@ -28,6 +28,27 @@ export type WidgetName = `${ string }/${ string }`;
 export type WidgetIcon = ReactElement< ComponentProps< 'svg' > >;
 
 /**
+ * How relevant an attribute is. Hosts may promote `'high'` to a prominent
+ * surface; `'low'` (the default) is not. The widget declares importance,
+ * not a surface.
+ */
+type WidgetAttributeRelevance = 'high' | 'low';
+
+/** A DataViews `Field` plus the widget-layer `relevance` hint; what hosts read. */
+type WidgetAttribute< Item = unknown > = Field< Item > & {
+	relevance?: WidgetAttributeRelevance;
+};
+
+/**
+ * Authoring helper: a `WidgetAttribute` with `id` narrowed to the widget's
+ * attribute keys (`Item`).
+ */
+export type WidgetAttributeField< Item > = WidgetAttribute< Item > & {
+	// `& string` drops number/symbol keys; `Field.id` is a string.
+	id: keyof Item & string;
+};
+
+/**
  * Literal contents of a widget's `widget.json` metadata file.
  *
  * Captures the *authoring* shape only; module entry points and style
@@ -46,12 +67,13 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	name: WidgetName;
 
 	/**
-	 * Display title; hosts surface it in pickers and chrome.
+	 * Human-readable title that names the widget type. Translatable.
 	 */
 	title: string;
 
 	/**
-	 * Short description; hosts surface it in pickers and help panels.
+	 * Human-readable description of what the widget type does.
+	 * Translatable.
 	 */
 	description?: string;
 
@@ -81,7 +103,8 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	presentation?: 'framed' | 'content-bleed' | 'full-bleed';
 
 	/**
-	 * Search aliases hosts use to match the widget in their pickers.
+	 * Alternative terms used to match the widget type when searching,
+	 * e.g. `calendar` for an events widget. Translatable.
 	 */
 	keywords?: string[];
 
@@ -103,9 +126,10 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	/**
 	 * Declarative attribute schema, bound to the widget's attribute
 	 * object via `Item`. Hosts render forms straight from this list
-	 * via `DataForm`, with no per-widget form wiring.
+	 * via `DataForm`, with no per-widget form wiring. Entries may carry
+	 * a `relevance` hint.
 	 */
-	attributes?: Field< Item >[];
+	attributes?: WidgetAttribute< Item >[];
 
 	/**
 	 * Structured example data hosts use for previews, and the default
@@ -193,4 +217,24 @@ export interface WidgetModuleRecord {
 	 * Authoring presentation hint; overrides the metadata module's value.
 	 */
 	presentation?: WidgetTypeMetadata[ 'presentation' ] | null;
+
+	/**
+	 * Grouping category; overrides the metadata module's value.
+	 */
+	category?: WidgetTypeMetadata[ 'category' ] | null;
+
+	/**
+	 * Translated title; overrides the metadata module's value.
+	 */
+	title?: WidgetTypeMetadata[ 'title' ] | null;
+
+	/**
+	 * Translated description; overrides the metadata module's value.
+	 */
+	description?: WidgetTypeMetadata[ 'description' ] | null;
+
+	/**
+	 * Translated search aliases; override the metadata module's value.
+	 */
+	keywords?: WidgetTypeMetadata[ 'keywords' ] | null;
 }

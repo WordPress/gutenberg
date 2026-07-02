@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import TabToolbarControls from '../tab-panel/tab-toolbar-controls';
+import TabToolbarControls from '../tabs/tab-toolbar-controls';
 
 /**
  * Initial template applied only when the block is first inserted (i.e. when

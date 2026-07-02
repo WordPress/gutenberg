@@ -73,7 +73,6 @@ const UnconnectedBorderControl = (
 			/>
 			<HStack spacing={ 4 } className={ innerWrapperClassName }>
 				<UnitControl
-					__next40pxDefaultSize
 					prefix={
 						<Spacer marginRight={ 1 } marginBottom={ 0 }>
 							<BorderControlDropdown
@@ -117,7 +116,6 @@ const UnconnectedBorderControl = (
 						step={ [ 'px', '%' ].includes( widthUnit ) ? 1 : 0.1 }
 						value={ widthValue || undefined }
 						withInputField={ false }
-						__next40pxDefaultSize
 					/>
 				) }
 			</HStack>

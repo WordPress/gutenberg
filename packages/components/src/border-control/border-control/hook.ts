@@ -130,10 +130,11 @@ export function useBorderControl(
 		wrapperWidth = '116px';
 	}
 	const innerWrapperClassName = useMemo( () => {
-		const widthStyle = !! wrapperWidth && styles.wrapperWidth;
-		const heightStyle = styles.wrapperHeight;
-
-		return cx( styles.innerWrapper(), widthStyle, heightStyle );
+		return cx(
+			styles.getInnerWrapperStyles( {
+				hasWidth: !! wrapperWidth,
+			} )
+		);
 	}, [ wrapperWidth, cx ] );
 
 	const sliderClassName = useMemo( () => {

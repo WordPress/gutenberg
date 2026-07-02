@@ -218,3 +218,12 @@
 		}
 	}
 }
+
+// Inline-note highlight applied to the `core/note` marker (`mark.wp-note`).
+// Each marker is tinted by `<NoteHighlightStyles>` using the note author's
+// color from `AVATAR_BORDER_COLORS`; this base rule only provides shared
+// layout/transition properties.
+mark.wp-note {
+	border-radius: 1px;
+	transition: background-color 0.1s ease-in-out;
+}

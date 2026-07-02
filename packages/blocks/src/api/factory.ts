@@ -7,6 +7,7 @@ import { v4 as uuid } from 'uuid';
  * WordPress dependencies
  */
 import { createHooks, applyFilters } from '@wordpress/hooks';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -38,16 +39,20 @@ const getBlockTypeWithTransformMetadata = (
 /**
  * Returns a block object given its type and attributes.
  *
- * @param name        Block name.
- * @param attributes  Block attributes.
- * @param innerBlocks Nested blocks.
+ * @param name         Block name.
+ * @param attributes   Block attributes.
+ * @param innerBlocks  Nested blocks.
+ * @param innerContent Static HTML fragments interleaved with inner blocks,
+ *                     where `null` entries mark inner block positions. Only
+ *                     applies to the Custom HTML block.
  *
  * @return Block object.
  */
 export function createBlock(
 	name: string,
 	attributes: Record< string, unknown > = {},
-	innerBlocks: Block[] = []
+	innerBlocks: Block[] = [],
+	innerContent?: Array< string | null >
 ): Block {
 	if ( ! isBlockRegistered( name ) ) {
 		return createBlock( 'core/missing', {
@@ -66,13 +71,27 @@ export function createBlock(
 
 	// Blocks are stored with a unique ID, the assigned type name, the block
 	// attributes, and their inner blocks.
-	return {
+	const block: Block = {
 		clientId,
 		name,
 		isValid: true,
 		attributes: sanitizedAttributes,
 		innerBlocks,
 	};
+
+	if ( innerContent ) {
+		// Static inner content is currently a Custom HTML block mechanism
+		// only; it isn't exposed as a block support.
+		if ( name === 'core/html' ) {
+			block.innerContent = innerContent;
+		} else {
+			warning(
+				`The innerContent argument passed to createBlock for the "${ name }" block was ignored. Only the Custom HTML block stores static inner content.`
+			);
+		}
+	}
+
+	return block;
 }
 
 /**
@@ -684,6 +703,7 @@ type BlockExample = {
 		attributes?: Record< string, unknown >;
 		innerBlocks?: BlockExample[ 'innerBlocks' ];
 	} >;
+	innerContent?: Array< string | null >;
 };
 
 export const getBlockFromExample = (
@@ -695,5 +715,6 @@ export const getBlockFromExample = (
 		example.attributes,
 		( example.innerBlocks ?? [] ).map( ( innerBlock ) =>
 			getBlockFromExample( innerBlock.name, innerBlock )
-		)
+		),
+		example.innerContent
 	);
