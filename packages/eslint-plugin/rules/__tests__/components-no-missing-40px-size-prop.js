@@ -92,10 +92,11 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 				<Modal />
 			`,
 		},
-		// All targeted components with __next40pxDefaultSize
+		// Retired components without the prop, and targeted components with the prop
 		{
 			code: `
 				import {
+					CustomSelectControl,
 					FormTokenField,
 					InputControl,
 					NumberControl,
@@ -105,13 +106,14 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 					UnitControl,
 				} from '@wordpress/components';
 				<>
-					<FormTokenField __next40pxDefaultSize />
+					<CustomSelectControl />
+					<FormTokenField />
 					<InputControl __next40pxDefaultSize />
 					<NumberControl __next40pxDefaultSize />
 					<RangeControl />
 					<SelectControl __next40pxDefaultSize />
 					<ToggleGroupControl />
-					<UnitControl __next40pxDefaultSize />
+					<UnitControl />
 				</>
 			`,
 		},

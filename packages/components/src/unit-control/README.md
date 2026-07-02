@@ -15,7 +15,7 @@ import { __experimentalUnitControl as UnitControl } from '@wordpress/components'
 const Example = () => {
 	const [ value, setValue ] = useState( '10px' );
 
-	return <UnitControl __next40pxDefaultSize onChange={ setValue } value={ value } />;
+	return <UnitControl onChange={ setValue } value={ value } />;
 };
 ```
 
@@ -54,19 +54,16 @@ Determines if the unit `<select>` is tabbable.
 If this property is added, a label will be generated using label property as the content.
 
 -   Required: No
-
 ### `labelPosition`: `string`
 
 The position of the label (`top`, `side`, `bottom`, or `edge`).
 
 -   Required: No
-
 ### `onBlur`: `FocusEventHandler< HTMLInputElement | HTMLSelectElement >`
 
 Callback invoked when either the quantity or unit inputs fire the `blur` event.
 
 -   Required: No
-
 ### `onFocus`: `FocusEventHandler< HTMLInputElement | HTMLSelectElement >`
 
 Callback invoked when either the quantity or unit inputs fire the `focus` event.
@@ -128,7 +125,7 @@ const Example = () => {
 	];
 
 	return (
-		<UnitControl __next40pxDefaultSize onChange={ setValue } value={ value } units={ units } />
+		<UnitControl onChange={ setValue } value={ value } units={ units } />
 	);
 };
 ```
@@ -143,14 +140,7 @@ For example, a `value` of `50%` will set the current unit to `%`.
 Example:
 
 ```jsx
-<UnitControl __next40pxDefaultSize value="50%" />
+<UnitControl value="50%" />
 ```
 
 -   Required: No
-
-### `__next40pxDefaultSize`: `boolean`
-
-Start opting into the larger default height that will become the default size in a future version.
-
--   Required: No
--   Default: `false`

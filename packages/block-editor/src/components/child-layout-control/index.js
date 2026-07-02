@@ -224,7 +224,6 @@ function FlexControls( {
 			</ToggleGroupControl>
 			{ hasFlexSizeValue && (
 				<UnitControl
-					size="__unstable-large"
 					units={ units }
 					onChange={ ( value ) => {
 						onChange( {

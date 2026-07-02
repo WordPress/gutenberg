@@ -39,9 +39,9 @@ const initialView: View = {
 	mediaField: 'icon',
 	showMedia: true,
 	titleField: 'label',
-	layout: {
-		density: 'compact',
-	},
+	// Default (non-compact) density: its 48px media tile gives block icons
+	// padding around the canonical 24px render, without shrinking the icon
+	// (which would crop icons that lack a viewBox, e.g. core/icon).
 };
 
 interface DataRow {
@@ -54,9 +54,13 @@ const fields = [
 		id: 'icon',
 		label: __( 'Icon' ),
 		type: 'media' as const,
+		// No `size` prop: block icons render at their native 24px, matching the
+		// editor's `.block-editor-block-icon`. That keeps viewBox-less icons
+		// (e.g. core/icon) centered and uncropped. Painted and clamped in
+		// block-guidelines.scss.
 		render: ( { item } ) => (
 			<div className="block-guidelines__icon">
-				<WCIcon icon={ item.icon ?? blockDefault } size={ 16 } />
+				<WCIcon icon={ item.icon ?? blockDefault } />
 			</div>
 		),
 	},
