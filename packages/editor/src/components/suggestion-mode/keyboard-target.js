@@ -156,6 +156,18 @@ export function readEventRange( event, { preferTargetRanges = true } = {} ) {
 	) {
 		return null;
 	}
+	return mapRangeToOffsets( editable, range );
+}
+
+/**
+ * Map a DOM range within a rich-text editable to normalized character offsets,
+ * using the same call RichText and the block-editor selection observer use.
+ *
+ * @param {Element}           editable Rich-text editable root.
+ * @param {Range|StaticRange} range    Range within the editable.
+ * @return {?{start: number, end: number}} Normalized offsets, or null.
+ */
+function mapRangeToOffsets( editable, range ) {
 	try {
 		const { start, end } = create( {
 			element: editable,
@@ -170,6 +182,72 @@ export function readEventRange( event, { preferTargetRanges = true } = {} ) {
 	} catch {
 		return null;
 	}
+}
+
+/**
+ * Read the live DOM selection when it sits inside the given block's rich-text
+ * editable, mapped to character offsets within that editable.
+ *
+ * Used by asynchronous marker writers (the format keyboard) right before a
+ * write: writing a marker re-renders RichText, and RichText re-applies the
+ * STORE selection to the DOM. The store selection can be stale by then (the
+ * user moved the caret during the note round trip, and the store's
+ * `selectionchange` sync is asynchronous), so re-applying it would clobber the
+ * live caret — e.g. undoing an `End` press and re-selecting the formatted run,
+ * which a fast typist's next keystroke would then type over. Dispatching a
+ * `selectionChange` with these DOM-derived offsets alongside the write keeps
+ * the restore anchored to where the user actually is.
+ *
+ * Returns null when the live selection is absent or not inside this block's
+ * rich text (e.g. focus moved to the sidebar) — callers then leave the store
+ * selection alone.
+ *
+ * @param {string}  clientId       Block client id the write targets.
+ * @param {?string} [attributeKey] Attribute key the write targets, when known.
+ * @return {?{start: number, end: number}} Normalized offsets, or null.
+ */
+export function readLiveInlineSelection( clientId, attributeKey ) {
+	if ( ! clientId ) {
+		return null;
+	}
+	for ( const doc of getCandidateDocuments() ) {
+		const selection = doc.defaultView?.getSelection?.();
+		if ( ! selection || selection.rangeCount === 0 ) {
+			continue;
+		}
+		const range = selection.getRangeAt( 0 );
+		const node = range.startContainer;
+		const element =
+			node.nodeType === node.ELEMENT_NODE ? node : node.parentElement;
+		const editable = element?.closest?.( RICH_TEXT_EDITABLE_SELECTOR );
+		if ( ! editable ) {
+			continue;
+		}
+		// The selection must live in THIS block's rich text (mirroring
+		// `isEventTargetSelectedRichText`): a selection elsewhere must not
+		// move this block's stored selection.
+		const blockElement = editable.closest( '[data-block]' );
+		if (
+			! blockElement ||
+			blockElement.getAttribute( 'data-block' ) !== clientId
+		) {
+			continue;
+		}
+		const editableKey = editable.getAttribute(
+			'data-wp-block-attribute-key'
+		);
+		if ( attributeKey && editableKey && editableKey !== attributeKey ) {
+			continue;
+		}
+		if (
+			! editable.contains( range.startContainer ) ||
+			! editable.contains( range.endContainer )
+		) {
+			continue;
+		}
+		return mapRangeToOffsets( editable, range );
+	}
+	return null;
 }
 
 export function getCandidateDocuments() {

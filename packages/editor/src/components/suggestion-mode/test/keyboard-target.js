@@ -5,6 +5,7 @@ import {
 	getCandidateDocuments,
 	isEventTargetSelectedRichText,
 	readEventRange,
+	readLiveInlineSelection,
 } from '../keyboard-target';
 
 /*
@@ -303,6 +304,106 @@ describe( 'readEventRange', () => {
 			],
 		};
 		expect( readEventRange( event ) ).toBeNull();
+	} );
+} );
+
+describe( 'readLiveInlineSelection', () => {
+	afterEach( () => {
+		document.body.innerHTML = '';
+		jest.restoreAllMocks();
+	} );
+
+	/**
+	 * Build a canvas-like block with a rich-text editable containing
+	 * `Hello <mark>world</mark>` and mock the document's live selection.
+	 *
+	 * @param {Object} options
+	 * @param {string} options.clientId Block client id.
+	 * @return {{ editable: HTMLElement, helloText: Text, worldText: Text }}
+	 *         The editable and its two text nodes.
+	 */
+	function createBlockWithMark( { clientId } ) {
+		const block = document.createElement( 'div' );
+		block.setAttribute( 'data-block', clientId );
+		const editable = document.createElement( 'p' );
+		editable.className = 'block-editor-rich-text__editable';
+		editable.setAttribute( 'data-wp-block-attribute-key', 'content' );
+		const helloText = document.createTextNode( 'Hello ' );
+		const mark = document.createElement( 'mark' );
+		const worldText = document.createTextNode( 'world' );
+		mark.appendChild( worldText );
+		editable.appendChild( helloText );
+		editable.appendChild( mark );
+		block.appendChild( editable );
+		document.body.appendChild( block );
+		return { editable, helloText, worldText };
+	}
+
+	function mockSelection( range ) {
+		jest.spyOn( window, 'getSelection' ).mockReturnValue(
+			range
+				? { rangeCount: 1, getRangeAt: () => range }
+				: { rangeCount: 0, getRangeAt: () => null }
+		);
+	}
+
+	it( 'maps the live selection inside the block to value offsets', () => {
+		const { worldText } = createBlockWithMark( { clientId: 'block-1' } );
+		mockSelection( {
+			startContainer: worldText,
+			startOffset: 5,
+			endContainer: worldText,
+			endOffset: 5,
+		} );
+		expect( readLiveInlineSelection( 'block-1', 'content' ) ).toEqual( {
+			start: 11,
+			end: 11,
+		} );
+	} );
+
+	it( 'ignores a selection living in a different block', () => {
+		createBlockWithMark( { clientId: 'block-1' } );
+		const { helloText } = createBlockWithMark( { clientId: 'block-2' } );
+		mockSelection( {
+			startContainer: helloText,
+			startOffset: 1,
+			endContainer: helloText,
+			endOffset: 1,
+		} );
+		expect( readLiveInlineSelection( 'block-1', 'content' ) ).toBeNull();
+	} );
+
+	it( 'ignores a different attribute of the same block', () => {
+		const { helloText } = createBlockWithMark( { clientId: 'block-1' } );
+		mockSelection( {
+			startContainer: helloText,
+			startOffset: 1,
+			endContainer: helloText,
+			endOffset: 1,
+		} );
+		expect( readLiveInlineSelection( 'block-1', 'citation' ) ).toBeNull();
+	} );
+
+	it( 'returns null when there is no live selection', () => {
+		createBlockWithMark( { clientId: 'block-1' } );
+		mockSelection( null );
+		expect( readLiveInlineSelection( 'block-1', 'content' ) ).toBeNull();
+		expect( readLiveInlineSelection( undefined, 'content' ) ).toBeNull();
+	} );
+
+	it( 'returns null when the selection sits outside any rich text', () => {
+		createBlockWithMark( { clientId: 'block-1' } );
+		const outside = document.createElement( 'div' );
+		const outsideText = document.createTextNode( 'elsewhere' );
+		outside.appendChild( outsideText );
+		document.body.appendChild( outside );
+		mockSelection( {
+			startContainer: outsideText,
+			startOffset: 2,
+			endContainer: outsideText,
+			endOffset: 2,
+		} );
+		expect( readLiveInlineSelection( 'block-1', 'content' ) ).toBeNull();
 	} );
 } );
 

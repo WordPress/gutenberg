@@ -15,6 +15,7 @@ import { useSuggestionOverlay } from './overlay-context';
 import { INLINE_OP_TYPE, useSuggestionsProvider } from './provider';
 import { SUGGESTION_TYPE_FORMAT, applyFormatPlan } from '../inline-suggestions';
 import { contentKey } from './suggestion-content-reconciler';
+import { readLiveInlineSelection } from './keyboard-target';
 import { removeNoteIdFromMetadata } from '../collab-sidebar/utils';
 
 /**
@@ -51,7 +52,8 @@ export default function SuggestionFormatKeyboard() {
 		[]
 	);
 	const { createSuggestion, deleteSuggestion } = useSuggestionsProvider();
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const { updateBlockAttributes, selectionChange } =
+		useDispatch( blockEditorStore );
 	const { getBlockAttributes } = useSelect( blockEditorStore );
 	const { createNotice } = useDispatch( noticesStore );
 	const {
@@ -152,8 +154,32 @@ export default function SuggestionFormatKeyboard() {
 					id,
 					authorId,
 				} );
+				/*
+				 * Writing the marker re-renders RichText, which re-applies the
+				 * STORE selection to the DOM. The note POST above is an async
+				 * gap during which the user may have moved the caret (End, a
+				 * click), and the store's selection sync lags the DOM — so the
+				 * restore would clobber the live caret and re-select the run,
+				 * making a fast typist's next keystroke a type-over. Read the
+				 * live DOM selection and move the store selection with the
+				 * write so the restore lands where the user actually is. A
+				 * format plan never changes the text, so the DOM offsets map
+				 * 1:1 onto the marked value.
+				 */
+				const liveSelection = readLiveInlineSelection(
+					clientId,
+					'content'
+				);
 				requestInterceptorBypass( clientId );
 				updateBlockAttributes( clientId, { content: marked } );
+				if ( liveSelection ) {
+					selectionChange(
+						clientId,
+						'content',
+						liveSelection.start,
+						liveSelection.end
+					);
+				}
 			} catch {
 				// `createSuggestion` surfaces its own error notice; trash a
 				// note created before the failure so it isn't orphaned.
@@ -166,6 +192,7 @@ export default function SuggestionFormatKeyboard() {
 			createSuggestion,
 			getBlockAttributes,
 			updateBlockAttributes,
+			selectionChange,
 			requestInterceptorBypass,
 			cleanupAbandonedNote,
 			notifyDropped,
