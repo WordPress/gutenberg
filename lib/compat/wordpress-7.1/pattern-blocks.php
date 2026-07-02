@@ -65,3 +65,66 @@ function gutenberg_enqueue_auto_register_pattern_blocks() {
 	}
 }
 add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_auto_register_pattern_blocks' );
+
+/**
+ * Injects editor slot placeholders into an SSR-islands render callback.
+ *
+ * The editor shell needs a `<wp-inner-block-slot>` marker wherever the content
+ * goes, and only the block's own callback knows where that is. Instead of
+ * making every author detect the editor context and emit the marker by hand,
+ * this wraps the callback at registration: when the block renders with no
+ * saved content in a REST request (the editor's SSR preview), the callback
+ * receives one slot per top-level pattern block as `$content` and places it
+ * like any other content.
+ *
+ * @param array $args Arguments passed to `register_block_type()`.
+ * @return array Filtered arguments.
+ */
+function gutenberg_wrap_ssr_islands_render_callback( $args ) {
+	if (
+		empty( $args['supports']['autoRegister'] ) ||
+		empty( $args['pattern'] ) ||
+		! is_string( $args['pattern'] ) ||
+		empty( $args['render_callback'] )
+	) {
+		return $args;
+	}
+
+	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-pattern-blocks' ) ) {
+		return $args;
+	}
+
+	// One slot per top-level pattern block; the editable islands portal into
+	// them by index. `parse_blocks()` also returns whitespace nodes with a null
+	// block name; the filter drops them.
+	$top_level_blocks = array_filter(
+		parse_blocks( $args['pattern'] ),
+		static function ( $block ) {
+			return ! empty( $block['blockName'] );
+		}
+	);
+	$slot_count       = max( 1, count( $top_level_blocks ) );
+
+	$original_render_callback = $args['render_callback'];
+
+	$args['render_callback'] = static function ( $attributes, $content, $block ) use ( $original_render_callback, $slot_count ) {
+		// Empty content in a REST request is the editor's SSR preview, which
+		// renders the block bare. Pass the slots as `$content` so the editor
+		// has somewhere to portal the editable islands.
+		if ( '' === trim( (string) $content ) && defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+			$slots = '';
+			for ( $index = 0; $index < $slot_count; $index++ ) {
+				$slots .= sprintf(
+					'<wp-inner-block-slot data-slot-index="%d" style="display:contents"></wp-inner-block-slot>',
+					$index
+				);
+			}
+			$content = $slots;
+		}
+
+		return call_user_func( $original_render_callback, $attributes, $content, $block );
+	};
+
+	return $args;
+}
+add_filter( 'register_block_type_args', 'gutenberg_wrap_ssr_islands_render_callback' );

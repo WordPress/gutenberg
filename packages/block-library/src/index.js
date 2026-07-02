@@ -388,15 +388,15 @@ function createPatternBlockComponents(
 }
 
 /**
- * Builds `edit`/`save` for a PHP-only `pattern` block in SSR-islands mode
- * (`patternEditorPreview: 'ssr'`).
+ * Builds `edit`/`save` for a PHP-only `pattern` block with a `render_callback`
+ * (SSR-islands mode).
  *
  * The editor renders the PHP `render_callback` shell server-side and portals the
  * editable pattern inner blocks (the islands) into its slots, so the editor
  * matches the frontend (WYSIWYG) while the islands stay editable in the canvas.
- * In the editor SSR context the block renders with no inner content, so the
- * `render_callback` receives `$content === ''` and emits its wrapper with
- * `<wp-inner-block-slot>` placeholders instead of the saved content.
+ * In the editor SSR context the block renders with no inner content, and the
+ * PHP side passes `<wp-inner-block-slot>` placeholders as `$content`, so the
+ * shell arrives with slots where the saved content would go.
  *
  * @param {string} blockName Block name, used to fetch the server-rendered shell.
  * @param {string} markup    Pattern markup seeded as the editable inner blocks.
