@@ -82,10 +82,9 @@ export default function InnerContent( { clientId, html: htmlProp } ) {
 	const containerRef = useRef();
 	const [ slots, setSlots ] = useState( [] );
 
-	// When the markup changes (e.g. a re-rendered server shell), re-injecting it
-	// remounts the portalled inner blocks and drops DOM focus, even though the
-	// block selection survives in the store. Remember whether the caret was
-	// inside an island so it can be restored after the re-portal.
+	// Moving a slot node into re-injected markup drops DOM focus, even though
+	// the block selection survives in the store. Remember whether the caret
+	// was inside an island so it can be restored afterwards.
 	const restoreFocusRef = useRef( false );
 
 	useLayoutEffect( () => {
@@ -95,18 +94,34 @@ export default function InnerContent( { clientId, html: htmlProp } ) {
 			container.ownerDocument.activeElement
 		);
 
-		// Sanitize before injecting into the canvas: `safeHTML` removes
+		// Parse the new markup off-DOM. Sanitize it first: `safeHTML` removes
 		// `<script>` elements and inline event handlers, matching how block
 		// save content is rendered elsewhere in the editor.
-		container.innerHTML = safeHTML( html );
+		const template = container.ownerDocument.createElement( 'template' );
+		template.innerHTML = safeHTML( html );
 
-		setSlots(
-			Array.from( container.querySelectorAll( SLOT_TAG_NAME ) ).sort(
-				( a, b ) =>
-					Number( a.dataset.slotIndex ) -
-					Number( b.dataset.slotIndex )
-			)
+		const nextSlots = Array.from(
+			template.content.querySelectorAll( SLOT_TAG_NAME )
+		).sort(
+			( a, b ) =>
+				Number( a.dataset.slotIndex ) - Number( b.dataset.slotIndex )
 		);
+
+		// Carry the current slot nodes over into the new markup: the portalled
+		// blocks move with them instead of remounting, so a re-rendered shell
+		// doesn't flash the islands or reset their DOM state.
+		container.querySelectorAll( SLOT_TAG_NAME ).forEach( ( slot ) => {
+			const index = nextSlots.findIndex(
+				( next ) => next.dataset.slotIndex === slot.dataset.slotIndex
+			);
+			if ( index !== -1 ) {
+				nextSlots[ index ].replaceWith( slot );
+				nextSlots[ index ] = slot;
+			}
+		} );
+
+		container.replaceChildren( template.content );
+		setSlots( nextSlots );
 	}, [ html ] );
 
 	// After the inner blocks re-portal into the freshly injected slots, refocus

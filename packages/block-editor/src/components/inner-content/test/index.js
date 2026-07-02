@@ -77,6 +77,33 @@ describe( 'InnerContent', () => {
 		expect( root.querySelector( 'button' ) ).toHaveTextContent( 'Click' );
 	} );
 
+	it( 'keeps the slot nodes when the shell re-renders', () => {
+		const block = createBlock( BLOCK_NAME, {}, [], [] );
+		const shellA =
+			'<div class="shell-a"><wp-inner-block-slot data-slot-index="0"></wp-inner-block-slot></div>';
+		const shellB =
+			'<div class="shell-b"><wp-inner-block-slot data-slot-index="0"></wp-inner-block-slot></div>';
+		const { container, rerender } = render(
+			<BlockEditorProvider value={ [ block ] }>
+				<InnerContent clientId={ block.clientId } html={ shellA } />
+			</BlockEditorProvider>
+		);
+		const root = container.querySelector( '.block-editor-inner-content' );
+		const slot = root.querySelector( 'wp-inner-block-slot' );
+
+		rerender(
+			<BlockEditorProvider value={ [ block ] }>
+				<InnerContent clientId={ block.clientId } html={ shellB } />
+			</BlockEditorProvider>
+		);
+
+		// The new shell is injected, but the slot node survives, so the
+		// portalled blocks move with it instead of remounting.
+		expect( root.querySelector( '.shell-b' ) ).not.toBeNull();
+		expect( root.querySelector( '.shell-a' ) ).toBeNull();
+		expect( root.querySelector( 'wp-inner-block-slot' ) ).toBe( slot );
+	} );
+
 	it( 'uses the `html` prop verbatim instead of building from innerContent', () => {
 		const block = createBlock(
 			BLOCK_NAME,
