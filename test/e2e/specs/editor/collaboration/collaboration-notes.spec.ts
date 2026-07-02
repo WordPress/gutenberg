@@ -180,12 +180,14 @@ test.describe( 'Collaboration - Notes Sync', () => {
 				.getByRole( 'treeitem', { name: 'Note: Main note' } )
 		).toBeVisible();
 
-		// The reply form deliberately does not focus on mount so that
-		// selecting a thread keeps focus on the thread for keyboard
-		// navigation. Confirm the field does not steal focus, then click into
-		// the contenteditable to place the caret before typing the reply.
-		// (The skip-link focus path is covered deterministically in the
-		// single-user block-notes spec.)
+		/*
+		 * The reply form deliberately does not focus on mount so that
+		 * selecting a thread keeps focus on the thread for keyboard
+		 * navigation. Confirm the field does not steal focus, then click into
+		 * the contenteditable to place the caret before typing the reply.
+		 * (The skip-link focus path is covered deterministically in the
+		 * single-user block-notes spec.)
+		 */
 		const replyTextbox = page.getByRole( 'textbox', {
 			name: 'Reply to',
 		} );

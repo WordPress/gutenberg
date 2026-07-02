@@ -120,10 +120,12 @@ test.describe( 'Block Notes', () => {
 			// Select all text in the note form.
 			await pageUtils.pressKeys( 'primary+a' );
 
-			// Cmd+K should open the inline link UI rather than the
-			// WordPress command palette. The command palette has the
-			// "Command palette" accessible name; the inline link UI
-			// surfaces the LinkControl search combobox.
+			/*
+			 * Cmd+K should open the inline link UI rather than the
+			 * WordPress command palette. The command palette has the
+			 * "Command palette" accessible name; the inline link UI
+			 * surfaces the LinkControl search combobox.
+			 */
 			await pageUtils.pressKeys( 'primary+k' );
 			await expect(
 				page.getByRole( 'combobox', {
@@ -136,8 +138,10 @@ test.describe( 'Block Notes', () => {
 				'Command palette should not have opened'
 			).toBeHidden();
 
-			// Pressing Escape closes the link popover and leaves the note
-			// form intact — focus does not get yanked out of the editor.
+			/*
+			 * Pressing Escape closes the link popover and leaves the note
+			 * form intact — focus does not get yanked out of the editor.
+			 */
 			await page.keyboard.press( 'Escape' );
 			await expect(
 				page.getByRole( 'combobox', { name: 'Search or type URL' } )
@@ -159,8 +163,10 @@ test.describe( 'Block Notes', () => {
 				exact: true,
 			} );
 			await textbox.click();
-			// Typing `code` (backtick-wrapped) should auto-apply
-			// `core/code`'s inline format via its `__unstableInputRule`.
+			/*
+			 * Typing `code` (backtick-wrapped) should auto-apply
+			 * `core/code`'s inline format via its `__unstableInputRule`.
+			 */
 			await page.keyboard.type( '`code` after' );
 			await expect( textbox.locator( 'code' ) ).toHaveText( 'code' );
 		} );

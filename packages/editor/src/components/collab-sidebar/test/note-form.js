@@ -45,10 +45,12 @@ jest.mock( '@wordpress/ui', () => {
 	};
 } );
 
-// The form renders `RichTextControl` from `@wordpress/rich-text-control`,
-// whose import graph reaches the full rich-text/components machinery that
-// isn't relevant to the form's logic. Substitute a minimal contenteditable
-// stand-in so the test stays focused on the form's behavior.
+/*
+ * The form renders `RichTextControl` from `@wordpress/rich-text-control`,
+ * whose import graph reaches the full rich-text/components machinery that
+ * isn't relevant to the form's logic. Substitute a minimal contenteditable
+ * stand-in so the test stays focused on the form's behavior.
+ */
 const MockRichTextControl = ( {
 	value,
 	onChange,
@@ -152,8 +154,10 @@ describe( 'NoteForm', () => {
 	it( 'submits the form on ⌘+Enter when the content is non-empty', () => {
 		const { onSubmit } = setup();
 		const input = setInputValue( 'Hello' );
-		// `isKeyboardEvent.primary` uses Ctrl on non-Apple platforms; jsdom's
-		// navigator.platform is empty, so Ctrl is the primary modifier here.
+		/*
+		 * `isKeyboardEvent.primary` uses Ctrl on non-Apple platforms; jsdom's
+		 * navigator.platform is empty, so Ctrl is the primary modifier here.
+		 */
 		fireEvent.keyDown( input, { key: 'Enter', ctrlKey: true } );
 		expect( onSubmit ).toHaveBeenCalledWith( 'Hello' );
 	} );
@@ -173,8 +177,10 @@ describe( 'NoteForm', () => {
 	it( 'does not submit on ⌘+Enter when the content is empty', () => {
 		const { onSubmit } = setup();
 		const input = screen.getByTestId( 'note-rich-text' );
-		// `isKeyboardEvent.primary` uses Ctrl on non-Apple platforms; jsdom's
-		// navigator.platform is empty, so Ctrl is the primary modifier here.
+		/*
+		 * `isKeyboardEvent.primary` uses Ctrl on non-Apple platforms; jsdom's
+		 * navigator.platform is empty, so Ctrl is the primary modifier here.
+		 */
 		fireEvent.keyDown( input, { key: 'Enter', ctrlKey: true } );
 		expect( onSubmit ).not.toHaveBeenCalled();
 	} );
