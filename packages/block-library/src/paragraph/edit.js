@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { __, _x, isRTL, sprintf } from '@wordpress/i18n';
+import { __, _x, isRTL } from '@wordpress/i18n';
 import {
 	ToolbarButton,
 	ToggleControl,
@@ -19,14 +19,19 @@ import {
 	useBlockProps,
 	useSettings,
 	useBlockEditingMode,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { getBlockSupport } from '@wordpress/blocks';
 import { formatLTR } from '@wordpress/icons';
+import { useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
 import { useOnEnter } from './use-enter';
 import useDeprecatedAlign from './deprecated-attributes';
+import { unlock } from '../lock-unlock';
+
+const { BlockAriaLabelOverrideContext } = unlock( blockEditorPrivateApis );
 
 function ParagraphRTLControl( { direction, setDirection } ) {
 	return (
@@ -119,18 +124,7 @@ function ParagraphBlock( {
 		style: { direction },
 	} );
 	const blockEditingMode = useBlockEditingMode();
-	const { 'aria-label': injectedAriaLabel, ...restBlockProps } = blockProps;
-	// translators: %s: block type title e.g. "Paragraph"
-	const blockLabel = sprintf( __( 'Block: %s' ), blockProps[ 'data-title' ] );
-
-	let ariaLabel = __( 'Block: Paragraph' );
-	if ( injectedAriaLabel !== blockLabel ) {
-		ariaLabel = injectedAriaLabel;
-	} else if ( RichText.isEmpty( content ) ) {
-		ariaLabel = __(
-			'Empty block; start writing or type forward slash to choose a block'
-		);
-	}
+	const ariaLabelOverride = useContext( BlockAriaLabelOverrideContext );
 
 	return (
 		<>
@@ -155,7 +149,7 @@ function ParagraphBlock( {
 			<RichText
 				identifier="content"
 				tagName="p"
-				{ ...restBlockProps }
+				{ ...blockProps }
 				value={ content }
 				onChange={ ( newContent ) =>
 					setAttributes( { content: newContent } )
@@ -163,7 +157,14 @@ function ParagraphBlock( {
 				onMerge={ mergeBlocks }
 				onReplace={ onReplace }
 				onRemove={ onRemove }
-				aria-label={ ariaLabel }
+				aria-label={
+					ariaLabelOverride ??
+					( RichText.isEmpty( content )
+						? __(
+								'Empty block; start writing or type forward slash to choose a block'
+						  )
+						: __( 'Block: Paragraph' ) )
+				}
 				data-empty={ RichText.isEmpty( content ) }
 				placeholder={ placeholder || __( 'Type / to choose a block' ) }
 				data-custom-placeholder={ placeholder ? true : undefined }

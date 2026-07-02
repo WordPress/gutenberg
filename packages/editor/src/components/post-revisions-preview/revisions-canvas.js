@@ -26,7 +26,9 @@ import {
 } from './diff-format-types';
 import { useDiffMarkers } from './diff-markers';
 
-const { usePrivateStyleOverride } = unlock( blockEditorPrivateApis );
+const { usePrivateStyleOverride, BlockAriaLabelOverrideContext } = unlock(
+	blockEditorPrivateApis
+);
 
 // SVG filter for removed blocks: grayscale + red tint
 const REVISION_REMOVED_FILTER_SVG = `
@@ -123,14 +125,15 @@ function getDiffStatusLabel( status, blockTitle ) {
  */
 function withRevisionDiffClasses( BlockListBlock ) {
 	return ( props ) => {
-		const { block, className, wrapperProps } = props;
+		const { block, className } = props;
 		const diffStatus = block?.__revisionDiffStatus?.status;
 
-		const blockTitle = getBlockType( block.name )?.title;
-		const diffLabel =
-			diffStatus && blockTitle
-				? getDiffStatusLabel( diffStatus, blockTitle )
-				: undefined;
+		const blockTitle = diffStatus
+			? getBlockType( block.name )?.title
+			: undefined;
+		const diffLabel = blockTitle
+			? getDiffStatusLabel( diffStatus, blockTitle )
+			: undefined;
 
 		const enhancedClassName = clsx( className, {
 			'is-revision-added': diffStatus === 'added',
@@ -138,15 +141,12 @@ function withRevisionDiffClasses( BlockListBlock ) {
 			'is-revision-modified': diffStatus === 'modified',
 		} );
 
+		// The provider is always rendered (even with an undefined label) so
+		// that nested blocks don't inherit an ancestor's diff label.
 		return (
-			<BlockListBlock
-				{ ...props }
-				className={ enhancedClassName }
-				wrapperProps={ {
-					...wrapperProps,
-					...( diffLabel && { 'aria-label': diffLabel } ),
-				} }
-			/>
+			<BlockAriaLabelOverrideContext.Provider value={ diffLabel }>
+				<BlockListBlock { ...props } className={ enhancedClassName } />
+			</BlockAriaLabelOverrideContext.Provider>
 		);
 	};
 }
