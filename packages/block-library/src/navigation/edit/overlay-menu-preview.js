@@ -42,7 +42,6 @@ export default function OverlayMenuPreview( { setAttributes, hasIcon, icon } ) {
 				onDeselect={ () => setAttributes( { icon: 'handle' } ) }
 			>
 				<ToggleGroupControl
-					__next40pxDefaultSize
 					className="wp-block-navigation__overlay-menu-icon-toggle-group"
 					label={ __( 'Icon' ) }
 					value={ icon }

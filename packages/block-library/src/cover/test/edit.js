@@ -10,7 +10,7 @@ import userEvent from '@testing-library/user-event';
 import {
 	initializeEditor,
 	selectBlock,
-} from 'test/integration/helpers/integration-test-editor';
+} from '@wordpress/integration-tests/helpers/integration-test-editor';
 
 const defaultSettings = {
 	__experimentalFeatures: {
