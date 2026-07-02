@@ -686,7 +686,6 @@ export default function GalleryEdit( props ) {
 								options={ imageSizeOptions }
 								onChange={ updateImagesSize }
 								hideCancelButton
-								size="__unstable-large"
 							/>
 						</ToolsPanelItem>
 					) }
