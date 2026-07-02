@@ -787,7 +787,7 @@ export function fetchRemoteFile(
 				},
 			} );
 		} catch ( error ) {
-			dispatch.cancelItem(
+			await dispatch.cancelItem(
 				id,
 				error instanceof UploadError
 					? error
