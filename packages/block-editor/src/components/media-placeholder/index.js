@@ -127,7 +127,10 @@ export function MediaPlaceholder( {
 	isAppender,
 	accept,
 	addToGallery,
+	gallery: galleryProp,
 	multiple = false,
+	multipleUpload = multiple,
+	multipleBlockDrop = multiple,
 	handleUpload = true,
 	disableDropZone,
 	disableMediaButtons,
@@ -185,6 +188,7 @@ export function MediaPlaceholder( {
 				allowedType === 'image' || allowedType.startsWith( 'image/' )
 		);
 	};
+	const gallery = galleryProp ?? ( multiple && onlyAllowsImages() );
 
 	const onFilesUpload = ( files ) => {
 		if (
@@ -195,7 +199,7 @@ export function MediaPlaceholder( {
 		}
 		onFilesPreUpload( files );
 		let setMedia;
-		if ( multiple ) {
+		if ( multipleUpload ) {
 			if ( addToGallery ) {
 				// Since the setMedia function runs multiple times per upload group
 				// and is passed newMedia containing every item in its group each time, we must
@@ -242,7 +246,7 @@ export function MediaPlaceholder( {
 			filesList: files,
 			onFileChange: setMedia,
 			onError,
-			multiple,
+			multiple: multipleUpload,
 		} );
 	};
 
@@ -291,7 +295,9 @@ export function MediaPlaceholder( {
 			return;
 		}
 
-		onSelect( multiple ? uploadedMediaList : uploadedMediaList[ 0 ] );
+		onSelect(
+			multipleBlockDrop ? uploadedMediaList : uploadedMediaList[ 0 ]
+		);
 	}
 
 	const onUpload = ( event ) => {
@@ -395,7 +401,7 @@ export function MediaPlaceholder( {
 					return (
 						types.every( ( type ) =>
 							allowedTypes.includes( type )
-						) && ( multiple ? true : types.length === 1 )
+						) && ( multipleBlockDrop ? true : types.length === 1 )
 					);
 				} }
 			/>
@@ -465,7 +471,7 @@ export function MediaPlaceholder( {
 		const uploadMediaLibraryButton = (
 			<MediaUpload
 				addToGallery={ addToGallery }
-				gallery={ multiple && onlyAllowsImages() }
+				gallery={ gallery }
 				multiple={ multiple }
 				onSelect={ onSelect }
 				allowedTypes={ allowedTypes }
@@ -486,7 +492,7 @@ export function MediaPlaceholder( {
 					<FormFileUpload
 						onChange={ onUpload }
 						accept={ computedAccept }
-						multiple={ !! multiple }
+						multiple={ !! multipleUpload }
 						render={ ( { openFileDialog } ) => {
 							const content = (
 								<>
@@ -534,7 +540,7 @@ export function MediaPlaceholder( {
 						) }
 						onChange={ onUpload }
 						accept={ computedAccept }
-						multiple={ !! multiple }
+						multiple={ !! multipleUpload }
 					/>
 					{ uploadMediaLibraryButton }
 					{ renderUrlSelectionUI() }

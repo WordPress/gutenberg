@@ -173,16 +173,111 @@ export function ImageEdit( {
 		}
 	}
 
-	function onSelectImagesList( images ) {
-		const win = containerRef.current?.ownerDocument.defaultView;
+	function getDefaultLinkDestination() {
+		if ( attributes.linkDestination ) {
+			return attributes.linkDestination;
+		}
 
-		if ( images.every( ( file ) => file instanceof win.File ) ) {
+		// Use the WordPress option to determine the proper default.
+		// The constants used in Gutenberg do not match WP options so a little more complicated than ideal.
+		switch (
+			window?.wp?.media?.view?.settings?.defaultProps?.link ||
+			LINK_DESTINATION_NONE
+		) {
+			case 'file':
+			case LINK_DESTINATION_MEDIA:
+				return LINK_DESTINATION_MEDIA;
+			case 'post':
+			case LINK_DESTINATION_ATTACHMENT:
+				return LINK_DESTINATION_ATTACHMENT;
+			case LINK_DESTINATION_CUSTOM:
+				return LINK_DESTINATION_CUSTOM;
+			case LINK_DESTINATION_NONE:
+				return LINK_DESTINATION_NONE;
+		}
+
+		return LINK_DESTINATION_NONE;
+	}
+
+	function getImageAttributesFromMedia(
+		media,
+		{ preserveCurrentCaption = false, resetSize = true } = {}
+	) {
+		const { imageDefaultSize } = getSettings();
+
+		// Try to use the previous selected image size if its available
+		// otherwise try the default image size or fallback to "full"
+		let newSize = DEFAULT_MEDIA_SIZE_SLUG;
+		if ( sizeSlug && hasSize( media, sizeSlug ) ) {
+			newSize = sizeSlug;
+		} else if ( hasSize( media, imageDefaultSize ) ) {
+			newSize = imageDefaultSize;
+		}
+
+		let mediaAttributes = pickRelevantMediaFiles( media, newSize );
+
+		// Normalize newline characters in caption to <br />
+		// to preserve line breaks in both editor and frontend.
+		if (
+			typeof mediaAttributes.caption === 'string' &&
+			mediaAttributes.caption.includes( '\n' )
+		) {
+			mediaAttributes.caption = mediaAttributes.caption.replace(
+				/\n/g,
+				'<br>'
+			);
+		}
+
+		// If a caption text was meanwhile written by the user,
+		// make sure the text is not overwritten by empty captions.
+		if (
+			preserveCurrentCaption &&
+			captionRef.current &&
+			! mediaAttributes.caption
+		) {
+			const { caption: omittedCaption, ...restMediaAttributes } =
+				mediaAttributes;
+			mediaAttributes = restMediaAttributes;
+		}
+
+		const linkDestination = getDefaultLinkDestination();
+
+		// Check if the image is linked to it's media.
+		let href;
+		switch ( linkDestination ) {
+			case LINK_DESTINATION_MEDIA:
+				href = media.url;
+				break;
+			case LINK_DESTINATION_ATTACHMENT:
+				href = media.link;
+				break;
+		}
+		mediaAttributes.href = href;
+
+		return {
+			blob: undefined,
+			...mediaAttributes,
+			...( resetSize && { sizeSlug: newSize } ),
+			linkDestination,
+		};
+	}
+
+	function onSelectImagesList( images ) {
+		const selectedImages = Array.from( images );
+		const isFile = ( item ) =>
+			Object.prototype.toString.call( item ) === '[object File]';
+
+		if ( selectedImages.length === 1 && ! isFile( selectedImages[ 0 ] ) ) {
+			onSelectImage( selectedImages[ 0 ] );
+			return;
+		}
+
+		if ( selectedImages.every( isFile ) ) {
 			/** @type {File[]} */
-			const files = images;
+			const files = selectedImages;
 			const rootClientId = getBlockRootClientId( clientId );
 
 			if ( files.some( ( file ) => ! isValidFileType( file ) ) ) {
-				// Copied from the same notice in the gallery block.
 				createErrorNotice(
 					__(
 						'If uploading to a gallery all files need to be image formats'
@@ -199,6 +294,10 @@ export function ImageEdit( {
 					} )
 				);
 
+			if ( ! imageBlocks.length ) {
+				return;
+			}
+
 			if ( getBlockName( rootClientId ) === 'core/gallery' ) {
 				replaceBlock( clientId, imageBlocks );
 			} else if ( canInsertBlockType( 'core/gallery', rootClientId ) ) {
@@ -210,11 +309,28 @@ export function ImageEdit( {
 
 				replaceBlock( clientId, galleryBlock );
 			}
+			return;
+		}
+
+		const imageBlocks = selectedImages
+			.filter( ( image ) => image?.url )
+			.map( ( image ) =>
+				createBlock(
+					'core/image',
+					getImageAttributesFromMedia( image )
+				)
+			);
+
+		if ( imageBlocks.length ) {
+			replaceBlock( clientId, imageBlocks );
 		}
 	}
 
 	function onSelectImage( media ) {
-		if ( Array.isArray( media ) ) {
+		if (
+			Array.isArray( media ) ||
+			Object.prototype.toString.call( media ) === '[object FileList]'
+		) {
 			onSelectImagesList( media );
 			return;
 		}
@@ -289,90 +405,14 @@ export function ImageEdit( {
 			return;
 		}
 
-		const { imageDefaultSize } = getSettings();
-
-		// Try to use the previous selected image size if its available
-		// otherwise try the default image size or fallback to "full"
-		let newSize = DEFAULT_MEDIA_SIZE_SLUG;
-		if ( sizeSlug && hasSize( media, sizeSlug ) ) {
-			newSize = sizeSlug;
-		} else if ( hasSize( media, imageDefaultSize ) ) {
-			newSize = imageDefaultSize;
-		}
-
-		let mediaAttributes = pickRelevantMediaFiles( media, newSize );
-
-		// Normalize newline characters in caption to <br />
-		// to preserve line breaks in both editor and frontend.
-		if (
-			typeof mediaAttributes.caption === 'string' &&
-			mediaAttributes.caption.includes( '\n' )
-		) {
-			mediaAttributes.caption = mediaAttributes.caption.replace(
-				/\n/g,
-				'<br>'
-			);
-		}
-
-		// If a caption text was meanwhile written by the user,
-		// make sure the text is not overwritten by empty captions.
-		if ( captionRef.current && ! mediaAttributes.caption ) {
-			const { caption: omittedCaption, ...restMediaAttributes } =
-				mediaAttributes;
-			mediaAttributes = restMediaAttributes;
-		}
-
-		let additionalAttributes;
 		// Reset the dimension attributes if changing to a different image.
-		if ( ! media.id || media.id !== id ) {
-			additionalAttributes = {
-				sizeSlug: newSize,
-			};
-		}
-
-		// Check if default link setting should be used.
-		let linkDestination = attributes.linkDestination;
-		if ( ! linkDestination ) {
-			// Use the WordPress option to determine the proper default.
-			// The constants used in Gutenberg do not match WP options so a little more complicated than ideal.
-			switch (
-				window?.wp?.media?.view?.settings?.defaultProps?.link ||
-				LINK_DESTINATION_NONE
-			) {
-				case 'file':
-				case LINK_DESTINATION_MEDIA:
-					linkDestination = LINK_DESTINATION_MEDIA;
-					break;
-				case 'post':
-				case LINK_DESTINATION_ATTACHMENT:
-					linkDestination = LINK_DESTINATION_ATTACHMENT;
-					break;
-				case LINK_DESTINATION_CUSTOM:
-					linkDestination = LINK_DESTINATION_CUSTOM;
-					break;
-				case LINK_DESTINATION_NONE:
-					linkDestination = LINK_DESTINATION_NONE;
-					break;
-			}
-		}
-
-		// Check if the image is linked to it's media.
-		let href;
-		switch ( linkDestination ) {
-			case LINK_DESTINATION_MEDIA:
-				href = media.url;
-				break;
-			case LINK_DESTINATION_ATTACHMENT:
-				href = media.link;
-				break;
-		}
-		mediaAttributes.href = href;
+		const resetSize = ! media.id || media.id !== id;
 
 		setAttributes( {
-			blob: undefined,
-			...mediaAttributes,
-			...additionalAttributes,
-			linkDestination,
+			...getImageAttributesFromMedia( media, {
+				preserveCurrentCaption: true,
+				resetSize,
+			} ),
 		} );
 		setTemporaryURL();
 	}
@@ -549,7 +589,11 @@ export function ImageEdit( {
 					onError={ onUploadError }
 					placeholder={ placeholder }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					gallery={ false }
 					handleUpload={ ( files ) => files.length === 1 }
+					multiple="add"
+					multipleUpload={ false }
+					multipleBlockDrop={ false }
 					value={ { id, src } }
 					mediaPreview={ mediaPreview }
 					disableMediaButtons={ temporaryURL || url }

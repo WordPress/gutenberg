@@ -456,9 +456,22 @@ export function MediaUploadModal( {
 					);
 
 					// Transform the selected posts to the expected Attachment format
+					const selectionOrder = new Map(
+						selection.map( ( id, index ) => [
+							String( id ),
+							index,
+						] )
+					);
 					const transformedPosts = ( selectedPosts ?? [] )
 						.map( transformAttachment )
-						.filter( Boolean );
+						.filter( Boolean )
+						.sort(
+							( a, b ) =>
+								( selectionOrder.get( String( a.id ) ) ??
+									selection.length ) -
+								( selectionOrder.get( String( b.id ) ) ??
+									selection.length )
+						);
 
 					const selectedItems = multiple
 						? transformedPosts

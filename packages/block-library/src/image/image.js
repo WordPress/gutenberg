@@ -890,6 +890,9 @@ export default function Image( {
 				mediaId={ id }
 				mediaURL={ url }
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				gallery={ false }
+				multiple="add"
+				multipleUpload={ false }
 				onSelect={ onSelectImage }
 				onSelectURL={ onSelectURL }
 				onError={ onUploadError }

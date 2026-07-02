@@ -58,7 +58,9 @@ const MediaReplaceFlow = ( {
 	removeNotice,
 	children,
 	multiple = false,
+	multipleUpload = multiple,
 	addToGallery,
+	gallery: galleryProp,
 	handleUpload = true,
 	variant,
 	popoverProps,
@@ -127,10 +129,11 @@ const MediaReplaceFlow = ( {
 		mediaUpload( {
 			allowedTypes,
 			filesList: files,
-			onFileChange: ( [ media ] ) => {
-				selectMedia( media, closeMenu );
+			onFileChange: ( media ) => {
+				selectMedia( multipleUpload ? media : media[ 0 ], closeMenu );
 			},
 			onError: onUploadError,
+			multiple: multipleUpload,
 		} );
 	};
 
@@ -152,7 +155,7 @@ const MediaReplaceFlow = ( {
 		);
 	};
 
-	const gallery = multiple && onlyAllowsImages();
+	const gallery = galleryProp ?? ( multiple && onlyAllowsImages() );
 
 	const mergedPopoverProps = {
 		...popoverProps,
@@ -196,7 +199,12 @@ const MediaReplaceFlow = ( {
 								gallery={ gallery }
 								addToGallery={ addToGallery }
 								multiple={ multiple }
-								value={ multiple ? mediaIds : mediaId }
+								value={
+									multiple
+										? mediaIds ??
+										  ( mediaId ? [ mediaId ] : undefined )
+										: mediaId
+								}
 								onSelect={ ( media ) =>
 									selectMedia( media, onClose )
 								}
@@ -215,7 +223,7 @@ const MediaReplaceFlow = ( {
 									uploadFiles( event, onClose );
 								} }
 								accept={ computedAccept }
-								multiple={ !! multiple }
+								multiple={ !! multipleUpload }
 								render={ ( { openFileDialog } ) => {
 									return (
 										<MenuItem
