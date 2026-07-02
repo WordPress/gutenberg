@@ -16,6 +16,52 @@ require_once __DIR__ . '/class-wp-widget-type-registry.php';
 require_once __DIR__ . '/class-wp-rest-widget-modules-controller.php';
 
 /**
+ * Returns the i18n schema describing which widget metadata fields are
+ * translatable and the gettext context to use for each.
+ *
+ * Read once from widget-i18n.json and memoized for the rest of the request.
+ *
+ * @return array Map of translatable field name to gettext context.
+ */
+function gutenberg_get_widget_metadata_i18n_schema() {
+	static $i18n_schema = null;
+
+	if ( null === $i18n_schema ) {
+		$schema      = wp_json_file_decode( __DIR__ . '/widget-i18n.json', array( 'associative' => true ) );
+		$i18n_schema = is_array( $schema ) ? $schema : array();
+	}
+
+	return $i18n_schema;
+}
+
+/**
+ * Translates a widget's user-facing metadata strings.
+ *
+ * Runs `title`, `description`, and `keywords` through the widget i18n schema
+ * using the widget's `textdomain`, leaving every other key untouched. A no-op
+ * when the widget declares no `textdomain`.
+ *
+ * @param array $widget Widget data from the build manifest.
+ * @return array Widget data with its translatable strings localized.
+ */
+function gutenberg_translate_widget_metadata( $widget ) {
+	$textdomain = $widget['textdomain'] ?? null;
+	if ( ! $textdomain ) {
+		return $widget;
+	}
+
+	$i18n_schema = gutenberg_get_widget_metadata_i18n_schema();
+
+	foreach ( array( 'title', 'description', 'keywords' ) as $field ) {
+		if ( isset( $widget[ $field ], $i18n_schema[ $field ] ) ) {
+			$widget[ $field ] = translate_settings_using_i18n_schema( $i18n_schema[ $field ], $widget[ $field ], $textdomain );
+		}
+	}
+
+	return $widget;
+}
+
+/**
  * Hydrates the widget type registry from the build manifest.
  *
  * Iterates the widgets discovered by the build pipeline (via
@@ -36,6 +82,8 @@ function gutenberg_register_widget_types() {
 			continue;
 		}
 
+		$widget = gutenberg_translate_widget_metadata( $widget );
+
 		$registry->register(
 			$widget['name'],
 			array(
@@ -43,6 +91,9 @@ function gutenberg_register_widget_types() {
 				'widget_module' => $widget['widget_module'] ?? null,
 				'presentation'  => $widget['presentation'] ?? null,
 				'category'      => $widget['category'] ?? null,
+				'title'         => $widget['title'] ?? null,
+				'description'   => $widget['description'] ?? null,
+				'keywords'      => $widget['keywords'] ?? null,
 			)
 		);
 	}

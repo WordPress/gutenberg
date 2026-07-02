@@ -49,7 +49,6 @@ const FontSizePickerToggleGroup = ( props: FontSizePickerToggleGroupProps ) => {
 
 	return (
 		<ToggleGroupControl
-			__next40pxDefaultSize
 			label={ __( 'Font size' ) }
 			hideLabelFromVision
 			value={ currentValue }

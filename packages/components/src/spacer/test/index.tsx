@@ -95,6 +95,20 @@ describe( 'props', () => {
 		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
 	} );
 
+	test( 'should preserve explicit margin props regardless of Emotion insertion order', () => {
+		render( <Spacer marginRight={ 5 } data-testid="primer" /> );
+		render(
+			<Spacer margin={ 10 } marginRight={ 5 } data-testid="target" />
+		);
+
+		const styles = window.getComputedStyle(
+			screen.getByTestId( 'target' )
+		);
+
+		expect( styles.marginRight ).toBe( 'calc(20px)' );
+		expect( styles.marginTop ).toBe( 'calc(40px)' );
+	} );
+
 	test( 'should render padding', () => {
 		render( <Spacer data-testid="spacer" /> );
 		render( <Spacer padding={ 5 } data-testid="customized-spacer" /> );
@@ -175,5 +189,19 @@ describe( 'props', () => {
 		expect(
 			screen.getByTestId( 'customized-spacer' )
 		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
+	} );
+
+	test( 'should preserve explicit padding props regardless of Emotion insertion order', () => {
+		render( <Spacer paddingRight={ 5 } data-testid="primer" /> );
+		render(
+			<Spacer padding={ 10 } paddingRight={ 5 } data-testid="target" />
+		);
+
+		const styles = window.getComputedStyle(
+			screen.getByTestId( 'target' )
+		);
+
+		expect( styles.paddingRight ).toBe( 'calc(20px)' );
+		expect( styles.paddingTop ).toBe( 'calc(40px)' );
 	} );
 } );
