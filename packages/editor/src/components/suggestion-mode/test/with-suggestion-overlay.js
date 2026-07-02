@@ -22,6 +22,7 @@ import { render, screen, act, fireEvent } from '@testing-library/react';
  * WordPress dependencies
  */
 import { createRegistry, RegistryProvider } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createBlock, registerBlockType } from '@wordpress/blocks';
@@ -235,7 +236,12 @@ describe( 'withSuggestionOverlay', () => {
 		// insertion — not divert into the overlay as a content suggestion.
 		let overlayHandle;
 		function CaptureOverlay() {
-			overlayHandle = useSuggestionOverlay();
+			const overlay = useSuggestionOverlay();
+			// Assigned in an effect (not during render) to keep the harness
+			// compliant with the react-hooks purity rules.
+			useEffect( () => {
+				overlayHandle = overlay;
+			}, [ overlay ] );
 			return null;
 		}
 

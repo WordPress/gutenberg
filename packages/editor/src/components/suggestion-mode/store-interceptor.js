@@ -695,17 +695,10 @@ export default function SuggestionStoreInterceptor() {
 	const consumeInterceptorBypassRef = useRef( consumeInterceptorBypass );
 	consumeInterceptorBypassRef.current = consumeInterceptorBypass;
 
-	const markDeferredInsertionRef = useRef( markDeferredInsertion );
-	markDeferredInsertionRef.current = markDeferredInsertion;
-
-	const unmarkDeferredInsertionRef = useRef( unmarkDeferredInsertion );
-	unmarkDeferredInsertionRef.current = unmarkDeferredInsertion;
-
-	const isDeferredInsertionRef = useRef( isDeferredInsertion );
-	isDeferredInsertionRef.current = isDeferredInsertion;
-
-	const clearDeferredInsertionsRef = useRef( clearDeferredInsertions );
-	clearDeferredInsertionsRef.current = clearDeferredInsertions;
+	// The deferred-insertion callbacks are identity-stable (`useCallback`
+	// with no dependencies in the overlay provider), so unlike the values
+	// above they can be closed over by the effect directly — listing them in
+	// its dependency array never re-subscribes in practice.
 
 	useEffect( () => {
 		if ( ! isSuggestMode ) {
@@ -734,7 +727,7 @@ export default function SuggestionStoreInterceptor() {
 		// A block deferred in a previous Suggest session is seeded into the
 		// snapshot below like any other pre-existing block, so stale entries
 		// must not survive into this session.
-		clearDeferredInsertionsRef.current?.();
+		clearDeferredInsertions();
 
 		// Snapshot of every block's attributes at the moment Suggest mode
 		// activated. New blocks added during the session are slotted in as
@@ -811,12 +804,12 @@ export default function SuggestionStoreInterceptor() {
 					// real attributes instead of opening a separate
 					// suggestion for it.
 					if ( block && isUnmodifiedDefaultBlock( block ) ) {
-						markDeferredInsertionRef.current?.( clientId );
+						markDeferredInsertion( clientId );
 						continue;
 					}
 
 					snapshot.set( clientId, current );
-					unmarkDeferredInsertionRef.current?.( clientId );
+					unmarkDeferredInsertion( clientId );
 					const parentClientId =
 						blockEditor.getBlockRootClientId?.( clientId ) || null;
 					const parentExisted =
@@ -1042,8 +1035,8 @@ export default function SuggestionStoreInterceptor() {
 					// was never registered as a suggestion, so its removal
 					// isn't one either — deleting an empty just-added
 					// paragraph must not propose removing it. Forget it.
-					if ( isDeferredInsertionRef.current?.( clientId ) ) {
-						unmarkDeferredInsertionRef.current?.( clientId );
+					if ( isDeferredInsertion( clientId ) ) {
+						unmarkDeferredInsertion( clientId );
 						continue;
 					}
 					// "Apply / reject landing": when another client
@@ -1185,7 +1178,14 @@ export default function SuggestionStoreInterceptor() {
 		}, BLOCK_EDITOR_STORE_NAME );
 
 		return unsubscribe;
-	}, [ isSuggestMode, registry ] );
+	}, [
+		isSuggestMode,
+		registry,
+		markDeferredInsertion,
+		unmarkDeferredInsertion,
+		isDeferredInsertion,
+		clearDeferredInsertions,
+	] );
 
 	return null;
 }
