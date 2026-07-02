@@ -42,6 +42,19 @@ test.describe( 'Revision block diff aria-labels', () => {
 					content: 'Newly added verse',
 				} )
 			);
+			// A Group block matching the "Row" variation, to check that
+			// diff labels use the variation-aware title.
+			dispatch( 'core/block-editor' ).insertBlocks(
+				window.wp.blocks.createBlock(
+					'core/group',
+					{ layout: { type: 'flex', flexWrap: 'nowrap' } },
+					[
+						window.wp.blocks.createBlock( 'core/paragraph', {
+							content: 'Inside the row',
+						} ),
+					]
+				)
+			);
 		} );
 
 		// Save draft again to create the second revision.
@@ -81,12 +94,21 @@ test.describe( 'Revision block diff aria-labels', () => {
 			} )
 		).toBeVisible();
 
-		// Unchanged blocks keep the default label.
+		// Diff labels use the variation-aware block title.
 		await expect(
 			editor.canvas.getByRole( 'document', {
-				name: 'Block: Paragraph',
-				exact: true,
+				name: 'Added Block: Row',
 			} )
+		).toBeVisible();
+
+		// The unchanged block keeps the default label.
+		await expect(
+			editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Paragraph',
+					exact: true,
+				} )
+				.filter( { hasText: 'Unchanged paragraph' } )
 		).toBeVisible();
 	} );
 } );

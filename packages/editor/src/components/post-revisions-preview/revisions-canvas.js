@@ -8,10 +8,10 @@ import clsx from 'clsx';
  */
 import { Spinner } from '@wordpress/components';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { select as globalSelect, useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
-import { getBlockType } from '@wordpress/blocks';
+import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { sprintf, __ } from '@wordpress/i18n';
 
 /**
@@ -128,12 +128,21 @@ function withRevisionDiffClasses( BlockListBlock ) {
 		const { block, className } = props;
 		const diffStatus = block?.__revisionDiffStatus?.status;
 
-		const blockTitle = diffStatus
-			? getBlockType( block.name )?.title
-			: undefined;
-		const diffLabel = blockTitle
-			? getDiffStatusLabel( diffStatus, blockTitle )
-			: undefined;
+		let diffLabel;
+		if ( diffStatus ) {
+			// Resolve the variation-aware title (e.g. "YouTube", "Row") so
+			// blocks are announced by the name users know them as. The
+			// canvas's default wrapper labels can't be reused here: in
+			// preview mode they intentionally skip variation matching.
+			const blockTitle =
+				globalSelect( blocksStore ).getActiveBlockVariation(
+					block.name,
+					block.attributes
+				)?.title ?? getBlockType( block.name )?.title;
+			if ( blockTitle ) {
+				diffLabel = getDiffStatusLabel( diffStatus, blockTitle );
+			}
+		}
 
 		const enhancedClassName = clsx( className, {
 			'is-revision-added': diffStatus === 'added',
@@ -141,8 +150,10 @@ function withRevisionDiffClasses( BlockListBlock ) {
 			'is-revision-modified': diffStatus === 'modified',
 		} );
 
-		// The provider is always rendered (even with an undefined label) so
-		// that nested blocks don't inherit an ancestor's diff label.
+		// The provider is always rendered — even with an undefined label —
+		// so the element tree keeps its shape when a diff status appears or
+		// disappears (a conditional wrapper would remount the whole block
+		// subtree), and so nested blocks don't inherit an ancestor's label.
 		return (
 			<BlockAriaLabelOverrideContext.Provider value={ diffLabel }>
 				<BlockListBlock { ...props } className={ enhancedClassName } />
