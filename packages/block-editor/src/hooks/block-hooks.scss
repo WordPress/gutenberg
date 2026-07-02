@@ -15,3 +15,26 @@
 		margin-bottom: $grid-unit-20;
 	}
 }
+
+.block-editor-hooks__position-control-item {
+	// Allow Base UI's item text wrapper to shrink inside the select item's flex row.
+	> div {
+		min-width: 0;
+	}
+}
+
+.block-editor-hooks__position-control-item-content,
+.block-editor-hooks__position-control-item-hint {
+	display: block;
+	white-space: normal;
+}
+
+.block-editor-hooks__position-control-item-content {
+	max-inline-size: 280px;
+}
+
+.block-editor-hooks__position-control-item-hint {
+	color: $gray-700;
+	margin-block-start: $grid-unit-05;
+	overflow-wrap: break-word;
+}
