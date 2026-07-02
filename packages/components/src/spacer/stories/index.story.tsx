@@ -74,3 +74,11 @@ export const Default: StoryFn< typeof Spacer > = Template.bind( {} );
 Default.args = {
 	children: 'This is the spacer',
 };
+
+export const Nested: StoryFn< typeof Spacer > = () => (
+	<Spacer padding={ 4 } style={ { backgroundColor: '#ddd' } }>
+		<Spacer style={ { backgroundColor: '#fff' } }>
+			<BlackBox />
+		</Spacer>
+	</Spacer>
+);
