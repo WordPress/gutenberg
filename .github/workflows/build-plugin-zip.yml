@@ -30,7 +30,7 @@ jobs:
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
-        if: ${{ github.event_name == 'workflow_dispatch' }}
+        if: ${{ github.repository == 'WordPress/gutenberg' && github.event_name == 'workflow_dispatch' }}
         outputs:
             current_stable_branch: ${{ steps.get_branches.outputs.current_stable_branch }}
             next_stable_branch: ${{ steps.get_branches.outputs.next_stable_branch }}
@@ -60,18 +60,19 @@ jobs:
             contents: write
         needs: compute-stable-branches
         if: |
-            github.event_name == 'workflow_dispatch' && (
-              (
-                github.ref == 'refs/heads/trunk' ||
-                endsWith( github.ref, needs.compute-stable-branches.outputs.next_stable_branch )
-              ) && (
-                github.event.inputs.version == 'rc' ||
-                github.event.inputs.version == 'stable'
-              ) || (
-                startsWith( github.ref, 'refs/heads/release/' ) &&
-                github.event.inputs.version == 'stable'
+            github.repository == 'WordPress/gutenberg' &&
+              github.event_name == 'workflow_dispatch' && (
+                (
+                  github.ref == 'refs/heads/trunk' ||
+                  endsWith( github.ref, needs.compute-stable-branches.outputs.next_stable_branch )
+                ) && (
+                  github.event.inputs.version == 'rc' ||
+                  github.event.inputs.version == 'stable'
+                ) || (
+                  startsWith( github.ref, 'refs/heads/release/' ) &&
+                  github.event.inputs.version == 'stable'
+                )
               )
-            )
         outputs:
             old_version: ${{ steps.get_version.outputs.old_version }}
             new_version: ${{ steps.get_version.outputs.new_version }}
@@ -349,6 +350,7 @@ jobs:
             contents: write
         if: |
             always() &&
+            github.repository == 'WordPress/gutenberg' &&
             needs.build.result == 'failure' &&
             needs.bump-version.outputs.release_branch_commit
 
@@ -401,6 +403,7 @@ jobs:
         name: Create Release Draft and Attach Asset
         needs: [bump-version, build]
         runs-on: 'ubuntu-24.04'
+        if: ${{ github.repository == 'WordPress/gutenberg' && github.event_name == 'workflow_dispatch' }}
         permissions:
             contents: write
 
@@ -468,7 +471,7 @@ jobs:
             contents: read
         environment: WordPress packages
         needs: [bump-version, build]
-        if: ${{ endsWith( needs.bump-version.outputs.new_version, '-rc.1' ) }}
+        if: ${{ github.repository == 'WordPress/gutenberg' && endsWith( needs.bump-version.outputs.new_version, '-rc.1' ) }}
         steps:
             - name: Checkout (for CLI)
               uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0

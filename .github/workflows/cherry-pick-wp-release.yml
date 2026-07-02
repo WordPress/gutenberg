@@ -23,11 +23,11 @@ permissions: {}
 jobs:
     cherry-pick:
         runs-on: 'ubuntu-24.04'
+        if: ${{ github.repository == 'WordPress/gutenberg' && github.event.pull_request.merged == true }}
         permissions:
             contents: write
             issues: write
             pull-requests: write
-        if: github.event.pull_request.merged == true
         steps:
             - name: Determine if label should trigger cherry-pick
               id: label-check

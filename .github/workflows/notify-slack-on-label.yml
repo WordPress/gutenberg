@@ -8,7 +8,7 @@ on:
 
 jobs:
     notify:
-        if: ${{ github.event.label.name == 'Needs Testing' }}
+        if: ${{ github.repository == 'WordPress/gutenberg' && github.event.label.name == 'Needs Testing' }}
         runs-on: ubuntu-latest
         permissions: {}
         env:

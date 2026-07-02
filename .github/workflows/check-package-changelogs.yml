@@ -21,6 +21,7 @@ jobs:
     check:
         name: Check CHANGELOG diff (${{ matrix.package }})
         runs-on: 'ubuntu-24.04'
+        if: ${{ github.repository == 'WordPress/gutenberg' }}
         permissions:
             contents: read
         strategy:
