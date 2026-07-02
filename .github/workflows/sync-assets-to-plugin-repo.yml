@@ -15,6 +15,7 @@ jobs:
     sync-assets:
         name: Sync assets to WordPress.org plugin repo
         runs-on: 'ubuntu-24.04'
+        if: ${{ github.repository == 'WordPress/gutenberg' }}
         permissions:
             contents: read
         environment: wp.org plugin
