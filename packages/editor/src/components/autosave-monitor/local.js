@@ -11,7 +11,7 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
-import AutosaveMonitor from '../autosave-monitor';
+import AutosaveMonitor from './index';
 import {
 	localAutosaveGet,
 	localAutosaveClear,

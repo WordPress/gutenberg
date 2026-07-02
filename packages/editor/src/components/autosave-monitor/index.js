@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
+import { useEvent } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -18,11 +19,7 @@ import { store as editorStore } from '../../store';
  * @param {number}   intervalInSeconds Seconds between ticks.
  */
 function useInterval( callback, intervalInSeconds ) {
-	const callbackRef = useRef( callback );
-
-	useEffect( () => {
-		callbackRef.current = callback;
-	}, [ callback ] );
+	const onTick = useEvent( callback );
 
 	useEffect( () => {
 		// Interval can be undefined before editor settings are populated.
@@ -30,12 +27,9 @@ function useInterval( callback, intervalInSeconds ) {
 			return;
 		}
 
-		const id = setInterval(
-			() => callbackRef.current(),
-			intervalInSeconds * 1000
-		);
+		const id = setInterval( onTick, intervalInSeconds * 1000 );
 		return () => clearInterval( id );
-	}, [ intervalInSeconds ] );
+	}, [ onTick, intervalInSeconds ] );
 }
 
 /**

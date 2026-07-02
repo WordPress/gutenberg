@@ -1,3 +1,18 @@
+# AutosaveMonitor
+
+`AutosaveMonitor` monitors the changes made to the edited post and triggers an autosave when there is something new to save. The post is checked on an interval, which defaults to the editor's `autosaveInterval` setting and saves to the server via the editor store's `autosave` action. Both the interval and the save callback can be overridden with props.
+
+## Example
+
+```js
+const MyLayout = () => (
+	<main>
+		<AutosaveMonitor interval={ 30 } />
+		<MyEditor />
+	</main>
+);
+```
+
 # LocalAutosaveMonitor
 
 `LocalAutosaveMonitor` is a component based on `AutosaveMonitor` that ensures that a local copy of the current post is regularly saved in `sessionStorage`. Additionally, it will:
