@@ -79,10 +79,6 @@ describe( 'props', () => {
 			</Flex>
 		);
 
-		expect( screen.getByTestId( 'flex' ) ).toHaveAttribute(
-			'data-layout',
-			'column'
-		);
 		expect( screen.getByTestId( 'flex' ) ).toHaveStyle( {
 			'--wp-components-flex-align': 'normal',
 			'--wp-components-flex-direction': 'column',

@@ -2,9 +2,7 @@
 
 exports[`props should render correctly 1`] = `
 <div
-  class="style-flex style-items-row components-flex"
-  data-expanded="true"
-  data-layout="row"
+  class="style-flex style-items-row style-expanded-row components-flex"
   data-testid="base-flex"
   data-wp-c16t="true"
   data-wp-component="Flex"
