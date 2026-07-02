@@ -1,9 +1,6 @@
 /**
  * WordPress dependencies
  */
-// @ts-ignore — `@wordpress/rich-text-control` ships no `.d.ts` files, so the
-// type-declaration build cannot resolve this import even though the package
-// is declared as a dependency.
 import { RichTextControl } from '@wordpress/rich-text-control';
 import { useCallback } from '@wordpress/element';
 

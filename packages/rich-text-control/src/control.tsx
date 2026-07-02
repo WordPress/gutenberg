@@ -2,6 +2,7 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import type { FocusEvent } from 'react';
 
 /**
  * WordPress dependencies
@@ -25,6 +26,7 @@ import {
 	insert,
 	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
+import type { RichTextValue } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -34,6 +36,7 @@ import { getAllowedFormats } from './utils';
 import FormatEdit from './format-edit';
 import shortcutsListener from './event-listeners/shortcuts';
 import inputEventsListener from './event-listeners/input-events';
+import type { EventListenersProps } from './types';
 
 // `keyboardShortcutContext` / `inputEventContext` are the same context objects
 // that `@wordpress/block-editor`'s `RichTextShortcut` / `RichTextInputEvent`
@@ -49,6 +52,66 @@ const { useRichText, keyboardShortcutContext, inputEventContext } =
 const OWNED_POPOVER_SELECTOR =
 	'[data-rich-text-control-popover-slot],[data-wp-compat-overlay-slot]';
 
+export type RichTextControlProps = {
+	/**
+	 * Label text for the control.
+	 */
+	label: string;
+	/**
+	 * The rich text value (HTML string).
+	 */
+	value: string;
+	/**
+	 * Callback function invoked when the value changes.
+	 */
+	onChange: ( value: string ) => void;
+	/**
+	 * Placeholder text displayed when the field is empty.
+	 */
+	placeholder?: string;
+	/**
+	 * Unique identifier for the control.
+	 */
+	id?: string;
+	/**
+	 * Block client ID for context (used by format types that need it).
+	 */
+	clientId?: string;
+	/**
+	 * Additional class name applied to the contenteditable element.
+	 */
+	className?: string;
+	/**
+	 * Whether to visually hide the label (still accessible to screen readers).
+	 */
+	hideLabelFromVision?: boolean;
+	/**
+	 * Array of allowed format types.
+	 */
+	allowedFormats?: string[];
+	/**
+	 * Whether to disable all formatting.
+	 */
+	disableFormats?: boolean;
+	/**
+	 * Whether to disable interactive formatting features.
+	 */
+	withoutInteractiveFormatting?: boolean;
+	/**
+	 * Whether to preserve whitespace in the content.
+	 */
+	preserveWhiteSpace?: boolean;
+	/**
+	 * Whether to disable line breaks in the content.
+	 */
+	disableLineBreaks?: boolean;
+	/**
+	 * Whether to move focus to the field when it mounts. Off by default; opt
+	 * in for standalone forms where no other code lands focus on the field.
+	 */
+	focusOnMount?: boolean;
+};
+
 /**
  * A rich text control component that provides a contenteditable field with
  * formatting capabilities.
@@ -59,24 +122,6 @@ const OWNED_POPOVER_SELECTOR =
  * and skips block-editor selection coupling, while still wiring registered
  * format types so familiar keyboard shortcuts (Cmd+B, Cmd+I, Cmd+K) continue
  * to work.
- *
- * @param {Object}   props                                Component properties.
- * @param {string}   props.label                          Label text for the control.
- * @param {string}   props.value                          The rich text value (HTML string).
- * @param {Function} props.onChange                       Callback function invoked when the value changes.
- * @param {string}   [props.placeholder]                  Placeholder text displayed when the field is empty.
- * @param {string}   [props.id]                           Unique identifier for the control.
- * @param {string}   [props.clientId]                     Block client ID for context (used by format types that need it).
- * @param {string}   [props.className]                    Additional class name applied to the contenteditable element.
- * @param {boolean}  [props.hideLabelFromVision]          Whether to visually hide the label (still accessible to screen readers).
- * @param {Array}    [props.allowedFormats]               Array of allowed format types.
- * @param {boolean}  [props.disableFormats]               Whether to disable all formatting.
- * @param {boolean}  [props.withoutInteractiveFormatting] Whether to disable interactive formatting features.
- * @param {boolean}  [props.preserveWhiteSpace]           Whether to preserve whitespace in the content.
- * @param {boolean}  [props.disableLineBreaks]            Whether to disable line breaks in the content.
- * @param {boolean}  [props.focusOnMount]                 Whether to move focus to the field when it mounts. Off by default; opt in for standalone forms where no other code lands focus on the field.
- *
- * @return {Element} The rendered RichTextControl component.
  */
 export default function RichTextControl( {
 	label,
@@ -93,15 +138,20 @@ export default function RichTextControl( {
 	preserveWhiteSpace,
 	disableLineBreaks,
 	focusOnMount,
-} ) {
-	const [ selection, setSelection ] = useState( {
+}: RichTextControlProps ) {
+	const [ selection, setSelection ] = useState< {
+		start: number | undefined;
+		end: number | undefined;
+	} >( {
 		start: undefined,
 		end: undefined,
 	} );
 	const [ isSelected, setIsSelected ] = useState( false );
-	const anchorRef = useRef();
-	const inputEvents = useRef( new Set() );
-	const keyboardShortcuts = useRef( new Set() );
+	const anchorRef = useRef< HTMLDivElement | undefined >( undefined );
+	const inputEvents = useRef( new Set< ( event: Event ) => void >() );
+	const keyboardShortcuts = useRef(
+		new Set< ( event: KeyboardEvent ) => void >()
+	);
 
 	// Format types open their UI (e.g. the inline link popover via Cmd+K) in
 	// portaled popovers. We host them in a private `SlotFillProvider` paired
@@ -113,16 +163,22 @@ export default function RichTextControl( {
 	// scroll/overflow container the control sits in (e.g. a sidebar). The body
 	// is read from the field element rather than the global `document` to stay
 	// correct if the control is ever rendered inside an iframe.
-	const [ popoverSlotContainer, setPopoverSlotContainer ] = useState();
-	const popoverSlotContainerRef = useRefEffect( ( element ) => {
-		setPopoverSlotContainer( element.ownerDocument.body );
-	}, [] );
+	const [ popoverSlotContainer, setPopoverSlotContainer ] =
+		useState< HTMLElement >();
+	const popoverSlotContainerRef = useRefEffect< HTMLElement >(
+		( element ) => {
+			setPopoverSlotContainer( element.ownerDocument.body );
+		},
+		[]
+	);
 
 	// When the textbox blurs, defer flipping `isSelected` to `false` so a
 	// portal-rendered popover (e.g., the inline link UI opened via Cmd+K)
 	// can claim focus without `FormatEdit` — and therefore the popover
 	// itself — unmounting underneath it.
-	const blurDeselectTimeoutRef = useRef( undefined );
+	const blurDeselectTimeoutRef = useRef<
+		ReturnType< typeof setTimeout > | undefined
+	>( undefined );
 	useEffect( () => () => clearTimeout( blurDeselectTimeoutRef.current ), [] );
 
 	/*
@@ -133,10 +189,12 @@ export default function RichTextControl( {
 	 * its format UI) once focus settles outside both the field and its
 	 * popovers.
 	 */
-	const stopPopoverFocusTrackingRef = useRef( undefined );
+	const stopPopoverFocusTrackingRef = useRef< ( () => void ) | undefined >(
+		undefined
+	);
 	useEffect( () => () => stopPopoverFocusTrackingRef.current?.(), [] );
 
-	function trackPopoverFocusOut( ownerDocument ) {
+	function trackPopoverFocusOut( ownerDocument: Document ) {
 		stopPopoverFocusTrackingRef.current?.();
 
 		function onDocumentFocusOut() {
@@ -144,7 +202,7 @@ export default function RichTextControl( {
 			blurDeselectTimeoutRef.current = setTimeout( () => {
 				const active = ownerDocument.activeElement;
 				if (
-					anchorRef.current?.contains( active ) ||
+					( active && anchorRef.current?.contains( active ) ) ||
 					( active && active.closest( OWNED_POPOVER_SELECTOR ) )
 				) {
 					return;
@@ -177,7 +235,10 @@ export default function RichTextControl( {
 		onChange,
 		selectionStart: selection.start,
 		selectionEnd: selection.end,
-		onSelectionChange: ( start, end ) => setSelection( { start, end } ),
+		onSelectionChange: (
+			start: number | undefined,
+			end: number | undefined
+		) => setSelection( { start, end } ),
 		__unstableIsSelected: isSelected,
 		preserveWhiteSpace: !! preserveWhiteSpace,
 		placeholder,
@@ -206,7 +267,7 @@ export default function RichTextControl( {
 	// Optionally move focus to the field when it mounts. `RichTextControl`
 	// has no block-editor selection to land focus, so standalone consumers
 	// (e.g. a note form) need a way to land the caret on open.
-	const focusOnMountRef = useRefEffect(
+	const focusOnMountRef = useRefEffect< HTMLElement >(
 		( element ) => {
 			if ( focusOnMount ) {
 				element.focus();
@@ -219,7 +280,7 @@ export default function RichTextControl( {
 	// and InputEvent handlers (e.g. native formatBold) to the contenteditable.
 	// FormatEdit populates these Sets via context; without these listeners the
 	// callbacks would never fire.
-	const eventListenersPropsRef = useRef( {
+	const eventListenersPropsRef = useRef< EventListenersProps >( {
 		keyboardShortcuts,
 		inputEvents,
 	} );
@@ -250,9 +311,9 @@ export default function RichTextControl( {
 	 * a meta/ctrl modifier are left to consumers (e.g. a form submitting
 	 * on Cmd+Enter).
 	 */
-	const enterRef = useRefEffect(
+	const enterRef = useRefEffect< HTMLElement >(
 		( element ) => {
-			function onKeyDown( event ) {
+			function onKeyDown( event: KeyboardEvent ) {
 				if (
 					event.key !== 'Enter' ||
 					event.defaultPrevented ||
@@ -267,7 +328,7 @@ export default function RichTextControl( {
 				}
 				const { getValue: getCurrentValue, onChange: handleChange } =
 					inputRulePropsRef.current;
-				const current = getCurrentValue();
+				const current: RichTextValue = getCurrentValue();
 				// Fall back to the end of the content if the selection has
 				// not been synced into the value yet.
 				handleChange(
@@ -285,7 +346,7 @@ export default function RichTextControl( {
 		[ disableLineBreaks ]
 	);
 
-	const eventListenersRef = useRefEffect(
+	const eventListenersRef = useRefEffect< HTMLElement >(
 		( element ) => {
 			if ( ! isSelected ) {
 				return;
@@ -300,9 +361,9 @@ export default function RichTextControl( {
 			// Apply format-level input rules (e.g. `core/code`'s
 			// backtick→inline-code transform). Block-transform input rules
 			// don't apply to a standalone field.
-			function onFormatInput( event ) {
+			function onFormatInput( event: Event ) {
 				if (
-					event.inputType !== 'insertText' &&
+					( event as InputEvent ).inputType !== 'insertText' &&
 					event.type !== 'compositionend'
 				) {
 					return;
@@ -314,7 +375,16 @@ export default function RichTextControl( {
 				} = inputRulePropsRef.current;
 				const current = getCurrentValue();
 				const transformed = types.reduce(
-					( accumulator, { __unstableInputRule } ) =>
+					(
+						accumulator: RichTextValue,
+						{
+							__unstableInputRule,
+						}: {
+							__unstableInputRule?: (
+								value: RichTextValue
+							) => RichTextValue;
+						}
+					) =>
 						__unstableInputRule
 							? __unstableInputRule( accumulator )
 							: accumulator,
@@ -388,7 +458,7 @@ export default function RichTextControl( {
 						stopPopoverFocusTrackingRef.current?.();
 						setIsSelected( true );
 					} }
-					onBlur={ ( event ) => {
+					onBlur={ ( event: FocusEvent< HTMLDivElement > ) => {
 						clearTimeout( blurDeselectTimeoutRef.current );
 						const ownerDocument = event.currentTarget.ownerDocument;
 						blurDeselectTimeoutRef.current = setTimeout( () => {
