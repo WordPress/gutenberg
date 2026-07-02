@@ -61,13 +61,7 @@ A companion `editor.BlockListBlock` filter tags each block with a pending change
 
 For **attribute suggestions** the store is never touched, so autosave, undo/redo, and RTC sync stay at the real baseline. **Structural suggestions** are different: their pending state (the `metadata.suggestion` markers, and pending-insert blocks themselves) lives in the real block tree, so serializing the post would leak it into `post_content`. While any pending structural state exists, `SuggestionSaveLock` holds the editor's save and autosave locks (`lockPostSaving` / `lockPostAutosaving`), releasing them once every structural suggestion has been applied or rejected.
 
-### Inline preview marks
-
-For text-valued (RichText) attributes, the overlay HOC also renders the change **inline** inside the block, Google-Docs style, rather than only in the sidebar. On each render (gated on `! isBlockSelected`, so the marks never fight the caret), `markContentDiff` word-diffs the baseline against the proposed value and wraps the runs: removed runs in `<del class="has-suggestion-deletion">`, added runs in `<ins class="has-suggestion-addition">`. The marked HTML is fed back into the block's RichText for display only.
-
-The persisted value is never the marked one. Incoming `setAttributes` payloads are passed through `stripSuggestionMarks` first, so the overlay always stores the *clean* proposed value — without this, the next render would diff against an already-marked value and double up the marks. The two format types (`gutenberg/suggested-deletion`, `gutenberg/suggested-addition`) are registered without an `edit` UI in `inline-formats.js` so they never appear in the block toolbar.
-
-When the suggester's user id is known, `getAvatarBorderColor` resolves their avatar color and it rides on each `<del>`/`<ins>` as an inline `style="--suggestion-author-color: …"`, so two suggesters' marks are distinguishable at a glance. Omitting the color leaves the existing red/green CSS fallback, so single-suggester sessions look unchanged.
+When the suggester's user id is known, `getAvatarBorderColor` resolves their avatar color and it rides on the block wrapper as an inline `style="--suggestion-author-color: …"`, so two suggesters' pending treatments are distinguishable at a glance. Omitting the color leaves the existing CSS fallback, so single-suggester sessions look unchanged. In this layer suggestions are surfaced through the pending-treatment classes and the sidebar summary; an in-content rendering of text changes is layered on separately (see the inline marker work stacked on this PR).
 
 ### Auto-save
 
@@ -113,14 +107,13 @@ The Suggest-mode subsystem lives in `packages/editor/src/components/suggestion-m
 
 | File | Role |
 |------|------|
-| `index.js`                  | Barrel that re-exports the subsystem's public surface and registers the inline format types on import. |
+| `index.js`                  | Barrel that re-exports the subsystem's public surface. |
 | `constants.js`              | Shared constants (`EDITOR_STORE_NAME`, `SUGGEST_INTENT`) referenced by name to avoid a module cycle with the editor store. |
 | `overlay-context.js`        | `SuggestionOverlayProvider`, `useSuggestionOverlay`. The in-memory overlay store and bypass refs. |
-| `with-suggestion-overlay.js`| `editor.BlockEdit` HOC that diverts `setAttributes` into the overlay; renders inline `<del>`/`<ins>` marks for text attributes and the `editor.BlockListBlock` filter for pending-state classes. |
-| `inline-formats.js`         | Registers the `gutenberg/suggested-deletion` / `gutenberg/suggested-addition` RichText formats; `markContentDiff` / `stripSuggestionMarks` for the inline preview. |
+| `with-suggestion-overlay.js`| `editor.BlockEdit` HOC that diverts `setAttributes` into the overlay; plus the `editor.BlockListBlock` filter for pending-state classes and move ghosts. |
 | `store-interceptor.js`      | Snapshot/diff/revert subscriber for store-level mutations (attribute and structural); multi-peer accept logic. |
 | `provider.js`               | `useSuggestionsProvider` — the `createSuggestion` / `applySuggestion` / `rejectSuggestion` API. Owns `operationsFromOverlay`, `applyOperations`, `hasAttributeConflict`, `findStructuralOp`, `clearSuggestionMarkerAttributes`, `parseSuggestionPayload`, and the wrapper-aware equality check. |
-| `suggestion-diff.js`        | Inline diff preview rendered in a comment thread (word-level for text attributes, label fallback otherwise). |
+| `word-diff.js`              | `wordDiff` — the word-level LCS behind the summary, bounded by `MAX_DIFF_LENGTH` (characters, applied by callers) and `MAX_DIFF_TOKENS` (tokens, applied internally). |
 | `suggestion-summary.js`     | Compact sidebar summary ("Add: …", "Delete: …", "Format: …") used in collapsed thread lists. |
 | `auto-save.js`              | Debounced background persistence of pending overlays as note comments (replaces the explicit "Submit" affordance from earlier phases). |
 
@@ -210,9 +203,8 @@ The current implementation (`provider.js`) uses comment meta. A future Yjs-backe
 
 In the notes sidebar, a suggestion thread renders:
 
-- **`SuggestionSummary`** — a Docs-style "Add: …", "Delete: …", "Format: …" summary derived from the operations.
+- **`SuggestionSummary`** — a Docs-style "Add: …", "Delete: …", "Format: …" summary derived from the operations. It is the sidebar's sole suggestion renderer; its `wordDiff` engine lives in `word-diff.js`, capped by `MAX_DIFF_LENGTH`/`MAX_DIFF_TOKENS` so a large payload can't freeze the sidebar.
 - **Accept / Reject icon buttons** — checkmark and close icons that trigger the provider's apply/reject flows.
-- **`SuggestionDiff`** (still available) — the full word-level diff preview for when a more detailed view is needed.
 
 ## Yjs v2 Migration Path
 
@@ -236,7 +228,7 @@ These are non-obvious quirks reviewers should keep in mind when reading the code
 
 ## Known Limitations
 
-- **Sub-attribute anchoring**: a suggestion targets a whole attribute (`before` → `after`), not an anchored sub-range. The inline `<del>`/`<ins>` marks are a display-only rendering of that whole-attribute diff, not independently anchored spans. So if the author edits the same attribute while a suggestion is pending, the captured `before` no longer matches and Apply overwrites the interim edit (after a staleness confirmation) rather than merging it. True fragment-level, edit-resilient suggestions depend on the inline-annotation / Yjs attribution infrastructure tracked separately — see [Yjs v2 Migration Path](#yjs-v2-migration-path).
+- **Sub-attribute anchoring**: a suggestion targets a whole attribute (`before` → `after`), not an anchored sub-range. So if the author edits the same attribute while a suggestion is pending, the captured `before` no longer matches and Apply overwrites the interim edit (after a staleness confirmation) rather than merging it. Fragment-level, edit-resilient suggestions for inline text are addressed by the marker work stacked on this PR; the general case depends on the inline-annotation / Yjs attribution infrastructure — see [Yjs v2 Migration Path](#yjs-v2-migration-path).
 - **Permissions**: the Gutenberg REST comment controller overrides `update_item_permissions_check` so users with `edit_post` on the parent can update note comments — **but only for suggestion-lifecycle fields** (`status` limited to `approved`/`hold`, plus `meta._wp_suggestion_status`). Any other field in the update body falls back to core's `edit_comment` check, preventing post editors from rewriting another user's note content. The `_wp_suggestion` and `_wp_suggestion_status` meta `auth_callback`s follow the same `edit_post`-on-parent pattern.
 - **Payload size**: `_wp_suggestion` meta is capped at 64 KB via a `sanitize_callback`. Requests exceeding that limit are rejected (the callback returns an empty string), not truncated — mid-string truncation would produce invalid JSON that `parseSuggestionPayload` would silently drop.
 - **Rich-text format fidelity**: the word-level diff operates on the serialized HTML string, which may produce noisy diffs when formatting (bold, links) changes. Progressive enhancement planned.

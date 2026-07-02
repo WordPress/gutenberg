@@ -1400,11 +1400,6 @@
 			"count": 5
 		}
 	},
-	"packages/editor/src/components/suggestion-mode/suggestion-diff.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/editor/src/components/suggestion-mode/suggestion-summary.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
