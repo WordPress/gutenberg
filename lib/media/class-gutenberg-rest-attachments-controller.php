@@ -373,7 +373,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		// Add per-file, size-aware encode quality for images.
 		if ( rest_is_field_included( 'image_quality', $fields ) ) {
 			if ( wp_attachment_is_image( $item ) ) {
-				$mime_type = get_post_mime_type( $item );
+				$mime_type = (string) get_post_mime_type( $item );
 				$filename  = get_attached_file( $item->ID );
 
 				// Resolve the output MIME type the same way core's
@@ -389,8 +389,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				$output_mime    = $output_formats[ $mime_type ] ?? $mime_type;
 
 				$metadata    = wp_get_attachment_metadata( $item->ID, true );
-				$full_width  = ( is_array( $metadata ) && isset( $metadata['width'] ) ) ? (int) $metadata['width'] : 0;
-				$full_height = ( is_array( $metadata ) && isset( $metadata['height'] ) ) ? (int) $metadata['height'] : 0;
+				$full_width  = max( 0, ( is_array( $metadata ) && isset( $metadata['width'] ) ) ? (int) $metadata['width'] : 0 );
+				$full_height = max( 0, ( is_array( $metadata ) && isset( $metadata['height'] ) ) ? (int) $metadata['height'] : 0 );
 
 				$full_quality = $this->get_image_encode_quality(
 					$output_mime,
@@ -994,28 +994,28 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 * https://github.com/WordPress/wordpress-develop/pull/11856; until it lands
 	 * the function_exists() guard falls back to the inline implementation below.
 	 *
-	 * @param string $output_mime The output image MIME type, e.g. 'image/jpeg'.
-	 * @param array  $size        Dimensions ('width', 'height') for the wp_editor_set_quality filter.
-	 * @return int Encode quality between 1 and 100.
+	 * @param non-empty-string $mime_type The output image MIME type, e.g. 'image/jpeg'.
+	 * @param array{ width?: non-negative-int, height?: non-negative-int } $size Dimensions ('width', 'height') for the wp_editor_set_quality filter.
+	 * @return int<1, 100> Encode quality between 1 and 100.
 	 */
-	private function get_image_encode_quality( $output_mime, $size ) {
+	private function get_image_encode_quality( string $mime_type, array $size = array() ): int {
 		if ( function_exists( 'wp_get_image_encode_quality' ) ) {
-			return wp_get_image_encode_quality( $output_mime, $size );
+			return wp_get_image_encode_quality( $mime_type, $size );
 		}
 
 		// Mirror WP_Image_Editor::get_default_quality(): WebP defaults to 86,
 		// everything else to 82.
-		$default_quality = ( 'image/webp' === $output_mime ) ? 86 : 82;
+		$default_quality = ( 'image/webp' === $mime_type ) ? 86 : 82;
 
 		/** This filter is documented in wp-includes/class-wp-image-editor.php */
 		$quality = apply_filters(
 			'wp_editor_set_quality', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 			$default_quality,
-			$output_mime,
+			$mime_type,
 			$size
 		);
 
-		if ( 'image/jpeg' === $output_mime ) {
+		if ( 'image/jpeg' === $mime_type ) {
 			/** This filter is documented in wp-includes/class-wp-image-editor.php */
 			$quality = apply_filters( 'jpeg_quality', $quality, 'image_resize' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		}
@@ -1026,6 +1026,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			$quality = (int) $quality;
 		}
 
+		// Reset out-of-range values to the default, matching WP_Image_Editor::set_quality().
 		if ( $quality < 0 || $quality > 100 ) {
 			$quality = $default_quality;
 		}
@@ -1035,6 +1036,6 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			$quality = 1;
 		}
 
-		return (int) $quality;
+		return $quality;
 	}
 }
