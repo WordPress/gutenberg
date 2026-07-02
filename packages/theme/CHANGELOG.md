@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.17.0 (2026-06-30)
+
 ### Breaking Changes
 
 -   Remove the root `CornerRadiusPreset` type export. Derive it from `ThemeProvider`'s `cornerRadius` prop instead ([#79620](https://github.com/WordPress/gutenberg/pull/79620)).
