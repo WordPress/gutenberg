@@ -7,7 +7,10 @@ import type { ReactNode } from 'react';
 /**
  * WordPress dependencies
  */
-import { Card, Icon, Stack } from '@wordpress/ui';
+import { info } from '@wordpress/icons';
+// Dashboard is still experimental.
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Card, Icon, IconButton, Stack } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
 
 /**
@@ -17,7 +20,8 @@ import styles from './widget-header.module.css';
 
 export interface WidgetHeaderProps {
 	/**
-	 * Widget type, source of the icon and title shown as identity.
+	 * Widget type, source of the icon, title, and info note shown as
+	 * identity.
 	 */
 	widgetType?: WidgetType;
 
@@ -83,6 +87,16 @@ export function WidgetHeader( {
 					<Card.Title id={ titleId } render={ <h2 /> }>
 						{ widgetType.title }
 					</Card.Title>
+
+					{ widgetType.info && (
+						<IconButton
+							icon={ info }
+							label={ widgetType.info }
+							variant="minimal"
+							tone="neutral"
+							size="compact"
+						/>
+					) }
 				</Stack>
 			) }
 			{ children && <div className={ styles.toolbar }>{ children }</div> }

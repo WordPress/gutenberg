@@ -45,6 +45,7 @@ const widgetTypes: WidgetType[] = [
 		apiVersion: 1,
 		name: 'test/greet',
 		title: 'Greet',
+		info: 'Greetings at a glance.',
 		renderModule: 'test-greet-module',
 	},
 ];
@@ -99,6 +100,16 @@ describe( 'WidgetDashboard', () => {
 		expect( await screen.findByTestId( 'greeting' ) ).toHaveTextContent(
 			'hello'
 		);
+	} );
+
+	it( 'surfaces the widget type info note in the header', async () => {
+		render( <Harness /> );
+
+		expect(
+			await screen.findByRole( 'button', {
+				name: 'Greetings at a glance.',
+			} )
+		).toBeInTheDocument();
 	} );
 
 	it( 'threads setAttributes into onLayoutChange on commit with merged attributes', async () => {

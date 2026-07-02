@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `WidgetHeader`: surface the widget type's `info` note as a tooltip
+    affordance beside the title.
+
 ## 0.2.0 (2026-07-01)
 
 ## 0.1.0 (2026-06-24)
