@@ -21,7 +21,8 @@
 
 ### Documentation
 
-- Fix `overriden` typo to `overridden` in README. ([#79331](https://github.com/WordPress/gutenberg/pull/79331))
+-   Fix `overriden` typo to `overridden` in README. ([#79331](https://github.com/WordPress/gutenberg/pull/79331))
+-   Add component documentation for `DataViews`, `DataViewsPicker`, and `DataForm` components ([#79460](https://github.com/WordPress/gutenberg/pull/79460)).
 
 ### Internal
 

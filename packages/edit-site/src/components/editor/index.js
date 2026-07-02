@@ -1,14 +1,9 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
-import { Button, __unstableMotion as motion } from '@wordpress/components';
-import { useInstanceId, useReducedMotion } from '@wordpress/compose';
+import { Button } from '@wordpress/components';
+import { useInstanceId } from '@wordpress/compose';
 import {
 	EditorKeyboardShortcutsRegister,
 	privateApis as editorPrivateApis,
@@ -21,7 +16,7 @@ import { useCallback } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { decodeEntities } from '@wordpress/html-entities';
-import { Icon, arrowUpLeft, arrowUpRight } from '@wordpress/icons';
+import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -37,7 +32,6 @@ import { isPreviewingTheme } from '../../utils/is-previewing-theme';
 import SaveButton from '../save-button';
 import SavePanel from '../save-panel';
 import SiteEditorMoreMenu from '../more-menu';
-import SiteIcon from '../site-icon';
 import useEditorIframeProps from '../block-editor/use-editor-iframe-props';
 import { ViewportSync } from '../block-editor/use-viewport-sync';
 import useEditorTitle from './use-editor-title';
@@ -52,30 +46,6 @@ import SitePreview from './site-preview';
 const { Editor, BackButton } = unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
-
-const toggleHomeIconVariants = {
-	edit: {
-		opacity: 0,
-		scale: 0.2,
-	},
-	hover: {
-		opacity: 1,
-		scale: 1,
-		clipPath: 'inset( 22% round 2px )',
-	},
-};
-
-const siteIconVariants = {
-	edit: {
-		clipPath: 'inset(0% round 0px)',
-	},
-	hover: {
-		clipPath: 'inset( 22% round 2px )',
-	},
-	tap: {
-		clipPath: 'inset(0% round 0px)',
-	},
-};
 
 function getListPathForPostType( postType ) {
 	switch ( postType ) {
@@ -113,7 +83,6 @@ function getNavigationPath( location, postType ) {
 }
 
 export default function EditSiteEditor( { isHomeRoute = false } ) {
-	const disableMotion = useReducedMotion();
 	const location = useLocation();
 	const history = useHistory();
 	const { canvas = 'view' } = location.query;
@@ -123,15 +92,10 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 	// deprecated sync state with url
 	useSyncDeprecatedEntityIntoState( entity );
 	const { postType, postId, context } = entity;
-	const { isBlockBasedTheme, hasSiteIcon } = useSelect( ( select ) => {
-		const { getCurrentTheme, getEntityRecord } = select( coreDataStore );
-		const siteData = getEntityRecord( 'root', '__unstableBase', undefined );
-
-		return {
-			isBlockBasedTheme: getCurrentTheme()?.is_block_theme,
-			hasSiteIcon: !! siteData?.site_icon_url,
-		};
-	}, [] );
+	const isBlockBasedTheme = useSelect(
+		( select ) => select( coreDataStore ).getCurrentTheme()?.is_block_theme,
+		[]
+	);
 	const postWithTemplate = !! context?.postId;
 	useEditorTitle(
 		postWithTemplate ? context.postType : postType,
@@ -204,11 +168,6 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 	);
 
 	const isReady = ! isLoading;
-	const transition = {
-		duration: disableMotion ? 0 : 0.2,
-	};
-
-	const hasAdminBarInEditor = window.__experimentalAdminBarInEditor;
 
 	return ! isBlockBasedTheme && isHomeRoute ? (
 		<SitePreview />
@@ -246,14 +205,7 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 						<BackButton>
 							{ ( { length } ) =>
 								length <= 1 && (
-									<motion.div
-										className="edit-site-editor__view-mode-toggle"
-										transition={ transition }
-										animate="edit"
-										initial="edit"
-										whileHover="hover"
-										whileTap="tap"
-									>
+									<div className="edit-site-editor__view-mode-toggle">
 										<Button
 											__next40pxDefaultSize
 											label={ __( 'Open Navigation' ) }
@@ -275,52 +227,17 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 													}
 												);
 											} }
-										>
-											{ ! hasAdminBarInEditor && (
-												<motion.div
-													variants={
-														! disableMotion &&
-														siteIconVariants
-													}
-												>
-													<SiteIcon className="edit-site-editor__view-mode-toggle-icon" />
-												</motion.div>
-											) }
-										</Button>
-										{ hasAdminBarInEditor ? (
-											<div className="edit-site-editor__back-icon">
-												<Icon
-													icon={
-														isRTL()
-															? arrowUpRight
-															: arrowUpLeft
-													}
-												/>
-											</div>
-										) : (
-											<motion.div
-												className={ clsx(
-													'edit-site-editor__back-icon',
-													{
-														'has-site-icon':
-															hasSiteIcon,
-													}
-												) }
-												variants={
-													! disableMotion &&
-													toggleHomeIconVariants
+										/>
+										<div className="edit-site-editor__back-icon">
+											<Icon
+												icon={
+													isRTL()
+														? chevronRight
+														: chevronLeft
 												}
-											>
-												<Icon
-													icon={
-														isRTL()
-															? arrowUpRight
-															: arrowUpLeft
-													}
-												/>
-											</motion.div>
-										) }
-									</motion.div>
+											/>
+										</div>
+									</div>
 								)
 							}
 						</BackButton>

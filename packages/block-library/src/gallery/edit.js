@@ -663,7 +663,6 @@ export default function GalleryEdit( props ) {
 								min={ 1 }
 								max={ Math.min( MAX_COLUMNS, images.length ) }
 								required
-								__next40pxDefaultSize
 							/>
 						</ToolsPanelItem>
 					) }
@@ -774,7 +773,6 @@ export default function GalleryEdit( props ) {
 									} )
 								}
 								isBlock
-								__next40pxDefaultSize
 								help={ __(
 									'Adjust the appearance of buttons in the lightbox.'
 								) }

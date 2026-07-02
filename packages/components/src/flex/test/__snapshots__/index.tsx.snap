@@ -5,27 +5,25 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -1,22 +1,18 @@
+@@ -1,20 +1,18 @@
   <div
-    class="components-flex css-4xxgm8-PolymorphicDiv-Flex-base-ItemsRow e19lxcc00"
+    class="css-a57899-Flex css-lmbxer-base css-1ozeagb-ItemsRow components-flex"
 -   data-testid="flex"
 +   data-testid="base-flex"
     data-wp-c16t="true"
     data-wp-component="Flex"
   >
     <div
-      class="components-flex-item css-11ygw1k-PolymorphicDiv-Item-sx-Base e19lxcc00"
+      class="css-1rk86jm-Item-base-itemStyles components-flex-item"
       data-wp-c16t="true"
       data-wp-component="FlexItem"
     >
       Item
     </div>
--   <div
--     class="css-1ragr82-PolymorphicDiv e19lxcc00"
--   />
+-   <div />
 -   <div />
     <div
-      class="components-flex-item components-flex-block css-1gfd63q-PolymorphicDiv-Item-sx-Base-block e19lxcc00"
+      class="css-7ugsc8-Item-base-block-itemStyles components-flex-item components-flex-block"
       data-wp-c16t="true"
       data-wp-component="FlexBlock"
     >
@@ -36,8 +34,11 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-@@ -1,15 +1,15 @@
+@@ -1,18 +1,18 @@
   Array [
+    Object {
+      "display": "flex",
+    },
     Object {
 -     "-ms-flex-align": "flex-start",
 +     "-ms-flex-align": "center",
@@ -51,11 +52,11 @@ Snapshot Diff:
       "-webkit-justify-content": "space-between",
 -     "align-items": "flex-start",
 +     "align-items": "center",
-      "display": "flex",
       "flex-direction": "row",
       "gap": "calc(4px * 2)",
       "justify-content": "space-between",
       "width": "100%",
+    },
 `;
 
 exports[`props should render correctly 1`] = `
@@ -64,6 +65,9 @@ exports[`props should render correctly 1`] = `
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+}
+
+.emotion-1 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -78,11 +82,11 @@ exports[`props should render correctly 1`] = `
   width: 100%;
 }
 
-.emotion-0>* {
+.emotion-2>* {
   min-width: 0;
 }
 
-.emotion-2 {
+.emotion-3 {
   display: block;
   max-height: 100%;
   max-width: 100%;
@@ -102,20 +106,20 @@ exports[`props should render correctly 1`] = `
 }
 
 <div
-  class="components-flex emotion-0 emotion-1"
+  class="emotion-0 emotion-1 emotion-2 components-flex"
   data-testid="base-flex"
   data-wp-c16t="true"
   data-wp-component="Flex"
 >
   <div
-    class="components-flex-item emotion-2 emotion-1"
+    class="emotion-3 components-flex-item"
     data-wp-c16t="true"
     data-wp-component="FlexItem"
   >
     Item
   </div>
   <div
-    class="components-flex-item components-flex-block emotion-4 emotion-1"
+    class="emotion-4 components-flex-item components-flex-block"
     data-wp-c16t="true"
     data-wp-component="FlexBlock"
   >
@@ -129,7 +133,9 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-  Array [
+@@ -3,18 +3,17 @@
+      "display": "flex",
+    },
     Object {
       "-ms-flex-align": "center",
       "-ms-flex-direction": "row",
@@ -142,7 +148,6 @@ Snapshot Diff:
 -     "-webkit-justify-content": "flex-start",
 +     "-webkit-justify-content": "space-between",
       "align-items": "center",
-      "display": "flex",
       "flex-direction": "row",
       "gap": "calc(4px * 2)",
 -     "justify-content": "flex-start",
@@ -154,25 +159,5 @@ Snapshot Diff:
 
 exports[`props should render spacing 1`] = `
 Snapshot Diff:
-- Received styles
-+ Base styles
-
-  Array [
-    Object {
--     "min-width": "0",
--   },
--   Object {
-      "-ms-flex": "1",
-      "-webkit-flex": "1",
-      "display": "block",
-      "flex": "1",
-      "max-height": "100%",
-      "max-width": "100%",
-      "min-height": "0",
-+     "min-width": "0",
-+   },
-+   Object {
-      "min-width": "0",
-    },
-  ]
+Compared values have no visual difference.
 `;

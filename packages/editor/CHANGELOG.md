@@ -5,6 +5,7 @@
 ### New Features
 
 -   Add an "Optimize" inspector control to image-bearing blocks (image, cover, media-text, post-featured-image, site-logo) that re-processes a previously uploaded image client-side and repoints the block at the optimized attachment. Shown only when client-side media processing is active ([#79509](https://github.com/WordPress/gutenberg/pull/79509)).
+-   Add an "Attachments" source to the block inserter's Media tab, listing images attached to the current post with the ability to attach and detach them ([#79336](https://github.com/WordPress/gutenberg/pull/79336)).
 
 ## 14.49.0 (2026-06-24)
 

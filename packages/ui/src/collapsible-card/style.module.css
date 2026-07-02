@@ -68,12 +68,12 @@
 			margin-block-start: var(--wp-ui-card-header-content-margin);
 
 			/* Clip while collapsed or transitioning so the panel collapses
-			   cleanly. The `overflowVisible` class is set once the open
+			   cleanly. The `overflow-visible` class is set once the open
 			   transition has settled, dropping the clip so descendant
 			   focus rings aren't cut off. */
 			overflow: hidden;
 
-			&.overflowVisible {
+			&.overflow-visible {
 				overflow: visible;
 			}
 

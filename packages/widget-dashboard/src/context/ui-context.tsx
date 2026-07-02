@@ -13,8 +13,6 @@ import {
 	useState,
 } from '@wordpress/element';
 
-type DrawerSide = 'left' | 'right';
-
 interface DashboardUIContextValue {
 	inserterOpen: boolean;
 	setInserterOpen: ( next: boolean ) => void;
@@ -32,23 +30,6 @@ interface DashboardUIContextValue {
 	 */
 	settingsWidgetUuid: string | null;
 	setSettingsWidgetUuid: ( next: string | null ) => void;
-
-	/**
-	 * Edge the settings drawer slides in from. The gear sets it from the
-	 * widget's on-screen position so the drawer opens on the side away
-	 * from the widget, trying not to cover it.
-	 */
-	settingsDrawerSide: DrawerSide;
-	setSettingsDrawerSide: ( next: DrawerSide ) => void;
-
-	/**
-	 * Inline-start inset (px) the settings drawer is offset by when it
-	 * opens from the left, so it clears fixed page chrome (the WordPress
-	 * admin menu) instead of sliding over it. `0` when there's nothing to
-	 * clear.
-	 */
-	settingsDrawerInset: number;
-	setSettingsDrawerInset: ( next: number ) => void;
 }
 
 const Context = createContext< DashboardUIContextValue | null >( null );
@@ -85,9 +66,6 @@ export function WidgetDashboardUIProvider( { children }: ProviderProps ) {
 	const [ settingsWidgetUuid, setSettingsWidgetUuid ] = useState<
 		string | null
 	>( null );
-	const [ settingsDrawerSide, setSettingsDrawerSide ] =
-		useState< DrawerSide >( 'right' );
-	const [ settingsDrawerInset, setSettingsDrawerInset ] = useState( 0 );
 
 	const value = useMemo< DashboardUIContextValue >(
 		() => ( {
@@ -99,18 +77,12 @@ export function WidgetDashboardUIProvider( { children }: ProviderProps ) {
 			setResetDialogOpen,
 			settingsWidgetUuid,
 			setSettingsWidgetUuid,
-			settingsDrawerSide,
-			setSettingsDrawerSide,
-			settingsDrawerInset,
-			setSettingsDrawerInset,
 		} ),
 		[
 			inserterOpen,
 			layoutSettingsOpen,
 			resetDialogOpen,
 			settingsWidgetUuid,
-			settingsDrawerSide,
-			settingsDrawerInset,
 		]
 	);
 

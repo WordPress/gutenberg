@@ -1,6 +1,6 @@
 == Changelog ==
 
-= 23.5.0-rc.1 =
+= 23.5.0 =
 
 ## Changelog
 
@@ -59,6 +59,7 @@
 - Block Editor: Allow overriding `disableContentOnlyForTemplateParts` setting. ([79191](https://github.com/WordPress/gutenberg/pull/79191))
 - Editor: Hide cmd palette shortcut in document bar when admin bar is shown. ([79060](https://github.com/WordPress/gutenberg/pull/79060))
 - Feature: Need to add “Show More” / “Show Less” toggle in Note. ([77446](https://github.com/WordPress/gutenberg/pull/77446))
+- Integrate Resizable Editor with Device Preview and add Responsive editing. ([75121](https://github.com/WordPress/gutenberg/pull/75121))
 - Notes: Simplify 'Show more/less' collapse logic. ([79261](https://github.com/WordPress/gutenberg/pull/79261))
 - Rename `Toolbar in editor` experiment to match iteration issue. ([79074](https://github.com/WordPress/gutenberg/pull/79074))
 - Revisions screen with picker-activity layout. ([77333](https://github.com/WordPress/gutenberg/pull/77333))
@@ -119,12 +120,6 @@
 - Block bindings : Add support to list-item. ([78947](https://github.com/WordPress/gutenberg/pull/78947))
 
 
-### New APIs
-
-#### Site Editor
-- Theme: Promote ThemeProvider to stable API. ([78958](https://github.com/WordPress/gutenberg/pull/78958))
-
-
 ### Bug Fixes
 
 - Block Bindings: Preserve nested lists when binding List Item content. ([79346](https://github.com/WordPress/gutenberg/pull/79346))
@@ -139,6 +134,7 @@
 - Editor: Disable saving while a non-post entity is being saved. ([79069](https://github.com/WordPress/gutenberg/pull/79069))
 - Editor: Guard PostViewLink against post types without a labels object. ([79160](https://github.com/WordPress/gutenberg/pull/79160))
 - Mark all controlled/mode block changes non-persistent. ([79350](https://github.com/WordPress/gutenberg/pull/79350))
+- Paste: move spaces out of inline formatting elements. ([79637](https://github.com/WordPress/gutenberg/pull/79637))
 - RTC: Fix code editor cursor jumping to the end on remote sync. ([79005](https://github.com/WordPress/gutenberg/pull/79005))
 - Revisions: Ignore empty `[]/{}` meta values in the Meta diff panel. ([79185](https://github.com/WordPress/gutenberg/pull/79185))
 - Style Book: Fix crash when previewing variations for blocks without examples. ([79131](https://github.com/WordPress/gutenberg/pull/79131))
@@ -305,6 +301,7 @@
 
 #### Site Editor
 - Patterns: Migrate modals to @wordpress/ui components and fix rename input width. ([79233](https://github.com/WordPress/gutenberg/pull/79233))
+- Theme: Restore public ThemeProvider export. ([79620](https://github.com/WordPress/gutenberg/pull/79620))
 
 #### Icons
 - Use snake_case `file_path` key in icon registry. ([79100](https://github.com/WordPress/gutenberg/pull/79100))
@@ -328,6 +325,8 @@
 
 #### Build Tooling
 - Build: Add GUTENBERG_CHECK_INSTALLED_DEPS env var to opt out of installed-deps check. ([79068](https://github.com/WordPress/gutenberg/pull/79068))
+- Build: Replace unmaintained release actions. ([78258](https://github.com/WordPress/gutenberg/pull/78258))
+- Build: Use GUTENBERG_TOKEN when creating the release draft. ([79747](https://github.com/WordPress/gutenberg/pull/79747))
 - Configure Flakiness.io reporting for end-to-end tests. ([79173](https://github.com/WordPress/gutenberg/pull/79173))
 - Handle WP.org SVN missing tag warnings. ([79257](https://github.com/WordPress/gutenberg/pull/79257))
 - Remove Lighthouse patch. ([79319](https://github.com/WordPress/gutenberg/pull/79319))
@@ -376,13 +375,14 @@ The following PRs were merged by first-time contributors:
 - @ishitaj34: Gallery: Hide Navigation button type when lightbox editing is disabled. ([79147](https://github.com/WordPress/gutenberg/pull/79147))
 - @lonesahilnazir: Image block: Remove duplicate data-wp-bind--srcset in the lightbox overlay. ([79202](https://github.com/WordPress/gutenberg/pull/79202))
 - @sdnunca: Plugins API: Fix the plugin 'render' property validation. ([79315](https://github.com/WordPress/gutenberg/pull/79315))
+- @slackticus: Build: Replace unmaintained release actions. ([78258](https://github.com/WordPress/gutenberg/pull/78258))
 
 
 ## Contributors
 
 The following contributors merged PRs in this release:
 
-@aaronrobertshaw @adamsilverstein @adamziel @aduth @andrewserong @aslushnikov @cbravobernal @chihsuan @ciampo @CookieDarb @desrosj @dhruvikpatel18 @fushar @hbhalodia @himanshupathak95 @i-am-chitti @im3dabasia @ishitaj34 @jameskoster @jasmussen @jordesign @jorgefilipecosta @jsnajdr @juanfra @kushagra-goyal-14 @lonesahilnazir @Mamaduka @manzoorwanijk @maxschmeling @Mayank-Tripathi32 @mcsf @mirka @Mustafabharmal @ntsekouras @oandregal @ralucaStan @ramonjd @retrofox @rushikeshmore @SainathPoojary @saulyz @scruffian @sdnunca @shail-mehta @shekharnwagh @shimotmk @shrivastavanolo @t-hamano @taipeicoder @talldan @tellthemachines @tyxla @USERSATOSHI
+@aaronrobertshaw @adamsilverstein @adamziel @aduth @andrewserong @aslushnikov @cbravobernal @chihsuan @ciampo @CookieDarb @desrosj @dhruvikpatel18 @ellatrix @fushar @hbhalodia @himanshupathak95 @i-am-chitti @im3dabasia @ishitaj34 @jameskoster @jasmussen @jordesign @jorgefilipecosta @jsnajdr @juanfra @kushagra-goyal-14 @lonesahilnazir @Mamaduka @manzoorwanijk @maxschmeling @Mayank-Tripathi32 @mcsf @mirka @Mustafabharmal @ntsekouras @oandregal @ralucaStan @ramonjd @retrofox @rushikeshmore @SainathPoojary @saulyz @scruffian @sdnunca @shail-mehta @shekharnwagh @shimotmk @shrivastavanolo @slackticus @t-hamano @taipeicoder @talldan @tellthemachines @tyxla @USERSATOSHI
 
 
 = 23.4.0 =

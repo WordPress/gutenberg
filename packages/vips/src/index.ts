@@ -667,21 +667,41 @@ export async function rotateImage(
 }
 
 /**
- * Determines whether an image has an alpha channel.
+ * Determines whether an image has visible transparency.
+ *
+ * Channel presence alone is not enough: PNG encoders often retain an alpha
+ * channel even when every pixel is fully opaque, and animated GIFs declare
+ * a transparent color index for disposal-method frame compositing without
+ * ever rendering a visibly transparent pixel. This check loads the first
+ * frame (any transparency there is visible — there is no previous frame to
+ * inherit from) and samples the alpha channel for an actually-transparent
+ * pixel.
  *
  * @param buffer Original file object.
- * @return Whether the image has an alpha channel.
+ * @return Whether any pixel in the image is partially or fully transparent.
  */
 export async function hasTransparency(
 	buffer: ArrayBuffer
 ): Promise< boolean > {
 	const vips = await getVips();
 	const image = vips.Image.newFromBuffer( buffer );
-	const hasAlpha = image.hasAlpha();
+
+	if ( ! image.hasAlpha() ) {
+		cleanup?.();
+		return false;
+	}
+
+	// `min()` on the alpha band is one read of a single channel of frame 0.
+	// For uchar (GIF/8-bit PNG) the opaque value is 255; 16-bit PNGs (rare
+	// inputs here) use 65535. Anything lower means at least one pixel is
+	// transparent.
+	const alpha = image.extractBand( image.bands - 1 );
+	const minAlpha = alpha.min();
+	const opaqueValue = image.format === 'ushort' ? 65535 : 255;
 
 	cleanup?.();
 
-	return hasAlpha;
+	return minAlpha < opaqueValue;
 }
 
 // Re-export with vips prefix for worker module compatibility.
