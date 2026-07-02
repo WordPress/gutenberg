@@ -7,7 +7,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { mapMarker } from '@wordpress/icons';
-import { Icon, Link, Stack, Text, Tooltip, EmptyState } from '@wordpress/ui';
+import { Icon, Link, Stack, EmptyState } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -184,39 +184,6 @@ export default function WordPressEvents( {
 					>
 						{ __( 'WordCamps' ) }
 					</Link>
-
-					{ locationLabel && (
-						<div className={ styles.footerLocation }>
-							<Tooltip.Root>
-								<Tooltip.Trigger
-									aria-label={ __( 'Change from settings.' ) }
-									render={
-										<Stack
-											direction="row"
-											align="center"
-											gap="xs"
-										>
-											<Icon
-												icon={ mapMarker }
-												size={ 16 }
-											/>
-											<Text
-												variant="body-sm"
-												className={
-													styles.locationSummary
-												}
-											>
-												{ locationLabel }
-											</Text>
-										</Stack>
-									}
-								/>
-								<Tooltip.Popup>
-									{ __( 'Change from settings.' ) }
-								</Tooltip.Popup>
-							</Tooltip.Root>
-						</div>
-					) }
 				</Stack>
 			</div>
 		</Stack>
