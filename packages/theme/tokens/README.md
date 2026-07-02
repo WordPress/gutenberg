@@ -23,7 +23,7 @@ Each JSON file contains both primitive and semantic token definitions in a hiera
 
 ## Token Naming
 
-Semantic tokens follow a consistent naming pattern that encodes the token's purpose. See the [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md) for the naming pattern, the meaning of each segment (type, property, target, tone, emphasis, state), and guidance on how to pick the right token.
+Semantic tokens follow a consistent naming pattern that encodes the token's purpose. See the [Design Token Guidance](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/token-guidance.md) for the naming pattern, the meaning of each segment (type, property, target, tone, emphasis, state), and guidance on how to pick the right token.
 
 ## Primitive and Semantic Tokens
 
