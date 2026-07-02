@@ -822,7 +822,10 @@ test.describe( 'Client-side media processing', () => {
 		const originalSize = original.media_details?.filesize;
 
 		// Open the block inspector, expand the Optimize panel, and run it.
+		// The image block inspector defaults to the Content tab; the
+		// Optimize panel lives on the Settings tab.
 		await editor.openDocumentSettingsSidebar();
+		await page.getByRole( 'tab', { name: 'Settings' } ).click();
 		await page
 			.getByRole( 'button', { name: 'Optimize', exact: true } )
 			.click();
