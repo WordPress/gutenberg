@@ -6,7 +6,7 @@ Suggestions extend the Notes feature (block-level comments) to support proposed 
 
 There are two complementary mechanisms, by change type:
 
-- **Inline text and formatting changes** (typing, deleting, type-over, paste, bold/italic/link toggles, and the residual `onChange` seams — IME commits, autocorrect, drag-drop, multi-line paste) live as anchored `core/suggestion` `<mark>` markers **in block content** (Option B), re-resolved on read — edit-resilient and per-author. See [Inline suggestion markers](#inline-suggestion-markers).
+- **Inline text and formatting changes** (typing, deleting, type-over, paste, bold/italic/link toggles, and the residual `onChange` seams — IME commits, autocorrect, drag-drop) live as anchored `core/suggestion` `<mark>` markers **in block content** (Option B), re-resolved on read — edit-resilient and per-author. See [Inline suggestion markers](#inline-suggestion-markers).
 - **Non-text attribute changes** (alignment, heading level, color) and **structural changes** (insert / remove / move blocks) are captured as versioned operation payloads on a note comment via an in-memory **overlay**, auto-saved in the background after a short idle window. The overlay's remaining role is this attribute-only revert shim — it never renders inline content diffs anymore.
 
 The feature is designed around a swappable provider interface so the storage backend can evolve from comment-meta (today) to Yjs `AttributionManager` (future) without changing the UI or accept/reject logic.
@@ -72,7 +72,7 @@ Inline **text** changes — typing, deleting (character, word, or line), type-ov
 
 Inline **formatting** changes (bold / italic / link toggled over a run, the text unchanged) are markers too: the reformatted run is wrapped in a single `format`-type marker carrying the *proposed* formatting — the Google Docs model, the text shown once and never duplicated into a paired del/ins diff. The overlay HOC's `setAttributes` seam detects the format-only diff (`planFormatMarkers`) and hands it to the singleton `SuggestionFormatKeyboard`, which opens the note (recording the original run as `beforeHTML` so a reject can restore it) and writes the marker.
 
-Text edits that reach a block as a whole new `content` value with no interceptable input event — a committed IME composition, autocorrect (`insertReplacementText`), drag-drop, multi-line paste — are diffed into markers by the singleton content reconciler (`SuggestionContentReconciler`): the HOC plans the edit against the previous value (`planEditMarkers`) and, when every planned action opens a fresh note, the reconciler executes it. Both singletons serialize their note-then-marker writes per block through a shared write queue and re-validate the live content around the async note POST, abandoning (and trashing the note of) a plan the content has moved past.
+Text edits that reach a block as a whole new `content` value with no interceptable input event — a committed IME composition, autocorrect (`insertReplacementText`), drag-drop — are diffed into markers by the singleton content reconciler (`SuggestionContentReconciler`): the HOC plans the edit against the previous value (`planEditMarkers`) and, when every planned action opens a fresh note, the reconciler executes it. Both singletons serialize their note-then-marker writes per block through a shared write queue and re-validate the live content around the async note POST, abandoning (and trashing the note of) a plan the content has moved past.
 
 See [Inline suggestion markers](#inline-suggestion-markers) below for the full model. The overlay path described in this section handles what's left: **non-text attribute** suggestions (alignment, heading level, color) and inline edits the marker planners decline (an edit straddling an existing marker, a format toggle overlapping one). Values captured into the overlay — baseline and proposed alike — are stripped of live `core/suggestion` markers first (`stripSuggestionMarkers`), so accepting an attribute suggestion later can never replay (and resurrect) a marker whose suggestion was resolved in the interim. By construction the overlay no longer renders inline content diffs — the old `<del>`/`<ins>` preview and its display-only format types are gone.
 
@@ -138,7 +138,8 @@ where `data-suggestion-id` is the linked note's comment id, `data-suggestion-typ
 | Type over a selection | `del` marker on the old text + an `add` run for the replacement (two notes) |
 | Single-line paste | `add` marker (handled on the `paste` event, ahead of the editor's paste pipeline) |
 | Bold / italic / link toggle | single `format` marker wrapping the reformatted run (via `SuggestionFormatKeyboard`) |
-| IME commit, autocorrect, drag-drop, multi-line paste | diffed into `add`/`del` markers by `SuggestionContentReconciler` |
+| IME commit, autocorrect, drag-drop | diffed into `add`/`del` markers by `SuggestionContentReconciler` |
+| Multi-line paste | the paste pipeline commits the merged value to the block-editor store directly (not through `setAttributes`), so the store interceptor captures it as a whole-attribute suggestion — never a raw commit, never an inline overlay diff. Converting this capture into inline markers is a possible follow-up. |
 
 The first keystroke of a run opens the note asynchronously; keystrokes during that window are buffered (typing) or counted (deletion) and applied when the comment id resolves. Edits whose range overlaps an existing suggestion marker are left alone (guarded by `formatsRangeHasSuggestion` / `valueRangeHasSuggestion`) rather than nesting or re-attributing another suggestion's marker.
 
@@ -169,7 +170,7 @@ The Suggest-mode subsystem lives in `packages/editor/src/components/suggestion-m
 | `suggestion-deletion-keyboard.js` | `beforeinput`/`cut`-capture handler turning selection, collapsed-cursor, word/line deletes and cut into `del` markers. |
 | `suggestion-addition-keyboard.js` | `beforeinput`/`paste`-capture handler turning typing, type-over, and single-line paste into `add` markers (and the `del` half of a type-over). |
 | `suggestion-format-keyboard.js` | Singleton owning the write side of `format` markers: opens the note (with `beforeHTML`/`afterHTML`) and writes the reformatted run wrapped in one marker. |
-| `suggestion-content-reconciler.js` | Singleton executing marker plans for `onChange`-only text edits (IME commit, autocorrect, drag-drop, multi-line paste). |
+| `suggestion-content-reconciler.js` | Singleton executing marker plans for `onChange`-only text edits (IME commit, autocorrect, drag-drop). |
 | `keyboard-target.js`        | Shared DOM-target guards (`isEventTargetSelectedRichText`, `getCandidateDocuments`) keeping the capture keyboards off sidebar/plugin editables. |
 | `grapheme-boundaries.js`    | Grapheme-safe range stepping for collapsed deletes (surrogate pairs, ZWJ sequences, combining marks). |
 | `use-move-ghosts.js`        | `MoveGhostsProvider` — computes the document-wide pending-move ghost index once and shares it over context; per-block `useMoveGhosts()` is a plain context read. |

@@ -211,7 +211,7 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 		).toBeVisible();
 	} );
 
-	test( 'seam: pasting multi-line text becomes addition markers', async ( {
+	test( 'seam: a multi-line paste is captured as an attribute suggestion, never a raw commit', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -231,10 +231,15 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 
 		/*
 		 * A REAL multi-line paste: the addition keyboard declines anything
-		 * matching /[\r\n]/, so this exercises the editor's own paste
-		 * pipeline feeding RichText a fresh `content` value, which the
-		 * content reconciler diffs into markers — not the single-line
-		 * keyboard shortcut path the old (newline-free) clipboard data took.
+		 * matching /[\r\n]/, so the editor's own paste pipeline handles it.
+		 * That pipeline commits the merged value to the block-editor store
+		 * directly (not through the block's `setAttributes` prop), so the
+		 * STORE INTERCEPTOR — not the content reconciler — captures it,
+		 * reverting the store to baseline and diverting the pasted value
+		 * into the attribute overlay as a whole-attribute suggestion.
+		 * Converting that capture into inline markers is a possible
+		 * follow-up; what this safety net pins is that the paste is never
+		 * committed raw and never rendered as an overlay inline diff.
 		 */
 		pageUtils.setClipboardData( { plainText: ' one two\nthree four' } );
 		await pageUtils.pressKeys( 'primary+v' );
@@ -242,16 +247,18 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 		await waitForSuggestionSaved( page );
 		await deselect( page );
 
-		// The whole pasted run — including the line break — lands as marker-
-		// diffed content on the block, not as a raw content change.
-		const addMarker = paragraph.locator(
-			`${ SUGGESTION_MARK }[data-suggestion-type="add"]`
-		);
-		await expect( addMarker ).toBeVisible();
-		await expect( addMarker ).toContainText( 'one two' );
-		await expect( addMarker ).toContainText( 'three four' );
-		// The pre-paste text is untouched outside the marker.
-		await expect( paragraph ).toContainText( 'Start' );
+		// The suggester sees their pasted text live (overlay merge)…
+		await expect( paragraph ).toContainText( 'one two' );
+		await expect( paragraph ).toContainText( 'three four' );
+		// …with the attribute-pending bracket treatment, not inline markers.
+		await expect( paragraph ).toHaveClass( /is-suggestion-pending/ );
+		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 0 );
+		// The store (and thus serialized content) stays at the baseline:
+		// nothing from the paste is committed until the suggestion is
+		// accepted.
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).toContain( '<p>Start</p>' );
+		expect( serialized ).not.toContain( 'one two' );
 	} );
 
 	test( 'seam: an autocorrect-style replacement (insertReplacementText) becomes markers via the reconciler', async ( {
