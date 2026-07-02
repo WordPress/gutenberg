@@ -187,9 +187,8 @@ jobs:
         needs: bump-version
         if: |
             always() && (
-              github.event_name == 'pull_request' ||
-              github.event_name == 'workflow_dispatch' ||
-              github.repository == 'WordPress/gutenberg'
+              github.repository == 'WordPress/gutenberg' ||
+              github.event_name == 'pull_request'
             )
         strategy:
             matrix:
