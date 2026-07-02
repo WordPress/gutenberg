@@ -196,21 +196,19 @@ add_action(
 			),
 		);
 
-		// An ordinary dynamic-block callback: it wraps $content and falls back
-		// to the pattern when empty, with no editor-specific code. In the
-		// editor's SSR preview the framework passes slot placeholders as
-		// $content (see gutenberg_wrap_ssr_islands_render_callback) and the
-		// editor swaps them for the editable pattern blocks. `variant` sets a
-		// class, `featured` a ribbon.
-		$render_pattern_block = static function ( $attributes, $content ) use ( $pattern_markup ) {
-			$body     = ( '' !== trim( (string) $content ) ) ? $content : do_blocks( $pattern_markup );
+		// An ordinary dynamic-block callback that wraps $content, with no
+		// editor-specific code and no empty check: the framework guarantees a
+		// non-empty $content (saved blocks, editor slot placeholders, or the
+		// pattern as fallback; see gutenberg_wrap_ssr_islands_render_callback).
+		// `variant` sets a class, `featured` a ribbon.
+		$render_pattern_block = static function ( $attributes, $content ) {
 			$variant  = isset( $attributes['variant'] ) ? sanitize_html_class( $attributes['variant'] ) : 'default';
 			$featured = ! empty( $attributes['featured'] );
 			$classes  = 'pattern-block-demo is-variant-' . $variant . ( $featured ? ' is-featured' : '' );
 			$wrapper  = get_block_wrapper_attributes( array( 'class' => $classes ) );
 			$ribbon   = $featured ? '<p class="pattern-block-demo__ribbon"><strong>Featured</strong></p>' : '';
 
-			return sprintf( '<div %1$s>%2$s%3$s</div>', $wrapper, $ribbon, $body );
+			return sprintf( '<div %1$s>%2$s%3$s</div>', $wrapper, $ribbon, $content );
 		};
 
 		// SSR-islands: a pattern block with a render_callback renders its PHP shell
