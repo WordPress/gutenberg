@@ -23,8 +23,8 @@ export const Default: Story = {
 		style: {
 			width: 'var(--wpds-dimension-surface-width-xs)',
 			height: textLineHeight,
+			borderRadius: 'var(--wpds-border-radius-md)',
 		},
-		radius: 'md',
 	},
 };
 
@@ -33,8 +33,8 @@ export const Circle: Story = {
 		style: {
 			width: 'var(--wpds-dimension-size-lg)',
 			height: 'var(--wpds-dimension-size-lg)',
+			borderRadius: '50%',
 		},
-		radius: 'full',
 	},
 };
 
@@ -49,21 +49,30 @@ export const TextLines: Story = {
 		>
 			<Skeleton
 				{ ...args }
-				style={ { width: '100%', height: textLineHeight } }
+				style={ {
+					width: '100%',
+					height: textLineHeight,
+					borderRadius: 'var(--wpds-border-radius-md)',
+				} }
 			/>
 			<Skeleton
 				{ ...args }
-				style={ { width: '100%', height: textLineHeight } }
+				style={ {
+					width: '100%',
+					height: textLineHeight,
+					borderRadius: 'var(--wpds-border-radius-md)',
+				} }
 			/>
 			<Skeleton
 				{ ...args }
-				style={ { width: '60%', height: textLineHeight } }
+				style={ {
+					width: '60%',
+					height: textLineHeight,
+					borderRadius: 'var(--wpds-border-radius-md)',
+				} }
 			/>
 		</div>
 	),
-	args: {
-		radius: 'md',
-	},
 };
 
 export const CardPlaceholder: Story = {
@@ -81,8 +90,8 @@ export const CardPlaceholder: Story = {
 				style={ {
 					width: 'var(--wpds-dimension-size-lg)',
 					height: 'var(--wpds-dimension-size-lg)',
+					borderRadius: '50%',
 				} }
-				radius="full"
 			/>
 			<div
 				style={ {
@@ -94,11 +103,19 @@ export const CardPlaceholder: Story = {
 			>
 				<Skeleton
 					{ ...args }
-					style={ { width: '80%', height: textLineHeight } }
+					style={ {
+						width: '80%',
+						height: textLineHeight,
+						borderRadius: 'var(--wpds-border-radius-md)',
+					} }
 				/>
 				<Skeleton
 					{ ...args }
-					style={ { width: '50%', height: textLineHeight } }
+					style={ {
+						width: '50%',
+						height: textLineHeight,
+						borderRadius: 'var(--wpds-border-radius-md)',
+					} }
 				/>
 			</div>
 		</div>

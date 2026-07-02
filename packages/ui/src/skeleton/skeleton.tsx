@@ -5,31 +5,19 @@ import { type SkeletonProps } from './types';
 import resetStyles from '../utils/css/resets.module.css';
 import styles from './style.module.css';
 
-// Static map so the build-time token-fallback plugin can inject fallbacks.
-const radiusTokens: Record<
-	NonNullable< SkeletonProps[ 'radius' ] >,
-	string
-> = {
-	none: '0',
-	xs: 'var(--wpds-border-radius-xs)',
-	sm: 'var(--wpds-border-radius-sm)',
-	md: 'var(--wpds-border-radius-md)',
-	lg: 'var(--wpds-border-radius-lg)',
-	xl: 'var(--wpds-border-radius-xl)',
-	full: '9999px',
-};
-
 /**
  * A placeholder shown while content is loading.
+ *
+ * Size and corner radius are controlled via standard `div` props such as
+ * `style` and `className`.
  */
 export const Skeleton = forwardRef< HTMLDivElement, SkeletonProps >(
-	function Skeleton( { radius = 'md', render, ...props }, ref ) {
+	function Skeleton( { render, ...props }, ref ) {
 		return useRender( {
 			render,
 			ref,
 			props: mergeProps< 'div' >(
 				{
-					style: { borderRadius: radiusTokens[ radius ] },
 					className: clsx(
 						styles.skeleton,
 						styles.pulse,
