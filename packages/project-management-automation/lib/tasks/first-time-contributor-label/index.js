@@ -14,32 +14,23 @@ const debug = require( '../../debug' );
  */
 async function firstTimeContributorLabel( payload, octokit ) {
 	const userType = payload.pull_request.user.type;
+	const authorAssociation = payload.pull_request.author_association;
 
 	if ( userType === 'Bot' ) {
 		debug( 'first-time-contributor: User is a bot. Aborting' );
 		return;
 	}
 
-	const repo = payload.repository.name;
-	const owner = payload.repository.owner.login;
-	const author = payload.pull_request.user.login;
-
-	debug(
-		`first-time-contributor: Searching for commits in ${ owner }/${ repo } by @${ author }`
-	);
-
-	const { data: commits } = await octokit.rest.repos.listCommits( {
-		owner,
-		repo,
-		author,
-	} );
-
-	if ( commits.length > 0 ) {
+	if ( authorAssociation && authorAssociation !== 'FIRST_TIME_CONTRIBUTOR' ) {
 		debug(
-			`first-time-contributor-label: Not the first commit for author. Aborting`
+			`first-time-contributor: Author association is ${ authorAssociation }. Aborting`
 		);
 		return;
 	}
+
+	const repo = payload.repository.name;
+	const owner = payload.repository.owner.login;
+	const author = payload.pull_request.user.login;
 
 	const pullRequestNumber = payload.pull_request.number;
 
