@@ -651,36 +651,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return array Responsive media queries.
 	 */
 	public static function get_viewport_media_queries( $viewport_settings = null, $options = array() ) {
-		if ( null === $viewport_settings ) {
-			$breakpoints = static::DEFAULT_VIEWPORT_BREAKPOINTS;
-		} else {
-			$breakpoints = static::sanitize_viewport_settings( $viewport_settings );
-
-			if ( empty( $breakpoints ) ) {
-				$breakpoints = static::DEFAULT_VIEWPORT_BREAKPOINTS;
-			} elseif ( empty( $breakpoints['mobile'] ) ) {
-				$breakpoints = array(
-					'mobile' => $breakpoints['tablet'],
-				);
-			}
-		}
-
-		$mobile_breakpoint = static::get_viewport_breakpoint_value_in_pixels(
-			$breakpoints['mobile']
-		);
-		$tablet_breakpoint = isset( $breakpoints['tablet'] )
-			? static::get_viewport_breakpoint_value_in_pixels(
-				$breakpoints['tablet']
-			)
-			: null;
-
-		if (
-			null === $mobile_breakpoint ||
-			null === $tablet_breakpoint ||
-			$mobile_breakpoint >= $tablet_breakpoint
-		) {
-			unset( $breakpoints['tablet'] );
-		}
+		$breakpoints = static::sanitize_viewport_settings( $viewport_settings );
 
 		$responsive_media_queries = array(
 			'@mobile' => "@media (width <= {$breakpoints['mobile']})",
@@ -785,7 +756,7 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	private static function sanitize_viewport_settings( $viewport_settings ) {
 		if ( ! is_array( $viewport_settings ) ) {
-			return array();
+			return static::DEFAULT_VIEWPORT_BREAKPOINTS;
 		}
 
 		$sanitized = array();
@@ -796,6 +767,33 @@ class WP_Theme_JSON_Gutenberg {
 			) {
 				$sanitized[ $breakpoint ] = trim( $viewport_settings[ $breakpoint ] );
 			}
+		}
+
+		if ( empty( $sanitized ) ) {
+			return static::DEFAULT_VIEWPORT_BREAKPOINTS;
+		}
+
+		if ( empty( $sanitized['mobile'] ) ) {
+			$sanitized = array(
+				'mobile' => $sanitized['tablet'],
+			);
+		}
+
+		$mobile_breakpoint = static::get_viewport_breakpoint_value_in_pixels(
+			$sanitized['mobile']
+		);
+		$tablet_breakpoint = isset( $sanitized['tablet'] )
+			? static::get_viewport_breakpoint_value_in_pixels(
+				$sanitized['tablet']
+			)
+			: null;
+
+		if (
+			null === $mobile_breakpoint ||
+			null === $tablet_breakpoint ||
+			$mobile_breakpoint >= $tablet_breakpoint
+		) {
+			unset( $sanitized['tablet'] );
 		}
 
 		return $sanitized;
@@ -1417,11 +1415,8 @@ class WP_Theme_JSON_Gutenberg {
 
 			$result = static::remove_keys_not_in_schema( $input[ $subtree ], $schema[ $subtree ] );
 
-			if ( 'settings' === $subtree && isset( $result['viewport'] ) ) {
-				$result['viewport'] = static::sanitize_viewport_settings( $result['viewport'] );
-				if ( empty( $result['viewport'] ) ) {
-					unset( $result['viewport'] );
-				}
+			if ( 'settings' === $subtree && array_key_exists( 'viewport', $input[ $subtree ] ) ) {
+				$result['viewport'] = static::sanitize_viewport_settings( $input[ $subtree ]['viewport'] );
 			}
 
 			if ( empty( $result ) ) {
@@ -4977,11 +4972,8 @@ class WP_Theme_JSON_Gutenberg {
 		// Preserve all valid settings that have type markers in VALID_SETTINGS.
 		self::preserve_valid_typed_settings( $input, $output, static::VALID_SETTINGS );
 
-		if ( $allow_viewport && isset( $input['viewport'] ) && is_array( $input['viewport'] ) ) {
-			$viewport_settings = static::sanitize_viewport_settings( $input['viewport'] );
-			if ( ! empty( $viewport_settings ) ) {
-				$output['viewport'] = $viewport_settings;
-			}
+		if ( $allow_viewport && array_key_exists( 'viewport', $input ) ) {
+			$output['viewport'] = static::sanitize_viewport_settings( $input['viewport'] );
 		}
 
 		return $output;

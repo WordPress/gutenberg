@@ -1063,6 +1063,29 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_viewport_settings_use_defaults_when_no_custom_breakpoints_are_valid() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'viewport' => array(
+						'mobile'  => '100%',
+						'tablet'  => 'auto',
+						'desktop' => '1200px',
+					),
+				),
+			)
+		);
+
+		$this->assertSame(
+			array(
+				'mobile' => '480px',
+				'tablet' => '782px',
+			),
+			$theme_json->get_raw_data()['settings']['viewport']
+		);
+	}
+
 	public function test_get_viewport_media_queries_omits_tablet_when_its_breakpoint_is_not_larger_than_mobile() {
 		$this->assertSame(
 			array(
@@ -1156,7 +1179,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSame(
 			array(
 				'mobile' => '960px',
-				'tablet' => '640px',
 			),
 			$theme_json->get_raw_data()['settings']['viewport']
 		);
