@@ -240,14 +240,16 @@ const resolve = ( path: string, namespace: string ) => {
  * Splits a ;-delimited expression into individual statements, respecting
  * string literals, template literals, regex literals, and IIFEs so
  * semicolons inside them are not treated as statement boundaries.
- * Returns null when the string contains no semicolon.
+ * Returns null when the string is empty or whitespace-only.
+ * When there are no semicolons, the whole expression is returned as a
+ * single statement.
  *
  * The IIFE support is intentionally limited, matching Datastar's genRx():
  * only function(){} and ()=>{} syntax with no arguments and no nested
  * IIFEs are recognised.
  */
 export const splitStatements = ( expr: string ): string[] | null => {
-	if ( typeof expr !== 'string' || ! expr.includes( ';' ) ) {
+	if ( typeof expr !== 'string' || ! expr.trim() ) {
 		return null;
 	}
 	const re =
@@ -259,22 +261,22 @@ export const splitStatements = ( expr: string ): string[] | null => {
 export const getEvaluate: GetEvaluate =
 	( { scope } ) =>
 	( entry ) => {
-		let { value: path, namespace } = entry;
+		const { value: path, namespace } = entry;
 		if ( typeof path !== 'string' ) {
 			throw new Error( 'The `value` prop should be a string path' );
 		}
-		// If path starts with !, remove it and save a flag.
-		const hasNegationOperator =
-			path[ 0 ] === '!' && !! ( path = path.slice( 1 ).trimStart() );
 		setScope( scope );
 
-		// Legacy path: simple dotted path reference — use resolve() which
-		// handles function wrapping for scope management (required for
-		// data-wp-on--click="actions.toggleOptionsMenu" etc.).
-		// Complex expressions (operators, comparisons, semicolons) fall
-		// through to the full-expression path below.
-		if ( /^[a-zA-Z_$][\w.]*$/.test( path ) ) {
-			const value = resolve( path, namespace );
+		// Legacy path:
+		// match an optional leading `!` followed by a simple
+		// dotted path. Both the negation flag and the clean path are
+		// captured in one go, avoiding any mutation of the original `path`
+		// variable (which is used unchanged by the full-expression path).
+		const [ , hasNegationOperator, cleanPath ] =
+			path.match( /^(!)?\s*([a-zA-Z_$][\w.]*)$/ ) ?? [];
+		if ( cleanPath ) {
+
+			const value = resolve( cleanPath, namespace );
 			// Functions are returned without invoking them.
 			if ( typeof value === 'function' ) {
 				// When used with a negation operator, ignore the negation —
@@ -285,7 +287,8 @@ export const getEvaluate: GetEvaluate =
 						'Using a function with a negation operator is deprecated and will stop working in WordPress 7.1. Please use derived state instead.'
 					);
 				}
-				// Reset scope before return and wrap the function so it will still run within the correct scope.
+				// Reset scope before return and wrap the function so it
+				// will still run within the correct scope.
 				resetScope();
 				const wrappedFunction: Function = (
 					...functionArgs: any[]
@@ -310,12 +313,12 @@ export const getEvaluate: GetEvaluate =
 				: result;
 		}
 
-		// Full-expression path — inspired by DataStar's genRx().
+		// Full-expression path:
 		// Compiles arbitrary JavaScript expressions via new Function(),
 		// passing state, context, actions, and callbacks as named
 		// parameters. Supports ;-delimited multiple statements: the
 		// last statement's value is what the directive receives
-		// (DataStar's "last statement wins" convention).
+		// (needed for directives like data-wp-text).
 		try {
 			let resolvedStore = stores.get( namespace );
 			if ( typeof resolvedStore === 'undefined' ) {
@@ -354,7 +357,7 @@ export const getEvaluate: GetEvaluate =
 			);
 			const result = fn( state, ctx, actions, callbacks );
 			resetScope();
-			return hasNegationOperator ? ! result : result;
+			return result;
 		} catch ( e ) {
 			resetScope();
 			if ( e === PENDING_GETTER ) {
