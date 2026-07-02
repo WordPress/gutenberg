@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   `Button`: Migrate hardcoded Sass color, spacing, and typography values to WPDS design tokens.
+
 ## 37.0.0 (2026-07-14)
 
 ### Enhancements

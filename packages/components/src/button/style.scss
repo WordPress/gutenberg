@@ -17,6 +17,9 @@
 		box-shadow: none;
 	}
 
+	// Legacy default height (36px) has no exact WPDS size token match.
+	--wp-components-button-height: 36px;
+
 	&:focus:not(:active) {
 		@include mixins.outset-ring__focus();
 	}
@@ -24,24 +27,26 @@
 	display: inline-flex;
 	text-decoration: none;
 	font-family: inherit;
-	font-size: $default-font-size;
+	font-size: var(--wpds-typography-font-size-md);
 	font-weight: var(--wpds-typography-font-weight-emphasis);
 	margin: 0;
 	cursor: var(--wpds-cursor-control);
 	appearance: none;
 	background: none;
-	height: $button-size;
+	height: var(--wp-components-button-height);
 	align-items: center;
 	box-sizing: border-box;
-	padding: 4px 12px; // Allows 32px min-height.
-	border-radius: $radius-small;
+	padding:
+		var(--wpds-dimension-padding-xs)
+		var(--wpds-dimension-padding-md); // Allows 32px min-height.
+	border-radius: var(--wpds-border-radius-sm);
 	color: $components-color-foreground;
 	// Every variant reserves a 1px border (transparent by default) so the box
 	// size stays identical whether or not a variant paints a visible border.
 	border: $border-width solid transparent;
 
 	&.is-next-40px-default-size {
-		height: $button-size-next-default-40px;
+		height: var(--wpds-dimension-size-lg);
 	}
 
 	&[aria-expanded="true"],
@@ -168,7 +173,7 @@
 
 		// Pull left if the tertiary button stands alone after a description, so as to vertically align with items above.
 		p + & {
-			margin-left: -($grid-unit-15 * 0.5);
+			margin-left: calc(-1 * var(--wpds-dimension-padding-md) / 2);
 		}
 	}
 
@@ -237,7 +242,7 @@
 		height: auto;
 
 		&:focus:not(:active) {
-			border-radius: $radius-small;
+			border-radius: var(--wpds-border-radius-sm);
 			text-decoration: none;
 		}
 
@@ -278,19 +283,20 @@
 	}
 
 	&.is-compact {
-		height: $button-size-compact;
+		height: var(--wpds-dimension-size-md);
 
 		&.has-icon:not(.has-text) {
 			padding: 0;
-			min-width: $button-size-compact;
+			min-width: var(--wpds-dimension-size-md);
 		}
 	}
 
 	&.is-small {
 		height: var(--wpds-dimension-size-sm);
+		// 22px has no exact WPDS line-height token match (sm is 20px, md is 24px).
 		line-height: 22px;
-		padding: 0 8px;
-		font-size: 11px;
+		padding: 0 var(--wpds-dimension-padding-sm);
+		font-size: var(--wpds-typography-font-size-xs);
 
 		&.has-icon:not(.has-text) {
 			padding: 0;
@@ -299,32 +305,33 @@
 	}
 
 	&.has-icon {
-		padding: 6px; // Works for 24px icons. Smaller icons are vertically centered by flex alignments.
+		padding-block: var(--wpds-dimension-padding-xs);
+		padding-inline: 0;
 
 		// Icon buttons are square.
-		min-width: $button-size;
+		min-width: var(--wp-components-button-height);
 		justify-content: center;
 
 		&.is-next-40px-default-size {
-			min-width: $button-size-next-default-40px;
+			min-width: var(--wpds-dimension-size-lg);
 		}
 
 		.dashicon {
 			display: inline-flex;
 			justify-content: center;
 			align-items: center;
-			padding: 2px;
+			padding: var(--wpds-dimension-padding-xs);
 			box-sizing: content-box;
 		}
 
 		&.has-text {
 			justify-content: start;
-			padding-right: $grid-unit-15;
-			padding-left: $grid-unit-10;
-			gap: $grid-unit-05;
+			padding-right: var(--wpds-dimension-padding-md);
+			padding-left: var(--wpds-dimension-gap-sm);
+			gap: var(--wpds-dimension-gap-xs);
 			&.has-icon-right {
-				padding-right: $grid-unit-10;
-				padding-left: $grid-unit-15;
+				padding-right: var(--wpds-dimension-gap-sm);
+				padding-left: var(--wpds-dimension-padding-md);
 			}
 		}
 
