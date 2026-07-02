@@ -857,11 +857,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/spacer/hook.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/spinner/styles.ts": {
 		"no-restricted-imports": {
 			"count": 2
