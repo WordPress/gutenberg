@@ -1356,7 +1356,7 @@ type TranscodeGifItemArgs = OperationArgs[ OperationType.TranscodeGif ];
  * Runs inside a sideload item whose parent is the GIF's image attachment
  * (see generateThumbnails). The next Upload op then sideloads the
  * transcoded video as a companion of that attachment under the
- * `animated-video` image size; the GIF stays the primary attachment and
+ * `animated_video` image size; the GIF stays the primary attachment and
  * the editor block stays `core/image`.
  *
  * @param id     Item ID.
@@ -1410,7 +1410,7 @@ export function transcodeGifItem(
 				parentId: item.parentId,
 				additionalData: {
 					post: item.additionalData?.post,
-					image_size: 'animated-video-poster',
+					image_size: 'animated_video_poster',
 					convert_format: false,
 				},
 				operations: [
@@ -1491,7 +1491,9 @@ export function generateThumbnails( id: QueueItemId ) {
 		// sideload flow owns. The HEIC was kept on item.originalHeicFile;
 		// the uploaded file is a JPEG conversion. parentId guarantees
 		// processItem routes this to the sideload endpoint, never the main
-		// create endpoint.
+		// create endpoint. The `source_original` image_size token is
+		// format-agnostic (it also covers HEIF) and matches the server-side
+		// WP_REST_Attachments_Controller::IMAGE_SIZE_SOURCE_ORIGINAL constant.
 		if ( item.originalHeicFile && attachment.id ) {
 			dispatch.addSideloadItem( {
 				file: item.originalHeicFile,
@@ -1499,7 +1501,7 @@ export function generateThumbnails( id: QueueItemId ) {
 				parentId: item.id,
 				additionalData: {
 					post: attachment.id,
-					image_size: 'original-heic',
+					image_size: 'source_original',
 					convert_format: false,
 				},
 				operations: [ OperationType.Upload ],
@@ -1522,7 +1524,7 @@ export function generateThumbnails( id: QueueItemId ) {
 				parentId: item.id,
 				additionalData: {
 					post: attachment.id,
-					image_size: 'animated-video',
+					image_size: 'animated_video',
 					convert_format: false,
 				},
 				operations: [

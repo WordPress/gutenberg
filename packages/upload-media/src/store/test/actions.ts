@@ -876,7 +876,7 @@ describe( 'actions', () => {
 				);
 			} );
 
-			it( 'keeps the parent GIF when its only child is a failed animated-video companion', async () => {
+			it( 'keeps the parent GIF when its only child is a failed animated_video companion', async () => {
 				const mediaDelete = jest.fn().mockResolvedValue( undefined );
 				const parentOnError = jest.fn();
 				unlock( registry.dispatch( uploadStore ) ).updateSettings( {
@@ -887,7 +887,7 @@ describe( 'actions', () => {
 				// accumulated sub-sizes — the pre-fix "total failure" case.
 				const { parent, child } = setUpParentAndChild( {
 					parentOnError,
-					imageSize: 'animated-video',
+					imageSize: 'animated_video',
 				} );
 
 				await registry

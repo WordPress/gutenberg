@@ -779,7 +779,7 @@ describe( 'private actions', () => {
 			expect( poster.additionalData ).toEqual(
 				expect.objectContaining( {
 					post: 42,
-					image_size: 'animated-video-poster',
+					image_size: 'animated_video_poster',
 					convert_format: false,
 				} )
 			);
@@ -888,7 +888,7 @@ describe( 'private actions', () => {
 			);
 		}
 
-		it( 'sideloads the converted video as an animated-video companion', async () => {
+		it( 'sideloads the converted video as an animated_video companion', async () => {
 			const gif = makeGif();
 			const item = {
 				id: 'g',
@@ -914,7 +914,7 @@ describe( 'private actions', () => {
 			expect( sideload.additionalData ).toEqual(
 				expect.objectContaining( {
 					post: 42,
-					image_size: 'animated-video',
+					image_size: 'animated_video',
 					convert_format: false,
 				} )
 			);

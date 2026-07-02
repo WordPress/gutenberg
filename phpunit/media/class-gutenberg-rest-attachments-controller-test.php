@@ -149,6 +149,111 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
+	 * Verifies that still HEIC/HEIF uploads bypass the image editor support
+	 * check even when generate_sub_sizes is not false.
+	 *
+	 * The browser's canvas fallback can always decode still HEIC/HEIF, so the
+	 * upload is allowed even when the server has no editor that supports it.
+	 *
+	 * @covers ::create_item_permissions_check
+	 *
+	 * @dataProvider data_still_heic_mime_types
+	 *
+	 * @param string $mime_type Still HEIC/HEIF mime type.
+	 */
+	public function test_create_item_still_heic_bypasses_unsupported_image_type_check( $mime_type ) {
+		wp_set_current_user( self::$admin_id );
+
+		// Remove all image editors so wp_image_editor_supports() returns false.
+		add_filter( 'wp_image_editors', '__return_empty_array' );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_file_params(
+			array(
+				'file' => array(
+					'name'     => 'canola.heic',
+					'type'     => $mime_type,
+					'tmp_name' => DIR_TESTDATA . '/images/canola.jpg',
+					'error'    => 0,
+					'size'     => filesize( DIR_TESTDATA . '/images/canola.jpg' ),
+				),
+			)
+		);
+		$request->set_param( 'generate_sub_sizes', true );
+
+		$controller = new Gutenberg_REST_Attachments_Controller( 'attachment' );
+		$result     = $controller->create_item_permissions_check( $request );
+
+		// Should pass because the browser can decode still HEIC/HEIF client-side.
+		$this->assertTrue( $result );
+	}
+
+	/**
+	 * Data provider for still HEIC/HEIF mime types.
+	 *
+	 * @return array[]
+	 */
+	public function data_still_heic_mime_types() {
+		return array(
+			'heic' => array( 'image/heic' ),
+			'heif' => array( 'image/heif' ),
+		);
+	}
+
+	/**
+	 * Verifies that HEIC/HEIF sequence uploads do not bypass the editor support check.
+	 *
+	 * The multi-frame '-sequence' variants (Live Photos) cannot be processed by
+	 * the server or decoded by the browser fallback, so they should fall through
+	 * to the standard unsupported mime-type error rather than be stored.
+	 *
+	 * @covers ::create_item_permissions_check
+	 *
+	 * @dataProvider data_heic_sequence_mime_types
+	 *
+	 * @param string $mime_type HEIC/HEIF sequence mime type.
+	 */
+	public function test_create_item_heic_sequence_is_not_bypassed( $mime_type ) {
+		wp_set_current_user( self::$admin_id );
+
+		// Remove all image editors so wp_image_editor_supports() returns false.
+		add_filter( 'wp_image_editors', '__return_empty_array' );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_file_params(
+			array(
+				'file' => array(
+					'name'     => 'live-photo.heic',
+					'type'     => $mime_type,
+					'tmp_name' => DIR_TESTDATA . '/images/canola.jpg',
+					'error'    => 0,
+					'size'     => filesize( DIR_TESTDATA . '/images/canola.jpg' ),
+				),
+			)
+		);
+		$request->set_param( 'generate_sub_sizes', true );
+
+		$controller = new Gutenberg_REST_Attachments_Controller( 'attachment' );
+		$result     = $controller->create_item_permissions_check( $request );
+
+		// Should fail: sequences are unsupported by both the server and the fallback.
+		$this->assertWPError( $result );
+		$this->assertSame( 'rest_upload_image_type_not_supported', $result->get_error_code() );
+	}
+
+	/**
+	 * Data provider for HEIC/HEIF sequence mime types.
+	 *
+	 * @return array[]
+	 */
+	public function data_heic_sequence_mime_types() {
+		return array(
+			'heic-sequence' => array( 'image/heic-sequence' ),
+			'heif-sequence' => array( 'image/heif-sequence' ),
+		);
+	}
+
+	/**
 	 * Verifies that skipping sub-size generation works.
 	 *
 	 * @covers ::create_item
@@ -929,6 +1034,28 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
+	 * Verifies that the sideload route does not advertise a generate_sub_sizes arg.
+	 *
+	 * sideload_item() never reads generate_sub_sizes, so advertising it on the
+	 * route would silently mislead clients into expecting server-side sub-size
+	 * generation. That arg only does real work on create_item() (POST /wp/v2/media).
+	 *
+	 * @covers ::register_routes
+	 */
+	public function test_sideload_route_omits_generate_sub_sizes() {
+		$routes = rest_get_server()->get_routes();
+		$this->assertArrayHasKey( '/wp/v2/media/(?P<id>[\d]+)/sideload', $routes );
+
+		foreach ( $routes['/wp/v2/media/(?P<id>[\d]+)/sideload'] as $route ) {
+			$this->assertArrayNotHasKey(
+				'generate_sub_sizes',
+				$route['args'],
+				'Sideload route should not advertise the unused generate_sub_sizes arg.'
+			);
+		}
+	}
+
+	/**
 	 * Verifies that sideloading with `convert_format=false` (as a string, matching
 	 * multipart/form-data semantics) suppresses the alt-extension collision check
 	 * inside `wp_unique_filename()`, so a companion file that shares the attachment's
@@ -977,7 +1104,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
 		$request->set_header( 'Content-Type', 'image/png' );
 		$request->set_header( 'Content-Disposition', 'attachment; filename=heic-companion.png' );
-		$request->set_param( 'image_size', 'original-heic' );
+		$request->set_param( 'image_size', Gutenberg_REST_Attachments_Controller::IMAGE_SIZE_SOURCE_ORIGINAL );
 		$request->set_param( 'convert_format', 'false' );
 		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/one-blue-pixel-100x100.png' ) );
 
@@ -993,6 +1120,58 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 			$data['file'],
 			'Companion file should share the attachment basename without a numeric suffix.'
 		);
+	}
+
+	/**
+	 * Verifies that a source-format original sideload succeeds even when
+	 * wp_getimagesize() cannot read the file's dimensions.
+	 *
+	 * The `source_original` companion (e.g. the HEIC kept next to its JPEG
+	 * derivative) is stored byte-for-byte: its dimensions are neither validated
+	 * nor recorded, and servers without HEIC/HEIF support cannot read them at
+	 * all. The dimension read must therefore be skipped entirely - running it
+	 * would reject the companion as "corrupted or unsupported" on exactly the
+	 * servers the client-side flow is designed to help.
+	 *
+	 * @covers ::sideload_item
+	 * @covers ::validate_image_dimensions
+	 */
+	public function test_sideload_source_original_skips_dimension_read() {
+		if ( ! file_exists( DIR_TESTDATA . '/images/test-image.heic' ) ) {
+			$this->markTestSkipped( 'The HEIC test fixture is not available.' );
+		}
+
+		wp_set_current_user( self::$admin_id );
+
+		// Upload the JPEG derivative the way client-side uploads do.
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=heic-source.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+
+		$response      = rest_get_server()->dispatch( $request );
+		$attachment_id = $response->get_data()['id'];
+		$this->assertSame( 201, $response->get_status() );
+
+		// Sideload the real HEIC companion. On servers without HEIC support
+		// wp_getimagesize() returns false for this file, so the sideload only
+		// succeeds when the dimension read is skipped for source originals.
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
+		$request->set_header( 'Content-Type', 'image/heic' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=heic-source.heic' );
+		$request->set_param( 'image_size', Gutenberg_REST_Attachments_Controller::IMAGE_SIZE_SOURCE_ORIGINAL );
+		$request->set_param( 'convert_format', false );
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/test-image.heic' ) );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status(), 'Sideloading a source-format original should succeed regardless of server-side HEIC support.' );
+
+		$data = $response->get_data();
+		$this->assertSame( Gutenberg_REST_Attachments_Controller::IMAGE_SIZE_SOURCE_ORIGINAL, $data['image_size'], 'Response should echo the image_size.' );
+		$this->assertMatchesRegularExpression( '/heic-source.*\.heic$/', $data['file'], 'Response file should reference the HEIC filename.' );
+		$this->assertArrayNotHasKey( 'width', $data, 'Source originals should not record dimensions.' );
 	}
 
 	/**
@@ -1464,6 +1643,116 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
+	 * Verifies that sideloading the 'original' size rejects an image whose
+	 * dimensions do not match the original attachment dimensions.
+	 *
+	 * @covers ::sideload_item
+	 * @covers ::validate_image_dimensions
+	 */
+	public function test_sideload_item_rejects_original_dimension_mismatch() {
+		wp_set_current_user( self::$admin_id );
+
+		$attachment_id = self::factory()->attachment->create_object(
+			DIR_TESTDATA . '/images/canola.jpg',
+			0,
+			array(
+				'post_mime_type' => 'image/jpeg',
+			)
+		);
+
+		wp_update_attachment_metadata(
+			$attachment_id,
+			wp_generate_attachment_metadata( $attachment_id, DIR_TESTDATA . '/images/canola.jpg' )
+		);
+
+		// Sideload a 50x50 image as the original; it does not match canola.jpg.
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=canola.jpg' );
+		$request->set_param( 'image_size', 'original' );
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/test-image.jpg' ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 400, $response->get_status(), 'Mismatched original sideload should be rejected.' );
+		$this->assertSame( 'rest_upload_dimension_mismatch', $response->get_data()['code'] );
+	}
+
+	/**
+	 * Verifies that sideloading the 'original' size accepts an image whose
+	 * dimensions match the original attachment dimensions.
+	 *
+	 * @covers ::sideload_item
+	 * @covers ::validate_image_dimensions
+	 */
+	public function test_sideload_item_accepts_matching_original_dimensions() {
+		wp_set_current_user( self::$admin_id );
+
+		$attachment_id = self::factory()->attachment->create_object(
+			DIR_TESTDATA . '/images/canola.jpg',
+			0,
+			array(
+				'post_mime_type' => 'image/jpeg',
+			)
+		);
+
+		wp_update_attachment_metadata(
+			$attachment_id,
+			wp_generate_attachment_metadata( $attachment_id, DIR_TESTDATA . '/images/canola.jpg' )
+		);
+
+		// Sideload the same image as the original; dimensions match.
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=canola-original.jpg' );
+		$request->set_param( 'image_size', 'original' );
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status(), 'Matching original sideload should succeed.' );
+	}
+
+	/**
+	 * Verifies that sideloading a file whose dimensions cannot be read is
+	 * rejected rather than stored with zero dimensions.
+	 *
+	 * The body is a JFIF header with no frame data: its magic bytes identify it
+	 * as a JPEG so the upload itself succeeds, but wp_getimagesize() cannot
+	 * determine dimensions, which is the corrupted/unsupported-format case.
+	 *
+	 * @covers ::sideload_item
+	 */
+	public function test_sideload_item_rejects_unreadable_image() {
+		wp_set_current_user( self::$admin_id );
+
+		$attachment_id = self::factory()->attachment->create_object(
+			DIR_TESTDATA . '/images/canola.jpg',
+			0,
+			array(
+				'post_mime_type' => 'image/jpeg',
+			)
+		);
+
+		wp_update_attachment_metadata(
+			$attachment_id,
+			wp_generate_attachment_metadata( $attachment_id, DIR_TESTDATA . '/images/canola.jpg' )
+		);
+
+		// A JPEG SOI + JFIF APP0 marker followed immediately by EOI: valid magic
+		// bytes, but no SOF marker, so wp_getimagesize() returns false.
+		$unreadable = "\xFF\xD8\xFF\xE0\x00\x10JFIF\x00\x01\x01\x00\x00\x01\x00\x01\x00\x00\xFF\xD9";
+
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=canola-thumbnail.jpg' );
+		$request->set_param( 'image_size', 'thumbnail' );
+		$request->set_body( $unreadable );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 400, $response->get_status(), 'Unreadable image sideload should be rejected.' );
+		$this->assertSame( 'rest_upload_invalid_image', $response->get_data()['code'] );
+	}
+
+	/**
 	 * Verifies that image_output_format and image_save_progressive are in the schema.
 	 *
 	 * @covers ::get_item_schema
@@ -1505,6 +1794,35 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$this->assertArrayHasKey( 'image_output_format', $data );
 		// No custom filter, so output format should be null (no conversion needed).
 		$this->assertNull( $data['image_output_format'] );
+	}
+
+	/**
+	 * Verifies that the image_output_format and image_save_progressive fields are
+	 * omitted entirely for non-image attachments, matching the core backport.
+	 *
+	 * @covers ::prepare_item_for_response
+	 */
+	public function test_image_output_format_skipped_for_non_image() {
+		wp_set_current_user( self::$admin_id );
+
+		$attachment_id = self::factory()->attachment->create_object(
+			DIR_TESTDATA . '/uploads/dashicons.woff',
+			0,
+			array(
+				'post_mime_type' => 'application/font-woff',
+				'post_type'      => 'attachment',
+			)
+		);
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/media/' . $attachment_id );
+		$request->set_param( 'context', 'edit' );
+
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertArrayNotHasKey( 'image_output_format', $data );
+		$this->assertArrayNotHasKey( 'image_save_progressive', $data );
 	}
 
 	/**
