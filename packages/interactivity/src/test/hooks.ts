@@ -205,14 +205,14 @@ describe( 'Interactivity API', () => {
 			} catch {}
 		} );
 
-		const evaluateExpr = ( expr: string ) => {
+		const evaluateExpr = ( expr: string, evt?: Event ) => {
 			const evaluate = getEvaluate( { scope: testScope } );
 			return evaluate( {
 				value: expr,
 				namespace: testNamespace,
 				suffix: null,
 				uniqueId: null,
-			} as any );
+			} as any, evt );
 		};
 
 		it( 'should evaluate context comparisons with !==', () => {
@@ -444,6 +444,39 @@ describe( 'Interactivity API', () => {
 			expect( evaluateExpr( 'state.zeroString + context.n' ) ).toBe(
 				'042'
 			);
+		} );
+
+		it( 'should make evt available in full-expression path', () => {
+			const mockEvent = new Event( 'click' );
+			const result = evaluateExpr( 'evt instanceof Event', mockEvent );
+			expect( result ).toBe( true );
+		} );
+
+		it( 'should allow accessing event properties in full-expression path', () => {
+			const mockEvent = new Event( 'click' );
+			const result = evaluateExpr(
+				'evt.type === "click"',
+				mockEvent
+			);
+			expect( result ).toBe( true );
+		} );
+
+		it( 'should make el available in full-expression path (null by default)', () => {
+			// el is read from scope.ref.current, which is null in tests.
+			const result = evaluateExpr( 'el === null' );
+			expect( result ).toBe( true );
+		} );
+
+		it( 'should make el available in full-expression path (with element)', () => {
+			const mockEl = document.createElement( 'div' );
+			testScope.ref.current = mockEl;
+			const result = evaluateExpr( 'el.tagName === "DIV"' );
+			expect( result ).toBe( true );
+		} );
+
+		it( 'should have evt as undefined when not passed', () => {
+			const result = evaluateExpr( 'typeof evt' );
+			expect( result ).toBe( 'undefined' );
 		} );
 	} );
 } );

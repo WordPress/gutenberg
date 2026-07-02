@@ -94,7 +94,7 @@ interface DirectiveOptions {
 }
 
 export interface Evaluate {
-	( entry: DirectiveEntry ): any;
+	( entry: DirectiveEntry, evt?: Event ): any;
 }
 
 interface GetEvaluate {
@@ -260,7 +260,7 @@ export const splitStatements = ( expr: string ): string[] | null => {
 // Generate the evaluate function.
 export const getEvaluate: GetEvaluate =
 	( { scope } ) =>
-	( entry ) => {
+	( entry, evt ) => {
 		const { value: path, namespace } = entry;
 		if ( typeof path !== 'string' ) {
 			throw new Error( 'The `value` prop should be a string path' );
@@ -315,8 +315,10 @@ export const getEvaluate: GetEvaluate =
 
 		// Full-expression path:
 		// Compiles arbitrary JavaScript expressions via new Function(),
-		// passing state, context, actions, and callbacks as named
-		// parameters. Supports ;-delimited multiple statements: the
+		// passing state, context, actions, callbacks, current element and triggering event as named
+		// parameters to be used in expressions.
+		//
+		// Supports ;-delimited multiple statements: the
 		// last statement's value is what the directive receives
 		// (needed for directives like data-wp-text).
 		try {
@@ -356,6 +358,16 @@ export const getEvaluate: GetEvaluate =
 				expression
 			);
 			const result = fn( state, ctx, actions, callbacks );
+				fn = new Function(
+					'state',
+					'context',
+					'actions',
+					'callbacks',
+					'el',
+					'evt',
+					expression
+				);
+			const result = fn( state, ctx, actions, callbacks, el, evt );
 			resetScope();
 			return result;
 		} catch ( e ) {
@@ -397,7 +409,6 @@ const Directives = ( {
 	// level because each level has a different context, but they share the same
 	// element ref, state and props.
 	const scope = useRef< Scope >( {} as Scope ).current;
-
 	scope.evaluate = useCallback( getEvaluate( { scope } ), [] );
 	const { client, server } = useContext( context );
 	scope.context = client;
