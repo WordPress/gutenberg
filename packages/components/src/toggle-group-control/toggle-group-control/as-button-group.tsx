@@ -23,7 +23,6 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 		isAdaptiveWidth,
 		label,
 		onChange,
-		size,
 		value: valueProp,
 		id: idProp,
 		setSelectedElement,
@@ -63,7 +62,6 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 			setValue: setSelectedValue,
 			isBlock: ! isAdaptiveWidth,
 			isDeselectable: true,
-			size,
 			setSelectedElement,
 		} ),
 		[
@@ -71,7 +69,6 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 			selectedValue,
 			setSelectedValue,
 			isAdaptiveWidth,
-			size,
 			setSelectedElement,
 		]
 	);

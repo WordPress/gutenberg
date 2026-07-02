@@ -157,7 +157,6 @@
 				user-select: none;
 			}
 
-			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
 			&[data-swipe-direction="left"] {
 				--stretch-size: calc(100vw - var(--viewport-inset));
 
@@ -177,7 +176,6 @@
 				}
 			}
 
-			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
 			&[data-swipe-direction="right"] {
 				--stretch-size: calc(100vw - var(--viewport-inset));
 
