@@ -124,7 +124,33 @@ function removeMarkedRange( value, suggestionId ) {
 		return value;
 	}
 	const record = create( { html: value.toHTMLString() } );
-	return new RichTextData( remove( record, range.start, range.end ) );
+	/*
+	 * The resolved range spans first-to-last character carrying the id, so a
+	 * fragmented marker can interleave ANOTHER suggestion's marker inside the
+	 * span (e.g. a copy/paste split the run and a second suggestion landed in
+	 * the gap). Removing the span wholesale would delete the inner marker's
+	 * text along with it, so remove only the characters that actually carry
+	 * THIS id — back-to-front, so earlier offsets stay valid as text shrinks.
+	 */
+	const target = String( suggestionId );
+	const carriesId = ( index ) =>
+		record.formats[ index ]?.some(
+			( f ) =>
+				f.type === SUGGESTION_FORMAT_NAME &&
+				f.attributes?.[ SUGGESTION_ID_ATTRIBUTE ] === target
+		);
+	let result = record;
+	let runEnd = null;
+	for ( let i = range.end - 1; i >= range.start - 1; i-- ) {
+		const hit = i >= range.start && carriesId( i );
+		if ( hit && runEnd === null ) {
+			runEnd = i + 1;
+		} else if ( ! hit && runEnd !== null ) {
+			result = remove( result, i + 1, runEnd );
+			runEnd = null;
+		}
+	}
+	return new RichTextData( result );
 }
 
 /**

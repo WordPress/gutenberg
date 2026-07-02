@@ -90,6 +90,26 @@ describe( 'inline deletion operations', () => {
 			const result = acceptInlineDeletion( value, 7 );
 			expect( result.toHTMLString() ).toBe( 'prepended ' );
 		} );
+
+		it( 'spares another marker interleaved inside a fragmented run', () => {
+			/*
+			 * The target marker is fragmented (same id split in two) with a
+			 * DIFFERENT suggestion's marker in the gap. The resolved range
+			 * spans first -> last hit of the id, but accepting the deletion
+			 * must remove only the characters carrying the target id — never
+			 * the inner marker's text.
+			 */
+			const value = RichTextData.fromHTMLString(
+				`${ del( 1, 'AB' ) }${ add( 2, 'IN' ) }${ del( 1, 'CD' ) }`
+			);
+			const result = acceptInlineDeletion( value, 1 );
+			const html = result.toHTMLString();
+			expect( html ).not.toContain( 'AB' );
+			expect( html ).not.toContain( 'CD' );
+			expect( html ).toContain( 'IN' );
+			expect( html ).toContain( 'data-suggestion-id="2"' );
+			expect( html ).not.toContain( 'data-suggestion-id="1"' );
+		} );
 	} );
 
 	describe( 'rejectInlineDeletion', () => {
@@ -190,6 +210,21 @@ describe( 'inline addition operations', () => {
 			expect( rejectInlineAddition( value, 99 ).toHTMLString() ).toBe(
 				'no markers here'
 			);
+		} );
+
+		it( 'spares another marker interleaved inside a fragmented run', () => {
+			// Mirror of the acceptInlineDeletion interleaved case: rejecting
+			// the fragmented addition removes only its own characters.
+			const value = RichTextData.fromHTMLString(
+				`${ add( 3, 'AB' ) }${ del( 4, 'IN' ) }${ add( 3, 'CD' ) }`
+			);
+			const result = rejectInlineAddition( value, 3 );
+			const html = result.toHTMLString();
+			expect( html ).not.toContain( 'AB' );
+			expect( html ).not.toContain( 'CD' );
+			expect( html ).toContain( 'IN' );
+			expect( html ).toContain( 'data-suggestion-id="4"' );
+			expect( html ).not.toContain( 'data-suggestion-id="3"' );
 		} );
 	} );
 

@@ -73,11 +73,19 @@ function formatKey( format ) {
 	return `${ format.type }(${ parts.join( ',' ) })`;
 }
 
+/*
+ * Per-stack-array memo for `stackKey`. Rich-text shares one formats-array
+ * reference across every character of a contiguous formatted run, so caching
+ * by reference collapses the per-character key computation to once per run.
+ * A WeakMap so retired records don't pin their stacks in memory.
+ */
+const stackKeyCache = new WeakMap();
+
 /**
  * Comparison key for a character's whole format stack, excluding the suggestion
  * marker itself (so a value that already carries markers isn't seen as
  * "different" only because of them, and re-running is stable). Sorted so stack
- * order doesn't matter.
+ * order doesn't matter. Memoized per stack-array reference.
  *
  * @param {Array} stack Per-character format stack (may be undefined).
  * @return {string} Comparison key for the stack.
@@ -86,11 +94,17 @@ function stackKey( stack ) {
 	if ( ! Array.isArray( stack ) ) {
 		return '';
 	}
-	return stack
+	const cached = stackKeyCache.get( stack );
+	if ( cached !== undefined ) {
+		return cached;
+	}
+	const key = stack
 		.filter( ( f ) => f.type !== SUGGESTION_FORMAT_NAME )
 		.map( formatKey )
 		.sort()
 		.join( '|' );
+	stackKeyCache.set( stack, key );
+	return key;
 }
 
 /**

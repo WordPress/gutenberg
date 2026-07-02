@@ -300,8 +300,13 @@ export function planEditMarkers( prevValue, nextValue, { authorId } = {} ) {
 				],
 			};
 		}
-		// Already proposed for deletion: nothing to do (the removal is rejected
-		// by the caller re-rendering the un-applied value).
+		/*
+		 * Already proposed for deletion: no marker action to plan. An empty
+		 * plan reads as "not handled" to `maybeHandleContentEdit`, which
+		 * returns false so the edit falls through to the attribute-overlay
+		 * path and is captured there as a whole-attribute suggestion — the
+		 * removal is neither applied in place nor silently discarded.
+		 */
 		if ( uniformMarker( edit.start, edit.end, SUGGESTION_TYPE_DELETION ) ) {
 			return { kind: 'delete', actions: [] };
 		}

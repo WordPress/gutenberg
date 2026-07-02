@@ -173,6 +173,33 @@ describe( 'findMarkerRange', () => {
 			end: 6,
 		} );
 	} );
+
+	it( 'spans across ANOTHER marker interleaved inside a fragmented run', () => {
+		/*
+		 * A fragmented marker (same id split in two) with a DIFFERENT
+		 * suggestion's marker sitting in the gap: the outer id's range still
+		 * spans first -> last hit, which includes the inner marker's text.
+		 * Pinned here because span-consumers must not treat the whole range
+		 * as belonging to the outer id — see `removeMarkedRange`
+		 * (inline-suggestions/operations.js), which removes only the
+		 * characters carrying the outer id so accept/reject of the outer
+		 * marker can't delete the inner marker's text.
+		 */
+		const value = RichTextData.fromHTMLString(
+			'<mark class="wp-marker" data-id="7">AB</mark>' +
+				'<mark class="wp-marker" data-id="8">IN</mark>' +
+				'<mark class="wp-marker" data-id="7">CD</mark>'
+		);
+		expect( findMarkerRange( value, { ...options, id: 7 } ) ).toEqual( {
+			start: 0,
+			end: 6,
+		} );
+		// The inner marker still resolves independently.
+		expect( findMarkerRange( value, { ...options, id: 8 } ) ).toEqual( {
+			start: 2,
+			end: 4,
+		} );
+	} );
 } );
 
 describe( 'findMarkerText', () => {
