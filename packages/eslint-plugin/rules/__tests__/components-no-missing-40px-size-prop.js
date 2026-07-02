@@ -96,20 +96,19 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 		{
 			code: `
 				import {
-					Button,
-					ClipboardButton,
-					IconButton,
 					InputControl,
 					NumberControl,
+					RangeControl,
 					SelectControl,
+					ToggleGroupControl,
 				} from '@wordpress/components';
 				<>
-					<Button __next40pxDefaultSize />
-					<ClipboardButton __next40pxDefaultSize />
-					<IconButton __next40pxDefaultSize />
+					<FormTokenField />
 					<InputControl __next40pxDefaultSize />
 					<NumberControl __next40pxDefaultSize />
+					<RangeControl />
 					<SelectControl __next40pxDefaultSize />
+					<ToggleGroupControl />
 				</>
 			`,
 		},
