@@ -14,11 +14,7 @@ import { unlock } from '../../lock-unlock';
 import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';
 import { INLINE_OP_TYPE, useSuggestionsProvider } from './provider';
 import { useSuggestionOverlay } from './overlay-context';
-import {
-	wrapInlineMarker,
-	readInlineSelection,
-	readInlineCaret,
-} from '../inline-markers';
+import { wrapInlineMarker, readInlineCaret } from '../inline-markers';
 import {
 	SUGGESTION_FORMAT_NAME,
 	SUGGESTION_TYPE_DELETION,
@@ -30,6 +26,7 @@ import {
 import {
 	getCandidateDocuments,
 	isEventTargetSelectedRichText,
+	readEventRange,
 } from './keyboard-target';
 import {
 	previousGraphemeBoundary,
@@ -352,12 +349,36 @@ export default function SuggestionDeletionKeyboard() {
 				return;
 			}
 
-			// Selection delete (any delete input type over a range).
-			const selection = readInlineSelection(
+			/*
+			 * The store caret identifies the block and attribute (the
+			 * event-target guard above already matched the event against it),
+			 * but its OFFSETS are synced from the DOM asynchronously and lag
+			 * the live caret under fast typing — so offsets come from the DOM
+			 * at input time (`readEventRange`), falling back to the store
+			 * offsets when no DOM range resolves. Target ranges are not
+			 * consulted for deletion: a delete's target range is already
+			 * expanded to the text being removed, while this handler needs
+			 * the caret/selection that triggered it to keep collapsed-delete
+			 * runs growing a single marker.
+			 */
+			const anchor = readInlineCaret(
 				getSelectionStart,
 				getSelectionEnd
 			);
-			if ( selection ) {
+			if ( ! anchor ) {
+				// Block-level / cross-attribute selection: nothing to anchor to.
+				resetRun();
+				return;
+			}
+			const domRange = readEventRange( event, {
+				preferTargetRanges: false,
+			} );
+			const { clientId, attributeKey } = anchor;
+			const start = domRange ? domRange.start : anchor.start;
+			const end = domRange ? domRange.end : anchor.end;
+
+			// Selection delete (any delete input type over a range).
+			if ( start !== end ) {
 				/*
 				 * Leave a selection that overlaps an existing suggestion
 				 * marker to the default path: `applyFormat` over the range
@@ -366,28 +387,21 @@ export default function SuggestionDeletionKeyboard() {
 				 */
 				if (
 					valueRangeHasSuggestion(
-						getBlockAttributes( selection.clientId )?.[
-							selection.attributeKey
-						],
-						selection.start,
-						selection.end
+						getBlockAttributes( clientId )?.[ attributeKey ],
+						start,
+						end
 					)
 				) {
 					resetRun();
 					return;
 				}
 				event.preventDefault();
-				deleteSelection( selection );
+				deleteSelection( { clientId, attributeKey, start, end } );
 				return;
 			}
 
 			// Collapsed-cursor delete.
-			const caret = readInlineCaret( getSelectionStart, getSelectionEnd );
-			if ( ! caret || caret.start !== caret.end ) {
-				resetRun();
-				return;
-			}
-			const { clientId, attributeKey, start: pos } = caret;
+			const pos = start;
 			const { text, length, formats } =
 				readValueMetrics(
 					getBlockAttributes( clientId )?.[ attributeKey ]
@@ -488,16 +502,29 @@ export default function SuggestionDeletionKeyboard() {
 			) {
 				return;
 			}
-			const selection = readInlineSelection(
+			/*
+			 * Anchor (block + attribute) from the store; offsets from the DOM
+			 * truth at cut time (`cut` is a clipboard event with no target
+			 * ranges, so this reads the live selection), falling back to the
+			 * store offsets. See `onBeforeInput`.
+			 */
+			const anchor = readInlineCaret(
 				getSelectionStart,
 				getSelectionEnd
 			);
-			if ( ! selection ) {
+			if ( ! anchor ) {
+				resetRun();
+				return;
+			}
+			const domRange = readEventRange( event );
+			const { clientId, attributeKey } = anchor;
+			const start = domRange ? domRange.start : anchor.start;
+			const end = domRange ? domRange.end : anchor.end;
+			if ( start === end ) {
 				// Collapsed caret: nothing selected to cut.
 				resetRun();
 				return;
 			}
-			const { clientId, attributeKey, start, end } = selection;
 			const value = getBlockAttributes( clientId )?.[ attributeKey ];
 			const { formats, text } = readValueMetrics( value );
 			// Leave a selection overlapping an existing suggestion marker to the
@@ -522,7 +549,7 @@ export default function SuggestionDeletionKeyboard() {
 			}
 			event.preventDefault();
 			event.stopImmediatePropagation();
-			deleteSelection( selection );
+			deleteSelection( { clientId, attributeKey, start, end } );
 		},
 		[
 			getSelectionStart,

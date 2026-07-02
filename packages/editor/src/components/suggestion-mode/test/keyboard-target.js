@@ -4,6 +4,7 @@
 import {
 	getCandidateDocuments,
 	isEventTargetSelectedRichText,
+	readEventRange,
 } from '../keyboard-target';
 
 /*
@@ -154,6 +155,154 @@ describe( 'isEventTargetSelectedRichText', () => {
 		expect( isEventTargetSelectedRichText( undefined, selection ) ).toBe(
 			false
 		);
+	} );
+} );
+
+describe( 'readEventRange', () => {
+	afterEach( () => {
+		document.body.innerHTML = '';
+		jest.restoreAllMocks();
+	} );
+
+	/**
+	 * Build a rich-text-like editable containing `Hello <mark>world</mark>`
+	 * (text "Hello world"), appended to the test document body.
+	 *
+	 * @return {{ editable: HTMLElement, helloText: Text, worldText: Text }}
+	 *         The editable and its two text nodes.
+	 */
+	function createEditableWithMark() {
+		const editable = document.createElement( 'p' );
+		editable.className = 'block-editor-rich-text__editable';
+		const helloText = document.createTextNode( 'Hello ' );
+		const mark = document.createElement( 'mark' );
+		const worldText = document.createTextNode( 'world' );
+		mark.appendChild( worldText );
+		editable.appendChild( helloText );
+		editable.appendChild( mark );
+		document.body.appendChild( editable );
+		return { editable, helloText, worldText };
+	}
+
+	/*
+	 * A plain object shaped like a `StaticRange` (what `getTargetRanges()`
+	 * returns): the helper — via rich-text `create` — only reads the four
+	 * container/offset properties, so a live `Range` is not required.
+	 */
+	function staticRange(
+		startContainer,
+		startOffset,
+		endContainer,
+		endOffset
+	) {
+		return { startContainer, startOffset, endContainer, endOffset };
+	}
+
+	it( 'maps a target range spanning text and mark nodes to value offsets', () => {
+		const { editable, helloText, worldText } = createEditableWithMark();
+		const range = staticRange( helloText, 6, worldText, 5 );
+		const event = {
+			target: editable,
+			getTargetRanges: () => [ range ],
+		};
+		expect( readEventRange( event ) ).toEqual( { start: 6, end: 11 } );
+	} );
+
+	it( 'maps a collapsed target range (caret) inside a mark', () => {
+		const { editable, worldText } = createEditableWithMark();
+		const range = staticRange( worldText, 5, worldText, 5 );
+		const event = {
+			target: editable,
+			getTargetRanges: () => [ range ],
+		};
+		expect( readEventRange( event ) ).toEqual( { start: 11, end: 11 } );
+	} );
+
+	it( 'resolves the editable from a descendant target', () => {
+		const { editable, helloText, worldText } = createEditableWithMark();
+		const range = staticRange( helloText, 0, worldText, 5 );
+		const event = {
+			// Real input events target the focused node's element.
+			target: editable.querySelector( 'mark' ),
+			getTargetRanges: () => [ range ],
+		};
+		expect( readEventRange( event ) ).toEqual( { start: 0, end: 11 } );
+	} );
+
+	it( 'falls back to the live DOM selection when there are no target ranges', () => {
+		const { editable, helloText } = createEditableWithMark();
+		const range = staticRange( helloText, 2, helloText, 4 );
+		jest.spyOn( window, 'getSelection' ).mockReturnValue( {
+			rangeCount: 1,
+			getRangeAt: () => range,
+		} );
+		// A clipboard event: no `getTargetRanges` at all.
+		expect( readEventRange( { target: editable } ) ).toEqual( {
+			start: 2,
+			end: 4,
+		} );
+		// An input event whose target-range list is empty.
+		expect(
+			readEventRange( {
+				target: editable,
+				getTargetRanges: () => [],
+			} )
+		).toEqual( { start: 2, end: 4 } );
+	} );
+
+	it( 'ignores target ranges when preferTargetRanges is false', () => {
+		const { editable, helloText, worldText } = createEditableWithMark();
+		jest.spyOn( window, 'getSelection' ).mockReturnValue( {
+			rangeCount: 1,
+			getRangeAt: () => staticRange( worldText, 5, worldText, 5 ),
+		} );
+		const event = {
+			target: editable,
+			// A delete's target range is pre-expanded to the removed text;
+			// deletion callers need the triggering caret instead.
+			getTargetRanges: () => [
+				staticRange( helloText, 0, worldText, 5 ),
+			],
+		};
+		expect(
+			readEventRange( event, { preferTargetRanges: false } )
+		).toEqual( { start: 11, end: 11 } );
+	} );
+
+	it( 'returns null when no range is available (store fallback)', () => {
+		const { editable } = createEditableWithMark();
+		jest.spyOn( window, 'getSelection' ).mockReturnValue( {
+			rangeCount: 0,
+			getRangeAt: () => null,
+		} );
+		expect(
+			readEventRange( { target: editable, getTargetRanges: () => [] } )
+		).toBeNull();
+	} );
+
+	it( 'returns null when the target is not inside an editable', () => {
+		createEditableWithMark();
+		const outside = document.createElement( 'div' );
+		document.body.appendChild( outside );
+		expect(
+			readEventRange( { target: outside, getTargetRanges: () => [] } )
+		).toBeNull();
+		expect( readEventRange( undefined ) ).toBeNull();
+	} );
+
+	it( 'returns null when the range reaches outside the editable', () => {
+		const { editable, helloText } = createEditableWithMark();
+		const outside = document.createElement( 'p' );
+		const outsideText = document.createTextNode( 'elsewhere' );
+		outside.appendChild( outsideText );
+		document.body.appendChild( outside );
+		const event = {
+			target: editable,
+			getTargetRanges: () => [
+				staticRange( helloText, 0, outsideText, 3 ),
+			],
+		};
+		expect( readEventRange( event ) ).toBeNull();
 	} );
 } );
 
