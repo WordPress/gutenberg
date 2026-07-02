@@ -1,10 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect, useRef } from '@wordpress/element';
+import { useCallback, useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as noticesStore } from '@wordpress/notices';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -16,6 +18,25 @@ import {
 	SUGGESTION_TYPE_DELETION,
 	applyEditPlan,
 } from '../inline-suggestions';
+import { removeNoteIdFromMetadata } from '../collab-sidebar/utils';
+
+/**
+ * Stable comparison key for a `content` attribute value: the HTML string for
+ * rich-text values, the string itself otherwise. Used to detect whether the
+ * block's live content moved on while a note request was in flight.
+ *
+ * @param {*} value Block `content` attribute value.
+ * @return {string|null} Comparison key, or null for non-string-like values.
+ */
+export function contentKey( value ) {
+	if ( typeof value === 'string' ) {
+		return value;
+	}
+	if ( value && typeof value.toString === 'function' ) {
+		return value.toString();
+	}
+	return null;
+}
 
 /**
  * Owns the write side of text-edit suggestions that reach a block as a whole new
@@ -39,6 +60,14 @@ import {
  * can't resolve are left to the overlay path, so this handler always has a note
  * to create for every id the plan consumes.
  *
+ * Writes are serialized per block through the overlay context's shared write
+ * queue (shared with `SuggestionFormatKeyboard`), and every write re-validates
+ * the block's live content against the snapshot its plan was computed from —
+ * the note POST is an async gap during which typing markers, collaborators, or
+ * a queued sibling write may have changed the content. A stale plan is
+ * abandoned: its just-created notes are trashed and a snackbar tells the user
+ * the edit wasn't captured.
+ *
  * @return {null} Renders nothing.
  */
 export default function SuggestionContentReconciler() {
@@ -46,31 +75,77 @@ export default function SuggestionContentReconciler() {
 		( select ) => select( coreStore ).getCurrentUser()?.id ?? null,
 		[]
 	);
-	const { createSuggestion } = useSuggestionsProvider();
+	const { createSuggestion, deleteSuggestion } = useSuggestionsProvider();
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	const { registerContentHandler, requestInterceptorBypass } =
-		useSuggestionOverlay();
+	const { getBlockAttributes } = useSelect( blockEditorStore );
+	const { createNotice } = useDispatch( noticesStore );
+	const {
+		registerContentHandler,
+		requestInterceptorBypass,
+		enqueueSuggestionWrite,
+	} = useSuggestionOverlay();
 
-	// Per-clientId guard so a second edit on the same block while its note is
-	// still being created doesn't open a duplicate note.
-	const inFlightRef = useRef( new Set() );
+	// Trash notes created for a plan that was abandoned, and drop their ids
+	// from the block's note linkage. Best-effort: a failed trash is already
+	// surfaced by `deleteSuggestion`'s own notice.
+	const cleanupAbandonedNotes = useCallback(
+		async ( clientId, ids ) => {
+			if ( ids.length === 0 ) {
+				return;
+			}
+			let metadata = getBlockAttributes( clientId )?.metadata;
+			for ( const id of ids ) {
+				metadata = removeNoteIdFromMetadata( metadata, id );
+			}
+			requestInterceptorBypass( clientId );
+			updateBlockAttributes( clientId, { metadata } );
+			for ( const id of ids ) {
+				try {
+					await deleteSuggestion( { commentId: id } );
+				} catch {
+					// `deleteSuggestion` surfaces its own notice.
+				}
+			}
+		},
+		[
+			getBlockAttributes,
+			updateBlockAttributes,
+			requestInterceptorBypass,
+			deleteSuggestion,
+		]
+	);
 
-	const handleContentEdit = useCallback(
+	const notifyDropped = useCallback( () => {
+		createNotice(
+			'warning',
+			__( 'The edit could not be captured as a suggestion.' ),
+			{ type: 'snackbar', isDismissible: true }
+		);
+	}, [ createNotice ] );
+
+	// The queued task: open the plan's notes, then re-validate and write.
+	const runContentEdit = useCallback(
 		async ( { clientId, blockName, prevContent, plan } ) => {
-			const actions = plan?.actions ?? [];
-			if ( actions.length === 0 ) {
+			const actions = plan.actions;
+			const snapshotKey = contentKey( prevContent );
+			/*
+			 * The plan was diffed against `prevContent`. If the block moved on
+			 * while this task waited in the queue, the plan no longer applies —
+			 * abandon before creating any notes.
+			 */
+			if (
+				contentKey( getBlockAttributes( clientId )?.content ) !==
+				snapshotKey
+			) {
+				notifyDropped();
 				return;
 			}
-			if ( inFlightRef.current.has( clientId ) ) {
-				return;
-			}
-			inFlightRef.current.add( clientId );
+			const ids = [];
 			try {
 				// Open one note per action that needs a fresh id, in the order
 				// the actions appear — the same order `applyEditPlan` consumes
 				// `ids`. A `wrap-del` action becomes a deletion note; every other
 				// id-consuming action (`insert-add`) becomes an addition note.
-				const ids = [];
 				for ( const action of actions ) {
 					if ( ! action.newNote ) {
 						continue;
@@ -92,11 +167,28 @@ export default function SuggestionContentReconciler() {
 					} );
 					const id = record?.id;
 					if ( ! id ) {
-						// A note failed to open; abandon rather than write a
-						// marker with a missing id.
+						// A note failed to open; trash the ones already created
+						// rather than orphaning half a replace plan.
+						await cleanupAbandonedNotes( clientId, ids );
+						notifyDropped();
 						return;
 					}
 					ids.push( id );
+				}
+				/*
+				 * The note POSTs are an async gap: re-read the live content at
+				 * write time. If it no longer matches the snapshot the plan was
+				 * computed from (typing markers landed, a collaborator edited,
+				 * an interleaved flush), writing `applyEditPlan( prevContent )`
+				 * would clobber those changes — abandon instead.
+				 */
+				if (
+					contentKey( getBlockAttributes( clientId )?.content ) !==
+					snapshotKey
+				) {
+					await cleanupAbandonedNotes( clientId, ids );
+					notifyDropped();
+					return;
 				}
 				const marked = applyEditPlan( prevContent, actions, {
 					authorId,
@@ -105,18 +197,48 @@ export default function SuggestionContentReconciler() {
 				requestInterceptorBypass( clientId );
 				updateBlockAttributes( clientId, { content: marked } );
 			} catch {
-				// `createSuggestion` surfaces its own error notice; there is
-				// nothing to write on failure.
-			} finally {
-				inFlightRef.current.delete( clientId );
+				// `createSuggestion` surfaces its own error notice; trash any
+				// notes created before the failure so none are orphaned.
+				await cleanupAbandonedNotes( clientId, ids );
+				notifyDropped();
 			}
 		},
 		[
 			authorId,
 			createSuggestion,
+			getBlockAttributes,
 			updateBlockAttributes,
 			requestInterceptorBypass,
+			cleanupAbandonedNotes,
+			notifyDropped,
 		]
+	);
+
+	/*
+	 * Synchronous front door handed to the overlay HOC. Validates the request
+	 * cheaply and returns false when it cannot be processed, so
+	 * `wrappedSetAttributes` falls through to the overlay path instead of
+	 * swallowing the edit. Processable requests are queued per block — a second
+	 * edit arriving while a note POST is in flight waits its turn instead of
+	 * being dropped, re-validating against live content when it runs.
+	 */
+	const handleContentEdit = useCallback(
+		( request ) => {
+			const actions = request?.plan?.actions ?? [];
+			if (
+				! request?.clientId ||
+				actions.length === 0 ||
+				! actions.every( ( action ) => action.newNote ) ||
+				contentKey( request.prevContent ) === null
+			) {
+				return false;
+			}
+			enqueueSuggestionWrite( request.clientId, () =>
+				runContentEdit( request )
+			);
+			return true;
+		},
+		[ enqueueSuggestionWrite, runContentEdit ]
 	);
 
 	// Register the handler with the overlay context so the per-block HOC can

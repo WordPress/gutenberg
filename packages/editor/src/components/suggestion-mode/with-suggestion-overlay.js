@@ -195,9 +195,13 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 			if ( plan.kind !== 'format' ) {
 				return false;
 			}
+			// `prevContent` rides along so the handler can re-validate the
+			// live block content against the snapshot the plan was diffed
+			// from before (and after) its async note round trip.
 			return requestFormatSuggestion( {
 				clientId,
 				blockName: name,
+				prevContent,
 				nextContent,
 				plan,
 			} );

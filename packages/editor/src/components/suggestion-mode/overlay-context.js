@@ -42,6 +42,11 @@ import {
 } from '@wordpress/element';
 import { useRegistry, useSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { createSuggestionWriteQueue } from './suggestion-write-queue';
+
 // Referenced by name to keep the provider runnable in tests and standalone
 // contexts where the block-editor store isn't registered. Orphan cleanup is
 // skipped in those environments.
@@ -87,6 +92,8 @@ const OverlayContext = createContext( {
 	requestFormatSuggestion: () => false,
 	registerContentHandler: () => () => {},
 	requestContentSuggestion: () => false,
+	// Standalone default (no provider mounted): run the task immediately.
+	enqueueSuggestionWrite: ( clientId, task ) => task(),
 } );
 
 /**
@@ -326,8 +333,13 @@ export function SuggestionOverlayProvider( { children } ) {
 		if ( ! handler ) {
 			return false;
 		}
-		handler( request );
-		return true;
+		/*
+		 * The handler returns a synchronous verdict: `false` means it cannot
+		 * process this request, and the caller must let the edit fall through
+		 * to the overlay path rather than swallow it. Anything else —
+		 * including a promise from an async handler — counts as accepted.
+		 */
+		return handler( request ) !== false;
 	}, [] );
 
 	// Single slot for the content-reconciliation handler, the twin of the format
@@ -352,9 +364,25 @@ export function SuggestionOverlayProvider( { children } ) {
 		if ( ! handler ) {
 			return false;
 		}
-		handler( request );
-		return true;
+		// Same synchronous-verdict contract as `requestFormatSuggestion`.
+		return handler( request ) !== false;
 	}, [] );
+
+	/*
+	 * One write queue per editor, shared by the content reconciler and the
+	 * format keyboard so their note-then-marker flights serialize per block
+	 * instead of interleaving (each component keeping its own in-flight guard
+	 * previously let one of each race on the same block). A ref because the
+	 * queue is imperative state consumed outside React's render cycle.
+	 */
+	const writeQueueRef = useRef( null );
+	if ( writeQueueRef.current === null ) {
+		writeQueueRef.current = createSuggestionWriteQueue();
+	}
+	const enqueueSuggestionWrite = useCallback(
+		( clientId, task ) => writeQueueRef.current.enqueue( clientId, task ),
+		[]
+	);
 
 	// Prune overlay entries whose block was removed from the editor. This
 	// prevents stale baselines from persisting after a block is deleted.
@@ -407,6 +435,7 @@ export function SuggestionOverlayProvider( { children } ) {
 			requestFormatSuggestion,
 			registerContentHandler,
 			requestContentSuggestion,
+			enqueueSuggestionWrite,
 		} ),
 		[
 			entries,
@@ -423,6 +452,7 @@ export function SuggestionOverlayProvider( { children } ) {
 			requestFormatSuggestion,
 			registerContentHandler,
 			requestContentSuggestion,
+			enqueueSuggestionWrite,
 		]
 	);
 

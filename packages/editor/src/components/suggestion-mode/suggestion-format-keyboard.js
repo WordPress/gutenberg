@@ -1,10 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect, useRef } from '@wordpress/element';
+import { useCallback, useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as noticesStore } from '@wordpress/notices';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -12,6 +14,8 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useSuggestionOverlay } from './overlay-context';
 import { INLINE_OP_TYPE, useSuggestionsProvider } from './provider';
 import { SUGGESTION_TYPE_FORMAT, applyFormatPlan } from '../inline-suggestions';
+import { contentKey } from './suggestion-content-reconciler';
+import { removeNoteIdFromMetadata } from '../collab-sidebar/utils';
 
 /**
  * Owns the write side of formatting suggestions in Suggest mode.
@@ -31,6 +35,14 @@ import { SUGGESTION_TYPE_FORMAT, applyFormatPlan } from '../inline-suggestions';
  * The text is shown once, carrying the proposed formatting (the Google Docs
  * model), never duplicated.
  *
+ * Writes are serialized per block through the overlay context's shared write
+ * queue (shared with `SuggestionContentReconciler`), and every write
+ * re-validates the block's live content against the snapshot the plan was
+ * diffed from — the note POST is an async gap during which typing markers,
+ * collaborators, or a queued sibling write may have changed the content. A
+ * stale plan is abandoned: its just-created note is trashed and a snackbar
+ * tells the user the edit wasn't captured.
+ *
  * @return {null} Renders nothing.
  */
 export default function SuggestionFormatKeyboard() {
@@ -38,24 +50,71 @@ export default function SuggestionFormatKeyboard() {
 		( select ) => select( coreStore ).getCurrentUser()?.id ?? null,
 		[]
 	);
-	const { createSuggestion } = useSuggestionsProvider();
+	const { createSuggestion, deleteSuggestion } = useSuggestionsProvider();
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	const { registerFormatHandler, requestInterceptorBypass } =
-		useSuggestionOverlay();
+	const { getBlockAttributes } = useSelect( blockEditorStore );
+	const { createNotice } = useDispatch( noticesStore );
+	const {
+		registerFormatHandler,
+		requestInterceptorBypass,
+		enqueueSuggestionWrite,
+	} = useSuggestionOverlay();
 
-	// Per-clientId guard so a second toggle on the same block while its note is
-	// still being created doesn't open a duplicate note.
-	const inFlightRef = useRef( new Set() );
-
-	const handleFormatEdit = useCallback(
-		async ( { clientId, blockName, nextContent, plan } ) => {
-			if ( ! plan || plan.kind !== 'format' ) {
+	// Trash the note created for an abandoned plan and drop its id from the
+	// block's note linkage. Best-effort: a failed trash is already surfaced
+	// by `deleteSuggestion`'s own notice.
+	const cleanupAbandonedNote = useCallback(
+		async ( clientId, id ) => {
+			if ( ! id ) {
 				return;
 			}
-			if ( inFlightRef.current.has( clientId ) ) {
+			const metadata = removeNoteIdFromMetadata(
+				getBlockAttributes( clientId )?.metadata,
+				id
+			);
+			requestInterceptorBypass( clientId );
+			updateBlockAttributes( clientId, { metadata } );
+			try {
+				await deleteSuggestion( { commentId: id } );
+			} catch {
+				// `deleteSuggestion` surfaces its own notice.
+			}
+		},
+		[
+			getBlockAttributes,
+			updateBlockAttributes,
+			requestInterceptorBypass,
+			deleteSuggestion,
+		]
+	);
+
+	const notifyDropped = useCallback( () => {
+		createNotice(
+			'warning',
+			__(
+				'The formatting change could not be captured as a suggestion.'
+			),
+			{ type: 'snackbar', isDismissible: true }
+		);
+	}, [ createNotice ] );
+
+	// The queued task: open the format note, then re-validate and write.
+	const runFormatEdit = useCallback(
+		async ( { clientId, blockName, prevContent, nextContent, plan } ) => {
+			const snapshotKey = contentKey( prevContent );
+			/*
+			 * The plan was diffed against `prevContent`. If the block moved on
+			 * while this task waited in the queue, the plan no longer applies —
+			 * abandon before creating a note.
+			 */
+			if (
+				contentKey( getBlockAttributes( clientId )?.content ) !==
+				snapshotKey
+			) {
+				notifyDropped();
 				return;
 			}
-			inFlightRef.current.add( clientId );
+			let id = null;
 			try {
 				const record = await createSuggestion( {
 					clientId,
@@ -70,28 +129,73 @@ export default function SuggestionFormatKeyboard() {
 						},
 					],
 				} );
-				const id = record?.id;
-				if ( id ) {
-					const marked = applyFormatPlan( nextContent, plan, {
-						id,
-						authorId,
-					} );
-					requestInterceptorBypass( clientId );
-					updateBlockAttributes( clientId, { content: marked } );
+				id = record?.id ?? null;
+				if ( ! id ) {
+					notifyDropped();
+					return;
 				}
+				/*
+				 * The note POST is an async gap: re-read the live content at
+				 * write time. If it no longer matches the snapshot the plan
+				 * was diffed from, writing the marked `nextContent` would
+				 * clobber whatever landed in between — abandon instead.
+				 */
+				if (
+					contentKey( getBlockAttributes( clientId )?.content ) !==
+					snapshotKey
+				) {
+					await cleanupAbandonedNote( clientId, id );
+					notifyDropped();
+					return;
+				}
+				const marked = applyFormatPlan( nextContent, plan, {
+					id,
+					authorId,
+				} );
+				requestInterceptorBypass( clientId );
+				updateBlockAttributes( clientId, { content: marked } );
 			} catch {
-				// `createSuggestion` surfaces its own error notice; there is
-				// nothing to write on failure.
-			} finally {
-				inFlightRef.current.delete( clientId );
+				// `createSuggestion` surfaces its own error notice; trash a
+				// note created before the failure so it isn't orphaned.
+				await cleanupAbandonedNote( clientId, id );
+				notifyDropped();
 			}
 		},
 		[
 			authorId,
 			createSuggestion,
+			getBlockAttributes,
 			updateBlockAttributes,
 			requestInterceptorBypass,
+			cleanupAbandonedNote,
+			notifyDropped,
 		]
+	);
+
+	/*
+	 * Synchronous front door handed to the overlay HOC. Validates the request
+	 * cheaply and returns false when it cannot be processed, so
+	 * `wrappedSetAttributes` falls through to the overlay path instead of
+	 * swallowing the edit. Processable requests are queued per block — a second
+	 * toggle arriving while a note POST is in flight waits its turn instead of
+	 * being dropped, re-validating against live content when it runs.
+	 */
+	const handleFormatEdit = useCallback(
+		( request ) => {
+			if (
+				! request?.clientId ||
+				! request?.plan ||
+				request.plan.kind !== 'format' ||
+				contentKey( request.prevContent ) === null
+			) {
+				return false;
+			}
+			enqueueSuggestionWrite( request.clientId, () =>
+				runFormatEdit( request )
+			);
+			return true;
+		},
+		[ enqueueSuggestionWrite, runFormatEdit ]
 	);
 
 	// Register the handler with the overlay context so the per-block HOC can
