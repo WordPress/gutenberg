@@ -26,6 +26,7 @@ import {
 import {
 	getCandidateDocuments,
 	isEventTargetSelectedRichText,
+	readEventRange,
 } from './keyboard-target';
 
 /**
@@ -259,9 +260,13 @@ export default function SuggestionAdditionKeyboard() {
 	 * native edit when this returns true — when no valid single-attribute
 	 * anchor exists the input has to fall through to the native/overlay path
 	 * rather than being swallowed.
+	 *
+	 * `domRange` carries the DOM-derived offsets for the edit
+	 * (`readEventRange`); the store caret is only trusted for block/attribute
+	 * identification because its offsets lag the DOM under fast typing.
 	 */
 	const insertText = useCallback(
-		( text, allowGrow ) => {
+		( text, allowGrow, domRange ) => {
 			const caret = readInlineCaret( getSelectionStart, getSelectionEnd );
 			const inFlight = runRef.current;
 			if ( inFlight && inFlight.id === null ) {
@@ -291,7 +296,16 @@ export default function SuggestionAdditionKeyboard() {
 				resetRun();
 				return false;
 			}
-			const { clientId, attributeKey, start, end } = caret;
+			const { clientId, attributeKey } = caret;
+			/*
+			 * Offsets come from the DOM truth at input time when available.
+			 * The store's selection offsets are synced asynchronously and lag
+			 * the DOM caret after a marker write re-rendered RichText — a fast
+			 * typist's next `beforeinput` would otherwise land the marker at
+			 * stale offsets, splitting existing content/markers mid-word.
+			 */
+			const start = domRange ? domRange.start : caret.start;
+			const end = domRange ? domRange.end : caret.end;
 			if (
 				start !== end &&
 				valueRangeHasSuggestion(
@@ -383,7 +397,7 @@ export default function SuggestionAdditionKeyboard() {
 			 * — a preventDefault without a subsequent write would silently
 			 * drop the typed character.
 			 */
-			if ( insertText( text, true ) ) {
+			if ( insertText( text, true, readEventRange( event ) ) ) {
 				event.preventDefault();
 			}
 		},
@@ -415,7 +429,9 @@ export default function SuggestionAdditionKeyboard() {
 			 * point — but only once the caret resolved to a valid anchor;
 			 * otherwise let the editor's paste pipeline have it.
 			 */
-			if ( insertText( plain, false ) ) {
+			// A clipboard event exposes no target ranges; `readEventRange`
+			// falls back to the live DOM selection.
+			if ( insertText( plain, false, readEventRange( event ) ) ) {
 				event.preventDefault();
 				event.stopImmediatePropagation();
 			}
