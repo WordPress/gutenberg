@@ -130,11 +130,7 @@ function useEditorStyles( settings ) {
 	] );
 }
 
-/**
- * @param {Object}  props
- * @param {boolean} props.isLegacy True for device previews where split view is disabled.
- */
-function MetaBoxesMain( { isLegacy } ) {
+function MetaBoxesMain() {
 	const [ isOpen, openHeight, hasAnyVisible ] = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const { isMetaBoxLocationVisible } = select( editPostStore );
@@ -283,16 +279,12 @@ function MetaBoxesMain( { isLegacy } ) {
 		<div
 			// The class name 'edit-post-layout__metaboxes' is retained because some plugins use it.
 			className="edit-post-layout__metaboxes edit-post-meta-boxes-main__liner"
-			hidden={ ! isLegacy && ! isOpen }
+			hidden={ ! isOpen }
 		>
 			<MetaBoxes location="normal" />
 			<MetaBoxes location="advanced" />
 		</div>
 	);
-
-	if ( isLegacy ) {
-		return contents;
-	}
 
 	const isAutoHeight = openHeight === undefined;
 	const usedOpenHeight = isShort ? 'auto' : openHeight;
@@ -595,9 +587,7 @@ function Layout( {
 							}
 							extraContent={
 								! isDistractionFree &&
-								showMetaBoxes && (
-									<MetaBoxesMain isLegacy={ false } />
-								)
+								showMetaBoxes && <MetaBoxesMain />
 							}
 						>
 							<PostLockedModal />

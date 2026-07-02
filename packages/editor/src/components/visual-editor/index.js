@@ -402,7 +402,6 @@ function VisualEditor( {
 					// Horizontal padding leaves room for the resize handles
 					// that appear on the left/right of a resizable canvas.
 					'has-horizontal-padding': isFocusedEntity || enableResizing,
-					'is-iframed': true,
 				}
 			) }
 		>
@@ -455,8 +454,8 @@ function VisualEditor( {
 							contentEditable={ false }
 							ref={ observeTypingRef }
 							style={ {
-								// This is using inline styles
-								// so it's applied for both iframed and non iframed editors.
+								// This is using inline styles so it's applied
+								// within the editor iframe.
 								marginTop: '4rem',
 							} }
 						>
