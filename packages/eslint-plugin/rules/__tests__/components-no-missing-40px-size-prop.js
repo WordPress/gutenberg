@@ -92,28 +92,24 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 				<Modal />
 			`,
 		},
-		// Retired components without the prop, and targeted components with the prop
+		// All targeted components with __next40pxDefaultSize
 		{
 			code: `
 				import {
-					CustomSelectControl,
-					FormTokenField,
+					Button,
+					ClipboardButton,
+					IconButton,
 					InputControl,
 					NumberControl,
-					RangeControl,
 					SelectControl,
-					ToggleGroupControl,
-					UnitControl,
 				} from '@wordpress/components';
 				<>
-					<CustomSelectControl />
-					<FormTokenField />
+					<Button __next40pxDefaultSize />
+					<ClipboardButton __next40pxDefaultSize />
+					<IconButton __next40pxDefaultSize />
 					<InputControl __next40pxDefaultSize />
 					<NumberControl __next40pxDefaultSize />
-					<RangeControl />
 					<SelectControl __next40pxDefaultSize />
-					<ToggleGroupControl />
-					<UnitControl />
 				</>
 			`,
 		},

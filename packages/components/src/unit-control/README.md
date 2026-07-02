@@ -54,16 +54,19 @@ Determines if the unit `<select>` is tabbable.
 If this property is added, a label will be generated using label property as the content.
 
 -   Required: No
+
 ### `labelPosition`: `string`
 
 The position of the label (`top`, `side`, `bottom`, or `edge`).
 
 -   Required: No
+
 ### `onBlur`: `FocusEventHandler< HTMLInputElement | HTMLSelectElement >`
 
 Callback invoked when either the quantity or unit inputs fire the `blur` event.
 
 -   Required: No
+
 ### `onFocus`: `FocusEventHandler< HTMLInputElement | HTMLSelectElement >`
 
 Callback invoked when either the quantity or unit inputs fire the `focus` event.
