@@ -88,10 +88,13 @@ function TextShadowControl( { textShadow, onChange } ) {
 		[ defaultPresetsEnabled, defaultPresets, themePresets, customPresets ]
 	);
 
-	const choices = presets.map( ( preset ) => ( {
-		value: `var:preset|text-shadow|${ preset.slug }`,
-		label: preset.name,
-	} ) );
+	const choices = [
+		{ value: 'none', label: __( 'None' ) },
+		...presets.map( ( preset ) => ( {
+			value: `var:preset|text-shadow|${ preset.slug }`,
+			label: preset.name,
+		} ) ),
+	];
 
 	const activeSlug = presets.find(
 		( preset ) => preset.textShadow === textShadow
@@ -113,7 +116,7 @@ function TextShadowControl( { textShadow, onChange } ) {
 				>
 					{ __( 'Code is poetry' ) }
 				</div>
-				{ choices.length >= PRESETS_SELECT_THRESHOLD ? (
+				{ presets.length >= PRESETS_SELECT_THRESHOLD ? (
 					<SelectControl
 						__next40pxDefaultSize
 						hideLabelFromVision
