@@ -1839,6 +1839,25 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
+	 * Verifies that schema validation still applies to the `url` argument even
+	 * though it registers a custom `validate_callback`, which replaces the
+	 * default rest_validate_request_arg() unless re-applied.
+	 *
+	 * @covers ::get_endpoint_args_for_item_schema
+	 */
+	public function test_create_item_from_url_rejects_non_string_url() {
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_param( 'url', array( 'https://example.com/image.jpg' ) );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 'rest_invalid_param', $response->get_data()['code'] );
+		$this->assertSame( 400, $response->get_status() );
+	}
+
+	/**
 	 * Verifies that the `url` argument is registered on the creatable media route
 	 * so requests can supply an external image URL to sideload.
 	 *
