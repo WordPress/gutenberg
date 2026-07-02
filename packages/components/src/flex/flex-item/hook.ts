@@ -2,7 +2,6 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import type { CSSProperties } from 'react';
 
 /**
  * Internal dependencies
@@ -12,10 +11,6 @@ import { useContextSystem } from '../../context';
 import { useFlexContext } from '../context';
 import type { FlexItemProps } from '../types';
 import styles from '../style.module.scss';
-
-type FlexItemStyle = CSSProperties & {
-	'--wp-components-flex-item-display'?: CSSProperties[ 'display' ];
-};
 
 export function useFlexItem(
 	props: WordPressComponentProps< FlexItemProps, 'div' >
@@ -31,7 +26,7 @@ export function useFlexItem(
 	const contextDisplay = useFlexContext().flexItemDisplay;
 	const display = displayProp || contextDisplay;
 
-	const itemStyle: FlexItemStyle = {
+	const itemStyle = {
 		...( display && { '--wp-components-flex-item-display': display } ),
 		...style,
 	};
