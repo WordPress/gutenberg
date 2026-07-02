@@ -5,7 +5,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
-import { create } from '@wordpress/rich-text';
+import { RichTextData, create, slice } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -59,6 +59,31 @@ function readValueMetrics( value ) {
 		length: record.text.length,
 		formats: record.formats ?? [],
 	};
+}
+
+/**
+ * Serialize a slice of a rich-text attribute value to an HTML string,
+ * preserving inline formatting (bold, links, …). Used by the cut handler to
+ * write a `text/html` clipboard flavor alongside `text/plain`, so pasting the
+ * cut run elsewhere keeps its formatting. Exported for unit tests.
+ *
+ * @param {*}      value Block attribute value (RichTextData, string, other).
+ * @param {number} start Slice start (character offset).
+ * @param {number} end   Slice end (character offset).
+ * @return {string} HTML of the sliced run; empty for non-string-like values.
+ */
+export function sliceValueToHTML( value, start, end ) {
+	let html = null;
+	if ( value && typeof value.toHTMLString === 'function' ) {
+		html = value.toHTMLString();
+	} else if ( typeof value === 'string' ) {
+		html = value;
+	}
+	if ( html === null ) {
+		return '';
+	}
+	const record = create( { html } );
+	return new RichTextData( slice( record, start, end ) ).toHTMLString();
 }
 
 /**
@@ -473,22 +498,28 @@ export default function SuggestionDeletionKeyboard() {
 				return;
 			}
 			const { clientId, attributeKey, start, end } = selection;
-			const { formats, text } = readValueMetrics(
-				getBlockAttributes( clientId )?.[ attributeKey ]
-			);
+			const value = getBlockAttributes( clientId )?.[ attributeKey ];
+			const { formats, text } = readValueMetrics( value );
 			// Leave a selection overlapping an existing suggestion marker to the
 			// default path rather than nesting marks.
 			if ( formatsRangeHasSuggestion( formats, start, end ) ) {
 				resetRun();
 				return;
 			}
-			// Preserve the copy half of cut: put the selected text on the
-			// clipboard, then cancel the browser's delete so the text is marked
-			// for deletion instead of removed.
+			/*
+			 * Preserve the copy half of cut: put the selected run on the
+			 * clipboard as plain text AND as HTML (so pasting elsewhere keeps
+			 * bold/links/other inline formatting), then cancel the browser's
+			 * delete so the text is marked for deletion instead of removed.
+			 */
 			event.clipboardData?.setData?.(
 				'text/plain',
 				text.slice( start, end )
 			);
+			const htmlSlice = sliceValueToHTML( value, start, end );
+			if ( htmlSlice ) {
+				event.clipboardData?.setData?.( 'text/html', htmlSlice );
+			}
 			event.preventDefault();
 			event.stopImmediatePropagation();
 			deleteSelection( selection );
