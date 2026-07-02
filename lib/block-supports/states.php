@@ -520,7 +520,7 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 	);
 	$css_rules                = array();
 	$viewport_settings        = gutenberg_get_global_settings( array( 'viewport' ) );
-	$responsive_media_queries = WP_Theme_JSON_Gutenberg::get_responsive_media_queries( $viewport_settings );
+	$responsive_media_queries = WP_Theme_JSON_Gutenberg::get_viewport_media_queries( $viewport_settings );
 
 	foreach ( $supported_pseudo_states as $pseudo_state ) {
 		if ( empty( $style[ $pseudo_state ] ) || ! is_array( $style[ $pseudo_state ] ) ) {

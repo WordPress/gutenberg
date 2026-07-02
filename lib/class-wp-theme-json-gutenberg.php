@@ -650,7 +650,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * }
 	 * @return array Responsive media queries.
 	 */
-	public static function get_responsive_media_queries( $viewport_settings = null, $options = array() ) {
+	public static function get_viewport_media_queries( $viewport_settings = null, $options = array() ) {
 		if ( null === $viewport_settings ) {
 			$breakpoints = static::DEFAULT_VIEWPORT_BREAKPOINTS;
 		} else {
@@ -1268,7 +1268,7 @@ class WP_Theme_JSON_Gutenberg {
 		// Build the schema based on valid block & element names.
 		$schema                   = array();
 		$schema_styles_elements   = array();
-		$responsive_media_queries = static::get_responsive_media_queries( $input['settings']['viewport'] ?? null );
+		$responsive_media_queries = static::get_viewport_media_queries( $input['settings']['viewport'] ?? null );
 
 		/*
 		 * Set allowed element pseudo selectors and responsive breakpoint states.
@@ -3506,7 +3506,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		$include_variations       = $options['include_block_style_variations'] ?? false;
 		$include_node_paths_only  = $options['include_node_paths_only'] ?? false;
-		$responsive_media_queries = static::get_responsive_media_queries( $theme_json['settings']['viewport'] ?? null );
+		$responsive_media_queries = static::get_viewport_media_queries( $theme_json['settings']['viewport'] ?? null );
 
 		// If only node paths are to be returned, skip selector assignment.
 		if ( ! $include_node_paths_only ) {
@@ -3792,7 +3792,7 @@ class WP_Theme_JSON_Gutenberg {
 		$settings                 = $this->theme_json['settings'] ?? null;
 		$is_root_selector         = static::ROOT_BLOCK_SELECTOR === $selector;
 		$media_query              = $block_metadata['media_query'] ?? null;
-		$responsive_media_queries = static::get_responsive_media_queries( $settings['viewport'] ?? null );
+		$responsive_media_queries = static::get_viewport_media_queries( $settings['viewport'] ?? null );
 
 		$feature_declarations = static::get_feature_declarations_for_node( $block_metadata, $node );
 
@@ -4647,7 +4647,7 @@ class WP_Theme_JSON_Gutenberg {
 		$blocks_metadata          = static::get_blocks_metadata();
 		$style_options            = array( 'include_block_style_variations' => true ); // Allow variations data.
 		$style_nodes              = static::get_style_nodes( $theme_json, $blocks_metadata, $style_options );
-		$responsive_media_queries = static::get_responsive_media_queries( $theme_json['settings']['viewport'] ?? null );
+		$responsive_media_queries = static::get_viewport_media_queries( $theme_json['settings']['viewport'] ?? null );
 
 		foreach ( $style_nodes as $metadata ) {
 			$input = _wp_array_get( $theme_json, $metadata['path'], array() );

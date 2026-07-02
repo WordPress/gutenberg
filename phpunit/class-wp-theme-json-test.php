@@ -1025,13 +1025,13 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_get_responsive_media_queries_uses_valid_custom_breakpoint_without_merging_defaults() {
+	public function test_get_viewport_media_queries_uses_valid_custom_breakpoint_without_merging_defaults() {
 		$this->assertSame(
 			array(
 				'mobile'  => '@media (width <= 640px)',
 				'desktop' => '@media (width > 640px)',
 			),
-			WP_Theme_JSON_Gutenberg::get_responsive_media_queries(
+			WP_Theme_JSON_Gutenberg::get_viewport_media_queries(
 				array(
 					'mobile'  => ' 640px ',
 					'tablet'  => 'calc(100% - 1rem)',
@@ -1044,14 +1044,14 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_get_responsive_media_queries_uses_defaults_when_no_custom_breakpoints_are_valid() {
+	public function test_get_viewport_media_queries_uses_defaults_when_no_custom_breakpoints_are_valid() {
 		$this->assertSame(
 			array(
 				'mobile'  => '@media (width <= 480px)',
 				'tablet'  => '@media (480px < width <= 782px)',
 				'desktop' => '@media (width > 782px)',
 			),
-			WP_Theme_JSON_Gutenberg::get_responsive_media_queries(
+			WP_Theme_JSON_Gutenberg::get_viewport_media_queries(
 				array(
 					'mobile' => '100%',
 					'tablet' => 'auto',
@@ -1063,13 +1063,13 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_get_responsive_media_queries_omits_tablet_when_its_breakpoint_is_not_larger_than_mobile() {
+	public function test_get_viewport_media_queries_omits_tablet_when_its_breakpoint_is_not_larger_than_mobile() {
 		$this->assertSame(
 			array(
 				'mobile'  => '@media (width <= 64rem)',
 				'desktop' => '@media (width > 64rem)',
 			),
-			WP_Theme_JSON_Gutenberg::get_responsive_media_queries(
+			WP_Theme_JSON_Gutenberg::get_viewport_media_queries(
 				array(
 					'mobile' => '64rem',
 					'tablet' => '40rem',
