@@ -5,6 +5,7 @@ import { store as editorStore } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -19,6 +20,7 @@ export function useShouldIframe() {
 		const { getClientIdsWithDescendants, getBlockName } =
 			select( blockEditorStore );
 		const { getBlockType } = select( blocksStore );
+		const { getCurrentTheme } = select( coreStore );
 
 		return (
 			// If the Gutenberg plugin is active, we ALWAYS use the iframe for
@@ -28,6 +30,8 @@ export function useShouldIframe() {
 			// blocks easily. Before GB v22.5, we only enforced it for
 			// block-based themes (classic themes used the same rules as core).
 			isGutenbergPlugin ||
+			// Always iframe the editor for block themes.
+			getCurrentTheme()?.is_block_theme ||
 			// We also still want to iframe all the special
 			// editor features and modes such as device previews, zoom out, and
 			// template/pattern editing.
