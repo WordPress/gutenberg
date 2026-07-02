@@ -187,59 +187,19 @@ export const getSelectionRects = (
 };
 
 /**
- * Computes selection highlight rectangles for the full content of a block.
- * Used for intermediate blocks in a multi-block selection.
+ * Finds all block elements between two blocks in DOM order (exclusive of
+ * start and end). Descendant blocks are filtered out — if a parent block is
+ * already in the result, its children are skipped. This prevents
+ * double-highlighting nested structures (e.g. selecting across a list returns
+ * the list block, not the individual list items inside it).
  *
- * @param blockElement   - The block element
- * @param editorDocument - The editor document
- * @param overlayRect    - Pre-computed bounding rect of the overlay element
- * @return Array of selection rectangles relative to the overlay
- */
-export const getFullBlockSelectionRects = (
-	blockElement: HTMLElement,
-	editorDocument: Document,
-	overlayRect: DOMRect
-): SelectionRect[] => {
-	const range = editorDocument.createRange();
-	range.selectNodeContents( blockElement );
-	const clientRects = range.getClientRects();
-	const rects: SelectionRect[] = [];
-
-	for ( const rect of clientRects ) {
-		if ( rect.width === 0 && rect.height === 0 ) {
-			continue;
-		}
-		rects.push( {
-			x: rect.left - overlayRect.left,
-			y: rect.top - overlayRect.top,
-			width: rect.width,
-			height: rect.height,
-		} );
-	}
-
-	// Fallback: if getClientRects returned nothing, use the block's bounding rect.
-	if ( rects.length === 0 ) {
-		const blockRect = blockElement.getBoundingClientRect();
-		if ( blockRect.width > 0 && blockRect.height > 0 ) {
-			rects.push( {
-				x: blockRect.left - overlayRect.left,
-				y: blockRect.top - overlayRect.top,
-				width: blockRect.width,
-				height: blockRect.height,
-			} );
-		}
-	}
-
-	return rects;
-};
-
-/**
- * Finds all block elements between two blocks in DOM order (exclusive of start and end).
+ * NOTE: startBlockId and endBlockId may be in either order — the function
+ * normalises to DOM order internally.
  *
- * @param startBlockId   - The clientId of the start block
- * @param endBlockId     - The clientId of the end block
+ * @param startBlockId   - The clientId of one end block
+ * @param endBlockId     - The clientId of the other end block
  * @param editorDocument - The editor document
- * @return Array of intermediate block HTMLElements in document order
+ * @return Intermediate block HTMLElements in document order, descendants excluded
  */
 export const getBlocksBetween = (
 	startBlockId: string,
@@ -273,7 +233,12 @@ export const getBlocksBetween = (
 
 	const result: HTMLElement[] = [];
 	for ( let i = startIndex + 1; i < endIndex; i++ ) {
-		result.push( allBlocks[ i ] );
+		const block = allBlocks[ i ];
+		// Skip descendants of blocks already in the result to prevent
+		// double-highlights on nested blocks (e.g. list items inside a list).
+		if ( ! result.some( ( r ) => r.contains( block ) ) ) {
+			result.push( block );
+		}
 	}
 	return result;
 };
