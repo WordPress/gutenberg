@@ -1,12 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 
-/**
- * Internal dependencies
- */
 import Theme from '../';
 
 type MyThemableComponentProps = {

@@ -1,17 +1,8 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { CSSProperties } from 'react';
 
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 
-/**
- * Internal dependencies
- */
 import type { ThemeOutputValues, ThemeProps } from './types';
 import type { WordPressComponentProps } from '../context';
 import { generateThemeVariables } from './color-algorithms';
