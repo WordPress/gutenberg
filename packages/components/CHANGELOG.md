@@ -103,6 +103,7 @@
 
 -   Add a private, presentational `ContentEditableControl`: a labeled `contentEditable` form field. The rich-text behavior is injected by the consumer (e.g. the DataViews `richtext` control), keeping the component free of any `@wordpress/rich-text` dependency ([#78471](https://github.com/WordPress/gutenberg/pull/78471)).
 -   `Autocomplete`: subscribe the keyboard listener through the rich text selection owner, so it also handles events targeting a focused editing host ([#79105](https://github.com/WordPress/gutenberg/pull/79105)).
+-   `Button`: Migrate hardcoded Sass color, spacing, and typography values to WPDS design tokens ([#79993](https://github.com/WordPress/gutenberg/pull/79993)).
 -   Enforce CSS Module class selector naming for component-library packages ([#79504](https://github.com/WordPress/gutenberg/pull/79504)).
 -   Update `@ariakit/react` to `0.4.32` ([#79860](https://github.com/WordPress/gutenberg/pull/79860)).
 -   `Flex`: Migrate styles from Emotion to SCSS Modules ([#79450](https://github.com/WordPress/gutenberg/pull/79450)).
