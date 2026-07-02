@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "23.5.0-rc.1",
+	"version": "23.5.0",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -65,7 +65,7 @@
 		"IS_GUTENBERG_PLUGIN": true
 	},
 	"devDependencies": {
-		"@playwright/test": "^1.58.2",
+		"@playwright/test": "^1.61.1",
 		"@types/react": "^18.3.27",
 		"@types/react-dom": "^18.3.1",
 		"@typescript/native-preview": "^7.0.0-dev.20260423.1",
@@ -176,40 +176,6 @@
 		"test:unit:watch": "npm run --workspace @wordpress/unit-tests test:unit:watch --",
 		"wp-env": "wp-env",
 		"wp-env-test": "wp-env --config .wp-env.test.json"
-	},
-	"lint-staged": {
-		"*.{js,json,ts,tsx,yml,yaml}": [
-			"wp-scripts format"
-		],
-		"**/*.{js,ts,tsx,jsx}": [
-			"npm run prelint:js",
-			"node ./tools/eslint/lint-js.cjs --config eslint.config.strict.cjs"
-		],
-		"*.scss": [
-			"wp-scripts lint-style"
-		],
-		"package-lock.json": [
-			"npm run lint:lockfile"
-		],
-		"packages/*/package.json": [
-			"wp-scripts lint-pkg-json"
-		],
-		"{docs/toc.json,tools/docs/*.cjs,packages/{*/README.md,components/src/*/**/README.md,block-library/src/*/README.md}}": [
-			"npm run docs:gen"
-		],
-		"packages/**/*.{js,ts,tsx,json}": [
-			"npm run docs:api-ref",
-			"npm run docs:blocks",
-			"npm run docs:blocks-detail",
-			"npm run docs:theme-ref",
-			"npm run docs:check-api-docs-unstaged"
-		],
-		"packages/icons/src/library/*": [
-			"npm run -w packages/icons build"
-		],
-		"**/tsconfig.json": [
-			"npm run lint:tsconfig"
-		]
 	},
 	"workspaces": [
 		"packages/*",

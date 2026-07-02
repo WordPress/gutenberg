@@ -71,9 +71,12 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-attachments-controller-7-1.php';
 	require __DIR__ . '/compat/wordpress-7.1/view-config-api.php';
 	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-view-config-controller-7-1.php';
+	require __DIR__ . '/compat/wordpress-7.1/class-wp-icon-collections-registry.php';
+	require __DIR__ . '/compat/wordpress-7.1/class-wp-rest-icon-collections-controller.php';
 	require __DIR__ . '/compat/wordpress-7.1/rest-api.php';
 	require __DIR__ . '/compat/wordpress-7.1/collaboration.php';
 	require __DIR__ . '/compat/wordpress-7.1/block-bindings.php';
+	require __DIR__ . '/compat/wordpress-7.1/block-comments.php';
 
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
@@ -117,13 +120,14 @@ if ( class_exists( '\WordPress\AiClient\AiClient' ) ) {
 }
 
 // WordPress 7.1 compat.
+require __DIR__ . '/compat/wordpress-7.1/admin-bar.php';
 require __DIR__ . '/compat/wordpress-7.1/kses.php';
 require __DIR__ . '/compat/wordpress-7.1/media.php';
 require __DIR__ . '/compat/wordpress-7.1/preload.php';
 require __DIR__ . '/compat/wordpress-7.1/classic-block.php';
+require __DIR__ . '/compat/wordpress-7.1/icons.php';
 
 // Experimental features.
-require __DIR__ . '/experimental/omnibar/load.php';
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
@@ -215,8 +219,8 @@ require __DIR__ . '/overlay-patterns.php';
 
 // Guidelines (only load when experiment is enabled).
 if ( gutenberg_is_experiment_enabled( 'gutenberg-guidelines' ) ) {
-	require __DIR__ . '/experimental/guidelines/load.php';
-	require __DIR__ . '/experimental/guidelines/index.php';
+	require __DIR__ . '/experimental/knowledge/load.php';
+	require __DIR__ . '/experimental/knowledge/index.php';
 }
 
 // Content types (only load when experiment is enabled).

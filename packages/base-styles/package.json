@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/base-styles",
-	"version": "10.1.0",
+	"version": "10.2.0",
 	"description": "Base SCSS utilities and variables for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -41,6 +41,9 @@
 		"./z-index": "./_z-index.scss"
 	},
 	"wpScript": true,
+	"devDependencies": {
+		"@wordpress/stylelint-tools": "file:../../tools/stylelint"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

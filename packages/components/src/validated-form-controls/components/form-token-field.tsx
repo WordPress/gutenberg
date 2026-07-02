@@ -16,11 +16,7 @@ const UnforwardedValidatedFormTokenField = (
 		customValidity,
 		markWhenOptional,
 		...restProps
-	}: Omit<
-		React.ComponentProps< typeof FormTokenField >,
-		'__next40pxDefaultSize'
-	> &
-		ValidatedControlProps,
+	}: React.ComponentProps< typeof FormTokenField > & ValidatedControlProps,
 	forwardedRef: React.ForwardedRef< HTMLDivElement >
 ) => {
 	const validityTargetRef = useRef< HTMLInputElement >( null );
@@ -36,7 +32,7 @@ const UnforwardedValidatedFormTokenField = (
 				customValidity={ customValidity }
 				getValidityTarget={ () => validityTargetRef.current }
 			>
-				<FormTokenField __next40pxDefaultSize { ...restProps } />
+				<FormTokenField { ...restProps } />
 			</ControlWithError>
 			<input
 				className="components-validated-control__error-delegate"

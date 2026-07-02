@@ -1880,4 +1880,130 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$this->assertSame( 'string', $creatable['args']['url']['type'] );
 		$this->assertSame( 'uri', $creatable['args']['url']['format'] );
 	}
+
+	/**
+	 * Verifies that image_quality is present in the schema.
+	 *
+	 * @covers ::get_item_schema
+	 */
+	public function test_image_quality_in_schema() {
+		$controller = new Gutenberg_REST_Attachments_Controller( 'attachment' );
+		$schema     = $controller->get_item_schema();
+
+		$this->assertArrayHasKey( 'image_quality', $schema['properties'] );
+		$this->assertSame( 'object', $schema['properties']['image_quality']['type'] );
+		$this->assertContains( 'edit', $schema['properties']['image_quality']['context'] );
+		$this->assertTrue( $schema['properties']['image_quality']['readonly'] );
+
+		$default = $schema['properties']['image_quality']['properties']['default'];
+		$this->assertSame( 'integer', $default['type'] );
+		$this->assertSame( 1, $default['minimum'] );
+		$this->assertSame( 100, $default['maximum'] );
+
+		$sizes = $schema['properties']['image_quality']['properties']['sizes'];
+		$this->assertSame( 'object', $sizes['type'] );
+		// Sizes are enumerated from the registered sub-sizes, each bounded 1-100.
+		$this->assertArrayHasKey( 'thumbnail', $sizes['properties'] );
+		$this->assertSame( 'integer', $sizes['properties']['thumbnail']['type'] );
+		$this->assertSame( 1, $sizes['properties']['thumbnail']['minimum'] );
+		$this->assertSame( 100, $sizes['properties']['thumbnail']['maximum'] );
+	}
+
+	/**
+	 * Verifies that image_quality reports the default quality and no per-size
+	 * overrides when no filter alters the value.
+	 *
+	 * @covers ::create_item
+	 * @covers ::prepare_item_for_response
+	 */
+	public function test_image_quality_default_in_create_response() {
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=canola.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertArrayHasKey( 'image_quality', $data );
+		// JPEG default quality is 82; no filter, so no per-size overrides.
+		$this->assertSame( 82, $data['image_quality']['default'] );
+		$this->assertSame( array(), $data['image_quality']['sizes'] );
+	}
+
+	/**
+	 * Verifies that image_quality reflects a size-aware wp_editor_set_quality
+	 * filter: the full-size value is filtered and sub-sizes that diverge are
+	 * reported individually.
+	 *
+	 * @covers ::create_item
+	 * @covers ::prepare_item_for_response
+	 */
+	public function test_image_quality_with_size_aware_filter() {
+		wp_set_current_user( self::$admin_id );
+
+		// Lower the quality for small images (e.g. thumbnails) only.
+		$filter = static function ( $quality, $mime_type, $size ) {
+			if ( is_array( $size ) && ! empty( $size['width'] ) && $size['width'] <= 300 ) {
+				return 60;
+			}
+			return $quality;
+		};
+		add_filter( 'wp_editor_set_quality', $filter, 10, 3 );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=canola.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		remove_filter( 'wp_editor_set_quality', $filter, 10 );
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertArrayHasKey( 'image_quality', $data );
+		// The full-size image (> 300px wide) keeps the default quality.
+		$this->assertSame( 82, $data['image_quality']['default'] );
+		// The thumbnail size (150x150) is <= 300px and diverges to 60.
+		$this->assertArrayHasKey( 'thumbnail', $data['image_quality']['sizes'] );
+		$this->assertSame( 60, $data['image_quality']['sizes']['thumbnail'] );
+	}
+
+	/**
+	 * Verifies that the reported quality includes the legacy jpeg_quality filter
+	 * for JPEG output, matching WP_Image_Editor::set_quality().
+	 *
+	 * @covers ::create_item
+	 * @covers ::prepare_item_for_response
+	 */
+	public function test_image_quality_honors_jpeg_quality_filter() {
+		wp_set_current_user( self::$admin_id );
+
+		$filter = static function () {
+			return 70;
+		};
+		add_filter( 'jpeg_quality', $filter );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=canola.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		remove_filter( 'jpeg_quality', $filter );
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertArrayHasKey( 'image_quality', $data );
+		// JPEG output, so the jpeg_quality filter overrides the 82 default.
+		$this->assertSame( 70, $data['image_quality']['default'] );
+	}
 }

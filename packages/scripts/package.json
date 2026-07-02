@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/scripts",
-	"version": "32.5.0",
+	"version": "32.6.0",
 	"description": "Collection of reusable scripts for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -50,7 +50,7 @@
 		"adm-zip": "^0.5.9",
 		"babel-jest": "^29.7.0",
 		"babel-loader": "^9.2.1",
-		"browserslist": "^4.21.10",
+		"browserslist": "^4.28.4",
 		"chalk": "^4.1.1",
 		"check-node-version": "^4.1.0",
 		"copy-webpack-plugin": "^10.2.0",
@@ -80,16 +80,16 @@
 		"puppeteer-core": "^23.10.1",
 		"react-refresh": "^0.14.0",
 		"read-pkg-up": "^7.0.1",
-		"resolve-bin": "^0.4.0",
+		"resolve-bin": "^1.0.1",
 		"rtlcss": "^4.3.0",
 		"sass": "^1.54.0",
 		"sass-loader": "^16.0.3",
 		"schema-utils": "^4.2.0",
 		"source-map-loader": "^3.0.0",
-		"stylelint": "^16.8.2",
+		"stylelint": "^16.26.1",
 		"terser-webpack-plugin": "^5.3.10",
 		"url-loader": "^4.1.1",
-		"webpack": "^5.97.0",
+		"webpack": "^5.108.1",
 		"webpack-bundle-analyzer": "^4.9.1",
 		"webpack-cli": "^5.1.4",
 		"webpack-dev-server": "^4.15.1"
@@ -98,12 +98,15 @@
 		"rimraf": "^5.0.10"
 	},
 	"peerDependencies": {
-		"@playwright/test": "^1.58.2",
+		"@playwright/test": ">=1",
 		"@wordpress/env": ">=10.0.0",
 		"react": "^18.0.0",
 		"react-dom": "^18.0.0"
 	},
 	"peerDependenciesMeta": {
+		"@playwright/test": {
+			"optional": true
+		},
 		"@wordpress/env": {
 			"optional": true
 		}

@@ -34,6 +34,39 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	const META_KEY_SOURCE_IMAGE = 'source_image';
 
 	/**
+	 * Image size token for the video transcoded from an animated GIF, sideloaded
+	 * as a companion of the GIF attachment.
+	 *
+	 * Paired with META_KEY_ANIMATED_VIDEO: used both in the `/sideload` route
+	 * and when writing the sideloaded file to its metadata key, so the
+	 * hyphenated size token and the underscored meta key never drift apart.
+	 *
+	 * @var string
+	 */
+	const IMAGE_SIZE_ANIMATED_VIDEO = 'animated-video';
+
+	/**
+	 * Image size token for the static first-frame poster of a converted GIF.
+	 *
+	 * @var string
+	 */
+	const IMAGE_SIZE_ANIMATED_VIDEO_POSTER = 'animated-video-poster';
+
+	/**
+	 * Metadata key holding the basename of the converted animated-GIF video.
+	 *
+	 * @var string
+	 */
+	const META_KEY_ANIMATED_VIDEO = 'animated_video';
+
+	/**
+	 * Metadata key holding the basename of the converted GIF's poster image.
+	 *
+	 * @var string
+	 */
+	const META_KEY_ANIMATED_VIDEO_POSTER = 'animated_video_poster';
+
+	/**
 	 * Registers the routes for attachments.
 	 *
 	 * @see register_rest_route()
@@ -72,6 +105,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 								$valid_sizes   = array_keys( wp_get_registered_image_subsizes() );
 								$valid_sizes[] = 'original';
 								$valid_sizes[] = self::IMAGE_SIZE_SOURCE_ORIGINAL;
+								$valid_sizes[] = self::IMAGE_SIZE_ANIMATED_VIDEO;
+								$valid_sizes[] = self::IMAGE_SIZE_ANIMATED_VIDEO_POSTER;
 								$valid_sizes[] = 'scaled';
 								$valid_sizes[] = 'full';
 
@@ -296,6 +331,35 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			'readonly'    => true,
 		);
 
+		// Enumerate the registered sub-sizes so the schema documents exactly which
+		// keys may appear under "sizes".
+		$size_quality_properties = array();
+		foreach ( array_keys( wp_get_registered_image_subsizes() ) as $size_name ) {
+			$size_quality_properties[ $size_name ] = array(
+				'type'    => 'integer',
+				'minimum' => 1,
+				'maximum' => 100,
+			);
+		}
+
+		$schema['properties']['image_quality'] = array(
+			'description' => __( 'Encode quality (1-100) from the wp_editor_set_quality filter, resolved against the output MIME type. "default" applies to the full-size image; "sizes" lists per-registered-size overrides where the filtered value differs from "default".', 'gutenberg' ),
+			'type'        => 'object',
+			'context'     => array( 'edit' ),
+			'readonly'    => true,
+			'properties'  => array(
+				'default' => array(
+					'type'    => 'integer',
+					'minimum' => 1,
+					'maximum' => 100,
+				),
+				'sizes'   => array(
+					'type'       => 'object',
+					'properties' => $size_quality_properties,
+				),
+			),
+		);
+
 		return $schema;
 	}
 
@@ -369,6 +433,60 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 					'image_save_progressive', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 					false,
 					$mime_type
+				);
+			}
+		}
+
+		// Add per-file, size-aware encode quality for images.
+		if ( rest_is_field_included( 'image_quality', $fields ) ) {
+			if ( wp_attachment_is_image( $item ) ) {
+				$mime_type = (string) get_post_mime_type( $item );
+				$filename  = get_attached_file( $item->ID );
+
+				// Resolve the output MIME type the same way core's
+				// WP_Image_Editor::set_quality() does: quality is filtered
+				// against the format the file will actually be saved as.
+				/** This filter is documented in wp-includes/class-wp-image-editor.php */
+				$output_formats = apply_filters(
+					'image_editor_output_format', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+					array( $mime_type => $mime_type ),
+					$filename ? $filename : '',
+					$mime_type
+				);
+				$output_mime    = $output_formats[ $mime_type ] ?? $mime_type;
+
+				$metadata    = wp_get_attachment_metadata( $item->ID, true );
+				$full_width  = max( 0, ( is_array( $metadata ) && isset( $metadata['width'] ) ) ? (int) $metadata['width'] : 0 );
+				$full_height = max( 0, ( is_array( $metadata ) && isset( $metadata['height'] ) ) ? (int) $metadata['height'] : 0 );
+
+				$full_quality = $this->get_image_encode_quality(
+					$output_mime,
+					array(
+						'width'  => $full_width,
+						'height' => $full_height,
+					)
+				);
+
+				$size_quality = array();
+				foreach ( wp_get_registered_image_subsizes() as $size_name => $size_data ) {
+					$quality = $this->get_image_encode_quality(
+						$output_mime,
+						array(
+							'width'  => (int) $size_data['width'],
+							'height' => (int) $size_data['height'],
+						)
+					);
+
+					// Only report sizes that diverge from the full-size value
+					// to keep the response payload small.
+					if ( $quality !== $full_quality ) {
+						$size_quality[ $size_name ] = $quality;
+					}
+				}
+
+				$data['image_quality'] = array(
+					'default' => $full_quality,
+					'sizes'   => $size_quality,
 				);
 			}
 		}
@@ -639,6 +757,17 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				// web-viewable JPEG derivative. Cleanup on attachment delete
 				// is handled by a delete_attachment hook that reads this key.
 				$metadata[ self::META_KEY_SOURCE_IMAGE ] = $sub_size['file'];
+			} elseif ( self::IMAGE_SIZE_ANIMATED_VIDEO === $image_size ) {
+				// Converted video companion of an animated GIF. Stored
+				// under its own key; the GIF stays the attachment. The
+				// editor reads this key to switch the block to a video;
+				// companion cleanup lives in lib/media/animated-gif-to-video.php.
+				$metadata[ self::META_KEY_ANIMATED_VIDEO ] = $sub_size['file'];
+			} elseif ( self::IMAGE_SIZE_ANIMATED_VIDEO_POSTER === $image_size ) {
+				// Static first-frame poster for the converted video. Used as
+				// the video block's poster and deleted alongside the video.
+				// See lib/media/animated-gif-to-video.php.
+				$metadata[ self::META_KEY_ANIMATED_VIDEO_POSTER ] = $sub_size['file'];
 			} elseif ( 'scaled' === $image_size ) {
 				if ( ! empty( $sub_size['original_image'] ) ) {
 					$metadata['original_image'] = $sub_size['original_image'];
@@ -759,6 +888,13 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 * @return true|WP_Error True if valid, WP_Error if invalid.
 	 */
 	private function validate_image_dimensions( int $width, int $height, $image_size, int $attachment_id ) {
+		// 'animated-video' companion file: video, not an image. Skip *all*
+		// dimension checks (the caller passes (0, 0) for this case so the
+		// positive-dimension assertion below would otherwise fire).
+		if ( self::IMAGE_SIZE_ANIMATED_VIDEO === $image_size ) {
+			return true;
+		}
+
 		// Dimensions must be positive for all sizes.
 		if ( $width <= 0 || $height <= 0 ) {
 			return new WP_Error(
@@ -782,6 +918,13 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 		// Source-format original companion file: no dimension constraint.
 		if ( self::IMAGE_SIZE_SOURCE_ORIGINAL === $image_size ) {
+			return true;
+		}
+
+		// 'animated-video-poster' companion: a static poster image for the
+		// converted video. It is a real image (so it has positive dimensions)
+		// but is not a registered sub-size, so it has no dimension constraint.
+		if ( self::IMAGE_SIZE_ANIMATED_VIDEO_POSTER === $image_size ) {
 			return true;
 		}
 
@@ -957,7 +1100,12 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		// (corrupted/unsupported files) and for populating the sub-size payload
 		// below. Scalar 'original' is a byte-only passthrough and does not need
 		// dimensions, but reading them here is harmless.
-		$size = wp_getimagesize( $path );
+		//
+		// 'animated-video' companions are video files (MP4/WebM); the image
+		// helpers can't read their dimensions and would falsely report the
+		// upload as "corrupted or unsupported". Skip the read for this case;
+		// validate_image_dimensions() also short-circuits it below.
+		$size = self::IMAGE_SIZE_ANIMATED_VIDEO === $image_size ? array( 0, 0 ) : wp_getimagesize( $path );
 
 		if ( ! $size ) {
 			// Could not determine dimensions (corrupted file, unsupported format).
@@ -1001,6 +1149,17 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			// attachment delete is handled by a delete_attachment hook that reads
 			// this key.
 			$sub_size_data['file'] = wp_basename( $path );
+		} elseif ( self::IMAGE_SIZE_ANIMATED_VIDEO === $image_size ) {
+			// Converted animated-GIF video companion. finalize_item()
+			// writes the filename to $metadata['animated_video']; the editor
+			// reads it to switch the block to a video, and a delete_attachment
+			// hook removes it. See lib/media/animated-gif-to-video.php.
+			$sub_size_data['file'] = wp_basename( $path );
+		} elseif ( self::IMAGE_SIZE_ANIMATED_VIDEO_POSTER === $image_size ) {
+			// Static poster for the converted video. finalize_item() writes
+			// the filename to $metadata['animated_video_poster']; used as the
+			// video block's poster and deleted with the video.
+			$sub_size_data['file'] = wp_basename( $path );
 		} elseif ( 'scaled' === $image_size ) {
 			// Record the current attached file as the original.
 			$current_file                    = get_attached_file( $attachment_id, true );
@@ -1023,5 +1182,63 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		}
 
 		return rest_ensure_response( $sub_size_data );
+	}
+
+	/**
+	 * Resolves the encode quality WordPress would use for an image.
+	 *
+	 * Prefers the core wp_get_image_encode_quality() helper when available, and
+	 * otherwise mirrors WP_Image_Editor::set_quality() inline for WordPress
+	 * versions that predate it: per-format default, the wp_editor_set_quality
+	 * filter, the jpeg_quality filter for JPEG output, then resets non-numeric
+	 * or out-of-range values to the default and squashes 0 to 1.
+	 *
+	 * wp_get_image_encode_quality() is proposed for WordPress core in
+	 * https://github.com/WordPress/wordpress-develop/pull/11856; until it lands
+	 * the function_exists() guard falls back to the inline implementation below.
+	 *
+	 * @param non-empty-string $mime_type The output image MIME type, e.g. 'image/jpeg'.
+	 * @param array{ width?: non-negative-int, height?: non-negative-int } $size Dimensions ('width', 'height') for the wp_editor_set_quality filter.
+	 * @return int<1, 100> Encode quality between 1 and 100.
+	 */
+	private function get_image_encode_quality( string $mime_type, array $size = array() ): int {
+		if ( function_exists( 'wp_get_image_encode_quality' ) ) {
+			return wp_get_image_encode_quality( $mime_type, $size );
+		}
+
+		// Mirror WP_Image_Editor::get_default_quality(): WebP defaults to 86,
+		// everything else to 82.
+		$default_quality = ( 'image/webp' === $mime_type ) ? 86 : 82;
+
+		/** This filter is documented in wp-includes/class-wp-image-editor.php */
+		$quality = apply_filters(
+			'wp_editor_set_quality', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+			$default_quality,
+			$mime_type,
+			$size
+		);
+
+		if ( 'image/jpeg' === $mime_type ) {
+			/** This filter is documented in wp-includes/class-wp-image-editor.php */
+			$quality = apply_filters( 'jpeg_quality', $quality, 'image_resize' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		}
+
+		if ( ! is_numeric( $quality ) ) {
+			$quality = $default_quality;
+		} else {
+			$quality = (int) $quality;
+		}
+
+		// Reset out-of-range values to the default, matching WP_Image_Editor::set_quality().
+		if ( $quality < 0 || $quality > 100 ) {
+			$quality = $default_quality;
+		}
+
+		// Allow 0, but squash to 1, matching WP_Image_Editor::set_quality().
+		if ( 0 === $quality ) {
+			$quality = 1;
+		}
+
+		return $quality;
 	}
 }

@@ -113,7 +113,7 @@ function gutenberg_initialize_experiments_settings() {
 				array(
 					'id'          => 'gutenberg-guidelines',
 					'label'       => __( 'Guidelines', 'gutenberg' ),
-					'description' => __( 'Enables guidelines feature for managing editorial voice and tone guidelines under Settings.', 'gutenberg' ),
+					'description' => __( 'Enables the Guidelines page under Settings and the experimental knowledge storage (wp_knowledge).', 'gutenberg' ),
 				),
 				array(
 					'id'          => 'gutenberg-content-types',
@@ -124,11 +124,6 @@ function gutenberg_initialize_experiments_settings() {
 					'id'          => 'gutenberg-dashboard-widgets',
 					'label'       => __( 'New Dashboard experience', 'gutenberg' ),
 					'description' => __( 'Enables a new dashboard experience with resizable, reorderable widgets that plugins can register and users can personalize.', 'gutenberg' ),
-				),
-				array(
-					'id'          => 'gutenberg-omnibar',
-					'label'       => __( 'Toolbar UI refresh', 'gutenberg' ),
-					'description' => __( 'Previews a redesigned toolbar UI that is visually consistent everywhere. For now, it includes replacing home/odometer dashicon with site icon if set.', 'gutenberg' ),
 				),
 				array(
 					'id'          => 'gutenberg-react-19',

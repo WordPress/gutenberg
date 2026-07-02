@@ -391,7 +391,6 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 			<Flex gap={ 4 }>
 				<FlexItem isBlock>
 					<UnitControl
-						size="__unstable-large"
 						onChange={ ( newValue ) => {
 							onChange( {
 								...layout,
@@ -409,7 +408,6 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 				</FlexItem>
 				<FlexItem isBlock>
 					<RangeControl
-						__next40pxDefaultSize
 						onChange={ handleSliderChange }
 						value={ quantity || 0 }
 						min={ 0 }
@@ -469,7 +467,7 @@ function GridLayoutColumnsAndRowsControl( {
 									columnCount: newColumnCount,
 								} );
 							} }
-							value={ columnCount }
+							value={ columnCount ?? '' }
 							min={ 1 }
 							label={ __( 'Columns' ) }
 							hideLabelFromVision={ ! isManualPlacement }
@@ -497,7 +495,6 @@ function GridLayoutColumnsAndRowsControl( {
 							/>
 						) : (
 							<RangeControl
-								__next40pxDefaultSize
 								value={ columnCount ?? 1 }
 								onChange={ ( value ) =>
 									onChange( {
@@ -591,7 +588,6 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 
 	return (
 		<ToggleGroupControl
-			__next40pxDefaultSize
 			label={ __( 'Grid item position' ) }
 			value={ gridPlacement }
 			onChange={ onChangeType }

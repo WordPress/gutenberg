@@ -2,14 +2,28 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `InnerContent`: Render the selected inner block synchronously so its rich text selection stays current while typing; otherwise a stale selection offset could place a typed character at the wrong position in editable static inner blocks ([#79726](https://github.com/WordPress/gutenberg/pull/79726)).
+-   `useTypingObserver`: Capture the window reference at mount and reuse it during cleanup so the ref cleanup no longer reads `node.ownerDocument.defaultView` (which is `null` once the iframe-hosted editor has been detached from its window) and throws, which was also leaking the `removeEventListener` calls that follow it ([#78772](https://github.com/WordPress/gutenberg/pull/78772)).
+
 ### Breaking Changes
 
 -   The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed from the following:
+    -   `FontAppearanceControl` ([#79635](https://github.com/WordPress/gutenberg/pull/79635)).
+    -   `FontFamilyControl` ([#79593](https://github.com/WordPress/gutenberg/pull/79593)).
     -   `LetterSpacingControl` ([#79533](https://github.com/WordPress/gutenberg/pull/79533)).
+    -   `LineHeightControl` ([#79589](https://github.com/WordPress/gutenberg/pull/79589)).
 
 ### Deprecations
 
 -   Soft-deprecate the `__experimentalImageEditor` component. The Media Editor modal is now the default crop experience for core blocks ([#78654](https://github.com/WordPress/gutenberg/pull/78654)).
+
+### Enhancements
+
+-   Inserter media categories support an optional `emptyMessage`, shown in place of the generic "No results found" notice, that also keeps a source listed when it has no items. The media panel additionally renders attach/detach affordances for attached images ([#79336](https://github.com/WordPress/gutenberg/pull/79336)).
+
+## 15.23.0 (2026-07-01)
 
 ## 15.22.0 (2026-06-24)
 

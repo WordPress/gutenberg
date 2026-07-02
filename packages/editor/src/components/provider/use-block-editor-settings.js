@@ -22,7 +22,7 @@ import { privateApis as mediaEditorPrivateApis } from '@wordpress/media-editor';
 /**
  * Internal dependencies
  */
-import inserterMediaCategories from '../media-categories';
+import getInserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import mediaUploadOnSuccess from '../../utils/media-upload/on-success';
 import { default as mediaSideload } from '../../utils/media-sideload';
@@ -115,7 +115,6 @@ const {
 	getMediaSelectKey,
 	isIsolatedEditorKey,
 	deviceTypeKey,
-	onViewportStateChangeKey,
 	isNavigationOverlayContextKey,
 	isNavigationPostEditorKey,
 	mediaUploadOnSuccessKey,
@@ -155,6 +154,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		deviceType,
 		isNavigationOverlayContext,
 		isRevisionsMode,
+		viewablePostTypeLabel,
+		currentPostId,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -162,9 +163,12 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				getRawEntityRecord,
 				getEntityRecord,
 				getBlockPatternCategories,
+				getPostType,
 			} = select( coreStore );
 			const { get } = select( preferencesStore );
 			const { getBlockTypes } = select( blocksStore );
+			const { getCurrentPostId, getCurrentPostType } =
+				select( editorStore );
 			const { getDeviceType, isRevisionsMode: _isRevisionsMode } = unlock(
 				select( editorStore )
 			);
@@ -179,6 +183,19 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 
 			// Fetch image sizes from REST API index for client-side media processing.
 			const baseData = getEntityRecord( 'root', '__unstableBase' );
+
+			// The attached-images category follows the post being edited, not the
+			// root-level entity in `postType`/`postId`. With "Show template" on,
+			// the root becomes the template (wp_template), but media still attaches
+			// to the page being edited.
+			//
+			// Guard on a truthy slug: `getPostType()` with no slug resolves the
+			// whole `/wp/v2/types` collection rather than the single, already
+			// fetched record for the current type.
+			const currentPostType = getCurrentPostType();
+			const postTypeObject = currentPostType
+				? getPostType( currentPostType )
+				: undefined;
 
 			function getSectionRootBlock() {
 				if ( renderingMode === 'template-locked' ) {
@@ -223,6 +240,14 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				} ),
 				pageOnFront: siteSettings?.page_on_front,
 				pageForPosts: siteSettings?.page_for_posts,
+				// The post type's singular name, but only for real, front-end
+				// rendered content (`viewable`). Empty for synced patterns,
+				// navigation and templates, which gates the attached-images
+				// category off for them and words its copy for everything else.
+				viewablePostTypeLabel: postTypeObject?.viewable
+					? postTypeObject?.labels?.singular_name
+					: undefined,
+				currentPostId: getCurrentPostId(),
 				restBlockPatternCategories: getBlockPatternCategories(),
 				sectionRootClientId: getSectionRootBlock(),
 				deviceType: getDeviceType(),
@@ -278,9 +303,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	);
 
 	const { undo, setIsInserterOpened } = useDispatch( editorStore );
-	const { updateDeviceTypeForViewportState } = unlock(
-		useDispatch( editorStore )
-	);
 	const { editMediaEntity } = unlock( useDispatch( coreStore ) );
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { openMediaEditorModal } = useDispatch( mediaEditorStore );
@@ -326,6 +348,15 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	}, [ settings.allowedBlockTypes, hiddenBlockTypes, blockTypes ] );
 
 	const forceDisableFocusMode = settings.focusMode === false;
+
+	// The "Attachments" media category depends on the edited post and its post
+	// type label (which gates whether it's offered and words its copy), so the
+	// categories are derived rather than being a static list.
+	const inserterMediaCategories = useMemo(
+		() =>
+			getInserterMediaCategories( currentPostId, viewablePostTypeLabel ),
+		[ currentPostId, viewablePostTypeLabel ]
+	);
 
 	return useMemo( () => {
 		const blockEditorSettings = {
@@ -423,7 +454,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				renderingMode === 'template-locked' ||
 				settings.disableContentOnlyForTemplateParts,
 			...( deviceType ? { [ deviceTypeKey ]: deviceType } : {} ),
-			[ onViewportStateChangeKey ]: updateDeviceTypeForViewportState,
 			[ isNavigationOverlayContextKey ]: isNavigationOverlayContext,
 		};
 
@@ -445,6 +475,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		hasUploadPermissions,
 		blockPatterns,
 		blockPatternCategories,
+		inserterMediaCategories,
 		canUseUnfilteredHTML,
 		undo,
 		createPageEntity,
@@ -459,7 +490,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		renderingMode,
 		editMediaEntity,
 		openMediaEditorModal,
-		updateDeviceTypeForViewportState,
 		deviceType,
 		allImageSizes,
 		bigImageSizeThreshold,
