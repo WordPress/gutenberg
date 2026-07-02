@@ -720,23 +720,18 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return float|null Viewport breakpoint size in pixels, or null when invalid.
 	 */
 	private static function get_viewport_breakpoint_value_in_pixels( $value ) {
-		if ( ! is_string( $value ) ) {
+		if ( ! static::is_valid_viewport_breakpoint_size( $value ) ) {
 			return null;
 		}
 
 		$value = trim( $value );
-		if (
-			! preg_match(
-				'/^(\d+|\d*\.\d+)(px|em|rem)$/',
-				$value,
-				$matches
-			)
-		) {
-			return null;
+		$unit  = substr( $value, -3 );
+		if ( 'rem' === $unit ) {
+			$number = (float) substr( $value, 0, -3 );
+		} else {
+			$unit   = substr( $value, -2 );
+			$number = (float) substr( $value, 0, -2 );
 		}
-
-		$number = (float) $matches[1];
-		$unit   = $matches[2];
 
 		/*
 		 * Use the most common browser default font size as the base for em/rem
