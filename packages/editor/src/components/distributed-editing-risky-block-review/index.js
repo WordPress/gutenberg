@@ -37,23 +37,21 @@ const AUTHORSHIP_FOCUS_DIMMED_STYLE = {
 	opacity: 0.2,
 	transition: 'opacity 0.1s linear',
 };
+const PENDING_EDIT_INDICATOR_VARIABLE_STYLE = {
+	'--distributed-editing-indicator-color': '#6f5bd7',
+	'--distributed-editing-indicator-border-color': 'rgba(111, 91, 215, 0.42)',
+	'--distributed-editing-delete-indicator-color': '#d63638',
+	'--distributed-editing-delete-indicator-border-color':
+		'rgba(214, 54, 56, 0.48)',
+};
 const PENDING_GHOST_BLOCK_LIST_PREVIEW_STYLE = {
-	background: 'rgba(34, 113, 177, 0.045)',
-	border: '1px dashed rgba(34, 113, 177, 0.36)',
-	borderInlineStart: '3px solid rgba(34, 113, 177, 0.55)',
+	...PENDING_EDIT_INDICATOR_VARIABLE_STYLE,
+	border: '1px solid var(--distributed-editing-indicator-border-color)',
 	borderRadius: '2px',
 	marginBlock: '4px 8px',
-	opacity: 0.74,
 	paddingBlock: '4px',
 	paddingInline: '12px 8px',
 	position: 'relative',
-	transition:
-		'background-color 120ms ease-out, border-color 120ms ease-out, opacity 120ms ease-out',
-};
-const PENDING_GHOST_BLOCK_LIST_PREVIEW_ACTIVE_STYLE = {
-	background: 'rgba(34, 113, 177, 0.07)',
-	borderColor: 'rgba(34, 113, 177, 0.56)',
-	opacity: 1,
 };
 const PENDING_GHOST_PREVIEW_STYLE = {
 	overflowWrap: 'anywhere',
@@ -97,6 +95,7 @@ const PENDING_GHOST_CALLOUT_DETAIL_STYLE = {
 	lineHeight: 1.4,
 };
 const EMPTY_PENDING_GHOSTS = {
+	inPlace: [],
 	before: [],
 	after: [],
 };
@@ -254,6 +253,7 @@ export function getDistributedEditingPendingGhostEntriesForBlockPath(
 	}
 
 	const ghosts = {
+		inPlace: [],
 		before: [],
 		after: [],
 	};
@@ -417,8 +417,74 @@ function getDistributedEditingPendingGhostPlacementForBlockPath(
 	}
 
 	return getDistributedEditingBlockPathsMatch( itemPath, blockPath )
-		? 'after'
+		? 'inPlace'
 		: null;
+}
+
+/**
+ * Returns wrapper props for an existing block with a pending remote edit.
+ *
+ * Deleted blocks keep their local before-state in the editor and receive a red
+ * indicator. Modified blocks are rendered through the inert preview path, so
+ * they normally do not use this helper.
+ *
+ * @param {Object} wrapperProps Existing BlockListBlock wrapper props.
+ * @param {Object} ghost        Pending edit descriptor.
+ *
+ * @return {Object} Enhanced wrapper props.
+ */
+export function getDistributedEditingPendingEditWrapperProps(
+	wrapperProps = {},
+	ghost = {}
+) {
+	const changeKind =
+		ghost.changeKind || ghost.change_kind || 'unknown_change';
+	const blockName = ghost.blockName || ghost.block_name || __( 'block' );
+	const displayName = ghost.displayName || __( 'Editor' );
+	const isDeleted = changeKind === 'deleted_block';
+	const style = isDeleted
+		? {
+				...wrapperProps.style,
+				...PENDING_EDIT_INDICATOR_VARIABLE_STYLE,
+				border: '1px solid var(--distributed-editing-delete-indicator-border-color)',
+				borderRadius: '2px',
+		  }
+		: wrapperProps.style;
+	const annotationLabel = sprintf(
+		/* translators: 1: editor display name, 2: block name. */
+		__( 'Pending edit by %1$s in %2$s' ),
+		displayName,
+		blockName
+	);
+	const ariaLabel = wrapperProps[ 'aria-label' ]
+		? sprintf(
+				/* translators: 1: existing block label, 2: DE-RTC pending edit label. */
+				__( '%1$s. %2$s' ),
+				wrapperProps[ 'aria-label' ],
+				annotationLabel
+		  )
+		: annotationLabel;
+
+	return {
+		...wrapperProps,
+		className: clsx(
+			wrapperProps.className,
+			'has-distributed-editing-pending-edit',
+			isDeleted && 'has-distributed-editing-pending-edit--deleted'
+		),
+		'aria-label': ariaLabel,
+		'data-distributed-editing-pending-edit': 'true',
+		'data-distributed-editing-pending-edit-author': displayName,
+		'data-distributed-editing-pending-edit-block-name': blockName,
+		'data-distributed-editing-pending-edit-change-kind': changeKind,
+		'data-distributed-editing-pending-edit-attribution-key':
+			ghost.attributionKey || '',
+		'data-distributed-editing-pending-edit-raw-content': 'false',
+		'data-distributed-editing-pending-edit-visual-treatment': isDeleted
+			? 'delete-before-state-indicator'
+			: 'post-modification-indicator',
+		style,
+	};
 }
 
 /**
@@ -524,21 +590,73 @@ function withDistributedEditingRiskyBlockReviewAnnotations( BlockListBlock ) {
 					after: Array.isArray( parsed?.after )
 						? parsed.after
 						: EMPTY_ARRAY,
+					inPlace: Array.isArray( parsed?.inPlace )
+						? parsed.inPlace
+						: EMPTY_ARRAY,
 				};
 			} catch {
 				return EMPTY_PENDING_GHOSTS;
 			}
 		}, [ pendingGhostsJson ] );
+		const inPlaceModifiedGhost =
+			pendingGhosts.inPlace.find(
+				( ghost ) =>
+					( ghost.changeKind || ghost.change_kind ) ===
+					'modified_block'
+			) || null;
+		const inPlaceDeletedGhost =
+			pendingGhosts.inPlace.find(
+				( ghost ) =>
+					( ghost.changeKind || ghost.change_kind ) ===
+					'deleted_block'
+			) || null;
 		const reviewWrapperProps = reviewItem
 			? getDistributedEditingRiskyBlockReviewWrapperProps(
 					props.wrapperProps,
 					reviewItem
 			  )
 			: props.wrapperProps;
+		const pendingEditWrapperProps =
+			inPlaceDeletedGhost && ! inPlaceModifiedGhost
+				? getDistributedEditingPendingEditWrapperProps(
+						reviewWrapperProps,
+						inPlaceDeletedGhost
+				  )
+				: reviewWrapperProps;
 		const wrapperProps = getDistributedEditingAuthorshipFocusWrapperProps(
-			reviewWrapperProps,
+			pendingEditWrapperProps,
 			authorshipFocus
 		);
+		let renderedBlock = (
+			<BlockListBlock { ...props } wrapperProps={ wrapperProps } />
+		);
+
+		if ( reviewItem ) {
+			renderedBlock = (
+				<BlockListBlock
+					{ ...props }
+					className={ clsx(
+						props.className,
+						'is-distributed-editing-risky-block-review-target'
+					) }
+					wrapperProps={ wrapperProps }
+				/>
+			);
+		}
+
+		if ( inPlaceModifiedGhost ) {
+			renderedBlock = (
+				<DistributedEditingPendingGhostBlockListPreview
+					authorshipFocusAttributionKey={
+						authorshipFocusAttributionKey
+					}
+					ghost={ {
+						...inPlaceModifiedGhost,
+						placement: 'in-place',
+					} }
+				/>
+			);
+		}
 
 		return (
 			<>
@@ -551,21 +669,7 @@ function withDistributedEditingRiskyBlockReviewAnnotations( BlockListBlock ) {
 						key={ ghost.key }
 					/>
 				) ) }
-				{ reviewItem ? (
-					<BlockListBlock
-						{ ...props }
-						className={ clsx(
-							props.className,
-							'is-distributed-editing-risky-block-review-target'
-						) }
-						wrapperProps={ wrapperProps }
-					/>
-				) : (
-					<BlockListBlock
-						{ ...props }
-						wrapperProps={ wrapperProps }
-					/>
-				) }
+				{ renderedBlock }
 				{ pendingGhosts.after.map( ( ghost ) => (
 					<DistributedEditingPendingGhostBlockListPreview
 						authorshipFocusAttributionKey={
@@ -603,6 +707,8 @@ export function DistributedEditingPendingGhostBlockListPreview( {
 	} );
 	const blockName = ghost.blockName || __( 'block' );
 	const changeKind = ghost.changeKind || 'unknown_change';
+	const placement = ghost.placement || 'block-list';
+	const isInPlacePreview = placement === 'in-place';
 	const tooltipId = `distributed-editing-pending-ghost-${
 		ghost.key || 'preview'
 	}`;
@@ -640,6 +746,7 @@ export function DistributedEditingPendingGhostBlockListPreview( {
 			<div
 				{ ...previewBlockProps }
 				data-distributed-editing-pending-ghost-renderer="block-preview"
+				data-testid="distributed-editing-pending-ghost-block-preview"
 			/>
 		);
 	}
@@ -648,7 +755,11 @@ export function DistributedEditingPendingGhostBlockListPreview( {
 		<div
 			aria-label={ ghostLabel }
 			aria-describedby={ tooltipId }
-			className="editor-distributed-editing-risky-block-review__pending-ghost-block-list-preview"
+			className={ clsx(
+				'editor-distributed-editing-risky-block-review__pending-ghost-block-list-preview',
+				isInPlacePreview &&
+					'editor-distributed-editing-risky-block-review__pending-ghost-block-list-preview--in-place'
+			) }
 			data-distributed-editing-pending-ghost="true"
 			data-distributed-editing-pending-ghost-author={ ghost.displayName }
 			data-distributed-editing-pending-ghost-author-inline="false"
@@ -657,9 +768,13 @@ export function DistributedEditingPendingGhostBlockListPreview( {
 			data-distributed-editing-pending-ghost-block-list-preview="true"
 			data-distributed-editing-pending-ghost-callout="hover-focus"
 			data-distributed-editing-pending-ghost-inert="true"
-			data-distributed-editing-pending-ghost-placement="block-list"
+			data-distributed-editing-pending-ghost-placement={ placement }
 			data-distributed-editing-pending-ghost-raw-content="false"
-			data-distributed-editing-pending-ghost-visual-treatment="subtle-wash-border"
+			data-distributed-editing-pending-ghost-visual-treatment={
+				isInPlacePreview
+					? 'post-modification-indicator'
+					: 'insertion-indicator'
+			}
 			data-distributed-editing-pending-ghost-authorship-focus={
 				isDimmedByAuthorshipFocus ? 'dimmed' : 'visible'
 			}
@@ -674,9 +789,6 @@ export function DistributedEditingPendingGhostBlockListPreview( {
 			role="note"
 			style={ {
 				...PENDING_GHOST_BLOCK_LIST_PREVIEW_STYLE,
-				...( isCalloutOpen
-					? PENDING_GHOST_BLOCK_LIST_PREVIEW_ACTIVE_STYLE
-					: {} ),
 				...( isDimmedByAuthorshipFocus
 					? AUTHORSHIP_FOCUS_DIMMED_STYLE
 					: {} ),

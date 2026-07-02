@@ -21,6 +21,7 @@ import DistributedEditingRiskyBlockReviewPrePublishPanel, {
 	getDistributedEditingAuthorshipFocusForBlockPath,
 	getDistributedEditingAuthorshipFocusWrapperProps,
 	getDistributedEditingAuthorshipRichTextRanges,
+	getDistributedEditingPendingEditWrapperProps,
 	getDistributedEditingPendingGhostEntriesForBlockPath,
 	getDistributedEditingRiskyBlockReviewWrapperProps,
 	shouldRenderDistributedEditingRiskyBlockReview,
@@ -55,6 +56,29 @@ jest.mock( '@wordpress/block-editor', () => ( {
 	} ) ),
 	store: { name: 'core/block-editor' },
 } ) );
+jest.mock( '@wordpress/blocks', () => {
+	const actual = jest.requireActual( '@wordpress/blocks' );
+
+	return {
+		...actual,
+		parse: jest.fn( ( serialized ) => {
+			if ( serialized?.includes( '<!-- wp:paragraph' ) ) {
+				return [
+					{
+						attributes: {
+							content: 'Draft wording',
+						},
+						clientId: 'mock-pending-paragraph',
+						innerBlocks: [],
+						name: 'core/paragraph',
+					},
+				];
+			}
+
+			return actual.parse( serialized );
+		} ),
+	};
+} );
 
 const RISKY_REVIEW_ITEM = {
 	id: 'risk-html-added',
@@ -256,6 +280,57 @@ describe( 'getDistributedEditingRiskyBlockReviewWrapperProps', () => {
 		expect( wrapperProps.style.boxShadow ).toContain( '#2271b1' );
 		expect( wrapperProps.style.boxShadow ).toContain(
 			'rgba(34, 113, 177, 0.08)'
+		);
+	} );
+} );
+
+describe( 'getDistributedEditingPendingEditWrapperProps', () => {
+	it( 'marks deleted pending edits with a red before-state treatment', () => {
+		const wrapperProps = getDistributedEditingPendingEditWrapperProps(
+			{
+				'aria-label': 'Paragraph',
+				className: 'wp-block',
+				style: {
+					boxShadow: '0 0 0 1px currentColor',
+				},
+			},
+			{
+				attributionKey: 'presence:author-session',
+				blockName: 'core/paragraph',
+				changeKind: 'deleted_block',
+				displayName: 'Author',
+			}
+		);
+
+		expect( wrapperProps ).toMatchObject( {
+			'aria-label': 'Paragraph. Pending edit by Author in core/paragraph',
+			'data-distributed-editing-pending-edit': 'true',
+			'data-distributed-editing-pending-edit-author': 'Author',
+			'data-distributed-editing-pending-edit-block-name':
+				'core/paragraph',
+			'data-distributed-editing-pending-edit-change-kind':
+				'deleted_block',
+			'data-distributed-editing-pending-edit-attribution-key':
+				'presence:author-session',
+			'data-distributed-editing-pending-edit-raw-content': 'false',
+			'data-distributed-editing-pending-edit-visual-treatment':
+				'delete-before-state-indicator',
+		} );
+		expect( wrapperProps.className ).toContain(
+			'has-distributed-editing-pending-edit--deleted'
+		);
+		expect( wrapperProps.style ).toMatchObject( {
+			'--distributed-editing-delete-indicator-border-color':
+				'rgba(214, 54, 56, 0.48)',
+			border: '1px solid var(--distributed-editing-delete-indicator-border-color)',
+			borderRadius: '2px',
+			boxShadow: '0 0 0 1px currentColor',
+		} );
+		expect( wrapperProps.style.boxShadow ).not.toMatch(
+			/9999px|distributed-editing-delete-indicator/
+		);
+		expect( JSON.stringify( wrapperProps ) ).not.toMatch(
+			/rawContent|session_key|userId/
 		);
 	} );
 } );
@@ -482,14 +557,15 @@ describe( 'getDistributedEditingPendingGhostEntriesForBlockPath', () => {
 			);
 
 		expect( pendingGhosts.before ).toHaveLength( 0 );
-		expect( pendingGhosts.after ).toEqual( [
+		expect( pendingGhosts.inPlace ).toEqual( [
 			expect.objectContaining( {
 				displayName: 'Same author in another tab',
-				key: 'same-user-tab-modified-paragraph-after',
-				placement: 'after',
+				key: 'same-user-tab-modified-paragraph-inPlace',
+				placement: 'inPlace',
 				safePreviewText: 'Draft wording',
 			} ),
 		] );
+		expect( pendingGhosts.after ).toHaveLength( 0 );
 		expect( followingSiblingGhosts.before ).toEqual( [
 			expect.objectContaining( {
 				displayName: 'Author',
@@ -499,6 +575,44 @@ describe( 'getDistributedEditingPendingGhostEntriesForBlockPath', () => {
 			} ),
 		] );
 		expect( followingSiblingGhosts.after ).toHaveLength( 0 );
+	} );
+
+	it( 'positions deleted block previews in place so the before-state can remain visible', () => {
+		const pendingGhosts =
+			getDistributedEditingPendingGhostEntriesForBlockPath(
+				[
+					{
+						key: 'author-session',
+						displayName: 'Author',
+						relationship: 'other_user',
+						pendingPreview: {
+							available: true,
+							items: [
+								{
+									previewId: 'deleted-paragraph',
+									blockPath: [ 0 ],
+									blockName: 'core/paragraph',
+									changeKind: 'deleted_block',
+									safePreviewText: 'Removed paragraph',
+								},
+							],
+						},
+					},
+				],
+				[ 0 ],
+				{ siblingCount: 1 }
+			);
+
+		expect( pendingGhosts.inPlace ).toEqual( [
+			expect.objectContaining( {
+				changeKind: 'deleted_block',
+				key: 'author-session-deleted-paragraph-inPlace',
+				placement: 'inPlace',
+				safePreviewText: 'Removed paragraph',
+			} ),
+		] );
+		expect( pendingGhosts.before ).toHaveLength( 0 );
+		expect( pendingGhosts.after ).toHaveLength( 0 );
 	} );
 
 	it( 'renders an inserted preview before the following sibling and ignores other parents', () => {
@@ -716,7 +830,7 @@ describe( 'DistributedEditingPendingGhostBlockListPreview', () => {
 		);
 		expect( ghost ).toHaveAttribute(
 			'data-distributed-editing-pending-ghost-visual-treatment',
-			'subtle-wash-border'
+			'insertion-indicator'
 		);
 		expect( ghost ).toHaveAttribute(
 			'data-distributed-editing-pending-ghost-placement',
@@ -730,6 +844,12 @@ describe( 'DistributedEditingPendingGhostBlockListPreview', () => {
 			'data-distributed-editing-pending-ghost-author-inline',
 			'false'
 		);
+		expect( ghost ).toHaveStyle(
+			'border: 1px solid var(--distributed-editing-indicator-border-color)'
+		);
+		expect( ghost.getAttribute( 'style' ) ).not.toMatch(
+			/background|box-shadow|opacity|9999px|currentColor/
+		);
 		expect( ghost ).toHaveAttribute( 'tabindex', '0' );
 		expect( tooltip ).toHaveAttribute(
 			'data-distributed-editing-pending-ghost-author-callout',
@@ -740,6 +860,54 @@ describe( 'DistributedEditingPendingGhostBlockListPreview', () => {
 		expect( tooltip ).toHaveTextContent( 'core/html' );
 		expect( tooltip ).toHaveTextContent( 'Pending added block' );
 		expect( screen.getByText( 'Script' ) ).toBeInTheDocument();
+	} );
+
+	it( 'renders modified pending blocks in place with the post-modification treatment', () => {
+		render(
+			<DistributedEditingPendingGhostBlockListPreview
+				ghost={ {
+					blockName: 'core/paragraph',
+					changeKind: 'modified_block',
+					displayName: 'Author',
+					key: 'author-modified-paragraph',
+					placement: 'in-place',
+					safePreviewSerializedBlocks:
+						'<!-- wp:paragraph --><p>Draft wording</p><!-- /wp:paragraph -->',
+					safePreviewText: 'Draft wording',
+				} }
+			/>
+		);
+
+		const ghost = screen.getByRole( 'note', {
+			name: 'Pending edit by Author in core/paragraph',
+		} );
+
+		expect( ghost ).toHaveAttribute(
+			'data-distributed-editing-pending-ghost-placement',
+			'in-place'
+		);
+		expect( ghost ).toHaveAttribute(
+			'data-distributed-editing-pending-ghost-visual-treatment',
+			'post-modification-indicator'
+		);
+		expect( ghost ).toHaveClass(
+			'editor-distributed-editing-risky-block-review__pending-ghost-block-list-preview--in-place'
+		);
+		expect(
+			screen.getByTestId(
+				'distributed-editing-pending-ghost-block-preview'
+			)
+		).toBeInTheDocument();
+		expect( ghost ).toHaveAttribute(
+			'data-distributed-editing-pending-ghost-raw-content',
+			'false'
+		);
+		expect( ghost ).toHaveStyle(
+			'border: 1px solid var(--distributed-editing-indicator-border-color)'
+		);
+		expect( ghost.getAttribute( 'style' ) ).not.toMatch(
+			/background|box-shadow|opacity|9999px|currentColor/
+		);
 	} );
 
 	it( 'renders sanitized Custom HTML preview content inside the ghost block', () => {

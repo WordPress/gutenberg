@@ -99,32 +99,51 @@
 	}
 }
 
+.has-distributed-editing-pending-edit,
 .editor-distributed-editing-risky-block-review__pending-ghost-block-list-preview {
-	background: rgba(34, 113, 177, 0.045);
-	border: 1px dashed rgba(34, 113, 177, 0.36);
-	border-inline-start: 3px solid rgba(34, 113, 177, 0.55);
+	--distributed-editing-indicator-color: #6f5bd7;
+	--distributed-editing-indicator-border-color: rgba(111, 91, 215, 0.42);
+	--distributed-editing-indicator-active-border-color: rgba(111, 91, 215, 0.58);
+	--distributed-editing-delete-indicator-color: #d63638;
+	--distributed-editing-delete-indicator-border-color: rgba(214, 54, 56, 0.48);
+}
+
+.has-distributed-editing-pending-edit {
+	isolation: isolate;
+	position: relative;
+}
+
+.has-distributed-editing-pending-edit--deleted {
+	--distributed-editing-indicator-color: var(--distributed-editing-delete-indicator-color);
+	--distributed-editing-indicator-border-color: var(--distributed-editing-delete-indicator-border-color);
+}
+
+.editor-distributed-editing-risky-block-review__pending-ghost-block-list-preview {
+	border: 1px solid var(--distributed-editing-indicator-border-color, rgba(111, 91, 215, 0.42));
 	border-radius: $radius-small;
+	isolation: isolate;
 	margin-block: $grid-unit-05 $grid-unit-10;
-	opacity: 0.74;
 	padding-block: $grid-unit-05;
 	padding-inline: $grid-unit-15 $grid-unit-10;
 	position: relative;
-	transition:
-		background-color 120ms ease-out,
-		border-color 120ms ease-out,
-		opacity 120ms ease-out;
+}
+
+.editor-distributed-editing-risky-block-review__pending-ghost-block-list-preview--in-place {
+	margin-block: 0 $grid-unit-10;
+	padding-block: 0;
+	padding-inline: 0;
 }
 
 .editor-distributed-editing-risky-block-review__pending-ghost-block-list-preview:hover,
 .editor-distributed-editing-risky-block-review__pending-ghost-block-list-preview:focus-within {
-	background: rgba(34, 113, 177, 0.07);
-	border-color: rgba(34, 113, 177, 0.56);
-	opacity: 1;
+	--distributed-editing-indicator-border-color: var(--distributed-editing-indicator-active-border-color, rgba(111, 91, 215, 0.58));
 }
 
 .editor-distributed-editing-risky-block-review__pending-ghost-preview {
 	overflow-wrap: anywhere;
 	pointer-events: none;
+	position: relative;
+	z-index: 1;
 
 	> * {
 		margin-block: 0 0.35em;
