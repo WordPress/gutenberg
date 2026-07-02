@@ -17,7 +17,6 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
-import { View } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
@@ -65,7 +64,7 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 					__next40pxDefaultSize
 				/>
 			) : (
-				<View className="tools-panel-item-spacing">
+				<div className="tools-panel-item-spacing">
 					<SpacingSizesControl
 						values={ { all: computedValue } }
 						onChange={ ( { all } ) => {
@@ -78,7 +77,7 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 						splitOnAxis={ false }
 						showSideInLabel={ false }
 					/>
-				</View>
+				</div>
 			) }
 		</>
 	);

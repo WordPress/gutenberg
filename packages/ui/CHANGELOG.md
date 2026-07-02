@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add `LinkButton` component ([#78944](https://github.com/WordPress/gutenberg/pull/78944)).
+
 ### Bug Fixes
 
 -   `IconButton`: Keep the inline padding override valid when reused in button length calculations ([#79722](https://github.com/WordPress/gutenberg/pull/79722)).
