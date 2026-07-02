@@ -48,7 +48,9 @@ function UnforwardedSelectControl< V extends string >(
 	const {
 		// Prevent passing legacy props to internal components.
 		__nextHasNoMarginBottom: _,
-		__next40pxDefaultSize: __,
+		__next40pxDefaultSize: _next40pxDefaultSize,
+		__next36pxDefaultSize: _next36pxDefaultSize,
+		__shouldNotWarnDeprecated36pxSize: _shouldNotWarnDeprecated36pxSize,
 		className,
 		disabled = false,
 		help,
