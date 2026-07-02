@@ -288,7 +288,18 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 			};
 		}
 
+		// SelectionInMultipleBlocks is decomposed by the caller into per-endpoint
+		// Cursor / WholeBlock calls and should never arrive here directly.
+		if ( selection.type === SelectionType.SelectionInMultipleBlocks ) {
+			return {
+				richTextOffset: null,
+				localClientId: null,
+				attributeKey: null,
+			};
+		}
+
 		// Text-based selections: resolve cursor position and navigate up.
+		// SelectionCursor → cursorPosition; SelectionInOneBlock → cursorStartPosition.
 		const cursorPos =
 			'cursorPosition' in selection
 				? selection.cursorPosition

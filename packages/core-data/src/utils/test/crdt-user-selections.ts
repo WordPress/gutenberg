@@ -28,6 +28,8 @@ jest.mock( '@wordpress/block-editor', () => ( {
 } ) );
 import type {
 	CursorPosition,
+	CursorEndpoint,
+	WholeBlockEndpoint,
 	SelectionNone,
 	SelectionCursor,
 	SelectionInOneBlock,
@@ -269,21 +271,24 @@ describe( 'areSelectionsStatesEqual', () => {
 	} );
 
 	describe( 'SelectionType.SelectionInMultipleBlocks', () => {
-		test( 'returns true when selections in multiple blocks are identical', () => {
-			const cursorStartPosition = createCursorPosition(
-				'first block',
-				5
-			);
-			const cursorEndPosition = createCursorPosition( 'second block', 3 );
+		test( 'returns true when both endpoints are identical CursorEndpoints', () => {
+			const startEndpoint: CursorEndpoint = {
+				kind: 'cursor',
+				cursorPosition: createCursorPosition( 'first block', 5 ),
+			};
+			const endEndpoint: CursorEndpoint = {
+				kind: 'cursor',
+				cursorPosition: createCursorPosition( 'second block', 3 ),
+			};
 			const selection1: SelectionInMultipleBlocks = {
 				type: SelectionType.SelectionInMultipleBlocks,
-				cursorStartPosition,
-				cursorEndPosition,
+				startEndpoint,
+				endEndpoint,
 			};
 			const selection2: SelectionInMultipleBlocks = {
 				type: SelectionType.SelectionInMultipleBlocks,
-				cursorStartPosition,
-				cursorEndPosition,
+				startEndpoint,
+				endEndpoint,
 			};
 
 			expect( areSelectionsStatesEqual( selection1, selection2 ) ).toBe(
@@ -291,16 +296,53 @@ describe( 'areSelectionsStatesEqual', () => {
 			);
 		} );
 
-		test( 'returns false when start cursor position differs', () => {
+		test( 'returns true when both endpoints are identical WholeBlockEndpoints', () => {
+			const startEndpoint: WholeBlockEndpoint = {
+				kind: 'whole-block',
+				blockPosition: createBlockPosition( 0 ),
+			};
+			const endEndpoint: WholeBlockEndpoint = {
+				kind: 'whole-block',
+				blockPosition: createBlockPosition( 1 ),
+			};
 			const selection1: SelectionInMultipleBlocks = {
 				type: SelectionType.SelectionInMultipleBlocks,
-				cursorStartPosition: createCursorPosition( 'first block', 5 ),
-				cursorEndPosition: createCursorPosition( 'second block', 3 ),
+				startEndpoint,
+				endEndpoint,
 			};
 			const selection2: SelectionInMultipleBlocks = {
 				type: SelectionType.SelectionInMultipleBlocks,
-				cursorStartPosition: createCursorPosition( 'first block', 6 ),
-				cursorEndPosition: createCursorPosition( 'second block', 3 ),
+				startEndpoint,
+				endEndpoint,
+			};
+
+			expect( areSelectionsStatesEqual( selection1, selection2 ) ).toBe(
+				true
+			);
+		} );
+
+		test( 'returns false when start CursorEndpoint cursor position differs', () => {
+			const selection1: SelectionInMultipleBlocks = {
+				type: SelectionType.SelectionInMultipleBlocks,
+				startEndpoint: {
+					kind: 'cursor',
+					cursorPosition: createCursorPosition( 'first block', 5 ),
+				},
+				endEndpoint: {
+					kind: 'cursor',
+					cursorPosition: createCursorPosition( 'second block', 3 ),
+				},
+			};
+			const selection2: SelectionInMultipleBlocks = {
+				type: SelectionType.SelectionInMultipleBlocks,
+				startEndpoint: {
+					kind: 'cursor',
+					cursorPosition: createCursorPosition( 'first block', 6 ),
+				},
+				endEndpoint: {
+					kind: 'cursor',
+					cursorPosition: createCursorPosition( 'second block', 3 ),
+				},
 			};
 
 			expect( areSelectionsStatesEqual( selection1, selection2 ) ).toBe(
@@ -308,16 +350,57 @@ describe( 'areSelectionsStatesEqual', () => {
 			);
 		} );
 
-		test( 'returns false when end cursor position differs', () => {
+		test( 'returns false when end CursorEndpoint cursor position differs', () => {
 			const selection1: SelectionInMultipleBlocks = {
 				type: SelectionType.SelectionInMultipleBlocks,
-				cursorStartPosition: createCursorPosition( 'first block', 5 ),
-				cursorEndPosition: createCursorPosition( 'second block', 3 ),
+				startEndpoint: {
+					kind: 'cursor',
+					cursorPosition: createCursorPosition( 'first block', 5 ),
+				},
+				endEndpoint: {
+					kind: 'cursor',
+					cursorPosition: createCursorPosition( 'second block', 3 ),
+				},
 			};
 			const selection2: SelectionInMultipleBlocks = {
 				type: SelectionType.SelectionInMultipleBlocks,
-				cursorStartPosition: createCursorPosition( 'first block', 5 ),
-				cursorEndPosition: createCursorPosition( 'second block', 4 ),
+				startEndpoint: {
+					kind: 'cursor',
+					cursorPosition: createCursorPosition( 'first block', 5 ),
+				},
+				endEndpoint: {
+					kind: 'cursor',
+					cursorPosition: createCursorPosition( 'second block', 4 ),
+				},
+			};
+
+			expect( areSelectionsStatesEqual( selection1, selection2 ) ).toBe(
+				false
+			);
+		} );
+
+		test( 'returns false when endpoint kinds differ (text vs block)', () => {
+			const selection1: SelectionInMultipleBlocks = {
+				type: SelectionType.SelectionInMultipleBlocks,
+				startEndpoint: {
+					kind: 'cursor',
+					cursorPosition: createCursorPosition( 'first block', 5 ),
+				},
+				endEndpoint: {
+					kind: 'cursor',
+					cursorPosition: createCursorPosition( 'second block', 3 ),
+				},
+			};
+			const selection2: SelectionInMultipleBlocks = {
+				type: SelectionType.SelectionInMultipleBlocks,
+				startEndpoint: {
+					kind: 'whole-block',
+					blockPosition: createBlockPosition( 0 ),
+				},
+				endEndpoint: {
+					kind: 'cursor',
+					cursorPosition: createCursorPosition( 'second block', 3 ),
+				},
 			};
 
 			expect( areSelectionsStatesEqual( selection1, selection2 ) ).toBe(
@@ -732,12 +815,15 @@ describe( 'getSelectionState', () => {
 			expect( result.type ).toBe(
 				SelectionType.SelectionInMultipleBlocks
 			);
+			const multiBlock = result as SelectionInMultipleBlocks;
+			expect( multiBlock.startEndpoint.kind ).toBe( 'cursor' );
+			expect( multiBlock.endEndpoint.kind ).toBe( 'cursor' );
 			expect(
-				( result as SelectionInMultipleBlocks ).cursorStartPosition
+				( multiBlock.startEndpoint as CursorEndpoint ).cursorPosition
 					.absoluteOffset
 			).toBe( 5 );
 			expect(
-				( result as SelectionInMultipleBlocks ).cursorEndPosition
+				( multiBlock.endEndpoint as CursorEndpoint ).cursorPosition
 					.absoluteOffset
 			).toBe( 3 );
 		} );

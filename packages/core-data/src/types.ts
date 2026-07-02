@@ -160,13 +160,54 @@ export type SelectionInOneBlock = {
 	selectionDirection?: SelectionDirection;
 };
 
+/**
+ * A selection endpoint where the cursor lands inside a RichText field.
+ *
+ * WHY this shape exists: Yjs tracks text positions via Y.RelativePosition
+ * anchored to a Y.Text node. When the sender's block has an attributeKey and
+ * offset we can create this precise anchor, letting us render the cursor at
+ * the exact character on the receiver's screen even after concurrent edits
+ * shift surrounding text.
+ *
+ * Any block type can produce a CursorEndpoint — a paragraph mid-word, a
+ * table cell, a heading — as long as the selection carries a character offset.
+ */
+export type CursorEndpoint = {
+	kind: 'cursor';
+	cursorPosition: CursorPosition;
+};
+
+/**
+ * A selection endpoint where an entire block is selected, with no character
+ * offset (e.g. an image, a spacer, or a paragraph selected as a whole block
+ * via keyboard block-selection mode).
+ *
+ * WHY a different shape: blocks without a RichText field have no Y.Text node
+ * to anchor a relative position to. Instead we pin to the block's slot in its
+ * parent Y.Array, which survives concurrent insertions and deletions of sibling
+ * blocks in the same way a text anchor survives edits to the text.
+ */
+export type WholeBlockEndpoint = {
+	kind: 'whole-block';
+	blockPosition: Y.RelativePosition;
+};
+
+/**
+ * One end of a multi-block selection. The kind discriminant tells the receiver
+ * whether to resolve this endpoint as a precise in-text cursor (CursorEndpoint)
+ * or as a block-level anchor (WholeBlockEndpoint), so each end is handled
+ * correctly regardless of the block types involved.
+ */
+export type SelectionEndpoint = CursorEndpoint | WholeBlockEndpoint;
+
 export type SelectionInMultipleBlocks = {
-	// The user has highlighted text over multiple blocks.
-	// The blocks are derived on the receiver side by navigating up from the
-	// resolved cursor positions via Y.AbstractType.parent.
+	// The user's selection spans more than one block. Each endpoint is resolved
+	// independently: text blocks carry a character-level CursorEndpoint while
+	// blocks without a RichText field (or selected as whole blocks) carry a
+	// WholeBlockEndpoint. Mixed combinations (e.g. paragraph → image) are valid.
 	type: SelectionType.SelectionInMultipleBlocks;
-	cursorStartPosition: CursorPosition;
-	cursorEndPosition: CursorPosition;
+	startEndpoint: SelectionEndpoint;
+	endEndpoint: SelectionEndpoint;
 	// The direction of the selection, indicating where the caret sits.
 	selectionDirection?: SelectionDirection;
 };
