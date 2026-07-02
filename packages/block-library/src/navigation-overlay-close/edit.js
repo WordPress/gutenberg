@@ -60,7 +60,6 @@ export default function NavigationOverlayCloseEdit( {
 								setAttributes( { displayMode: value } )
 							}
 							isBlock
-							__next40pxDefaultSize
 						>
 							<ToggleGroupControlOption
 								value="icon"

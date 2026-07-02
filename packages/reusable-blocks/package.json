@@ -62,6 +62,10 @@
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/url": "file:../url"
 	},
+	"devDependencies": {
+		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/preferences": "file:../preferences"
+	},
 	"peerDependencies": {
 		"react": "^18.0.0",
 		"react-dom": "^18.0.0"

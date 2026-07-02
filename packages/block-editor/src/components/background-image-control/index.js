@@ -579,7 +579,6 @@ function BackgroundSizeControls( {
 				onChange={ toggleScrollWithPage }
 			/>
 			<ToggleGroupControl
-				size="__unstable-large"
 				label={ __( 'Size' ) }
 				value={ currentValueForToggle }
 				onChange={ updateBackgroundSize }
