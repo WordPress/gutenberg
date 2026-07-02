@@ -60,6 +60,7 @@ function CustomSelectControl< T extends CustomSelectOption >(
 	props: CustomSelectProps< T >
 ) {
 	const {
+		// Prevent passing legacy props to internal component.
 		__next40pxDefaultSize: _next40pxDefaultSize,
 		__shouldNotWarnDeprecated36pxSize: _shouldNotWarnDeprecated36pxSize,
 		describedBy,
@@ -171,15 +172,12 @@ function CustomSelectControl< T extends CustomSelectOption >(
 		);
 	};
 
-	const translatedSize =
-		size === 'default' || size === '__unstable-large' ? 'default' : size;
-
 	return (
 		<>
 			<CustomSelect
 				aria-describedby={ descriptionId }
 				renderSelectedValue={ renderSelectedValue }
-				size={ translatedSize }
+				size={ size === '__unstable-large' ? 'default' : size }
 				store={ store }
 				className={ clsx(
 					// Keeping the classname for legacy reasons
