@@ -308,7 +308,7 @@ export function LocationPicker( {
 								}
 							/>
 						}
-						placeholder={ __( 'City, like Tokyo…' ) }
+						placeholder={ __( 'Select city…' ) }
 					/>
 					{ locationOptions.length > 0 && (
 						<Autocomplete.Popup>
