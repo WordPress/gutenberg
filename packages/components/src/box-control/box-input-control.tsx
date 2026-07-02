@@ -206,8 +206,6 @@ export default function BoxInputControl( {
 						<StyledUnitControl
 							{ ...props }
 							min={ min }
-							__shouldNotWarnDeprecated36pxSize
-							__next40pxDefaultSize
 							className="component-box-control__unit-control"
 							id={ inputId }
 							isPressEnterToChange
@@ -223,8 +221,6 @@ export default function BoxInputControl( {
 					</Tooltip>
 
 					<FlexedRangeControl
-						__next40pxDefaultSize
-						__shouldNotWarnDeprecated36pxSize
 						aria-controls={ inputId }
 						label={ LABELS[ side ] }
 						hideLabelFromVision
@@ -252,7 +248,6 @@ export default function BoxInputControl( {
 
 			{ hasPresets && ! showCustomValueControl && (
 				<FlexedRangeControl
-					__next40pxDefaultSize
 					className="spacing-sizes-control__range-control"
 					value={ presetIndex !== undefined ? presetIndex + 1 : 0 }
 					onChange={ ( newIndex ) => {

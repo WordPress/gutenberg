@@ -58,8 +58,6 @@ For the best development experience, we recommend configuring the [Stylelint rul
 
 If you reference `--wpds-*` tokens in CSS or JS/TS source, use the [build plugins](#build-plugins) to inject fallback values at build time so components render correctly even when the tokens stylesheet is not loaded. If you use `@wordpress/build`, these plugins are already enabled by default when `@wordpress/theme` is installed.
 
-If you write Sass/SCSS but cannot load the design tokens stylesheet, add build plugins to your pipeline, or use `@wordpress/build`, use the [Sass helper](#sass-helper) instead.
-
 ## Theme Provider
 
 The `ThemeProvider` is a React component that should wrap your application to provide design tokens and theme context to the child UI components. It accepts a set of customizable seed values and automatically generates a set of design tokens, which are exposed as CSS custom properties for use throughout the application.
@@ -232,8 +230,6 @@ This rule reports an error when a CSS declaration sets (defines) a custom proper
 
 This rule reports an error when a `var()` call for a `--wpds-*` token includes a manual fallback value. In CSS processed by the [build plugins](#build-plugins), fallback values are injected automatically, so manual fallbacks in `var(--wpds-*)` references are redundant and can drift out of sync with the token definitions.
 
-For Sass sources that cannot use the build plugins, use the [Sass helper](#sass-helper) instead of writing manual fallback values.
-
 ```css
 /* ✗ Error: Do not add a fallback value for Design System token '--wpds-color-foreground-content-neutral' */
 .example {
@@ -307,30 +303,6 @@ export default defineConfig( {
 	},
 } );
 ```
-
-## Sass helper
-
-An alternative to loading the [design tokens stylesheet](#outside-wordpress), using the [build plugins](#build-plugins), or `@wordpress/build`. Use it when you write Sass/SCSS and cannot change your build setup to support any of those options.
-
-You do not need this helper if you already load the design tokens stylesheet or use fallback injection via the build plugins or `@wordpress/build`. In those cases, write bare `var(--wpds-*)` references in your source.
-
-The `@wordpress/theme/utils` export provides a generated `var()` function that wraps token references with the same fallback map used by the build plugins. For example, `wpds.var('--wpds-color-foreground-content-neutral')` compiles to `var(--wpds-color-foreground-content-neutral, #1e1e1e)`.
-
-```scss
-@use '@wordpress/theme/utils' as wpds;
-
-.example {
-	color: wpds.var( '--wpds-color-foreground-content-neutral' );
-}
-```
-
-When using Sass with [`NodePackageImporter`](https://sass-lang.com/documentation/js-api/classes/nodepackageimporter/), you can import via the `pkg:` scheme:
-
-```scss
-@use 'pkg:@wordpress/theme/utils' as wpds;
-```
-
-The same `@wordpress/theme/utils` import also supports Sass setups that resolve packages from `node_modules` with a load path.
 
 ## Contributing to this package
 

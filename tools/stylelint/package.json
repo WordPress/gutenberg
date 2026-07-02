@@ -23,6 +23,8 @@
 		"./config": "./config.js"
 	},
 	"dependencies": {
+		"@wordpress/stylelint-config": "file:../../packages/stylelint-config",
+		"@wordpress/theme": "file:../../packages/theme",
 		"stylelint-plugin-logical-css": "^1.2.3"
 	},
 	"publishConfig": {

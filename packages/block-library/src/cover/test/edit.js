@@ -10,7 +10,7 @@ import userEvent from '@testing-library/user-event';
 import {
 	initializeEditor,
 	selectBlock,
-} from 'test/integration/helpers/integration-test-editor';
+} from '@wordpress/integration-tests/helpers/integration-test-editor';
 
 const defaultSettings = {
 	__experimentalFeatures: {
@@ -217,7 +217,7 @@ describe( 'Cover block', () => {
 			await selectBlock( 'Block: Cover' );
 			expect(
 				within( screen.getByLabelText( 'Block: Cover' ) ).getByRole(
-					'img'
+					'presentation'
 				)
 			).toBeInTheDocument();
 
@@ -232,7 +232,7 @@ describe( 'Cover block', () => {
 
 			expect(
 				within( screen.getByLabelText( 'Block: Cover' ) ).queryByRole(
-					'img'
+					'presentation'
 				)
 			).not.toBeInTheDocument();
 		} );
@@ -318,7 +318,7 @@ describe( 'Cover block', () => {
 
 			expect(
 				within( screen.getByLabelText( 'Block: Cover' ) ).getByRole(
-					'img'
+					'presentation'
 				)
 			).toHaveStyle( 'object-position: 100% 50%;' );
 		} );
