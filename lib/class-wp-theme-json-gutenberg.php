@@ -638,7 +638,13 @@ class WP_Theme_JSON_Gutenberg {
 	);
 
 	/**
-	 * Returns media queries for responsive style states.
+	 * Returns CSS media queries for responsive viewport style states.
+	 *
+	 * Breakpoint values are read from `settings.viewport`, sanitized, and
+	 * normalized before the media query strings are generated. By default, the
+	 * returned keys are the theme.json style-state names (`@mobile`, `@tablet`).
+	 * When `$options['include_desktop']` is truthy, the returned keys are
+	 * `mobile`, `tablet`, and `desktop` for block visibility support.
 	 *
 	 * @since 7.1.0
 	 *
@@ -691,7 +697,11 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Checks whether a viewport breakpoint size is a safe CSS length.
+	 * Checks whether a viewport breakpoint value is a safe CSS length.
+	 *
+	 * Viewport breakpoints are limited to numeric `px`, `em`, and `rem` lengths.
+	 * CSS functions, percentages, and other units are rejected because breakpoint
+	 * values are interpolated into generated media queries.
 	 *
 	 * @since 7.1.0
 	 *
@@ -712,11 +722,15 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Converts a viewport breakpoint size to a pixel value for comparison.
+	 * Converts a valid viewport breakpoint size to pixels for ordering checks.
+	 *
+	 * Generated media queries keep the original units. This method only
+	 * normalizes values so `mobile` and `tablet` can be compared safely. `em`
+	 * and `rem` lengths use a 16px base for comparison.
 	 *
 	 * @since 7.1.0
 	 *
-	 * @param string $value Viewport breakpoint size.
+	 * @param mixed $value Viewport breakpoint size.
 	 * @return float|null Viewport breakpoint size in pixels, or null when invalid.
 	 */
 	private static function get_viewport_breakpoint_value_in_pixels( $value ) {
@@ -742,12 +756,17 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Sanitizes viewport breakpoint settings.
+	 * Sanitizes and normalizes viewport breakpoint settings.
+	 *
+	 * Keeps only supported breakpoint keys, trims valid CSS lengths, and returns
+	 * the default breakpoints when no valid custom breakpoint is provided. When
+	 * only `tablet` is valid, it is treated as `mobile`. When `tablet` is not
+	 * larger than `mobile`, it is removed.
 	 *
 	 * @since 7.1.0
 	 *
 	 * @param mixed $viewport_settings Viewport settings from theme.json.
-	 * @return array Sanitized viewport settings.
+	 * @return array Sanitized viewport breakpoint settings.
 	 */
 	private static function sanitize_viewport_settings( $viewport_settings ) {
 		if ( ! is_array( $viewport_settings ) ) {
@@ -4789,10 +4808,14 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Remove insecure element styles within a variation or block.
 	 *
+	 * When responsive media queries are provided, nested responsive state styles
+	 * for those media-query keys are re-added after the base sanitization pass.
+	 *
 	 * @since 6.8.0
 	 *
 	 * @param array      $elements                 The elements to process.
-	 * @param array|null $responsive_media_queries Optional. Responsive media queries. Default null.
+	 * @param array|null $responsive_media_queries Optional. Media queries whose keys define allowed
+	 *                                             viewport states. Default null.
 	 * @return array The sanitized elements styles.
 	 */
 	protected static function remove_insecure_element_styles( $elements, $responsive_media_queries = null ) {
@@ -4838,10 +4861,14 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Remove insecure styles from inner blocks and their elements.
 	 *
+	 * When responsive media queries are provided, nested responsive state styles
+	 * for those media-query keys are re-added after the base sanitization pass.
+	 *
 	 * @since 6.8.0
 	 *
 	 * @param array      $blocks                   The block styles to process.
-	 * @param array|null $responsive_media_queries Optional. Responsive media queries. Default null.
+	 * @param array|null $responsive_media_queries Optional. Media queries whose keys define allowed
+	 *                                             viewport states. Default null.
 	 * @return array Sanitized block type styles.
 	 */
 	protected static function remove_insecure_inner_block_styles( $blocks, $responsive_media_queries = null ) {
@@ -4911,7 +4938,8 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 5.9.0
 	 *
 	 * @param array $input          Node to process.
-	 * @param bool  $allow_viewport Whether to preserve viewport settings.
+	 * @param bool  $allow_viewport Whether to preserve and sanitize top-level
+	 *                              viewport settings.
 	 * @return array
 	 */
 	protected static function remove_insecure_settings( $input, $allow_viewport = true ) {
