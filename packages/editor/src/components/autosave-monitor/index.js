@@ -2,35 +2,16 @@
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
-import { useEvent } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as noticesStore } from '@wordpress/notices';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-
-/**
- * Calls `callback` every `intervalInSeconds`. The latest `callback` is always
- * invoked without resetting the timer.
- *
- * @param {Function} callback          Function to call on each tick.
- * @param {number}   intervalInSeconds Seconds between ticks.
- */
-function useInterval( callback, intervalInSeconds ) {
-	const onTick = useEvent( callback );
-
-	useEffect( () => {
-		// Interval can be undefined before editor settings are populated.
-		if ( ! intervalInSeconds ) {
-			return;
-		}
-
-		const id = setInterval( onTick, intervalInSeconds * 1000 );
-		return () => clearInterval( id );
-	}, [ onTick, intervalInSeconds ] );
-}
+import useInterval from './use-interval';
 
 /**
  * Monitors the changes made to the edited post and triggers autosave if necessary.
@@ -50,11 +31,16 @@ function useInterval( callback, intervalInSeconds ) {
  */
 export default function AutosaveMonitor( { interval, autosave } ) {
 	const { autosave: autosaveAction } = useDispatch( editorStore );
+	const { createWarningNotice } = useDispatch( noticesStore );
 	const triggerAutosave = autosave ?? autosaveAction;
 
 	const { getReferenceByDistinctEdits } = useSelect( coreStore );
-	const { isEditedPostDirty, isEditedPostAutosaveable, isAutosavingPost } =
-		useSelect( editorStore );
+	const {
+		isEditedPostDirty,
+		isEditedPostAutosaveable,
+		isAutosavingPost,
+		getEditorSettings,
+	} = useSelect( editorStore );
 
 	const autosaveInterval = useSelect(
 		( select ) => {
@@ -66,6 +52,30 @@ export default function AutosaveMonitor( { interval, autosave } ) {
 		},
 		[ interval ]
 	);
+
+	// Warn the user once when the server already holds an autosave that is more
+	// recent than the loaded post.
+	useEffect( () => {
+		const { autosave: existingAutosave } = getEditorSettings();
+		if ( ! existingAutosave ) {
+			return;
+		}
+
+		createWarningNotice(
+			__(
+				'There is an autosave of this post that is more recent than the version below.'
+			),
+			{
+				id: 'autosave-exists',
+				actions: [
+					{
+						label: __( 'View the autosave' ),
+						url: existingAutosave.editLink,
+					},
+				],
+			}
+		);
+	}, [ getEditorSettings, createWarningNotice ] );
 
 	// Reference of the edits last considered for autosaving. Mutable state that
 	// must not trigger a re-render, hence a ref.

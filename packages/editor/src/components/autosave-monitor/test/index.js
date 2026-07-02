@@ -33,11 +33,14 @@ function setState( overrides = {} ) {
 		isAutosaveable: false,
 		isAutosaving: false,
 		autosaveInterval: 10,
+		existingAutosave: undefined,
 		...overrides,
 	};
 }
 
 describe( 'AutosaveMonitor', () => {
+	let createWarningNotice;
+
 	beforeEach( () => {
 		setState();
 		// `useSelect( store )` (static mode) returns bound selectors; the
@@ -52,6 +55,7 @@ describe( 'AutosaveMonitor', () => {
 				isAutosavingPost: () => state.isAutosaving,
 				getEditorSettings: () => ( {
 					autosaveInterval: state.autosaveInterval,
+					autosave: state.existingAutosave,
 				} ),
 			};
 			if ( typeof mapSelectOrStore === 'function' ) {
@@ -59,7 +63,11 @@ describe( 'AutosaveMonitor', () => {
 			}
 			return selectors;
 		} );
-		useDispatch.mockReturnValue( { autosave: jest.fn() } );
+		createWarningNotice = jest.fn();
+		useDispatch.mockReturnValue( {
+			autosave: jest.fn(),
+			createWarningNotice,
+		} );
 		setInterval.mockClear();
 		clearInterval.mockClear();
 	} );
@@ -197,6 +205,28 @@ describe( 'AutosaveMonitor', () => {
 		setState( { isDirty: true, isAutosaveable: true, editsReference: 2 } );
 		jest.advanceTimersByTime( 5000 );
 		expect( autosave ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'should warn about a more recent server autosave on mount', () => {
+		setState( { existingAutosave: { editLink: 'autosave-edit-link' } } );
+		render( <AutosaveMonitor /> );
+
+		expect( createWarningNotice ).toHaveBeenCalledTimes( 1 );
+		expect( createWarningNotice ).toHaveBeenCalledWith(
+			expect.any( String ),
+			expect.objectContaining( {
+				id: 'autosave-exists',
+				actions: [
+					expect.objectContaining( { url: 'autosave-edit-link' } ),
+				],
+			} )
+		);
+	} );
+
+	it( 'should not warn when there is no more recent server autosave', () => {
+		render( <AutosaveMonitor /> );
+
+		expect( createWarningNotice ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should fall back to the editor store autosave action', () => {

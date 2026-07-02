@@ -25,6 +25,9 @@ jest.spyOn( global, 'setInterval' );
 window.requestIdleCallback = ( callback ) => callback();
 const { default: LocalAutosaveMonitor } = require( '../local' );
 
+// sessionStorage key used by the local-autosave store helpers for post ID 1.
+const BACKUP_KEY = 'wp-autosave-block-editor-post-1';
+
 // The current edited-post state, read live by the mocked selectors so it can be
 // changed between timer ticks without re-rendering the component.
 let state;
@@ -32,10 +35,14 @@ let state;
 function setState( overrides = {} ) {
 	state = {
 		editsReference: 1,
+		isSaveable: false,
 		isDirty: false,
-		isAutosaveable: false,
+		isAutosavingLocked: false,
+		supportsAutosave: true,
 		isAutosaving: false,
+		isAutosaveable: true,
 		localAutosaveInterval: 15,
+		editedPost: { title: 'title', content: 'content', excerpt: 'excerpt' },
 		...overrides,
 	};
 }
@@ -45,15 +52,24 @@ describe( 'LocalAutosaveMonitor', () => {
 
 	beforeEach( () => {
 		setState();
+		window.sessionStorage.clear();
 		useSelect.mockImplementation( ( mapSelectOrStore ) => {
 			const selectors = {
 				getReferenceByDistinctEdits: () => state.editsReference,
-				isEditedPostDirty: () => state.isDirty,
-				isEditedPostAutosaveable: () => state.isAutosaveable,
-				isAutosavingPost: () => state.isAutosaving,
+				getPostType: () => ( {
+					supports: { autosave: state.supportsAutosave },
+				} ),
 				getCurrentPostId: () => 1,
+				getCurrentPostType: () => 'post',
 				isEditedPostNew: () => false,
+				isEditedPostSaveable: () => state.isSaveable,
+				isEditedPostDirty: () => state.isDirty,
+				isPostAutosavingLocked: () => state.isAutosavingLocked,
+				isAutosavingPost: () => state.isAutosaving,
+				isEditedPostAutosaveable: () => state.isAutosaveable,
 				didPostSaveRequestFail: () => false,
+				getEditedPostAttribute: ( attribute ) =>
+					state.editedPost[ attribute ],
 				getEditorSettings: () => ( {
 					localAutosaveInterval: state.localAutosaveInterval,
 				} ),
@@ -79,7 +95,7 @@ describe( 'LocalAutosaveMonitor', () => {
 	} );
 
 	it( 'should save a local autosave on the timer tick', () => {
-		setState( { isDirty: true, isAutosaveable: true } );
+		setState( { isSaveable: true, isDirty: true } );
 		render( <LocalAutosaveMonitor /> );
 
 		jest.advanceTimersByTime( 15000 );
@@ -88,34 +104,127 @@ describe( 'LocalAutosaveMonitor', () => {
 		expect( autosave ).toHaveBeenCalledWith( { local: true } );
 	} );
 
-	// Characterization of behavior the local monitor inherits by reusing the
-	// remote engine. Local autosaves only write to sessionStorage, yet they are
-	// gated by remote (REST) save state. Expected to change with the planned
-	// per-kind decision logic; see the AutosaveMonitor follow-up work.
-	describe( 'divergence inherited from the remote monitor', () => {
-		it( 'should skip the local backup while a remote autosave is in flight', () => {
+	it( 'should not save again until there are new edits', () => {
+		setState( { isSaveable: true, isDirty: true } );
+		render( <LocalAutosaveMonitor /> );
+
+		jest.advanceTimersByTime( 15000 );
+		expect( autosave ).toHaveBeenCalledTimes( 1 );
+
+		// No new edits: a subsequent tick should not save again.
+		jest.advanceTimersByTime( 15000 );
+		expect( autosave ).toHaveBeenCalledTimes( 1 );
+
+		// A new distinct edit triggers another local autosave.
+		setState( { isSaveable: true, isDirty: true, editsReference: 2 } );
+		jest.advanceTimersByTime( 15000 );
+		expect( autosave ).toHaveBeenCalledTimes( 2 );
+	} );
+
+	it( 'should not save when the post is not dirty', () => {
+		setState( { isSaveable: true, isDirty: false } );
+		render( <LocalAutosaveMonitor /> );
+
+		jest.advanceTimersByTime( 15000 );
+
+		expect( autosave ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should not save when the post has no saveable content', () => {
+		setState( { isSaveable: false, isDirty: true } );
+		render( <LocalAutosaveMonitor /> );
+
+		jest.advanceTimersByTime( 15000 );
+
+		expect( autosave ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should not save when autosaving is locked', () => {
+		setState( {
+			isSaveable: true,
+			isDirty: true,
+			isAutosavingLocked: true,
+		} );
+		render( <LocalAutosaveMonitor /> );
+
+		jest.advanceTimersByTime( 15000 );
+
+		expect( autosave ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should not save when the post type does not support autosaves', () => {
+		setState( {
+			isSaveable: true,
+			isDirty: true,
+			supportsAutosave: false,
+		} );
+		render( <LocalAutosaveMonitor /> );
+
+		jest.advanceTimersByTime( 15000 );
+
+		expect( autosave ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should skip the backup when it already matches the edited post', () => {
+		setState( { isSaveable: true, isDirty: true } );
+		render( <LocalAutosaveMonitor /> );
+
+		window.sessionStorage.setItem(
+			BACKUP_KEY,
+			JSON.stringify( {
+				post_title: 'title',
+				content: 'content',
+				excerpt: 'excerpt',
+			} )
+		);
+		jest.advanceTimersByTime( 15000 );
+
+		expect( autosave ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should save when the backup differs from the edited post', () => {
+		setState( { isSaveable: true, isDirty: true } );
+		render( <LocalAutosaveMonitor /> );
+
+		window.sessionStorage.setItem(
+			BACKUP_KEY,
+			JSON.stringify( {
+				post_title: 'title',
+				content: 'stale content',
+				excerpt: 'excerpt',
+			} )
+		);
+		jest.advanceTimersByTime( 15000 );
+
+		expect( autosave ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	// A local backup only writes to sessionStorage, so it must not be gated by
+	// remote (REST) save state.
+	describe( 'independence from the remote monitor', () => {
+		it( 'should save while a remote autosave is in flight', () => {
+			setState( { isSaveable: true, isDirty: true, isAutosaving: true } );
+			render( <LocalAutosaveMonitor /> );
+
+			jest.advanceTimersByTime( 15000 );
+
+			expect( autosave ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'should save even when the post is not autosaveable against the server autosave', () => {
+			// `isEditedPostAutosaveable()` waits for the server autosave to
+			// load and compares edits against it — irrelevant to the local
+			// backup, so it must not be consulted.
 			setState( {
+				isSaveable: true,
 				isDirty: true,
-				isAutosaveable: true,
-				isAutosaving: true,
+				isAutosaveable: false,
 			} );
 			render( <LocalAutosaveMonitor /> );
 
 			jest.advanceTimersByTime( 15000 );
 
-			expect( autosave ).not.toHaveBeenCalled();
-		} );
-
-		it( 'should skip the local backup while the post is not autosaveable against the server autosave', () => {
-			// `isEditedPostAutosaveable()` compares edits against the *server*
-			// autosave and returns false until that autosave has loaded — a
-			// baseline and a fetch that a sessionStorage backup doesn't need.
-			setState( { isDirty: true, isAutosaveable: false } );
-			render( <LocalAutosaveMonitor /> );
-
-			jest.advanceTimersByTime( 15000 );
-
-			expect( autosave ).not.toHaveBeenCalled();
+			expect( autosave ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 } );
