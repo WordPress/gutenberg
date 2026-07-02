@@ -21,7 +21,10 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
+import {
+	insert,
+	privateApis as richTextPrivateApis,
+} from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -212,27 +215,6 @@ export default function RichTextControl( {
 		[ focusOnMount ]
 	);
 
-	/*
-	 * The rich-text hook has no Enter handling of its own, so without this
-	 * the browser would insert a line break even though `aria-multiline`
-	 * advertises single-line semantics when `disableLineBreaks` is set.
-	 */
-	const disableLineBreaksRef = useRefEffect(
-		( element ) => {
-			if ( ! disableLineBreaks ) {
-				return;
-			}
-			function onKeyDown( event ) {
-				if ( event.key === 'Enter' ) {
-					event.preventDefault();
-				}
-			}
-			element.addEventListener( 'keydown', onKeyDown );
-			return () => element.removeEventListener( 'keydown', onKeyDown );
-		},
-		[ disableLineBreaks ]
-	);
-
 	// Wire registered format keyboard shortcuts (e.g. Cmd+B, Cmd+I, Cmd+K)
 	// and InputEvent handlers (e.g. native formatBold) to the contenteditable.
 	// FormatEdit populates these Sets via context; without these listeners the
@@ -243,7 +225,7 @@ export default function RichTextControl( {
 	} );
 
 	// Keep `formatTypes`/`getValue`/`onChange` accessible to the input-rule
-	// listener without retearing it down on every value change.
+	// and Enter listeners without retearing them down on every value change.
 	const inputRulePropsRef = useRef( {
 		formatTypes,
 		getValue,
@@ -256,6 +238,52 @@ export default function RichTextControl( {
 			onChange: onRichTextChange,
 		};
 	} );
+
+	/*
+	 * The rich-text hook has no Enter handling of its own. Left to the
+	 * browser, Enter mutates the DOM directly with `<br>` elements (and
+	 * Chrome appends an extra trailing break to keep the caret visible,
+	 * which reads as two new lines). Mirror the block-editor behavior
+	 * instead: prevent the native action and insert the line break into
+	 * the value — or nothing when `disableLineBreaks` is set, matching
+	 * the single-line semantics `aria-multiline` advertises. Presses with
+	 * a meta/ctrl modifier are left to consumers (e.g. a form submitting
+	 * on Cmd+Enter).
+	 */
+	const enterRef = useRefEffect(
+		( element ) => {
+			function onKeyDown( event ) {
+				if (
+					event.key !== 'Enter' ||
+					event.defaultPrevented ||
+					event.metaKey ||
+					event.ctrlKey
+				) {
+					return;
+				}
+				event.preventDefault();
+				if ( disableLineBreaks ) {
+					return;
+				}
+				const { getValue: getCurrentValue, onChange: handleChange } =
+					inputRulePropsRef.current;
+				const current = getCurrentValue();
+				// Fall back to the end of the content if the selection has
+				// not been synced into the value yet.
+				handleChange(
+					insert(
+						current,
+						'\n',
+						current.start ?? current.text.length,
+						current.end ?? current.text.length
+					)
+				);
+			}
+			element.addEventListener( 'keydown', onKeyDown );
+			return () => element.removeEventListener( 'keydown', onKeyDown );
+		},
+		[ disableLineBreaks ]
+	);
 
 	const eventListenersRef = useRefEffect(
 		( element ) => {
@@ -350,7 +378,7 @@ export default function RichTextControl( {
 						anchorRef,
 						eventListenersRef,
 						focusOnMountRef,
-						disableLineBreaksRef,
+						enterRef,
 						popoverSlotContainerRef,
 					] ) }
 					onFocus={ () => {

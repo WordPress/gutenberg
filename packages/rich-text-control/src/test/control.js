@@ -18,6 +18,22 @@ function getTextbox( container ) {
 	return container.querySelector( '.wp-rich-text-control' );
 }
 
+/*
+ * `useRichText` schedules a selection sync via `queueMicrotask` when focus
+ * enters the editable, which fires a `setSelection`-driven re-render of
+ * `RichTextControl`. Flush that microtask inside an `act` block so React
+ * doesn't warn about updates outside `act(...)`.
+ */
+const flushMicrotasks = () =>
+	act( async () => {
+		await Promise.resolve();
+	} );
+
+async function focusTextbox( textbox ) {
+	fireEvent.focus( textbox );
+	await flushMicrotasks();
+}
+
 describe( 'RichTextControl', () => {
 	beforeAll( () => {
 		// Register a minimal stub for `core/bold` so the optional
@@ -119,28 +135,81 @@ describe( 'RichTextControl', () => {
 		);
 	} );
 
-	it( 'blocks Enter from inserting line breaks when `disableLineBreaks` is set', () => {
-		const { container, rerender } = render(
-			<RichTextControl
-				label="Single line"
-				value=""
-				onChange={ () => {} }
-				disableLineBreaks
-			/>
-		);
-		const textbox = getTextbox( container );
+	describe( 'line breaks', () => {
+		it( 'blocks Enter from inserting line breaks when `disableLineBreaks` is set', async () => {
+			const onChange = jest.fn();
+			const { container } = render(
+				<RichTextControl
+					label="Single line"
+					value=""
+					onChange={ onChange }
+					disableLineBreaks
+				/>
+			);
+			const textbox = getTextbox( container );
+			await focusTextbox( textbox );
 
-		// `fireEvent` returns `false` when `preventDefault()` was called.
-		expect( fireEvent.keyDown( textbox, { key: 'Enter' } ) ).toBe( false );
+			// `fireEvent` returns `false` when `preventDefault()` was called.
+			expect( fireEvent.keyDown( textbox, { key: 'Enter' } ) ).toBe(
+				false
+			);
+			expect( onChange ).not.toHaveBeenCalled();
+		} );
 
-		rerender(
-			<RichTextControl
-				label="Single line"
-				value=""
-				onChange={ () => {} }
-			/>
+		it.each( [
+			[ 'Enter', {} ],
+			[ 'Shift+Enter', { shiftKey: true } ],
+		] )(
+			'inserts a single line break into the value on %s',
+			async ( _label, modifiers ) => {
+				const onChange = jest.fn();
+				const { container } = render(
+					<RichTextControl
+						label="Note"
+						value="hi"
+						onChange={ onChange }
+					/>
+				);
+				const textbox = getTextbox( container );
+				await focusTextbox( textbox );
+
+				/*
+				 * The control takes over Enter handling from the browser
+				 * (native contenteditable handling appends an extra `<br>` at
+				 * the end of the content, rendering as two new lines) and
+				 * inserts the break into the rich text value instead.
+				 */
+				expect(
+					fireEvent.keyDown( textbox, {
+						key: 'Enter',
+						...modifiers,
+					} )
+				).toBe( false );
+				expect( onChange ).toHaveBeenCalledTimes( 1 );
+				expect( onChange.mock.calls[ 0 ][ 0 ] ).toBe( 'hi<br>' );
+			}
 		);
-		expect( fireEvent.keyDown( textbox, { key: 'Enter' } ) ).toBe( true );
+
+		it( 'leaves Enter presses with a meta or ctrl modifier to consumers', async () => {
+			const onChange = jest.fn();
+			const { container } = render(
+				<RichTextControl
+					label="Note"
+					value="hi"
+					onChange={ onChange }
+				/>
+			);
+			const textbox = getTextbox( container );
+			await focusTextbox( textbox );
+
+			expect(
+				fireEvent.keyDown( textbox, { key: 'Enter', metaKey: true } )
+			).toBe( true );
+			expect(
+				fireEvent.keyDown( textbox, { key: 'Enter', ctrlKey: true } )
+			).toBe( true );
+			expect( onChange ).not.toHaveBeenCalled();
+		} );
 	} );
 
 	it( 'merges a consumer-supplied className with the control class', () => {
@@ -234,20 +303,6 @@ describe( 'RichTextControl', () => {
 		beforeEach( () => {
 			currentOnUse = jest.fn();
 		} );
-
-		// `useRichText` schedules a selection sync via `queueMicrotask` when
-		// focus enters the editable, which fires a `setSelection`-driven
-		// re-render of `RichTextControl`. Flush that microtask inside an
-		// `act` block so React doesn't warn about updates outside `act(...)`.
-		const flushMicrotasks = () =>
-			act( async () => {
-				await Promise.resolve();
-			} );
-
-		async function focusTextbox( textbox ) {
-			fireEvent.focus( textbox );
-			await flushMicrotasks();
-		}
 
 		async function blurTextbox( textbox ) {
 			fireEvent.blur( textbox );
@@ -488,11 +543,6 @@ describe( 'RichTextControl', () => {
 		afterAll( () => {
 			unregisterFormatType( 'core/test-input-rule' );
 		} );
-
-		const flushMicrotasks = () =>
-			act( async () => {
-				await Promise.resolve();
-			} );
 
 		it( 'runs registered format input rules on insertText input events', async () => {
 			const onChange = jest.fn();
