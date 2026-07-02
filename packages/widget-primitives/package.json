@@ -1,0 +1,71 @@
+{
+	"name": "@wordpress/widget-primitives",
+	"version": "0.1.1",
+	"description": "Host-agnostic toolkit for dashboard widgets: the widget contract types, the discovery hook, and the render entry point.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"widgets",
+		"dashboard"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/widget-primitives/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/widget-primitives"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=20.10.0",
+		"npm": ">=10.2.3"
+	},
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"default": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpScript": false,
+	"types": "build-types",
+	"sideEffects": false,
+	"dependencies": {
+		"@wordpress/dataviews": "file:../dataviews",
+		"@wordpress/element": "file:../element"
+	},
+	"devDependencies": {
+		"@storybook/addon-docs": "^10.4.3",
+		"@storybook/react-vite": "^10.4.3",
+		"@wordpress/components": "file:../components",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/ui": "file:../ui",
+		"storybook": "^10.4.3"
+	},
+	"peerDependencies": {
+		"@types/react": "^18.3.27",
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

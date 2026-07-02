@@ -35,6 +35,7 @@ import { useInstanceId } from '@wordpress/compose';
 import { Icon, search } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -46,6 +47,20 @@ import {
 	isPercentageUnit,
 } from './utils.js';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+
+// Help text describing each wrapper element option. Kept local to the block
+// because the choices and their guidance are specific to the Search block.
+const TAG_NAME_MESSAGES = {
+	'': __(
+		'Lets the theme decide. Uses the <search> landmark element if the theme opts in, otherwise a <form>.'
+	),
+	search: __(
+		'Wraps the block in a <search> landmark, announced as a search region by assistive technologies.'
+	),
+	form: __(
+		'Uses a <form role="search"> wrapper for backward compatibility with existing theme styles.'
+	),
+};
 
 // Used to calculate border radius adjustment to avoid "fat" corners when
 // button is placed inside wrapper.
@@ -70,7 +85,7 @@ export default function SearchEdit( {
 		buttonText,
 		buttonPosition,
 		buttonUseIcon,
-		isSearchFieldHidden,
+		tagName,
 		style,
 	} = attributes;
 
@@ -139,6 +154,7 @@ export default function SearchEdit( {
 	const isButtonPositionOutside = 'button-outside' === buttonPosition;
 	const hasNoButton = 'no-button' === buttonPosition;
 	const hasOnlyButton = 'button-only' === buttonPosition;
+	const isSearchFieldHidden = hasOnlyButton && ! isSelected;
 	const searchFieldRef = useRef();
 	const buttonRef = useRef();
 
@@ -146,25 +162,6 @@ export default function SearchEdit( {
 		availableUnits: [ '%', 'px' ],
 		defaultValues: { '%': PC_WIDTH_DEFAULT, px: PX_WIDTH_DEFAULT },
 	} );
-
-	useEffect( () => {
-		if ( hasOnlyButton && ! isSelected ) {
-			setAttributes( {
-				isSearchFieldHidden: true,
-			} );
-		}
-	}, [ hasOnlyButton, isSelected, setAttributes ] );
-
-	// Show the search field when width changes.
-	useEffect( () => {
-		if ( ! hasOnlyButton || ! isSelected ) {
-			return;
-		}
-
-		setAttributes( {
-			isSearchFieldHidden: false,
-		} );
-	}, [ hasOnlyButton, isSelected, setAttributes, width ] );
 
 	const getBlockClassNames = () => {
 		return clsx(
@@ -183,7 +180,7 @@ export default function SearchEdit( {
 			buttonUseIcon && ! hasNoButton
 				? 'wp-block-search__icon-button'
 				: undefined,
-			hasOnlyButton && isSearchFieldHidden
+			isSearchFieldHidden
 				? 'wp-block-search__searchfield-hidden'
 				: undefined
 		);
@@ -223,10 +220,12 @@ export default function SearchEdit( {
 		// If the input is inside the wrapper, the wrapper gets the border color styles/classes, not the input control.
 		const textFieldClasses = clsx(
 			'wp-block-search__input',
+			hasNoButton ? colorProps.className : undefined,
 			isButtonPositionInside ? undefined : borderProps.className,
 			typographyProps.className
 		);
 		const textFieldStyles = {
+			...( hasNoButton ? colorProps.style : {} ),
 			...( isButtonPositionInside
 				? {
 						borderRadius: borderProps.style?.borderRadius,
@@ -292,14 +291,6 @@ export default function SearchEdit( {
 				  }
 				: borderProps.style ),
 		};
-		const handleButtonClick = () => {
-			if ( hasOnlyButton ) {
-				setAttributes( {
-					isSearchFieldHidden: ! isSearchFieldHidden,
-				} );
-			}
-		};
-
 		return (
 			<>
 				{ buttonUseIcon && (
@@ -312,7 +303,6 @@ export default function SearchEdit( {
 								? stripHTML( buttonText )
 								: __( 'Search' )
 						}
-						onClick={ handleButtonClick }
 						ref={ buttonRef }
 					>
 						<Icon icon={ search } />
@@ -331,7 +321,6 @@ export default function SearchEdit( {
 						onChange={ ( html ) =>
 							setAttributes( { buttonText: html } )
 						}
-						onClick={ handleButtonClick }
 					/>
 				) }
 			</>
@@ -351,7 +340,6 @@ export default function SearchEdit( {
 							showLabel: true,
 							buttonUseIcon: false,
 							buttonPosition: 'button-outside',
-							isSearchFieldHidden: false,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -382,7 +370,6 @@ export default function SearchEdit( {
 						onDeselect={ () => {
 							setAttributes( {
 								buttonPosition: 'button-outside',
-								isSearchFieldHidden: false,
 							} );
 						} }
 						isShownByDefault
@@ -394,8 +381,6 @@ export default function SearchEdit( {
 							onChange={ ( value ) => {
 								setAttributes( {
 									buttonPosition: value,
-									isSearchFieldHidden:
-										value === 'button-only',
 								} );
 							} }
 							options={ buttonPositionControls }
@@ -488,7 +473,6 @@ export default function SearchEdit( {
 									} );
 								} }
 								isBlock
-								__next40pxDefaultSize
 							>
 								{ PERCENTAGE_WIDTHS.map( ( widthValue ) => {
 									return (
@@ -507,6 +491,31 @@ export default function SearchEdit( {
 						</VStack>
 					</ToolsPanelItem>
 				</ToolsPanel>
+			</InspectorControls>
+			<InspectorControls group="advanced">
+				<SelectControl
+					__next40pxDefaultSize
+					label={ __( 'HTML element' ) }
+					value={ tagName ?? '' }
+					options={ [
+						{ label: __( 'Default' ), value: '' },
+						{ label: '<search>', value: 'search' },
+						{ label: '<form>', value: 'form' },
+					] }
+					onChange={ ( value ) => {
+						setAttributes( { tagName: value } );
+						// The help text is updated via aria-describedby, which
+						// is not re-announced while focus remains on the select.
+						// Announce the new description so it is not missed.
+						// speak() strips HTML-like tags, which would drop the
+						// element names (e.g. <search>) entirely. Remove only the
+						// angle brackets so the words are retained when spoken.
+						speak(
+							TAG_NAME_MESSAGES[ value ].replace( /[<>]/g, '' )
+						);
+					} }
+					help={ TAG_NAME_MESSAGES[ tagName ?? '' ] }
+				/>
 			</InspectorControls>
 		</>
 	);
@@ -590,64 +599,74 @@ export default function SearchEdit( {
 		typographyProps.className
 	);
 
+	// Reflect an explicit <search> choice in the editor markup so wrapper
+	// styles match the front end. The <form> and theme-deferred default keep
+	// the historical <div> to avoid nesting a live <form> in the editor.
+	const Wrapper = 'search' === tagName ? 'search' : 'div';
+
 	return (
-		<div { ...blockProps }>
+		<>
 			{ controls }
-
-			{ showLabel && (
-				<RichText
-					identifier="label"
-					className={ labelClassnames }
-					aria-label={ __( 'Label text' ) }
-					placeholder={ __( 'Add label…' ) }
-					withoutInteractiveFormatting
-					value={ label }
-					onChange={ ( html ) => setAttributes( { label: html } ) }
-					style={ typographyProps.style }
-				/>
-			) }
-
-			<ResizableBox
-				size={ {
-					width:
-						width === undefined
-							? 'auto'
-							: `${ width }${ widthUnit }`,
-					height: 'auto',
-				} }
-				className={ clsx(
-					'wp-block-search__inside-wrapper',
-					isButtonPositionInside ? borderProps.className : undefined
-				) }
-				style={ getWrapperStyles() }
-				minWidth={ MIN_WIDTH }
-				enable={ getResizableSides() }
-				onResizeStart={ ( event, direction, elt ) => {
-					setAttributes( {
-						width: parseInt( elt.offsetWidth, 10 ),
-						widthUnit: 'px',
-					} );
-					toggleSelection( false );
-				} }
-				onResizeStop={ ( event, direction, elt, delta ) => {
-					setAttributes( {
-						width: parseInt( width + delta.width, 10 ),
-					} );
-					toggleSelection( true );
-				} }
-				showHandle={ isSelected }
-			>
-				{ ( isButtonPositionInside ||
-					isButtonPositionOutside ||
-					hasOnlyButton ) && (
-					<>
-						{ renderTextField() }
-						{ renderButton() }
-					</>
+			<Wrapper { ...blockProps }>
+				{ showLabel && (
+					<RichText
+						identifier="label"
+						className={ labelClassnames }
+						aria-label={ __( 'Label text' ) }
+						placeholder={ __( 'Add label…' ) }
+						withoutInteractiveFormatting
+						value={ label }
+						onChange={ ( html ) =>
+							setAttributes( { label: html } )
+						}
+						style={ typographyProps.style }
+					/>
 				) }
 
-				{ hasNoButton && renderTextField() }
-			</ResizableBox>
-		</div>
+				<ResizableBox
+					size={ {
+						width:
+							width === undefined
+								? 'auto'
+								: `${ width }${ widthUnit }`,
+						height: 'auto',
+					} }
+					className={ clsx(
+						'wp-block-search__inside-wrapper',
+						isButtonPositionInside
+							? borderProps.className
+							: undefined
+					) }
+					style={ getWrapperStyles() }
+					minWidth={ MIN_WIDTH }
+					enable={ getResizableSides() }
+					onResizeStart={ ( event, direction, elt ) => {
+						setAttributes( {
+							width: parseInt( elt.offsetWidth, 10 ),
+							widthUnit: 'px',
+						} );
+						toggleSelection( false );
+					} }
+					onResizeStop={ ( event, direction, elt, delta ) => {
+						setAttributes( {
+							width: parseInt( width + delta.width, 10 ),
+						} );
+						toggleSelection( true );
+					} }
+					showHandle={ isSelected }
+				>
+					{ ( isButtonPositionInside ||
+						isButtonPositionOutside ||
+						hasOnlyButton ) && (
+						<>
+							{ renderTextField() }
+							{ renderButton() }
+						</>
+					) }
+
+					{ hasNoButton && renderTextField() }
+				</ResizableBox>
+			</Wrapper>
+		</>
 	);
 }

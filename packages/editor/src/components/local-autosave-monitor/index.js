@@ -3,7 +3,7 @@
  */
 import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { ifCondition, usePrevious } from '@wordpress/compose';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { parse } from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
@@ -53,19 +53,14 @@ const hasSessionStorageSupport = () => {
  * restore a local autosave, if one exists.
  */
 function useAutosaveNotice() {
-	const { postId, isEditedPostNew, hasRemoteAutosave } = useSelect(
+	const registry = useRegistry();
+	const { postId, isEditedPostNew } = useSelect(
 		( select ) => ( {
 			postId: select( editorStore ).getCurrentPostId(),
 			isEditedPostNew: select( editorStore ).isEditedPostNew(),
-			hasRemoteAutosave:
-				!! select( editorStore ).getEditorSettings().autosave,
 		} ),
 		[]
 	);
-	const { getEditedPostAttribute } = useSelect( editorStore );
-
-	const { createWarningNotice, removeNotice } = useDispatch( noticesStore );
-	const { editPost, resetEditorBlocks } = useDispatch( editorStore );
 
 	useEffect( () => {
 		let localAutosave = localAutosaveGet( postId, isEditedPostNew );
@@ -83,23 +78,30 @@ function useAutosaveNotice() {
 		const { post_title: title, content, excerpt } = localAutosave;
 		const edits = { title, content, excerpt };
 
-		{
-			// Only display a notice if there is a difference between what has been
-			// saved and that which is stored in sessionStorage.
-			const hasDifference = Object.keys( edits ).some( ( key ) => {
-				return edits[ key ] !== getEditedPostAttribute( key );
-			} );
+		const { getEditedPostAttribute, getEditorSettings } =
+			registry.select( editorStore );
 
-			if ( ! hasDifference ) {
-				// If there is no difference, it can be safely ejected from storage.
-				localAutosaveClear( postId, isEditedPostNew );
-				return;
-			}
+		// Only display a notice if there is a difference between what has been
+		// saved and that which is stored in sessionStorage.
+		const hasDifference = Object.keys( edits ).some( ( key ) => {
+			return edits[ key ] !== getEditedPostAttribute( key );
+		} );
+
+		if ( ! hasDifference ) {
+			// If there is no difference, it can be safely ejected from storage.
+			localAutosaveClear( postId, isEditedPostNew );
+			return;
 		}
 
+		const hasRemoteAutosave = !! getEditorSettings().autosave;
 		if ( hasRemoteAutosave ) {
 			return;
 		}
+
+		const { createWarningNotice, removeNotice } =
+			registry.dispatch( noticesStore );
+		const { editPost, resetEditorBlocks } =
+			registry.dispatch( editorStore );
 
 		const id = 'wpEditorAutosaveRestore';
 
@@ -125,7 +127,7 @@ function useAutosaveNotice() {
 				],
 			}
 		);
-	}, [ isEditedPostNew, postId ] );
+	}, [ registry, postId, isEditedPostNew ] );
 }
 
 /**

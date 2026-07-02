@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { dispatch, select, subscribe } from '@wordpress/data';
-import type { Y } from '@wordpress/sync';
+import { Y } from '@wordpress/sync';
 // @ts-ignore No exported types for block editor store selectors.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
@@ -11,17 +11,40 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  */
 import { BaseAwarenessState, baseEqualityFieldChecks } from './base-awareness';
 import {
+	getBlockPathInYdoc,
+	getContainingBlockYMap,
+	resolveBlockClientIdByPath,
+} from './block-lookup';
+import {
 	AWARENESS_CURSOR_UPDATE_THROTTLE_IN_MS,
 	LOCAL_CURSOR_UPDATE_DEBOUNCE_IN_MS,
 } from './config';
 import { STORE_NAME as coreStore } from '../name';
 import {
+	asHtmlStringIndex,
+	htmlIndexToRichTextOffset,
+} from '../utils/crdt-utils';
+import {
 	areSelectionsStatesEqual,
 	getSelectionState,
+	SelectionType,
+	SelectionDirection,
 } from '../utils/crdt-user-selections';
 
-import type { WPBlockSelection } from '../types';
-import type { EditorState, PostEditorState } from './types';
+import type {
+	ResolvedSelection,
+	SelectionState,
+	WPBlockSelection,
+} from '../types';
+import type { YBlocks } from '../utils/crdt-blocks';
+import type { EditorStoreBlock } from './block-lookup';
+import type {
+	DebugCollaboratorData,
+	EditorState,
+	PostEditorState,
+	SerializableYItem,
+	YDocDebugData,
+} from './types';
 
 export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	protected equalityFieldChecks = {
@@ -38,16 +61,16 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		super( doc );
 	}
 
-	public setUp(): void {
-		super.setUp();
+	protected onSetUp(): void {
+		super.onSetUp();
 
-		this.subscribeToUserSelectionChanges();
+		this.subscribeToCollaboratorSelectionChanges();
 	}
 
 	/**
-	 * Subscribe to user selection changes and update the selection state.
+	 * Subscribe to collaborator selection changes and update the selection state.
 	 */
-	private subscribeToUserSelectionChanges(): void {
+	private subscribeToCollaboratorSelectionChanges(): void {
 		const {
 			getSelectionStart,
 			getSelectionEnd,
@@ -60,6 +83,18 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		let selectionEnd = getSelectionEnd();
 		let localCursorTimeout: NodeJS.Timeout | null = null;
 
+		// During rapid selection changes (e.g. undo restoring content and
+		// selection), the debounce discards intermediate events. If we use the
+		// last intermediate state instead of the overall change it can produce
+		// the wrong direction.
+		// Use selectionBeforeDebounce to capture the selection state from
+		// before the debounce window so that direction is computed across the
+		// full window when it fires.
+		let selectionBeforeDebounce: {
+			start: WPBlockSelection;
+			end: WPBlockSelection;
+		} | null = null;
+
 		subscribe( () => {
 			const newSelectionStart = getSelectionStart();
 			const newSelectionEnd = getSelectionEnd();
@@ -69,6 +104,15 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 				newSelectionEnd === selectionEnd
 			) {
 				return;
+			}
+
+			// On the first change of a debounce window, snapshot the state
+			// we're moving away from.
+			if ( ! selectionBeforeDebounce ) {
+				selectionBeforeDebounce = {
+					start: selectionStart,
+					end: selectionEnd,
+				};
 			}
 
 			selectionStart = newSelectionStart;
@@ -94,10 +138,29 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 			}
 
 			localCursorTimeout = setTimeout( () => {
+				// Compute direction across the full debounce window.
+				const selectionStateOptions: {
+					selectionDirection?: SelectionDirection;
+				} = {};
+
+				if ( selectionBeforeDebounce ) {
+					selectionStateOptions.selectionDirection =
+						detectSelectionDirection(
+							selectionBeforeDebounce.start,
+							selectionBeforeDebounce.end,
+							selectionStart,
+							selectionEnd
+						);
+
+					// Reset debounced selection state.
+					selectionBeforeDebounce = null;
+				}
+
 				const selectionState = getSelectionState(
 					selectionStart,
 					selectionEnd,
-					this.doc
+					this.doc,
+					selectionStateOptions
 				);
 
 				this.setThrottledLocalStateField(
@@ -110,7 +173,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	}
 
 	/**
-	 * Update the entity record with the current user's selection.
+	 * Update the entity record with the current collaborator's selection.
 	 *
 	 * @param selectionStart  - The start position of the selection.
 	 * @param selectionEnd    - The end position of the selection.
@@ -162,6 +225,228 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 			return state1 === state2;
 		}
 
+		if ( ! state1.selection || ! state2.selection ) {
+			return state1.selection === state2.selection;
+		}
+
 		return areSelectionsStatesEqual( state1.selection, state2.selection );
 	}
+
+	/**
+	 * Resolve a selection state to a text index and block client ID.
+	 *
+	 * For text-based selections, navigates up from the resolved Y.Text via
+	 * AbstractType.parent to find the containing block, then resolves the
+	 * local clientId via the block's tree path.
+	 * For WholeBlock selections, resolves the block's relative position and
+	 * then finds the local clientId via tree path.
+	 *
+	 * Tree-path resolution is used instead of reading the clientId directly
+	 * from the Yjs block because the local block-editor store may use different
+	 * clientIds (e.g. in "Show Template" mode where blocks are cloned).
+	 *
+	 * @param selection - The selection state.
+	 * @param blocks    - The tree of block-editor store post content blocks.
+	 * @return The rich-text offset and block client ID, or nulls if not resolvable.
+	 */
+	public convertSelectionStateToAbsolute(
+		selection: SelectionState,
+		blocks: EditorStoreBlock[]
+	): ResolvedSelection {
+		if ( selection.type === SelectionType.None ) {
+			return {
+				richTextOffset: null,
+				localClientId: null,
+				attributeKey: null,
+			};
+		}
+
+		if ( selection.type === SelectionType.WholeBlock ) {
+			const absolutePos = Y.createAbsolutePositionFromRelativePosition(
+				selection.blockPosition,
+				this.doc
+			);
+
+			let localClientId: string | null = null;
+
+			if ( absolutePos && absolutePos.type instanceof Y.Array ) {
+				const parentArray = absolutePos.type as YBlocks;
+				const block = parentArray.get( absolutePos.index );
+
+				if ( block instanceof Y.Map ) {
+					const path = getBlockPathInYdoc( block );
+					localClientId = path
+						? resolveBlockClientIdByPath( path, blocks )
+						: null;
+				}
+			}
+
+			return {
+				richTextOffset: null,
+				localClientId,
+				attributeKey: null,
+			};
+		}
+
+		// Text-based selections: resolve cursor position and navigate up.
+		const cursorPos =
+			'cursorPosition' in selection
+				? selection.cursorPosition
+				: selection.cursorStartPosition;
+
+		const absolutePosition = Y.createAbsolutePositionFromRelativePosition(
+			cursorPos.relativePosition,
+			this.doc
+		);
+
+		if ( ! absolutePosition ) {
+			return {
+				richTextOffset: null,
+				localClientId: null,
+				attributeKey: null,
+			};
+		}
+
+		const yType = getContainingBlockYMap( absolutePosition.type );
+		const path = yType ? getBlockPathInYdoc( yType ) : null;
+		const localClientId = path
+			? resolveBlockClientIdByPath( path, blocks )
+			: null;
+
+		return {
+			richTextOffset: htmlIndexToRichTextOffset(
+				absolutePosition.type.toString(),
+				asHtmlStringIndex( absolutePosition.index )
+			),
+			localClientId,
+			attributeKey: cursorPos.attributeKey ?? null,
+		};
+	}
+
+	/**
+	 * Type guard to check if a struct is a Y.Item (not Y.GC)
+	 * @param struct - The struct to check.
+	 * @return True if the struct is a Y.Item, false otherwise.
+	 */
+	private isYItem( struct: Y.Item | Y.GC ): struct is Y.Item {
+		return 'content' in struct;
+	}
+
+	/**
+	 * Get data for debugging, using the awareness state.
+	 *
+	 * @return {YDocDebugData} The debug data.
+	 */
+	public getDebugData(): YDocDebugData {
+		const ydoc = this.doc;
+
+		// Manually extract doc data to avoid deprecated toJSON method
+		const docData: Record< string, unknown > = Object.fromEntries(
+			Array.from( ydoc.share, ( [ key, value ] ) => [
+				key,
+				value.toJSON(),
+			] )
+		);
+
+		// Build collaboratorMap from awareness store (all collaborators seen this session)
+		const collaboratorMapData = new Map< string, DebugCollaboratorData >(
+			Array.from( this.getSeenStates().entries() ).map(
+				( [ clientId, collaboratorState ] ) => [
+					String( clientId ),
+					{
+						name: collaboratorState.collaboratorInfo.name,
+						wpUserId: collaboratorState.collaboratorInfo.id,
+					},
+				]
+			)
+		);
+
+		// Serialize Yjs client items to avoid deep nesting
+		const serializableClientItems: Record<
+			number,
+			Array< SerializableYItem >
+		> = {};
+
+		ydoc.store.clients.forEach( ( structs, clientId ) => {
+			// Filter for Y.Item only (skip Y.GC garbage collection structs)
+			const items = structs.filter( this.isYItem );
+
+			serializableClientItems[ clientId ] = items.map( ( item ) => {
+				const { left, right, ...rest } = item;
+
+				return {
+					...rest,
+					left: left
+						? {
+								id: left.id,
+								length: left.length,
+								origin: left.origin,
+								content: left.content,
+						  }
+						: null,
+					right: right
+						? {
+								id: right.id,
+								length: right.length,
+								origin: right.origin,
+								content: right.content,
+						  }
+						: null,
+				};
+			} );
+		} );
+
+		return {
+			doc: docData,
+			clients: serializableClientItems,
+			collaboratorMap: Object.fromEntries( collaboratorMapData ),
+		};
+	}
+}
+
+/**
+ * Detect the direction of a selection change by comparing old and new edges.
+ *
+ * When the user extends a selection backward (e.g. Shift+Left), the
+ * selectionStart edge moves while selectionEnd stays fixed, so the caret
+ * is at the start.  The reverse is true for forward extension.
+ *
+ * @param prevStart - The previous selectionStart.
+ * @param prevEnd   - The previous selectionEnd.
+ * @param newStart  - The new selectionStart.
+ * @param newEnd    - The new selectionEnd.
+ * @return The detected direction, defaulting to Forward when indeterminate.
+ */
+function detectSelectionDirection(
+	prevStart: WPBlockSelection,
+	prevEnd: WPBlockSelection,
+	newStart: WPBlockSelection,
+	newEnd: WPBlockSelection
+): SelectionDirection {
+	const startMoved = ! areBlockSelectionsEqual( prevStart, newStart );
+	const endMoved = ! areBlockSelectionsEqual( prevEnd, newEnd );
+
+	if ( startMoved && ! endMoved ) {
+		return SelectionDirection.Backward;
+	}
+
+	return SelectionDirection.Forward;
+}
+
+/**
+ * Compare two WPBlockSelection objects by value.
+ *
+ * @param a - First selection.
+ * @param b - Second selection.
+ * @return True if all fields are equal.
+ */
+function areBlockSelectionsEqual(
+	a: WPBlockSelection,
+	b: WPBlockSelection
+): boolean {
+	return (
+		a.clientId === b.clientId &&
+		a.attributeKey === b.attributeKey &&
+		a.offset === b.offset
+	);
 }

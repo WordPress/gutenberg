@@ -1,7 +1,7 @@
 // Import the default config file and expose it in the project root.
 // Useful for editor integrations.
 module.exports = {
-	...require( '@wordpress/prettier-config' ),
+	...require( './packages/prettier-config' ),
 	overrides: [
 		{
 			files: [ 'changelog.txt' ],

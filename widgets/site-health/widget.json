@@ -1,0 +1,8 @@
+{
+	"name": "core/site-health",
+	"title": "Site Health Status",
+	"description": "Shows an overview of your site health and any issues that need attention.",
+	"category": "site",
+	"presentation": "framed",
+	"textdomain": "default"
+}

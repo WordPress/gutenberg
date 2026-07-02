@@ -196,9 +196,10 @@ test.describe( 'Quote', () => {
 		test( 'and renders only one paragraph for the cite, if the quote is void', async ( {
 			editor,
 			page,
+			pageUtils,
 		} ) => {
 			await editor.insertBlock( { name: 'core/quote' } );
-			await page.keyboard.press( 'ArrowUp' );
+			await pageUtils.pressKeys( 'primary+a' );
 			await editor.clickBlockToolbarButton( 'Add citation' );
 			await page.keyboard.type( 'cite' );
 			await editor.clickBlockOptionsMenuItem( 'Ungroup' );
@@ -215,11 +216,11 @@ test.describe( 'Quote', () => {
 
 		test( 'and renders a void paragraph if both the cite and quote are void', async ( {
 			editor,
-			page,
+			pageUtils,
 		} ) => {
 			await editor.insertBlock( { name: 'core/quote' } );
 			// Select the quote
-			await page.keyboard.press( 'ArrowUp' );
+			await pageUtils.pressKeys( 'primary+a' );
 			await editor.clickBlockOptionsMenuItem( 'Ungroup' );
 			expect( await editor.getEditedPostContent() ).toBe( '' );
 		} );
@@ -262,6 +263,22 @@ test.describe( 'Quote', () => {
 			`<!-- wp:verse -->
 <pre class="wp-block-verse">First paragraph<br>A heading</pre>
 <!-- /wp:verse -->`
+		);
+	} );
+
+	test( 'can be converted to a pullquote', async ( { editor, page } ) => {
+		await editor.insertBlock( { name: 'core/quote' } );
+		await page.keyboard.type( 'one' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'two' );
+		await editor.clickBlockToolbarButton( 'Select parent block: Quote' );
+		await editor.clickBlockToolbarButton( 'Add citation' );
+		await page.keyboard.type( 'cite' );
+		await editor.transformBlockTo( 'core/pullquote' );
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:pullquote -->
+<figure class="wp-block-pullquote"><blockquote><p>one<br>two</p><cite>cite</cite></blockquote></figure>
+<!-- /wp:pullquote -->`
 		);
 	} );
 
@@ -318,7 +335,7 @@ test.describe( 'Quote', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/quote' } );
 		await page.keyboard.type( '1' );
-		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeys( 'primary+a', { times: 2 } );
 		await editor.clickBlockToolbarButton( 'Add citation' );
 		await page.keyboard.type( '2' );
 		expect( await editor.getEditedPostContent() ).toBe(
@@ -349,7 +366,7 @@ test.describe( 'Quote', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/quote' } );
 		await page.keyboard.type( '1' );
-		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeys( 'primary+a', { times: 2 } );
 		await editor.clickBlockToolbarButton( 'Add citation' );
 		await page.keyboard.type( '2' );
 		await pageUtils.pressKeys( 'Shift+ArrowUp' );

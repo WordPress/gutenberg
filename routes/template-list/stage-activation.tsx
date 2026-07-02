@@ -13,7 +13,6 @@ import { Page } from '@wordpress/admin-ui';
 import type { View, Action } from '@wordpress/dataviews';
 import { store as coreStore } from '@wordpress/core-data';
 import {
-	Button,
 	Modal,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
@@ -22,12 +21,16 @@ import { useMemo, useCallback, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { published, commentAuthorAvatar } from '@wordpress/icons';
+import { unlock } from '@wordpress/routes-lock-unlock';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../lock-unlock';
-import { getDefaultView, DEFAULT_LAYOUTS } from './view-utils';
+import {
+	DEFAULT_VIEW,
+	getActiveViewOverridesForTab,
+	DEFAULT_LAYOUTS,
+} from './view-utils';
 import { previewField } from './fields/preview';
 import { authorField } from './fields/author';
 import { descriptionField } from './fields/description';
@@ -65,9 +68,11 @@ function TemplateListActivation() {
 	);
 	const [ selectedRegisteredTemplate, setSelectedRegisteredTemplate ] =
 		useState< Template | null >( null );
-	const defaultView: View = useMemo( () => {
-		return getDefaultView( activeView );
-	}, [ activeView ] );
+	const defaultView = DEFAULT_VIEW;
+	const activeViewOverrides = useMemo(
+		() => getActiveViewOverridesForTab( activeView ),
+		[ activeView ]
+	);
 
 	// Callback to handle URL query parameter changes
 	const handleQueryParamsChange = useCallback(
@@ -86,8 +91,9 @@ function TemplateListActivation() {
 	const { view, isModified, updateView, resetToDefault } = useView( {
 		kind: 'postType',
 		name: 'wp_template',
-		slug: activeView,
+		slug: 'default-new',
 		defaultView,
+		activeViewOverrides,
 		queryParams: searchParams,
 		onChangeQueryParams: handleQueryParamsChange,
 	} );
@@ -295,20 +301,7 @@ function TemplateListActivation() {
 		<Page
 			title={ __( 'Templates' ) }
 			className="template-page"
-			actions={
-				<>
-					{ isModified && (
-						<Button
-							variant="tertiary"
-							size="compact"
-							onClick={ onReset }
-						>
-							{ __( 'Reset view' ) }
-						</Button>
-					) }
-					<AddNewTemplate />
-				</>
-			}
+			actions={ <AddNewTemplate /> }
 			hasPadding={ false }
 		>
 			{ tabs.length > 1 && (
@@ -338,6 +331,7 @@ function TemplateListActivation() {
 				defaultLayouts={ DEFAULT_LAYOUTS }
 				getItemId={ getItemId }
 				selection={ selection }
+				onReset={ isModified ? onReset : false }
 				onChangeSelection={ ( items: string[] ) => {
 					navigate( {
 						search: {

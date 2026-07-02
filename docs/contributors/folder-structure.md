@@ -9,10 +9,9 @@ The following snippet explains how the Gutenberg repository is structured omitti
     ├── CONTRIBUTING.md
     │
     ├── .editorconfig
-    ├── .eslintignore
-    ├── .eslintrc
+    ├── eslint.config.cjs
+    ├── eslint.config.strict.cjs
     ├── .jshintignore
-    ├── .eslintignore
     ├── .prettierrc.js
     ├── .stylelintignore
     ├── .stylelintrc.js
@@ -54,38 +53,26 @@ The following snippet explains how the Gutenberg repository is structured omitti
     ├── gutenberg.php
     │   Entry point of the Gutenberg plugin.
     │
-    ├── post-content.php
-    │   Demo post content used on the Gutenberg plugin to showcase the editor.
-    │
     ├── .github/*
     │   Config of the different GitHub features (issues and PR templates, CI, owners).
     │
-    ├── bin/api-docs
-    │   Tool/script used to generate the API Docs.
+    ├── tools/docs
+    │   Tools for generating Gutenberg documentation (manifest generator, API docs, block library list, component docs, theme reference).
     │
-    ├── bin/packages
-    │   Set of scripts used to build the WordPress packages.
+    ├── tools/build-scripts
+    │   Build orchestration scripts for the Gutenberg monorepo (@wordpress/build-scripts).
     │
-    ├── bin/plugin
-    │   Tool use to perform the Gutenberg plugin release and the npm releases as well.
-    │
-    ├── docs/tool
-    │   Tool used to generate the Block editor handbook's markdown pages.
+    ├── tools/release
+    │   CLI tool used to perform the Gutenberg plugin release and the npm releases as well.
     │
     ├── docs/*.md
     │   Set of documentation pages composing the [Block editor handbook](https://developer.wordpress.org/block-editor/).
     │
-    ├── platform-docs
-    │   Documentation website targeted to non WordPress developers
-    │   using Gutenberg in their own applications.
-    │   Deployed on [https://wordpress.org/gutenberg-framework/](https://wordpress.org/gutenberg-framework/).
-    │
-    │
     ├── lib
     │   PHP Source code of the Gutenberg plugin.
     │
-    ├── lib/compact/wordpress-x.x
-    │   PHP code that was include in WordPress ont the WordPress X.X version.
+    ├── lib/compat/wordpress-x.x
+    │   PHP code that was included in WordPress on the WordPress X.X version.
     │   It is kept to ensure plugin compatibility with older WordPress versions.
     │
     ├── packages

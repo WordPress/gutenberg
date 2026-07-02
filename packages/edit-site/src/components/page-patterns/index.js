@@ -6,20 +6,17 @@ import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
-import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { useView } from '@wordpress/views';
+import { useView, useViewConfig } from '@wordpress/views';
 import { useSelect } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
-import { Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import {
-	LAYOUT_GRID,
-	LAYOUT_TABLE,
 	PATTERN_TYPES,
 	TEMPLATE_PART_POST_TYPE,
 	PATTERN_DEFAULT_CATEGORY,
@@ -29,43 +26,15 @@ import { unlock } from '../../lock-unlock';
 import usePatterns, { useAugmentPatternsWithPermissions } from './use-patterns';
 import PatternsActions from './actions';
 import { useEditPostAction } from '../dataviews-actions';
-import {
-	patternStatusField,
-	previewField,
-	templatePartAuthorField,
-} from './fields';
+import { previewField } from './fields';
 import usePatternCategories from '../sidebar-navigation-screen-patterns/use-pattern-categories';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
-const { usePostActions, patternTitleField } = unlock( editorPrivateApis );
+const { usePostActions, usePostFields } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
-const defaultLayouts = {
-	[ LAYOUT_TABLE ]: {
-		layout: {
-			styles: {
-				author: {
-					width: '1%',
-				},
-			},
-		},
-	},
-	[ LAYOUT_GRID ]: {
-		layout: {
-			badgeFields: [ 'sync-status' ],
-		},
-	},
-};
-const DEFAULT_VIEW = {
-	type: LAYOUT_GRID,
-	perPage: 20,
-	titleField: 'title',
-	mediaField: 'preview',
-	fields: [ 'sync-status' ],
-	filters: [],
-	...defaultLayouts[ LAYOUT_GRID ],
-};
+const VIEW_CONFIG_FIELDS = [ 'default_view', 'default_layouts' ];
 
 function usePagePatternsHeader( type, categoryId ) {
 	const { patternCategories } = usePatternCategories();
@@ -100,11 +69,18 @@ export default function DataviewsPatterns() {
 	const { postType = 'wp_block', categoryId: categoryIdFromURL } = query;
 	const history = useHistory();
 	const categoryId = categoryIdFromURL || PATTERN_DEFAULT_CATEGORY;
+	const { default_view: defaultView, default_layouts: defaultLayouts } =
+		useViewConfig( {
+			kind: 'postType',
+			name: postType,
+			fields: VIEW_CONFIG_FIELDS,
+		} );
 	const { view, updateView, isModified, resetToDefault } = useView( {
 		kind: 'postType',
 		name: postType,
-		slug: categoryId,
-		defaultView: DEFAULT_VIEW,
+		slug: 'default',
+		defaultView,
+		defaultLayouts,
 		queryParams: {
 			page: query.pageNumber,
 			search: query.search,
@@ -127,38 +103,10 @@ export default function DataviewsPatterns() {
 		syncStatus: viewSyncStatus,
 	} );
 
-	const { records } = useEntityRecords( 'postType', TEMPLATE_PART_POST_TYPE, {
-		per_page: -1,
-	} );
-
-	const authors = useMemo( () => {
-		if ( ! records ) {
-			return EMPTY_ARRAY;
-		}
-		const authorsSet = new Set();
-		records.forEach( ( template ) => {
-			authorsSet.add( template.author_text );
-		} );
-		return Array.from( authorsSet ).map( ( author ) => ( {
-			value: author,
-			label: author,
-		} ) );
-	}, [ records ] );
-
+	const postTypeFields = usePostFields( { postType } );
 	const fields = useMemo( () => {
-		const _fields = [ previewField, patternTitleField ];
-
-		if ( postType === PATTERN_TYPES.user ) {
-			_fields.push( patternStatusField );
-		} else if ( postType === TEMPLATE_PART_POST_TYPE ) {
-			_fields.push( {
-				...templatePartAuthorField,
-				elements: authors,
-			} );
-		}
-
-		return _fields;
-	}, [ postType, authors ] );
+		return [ previewField, ...( postTypeFields || [] ) ];
+	}, [ postTypeFields ] );
 
 	const { data, paginationInfo } = useMemo( () => {
 		// Search is managed server-side as well as filters for patterns.
@@ -203,22 +151,13 @@ export default function DataviewsPatterns() {
 			<Page
 				className="edit-site-page-patterns-dataviews"
 				title={ title }
+				headingLevel={ 2 }
 				subTitle={ description }
 				actions={
-					<>
-						{ isModified && (
-							<Button
-								__next40pxDefaultSize
-								onClick={ resetToDefault }
-							>
-								{ __( 'Reset view' ) }
-							</Button>
-						) }
-						<PatternsActions
-							categoryId={ categoryId }
-							postType={ postType }
-						/>
-					</>
+					<PatternsActions
+						categoryId={ categoryId }
+						type={ postType }
+					/>
 				}
 			>
 				<DataViews
@@ -247,6 +186,7 @@ export default function DataviewsPatterns() {
 					view={ view }
 					onChangeView={ updateView }
 					defaultLayouts={ defaultLayouts }
+					onReset={ isModified ? resetToDefault : false }
 				/>
 			</Page>
 		</ExperimentalBlockEditorProvider>

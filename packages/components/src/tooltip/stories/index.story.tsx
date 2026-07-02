@@ -36,6 +36,11 @@ const meta: Meta< typeof Tooltip > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Use `Tooltip` from `@wordpress/ui` instead.',
+		},
 	},
 };
 export default meta;

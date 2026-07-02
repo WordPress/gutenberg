@@ -20,7 +20,7 @@ import { createTemplatePartId } from '../../template-part/edit/utils/create-temp
  * @param {Object} props              Component props.
  * @param {string} props.overlay      The overlay template part slug.
  * @param {string} props.currentTheme The current theme stylesheet name.
- * @return {JSX.Element|null} The overlay preview component or null if no overlay is selected.
+ * @return {React.JSX.Element} The overlay preview component or null if no overlay is selected.
  */
 export default function OverlayPreview( { overlay, currentTheme } ) {
 	const templatePartId = useMemo( () => {
@@ -30,14 +30,13 @@ export default function OverlayPreview( { overlay, currentTheme } ) {
 		return createTemplatePartId( currentTheme, overlay );
 	}, [ currentTheme, overlay ] );
 
-	const { content, editedBlocks, hasResolved, recordExists } = useSelect(
+	const { content, editedBlocks, hasResolved } = useSelect(
 		( select ) => {
 			if ( ! templatePartId ) {
 				return {
 					content: null,
 					editedBlocks: null,
 					hasResolved: true,
-					recordExists: false,
 				};
 			}
 
@@ -60,7 +59,6 @@ export default function OverlayPreview( { overlay, currentTheme } ) {
 					templatePartId,
 					{ context: 'view' },
 				] ),
-				recordExists: !! editedRecord,
 			};
 		},
 		[ templatePartId ]
@@ -90,23 +88,6 @@ export default function OverlayPreview( { overlay, currentTheme } ) {
 		return (
 			<div className="wp-block-navigation__overlay-preview-loading">
 				<Spinner />
-			</div>
-		);
-	}
-
-	// Show message if the overlay template part has been deleted.
-	if ( hasResolved && ! recordExists ) {
-		return (
-			<div className="wp-block-navigation__overlay-preview-empty">
-				{ __( 'This overlay template part no longer exists.' ) }
-			</div>
-		);
-	}
-
-	if ( ! blocks || blocks.length === 0 ) {
-		return (
-			<div className="wp-block-navigation__overlay-preview-empty">
-				{ __( 'This overlay is empty.' ) }
 			</div>
 		);
 	}

@@ -14,6 +14,7 @@ import { useState } from '@wordpress/element';
 import FormToggle from '..';
 
 const meta: Meta< typeof FormToggle > = {
+	tags: [ 'manifest' ],
 	component: FormToggle,
 	title: 'Components/FormToggle',
 	argTypes: {
@@ -26,6 +27,11 @@ const meta: Meta< typeof FormToggle > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'For standard toggles with labels, use `ToggleControl` instead.',
+		},
 	},
 };
 export default meta;

@@ -28,8 +28,7 @@ export const buttonView = ( {
 	isDeselectable,
 	isIcon,
 	isPressed,
-	size,
-}: Pick< ToggleGroupControlProps, 'isDeselectable' | 'size' > &
+}: Pick< ToggleGroupControlProps, 'isDeselectable' > &
 	Pick< ToggleGroupControlOptionBaseProps, 'isIcon' > & {
 		isPressed?: boolean;
 	} ) => css`
@@ -63,17 +62,18 @@ export const buttonView = ( {
 		border: 0;
 	}
 
-	&[disabled] {
+	&[disabled],
+	&[aria-disabled='true'] {
 		opacity: 0.4;
 		cursor: default;
 	}
 
-	&:hover {
-		color: ${ COLORS.theme.gray[ 900 ] };
+	&:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
+		color: ${ COLORS.theme.foreground };
 	}
 
 	${ isDeselectable && deselectable }
-	${ isIcon && isIconStyles( { size } ) }
+	${ isIcon && isIconStyles }
 	${ isPressed && pressed }
 `;
 
@@ -83,8 +83,6 @@ const pressed = css`
 `;
 
 const deselectable = css`
-	color: ${ COLORS.theme.foreground };
-
 	&:focus {
 		outline: ${ CONFIG.borderWidthFocus } solid ${ COLORS.ui.borderFocus };
 		outline-offset: 2px;
@@ -103,19 +101,9 @@ export const ButtonContentView = styled.div`
 	line-height: 1;
 `;
 
-const isIconStyles = ( {
-	size = 'default',
-}: Pick< ToggleGroupControlProps, 'size' > ) => {
-	const iconButtonSizes = {
-		default: '34px',
-		'__unstable-large': '38px',
-	};
-
-	return css`
-		color: ${ COLORS.theme.foreground };
-		height: ${ iconButtonSizes[ size ] };
-		aspect-ratio: 1;
-		padding-left: 0;
-		padding-right: 0;
-	`;
-};
+const isIconStyles = css`
+	height: 38px;
+	aspect-ratio: 1;
+	padding-left: 0;
+	padding-right: 0;
+`;

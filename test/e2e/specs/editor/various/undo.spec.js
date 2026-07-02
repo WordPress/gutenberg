@@ -53,6 +53,8 @@ test.describe( 'undo', () => {
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
 			blockIndex: 0,
+			startOffset: 0,
+			endOffset: 0,
 		} );
 
 		await pageUtils.pressKeys( 'primaryShift+z' );
@@ -128,6 +130,8 @@ test.describe( 'undo', () => {
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
 			blockIndex: 0,
+			startOffset: 0,
+			endOffset: 0,
 		} );
 
 		await pageUtils.pressKeys( 'primaryShift+z' );
@@ -173,6 +177,19 @@ test.describe( 'undo', () => {
 		await editor.canvas.locator( '[data-type="core/paragraph"]' ).click();
 		await pageUtils.pressKeys( 'primary+a' );
 		await pageUtils.pressKeys( 'primary+b' );
+
+		// Real-time collaboration causes block CRDT content to be updated
+		// asynchronously, and the RTC undo manager relies on up-to-date CRDT
+		// content. Ensure the bold has been applied before trying to undo.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: '<strong>test</strong>',
+				},
+			},
+		] );
+
 		await pageUtils.pressKeys( 'primary+z' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -221,6 +238,8 @@ test.describe( 'undo', () => {
 		await expect.poll( editor.getEditedPostContent ).toBe( thirdBlock );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
 			blockIndex: 2,
+			startOffset: 0,
+			endOffset: 0,
 		} );
 
 		await pageUtils.pressKeys( 'primary+z' ); // Undo 3rd block.
@@ -237,6 +256,8 @@ test.describe( 'undo', () => {
 		await expect.poll( editor.getEditedPostContent ).toBe( secondBlock );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
 			blockIndex: 1,
+			startOffset: 0,
+			endOffset: 0,
 		} );
 
 		await pageUtils.pressKeys( 'primary+z' ); // Undo 2nd block.
@@ -253,6 +274,8 @@ test.describe( 'undo', () => {
 		await expect.poll( editor.getEditedPostContent ).toBe( firstBlock );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
 			blockIndex: 0,
+			startOffset: 0,
+			endOffset: 0,
 		} );
 
 		await pageUtils.pressKeys( 'primary+z' ); // Undo 1st block.
@@ -496,6 +519,56 @@ test.describe( 'undo', () => {
 		await expect(
 			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
 		).toHaveText( '' );
+	} );
+
+	// See: https://github.com/WordPress/gutenberg/issues/24679.
+	test( 'should not be dirty after undoing all changes', async ( {
+		page,
+		pageUtils,
+		editor,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Hello World' );
+		await editor.publishPost();
+		await page
+			.getByRole( 'region', { name: 'Editor publish' } )
+			.getByRole( 'button', { name: 'Close panel' } )
+			.click();
+
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'Howdy!' );
+
+		await expect(
+			page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Save' } )
+		).toBeEnabled();
+
+		// Undo new block and content addition.
+		await pageUtils.pressKeys( 'primary+z', { times: 2 } );
+
+		// This cleanup runs through `withMultiEntityRecordEdits`, which
+		// real-time collaboration bypasses in favor of its own undo manager.
+		const isCollaborationEnabled = await page.evaluate(
+			() => window._wpCollaborationEnabled === true
+		);
+
+		// The entity is no longer dirty, so the "Save" button is disabled.
+		// Under real-time collaboration the undo runs through the RTC undo
+		// manager, which doesn't yet clear the dirty state, so the button
+		// stays enabled for now. That path is fixed separately.
+		// See: https://github.com/WordPress/gutenberg/pull/77100.
+		await expect(
+			page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Save' } )
+		).toHaveAttribute(
+			'aria-disabled',
+			isCollaborationEnabled ? 'false' : 'true'
+		);
 	} );
 } );
 

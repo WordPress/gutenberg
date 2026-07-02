@@ -1,0 +1,166 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.backdrop {
+			position: fixed;
+			inset: 0;
+			z-index: var(--wp-ui-dialog-z-index, initial);
+			background-color: rgba(0, 0, 0, 0.35);
+
+			&[data-starting-style],
+			&[data-ending-style] {
+				opacity: 0;
+			}
+
+			&[data-open] {
+				opacity: 1;
+			}
+
+			@media not (prefers-reduced-motion) {
+				transition: opacity var(--wpds-motion-duration-md) var(--wpds-motion-easing-subtle);
+			}
+		}
+
+		/*
+		 * The popup is a flex column that lays out three regions — header,
+		 * content, footer — as siblings. The middle `.content` region owns the
+		 * scroll; the popup itself clips to its rounded border. See
+		 * `overlay-chrome.module.css` for the shared chrome/content primitives.
+		 */
+		.popup {
+			--viewport-inset: var(--wpds-dimension-padding-2xl);
+
+			position: fixed;
+			top: 50%;
+			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical centering technique used with transform: translate(-50%, -50%) */
+			left: 50%;
+			z-index: var(--wp-ui-dialog-z-index, initial);
+			transform: translate(-50%, -50%);
+			box-sizing: border-box;
+			display: flex;
+			flex-direction: column;
+			min-width: var(--wpds-dimension-surface-width-sm);
+			width: calc(100vw - 2 * var(--viewport-inset));
+			max-height: calc(100dvh - 2 * var(--viewport-inset));
+			background-color: var(--wpds-color-background-surface-neutral-strong);
+			border-radius: var(--wpds-border-radius-lg);
+			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+			box-shadow: var(--wpds-elevation-lg);
+			overflow: hidden;
+			font-family: var(--wpds-typography-font-family-body);
+			font-size: var(--wpds-typography-font-size-md);
+			line-height: var(--wpds-typography-line-height-md);
+			color: var(--wpds-color-foreground-content-neutral);
+
+			&[data-starting-style],
+			&[data-ending-style] {
+				opacity: 0;
+				transform: translate(-50%, -50%) scale(0.9);
+			}
+
+			@media not (prefers-reduced-motion) {
+				transition:
+					opacity var(--wpds-motion-duration-md) var(--wpds-motion-easing-expressive),
+					transform var(--wpds-motion-duration-md) var(--wpds-motion-easing-expressive);
+			}
+
+			@media (min-width: 480px) {
+				min-width: var(--wpds-dimension-surface-width-md);
+			}
+
+			&.is-small {
+				max-width: var(--wpds-dimension-surface-width-md);
+			}
+
+			&.is-medium {
+				max-width: var(--wpds-dimension-surface-width-lg);
+			}
+
+			&.is-large {
+				max-width: var(--wpds-dimension-surface-width-2xl);
+			}
+
+			&.is-stretch {
+				/* The dialog stretches to fill available width. */
+				max-width: none;
+			}
+
+			&.is-full {
+				/*
+				 * Force full height (full width is already in default styles).
+				 * The max-{width,height} properties will make sure some padding is shown.
+				 */
+				height: 100dvh;
+			}
+		}
+
+		/*
+		 * When a backdrop is rendered alongside the popup (modal mode),
+		 * hide the regular-mode border. The backdrop already provides
+		 * visual containment, so the border becomes redundant noise.
+		 * `transparent` (not `none`) keeps popup geometry identical
+		 * across modal/non-modal — `box-sizing: border-box` absorbs the
+		 * 1px into the existing box.
+		 */
+		.backdrop ~ * .popup {
+			border-color: transparent;
+		}
+
+		/*
+		 * Forced-colors mode strips `box-shadow` and substitutes
+		 * `background-color` with `Canvas` (the page background), so the
+		 * boundary depends entirely on the border. Set `CanvasText`
+		 * explicitly for both modal and non-modal popups: `transparent`
+		 * is not substituted by the UA, and being explicit also removes
+		 * any reliance on UA color-substitution behavior for the
+		 * non-modal case.
+		 */
+		@media (forced-colors: active) {
+			.popup,
+			.backdrop ~ * .popup {
+				border-color: CanvasText;
+			}
+		}
+
+		/*
+		 * Chrome + content primitives are centralized in
+		 * `overlay-chrome.module.css` and shared with `drawer/style.module.css`
+		 * and `alert-dialog/popup.tsx`. Separator coloring and the modal
+		 * overscroll rule live there as well, keyed off the
+		 * `data-wp-ui-overlay-scroll-container` attribute that
+		 * `useOverlayScrollStateAttributes` sets on the scroll container.
+		 */
+		.header {
+			composes: header from "../utils/css/overlay-chrome.module.css";
+		}
+
+		.footer {
+			composes: footer from "../utils/css/overlay-chrome.module.css";
+		}
+
+		.title {
+			composes: title from "../utils/css/overlay-chrome.module.css";
+		}
+
+		.content {
+			composes: content from "../utils/css/overlay-chrome.module.css";
+		}
+
+		/*
+		 * Push the close icon to the inline end even when the title is taken out
+		 * of flow (e.g. wrapped in `VisuallyHidden`, which sets `position:
+		 * absolute`). In that case `.title`'s `margin-inline-end: auto` is a
+		 * no-op because the title no longer participates in the flex layout, so
+		 * we also anchor the close icon itself.
+		 */
+		.header [data-wp-ui-dialog-close-icon] {
+			margin-inline-start: auto;
+		}
+
+		.description {
+			margin-bottom: var(--wpds-dimension-gap-lg);
+		}
+
+	}
+}

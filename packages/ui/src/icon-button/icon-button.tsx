@@ -1,0 +1,71 @@
+import clsx from 'clsx';
+import { forwardRef } from '@wordpress/element';
+import { Button } from '../button';
+import { Icon } from '../icon';
+import * as Tooltip from '../tooltip';
+import styles from './style.module.css';
+import { type IconButtonProps } from './types';
+
+/**
+ * An icon-only button with automatic tooltip and optimized styling.
+ * Inherits all Button props while providing icon-specific enhancements.
+ *
+ * When rendering a group of `IconButton`s, wrap them in a `Tooltip.Provider`
+ * to coordinate tooltip delays across the group.
+ *
+ * See the [Usage Guidelines](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-button-usage-guidelines--docs)
+ * for when to use `Button`, `IconButton`, `Link`, or `LinkButton`.
+ */
+export const IconButton = forwardRef< HTMLButtonElement, IconButtonProps >(
+	function IconButton(
+		{
+			label,
+			className,
+			// Prevent accidental forwarding of `children`
+			children: _children,
+			disabled,
+			focusableWhenDisabled = true,
+			icon,
+			size,
+			shortcut,
+			positioner,
+			...restProps
+		}: IconButtonProps & { children?: unknown },
+		ref
+	) {
+		const classes = clsx( styles[ 'icon-button' ], className );
+
+		return (
+			<Tooltip.Root>
+				<Tooltip.Trigger
+					ref={ ref }
+					disabled={ disabled && ! focusableWhenDisabled }
+					render={
+						<Button
+							{ ...restProps }
+							size={ size }
+							aria-label={ label }
+							aria-keyshortcuts={ shortcut?.ariaKeyShortcut }
+							disabled={ disabled }
+							focusableWhenDisabled={ focusableWhenDisabled }
+						/>
+					}
+					className={ classes }
+				>
+					<Icon icon={ icon } size={ 24 } className={ styles.icon } />
+				</Tooltip.Trigger>
+				<Tooltip.Popup positioner={ positioner }>
+					{ label }
+					{ shortcut && (
+						<>
+							{ ' ' }
+							<span aria-hidden="true">
+								{ shortcut.displayShortcut }
+							</span>
+						</>
+					) }
+				</Tooltip.Popup>
+			</Tooltip.Root>
+		);
+	}
+);

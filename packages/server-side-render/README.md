@@ -63,20 +63,12 @@ function Example() {
 
 _Parameters_
 
--   _props_ `Object`: Component props.
--   _props.block_ `string`: The identifier of the block to be serverside rendered.
--   _props.attributes_ `Object`: The block attributes to be sent to the server for rendering.
--   _props.className_ `[string]`: Additional classes to apply to the wrapper element.
--   _props.httpMethod_ `[string]`: The HTTP method to use ('GET' or 'POST'). Default is 'GET'
--   _props.urlQueryArgs_ `[Object]`: Additional query arguments to append to the request URL.
--   _props.skipBlockSupportAttributes_ `[boolean]`: Whether to remove block support attributes before sending.
--   _props.EmptyResponsePlaceholder_ `[Function]`: Component rendered when the API response is empty.
--   _props.ErrorResponsePlaceholder_ `[Function]`: Component rendered when the API response is an error.
--   _props.LoadingResponsePlaceholder_ `[Function]`: Component rendered while the API request is loading.
+-   _props_ `ServerSideRenderWithPostIdProps`: Component props.
+-   _props.urlQueryArgs_ `ServerSideRenderWithPostIdProps[ 'urlQueryArgs' ]`: Additional query arguments to append to the request URL.
 
 _Returns_
 
--   `JSX.Element`: The rendered server-side content.
+-   The rendered server-side content.
 
 ### useServerSideRender
 
@@ -112,12 +104,7 @@ function MyServerSideRender( { attributes, block } ) {
 
 _Parameters_
 
--   _args_ `Object`: The hook configuration object.
--   _args.attributes_ `Object`: The block attributes to be sent to the server for rendering.
--   _args.block_ `string`: The identifier of the block to be serverside rendered. Example: 'core/archives'.
--   _args.skipBlockSupportAttributes_ `[boolean]`: Whether to remove block support attributes before sending.
--   _args.httpMethod_ `[string]`: The HTTP method to use ('GET' or 'POST'). Default is 'GET'.
--   _args.urlQueryArgs_ `[Object]`: Additional query arguments to append to the request URL.
+-   _args_ `UseServerSideRenderArgs`: The hook configuration object.
 
 _Returns_
 

@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import {
 	useBlockProps,
 	useInnerBlocksProps,
@@ -9,136 +8,92 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { useMemo, useEffect } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import Controls from './controls';
+import TabToolbarControls from './tab-toolbar-controls';
+import useTabListItemsSync from './use-tab-list-items-sync';
 
-const TABS_TEMPLATE = [
-	[
-		'core/tabs-menu',
-		{
-			lock: {
-				remove: true,
-			},
-		},
-	],
-	[
-		'core/tab-panels',
-		{
-			lock: {
-				remove: true,
-			},
-		},
-		[
-			[
-				'core/tab',
-				{
-					anchor: 'tab-1',
-					label: 'Tab 1',
-				},
-				[
-					[
-						'core/paragraph',
-						{
-							placeholder: __( 'Type / to add a block to tab' ),
-						},
-					],
-				],
-			],
-		],
-	],
-];
+const EMPTY_ARRAY = [];
 
-function Edit( {
-	clientId,
-	attributes,
-	setAttributes,
-	__unstableLayoutClassNames: layoutClassNames,
-} ) {
+/**
+ * Only the two structural child blocks are specified here — without inner
+ * block entries for core/tab-list or core/tab-panels.
+ *
+ * If inner blocks were included in this template, `synchronizeBlocksWithTemplate`
+ * (called whenever templateLock === 'all') would recurse into the containers and
+ * truncate them to the template count, causing data loss when a saved block with
+ * more than two tabs is re-opened in the editor.
+ *
+ * Initial tab/panel creation is delegated to the tab-panels template in
+ * tab-panels/edit.js (templateLock: false, applied only when empty).
+ */
+const TABS_TEMPLATE = [ [ 'core/tab-list' ], [ 'core/tab-panels' ] ];
+
+function Edit( { clientId, attributes } ) {
 	const { anchor, activeTabIndex, editorActiveTabIndex } = attributes;
 
-	/**
-	 * Initialize editorActiveTabIndex to activeTabIndex on mount.
-	 * This ensures the ephemeral editor state starts at the persisted default.
-	 */
-	useEffect( () => {
-		if ( editorActiveTabIndex === undefined ) {
-			setAttributes( { editorActiveTabIndex: activeTabIndex } );
-		}
-	}, [] ); // eslint-disable-line react-hooks/exhaustive-deps
-
-	/**
-	 * Compute tabs list from innerblocks to provide via context.
-	 * This traverses the tab-panels block to find all tab blocks
-	 * and extracts their label and anchor for the tabs-menu to consume.
-	 */
-	const tabsList = useSelect(
+	const { tabPanels, tabListClientId } = useSelect(
 		( select ) => {
 			const { getBlocks } = select( blockEditorStore );
 			const innerBlocks = getBlocks( clientId );
 
-			// Find tab-panels block and extract tab data
-			const tabPanels = innerBlocks.find(
+			const tabPanelsBlock = innerBlocks.find(
 				( block ) => block.name === 'core/tab-panels'
 			);
+			const tabList = innerBlocks.find(
+				( block ) => block.name === 'core/tab-list'
+			);
 
-			if ( ! tabPanels ) {
-				return [];
-			}
-
-			return tabPanels.innerBlocks
-				.filter( ( block ) => block.name === 'core/tab' )
-				.map( ( tab, index ) => ( {
-					id: tab.attributes.anchor || `tab-${ index }`,
-					label: tab.attributes.label || '',
-					clientId: tab.clientId,
-					index,
-				} ) );
+			return {
+				tabPanels: tabPanelsBlock?.innerBlocks ?? EMPTY_ARRAY,
+				tabListClientId: tabList?.clientId ?? null,
+			};
 		},
 		[ clientId ]
 	);
 
+	useTabListItemsSync( { tabPanels, tabListClientId } );
+
 	/**
 	 * Memoize context value to prevent unnecessary re-renders.
 	 */
-	const contextValue = useMemo(
-		() => ( {
-			'core/tabs-list': tabsList,
+	const contextValue = useMemo( () => {
+		/**
+		 * Compute tabs list from innerblocks to provide via context.
+		 * This traverses the tab-panels block to find all tab-panel blocks
+		 * and extracts their label and anchor for the tab-list to consume.
+		 */
+		const tabList = tabPanels.map( ( tab, index ) => ( {
+			id: tab.attributes.anchor || `tab-${ index }`,
+			label: tab.attributes.label || '',
+			clientId: tab.clientId,
+			index,
+		} ) );
+
+		return {
+			'core/tabs-list': tabList,
 			'core/tabs-id': anchor,
 			'core/tabs-activeTabIndex': activeTabIndex,
 			'core/tabs-editorActiveTabIndex': editorActiveTabIndex,
-		} ),
-		[ tabsList, anchor, activeTabIndex, editorActiveTabIndex ]
-	);
+		};
+	}, [ tabPanels, anchor, activeTabIndex, editorActiveTabIndex ] );
 
-	/**
-	 * Block props for the tabs container.
-	 */
-	const blockProps = useBlockProps( {
-		className: layoutClassNames,
-	} );
+	const blockProps = useBlockProps();
 
-	/**
-	 * Innerblocks props for the tabs container.
-	 */
 	const innerBlockProps = useInnerBlocksProps( blockProps, {
-		template: TABS_TEMPLATE,
-		templateLock: false,
-		renderAppender: false,
 		__experimentalCaptureToolbars: true,
+		template: TABS_TEMPLATE,
+		templateLock: 'all',
+		renderAppender: false,
 	} );
 
 	return (
 		<BlockContextProvider value={ contextValue }>
 			<div { ...innerBlockProps }>
-				<Controls
-					clientId={ clientId }
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-				/>
+				<TabToolbarControls tabsClientId={ clientId } />
 				{ innerBlockProps.children }
 			</div>
 		</BlockContextProvider>

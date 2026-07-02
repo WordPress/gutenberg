@@ -88,7 +88,8 @@ const ValidationComponent = ( {
 	minMax: boolean;
 	layout:
 		| 'regular'
-		| 'panel'
+		| 'panel-dropdown'
+		| 'panel-modal'
 		| 'card-collapsible'
 		| 'card-not-collapsible'
 		| 'details';
@@ -738,7 +739,7 @@ const ValidationComponent = ( {
 			},
 			{
 				id: 'customEdit',
-				label: 'Custom Control',
+				label: 'Custom control',
 				Edit: CustomEditControl,
 				isValid: {
 					required,
@@ -782,7 +783,7 @@ const ValidationComponent = ( {
 			{
 				id: 'toggleGroup',
 				type: 'text',
-				label: 'Toggle Group',
+				label: 'Toggle group',
 				Edit: 'toggleGroup',
 				elements:
 					elements === 'async'
@@ -848,35 +849,50 @@ const ValidationComponent = ( {
 				id: 'date',
 				type: 'date',
 				label: 'Date',
+				description: minMax
+					? 'Must be between Apr 1 and Apr 20, 2026'
+					: undefined,
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customDateRule ),
+					min: minMax ? '2026-04-01' : undefined,
+					max: minMax ? '2026-04-20' : undefined,
 				},
 			},
 			{
 				id: 'dateRange',
 				type: 'date',
-				label: 'Date Range',
+				label: 'Date range',
 				Edit: DateRangeEdit,
+				description: minMax
+					? 'Must be between Apr 1 and Apr 20, 2026'
+					: undefined,
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customDateRangeRule ),
+					min: minMax ? '2026-04-01' : undefined,
+					max: minMax ? '2026-04-20' : undefined,
 				},
 			},
 			{
 				id: 'datetime',
 				type: 'datetime',
-				label: 'Date Time',
+				label: 'Date time',
+				description: minMax
+					? 'Must be between Apr 1 and Apr 20, 2026'
+					: undefined,
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customDateTimeRule ),
+					min: minMax ? '2026-04-01T00:00:00.000Z' : undefined,
+					max: minMax ? '2026-04-20T23:59:59.000Z' : undefined,
 				},
 			},
 		];
-	}, [ elements, custom, required, pattern, minMax, getElements ] );
+	}, [ elements, custom, pattern, minMax, getElements, required ] );
 
 	const form = useMemo( () => {
 		if ( layout === 'regular' ) {
@@ -946,41 +962,48 @@ const ValidationComponent = ( {
 		const groupedFields = [
 			{
 				id: 'textFields',
-				label: 'Text Fields',
+				label: 'Text fields',
 				children: [ 'text', 'textarea', 'password', 'customEdit' ],
 			},
 			{
 				id: 'numberFields',
-				label: 'Number Fields',
+				label: 'Number fields',
 				children: [ 'integer', 'number' ],
 			},
 			{
 				id: 'contactFields',
-				label: 'Contact Fields',
+				label: 'Contact fields',
 				children: [ 'email', 'telephone', 'url' ],
 			},
 			{
 				id: 'selectFields',
-				label: 'Selection Fields',
+				label: 'Selection fields',
 				children: [ 'select', 'combobox', 'textWithRadio' ],
 			},
 			{
 				id: 'booleanFields',
-				label: 'Boolean Fields',
+				label: 'Boolean fields',
 				children: [ 'boolean', 'toggle', 'toggleGroup' ],
 			},
 			{ id: 'color' },
 			{ id: 'array' },
 			{
 				id: 'dateFields',
-				label: 'Date Fields',
+				label: 'Date fields',
 				children: [ 'date', 'dateRange', 'datetime' ],
 			},
 		];
 
-		if ( layout === 'panel' ) {
+		if ( layout === 'panel-dropdown' ) {
 			return {
-				layout: { type: 'panel' as const },
+				layout: { type: 'panel' as const, openAs: 'dropdown' as const },
+				fields: groupedFields,
+			};
+		}
+
+		if ( layout === 'panel-modal' ) {
+			return {
+				layout: { type: 'panel' as const, openAs: 'modal' as const },
 				fields: groupedFields,
 			};
 		}
@@ -1010,7 +1033,7 @@ const ValidationComponent = ( {
 
 	return (
 		<form>
-			<Stack direction="column" align="start" gap="xl">
+			<Stack direction="column" align="start" gap="3xl">
 				<DataForm< ValidatedItem >
 					data={ post }
 					fields={ _fields }

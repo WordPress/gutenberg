@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { createRef } from '@wordpress/element';
 import * as Field from '../index';
 
@@ -32,5 +32,50 @@ describe( 'Field', () => {
 		expect( labelRef.current ).toBeInstanceOf( HTMLLabelElement );
 		expect( descriptionRef.current ).toBeInstanceOf( HTMLParagraphElement );
 		expect( detailsRef.current ).toBeInstanceOf( HTMLDivElement );
+	} );
+
+	it( 'keeps the accessible name when the label is visually hidden', () => {
+		render(
+			<Field.Root>
+				<Field.Label hideFromVision>Field Label</Field.Label>
+				<Field.Control render={ <input /> } />
+			</Field.Root>
+		);
+
+		expect(
+			screen.getByRole( 'textbox', { name: 'Field Label' } )
+		).toBeVisible();
+	} );
+
+	it( 'preserves the native label element when hideFromVision is enabled', () => {
+		render(
+			<Field.Root>
+				<Field.Label hideFromVision>Field Label</Field.Label>
+				<Field.Control render={ <input /> } />
+			</Field.Root>
+		);
+
+		expect( screen.getByText( 'Field Label' ).tagName ).toBe( 'LABEL' );
+	} );
+
+	it( 'renders details with a semantically associated description for the control', () => {
+		render(
+			<Field.Root>
+				<Field.Label>Field Label</Field.Label>
+				<Field.Control render={ <input /> } />
+				<Field.Details>
+					<a href="#details">Details</a>
+				</Field.Details>
+			</Field.Root>
+		);
+
+		expect(
+			screen.getByRole( 'textbox', {
+				name: 'Field Label',
+				description: 'More details follow the field.',
+			} )
+		).toBeVisible();
+
+		expect( screen.getByRole( 'link', { name: 'Details' } ) ).toBeVisible();
 	} );
 } );

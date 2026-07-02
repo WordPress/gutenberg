@@ -27,7 +27,7 @@ import {
 	fullscreen,
 	linkOff,
 } from '@wordpress/icons';
-import { prependHTTP } from '@wordpress/url';
+import { prependHTTPS } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -38,7 +38,7 @@ const LINK_DESTINATION_NONE = 'none';
 const LINK_DESTINATION_CUSTOM = 'custom';
 const LINK_DESTINATION_MEDIA = 'media';
 const LINK_DESTINATION_ATTACHMENT = 'attachment';
-const NEW_TAB_REL = [ 'noreferrer', 'noopener' ];
+const NEW_TAB_REL = [ 'noopener' ];
 
 const ImageURLInputUI = ( {
 	linkDestination,
@@ -156,7 +156,7 @@ const ImageURLInputUI = ( {
 					)?.linkDestination || LINK_DESTINATION_CUSTOM;
 
 				onChangeUrl( {
-					href: prependHTTP( urlInput ),
+					href: prependHTTPS( urlInput ),
 					linkDestination: selectedDestination,
 					lightbox: { enabled: false },
 				} );
@@ -233,7 +233,6 @@ const ImageURLInputUI = ( {
 				checked={ linkTarget === '_blank' }
 			/>
 			<TextControl
-				__next40pxDefaultSize
 				label={ __( 'Link relation' ) }
 				value={ rel ?? '' }
 				onChange={ onSetLinkRel }
@@ -249,7 +248,6 @@ const ImageURLInputUI = ( {
 				) }
 			/>
 			<TextControl
-				__next40pxDefaultSize
 				label={ __( 'Link CSS class' ) }
 				value={ linkClass || '' }
 				onChange={ onSetLinkClass }

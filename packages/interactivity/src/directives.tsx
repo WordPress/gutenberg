@@ -1,4 +1,4 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
+// eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair
 /* eslint-disable react-hooks/exhaustive-deps */
 
 /**
@@ -745,7 +745,7 @@ export default () => {
 				/*
 				 * We set the value directly to the corresponding HTMLElement instance
 				 * property excluding the following special cases. We follow Preact's
-				 * logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L110-L129
+				 * logic: https://github.com/preactjs/preact/blob/10.29.1/src/diff/props.js#L115-L129
 				 */
 				if ( attribute === 'style' ) {
 					if ( typeof result === 'string' ) {
@@ -774,6 +774,7 @@ export default () => {
 					attribute !== 'rowSpan' &&
 					attribute !== 'colSpan' &&
 					attribute !== 'role' &&
+					attribute !== 'popover' &&
 					attribute in el
 				) {
 					try {
@@ -782,20 +783,23 @@ export default () => {
 								? ''
 								: result;
 						return;
-					} catch ( err ) {}
+					} catch {}
 				}
 				/*
 				 * aria- and data- attributes have no boolean representation.
 				 * A `false` value is different from the attribute not being
 				 * present, so we can't remove it.
-				 * We follow Preact's logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L131C24-L136
+				 * We follow Preact's logic: https://github.com/preactjs/preact/blob/10.29.1/src/diff/props.js#L138-L150
 				 */
 				if (
 					result !== null &&
 					result !== undefined &&
 					( result !== false || attribute[ 4 ] === '-' )
 				) {
-					el.setAttribute( attribute, result );
+					el.setAttribute(
+						attribute,
+						attribute === 'popover' && result === true ? '' : result
+					);
 				} else {
 					el.removeAttribute( attribute );
 				}
@@ -858,7 +862,7 @@ export default () => {
 				}
 				element.props.children =
 					typeof result === 'object' ? null : result.toString();
-			} catch ( e ) {
+			} catch {
 				element.props.children = null;
 			}
 		} );

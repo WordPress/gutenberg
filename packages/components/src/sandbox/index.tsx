@@ -6,6 +6,7 @@ import {
 	useRef,
 	useState,
 	useEffect,
+	useMemo,
 } from '@wordpress/element';
 import { useFocusableIframe, useMergeRefs } from '@wordpress/compose';
 
@@ -13,6 +14,25 @@ import { useFocusableIframe, useMergeRefs } from '@wordpress/compose';
  * Internal dependencies
  */
 import type { SandBoxProps } from './types';
+
+type SandBoxContentProps = Omit< SandBoxProps, 'allowSameOrigin' >;
+
+/**
+ * Matches CSS viewport-relative length values such as `100vh`, `50.5vw`,
+ * and `.5dvh`. Used to strip viewport units from user-supplied HTML inside
+ * the sandbox iframe, because those units are relative to the iframe's
+ * own size and would create a measurement feedback loop with the
+ * resize observer.
+ *
+ * Exported for tests. NOTE: an identical regex literal is duplicated
+ * inside `observeAndResizeJS` below because that function is serialized
+ * via `.toString()` and embedded into the iframe's `srcdoc` — it has no
+ * access to this module's scope at runtime. If you change one, change
+ * the other; the "is embedded in the sandbox iframe srcdoc" test
+ * guards against drift.
+ */
+export const VIEWPORT_UNIT_VALUE_REGEX =
+	/^\d*\.?\d+(?:vw|vh|svw|lvw|dvw|svh|lvh|dvh|vi|svi|lvi|dvi|vb|svb|lvb|dvb|vmin|svmin|lvmin|dvmin|vmax|svmax|lvmax|dvmax)$/;
 
 const observeAndResizeJS = function () {
 	const { MutationObserver } = window;
@@ -55,7 +75,7 @@ const observeAndResizeJS = function () {
 				[ 'width', 'height', 'minHeight', 'maxHeight' ] as const
 			 ).forEach( function ( style ) {
 				if (
-					/^\\d+(vw|vh|svw|lvw|dvw|svh|lvh|dvh|vi|svi|lvi|dvi|vb|svb|lvb|dvb|vmin|svmin|lvmin|dvmin|vmax|svmax|lvmax|dvmax)$/.test(
+					/^\d*\.?\d+(?:vw|vh|svw|lvw|dvw|svh|lvh|dvh|vi|svi|lvi|dvi|vb|svb|lvb|dvb|vmin|svmin|lvmin|dvmin|vmax|svmax|lvmax|dvmax)$/.test(
 						ruleOrNode.style[ style ]
 					)
 				) {
@@ -115,17 +135,67 @@ const style = `
 `;
 
 /**
- * This component provides an isolated environment for arbitrary HTML via iframes.
- *
- * ```jsx
- * import { SandBox } from '@wordpress/components';
- *
- * const MySandBox = () => (
- * 	<SandBox html="<p>Content</p>" title="SandBox" type="embed" />
- * );
- * ```
+ * Builds the full HTML document string for the sandbox iframe content.
  */
-function SandBox( {
+function buildSandBoxDocument( {
+	html,
+	title,
+	type,
+	styles,
+	scripts,
+}: {
+	html: string;
+	title: string;
+	type?: string;
+	styles: string[];
+	scripts: string[];
+} ): string {
+	const htmlDoc = (
+		<html lang={ document.documentElement.lang } className={ type }>
+			<head>
+				<title>{ title }</title>
+				<style dangerouslySetInnerHTML={ { __html: style } } />
+				{ styles.map( ( rules, i ) => (
+					<style
+						key={ i }
+						dangerouslySetInnerHTML={ { __html: rules } }
+					/>
+				) ) }
+			</head>
+			<body
+				data-resizable-iframe-connected="data-resizable-iframe-connected"
+				className={ type }
+			>
+				<div dangerouslySetInnerHTML={ { __html: html } } />
+				<script
+					type="text/javascript"
+					dangerouslySetInnerHTML={ {
+						__html: `(${ observeAndResizeJS.toString() })();`,
+					} }
+				/>
+				{ scripts.map( ( src ) => (
+					<script key={ src } src={ src } />
+				) ) }
+			</body>
+		</html>
+	);
+
+	return '<!DOCTYPE html>' + renderToString( htmlDoc );
+}
+
+/**
+ * Isolated sandbox that uses the `srcdoc` attribute to render content
+ * without `allow-same-origin`. This is the default for user-controlled
+ * content (e.g., the HTML block) where same-origin access would be a
+ * security risk.
+ *
+ * Because `srcdoc` is a declarative attribute, the browser automatically
+ * re-renders the content when the iframe is moved in the DOM (e.g.,
+ * block reordering), so no `load` event listener is needed.
+ * The `message` listener is re-synced on every `load` so
+ * it follows the iframe if it's reparented into a different document.
+ */
+function IsolatedSandBox( {
 	html = '',
 	title = '',
 	type,
@@ -133,15 +203,124 @@ function SandBox( {
 	scripts = [],
 	onFocus,
 	tabIndex,
-}: SandBoxProps ) {
-	const ref = useRef< HTMLIFrameElement >();
+}: SandBoxContentProps ) {
+	const ref = useRef< HTMLIFrameElement >( null );
+	const [ width, setWidth ] = useState( 0 );
+	const [ height, setHeight ] = useState( 0 );
+
+	const srcDoc = useMemo(
+		() => buildSandBoxDocument( { html, title, type, styles, scripts } ),
+		[ html, title, type, styles, scripts ]
+	);
+
+	useEffect( () => {
+		const iframe = ref.current;
+		if ( ! iframe ) {
+			return;
+		}
+
+		function checkMessageForResize( event: MessageEvent ) {
+			// Verify that the mounted element is the source of the message.
+			// iframe.contentWindow is accessible cross-origin as a
+			// WindowProxy reference, so this check still works without
+			// allow-same-origin.
+			if ( ! iframe || iframe.contentWindow !== event.source ) {
+				return;
+			}
+
+			// Attempt to parse the message data as JSON if passed as string.
+			let data = event.data || {};
+
+			if ( 'string' === typeof data ) {
+				try {
+					data = JSON.parse( data );
+				} catch {}
+			}
+
+			// Update the state only if the message is formatted as we expect,
+			// i.e. as an object with a 'resize' action.
+			if ( 'resize' !== data.action ) {
+				return;
+			}
+
+			setWidth( data.width );
+			setHeight( data.height );
+		}
+
+		let currentView: Window | null = null;
+		function syncListener() {
+			const view = iframe?.ownerDocument?.defaultView ?? null;
+			if ( view === currentView ) {
+				return;
+			}
+
+			currentView?.removeEventListener(
+				'message',
+				checkMessageForResize
+			);
+
+			currentView = view;
+			currentView?.addEventListener( 'message', checkMessageForResize );
+		}
+
+		syncListener();
+		iframe.addEventListener( 'load', syncListener );
+
+		return () => {
+			iframe.removeEventListener( 'load', syncListener );
+			currentView?.removeEventListener(
+				'message',
+				checkMessageForResize
+			);
+		};
+	}, [] );
+
+	return (
+		<iframe
+			ref={ useMergeRefs( [ ref, useFocusableIframe() ] ) }
+			title={ title }
+			tabIndex={ tabIndex }
+			className="components-sandbox"
+			sandbox="allow-scripts allow-presentation"
+			srcDoc={ srcDoc }
+			onFocus={ onFocus }
+			width={ Math.ceil( width ) }
+			height={ Math.ceil( height ) }
+		/>
+	);
+}
+
+/**
+ * Same-origin sandbox that writes to `contentDocument` directly. This
+ * preserves the parent page's URL as the iframe's document URL, which
+ * provides a valid Referer header for nested iframes (required by
+ * providers like YouTube).
+ *
+ * Only used when `allowSameOrigin` is true — i.e., for server-fetched
+ * oEmbed previews that are not directly user-controlled.
+ *
+ * This implementation is intentionally kept close to the original
+ * pre-refactor code to preserve past bugfixes:
+ * - load listener for iframe re-initialization after DOM moves (#21916)
+ * - forceRerender guard to avoid unnecessary full rewrites (#20176)
+ */
+function SameOriginSandBox( {
+	html = '',
+	title = '',
+	type,
+	styles = [],
+	scripts = [],
+	onFocus,
+	tabIndex,
+}: SandBoxContentProps ) {
+	const ref = useRef< HTMLIFrameElement >( null );
 	const [ width, setWidth ] = useState( 0 );
 	const [ height, setHeight ] = useState( 0 );
 
 	function isFrameAccessible() {
 		try {
 			return !! ref.current?.contentDocument?.body;
-		} catch ( e ) {
+		} catch {
 			return false;
 		}
 	}
@@ -232,7 +411,7 @@ function SandBox( {
 			if ( 'string' === typeof data ) {
 				try {
 					data = JSON.parse( data );
-				} catch ( e ) {}
+				} catch {}
 			}
 
 			// Update the state only if the message is formatted as we expect,
@@ -290,6 +469,24 @@ function SandBox( {
 			height={ Math.ceil( height ) }
 		/>
 	);
+}
+
+/**
+ * This component provides an isolated environment for arbitrary HTML via iframes.
+ *
+ * ```jsx
+ * import { SandBox } from '@wordpress/components';
+ *
+ * const MySandBox = () => (
+ * 	<SandBox html="<p>Content</p>" title="SandBox" type="embed" />
+ * );
+ * ```
+ */
+function SandBox( { allowSameOrigin = false, ...contentProps }: SandBoxProps ) {
+	if ( allowSameOrigin ) {
+		return <SameOriginSandBox { ...contentProps } />;
+	}
+	return <IsolatedSandBox { ...contentProps } />;
 }
 
 export default SandBox;

@@ -1,0 +1,79 @@
+{
+	"name": "@wordpress/grid",
+	"version": "0.1.1",
+	"description": "Grid layout components for arranging tiles in dashboard-style surfaces, with drag-to-reorder and tile resizing.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"grid",
+		"dashboard"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/grid/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/grid"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=20.10.0",
+		"npm": ">=10.2.3"
+	},
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"default": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpScript": false,
+	"types": "build-types",
+	"sideEffects": [
+		"src/**/*.module.css"
+	],
+	"dependencies": {
+		"@dnd-kit/core": "^6.3.1",
+		"@dnd-kit/sortable": "^10.0.0",
+		"@dnd-kit/utilities": "^3.2.2",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/element": "file:../element",
+		"@wordpress/style-runtime": "file:../style-runtime",
+		"clsx": "^2.1.1"
+	},
+	"devDependencies": {
+		"@storybook/react-vite": "^10.4.3",
+		"@testing-library/dom": "^10.4.1",
+		"@testing-library/react": "^16.3.2",
+		"@types/jest": "^29.5.14",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/ui": "file:../ui",
+		"storybook": "^10.4.3"
+	},
+	"peerDependencies": {
+		"@types/react": "^18.3.27",
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

@@ -7,7 +7,7 @@ import {
 	SelectControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { useMemo, useCallback, Platform } from '@wordpress/element';
+import { useMemo, useCallback } from '@wordpress/element';
 
 const options = [
 	{ value: 'auto', label: __( 'Auto' ) },
@@ -23,12 +23,9 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 		'Autoplay may cause usability issues for some users.'
 	);
 
-	const getAutoplayHelp = Platform.select( {
-		web: useCallback( ( checked ) => {
-			return checked ? autoPlayHelpText : null;
-		}, [] ),
-		native: autoPlayHelpText,
-	} );
+	const getAutoplayHelp = useCallback( ( checked ) => {
+		return checked ? autoPlayHelpText : null;
+	}, [] );
 
 	const toggleFactory = useMemo( () => {
 		const toggleAttribute = ( attribute ) => {

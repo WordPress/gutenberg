@@ -48,7 +48,7 @@ This isn’t to say that you should banish these words from your vocabulary. You
 
 #### FOUR: Look out for “we.”
 
-Any time text or instructions uses “we” a lot, it means the focus of the text is on the people behind the software and not the people using the software. Sometimes that’s what you actually want—but it’s usually not. The focus should typically be on the user, what they need, and how they benefit rather than “what we did” or “what we want.”
+Any time text or instructions use “we” a lot, it means the focus of the text is on the people behind the software and not the people using the software. Sometimes that’s what you actually want—but it’s usually not. The focus should typically be on the user, what they need, and how they benefit rather than “what we did” or “what we want.”
 
 We’re the only ones that care about what we did or want; the user just wants software that works. If you see a lot of “we”s, think about whether you should reframe what you’re writing to focus on the benefits to and successes of the user.
 
@@ -105,7 +105,7 @@ In a simple list that’s meant to be purely instructional (e.g., in UI copy whe
 > To continue, choose an action:
 >
 > -   Add a simple text block.
-> -   Add a quote block.
+> -   Add a pullquote block.
 > -   Add an image block.
 
 If your list is more persuasive (e.g., trying to convince someone to use a feature by listing its benefits) or includes multi-step instructions, you’ll want to vary your verbs to keep the reader engaged with more interesting language, as in the example above:

@@ -28,6 +28,13 @@ type UnitControlPassthroughProps = Omit<
 
 type DeprecatedBoxControlProps = {
 	/**
+	 * Start opting into the larger default height that will become the default size in a future version.
+	 *
+	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
+	 * @ignore
+	 */
+	__next40pxDefaultSize?: boolean;
+	/**
 	 * @deprecated Pass to the `inputProps` prop instead.
 	 * @ignore
 	 */
@@ -94,12 +101,6 @@ export type BoxControlProps = Pick< UnitControlProps, 'units' > &
 		 * The current values of the control, expressed as an object of `top`, `right`, `bottom`, and `left` values.
 		 */
 		values?: BoxControlValue;
-		/**
-		 * Start opting into the larger default height that will become the default size in a future version.
-		 *
-		 * @default false
-		 */
-		__next40pxDefaultSize?: boolean;
 	} & (
 		| {
 				/**

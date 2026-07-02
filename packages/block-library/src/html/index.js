@@ -20,12 +20,11 @@ export { metadata, name };
 export const settings = {
 	icon,
 	example: {
-		attributes: {
-			content:
-				'<marquee>' +
+		innerContent: [
+			'<marquee>' +
 				__( 'Welcome to the wonderful world of blocks…' ) +
 				'</marquee>',
-		},
+		],
 	},
 	edit,
 	save,

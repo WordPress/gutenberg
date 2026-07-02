@@ -4,7 +4,7 @@
 import {
 	Button,
 	CustomSelectControl,
-	Icon,
+	Icon as WCIcon,
 	RangeControl,
 	__experimentalHStack as HStack,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
@@ -168,12 +168,18 @@ export default function PresetInputControl( {
 		unitConfig?.max ?? customValueSettings[ computedUnit ]?.max ?? 10;
 
 	const handleCustomValueChange = ( newValue ) => {
-		const isNumeric = ! isNaN( parseFloat( newValue ) );
-		const newCustomValue = isNumeric ? newValue : undefined;
-
-		if ( newCustomValue !== undefined ) {
-			onChange( newCustomValue );
+		// Treat empty or undefined as an explicit clear and propagate undefined.
+		if ( newValue === undefined || newValue === '' ) {
+			onChange( undefined );
+			return;
 		}
+
+		// Ignore non-numeric intermediate input (e.g. just a unit).
+		if ( isNaN( parseFloat( newValue ) ) ) {
+			return;
+		}
+
+		onChange( newValue );
 	};
 	const handleCustomValueSliderChange = ( next ) => {
 		onChange( [ next, computedUnit ].join( '' ) );
@@ -202,7 +208,7 @@ export default function PresetInputControl( {
 			className={ `preset-input-control__wrapper ${ className }__wrapper` }
 		>
 			{ icon && (
-				<Icon
+				<WCIcon
 					className="preset-input-control__icon"
 					icon={ icon }
 					size={ ICON_SIZE }
@@ -261,7 +267,6 @@ export default function PresetInputControl( {
 					step={ 1 }
 					value={ currentValue }
 					withInputField={ false }
-					__next40pxDefaultSize
 				/>
 			) }
 			{ hasPresets && ! showRangeControl && ! showCustomValueControl && (

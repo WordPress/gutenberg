@@ -152,6 +152,7 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 						? decodeEntities( record.title?.rendered )
 						: __( '(no title)' ),
 					icon: icons[ postType ],
+					category: 'edit',
 				};
 
 				if (
@@ -260,6 +261,7 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 							? record.title?.rendered
 							: __( '(no title)' ),
 						icon: icons[ templateType ],
+						category: 'edit',
 						callback: ( { close } ) => {
 							if ( isSiteEditor ) {
 								history.navigate(
@@ -288,6 +290,7 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 					name: 'core/edit-site/open-template-parts',
 					label: __( 'Go to: Template parts' ),
 					icon: symbolFilled,
+					category: 'view',
 					callback: ( { close } ) => {
 						if ( isSiteEditor ) {
 							history.navigate(
@@ -346,6 +349,7 @@ const getSiteEditorBasicNavigationCommands = () =>
 					name: 'core/edit-site/open-styles',
 					label: __( 'Go to: Styles' ),
 					icon: styles,
+					category: 'view',
 					callback: ( { close } ) => {
 						if ( isSiteEditor ) {
 							history.navigate( '/styles' );
@@ -365,6 +369,7 @@ const getSiteEditorBasicNavigationCommands = () =>
 					name: 'core/edit-site/open-navigation',
 					label: __( 'Go to: Navigation' ),
 					icon: navigation,
+					category: 'view',
 					callback: ( { close } ) => {
 						if ( isSiteEditor ) {
 							history.navigate( '/navigation' );
@@ -384,6 +389,7 @@ const getSiteEditorBasicNavigationCommands = () =>
 					name: 'core/edit-site/open-templates',
 					label: __( 'Go to: Templates' ),
 					icon: layout,
+					category: 'view',
 					callback: ( { close } ) => {
 						if ( isSiteEditor ) {
 							history.navigate( mapRoute( '/template' ) );
@@ -405,6 +411,7 @@ const getSiteEditorBasicNavigationCommands = () =>
 					name: 'core/edit-site/open-patterns',
 					label: __( 'Go to: Patterns' ),
 					icon: symbol,
+					category: 'view',
 					callback: ( { close } ) => {
 						if ( canCreateTemplate ) {
 							if ( isSiteEditor ) {
@@ -446,9 +453,12 @@ const getGlobalStylesOpenCssCommands = () =>
 	function useGlobalStylesOpenCssCommands() {
 		const history = useHistory();
 		const isSiteEditor = isInSiteEditor();
-		const { canEditCSS } = useSelect( ( select ) => {
-			const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
-				select( coreStore );
+		const { canEditCSS, isBlockBasedTheme } = useSelect( ( select ) => {
+			const {
+				getEntityRecord,
+				__experimentalGetCurrentGlobalStylesId,
+				getCurrentTheme,
+			} = select( coreStore );
 
 			const globalStylesId = __experimentalGetCurrentGlobalStylesId();
 			const globalStyles = globalStylesId
@@ -457,11 +467,12 @@ const getGlobalStylesOpenCssCommands = () =>
 
 			return {
 				canEditCSS: !! globalStyles?._links?.[ 'wp:action-edit-css' ],
+				isBlockBasedTheme: getCurrentTheme()?.is_block_theme,
 			};
 		}, [] );
 
 		const commands = useMemo( () => {
-			if ( ! canEditCSS ) {
+			if ( ! canEditCSS || ! isBlockBasedTheme ) {
 				return [];
 			}
 
@@ -470,6 +481,7 @@ const getGlobalStylesOpenCssCommands = () =>
 					name: 'core/open-styles-css',
 					label: __( 'Open custom CSS' ),
 					icon: brush,
+					category: 'view',
 					callback: ( { close } ) => {
 						close();
 
@@ -487,7 +499,7 @@ const getGlobalStylesOpenCssCommands = () =>
 					},
 				},
 			];
-		}, [ history, canEditCSS, isSiteEditor ] );
+		}, [ history, canEditCSS, isSiteEditor, isBlockBasedTheme ] );
 
 		return {
 			isLoading: false,

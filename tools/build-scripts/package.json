@@ -1,0 +1,53 @@
+{
+	"name": "@wordpress/build-scripts",
+	"version": "0.0.0",
+	"description": "Internal build orchestration scripts for the Gutenberg monorepo.",
+	"private": true,
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"build"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/tools/build-scripts",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/WordPress/gutenberg.git",
+		"directory": "tools/build-scripts"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"type": "module",
+	"dependencies": {
+		"@babel/parser": "^7.28.6",
+		"@babel/traverse": "^7.25.7",
+		"@emotion/babel-plugin": "^11.13.5",
+		"@typescript/native-preview": "^7.0.0-dev.20260423.1",
+		"@wordpress/babel-preset-default": "file:../../packages/babel-preset-default",
+		"@wordpress/build": "file:../../packages/wp-build",
+		"@wordpress/react-19": "file:../react-19",
+		"@wordpress/scripts": "file:../../packages/scripts",
+		"babel-plugin-inline-json-import": "^0.3.2",
+		"chalk": "^4.1.1",
+		"cross-spawn": "^7.0.6",
+		"esbuild": "^0.27.2",
+		"fast-glob": "^3.2.7",
+		"magic-string": "^0.30.21",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1",
+		"source-map": "^0.6.1"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"build:all": "node ./build.mjs",
+		"dev": "node ./dev.mjs",
+		"build-vendors": "node ./packages/build-vendors.mjs",
+		"generate-worker-placeholders": "node ./packages/generate-worker-placeholders.mjs",
+		"resolve-trace-source-maps": "node ./packages/resolve-trace-source-maps.cjs",
+		"check-type-declarations": "node ./packages/check-build-type-declaration-files.cjs"
+	}
+}

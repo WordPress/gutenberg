@@ -23,7 +23,7 @@ import { unlock } from '../../lock-unlock';
 
 const {
 	ExperimentalBlockEditorProvider,
-	__unstableBlockStyleVariationOverridesWithConfig,
+	BlockStyleVariationOverridesWithConfig,
 } = unlock( blockEditorPrivateApis );
 
 function isObjectEmpty( object ) {
@@ -35,10 +35,10 @@ function isObjectEmpty( object ) {
  * Coordinates with ScreenRevisions through the path parameter to display
  * the currently selected revision.
  *
- * @param {Object}                       props      Component props.
- * @param {string}                       props.path Current path in global styles.
- * @param {import('react').ForwardedRef} ref        Ref to the Revisions component.
- * @return {JSX.Element|null} The Revisions component or null if loading.
+ * @param {Object}             props      Component props.
+ * @param {string}             props.path Current path in global styles.
+ * @param {React.ForwardedRef} ref        Ref to the Revisions component.
+ * @return {React.JSX.Element} The Revisions component or null if loading.
  */
 function StylesCanvasRevisions( { path }, ref ) {
 	const blocks = useSelect( ( select ) => {
@@ -133,7 +133,7 @@ function StylesCanvasRevisions( { path }, ref ) {
 					 * so they can access any registered style overrides.
 					 */ }
 					<EditorStyles styles={ editorStyles } />
-					<__unstableBlockStyleVariationOverridesWithConfig
+					<BlockStyleVariationOverridesWithConfig
 						config={ mergedConfig }
 					/>
 				</ExperimentalBlockEditorProvider>

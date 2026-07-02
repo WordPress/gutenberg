@@ -1,17 +1,7 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
-import {
-	AlignmentControl,
-	BlockControls,
-	InspectorControls,
-	useBlockProps,
-} from '@wordpress/block-editor';
+import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
@@ -26,11 +16,18 @@ import {
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
-function PostAuthorNameEdit( {
-	context: { postType, postId },
-	attributes: { textAlign, isLink, linkTarget },
-	setAttributes,
-} ) {
+/**
+ * Internal dependencies
+ */
+import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
+
+function PostAuthorNameEdit( props ) {
+	useDeprecatedTextAlign( props );
+	const {
+		attributes: { isLink, linkTarget },
+		setAttributes,
+		context: { postType, postId },
+	} = props;
 	const { authorName, supportsAuthor } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, getUser, getPostType } =
@@ -50,11 +47,7 @@ function PostAuthorNameEdit( {
 		[ postType, postId ]
 	);
 
-	const blockProps = useBlockProps( {
-		className: clsx( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
-	} );
+	const blockProps = useBlockProps();
 
 	const displayName = authorName?.name || __( 'Author Name' );
 
@@ -74,14 +67,6 @@ function PostAuthorNameEdit( {
 
 	return (
 		<>
-			<BlockControls group="block">
-				<AlignmentControl
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-			</BlockControls>
 			<InspectorControls>
 				<ToolsPanel
 					label={ __( 'Settings' ) }

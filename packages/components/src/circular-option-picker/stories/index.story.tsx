@@ -38,6 +38,11 @@ const meta: Meta< typeof CircularOptionPicker > = {
 			canvas: { sourceState: 'shown' },
 			source: { excludeDecorators: true },
 		},
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Mostly intended for internal use.',
+		},
 	},
 	decorators: [
 		// Share current color state between main component, `actions` and `options`

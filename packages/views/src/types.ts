@@ -1,7 +1,24 @@
 /**
  * WordPress dependencies
  */
-import type { View } from '@wordpress/dataviews';
+import type { View, SupportedLayouts } from '@wordpress/dataviews';
+
+export type ActiveViewOverrides = {
+	// scalar values
+	titleField?: View[ 'titleField' ];
+	showTitle?: View[ 'showTitle' ];
+	mediaField?: View[ 'mediaField' ];
+	showMedia?: View[ 'showMedia' ];
+	descriptionField?: View[ 'descriptionField' ];
+	showDescription?: View[ 'showDescription' ];
+	showLevels?: View[ 'showLevels' ];
+	infiniteScrollEnabled?: View[ 'infiniteScrollEnabled' ];
+	// array & object values
+	filters?: View[ 'filters' ];
+	sort?: View[ 'sort' ];
+	groupBy?: View[ 'groupBy' ];
+	layout?: Record< string, unknown >;
+};
 
 export interface ViewConfig {
 	/**
@@ -25,6 +42,21 @@ export interface ViewConfig {
 	 * Default view configuration
 	 */
 	defaultView: View;
+
+	/**
+	 * View overrides applied on top of the persisted view but never persisted.
+	 * These represent tab-specific configuration (filters, sort) and
+	 * developer-defined view defaults that should override the persisted
+	 * view settings.
+	 */
+	activeViewOverrides?: ActiveViewOverrides;
+
+	/**
+	 * Default layout configurations keyed by layout type.
+	 * Used to apply layout-type-specific defaults (e.g., table column styles)
+	 * that are merged as overrides based on the resolved view type.
+	 */
+	defaultLayouts?: SupportedLayouts;
 
 	/**
 	 * Optional query parameters from URL (page, search)

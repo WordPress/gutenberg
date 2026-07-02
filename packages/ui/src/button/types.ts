@@ -1,5 +1,6 @@
 import { type ReactNode, type HTMLAttributes } from 'react';
 import type { Button as _Button } from '@base-ui/react/button';
+import { type IconProps } from '../icon/types';
 import type { ComponentProps } from '../utils/types';
 
 type _ButtonProps = ComponentProps< typeof _Button >;
@@ -69,4 +70,11 @@ export interface ButtonProps
 	 * The text used for assistive technology to indicate the loading state.
 	 */
 	loadingAnnouncement?: string;
+}
+
+export interface ButtonIconProps extends IconProps {
+	/**
+	 * The icon to display, from the `@wordpress/icons` package.
+	 */
+	icon: IconProps[ 'icon' ];
 }

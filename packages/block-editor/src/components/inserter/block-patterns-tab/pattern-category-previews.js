@@ -14,7 +14,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalHeading as Heading,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	FlexBlock,
 } from '@wordpress/components';
 
@@ -162,23 +162,23 @@ export function PatternCategoryPreviews( {
 					/>
 				</HStack>
 				{ ! currentCategoryPatterns.length && (
-					<Text
+					<WCText
 						variant="muted"
 						className="block-editor-inserter__patterns-category-no-results"
 					>
 						{ __( 'No results found' ) }
-					</Text>
+					</WCText>
 				) }
 			</VStack>
 			{ currentCategoryPatterns.length > 0 && (
 				<>
-					<Text
+					<WCText
 						size="12"
 						as="p"
 						className="block-editor-inserter__help-text"
 					>
 						{ __( 'Drag and drop patterns into the canvas.' ) }
-					</Text>
+					</WCText>
 					<BlockPatternsList
 						ref={ scrollContainerRef }
 						blockPatterns={ pagingProps.categoryPatterns }

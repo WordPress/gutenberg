@@ -23,15 +23,10 @@ import HtmlRenderer from './utils/html-renderer';
 /**
  * Internal dependencies
  */
-// When IS_GUTENBERG_PLUGIN is set to false, imports of experimental blocks
-// are transformed by packages/block-library/src/index.js as follows:
-//    import * as experimentalBlock from './experimental-block'
-// becomes
-//    const experimentalBlock = null;
-// This enables webpack to eliminate the experimental blocks code from the
-// production build to make the final bundle smaller.
-//
-// See https://github.com/WordPress/gutenberg/pull/40655 for more context.
+// Experimental blocks are only registered in the Gutenberg plugin (see
+// `__experimentalRegisterExperimentalCoreBlocks`). `registerCoreBlocks`
+// filters them out via `isBlockMetadataExperimental`, so they are never
+// available in WordPress core regardless of what ends up in the bundle.
 import * as accordion from './accordion';
 import * as accordionItem from './accordion-item';
 import * as accordionHeading from './accordion-heading';
@@ -74,6 +69,7 @@ import * as group from './group';
 import * as heading from './heading';
 import * as homeLink from './home-link';
 import * as html from './html';
+import * as icon from './icon';
 import * as image from './image';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
@@ -93,6 +89,8 @@ import * as pattern from './pattern';
 import * as pageList from './page-list';
 import * as pageListItem from './page-list-item';
 import * as paragraph from './paragraph';
+import * as playlist from './playlist';
+import * as playlistTrack from './playlist-track';
 import * as postAuthor from './post-author';
 import * as postAuthorName from './post-author-name';
 import * as postAuthorBiography from './post-author-biography';
@@ -132,13 +130,12 @@ import * as siteTitle from './site-title';
 import * as socialLink from './social-link';
 import * as socialLinks from './social-links';
 import * as spacer from './spacer';
-import * as tab from './tab';
+import * as tabPanel from './tab-panel';
 import * as tabPanels from './tab-panels';
 import * as table from './table';
 import * as tableOfContents from './table-of-contents';
+import * as tabList from './tab-list';
 import * as tabs from './tabs';
-import * as tabsMenu from './tabs-menu';
-import * as tabsMenuItem from './tabs-menu-item';
 import * as tagCloud from './tag-cloud';
 import * as templatePart from './template-part';
 import * as termCount from './term-count';
@@ -263,7 +260,9 @@ const getAllBlocks = () => {
 		postCommentsForm,
 		tableOfContents,
 		homeLink,
+		icon,
 		logInOut,
+		navigationOverlayClose,
 		termCount,
 		termDescription,
 		termName,
@@ -274,14 +273,6 @@ const getAllBlocks = () => {
 		breadcrumbs,
 	];
 
-	if ( window?.__experimentalEnableBlockExperiments ) {
-		blocks.push( tab );
-		blocks.push( tabs );
-		blocks.push( tabsMenu );
-		blocks.push( tabsMenuItem );
-		blocks.push( tabPanels );
-	}
-
 	if ( window?.__experimentalEnableFormBlocks ) {
 		blocks.push( form );
 		blocks.push( formInput );
@@ -289,26 +280,18 @@ const getAllBlocks = () => {
 		blocks.push( formSubmissionNotification );
 	}
 
-	if ( window?.__experimentalNavigationOverlays ) {
-		blocks.push( navigationOverlayClose );
+	if ( window?.__experimentalEnableBlockExperiments ) {
+		blocks.push( tabList );
+		blocks.push( tabs );
+		blocks.push( tabPanel );
+		blocks.push( tabPanels );
+		blocks.push( playlist );
+		blocks.push( playlistTrack );
 	}
 
-	// When in a WordPress context, conditionally
-	// add the classic block and TinyMCE editor
-	// under any of the following conditions:
-	//   - the current post contains a classic block
-	//   - the experiment to disable TinyMCE isn't active.
-	//   - a query argument specifies that TinyMCE should be loaded
-	if (
-		window?.wp?.oldEditor &&
-		( window?.wp?.needsClassicBlock ||
-			! window?.__experimentalDisableTinymce ||
-			!! new URLSearchParams( window?.location?.search ).get(
-				'requiresTinymce'
-			) )
-	) {
-		blocks.push( classic );
-	}
+	// Always register the classic block. Inserter availability is controlled
+	// by the block's `supports.inserter` value in `freeform/init`.
+	blocks.push( classic );
 
 	return blocks.filter( Boolean );
 };

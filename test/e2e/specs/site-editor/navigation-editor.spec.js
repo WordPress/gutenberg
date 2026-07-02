@@ -93,10 +93,13 @@ test.describe( 'Editing Navigation Menus', () => {
 
 			await expect( sidebar ).toBeVisible();
 
-			// Check that the `Menu` control is visible.
-			// This is effectively the contents of the "List View" tab.
+			// Check that the `Navigation` heading is visible.
+			// This is the BlockCard title in the sidebar.
 			await expect(
-				sidebar.getByRole( 'heading', { name: 'Menu', exact: true } )
+				sidebar.getByRole( 'heading', {
+					name: 'Navigation',
+					exact: true,
+				} )
 			).toBeVisible();
 
 			// Check the Document Overview tab is not present.
@@ -104,10 +107,10 @@ test.describe( 'Editing Navigation Menus', () => {
 				sidebar.getByRole( 'tab', { name: 'Document Overview' } )
 			).toBeHidden();
 
-			// The Settings tab is visible due to Custom CSS support.
 			await expect(
 				sidebar.getByRole( 'tab', { name: 'Settings' } )
-			).toBeVisible();
+			).toBeHidden();
+
 			await expect(
 				sidebar.getByRole( 'tab', { name: 'Styles' } )
 			).toBeHidden();

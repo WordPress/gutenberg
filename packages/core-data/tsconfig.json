@@ -4,12 +4,13 @@
 	"compilerOptions": {
 		"checkJs": false,
 		"noImplicitAny": false,
-		"types": [ "node" ]
+		"types": [ "jest", "node" ]
 	},
 	"references": [
 		{ "path": "../api-fetch" },
-		{ "path": "../compose" },
 		{ "path": "../block-editor" },
+		{ "path": "../blocks" },
+		{ "path": "../compose" },
 		{ "path": "../data" },
 		{ "path": "../deprecated" },
 		{ "path": "../element" },
@@ -22,5 +23,8 @@
 		{ "path": "../undo-manager" },
 		{ "path": "../url" },
 		{ "path": "../warning" }
+	],
+	"exclude": [
+		"src/**/test/**/*.js" // only exclude js files, ts files should be checked
 	]
 }

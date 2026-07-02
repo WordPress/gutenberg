@@ -13,7 +13,7 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import _CustomSelect from '../custom-select-control-v2/custom-select';
+import CustomSelect from '../custom-select-control-v2/custom-select';
 import CustomSelectItem from '../custom-select-control-v2/item';
 import * as Styled from '../custom-select-control-v2/styles';
 import type { CustomSelectProps, CustomSelectOption } from './types';
@@ -52,6 +52,11 @@ function getDescribedBy( currentName: string, describedBy?: string ) {
 	return sprintf( __( 'Currently selected: %s' ), currentName );
 }
 
+/**
+ * `CustomSelectControl` is a dropdown for selecting a single option from a
+ * list, with support for custom styling. Use it instead of the `SelectControl`
+ * when options need richer markup (e.g. per-option styles or hints).
+ */
 function CustomSelectControl< T extends CustomSelectOption >(
 	props: CustomSelectProps< T >
 ) {
@@ -189,7 +194,7 @@ function CustomSelectControl< T extends CustomSelectOption >(
 
 	return (
 		<>
-			<_CustomSelect
+			<CustomSelect
 				aria-describedby={ descriptionId }
 				renderSelectedValue={ renderSelectedValue }
 				size={ translatedSize }
@@ -203,7 +208,7 @@ function CustomSelectControl< T extends CustomSelectOption >(
 				{ ...restProps }
 			>
 				{ children }
-			</_CustomSelect>
+			</CustomSelect>
 			<VisuallyHidden>
 				<span id={ descriptionId }>
 					{ getDescribedBy( selectedOption?.name, describedBy ) }

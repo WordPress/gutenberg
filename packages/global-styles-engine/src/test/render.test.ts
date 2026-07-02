@@ -7,6 +7,7 @@ import {
 	generateCustomProperties,
 	transformToStyles,
 	getBlockSelectors,
+	generateGlobalStyles,
 } from '../core/render';
 import type { GlobalStylesConfig } from '../types';
 import {
@@ -167,6 +168,7 @@ describe( 'global styles renderer', () => {
 						},
 					},
 					selector: ELEMENTS.link,
+					elementName: 'link',
 					skipSelectorWrapper: true,
 				},
 				{
@@ -177,6 +179,7 @@ describe( 'global styles renderer', () => {
 						},
 					},
 					selector: '.my-heading1, .my-heading2',
+					name: 'core/heading',
 				},
 				{
 					styles: {
@@ -185,6 +188,7 @@ describe( 'global styles renderer', () => {
 						},
 					},
 					selector: '.my-heading1 h1, .my-heading2 h1',
+					elementName: 'h1',
 				},
 				{
 					styles: {
@@ -193,6 +197,7 @@ describe( 'global styles renderer', () => {
 						},
 					},
 					selector: '.my-heading1 h2, .my-heading2 h2',
+					elementName: 'h2',
 				},
 				{
 					styles: {
@@ -211,6 +216,7 @@ describe( 'global styles renderer', () => {
 					},
 					selector:
 						'.my-heading1 a:where(:not(.wp-element-button)), .my-heading2 a:where(:not(.wp-element-button))',
+					elementName: 'link',
 				},
 				{
 					styles: {
@@ -219,6 +225,7 @@ describe( 'global styles renderer', () => {
 						},
 					},
 					selector: '.my-image',
+					name: 'core/image',
 					featureSelectors: '.my-image img, .my-image .crop-area',
 				},
 			] );
@@ -389,6 +396,15 @@ describe( 'global styles renderer', () => {
 	} );
 
 	describe( 'transformToStyles', () => {
+		const minimalStyleOptions = {
+			blockGap: false,
+			blockStyles: true,
+			layoutStyles: false,
+			marginReset: false,
+			presets: false,
+			rootPadding: false,
+		};
+
 		it( 'should return a ruleset', () => {
 			const tree = {
 				settings: {
@@ -645,7 +661,600 @@ describe( 'global styles renderer', () => {
 				styleOptions
 			);
 			expect( withVariations ).toEqual(
-				':root :where(.is-style-foo.wp-image.wp-image-spacing){padding-top: 2px;}:root :where(.is-style-foo.wp-image.wp-image-border-color){border-color: blue;}:root :where(.is-style-foo.wp-image){color: blue;}'
+				':root :where(.wp-image-spacing.is-style-foo){padding-top: 2px;}:root :where(.wp-image-border-color.is-style-foo){border-color: blue;}:root :where(.is-style-foo.wp-image){color: blue;}'
+			);
+		} );
+
+		it( 'handles variation inner block states', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/group': {
+							variations: {
+								foo: {
+									blocks: {
+										'core/button': {
+											color: {
+												text: 'red',
+											},
+											':hover': {
+												color: {
+													text: 'blue',
+												},
+											},
+											'@mobile': {
+												color: {
+													text: 'green',
+												},
+												':hover': {
+													color: {
+														text: 'yellow',
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/group': {
+					selector: '.wp-block-group',
+					styleVariationSelectors: {
+						foo: '.is-style-foo.wp-block-group',
+					},
+				},
+				'core/button': {
+					selector: '.wp-block-button',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				{
+					...minimalStyleOptions,
+					variationStyles: true,
+				}
+			);
+
+			expect( result ).toEqual(
+				':root :where(.is-style-foo.wp-block-group .wp-block-button){color: red;}@media (width <= 480px){:root :where(.is-style-foo.wp-block-group .wp-block-button){color: green;}}:root :where(.is-style-foo.wp-block-group .wp-block-button:hover){color: blue;}@media (width <= 480px){:root :where(.is-style-foo.wp-block-group .wp-block-button:hover){color: yellow;}}'
+			);
+		} );
+
+		it( 'should handle block pseudo selectors', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/button': {
+							color: {
+								text: 'red',
+							},
+							':hover': {
+								color: {
+									text: 'blue',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				{
+					blockGap: false,
+					blockStyles: true,
+					layoutStyles: false,
+					marginReset: false,
+					presets: false,
+					rootPadding: false,
+				}
+			);
+
+			expect( result ).toEqual(
+				':root :where(.wp-block-button){color: red;}:root :where(.wp-block-button:hover){color: blue;}'
+			);
+		} );
+
+		it( 'outputs default pseudo styles after responsive base styles', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/button': {
+							color: {
+								text: 'black',
+							},
+							':hover': {
+								color: {
+									text: 'blue',
+								},
+							},
+							'@mobile': {
+								color: {
+									text: 'red',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				':root :where(.wp-block-button){color: black;}@media (width <= 480px){:root :where(.wp-block-button){color: red;}}:root :where(.wp-block-button:hover){color: blue;}'
+			);
+		} );
+
+		it( 'ignores root-level state styles', () => {
+			const tree = {
+				styles: {
+					color: {
+						text: 'red',
+					},
+					':hover': {
+						color: {
+							text: 'blue',
+						},
+					},
+					'@mobile': {
+						color: {
+							text: 'green',
+						},
+						':hover': {
+							color: {
+								text: 'yellow',
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				{},
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual( 'body{color: red;}' );
+		} );
+
+		it( 'should handle style variation pseudo selectors', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/button': {
+							variations: {
+								foo: {
+									color: {
+										text: 'green',
+									},
+									dimensions: {
+										width: '10rem',
+									},
+									':hover': {
+										color: {
+											text: 'yellow',
+										},
+										dimensions: {
+											width: '20rem',
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button .wp-block-button__link',
+					featureSelectors: {
+						dimensions: {
+							root: '.wp-block-button',
+							width: '.wp-block-button',
+						},
+					},
+					styleVariationSelectors: {
+						foo: '.wp-block-button.is-style-foo .wp-block-button__link',
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				{
+					blockGap: false,
+					blockStyles: true,
+					layoutStyles: false,
+					marginReset: false,
+					presets: false,
+					rootPadding: false,
+					variationStyles: true,
+				}
+			);
+
+			expect( result ).toEqual(
+				':root :where(.wp-block-button.is-style-foo){width: 10rem;}:root :where(.wp-block-button.is-style-foo .wp-block-button__link){color: green;}:root :where(.wp-block-button.is-style-foo:hover){width: 20rem;}:root :where(.wp-block-button.is-style-foo .wp-block-button__link:hover){color: yellow;}'
+			);
+		} );
+
+		it( 'outputs variation responsive pseudo styles after default pseudo styles', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/button': {
+							variations: {
+								foo: {
+									color: {
+										text: 'green',
+									},
+									dimensions: {
+										width: '10rem',
+									},
+									':hover': {
+										color: {
+											text: 'blue',
+										},
+										dimensions: {
+											width: '20rem',
+										},
+									},
+									'@tablet': {
+										color: {
+											text: 'red',
+										},
+										dimensions: {
+											width: '30rem',
+										},
+										':hover': {
+											color: {
+												text: 'orange',
+											},
+											dimensions: {
+												width: '40rem',
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button .wp-block-button__link',
+					featureSelectors: {
+						dimensions: {
+							root: '.wp-block-button',
+							width: '.wp-block-button',
+						},
+					},
+					styleVariationSelectors: {
+						foo: '.wp-block-button.is-style-foo .wp-block-button__link',
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				{
+					...minimalStyleOptions,
+					variationStyles: true,
+				}
+			);
+
+			expect( result ).toEqual(
+				':root :where(.wp-block-button.is-style-foo){width: 10rem;}:root :where(.wp-block-button.is-style-foo .wp-block-button__link){color: green;}@media (480px < width <= 782px){:root :where(.wp-block-button.is-style-foo){width: 30rem;}:root :where(.wp-block-button.is-style-foo .wp-block-button__link){color: red;}}:root :where(.wp-block-button.is-style-foo:hover){width: 20rem;}:root :where(.wp-block-button.is-style-foo .wp-block-button__link:hover){color: blue;}@media (480px < width <= 782px){:root :where(.wp-block-button.is-style-foo:hover){width: 40rem;}:root :where(.wp-block-button.is-style-foo .wp-block-button__link:hover){color: orange;}}'
+			);
+		} );
+
+		it( 'handles responsive block styles', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/button': {
+							color: {
+								text: 'red',
+							},
+							'@mobile': {
+								color: {
+									text: 'blue',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				':root :where(.wp-block-button){color: red;}@media (width <= 480px){:root :where(.wp-block-button){color: blue;}}'
+			);
+		} );
+
+		it( 'handles legacy responsive block styles', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/button': {
+							color: {
+								text: 'red',
+							},
+							mobile: {
+								color: {
+									text: 'blue',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				':root :where(.wp-block-button){color: red;}@media (width <= 480px){:root :where(.wp-block-button){color: blue;}}'
+			);
+		} );
+
+		it( 'handles responsive pseudo selector styles', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/button': {
+							':hover': {
+								color: {
+									text: 'blue',
+								},
+							},
+							'@mobile': {
+								color: {
+									text: 'red',
+								},
+								':hover': {
+									color: {
+										text: 'orange',
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				'@media (width <= 480px){:root :where(.wp-block-button){color: red;}}:root :where(.wp-block-button:hover){color: blue;}@media (width <= 480px){:root :where(.wp-block-button:hover){color: orange;}}'
+			);
+		} );
+
+		it( 'handles responsive feature selector styles', () => {
+			const tree = {
+				settings: {},
+				styles: {
+					blocks: {
+						'core/button': {
+							dimensions: {
+								width: '25%',
+							},
+							'@mobile': {
+								dimensions: {
+									width: '50%',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button .wp-block-button__link',
+					featureSelectors: {
+						dimensions: {
+							root: '.wp-block-button',
+							width: '.wp-block-button',
+						},
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				':root :where(.wp-block-button){width: calc(25 * 1% - (var(--wp--style--block-gap, 0.5em) * (1 - 25 / 100)));}@media (width <= 480px){:root :where(.wp-block-button){width: calc(50 * 1% - (var(--wp--style--block-gap, 0.5em) * (1 - 50 / 100)));}}'
+			);
+		} );
+
+		it( 'handles responsive element styles', () => {
+			const tree = {
+				styles: {
+					elements: {
+						link: {
+							color: {
+								text: 'blue',
+							},
+							'@mobile': {
+								color: {
+									text: 'red',
+								},
+								':hover': {
+									color: {
+										text: 'orange',
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				{},
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				'a:where(:not(.wp-element-button)){color: blue;}@media (width <= 480px){:root :where(a:where(:not(.wp-element-button))){color: red;}}@media (width <= 480px){:root :where(a:where(:not(.wp-element-button)):hover){color: orange;}}'
+			);
+		} );
+
+		it( 'handles responsive style variation styles', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/button': {
+							variations: {
+								foo: {
+									color: {
+										text: 'green',
+									},
+									'@mobile': {
+										color: {
+											text: 'yellow',
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button',
+					styleVariationSelectors: {
+						foo: '.is-style-foo.wp-block-button',
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				{
+					...minimalStyleOptions,
+					variationStyles: true,
+				}
+			);
+
+			expect( result ).toEqual(
+				':root :where(.is-style-foo.wp-block-button){color: green;}@media (width <= 480px){:root :where(.is-style-foo.wp-block-button){color: yellow;}}'
 			);
 		} );
 
@@ -689,6 +1298,167 @@ describe( 'global styles renderer', () => {
 				transformToStyles( Object.freeze( tree ), 'body' )
 			).toEqual(
 				':root { --wp--style--global--content-size: 840px; --wp--style--global--wide-size: 1100px;}:where(body) {margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }'
+			);
+		} );
+	} );
+
+	describe( 'generateGlobalStyles', () => {
+		beforeEach( () => {
+			jest.clearAllMocks();
+			const mockSelect = require( '@wordpress/data' ).select as jest.Mock;
+			mockSelect.mockReturnValue( {
+				getBlockStyles: () => [],
+			} );
+		} );
+
+		it( 'should use css feature selector for block custom CSS when defined', () => {
+			const config = {
+				version: 3,
+				settings: {},
+				styles: {
+					blocks: {
+						'core/paragraph': {
+							css: 'color:red;',
+						},
+					},
+				},
+			};
+
+			const blockTypes = [
+				{
+					name: 'core/paragraph',
+					selectors: {
+						root: 'p',
+						css: '.custom-p',
+					},
+				},
+			];
+
+			const [ styles ] = generateGlobalStyles( config, blockTypes );
+			const customCssStylesheet = styles.find(
+				( s: any ) => s.css && s.css.includes( 'color:red;' )
+			);
+			expect( customCssStylesheet ).toBeDefined();
+			expect( customCssStylesheet.css ).toContain(
+				':root :where(.custom-p){color:red;}'
+			);
+			expect( customCssStylesheet.css ).not.toContain(
+				':root :where(p){color:red;}'
+			);
+		} );
+
+		it( 'should use css feature selector object form with root subkey for block custom CSS', () => {
+			const config = {
+				version: 3,
+				settings: {},
+				styles: {
+					blocks: {
+						'core/paragraph': {
+							css: 'color:red;',
+						},
+					},
+				},
+			};
+
+			const blockTypes = [
+				{
+					name: 'core/paragraph',
+					selectors: {
+						root: 'p',
+						css: { root: '.custom-p' },
+					},
+				},
+			];
+
+			const [ styles ] = generateGlobalStyles( config, blockTypes );
+			const customCssStylesheet = styles.find(
+				( s: any ) => s.css && s.css.includes( 'color:red;' )
+			);
+			expect( customCssStylesheet ).toBeDefined();
+			expect( customCssStylesheet.css ).toContain(
+				':root :where(.custom-p){color:red;}'
+			);
+			expect( customCssStylesheet.css ).not.toContain(
+				':root :where(p){color:red;}'
+			);
+		} );
+
+		it( 'should fall back to root selector for block custom CSS when no css feature selector is defined', () => {
+			const config = {
+				version: 3,
+				settings: {},
+				styles: {
+					blocks: {
+						'core/paragraph': {
+							css: 'color:red;',
+						},
+					},
+				},
+			};
+
+			const blockTypes = [
+				{
+					name: 'core/paragraph',
+					selectors: {
+						root: 'p',
+					},
+				},
+			];
+
+			const [ styles ] = generateGlobalStyles( config, blockTypes );
+			const customCssStylesheet = styles.find(
+				( s: any ) => s.css && s.css.includes( 'color:red;' )
+			);
+			expect( customCssStylesheet ).toBeDefined();
+			expect( customCssStylesheet.css ).toContain(
+				':root :where(p){color:red;}'
+			);
+		} );
+
+		it( 'should output duotone SVG filters with __unstableType of svgs', () => {
+			const mockSelect = require( '@wordpress/data' ).select as jest.Mock;
+			mockSelect.mockReturnValue( {
+				getBlockStyles: () => [],
+			} );
+
+			const config = {
+				version: 3,
+				settings: {
+					color: {
+						duotone: {
+							theme: [
+								{
+									slug: 'midnight',
+									name: 'Midnight',
+									colors: [ '#263135', '#69a8a7' ],
+								},
+							],
+						},
+					},
+				},
+				styles: {},
+			};
+
+			const blockTypes = [
+				{
+					name: 'core/image',
+					selectors: {
+						root: '.wp-block-image',
+						filter: { duotone: '.wp-block-image img' },
+					},
+				},
+			];
+
+			const [ styles ] = generateGlobalStyles( config, blockTypes );
+
+			const svgStyle = styles.find(
+				( s: any ) => s.__unstableType === 'svgs'
+			);
+
+			expect( svgStyle ).toBeDefined();
+			expect( svgStyle.__unstableType ).toBe( 'svgs' );
+			expect( svgStyle.assets.join( '' ) ).toContain(
+				'wp-duotone-midnight'
 			);
 		} );
 	} );
@@ -787,6 +1557,129 @@ describe( 'global styles renderer', () => {
 					hasLayoutSupport: false,
 				},
 			} );
+		} );
+	} );
+
+	describe( 'button width declarations', () => {
+		it( 'should convert direct percentage width to calc() formula', () => {
+			const tree: GlobalStylesConfig = {
+				settings: {},
+				styles: {
+					blocks: {
+						'core/button': {
+							dimensions: {
+								width: '25%',
+							},
+						},
+					},
+				},
+			};
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button .wp-block-button__link',
+					featureSelectors: {
+						dimensions: {
+							root: '.wp-block-button',
+							width: '.wp-block-button',
+						},
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors
+			);
+			expect( result ).toContain(
+				':root :where(.wp-block-button){width: calc(25 * 1% - (var(--wp--style--block-gap, 0.5em) * (1 - 25 / 100)));}'
+			);
+		} );
+
+		it( 'should convert preset percentage width to calc() formula', () => {
+			const tree = {
+				settings: {
+					blocks: {
+						'core/button': {
+							dimensions: {
+								dimensionSizes: {
+									default: [
+										{
+											slug: '50',
+											name: '50%',
+											size: '50%',
+										},
+									],
+								},
+							},
+						},
+					},
+				},
+				styles: {
+					blocks: {
+						'core/button': {
+							dimensions: {
+								width: 'var:preset|dimension|50',
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button .wp-block-button__link',
+					featureSelectors: {
+						dimensions: {
+							root: '.wp-block-button',
+							width: '.wp-block-button',
+						},
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors
+			);
+			expect( result ).toContain(
+				':root :where(.wp-block-button){width: calc(50 * 1% - (var(--wp--style--block-gap, 0.5em) * (1 - 50 / 100)));}'
+			);
+		} );
+
+		it( 'should not convert non-percentage width', () => {
+			const tree: GlobalStylesConfig = {
+				settings: {},
+				styles: {
+					blocks: {
+						'core/button': {
+							dimensions: {
+								width: '200px',
+							},
+						},
+					},
+				},
+			};
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button .wp-block-button__link',
+					featureSelectors: {
+						dimensions: {
+							root: '.wp-block-button',
+							width: '.wp-block-button',
+						},
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors
+			);
+			expect( result ).toContain(
+				':root :where(.wp-block-button){width: 200px;}'
+			);
 		} );
 	} );
 } );

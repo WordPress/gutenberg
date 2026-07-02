@@ -40,7 +40,10 @@ function isFormValid( formValidity: FormValidity | undefined ): boolean {
 					// Recursively check children validations
 					return isFormValid( validation as FormValidity );
 				}
-				return validation.type === 'valid';
+				return (
+					validation.type !== 'invalid' &&
+					validation.type !== 'validating'
+				);
 			}
 		);
 	} );
@@ -147,6 +150,7 @@ function setValidityAtPath(
 			current[ segment ] = {};
 		}
 
+		current[ segment ] = { ...current[ segment ] };
 		current = current[ segment ];
 	}
 
@@ -157,6 +161,45 @@ function setValidityAtPath(
 		...fieldValidity,
 	};
 
+	return result;
+}
+
+function removeValidationProperty(
+	formValidity: FormValidity | undefined,
+	path: string[],
+	property: keyof FieldValidity
+): FormValidity | undefined {
+	if ( ! formValidity || path.length === 0 ) {
+		return formValidity;
+	}
+	const result = { ...formValidity };
+	// Navigate to parent of target.
+	let current: any = result;
+	for ( let i = 0; i < path.length - 1; i++ ) {
+		const segment = path[ i ];
+		if ( ! current[ segment ] ) {
+			return formValidity; // Path doesn't exist
+		}
+		current[ segment ] = { ...current[ segment ] };
+		current = current[ segment ];
+	}
+	const finalKey = path[ path.length - 1 ];
+	if ( ! current[ finalKey ] ) {
+		return formValidity;
+	}
+	const fieldValidity = { ...current[ finalKey ] };
+	delete fieldValidity[ property ];
+	// If field has no more validations, remove it entirely.
+	if ( Object.keys( fieldValidity ).length === 0 ) {
+		delete current[ finalKey ];
+	} else {
+		// Keep the field if it has other validations (including children).
+		current[ finalKey ] = fieldValidity;
+	}
+	// If root is empty, return undefined
+	if ( Object.keys( result ).length === 0 ) {
+		return undefined;
+	}
 	return result;
 }
 
@@ -215,6 +258,15 @@ function handleElementsValidationAsync< Item >(
 					);
 					return newFormValidity;
 				} );
+			} else {
+				// Validation passed so we need to remove `elements` from validity.
+				setFormValidity( ( prev ) => {
+					return removeValidationProperty(
+						prev,
+						[ ...path, formField.id ],
+						'elements'
+					);
+				} );
 			}
 		} )
 		.catch( ( error ) => {
@@ -265,18 +317,13 @@ function handleCustomValidationAsync< Item >(
 			}
 
 			if ( result === null ) {
+				// Validation passed so we need to remove `custom` from validity.
 				setFormValidity( ( prev ) => {
-					const newFormValidity = setValidityAtPath(
+					return removeValidationProperty(
 						prev,
-						{
-							custom: {
-								type: 'valid',
-								message: __( 'Valid' ),
-							},
-						},
-						[ ...path, formField.id ]
+						[ ...path, formField.id ],
+						'custom'
 					);
-					return newFormValidity;
 				} );
 				return;
 			}
@@ -448,27 +495,6 @@ function validateFormField< Item >(
 		};
 	}
 
-	// Validate the field: isValid.elements (async)
-	if (
-		!! formField.field &&
-		formField.field.isValid.elements &&
-		formField.field.hasElements &&
-		typeof formField.field.getElements === 'function'
-	) {
-		handleElementsValidationAsync(
-			formField.field.getElements(),
-			formField,
-			promiseHandler
-		);
-
-		return {
-			elements: {
-				type: 'validating',
-				message: __( 'Validating…' ),
-			},
-		};
-	}
-
 	// Validate the field: isValid.custom (sync)
 	let customError;
 	if ( !! formField.field && formField.field.isValid.custom ) {
@@ -512,16 +538,39 @@ function validateFormField< Item >(
 		};
 	}
 
+	// Aggregate async validations (`elements` and `custom`).
+	const fieldValidity: FieldValidity = {};
+	// Validate the field: isValid.elements (async)
+	if (
+		!! formField.field &&
+		formField.field.isValid.elements &&
+		formField.field.hasElements &&
+		typeof formField.field.getElements === 'function'
+	) {
+		handleElementsValidationAsync(
+			formField.field.getElements(),
+			formField,
+			promiseHandler
+		);
+		fieldValidity.elements = {
+			type: 'validating',
+			message: __( 'Validating…' ),
+		};
+	}
+
 	// Validate the field: isValid.custom (async)
 	if ( customError instanceof Promise ) {
 		handleCustomValidationAsync( customError, formField, promiseHandler );
 
-		return {
-			custom: {
-				type: 'validating',
-				message: __( 'Validating…' ),
-			},
+		fieldValidity.custom = {
+			type: 'validating',
+			message: __( 'Validating…' ),
 		};
+	}
+
+	// Return aggregated validations if any exist
+	if ( Object.keys( fieldValidity ).length > 0 ) {
+		return fieldValidity;
 	}
 
 	// Validate its children.

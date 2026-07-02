@@ -19,7 +19,7 @@ component, and the `Menu.Popover` component.
 
 ### `as`
 
- - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | "base" | "bdi" | "bdo" | "big" | "blockquote" | "body" | "br" | "button" | "canvas" | ... 516 more ... | ("view" & FunctionComponent<...>)`
+ - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | "base" | "bdi" | "bdo" | "big" | "blockquote" | "body" | "br" | "button" | "canvas" | ... 517 more ...`
  - Required: No
 
 The HTML element or React component to render the component as.
@@ -57,7 +57,7 @@ override the `defaultOpen` prop.
 
 ### `onOpenChange`
 
- - Type: `(open: boolean) => void`
+ - Type: `((open: boolean) => void)`
  - Required: No
 
 A callback that gets called when the `open` state changes.
@@ -306,7 +306,7 @@ that don't support the native `disabled` attribute.
 The checked state of the radio menu item when it is initially rendered.
 Use when not wanting to control its checked state.
 
-Note: this prop will be overriden by the `checked` prop, if it is defined.
+Note: this prop will be overridden by the `checked` prop, if it is defined.
 
 ##### `hideOnClick`
 
@@ -404,7 +404,7 @@ that don't support the native `disabled` attribute.
 The checked state of the checkbox menu item when it is initially rendered.
 Use when not wanting to control its checked state.
 
-Note: this prop will be overriden by the `checked` prop, if it is defined.
+Note: this prop will be overridden by the `checked` prop, if it is defined.
 
 ##### `hideOnClick`
 

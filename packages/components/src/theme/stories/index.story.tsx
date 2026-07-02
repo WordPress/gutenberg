@@ -23,6 +23,11 @@ const meta: Meta< typeof Theme > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'This is an internal experiment and not meant for external use. Will be superseded by `@wordpress/theme`.',
+		},
 	},
 };
 export default meta;

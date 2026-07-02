@@ -1,0 +1,49 @@
+<svg viewBox="0 0 760 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="In full-bleed presentation, the widget owns the whole tile edge to edge, and the host keeps its identity header in a VisuallyHidden node for accessibility instead of painting it.">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#94a3b8"/>
+    </marker>
+    <clipPath id="tileClip">
+      <rect x="308" y="86" width="372" height="210" rx="10"/>
+    </clipPath>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eef4ff"/>
+      <stop offset="1" stop-color="#e3edfb"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="6" y="6" width="748" height="348" rx="12" fill="#ffffff"/>
+
+  <!-- Caption -->
+  <text x="380" y="42" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="12.5" font-weight="700" fill="#334155">In full-bleed, the widget owns the tile; identity stays hidden, kept for a11y.</text>
+
+  <!-- Identity: the same metadata -->
+  <rect x="40" y="116" width="172" height="128" rx="10" fill="#e2ecfd" stroke="#2f54a5" stroke-width="1.5"/>
+  <text x="60" y="144" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="700" fill="#1e3a8a">Identity</text>
+  <text x="60" y="162" font-family="-apple-system, system-ui, sans-serif" font-size="10.5" fill="#2f54a5" opacity="0.8">metadata</text>
+  <rect x="60" y="176" width="18" height="18" rx="4" fill="#2f54a5"/>
+  <text x="86" y="190" font-family="ui-monospace, SFMono-Regular, monospace" font-size="11.5" fill="#2f54a5">icon</text>
+  <text x="60" y="220" font-family="ui-monospace, SFMono-Regular, monospace" font-size="11.5" fill="#2f54a5">title: Welcome</text>
+
+  <!-- host reads (same read, different outcome) -->
+  <line x1="212" y1="150" x2="300" y2="150" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="256" y="140" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#94a3b8">host reads</text>
+
+  <!-- The tile, full-bleed: the widget owns it edge to edge -->
+  <g clip-path="url(#tileClip)">
+    <rect x="308" y="86" width="372" height="210" fill="url(#sky)"/>
+    <circle cx="602" cy="152" r="46" fill="#c3d9f5" opacity="0.7"/>
+    <path d="M308 296 L308 252 Q 430 216 560 246 Q 642 264 680 240 L680 296 Z" fill="#d7f0ea"/>
+    <path d="M308 296 L308 274 Q 452 246 592 270 Q 652 280 680 266 L680 296 Z" fill="#bfe3d8"/>
+  </g>
+  <rect x="308" y="86" width="372" height="210" rx="10" fill="none" stroke="#cbd5e1" stroke-width="1.5"/>
+
+  <!-- The header the host did NOT paint, kept in a VisuallyHidden node -->
+  <rect x="320" y="98" width="190" height="46" rx="8" fill="#ffffff" fill-opacity="0.82" stroke="#94a3b8" stroke-width="1.3" stroke-dasharray="5 4"/>
+  <rect x="332" y="108" width="16" height="16" rx="4" fill="none" stroke="#94a3b8" stroke-width="1.3"/>
+  <text x="356" y="120" font-family="-apple-system, system-ui, sans-serif" font-size="11" font-weight="600" fill="#475569">icon + Welcome</text>
+  <text x="332" y="136" font-family="-apple-system, system-ui, sans-serif" font-size="9.5" font-style="italic" fill="#94a3b8">VisuallyHidden · a11y</text>
+
+  <!-- value -->
+  <text x="494" y="322" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="12.5" font-weight="700" fill="#1d6b5a">presentation: full-bleed</text>
+</svg>

@@ -149,7 +149,8 @@ export const AsyncValidation: StoryObj< typeof ValidatedInputControl > = {
 				>[ 'customValidity' ]
 			>( undefined );
 
-		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
+		const timeoutRef =
+			useRef< ReturnType< typeof setTimeout > >( undefined );
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		const debouncedValidate = useCallback(

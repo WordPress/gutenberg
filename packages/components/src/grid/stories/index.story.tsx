@@ -36,6 +36,11 @@ const meta: Meta< typeof Grid > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Planned for deprecation. Write your own CSS instead.',
+		},
 	},
 };
 export default meta;

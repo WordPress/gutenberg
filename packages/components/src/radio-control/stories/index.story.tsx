@@ -14,6 +14,7 @@ import { useState } from '@wordpress/element';
 import RadioControl from '..';
 
 const meta: Meta< typeof RadioControl > = {
+	tags: [ 'manifest' ],
 	component: RadioControl,
 	title: 'Components/Selection & Input/Common/RadioControl',
 	id: 'components-radiocontrol',
@@ -36,6 +37,11 @@ const meta: Meta< typeof RadioControl > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `RadioGroupControl` in `@wordpress/ui`, but continue using for now.',
+		},
 	},
 };
 export default meta;

@@ -21,6 +21,7 @@ import {
 } from '@wordpress/keyboard-shortcuts';
 import { Icon, search as inputIcon } from '@wordpress/icons';
 import { executeAbility, store as abilitiesStore } from '@wordpress/abilities';
+import { initialize as initializeCoreAbilities } from '@wordpress/core-abilities';
 
 /**
  * Internal dependencies
@@ -110,7 +111,7 @@ export function WorkflowMenu() {
 
 	useShortcut(
 		'core/workflows',
-		/** @type {import('react').KeyboardEventHandler} */
+		/** @type {React.KeyboardEventHandler} */
 		withIgnoreIMEEvents( ( event ) => {
 			// Bails to avoid obscuring the effect of the preceding handler(s).
 			if ( event.defaultPrevented ) {
@@ -124,6 +125,12 @@ export function WorkflowMenu() {
 			bindGlobal: true,
 		}
 	);
+
+	useEffect( () => {
+		if ( isOpen ) {
+			initializeCoreAbilities();
+		}
+	}, [ isOpen ] );
 
 	const closeAndReset = () => {
 		setSearch( '' );
