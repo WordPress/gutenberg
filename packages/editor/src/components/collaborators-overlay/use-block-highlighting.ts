@@ -5,6 +5,7 @@ import {
 	privateApis as coreDataPrivateApis,
 	type CoreDataPrivateApis,
 	type PostEditorAwarenessState as ActiveCollaborator,
+	type SelectionEndpoint,
 } from '@wordpress/core-data';
 import { useEffect, useRef, useState } from '@wordpress/element';
 
@@ -15,6 +16,7 @@ import { unlock } from '../../lock-unlock';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 import { getAvatarUrl } from './get-avatar-url';
 import { useDebouncedRecompute } from './use-debounced-recompute';
+import { getBlocksBetween, isNodeBefore } from './cursor-dom-utils';
 
 const { useActiveCollaborators, useResolvedSelection } =
 	unlock( coreDataPrivateApis );
@@ -82,46 +84,121 @@ export function useBlockHighlighting(
 		// even if a later render replaces it.
 		const currentHighlightedIds = highlightedBlockIds.current;
 
+		type BlockEntry = {
+			blockId: string;
+			color: string;
+			userName: string;
+			avatarUrl: string | undefined;
+		};
+
 		// Deduplicate by blockId — when multiple collaborators select the
 		// same block, only the first one gets the highlight and avatar label.
 		const seen = new Set< string >();
 		const blocksToHighlight = userStates
 			.filter( ( userState: ActiveCollaborator ) => {
-				const isWholeBlockSelected =
-					userState.editorState?.selection?.type ===
-					SelectionType.WholeBlock;
-
-				return ! userState.isMe && isWholeBlockSelected;
-			} )
-			.map( ( userState ) => {
-				let localClientId;
-				try {
-					( { localClientId } = resolveSelection(
-						userState.editorState?.selection
-					) );
-				} catch {
-					return null;
-				}
-
-				if ( ! localClientId ) {
-					return null;
-				}
-
-				return {
-					blockId: localClientId,
-					color: userState.isMe
-						? 'var(--wp-admin-theme-color)'
-						: getAvatarBorderColor( userState.collaboratorInfo.id ),
-					userName: userState.collaboratorInfo.name,
-					avatarUrl: getAvatarUrl(
-						userState.collaboratorInfo.avatar_urls
-					),
-				};
-			} )
-			.filter( ( block ): block is NonNullable< typeof block > => {
-				if ( ! block ) {
+				if ( userState.isMe ) {
 					return false;
 				}
+				const selType = userState.editorState?.selection?.type;
+				return (
+					selType === SelectionType.WholeBlock ||
+					selType === SelectionType.SelectionInMultipleBlocks
+				);
+			} )
+			.flatMap< BlockEntry >( ( userState ) => {
+				// Cast to any: the selection union type is narrowed by the
+				// filter above, but TypeScript cannot infer that after .flatMap.
+				const selection = userState.editorState?.selection as any;
+
+				if ( selection.type === SelectionType.WholeBlock ) {
+					let localClientId: string | null;
+					try {
+						( { localClientId } = resolveSelection( selection ) );
+					} catch {
+						return [];
+					}
+					if ( ! localClientId ) {
+						return [];
+					}
+					return [
+						{
+							blockId: localClientId,
+							color: getAvatarBorderColor(
+								userState.collaboratorInfo.id
+							),
+							userName: userState.collaboratorInfo.name,
+							avatarUrl: getAvatarUrl(
+								userState.collaboratorInfo.avatar_urls
+							),
+						},
+					];
+				}
+
+				// SelectionInMultipleBlocks: resolve each endpoint independently.
+				const resolveEndpointId = (
+					endpoint: SelectionEndpoint
+				): string | null => {
+					try {
+						return endpoint.kind === 'cursor'
+							? resolveSelection( {
+									type: SelectionType.Cursor,
+									cursorPosition: endpoint.cursorPosition,
+							  } ).localClientId
+							: resolveSelection( {
+									type: SelectionType.WholeBlock,
+									blockPosition: endpoint.blockPosition,
+							  } ).localClientId;
+					} catch {
+						return null;
+					}
+				};
+
+				const startId = resolveEndpointId( selection.startEndpoint );
+				const endId = resolveEndpointId( selection.endEndpoint );
+				if ( ! startId || ! endId ) {
+					return [];
+				}
+
+				const color = getAvatarBorderColor(
+					userState.collaboratorInfo.id
+				);
+				const userName = userState.collaboratorInfo.name;
+				const avatarUrl = getAvatarUrl(
+					userState.collaboratorInfo.avatar_urls
+				);
+
+				// Yjs reports startEndpoint/endEndpoint in selection direction,
+				// not DOM order — a backward selection has startEndpoint below
+				// endEndpoint in the document. Normalise to DOM order so
+				// getBlocksBetween and the avatar-placement logic below always
+				// operate top-to-bottom.
+				const startEl =
+					blockEditorDocument.querySelector< HTMLElement >(
+						`[data-block="${ startId }"]`
+					);
+				const endEl = blockEditorDocument.querySelector< HTMLElement >(
+					`[data-block="${ endId }"]`
+				);
+				let firstId = startId;
+				let lastId = endId;
+				if ( startEl && endEl && isNodeBefore( endEl, startEl ) ) {
+					firstId = endId;
+					lastId = startId;
+				}
+
+				const intermediateIds = getBlocksBetween(
+					startId,
+					endId,
+					blockEditorDocument
+				)
+					.map( ( el ) => el.getAttribute( 'data-block' ) )
+					.filter( ( id ): id is string => Boolean( id ) );
+
+				return [ firstId, ...intermediateIds, lastId ].map(
+					( blockId ) => ( { blockId, color, userName, avatarUrl } )
+				);
+			} )
+			.filter( ( block ) => {
 				if ( seen.has( block.blockId ) ) {
 					return false;
 				}
@@ -156,6 +233,13 @@ export function useBlockHighlighting(
 		const results: BlockHighlightData[] = [];
 		const overlayRect = overlayElement?.getBoundingClientRect() ?? null;
 
+		// Track which users already have an avatar placed. We key by color
+		// because getAvatarBorderColor returns a deterministic value per
+		// collaborator ID, making it a cheap unique identifier here.
+		// Blocks arrive in document order (top to bottom) so the first
+		// block encountered per user is always the topmost visible one.
+		const usersWithAvatar = new Set< string >();
+
 		blocksToHighlight.forEach( ( block ) => {
 			const { color, blockId, userName, avatarUrl } = block;
 			const blockElement = getBlockElementById(
@@ -174,9 +258,9 @@ export function useBlockHighlighting(
 			);
 			currentHighlightedIds.add( blockId );
 
-			if ( overlayRect ) {
+			if ( overlayRect && ! usersWithAvatar.has( color ) ) {
+				usersWithAvatar.add( color );
 				const blockRect = blockElement.getBoundingClientRect();
-
 				results.push( {
 					blockId,
 					userName,

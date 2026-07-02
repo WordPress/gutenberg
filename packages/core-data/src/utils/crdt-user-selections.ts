@@ -415,7 +415,7 @@ export function areSelectionsStatesEqual(
 /**
  * Check if two SelectionEndpoints are equal.
  *
- * Endpoints of different kinds (text vs block) are never equal.
+ * Endpoints of different kinds (cursor vs whole-block) are never equal.
  *
  * @param ep1 - First endpoint.
  * @param ep2 - Second endpoint.

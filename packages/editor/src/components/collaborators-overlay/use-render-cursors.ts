@@ -2,6 +2,7 @@ import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
 import type {
 	CoreDataPrivateApis,
 	ResolvedSelection,
+	SelectionEndpoint,
 	PostEditorAwarenessState as ActiveCollaborator,
 } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
@@ -119,20 +120,42 @@ export function useRenderCursors(
 					// Selection may reference a stale Yjs position.
 					return;
 				}
-			} else if (
-				selection.type === SelectionType.SelectionInOneBlock ||
-				selection.type === SelectionType.SelectionInMultipleBlocks
-			) {
+			} else if ( selection.type === SelectionType.SelectionInOneBlock ) {
 				try {
 					start = resolveSelection( {
 						type: SelectionType.Cursor,
 						cursorPosition: selection.cursorStartPosition,
 					} );
-
 					end = resolveSelection( {
 						type: SelectionType.Cursor,
 						cursorPosition: selection.cursorEndPosition,
 					} );
+				} catch {
+					// Selection may reference a stale Yjs position.
+					return;
+				}
+			} else if (
+				selection.type === SelectionType.SelectionInMultipleBlocks
+			) {
+				// Each endpoint is either a CursorEndpoint (character offset
+				// inside a RichText field) or a WholeBlockEndpoint (block selected
+				// as a unit, no character offset). Resolve independently so each
+				// end uses the right Yjs anchor regardless of block type.
+				const resolveEndpoint = (
+					endpoint: SelectionEndpoint
+				): ResolvedSelection =>
+					endpoint.kind === 'cursor'
+						? resolveSelection( {
+								type: SelectionType.Cursor,
+								cursorPosition: endpoint.cursorPosition,
+						  } )
+						: resolveSelection( {
+								type: SelectionType.WholeBlock,
+								blockPosition: endpoint.blockPosition,
+						  } );
+				try {
+					start = resolveEndpoint( selection.startEndpoint );
+					end = resolveEndpoint( selection.endEndpoint );
 				} catch {
 					// Selection may reference a stale Yjs position.
 					return;

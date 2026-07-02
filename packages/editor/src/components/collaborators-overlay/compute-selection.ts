@@ -8,8 +8,6 @@ import { unlock } from '../../lock-unlock';
 import {
 	getCursorPosition,
 	getSelectionRects,
-	getFullBlockSelectionRects,
-	getBlocksBetween,
 	isNodeBefore,
 } from './cursor-dom-utils';
 import type { CursorCoords, SelectionRect } from './cursor-dom-utils';
@@ -30,9 +28,13 @@ interface SingleBlockResult {
 	blockElement: HTMLElement | null;
 }
 
-/** Selection rects and the resolved block elements for a multi-block selection. */
+/**
+ * Resolved block elements for a multi-block selection. No pixel rects are
+ * computed — highlighting is handled entirely via CSS outlines applied by
+ * use-block-highlighting. Only the endpoint elements are needed here for
+ * cursor label positioning.
+ */
 interface MultiBlockResult {
-	rects: SelectionRect[];
 	firstBlock: HTMLElement | null;
 	lastBlock: HTMLElement | null;
 	firstBlockClientId: string | null;
@@ -159,12 +161,7 @@ function computeTextSelection(
 	end: ResolvedSelection,
 	overlayContext: OverlayContext
 ): SelectionVisual {
-	if (
-		! start.localClientId ||
-		! end.localClientId ||
-		start.richTextOffset === null ||
-		end.richTextOffset === null
-	) {
+	if ( ! start.localClientId || ! end.localClientId ) {
 		return {};
 	}
 
@@ -172,46 +169,52 @@ function computeTextSelection(
 		selection.selectionDirection === SelectionDirection.Backward;
 	const activeEnd = isReverse ? start : end;
 
-	let allRects: SelectionRect[];
-	let activeEndBlock: HTMLElement | null = null;
-
+	// Single-block: both endpoints must have a text offset.
 	if ( selection.type === SelectionType.SelectionInOneBlock ) {
+		if ( start.richTextOffset === null || end.richTextOffset === null ) {
+			return {};
+		}
 		const result = computeSingleBlockRects( start, end, overlayContext );
-		allRects = result.rects;
-		// Single block: start and end share the same block element.
-		activeEndBlock = result.blockElement;
-	} else {
-		const result = computeMultiBlockRects( start, end, overlayContext );
-		allRects = result.rects;
-		// Pick the block element that matches the active end.
-		activeEndBlock =
-			activeEnd.localClientId === result.firstBlockClientId
-				? result.firstBlock
-				: result.lastBlock;
-	}
-
-	if ( allRects.length > 0 ) {
+		if ( result.rects.length > 0 ) {
+			return {
+				coords: getCursorPosition(
+					activeEnd.richTextOffset,
+					result.blockElement,
+					overlayContext.editorDocument,
+					overlayContext.overlayRect
+				),
+				selectionRects: result.rects,
+			};
+		}
+		// Fallback: cursor only, no selection rects.
 		return {
 			coords: getCursorPosition(
-				activeEnd.richTextOffset,
-				activeEndBlock,
+				start.richTextOffset,
+				resolveTargetElement( overlayContext.editorDocument, start ),
 				overlayContext.editorDocument,
 				overlayContext.overlayRect
 			),
-			selectionRects: allRects,
 		};
 	}
 
-	// Fallback: cursor at start position only.
-	const startBlock = resolveTargetElement(
-		overlayContext.editorDocument,
-		start
-	);
-
+	// Multi-block: all selected blocks are highlighted via CSS outline by
+	// use-block-highlighting. Show a cursor label only at the active end
+	// when it has a known character offset (CursorEndpoint). When the active
+	// end is a WholeBlockEndpoint (richTextOffset is null — e.g. an image or
+	// a block selected as a unit), there is no meaningful character position
+	// to render the cursor at, so we return nothing; the block outline and
+	// avatar label from use-block-highlighting are the only visuals needed.
+	if ( activeEnd.richTextOffset === null ) {
+		return {};
+	}
+	const { firstBlock, lastBlock, firstBlockClientId } =
+		computeMultiBlockRects( start, end, overlayContext );
+	const activeEndBlock =
+		activeEnd.localClientId === firstBlockClientId ? firstBlock : lastBlock;
 	return {
 		coords: getCursorPosition(
-			start.richTextOffset,
-			startBlock,
+			activeEnd.richTextOffset,
+			activeEndBlock,
 			overlayContext.editorDocument,
 			overlayContext.overlayRect
 		),
@@ -292,62 +295,19 @@ function computeMultiBlockRects(
 	if (
 		! firstBlock ||
 		! lastBlock ||
-		docFirst.richTextOffset === null ||
-		docLast.richTextOffset === null ||
 		! docFirst.localClientId ||
 		! docLast.localClientId
 	) {
 		return {
-			rects: [],
 			firstBlock: null,
 			lastBlock: null,
 			firstBlockClientId: null,
 		};
 	}
 
-	const allRects: SelectionRect[] = [];
-
-	// First block: from start offset to end of block.
-	const startRects = getSelectionRects(
-		firstBlock,
-		docFirst.richTextOffset,
-		Number.MAX_SAFE_INTEGER,
-		overlayContext.editorDocument,
-		overlayContext.overlayRect
-	);
-	if ( startRects ) {
-		allRects.push( ...startRects );
-	}
-
-	// Intermediate blocks: full content.
-	const intermediateBlocks = getBlocksBetween(
-		docFirst.localClientId,
-		docLast.localClientId,
-		overlayContext.editorDocument
-	);
-	for ( const intermediateBlock of intermediateBlocks ) {
-		const rects = getFullBlockSelectionRects(
-			intermediateBlock,
-			overlayContext.editorDocument,
-			overlayContext.overlayRect
-		);
-		allRects.push( ...rects );
-	}
-
-	// Last block: from 0 to end offset.
-	const endRects = getSelectionRects(
-		lastBlock,
-		0,
-		docLast.richTextOffset,
-		overlayContext.editorDocument,
-		overlayContext.overlayRect
-	);
-	if ( endRects ) {
-		allRects.push( ...endRects );
-	}
-
+	// All selected blocks are highlighted with a CSS outline by use-block-highlighting.
+	// This function only resolves the endpoint elements needed for cursor positioning.
 	return {
-		rects: allRects,
 		firstBlock,
 		lastBlock,
 		firstBlockClientId: docFirst.localClientId,
