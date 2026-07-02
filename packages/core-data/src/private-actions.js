@@ -176,6 +176,10 @@ export const setCollaborationSupported =
 		dispatch( { type: 'SET_COLLABORATION_SUPPORTED', supported } );
 		if ( ! supported && hasSyncManager() ) {
 			getSyncManager().unloadAll();
+			dispatch.__unstableNotifySyncUndoManagerChange( {
+				hasUndo: false,
+				hasRedo: false,
+			} );
 		}
 	};
 

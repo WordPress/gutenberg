@@ -1,0 +1,89 @@
+{
+	"name": "@wordpress/widget-dashboard",
+	"version": "0.1.1",
+	"description": "Stateless rendering engine for widget dashboards: the WidgetDashboard compound component and its grid-settings kit.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"widgets",
+		"dashboard",
+		"grid"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/widget-dashboard/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/widget-dashboard"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=20.10.0",
+		"npm": ">=10.2.3"
+	},
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"default": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpScript": false,
+	"types": "build-types",
+	"sideEffects": [
+		"src/**/*.module.css"
+	],
+	"dependencies": {
+		"@wordpress/commands": "file:../commands",
+		"@wordpress/components": "file:../components",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/data": "file:../data",
+		"@wordpress/dataviews": "file:../dataviews",
+		"@wordpress/element": "file:../element",
+		"@wordpress/grid": "file:../grid",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/primitives": "file:../primitives",
+		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/style-runtime": "file:../style-runtime",
+		"@wordpress/ui": "file:../ui",
+		"@wordpress/viewport": "file:../viewport",
+		"@wordpress/widget-primitives": "file:../widget-primitives",
+		"clsx": "^2.1.1",
+		"fast-deep-equal": "^3.1.3",
+		"uuid": "^14.0.0"
+	},
+	"devDependencies": {
+		"@testing-library/dom": "^10.4.1",
+		"@testing-library/jest-dom": "^6.9.1",
+		"@testing-library/react": "^16.3.2",
+		"@testing-library/user-event": "^14.6.1",
+		"@types/jest": "^29.5.14"
+	},
+	"peerDependencies": {
+		"@types/react": "^18.3.27",
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

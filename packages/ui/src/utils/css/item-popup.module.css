@@ -16,7 +16,7 @@
 			border-radius: var(--wpds-border-radius-md);
 			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 			box-shadow: var(--wpds-elevation-md);
-			background-color: var(--wpds-color-bg-surface-neutral-strong);
+			background-color: var(--wpds-color-background-surface-neutral-strong);
 		}
 
 		.list {
@@ -27,7 +27,7 @@
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-md);
 			line-height: var(--wpds-typography-line-height-sm);
-			color: var(--wpds-color-fg-interactive-neutral);
+			color: var(--wpds-color-foreground-interactive-neutral);
 		}
 
 		.list-scrollable-container {
@@ -50,8 +50,20 @@
 			}
 		}
 
+		.group:not(:first-child) {
+			margin-block-start: var(--wpds-dimension-gap-sm);
+		}
+
+		.group-label {
+			display: flex;
+			align-items: center;
+			min-height: var(--wpds-dimension-size-md);
+			padding-inline: var(--wpds-dimension-padding-md);
+			color: var(--wpds-color-foreground-content-neutral-weak);
+		}
+
 		.item {
-			--wp-ui-popup-item-height: 40px;
+			--wp-ui-popup-item-height: var(--wpds-dimension-size-lg);
 			--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-md);
 			--wp-ui-popup-item-padding-block: var(--wpds-dimension-padding-xs);
 
@@ -74,12 +86,12 @@
 			}
 
 			&.is-size-compact {
-				--wp-ui-popup-item-height: 32px;
+				--wp-ui-popup-item-height: var(--wpds-dimension-size-md);
 				--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-sm);
 			}
 
 			&.is-size-small {
-				--wp-ui-popup-item-height: 24px;
+				--wp-ui-popup-item-height: var(--wpds-dimension-size-sm);
 				--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-sm);
 				--wp-ui-popup-item-padding-block: 2px;
 			}
@@ -91,8 +103,8 @@
 			}
 
 			&[data-highlighted]:not([aria-disabled="true"]) {
-				background-color: var(--wpds-color-bg-interactive-brand-weak-active);
-				color: var(--wpds-color-fg-interactive-neutral);
+				background-color: var(--wpds-color-background-interactive-brand-weak-active);
+				color: var(--wpds-color-foreground-interactive-neutral);
 				outline: none; /* Disable user agent focus ring */
 
 				@media ( forced-colors: active ) {
@@ -101,7 +113,12 @@
 			}
 
 			&[aria-disabled="true"] {
-				color: var(--wpds-color-fg-interactive-neutral-disabled);
+				/* Background is brand-toned (see `[data-highlighted]` above); the
+				   foreground text stays neutral in every state. The disabled
+				   background currently resolves to transparent, but referencing the
+				   token keeps it in sync if its value ever changes. */
+				background-color: var(--wpds-color-background-interactive-brand-weak-disabled);
+				color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
 				@media ( forced-colors: active ) {
 					color: GrayText;
@@ -116,7 +133,7 @@
 		/* Only style when there is content, because otherwise the element would block clicks
 		on the .list beneath it (both share grid-area: main and overlap). */
 		.empty:not(:empty) {
-			--wp-ui-popup-empty-min-height: 40px;
+			--wp-ui-popup-empty-min-height: var(--wpds-dimension-size-lg);
 			--wp-ui-popup-empty-padding-inline: var(--wpds-dimension-padding-md);
 
 			grid-area: main;
@@ -127,7 +144,7 @@
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-md);
 			line-height: var(--wpds-typography-line-height-sm);
-			color: var(--wpds-color-fg-content-neutral-weak);
+			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
 	}

@@ -19,9 +19,9 @@ import type { AngleCircleProps } from './types';
 
 type UseDraggingArgumentType = Parameters< typeof useDragging >[ 0 ];
 type UseDraggingCallbackEvent =
-	| Parameters< UseDraggingArgumentType[ 'onDragStart' ] >[ 0 ]
-	| Parameters< UseDraggingArgumentType[ 'onDragMove' ] >[ 0 ]
-	| Parameters< UseDraggingArgumentType[ 'onDragEnd' ] >[ 0 ];
+	| Parameters< NonNullable< UseDraggingArgumentType[ 'onDragStart' ] > >[ 0 ]
+	| Parameters< NonNullable< UseDraggingArgumentType[ 'onDragMove' ] > >[ 0 ]
+	| Parameters< NonNullable< UseDraggingArgumentType[ 'onDragEnd' ] > >[ 0 ];
 
 function AngleCircle( {
 	value,

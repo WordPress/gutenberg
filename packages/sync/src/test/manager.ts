@@ -509,6 +509,31 @@ describe( 'SyncManager', () => {
 			expect( mockSyncConfig.applyChangesToCRDTDoc ).toHaveBeenCalled();
 		} );
 
+		it( 'clears the undo manager after unloading all entities', async () => {
+			const manager = createSyncManager();
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'456',
+				mockRecord,
+				mockHandlers
+			);
+
+			expect( manager.undoManager ).toBeDefined();
+
+			manager.unloadAll();
+
+			expect( manager.undoManager ).toBeUndefined();
+		} );
+
 		it( 'destroys providers and skips initialization when unload runs during load', async () => {
 			// Hold provider creation open so we can interrupt the load between
 			// `entityStates.set(...)` and the provider creation resolving.

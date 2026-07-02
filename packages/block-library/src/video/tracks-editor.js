@@ -120,7 +120,6 @@ function SingleTrackEditor( {
 			</span>
 			<Grid columns={ 2 } gap={ 4 }>
 				<TextControl
-					__next40pxDefaultSize
 					onChange={ ( newLabel ) =>
 						setTrackState( ( prevTrackState ) => ( {
 							...prevTrackState,
@@ -132,7 +131,6 @@ function SingleTrackEditor( {
 					help={ __( 'Title of track' ) }
 				/>
 				<TextControl
-					__next40pxDefaultSize
 					onChange={ ( newSrcLang ) =>
 						setTrackState( ( prevTrackState ) => ( {
 							...prevTrackState,

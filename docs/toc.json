@@ -354,7 +354,10 @@
 					{
 						"docs/explanations/architecture/full-site-editing-templates.md": []
 					},
-					{ "docs/explanations/architecture/styles.md": [] }
+					{ "docs/explanations/architecture/styles.md": [] },
+					{
+						"docs/explanations/architecture/dashboard-widgets.md": []
+					}
 				]
 			},
 			{

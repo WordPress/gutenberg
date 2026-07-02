@@ -23,30 +23,30 @@
 	}
 
 	.block-editor-list-view-block-select-button {
-		color: var(--wpds-color-fg-interactive-neutral-weak);
+		color: var(--wpds-color-foreground-interactive-neutral-weak);
 		&:hover,
 		&:focus,
 		&[aria-current] {
-			color: var(--wpds-color-fg-interactive-neutral-active);
+			color: var(--wpds-color-foreground-interactive-neutral-active);
 		}
 	}
 
 	.block-editor-list-view-block__menu {
-		color: var(--wpds-color-fg-interactive-neutral-weak);
+		color: var(--wpds-color-foreground-interactive-neutral-weak);
 		&:hover,
 		&:focus {
-			color: var(--wpds-color-fg-interactive-neutral-active);
+			color: var(--wpds-color-foreground-interactive-neutral-active);
 		}
 	}
 
 	.block-editor-inserter__toggle {
-		background: var(--wpds-color-bg-interactive-brand-strong);
-		color: var(--wpds-color-fg-interactive-brand-strong);
+		background: var(--wpds-color-background-interactive-brand-strong);
+		color: var(--wpds-color-foreground-interactive-brand-strong);
 
 		&:hover,
 		&:focus {
-			background: var(--wpds-color-bg-interactive-brand-strong-active);
-			color: var(--wpds-color-fg-interactive-brand-strong-active);
+			background: var(--wpds-color-background-interactive-brand-strong-active);
+			color: var(--wpds-color-foreground-interactive-brand-strong-active);
 		}
 	}
 }

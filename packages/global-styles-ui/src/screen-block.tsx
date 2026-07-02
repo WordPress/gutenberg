@@ -275,7 +275,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 		// If there are settings changes, we need to update both styles and
 		// settings atomically to avoid race conditions.
 		if ( newSettings?.typography ) {
-			// Build the state-aware path so that viewport styles (e.g. mobile)
+			// Build the state-aware path so that viewport styles (e.g. @mobile)
 			// are written to the correct sub-path and do not overwrite the default.
 			const stylePathForState = [ prefix, stateParam ]
 				.filter( Boolean )
@@ -364,14 +364,6 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					</VStack>
 				</div>
 			) }
-			{ hasColorPanel && (
-				<StylesColorPanel
-					inheritedValue={ inheritedStyle }
-					value={ style }
-					onChange={ setStyle }
-					settings={ settings }
-				/>
-			) }
 			{ hasBackgroundPanel && (
 				<StylesBackgroundPanel
 					inheritedValue={ inheritedStyle }
@@ -417,6 +409,14 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					onChange={ setStyle }
 					settings={ settings }
 					includeLayoutControls
+				/>
+			) }
+			{ hasColorPanel && (
+				<StylesColorPanel
+					inheritedValue={ inheritedStyle }
+					value={ style }
+					onChange={ setStyle }
+					settings={ settings }
 				/>
 			) }
 			{ hasImageSettingsPanel && ! hasSelectedState && (

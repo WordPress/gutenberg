@@ -64,7 +64,9 @@ class Tests_Blocks_Render_Rss extends WP_UnitTestCase {
 		$wp_block_supports = WP_Block_Supports::get_instance();
 		$reflection        = new ReflectionClass( $wp_block_supports );
 		$property          = $reflection->getProperty( 'block_to_render' );
-		$property->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$property->setAccessible( true );
+		}
 		$property->setValue( $wp_block_supports, $block );
 	}
 

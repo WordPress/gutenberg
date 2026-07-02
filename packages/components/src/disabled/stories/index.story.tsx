@@ -46,7 +46,6 @@ const Form = () => {
 	return (
 		<VStack>
 			<TextControl
-				__next40pxDefaultSize
 				label="Text Control"
 				value={ textControlValue }
 				onChange={ setTextControlValue }

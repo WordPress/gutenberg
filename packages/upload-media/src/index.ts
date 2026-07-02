@@ -6,7 +6,8 @@ import { store as uploadStore } from './store';
 export { uploadStore as store };
 
 export { default as MediaUploadProvider } from './components/provider';
-export { UploadError } from './upload-error';
+export { ErrorCode, UploadError } from './upload-error';
+export { getErrorMessage } from './error-messages';
 export {
 	detectClientSideMediaSupport,
 	isClientSideMediaSupported,
@@ -16,3 +17,4 @@ export {
 
 export type { ImageFormat } from './store/types';
 export type { FeatureDetectionResult } from './feature-detection';
+export type { ErrorMessageConfig } from './error-messages';

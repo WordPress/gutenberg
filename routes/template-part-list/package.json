@@ -23,9 +23,9 @@
 		"@wordpress/icons": "file:../../packages/icons",
 		"@wordpress/keycodes": "file:../../packages/keycodes",
 		"@wordpress/lazy-editor": "file:../../packages/lazy-editor",
+		"@wordpress/routes-lock-unlock": "file:../lock-unlock",
 		"@wordpress/route": "file:../../packages/route",
 		"@wordpress/notices": "file:../../packages/notices",
-		"@wordpress/private-apis": "file:../../packages/private-apis",
 		"@wordpress/views": "file:../../packages/views",
 		"clsx": "^2.1.1",
 		"dequal": "^2.0.3"

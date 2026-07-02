@@ -1669,7 +1669,7 @@ When the field declares a type, it gets a default sort function:
 }
 ```
 
-The default sorting can be overriden by providing a custom sort function. It takes the following arguments:
+The default sorting can be overridden by providing a custom sort function. It takes the following arguments:
 
 -   `a`: the first item to compare
 -   `b`: the second item to compare
@@ -1717,7 +1717,7 @@ Fields that define a type come with default validation for the type. For example
 }
 ```
 
-The validation rules can be overriden by the field author. For example, to set the field as required, or to provide a custom validation so that only even numbers are valid:
+The validation rules can be overridden by the field author. For example, to set the field as required, or to provide a custom validation so that only even numbers are valid:
 
 ```js
 {
