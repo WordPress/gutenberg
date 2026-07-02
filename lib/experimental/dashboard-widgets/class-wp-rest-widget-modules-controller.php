@@ -199,6 +199,18 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 				$data['category'] = $widget_type->category;
 			}
 
+			if ( rest_is_field_included( 'title', $fields ) ) {
+				$data['title'] = $widget_type->title;
+			}
+
+			if ( rest_is_field_included( 'description', $fields ) ) {
+				$data['description'] = $widget_type->description;
+			}
+
+			if ( rest_is_field_included( 'keywords', $fields ) ) {
+				$data['keywords'] = $widget_type->keywords;
+			}
+
 			$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
 			$data    = $this->add_additional_fields_to_object( $data, $request );
 			$data    = $this->filter_response_by_context( $data, $context );
@@ -253,6 +265,28 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 					'category'      => array(
 						'description' => __( 'Widget types are grouped into categories to help users browse and discover them.', 'gutenberg' ),
 						'type'        => array( 'string', 'null' ),
+						'context'     => array( 'view', 'edit', 'embed' ),
+						'readonly'    => true,
+					),
+
+					'title'         => array(
+						'description' => __( 'Human-readable title that names the widget type. Translatable.', 'gutenberg' ),
+						'type'        => array( 'string', 'null' ),
+						'context'     => array( 'view', 'edit', 'embed' ),
+						'readonly'    => true,
+					),
+
+					'description'   => array(
+						'description' => __( 'Human-readable description of what the widget type does. Translatable.', 'gutenberg' ),
+						'type'        => array( 'string', 'null' ),
+						'context'     => array( 'view', 'edit', 'embed' ),
+						'readonly'    => true,
+					),
+
+					'keywords'      => array(
+						'description' => __( 'Alternative terms used to match the widget type when searching, e.g. "calendar" for an events widget. Translatable.', 'gutenberg' ),
+						'type'        => array( 'array', 'null' ),
+						'items'       => array( 'type' => 'string' ),
 						'context'     => array( 'view', 'edit', 'embed' ),
 						'readonly'    => true,
 					),
