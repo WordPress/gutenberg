@@ -105,8 +105,13 @@ describe( 'WidgetDashboard', () => {
 	it( 'surfaces the widget type info note in the header', async () => {
 		render( <Harness /> );
 
-		// The visually hidden copy inside the tooltip trigger; the popup
-		// itself only mounts on hover/focus.
+		// The infotip trigger opens a popover holding the note.
+		await userEvent.click(
+			await screen.findByRole( 'button', {
+				name: 'More information',
+			} )
+		);
+
 		expect(
 			await screen.findByText( 'Greetings at a glance.' )
 		).toBeInTheDocument();

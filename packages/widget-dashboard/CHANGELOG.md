@@ -4,8 +4,8 @@
 
 ### Enhancements
 
--   `WidgetHeader`: surface the widget type's `info` note as a tooltip
-    affordance beside the title.
+-   `WidgetHeader`: surface the widget type's `info` note as an infotip
+    (hover-open popover) beside the title.
 
 ## 0.2.0 (2026-07-01)
 

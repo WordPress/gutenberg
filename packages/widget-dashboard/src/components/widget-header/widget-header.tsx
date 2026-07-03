@@ -7,8 +7,11 @@ import type { ReactNode } from 'react';
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { info } from '@wordpress/icons';
-import { Card, Icon, Stack, Tooltip, VisuallyHidden } from '@wordpress/ui';
+// Dashboard is still experimental.
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Card, Icon, Popover, Stack, VisuallyHidden } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
 
 /**
@@ -87,22 +90,28 @@ export function WidgetHeader( {
 					</Card.Title>
 
 					{ widgetType.info && (
-						<Tooltip.Root>
-							<Tooltip.Trigger
-								render={
-									<span className={ styles.info }>
-										<Icon
-											icon={ info }
-											aria-hidden="true"
-										/>
-										<VisuallyHidden>
-											{ widgetType.info }
-										</VisuallyHidden>
-									</span>
-								}
-							/>
-							<Tooltip.Popup>{ widgetType.info }</Tooltip.Popup>
-						</Tooltip.Root>
+						<Popover.Root>
+							<Popover.Trigger
+								openOnHover
+								delay={ 200 }
+								closeDelay={ 200 }
+								aria-label={ __( 'More information' ) }
+								className={ styles.info }
+							>
+								<Icon icon={ info } size={ 20 } />
+							</Popover.Trigger>
+
+							<Popover.Popup>
+								<Popover.Arrow />
+								<VisuallyHidden render={ <Popover.Title /> }>
+									{ __( 'More information' ) }
+								</VisuallyHidden>
+
+								<Popover.Description>
+									{ widgetType.info }
+								</Popover.Description>
+							</Popover.Popup>
+						</Popover.Root>
 					) }
 				</Stack>
 			) }

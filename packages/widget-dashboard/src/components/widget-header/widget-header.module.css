@@ -24,10 +24,23 @@
 	min-width: 0;
 }
 
-.icon,
-.info {
+.icon {
 	display: inline-flex;
 	color: var(--wpds-color-foreground-content-neutral);
+}
+
+/**
+ * Infotip trigger: a bare icon button beside the title.
+ */
+.info {
+	display: inline-flex;
+	align-items: center;
+	padding: 0;
+	border: 0;
+	background: none;
+	border-radius: var(--wpds-border-radius-sm);
+	color: var(--wpds-color-foreground-content-neutral);
+	cursor: var(--wpds-cursor-control);
 }
 
 .toolbar {
