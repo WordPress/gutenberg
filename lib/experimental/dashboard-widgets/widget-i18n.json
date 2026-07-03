@@ -1,6 +1,9 @@
 {
 	"title": "widget title",
 	"description": "widget description",
-	"info": "widget info",
+	"help": {
+		"text": "widget help text",
+		"actions": [ { "label": "widget help action label" } ]
+	},
 	"keywords": [ "widget keyword" ]
 }

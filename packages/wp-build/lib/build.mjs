@@ -2016,7 +2016,7 @@ async function buildAllWidgets() {
  * Discover all widgets and collect their registry-facing data.
  * Widgets without a valid widget.json are skipped.
  *
- * @return {Array<{ name: string, dirName: string, title: string | null, description: string | null, info: string | null, hasRender: boolean, hasWidget: boolean, presentation: string | null, category: string | null, keywords: string[] | null, textdomain: string | null }>} Array of widget objects.
+ * @return {Array<{ name: string, dirName: string, title: string | null, description: string | null, help: import('./widget-utils.mjs').WidgetHelpMetadata | null, hasRender: boolean, hasWidget: boolean, presentation: string | null, category: string | null, keywords: string[] | null, textdomain: string | null }>} Array of widget objects.
  */
 function collectWidgets() {
 	return getAllWidgets( ROOT_DIR ).flatMap( ( widgetName ) => {
@@ -2037,7 +2037,7 @@ function collectWidgets() {
 				dirName: widgetName,
 				title: metadata.title ?? null,
 				description: metadata.description ?? null,
-				info: metadata.info ?? null,
+				help: metadata.help ?? null,
 				hasRender: widgetFiles.hasRender,
 				hasWidget: widgetFiles.hasWidget,
 				presentation: metadata.presentation ?? null,
@@ -2082,6 +2082,39 @@ function toPhpStringArrayLiteral( values ) {
 }
 
 /**
+ * Format a widget help note as a PHP array literal. Returns the PHP
+ * literal `null` when the note has no text; actions missing a `label`
+ * or `href` are dropped.
+ *
+ * @param {import('./widget-utils.mjs').WidgetHelpMetadata|null|undefined} help Source value.
+ * @return {string} PHP array literal, or `null`.
+ */
+function toPhpHelpLiteral( help ) {
+	if ( ! help || typeof help.text !== 'string' || help.text === '' ) {
+		return 'null';
+	}
+
+	const parts = [ `'text' => ${ toPhpStringLiteral( help.text ) }` ];
+
+	if ( Array.isArray( help.actions ) ) {
+		const actions = help.actions
+			.filter( ( action ) => action && action.label && action.href )
+			.map(
+				( action ) =>
+					`array( 'label' => ${ toPhpStringLiteral(
+						action.label
+					) }, 'href' => ${ toPhpStringLiteral( action.href ) } )`
+			);
+
+		if ( actions.length > 0 ) {
+			parts.push( `'actions' => array( ${ actions.join( ', ' ) } )` );
+		}
+	}
+
+	return `array( ${ parts.join( ', ' ) } )`;
+}
+
+/**
  * Generate global widget registry file.
  * Creates a single registry with all widgets including file availability.
  *
@@ -2105,7 +2138,7 @@ async function generateWidgetRegistry( widgets, replacements ) {
 			const categoryStr = toPhpStringLiteral( widget.category );
 			const titleStr = toPhpStringLiteral( widget.title );
 			const descriptionStr = toPhpStringLiteral( widget.description );
-			const infoStr = toPhpStringLiteral( widget.info );
+			const helpStr = toPhpHelpLiteral( widget.help );
 			const keywordsStr = toPhpStringArrayLiteral( widget.keywords );
 			const textdomainStr = toPhpStringLiteral( widget.textdomain );
 			return `\tarray(
@@ -2113,7 +2146,7 @@ async function generateWidgetRegistry( widgets, replacements ) {
 		'dir_name'     => '${ widget.dirName }',
 		'title'        => ${ titleStr },
 		'description'  => ${ descriptionStr },
-		'info'         => ${ infoStr },
+		'help'         => ${ helpStr },
 		'has_render'   => ${ hasRenderStr },
 		'has_widget'   => ${ hasWidgetStr },
 		'presentation' => ${ presentationStr },

@@ -12,12 +12,7 @@
 /**
  * External dependencies
  */
-import type {
-	ComponentProps,
-	ComponentType,
-	ReactElement,
-	ReactNode,
-} from 'react';
+import type { ComponentProps, ComponentType, ReactElement } from 'react';
 import type { Field } from '@wordpress/dataviews';
 
 /**
@@ -31,6 +26,39 @@ export type WidgetName = `${ string }/${ string }`;
  * `@wordpress/icons`.
  */
 export type WidgetIcon = ReactElement< ComponentProps< 'svg' > >;
+
+/**
+ * A call to action in a widget's help note. The widget declares label and
+ * destination; how the link renders is the host's call.
+ */
+export interface WidgetHelpAction {
+	/**
+	 * Action label. Translatable.
+	 */
+	label: string;
+
+	/**
+	 * Link destination.
+	 */
+	href: string;
+}
+
+/**
+ * Declarative contextual help for a widget type, meant for compact
+ * surfaces such as tooltips.
+ */
+export interface WidgetHelp {
+	/**
+	 * The note. Translatable. May carry `<em>`/`<strong>`; links belong
+	 * in `actions`.
+	 */
+	text: string;
+
+	/**
+	 * Calls to action rendered after the text.
+	 */
+	actions?: WidgetHelpAction[];
+}
 
 /**
  * How relevant an attribute is. Hosts may promote `'high'` to a prominent
@@ -83,12 +111,9 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	description?: string;
 
 	/**
-	 * Brief contextual note about the widget type, meant for compact
-	 * surfaces such as tooltips. Metadata modules may provide any
-	 * renderable node (e.g. text with a link); `widget.json` and the
-	 * wire record carry plain, translatable strings.
+	 * Contextual help note for compact surfaces.
 	 */
-	info?: ReactNode;
+	help?: WidgetHelp;
 
 	/**
 	 * Visual identifier for the widget type; hosts decide where, and
@@ -214,7 +239,12 @@ export type ResolveWidgetModule = (
 type WidgetModuleRecordOverrides = {
 	[ K in keyof Pick<
 		WidgetTypeMetadata,
-		'title' | 'description' | 'category' | 'presentation' | 'keywords'
+		| 'title'
+		| 'description'
+		| 'help'
+		| 'category'
+		| 'presentation'
+		| 'keywords'
 	> ]?: WidgetTypeMetadata[ K ] | null;
 };
 
@@ -238,10 +268,4 @@ export interface WidgetModuleRecord extends WidgetModuleRecordOverrides {
 	 * Script-module id dynamically imported for the widget's live metadata.
 	 */
 	widget_module?: string | null;
-
-	/**
-	 * Translated info note; overrides the metadata module's value. The
-	 * wire format carries plain strings only.
-	 */
-	info?: string | null;
 }

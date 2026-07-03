@@ -207,8 +207,8 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 				$data['description'] = $widget_type->description;
 			}
 
-			if ( rest_is_field_included( 'info', $fields ) ) {
-				$data['info'] = $widget_type->info;
+			if ( rest_is_field_included( 'help', $fields ) ) {
+				$data['help'] = $widget_type->help;
 			}
 
 			if ( rest_is_field_included( 'keywords', $fields ) ) {
@@ -287,9 +287,26 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 						'readonly'    => true,
 					),
 
-					'info'          => array(
-						'description' => __( 'Brief contextual note about the widget type, meant for compact surfaces such as tooltips. Translatable.', 'gutenberg' ),
-						'type'        => array( 'string', 'null' ),
+					'help'          => array(
+						'description' => __( 'Contextual help note for the widget type: text plus optional action links. Translatable.', 'gutenberg' ),
+						'type'        => array( 'object', 'null' ),
+						'properties'  => array(
+							'text'    => array(
+								'description' => __( 'Help text; may carry minimal inline emphasis.', 'gutenberg' ),
+								'type'        => 'string',
+							),
+							'actions' => array(
+								'description' => __( 'Action links rendered by the host after the text.', 'gutenberg' ),
+								'type'        => 'array',
+								'items'       => array(
+									'type'       => 'object',
+									'properties' => array(
+										'label' => array( 'type' => 'string' ),
+										'href'  => array( 'type' => 'string' ),
+									),
+								),
+							),
+						),
 						'context'     => array( 'view', 'edit', 'embed' ),
 						'readonly'    => true,
 					),

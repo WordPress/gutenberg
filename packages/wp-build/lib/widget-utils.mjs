@@ -24,11 +24,23 @@ export function getAllWidgets( rootDir ) {
 }
 
 /**
+ * @typedef {Object} WidgetHelpActionMetadata
+ * @property {string} label Action label.
+ * @property {string} href  Link destination.
+ */
+
+/**
+ * @typedef {Object} WidgetHelpMetadata
+ * @property {string}                     text      Help text; may carry `em`/`strong`.
+ * @property {WidgetHelpActionMetadata[]} [actions] Action links rendered after the text.
+ */
+
+/**
  * @typedef {Object} WidgetMetadata
  * @property {string}                                    name           Widget namespaced identifier.
  * @property {string}                                    [title]        Human-readable title.
  * @property {string}                                    [description]  Short description.
- * @property {string}                                    [info]         Brief contextual note for compact surfaces such as tooltips.
+ * @property {WidgetHelpMetadata}                        [help]         Contextual help note for compact surfaces.
  * @property {string}                                    [category]     Grouping category.
  * @property {'framed' | 'content-bleed' | 'full-bleed'} [presentation] Authoring intent about how the widget wants to render.
  * @property {string[]}                                  [keywords]     Search aliases used to match the widget.

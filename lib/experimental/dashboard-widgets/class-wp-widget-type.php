@@ -98,15 +98,14 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 		public $description = null;
 
 		/**
-		 * Brief contextual note about the widget type, meant for compact
-		 * surfaces such as tooltips. Translated at registration time using
-		 * the widget's text domain.
+		 * Contextual help note: `text` plus optional `actions` links.
+		 * Translated at registration time using the widget's text domain.
 		 *
 		 * Null when the widget did not declare the field.
 		 *
-		 * @var string|null
+		 * @var array|null
 		 */
-		public $info = null;
+		public $help = null;
 
 		/**
 		 * Alternative terms used to match the widget type when searching,
