@@ -134,9 +134,13 @@ function example_filter_page_view_config( $data ) {
         1
     );
 
-    // Unset a nested value with null: drop the grid layout option.
+    // Unset a nested value with null: drop the grid layout option. Form
+    // properties other than `fields` also merge here.
     $data->update_properties(
-        array( 'default_layouts' => array( 'grid' => null ) ),
+        array(
+            'default_layouts' => array( 'grid' => null ),
+            'form'            => array( 'layout' => array( 'type' => 'regular' ) ),
+        ),
         1
     );
 
