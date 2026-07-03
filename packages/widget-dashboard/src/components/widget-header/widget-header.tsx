@@ -92,9 +92,6 @@ export function WidgetHeader( {
 					{ widgetType.info && (
 						<Popover.Root>
 							<Popover.Trigger
-								openOnHover
-								delay={ 200 }
-								closeDelay={ 200 }
 								aria-label={ __( 'More information' ) }
 								className={ styles.info }
 							>
@@ -111,7 +108,12 @@ export function WidgetHeader( {
 										}
 									/>
 								}
-								positioner={ <Popover.Positioner side="top" /> }
+								positioner={
+									<Popover.Positioner
+										side="bottom"
+										align="start"
+									/>
+								}
 							>
 								<Popover.Arrow />
 								<VisuallyHidden render={ <Popover.Title /> }>
