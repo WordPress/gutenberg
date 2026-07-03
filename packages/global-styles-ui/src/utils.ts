@@ -5,7 +5,10 @@ import {
 	areGlobalStylesEqual,
 	privateApis as globalStylesEnginePrivateApis,
 } from '@wordpress/global-styles-engine';
-import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
+import type {
+	GlobalStylesConfig,
+	GlobalStylesSettings,
+} from '@wordpress/global-styles-engine';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -97,9 +100,7 @@ export function getValidPseudoStates( name: string ): StateDefinition[] {
  * @return Array of valid viewport state definitions.
  */
 export function getValidViewportStates(
-	viewportSettings?: NonNullable<
-		GlobalStylesConfig[ 'settings' ]
-	>[ 'viewport' ]
+	viewportSettings?: GlobalStylesSettings[ 'viewport' ]
 ): StateDefinition[] {
 	const breakpoints = getViewportBreakpoints( viewportSettings );
 
