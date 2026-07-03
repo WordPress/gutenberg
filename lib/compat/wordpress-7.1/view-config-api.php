@@ -146,7 +146,7 @@ function gutenberg_get_entity_view_config( $kind, $name ) {
 		'form'            => 'postType' === $kind ? _gutenberg_get_default_post_type_form() : array(),
 	);
 
-	$data = new Gutenberg_View_Config_Data( $config, $kind, $name );
+	$data = new Gutenberg_View_Config_Data( $config );
 
 	/**
 	 * Filters the view configuration for a given entity.
@@ -156,9 +156,9 @@ function gutenberg_get_entity_view_config( $kind, $name ) {
 	 *
 	 * Callbacks receive a Gutenberg_View_Config_Data object and contribute
 	 * through it: `set()` replaces a whole top-level key (the entity's base
-	 * definition), while `update_with()` and the `remove_*` helpers layer
-	 * versioned, identity-aware patches that survive future shape changes.
-	 * Callbacks must return the object they were given.
+	 * definition), while the `update_*` functions layer versioned, identity-aware
+	 * patches that survive future shape changes. Callbacks must return the
+	 * object they were given.
 	 *
 	 * @param Gutenberg_View_Config_Data $data   The view configuration container
 	 *                                           for the entity, exposing the
@@ -195,8 +195,8 @@ function gutenberg_get_entity_view_config( $kind, $name ) {
 		return $config;
 	}
 
-	// The verbs keep the container close to the documented shape (set() rejects
-	// unknown keys and update_with() discards them), but a documented key may
+	// The functions keep the container close to the documented shape (set() and
+	// update_properties() reject unknown keys), but a documented key may
 	// still be missing — dropped by a null reset patch, or omitted by a callback
 	// returning its own off-shape container. Normalize either way: drop
 	// undocumented keys and backfill any dropped documented keys from the
@@ -334,7 +334,7 @@ function _gutenberg_get_entity_view_config_post_type_page( $data ) {
 	// than replacing it, so its post-type-specific title is kept. The version
 	// is pinned to the literal this patch was authored against as an extra guard,
 	// so a future LATEST_VERSION bump migrates it instead of silently skipping it.
-	$data->update_with( array( 'view_list' => $view_list ), 1 );
+	$data->update_view_list_items( array_column( $view_list, null, 'slug' ), 1 );
 
 	return $data;
 }

@@ -9,70 +9,19 @@
 class Tests_View_Config_Data extends WP_UnitTestCase {
 
 	/**
-	 * Builds a representative view configuration container.
-	 *
-	 * The form intentionally includes a group with nested `children` so identity
-	 * resolution can be exercised across nesting levels.
-	 *
-	 * @return Gutenberg_View_Config_Data A fresh container.
-	 */
-	private function make_data() {
-		$config = array(
-			'default_view'    => array(
-				'type'    => 'table',
-				'perPage' => 20,
-				'sort'    => array(
-					'field'     => 'title',
-					'direction' => 'asc',
-				),
-				'fields'  => array( 'author', 'status' ),
-			),
-			'default_layouts' => array(
-				'table' => array(),
-				'grid'  => array(),
-				'list'  => array(),
-			),
-			'view_list'       => array(
-				array(
-					'title' => 'All',
-					'slug'  => 'all',
-				),
-				array(
-					'title' => 'Published',
-					'slug'  => 'published',
-				),
-			),
-			'form'            => array(
-				'layout' => array( 'type' => 'panel' ),
-				'fields' => array(
-					array(
-						'id'    => 'excerpt',
-						'label' => 'Excerpt',
-					),
-					array(
-						'id'       => 'discussion',
-						'label'    => 'Discussion',
-						'children' => array(
-							'comment_status',
-							'ping_status',
-						),
-					),
-					'date',
-					'slug',
-				),
-			),
-		);
-
-		return new Gutenberg_View_Config_Data( $config );
-	}
-
-	/**
 	 * set() replaces a whole documented key.
 	 *
 	 * @covers ::set
 	 */
 	public function test_set_replaces_key() {
-		$data = $this->make_data();
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'default_view' => array(
+					'type'    => 'table',
+					'perPage' => 20,
+				),
+			)
+		);
 		$data->set( 'default_view', array( 'type' => 'grid' ) );
 
 		$this->assertSame( array( 'type' => 'grid' ), $data->get_config()['default_view'] );
@@ -86,7 +35,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	public function test_set_unknown_key_triggers_doing_it_wrong() {
 		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::set' );
 
-		$data   = $this->make_data();
+		$data   = new Gutenberg_View_Config_Data( array( 'default_view' => array( 'type' => 'table' ) ) );
 		$before = $data->get_config();
 		$data->set( 'not_a_real_key', 'nope' );
 
@@ -94,25 +43,24 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 	/**
-	 * update_with() merges a documented key that is absent from the config.
+	 * update_properties() merges object-shaped keys recursively.
 	 *
-	 * @covers ::update_with
+	 * @covers ::update_properties
 	 */
-	public function test_update_with_merges_a_documented_key_absent_from_config() {
-		$data = new Gutenberg_View_Config_Data( array( 'default_view' => array() ) );
-		$data->update_with( array( 'form' => array( 'fields' => array( 'excerpt' ) ) ), 1 );
-
-		$this->assertSame( array( 'fields' => array( 'excerpt' ) ), $data->get_config()['form'] );
-	}
-
-	/**
-	 * update_with() merges object-shaped keys recursively.
-	 *
-	 * @covers ::update_with
-	 */
-	public function test_update_with_merges_default_view_recursively() {
-		$data = $this->make_data();
-		$data->update_with(
+	public function test_update_properties_merges_default_view_recursively() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'default_view' => array(
+					'type'    => 'table',
+					'perPage' => 20,
+					'sort'    => array(
+						'field'     => 'title',
+						'direction' => 'asc',
+					),
+				),
+			)
+		);
+		$data->update_properties(
 			array(
 				'default_view' => array(
 					'perPage' => 50,
@@ -122,27 +70,34 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 			1
 		);
 
-		$default_view = $data->get_config()['default_view'];
-		$this->assertSame( 50, $default_view['perPage'] );
 		$this->assertSame(
 			array(
-				'field'     => 'title',
-				'direction' => 'desc',
+				'type'    => 'table',
+				'perPage' => 50,
+				'sort'    => array(
+					'field'     => 'title',
+					'direction' => 'desc',
+				),
 			),
-			$default_view['sort']
+			$data->get_config()['default_view']
 		);
-		// Untouched values are preserved.
-		$this->assertSame( 'table', $default_view['type'] );
 	}
 
 	/**
-	 * update_with() merges default_layouts by map key and adds unknown ones.
+	 * update_properties() merges default_layouts by map key and adds unknown ones.
 	 *
-	 * @covers ::update_with
+	 * @covers ::update_properties
 	 */
-	public function test_update_with_merges_default_layouts_by_key() {
-		$data = $this->make_data();
-		$data->update_with(
+	public function test_update_properties_merges_default_layouts_by_key() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'default_layouts' => array(
+					'table' => array(),
+					'grid'  => array(),
+				),
+			)
+		);
+		$data->update_properties(
 			array(
 				'default_layouts' => array(
 					'table'    => array( 'density' => 'compact' ),
@@ -152,277 +107,98 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 			1
 		);
 
-		$default_layouts = $data->get_config()['default_layouts'];
-		$this->assertSame( array( 'density' => 'compact' ), $default_layouts['table'] );
-		$this->assertArrayHasKey( 'activity', $default_layouts );
-		// Existing keys are preserved.
-		$this->assertArrayHasKey( 'grid', $default_layouts );
-		$this->assertArrayHasKey( 'list', $default_layouts );
-	}
-
-	/**
-	 * update_with() merges a `view_list` entry by matching slug and appends an unknown one.
-	 *
-	 * @covers ::update_with
-	 */
-	public function test_update_with_merges_view_by_slug_and_appends_unknown() {
-		$data = $this->make_data();
-		$data->update_with(
-			array(
-				'view_list' => array(
-					array(
-						'slug'  => 'published',
-						'title' => 'Live',
-					),
-					array(
-						'slug'  => 'mine',
-						'title' => 'Mine',
-					),
-				),
-			),
-			1
-		);
-
-		$view_list = $data->get_config()['view_list'];
-		$this->assertCount( 3, $view_list );
-		// Matching slug merges in place.
 		$this->assertSame(
 			array(
-				'title' => 'Live',
-				'slug'  => 'published',
+				'table'    => array( 'density' => 'compact' ),
+				'grid'     => array(),
+				'activity' => array(),
 			),
-			$view_list[1]
-		);
-		// Unknown slug appends to the end.
-		$this->assertSame(
-			array(
-				'slug'  => 'mine',
-				'title' => 'Mine',
-			),
-			$view_list[2]
+			$data->get_config()['default_layouts']
 		);
 	}
 
 	/**
-	 * update_with() merges a form field by matching id.
+	 * update_properties() merges the form's plain properties and leaves its
+	 * fields untouched.
 	 *
-	 * @covers ::update_with
+	 * @covers ::update_properties
 	 */
-	public function test_update_with_merges_existing_field_by_id() {
-		$data = $this->make_data();
-		$data->update_with(
+	public function test_update_properties_merges_form_layout() {
+		$data = new Gutenberg_View_Config_Data(
 			array(
 				'form' => array(
-					'fields' => array(
-						array(
-							'id'    => 'excerpt',
-							'label' => 'Summary',
-						),
-					),
+					'layout' => array( 'type' => 'panel' ),
+					'fields' => array( 'date', 'slug' ),
 				),
-			),
-			1
+			)
 		);
-
-		$fields = $data->get_config()['form']['fields'];
-		// No new field is appended.
-		$this->assertCount( 4, $fields );
-		$this->assertSame(
-			array(
-				'id'    => 'excerpt',
-				'label' => 'Summary',
-			),
-			$fields[0]
-		);
-	}
-
-	/**
-	 * update_with() appends a form field with an unknown id to the end.
-	 *
-	 * @covers ::update_with
-	 */
-	public function test_update_with_appends_unknown_field() {
-		$data = $this->make_data();
-		$data->update_with(
-			array(
-				'form' => array(
-					'fields' => array(
-						array(
-							'id'    => 'my_field',
-							'label' => 'Mine',
-						),
-					),
-				),
-			),
-			1
-		);
-
-		$fields = $data->get_config()['form']['fields'];
-		$this->assertCount( 5, $fields );
-		$last = end( $fields );
-		$this->assertSame( 'my_field', $last['id'] );
-	}
-
-	/**
-	 * update_with() reaches a nested group child when the group is targeted.
-	 *
-	 * @covers ::update_with
-	 */
-	public function test_update_with_merges_nested_group_child_by_id() {
-		$data = $this->make_data();
-		$data->update_with(
-			array(
-				'form' => array(
-					'fields' => array(
-						array(
-							'id'       => 'discussion',
-							'children' => array(
-								array(
-									'id'    => 'ping_status',
-									'label' => 'Pings',
-								),
-							),
-						),
-					),
-				),
-			),
-			1
-		);
-
-		$fields = $data->get_config()['form']['fields'];
-		// The group merges in place rather than being appended.
-		$this->assertCount( 4, $fields );
-		// comment_status stays a bare string; the matched ping_status child is
-		// promoted from a bare string and merged with the incoming overrides.
-		$this->assertSame(
-			array(
-				'id'       => 'discussion',
-				'label'    => 'Discussion',
-				'children' => array(
-					'comment_status',
-					array(
-						'id'    => 'ping_status',
-						'label' => 'Pings',
-					),
-				),
-			),
-			$fields[1]
-		);
-	}
-
-	/**
-	 * update_with() appends at top level when the id only exists nested.
-	 *
-	 * Adding is append-only at the top level; only remove_fields() reaches
-	 * nested members by identity.
-	 *
-	 * @covers ::update_with
-	 */
-	public function test_update_with_appends_when_id_only_exists_nested() {
-		$data = $this->make_data();
-		$data->update_with(
-			array(
-				'form' => array(
-					'fields' => array(
-						array(
-							'id'    => 'ping_status',
-							'label' => 'Pings',
-						),
-					),
-				),
-			),
-			1
-		);
-
-		$fields = $data->get_config()['form']['fields'];
-		$this->assertCount( 5, $fields );
-		$last = end( $fields );
-		$this->assertSame( 'ping_status', $last['id'] );
-		// The nested ping_status is left untouched.
-		$this->assertSame( array( 'comment_status', 'ping_status' ), $fields[1]['children'] );
-	}
-
-	/**
-	 * update_with() discards keys outside the documented shape.
-	 *
-	 * @covers ::update_with
-	 */
-	public function test_update_with_discards_unknown_keys() {
-		$data = $this->make_data();
-		$data->update_with( array( 'not_a_real_key' => 'nope' ), 1 );
-
-		$this->assertArrayNotHasKey( 'not_a_real_key', $data->get_config() );
-	}
-
-	/**
-	 * update_with() rejects a patch whose version cannot be migrated — omitted, or
-	 * newer than the latest supported version.
-	 *
-	 * @covers ::update_with
-	 */
-	public function test_update_with_rejects_unmigratable_version() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::update_with' );
-
-		$data   = $this->make_data();
-		$before = $data->get_config();
-
-		// Omitted: no version declared.
-		$data->update_with( array( 'default_view' => array( 'type' => 'grid' ) ) );
-		$this->assertSame( $before, $data->get_config() );
-
-		// Newer than the latest supported version.
-		$data->update_with(
-			array( 'default_view' => array( 'type' => 'grid' ) ),
-			Gutenberg_View_Config_Data::LATEST_VERSION + 1
-		);
-		$this->assertSame( $before, $data->get_config() );
-	}
-
-	/**
-	 * update_with() unsets a default_view property when the patch value is null.
-	 *
-	 * @covers ::update_with
-	 */
-	public function test_update_with_null_unsets_default_view_prop() {
-		$data = $this->make_data();
-		$data->update_with(
-			array( 'default_view' => array( 'perPage' => null ) ),
-			1
-		);
-
-		$default_view = $data->get_config()['default_view'];
-		$this->assertArrayNotHasKey( 'perPage', $default_view );
-		// Sibling properties are preserved.
-		$this->assertSame( 'table', $default_view['type'] );
-		$this->assertSame( array( 'author', 'status' ), $default_view['fields'] );
-	}
-
-	/**
-	 * update_with() unsets a default_layouts entry when the patch value is null.
-	 *
-	 * @covers ::update_with
-	 */
-	public function test_update_with_null_unsets_default_layout() {
-		$data = $this->make_data();
-		$data->update_with(
-			array( 'default_layouts' => array( 'grid' => null ) ),
+		$data->update_properties(
+			array( 'form' => array( 'layout' => array( 'type' => 'card' ) ) ),
 			1
 		);
 
 		$this->assertSame(
-			array( 'table', 'list' ),
-			array_keys( $data->get_config()['default_layouts'] )
+			array(
+				'layout' => array( 'type' => 'card' ),
+				'fields' => array( 'date', 'slug' ),
+			),
+			$data->get_config()['form']
 		);
 	}
 
 	/**
-	 * update_with() unsets several default_layouts entries in one patch.
+	 * update_properties() merges a documented key that is absent from the config.
 	 *
-	 * @covers ::update_with
+	 * @covers ::update_properties
 	 */
-	public function test_update_with_null_unsets_multiple_default_layouts() {
-		$data = $this->make_data();
-		$data->update_with(
+	public function test_update_properties_merges_a_documented_key_absent_from_config() {
+		$data = new Gutenberg_View_Config_Data( array( 'default_view' => array() ) );
+		$data->update_properties(
+			array( 'default_layouts' => array( 'table' => array( 'density' => 'compact' ) ) ),
+			1
+		);
+
+		$this->assertSame(
+			array( 'table' => array( 'density' => 'compact' ) ),
+			$data->get_config()['default_layouts']
+		);
+	}
+
+	/**
+	 * update_properties() unsets a property when the patch value is null.
+	 *
+	 * @covers ::update_properties
+	 */
+	public function test_update_properties_null_unsets_property() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'default_view' => array(
+					'type'    => 'table',
+					'perPage' => 20,
+				),
+			)
+		);
+		$data->update_properties( array( 'default_view' => array( 'perPage' => null ) ), 1 );
+
+		$this->assertSame( array( 'type' => 'table' ), $data->get_config()['default_view'] );
+	}
+
+	/**
+	 * update_properties() unsets several default_layouts entries in one patch.
+	 *
+	 * @covers ::update_properties
+	 */
+	public function test_update_properties_null_unsets_multiple_default_layouts() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'default_layouts' => array(
+					'table' => array(),
+					'grid'  => array(),
+					'list'  => array(),
+				),
+			)
+		);
+		$data->update_properties(
 			array(
 				'default_layouts' => array(
 					'grid' => null,
@@ -432,18 +208,15 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 			1
 		);
 
-		$this->assertSame(
-			array( 'table' ),
-			array_keys( $data->get_config()['default_layouts'] )
-		);
+		$this->assertSame( array( 'table' => array() ), $data->get_config()['default_layouts'] );
 	}
 
 	/**
-	 * update_with() unsets a deeply nested layout property when the value is null.
+	 * update_properties() unsets a deeply nested layout property when the value is null.
 	 *
-	 * @covers ::update_with
+	 * @covers ::update_properties
 	 */
-	public function test_update_with_null_unsets_nested_layout_prop() {
+	public function test_update_properties_null_unsets_nested_layout_prop() {
 		$data = new Gutenberg_View_Config_Data(
 			array(
 				'default_layouts' => array(
@@ -456,54 +229,40 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				),
 			)
 		);
-		$data->update_with(
+		$data->update_properties(
 			array( 'default_layouts' => array( 'table' => array( 'layout' => array( 'styles' => null ) ) ) ),
 			1
 		);
 
-		$layout = $data->get_config()['default_layouts']['table']['layout'];
-		$this->assertArrayNotHasKey( 'styles', $layout );
-		// The sibling property is preserved.
-		$this->assertSame( 'compact', $layout['density'] );
+		$this->assertSame(
+			array( 'layout' => array( 'density' => 'compact' ) ),
+			$data->get_config()['default_layouts']['table']
+		);
 	}
 
 	/**
-	 * update_with() unsets a form field property when the patch value is null,
-	 * finding the field by identity first.
+	 * update_properties() drops a whole top-level key when the patch value is
+	 * null — any documented key, including the identity-keyed view_list —
+	 * rather than storing a literal null. gutenberg_get_entity_view_config()
+	 * backfills a dropped documented key from the defaults, so that reads as
+	 * a reset.
 	 *
-	 * @covers ::update_with
+	 * @covers ::update_properties
 	 */
-	public function test_update_with_null_unsets_field_property() {
-		$data = $this->make_data();
-		$data->update_with(
+	public function test_update_properties_null_drops_whole_top_level_key() {
+		$data = new Gutenberg_View_Config_Data(
 			array(
-				'form' => array(
-					'fields' => array(
-						array(
-							'id'    => 'excerpt',
-							'label' => null,
-						),
+				'default_view' => array( 'type' => 'table' ),
+				'view_list'    => array(
+					array(
+						'title' => 'All',
+						'slug'  => 'all',
 					),
 				),
-			),
-			1
+				'form'         => array( 'layout' => array( 'type' => 'panel' ) ),
+			)
 		);
-
-		$fields = $data->get_config()['form']['fields'];
-		// The field is merged in place, not appended.
-		$this->assertCount( 4, $fields );
-		$this->assertSame( array( 'id' => 'excerpt' ), $fields[0] );
-	}
-
-	/**
-	 * update_with() drops a whole top-level key when the patch value is null,
-	 * rather than storing a literal null.
-	 *
-	 * @covers ::update_with
-	 */
-	public function test_update_with_null_drops_whole_top_level_key() {
-		$data = $this->make_data();
-		$data->update_with(
+		$data->update_properties(
 			array(
 				'default_view' => null,
 				'view_list'    => null,
@@ -511,23 +270,21 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 			1
 		);
 
-		$config = $data->get_config();
-		$this->assertArrayNotHasKey( 'default_view', $config );
-		$this->assertArrayNotHasKey( 'view_list', $config );
-		// Untouched keys are preserved.
-		$this->assertArrayHasKey( 'form', $config );
+		$this->assertSame(
+			array( 'form' => array( 'layout' => array( 'type' => 'panel' ) ) ),
+			$data->get_config()
+		);
 	}
 
 	/**
-	 * update_with() consumes a null delete-marker merged into an empty base
-	 * instead of storing it as a literal value.
+	 * update_properties() consumes a null delete-marker merged into an empty
+	 * base instead of storing it as a literal value.
 	 *
-	 * @covers ::update_with
+	 * @covers ::update_properties
 	 */
-	public function test_update_with_null_into_empty_base_is_consumed() {
-		$data = $this->make_data();
-		// The `table` layout entry is an empty array in the base config.
-		$data->update_with(
+	public function test_update_properties_null_into_empty_base_is_consumed() {
+		$data = new Gutenberg_View_Config_Data( array( 'default_layouts' => array( 'table' => array() ) ) );
+		$data->update_properties(
 			array( 'default_layouts' => array( 'table' => array( 'layout' => null ) ) ),
 			1
 		);
@@ -536,15 +293,15 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 	/**
-	 * update_with() strips nulls from a subtree assigned to a key absent from
-	 * the base instead of storing them as literal values.
+	 * update_properties() strips nulls from a subtree assigned to a key absent
+	 * from the base instead of storing them as literal values.
 	 *
-	 * @covers ::update_with
+	 * @covers ::update_properties
 	 */
-	public function test_update_with_null_stripped_from_absent_key_subtree() {
-		$data = $this->make_data();
+	public function test_update_properties_null_stripped_from_absent_key_subtree() {
+		$data = new Gutenberg_View_Config_Data( array( 'default_view' => array( 'type' => 'table' ) ) );
 		// The base default_view has no `layout` key.
-		$data->update_with(
+		$data->update_properties(
 			array(
 				'default_view' => array(
 					'layout' => array(
@@ -560,197 +317,795 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 	/**
-	 * update_with() rejects a null patch value for the identity-keyed `fields`
-	 * and `children` lists: only remove_fields() may remove list content.
+	 * update_properties() rejects the identity-keyed branches: a non-null
+	 * view_list value and form fields belong to their dedicated functions. A
+	 * valid sibling form property still merges.
 	 *
-	 * @covers ::update_with
+	 * @covers ::update_properties
 	 */
-	public function test_update_with_null_cannot_delete_field_lists() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::update_with' );
+	public function test_update_properties_rejects_identity_keyed_branches() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::update_properties' );
 
-		$data   = $this->make_data();
-		$before = $data->get_config();
-
-		$data->update_with( array( 'form' => array( 'fields' => null ) ), 1 );
-		$this->assertSame( $before['form']['fields'], $data->get_config()['form']['fields'] );
-
-		$data->update_with(
+		$data = new Gutenberg_View_Config_Data(
 			array(
 				'form' => array(
-					'fields' => array(
-						array(
-							'id'       => 'discussion',
-							'children' => null,
-						),
+					'layout' => array( 'type' => 'panel' ),
+					'fields' => array( 'date' ),
+				),
+			)
+		);
+
+		$data->update_properties(
+			array(
+				'view_list' => array(
+					array(
+						'slug'  => 'mine',
+						'title' => 'Mine',
 					),
+				),
+			),
+			1
+		);
+		$this->assertArrayNotHasKey( 'view_list', $data->get_config() );
+
+		$data->update_properties(
+			array(
+				'form' => array(
+					'layout' => array( 'type' => 'card' ),
+					'fields' => array( 'my_field' ),
 				),
 			),
 			1
 		);
 		$this->assertSame(
-			array( 'comment_status', 'ping_status' ),
-			$data->get_config()['form']['fields'][1]['children']
+			array(
+				'layout' => array( 'type' => 'card' ),
+				'fields' => array( 'date' ),
+			),
+			$data->get_config()['form']
 		);
 	}
 
 	/**
-	 * update_with() rejects a list member that declares no identity: it could
-	 * never be matched, merged, or removed afterwards.
+	 * update_properties() rejects an undocumented top-level key. Nested
+	 * properties are not validated: their vocabulary is owned by the
+	 * client-side consumers.
 	 *
-	 * @covers ::update_with
+	 * @covers ::update_properties
 	 */
-	public function test_update_with_rejects_member_without_identity() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::update_with' );
+	public function test_update_properties_warns_on_unknown_top_level_key() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::update_properties' );
 
-		$data   = $this->make_data();
+		$data = new Gutenberg_View_Config_Data( array( 'default_view' => array( 'type' => 'table' ) ) );
+		$data->update_properties( array( 'not_a_real_key' => 'nope' ), 1 );
+
+		$this->assertSame( array( 'default_view' => array( 'type' => 'table' ) ), $data->get_config() );
+	}
+
+	/**
+	 * update_properties() rejects a list where the form map is expected.
+	 *
+	 * @covers ::update_properties
+	 */
+	public function test_update_properties_rejects_list_shaped_form_patch() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::update_properties' );
+
+		$data   = new Gutenberg_View_Config_Data( array( 'form' => array( 'layout' => array( 'type' => 'panel' ) ) ) );
+		$before = $data->get_config();
+		$data->update_properties( array( 'form' => array( array( 'id' => 'my_field' ) ) ), 1 );
+
+		$this->assertSame( $before, $data->get_config() );
+	}
+
+	/**
+	 * Every update function rejects a patch whose version cannot be migrated —
+	 * omitted, or newer than the latest supported version.
+	 *
+	 * @covers ::update_properties
+	 * @covers ::update_view_list_items
+	 * @covers ::update_form_fields
+	 */
+	public function test_update_functions_reject_unmigratable_version() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::update_properties' );
+		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::update_view_list_items' );
+		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::update_form_fields' );
+
+		$data   = new Gutenberg_View_Config_Data( array( 'default_view' => array( 'type' => 'table' ) ) );
 		$before = $data->get_config();
 
-		$data->update_with(
-			array(
-				'view_list' => array(
-					array(
-						'slug'  => null,
-						'title' => 'Broken',
-					),
-				),
-			),
-			1
-		);
-		$data->update_with(
-			array(
-				'form' => array(
-					'fields' => array(
-						array( 'label' => 'No id' ),
-						null,
-					),
-				),
-			),
-			1
+		// Omitted: no version declared.
+		$data->update_properties( array( 'default_view' => array( 'type' => 'grid' ) ) );
+		$data->update_view_list_items( array( 'mine' => array( 'title' => 'Mine' ) ) );
+		$data->update_form_fields( array( 'excerpt' => array( 'label' => 'Summary' ) ) );
+
+		// Newer than the latest supported version.
+		$data->update_properties(
+			array( 'default_view' => array( 'type' => 'grid' ) ),
+			Gutenberg_View_Config_Data::LATEST_VERSION + 1
 		);
 
 		$this->assertSame( $before, $data->get_config() );
 	}
 
 	/**
-	 * update_with() rejects patches whose shape does not match the key: a
-	 * map where a list is expected, or a list where a map is expected.
+	 * update_view_list_items() merges a matching slug in place and appends an
+	 * unknown one, injecting the slug from the patch key.
 	 *
-	 * @covers ::update_with
+	 * @covers ::update_view_list_items
 	 */
-	public function test_update_with_rejects_shape_mismatched_patches() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::update_with' );
-
-		$data   = $this->make_data();
-		$before = $data->get_config();
-
-		// A map where the view_list list is expected.
-		$data->update_with(
+	public function test_update_view_list_items_merges_by_slug_and_appends_unknown() {
+		$data = new Gutenberg_View_Config_Data(
 			array(
 				'view_list' => array(
+					array(
+						'title' => 'All',
+						'slug'  => 'all',
+					),
+					array(
+						'title' => 'Published',
+						'slug'  => 'published',
+					),
+				),
+			)
+		);
+		$data->update_view_list_items(
+			array(
+				'published' => array( 'title' => 'Live' ),
+				'mine'      => array( 'title' => 'Mine' ),
+			),
+			1
+		);
+
+		$this->assertSame(
+			array(
+				array(
+					'title' => 'All',
+					'slug'  => 'all',
+				),
+				array(
+					'title' => 'Live',
+					'slug'  => 'published',
+				),
+				array(
+					'slug'  => 'mine',
+					'title' => 'Mine',
+				),
+			),
+			$data->get_config()['view_list']
+		);
+	}
+
+	/**
+	 * update_view_list_items() removes a view when the patch value is null.
+	 *
+	 * @covers ::update_view_list_items
+	 */
+	public function test_update_view_list_items_null_removes_view() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'view_list' => array(
+					array(
+						'title' => 'All',
+						'slug'  => 'all',
+					),
+					array(
+						'title' => 'Published',
+						'slug'  => 'published',
+					),
+				),
+			)
+		);
+		$data->update_view_list_items( array( 'published' => null ), 1 );
+
+		$this->assertSame(
+			array(
+				array(
+					'title' => 'All',
+					'slug'  => 'all',
+				),
+			),
+			$data->get_config()['view_list']
+		);
+	}
+
+	/**
+	 * The patch key is the identity: a conflicting `slug` property inside the
+	 * value is ignored.
+	 *
+	 * @covers ::update_view_list_items
+	 */
+	public function test_update_view_list_items_patch_key_wins_over_slug_property() {
+		$data = new Gutenberg_View_Config_Data( array( 'view_list' => array() ) );
+		$data->update_view_list_items(
+			array(
+				'mine' => array(
+					'slug'  => 'other',
+					'title' => 'Mine',
+				),
+			),
+			1
+		);
+
+		$this->assertSame(
+			array(
+				array(
+					'slug'  => 'mine',
+					'title' => 'Mine',
+				),
+			),
+			$data->get_config()['view_list']
+		);
+	}
+
+	/**
+	 * update_view_list_items() rejects patches that are not keyed by slug and
+	 * members that are not view objects.
+	 *
+	 * @covers ::update_view_list_items
+	 */
+	public function test_update_view_list_items_rejects_off_shape_patches() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::update_view_list_items' );
+
+		$data   = new Gutenberg_View_Config_Data(
+			array(
+				'view_list' => array(
+					array(
+						'title' => 'All',
+						'slug'  => 'all',
+					),
+				),
+			)
+		);
+		$before = $data->get_config();
+
+		// A positional list where a map keyed by slug is expected.
+		$data->update_view_list_items(
+			array(
+				array(
 					'slug'  => 'mine',
 					'title' => 'Mine',
 				),
 			),
 			1
 		);
-		// A list where the form map is expected.
-		$data->update_with( array( 'form' => array( array( 'id' => 'my_field' ) ) ), 1 );
-		// A map where the fields list is expected.
-		$data->update_with( array( 'form' => array( 'fields' => array( 'id' => 'my_field' ) ) ), 1 );
+		// A scalar where a view object (or null) is expected.
+		$data->update_view_list_items( array( 'all' => 'nope' ), 1 );
 
 		$this->assertSame( $before, $data->get_config() );
 	}
 
 	/**
-	 * remove_view_list_items() drops a view by slug.
+	 * update_form_fields() merges a top-level field by its id: in place, with
+	 * siblings untouched and nothing appended.
 	 *
-	 * @covers ::remove_view_list_items
+	 * @covers ::update_form_fields
 	 */
-	public function test_remove_view_list_items_by_slug() {
-		$data = $this->make_data();
-		$data->remove_view_list_items( 'published' );
+	public function test_update_form_fields_merges_top_level_field_by_id() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'form' => array(
+					'fields' => array(
+						array(
+							'id'    => 'excerpt',
+							'label' => 'Excerpt',
+						),
+						'date',
+					),
+				),
+			)
+		);
+		$data->update_form_fields( array( 'excerpt' => array( 'label' => 'Summary' ) ), 1 );
 
-		$slugs = wp_list_pluck( $data->get_config()['view_list'], 'slug' );
-		$this->assertSame( array( 'all' ), $slugs );
+		$this->assertSame(
+			array(
+				array(
+					'id'    => 'excerpt',
+					'label' => 'Summary',
+				),
+				'date',
+			),
+			$data->get_config()['form']['fields']
+		);
 	}
 
 	/**
-	 * remove_view_list_items() drops several views when given an array of slugs.
+	 * update_form_fields() finds a nested field by its bare id: the caller does
+	 * not need to know (or address) the group the field lives in.
 	 *
-	 * @covers ::remove_view_list_items
+	 * @covers ::update_form_fields
 	 */
-	public function test_remove_view_list_items_multiple_by_array() {
-		$data = $this->make_data();
-		$data->remove_view_list_items( array( 'all', 'published' ) );
+	public function test_update_form_fields_merges_nested_field_without_addressing_group() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'form' => array(
+					'fields' => array(
+						array(
+							'id'       => 'discussion',
+							'label'    => 'Discussion',
+							'children' => array( 'comment_status', 'ping_status' ),
+						),
+					),
+				),
+			)
+		);
+		$data->update_form_fields( array( 'ping_status' => array( 'label' => 'Pings' ) ), 1 );
 
-		$this->assertSame( array(), $data->get_config()['view_list'] );
+		// comment_status stays a bare string; the matched ping_status child is
+		// promoted from a bare string and merged with the incoming overrides.
+		$this->assertSame(
+			array(
+				array(
+					'id'       => 'discussion',
+					'label'    => 'Discussion',
+					'children' => array(
+						'comment_status',
+						array(
+							'id'    => 'ping_status',
+							'label' => 'Pings',
+						),
+					),
+				),
+			),
+			$data->get_config()['form']['fields']
+		);
 	}
 
 	/**
-	 * remove_view_list_items() removes the found slugs in an array and silently
-	 * ignores the rest.
+	 * Fields are visited in document order and a group matches before its own
+	 * children, so a group and a child sharing an id (as in core's default
+	 * `status` group) resolve to the group; the child is reached through a
+	 * `children` patch on the group.
 	 *
-	 * @covers ::remove_view_list_items
+	 * @covers ::update_form_fields
 	 */
-	public function test_remove_view_list_items_mixes_found_and_missing_silently() {
-		$data = $this->make_data();
-		$data->remove_view_list_items( array( 'published', 'does_not_exist' ) );
+	public function test_update_form_fields_matches_group_before_its_children() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'form' => array(
+					'fields' => array(
+						array(
+							'id'       => 'status',
+							'label'    => 'Status',
+							'children' => array( 'status', 'password' ),
+						),
+					),
+				),
+			)
+		);
+		$data->update_form_fields(
+			array(
+				'status' => array(
+					'label'    => 'Visibility',
+					'children' => array( 'status' => array( 'label' => 'State' ) ),
+				),
+			),
+			1
+		);
 
-		$slugs = wp_list_pluck( $data->get_config()['view_list'], 'slug' );
-		$this->assertSame( array( 'all' ), $slugs );
+		$this->assertSame(
+			array(
+				array(
+					'id'       => 'status',
+					'label'    => 'Visibility',
+					'children' => array(
+						array(
+							'id'    => 'status',
+							'label' => 'State',
+						),
+						'password',
+					),
+				),
+			),
+			$data->get_config()['form']['fields']
+		);
 	}
 
 	/**
-	 * remove_fields() drops a nested field by id, walking the current structure.
+	 * update_form_fields() appends an unknown id to the end of the top-level
+	 * list: as an object when the patch carries overrides, as a bare string
+	 * reference otherwise.
 	 *
-	 * @covers ::remove_fields
+	 * @covers ::update_form_fields
 	 */
-	public function test_remove_fields_nested_by_id() {
-		$data = $this->make_data();
-		$data->remove_fields( 'ping_status' );
+	public function test_update_form_fields_appends_unknown_field() {
+		$data = new Gutenberg_View_Config_Data( array( 'form' => array( 'fields' => array( 'date' ) ) ) );
+		$data->update_form_fields(
+			array(
+				'my_field'    => array( 'label' => 'Mine' ),
+				'other_field' => array(),
+			),
+			1
+		);
 
-		$fields     = $data->get_config()['form']['fields'];
-		$discussion = $fields[1];
-		$this->assertSame( 'discussion', $discussion['id'] );
-		// Only ping_status is dropped from the group's children.
-		$this->assertSame( array( 'comment_status' ), $discussion['children'] );
+		$this->assertSame(
+			array(
+				'date',
+				array(
+					'id'    => 'my_field',
+					'label' => 'Mine',
+				),
+				'other_field',
+			),
+			$data->get_config()['form']['fields']
+		);
 	}
 
 	/**
-	 * remove_fields() drops several form fields when given an array of ids.
+	 * A null patch value removes the field wherever it lives, including nested
+	 * inside a group's children.
 	 *
-	 * @covers ::remove_fields
+	 * @covers ::update_form_fields
 	 */
-	public function test_remove_fields_multiple_by_array() {
-		$data = $this->make_data();
-		$data->remove_fields( array( 'ping_status', 'comment_status' ) );
+	public function test_update_form_fields_null_removes_field_wherever_it_lives() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'form' => array(
+					'fields' => array(
+						array(
+							'id'    => 'excerpt',
+							'label' => 'Excerpt',
+						),
+						array(
+							'id'       => 'discussion',
+							'label'    => 'Discussion',
+							'children' => array( 'comment_status', 'ping_status' ),
+						),
+						'date',
+					),
+				),
+			)
+		);
+		$data->update_form_fields(
+			array(
+				'excerpt'     => null,
+				'ping_status' => null,
+			),
+			1
+		);
 
-		$fields = $data->get_config()['form']['fields'];
-		// Top-level fields are untouched.
-		$this->assertCount( 4, $fields );
-		$this->assertSame( 'excerpt', $fields[0]['id'] );
-		// Both nested children were dropped; the group itself remains.
-		$discussion = $fields[1];
-		$this->assertSame( 'discussion', $discussion['id'] );
-		$this->assertSame( array(), $discussion['children'] );
+		$this->assertSame(
+			array(
+				array(
+					'id'       => 'discussion',
+					'label'    => 'Discussion',
+					'children' => array( 'comment_status' ),
+				),
+				'date',
+			),
+			$data->get_config()['form']['fields']
+		);
 	}
 
 	/**
-	 * The remove helpers are a silent no-op when the identity is not found.
+	 * A `children` map merges into the group's children by id, appending
+	 * unknown ones.
+	 *
+	 * @covers ::update_form_fields
+	 */
+	public function test_update_form_fields_children_map_merges_by_id() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'form' => array(
+					'fields' => array(
+						array(
+							'id'       => 'discussion',
+							'label'    => 'Discussion',
+							'children' => array( 'comment_status', 'ping_status' ),
+						),
+					),
+				),
+			)
+		);
+		$data->update_form_fields(
+			array(
+				'discussion' => array(
+					'children' => array(
+						'comment_status' => array( 'label' => 'Comments' ),
+						'my_field'       => array(),
+					),
+				),
+			),
+			1
+		);
+
+		$this->assertSame(
+			array(
+				array(
+					'id'       => 'discussion',
+					'label'    => 'Discussion',
+					'children' => array(
+						array(
+							'id'    => 'comment_status',
+							'label' => 'Comments',
+						),
+						'ping_status',
+						'my_field',
+					),
+				),
+			),
+			$data->get_config()['form']['fields']
+		);
+	}
+
+	/**
+	 * A `children` list replaces the group's children wholesale while the group
+	 * keeps its position among the other top-level fields.
+	 *
+	 * @covers ::update_form_fields
+	 */
+	public function test_update_form_fields_children_list_replaces_wholesale() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'form' => array(
+					'fields' => array(
+						'excerpt',
+						array(
+							'id'       => 'discussion',
+							'label'    => 'Discussion',
+							'children' => array( 'comment_status', 'ping_status' ),
+						),
+						'date',
+					),
+				),
+			)
+		);
+		$data->update_form_fields(
+			array( 'discussion' => array( 'children' => array( 'ping_status', 'my_field' ) ) ),
+			1
+		);
+
+		$this->assertSame(
+			array(
+				'excerpt',
+				array(
+					'id'       => 'discussion',
+					'label'    => 'Discussion',
+					'children' => array( 'ping_status', 'my_field' ),
+				),
+				'date',
+			),
+			$data->get_config()['form']['fields']
+		);
+	}
+
+	/**
+	 * A null `children` value deletes the key, turning the group into a plain
+	 * field.
+	 *
+	 * @covers ::update_form_fields
+	 */
+	public function test_update_form_fields_children_null_drops_key() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'form' => array(
+					'fields' => array(
+						array(
+							'id'       => 'discussion',
+							'label'    => 'Discussion',
+							'children' => array( 'comment_status' ),
+						),
+					),
+				),
+			)
+		);
+		$data->update_form_fields( array( 'discussion' => array( 'children' => null ) ), 1 );
+
+		$this->assertSame(
+			array(
+				array(
+					'id'    => 'discussion',
+					'label' => 'Discussion',
+				),
+			),
+			$data->get_config()['form']['fields']
+		);
+	}
+
+	/**
+	 * The patch key is the identity: a conflicting `id` property inside the
+	 * value is ignored.
+	 *
+	 * @covers ::update_form_fields
+	 */
+	public function test_update_form_fields_patch_key_wins_over_id_property() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'form' => array(
+					'fields' => array(
+						array(
+							'id'    => 'excerpt',
+							'label' => 'Excerpt',
+						),
+					),
+				),
+			)
+		);
+		$data->update_form_fields(
+			array(
+				'excerpt' => array(
+					'id'    => 'other',
+					'label' => 'Summary',
+				),
+			),
+			1
+		);
+
+		$this->assertSame(
+			array(
+				array(
+					'id'    => 'excerpt',
+					'label' => 'Summary',
+				),
+			),
+			$data->get_config()['form']['fields']
+		);
+	}
+
+	/**
+	 * update_form_fields() rejects patches that are not keyed by id and members
+	 * that are not field objects.
+	 *
+	 * @covers ::update_form_fields
+	 */
+	public function test_update_form_fields_rejects_off_shape_patches() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::update_form_fields' );
+
+		$data   = new Gutenberg_View_Config_Data( array( 'form' => array( 'fields' => array( 'date' ) ) ) );
+		$before = $data->get_config();
+
+		// A positional list where a map keyed by id is expected.
+		$data->update_form_fields( array( array( 'id' => 'my_field' ) ), 1 );
+		// A scalar where a field object (or null) is expected.
+		$data->update_form_fields( array( 'date' => 'nope' ), 1 );
+
+		$this->assertSame( $before, $data->get_config() );
+	}
+
+	/**
+	 * Several null field patches drop several members in one patch: both nested
+	 * children are removed while the group itself remains.
+	 *
+	 * @covers ::update_form_fields
+	 */
+	public function test_update_form_fields_null_removes_multiple_nested_fields() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'form' => array(
+					'fields' => array(
+						'excerpt',
+						array(
+							'id'       => 'discussion',
+							'label'    => 'Discussion',
+							'children' => array( 'comment_status', 'ping_status' ),
+						),
+					),
+				),
+			)
+		);
+		$data->update_form_fields(
+			array(
+				'ping_status'    => null,
+				'comment_status' => null,
+			),
+			1
+		);
+
+		$this->assertSame(
+			array(
+				'excerpt',
+				array(
+					'id'       => 'discussion',
+					'label'    => 'Discussion',
+					'children' => array(),
+				),
+			),
+			$data->get_config()['form']['fields']
+		);
+	}
+
+	/**
+	 * Removing a group removes its children with it: they are not hoisted to
+	 * the top level.
+	 *
+	 * @covers ::update_form_fields
+	 */
+	public function test_update_form_fields_null_removes_group_with_its_children() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'form' => array(
+					'fields' => array(
+						array(
+							'id'       => 'discussion',
+							'label'    => 'Discussion',
+							'children' => array( 'comment_status', 'ping_status' ),
+						),
+						'date',
+					),
+				),
+			)
+		);
+		$data->update_form_fields( array( 'discussion' => null ), 1 );
+
+		$this->assertSame( array( 'date' ), $data->get_config()['form']['fields'] );
+	}
+
+	/**
+	 * Patch entries apply in order and a null removes every occurrence of the
+	 * id, so a field moves into a group by removing it first and appending it
+	 * to the group's children later in the same patch.
+	 *
+	 * @covers ::update_form_fields
+	 */
+	public function test_update_form_fields_moves_field_into_group_in_one_patch() {
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'form' => array(
+					'fields' => array(
+						'author',
+						array(
+							'id'       => 'discussion',
+							'label'    => 'Discussion',
+							'children' => array( 'comment_status' ),
+						),
+					),
+				),
+			)
+		);
+		$data->update_form_fields(
+			array(
+				'author'     => null,
+				'discussion' => array( 'children' => array( 'author' => array() ) ),
+			),
+			1
+		);
+
+		$this->assertSame(
+			array(
+				array(
+					'id'       => 'discussion',
+					'label'    => 'Discussion',
+					'children' => array( 'comment_status', 'author' ),
+				),
+			),
+			$data->get_config()['form']['fields']
+		);
+	}
+
+	/**
+	 * A null patch for an identity that is not found is a silent no-op.
 	 *
 	 * A member that is not present may have been removed by another filter or
 	 * simply not apply to this entity, so it is not treated as misuse.
 	 *
-	 * @covers ::remove_fields
-	 * @covers ::remove_view_list_items
+	 * @covers ::update_form_fields
+	 * @covers ::update_view_list_items
 	 */
-	public function test_remove_not_found_is_silent_no_op() {
-		$data   = $this->make_data();
-		$before = $data->get_config();
+	public function test_null_patch_for_unknown_identity_is_silent_no_op() {
+		$data = new Gutenberg_View_Config_Data( array( 'form' => array( 'fields' => array( 'date' ) ) ) );
+		$data->update_form_fields( array( 'does_not_exist' => null ), 1 );
 
-		$data->remove_fields( 'does_not_exist' );
-		$data->remove_view_list_items( 'does_not_exist' );
+		$this->assertSame( array( 'date' ), $data->get_config()['form']['fields'] );
 
-		$this->assertSame( $before, $data->get_config() );
+		$data = new Gutenberg_View_Config_Data(
+			array(
+				'view_list' => array(
+					array(
+						'title' => 'All',
+						'slug'  => 'all',
+					),
+				),
+			)
+		);
+		$data->update_view_list_items( array( 'does_not_exist' => null ), 1 );
+
+		$this->assertSame(
+			array(
+				array(
+					'title' => 'All',
+					'slug'  => 'all',
+				),
+			),
+			$data->get_config()['view_list']
+		);
 	}
 }

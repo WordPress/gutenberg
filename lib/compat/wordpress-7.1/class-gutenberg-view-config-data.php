@@ -16,20 +16,20 @@
  *   entity's authoritative definition (core's per-post-type callbacks). Because
  *   it replaces rather than merges, a third party using it stops inheriting
  *   core's future changes to that key (a "freeze"), so third parties should
- *   prefer the layering verbs below.
- * - Versioned layering (`update_with()` and the `remove_*` helpers): additive
- *   patches that survive future shape changes. Each `update_with()` contribution
- *   declares the schema version it was authored against and is migrated forward
- *   to the latest version before it merges: identity-keyed lists (`view_list` by
- *   `slug`, `form` fields by `id`) merge a matching member in place and append an
- *   unknown one to the end; the object-shaped keys (`default_view`,
- *   `default_layouts`) merge recursively; and a patch value of `null` deletes
- *   that key (e.g. a nested layout property or a field's `label`). Dropping a
- *   whole list member instead
- *   goes through `remove_view_list_items()` (by `slug`) and `remove_fields()`
- *   (by `id`, recursing into group `children`): they name identities and core
- *   walks its own current structure to drop them, which keeps inheritance intact
- *   and version-safe.
+ *   prefer the layering functions below.
+ * - Versioned layering: additive patches that survive future shape changes.
+ *   Each contribution declares the schema version it was authored against so it
+ *   can be migrated forward to the latest version before it merges, and each
+ *   function covers one part of the configuration. `update_properties()` merges the
+ *   object-shaped keys: `default_view`, `default_layouts`, and `form` minus its
+ *   `fields`. `update_view_list_items()` patches `view_list` entries by `slug`,
+ *   and `update_form_fields()` patches `form` fields by `id`, finding a field
+ *   wherever it lives — at the top level or nested in a group's `children`.
+ *   All the update functions follow the same rules: a map value merges key by key, a list
+ *   value replaces wholesale, and `null` deletes what it names — a property, a
+ *   whole member, or a whole top-level key, which
+ *   `gutenberg_get_entity_view_config()` backfills from the defaults so it
+ *   reads as a reset.
  *
  * @since 7.1.0
  */
@@ -85,8 +85,8 @@ class Gutenberg_View_Config_Data {
 	 * Replaces a whole top-level key with a new value.
 	 *
 	 * Intended for the entity's base definition (core's per-post-type callbacks).
-	 * Third parties should prefer update_with() and the remove_* helpers so they
-	 * keep inheriting core's future changes.
+	 * Third parties should prefer the update_* functions so they keep inheriting
+	 * core's future changes.
 	 *
 	 * @since 7.1.0
 	 *
@@ -113,22 +113,24 @@ class Gutenberg_View_Config_Data {
 	}
 
 	/**
-	 * Merges a versioned patch into the configuration.
+	 * Merges a versioned patch into the object-shaped configuration keys.
 	 *
-	 * The patch is migrated from the declared version up to the latest version
-	 * and then merged by identity: matching collection members merge in place and
-	 * unknown ones append to the end. A patch value of `null` deletes that key
-	 * rather than assigning `null`: a nested value (a `default_view` property, a
-	 * `default_layouts` entry or nested layout property, a field's `label`) is
-	 * unset, and a whole top-level key is dropped from the container —
-	 * `gutenberg_get_entity_view_config()` backfills a dropped documented key
-	 * from the defaults, so that reads as a reset. Null never removes list
-	 * content: a `null` inside a list member is kept as a literal value, and
-	 * nulling the `fields`/`children` lists themselves is rejected; use
-	 * `remove_view_list_items()` / `remove_fields()` to drop list members.
+	 * Covers `default_view`, `default_layouts`, and `form` except its `fields`.
+	 * A map value merges key by key, a list value replaces wholesale, and a
+	 * `null` value deletes the key it names: a nested value (a `default_view`
+	 * property, a `default_layouts` entry or nested layout property) is unset,
+	 * and a whole top-level key — any documented key, including `view_list` —
+	 * is dropped from the container. `gutenberg_get_entity_view_config()`
+	 * backfills a dropped documented key from the defaults, so that reads as a
+	 * reset.
 	 *
-	 * A patch whose version is missing or outside `[1, LATEST_VERSION]` is rejected
-	 * (it cannot be migrated) and does not merge.
+	 * The identity-keyed collections are managed by their own functions and are
+	 * rejected here: a non-null `view_list` value must go through
+	 * `update_view_list_items()`, and a `fields` key inside a `form` value must
+	 * go through `update_form_fields()`.
+	 *
+	 * A patch whose version is missing or outside `[1, LATEST_VERSION]` is
+	 * rejected (it cannot be migrated) and does not merge.
 	 *
 	 * @since 7.1.0
 	 *
@@ -136,27 +138,24 @@ class Gutenberg_View_Config_Data {
 	 * @param int|null $version The schema version the patch was authored against.
 	 * @return Gutenberg_View_Config_Data The instance, for chaining.
 	 */
-	public function update_with( array $patch, $version = null ) {
-		if ( ! $this->is_valid_version( $version ) ) {
-			if ( self::LATEST_VERSION > 1 ) {
-				$message = sprintf(
-					/* translators: %d: the latest supported version. */
-					esc_html__( 'A view configuration contribution must declare a version between 1 and %d.', 'gutenberg' ),
-					self::LATEST_VERSION
-				);
-			} else {
-				$message = esc_html__( 'A view configuration contribution must declare version 1.', 'gutenberg' );
-			}
-			_doing_it_wrong( __METHOD__, $message, '7.1.0' );
+	public function update_properties( array $patch, $version = null ) {
+		if ( ! $this->check_version( $version, __METHOD__ ) ) {
 			return $this;
 		}
 
-		$patch = $this->migrate( $patch );
+		$patch = $this->migrate( $patch, $version, 'properties' );
 
 		foreach ( $patch as $key => $value ) {
-			// Keys outside the documented shape are discarded, so the container
-			// only ever exposes the documented keys.
 			if ( ! in_array( $key, self::CONFIG_KEYS, true ) ) {
+				_doing_it_wrong(
+					__METHOD__,
+					sprintf(
+						/* translators: %s: the configuration key. */
+						esc_html__( '"%s" is not a documented view configuration key.', 'gutenberg' ),
+						esc_html( $key )
+					),
+					'7.1.0'
+				);
 				continue;
 			}
 			// A null patch value drops the whole key from the container rather
@@ -165,132 +164,263 @@ class Gutenberg_View_Config_Data {
 				unset( $this->config[ $key ] );
 				continue;
 			}
+			if ( 'view_list' === $key ) {
+				_doing_it_wrong(
+					__METHOD__,
+					esc_html__( 'The "view_list" entries are patched by identity. Use update_view_list_items() instead.', 'gutenberg' ),
+					'7.1.0'
+				);
+				continue;
+			}
+			if ( 'form' === $key ) {
+				$value = $this->extract_form_properties( $value );
+				// Nothing left to merge: the value was off-shape, or held only
+				// the rejected `fields` key.
+				if ( null === $value || array() === $value ) {
+					continue;
+				}
+			}
 			// A documented key that is not yet present merges onto an empty base.
 			$current              = array_key_exists( $key, $this->config ) ? $this->config[ $key ] : array();
-			$this->config[ $key ] = $this->merge_value( $key, $current, $value );
+			$this->config[ $key ] = $this->deep_merge( $current, $value );
 		}
 
 		return $this;
 	}
 
 	/**
-	 * Removes one or more `view_list` entries by `slug`.
+	 * Merges a versioned patch into the `view_list`, keyed by `slug`.
 	 *
-	 * Core walks its own current view list to drop the named entries, so the
-	 * caller only needs the stable slug.
+	 * Each patch key names the `slug` of the view it patches: a matching view
+	 * merges in place and keeps its position (a map value merges key by key, a
+	 * list value — e.g. the view's `filters` — replaces wholesale), an unknown
+	 * slug appends a new view to the end, and a `null` value removes the view.
+	 * The patch key is the identity: a `slug` property inside the value is
+	 * ignored. A `null` for a slug that is not found is a silent no-op: the
+	 * view may have been removed by another filter or simply not apply to this
+	 * entity, which is a legitimate outcome rather than misuse.
 	 *
-	 * An entry that is not found is left untouched without warning: it may have
-	 * been removed by another filter or simply not apply to this entity, which is
-	 * a legitimate outcome rather than misuse.
+	 * A patch whose version is missing or outside `[1, LATEST_VERSION]` is
+	 * rejected (it cannot be migrated) and does not merge.
 	 *
 	 * @since 7.1.0
 	 *
-	 * @param string|string[] $slugs A single slug to remove, or an array of slugs.
+	 * @param array    $items   The view patches, keyed by slug.
+	 * @param int|null $version The schema version the patch was authored against.
 	 * @return Gutenberg_View_Config_Data The instance, for chaining.
 	 */
-	public function remove_view_list_items( $slugs ) {
-		$slugs = (array) $slugs;
+	public function update_view_list_items( array $items, $version = null ) {
+		if ( ! $this->check_version( $version, __METHOD__ ) ) {
+			return $this;
+		}
 
-		if ( isset( $this->config['view_list'] ) && is_array( $this->config['view_list'] ) ) {
-			$this->config['view_list'] = array_values(
-				array_filter(
-					$this->config['view_list'],
-					static function ( $item ) use ( $slugs ) {
-						$slug = is_array( $item ) && isset( $item['slug'] ) ? $item['slug'] : null;
-						return ! in_array( $slug, $slugs, true );
-					}
-				)
+		$items = $this->migrate( $items, $version, 'view_list' );
+
+		if ( array() === $items ) {
+			return $this;
+		}
+		if ( array_is_list( $items ) ) {
+			_doing_it_wrong(
+				__METHOD__,
+				esc_html__( 'A view list patch must be keyed by view "slug".', 'gutenberg' ),
+				'7.1.0'
 			);
+			return $this;
 		}
+
+		$view_list = isset( $this->config['view_list'] ) && is_array( $this->config['view_list'] ) ? $this->config['view_list'] : array();
+
+		foreach ( $items as $slug => $value ) {
+			// PHP casts numeric-string array keys to integers; identities are strings.
+			$slug = (string) $slug;
+
+			if ( null === $value ) {
+				$view_list = array_values(
+					array_filter(
+						$view_list,
+						static function ( $item ) use ( $slug ) {
+							return ! is_array( $item ) || ! isset( $item['slug'] ) || $item['slug'] !== $slug;
+						}
+					)
+				);
+				continue;
+			}
+
+			if ( ! is_array( $value ) || ( array() !== $value && array_is_list( $value ) ) ) {
+				_doing_it_wrong(
+					__METHOD__,
+					esc_html__( 'Each view patch must be an object of view properties, or null to remove the view.', 'gutenberg' ),
+					'7.1.0'
+				);
+				continue;
+			}
+
+			// The patch key is the identity.
+			unset( $value['slug'] );
+
+			$index = null;
+			foreach ( $view_list as $i => $item ) {
+				if ( is_array( $item ) && isset( $item['slug'] ) && $item['slug'] === $slug ) {
+					$index = $i;
+					break;
+				}
+			}
+
+			if ( null === $index ) {
+				$view_list[] = array_merge( array( 'slug' => $slug ), $value );
+				continue;
+			}
+			// An empty patch value has nothing to merge (and deep_merge would
+			// treat an empty array as a list, replacing the whole view).
+			if ( array() !== $value ) {
+				$view_list[ $index ] = $this->deep_merge( $view_list[ $index ], $value );
+			}
+		}
+
+		$this->config['view_list'] = array_values( $view_list );
 
 		return $this;
 	}
 
 	/**
-	 * Removes one or more `form` fields by `id`, recursing into group children.
+	 * Merges a versioned patch into the `form` fields, keyed by field `id`.
 	 *
-	 * Core walks its own current form structure to find and drop the named
-	 * fields, including ones nested inside a group's `children`, so the caller
-	 * only needs the stable id.
+	 * Each patch key names the `id` of the field it patches, and the field is
+	 * found wherever it lives — at the top level or nested inside a group's
+	 * `children`. Fields are visited in document order and a group is checked
+	 * before its own children, so when an id appears at both levels the group
+	 * wins. A matching field merges in place, an unknown id appends a new field
+	 * to the end of the top-level list, and a `null` value removes the field.
+	 * The patch key is the identity: an `id` property inside the value is
+	 * ignored.
 	 *
-	 * A field that is not found is left untouched without warning: it may have
-	 * been removed by another filter or simply not apply to this entity, which is
-	 * a legitimate outcome rather than misuse.
+	 * Inside a field patch, `children` follows the same rules: a map merges
+	 * into the group's children by id (appending unknown ones), a list replaces
+	 * the children wholesale, and `null` deletes the key.
+	 *
+	 * A patch whose version is missing or outside `[1, LATEST_VERSION]` is
+	 * rejected (it cannot be migrated) and does not merge.
 	 *
 	 * @since 7.1.0
 	 *
-	 * @param string|string[] $ids A single field id to remove, or an array of ids.
+	 * @param array    $fields  The field patches, keyed by field id.
+	 * @param int|null $version The schema version the patch was authored against.
 	 * @return Gutenberg_View_Config_Data The instance, for chaining.
 	 */
-	public function remove_fields( $ids ) {
-		$ids = (array) $ids;
-
-		if ( isset( $this->config['form']['fields'] ) && is_array( $this->config['form']['fields'] ) ) {
-			$this->config['form']['fields'] = $this->reject_fields( $this->config['form']['fields'], $ids );
+	public function update_form_fields( array $fields, $version = null ) {
+		if ( ! $this->check_version( $version, __METHOD__ ) ) {
+			return $this;
 		}
+
+		$fields = $this->migrate( $fields, $version, 'form_fields' );
+
+		if ( array() === $fields ) {
+			return $this;
+		}
+		if ( array_is_list( $fields ) ) {
+			_doing_it_wrong(
+				__METHOD__,
+				esc_html__( 'A fields patch must be keyed by field "id".', 'gutenberg' ),
+				'7.1.0'
+			);
+			return $this;
+		}
+
+		if ( ! isset( $this->config['form'] ) || ! is_array( $this->config['form'] ) ) {
+			$this->config['form'] = array();
+		}
+		$current = isset( $this->config['form']['fields'] ) && is_array( $this->config['form']['fields'] ) ? $this->config['form']['fields'] : array();
+
+		$this->config['form']['fields'] = $this->merge_fields_by_identity( $current, $fields );
 
 		return $this;
 	}
 
 	/**
-	 * Migrates a patch up to the latest version.
+	 * Migrates a patch from its declared version up to the latest version.
 	 *
 	 * The latest version is the only version so far, so this is an identity
-	 * transform for now. Version-specific steps — and the source version they
-	 * migrate from — are added here as the schema evolves.
+	 * transform for now. Version-specific steps dispatch on the declared
+	 * version and the part of the configuration the patch targets as the
+	 * schema evolves.
 	 *
 	 * @since 7.1.0
 	 *
-	 * @param array $patch The patch to migrate.
+	 * @param array  $patch   The patch to migrate.
+	 * @param int    $version The schema version the patch was authored against.
+	 * @param string $scope   The part of the configuration the patch targets: 'properties', 'view_list', or 'form_fields'.
 	 * @return array The migrated patch.
 	 */
-	private function migrate( array $patch ) {
+	private function migrate( array $patch, $version, $scope ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		return $patch;
 	}
 
 	/**
-	 * Determines whether a declared version can be migrated to the latest version.
+	 * Validates a declared patch version, reporting misuse against the given
+	 * public method.
 	 *
 	 * @since 7.1.0
 	 *
-	 * @param mixed $version The declared version.
-	 * @return bool Whether the version is a supported integer.
+	 * @param mixed  $version The declared version.
+	 * @param string $method  The public method the patch was passed to.
+	 * @return bool Whether the version can be migrated to the latest version.
 	 */
-	private function is_valid_version( $version ) {
-		return is_int( $version )
-			&& $version >= 1
-			&& $version <= self::LATEST_VERSION;
+	private function check_version( $version, $method ) {
+		if ( is_int( $version ) && $version >= 1 && $version <= self::LATEST_VERSION ) {
+			return true;
+		}
+
+		if ( self::LATEST_VERSION > 1 ) {
+			$message = sprintf(
+				/* translators: %d: the latest supported version. */
+				esc_html__( 'A view configuration contribution must declare a version between 1 and %d.', 'gutenberg' ),
+				self::LATEST_VERSION
+			);
+		} else {
+			$message = esc_html__( 'A view configuration contribution must declare version 1.', 'gutenberg' );
+		}
+		_doing_it_wrong( esc_html( $method ), $message, '7.1.0' );
+
+		return false;
 	}
 
 	/**
-	 * Merges an incoming value for a top-level key into the current value.
-	 *
-	 * Dispatches the identity-keyed collections to their dedicated mergers and
-	 * falls back to a recursive value merge for object-shaped keys.
+	 * Validates a `form` patch value for update_properties() and strips the
+	 * `fields` key, which is managed by update_form_fields().
 	 *
 	 * @since 7.1.0
 	 *
-	 * @param string $key      The top-level key being merged.
-	 * @param mixed  $current  The current value.
-	 * @param mixed  $incoming The incoming value.
-	 * @return mixed The merged value.
+	 * @param mixed $value The incoming `form` patch value.
+	 * @return array|null The form properties to merge, or null when the value
+	 *                    is off-shape.
 	 */
-	private function merge_value( $key, $current, $incoming ) {
-		if ( 'view_list' === $key ) {
-			return $this->merge_view_list( $current, $incoming );
+	private function extract_form_properties( $value ) {
+		if ( ! is_array( $value ) || ( array() !== $value && array_is_list( $value ) ) ) {
+			_doing_it_wrong(
+				'Gutenberg_View_Config_Data::update_properties',
+				esc_html__( 'A "form" patch must be an object of form properties, not a list.', 'gutenberg' ),
+				'7.1.0'
+			);
+			return null;
 		}
-		if ( 'form' === $key ) {
-			return $this->merge_form( $current, $incoming );
+		if ( array_key_exists( 'fields', $value ) ) {
+			_doing_it_wrong(
+				'Gutenberg_View_Config_Data::update_properties',
+				esc_html__( 'The form "fields" are patched by identity. Use update_form_fields() instead.', 'gutenberg' ),
+				'7.1.0'
+			);
+			unset( $value['fields'] );
 		}
-		return $this->deep_merge( $current, $incoming );
+
+		return $value;
 	}
 
 	/**
 	 * Recursively merges two values.
 	 *
-	 * Associative arrays (maps) merge key by key; lists and scalars are replaced
-	 * wholesale by the incoming value, since lists without a defined identity
-	 * cannot be merged member by member.
+	 * Associative arrays (maps) merge key by key and a null patch value deletes
+	 * the key; lists and scalars are replaced wholesale by the incoming value,
+	 * since lists without a defined identity cannot be merged member by member.
 	 *
 	 * @since 7.1.0
 	 *
@@ -328,219 +458,151 @@ class Gutenberg_View_Config_Data {
 	}
 
 	/**
-	 * Merges an incoming view list into the current one, keyed by `slug`.
+	 * Merges a map of field patches into a field list by identity.
+	 *
+	 * Shared by the top-level `form` fields and a group's `children`: a `null`
+	 * value removes the matching field (recursing into children), a map value
+	 * merges into the matching field wherever it lives, and an unknown id
+	 * appends a new field to the end of this list. A `null` for an id that is
+	 * not found is a silent no-op: the field may have been removed by another
+	 * filter or simply not apply to this entity, which is a legitimate outcome
+	 * rather than misuse.
 	 *
 	 * @since 7.1.0
 	 *
-	 * @param mixed $current  The current view list.
-	 * @param mixed $incoming The incoming view list.
-	 * @return mixed The merged view list.
+	 * @param array $current The current list of fields.
+	 * @param array $patches The field patches, keyed by field id.
+	 * @return array The merged list of fields.
 	 */
-	private function merge_view_list( $current, $incoming ) {
-		if ( ! is_array( $incoming ) || ! array_is_list( $incoming ) ) {
-			_doing_it_wrong(
-				'Gutenberg_View_Config_Data::update_with',
-				esc_html__( 'A "view_list" patch must be a list of view objects.', 'gutenberg' ),
-				'7.1.0'
-			);
-			return $current;
-		}
-		if ( ! is_array( $current ) ) {
-			$current = array();
-		}
+	private function merge_fields_by_identity( array $current, array $patches ) {
+		foreach ( $patches as $id => $value ) {
+			// PHP casts numeric-string array keys to integers; identities are strings.
+			$id = (string) $id;
 
-		$result  = $current;
-		$by_slug = array();
-		foreach ( $result as $index => $item ) {
-			if ( is_array( $item ) && isset( $item['slug'] ) ) {
-				$by_slug[ $item['slug'] ] = $index;
+			if ( null === $value ) {
+				$current = $this->reject_fields( $current, array( $id ) );
+				continue;
 			}
-		}
-
-		foreach ( $incoming as $item ) {
-			// A member without a slug could never be matched, merged, or
-			// removed afterwards, so it is rejected rather than appended.
-			$slug = is_array( $item ) && isset( $item['slug'] ) ? $item['slug'] : null;
-			if ( null === $slug ) {
+			if ( ! is_array( $value ) || ( array() !== $value && array_is_list( $value ) ) ) {
 				_doing_it_wrong(
-					'Gutenberg_View_Config_Data::update_with',
-					esc_html__( 'Each view in a "view_list" patch must declare a "slug".', 'gutenberg' ),
+					'Gutenberg_View_Config_Data::update_form_fields',
+					esc_html__( 'Each field patch must be an object of field properties, or null to remove the field.', 'gutenberg' ),
 					'7.1.0'
 				);
 				continue;
 			}
-			if ( isset( $by_slug[ $slug ] ) ) {
-				$index            = $by_slug[ $slug ];
-				$result[ $index ] = $this->deep_merge( $result[ $index ], $item );
-			} else {
-				$result[]         = $item;
-				$by_slug[ $slug ] = array_key_last( $result );
+
+			// The patch key is the identity.
+			unset( $value['id'] );
+
+			$merged = $this->merge_field_in_tree( $current, $id, $value );
+			if ( null !== $merged ) {
+				$current = $merged;
+				continue;
+			}
+			// An unknown id appends: as a bare string reference when the patch
+			// carries no overrides, as an object otherwise.
+			$current[] = array() === $value ? $id : $this->merge_field_item( $id, $id, $value );
+		}
+
+		return $current;
+	}
+
+	/**
+	 * Merges a field patch into the field carrying the given identity, wherever
+	 * it lives in the tree.
+	 *
+	 * Fields are visited in document order and a group is checked before its
+	 * own children, so when an id appears at both levels the group wins.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param array  $fields The list of fields to search.
+	 * @param string $id     The identity of the field to patch.
+	 * @param array  $value  The field patch.
+	 * @return array|null The updated list, or null when the id was not found.
+	 */
+	private function merge_field_in_tree( array $fields, $id, array $value ) {
+		foreach ( $fields as $index => $field ) {
+			if ( $this->field_identity( $field ) === $id ) {
+				$fields[ $index ] = $this->merge_field_item( $field, $id, $value );
+				return $fields;
+			}
+			if ( is_array( $field ) && isset( $field['children'] ) && is_array( $field['children'] ) ) {
+				$children = $this->merge_field_in_tree( $field['children'], $id, $value );
+				if ( null !== $children ) {
+					$fields[ $index ]['children'] = $children;
+					return $fields;
+				}
 			}
 		}
 
-		return array_values( $result );
+		return null;
 	}
 
 	/**
-	 * Merges an incoming form into the current one.
+	 * Merges a field patch into an existing field.
 	 *
-	 * The `fields` list is merged by field identity; every other key (e.g.
-	 * `layout`) is merged recursively as a value.
-	 *
-	 * @since 7.1.0
-	 *
-	 * @param mixed $current  The current form.
-	 * @param mixed $incoming The incoming form.
-	 * @return mixed The merged form.
-	 */
-	private function merge_form( $current, $incoming ) {
-		if ( ! is_array( $incoming ) || ( array() !== $incoming && array_is_list( $incoming ) ) ) {
-			_doing_it_wrong(
-				'Gutenberg_View_Config_Data::update_with',
-				esc_html__( 'A "form" patch must be an object of form properties, not a list.', 'gutenberg' ),
-				'7.1.0'
-			);
-			return $current;
-		}
-		if ( ! is_array( $current ) ) {
-			$current = array();
-		}
-
-		return $this->merge_map( $current, $incoming, 'fields' );
-	}
-
-	/**
-	 * Merges an incoming map into the current one, routing one identity-keyed
-	 * field list key to the field-list merger.
-	 *
-	 * Shared by the `form` key (whose `fields` are an identity-keyed list) and
-	 * a single field (whose `children` are). Every other key merges recursively
-	 * as a value, and a null patch value deletes the key — except the identity
-	 * list itself, whose content only `remove_fields()` may remove.
+	 * A bare string reference is promoted to an object so the overrides apply.
+	 * The `children` key follows the same rules — a map merges into the
+	 * group's children by id, a list replaces them wholesale, and `null`
+	 * deletes the key — and every other key merges as a value: a map merges
+	 * key by key, a list or scalar replaces, and `null` deletes the key.
 	 *
 	 * @since 7.1.0
 	 *
-	 * @param array  $current  The current map.
-	 * @param array  $incoming The incoming map patch.
-	 * @param string $list_key The key holding the identity-keyed field list.
-	 * @return array The merged map.
+	 * @param array|string $existing The existing field.
+	 * @param string       $id       The field identity.
+	 * @param array        $value    The field patch.
+	 * @return array|string The merged field.
 	 */
-	private function merge_map( array $current, array $incoming, $list_key ) {
-		$result = $current;
-		foreach ( $incoming as $key => $value ) {
-			if ( $list_key === $key ) {
-				// The identity-keyed list cannot be deleted with null: that
-				// would drop list members without naming them, which is what
-				// remove_fields() is for.
-				if ( null === $value ) {
+	private function merge_field_item( $existing, $id, array $value ) {
+		if ( ! is_array( $existing ) ) {
+			// Nothing to apply: keep the bare string reference.
+			if ( array() === $value ) {
+				return $existing;
+			}
+			// Promote the reference so the incoming overrides apply.
+			$existing = array( 'id' => $id );
+		}
+
+		foreach ( $value as $key => $item ) {
+			if ( 'children' === $key ) {
+				if ( null === $item ) {
+					unset( $existing['children'] );
+					continue;
+				}
+				if ( ! is_array( $item ) ) {
 					_doing_it_wrong(
-						'Gutenberg_View_Config_Data::update_with',
-						sprintf(
-							/* translators: %s: the patch key holding the field list. */
-							esc_html__( 'The "%s" list cannot be deleted with a null patch value. Use remove_fields() to remove fields.', 'gutenberg' ),
-							esc_html( $list_key )
-						),
+						'Gutenberg_View_Config_Data::update_form_fields',
+						esc_html__( 'A "children" patch must be an object keyed by field id to merge, a list to replace the children wholesale, or null to delete the key.', 'gutenberg' ),
 						'7.1.0'
 					);
 					continue;
 				}
-				$current_list   = isset( $result[ $key ] ) && is_array( $result[ $key ] ) ? $result[ $key ] : array();
-				$result[ $key ] = $this->merge_field_list( $current_list, $value );
+				// A list replaces the children wholesale (an empty array counts
+				// as a list, clearing them)...
+				if ( array_is_list( $item ) ) {
+					$existing['children'] = $item;
+					continue;
+				}
+				// ...and a map merges into them by identity.
+				$children             = isset( $existing['children'] ) && is_array( $existing['children'] ) ? $existing['children'] : array();
+				$existing['children'] = $this->merge_fields_by_identity( $children, $item );
 				continue;
 			}
-			if ( null === $value ) {
+			if ( null === $item ) {
 				// A null patch value deletes the key.
-				unset( $result[ $key ] );
+				unset( $existing[ $key ] );
 				continue;
 			}
-			$result[ $key ] = $this->deep_merge(
-				array_key_exists( $key, $result ) ? $result[ $key ] : array(),
-				$value
+			$existing[ $key ] = $this->deep_merge(
+				array_key_exists( $key, $existing ) ? $existing[ $key ] : array(),
+				$item
 			);
 		}
 
-		return $result;
-	}
-
-	/**
-	 * Merges an incoming list of form fields into the current one, keyed by `id`.
-	 *
-	 * A field whose identity matches an existing one merges in place; an unknown
-	 * one appends to the end.
-	 *
-	 * @since 7.1.0
-	 *
-	 * @param array $current  The current list of fields.
-	 * @param mixed $incoming The incoming list of fields.
-	 * @return mixed The merged list of fields.
-	 */
-	private function merge_field_list( $current, $incoming ) {
-		if ( ! is_array( $incoming ) || ! array_is_list( $incoming ) ) {
-			_doing_it_wrong(
-				'Gutenberg_View_Config_Data::update_with',
-				esc_html__( 'A fields patch must be a list of fields.', 'gutenberg' ),
-				'7.1.0'
-			);
-			return $current;
-		}
-
-		$result = $current;
-		$by_id  = array();
-		foreach ( $result as $index => $field ) {
-			$identity = $this->field_identity( $field );
-			if ( null !== $identity ) {
-				$by_id[ $identity ] = $index;
-			}
-		}
-
-		foreach ( $incoming as $field ) {
-			// A field without an identity could never be matched, merged, or
-			// removed afterwards, so it is rejected rather than appended.
-			$identity = $this->field_identity( $field );
-			if ( null === $identity ) {
-				_doing_it_wrong(
-					'Gutenberg_View_Config_Data::update_with',
-					esc_html__( 'Each field in a patch must be a string reference or declare a string "id".', 'gutenberg' ),
-					'7.1.0'
-				);
-				continue;
-			}
-			if ( isset( $by_id[ $identity ] ) ) {
-				$index            = $by_id[ $identity ];
-				$result[ $index ] = $this->merge_field_item( $result[ $index ], $field );
-			} else {
-				$result[]           = $field;
-				$by_id[ $identity ] = array_key_last( $result );
-			}
-		}
-
-		return array_values( $result );
-	}
-
-	/**
-	 * Merges an incoming form field into an existing one.
-	 *
-	 * A field may be a bare string (a reference with no overrides) or an object.
-	 * The nested `children` list is merged by identity like any field list.
-	 *
-	 * @since 7.1.0
-	 *
-	 * @param mixed $existing The existing field.
-	 * @param mixed $incoming The incoming field.
-	 * @return mixed The merged field.
-	 */
-	private function merge_field_item( $existing, $incoming ) {
-		// A bare string reference carries no overrides, so the richer existing
-		// definition wins.
-		if ( ! is_array( $incoming ) ) {
-			return $existing;
-		}
-		// Promote a bare string reference so the incoming object's overrides apply.
-		if ( ! is_array( $existing ) ) {
-			$existing = array( 'id' => $existing );
-		}
-
-		return $this->merge_map( $existing, $incoming, 'children' );
+		return $existing;
 	}
 
 	/**

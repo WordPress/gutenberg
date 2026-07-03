@@ -146,13 +146,13 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A filter can override configuration values through update_with().
+	 * A filter can override configuration values through update_properties().
 	 */
-	public function test_filter_update_with_overrides_config() {
+	public function test_filter_update_properties_overrides_config() {
 		add_filter(
 			'get_entity_view_config_custom_kind_custom_name',
 			function ( $data ) {
-				return $data->update_with(
+				return $data->update_properties(
 					array( 'default_view' => array( 'type' => 'grid' ) ),
 					1
 				);
@@ -184,7 +184,7 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 
 	/**
 	 * Successive filters share the same container, so their patches compose and
-	 * a later remove_fields() reaches a member contributed by an earlier filter.
+	 * a later null field patch reaches a member contributed by an earlier filter.
 	 */
 	public function test_filters_compose_across_the_chain() {
 		add_filter(
@@ -207,7 +207,7 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 		add_filter(
 			'get_entity_view_config_custom_kind_custom_name',
 			function ( $data ) {
-				return $data->remove_fields( 'ping_status' );
+				return $data->update_form_fields( array( 'ping_status' => null ), 1 );
 			},
 			11
 		);
@@ -221,14 +221,18 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Keys introduced through the container that are not part of the documented
-	 * shape are discarded.
+	 * Top-level keys introduced through the container that are not part of the
+	 * documented shape are rejected and never reach the response. Nested
+	 * properties are not validated: their vocabulary is owned by the
+	 * client-side consumers.
 	 */
-	public function test_filter_unknown_keys_are_discarded() {
+	public function test_filter_unknown_top_level_keys_warn_and_are_discarded() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::update_properties' );
+
 		add_filter(
 			'get_entity_view_config_custom_kind_custom_name',
 			function ( $data ) {
-				return $data->update_with( array( 'not_a_real_key' => 'nope' ), 1 );
+				return $data->update_properties( array( 'not_a_real_key' => 'nope' ), 1 );
 			}
 		);
 
@@ -276,7 +280,7 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 		add_filter(
 			'get_entity_view_config_custom_kind_custom_name',
 			function ( $data ) {
-				return $data->update_with( array( 'default_view' => null ), 1 );
+				return $data->update_properties( array( 'default_view' => null ), 1 );
 			}
 		);
 

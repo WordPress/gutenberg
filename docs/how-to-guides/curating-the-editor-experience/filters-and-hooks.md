@@ -89,46 +89,56 @@ In the following example, a custom saved view is added to the `page` list, the e
 
 ```php
 function example_filter_page_view_config( $data ) {
-    // Merge a partial configuration: add a saved view to the list, and
-    // retitle the existing Drafts view — matched by slug, only the given
-    // keys change.
-    $data->update_with(
+    // Patch the view list by slug: add a saved view, retitle the existing
+    // Drafts view — only the given keys change — and remove the Trash view
+    // with null.
+    $data->update_view_list_items(
         array(
-            'view_list' => array(
-                array(
-                    'title' => __( 'My drafts', 'example' ),
-                    'slug'  => 'my-drafts',
-                    'view'  => array(
-                        'filters' => array(
-                            array(
-                                'field'    => 'status',
-                                'operator' => 'isAny',
-                                'value'    => 'draft',
-                                'isLocked' => true,
-                            ),
+            'my-drafts' => array(
+                'title' => __( 'My drafts', 'example' ),
+                'view'  => array(
+                    'filters' => array(
+                        array(
+                            'field'    => 'status',
+                            'operator' => 'isAny',
+                            'value'    => 'draft',
+                            'isLocked' => true,
                         ),
                     ),
                 ),
-                array(
-                    'slug'  => 'drafts',
-                    'title' => __( 'In progress', 'example' ),
-                ),
+            ),
+            'drafts'    => array(
+                'title' => __( 'In progress', 'example' ),
+            ),
+            'trash'     => null,
+        ),
+        1
+    );
+
+    // Patch form fields by id, wherever they live in the form: retitle the
+    // excerpt field, remove the slug and author fields with null, and append
+    // a field to the discussion group. In a `children` map an unknown id
+    // appends. The id lives in the patch key, so the value only carries
+    // overrides: array() appends a plain reference. A bare string cannot
+    // express an addition — array( 'my_field' ) is a positional list, and a
+    // `children` list replaces the group's children wholesale instead.
+    $data->update_form_fields(
+        array(
+            'excerpt'    => array( 'label' => __( 'Summary', 'example' ) ),
+            'slug'       => null,
+            'author'     => null,
+            'discussion' => array(
+                'children' => array( 'my_field' => array() ),
             ),
         ),
         1
     );
 
     // Unset a nested value with null: drop the grid layout option.
-    $data->update_with(
+    $data->update_properties(
         array( 'default_layouts' => array( 'grid' => null ) ),
         1
     );
-
-    // Remove a view from the list by its slug.
-    $data->remove_view_list_items( 'trash' );
-
-    // Remove some fields from the form by their identity.
-    $data->remove_fields( array( 'slug', 'author' ) );
 
     return $data;
 }
@@ -137,9 +147,11 @@ add_filter( 'get_entity_view_config_postType_page', 'example_filter_page_view_co
 
 The filter receives an object holding the entity's view configuration. Contribute through its methods and return it:
 
--   `update_with( $patch, $version )` merges a partial configuration. Collection members are matched by identity — views by `slug` and form fields by `id` — so a matching member is merged in place and an unknown one is appended to the end. A value of `null` deletes that key — the way to unset a nested value such as a `default_layouts` entry, a nested layout property, or a field's `label` — and passing `null` for a whole top-level key resets it to its default. Null never deletes list content: use the remove helpers below for that. A schema version is required so the contribution can be migrated forward if the configuration shape changes.
--   `remove_view_list_items( $slugs )` drops one or more `view_list` entries by `slug`.
--   `remove_fields( $ids )` drops one or more `form` fields by `id`, including fields nested inside a group. Both remove helpers accept a single identity or an array.
+-   `update_properties( $patch, $version )` merges the object-shaped configuration: `default_view`, `default_layouts`, and `form` properties other than its `fields`. A map value merges key by key, a list value replaces wholesale, and a value of `null` deletes the key it names — passing `null` for a whole top-level key resets it to its default.
+-   `update_view_list_items( $items, $version )` patches the `view_list`, keyed by `slug`: a matching view merges in place, an unknown slug appends a new view to the end, and `null` removes the view.
+-   `update_form_fields( $fields, $version )` patches the `form` fields, keyed by `id`. A field is found wherever it lives — at the top level or nested inside a group's `children` — so a patch only needs the id: a matching field merges in place, an unknown id appends a new field, and `null` removes the field. The id always lives in the patch key and the value only carries overrides, so a new field with no overrides is expressed as `'my_field' => array()`, never as a bare string: a string can only appear in a list, and a `children` list means "replace the group's children wholesale", while a `children` map merges by `id` (unknown ids append to the group). Patch entries apply in order and a `null` removes every occurrence of the id, so to move a field into a group, remove it first and append it to the group's `children` later in the same patch.
+
+All `update_*` functions require a schema version so the contribution can be migrated forward if the configuration shape changes.
 
 ## Client-side (Editor) filters
 
