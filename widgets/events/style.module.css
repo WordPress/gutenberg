@@ -14,16 +14,12 @@
 	padding-inline: var(--wpds-dimension-padding-2xl);
 }
 
-.footerLocation {
-	margin-inline-start: auto;
-}
-
-.locationSummary {
-	color: var(--wpds-color-foreground-content-neutral-weak);
-}
-
 .statusText {
 	padding-inline: var(--wpds-dimension-padding-2xl);
 	color: var(--wpds-color-foreground-content-neutral-weak);
 	margin: 0;
+}
+
+.noLocationSelected {
+	flex-grow: 1;
 }

@@ -391,7 +391,6 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 			<Flex gap={ 4 }>
 				<FlexItem isBlock>
 					<UnitControl
-						size="__unstable-large"
 						onChange={ ( newValue ) => {
 							onChange( {
 								...layout,
@@ -589,7 +588,6 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 
 	return (
 		<ToggleGroupControl
-			__next40pxDefaultSize
 			label={ __( 'Grid item position' ) }
 			value={ gridPlacement }
 			onChange={ onChangeType }
