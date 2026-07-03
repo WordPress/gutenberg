@@ -3,6 +3,12 @@
  */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { select, dispatch } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { invalidateAttachmentResolutions } from '../../utils/invalidate-attachment-resolutions';
 
 const DEFAULT_EMPTY_GALLERY = [];
 
@@ -481,6 +487,14 @@ class MediaUpload extends Component {
 		if ( onClose ) {
 			onClose();
 		}
+
+		// Uploads performed inside the legacy wp.media modal attach media to the
+		// current post but never reach @wordpress/core-data, so views listing
+		// attached media (e.g. the Gallery block's dynamic mode) would stay stale
+		// until the editor reloads. Invalidate the cached attachment queries on
+		// close so they refetch — mirroring the core-data-native media modal,
+		// which does the same on upload completion.
+		invalidateAttachmentResolutions( { select, dispatch } );
 
 		this.frame.detach();
 	}
