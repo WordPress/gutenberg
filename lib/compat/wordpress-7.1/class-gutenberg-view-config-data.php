@@ -129,16 +129,16 @@ class Gutenberg_View_Config_Data {
 	 * `update_view_list_items()`, and a `fields` key inside a `form` value must
 	 * go through `update_form_fields()`.
 	 *
-	 * A patch whose version is missing or outside `[1, LATEST_VERSION]` is
-	 * rejected (it cannot be migrated) and does not merge.
+	 * A patch whose version is outside `[1, LATEST_VERSION]` is rejected (it
+	 * cannot be migrated) and does not merge.
 	 *
 	 * @since 7.1.0
 	 *
-	 * @param array    $patch   The partial configuration to merge.
-	 * @param int|null $version The schema version the patch was authored against.
+	 * @param array $patch   The partial configuration to merge.
+	 * @param int   $version The schema version the patch was authored against.
 	 * @return Gutenberg_View_Config_Data The instance, for chaining.
 	 */
-	public function update_properties( array $patch, $version = null ) {
+	public function update_properties( array $patch, $version ) {
 		if ( ! $this->check_version( $version, __METHOD__ ) ) {
 			return $this;
 		}
@@ -200,16 +200,16 @@ class Gutenberg_View_Config_Data {
 	 * view may have been removed by another filter or simply not apply to this
 	 * entity, which is a legitimate outcome rather than misuse.
 	 *
-	 * A patch whose version is missing or outside `[1, LATEST_VERSION]` is
-	 * rejected (it cannot be migrated) and does not merge.
+	 * A patch whose version is outside `[1, LATEST_VERSION]` is rejected (it
+	 * cannot be migrated) and does not merge.
 	 *
 	 * @since 7.1.0
 	 *
-	 * @param array    $items   The view patches, keyed by slug.
-	 * @param int|null $version The schema version the patch was authored against.
+	 * @param array $items   The view patches, keyed by slug.
+	 * @param int   $version The schema version the patch was authored against.
 	 * @return Gutenberg_View_Config_Data The instance, for chaining.
 	 */
-	public function update_view_list_items( array $items, $version = null ) {
+	public function update_view_list_items( array $items, $version ) {
 		if ( ! $this->check_version( $version, __METHOD__ ) ) {
 			return $this;
 		}
@@ -298,16 +298,16 @@ class Gutenberg_View_Config_Data {
 	 * into the group's children by id (appending unknown ones), a list replaces
 	 * the children wholesale, and `null` deletes the key.
 	 *
-	 * A patch whose version is missing or outside `[1, LATEST_VERSION]` is
-	 * rejected (it cannot be migrated) and does not merge.
+	 * A patch whose version is outside `[1, LATEST_VERSION]` is rejected (it
+	 * cannot be migrated) and does not merge.
 	 *
 	 * @since 7.1.0
 	 *
-	 * @param array    $fields  The field patches, keyed by field id.
-	 * @param int|null $version The schema version the patch was authored against.
+	 * @param array $fields  The field patches, keyed by field id.
+	 * @param int   $version The schema version the patch was authored against.
 	 * @return Gutenberg_View_Config_Data The instance, for chaining.
 	 */
-	public function update_form_fields( array $fields, $version = null ) {
+	public function update_form_fields( array $fields, $version ) {
 		if ( ! $this->check_version( $version, __METHOD__ ) ) {
 			return $this;
 		}

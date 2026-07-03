@@ -399,7 +399,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 
 	/**
 	 * Every update function rejects a patch whose version cannot be migrated —
-	 * omitted, or newer than the latest supported version.
+	 * newer than the latest supported version.
 	 *
 	 * @covers ::update_properties
 	 * @covers ::update_view_list_items
@@ -413,16 +413,10 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		$data   = new Gutenberg_View_Config_Data( array( 'default_view' => array( 'type' => 'table' ) ) );
 		$before = $data->get_config();
 
-		// Omitted: no version declared.
-		$data->update_properties( array( 'default_view' => array( 'type' => 'grid' ) ) );
-		$data->update_view_list_items( array( 'mine' => array( 'title' => 'Mine' ) ) );
-		$data->update_form_fields( array( 'excerpt' => array( 'layout' => array( 'labelPosition' => 'side' ) ) ) );
-
-		// Newer than the latest supported version.
-		$data->update_properties(
-			array( 'default_view' => array( 'type' => 'grid' ) ),
-			Gutenberg_View_Config_Data::LATEST_VERSION + 1
-		);
+		$version = Gutenberg_View_Config_Data::LATEST_VERSION + 1;
+		$data->update_properties( array( 'default_view' => array( 'type' => 'grid' ) ), $version );
+		$data->update_view_list_items( array( 'mine' => array( 'title' => 'Mine' ) ), $version );
+		$data->update_form_fields( array( 'excerpt' => array( 'layout' => array( 'labelPosition' => 'side' ) ) ), $version );
 
 		$this->assertSame( $before, $data->get_config() );
 	}
