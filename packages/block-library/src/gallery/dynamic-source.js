@@ -53,9 +53,9 @@ export function getDynamicSource( source ) {
 }
 
 /**
- * Upper bound on the number of images a dynamic source resolves, so the editor
- * query and the server render stay bounded. Kept in sync with the
- * `posts_per_page` cap in `block_core_gallery_resolve_dynamic_source()`.
+ * Upper bound on the number of images a dynamic source resolves, until the
+ * gallery supports pagination. Kept in sync with the `posts_per_page` cap in
+ * `block_core_gallery_resolve_dynamic_source()`.
  */
 export const MAX_IMAGES = 100;
 

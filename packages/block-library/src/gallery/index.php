@@ -101,6 +101,12 @@ function block_core_gallery_resolve_dynamic_source( $source, $block ) {
 			}
 			$order = strtoupper( $args['order'] ?? 'desc' ) === 'ASC' ? 'ASC' : 'DESC';
 
+			// Bound the number of resolved images until the gallery supports
+			// pagination. Kept in sync with the editor query's `per_page` cap; a
+			// case-insensitive grep for `max_images` finds both this and
+			// `MAX_IMAGES` in `dynamic-source.js`.
+			$max_images = 100;
+
 			$query = new WP_Query(
 				array(
 					'post_parent'    => $post_id,
@@ -109,9 +115,7 @@ function block_core_gallery_resolve_dynamic_source( $source, $block ) {
 					'post_mime_type' => 'image',
 					'orderby'        => $orderby,
 					'order'          => $order,
-					// Bounded to match the editor query's `per_page` cap (see
-					// `MAX_IMAGES` in `dynamic-source.js`).
-					'posts_per_page' => 100,
+					'posts_per_page' => $max_images,
 					'fields'         => 'ids',
 					'no_found_rows'  => true,
 				)
