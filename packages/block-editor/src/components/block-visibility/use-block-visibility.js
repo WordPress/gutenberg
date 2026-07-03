@@ -2,12 +2,15 @@
  * WordPress dependencies
  */
 import { useMediaQuery } from '@wordpress/compose';
-import { getViewportBreakpoints } from '@wordpress/global-styles-engine';
+import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
 import { BLOCK_VISIBILITY_VIEWPORTS } from './constants';
+import { unlock } from '../../lock-unlock';
+
+const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
 /**
  * Returns information about the current block visibility state.

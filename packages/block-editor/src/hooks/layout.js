@@ -14,7 +14,7 @@ import {
 	hasBlockSupport,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import { getResponsiveMediaQueries } from '@wordpress/global-styles-engine';
+import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import { useSelect } from '@wordpress/data';
 import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
@@ -59,6 +59,7 @@ const CHILD_LAYOUT_KEYS = [
 	'rowSpan',
 ];
 const { kebabCase } = unlock( componentsPrivateApis );
+const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 
 function getDefaultLayout( layoutBlockSupport = {}, blockVariation ) {
 	const defaultBlockLayout = layoutBlockSupport?.default;

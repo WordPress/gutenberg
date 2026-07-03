@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { getViewportBreakpoints } from '@wordpress/global-styles-engine';
+import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -12,6 +12,9 @@ import StateControl from '../components/global-styles/state-control';
 import StateControlBadges from '../components/global-styles/state-control-badges';
 import { useToolsPanelDropdownMenuProps } from '../components/global-styles/utils';
 import { store as blockEditorStore } from '../store';
+import { unlock } from '../lock-unlock';
+
+const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
 export const PSEUDO_STATE_LABELS = {
 	':hover': __( 'Hover' ),

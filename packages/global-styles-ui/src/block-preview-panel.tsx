@@ -7,8 +7,7 @@ import { getBlockType, getBlockFromExample } from '@wordpress/blocks';
 import { __experimentalSpacer as Spacer } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import {
-	getViewportBreakpoints,
-	getViewportBreakpointValueInPixels,
+	privateApis as globalStylesEnginePrivateApis,
 	__unstableGeneratePreviewStateStyles as generatePreviewStateStyles,
 } from '@wordpress/global-styles-engine';
 
@@ -16,6 +15,11 @@ import {
  * Internal dependencies
  */
 import { getVariationClassName } from './utils';
+import { unlock } from './lock-unlock';
+
+const { getViewportBreakpoints, getViewportBreakpointValueInPixels } = unlock(
+	globalStylesEnginePrivateApis
+);
 
 interface BlockPreviewPanelProps {
 	name: string;

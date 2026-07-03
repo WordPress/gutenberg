@@ -5,8 +5,8 @@ import { useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
 import {
-	getResponsiveMediaQueries,
 	mergeGlobalStyles,
+	privateApis as globalStylesEnginePrivateApis,
 } from '@wordpress/global-styles-engine';
 import {
 	getBlockSupport,
@@ -56,6 +56,8 @@ import { useSettings } from '../components/use-settings';
 import { store as blockEditorStore } from '../store';
 import { globalStylesDataKey } from '../store/private-keys';
 import { unlock } from '../lock-unlock';
+
+const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 
 const BORDER_SIDES = [ 'Top', 'Right', 'Bottom', 'Left' ];
 

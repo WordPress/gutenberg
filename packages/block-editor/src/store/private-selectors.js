@@ -6,7 +6,7 @@ import {
 	hasBlockSupport,
 	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
-import { getViewportBreakpoints } from '@wordpress/global-styles-engine';
+import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -43,6 +43,7 @@ import {
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
+const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
 export { getBlockSettings } from './get-block-settings';
 

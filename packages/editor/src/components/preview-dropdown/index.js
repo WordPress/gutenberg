@@ -21,7 +21,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { ActionItem } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { getViewportBreakpoints } from '@wordpress/global-styles-engine';
+import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import { VisuallyHidden } from '@wordpress/ui';
 
 /**
@@ -31,6 +31,8 @@ import { store as editorStore } from '../../store';
 import PostPreviewButton from '../post-preview-button';
 import { VIEWPORT_STATE_BY_DEVICE_TYPE } from '../../utils/device-type';
 import { unlock } from '../../lock-unlock';
+
+const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
 export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	const {

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { getViewportBreakpoints } from '@wordpress/global-styles-engine';
+import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -11,6 +11,9 @@ import {
 	BLOCK_VISIBILITY_VIEWPORT_ENTRIES,
 	BLOCK_VISIBILITY_VIEWPORTS,
 } from './constants';
+import { unlock } from '../../lock-unlock';
+
+const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
 export function getBlockVisibilityViewportEntries( viewportSettings ) {
 	const breakpoints = getViewportBreakpoints( viewportSettings );

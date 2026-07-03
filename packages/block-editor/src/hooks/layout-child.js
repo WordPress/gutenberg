@@ -4,7 +4,7 @@
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
-import { getResponsiveMediaQueries } from '@wordpress/global-styles-engine';
+import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -26,6 +26,8 @@ import {
 	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleForState,
 } from './block-style-state';
+
+const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 
 // Used for generating the instance ID
 const LAYOUT_CHILD_BLOCK_PROPS_REFERENCE = {};

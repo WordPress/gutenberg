@@ -1,10 +1,16 @@
 /**
  * WordPress dependencies
  */
-import {
-	getViewportBreakpoints,
-	getViewportBreakpointValueInPixels,
-} from '@wordpress/global-styles-engine';
+import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
+
+const { getViewportBreakpoints, getViewportBreakpointValueInPixels } = unlock(
+	globalStylesEnginePrivateApis
+);
 
 const VIEWPORT_KEY_BY_DEVICE_TYPE = {
 	Tablet: 'tablet',
