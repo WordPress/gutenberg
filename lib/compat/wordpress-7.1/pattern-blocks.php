@@ -113,10 +113,11 @@ function gutenberg_wrap_ssr_islands_render_callback( $args ) {
 
 	$args['render_callback'] = static function ( $attributes, $content, $block ) use ( $original_render_callback, $slot_count, $pattern ) {
 		if ( '' === trim( (string) $content ) ) {
-			if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
-				// The editor's SSR preview renders the block bare. Pass the
-				// slots as `$content` so the editor has somewhere to portal the
-				// editable islands.
+			$rest_route = isset( $GLOBALS['wp']->query_vars['rest_route'] ) ? $GLOBALS['wp']->query_vars['rest_route'] : '';
+			if ( defined( 'REST_REQUEST' ) && REST_REQUEST && str_contains( $rest_route, '/block-renderer/' ) ) {
+				// Only the editor's block-renderer preview renders the block
+				// bare on purpose. Pass the slots as `$content` so the editor
+				// has somewhere to portal the editable islands.
 				$slots = '';
 				for ( $index = 0; $index < $slot_count; $index++ ) {
 					$slots .= sprintf(
@@ -126,8 +127,9 @@ function gutenberg_wrap_ssr_islands_render_callback( $args ) {
 				}
 				$content = $slots;
 			} else {
-				// An empty block on the front end falls back to the pattern,
-				// matching the default content the editor seeds.
+				// Everywhere else an empty block falls back to the pattern:
+				// the front end, and REST renders like a post's
+				// `content.rendered`, which must match the front end.
 				$content = do_blocks( $pattern );
 			}
 		}
