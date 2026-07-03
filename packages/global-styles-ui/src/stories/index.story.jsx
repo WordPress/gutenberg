@@ -272,6 +272,18 @@ const BASE_SETTINGS = {
 						shadow: '6px 6px 0px rgba(0, 0, 0, 1)',
 					},
 				],
+				theme: [
+					{
+						name: 'Soft',
+						slug: 'soft',
+						shadow: '4px 4px 8px rgba(0, 0, 0, 0.15)',
+					},
+					{
+						name: 'Hard',
+						slug: 'hard',
+						shadow: '8px 8px 0px rgba(0, 0, 0, 0.35)',
+					},
+				],
 			},
 		},
 		layout: {
@@ -350,6 +362,18 @@ const BASE_SETTINGS = {
 						name: 'Extra Large',
 						slug: 'x-large',
 						size: '42px',
+					},
+				],
+				theme: [
+					{
+						name: 'Body',
+						slug: 'body',
+						size: '18px',
+					},
+					{
+						name: 'Heading',
+						slug: 'heading',
+						size: '48px',
 					},
 				],
 			},
