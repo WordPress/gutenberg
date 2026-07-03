@@ -334,7 +334,7 @@ test.describe( 'PHP-only auto-register blocks', () => {
 	} );
 } );
 
-test.describe( 'PHP-only pattern blocks (SSR-islands)', () => {
+test.describe( 'Editable PHP-only blocks (SSR-islands)', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activatePlugin(
 			'gutenberg-test-server-side-rendered-block'
@@ -359,7 +359,7 @@ test.describe( 'PHP-only pattern blocks (SSR-islands)', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.insertBlock( { name: 'test/php-only-pattern-ssr' } );
+		await editor.insertBlock( { name: 'test/php-only-editable-block' } );
 
 		// The server-rendered PHP shell is shown in the canvas, with the
 		// pattern's editable blocks portalled in place inside it (WYSIWYG). In the
@@ -371,7 +371,7 @@ test.describe( 'PHP-only pattern blocks (SSR-islands)', () => {
 		await expect( shell ).toContainText( 'Body text' );
 
 		// Unlike a content-only section, the auto-generated controls stay
-		// visible — SSR-islands needs them to drive the re-fetch.
+		// visible; SSR-islands needs them to drive the re-fetch.
 		await editor.openDocumentSettingsSidebar();
 		await expect( page.getByLabel( 'Variant' ) ).toBeVisible();
 		const featured = page.getByLabel( 'Featured' );
@@ -389,7 +389,7 @@ test.describe( 'PHP-only pattern blocks (SSR-islands)', () => {
 		// which the render_callback wraps on the frontend.
 		const content = await editor.getEditedPostContent();
 		// Opening delimiter carries the toggled attributes, so match its prefix.
-		expect( content ).toContain( '<!-- wp:test/php-only-pattern-ssr' );
+		expect( content ).toContain( '<!-- wp:test/php-only-editable-block' );
 		expect( content ).toContain(
 			'<h2 class="wp-block-heading">Title</h2>'
 		);

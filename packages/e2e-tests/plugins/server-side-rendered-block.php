@@ -175,8 +175,8 @@ add_action(
 			)
 		);
 
-		// The three pattern blocks below share content/attributes/render_callback
-		// and differ only in how the editor locks and previews the structure.
+		// Content, attributes, and render callback for the editable PHP-only
+		// demo block below.
 		$pattern_markup = '<!-- wp:group {"layout":{"type":"constrained"}} --><div class="wp-block-group">'
 			. '<!-- wp:heading --><h2 class="wp-block-heading">Title</h2><!-- /wp:heading -->'
 			. '<!-- wp:paragraph --><p>Body text.</p><!-- /wp:paragraph -->'
@@ -216,9 +216,9 @@ add_action(
 		// slots, so the editor matches the frontend (WYSIWYG) while the islands stay
 		// editable in the canvas.
 		register_block_type(
-			'test/php-only-pattern-ssr',
+			'test/php-only-editable-block',
 			array(
-				'title'           => 'PHP-only pattern: SSR-islands (WYSIWYG, editable)',
+				'title'           => 'Editable PHP-only block (SSR-islands)',
 				'icon'            => 'layout',
 				'category'        => 'widgets',
 				'description'     => 'The PHP wrapper is rendered server-side in the editor with the editable pattern blocks portalled into it, so the editor matches the frontend while the content stays editable in the canvas.',
