@@ -4,7 +4,7 @@
 import { getBlockType } from '@wordpress/blocks';
 // @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { useContext, useEffect, useMemo, useState } from '@wordpress/element';
+import { useContext, useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
@@ -122,22 +122,19 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 		() => getValidViewportStates( viewportSettings ),
 		[ viewportSettings ]
 	);
-	useEffect( () => {
-		if (
-			selectedViewport !== 'default' &&
-			! validViewportStates.some(
-				( state ) => state.value === selectedViewport
-			)
-		) {
-			setSelectedViewport( 'default' );
-		}
-	}, [ selectedViewport, validViewportStates ] );
+	const effectiveSelectedViewport =
+		selectedViewport === 'default' ||
+		validViewportStates.some(
+			( state ) => state.value === selectedViewport
+		)
+			? selectedViewport
+			: 'default';
 	const validPseudoStates = useMemo(
 		() => getValidPseudoStates( name ),
 		[ name ]
 	);
 
-	const stateParam = [ selectedViewport, selectedPseudoState ]
+	const stateParam = [ effectiveSelectedViewport, selectedPseudoState ]
 		.filter( ( value ) => value !== 'default' )
 		.join( '.' );
 	const hasSelectedState = stateParam.length > 0;
@@ -211,7 +208,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasFiltersPanel = useHasFiltersPanel( settings );
 	const shouldShowFiltersPanel =
-		hasFiltersPanel && selectedViewport === 'default';
+		hasFiltersPanel && effectiveSelectedViewport === 'default';
 	const hasImageSettingsPanel = useHasImageSettingsPanel(
 		name,
 		userSettings,
@@ -361,7 +358,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 				}
 				viewportStates={ validViewportStates }
 				pseudoStates={ validPseudoStates }
-				selectedViewport={ selectedViewport }
+				selectedViewport={ effectiveSelectedViewport }
 				selectedPseudoState={ selectedPseudoState }
 				onChangeViewport={ setSelectedViewport }
 				onChangePseudoState={ setSelectedPseudoState }
@@ -369,7 +366,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 			<BlockPreviewPanel
 				name={ name }
 				variation={ variation }
-				selectedViewport={ selectedViewport }
+				selectedViewport={ effectiveSelectedViewport }
 				selectedState={ hasSelectedState ? stateParam : 'default' }
 				stateStyles={ hasSelectedState ? inheritedStyle : undefined }
 				viewportSettings={ viewportSettings }
