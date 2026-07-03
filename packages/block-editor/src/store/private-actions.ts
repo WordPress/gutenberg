@@ -4,8 +4,14 @@
 import deprecated from '@wordpress/deprecated';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
+import type { Block } from '@wordpress/blocks';
 
-const castArray = ( maybeArray ) =>
+/**
+ * Internal dependencies
+ */
+import type { EditorSettings, StyleOverride } from './types';
+
+const castArray = < T >( maybeArray: T | T[] ): T[] =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
 
 /**
@@ -33,10 +39,11 @@ const privateSettings = [
  * @return {Object} Action object
  */
 export function __experimentalUpdateSettings(
-	settings,
+	settings: Partial< EditorSettings >,
 	{ stripExperimentalSettings = false, reset = false } = {}
 ) {
-	let incomingSettings = settings;
+	let incomingSettings: Partial< EditorSettings > &
+		Record< string, unknown > = settings;
 
 	if ( Object.hasOwn( incomingSettings, '__unstableIsPreviewMode' ) ) {
 		deprecated(
@@ -49,7 +56,7 @@ export function __experimentalUpdateSettings(
 
 		incomingSettings = { ...incomingSettings };
 		incomingSettings.isPreviewMode =
-			incomingSettings.__unstableIsPreviewMode;
+			incomingSettings.__unstableIsPreviewMode as boolean;
 		delete incomingSettings.__unstableIsPreviewMode;
 	}
 
@@ -99,19 +106,23 @@ export function showBlockInterface() {
  * Compared to `removeBlocks`, this private interface exposes an additional
  * parameter; see `forceRemove`.
  *
- * @param {string|string[]} clientIds      Client IDs of blocks to remove.
- * @param {boolean}         selectPrevious True if the previous block
- *                                         or the immediate parent
- *                                         (if no previous block exists)
- *                                         should be selected
- *                                         when a block is removed.
- * @param {boolean}         forceRemove    Whether to force the operation,
- *                                         bypassing any checks for certain
- *                                         block types.
+ * @param clientIds      Client IDs of blocks to remove.
+ * @param selectPrevious True if the previous block
+ *                       or the immediate parent
+ *                       (if no previous block exists)
+ *                       should be selected
+ *                       when a block is removed.
+ * @param forceRemove    Whether to force the operation,
+ *                       bypassing any checks for certain
+ *                       block types.
  */
 export const privateRemoveBlocks =
-	( clientIds, selectPrevious = true, forceRemove = false ) =>
-	( { select, dispatch, registry } ) => {
+	(
+		clientIds: string[],
+		selectPrevious: boolean = true,
+		forceRemove: boolean = false
+	) =>
+	( { select, dispatch, registry }: any ) => {
 		if ( ! clientIds || ! clientIds.length ) {
 			return;
 		}
@@ -135,18 +146,24 @@ export const privateRemoveBlocks =
 		const rules = ! forceRemove && select.getBlockRemovalRules();
 
 		if ( rules ) {
-			function flattenBlocks( blocks ) {
+			function flattenBlocks( blocks: Block[] ): Block[] {
 				const result = [];
 				const stack = [ ...blocks ];
 				while ( stack.length ) {
-					const { innerBlocks, ...block } = stack.shift();
+					const block = stack.shift();
+					if ( ! block ) {
+						continue;
+					}
+					const { innerBlocks, ...rest } = block;
 					stack.push( ...innerBlocks );
-					result.push( block );
+					result.push( rest as Block );
 				}
 				return result;
 			}
 
-			const blockList = clientIds.map( select.getBlock );
+			const blockList = clientIds
+				.map( ( clientId: string ) => select.getBlock( clientId ) )
+				.filter( ( block: Block | null ): block is Block => !! block );
 			const flattenedBlocks = flattenBlocks( blockList );
 
 			// Find the first message and use it.
@@ -188,7 +205,7 @@ export const privateRemoveBlocks =
  */
 export const ensureDefaultBlock =
 	() =>
-	( { select, dispatch } ) => {
+	( { select, dispatch }: any ) => {
 		// To avoid a focus loss when removing the last block, assure there is
 		// always a default block if the last of the blocks have been removed.
 		const count = select.getBlockCount();
@@ -213,16 +230,20 @@ export const ensureDefaultBlock =
  *
  * Contrast with `setBlockRemovalRules`.
  *
- * @param {string|string[]} clientIds      Client IDs of blocks to remove.
- * @param {boolean}         selectPrevious True if the previous block or the
- *                                         immediate parent (if no previous
- *                                         block exists) should be selected
- *                                         when a block is removed.
- * @param {string}          message        Message to display in the prompt.
+ * @param clientIds      Client IDs of blocks to remove.
+ * @param selectPrevious True if the previous block or the
+ *                       immediate parent (if no previous
+ *                       block exists) should be selected
+ *                       when a block is removed.
+ * @param message        Message to display in the prompt.
  *
- * @return {Object} Action object.
+ * @return  Action object.
  */
-function displayBlockRemovalPrompt( clientIds, selectPrevious, message ) {
+function displayBlockRemovalPrompt(
+	clientIds: string | string[],
+	selectPrevious: boolean,
+	message: string
+) {
 	return {
 		type: 'DISPLAY_BLOCK_REMOVAL_PROMPT',
 		clientIds,
@@ -236,7 +257,7 @@ function displayBlockRemovalPrompt( clientIds, selectPrevious, message ) {
  * be cleared, either be cause the user has confirmed or canceled the request
  * for removal.
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
 export function clearBlockRemovalPrompt() {
 	return {
@@ -262,17 +283,19 @@ export function clearBlockRemovalPrompt() {
  *
  * Contrast with `displayBlockRemovalPrompt`.
  *
- * @param {Record<string,string>|false} rules Block removal rules.
- * @return {Object} Action object.
+ * @param rules Block removal rules.
+ * @return Action object.
  */
-export function setBlockRemovalRules( rules = false ) {
+export function setBlockRemovalRules(
+	rules: Record< string, string > | false = false
+) {
 	return {
 		type: 'SET_BLOCK_REMOVAL_RULES',
 		rules,
 	};
 }
 
-export function setStyleOverride( id, style ) {
+export function setStyleOverride( id: string, style: StyleOverride ) {
 	return {
 		type: 'SET_STYLE_OVERRIDE',
 		id,
@@ -280,7 +303,7 @@ export function setStyleOverride( id, style ) {
 	};
 }
 
-export function deleteStyleOverride( id ) {
+export function deleteStyleOverride( id: string ) {
 	return {
 		type: 'DELETE_STYLE_OVERRIDE',
 		id,
@@ -290,10 +313,8 @@ export function deleteStyleOverride( id ) {
 /**
  * Action that sets the element that had focus when focus leaves the editor canvas.
  *
- * @param {Object} lastFocus The last focused element.
- *
- *
- * @return {Object} Action object.
+ * @param lastFocus The last focused element.
+ * @return Action object.
  */
 export function setLastFocus( lastFocus = null ) {
 	return {
@@ -305,7 +326,7 @@ export function setLastFocus( lastFocus = null ) {
 /**
  * Returns an action object used in signalling that the user has begun to drag.
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
 export function startDragging() {
 	return {
@@ -316,7 +337,7 @@ export function startDragging() {
 /**
  * Returns an action object used in signalling that the user has stopped dragging.
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
 export function stopDragging() {
 	return {
@@ -325,11 +346,11 @@ export function stopDragging() {
 }
 
 /**
- * @param {string|null} clientId The block's clientId, or `null` to clear.
+ * @param clientId The block's clientId, or `null` to clear.
  *
- * @return  {Object} Action object.
+ * @return Action object.
  */
-export function expandBlock( clientId ) {
+export function expandBlock( clientId: string | null ) {
 	return {
 		type: 'SET_BLOCK_EXPANDED_IN_LIST_VIEW',
 		clientId,
@@ -337,13 +358,16 @@ export function expandBlock( clientId ) {
 }
 
 /**
- * @param {Object} value
- * @param {string} value.rootClientId The root client ID to insert at.
- * @param {number} value.index        The index to insert at.
+ * @param value
+ * @param value.rootClientId The root client ID to insert at.
+ * @param value.index        The index to insert at.
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
-export function setInsertionPoint( value ) {
+export function setInsertionPoint( value: {
+	rootClientId: string;
+	index: number;
+} ) {
 	return {
 		type: 'SET_INSERTION_POINT',
 		value,
@@ -353,9 +377,9 @@ export function setInsertionPoint( value ) {
 /**
  * Mark a contentOnly section as being edited.
  *
- * @param {string} clientId The client id of the block.
+ * @param clientId The client id of the block.
  */
-export function editContentOnlySection( clientId ) {
+export function editContentOnlySection( clientId: string ) {
 	return {
 		type: 'EDIT_CONTENT_ONLY_SECTION',
 		clientId,
@@ -374,12 +398,12 @@ export function stopEditingContentOnlySection() {
 /**
  * Sets the zoom level.
  *
- * @param {number} zoom the new zoom level
- * @return {Object} Action object.
+ * @param zoom the new zoom level
+ * @return Action object.
  */
 export const setZoomLevel =
-	( zoom = 100 ) =>
-	( { select, dispatch } ) => {
+	( zoom: number = 100 ) =>
+	( { select, dispatch }: any ) => {
 		// When switching to zoom-out mode, we need to select the parent section
 		if ( zoom !== 100 ) {
 			const firstSelectedClientId = select.getBlockSelectionStart();
@@ -400,7 +424,7 @@ export const setZoomLevel =
 						// the parent section that contains the selected block.
 						sectionClientId = select
 							.getBlockParents( firstSelectedClientId )
-							.find( ( parent ) =>
+							.find( ( parent: string ) =>
 								sectionClientIds.includes( parent )
 							);
 					}
@@ -428,7 +452,7 @@ export const setZoomLevel =
 
 /**
  * Resets the Zoom state.
- * @return {Object} Action object.
+ * @return Action object.
  */
 export function resetZoomLevel() {
 	return {
@@ -439,11 +463,14 @@ export function resetZoomLevel() {
 /**
  * Action that toggles the spotlighted block state.
  *
- * @param {string}  clientId          The block's clientId.
- * @param {boolean} hasBlockSpotlight The spotlight state.
- * @return {Object} Action object.
+ * @param clientId          The block's clientId.
+ * @param hasBlockSpotlight The spotlight state.
+ * @return  Action object.
  */
-export function toggleBlockSpotlight( clientId, hasBlockSpotlight ) {
+export function toggleBlockSpotlight(
+	clientId: string,
+	hasBlockSpotlight: boolean
+) {
 	return {
 		type: 'TOGGLE_BLOCK_SPOTLIGHT',
 		clientId,
@@ -454,7 +481,7 @@ export function toggleBlockSpotlight( clientId, hasBlockSpotlight ) {
 /**
  * Opens the list view content panel popover.
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
 export function openListViewContentPanel() {
 	return {
@@ -465,7 +492,7 @@ export function openListViewContentPanel() {
 /**
  * Closes the list view content panel popover.
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
 export function closeListViewContentPanel() {
 	return {
@@ -477,10 +504,10 @@ export function closeListViewContentPanel() {
  * Returns an action object used to open the viewport modal
  * for the given client IDs.
  *
- * @param {string[]} clientIds Client IDs of blocks to configure viewport settings for.
- * @return {Object} Action object.
+ * @param clientIds Client IDs of blocks to configure viewport settings for.
+ * @return Action object.
  */
-export function showViewportModal( clientIds ) {
+export function showViewportModal( clientIds: string[] ) {
 	return {
 		type: 'SHOW_VIEWPORT_MODAL',
 		clientIds,
@@ -490,7 +517,7 @@ export function showViewportModal( clientIds ) {
 /**
  * Returns an action object used to close the viewport modal.
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
 export function hideViewportModal() {
 	return {
@@ -502,13 +529,18 @@ export function hideViewportModal() {
  * Requests to open a specific inspector tab, optionally with additional options.
  * This action signals intent to switch to a particular tab in the block inspector.
  *
- * @param {string} tabName             The name of the tab to open (e.g., 'list-view', 'settings', 'styles').
- * @param {Object} [options]           Optional configuration.
- * @param {string} [options.openPanel] Client ID of a specific panel to open (for tabs that support panels).
+ * @param tabName             The name of the tab to open (e.g., 'list-view', 'settings', 'styles').
+ * @param [options]           Optional configuration.
+ * @param [options.openPanel] Client ID of a specific panel to open (for tabs that support panels).
  *
- * @return {Object} Action object.
+ * @return  Action object.
  */
-export function requestInspectorTab( tabName, options = {} ) {
+export function requestInspectorTab(
+	tabName: string,
+	options: {
+		openPanel?: string;
+	} = {}
+) {
 	return {
 		type: 'REQUEST_INSPECTOR_TAB',
 		tabName,
@@ -519,7 +551,7 @@ export function requestInspectorTab( tabName, options = {} ) {
 /**
  * Clears the requested inspector tab state after it has been handled.
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
 export function clearRequestedInspectorTab() {
 	return {
@@ -530,12 +562,12 @@ export function clearRequestedInspectorTab() {
 /**
  * Sets the selected style state for a block's style controls.
  *
- * @param {string} clientId The block client ID.
- * @param {Object} value    The selected state value.
+ * @param clientId The block client ID.
+ * @param value    The selected state value.
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
-export function setSelectedBlockStyleState( clientId, value ) {
+export function setSelectedBlockStyleState( clientId: string, value: Object ) {
 	return {
 		type: 'SET_SELECTED_BLOCK_STYLE_STATE',
 		clientId,
@@ -546,12 +578,15 @@ export function setSelectedBlockStyleState( clientId, value ) {
 /**
  * Sets whether the selected style state is shown on the canvas.
  *
- * @param {string}  clientId The block client ID.
- * @param {boolean} value    Whether to show the selected state on the canvas.
+ * @param clientId The block client ID.
+ * @param value    Whether to show the selected state on the canvas.
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
-export function setSelectedBlockStyleStateCanvasPreview( clientId, value ) {
+export function setSelectedBlockStyleStateCanvasPreview(
+	clientId: string,
+	value: boolean
+) {
 	return {
 		type: 'SET_SELECTED_BLOCK_STYLE_STATE_CANVAS_PREVIEW',
 		clientId,
@@ -564,11 +599,11 @@ export function setSelectedBlockStyleStateCanvasPreview( clientId, value ) {
  * than 'default', block style edits in the inspector apply to that viewport.
  * Driven by the editor's device preview while Responsive editing is enabled.
  *
- * @param {string} viewport The selected viewport state (e.g. 'default', 'tablet', 'mobile').
+ * @param viewport The selected viewport state (e.g. 'default', 'tablet', 'mobile').
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
-export function setStyleStateViewport( viewport ) {
+export function setStyleStateViewport( viewport: string ) {
 	return {
 		type: 'SET_STYLE_STATE_VIEWPORT',
 		viewport,
@@ -579,11 +614,11 @@ export function setStyleStateViewport( viewport ) {
  * Sets whether Responsive editing is enabled. When enabled, the device preview
  * also drives which viewport block style edits are applied to. Session-only.
  *
- * @param {boolean} enabled Whether Responsive editing is enabled.
+ * @param enabled Whether Responsive editing is enabled.
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
-export function setResponsiveEditing( enabled ) {
+export function setResponsiveEditing( enabled: boolean ) {
 	return {
 		type: 'SET_RESPONSIVE_EDITING',
 		enabled,
