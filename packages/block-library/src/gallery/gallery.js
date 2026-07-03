@@ -18,7 +18,6 @@ export default function Gallery( props ) {
 		attributes,
 		isSelected,
 		setAttributes,
-		mediaPlaceholder,
 		insertBlocksAfter,
 		blockProps,
 		__unstableLayoutClassNames: layoutClassNames,
@@ -44,11 +43,6 @@ export default function Gallery( props ) {
 			) }
 		>
 			{ blockProps.children }
-			{ isSelected && ! blockProps.children && (
-				<div className="blocks-gallery-media-placeholder-wrapper">
-					{ mediaPlaceholder }
-				</div>
-			) }
 			<Caption
 				attributes={ attributes }
 				setAttributes={ setAttributes }
