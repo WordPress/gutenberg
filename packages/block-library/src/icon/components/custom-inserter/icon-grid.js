@@ -12,11 +12,11 @@ import { getScrollContainer } from '@wordpress/dom';
  */
 import HtmlRenderer from '../../../utils/html-renderer';
 
-const INITIAL_RESULTS = 20;
+const BATCH_SIZE = 20;
 
 export default function IconGrid( { icons, onChange, value } ) {
 	const shownIcons = useAsyncList( icons, {
-		step: INITIAL_RESULTS,
+		step: BATCH_SIZE,
 	} );
 
 	// Scroll the selected icon into view, but wait until enough icons render
@@ -27,7 +27,7 @@ export default function IconGrid( { icons, onChange, value } ) {
 		icons?.findIndex( ( icon ) => icon.name === value ) ?? -1;
 	const isReadyToScroll =
 		selectedIndex >= 0 &&
-		( shownIcons.length >= selectedIndex + INITIAL_RESULTS ||
+		( shownIcons.length >= selectedIndex + BATCH_SIZE ||
 			shownIcons.length === icons.length );
 
 	useLayoutEffect( () => {
