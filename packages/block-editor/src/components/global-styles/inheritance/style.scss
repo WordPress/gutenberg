@@ -12,15 +12,19 @@
 		position: relative;
 	}
 
-	.components-base-control__label,
-	.block-editor-global-styles-background-panel__inspector-media-replace-title {
+	.components-base-control__label {
 		text-decoration-line: underline;
 		text-decoration-style: dotted;
 		text-decoration-thickness: 1px;
 		text-underline-offset: 0.2em;
 	}
 
-	.block-editor-panel-color-gradient-settings__color-name {
+	// The color name and the background image title both live inside
+	// flex/truncated containers where an offset `text-decoration` underline
+	// is clipped by `overflow: hidden`. A dotted bottom border renders on the
+	// border edge, so it stays visible and matches the color label treatment.
+	.block-editor-panel-color-gradient-settings__color-name,
+	.block-editor-global-styles-background-panel__inspector-media-replace-title {
 		border-bottom: 1px dotted currentColor;
 	}
 }
