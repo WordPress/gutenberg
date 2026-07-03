@@ -1082,6 +1082,122 @@ describe( 'saveEntityRecord', () => {
 		expect( result ).toBe( updatedRecord );
 	} );
 
+	it( 'does not pass unchanged raw-attribute fields to SyncManager#update after saving', async () => {
+		// The raw entity record holds raw strings while the save response
+		// nests them as `{ raw, rendered }`; the comparison must not treat
+		// that shape difference as a server mutation.
+		const persistedRecord = {
+			id: 10,
+			title: 'Initial title',
+			content: '<p>Initial content</p>',
+			excerpt: 'Initial excerpt',
+			slug: 'initial-slug',
+			modified: '2026-07-01T00:00:00',
+		};
+		const edits = {
+			id: 10,
+			slug: 'updated-slug',
+		};
+		const configs = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				syncConfig: {},
+			},
+		];
+		const syncManager = {
+			update: jest.fn(),
+		};
+		const select = {
+			getRawEntityRecord: () => persistedRecord,
+		};
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
+		const updatedRecord = {
+			id: 10,
+			title: { raw: 'Initial title', rendered: 'Initial title' },
+			content: {
+				raw: '<p>Initial content</p>',
+				rendered: '<p>Initial content</p>',
+			},
+			excerpt: { raw: 'Initial excerpt', rendered: 'Initial excerpt' },
+			slug: 'updated-slug',
+			modified: '2026-07-02T00:00:00',
+		};
+		apiFetch.mockImplementation( () => updatedRecord );
+		getSyncManager.mockReturnValue( syncManager );
+
+		const result = await saveEntityRecord(
+			'postType',
+			'post',
+			edits
+		)( { select, dispatch, resolveSelect } );
+
+		expect( syncManager.update ).toHaveBeenCalledWith(
+			'postType/post',
+			10,
+			{
+				modified: '2026-07-02T00:00:00',
+			},
+			'local-undo-ignored',
+			{ isSave: true }
+		);
+		expect( result ).toBe( updatedRecord );
+	} );
+
+	it( 'passes raw-attribute fields whose raw value the server mutated to SyncManager#update', async () => {
+		const persistedRecord = {
+			id: 10,
+			content: '<p>Initial content</p>',
+		};
+		const edits = {
+			id: 10,
+			content: '<p>Content with <script>bad</script> markup</p>',
+		};
+		const configs = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				syncConfig: {},
+			},
+		];
+		const syncManager = {
+			update: jest.fn(),
+		};
+		const select = {
+			getRawEntityRecord: () => persistedRecord,
+		};
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
+		// The server strips disallowed markup from the sent content.
+		const updatedRecord = {
+			id: 10,
+			content: {
+				raw: '<p>Content with bad markup</p>',
+				rendered: '<p>Content with bad markup</p>',
+			},
+		};
+		apiFetch.mockImplementation( () => updatedRecord );
+		getSyncManager.mockReturnValue( syncManager );
+
+		const result = await saveEntityRecord(
+			'postType',
+			'post',
+			edits
+		)( { select, dispatch, resolveSelect } );
+
+		expect( syncManager.update ).toHaveBeenCalledWith(
+			'postType/post',
+			10,
+			{
+				content: updatedRecord.content,
+			},
+			'local-undo-ignored',
+			{ isSave: true }
+		);
+		expect( result ).toBe( updatedRecord );
+	} );
+
 	it( 'passes the full save response to SyncManager#update when the persisted record is missing', async () => {
 		const edits = {
 			id: 10,

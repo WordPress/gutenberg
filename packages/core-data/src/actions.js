@@ -25,6 +25,7 @@ import {
 	getSyncManager,
 } from './sync';
 import logEntityDeprecation from './utils/log-entity-deprecation';
+import { getRawValue } from './utils/crdt';
 
 function addTitleToAutoDraft( record ) {
 	return record.status === 'auto-draft' ? { ...record, title: '' } : record;
@@ -33,11 +34,16 @@ function addTitleToAutoDraft( record ) {
 function getServerMutatedFields( updatedRecord, persistedRecord, edits ) {
 	return Object.fromEntries(
 		Object.entries( updatedRecord ).filter( ( [ key, value ] ) => {
-			if ( key in edits ) {
-				return ! fastDeepEqual( value, edits[ key ] );
-			}
+			const baseline =
+				key in edits ? edits[ key ] : persistedRecord[ key ];
 
-			return ! fastDeepEqual( value, persistedRecord[ key ] );
+			// The save response nests raw attributes as `{ raw, rendered }`
+			// while the baseline holds raw strings; compare raw values so the
+			// shape difference does not read as a server mutation.
+			return ! fastDeepEqual(
+				getRawValue( value ) ?? value,
+				getRawValue( baseline ) ?? baseline
+			);
 		} )
 	);
 }
