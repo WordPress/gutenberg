@@ -33,7 +33,7 @@ const DYNAMIC_SOURCES = {
 	[ ATTACHED_MEDIA ]: {
 		// Short label for the entry affordance / future source chooser. Mirrors
 		// the "Attached images" media inserter category name.
-		title: __( 'Attached images' ),
+		title: __( 'Use attached images' ),
 		// Help text shown beneath the Source controls.
 		description: __( 'Images attached to the post.' ),
 		// Empty-state copy for the canvas preview.
