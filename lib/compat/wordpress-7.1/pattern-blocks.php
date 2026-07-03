@@ -44,9 +44,11 @@ function gutenberg_enqueue_auto_register_pattern_blocks() {
 
 		// Structural lock for the editable blocks: 'all' prevents add/move/remove
 		// while keeping the content editable and the generated controls visible.
-		// Soften it with `'patternLock' => false`.
+		// Canvas blocks can soften it with `'patternLock' => false`. SSR-islands
+		// blocks are always locked: the editor portals one block per slot and the
+		// slot count is fixed by the pattern, so the structure cannot change.
 		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- camelCase matches sibling block-registration args like supports.autoRegister.
-		$lock = ( isset( $block_type->patternLock ) && false === $block_type->patternLock ) ? false : 'all';
+		$lock = ( 'canvas' === $editor_mode && isset( $block_type->patternLock ) && false === $block_type->patternLock ) ? false : 'all';
 
 		$pattern_blocks[ $block_name ] = array(
 			'markup'            => $block_type->pattern,
