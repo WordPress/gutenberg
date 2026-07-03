@@ -108,15 +108,6 @@ export function WidgetHeader( {
 							</Popover.Trigger>
 
 							<Popover.Popup
-								portal={
-									<Popover.Portal
-										style={
-											{
-												'--wp-ui-popover-z-index': 99999,
-											} as React.CSSProperties
-										}
-									/>
-								}
 								positioner={
 									<Popover.Positioner
 										side="bottom"

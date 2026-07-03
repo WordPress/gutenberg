@@ -39,7 +39,7 @@
 	border: 0;
 	background: none;
 	border-radius: var(--wpds-border-radius-sm);
-	color: var(--wpds-color-foreground-content-neutral);
+	color: var(--wpds-color-foreground-content-neutral-weak);
 	cursor: var(--wpds-cursor-control);
 }
 
