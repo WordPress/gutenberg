@@ -1,6 +1,6 @@
 import type { GlobalStylesConfig } from '../types';
 
-export const DEFAULT_VIEWPORT_BREAKPOINTS = {
+const DEFAULT_VIEWPORT_BREAKPOINTS = {
 	mobile: '480px',
 	tablet: '782px',
 };
