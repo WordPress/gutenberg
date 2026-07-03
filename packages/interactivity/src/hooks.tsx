@@ -280,42 +280,46 @@ export const getEvaluate: GetEvaluate =
 		const [ , hasNegationOperator, cleanPath ] =
 			path.match( /^(!)?\s*([a-zA-Z_$][\w.]*)$/ ) ?? [];
 		if ( cleanPath ) {
-
-			const value = resolve( cleanPath, namespace );
-			// Functions are returned without invoking them.
-			if ( typeof value === 'function' ) {
-				// When used with a negation operator, ignore the negation —
-				// using `!` on a function reference is an antipattern;
-				// use derived state instead.
-				if ( hasNegationOperator ) {
-					warn(
-						'Using a function with a negation operator is deprecated and will stop working in WordPress 7.1. Please use derived state instead.'
-					);
-				}
-				// Reset scope before return and wrap the function so it
-				// will still run within the correct scope.
-				resetScope();
-				const wrappedFunction: Function = (
-					...functionArgs: any[]
-				) => {
-					setScope( scope );
-					const functionResult = value( ...functionArgs );
+			const firstSegment = cleanPath.split( '.' )[ 0 ];
+			// Skip legacy path for built-in expression parameters (el, evt)
+			// that should be resolved by the full-expression path instead.
+			if ( firstSegment !== 'el' && firstSegment !== 'evt' ) {
+				const value = resolve( cleanPath, namespace );
+				// Functions are returned without invoking them.
+				if ( typeof value === 'function' ) {
+					// When used with a negation operator, ignore the negation —
+					// using `!` on a function reference is an antipattern;
+					// use derived state instead.
+					if ( hasNegationOperator ) {
+						warn(
+							'Using a function with a negation operator is deprecated and will stop working in WordPress 7.1. Please use derived state instead.'
+						);
+					}
+					// Reset scope before return and wrap the function so it
+					// will still run within the correct scope.
 					resetScope();
-					return functionResult;
-				};
-				// Preserve the sync property from the original function
-				if ( value.sync ) {
-					const syncAwareFunction =
-						wrappedFunction as SyncAwareFunction;
-					syncAwareFunction.sync = true;
+					const wrappedFunction: Function = (
+						...functionArgs: any[]
+					) => {
+						setScope( scope );
+						const functionResult = value( ...functionArgs );
+						resetScope();
+						return functionResult;
+					};
+					// Preserve the sync property from the original function
+					if ( value.sync ) {
+						const syncAwareFunction =
+							wrappedFunction as SyncAwareFunction;
+						syncAwareFunction.sync = true;
+					}
+					return wrappedFunction;
 				}
-				return wrappedFunction;
+				const result = value;
+				resetScope();
+				return hasNegationOperator && value !== PENDING_GETTER
+					? ! result
+					: result;
 			}
-			const result = value;
-			resetScope();
-			return hasNegationOperator && value !== PENDING_GETTER
-				? ! result
-				: result;
 		}
 
 		// Full-expression path:
