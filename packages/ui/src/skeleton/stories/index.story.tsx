@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Skeleton } from '../index';
 
 const meta: Meta< typeof Skeleton > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/Skeleton',
 	component: Skeleton,
 	parameters: {
