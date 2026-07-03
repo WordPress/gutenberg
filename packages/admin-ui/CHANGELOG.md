@@ -6,6 +6,8 @@
 
 -   `Page`: Add a `navigation` prop (`{ items, selected }`) for link-based navigation between sections, rendered in the page header.
 
+## 2.5.0 (2026-07-01)
+
 ## 2.4.0 (2026-06-24)
 
 ### Internal
