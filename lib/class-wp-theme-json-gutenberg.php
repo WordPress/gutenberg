@@ -241,7 +241,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.2.0 Added `outline-*`, and `min-height` properties.
 	 * @since 6.3.0 Added `writing-mode` property.
 	 * @since 6.6.0 Added `background-[image|position|repeat|size]` properties.
-	 * @since 7.0.0 Added `dimensions.width`, `dimensions.height`. and
+	 * @since 7.0.0 Added `dimensions.width`, `dimensions.height`, and
 	 *              `typography.textIndent` properties.
 	 *
 	 * @var array
@@ -390,8 +390,9 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.4.0 Added `layout.allowEditing`.
 	 * @since 6.4.0 Added `lightbox`.
 	 * @since 7.0.0 Added type markers to the schema for boolean values.
-	 * @since 7.0.0 Added `dimensions.width`, `dimensions.height`. and
+	 * @since 7.0.0 Added `dimensions.width`, `dimensions.height`, and
 	 *              `typography.textIndent` properties.
+	 * @since 7.1.0 Added `viewport` property.
 	 * @var array
 	 */
 	const VALID_SETTINGS = array(
@@ -527,7 +528,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.2.0 Added `outline`, and `minHeight` properties.
 	 * @since 6.6.0 Added `background` sub properties to top-level only.
 	 * @since 6.6.0 Added `dimensions.aspectRatio`.
-	 * @since 7.0.0 Added `dimensions.width`, `dimensions.height`. and
+	 * @since 7.0.0 Added `dimensions.width`, `dimensions.height`, and
 	 *              `typography.textIndent` properties.
 	 * @var array
 	 */
@@ -773,41 +774,31 @@ class WP_Theme_JSON_Gutenberg {
 			return static::DEFAULT_VIEWPORT_BREAKPOINTS;
 		}
 
-		$sanitized = array();
+				$breakpoints = array();
 		foreach ( array_keys( static::DEFAULT_VIEWPORT_BREAKPOINTS ) as $breakpoint ) {
-			if (
-				isset( $viewport_settings[ $breakpoint ] ) &&
-				static::is_valid_viewport_breakpoint_size( $viewport_settings[ $breakpoint ] )
-			) {
-				$sanitized[ $breakpoint ] = trim( $viewport_settings[ $breakpoint ] );
+			$value = $viewport_settings[ $breakpoint ] ?? null;
+			$px    = static::get_viewport_breakpoint_value_in_pixels( $value );
+			if ( null !== $px ) {
+				$breakpoints[ $breakpoint ] = array(
+					'value' => trim( $value ),
+					'px'    => $px,
+				);
 			}
 		}
 
-		if ( empty( $sanitized ) ) {
+		if ( empty( $breakpoints ) ) {
 			return static::DEFAULT_VIEWPORT_BREAKPOINTS;
 		}
 
-		if ( empty( $sanitized['mobile'] ) ) {
-			$sanitized = array(
-				'mobile' => $sanitized['tablet'],
-			);
+		if ( ! isset( $breakpoints['mobile'] ) ) {
+			return array( 'mobile' => $breakpoints['tablet']['value'] );
 		}
 
-		$mobile_breakpoint = static::get_viewport_breakpoint_value_in_pixels(
-			$sanitized['mobile']
-		);
-		$tablet_breakpoint = isset( $sanitized['tablet'] )
-			? static::get_viewport_breakpoint_value_in_pixels(
-				$sanitized['tablet']
-			)
-			: null;
+		$sanitized = array( 'mobile' => $breakpoints['mobile']['value'] );
 
-		if (
-			null === $mobile_breakpoint ||
-			null === $tablet_breakpoint ||
-			$mobile_breakpoint >= $tablet_breakpoint
+		if ( isset( $breakpoints['tablet'] ) && $breakpoints['mobile']['px'] < $breakpoints['tablet']['px']
 		) {
-			unset( $sanitized['tablet'] );
+			$sanitized['tablet'] = $breakpoints['tablet']['value'];
 		}
 
 		return $sanitized;
