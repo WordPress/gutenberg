@@ -144,6 +144,7 @@ jobs:
             needs.get-release-metadata.outputs.plugin_asset_url
         needs: [get-release-branch, get-release-metadata]
         env:
+            RELEASE_BRANCH: ${{ needs.get-release-branch.outputs.release_branch }}
             TAG: ${{ github.event.release.tag_name }}
         strategy:
             matrix:
