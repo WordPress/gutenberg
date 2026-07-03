@@ -180,13 +180,15 @@ describe( 'MediaEditorImageControls', () => {
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'omits the aspect ratio dropdown for circle crops', () => {
+	it( 'disables the aspect ratio dropdown for circle crops', () => {
 		setup( { showAspectRatioControl: true }, undefined, {
 			cropShape: 'circle',
 		} );
 
+		// The toggle uses `accessibleWhenDisabled`, so it stays in the toolbar
+		// (greyed out) with its disabled state expressed via aria-disabled.
 		expect(
-			screen.queryByRole( 'button', { name: 'Aspect ratio' } )
-		).not.toBeInTheDocument();
+			screen.getByRole( 'button', { name: 'Aspect ratio' } )
+		).toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 } );

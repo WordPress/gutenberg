@@ -91,8 +91,7 @@ export default function MediaEditorImageControls( {
 		setCropShape,
 		aspectRatioOptions,
 	} = useCropOptions( { aspectRatioPresets } );
-	const hasAspectRatioControl =
-		! withLabels && showAspectRatioControl && cropShape === 'rectangle';
+	const hasAspectRatioControl = ! withLabels && showAspectRatioControl;
 	const hasCropShapeControl = ! withLabels && showCropShapeControl;
 	const minZoom = getMinZoom( state );
 	const zoomByFactor = ( factor: number ) => {
@@ -179,7 +178,13 @@ export default function MediaEditorImageControls( {
 			icon={ aspectRatioIcon }
 			label={ __( 'Aspect ratio' ) }
 			popoverProps={ { placement: 'top' } }
-			toggleProps={ { size: 'compact' } }
+			// Circle crops are locked to 1:1, so the aspect-ratio control is
+			// greyed out rather than removed to keep the toolbar stable.
+			toggleProps={ {
+				size: 'compact',
+				disabled: cropShape === 'circle',
+				accessibleWhenDisabled: true,
+			} }
 		>
 			{ ( { onClose } ) => (
 				<MenuGroup label={ __( 'Aspect ratio' ) }>

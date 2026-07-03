@@ -34,19 +34,21 @@ describe( 'CircleStencil', () => {
 			'wp-media-editor-image-editor__stencil--circle'
 		);
 		expect(
-			screen.getByRole( 'button', { name: 'Resize top edge' } )
+			screen.getByRole( 'button', { name: 'Resize from top edge' } )
 		).toBeInTheDocument();
 		expect(
-			screen.getByRole( 'button', { name: 'Resize right edge' } )
+			screen.getByRole( 'button', { name: 'Resize from right edge' } )
 		).toBeInTheDocument();
 		expect(
-			screen.getByRole( 'button', { name: 'Resize bottom edge' } )
+			screen.getByRole( 'button', { name: 'Resize from bottom edge' } )
 		).toBeInTheDocument();
 		expect(
-			screen.getByRole( 'button', { name: 'Resize left edge' } )
+			screen.getByRole( 'button', { name: 'Resize from left edge' } )
 		).toBeInTheDocument();
 		expect(
-			screen.queryByRole( 'button', { name: 'Resize top-left corner' } )
+			screen.queryByRole( 'button', {
+				name: 'Resize from top-left corner',
+			} )
 		).not.toBeInTheDocument();
 	} );
 } );

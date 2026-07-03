@@ -110,7 +110,10 @@ class Gutenberg_Image_Editor_Mask_Test extends WP_UnitTestCase {
 		}
 
 		$this->assertNotNull( $mask_schema, 'A mask modifier schema should be present.' );
-		$this->assertSame( 'object', $mask_schema['type'] );
+		// The object type and `type`/`args` requirement are inherited from the
+		// shared `items` schema, matching Core's flip/rotate/crop branches.
+		$this->assertSame( 'object', $args['modifiers']['items']['type'] );
+		$this->assertSame( array( 'mask' ), $mask_schema['properties']['type']['enum'] );
 		$this->assertSame(
 			array( 'circle' ),
 			$mask_schema['properties']['args']['properties']['shape']['enum']
@@ -294,6 +297,47 @@ class Gutenberg_Image_Editor_Mask_Test extends WP_UnitTestCase {
 		$this->assertSame( 201, $response->get_status() );
 		$this->assertSame( 'image/webp', $data['mime_type'] );
 		$this->assertStringEndsWith( '.webp', $data['source_url'] );
+	}
+
+	/**
+	 * A site filter that rewrites an alpha-capable format to an opaque one
+	 * (e.g. PNG -> JPEG) must not strip the mask's transparency. The save
+	 * suppresses the output-format filter, so the result stays alpha-capable.
+	 */
+	public function test_edit_media_item_forces_alpha_output_when_site_maps_to_opaque() {
+		wp_set_current_user( self::$admin_id );
+
+		$attachment_id = self::factory()->attachment->create_upload_object( DIR_TESTDATA . '/images/one-blue-pixel-100x100.png' );
+
+		$to_jpeg = static function () {
+			return array( 'image/png' => 'image/jpeg' );
+		};
+		add_filter( 'image_editor_output_format', $to_jpeg );
+
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/edit" );
+		$request->set_body_params(
+			array(
+				'src'       => wp_get_attachment_image_url( $attachment_id, 'full' ),
+				'modifiers' => array(
+					array(
+						'type' => 'mask',
+						'args' => array( 'shape' => 'circle' ),
+					),
+				),
+			)
+		);
+
+		$response = rest_do_request( $request );
+
+		remove_filter( 'image_editor_output_format', $to_jpeg );
+
+		$data = $response->get_data();
+		if ( 500 === $response->get_status() && isset( $data['code'] ) && 'rest_image_mask_unsupported' === $data['code'] ) {
+			$this->markTestSkipped( 'No mask-capable image editor is available.' );
+		}
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertSame( 'image/png', $data['mime_type'] );
 	}
 
 	/**

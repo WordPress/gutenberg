@@ -276,6 +276,46 @@ test.describe( 'Image', () => {
 		).toBeFocused();
 	} );
 
+	test( 'saves a circle crop as a transparent PNG', async ( {
+		editor,
+		page,
+		imageBlockUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
+
+		await imageBlockUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' )
+		);
+		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
+			timeout: 30_000,
+		} );
+
+		// Open the media editor, switch the crop shape to Circle, and save.
+		await editor.clickBlockToolbarButton( 'Crop' );
+		const modal = page.locator( 'role=dialog[name="Edit media"i]' );
+		await expect( modal ).toBeVisible();
+		await modal.getByRole( 'radio', { name: 'Circle' } ).click();
+		await modal.locator( 'role=button[name="Save"i]' ).click();
+		await expect( modal ).toBeHidden();
+
+		// A circle crop introduces transparency, so the new attachment must be
+		// saved as a PNG.
+		const [
+			{
+				attributes: { url },
+			},
+		] = await editor.getBlocks();
+		expect( url ).toMatch( /\.png$/ );
+		await expect( image ).toHaveAttribute( 'src', /\.png$/ );
+	} );
+
 	test( 'should undo without broken temporary state', async ( {
 		editor,
 		pageUtils,

@@ -41,10 +41,9 @@ class Gutenberg_REST_Attachments_Controller_With_Mask extends WP_REST_Attachment
 		if ( isset( $args['modifiers']['items']['oneOf'] ) && is_array( $args['modifiers']['items']['oneOf'] ) ) {
 			$args['modifiers']['items']['oneOf'][] = array(
 				'title'      => __( 'Mask', 'gutenberg' ),
-				'type'       => 'object',
 				'properties' => array(
 					'type' => array(
-						'description' => __( 'Mask type.', 'gutenberg' ),
+						'description' => __( 'Mask type. Masks are applied after flip, rotate, and crop modifiers, regardless of position.', 'gutenberg' ),
 						'type'        => 'string',
 						'enum'        => array( 'mask' ),
 					),
@@ -104,11 +103,16 @@ class Gutenberg_REST_Attachments_Controller_With_Mask extends WP_REST_Attachment
 	/**
 	 * Applies Core-supported edits and a circle mask before inserting the new attachment.
 	 *
-	 * This intentionally mirrors Core's edit_media_item() flow instead of
-	 * calling it as a black box. Gutenberg needs to support masks before the
-	 * site is running a Core version with native mask support, but the eventual
-	 * Core implementation should apply the mask inside Core's image-editor
-	 * pipeline rather than as a post-insert replacement.
+	 * This is a fork of WP_REST_Attachments_Controller::edit_media_item(), last
+	 * synced against WordPress 7.1. Core applies its modifiers inside a closed
+	 * `switch` with no hook at "apply this modifier" time, so there is no way to
+	 * inject the `mask` modifier without owning the loop; extending the method
+	 * means copying it. Keep this method as close to verbatim Core as possible
+	 * (the only intended deltas are the `mask` case, the alpha-capable output
+	 * negotiation, and forcing masks to run last) so it can be re-diffed against
+	 * Core on each release. The eventual Core implementation should apply the
+	 * mask inside Core's image-editor pipeline, at which point this fork and the
+	 * modifier `case` can be deleted.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, WP_Error object on failure.
@@ -151,6 +155,23 @@ class Gutenberg_REST_Attachments_Controller_With_Mask extends WP_REST_Attachment
 		 * to Core's `edit_media_item()` via the parent delegation above.
 		 */
 		$modifiers = $request['modifiers'];
+
+		/*
+		 * A mask operates on the final pixels, so it must run after any geometry
+		 * modifiers (flip/rotate/crop). Reorder so masks are applied last
+		 * regardless of their position in the request, matching the schema's
+		 * documented contract.
+		 */
+		$geometry_modifiers = array();
+		$mask_modifiers     = array();
+		foreach ( $modifiers as $modifier ) {
+			if ( isset( $modifier['type'] ) && 'mask' === $modifier['type'] ) {
+				$mask_modifiers[] = $modifier;
+			} else {
+				$geometry_modifiers[] = $modifier;
+			}
+		}
+		$modifiers = array_merge( $geometry_modifiers, $mask_modifiers );
 
 		/*
 		 * If the file doesn't exist, attempt a URL fopen on the src link.
@@ -280,10 +301,20 @@ class Gutenberg_REST_Attachments_Controller_With_Mask extends WP_REST_Attachment
 		$output_format            = wp_get_image_editor_output_format( $image_file, $mime_type );
 		$output_mime_type         = $output_format[ $mime_type ] ?? $mime_type;
 
-		if (
-			! in_array( $output_mime_type, $alpha_capable_mime_types, true ) ||
-			! $image_editor->supports_mime_type( $output_mime_type )
-		) {
+		// Honor the negotiated format only when it can hold an alpha channel;
+		// otherwise fall back to PNG so the mask's transparency survives.
+		if ( ! in_array( $output_mime_type, $alpha_capable_mime_types, true ) ) {
+			$output_mime_type = 'image/png';
+		}
+
+		/*
+		 * The chosen format must be writable by this editor. A mask-capable
+		 * editor always supports PNG (guaranteed by its `test()` capability
+		 * check), so PNG stays a safe fallback when a site negotiated an
+		 * alpha-capable format the editor cannot output (e.g. WebP on a build
+		 * without WebP support).
+		 */
+		if ( ! $image_editor->supports_mime_type( $output_mime_type ) ) {
 			$output_mime_type = 'image/png';
 		}
 

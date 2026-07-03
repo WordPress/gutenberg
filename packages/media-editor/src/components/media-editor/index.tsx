@@ -677,7 +677,9 @@ function MediaEditorContent( {
 	const imageControls =
 		isImage && ! isWide ? (
 			<MediaEditorImageControls
-				showAspectRatioControl={ cropShape === 'rectangle' }
+				// Always render the aspect-ratio control; it is disabled (greyed
+				// out) rather than removed for circle crops, which are locked to 1:1.
+				showAspectRatioControl
 				showCropShapeControl
 				aspectRatioPresets={ aspectRatioPresets }
 			/>
