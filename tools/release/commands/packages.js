@@ -28,6 +28,7 @@ const {
 const pluginConfig = require( '../config' );
 
 const NPM_RELEASE_GIT_PUSH_ATTEMPTS = 3;
+// Keep tag pushes small enough that GitHub ruleset validation handles each phase predictably.
 const NPM_RELEASE_TAG_PUSH_BATCH_SIZE = 25;
 
 /**
@@ -344,24 +345,27 @@ async function runPushGitChangesStep( {
 /**
  * Returns package metadata for public packages that Lerna tagged at HEAD.
  *
- * @param {string} gitWorkingDirectoryPath Git working directory path.
+ * @param {string}   gitWorkingDirectoryPath Git working directory path.
+ * @param {Object}   deps                    Dependencies.
+ * @param {Object}   deps.git                Git client.
+ * @param {Function} deps.globFn             Glob function.
+ * @param {Function} deps.readJSON           JSON reader.
  *
  * @return {Promise<Array<{ name: string, version: string, tagName: string }>>} Package metadata.
  */
-async function getNpmReleasePackages( gitWorkingDirectoryPath ) {
+async function getNpmReleasePackages( gitWorkingDirectoryPath, deps = {} ) {
+	const {
+		git = SimpleGit( gitWorkingDirectoryPath ),
+		globFn = glob,
+		readJSON = readJSONFile,
+	} = deps;
 	const localTagsAtHead = new Set(
-		(
-			await SimpleGit( gitWorkingDirectoryPath ).raw(
-				'tag',
-				'--points-at',
-				'HEAD'
-			)
-		)
+		( await git.raw( 'tag', '--points-at', 'HEAD' ) )
 			.split( '\n' )
 			.filter( Boolean )
 	);
 
-	const packageJSONPaths = await glob(
+	const packageJSONPaths = await globFn(
 		path.resolve( gitWorkingDirectoryPath, 'packages/*/package.json' )
 	);
 
@@ -371,7 +375,7 @@ async function getNpmReleasePackages( gitWorkingDirectoryPath ) {
 				name,
 				private: isPrivate,
 				version,
-			} = readJSONFile( packageJSONPath );
+			} = readJSON( packageJSONPath );
 			return {
 				isPrivate,
 				name,
@@ -478,10 +482,16 @@ function getNpmReleaseGitRecoveryCommands( {
 /**
  * Runs a release metadata push phase with retry.
  *
- * @param {string}   label Phase label.
- * @param {Function} task  Task to retry.
+ * @param {string}   label     Phase label.
+ * @param {Function} task      Task to retry.
+ * @param {Object}   deps      Dependencies.
+ * @param {Function} deps.wait Wait function.
  */
-async function runNpmReleaseGitPushPhase( label, task ) {
+async function runNpmReleaseGitPushPhase( label, task, deps = {} ) {
+	const {
+		wait = ( delay ) =>
+			new Promise( ( resolve ) => setTimeout( resolve, delay ) ),
+	} = deps;
 	for ( let attempt = 1; ; attempt++ ) {
 		try {
 			await task();
@@ -495,9 +505,7 @@ async function runNpmReleaseGitPushPhase( label, task ) {
 					err.message
 				}, retrying in ${ attempt * 5 }s...`
 			);
-			await new Promise( ( resolve ) =>
-				setTimeout( resolve, attempt * 5000 )
-			);
+			await wait( attempt * 5000 );
 		}
 	}
 }
@@ -507,11 +515,18 @@ async function runNpmReleaseGitPushPhase( label, task ) {
  *
  * @param {string} gitWorkingDirectoryPath Git working directory path.
  * @param {string} branchName              Branch name.
+ * @param {Object} deps                    Dependencies.
+ * @param {Object} deps.git                Git client.
  *
  * @return {Promise<?string>} Remote branch SHA.
  */
-async function getRemoteBranchSha( gitWorkingDirectoryPath, branchName ) {
-	const output = await SimpleGit( gitWorkingDirectoryPath ).raw(
+async function getRemoteBranchSha(
+	gitWorkingDirectoryPath,
+	branchName,
+	deps = {}
+) {
+	const { git = SimpleGit( gitWorkingDirectoryPath ) } = deps;
+	const output = await git.raw(
 		'ls-remote',
 		'--heads',
 		'origin',
@@ -523,50 +538,67 @@ async function getRemoteBranchSha( gitWorkingDirectoryPath, branchName ) {
 }
 
 /**
- * Gets the peeled remote SHA for a tag.
+ * Gets the peeled remote SHA for each tag.
  *
- * @param {string} gitWorkingDirectoryPath Git working directory path.
- * @param {string} tagName                 Tag name.
+ * @param {string}   gitWorkingDirectoryPath Git working directory path.
+ * @param {string[]} tagNames                Tag names.
+ * @param {Object}   deps                    Dependencies.
+ * @param {Object}   deps.git                Git client.
  *
- * @return {Promise<?string>} Remote tag SHA.
+ * @return {Promise<Map<string, string>>} Remote tag SHAs.
  */
-async function getRemoteTagSha( gitWorkingDirectoryPath, tagName ) {
-	const output = await SimpleGit( gitWorkingDirectoryPath ).raw(
+async function getRemoteTagShas(
+	gitWorkingDirectoryPath,
+	tagNames,
+	{ git = SimpleGit( gitWorkingDirectoryPath ) } = {}
+) {
+	if ( tagNames.length === 0 ) {
+		return new Map();
+	}
+
+	const output = await git.raw(
 		'ls-remote',
 		'--tags',
 		'origin',
-		`refs/tags/${ tagName }`,
-		`refs/tags/${ tagName }^{}`
+		...tagNames.flatMap( ( tagName ) => [
+			`refs/tags/${ tagName }`,
+			`refs/tags/${ tagName }^{}`,
+		] )
 	);
-	const refs = output
+	const remoteTagShas = new Map();
+	output
 		.trim()
 		.split( '\n' )
 		.filter( Boolean )
-		.map( ( line ) => {
-			const [ sha, ref ] = line.split( /\s+/ );
-			return { ref, sha };
+		.forEach( ( line ) => {
+			const [ sha, ref = '' ] = line.split( /\s+/ );
+			const match = ref.match( /^refs\/tags\/(.+?)(\^\{\})?$/ );
+			if ( match ) {
+				const [ , tagName, isPeeled ] = match;
+				if ( isPeeled || ! remoteTagShas.has( tagName ) ) {
+					remoteTagShas.set( tagName, sha );
+				}
+			}
 		} );
-	const peeled = refs.find(
-		( { ref } ) => ref === `refs/tags/${ tagName }^{}`
-	);
-	const direct = refs.find( ( { ref } ) => ref === `refs/tags/${ tagName }` );
-	return peeled?.sha || direct?.sha || null;
+	return remoteTagShas;
 }
 
 /**
  * Verifies that a remote branch points to the expected SHA.
  *
- * @param {Object} options                         Options.
- * @param {string} options.gitWorkingDirectoryPath Git working directory path.
- * @param {string} options.npmReleaseBranch        Npm release branch.
- * @param {string} options.publishCommit           Expected commit SHA.
+ * @param {Object}   options                         Options.
+ * @param {string}   options.gitWorkingDirectoryPath Git working directory path.
+ * @param {string}   options.npmReleaseBranch        Npm release branch.
+ * @param {string}   options.publishCommit           Expected commit SHA.
+ * @param {Object}   deps                            Dependencies.
+ * @param {Function} deps.getRemoteBranchShaFn       Gets the remote branch SHA.
  */
-async function verifyRemoteNpmReleaseBranch( {
-	gitWorkingDirectoryPath,
-	npmReleaseBranch,
-	publishCommit,
-} ) {
-	const remoteSha = await getRemoteBranchSha(
+async function verifyRemoteNpmReleaseBranch(
+	{ gitWorkingDirectoryPath, npmReleaseBranch, publishCommit },
+	deps = {}
+) {
+	const { getRemoteBranchShaFn = getRemoteBranchSha } = deps;
+	const remoteSha = await getRemoteBranchShaFn(
 		gitWorkingDirectoryPath,
 		npmReleaseBranch
 	);
@@ -586,18 +618,21 @@ async function verifyRemoteNpmReleaseBranch( {
  * @param {string}   options.gitWorkingDirectoryPath Git working directory path.
  * @param {string[]} options.packageTags             Package tag names.
  * @param {string}   options.publishCommit           Expected commit SHA.
+ * @param {Object}   deps                            Dependencies.
+ * @param {Function} deps.getRemoteTagShasFn         Gets remote tag SHAs.
  */
-async function verifyRemotePackageTags( {
-	gitWorkingDirectoryPath,
-	packageTags,
-	publishCommit,
-} ) {
+async function verifyRemotePackageTags(
+	{ gitWorkingDirectoryPath, packageTags, publishCommit },
+	deps = {}
+) {
+	const { getRemoteTagShasFn = getRemoteTagShas } = deps;
 	const mismatches = [];
+	const remoteTagShas = await getRemoteTagShasFn(
+		gitWorkingDirectoryPath,
+		packageTags
+	);
 	for ( const tagName of packageTags ) {
-		const remoteSha = await getRemoteTagSha(
-			gitWorkingDirectoryPath,
-			tagName
-		);
+		const remoteSha = remoteTagShas.get( tagName );
 		if ( remoteSha !== publishCommit ) {
 			mismatches.push(
 				`${ tagName }: expected ${ publishCommit }, got ${
@@ -614,18 +649,33 @@ async function verifyRemotePackageTags( {
 }
 
 /**
+ * Checks whether an npm command failed because the target package version is absent.
+ *
+ * @param {Error} error Command error.
+ *
+ * @return {boolean} Whether the package version is absent.
+ */
+function isNpmPackageVersionMissing( error ) {
+	const output = `${ error.stdout || '' }\n${ error.stderr || '' }`;
+	return output.includes( 'E404' );
+}
+
+/**
  * Runs a pragmatic npm preflight before publishing.
  *
- * @param {Object} options                         Options.
- * @param {string} options.gitWorkingDirectoryPath Git working directory path.
- * @param {Array}  options.releasePackages         Packages to publish.
+ * @param {Object}   options                         Options.
+ * @param {string}   options.gitWorkingDirectoryPath Git working directory path.
+ * @param {Array}    options.releasePackages         Packages to publish.
+ * @param {Object}   deps                            Dependencies.
+ * @param {Function} deps.commandFn                  Command runner.
  */
-async function runNpmPublishPreflight( {
-	gitWorkingDirectoryPath,
-	releasePackages,
-} ) {
+async function runNpmPublishPreflight(
+	{ gitWorkingDirectoryPath, releasePackages },
+	deps = {}
+) {
+	const { commandFn = command } = deps;
 	log( '>> Checking npm package access.' );
-	await command( 'npm access ls-packages @wordpress --json', {
+	await commandFn( 'npm access list packages @wordpress --json', {
 		cwd: gitWorkingDirectoryPath,
 		stdio: 'pipe',
 	} );
@@ -633,55 +683,61 @@ async function runNpmPublishPreflight( {
 	log( '>> Verifying target package versions are not already published.' );
 	for ( const { name, version } of releasePackages ) {
 		try {
-			await command( `npm view ${ name }@${ version } version --json`, {
+			await commandFn( `npm view ${ name }@${ version } version --json`, {
 				cwd: gitWorkingDirectoryPath,
 				stdio: 'pipe',
 			} );
-			throw new Error(
-				`${ name }@${ version } already exists in the npm registry.`
-			);
 		} catch ( error ) {
-			const output = `${ error.stdout || '' }\n${ error.stderr || '' }`;
-			if ( ! output.includes( 'E404' ) ) {
-				throw error;
+			if ( isNpmPackageVersionMissing( error ) ) {
+				continue;
 			}
+			throw error;
 		}
+		throw new Error(
+			`${ name }@${ version } already exists in the npm registry.`
+		);
 	}
 }
 
 /**
  * Pushes and verifies Git metadata for an npm release.
  *
- * @param {Object}   options                         Options.
- * @param {string}   options.gitWorkingDirectoryPath Git working directory path.
- * @param {string}   options.npmReleaseBranch        Npm release branch.
- * @param {string[]} options.packageTags             Package tag names.
- * @param {string}   options.publishCommit           Publish commit SHA.
+ * @param {Object}   options                             Options.
+ * @param {string}   options.gitWorkingDirectoryPath     Git working directory path.
+ * @param {string}   options.npmReleaseBranch            Npm release branch.
+ * @param {string[]} options.packageTags                 Package tag names.
+ * @param {string}   options.publishCommit               Publish commit SHA.
+ * @param {Object}   deps                                Dependencies.
+ * @param {Object}   deps.git                            Git client.
+ * @param {Function} deps.runPhase                       Runs a retryable phase.
+ * @param {Function} deps.verifyRemoteNpmReleaseBranchFn Verifies the remote branch.
+ * @param {Function} deps.verifyRemotePackageTagsFn      Verifies remote package tags.
  */
-async function pushNpmReleaseGitMetadata( {
-	gitWorkingDirectoryPath,
-	npmReleaseBranch,
-	packageTags,
-	publishCommit,
-} ) {
-	const repo = SimpleGit( gitWorkingDirectoryPath );
+async function pushNpmReleaseGitMetadata(
+	{ gitWorkingDirectoryPath, npmReleaseBranch, packageTags, publishCommit },
+	deps = {}
+) {
+	const {
+		git = SimpleGit( gitWorkingDirectoryPath ),
+		runPhase = runNpmReleaseGitPushPhase,
+		verifyRemoteNpmReleaseBranchFn = verifyRemoteNpmReleaseBranch,
+		verifyRemotePackageTagsFn = verifyRemotePackageTags,
+	} = deps;
 	try {
-		await runNpmReleaseGitPushPhase( 'Release branch push', async () => {
+		await runPhase( 'Release branch push', async () => {
 			log( '>> Pushing release branch to remote.' );
-			await repo.raw(
+			await git.raw(
 				'push',
 				'origin',
 				`${ publishCommit }:refs/heads/${ npmReleaseBranch }`
 			);
 		} );
-		await runNpmReleaseGitPushPhase(
-			'Release branch verification',
-			async () =>
-				verifyRemoteNpmReleaseBranch( {
-					gitWorkingDirectoryPath,
-					npmReleaseBranch,
-					publishCommit,
-				} )
+		await runPhase( 'Release branch verification', async () =>
+			verifyRemoteNpmReleaseBranchFn( {
+				gitWorkingDirectoryPath,
+				npmReleaseBranch,
+				publishCommit,
+			} )
 		);
 
 		if ( packageTags.length ) {
@@ -689,26 +745,21 @@ async function pushNpmReleaseGitMetadata( {
 				packageTags,
 				NPM_RELEASE_TAG_PUSH_BATCH_SIZE
 			) ) {
-				await runNpmReleaseGitPushPhase(
-					'Package tag push',
-					async () => {
-						log( '>> Pushing package tags to remote.' );
-						await repo.raw(
-							'push',
-							'origin',
-							...packageTagChunk.map( getTagRefspec )
-						);
-					}
-				);
+				await runPhase( 'Package tag push', async () => {
+					log( '>> Pushing package tags to remote.' );
+					await git.raw(
+						'push',
+						'origin',
+						...packageTagChunk.map( getTagRefspec )
+					);
+				} );
 			}
-			await runNpmReleaseGitPushPhase(
-				'Package tag verification',
-				async () =>
-					verifyRemotePackageTags( {
-						gitWorkingDirectoryPath,
-						packageTags,
-						publishCommit,
-					} )
+			await runPhase( 'Package tag verification', async () =>
+				verifyRemotePackageTagsFn( {
+					gitWorkingDirectoryPath,
+					packageTags,
+					publishCommit,
+				} )
 			);
 		}
 	} catch ( error ) {
@@ -1095,11 +1146,17 @@ async function publishNpmNext( options ) {
 }
 
 module.exports = {
+	getNpmReleasePackages,
 	getNpmReleaseGitRecoveryCommands,
+	getRemoteTagShas,
 	getTagPushCommands,
 	getTagRefspec,
+	pushNpmReleaseGitMetadata,
 	publishNpmGutenbergPlugin,
 	publishNpmBugfixLatest,
 	publishNpmBugfixWordPressCore,
 	publishNpmNext,
+	runNpmPublishPreflight,
+	runNpmReleaseGitPushPhase,
+	verifyRemotePackageTags,
 };
