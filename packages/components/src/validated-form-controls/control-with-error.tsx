@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 import {
 	cloneElement,
@@ -270,16 +269,6 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 	} )();
 
 	const visibleMessage = showMessage ? message : null;
-
-	const spokenMessage = showMessage
-		? errorMessage || statusMessage?.message
-		: undefined;
-
-	useEffect( () => {
-		if ( spokenMessage ) {
-			speak( spokenMessage, 'polite' );
-		}
-	}, [ spokenMessage ] );
 
 	// Imperatively manage `aria-describedby` on the validity target so we
 	// merge with any value the child control sets internally (e.g. from a
