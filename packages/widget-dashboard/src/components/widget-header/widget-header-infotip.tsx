@@ -6,7 +6,6 @@ import { __ } from '@wordpress/i18n';
 import { info } from '@wordpress/icons';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Icon, Link, Popover, Stack, VisuallyHidden } from '@wordpress/ui';
-import type { WidgetHelpLink } from '@wordpress/widget-primitives';
 
 /**
  * Internal dependencies
@@ -22,7 +21,10 @@ export interface WidgetInfotipProps {
 	/**
 	 * Links rendered after the content.
 	 */
-	links?: WidgetHelpLink[];
+	links?: {
+		label: string;
+		href: string;
+	}[];
 }
 
 /**
