@@ -27,7 +27,9 @@ export const Navigation = ( props: NavigationProps ) => {
 	}
 
 	if ( process.env.NODE_ENV !== 'production' ) {
-		const invalidItem = items.find( ( item ) => ! item.href );
+		const invalidItem = items.find(
+			( item ) => typeof item.href !== 'string'
+		);
 		if ( invalidItem ) {
 			throw new Error(
 				`Navigation: item "${ invalidItem.label }" is missing an \`href\` prop.`
@@ -44,8 +46,8 @@ export const Navigation = ( props: NavigationProps ) => {
 				gap="lg"
 				className={ styles.list }
 			>
-				{ items.map( ( item, index ) => (
-					<li key={ index }>
+				{ items.map( ( item ) => (
+					<li key={ item.href }>
 						<Text
 							variant="body-md"
 							render={
