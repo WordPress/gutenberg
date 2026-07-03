@@ -90,11 +90,69 @@ export interface RequestedInspectorTab {
 	[ key: string ]: unknown;
 }
 
+/**
+ * Interface for inserter media requests.
+ */
+export interface InserterMediaRequest {
+	/** How many items to fetch per page. */
+	per_page: number;
+	/** The search term to use for filtering the results. */
+	search: string;
+}
+
+/**
+ * Interface for inserter media responses. Any media resource should
+ * map their response to this interface, in order to create the core
+ * WordPress media blocks (image, video, audio).
+ */
+export interface InserterMediaItem {
+	/** The title of the media item. */
+	title: string;
+	/** The source url of the media item. */
+	url: string;
+	/** The preview source url of the media item to display in the media list. */
+	previewUrl?: string;
+	/** The WordPress id of the media item. */
+	id?: number;
+	/** The id of the media item from external source. */
+	sourceId?: number | string;
+	/** The alt text of the media item. */
+	alt?: string;
+	/** The caption of the media item. */
+	caption?: string;
+}
+
 export interface InserterMediaCategory {
+	/** The name of the media category, that should be unique among all media categories. */
 	name: string;
-	mediaType: string;
+	/** Labels for the media category. */
+	labels: {
+		/** General name of the media category. It's used in the inserter media items list. */
+		name: string;
+		/** Label for searching items. Default is 'Search Posts' / 'Search Pages'. */
+		search_items?: string;
+	};
+	/** The media type of the media category. */
+	mediaType: 'image' | 'audio' | 'video';
+	/** The function to fetch media items for the category. */
+	fetch: (
+		query?: Partial< InserterMediaRequest >
+	) => Promise< InserterMediaItem[] >;
+	/**
+	 * If the media category supports reporting media items, this function should return
+	 * the report url for the media item. It accepts the `InserterMediaItem` as an argument.
+	 */
+	getReportUrl?: ( item: InserterMediaItem ) => string;
+	/** If the media category is an external resource, this should be set to true. */
+	isExternalResource?: boolean;
+	/**
+	 * Optional message shown in place of the generic "No results found." when the
+	 * source has no items and there is no active search.
+	 */
+	emptyMessage?: string;
 	[ key: string ]: unknown;
 }
+
 export interface ClientIdTree {
 	clientId: string;
 	innerBlocks: ClientIdTree[];
