@@ -681,6 +681,8 @@ async function runNpmPublishPreflight(
 	} );
 
 	log( '>> Verifying target package versions are not already published.' );
+	// TODO: Consider bounded concurrency here if this preflight becomes too slow.
+	// Keep the first hardening pass sequential so registry errors stay easy to read.
 	for ( const { name, version } of releasePackages ) {
 		try {
 			await commandFn( `npm view ${ name }@${ version } version --json`, {
