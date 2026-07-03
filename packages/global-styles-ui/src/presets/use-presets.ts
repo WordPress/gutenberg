@@ -1,13 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useMemo } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import type { BasePreset } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
 import { useSetting } from '../hooks';
+
+const EMPTY_ARRAY: any[] = [];
 
 /**
  * Read + mutate the preset array stored at `${settingsPath}.${origin}`.
@@ -20,11 +22,12 @@ export function usePresets< T extends BasePreset >(
 	origin: string
 ) {
 	const path = `${ settingsPath }.${ origin }`;
-	const [ value, setPresets ] = useSetting< T[] >( path );
-	const [ base ] = useSetting< T[] >( path, undefined, 'base' );
-
-	const presets = useMemo( () => value || [], [ value ] );
-	const basePresets = useMemo( () => base || [], [ base ] );
+	const [ presets = EMPTY_ARRAY, setPresets ] = useSetting< T[] >( path );
+	const [ basePresets = EMPTY_ARRAY ] = useSetting< T[] >(
+		path,
+		undefined,
+		'base'
+	);
 
 	const add = useCallback(
 		( preset: T ) => setPresets( [ ...presets, preset ] ),
