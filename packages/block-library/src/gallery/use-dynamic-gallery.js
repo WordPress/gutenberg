@@ -202,7 +202,11 @@ export default function useDynamicGallery( {
 	);
 
 	// Switches the gallery into dynamic mode, displaying images attached to the
-	// current post. Any manually-added image blocks are removed.
+	// current post. Clearing the inner blocks removes the manually-added images:
+	// they're the gallery's image data, so there's nothing else to reset. The
+	// legacy `images`/`ids` attributes aren't touched — they're back-compat shims
+	// for the pre-innerBlocks format (see `deprecated.js`/`transforms.js`), empty
+	// on any gallery reachable here.
 	function enableDynamicMode() {
 		setAttributes( { dynamicContent: { source: ATTACHED_MEDIA } } );
 		replaceInnerBlocks( clientId, [] );
