@@ -69,62 +69,21 @@ const TREE_STRUCTURAL_KEYS = new Set( [ 'blocks', 'variations', 'css' ] );
 const EMPTY_INHERITANCE = Object.freeze( { value: {}, sources: {} } );
 
 /**
- * Source breadcrumb part identifiers for each Global Styles inheritance layer.
- */
-const SOURCE_BREADCRUMB_PARTS = {
-	styles: 'styles',
-	elements: 'elements',
-	blocks: 'blocks',
-	blockName: 'blockName',
-	variations: 'variations',
-	variationName: 'variationName',
-};
-
-/**
- * Breadcrumb source descriptors for each Global Styles inheritance layer.
+ * Source descriptors for each Global Styles inheritance layer. `layer`
+ * identifies which layer supplied a leaf and drives inherited-value detection.
  */
 const SOURCE_DESCRIPTORS = {
-	root: {
-		breadcrumb: [ SOURCE_BREADCRUMB_PARTS.styles ],
-		layer: 'root',
-	},
-	block: {
-		breadcrumb: [
-			SOURCE_BREADCRUMB_PARTS.styles,
-			SOURCE_BREADCRUMB_PARTS.blocks,
-			SOURCE_BREADCRUMB_PARTS.blockName,
-		],
-		layer: 'block',
-	},
-	blockVariation: {
-		breadcrumb: [
-			SOURCE_BREADCRUMB_PARTS.styles,
-			SOURCE_BREADCRUMB_PARTS.blocks,
-			SOURCE_BREADCRUMB_PARTS.blockName,
-			SOURCE_BREADCRUMB_PARTS.variations,
-			SOURCE_BREADCRUMB_PARTS.variationName,
-		],
-		layer: 'blockVariation',
-	},
+	root: { layer: 'root' },
+	block: { layer: 'block' },
+	blockVariation: { layer: 'blockVariation' },
 };
 
-function createSourceDescriptor(
-	type,
-	{ blockName, variation, blockStyles } = {}
-) {
+function createSourceDescriptor( type ) {
 	const descriptor = SOURCE_DESCRIPTORS[ type ];
 	if ( ! descriptor ) {
 		return null;
 	}
-	return {
-		...descriptor,
-		breadcrumb: [ ...descriptor.breadcrumb ],
-		blockName: blockName ?? null,
-		variation: variation ?? null,
-		variationTitle:
-			blockStyles?.find( ( style ) => style.name === variation )?.label ??
-			null,
-	};
+	return { ...descriptor };
 }
 
 // Pair a layer's style object with the source metadata for all of its leaves.
@@ -150,14 +109,8 @@ function getPathKey( path ) {
  * @return {Object} Stored source descriptor.
  */
 function getSourceForPath( source, path ) {
-	const breadcrumb = [ ...source.breadcrumb ];
-	const [ maybeElementsKey, maybeElement ] = path;
-	if ( maybeElementsKey === 'elements' && maybeElement ) {
-		breadcrumb.push( SOURCE_BREADCRUMB_PARTS.elements, maybeElement );
-	}
 	return {
 		...source,
-		breadcrumb,
 		path: [ ...path ],
 	};
 }
@@ -344,7 +297,6 @@ function getStateSlice( layerObject, selectedState ) {
  * @param {string}  args.blockName       Block name (e.g. `core/heading`).
  * @param {?string} [args.ownVariation]  Active block style variation slug, or null.
  * @param {Object}  [args.globalStyles]  The `settings[ globalStylesDataKey ]` payload.
- * @param {Array}   [args.blockStyles]   Registered styles for the block type.
  * @param {?Object} [args.selectedState] Selected block style state, or null for the default state.
  * @return {{ value: Object, sources: Object }} Merged panel-scoped payload and source map.
  */
@@ -352,7 +304,6 @@ function computeInheritedValue( {
 	blockName,
 	ownVariation = null,
 	globalStyles,
-	blockStyles = [],
 	selectedState = null,
 } = {} ) {
 	if ( ! globalStyles || ! globalStyles.styles ) {
@@ -387,17 +338,13 @@ function computeInheritedValue( {
 		block
 			? createContribution(
 					pickLayerRootContribution( block ),
-					createSourceDescriptor( 'block', { blockName } )
+					createSourceDescriptor( 'block' )
 			  )
 			: null,
 		variation
 			? createContribution(
 					pickLayerRootContribution( variation ),
-					createSourceDescriptor( 'blockVariation', {
-						blockName,
-						variation: ownVariation,
-						blockStyles,
-					} )
+					createSourceDescriptor( 'blockVariation' )
 			  )
 			: null,
 	];
@@ -423,7 +370,7 @@ function computeInheritedValue( {
 						pickLayerRootContribution(
 							getStateSlice( block, selectedState )
 						),
-						createSourceDescriptor( 'block', { blockName } )
+						createSourceDescriptor( 'block' )
 				  )
 				: null,
 			variation
@@ -431,11 +378,7 @@ function computeInheritedValue( {
 						pickLayerRootContribution(
 							getStateSlice( variation, selectedState )
 						),
-						createSourceDescriptor( 'blockVariation', {
-							blockName,
-							variation: ownVariation,
-							blockStyles,
-						} )
+						createSourceDescriptor( 'blockVariation' )
 				  )
 				: null
 		);
@@ -489,9 +432,6 @@ export function buildInheritedValue( args ) {
 		inner = new Map();
 		memo.set( gs, inner );
 	}
-	const blockStylesKey = ( args.blockStyles || [] )
-		.map( ( { name, label } ) => `${ name }:${ label }` )
-		.join( ',' );
 	const selectedStateKey = args.selectedState
 		? `${ args.selectedState.viewport ?? '' }:${
 				args.selectedState.pseudo ?? ''
@@ -501,8 +441,6 @@ export function buildInheritedValue( args ) {
 		( args.blockName || '' ) +
 		'\u0001' +
 		( args.ownVariation || '' ) +
-		'\u0001' +
-		blockStylesKey +
 		'\u0001' +
 		selectedStateKey;
 	if ( inner.has( key ) ) {

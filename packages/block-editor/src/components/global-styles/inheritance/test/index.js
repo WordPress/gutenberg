@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { click } from '@ariakit/test';
 
 /**
@@ -57,12 +57,9 @@ describe( 'getInheritanceProps', () => {
 	} );
 
 	test( 'returns ONLY the inherited className when isInherited is set', () => {
-		// The visual treatment for the inherited state is wired by the
-		// `<InheritanceToolsPanelItem>` wrapper, which renders its
-		// children inside a `<Tooltip>` from `@wordpress/components`.
-		// `getInheritanceProps` only emits the className that gates
-		// the label colouring; the tooltip text is supplied by the
-		// wrapper.
+		// The inherited state is conveyed purely through the className hook
+		// (`is-inherited-from-global-styles`), which the SCSS uses to apply
+		// the dotted-underline label treatment. No dot is rendered.
 		expect( getInheritanceProps( true, false ) ).toEqual( {
 			className: 'is-inherited-from-global-styles',
 			isInherited: true,
@@ -145,12 +142,12 @@ describe( 'getInheritanceProps', () => {
 	} );
 } );
 
-describe( 'InheritanceToolsPanelItem inherited label tooltip', () => {
+describe( 'InheritanceToolsPanelItem inherited state', () => {
 	function renderInheritedItem( label, labelClassName ) {
 		return render(
 			<ToolsPanel label="Panel" panelId="panel">
 				<InheritanceToolsPanelItem
-					isInherited
+					{ ...getInheritanceProps( true, false ) }
 					label={ label }
 					panelId="panel"
 					isShownByDefault
@@ -162,97 +159,114 @@ describe( 'InheritanceToolsPanelItem inherited label tooltip', () => {
 		);
 	}
 
-	function getAnchorText( container ) {
-		// eslint-disable-next-line testing-library/no-node-access
-		return container.querySelector(
-			'.global-styles-inheritance-tooltip-anchor__text'
-		)?.textContent;
-	}
-
-	function getAnchor( container ) {
-		// eslint-disable-next-line testing-library/no-node-access
-		return container.querySelector(
-			'.global-styles-inheritance-tooltip-anchor'
-		);
-	}
-
-	test( 'sources the tooltip anchor text from the label prop', () => {
-		const { container } = renderInheritedItem(
-			'Line height',
-			'components-base-control__label'
-		);
-		expect( getAnchorText( container ) ).toBe( 'Line height' );
+	test( 'applies the inherited-from-global-styles class to the item', () => {
+		renderInheritedItem( 'Line height', 'components-base-control__label' );
+		expect(
+			screen
+				.getByText( 'Line height' )
+				// eslint-disable-next-line testing-library/no-node-access
+				.closest( '.is-inherited-from-global-styles' )
+		).not.toBeNull();
 	} );
 
-	test( 'keeps the anchor text stable across re-renders (variation switch)', () => {
-		// Regression guard: the anchor used to derive its text from the
-		// mutated `labelEl.textContent`. Because the anchor is portaled
-		// into the label, each re-render re-read and compounded the text
-		// ("Line height" -> "Line heightLine height" -> ...). Sourcing the
-		// text from the `label` prop keeps it stable.
-		const { container, rerender } = renderInheritedItem(
-			'Line height',
-			'components-base-control__label'
-		);
-		expect( getAnchorText( container ) ).toBe( 'Line height' );
-
-		// Simulate a repeated variation switch forcing re-renders.
-		for ( let i = 0; i < 3; i++ ) {
-			rerender(
-				<ToolsPanel label="Panel" panelId="panel">
-					<InheritanceToolsPanelItem
-						isInherited
-						label="Line height"
-						panelId="panel"
-						isShownByDefault
-						hasValue={ () => false }
-					>
-						<div className="components-base-control__label">
-							Line height
-						</div>
-					</InheritanceToolsPanelItem>
-				</ToolsPanel>
-			);
-		}
-
-		expect( getAnchorText( container ) ).toBe( 'Line height' );
+	test( 'does not render a reset dot in the inherited state', () => {
+		renderInheritedItem( 'Line height', 'components-base-control__label' );
+		expect(
+			screen.queryByRole( 'button', {
+				name: 'Reset to inherited value',
+			} )
+		).not.toBeInTheDocument();
 	} );
+} );
 
-	test( 'anchors the tooltip on the color/gradient name label', () => {
-		const { container } = renderInheritedItem(
-			'Color',
-			'block-editor-panel-color-gradient-settings__color-name'
-		);
-		expect( getAnchorText( container ) ).toBe( 'Color' );
-	} );
-
-	test( 'forwards a label click to the control toggle button', () => {
-		// Regression guard: the anchor overlays the label and is portaled,
-		// so React routes its click through the portal parent tree rather
-		// than the DOM-ancestor toggle button. Without forwarding, clicking
-		// the label of a toggle-based control (color, background image)
-		// would not open the control.
-		const onToggle = jest.fn();
-		const { container } = render(
+describe( 'InheritanceToolsPanelItem local-override reset dot', () => {
+	function renderItem( props ) {
+		return render(
 			<ToolsPanel label="Panel" panelId="panel">
 				<InheritanceToolsPanelItem
-					isInherited
-					label="Color"
+					label="Line height"
 					panelId="panel"
 					isShownByDefault
 					hasValue={ () => false }
+					{ ...props }
 				>
-					<button type="button" onClick={ onToggle }>
-						<span className="components-base-control__label">
-							Color
-						</span>
-					</button>
+					<div className="components-base-control__label">
+						Line height
+					</div>
 				</InheritanceToolsPanelItem>
 			</ToolsPanel>
 		);
+	}
 
-		const anchor = getAnchor( container );
-		fireEvent.click( anchor );
-		expect( onToggle ).toHaveBeenCalledTimes( 1 );
+	test( 'renders the reset dot as a sibling of the control, not inside the label', () => {
+		renderItem( {
+			hasLocalOverride: true,
+			onDeselect: () => {},
+		} );
+		const resetButton = screen.getByRole( 'button', {
+			name: 'Reset to inherited value',
+		} );
+		expect( resetButton ).toBeVisible();
+
+		// The reset dot is a plain sibling; it must never be nested inside
+		// the label (which would create an interactive-in-label a11y issue).
+		expect(
+			// eslint-disable-next-line testing-library/no-node-access
+			resetButton.closest( '.components-base-control__label' )
+		).toBeNull();
+	} );
+
+	test( 'does not render the item reset dot when showLocalOverrideActionsInLabel is false', () => {
+		// Color/background render their own reset control next to a custom
+		// toggle, so the item must not render a second one.
+		renderItem( {
+			hasLocalOverride: true,
+			showLocalOverrideActionsInLabel: false,
+			onDeselect: () => {},
+		} );
+		expect(
+			screen.queryByRole( 'button', {
+				name: 'Reset to inherited value',
+			} )
+		).not.toBeInTheDocument();
+	} );
+
+	test( 'the reset dot invokes the deselect handler', async () => {
+		const onDeselect = jest.fn();
+		renderItem( { hasLocalOverride: true, onDeselect } );
+		await click(
+			screen.getByRole( 'button', { name: 'Reset to inherited value' } )
+		);
+		expect( onDeselect ).toHaveBeenCalled();
+	} );
+
+	test( 'does not offset the reset dot by default', () => {
+		renderItem( { hasLocalOverride: true, onDeselect: () => {} } );
+		const resetButton = screen.getByRole( 'button', {
+			name: 'Reset to inherited value',
+		} );
+		const affordance =
+			// eslint-disable-next-line testing-library/no-node-access
+			resetButton.closest( '.global-styles-inheritance-affordance' );
+		expect( affordance ).not.toHaveClass(
+			'global-styles-inheritance-affordance--offset-toggle'
+		);
+	} );
+
+	test( 'offsets the reset dot when the control has an inline-end toggle', () => {
+		renderItem( {
+			hasLocalOverride: true,
+			hasInlineEndToggle: true,
+			onDeselect: () => {},
+		} );
+		const resetButton = screen.getByRole( 'button', {
+			name: 'Reset to inherited value',
+		} );
+		const affordance =
+			// eslint-disable-next-line testing-library/no-node-access
+			resetButton.closest( '.global-styles-inheritance-affordance' );
+		expect( affordance ).toHaveClass(
+			'global-styles-inheritance-affordance--offset-toggle'
+		);
 	} );
 } );

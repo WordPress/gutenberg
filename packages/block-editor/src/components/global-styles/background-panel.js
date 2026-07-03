@@ -25,11 +25,7 @@ import {
 	extractPresetSlug,
 	encodeColorValueWithPalette,
 } from '../../utils/color-values';
-import {
-	getCommonInheritanceTooltipText,
-	getInheritanceProps,
-	InheritanceToolsPanelItem,
-} from './inheritance';
+import { getInheritanceProps, InheritanceToolsPanelItem } from './inheritance';
 
 const DEFAULT_CONTROLS = {
 	backgroundImage: true,
@@ -428,18 +424,6 @@ export default function BackgroundImagePanel( {
 		showInheritanceLabelIndicators
 			? getInheritanceProps( isInherited, hasLocalOverride, classNames )
 			: { className: classNames };
-	// The background image is stored as an object, so its source lives on the
-	// leaf sub-paths. Resolve the breadcrumb from the image leaves only (not
-	// size/position) so the tooltip reflects the inherited image itself.
-	const backgroundImageTooltipText = getCommonInheritanceTooltipText(
-		inheritedSources,
-		[
-			'background.backgroundImage.url',
-			'background.backgroundImage.id',
-			'background.backgroundImage.title',
-			'background.backgroundImage.source',
-		]
-	);
 
 	// The inherited background image is resolved above (before the early
 	// return) so this detection matches what `BackgroundImageControl`
@@ -467,7 +451,6 @@ export default function BackgroundImagePanel( {
 					showLocalOverrideActionsInLabel={ false }
 					hasValue={ () => hasBackgroundImageValue( value ) }
 					label={ __( 'Image' ) }
-					inheritanceTooltipText={ backgroundImageTooltipText }
 					onDeselect={ resetBackground }
 					isShownByDefault={ defaultControls.backgroundImage }
 					panelId={ panelId }

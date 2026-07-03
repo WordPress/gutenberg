@@ -22,39 +22,27 @@ import { getVariationNameFromClass } from '../../hooks/block-style-variation';
  * `null` means "no Provider above this panel"; the consumer hook then
  * returns an empty object and each panel preserves its existing behavior.
  *
- * @type {React.Context<?{ globalStyles: ?Object, blockName: ?string, ownVariation: ?string, blockStyles: ?Array }>}
+ * @type {React.Context<?{ globalStyles: ?Object, blockName: ?string, ownVariation: ?string }>}
  */
 export const InheritedValueContext = createContext( null );
 
 /**
- * Internal hook that reads the Global Styles payload and the block's
- * registered styles, and returns the wrapped `{ styles }` shape the builder
- * and ref-resolver helpers expect, plus the block styles. Shared by
+ * Internal hook that reads the Global Styles payload and returns the wrapped
+ * `{ styles }` shape the builder and ref-resolver helpers expect. Shared by
  * `InheritedValueProvider` (inspector) and `useInheritedStyleValue` (canvas).
  *
- * @param {?string} blockName Selected block name (e.g. `core/heading`).
- * @return {{ globalStyles: ?Object, blockStyles: Array }} Wrapped Global Styles payload and block styles.
+ * @return {{ globalStyles: ?Object }} Wrapped Global Styles payload.
  */
-function useRawGlobalStyles( blockName ) {
-	const { rawGlobalStylesData, blockStyles } = useSelect(
-		( select ) => {
-			const settings = select( blockEditorStore ).getSettings();
-			const blockStylesSelector = select( blocksStore ).getBlockStyles;
-			return {
-				rawGlobalStylesData: settings[ globalStylesDataKey ] ?? null,
-				blockStyles:
-					blockName && blockStylesSelector
-						? blockStylesSelector( blockName )
-						: [],
-			};
-		},
-		[ blockName ]
-	);
+function useRawGlobalStyles() {
+	const rawGlobalStylesData = useSelect( ( select ) => {
+		const settings = select( blockEditorStore ).getSettings();
+		return settings[ globalStylesDataKey ] ?? null;
+	}, [] );
 	const globalStyles = useMemo(
 		() => ( rawGlobalStylesData ? { styles: rawGlobalStylesData } : null ),
 		[ rawGlobalStylesData ]
 	);
-	return { globalStyles, blockStyles };
+	return { globalStyles };
 }
 
 /**
@@ -78,17 +66,16 @@ export function InheritedValueProvider( {
 	selectedState = null,
 	children,
 } ) {
-	const { globalStyles, blockStyles } = useRawGlobalStyles( blockName );
+	const { globalStyles } = useRawGlobalStyles();
 
 	const contextValue = useMemo(
 		() => ( {
 			globalStyles,
 			blockName: blockName ?? null,
 			ownVariation,
-			blockStyles,
 			selectedState: selectedState ?? null,
 		} ),
-		[ globalStyles, blockName, ownVariation, blockStyles, selectedState ]
+		[ globalStyles, blockName, ownVariation, selectedState ]
 	);
 	return (
 		<InheritedValueContext.Provider value={ contextValue }>
@@ -121,7 +108,6 @@ export function useInheritedValue() {
 			blockName: ctx.blockName,
 			ownVariation: ctx.ownVariation,
 			globalStyles: ctx.globalStyles,
-			blockStyles: ctx.blockStyles,
 			selectedState: ctx.selectedState,
 		} );
 	}, [ ctx ] );
@@ -132,7 +118,7 @@ export function useInheritedStyleValue( {
 	ownVariation = null,
 	selectedState = null,
 } ) {
-	const { globalStyles, blockStyles } = useRawGlobalStyles( blockName );
+	const { globalStyles } = useRawGlobalStyles();
 
 	return useMemo( () => {
 		if ( ! blockName ) {
@@ -142,10 +128,9 @@ export function useInheritedStyleValue( {
 			blockName,
 			ownVariation,
 			globalStyles,
-			blockStyles,
 			selectedState,
 		} );
-	}, [ blockName, ownVariation, globalStyles, blockStyles, selectedState ] );
+	}, [ blockName, ownVariation, globalStyles, selectedState ] );
 }
 
 /**
