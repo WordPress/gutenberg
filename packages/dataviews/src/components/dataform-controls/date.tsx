@@ -244,7 +244,7 @@ function ValidatedDateControl< Item >( {
 
 	useEffect( () => {
 		if ( isTouched && customValidity?.message ) {
-			speak( customValidity.message, 'polite' );
+			speak( customValidity.message );
 		}
 	}, [ isTouched, customValidity?.message ] );
 

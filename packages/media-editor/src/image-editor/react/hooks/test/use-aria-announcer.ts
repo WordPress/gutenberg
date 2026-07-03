@@ -59,10 +59,7 @@ describe( 'useAriaAnnouncer', () => {
 		} );
 		act( () => jest.advanceTimersByTime( 300 ) );
 
-		expect( speak ).toHaveBeenCalledWith(
-			'Flipped horizontally',
-			'polite'
-		);
+		expect( speak ).toHaveBeenCalledWith( 'Flipped horizontally' );
 
 		rerender( {
 			state: makeState( {
@@ -71,7 +68,7 @@ describe( 'useAriaAnnouncer', () => {
 		} );
 		act( () => jest.advanceTimersByTime( 300 ) );
 
-		expect( speak ).toHaveBeenCalledWith( 'Flip removed', 'polite' );
+		expect( speak ).toHaveBeenCalledWith( 'Flip removed' );
 	} );
 
 	it( 'announces combined flip state when both axes are active', () => {
@@ -90,8 +87,7 @@ describe( 'useAriaAnnouncer', () => {
 		act( () => jest.advanceTimersByTime( 300 ) );
 
 		expect( speak ).toHaveBeenCalledWith(
-			'Flipped horizontally and vertically',
-			'polite'
+			'Flipped horizontally and vertically'
 		);
 	} );
 

@@ -180,7 +180,7 @@ export function useAriaAnnouncer( state: CropperState ): void {
 			prevStateRef.current = current;
 			if ( msg !== prevMessageRef.current ) {
 				prevMessageRef.current = msg;
-				speak( msg, 'polite' );
+				speak( msg );
 			}
 		}, ARIA_DEBOUNCE_MS );
 
