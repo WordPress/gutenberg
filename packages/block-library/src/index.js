@@ -570,6 +570,11 @@ export const registerCoreBlocks = (
 					...( ( bootstrappedBlockType?.apiVersion ?? 0 ) < 3 && {
 						apiVersion: 3,
 					} ),
+					// The pattern is the natural inserter preview; an `example`
+					// provided at registration still wins.
+					example: bootstrappedBlockType?.example ?? {
+						innerBlocks: parse( markup ),
+					},
 					// `ssr-islands` renders the PHP shell server-side and portals
 					// the editable islands into it (WYSIWYG); the default mode
 					// edits the pattern blocks directly in the canvas.
