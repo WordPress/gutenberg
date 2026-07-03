@@ -340,15 +340,19 @@ function createPatternBlockComponents(
 		const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
 			useDispatch( blockEditorStore );
 
-		// Seed only when empty: on reload the inner blocks come from the saved
-		// post, and reseeding would overwrite edits.
+		// Seed only freshly inserted empty blocks: a reloaded empty block is a
+		// saved state (the pattern deleted under `patternLock: false`), and
+		// reseeding it would resurrect the deleted content.
 		useLayoutEffect( () => {
 			const seeded = parse( markup );
 			if ( ! seeded.length ) {
 				return;
 			}
+			const { getBlocks, wasBlockJustInserted } =
+				registry.select( blockEditorStore );
 			if (
-				registry.select( blockEditorStore ).getBlocks( clientId ).length
+				getBlocks( clientId ).length ||
+				! wasBlockJustInserted( clientId )
 			) {
 				return;
 			}
@@ -399,15 +403,19 @@ function createSsrIslandsComponents( blockName, markup ) {
 		const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
 			useDispatch( blockEditorStore );
 
-		// Seed only when empty: on reload the inner blocks come from the saved
-		// post, and reseeding would overwrite edits.
+		// Seed only freshly inserted empty blocks: a reloaded empty block is a
+		// saved state (the pattern deleted under `patternLock: false`), and
+		// reseeding it would resurrect the deleted content.
 		useLayoutEffect( () => {
 			const seeded = parse( markup );
 			if ( ! seeded.length ) {
 				return;
 			}
+			const { getBlocks, wasBlockJustInserted } =
+				registry.select( blockEditorStore );
 			if (
-				registry.select( blockEditorStore ).getBlocks( clientId ).length
+				getBlocks( clientId ).length ||
+				! wasBlockJustInserted( clientId )
 			) {
 				return;
 			}
