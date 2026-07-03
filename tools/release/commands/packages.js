@@ -907,17 +907,6 @@ async function publishPackagesToNpm(
 				stdio: 'inherit',
 			}
 		);
-	} else if ( [ 'bugfix', 'wp' ].includes( releaseType ) ) {
-		log(
-			'>> Bumping version of public packages changed since the last release.'
-		);
-		await commandFn(
-			`npx lerna version ${ minimumVersionBump } --no-private --no-push ${ yesFlag }`,
-			{
-				cwd: gitWorkingDirectoryPath,
-				stdio: 'inherit',
-			}
-		);
 	} else {
 		log(
 			'>> Bumping version of public packages changed since the last release.'
