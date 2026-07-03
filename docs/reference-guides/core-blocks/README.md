@@ -894,7 +894,7 @@ Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Ju
 
 -	**Name:** [core/quote](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-quote/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
--	**Supports:** align (full, left, right, wide), allowedBlocks, anchor, background (backgroundImage, backgroundSize), color (background, gradients, heading, link, text), dimensions (minHeight), interactivity (clientNavigation), layout (~~allowEditing~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, left, right, wide), allowedBlocks, anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, heading, link, text), dimensions (minHeight), interactivity (clientNavigation), layout (~~allowEditing~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** citation, textAlign, value
 
 ## Read More
