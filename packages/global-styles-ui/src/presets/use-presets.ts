@@ -14,6 +14,9 @@ const EMPTY_ARRAY: any[] = [];
 /**
  * Read + mutate the preset array stored at `${settingsPath}.${origin}`.
  *
+ * `presets` is the merged value (via `useSetting`); `basePresets` is the
+ * theme/base value, used for reset and comparison.
+ *
  * @param settingsPath Origin-keyed base path, e.g. 'shadow.presets'.
  * @param origin       'default' | 'theme' | 'custom'.
  */
