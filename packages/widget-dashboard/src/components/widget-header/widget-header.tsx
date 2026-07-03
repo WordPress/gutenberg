@@ -101,7 +101,18 @@ export function WidgetHeader( {
 								<Icon icon={ info } size={ 20 } />
 							</Popover.Trigger>
 
-							<Popover.Popup>
+							<Popover.Popup
+								portal={
+									<Popover.Portal
+										style={
+											{
+												'--wp-ui-popover-z-index': 99999,
+											} as React.CSSProperties
+										}
+									/>
+								}
+								positioner={ <Popover.Positioner side="top" /> }
+							>
 								<Popover.Arrow />
 								<VisuallyHidden render={ <Popover.Title /> }>
 									{ __( 'More information' ) }
