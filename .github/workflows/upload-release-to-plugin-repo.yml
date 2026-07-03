@@ -22,11 +22,47 @@ jobs:
                   fi
                   echo "github.ref is valid: ${{ github.ref }}"
 
+    get-release-metadata:
+        name: Get release metadata
+        runs-on: 'ubuntu-24.04'
+        permissions: {}
+        needs: validate-github-ref
+        outputs:
+            plugin_asset_url: ${{ steps.get_plugin_asset.outputs.plugin_asset_url }}
+            version: ${{ steps.get_release_version.outputs.version }}
+
+        steps:
+            - name: Validate release tag
+              id: get_release_version
+              env:
+                  TAG: ${{ github.event.release.tag_name }}
+              run: |
+                  VERSION="${TAG#v}"
+                  if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?$ ]]; then
+                    echo "::error::Release tag '$TAG' does not resolve to a valid Gutenberg plugin version."
+                    exit 1
+                  fi
+                  echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+            - name: Select Gutenberg plugin asset
+              id: get_plugin_asset
+              env:
+                  RELEASE_ASSETS: ${{ toJson(github.event.release.assets) }}
+              run: |
+                  asset_count="$(jq --arg name 'gutenberg.zip' '[.[] | select(.name == $name)] | length' <<< "$RELEASE_ASSETS")"
+                  if [[ "$asset_count" -ne 1 ]]; then
+                    echo "::error::Expected exactly one release asset named gutenberg.zip, found $asset_count."
+                    exit 1
+                  fi
+
+                  plugin_asset_url="$(jq -r --arg name 'gutenberg.zip' '.[] | select(.name == $name) | .browser_download_url' <<< "$RELEASE_ASSETS")"
+                  echo "plugin_asset_url=$plugin_asset_url" >> "$GITHUB_OUTPUT"
+
     compute-should-update-trunk:
         name: Decide if trunk or tag
         runs-on: 'ubuntu-24.04'
         permissions: {}
-        needs: validate-github-ref
+        needs: get-release-metadata
         # Skip this job if the release is a release candidate. This will in turn skip
         # the upload jobs, which are only relevant for non-RC releases.
         # We first check if the release is a prerelease, and then if the ref contains
@@ -49,10 +85,10 @@ jobs:
             - name: Decide if it is a trunk or tag update
               id: compute_should_update_trunk
               env:
-                  GITHUB_REF: ${{ github.ref }}
                   LATEST_VERSION: ${{ steps.compute_latest_version_in_core_repo.outputs.version }}
+                  RELEASE_VERSION: ${{ needs.get-release-metadata.outputs.version }}
               run: |
-                  latestPublishedVersion=$(echo "$GITHUB_REF" | sed -E 's/refs\/tags\/(v?)([0-9.]+)/\2/')
+                  latestPublishedVersion="$RELEASE_VERSION"
 
                   # Determines if the first version string is greater than the second version string.
                   #
@@ -85,7 +121,7 @@ jobs:
         name: Get release branch name
         runs-on: 'ubuntu-24.04'
         permissions: {}
-        needs: validate-github-ref
+        needs: get-release-metadata
         outputs:
             release_branch: ${{ steps.get_release_branch.outputs.release_branch }}
 
@@ -93,9 +129,9 @@ jobs:
             - name: Compute release branch name
               id: get_release_branch
               env:
-                  TAG: ${{ github.event.release.tag_name }}
+                  VERSION: ${{ needs.get-release-metadata.outputs.version }}
               run: |
-                  IFS='.' read -r -a VERSION_ARRAY <<< "${TAG#v}"
+                  IFS='.' read -r -a VERSION_ARRAY <<< "${VERSION}"
                   RELEASE_BRANCH="release/${VERSION_ARRAY[0]}.${VERSION_ARRAY[1]}"
                   echo "release_branch=${RELEASE_BRANCH}" >> "$GITHUB_OUTPUT"
 
@@ -105,8 +141,8 @@ jobs:
         permissions:
             contents: write
         if: |
-            github.event.release.assets[0]
-        needs: get-release-branch
+            needs.get-release-metadata.outputs.plugin_asset_url
+        needs: [get-release-branch, get-release-metadata]
         env:
             TAG: ${{ github.event.release.tag_name }}
         strategy:
@@ -183,15 +219,15 @@ jobs:
         runs-on: 'ubuntu-24.04'
         permissions: {}
         environment: wp.org plugin
-        needs: [compute-should-update-trunk, update-changelog]
+        needs: [compute-should-update-trunk, update-changelog, get-release-metadata]
         if: |
-            needs.compute-should-update-trunk.outputs.should_update_trunk == 'true' && github.event.release.assets[0]
+            needs.compute-should-update-trunk.outputs.should_update_trunk == 'true' && needs.get-release-metadata.outputs.plugin_asset_url
         env:
             PLUGIN_REPO_URL: 'https://plugins.svn.wordpress.org/gutenberg'
             STABLE_VERSION_REGEX: '[0-9]\+\.[0-9]\+\.[0-9]\+\s*'
             SVN_USERNAME: ${{ secrets.svn_username }}
             SVN_PASSWORD: ${{ secrets.svn_password }}
-            VERSION: ${{ github.event.release.name }}
+            VERSION: ${{ needs.get-release-metadata.outputs.version }}
 
         steps:
             - name: Install Subversion
@@ -209,7 +245,7 @@ jobs:
 
             - name: Download and unzip Gutenberg plugin asset into trunk folder
               env:
-                  PLUGIN_URL: ${{ github.event.release.assets[0].browser_download_url }}
+                  PLUGIN_URL: ${{ needs.get-release-metadata.outputs.plugin_asset_url }}
               run: |
                   curl -L -o gutenberg.zip "$PLUGIN_URL"
                   unzip gutenberg.zip -d trunk
@@ -266,15 +302,15 @@ jobs:
         runs-on: 'ubuntu-24.04'
         permissions: {}
         environment: wp.org plugin
-        needs: [compute-should-update-trunk, update-changelog]
+        needs: [compute-should-update-trunk, update-changelog, get-release-metadata]
         if: |
-            needs.compute-should-update-trunk.outputs.should_update_trunk == 'false' && github.event.release.assets[0]
+            needs.compute-should-update-trunk.outputs.should_update_trunk == 'false' && needs.get-release-metadata.outputs.plugin_asset_url
         env:
             PLUGIN_REPO_URL: 'https://plugins.svn.wordpress.org/gutenberg'
             STABLE_VERSION_REGEX: '[0-9]\+\.[0-9]\+\.[0-9]\+\s*'
             SVN_USERNAME: ${{ secrets.svn_username }}
             SVN_PASSWORD: ${{ secrets.svn_password }}
-            VERSION: ${{ github.event.release.name }}
+            VERSION: ${{ needs.get-release-metadata.outputs.version }}
 
         steps:
             - name: Install Subversion
@@ -283,7 +319,7 @@ jobs:
 
             - name: Download and unzip Gutenberg plugin asset into tags folder
               env:
-                  PLUGIN_URL: ${{ github.event.release.assets[0].browser_download_url }}
+                  PLUGIN_URL: ${{ needs.get-release-metadata.outputs.plugin_asset_url }}
               run: |
                   # do the magic here
                   curl -L -o gutenberg.zip "$PLUGIN_URL"
@@ -300,7 +336,7 @@ jobs:
               uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
               with:
                   name: changelog trunk
-                  path: ${{ github.event.release.name }}
+                  path: ${{ needs.get-release-metadata.outputs.version }}
 
             - name: Check if SVN tag already exists
               id: check_svn_tag

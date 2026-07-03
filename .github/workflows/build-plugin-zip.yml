@@ -13,12 +13,14 @@ on:
                 description: 'rc or stable?'
                 required: true
 
-# Cancels all previous workflow runs for pull requests that have not completed.
+# Cancels previous non-release workflow runs that have not completed.
+# Workflow-dispatched release runs must not cancel an in-flight run after it may have
+# pushed version bump commits.
 concurrency:
-    # The concurrency group contains the workflow name and the branch name for pull requests
-    # or the commit hash for any other events.
-    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
-    cancel-in-progress: true
+    # The concurrency group contains the workflow name and the release type/ref for release
+    # dispatches, the branch name for pull requests, or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'workflow_dispatch' && format( '{0}-{1}', github.ref, github.event.inputs.version ) || ( github.event_name == 'pull_request' && github.head_ref || github.sha ) }}
+    cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
 
 # Disable permissions for all available scopes by default.
 # Any needed permissions should be configured at the job level.
@@ -53,11 +55,45 @@ jobs:
                     echo "next_stable_branch=release/${LATEST_STABLE_MAJOR}.$((LATEST_STABLE_MINOR + 1))" >> "$GITHUB_OUTPUT"
                   fi
 
+    preflight-release-token:
+        name: Preflight release token
+        runs-on: 'ubuntu-24.04'
+        permissions: {}
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+
+        steps:
+            - name: Validate GitHub release token
+              env:
+                  GH_TOKEN: ${{ secrets.GUTENBERG_TOKEN }}
+              run: |
+                  gh auth status --hostname github.com
+
+                  headers_file="$(mktemp)"
+                  if ! gh api -i "repos/${GITHUB_REPOSITORY}" > "$headers_file"; then
+                    echo "::error::GUTENBERG_TOKEN cannot access ${GITHUB_REPOSITORY}. The release workflow token must be able to create draft releases in this repository."
+                    rm -f "$headers_file"
+                    exit 1
+                  fi
+
+                  oauth_scopes="$(
+                    awk -F': ' 'tolower($1) == "x-oauth-scopes" { print tolower($2) }' "$headers_file" |
+                    tr -d '\r' |
+                    tail -n 1
+                  )"
+
+                  if [[ -n "$oauth_scopes" ]] && ! tr ',' '\n' <<< "$oauth_scopes" | sed 's/^ *//;s/ *$//' | grep -qx 'repo'; then
+                    echo "::error::GUTENBERG_TOKEN is visibly under-scoped (${oauth_scopes}). The release workflow token must be able to create draft releases in this repository."
+                    rm -f "$headers_file"
+                    exit 1
+                  fi
+
+                  rm -f "$headers_file"
+
     bump-version:
         name: Bump version
         runs-on: 'ubuntu-24.04'
         environment: 'GitHub Releases'
-        needs: compute-stable-branches
+        needs: [compute-stable-branches, preflight-release-token]
         if: |
             github.event_name == 'workflow_dispatch' && (
               (
@@ -422,6 +458,7 @@ jobs:
         needs: [bump-version, build]
         runs-on: 'ubuntu-24.04'
         environment: 'GitHub Releases'
+        if: ${{ needs.bump-version.outputs.new_version }}
 
         steps:
             - name: Generate application token
