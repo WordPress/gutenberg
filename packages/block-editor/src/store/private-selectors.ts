@@ -117,9 +117,12 @@ export const isBlockSubtreeDisabled = (
  */
 export function isContainerInsertableToInContentOnlyMode(
 	state: State,
-	blockName: string,
-	rootClientId: string
+	blockName: string | null,
+	rootClientId: string | null
 ): boolean {
+	if ( ! rootClientId || ! blockName ) {
+		return false;
+	}
 	const isBlockContentBlock = isContentBlock( blockName );
 	const rootBlockName = getBlockName( state, rootClientId );
 	const isContainerContentBlock = isContentBlock( rootBlockName );
@@ -544,7 +547,11 @@ export const hasAllowedPatterns = createRegistrySelector(
 					return (
 						checkAllowListRecursive( grammar, allowedBlockTypes ) &&
 						grammar.every( ( { name: blockName } ) =>
-							canInsertBlockType( state, blockName, rootClientId )
+							canInsertBlockType(
+								state,
+								blockName as string,
+								rootClientId
+							)
 						)
 					);
 				} );
@@ -606,7 +613,7 @@ export const getPatternBySlug = createRegistrySelector( ( select ) =>
 );
 
 export const getAllPatterns = createRegistrySelector( ( select ) =>
-	createSelector( ( state ) => {
+	createSelector( ( state ): Pattern[] => {
 		return [
 			...unlock( select( STORE_NAME ) )
 				.getReusableBlocks()
@@ -742,7 +749,7 @@ function isSectionBlockCandidate( state: State, clientId: string ) {
 		getTemplateLock( state, clientId ) === 'contentOnly';
 	const rootClientId = getBlockRootClientId( state, clientId );
 	const hasRootContentOnlyTemplateLock =
-		getTemplateLock( state, rootClientId ) === 'contentOnly';
+		getTemplateLock( state, rootClientId ?? undefined ) === 'contentOnly';
 	if ( hasContentOnlyTemplateLock && ! hasRootContentOnlyTemplateLock ) {
 		return true;
 	}
@@ -990,7 +997,7 @@ export function getInsertionPoint( state: State ) {
  */
 export const isBlockHiddenAnywhere = ( state: State, clientId: string ) => {
 	const blockName = getBlockName( state, clientId );
-	if ( ! hasBlockSupport( blockName, 'visibility', true ) ) {
+	if ( ! blockName || ! hasBlockSupport( blockName, 'visibility', true ) ) {
 		return false;
 	}
 	const attributes = state.blocks.attributes.get( clientId ) as
@@ -1028,7 +1035,7 @@ export const isBlockHiddenAnywhere = ( state: State, clientId: string ) => {
  */
 export const isBlockHiddenEverywhere = ( state: State, clientId: string ) => {
 	const blockName = getBlockName( state, clientId );
-	if ( ! hasBlockSupport( blockName, 'visibility', true ) ) {
+	if ( ! blockName || ! hasBlockSupport( blockName, 'visibility', true ) ) {
 		return false;
 	}
 	const attributes = state.blocks.attributes.get( clientId ) as
@@ -1185,7 +1192,7 @@ export function isMoveLockedBlock( state: State, clientId: string ) {
 	}
 
 	const rootClientId = getBlockRootClientId( state, clientId );
-	const templateLock = getTemplateLock( state, rootClientId );
+	const templateLock = getTemplateLock( state, rootClientId ?? undefined );
 
 	// While `contentOnly` templateLock does sometimes prevent moving, a user can't modify
 	// this, so don't include it in this function. See the `canMoveBlock` selector
@@ -1215,7 +1222,7 @@ export function isRemoveLockedBlock( state: State, clientId: string ) {
 	}
 
 	const rootClientId = getBlockRootClientId( state, clientId );
-	const templateLock = getTemplateLock( state, rootClientId );
+	const templateLock = getTemplateLock( state, rootClientId ?? undefined );
 
 	// While `contentOnly` templateLock does sometimes prevent removal, a user can't modify
 	// this, so don't include it in this function. See the `canRemoveBlock` selector
@@ -1314,7 +1321,7 @@ export function shouldRenderBlockListView( state: State, clientId: string ) {
 		return true;
 	}
 
-	if ( ! hasBlockSupport( blockName, 'listView' ) ) {
+	if ( ! blockName || ! hasBlockSupport( blockName, 'listView' ) ) {
 		return false;
 	}
 

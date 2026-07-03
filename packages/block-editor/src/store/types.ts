@@ -34,6 +34,7 @@ export interface BlocksState {
 	blockEditingModes: Map< string, BlockEditingMode >;
 	isPersistentChange: boolean;
 	isIgnoredChange: boolean;
+	lastBlockChangeHistoryMode: 'persistent' | 'ignore' | 'merge';
 }
 
 export interface SelectionState {
@@ -161,10 +162,10 @@ export interface State {
 	blockListSettings: Map< string, Record< string, unknown > >;
 	insertionPoint: InsertionPoint | null;
 	insertionCue: unknown;
-	template: TemplateState | null;
+	template?: TemplateState | null;
 	settings: EditorSettings;
 	preferences: {
-		insertUsage: Record< string, unknown >;
+		insertUsage: Record< string, { time: number; count: number } >;
 	};
 	lastBlockAttributesChange: {
 		clientId: string;
@@ -175,7 +176,7 @@ export interface State {
 	highlightedBlock: string | null;
 	lastBlockInserted: LastBlockInserted;
 	editedContentOnlySection: string | null;
-	blockVisibility: Record< string, unknown >;
+	blockVisibility: Record< string, boolean >;
 	viewportModalClientIds: string[] | null;
 	styleOverrides: Map< string, StyleOverride >;
 	removalPromptData: unknown | false;
@@ -197,6 +198,7 @@ export interface State {
 	// Derived state (added by pipe transforms after combineReducers)
 	derivedBlockEditingModes?: Map< string, BlockEditingMode >;
 	blockPatterns?: unknown[];
+	automaticChangeStatus?: boolean;
 }
 
 export interface BlockLock {
@@ -249,6 +251,7 @@ export interface Pattern {
 	inserter?: boolean;
 	blocks?: Block[];
 	[ key: string ]: unknown;
+	blockTypes?: string[];
 }
 
 export interface GrammarBlock {

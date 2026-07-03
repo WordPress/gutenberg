@@ -22,7 +22,14 @@ import {
 } from './private-selectors';
 import { getBlockEditingMode } from './selectors';
 import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
-import type { State, EditorSettings, UserPattern, UserPatternCategory, Pattern, GrammarBlock } from './types';
+import type {
+	State,
+	EditorSettings,
+	UserPattern,
+	UserPatternCategory,
+	Pattern,
+	GrammarBlock,
+} from './types';
 
 // ─── Pattern types ────────────────────────────────────────────────────────────
 
@@ -97,7 +104,7 @@ export function getGrammar( pattern: Pattern ): GrammarBlock[] {
 }
 
 export const checkAllowList = (
-	list: boolean | string[],
+	list: string[],
 	item: string | null,
 	defaultResult: boolean | null = null
 ): boolean | null => {
@@ -161,16 +168,16 @@ export const getAllPatternsDependants =
 
 export const getInsertBlockTypeDependants =
 	() =>
-	( state: State, rootClientId: string ): unknown[] => {
+	( state: State, rootClientId: string | undefined ): unknown[] => {
 		return [
-			state.blockListSettings.get( rootClientId ),
-			state.blocks.byClientId.get( rootClientId ),
-			state.blocks.order.get( rootClientId || '' ),
+			state.blockListSettings.get( rootClientId ?? '' ),
+			state.blocks.byClientId.get( rootClientId ?? '' ),
+			state.blocks.order.get( rootClientId ?? '' ),
 			state.settings.allowedBlockTypes,
 			state.settings.templateLock,
 			getBlockEditingMode( state, rootClientId ),
 			getSectionRootClientId( state ),
-			isSectionBlock( state, rootClientId ),
-			getParentSectionBlock( state, rootClientId ),
+			isSectionBlock( state, rootClientId ?? '' ),
+			getParentSectionBlock( state, rootClientId ?? '' ),
 		];
 	};

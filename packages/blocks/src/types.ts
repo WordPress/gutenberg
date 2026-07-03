@@ -135,6 +135,10 @@ export interface BlockVariation<
 	 * The source of the variation, added internally.
 	 */
 	source?: string;
+	/**
+	 * Whether the variation is only available in search results and not in the inserter.
+	 */
+	isSearchOnly?: boolean;
 }
 
 /**
