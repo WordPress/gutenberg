@@ -30,7 +30,7 @@ function getComputedStyle( element ) {
  * Get all colors needed for the waveform player based on the element's styles.
  *
  * @param {Element} element - The element to derive colors from.
- * @return {Object} Object containing textColor, waveformColor, progressColor.
+ * @return {Object} Object containing textColor, waveformColor, and progressColor.
  */
 export function getWaveformColors( element ) {
 	const textColor = getComputedStyle( element ).color;
@@ -89,7 +89,9 @@ export function createWaveformContainer( {
 	}
 	container.setAttribute( 'data-text-color', buttonColor );
 	container.setAttribute( 'data-text-secondary-color', buttonColor );
-
+	container.style.setProperty( '--wfp-button-color', buttonColor );
+	container.style.setProperty( '--wfp-text-color', buttonColor );
+	container.style.setProperty( '--wfp-text-secondary-color', buttonColor );
 	if ( title ) {
 		container.setAttribute( 'data-title', title );
 	}
@@ -118,6 +120,33 @@ export function styleSvgIcons( container, buttonColor ) {
 	svgPaths.forEach( ( path ) => {
 		path.style.fill = iconColor;
 	} );
+}
+
+/**
+ * Update a live waveform player when inherited colors change.
+ *
+ * @param {Object}  player           - The waveform player object.
+ * @param {Element} player.element   - The element to derive colors from.
+ * @param {Element} player.container - The waveform container element.
+ * @param {Object}  player.instance  - The waveform player instance.
+ */
+export function updateWaveformPlayerColors( { element, container, instance } ) {
+	const colors = getWaveformColors( element );
+
+	container.style.setProperty( '--wfp-button-color', colors.textColor );
+	container.style.setProperty( '--wfp-text-color', colors.textColor );
+	container.style.setProperty(
+		'--wfp-text-secondary-color',
+		colors.textColor
+	);
+
+	if ( instance.options ) {
+		instance.options.waveformColor = colors.waveformColor;
+		instance.options.progressColor = colors.progressColor;
+	}
+
+	instance.drawWaveform?.();
+	styleSvgIcons( container, colors.textColor );
 }
 
 /**
@@ -216,7 +245,7 @@ export function logPlayError( error ) {
  * @param {Function} options.onEnded       - Callback when track ends.
  * @param {Object}   options.labels        - Translated button labels.
  * @param {string}   options.waveformStyle - Waveform style (bars, mirror, line, blocks, dots, seekbar).
- * @return {Object} Object with instance, container, and destroy function.
+ * @return {Object} Object with element, instance, container, and destroy function.
  */
 export function initWaveformPlayer(
 	element,
@@ -263,7 +292,7 @@ export function initWaveformPlayer(
 	let cleanupPlayButtonAccessibility;
 	const handlers = {
 		ready: () => {
-			styleSvgIcons( container, textColor );
+			updateWaveformPlayerColors( { element, container, instance } );
 			cleanupPlayButtonAccessibility = setupPlayButtonAccessibility(
 				container,
 				labels
@@ -280,6 +309,7 @@ export function initWaveformPlayer(
 
 	// Return instance, container, and cleanup function.
 	return {
+		element,
 		instance,
 		container,
 		destroy: () => {

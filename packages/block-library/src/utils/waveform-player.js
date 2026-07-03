@@ -8,7 +8,11 @@ import { __, _x } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { initWaveformPlayer, updateSeekControlLabel } from './waveform-utils';
+import {
+	initWaveformPlayer,
+	updateSeekControlLabel,
+	updateWaveformPlayerColors,
+} from './waveform-utils';
 
 const EMPTY_ARTIST_PLACEHOLDER = '\u00a0';
 
@@ -64,6 +68,7 @@ function updatePlayerMetadata( instance, { title, artist, image, imageAlt } ) {
  * @param {string}   props.image         - The artwork image URL.
  * @param {string}   props.imageAlt      - The artwork image alt text.
  * @param {string}   props.waveformStyle - Waveform style (bars, mirror, line, blocks, dots, seekbar).
+ * @param {string}   props.colorContext  - Context value that changes when inherited colors may have changed.
  * @param {Function} props.onEnded       - Callback when the track finishes playing.
  * @return {Element} The WaveformPlayer element.
  */
@@ -74,6 +79,7 @@ export function WaveformPlayer( {
 	image,
 	imageAlt,
 	waveformStyle,
+	colorContext,
 	onEnded,
 } ) {
 	// Store onEnded in a stable callback so it doesn't need to be a useRefEffect dependency.
@@ -109,6 +115,12 @@ export function WaveformPlayer( {
 			} );
 		}
 	}, [ title, artist, image, imageAlt ] );
+
+	useEffect( () => {
+		if ( playerRef.current ) {
+			updateWaveformPlayerColors( playerRef.current );
+		}
+	}, [ colorContext ] );
 
 	const ref = useRefEffect(
 		( element ) => {
