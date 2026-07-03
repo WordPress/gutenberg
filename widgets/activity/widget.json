@@ -3,7 +3,7 @@
 	"title": "Activity",
 	"description": "Displays recently published posts, scheduled posts, and recent comments.",
 	"help": {
-		"text": "Recent publishing and comment activity on this site."
+		"content": "Recent publishing and comment activity on this site."
 	},
 	"category": "dashboard",
 	"presentation": "content-bleed",

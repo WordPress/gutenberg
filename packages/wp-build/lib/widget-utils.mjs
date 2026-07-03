@@ -31,7 +31,7 @@ export function getAllWidgets( rootDir ) {
 
 /**
  * @typedef {Object} WidgetHelpMetadata
- * @property {string}                   text    Help text; may carry `em`/`strong`.
+ * @property {string}                   content Help content; may carry `em`/`strong`.
  * @property {WidgetHelpLinkMetadata[]} [links] Links contextual to the note.
  */
 

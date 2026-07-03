@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Widgets: carry the optional `help` field (text plus links) from
+-   Widgets: carry the optional `help` field (content plus links) from
     `widget.json` into the generated PHP registry.
 
 ## 0.18.0 (2026-07-01)

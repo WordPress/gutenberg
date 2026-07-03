@@ -65,21 +65,21 @@ function gutenberg_translate_widget_metadata( $widget ) {
 }
 
 /**
- * Constrains a widget help note to its allowed shape: `text` keeps only
- * `em`/`strong` markup, and links missing a `label` or `href` are
+ * Constrains a widget help note to its allowed shape: `content` keeps
+ * only `em`/`strong` markup, and links missing a `label` or `href` are
  * dropped.
  *
  * @param array|null $help Help note from the build manifest.
- * @return array|null Sanitized help note, or null when there is no text.
+ * @return array|null Sanitized help note, or null when there is no content.
  */
 function gutenberg_sanitize_widget_help( $help ) {
-	if ( ! is_array( $help ) || empty( $help['text'] ) || ! is_string( $help['text'] ) ) {
+	if ( ! is_array( $help ) || empty( $help['content'] ) || ! is_string( $help['content'] ) ) {
 		return null;
 	}
 
 	$sanitized = array(
-		'text' => wp_kses(
-			$help['text'],
+		'content' => wp_kses(
+			$help['content'],
 			array(
 				'em'     => array(),
 				'strong' => array(),

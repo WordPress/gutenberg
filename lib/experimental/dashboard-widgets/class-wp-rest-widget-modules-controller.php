@@ -288,15 +288,15 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 					),
 
 					'help'          => array(
-						'description' => __( 'Contextual help note for the widget type: text plus optional links. Translatable.', 'gutenberg' ),
+						'description' => __( 'Contextual help note for the widget type: content plus optional links. Translatable.', 'gutenberg' ),
 						'type'        => array( 'object', 'null' ),
 						'properties'  => array(
-							'text'  => array(
-								'description' => __( 'Help text; may carry minimal inline emphasis.', 'gutenberg' ),
+							'content' => array(
+								'description' => __( 'Help content; may carry minimal inline emphasis.', 'gutenberg' ),
 								'type'        => 'string',
 							),
-							'links' => array(
-								'description' => __( 'Optional links contextual to the help text.', 'gutenberg' ),
+							'links'   => array(
+								'description' => __( 'Optional links contextual to the help content.', 'gutenberg' ),
 								'type'        => 'array',
 								'items'       => array(
 									'type'       => 'object',

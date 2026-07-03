@@ -2,7 +2,7 @@
 	"title": "widget title",
 	"description": "widget description",
 	"help": {
-		"text": "widget help text",
+		"content": "widget help content",
 		"links": [ { "label": "widget help link label" } ]
 	},
 	"keywords": [ "widget keyword" ]

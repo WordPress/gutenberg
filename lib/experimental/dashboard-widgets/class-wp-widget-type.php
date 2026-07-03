@@ -98,8 +98,8 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 		public $description = null;
 
 		/**
-		 * Contextual help note: `text` plus optional `links`. Translated
-		 * at registration time using the widget's text domain.
+		 * Contextual help note: `content` plus optional `links`.
+		 * Translated at registration time using the widget's text domain.
 		 *
 		 * Null when the widget did not declare the field.
 		 *

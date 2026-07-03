@@ -46,7 +46,7 @@ const widgetTypes: WidgetType[] = [
 		name: 'test/greet',
 		title: 'Greet',
 		help: {
-			text: 'Greetings at a glance.',
+			content: 'Greetings at a glance.',
 			links: [ { label: 'Learn more', href: 'options-general.php' } ],
 		},
 		renderModule: 'test-greet-module',

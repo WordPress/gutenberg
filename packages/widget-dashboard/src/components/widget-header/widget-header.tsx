@@ -127,7 +127,7 @@ export function WidgetHeader( {
 								>
 									<Popover.Description>
 										{ createInterpolateElement(
-											widgetType.help.text,
+											widgetType.help.content,
 											{
 												em: <em />,
 												strong: <strong />,

@@ -3,7 +3,7 @@
 	"title": "Quick draft",
 	"description": "Quickly draft a new post.",
 	"help": {
-		"text": "Drafts saved here are <em>private</em> until you publish them."
+		"content": "Drafts saved here are <em>private</em> until you publish them."
 	},
 	"category": "dashboard",
 	"presentation": "content-bleed",

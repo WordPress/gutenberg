@@ -3,8 +3,11 @@
 	"title": "Site Health Status",
 	"description": "Shows an overview of your site health and any issues that need attention.",
 	"help": {
-		"text": "Results come from your site's latest health checks.",
-		"links": [ { "label": "Visit Site Health", "href": "site-health.php" } ]
+		"content": "Results come from your site's latest health checks.",
+		"links": [
+			{ "label": "Visit Site Health", "href": "site-health.php" },
+			{ "label": "View all issues", "href": "site-health.php?tab=tools" }
+		]
 	},
 	"category": "site",
 	"presentation": "framed",

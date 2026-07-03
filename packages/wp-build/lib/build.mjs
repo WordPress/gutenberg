@@ -2083,18 +2083,18 @@ function toPhpStringArrayLiteral( values ) {
 
 /**
  * Format a widget help note as a PHP array literal. Returns the PHP
- * literal `null` when the note has no text; links missing a `label`
+ * literal `null` when the note has no content; links missing a `label`
  * or `href` are dropped.
  *
  * @param {import('./widget-utils.mjs').WidgetHelpMetadata|null|undefined} help Source value.
  * @return {string} PHP array literal, or `null`.
  */
 function toPhpHelpLiteral( help ) {
-	if ( ! help || typeof help.text !== 'string' || help.text === '' ) {
+	if ( ! help || typeof help.content !== 'string' || help.content === '' ) {
 		return 'null';
 	}
 
-	const parts = [ `'text' => ${ toPhpStringLiteral( help.text ) }` ];
+	const parts = [ `'content' => ${ toPhpStringLiteral( help.content ) }` ];
 
 	if ( Array.isArray( help.links ) ) {
 		const links = help.links

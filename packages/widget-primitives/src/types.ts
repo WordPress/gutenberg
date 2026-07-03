@@ -51,7 +51,7 @@ export interface WidgetHelp {
 	 * The note. Translatable. May carry `<em>`/`<strong>`; links belong
 	 * in `links`.
 	 */
-	text: string;
+	content: string;
 
 	/**
 	 * Links contextual to the note.

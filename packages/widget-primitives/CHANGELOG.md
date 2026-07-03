@@ -17,7 +17,7 @@
     `keywords`, overlaid onto the metadata module's values. Lets a host
     supply metadata translated server-side.
 -   `WidgetTypeMetadata`: add optional `help`, a declarative contextual
-    note (`text` plus optional `links`) for compact surfaces such as
+    note (`content` plus optional `links`) for compact surfaces such as
     tooltips. Also carried by `WidgetModuleRecord`, overlaid onto the
     metadata module's value.
 
