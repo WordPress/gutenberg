@@ -81,6 +81,9 @@ jobs:
                     tail -n 1
                   )"
 
+                  # GitHub only exposes x-oauth-scopes for classic PATs. Fine-grained
+                  # PATs and GitHub App tokens may omit it, so this catches visible
+                  # under-scoping while the repository access check remains the fallback.
                   if [[ -n "$oauth_scopes" ]] && ! tr ',' '\n' <<< "$oauth_scopes" | sed 's/^ *//;s/ *$//' | grep -qx 'repo'; then
                     echo "::error::GUTENBERG_TOKEN is visibly under-scoped (${oauth_scopes}). The release workflow token must be able to create draft releases in this repository."
                     rm -f "$headers_file"
@@ -233,8 +236,14 @@ jobs:
         if: |
             always() && (
               github.event_name == 'pull_request' ||
-              github.event_name == 'workflow_dispatch' ||
-              github.repository == 'WordPress/gutenberg'
+              (
+                github.event_name == 'workflow_dispatch' &&
+                needs.bump-version.result == 'success'
+              ) ||
+              (
+                github.event_name != 'workflow_dispatch' &&
+                github.repository == 'WordPress/gutenberg'
+              )
             )
         strategy:
             matrix:
