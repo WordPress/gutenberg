@@ -14,6 +14,7 @@
 .components-button {
 	&:focus:not(:active) {
 		@include mixins.outset-ring__focus();
+		box-shadow: none;
 	}
 
 	display: inline-flex;
@@ -137,6 +138,10 @@
 			box-shadow: inset 0 0 0 $border-width $components-color-accent-darker-20;
 			color: $components-color-accent-darker-20;
 			background: color-mix(in srgb, $components-color-accent 4%, transparent);
+		}
+
+		&:focus:not(:active) {
+			box-shadow: inset 0 0 0 $border-width $components-color-accent, 0 0 0 currentColor;
 		}
 
 		&:disabled:not(:focus),
