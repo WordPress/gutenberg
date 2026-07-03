@@ -8,13 +8,13 @@ import type { ReactNode } from 'react';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { close, info } from '@wordpress/icons';
+import { info } from '@wordpress/icons';
 // Dashboard is still experimental.
 /* eslint-disable @wordpress/use-recommended-components */
 import {
 	Card,
 	Icon,
-	IconButton,
+	Link,
 	Popover,
 	Stack,
 	VisuallyHidden,
@@ -25,11 +25,12 @@ import type { WidgetType } from '@wordpress/widget-primitives';
 /**
  * Internal dependencies
  */
+import { HelpText } from './help-text';
 import styles from './widget-header.module.css';
 
 export interface WidgetHeaderProps {
 	/**
-	 * Widget type, source of the icon, title, and info note shown as
+	 * Widget type, source of the icon, title, and help note shown as
 	 * identity.
 	 */
 	widgetType?: WidgetType;
@@ -97,11 +98,11 @@ export function WidgetHeader( {
 						{ widgetType.title }
 					</Card.Title>
 
-					{ widgetType.info && (
+					{ widgetType.help && (
 						<Popover.Root modal="trap-focus">
 							<Popover.Trigger
 								aria-label={ __( 'More information' ) }
-								className={ styles.info }
+								className={ styles.help }
 							>
 								<Icon icon={ info } size={ 20 } />
 							</Popover.Trigger>
@@ -128,21 +129,27 @@ export function WidgetHeader( {
 									{ __( 'More information' ) }
 								</VisuallyHidden>
 
-								<Stack direction="row" align="start" gap="sm">
+								<Stack
+									direction="column"
+									align="start"
+									gap="sm"
+								>
 									<Popover.Description>
-										{ widgetType.info }
+										<HelpText
+											text={ widgetType.help.text }
+										/>
 									</Popover.Description>
-									<Popover.Close
-										render={
-											<IconButton
-												variant="minimal"
-												size="compact"
-												tone="neutral"
-												icon={ close }
-												label={ __( 'Close' ) }
-											/>
-										}
-									/>
+
+									{ widgetType.help.actions?.map(
+										( action ) => (
+											<Link
+												key={ action.href }
+												href={ action.href }
+											>
+												{ action.label }
+											</Link>
+										)
+									) }
 								</Stack>
 							</Popover.Popup>
 						</Popover.Root>

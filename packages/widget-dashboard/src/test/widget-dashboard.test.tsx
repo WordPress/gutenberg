@@ -45,7 +45,10 @@ const widgetTypes: WidgetType[] = [
 		apiVersion: 1,
 		name: 'test/greet',
 		title: 'Greet',
-		info: 'Greetings at a glance.',
+		help: {
+			text: 'Greetings at a glance.',
+			actions: [ { label: 'Learn more', href: 'options-general.php' } ],
+		},
 		renderModule: 'test-greet-module',
 	},
 ];
@@ -102,7 +105,7 @@ describe( 'WidgetDashboard', () => {
 		);
 	} );
 
-	it( 'surfaces the widget type info note in the header', async () => {
+	it( 'surfaces the widget type help note in the header', async () => {
 		render( <Harness /> );
 
 		// The infotip trigger opens a popover holding the note.
@@ -116,10 +119,9 @@ describe( 'WidgetDashboard', () => {
 			await screen.findByText( 'Greetings at a glance.' )
 		).toBeInTheDocument();
 
-		// Focus is trapped while open, so the popover carries an explicit
-		// Close control.
+		// Declared actions render as links resolved by the host.
 		expect(
-			screen.getByRole( 'button', { name: 'Close' } )
+			screen.getByRole( 'link', { name: 'Learn more' } )
 		).toBeInTheDocument();
 	} );
 
