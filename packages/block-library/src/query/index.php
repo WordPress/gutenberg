@@ -71,6 +71,46 @@ function register_block_core_query() {
 add_action( 'init', 'register_block_core_query' );
 
 /**
+ * Normalizes the `perPage` and `offset` query context passed down to the
+ * descendants of a Query Loop block that inherits the global query.
+ *
+ * When `inherit` is enabled, the block's own `perPage`/`offset` attributes
+ * are not used to build the query: rendering relies entirely on the main
+ * `$wp_query`, which is paginated according to the site's Reading Settings.
+ * If a block's stored `perPage` attribute has drifted from that value (for
+ * example, content authored outside the block editor, or saved before the
+ * "Items per Page" control was hidden for inheriting queries), any block
+ * reading `context.query.perPage` would see a number that doesn't match
+ * what is actually rendered. This keeps the exposed context truthful.
+ *
+ * @since 6.9.0
+ *
+ * @param array         $context      Prepared block context.
+ * @param array         $parsed_block Block being rendered.
+ * @param WP_Block|null $parent_block If this is a nested block, a reference to the parent block.
+ * @return array Filtered block context.
+ */
+function block_core_query_normalize_inherited_context( $context, $parsed_block, $parent_block ) {
+	if ( ! $parent_block instanceof WP_Block || 'core/query' !== $parent_block->name ) {
+		return $context;
+	}
+
+	if ( empty( $context['query']['inherit'] ) ) {
+		return $context;
+	}
+
+	global $wp_query;
+
+	$context['query']['perPage'] = $wp_query instanceof WP_Query
+		? (int) $wp_query->get( 'posts_per_page' )
+		: (int) get_option( 'posts_per_page' );
+	$context['query']['offset']  = 0;
+
+	return $context;
+}
+add_filter( 'render_block_context', 'block_core_query_normalize_inherited_context', 10, 3 );
+
+/**
  * Traverse the tree of blocks looking for any plugin block (i.e., a block from
  * an installed plugin) inside a Query block with the enhanced pagination
  * enabled. If at least one is found, the enhanced pagination is effectively
