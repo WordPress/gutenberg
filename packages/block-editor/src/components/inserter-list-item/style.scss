@@ -92,12 +92,6 @@
 			outline-offset: -2px;
 		}
 	}
-
-	&:not(:disabled) {
-		&:focus {
-			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-		}
-	}
 }
 
 .block-editor-block-types-list__item-icon {
