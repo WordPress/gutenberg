@@ -8,10 +8,18 @@ import type { ReactNode } from 'react';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { info } from '@wordpress/icons';
+import { close, info } from '@wordpress/icons';
 // Dashboard is still experimental.
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Card, Icon, Popover, Stack, VisuallyHidden } from '@wordpress/ui';
+/* eslint-disable @wordpress/use-recommended-components */
+import {
+	Card,
+	Icon,
+	IconButton,
+	Popover,
+	Stack,
+	VisuallyHidden,
+} from '@wordpress/ui';
+/* eslint-enable @wordpress/use-recommended-components */
 import type { WidgetType } from '@wordpress/widget-primitives';
 
 /**
@@ -90,7 +98,7 @@ export function WidgetHeader( {
 					</Card.Title>
 
 					{ widgetType.info && (
-						<Popover.Root>
+						<Popover.Root modal="trap-focus">
 							<Popover.Trigger
 								aria-label={ __( 'More information' ) }
 								className={ styles.info }
@@ -120,9 +128,22 @@ export function WidgetHeader( {
 									{ __( 'More information' ) }
 								</VisuallyHidden>
 
-								<Popover.Description>
-									{ widgetType.info }
-								</Popover.Description>
+								<Stack direction="row" align="start" gap="sm">
+									<Popover.Description>
+										{ widgetType.info }
+									</Popover.Description>
+									<Popover.Close
+										render={
+											<IconButton
+												variant="minimal"
+												size="compact"
+												tone="neutral"
+												icon={ close }
+												label={ __( 'Close' ) }
+											/>
+										}
+									/>
+								</Stack>
 							</Popover.Popup>
 						</Popover.Root>
 					) }

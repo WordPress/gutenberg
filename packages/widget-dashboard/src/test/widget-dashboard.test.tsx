@@ -115,6 +115,12 @@ describe( 'WidgetDashboard', () => {
 		expect(
 			await screen.findByText( 'Greetings at a glance.' )
 		).toBeInTheDocument();
+
+		// Focus is trapped while open, so the popover carries an explicit
+		// Close control.
+		expect(
+			screen.getByRole( 'button', { name: 'Close' } )
+		).toBeInTheDocument();
 	} );
 
 	it( 'threads setAttributes into onLayoutChange on commit with merged attributes', async () => {
