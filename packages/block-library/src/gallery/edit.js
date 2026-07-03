@@ -623,21 +623,6 @@ export default function GalleryEdit( props ) {
 		disableMediaButtons: imagesUploading,
 		value: {},
 	};
-	const mediaPlaceholder = (
-		<MediaPlaceholder
-			handleUpload={ false }
-			icon={ sharedIcon }
-			labels={ {
-				title: __( 'Gallery' ),
-				instructions: PLACEHOLDER_TEXT,
-			} }
-			onSelect={ updateImages }
-			allowedTypes={ ALLOWED_MEDIA_TYPES }
-			multiple
-			onError={ onUploadError }
-			{ ...mediaPlaceholderProps }
-		/>
-	);
 
 	const blockProps = useBlockProps( {
 		className: clsx(
@@ -976,9 +961,6 @@ export default function GalleryEdit( props ) {
 					{ ...props }
 					isContentLocked={ isContentLocked }
 					images={ images }
-					mediaPlaceholder={
-						! hasImages ? mediaPlaceholder : undefined
-					}
 					blockProps={ innerBlocksProps }
 					insertBlocksAfter={ insertBlocksAfter }
 					multiGallerySelection={ multiGallerySelection }
