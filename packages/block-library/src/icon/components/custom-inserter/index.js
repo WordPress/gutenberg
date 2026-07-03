@@ -42,10 +42,11 @@ export default function CustomInserterModal( { onClose, value, onChange } ) {
 
 	const { icons, hasResolvedIcons } = useSelect(
 		( select ) => {
-			if ( ! collectionSlug ) {
+			if ( collectionSlug === null ) {
 				return { icons: null, hasResolvedIcons: false };
 			}
-			const query = { namespace: collectionSlug };
+			const query =
+				collectionSlug === '' ? {} : { namespace: collectionSlug };
 			const { getEntityRecords, hasFinishedResolution } =
 				select( coreDataStore );
 			return {
@@ -102,6 +103,7 @@ export default function CustomInserterModal( { onClose, value, onChange } ) {
 						onChange={ debouncedSetSearchInput }
 					/>
 					<Tabs.List className="wp-block-icon__inserter-collections">
+						<Tabs.Tab value="">{ __( 'All' ) }</Tabs.Tab>
 						{ collections?.map( ( collection ) => (
 							<Tabs.Tab
 								key={ collection.slug }
@@ -112,25 +114,27 @@ export default function CustomInserterModal( { onClose, value, onChange } ) {
 						) ) }
 					</Tabs.List>
 				</Stack>
-				{ collections?.map( ( collection ) => (
-					<Tabs.Panel
-						key={ collection.slug }
-						value={ collection.slug }
-						className="wp-block-icon__inserter-panel"
-					>
-						{ ! hasResolvedIcons ? (
-							<div className="wp-block-icon__inserter-loading">
-								<Spinner />
-							</div>
-						) : (
-							<IconGrid
-								icons={ filteredIcons }
-								onChange={ onChange }
-								value={ value }
-							/>
-						) }
-					</Tabs.Panel>
-				) ) }
+				{ [ { slug: '' }, ...( collections ?? [] ) ].map(
+					( collection ) => (
+						<Tabs.Panel
+							key={ collection.slug }
+							value={ collection.slug }
+							className="wp-block-icon__inserter-panel"
+						>
+							{ ! hasResolvedIcons ? (
+								<div className="wp-block-icon__inserter-loading">
+									<Spinner />
+								</div>
+							) : (
+								<IconGrid
+									icons={ filteredIcons }
+									onChange={ onChange }
+									value={ value }
+								/>
+							) }
+						</Tabs.Panel>
+					)
+				) }
 			</Tabs.Root>
 		</Modal>
 	);
