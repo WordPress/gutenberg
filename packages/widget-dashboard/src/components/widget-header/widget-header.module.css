@@ -29,6 +29,10 @@
 	color: var(--wpds-color-foreground-content-neutral);
 }
 
+.popoverPopup {
+	max-width: 300px;
+}
+
 /**
  * Infotip trigger: a bare icon button beside the title.
  */

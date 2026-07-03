@@ -46,9 +46,8 @@ export function WidgetInfotip( {
 			</Popover.Trigger>
 
 			<Popover.Popup
-				positioner={
-					<Popover.Positioner side="bottom" align="start" />
-				}
+				className={ styles.popoverPopup }
+				positioner={ <Popover.Positioner side="top" align="start" /> }
 			>
 				<Popover.Arrow />
 				<VisuallyHidden render={ <Popover.Title /> }>
