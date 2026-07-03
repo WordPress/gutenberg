@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Cap build phase concurrency (package transpiling and bundling, routes, widgets) at the machine's available parallelism instead of fanning out unbounded, which exhausted memory on projects with many widgets. Override the default with the `--concurrency` flag or the `WP_BUILD_CONCURRENCY` environment variable.
+
 ## 0.18.0 (2026-07-01)
 
 ## 0.17.0 (2026-06-24)

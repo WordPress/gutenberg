@@ -50,6 +50,7 @@ import {
 	findScriptsToRebundle,
 	findRoutesToRebuild,
 } from './dependency-graph.mjs';
+import { createLimiter, resolveConcurrency } from './concurrency.mjs';
 import {
 	generatePhpFromTemplate,
 	getPhpReplacements,
@@ -1828,10 +1829,11 @@ async function buildRoute( routeName ) {
  * Routes whose pages are all in `experimentalPageIds` are skipped. Pass an
  * empty set (the default) to build every route.
  *
- * @param {Set<string>} experimentalPageIds Page ids marked experimental.
+ * @param {Set<string>}                                experimentalPageIds Page ids marked experimental.
+ * @param {(task: () => Promise<any>) => Promise<any>} runLimited          Concurrency-limited task scheduler.
  * @return {Promise<void>}
  */
-async function buildRoutes( experimentalPageIds = new Set() ) {
+async function buildRoutes( experimentalPageIds = new Set(), runLimited ) {
 	console.log( '\n🚦 Phase 3: Building routes...\n' );
 
 	const allRoutes = getAllRoutes( ROOT_DIR );
@@ -1855,12 +1857,14 @@ async function buildRoutes( experimentalPageIds = new Set() ) {
 	}
 
 	await Promise.all(
-		routes.map( async ( routeName ) => {
-			const buildTime = await buildRoute( routeName );
-			console.log(
-				`   ✔ Built route ${ routeName } (${ buildTime }ms)`
-			);
-		} )
+		routes.map( ( routeName ) =>
+			runLimited( async () => {
+				const buildTime = await buildRoute( routeName );
+				console.log(
+					`   ✔ Built route ${ routeName } (${ buildTime }ms)`
+				);
+			} )
+		)
 	);
 }
 
@@ -1986,9 +1990,10 @@ async function buildWidget( widgetName ) {
 /**
  * Build all discovered widgets.
  *
+ * @param {(task: () => Promise<any>) => Promise<any>} runLimited Concurrency-limited task scheduler.
  * @return {Promise<void>}
  */
-async function buildAllWidgets() {
+async function buildAllWidgets( runLimited ) {
 	console.log( '\n🧩 Phase 4: Building widgets...\n' );
 
 	const widgets = getAllWidgets( ROOT_DIR );
@@ -2003,12 +2008,14 @@ async function buildAllWidgets() {
 	);
 
 	await Promise.all(
-		widgets.map( async ( widgetName ) => {
-			const buildTime = await buildWidget( widgetName );
-			console.log(
-				`   ✔ Built widget ${ widgetName } (${ buildTime }ms)`
-			);
-		} )
+		widgets.map( ( widgetName ) =>
+			runLimited( async () => {
+				const buildTime = await buildWidget( widgetName );
+				console.log(
+					`   ✔ Built widget ${ widgetName } (${ buildTime }ms)`
+				);
+			} )
+		)
 	);
 }
 
@@ -2156,11 +2163,14 @@ async function generateWidgetsPhp( widgets, replacements ) {
  * Main build function.
  *
  * @param {string?} baseUrlExpression
+ * @param {number}  concurrency       Maximum number of build units (package,
+ *                                    route, widget) processed at the same time.
  */
-async function buildAll( baseUrlExpression ) {
-	console.log( '🔨 Building packages...\n' );
+async function buildAll( baseUrlExpression, concurrency ) {
+	console.log( `🔨 Building packages (concurrency: ${ concurrency })...\n` );
 
 	const startTime = Date.now();
+	const runLimited = createLimiter( concurrency );
 
 	// Build maps: short name ↔ full name ↔ package.json from package.json files
 	const shortToFull = new Map();
@@ -2181,13 +2191,15 @@ async function buildAll( baseUrlExpression ) {
 
 	for ( const level of levels ) {
 		await Promise.all(
-			level.map( async ( fullName ) => {
-				const packageName = fullToShort.get( fullName );
-				const buildTime = await transpilePackage( packageName );
-				console.log(
-					`   ✔ Transpiled ${ packageName } (${ buildTime }ms)`
-				);
-			} )
+			level.map( ( fullName ) =>
+				runLimited( async () => {
+					const packageName = fullToShort.get( fullName );
+					const buildTime = await transpilePackage( packageName );
+					console.log(
+						`   ✔ Transpiled ${ packageName } (${ buildTime }ms)`
+					);
+				} )
+			)
 		);
 	}
 
@@ -2196,26 +2208,28 @@ async function buildAll( baseUrlExpression ) {
 	const scripts = [];
 	const styles = [];
 	await Promise.all(
-		PACKAGES.map( async ( packageName ) => {
-			const startBundleTime = Date.now();
-			const ret = await bundlePackage( packageName );
-			const buildTime = Date.now() - startBundleTime;
-			if ( ret ) {
-				console.log(
-					`   ✔ Bundled ${ packageName } (${ buildTime }ms)`
-				);
+		PACKAGES.map( ( packageName ) =>
+			runLimited( async () => {
+				const startBundleTime = Date.now();
+				const ret = await bundlePackage( packageName );
+				const buildTime = Date.now() - startBundleTime;
+				if ( ret ) {
+					console.log(
+						`   ✔ Bundled ${ packageName } (${ buildTime }ms)`
+					);
 
-				if ( ret.modules ) {
-					modules.push( ...ret.modules );
+					if ( ret.modules ) {
+						modules.push( ...ret.modules );
+					}
+					if ( ret.scripts ) {
+						scripts.push( ...ret.scripts );
+					}
+					if ( ret.styles ) {
+						styles.push( ...ret.styles );
+					}
 				}
-				if ( ret.scripts ) {
-					scripts.push( ...ret.scripts );
-				}
-				if ( ret.styles ) {
-					styles.push( ...ret.styles );
-				}
-			}
-		} )
+			} )
+		)
 	);
 
 	// Normalize PAGES config to support both string and object formats
@@ -2247,10 +2261,10 @@ async function buildAll( baseUrlExpression ) {
 					.map( ( page ) => page.id )
 		  )
 		: new Set();
-	await buildRoutes( experimentalPageIds );
+	await buildRoutes( experimentalPageIds, runLimited );
 
 	// Build widgets
-	await buildAllWidgets();
+	await buildAllWidgets( runLimited );
 
 	// Collect widget data for PHP generation
 	const widgets = collectWidgets();
@@ -2683,13 +2697,17 @@ async function main() {
 						? "includes_url( 'build/' )"
 						: 'plugin_dir_url( __FILE__ )',
 			},
+			concurrency: {
+				type: 'string',
+			},
 		},
 		strict: false,
 	} );
 
 	const baseUrlExpression = values[ 'base-url' ];
+	const concurrency = resolveConcurrency( values.concurrency );
 
-	await buildAll( baseUrlExpression );
+	await buildAll( baseUrlExpression, concurrency );
 
 	if ( values.watch ) {
 		console.log( '\n👀 Watching for changes...\n' );
