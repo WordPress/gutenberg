@@ -1278,12 +1278,36 @@ class WP_Theme_JSON_Gutenberg {
 		if ( ! str_contains( $selector, ',' ) ) {
 			return $selector . $to_append;
 		}
+
+		/**
+		 * Check for an opportunity to skip the more-costly selector splitting.
+		 * This should be possible if there are no comments, strings, functions,
+		 * URLs, escapes, or comment declaration openers (CDOs).
+		 *
+		 * Note that this means the fast-path will not apply for selectors like
+		 * the following incomplete list:
+		 *
+		 *  - `[class ~= "wide"]`
+		 *  - `.wp-block:is(.is-style-a, .is-style-b)`
+		 *  - `:nth-child(1)`
+		 *
+		 * These syntax forms all present opportunities where a comma may not
+		 * separate selectors. If none of the start characters are present,
+		 * there should be no way for a comma to mean anything other than a
+		 * comma token. The exception are syntax errors, which are not handled here.
+		 *
+		 * @see https://www.w3.org/TR/css-syntax-3/#parse-comma-separated-list-of-component-values
+		 */
+		if ( strlen( $selector ) === strcspn( $selector, '/\'"(<\\' ) ) {
+			return str_replace( ',', $to_append . ',', $selector ) . $to_append;
+		}
+
 		$new_selectors = array();
 		$selectors     = static::split_selector_list( $selector );
 		foreach ( $selectors as $sel ) {
 			$new_selectors[] = $sel . $to_append;
 		}
-		return implode( ',', $new_selectors );
+		return implode( ', ', $new_selectors );
 	}
 
 	/**
@@ -1333,7 +1357,7 @@ class WP_Theme_JSON_Gutenberg {
 			$new_selectors[] = $to_prepend . $sel;
 		}
 
-		return implode( ',', $new_selectors );
+		return implode( ', ', $new_selectors );
 	}
 
 	/**
@@ -1375,7 +1399,8 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	protected static function split_selector_list( $selector ): array {
 		if ( ! str_contains( $selector, ',' ) ) {
-			return array( $selector );
+			// See note on trimming CSS whitespace in main loop.
+			return array( trim( $selector, " \t\n" ) );
 		}
 
 		$selectors         = array();
@@ -1485,7 +1510,8 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		if ( $was_at < $selector_length ) {
-			$selectors[] = substr( $selector, $was_at );
+			// See note on trimming CSS whitespace in main loop.
+			$selectors[] = trim( substr( $selector, $was_at ), " \t\n" );
 		}
 
 		return $selectors;
@@ -2474,8 +2500,6 @@ class WP_Theme_JSON_Gutenberg {
 		$selectors_scoped = array();
 		foreach ( $scopes as $outer ) {
 			foreach ( $selectors as $inner ) {
-				$outer = trim( $outer );
-				$inner = trim( $inner );
 				if ( ! empty( $outer ) && ! empty( $inner ) ) {
 					$selectors_scoped[] = $outer . ' ' . $inner;
 				} elseif ( empty( $outer ) ) {
@@ -5597,7 +5621,7 @@ class WP_Theme_JSON_Gutenberg {
 			);
 		}
 
-		return implode( ',', $result );
+		return implode( ', ', $result );
 	}
 
 	/**
@@ -5626,8 +5650,7 @@ class WP_Theme_JSON_Gutenberg {
 		$selector_parts  = static::split_selector_list( $feature_selector );
 		$selector_parts  = array_map(
 			static function ( $selector ) use ( $variation_class ) {
-				$selector = trim( $selector );
-				$prefix   = $variation_class . ' ';
+				$prefix = $variation_class . ' ';
 
 				if ( str_starts_with( $selector, $prefix ) ) {
 					return substr( $selector, strlen( $prefix ) );
@@ -5640,7 +5663,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		return static::get_block_style_variation_selector(
 			$variation_name,
-			implode( ',', $selector_parts )
+			implode( ', ', $selector_parts )
 		);
 	}
 

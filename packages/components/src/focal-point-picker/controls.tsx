@@ -86,7 +86,6 @@ export default function FocalPointPickerControls( {
 function FocalPointUnitControl( props: UnitControlProps ) {
 	return (
 		<StyledUnitControl
-			__next40pxDefaultSize
 			className="focal-point-picker__controls-position-unit-control"
 			labelPosition="top"
 			max={ TEXTCONTROL_MAX }

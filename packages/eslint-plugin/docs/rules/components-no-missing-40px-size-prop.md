@@ -10,11 +10,9 @@ The following components are checked by this rule:
 
 -   Button
 -   CustomSelectControl
--   FormTokenField
 -   InputControl
 -   NumberControl
 -   SelectControl
--   UnitControl
 
 Examples of **incorrect** code for this rule:
 
