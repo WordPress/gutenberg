@@ -98,6 +98,10 @@
 	.components-modal__content::before {
 		margin-bottom: $grid-unit-05;
 	}
+
+	&-actions {
+		width: 100%;
+	}
 }
 
 .edit-site-add-new-template__modal {
