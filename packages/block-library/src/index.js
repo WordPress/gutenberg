@@ -19,7 +19,7 @@ import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { useLayoutEffect, useRef } from '@wordpress/element';
+import { useLayoutEffect, useState } from '@wordpress/element';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -322,6 +322,45 @@ export const __experimentalGetCoreBlocks = () =>
 const { InnerContent } = unlock( blockEditorPrivateApis );
 
 /**
+ * Seeds a pattern block's inner blocks from its `pattern` markup.
+ *
+ * Seeds only freshly inserted empty blocks: a reloaded empty block is a
+ * saved state (the pattern deleted under `patternLock: false`), and
+ * reseeding it would resurrect the deleted content.
+ *
+ * @param {string} clientId Client ID of the pattern block.
+ * @param {string} markup   Block-markup string from the `pattern` registration property.
+ */
+function useSeedPatternBlocks( clientId, markup ) {
+	const registry = useRegistry();
+	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+
+	useLayoutEffect( () => {
+		const seeded = parse( markup );
+		if ( ! seeded.length ) {
+			return;
+		}
+		const { getBlocks, wasBlockJustInserted } =
+			registry.select( blockEditorStore );
+		if (
+			getBlocks( clientId ).length ||
+			! wasBlockJustInserted( clientId )
+		) {
+			return;
+		}
+		__unstableMarkNextChangeAsNotPersistent();
+		replaceInnerBlocks( clientId, seeded, false );
+	}, [
+		clientId,
+		markup,
+		registry,
+		replaceInnerBlocks,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
+}
+
+/**
  * Builds `edit`/`save` for a PHP-only block whose editable content is seeded
  * from a `pattern` markup string.
  *
@@ -336,34 +375,7 @@ function createPatternBlockComponents(
 	hasRenderCallback = false
 ) {
 	function Edit( { clientId } ) {
-		const registry = useRegistry();
-		const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
-			useDispatch( blockEditorStore );
-
-		// Seed only freshly inserted empty blocks: a reloaded empty block is a
-		// saved state (the pattern deleted under `patternLock: false`), and
-		// reseeding it would resurrect the deleted content.
-		useLayoutEffect( () => {
-			const seeded = parse( markup );
-			if ( ! seeded.length ) {
-				return;
-			}
-			const { getBlocks, wasBlockJustInserted } =
-				registry.select( blockEditorStore );
-			if (
-				getBlocks( clientId ).length ||
-				! wasBlockJustInserted( clientId )
-			) {
-				return;
-			}
-			__unstableMarkNextChangeAsNotPersistent();
-			replaceInnerBlocks( clientId, seeded, false );
-		}, [
-			clientId,
-			registry,
-			replaceInnerBlocks,
-			__unstableMarkNextChangeAsNotPersistent,
-		] );
+		useSeedPatternBlocks( clientId, markup );
 
 		// No `template`, so template sync stays inert; `templateLock` only locks
 		// the structure.
@@ -399,34 +411,7 @@ function createPatternBlockComponents(
  */
 function createSsrIslandsComponents( blockName, markup ) {
 	function Edit( { clientId, attributes } ) {
-		const registry = useRegistry();
-		const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
-			useDispatch( blockEditorStore );
-
-		// Seed only freshly inserted empty blocks: a reloaded empty block is a
-		// saved state (the pattern deleted under `patternLock: false`), and
-		// reseeding it would resurrect the deleted content.
-		useLayoutEffect( () => {
-			const seeded = parse( markup );
-			if ( ! seeded.length ) {
-				return;
-			}
-			const { getBlocks, wasBlockJustInserted } =
-				registry.select( blockEditorStore );
-			if (
-				getBlocks( clientId ).length ||
-				! wasBlockJustInserted( clientId )
-			) {
-				return;
-			}
-			__unstableMarkNextChangeAsNotPersistent();
-			replaceInnerBlocks( clientId, seeded, false );
-		}, [
-			clientId,
-			registry,
-			replaceInnerBlocks,
-			__unstableMarkNextChangeAsNotPersistent,
-		] );
+		useSeedPatternBlocks( clientId, markup );
 
 		const { content, status } = useServerSideRender( {
 			block: blockName,
@@ -435,11 +420,12 @@ function createSsrIslandsComponents( blockName, markup ) {
 
 		// Hold the last good shell: `useServerSideRender` drops `content` while
 		// loading, and the islands must never disappear mid-edit.
-		const shellRef = useRef();
-		if ( status === 'success' && typeof content === 'string' ) {
-			shellRef.current = content;
-		}
-		const shell = shellRef.current;
+		const [ shell, setShell ] = useState();
+		useLayoutEffect( () => {
+			if ( status === 'success' && typeof content === 'string' ) {
+				setShell( content );
+			}
+		}, [ status, content ] );
 
 		// The hook call applies the structural lock even when the portal path
 		// below ignores its output. The lock is `'all'` rather than
