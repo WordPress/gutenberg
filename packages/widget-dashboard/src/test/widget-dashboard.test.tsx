@@ -47,7 +47,7 @@ const widgetTypes: WidgetType[] = [
 		title: 'Greet',
 		help: {
 			text: 'Greetings at a glance.',
-			actions: [ { label: 'Learn more', href: 'options-general.php' } ],
+			links: [ { label: 'Learn more', href: 'options-general.php' } ],
 		},
 		renderModule: 'test-greet-module',
 	},
@@ -119,7 +119,7 @@ describe( 'WidgetDashboard', () => {
 			await screen.findByText( 'Greetings at a glance.' )
 		).toBeInTheDocument();
 
-		// Declared actions render as links resolved by the host.
+		// The note's declared links render in the popover.
 		expect(
 			screen.getByRole( 'link', { name: 'Learn more' } )
 		).toBeInTheDocument();

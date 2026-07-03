@@ -63,8 +63,8 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 				'title'         => 'Widget A',
 				'description'   => 'The first test widget.',
 				'help'          => array(
-					'text'    => 'Everything about A, briefly.',
-					'actions' => array(
+					'text'  => 'Everything about A, briefly.',
+					'links' => array(
 						array(
 							'label' => 'Learn more',
 							'href'  => 'options-general.php',
@@ -142,8 +142,8 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 		$this->assertSame( 'The first test widget.', $data['description'] );
 		$this->assertSame(
 			array(
-				'text'    => 'Everything about A, briefly.',
-				'actions' => array(
+				'text'  => 'Everything about A, briefly.',
+				'links' => array(
 					array(
 						'label' => 'Learn more',
 						'href'  => 'options-general.php',

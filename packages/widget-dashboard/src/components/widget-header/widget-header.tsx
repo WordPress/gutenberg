@@ -135,16 +135,14 @@ export function WidgetHeader( {
 										) }
 									</Popover.Description>
 
-									{ widgetType.help.actions?.map(
-										( action ) => (
-											<Link
-												key={ action.href }
-												href={ action.href }
-											>
-												{ action.label }
-											</Link>
-										)
-									) }
+									{ widgetType.help.links?.map( ( link ) => (
+										<Link
+											key={ link.href }
+											href={ link.href }
+										>
+											{ link.label }
+										</Link>
+									) ) }
 								</Stack>
 							</Popover.Popup>
 						</Popover.Root>

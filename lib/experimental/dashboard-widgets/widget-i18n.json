@@ -3,7 +3,7 @@
 	"description": "widget description",
 	"help": {
 		"text": "widget help text",
-		"actions": [ { "label": "widget help action label" } ]
+		"links": [ { "label": "widget help link label" } ]
 	},
 	"keywords": [ "widget keyword" ]
 }

@@ -15,7 +15,7 @@ export type {
 	WidgetName,
 	WidgetIcon,
 	WidgetHelp,
-	WidgetHelpAction,
+	WidgetHelpLink,
 	WidgetType,
 	WidgetAttributeField,
 	WidgetRenderProps,

@@ -28,12 +28,11 @@ export type WidgetName = `${ string }/${ string }`;
 export type WidgetIcon = ReactElement< ComponentProps< 'svg' > >;
 
 /**
- * A call to action in a widget's help note. The widget declares label and
- * destination; how the link renders is the host's call.
+ * A link in a widget's help note.
  */
-export interface WidgetHelpAction {
+export interface WidgetHelpLink {
 	/**
-	 * Action label. Translatable.
+	 * Link label. Translatable.
 	 */
 	label: string;
 
@@ -50,14 +49,14 @@ export interface WidgetHelpAction {
 export interface WidgetHelp {
 	/**
 	 * The note. Translatable. May carry `<em>`/`<strong>`; links belong
-	 * in `actions`.
+	 * in `links`.
 	 */
 	text: string;
 
 	/**
-	 * Calls to action rendered after the text.
+	 * Links contextual to the note.
 	 */
-	actions?: WidgetHelpAction[];
+	links?: WidgetHelpLink[];
 }
 
 /**

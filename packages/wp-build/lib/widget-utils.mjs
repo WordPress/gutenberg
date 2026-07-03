@@ -24,15 +24,15 @@ export function getAllWidgets( rootDir ) {
 }
 
 /**
- * @typedef {Object} WidgetHelpActionMetadata
- * @property {string} label Action label.
+ * @typedef {Object} WidgetHelpLinkMetadata
+ * @property {string} label Link label.
  * @property {string} href  Link destination.
  */
 
 /**
  * @typedef {Object} WidgetHelpMetadata
- * @property {string}                     text      Help text; may carry `em`/`strong`.
- * @property {WidgetHelpActionMetadata[]} [actions] Action links rendered after the text.
+ * @property {string}                   text    Help text; may carry `em`/`strong`.
+ * @property {WidgetHelpLinkMetadata[]} [links] Links contextual to the note.
  */
 
 /**

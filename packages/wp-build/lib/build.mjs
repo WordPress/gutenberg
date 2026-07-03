@@ -2083,7 +2083,7 @@ function toPhpStringArrayLiteral( values ) {
 
 /**
  * Format a widget help note as a PHP array literal. Returns the PHP
- * literal `null` when the note has no text; actions missing a `label`
+ * literal `null` when the note has no text; links missing a `label`
  * or `href` are dropped.
  *
  * @param {import('./widget-utils.mjs').WidgetHelpMetadata|null|undefined} help Source value.
@@ -2096,18 +2096,18 @@ function toPhpHelpLiteral( help ) {
 
 	const parts = [ `'text' => ${ toPhpStringLiteral( help.text ) }` ];
 
-	if ( Array.isArray( help.actions ) ) {
-		const actions = help.actions
-			.filter( ( action ) => action && action.label && action.href )
+	if ( Array.isArray( help.links ) ) {
+		const links = help.links
+			.filter( ( link ) => link && link.label && link.href )
 			.map(
-				( action ) =>
+				( link ) =>
 					`array( 'label' => ${ toPhpStringLiteral(
-						action.label
-					) }, 'href' => ${ toPhpStringLiteral( action.href ) } )`
+						link.label
+					) }, 'href' => ${ toPhpStringLiteral( link.href ) } )`
 			);
 
-		if ( actions.length > 0 ) {
-			parts.push( `'actions' => array( ${ actions.join( ', ' ) } )` );
+		if ( links.length > 0 ) {
+			parts.push( `'links' => array( ${ links.join( ', ' ) } )` );
 		}
 	}
 

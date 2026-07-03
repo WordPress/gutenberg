@@ -25,8 +25,8 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 		$this->assertSame( 'widget description', $schema->description );
 		$this->assertSame( 'widget help text', $schema->help->text );
 		$this->assertSame(
-			'widget help action label',
-			$schema->help->actions[0]->label
+			'widget help link label',
+			$schema->help->links[0]->label
 		);
 		$this->assertSame( array( 'widget keyword' ), $schema->keywords );
 	}
@@ -44,8 +44,8 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 				'title'       => 'Welcome',
 				'description' => 'Displays a welcome panel.',
 				'help'        => array(
-					'text'    => 'Welcome at a glance.',
-					'actions' => array(
+					'text'  => 'Welcome at a glance.',
+					'links' => array(
 						array(
 							'label' => 'Learn more',
 							'href'  => 'about.php',
@@ -61,21 +61,21 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 		$this->assertSame( 'Bienvenido', $widget['title'] );
 		$this->assertSame( 'Muestra un panel de bienvenida.', $widget['description'] );
 		$this->assertSame( 'Bienvenida de un vistazo.', $widget['help']['text'] );
-		$this->assertSame( 'Más información', $widget['help']['actions'][0]['label'] );
-		$this->assertSame( 'about.php', $widget['help']['actions'][0]['href'] );
+		$this->assertSame( 'Más información', $widget['help']['links'][0]['label'] );
+		$this->assertSame( 'about.php', $widget['help']['links'][0]['href'] );
 		$this->assertSame( array( 'inicio' ), $widget['keywords'] );
 		$this->assertSame( 'dashboard', $widget['category'] );
 	}
 
 	/**
 	 * The help text keeps minimal emphasis, everything else is stripped,
-	 * and malformed actions are dropped.
+	 * and malformed links are dropped.
 	 */
-	public function test_sanitize_widget_help_constrains_markup_and_actions() {
+	public function test_sanitize_widget_help_constrains_markup_and_links() {
 		$help = gutenberg_sanitize_widget_help(
 			array(
-				'text'    => 'Keep <em>emphasis</em> and <strong>bold</strong>, drop <a href="https://example.com">links</a>.',
-				'actions' => array(
+				'text'  => 'Keep <em>emphasis</em> and <strong>bold</strong>, drop <a href="https://example.com">links</a>.',
+				'links' => array(
 					array(
 						'label' => 'Valid',
 						'href'  => 'site-health.php',
@@ -93,7 +93,7 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 					'href'  => 'site-health.php',
 				),
 			),
-			$help['actions']
+			$help['links']
 		);
 	}
 
@@ -102,7 +102,7 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 	 */
 	public function test_sanitize_widget_help_requires_text() {
 		$this->assertNull( gutenberg_sanitize_widget_help( null ) );
-		$this->assertNull( gutenberg_sanitize_widget_help( array( 'actions' => array() ) ) );
+		$this->assertNull( gutenberg_sanitize_widget_help( array( 'links' => array() ) ) );
 	}
 
 	/**
@@ -132,11 +132,11 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 	 */
 	public function translate_to_spanish( $translation, $text, $context, $domain ) {
 		$messages = array(
-			'widget title'             => array( 'Welcome' => 'Bienvenido' ),
-			'widget description'       => array( 'Displays a welcome panel.' => 'Muestra un panel de bienvenida.' ),
-			'widget help text'         => array( 'Welcome at a glance.' => 'Bienvenida de un vistazo.' ),
-			'widget help action label' => array( 'Learn more' => 'Más información' ),
-			'widget keyword'           => array( 'start' => 'inicio' ),
+			'widget title'           => array( 'Welcome' => 'Bienvenido' ),
+			'widget description'     => array( 'Displays a welcome panel.' => 'Muestra un panel de bienvenida.' ),
+			'widget help text'       => array( 'Welcome at a glance.' => 'Bienvenida de un vistazo.' ),
+			'widget help link label' => array( 'Learn more' => 'Más información' ),
+			'widget keyword'         => array( 'start' => 'inicio' ),
 		);
 
 		if ( 'default' === $domain && isset( $messages[ $context ][ $text ] ) ) {

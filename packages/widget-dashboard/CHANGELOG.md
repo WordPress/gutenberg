@@ -5,8 +5,7 @@
 ### Enhancements
 
 -   `WidgetHeader`: surface the widget type's `help` note as an infotip
-    beside the title: a click-open popover with the note's text and its
-    declared action links.
+    beside the title: a click-open popover with the note and its links.
 
 ## 0.2.0 (2026-07-01)
 
