@@ -648,7 +648,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 7.1.0
 	 *
-	 * @param array|null $viewport_settings Viewport settings from theme.json.
+	 * @param mixed $viewport_settings Viewport settings from theme.json.
 	 * @param array      $options           {
 	 *     Optional. Options for generating media queries.
 	 *
