@@ -106,7 +106,13 @@ export function getBlockSettings(
 		let id: string | undefined = clientId;
 		do {
 			const name = getBlockName( state, id );
-			if ( hasBlockSupport( name, '__experimentalSettings', false ) ) {
+			if (
+				hasBlockSupport(
+					name as string,
+					'__experimentalSettings',
+					false
+				)
+			) {
 				candidates.push( id );
 			}
 		} while ( ( id = state.blocks.parents.get( id ) ) );
@@ -145,7 +151,7 @@ export function getBlockSettings(
 			) as Record< string, any >;
 			result =
 				getValueFromObjectPath(
-					candidateAtts.settings?.blocks?.[ blockName ],
+					candidateAtts.settings?.blocks?.[ blockName as string ],
 					normalizedPath
 				) ??
 				getValueFromObjectPath(

@@ -407,7 +407,7 @@ export function MyComponent() {
 
 WordPress extenders cannot update the private block settings on their own. The `updateSettings()` actions of the `@wordpress/block-editor` store will filter out all the settings that are **not** a part of the public API. The only way to actually store them is via the private action `__experimentalUpdateSettings()`.
 
-To privatize a block editor setting, add it to the `privateSettings` list in [/packages/block-editor/src/store/private-actions.js](/packages/block-editor/src/store/private-actions.js):
+To privatize a block editor setting, add it to the `privateSettings` list in [/packages/block-editor/src/store/private-actions.ts](/packages/block-editor/src/store/private-actions.ts):
 
 ```js
 const privateSettings = [

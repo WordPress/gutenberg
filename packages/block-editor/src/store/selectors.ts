@@ -1991,7 +1991,8 @@ const canInsertBlockTypeUnmemoized = (
  * @return  Whether the given block type is allowed to be inserted.
  */
 export const canInsertBlockType = createSelector(
-	canInsertBlockTypeUnmemoized,
+	( state: State, blockName: string, rootClientId: string | null = null ) =>
+		canInsertBlockTypeUnmemoized( state, blockName, rootClientId ),
 	( state: State, _blockName: string, rootClientId: string | undefined ) =>
 		getInsertBlockTypeDependants()( state, rootClientId )
 );
@@ -3016,11 +3017,11 @@ function enhancePatternWithParsedBlocks( pattern: Pattern ) {
  * @return {Array?} The list of allowed patterns.
  */
 export const __experimentalGetAllowedPatterns = createRegistrySelector(
-	( select ) => {
-		return createSelector(
+	( select ) =>
+		createSelector(
 			(
-				state,
-				rootClientId = null,
+				state: State,
+				rootClientId: string | null = null,
 				options = DEFAULT_INSERTER_OPTIONS
 			) => {
 				const { getAllPatterns } = unlock( select( STORE_NAME ) );
@@ -3057,8 +3058,7 @@ export const __experimentalGetAllowedPatterns = createRegistrySelector(
 				return patternsAllowed;
 			},
 			getAllowedPatternsDependants( select )
-		);
-	}
+		)
 );
 
 /**

@@ -33,7 +33,7 @@ export const storeConfig = {
 export const store = createReduxStore( STORE_NAME, {
 	...storeConfig,
 	persist: [ 'preferences' ],
-} );
+} as any);
 
 // We will be able to use the `register` function once we switch
 // the "preferences" persistence to use the new preferences package.
