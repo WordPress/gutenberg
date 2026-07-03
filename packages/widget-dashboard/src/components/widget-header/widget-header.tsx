@@ -7,6 +7,7 @@ import type { ReactNode } from 'react';
 /**
  * WordPress dependencies
  */
+import { createInterpolateElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { info } from '@wordpress/icons';
 // Dashboard is still experimental.
@@ -25,7 +26,6 @@ import type { WidgetType } from '@wordpress/widget-primitives';
 /**
  * Internal dependencies
  */
-import { HelpText } from './help-text';
 import styles from './widget-header.module.css';
 
 export interface WidgetHeaderProps {
@@ -135,9 +135,13 @@ export function WidgetHeader( {
 									gap="sm"
 								>
 									<Popover.Description>
-										<HelpText
-											text={ widgetType.help.text }
-										/>
+										{ createInterpolateElement(
+											widgetType.help.text,
+											{
+												em: <em />,
+												strong: <strong />,
+											}
+										) }
 									</Popover.Description>
 
 									{ widgetType.help.actions?.map(
