@@ -322,12 +322,8 @@ export const __experimentalGetCoreBlocks = () =>
 const { InnerContent } = unlock( blockEditorPrivateApis );
 
 /**
- * Builds `edit`/`save` for a PHP-only block that uses a `pattern` markup string.
- * On first insert the pattern becomes real inner blocks (content blocks stay
- * editable in the canvas) and the block saves as normal block markup.
- *
- * Gotcha: with a `render_callback`, `save` emits only the inner blocks; PHP
- * renders the wrapper, so saving one too would double-wrap.
+ * Builds `edit`/`save` for a PHP-only block whose editable content is seeded
+ * from a `pattern` markup string.
  *
  * @param {string}       markup              Block-markup string from the `pattern` registration property.
  * @param {string|false} [lock]              Locking mode: `'all'` (default) or `false`.
@@ -344,8 +340,8 @@ function createPatternBlockComponents(
 		const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
 			useDispatch( blockEditorStore );
 
-		// Seed inner blocks from the markup only when empty; on reload they come
-		// from the saved post, so reseeding would overwrite edits.
+		// Seed only when empty: on reload the inner blocks come from the saved
+		// post, and reseeding would overwrite edits.
 		useLayoutEffect( () => {
 			const seeded = parse( markup );
 			if ( ! seeded.length ) {
@@ -376,8 +372,8 @@ function createPatternBlockComponents(
 	}
 
 	function save() {
-		// PHP renders the wrapper; save only the inner blocks to avoid double-
-		// wrapping. Without a callback the saved wrapper is the output.
+		// With a render_callback PHP renders the wrapper, so saving one too
+		// would double-wrap. Without one the saved wrapper is the output.
 		if ( hasRenderCallback ) {
 			return <InnerBlocks.Content />;
 		}
@@ -389,14 +385,9 @@ function createPatternBlockComponents(
 
 /**
  * Builds `edit`/`save` for a PHP-only `pattern` block with a `render_callback`
- * (SSR-islands mode).
- *
- * The editor renders the PHP `render_callback` shell server-side and portals the
- * editable pattern inner blocks (the islands) into its slots, so the editor
- * matches the frontend (WYSIWYG) while the islands stay editable in the canvas.
- * In the editor SSR context the block renders with no inner content, and the
- * PHP side passes `<wp-inner-block-slot>` placeholders as `$content`, so the
- * shell arrives with slots where the saved content would go.
+ * (SSR-islands). The editor shows the server-rendered shell and portals the
+ * editable pattern blocks into its `<wp-inner-block-slot>` placeholders, so it
+ * matches the frontend while the content stays editable in the canvas.
  *
  * @param {string} blockName Block name, used to fetch the server-rendered shell.
  * @param {string} markup    Pattern markup seeded as the editable inner blocks.
@@ -408,8 +399,8 @@ function createSsrIslandsComponents( blockName, markup ) {
 		const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
 			useDispatch( blockEditorStore );
 
-		// Seed the pattern as editable inner blocks once, when empty (same as the
-		// canvas-editable pattern mode). On reload they come from the saved post.
+		// Seed only when empty: on reload the inner blocks come from the saved
+		// post, and reseeding would overwrite edits.
 		useLayoutEffect( () => {
 			const seeded = parse( markup );
 			if ( ! seeded.length ) {
@@ -442,19 +433,18 @@ function createSsrIslandsComponents( blockName, markup ) {
 		}
 		const shell = shellRef.current;
 
-		// Lock the island structure with `'all'`: no add/move/remove, but the
-		// content stays editable and the generated `variant`/`featured` controls
-		// stay visible (SSR-islands needs them to drive the shell re-fetch). The
-		// `useInnerBlocksProps` side effect applies the lock; the blocks render
-		// either inline (fallback) or portalled into the shell.
+		// The hook call applies the structural lock even when the portal path
+		// below ignores its output. The lock is `'all'` rather than
+		// `'contentOnly'` so the generated inspector controls stay visible to
+		// drive the shell re-fetch.
 		const blockProps = useBlockProps();
 		const innerBlocksProps = useInnerBlocksProps( blockProps, {
 			templateLock: 'all',
 			renderAppender: false,
 		} );
 
-		// Until the first shell arrives (or on error), show the editable islands
-		// plainly so they are never hidden.
+		// The islands must stay visible while the shell is missing, whether
+		// that's the first load or an error.
 		if ( ! shell ) {
 			return <div { ...innerBlocksProps } />;
 		}
@@ -467,7 +457,8 @@ function createSsrIslandsComponents( blockName, markup ) {
 	}
 
 	function save() {
-		// PHP wraps the saved islands on the frontend; save only the inner blocks.
+		// PHP wraps the saved islands on the frontend; saving the wrapper too
+		// would double-wrap.
 		return <InnerBlocks.Content />;
 	}
 
@@ -494,8 +485,8 @@ export const registerCoreBlocks = (
 	// Auto-register PHP-only blocks with ServerSideRender
 	if ( window.__unstableAutoRegisterBlocks ) {
 		window.__unstableAutoRegisterBlocks.forEach( ( blockName ) => {
-			// A block with both `pattern` and `render_callback` registers as a
-			// pattern block below; skip its SSR registration here.
+			// Pattern blocks register below; a second registration here would
+			// clobber theirs.
 			if ( window.__unstableAutoRegisterBlockPatterns?.[ blockName ] ) {
 				return;
 			}
@@ -553,7 +544,7 @@ export const registerCoreBlocks = (
 		} );
 	}
 
-	// Auto-register PHP-only `pattern` blocks as real, locked inner blocks.
+	// Auto-register PHP-only `pattern` blocks as editable inner blocks.
 	if ( window.__unstableAutoRegisterBlockPatterns ) {
 		Object.entries( window.__unstableAutoRegisterBlockPatterns ).forEach(
 			( [
@@ -575,9 +566,6 @@ export const registerCoreBlocks = (
 					example: bootstrappedBlockType?.example ?? {
 						innerBlocks: parse( markup ),
 					},
-					// `ssr-islands` renders the PHP shell server-side and portals
-					// the editable islands into it (WYSIWYG); the default mode
-					// edits the pattern blocks directly in the canvas.
 					...( editorMode === 'ssr-islands'
 						? createSsrIslandsComponents( blockName, markup )
 						: createPatternBlockComponents(
