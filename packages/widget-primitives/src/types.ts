@@ -12,7 +12,12 @@
 /**
  * External dependencies
  */
-import type { ComponentProps, ComponentType, ReactElement } from 'react';
+import type {
+	ComponentProps,
+	ComponentType,
+	ReactElement,
+	ReactNode,
+} from 'react';
 import type { Field } from '@wordpress/dataviews';
 
 /**
@@ -79,9 +84,11 @@ export interface WidgetTypeMetadata< Item = unknown > {
 
 	/**
 	 * Brief contextual note about the widget type, meant for compact
-	 * surfaces such as tooltips. Translatable.
+	 * surfaces such as tooltips. Metadata modules may provide any
+	 * renderable node (e.g. text with a link); `widget.json` and the
+	 * wire record carry plain, translatable strings.
 	 */
-	info?: string;
+	info?: ReactNode;
 
 	/**
 	 * Visual identifier for the widget type; hosts decide where, and
@@ -207,12 +214,7 @@ export type ResolveWidgetModule = (
 type WidgetModuleRecordOverrides = {
 	[ K in keyof Pick<
 		WidgetTypeMetadata,
-		| 'title'
-		| 'description'
-		| 'info'
-		| 'category'
-		| 'presentation'
-		| 'keywords'
+		'title' | 'description' | 'category' | 'presentation' | 'keywords'
 	> ]?: WidgetTypeMetadata[ K ] | null;
 };
 
@@ -236,4 +238,10 @@ export interface WidgetModuleRecord extends WidgetModuleRecordOverrides {
 	 * Script-module id dynamically imported for the widget's live metadata.
 	 */
 	widget_module?: string | null;
+
+	/**
+	 * Translated info note; overrides the metadata module's value. The
+	 * wire format carries plain strings only.
+	 */
+	info?: string | null;
 }
