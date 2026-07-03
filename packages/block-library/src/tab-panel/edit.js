@@ -8,7 +8,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMemo, useEffect } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -102,22 +102,8 @@ export default function Edit( { clientId, isSelected } ) {
 	// Determine if this is the default tab (for the "Default Tab" toggle in controls)
 	const isDefaultTab = activeTabIndex === blockIndex;
 
-	/**
-	 * This hook determines if the current tab panel should be visible.
-	 * This is true if it is the editor active tab, or if it is selected directly.
-	 */
-	const isSelectedTab = useMemo( () => {
-		// Show if this tab is directly selected or has selected inner blocks
-		if ( isSelected || hasInnerBlocksSelected ) {
-			return true;
-		}
-		// Always show the active tab (at effectiveActiveIndex) regardless of other selection state.
-		// This ensures the tab panel remains visible when editing labels in tab-list.
-		if ( isActiveTab ) {
-			return true;
-		}
-		return false;
-	}, [ isSelected, hasInnerBlocksSelected, isActiveTab ] );
+	// Visible when selected, containing the selection, or the active tab.
+	const isSelectedTab = isSelected || hasInnerBlocksSelected || isActiveTab;
 
 	const blockProps = useBlockProps( {
 		hidden: ! isSelectedTab,
