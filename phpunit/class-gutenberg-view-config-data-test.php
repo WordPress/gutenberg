@@ -416,7 +416,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		// Omitted: no version declared.
 		$data->update_properties( array( 'default_view' => array( 'type' => 'grid' ) ) );
 		$data->update_view_list_items( array( 'mine' => array( 'title' => 'Mine' ) ) );
-		$data->update_form_fields( array( 'excerpt' => array( 'label' => 'Summary' ) ) );
+		$data->update_form_fields( array( 'excerpt' => array( 'layout' => array( 'labelPosition' => 'side' ) ) ) );
 
 		// Newer than the latest supported version.
 		$data->update_properties(
@@ -586,21 +586,27 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				'form' => array(
 					'fields' => array(
 						array(
-							'id'    => 'excerpt',
-							'label' => 'Excerpt',
+							'id'     => 'excerpt',
+							'layout' => array(
+								'type'          => 'panel',
+								'labelPosition' => 'top',
+							),
 						),
 						'date',
 					),
 				),
 			)
 		);
-		$data->update_form_fields( array( 'excerpt' => array( 'label' => 'Summary' ) ), 1 );
+		$data->update_form_fields( array( 'excerpt' => array( 'layout' => array( 'labelPosition' => 'side' ) ) ), 1 );
 
 		$this->assertSame(
 			array(
 				array(
-					'id'    => 'excerpt',
-					'label' => 'Summary',
+					'id'     => 'excerpt',
+					'layout' => array(
+						'type'          => 'panel',
+						'labelPosition' => 'side',
+					),
 				),
 				'date',
 			),
@@ -628,7 +634,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				),
 			)
 		);
-		$data->update_form_fields( array( 'ping_status' => array( 'label' => 'Pings' ) ), 1 );
+		$data->update_form_fields( array( 'ping_status' => array( 'layout' => array( 'labelPosition' => 'side' ) ) ), 1 );
 
 		// comment_status stays a bare string; the matched ping_status child is
 		// promoted from a bare string and merged with the incoming overrides.
@@ -640,8 +646,8 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 					'children' => array(
 						'comment_status',
 						array(
-							'id'    => 'ping_status',
-							'label' => 'Pings',
+							'id'     => 'ping_status',
+							'layout' => array( 'labelPosition' => 'side' ),
 						),
 					),
 				),
@@ -676,7 +682,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 			array(
 				'status' => array(
 					'label'    => 'Visibility',
-					'children' => array( 'status' => array( 'label' => 'State' ) ),
+					'children' => array( 'status' => array( 'layout' => array( 'labelPosition' => 'none' ) ) ),
 				),
 			),
 			1
@@ -689,8 +695,8 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 					'label'    => 'Visibility',
 					'children' => array(
 						array(
-							'id'    => 'status',
-							'label' => 'State',
+							'id'     => 'status',
+							'layout' => array( 'labelPosition' => 'none' ),
 						),
 						'password',
 					),
@@ -711,7 +717,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		$data = new Gutenberg_View_Config_Data( array( 'form' => array( 'fields' => array( 'date' ) ) ) );
 		$data->update_form_fields(
 			array(
-				'my_field'    => array( 'label' => 'Mine' ),
+				'my_field'    => array( 'layout' => array( 'labelPosition' => 'side' ) ),
 				'other_field' => array(),
 			),
 			1
@@ -721,8 +727,8 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 			array(
 				'date',
 				array(
-					'id'    => 'my_field',
-					'label' => 'Mine',
+					'id'     => 'my_field',
+					'layout' => array( 'labelPosition' => 'side' ),
 				),
 				'other_field',
 			),
@@ -742,8 +748,8 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				'form' => array(
 					'fields' => array(
 						array(
-							'id'    => 'excerpt',
-							'label' => 'Excerpt',
+							'id'     => 'excerpt',
+							'layout' => array( 'type' => 'panel' ),
 						),
 						array(
 							'id'       => 'discussion',
@@ -800,7 +806,7 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 			array(
 				'discussion' => array(
 					'children' => array(
-						'comment_status' => array( 'label' => 'Comments' ),
+						'comment_status' => array( 'layout' => array( 'labelPosition' => 'none' ) ),
 						'my_field'       => array(),
 					),
 				),
@@ -815,8 +821,8 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 					'label'    => 'Discussion',
 					'children' => array(
 						array(
-							'id'    => 'comment_status',
-							'label' => 'Comments',
+							'id'     => 'comment_status',
+							'layout' => array( 'labelPosition' => 'none' ),
 						),
 						'ping_status',
 						'my_field',
@@ -913,8 +919,8 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 				'form' => array(
 					'fields' => array(
 						array(
-							'id'    => 'excerpt',
-							'label' => 'Excerpt',
+							'id'     => 'excerpt',
+							'layout' => array( 'labelPosition' => 'top' ),
 						),
 					),
 				),
@@ -923,8 +929,8 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		$data->update_form_fields(
 			array(
 				'excerpt' => array(
-					'id'    => 'other',
-					'label' => 'Summary',
+					'id'     => 'other',
+					'layout' => array( 'labelPosition' => 'side' ),
 				),
 			),
 			1
@@ -933,8 +939,8 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 		$this->assertSame(
 			array(
 				array(
-					'id'    => 'excerpt',
-					'label' => 'Summary',
+					'id'     => 'excerpt',
+					'layout' => array( 'labelPosition' => 'side' ),
 				),
 			),
 			$data->get_config()['form']['fields']
