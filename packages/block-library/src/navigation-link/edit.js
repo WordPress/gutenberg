@@ -8,9 +8,11 @@ import clsx from 'clsx';
  */
 import { createBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { store as coreDataStore } from '@wordpress/core-data';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
 import {
 	BlockControls,
 	InspectorControls,
@@ -95,6 +97,38 @@ export default function NavigationLinkEdit( {
 		__unstableMarkNextChangeAsNotPersistent,
 		selectBlock,
 	} = useDispatch( blockEditorStore );
+
+	// Fetch the live entity title for post-type and taxonomy links so the editor
+	// label stays in sync when a post's title or a term's name changes.
+	const liveEntityTitle = useSelect(
+		( select ) => {
+			if ( ! id || ( kind !== 'post-type' && kind !== 'taxonomy' ) ) {
+				return null;
+			}
+			const isPostType = kind === 'post-type';
+			const entityType = isPostType ? 'postType' : 'taxonomy';
+			const typeForAPI = type === 'tag' ? 'post_tag' : type;
+			const record = select( coreDataStore ).getEntityRecord(
+				entityType,
+				typeForAPI,
+				id
+			);
+			if ( ! record ) {
+				return null;
+			}
+			// Posts/pages expose title as { raw, rendered }; terms expose name.
+			const rawTitle = record?.title;
+			if ( typeof rawTitle === 'string' ) {
+				return rawTitle;
+			}
+			if ( rawTitle && 'rendered' in rawTitle ) {
+				return rawTitle.rendered || null;
+			}
+			return record?.name || null;
+		},
+		[ id, kind, type ]
+	);
+
 	// Have the link editing ui open on mount when lacking a url and selected.
 	const [ isLinkOpen, setIsLinkOpen ] = useState( isSelected && ! url );
 	// Use internal state instead of a ref to make sure that the component
@@ -225,6 +259,20 @@ export default function NavigationLinkEdit( {
 		__unstableMarkNextChangeAsNotPersistent,
 		transformToSubmenu,
 	] );
+
+	// Sync the block's stored label with the live entity title.
+	useEffect( () => {
+		if ( ! liveEntityTitle || ! label ) {
+			return;
+		}
+		// Decode HTML entities in the stored label before comparing
+		const decodedLabel = decodeEntities( label ).trim();
+		if ( decodedLabel !== liveEntityTitle.trim() ) {
+			// Mark as non-persistent so label auto-sync doesn't pollute undo history.
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { label: liveEntityTitle } );
+		}
+	}, [ liveEntityTitle ] ); // eslint-disable-line react-hooks/exhaustive-deps
 
 	// Handle link UI when a new link is created
 	useEffect( () => {

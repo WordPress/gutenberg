@@ -114,6 +114,77 @@ function block_core_navigation_link_maybe_urldecode( $url ) {
 
 
 /**
+ * Returns the dynamic URL for a navigation link based on its kind and id.
+ *
+ * For non-custom links (those with an id and a recognized kind), retrieves
+ * the current permalink using WordPress core functions so that links stay
+ * up-to-date even when a post's slug or a term's slug is changed after the
+ * menu item was saved.
+ *
+ * Returns null for custom/external links (no id, or unrecognised kind) so
+ * the caller falls back to the stored URL.
+ *
+ * @since 6.8.0
+ *
+ * @param array $attributes The block attributes.
+ * @return string|null The dynamic URL, or null if one cannot be determined.
+ */
+function block_core_navigation_link_get_dynamic_url( $attributes ) {
+	$kind = isset( $attributes['kind'] ) ? $attributes['kind'] : '';
+	$id   = isset( $attributes['id'] ) ? (int) $attributes['id'] : 0;
+	$type = isset( $attributes['type'] ) ? $attributes['type'] : '';
+
+	if ( 'post-type' === $kind && $id ) {
+		$url = get_permalink( $id );
+		return $url ? $url : null;
+	}
+
+	if ( 'taxonomy' === $kind && $id ) {
+		$url = get_term_link( $id, $type );
+		return ( ! is_wp_error( $url ) ) ? $url : null;
+	}
+
+	if ( 'post-type-archive' === $kind && $type ) {
+		$url = get_post_type_archive_link( $type );
+		return $url ? $url : null;
+	}
+
+	return null;
+}
+
+/**
+ * Returns the dynamic label for a navigation link based on its kind and id.
+ *
+ * For post-type links the current post title is returned; for taxonomy links
+ * the current term name is returned. Returns null for custom/external links
+ * (no id, or unrecognised kind) so the caller falls back to the stored label.
+ *
+ * @since 6.8.0
+ *
+ * @param array $attributes The block attributes.
+ * @return string|null The dynamic label, or null if one cannot be determined.
+ */
+function block_core_navigation_link_get_dynamic_label( $attributes ) {
+	$kind = isset( $attributes['kind'] ) ? $attributes['kind'] : '';
+	$id   = isset( $attributes['id'] ) ? (int) $attributes['id'] : 0;
+	$type = isset( $attributes['type'] ) ? $attributes['type'] : '';
+
+	if ( 'post-type' === $kind && $id ) {
+		$title = get_the_title( $id );
+		return $title ? $title : null;
+	}
+
+	if ( 'taxonomy' === $kind && $id ) {
+		$term = get_term( $id, $type );
+		if ( $term && ! is_wp_error( $term ) ) {
+			return $term->name;
+		}
+	}
+
+	return null;
+}
+
+/**
  * Renders the `core/navigation-link` block.
  *
  * @since 5.9.0
@@ -167,7 +238,11 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		'<a class="wp-block-navigation-item__content" ';
 
 	// Start appending HTML attributes to anchor tag.
-	if ( isset( $attributes['url'] ) ) {
+	// Try to resolve the URL dynamically (keeps links correct after slug changes).
+	$dynamic_url = block_core_navigation_link_get_dynamic_url( $attributes );
+	if ( null !== $dynamic_url ) {
+		$html .= ' href="' . esc_url( $dynamic_url ) . '"';
+	} elseif ( isset( $attributes['url'] ) ) {
 		$html .= ' href="' . esc_url( block_core_navigation_link_maybe_urldecode( $attributes['url'] ) ) . '"';
 	}
 
@@ -196,7 +271,11 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		// Wrap title with span to isolate it from submenu icon.
 		'<span class="wp-block-navigation-item__label">';
 
-	if ( isset( $attributes['label'] ) ) {
+	// Try to resolve the label dynamically (keeps labels correct after title changes).
+	$dynamic_label = block_core_navigation_link_get_dynamic_label( $attributes );
+	if ( null !== $dynamic_label ) {
+		$html .= wp_kses_post( $dynamic_label );
+	} elseif ( isset( $attributes['label'] ) ) {
 		$html .= wp_kses_post( $attributes['label'] );
 	}
 
