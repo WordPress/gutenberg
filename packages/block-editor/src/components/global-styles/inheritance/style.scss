@@ -1,17 +1,12 @@
-// Inherited Global Styles values — visual treatment for inspector
-// control labels.
+// Inherited Global Styles values — visual treatment for inspector control
+// labels.
 //
-// `.is-inherited-from-global-styles` marks controls that are displaying
-// inherited values. `.has-local-override-from-global-styles` marks controls
-// that locally override inherited values. The states are mutually exclusive.
-
+// `.is-inherited-from-global-styles` marks controls displaying inherited
+// values: the label gets a dotted underline.
+// `.has-local-override-from-global-styles` marks controls that locally override
+// inherited values: a blue reset dot is rendered as a sibling at the item's
+// inline-end. The states are mutually exclusive.
 .is-inherited-from-global-styles {
-	.components-base-control__label,
-	.block-editor-panel-color-gradient-settings__color-name,
-	.block-editor-global-styles-background-panel__inspector-media-replace-title {
-		position: relative;
-	}
-
 	.components-base-control__label {
 		text-decoration-line: underline;
 		text-decoration-style: dotted;
@@ -29,27 +24,47 @@
 	}
 }
 
-// The tooltip target overlays the visible label text only. This keeps
-// the inherited-value tooltip scoped to labels without wrapping the
-// full control or intercepting nested control tooltips.
-.global-styles-inheritance-tooltip-anchor {
-	display: inline-block;
+// Local-override reset dot — a sibling of the control positioned at the item's
+// inline-end.
+.has-local-override-from-global-styles {
+	position: relative;
+}
+
+.global-styles-inheritance-affordance {
 	position: absolute;
-	inset: 0;
+	inset-block-start: 0;
+	inset-inline-end: 0;
+	z-index: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	// The wrapper wraps only the 14px reset dot (no fixed footprint), so the
+	// dot centers on the control's label/header line and sits a natural
+	// distance from any inline-end toggle. It is out of flow and must never
+	// intercept pointer events meant for an adjacent toggle button; only the
+	// reset button itself is interactive.
+	pointer-events: none;
+
+	// Controls that render a 24px toggle at the item's inline-end (linked/
+	// unlink, units switch): shift the dot one toggle width plus an 8px gap
+	// toward the inline-start so it sits just to the left of that toggle and
+	// the two never overlap.
+	&--offset-toggle {
+		inset-inline-end: calc(24px + 8px);
+	}
+
+	.has-local-override-from-global-styles__reset {
+		pointer-events: auto;
+		// The affordance wrapper handles placement; drop the inline margin the
+		// shared rule adds for the in-label (color/background) context.
+		margin-inline-start: 0 !important;
+	}
 }
 
-.global-styles-inheritance-tooltip-anchor__text {
-	visibility: hidden;
-}
-
-.global-styles-inheritance-tooltip-content__line {
-	display: block;
-}
-
-// Local-override reset button — portaled into the label DOM node so the
-// trigger sits inline with the label text. At rest it shows the blue dot
-// signalling a local override; on hover/focus the dot is swapped for the
-// `reset` (dash) icon and a "Reset to inherited value" tooltip.
+// Local-override reset button. At rest it shows the blue dot signalling a local
+// override; on hover/focus the dot is swapped for the `reset` (dash) icon and a
+// "Reset to inherited value" tooltip.
 .has-local-override-from-global-styles__reset {
 	display: inline-flex !important;
 	align-items: center;
@@ -100,10 +115,9 @@
 
 	// Color/gradient control context: the button is positioned by
 	// `block-editor-panel-color-gradient-settings__reset` (absolute,
-	// hover-revealed). The local override must stay visible and centered
-	// in that slot. The shared rule above sets `position: relative` for the
-	// inline label context, so re-assert `position: absolute` here (this
-	// compound selector wins on specificity) to sit in the reset slot.
+	// hover-revealed) as a sibling of the toggle. The shared rule above sets
+	// `position: relative`; re-assert `position: absolute` here (this compound
+	// selector wins on specificity) to sit in the reset slot.
 	&.block-editor-panel-color-gradient-settings__reset {
 		position: absolute;
 		justify-content: center;
