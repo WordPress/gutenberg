@@ -122,7 +122,11 @@ export default function CustomInserterModal( { onClose, value, onChange } ) {
 							className="wp-block-icon__inserter-panel"
 						>
 							{ ! hasResolvedIcons ? (
-								<div className="wp-block-icon__inserter-loading">
+								<div
+									className="wp-block-icon__inserter-loading"
+									role="status"
+									aria-label={ __( 'Loading…' ) }
+								>
 									<Spinner />
 								</div>
 							) : (
