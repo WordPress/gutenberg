@@ -957,19 +957,6 @@
 				"custom"
 			]
 		},
-		"settingsPropertiesComplete": {
-			"allOf": [
-				{
-					"$ref": "#/definitions/settingsProperties"
-				},
-				{
-					"type": "object",
-					"propertyNames": {
-						"$ref": "#/definitions/settingsPropertyNames"
-					}
-				}
-			]
-		},
 		"settingsBlockPropertiesComplete": {
 			"allOf": [
 				{
