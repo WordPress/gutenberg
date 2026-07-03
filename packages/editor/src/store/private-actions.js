@@ -169,7 +169,6 @@ export const saveDirtyEntities =
 		close?.( entitiesToSave );
 		const siteItemsToSave = [];
 		const pendingSavedRecords = [];
-		const pendingSavedRecordEntities = [];
 		entitiesToSave.forEach( ( { kind, name, key, property } ) => {
 			if ( 'root' === kind && 'site' === name ) {
 				siteItemsToSave.push( property );
@@ -191,9 +190,15 @@ export const saveDirtyEntities =
 				pendingSavedRecords.push(
 					registry
 						.dispatch( coreStore )
-						.saveEditedEntityRecord( kind, name, key )
+						.saveEditedEntityRecord( kind, name, key, {
+							throwOnError: true,
+						} )
+						.catch( ( error ) => {
+							return error instanceof Error
+								? error
+								: new Error( error.message, { cause: error } );
+						} )
 				);
-				pendingSavedRecordEntities.push( { kind, name, key } );
 			}
 		} );
 		if ( siteItemsToSave.length ) {
@@ -204,14 +209,17 @@ export const saveDirtyEntities =
 						'root',
 						'site',
 						undefined,
-						siteItemsToSave
+						siteItemsToSave,
+						{
+							throwOnError: true,
+						}
 					)
+					.catch( ( error ) => {
+						return error instanceof Error
+							? error
+							: new Error( error.message, { cause: error } );
+					} )
 			);
-			pendingSavedRecordEntities.push( {
-				kind: 'root',
-				name: 'site',
-				key: undefined,
-			} );
 		}
 		registry
 			.dispatch( blockEditorStore )
@@ -225,32 +233,17 @@ export const saveDirtyEntities =
 				return values;
 			} )
 			.then( ( values ) => {
-				if (
-					values.some( ( value ) => typeof value === 'undefined' )
-				) {
-					// Find the first failed save and retrieve its error from
-					// the store so we can surface the server's own message
-					// (e.g. "The CSS must not contain </style>.") rather than
-					// a generic fallback.
-					const failedIndex = values.findIndex(
-						( value ) => typeof value === 'undefined'
-					);
-					const failedEntity =
-						pendingSavedRecordEntities[ failedIndex ];
-					const error = failedEntity
-						? registry
-								.select( coreStore )
-								.getLastEntitySaveError(
-									failedEntity.kind,
-									failedEntity.name,
-									failedEntity.key
-								)
-						: undefined;
+				const errors = values.filter( ( v ) => v instanceof Error );
+				if ( errors ) {
+					const firstMessage = errors.find(
+						( e ) => e.message
+					)?.message;
+
 					registry
 						.dispatch( noticesStore )
 						.createErrorNotice(
 							decodeEntities(
-								error?.message || __( 'Saving failed.' )
+								firstMessage || __( 'Saving failed.' )
 							),
 							{
 								type: 'snackbar',
