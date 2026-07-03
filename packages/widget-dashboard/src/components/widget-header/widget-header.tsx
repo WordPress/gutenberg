@@ -7,25 +7,13 @@ import type { ReactNode } from 'react';
 /**
  * WordPress dependencies
  */
-import { createInterpolateElement } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-import { info } from '@wordpress/icons';
-// Dashboard is still experimental.
-/* eslint-disable @wordpress/use-recommended-components */
-import {
-	Card,
-	Icon,
-	Link,
-	Popover,
-	Stack,
-	VisuallyHidden,
-} from '@wordpress/ui';
-/* eslint-enable @wordpress/use-recommended-components */
+import { Card, Icon, Stack } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
 
 /**
  * Internal dependencies
  */
+import { WidgetInfotip } from './widget-header-infotip';
 import styles from './widget-header.module.css';
 
 export interface WidgetHeaderProps {
@@ -99,53 +87,10 @@ export function WidgetHeader( {
 					</Card.Title>
 
 					{ widgetType.help && (
-						<Popover.Root modal="trap-focus">
-							<Popover.Trigger
-								aria-label={ __( 'More information' ) }
-								className={ styles.help }
-							>
-								<Icon icon={ info } size={ 20 } />
-							</Popover.Trigger>
-
-							<Popover.Popup
-								positioner={
-									<Popover.Positioner
-										side="bottom"
-										align="start"
-									/>
-								}
-							>
-								<Popover.Arrow />
-								<VisuallyHidden render={ <Popover.Title /> }>
-									{ __( 'More information' ) }
-								</VisuallyHidden>
-
-								<Stack
-									direction="column"
-									align="start"
-									gap="sm"
-								>
-									<Popover.Description>
-										{ createInterpolateElement(
-											widgetType.help.content,
-											{
-												em: <em />,
-												strong: <strong />,
-											}
-										) }
-									</Popover.Description>
-
-									{ widgetType.help.links?.map( ( link ) => (
-										<Link
-											key={ link.href }
-											href={ link.href }
-										>
-											{ link.label }
-										</Link>
-									) ) }
-								</Stack>
-							</Popover.Popup>
-						</Popover.Root>
+						<WidgetInfotip
+							content={ widgetType.help.content }
+							links={ widgetType.help.links }
+						/>
 					) }
 				</Stack>
 			) }
