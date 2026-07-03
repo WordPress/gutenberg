@@ -115,19 +115,22 @@ function example_filter_page_view_config( $data ) {
         1
     );
 
-    // Patch form fields by id, wherever they live in the form: retitle the
-    // excerpt field, remove the slug and author fields with null, and append
-    // a field to the discussion group. In a `children` map an unknown id
-    // appends. The id lives in the patch key, so the value only carries
-    // overrides: array() appends a plain reference. A bare string cannot
-    // express an addition — array( 'my_field' ) is a positional list, and a
-    // `children` list replaces the group's children wholesale instead.
+    // Patch form fields by id, wherever they live in the form: update the
+    // label position of the post content info field, remove the slug and
+    // author fields with null, and append a field to the discussion group.
+    // In a `children` map an unknown id appends. The id lives in the patch
+    // key, so the value only carries overrides: array() appends a plain
+    // reference. A bare string cannot express an addition —
+    // array( 'my_field' ) is a positional list, and a `children` list
+    // replaces the group's children wholesale instead.
     $data->update_form_fields(
         array(
-            'excerpt'    => array( 'label' => __( 'Summary', 'example' ) ),
-            'slug'       => null,
-            'author'     => null,
-            'discussion' => array(
+            'post-content-info' => array(
+                'layout' => array( 'labelPosition' => 'side' ),
+            ),
+            'slug'              => null,
+            'author'            => null,
+            'discussion'        => array(
                 'children' => array( 'my_field' => array() ),
             ),
         ),
