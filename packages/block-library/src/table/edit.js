@@ -13,6 +13,8 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
+import { isVerticalEdge } from '@wordpress/dom';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import {
 	InspectorControls,
 	BlockControls,
@@ -412,6 +414,39 @@ function TableEdit( {
 		},
 	];
 
+	// Determine the last section and its last row index so we can provide
+	// Arrow Down escape behaviour for cells in that position.
+	const lastSectionName = sections[ sections.length - 1 ];
+	const lastSectionRows = lastSectionName
+		? attributes[ lastSectionName ]
+		: [];
+	const lastRowIndex = lastSectionRows.length - 1;
+
+	/**
+	 * Handles Arrow Down key press in the last row of the table. When the
+	 * caret is at the bottom vertical edge of the cell, insert a new default
+	 * block after the table so keyboard-only users can escape the block.
+	 *
+	 * @param {KeyboardEvent} event The keyboard event.
+	 */
+	function onLastRowKeyDown( event ) {
+		if ( event.defaultPrevented ) {
+			return;
+		}
+
+		if ( event.key !== 'ArrowDown' ) {
+			return;
+		}
+
+		if ( ! isVerticalEdge( event.currentTarget, false ) ) {
+			return;
+		}
+
+		event.preventDefault();
+
+		insertBlocksAfter( createBlock( getDefaultBlockName() ) );
+	}
+
 	const renderedSections = sections.map( ( name ) => (
 		<TSection name={ name } key={ name }>
 			{ attributes[ name ].map( ( { cells }, rowIndex ) => (
@@ -421,6 +456,12 @@ function TableEdit( {
 							selectedCell?.sectionName === name &&
 							selectedCell?.rowIndex === rowIndex &&
 							selectedCell?.columnIndex === columnIndex;
+
+						// Determine if this cell is in the last row of the last
+						// section so we can attach the Arrow Down escape handler.
+						const isLastRowOfLastSection =
+							name === lastSectionName &&
+							rowIndex === lastRowIndex;
 
 						// Important - the Cell component is memoized to improve typing performance.
 						// ensure all props passed have stable references.
@@ -438,6 +479,11 @@ function TableEdit( {
 									isSelected ? onChange : undefined
 								}
 								setSelectedCell={ setSelectedCell }
+								onArrowDownFromLastRow={
+									isLastRowOfLastSection
+										? onLastRowKeyDown
+										: undefined
+								}
 								{ ...cellProps }
 							/>
 						);
@@ -615,6 +661,7 @@ const Cell = memo( function ( {
 	content,
 	onChange,
 	setSelectedCell,
+	onArrowDownFromLastRow,
 } ) {
 	return (
 		<CellTag
@@ -642,6 +689,7 @@ const Cell = memo( function ( {
 				} }
 				aria-label={ cellAriaLabel[ name ] }
 				placeholder={ placeholder[ name ] }
+				onKeyDown={ onArrowDownFromLastRow }
 			/>
 		</CellTag>
 	);
