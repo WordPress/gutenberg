@@ -1,13 +1,22 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { click } from '@ariakit/test';
+
+/**
+ * WordPress dependencies
+ */
+import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import { getInheritanceProps, InheritanceResetButton } from '../';
+import {
+	getInheritanceProps,
+	InheritanceResetButton,
+	InheritanceToolsPanelItem,
+} from '../';
 
 describe( 'InheritanceResetButton', () => {
 	test( 'renders an always-visible reset button labelled for the inherited value', () => {
@@ -133,5 +142,117 @@ describe( 'getInheritanceProps', () => {
 				hasLocalOverride: false,
 			}
 		);
+	} );
+} );
+
+describe( 'InheritanceToolsPanelItem inherited label tooltip', () => {
+	function renderInheritedItem( label, labelClassName ) {
+		return render(
+			<ToolsPanel label="Panel" panelId="panel">
+				<InheritanceToolsPanelItem
+					isInherited
+					label={ label }
+					panelId="panel"
+					isShownByDefault
+					hasValue={ () => false }
+				>
+					<div className={ labelClassName }>{ label }</div>
+				</InheritanceToolsPanelItem>
+			</ToolsPanel>
+		);
+	}
+
+	function getAnchorText( container ) {
+		// eslint-disable-next-line testing-library/no-node-access
+		return container.querySelector(
+			'.global-styles-inheritance-tooltip-anchor__text'
+		)?.textContent;
+	}
+
+	function getAnchor( container ) {
+		// eslint-disable-next-line testing-library/no-node-access
+		return container.querySelector(
+			'.global-styles-inheritance-tooltip-anchor'
+		);
+	}
+
+	test( 'sources the tooltip anchor text from the label prop', () => {
+		const { container } = renderInheritedItem(
+			'Line height',
+			'components-base-control__label'
+		);
+		expect( getAnchorText( container ) ).toBe( 'Line height' );
+	} );
+
+	test( 'keeps the anchor text stable across re-renders (variation switch)', () => {
+		// Regression guard: the anchor used to derive its text from the
+		// mutated `labelEl.textContent`. Because the anchor is portaled
+		// into the label, each re-render re-read and compounded the text
+		// ("Line height" -> "Line heightLine height" -> ...). Sourcing the
+		// text from the `label` prop keeps it stable.
+		const { container, rerender } = renderInheritedItem(
+			'Line height',
+			'components-base-control__label'
+		);
+		expect( getAnchorText( container ) ).toBe( 'Line height' );
+
+		// Simulate a repeated variation switch forcing re-renders.
+		for ( let i = 0; i < 3; i++ ) {
+			rerender(
+				<ToolsPanel label="Panel" panelId="panel">
+					<InheritanceToolsPanelItem
+						isInherited
+						label="Line height"
+						panelId="panel"
+						isShownByDefault
+						hasValue={ () => false }
+					>
+						<div className="components-base-control__label">
+							Line height
+						</div>
+					</InheritanceToolsPanelItem>
+				</ToolsPanel>
+			);
+		}
+
+		expect( getAnchorText( container ) ).toBe( 'Line height' );
+	} );
+
+	test( 'anchors the tooltip on the color/gradient name label', () => {
+		const { container } = renderInheritedItem(
+			'Color',
+			'block-editor-panel-color-gradient-settings__color-name'
+		);
+		expect( getAnchorText( container ) ).toBe( 'Color' );
+	} );
+
+	test( 'forwards a label click to the control toggle button', () => {
+		// Regression guard: the anchor overlays the label and is portaled,
+		// so React routes its click through the portal parent tree rather
+		// than the DOM-ancestor toggle button. Without forwarding, clicking
+		// the label of a toggle-based control (color, background image)
+		// would not open the control.
+		const onToggle = jest.fn();
+		const { container } = render(
+			<ToolsPanel label="Panel" panelId="panel">
+				<InheritanceToolsPanelItem
+					isInherited
+					label="Color"
+					panelId="panel"
+					isShownByDefault
+					hasValue={ () => false }
+				>
+					<button type="button" onClick={ onToggle }>
+						<span className="components-base-control__label">
+							Color
+						</span>
+					</button>
+				</InheritanceToolsPanelItem>
+			</ToolsPanel>
+		);
+
+		const anchor = getAnchor( container );
+		fireEvent.click( anchor );
+		expect( onToggle ).toHaveBeenCalledTimes( 1 );
 	} );
 } );

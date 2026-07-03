@@ -25,6 +25,35 @@ import { __ } from '@wordpress/i18n';
 const GENERIC_INHERITANCE_TOOLTIP_TEXT = __( 'Default inherited from:' );
 const INHERITANCE_TOOLTIP_LINE_SEPARATOR = '\n';
 
+// Label nodes the portal may adorn with the inherited-value tooltip. Shared by
+// the initial query and the `MutationObserver` re-query so the two never drift.
+// The background image control's label uses its own class, matching the same
+// node the inheritance SCSS already treats as a label target.
+const LABEL_TARGET_SELECTOR =
+	'.components-base-control__label, .block-editor-panel-color-gradient-settings__color-name, .block-editor-global-styles-background-panel__inspector-media-replace-title';
+
+// Class of the stable wrapper this component owns and re-parents between
+// labels; the portal renders into it.
+const PORTAL_CONTAINER_CLASS = 'global-styles-inheritance-portal';
+
+// Classes owned by the nodes this component portals into the label. Mutations
+// that only touch these must not retrigger the observer's re-query, otherwise
+// the injection feeds back into the observer.
+const PORTAL_OWNED_CLASSES = [
+	PORTAL_CONTAINER_CLASS,
+	'global-styles-inheritance-tooltip-anchor',
+	'has-local-override-from-global-styles__reset',
+];
+
+function isPortalOwnedNode( node ) {
+	return (
+		node?.nodeType === window.Node.ELEMENT_NODE &&
+		PORTAL_OWNED_CLASSES.some( ( className ) =>
+			node.classList.contains( className )
+		)
+	);
+}
+
 const BREADCRUMB_LABELS = {
 	styles: __( 'Styles' ),
 	elements: __( 'Elements' ),
@@ -244,12 +273,16 @@ export function InheritanceResetButton( { onResetToInherited, className } ) {
  *
  * Mounts a hidden sentinel `<span>` whose `parentElement` is the
  * `ToolsPanelItem` content wrapper. From the sentinel we run a
- * `querySelector` for the supported label selectors and create a
- * portal targeting the first match. The label DOM node may be
- * replaced by the inner control on re-render, so we re-query on
- * every render and only call `setState` when the target changes
- * (referential equality through `Object.is`, so React skips the
- * re-render when stable).
+ * `querySelector` for the supported label selectors and adopt the first
+ * match.
+ *
+ * Rather than portaling directly into the label — which is owned by the
+ * inner control's React tree and may be swapped out on re-render (e.g. when
+ * setting a new background image), causing `removeChild` errors during
+ * reconciliation — we create our own stable `<span>` and imperatively
+ * re-parent it into the current label. React only ever manages the inside
+ * of that span, so it never conflicts with the label owner's DOM updates.
+ * The span uses `display: contents` so it adds no box of its own.
  *
  * @param {Object}   props
  * @param {Function} props.onResetToInherited     Reset handler forwarded to the
@@ -258,6 +291,10 @@ export function InheritanceResetButton( { onResetToInherited, className } ) {
  *                                                tooltip to the label.
  * @param {string}   props.inheritanceTooltipText Tooltip text for inherited
  *                                                controls.
+ * @param {string}   props.label                  Pristine label text used as the
+ *                                                tooltip anchor. Sourced from the
+ *                                                `label` prop rather than the
+ *                                                mutated DOM so it never compounds.
  *
  * @return {Element} The sentinel span plus portaled inheritance UI.
  */
@@ -265,9 +302,11 @@ function PortaledInheritanceControls( {
 	onResetToInherited,
 	isInherited,
 	inheritanceTooltipText,
+	label,
 } ) {
 	const sentinelRef = useRef( null );
-	const [ labelEl, setLabelEl ] = useState( null );
+	const portalNodeRef = useRef( null );
+	const [ portalNode, setPortalNode ] = useState( null );
 
 	useLayoutEffect( () => {
 		const sentinel = sentinelRef.current;
@@ -281,22 +320,88 @@ function PortaledInheritanceControls( {
 		if ( ! scope ) {
 			return;
 		}
-		const target = scope.querySelector(
-			'.components-base-control__label, .block-editor-panel-color-gradient-settings__color-name'
-		);
-		setLabelEl( target ?? null );
+
+		// Our own container. `display: contents` keeps it layout-neutral so
+		// the anchor/reset behave as direct children of the label.
+		if ( ! portalNodeRef.current ) {
+			const node = sentinel.ownerDocument.createElement( 'span' );
+			node.className = PORTAL_CONTAINER_CLASS;
+			node.style.display = 'contents';
+			portalNodeRef.current = node;
+		}
+		const portal = portalNodeRef.current;
+
+		// Forward clicks on the tooltip anchor overlay to the control it
+		// labels. The anchor is portaled, so React routes its synthetic
+		// events through the portal's React parent tree rather than the
+		// DOM-ancestor control; for toggle-based controls (color, background
+		// image) the overlay would otherwise swallow the click and the toggle
+		// would never open. A native listener re-dispatches the click on the
+		// nearest ancestor button. Plain-label controls have no ancestor
+		// button, so this is a no-op for them.
+		const forwardAnchorClick = ( event ) => {
+			if (
+				! event.target.closest(
+					'.global-styles-inheritance-tooltip-anchor'
+				)
+			) {
+				return;
+			}
+			const button = portal.closest( 'button' );
+			button?.click();
+		};
+		portal.addEventListener( 'click', forwardAnchorClick );
+
+		// Adopt the current label (re-parenting our stable container so React
+		// never has to unmount the portal across label swaps).
+		const syncTarget = () => {
+			// Idempotent guard: if our container is already attached to a
+			// valid label, leave it in place. Re-parenting the node while
+			// the inner control is mid-interaction — e.g. opening/closing the
+			// background image dropdown or switching the image — races with
+			// that control's own click/focus handling and makes the dropdown
+			// fail to open or close reliably. Only move when the label node
+			// has actually been detached or replaced.
+			if (
+				portal.isConnected &&
+				portal.parentElement?.matches( LABEL_TARGET_SELECTOR )
+			) {
+				return;
+			}
+			const target = scope.querySelector( LABEL_TARGET_SELECTOR );
+			if ( ! target ) {
+				portal.remove();
+				setPortalNode( null );
+				return;
+			}
+			target.appendChild( portal );
+			setPortalNode( portal );
+		};
+		syncTarget();
 
 		// Watch for label DOM replacement when the inner control
 		// re-renders (e.g. on value change). Only observe direct
 		// child changes within this panel item — cheap and bounded.
-		const observer = new window.MutationObserver( () => {
-			const next = scope.querySelector(
-				'.components-base-control__label, .block-editor-panel-color-gradient-settings__color-name'
+		const observer = new window.MutationObserver( ( mutations ) => {
+			// Skip mutations caused solely by this component's own
+			// portaled nodes to avoid an observer feedback loop.
+			const hasRelevantMutation = mutations.some( ( mutation ) =>
+				[ ...mutation.addedNodes, ...mutation.removedNodes ].some(
+					( node ) => ! isPortalOwnedNode( node )
+				)
 			);
-			setLabelEl( ( prev ) => ( prev === next ? prev : next ?? null ) );
+			if ( ! hasRelevantMutation ) {
+				return;
+			}
+			syncTarget();
 		} );
 		observer.observe( scope, { childList: true, subtree: true } );
-		return () => observer.disconnect();
+		return () => {
+			observer.disconnect();
+			portal.removeEventListener( 'click', forwardAnchorClick );
+			portal.remove();
+			portalNodeRef.current = null;
+		};
 	}, [] );
 
 	return (
@@ -306,7 +411,7 @@ function PortaledInheritanceControls( {
 				aria-hidden="true"
 				style={ { display: 'none' } }
 			/>
-			{ labelEl &&
+			{ portalNode &&
 				createPortal(
 					<>
 						{ isInherited && (
@@ -315,7 +420,7 @@ function PortaledInheritanceControls( {
 									render={
 										<span className="global-styles-inheritance-tooltip-anchor">
 											<span className="global-styles-inheritance-tooltip-anchor__text">
-												{ labelEl.textContent }
+												{ label }
 											</span>
 										</span>
 									}
@@ -336,7 +441,7 @@ function PortaledInheritanceControls( {
 							/>
 						) }
 					</>,
-					labelEl
+					portalNode
 				) }
 		</>
 	);
@@ -365,6 +470,7 @@ export function InheritanceToolsPanelItem( {
 			{ children }
 			{ ( isInherited || hasLocalOverride ) && (
 				<PortaledInheritanceControls
+					label={ label }
 					inheritanceTooltipText={ inheritanceTooltipText }
 					isInherited={ isInherited }
 					onResetToInherited={

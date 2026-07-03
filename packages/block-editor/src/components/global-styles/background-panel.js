@@ -2,8 +2,10 @@
  * WordPress dependencies
  */
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { getResolvedValue } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -13,14 +15,19 @@ import ColorGradientDropdownItem from './color-gradient-dropdown-item';
 import { useHasBackgroundColorPanel } from './color-panel';
 import { useColorGradientSettings } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
+import { store as blockEditorStore } from '../../store';
+import {
+	globalStylesDataKey,
+	globalStylesLinksDataKey,
+} from '../../store/private-keys';
 import { setImmutably } from '../../utils/object';
 import {
 	extractPresetSlug,
 	encodeColorValueWithPalette,
 } from '../../utils/color-values';
 import {
+	getCommonInheritanceTooltipText,
 	getInheritanceProps,
-	getInheritanceTooltipTextByPath,
 	InheritanceToolsPanelItem,
 } from './inheritance';
 
@@ -249,6 +256,28 @@ export default function BackgroundImagePanel( {
 		encodeGradientValue,
 	} = useColorGradientSettings( settings );
 
+	// Global Styles payload used to resolve inherited `ref`/theme-file
+	// background image pointers for the inherited-label affordance.
+	const { globalStyles, _links } = useSelect( ( select ) => {
+		const _settings = select( blockEditorStore ).getSettings();
+		return {
+			globalStyles: _settings[ globalStylesDataKey ],
+			_links: _settings[ globalStylesLinksDataKey ],
+		};
+	}, [] );
+
+	// Resolve `ref`/theme-file pointers before detecting an inherited image so
+	// the label affordance matches what `BackgroundImageControl` displays,
+	// which also resolves the inherited value (see `background-image-control`).
+	const resolvedInheritedBackgroundImage = useMemo(
+		() =>
+			getResolvedValue( inheritedValue?.background?.backgroundImage, {
+				styles: globalStyles,
+				_links,
+			} ),
+		[ inheritedValue?.background?.backgroundImage, globalStyles, _links ]
+	);
+
 	const hasBackgroundGradientControl = useHasBackgroundControl(
 		settings,
 		'gradient'
@@ -399,11 +428,24 @@ export default function BackgroundImagePanel( {
 		showInheritanceLabelIndicators
 			? getInheritanceProps( isInherited, hasLocalOverride, classNames )
 			: { className: classNames };
-	const tooltipText = ( path ) =>
-		getInheritanceTooltipTextByPath( inheritedSources, path );
+	// The background image is stored as an object, so its source lives on the
+	// leaf sub-paths. Resolve the breadcrumb from the image leaves only (not
+	// size/position) so the tooltip reflects the inherited image itself.
+	const backgroundImageTooltipText = getCommonInheritanceTooltipText(
+		inheritedSources,
+		[
+			'background.backgroundImage.url',
+			'background.backgroundImage.id',
+			'background.backgroundImage.title',
+			'background.backgroundImage.source',
+		]
+	);
 
+	// The inherited background image is resolved above (before the early
+	// return) so this detection matches what `BackgroundImageControl`
+	// renders and the label affordance appears whenever an image is inherited.
 	const inheritedBackgroundImage = hasBackgroundImageValue( {
-		background: inheritedValue?.background,
+		background: { backgroundImage: resolvedInheritedBackgroundImage },
 	} );
 	const hasLocalBackgroundImage = hasBackgroundImageValue( value );
 
@@ -425,9 +467,7 @@ export default function BackgroundImagePanel( {
 					showLocalOverrideActionsInLabel={ false }
 					hasValue={ () => hasBackgroundImageValue( value ) }
 					label={ __( 'Image' ) }
-					inheritanceTooltipText={ tooltipText(
-						'background.backgroundImage'
-					) }
+					inheritanceTooltipText={ backgroundImageTooltipText }
 					onDeselect={ resetBackground }
 					isShownByDefault={ defaultControls.backgroundImage }
 					panelId={ panelId }
