@@ -207,12 +207,15 @@ describe( 'Interactivity API', () => {
 
 		const evaluateExpr = ( expr: string, evt?: Event ) => {
 			const evaluate = getEvaluate( { scope: testScope } );
-			return evaluate( {
-				value: expr,
-				namespace: testNamespace,
-				suffix: null,
-				uniqueId: null,
-			} as any, evt );
+			return evaluate(
+				{
+					value: expr,
+					namespace: testNamespace,
+					suffix: null,
+					uniqueId: null,
+				} as any,
+				evt
+			);
 		};
 
 		it( 'should evaluate context comparisons with !==', () => {
@@ -454,10 +457,7 @@ describe( 'Interactivity API', () => {
 
 		it( 'should allow accessing event properties in full-expression path', () => {
 			const mockEvent = new Event( 'click' );
-			const result = evaluateExpr(
-				'evt.type === "click"',
-				mockEvent
-			);
+			const result = evaluateExpr( 'evt.type === "click"', mockEvent );
 			expect( result ).toBe( true );
 		} );
 
@@ -472,6 +472,39 @@ describe( 'Interactivity API', () => {
 			testScope.ref.current = mockEl;
 			const result = evaluateExpr( 'el.tagName === "DIV"' );
 			expect( result ).toBe( true );
+		} );
+
+		it( 'should route el.tagName through full-expression path (not legacy)', () => {
+			// Simple dotted path el.tagName matches the legacy path regex.
+			// Before the el/evt exclusion, the legacy path would intercept it
+			// and try resolve("el.tagName"), returning undefined.
+			const mockEl = document.createElement( 'section' );
+			testScope.ref.current = mockEl;
+			const result = evaluateExpr( 'el.tagName' );
+			expect( result ).toBe( 'SECTION' );
+		} );
+
+		it( 'should route evt.type through full-expression path (not legacy)', () => {
+			// Simple dotted path evt.type matches the legacy path regex.
+			// Before the el/evt exclusion, the legacy path would intercept it
+			// and try resolve("evt.type"), returning undefined.
+			const mockEvent = new Event( 'click' );
+			const result = evaluateExpr( 'evt.type', mockEvent );
+			expect( result ).toBe( 'click' );
+		} );
+
+		it( 'should route evt.defaultPrevented through full-expression path', () => {
+			const mockEvent = new Event( 'click' );
+			const result = evaluateExpr( 'evt.defaultPrevented', mockEvent );
+			expect( result ).toBe( false );
+		} );
+
+		it( 'should route bare evt through full-expression path', () => {
+			// Even a bare "evt" (no property access) should route through
+			// the full-expression path and return the event object itself.
+			const mockEvent = new Event( 'click' );
+			const result = evaluateExpr( 'evt', mockEvent );
+			expect( result ).toBe( mockEvent );
 		} );
 
 		it( 'should have evt as undefined when not passed', () => {
