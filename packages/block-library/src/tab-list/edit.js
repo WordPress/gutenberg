@@ -29,33 +29,47 @@ const EMPTY_ARRAY = [];
 function Edit( {
 	attributes,
 	clientId,
-	context,
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
-	const tabsList = context[ 'core/tabs-list' ] || EMPTY_ARRAY;
-
 	const colorProps = useColorProps( attributes );
 	const borderProps = useBorderProps( attributes );
 	const spacingProps = getSpacingClassesAndStyles( attributes );
 
-	const { tabsClientId, editorActiveTabIndex, activeTabIndex } = useSelect(
-		( select ) => {
-			const { getBlockRootClientId, getBlockAttributes } =
-				select( blockEditorStore );
+	const { tabsClientId, tabsList, editorActiveTabIndex, activeTabIndex } =
+		useSelect(
+			( select ) => {
+				const { getBlockRootClientId, getBlockAttributes, getBlocks } =
+					select( blockEditorStore );
 
-			const _tabsClientId = getBlockRootClientId( clientId );
-			const tabsAttributes = _tabsClientId
-				? getBlockAttributes( _tabsClientId )
-				: {};
+				const _tabsClientId = getBlockRootClientId( clientId );
+				const tabsAttributes = _tabsClientId
+					? getBlockAttributes( _tabsClientId )
+					: {};
 
-			return {
-				tabsClientId: _tabsClientId,
-				editorActiveTabIndex: tabsAttributes?.editorActiveTabIndex,
-				activeTabIndex: tabsAttributes?.activeTabIndex ?? 0,
-			};
-		},
-		[ clientId ]
-	);
+				// Derive the tabs list from the sibling tab-panels block's
+				// tab-panel children, providing the label and clientId that the
+				// tab buttons need.
+				const tabPanelsBlock = _tabsClientId
+					? getBlocks( _tabsClientId ).find(
+							( block ) => block.name === 'core/tab-panels'
+					  )
+					: undefined;
+				const _tabsList = (
+					tabPanelsBlock?.innerBlocks ?? EMPTY_ARRAY
+				).map( ( tab ) => ( {
+					label: tab.attributes.label || '',
+					clientId: tab.clientId,
+				} ) );
+
+				return {
+					tabsClientId: _tabsClientId,
+					tabsList: _tabsList,
+					editorActiveTabIndex: tabsAttributes?.editorActiveTabIndex,
+					activeTabIndex: tabsAttributes?.activeTabIndex ?? 0,
+				};
+			},
+			[ clientId ]
+		);
 	const { isBlockSelected, hasSelectedInnerBlock } =
 		useSelect( blockEditorStore );
 	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =

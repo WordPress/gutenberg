@@ -24,24 +24,29 @@ const TEMPLATE = [
 	],
 ];
 
-export default function Edit( { clientId, context, isSelected } ) {
-	// Consume tab indices from context
-	const activeTabIndex = context[ 'core/tabs-activeTabIndex' ];
-	const editorActiveTabIndex = context[ 'core/tabs-editorActiveTabIndex' ];
-	const effectiveActiveIndex = editorActiveTabIndex ?? activeTabIndex;
-
-	const { blockIndex, hasInnerBlocksSelected, tabsClientId } = useSelect(
+export default function Edit( { clientId, isSelected } ) {
+	const {
+		activeTabIndex,
+		editorActiveTabIndex,
+		blockIndex,
+		hasInnerBlocksSelected,
+		tabsClientId,
+	} = useSelect(
 		( select ) => {
 			const {
 				getBlockRootClientId,
 				getBlockIndex,
 				hasSelectedInnerBlock,
+				getBlockAttributes,
 			} = select( blockEditorStore );
 
 			// Get the tab-panel parent first
 			const tabPanelsClientId = getBlockRootClientId( clientId );
 			// Then get the tabs parent
 			const _tabsClientId = getBlockRootClientId( tabPanelsClientId );
+
+			// Read the active tab indices directly from the tabs block.
+			const tabsAttributes = getBlockAttributes( _tabsClientId ) ?? {};
 
 			// Get data about this instance of core/tab.
 			const _blockIndex = getBlockIndex( clientId );
@@ -51,6 +56,8 @@ export default function Edit( { clientId, context, isSelected } ) {
 			);
 
 			return {
+				activeTabIndex: tabsAttributes.activeTabIndex,
+				editorActiveTabIndex: tabsAttributes.editorActiveTabIndex,
 				blockIndex: _blockIndex,
 				hasInnerBlocksSelected: _hasInnerBlocksSelected,
 				tabsClientId: _tabsClientId,
@@ -58,6 +65,8 @@ export default function Edit( { clientId, context, isSelected } ) {
 		},
 		[ clientId ]
 	);
+
+	const effectiveActiveIndex = editorActiveTabIndex ?? activeTabIndex;
 
 	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
