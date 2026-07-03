@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { v4 as uuid } from 'uuid';
 
 /**
@@ -27,6 +28,18 @@ import logEntityDeprecation from './utils/log-entity-deprecation';
 
 function addTitleToAutoDraft( record ) {
 	return record.status === 'auto-draft' ? { ...record, title: '' } : record;
+}
+
+function getServerMutatedFields( updatedRecord, persistedRecord, edits ) {
+	return Object.fromEntries(
+		Object.entries( updatedRecord ).filter( ( [ key, value ] ) => {
+			if ( key in edits ) {
+				return ! fastDeepEqual( value, edits[ key ] );
+			}
+
+			return ! fastDeepEqual( value, persistedRecord[ key ] );
+		} )
+	);
 }
 
 /**
@@ -783,12 +796,25 @@ export const saveEntityRecord =
 						edits
 					);
 					if ( entityConfig.syncConfig ) {
+						let syncChanges;
+						if ( __unstableSkipSyncUpdate ) {
+							syncChanges = {};
+						} else if ( isNewRecord || ! persistedRecord ) {
+							syncChanges = updatedRecord;
+						} else {
+							syncChanges = getServerMutatedFields(
+								updatedRecord,
+								persistedRecord,
+								edits
+							);
+						}
+
 						// Use an untracked origin so that the save
 						// response does not create undo levels.
 						getSyncManager()?.update(
 							`${ kind }/${ name }`,
 							recordId,
-							__unstableSkipSyncUpdate ? {} : updatedRecord,
+							syncChanges,
 							LOCAL_UNDO_IGNORED_ORIGIN,
 							{ isSave: true }
 						);
