@@ -324,14 +324,18 @@ const { InnerContent } = unlock( blockEditorPrivateApis );
 /**
  * Seeds a pattern block's inner blocks from its `pattern` markup.
  *
- * Seeds only freshly inserted empty blocks: a reloaded empty block is a
- * saved state (the pattern deleted under `patternLock: false`), and
- * reseeding it would resurrect the deleted content.
+ * A locked block cannot be emptied in the editor, so an empty one always
+ * means "never seeded" and seeds on mount, wherever it came from: a CPT or
+ * InnerBlocks template, an inserted pattern, or a bare paste. An unlockable
+ * block (`patternLock: false`) can be legitimately emptied and saved, so it
+ * only seeds when it (or an ancestor) was just inserted; a reloaded empty
+ * block is a saved state and stays empty.
  *
- * @param {string} clientId Client ID of the pattern block.
- * @param {string} markup   Block-markup string from the `pattern` registration property.
+ * @param {string}  clientId     Client ID of the pattern block.
+ * @param {string}  markup       Block-markup string from the `pattern` registration property.
+ * @param {boolean} [isUnlocked] Whether the block registered `patternLock: false`.
  */
-function useSeedPatternBlocks( clientId, markup ) {
+function useSeedPatternBlocks( clientId, markup, isUnlocked = false ) {
 	const registry = useRegistry();
 	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
@@ -341,19 +345,27 @@ function useSeedPatternBlocks( clientId, markup ) {
 		if ( ! seeded.length ) {
 			return;
 		}
-		const { getBlocks, wasBlockJustInserted } =
+		const { getBlocks, getBlockParents, wasBlockJustInserted } =
 			registry.select( blockEditorStore );
-		if (
-			getBlocks( clientId ).length ||
-			! wasBlockJustInserted( clientId )
-		) {
+		if ( getBlocks( clientId ).length ) {
 			return;
+		}
+		if ( isUnlocked ) {
+			const justInserted =
+				wasBlockJustInserted( clientId ) ||
+				getBlockParents( clientId ).some( ( parentId ) =>
+					wasBlockJustInserted( parentId )
+				);
+			if ( ! justInserted ) {
+				return;
+			}
 		}
 		__unstableMarkNextChangeAsNotPersistent();
 		replaceInnerBlocks( clientId, seeded, false );
 	}, [
 		clientId,
 		markup,
+		isUnlocked,
 		registry,
 		replaceInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
@@ -375,7 +387,7 @@ function createPatternBlockComponents(
 	hasRenderCallback = false
 ) {
 	function Edit( { clientId } ) {
-		useSeedPatternBlocks( clientId, markup );
+		useSeedPatternBlocks( clientId, markup, lock === false );
 
 		// No `template`, so template sync stays inert; `templateLock` only locks
 		// the structure.
