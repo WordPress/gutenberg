@@ -46,9 +46,6 @@ function Edit( {
 					? getBlockAttributes( _tabsClientId )
 					: {};
 
-				// Derive the tabs list from the sibling tab-panels block's
-				// tab-panel children, providing the label and clientId that the
-				// tab buttons need.
 				const tabPanelsBlock = _tabsClientId
 					? getBlocks( _tabsClientId ).find(
 							( block ) => block.name === 'core/tab-panels'
