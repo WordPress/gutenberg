@@ -183,16 +183,21 @@ add_action(
 			. '</div><!-- /wp:group -->';
 
 		$pattern_attributes = array(
-			'variant'  => array(
+			'variant'     => array(
 				'type'    => 'string',
 				'enum'    => array( 'default', 'highlight' ),
 				'default' => 'default',
 				'label'   => 'Variant',
 			),
-			'featured' => array(
+			'featured'    => array(
 				'type'    => 'boolean',
 				'default' => false,
 				'label'   => 'Featured',
+			),
+			'membersOnly' => array(
+				'type'    => 'boolean',
+				'default' => false,
+				'label'   => 'Members only',
 			),
 		);
 
@@ -200,7 +205,10 @@ add_action(
 		// editor-specific code and no empty check: the framework guarantees a
 		// non-empty $content (saved blocks, editor slot placeholders, or the
 		// pattern as fallback; see gutenberg_wrap_ssr_islands_render_callback).
-		// `variant` sets a class, `featured` a ribbon.
+		// `variant` sets a class, `featured` a ribbon, and `membersOnly` swaps
+		// the content for a login notice when the visitor is logged out, the
+		// job enclosing shortcodes used to do. The footer is computed on the
+		// server on every render.
 		$render_pattern_block = static function ( $attributes, $content ) {
 			$variant  = isset( $attributes['variant'] ) ? sanitize_html_class( $attributes['variant'] ) : 'default';
 			$featured = ! empty( $attributes['featured'] );
@@ -208,7 +216,19 @@ add_action(
 			$wrapper  = get_block_wrapper_attributes( array( 'class' => $classes ) );
 			$ribbon   = $featured ? '<p class="pattern-block-demo__ribbon"><strong>Featured</strong></p>' : '';
 
-			return sprintf( '<div %1$s>%2$s%3$s</div>', $wrapper, $ribbon, $content );
+			if ( ! empty( $attributes['membersOnly'] ) && ! is_user_logged_in() ) {
+				$content = '<p class="pattern-block-demo__gate">This content is for members only. Please log in.</p>';
+			}
+
+			$viewer = is_user_logged_in() ? wp_get_current_user()->display_name : 'guest';
+			$meta   = sprintf(
+				'<p class="pattern-block-demo__meta">Rendered by PHP at %1$s for %2$s · %3$d published posts</p>',
+				esc_html( wp_date( 'H:i:s' ) ),
+				esc_html( $viewer ),
+				(int) wp_count_posts()->publish
+			);
+
+			return sprintf( '<div %1$s>%2$s%3$s%4$s</div>', $wrapper, $ribbon, $content, $meta );
 		};
 
 		// SSR-islands: a pattern block with a render_callback renders its PHP shell
@@ -236,7 +256,7 @@ add_action(
 			)
 		);
 
-		// Demo styles for the `variant`/`featured` output, in editor and frontend.
+		// Demo styles for the wrapper output, in editor and frontend.
 		add_action(
 			'enqueue_block_assets',
 			static function () {
@@ -247,6 +267,8 @@ add_action(
 					'.pattern-block-demo.is-variant-highlight{background:#fffbe6;border:2px solid #f0b849;padding:1em;}'
 					. '.pattern-block-demo.is-featured{box-shadow:0 0 0 3px #3858e9;}'
 					. '.pattern-block-demo__ribbon{margin:0 0 .5em;color:#3858e9;}'
+					. '.pattern-block-demo__gate{background:#f6f7f7;border:1px dashed #949494;padding:1em;}'
+					. '.pattern-block-demo__meta{margin:.5em 0 0;font-size:12px;color:#757575;}'
 				);
 			}
 		);
