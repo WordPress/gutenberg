@@ -2,7 +2,9 @@
 	"name": "core/activity",
 	"title": "Activity",
 	"description": "Displays recently published posts, scheduled posts, and recent comments.",
-	"info": "Recent publishing and comment activity on this site.",
+	"help": {
+		"text": "Recent publishing and comment activity on this site."
+	},
 	"category": "dashboard",
 	"presentation": "content-bleed",
 	"textdomain": "default"
