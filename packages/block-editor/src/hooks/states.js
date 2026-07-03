@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import { __ } from '@wordpress/i18n';
 
@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 import StateControl from '../components/global-styles/state-control';
 import StateControlBadges from '../components/global-styles/state-control-badges';
 import { useToolsPanelDropdownMenuProps } from '../components/global-styles/utils';
-import { store as blockEditorStore } from '../store';
+import { useSettings } from '../components/use-settings';
 import { unlock } from '../lock-unlock';
 
 const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
@@ -62,6 +62,7 @@ function getPseudoStateOptions( name ) {
 }
 
 const DEFAULT_STATE_VALUE = 'default';
+const EMPTY_STATE_OPTIONS = [];
 
 /**
  * Renders a pseudo-state selector in the block card header.
@@ -76,7 +77,10 @@ const DEFAULT_STATE_VALUE = 'default';
  * @return {Element|null} State control component, or null if not applicable.
  */
 export function BlockStatesControl( { name, value, onChange } ) {
-	const pseudoStateOptions = getPseudoStateOptions( name );
+	const pseudoStateOptions = useMemo(
+		() => getPseudoStateOptions( name ),
+		[ name ]
+	);
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	if ( ! pseudoStateOptions.length ) {
@@ -104,14 +108,15 @@ export function BlockStatesControl( { name, value, onChange } ) {
  * @return {Element|null} Badges component, or null if there is nothing to show.
  */
 export function BlockStateBadges( { name, value, isResponsiveEditing } ) {
-	const pseudoStateOptions = getPseudoStateOptions( name );
-	const deviceStateOptions = useSelect( ( select ) => {
-		const settings = select( blockEditorStore ).getSettings();
-
-		return getDeviceStateOptions(
-			settings.__experimentalFeatures?.viewport
-		);
-	}, [] );
+	const pseudoStateOptions = useMemo(
+		() => getPseudoStateOptions( name ),
+		[ name ]
+	);
+	const [ viewportSettings ] = useSettings( 'viewport' );
+	const deviceStateOptions = useMemo(
+		() => getDeviceStateOptions( viewportSettings ),
+		[ viewportSettings ]
+	);
 
 	if ( ! pseudoStateOptions.length && ! isResponsiveEditing ) {
 		return null;
@@ -119,7 +124,9 @@ export function BlockStateBadges( { name, value, isResponsiveEditing } ) {
 
 	return (
 		<StateControlBadges
-			viewportStates={ isResponsiveEditing ? deviceStateOptions : [] }
+			viewportStates={
+				isResponsiveEditing ? deviceStateOptions : EMPTY_STATE_OPTIONS
+			}
 			pseudoStates={ pseudoStateOptions }
 			viewportValue={ value?.viewport ?? DEFAULT_STATE_VALUE }
 			pseudoStateValue={ value?.pseudo ?? DEFAULT_STATE_VALUE }
