@@ -54,10 +54,11 @@ function gutenberg_render_custom_css_support_styles( $parsed_block ) {
 	$processed_css = WP_Theme_JSON_Gutenberg::process_blocks_custom_css( $custom_css, $selector );
 
 	if ( ! empty( $processed_css ) ) {
-		/*
-		 * Track which class names have already had their CSS enqueued to prevent
-		 * duplicate styles when the same block is rendered multiple times inside
-		 * a Query Loop (render_block_data fires once per loop iteration).
+		/**
+		 * Skip CSS that has already been added. Blocks with identical attributes
+		 * share the same class name and processed CSS via {@see wp_unique_id_from_values()},
+		 * so the same style would otherwise be enqueued more than once (e.g. inside
+		 * a Query Loop or when blocks share identical custom CSS).
 		 */
 		$handle = 'wp-block-custom-css';
 		if ( ! wp_style_is( $handle, 'registered' ) ) {
