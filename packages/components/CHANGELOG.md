@@ -24,7 +24,7 @@
     -   `ToggleGroupControl` ([#79656](https://github.com/WordPress/gutenberg/pull/79656))
     -   `TreeSelect` ([#79550](https://github.com/WordPress/gutenberg/pull/79550))
     -   `UnitControl` ([#79721](https://github.com/WordPress/gutenberg/pull/79721))
-    -   `NumberControl` ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD))
+    -   `NumberControl` ([#79861](https://github.com/WordPress/gutenberg/pull/79861))
 
 ### Enhancements
 
