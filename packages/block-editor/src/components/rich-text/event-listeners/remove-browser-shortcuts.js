@@ -2,6 +2,14 @@
  * WordPress dependencies
  */
 import { isKeyboardEvent } from '@wordpress/keycodes';
+import { privateApis as composePrivateApis } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../../lock-unlock';
+
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 /**
  * Hook to prevent default behaviors for key combinations otherwise handled
@@ -17,8 +25,5 @@ export default () => ( node ) => {
 			event.preventDefault();
 		}
 	}
-	node.addEventListener( 'keydown', onKeydown );
-	return () => {
-		node.removeEventListener( 'keydown', onKeydown );
-	};
+	return subscribeDelegatedListener( node, 'keydown', onKeydown, true );
 };

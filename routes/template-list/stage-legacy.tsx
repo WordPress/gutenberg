@@ -18,11 +18,11 @@ import { useMemo, useCallback } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { layout } from '@wordpress/icons';
+import { unlock } from '@wordpress/routes-lock-unlock';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../lock-unlock';
 import {
 	DEFAULT_VIEW_LEGACY,
 	getActiveViewOverridesForTabLegacy,

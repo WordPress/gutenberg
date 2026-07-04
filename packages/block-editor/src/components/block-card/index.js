@@ -8,7 +8,7 @@ import clsx from 'clsx';
  */
 import {
 	Button,
-	Icon,
+	Icon as WCIcon,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { Text, Stack } from '@wordpress/ui';
@@ -21,7 +21,7 @@ import {
 	arrowRight,
 	arrowLeft,
 } from '@wordpress/icons';
-import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
+import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -79,6 +79,7 @@ function OptionalParentSelectButton( { children, onClick } ) {
  * @param {string}        [props.parentClientId]        The parent clientId, if this card is for a parent block.
  * @param {string}        [props.isChild]               Whether the block card is for a child block, in which case, indent the block using an arrow.
  * @param {string}        [props.clientId]              Whether the block card is for a child block, in which case, indent the block using an arrow.
+ * @param {Element}       [props.controls]              Controls rendered beside the block title.
  * @param {Element}       [props.children]              Children.
  * @return {Element}                        Block card component.
  */
@@ -94,6 +95,7 @@ function BlockCard( {
 	isChild,
 	children,
 	clientId,
+	controls,
 } ) {
 	if ( blockType ) {
 		deprecated( '`blockType` property in `BlockCard component`', {
@@ -108,20 +110,14 @@ function BlockCard( {
 			if ( parentClientId || isChild || ! allowParentNavigation ) {
 				return {};
 			}
-			const { getBlockParents, getBlockName } =
-				select( blockEditorStore );
+			const { getBlockParents, getBlockName, shouldRenderBlockListView } =
+				unlock( select( blockEditorStore ) );
 
-			// Find the top-most parent block that is either:
-			// 1. A navigation block (special case for ad-hoc list view support)
-			// 2. Any block with listView support
+			// Find the top-most parent block that participates in List View.
 			const parents = getBlockParents( clientId, false );
-			const foundParentId = parents.find( ( parentId ) => {
-				const parentName = getBlockName( parentId );
-				return (
-					parentName === 'core/navigation' ||
-					hasBlockSupport( parentName, 'listView' )
-				);
-			} );
+			const foundParentId = parents.find( ( parentId ) =>
+				shouldRenderBlockListView( parentId )
+			);
 
 			return {
 				parentBlockClientId: foundParentId,
@@ -149,58 +145,65 @@ function BlockCard( {
 			) }
 		>
 			<Stack direction="column" gap="sm">
-				<Stack direction="row" align="center" justify="flex-start">
-					{ parentBlockClientId && (
-						<Button
-							onClick={ () => selectBlock( parentBlockClientId ) }
-							label={
-								parentBlockName
-									? sprintf(
-											/* translators: %s: The name of the parent block. */
-											__( 'Go to "%s" block' ),
-											getBlockType( parentBlockName )
-												?.title
-									  )
-									: __( 'Go to parent block' )
+				<Stack direction="row" align="center" justify="space-between">
+					<Stack direction="row" align="center" justify="flex-start">
+						{ parentBlockClientId && (
+							<Button
+								onClick={ () =>
+									selectBlock( parentBlockClientId )
+								}
+								label={
+									parentBlockName
+										? sprintf(
+												/* translators: %s: The name of the parent block. */
+												__( 'Go to "%s" block' ),
+												getBlockType( parentBlockName )
+													?.title
+										  )
+										: __( 'Go to parent block' )
+								}
+								style={
+									// TODO: This style override is also used in ToolsPanelHeader.
+									// It should be supported out-of-the-box by Button.
+									{ minWidth: 24, padding: 0 }
+								}
+								icon={ isRTL() ? chevronRight : chevronLeft }
+								size="small"
+							/>
+						) }
+						{ isChild && (
+							<span className="block-editor-block-card__child-indicator-icon">
+								<WCIcon
+									icon={ isRTL() ? arrowLeft : arrowRight }
+								/>
+							</span>
+						) }
+						<OptionalParentSelectButton
+							onClick={
+								parentClientId
+									? () => {
+											selectBlock( parentClientId );
+									  }
+									: undefined
 							}
-							style={
-								// TODO: This style override is also used in ToolsPanelHeader.
-								// It should be supported out-of-the-box by Button.
-								{ minWidth: 24, padding: 0 }
-							}
-							icon={ isRTL() ? chevronRight : chevronLeft }
-							size="small"
-						/>
-					) }
-					{ isChild && (
-						<span className="block-editor-block-card__child-indicator-icon">
-							<Icon icon={ isRTL() ? arrowLeft : arrowRight } />
-						</span>
-					) }
-					<OptionalParentSelectButton
-						onClick={
-							parentClientId
-								? () => {
-										selectBlock( parentClientId );
-								  }
-								: undefined
-						}
-					>
-						<BlockIcon icon={ icon } showColors />
-						<Stack direction="column" gap="xs">
-							<TitleElement className="block-editor-block-card__title">
-								<span className="block-editor-block-card__name">
-									{ !! name?.length ? name : title }
-								</span>
-								{ ! parentClientId &&
-									! isChild &&
-									!! name?.length && (
-										<WCBadge>{ title }</WCBadge>
-									) }
-							</TitleElement>
-							{ children }
-						</Stack>
-					</OptionalParentSelectButton>
+						>
+							<BlockIcon icon={ icon } showColors />
+							<Stack direction="column" gap="xs">
+								<TitleElement className="block-editor-block-card__title">
+									<span className="block-editor-block-card__name">
+										{ !! name?.length ? name : title }
+									</span>
+									{ ! parentClientId &&
+										! isChild &&
+										!! name?.length && (
+											<WCBadge>{ title }</WCBadge>
+										) }
+								</TitleElement>
+								{ children }
+							</Stack>
+						</OptionalParentSelectButton>
+					</Stack>
+					{ controls }
 				</Stack>
 				{ ! parentClientId && ! isChild && description && (
 					<Text className="block-editor-block-card__description">

@@ -91,6 +91,18 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 				'show_in_quick_edit' => array( 'type' => 'boolean' ),
 				'show_admin_column'  => array( 'type' => 'boolean' ),
 				'show_in_rest'       => array( 'type' => 'boolean' ),
+				'sort'               => array( 'type' => 'boolean' ),
+				'default_term'       => array(
+					'type'                 => 'object',
+					'additionalProperties' => false,
+					'properties'           => array(
+						'name' => array(
+							'type'      => 'string',
+							// Matches the `wp_terms.name` column (varchar(200)).
+							'maxLength' => 200,
+						),
+					),
+				),
 				'labels'             => array(
 					'type'                 => 'object',
 					'additionalProperties' => false,

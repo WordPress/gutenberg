@@ -27,7 +27,6 @@ import type {
 	SelectionInOneBlock,
 	SelectionInMultipleBlocks,
 	SelectionWholeBlock,
-	SelectionDirection,
 	CursorPosition,
 } from '../types';
 
@@ -40,6 +39,16 @@ export enum SelectionType {
 	SelectionInOneBlock = 'selection-in-one-block',
 	SelectionInMultipleBlocks = 'selection-in-multiple-blocks',
 	WholeBlock = 'whole-block',
+}
+
+/**
+ * The direction of a text selection, indicating where the caret sits.
+ */
+export enum SelectionDirection {
+	/** The caret is at the end of the selection (default / left-to-right). */
+	Forward = 'f',
+	/** The caret is at the start of the selection (right-to-left). */
+	Backward = 'b',
 }
 
 /**

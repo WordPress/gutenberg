@@ -3,10 +3,7 @@ import { forwardRef } from '@wordpress/element';
 import type { PortalProps } from './types';
 
 /**
- * Root element that portals `Popover` floating content. Pass to
- * `Popover.Popup`'s `portal` prop (for example `container` for
- * cross-document rendering). When `portal` is omitted, `Popover.Popup` uses
- * this component with default props.
+ * Used to apply custom portal behavior to `Popover`'s floating content.
  */
 const Portal = forwardRef< HTMLDivElement, PortalProps >(
 	function PopoverPortal( props, ref ) {

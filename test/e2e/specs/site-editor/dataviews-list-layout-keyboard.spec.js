@@ -8,11 +8,11 @@ test.describe( 'Dataviews List Layout', () => {
 		// Activate a theme with permissions to access the site editor.
 		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.createPage( {
-			title: 'Privacy Policy',
+			title: 'Page One',
 			status: 'publish',
 		} );
 		await requestUtils.createPage( {
-			title: 'Sample Page',
+			title: 'Page Two',
 			status: 'publish',
 		} );
 	} );
@@ -112,10 +112,10 @@ test.describe( 'Dataviews List Layout', () => {
 
 		// Use arrow up/down to move through the list.
 		await page.keyboard.press( 'ArrowDown' );
-		await expect( page.getByLabel( 'Sample Page' ) ).toBeFocused();
+		await expect( page.getByLabel( 'Page Two' ) ).toBeFocused();
 
 		await page.keyboard.press( 'ArrowUp' );
-		await expect( page.getByLabel( 'Privacy Policy' ) ).toBeFocused();
+		await expect( page.getByLabel( 'Page One' ) ).toBeFocused();
 	} );
 
 	test( 'Actions are reachable via RIGHT/LEFT arrow keys', async ( {
@@ -134,26 +134,26 @@ test.describe( 'Dataviews List Layout', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		await expect(
 			page
-				.getByRole( 'row', { name: 'Privacy Policy Edit Actions' } )
+				.getByRole( 'row', { name: 'Page One Edit Actions' } )
 				.getByRole( 'button', { name: 'Edit' } )
 		).toBeFocused();
 
 		await page.keyboard.press( 'ArrowRight' );
 		await expect(
 			page
-				.getByRole( 'row', { name: 'Privacy Policy Edit Actions' } )
+				.getByRole( 'row', { name: 'Page One Edit Actions' } )
 				.getByLabel( 'Actions' )
 		).toBeFocused();
 
 		await page.keyboard.press( 'ArrowLeft' );
 		await expect(
 			page
-				.getByRole( 'row', { name: 'Privacy Policy Edit Actions' } )
+				.getByRole( 'row', { name: 'Page One Edit Actions' } )
 				.getByRole( 'button', { name: 'Edit' } )
 		).toBeFocused();
 
 		await page.keyboard.press( 'ArrowLeft' );
-		await expect( page.getByLabel( 'Privacy Policy' ) ).toBeFocused();
+		await expect( page.getByLabel( 'Page One' ) ).toBeFocused();
 	} );
 
 	test( 'Search input retains focus while typing', async ( { page } ) => {
@@ -169,9 +169,7 @@ test.describe( 'Dataviews List Layout', () => {
 			'[role="row"]:has([data-active-item])'
 		);
 		const activeRowText = await activeRow.textContent();
-		const searchTerm = activeRowText.includes( 'Privacy' )
-			? 'Sample'
-			: 'Privacy';
+		const searchTerm = activeRowText.includes( 'One' ) ? 'Two' : 'One';
 
 		// Type a query that filters out the auto-activated item.
 		await searchBox.click();
@@ -201,14 +199,14 @@ test.describe( 'Dataviews List Layout', () => {
 		await page.keyboard.press( 'ArrowDown' );
 		await expect(
 			page
-				.getByRole( 'row', { name: 'Sample Page Edit Actions' } )
+				.getByRole( 'row', { name: 'Page Two Edit Actions' } )
 				.getByRole( 'button', { name: 'Edit' } )
 		).toBeFocused();
 
 		await page.keyboard.press( 'ArrowUp' );
 		await expect(
 			page
-				.getByRole( 'row', { name: 'Privacy Policy Edit Actions' } )
+				.getByRole( 'row', { name: 'Page One Edit Actions' } )
 				.getByRole( 'button', { name: 'Edit' } )
 		).toBeFocused();
 
@@ -217,14 +215,14 @@ test.describe( 'Dataviews List Layout', () => {
 		await page.keyboard.press( 'ArrowDown' );
 		await expect(
 			page
-				.getByRole( 'row', { name: 'Sample Page Edit Actions' } )
+				.getByRole( 'row', { name: 'Page Two Edit Actions' } )
 				.getByLabel( 'Actions' )
 		).toBeFocused();
 
 		await page.keyboard.press( 'ArrowUp' );
 		await expect(
 			page
-				.getByRole( 'row', { name: 'Privacy Policy Edit Actions' } )
+				.getByRole( 'row', { name: 'Page One Edit Actions' } )
 				.getByLabel( 'Actions' )
 		).toBeFocused();
 	} );

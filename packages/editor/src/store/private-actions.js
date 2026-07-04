@@ -17,6 +17,11 @@ import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
  */
 import isTemplateRevertable from './utils/is-template-revertable';
 import { buildRevisionsPageQuery } from './private-selectors';
+import {
+	getDeviceTypeByCanvasWidth,
+	VIEWPORT_STATE_BY_DEVICE_TYPE,
+} from '../utils/device-type';
+import { unlock } from '../lock-unlock';
 export * from '../dataviews/store/private-actions';
 
 /**
@@ -573,6 +578,34 @@ export function setShowStylebook( show ) {
 export function resetStylesNavigation() {
 	return {
 		type: 'RESET_STYLES_NAVIGATION',
+	};
+}
+
+/**
+ * Set the width of the canvas.
+ *
+ * @param {number} width The width of the canvas in pixels.
+ */
+export function setCanvasWidth( width ) {
+	return ( { dispatch, registry } ) => {
+		dispatch( {
+			type: 'SET_CANVAS_WIDTH',
+			width,
+		} );
+
+		// While Responsive editing is enabled, the canvas width also drives the
+		// viewport style state, whether changed via the device preview or by
+		// manually resizing the canvas.
+		if (
+			unlock( registry.select( blockEditorStore ) ).isResponsiveEditing()
+		) {
+			const deviceType = getDeviceTypeByCanvasWidth( width );
+			unlock(
+				registry.dispatch( blockEditorStore )
+			).setStyleStateViewport(
+				VIEWPORT_STATE_BY_DEVICE_TYPE[ deviceType ] ?? 'default'
+			);
+		}
 	};
 }
 

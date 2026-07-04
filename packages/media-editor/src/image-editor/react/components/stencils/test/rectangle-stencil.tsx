@@ -8,6 +8,7 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
  */
 import { RectangleStencil } from '../rectangle-stencil';
 import type { NormalizedRect, Size } from '../../../../core/types';
+import { DEFAULT_KEYBOARD_STEP } from '../../../../core/constants';
 
 const DEFAULT_CROP_RECT: NormalizedRect = {
 	x: 0.1,
@@ -32,23 +33,29 @@ function renderStencil(
 	const onResizeStart = jest.fn();
 	const onResizeEnd = jest.fn();
 	const onEscape = jest.fn();
+	const props = {
+		cropRect: DEFAULT_CROP_RECT,
+		containerSize: CONTAINER_SIZE,
+		imageSize: IMAGE_SIZE,
+		onCropChange,
+		onResizeStart,
+		onResizeEnd,
+		onEscape,
+		freeformCrop: true,
+		cropBounds: CROP_BOUNDS,
+		...overrides,
+	};
 
-	render(
-		<RectangleStencil
-			cropRect={ DEFAULT_CROP_RECT }
-			containerSize={ CONTAINER_SIZE }
-			imageSize={ IMAGE_SIZE }
-			onCropChange={ onCropChange }
-			onResizeStart={ onResizeStart }
-			onResizeEnd={ onResizeEnd }
-			onEscape={ onEscape }
-			freeformCrop
-			cropBounds={ CROP_BOUNDS }
-			{ ...overrides }
-		/>
-	);
+	const utils = render( <RectangleStencil { ...props } /> );
 
-	return { onCropChange, onResizeStart, onResizeEnd, onEscape };
+	return {
+		...utils,
+		props,
+		onCropChange,
+		onResizeStart,
+		onResizeEnd,
+		onEscape,
+	};
 }
 
 describe( 'RectangleStencil', () => {
@@ -212,6 +219,66 @@ describe( 'RectangleStencil', () => {
 			expect( newRect.height ).toBeCloseTo( 0.81, 5 );
 			expect( newRect.y ).toBeCloseTo( 0.1, 5 );
 		} );
+
+		it( 'applies snapCropRect to freeform resize output', () => {
+			const snapCropRect = jest.fn( ( rect: NormalizedRect ) => ( {
+				...rect,
+				width: 0.82,
+			} ) );
+			const { onCropChange } = renderStencil( { snapCropRect } );
+			const eHandle = screen.getAllByRole( 'button' )[ 3 ];
+
+			fireEvent.keyDown( eHandle, {
+				key: 'ArrowRight',
+				shiftKey: false,
+			} );
+
+			expect( snapCropRect ).toHaveBeenCalledTimes( 1 );
+			expect( snapCropRect.mock.calls[ 0 ][ 0 ].width ).toBeCloseTo(
+				0.81,
+				5
+			);
+			expect( snapCropRect.mock.calls[ 0 ][ 1 ] ).toBe( 'e' );
+			expect( onCropChange.mock.calls[ 0 ][ 0 ].width ).toBeCloseTo(
+				0.82,
+				5
+			);
+		} );
+
+		it( 'shrinks a locked-ratio crop from a corner handle', () => {
+			const { onCropChange } = renderStencil( {
+				aspectRatio: 1,
+				containerSize: { width: 500, height: 500 },
+				imageSize: { width: 500, height: 500 },
+			} );
+			const nwHandle = screen.getByRole( 'button', {
+				name: 'Resize top-left corner',
+			} );
+
+			fireEvent.keyDown( nwHandle, {
+				key: 'ArrowRight',
+				shiftKey: false,
+			} );
+
+			expect( onCropChange ).toHaveBeenCalledTimes( 1 );
+			const newRect: NormalizedRect = onCropChange.mock.calls[ 0 ][ 0 ];
+			expect( newRect.x ).toBeCloseTo(
+				DEFAULT_CROP_RECT.x + DEFAULT_KEYBOARD_STEP,
+				5
+			);
+			expect( newRect.y ).toBeCloseTo(
+				DEFAULT_CROP_RECT.y + DEFAULT_KEYBOARD_STEP,
+				5
+			);
+			expect( newRect.width ).toBeCloseTo(
+				DEFAULT_CROP_RECT.width - DEFAULT_KEYBOARD_STEP,
+				5
+			);
+			expect( newRect.height ).toBeCloseTo(
+				DEFAULT_CROP_RECT.height - DEFAULT_KEYBOARD_STEP,
+				5
+			);
+		} );
 	} );
 
 	describe( 'keyboard — arrow keys (coarse step with Shift)', () => {
@@ -246,6 +313,21 @@ describe( 'RectangleStencil', () => {
 			const coarseDelta = coarseRect.width - DEFAULT_CROP_RECT.width;
 
 			expect( coarseDelta / fineDelta ).toBeCloseTo( 10, 0 );
+		} );
+
+		it( 'does not apply snapCropRect while resizing a locked aspect ratio', () => {
+			const snapCropRect = jest.fn( ( rect: NormalizedRect ) => rect );
+			renderStencil( { aspectRatio: 1, snapCropRect } );
+			const nwHandle = screen.getByRole( 'button', {
+				name: 'Resize top-left corner',
+			} );
+
+			fireEvent.keyDown( nwHandle, {
+				key: 'ArrowRight',
+				shiftKey: false,
+			} );
+
+			expect( snapCropRect ).not.toHaveBeenCalled();
 		} );
 	} );
 
@@ -286,6 +368,76 @@ describe( 'RectangleStencil', () => {
 			} );
 
 			expect( firstHandle.focus ).toHaveBeenCalled();
+		} );
+
+		it( 'does not start a pointer resize while resizing is disabled', () => {
+			const { onResizeStart } = renderStencil( {
+				isResizeDisabled: true,
+			} );
+			const [ firstHandle ] = screen.getAllByRole( 'button' );
+
+			fireEvent.pointerDown( firstHandle, {
+				button: 0,
+				clientX: 100,
+				clientY: 100,
+				pointerId: 1,
+			} );
+
+			expect( onResizeStart ).not.toHaveBeenCalled();
+		} );
+
+		it( 'cancels an active pointer resize when resizing becomes disabled', () => {
+			const { props, rerender, onResizeStart, onResizeEnd } =
+				renderStencil();
+			const [ firstHandle ] = screen.getAllByRole( 'button' );
+
+			fireEvent.pointerDown( firstHandle, {
+				button: 0,
+				clientX: 100,
+				clientY: 100,
+				pointerId: 1,
+			} );
+
+			expect( onResizeStart ).toHaveBeenCalledTimes( 1 );
+			expect( onResizeEnd ).not.toHaveBeenCalled();
+
+			rerender( <RectangleStencil { ...props } isResizeDisabled /> );
+
+			expect( onResizeEnd ).toHaveBeenCalledTimes( 1 );
+
+			fireEvent.pointerUp( firstHandle, { pointerId: 1 } );
+
+			expect( onResizeEnd ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'only stops touchstart propagation for single-touch handle gestures', () => {
+			const onTouchStart = jest.fn();
+			render(
+				<div onTouchStart={ onTouchStart }>
+					<RectangleStencil
+						cropRect={ DEFAULT_CROP_RECT }
+						containerSize={ CONTAINER_SIZE }
+						imageSize={ IMAGE_SIZE }
+						onCropChange={ jest.fn() }
+						freeformCrop
+						cropBounds={ CROP_BOUNDS }
+					/>
+				</div>
+			);
+			const [ firstHandle ] = screen.getAllByRole( 'button' );
+
+			fireEvent.touchStart( firstHandle, {
+				touches: [ { clientX: 100, clientY: 100 } ],
+			} );
+			expect( onTouchStart ).not.toHaveBeenCalled();
+
+			fireEvent.touchStart( firstHandle, {
+				touches: [
+					{ clientX: 100, clientY: 100 },
+					{ clientX: 160, clientY: 100 },
+				],
+			} );
+			expect( onTouchStart ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 } );

@@ -18,7 +18,7 @@ import {
 	CheckboxControl,
 	Flex,
 	FlexItem,
-	Icon,
+	Icon as WCIcon,
 	Modal,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -287,7 +287,7 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 														)
 													}
 												/>
-												<Icon
+												<WCIcon
 													icon={ icon }
 													className={ clsx( {
 														'block-editor-block-visibility-modal__options-icon--checked':

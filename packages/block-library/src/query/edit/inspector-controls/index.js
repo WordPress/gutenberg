@@ -218,7 +218,6 @@ export default function QueryInspectorControls( props ) {
 						>
 							<VStack spacing={ 4 }>
 								<ToggleGroupControl
-									__next40pxDefaultSize
 									label={ __( 'Query type' ) }
 									isBlock
 									onChange={ ( value ) => {
@@ -278,7 +277,6 @@ export default function QueryInspectorControls( props ) {
 								/>
 							) : (
 								<ToggleGroupControl
-									__next40pxDefaultSize
 									isBlock
 									value={ postType }
 									label={ postTypeControlLabel }
@@ -432,7 +430,6 @@ export default function QueryInspectorControls( props ) {
 							} }
 						>
 							<TextControl
-								__next40pxDefaultSize
 								label={ __( 'Keyword' ) }
 								value={ querySearch }
 								onChange={ ( newQuerySearch ) => {

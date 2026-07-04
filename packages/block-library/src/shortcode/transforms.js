@@ -53,12 +53,12 @@ const transforms = {
 		return getShortcodeFromTransforms().map( ( fromTransform ) => ( {
 			type: 'block',
 			blocks: [ fromTransform.blockName ],
-			isMatch: ( { text } ) => {
+			isMatch: ( { text = '' } ) => {
 				return []
 					.concat( fromTransform.tag )
 					.some( ( tag ) => isSingleShortcode( text, tag ) );
 			},
-			transform: ( { text } ) => {
+			transform: ( { text = '' } ) => {
 				return rawHandler( { HTML: `<p>${ text.trim() }</p>` } );
 			},
 		} ) );

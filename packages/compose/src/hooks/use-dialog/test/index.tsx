@@ -1,7 +1,9 @@
 /**
  * External dependencies
  */
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { createPortal } from 'react-dom';
 
 /**
  * Internal dependencies
@@ -22,44 +24,58 @@ function Dialog( { onClose }: { onClose?: () => void } ) {
 	);
 }
 
-// `useDialog` currently detects the Escape key via the deprecated `keyCode`
-// property (`event.keyCode === 27`). In jsdom, `userEvent.keyboard('[Escape]')`
-// does not set `keyCode` to 27, so we use `fireEvent` to control the event
-// shape. Once the hook is updated to use `event.key === 'Escape'`, these tests
-// should be rewritten to use `userEvent` for more realistic event simulation.
-function pressEscapeOn( element: HTMLElement ) {
-	fireEvent.keyDown( element, { keyCode: 27, key: 'Escape' } );
-}
-
 describe( 'useDialog', () => {
-	it( 'should call onClose when Escape is pressed', () => {
+	it( 'should call onClose when Escape is pressed', async () => {
+		const user = userEvent.setup();
 		const onClose = jest.fn();
 
 		render( <Dialog onClose={ onClose } /> );
 
-		pressEscapeOn( screen.getByRole( 'dialog' ) );
+		screen.getByRole( 'dialog' ).focus();
+		await user.keyboard( '[Escape]' );
 
 		expect( onClose ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it( 'should not call onClose when Escape is pressed if defaultPrevented', () => {
+	it( 'should not call onClose when Escape is pressed if defaultPrevented', async () => {
+		const user = userEvent.setup();
 		const onClose = jest.fn();
 
-		render( <Dialog onClose={ onClose } /> );
+		function DialogWithChild() {
+			const [ ref, props ] = useDialog( {
+				onClose,
+				focusOnMount: false,
+			} );
+			return (
+				<div
+					ref={ ref }
+					{ ...props }
+					role="dialog"
+					aria-label="Test dialog"
+				>
+					<button
+						onKeyDown={ ( event ) => {
+							if ( event.key === 'Escape' ) {
+								event.preventDefault();
+							}
+						} }
+					>
+						Inside
+					</button>
+				</div>
+			);
+		}
 
-		const dialog = screen.getByRole( 'dialog' );
-		const event = new KeyboardEvent( 'keydown', {
-			keyCode: 27,
-			bubbles: true,
-			cancelable: true,
-		} );
-		event.preventDefault();
-		dialog.dispatchEvent( event );
+		render( <DialogWithChild /> );
+
+		screen.getByRole( 'button', { name: 'Inside' } ).focus();
+		await user.keyboard( '[Escape]' );
 
 		expect( onClose ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should stop Escape event from propagating to parent elements', () => {
+	it( 'should stop Escape event from propagating to parent elements', async () => {
+		const user = userEvent.setup();
 		const onClose = jest.fn();
 		const parentKeyDownHandler = jest.fn();
 
@@ -70,13 +86,15 @@ describe( 'useDialog', () => {
 			</div>
 		);
 
-		pressEscapeOn( screen.getByRole( 'button', { name: 'Inside' } ) );
+		screen.getByRole( 'button', { name: 'Inside' } ).focus();
+		await user.keyboard( '[Escape]' );
 
 		expect( onClose ).toHaveBeenCalledTimes( 1 );
 		expect( parentKeyDownHandler ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should let Escape propagate when there is no onClose handler', () => {
+	it( 'should let Escape propagate when there is no onClose handler', async () => {
+		const user = userEvent.setup();
 		const parentKeyDownHandler = jest.fn();
 
 		render(
@@ -86,12 +104,62 @@ describe( 'useDialog', () => {
 			</div>
 		);
 
-		pressEscapeOn( screen.getByRole( 'button', { name: 'Inside' } ) );
+		screen.getByRole( 'button', { name: 'Inside' } ).focus();
+		await user.keyboard( '[Escape]' );
 
 		expect( parentKeyDownHandler ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it( 'should close only the innermost dialog when nested', () => {
+	it( 'should not close when a portaled descendant handles Escape and stops propagation', async () => {
+		const user = userEvent.setup();
+		const onClose = jest.fn();
+		const descendantHandled = jest.fn();
+
+		const portalTarget = document.createElement( 'div' );
+		document.body.appendChild( portalTarget );
+
+		function DialogWithPortaledChild() {
+			const [ ref, props ] = useDialog( {
+				onClose,
+				focusOnMount: false,
+			} );
+			return (
+				<div
+					ref={ ref }
+					{ ...props }
+					role="dialog"
+					aria-label="Test dialog"
+				>
+					{ createPortal(
+						<button
+							onKeyDown={ ( event ) => {
+								if ( event.key === 'Escape' ) {
+									descendantHandled();
+									event.stopPropagation();
+								}
+							} }
+						>
+							Portaled
+						</button>,
+						portalTarget
+					) }
+				</div>
+			);
+		}
+
+		render( <DialogWithPortaledChild /> );
+
+		screen.getByText( 'Portaled' ).focus();
+		await user.keyboard( '[Escape]' );
+
+		expect( descendantHandled ).toHaveBeenCalledTimes( 1 );
+		expect( onClose ).not.toHaveBeenCalled();
+
+		document.body.removeChild( portalTarget );
+	} );
+
+	it( 'should close only the innermost dialog when nested', async () => {
+		const user = userEvent.setup();
 		const outerOnClose = jest.fn();
 		const innerOnClose = jest.fn();
 
@@ -126,22 +194,82 @@ describe( 'useDialog', () => {
 
 		render( <NestedDialogs /> );
 
-		pressEscapeOn( screen.getByRole( 'button', { name: 'Focusable' } ) );
+		screen.getByRole( 'button', { name: 'Focusable' } ).focus();
+		await user.keyboard( '[Escape]' );
 
 		expect( innerOnClose ).toHaveBeenCalledTimes( 1 );
 		expect( outerOnClose ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should not call onClose for non-Escape keys', () => {
+	it( 'should call the consumer-provided onKeyDown alongside close-on-Escape', async () => {
+		const user = userEvent.setup();
+		const onClose = jest.fn();
+		const consumerOnKeyDown = jest.fn();
+
+		function DialogWithConsumerOnKeyDown() {
+			const [ ref, props ] = useDialog( {
+				onClose,
+				onKeyDown: consumerOnKeyDown,
+				focusOnMount: false,
+			} );
+			return (
+				<div
+					ref={ ref }
+					{ ...props }
+					role="dialog"
+					aria-label="Test dialog"
+				/>
+			);
+		}
+
+		render( <DialogWithConsumerOnKeyDown /> );
+
+		screen.getByRole( 'dialog' ).focus();
+		await user.keyboard( '[Escape]' );
+
+		expect( consumerOnKeyDown ).toHaveBeenCalledTimes( 1 );
+		expect( consumerOnKeyDown.mock.calls[ 0 ][ 0 ].key ).toBe( 'Escape' );
+		expect( onClose ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'should let the consumer-provided onKeyDown opt out of close-on-Escape via preventDefault', async () => {
+		const user = userEvent.setup();
+		const onClose = jest.fn();
+
+		function DialogOptingOut() {
+			const [ ref, props ] = useDialog( {
+				onClose,
+				onKeyDown: ( event ) => event.preventDefault(),
+				focusOnMount: false,
+			} );
+			return (
+				<div
+					ref={ ref }
+					{ ...props }
+					role="dialog"
+					aria-label="Test dialog"
+				/>
+			);
+		}
+
+		render( <DialogOptingOut /> );
+
+		screen.getByRole( 'dialog' ).focus();
+		await user.keyboard( '[Escape]' );
+
+		expect( onClose ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should not call onClose for non-Escape keys', async () => {
+		const user = userEvent.setup();
 		const onClose = jest.fn();
 
 		render( <Dialog onClose={ onClose } /> );
 
-		const dialog = screen.getByRole( 'dialog' );
-
-		fireEvent.keyDown( dialog, { keyCode: 13, key: 'Enter' } );
-		fireEvent.keyDown( dialog, { keyCode: 65, key: 'a' } );
-		fireEvent.keyDown( dialog, { keyCode: 9, key: 'Tab' } );
+		screen.getByRole( 'dialog' ).focus();
+		await user.keyboard( '[Enter]' );
+		await user.keyboard( 'a' );
+		await user.keyboard( '[Tab]' );
 
 		expect( onClose ).not.toHaveBeenCalled();
 	} );

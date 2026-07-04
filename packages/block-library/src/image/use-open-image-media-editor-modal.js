@@ -104,9 +104,6 @@ export function getSyncedImageBlockAttributes(
 }
 
 const { openMediaEditorModalKey } = unlock( blockEditorPrivateApis );
-// Caption sync needs `caption.raw`; view/default attachment records can contain
-// only rendered caption data or be tied to an in-flight stale resolution.
-const ATTACHMENT_EDIT_QUERY = { context: 'edit' };
 
 function getAttachmentFallbackForEmptyBlockMetadata( { alt, caption } ) {
 	const attachment = {};
@@ -136,7 +133,11 @@ function hasKnownAttachmentMetadata( attachment ) {
 	return hasKnownAlt && hasKnownCaption;
 }
 
-export function useOpenImageMediaEditorModal( { attributes, setAttributes } ) {
+export function useOpenImageMediaEditorModal( {
+	attributes,
+	setAttributes,
+	onClose,
+} ) {
 	// Keep this hook private to the Image block and pass the block attributes
 	// object so the callsite stays compact. Destructure only the attributes
 	// currently used for metadata sync; add more here if the sync policy grows.
@@ -147,11 +148,16 @@ export function useOpenImageMediaEditorModal( { attributes, setAttributes } ) {
 			select( blockEditorStore ).getSettings()[ openMediaEditorModalKey ],
 		[]
 	);
-	// Track the block's current alt and caption in a ref so handleMediaUpdate
-	// can read the latest values without being listed as a dependency (which
-	// would recreate the callback and re-register the onUpdate handler on every
-	// keystroke while the modal is open).
-	const blockMetadataRef = useRef( { alt, caption: caption?.toString() } );
+	// Track the block's current attachment and metadata in a ref so
+	// handleMediaUpdate can read the latest values without being listed as
+	// dependencies (which would recreate the callback and re-register the
+	// onUpdate handler on every block change while the modal is open).
+	const blockAttributesRef = useRef( {
+		id,
+		url,
+		alt,
+		caption: caption?.toString(),
+	} );
 	// Snapshot of the attachment's metadata taken just before the modal opens,
 	// used as the baseline for detecting what changed during the editing session.
 	const mediaEditorMetadataBaselineRef = useRef();
@@ -160,28 +166,31 @@ export function useOpenImageMediaEditorModal( { attributes, setAttributes } ) {
 	const mediaEditorMetadataSyncRequestRef = useRef( 0 );
 
 	useEffect( () => {
-		blockMetadataRef.current = { alt, caption: caption?.toString() };
-	}, [ alt, caption ] );
+		blockAttributesRef.current = {
+			id,
+			url,
+			alt,
+			caption: caption?.toString(),
+		};
+	}, [ alt, caption, id, url ] );
 
+	// Reads the cached attachment record. The `attachment` postType entity
+	// fetches with `context: 'edit'` by default, so `getEditedEntityRecord`
+	// returns the edit-context record — carrying `caption` as `{ raw }` and a
+	// usable `alt_text` — without us specifying a context. It is resolver-
+	// backed, so on a cold cache this also kicks off the fetch and returns a
+	// falsy value synchronously; that resolution shares its cache key with the
+	// `resolveAttachmentRecord` call below (both keyed on the no-query
+	// `getEntityRecord`), so the two dedupe into a single request.
 	const getCachedAttachmentRecord = useCallback(
-		( attachmentId ) => {
-			const { getEditedEntityRecord, getEntityRecord } =
-				registry.select( coreStore );
-			return (
-				getEditedEntityRecord(
+		( attachmentId ) =>
+			registry
+				.select( coreStore )
+				.getEditedEntityRecord(
 					'postType',
 					'attachment',
 					attachmentId
-				) ||
-				getEntityRecord(
-					'postType',
-					'attachment',
-					attachmentId,
-					ATTACHMENT_EDIT_QUERY
-				) ||
-				getEntityRecord( 'postType', 'attachment', attachmentId )
-			);
-		},
+				),
 		[ registry ]
 	);
 
@@ -190,18 +199,10 @@ export function useOpenImageMediaEditorModal( { attributes, setAttributes } ) {
 			const resolveSelect = registry.resolveSelect( coreStore );
 
 			try {
-				return (
-					( await resolveSelect.getEntityRecord(
-						'postType',
-						'attachment',
-						attachmentId,
-						ATTACHMENT_EDIT_QUERY
-					) ) ||
-					( await resolveSelect.getEntityRecord(
-						'postType',
-						'attachment',
-						attachmentId
-					) )
+				return await resolveSelect.getEntityRecord(
+					'postType',
+					'attachment',
+					attachmentId
 				);
 			} catch {
 				return undefined;
@@ -212,20 +213,15 @@ export function useOpenImageMediaEditorModal( { attributes, setAttributes } ) {
 
 	const resolveFreshAttachmentRecord = useCallback(
 		async ( attachmentId ) => {
-			// Bust cached records so resolveAttachmentRecord fetches the
-			// server state that reflects the media editor's saved changes.
+			// Invalidate the cached resolution so resolveAttachmentRecord
+			// re-fetches the server state that reflects the media editor's
+			// saved changes.
 			const { invalidateResolution } = registry.dispatch( coreStore );
 
 			invalidateResolution( 'getEntityRecord', [
 				'postType',
 				'attachment',
 				attachmentId,
-			] );
-			invalidateResolution( 'getEntityRecord', [
-				'postType',
-				'attachment',
-				attachmentId,
-				ATTACHMENT_EDIT_QUERY,
 			] );
 			return resolveAttachmentRecord( attachmentId );
 		},
@@ -245,9 +241,16 @@ export function useOpenImageMediaEditorModal( { attributes, setAttributes } ) {
 			const syncRequest = ++mediaEditorMetadataSyncRequestRef.current;
 			const nextAttributes = {};
 
-			if ( newId !== id ) {
+			const currentBlockAttributes = blockAttributesRef.current;
+
+			if ( newId !== currentBlockAttributes.id ) {
 				nextAttributes.id = newId;
-				nextAttributes.url = newUrl ?? url;
+				nextAttributes.url = newUrl ?? currentBlockAttributes.url;
+				blockAttributesRef.current = {
+					...blockAttributesRef.current,
+					id: nextAttributes.id,
+					url: nextAttributes.url,
+				};
 			}
 
 			if ( originalAttachment ) {
@@ -270,27 +273,28 @@ export function useOpenImageMediaEditorModal( { attributes, setAttributes } ) {
 				// has independently customised on the block (i.e. values
 				// that don't match the pre-session attachment metadata)
 				// are left untouched.
+				const latestBlockAttributes = blockAttributesRef.current;
 				const resolvedMetadataAttributes =
 					getSyncedImageBlockAttributes(
-						blockMetadataRef.current,
+						latestBlockAttributes,
 						originalAttachment,
 						resolvedAttachment
 					);
 
 				if ( Object.keys( resolvedMetadataAttributes ).length ) {
 					Object.assign( nextAttributes, resolvedMetadataAttributes );
-					blockMetadataRef.current = {
-						...blockMetadataRef.current,
-						...resolvedMetadataAttributes,
-					};
 				}
 			}
 
 			if ( Object.keys( nextAttributes ).length ) {
+				blockAttributesRef.current = {
+					...blockAttributesRef.current,
+					...nextAttributes,
+				};
 				setAttributes( nextAttributes );
 			}
 		},
-		[ id, resolveFreshAttachmentRecord, setAttributes, url ]
+		[ resolveFreshAttachmentRecord, setAttributes ]
 	);
 
 	const openImageMediaEditorModal = useCallback( async () => {
@@ -299,14 +303,14 @@ export function useOpenImageMediaEditorModal( { attributes, setAttributes } ) {
 		}
 
 		// Snapshot the attachment's current metadata before the user makes
-		// any changes so handleMediaUpdate can compare against it later.
-		// Prefer a freshly resolved edit-context record for accuracy; fall
-		// back to whatever is in the cache, or a minimal object derived from
-		// the block's own attributes when nothing is cached yet.
+		// any changes so handleMediaUpdate can compare against it later. Use
+		// the cached record when it's already present; only resolve when
+		// nothing is cached yet, then fall back to a minimal object derived
+		// from the block's own attributes.
 		const cachedAttachmentRecord = getCachedAttachmentRecord( id );
 		const fallbackAttachmentRecord =
 			getAttachmentFallbackForEmptyBlockMetadata(
-				blockMetadataRef.current
+				blockAttributesRef.current
 			);
 		const resolvedAttachmentRecord = hasKnownAttachmentMetadata(
 			cachedAttachmentRecord
@@ -324,11 +328,13 @@ export function useOpenImageMediaEditorModal( { attributes, setAttributes } ) {
 		openMediaEditorModal( {
 			id,
 			onUpdate: handleMediaUpdate,
+			onClose,
 		} );
 	}, [
 		getCachedAttachmentRecord,
 		handleMediaUpdate,
 		id,
+		onClose,
 		openMediaEditorModal,
 		resolveAttachmentRecord,
 	] );

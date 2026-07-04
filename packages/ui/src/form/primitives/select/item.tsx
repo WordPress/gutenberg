@@ -27,6 +27,7 @@ export const Item = forwardRef< HTMLDivElement, SelectItemProps >(
 				<Icon
 					icon={ check }
 					className={ clsx(
+						itemPopupStyles[ 'item-icon' ],
 						itemPopupStyles[ 'item-indicator-icon' ]
 					) }
 					size={ size === 'small' ? 20 : 24 }

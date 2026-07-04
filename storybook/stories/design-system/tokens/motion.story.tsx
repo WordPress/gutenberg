@@ -63,20 +63,20 @@ const DURATION_OPTIONS = [
 const labelStyle = {
 	fontFamily: 'var(--wpds-typography-font-family-mono)',
 	fontSize: 'var(--wpds-typography-font-size-sm)',
-	color: 'var(--wpds-color-fg-content-neutral)',
+	color: 'var(--wpds-color-foreground-content-neutral)',
 } as const;
 
 const descriptionStyle = {
 	fontFamily: 'var(--wpds-typography-font-family-body)',
 	fontSize: 'var(--wpds-typography-font-size-xs)',
-	color: 'var(--wpds-color-fg-content-neutral-weak)',
+	color: 'var(--wpds-color-foreground-content-neutral-weak)',
 } as const;
 
 const trackStyle = {
 	position: 'relative',
 	height: '40px',
 	borderRadius: 'var(--wpds-border-radius-sm)',
-	backgroundColor: 'var(--wpds-color-bg-surface-neutral-weak)',
+	backgroundColor: 'var(--wpds-color-background-surface-neutral-weak)',
 	overflow: 'hidden',
 	flex: 1,
 } as const;
@@ -93,7 +93,7 @@ const dotBaseStyle = {
 	width: '32px',
 	height: '32px',
 	borderRadius: 'var(--wpds-border-radius-sm)',
-	backgroundColor: 'var(--wpds-color-bg-interactive-brand-strong)',
+	backgroundColor: 'var(--wpds-color-background-interactive-brand-strong)',
 	animationName: 'slideRight',
 	animationFillMode: 'forwards',
 } as const;

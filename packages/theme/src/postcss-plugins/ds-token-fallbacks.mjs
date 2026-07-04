@@ -1,17 +1,17 @@
-import _tokenFallbacks from '../prebuilt/js/design-token-fallbacks.mjs';
-
-/** @type {Record<string, string>} */
-const tokenFallbacks = _tokenFallbacks;
+import tokenFallbacks from '../prebuilt/js/design-token-fallbacks.mjs';
+import { addFallbackToVar as _addFallbackToVar } from './add-fallback-to-var.mjs';
 
 /**
  * Replace bare `var(--wpds-*)` references in a CSS value string with
- * `var(--wpds-*, <fallback>)` using the generated token fallback map.
+ * `var(--wpds-*, <fallback>)` using the package's generated token
+ * fallback map.
  *
  * Existing fallbacks (i.e. var() calls that already contain a comma) are
  * left untouched, making the function safe to run multiple times.
  *
- * NOTE: The regex and replacement logic here mirrors `add-fallback-to-var.ts`.
- * If you update one, update the other to match.
+ * This is a thin wrapper around the generic `addFallbackToVar` helper in
+ * `./add-fallback-to-var.mjs`, prebound to the package's token fallback
+ * map. Update the regex/replacement logic in that file, not here.
  *
  * @param {string}  cssValue               A CSS declaration value.
  * @param {Object}  [options]              Options.
@@ -24,24 +24,6 @@ const tokenFallbacks = _tokenFallbacks;
  *                                         engine still sees the correct value.
  * @return {string}                        The value with fallbacks injected.
  */
-export function addFallbackToVar( cssValue, { escapeQuotes = false } = {} ) {
-	return cssValue.replace(
-		/var\(\s*(--wpds-[\w-]+)\s*\)/g,
-		( match, tokenName ) => {
-			let fallback = tokenFallbacks[ tokenName ];
-			if ( fallback === undefined ) {
-				throw new Error(
-					`Unknown design token: ${ tokenName }. ` +
-						'This token is not in the design system. ' +
-						'If this token was recently renamed, update all references to use the new name.'
-				);
-			}
-			if ( escapeQuotes ) {
-				fallback = fallback
-					.replaceAll( '"', '\\"' )
-					.replaceAll( "'", "\\'" );
-			}
-			return `var(${ tokenName }, ${ fallback })`;
-		}
-	);
+export function addFallbackToVar( cssValue, options ) {
+	return _addFallbackToVar( cssValue, tokenFallbacks, options );
 }

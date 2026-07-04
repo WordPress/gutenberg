@@ -198,10 +198,8 @@ export class PerfUtils {
 
 	async expectExpandedState( locator: Locator, state: 'true' | 'false' ) {
 		return await Promise.any( [
-			// eslint-disable-next-line playwright/missing-playwright-await
 			expect( locator ).toHaveAttribute( 'aria-expanded', state ),
 			// Legacy selector.
-			// eslint-disable-next-line playwright/missing-playwright-await
 			expect( locator ).toHaveAttribute( 'aria-pressed', state ),
 		] );
 	}

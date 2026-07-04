@@ -34,6 +34,7 @@
 		{ "path": "../keyboard-shortcuts" },
 		{ "path": "../primitives" },
 		{ "path": "../rich-text" },
+		{ "path": "../server-side-render" },
 		{ "path": "../shortcode" },
 		{ "path": "../ui" },
 		{ "path": "../upload-media" },

@@ -9,6 +9,11 @@ import { render, screen } from '@testing-library/react';
 import { View } from '../../view';
 import { Flex, FlexBlock, FlexItem } from '../';
 
+const getGeneratedEmotionClassNames = ( element: HTMLElement ) =>
+	Array.from( element.classList ).filter( ( className ) =>
+		/^(css|emotion)-/.test( className )
+	);
+
 describe( 'props', () => {
 	test( 'should render correctly', () => {
 		render(
@@ -106,5 +111,20 @@ describe( 'props', () => {
 		expect( screen.getByTestId( 'flex-block' ) ).toMatchStyleDiffSnapshot(
 			screen.getByTestId( 'flex-block-with-gap' )
 		);
+	} );
+
+	test( 'should compose flex item styles in a single generated class', () => {
+		render(
+			<Flex>
+				<FlexItem isBlock display="inline-flex" data-testid="item">
+					Item
+				</FlexItem>
+			</Flex>
+		);
+
+		const item = screen.getByTestId( 'item' );
+
+		expect( getGeneratedEmotionClassNames( item ) ).toHaveLength( 1 );
+		expect( item ).toHaveStyle( { display: 'inline-flex' } );
 	} );
 } );

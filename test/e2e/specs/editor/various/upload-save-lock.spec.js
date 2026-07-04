@@ -20,6 +20,14 @@ const TEST_IMAGE_FILE_PATH = path.join(
 	'10x10_e2e_test_image_z9T8jK.png'
 );
 
+const MEDIA_URLS = [
+	'/wp/v2/media',
+	`rest_route=${ encodeURIComponent( '/wp/v2/media' ) }`,
+];
+
+const isMediaURL = ( url ) =>
+	MEDIA_URLS.some( ( u ) => url.href.includes( u ) );
+
 /**
  * Creates a temporary copy of the test image with a unique name.
  *
@@ -67,7 +75,10 @@ test.describe( 'Upload save lock', () => {
 		const uploadPromise = new Promise( ( resolve ) => {
 			resolveUpload = resolve;
 		} );
-		await page.route( '**/wp/v2/media', async ( route ) => {
+		await page.route( isMediaURL, async ( route ) => {
+			if ( route.request().method() !== 'POST' ) {
+				return route.fallback();
+			}
 			await uploadPromise;
 			await route.continue();
 		} );
@@ -128,7 +139,10 @@ test.describe( 'Upload save lock', () => {
 			resolveAllUploads = resolve;
 		} );
 
-		await page.route( '**/wp/v2/media', async ( route ) => {
+		await page.route( isMediaURL, async ( route ) => {
+			if ( route.request().method() !== 'POST' ) {
+				return route.fallback();
+			}
 			await allUploadsPromise;
 			await route.continue();
 		} );
@@ -197,7 +211,10 @@ test.describe( 'Upload save lock', () => {
 		const uploadPromise = new Promise( ( resolve ) => {
 			resolveUpload = resolve;
 		} );
-		await page.route( '**/wp/v2/media', async ( route ) => {
+		await page.route( isMediaURL, async ( route ) => {
+			if ( route.request().method() !== 'POST' ) {
+				return route.fallback();
+			}
 			await uploadPromise;
 			await route.continue();
 		} );
@@ -268,7 +285,10 @@ test.describe( 'Upload save lock', () => {
 		const uploadPromise = new Promise( ( resolve ) => {
 			resolveUpload = resolve;
 		} );
-		await page.route( '**/wp/v2/media', async ( route ) => {
+		await page.route( isMediaURL, async ( route ) => {
+			if ( route.request().method() !== 'POST' ) {
+				return route.fallback();
+			}
 			await uploadPromise;
 			await route.continue();
 		} );
@@ -326,7 +346,10 @@ test.describe( 'Upload save lock', () => {
 		await expect( saveDraftButton ).toBeEnabled();
 
 		// Intercept the upload request and return an error.
-		await page.route( '**/wp/v2/media', async ( route ) => {
+		await page.route( isMediaURL, async ( route ) => {
+			if ( route.request().method() !== 'POST' ) {
+				return route.fallback();
+			}
 			await route.fulfill( {
 				status: 500,
 				contentType: 'application/json',

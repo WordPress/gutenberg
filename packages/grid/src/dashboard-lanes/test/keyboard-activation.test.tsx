@@ -1,8 +1,4 @@
 /**
- * @jest-environment jsdom
- */
-
-/**
  * External dependencies
  */
 import { render } from '@testing-library/react';
@@ -58,9 +54,11 @@ describe( 'DashboardLanes keyboard activation', () => {
 		expect( activator ).not.toBeNull();
 		expect( activator ).toHaveAttribute( 'tabindex', '0' );
 
-		// Outer item is identified by `data-lanes-key`; the activator
+		// Outer item is identified by `data-wp-grid-item-key`; the activator
 		// must be its descendant.
-		const lanesItem = container.querySelector( '[data-lanes-key="a"]' );
+		const lanesItem = container.querySelector(
+			'[data-wp-grid-item-key="a"]'
+		);
 		expect( lanesItem ).not.toBeNull();
 		expect( activator ).not.toBe( lanesItem );
 		expect( lanesItem!.contains( activator! ) ).toBe( true );

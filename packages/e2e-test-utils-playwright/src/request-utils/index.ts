@@ -21,6 +21,7 @@ import {
 	activateTheme,
 	getCurrentThemeGlobalStylesPostId,
 	getThemeGlobalStylesRevisions,
+	resetThemeGlobalStyles,
 } from './themes';
 import { createBlock, deleteAllBlocks } from './blocks';
 import { createComment, deleteAllComments } from './comments';
@@ -33,7 +34,7 @@ import {
 } from './menus';
 import { deleteAllPages, createPage } from './pages';
 import { createRecord } from './records';
-import { resetPreferences } from './preferences';
+import { resetPreferences, setPreferences } from './preferences';
 import { getSiteSettings, updateSiteSettings } from './site-settings';
 import { deleteAllWidgets, addWidgetBlock } from './widgets';
 import { deleteAllPatternCategories } from './patterns';
@@ -182,6 +183,8 @@ class RequestUtils {
 	createTemplate: typeof createTemplate = createTemplate.bind( this );
 	/** @borrows resetPreferences as this.resetPreferences */
 	resetPreferences: typeof resetPreferences = resetPreferences.bind( this );
+	/** @borrows setPreferences as this.setPreferences */
+	setPreferences: typeof setPreferences = setPreferences.bind( this );
 	/** @borrows listMedia as this.listMedia */
 	listMedia: typeof listMedia = listMedia.bind( this );
 	/** @borrows uploadMedia as this.uploadMedia */
@@ -209,6 +212,9 @@ class RequestUtils {
 	/** @borrows getThemeGlobalStylesRevisions as this.getThemeGlobalStylesRevisions */
 	getThemeGlobalStylesRevisions: typeof getThemeGlobalStylesRevisions =
 		getThemeGlobalStylesRevisions.bind( this );
+	/** @borrows resetThemeGlobalStyles as this.resetThemeGlobalStyles */
+	resetThemeGlobalStyles: typeof resetThemeGlobalStyles =
+		resetThemeGlobalStyles.bind( this );
 	/** @borrows deleteAllPatternCategories as this.deleteAllPatternCategories */
 	deleteAllPatternCategories = deleteAllPatternCategories.bind( this );
 	/** @borrows setGutenbergExperiments as this.setGutenbergExperiments */

@@ -6,12 +6,14 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { RawHTML, useRef, useState } from '@wordpress/element';
+import { useRef, useState, useLayoutEffect } from '@wordpress/element';
 import {
 	__experimentalConfirmDialog as ConfirmDialog,
 	Button,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Button as UIButton } from '@wordpress/ui';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { moreVertical, published } from '@wordpress/icons';
 
@@ -65,6 +67,28 @@ export function Note( {
 } ) {
 	const [ actionState, setActionState ] = useState( null );
 	const actionButtonRef = useRef( null );
+
+	const commentRef = useRef( null );
+	const rawContent = note?.content?.raw;
+	const [ prevContent, setPrevContent ] = useState( rawContent );
+	const [ isExpanded, setIsExpanded ] = useState( false );
+	const [ isOverflowing, setIsOverflowing ] = useState( false );
+
+	// Collapse whenever the content changes so it can be re-measured.
+	if ( prevContent !== rawContent ) {
+		setPrevContent( rawContent );
+		setIsExpanded( false );
+	}
+
+	// Measure the (clamped) content to decide whether the toggle is needed.
+	useLayoutEffect( () => {
+		const commentElement = commentRef.current;
+		if ( commentElement ) {
+			setIsOverflowing(
+				commentElement.scrollHeight > commentElement.clientHeight
+			);
+		}
+	}, [ rawContent ] );
 
 	const canResolve = note.parent === 0;
 	const isResolutionNote =
@@ -132,36 +156,37 @@ export function Note( {
 				} }
 			/>
 		);
-	} else if ( isResolutionNote ) {
-		const actionText =
-			note.meta._wp_note_status === 'resolved'
-				? __( 'Marked as resolved' )
-				: __( 'Reopened' );
-		const raw = note?.content?.raw;
-		const text =
-			raw && typeof raw === 'string' && raw.trim() !== ''
-				? sprintf(
-						// translators: %1$s: action label ("Marked as resolved" or "Reopened"); %2$s: note text.
-						__( '%1$s: %2$s' ),
-						actionText,
-						raw
-				  )
-				: actionText;
-		body = (
-			<RawHTML
-				className={ clsx(
-					'editor-collab-sidebar-panel__note-content',
-					'editor-collab-sidebar-panel__resolution-text'
-				) }
-			>
-				{ text }
-			</RawHTML>
-		);
 	} else {
+		let content;
+		if ( isResolutionNote ) {
+			const actionText =
+				note.meta._wp_note_status === 'resolved'
+					? __( 'Marked as resolved' )
+					: __( 'Reopened' );
+			const raw = note?.content?.raw;
+			content =
+				raw && typeof raw === 'string' && raw.trim() !== ''
+					? sprintf(
+							// translators: %1$s: action label ("Marked as resolved" or "Reopened"); %2$s: note text.
+							__( '%1$s: %2$s' ),
+							actionText,
+							raw
+					  )
+					: actionText;
+		} else {
+			content = note?.content?.rendered;
+		}
+
 		body = (
-			<RawHTML className="editor-collab-sidebar-panel__note-content">
-				{ note?.content?.rendered }
-			</RawHTML>
+			<div
+				ref={ commentRef }
+				className={ clsx( 'editor-collab-sidebar-panel__note-content', {
+					'editor-collab-sidebar-panel__resolution-text':
+						isResolutionNote,
+					'is-collapsed': ! isExpanded,
+				} ) }
+				dangerouslySetInnerHTML={ { __html: content ?? '' } }
+			/>
 		);
 	}
 
@@ -203,6 +228,16 @@ export function Note( {
 				>
 					{ deleteConfirmMessage }
 				</ConfirmDialog>
+			) }
+			{ isOverflowing && 'edit' !== actionState && (
+				<UIButton
+					className="editor-collab-sidebar-panel__show-more-button"
+					variant="unstyled"
+					size="small"
+					onClick={ () => setIsExpanded( ! isExpanded ) }
+				>
+					{ ! isExpanded ? __( 'Show more' ) : __( 'Show less' ) }
+				</UIButton>
 			) }
 		</NoteCard>
 	);

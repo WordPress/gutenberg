@@ -1,0 +1,48 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
+.media-editor-image-controls {
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: center;
+	gap: $grid-unit-10;
+
+	// Stacked layout used inside the Crop panel on wide viewports: the Rotate
+	// and Flip groups sit side by side (rotate left, flip right) in a row, with
+	// the Zoom group beneath them. The aspect-ratio select renders separately
+	// below in the Crop panel.
+	&.is-stacked {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: $grid-unit-30;
+	}
+
+	&__transforms {
+		display: flex;
+		gap: $grid-unit-60;
+	}
+
+	&__group {
+		display: flex;
+		flex-direction: column;
+		gap: $grid-unit-05;
+	}
+
+	// Match the uppercase 11px heading the panel's other controls use for
+	// their labels (Zoom, Aspect ratio) so the groups read as section
+	// headings. Mirrors `baseLabelTypography` from `@wordpress/components`.
+	&__label {
+		font-size: 11px;
+		font-weight: 500;
+		line-height: 1.4;
+		text-transform: uppercase;
+	}
+
+	&__buttons {
+		display: flex;
+		gap: $grid-unit-10;
+		// Small leading inset so the leftmost (rotate) button's focus ring
+		// isn't clipped by the sidebar's `overflow: hidden`.
+		padding-inline: 2px 0;
+	}
+}

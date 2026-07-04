@@ -25,10 +25,41 @@ describe( 'SyncUndoManager', () => {
 			map: doc.getMap( 'record' ),
 			handlers: {
 				addUndoMeta: jest.fn(),
+				onUndoStackChange: jest.fn(),
 				restoreUndoMeta: jest.fn(),
 			},
 		};
 	}
+
+	it( 'notifies scoped handlers when the Yjs undo stack changes', () => {
+		const undoManager = createUndoManager();
+		const first = createScopedMap();
+		const second = createScopedMap();
+
+		undoManager.addToScope( first.map, first.handlers );
+		undoManager.addToScope( second.map, second.handlers );
+
+		first.doc.transact( () => {
+			first.map.set( 'title', 'First changed' );
+		}, LOCAL_EDITOR_ORIGIN );
+
+		expect( first.handlers.onUndoStackChange ).toHaveBeenCalled();
+		expect( second.handlers.onUndoStackChange ).not.toHaveBeenCalled();
+
+		first.handlers.onUndoStackChange.mockClear();
+
+		undoManager.undo();
+
+		expect( first.handlers.onUndoStackChange ).toHaveBeenCalled();
+		expect( second.handlers.onUndoStackChange ).not.toHaveBeenCalled();
+
+		first.handlers.onUndoStackChange.mockClear();
+
+		undoManager.redo();
+
+		expect( first.handlers.onUndoStackChange ).toHaveBeenCalled();
+		expect( second.handlers.onUndoStackChange ).not.toHaveBeenCalled();
+	} );
 
 	it( 'only runs metadata handlers for the document that created the stack item', () => {
 		const undoManager = createUndoManager();

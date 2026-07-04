@@ -84,6 +84,9 @@ test.describe( 'Navigating the block hierarchy', () => {
 
 		await column.last().click();
 
+		// Activate the block to transfer focus to the canvas.
+		await page.keyboard.press( 'Enter' );
+
 		// Open the block inserter.
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'Enter' );
@@ -124,6 +127,12 @@ test.describe( 'Navigating the block hierarchy', () => {
 			name: 'Block navigation structure',
 		} );
 		await expect( listView ).toBeVisible();
+		await expect(
+			listView.getByRole( 'link', {
+				name: 'Paragraph',
+				exact: true,
+			} )
+		).toBeFocused();
 
 		// Navigate to the columns blocks using the keyboard.
 		await pageUtils.pressKeys( 'ArrowUp', { times: 2 } );
@@ -133,10 +142,11 @@ test.describe( 'Navigating the block hierarchy', () => {
 		await pageUtils.pressKeys( 'ctrl+`' );
 
 		// Navigate to the block settings sidebar and tweak the column count.
+		const slider = page.getByRole( 'slider', { name: 'Columns' } );
+		// Ensure the block is selected and slider control is visible in the inspector.
+		await expect( slider ).toBeVisible();
 		await pageUtils.pressKeys( 'Tab', { times: 5 } );
-		await expect(
-			page.getByRole( 'slider', { name: 'Columns' } )
-		).toBeFocused();
+		await expect( slider ).toBeFocused();
 		await page.keyboard.press( 'ArrowRight' );
 
 		// Navigate to the third column in the columns block via List View.
@@ -247,11 +257,15 @@ test.describe( 'Navigating the block hierarchy', () => {
 
 		// Open list view and return to the first block.
 		await pageUtils.pressKeys( 'access+o' );
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
 		await expect(
-			page.getByRole( 'treegrid', {
-				name: 'Block navigation structure',
+			listView.getByRole( 'link', {
+				name: 'Group',
+				exact: true,
 			} )
-		).toBeVisible();
+		).toBeFocused();
 		await page.keyboard.press( 'Enter' );
 
 		await expect(

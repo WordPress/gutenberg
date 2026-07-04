@@ -13,11 +13,16 @@ import type { HistoryRecord } from '@wordpress/undo-manager';
  */
 import { LOCAL_EDITOR_ORIGIN } from './config';
 import { YMultiDocUndoManager } from './y-utilities/y-multidoc-undomanager';
-import type { ObjectData, RecordHandlers, SyncUndoManager } from './types';
+import type {
+	ObjectData,
+	RecordHandlers,
+	SyncUndoManager,
+	SyncUndoStackState,
+} from './types';
 
 type UndoMetaHandlers = Pick<
 	RecordHandlers,
-	'addUndoMeta' | 'restoreUndoMeta'
+	'addUndoMeta' | 'onUndoStackChange' | 'restoreUndoMeta'
 >;
 
 interface StackItemEvent {
@@ -46,6 +51,17 @@ export function createUndoManager(): SyncUndoManager {
 		trackedOrigins: new Set( [ LOCAL_EDITOR_ORIGIN ] ),
 	} );
 
+	const getUndoStackState = (): SyncUndoStackState => ( {
+		hasRedo: yUndoManager.canRedo(),
+		hasUndo: yUndoManager.canUndo(),
+	} );
+
+	const notifyUndoStackChange = ( ydoc: Y.Doc ): void => {
+		undoMetaHandlers
+			.get( ydoc )
+			?.onUndoStackChange?.( getUndoStackState() );
+	};
+
 	yUndoManager.on( 'stack-item-added', ( event: StackItemEvent ) => {
 		const handlers = undoMetaHandlers.get( event.ydoc );
 		if ( ! handlers ) {
@@ -53,6 +69,11 @@ export function createUndoManager(): SyncUndoManager {
 		}
 
 		handlers.addUndoMeta( event.ydoc, event.stackItem.meta );
+		notifyUndoStackChange( event.ydoc );
+	} );
+
+	yUndoManager.on( 'stack-item-updated', ( event: StackItemEvent ) => {
+		notifyUndoStackChange( event.ydoc );
 	} );
 
 	yUndoManager.on( 'stack-item-popped', ( event: StackItemEvent ) => {
@@ -62,6 +83,13 @@ export function createUndoManager(): SyncUndoManager {
 		}
 
 		handlers.restoreUndoMeta( event.ydoc, event.stackItem.meta );
+		notifyUndoStackChange( event.ydoc );
+	} );
+
+	yUndoManager.on( 'stack-cleared', () => {
+		undoMetaHandlers.forEach( ( handlers ) => {
+			handlers.onUndoStackChange?.( getUndoStackState() );
+		} );
 	} );
 
 	return {
@@ -84,10 +112,11 @@ export function createUndoManager(): SyncUndoManager {
 		/**
 		 * Add a Yjs map to the scope of the undo manager.
 		 *
-		 * @param {Y.Map< any >} ymap                     The Yjs map to add to the scope.
-		 * @param                handlers
-		 * @param                handlers.addUndoMeta
-		 * @param                handlers.restoreUndoMeta
+		 * @param {Y.Map< any >} ymap                       The Yjs map to add to the scope.
+		 * @param                handlers                   Handlers for the scoped document.
+		 * @param                handlers.addUndoMeta       Handler to add metadata to undo items.
+		 * @param                handlers.onUndoStackChange Handler for undo stack changes.
+		 * @param                handlers.restoreUndoMeta   Handler to restore metadata from undo items.
 		 */
 		addToScope( ymap: Y.Map< any >, handlers: UndoMetaHandlers ): void {
 			if ( ymap.doc === null ) {

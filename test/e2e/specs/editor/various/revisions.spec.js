@@ -276,6 +276,69 @@ test.describe( 'Post revisions', () => {
 	} );
 } );
 
+test.describe( 'Post revisions with classic meta boxes', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activatePlugin( 'gutenberg-test-plugin-meta-box' );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin( 'gutenberg-test-plugin-meta-box' );
+	} );
+
+	test( 'falls back to the classic revisions screen', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Revisions with meta box' );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'Original content' );
+		await editor.saveDraft();
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' - Updated content' );
+		await editor.saveDraft();
+
+		await editor.openDocumentSettingsSidebar();
+		const settingsSidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await settingsSidebar.getByRole( 'tab', { name: 'Post' } ).click();
+
+		// With classic meta boxes the Revisions control is rendered as a
+		// link to the classic admin screen, not a button that opens the
+		// in-editor visual revisions mode.
+		const revisionsLink = settingsSidebar.getByRole( 'link', {
+			name: 'Open revisions screen: 2 revisions',
+		} );
+		await expect( revisionsLink ).toBeVisible();
+		await expect( revisionsLink ).toHaveAttribute(
+			'href',
+			/revision\.php\?revision=\d+/
+		);
+
+		// The inline DataViews revisions panel is hidden (its PanelBody
+		// toggle would be the only element with accessible name exactly
+		// "Revisions"; substring matches like the slug field aria-label
+		// are excluded with exact: true).
+		await expect(
+			settingsSidebar.getByRole( 'button', {
+				name: 'Revisions',
+				exact: true,
+			} )
+		).toHaveCount( 0 );
+	} );
+} );
+
 test.describe( 'Post revisions slider pagination', () => {
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllPosts();

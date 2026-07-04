@@ -70,6 +70,15 @@ test.describe( 'Site Editor Performance', () => {
 			} );
 
 			draftId = page.id;
+
+			// Set preferences via REST so that welcomeGuide is reliably
+			// persisted before the timed iterations start.
+			await requestUtils.setPreferences( 'core/edit-site', {
+				welcomeGuide: false,
+				welcomeGuideStyles: false,
+				welcomeGuidePage: false,
+				welcomeGuideTemplate: false,
+			} );
 		} );
 
 		const samples = 10;
@@ -81,19 +90,30 @@ test.describe( 'Site Editor Performance', () => {
 				perfUtils,
 				metrics,
 			} ) => {
+				// Start tracing before navigating so the page load is captured.
+				await metrics.startTracing();
+
 				// Go to the test draft.
-				await admin.visitSiteEditor( {
-					postId: draftId,
-					postType: 'page',
-					canvas: 'edit',
-				} );
+				await admin.page.goto(
+					'wp-admin/site-editor.php?postId=' +
+						draftId +
+						'&postType=page&canvas=edit'
+				);
 
 				// Wait for the first block.
 				const canvas = await perfUtils.getCanvas();
 				await canvas.locator( '.wp-block' ).first().waitFor();
 
-				// Get the durations.
+				// Capture timing metrics before `stopTracing()`, which
+				// blocks for the trace download/parse and would otherwise
+				// inflate `timeSinceResponseEnd` by seconds.
 				const loadingDurations = await metrics.getLoadingDurations();
+
+				// Stop tracing. Save just one representative sample.
+				await metrics.stopTracing(
+					i === Math.floor( iterations / 2 ) &&
+						'site-editor-first-block'
+				);
 
 				// Save the results.
 				if ( i > throwaway ) {
@@ -183,7 +203,7 @@ test.describe( 'Site Editor Performance', () => {
 			} );
 
 			// Stop tracing.
-			await metrics.stopTracing();
+			await metrics.stopTracing( 'site-editor-type' );
 
 			// Get the durations.
 			const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
@@ -237,7 +257,10 @@ test.describe( 'Site Editor Performance', () => {
 				await page
 					.getByRole( 'button', { name: 'Single Posts' } )
 					.click();
-				await metrics.stopTracing();
+				// Stop tracing. Save just one representative sample.
+				await metrics.stopTracing(
+					i === Math.floor( iterations / 2 ) && 'site-editor-navigate'
+				);
 
 				// Get the durations.
 				const [ mouseClickEvents ] = metrics.getClickEventDurations();
@@ -346,13 +369,20 @@ test.describe( 'Site Editor Performance', () => {
 
 				await Promise.all(
 					patterns.map( async ( pattern ) => {
+						const option = page.getByRole( 'option', {
+							name: pattern,
+							exact: true,
+						} );
+
+						// The pattern previews are rendered lazily: each
+						// preview's `Editor canvas` iframe is only created once
+						// its list item is scrolled into view. Without this the
+						// off-screen previews never render and the wait below
+						// times out.
+						await option.scrollIntoViewIfNeeded();
+
 						const canvas = await perfUtils.getCanvas(
-							page
-								.getByRole( 'option', {
-									name: pattern,
-									exact: true,
-								} )
-								.getByTitle( 'Editor canvas' )
+							option.getByTitle( 'Editor canvas' )
 						);
 
 						// Wait until the first block is rendered AND all

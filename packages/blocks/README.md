@@ -45,6 +45,7 @@ _Parameters_
 -   _name_ `string`: Block name.
 -   _attributes_ `Record< string, unknown >`: Block attributes.
 -   _innerBlocks_ `Block[]`: Nested blocks.
+-   _innerContent_ `Array< string | null >`: Static HTML fragments interleaved with inner blocks, where `null` entries mark inner block positions. Only applies to the Custom HTML block.
 
 _Returns_
 
@@ -280,7 +281,7 @@ _Parameters_
 
 _Returns_
 
--   `BlockType[]`: Block types that the blocks argument can be transformed to.
+-   `BlockTypeWithTransformMetadata[]`: Block types that the blocks argument can be transformed to.
 
 ### getSaveContent
 
@@ -635,7 +636,7 @@ registerBlockType( 'namespace/block-name', {
 _Parameters_
 
 -   _blockNameOrMetadata_ `string | BlockConfiguration< Attributes >`: Block type name or its metadata.
--   _settings_ `Partial< BlockConfiguration< Attributes > >`: Block settings.
+-   _settings_ `Partial< SettingsBlockConfiguration< Attributes > >`: Block settings.
 
 _Returns_
 
@@ -826,6 +827,7 @@ _Parameters_
 
 -   _blocks_ `Block[] | Block`: Blocks array or block object.
 -   _name_ `string`: Block name.
+-   _variationName_ `string`: Optional target block variation name.
 
 _Returns_
 

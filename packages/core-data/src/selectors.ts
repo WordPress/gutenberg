@@ -24,6 +24,7 @@ import {
 	isNumericID,
 	getUserPermissionCacheKey,
 } from './utils';
+import { getSyncManager } from './sync';
 import type * as ET from './entity-types';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
@@ -44,6 +45,10 @@ export interface State {
 	themeGlobalStyleVariations: Record< string, string >;
 	themeGlobalStyleRevisions: Record< number, Object >;
 	undoManager: UndoManager;
+	syncUndoManagerState: {
+		hasRedo: boolean;
+		hasUndo: boolean;
+	};
 	userPermissions: Record< string, boolean >;
 	users: UserState;
 	navigationFallbackId: EntityRecordKey;
@@ -1148,6 +1153,9 @@ export function getRedoEdit( state: State ): Optional< any > {
  * @return Whether there is a previous edit or not.
  */
 export function hasUndo( state: State ): boolean {
+	if ( getSyncManager()?.undoManager ) {
+		return state.syncUndoManagerState.hasUndo;
+	}
 	return getUndoManager( state ).hasUndo();
 }
 
@@ -1160,6 +1168,9 @@ export function hasUndo( state: State ): boolean {
  * @return Whether there is a next edit or not.
  */
 export function hasRedo( state: State ): boolean {
+	if ( getSyncManager()?.undoManager ) {
+		return state.syncUndoManagerState.hasRedo;
+	}
 	return getUndoManager( state ).hasRedo();
 }
 
@@ -1661,35 +1672,3 @@ export const getRevision = createSelector(
 		];
 	}
 );
-
-/**
- * Returns the current sync connection status across all entities. Prioritizes
- * disconnected states, then connecting, then connected.
- *
- * @param state Data state.
- *
- * @return The current sync connection state, prioritized by importance.
- */
-export function getSyncConnectionStatus(
-	state: State
-): ConnectionStatus | undefined {
-	if ( ! state.syncConnectionStatuses ) {
-		return undefined;
-	}
-
-	const PRIORITIZED_STATUSES = [ 'disconnected', 'connecting', 'connected' ];
-
-	let coalesced: ConnectionStatus | undefined;
-
-	for ( const status of Object.values( state.syncConnectionStatuses ) ) {
-		if (
-			! coalesced ||
-			PRIORITIZED_STATUSES.indexOf( status.status ) <
-				PRIORITIZED_STATUSES.indexOf( coalesced.status )
-		) {
-			coalesced = status;
-		}
-	}
-
-	return coalesced;
-}

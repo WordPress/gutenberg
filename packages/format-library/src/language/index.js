@@ -12,9 +12,8 @@ import {
 	SelectControl,
 	Button,
 	Popover,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { useState } from '@wordpress/element';
 import { applyFormat, removeFormat, useAnchor } from '@wordpress/rich-text';
 import { language as languageIcon } from '@wordpress/icons';
@@ -83,9 +82,10 @@ function InlineLanguageUI( { value, contentRef, onChange, onClose } ) {
 			anchor={ popoverAnchor }
 			onClose={ onClose }
 		>
-			<VStack
-				as="form"
-				spacing={ 4 }
+			<Stack
+				render={ <form /> }
+				direction="column"
+				gap="lg"
 				className="block-editor-format-toolbar__language-container-content"
 				onSubmit={ ( event ) => {
 					event.preventDefault();
@@ -102,7 +102,6 @@ function InlineLanguageUI( { value, contentRef, onChange, onClose } ) {
 				} }
 			>
 				<TextControl
-					__next40pxDefaultSize
 					label={ title }
 					value={ lang }
 					onChange={ ( val ) => setLang( val ) }
@@ -126,15 +125,15 @@ function InlineLanguageUI( { value, contentRef, onChange, onClose } ) {
 					] }
 					onChange={ ( val ) => setDir( val ) }
 				/>
-				<HStack alignment="right">
+				<Stack justify="right">
 					<Button
 						__next40pxDefaultSize
 						variant="primary"
 						type="submit"
 						text={ __( 'Apply' ) }
 					/>
-				</HStack>
-			</VStack>
+				</Stack>
+			</Stack>
 		</Popover>
 	);
 }

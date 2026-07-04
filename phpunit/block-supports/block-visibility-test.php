@@ -93,7 +93,7 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 		$this->assertSame( '', $result, 'Block content should be empty when blockVisibility is false and support is opted in.' );
 	}
 
-	public function test_block_visibility_support_shows_block_when_support_not_opted_in() {
+	public function test_block_visibility_support_hides_block_when_visibility_false_even_without_support() {
 		$this->register_visibility_block_with_support(
 			'test/visibility-block',
 			array( 'visibility' => false )
@@ -111,7 +111,7 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 
 		$result = gutenberg_render_block_visibility_support( $block_content, $block );
 
-		$this->assertSame( $block_content, $result, 'Block content should remain unchanged when blockVisibility support is not opted in.' );
+		$this->assertSame( '', $result, 'Block content should be empty when blockVisibility is false, even without visibility support.' );
 	}
 
 	public function test_block_visibility_support_no_visibility_attribute() {

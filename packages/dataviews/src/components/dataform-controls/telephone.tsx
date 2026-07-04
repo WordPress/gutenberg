@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	Icon,
+	Icon as WCIcon,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 } from '@wordpress/components';
 import { mobile } from '@wordpress/icons';
@@ -33,7 +33,7 @@ export default function Telephone< Item >( {
 				type: 'tel',
 				prefix: (
 					<InputControlPrefixWrapper variant="icon">
-						<Icon icon={ mobile } />
+						<WCIcon icon={ mobile } />
 					</InputControlPrefixWrapper>
 				),
 			} }

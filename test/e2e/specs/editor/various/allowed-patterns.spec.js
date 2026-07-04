@@ -32,7 +32,7 @@ test.describe( 'Allowed Patterns', () => {
 
 		await expect(
 			page
-				.getByRole( 'listbox', { name: 'Block patterns' } )
+				.getByRole( 'listbox', { name: 'Patterns' } )
 				.getByRole( 'option' )
 		).toHaveText( [
 			'Test: Single heading',
@@ -75,7 +75,7 @@ test.describe( 'Allowed Patterns', () => {
 
 			await expect(
 				page
-					.getByRole( 'listbox', { name: 'Block patterns' } )
+					.getByRole( 'listbox', { name: 'Patterns' } )
 					.getByRole( 'option' )
 			).toHaveText( [ 'Test: Single heading' ] );
 		} );

@@ -17,6 +17,23 @@ import type { SandBoxProps } from './types';
 
 type SandBoxContentProps = Omit< SandBoxProps, 'allowSameOrigin' >;
 
+/**
+ * Matches CSS viewport-relative length values such as `100vh`, `50.5vw`,
+ * and `.5dvh`. Used to strip viewport units from user-supplied HTML inside
+ * the sandbox iframe, because those units are relative to the iframe's
+ * own size and would create a measurement feedback loop with the
+ * resize observer.
+ *
+ * Exported for tests. NOTE: an identical regex literal is duplicated
+ * inside `observeAndResizeJS` below because that function is serialized
+ * via `.toString()` and embedded into the iframe's `srcdoc` — it has no
+ * access to this module's scope at runtime. If you change one, change
+ * the other; the "is embedded in the sandbox iframe srcdoc" test
+ * guards against drift.
+ */
+export const VIEWPORT_UNIT_VALUE_REGEX =
+	/^\d*\.?\d+(?:vw|vh|svw|lvw|dvw|svh|lvh|dvh|vi|svi|lvi|dvi|vb|svb|lvb|dvb|vmin|svmin|lvmin|dvmin|vmax|svmax|lvmax|dvmax)$/;
+
 const observeAndResizeJS = function () {
 	const { MutationObserver } = window;
 
@@ -58,7 +75,7 @@ const observeAndResizeJS = function () {
 				[ 'width', 'height', 'minHeight', 'maxHeight' ] as const
 			 ).forEach( function ( style ) {
 				if (
-					/^\\d+(vw|vh|svw|lvw|dvw|svh|lvh|dvh|vi|svi|lvi|dvi|vb|svb|lvb|dvb|vmin|svmin|lvmin|dvmin|vmax|svmax|lvmax|dvmax)$/.test(
+					/^\d*\.?\d+(?:vw|vh|svw|lvw|dvw|svh|lvh|dvh|vi|svi|lvi|dvi|vb|svb|lvb|dvb|vmin|svmin|lvmin|dvmin|vmax|svmax|lvmax|dvmax)$/.test(
 						ruleOrNode.style[ style ]
 					)
 				) {

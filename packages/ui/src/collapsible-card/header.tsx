@@ -25,6 +25,8 @@ import type { HeaderProps } from './types';
  * Avoid placing interactive elements (buttons, links, inputs) inside the
  * header, since the entire area is clickable and their events will bubble
  * to trigger the collapse toggle.
+ *
+ * Place full-bleed media in `CollapsibleCard.Content`, not the header.
  */
 export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 	function CollapsibleCardHeader(

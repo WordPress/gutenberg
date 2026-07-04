@@ -215,30 +215,85 @@ function MyComponent( props, ref ) {
 }
 ```
 
+## Overlay Slot Props
+
+Compound overlay primitives (`Tooltip`, `Popover`, `Select`, `Autocomplete`, etc.) expose their underlying Base UI subcomponents (`Portal`, `Positioner`, …) through **slot props** on `Popup` rather than as flat prop subsets. The corresponding subcomponents are exported alongside `Popup` (e.g. `Tooltip.Portal`, `Tooltip.Positioner`).
+
+### Pattern
+
+For each Base UI subcomponent that we want to expose to consumers:
+
+1. Export a renderable wrapper subcomponent matching the Base UI subcomponent's name (e.g. `Tooltip.Positioner`).
+2. Add an optional slot prop on `Popup` named after the subcomponent (e.g. `positioner`). The prop type accepts a React element of the matching subcomponent: `ReactElement< Omit< MySubcomponentProps, 'children' > >`.
+3. When the slot prop is omitted, `Popup` uses the wrapper subcomponent with default props.
+4. When the slot prop is provided, `Popup` clones the given element and injects the rest of the subtree as `children`. Use the `renderSlotWithChildren` helper to keep this consistent across overlays.
+
+```tsx
+<Tooltip.Popup
+	portal={ <Tooltip.Portal container={ myContainer } /> }
+	positioner={ <Tooltip.Positioner side="right" sideOffset={ 8 } /> }
+>
+	Save
+</Tooltip.Popup>
+```
+
+### Why
+
+-   One mental model across overlays — same prop names, same prop shape, regardless of which primitive is in use.
+-   The wrapper subcomponents are also valid as standalone exports for advanced compositions.
+-   `Popup` does not need to maintain a hand-picked `Pick<>` list of positioner/portal props. The full Base UI surface is reachable through the corresponding subcomponent.
+
+### When to add a new slot prop
+
+Only when there is a concrete consumer that needs to reach a Base UI subcomponent's customization. Do not preemptively expose slots.
+
+High-level wrappers that hide `Popup` (for example `IconButton`, which renders a `Tooltip` internally) should re-expose the same slot props — same name, same shape — to keep the API uniform.
+
 ## CSS Architecture
 
 ### CSS Layers
 
 We use [CSS cascade layers](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Cascade_layers) to ensure an expected order of precedence in style resolution. All component stylesheets must follow this layering approach to maintain consistency and prevent specificity conflicts.
 
-Every component stylesheet must include the layer definition at the top and wrap all styles within the appropriate layer:
+Every component stylesheet must include the layer definition in the top-level `wp-ui` layer and wrap all styles within the appropriate layer:
 
 ```css
-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
 
-@layer wp-ui-components {
-	.stack {
-		display: flex;
+	@layer components {
+		.stack {
+			display: flex;
+		}
 	}
 }
 ```
 
 #### CSS Layer Hierarchy
 
--   **`wp-ui-utilities`** - Shared utility styles (box-sizing, focus rings, resets) that apply before component styles
--   **`wp-ui-components`** - Default styles for design system components (`.stack`, etc.)
--   **`wp-ui-compositions`** - Internal compositions that extend base components
--   **`wp-ui-overrides`** - Last-resort styles to override default rules
+All sub-layers are nested within the top-level `wp-ui` layer:
+
+-   **`utilities`** - Shared utility styles (box-sizing, focus rings, resets) that apply before component styles
+-   **`components`** - Default styles for design system components (`.stack`, etc.)
+-   **`compositions`** - Internal compositions that extend base components
+-   **`overrides`** - Last-resort styles to override default rules
+
+A rule that overrides a primitive defined in another stylesheet (e.g. a shared class from `overlay-chrome.module.css`) must live in a **higher** layer than that primitive — typically `wp-ui-compositions`. Placing both in the same layer leaves the conflict to be resolved by `<style>` injection order, which is not deterministic and can flip when an unrelated component lazy-loads (its own copy of the shared stylesheet re-orders the tags). The layer hierarchy is what guarantees the override wins.
+
+When the override also `composes` the primitive it extends, keep the override in `wp-ui.compositions` (the `composes` does not change its layer) and let `composes` bind the two classes together so the base can never be applied without the override:
+
+```css
+@layer wp-ui {
+	/* ... */
+
+	@layer compositions {
+		.footer-column {
+			composes: footer from '../utils/css/overlay-chrome.module.css';
+			flex-direction: column;
+		}
+	}
+}
+```
 
 ### Custom Properties and State Styles
 
