@@ -98,4 +98,11 @@ export type NumberControlProps = Omit<
 	 * @ignore
 	 */
 	__shouldNotWarnDeprecated36pxSize?: boolean;
+	/**
+	 * Start opting into the larger default height that will become the default size in a future version.
+	 *
+	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
+	 * @ignore
+	 */
+	__next40pxDefaultSize?: boolean;
 };

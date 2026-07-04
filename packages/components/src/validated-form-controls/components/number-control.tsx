@@ -17,10 +17,7 @@ const UnforwardedValidatedNumberControl = (
 		customValidity,
 		markWhenOptional,
 		...restProps
-	}: Omit<
-		React.ComponentProps< typeof NumberControl >,
-		'__next40pxDefaultSize'
-	> &
+	}: React.ComponentProps< typeof NumberControl > &
 		ValidatedControlProps,
 	forwardedRef: React.ForwardedRef< HTMLInputElement >
 ) => {
@@ -35,7 +32,6 @@ const UnforwardedValidatedNumberControl = (
 			getValidityTarget={ () => validityTargetRef.current }
 		>
 			<NumberControl
-				__next40pxDefaultSize
 				ref={ mergedRefs }
 				{ ...restProps }
 			/>
