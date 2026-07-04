@@ -30,9 +30,11 @@ export interface CursorData {
 	clientId: number;
 	color: string;
 	avatarUrl?: string;
-	x: number;
-	y: number;
-	height: number;
+	// x/y/height absent for multi-block selections — avatar comes from
+	// use-block-highlighting; only selectionRects are rendered here.
+	x?: number;
+	y?: number;
+	height?: number;
 	isMe?: boolean;
 	selectionRects?: SelectionRect[];
 }
@@ -176,20 +178,21 @@ export function useRenderCursors(
 				overlayContext
 			);
 
-			if ( selectionVisual.coords ) {
+			const hasCoords = Boolean( selectionVisual.coords );
+			const hasRects =
+				( selectionVisual.selectionRects?.length ?? 0 ) > 0;
+			if ( hasCoords || hasRects ) {
 				const cursorData: CursorData = {
 					userName,
 					clientId,
 					color,
 					avatarUrl,
 					isMe: user.isMe,
-					...selectionVisual.coords,
+					...( selectionVisual.coords ?? {} ),
 				};
-
 				if ( selectionVisual.selectionRects ) {
 					cursorData.selectionRects = selectionVisual.selectionRects;
 				}
-
 				results.push( cursorData );
 			}
 		} );

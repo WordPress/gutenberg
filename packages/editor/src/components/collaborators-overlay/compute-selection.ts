@@ -7,6 +7,7 @@ import type {
 import { unlock } from '../../lock-unlock';
 import {
 	getCursorPosition,
+	getBlocksBetween,
 	getSelectionRects,
 	isNodeBefore,
 } from './cursor-dom-utils';
@@ -26,18 +27,6 @@ interface OverlayContext {
 interface SingleBlockResult {
 	rects: SelectionRect[];
 	blockElement: HTMLElement | null;
-}
-
-/**
- * Resolved block elements for a multi-block selection. No pixel rects are
- * computed — highlighting is handled entirely via CSS outlines applied by
- * use-block-highlighting. Only the endpoint elements are needed here for
- * cursor label positioning.
- */
-interface MultiBlockResult {
-	firstBlock: HTMLElement | null;
-	lastBlock: HTMLElement | null;
-	firstBlockClientId: string | null;
 }
 
 /** Result of computing visual cursor/selection state for a single user. */
@@ -77,11 +66,31 @@ function resolveTargetElement(
 	}
 
 	const attrKey = CSS.escape( resolvedSelection.attributeKey );
-	return (
-		blockElement.querySelector< HTMLElement >(
-			`[data-wp-block-attribute-key="${ attrKey }"]`
-		) ?? blockElement
+	const byKey = blockElement.querySelector< HTMLElement >(
+		`[data-wp-block-attribute-key="${ attrKey }"]`
 	);
+	if ( byKey ) {
+		return byKey;
+	}
+
+	// Fallback chain — each is safer than the raw [data-block] wrapper because
+	// [data-block] includes toolbar text nodes that corrupt the TreeWalker
+	// offset walk inside findInnerBlockOffset.
+	//
+	// 1. contenteditable — present when the block is in edit mode.
+	const editable = blockElement.querySelector< HTMLElement >(
+		'[contenteditable="true"]'
+	);
+	if ( editable ) {
+		return editable;
+	}
+
+	// 2. Common block-level text elements — always present in the DOM regardless
+	//    of whether the block is currently focused by this user.
+	const textEl = blockElement.querySelector< HTMLElement >(
+		'p, h1, h2, h3, h4, h5, h6, pre, blockquote, td, th, li, figcaption'
+	);
+	return textEl ?? blockElement;
 }
 
 /**
@@ -197,28 +206,147 @@ function computeTextSelection(
 		};
 	}
 
-	// Multi-block: all selected blocks are highlighted via CSS outline by
-	// use-block-highlighting. Show a cursor label only at the active end
-	// when it has a known character offset (CursorEndpoint). When the active
-	// end is a WholeBlockEndpoint (richTextOffset is null — e.g. an image or
-	// a block selected as a unit), there is no meaningful character position
-	// to render the cursor at, so we return nothing; the block outline and
-	// avatar label from use-block-highlighting are the only visuals needed.
-	if ( activeEnd.richTextOffset === null ) {
+	// Multi-block: full bounding-box overlay for text blocks, CSS outline for
+	// non-text blocks (image, spacer, etc.) via use-block-highlighting.
+	// No cursor coords — the single avatar placed by use-block-highlighting on
+	// the topmost block is the only indicator.
+	return computeMultiBlockOverlayRects( start, end, overlayContext );
+}
+
+/**
+ * Return a full bounding-box SelectionRect for a block element.
+ *
+ * @param blockEl     - The block element.
+ * @param overlayRect - Overlay bounding rect for coordinate transform.
+ * @return A single SelectionRect covering the full block.
+ */
+function blockBoundingRect(
+	blockEl: HTMLElement,
+	overlayRect: DOMRect
+): SelectionRect {
+	const r = blockEl.getBoundingClientRect();
+	return {
+		x: r.left - overlayRect.left,
+		y: r.top - overlayRect.top,
+		width: r.width,
+		height: r.height,
+	};
+}
+
+/**
+ * Compute overlay rects for a multi-block selection.
+ *
+ * - Middle blocks always receive a full bounding-box overlay.
+ * - First block: full bounding-box when the cursor starts at offset 0 or the
+ *   endpoint is a WholeBlock; partial text-level rects otherwise.
+ * - Last block: partial text-level rects from 0 to the cursor offset when the
+ *   endpoint is a CursorEndpoint; full bounding-box for WholeBlock.
+ * - Non-text blocks (image, spacer — no visible innerText) produce no rects;
+ *   CSS outline in use-block-highlighting handles those instead.
+ *
+ * @param start          - Start endpoint (resolved block clientId + text offset).
+ * @param end            - End endpoint (resolved block clientId + text offset).
+ * @param overlayContext - Shared editor document / overlay references.
+ * @return selectionRects covering each text block in the selection, or {}.
+ */
+function computeMultiBlockOverlayRects(
+	start: ResolvedSelection,
+	end: ResolvedSelection,
+	overlayContext: OverlayContext
+): SelectionVisual {
+	const { editorDocument, overlayRect } = overlayContext;
+
+	const startBlockEl = editorDocument.querySelector< HTMLElement >(
+		`[data-block="${ start.localClientId }"]`
+	);
+	const endBlockEl = editorDocument.querySelector< HTMLElement >(
+		`[data-block="${ end.localClientId }"]`
+	);
+	if ( ! startBlockEl || ! endBlockEl ) {
 		return {};
 	}
-	const { firstBlock, lastBlock, firstBlockClientId } =
-		computeMultiBlockRects( start, end, overlayContext );
-	const activeEndBlock =
-		activeEnd.localClientId === firstBlockClientId ? firstBlock : lastBlock;
-	return {
-		coords: getCursorPosition(
-			activeEnd.richTextOffset,
-			activeEndBlock,
-			overlayContext.editorDocument,
-			overlayContext.overlayRect
-		),
-	};
+
+	// Normalise to DOM order — Yjs reports endpoints in selection direction.
+	let docFirst = start;
+	let docLast = end;
+	let docFirstEl = startBlockEl;
+	let docLastEl = endBlockEl;
+	if ( isNodeBefore( endBlockEl, startBlockEl ) ) {
+		[ docFirst, docLast ] = [ docLast, docFirst ];
+		[ docFirstEl, docLastEl ] = [ docLastEl, docFirstEl ];
+	}
+
+	const middleEls = getBlocksBetween(
+		( docFirstEl.getAttribute( 'data-block' ) ?? '' ) as string,
+		( docLastEl.getAttribute( 'data-block' ) ?? '' ) as string,
+		editorDocument
+	);
+
+	const MAX = Number.MAX_SAFE_INTEGER;
+	const rects: SelectionRect[] = [];
+
+	// First block — full bounding-box when the selection starts at offset 0 or
+	// this is a WholeBlock endpoint (no character position). When the cursor
+	// starts mid-block, use text-level rects so only the selected portion shows.
+	if ( docFirstEl.innerText?.trim() ) {
+		const firstOffset = docFirst.richTextOffset;
+		if ( firstOffset === null || firstOffset === 0 ) {
+			rects.push( blockBoundingRect( docFirstEl, overlayRect ) );
+		} else {
+			const el = resolveTargetElement( editorDocument, docFirst );
+			const textRects = el
+				? getSelectionRects(
+						el,
+						firstOffset,
+						MAX,
+						editorDocument,
+						overlayRect
+				  )
+				: null;
+			rects.push(
+				...( textRects ?? [
+					blockBoundingRect( docFirstEl, overlayRect ),
+				] )
+			);
+		}
+	}
+
+	// Middle blocks — always the full block width.
+	for ( const blockEl of middleEls ) {
+		if ( blockEl.innerText?.trim() ) {
+			rects.push( blockBoundingRect( blockEl, overlayRect ) );
+		}
+	}
+
+	// Last block — partial text-level rects up to the cursor offset so the
+	// unselected tail of the block is not highlighted. WholeBlock endpoints
+	// (no character position) get the full bounding-box instead.
+	if ( docLastEl.innerText?.trim() ) {
+		const lastOffset = docLast.richTextOffset;
+		if ( lastOffset === null ) {
+			rects.push( blockBoundingRect( docLastEl, overlayRect ) );
+		} else if ( lastOffset > 0 ) {
+			const el = resolveTargetElement( editorDocument, docLast );
+			const textRects = el
+				? getSelectionRects(
+						el,
+						0,
+						lastOffset,
+						editorDocument,
+						overlayRect
+				  )
+				: null;
+			rects.push(
+				...( textRects ?? [
+					blockBoundingRect( docLastEl, overlayRect ),
+				] )
+			);
+		}
+		// lastOffset === 0: cursor is at the very start of the last block —
+		// nothing in this block is selected, so produce no rect.
+	}
+
+	return rects.length > 0 ? { selectionRects: rects } : {};
 }
 
 /**
@@ -255,61 +383,5 @@ function computeSingleBlockRects(
 				overlayContext.overlayRect
 			) ?? [],
 		blockElement,
-	};
-}
-
-/**
- * Compute selection rects for a selection spanning multiple blocks.
- *
- * Normalizes to document order — for backward selections the block editor
- * reports start after end.
- *
- * @param start          - Start position (block clientId + text index).
- * @param end            - End position (block clientId + text index).
- * @param overlayContext - Shared editor document / overlay references.
- * @return Array of selection rectangles.
- */
-function computeMultiBlockRects(
-	start: ResolvedSelection,
-	end: ResolvedSelection,
-	overlayContext: OverlayContext
-): MultiBlockResult {
-	let docFirst = start;
-	let docLast = end;
-	let firstBlock = resolveTargetElement(
-		overlayContext.editorDocument,
-		docFirst
-	);
-	let lastBlock = resolveTargetElement(
-		overlayContext.editorDocument,
-		docLast
-	);
-
-	// Swap to document order if needed.
-	if ( firstBlock && lastBlock && isNodeBefore( lastBlock, firstBlock ) ) {
-		docFirst = end;
-		docLast = start;
-		[ firstBlock, lastBlock ] = [ lastBlock, firstBlock ];
-	}
-
-	if (
-		! firstBlock ||
-		! lastBlock ||
-		! docFirst.localClientId ||
-		! docLast.localClientId
-	) {
-		return {
-			firstBlock: null,
-			lastBlock: null,
-			firstBlockClientId: null,
-		};
-	}
-
-	// All selected blocks are highlighted with a CSS outline by use-block-highlighting.
-	// This function only resolves the endpoint elements needed for cursor positioning.
-	return {
-		firstBlock,
-		lastBlock,
-		firstBlockClientId: docFirst.localClientId,
 	};
 }

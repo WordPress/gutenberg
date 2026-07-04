@@ -89,6 +89,9 @@ export function useBlockHighlighting(
 			color: string;
 			userName: string;
 			avatarUrl: string | undefined;
+			// true for WholeBlock (always outline); false for
+			// SelectionInMultipleBlocks (outline only on non-text blocks).
+			alwaysOutline: boolean;
 		};
 
 		// Deduplicate by blockId — when multiple collaborators select the
@@ -130,6 +133,7 @@ export function useBlockHighlighting(
 							avatarUrl: getAvatarUrl(
 								userState.collaboratorInfo.avatar_urls
 							),
+							alwaysOutline: true,
 						},
 					];
 				}
@@ -195,7 +199,13 @@ export function useBlockHighlighting(
 					.filter( ( id ): id is string => Boolean( id ) );
 
 				return [ firstId, ...intermediateIds, lastId ].map(
-					( blockId ) => ( { blockId, color, userName, avatarUrl } )
+					( blockId ) => ( {
+						blockId,
+						color,
+						userName,
+						avatarUrl,
+						alwaysOutline: false,
+					} )
 				);
 			} )
 			.filter( ( block ) => {
@@ -251,12 +261,28 @@ export function useBlockHighlighting(
 				return;
 			}
 
-			blockElement.classList.add( 'is-collaborator-selected' );
-			blockElement.style.setProperty(
-				'--collaborator-outline-color',
-				color
-			);
-			currentHighlightedIds.add( blockId );
+			// Reset any stale outline class first. Without this, a block that
+			// transitions from a WholeBlock selection (always outlined) to being
+			// a text block inside a SelectionInMultipleBlocks range would keep
+			// the class indefinitely — the cleanup loop only removes blocks that
+			// leave the selection entirely.
+			blockElement.classList.remove( 'is-collaborator-selected' );
+			blockElement.style.removeProperty( '--collaborator-outline-color' );
+			currentHighlightedIds.delete( blockId );
+
+			// WholeBlock (single block entirely selected): always outline.
+			// SelectionInMultipleBlocks: outline only on non-text blocks
+			// (image, spacer, etc.) — text blocks are highlighted via text
+			// rects from compute-selection so their content stays visible.
+			const isNonTextBlock = ! blockElement.innerText?.trim();
+			if ( block.alwaysOutline || isNonTextBlock ) {
+				blockElement.classList.add( 'is-collaborator-selected' );
+				blockElement.style.setProperty(
+					'--collaborator-outline-color',
+					color
+				);
+				currentHighlightedIds.add( blockId );
+			}
 
 			if ( overlayRect && ! usersWithAvatar.has( color ) ) {
 				usersWithAvatar.add( color );

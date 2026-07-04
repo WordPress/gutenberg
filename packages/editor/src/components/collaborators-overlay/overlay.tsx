@@ -157,33 +157,35 @@ export function Overlay( {
 								} }
 							/>
 						) ) }
-					<div
-						ref={ setCursorRef( cursor.clientId ) }
-						className="collaborators-overlay-user"
-						style={ {
-							left: `${ cursor.x }px`,
-							top: `${ cursor.y }px`,
-						} }
-					>
-						{ ! cursor.isMe && (
-							<div
-								className="collaborators-overlay-user-cursor"
-								style={ {
-									backgroundColor: cursor.color,
-									height: `${ cursor.height }px`,
-								} }
+					{ cursor.x !== undefined && (
+						<div
+							ref={ setCursorRef( cursor.clientId ) }
+							className="collaborators-overlay-user"
+							style={ {
+								left: `${ cursor.x }px`,
+								top: `${ cursor.y }px`,
+							} }
+						>
+							{ ! cursor.isMe && (
+								<div
+									className="collaborators-overlay-user-cursor"
+									style={ {
+										backgroundColor: cursor.color,
+										height: `${ cursor.height }px`,
+									} }
+								/>
+							) }
+							<Avatar
+								className="collaborators-overlay-user-label"
+								variant="badge"
+								size="small"
+								src={ cursor.avatarUrl }
+								name={ cursor.userName }
+								label={ cursor.isMe ? __( 'You' ) : undefined }
+								borderColor={ cursor.color }
 							/>
-						) }
-						<Avatar
-							className="collaborators-overlay-user-label"
-							variant="badge"
-							size="small"
-							src={ cursor.avatarUrl }
-							name={ cursor.userName }
-							label={ cursor.isMe ? __( 'You' ) : undefined }
-							borderColor={ cursor.color }
-						/>
-					</div>
+						</div>
+					) }
 				</div>
 			) ) }
 			{ highlights.map( ( highlight ) => (
