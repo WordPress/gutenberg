@@ -47,7 +47,7 @@ function gutenberg_render_custom_css_support_styles( $parsed_block ) {
 		? "$existing_class_name $class_name"
 		: $class_name;
 
-	_wp_array_set( $parsed_block, array( 'attrs', 'className' ), $updated_class_name );
+	$parsed_block['attrs']['className'] = $updated_class_name;
 
 	// Process the custom CSS using the same method as global styles.
 	$selector      = '.' . $class_name;
