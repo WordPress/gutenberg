@@ -85,7 +85,7 @@ export function getResetLayout( layoutBlockSupport = {}, blockVariation ) {
 	} );
 }
 
-function getLayoutStateOverrides(
+export function getLayoutStateOverrides(
 	layout = {},
 	baseLayout = {},
 	existingLayout = {}
@@ -98,11 +98,13 @@ function getLayoutStateOverrides(
 	);
 
 	Object.entries( layout || {} ).forEach( ( [ key, value ] ) => {
+		const baseHasValue = Object.hasOwn( baseLayout || {}, key );
 		if (
 			! CHILD_LAYOUT_KEYS.includes( key ) &&
 			value !== baseLayout?.[ key ]
 		) {
-			overrides[ key ] = value;
+			overrides[ key ] =
+				value === undefined && baseHasValue ? null : value;
 		}
 	} );
 
@@ -466,7 +468,7 @@ function LayoutPanelPure( {
 			const nextStateStyle = cleanEmptyObject( {
 				...stateStyle,
 				layout: getLayoutStateOverrides(
-					cleanEmptyObject( newLayout ),
+					newLayout,
 					baseLayout,
 					stateStyle?.layout
 				),

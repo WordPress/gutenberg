@@ -6,9 +6,15 @@ import { Spinner } from '@wordpress/components';
 import { useEntityRecord } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import { DataForm } from '@wordpress/dataviews';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import {
+	createInterpolateElement,
+	useEffect,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
+import { Card, Link, Stack, Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -156,12 +162,42 @@ function ExperimentsPage() {
 
 	return (
 		<Page
-			title={ __( 'Experimental settings' ) }
+			title={ __( 'Gutenberg Experiments' ) }
 			subTitle={ __(
-				"The block editor includes experimental features that are usable while they're in development. Select the ones you'd like to enable. These features are likely to change, so avoid using them in production."
+				'The latest block and full site editing features before they ship in a WordPress release.'
 			) }
 		>
-			<div className="experiments-page__form">
+			<Stack
+				className="experiments-page__container"
+				direction="column"
+				gap="md"
+			>
+				<Card.Root>
+					<Card.Content>
+						<Stack direction="column" gap="md">
+							<Text variant="body-lg" render={ <p /> }>
+								{ __(
+									'The Gutenberg plugin adds editing, customization, and site building to WordPress, and gives early adopters access to the latest block and full site editing features before they ship in a WordPress release.'
+								) }
+							</Text>
+							<Text variant="body-lg" render={ <p /> }>
+								{ createInterpolateElement(
+									__(
+										'The experiments below are in active development, so expect rough edges and changes over time. To learn more about the project and how to build with blocks, see the <a>Block Editor Handbook</a>.'
+									),
+									{
+										a: (
+											<Link
+												href="https://developer.wordpress.org/block-editor/"
+												openInNewTab
+											/>
+										),
+									}
+								) }
+							</Text>
+						</Stack>
+					</Card.Content>
+				</Card.Root>
 				<DataForm
 					data={ settings }
 					fields={ fields }
@@ -173,7 +209,7 @@ function ExperimentsPage() {
 						setSettings( values );
 					} }
 				/>
-			</div>
+			</Stack>
 		</Page>
 	);
 }

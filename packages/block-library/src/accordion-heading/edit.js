@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -53,7 +58,13 @@ export default function Edit( { attributes, setAttributes, context } ) {
 		},
 	} );
 
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		className: clsx( {
+			'has-icon': showIcon,
+			'has-icon-left': showIcon && iconPosition === 'left',
+			'has-icon-right': showIcon && iconPosition === 'right',
+		} ),
+	} );
 	const spacingProps = useSpacingProps( attributes );
 
 	return (

@@ -605,7 +605,6 @@ export default function TypographyPanel( {
 						fontFamilies={ fontFamilies }
 						value={ fontFamily }
 						onChange={ setFontFamily }
-						size="__unstable-large"
 					/>
 				</ToolsPanelItem>
 			) }
@@ -625,7 +624,6 @@ export default function TypographyPanel( {
 						disableCustomFontSizes={ disableCustomFontSizes }
 						withReset={ false }
 						withSlider
-						size="__unstable-large"
 					/>
 				</ToolsPanelItem>
 			) }
@@ -663,7 +661,6 @@ export default function TypographyPanel( {
 						__unstableInputWidth="auto"
 						value={ lineHeight }
 						onChange={ setLineHeight }
-						size="__unstable-large"
 					/>
 				</ToolsPanelItem>
 			) }
@@ -679,7 +676,6 @@ export default function TypographyPanel( {
 					<LetterSpacingControl
 						value={ letterSpacing }
 						onChange={ setLetterSpacing }
-						size="__unstable-large"
 						__unstableInputWidth="auto"
 					/>
 				</ToolsPanelItem>
@@ -695,7 +691,6 @@ export default function TypographyPanel( {
 					<TextIndentControl
 						value={ textIndent }
 						onChange={ setTextIndentValue }
-						size="__unstable-large"
 						__unstableInputWidth="auto"
 						withSlider
 						hasBottomMargin={ isGlobalStyles }

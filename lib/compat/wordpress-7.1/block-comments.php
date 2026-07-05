@@ -2,8 +2,8 @@
 /**
  * Block comments compatibility for WordPress 7.1.
  *
- * Extends note-related block comment functions to also handle
- * the 'reaction' comment type for emoji reactions on notes.
+ * Extends note-related block comment functions to support inline note markers
+ * and the 'reaction' comment type for emoji reactions on notes.
  *
  * Why a custom comment type (vs. comment meta on the parent note)?
  *
@@ -22,6 +22,94 @@
  *
  * @package gutenberg
  */
+
+/**
+ * Strip inline note markers from rendered block output.
+ *
+ * Inline notes are anchored in raw block content with
+ * `<mark class="wp-note" data-id="N">...</mark>` so the marker survives edits,
+ * but the public HTML should not expose note metadata. `render_block` unwraps
+ * the marker entirely - dropping the `<mark>` open tag and its matching closer
+ * while keeping the marked text - so nothing leaks to the front end. The raw
+ * `post_content` (and the REST `raw` view, revisions, exports) keeps the marker
+ * so the editor can re-attach on reload.
+ *
+ * Only note markers are unwrapped: `WP_HTML_Tag_Processor::has_class()` matches
+ * the `wp-note` class by exact token, so a `<mark>` a user or plugin added
+ * (e.g. a `core/text-color` highlight, or an unrelated `wp-note-foo` class) is
+ * never flagged and survives byte-for-byte with all of its attributes intact.
+ * A naive regex would be wrong here: a `\bwp-note\b` word boundary also matches
+ * `wp-note-foo`, which is why the class check goes through the HTML API instead.
+ *
+ * The HTML API has no public token-removal method yet (it is on the roadmap:
+ * https://github.com/WordPress/gutenberg/discussions/54583), so an anonymous
+ * `WP_HTML_Tag_Processor` subclass unwraps each note `<mark>` and its matching
+ * closer directly on the parsed token stream. Walking tokens - rather than
+ * matching `<mark>` with a regex - means `</mark>`-looking text inside a comment
+ * or attribute value can never be mistaken for a real tag, and a nesting stack
+ * keeps each note opener paired with its own closer so overlapping notes and any
+ * user highlight `<mark>` left intact still resolve correctly.
+ *
+ * @param string $block_content Rendered block HTML.
+ * @return string Block HTML with wp-note markers unwrapped.
+ */
+function gutenberg_strip_inline_note_markers( $block_content ) {
+	if ( ! str_contains( $block_content, 'wp-note' ) ) {
+		return $block_content;
+	}
+
+	// Anonymous subclass exposing token removal, which WP_HTML_Tag_Processor
+	// does not provide publicly yet. Removing the current token via its bookmark
+	// span unwraps the `<mark>` (opener or closer) while keeping the text it
+	// wraps. The redeclaration-guard sniff cannot tell these class methods from
+	// global functions, so it is disabled for the class body.
+	// phpcs:disable Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames.FunctionNotGuardedAgainstRedeclaration
+	$processor = new class( $block_content ) extends WP_HTML_Tag_Processor {
+		/**
+		 * Gets the span for the current token.
+		 *
+		 * @return WP_HTML_Span Current token span.
+		 */
+		private function get_span() {
+			// Always called after next_tag() returned true, so the bookmark is set.
+			$this->set_bookmark( 'here' );
+			return $this->bookmarks['here'];
+		}
+
+		/**
+		 * Removes the current token, keeping any text it wraps.
+		 */
+		public function remove_token() {
+			$span = $this->get_span();
+
+			$this->lexical_updates[] = new WP_HTML_Text_Replacement( $span->start, $span->length, '' );
+		}
+	};
+	// phpcs:enable Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames.FunctionNotGuardedAgainstRedeclaration
+
+	// Walk every `<mark>`, tracking note nesting on a stack so each note opener
+	// pairs with its own closer, and unwrap only the note markers.
+	$mark_stack = array();
+	$query      = array(
+		'tag_name'    => 'MARK',
+		'tag_closers' => 'visit',
+	);
+	while ( $processor->next_tag( $query ) ) {
+		if ( $processor->is_tag_closer() ) {
+			$is_note = array_pop( $mark_stack );
+		} else {
+			$is_note      = $processor->has_class( 'wp-note' );
+			$mark_stack[] = $is_note;
+		}
+
+		if ( true === $is_note ) {
+			$processor->remove_token();
+		}
+	}
+
+	return $processor->get_updated_html();
+}
+add_filter( 'render_block', 'gutenberg_strip_inline_note_markers' );
 
 /**
  * Returns the list of internal comment types used by core features.
@@ -72,8 +160,8 @@ add_filter( 'get_avatar_comment_types', 'gutenberg_update_get_avatar_comment_typ
  *
  * @global wpdb $wpdb WordPress database abstraction object.
  *
- * @param string[] $clauses The current SQL clauses for the comments query.
- * @param WP_Comment_Query $query The current comments query.
+ * @param string[]         $clauses The current SQL clauses for the comments query.
+ * @param WP_Comment_Query $query   The current comments query.
  *
  * @return string[] The modified SQL clauses for the comments query.
  */
@@ -103,11 +191,19 @@ add_action( 'comments_clauses', 'gutenberg_exclude_block_comments_from_admin_7_1
  */
 function gutenberg_filter_comment_count_query_exclude_block_comments_7_1( $query ) {
 	if ( str_starts_with( $query, 'SELECT comment_post_ID, COUNT(comment_ID) as num_comments FROM' ) && str_contains( $query, 'comment_approved' ) ) {
-		if ( ! str_contains( $query, "comment_type != 'note'" ) ) {
-			$type_clauses = array();
-			foreach ( gutenberg_get_internal_comment_types() as $internal_type ) {
-				$type_clauses[] = "comment_type != '" . esc_sql( $internal_type ) . "'";
+		// Add an exclusion clause for each internal type not already present.
+		// Core (and older versions of this filter) may have already injected
+		// the note-only exclusion, so expanding per type - rather than bailing
+		// when any exclusion exists - ensures reactions are excluded too and
+		// keeps the filter idempotent if it runs more than once.
+		$type_clauses = array();
+		foreach ( gutenberg_get_internal_comment_types() as $internal_type ) {
+			$clause = "comment_type != '" . esc_sql( $internal_type ) . "'";
+			if ( ! str_contains( $query, $clause ) ) {
+				$type_clauses[] = $clause;
 			}
+		}
+		if ( ! empty( $type_clauses ) ) {
 			$query = str_replace( 'comment_approved', implode( ' AND ', $type_clauses ) . ' AND comment_approved', $query );
 		}
 	}
@@ -136,9 +232,9 @@ add_filter( 'comments_list_table_query_args', 'gutenberg_hide_note_from_comment_
  *
  * Replaces the 6.9 implementation to also exclude 'reaction' type.
  *
- * @param int|null $new     The new comment count. Default null.
- * @param int      $old     The old comment count.
- * @param int      $post_id Post ID.
+ * @param int|null $new_count The new comment count. Default null.
+ * @param int      $old_count The old comment count.
+ * @param int      $post_id   Post ID.
  * @return int|null The modified comment count.
  */
 function gutenberg_exclude_notes_from_comment_count_7_1( $new_count, $old_count, $post_id ) {

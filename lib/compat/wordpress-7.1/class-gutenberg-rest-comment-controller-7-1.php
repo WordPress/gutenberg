@@ -2,10 +2,8 @@
 /**
  * REST API comment controller with reaction support for WordPress 7.1 compatibility.
  *
- * Extends the core comments controller to add support for the 'reaction'
- * comment type, enabling emoji reactions on notes. The notes functionality
- * this builds on ships in WordPress 6.9 core, which is the plugin's minimum
- * supported version.
+ * Extends the 6.9 comment controller to add support for the 'reaction'
+ * comment type, enabling emoji reactions on notes.
  *
  * @package gutenberg
  * @since   7.1.0
@@ -61,6 +59,32 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 	 */
 	protected function is_note_or_reaction( $type ) {
 		return in_array( $type, gutenberg_get_internal_comment_types(), true );
+	}
+
+	/**
+	 * Checks whether a post type supports notes.
+	 *
+	 * The core comment controller (WordPress 6.9) declares this check as a
+	 * private method, so it cannot be reused from this subclass. The logic is
+	 * mirrored here to keep the note permission checks working.
+	 *
+	 * @param string $post_type Post type name.
+	 * @return bool True if the post type supports notes, false otherwise.
+	 */
+	protected function check_post_type_supports_notes( $post_type ) {
+		$supports = get_all_post_type_supports( $post_type );
+		if ( ! isset( $supports['editor'] ) ) {
+			return false;
+		}
+		if ( ! is_array( $supports['editor'] ) ) {
+			return false;
+		}
+		foreach ( $supports['editor'] as $item ) {
+			if ( ! empty( $item['notes'] ) ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public function get_items_permissions_check( $request ) {
@@ -179,6 +203,43 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 		}
 
 		return true;
+	}
+
+	/**
+	 * Checks if the current user can read the comment.
+	 *
+	 * Core's implementation only excludes the 'note' type from the public read
+	 * path, where an approved comment on a readable post is world-readable.
+	 * Reactions are an internal comment type too, so without this override a
+	 * direct request such as GET /wp/v2/comments/{reaction_id} would expose
+	 * reaction rows - including the reacting user's identity - to any reader of
+	 * the post. Give reactions the same restriction core gives notes: never
+	 * public, readable only by their author or users who can edit the comment.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param WP_Comment      $comment Comment object.
+	 * @param WP_REST_Request $request Request data to check.
+	 * @return bool True if the user can read the comment, false otherwise.
+	 */
+	protected function check_read_permission( $comment, $request ) {
+		if ( 'reaction' === $comment->comment_type ) {
+			if ( 0 === get_current_user_id() ) {
+				return false;
+			}
+
+			if ( empty( $comment->comment_post_ID ) && ! current_user_can( 'moderate_comments' ) ) {
+				return false;
+			}
+
+			if ( ! empty( $comment->user_id ) && get_current_user_id() === (int) $comment->user_id ) {
+				return true;
+			}
+
+			return current_user_can( 'edit_comment', $comment->comment_ID );
+		}
+
+		return parent::check_read_permission( $comment, $request );
 	}
 
 	public function create_item_permissions_check( $request ) {
@@ -344,6 +405,10 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 			);
 		}
 
+		// The canonical reaction slug, populated once validated below so the
+		// stored content matches what was validated (not the raw input).
+		$reaction_slug = null;
+
 		// Validate reaction-specific requirements.
 		if ( ! empty( $request['type'] ) && 'reaction' === $request['type'] ) {
 			// Validate parent is a note.
@@ -390,6 +455,19 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 				$emoji_slug
 			);
 
+			// A hex-shaped slug must still be made of assignable Unicode code
+			// points: reject anything above U+10FFFF or in the UTF-16 surrogate
+			// range (U+D800–U+DFFF).
+			if ( $is_hex_key ) {
+				foreach ( explode( '-', $emoji_slug ) as $codepoint ) {
+					$value = hexdec( $codepoint );
+					if ( $value > 0x10FFFF || ( $value >= 0xD800 && $value <= 0xDFFF ) ) {
+						$is_hex_key = false;
+						break;
+					}
+				}
+			}
+
 			if ( ! $is_curated_slug && ! $is_hex_key ) {
 				return new WP_Error(
 					'rest_comment_invalid_reaction',
@@ -419,6 +497,8 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 					);
 				}
 			}
+
+			$reaction_slug = $emoji_slug;
 		}
 
 		$prepared_comment = $this->prepare_item_for_database( $request );
@@ -427,6 +507,13 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 		}
 
 		$prepared_comment['comment_type'] = $request['type'];
+
+		// Persist the validated, canonical reaction slug rather than the raw
+		// request content, so stored values stay consistent for grouping and
+		// counting (e.g. "<b>heart</b>" is stored as "heart").
+		if ( null !== $reaction_slug ) {
+			$prepared_comment['comment_content'] = $reaction_slug;
+		}
 
 		if ( ! isset( $prepared_comment['comment_content'] ) ) {
 			$prepared_comment['comment_content'] = '';
@@ -542,6 +629,40 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 				__( 'Creating comment failed.', 'gutenberg' ),
 				array( 'status' => 500 )
 			);
+		}
+
+		// The pre-insert uniqueness check is not atomic, so two concurrent
+		// requests for the same user/note/emoji can both insert an approved
+		// row. Converge on a single row deterministically: keep the earliest
+		// matching reaction (lowest comment ID) and delete any later
+		// duplicates. Every concurrent request applies the same rule, so they
+		// all settle on the same surviving row. If this request's own row lost
+		// the race, repoint the response to the survivor.
+		if ( null !== $reaction_slug ) {
+			$matching   = get_comments(
+				array(
+					'parent'  => $request['parent'],
+					'user_id' => get_current_user_id(),
+					'type'    => 'reaction',
+					'status'  => 'approve',
+					'orderby' => 'comment_ID',
+					'order'   => 'ASC',
+				)
+			);
+			$duplicates = array();
+			foreach ( $matching as $candidate ) {
+				if ( wp_strip_all_tags( $candidate->comment_content ) === $reaction_slug ) {
+					$duplicates[] = (int) $candidate->comment_ID;
+				}
+			}
+
+			if ( count( $duplicates ) > 1 ) {
+				$survivor_id = array_shift( $duplicates );
+				foreach ( $duplicates as $duplicate_id ) {
+					wp_delete_comment( $duplicate_id, true );
+				}
+				$comment_id = $survivor_id;
+			}
 		}
 
 		if ( isset( $request['status'] ) ) {
@@ -794,41 +915,13 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 
 		return parent::check_is_comment_content_allowed( $prepared_comment );
 	}
-
-	/**
-	 * Checks if a post type supports notes.
-	 *
-	 * Core's WP_REST_Comments_Controller declares this helper as private, so it
-	 * is reimplemented here to keep it available to this subclass.
-	 *
-	 * @since 7.1.0
-	 *
-	 * @param string $post_type Post type name.
-	 * @return bool True if post type supports notes, false otherwise.
-	 */
-	protected function check_post_type_supports_notes( $post_type ) {
-		$supports = get_all_post_type_supports( $post_type );
-		if ( ! isset( $supports['editor'] ) ) {
-			return false;
-		}
-		if ( ! is_array( $supports['editor'] ) ) {
-			return false;
-		}
-		foreach ( $supports['editor'] as $item ) {
-			if ( ! empty( $item['notes'] ) ) {
-				return true;
-			}
-		}
-		return false;
-	}
 }
 
 /**
  * Registers the Gutenberg REST comment controller for WordPress 7.1 compatibility.
  *
- * Registers on rest_api_init at the default priority so it takes precedence over
- * core's comments controller (registered at priority 99), adding reaction support
- * on top of the notes functionality that ships in WordPress 6.9 core.
+ * Replaces the 6.9 controller registration to use the 7.1 controller
+ * which adds reaction support.
  */
 function gutenberg_register_comment_controller_7_1() {
 	$controller = new Gutenberg_REST_Comment_Controller_7_1();

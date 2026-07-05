@@ -12,25 +12,17 @@ const { hasTruthyJsxAttribute } = require( '../utils' );
  * These can be exempted if they have a non-default `size` prop.
  */
 const COMPONENTS_REQUIRING_40PX = new Set( [
-	'BorderBoxControl',
-	'BorderControl',
 	'Button',
 	'ClipboardButton',
 	'ComboboxControl',
 	'CustomSelectControl',
 	'FontAppearanceControl',
-	'FontFamilyControl',
-	'FontSizePicker',
 	'FormTokenField',
 	'IconButton',
 	'InputControl',
-	'LetterSpacingControl',
-	'LineHeightControl',
 	'NumberControl',
 	'Radio',
-	'RangeControl',
 	'SelectControl',
-	'TreeSelect',
 	'ToggleGroupControl',
 	'UnitControl',
 ] );

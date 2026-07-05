@@ -41,15 +41,15 @@
 		"./package.json": "./package.json"
 	},
 	"dependencies": {
-		"@stylistic/stylelint-plugin": "^3.0.1",
+		"@stylistic/stylelint-plugin": "^3.1.3",
 		"@wordpress/theme": "file:../theme",
 		"stylelint-config-recommended": "^14.0.1",
 		"stylelint-config-recommended-scss": "^14.1.0"
 	},
 	"devDependencies": {
 		"@wordpress/npm-package-json-lint-config": "file:../npm-package-json-lint-config",
-		"stylelint": "^16.8.2",
-		"stylelint-scss": "^6.4.0"
+		"stylelint": "^16.26.1",
+		"stylelint-scss": "^6.14.0"
 	},
 	"peerDependencies": {
 		"stylelint": "^16.8.2",

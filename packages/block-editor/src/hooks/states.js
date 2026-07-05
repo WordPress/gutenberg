@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { getBlockType } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -23,6 +22,19 @@ export const RESPONSIVE_STATE_LABELS = {
 	'@mobile': __( 'Mobile' ),
 };
 
+// Viewport states are selected globally via the editor's device preview
+// (Responsive editing). 'default' maps to the Desktop device, the remaining
+// options are derived from the shared responsive-state labels.
+const DEVICE_STATE_OPTIONS = [
+	{ value: 'default', label: __( 'Desktop' ) },
+	...Object.entries( RESPONSIVE_STATE_LABELS ).map(
+		( [ value, label ] ) => ( {
+			value,
+			label,
+		} )
+	),
+];
+
 // Keep in sync with WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS
 // and packages/global-styles-engine/src/core/render.tsx.
 export const VALID_BLOCK_PSEUDO_STATES = {
@@ -43,23 +55,11 @@ function getPseudoStateOptions( name ) {
 
 const DEFAULT_STATE_VALUE = 'default';
 
-function getViewportStateOptions( name ) {
-	if ( ! getBlockType( name )?.attributes?.style ) {
-		return [];
-	}
-
-	return Object.entries( RESPONSIVE_STATE_LABELS ).map(
-		( [ value, label ] ) => ( {
-			value,
-			label,
-		} )
-	);
-}
-
 /**
- * Renders a style-state selector in the block card header.
- * Viewport states are shown for blocks with a style attribute, while
- * pseudo-states are shown for blocks with configured pseudo-state support.
+ * Renders a pseudo-state selector in the block card header.
+ *
+ * Viewport states are selected globally via the editor's device preview
+ * (Responsive editing), so only pseudo-states are exposed here.
  *
  * @param {Object}   props          Component props.
  * @param {string}   props.name     Block name.
@@ -68,21 +68,17 @@ function getViewportStateOptions( name ) {
  * @return {Element|null} State control component, or null if not applicable.
  */
 export function BlockStatesControl( { name, value, onChange } ) {
-	const viewportStateOptions = getViewportStateOptions( name );
 	const pseudoStateOptions = getPseudoStateOptions( name );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	if ( ! viewportStateOptions.length && ! pseudoStateOptions.length ) {
+	if ( ! pseudoStateOptions.length ) {
 		return null;
 	}
 
 	return (
 		<StateControl
-			viewportStates={ viewportStateOptions }
 			pseudoStates={ pseudoStateOptions }
-			viewportValue={ value?.viewport ?? DEFAULT_STATE_VALUE }
 			pseudoStateValue={ value?.pseudo ?? DEFAULT_STATE_VALUE }
-			onChangeViewport={ ( viewport ) => onChange( { viewport } ) }
 			onChangePseudoState={ ( pseudo ) => onChange( { pseudo } ) }
 			popoverProps={ dropdownMenuProps.popoverProps }
 			showText={ false }
@@ -90,17 +86,25 @@ export function BlockStatesControl( { name, value, onChange } ) {
 	);
 }
 
-export function BlockStateBadges( { name, value } ) {
-	const viewportStateOptions = getViewportStateOptions( name );
+/**
+ * Renders badges for the active style states of a block.
+ *
+ * @param {Object}  props                     Component props.
+ * @param {string}  props.name                Block name.
+ * @param {Object}  props.value               Currently selected style-state value.
+ * @param {boolean} props.isResponsiveEditing Whether Responsive editing is enabled.
+ * @return {Element|null} Badges component, or null if there is nothing to show.
+ */
+export function BlockStateBadges( { name, value, isResponsiveEditing } ) {
 	const pseudoStateOptions = getPseudoStateOptions( name );
 
-	if ( ! viewportStateOptions.length && ! pseudoStateOptions.length ) {
+	if ( ! pseudoStateOptions.length && ! isResponsiveEditing ) {
 		return null;
 	}
 
 	return (
 		<StateControlBadges
-			viewportStates={ viewportStateOptions }
+			viewportStates={ isResponsiveEditing ? DEVICE_STATE_OPTIONS : [] }
 			pseudoStates={ pseudoStateOptions }
 			viewportValue={ value?.viewport ?? DEFAULT_STATE_VALUE }
 			pseudoStateValue={ value?.pseudo ?? DEFAULT_STATE_VALUE }

@@ -16,13 +16,13 @@ import {
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback, useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import AddTabToolbarControl from '../tab-panel/add-tab-toolbar-control';
-import RemoveTabToolbarControl from '../tab-panel/remove-tab-toolbar-control';
+import TabToolbarControls from '../tabs/tab-toolbar-controls';
+import useTabActions from '../tabs/use-tab-actions';
 
 const EMPTY_ARRAY = [];
 
@@ -56,38 +56,27 @@ function Edit( {
 		},
 		[ clientId ]
 	);
+	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+	const { insertTab, removeTab } = useTabActions( tabsClientId );
 
 	const effectiveActiveIndex = editorActiveTabIndex ?? activeTabIndex;
 
-	const { __unstableMarkNextChangeAsNotPersistent, updateBlockAttributes } =
-		useDispatch( blockEditorStore );
+	function selectTabPanel( tabIndex ) {
+		if ( tabsClientId && tabIndex !== effectiveActiveIndex ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			updateBlockAttributes( tabsClientId, {
+				editorActiveTabIndex: tabIndex,
+			} );
+		}
+	}
 
-	const handleTabClick = useCallback(
-		( tabIndex ) => {
-			if ( tabsClientId && tabIndex !== effectiveActiveIndex ) {
-				__unstableMarkNextChangeAsNotPersistent();
-				updateBlockAttributes( tabsClientId, {
-					editorActiveTabIndex: tabIndex,
-				} );
-			}
-		},
-		[
-			tabsClientId,
-			effectiveActiveIndex,
-			updateBlockAttributes,
-			__unstableMarkNextChangeAsNotPersistent,
-		]
-	);
-
-	const handleLabelChange = useCallback(
-		( tabIndex, newLabel ) => {
-			const tab = tabsList[ tabIndex ];
-			if ( tab?.clientId ) {
-				updateBlockAttributes( tab.clientId, { label: newLabel } );
-			}
-		},
-		[ tabsList, updateBlockAttributes ]
-	);
+	function handleLabelChange( tabIndex, newLabel ) {
+		const tab = tabsList[ tabIndex ];
+		if ( tab?.clientId ) {
+			updateBlockAttributes( tab.clientId, { label: newLabel } );
+		}
+	}
 
 	const menuRef = useRef();
 	const prevTabCountRef = useRef( tabsList.length );
@@ -117,13 +106,7 @@ function Edit( {
 			} );
 		};
 
-		if ( tabsList.length > prevCount ) {
-			// Tab added — focus the last (newly added) button.
-			focusButtonAt( tabsList.length - 1 );
-		} else {
-			// Tab removed — focus the new active button.
-			focusButtonAt( effectiveActiveIndex );
-		}
+		focusButtonAt( effectiveActiveIndex );
 	}, [ tabsList.length, effectiveActiveIndex ] );
 
 	const blockProps = useBlockProps( {
@@ -144,8 +127,7 @@ function Edit( {
 
 	return (
 		<>
-			<AddTabToolbarControl tabsClientId={ tabsClientId } />
-			<RemoveTabToolbarControl tabsClientId={ tabsClientId } />
+			<TabToolbarControls tabsClientId={ tabsClientId } />
 			<div { ...blockProps }>
 				{ tabsList.map( ( tab, index ) => {
 					const isActive = index === effectiveActiveIndex;
@@ -158,9 +140,11 @@ function Edit( {
 							className={ buttonClassName || undefined }
 							style={ buttonStyle }
 							tabIndex={ -1 }
-							onClick={ ( event ) => {
-								event.preventDefault();
-								handleTabClick( index );
+							// Activate the matching panel whenever this tab
+							// receives focus — whether from a click or the caret
+							// moving into the label via the keyboard.
+							onFocus={ () => {
+								selectTabPanel( index );
 							} }
 						>
 							<RichText
@@ -171,6 +155,10 @@ function Edit( {
 								onChange={ ( newLabel ) =>
 									handleLabelChange( index, newLabel )
 								}
+								__unstableOnSplitAtEnd={ () =>
+									insertTab( index + 1 )
+								}
+								onRemove={ () => removeTab( index ) }
 							/>
 						</button>
 					);

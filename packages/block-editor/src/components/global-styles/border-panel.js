@@ -279,7 +279,6 @@ export default function BorderPanel( {
 						popoverPlacement="left-start"
 						value={ border }
 						__experimentalIsRenderedInSidebar
-						size="__unstable-large"
 						hideLabelFromVision={ ! hasShadowControl }
 						label={ __( 'Border' ) }
 					/>

@@ -1,7 +1,10 @@
-import type { CornerRadiusPreset } from '@wordpress/theme';
 import { ThemeProvider } from '@wordpress/theme';
 import type { StoryContext } from 'storybook/internal/types';
 import { storyIdMatchesDesignSystemTheme } from './utils/design-system-theme-story-matchers';
+
+type ThemeProviderCornerRadius = React.ComponentProps<
+	typeof ThemeProvider
+>[ 'cornerRadius' ];
 
 /**
  * Decorator that applies Design System theme based on toolbar selections.
@@ -23,8 +26,8 @@ export function WithDesignSystemTheme(
 
 	const colorTheme = context.globals.dsColorTheme;
 	const cursorControl = context.globals.dsCursorControl || undefined;
-	const cornerRadiusPreset =
-		( context.globals.dsCornerRadius as CornerRadiusPreset ) || undefined;
+	const cornerRadiusPreset: ThemeProviderCornerRadius =
+		context.globals.dsCornerRadius || undefined;
 
 	let color;
 	if ( colorTheme === 'dark' ) {
@@ -36,7 +39,7 @@ export function WithDesignSystemTheme(
 			color={ color }
 			cursor={ cursorControl ? { control: cursorControl } : undefined }
 			cornerRadius={ cornerRadiusPreset }
-			isRoot
+			isRoot={ context.viewMode !== 'docs' }
 		>
 			<div
 				style={

@@ -14,14 +14,7 @@ import { T_SHIRT_ABBREVIATIONS, T_SHIRT_NAMES } from './constants';
 import type { FontSizePickerToggleGroupProps } from './types';
 
 const FontSizePickerToggleGroup = ( props: FontSizePickerToggleGroupProps ) => {
-	const {
-		fontSizes,
-		value,
-		valueMode = 'literal',
-		__next40pxDefaultSize,
-		size,
-		onChange,
-	} = props;
+	const { fontSizes, value, valueMode = 'literal', onChange } = props;
 
 	// Find the current value based on valueMode
 	const currentValue = ( () => {
@@ -56,8 +49,7 @@ const FontSizePickerToggleGroup = ( props: FontSizePickerToggleGroupProps ) => {
 
 	return (
 		<ToggleGroupControl
-			__next40pxDefaultSize={ __next40pxDefaultSize }
-			__shouldNotWarnDeprecated36pxSize
+			__next40pxDefaultSize
 			label={ __( 'Font size' ) }
 			hideLabelFromVision
 			value={ currentValue }
@@ -78,7 +70,6 @@ const FontSizePickerToggleGroup = ( props: FontSizePickerToggleGroupProps ) => {
 				}
 			} }
 			isBlock
-			size={ size }
 		>
 			{ fontSizes.map( ( fontSize, index ) => (
 				<ToggleGroupControlOption

@@ -88,15 +88,15 @@ function ColorGradientControlInner( {
 		// The `ColorPalette` must stay at a stable position in the tree whether
 		// or not a notice is present. Wrapping it in a `VStack` only when a
 		// notice appears remounts it, which resets the custom color picker back
-		// to the swatch view mid-edit. Keep `ColorPalette` last and toggle only
-		// the notice ahead of it; the notice's own bottom margin provides the
-		// spacing the wrapper used to.
+		// to the swatch view mid-edit. Keep `ColorPalette` first and toggle only
+		// the trailing notice after it, so the palette holds a stable index and
+		// the notice sits at the bottom of the popover.
 		[ TAB_IDS.color ]: (
 			<>
+				{ colorPalette }
 				{ noticeProps && (
 					<Notice isDismissible={ false } { ...noticeProps } />
 				) }
-				{ colorPalette }
 			</>
 		),
 		[ TAB_IDS.gradient ]: (

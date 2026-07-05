@@ -989,7 +989,7 @@ class WP_Duotone_Gutenberg {
 
 		$inner_classnames = explode( ' ', $tags->get_attribute( 'class' ) );
 		foreach ( $inner_classnames as $classname ) {
-			if ( 0 === strpos( $classname, 'wp-duotone' ) ) {
+			if ( str_starts_with( $classname, 'wp-duotone' ) ) {
 				$tags->remove_class( $classname );
 				$tags->seek( 'wrapper-div' );
 				$tags->add_class( $classname );
