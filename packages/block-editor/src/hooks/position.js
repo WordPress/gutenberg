@@ -8,10 +8,15 @@ import clsx from 'clsx';
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
-import { BaseControl, CustomSelectControl } from '@wordpress/components';
+import {
+	BaseControl,
+	BoxControl,
+	CustomSelectControl,
+} from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
+import { __experimentalUseCustomUnits as useCustomUnits } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -201,6 +206,10 @@ export function PositionPanelPure( {
 	const allowFixed = hasFixedPositionSupport( blockName );
 	const allowSticky = hasStickyPositionSupport( blockName );
 	const value = style?.position?.type;
+	const [ spacingUnits ] = useSettings( 'spacing.units' );
+	const units = useCustomUnits( {
+		availableUnits: spacingUnits || [ '%', 'px', 'em', 'rem', 'vw' ],
+	} );
 
 	const { firstParentClientId } = useSelect(
 		( select ) => {
@@ -263,6 +272,20 @@ export function PositionPanelPure( {
 		? options.find( ( option ) => option.value === value ) || DEFAULT_OPTION
 		: DEFAULT_OPTION;
 
+	const onChangeSides = ( next ) => {
+		const newStyle = {
+			...style,
+			position: {
+				...style?.position,
+				...next,
+			},
+		};
+
+		setAttributes( {
+			style: cleanEmptyObject( newStyle ),
+		} );
+	};
+
 	// Only display position controls if there is at least one option to choose from.
 	return options.length > 1 ? (
 		<InspectorControls group="position">
@@ -281,6 +304,15 @@ export function PositionPanelPure( {
 						onChangeType( selectedItem.value );
 					} }
 				/>
+				{ value === STICKY_OPTION.value && (
+					<BoxControl
+						label={ __( 'Sticky offset' ) }
+						values={ style?.position }
+						onChange={ onChangeSides }
+						units={ units }
+						sides={ POSITION_SIDES }
+					/>
+				) }
 			</BaseControl>
 		</InspectorControls>
 	) : null;
