@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { createSlotFill } from '@wordpress/components';
-import { useRef } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
@@ -97,7 +97,7 @@ function NotesSidebar( { postId } ) {
 
 	const shouldShowFloatingNotes =
 		showFloatingSidebar &&
-		( unresolvedNotes.length > 0 || selectedNote !== undefined );
+		( unresolvedNotes.length > 0 || selectedNoteId !== undefined );
 	useEnableFloatingSidebar( shouldShowFloatingNotes );
 
 	async function focusNote( {
