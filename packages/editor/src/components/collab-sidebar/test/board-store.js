@@ -58,6 +58,92 @@ describe( 'createBoardStore', () => {
 			expect( store.getBlockRects()[ 12 ].top ).toBe( 100 );
 		} );
 
+		describe( 'pending new note', () => {
+			let blockEl;
+
+			beforeEach( () => {
+				blockEl = document.createElement( 'p' );
+				blockEl.textContent = 'Some longer paragraph text';
+				// Selections only work on nodes attached to the document.
+				document.body.appendChild( blockEl );
+				mockRect( blockEl, 100 );
+			} );
+
+			afterEach( () => {
+				window.getSelection().removeAllRanges();
+				document.body.removeChild( blockEl );
+				// jsdom's Range has no getBoundingClientRect; selectText
+				// defines one, so drop it to keep tests isolated.
+				delete window.Range.prototype.getBoundingClientRect;
+			} );
+
+			function selectText( node, start, end ) {
+				const range = document.createRange();
+				range.setStart( node, start );
+				range.setEnd( node, end );
+				window.Range.prototype.getBoundingClientRect = () => ( {
+					top: 160,
+				} );
+				const selection = window.getSelection();
+				selection.removeAllRanges();
+				selection.addRange( range );
+			}
+
+			it( 'anchors to the text selection it will attach to', () => {
+				selectText( blockEl.firstChild, 5, 11 );
+
+				const store = createBoardStore();
+				store.registerThread(
+					'new',
+					blockEl,
+					document.createElement( 'div' )
+				);
+
+				expect( store.getBlockRects().new.top ).toBe( 160 );
+			} );
+
+			it( 'falls back to the block rect for a collapsed selection', () => {
+				selectText( blockEl.firstChild, 5, 5 );
+
+				const store = createBoardStore();
+				store.registerThread(
+					'new',
+					blockEl,
+					document.createElement( 'div' )
+				);
+
+				expect( store.getBlockRects().new.top ).toBe( 100 );
+			} );
+
+			it( 'falls back to the block rect when the selection is outside the block', () => {
+				const other = document.createElement( 'p' );
+				other.textContent = 'Elsewhere';
+				document.body.appendChild( other );
+				selectText( other.firstChild, 0, 4 );
+
+				const store = createBoardStore();
+				store.registerThread(
+					'new',
+					blockEl,
+					document.createElement( 'div' )
+				);
+
+				expect( store.getBlockRects().new.top ).toBe( 100 );
+				document.body.removeChild( other );
+			} );
+
+			it( 'falls back to the block rect when there is no selection', () => {
+				const store = createBoardStore();
+				store.registerThread(
+					'new',
+					blockEl,
+					document.createElement( 'div' )
+				);
+
+				expect( store.getBlockRects().new.top ).toBe( 100 );
+			} );
+		} );
+
 		it( 'anchors each note to its own marker within the same block', () => {
 			const store = createBoardStore();
 			const blockEl = document.createElement( 'p' );

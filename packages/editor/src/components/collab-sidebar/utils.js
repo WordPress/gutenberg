@@ -223,6 +223,28 @@ export function getNoteMarkerSelector( noteId ) {
 	return `mark.wp-note[data-id="${ escapedId }"]`;
 }
 
+/**
+ * Measure the bounding rect of the current text selection within a block
+ * element, or return null when there is no usable selection (collapsed, or
+ * not fully inside the block). A pending new note has no in-content marker
+ * yet, so the selection it will attach to is the only anchor available for
+ * positioning its floating form.
+ *
+ * @param {HTMLElement} blockEl Block DOM element to resolve the selection in.
+ * @return {?DOMRect} Selection rect, or null.
+ */
+export function getSelectionRect( blockEl ) {
+	const selection = blockEl.ownerDocument.defaultView?.getSelection();
+	if ( ! selection || selection.rangeCount === 0 || selection.isCollapsed ) {
+		return null;
+	}
+	const range = selection.getRangeAt( 0 );
+	if ( ! blockEl.contains( range.commonAncestorContainer ) ) {
+		return null;
+	}
+	return range.getBoundingClientRect();
+}
+
 // Sentinel that sorts a block-level (whole-block) note before any inline note
 // within the same block. Negative so any real character offset (>= 0) ranks
 // after it. Number.NEGATIVE_INFINITY would work too; -1 is enough and keeps
