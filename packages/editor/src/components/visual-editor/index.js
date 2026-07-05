@@ -29,6 +29,7 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import EditTemplateBlocksNotification from './edit-template-blocks-notification';
 import ResizableEditor from '../resizable-editor';
+import { FloatingNotesSlot } from '../collab-sidebar/floating-notes';
 import useSelectNearestEditableBlock from './use-select-nearest-editable-block';
 import {
 	NAVIGATION_POST_TYPE,
@@ -505,6 +506,7 @@ function VisualEditor( {
 					</RecursionProvider>
 				</BlockCanvas>
 			</ResizableEditor>
+			<FloatingNotesSlot />
 		</div>
 	);
 }

@@ -3,7 +3,7 @@
 The Notes sidebar (a.k.a. collab sidebar) lets users attach threaded notes to individual blocks. It renders in two modes:
 
 - **All notes** - a full sidebar (opened from the editor's More menu) listing every note thread on the current post.
-- **Floating notes** - on larger viewports, unresolved notes also float next to their associated blocks in the canvas, positioned to track scroll and avoid overlap.
+- **Floating notes** - on larger viewports, unresolved notes float next to their associated blocks, overlaying space reserved at the right edge of the canvas, positioned to track scroll and avoid overlap. The floating notes are part of the canvas surface: they occupy no sidebar, so they can coexist with the Settings sidebar and leave notices and the canvas scrollbar at the full editor width.
 
 Notes are stored as WordPress comments (`type: 'note'`) attached to the post. A block references its thread via `metadata.noteId` on block attributes. Each thread has a top-level note plus replies; threads can be resolved (stored as status `approved`) or reopened.
 
@@ -23,8 +23,9 @@ collab-sidebar/
 ├── add-note-menu-item.js           AddNoteMenuItem - block-toolbar "Add note" trigger
 ├── note-indicator-toolbar.js       NoteAvatarIndicator - toolbar participants avatars
 ├── floating-container.js           FloatingContainer - stack wrapper that applies `top` in floating mode
+├── floating-notes.js               FloatingNotes - canvas overlay + reserved canvas space (slot fill rendered by VisualEditor)
 │
-├── hooks.js                        useNoteThreads, useNoteActions, useFloatingBoard, useEnableFloatingSidebar
+├── hooks.js                        useNoteThreads, useNoteActions, useFloatingBoard
 ├── utils.js                        focusNoteThread, getNoteExcerpt, sanitizeNoteContent, calculateNotePositions, getAvatarBorderColor
 ├── board-store.js                  createBoardStore - ResizeObserver + ref registry for floating layout
 ├── constants.js                    sidebar identifier strings
@@ -50,15 +51,18 @@ NotesSidebarContainer (index.js)         - gates on post type support
       │                   │         └── NoteByline + actions slot + body children
       │                   ├── Note[]     - replies (when selected)
       │                   └── NoteCard + NoteForm - inline reply form (when selected)
-      └── PluginSidebar (floating)       - floating sidebar (large viewport, unresolved notes)
-           └── Notes (same)              - isFloating
+      └── FloatingNotesFill (floating)   - canvas overlay (large viewport, unresolved notes, "All notes" closed)
+           └── FloatingNotes             - region overlaying the reserved canvas space
+                └── Notes (same)         - isFloating
 ```
 
-`Notes` is reused for both sidebar surfaces. The only visual difference is driven by `isFloating` (whether to layer threads over the canvas or stack them in a panel).
+`Notes` is reused for both surfaces. The only visual difference is driven by `isFloating` (whether to layer threads over the canvas or stack them in a panel).
+
+`FloatingNotes` renders through a `FloatingNotesSlot` placed by `VisualEditor` inside `.editor-visual-editor`, and reserves matching space inside the canvas document (`padding-right` on its `html` element) so content never flows under the panel. Because the space lives inside the canvas, it keeps the canvas background and leaves the canvas scrollbar at the window edge.
 
 ## Floating board
 
-Goal: in the floating sidebar, each unresolved note appears beside its associated block, tracks canvas scroll, and shifts up/down to avoid overlapping with neighbors - all without re-rendering threads as the canvas scrolls.
+Goal: in the floating overlay, each unresolved note appears beside its associated block, tracks canvas scroll, and shifts up/down to avoid overlapping with neighbors - all without re-rendering threads as the canvas scrolls.
 
 Three layers cooperate:
 

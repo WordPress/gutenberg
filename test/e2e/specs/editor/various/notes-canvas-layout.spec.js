@@ -57,16 +57,24 @@ test.describe( 'Notes canvas layout', () => {
 		await expect( notice ).toBeVisible();
 
 		const noticeBox = await notice.boundingBox();
-		const bodyBox = await page
-			.locator( '.interface-interface-skeleton__body' )
+		const canvasBox = await page
+			.locator( 'iframe[name="editor-canvas"]' )
+			.boundingBox();
+		const notesBox = await page
+			.locator( '.editor-collab-sidebar, .editor-collab-sidebar-overlay' )
 			.boundingBox();
 
-		// The notice must reach (nearly) the right edge of the editor body.
-		// A reserved sidebar column leaves a ~280px gap; allow a generous
-		// tolerance for scrollbars and padding.
-		expect(
-			bodyBox.x + bodyBox.width - ( noticeBox.x + noticeBox.width )
-		).toBeLessThan( 40 );
+		// The notice must reach (nearly) the right edge of the visual canvas
+		// surface: the canvas itself plus any notes area painted beside it.
+		// A notes column outside the canvas leaves a ~280px gap; allow a
+		// generous tolerance for scrollbars and padding.
+		const surfaceRight = Math.max(
+			canvasBox.x + canvasBox.width,
+			notesBox.x + notesBox.width
+		);
+		expect( surfaceRight - ( noticeBox.x + noticeBox.width ) ).toBeLessThan(
+			40
+		);
 	} );
 
 	test( 'canvas iframe spans the full editor width when notes are visible', async ( {
@@ -82,15 +90,23 @@ test.describe( 'Notes canvas layout', () => {
 		const canvasBox = await page
 			.locator( 'iframe[name="editor-canvas"]' )
 			.boundingBox();
-		const bodyBox = await page
-			.locator( '.interface-interface-skeleton__body' )
+		const contentBox = await page
+			.locator( '.interface-interface-skeleton__content' )
+			.boundingBox();
+		const notesBox = await page
+			.locator( '.editor-collab-sidebar, .editor-collab-sidebar-overlay' )
 			.boundingBox();
 
 		// The canvas (and therefore its scrollbar) must reach the right
-		// edge of the editor body instead of stopping at a sidebar column.
+		// edge of the editor content area instead of stopping at a notes
+		// column, and the notes must overlay the canvas, not sit beside it.
 		expect(
-			bodyBox.x + bodyBox.width - ( canvasBox.x + canvasBox.width )
+			contentBox.x + contentBox.width - ( canvasBox.x + canvasBox.width )
 		).toBeLessThan( 5 );
+		expect( notesBox.x ).toBeGreaterThanOrEqual( canvasBox.x );
+		expect( notesBox.x + notesBox.width ).toBeLessThanOrEqual(
+			canvasBox.x + canvasBox.width + 1
+		);
 	} );
 
 	test( 'floating notes do not overlap full-width content', async ( {
@@ -118,19 +134,37 @@ test.describe( 'Notes canvas layout', () => {
 			.click( { position: { x: 10, y: 10 } } );
 		await addNote( page, editor, 'Cover note' );
 
+		await expect(
+			page
+				.getByRole( 'region', { name: 'Notes' } )
+				.getByRole( 'treeitem', { name: 'Note: Cover note' } )
+		).toBeVisible();
+
+		// The full-width block must not render (or hit-test) inside the
+		// space reserved for the notes; probe a point inside that area at
+		// the cover's vertical center.
 		const coverBox = await editor.canvas
 			.locator( '[data-type="core/cover"]' )
 			.first()
 			.boundingBox();
-		const threadBox = await page
-			.getByRole( 'region', { name: 'Notes' } )
-			.getByRole( 'treeitem', { name: 'Note: Cover note' } )
+		const canvasBox = await page
+			.locator( 'iframe[name="editor-canvas"]' )
 			.boundingBox();
-
-		// The full-width block must stop before the notes panel begins.
-		expect( coverBox.x + coverBox.width ).toBeLessThanOrEqual(
-			threadBox.x + 1
-		);
+		const probe = {
+			// Canvas-local coordinates, 100px inside the reserved area.
+			x: canvasBox.width - 100,
+			y: coverBox.y - canvasBox.y + coverBox.height / 2,
+		};
+		const hitsCover = await editor.canvas
+			.locator( 'body' )
+			.evaluate( ( body, point ) => {
+				const el = body.ownerDocument.elementFromPoint(
+					point.x,
+					point.y
+				);
+				return !! el?.closest( '[data-type="core/cover"]' );
+			}, probe );
+		expect( hitsCover ).toBe( false );
 	} );
 
 	test( 'floating notes remain visible when the Settings sidebar is open', async ( {

@@ -9,7 +9,7 @@ import {
 	useSyncExternalStore,
 } from '@wordpress/element';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
-import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
@@ -17,14 +17,12 @@ import {
 import { store as noticesStore } from '@wordpress/notices';
 import { getScrollContainer } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
-import { store as interfaceStore } from '@wordpress/interface';
 import { RichTextData, create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-import { FLOATING_NOTES_SIDEBAR } from './constants';
 import { unlock } from '../../lock-unlock';
 import { createBoardStore } from './board-store';
 import { NOTE_FORMAT_NAME } from './format';
@@ -492,36 +490,6 @@ export function useNoteActions() {
 	};
 
 	return { onCreate, onEdit, onDelete };
-}
-
-export function useEnableFloatingSidebar( enabled = false ) {
-	const registry = useRegistry();
-	useEffect( () => {
-		if ( ! enabled ) {
-			return;
-		}
-
-		const { getActiveComplementaryArea } =
-			registry.select( interfaceStore );
-		const { disableComplementaryArea, enableComplementaryArea } =
-			registry.dispatch( interfaceStore );
-
-		const unsubscribe = registry.subscribe( () => {
-			// Return `null` to indicate the user hid the complementary area.
-			if ( getActiveComplementaryArea( 'core' ) === null ) {
-				enableComplementaryArea( 'core', FLOATING_NOTES_SIDEBAR );
-			}
-		} );
-
-		return () => {
-			unsubscribe();
-			if (
-				getActiveComplementaryArea( 'core' ) === FLOATING_NOTES_SIDEBAR
-			) {
-				disableComplementaryArea( 'core', FLOATING_NOTES_SIDEBAR );
-			}
-		};
-	}, [ enabled, registry ] );
 }
 
 export function useFloatingBoard( {
