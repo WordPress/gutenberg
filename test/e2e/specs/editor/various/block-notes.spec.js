@@ -61,11 +61,11 @@ test.describe( 'Block Notes', () => {
 			} )
 			.fill( 'A test comment' );
 		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'region', { name: 'Notes' } )
 			.getByRole( 'button', { name: 'Add note', exact: true } )
 			.click();
 		const thread = page
-			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'region', { name: 'Notes' } )
 			.getByRole( 'treeitem', {
 				name: 'Note: A test comment',
 			} );
@@ -88,7 +88,7 @@ test.describe( 'Block Notes', () => {
 
 		await commentForm.fill( 'Test reply' );
 		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'region', { name: 'Notes' } )
 			.getByRole( 'button', { name: 'Reply', exact: true } )
 			.click();
 		await expect( commentText ).toHaveText( 'Test reply' );
@@ -111,7 +111,7 @@ test.describe( 'Block Notes', () => {
 			.first()
 			.fill( 'Test comment after edit.' );
 		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'region', { name: 'Notes' } )
 			.getByRole( 'button', { name: 'Update', exact: true } )
 			.click();
 
@@ -248,7 +248,7 @@ test.describe( 'Block Notes', () => {
 
 		const threadsContainer = page
 			.getByRole( 'region', {
-				name: 'Editor settings',
+				name: 'Notes',
 			} )
 			.getByRole( 'tree' );
 		const threads = threadsContainer.getByRole( 'treeitem' );
@@ -309,7 +309,7 @@ test.describe( 'Block Notes', () => {
 
 					const thread = page
 						.getByRole( 'region', {
-							name: 'Editor settings',
+							name: 'Notes',
 						} )
 						.getByRole( 'treeitem', {
 							name: 'Note: Test comment',
@@ -356,14 +356,14 @@ test.describe( 'Block Notes', () => {
 
 			const firstThread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Notes',
 				} )
 				.getByRole( 'treeitem', {
 					name: 'Note: One',
 				} );
 			const secondThread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Notes',
 				} )
 				.getByRole( 'treeitem', {
 					name: 'Note: Two',
@@ -399,14 +399,14 @@ test.describe( 'Block Notes', () => {
 
 			const firstThread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Notes',
 				} )
 				.getByRole( 'treeitem', {
 					name: 'Note: One',
 				} );
 			const lastThread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Notes',
 				} )
 				.getByRole( 'treeitem', {
 					name: 'Note: Three',
@@ -432,7 +432,7 @@ test.describe( 'Block Notes', () => {
 
 			const thread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Notes',
 				} )
 				.getByRole( 'treeitem', {
 					name: 'Note: Test comment escape',
@@ -458,7 +458,7 @@ test.describe( 'Block Notes', () => {
 			} );
 
 			const thread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'treeitem', {
 					name: 'Note: Sticky collapse note',
 				} );
@@ -486,7 +486,7 @@ test.describe( 'Block Notes', () => {
 
 			const thread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Notes',
 				} )
 				.getByRole( 'treeitem', {
 					name: 'Note: Test comment',
@@ -511,7 +511,7 @@ test.describe( 'Block Notes', () => {
 
 			const thread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Notes',
 				} )
 				.getByRole( 'treeitem', {
 					name: 'Note: Test comment',
@@ -536,7 +536,7 @@ test.describe( 'Block Notes', () => {
 
 			const thread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Notes',
 				} )
 				.getByRole( 'treeitem' )
 				.first();
@@ -557,7 +557,7 @@ test.describe( 'Block Notes', () => {
 			} );
 			const replyForm = page.getByRole( 'textbox', { name: 'Reply to' } );
 			const replyButton = page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'button', { name: 'Reply', exact: true } );
 
 			await replyForm.fill( 'First reply' );
@@ -579,7 +579,7 @@ test.describe( 'Block Notes', () => {
 
 			const thread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Notes',
 				} )
 				.getByRole( 'treeitem', {
 					name: 'Note: Test comment',
@@ -613,17 +613,17 @@ test.describe( 'Block Notes', () => {
 				comment: 'Third block comment',
 			} );
 			const firstThread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'treeitem', {
 					name: 'Note: First block comment',
 				} );
 			const secondThread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'treeitem', {
 					name: 'Note: Second block comment',
 				} );
 			const thirdThread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'treeitem', {
 					name: 'Note: Third block comment',
 				} );
@@ -686,7 +686,7 @@ test.describe( 'Block Notes', () => {
 			} );
 			await commentForm.fill( 'Test reply' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'button', { name: 'Reply', exact: true } )
 				.click();
 			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Delete', 1 );
@@ -695,7 +695,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'button', { name: 'Delete' } )
 				.click();
 			const thread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'treeitem', {
 					name: 'Note: Test comment',
 				} );
@@ -714,7 +714,7 @@ test.describe( 'Block Notes', () => {
 			} );
 			const thread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Notes',
 				} )
 				.getByRole( 'treeitem', {
 					name: 'Note: Test comment',
@@ -746,7 +746,7 @@ test.describe( 'Block Notes', () => {
 			} );
 			const thread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Notes',
 				} )
 				.getByRole( 'treeitem', {
 					name: 'Note: Test comment',
@@ -785,14 +785,14 @@ test.describe( 'Block Notes', () => {
 			// Test focus on action button when note editing is cancelled.
 			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Edit' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'button', { name: 'Cancel' } )
 				.first()
 				.click();
 
 			await expect(
 				page
-					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'region', { name: 'Notes' } )
 					.getByRole( 'button', { name: 'Actions' } )
 			).toBeFocused();
 
@@ -803,13 +803,13 @@ test.describe( 'Block Notes', () => {
 				.first()
 				.fill( 'Test comment after edit.' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'button', { name: 'Update' } )
 				.click();
 
 			await expect(
 				page
-					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'region', { name: 'Notes' } )
 					.getByRole( 'button', { name: 'Actions' } )
 			).toBeFocused();
 		} );
@@ -829,7 +829,7 @@ test.describe( 'Block Notes', () => {
 				exact: true,
 			} );
 			const thread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'treeitem', {
 					name: 'Note: A test comment',
 				} );
@@ -864,7 +864,7 @@ test.describe( 'Block Notes', () => {
 				exact: true,
 			} );
 			const thread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'treeitem', {
 					name: 'Note: A test comment',
 				} );
@@ -899,12 +899,12 @@ test.describe( 'Block Notes', () => {
 			await expect( newNoteForm ).toBeFocused();
 			await newNoteForm.fill( 'Second note on block' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
 			const settings = page.getByRole( 'region', {
-				name: 'Editor settings',
+				name: 'Notes',
 			} );
 			await expect(
 				settings.getByRole( 'treeitem', {
@@ -939,7 +939,7 @@ test.describe( 'Block Notes', () => {
 
 			// Both notes should be visible.
 			const settings = page.getByRole( 'region', {
-				name: 'Editor settings',
+				name: 'Notes',
 			} );
 			await expect(
 				settings.getByRole( 'treeitem', { name: 'Note: Note to keep' } )
@@ -999,7 +999,7 @@ test.describe( 'Block Notes', () => {
 			await blockNoteUtils.addNote( 'Note B' );
 
 			const settings = page.getByRole( 'region', {
-				name: 'Editor settings',
+				name: 'Notes',
 			} );
 
 			// Resolve Note A.
@@ -1042,7 +1042,7 @@ test.describe( 'Block Notes', () => {
 			await blockNoteUtils.addNote( 'Second note' );
 
 			const settings = page.getByRole( 'region', {
-				name: 'Editor settings',
+				name: 'Notes',
 			} );
 
 			// Resolve the first note.
@@ -1138,7 +1138,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Color me' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
@@ -1207,7 +1207,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Survive the toggle' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
@@ -1252,7 +1252,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Anchored to text' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
@@ -1261,7 +1261,7 @@ test.describe( 'Block Notes', () => {
 			).toBeVisible();
 
 			const thread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'treeitem', { name: 'Note: Anchored to text' } );
 			await expect( thread ).toBeVisible();
 
@@ -1304,7 +1304,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Remove my marker on delete' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
@@ -1349,7 +1349,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Resolve removes my marker' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
@@ -1407,7 +1407,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Just this word' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
@@ -1442,7 +1442,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Pick me' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
@@ -1469,7 +1469,7 @@ test.describe( 'Block Notes', () => {
 			// Selecting the note from the sidebar promotes its marker to the
 			// stronger active alpha (≈0x80/255) via the selected-note rule.
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Notes' } )
 				.getByRole( 'treeitem', { name: 'Note: Pick me' } )
 				.click();
 
@@ -1528,20 +1528,20 @@ class BlockNoteUtils {
 			.getByRole( 'textbox', { name: 'New note', exact: true } )
 			.fill( content );
 		await this.#page
-			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'region', { name: /^Notes$|^Editor settings$/ } )
 			.getByRole( 'button', { name: 'Add note', exact: true } )
 			.click();
 		// Wait for the new thread to appear before returning.
 		await expect(
 			this.#page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: /^Notes$|^Editor settings$/ } )
 				.getByRole( 'treeitem', { name: `Note: ${ content }` } )
 		).toBeVisible();
 	}
 
 	async clickBlockNoteActionMenuItem( actionName, index = 0 ) {
 		await this.#page
-			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'region', { name: /^Notes$|^Editor settings$/ } )
 			.getByRole( 'button', { name: 'Actions' } )
 			.nth( index )
 			.click();
