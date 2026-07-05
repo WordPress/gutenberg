@@ -13,7 +13,7 @@ import {
 } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { url, caption, type, providerNameSlug } = attributes;
+	const { url, caption, type, providerNameSlug, thumbnail } = attributes;
 
 	if ( ! url ) {
 		return null;
@@ -25,10 +25,31 @@ export default function save( { attributes } ) {
 		[ `wp-block-embed-${ providerNameSlug }` ]: providerNameSlug,
 	} );
 
+	const blockProps = useBlockProps.save( { className } );
+
+	if ( thumbnail ) {
+		blockProps[ 'data-thumbnail' ] = thumbnail;
+	}
+
+	const showThumbnail = thumbnail && 'video' === type;
+
 	return (
-		<figure { ...useBlockProps.save( { className } ) }>
+		<figure { ...blockProps }>
 			<div className="wp-block-embed__wrapper">
 				{ `\n${ url }\n` /* URL needs to be on its own line. */ }
+				{ showThumbnail && (
+					<button
+						type="button"
+						className="wp-block-embed__thumbnail-overlay"
+					>
+						<img
+							src={ thumbnail }
+							alt=""
+							className="wp-block-embed__thumbnail-image"
+						/>
+						<div className="wp-block-embed__play-indicator" />
+					</button>
+				) }
 			</div>
 			{ ! RichText.isEmpty( caption ) && (
 				<RichText.Content

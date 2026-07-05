@@ -48,6 +48,38 @@
 	position: relative;
 }
 
+.wp-block-embed__thumbnail-overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 1;
+	background-color: rgba(0, 0, 0, 0.85);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+	cursor: pointer;
+	border: none;
+	padding: 0;
+}
+
+.wp-block-embed__thumbnail-image {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.wp-block-embed__play-indicator {
+	position: absolute;
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-width: 12px 0 12px 20px;
+	border-color: transparent transparent transparent rgba(255, 255, 255, 0.9);
+}
+
 // Add responsiveness to embeds with aspect ratios.
 .wp-embed-responsive .wp-has-aspect-ratio {
 	.wp-block-embed__wrapper::before {

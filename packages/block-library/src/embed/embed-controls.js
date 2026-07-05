@@ -16,6 +16,7 @@ import { pencil } from '@wordpress/icons';
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import PosterImage from '../utils/poster-image';
 
 function getResponsiveHelp( checked ) {
 	return checked
@@ -34,8 +35,15 @@ const EmbedControls = ( {
 	allowResponsive,
 	toggleResponsive,
 	switchBackToURLInput,
+	thumbnail,
+	setAttributes,
+	type,
 } ) => {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
+	const showInspector =
+		( themeSupportsResponsive && blockSupportsResponsive ) ||
+		type === 'video';
 
 	return (
 		<>
@@ -51,31 +59,51 @@ const EmbedControls = ( {
 					) }
 				</ToolbarGroup>
 			</BlockControls>
-			{ themeSupportsResponsive && blockSupportsResponsive && (
+			{ showInspector && (
 				<InspectorControls>
-					<ToolsPanel
-						label={ __( 'Media settings' ) }
-						resetAll={ () => {
-							toggleResponsive( true );
-						} }
-						dropdownMenuProps={ dropdownMenuProps }
-					>
-						<ToolsPanelItem
-							label={ __( 'Media settings' ) }
-							isShownByDefault
-							hasValue={ () => ! allowResponsive }
-							onDeselect={ () => {
-								toggleResponsive( ! allowResponsive );
+					{ type === 'video' && (
+						<ToolsPanel
+							label={ __( 'Thumbnail settings' ) }
+							resetAll={ () => {
+								setAttributes( { thumbnail: undefined } );
 							} }
+							dropdownMenuProps={ dropdownMenuProps }
 						>
-							<ToggleControl
-								label={ __( 'Resize for smaller devices' ) }
-								checked={ allowResponsive }
-								help={ getResponsiveHelp }
-								onChange={ toggleResponsive }
+							<PosterImage
+								poster={ thumbnail }
+								onChange={ ( posterImage ) =>
+									setAttributes( {
+										thumbnail: posterImage?.url,
+									} )
+								}
 							/>
-						</ToolsPanelItem>
-					</ToolsPanel>
+						</ToolsPanel>
+					) }
+					{ themeSupportsResponsive && blockSupportsResponsive && (
+						<ToolsPanel
+							label={ __( 'Media settings' ) }
+							resetAll={ () => {
+								toggleResponsive( true );
+							} }
+							dropdownMenuProps={ dropdownMenuProps }
+						>
+							<ToolsPanelItem
+								label={ __( 'Media settings' ) }
+								isShownByDefault
+								hasValue={ () => ! allowResponsive }
+								onDeselect={ () => {
+									toggleResponsive( ! allowResponsive );
+								} }
+							>
+								<ToggleControl
+									label={ __( 'Resize for smaller devices' ) }
+									checked={ allowResponsive }
+									help={ getResponsiveHelp }
+									onChange={ toggleResponsive }
+								/>
+							</ToolsPanelItem>
+						</ToolsPanel>
+					) }
 				</InspectorControls>
 			) }
 		</>

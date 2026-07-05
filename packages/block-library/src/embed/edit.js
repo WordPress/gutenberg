@@ -42,6 +42,7 @@ const EmbedEdit = ( props ) => {
 			previewable,
 			responsive,
 			url: attributesUrl,
+			thumbnail,
 		},
 		attributes,
 		isSelected,
@@ -273,6 +274,9 @@ const EmbedEdit = ( props ) => {
 				allowResponsive={ allowResponsive }
 				toggleResponsive={ toggleResponsive }
 				switchBackToURLInput={ () => setIsEditingURL( true ) }
+				thumbnail={ thumbnail }
+				setAttributes={ setAttributes }
+				type={ type }
 			/>
 			<figure
 				{ ...blockProps }
@@ -299,6 +303,7 @@ const EmbedEdit = ( props ) => {
 					insertBlocksAfter={ insertBlocksAfter }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
+					thumbnail={ thumbnail }
 				/>
 				<Caption
 					attributes={ attributes }

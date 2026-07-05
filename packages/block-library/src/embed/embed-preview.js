@@ -31,6 +31,7 @@ export default function EmbedPreview( {
 	className,
 	icon,
 	label,
+	thumbnail,
 } ) {
 	const [ interactive, setInteractive ] = useState( false );
 
@@ -82,6 +83,16 @@ export default function EmbedPreview( {
 					type={ sandboxClassnames }
 					onFocus={ hideOverlay }
 				/>
+				{ thumbnail && 'video' === type && ! interactive && (
+					<div className="wp-block-embed__thumbnail-overlay">
+						<img
+							src={ thumbnail }
+							alt={ __( 'Custom thumbnail' ) }
+							className="wp-block-embed__thumbnail-image"
+						/>
+						<div className="wp-block-embed__play-indicator" />
+					</div>
+				) }
 				{ ! interactive && (
 					<div
 						className="block-library-embed__interactive-overlay"

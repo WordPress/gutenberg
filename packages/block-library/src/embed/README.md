@@ -21,6 +21,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `allowResponsive` | `boolean` | `true` | — |
 | `responsive` | `boolean` | `false` | [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `previewable` | `boolean` | `true` | [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `thumbnail` | `string` | — | — |
 
 ## Supports
 
