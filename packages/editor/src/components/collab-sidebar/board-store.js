@@ -1,3 +1,8 @@
+/**
+ * Internal dependencies
+ */
+import { getNoteMarkerSelector } from './utils';
+
 export function createBoardStore() {
 	const listeners = new Set();
 	const blockRefs = new Map();
@@ -72,9 +77,19 @@ export function createBoardStore() {
 		getBlockRects() {
 			// Batch all rect reads before any writes to avoid layout thrashing.
 			return Object.fromEntries(
-				Array.from( blockRefs ).flatMap( ( [ id, el ] ) =>
-					el ? [ [ id, el.getBoundingClientRect() ] ] : []
-				)
+				Array.from( blockRefs ).flatMap( ( [ id, el ] ) => {
+					if ( ! el ) {
+						return [];
+					}
+					// An inline note anchors to its in-content marker so the
+					// thread aligns with the noted text rather than the block.
+					// Resolved at read time because rich-text re-renders
+					// replace the marker element. A marker split into several
+					// runs (crossing overlaps) resolves to its first run.
+					const anchor =
+						el.querySelector( getNoteMarkerSelector( id ) ) ?? el;
+					return [ [ id, anchor.getBoundingClientRect() ] ];
+				} )
 			);
 		},
 

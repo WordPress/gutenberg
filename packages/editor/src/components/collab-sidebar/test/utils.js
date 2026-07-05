@@ -26,6 +26,7 @@ import {
 	pickPrimaryNote,
 	BLOCK_LEVEL_NOTE_START,
 	getInlineMarkerStart,
+	getNoteMarkerSelector,
 } from '../utils';
 
 function makeRect( top ) {
@@ -996,5 +997,22 @@ describe( 'removeNoteFormat', () => {
 				'5'
 			).toHTMLString()
 		).toBe( 'a b c' );
+	} );
+} );
+
+describe( 'getNoteMarkerSelector', () => {
+	it( 'targets the note marker by id', () => {
+		expect( getNoteMarkerSelector( 12 ) ).toBe(
+			'mark.wp-note[data-id="12"]'
+		);
+		expect( getNoteMarkerSelector( '12' ) ).toBe(
+			'mark.wp-note[data-id="12"]'
+		);
+	} );
+
+	it( 'escapes quotes and backslashes', () => {
+		expect( getNoteMarkerSelector( '1"2\\3' ) ).toBe(
+			'mark.wp-note[data-id="1\\"2\\\\3"]'
+		);
 	} );
 } );

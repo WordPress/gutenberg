@@ -207,6 +207,22 @@ export function findNoteInBlock( attributes, noteId ) {
 	return null;
 }
 
+/**
+ * Build the CSS selector matching a note's in-content `core/note` marker in
+ * the editor canvas. The format serializes as `<mark class="wp-note">` with
+ * the note id in `data-id`.
+ *
+ * @param {number|string} noteId Note id the marker carries.
+ * @return {string} Selector for the note's marker element(s).
+ */
+export function getNoteMarkerSelector( noteId ) {
+	// `noteId` is a server comment ID (always a positive integer), but escape
+	// `"`/`\` defensively since it composes a quoted attribute value from
+	// stored data.
+	const escapedId = String( noteId ).replace( /["\\]/g, '\\$&' );
+	return `mark.wp-note[data-id="${ escapedId }"]`;
+}
+
 // Sentinel that sorts a block-level (whole-block) note before any inline note
 // within the same block. Negative so any real character offset (>= 0) ranks
 // after it. Number.NEGATIVE_INFINITY would work too; -1 is enough and keeps
