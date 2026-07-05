@@ -79,7 +79,9 @@ export default function figureContentReducer(
 		nodeToInsert = node.parentNode!;
 	}
 
-	const wrapper = ( nodeToInsert as HTMLElement ).closest( 'p,div' );
+	const wrapper = ( nodeToInsert as HTMLElement ).closest(
+		'p,div,h1,h2,h3,h4,h5,h6'
+	);
 
 	// If wrapped in a paragraph or div, only extract if it's aligned or if
 	// there is no text content.
@@ -97,6 +99,30 @@ export default function figureContentReducer(
 			! wrapper.textContent!.trim()
 		) {
 			wrapFigureContent( nodeToInsert, wrapper );
+		} else if (
+			node.nodeName === 'IMG' &&
+			( ( node as HTMLImageElement ).src.startsWith( 'blob:' ) ||
+				( node as HTMLImageElement ).src.startsWith( 'data:' ) )
+		) {
+			const current = nodeToInsert;
+			while ( current.parentNode && current.parentNode !== wrapper ) {
+				const parent = current.parentNode as Element;
+				const clone = parent.cloneNode( false ) as Element;
+				while ( current.nextSibling ) {
+					clone.appendChild( current.nextSibling );
+				}
+				parent.parentNode!.insertBefore( clone, parent.nextSibling );
+				parent.parentNode!.insertBefore( current, clone );
+			}
+			if ( current.parentNode === wrapper ) {
+				const clone = wrapper.cloneNode( false ) as Element;
+				while ( current.nextSibling ) {
+					clone.appendChild( current.nextSibling );
+				}
+				wrapper.parentNode!.insertBefore( clone, wrapper.nextSibling );
+
+				wrapFigureContent( current, clone );
+			}
 		}
 	} else {
 		wrapFigureContent( nodeToInsert );
