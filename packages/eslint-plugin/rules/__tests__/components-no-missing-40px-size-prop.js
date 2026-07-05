@@ -96,7 +96,6 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 		{
 			code: `
 				import {
-					CustomSelectControl,
 					InputControl,
 					NumberControl,
 					RangeControl,
@@ -104,7 +103,6 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 					ToggleGroupControl,
 				} from '@wordpress/components';
 				<>
-					<CustomSelectControl __next40pxDefaultSize />
 					<FormTokenField />
 					<InputControl __next40pxDefaultSize />
 					<NumberControl __next40pxDefaultSize />
