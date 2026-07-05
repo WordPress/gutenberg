@@ -278,13 +278,32 @@ export default function RichTextControl( {
 	// so we merge its `ref` into the contenteditable below and render the
 	// returned popover. With no `completers` it does no work and renders
 	// nothing, keeping the control zero-cost for consumers that don't opt in.
-	const { ref: autocompleteRef, ...autocompleteProps } = useAutocompleteProps(
-		{
-			completers,
-			record: value,
-			onChange: onRichTextChange,
-		}
-	);
+	// The hook anchors its popover to its own internal ref and overrides
+	// whatever `contentRef` is passed, but the parameter type requires one.
+	const unusedContentRef = useRef< HTMLElement >( null );
+	const {
+		ref: autocompleteRef,
+		'aria-activedescendant': autocompleteActiveDescendant,
+		'aria-autocomplete': autocompleteAriaAutocomplete,
+		...autocompleteRest
+	} = useAutocompleteProps( {
+		completers,
+		record: value,
+		onChange: onRichTextChange,
+		// This control's completers insert their completion into the value;
+		// none replace the whole value, so the required `onReplace` is a
+		// no-op here.
+		onReplace: () => {},
+		contentRef: unusedContentRef,
+	} );
+	// Normalize the hook's loosely-typed aria values for the DOM element:
+	// `aria-activedescendant` may be `null` (React wants `undefined`) and
+	// `aria-autocomplete` is only ever `'list'` or `undefined` at runtime.
+	const autocompleteProps = {
+		...autocompleteRest,
+		'aria-activedescendant': autocompleteActiveDescendant ?? undefined,
+		'aria-autocomplete': autocompleteAriaAutocomplete as 'list' | undefined,
+	};
 
 	const { baseControlProps, controlProps } = useBaseControlProps( {
 		id,
