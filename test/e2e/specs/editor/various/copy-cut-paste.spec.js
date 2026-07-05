@@ -374,6 +374,33 @@ test.describe( 'Copy/cut/paste', () => {
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	test( 'should paste single line text over partial cross-block selection', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'first paragraph' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'second paragraph' );
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		// Partial select: " paragraph" from the first block and "second"
+		// from the second block.
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 7 } );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 8 } );
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
+		await pageUtils.pressKeys( 'shift+ArrowRight', { times: 6 } );
+		// Paste a single line of plain text over the partial selection.
+		pageUtils.setClipboardData( {
+			html: 'REPLACEMENT',
+			plainText: 'REPLACEMENT',
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	test( 'should cut partial selection and merge like a normal `delete` - not forward', async ( {
 		editor,
 		page,
