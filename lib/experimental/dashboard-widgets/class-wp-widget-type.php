@@ -98,6 +98,16 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 		public $description = null;
 
 		/**
+		 * Contextual help note: `content` plus optional `links`.
+		 * Translated at registration time using the widget's text domain.
+		 *
+		 * Null when the widget did not declare the field.
+		 *
+		 * @var array|null
+		 */
+		public $help = null;
+
+		/**
 		 * Alternative terms used to match the widget type when searching,
 		 * e.g. "calendar" for an events widget. Translated at registration
 		 * time using the widget's text domain.
