@@ -47,7 +47,7 @@ jobs:
                       os: 'macos-15'
 
         steps:
-            - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+            - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -73,6 +73,19 @@ jobs:
             - name: Lint package.json files
               run: npm run lint:pkg-json
 
+            - name: Lint dependency versions across workspaces
+              run: npm run lint:deps
+
+            - name: Check root dependencies
+              if: ${{ matrix.annotations && github.event_name == 'pull_request' }}
+              env:
+                  BASE_SHA: ${{ github.event.pull_request.base.sha }}
+              # Fetch just the base commit so the check can read its
+              # package.json without a costly full-history checkout.
+              run: |
+                  git fetch --no-tags --depth=1 origin "$BASE_SHA"
+                  npm run --workspace @wordpress/validation-tools check-root-dependencies -- --base "$BASE_SHA"
+
             - name: Lint package-lock.json file
               run: npm run lint:lockfile
 
@@ -81,7 +94,9 @@ jobs:
 
             - name: Lint JavaScript
               if: ${{ matrix.annotations }}
-              run: npm run lint:js -- --format compact
+              # `--quiet` reports only errors so they aren't buried under warnings in the CI log.
+              # `--prune-suppressions` ensures `suppressions.json` stays in sync.
+              run: npm run lint:js -- --format compact --quiet --prune-suppressions
 
             - name: Lint Styles
               if: ${{ matrix.annotations }}
@@ -89,6 +104,10 @@ jobs:
 
             - name: Type checking
               run: npm run build
+
+            - name: Audit published dependencies
+              if: ${{ matrix.annotations }}
+              run: npm run lint:published-deps -- --fail-unused-ignores
 
             - name: Check local changes
               run: npm run other:check-local-changes

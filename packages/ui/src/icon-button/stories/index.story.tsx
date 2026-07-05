@@ -87,21 +87,23 @@ export const Disabled: Story = {
 export const WithDifferentIcons: Story = {
 	...Default,
 	render: ( args ) => (
-		<div
-			style={ {
-				display: 'flex',
-				gap: '1rem',
-				alignItems: 'center',
-				flexWrap: 'wrap',
-			} }
-		>
-			<IconButton { ...args } icon={ wordpress } label="WordPress" />
-			<IconButton { ...args } icon={ plus } label="Add" />
-			<IconButton { ...args } icon={ pencil } label="Edit" />
-			<IconButton { ...args } icon={ trash } label="Delete" />
-			<IconButton { ...args } icon={ download } label="Download" />
-			<IconButton { ...args } icon={ upload } label="Upload" />
-		</div>
+		<Tooltip.Provider>
+			<div
+				style={ {
+					display: 'flex',
+					gap: '1rem',
+					alignItems: 'center',
+					flexWrap: 'wrap',
+				} }
+			>
+				<IconButton { ...args } icon={ wordpress } label="WordPress" />
+				<IconButton { ...args } icon={ plus } label="Add" />
+				<IconButton { ...args } icon={ pencil } label="Edit" />
+				<IconButton { ...args } icon={ trash } label="Delete" />
+				<IconButton { ...args } icon={ download } label="Download" />
+				<IconButton { ...args } icon={ upload } label="Upload" />
+			</div>
+		</Tooltip.Provider>
 	),
 };
 

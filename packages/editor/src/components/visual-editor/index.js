@@ -14,7 +14,6 @@ import {
 	useSettings,
 	RecursionProvider,
 	privateApis as blockEditorPrivateApis,
-	__experimentalUseResizeCanvas as useResizeCanvas,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -112,6 +111,7 @@ function VisualEditor( {
 		postType,
 		isPreview,
 		styles,
+		hasCanvasWidth,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostId,
@@ -120,6 +120,7 @@ function VisualEditor( {
 			getEditorSettings,
 			getRenderingMode,
 			getDeviceType,
+			getCanvasWidth,
 		} = unlock( select( editorStore ) );
 		const { getPostType, getEditedEntityRecord } = select( coreStore );
 		const postTypeSlug = getCurrentPostType();
@@ -161,6 +162,7 @@ function VisualEditor( {
 			postType: postTypeSlug,
 			isPreview: editorSettings.isPreviewMode,
 			styles: editorSettings.styles,
+			hasCanvasWidth: getCanvasWidth() !== undefined,
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -185,7 +187,6 @@ function VisualEditor( {
 	}, [] );
 
 	const localRef = useRef();
-	const deviceStyles = useResizeCanvas( deviceType );
 	const [ globalLayoutSettings ] = useSettings( 'layout' );
 
 	// fallbackLayout is used if there is no Post Content,
@@ -319,17 +320,19 @@ function VisualEditor( {
 		.is-root-container.alignfull:where(.is-layout-flow) > :not(.alignleft):not(.alignright) { max-width: none;}`;
 
 	const enableResizing =
-		[
+		( [
 			NAVIGATION_POST_TYPE,
 			TEMPLATE_PART_POST_TYPE,
 			PATTERN_POST_TYPE,
 		].includes( postType ) &&
-		// Disable in previews / view mode.
-		! isPreview &&
-		// Disable resizing in mobile viewport.
-		! isMobileViewport &&
-		// Disable resizing in zoomed-out mode.
-		! isZoomedOut;
+			// Disable in previews / view mode.
+			! isPreview &&
+			// Disable resizing in mobile viewport.
+			! isMobileViewport &&
+			// Disable resizing in zoomed-out mode.
+			! isZoomedOut ) ||
+		// When the canvas has an explicit width, always allow resizing.
+		hasCanvasWidth;
 
 	const isNavigationPreview = postType === NAVIGATION_POST_TYPE && isPreview;
 
@@ -394,8 +397,12 @@ function VisualEditor( {
 				'edit-post-visual-editor',
 				className,
 				{
-					'has-padding': isFocusedEntity || enableResizing,
-					'is-resizable': enableResizing,
+					// Vertical padding frames a width-constrained canvas
+					// (device preview or after a resize) as a centered preview.
+					'has-vertical-padding': isFocusedEntity || hasCanvasWidth,
+					// Horizontal padding leaves room for the resize handles
+					// that appear on the left/right of a resizable canvas.
+					'has-horizontal-padding': isFocusedEntity || enableResizing,
 					'is-iframed': ! disableIframe,
 				}
 			) }
@@ -409,10 +416,7 @@ function VisualEditor( {
 					height="100%"
 					iframeProps={ {
 						...iframeProps,
-						style: {
-							...iframeProps?.style,
-							...deviceStyles,
-						},
+						style: iframeProps?.style,
 					} }
 				>
 					{ themeSupportsLayout &&

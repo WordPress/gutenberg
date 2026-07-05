@@ -2,7 +2,8 @@
  * Build verification test for WASM inlining in the vips package.
  *
  * This test verifies that the build process correctly inlines WASM files
- * as base64 data URLs in the vips package output.
+ * into the vips package output as a compact UTF-8 binary string that is
+ * decoded back to a `Uint8Array` at runtime (rather than a base64 data URL).
  */
 
 /**
@@ -30,11 +31,19 @@ test.describe( 'WASM Inlining (build verification)', () => {
 		buildContent = fs.readFileSync( buildModulePath, 'utf8' );
 	} );
 
-	test( 'should inline vips.wasm as base64 data URL', () => {
-		// Verify the main vips.wasm is inlined
-		// Variable name: vips_default (from wasm-vips/vips.wasm)
+	test( 'should inline vips.wasm as a decoded Uint8Array, not a base64 data URL', () => {
+		// `vips_default` is the inlined `wasm-vips/vips.wasm` export. It is now a
+		// `Uint8Array` decoded from a compact UTF-8 string at runtime, so the
+		// inlined bytes compress well.
+		expect( buildContent ).toMatch( /var vips_default\s*=\s*\w+;/ );
+
+		// It must no longer be the old base64 data URL string.
+		expect( buildContent ).not.toMatch( /data:application\/wasm;base64,/ );
+
+		// The runtime decode loop converts the inlined string into bytes.
+		expect( buildContent ).toMatch( /new Uint8Array\(\s*\w+\.length\s*\)/ );
 		expect( buildContent ).toMatch(
-			/var vips_default\s*=\s*"data:application\/wasm;base64,/
+			/\w+\[\s*i\s*\]\s*=\s*\w+\.charCodeAt\(\s*i\s*\);/
 		);
 	} );
 

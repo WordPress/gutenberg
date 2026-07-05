@@ -275,7 +275,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 		// If there are settings changes, we need to update both styles and
 		// settings atomically to avoid race conditions.
 		if ( newSettings?.typography ) {
-			// Build the state-aware path so that viewport styles (e.g. mobile)
+			// Build the state-aware path so that viewport styles (e.g. @mobile)
 			// are written to the correct sub-path and do not overwrite the default.
 			const stylePathForState = [ prefix, stateParam ]
 				.filter( Boolean )
@@ -364,12 +364,16 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					</VStack>
 				</div>
 			) }
-			{ hasColorPanel && (
-				<StylesColorPanel
+			{ hasTypographyPanel && (
+				<StylesTypographyPanel
 					inheritedValue={ inheritedStyle }
 					value={ style }
-					onChange={ setStyle }
+					onChange={ onChangeTypography }
 					settings={ settings }
+					// Only expose global-settings controls (e.g. "Indent all
+					// paragraphs") when not editing a state-specific variation,
+					// because those settings are global and cannot be per-breakpoint.
+					isGlobalStyles={ ! hasSelectedState }
 				/>
 			) }
 			{ hasBackgroundPanel && (
@@ -381,16 +385,13 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
 				/>
 			) }
-			{ hasTypographyPanel && (
-				<StylesTypographyPanel
-					inheritedValue={ inheritedStyle }
-					value={ style }
-					onChange={ onChangeTypography }
+			{ shouldShowFiltersPanel && (
+				<StylesFiltersPanel
+					inheritedValue={ inheritedStyleWithLayout }
+					value={ styleWithLayout }
+					onChange={ setStyle }
 					settings={ settings }
-					// Only expose global-settings controls (e.g. "Indent all
-					// paragraphs") when not editing a state-specific variation,
-					// because those settings are global and cannot be per-breakpoint.
-					isGlobalStyles={ ! hasSelectedState }
+					includeLayoutControls
 				/>
 			) }
 			{ hasDimensionsPanel && (
@@ -410,13 +411,12 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					settings={ settings }
 				/>
 			) }
-			{ shouldShowFiltersPanel && (
-				<StylesFiltersPanel
-					inheritedValue={ inheritedStyleWithLayout }
-					value={ styleWithLayout }
+			{ hasColorPanel && (
+				<StylesColorPanel
+					inheritedValue={ inheritedStyle }
+					value={ style }
 					onChange={ setStyle }
 					settings={ settings }
-					includeLayoutControls
 				/>
 			) }
 			{ hasImageSettingsPanel && ! hasSelectedState && (

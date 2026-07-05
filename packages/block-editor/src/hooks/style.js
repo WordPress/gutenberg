@@ -19,7 +19,8 @@ import { getCSSRules, compileCSS } from '@wordpress/style-engine';
  */
 import { BACKGROUND_SUPPORT_KEY, BackgroundImagePanel } from './background';
 import { BORDER_SUPPORT_KEY, BorderPanel, SHADOW_SUPPORT_KEY } from './border';
-import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
+import { COLOR_SUPPORT_KEY } from './color';
+import { ElementsEdit } from './elements';
 import {
 	TypographyPanel,
 	TYPOGRAPHY_SUPPORT_KEY,
@@ -29,6 +30,7 @@ import {
 	DIMENSIONS_SUPPORT_KEY,
 	SPACING_SUPPORT_KEY,
 	DimensionsPanel,
+	isExplicitAspectRatio,
 } from './dimensions';
 import {
 	cleanEmptyObject,
@@ -56,8 +58,8 @@ const BORDER_SIDES = [ 'Top', 'Right', 'Bottom', 'Left' ];
 // Keep in sync with WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS and
 // packages/global-styles-engine/src/core/render.tsx.
 const RESPONSIVE_BREAKPOINTS = {
-	mobile: '@media (width <= 480px)',
-	tablet: '@media (480px < width <= 782px)',
+	'@mobile': '@media (width <= 480px)',
+	'@tablet': '@media (480px < width <= 782px)',
 };
 
 const styleSupportKeys = [
@@ -135,6 +137,72 @@ function getStateFallbackBorderStyles( stateStyles ) {
 }
 
 /**
+ * Returns background reset CSS for a state that sets a solid background color.
+ *
+ * When a state sets `color.background` (a solid color) without also setting a
+ * gradient (`color.gradient` or `background.gradient`), any gradient applied to
+ * the default state via an inline `background` shorthand or `background-image`
+ * declaration must be explicitly cleared. Without this, the gradient image layer
+ * remains visible even though the solid hover color wins `background-color`.
+ *
+ * @param {Object} stateStyles State style object.
+ * @param {string} selector    CSS selector for the generated style.
+ * @return {string|undefined} CSS string with background-image reset, or undefined.
+ */
+function getStateBackgroundResetCSS( stateStyles, selector ) {
+	const hasSolidBackground = !! stateStyles?.color?.background;
+
+	if ( ! hasSolidBackground ) {
+		return undefined;
+	}
+
+	const hasColorGradient = !! stateStyles?.color?.gradient;
+	const hasBackgroundGradient =
+		!! stateStyles?.background?.gradient ||
+		!! stateStyles?.background?.backgroundImage;
+
+	if ( hasColorGradient || hasBackgroundGradient ) {
+		return undefined;
+	}
+
+	const declaration = 'background-image: unset !important';
+	return selector
+		? `${ selector } { ${ declaration }; }`
+		: `${ declaration };`;
+}
+
+/**
+ * Returns fallback dimension styles that keep state styles aligned with the
+ * default dimensions block-support output.
+ *
+ * @param {Object} stateStyles State style object.
+ * @return {Object|undefined} Style object containing fallback dimension styles.
+ */
+function getStateFallbackDimensionStyles( stateStyles ) {
+	const dimensions = stateStyles?.dimensions;
+	if ( ! dimensions ) {
+		return undefined;
+	}
+
+	if ( isExplicitAspectRatio( dimensions.aspectRatio ) ) {
+		return {
+			dimensions: {
+				minHeight: 'unset',
+				height: 'unset',
+			},
+		};
+	}
+
+	if ( dimensions.minHeight || dimensions.height ) {
+		return {
+			dimensions: {
+				aspectRatio: 'unset',
+			},
+		};
+	}
+}
+
+/**
  * Generates CSS for a block instance state style object.
  *
  * State declarations need to win over preset utility classes, but fallback
@@ -146,14 +214,25 @@ function getStateFallbackBorderStyles( stateStyles ) {
  * @return {string} Generated stylesheet.
  */
 export function getStateStylesCSS( stateStyles, selector ) {
-	const css = compileCSS( stateStyles, { selector } );
+	const fallbackDimensionStyles =
+		getStateFallbackDimensionStyles( stateStyles );
+	const stylesWithDimensionFallbacks = fallbackDimensionStyles
+		? mergeStyleObjects( stateStyles, fallbackDimensionStyles )
+		: stateStyles;
+	const css = compileCSS( stylesWithDimensionFallbacks, { selector } );
 	const importantCSS = css ? css.replace( /;/g, ' !important;' ) : undefined;
 	const fallbackBorderStyles = getStateFallbackBorderStyles( stateStyles );
 	const fallbackCSS = fallbackBorderStyles
 		? compileCSS( fallbackBorderStyles, { selector } )
 		: undefined;
+	const backgroundResetCSS = getStateBackgroundResetCSS(
+		stateStyles,
+		selector
+	);
 
-	return [ importantCSS, fallbackCSS ].filter( Boolean ).join( '\n' );
+	return [ importantCSS, fallbackCSS, backgroundResetCSS ]
+		.filter( Boolean )
+		.join( '\n' );
 }
 
 function isPlainObject( value ) {
@@ -341,7 +420,10 @@ export function getResponsiveStateCSSRules( style, name, baseSelector ) {
 
 	Object.entries( RESPONSIVE_BREAKPOINTS ).forEach(
 		( [ viewport, mediaQuery ] ) => {
-			const viewportStyles = style?.[ viewport ];
+			const viewportStyles = getStyleForState( style, {
+				viewport,
+				pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
+			} );
 			if ( ! viewportStyles ) {
 				return;
 			}
@@ -386,8 +468,8 @@ export function getResponsiveStateCSSRules( style, name, baseSelector ) {
  * Returns the style value used to force-preview a selected state on canvas.
  *
  * Responsive pseudo states inherit from their default-viewport pseudo state.
- * For example, selecting `mobile + :hover` should preview styles from
- * `:hover`, with `mobile.:hover` values layered on top when present.
+ * For example, selecting `@mobile + :hover` should preview styles from
+ * `:hover`, with `@mobile.:hover` values layered on top when present.
  *
  * @param {Object} style         Block style object.
  * @param {Object} selectedState Selected block style state.
@@ -770,7 +852,7 @@ function BlockStyleControls( {
 
 	return (
 		<BlockStyleStateProvider value={ selectedState }>
-			<ColorEdit { ...passedProps } />
+			<ElementsEdit { ...passedProps } />
 			<BackgroundImagePanel { ...passedProps } />
 			<TypographyPanel { ...passedProps } />
 			<BorderPanel { ...passedProps } />

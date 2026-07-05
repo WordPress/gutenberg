@@ -5,6 +5,7 @@
  */
 import spawn from 'cross-spawn';
 import { fileURLToPath } from 'url';
+import { parseArgs } from 'util';
 import path from 'path';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
@@ -78,24 +79,42 @@ function exec( command, args = [], options = {} ) {
  * Main build orchestration function.
  */
 async function build() {
-	const skipTypes = process.argv.includes( '--skip-types' );
+	const { values } = parseArgs( {
+		options: {
+			'skip-types': { type: 'boolean', default: false },
+		},
+		strict: false,
+	} );
+	const skipTypes = values[ 'skip-types' ];
 
 	console.log( '🔨 Starting build process...\n' );
 
 	const startTime = Date.now();
 
 	try {
-		// Step 0: Verify node_modules is in sync with package-lock.json
-		console.log( '🔍 Checking dependencies...' );
-		await exec( 'npm', [
-			'run',
-			'check-installed-deps',
-			'--workspace',
-			'@wordpress/validation-tools',
-			'--silent',
-		] ).catch( () => {
-			throw new Error( 'Run `npm install` to update.' );
-		} );
+		/*
+		 * Step 0: Verify node_modules is in sync with package-lock.json.
+		 *
+		 * GUTENBERG_CHECK_INSTALLED_DEPS controls when this runs:
+		 *   - `BEFORE_BUILD` (default): pre-build gate.
+		 *   - `NEVER`: skip entirely (sticky opt-out for power users).
+		 */
+		if ( process.env.GUTENBERG_CHECK_INSTALLED_DEPS === 'NEVER' ) {
+			console.log(
+				'🔍 Skipping dependency check (GUTENBERG_CHECK_INSTALLED_DEPS=NEVER).'
+			);
+		} else {
+			console.log( '🔍 Checking dependencies...' );
+			await exec( 'npm', [
+				'run',
+				'check-installed-deps',
+				'--workspace',
+				'@wordpress/validation-tools',
+				'--silent',
+			] ).catch( () => {
+				throw new Error( 'Run `npm install` to update.' );
+			} );
+		}
 
 		console.log( '\n🧹 Cleaning packages...' );
 		await exec( 'npm', [ 'run', 'clean:packages' ], { silent: true } );

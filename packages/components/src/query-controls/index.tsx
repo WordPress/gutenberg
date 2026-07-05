@@ -139,7 +139,6 @@ export function QueryControls( {
 					props.categoriesList &&
 					props.onCategoryChange && (
 						<CategorySelect
-							__next40pxDefaultSize
 							key="query-controls-category-select"
 							categoriesList={ props.categoriesList }
 							label={ __( 'Category' ) }
@@ -152,7 +151,6 @@ export function QueryControls( {
 					props.categorySuggestions &&
 					props.onCategoryChange && (
 						<FormTokenField
-							__next40pxDefaultSize
 							key="query-controls-categories-select"
 							label={ __( 'Categories' ) }
 							value={
@@ -175,7 +173,6 @@ export function QueryControls( {
 					),
 				onAuthorChange && (
 					<AuthorSelect
-						__next40pxDefaultSize
 						key="query-controls-author-select"
 						authorList={ authorList }
 						label={ __( 'Author' ) }
@@ -186,7 +183,6 @@ export function QueryControls( {
 				),
 				onNumberOfItemsChange && (
 					<RangeControl
-						__next40pxDefaultSize
 						key="query-controls-range-control"
 						label={ __( 'Number of items' ) }
 						value={ numberOfItems }

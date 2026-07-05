@@ -23,9 +23,11 @@ const ALLOWLIST = {
 			'EmptyState',
 			'Icon',
 			'Link',
+			'Skeleton',
 			'Stack',
 			'Tabs',
 			'Text',
+			'Tooltip',
 			'VisuallyHidden',
 		],
 		message:
@@ -60,6 +62,7 @@ const DENYLIST = {
 		CardMedia: 'Use `Card.FullBleed` from `@wordpress/ui` instead.',
 		TabPanel: 'Use `Tabs` from `@wordpress/ui` instead.',
 		Tabs: 'Use `Tabs` from `@wordpress/ui` instead.',
+		Tooltip: 'Use `Tooltip` from `@wordpress/ui` instead.',
 		VisuallyHidden: 'Use `{{ name }}` from `@wordpress/ui` instead.',
 	},
 };

@@ -1,0 +1,63 @@
+{
+	"name": "@wordpress/video-conversion",
+	"version": "0.1.0",
+	"description": "Client-side video conversion for WordPress. Currently converts animated GIFs to MP4/WebM via WebCodecs.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"media",
+		"video",
+		"webcodecs",
+		"gif"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/video-conversion/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/video-conversion"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"files": [
+		"src",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"type": "module",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs"
+		},
+		"./worker": {
+			"types": "./build-types/video-conversion-worker.d.ts",
+			"import": "./build-module/video-conversion-worker.mjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpWorkers": {
+		"./worker": {
+			"entry": "./src/worker.ts"
+		}
+	},
+	"wpScriptModuleExports": {
+		"./worker": "./build-module/video-conversion-worker.mjs",
+		"./loader": "./build-module/loader.mjs"
+	},
+	"types": "build-types",
+	"dependencies": {
+		"@wordpress/worker-threads": "file:../worker-threads",
+		"mediabunny": "^1.45.2"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}
