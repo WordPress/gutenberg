@@ -16,7 +16,11 @@ import { unlock } from '../../lock-unlock';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 import { getAvatarUrl } from './get-avatar-url';
 import { useDebouncedRecompute } from './use-debounced-recompute';
-import { getBlocksBetween, isNodeBefore } from './cursor-dom-utils';
+import {
+	blockContainerOf,
+	getBlocksBetween,
+	isNodeBefore,
+} from './cursor-dom-utils';
 
 const { useActiveCollaborators, useResolvedSelection } =
 	unlock( coreDataPrivateApis );
@@ -183,30 +187,64 @@ export function useBlockHighlighting(
 				const endEl = blockEditorDocument.querySelector< HTMLElement >(
 					`[data-block="${ endId }"]`
 				);
-				let firstId = startId;
-				let lastId = endId;
+				let firstEl = startEl;
+				let lastEl = endEl;
 				if ( startEl && endEl && isNodeBefore( endEl, startEl ) ) {
-					firstId = endId;
-					lastId = startId;
+					firstEl = endEl;
+					lastEl = startEl;
+				}
+
+				// Promote inner blocks (e.g. list-items) to their nearest
+				// [data-block] ancestor so the whole container is treated as one
+				// visual unit rather than highlighting each inner block separately.
+				const effectiveFirstEl = firstEl
+					? blockContainerOf( firstEl )
+					: null;
+				const effectiveLastEl = lastEl
+					? blockContainerOf( lastEl )
+					: null;
+				const effectiveFirstId =
+					effectiveFirstEl?.getAttribute( 'data-block' ) ?? startId;
+				const effectiveLastId =
+					effectiveLastEl?.getAttribute( 'data-block' ) ?? endId;
+
+				// Both endpoints in the same container (e.g. two list-items in one list).
+				if ( effectiveFirstId === effectiveLastId ) {
+					return [
+						{
+							blockId: effectiveFirstId,
+							color,
+							userName,
+							avatarUrl,
+							alwaysOutline: false,
+						},
+					];
 				}
 
 				const intermediateIds = getBlocksBetween(
-					startId,
-					endId,
+					effectiveFirstId,
+					effectiveLastId,
 					blockEditorDocument
 				)
+					.filter(
+						( el ) =>
+							! effectiveFirstEl?.contains( el ) &&
+							! effectiveLastEl?.contains( el )
+					)
 					.map( ( el ) => el.getAttribute( 'data-block' ) )
 					.filter( ( id ): id is string => Boolean( id ) );
 
-				return [ firstId, ...intermediateIds, lastId ].map(
-					( blockId ) => ( {
-						blockId,
-						color,
-						userName,
-						avatarUrl,
-						alwaysOutline: false,
-					} )
-				);
+				return [
+					effectiveFirstId,
+					...intermediateIds,
+					effectiveLastId,
+				].map( ( blockId ) => ( {
+					blockId,
+					color,
+					userName,
+					avatarUrl,
+					alwaysOutline: false,
+				} ) );
 			} )
 			.filter( ( block ) => {
 				if ( seen.has( block.blockId ) ) {

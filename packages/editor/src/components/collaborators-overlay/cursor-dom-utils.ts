@@ -187,6 +187,19 @@ export const getSelectionRects = (
 };
 
 /**
+ * Return the nearest [data-block] ancestor of el, or el itself if it has none.
+ *
+ * Used to promote inner blocks (e.g. list-items) to their parent container
+ * (e.g. the list block) so the whole container is treated as one visual unit
+ * rather than each child block being highlighted individually.
+ *
+ * @param el - The block element to promote.
+ * @return The nearest [data-block] ancestor, or el itself.
+ */
+export const blockContainerOf = ( el: HTMLElement ): HTMLElement =>
+	el.parentElement?.closest< HTMLElement >( '[data-block]' ) ?? el;
+
+/**
  * Finds all block elements between two blocks in DOM order (exclusive of
  * start and end). Descendant blocks are filtered out — if a parent block is
  * already in the result, its children are skipped. This prevents

@@ -6,6 +6,7 @@ import type {
 
 import { unlock } from '../../lock-unlock';
 import {
+	blockContainerOf,
 	getCursorPosition,
 	getBlocksBetween,
 	getSelectionRects,
@@ -276,22 +277,51 @@ function computeMultiBlockOverlayRects(
 		[ docFirstEl, docLastEl ] = [ docLastEl, docFirstEl ];
 	}
 
+	// Promote inner blocks (e.g. list-items) to their nearest [data-block]
+	// ancestor. Without this, sibling inner blocks between the endpoint and the
+	// other end of the selection (e.g. the remaining list-items) appear as
+	// individual middle blocks, each getting its own highlight rect instead of
+	// one rect covering the whole list.
+	const effectiveFirstEl = blockContainerOf( docFirstEl );
+	const effectiveLastEl = blockContainerOf( docLastEl );
+	const effectiveFirstId =
+		effectiveFirstEl.getAttribute( 'data-block' ) ?? '';
+	const effectiveLastId = effectiveLastEl.getAttribute( 'data-block' ) ?? '';
+
+	// When both endpoints are inner blocks of the same container, show that
+	// container as a single unit (e.g. selecting across list-items within one list).
+	if ( effectiveFirstId && effectiveFirstId === effectiveLastId ) {
+		return effectiveFirstEl.innerText?.trim()
+			? {
+					selectionRects: [
+						blockBoundingRect( effectiveFirstEl, overlayRect ),
+					],
+			  }
+			: {};
+	}
+
 	const middleEls = getBlocksBetween(
-		( docFirstEl.getAttribute( 'data-block' ) ?? '' ) as string,
-		( docLastEl.getAttribute( 'data-block' ) ?? '' ) as string,
+		effectiveFirstId,
+		effectiveLastId,
 		editorDocument
+	).filter(
+		( el ) =>
+			! effectiveFirstEl.contains( el ) &&
+			! effectiveLastEl.contains( el )
 	);
 
 	const MAX = Number.MAX_SAFE_INTEGER;
 	const rects: SelectionRect[] = [];
 
-	// First block — full bounding-box when the selection starts at offset 0 or
-	// this is a WholeBlock endpoint (no character position). When the cursor
-	// starts mid-block, use text-level rects so only the selected portion shows.
-	if ( docFirstEl.innerText?.trim() ) {
-		const firstOffset = docFirst.richTextOffset;
+	// First block — use effectiveFirstEl (the container when promoted).
+	// When the endpoint was promoted (e.g. list-item → list), always show the
+	// full bounding-box because the cursor offset is relative to the inner block,
+	// not the container. When not promoted, apply the normal partial/full logic.
+	if ( effectiveFirstEl.innerText?.trim() ) {
+		const wasPromoted = effectiveFirstEl !== docFirstEl;
+		const firstOffset = wasPromoted ? null : docFirst.richTextOffset;
 		if ( firstOffset === null || firstOffset === 0 ) {
-			rects.push( blockBoundingRect( docFirstEl, overlayRect ) );
+			rects.push( blockBoundingRect( effectiveFirstEl, overlayRect ) );
 		} else {
 			const el = resolveTargetElement( editorDocument, docFirst );
 			const textRects = el
@@ -305,7 +335,7 @@ function computeMultiBlockOverlayRects(
 				: null;
 			rects.push(
 				...( textRects ?? [
-					blockBoundingRect( docFirstEl, overlayRect ),
+					blockBoundingRect( effectiveFirstEl, overlayRect ),
 				] )
 			);
 		}
@@ -318,13 +348,12 @@ function computeMultiBlockOverlayRects(
 		}
 	}
 
-	// Last block — partial text-level rects up to the cursor offset so the
-	// unselected tail of the block is not highlighted. WholeBlock endpoints
-	// (no character position) get the full bounding-box instead.
-	if ( docLastEl.innerText?.trim() ) {
-		const lastOffset = docLast.richTextOffset;
+	// Last block — use effectiveLastEl. Same promotion logic as the first block.
+	if ( effectiveLastEl.innerText?.trim() ) {
+		const wasPromoted = effectiveLastEl !== docLastEl;
+		const lastOffset = wasPromoted ? null : docLast.richTextOffset;
 		if ( lastOffset === null ) {
-			rects.push( blockBoundingRect( docLastEl, overlayRect ) );
+			rects.push( blockBoundingRect( effectiveLastEl, overlayRect ) );
 		} else if ( lastOffset > 0 ) {
 			const el = resolveTargetElement( editorDocument, docLast );
 			const textRects = el
@@ -338,7 +367,7 @@ function computeMultiBlockOverlayRects(
 				: null;
 			rects.push(
 				...( textRects ?? [
-					blockBoundingRect( docLastEl, overlayRect ),
+					blockBoundingRect( effectiveLastEl, overlayRect ),
 				] )
 			);
 		}
