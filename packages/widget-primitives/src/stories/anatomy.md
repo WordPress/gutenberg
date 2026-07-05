@@ -22,7 +22,7 @@ How the widget asks to sit in the host's frame. Today this layer holds one prope
 
 `presentation` suggests how much chrome the widget wants around it.
 The widget speaks in its own vocabulary ("render me without a frame"); the host decides how to materialize it, including whether to show the identity at all and which parts of it.
-Painting the icon and title into a header is the conventional choice, not the only one: a host could just as well render the title in a footer. Its three values are one axis, from the most chrome to none.
+Painting the icon and title into a header is the conventional choice, not the only one: a host could just as well render the title in a footer. The three values run from most chrome (`framed`) through `content-bleed` to none (`full-bleed`).
 
 `framed` (the default): the host paints the header from identity and pads the content. Site Health renders inside that frame.
 
@@ -51,12 +51,10 @@ Either way the host never interprets the values. It mounts the form from the dec
 
 ![The attributes are a contract both sides write: the render module reads them to produce the output, the widget asks for changes through setAttributes, and the host edits them through a settings form. The meaning stays the widget's.](./assets/representation.svg)
 
-The `WidgetRender` stories show these in motion: Default, where the widget asks; With Settings, where the host edits; and With Host Chrome, where the host frames it.
-
 ## Why the split matters
 
 Each layer is consumed by one verb: identity is _copied_, framing is _translated_, representation is _rendered_. Each verb is a boundary of ownership.
 
-A widget does not declare its own header, because the header is host chrome, not something the widget owns. A widget does not declare a width in pixels, because pixels belong to the host's translation of framing, not to the framing itself. Both questions look like they concern the widget, but each is answered by what the host owns: the header, and the pixel translation of framing.
+A widget does not declare its own header, because the header is host chrome, not something the widget owns. A widget does not declare a width in pixels, because pixels belong to the host's translation of framing, not to the framing itself.
 
 The same separation is what makes a widget portable. Only the framing layer is re-translated when the host changes; identity and representation are consumed the same way everywhere. A host is free to render a widget in a context its author never anticipated, as long as it honors the three layers for what they are.

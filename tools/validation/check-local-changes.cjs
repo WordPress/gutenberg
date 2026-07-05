@@ -44,6 +44,7 @@ SimpleGit()
 				`There are local changes after running one or more of the following commands:
 
 - npm install
+- npm run lint:js:prune-suppressions
 - npm run docs:build
 - npm run --workspace @wordpress/theme build
 

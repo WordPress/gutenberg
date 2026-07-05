@@ -89,9 +89,8 @@ function getBlockIconVariant( { select, clientIds } ) {
 }
 
 function getBlockIcon( { select, clientIds } ) {
-	const { getBlockName, getBlockAttributes, isSectionBlock } = unlock(
-		select( blockEditorStore )
-	);
+	const { getBlockName, getBlockAttributes, getBlock, isSectionBlock } =
+		unlock( select( blockEditorStore ) );
 
 	const _isSingleBlock = clientIds.length === 1;
 	const firstClientId = clientIds[ 0 ];
@@ -109,7 +108,12 @@ function getBlockIcon( { select, clientIds } ) {
 	const blockType = getBlockType( blockName );
 	if ( _isSingleBlock ) {
 		const { getActiveBlockVariation } = select( blocksStore );
-		const match = getActiveBlockVariation( blockName, blockAttributes );
+		const match = getActiveBlockVariation(
+			blockName,
+			blockAttributes,
+			undefined,
+			getBlock?.( firstClientId )?.innerContent
+		);
 		return match?.icon || blockType?.icon;
 	}
 

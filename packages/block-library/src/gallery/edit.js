@@ -31,7 +31,6 @@ import {
 import { useEffect, useMemo } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { View } from '@wordpress/primitives';
 import { createBlock } from '@wordpress/blocks';
 import { createBlobURL } from '@wordpress/blob';
 import { store as noticesStore } from '@wordpress/notices';
@@ -609,10 +608,10 @@ export default function GalleryEdit( props ) {
 
 	if ( ! hasImages ) {
 		return (
-			<View { ...innerBlocksProps }>
+			<div { ...innerBlocksProps }>
 				{ innerBlocksProps.children }
 				{ mediaPlaceholder }
-			</View>
+			</div>
 		);
 	}
 
@@ -663,7 +662,6 @@ export default function GalleryEdit( props ) {
 								min={ 1 }
 								max={ Math.min( MAX_COLUMNS, images.length ) }
 								required
-								__next40pxDefaultSize
 							/>
 						</ToolsPanelItem>
 					) }
@@ -774,7 +772,6 @@ export default function GalleryEdit( props ) {
 									} )
 								}
 								isBlock
-								__next40pxDefaultSize
 								help={ __(
 									'Adjust the appearance of buttons in the lightbox.'
 								) }

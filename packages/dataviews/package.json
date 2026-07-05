@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/dataviews",
-	"version": "17.0.0",
+	"version": "17.1.0",
 	"description": "DataViews is a component that provides an API to render datasets using different types of layouts (table, grid, list, etc.).",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -82,6 +82,7 @@
 		"@testing-library/react": "^16.3.2",
 		"@testing-library/user-event": "^14.6.1",
 		"@types/jest": "^29.5.14",
+		"@wordpress/format-library": "file:../format-library",
 		"esbuild": "^0.27.2",
 		"storybook": "^10.4.3"
 	},

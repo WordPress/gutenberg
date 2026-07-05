@@ -1,8 +1,3 @@
-.headerIcon {
-	display: inline-flex;
-	color: var(--wpds-color-foreground-content-neutral);
-}
-
 /* Scroll viewport that fills the tile height; min:0 bounds tall content. */
 .content {
 	flex: 1;

@@ -78,6 +78,16 @@ const CONFIG = [
 		rtl: [ designTokens, componentsRtl, dataviewsRtl ],
 	},
 	{
+		// The DataForm stories include a `richtext` control, which renders
+		// format UI from `@wordpress/format-library` and the inline link
+		// popover (`LinkControl`) from `@wordpress/block-editor`. Stack those
+		// styles on top of the `dataviews-` set above (all matching entries
+		// apply).
+		componentIdMatcher: /^dataviews-dataform/,
+		ltr: [ blockEditorLtr, formatLibraryLtr, richTextControlLtr ],
+		rtl: [ blockEditorRtl, formatLibraryRtl, richTextControlRtl ],
+	},
+	{
 		componentIdMatcher: /^fields-/,
 		ltr: [ componentsLtr, dataviewsLtr, fieldsLtr, mediaFieldsLtr ],
 		rtl: [ componentsRtl, dataviewsRtl, fieldsRtl, mediaFieldsRtl ],

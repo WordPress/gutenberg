@@ -326,11 +326,6 @@
 			"count": 2
 		}
 	},
-	"packages/block-library/src/embed/embed-placeholder.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
 	"packages/block-library/src/form-input/edit.js": {
 		"react-hooks/refs": {
 			"count": 3
@@ -651,7 +646,7 @@
 	},
 	"packages/components/src/combobox-control/styles.ts": {
 		"no-restricted-imports": {
-			"count": 2
+			"count": 1
 		}
 	},
 	"packages/components/src/confirm-dialog/styles.ts": {
@@ -726,7 +721,7 @@
 	},
 	"packages/components/src/flex/flex-item/hook.ts": {
 		"no-restricted-imports": {
-			"count": 2
+			"count": 1
 		}
 	},
 	"packages/components/src/flex/flex/hook.ts": {
@@ -761,7 +756,7 @@
 	},
 	"packages/components/src/form-token-field/styles.ts": {
 		"no-restricted-imports": {
-			"count": 2
+			"count": 1
 		}
 	},
 	"packages/components/src/grid/hook.ts": {
@@ -982,7 +977,7 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/view/component.tsx": {
+	"packages/components/src/utils/test/polymorphic-element.tsx": {
 		"no-restricted-imports": {
 			"count": 1
 		}
@@ -995,16 +990,6 @@
 	"packages/compose/src/hooks/use-dialog/index.ts": {
 		"react-hooks/immutability": {
 			"count": 1
-		}
-	},
-	"packages/compose/src/hooks/use-dragging/index.js": {
-		"react-hooks/immutability": {
-			"count": 1
-		}
-	},
-	"packages/compose/src/hooks/use-focus-return/index.js": {
-		"react-hooks/immutability": {
-			"count": 2
 		}
 	},
 	"packages/compose/src/hooks/use-merge-refs/index.ts": {
@@ -1333,11 +1318,6 @@
 	"packages/editor/src/components/post-publish-panel/postpublish.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
-		}
-	},
-	"packages/editor/src/components/post-revisions-panel/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
 		}
 	},
 	"packages/editor/src/components/post-status/index.js": {
@@ -1671,11 +1651,6 @@
 			"count": 1
 		}
 	},
-	"packages/global-styles-ui/src/screen-color-palette.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/global-styles-ui/src/screen-colors.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -1756,11 +1731,6 @@
 	},
 	"packages/lazy-editor/src/components/preview/index.tsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
-	"packages/media-editor/src/components/media-editor/index.tsx": {
-		"@wordpress/use-recommended-components": {
 			"count": 1
 		}
 	},
@@ -1913,11 +1883,6 @@
 		},
 		"react-hooks/refs": {
 			"count": 2
-		}
-	},
-	"routes/guidelines/components/revision-history.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
 		}
 	},
 	"routes/guidelines/stage.tsx": {
