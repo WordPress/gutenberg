@@ -159,7 +159,7 @@ test.describe( 'Block Notes', () => {
 		await blockNoteUtils.openBlockNoteSidebar();
 
 		const thread = page
-			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'region', { name: 'Collab panel' } )
 			.getByRole( 'treeitem', {
 				name: 'Note: Test comment to resolve.',
 			} );
@@ -212,7 +212,7 @@ test.describe( 'Block Notes', () => {
 		const commentForm = page.getByRole( 'textbox', { name: 'Reply to' } );
 		await commentForm.fill( 'Test reply that reopens the comment.' );
 		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'region', { name: 'Collab panel' } )
 			.getByRole( 'button', { name: 'Reopen & Reply', exact: true } )
 			.click();
 
@@ -458,7 +458,7 @@ test.describe( 'Block Notes', () => {
 			} );
 
 			const thread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Collab panel' } )
 				.getByRole( 'treeitem', {
 					name: 'Note: Sticky collapse note',
 				} );
@@ -899,12 +899,12 @@ test.describe( 'Block Notes', () => {
 			await expect( newNoteForm ).toBeFocused();
 			await newNoteForm.fill( 'Second note on block' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Collab panel' } )
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
 			const settings = page.getByRole( 'region', {
-				name: 'Editor settings',
+				name: 'Collab panel',
 			} );
 			await expect(
 				settings.getByRole( 'treeitem', {
@@ -939,7 +939,7 @@ test.describe( 'Block Notes', () => {
 
 			// Both notes should be visible.
 			const settings = page.getByRole( 'region', {
-				name: 'Editor settings',
+				name: 'Collab panel',
 			} );
 			await expect(
 				settings.getByRole( 'treeitem', { name: 'Note: Note to keep' } )
@@ -999,7 +999,7 @@ test.describe( 'Block Notes', () => {
 			await blockNoteUtils.addNote( 'Note B' );
 
 			const settings = page.getByRole( 'region', {
-				name: 'Editor settings',
+				name: 'Collab panel',
 			} );
 
 			// Resolve Note A.
@@ -1042,7 +1042,7 @@ test.describe( 'Block Notes', () => {
 			await blockNoteUtils.addNote( 'Second note' );
 
 			const settings = page.getByRole( 'region', {
-				name: 'Editor settings',
+				name: 'Collab panel',
 			} );
 
 			// Resolve the first note.
@@ -1138,7 +1138,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Color me' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Collab panel' } )
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
@@ -1207,7 +1207,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Survive the toggle' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Collab panel' } )
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
@@ -1252,7 +1252,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Anchored to text' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Collab panel' } )
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
@@ -1261,7 +1261,7 @@ test.describe( 'Block Notes', () => {
 			).toBeVisible();
 
 			const thread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Collab panel' } )
 				.getByRole( 'treeitem', { name: 'Note: Anchored to text' } );
 			await expect( thread ).toBeVisible();
 
@@ -1304,7 +1304,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Remove my marker on delete' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Collab panel' } )
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
@@ -1349,7 +1349,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Resolve removes my marker' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Collab panel' } )
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
@@ -1407,7 +1407,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Just this word' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Collab panel' } )
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
@@ -1442,7 +1442,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Pick me' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Collab panel' } )
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
@@ -1469,7 +1469,7 @@ test.describe( 'Block Notes', () => {
 			// Selecting the note from the sidebar promotes its marker to the
 			// stronger active alpha (≈0x80/255) via the selected-note rule.
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Collab panel' } )
 				.getByRole( 'treeitem', { name: 'Note: Pick me' } )
 				.click();
 
@@ -1547,13 +1547,13 @@ class BlockNoteUtils {
 			.getByRole( 'textbox', { name: 'New note', exact: true } )
 			.fill( content );
 		await this.#page
-			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'region', { name: 'Collab panel' } )
 			.getByRole( 'button', { name: 'Add note', exact: true } )
 			.click();
 		// Wait for the new thread to appear before returning.
 		await expect(
 			this.#page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Collab panel' } )
 				.getByRole( 'treeitem', { name: `Note: ${ content }` } )
 		).toBeVisible();
 	}
