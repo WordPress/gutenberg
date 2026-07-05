@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Table of Contents: Recognize custom heading block types registered via the new `editor.headingBlockTypes` filter.
+
 ## 10.1.0 (2026-07-01)
 
 ## 10.0.0 (2026-06-24)

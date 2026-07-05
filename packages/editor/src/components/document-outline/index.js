@@ -13,6 +13,7 @@ import { Path, SVG, Line, Rect } from '@wordpress/components';
  * Internal dependencies
  */
 import DocumentOutlineItem from './item';
+import useHeadingBlockTypes from './use-heading-block-types';
 import { store as editorStore } from '../../store';
 
 /**
@@ -78,13 +79,20 @@ function EmptyOutlineIllustration() {
  * level   - An integer with the heading level.
  * isEmpty - Flag indicating if the heading has no content.
  *
- * @param {?Array} blocks An array of blocks.
+ * Blocks registered via the `editor.headingBlockTypes` filter are expected
+ * to have `level` and `content` attributes, the same as `core/heading`.
+ *
+ * @param {?Array}    blocks            An array of blocks.
+ * @param {?string[]} headingBlockTypes Block type names considered headings.
  *
  * @return {Array} An array of heading blocks enhanced with the properties described above.
  */
-const computeOutlineHeadings = ( blocks = [] ) => {
+export const computeOutlineHeadings = (
+	blocks = [],
+	headingBlockTypes = []
+) => {
 	return blocks
-		.filter( ( block ) => block.name === 'core/heading' )
+		.filter( ( block ) => headingBlockTypes.includes( block.name ) )
 		.map( ( block ) => ( {
 			...block,
 			level: block.attributes.level,
@@ -110,6 +118,7 @@ export default function DocumentOutline( {
 	hasOutlineItemsDisabled,
 } ) {
 	const { selectBlock } = useDispatch( blockEditorStore );
+	const headingBlockTypes = useHeadingBlockTypes();
 	const { title, isTitleSupported } = useSelect( ( select ) => {
 		const { getEditedPostAttribute } = select( editorStore );
 		const { getPostType } = select( coreStore );
@@ -148,8 +157,8 @@ export default function DocumentOutline( {
 	const prevHeadingLevelRef = useRef( 1 );
 
 	const headings = useMemo(
-		() => computeOutlineHeadings( blocks ),
-		[ blocks ]
+		() => computeOutlineHeadings( blocks, headingBlockTypes ),
+		[ blocks, headingBlockTypes ]
 	);
 
 	if ( headings.length < 1 ) {

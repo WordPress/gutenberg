@@ -12,18 +12,21 @@ import WordCount from '../word-count';
 import TimeToRead from '../time-to-read';
 import DocumentOutline from '../document-outline';
 import CharacterCount from '../character-count';
+import useHeadingBlockTypes from '../document-outline/use-heading-block-types';
 
 function TableOfContentsPanel( { hasOutlineItemsDisabled, onRequestClose } ) {
+	const headingBlockTypes = useHeadingBlockTypes();
 	const { headingCount, paragraphCount, numberOfBlocks } = useSelect(
 		( select ) => {
-			const { getGlobalBlockCount } = select( blockEditorStore );
+			const { getBlocksByName, getGlobalBlockCount } =
+				select( blockEditorStore );
 			return {
-				headingCount: getGlobalBlockCount( 'core/heading' ),
+				headingCount: getBlocksByName( headingBlockTypes ).length,
 				paragraphCount: getGlobalBlockCount( 'core/paragraph' ),
 				numberOfBlocks: getGlobalBlockCount(),
 			};
 		},
-		[]
+		[ headingBlockTypes ]
 	);
 	return (
 		/*

@@ -444,6 +444,24 @@ wp.hooks.addFilter(
 );
 ```
 
+### `editor.headingBlockTypes`
+
+Used to modify the list of blocks that are treated as headings by the Document Outline panel and the Table of Contents block. By default, only the Heading block (`core/heading`) is included. A block added here must have a numeric `level` attribute and a `content` attribute containing the heading text, the same attribute names the Heading block uses, or it won't appear correctly in the Document Outline or Table of Contents.
+
+The following example adds the fictitious block `namespace/example-heading`.
+
+```js
+const addExampleBlockToHeadingBlockTypes = ( blockTypes ) => {
+	return [ ...blockTypes, 'namespace/example-heading' ];
+};
+
+wp.hooks.addFilter(
+	'editor.headingBlockTypes',
+	'my-plugin/heading-block-types',
+	addExampleBlockToHeadingBlockTypes
+);
+```
+
 ## Removing Blocks
 
 ### Using a deny list
