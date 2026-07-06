@@ -371,7 +371,9 @@ function ApplicationPasswordConnector( {
 			| Record< string, { username?: string; password?: string } >
 			| undefined;
 		const credentials = record?.[ settingName ];
-		if ( credentials?.username !== username || ! credentials?.password ) {
+		// The server sanitizes the username (trimming/collapsing whitespace),
+		// so only verify that both credentials were persisted, not equality.
+		if ( ! credentials?.username || ! credentials?.password ) {
 			throw new Error(
 				__( 'It was not possible to save these credentials.' )
 			);

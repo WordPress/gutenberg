@@ -302,7 +302,10 @@ export function ApplicationPasswordConnectorSettings( {
 		setSaveError( null );
 		setIsSaving( true );
 		try {
-			await onSave?.( { username, applicationPassword } );
+			await onSave?.( {
+				username: username.trim(),
+				applicationPassword,
+			} );
 		} catch ( error ) {
 			setSaveError(
 				error instanceof Error
@@ -386,7 +389,9 @@ export function ApplicationPasswordConnectorSettings( {
 						__next40pxDefaultSize
 						variant="primary"
 						disabled={
-							! username || ! applicationPassword || isSaving
+							! username.trim() ||
+							! applicationPassword ||
+							isSaving
 						}
 						accessibleWhenDisabled
 						isBusy={ isSaving }
