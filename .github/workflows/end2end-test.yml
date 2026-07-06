@@ -108,7 +108,7 @@ jobs:
                   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
                   # Run against the "slow" profile (a short simulated send
                   # delay) for better coverage of real-world timing.
-                  RTC_WS_DELAY: 100
+                  RTC_WS_DELAY: 50
                   # Label flaky reports so this job's diagnostics don't collide
                   # with the default suite's when artifacts are merged, and so
                   # WebSocket-provider flakes are reported as their own issues.
