@@ -79,10 +79,10 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.1/block-comments.php';
 	// The suggestion meta registration and REST controller are always loaded:
 	// both are inert without suggestion data, which only the experiment-gated
-	// editor UI creates. The user-facing feature is gated in JS. Note there is
-	// no front-end strip in this layer — pending structural suggestion state
-	// is kept out of saved content by an editor-side save lock instead (see
-	// packages/editor/src/components/suggestion-mode/save-lock.js).
+	// editor UI creates. The user-facing feature is gated in JS. Pending
+	// structural suggestion state saves into content and is hidden at render
+	// time (`gutenberg_strip_pending_structural_suggestions`), mirroring the
+	// inline marker strip.
 	require __DIR__ . '/compat/wordpress-7.1/block-suggestions.php';
 	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-comment-controller-7-1.php';
 
