@@ -50,7 +50,7 @@ export default {
 			// their `content` attribute like `core/block` does. TODO: derive
 			// this from the block type providing the `pattern/overrides`
 			// context instead of a name list.
-			[ 'core/block', 'test/php-only-editable-block' ],
+			[ 'core/block', 'test/php-only-synced-block' ],
 			true
 		);
 

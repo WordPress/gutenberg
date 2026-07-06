@@ -176,13 +176,10 @@ add_action(
 		);
 
 		// Content, attributes, and render callback for the editable PHP-only
-		// demo block below. SPIKE: the heading and paragraph declare
-		// `core/pattern-overrides` bindings, which opts the block into synced
-		// mode: only these two fields are editable, and instances store just
-		// their overrides.
+		// demo block below.
 		$pattern_markup = '<!-- wp:group {"layout":{"type":"constrained"}} --><div class="wp-block-group">'
-			. '<!-- wp:heading {"metadata":{"name":"Title","bindings":{"__default":{"source":"core/pattern-overrides"}}}} --><h2 class="wp-block-heading">Title</h2><!-- /wp:heading -->'
-			. '<!-- wp:paragraph {"metadata":{"name":"Body","bindings":{"__default":{"source":"core/pattern-overrides"}}}} --><p>Body text.</p><!-- /wp:paragraph -->'
+			. '<!-- wp:heading --><h2 class="wp-block-heading">Title</h2><!-- /wp:heading -->'
+			. '<!-- wp:paragraph --><p>Body text.</p><!-- /wp:paragraph -->'
 			. '</div><!-- /wp:group -->';
 
 		$pattern_attributes = array(
@@ -255,6 +252,33 @@ add_action(
 					),
 				),
 				'pattern'         => $pattern_markup,
+				'render_callback' => $render_pattern_block,
+			)
+		);
+
+		// SPIKE: the synced sibling of the block above, sharing its attributes
+		// and render callback. The Title heading declares a
+		// `core/pattern-overrides` binding, so it is editable per instance;
+		// the paragraph has no binding, so the plugin owns it and edits to
+		// this markup propagate to existing posts.
+		$synced_pattern_markup = '<!-- wp:group {"layout":{"type":"constrained"}} --><div class="wp-block-group">'
+			. '<!-- wp:heading {"metadata":{"name":"Title","bindings":{"__default":{"source":"core/pattern-overrides"}}}} --><h2 class="wp-block-heading">Synced title</h2><!-- /wp:heading -->'
+			. '<!-- wp:paragraph --><p>Owned by the plugin: shipped with v1.</p><!-- /wp:paragraph -->'
+			. '</div><!-- /wp:group -->';
+
+		register_block_type(
+			'test/php-only-synced-block',
+			array(
+				'title'           => 'Synced PHP-only block (pattern overrides)',
+				'icon'            => 'update',
+				'category'        => 'widgets',
+				'description'     => 'The registration owns the pattern: only the bound Title is editable per instance, and plugin updates to the rest propagate to existing content.',
+				'keywords'        => array( 'pattern', 'autotest' ),
+				'attributes'      => $pattern_attributes,
+				'supports'        => array(
+					'autoRegister' => true,
+				),
+				'pattern'         => $synced_pattern_markup,
 				'render_callback' => $render_pattern_block,
 			)
 		);
