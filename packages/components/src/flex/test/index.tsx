@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { render, screen } from '@testing-library/react';
 
 import { View } from '../../view';
@@ -66,6 +67,26 @@ describe( 'props', () => {
 		} );
 	} );
 
+	test( 'should prefer generated flex styles over consumer CSS custom properties', () => {
+		render(
+			<Flex
+				align="flex-start"
+				data-testid="flex"
+				style={
+					{
+						'--wp-components-flex-align': 'center',
+					} as CSSProperties
+				}
+			>
+				<FlexItem>Item</FlexItem>
+			</Flex>
+		);
+
+		expect( screen.getByTestId( 'flex' ) ).toHaveStyle( {
+			'--wp-components-flex-align': 'flex-start',
+		} );
+	} );
+
 	test( 'should render column direction', () => {
 		render(
 			<Flex direction="column" data-testid="flex">
@@ -86,6 +107,28 @@ describe( 'props', () => {
 		render(
 			<Flex>
 				<FlexItem display="inline-flex" data-testid="item">
+					Item
+				</FlexItem>
+			</Flex>
+		);
+
+		expect( screen.getByTestId( 'item' ) ).toHaveStyle( {
+			'--wp-components-flex-item-display': 'inline-flex',
+		} );
+	} );
+
+	test( 'should prefer generated flex item styles over consumer CSS custom properties', () => {
+		render(
+			<Flex>
+				<FlexItem
+					display="inline-flex"
+					data-testid="item"
+					style={
+						{
+							'--wp-components-flex-item-display': 'block',
+						} as CSSProperties
+					}
+				>
 					Item
 				</FlexItem>
 			</Flex>

@@ -16,7 +16,7 @@
 }
 
 .item {
-	display: var(--wp-components-flex-item-display, block);
+	display: var(--wp-components-flex-item-display);
 	max-height: 100%;
 	max-width: 100%;
 	min-height: 0;

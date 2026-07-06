@@ -49,13 +49,13 @@ export function useFlex( props: WordPressComponentProps< FlexProps, 'div' > ) {
 		typeof direction === 'string' && !! direction.includes( 'column' );
 
 	const flexStyle = {
+		...style,
 		'--wp-components-flex-align':
 			align ?? ( isColumn ? 'normal' : 'center' ),
 		'--wp-components-flex-direction': direction,
 		'--wp-components-flex-wrap': wrap ? 'wrap' : 'nowrap',
 		'--wp-components-flex-gap': space( gap ),
 		'--wp-components-flex-justify': justify,
-		...style,
 	};
 
 	return {
