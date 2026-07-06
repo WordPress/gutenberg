@@ -478,8 +478,8 @@ function createSsrIslandsComponents( blockName, markup ) {
 const NOOP = () => {};
 
 /**
- * SPIKE: builds `edit`/`save` for a PHP-only `pattern` block whose pattern
- * declares `core/pattern-overrides` bindings (synced mode).
+ * Builds `edit`/`save` for a PHP-only `pattern` block whose pattern declares
+ * `core/pattern-overrides` bindings (synced mode).
  *
  * The registration owns the structure: the editor renders the pattern as a
  * controlled, read-only tree where only bound fields are editable (the derived

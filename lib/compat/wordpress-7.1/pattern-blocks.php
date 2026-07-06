@@ -36,14 +36,11 @@ function gutenberg_enqueue_auto_register_pattern_blocks() {
 		if ( empty( $block_type->supports['autoRegister'] ) || empty( $block_type->pattern ) || ! is_string( $block_type->pattern ) ) {
 			continue;
 		}
-		// Two independent axes. Bindings decide the content model: a pattern
-		// that declares `core/pattern-overrides` bindings opts into synced
-		// mode (SPIKE), where the registration owns the structure, the
-		// instance stores only the overrides, and only bound fields are
-		// editable. Otherwise the `render_callback` decides the editing mode:
-		// with one, SSR-islands (the editor renders that shell server-side
-		// and portals the editable pattern blocks into its slots); without
-		// one, the blocks are the output and are edited bare.
+		// Bindings decide the content model: with `core/pattern-overrides`
+		// bindings the registration owns the structure, only bound fields are
+		// editable, and instances store just their overrides. Otherwise the
+		// `render_callback` decides how the pattern is edited: inside its
+		// server-rendered shell (SSR-islands) or bare (canvas).
 		if ( str_contains( $block_type->pattern, 'core/pattern-overrides' ) ) {
 			$editor_mode = 'synced-islands';
 		} elseif ( empty( $block_type->render_callback ) ) {
@@ -106,9 +103,9 @@ function gutenberg_wrap_ssr_islands_render_callback( $args ) {
 		return $args;
 	}
 
-	// SPIKE: a synced pattern must render server-side (the post stores only
-	// the overrides), so a block that doesn't bring a render_callback gets
-	// the identity one: the pattern with the overrides applied, unwrapped.
+	// A synced pattern must render server-side (the post stores only the
+	// overrides), so a block that doesn't bring a render_callback gets the
+	// identity one: the pattern with the overrides applied, unwrapped.
 	if ( empty( $args['render_callback'] ) ) {
 		if ( ! str_contains( $args['pattern'], 'core/pattern-overrides' ) ) {
 			return $args;
@@ -122,9 +119,9 @@ function gutenberg_wrap_ssr_islands_render_callback( $args ) {
 	$pattern                  = $args['pattern'];
 	$is_synced                = str_contains( $pattern, 'core/pattern-overrides' );
 
-	// SPIKE: synced pattern blocks store per-instance overrides in `content`
-	// and provide them as the `pattern/overrides` context, like `core/block`,
-	// so the pattern-overrides binding resolves in both editor and frontend.
+	// The overrides binding resolves through the `pattern/overrides` context,
+	// so the block stores them in a `content` attribute and provides it as
+	// that context, like `core/block` does.
 	if ( $is_synced ) {
 		if ( ! isset( $args['attributes']['content'] ) ) {
 			$args['attributes']['content'] = array( 'type' => 'object' );
@@ -145,9 +142,9 @@ function gutenberg_wrap_ssr_islands_render_callback( $args ) {
 				// matching the single `$content` a callback receives.
 				$content = '<wp-inner-block-slot data-slot-index="0" style="display:contents"></wp-inner-block-slot>';
 			} elseif ( $is_synced ) {
-				// SPIKE: render the registration pattern as the block's inner
-				// blocks so the instance context (the overrides) reaches the
-				// bindings, mirroring render_block_core_block().
+				// The pattern renders as the block's inner blocks so the
+				// instance context (the overrides) reaches the bindings,
+				// mirroring render_block_core_block().
 				$block->parsed_block['innerBlocks']  = parse_blocks( $pattern );
 				$block->parsed_block['innerContent'] = array_fill( 0, count( $block->parsed_block['innerBlocks'] ), null );
 				$block->refresh_context_dependents();

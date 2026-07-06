@@ -256,11 +256,10 @@ add_action(
 			)
 		);
 
-		// SPIKE: the synced sibling of the block above, sharing its attributes
-		// and render callback. The Title heading declares a
-		// `core/pattern-overrides` binding, so it is editable per instance;
-		// the paragraph has no binding, so the plugin owns it and edits to
-		// this markup propagate to existing posts.
+		// The synced sibling of the block above, sharing its attributes and
+		// render callback. The bound Title is editable per instance; the
+		// paragraph has no binding, so the plugin owns it and edits to this
+		// markup propagate to existing posts.
 		$synced_pattern_markup = '<!-- wp:group {"layout":{"type":"constrained"}} --><div class="wp-block-group">'
 			. '<!-- wp:heading {"metadata":{"name":"Title","bindings":{"__default":{"source":"core/pattern-overrides"}}}} --><h2 class="wp-block-heading">Synced title</h2><!-- /wp:heading -->'
 			. '<!-- wp:paragraph --><p>Owned by the plugin: shipped with v1.</p><!-- /wp:paragraph -->'
