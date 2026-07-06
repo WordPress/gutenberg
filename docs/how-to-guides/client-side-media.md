@@ -100,6 +100,8 @@ add_filter( 'image_editor_output_format', function ( $formats ) {
 
 Client-side processing will apply this conversion before uploading sub-sized images. If a PNG has transparency and the target format is JPEG, the conversion is skipped to preserve the alpha channel.
 
+UltraHDR JPEGs (HDR photos with an embedded gain map, as produced by recent Android phone cameras) are also excluded from format conversion — converting to a different codec would strip the gain map. They upload unmodified, and their sub-sizes are generated as UltraHDR JPEGs with the gain map preserved. See the [architecture documentation](/docs/explanations/architecture/client-side-media-architecture.md#ultrahdr-jpeg) for details.
+
 ### Progressive/interlaced image output
 
 The `image_save_progressive` filter controls whether images are saved with progressive (JPEG) or interlaced (PNG, GIF) encoding.

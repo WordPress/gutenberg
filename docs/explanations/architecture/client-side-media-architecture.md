@@ -56,7 +56,7 @@ The `core/upload-media` data store manages the upload queue and coordinates the 
 -   Maintains a queue of items with statuses (queued, processing, paused, uploaded, error).
 -   Enforces concurrency limits (max 5 concurrent uploads, max 2 concurrent image processing operations).
 -   Chains operations sequentially per item: prepare → transcode → upload → thumbnail generation → sideload → finalize.
--   Handles batch grouping, progress tracking, retry logic, and error handling.
+-   Handles batch grouping, progress tracking, retry logic, and error handling. Failed network requests are retried automatically with exponential backoff and jitter (up to 4 total attempts) before an error is surfaced.
 -   Manages blob URLs for image previews and revokes them after use.
 
 **Key source files:**
@@ -246,6 +246,19 @@ Notes:
 -   Opaque animated GIFs are additionally converted to a companion video (MP4/WebM) outside the vips pipeline — see [Animated GIF to video conversion](#animated-gif-to-video-conversion) below.
 -   PNG-to-JPEG conversion is skipped when the PNG has transparency.
 -   AVIF uploads bypass the server's `wp_prevent_unsupported_mime_type_uploads` check when `generate_sub_sizes=false`, so a host without server-side AVIF support can still accept client-processed AVIF files.
+-   UltraHDR JPEGs keep their HDR gain maps through sub-size generation — see [UltraHDR JPEG](#ultrahdr-jpeg) below.
+
+### UltraHDR JPEG
+
+UltraHDR JPEGs — the HDR photo format produced by recent Android phone cameras — embed an ISO 21496-1 gain map alongside a standard SDR base image. The format is backwards compatible: SDR displays simply show the base image.
+
+When a JPEG is uploaded, the client probes it for a gain map (`getUltraHdrInfo()` in `@wordpress/vips`, backed by libvips's `uhdrload` loader). When a gain map is found:
+
+-   **The original uploads unmodified.** No transcoding or re-encoding touches the main file, so the full HDR data reaches the media library intact.
+-   **Sub-sizes keep their gain maps.** Resize operations route through libvips's `uhdrload`/`uhdrsave` pipeline, which decodes the gain map alongside the base image. The gain map is scaled and cropped in lockstep with the base image and saved with `keep: 'icc|gainmap'`, so every generated thumbnail is itself a valid UltraHDR JPEG.
+-   **Format conversion is skipped.** The `image_editor_output_format` mapping is not applied to UltraHDR sources — converting to a different codec would strip the gain map.
+
+The probe is skipped for images routed to the server by the large-image gate, since only the client-side resize path preserves gain maps.
 
 ### HEIC/HEIF
 
@@ -386,6 +399,15 @@ The upload store enforces two separate concurrency limits to balance performance
 When a concurrency limit is reached, new items wait in the queue. As operations complete, pending items are automatically dequeued and processed.
 
 Additionally, sideload uploads to the same WordPress post are serialized to prevent race conditions in attachment metadata updates. If one sideload is in progress for a post, other sideloads targeting the same post are paused until the first completes.
+
+## Upload progress
+
+While uploads are in flight, the editor shows a snackbar with batch progress (`UploadProgressSnackbar` in `@wordpress/editor`). The component is a controller that manages a notice through the notices store, so it positions and stacks with every other editor snackbar. It reads from two sources so progress is reported on both paths:
+
+-   The `core/upload-media` queue for client-side processing, counting only original user-uploaded files (generated sub-sizes and thumbnails are ignored).
+-   An editor-local tracker populated by the editor's `mediaUpload` wrapper for the traditional server-side path.
+
+A spinner accompanies the text while uploads run; when the last upload finishes it briefly becomes a checkmark before the snackbar dismisses. For accessibility, `wp.a11y.speak()` announces once when uploads start and once when they complete, avoiding per-tick chatter.
 
 ## Post-save locking
 
