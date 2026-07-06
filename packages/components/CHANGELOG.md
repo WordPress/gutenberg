@@ -15,6 +15,7 @@
     -   `BorderBoxControl` ([#79420](https://github.com/WordPress/gutenberg/pull/79420))
     -   `BorderControl` ([#79418](https://github.com/WordPress/gutenberg/pull/79418))
     -   `ComboboxControl` ([#79636](https://github.com/WordPress/gutenberg/pull/79636)).
+    -   `CustomSelectControl` ([#79796](https://github.com/WordPress/gutenberg/pull/79796)).
     -   `FontSizePicker` ([#79481](https://github.com/WordPress/gutenberg/pull/79481))
     -   `FormFileUpload` ([#79655](https://github.com/WordPress/gutenberg/pull/79655))
     -   `FormTokenField` ([#79720](https://github.com/WordPress/gutenberg/pull/79720))
@@ -44,6 +45,8 @@
 ### Internal
 
 -   Enforce CSS Module class selector naming for component-library packages ([#79504](https://github.com/WordPress/gutenberg/pull/79504)).
+-   Update `@ariakit/react` to `0.4.32` ([#79860](https://github.com/WordPress/gutenberg/pull/79860)).
+-   `Flex`: Migrate styles from Emotion to SCSS Modules ([#79450](https://github.com/WordPress/gutenberg/pull/79450)).
 -   `Surface`: Migrate styles from Emotion to SCSS Modules and use WPDS tokens for migrated visual values ([#79445](https://github.com/WordPress/gutenberg/pull/79445)).
 -   `Truncate`: Migrate styles from Emotion to SCSS Modules ([#79446](https://github.com/WordPress/gutenberg/pull/79446)).
 -   `View`: Migrate away from Emotion while preserving polymorphic `as` behavior and style cascade order ([#79443](https://github.com/WordPress/gutenberg/pull/79443)).

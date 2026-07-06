@@ -36,6 +36,8 @@ interface ProbeApi {
 		exitEditMode?: boolean;
 		revertLayout?: boolean;
 	} ) => void;
+	scheduleAutoSave: () => void;
+	flushAutoSave: () => void;
 }
 
 const probeRef: { current: ProbeApi | null } = { current: null };
@@ -52,6 +54,8 @@ function Probe() {
 			mutateGridSettings: ctx.onGridSettingsChange,
 			commit: ctx.commit,
 			cancel: ctx.cancel,
+			scheduleAutoSave: ctx.scheduleAutoSave,
+			flushAutoSave: ctx.flushAutoSave,
 		};
 	} );
 	return null;
@@ -69,6 +73,7 @@ interface HarnessProps {
 	onLayoutChange: ( next: DashboardWidget[] ) => void;
 	gridSettings?: WidgetGridSettings;
 	onGridSettingsChange?: ( next: WidgetGridSettings ) => void;
+	initialEditMode?: boolean;
 }
 
 function Harness( {
@@ -76,8 +81,9 @@ function Harness( {
 	onLayoutChange,
 	gridSettings,
 	onGridSettingsChange,
+	initialEditMode = true,
 }: HarnessProps ) {
-	const [ editMode, setEditMode ] = useState( true );
+	const [ editMode, setEditMode ] = useState( initialEditMode );
 
 	return (
 		<WidgetDashboard
@@ -472,5 +478,117 @@ describe( 'WidgetDashboard staging layer', () => {
 		} );
 
 		expect( readProbe().editMode ).toBe( true );
+	} );
+
+	describe( 'inline auto-save', () => {
+		const moved: DashboardWidget[] = [
+			{ ...initialLayout[ 1 ] },
+			{ ...initialLayout[ 0 ] },
+		];
+
+		beforeEach( () => {
+			jest.useFakeTimers();
+		} );
+
+		afterEach( () => {
+			jest.useRealTimers();
+		} );
+
+		it( 'publishes a scheduled edit once the debounce elapses, staying in normal mode', () => {
+			const onLayoutChange = jest.fn();
+			render(
+				<Harness
+					layout={ initialLayout }
+					onLayoutChange={ onLayoutChange }
+					initialEditMode={ false }
+				/>
+			);
+
+			act( () => {
+				readProbe().mutate( moved );
+				readProbe().scheduleAutoSave();
+			} );
+
+			expect( onLayoutChange ).not.toHaveBeenCalled();
+
+			act( () => {
+				jest.runOnlyPendingTimers();
+			} );
+
+			expect( onLayoutChange ).toHaveBeenCalledTimes( 1 );
+			expect(
+				onLayoutChange.mock.calls[ 0 ][ 0 ].map(
+					( w: DashboardWidget ) => w.uuid
+				)
+			).toEqual( [ 'b', 'a' ] );
+			expect( readProbe().editMode ).toBe( false );
+		} );
+
+		it( 'publishes a pending edit immediately on flushAutoSave', () => {
+			const onLayoutChange = jest.fn();
+			render(
+				<Harness
+					layout={ initialLayout }
+					onLayoutChange={ onLayoutChange }
+					initialEditMode={ false }
+				/>
+			);
+
+			act( () => {
+				readProbe().mutate( moved );
+				readProbe().scheduleAutoSave();
+			} );
+
+			act( () => {
+				readProbe().flushAutoSave();
+			} );
+
+			expect( onLayoutChange ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'flushes a pending edit on unmount instead of dropping it', () => {
+			const onLayoutChange = jest.fn();
+			const { unmount } = render(
+				<Harness
+					layout={ initialLayout }
+					onLayoutChange={ onLayoutChange }
+					initialEditMode={ false }
+				/>
+			);
+
+			act( () => {
+				readProbe().mutate( moved );
+				readProbe().scheduleAutoSave();
+			} );
+
+			expect( onLayoutChange ).not.toHaveBeenCalled();
+
+			unmount();
+
+			expect( onLayoutChange ).toHaveBeenCalledTimes( 1 );
+			expect(
+				onLayoutChange.mock.calls[ 0 ][ 0 ].map(
+					( w: DashboardWidget ) => w.uuid
+				)
+			).toEqual( [ 'b', 'a' ] );
+		} );
+
+		it( 'does not publish unscheduled staging on unmount', () => {
+			const onLayoutChange = jest.fn();
+			const { unmount } = render(
+				<Harness
+					layout={ initialLayout }
+					onLayoutChange={ onLayoutChange }
+				/>
+			);
+
+			act( () => {
+				readProbe().mutate( moved );
+			} );
+
+			unmount();
+
+			expect( onLayoutChange ).not.toHaveBeenCalled();
+		} );
 	} );
 } );

@@ -12,7 +12,7 @@ The three layers are what a widget _is_, how it _asks_ to be framed, and what it
 
 ## Identity
 
-What the widget is: `name`, `title`, `description`, `icon`, `category`, `keywords`.
+What the widget is: `name`, `title`, `description`, `help`, `icon`, `category`, `keywords`.
 
 The host shows this almost verbatim, in pickers, headers, and help. It decides _where_ identity appears and _whether_ to show it, never _what it says_. Identity is copied, not interpreted: two hosts displaying the same widget show the same title.
 

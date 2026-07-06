@@ -139,7 +139,7 @@
 		"prepublishOnly": "npm run build",
 		"rtc:http": "node ./test/e2e/bin/rtc-dev.mjs --mode=http",
 		"rtc:ws": "node ./test/e2e/bin/rtc-dev.mjs --mode=websockets",
-		"rtc:ws:slow": "cross-env RTC_WS_DELAY=100 npm run rtc:ws",
+		"rtc:ws:slow": "cross-env RTC_WS_DELAY=50 npm run rtc:ws",
 		"start": "npm run dev",
 		"prestorybook:build": "npm run build -- --skip-types",
 		"storybook:build": "npm run --workspace @wordpress/storybook storybook:build",

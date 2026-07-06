@@ -280,6 +280,15 @@ export interface Attachment {
 	image_output_format?: string | null;
 	/** Whether to use progressive/interlaced encoding. */
 	image_save_progressive?: boolean;
+	/**
+	 * Encode quality (1-100) from the `wp_editor_set_quality` filter.
+	 * `default` applies to the full-size image; `sizes` holds per-registered-size
+	 * overrides keyed by size name, present only where they differ from `default`.
+	 */
+	image_quality?: {
+		default: number;
+		sizes: Record< string, number >;
+	};
 }
 
 export type OnChangeHandler = ( attachments: Partial< Attachment >[] ) => void;
@@ -338,6 +347,12 @@ export interface OperationArgs {
 		 * If true, uses '-scaled' suffix instead of dimension suffix.
 		 */
 		isThresholdResize?: boolean;
+		/**
+		 * Re-encode quality (0-1) for the resized image, derived from the
+		 * `wp_editor_set_quality` filter. Falls back to the vips default
+		 * when omitted.
+		 */
+		quality?: number;
 	};
 	[ OperationType.Rotate ]: {
 		/**
