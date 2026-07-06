@@ -367,3 +367,36 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 	return $block_content;
 }
 add_filter( 'render_block', 'gutenberg_strip_inline_suggestion_markers' );
+
+/**
+ * Hide un-accepted structural suggestions on the front end.
+ *
+ * Pending structural suggestion state (the `metadata.suggestion` marker, and
+ * for insertions the suggested block itself) saves into `post_content` so a
+ * suggestion survives a reload — the structural counterpart of the inline
+ * markers above. At render time the strip is type-aware, mirroring the
+ * del/add split:
+ *
+ * - `pending-remove`: the block is real content until its removal is
+ *   accepted, so it renders unchanged (`metadata` never reaches front-end
+ *   markup).
+ * - `pending-insert`: the block is proposed new content, so it must not
+ *   render until accepted — the whole subtree is dropped.
+ * - `pending-move`: the block renders (its content is real); it appears at
+ *   the proposed position because block order is fixed before render. See
+ *   Known Limitations in the suggestions architecture doc.
+ *
+ * @param string $block_content Rendered block HTML.
+ * @param array  $block         Parsed block, including attributes.
+ * @return string Block HTML, or an empty string for a pending insertion.
+ */
+function gutenberg_strip_pending_structural_suggestions( $block_content, $block ) {
+	if ( ! isset( $block['attrs']['metadata']['suggestion']['type'] ) ) {
+		return $block_content;
+	}
+	if ( 'pending-insert' === $block['attrs']['metadata']['suggestion']['type'] ) {
+		return '';
+	}
+	return $block_content;
+}
+add_filter( 'render_block', 'gutenberg_strip_pending_structural_suggestions', 10, 2 );

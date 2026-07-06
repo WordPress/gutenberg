@@ -5,6 +5,7 @@ import { useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as interfaceStore } from '@wordpress/interface';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 
@@ -17,6 +18,7 @@ import {
 	addNoteIdToMetadata,
 	getNoteIdsFromMetadata,
 } from '../collab-sidebar/utils';
+import { ALL_NOTES_SIDEBAR, SIDEBARS } from '../collab-sidebar/constants';
 import {
 	acceptInlineDeletion,
 	rejectInlineDeletion,
@@ -430,6 +432,8 @@ export function useSuggestionsProvider() {
 
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createNotice } = useDispatch( noticesStore );
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
+	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { updateBlockAttributes, removeBlock, moveBlockToPosition } =
 		useDispatch( blockEditorStore );
 	const {
@@ -497,6 +501,15 @@ export function useSuggestionsProvider() {
 							savedRecord.id
 						),
 					} );
+
+					// Surface the new note: when a non-notes sidebar (e.g.
+					// post or block settings) is open, switch it to the
+					// notes sidebar so the suggestion is immediately
+					// visible. A closed sidebar stays closed.
+					const activeArea = getActiveComplementaryArea( 'core' );
+					if ( activeArea && ! SIDEBARS.includes( activeArea ) ) {
+						enableComplementaryArea( 'core', ALL_NOTES_SIDEBAR );
+					}
 				}
 
 				return savedRecord;
@@ -516,6 +529,8 @@ export function useSuggestionsProvider() {
 			updateBlockAttributes,
 			selectBlockAttributes,
 			createNotice,
+			getActiveComplementaryArea,
+			enableComplementaryArea,
 		]
 	);
 
