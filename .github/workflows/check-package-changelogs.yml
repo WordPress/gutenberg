@@ -19,6 +19,8 @@ on:
             - 'packages/ui/**'
             - 'packages/undo-manager/**'
             - 'packages/views/**'
+            - 'packages/widget-dashboard/**'
+            - 'packages/widget-primitives/**'
             - 'packages/wp-build/**'
             - '!packages/*/src/**/stories/**'
             - '!packages/*/src/**/test/**'
@@ -53,6 +55,8 @@ jobs:
                     - theme
                     - components
                     - private-apis
+                    - widget-dashboard
+                    - widget-primitives
                     - wp-build
         steps:
             - name: 'Get PR commit count'
