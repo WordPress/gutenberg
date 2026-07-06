@@ -1,5 +1,19 @@
 .notices-inline-notices-wrapper {
 	display: flex;
 	flex-direction: column;
-	gap: var(--wpds-dimension-gap-md);
+	gap: 0;
+
+	.components-notice-list {
+		gap: 0;
+	}
+
+	.components-notice {
+		border-inline-width: 0;
+		border-radius: 0;
+	}
+
+	.components-notice-list:not(:first-child) .components-notice:first-child,
+	.components-notice + .components-notice {
+		border-block-start-width: 0;
+	}
 }

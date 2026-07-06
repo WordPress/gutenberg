@@ -13,26 +13,9 @@
 	flex: 1 0 auto;
 }
 
-.editor-editor-interface .editor-notices {
-	gap: 0;
-}
-
 .editor-notices__dismissible,
 .editor-notices__pinned {
 	position: relative;
 	inset-inline: 0;
 	inset-block-start: 0;
-
-	&.components-notice-list {
-		gap: 0;
-	}
-
-	.components-notice {
-		border-inline-width: 0;
-	}
-
-	&:not(:first-child) .components-notice:first-child,
-	.components-notice + .components-notice {
-		border-block-start-width: 0;
-	}
 }
