@@ -267,11 +267,7 @@ export default function useOnBlockDrop(
 				}
 
 				const groupInnerBlocks = blocks.map( ( block ) => {
-					return createBlock(
-						block.name,
-						block.attributes,
-						block.innerBlocks
-					);
+					return cloneBlock( block );
 				} );
 
 				const areAllImages = blocks.every( ( block ) => {
