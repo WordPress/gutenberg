@@ -492,22 +492,53 @@ const NOOP = () => {};
  * @return {{ edit: Function, save: Function }} The edit and save components.
  */
 function createSyncedPatternComponents( blockName, markup ) {
-	function Edit() {
+	// A bare slot stands in until the server shell arrives. The slot node is
+	// carried over between injections, so the portalled children (and the
+	// controlled-tree sync living in them) never remount.
+	const INITIAL_SHELL =
+		'<wp-inner-block-slot data-slot-index="0" style="display:contents"></wp-inner-block-slot>';
+
+	function Edit( { clientId, attributes } ) {
 		const blocks = useMemo( () => parse( markup ), [] );
 
-		// SPIKE limitation: the controlled tree renders inline, without the
-		// SSR shell. The controlled sync lives in the children rendered by
-		// `useInnerBlocksProps`, so portalling them away (InnerContent)
-		// unmounts the sync and empties the tree. Composing both needs the
-		// portal to reuse these children instead of mounting its own.
-		const innerBlocksProps = useInnerBlocksProps( useBlockProps(), {
+		// The shell only depends on the block's own attributes; the overrides
+		// live inside the islands, so leaving them out keeps typing in a
+		// bound field from refetching the shell.
+		const { content: overrides, ...shellAttributes } = attributes;
+		const { content, status } = useServerSideRender( {
+			block: blockName,
+			attributes: shellAttributes,
+		} );
+
+		// Hold the last good shell: `useServerSideRender` drops `content`
+		// while loading, and the islands must never disappear mid-edit.
+		const [ shell, setShell ] = useState();
+		useLayoutEffect( () => {
+			if ( status === 'success' && typeof content === 'string' ) {
+				setShell( content );
+			}
+		}, [ status, content ] );
+
+		const blockProps = useBlockProps();
+		// The controlled tree's store sync lives in these children; they are
+		// portalled into the shell instead of rendered in place.
+		const innerBlocksProps = useInnerBlocksProps( blockProps, {
 			value: blocks,
 			onInput: NOOP,
 			onChange: NOOP,
 			renderAppender: false,
 		} );
 
-		return <div { ...innerBlocksProps } />;
+		return (
+			<div { ...blockProps }>
+				<InnerContent
+					clientId={ clientId }
+					html={ shell ?? INITIAL_SHELL }
+				>
+					{ innerBlocksProps.children }
+				</InnerContent>
+			</div>
+		);
 	}
 
 	function save() {
