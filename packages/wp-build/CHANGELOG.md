@@ -6,6 +6,11 @@
 
 -   Widgets: carry the optional `help` field (content plus links) from
     `widget.json` into the generated PHP registry.
+-   Widgets: carry the optional `category` field from `widget.json` into
+    the generated PHP registry ([#79638](https://github.com/WordPress/gutenberg/pull/79638)).
+-   Widgets: carry `title`, `description`, `keywords`, and `textdomain`
+    from `widget.json` into the generated PHP registry, so hosts can
+    translate them server-side ([#79701](https://github.com/WordPress/gutenberg/pull/79701)).
 
 ## 0.18.0 (2026-07-01)
 
