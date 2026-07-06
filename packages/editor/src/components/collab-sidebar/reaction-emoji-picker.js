@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { Button, Composite } from '@wordpress/components';
 
 /**
@@ -10,11 +10,15 @@ import { Button, Composite } from '@wordpress/components';
  * potential encoding issues with emoji characters.
  */
 export const REACTION_EMOJIS = [
-	{ emoji: '❤️', label: __( 'Heart' ), value: 'heart' },
-	{ emoji: '🎉', label: __( 'Celebration' ), value: 'celebration' },
-	{ emoji: '😄', label: __( 'Smile' ), value: 'smile' },
-	{ emoji: '👀', label: __( 'Eyes' ), value: 'eyes' },
-	{ emoji: '🚀', label: __( 'Rocket' ), value: 'rocket' },
+	{ emoji: '❤️', label: _x( 'Heart', 'emoji reaction' ), value: 'heart' },
+	{
+		emoji: '🎉',
+		label: _x( 'Celebration', 'emoji reaction' ),
+		value: 'celebration',
+	},
+	{ emoji: '😄', label: _x( 'Smile', 'emoji reaction' ), value: 'smile' },
+	{ emoji: '👀', label: _x( 'Eyes', 'emoji reaction' ), value: 'eyes' },
+	{ emoji: '🚀', label: _x( 'Rocket', 'emoji reaction' ), value: 'rocket' },
 ];
 
 /**
