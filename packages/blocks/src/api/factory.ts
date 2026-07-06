@@ -28,6 +28,13 @@ type BlockTypeWithTransformMetadata = BlockType & {
 	variationName?: string;
 };
 
+type TemplateBlock = [
+	string,
+	Record< string, unknown >?,
+	Array< unknown >?,
+	Array< string | null >?,
+];
+
 const getBlockTypeWithTransformMetadata = (
 	blockType: BlockType,
 	transform: BlockTransform
@@ -105,28 +112,26 @@ export function createBlock(
  * @return Array of Block objects.
  */
 export function createBlocksFromInnerBlocksTemplate(
-	innerBlocksOrTemplate: Array<
-		Block | [ string, Record< string, unknown >?, Array< unknown >? ]
-	> = []
+	innerBlocksOrTemplate: Array< Block | TemplateBlock > = []
 ): Block[] {
 	return innerBlocksOrTemplate.map( ( innerBlock ) => {
-		const innerBlockTemplate = Array.isArray( innerBlock )
+		const innerBlockTemplate: TemplateBlock = Array.isArray( innerBlock )
 			? innerBlock
 			: [
 					innerBlock.name,
 					innerBlock.attributes,
 					innerBlock.innerBlocks,
+					innerBlock.innerContent,
 			  ];
-		const [ name, attributes, innerBlocks = [] ] = innerBlockTemplate;
+		const [ name, attributes, innerBlocks = [], innerContent ] =
+			innerBlockTemplate;
 		return createBlock(
 			name as string,
 			attributes as Record< string, unknown >,
 			createBlocksFromInnerBlocksTemplate(
-				innerBlocks as Array<
-					| Block
-					| [ string, Record< string, unknown >?, Array< unknown >? ]
-				>
-			)
+				innerBlocks as Array< Block | TemplateBlock >
+			),
+			innerContent
 		);
 	} );
 }
