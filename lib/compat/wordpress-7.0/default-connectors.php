@@ -309,6 +309,13 @@ function _gutenberg_is_ai_api_key_valid( string $key, string $provider_id ): ?bo
 /**
  * Sanitizes stored application-password credentials for a connector.
  *
+ * Credential fields that are missing or not strings keep their currently
+ * stored values, so partial updates cannot silently clear a stored secret.
+ * A password matching the mask that `_gutenberg_connectors_rest_settings_dispatch()`
+ * places in REST responses also keeps the stored password, so a masked
+ * settings response can be submitted back to the endpoint unchanged.
+ * Pass an empty string to clear a field.
+ *
  * @access private
  *
  * @param mixed $value The submitted setting value.
@@ -319,10 +326,27 @@ function _gutenberg_sanitize_application_password_credentials( $value ): array {
 		$value = array();
 	}
 
-	return array(
-		'username' => isset( $value['username'] ) && is_string( $value['username'] ) ? sanitize_text_field( $value['username'] ) : '',
-		'password' => isset( $value['password'] ) && is_string( $value['password'] ) ? sanitize_text_field( $value['password'] ) : '',
-	);
+	$option = str_replace( 'sanitize_option_', '', (string) current_filter() );
+	$stored = get_option( $option );
+	if ( ! is_array( $stored ) ) {
+		$stored = array();
+	}
+
+	$credentials = array();
+	foreach ( array( 'username', 'password' ) as $field ) {
+		if ( isset( $value[ $field ] ) && is_string( $value[ $field ] ) ) {
+			$credentials[ $field ] = sanitize_text_field( $value[ $field ] );
+		} else {
+			$credentials[ $field ] = isset( $stored[ $field ] ) && is_string( $stored[ $field ] ) ? $stored[ $field ] : '';
+		}
+	}
+
+	// A masked password means a client resubmitted a masked REST response.
+	if ( str_repeat( "\u{2022}", 16 ) === $credentials['password'] ) {
+		$credentials['password'] = isset( $stored['password'] ) && is_string( $stored['password'] ) ? $stored['password'] : '';
+	}
+
+	return $credentials;
 }
 
 /**

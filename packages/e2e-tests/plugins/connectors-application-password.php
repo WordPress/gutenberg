@@ -50,6 +50,29 @@ add_action(
 				},
 			)
 		);
+
+		// Exposes the raw stored credentials so tests can assert what was
+		// persisted, bypassing the masking applied to /wp/v2/settings.
+		register_rest_route(
+			'gutenberg-test-connectors/v1',
+			'/application-password-credentials',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => static function () {
+					$credentials = get_option(
+						GUTENBERG_TEST_CONNECTOR_CREDENTIALS_SETTING,
+						array()
+					);
+					return array(
+						'username' => is_array( $credentials ) && isset( $credentials['username'] ) ? $credentials['username'] : '',
+						'password' => is_array( $credentials ) && isset( $credentials['password'] ) ? $credentials['password'] : '',
+					);
+				},
+				'permission_callback' => static function () {
+					return current_user_can( 'manage_options' );
+				},
+			)
+		);
 	}
 );
 

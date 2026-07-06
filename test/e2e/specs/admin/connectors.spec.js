@@ -675,6 +675,47 @@ test.describe( 'Connectors', () => {
 				password: '',
 			} );
 		} );
+
+		test( 'should keep the stored password when a masked settings response is saved back', async ( {
+			requestUtils,
+		} ) => {
+			await requestUtils.rest( {
+				path: '/wp/v2/settings',
+				method: 'POST',
+				data: {
+					[ CREDENTIALS_SETTING ]: {
+						username: 'remote-user',
+						password: APPLICATION_PASSWORD,
+					},
+				},
+			} );
+
+			// Read the settings back; the REST API masks the password.
+			const settings = await requestUtils.rest( {
+				path: '/wp/v2/settings',
+			} );
+			expect( settings[ CREDENTIALS_SETTING ].password ).toBe(
+				'\u2022'.repeat( 16 )
+			);
+
+			// Save the masked response back, as a read-modify-write client
+			// would, and confirm the stored password is not overwritten.
+			await requestUtils.rest( {
+				path: '/wp/v2/settings',
+				method: 'POST',
+				data: {
+					[ CREDENTIALS_SETTING ]: settings[ CREDENTIALS_SETTING ],
+				},
+			} );
+
+			const storedCredentials = await requestUtils.rest( {
+				path: '/gutenberg-test-connectors/v1/application-password-credentials',
+			} );
+			expect( storedCredentials ).toEqual( {
+				username: 'remote-user',
+				password: APPLICATION_PASSWORD,
+			} );
+		} );
 	} );
 
 	test.describe( 'JS extensibility', () => {
