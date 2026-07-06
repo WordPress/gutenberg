@@ -268,7 +268,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 * @param string $method Optional. HTTP method of the request. The arguments for `CREATABLE` requests are
 	 *                       checked for required values and may fall-back to a given default, this is not done
 	 *                       on `EDITABLE` requests. Default WP_REST_Server::CREATABLE.
-	 * @return array Endpoint arguments.
+	 * @return array<string, array<string, mixed>> Endpoint arguments keyed by argument name.
 	 */
 	public function get_endpoint_args_for_item_schema( $method = WP_REST_Server::CREATABLE ) {
 		$args = rest_get_endpoint_args_for_schema( $this->get_item_schema(), $method );
