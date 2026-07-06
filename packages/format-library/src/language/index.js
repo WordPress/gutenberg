@@ -102,7 +102,6 @@ function InlineLanguageUI( { value, contentRef, onChange, onClose } ) {
 				} }
 			>
 				<TextControl
-					__next40pxDefaultSize
 					label={ title }
 					value={ lang }
 					onChange={ ( val ) => setLang( val ) }

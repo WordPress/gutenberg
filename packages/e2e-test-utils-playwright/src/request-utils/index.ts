@@ -21,6 +21,7 @@ import {
 	activateTheme,
 	getCurrentThemeGlobalStylesPostId,
 	getThemeGlobalStylesRevisions,
+	resetThemeGlobalStyles,
 } from './themes';
 import { createBlock, deleteAllBlocks } from './blocks';
 import { createComment, deleteAllComments } from './comments';
@@ -211,6 +212,9 @@ class RequestUtils {
 	/** @borrows getThemeGlobalStylesRevisions as this.getThemeGlobalStylesRevisions */
 	getThemeGlobalStylesRevisions: typeof getThemeGlobalStylesRevisions =
 		getThemeGlobalStylesRevisions.bind( this );
+	/** @borrows resetThemeGlobalStyles as this.resetThemeGlobalStyles */
+	resetThemeGlobalStyles: typeof resetThemeGlobalStyles =
+		resetThemeGlobalStyles.bind( this );
 	/** @borrows deleteAllPatternCategories as this.deleteAllPatternCategories */
 	deleteAllPatternCategories = deleteAllPatternCategories.bind( this );
 	/** @borrows setGutenbergExperiments as this.setGutenbergExperiments */

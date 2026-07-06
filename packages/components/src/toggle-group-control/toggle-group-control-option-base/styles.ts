@@ -28,8 +28,7 @@ export const buttonView = ( {
 	isDeselectable,
 	isIcon,
 	isPressed,
-	size,
-}: Pick< ToggleGroupControlProps, 'isDeselectable' | 'size' > &
+}: Pick< ToggleGroupControlProps, 'isDeselectable' > &
 	Pick< ToggleGroupControlOptionBaseProps, 'isIcon' > & {
 		isPressed?: boolean;
 	} ) => css`
@@ -74,7 +73,7 @@ export const buttonView = ( {
 	}
 
 	${ isDeselectable && deselectable }
-	${ isIcon && isIconStyles( { size } ) }
+	${ isIcon && isIconStyles }
 	${ isPressed && pressed }
 `;
 
@@ -102,18 +101,9 @@ export const ButtonContentView = styled.div`
 	line-height: 1;
 `;
 
-const isIconStyles = ( {
-	size = 'default',
-}: Pick< ToggleGroupControlProps, 'size' > ) => {
-	const iconButtonSizes = {
-		default: '34px',
-		'__unstable-large': '38px',
-	};
-
-	return css`
-		height: ${ iconButtonSizes[ size ] };
-		aspect-ratio: 1;
-		padding-left: 0;
-		padding-right: 0;
-	`;
-};
+const isIconStyles = css`
+	height: 38px;
+	aspect-ratio: 1;
+	padding-left: 0;
+	padding-right: 0;
+`;

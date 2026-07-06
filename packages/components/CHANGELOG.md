@@ -2,9 +2,92 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `ExternalLink`: No longer sets the `rel` attribute by default. Consumers relying on the previous behavior should pass `rel` explicitly ([#79743](https://github.com/WordPress/gutenberg/pull/79743)).
+-   `View`: The legacy Emotion `css` prop no longer applies styles and is now accepted as a no-op for compatibility. Use `style` for inline styles or `className` for CSS-based styling instead ([#79443](https://github.com/WordPress/gutenberg/pull/79443)).
+-   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
+    -   `Truncate` ([#79446](https://github.com/WordPress/gutenberg/pull/79446))
+    -   `Divider` ([#79444](https://github.com/WordPress/gutenberg/pull/79444))
+    -   `Surface` ([#79445](https://github.com/WordPress/gutenberg/pull/79445))
+    -   `View` ([#79443](https://github.com/WordPress/gutenberg/pull/79443))
+-   The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed from the following:
+    -   `BorderBoxControl` ([#79420](https://github.com/WordPress/gutenberg/pull/79420))
+    -   `BorderControl` ([#79418](https://github.com/WordPress/gutenberg/pull/79418))
+    -   `ComboboxControl` ([#79636](https://github.com/WordPress/gutenberg/pull/79636)).
+    -   `CustomSelectControl` ([#79796](https://github.com/WordPress/gutenberg/pull/79796)).
+    -   `FontSizePicker` ([#79481](https://github.com/WordPress/gutenberg/pull/79481))
+    -   `FormFileUpload` ([#79655](https://github.com/WordPress/gutenberg/pull/79655))
+    -   `FormTokenField` ([#79720](https://github.com/WordPress/gutenberg/pull/79720))
+    -   `RangeControl` ([#79590](https://github.com/WordPress/gutenberg/pull/79590))
+    -   `Radio` ([#79657](https://github.com/WordPress/gutenberg/pull/79657))
+    -   `ToggleGroupControl` ([#79656](https://github.com/WordPress/gutenberg/pull/79656))
+    -   `TreeSelect` ([#79550](https://github.com/WordPress/gutenberg/pull/79550))
+    -   `UnitControl` ([#79721](https://github.com/WordPress/gutenberg/pull/79721))
+
+### Enhancements
+
+-   `Button`: Align focus rings with the design system ([#78646](https://github.com/WordPress/gutenberg/pull/78646)).
+-   The `size` prop no longer has any effect and can be safely removed from the following:
+    -   `BorderBoxControl` ([#79420](https://github.com/WordPress/gutenberg/pull/79420))
+    -   `BorderControl` ([#79418](https://github.com/WordPress/gutenberg/pull/79418))
+    -   `FontSizePicker` ([#79481](https://github.com/WordPress/gutenberg/pull/79481))
+    -   `ToggleGroupControl` ([#79656](https://github.com/WordPress/gutenberg/pull/79656))
+
+### Documentation
+
+-   Document `clsx` object syntax for conditional CSS Module classes ([#79490](https://github.com/WordPress/gutenberg/pull/79490), [#79535](https://github.com/WordPress/gutenberg/pull/79535)).
+
+### Bug Fixes
+
+-   `Divider`: Restore lower-specificity border styles so custom border colors can override the default divider color. ([#79534](https://github.com/WordPress/gutenberg/pull/79534))
+
+### Internal
+
+-   Enforce CSS Module class selector naming for component-library packages ([#79504](https://github.com/WordPress/gutenberg/pull/79504)).
+-   `Surface`: Migrate styles from Emotion to SCSS Modules and use WPDS tokens for migrated visual values ([#79445](https://github.com/WordPress/gutenberg/pull/79445)).
+-   `Truncate`: Migrate styles from Emotion to SCSS Modules ([#79446](https://github.com/WordPress/gutenberg/pull/79446)).
+-   `View`: Migrate away from Emotion while preserving polymorphic `as` behavior and style cascade order ([#79443](https://github.com/WordPress/gutenberg/pull/79443)).
+
+## 36.1.0 (2026-07-01)
+
+## 36.0.0 (2026-06-24)
+
+### Breaking Changes
+
+-   The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed from the following:
+    -   `BoxControl` ([#79419](https://github.com/WordPress/gutenberg/pull/79419))
+    -   `TextControl` ([#79386](https://github.com/WordPress/gutenberg/pull/79386))
+
+### Enhancements
+
+-   `BaseControl`: Apply `text-wrap: pretty` to help text to avoid typographic widows ([#79112](https://github.com/WordPress/gutenberg/pull/79112)).
+-   `Button`, `DropdownMenu`, `FormToggle`, `Modal`, `Panel`, `RadioControl`, `Toolbar`: Migrate hardcoded border and stroke colors to WPDS tokens ([#79244](https://github.com/WordPress/gutenberg/pull/79244)).
+
 ### Bug Fixes
 
 -   `SandBox`: Fix the viewport-unit (`vh`, `vw`, etc.) stripping so user-supplied HTML using these units in `width`/`height` no longer triggers a runaway resize loop in the preview ([#78677](https://github.com/WordPress/gutenberg/pull/78677)).
+-   `BoxControl`: Respect a consumer-supplied `placeholder` passed via `inputProps`, falling back to it when there is no mixed-value placeholder ([#79466](https://github.com/WordPress/gutenberg/pull/79466)).
+
+### Internal
+
+-   `ResizableBox`: Make the `children` prop optional ([#79370](https://github.com/WordPress/gutenberg/pull/79370)).
+-   Add documentation and lint guardrails for the ongoing Emotion migration ([#79442](https://github.com/WordPress/gutenberg/pull/79442)).
+-   `Divider`: Migrate styles from Emotion to SCSS Modules ([#79444](https://github.com/WordPress/gutenberg/pull/79444)).
+-   Adopt `--wpds-dimension-size-*` design tokens [#79093](https://github.com/WordPress/gutenberg/pull/79093).
+-   Point the legacy `--wp-components-*` color fallbacks at the design system tokens (`--wpds-*` / `--wp-admin-theme-color*`), so component styles get sensible defaults from the prebuilt token stylesheet without a runtime `<ThemeProvider>` ([#78664](https://github.com/WordPress/gutenberg/pull/78664)).
+-   `withFallbackStyles`: Refactor from a class component to a function component with hooks ([#78837](https://github.com/WordPress/gutenberg/pull/78837)).
+
+### Documentation
+
+-   `Menu`: Fix `overriden` typo to `overridden` in `CheckboxItemProps` and `RadioItemProps`. ([#79331](https://github.com/WordPress/gutenberg/pull/79331))
+-   Add component documentation for `ColorPicker`, `CustomSelectControl`, `Navigator`, `NumberControl`, `ResizableBox`, and `Slot` components ([#79460](https://github.com/WordPress/gutenberg/pull/79460)).
+
+### Code Quality
+
+-   Move `@types/react` from `dependencies` to an optional peer dependency so consumers' React type version is used [#79095](https://github.com/WordPress/gutenberg/pull/79095).
+
+## 35.0.1 (2026-06-16)
 
 ## 35.0.0 (2026-06-10)
 
@@ -43,6 +126,7 @@
 
 ### Enhancements
 
+-   `Tooltip`: Mark as not recommended for use in a WordPress environment, in favour of `Tooltip` from `@wordpress/ui` ([#78693](https://github.com/WordPress/gutenberg/pull/78693)).
 -   `Tabs`, `TabPanel`: Align selected tab colors and indicators with `@wordpress/ui` `Tabs` ([#78418](https://github.com/WordPress/gutenberg/pull/78418)).
 -   `NoticeList`: Add vertical spacing between notices in a list.
 -   `Draggable`: Render the drag clone inside the `@wordpress/ui` compat overlay slot so it shares stacking with `@wordpress/ui` overlays opened mid-drag. Auto-enabled in WordPress environments; other hosts can opt in via `useEnableWpCompatOverlaySlot()` ([#78183](https://github.com/WordPress/gutenberg/pull/78183), [#78354](https://github.com/WordPress/gutenberg/pull/78354)).

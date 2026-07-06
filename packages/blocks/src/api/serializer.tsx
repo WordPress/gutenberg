@@ -331,6 +331,42 @@ export function serializeAttributes(
 }
 
 /**
+ * Given the static HTML fragments of the Custom HTML block and its inner
+ * blocks, returns the block's inner HTML markup by interleaving the fragments
+ * with the serialized inner blocks.
+ *
+ * @param innerContent Static HTML fragments, `null` marking inner block positions.
+ * @param innerBlocks  Inner blocks.
+ *
+ * @return HTML.
+ */
+function serializeInnerContent(
+	innerContent: Array< string | null >,
+	innerBlocks: Block[]
+): string {
+	let childIndex = 0;
+	const parts = innerContent.map( ( item ) => {
+		if ( item !== null ) {
+			return item;
+		}
+		const innerBlock = innerBlocks[ childIndex++ ];
+		return innerBlock
+			? serializeBlock( innerBlock, { isInnerBlocks: true } )
+			: '';
+	} );
+
+	// Defensively append inner blocks without a matching placeholder so that
+	// content is never lost when the two arrays fall out of sync.
+	for ( ; childIndex < innerBlocks.length; childIndex++ ) {
+		parts.push(
+			serializeBlock( innerBlocks[ childIndex ], { isInnerBlocks: true } )
+		);
+	}
+
+	return parts.join( '' ).trim();
+}
+
+/**
  * Given a block object, returns the Block's Inner HTML markup.
  *
  * @param block Block instance.
@@ -338,6 +374,12 @@ export function serializeAttributes(
  * @return HTML.
  */
 export function getBlockInnerHTML( block: Block ): string {
+	// The Custom HTML block serializes from its static HTML fragments rather
+	// than from a `save` implementation.
+	if ( block.innerContent && block.name === 'core/html' ) {
+		return serializeInnerContent( block.innerContent, block.innerBlocks );
+	}
+
 	// If block was parsed as invalid or encounters an error while generating
 	// save content, use original content instead to avoid content loss. If a
 	// block contains nested content, exempt it from this condition because we

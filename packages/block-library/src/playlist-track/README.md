@@ -24,7 +24,6 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 |-----------|------|---------|-------------|
 | `blob` | `string` | — | [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `local` |
 | `id` | `number` | — | — |
-| `uniqueId` | `string` | — | — |
 | `src` | `string` | — | — |
 | `type` | `string` | `"audio"` | — |
 | `album` | `string` | — | — |
@@ -49,7 +48,6 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 **Uses context:**
 
 - `showArtists`
-- `currentTrack`
 
 ## Block Markup
 

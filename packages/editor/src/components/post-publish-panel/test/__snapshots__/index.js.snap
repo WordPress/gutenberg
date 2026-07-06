@@ -32,6 +32,9 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+}
+
+.emotion-11 {
   -webkit-align-items: flex-start;
   -webkit-box-align: flex-start;
   -ms-flex-align: flex-start;
@@ -47,7 +50,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
   width: 100%;
 }
 
-.emotion-10>* {
+.emotion-12>* {
   min-width: 0;
 }
 
@@ -66,6 +69,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
       >
         <svg
           aria-hidden="true"
+          fill="currentColor"
           focusable="false"
           height="24"
           viewBox="0 0 24 24"
@@ -90,7 +94,6 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
           <a
             class="components-external-link"
             href="https://wordpress.local/sample-page/"
-            rel="external noopener"
             target="_blank"
           >
             <span
@@ -134,7 +137,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
                   post address
                 </label>
                 <input
-                  class="components-text-control__input is-next-40px-default-size"
+                  class="components-text-control__input"
                   id="inspector-text-control-0"
                   readonly=""
                   type="text"
@@ -162,12 +165,14 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
               target="_blank"
             >
               <span
+                class="style-visually-hidden"
                 data-visually-hidden=""
               >
                 (opens in a new tab)
               </span>
               <svg
                 aria-hidden="true"
+                fill="currentColor"
                 focusable="false"
                 height="24"
                 viewBox="0 0 24 24"
@@ -197,7 +202,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
           class="components-base-control__field emotion-2 emotion-3"
         >
           <div
-            class="components-flex components-h-stack emotion-10 emotion-11"
+            class="emotion-10 emotion-11 emotion-12 components-flex components-h-stack"
             data-wp-c16t="true"
             data-wp-component="HStack"
           >
@@ -257,6 +262,9 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+}
+
+.emotion-11 {
   -webkit-align-items: flex-start;
   -webkit-box-align: flex-start;
   -ms-flex-align: flex-start;
@@ -272,7 +280,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
   width: 100%;
 }
 
-.emotion-10>* {
+.emotion-12>* {
   min-width: 0;
 }
 
@@ -291,6 +299,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
       >
         <svg
           aria-hidden="true"
+          fill="currentColor"
           focusable="false"
           height="24"
           viewBox="0 0 24 24"
@@ -315,7 +324,6 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
           <a
             class="components-external-link"
             href="https://wordpress.local/sample-page/"
-            rel="external noopener"
             target="_blank"
           >
             <span
@@ -362,7 +370,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
                   post address
                 </label>
                 <input
-                  class="components-text-control__input is-next-40px-default-size"
+                  class="components-text-control__input"
                   id="inspector-text-control-1"
                   readonly=""
                   type="text"
@@ -402,7 +410,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
           class="components-base-control__field emotion-2 emotion-3"
         >
           <div
-            class="components-flex components-h-stack emotion-10 emotion-11"
+            class="emotion-10 emotion-11 emotion-12 components-flex components-h-stack"
             data-wp-c16t="true"
             data-wp-component="HStack"
           >
@@ -452,6 +460,9 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+}
+
+.emotion-5 {
   -webkit-align-items: flex-start;
   -webkit-box-align: flex-start;
   -ms-flex-align: flex-start;
@@ -467,7 +478,7 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
   width: 100%;
 }
 
-.emotion-4>* {
+.emotion-6>* {
   min-width: 0;
 }
 
@@ -521,6 +532,7 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
           <svg
             aria-hidden="true"
             class="components-site-icon"
+            fill="currentColor"
             focusable="false"
             height="36px"
             viewBox="-2 -2 24 24"
@@ -556,7 +568,7 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
           class="components-base-control__field emotion-2 emotion-3"
         >
           <div
-            class="components-flex components-h-stack emotion-4 emotion-5"
+            class="emotion-4 emotion-5 emotion-6 components-flex components-h-stack"
             data-wp-c16t="true"
             data-wp-component="HStack"
           >
@@ -606,6 +618,9 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+}
+
+.emotion-5 {
   -webkit-align-items: flex-start;
   -webkit-box-align: flex-start;
   -ms-flex-align: flex-start;
@@ -621,7 +636,7 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
   width: 100%;
 }
 
-.emotion-4>* {
+.emotion-6>* {
   min-width: 0;
 }
 
@@ -675,6 +690,7 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
           <svg
             aria-hidden="true"
             class="components-site-icon"
+            fill="currentColor"
             focusable="false"
             height="36px"
             viewBox="-2 -2 24 24"
@@ -710,7 +726,7 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
           class="components-base-control__field emotion-2 emotion-3"
         >
           <div
-            class="components-flex components-h-stack emotion-4 emotion-5"
+            class="emotion-4 emotion-5 emotion-6 components-flex components-h-stack"
             data-wp-c16t="true"
             data-wp-component="HStack"
           >
@@ -804,6 +820,9 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+}
+
+.emotion-11 {
   -webkit-align-items: flex-start;
   -webkit-box-align: flex-start;
   -ms-flex-align: flex-start;
@@ -819,7 +838,7 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
   width: 100%;
 }
 
-.emotion-10>* {
+.emotion-12>* {
   min-width: 0;
 }
 
@@ -889,7 +908,7 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
           class="components-base-control__field emotion-8 emotion-9"
         >
           <div
-            class="components-flex components-h-stack emotion-10 emotion-11"
+            class="emotion-10 emotion-11 emotion-12 components-flex components-h-stack"
             data-wp-c16t="true"
             data-wp-component="HStack"
           >

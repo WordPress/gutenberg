@@ -4,6 +4,7 @@
 import { getValueFromObjectPath } from '../utils/object';
 import { getValueFromVariable } from '../utils/common';
 import type { GlobalStylesConfig, UnresolvedValue } from '../types';
+import { getLegacyStyleStatePath } from '../style-state-back-compat';
 
 export function getStyle< T = any >(
 	globalStyles?: GlobalStylesConfig,
@@ -19,9 +20,30 @@ export function getStyle< T = any >(
 		return undefined;
 	}
 
-	const rawResult = getValueFromObjectPath( globalStyles, finalPath ) as
+	let rawResult = getValueFromObjectPath( globalStyles, finalPath ) as
 		| string
 		| UnresolvedValue;
+	const legacyPath = getLegacyStyleStatePath( finalPath );
+	if ( rawResult === undefined && legacyPath ) {
+		let hasCanonicalPath = true;
+		let currentValue: any = globalStyles;
+		for ( const pathPart of finalPath.split( '.' ) ) {
+			if (
+				! currentValue ||
+				typeof currentValue !== 'object' ||
+				! Object.hasOwn( currentValue, pathPart )
+			) {
+				hasCanonicalPath = false;
+				break;
+			}
+			currentValue = currentValue[ pathPart ];
+		}
+		if ( ! hasCanonicalPath ) {
+			rawResult = getValueFromObjectPath( globalStyles, legacyPath ) as
+				| string
+				| UnresolvedValue;
+		}
+	}
 	const result = shouldDecodeEncode
 		? getValueFromVariable( globalStyles, blockName, rawResult )
 		: rawResult;

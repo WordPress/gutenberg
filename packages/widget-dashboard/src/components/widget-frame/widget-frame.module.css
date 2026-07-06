@@ -1,0 +1,17 @@
+/* Scroll viewport that fills the tile height; min:0 bounds tall content. */
+.content {
+	flex: 1;
+	height: 100%;
+	overflow-y: auto;
+	min-width: 0;
+	min-height: 0;
+}
+
+/* Bleeding body reaches the card borders. Card exposes no padding-less section. */
+.bleedContent {
+	padding: 0;
+}
+
+.loading {
+	height: 100%;
+}

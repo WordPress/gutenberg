@@ -147,6 +147,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		'should_skip_gap_serialization' => false,
 		'fallback_gap_value'            => '0.5em',
 		'block_spacing'                 => null,
+		'options'                       => array(),
 	);
 
 	/**
@@ -168,7 +169,8 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 			$args['gap_value'],
 			$args['should_skip_gap_serialization'],
 			$args['fallback_gap_value'],
-			$args['block_spacing']
+			$args['block_spacing'],
+			$args['options']
 		);
 
 		$this->assertSame( $expected_output, $layout_styles );
@@ -255,6 +257,21 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 					),
 				),
 				'expected_output' => '.wp-layout > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width:800px;margin-left:auto !important;margin-right:auto !important;}.wp-layout > .alignwide{max-width:1200px;}.wp-layout .alignfull{max-width:none;}.wp-layout > .alignfull{margin-right:calc(10px * -1);margin-left:calc(20px * -1);}',
+			),
+			'constrained layout with content size unset in viewport' => array(
+				'args'            => array(
+					'selector' => '.wp-layout',
+					'layout'   => array(
+						'type'        => 'constrained',
+						'contentSize' => '800px',
+					),
+					'options'  => array(
+						'viewport_overrides' => array(
+							'contentSize' => null,
+						),
+					),
+				),
+				'expected_output' => '.wp-layout > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width:var(--wp--style--global--content-size, none);}.wp-layout > .alignwide{max-width:var(--wp--style--global--wide-size, none);}.wp-layout .alignfull{max-width:none;}',
 			),
 			'constrained layout with block gap support'    => array(
 				'args'            => array(
@@ -417,6 +434,162 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 					),
 				),
 				'expected_output' => '.wp-block-group.wp-container-6 > *{margin-block-start:0;margin-block-end:0;}.wp-block-group.wp-container-6 > * + *{margin-block-start:var(--wp--preset--spacing--70);margin-block-end:0;}',
+			),
+		);
+	}
+
+	/**
+	 * Check that gutenberg_get_child_layout_style_rules() renders flex child sizing styles.
+	 *
+	 * @dataProvider data_gutenberg_get_child_layout_style_rules
+	 *
+	 * @covers ::gutenberg_get_child_layout_style_rules
+	 *
+	 * @param array      $child_layout       Child layout values.
+	 * @param array|null $viewport_overrides Optional child viewport layout overrides.
+	 * @param array      $expected_output    The expected output.
+	 */
+	public function test_gutenberg_get_child_layout_style_rules( $child_layout, $viewport_overrides, $expected_output ) {
+		$actual_output = gutenberg_get_child_layout_style_rules(
+			'.wp-container-content-test',
+			$child_layout,
+			array(),
+			$viewport_overrides
+		);
+
+		$this->assertSame( $expected_output, $actual_output );
+	}
+
+	/**
+	 * Data provider for test_gutenberg_get_child_layout_style_rules().
+	 *
+	 * @return array
+	 */
+	public function data_gutenberg_get_child_layout_style_rules() {
+		return array(
+			'legacy fixed sizing remains shrinkable'      => array(
+				'child_layout'       => array(
+					'selfStretch' => 'fixed',
+					'flexSize'    => '320px',
+				),
+				'viewport_overrides' => null,
+				'expected_output'    => array(
+					array(
+						'selector'     => '.wp-container-content-test',
+						'declarations' => array(
+							'flex-basis' => '320px',
+							'box-sizing' => 'border-box',
+						),
+					),
+				),
+			),
+			'fixed sizing can opt out of shrinking'       => array(
+				'child_layout'       => array(
+					'selfStretch' => 'fixedNoShrink',
+					'flexSize'    => '320px',
+				),
+				'viewport_overrides' => null,
+				'expected_output'    => array(
+					array(
+						'selector'     => '.wp-container-content-test',
+						'declarations' => array(
+							'flex-basis'  => '320px',
+							'flex-shrink' => '0',
+							'box-sizing'  => 'border-box',
+						),
+					),
+				),
+			),
+			'viewport overrides can switch fixedNoShrink to max' => array(
+				'child_layout'       => array(
+					'selfStretch' => 'fixedNoShrink',
+					'flexSize'    => '320px',
+				),
+				'viewport_overrides' => array(
+					'selfStretch' => 'fixed',
+				),
+				'expected_output'    => array(
+					array(
+						'selector'     => '.wp-container-content-test',
+						'declarations' => array(
+							'flex-basis'  => '320px',
+							'flex-shrink' => 'unset',
+							'box-sizing'  => 'border-box',
+						),
+					),
+				),
+			),
+			'viewport overrides can switch fixedNoShrink to fit' => array(
+				'child_layout'       => array(
+					'selfStretch' => 'fixedNoShrink',
+					'flexSize'    => '320px',
+				),
+				'viewport_overrides' => array(
+					'selfStretch' => 'fit',
+				),
+				'expected_output'    => array(
+					array(
+						'selector'     => '.wp-container-content-test',
+						'declarations' => array(
+							'flex-basis'  => 'unset',
+							'flex-shrink' => 'unset',
+						),
+					),
+				),
+			),
+			'viewport overrides can switch fixed to fit'  => array(
+				'child_layout'       => array(
+					'selfStretch' => 'fixed',
+					'flexSize'    => '320px',
+				),
+				'viewport_overrides' => array(
+					'selfStretch' => 'fit',
+				),
+				'expected_output'    => array(
+					array(
+						'selector'     => '.wp-container-content-test',
+						'declarations' => array(
+							'flex-basis' => 'unset',
+						),
+					),
+				),
+			),
+			'viewport overrides can switch fixedNoShrink to grow' => array(
+				'child_layout'       => array(
+					'selfStretch' => 'fixedNoShrink',
+					'flexSize'    => '320px',
+				),
+				'viewport_overrides' => array(
+					'selfStretch' => 'fill',
+				),
+				'expected_output'    => array(
+					array(
+						'selector'     => '.wp-container-content-test',
+						'declarations' => array(
+							'flex-basis'  => 'unset',
+							'flex-shrink' => 'unset',
+							'flex-grow'   => '1',
+						),
+					),
+				),
+			),
+			'viewport overrides can switch fixed to grow' => array(
+				'child_layout'       => array(
+					'selfStretch' => 'fixed',
+					'flexSize'    => '320px',
+				),
+				'viewport_overrides' => array(
+					'selfStretch' => 'fill',
+				),
+				'expected_output'    => array(
+					array(
+						'selector'     => '.wp-container-content-test',
+						'declarations' => array(
+							'flex-basis' => 'unset',
+							'flex-grow'  => '1',
+						),
+					),
+				),
 			),
 		);
 	}

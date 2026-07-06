@@ -3,10 +3,10 @@
  */
 import { __ } from '@wordpress/i18n';
 
-function InserterNoResults() {
+function InserterNoResults( { children = __( 'No results found.' ) } ) {
 	return (
 		<div className="block-editor-inserter__no-results">
-			<p>{ __( 'No results found.' ) }</p>
+			<p>{ children }</p>
 		</div>
 	);
 }

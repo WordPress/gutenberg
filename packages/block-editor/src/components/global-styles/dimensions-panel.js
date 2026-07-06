@@ -544,7 +544,6 @@ export default function DimensionsPanel( {
 					panelId={ panelId }
 				>
 					<UnitControl
-						__next40pxDefaultSize
 						label={ __( 'Content width' ) }
 						labelPosition="top"
 						value={ contentSizeValue || '' }
@@ -571,7 +570,6 @@ export default function DimensionsPanel( {
 					panelId={ panelId }
 				>
 					<UnitControl
-						__next40pxDefaultSize
 						label={ __( 'Wide width' ) }
 						labelPosition="top"
 						value={ wideSizeValue || '' }
@@ -602,7 +600,6 @@ export default function DimensionsPanel( {
 				>
 					{ ! showSpacingPresetsControl && (
 						<BoxControl
-							__next40pxDefaultSize
 							values={ paddingValues }
 							onChange={ setPaddingValues }
 							label={ __( 'Padding' ) }
@@ -645,7 +642,6 @@ export default function DimensionsPanel( {
 				>
 					{ ! showSpacingPresetsControl && (
 						<BoxControl
-							__next40pxDefaultSize
 							values={ marginValues }
 							onChange={ setMarginValues }
 							inputProps={ {
@@ -701,7 +697,6 @@ export default function DimensionsPanel( {
 					{ ! showSpacingPresetsControl &&
 						( isAxialGap ? (
 							<BoxControl
-								__next40pxDefaultSize
 								label={ __( 'Block spacing' ) }
 								min={ 0 }
 								onChange={ setGapValues }
@@ -713,7 +708,6 @@ export default function DimensionsPanel( {
 							/>
 						) : (
 							<UnitControl
-								__next40pxDefaultSize
 								label={ __( 'Block spacing' ) }
 								min={ 0 }
 								onChange={ setGapValue }

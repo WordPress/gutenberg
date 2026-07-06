@@ -106,7 +106,6 @@ export const AddNavigationModal = ( {
 						label={ __( 'Name' ) }
 						placeholder={ __( 'Enter menu name' ) }
 						disabled={ isBusy }
-						__next40pxDefaultSize
 					/>
 					<HStack justify="right" spacing={ 2 }>
 						<Button

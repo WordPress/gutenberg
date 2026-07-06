@@ -22,6 +22,9 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+}
+
+.emotion-5 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -37,11 +40,11 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
   width: 100%;
 }
 
-.emotion-4>* {
+.emotion-6>* {
   min-width: 0;
 }
 
-.emotion-6 {
+.emotion-7 {
   display: block;
   max-height: 100%;
   max-width: 100%;
@@ -63,7 +66,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
         class="components-base-control__field emotion-2 emotion-3"
       >
         <div
-          class="components-flex components-h-stack emotion-4 emotion-5"
+          class="emotion-4 emotion-5 emotion-6 components-flex components-h-stack"
           data-wp-c16t="true"
           data-wp-component="HStack"
         >
@@ -83,7 +86,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
             />
           </span>
           <label
-            class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+            class="emotion-7 components-flex-item components-flex-block components-toggle-control__label"
             data-wp-c16t="true"
             data-wp-component="FlexBlock"
             for="inspector-toggle-control-3"
@@ -128,6 +131,9 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields 
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+}
+
+.emotion-5 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -143,11 +149,11 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields 
   width: 100%;
 }
 
-.emotion-4>* {
+.emotion-6>* {
   min-width: 0;
 }
 
-.emotion-6 {
+.emotion-7 {
   display: block;
   max-height: 100%;
   max-width: 100%;
@@ -169,7 +175,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields 
         class="components-base-control__field emotion-2 emotion-3"
       >
         <div
-          class="components-flex components-h-stack emotion-4 emotion-5"
+          class="emotion-4 emotion-5 emotion-6 components-flex components-h-stack"
           data-wp-c16t="true"
           data-wp-component="HStack"
         >
@@ -190,7 +196,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields 
             />
           </span>
           <label
-            class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+            class="emotion-7 components-flex-item components-flex-block components-toggle-control__label"
             data-wp-c16t="true"
             data-wp-component="FlexBlock"
             for="inspector-toggle-control-0"
@@ -224,6 +230,9 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+}
+
+.emotion-5 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -239,11 +248,11 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
   width: 100%;
 }
 
-.emotion-4>* {
+.emotion-6>* {
   min-width: 0;
 }
 
-.emotion-6 {
+.emotion-7 {
   display: block;
   max-height: 100%;
   max-width: 100%;
@@ -265,7 +274,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
         class="components-base-control__field emotion-2 emotion-3"
       >
         <div
-          class="components-flex components-h-stack emotion-4 emotion-5"
+          class="emotion-4 emotion-5 emotion-6 components-flex components-h-stack"
           data-wp-c16t="true"
           data-wp-component="HStack"
         >
@@ -286,7 +295,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
             />
           </span>
           <label
-            class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+            class="emotion-7 components-flex-item components-flex-block components-toggle-control__label"
             data-wp-c16t="true"
             data-wp-component="FlexBlock"
             for="inspector-toggle-control-2"
@@ -331,6 +340,9 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fiel
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+}
+
+.emotion-5 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -346,11 +358,11 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fiel
   width: 100%;
 }
 
-.emotion-4>* {
+.emotion-6>* {
   min-width: 0;
 }
 
-.emotion-6 {
+.emotion-7 {
   display: block;
   max-height: 100%;
   max-width: 100%;
@@ -372,7 +384,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fiel
         class="components-base-control__field emotion-2 emotion-3"
       >
         <div
-          class="components-flex components-h-stack emotion-4 emotion-5"
+          class="emotion-4 emotion-5 emotion-6 components-flex components-h-stack"
           data-wp-c16t="true"
           data-wp-component="HStack"
         >
@@ -392,7 +404,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fiel
             />
           </span>
           <label
-            class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+            class="emotion-7 components-flex-item components-flex-block components-toggle-control__label"
             data-wp-c16t="true"
             data-wp-component="FlexBlock"
             for="inspector-toggle-control-1"

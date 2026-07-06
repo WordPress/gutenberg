@@ -13,7 +13,7 @@
  * tab-specific attributes (id, aria-controls, context) and interactivity
  * directives using data from the tabs-list context.
  *
- * @since 7.0.0
+ * @since 7.1.0
  *
  * @param array     $attributes Block attributes.
  * @param string    $content    Block content (rendered buttons from save.js).
@@ -32,13 +32,11 @@ function block_core_tab_list_render_callback( array $attributes, string $content
 	$tab_index     = 0;
 
 	while ( $tag_processor->next_tag( 'button' ) ) {
-		$tab = $tabs_list[ $tab_index ] ?? null;
+		$tab_id = $tabs_list[ $tab_index ] ?? null;
 
-		if ( null === $tab ) {
+		if ( null === $tab_id ) {
 			break;
 		}
-
-		$tab_id = $tab['id'] ?? 'tab-' . $tab_index;
 
 		$tag_processor->set_attribute( 'id', 'tab__' . $tab_id );
 		$tag_processor->set_attribute( 'aria-controls', $tab_id );
@@ -60,7 +58,7 @@ function block_core_tab_list_render_callback( array $attributes, string $content
 /**
  * Registers the `core/tab-list` block on the server.
  *
- * @since 7.0.0
+ * @since 7.1.0
  */
 function register_block_core_tab_list() {
 	register_block_type_from_metadata(

@@ -55,7 +55,6 @@ function PasswordEdit( {
 						value={ field.getValue( { item: data } ) || '' }
 						placeholder={ __( 'Use a secure password' ) }
 						type="text"
-						__next40pxDefaultSize
 						maxLength={ 255 }
 					/>
 				</div>
