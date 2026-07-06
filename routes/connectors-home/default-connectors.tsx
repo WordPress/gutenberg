@@ -308,15 +308,22 @@ function ApplicationPasswordConnector( {
 	const helpLabel = getHelpLabel( helpUrl );
 	const pluginSlug = getPluginSlug( plugin?.file );
 
-	const currentUsername = useSelect(
+	const { currentUsername, hasResolvedSettings } = useSelect(
 		( registrySelect ) => {
-			const siteSettings = registrySelect( coreStore ).getEntityRecord(
-				'root',
-				'site'
-			) as
+			const { getEntityRecord, hasFinishedResolution } =
+				registrySelect( coreStore );
+			const siteSettings = getEntityRecord( 'root', 'site' ) as
 				| Record< string, { username?: string; password?: string } >
 				| undefined;
-			return siteSettings?.[ settingName ]?.username ?? '';
+			return {
+				currentUsername: siteSettings?.[ settingName ]?.username ?? '',
+				// The settings form seeds its state on mount, so wait for the
+				// site settings to resolve before rendering it.
+				hasResolvedSettings: hasFinishedResolution( 'getEntityRecord', [
+					'root',
+					'site',
+				] ),
+			};
 		},
 		[ settingName ]
 	);
@@ -456,24 +463,26 @@ function ApplicationPasswordConnector( {
 				/>
 			}
 		>
-			{ isExpanded && pluginStatus === 'active' && (
-				<ApplicationPasswordConnectorSettings
-					key={ isConnected ? 'connected' : 'setup' }
-					initialUsername={ currentUsername }
-					helpUrl={ helpUrl }
-					helpLabel={ helpLabel }
-					readOnly={ isConnected }
-					onRemove={ async () => {
-						await removeCredentials();
-						actionButtonRef.current?.focus();
-					} }
-					onSave={ async ( credentials ) => {
-						await saveCredentials( credentials );
-						setIsExpanded( false );
-						actionButtonRef.current?.focus();
-					} }
-				/>
-			) }
+			{ isExpanded &&
+				pluginStatus === 'active' &&
+				hasResolvedSettings && (
+					<ApplicationPasswordConnectorSettings
+						key={ isConnected ? 'connected' : 'setup' }
+						initialUsername={ currentUsername }
+						helpUrl={ helpUrl }
+						helpLabel={ helpLabel }
+						readOnly={ isConnected }
+						onRemove={ async () => {
+							await removeCredentials();
+							actionButtonRef.current?.focus();
+						} }
+						onSave={ async ( credentials ) => {
+							await saveCredentials( credentials );
+							setIsExpanded( false );
+							actionButtonRef.current?.focus();
+						} }
+					/>
+				) }
 		</ConnectorItem>
 	);
 }
