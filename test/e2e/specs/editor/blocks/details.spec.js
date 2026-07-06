@@ -136,7 +136,8 @@ test.describe( 'Details', () => {
 
 		await expect( paragraph ).toContainText( 'Details content' );
 
-		await paragraph.getByRole( 'textbox' ).click();
+		await paragraph.click();
+		await expect( paragraph ).toBeFocused();
 		await pageUtils.pressKeys( 'primary+ArrowLeft' );
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.type( ' updated' );
