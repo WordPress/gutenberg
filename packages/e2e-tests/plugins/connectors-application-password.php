@@ -9,8 +9,7 @@
  * @package gutenberg-test-connectors-application-password
  */
 
-const GUTENBERG_TEST_CONNECTOR_USERNAME_SETTING             = 'connectors_content_source_test_remote_wordpress_username';
-const GUTENBERG_TEST_CONNECTOR_APPLICATION_PASSWORD_SETTING = 'connectors_content_source_test_remote_wordpress_application_password';
+const GUTENBERG_TEST_CONNECTOR_CREDENTIALS_SETTING = 'connectors_content_source_test_remote_wordpress_credentials';
 
 add_action(
 	'wp_connectors_init',
@@ -22,10 +21,9 @@ add_action(
 				'description'    => 'Connect to example.com as a remote WordPress site.',
 				'type'           => 'content_source',
 				'authentication' => array(
-					'method'                            => 'application_password',
-					'credentials_url'                   => 'https://example.com/wp-admin/profile.php',
-					'username_setting_name'             => GUTENBERG_TEST_CONNECTOR_USERNAME_SETTING,
-					'application_password_setting_name' => GUTENBERG_TEST_CONNECTOR_APPLICATION_PASSWORD_SETTING,
+					'method'          => 'application_password',
+					'credentials_url' => 'https://example.com/wp-admin/profile.php',
+					'setting_name'    => GUTENBERG_TEST_CONNECTOR_CREDENTIALS_SETTING,
 				),
 			)
 		);
@@ -58,7 +56,6 @@ add_action(
 register_deactivation_hook(
 	__FILE__,
 	static function () {
-		delete_option( GUTENBERG_TEST_CONNECTOR_USERNAME_SETTING );
-		delete_option( GUTENBERG_TEST_CONNECTOR_APPLICATION_PASSWORD_SETTING );
+		delete_option( GUTENBERG_TEST_CONNECTOR_CREDENTIALS_SETTING );
 	}
 );

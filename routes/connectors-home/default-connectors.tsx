@@ -303,9 +303,7 @@ function ApplicationPasswordConnector( {
 		authentication?.method === 'application_password'
 			? authentication
 			: undefined;
-	const usernameSettingName = auth?.usernameSettingName ?? '';
-	const applicationPasswordSettingName =
-		auth?.applicationPasswordSettingName ?? '';
+	const settingName = auth?.settingName ?? '';
 	const helpUrl = auth?.credentialsUrl ?? undefined;
 	const helpLabel = getHelpLabel( helpUrl );
 	const pluginSlug = getPluginSlug( plugin?.file );
@@ -315,10 +313,12 @@ function ApplicationPasswordConnector( {
 			const siteSettings = registrySelect( coreStore ).getEntityRecord(
 				'root',
 				'site'
-			) as Record< string, string > | undefined;
-			return siteSettings?.[ usernameSettingName ] ?? '';
+			) as
+				| Record< string, { username?: string; password?: string } >
+				| undefined;
+			return siteSettings?.[ settingName ]?.username ?? '';
 		},
-		[ usernameSettingName ]
+		[ settingName ]
 	);
 
 	const {
@@ -334,8 +334,7 @@ function ApplicationPasswordConnector( {
 		getButtonLabel,
 	} = useConnectorPlugin( {
 		file: plugin?.file,
-		settingName: usernameSettingName,
-		additionalSettingName: applicationPasswordSettingName,
+		settingName,
 		connectorName: name,
 		isInstalled: plugin?.isInstalled,
 		isActivated: plugin?.isActivated,
@@ -361,16 +360,18 @@ function ApplicationPasswordConnector( {
 			'root',
 			'site',
 			{
-				[ usernameSettingName ]: username,
-				[ applicationPasswordSettingName ]: applicationPassword,
+				[ settingName ]: {
+					username,
+					password: applicationPassword,
+				},
 			},
 			{ throwOnError: true }
 		);
-		const record = updatedRecord as Record< string, string > | undefined;
-		if (
-			record?.[ usernameSettingName ] !== username ||
-			! record?.[ applicationPasswordSettingName ]
-		) {
+		const record = updatedRecord as
+			| Record< string, { username?: string; password?: string } >
+			| undefined;
+		const credentials = record?.[ settingName ];
+		if ( credentials?.username !== username || ! credentials?.password ) {
 			throw new Error(
 				__( 'It was not possible to save these credentials.' )
 			);
@@ -396,8 +397,10 @@ function ApplicationPasswordConnector( {
 				'root',
 				'site',
 				{
-					[ usernameSettingName ]: '',
-					[ applicationPasswordSettingName ]: '',
+					[ settingName ]: {
+						username: '',
+						password: '',
+					},
 				},
 				{ throwOnError: true }
 			);

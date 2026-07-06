@@ -24,8 +24,6 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 	 *         method: 'api_key'|'application_password'|'none',
 	 *         credentials_url?: non-empty-string,
 	 *         setting_name?: non-empty-string,
-	 *         username_setting_name?: non-empty-string,
-	 *         application_password_setting_name?: non-empty-string,
 	 *         constant_name?: non-empty-string,
 	 *         env_var_name?: non-empty-string
 	 *     },
@@ -59,13 +57,11 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 		 * Registers a new connector.
 		 *
 		 * Validates the provided arguments and stores the connector in the registry.
-		 * For connectors with `api_key` authentication, a `setting_name` can be provided
-		 * explicitly. For connectors with `application_password` authentication,
-		 * `username_setting_name` and `application_password_setting_name` can be provided.
-		 * When omitted, setting names are automatically generated using the pattern
-		 * `connectors_{$type}_{$id}_{$credential}`, with hyphens in the type and ID
-		 * normalized to underscores. These setting names are used for Settings API
-		 * registration and REST API exposure.
+		 * For connectors with `api_key` or `application_password` authentication, a
+		 * `setting_name` can be provided explicitly. When omitted, setting names are
+		 * automatically generated using the pattern `connectors_{$type}_{$id}_{$credential}`,
+		 * with hyphens in the type and ID normalized to underscores. These setting
+		 * names are used for Settings API registration and REST API exposure.
 		 *
 		 * Registering a connector with an ID that is already registered will trigger a
 		 * `_doing_it_wrong()` notice and return `null`. To override an existing connector,
@@ -90,16 +86,13 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 		 *         @type string $method          Required. The authentication method: 'api_key',
 		 *                                       'application_password', or 'none'.
 		 *         @type string $credentials_url Optional. URL where users can obtain API credentials.
-		 *         @type string $setting_name    Optional. The setting name for the API key.
-		 *                                       When omitted, auto-generated as
-		 *                                       `connectors_{$type}_{$id}_api_key`.
+		 *         @type string $setting_name    Optional. The setting name for the API key
+		 *                                       or application-password credentials. When
+		 *                                       omitted, auto-generated as
+		 *                                       `connectors_{$type}_{$id}_api_key` for API
+		 *                                       keys and `connectors_{$type}_{$id}_credentials`
+		 *                                       for application passwords.
 		 *                                       Must be a non-empty string when provided.
-		 *         @type string $username_setting_name Optional. The setting name for the username used
-		 *                                       with application password authentication. When omitted,
-		 *                                       auto-generated as `connectors_{$type}_{$id}_username`.
-		 *         @type string $application_password_setting_name Optional. The setting name for the
-		 *                                       application password. When omitted, auto-generated as
-		 *                                       `connectors_{$type}_{$id}_application_password`.
 		 *         @type string $constant_name   Optional. PHP constant name for the API key
 		 *                                       (e.g. 'ANTHROPIC_API_KEY'). Only checked when provided.
 		 *         @type string $env_var_name    Optional. Environment variable name for the API key
@@ -127,8 +120,6 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 		 *         method: 'api_key'|'application_password'|'none',
 		 *         credentials_url?: non-empty-string,
 		 *         setting_name?: non-empty-string,
-		 *         username_setting_name?: non-empty-string,
-		 *         application_password_setting_name?: non-empty-string,
 		 *         constant_name?: non-empty-string,
 		 *         env_var_name?: non-empty-string
 		 *     },
@@ -202,21 +193,19 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 				return null;
 			}
 
-			if ( 'application_password' !== $args['authentication']['method'] ) {
-				foreach ( array( 'username_setting_name', 'application_password_setting_name' ) as $setting_name_key ) {
-					if ( array_key_exists( $setting_name_key, $args['authentication'] ) ) {
-						_doing_it_wrong(
-							__METHOD__,
-							sprintf(
-								/* translators: 1: Connector ID, 2: Authentication setting name key. */
-								__( 'Connector "%1$s" authentication %2$s can only be provided when authentication method is "application_password".' ),
-								esc_html( $id ),
-								esc_html( $setting_name_key )
-							),
-							'7.0.0'
-						);
-						return null;
-					}
+			foreach ( array( 'username_setting_name', 'application_password_setting_name' ) as $setting_name_key ) {
+				if ( array_key_exists( $setting_name_key, $args['authentication'] ) ) {
+					_doing_it_wrong(
+						__METHOD__,
+						sprintf(
+							/* translators: 1: Connector ID, 2: Authentication setting name key. */
+							__( 'Connector "%1$s" authentication %2$s is not supported. Use setting_name instead.' ),
+							esc_html( $id ),
+							esc_html( $setting_name_key )
+						),
+						'7.0.0'
+					);
+					return null;
 				}
 			}
 
@@ -244,7 +233,7 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 				}
 			}
 
-			if ( 'api_key' === $args['authentication']['method'] ) {
+			if ( in_array( $args['authentication']['method'], array( 'api_key', 'application_password' ), true ) ) {
 				if ( isset( $args['authentication']['setting_name'] ) ) {
 					if ( ! is_string( $args['authentication']['setting_name'] ) || '' === $args['authentication']['setting_name'] ) {
 						_doing_it_wrong(
@@ -257,8 +246,12 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 					}
 					$connector['authentication']['setting_name'] = $args['authentication']['setting_name'];
 				} else {
-					$connector['authentication']['setting_name'] = str_replace( '-', '_', "connectors_{$connector['type']}_{$id}_api_key" );
+					$setting_suffix                              = 'api_key' === $args['authentication']['method'] ? 'api_key' : 'credentials';
+					$connector['authentication']['setting_name'] = str_replace( '-', '_', "connectors_{$connector['type']}_{$id}_{$setting_suffix}" );
 				}
+			}
+
+			if ( 'api_key' === $args['authentication']['method'] ) {
 				if ( isset( $args['authentication']['constant_name'] ) ) {
 					if ( ! is_string( $args['authentication']['constant_name'] ) || '' === $args['authentication']['constant_name'] ) {
 						_doing_it_wrong(
@@ -282,42 +275,6 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 						return null;
 					}
 					$connector['authentication']['env_var_name'] = $args['authentication']['env_var_name'];
-				}
-			}
-
-			if ( 'application_password' === $args['authentication']['method'] ) {
-				$default_setting_names = array(
-					'username_setting_name'             => str_replace(
-						'-',
-						'_',
-						"connectors_{$connector['type']}_{$id}_username"
-					),
-					'application_password_setting_name' => str_replace(
-						'-',
-						'_',
-						"connectors_{$connector['type']}_{$id}_application_password"
-					),
-				);
-
-				foreach ( $default_setting_names as $setting_name_key => $default_setting_name ) {
-					if ( isset( $args['authentication'][ $setting_name_key ] ) ) {
-						if ( ! is_string( $args['authentication'][ $setting_name_key ] ) || '' === $args['authentication'][ $setting_name_key ] ) {
-							_doing_it_wrong(
-								__METHOD__,
-								sprintf(
-									/* translators: 1: Connector ID, 2: Authentication setting name key. */
-									__( 'Connector "%1$s" authentication %2$s must be a non-empty string.' ),
-									esc_html( $id ),
-									esc_html( $setting_name_key )
-								),
-								'7.0.0'
-							);
-							return null;
-						}
-						$connector['authentication'][ $setting_name_key ] = $args['authentication'][ $setting_name_key ];
-					} else {
-						$connector['authentication'][ $setting_name_key ] = $default_setting_name;
-					}
 				}
 			}
 

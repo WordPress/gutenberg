@@ -14,7 +14,6 @@ export type PluginStatus = 'checking' | 'not-installed' | 'inactive' | 'active';
 interface UseConnectorPluginOptions {
 	file?: string;
 	settingName: string;
-	additionalSettingName?: string;
 	connectorName: string;
 	isInstalled?: boolean;
 	isActivated?: boolean;
@@ -42,7 +41,6 @@ interface UseConnectorPluginReturn {
 export function useConnectorPlugin( {
 	file: pluginFileFromServer,
 	settingName,
-	additionalSettingName,
 	connectorName,
 	isInstalled,
 	isActivated,
@@ -72,16 +70,21 @@ export function useConnectorPlugin( {
 		( select ) => {
 			const store = select( coreStore );
 			const siteSettings = store.getEntityRecord( 'root', 'site' ) as
-				| Record< string, string >
+				| Record<
+						string,
+						| string
+						| {
+								username?: string;
+								password?: string;
+						  }
+				  >
 				| undefined;
-			const apiKey = siteSettings?.[ settingName ] ?? '';
-			const additionalSettingValue = additionalSettingName
-				? siteSettings?.[ additionalSettingName ] ?? ''
-				: undefined;
+			const settingValue = siteSettings?.[ settingName ];
+			const apiKey = typeof settingValue === 'string' ? settingValue : '';
 			const credentialsExist =
-				!! apiKey &&
-				( additionalSettingValue === undefined ||
-					!! additionalSettingValue );
+				typeof settingValue === 'object' && settingValue !== null
+					? !! settingValue.username && !! settingValue.password
+					: !! apiKey;
 
 			const canCreate = !! store.canUser( 'create', {
 				kind: 'root',
@@ -163,7 +166,6 @@ export function useConnectorPlugin( {
 			pluginFileFromServer,
 			pluginBasename,
 			settingName,
-			additionalSettingName,
 			isInstalled,
 			isActivated,
 		]

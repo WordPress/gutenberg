@@ -47,15 +47,12 @@ if ( ! function_exists( 'wp_get_connector' ) ) {
 	 *         Authentication configuration. When method is 'api_key', includes
 	 *         credentials_url, setting_name, and optionally constant_name and
 	 *         env_var_name. When method is 'application_password', includes
-	 *         credentials_url, username_setting_name, and
-	 *         application_password_setting_name. When 'none', only method is present.
+	 *         credentials_url and setting_name. When 'none', only method is present.
 	 *
 	 *         @type string $method          The authentication method: 'api_key',
 	 *                                       'application_password', or 'none'.
 	 *         @type string $credentials_url Optional. URL where users can obtain API credentials.
-	 *         @type string $setting_name    Optional. The setting name for the API key.
-	 *         @type string $username_setting_name Optional. The setting name for the username.
-	 *         @type string $application_password_setting_name Optional. The setting name for the application password.
+	 *         @type string $setting_name    Optional. The setting name for the API key or application-password credentials.
 	 *         @type string $constant_name   Optional. PHP constant name for the API key.
 	 *         @type string $env_var_name    Optional. Environment variable name for the API key.
 	 *     }
@@ -77,8 +74,6 @@ if ( ! function_exists( 'wp_get_connector' ) ) {
 	 *         method: 'api_key'|'application_password'|'none',
 	 *         credentials_url?: non-empty-string,
 	 *         setting_name?: non-empty-string,
-	 *         username_setting_name?: non-empty-string,
-	 *         application_password_setting_name?: non-empty-string,
 	 *         constant_name?: non-empty-string,
 	 *         env_var_name?: non-empty-string
 	 *     },
@@ -120,15 +115,12 @@ if ( ! function_exists( 'wp_get_connectors' ) ) {
 	 *             Authentication configuration. When method is 'api_key', includes
 	 *             credentials_url, setting_name, and optionally constant_name and
 	 *             env_var_name. When method is 'application_password', includes
-	 *             credentials_url, username_setting_name, and
-	 *             application_password_setting_name. When 'none', only method is present.
+	 *             credentials_url and setting_name. When 'none', only method is present.
 	 *
 	 *             @type string $method          The authentication method: 'api_key',
 	 *                                           'application_password', or 'none'.
 	 *             @type string $credentials_url Optional. URL where users can obtain API credentials.
-	 *             @type string $setting_name    Optional. The setting name for the API key.
-	 *             @type string $username_setting_name Optional. The setting name for the username.
-	 *             @type string $application_password_setting_name Optional. The setting name for the application password.
+	 *             @type string $setting_name    Optional. The setting name for the API key or application-password credentials.
 	 *             @type string $constant_name   Optional. PHP constant name for the API key.
 	 *             @type string $env_var_name    Optional. Environment variable name for the API key.
 	 *         }
@@ -151,8 +143,6 @@ if ( ! function_exists( 'wp_get_connectors' ) ) {
 	 *         method: 'api_key'|'application_password'|'none',
 	 *         credentials_url?: non-empty-string,
 	 *         setting_name?: non-empty-string,
-	 *         username_setting_name?: non-empty-string,
-	 *         application_password_setting_name?: non-empty-string,
 	 *         constant_name?: non-empty-string,
 	 *         env_var_name?: non-empty-string
 	 *     },

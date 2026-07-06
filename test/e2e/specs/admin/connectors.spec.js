@@ -554,10 +554,8 @@ test.describe( 'Connectors', () => {
 
 	test.describe( 'Application password setup flow', () => {
 		const PLUGIN_SLUG = 'gutenberg-test-application-password-connector';
-		const USERNAME_SETTING =
-			'connectors_content_source_test_remote_wordpress_username';
-		const APPLICATION_PASSWORD_SETTING =
-			'connectors_content_source_test_remote_wordpress_application_password';
+		const CREDENTIALS_SETTING =
+			'connectors_content_source_test_remote_wordpress_credentials';
 		const APPLICATION_PASSWORD = 'abcd efgh ijkl mnop 1234';
 
 		test.beforeAll( async ( { requestUtils } ) => {
@@ -578,8 +576,10 @@ test.describe( 'Connectors', () => {
 				path: '/wp/v2/settings',
 				method: 'POST',
 				data: {
-					[ USERNAME_SETTING ]: '',
-					[ APPLICATION_PASSWORD_SETTING ]: '',
+					[ CREDENTIALS_SETTING ]: {
+						username: '',
+						password: '',
+					},
 				},
 			} );
 		} );
@@ -633,8 +633,10 @@ test.describe( 'Connectors', () => {
 			const settings = await requestUtils.rest( {
 				path: '/wp/v2/settings',
 			} );
-			expect( settings[ USERNAME_SETTING ] ).toBe( 'remote-user' );
-			expect( settings[ APPLICATION_PASSWORD_SETTING ] ).toBe(
+			expect( settings[ CREDENTIALS_SETTING ].username ).toBe(
+				'remote-user'
+			);
+			expect( settings[ CREDENTIALS_SETTING ].password ).toBe(
 				'\u2022'.repeat( 16 )
 			);
 
@@ -668,10 +670,10 @@ test.describe( 'Connectors', () => {
 			const clearedSettings = await requestUtils.rest( {
 				path: '/wp/v2/settings',
 			} );
-			expect( clearedSettings[ USERNAME_SETTING ] ).toBe( '' );
-			expect( clearedSettings[ APPLICATION_PASSWORD_SETTING ] ).toBe(
-				''
-			);
+			expect( clearedSettings[ CREDENTIALS_SETTING ] ).toEqual( {
+				username: '',
+				password: '',
+			} );
 		} );
 	} );
 

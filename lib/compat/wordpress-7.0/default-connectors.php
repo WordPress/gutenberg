@@ -307,6 +307,25 @@ function _gutenberg_is_ai_api_key_valid( string $key, string $provider_id ): ?bo
 }
 
 /**
+ * Sanitizes stored application-password credentials for a connector.
+ *
+ * @access private
+ *
+ * @param mixed $value The submitted setting value.
+ * @return array{username: string, password: string} Sanitized credentials.
+ */
+function _gutenberg_sanitize_application_password_credentials( $value ): array {
+	if ( ! is_array( $value ) ) {
+		$value = array();
+	}
+
+	return array(
+		'username' => isset( $value['username'] ) && is_string( $value['username'] ) ? sanitize_text_field( $value['username'] ) : '',
+		'password' => isset( $value['password'] ) && is_string( $value['password'] ) ? sanitize_text_field( $value['password'] ) : '',
+	);
+}
+
+/**
  * Masks and validates connector credentials in REST responses.
  *
  * On every `/wp/v2/settings` response, masks connector API key and application
@@ -342,10 +361,13 @@ function _gutenberg_connectors_rest_settings_dispatch( WP_REST_Response $respons
 	foreach ( wp_get_connectors() as $connector_id => $connector_data ) {
 		$auth = $connector_data['authentication'];
 
-		if ( 'application_password' === $auth['method'] && ! empty( $auth['application_password_setting_name'] ) ) {
-			$setting_name = $auth['application_password_setting_name'];
-			if ( array_key_exists( $setting_name, $data ) && is_string( $data[ $setting_name ] ) && '' !== $data[ $setting_name ] ) {
-				$data[ $setting_name ] = str_repeat( "\u{2022}", 16 );
+		if ( 'application_password' === $auth['method'] && ! empty( $auth['setting_name'] ) ) {
+			$setting_name = $auth['setting_name'];
+			if ( array_key_exists( $setting_name, $data ) && is_array( $data[ $setting_name ] ) ) {
+				$password = $data[ $setting_name ]['password'] ?? '';
+				if ( is_string( $password ) && '' !== $password ) {
+					$data[ $setting_name ]['password'] = str_repeat( "\u{2022}", 16 );
+				}
 			}
 			continue;
 		}
@@ -424,38 +446,38 @@ function _gutenberg_register_default_connector_settings(): void {
 				'show_in_rest'      => true,
 				'sanitize_callback' => 'sanitize_text_field',
 			);
-		} elseif ( 'application_password' === $auth['method'] && ! empty( $auth['username_setting_name'] ) && ! empty( $auth['application_password_setting_name'] ) ) {
-			$settings[ $auth['username_setting_name'] ]             = array(
-				'type'              => 'string',
+		} elseif ( 'application_password' === $auth['method'] && ! empty( $auth['setting_name'] ) ) {
+			$settings[ $auth['setting_name'] ] = array(
+				'type'              => 'object',
 				'label'             => sprintf(
 					/* translators: %s: Connector name. */
-					__( '%s Username', 'gutenberg' ),
+					__( '%s Credentials', 'gutenberg' ),
 					$connector_data['name']
 				),
 				'description'       => sprintf(
 					/* translators: %s: Connector name. */
-					__( 'Username for the %s connector.', 'gutenberg' ),
+					__( 'Application password credentials for the %s connector.', 'gutenberg' ),
 					$connector_data['name']
 				),
-				'default'           => '',
-				'show_in_rest'      => true,
-				'sanitize_callback' => 'sanitize_text_field',
-			);
-			$settings[ $auth['application_password_setting_name'] ] = array(
-				'type'              => 'string',
-				'label'             => sprintf(
-					/* translators: %s: Connector name. */
-					__( '%s Application Password', 'gutenberg' ),
-					$connector_data['name']
+				'default'           => array(
+					'username' => '',
+					'password' => '',
 				),
-				'description'       => sprintf(
-					/* translators: %s: Connector name. */
-					__( 'Application password for the %s connector.', 'gutenberg' ),
-					$connector_data['name']
+				'show_in_rest'      => array(
+					'schema' => array(
+						'type'                 => 'object',
+						'properties'           => array(
+							'username' => array(
+								'type' => 'string',
+							),
+							'password' => array(
+								'type' => 'string',
+							),
+						),
+						'additionalProperties' => false,
+					),
 				),
-				'default'           => '',
-				'show_in_rest'      => true,
-				'sanitize_callback' => 'sanitize_text_field',
+				'sanitize_callback' => '_gutenberg_sanitize_application_password_credentials',
 			);
 		}
 
@@ -568,15 +590,14 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 				$auth_out['isConnected'] = 'none' !== $auth_out['keySource'];
 			}
 		} elseif ( 'application_password' === $auth['method'] ) {
-			$username_setting_name             = $auth['username_setting_name'] ?? '';
-			$application_password_setting_name = $auth['application_password_setting_name'] ?? '';
-			$username                          = get_option( $username_setting_name, '' );
-			$application_password              = get_option( $application_password_setting_name, '' );
+			$setting_name = $auth['setting_name'] ?? '';
+			$credentials  = get_option( $setting_name, array() );
+			$username     = is_array( $credentials ) ? ( $credentials['username'] ?? '' ) : '';
+			$password     = is_array( $credentials ) ? ( $credentials['password'] ?? '' ) : '';
 
-			$auth_out['usernameSettingName']            = $username_setting_name;
-			$auth_out['applicationPasswordSettingName'] = $application_password_setting_name;
-			$auth_out['credentialsUrl']                 = $auth['credentials_url'] ?? null;
-			$auth_out['isConnected']                    = is_string( $username ) && '' !== $username && is_string( $application_password ) && '' !== $application_password;
+			$auth_out['settingName']    = $setting_name;
+			$auth_out['credentialsUrl'] = $auth['credentials_url'] ?? null;
+			$auth_out['isConnected']    = is_string( $username ) && '' !== $username && is_string( $password ) && '' !== $password;
 		}
 
 		$connector_out = array(

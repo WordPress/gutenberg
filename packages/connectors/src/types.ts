@@ -15,8 +15,7 @@ export type ConnectorAuthentication =
 	  }
 	| {
 			method: 'application_password';
-			usernameSettingName: string;
-			applicationPasswordSettingName: string;
+			settingName: string;
 			credentialsUrl: string | null;
 			isConnected?: boolean;
 	  }
