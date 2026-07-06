@@ -493,6 +493,28 @@ describe( 'clearSuggestionMarkerAttributes', () => {
 	} );
 } );
 
+/*
+ * Minimal `core/interface` stub tracking only the active complementary
+ * area — the piece of state `createSuggestion` reads and writes when
+ * surfacing a new note. Registered under the production store name so
+ * the provider's descriptor-based lookups resolve to it.
+ */
+function createStubInterfaceStore() {
+	return createReduxStore( 'core/interface', {
+		reducer: ( state = { activeArea: null }, action ) =>
+			action.type === 'ENABLE_AREA' ? { activeArea: action.area } : state,
+		actions: {
+			enableComplementaryArea: ( scope, area ) => ( {
+				type: 'ENABLE_AREA',
+				area,
+			} ),
+		},
+		selectors: {
+			getActiveComplementaryArea: ( state ) => state.activeArea,
+		},
+	} );
+}
+
 describe( 'rejectSuggestion (block-move)', () => {
 	const PARAGRAPH = 'core/test-move-paragraph';
 	const GROUP = 'core/test-move-group';
@@ -550,6 +572,7 @@ describe( 'rejectSuggestion (block-move)', () => {
 		registry.register( noticesStore );
 		registry.register( blockEditorStore );
 		registry.register( createStubCoreStore() );
+		registry.register( createStubInterfaceStore() );
 		registry.dispatch( blockEditorStore ).resetBlocks( initialBlocks );
 
 		let providerHandle;
@@ -654,5 +677,150 @@ describe( 'rejectSuggestion (block-move)', () => {
 		expect( blockEditor.getBlockRootClientId( moved.clientId ) || '' ).toBe(
 			''
 		);
+	} );
+} );
+describe( 'createSuggestion (notes sidebar switch)', () => {
+	const PARAGRAPH = 'core/test-sidebar-paragraph';
+	const ALL_NOTES_SIDEBAR = 'edit-post/collab-history-sidebar';
+	const FLOATING_NOTES_SIDEBAR = 'edit-post/collab-sidebar';
+
+	beforeAll( () => {
+		registerBlockType( PARAGRAPH, {
+			apiVersion: 3,
+			attributes: {
+				content: { type: 'string', default: '' },
+				metadata: { type: 'object' },
+			},
+			save: () => null,
+			category: 'text',
+			title: 'Test Sidebar Paragraph',
+		} );
+	} );
+
+	afterAll( () => {
+		getBlockTypes().forEach( ( block ) =>
+			unregisterBlockType( block.name )
+		);
+	} );
+
+	/*
+	 * Store stubs registered under the production store names so the
+	 * provider's descriptor-based lookups resolve to them. `saveEntityRecord`
+	 * returns a record with an id so the post-save branch (metadata linkage
+	 * and the sidebar switch) runs.
+	 */
+	function createStubCoreStore() {
+		return createReduxStore( 'core', {
+			reducer: ( state = {} ) => state,
+			actions: {
+				saveEntityRecord: () => () => ( { id: 123 } ),
+			},
+			selectors: {
+				getEditedEntityRecord: () => null,
+				getEntityRecord: () => null,
+				getCurrentUser: () => null,
+			},
+		} );
+	}
+
+	function createStubEditorStore() {
+		return createReduxStore( 'core/editor', {
+			reducer: ( state = {} ) => state,
+			selectors: {
+				getCurrentPostId: () => 42,
+				getCurrentPostType: () => 'post',
+			},
+		} );
+	}
+
+	function setup( { activeArea } ) {
+		const registry = createRegistry();
+		registry.register( noticesStore );
+		registry.register( blockEditorStore );
+		registry.register( createStubCoreStore() );
+		registry.register( createStubEditorStore() );
+		const interfaceStub = createStubInterfaceStore();
+		registry.register( interfaceStub );
+		if ( activeArea ) {
+			registry
+				.dispatch( interfaceStub )
+				.enableComplementaryArea( 'core', activeArea );
+		}
+
+		const block = createBlock( PARAGRAPH, { content: 'Hello' } );
+		registry.dispatch( blockEditorStore ).resetBlocks( [ block ] );
+
+		let providerHandle;
+		function CaptureProvider() {
+			providerHandle = useSuggestionsProvider();
+			return null;
+		}
+
+		render(
+			<RegistryProvider value={ registry }>
+				<CaptureProvider />
+			</RegistryProvider>
+		);
+
+		return { registry, block, getProvider: () => providerHandle };
+	}
+
+	async function createAttributeSuggestion( getProvider, block ) {
+		await act( async () => {
+			await getProvider().createSuggestion( {
+				clientId: block.clientId,
+				blockName: PARAGRAPH,
+				operations: [
+					{
+						type: 'attribute-set',
+						attribute: 'content',
+						value: 'Hello world',
+						baseline: 'Hello',
+					},
+				],
+			} );
+		} );
+	}
+
+	it( 'switches an open non-notes sidebar to the All notes sidebar', async () => {
+		const { registry, block, getProvider } = setup( {
+			activeArea: 'edit-post/document',
+		} );
+
+		await createAttributeSuggestion( getProvider, block );
+
+		expect(
+			registry
+				.select( 'core/interface' )
+				.getActiveComplementaryArea( 'core' )
+		).toBe( ALL_NOTES_SIDEBAR );
+	} );
+
+	it( 'leaves a closed sidebar closed', async () => {
+		const { registry, block, getProvider } = setup( {
+			activeArea: null,
+		} );
+
+		await createAttributeSuggestion( getProvider, block );
+
+		expect(
+			registry
+				.select( 'core/interface' )
+				.getActiveComplementaryArea( 'core' )
+		).toBe( null );
+	} );
+
+	it( 'leaves an already-open notes sidebar in place', async () => {
+		const { registry, block, getProvider } = setup( {
+			activeArea: FLOATING_NOTES_SIDEBAR,
+		} );
+
+		await createAttributeSuggestion( getProvider, block );
+
+		expect(
+			registry
+				.select( 'core/interface' )
+				.getActiveComplementaryArea( 'core' )
+		).toBe( FLOATING_NOTES_SIDEBAR );
 	} );
 } );
