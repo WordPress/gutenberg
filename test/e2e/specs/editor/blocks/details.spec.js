@@ -117,7 +117,6 @@ test.describe( 'Details', () => {
 			name: 'core/details',
 			attributes: {
 				summary: 'Details summary',
-				showContent: true,
 			},
 			innerBlocks: [
 				{
@@ -129,9 +128,13 @@ test.describe( 'Details', () => {
 			],
 		} );
 
+		await page.keyboard.press( 'Enter' );
+
 		const paragraph = editor.canvas.getByRole( 'document', {
 			name: 'Block: Paragraph',
 		} );
+
+		await expect( paragraph ).toContainText( 'Details content' );
 
 		await paragraph.getByRole( 'textbox' ).click();
 		await pageUtils.pressKeys( 'primary+ArrowLeft' );
