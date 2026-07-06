@@ -17,3 +17,8 @@
 	background: var(--some-other-var);
 }
 
+/* Valid: Token-like strings outside var() references are ignored */
+.other-strings {
+	background-image: url("./var(--wpds-invalid-token).svg");
+	content: "var(--wpds-invalid-token)";
+}

@@ -4,8 +4,9 @@ import tokenList from '../prebuilt/js/design-tokens.mjs';
 const DS_TOKEN_PREFIX = 'wpds-';
 
 /**
- * Extracts all unique CSS custom properties (variables) from a given CSS value string,
- * including those in fallback positions, optionally filtering by a specific prefix.
+ * Extracts all unique CSS custom properties referenced via var() from a given
+ * CSS value string, including those in fallback positions, optionally filtering
+ * by a specific prefix.
  *
  * @param {string} value       - The CSS value string to search for variables.
  * @param {string} [prefix=''] - Optional prefix to filter variables (e.g., 'wpds-').
@@ -21,23 +22,87 @@ const DS_TOKEN_PREFIX = 'wpds-';
  * // → Set { '--wpds-border-radius-sm', '--wpds-border-radius-md', '--wpds-color-foreground-content-neutral' }
  */
 function extractCSSVariables( value, prefix = '' ) {
-	const regex = /--[\w-]+/g;
 	/** @type {Set<string>} */
 	const variables = new Set();
 
-	let match;
-	while ( ( match = regex.exec( value ) ) !== null ) {
-		const variableName = match[ 0 ];
-		if ( variableName.startsWith( `--${ prefix }` ) ) {
-			variables.add( variableName );
+	for ( let index = 0; index < value.length; index++ ) {
+		const character = value[ index ];
+
+		if ( character === '"' || character === "'" ) {
+			index = getStringEndIndex( value, index );
+			continue;
+		}
+
+		if ( value.slice( index, index + 4 ).toLowerCase() === 'url(' ) {
+			index = getFunctionEndIndex( value, index + 3 );
+			continue;
+		}
+
+		if ( value.slice( index, index + 4 ).toLowerCase() === 'var(' ) {
+			const variableName = value
+				.slice( index + 4 )
+				.trimStart()
+				.match( /^--[\w-]+/ )?.[ 0 ];
+
+			if ( variableName && variableName.startsWith( `--${ prefix }` ) ) {
+				variables.add( variableName );
+			}
 		}
 	}
 
 	return variables;
 }
 
+function getStringEndIndex( value, startIndex ) {
+	const quote = value[ startIndex ];
+
+	for ( let index = startIndex + 1; index < value.length; index++ ) {
+		if ( value[ index ] === '\\' ) {
+			index++;
+			continue;
+		}
+
+		if ( value[ index ] === quote ) {
+			return index;
+		}
+	}
+
+	return value.length - 1;
+}
+
+function getFunctionEndIndex( value, openingParenthesisIndex ) {
+	let depth = 1;
+
+	for (
+		let index = openingParenthesisIndex + 1;
+		index < value.length;
+		index++
+	) {
+		const character = value[ index ];
+
+		if ( character === '"' || character === "'" ) {
+			index = getStringEndIndex( value, index );
+			continue;
+		}
+
+		if ( character === '(' ) {
+			depth++;
+		}
+
+		if ( character === ')' ) {
+			depth--;
+		}
+
+		if ( depth === 0 ) {
+			return index;
+		}
+	}
+
+	return value.length - 1;
+}
+
 const knownTokens = new Set( tokenList );
-const wpdsTokenPrefix = `--${ DS_TOKEN_PREFIX }`;
+const wpdsTokenVarRegex = new RegExp( `var\\(\\s*--${ DS_TOKEN_PREFIX }`, 'i' );
 
 const {
 	createPlugin,
@@ -66,7 +131,7 @@ const ruleFunction = ( primary ) => {
 		root.walkDecls( ( ruleNode ) => {
 			const { value } = ruleNode;
 			// Early match for WPDS tokens to avoid unnecessary processing.
-			if ( value.includes( wpdsTokenPrefix ) ) {
+			if ( wpdsTokenVarRegex.test( value ) ) {
 				const usedTokens = extractCSSVariables(
 					value,
 					DS_TOKEN_PREFIX

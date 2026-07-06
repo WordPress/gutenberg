@@ -8,7 +8,7 @@
 
 ### Bug Fixes
 
--   Fix `plugin-wpds/no-unknown-ds-tokens` so it detects unknown bare `--wpds-*` tokens at the start of declaration values ([#79766](https://github.com/WordPress/gutenberg/pull/79766)).
+-   Fix `plugin-wpds/no-unknown-ds-tokens` false positives for token-like strings outside `var()` references ([#79766](https://github.com/WordPress/gutenberg/pull/79766)).
 -   Mark the published `design-tokens.css` file as side-effectful so downstream bundlers preserve the documented CSS import ([#79551](https://github.com/WordPress/gutenberg/pull/79551)).
 
 ## 0.17.0 (2026-06-30)
