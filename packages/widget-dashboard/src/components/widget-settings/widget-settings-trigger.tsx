@@ -44,7 +44,7 @@ export function WidgetSettingsTrigger( {
 }: WidgetSettingsTriggerProps ): React.ReactNode {
 	const { settingsWidgetUuid, setSettingsWidgetUuid } =
 		useDashboardUIContext();
-	const { cancel } = useDashboardInternalContext();
+	const { cancel, flushAutoSave } = useDashboardInternalContext();
 
 	const toggle = useCallback( () => {
 		// Re-clicking the open instance's gear closes the drawer, discarding
@@ -54,8 +54,17 @@ export function WidgetSettingsTrigger( {
 			setSettingsWidgetUuid( null );
 			return;
 		}
+		// Persist any pending inline edit before opening, so the drawer's edits
+		// stay isolated and its Cancel discards only the drawer's own changes.
+		flushAutoSave();
 		setSettingsWidgetUuid( widget.uuid );
-	}, [ cancel, settingsWidgetUuid, setSettingsWidgetUuid, widget.uuid ] );
+	}, [
+		cancel,
+		flushAutoSave,
+		settingsWidgetUuid,
+		setSettingsWidgetUuid,
+		widget.uuid,
+	] );
 
 	// Surface the drawer only when there are attributes not already promoted
 	// inline; if every attribute is high-relevance, the drawer would just

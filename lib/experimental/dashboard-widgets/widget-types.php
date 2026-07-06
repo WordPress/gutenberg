@@ -20,15 +20,18 @@ require_once __DIR__ . '/class-wp-rest-widget-modules-controller.php';
  * translatable and the gettext context to use for each.
  *
  * Read once from widget-i18n.json and memoized for the rest of the request.
+ * Decoded as objects, not associative arrays: that is how
+ * `translate_settings_using_i18n_schema()` tells keyed maps apart from
+ * lists.
  *
- * @return array Map of translatable field name to gettext context.
+ * @return object Map of translatable field name to gettext context.
  */
 function gutenberg_get_widget_metadata_i18n_schema() {
 	static $i18n_schema = null;
 
 	if ( null === $i18n_schema ) {
-		$schema      = wp_json_file_decode( __DIR__ . '/widget-i18n.json', array( 'associative' => true ) );
-		$i18n_schema = is_array( $schema ) ? $schema : array();
+		$schema      = wp_json_file_decode( __DIR__ . '/widget-i18n.json' );
+		$i18n_schema = is_object( $schema ) ? $schema : new stdClass();
 	}
 
 	return $i18n_schema;
@@ -37,9 +40,9 @@ function gutenberg_get_widget_metadata_i18n_schema() {
 /**
  * Translates a widget's user-facing metadata strings.
  *
- * Runs `title`, `description`, and `keywords` through the widget i18n schema
- * using the widget's `textdomain`, leaving every other key untouched. A no-op
- * when the widget declares no `textdomain`.
+ * Runs `title`, `description`, `help`, and `keywords` through the widget
+ * i18n schema using the widget's `textdomain`, leaving every other key
+ * untouched. A no-op when the widget declares no `textdomain`.
  *
  * @param array $widget Widget data from the build manifest.
  * @return array Widget data with its translatable strings localized.
@@ -52,13 +55,55 @@ function gutenberg_translate_widget_metadata( $widget ) {
 
 	$i18n_schema = gutenberg_get_widget_metadata_i18n_schema();
 
-	foreach ( array( 'title', 'description', 'keywords' ) as $field ) {
-		if ( isset( $widget[ $field ], $i18n_schema[ $field ] ) ) {
-			$widget[ $field ] = translate_settings_using_i18n_schema( $i18n_schema[ $field ], $widget[ $field ], $textdomain );
+	foreach ( array( 'title', 'description', 'help', 'keywords' ) as $field ) {
+		if ( isset( $widget[ $field ], $i18n_schema->$field ) ) {
+			$widget[ $field ] = translate_settings_using_i18n_schema( $i18n_schema->$field, $widget[ $field ], $textdomain );
 		}
 	}
 
 	return $widget;
+}
+
+/**
+ * Constrains a widget help note to its allowed shape: `content` keeps
+ * only `em`/`strong` markup, and links missing a `label` or `href` are
+ * dropped.
+ *
+ * @param array|null $help Help note from the build manifest.
+ * @return array|null Sanitized help note, or null when there is no content.
+ */
+function gutenberg_sanitize_widget_help( $help ) {
+	if ( ! is_array( $help ) || empty( $help['content'] ) || ! is_string( $help['content'] ) ) {
+		return null;
+	}
+
+	$sanitized = array(
+		'content' => wp_kses(
+			$help['content'],
+			array(
+				'em'     => array(),
+				'strong' => array(),
+			)
+		),
+	);
+
+	if ( ! empty( $help['links'] ) && is_array( $help['links'] ) ) {
+		$links = array();
+		foreach ( $help['links'] as $link ) {
+			if ( is_array( $link ) && ! empty( $link['label'] ) && ! empty( $link['href'] ) ) {
+				$links[] = array(
+					'label' => $link['label'],
+					'href'  => $link['href'],
+				);
+			}
+		}
+
+		if ( $links ) {
+			$sanitized['links'] = $links;
+		}
+	}
+
+	return $sanitized;
 }
 
 /**
@@ -93,6 +138,7 @@ function gutenberg_register_widget_types() {
 				'category'      => $widget['category'] ?? null,
 				'title'         => $widget['title'] ?? null,
 				'description'   => $widget['description'] ?? null,
+				'help'          => gutenberg_sanitize_widget_help( $widget['help'] ?? null ),
 				'keywords'      => $widget['keywords'] ?? null,
 			)
 		);
