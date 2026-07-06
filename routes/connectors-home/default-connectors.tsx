@@ -337,6 +337,7 @@ function ApplicationPasswordConnector( {
 		isBusy,
 		isConnected,
 		setIsConnected,
+		keySource,
 		handleButtonClick,
 		getButtonLabel,
 	} = useConnectorPlugin( {
@@ -345,8 +346,11 @@ function ApplicationPasswordConnector( {
 		connectorName: name,
 		isInstalled: plugin?.isInstalled,
 		isActivated: plugin?.isActivated,
+		keySource: auth?.keySource,
 		initialIsConnected: auth?.isConnected,
 	} );
+	const isExternallyConfigured =
+		keySource === 'env' || keySource === 'constant';
 
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createSuccessNotice, createErrorNotice } =
@@ -468,14 +472,23 @@ function ApplicationPasswordConnector( {
 				hasResolvedSettings && (
 					<ApplicationPasswordConnectorSettings
 						key={ isConnected ? 'connected' : 'setup' }
-						initialUsername={ currentUsername }
+						initialUsername={
+							isExternallyConfigured
+								? '••••••••••••••••'
+								: currentUsername
+						}
 						helpUrl={ helpUrl }
 						helpLabel={ helpLabel }
-						readOnly={ isConnected }
-						onRemove={ async () => {
-							await removeCredentials();
-							actionButtonRef.current?.focus();
-						} }
+						readOnly={ isConnected || isExternallyConfigured }
+						keySource={ keySource }
+						onRemove={
+							isExternallyConfigured
+								? undefined
+								: async () => {
+										await removeCredentials();
+										actionButtonRef.current?.focus();
+								  }
+						}
 						onSave={ async ( credentials ) => {
 							await saveCredentials( credentials );
 							setIsExpanded( false );

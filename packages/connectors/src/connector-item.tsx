@@ -254,6 +254,7 @@ export interface ApplicationPasswordConnectorSettingsProps {
 	helpUrl?: string;
 	helpLabel?: string;
 	readOnly?: boolean;
+	keySource?: ApiKeySource;
 }
 
 /**
@@ -266,6 +267,7 @@ export interface ApplicationPasswordConnectorSettingsProps {
  * @param props.helpUrl         - URL where users can create an application password.
  * @param props.helpLabel       - Custom label for the help link.
  * @param props.readOnly        - Whether the form is in read-only mode.
+ * @param props.keySource       - The source of the credentials: 'env', 'constant', 'database', or 'none'.
  */
 export function ApplicationPasswordConnectorSettings( {
 	onSave,
@@ -274,6 +276,7 @@ export function ApplicationPasswordConnectorSettings( {
 	helpUrl,
 	helpLabel,
 	readOnly = false,
+	keySource,
 }: ApplicationPasswordConnectorSettingsProps ) {
 	const [ username, setUsername ] = useState( initialUsername );
 	const [ applicationPassword, setApplicationPassword ] = useState( '' );
@@ -318,7 +321,15 @@ export function ApplicationPasswordConnectorSettings( {
 	};
 
 	let applicationPasswordHelp: ReactNode = help;
-	if ( readOnly ) {
+	if ( keySource === 'env' ) {
+		applicationPasswordHelp = __(
+			'These credentials are configured using an environment variable.'
+		);
+	} else if ( keySource === 'constant' ) {
+		applicationPasswordHelp = __(
+			'These credentials are configured as a constant.'
+		);
+	} else if ( readOnly ) {
 		applicationPasswordHelp = __(
 			'Your application password is stored securely.'
 		);

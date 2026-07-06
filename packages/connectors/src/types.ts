@@ -17,6 +17,7 @@ export type ConnectorAuthentication =
 			method: 'application_password';
 			settingName: string;
 			credentialsUrl: string | null;
+			keySource?: ApiKeySource;
 			isConnected?: boolean;
 	  }
 	| { method: 'none' };
