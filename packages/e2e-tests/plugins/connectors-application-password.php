@@ -19,7 +19,7 @@ add_action(
 			'test-remote-wordpress',
 			array(
 				'name'           => 'Test Remote WordPress',
-				'description'    => 'Connect to a remote WordPress site for E2E testing.',
+				'description'    => 'Connect to example.com as a remote WordPress site.',
 				'type'           => 'content_source',
 				'authentication' => array(
 					'method'                            => 'application_password',
