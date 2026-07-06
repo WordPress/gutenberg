@@ -9,7 +9,6 @@ This is a temporary rule to help migrate components to the new default size. Onc
 The following components are checked by this rule:
 
 -   Button
--   CustomSelectControl
 -   InputControl
 -   NumberControl
 -   SelectControl
