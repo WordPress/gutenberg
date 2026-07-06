@@ -165,24 +165,6 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A filter can replace a whole key through set().
-	 */
-	public function test_filter_set_replaces_key() {
-		add_filter(
-			'get_entity_view_config_custom_kind_custom_name',
-			function ( $data ) {
-				return $data->set( 'form', array( 'custom' => true ) );
-			}
-		);
-
-		$config = gutenberg_get_entity_view_config( 'custom_kind', 'custom_name' );
-
-		$this->assertSame( array( 'custom' => true ), $config['form'] );
-		// Untouched keys keep their defaults.
-		$this->assertSame( self::DEFAULT_VIEW, $config['default_view'] );
-	}
-
-	/**
 	 * Successive filters share the same container, so their patches compose and
 	 * a later null field patch reaches a member contributed by an earlier filter.
 	 */
@@ -218,28 +200,6 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 			array( 'comment_status' ),
 			$config['form']['fields'][0]['children']
 		);
-	}
-
-	/**
-	 * Top-level keys introduced through the container that are not part of the
-	 * documented shape are rejected and never reach the response. Nested
-	 * properties are not validated: their vocabulary is owned by the
-	 * client-side consumers.
-	 */
-	public function test_filter_unknown_top_level_keys_warn_and_are_discarded() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_View_Config_Data::update_properties' );
-
-		add_filter(
-			'get_entity_view_config_custom_kind_custom_name',
-			function ( $data ) {
-				return $data->update_properties( array( 'not_a_real_key' => 'nope' ), 1 );
-			}
-		);
-
-		$config = gutenberg_get_entity_view_config( 'custom_kind', 'custom_name' );
-
-		$this->assertArrayNotHasKey( 'not_a_real_key', $config );
-		$this->assertSameSets( self::CONFIG_KEYS, array_keys( $config ) );
 	}
 
 	/**

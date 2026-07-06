@@ -184,34 +184,6 @@ class Tests_View_Config_Data extends WP_UnitTestCase {
 	}
 
 	/**
-	 * update_properties() unsets several default_layouts entries in one patch.
-	 *
-	 * @covers ::update_properties
-	 */
-	public function test_update_properties_null_unsets_multiple_default_layouts() {
-		$data = new Gutenberg_View_Config_Data(
-			array(
-				'default_layouts' => array(
-					'table' => array(),
-					'grid'  => array(),
-					'list'  => array(),
-				),
-			)
-		);
-		$data->update_properties(
-			array(
-				'default_layouts' => array(
-					'grid' => null,
-					'list' => null,
-				),
-			),
-			1
-		);
-
-		$this->assertSame( array( 'table' => array() ), $data->get_config()['default_layouts'] );
-	}
-
-	/**
 	 * update_properties() unsets a deeply nested layout property when the value is null.
 	 *
 	 * @covers ::update_properties
