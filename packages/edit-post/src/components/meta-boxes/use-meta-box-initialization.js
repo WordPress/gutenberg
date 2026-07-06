@@ -1,10 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { useEffect } from '@wordpress/element';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -46,6 +47,7 @@ export const useMetaBoxInitialization = ( enabled ) => {
 	const { setCollaborationSupported } = unlock( useDispatch( coreStore ) );
 	const { updateEditorSettings } = useDispatch( editorStore );
 	const { initializeMetaBoxes } = useDispatch( editPostStore );
+	const registry = useRegistry();
 
 	// The effect has to rerun when the editor is ready because initializeMetaBoxes
 	// will noop until then.
@@ -65,6 +67,18 @@ export const useMetaBoxInitialization = ( enabled ) => {
 			// admin screen instead.
 			if ( hasActiveMetaBoxes ) {
 				updateEditorSettings( { disableVisualRevisions: true } );
+
+				// The flag arrives after the editor is ready, so revisions
+				// mode may already be active (deep link or a click that
+				// beat the flag). Honor the intent on the classic screen.
+				const revisionId = unlock(
+					registry.select( editorStore )
+				).getCurrentRevisionId();
+				if ( revisionId ) {
+					window.location.href = addQueryArgs( 'revision.php', {
+						revision: revisionId,
+					} );
+				}
 			}
 		}
 	}, [
@@ -75,5 +89,6 @@ export const useMetaBoxInitialization = ( enabled ) => {
 		hasIncompatibleMetaBoxes,
 		hasActiveMetaBoxes,
 		updateEditorSettings,
+		registry,
 	] );
 };

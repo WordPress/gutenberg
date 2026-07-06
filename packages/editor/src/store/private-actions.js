@@ -661,6 +661,70 @@ export const setRevisionPage =
 	};
 
 /**
+ * Enter revisions mode at a specific revision, locating the revisions
+ * page that contains it. Exits revisions mode with a notice when the
+ * revision does not belong to the current post.
+ *
+ * Used to open a revision from a shared URL (`revision` query arg).
+ *
+ * @param {number} revisionId The revision ID to open.
+ */
+export const openRevision =
+	( revisionId ) =>
+	async ( { dispatch, select, registry } ) => {
+		// Enter revisions mode right away; the canvas and slider render
+		// loading states until the revision's page is located.
+		dispatch.setCurrentRevisionId( revisionId );
+
+		const postType = select.getCurrentPostType();
+		const postId = select.getCurrentPostId();
+		const entityConfig = registry
+			.select( coreStore )
+			.getEntityConfig( 'postType', postType );
+		const revisionKey = entityConfig?.revisionKey || 'id';
+
+		// Fetch the full id list in one request (`per_page: -1` is not
+		// paginated) to both validate the revision and find its position.
+		// Ordering must match `buildRevisionsPageQuery` so the position
+		// maps to the page the slider fetches.
+		const revisions = await registry
+			.resolveSelect( coreStore )
+			.getRevisions( 'postType', postType, postId, {
+				per_page: -1,
+				context: 'edit',
+				orderby: 'date',
+				order: 'desc',
+				_fields: revisionKey,
+			} );
+
+		// The user selected another revision or exited while fetching.
+		if ( select.getCurrentRevisionId() !== revisionId ) {
+			return;
+		}
+
+		const index = ( revisions ?? [] ).findIndex(
+			( revision ) => revision[ revisionKey ] === revisionId
+		);
+		if ( index === -1 ) {
+			dispatch.setCurrentRevisionId( null );
+			registry
+				.dispatch( noticesStore )
+				.createNotice( 'warning', __( 'Invalid revision ID.' ), {
+					type: 'snackbar',
+					id: 'editor-revision-invalid',
+				} );
+			return;
+		}
+
+		const page = Math.floor( index / select.getRevisionsPerPage() ) + 1;
+		if ( page !== select.getRevisionPage() ) {
+			// Raw action on purpose: the `setRevisionPage` thunk would
+			// re-select the newest revision of the page.
+			dispatch( { type: 'SET_REVISION_PAGE', page } );
+		}
+	};
+
+/**
  * Set whether the revision diff highlighting is shown.
  *
  * @param {boolean} showDiff Whether to show diff highlighting.
