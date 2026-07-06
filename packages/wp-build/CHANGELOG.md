@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Generated pages now enqueue the classic script dependencies declared by each route's content and route modules, merged into the prerequisites script. Previously a route relied on whatever classic scripts `@wordpress/boot` happened to load eagerly, so a route using e.g. `@wordpress/viewport` could break if those were not loaded. [#79913](https://github.com/WordPress/gutenberg/pull/79913).
+
 ### Enhancements
 
 -   Widgets: carry the optional metadata fields from `widget.json` into

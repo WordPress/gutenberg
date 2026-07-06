@@ -72,6 +72,47 @@ function {{PREFIX}}_get_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_routes() {
 }
 
 /**
+ * Collect the classic script dependencies for the {{PAGE_SLUG}}-wp-admin prerequisites script.
+ *
+ * Merges @wordpress/boot's classic dependencies with the classic script dependencies
+ * declared by each route's content and route modules. Script modules cannot load
+ * classic-script dependencies themselves, so the page is responsible for enqueuing
+ * them; otherwise a route relies on whatever @wordpress/boot happens to load eagerly.
+ *
+ * @param array $routes            Registered routes (may carry content_module / route_module ids).
+ * @param array $boot_dependencies Classic script dependencies of @wordpress/boot.
+ * @return array De-duplicated list of classic script handles.
+ */
+function {{PREFIX}}_get_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_route_dependencies( $routes, $boot_dependencies ) {
+	$dependencies = $boot_dependencies;
+
+	foreach ( $routes as $route ) {
+		foreach ( array( 'content_module', 'route_module' ) as $module_key ) {
+			if ( empty( $route[ $module_key ] ) ) {
+				continue;
+			}
+
+			// Module ids look like "<namespace>/routes/<name>/(content|route)".
+			if ( ! preg_match( '#/routes/([^/]+)/(content|route)$#', $route[ $module_key ], $matches ) ) {
+				continue;
+			}
+
+			$module_asset_path = __DIR__ . '/../../routes/' . $matches[1] . '/' . $matches[2] . '.min.asset.php';
+			if ( ! file_exists( $module_asset_path ) ) {
+				continue;
+			}
+
+			$module_asset = require $module_asset_path;
+			if ( ! empty( $module_asset['dependencies'] ) ) {
+				$dependencies = array_merge( $dependencies, $module_asset['dependencies'] );
+			}
+		}
+	}
+
+	return array_values( array_unique( $dependencies ) );
+}
+
+/**
  * Get all registered menu items for the {{PAGE_SLUG}}-wp-admin page.
  *
  * @return array Array of menu item objects.
@@ -150,10 +191,18 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts( $hook_suf
 	if ( file_exists( $asset_file ) ) {
 		$asset = require $asset_file;
 
+		// Route content/route modules declare their own classic script dependencies
+		// (e.g. wp-viewport) that must be present before the module evaluates. Because
+		// script modules do not load classic-script dependencies themselves, merge each
+		// route's declared dependencies into the prerequisites script. This lets each
+		// route reliably receive its classic dependencies without relying on whatever
+		// @wordpress/boot happens to load eagerly.
+		$prerequisite_dependencies = {{PREFIX}}_get_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_route_dependencies( $routes, $asset['dependencies'] );
+
 		// This script serves two purposes:
 		// 1. It ensures all the globals that are made available to the modules are loaded.
 		// 2. It initializes the boot module as an inline script.
-		wp_register_script( '{{PAGE_SLUG}}-wp-admin-prerequisites', '', $asset['dependencies'], $asset['version'], true );
+		wp_register_script( '{{PAGE_SLUG}}-wp-admin-prerequisites', '', $prerequisite_dependencies, $asset['version'], true );
 
 		$init_modules = {{INIT_MODULES_JSON}};
 
@@ -193,7 +242,7 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts( $hook_suf
 
 		// Register prerequisites style by filtering script dependencies to find registered styles
 		$style_dependencies = array_filter(
-			$asset['dependencies'],
+			$prerequisite_dependencies,
 			function ( $handle ) {
 				return wp_style_is( $handle, 'registered' );
 			}
