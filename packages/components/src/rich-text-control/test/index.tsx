@@ -87,6 +87,16 @@ describe( 'RichTextControl (presentational shell)', () => {
 		expect( textbox ).toHaveClass( 'my-custom-class' );
 	} );
 
+	it( 'forwards additional native props to the textbox', () => {
+		const { container } = render(
+			<RichTextControl label="Note" dir="rtl" data-testid="my-textbox" />
+		);
+
+		const textbox = getTextbox( container )!;
+		expect( textbox ).toHaveAttribute( 'dir', 'rtl' );
+		expect( textbox ).toHaveAttribute( 'data-testid', 'my-textbox' );
+	} );
+
 	it( 'attaches the injected editableRef to the contenteditable element', () => {
 		const editableRef = jest.fn();
 		const { container } = render(

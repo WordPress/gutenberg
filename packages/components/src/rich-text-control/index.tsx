@@ -2,7 +2,7 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import type { FocusEvent, Ref, ReactNode } from 'react';
+import type { FocusEvent } from 'react';
 
 /**
  * WordPress dependencies
@@ -21,63 +21,16 @@ import {
  */
 import BaseControl from '../base-control';
 import { useBaseControlProps } from '../base-control/hooks';
+import type { WordPressComponentProps } from '../context';
 import Popover from '../popover';
 import { Provider as SlotFillProvider } from '../slot-fill';
+import type { RichTextControlProps } from './types';
 
 // Popovers opened from this control land either in the control's own portaled
 // slot (see `SlotFillProvider` below) or, for popovers already migrated to
 // `@wordpress/ui`, in the shared compat overlay slot.
 const OWNED_POPOVER_SELECTOR =
 	'[data-rich-text-control-popover-slot],[data-wp-compat-overlay-slot]';
-
-type RichTextControlProps = {
-	/**
-	 * Label text for the control.
-	 */
-	label: string;
-	/**
-	 * Ref attached to the `contentEditable` element. The rich-text wiring is
-	 * injected through this ref (e.g. the `useRichText` ref, event-listener
-	 * refs, and an anchor ref), keeping this component free of any
-	 * `@wordpress/rich-text` dependency.
-	 */
-	editableRef?: Ref< HTMLDivElement >;
-	/**
-	 * Called when the field gains or loses an "active" selection. The control
-	 * is controlled: it owns no selection state itself, it only drives the
-	 * focus/blur transitions (deferring deselection so a format popover opened
-	 * from the field can claim focus without the field deselecting).
-	 */
-	onSelectedChange?: ( isSelected: boolean ) => void;
-	/**
-	 * Placeholder slot for the rich-text assembly (e.g. `FormatEdit` and its
-	 * context providers). Rendered inside the control's private
-	 * `SlotFillProvider` so any format popovers portal into this control's own
-	 * `Popover.Slot`.
-	 */
-	children?: ReactNode;
-	/**
-	 * Unique identifier for the control.
-	 */
-	id?: string;
-	/**
-	 * Additional class name applied to the `contentEditable` element.
-	 */
-	className?: string;
-	/**
-	 * Whether to visually hide the label (still accessible to screen readers).
-	 */
-	hideLabelFromVision?: boolean;
-	/**
-	 * Whether line breaks are disabled. Drives `aria-multiline`.
-	 */
-	disableLineBreaks?: boolean;
-	/**
-	 * Whether to move focus to the field when it mounts. Off by default; opt in
-	 * for standalone forms where no other code lands focus on the field.
-	 */
-	focusOnMount?: boolean;
-};
 
 /**
  * A presentational rich text control: a labeled `contentEditable` form field
@@ -117,7 +70,10 @@ function RichTextControl( {
 	hideLabelFromVision,
 	disableLineBreaks,
 	focusOnMount,
-}: RichTextControlProps ) {
+	onFocus,
+	onBlur,
+	...additionalProps
+}: WordPressComponentProps< RichTextControlProps, 'div', false > ) {
 	// Format types open their UI (e.g. the inline link popover via Cmd+K) in
 	// portaled popovers. We host them in a private `SlotFillProvider` paired
 	// with our own `Popover.Slot` (rendered below), wrapped in a marker
@@ -232,7 +188,8 @@ function RichTextControl( {
 						focusOnMountRef,
 						popoverSlotContainerRef,
 					] ) }
-					onFocus={ () => {
+					onFocus={ ( event: FocusEvent< HTMLDivElement > ) => {
+						onFocus?.( event );
 						clearTimeout( blurDeselectTimeoutRef.current );
 						// Focus is back in the field, so its own blur handling
 						// takes over from the popover focus tracking again.
@@ -240,6 +197,7 @@ function RichTextControl( {
 						onSelectedChange?.( true );
 					} }
 					onBlur={ ( event: FocusEvent< HTMLDivElement > ) => {
+						onBlur?.( event );
 						clearTimeout( blurDeselectTimeoutRef.current );
 						const { ownerDocument } = event.currentTarget;
 						blurDeselectTimeoutRef.current = setTimeout( () => {
@@ -268,6 +226,7 @@ function RichTextControl( {
 					} }
 					contentEditable
 					suppressContentEditableWarning
+					{ ...additionalProps }
 					{ ...controlProps }
 				/>
 			</BaseControl>
