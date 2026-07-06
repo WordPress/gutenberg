@@ -7,7 +7,7 @@ import type { ReactNode } from 'react';
 /**
  * WordPress dependencies
  */
-import { debounce } from '@wordpress/compose';
+import { debounce, useEvent } from '@wordpress/compose';
 import {
 	createContext,
 	useCallback,
@@ -308,14 +308,14 @@ export function WidgetDashboardProvider( {
 	);
 
 	// Auto-save for inline edits.
-	// A single debounced timer marks a save pending;
-	// the effect below publishes it, reading the latest `commit`
-	// (and so the current staging) through its dependency.
-	const [ autoSavePending, setAutoSavePending ] = useState( false );
+	// A single debounced timer publishes through `useEvent`, so it always
+	// reads the latest `commit` (and so the current staging) without
+	// resetting on staging re-renders.
+	const publishAutoSave = useEvent( () => commit( { exitEditMode: false } ) );
 
 	const scheduleAutoSave = useMemo(
-		() => debounce( () => setAutoSavePending( true ), AUTO_SAVE_DELAY_MS ),
-		[]
+		() => debounce( publishAutoSave, AUTO_SAVE_DELAY_MS ),
+		[ publishAutoSave ]
 	);
 
 	const flushAutoSave = useCallback(
@@ -323,17 +323,8 @@ export function WidgetDashboardProvider( {
 		[ scheduleAutoSave ]
 	);
 
-	useEffect( () => {
-		if ( ! autoSavePending ) {
-			return;
-		}
-
-		setAutoSavePending( false );
-		commit( { exitEditMode: false } );
-	}, [ autoSavePending, commit ] );
-
 	// Entering customize flushes any pending inline save first, so it does not
-	// commingle with the layout edit flow. Cancel the timer on unmount.
+	// commingle with the layout edit flow.
 	useEffect( () => {
 		if ( ! editMode ) {
 			return;
@@ -342,7 +333,9 @@ export function WidgetDashboardProvider( {
 		scheduleAutoSave.flush();
 	}, [ editMode, scheduleAutoSave ] );
 
-	useEffect( () => () => scheduleAutoSave.cancel(), [ scheduleAutoSave ] );
+	// Flush, not cancel, on unmount: an edit still inside the debounce window
+	// must persist when the user navigates away from the dashboard.
+	useEffect( () => () => scheduleAutoSave.flush(), [ scheduleAutoSave ] );
 
 	const cancel = useCallback(
 		( options?: CancelOptions ) => {
