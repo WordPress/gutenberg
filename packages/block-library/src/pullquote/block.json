@@ -18,6 +18,9 @@
 			"source": "rich-text",
 			"selector": "cite",
 			"role": "content"
+		},
+		"citationTextTransform": {
+			"type": "string"
 		}
 	},
 	"supports": {

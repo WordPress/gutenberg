@@ -4,7 +4,7 @@
 import { RichText, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { citation, value } = attributes;
+	const { citation, value, citationTextTransform } = attributes;
 	const shouldShowCitation = ! RichText.isEmpty( citation );
 
 	return (
@@ -12,7 +12,15 @@ export default function save( { attributes } ) {
 			<blockquote>
 				<RichText.Content tagName="p" value={ value } />
 				{ shouldShowCitation && (
-					<RichText.Content tagName="cite" value={ citation } />
+					<RichText.Content
+						tagName="cite"
+						value={ citation }
+						style={
+							citationTextTransform
+								? { textTransform: citationTextTransform }
+								: undefined
+						}
+					/>
 				) }
 			</blockquote>
 		</figure>
