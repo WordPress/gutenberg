@@ -391,7 +391,7 @@ describe( 'RichTextControl', () => {
 			} );
 		}
 
-		it( 'keeps dispatching shortcuts when focus moves into the control popover slot', async () => {
+		it( 'keeps dispatching shortcuts when focus moves into a popover container', async () => {
 			const { container } = render(
 				<>
 					<RichTextControl
@@ -399,10 +399,9 @@ describe( 'RichTextControl', () => {
 						value=""
 						onChange={ () => {} }
 					/>
-					{ /* Stand-in for the inline link UI popover, which the
-					   control scopes into its own slot, marked with this
-					   attribute. */ }
-					<div data-rich-text-control-popover-slot>
+					{ /* Stand-in for the inline link UI popover, rendered into
+					   an ambient `Popover.Slot` up the tree. */ }
+					<div className="popover-slot">
 						<button type="button">Inside popover</button>
 					</div>
 				</>
@@ -454,7 +453,7 @@ describe( 'RichTextControl', () => {
 						value=""
 						onChange={ () => {} }
 					/>
-					<div data-rich-text-control-popover-slot>
+					<div className="popover-slot">
 						<button type="button">Inside popover</button>
 					</div>
 					<button type="button">Outside</button>
@@ -485,7 +484,7 @@ describe( 'RichTextControl', () => {
 			expect( currentOnUse ).not.toHaveBeenCalled();
 		} );
 
-		it( 'deselects when focus moves to an unrelated popover', async () => {
+		it( 'deselects when focus moves outside any popover container', async () => {
 			const { container } = render(
 				<>
 					<RichTextControl
@@ -493,10 +492,8 @@ describe( 'RichTextControl', () => {
 						value=""
 						onChange={ () => {} }
 					/>
-					{ /* A popover this control did not open: it carries the
-					   generic `.components-popover` class but none of the
-					   control's slot markers, so it must not keep the field
-					   selected. */ }
+					{ /* An element outside the field and outside every popover
+					   container must not keep the field selected. */ }
 					<div className="components-popover">
 						<button type="button">Unrelated popover</button>
 					</div>

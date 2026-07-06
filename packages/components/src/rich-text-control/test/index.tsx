@@ -226,7 +226,7 @@ describe( 'RichTextControl (presentational shell)', () => {
 			await flushBlurTimer();
 		}
 
-		it( 'stays selected when focus moves into the control popover slot', async () => {
+		it( 'stays selected when focus moves into an ambient popover slot', async () => {
 			const onSelectedChange = jest.fn();
 			const { container } = render(
 				<>
@@ -234,10 +234,34 @@ describe( 'RichTextControl (presentational shell)', () => {
 						label="Field"
 						onSelectedChange={ onSelectedChange }
 					/>
-					{ /* Stand-in for the inline link UI popover, which the
-					   control scopes into its own slot, marked with this
-					   attribute. */ }
-					<div data-rich-text-control-popover-slot>
+					{ /* Stand-in for the inline link UI popover, rendered into
+					   an ambient `Popover.Slot` up the tree. */ }
+					<div className="popover-slot">
+						<button type="button">Inside popover</button>
+					</div>
+				</>
+			);
+
+			await blurWithFocusIn(
+				getTextbox( container )!,
+				screen.getByRole( 'button', { name: 'Inside popover' } )
+			);
+
+			expect( onSelectedChange ).not.toHaveBeenCalledWith( false );
+		} );
+
+		it( 'stays selected when focus moves into the popover fallback container', async () => {
+			const onSelectedChange = jest.fn();
+			const { container } = render(
+				<>
+					<RichTextControl
+						label="Field"
+						onSelectedChange={ onSelectedChange }
+					/>
+					{ /* Stand-in for a popover portaled to the body-level
+					   fallback container `Popover` creates when no slot is
+					   registered. */ }
+					<div className="components-popover__fallback-container">
 						<button type="button">Inside popover</button>
 					</div>
 				</>
@@ -283,7 +307,7 @@ describe( 'RichTextControl (presentational shell)', () => {
 						label="Field"
 						onSelectedChange={ onSelectedChange }
 					/>
-					<div data-rich-text-control-popover-slot>
+					<div className="popover-slot">
 						<button type="button">Inside popover</button>
 					</div>
 					<button type="button">Outside</button>
@@ -309,7 +333,7 @@ describe( 'RichTextControl (presentational shell)', () => {
 			expect( onSelectedChange ).toHaveBeenLastCalledWith( false );
 		} );
 
-		it( 'deselects when focus moves to an unrelated popover', async () => {
+		it( 'deselects when focus moves outside any popover container', async () => {
 			const onSelectedChange = jest.fn();
 			const { container } = render(
 				<>
@@ -317,18 +341,17 @@ describe( 'RichTextControl (presentational shell)', () => {
 						label="Field"
 						onSelectedChange={ onSelectedChange }
 					/>
-					{ /* A popover this control did not open: generic
-					   `.components-popover` but none of the control's slot
-					   markers, so it must not keep the field selected. */ }
-					<div className="components-popover">
-						<button type="button">Unrelated popover</button>
+					{ /* An element outside the field and outside every popover
+					   container must not keep the field selected. */ }
+					<div>
+						<button type="button">Elsewhere</button>
 					</div>
 				</>
 			);
 
 			await blurWithFocusIn(
 				getTextbox( container )!,
-				screen.getByRole( 'button', { name: 'Unrelated popover' } )
+				screen.getByRole( 'button', { name: 'Elsewhere' } )
 			);
 
 			expect( onSelectedChange ).toHaveBeenLastCalledWith( false );

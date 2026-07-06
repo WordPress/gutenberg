@@ -7,14 +7,8 @@ import type { FocusEvent, ForwardedRef } from 'react';
 /**
  * WordPress dependencies
  */
-import { useEvent, useMergeRefs, useRefEffect } from '@wordpress/compose';
-import {
-	createPortal,
-	forwardRef,
-	useEffect,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { useEvent, useMergeRefs } from '@wordpress/compose';
+import { forwardRef, useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,20 +16,26 @@ import {
 import BaseControl from '../base-control';
 import { useBaseControlProps } from '../base-control/hooks';
 import type { WordPressComponentProps } from '../context';
-import Popover from '../popover';
-import { Provider as SlotFillProvider } from '../slot-fill';
 import { useControlledValue } from '../utils/hooks';
 import type { RichTextControlProps } from './types';
 
-// Popovers opened from this control land either in the control's own portaled
-// slot (see `SlotFillProvider` below) or, for popovers already migrated to
-// `@wordpress/ui`, in the shared compat overlay slot.
-const OWNED_POPOVER_SELECTOR =
-	'[data-rich-text-control-popover-slot],[data-wp-compat-overlay-slot]';
+/*
+ * Format popovers opened from this control render into whatever popover
+ * container is in scope: an ambient `Popover.Slot` when a provider exists up
+ * the tree, the body-level fallback container otherwise, or -- for popovers
+ * already migrated to `@wordpress/ui` -- the shared compat overlay slot. Blur
+ * handling treats focus inside any of these containers as "still in the
+ * field's popover". That trades a little precision (an unrelated popover in
+ * the same container also matches) for using the popover primitives as-is;
+ * in practice, reaching an unrelated popover moves focus through a
+ * non-popover element first, which already deselects the field.
+ */
+const POPOVER_CONTAINER_SELECTOR =
+	'.popover-slot,.components-popover__fallback-container,[data-wp-compat-overlay-slot]';
 
 /**
  * A presentational rich text control: a labeled `contentEditable` form field
- * with the slot scaffolding format popovers need.
+ * with the selection tracking format popovers need.
  *
  * Unlike the in-canvas `RichText` from `@wordpress/block-editor`, this control
  * is intended for standalone form fields (DataForms, sidebar inputs, etc.).
@@ -43,7 +43,7 @@ const OWNED_POPOVER_SELECTOR =
  * dependency: the editable behavior (value, formatting, keyboard shortcuts) is
  * injected by the consumer through the forwarded ref and `children`. The
  * consumer owns the `useRichText` wiring; this component owns the chrome
- * (`BaseControl` + label, the editable element, and the popover slot).
+ * (`BaseControl` + label and the editable element).
  *
  * The selection ("active") state can be controlled through the `isSelected`
  * prop or left uncontrolled; either way `children` are mounted only while the
@@ -90,25 +90,6 @@ function UnforwardedRichTextControl(
 		defaultValue: defaultIsSelected,
 		onChange: onSelectedChange,
 	} );
-	// Format types open their UI (e.g. the inline link popover via Cmd+K) in
-	// portaled popovers. We host them in a private `SlotFillProvider` paired
-	// with our own `Popover.Slot` (rendered below), wrapped in a marker
-	// element. That way blur handling can tell precisely that focus moved into
-	// a popover this control opened, rather than any popover that happens to be
-	// on screen, and the popovers don't leak into an ambient slot registry.
-	// The slot is portaled to the field's document body so popovers escape any
-	// scroll/overflow container the control sits in (e.g. a sidebar). The body
-	// is read from the field element rather than the global `document` to stay
-	// correct if the control is ever rendered inside an iframe.
-	const [ popoverSlotContainer, setPopoverSlotContainer ] =
-		useState< HTMLElement >();
-	const popoverSlotContainerRef = useRefEffect< HTMLDivElement >(
-		( element ) => {
-			setPopoverSlotContainer( element.ownerDocument.body );
-		},
-		[]
-	);
-
 	// When the textbox blurs, defer flipping the selection off so a
 	// portal-rendered popover (e.g. the inline link UI opened via Cmd+K) can
 	// claim focus without the consumer's `FormatEdit` -- and therefore the
@@ -148,7 +129,7 @@ function UnforwardedRichTextControl(
 				if (
 					( active &&
 						editableWrapperRef.current?.contains( active ) ) ||
-					( active && active.closest( OWNED_POPOVER_SELECTOR ) )
+					( active && active.closest( POPOVER_CONTAINER_SELECTOR ) )
 				) {
 					return;
 				}
@@ -172,27 +153,14 @@ function UnforwardedRichTextControl(
 
 	return (
 		<>
-			<SlotFillProvider>
-				{ isSelected && children }
-				{ popoverSlotContainer &&
-					createPortal(
-						<div data-rich-text-control-popover-slot>
-							<Popover.Slot />
-						</div>,
-						popoverSlotContainer
-					) }
-			</SlotFillProvider>
+			{ isSelected && children }
 			<BaseControl { ...baseControlProps }>
 				<div
 					className={ clsx( 'wp-rich-text-control', className ) }
 					role="textbox"
 					aria-multiline={ ! disableLineBreaks }
 					aria-label={ label }
-					ref={ useMergeRefs( [
-						forwardedRef,
-						editableWrapperRef,
-						popoverSlotContainerRef,
-					] ) }
+					ref={ useMergeRefs( [ forwardedRef, editableWrapperRef ] ) }
 					onFocus={ ( event: FocusEvent< HTMLDivElement > ) => {
 						onFocus?.( event );
 						clearTimeout( blurDeselectTimeoutRef.current );
@@ -206,22 +174,15 @@ function UnforwardedRichTextControl(
 						clearTimeout( blurDeselectTimeoutRef.current );
 						const { ownerDocument } = event.currentTarget;
 						blurDeselectTimeoutRef.current = setTimeout( () => {
-							// Stay selected if focus moved into a popover that a
-							// format type opened from this control (e.g. the
-							// inline link UI via Cmd+K). `@wordpress/components`
-							// popovers are scoped to this control's own slot
-							// (see `SlotFillProvider` above) and land inside the
-							// `data-rich-text-control-popover-slot` marker, so we
-							// match them precisely rather than treating any
-							// on-screen popover as ours.
-							// `[data-wp-compat-overlay-slot]` additionally covers
-							// popovers already migrated to `@wordpress/ui`, which
-							// portal into the shared compat overlay slot rather
-							// than our own.
+							// Stay selected if focus moved into a popover
+							// container, i.e. (approximately) a popover that a
+							// format type opened from this control, such as the
+							// inline link UI via Cmd+K. See
+							// `POPOVER_CONTAINER_SELECTOR` above.
 							const active = ownerDocument.activeElement;
 							if (
 								active &&
-								active.closest( OWNED_POPOVER_SELECTOR )
+								active.closest( POPOVER_CONTAINER_SELECTOR )
 							) {
 								trackPopoverFocusOut( ownerDocument );
 								return;

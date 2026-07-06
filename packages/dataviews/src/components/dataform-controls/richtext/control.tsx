@@ -28,9 +28,9 @@ import { getAllowedFormats } from './utils';
 import FormatEdit from './format-edit';
 
 // The presentational shell. It owns the chrome (`BaseControl` + label, the
-// `contentEditable` element, and the popover slot plus its blur/focus
-// selection heuristic) and has no `@wordpress/rich-text` dependency. This
-// module is the "assembly" that injects the rich-text wiring into it.
+// `contentEditable` element, and the blur/focus selection heuristic) and has
+// no `@wordpress/rich-text` dependency. This module is the "assembly" that
+// injects the rich-text wiring into it.
 const { RichTextControl: RichTextControlShell } = unlock(
 	componentsPrivateApis
 );
