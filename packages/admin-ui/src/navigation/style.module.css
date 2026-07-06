@@ -13,16 +13,5 @@
 }
 
 .list .item {
-	color: var(--wpds-color-foreground-interactive-neutral-weak);
-	font-weight: var(--wpds-typography-font-weight-regular);
 	text-decoration: none;
-}
-
-.list .item:hover {
-	color: var(--wpds-color-foreground-interactive-neutral-active);
-}
-
-.list .item[aria-current="page"] {
-	color: var(--wpds-color-foreground-interactive-neutral-active);
-	font-weight: var(--wpds-typography-font-weight-medium);
 }
