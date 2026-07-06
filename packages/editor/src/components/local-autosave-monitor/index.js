@@ -7,6 +7,7 @@ import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { parse } from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -98,7 +99,7 @@ function useAutosaveNotice() {
 			return;
 		}
 
-		const { createWarningNotice, removeNotice } =
+		const { createWarningNotice, createSuccessNotice, removeNotice } =
 			registry.dispatch( noticesStore );
 		const { editPost, resetEditorBlocks } =
 			registry.dispatch( editorStore );
@@ -119,9 +120,30 @@ function useAutosaveNotice() {
 								content: editsContent,
 								...editsWithoutContent
 							} = edits;
-							editPost( editsWithoutContent );
-							resetEditorBlocks( parse( edits.content ) );
-							removeNotice( id );
+
+							registry.batch( () => {
+								editPost( editsWithoutContent );
+								resetEditorBlocks( parse( edits.content ) );
+								removeNotice( id );
+
+								createSuccessNotice(
+									__( 'Autosave restored.' ),
+									{
+										type: 'snackbar',
+										id: 'wpEditorAutosaveRestored',
+										actions: [
+											{
+												label: __( 'Undo' ),
+												onClick: () => {
+													registry
+														.dispatch( coreStore )
+														.undo();
+												},
+											},
+										],
+									}
+								);
+							} );
 						},
 					},
 				],

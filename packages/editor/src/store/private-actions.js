@@ -670,8 +670,7 @@ export function setShowRevisionDiff( showDiff ) {
 }
 
 /**
- * Restore a revision by replacing the current content with the revision's content
- * and auto-saving.
+ * Restore a revision by replacing the current content with the revision's content.
  *
  * @param {number} revisionId The revision ID to restore.
  */
@@ -728,14 +727,11 @@ export const restoreRevision =
 			edits.meta = revision.meta;
 		}
 
-		// Apply edits and save.
+		// Apply edits.
 		dispatch.editPost( edits );
 
 		// Exit revisions mode.
 		dispatch.setCurrentRevisionId( null );
-
-		// Save the post to persist the restored revision.
-		await dispatch.savePost();
 
 		// Show success notice.
 		registry.dispatch( noticesStore ).createSuccessNotice(
