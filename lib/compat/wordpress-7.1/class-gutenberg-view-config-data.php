@@ -138,12 +138,10 @@ class Gutenberg_View_Config_Data {
 	 * @param int   $version The schema version the patch was authored against.
 	 * @return Gutenberg_View_Config_Data The instance, for chaining.
 	 */
-	public function update_properties( array $patch, $version ) {
+	public function update_properties( array $patch, int $version ) {
 		if ( ! $this->check_version( $version, __METHOD__ ) ) {
 			return $this;
 		}
-
-		$patch = $this->migrate( $patch, $version, 'properties' );
 
 		foreach ( $patch as $key => $value ) {
 			if ( ! in_array( $key, self::CONFIG_KEYS, true ) ) {
@@ -181,8 +179,7 @@ class Gutenberg_View_Config_Data {
 				}
 			}
 			// A documented key that is not yet present merges onto an empty base.
-			$current              = array_key_exists( $key, $this->config ) ? $this->config[ $key ] : array();
-			$this->config[ $key ] = $this->deep_merge( $current, $value );
+			$this->config[ $key ] = $this->deep_merge( $this->config[ $key ] ?? array(), $value );
 		}
 
 		return $this;
@@ -209,14 +206,12 @@ class Gutenberg_View_Config_Data {
 	 * @param int   $version The schema version the patch was authored against.
 	 * @return Gutenberg_View_Config_Data The instance, for chaining.
 	 */
-	public function update_view_list_items( array $items, $version ) {
+	public function update_view_list_items( array $items, int $version ) {
 		if ( ! $this->check_version( $version, __METHOD__ ) ) {
 			return $this;
 		}
 
-		$items = $this->migrate( $items, $version, 'view_list' );
-
-		if ( array() === $items ) {
+		if ( empty( $items ) ) {
 			return $this;
 		}
 		if ( array_is_list( $items ) ) {
@@ -238,9 +233,7 @@ class Gutenberg_View_Config_Data {
 				$view_list = array_values(
 					array_filter(
 						$view_list,
-						static function ( $item ) use ( $slug ) {
-							return ! is_array( $item ) || ! isset( $item['slug'] ) || $item['slug'] !== $slug;
-						}
+						static fn( $item ) => ! is_array( $item ) || ! isset( $item['slug'] ) || $item['slug'] !== $slug
 					)
 				);
 				continue;
@@ -249,7 +242,7 @@ class Gutenberg_View_Config_Data {
 			if ( ! is_array( $value ) || ( array() !== $value && array_is_list( $value ) ) ) {
 				_doing_it_wrong(
 					__METHOD__,
-					esc_html__( 'Each view patch must be an object of view properties, or null to remove the view.', 'gutenberg' ),
+					esc_html__( 'Each view patch must be an associative array of view properties, or null to remove the view.', 'gutenberg' ),
 					'7.1.0'
 				);
 				continue;
@@ -307,14 +300,12 @@ class Gutenberg_View_Config_Data {
 	 * @param int   $version The schema version the patch was authored against.
 	 * @return Gutenberg_View_Config_Data The instance, for chaining.
 	 */
-	public function update_form_fields( array $fields, $version ) {
+	public function update_form_fields( array $fields, int $version ) {
 		if ( ! $this->check_version( $version, __METHOD__ ) ) {
 			return $this;
 		}
 
-		$fields = $this->migrate( $fields, $version, 'form_fields' );
-
-		if ( array() === $fields ) {
+		if ( empty( $fields ) ) {
 			return $this;
 		}
 		if ( array_is_list( $fields ) ) {
@@ -337,49 +328,25 @@ class Gutenberg_View_Config_Data {
 	}
 
 	/**
-	 * Migrates a patch from its declared version up to the latest version.
-	 *
-	 * The latest version is the only version so far, so this is an identity
-	 * transform for now. Version-specific steps dispatch on the declared
-	 * version and the part of the configuration the patch targets as the
-	 * schema evolves.
-	 *
-	 * @since 7.1.0
-	 *
-	 * @param array  $patch   The patch to migrate.
-	 * @param int    $version The schema version the patch was authored against.
-	 * @param string $scope   The part of the configuration the patch targets: 'properties', 'view_list', or 'form_fields'.
-	 * @return array The migrated patch.
-	 */
-	private function migrate( array $patch, $version, $scope ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-		return $patch;
-	}
-
-	/**
 	 * Validates a declared patch version, reporting misuse against the given
 	 * public method.
 	 *
 	 * @since 7.1.0
 	 *
-	 * @param mixed  $version The declared version.
+	 * @param int    $version The declared version.
 	 * @param string $method  The public method the patch was passed to.
 	 * @return bool Whether the version can be migrated to the latest version.
 	 */
-	private function check_version( $version, $method ) {
-		if ( is_int( $version ) && $version >= 1 && $version <= self::LATEST_VERSION ) {
+	private function check_version( int $version, $method ) {
+		if ( $version >= 1 && $version <= self::LATEST_VERSION ) {
 			return true;
 		}
 
-		if ( self::LATEST_VERSION > 1 ) {
-			$message = sprintf(
-				/* translators: %d: the latest supported version. */
-				esc_html__( 'A view configuration contribution must declare a version between 1 and %d.', 'gutenberg' ),
-				self::LATEST_VERSION
-			);
-		} else {
-			$message = esc_html__( 'A view configuration contribution must declare version 1.', 'gutenberg' );
-		}
-		_doing_it_wrong( esc_html( $method ), $message, '7.1.0' );
+		_doing_it_wrong(
+			esc_html( $method ),
+			esc_html__( 'A view configuration contribution must declare a supported schema version.', 'gutenberg' ),
+			'7.1.0'
+		);
 
 		return false;
 	}
@@ -398,7 +365,7 @@ class Gutenberg_View_Config_Data {
 		if ( ! is_array( $value ) || ( array() !== $value && array_is_list( $value ) ) ) {
 			_doing_it_wrong(
 				'Gutenberg_View_Config_Data::update_properties',
-				esc_html__( 'A "form" patch must be an object of form properties, not a list.', 'gutenberg' ),
+				esc_html__( 'A "form" patch must be an associative array of form properties.', 'gutenberg' ),
 				'7.1.0'
 			);
 			return null;
@@ -486,7 +453,7 @@ class Gutenberg_View_Config_Data {
 			if ( ! is_array( $value ) || ( array() !== $value && array_is_list( $value ) ) ) {
 				_doing_it_wrong(
 					'Gutenberg_View_Config_Data::update_form_fields',
-					esc_html__( 'Each field patch must be an object of field properties, or null to remove the field.', 'gutenberg' ),
+					esc_html__( 'Each field patch must be an associative array of field properties, or null to remove the field.', 'gutenberg' ),
 					'7.1.0'
 				);
 				continue;
@@ -575,7 +542,7 @@ class Gutenberg_View_Config_Data {
 				if ( ! is_array( $item ) ) {
 					_doing_it_wrong(
 						'Gutenberg_View_Config_Data::update_form_fields',
-						esc_html__( 'A "children" patch must be an object keyed by field id to merge, a list to replace the children wholesale, or null to delete the key.', 'gutenberg' ),
+						esc_html__( 'A "children" patch must be an associative array keyed by field id to merge, a numerically indexed array to replace the children wholesale, or null to delete the key.', 'gutenberg' ),
 						'7.1.0'
 					);
 					continue;
