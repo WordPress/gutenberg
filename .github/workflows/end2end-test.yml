@@ -109,6 +109,10 @@ jobs:
                   # Run against the "slow" profile (a short simulated send
                   # delay) for better coverage of real-world timing.
                   RTC_WS_DELAY: 100
+                  # Label flaky reports so this job's diagnostics don't collide
+                  # with the default suite's when artifacts are merged, and so
+                  # WebSocket-provider flakes are reported as their own issues.
+                  FLAKY_TESTS_REPORT_LABEL: 'RTC WebSocket'
               run: |
                   xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run --workspace @wordpress/e2e-tests-playwright test:e2e:rtc-websocket
 
