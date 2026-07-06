@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Load the editor lazily. The save/"review changes" UI no longer statically imports `@wordpress/editor`, so the editor (and its `block-editor`/`block-library`/`media-utils` dependencies) is only loaded on demand instead of eagerly on every view, including list views that never edit.
+-   Load the editor lazily. The save/"review changes" UI no longer statically imports `@wordpress/editor`, so the editor (and its `block-editor`/`block-library`/`media-utils` dependencies) is only loaded on demand instead of eagerly on every view, including list views that never edit. [#79913](https://github.com/WordPress/gutenberg/pull/79913).
 
 ## 0.17.0 (2026-07-01)
 
