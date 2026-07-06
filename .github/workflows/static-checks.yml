@@ -106,6 +106,7 @@ jobs:
               run: |
                   npm run lint:css -- --formatter compact
                   npm run lint:css -- --formatter compact --suppress
+                  wp-scripts format tools/stylelint/stylelint-suppressions.json
 
             - name: Type checking
               run: npm run build
