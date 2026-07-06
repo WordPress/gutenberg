@@ -30,6 +30,7 @@ test.describe( 'Collaboration - synced taxonomy records', () => {
 			content:
 				'<!-- wp:paragraph --><p>Hello world</p><!-- /wp:paragraph -->',
 			status: 'draft',
+			date_gmt: new Date().toISOString(),
 		} );
 
 		const publishPanelFor = ( target: Page ) =>
