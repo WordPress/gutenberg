@@ -1,13 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { RichTextControl } from '@wordpress/rich-text-control';
 import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import type { DataFormControlProps } from '../../types';
+import RichTextControl from './control';
+import type { DataFormControlProps } from '../../../types';
 
 export default function RichText< Item >( {
 	data,

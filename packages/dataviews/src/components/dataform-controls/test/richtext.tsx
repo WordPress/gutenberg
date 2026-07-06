@@ -4,13 +4,15 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-// The `RichTextControl` component depends on `@wordpress/rich-text`'s
-// useRichText hook (format types, event listeners, etc.) which is
-// integration-heavy. Mock the rich-text-control module entirely so this file
-// can verify the control's prop wiring in isolation without standing up the
-// real editing pipeline.
-jest.mock( '@wordpress/rich-text-control', () => ( {
-	RichTextControl( props: any ) {
+// The rich-text assembly (`./control`) wires `@wordpress/rich-text`'s
+// useRichText hook (format types, event listeners, etc.) into the
+// presentational `RichTextControl` shell from `@wordpress/components`, which is
+// integration-heavy. Mock the assembly entirely so this file can verify the
+// dataform control's prop wiring in isolation without standing up the real
+// editing pipeline.
+jest.mock( '../richtext/control', () => ( {
+	__esModule: true,
+	default( props: any ) {
 		const handleChange = ( event: any ) =>
 			props.onChange( event.target.value );
 
