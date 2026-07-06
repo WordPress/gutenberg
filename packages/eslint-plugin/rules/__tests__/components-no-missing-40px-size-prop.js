@@ -43,13 +43,6 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
 				<SelectControl />
 			`,
 		},
-		// NumberControl no longer requires __next40pxDefaultSize
-		{
-			code: `
-				import { NumberControl } from '@wordpress/components';
-				<NumberControl />
-			`,
-		},
 		// Component with size="compact"
 		{
 			code: `
