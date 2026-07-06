@@ -6,7 +6,7 @@ import config from '../../terrazzo.config';
 
 const legacyWpComponentsAliasesCSS = `
 /* Legacy @wordpress/components color aliases. */
-:root {
+:where(:root) {
 \t--wp-components-color-accent: var(--wp-admin-theme-color, #3858e9);
 \t--wp-components-color-accent-darker-10: var(--wp-admin-theme-color-darker-10, #2145e6);
 \t--wp-components-color-accent-darker-20: var(--wp-admin-theme-color-darker-20, #183ad6);

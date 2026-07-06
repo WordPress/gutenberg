@@ -30,6 +30,9 @@ describe( 'useThemeProviderStyles', () => {
 			);
 
 			expect( prebuiltCSS ).toMatch(
+				/:where\(\s*:root\s*\)\s*{[\s\S]*--wp-components-color-accent/
+			);
+			expect( prebuiltCSS ).toMatch(
 				/--wp-components-color-accent:\s*var\(\s*--wp-admin-theme-color\s*,\s*#3858e9\s*\);/
 			);
 			expect( prebuiltCSS ).toMatch(

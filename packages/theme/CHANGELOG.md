@@ -9,6 +9,7 @@
 
 ### Documentation
 
+-   Document the legacy `--wp-components-*` color alias compatibility behavior in the design token delivery model ([#79772](https://github.com/WordPress/gutenberg/pull/79772)).
 -   Document that `ThemeProvider` does not accept wrapper customization props ([#79763](https://github.com/WordPress/gutenberg/pull/79763)).
 -   Clarify the design token documentation entry points and keep the generated token guidance source internal ([#79829](https://github.com/WordPress/gutenberg/pull/79829)).
 -   Clarify that `--wpds-color-stroke-focus` is a standalone exception to the normal color token naming pattern ([#79764](https://github.com/WordPress/gutenberg/pull/79764)).
