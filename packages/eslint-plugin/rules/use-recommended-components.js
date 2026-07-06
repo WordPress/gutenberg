@@ -23,6 +23,7 @@ const ALLOWLIST = {
 			'EmptyState',
 			'Icon',
 			'Link',
+			'Skeleton',
 			'Stack',
 			'Tabs',
 			'Text',

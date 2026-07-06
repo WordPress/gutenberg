@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Breaking Changes
-
--   Remove the root `CornerRadiusPreset` type export. Derive it from `ThemeProvider`'s `cornerRadius` prop instead ([#79620](https://github.com/WordPress/gutenberg/pull/79620)).
-
 ### Bug Fixes
 
 -   Mark the published `design-tokens.css` file as side-effectful so downstream bundlers preserve the documented CSS import ([#79551](https://github.com/WordPress/gutenberg/pull/79551)).
@@ -13,6 +9,8 @@
 ### Documentation
 
 -   Document that `ThemeProvider` does not accept wrapper customization props ([#79763](https://github.com/WordPress/gutenberg/pull/79763)).
+-   Clarify the design token documentation entry points and keep the generated token guidance source internal ([#79829](https://github.com/WordPress/gutenberg/pull/79829)).
+-   Clarify that `--wpds-color-stroke-focus` is a standalone exception to the normal color token naming pattern ([#79764](https://github.com/WordPress/gutenberg/pull/79764)).
 
 ## 0.17.0 (2026-06-30)
 

@@ -617,7 +617,6 @@ function BackgroundSizeControls( {
 					aria-label={ __( 'Background image width' ) }
 					onChange={ updateBackgroundSize }
 					value={ sizeValue }
-					size="__unstable-large"
 					__unstableInputWidth="100px"
 					min={ 0 }
 					placeholder={ __( 'Auto' ) }
