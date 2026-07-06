@@ -697,10 +697,24 @@ async function runNpmPublishPreflight(
 ) {
 	const { commandFn = command } = deps;
 	log( '>> Checking npm package access.' );
-	await commandFn( 'npm access list packages @wordpress --json', {
-		cwd: gitWorkingDirectoryPath,
-		stdio: 'pipe',
-	} );
+	try {
+		await commandFn( 'npm access list packages @wordpress --json', {
+			cwd: gitWorkingDirectoryPath,
+			stdio: 'pipe',
+		} );
+	} catch ( error ) {
+		log(
+			formats.warning(
+				'>> Unable to list npm package access. Continuing because `npm whoami` already verified credentials.'
+			)
+		);
+		const output = `${ error.stdout || '' }\n${
+			error.stderr || ''
+		}`.trim();
+		if ( output ) {
+			log( output );
+		}
+	}
 
 	log( '>> Verifying target package versions are not already published.' );
 	// TODO: Consider bounded concurrency here if this preflight becomes too slow.
@@ -890,13 +904,25 @@ async function publishVersionedPackagesToNpm(
 		log(
 			'>> Trying to finish failed publishing of modified npm packages.'
 		);
-		await commandFn(
-			`npx lerna publish from-package --dist-tag ${ distTag } ${ yesFlag } ${ noVerifyAccessFlag }`,
-			{
-				cwd: gitWorkingDirectoryPath,
-				stdio: 'inherit',
-			}
-		);
+		try {
+			await commandFn(
+				`npx lerna publish from-package --dist-tag ${ distTag } ${ yesFlag } ${ noVerifyAccessFlag }`,
+				{
+					cwd: gitWorkingDirectoryPath,
+					stdio: 'inherit',
+				}
+			);
+		} catch ( error ) {
+			log(
+				formats.warning(
+					'>> npm publishing did not finish. Some package versions may already be published.'
+				)
+			);
+			log(
+				`>> Do not start a fresh release. After checking npm registry state, rerun the same release command from this checkout with --resume --repository-path ${ gitWorkingDirectoryPath }.`
+			);
+			throw error;
+		}
 	}
 
 	const publishCommit = await git.revparse( [ 'HEAD' ] );

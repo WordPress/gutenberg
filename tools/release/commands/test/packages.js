@@ -218,6 +218,40 @@ describe( 'runNpmPublishPreflight', () => {
 		expect( console ).toHaveLogged();
 	} );
 
+	it( 'continues when the npm access listing check fails', async () => {
+		const commandFn = jest
+			.fn()
+			.mockRejectedValueOnce( {
+				stderr: 'npm ERR! access denied',
+			} )
+			.mockRejectedValueOnce( {
+				stderr: 'npm ERR! code E404',
+			} );
+
+		await runNpmPublishPreflight(
+			{
+				distTag: 'latest',
+				gitWorkingDirectoryPath: '/repo',
+				releasePackages: [
+					{ name: '@wordpress/a11y', version: '4.50.0' },
+				],
+			},
+			{ commandFn }
+		);
+
+		expect( commandFn ).toHaveBeenNthCalledWith(
+			1,
+			'npm access list packages @wordpress --json',
+			{ cwd: '/repo', stdio: 'pipe' }
+		);
+		expect( commandFn ).toHaveBeenNthCalledWith(
+			2,
+			'npm view @wordpress/a11y@4.50.0 version --json',
+			{ cwd: '/repo', stdio: 'pipe' }
+		);
+		expect( console ).toHaveLogged();
+	} );
+
 	it( 'fails when a target package version already exists', async () => {
 		const commandFn = jest
 			.fn()
@@ -496,6 +530,43 @@ describe( 'publishVersionedPackagesToNpm', () => {
 		);
 		expect( git.reset ).not.toHaveBeenCalled();
 		expect( console ).toHaveLogged();
+	} );
+
+	it( 'prints resume guidance when from-package retry fails', async () => {
+		const commandFn = jest
+			.fn()
+			.mockRejectedValueOnce( new Error( 'partial publish' ) )
+			.mockRejectedValueOnce( new Error( 'still failing' ) );
+
+		await expect(
+			publishVersionedPackagesToNpm(
+				{
+					distTag: 'latest',
+					gitWorkingDirectoryPath: '/repo',
+					noVerifyAccessFlag: '--no-verify-access',
+					npmReleaseBranch: 'wp/latest',
+					yesFlag: '--yes',
+				},
+				{
+					commandFn,
+					git: {
+						revparse: jest.fn(),
+					},
+					getNpmReleasePackagesFn: jest
+						.fn()
+						.mockResolvedValue( [
+							{ tagName: '@wordpress/a11y@4.50.0' },
+						] ),
+					pushNpmReleaseGitMetadataFn: jest.fn(),
+					runNpmPublishPreflightFn: jest.fn(),
+				}
+			)
+		).rejects.toThrow( 'still failing' );
+
+		expect( commandFn ).toHaveBeenCalledTimes( 2 );
+		expect( console ).toHaveLoggedWith(
+			'>> Do not start a fresh release. After checking npm registry state, rerun the same release command from this checkout with --resume --repository-path /repo.'
+		);
 	} );
 } );
 
