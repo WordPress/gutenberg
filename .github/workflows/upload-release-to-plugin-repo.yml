@@ -201,7 +201,6 @@ jobs:
             - name: Check out Gutenberg trunk from WP.org plugin repo
               run: |
                   svn checkout "$PLUGIN_REPO_URL/trunk" --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
-                  svn checkout "$PLUGIN_REPO_URL/tags" --depth=immediates --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
 
             - name: Delete everything
               working-directory: ./trunk
@@ -263,13 +262,16 @@ jobs:
               if: steps.check_svn_tag.outputs.exists != 'true'
               working-directory: ./trunk
               run: |
-                  svn st | grep '^?' | awk '{print $2}' | xargs -r svn add
-                  svn st | grep '^!' | awk '{print $2}' | xargs -r svn rm
-                  svn cp . "../tags/$VERSION"
-                  svn commit . "../tags/$VERSION" \
-                   -m "Releasing version $VERSION" \
+                  svn commit -m "Releasing version $VERSION" \
                    --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
                    --config-option=servers:global:http-timeout=600
+
+            - name: Tag the new version
+              if: steps.check_svn_tag.outputs.exists != 'true'
+              run: |
+                  svn cp "$PLUGIN_REPO_URL/trunk" "$PLUGIN_REPO_URL/tags/$VERSION" \
+                   -m "Tagging version $VERSION" \
+                   --no-auth-cache --non-interactive --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
 
     upload-tag:
         name: Publish as tag
