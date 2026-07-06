@@ -2,7 +2,8 @@
  * WordPress dependencies
  */
 import { isKeyboardEvent } from '@wordpress/keycodes';
-import { useEffect, useContext, useRef } from '@wordpress/element';
+import { useEffect, useContext } from '@wordpress/element';
+import { useEvent } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -12,18 +13,18 @@ import { keyboardShortcutContext } from './contexts';
 export function RichTextShortcut( { character, type, onUse } ) {
 	const keyboardShortcuts = useContext( keyboardShortcutContext );
 
-	// Keep the latest `onUse` in a ref so the registered callback can call it
-	// without re-running the registration effect on every render.
-	const onUseRef = useRef( onUse );
-	useEffect( () => {
-		onUseRef.current = onUse;
-	} );
+	/*
+	 * Keep a stable reference to the latest `onUse` so the registered
+	 * callback can call it without re-running the registration effect on
+	 * every render.
+	 */
+	const stableOnUse = useEvent( onUse );
 
 	useEffect( () => {
 		const shortcuts = keyboardShortcuts.current;
 		function callback( event ) {
 			if ( isKeyboardEvent[ type ]( event, character ) ) {
-				onUseRef.current();
+				stableOnUse();
 				event.preventDefault();
 			}
 		}
@@ -32,7 +33,7 @@ export function RichTextShortcut( { character, type, onUse } ) {
 		return () => {
 			shortcuts.delete( callback );
 		};
-	}, [ character, type, keyboardShortcuts ] );
+	}, [ character, type, keyboardShortcuts, stableOnUse ] );
 
 	return null;
 }

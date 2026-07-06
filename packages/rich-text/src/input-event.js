@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useContext, useRef } from '@wordpress/element';
+import { useEffect, useContext } from '@wordpress/element';
+import { useEvent } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -11,18 +12,18 @@ import { inputEventContext } from './contexts';
 export function RichTextInputEvent( { inputType, onInput } ) {
 	const callbacks = useContext( inputEventContext );
 
-	// Keep the latest `onInput` in a ref so the registered callback can call it
-	// without re-running the registration effect on every render.
-	const onInputRef = useRef( onInput );
-	useEffect( () => {
-		onInputRef.current = onInput;
-	} );
+	/*
+	 * Keep a stable reference to the latest `onInput` so the registered
+	 * callback can call it without re-running the registration effect on
+	 * every render.
+	 */
+	const stableOnInput = useEvent( onInput );
 
 	useEffect( () => {
 		const inputCallbacks = callbacks.current;
 		function callback( event ) {
 			if ( event.inputType === inputType ) {
-				onInputRef.current();
+				stableOnInput();
 				event.preventDefault();
 			}
 		}
@@ -31,7 +32,7 @@ export function RichTextInputEvent( { inputType, onInput } ) {
 		return () => {
 			inputCallbacks.delete( callback );
 		};
-	}, [ inputType, callbacks ] );
+	}, [ inputType, callbacks, stableOnInput ] );
 
 	return null;
 }
