@@ -4,7 +4,7 @@ import { FORMAT_ID } from '@terrazzo/plugin-css';
 import type { Plugin } from '@terrazzo/parser';
 
 const TOKEN_GUIDANCE = readFileSync(
-	new URL( '../../docs/token-guidance.md', import.meta.url ),
+	new URL( './preamble.md', import.meta.url ),
 	'utf8'
 )
 	.replace( /^# .+\n+/, '' )

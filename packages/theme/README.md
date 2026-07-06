@@ -14,18 +14,14 @@ A theming package that's part of the WordPress Design System. It has two parts:
 This README is the entry point for package consumers. It covers how to load design tokens, use `ThemeProvider`, and configure the package's development tooling.
 
 -   To use design tokens and `ThemeProvider`, start here.
--   To pick the right design token, see the [Design Token Guidance](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/token-guidance.md).
--   To browse every available token, see the generated [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md).
+-   To pick the right design token or browse every available token, see the generated [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md).
 -   To edit token source files, see the [Design Tokens Maintainer's Guide](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/tokens/README.md).
--   To understand the docs folder, see the [Theme Docs README](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/README.md).
 
 ## Design Tokens
 
 Design tokens are named values that describe the visual purpose of a value. Rather than hardcoding values like `#3858e9` or `16px`, use semantic custom properties like `--wpds-color-background-interactive-brand-strong` or `--wpds-dimension-padding-2xl`.
 
-The **[Design Token Guidance](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/token-guidance.md)** explains the naming pattern and how to choose a token.
-
-The **[Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md)** contains the complete generated list of available design tokens.
+The **[Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md)** explains the naming pattern, how to choose a token, and the complete generated list of available design tokens.
 
 ### Using Design Tokens
 

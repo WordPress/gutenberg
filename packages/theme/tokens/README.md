@@ -2,7 +2,7 @@
 
 This maintainer-facing guide explains how the WordPress Design System token source files are organized and generated.
 
-For consumer-facing usage, start with the [`@wordpress/theme` package README](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/README.md), the [Design Token Guidance](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/token-guidance.md), and the generated [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md).
+For consumer-facing usage, start with the [`@wordpress/theme` package README](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/README.md) and the generated [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md).
 
 ## Structure
 
@@ -21,7 +21,7 @@ Each JSON file contains both primitive and semantic token definitions in a hiera
 
 ## Token Naming
 
-Semantic tokens follow a consistent naming pattern that encodes the token's purpose. See the [Design Token Guidance](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/token-guidance.md) for the naming pattern, the meaning of each segment (type, property, target, tone, emphasis, state), and guidance on how to pick the right token. See the [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md) for the complete generated list of token names.
+Semantic tokens follow a consistent naming pattern that encodes the token's purpose. See the [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md) for the naming pattern, the meaning of each segment (type, property, target, tone, emphasis, state), guidance on how to pick the right token, and the complete generated list of token names.
 
 ## Primitive and Semantic Tokens
 
