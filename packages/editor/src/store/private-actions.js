@@ -211,9 +211,9 @@ export const saveDirtyEntities =
 			.__unstableMarkLastChangeAsPersistent();
 
 		Promise.all( pendingSavedRecords )
-			.then( ( values ) => {
+			.then( async ( values ) => {
 				if ( onSave ) {
-					onSave();
+					await onSave();
 				}
 				return values;
 			} )
