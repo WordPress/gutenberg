@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Load the editor lazily. The save/"review changes" UI no longer statically imports `@wordpress/editor`, so the editor (and its `block-editor`/`block-library`/`media-utils` dependencies) is only loaded on demand instead of eagerly on every view, including list views that never edit.
+
 ## 0.17.0 (2026-07-01)
 
 ## 0.16.0 (2026-06-24)

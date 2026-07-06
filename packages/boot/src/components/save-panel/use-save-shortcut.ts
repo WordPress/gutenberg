@@ -7,11 +7,16 @@ import {
 	store as keyboardShortcutsStore,
 } from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as editorStore } from '@wordpress/editor';
 
 const shortcutName = 'core/boot/save';
+
+// The editor store is provided by the classic @wordpress/editor script, which is
+// loaded lazily (via the canvas / lazy-editor). Referencing it by name here — rather
+// than importing the store descriptor — keeps @wordpress/editor out of boot's eager
+// dependency graph so the editor only loads when there is something to edit.
+const EDITOR_STORE_NAME = 'core/editor';
 
 /**
  * Register the save keyboard shortcut in view mode.
@@ -24,11 +29,9 @@ export default function useSaveShortcut( {
 }: {
 	openSavePanel: () => void;
 } ) {
+	const registry = useRegistry();
 	const { __experimentalGetDirtyEntityRecords, isSavingEntityRecord } =
 		useSelect( coreStore );
-	const { hasNonPostEntityChanges, isPostSavingLocked } =
-		useSelect( editorStore );
-	const { savePost } = useDispatch( editorStore );
 	const { registerShortcut, unregisterShortcut } = useDispatch(
 		keyboardShortcutsStore
 	);
@@ -57,10 +60,14 @@ export default function useSaveShortcut( {
 		if ( ! hasDirtyEntities || isSaving ) {
 			return;
 		}
-		if ( hasNonPostEntityChanges() ) {
+		// The editor store is only registered once the editor has been loaded.
+		// When it isn't present there is nothing post-related to save, so fall
+		// back to the entity-only save panel.
+		const editorSelectors = registry.select( EDITOR_STORE_NAME );
+		if ( ! editorSelectors || editorSelectors.hasNonPostEntityChanges() ) {
 			openSavePanel();
-		} else if ( ! isPostSavingLocked() ) {
-			savePost();
+		} else if ( ! editorSelectors.isPostSavingLocked() ) {
+			registry.dispatch( EDITOR_STORE_NAME ).savePost();
 		}
 	} );
 }

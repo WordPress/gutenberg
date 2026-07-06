@@ -1,14 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, Suspense } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { _n, __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { displayShortcut, rawShortcut } from '@wordpress/keycodes';
 import { check } from '@wordpress/icons';
-import { EntitiesSavedStates } from '@wordpress/editor';
-import { Button, Modal } from '@wordpress/components';
+import { Button, Modal, Spinner } from '@wordpress/components';
 import { Tooltip } from '@wordpress/ui';
 
 /**
@@ -16,6 +15,7 @@ import { Tooltip } from '@wordpress/ui';
  */
 import './style.scss';
 import useSaveShortcut from '../save-panel/use-save-shortcut';
+import LazyEntitiesSavedStates from '../save-panel/lazy-entities-saved-states';
 
 export default function SaveButton() {
 	const [ isSaveViewOpen, setIsSaveViewOpened ] = useState( false );
@@ -120,10 +120,12 @@ export default function SaveButton() {
 					onRequestClose={ () => setIsSaveViewOpened( false ) }
 					size="small"
 				>
-					<EntitiesSavedStates
-						close={ () => setIsSaveViewOpened( false ) }
-						variant="inline"
-					/>
+					<Suspense fallback={ <Spinner /> }>
+						<LazyEntitiesSavedStates
+							close={ () => setIsSaveViewOpened( false ) }
+							variant="inline"
+						/>
+					</Suspense>
 				</Modal>
 			) }
 		</>

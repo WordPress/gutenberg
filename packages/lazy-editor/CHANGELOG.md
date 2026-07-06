@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Export `EntitiesSavedStates` so consumers can render the editor's "review changes" UI on demand through this script module instead of statically depending on `@wordpress/editor`.
+
 ## 1.16.0 (2026-07-01)
 
 ## 1.15.0 (2026-06-24)
