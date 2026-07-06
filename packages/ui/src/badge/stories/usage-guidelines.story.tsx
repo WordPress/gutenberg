@@ -1,9 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { caution, error, page, plugins, published } from '@wordpress/icons';
 import { Badge } from '../index';
+import { Icon } from '../../icon';
 import { Stack } from '../../stack';
+import { Text } from '../../text';
 
 const meta: Meta< typeof Badge > = {
-	title: 'Design System/Components/Badge/Choosing intent',
+	title: 'Design System/Components/Badge/Usage Guidelines',
 	component: Badge,
 	decorators: [
 		( Story ) => (
@@ -15,7 +18,7 @@ const meta: Meta< typeof Badge > = {
 	parameters: {
 		controls: { disable: true },
 	},
-	tags: [ '!dev' /* Hide individual story pages from sidebar */, 'manifest' ],
+	tags: [ '!dev' /* Hide individual story pages from sidebar */ ],
 };
 export default meta;
 
@@ -124,6 +127,76 @@ export const PluginStatus: Story = {
 		<>
 			<Badge intent="stable">Active</Badge>
 			<Badge intent="none">Inactive</Badge>
+		</>
+	),
+};
+
+export const TextOnlyBadges: Story = {
+	render: () => (
+		<>
+			<Badge intent="stable">Active</Badge>
+			<Badge intent="medium">Review needed</Badge>
+			<Badge intent="high">Payment declined</Badge>
+		</>
+	),
+};
+
+export const WithAdjacentContentIcon: Story = {
+	render: () => (
+		<Stack direction="column" gap="sm">
+			<Stack direction="row" gap="sm" align="center">
+				<Icon icon={ page } size={ 24 } />
+				<Text variant="body-md">About page</Text>
+				<Badge intent="none">Published</Badge>
+			</Stack>
+			<Stack direction="row" gap="sm" align="center">
+				<Icon icon={ plugins } size={ 24 } />
+				<Text variant="body-md">My Plugin</Text>
+				<Badge intent="stable">Active</Badge>
+			</Stack>
+		</Stack>
+	),
+};
+
+export const IncorrectBadgeWithIcon: Story = {
+	render: () => (
+		<>
+			{ /* @ts-expect-error Demonstrating incorrect Badge usage with icon children. */ }
+			<Badge intent="stable">
+				<Stack
+					align="center"
+					direction="row"
+					gap="xs"
+					render={ <span /> }
+				>
+					<Icon icon={ published } size={ 16 } />
+					Active
+				</Stack>
+			</Badge>
+			{ /* @ts-expect-error Demonstrating incorrect Badge usage with icon children. */ }
+			<Badge intent="medium">
+				<Stack
+					align="center"
+					direction="row"
+					gap="xs"
+					render={ <span /> }
+				>
+					<Icon icon={ caution } size={ 16 } />
+					Review needed
+				</Stack>
+			</Badge>
+			{ /* @ts-expect-error Demonstrating incorrect Badge usage with icon children. */ }
+			<Badge intent="high">
+				<Stack
+					align="center"
+					direction="row"
+					gap="xs"
+					render={ <span /> }
+				>
+					<Icon icon={ error } size={ 16 } />
+					Payment declined
+				</Stack>
+			</Badge>
 		</>
 	),
 };

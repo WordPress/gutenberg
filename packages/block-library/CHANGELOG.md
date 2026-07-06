@@ -2,11 +2,17 @@
 
 ## Unreleased
 
+## 10.1.0 (2026-07-01)
+
 ## 10.0.0 (2026-06-24)
 
 ### Breaking Changes
 
 -   Removed the `@wordpress/block-library/babel-plugin` export. It was an internal transform for stripping experimental blocks from WordPress core builds and is no longer used by Gutenberg's build process ([#79162](https://github.com/WordPress/gutenberg/pull/79162)).
+
+### New Features
+
+-   Gallery: add a dynamic mode that displays images resolved from a source (initially the images attached to the current post) instead of manually-added image blocks, with an editor preview, mode toggles, and server-side rendering. [#78796](https://github.com/WordPress/gutenberg/pull/78796).
 
 ### Enhancements
 

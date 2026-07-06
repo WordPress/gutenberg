@@ -22,6 +22,9 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+}
+
+.emotion-5 {
   -webkit-align-items: stretch;
   -webkit-box-align: stretch;
   -ms-flex-align: stretch;
@@ -36,11 +39,11 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
   justify-content: center;
 }
 
-.emotion-4>* {
+.emotion-6>* {
   min-height: 0;
 }
 
-.emotion-6 {
+.emotion-7 {
   font-size: 11px;
   font-weight: 499;
   line-height: 1.4;
@@ -50,11 +53,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
   padding: 0;
 }
 
-.emotion-8 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
+.emotion-10 {
   -webkit-align-items: stretch;
   -webkit-box-align: stretch;
   -ms-flex-align: stretch;
@@ -69,15 +68,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
   justify-content: center;
 }
 
-.emotion-8>* {
-  min-height: 0;
-}
-
-.emotion-10 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
+.emotion-13 {
   -webkit-align-items: stretch;
   -webkit-box-align: stretch;
   -ms-flex-align: stretch;
@@ -92,15 +83,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
   justify-content: center;
 }
 
-.emotion-10>* {
-  min-height: 0;
-}
-
-.emotion-12 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
+.emotion-16 {
   -webkit-align-items: stretch;
   -webkit-box-align: stretch;
   -ms-flex-align: stretch;
@@ -115,10 +98,6 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
   justify-content: center;
 }
 
-.emotion-12>* {
-  min-height: 0;
-}
-
 <div>
   <div
     class="components-base-control block-editor-color-gradient-control emotion-0 emotion-1"
@@ -130,7 +109,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
         class="block-editor-color-gradient-control__fieldset"
       >
         <div
-          class="components-flex components-h-stack components-v-stack emotion-4 emotion-5"
+          class="emotion-4 emotion-5 emotion-6 components-flex components-h-stack components-v-stack"
           data-wp-c16t="true"
           data-wp-component="VStack"
         >
@@ -139,7 +118,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
               class="block-editor-color-gradient-control__color-indicator"
             >
               <span
-                class="components-base-control__label emotion-6 emotion-7"
+                class="components-base-control__label emotion-7 emotion-8"
               >
                 Test Color
               </span>
@@ -149,7 +128,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
             class="block-editor-color-gradient-control__panel"
           >
             <div
-              class="components-flex components-h-stack components-v-stack emotion-8 emotion-5"
+              class="emotion-4 emotion-10 emotion-6 components-flex components-h-stack components-v-stack"
               data-wp-c16t="true"
               data-wp-component="VStack"
             >
@@ -158,7 +137,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
                 tabindex="-1"
               >
                 <div
-                  class="components-flex components-h-stack components-v-stack components-color-palette__custom-color-wrapper emotion-10 emotion-5"
+                  class="emotion-4 emotion-13 emotion-6 components-flex components-h-stack components-v-stack components-color-palette__custom-color-wrapper"
                   data-wp-c16t="true"
                   data-wp-component="VStack"
                 >
@@ -171,19 +150,19 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
                     type="button"
                   />
                   <div
-                    class="components-flex components-h-stack components-v-stack components-color-palette__custom-color-text-wrapper emotion-12 emotion-5"
+                    class="emotion-4 emotion-16 emotion-6 components-flex components-h-stack components-v-stack components-color-palette__custom-color-text-wrapper"
                     data-wp-c16t="true"
                     data-wp-component="VStack"
                   >
                     <span
-                      class="style-truncate components-truncate components-color-palette__custom-color-name emotion-14 emotion-5"
+                      class="style-truncate components-truncate components-color-palette__custom-color-name"
                       data-wp-c16t="true"
                       data-wp-component="Truncate"
                     >
                       red
                     </span>
                     <span
-                      class="style-truncate components-truncate components-color-palette__custom-color-value components-color-palette__custom-color-value--is-hex emotion-14 emotion-5"
+                      class="style-truncate components-truncate components-color-palette__custom-color-value components-color-palette__custom-color-value--is-hex"
                       data-wp-c16t="true"
                       data-wp-component="Truncate"
                     >

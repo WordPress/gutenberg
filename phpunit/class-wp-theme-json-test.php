@@ -5020,7 +5020,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$actual_styles    = $theme_json->get_styles_for_block( $metadata );
 		$default_styles   = ':root :where(.wp-block-test-milk .liquid, .wp-block-test-milk:is(.frothed, .steamed) .foam, .wp-block-test-milk:not(.spoiled), .wp-block-test-milk.in-bottle){background-color: white;}';
-		$variation_styles = ':root :where(.wp-block-test-milk.is-style-chocolate .liquid,.wp-block-test-milk.is-style-chocolate:is(.frothed, .steamed) .foam,.wp-block-test-milk.is-style-chocolate:not(.spoiled),.wp-block-test-milk.in-bottle.is-style-chocolate){background-color: #35281E;}';
+		$variation_styles = ':root :where(.wp-block-test-milk.is-style-chocolate .liquid, .wp-block-test-milk.is-style-chocolate:is(.frothed, .steamed) .foam, .wp-block-test-milk.is-style-chocolate:not(.spoiled), .wp-block-test-milk.in-bottle.is-style-chocolate){background-color: #35281E;}';
 		$expected         = $default_styles . $variation_styles;
 
 		unregister_block_style( 'test/milk', 'chocolate' );
@@ -8236,22 +8236,22 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'where with internal commas and top-level comma' => array(
 				'selector'   => ':where(.a, .b),.c',
 				'to_prepend' => '.scope ',
-				'expected'   => '.scope :where(.a, .b),.scope .c',
+				'expected'   => '.scope :where(.a, .b), .scope .c',
 			),
 			'is with internal commas and top-level comma'  => array(
 				'selector'   => ':is(.x, .y),.z',
 				'to_prepend' => '.wrapper ',
-				'expected'   => '.wrapper :is(.x, .y),.wrapper .z',
+				'expected'   => '.wrapper :is(.x, .y), .wrapper .z',
 			),
 			'multiple parenthesized selectors with top-level comma' => array(
 				'selector'   => ':where(.a, .b),:is(.c, .d)',
 				'to_prepend' => '.scope ',
-				'expected'   => '.scope :where(.a, .b),.scope :is(.c, .d)',
+				'expected'   => '.scope :where(.a, .b), .scope :is(.c, .d)',
 			),
 			'nested parentheses with commas'               => array(
 				'selector'   => ':where(:not(.a, .b), .c),.d',
 				'to_prepend' => '.scope ',
-				'expected'   => '.scope :where(:not(.a, .b), .c),.scope .d',
+				'expected'   => '.scope :where(:not(.a, .b), .c), .scope .d',
 			),
 		);
 	}

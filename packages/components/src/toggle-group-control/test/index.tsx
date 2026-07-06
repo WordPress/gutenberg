@@ -15,7 +15,7 @@ import { formatLowercase, formatUppercase } from '@wordpress/icons';
  */
 import Button from '../../button';
 import {
-	ToggleGroupControl as _ToggleGroupControl,
+	ToggleGroupControl,
 	ToggleGroupControlOption,
 	ToggleGroupControlOptionIcon,
 } from '../index';
@@ -27,9 +27,10 @@ const hoverOutside = async () => {
 	await hover( document.body, { clientX: 10, clientY: 10 } );
 };
 
-const ToggleGroupControl = ( props: ToggleGroupControlProps ) => {
-	return <_ToggleGroupControl { ...props } __next40pxDefaultSize />;
-};
+const getGeneratedEmotionClassNames = ( element: HTMLElement ) =>
+	Array.from( element.classList ).filter( ( className ) =>
+		/^(css|emotion)-/.test( className )
+	);
 
 const ControlledToggleGroupControl = ( {
 	value: valueProp,
@@ -634,4 +635,19 @@ describe.each( [
 			} );
 		} );
 	} );
+} );
+
+test( 'should compose block styles in a single generated class', () => {
+	render(
+		<ToggleGroupControl label="Test Toggle Group Control" isBlock>
+			{ options }
+		</ToggleGroupControl>
+	);
+
+	const control = screen.getByRole( 'radiogroup', {
+		name: 'Test Toggle Group Control',
+	} );
+
+	expect( getGeneratedEmotionClassNames( control ) ).toHaveLength( 1 );
+	expect( control ).toHaveStyle( { display: 'flex' } );
 } );
