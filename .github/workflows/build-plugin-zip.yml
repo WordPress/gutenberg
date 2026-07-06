@@ -17,9 +17,9 @@ on:
 # Workflow-dispatched release runs must not cancel an in-flight run after it may have
 # pushed version bump commits.
 concurrency:
-    # The concurrency group contains the workflow name and ref for release dispatches,
+    # The concurrency group contains a shared release group for dispatches,
     # the branch name for pull requests, or the commit hash for any other events.
-    group: ${{ github.workflow }}-${{ github.event_name == 'workflow_dispatch' && github.ref || ( github.event_name == 'pull_request' && github.head_ref || github.sha ) }}
+    group: ${{ github.workflow }}-${{ github.event_name == 'workflow_dispatch' && 'release' || ( github.event_name == 'pull_request' && github.head_ref || github.sha ) }}
     cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
 
 # Disable permissions for all available scopes by default.
