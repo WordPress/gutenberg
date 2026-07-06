@@ -736,6 +736,7 @@ export default function TypographyPanel( {
 					<TextDecorationControl
 						value={ textDecoration }
 						onChange={ setTextDecoration }
+						size="__unstable-large"
 						__unstableInputWidth="auto"
 					/>
 				</ToolsPanelItem>
@@ -752,6 +753,7 @@ export default function TypographyPanel( {
 					<WritingModeControl
 						value={ writingMode }
 						onChange={ setWritingMode }
+						size="__unstable-large"
 					/>
 				</ToolsPanelItem>
 			) }
@@ -768,6 +770,7 @@ export default function TypographyPanel( {
 						onChange={ setTextTransform }
 						showNone
 						isBlock
+						size="__unstable-large"
 					/>
 				</ToolsPanelItem>
 			) }
@@ -783,6 +786,7 @@ export default function TypographyPanel( {
 						value={ textAlign }
 						onChange={ setTextAlign }
 						options={ [ 'left', 'center', 'right', 'justify' ] }
+						size="__unstable-large"
 					/>
 
 					{ textAlign === 'justify' && (
