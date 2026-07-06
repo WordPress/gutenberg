@@ -5,7 +5,14 @@ import type { InputControlProps } from '../input-control/types';
 
 export type NumberControlProps = Omit<
 	InputControlProps,
-	'isDragEnabled' | 'min' | 'max' | 'required' | 'step' | 'type' | 'value'
+	| 'isDragEnabled'
+	| 'min'
+	| 'max'
+	| 'required'
+	| 'step'
+	| 'type'
+	| 'value'
+	| '__next40pxDefaultSize'
 > & {
 	/**
 	 * If true, the default `input` HTML arrows will be hidden.
