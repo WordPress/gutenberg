@@ -5,7 +5,7 @@ import os from 'node:os';
 import esbuild from 'esbuild';
 
 const MIN_DEFAULT_BUILD_CONCURRENCY = 2;
-const MAX_DEFAULT_BUILD_CONCURRENCY = 8;
+const MAX_DEFAULT_BUILD_CONCURRENCY = 16;
 
 /**
  * @typedef {Object} QueuedBuild
@@ -14,7 +14,7 @@ const MAX_DEFAULT_BUILD_CONCURRENCY = 8;
  * @property {(reason?: unknown) => void}       reject  Promise rejecter.
  */
 
-let buildConcurrency = getDefaultBuildConcurrency();
+let buildConcurrency = MIN_DEFAULT_BUILD_CONCURRENCY;
 let activeBuilds = 0;
 /** @type {QueuedBuild[]} */
 const queuedBuilds = [];
@@ -51,21 +51,21 @@ export function getDefaultBuildConcurrency(
 /**
  * Parse a concurrency override.
  *
- * @param {string|undefined} value  Concurrency override value.
- * @param {string}           source Source of the override for error messages.
+ * @param {string|undefined} value Concurrency override value.
  * @return {number|undefined} Parsed concurrency, or undefined when unset.
  */
-export function parseBuildConcurrency( value, source ) {
+export function parseBuildConcurrency( value ) {
 	if ( value === undefined ) {
 		return undefined;
 	}
 
 	if ( ! /^\d+$/.test( value ) || Number( value ) === 0 ) {
-		throw new Error(
-			`Invalid ${ source } value: ${ JSON.stringify(
+		console.warn(
+			`Invalid build concurrency value: ${ JSON.stringify(
 				value
-			) }. Expected a positive integer.`
+			) }. Expected a positive integer; falling back to the default.`
 		);
+		return undefined;
 	}
 
 	return Number( value );

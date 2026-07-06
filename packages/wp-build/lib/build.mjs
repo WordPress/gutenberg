@@ -2306,11 +2306,9 @@ async function generateWidgetsPhp( widgets, replacements ) {
  * Main build function.
  *
  * @param {string?} baseUrlExpression
- * @param {number}  buildConcurrency
  */
-async function buildAll( baseUrlExpression, buildConcurrency ) {
+async function buildAll( baseUrlExpression ) {
 	console.log( '🔨 Building packages...\n' );
-	console.log( `⚙️ Using build concurrency: ${ buildConcurrency }\n` );
 
 	const startTime = Date.now();
 
@@ -2850,6 +2848,7 @@ async function main() {
 			},
 			concurrency: {
 				type: 'string',
+				default: process.env.WP_BUILD_CONCURRENCY,
 			},
 		},
 		strict: false,
@@ -2857,15 +2856,12 @@ async function main() {
 
 	const baseUrlExpression = values[ 'base-url' ];
 	const buildConcurrency =
-		parseBuildConcurrency( values.concurrency, '--concurrency' ) ??
-		parseBuildConcurrency(
-			process.env.WP_BUILD_CONCURRENCY,
-			'WP_BUILD_CONCURRENCY'
-		) ??
+		parseBuildConcurrency( values.concurrency ) ??
 		getDefaultBuildConcurrency();
 	setBuildConcurrency( buildConcurrency );
+	console.log( `⚙️ Using build concurrency: ${ buildConcurrency }\n` );
 
-	await buildAll( baseUrlExpression, buildConcurrency );
+	await buildAll( baseUrlExpression );
 
 	if ( values.watch ) {
 		console.log( '\n👀 Watching for changes...\n' );
