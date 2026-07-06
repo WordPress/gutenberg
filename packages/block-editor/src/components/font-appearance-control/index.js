@@ -155,7 +155,6 @@ export default function FontAppearanceControl( props ) {
 		hasStylesOrWeights && (
 			<CustomSelectControl
 				{ ...otherProps }
-				__next40pxDefaultSize
 				className="components-font-appearance-control"
 				label={ label }
 				describedBy={ getDescribedBy() }
