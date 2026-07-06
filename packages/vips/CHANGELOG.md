@@ -9,6 +9,7 @@
 ### Enhancements
 
 - Bump `wasm-vips` to `^0.0.18`, adding native decoding of 10- and 12-bit (high bit depth) AVIF images ([#79179](https://github.com/WordPress/gutenberg/pull/79179)).
+- Preserve the bit depth of high-bit-depth (10/12-bit) AVIF images through `resizeImage`, `compressImage`, and `convertImageFormat` so HDR sub-sizes are no longer flattened to 8-bit.
 
 ## 2.1.1 (2026-06-16)
 
