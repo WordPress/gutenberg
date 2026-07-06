@@ -273,4 +273,49 @@ test.describe( 'Suggestion mode persistence', () => {
 			page.locator( 'body' ).getByText( 'Proposed new paragraph' )
 		).toBeHidden();
 	} );
+
+	test( 'a typed inline addition survives a reload and can still be accepted', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		const suggestionSaved = suggestionSavedPromise( page );
+		await page.keyboard.type( ' world' );
+		await suggestionSaved;
+		// The marker is only written once the async note id resolves.
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="add"]'
+			)
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+
+		await editor.saveDraft();
+		await page.reload();
+
+		// The marker lives in saved content, so it comes back decorated and
+		// its note stays linked.
+		const reloaded = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await expect(
+			reloaded.locator( 'mark.wp-suggestion[data-suggestion-type="add"]' )
+		).toContainText( 'world' );
+
+		// Accepting after the reload unwraps the marker and keeps the text.
+		await decideSuggestion( page, 'Accept' );
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).toContain( 'Hello world' );
+		expect( serialized ).not.toContain( 'data-suggestion-id' );
+	} );
 } );

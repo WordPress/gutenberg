@@ -646,4 +646,70 @@ test.describe( 'Suggestion mode', () => {
 		await expect( summaries ).toContainText( 'Insert block:' );
 		await expect( summaries ).not.toContainText( 'Add:' );
 	} );
+
+	test( 'paste — a single-line paste becomes an in-content add marker', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+
+		pageUtils.setClipboardData( { plainText: ' pasted words' } );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		// The pasted run lands as a single add marker, not a raw commit.
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="add"]'
+			)
+		).toContainText( 'pasted words' );
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).toContain( 'Hello' );
+		expect( serialized ).toContain( 'data-suggestion-type="add"' );
+	} );
+
+	test( 'an open settings sidebar switches to All notes when a suggestion is created', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello' },
+		} );
+		await editor.openDocumentSettingsSidebar();
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		const suggestionSaved = suggestionSavedPromise( page );
+		await page.keyboard.type( '!' );
+		await suggestionSaved;
+
+		// The open non-notes sidebar is switched to the notes sidebar so the
+		// fresh suggestion note is immediately visible.
+		const sidebar = page.getByRole( 'region', { name: 'Editor settings' } );
+		await expect(
+			sidebar.getByRole( 'heading', { name: 'All notes' } )
+		).toBeVisible();
+		await expect(
+			sidebar.locator(
+				'.editor-collab-sidebar-panel__suggestion-summary'
+			)
+		).toContainText( 'Add:' );
+	} );
 } );
