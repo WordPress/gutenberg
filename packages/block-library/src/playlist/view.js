@@ -12,7 +12,6 @@ import {
 	updateSeekControlLabel,
 	setupPlayButtonArtwork,
 	getPlaylistPlaybackAction,
-	getNextRepeatMode,
 	replayWaveformPlayerTrack,
 } from '../utils/waveform-utils';
 
@@ -226,8 +225,7 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 			context.playedTracks = [];
 		},
 		onRepeatToggle: ( nextMode ) => {
-			context.repeatMode =
-				nextMode ?? getNextRepeatMode( context.repeatMode );
+			context.repeatMode = nextMode;
 		},
 		isShuffled: context.isShuffled,
 		repeatMode: context.repeatMode,

@@ -26,7 +26,13 @@ const { validateCollection } = require( './validate-collection.cjs' );
 const execFileAsync = promisify( execFile );
 
 const ICON_LIBRARY_DIR = path.join( __dirname, '..', 'src', 'library' );
-const STRING_EXPORT_SVG_FILES = [ 'repeat.svg', 'repeat-all.svg' ];
+const STRING_EXPORT_SVG_FILES = [
+	'next.svg',
+	'previous.svg',
+	'repeat.svg',
+	'repeat-all.svg',
+	'shuffle.svg',
+];
 
 /**
  * List of SVG attributes whose names need to be converted from kebab-case

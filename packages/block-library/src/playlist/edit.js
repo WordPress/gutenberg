@@ -40,7 +40,6 @@ import { WaveformPlayer } from '../utils/waveform-player';
 import { PlaylistContext } from './context';
 import {
 	getPlaylistPlaybackAction,
-	getNextRepeatMode,
 	replayWaveformPlayerTrack,
 } from '../utils/waveform-utils';
 import { getTrackAttributes } from './utils';
@@ -235,9 +234,7 @@ const PlaylistEdit = ( {
 	}, [] );
 
 	const onRepeatToggle = useCallback( ( nextMode ) => {
-		setRepeatMode(
-			( currentMode ) => nextMode ?? getNextRepeatMode( currentMode )
-		);
+		setRepeatMode( nextMode );
 	}, [] );
 
 	const onChangeOrder = useCallback(
