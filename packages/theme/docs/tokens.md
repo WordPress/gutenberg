@@ -122,6 +122,12 @@ Most color tokens extend the base pattern with additional modifiers for tone, em
 
 `--wpds-color-stroke-focus` is the only color token that does not follow this target/tone grammar. Its `focus` segment describes the focus-ring purpose directly, and the token intentionally applies across tones.
 
+### Keep color roles aligned
+
+When styling one UI element across states, keep the token role aligned and change only the state segment. For example, pair `--wpds-color-foreground-interactive-neutral` with `--wpds-color-foreground-interactive-neutral-active` and `--wpds-color-foreground-interactive-neutral-disabled` rather than switching tones between states.
+
+When styling related parts of the same UI element, prefer matching the target and tone across properties. For example, an interactive neutral control should generally use the corresponding `background`, `foreground`, and `stroke` interactive neutral tokens. Mixing tones or targets should be intentional, usually to satisfy contrast, hierarchy, or a documented component-specific pattern.
+
 ### Tone
 
 The semantic intent of the color.
