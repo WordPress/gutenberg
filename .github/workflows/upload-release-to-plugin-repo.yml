@@ -249,7 +249,17 @@ jobs:
                   fi
                   rm -f "$svn_error_file"
 
-            - name: Commit the release
+            - name: Add new files
+              if: steps.check_svn_tag.outputs.exists != 'true'
+              working-directory: ./trunk
+              run: svn st | grep '^?' | awk '{print $2}' | xargs -r svn add
+
+            - name: Remove deleted files
+              if: steps.check_svn_tag.outputs.exists != 'true'
+              working-directory: ./trunk
+              run: svn st | grep '^!' | awk '{print $2}' | xargs -r svn rm
+
+            - name: Commit changes
               if: steps.check_svn_tag.outputs.exists != 'true'
               working-directory: ./trunk
               run: |
