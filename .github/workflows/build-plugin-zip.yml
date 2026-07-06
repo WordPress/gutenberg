@@ -85,6 +85,7 @@ jobs:
               with:
                   client-id: ${{ vars.APP_CLIENT_ID }}
                   private-key: ${{ secrets.APP_PRIVATE_KEY }}
+                  permission-contents: write
 
             - name: Checkout code
               uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -364,6 +365,7 @@ jobs:
               with:
                   client-id: ${{ vars.APP_CLIENT_ID }}
                   private-key: ${{ secrets.APP_PRIVATE_KEY }}
+                  permission-contents: write
 
             - name: Checkout code
               uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -422,6 +424,8 @@ jobs:
               with:
                   client-id: ${{ vars.APP_CLIENT_ID }}
                   private-key: ${{ secrets.APP_PRIVATE_KEY }}
+                  permission-contents: write
+                  permission-workflows: write
 
             - name: Set Release Version
               id: get_release_version
