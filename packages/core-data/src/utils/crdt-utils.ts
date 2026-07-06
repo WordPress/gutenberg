@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Y } from '@wordpress/sync';
-import { create, insert, toHTMLString } from '@wordpress/rich-text';
+import { create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -243,10 +243,27 @@ export function htmlIndexToRichTextOffset(
 	return asRichTextOffset( markerPos === -1 ? htmlIndex : markerPos );
 }
 
+// Element tags that `@wordpress/rich-text` `create()` represents as a single
+// visible character: `<br>` (a line break) and `<img>` (an inline "object").
+// Every other element is a formatting wrapper contributing no visible character.
+const VISIBLE_ELEMENT = /^<(?:br|img)\b/i;
+
 /**
  * Convert a rich-text offset (counting only text characters) to an HTML
  * character index (counting tag characters). Used on write paths where the
  * block editor provides a text offset but Y.Text expects an HTML index.
+ *
+ * The index is computed directly against `html` — the exact string stored in
+ * the Y.Text — by walking it and counting markup as it appears: element tags
+ * advance the index without adding a visible character, while a `<br>`, each
+ * HTML entity (e.g. `&nbsp;`), and every other character each count as one
+ * visible character.
+ *
+ * This must NOT round-trip through `toHTMLString( create() )`, which re-encodes
+ * content — most notably turning `&nbsp;` (6 characters) back into a plain
+ * space (1 character). That produces an index into a *different* string than
+ * the one stored in the Y.Text, shifting a remote cursor left by the
+ * encoding-length difference for every preceding `&nbsp;` (see #79711).
  *
  * @param html           The full HTML string from Y.Text.
  * @param richTextOffset The rich-text text offset.
@@ -260,31 +277,47 @@ export function richTextOffsetToHtmlIndex(
 		return asHtmlStringIndex( richTextOffset );
 	}
 
-	const marker = pickMarker( html );
-	if ( ! marker ) {
-		return asHtmlStringIndex( richTextOffset );
+	const length = html.length;
+	let rawIndex = 0;
+	let visible = 0;
+
+	while ( rawIndex < length ) {
+		// Skip wrapping tags so the index lands just before the next visible
+		// character, inside the formatting that wraps it.
+		while ( rawIndex < length && html[ rawIndex ] === '<' ) {
+			const tagEnd = html.indexOf( '>', rawIndex );
+			const tag = html.slice(
+				rawIndex,
+				tagEnd === -1 ? length : tagEnd + 1
+			);
+			if ( VISIBLE_ELEMENT.test( tag ) ) {
+				break;
+			}
+			rawIndex = tagEnd === -1 ? length : tagEnd + 1;
+		}
+
+		if ( visible === richTextOffset ) {
+			return asHtmlStringIndex( rawIndex );
+		}
+
+		if ( rawIndex >= length ) {
+			break;
+		}
+
+		const char = html[ rawIndex ];
+		if ( char === '<' ) {
+			const tagEnd = html.indexOf( '>', rawIndex );
+			rawIndex = tagEnd === -1 ? length : tagEnd + 1;
+		} else if ( char === '&' ) {
+			const entityEnd = html.indexOf( ';', rawIndex );
+			rawIndex = entityEnd === -1 ? rawIndex + 1 : entityEnd + 1;
+		} else {
+			rawIndex += 1;
+		}
+		visible += 1;
 	}
 
-	const value = create( { html } );
-	const markerValue = create( { text: marker } );
-	// The marker must inherit the formatting at the insertion point so that
-	// toHTMLString does not split surrounding tags (e.g. <strong>) around it.
-	if ( value.formats[ richTextOffset ] ) {
-		markerValue.formats[ 0 ] = value.formats[ richTextOffset ];
-	}
-
-	const withMarker = insert(
-		value,
-		markerValue,
-		richTextOffset,
-		richTextOffset
-	);
-
-	const htmlWithMarker = toHTMLString( { value: withMarker } );
-	const markerIndex = htmlWithMarker.indexOf( marker );
-	return asHtmlStringIndex(
-		markerIndex === -1 ? richTextOffset : markerIndex
-	);
+	return asHtmlStringIndex( length );
 }
 
 function findBlockByClientIdInBlocks(
