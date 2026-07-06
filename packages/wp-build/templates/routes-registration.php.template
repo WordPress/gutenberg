@@ -46,6 +46,11 @@ function {{PREFIX}}_register_page_routes( $page_routes, $register_function_name 
 		$content_handle = null;
 		$route_handle = null;
 
+		// Classic script dependencies declared by this route's modules. Script modules
+		// cannot load classic-script dependencies themselves, so they are collected here
+		// and enqueued by the page's prerequisites script (see the page render function).
+		$classic_dependencies = array();
+
 		// Register content module if exists
 		if ( $route['has_content'] ) {
 			$content_asset_path = __DIR__ . "/routes/{$route['name']}/content.min.asset.php";
@@ -53,6 +58,7 @@ function {{PREFIX}}_register_page_routes( $page_routes, $register_function_name 
 				$content_asset = require $content_asset_path;
 				$content_handle = '{{HANDLE_PREFIX}}/routes/' . $route['name'] . '/content';
 				$extension = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
+				$classic_dependencies = array_merge( $classic_dependencies, $content_asset['dependencies'] ?? array() );
 				// Deregister first to override any previously registered version
 				// (e.g., Core's default modules when running as a plugin).
 				wp_deregister_script_module( $content_handle );
@@ -72,6 +78,7 @@ function {{PREFIX}}_register_page_routes( $page_routes, $register_function_name 
 				$route_asset = require $route_asset_path;
 				$route_handle = '{{HANDLE_PREFIX}}/routes/' . $route['name'] . '/route';
 				$extension = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
+				$classic_dependencies = array_merge( $classic_dependencies, $route_asset['dependencies'] ?? array() );
 				// Deregister first to override any previously registered version
 				// (e.g., Core's default modules when running as a plugin).
 				wp_deregister_script_module( $route_handle );
@@ -86,7 +93,7 @@ function {{PREFIX}}_register_page_routes( $page_routes, $register_function_name 
 
 		// Register route with page
 		if ( function_exists( $register_function_name ) ) {
-			call_user_func( $register_function_name, $route['path'], $content_handle, $route_handle );
+			call_user_func( $register_function_name, $route['path'], $content_handle, $route_handle, $classic_dependencies );
 		}
 	}
 }

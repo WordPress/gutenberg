@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { lazy } from '@wordpress/element';
+import { lazy, Suspense } from '@wordpress/element';
+import { Spinner } from '@wordpress/components';
 
 /**
  * `EntitiesSavedStates` lives in `@wordpress/editor`, a classic script that would
@@ -12,10 +13,19 @@ import { lazy } from '@wordpress/element';
  * until the "Review changes" modal actually opens, which only happens while editing,
  * when the editor has already been loaded by the canvas.
  */
-const LazyEntitiesSavedStates = lazy( () =>
+const EntitiesSavedStates = lazy( () =>
 	import( '@wordpress/lazy-editor' ).then( ( module ) => ( {
 		default: module.EntitiesSavedStates,
 	} ) )
 );
 
-export default LazyEntitiesSavedStates;
+export default function LazyEntitiesSavedStates( props: {
+	close: () => void;
+	variant?: 'inline';
+} ) {
+	return (
+		<Suspense fallback={ <Spinner /> }>
+			<EntitiesSavedStates { ...props } />
+		</Suspense>
+	);
+}

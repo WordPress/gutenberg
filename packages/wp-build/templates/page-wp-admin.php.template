@@ -10,20 +10,22 @@
  * @package {{PREFIX}}
  */
 
-// Global storage for {{PAGE_SLUG}} routes and menu items
-global ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_routes, ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_menu_items;
-${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_routes     = array();
-${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_menu_items = array();
+// Global storage for {{PAGE_SLUG}} routes, menu items, and route classic dependencies
+global ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_routes, ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_menu_items, ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_route_dependencies;
+${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_routes             = array();
+${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_menu_items         = array();
+${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_route_dependencies = array();
 
 /**
  * Register a route for the {{PAGE_SLUG}}-wp-admin page.
  *
- * @param string      $path           Route path (e.g., '/types/$type/edit/$id').
- * @param string|null $content_module Script module ID for content (stage/inspector).
- * @param string|null $route_module   Script module ID for route lifecycle hooks.
+ * @param string      $path                 Route path (e.g., '/types/$type/edit/$id').
+ * @param string|null $content_module       Script module ID for content (stage/inspector).
+ * @param string|null $route_module         Script module ID for route lifecycle hooks.
+ * @param array       $classic_dependencies Classic script handles the route's modules depend on.
  */
-function {{PREFIX}}_register_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_route( $path, $content_module = null, $route_module = null ) {
-	global ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_routes;
+function {{PREFIX}}_register_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_route( $path, $content_module = null, $route_module = null, $classic_dependencies = array() ) {
+	global ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_routes, ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_route_dependencies;
 
 	$route = array( 'path' => $path );
 	if ( ! empty( $content_module ) ) {
@@ -33,7 +35,11 @@ function {{PREFIX}}_register_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_route( $path, $co
 		$route['route_module'] = $route_module;
 	}
 
-	${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_routes[] = $route;
+	${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_routes[]             = $route;
+	${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_route_dependencies = array_merge(
+		${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_route_dependencies,
+		$classic_dependencies
+	);
 }
 
 /**
@@ -69,47 +75,6 @@ function {{PREFIX}}_register_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_menu_item( $id, $
 function {{PREFIX}}_get_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_routes() {
 	global ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_routes;
 	return ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_routes ?? array();
-}
-
-/**
- * Collect the classic script dependencies for the {{PAGE_SLUG}}-wp-admin prerequisites script.
- *
- * Merges @wordpress/boot's classic dependencies with the classic script dependencies
- * declared by each route's content and route modules. Script modules cannot load
- * classic-script dependencies themselves, so the page is responsible for enqueuing
- * them; otherwise a route relies on whatever @wordpress/boot happens to load eagerly.
- *
- * @param array $routes            Registered routes (may carry content_module / route_module ids).
- * @param array $boot_dependencies Classic script dependencies of @wordpress/boot.
- * @return array De-duplicated list of classic script handles.
- */
-function {{PREFIX}}_get_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_route_dependencies( $routes, $boot_dependencies ) {
-	$dependencies = $boot_dependencies;
-
-	foreach ( $routes as $route ) {
-		foreach ( array( 'content_module', 'route_module' ) as $module_key ) {
-			if ( empty( $route[ $module_key ] ) ) {
-				continue;
-			}
-
-			// Module ids look like "<namespace>/routes/<name>/(content|route)".
-			if ( ! preg_match( '#/routes/([^/]+)/(content|route)$#', $route[ $module_key ], $matches ) ) {
-				continue;
-			}
-
-			$module_asset_path = __DIR__ . '/../../routes/' . $matches[1] . '/' . $matches[2] . '.min.asset.php';
-			if ( ! file_exists( $module_asset_path ) ) {
-				continue;
-			}
-
-			$module_asset = require $module_asset_path;
-			if ( ! empty( $module_asset['dependencies'] ) ) {
-				$dependencies = array_merge( $dependencies, $module_asset['dependencies'] );
-			}
-		}
-	}
-
-	return array_values( array_unique( $dependencies ) );
 }
 
 /**
@@ -192,12 +157,17 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts( $hook_suf
 		$asset = require $asset_file;
 
 		// Route content/route modules declare their own classic script dependencies
-		// (e.g. wp-viewport) that must be present before the module evaluates. Because
-		// script modules do not load classic-script dependencies themselves, merge each
-		// route's declared dependencies into the prerequisites script. This lets each
-		// route reliably receive its classic dependencies without relying on whatever
-		// @wordpress/boot happens to load eagerly.
-		$prerequisite_dependencies = {{PREFIX}}_get_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_route_dependencies( $routes, $asset['dependencies'] );
+		// (e.g. wp-viewport) that must be present before the module evaluates. Script
+		// modules cannot load classic-script dependencies themselves, so the deps
+		// collected during route registration are merged into the prerequisites script.
+		// This lets each route reliably receive its classic dependencies without relying
+		// on whatever @wordpress/boot happens to load eagerly.
+		global ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_route_dependencies;
+		$prerequisite_dependencies = array_values(
+			array_unique(
+				array_merge( $asset['dependencies'], ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_route_dependencies )
+			)
+		);
 
 		// This script serves two purposes:
 		// 1. It ensures all the globals that are made available to the modules are loaded.

@@ -1,13 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useState, Suspense } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { _n, __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { displayShortcut, rawShortcut } from '@wordpress/keycodes';
 import { check } from '@wordpress/icons';
-import { Button, Modal, Spinner } from '@wordpress/components';
+import { Button, Modal } from '@wordpress/components';
 import { Tooltip } from '@wordpress/ui';
 
 /**
@@ -120,12 +120,10 @@ export default function SaveButton() {
 					onRequestClose={ () => setIsSaveViewOpened( false ) }
 					size="small"
 				>
-					<Suspense fallback={ <Spinner /> }>
-						<LazyEntitiesSavedStates
-							close={ () => setIsSaveViewOpened( false ) }
-							variant="inline"
-						/>
-					</Suspense>
+					<LazyEntitiesSavedStates
+						close={ () => setIsSaveViewOpened( false ) }
+						variant="inline"
+					/>
 				</Modal>
 			) }
 		</>

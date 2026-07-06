@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useState, Suspense } from '@wordpress/element';
-import { Modal, Spinner } from '@wordpress/components';
+import { useState } from '@wordpress/element';
+import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -26,12 +26,10 @@ export default function SavePanel() {
 			title={ __( 'Review changes' ) }
 			size="small"
 		>
-			<Suspense fallback={ <Spinner /> }>
-				<LazyEntitiesSavedStates
-					close={ () => setIsOpen( false ) }
-					variant="inline"
-				/>
-			</Suspense>
+			<LazyEntitiesSavedStates
+				close={ () => setIsOpen( false ) }
+				variant="inline"
+			/>
 		</Modal>
 	);
 }
