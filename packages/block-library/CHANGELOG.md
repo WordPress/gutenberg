@@ -10,6 +10,10 @@
 
 -   Removed the `@wordpress/block-library/babel-plugin` export. It was an internal transform for stripping experimental blocks from WordPress core builds and is no longer used by Gutenberg's build process ([#79162](https://github.com/WordPress/gutenberg/pull/79162)).
 
+### New Features
+
+-   Gallery: add a dynamic mode that displays images resolved from a source (initially the images attached to the current post) instead of manually-added image blocks, with an editor preview, mode toggles, and server-side rendering. [#78796](https://github.com/WordPress/gutenberg/pull/78796).
+
 ### Enhancements
 
 -   Image and Site Logo blocks: the Crop toolbar button now opens the Media Editor modal instead of an inline cropper. The previous inline experience is removed ([#78654](https://github.com/WordPress/gutenberg/pull/78654)).
