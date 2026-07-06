@@ -12,7 +12,7 @@ body.js.block-editor-page {
 	&.is-fullscreen-mode {
 		@include break-medium {
 			&:has(.editor-editor-interface.is-distraction-free) {
-				--wp-admin--admin-bar--height: 0;
+				--wp-admin--admin-bar--height: 0px;
 
 				#wpadminbar {
 					display: none;
@@ -48,7 +48,7 @@ body.js.block-editor-page {
 
 	// The WP header height changes at this breakpoint.
 	@include break-medium {
-		min-height: calc(100vh - var(--wp-admin--admin-bar--height, 0));
+		min-height: calc(100vh - var(--wp-admin--admin-bar--height, 0px));
 	}
 
 	img {

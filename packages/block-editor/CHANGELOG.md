@@ -23,6 +23,8 @@
 
 -   Inserter media categories support an optional `emptyMessage`, shown in place of the generic "No results found" notice, that also keeps a source listed when it has no items. The media panel additionally renders attach/detach affordances for attached images ([#79336](https://github.com/WordPress/gutenberg/pull/79336)).
 
+## 15.23.0 (2026-07-01)
+
 ## 15.22.0 (2026-06-24)
 
 ### Enhancements

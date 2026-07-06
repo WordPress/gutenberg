@@ -76,6 +76,7 @@ class GifToVideoUtils {
 					.getItems();
 				return items.length === 0;
 			},
+			undefined,
 			{ timeout }
 		);
 	}
@@ -129,6 +130,7 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 
 	test( 'switches an uploaded GIF to the video GIF variation', async ( {
 		editor,
+		page,
 		gifToVideoUtils,
 		requestUtils,
 	} ) => {
@@ -155,16 +157,17 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 		await gifToVideoUtils.waitForUploadQueueEmpty( 60_000 );
 
 		// The block becomes a core/video block.
-		await gifToVideoUtils.page.waitForFunction(
+		await page.waitForFunction(
 			() =>
 				window.wp.data
 					.select( 'core/block-editor' )
 					.getBlocks()
 					.some( ( block ) => block.name === 'core/video' ),
+			undefined,
 			{ timeout: 30_000 }
 		);
 
-		const videoBlock = await gifToVideoUtils.page.evaluate( () =>
+		const videoBlock = await page.evaluate( () =>
 			window.wp.data
 				.select( 'core/block-editor' )
 				.getBlocks()
