@@ -34,8 +34,37 @@ Behind the scenes, all steps are automated via `npm exec release-cli -- npm-late
 10. Run the script `npx lerna publish --no-private`.
     - When asked for the version numbers to choose for each package pick the values of the updated CHANGELOG files.
     - You'll be asked for your One-Time Password (OTP) a couple of times. This is the code from the 2FA authenticator app you use. Depending on how many packages are to be released you may be asked for more than one OTP, as they tend to expire before all packages are released.
-    - If the publishing process ends up incomplete (perhaps because it timed-out or a bad OTP was introduced) you can resume it via [`npx lerna publish from-package`](https://lerna.js.org/docs/features/version-and-publish#from-package).
+    - If the publishing process ends up incomplete (perhaps because it timed-out or a bad OTP was introduced), inspect npm state before resuming with [`npx lerna publish from-package`](https://lerna.js.org/docs/features/version-and-publish#from-package). See [Recovering from a partial npm publish](#recovering-from-a-partial-npm-publish).
 11. Finally, now that the npm packages are published, cherry-pick the commits created by lerna ("Publish" and the CHANGELOG update) into the `trunk` branch of Gutenberg.
+
+### Recovering from a partial npm publish
+
+If npm publishing fails part-way through, do not assume every target package version is still unpublished. Some expected versions may already exist on npm while the release branch, package tags, or dist-tags still need recovery.
+
+Before restarting any mutating step, inspect the npm registry state for the packages listed in the failed job. Do not infer the remaining work from the package where the job stopped; retries or manual recovery attempts can leave a non-contiguous set of package versions published.
+
+For one package:
+
+```sh
+npm view @wordpress/components@X.Y.Z version
+npm dist-tag ls @wordpress/components
+```
+
+To inspect all package versions from the current release branch:
+
+```sh
+npx lerna list --json --no-private | jq -r '.[] | "\(.name)@\(.version)"' | while read package_version; do
+	package="${package_version%@*}"
+	version="${package_version##*@}"
+	echo "$package@$version"
+	npm view "$package@$version" version || true
+	npm dist-tag ls "$package"
+done
+```
+
+Resume from the package versions that already exist on npm. If the expected versions exist and the expected dist-tags point to them, continue either with [`npx lerna publish from-package`](https://lerna.js.org/docs/features/version-and-publish#from-package), which publishes local package versions that are not yet on npm and skips the ones that already made it, or the workflow's generated recovery command when one is printed.
+
+When a workflow run prints branch or package-tag recovery commands after npm publishing succeeds but Git metadata publication fails, prefer those run-specific commands over starting a fresh release.
 
 ## WordPress releases
 
@@ -127,7 +156,7 @@ Behind the scenes, the rest of the process is automated with `npm exec --no rele
 5. Run the script `npx lerna publish --no-private`.
     - When asked for the version numbers to choose for each package pick the values of the updated CHANGELOG files.
     - You'll be asked for your One-Time Password (OTP) a couple of times. This is the code from the 2FA authenticator app you use. Depending on how many packages are to be released you may be asked for more than one OTP, as they tend to expire before all packages are released.
-    - If the publishing process ends up incomplete (perhaps because it timed-out or a bad OTP was introduced) you can resume it via [`npx lerna publish from-package`](https://lerna.js.org/docs/features/version-and-publish#from-package).
+    - If the publishing process ends up incomplete (perhaps because it timed-out or a bad OTP was introduced), inspect npm state before resuming with [`npx lerna publish from-package`](https://lerna.js.org/docs/features/version-and-publish#from-package). See [Recovering from a partial npm publish](#recovering-from-a-partial-npm-publish).
 6. Finally, now that the npm packages are published, cherry-pick the commits created by lerna ("Publish" and the CHANGELOG update) into the `trunk` branch of Gutenberg.
 
 ## Development releases
