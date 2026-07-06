@@ -54,7 +54,7 @@ function gutenberg_render_custom_css_support_styles( $parsed_block ) {
 	$processed_css = WP_Theme_JSON_Gutenberg::process_blocks_custom_css( $custom_css, $selector );
 
 	if ( ! empty( $processed_css ) ) {
-		/**
+		/*
 		 * Skip CSS that has already been added. Blocks with identical attributes
 		 * share the same class name and processed CSS via {@see wp_unique_id_from_values()},
 		 * so the same style would otherwise be enqueued more than once (e.g. inside
