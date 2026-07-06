@@ -121,7 +121,9 @@ function gutenberg_wrap_ssr_islands_render_callback( $args ) {
 
 	// The overrides binding resolves through the `pattern/overrides` context,
 	// so the block stores them in a `content` attribute and provides it as
-	// that context, like `core/block` does.
+	// that context, like `core/block` does. The `{}` default is added on the
+	// JS side: an empty PHP array would bootstrap as `[]`, and stdClass would
+	// break the PHP bindings source, which array-accesses the context.
 	if ( $is_synced ) {
 		if ( ! isset( $args['attributes']['content'] ) ) {
 			$args['attributes']['content'] = array( 'type' => 'object' );

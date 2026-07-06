@@ -651,6 +651,17 @@ export const registerCoreBlocks = (
 					example: bootstrappedBlockType?.example ?? {
 						innerBlocks: parse( markup ),
 					},
+					// A fresh synced instance must already provide a truthy
+					// `pattern/overrides` context: gates like RichText's
+					// isInsidePatternOverrides check the value. The `{}`
+					// default lives here because PHP can't express it (an
+					// empty PHP array bootstraps as `[]`).
+					...( editorMode === 'synced-islands' && {
+						attributes: {
+							...bootstrappedBlockType?.attributes,
+							content: { type: 'object', default: {} },
+						},
+					} ),
 					...( () => {
 						if ( editorMode === 'synced-islands' ) {
 							return createSyncedPatternComponents(
