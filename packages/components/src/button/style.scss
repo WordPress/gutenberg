@@ -14,7 +14,6 @@
 .components-button {
 	&:focus:not(:active) {
 		@include mixins.outset-ring__focus();
-		box-shadow: none;
 	}
 
 	display: inline-flex;
@@ -141,6 +140,7 @@
 		}
 
 		&:focus:not(:active) {
+			// Restore the visual border that the outset-ring__focus mixin resets.
 			box-shadow: inset 0 0 0 $border-width $components-color-accent, 0 0 0 currentColor;
 		}
 
