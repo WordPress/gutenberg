@@ -17,9 +17,9 @@ on:
 # Workflow-dispatched release runs must not cancel an in-flight run after it may have
 # pushed version bump commits.
 concurrency:
-    # The concurrency group contains the workflow name and the release type/ref for release
-    # dispatches, the branch name for pull requests, or the commit hash for any other events.
-    group: ${{ github.workflow }}-${{ github.event_name == 'workflow_dispatch' && format( '{0}-{1}', github.ref, github.event.inputs.version ) || ( github.event_name == 'pull_request' && github.head_ref || github.sha ) }}
+    # The concurrency group contains the workflow name and ref for release dispatches,
+    # the branch name for pull requests, or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'workflow_dispatch' && github.ref || ( github.event_name == 'pull_request' && github.head_ref || github.sha ) }}
     cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
 
 # Disable permissions for all available scopes by default.
@@ -93,7 +93,7 @@ jobs:
                   # PATs and GitHub App tokens may omit it, and GitHub does not expose
                   # a non-mutating release-creation permission check. This catches visible
                   # under-scoping while the repository access check remains the fallback.
-                  if [[ -n "$oauth_scopes" ]] && ! tr ',' '\n' <<< "$oauth_scopes" | sed 's/^ *//;s/ *$//' | grep -qx 'repo'; then
+                  if [[ -n "$oauth_scopes" ]] && ! tr ',' '\n' <<< "$oauth_scopes" | sed 's/^ *//;s/ *$//' | grep -qxE 'repo|public_repo'; then
                     echo "::error::GUTENBERG_TOKEN is visibly under-scoped (${oauth_scopes}). The release workflow token must be able to create draft releases in this repository."
                     echo "::error::$token_follow_up"
                     rm -f "$headers_file"
