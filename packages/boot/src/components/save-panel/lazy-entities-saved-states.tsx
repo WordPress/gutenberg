@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ComponentProps } from 'react';
+
+/**
  * WordPress dependencies
  */
 import { lazy, Suspense } from '@wordpress/element';
@@ -19,10 +24,9 @@ const EntitiesSavedStates = lazy( () =>
 	} ) )
 );
 
-export default function LazyEntitiesSavedStates( props: {
-	close: () => void;
-	variant?: 'inline';
-} ) {
+export default function LazyEntitiesSavedStates(
+	props: ComponentProps< typeof EntitiesSavedStates >
+) {
 	return (
 		<Suspense fallback={ <Spinner /> }>
 			<EntitiesSavedStates { ...props } />
