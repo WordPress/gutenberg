@@ -30,9 +30,11 @@ import {
 	ValidatedToggleGroupControl,
 } from './validated-form-controls';
 import { ValidatedFormTokenField } from './validated-form-controls/components/form-token-field';
+import RichTextControl from './rich-text-control';
 
 export const privateApis = {};
 lock( privateApis, {
+	RichTextControl,
 	__experimentalPopoverLegacyPositionToPlacement,
 	ComponentsContext,
 	Tabs,
