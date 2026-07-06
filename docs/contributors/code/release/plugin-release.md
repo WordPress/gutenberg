@@ -338,7 +338,7 @@ svn cat https://plugins.svn.wordpress.org/gutenberg/trunk/readme.txt | grep "Sta
 svn cat https://plugins.svn.wordpress.org/gutenberg/trunk/gutenberg.php | grep "Version: $VERSION"
 ```
 
-Also confirm the matching GitHub release and `v$VERSION` tag still exist. The following SVN recovery command only repairs WordPress.org plugin repository state.
+Also confirm the matching GitHub release and `v$VERSION` tag still exist. If either is missing, stop and restore the GitHub release state before running SVN recovery commands; the SVN commands below only repair WordPress.org plugin repository state.
 
 If SVN `trunk` already contains the intended release but `tags/$VERSION` is missing, create the tag from the current SVN `trunk`:
 
