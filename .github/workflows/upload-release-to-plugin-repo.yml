@@ -187,7 +187,7 @@ jobs:
         if: |
             needs.compute-should-update-trunk.outputs.should_update_trunk == 'true' && github.event.release.assets[0]
         env:
-            PLUGIN_REPO_URL: 'https://plugins.svn.wordpress.org/gutenberg'
+            PLUGIN_REPO_URL: ${{ vars.WP_ORG_PLUGIN_REPO_URL }}
             STABLE_VERSION_REGEX: '[0-9]\+\.[0-9]\+\.[0-9]\+\s*'
             SVN_USERNAME: ${{ secrets.svn_username }}
             SVN_PASSWORD: ${{ secrets.svn_password }}
@@ -270,7 +270,7 @@ jobs:
         if: |
             needs.compute-should-update-trunk.outputs.should_update_trunk == 'false' && github.event.release.assets[0]
         env:
-            PLUGIN_REPO_URL: 'https://plugins.svn.wordpress.org/gutenberg'
+            PLUGIN_REPO_URL: ${{ vars.WP_ORG_PLUGIN_REPO_URL }}
             STABLE_VERSION_REGEX: '[0-9]\+\.[0-9]\+\.[0-9]\+\s*'
             SVN_USERNAME: ${{ secrets.svn_username }}
             SVN_PASSWORD: ${{ secrets.svn_password }}
