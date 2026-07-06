@@ -89,9 +89,6 @@ export function createWaveformContainer( {
 	}
 	container.setAttribute( 'data-text-color', buttonColor );
 	container.setAttribute( 'data-text-secondary-color', buttonColor );
-	container.style.setProperty( '--wfp-button-color', buttonColor );
-	container.style.setProperty( '--wfp-text-color', buttonColor );
-	container.style.setProperty( '--wfp-text-secondary-color', buttonColor );
 	if ( title ) {
 		container.setAttribute( 'data-title', title );
 	}
@@ -120,33 +117,6 @@ export function styleSvgIcons( container, buttonColor ) {
 	svgPaths.forEach( ( path ) => {
 		path.style.fill = iconColor;
 	} );
-}
-
-/**
- * Update a live waveform player when inherited colors change.
- *
- * @param {Object}  player           - The waveform player object.
- * @param {Element} player.element   - The element to derive colors from.
- * @param {Element} player.container - The waveform container element.
- * @param {Object}  player.instance  - The waveform player instance.
- */
-export function updateWaveformPlayerColors( { element, container, instance } ) {
-	const colors = getWaveformColors( element );
-
-	container.style.setProperty( '--wfp-button-color', colors.textColor );
-	container.style.setProperty( '--wfp-text-color', colors.textColor );
-	container.style.setProperty(
-		'--wfp-text-secondary-color',
-		colors.textColor
-	);
-
-	if ( instance.options ) {
-		instance.options.waveformColor = colors.waveformColor;
-		instance.options.progressColor = colors.progressColor;
-	}
-
-	instance.drawWaveform?.();
-	styleSvgIcons( container, colors.textColor );
 }
 
 /**
@@ -292,7 +262,7 @@ export function initWaveformPlayer(
 	let cleanupPlayButtonAccessibility;
 	const handlers = {
 		ready: () => {
-			updateWaveformPlayerColors( { element, container, instance } );
+			styleSvgIcons( container, textColor );
 			cleanupPlayButtonAccessibility = setupPlayButtonAccessibility(
 				container,
 				labels

@@ -155,6 +155,27 @@ describe( 'WaveformPlayer', () => {
 		expect( initWaveformPlayer ).toHaveBeenCalledTimes( 2 );
 	} );
 
+	it( 'destroys the player when remounted', () => {
+		const { rerender } = render(
+			<WaveformPlayer key="before" { ...baseProps } />
+		);
+
+		act( () => {
+			jest.advanceTimersByTime( 100 );
+		} );
+
+		const player = initWaveformPlayer.mock.results[ 0 ].value;
+
+		rerender( <WaveformPlayer key="after" { ...baseProps } /> );
+
+		act( () => {
+			jest.advanceTimersByTime( 100 );
+		} );
+
+		expect( player.destroy ).toHaveBeenCalledTimes( 1 );
+		expect( initWaveformPlayer ).toHaveBeenCalledTimes( 2 );
+	} );
+
 	it( 'recreates the player to show an image added to a track that had none', () => {
 		const { rerender } = render(
 			<WaveformPlayer { ...baseProps } image="" />

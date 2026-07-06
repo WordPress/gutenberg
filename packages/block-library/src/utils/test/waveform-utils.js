@@ -9,7 +9,6 @@ import '@testing-library/jest-dom';
 import {
 	createWaveformContainer,
 	styleSvgIcons,
-	updateWaveformPlayerColors,
 	setupPlayButtonAccessibility,
 	updateSeekControlLabel,
 	logPlayError,
@@ -52,11 +51,6 @@ describe( 'Waveform utilities', () => {
 				'#000000'
 			);
 			expect( container ).toHaveAttribute( 'data-seek-label', 'Seek' );
-			expect( container ).toHaveStyle( {
-				'--wfp-button-color': '#000000',
-				'--wfp-text-color': '#000000',
-				'--wfp-text-secondary-color': '#000000',
-			} );
 		} );
 
 		it( 'should set optional attributes when provided', () => {
@@ -108,47 +102,6 @@ describe( 'Waveform utilities', () => {
 			} );
 
 			expect( container ).toHaveAttribute( 'data-height', '150' );
-		} );
-	} );
-
-	describe( 'updateWaveformPlayerColors', () => {
-		it( 'should update a live player from the current text color', () => {
-			const element = document.createElement( 'div' );
-			element.style.color = '#000080';
-			document.body.appendChild( element );
-
-			const container = createWaveformContainer( basePlayerData );
-			const svg = document.createElementNS(
-				'http://www.w3.org/2000/svg',
-				'svg'
-			);
-			const path = document.createElementNS(
-				'http://www.w3.org/2000/svg',
-				'path'
-			);
-			const instance = {
-				options: {},
-				drawWaveform: jest.fn(),
-			};
-
-			svg.appendChild( path );
-			container.appendChild( svg );
-
-			updateWaveformPlayerColors( { element, container, instance } );
-
-			expect( container ).toHaveStyle( {
-				'--wfp-button-color': 'rgb(0, 0, 128)',
-				'--wfp-text-color': 'rgb(0, 0, 128)',
-				'--wfp-text-secondary-color': 'rgb(0, 0, 128)',
-			} );
-			expect( instance.options ).toMatchObject( {
-				waveformColor: 'rgba(0, 0, 128, 0.3)',
-				progressColor: 'rgba(0, 0, 128, 0.6)',
-			} );
-			expect( instance.drawWaveform ).toHaveBeenCalled();
-			expect( path ).toHaveStyle( { fill: '#ffffff' } );
-
-			element.remove();
 		} );
 	} );
 

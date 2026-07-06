@@ -56,20 +56,15 @@ const PlaylistEdit = ( {
 		showImages,
 		showArtists,
 		showTrackLength,
+		style,
+		textColor,
 	} = attributes;
 
 	// Extract the waveform style from the block style variation class.
 	const waveformStyle =
 		attributes.className?.match( /is-style-([\w-]+)/ )?.[ 1 ] || 'bars';
 	const blockProps = useBlockProps();
-	const waveformColorContext = useMemo(
-		() =>
-			JSON.stringify( {
-				className: blockProps.className,
-				style: blockProps.style,
-			} ),
-		[ blockProps.className, blockProps.style ]
-	);
+	const waveformColorKey = [ textColor, style?.color?.text ].join( '|' );
 	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -369,6 +364,7 @@ const PlaylistEdit = ( {
 			<figure { ...blockProps }>
 				<Disabled isDisabled={ ! isSelected }>
 					<WaveformPlayer
+						key={ waveformColorKey }
 						src={ currentTrackData?.src }
 						title={ currentTrackData?.title }
 						artist={ currentTrackData?.artist }
@@ -383,7 +379,6 @@ const PlaylistEdit = ( {
 								: undefined
 						}
 						waveformStyle={ waveformStyle }
-						colorContext={ waveformColorContext }
 						onEnded={ onTrackEnded }
 					/>
 				</Disabled>
