@@ -13,13 +13,13 @@
 	--wp-components-spacer-padding-inline-end: initial;
 
 	margin: var(--wp-components-spacer-margin);
-	margin-block-start: var(--wp-components-spacer-margin-block-start);
-	margin-block-end: var(--wp-components-spacer-margin-block-end);
-	margin-inline-start: var(--wp-components-spacer-margin-inline-start);
-	margin-inline-end: var(--wp-components-spacer-margin-inline-end);
+	margin-block-start: var(--wp-components-spacer-margin-block-start, var(--wp-components-spacer-margin));
+	margin-block-end: var(--wp-components-spacer-margin-block-end, var(--wp-components-spacer-margin));
+	margin-inline-start: var(--wp-components-spacer-margin-inline-start, var(--wp-components-spacer-margin));
+	margin-inline-end: var(--wp-components-spacer-margin-inline-end, var(--wp-components-spacer-margin));
 	padding: var(--wp-components-spacer-padding);
-	padding-block-start: var(--wp-components-spacer-padding-block-start);
-	padding-block-end: var(--wp-components-spacer-padding-block-end);
-	padding-inline-start: var(--wp-components-spacer-padding-inline-start);
-	padding-inline-end: var(--wp-components-spacer-padding-inline-end);
+	padding-block-start: var(--wp-components-spacer-padding-block-start, var(--wp-components-spacer-padding));
+	padding-block-end: var(--wp-components-spacer-padding-block-end, var(--wp-components-spacer-padding));
+	padding-inline-start: var(--wp-components-spacer-padding-inline-start, var(--wp-components-spacer-padding));
+	padding-inline-end: var(--wp-components-spacer-padding-inline-end, var(--wp-components-spacer-padding));
 }
