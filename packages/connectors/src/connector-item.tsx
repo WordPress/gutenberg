@@ -68,6 +68,124 @@ export function ConnectorItem( {
 
 export type { ApiKeySource } from './types';
 
+function getHelpLinkLabel( helpUrl?: string, helpLabel?: string ) {
+	return helpLabel || helpUrl?.replace( /^https?:\/\//, '' );
+}
+
+function createConnectorHelpLink(
+	helpUrl: string | undefined,
+	helpLabel: string | undefined,
+	message: string
+) {
+	if ( ! helpUrl ) {
+		return undefined;
+	}
+
+	return createInterpolateElement( sprintf( message, '<a></a>' ), {
+		a: (
+			<ExternalLink href={ helpUrl }>
+				{ getHelpLinkLabel( helpUrl, helpLabel ) }
+			</ExternalLink>
+		),
+	} );
+}
+
+function useConnectorSettingsSave< TValue >(
+	onSave: ( ( value: TValue ) => void | Promise< void > ) | undefined,
+	fallbackErrorMessage: string
+) {
+	const [ isSaving, setIsSaving ] = useState( false );
+	const [ saveError, setSaveError ] = useState< string | null >( null );
+
+	const handleSave = async ( value: TValue ) => {
+		setSaveError( null );
+		setIsSaving( true );
+		try {
+			await onSave?.( value );
+		} catch ( error ) {
+			setSaveError(
+				error instanceof Error ? error.message : fallbackErrorMessage
+			);
+		} finally {
+			setIsSaving( false );
+		}
+	};
+
+	return {
+		isSaving,
+		saveError,
+		setSaveError,
+		handleSave,
+	};
+}
+
+function ConnectorSettingsFrame( {
+	readOnly,
+	children,
+}: {
+	readOnly: boolean;
+	children: ReactNode;
+} ) {
+	return (
+		<VStack
+			spacing={ 4 }
+			className="connector-settings"
+			style={
+				readOnly
+					? {
+							'--wp-components-color-background': '#f0f0f0',
+					  }
+					: undefined
+			}
+		>
+			{ children }
+		</VStack>
+	);
+}
+
+function ConnectorSettingsFooter( {
+	readOnly,
+	onRemove,
+	canSave,
+	isSaving,
+	onSave,
+}: {
+	readOnly: boolean;
+	onRemove?: () => void;
+	canSave: boolean;
+	isSaving: boolean;
+	onSave: () => void;
+} ) {
+	if ( readOnly ) {
+		if ( ! onRemove ) {
+			return null;
+		}
+
+		return (
+			<HStack justify="flex-start">
+				<Button variant="link" isDestructive onClick={ onRemove }>
+					{ __( 'Remove and replace' ) }
+				</Button>
+			</HStack>
+		);
+	}
+
+	return (
+		<HStack justify="flex-start">
+			<Button
+				__next40pxDefaultSize
+				variant="primary"
+				disabled={ ! canSave || isSaving }
+				accessibleWhenDisabled
+				isBusy={ isSaving }
+				onClick={ onSave }
+			>
+				{ __( 'Save' ) }
+			</Button>
+		</HStack>
+	);
+}
+
 export interface DefaultConnectorSettingsProps {
 	onSave?: ( apiKey: string ) => void | Promise< void >;
 	onRemove?: () => void;
@@ -100,27 +218,20 @@ export function DefaultConnectorSettings( {
 	keySource,
 }: DefaultConnectorSettingsProps ) {
 	const [ apiKey, setApiKey ] = useState( initialValue );
-	const [ isSaving, setIsSaving ] = useState( false );
-	const [ saveError, setSaveError ] = useState< string | null >( null );
+	const { isSaving, saveError, setSaveError, handleSave } =
+		useConnectorSettingsSave(
+			onSave,
+			__(
+				'It was not possible to connect to the provider using this key.'
+			)
+		);
 
-	const helpLinkLabel = helpLabel || helpUrl?.replace( /^https?:\/\//, '' );
-
-	const helpLink = helpUrl
-		? createInterpolateElement(
-				sprintf(
-					/* translators: %s: Link to provider settings. */
-					__( 'Get your API key at %s' ),
-					'<a></a>'
-				),
-				{
-					a: (
-						<ExternalLink href={ helpUrl }>
-							{ helpLinkLabel }
-						</ExternalLink>
-					),
-				}
-		  )
-		: undefined;
+	const helpLink = createConnectorHelpLink(
+		helpUrl,
+		helpLabel,
+		/* translators: %s: Link to provider settings. */
+		__( 'Get your API key at %s' )
+	);
 
 	const isExternallyConfigured =
 		keySource === 'env' || keySource === 'constant';
@@ -138,21 +249,13 @@ export function DefaultConnectorSettings( {
 		}
 		if ( readOnly ) {
 			return helpUrl
-				? createInterpolateElement(
-						sprintf(
-							/* translators: %s: Link to provider settings. */
-							__(
-								'Your API key is stored securely. You can manage it at %s'
-							),
-							'<a></a>'
-						),
-						{
-							a: (
-								<ExternalLink href={ helpUrl }>
-									{ helpLinkLabel }
-								</ExternalLink>
-							),
-						}
+				? createConnectorHelpLink(
+						helpUrl,
+						helpLabel,
+						/* translators: %s: Link to provider settings. */
+						__(
+							'Your API key is stored securely. You can manage it at %s'
+						)
 				  )
 				: __( 'Your API key is stored securely.' );
 		}
@@ -166,36 +269,8 @@ export function DefaultConnectorSettings( {
 		return helpLink;
 	};
 
-	const handleSave = async () => {
-		setSaveError( null );
-		setIsSaving( true );
-		try {
-			await onSave?.( apiKey );
-		} catch ( error ) {
-			setSaveError(
-				error instanceof Error
-					? error.message
-					: __(
-							'It was not possible to connect to the provider using this key.'
-					  )
-			);
-		} finally {
-			setIsSaving( false );
-		}
-	};
-
 	return (
-		<VStack
-			spacing={ 4 }
-			className="connector-settings"
-			style={
-				readOnly
-					? {
-							'--wp-components-color-background': '#f0f0f0',
-					  }
-					: undefined
-			}
-		>
+		<ConnectorSettingsFrame readOnly={ readOnly }>
 			<TextControl
 				label={ __( 'API Key' ) }
 				value={ apiKey }
@@ -210,33 +285,14 @@ export function DefaultConnectorSettings( {
 				autoComplete="off"
 				help={ getHelp() }
 			/>
-			{ readOnly ? (
-				onRemove && (
-					<HStack justify="flex-start">
-						<Button
-							variant="link"
-							isDestructive
-							onClick={ onRemove }
-						>
-							{ __( 'Remove and replace' ) }
-						</Button>
-					</HStack>
-				)
-			) : (
-				<HStack justify="flex-start">
-					<Button
-						__next40pxDefaultSize
-						variant="primary"
-						disabled={ ! apiKey || isSaving }
-						accessibleWhenDisabled
-						isBusy={ isSaving }
-						onClick={ handleSave }
-					>
-						{ __( 'Save' ) }
-					</Button>
-				</HStack>
-			) }
-		</VStack>
+			<ConnectorSettingsFooter
+				readOnly={ readOnly }
+				onRemove={ onRemove }
+				canSave={ !! apiKey }
+				isSaving={ isSaving }
+				onSave={ () => handleSave( apiKey ) }
+			/>
+		</ConnectorSettingsFrame>
 	);
 }
 
@@ -280,45 +336,18 @@ export function ApplicationPasswordConnectorSettings( {
 }: ApplicationPasswordConnectorSettingsProps ) {
 	const [ username, setUsername ] = useState( initialUsername );
 	const [ applicationPassword, setApplicationPassword ] = useState( '' );
-	const [ isSaving, setIsSaving ] = useState( false );
-	const [ saveError, setSaveError ] = useState< string | null >( null );
+	const { isSaving, saveError, setSaveError, handleSave } =
+		useConnectorSettingsSave< ApplicationPasswordCredentials >(
+			onSave,
+			__( 'It was not possible to save these credentials.' )
+		);
 
-	const helpLinkLabel = helpLabel || helpUrl?.replace( /^https?:\/\//, '' );
-	const help = helpUrl
-		? createInterpolateElement(
-				sprintf(
-					/* translators: %s: Link to the remote site's application passwords screen. */
-					__( 'Create an application password at %s' ),
-					'<a></a>'
-				),
-				{
-					a: (
-						<ExternalLink href={ helpUrl }>
-							{ helpLinkLabel }
-						</ExternalLink>
-					),
-				}
-		  )
-		: undefined;
-
-	const handleSave = async () => {
-		setSaveError( null );
-		setIsSaving( true );
-		try {
-			await onSave?.( {
-				username: username.trim(),
-				applicationPassword,
-			} );
-		} catch ( error ) {
-			setSaveError(
-				error instanceof Error
-					? error.message
-					: __( 'It was not possible to save these credentials.' )
-			);
-		} finally {
-			setIsSaving( false );
-		}
-	};
+	const help = createConnectorHelpLink(
+		helpUrl,
+		helpLabel,
+		/* translators: %s: Link to the remote site's application passwords screen. */
+		__( 'Create an application password at %s' )
+	);
 
 	let applicationPasswordHelp: ReactNode = help;
 	if ( keySource === 'env' ) {
@@ -343,17 +372,7 @@ export function ApplicationPasswordConnectorSettings( {
 	}
 
 	return (
-		<VStack
-			spacing={ 4 }
-			className="connector-settings"
-			style={
-				readOnly
-					? {
-							'--wp-components-color-background': '#f0f0f0',
-					  }
-					: undefined
-			}
-		>
+		<ConnectorSettingsFrame readOnly={ readOnly }>
 			<TextControl
 				label={ __( 'Username' ) }
 				value={ username }
@@ -382,36 +401,18 @@ export function ApplicationPasswordConnectorSettings( {
 				autoComplete="new-password"
 				help={ applicationPasswordHelp }
 			/>
-			{ readOnly ? (
-				onRemove && (
-					<HStack justify="flex-start">
-						<Button
-							variant="link"
-							isDestructive
-							onClick={ onRemove }
-						>
-							{ __( 'Remove and replace' ) }
-						</Button>
-					</HStack>
-				)
-			) : (
-				<HStack justify="flex-start">
-					<Button
-						__next40pxDefaultSize
-						variant="primary"
-						disabled={
-							! username.trim() ||
-							! applicationPassword ||
-							isSaving
-						}
-						accessibleWhenDisabled
-						isBusy={ isSaving }
-						onClick={ handleSave }
-					>
-						{ __( 'Save' ) }
-					</Button>
-				</HStack>
-			) }
-		</VStack>
+			<ConnectorSettingsFooter
+				readOnly={ readOnly }
+				onRemove={ onRemove }
+				canSave={ !! username.trim() && !! applicationPassword }
+				isSaving={ isSaving }
+				onSave={ () =>
+					handleSave( {
+						username: username.trim(),
+						applicationPassword,
+					} )
+				}
+			/>
+		</ConnectorSettingsFrame>
 	);
 }

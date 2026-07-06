@@ -197,22 +197,6 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 				return null;
 			}
 
-			foreach ( array( 'username_setting_name', 'application_password_setting_name' ) as $setting_name_key ) {
-				if ( array_key_exists( $setting_name_key, $args['authentication'] ) ) {
-					_doing_it_wrong(
-						__METHOD__,
-						sprintf(
-							/* translators: 1: Connector ID, 2: Authentication setting name key. */
-							__( 'Connector "%1$s" authentication %2$s is not supported. Use setting_name instead.' ),
-							esc_html( $id ),
-							esc_html( $setting_name_key )
-						),
-						'7.0.0'
-					);
-					return null;
-				}
-			}
-
 			if ( 'ai_provider' === $args['type'] && ! class_exists( '\WordPress\AiClient\AiClient' ) ) {
 				// No need for a doing_it_wrong as AI support is disabled intentionally.
 				return null;
@@ -231,13 +215,13 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 				$connector['logo_url'] = $args['logo_url'];
 			}
 
-			if ( in_array( $args['authentication']['method'], array( 'api_key', 'application_password' ), true ) ) {
+			$requires_credentials = in_array( $args['authentication']['method'], array( 'api_key', 'application_password' ), true );
+
+			if ( $requires_credentials ) {
 				if ( ! empty( $args['authentication']['credentials_url'] ) && is_string( $args['authentication']['credentials_url'] ) ) {
 					$connector['authentication']['credentials_url'] = $args['authentication']['credentials_url'];
 				}
-			}
 
-			if ( in_array( $args['authentication']['method'], array( 'api_key', 'application_password' ), true ) ) {
 				if ( isset( $args['authentication']['setting_name'] ) ) {
 					if ( ! is_string( $args['authentication']['setting_name'] ) || '' === $args['authentication']['setting_name'] ) {
 						_doing_it_wrong(
@@ -253,9 +237,7 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 					$setting_suffix                              = 'api_key' === $args['authentication']['method'] ? 'api_key' : 'credentials';
 					$connector['authentication']['setting_name'] = str_replace( '-', '_', "connectors_{$connector['type']}_{$id}_{$setting_suffix}" );
 				}
-			}
 
-			if ( in_array( $args['authentication']['method'], array( 'api_key', 'application_password' ), true ) ) {
 				if ( isset( $args['authentication']['constant_name'] ) ) {
 					if ( ! is_string( $args['authentication']['constant_name'] ) || '' === $args['authentication']['constant_name'] ) {
 						_doing_it_wrong(

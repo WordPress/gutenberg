@@ -12,10 +12,8 @@ import {
 	type ConnectorConfig,
 	type ConnectorRenderProps,
 } from '@wordpress/connectors';
-import { store as coreStore } from '@wordpress/core-data';
-import { select, useDispatch, useSelect } from '@wordpress/data';
+import { select } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
-import { store as noticesStore } from '@wordpress/notices';
 import { Badge, Link } from '@wordpress/ui';
 import { unlock } from '@wordpress/routes-lock-unlock';
 
@@ -308,26 +306,6 @@ function ApplicationPasswordConnector( {
 	const helpLabel = getHelpLabel( helpUrl );
 	const pluginSlug = getPluginSlug( plugin?.file );
 
-	const { currentUsername, hasResolvedSettings } = useSelect(
-		( registrySelect ) => {
-			const { getEntityRecord, hasFinishedResolution } =
-				registrySelect( coreStore );
-			const siteSettings = getEntityRecord( 'root', 'site' ) as
-				| Record< string, { username?: string; password?: string } >
-				| undefined;
-			return {
-				currentUsername: siteSettings?.[ settingName ]?.username ?? '',
-				// The settings form seeds its state on mount, so wait for the
-				// site settings to resolve before rendering it.
-				hasResolvedSettings: hasFinishedResolution( 'getEntityRecord', [
-					'root',
-					'site',
-				] ),
-			};
-		},
-		[ settingName ]
-	);
-
 	const {
 		pluginStatus,
 		canInstallPlugins,
@@ -336,10 +314,13 @@ function ApplicationPasswordConnector( {
 		setIsExpanded,
 		isBusy,
 		isConnected,
-		setIsConnected,
+		currentUsername,
+		hasResolvedSettings,
 		keySource,
 		handleButtonClick,
 		getButtonLabel,
+		saveCredentials,
+		removeCredentials,
 	} = useConnectorPlugin( {
 		file: plugin?.file,
 		settingName,
@@ -352,98 +333,10 @@ function ApplicationPasswordConnector( {
 	const isExternallyConfigured =
 		keySource === 'env' || keySource === 'constant';
 
-	const { saveEntityRecord } = useDispatch( coreStore );
-	const { createSuccessNotice, createErrorNotice } =
-		useDispatch( noticesStore );
 	const actionButtonRef = useRef< HTMLButtonElement >( null );
 	const showUnavailableBadge =
 		( pluginStatus === 'not-installed' && canInstallPlugins === false ) ||
 		( pluginStatus === 'inactive' && canActivatePlugins === false );
-
-	const saveCredentials = async ( {
-		username,
-		applicationPassword,
-	}: {
-		username: string;
-		applicationPassword: string;
-	} ) => {
-		const updatedRecord = await saveEntityRecord(
-			'root',
-			'site',
-			{
-				[ settingName ]: {
-					username,
-					password: applicationPassword,
-				},
-			},
-			{ throwOnError: true }
-		);
-		const record = updatedRecord as
-			| Record< string, { username?: string; password?: string } >
-			| undefined;
-		const credentials = record?.[ settingName ];
-		// The server sanitizes the username (trimming/collapsing whitespace),
-		// so only verify that both credentials were persisted, not equality.
-		if ( ! credentials?.username || ! credentials?.password ) {
-			throw new Error(
-				__( 'It was not possible to save these credentials.' )
-			);
-		}
-
-		setIsConnected( true );
-		createSuccessNotice(
-			sprintf(
-				/* translators: %s: Name of the connector. */
-				__( '%s connected successfully.' ),
-				name
-			),
-			{
-				id: 'connector-connect-success',
-				type: 'snackbar',
-			}
-		);
-	};
-
-	const removeCredentials = async () => {
-		try {
-			await saveEntityRecord(
-				'root',
-				'site',
-				{
-					[ settingName ]: {
-						username: '',
-						password: '',
-					},
-				},
-				{ throwOnError: true }
-			);
-			setIsConnected( false );
-			createSuccessNotice(
-				sprintf(
-					/* translators: %s: Name of the connector. */
-					__( '%s disconnected.' ),
-					name
-				),
-				{
-					id: 'connector-disconnect-success',
-					type: 'snackbar',
-				}
-			);
-		} catch ( error ) {
-			createErrorNotice(
-				sprintf(
-					/* translators: %s: Name of the connector. */
-					__( 'Failed to disconnect %s.' ),
-					name
-				),
-				{
-					id: 'connector-disconnect-error',
-					type: 'snackbar',
-				}
-			);
-			throw error;
-		}
-	};
 
 	return (
 		<ConnectorItem
