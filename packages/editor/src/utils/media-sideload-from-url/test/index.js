@@ -55,7 +55,7 @@ describe( 'mediaSideloadFromUrl', () => {
 		mockCurrentPost( { id: 42 } );
 	} );
 
-	it( 'should POST to /wp/v2/media with the url and sub-sizes disabled', async () => {
+	it( 'should POST to /wp/v2/media with the url, leaving sub-size generation to the server', async () => {
 		apiFetch.mockResolvedValue( mockRestAttachment );
 
 		await new Promise( ( resolve ) => {
@@ -70,7 +70,6 @@ describe( 'mediaSideloadFromUrl', () => {
 			method: 'POST',
 			data: {
 				url: 'https://example.com/photo.jpg',
-				generate_sub_sizes: false,
 				post: 42,
 			},
 		} );

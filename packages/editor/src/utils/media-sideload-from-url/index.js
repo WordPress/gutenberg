@@ -16,8 +16,8 @@ const noop = () => {};
  * Sideloads an external image into the media library from its URL.
  *
  * The server downloads the remote file, which avoids a cross-origin browser
- * fetch that fails when the editor is cross-origin isolated. Only the original
- * file is stored; no sub-sizes are generated.
+ * fetch that fails when the editor is cross-origin isolated. Since the server
+ * owns the upload it also generates sub-sizes, as with a regular upload.
  *
  * @param {Object}   $0           Parameters object.
  * @param {string}   $0.url       URL of the external image to sideload.
@@ -42,7 +42,6 @@ export default function mediaSideloadFromUrl( {
 		method: 'POST',
 		data: {
 			url,
-			generate_sub_sizes: false,
 			...postData,
 		},
 	} )

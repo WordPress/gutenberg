@@ -1963,10 +1963,43 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 
 	/**
 	 * Verifies that supplying a `url` to the create endpoint sideloads the remote
-	 * image on the server and, with generate_sub_sizes=false, creates no sub-sizes.
+	 * image on the server and generates sub-sizes by default, matching the
+	 * behavior of a regular upload.
 	 *
 	 * This is the cross-origin-isolation fallback path: the server fetches the
-	 * remote image so the browser does not have to, and only the original is kept.
+	 * remote image so the browser does not have to, and since the server owns
+	 * the upload it also produces the derivative sizes.
+	 *
+	 * @covers ::create_item
+	 * @covers ::create_item_from_url
+	 */
+	public function test_create_item_from_url_generates_subsizes_by_default(): void {
+		wp_set_current_user( self::$admin_id );
+
+		add_filter( 'pre_http_request', array( $this, 'mock_image_download' ), 10, 3 );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_param( 'url', 'https://example.com/photo.jpg' );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'pre_http_request', array( $this, 'mock_image_download' ), 10 );
+
+		$data = $response->get_data();
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertSame( 'image', $data['media_type'] );
+		$this->assertSame( 'https://example.com/photo.jpg', $this->last_download_url );
+
+		// The 640x480 fixture is large enough for medium and thumbnail sub-sizes.
+		$metadata = wp_get_attachment_metadata( $data['id'], true );
+		$this->assertNotEmpty( $metadata['sizes'] ?? array(), 'Sideloaded external image should have sub-sizes by default.' );
+	}
+
+	/**
+	 * Verifies that the URL sideload path still honors an explicit
+	 * generate_sub_sizes=false opt-out, keeping only the original file so a
+	 * client-side processing pipeline can generate the derivatives itself.
 	 *
 	 * @covers ::create_item
 	 * @covers ::create_item_from_url
