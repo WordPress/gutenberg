@@ -1,14 +1,10 @@
-import { css } from '@emotion/react';
+import clsx from 'clsx';
 
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import { useFlexContext } from '../context';
-import * as styles from '../styles';
-import { useCx } from '../../utils/hooks/use-cx';
 import type { FlexItemProps } from '../types';
+import styles from '../style.module.scss';
 
 export function useFlexItem(
 	props: WordPressComponentProps< FlexItemProps, 'div' >
@@ -17,23 +13,21 @@ export function useFlexItem(
 		className,
 		display: displayProp,
 		isBlock = false,
+		style,
 		...otherProps
 	} = useContextSystem( props, 'FlexItem' );
 
 	const contextDisplay = useFlexContext().flexItemDisplay;
+	const display = displayProp || contextDisplay;
 
-	const base = css( {
-		display: displayProp || contextDisplay,
-	} );
-
-	const cx = useCx();
-
-	const itemStyles = css( styles.Item, base, isBlock && styles.block );
-
-	const classes = cx( itemStyles, className );
+	const itemStyle = {
+		...style,
+		'--wp-components-flex-item-display': display || 'block',
+	};
 
 	return {
 		...otherProps,
-		className: classes,
+		className: clsx( styles.item, isBlock && styles.block, className ),
+		style: itemStyle,
 	};
 }
