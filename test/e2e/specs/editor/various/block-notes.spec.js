@@ -1475,6 +1475,148 @@ test.describe( 'Block Notes', () => {
 
 			await expect.poll( alphaOf ).toBeGreaterThan( 0.4 );
 		} );
+
+		test.describe( 'Floating alignment', () => {
+			// Tall enough that the floating form/thread anchored at the last
+			// line still fits fully within the viewport: a thread extending
+			// below the fold gets scrolled into view by the browser on focus,
+			// which scrolls the floating panel and shifts every thread off
+			// its anchor (tracked as a follow-up; the alignment contract only
+			// holds while the panel is unscrolled).
+			test.use( { viewport: { width: 1280, height: 900 } } );
+
+			// A paragraph long enough that its last line sits well below the
+			// block top, so marker alignment is distinguishable from the old
+			// block-top alignment (#79875).
+			const LONG_TEXT =
+				'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. '.repeat(
+					3
+				) + 'The final anchor';
+
+			async function selectTrailingWord( { editor, page } ) {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: { content: LONG_TEXT },
+				} );
+
+				const paragraph = editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} );
+
+				// Select the trailing word "anchor": collapse a select-all to
+				// the end, then extend the selection back over the word.
+				await paragraph.click();
+				await page.keyboard.press( 'ControlOrMeta+a' );
+				await page.keyboard.press( 'ArrowRight' );
+				for ( let i = 0; i < 'anchor'.length; i++ ) {
+					await page.keyboard.press( 'Shift+ArrowLeft' );
+				}
+
+				return paragraph;
+			}
+
+			test( 'aligns the floating thread with its inline marker', async ( {
+				editor,
+				page,
+			} ) => {
+				const paragraph = await selectTrailingWord( { editor, page } );
+
+				await page
+					.getByRole( 'button', { name: 'More', exact: true } )
+					.click();
+				await page
+					.getByRole( 'menuitem', { name: 'Add note' } )
+					.click();
+				await page
+					.getByRole( 'textbox', { name: 'New note', exact: true } )
+					.fill( 'Align me' );
+				await page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'button', { name: 'Add note', exact: true } )
+					.click();
+
+				const mark = editor.canvas.locator( 'mark.wp-note' );
+				await expect( mark ).toHaveText( 'anchor' );
+
+				// The inline "Add note" flow activates the floating notes
+				// sidebar, so the saved thread renders as a floating panel.
+				const thread = page.getByRole( 'treeitem', {
+					name: 'Note: Align me',
+				} );
+				await expect( thread ).toHaveClass( /is-floating/ );
+
+				const markBox = await mark.boundingBox();
+				const paragraphBox = await paragraph.boundingBox();
+				expect( markBox.y - paragraphBox.y ).toBeGreaterThan( 100 );
+
+				// The thread tops out at the marker's line, not the block
+				// top: the -16px thread align offset is cancelled by the
+				// floating panel's 16px margin, so the boxes line up.
+				await expect
+					.poll( async () => {
+						const threadBox = await thread.boundingBox();
+						const currentMarkBox = await mark.boundingBox();
+						return Math.abs( threadBox.y - currentMarkBox.y );
+					} )
+					.toBeLessThan( 12 );
+			} );
+
+			test( 'aligns the pending new-note form with the text selection', async ( {
+				editor,
+				page,
+			} ) => {
+				const paragraph = await selectTrailingWord( { editor, page } );
+
+				await page
+					.getByRole( 'button', { name: 'More', exact: true } )
+					.click();
+				await page
+					.getByRole( 'menuitem', { name: 'Add note' } )
+					.click();
+
+				// The pending form floats next to the canvas while composing;
+				// there is no marker yet, so it anchors to the selection the
+				// note will attach to (the canvas keeps its selection while
+				// focus is in the form).
+				const form = page.locator(
+					'.editor-collab-sidebar-panel__thread.is-floating'
+				);
+				await expect( form ).toBeVisible();
+
+				// Selection top in top-level page coordinates, whether or not
+				// the canvas is iframed.
+				const selectionTop = await editor.canvas
+					.locator( 'body' )
+					.evaluate( () => {
+						const selection = window.getSelection();
+						if ( ! selection.rangeCount ) {
+							return null;
+						}
+						const rect = selection
+							.getRangeAt( 0 )
+							.getBoundingClientRect();
+						let top = rect.top;
+						let win = window;
+						while ( win !== win.parent ) {
+							top += win.frameElement.getBoundingClientRect().top;
+							win = win.parent;
+						}
+						return top;
+					} );
+
+				expect( selectionTop ).not.toBeNull();
+
+				const paragraphBox = await paragraph.boundingBox();
+				expect( selectionTop - paragraphBox.y ).toBeGreaterThan( 100 );
+
+				await expect
+					.poll( async () => {
+						const formBox = await form.boundingBox();
+						return Math.abs( formBox.y - selectionTop );
+					} )
+					.toBeLessThan( 12 );
+			} );
+		} );
 	} );
 } );
 
