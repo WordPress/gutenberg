@@ -343,4 +343,4 @@ jobs:
               run: |
                   svn import "$VERSION" "$PLUGIN_REPO_URL/tags/$VERSION" -m "Committing version $VERSION" \
                   --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
-                  --config-option=servers:global:http-timeout=300
+                  --config-option=servers:global:http-timeout=600
