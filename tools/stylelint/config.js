@@ -139,6 +139,12 @@ module.exports = {
 			},
 		},
 		{
+			files: [ '**/*.module.{css,scss}' ],
+			rules: {
+				'selector-class-pattern': SELECTOR_CLASS_PATTERN,
+			},
+		},
+		{
 			// SCSS-only: use the Sass-aware `function-no-unknown` variant.
 			files: [ '**/*.module.scss', 'routes/**/*.scss' ],
 			rules: {
@@ -153,16 +159,6 @@ module.exports = {
 						],
 					},
 				],
-			},
-		},
-		{
-			files: [
-				'packages/components/src/**/*.module.{css,scss}',
-				'packages/theme/src/**/*.module.{css,scss}',
-				'packages/ui/src/**/*.module.{css,scss}',
-			],
-			rules: {
-				'selector-class-pattern': SELECTOR_CLASS_PATTERN,
 			},
 		},
 	],
