@@ -482,38 +482,6 @@ function applyPlayerColors( instance, container, colorState ) {
 	instance.drawWaveform();
 }
 
-/**
- * Refresh a live waveform player after inherited block colors change.
- *
- * @param {Object}  player  - Object returned by initWaveformPlayer.
- * @param {Element} element - The element that inherits the block text color.
- * @return {boolean} Whether the player colors changed.
- */
-export function refreshWaveformPlayerColors( player, element ) {
-	if ( ! player?.instance || ! player?.container || ! player?.colorState ) {
-		return false;
-	}
-
-	const { textColor, waveformColor, progressColor } =
-		getWaveformColors( element );
-	const { colorState } = player;
-
-	if (
-		textColor === colorState.textColor &&
-		waveformColor === colorState.waveformColor &&
-		progressColor === colorState.progressColor
-	) {
-		return false;
-	}
-
-	colorState.textColor = textColor;
-	colorState.waveformColor = waveformColor;
-	colorState.progressColor = progressColor;
-	applyPlayerColors( player.instance, player.container, colorState );
-
-	return true;
-}
-
 // These icons are decorative; the parent control button carries the accessible
 // label.
 function decorativeIconString( icon ) {
@@ -887,7 +855,6 @@ export function initWaveformPlayer(
 	return {
 		instance,
 		container,
-		colorState,
 		destroy: () => {
 			cleanupAccessibility?.();
 			cleanupControls?.();

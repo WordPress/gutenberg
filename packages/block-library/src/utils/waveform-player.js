@@ -8,11 +8,7 @@ import { __, _x } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import {
-	initWaveformPlayer,
-	refreshWaveformPlayerColors,
-	updateSeekControlLabel,
-} from './waveform-utils';
+import { initWaveformPlayer, updateSeekControlLabel } from './waveform-utils';
 
 const EMPTY_ARTIST_PLACEHOLDER = '\u00a0';
 
@@ -94,7 +90,7 @@ export function WaveformPlayer( {
 	// and recreate the entire player on every re-render, making it disappear
 	// during editor resizes.
 	const onEndedEvent = useEvent( onEnded );
-	const elementRef = useRef();
+	const metadataRef = useRef( { title, artist, image, imageAlt } );
 	const playerRef = useRef();
 
 	// Due to how WaveformPlayer is implemented, the artwork element within the
@@ -107,11 +103,8 @@ export function WaveformPlayer( {
 	// throughout its lifetime.
 	const hasSrc = !! src;
 
-	// Combined props ref for `initWaveformPlayer`, which is called
-	// asynchronously after this component mounts.
-	const metadataRef = useRef( { src, title, artist, image, imageAlt } );
 	useEffect( () => {
-		metadataRef.current = { src, title, artist, image, imageAlt };
+		metadataRef.current = { title, artist, image, imageAlt };
 
 		const instance = playerRef.current?.instance;
 		if ( instance ) {
@@ -122,19 +115,7 @@ export function WaveformPlayer( {
 				imageAlt,
 			} );
 		}
-	}, [ src, title, artist, image, imageAlt ] );
-
-	// The block color controls update the parent figure's classes/styles, not
-	// this player component's props. Refresh the canvas colors after each
-	// editor render so the live player follows inherited color changes.
-	useEffect( () => {
-		if ( elementRef.current && playerRef.current ) {
-			refreshWaveformPlayerColors(
-				playerRef.current,
-				elementRef.current
-			);
-		}
-	} );
+	}, [ title, artist, image, imageAlt ] );
 
 	// Wrap callbacks and state reads in stable event handlers so the player
 	// isn't recreated when they change, while always seeing the latest value.
@@ -153,12 +134,8 @@ export function WaveformPlayer( {
 
 	const ref = useRefEffect(
 		( element ) => {
-			elementRef.current = element;
-
 			if ( ! hasSrc ) {
-				return () => {
-					elementRef.current = undefined;
-				};
+				return;
 			}
 
 			let cancelled = false;
@@ -218,7 +195,6 @@ export function WaveformPlayer( {
 				cancelled = true;
 				clearTimeout( timeoutId );
 				playerRef.current = undefined;
-				elementRef.current = undefined;
 				playerDestroy?.();
 			};
 		},
