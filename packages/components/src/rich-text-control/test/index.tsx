@@ -108,16 +108,81 @@ describe( 'RichTextControl (presentational shell)', () => {
 		expect( ref ).toHaveBeenCalledWith( getTextbox( container ) );
 	} );
 
-	describe( 'controlled selection', () => {
-		// The shell owns no selection state; it only drives the transitions.
-		// Blur is deferred via a 0ms `setTimeout` so a portal-rendered popover
-		// (e.g. the inline link UI) can claim focus before the consumer's
-		// `FormatEdit` -- and therefore the popover -- unmounts.
+	describe( 'selection', () => {
+		// The shell derives selection from the focus/blur transitions, usable
+		// both controlled (`isSelected`) and uncontrolled. Blur is deferred via
+		// a 0ms `setTimeout` so a portal-rendered popover (e.g. the inline link
+		// UI) can claim focus before the consumer's `FormatEdit` -- and
+		// therefore the popover -- unmounts.
 		async function flushBlurTimer() {
 			await act( async () => {
 				await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 			} );
 		}
+
+		it( 'mounts children only while selected (uncontrolled)', async () => {
+			const { container } = render(
+				<RichTextControl label="Field">
+					<span data-testid="assembly" />
+				</RichTextControl>
+			);
+			const textbox = getTextbox( container )!;
+
+			expect(
+				screen.queryByTestId( 'assembly' )
+			).not.toBeInTheDocument();
+
+			fireEvent.focus( textbox );
+			expect( screen.getByTestId( 'assembly' ) ).toBeInTheDocument();
+
+			fireEvent.blur( textbox );
+			await flushBlurTimer();
+			expect(
+				screen.queryByTestId( 'assembly' )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'starts selected with `defaultIsSelected` (uncontrolled)', () => {
+			render(
+				<RichTextControl label="Field" defaultIsSelected>
+					<span data-testid="assembly" />
+				</RichTextControl>
+			);
+
+			expect( screen.getByTestId( 'assembly' ) ).toBeInTheDocument();
+		} );
+
+		it( 'defers to the `isSelected` prop when controlled', () => {
+			const onSelectedChange = jest.fn();
+			const { container, rerender } = render(
+				<RichTextControl
+					label="Field"
+					isSelected={ false }
+					onSelectedChange={ onSelectedChange }
+				>
+					<span data-testid="assembly" />
+				</RichTextControl>
+			);
+
+			// Controlled: the shell requests the change but does not apply
+			// it itself.
+			fireEvent.focus( getTextbox( container )! );
+			expect( onSelectedChange ).toHaveBeenCalledWith( true );
+			expect(
+				screen.queryByTestId( 'assembly' )
+			).not.toBeInTheDocument();
+
+			rerender(
+				<RichTextControl
+					label="Field"
+					isSelected
+					onSelectedChange={ onSelectedChange }
+				>
+					<span data-testid="assembly" />
+				</RichTextControl>
+			);
+			expect( screen.getByTestId( 'assembly' ) ).toBeInTheDocument();
+		} );
 
 		it( 'reports selection on focus', () => {
 			const onSelectedChange = jest.fn();

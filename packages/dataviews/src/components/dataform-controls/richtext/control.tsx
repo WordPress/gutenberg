@@ -352,22 +352,22 @@ export default function RichTextControl( {
 			hideLabelFromVision={ hideLabelFromVision }
 			disableLineBreaks={ disableLineBreaks }
 			ref={ editableRef }
+			isSelected={ isSelected }
 			onSelectedChange={ setIsSelected }
 		>
-			{ isSelected && (
-				<keyboardShortcutContext.Provider value={ keyboardShortcuts }>
-					<inputEventContext.Provider value={ inputEvents }>
-						<FormatEdit
-							value={ value }
-							onChange={ onRichTextChange }
-							onFocus={ onFocus }
-							formatTypes={ formatTypes }
-							forwardedRef={ anchorRef }
-							isVisible={ false }
-						/>
-					</inputEventContext.Provider>
-				</keyboardShortcutContext.Provider>
-			) }
+			{ /* The shell mounts these only while the field is selected. */ }
+			<keyboardShortcutContext.Provider value={ keyboardShortcuts }>
+				<inputEventContext.Provider value={ inputEvents }>
+					<FormatEdit
+						value={ value }
+						onChange={ onRichTextChange }
+						onFocus={ onFocus }
+						formatTypes={ formatTypes }
+						forwardedRef={ anchorRef }
+						isVisible={ false }
+					/>
+				</inputEventContext.Provider>
+			</keyboardShortcutContext.Provider>
 		</RichTextControlShell>
 	);
 }

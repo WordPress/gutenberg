@@ -7,12 +7,11 @@ import type { FocusEvent, ForwardedRef } from 'react';
 /**
  * WordPress dependencies
  */
-import { useMergeRefs, useRefEffect } from '@wordpress/compose';
+import { useEvent, useMergeRefs, useRefEffect } from '@wordpress/compose';
 import {
 	createPortal,
 	forwardRef,
 	useEffect,
-	useInsertionEffect,
 	useRef,
 	useState,
 } from '@wordpress/element';
@@ -25,6 +24,7 @@ import { useBaseControlProps } from '../base-control/hooks';
 import type { WordPressComponentProps } from '../context';
 import Popover from '../popover';
 import { Provider as SlotFillProvider } from '../slot-fill';
+import { useControlledValue } from '../utils/hooks';
 import type { RichTextControlProps } from './types';
 
 // Popovers opened from this control land either in the control's own portaled
@@ -45,25 +45,30 @@ const OWNED_POPOVER_SELECTOR =
  * consumer owns the `useRichText` wiring; this component owns the chrome
  * (`BaseControl` + label, the editable element, and the popover slot).
  *
+ * The selection ("active") state can be controlled through the `isSelected`
+ * prop or left uncontrolled; either way `children` are mounted only while the
+ * field is selected.
+ *
  * @example
  * ```jsx
  * // The rich-text "assembly" lives in the consumer.
  * <RichTextControl
  *     label="Caption"
  *     ref={ mergedRef }
+ *     isSelected={ isSelected }
  *     onSelectedChange={ setIsSelected }
  * >
- *     { isSelected && (
- *         <keyboardShortcutContext.Provider value={ shortcuts }>
- *             <FormatEdit … />
- *         </keyboardShortcutContext.Provider>
- *     ) }
+ *     <keyboardShortcutContext.Provider value={ shortcuts }>
+ *         <FormatEdit … />
+ *     </keyboardShortcutContext.Provider>
  * </RichTextControl>
  * ```
  */
 function UnforwardedRichTextControl(
 	{
 		label,
+		isSelected: isSelectedProp,
+		defaultIsSelected,
 		onSelectedChange,
 		children,
 		id,
@@ -76,6 +81,15 @@ function UnforwardedRichTextControl(
 	}: WordPressComponentProps< RichTextControlProps, 'div', false >,
 	forwardedRef: ForwardedRef< HTMLDivElement >
 ) {
+	// Selection ("active") state, usable both controlled (`isSelected`) and
+	// uncontrolled (`defaultIsSelected` + internal state). Either way,
+	// `onSelectedChange` reports the focus/blur transitions the control
+	// derives below.
+	const [ isSelected = false, setIsSelected ] = useControlledValue( {
+		value: isSelectedProp,
+		defaultValue: defaultIsSelected,
+		onChange: onSelectedChange,
+	} );
 	// Format types open their UI (e.g. the inline link popover via Cmd+K) in
 	// portaled popovers. We host them in a private `SlotFillProvider` paired
 	// with our own `Popover.Slot` (rendered below), wrapped in a marker
@@ -102,12 +116,11 @@ function UnforwardedRichTextControl(
 	const blurDeselectTimeoutRef = useRef< ReturnType< typeof setTimeout > >();
 	useEffect( () => () => clearTimeout( blurDeselectTimeoutRef.current ), [] );
 
-	// The popover focus tracking below outlives individual renders, so read
-	// the latest `onSelectedChange` from a ref instead of closing over a
-	// possibly stale prop.
-	const onSelectedChangeRef = useRef( onSelectedChange );
-	useInsertionEffect( () => {
-		onSelectedChangeRef.current = onSelectedChange;
+	// The popover focus tracking below outlives individual renders, so call
+	// the setter through a stable reference instead of closing over a possibly
+	// stale one.
+	const setSelected = useEvent( ( next: boolean ) => {
+		setIsSelected?.( next );
 	} );
 
 	/*
@@ -140,7 +153,7 @@ function UnforwardedRichTextControl(
 					return;
 				}
 				stopPopoverFocusTrackingRef.current?.();
-				onSelectedChangeRef.current?.( false );
+				setSelected( false );
 			}, 0 );
 		}
 
@@ -160,7 +173,7 @@ function UnforwardedRichTextControl(
 	return (
 		<>
 			<SlotFillProvider>
-				{ children }
+				{ isSelected && children }
 				{ popoverSlotContainer &&
 					createPortal(
 						<div data-rich-text-control-popover-slot>
@@ -186,7 +199,7 @@ function UnforwardedRichTextControl(
 						// Focus is back in the field, so its own blur handling
 						// takes over from the popover focus tracking again.
 						stopPopoverFocusTrackingRef.current?.();
-						onSelectedChange?.( true );
+						setSelected( true );
 					} }
 					onBlur={ ( event: FocusEvent< HTMLDivElement > ) => {
 						onBlur?.( event );
@@ -213,7 +226,7 @@ function UnforwardedRichTextControl(
 								trackPopoverFocusOut( ownerDocument );
 								return;
 							}
-							onSelectedChange?.( false );
+							setSelected( false );
 						}, 0 );
 					} }
 					contentEditable

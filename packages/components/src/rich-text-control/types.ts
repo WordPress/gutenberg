@@ -17,17 +17,27 @@ export type RichTextControlProps = Pick<
 	 */
 	label: string;
 	/**
-	 * Called when the field gains or loses an "active" selection. The control
-	 * is controlled: it owns no selection state itself, it only drives the
+	 * The selection ("active") state of the field, for controlled usage.
+	 * When omitted, the control manages its own selection state from the
 	 * focus/blur transitions (deferring deselection so a format popover opened
 	 * from the field can claim focus without the field deselecting).
+	 */
+	isSelected?: boolean;
+	/**
+	 * The initial selection state for uncontrolled usage.
+	 *
+	 * @default false
+	 */
+	defaultIsSelected?: boolean;
+	/**
+	 * Called when the field gains or loses an "active" selection, in both
+	 * controlled and uncontrolled usage.
 	 */
 	onSelectedChange?: ( isSelected: boolean ) => void;
 	/**
 	 * Placeholder slot for the rich-text assembly (e.g. `FormatEdit` and its
-	 * context providers). Rendered inside the control's private
-	 * `SlotFillProvider` so any format popovers portal into this control's own
-	 * `Popover.Slot`.
+	 * context providers), mounted only while the field has an active
+	 * selection.
 	 */
 	children?: ReactNode;
 	/**
