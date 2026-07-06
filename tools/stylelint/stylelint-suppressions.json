@@ -98,5 +98,60 @@
 		"selector-class-pattern": {
 			"count": 3
 		}
+	},
+	"routes/template-list/add-new-template/style.scss": {
+		"selector-class-pattern": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/image/editor.scss": {
+		"selector-class-pattern": {
+			"count": 2
+		}
+	},
+	"packages/block-library/src/navigation/style.scss": {
+		"selector-class-pattern": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/editor.scss": {
+		"selector-class-pattern": {
+			"count": 1
+		}
+	},
+	"packages/components/src/focal-point-picker/style.scss": {
+		"selector-class-pattern": {
+			"count": 8
+		}
+	},
+	"packages/global-styles-ui/src/font-library/style.scss": {
+		"selector-class-pattern": {
+			"count": 2
+		}
+	},
+	"packages/global-styles-ui/src/variations/style.scss": {
+		"selector-class-pattern": {
+			"count": 6
+		}
+	},
+	"packages/block-editor/src/components/link-control/style.scss": {
+		"selector-class-pattern": {
+			"count": 1
+		}
+	},
+	"packages/dataviews/src/components/dataviews-filters/style.scss": {
+		"selector-class-pattern": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/add-new-template/style.scss": {
+		"selector-class-pattern": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/sidebar-navigation-screen/style.scss": {
+		"selector-class-pattern": {
+			"count": 5
+		}
 	}
 }

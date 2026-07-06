@@ -55,7 +55,7 @@ module.exports = {
 			},
 		],
 		'rule-empty-line-before': null,
-		'selector-class-pattern': null,
+		'selector-class-pattern': SELECTOR_CLASS_PATTERN,
 		'value-keyword-case': null,
 		'scss/operator-no-unspaced': null,
 		'scss/selector-no-redundant-nesting-selector': null,
@@ -136,12 +136,6 @@ module.exports = {
 						],
 					},
 				],
-			},
-		},
-		{
-			files: [ '**/*.module.{css,scss}' ],
-			rules: {
-				'selector-class-pattern': SELECTOR_CLASS_PATTERN,
 			},
 		},
 		{
