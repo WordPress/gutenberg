@@ -22,12 +22,16 @@ export const ThemeProvider = ( {
 	cornerRadius,
 	isRoot = false,
 }: ThemeProviderProps ) => {
-	const { themeProviderStyles, resolvedSettings, hasCustomPrimary } =
-		useThemeProviderStyles( {
-			color,
-			cursor,
-			cornerRadius,
-		} );
+	const {
+		themeProviderStyles,
+		resolvedSettings,
+		hasCustomPrimary,
+		hasCustomBackground,
+	} = useThemeProviderStyles( {
+		color,
+		cursor,
+		cornerRadius,
+	} );
 
 	const cornerRadiusPreset = resolvedSettings.cornerRadius ?? 'subtle';
 
@@ -35,8 +39,9 @@ export const ThemeProvider = ( {
 		() => ( {
 			resolvedSettings,
 			hasCustomPrimary,
+			hasCustomBackground,
 		} ),
-		[ resolvedSettings, hasCustomPrimary ]
+		[ resolvedSettings, hasCustomPrimary, hasCustomBackground ]
 	);
 
 	const wrapperRef = useRef< HTMLDivElement >( null );

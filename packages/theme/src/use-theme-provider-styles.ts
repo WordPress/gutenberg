@@ -28,6 +28,62 @@ type Entry = [ string, string ];
 const getCachedBgRamp = memoize( buildBgRamp, { maxSize: 10 } );
 const getCachedAccentRamp = memoize( buildAccentRamp, { maxSize: 10 } );
 
+const legacyWpComponentsOverridesCSS: Entry[] = [
+	[ '--wp-components-color-accent', 'var(--wp-admin-theme-color)' ],
+	[
+		'--wp-components-color-accent-darker-10',
+		'var(--wp-admin-theme-color-darker-10)',
+	],
+	[
+		'--wp-components-color-accent-darker-20',
+		'var(--wp-admin-theme-color-darker-20)',
+	],
+	[
+		'--wp-components-color-accent-inverted',
+		'var(--wpds-color-foreground-interactive-brand-strong)',
+	],
+	[
+		'--wp-components-color-background',
+		'var(--wpds-color-background-surface-neutral-strong)',
+	],
+	[
+		'--wp-components-color-foreground',
+		'var(--wpds-color-foreground-content-neutral)',
+	],
+	[
+		'--wp-components-color-foreground-inverted',
+		'var(--wpds-color-background-surface-neutral)',
+	],
+	[
+		'--wp-components-color-gray-100',
+		'var(--wpds-color-background-surface-neutral)',
+	],
+	[
+		'--wp-components-color-gray-200',
+		'var(--wpds-color-stroke-surface-neutral)',
+	],
+	[
+		'--wp-components-color-gray-300',
+		'var(--wpds-color-stroke-surface-neutral)',
+	],
+	[
+		'--wp-components-color-gray-400',
+		'var(--wpds-color-stroke-interactive-neutral)',
+	],
+	[
+		'--wp-components-color-gray-600',
+		'var(--wpds-color-stroke-interactive-neutral)',
+	],
+	[
+		'--wp-components-color-gray-700',
+		'var(--wpds-color-foreground-content-neutral-weak)',
+	],
+	[
+		'--wp-components-color-gray-800',
+		'var(--wpds-color-foreground-content-neutral)',
+	],
+];
+
 function customRgbFormat( color: PlainColorObject ): string {
 	const rgb = to( color, sRGB );
 	return rgb.coords
@@ -89,20 +145,23 @@ function colorTokensCSS(
 function generateStyles( {
 	primary,
 	hasCustomPrimary,
+	hasCustomColors,
 	computedColorRamps,
 }: {
 	primary: string;
 	hasCustomPrimary: boolean;
+	hasCustomColors: boolean;
 	computedColorRamps: Map< string, RampResult >;
 } ): CSSProperties {
 	return Object.fromEntries(
 		[
 			// Semantic color tokens
 			colorTokensCSS( computedColorRamps ),
-			// Legacy color variables only need runtime overrides when the
-			// primary seed is customized. The default bridge lives in the
-			// generated design-tokens CSS.
+			// Default legacy color aliases live in the generated design-tokens
+			// CSS. Runtime overrides keep those aliases scoped to custom
+			// provider colors.
 			hasCustomPrimary ? legacyWpAdminThemeOverridesCSS( primary ) : [],
+			hasCustomColors ? legacyWpComponentsOverridesCSS : [],
 		].flat()
 	);
 }
@@ -119,6 +178,7 @@ export function useThemeProviderStyles( {
 	const {
 		resolvedSettings: inheritedSettings,
 		hasCustomPrimary: inheritedHasCustomPrimary,
+		hasCustomBackground: inheritedHasCustomBackground,
 	} = useContext( ThemeContext );
 
 	// Compute settings:
@@ -138,6 +198,9 @@ export function useThemeProviderStyles( {
 		cornerRadius ?? inheritedSettings.cornerRadius ?? 'subtle';
 	const hasCustomPrimary =
 		color.primary !== undefined || inheritedHasCustomPrimary;
+	const hasCustomBackground =
+		color.background !== undefined || inheritedHasCustomBackground;
+	const hasCustomColors = hasCustomPrimary || hasCustomBackground;
 
 	const resolvedSettings = useMemo(
 		() => ( {
@@ -179,9 +242,10 @@ export function useThemeProviderStyles( {
 		return generateStyles( {
 			primary: seeds.primary,
 			hasCustomPrimary,
+			hasCustomColors,
 			computedColorRamps,
 		} );
-	}, [ primary, background, hasCustomPrimary ] );
+	}, [ primary, background, hasCustomPrimary, hasCustomColors ] );
 
 	const themeProviderStyles: CSSProperties = useMemo(
 		() => ( {
@@ -197,5 +261,6 @@ export function useThemeProviderStyles( {
 		resolvedSettings,
 		themeProviderStyles,
 		hasCustomPrimary,
+		hasCustomBackground,
 	};
 }
