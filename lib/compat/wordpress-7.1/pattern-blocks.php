@@ -40,7 +40,16 @@ function gutenberg_enqueue_auto_register_pattern_blocks() {
 		// editor renders that shell server-side and portals the editable pattern
 		// blocks into its slots (WYSIWYG). Without a render_callback the blocks are
 		// the output and are edited bare.
-		$editor_mode = ! empty( $block_type->render_callback ) ? 'ssr-islands' : 'canvas';
+		// SPIKE: a pattern that declares `core/pattern-overrides` bindings opts
+		// into synced mode: the registration owns the structure, the instance
+		// stores only the overrides, and only bound fields are editable.
+		if ( empty( $block_type->render_callback ) ) {
+			$editor_mode = 'canvas';
+		} elseif ( str_contains( $block_type->pattern, 'core/pattern-overrides' ) ) {
+			$editor_mode = 'synced-islands';
+		} else {
+			$editor_mode = 'ssr-islands';
+		}
 
 		// Structural lock for the editable blocks: 'all' prevents add/move/remove
 		// while keeping the content editable and the generated controls visible.
@@ -99,8 +108,22 @@ function gutenberg_wrap_ssr_islands_render_callback( $args ) {
 
 	$original_render_callback = $args['render_callback'];
 	$pattern                  = $args['pattern'];
+	$is_synced                = str_contains( $pattern, 'core/pattern-overrides' );
 
-	$args['render_callback'] = static function ( $attributes, $content, $block ) use ( $original_render_callback, $pattern ) {
+	// SPIKE: synced pattern blocks store per-instance overrides in `content`
+	// and provide them as the `pattern/overrides` context, like `core/block`,
+	// so the pattern-overrides binding resolves in both editor and frontend.
+	if ( $is_synced ) {
+		if ( ! isset( $args['attributes']['content'] ) ) {
+			$args['attributes']['content'] = array( 'type' => 'object' );
+		}
+		if ( ! isset( $args['provides_context'] ) ) {
+			$args['provides_context'] = array();
+		}
+		$args['provides_context']['pattern/overrides'] = 'content';
+	}
+
+	$args['render_callback'] = static function ( $attributes, $content, $block ) use ( $original_render_callback, $pattern, $is_synced ) {
 		if ( '' === trim( (string) $content ) ) {
 			$rest_route = isset( $GLOBALS['wp']->query_vars['rest_route'] ) ? $GLOBALS['wp']->query_vars['rest_route'] : '';
 			if ( defined( 'REST_REQUEST' ) && REST_REQUEST && str_contains( $rest_route, '/block-renderer/' ) ) {
@@ -109,6 +132,14 @@ function gutenberg_wrap_ssr_islands_render_callback( $args ) {
 				// somewhere to portal the editable islands: one content area,
 				// matching the single `$content` a callback receives.
 				$content = '<wp-inner-block-slot data-slot-index="0" style="display:contents"></wp-inner-block-slot>';
+			} elseif ( $is_synced ) {
+				// SPIKE: render the registration pattern as the block's inner
+				// blocks so the instance context (the overrides) reaches the
+				// bindings, mirroring render_block_core_block().
+				$block->parsed_block['innerBlocks']  = parse_blocks( $pattern );
+				$block->parsed_block['innerContent'] = array_fill( 0, count( $block->parsed_block['innerBlocks'] ), null );
+				$block->refresh_context_dependents();
+				$content = $block->render( array( 'dynamic' => false ) );
 			} else {
 				// Everywhere else an empty block falls back to the pattern:
 				// the front end, and REST renders like a post's

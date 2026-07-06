@@ -2594,7 +2594,13 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 			templatePartClientIds.push( clientId );
 		}
 
-		if ( block?.name === 'core/block' ) {
+		if (
+			block?.name === 'core/block' ||
+			// SPIKE: PHP-only pattern blocks in synced mode behave like synced
+			// pattern instances. TODO: derive this from the block type
+			// providing the `pattern/overrides` context instead of a name.
+			block?.name === 'test/php-only-editable-block'
+		) {
 			syncedPatternClientIds.push( clientId );
 		}
 	} );

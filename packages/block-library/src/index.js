@@ -19,7 +19,7 @@ import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { useLayoutEffect, useState } from '@wordpress/element';
+import { useLayoutEffect, useMemo, useState } from '@wordpress/element';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -475,6 +475,50 @@ function createSsrIslandsComponents( blockName, markup ) {
 	return { edit: Edit, save };
 }
 
+const NOOP = () => {};
+
+/**
+ * SPIKE: builds `edit`/`save` for a PHP-only `pattern` block whose pattern
+ * declares `core/pattern-overrides` bindings (synced mode).
+ *
+ * The registration owns the structure: the editor renders the pattern as a
+ * controlled, read-only tree where only bound fields are editable (the derived
+ * block editing modes disable the rest), and the instance saves just the
+ * overrides in its `content` attribute. The SSR shell composes on top like in
+ * ssr-islands mode.
+ *
+ * @param {string} blockName Block name, used to fetch the server-rendered shell.
+ * @param {string} markup    Pattern markup rendered as the controlled tree.
+ * @return {{ edit: Function, save: Function }} The edit and save components.
+ */
+function createSyncedPatternComponents( blockName, markup ) {
+	function Edit() {
+		const blocks = useMemo( () => parse( markup ), [] );
+
+		// SPIKE limitation: the controlled tree renders inline, without the
+		// SSR shell. The controlled sync lives in the children rendered by
+		// `useInnerBlocksProps`, so portalling them away (InnerContent)
+		// unmounts the sync and empties the tree. Composing both needs the
+		// portal to reuse these children instead of mounting its own.
+		const innerBlocksProps = useInnerBlocksProps( useBlockProps(), {
+			value: blocks,
+			onInput: NOOP,
+			onChange: NOOP,
+			renderAppender: false,
+		} );
+
+		return <div { ...innerBlocksProps } />;
+	}
+
+	function save() {
+		// The pattern lives in the registration and the overrides in the
+		// `content` attribute; there are no inner blocks to save.
+		return null;
+	}
+
+	return { edit: Edit, save };
+}
+
 /**
  * Function to register core blocks provided by the block editor.
  *
@@ -576,13 +620,25 @@ export const registerCoreBlocks = (
 					example: bootstrappedBlockType?.example ?? {
 						innerBlocks: parse( markup ),
 					},
-					...( editorMode === 'ssr-islands'
-						? createSsrIslandsComponents( blockName, markup )
-						: createPatternBlockComponents(
-								markup,
-								lock,
-								hasRenderCallback
-						  ) ),
+					...( () => {
+						if ( editorMode === 'synced-islands' ) {
+							return createSyncedPatternComponents(
+								blockName,
+								markup
+							);
+						}
+						if ( editorMode === 'ssr-islands' ) {
+							return createSsrIslandsComponents(
+								blockName,
+								markup
+							);
+						}
+						return createPatternBlockComponents(
+							markup,
+							lock,
+							hasRenderCallback
+						);
+					} )(),
 				} );
 			}
 		);

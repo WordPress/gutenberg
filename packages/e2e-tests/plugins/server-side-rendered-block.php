@@ -176,10 +176,13 @@ add_action(
 		);
 
 		// Content, attributes, and render callback for the editable PHP-only
-		// demo block below.
+		// demo block below. SPIKE: the heading and paragraph declare
+		// `core/pattern-overrides` bindings, which opts the block into synced
+		// mode: only these two fields are editable, and instances store just
+		// their overrides.
 		$pattern_markup = '<!-- wp:group {"layout":{"type":"constrained"}} --><div class="wp-block-group">'
-			. '<!-- wp:heading --><h2 class="wp-block-heading">Title</h2><!-- /wp:heading -->'
-			. '<!-- wp:paragraph --><p>Body text.</p><!-- /wp:paragraph -->'
+			. '<!-- wp:heading {"metadata":{"name":"Title","bindings":{"__default":{"source":"core/pattern-overrides"}}}} --><h2 class="wp-block-heading">Title</h2><!-- /wp:heading -->'
+			. '<!-- wp:paragraph {"metadata":{"name":"Body","bindings":{"__default":{"source":"core/pattern-overrides"}}}} --><p>Body text.</p><!-- /wp:paragraph -->'
 			. '</div><!-- /wp:group -->';
 
 		$pattern_attributes = array(
