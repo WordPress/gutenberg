@@ -932,6 +932,18 @@ test.describe( 'Block Notes', () => {
 			await addedNotice.click();
 			await expect( addedNotice ).toBeHidden();
 
+			/*
+			 * Clicking the snackbar moves focus (and selection) away from
+			 * the note thread, which collapses it and unmounts the
+			 * reaction pill. Re-select the thread so the pill renders
+			 * again before interacting with it.
+			 */
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: Re-add reaction' } )
+				.click();
+			await expect( reactionButton ).toBeVisible();
+
 			// Remove the reaction.
 			await reactionButton.click();
 			await expect( reactionButton ).toBeHidden();
