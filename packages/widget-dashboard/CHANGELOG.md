@@ -6,6 +6,10 @@
 
 -   `WidgetHeader`: surface the widget type's `help` note as an infotip
     beside the title: a click-open popover with the note and its links.
+-   `WidgetDashboard.Actions`: accept `children` to recompose the customize
+    toolbar from the new `Actions.*` triggers: `AddWidget`, `LayoutSettings`,
+    `Divider`, `Cancel`, `Done`. Omitting `children` keeps the default
+    arrangement.
 
 ## 0.2.0 (2026-07-01)
 

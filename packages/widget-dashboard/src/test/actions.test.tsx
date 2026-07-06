@@ -36,6 +36,7 @@ interface HarnessProps {
 	onEditChange?: ( next: boolean ) => void;
 	onLayoutChange?: ( next: DashboardWidget[] ) => void;
 	onGridSettingsChange?: ( next: WidgetGridSettings ) => void;
+	children?: React.ReactNode;
 }
 
 function Harness( {
@@ -43,6 +44,7 @@ function Harness( {
 	onEditChange,
 	onLayoutChange = () => {},
 	onGridSettingsChange,
+	children = <WidgetDashboard.Actions />,
 }: HarnessProps ) {
 	const [ editMode, setEditMode ] = useState( initialEditMode );
 
@@ -59,7 +61,7 @@ function Harness( {
 				onEditChange?.( next );
 			} }
 		>
-			<WidgetDashboard.Actions />
+			{ children }
 		</WidgetDashboard>
 	);
 }
@@ -211,6 +213,88 @@ describe( 'WidgetDashboard.Actions', () => {
 			expect(
 				screen.queryByRole( 'menuitem', { name: 'Layout settings' } )
 			).not.toBeInTheDocument();
+		} );
+	} );
+
+	describe( 'composition', () => {
+		it( 'renders only the composed triggers in the edit toolbar', () => {
+			render(
+				<Harness initialEditMode onGridSettingsChange={ () => {} }>
+					<WidgetDashboard.Actions>
+						<WidgetDashboard.Actions.AddWidget />
+						<WidgetDashboard.Actions.Divider />
+						<WidgetDashboard.Actions.Cancel />
+						<WidgetDashboard.Actions.Done />
+					</WidgetDashboard.Actions>
+				</Harness>
+			);
+
+			// Editable grid settings, but the trigger is not composed.
+			expect(
+				screen.queryByRole( 'button', { name: 'Layout settings' } )
+			).not.toBeInTheDocument();
+
+			expect(
+				screen.getByRole( 'button', { name: 'Add widget' } )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', { name: 'Cancel' } )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', { name: 'Done' } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'keeps the Customize button when composed with children', () => {
+			render(
+				<Harness>
+					<WidgetDashboard.Actions>
+						<WidgetDashboard.Actions.AddWidget />
+					</WidgetDashboard.Actions>
+				</Harness>
+			);
+
+			expect(
+				screen.getByRole( 'button', { name: 'Customize' } )
+			).toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', { name: 'Add widget' } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'opens the layout settings drawer from a composed trigger', async () => {
+			render(
+				<Harness initialEditMode onGridSettingsChange={ () => {} }>
+					<WidgetDashboard.Actions>
+						<WidgetDashboard.Actions.LayoutSettings />
+						<WidgetDashboard.Actions.Done />
+					</WidgetDashboard.Actions>
+				</Harness>
+			);
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Layout settings' } )
+			);
+
+			expect(
+				await screen.findByRole( 'dialog', { name: 'Layout settings' } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'supports triggers composed outside Actions', async () => {
+			render(
+				<Harness>
+					<WidgetDashboard.Actions.AddWidget />
+				</Harness>
+			);
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add widget' } )
+			);
+
+			expect(
+				await screen.findByRole( 'dialog', { name: 'Add widget' } )
+			).toBeInTheDocument();
 		} );
 	} );
 

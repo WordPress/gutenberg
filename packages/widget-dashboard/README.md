@@ -4,6 +4,7 @@
 This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes. While it is published as 0.x, breaking changes may ship in minor releases.
 
 This prerelease depends on WordPress core-private APIs and is built to run inside WordPress core. It is not yet safe to install and run as a standalone npm dependency from an external plugin.
+
 </div>
 
 Stateless rendering engine for widget dashboards. `WidgetDashboard` renders an editable grid of widget instances behind a consumer-controlled edit mode: drag-to-reorder, resize, a modal inserter, per-widget and grid-level settings, and command-palette integration.
@@ -145,7 +146,29 @@ Renders its children only when `layout` is empty. Pair it with `<WidgetDashboard
 
 #### `<WidgetDashboard.Actions />`
 
-Edit-mode toggle: a "Customize" button while `editMode` is off, and "Add widget", "Layout settings" (when `onGridSettingsChange` is provided), "Cancel", "Done" while it is on. The buttons and the more-actions menu are triggers: "Customize" and "Done" fire `onEditChange`, "Add widget" opens the inserter, "Layout settings" opens the layout-settings editor, and "Reset to default" opens the reset confirmation. Returns `null` when the dashboard is mounted without `onEditChange`, so surfaces that don't expose edit mode can keep `Actions` in their tree unconditionally.
+Edit-mode toggle: a "Customize" button while `editMode` is off, the customize toolbar while it is on, and an overflow menu with "Reset to default". Returns `null` without `onEditChange`, so surfaces without edit mode can keep `Actions` mounted unconditionally.
+
+Pass `children` to recompose the customize toolbar. The default arrangement is:
+
+```tsx
+<WidgetDashboard.Actions>
+	<WidgetDashboard.Actions.AddWidget />
+	<WidgetDashboard.Actions.LayoutSettings />
+	<WidgetDashboard.Actions.Divider />
+	<WidgetDashboard.Actions.Cancel />
+	<WidgetDashboard.Actions.Done />
+</WidgetDashboard.Actions>
+```
+
+Drop a trigger, reorder them, or mix in custom controls. The Customize button and the overflow menu render either way.
+
+-   `Actions.AddWidget` opens the widget inserter.
+-   `Actions.LayoutSettings` opens the layout-settings editor. Hidden without `onGridSettingsChange`.
+-   `Actions.Divider` renders the vertical rule between trigger clusters.
+-   `Actions.Cancel` discards staged edits and exits customize mode.
+-   `Actions.Done` publishes staged edits and exits customize mode. Disabled with nothing to publish.
+
+The triggers read the dashboard contexts, so they also work anywhere else in the `WidgetDashboard` subtree. Outside `Actions`, mode gating is up to the consumer.
 
 #### `<WidgetDashboard.Commands />`
 
