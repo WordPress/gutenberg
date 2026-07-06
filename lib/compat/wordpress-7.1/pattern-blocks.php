@@ -36,17 +36,18 @@ function gutenberg_enqueue_auto_register_pattern_blocks() {
 		if ( empty( $block_type->supports['autoRegister'] ) || empty( $block_type->pattern ) || ! is_string( $block_type->pattern ) ) {
 			continue;
 		}
-		// A pattern block with a `render_callback` renders as SSR-islands: the
-		// editor renders that shell server-side and portals the editable pattern
-		// blocks into its slots (WYSIWYG). Without a render_callback the blocks are
-		// the output and are edited bare.
-		// SPIKE: a pattern that declares `core/pattern-overrides` bindings opts
-		// into synced mode: the registration owns the structure, the instance
-		// stores only the overrides, and only bound fields are editable.
-		if ( empty( $block_type->render_callback ) ) {
-			$editor_mode = 'canvas';
-		} elseif ( str_contains( $block_type->pattern, 'core/pattern-overrides' ) ) {
+		// Two independent axes. Bindings decide the content model: a pattern
+		// that declares `core/pattern-overrides` bindings opts into synced
+		// mode (SPIKE), where the registration owns the structure, the
+		// instance stores only the overrides, and only bound fields are
+		// editable. Otherwise the `render_callback` decides the editing mode:
+		// with one, SSR-islands (the editor renders that shell server-side
+		// and portals the editable pattern blocks into its slots); without
+		// one, the blocks are the output and are edited bare.
+		if ( str_contains( $block_type->pattern, 'core/pattern-overrides' ) ) {
 			$editor_mode = 'synced-islands';
+		} elseif ( empty( $block_type->render_callback ) ) {
+			$editor_mode = 'canvas';
 		} else {
 			$editor_mode = 'ssr-islands';
 		}
@@ -96,14 +97,25 @@ function gutenberg_wrap_ssr_islands_render_callback( $args ) {
 	if (
 		empty( $args['supports']['autoRegister'] ) ||
 		empty( $args['pattern'] ) ||
-		! is_string( $args['pattern'] ) ||
-		empty( $args['render_callback'] )
+		! is_string( $args['pattern'] )
 	) {
 		return $args;
 	}
 
 	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-pattern-blocks' ) ) {
 		return $args;
+	}
+
+	// SPIKE: a synced pattern must render server-side (the post stores only
+	// the overrides), so a block that doesn't bring a render_callback gets
+	// the identity one: the pattern with the overrides applied, unwrapped.
+	if ( empty( $args['render_callback'] ) ) {
+		if ( ! str_contains( $args['pattern'], 'core/pattern-overrides' ) ) {
+			return $args;
+		}
+		$args['render_callback'] = static function ( $attributes, $content ) {
+			return $content;
+		};
 	}
 
 	$original_render_callback = $args['render_callback'];
