@@ -132,6 +132,12 @@ function gutenberg_wrap_ssr_islands_render_callback( $args ) {
 			$args['provides_context'] = array();
 		}
 		$args['provides_context']['pattern/overrides'] = 'content';
+
+		// There is no saved HTML to edit (the markup lives in the
+		// registration), so hide "Edit as HTML" like `core/block` does.
+		if ( ! isset( $args['supports']['html'] ) ) {
+			$args['supports']['html'] = false;
+		}
 	}
 
 	$args['render_callback'] = static function ( $attributes, $content, $block ) use ( $original_render_callback, $pattern, $is_synced ) {
