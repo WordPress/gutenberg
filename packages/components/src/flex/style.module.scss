@@ -7,11 +7,11 @@
 	justify-content: var(--wp-components-flex-justify);
 }
 
-.expandedColumn {
+.expanded-column {
 	height: 100%;
 }
 
-.expandedRow {
+.expanded-row {
 	width: 100%;
 }
 
@@ -27,13 +27,13 @@
 	flex: 1;
 }
 
-.itemsColumn {
+.items-column {
 	> * {
 		min-height: 0;
 	}
 }
 
-.itemsRow {
+.items-row {
 	> * {
 		min-width: 0;
 	}

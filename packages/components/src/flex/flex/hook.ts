@@ -62,9 +62,11 @@ export function useFlex( props: WordPressComponentProps< FlexProps, 'div' > ) {
 		...otherProps,
 		className: clsx(
 			styles.flex,
-			isColumn ? styles.itemsColumn : styles.itemsRow,
+			isColumn ? styles[ 'items-column' ] : styles[ 'items-row' ],
 			expanded &&
-				( isColumn ? styles.expandedColumn : styles.expandedRow ),
+				( isColumn
+					? styles[ 'expanded-column' ]
+					: styles[ 'expanded-row' ] ),
 			className
 		),
 		style: flexStyle,
