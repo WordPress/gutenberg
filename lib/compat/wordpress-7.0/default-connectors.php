@@ -253,6 +253,88 @@ function _gutenberg_get_api_key_source( string $setting_name, string $env_var_na
 }
 
 /**
+ * Parses a `username:password` credentials string.
+ *
+ * Splits on the first colon, matching the HTTP Basic authentication
+ * userinfo format, so passwords may contain colons.
+ *
+ * @access private
+ *
+ * @param string $value The raw credentials string.
+ * @return array{username: string, password: string} Parsed credentials. Both values
+ *                                                   are empty when the string is malformed.
+ */
+function _gutenberg_parse_application_password_credentials( string $value ): array {
+	$separator = strpos( $value, ':' );
+	$username  = false === $separator ? '' : substr( $value, 0, $separator );
+	$password  = false === $separator ? '' : substr( $value, $separator + 1 );
+
+	if ( '' === $username || '' === $password ) {
+		return array(
+			'username' => '',
+			'password' => '',
+		);
+	}
+
+	return array(
+		'username' => $username,
+		'password' => $password,
+	);
+}
+
+/**
+ * Resolves application-password credentials for a connector.
+ *
+ * Checks in order: environment variable, PHP constant, database. The
+ * environment variable and constant are only checked when their respective
+ * names are provided, and must contain the credentials as a single
+ * `username:password` string. A non-empty environment variable or constant
+ * claims the source even when malformed, in which case the resolved
+ * credentials are empty.
+ *
+ * @access private
+ *
+ * @param array $auth The connector's authentication configuration.
+ * @return array{username: string, password: string, source: string} Resolved credentials and
+ *                                                                   their source: 'env', 'constant',
+ *                                                                   'database', or 'none'.
+ */
+function _gutenberg_get_application_password_credentials( array $auth ): array {
+	// Check environment variable (only if explicitly configured).
+	$env_var_name = $auth['env_var_name'] ?? '';
+	if ( '' !== $env_var_name ) {
+		$env_value = getenv( $env_var_name );
+		if ( false !== $env_value && '' !== $env_value ) {
+			$credentials           = _gutenberg_parse_application_password_credentials( $env_value );
+			$credentials['source'] = 'env';
+			return $credentials;
+		}
+	}
+
+	// Check PHP constant (only if explicitly configured).
+	$constant_name = $auth['constant_name'] ?? '';
+	if ( '' !== $constant_name && defined( $constant_name ) ) {
+		$const_value = constant( $constant_name );
+		if ( is_string( $const_value ) && '' !== $const_value ) {
+			$credentials           = _gutenberg_parse_application_password_credentials( $const_value );
+			$credentials['source'] = 'constant';
+			return $credentials;
+		}
+	}
+
+	// Check database.
+	$stored   = get_option( $auth['setting_name'] ?? '', array() );
+	$username = is_array( $stored ) && isset( $stored['username'] ) && is_string( $stored['username'] ) ? $stored['username'] : '';
+	$password = is_array( $stored ) && isset( $stored['password'] ) && is_string( $stored['password'] ) ? $stored['password'] : '';
+
+	return array(
+		'username' => $username,
+		'password' => $password,
+		'source'   => '' !== $username || '' !== $password ? 'database' : 'none',
+	);
+}
+
+/**
  * Masks an API key, showing only the last 4 characters.
  *
  * @access private
@@ -614,14 +696,12 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 				$auth_out['isConnected'] = 'none' !== $auth_out['keySource'];
 			}
 		} elseif ( 'application_password' === $auth['method'] ) {
-			$setting_name = $auth['setting_name'] ?? '';
-			$credentials  = get_option( $setting_name, array() );
-			$username     = is_array( $credentials ) ? ( $credentials['username'] ?? '' ) : '';
-			$password     = is_array( $credentials ) ? ( $credentials['password'] ?? '' ) : '';
+			$credentials = _gutenberg_get_application_password_credentials( $auth );
 
-			$auth_out['settingName']    = $setting_name;
+			$auth_out['settingName']    = $auth['setting_name'] ?? '';
 			$auth_out['credentialsUrl'] = $auth['credentials_url'] ?? null;
-			$auth_out['isConnected']    = is_string( $username ) && '' !== $username && is_string( $password ) && '' !== $password;
+			$auth_out['keySource']      = $credentials['source'];
+			$auth_out['isConnected']    = '' !== $credentials['username'] && '' !== $credentials['password'];
 		}
 
 		$connector_out = array(

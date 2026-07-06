@@ -94,9 +94,13 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 		 *                                       for application passwords.
 		 *                                       Must be a non-empty string when provided.
 		 *         @type string $constant_name   Optional. PHP constant name for the API key
-		 *                                       (e.g. 'ANTHROPIC_API_KEY'). Only checked when provided.
+		 *                                       (e.g. 'ANTHROPIC_API_KEY') or for application-password
+		 *                                       credentials in `username:password` format. Only checked
+		 *                                       when provided.
 		 *         @type string $env_var_name    Optional. Environment variable name for the API key
-		 *                                       (e.g. 'ANTHROPIC_API_KEY'). Only checked when provided.
+		 *                                       (e.g. 'ANTHROPIC_API_KEY') or for application-password
+		 *                                       credentials in `username:password` format. Only checked
+		 *                                       when provided.
 		 *     }
 		 *     @type array  $plugin         {
 		 *         Optional. Plugin data for install/activate UI.
@@ -251,7 +255,7 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 				}
 			}
 
-			if ( 'api_key' === $args['authentication']['method'] ) {
+			if ( in_array( $args['authentication']['method'], array( 'api_key', 'application_password' ), true ) ) {
 				if ( isset( $args['authentication']['constant_name'] ) ) {
 					if ( ! is_string( $args['authentication']['constant_name'] ) || '' === $args['authentication']['constant_name'] ) {
 						_doing_it_wrong(
