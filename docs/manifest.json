@@ -2772,12 +2772,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/rich-text-control",
-		"slug": "packages-rich-text-control",
-		"markdown_source": "../packages/rich-text-control/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/rich-text",
 		"slug": "packages-rich-text",
 		"markdown_source": "../packages/rich-text/README.md",
