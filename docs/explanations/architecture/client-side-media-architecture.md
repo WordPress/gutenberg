@@ -127,24 +127,20 @@ The finalize step uses a gate: if any child sideloads are still pending, the ope
 
 If the finalize request fails, the error is logged but the upload is still considered successful — finalization is best-effort so that a plugin failure doesn't block the user's upload.
 
-## Extension points
+## Image quality resolution
 
-### `editor.media.imageQuality` (JavaScript filter)
+Client-side encoding honors the same PHP filters that govern server-side image quality: [`wp_editor_set_quality`](https://developer.wordpress.org/reference/hooks/wp_editor_set_quality/) and, for JPEG output, [`jpeg_quality`](https://developer.wordpress.org/reference/hooks/jpeg_quality/). There is no separate JavaScript quality filter.
 
-The `editor.media.imageQuality` filter allows plugins to control the quality setting (0–1) used during client-side image resize and crop operations. It is called via `@wordpress/hooks` in the `resizeCropItem()` action.
+When an upload completes, the attachment REST response carries a size-aware `image_quality` field. The server resolves the output MIME type the same way `WP_Image_Editor::set_quality()` does (after `image_editor_output_format`), then applies the filters with the full image dimensions for `default` and each registered sub-size's dimensions, reporting a size under `sizes` only when its filtered value diverges from `default`:
 
-```js
-wp.hooks.addFilter(
-	'editor.media.imageQuality',
-	'my-plugin/custom-quality',
-	( quality, context ) => {
-		// context: { item, mimeType, resize }
-		return quality;
-	}
-);
+```jsonc
+"image_quality": {
+	"default": 82,
+	"sizes": { "thumbnail": 60 }
+}
 ```
 
-The quality value is passed through to the vips worker during resize and crop operations.
+The client converts the 1–100 WordPress scale to the 0–1 scale the vips worker expects and applies the per-size value during sub-size resize and transcode. When the field is absent (an older server), the client falls back to the hardcoded default of `0.82`.
 
 ## WASM module loading
 
@@ -196,6 +192,10 @@ Cross-origin isolation requires that cross-origin resources include proper CORS 
 
 > **Note:** `<img>` is intentionally excluded from the mutated-element list. Document-Isolation-Policy doesn't require `<img>` resources to be CORS-enabled, and forcing `crossorigin="anonymous"` on cross-origin images would break previews for the common case of an Image block linking to a third-party URL without CORS headers.
 
+### External images
+
+Importing an external image into the media library (the Image block's "Upload to Media Library" action and the pre-publish "External media" panel) does not fetch the image bytes in the browser. A browser cross-origin fetch is subject to CORS — and fails outright in a `credentialless` isolated document — so the editor instead POSTs the image URL to `POST /wp/v2/media` (the `url` parameter) and the server downloads and sideloads the file, the same primitive behind core's `media_sideload_image()`. The editor exposes this path through the `mediaSideloadFromUrl` block editor setting.
+
 ### Browser support
 
 Client-side media processing is limited to Chromium-based browsers that support `Document-Isolation-Policy`:
@@ -241,6 +241,7 @@ The following formats are processed in the WASM/vips pipeline (`CLIENT_SIDE_SUPP
 
 Notes:
 -   AVIF encoding uses `effort: 2` to balance encoding speed with quality.
+-   High-bit-depth AVIF sources (10- or 12-bit, common for HDR photos) keep their bit depth in generated sub-sizes instead of being silently truncated to 8-bit.
 -   Animated GIF and WebP images preserve all frames during processing in the vips pipeline.
 -   Opaque animated GIFs are additionally converted to a companion video (MP4/WebM) outside the vips pipeline — see [Animated GIF to video conversion](#animated-gif-to-video-conversion) below.
 -   PNG-to-JPEG conversion is skipped when the PNG has transparency.
@@ -326,6 +327,7 @@ Client-side media processing extends the WordPress REST API in several ways:
 | `convert_format` | `POST /wp/v2/media`, `POST /wp/v2/media/{id}/sideload` | boolean | `true` | When `false`, the server skips format conversion via the `image_editor_output_format` filter. |
 | `replace_file` | `POST /wp/v2/media/{id}/sideload` | boolean | `false` | When `true`, replaces the attachment's main file with the sideloaded file, updating the MIME type and metadata and deleting the old file. Used for the HEIC → JPEG companion path. |
 | `image_size` | `POST /wp/v2/media/{id}/sideload` | string \| string[] | — | The image size name (e.g., `thumbnail`, `medium`, `scaled`, `original`). An array of names registers a single physical file under multiple sizes that share dimensions. |
+| `url` | `POST /wp/v2/media` | string | — | When present (instead of a file body), the server downloads the remote image with `download_url()` and sideloads it with `media_handle_sideload()`. Used to import external images without a browser cross-origin fetch — see [External images](#external-images) below. |
 
 When `generate_sub_sizes` is `false`, the following server-side filters are also temporarily disabled:
 -   `intermediate_image_sizes_advanced` — Prevents sub-size generation.
@@ -341,6 +343,7 @@ When `generate_sub_sizes` is `false`, the following server-side filters are also
 | `missing_image_sizes` | array | List of registered image size names that have not yet been generated for this attachment. |
 | `filename` | string | Original attachment file name. |
 | `filesize` | integer | Attachment file size in bytes. |
+| `image_quality` | object | Size-aware encode quality (1–100) from the `wp_editor_set_quality` filter: `{ default, sizes }`, where `sizes` lists only the registered sizes whose filtered value diverges from `default`. See [Image quality resolution](#image-quality-resolution). |
 
 ### Sideload endpoint
 

@@ -289,15 +289,17 @@ Client-side processing reads the following existing WordPress filters from the s
 -   **`image_editor_output_format`** — Maps input MIME types to output MIME types for automatic format conversion (e.g., JPEG → WebP). Applied during client-side transcoding.
 -   **`image_save_progressive`** — Controls progressive (JPEG) or interlaced (PNG, GIF) encoding. Applied during client-side compression and format conversion.
 -   **`wp_image_maybe_exif_rotate`** — Controls EXIF-based image rotation. When client-side processing is active, server-side rotation is disabled and the client handles it instead.
+-   **`wp_editor_set_quality`** (and **`jpeg_quality`** for JPEG output) — Encode quality (1–100). The server resolves these filters per registered size and reports the result in the upload response's size-aware `image_quality` field, which the client applies during sub-size resize and transcode. There is no separate JavaScript quality filter.
 
 > **Note:** There is no filter for the set of MIME types eligible for client-side processing. The supported set is fixed at `CLIENT_SIDE_SUPPORTED_MIME_TYPES` (`image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/avif`) in `packages/upload-media/src/store/constants.ts`. Files outside this set fall through to server-side processing or, for HEIC/HEIF, to a separate canvas-based decode path.
 
 ### REST API parameters
 
-Client-side processing uses two additional REST API parameters when uploading media:
+Client-side processing uses these additional REST API parameters when uploading media:
 
 -   **`generate_sub_sizes`** (boolean, default: `true`) — When set to `false` on `POST /wp/v2/media`, the server skips thumbnail generation. Client-side processing sets this to `false` so it can generate and sideload thumbnails itself.
 -   **`convert_format`** (boolean, default: `true`) — When set to `false` on `POST /wp/v2/media` or `POST /wp/v2/media/{id}/sideload`, the server skips format conversion via the `image_editor_output_format` filter. Used when the client has already performed the conversion.
+-   **`url`** (string) — When passed to `POST /wp/v2/media` instead of a file body, the server downloads the remote image and sideloads it. Used to import external images into the media library without a browser cross-origin fetch, which fails in the cross-origin-isolated editor.
 
 ### Animated GIF to video conversion
 

@@ -204,25 +204,29 @@ This double-fire pattern is the same one WordPress uses for big-image uploads on
 
 If the finalize request fails, the error is logged but the upload still succeeds — finalization is best-effort so that a plugin failure does not block the user's upload.
 
-## Controlling image quality (JavaScript)
+## Controlling image quality
 
-The `editor.media.imageQuality` filter allows plugins to control the quality setting (0–1) used during client-side image resize and crop operations. The default quality is `0.82`.
+Client-side encoding honors the same PHP filters that control server-side image quality — [`wp_editor_set_quality`](https://developer.wordpress.org/reference/hooks/wp_editor_set_quality/) and, for JPEG output, [`jpeg_quality`](https://developer.wordpress.org/reference/hooks/jpeg_quality/). The filtered values are carried to the client in the upload response's size-aware `image_quality` field, so the same code that tunes server-side quality works unchanged:
 
-```js
-wp.hooks.addFilter(
-	'editor.media.imageQuality',
-	'my-plugin/custom-quality',
-	( quality, context ) => {
-		// context contains: item, mimeType, resize
-		if ( context.mimeType === 'image/webp' ) {
-			return 0.9;
+```php
+/*
+ * Size-aware: drop JPEG thumbnails (300px wide or less) to quality 60,
+ * leave larger sizes untouched.
+ */
+add_filter(
+	'wp_editor_set_quality',
+	function ( $quality, $mime_type, $size ) {
+		if ( 'image/jpeg' === $mime_type && isset( $size['width'] ) && $size['width'] <= 300 ) {
+			return 60;
 		}
-		return quality;
-	}
+		return $quality;
+	},
+	10,
+	3
 );
 ```
 
-The quality value is passed through to the vips worker during resize and crop operations.
+Quality uses the WordPress 1–100 scale; the client converts it to the 0–1 scale the vips worker expects and applies it per sub-size during resize and transcode. When the server does not report the field, the client falls back to a default of `0.82`. There is no separate JavaScript quality filter.
 
 ## Using the finalize endpoint
 
@@ -244,6 +248,7 @@ Client-side media processing requires `SharedArrayBuffer` for WASM threading. Wo
 
 -   **External scripts**: Scripts loaded from other origins will automatically get a `crossorigin="anonymous"` attribute added, handled by WordPress server-side (via HTML processing) and client-side (via a MutationObserver).
 -   **Third-party page builders**: DIP is skipped on admin pages with an `action` parameter other than `edit`, to avoid conflicts with page builders that rely on same-origin iframe access.
+-   **External images**: Importing an external image into the media library is handled server-side — the editor sends the image URL to `POST /wp/v2/media` (the `url` parameter) and the server downloads and sideloads the file. A browser cross-origin fetch would be subject to CORS and fails in a `credentialless` isolated document, so plugins importing remote media should use the same server-side path (exposed to the editor as the `mediaSideloadFromUrl` setting) rather than `fetch()`ing image bytes in the browser.
 
 ### Content Security Policy (CSP) requirements
 
