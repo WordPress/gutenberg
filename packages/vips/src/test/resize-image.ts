@@ -281,6 +281,30 @@ describe( 'resizeImage', () => {
 			);
 		} );
 
+		it( 'crops a 10-bit AVIF to a position while preserving bit depth', async () => {
+			mockBitdepth = 10;
+			const avifFile = new File( [ '<BLOB>' ], 'example.avif', {
+				type: 'image/avif',
+			} );
+			const buffer = await avifFile.arrayBuffer();
+
+			await resizeImage( 'itemId', buffer, 'image/avif', {
+				width: 50,
+				height: 50,
+				crop: [ 'right', 'top' ],
+			} );
+
+			// Positional crops resize on the precision-preserving path and
+			// then crop the offset region directly on the 16-bit image.
+			expect( mockResize ).toHaveBeenCalled();
+			expect( mockThumbnailBuffer ).not.toHaveBeenCalled();
+			expect( mockCrop ).toHaveBeenCalledWith( 50, 0, 50, 50 );
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.avif',
+				expect.objectContaining( { bitdepth: 10 } )
+			);
+		} );
+
 		it( 'uses the standard thumbnail path for an 8-bit AVIF', async () => {
 			mockBitdepth = 8;
 			const avifFile = new File( [ '<BLOB>' ], 'example.avif', {
