@@ -52,6 +52,26 @@ or via npm script:
 }
 ```
 
+### Build Concurrency
+
+By default, `wp-build` limits concurrent `esbuild` build jobs to half of the
+available CPU parallelism, clamped between 2 and 8 jobs. This prevents large
+projects from starting every package, route, and widget bundle at once.
+
+Override the default with the `--concurrency` CLI flag:
+
+```bash
+wp-build --concurrency=4
+```
+
+Or with the `WP_BUILD_CONCURRENCY` environment variable:
+
+```bash
+WP_BUILD_CONCURRENCY=4 wp-build
+```
+
+When both are provided, `--concurrency` takes precedence.
+
 ### Testing Generated Styles
 
 Generated CSS module output skips automatic style injection when `NODE_ENV` is
