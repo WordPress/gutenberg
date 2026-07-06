@@ -6,30 +6,33 @@
  */
 
 /**
- * Mutable container passed through the `get_entity_view_config_{$kind}_{$name}`
- * filter so core and third parties can contribute to an entity's view
- * configuration as versioned patches instead of mutating a raw array.
+ * Holds an entity's view configuration while it is being built.
  *
- * Two kinds of contribution are supported:
+ * An instance of this class is what `get_entity_view_config_{$kind}_{$name}`
+ * filter callbacks receive: a callback changes the configuration by calling
+ * methods on the instance and returning it. The configuration has four
+ * top-level keys — `default_view`, `default_layouts`, `view_list`, and
+ * `form` — and there are two ways to contribute:
  *
- * - Base definition (`set()`): replaces a whole top-level key. Intended for the
- *   entity's authoritative definition (core's per-post-type callbacks). Because
- *   it replaces rather than merges, a third party using it stops inheriting
- *   core's future changes to that key (a "freeze"), so third parties should
- *   prefer the layering functions below.
- * - Versioned layering: additive patches that survive future shape changes.
- *   Each contribution declares the schema version it was authored against so it
- *   can be migrated forward to the latest version before it merges, and each
- *   function covers one part of the configuration. `update_properties()` merges the
- *   object-shaped keys: `default_view`, `default_layouts`, and `form` minus its
- *   `fields`. `update_view_list_items()` patches `view_list` entries by `slug`,
- *   and `update_form_fields()` patches `form` fields by `id`, finding a field
- *   wherever it lives — at the top level or nested in a group's `children`.
- *   All the update functions follow the same rules: a map value merges key by key, a list
- *   value replaces wholesale, and `null` deletes what it names — a property, a
- *   whole member, or a whole top-level key, which
- *   `gutenberg_get_entity_view_config()` backfills from the defaults so it
- *   reads as a reset.
+ * - The `update_*()` methods merge partial changes (patches) into what is
+ *   already there, each covering one part of the configuration:
+ *   `update_properties()` for `default_view`, `default_layouts`, and the
+ *   `form` settings other than its `fields`; `update_view_list_items()` for
+ *   the `view_list` entries, keyed by view `slug`; and `update_form_fields()`
+ *   for the `form` fields, keyed by field `id`. This is what plugins should
+ *   use: patches compose with core's configuration and with other plugins'.
+ * - `set()` replaces a whole top-level key. It shouldn't be the default
+ *   choice — a callback using it stops inheriting core's future changes to
+ *   that key — but it's useful for cases like a post type that doesn't
+ *   want the default form at all.
+ *
+ * Patches follow three shared rules: an associative array merges key by
+ * key, a numerically indexed array replaces the current value wholesale,
+ * and `null` deletes what it names — deleting a whole top-level key resets
+ * it to its default. Each patch also declares the configuration schema
+ * version it was written against (currently 1), so a future WordPress
+ * release that changes the configuration shape can migrate existing patches
+ * forward instead of breaking them.
  *
  * @since 7.1.0
  */
@@ -84,9 +87,9 @@ class Gutenberg_View_Config_Data {
 	/**
 	 * Replaces a whole top-level key with a new value.
 	 *
-	 * Intended for the entity's base definition (core's per-post-type callbacks).
-	 * Third parties should prefer the update_* functions so they keep inheriting
-	 * core's future changes.
+	 * It shouldn't be the default choice — a callback using it stops
+	 * inheriting core's future changes to that key — but it's useful for
+	 * cases like a post type that doesn't want the default form at all.
 	 *
 	 * @since 7.1.0
 	 *
@@ -113,24 +116,21 @@ class Gutenberg_View_Config_Data {
 	}
 
 	/**
-	 * Merges a versioned patch into the object-shaped configuration keys.
+	 * Merges a partial configuration into `default_view`, `default_layouts`,
+	 * and the `form` settings other than its `fields`.
 	 *
-	 * Covers `default_view`, `default_layouts`, and `form` except its `fields`.
-	 * A map value merges key by key, a list value replaces wholesale, and a
-	 * `null` value deletes the key it names: a nested value (a `default_view`
-	 * property, a `default_layouts` entry or nested layout property) is unset,
-	 * and a whole top-level key — any documented key, including `view_list` —
-	 * is dropped from the container. `gutenberg_get_entity_view_config()`
-	 * backfills a dropped documented key from the defaults, so that reads as a
-	 * reset.
+	 * An associative array merges key by key, a numerically indexed array
+	 * replaces the current value wholesale, and `null` deletes the key it
+	 * names; deleting a whole top-level key (any documented key, including
+	 * `view_list`) resets it to its default.
 	 *
-	 * The identity-keyed collections are managed by their own functions and are
-	 * rejected here: a non-null `view_list` value must go through
-	 * `update_view_list_items()`, and a `fields` key inside a `form` value must
-	 * go through `update_form_fields()`.
+	 * The keyed collections have dedicated methods and are rejected here: a
+	 * non-null `view_list` value must go through `update_view_list_items()`,
+	 * and a `fields` key inside a `form` value must go through
+	 * `update_form_fields()`.
 	 *
-	 * A patch whose version is outside `[1, LATEST_VERSION]` is rejected (it
-	 * cannot be migrated) and does not merge.
+	 * A patch that declares an unsupported schema version is rejected and
+	 * does not merge.
 	 *
 	 * @since 7.1.0
 	 *
@@ -178,7 +178,6 @@ class Gutenberg_View_Config_Data {
 					continue;
 				}
 			}
-			// A documented key that is not yet present merges onto an empty base.
 			$this->config[ $key ] = $this->deep_merge( $this->config[ $key ] ?? array(), $value );
 		}
 
@@ -186,19 +185,19 @@ class Gutenberg_View_Config_Data {
 	}
 
 	/**
-	 * Merges a versioned patch into the `view_list`, keyed by `slug`.
+	 * Adds, updates, or removes `view_list` entries, keyed by view `slug`.
 	 *
-	 * Each patch key names the `slug` of the view it patches: a matching view
-	 * merges in place and keeps its position (a map value merges key by key, a
-	 * list value — e.g. the view's `filters` — replaces wholesale), an unknown
-	 * slug appends a new view to the end, and a `null` value removes the view.
-	 * The patch key is the identity: a `slug` property inside the value is
-	 * ignored. A `null` for a slug that is not found is a silent no-op: the
-	 * view may have been removed by another filter or simply not apply to this
-	 * entity, which is a legitimate outcome rather than misuse.
+	 * Each patch key names the `slug` of the view it targets: a matching view
+	 * merges in place and keeps its position (following the shared rules —
+	 * e.g. the view's `filters`, being numerically indexed, replace
+	 * wholesale), an unknown slug appends a new view to the end, and `null`
+	 * removes the view. The patch key is the identity: a `slug` property
+	 * inside the value is ignored. A `null` for a slug that is not found is a
+	 * silent no-op — the view may have been removed by another callback or
+	 * simply not apply to this entity.
 	 *
-	 * A patch whose version is outside `[1, LATEST_VERSION]` is rejected (it
-	 * cannot be migrated) and does not merge.
+	 * A patch that declares an unsupported schema version is rejected and
+	 * does not merge.
 	 *
 	 * @since 7.1.0
 	 *
@@ -276,23 +275,26 @@ class Gutenberg_View_Config_Data {
 	}
 
 	/**
-	 * Merges a versioned patch into the `form` fields, keyed by field `id`.
+	 * Adds, updates, or removes `form` fields, keyed by field `id`.
 	 *
-	 * Each patch key names the `id` of the field it patches, and the field is
+	 * Each patch key names the `id` of the field it targets, and the field is
 	 * found wherever it lives — at the top level or nested inside a group's
 	 * `children`. Fields are visited in document order and a group is checked
 	 * before its own children, so when an id appears at both levels the group
 	 * wins. A matching field merges in place, an unknown id appends a new field
-	 * to the end of the top-level list, and a `null` value removes the field.
-	 * The patch key is the identity: an `id` property inside the value is
-	 * ignored.
+	 * to the end of the top-level fields, and `null` removes the field. The
+	 * patch key is the identity: an `id` property inside the value is ignored.
+	 * A `null` for an id that is not found is a silent no-op — the field may
+	 * have been removed by another callback or simply not apply to this
+	 * entity.
 	 *
-	 * Inside a field patch, `children` follows the same rules: a map merges
-	 * into the group's children by id (appending unknown ones), a list replaces
-	 * the children wholesale, and `null` deletes the key.
+	 * Inside a field patch, `children` follows the shared rules: an associative
+	 * array merges into the group's children by id (appending unknown ones), a
+	 * numerically indexed array replaces the children wholesale, and `null`
+	 * deletes the key.
 	 *
-	 * A patch whose version is outside `[1, LATEST_VERSION]` is rejected (it
-	 * cannot be migrated) and does not merge.
+	 * A patch that declares an unsupported schema version is rejected and
+	 * does not merge.
 	 *
 	 * @since 7.1.0
 	 *
@@ -335,7 +337,7 @@ class Gutenberg_View_Config_Data {
 	 *
 	 * @param int    $version The declared version.
 	 * @param string $method  The public method the patch was passed to.
-	 * @return bool Whether the version can be migrated to the latest version.
+	 * @return bool Whether the declared version is a supported schema version.
 	 */
 	private function check_version( int $version, $method ) {
 		if ( $version >= 1 && $version <= self::LATEST_VERSION ) {
@@ -396,9 +398,8 @@ class Gutenberg_View_Config_Data {
 	 * @return mixed The merged value.
 	 */
 	private function deep_merge( $current, $incoming ) {
-		// Only a map patch merges; scalars and lists replace wholesale. An
-		// empty array counts as a list, so patching with array() empties the
-		// key (e.g. 'filters' => array() clears the filters) rather than
+		// An empty array counts as a list, so patching with array() empties
+		// the key (e.g. 'filters' => array() clears the filters) rather than
 		// being a no-op map merge.
 		if ( ! is_array( $incoming ) || array_is_list( $incoming ) ) {
 			return $incoming;
@@ -431,9 +432,7 @@ class Gutenberg_View_Config_Data {
 	 * value removes the matching field (recursing into children), a map value
 	 * merges into the matching field wherever it lives, and an unknown id
 	 * appends a new field to the end of this list. A `null` for an id that is
-	 * not found is a silent no-op: the field may have been removed by another
-	 * filter or simply not apply to this entity, which is a legitimate outcome
-	 * rather than misuse.
+	 * not found is a silent no-op.
 	 *
 	 * @since 7.1.0
 	 *
@@ -468,7 +467,7 @@ class Gutenberg_View_Config_Data {
 				continue;
 			}
 			// An unknown id appends: as a bare string reference when the patch
-			// carries no overrides, as an object otherwise.
+			// carries no overrides, as an array otherwise.
 			$current[] = array() === $value ? $id : $this->merge_field_item( $id, $id, $value );
 		}
 
@@ -510,11 +509,10 @@ class Gutenberg_View_Config_Data {
 	/**
 	 * Merges a field patch into an existing field.
 	 *
-	 * A bare string reference is promoted to an object so the overrides apply.
+	 * A bare string reference is promoted to an array so the overrides apply.
 	 * The `children` key follows the same rules — a map merges into the
 	 * group's children by id, a list replaces them wholesale, and `null`
-	 * deletes the key — and every other key merges as a value: a map merges
-	 * key by key, a list or scalar replaces, and `null` deletes the key.
+	 * deletes the key — and every other key merges via deep_merge().
 	 *
 	 * @since 7.1.0
 	 *

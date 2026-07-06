@@ -154,11 +154,11 @@ function gutenberg_get_entity_view_config( $kind, $name ) {
 	 * The dynamic portions of the hook name, `$kind` and `$name`, refer to the
 	 * entity kind (e.g. `postType`) and the entity name (e.g. `page`).
 	 *
-	 * Callbacks receive a Gutenberg_View_Config_Data object and contribute
-	 * through it: `set()` replaces a whole top-level key (the entity's base
-	 * definition), while the `update_*` functions layer versioned, identity-aware
-	 * patches that survive future shape changes. Callbacks must return the
-	 * object they were given.
+	 * Callbacks receive a Gutenberg_View_Config_Data object and change the
+	 * configuration through its methods: the `update_*()` methods merge
+	 * partial changes into the current configuration, while `set()` replaces
+	 * a whole top-level key. Callbacks must return the object they were
+	 * given.
 	 *
 	 * @param Gutenberg_View_Config_Data $data   The view configuration container
 	 *                                           for the entity, exposing the

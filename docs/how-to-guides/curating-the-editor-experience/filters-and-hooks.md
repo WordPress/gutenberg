@@ -85,6 +85,16 @@ DataViews-powered screens (such as the Pages list and its Quick Edit form) build
 
 The configuration has four keys: `default_view`, `default_layouts`, `view_list` (the saved views shown in the list), and `form` (the DataForm used by consumers like Quick Edit).
 
+The filter receives an object holding the entity's view configuration. Change the configuration by calling its methods and return the object. Each method merges a partial change (a patch) into one part of the configuration, and patches follow three shared rules: an associative array merges key by key, a numerically indexed array replaces the current value wholesale, and `null` deletes what it names.
+
+-   `update_properties( $patch, $version )` merges into `default_view`, `default_layouts`, and the `form` properties other than its `fields`. Passing `null` for a whole top-level key resets it to its default.
+-   `update_view_list_items( $items, $version )` adds, updates, or removes views in the `view_list`, keyed by `slug`: a matching view merges in place, an unknown slug appends a new view to the end, and `null` removes the view.
+-   `update_form_fields( $fields, $version )` adds, updates, or removes `form` fields, keyed by `id`. A field is found wherever it lives — at the top level or nested inside a group's `children` — so a patch only needs the id: a matching field merges in place, an unknown id appends a new field, and `null` removes the field. Within a field patch, `children` follows the shared rules: an associative array merges into the group's children by `id` (unknown ids append to the group), a numerically indexed array replaces the children wholesale, and `null` deletes the key.
+
+For form fields, the id always lives in the patch key and the value only carries overrides, so a new field with no overrides is expressed as `'my_field' => array()` — not `array( 'my_field' )`, which is a numerically indexed array and would replace the group's children with just that field. Patch entries apply in order and `null` removes every occurrence of an id, so to move a field into a group, remove it first and append it to the group's `children` later in the same patch.
+
+The `$version` argument declares the configuration schema version the patch was written against (currently `1`), so that a future release that changes the configuration shape can migrate existing patches forward instead of breaking them.
+
 In the following example, a custom saved view is added to the `page` list, the existing Drafts view is retitled, the Trash view is removed, the `grid` layout option is unset, and `slug` and `author` fields are removed from the form.
 
 ```php
@@ -117,12 +127,8 @@ function example_filter_page_view_config( $data ) {
 
     // Patch form fields by id, wherever they live in the form: update the
     // label position of the post content info field, remove the slug and
-    // author fields with null, and append a field to the discussion group.
-    // In a `children` map an unknown id appends. The id lives in the patch
-    // key, so the value only carries overrides: array() appends a plain
-    // reference. A bare string cannot express an addition —
-    // array( 'my_field' ) is a positional list, and a `children` list
-    // replaces the group's children wholesale instead.
+    // author fields with null, and append a new field to the discussion
+    // group's children ( array() carries no overrides ).
     $data->update_form_fields(
         array(
             'post-content-info' => array(
@@ -151,14 +157,6 @@ function example_filter_page_view_config( $data ) {
 }
 add_filter( 'get_entity_view_config_postType_page', 'example_filter_page_view_config' );
 ```
-
-The filter receives an object holding the entity's view configuration. Contribute through its methods and return it:
-
--   `update_properties( $patch, $version )` merges the object-shaped configuration: `default_view`, `default_layouts`, and `form` properties other than its `fields`. A map value merges key by key, a list value replaces wholesale, and a value of `null` deletes the key it names — passing `null` for a whole top-level key resets it to its default.
--   `update_view_list_items( $items, $version )` patches the `view_list`, keyed by `slug`: a matching view merges in place, an unknown slug appends a new view to the end, and `null` removes the view.
--   `update_form_fields( $fields, $version )` patches the `form` fields, keyed by `id`. A field is found wherever it lives — at the top level or nested inside a group's `children` — so a patch only needs the id: a matching field merges in place, an unknown id appends a new field, and `null` removes the field. The id always lives in the patch key and the value only carries overrides, so a new field with no overrides is expressed as `'my_field' => array()`, never as a bare string: a string can only appear in a list, and a `children` list means "replace the group's children wholesale", while a `children` map merges by `id` (unknown ids append to the group). Patch entries apply in order and a `null` removes every occurrence of the id, so to move a field into a group, remove it first and append it to the group's `children` later in the same patch.
-
-All `update_*` functions require a schema version so the contribution can be migrated forward if the configuration shape changes.
 
 ## Client-side (Editor) filters
 
