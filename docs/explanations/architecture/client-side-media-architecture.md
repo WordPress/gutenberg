@@ -129,7 +129,7 @@ If the finalize request fails, the error is logged but the upload is still consi
 
 ## Image quality resolution
 
-Client-side encoding honors the same PHP filters that govern server-side image quality: [`wp_editor_set_quality`](https://developer.wordpress.org/reference/hooks/wp_editor_set_quality/) and, for still supported for JPEG output, [`jpeg_quality`](https://developer.wordpress.org/reference/hooks/jpeg_quality/). 
+Client-side encoding honors the same PHP filters that govern server-side image quality: [`wp_editor_set_quality`](https://developer.wordpress.org/reference/hooks/wp_editor_set_quality/) and, for JPEG output, the still-supported [`jpeg_quality`](https://developer.wordpress.org/reference/hooks/jpeg_quality/).
 
 When an upload completes, the attachment REST response carries a size-aware `image_quality` field. The server resolves the output MIME type the same way `WP_Image_Editor::set_quality()` does (after `image_editor_output_format`), then applies the filters with the full image dimensions for `default` and each registered sub-size's dimensions, reporting a size under `sizes` only when its filtered value diverges from `default`:
 
