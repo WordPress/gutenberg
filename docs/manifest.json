@@ -1980,6 +1980,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "RichTextControl",
+		"slug": "rich-text-control",
+		"markdown_source": "../packages/components/src/rich-text-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Sandbox",
 		"slug": "sandbox",
 		"markdown_source": "../packages/components/src/sandbox/README.md",
