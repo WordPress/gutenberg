@@ -15,8 +15,13 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import {
+	isHorizontalEdge,
+	isTextField,
+	placeCaretAtHorizontalEdge,
+} from '@wordpress/dom';
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -36,10 +41,40 @@ const TEMPLATE = [
 	],
 ];
 
-function DetailsEdit( { attributes, setAttributes, clientId } ) {
+function DetailsEdit( { attributes, setAttributes, clientId, onRemove } ) {
 	const { name, showContent, summary, allowedBlocks, placeholder } =
 		attributes;
-	const blockProps = useBlockProps();
+	const summaryRef = useRef();
+	const { getBlockOrder, getSelectionStart } = useSelect( blockEditorStore );
+
+	const handleDetailsKeyDownCapture = ( event ) => {
+		const { key, target } = event;
+
+		if (
+			event.defaultPrevented ||
+			key !== 'Backspace' ||
+			! isTextField( target ) ||
+			! isHorizontalEdge( target, true )
+		) {
+			return;
+		}
+
+		const shouldMoveToSummary =
+			summaryRef.current &&
+			! summaryRef.current.contains( target ) &&
+			getSelectionStart()?.clientId === getBlockOrder( clientId )[ 0 ];
+
+		if ( ! shouldMoveToSummary ) {
+			return;
+		}
+
+		event.preventDefault();
+		placeCaretAtHorizontalEdge( summaryRef.current, true );
+	};
+
+	const blockProps = useBlockProps( {
+		onKeyDownCapture: handleDetailsKeyDownCapture,
+	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
 		__experimentalCaptureToolbars: true,
@@ -126,6 +161,7 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 					onKeyUp={ handleSummaryKeyUp }
 				>
 					<RichText
+						ref={ summaryRef }
 						identifier="summary"
 						aria-label={ __(
 							'Write summary. Press Enter to expand or collapse the details.'
@@ -136,6 +172,7 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 						onChange={ ( newSummary ) =>
 							setAttributes( { summary: newSummary } )
 						}
+						onRemove={ onRemove }
 					/>
 				</summary>
 				{ innerBlocksProps.children }

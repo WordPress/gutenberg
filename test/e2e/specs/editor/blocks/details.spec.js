@@ -90,6 +90,72 @@ test.describe( 'Details', () => {
 		).toBeHidden();
 	} );
 
+	test( 'removes the block when pressing Backspace in an empty summary', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/details',
+		} );
+
+		const summary = editor.canvas.getByRole( 'textbox', {
+			name: 'Write summary',
+		} );
+
+		await summary.click();
+		await page.keyboard.press( 'Backspace' );
+
+		await expect.poll( editor.getBlocks ).toEqual( [] );
+	} );
+
+	test( 'moves focus to the summary when pressing Backspace at the start of body content', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/details',
+			attributes: {
+				summary: 'Details summary',
+				showContent: true,
+			},
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: {
+						content: 'Details content',
+					},
+				},
+			],
+		} );
+
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+
+		await paragraph.getByRole( 'textbox' ).click();
+		await pageUtils.pressKeys( 'primary+ArrowLeft' );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( ' updated' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/details',
+				attributes: {
+					summary: 'Details summary updated',
+				},
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: {
+							content: 'Details content',
+						},
+					},
+				],
+			},
+		] );
+	} );
+
 	test( 'selecting hidden blocks in list view expands details and focuses content', async ( {
 		editor,
 		page,
