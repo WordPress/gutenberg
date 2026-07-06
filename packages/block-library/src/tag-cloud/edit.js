@@ -175,7 +175,6 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 								units={ units }
 								min={ MIN_FONT_SIZE }
 								max={ MAX_FONT_SIZE }
-								size="__unstable-large"
 							/>
 						</FlexItem>
 						<FlexItem isBlock>
@@ -191,7 +190,6 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 								units={ units }
 								min={ MIN_FONT_SIZE }
 								max={ MAX_FONT_SIZE }
-								size="__unstable-large"
 							/>
 						</FlexItem>
 					</Flex>

@@ -6,7 +6,10 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 /**
  * Internal dependencies
  */
-const { recordRequests } = require( './record-requests' );
+const {
+	recordRequests,
+	waitForRequestsToSettle,
+} = require( './record-requests' );
 
 test.describe( 'Preload', () => {
 	let pageId;
@@ -39,8 +42,7 @@ test.describe( 'Preload', () => {
 			.locator( '[data-block]' )
 			.first()
 			.waitFor();
-		// eslint-disable-next-line playwright/no-networkidle
-		await page.waitForLoadState( 'networkidle' );
+		await waitForRequestsToSettle( requests );
 		stop();
 
 		// `POST /wp/v2/users/me` (preferences persistence) occasionally
@@ -72,8 +74,7 @@ test.describe( 'Preload', () => {
 			.getByRole( 'document', { name: 'Block: Heading' } )
 			.filter( { hasText: 'Hello' } )
 			.waitFor();
-		// eslint-disable-next-line playwright/no-networkidle
-		await page.waitForLoadState( 'networkidle' );
+		await waitForRequestsToSettle( requests );
 		stop();
 
 		// `POST /wp/v2/users/me` (preferences persistence) occasionally

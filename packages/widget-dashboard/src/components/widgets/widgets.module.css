@@ -1,5 +1,4 @@
 .grid {
-	/* stylelint-disable-next-line property-no-unknown -- container queries for the dashboard grid surface */
 	container-type: inline-size;
 	container-name: widget-dashboard;
 	width: 100%;
