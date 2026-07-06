@@ -34,9 +34,6 @@ function UnforwardedNumberControl(
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {
-		// Prevent passing legacy props to internal component.
-		__next40pxDefaultSize: _next40pxDefaultSize,
-		__shouldNotWarnDeprecated36pxSize: _shouldNotWarnDeprecated36pxSize,
 		__unstableStateReducer: stateReducerProp,
 		className,
 		dragDirection = 'n',
