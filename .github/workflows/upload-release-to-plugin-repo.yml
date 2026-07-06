@@ -271,7 +271,8 @@ jobs:
               run: |
                   svn cp "$PLUGIN_REPO_URL/trunk" "$PLUGIN_REPO_URL/tags/$VERSION" \
                    -m "Tagging version $VERSION" \
-                   --no-auth-cache --non-interactive --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
+                   --no-auth-cache --non-interactive --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
+                   --config-option=servers:global:http-timeout=600
 
     upload-tag:
         name: Publish as tag
