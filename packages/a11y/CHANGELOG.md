@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Improve `speak()` reliability by queueing polite announcements with a short clear-fill delay so rapid calls are announced in order. Assertive announcements remain synchronous.
+
 ## 4.50.0 (2026-07-01)
 
 ## 4.49.0 (2026-06-24)

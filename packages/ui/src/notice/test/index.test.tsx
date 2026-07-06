@@ -2,6 +2,12 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
 import * as Notice from '../index';
+import { resetQueue } from '../../../../a11y/src/shared/queue';
+
+afterEach( () => {
+	resetQueue();
+	jest.clearAllTimers();
+} );
 
 describe( 'Notice', () => {
 	describe( 'basic behaviour', () => {
@@ -177,14 +183,14 @@ describe( 'Notice', () => {
 	} );
 
 	describe( 'announcing to screen readers', () => {
-		it( 'creates a polite live region for non-error intents', () => {
+		it( 'creates a polite live region for non-error intents', async () => {
 			render(
 				<Notice.Root intent="info">
 					<Notice.Description>Update available.</Notice.Description>
 				</Notice.Root>
 			);
 			expect(
-				screen.getByText( 'Update available.', {
+				await screen.findByText( 'Update available.', {
 					selector: '[aria-live="polite"]',
 				} )
 			).toBeInTheDocument();
