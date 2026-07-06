@@ -36,11 +36,13 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 		} );
 		await collaborationUtils.openPost( post.id );
 
-		// User A inserts all text blocks via slash commands.
-		// For blocks where Enter creates a new paragraph (paragraph,
-		// heading), we chain naturally. For blocks where Enter adds a
-		// newline within (code, preformatted, verse), we insert a fresh
-		// default block via the editor keyboard shortcut.
+		// User A inserts all text blocks via slash commands. Whether the
+		// next block can be chained with Enter depends on the block we're
+		// currently in: paragraph and heading turn Enter into a new
+		// default block, so the block after them (heading, then code) is
+		// chained. Code, preformatted, and verse capture Enter as an
+		// in-block newline, so the block after each (preformatted, verse,
+		// pullquote) is inserted with the editor keyboard shortcut instead.
 
 		// Helper: insert a new default block (paragraph) after the
 		// currently focused block using the editor keyboard shortcut.
