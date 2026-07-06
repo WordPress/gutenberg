@@ -199,6 +199,7 @@ const restrictedSyntax = [
 		'RangeControl',
 		'Radio',
 		'SearchControl',
+		'SelectControl',
 		'TextControl',
 		'TextIndentControl',
 		'ToggleGroupControl',
