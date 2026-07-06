@@ -112,6 +112,7 @@ function VisualEditor( {
 		isPreview,
 		styles,
 		hasCanvasWidth,
+		isBlockTheme,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostId,
@@ -163,6 +164,7 @@ function VisualEditor( {
 			isPreview: editorSettings.isPreviewMode,
 			styles: editorSettings.styles,
 			hasCanvasWidth: getCanvasWidth() !== undefined,
+			isBlockTheme: editorSettings.__unstableIsBlockBasedTheme,
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -472,7 +474,7 @@ function VisualEditor( {
 							className={ clsx(
 								'is-' + deviceType.toLowerCase() + '-preview',
 								renderingMode !== 'post-only' ||
-									isDesignPostType
+									( isDesignPostType && isBlockTheme )
 									? 'wp-site-blocks'
 									: `${ blockListLayoutClass } wp-block-post-content`, // Ensure root level blocks receive default/flow blockGap styling rules.
 								{
