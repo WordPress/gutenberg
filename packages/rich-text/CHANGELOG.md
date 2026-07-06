@@ -4,7 +4,7 @@
 
 ### Internal
 
--   Expose `shortcutsListener` and `inputEventsListener` helpers as private APIs, so rich text fields outside `@wordpress/block-editor` can dispatch the keyboard shortcut and input event callbacks format types register. [#79345](https://github.com/WordPress/gutenberg/pull/79345)
+-   Expose `shortcutsListener` and `inputEventsListener` helpers as private APIs, so rich text fields outside `@wordpress/block-editor` can dispatch the keyboard shortcut and input event callbacks format types register. [#78471](https://github.com/WordPress/gutenberg/pull/78471)
 
 ## 7.50.0 (2026-07-01)
 
