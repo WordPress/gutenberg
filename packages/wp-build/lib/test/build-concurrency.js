@@ -24,32 +24,38 @@ describe( 'getDefaultBuildConcurrency()', () => {
 		expect( getDefaultBuildConcurrency( 4 ) ).toBe( 2 );
 		expect( getDefaultBuildConcurrency( 12 ) ).toBe( 6 );
 		expect( getDefaultBuildConcurrency( 16 ) ).toBe( 8 );
-		expect( getDefaultBuildConcurrency( 32 ) ).toBe( 8 );
+		expect( getDefaultBuildConcurrency( 32 ) ).toBe( 16 );
+		expect( getDefaultBuildConcurrency( 64 ) ).toBe( 16 );
 	} );
 } );
 
 describe( 'parseBuildConcurrency()', () => {
 	it( 'returns undefined when no value is configured', () => {
-		expect( parseBuildConcurrency( undefined, '--concurrency' ) ).toBe(
-			undefined
-		);
+		expect( parseBuildConcurrency( undefined ) ).toBe( undefined );
 	} );
 
 	it( 'accepts positive integers', () => {
-		expect( parseBuildConcurrency( '1', '--concurrency' ) ).toBe( 1 );
-		expect( parseBuildConcurrency( '01', '--concurrency' ) ).toBe( 1 );
-		expect( parseBuildConcurrency( '12', '--concurrency' ) ).toBe( 12 );
+		expect( parseBuildConcurrency( '1' ) ).toBe( 1 );
+		expect( parseBuildConcurrency( '01' ) ).toBe( 1 );
+		expect( parseBuildConcurrency( '12' ) ).toBe( 12 );
 	} );
 
-	it( 'rejects invalid values', () => {
-		for ( const value of [ '', '0', '-1', '1.5', 'abc' ] ) {
-			expect( () =>
-				parseBuildConcurrency( value, '--concurrency' )
-			).toThrow(
-				'Invalid --concurrency value: ' +
-					JSON.stringify( value ) +
-					'. Expected a positive integer.'
-			);
+	it( 'warns and returns undefined for invalid values', () => {
+		const warnSpy = jest.spyOn( console, 'warn' ).mockImplementation();
+
+		try {
+			for ( const value of [ '', '0', '-1', '1.5', 'abc' ] ) {
+				expect( parseBuildConcurrency( value ) ).toBe( undefined );
+				expect( warnSpy ).toHaveBeenLastCalledWith(
+					'Invalid build concurrency value: ' +
+						JSON.stringify( value ) +
+						'. Expected a positive integer; falling back to the default.'
+				);
+			}
+
+			expect( warnSpy ).toHaveBeenCalledTimes( 5 );
+		} finally {
+			warnSpy.mockRestore();
 		}
 	} );
 } );
