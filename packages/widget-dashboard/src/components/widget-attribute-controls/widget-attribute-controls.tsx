@@ -3,7 +3,7 @@
  */
 import { DataForm } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
-import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 import type { WidgetType } from '@wordpress/widget-primitives';
 
 /**
@@ -29,9 +29,9 @@ type WidgetAttributeControlsProps = {
 
 /**
  * Normal-mode controls: the `relevance: 'high'` attributes inline, plus the
- * settings trigger that opens the full settings drawer when needed.
- * Inline controls appear only for the high-relevance fields.
- * Inline edits publish immediately, so they need no Save affordance.
+ * settings trigger that opens the full settings drawer when needed. Inline
+ * controls appear only for the high-relevance fields; edits stage live and
+ * auto-save on the dashboard's shared debounce.
  *
  * @param {WidgetAttributeControlsProps} props Component props.
  */
@@ -39,7 +39,8 @@ export function WidgetAttributeControls( {
 	widget,
 	widgetType,
 }: WidgetAttributeControlsProps ): React.ReactNode {
-	const { layout, onLayoutChange, commit } = useDashboardInternalContext();
+	const { layout, onLayoutChange, scheduleAutoSave } =
+		useDashboardInternalContext();
 
 	const fields = useMemo< Field< WidgetAttributes >[] >(
 		() =>
@@ -62,16 +63,6 @@ export function WidgetAttributeControls( {
 		[ fields ]
 	);
 
-	// Publish once staging has advanced, so `commit` reads the fresh layout
-	// instead of the stale closure captured at edit time.
-	const [ pendingCommit, setPendingCommit ] = useState( false );
-	useEffect( () => {
-		if ( pendingCommit ) {
-			commit( { exitEditMode: false } );
-			setPendingCommit( false );
-		}
-	}, [ pendingCommit, commit ] );
-
 	const handleChange = useCallback(
 		( edits: Record< string, unknown > ) => {
 			onLayoutChange(
@@ -88,9 +79,9 @@ export function WidgetAttributeControls( {
 				)
 			);
 
-			setPendingCommit( true );
+			scheduleAutoSave();
 		},
-		[ layout, onLayoutChange, widget.uuid ]
+		[ layout, onLayoutChange, widget.uuid, scheduleAutoSave ]
 	);
 
 	const data = ( widget.attributes ??

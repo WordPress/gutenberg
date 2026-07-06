@@ -2,10 +2,20 @@
 
 ## Unreleased
 
+### New Features
+
+-   Widget toolbar: edit high-relevance widget attributes inline from the
+    tile toolbar.
+
 ### Enhancements
 
 -   `WidgetHeader`: surface the widget type's `help` note as an infotip
     beside the title: a click-open popover with the note and its links.
+-   Widget inserter: render more accurate widget previews.
+-   Widget settings: anchor the settings drawer to the right edge and
+    toggle it from the gear button.
+-   Restructure the tile chrome: extract `WidgetHeader` and `WidgetFrame`,
+    and move widget and layout controls into toolbar chips.
 
 ## 0.2.0 (2026-07-01)
 

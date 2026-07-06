@@ -729,21 +729,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/flex/flex-item/hook.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/components/src/flex/flex/hook.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/components/src/flex/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/focal-point-picker/styles/focal-point-picker-style.ts": {
 		"no-restricted-imports": {
 			"count": 2

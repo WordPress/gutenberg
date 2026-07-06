@@ -10,7 +10,6 @@ The following components are checked by this rule:
 
 -   Button
 -   InputControl
--   SelectControl
 
 Examples of **incorrect** code for this rule:
 
