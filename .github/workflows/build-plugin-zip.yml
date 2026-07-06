@@ -68,9 +68,12 @@ jobs:
               run: |
                   gh auth status --hostname github.com
 
-                  token_follow_up="Release managers/repository admins must fix this before the next RC day: "
-                  token_follow_up+="either make the default GITHUB_TOKEN with contents: write able to create draft releases and remove this PAT dependency, "
-                  token_follow_up+="or rotate/replace GUTENBERG_TOKEN with a token that can create draft releases in this repository."
+                  # This workflow currently relies on GUTENBERG_TOKEN for release
+                  # branch pushes and draft release creation. If repository policy
+                  # later allows the default GITHUB_TOKEN to create draft releases,
+                  # that can be handled as a separate workflow simplification.
+                  token_follow_up="Release managers should ask repository admins to rotate or replace GUTENBERG_TOKEN before the next RC day "
+                  token_follow_up+="with a token that can create draft releases in ${GITHUB_REPOSITORY}."
 
                   headers_file="$(mktemp)"
                   if ! gh api -i "repos/${GITHUB_REPOSITORY}" > "$headers_file"; then
