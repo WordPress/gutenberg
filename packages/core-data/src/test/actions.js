@@ -1145,6 +1145,62 @@ describe( 'saveEntityRecord', () => {
 		expect( result ).toBe( updatedRecord );
 	} );
 
+	it( 'does not pass edited raw-attribute fields to SyncManager#update when the server echoes them unchanged', async () => {
+		const persistedRecord = {
+			id: 10,
+			content: '<p>Initial content</p>',
+			modified: '2026-07-01T00:00:00',
+		};
+		const edits = {
+			id: 10,
+			content: '<p>Updated content</p>',
+		};
+		const configs = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				syncConfig: {},
+			},
+		];
+		const syncManager = {
+			update: jest.fn(),
+		};
+		const select = {
+			getRawEntityRecord: () => persistedRecord,
+		};
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
+		const updatedRecord = {
+			id: 10,
+			content: {
+				raw: edits.content,
+				// The rendered value differs from the raw baseline, but only
+				// raw values are compared.
+				rendered: '<p class="rendered">Updated content</p>\n',
+			},
+			modified: '2026-07-02T00:00:00',
+		};
+		apiFetch.mockImplementation( () => updatedRecord );
+		getSyncManager.mockReturnValue( syncManager );
+
+		const result = await saveEntityRecord(
+			'postType',
+			'post',
+			edits
+		)( { select, dispatch, resolveSelect } );
+
+		expect( syncManager.update ).toHaveBeenCalledWith(
+			'postType/post',
+			10,
+			{
+				modified: '2026-07-02T00:00:00',
+			},
+			'local-undo-ignored',
+			{ isSave: true }
+		);
+		expect( result ).toBe( updatedRecord );
+	} );
+
 	it( 'passes raw-attribute fields whose raw value the server mutated to SyncManager#update', async () => {
 		const persistedRecord = {
 			id: 10,
