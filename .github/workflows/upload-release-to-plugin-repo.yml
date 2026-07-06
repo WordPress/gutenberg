@@ -296,11 +296,13 @@ jobs:
             - name: Download and unzip Gutenberg plugin asset into tags folder
               env:
                   PLUGIN_URL: ${{ github.event.release.assets[0].browser_download_url }}
-              run: |
-                  # do the magic here
-                  curl -L -o gutenberg.zip "$PLUGIN_URL"
-                  unzip gutenberg.zip -d "$VERSION"
-                  rm gutenberg.zip
+              run: curl -L -o gutenberg.zip "$PLUGIN_URL"
+
+            - name: Unzip plugin zip
+              run: unzip gutenberg.zip -d "$VERSION"
+
+            - name: Remove zip file
+              run: rm gutenberg.zip
 
             - name: Replace the stable tag placeholder with the existing stable tag on the SVN repository
               env:
