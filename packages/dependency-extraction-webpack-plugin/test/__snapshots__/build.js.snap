@@ -170,7 +170,7 @@ exports[`DependencyExtractionWebpackPlugin modules Webpack \`nested-dynamic-impo
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`no-default\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array(), 'version' => '1e17a24e97ed7776722f', 'type' => 'module');
+"<?php return array('dependencies' => array(), 'version' => '1d4018004c72e23ff482', 'type' => 'module');
 "
 `;
 
@@ -589,7 +589,7 @@ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`nested-dynamic-impo
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts Webpack \`no-default\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array(), 'version' => '00e44c3b74e4e22ce7be');
+"<?php return array('dependencies' => array(), 'version' => '9eeb18bc6756ee01877b');
 "
 `;
 
