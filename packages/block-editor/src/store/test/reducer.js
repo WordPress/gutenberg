@@ -4236,8 +4236,26 @@ describe( 'state', () => {
 			);
 		} );
 
+		// Synced pattern hosts are detected through the block type providing
+		// the `pattern/overrides` context, so the type must be registered.
+		beforeAll( () => {
+			registerBlockType( 'core/block', {
+				apiVersion: 3,
+				save: noop,
+				edit: noop,
+				category: 'reusable',
+				title: 'Pattern',
+				attributes: {
+					ref: { type: 'number' },
+					content: { type: 'object' },
+				},
+				providesContext: { 'pattern/overrides': 'content' },
+			} );
+		} );
+
 		afterAll( () => {
 			isContentBlock.mockRestore();
+			unregisterBlockType( 'core/block' );
 		} );
 
 		describe( 'edit mode', () => {

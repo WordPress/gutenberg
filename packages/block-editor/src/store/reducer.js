@@ -2594,12 +2594,11 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 			templatePartClientIds.push( clientId );
 		}
 
+		// Any block type that provides the `pattern/overrides` context hosts
+		// synced-pattern overrides; `core/block` is the canonical one.
 		if (
-			block?.name === 'core/block' ||
-			// SPIKE: PHP-only pattern blocks in synced mode behave like synced
-			// pattern instances. TODO: derive this from the block type
-			// providing the `pattern/overrides` context instead of a name.
-			block?.name === 'test/php-only-synced-block'
+			select( blocksStore ).getBlockType( block?.name )
+				?.providesContext?.[ 'pattern/overrides' ]
 		) {
 			syncedPatternClientIds.push( clientId );
 		}

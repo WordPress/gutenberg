@@ -2,8 +2,7 @@
  * WordPress dependencies
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-const CONTENT = 'content';
+import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * @type {WPBlockBindingsSource}
@@ -36,7 +35,7 @@ export default {
 		return overridesValues;
 	},
 	setValues( { select, dispatch, clientId, bindings } ) {
-		const { getBlockAttributes, getBlockParentsByBlockName, getBlocks } =
+		const { getBlockAttributes, getBlockName, getBlockParents, getBlocks } =
 			select( blockEditorStore );
 		const currentBlockAttributes = getBlockAttributes( clientId );
 		const blockName = currentBlockAttributes?.metadata?.name;
@@ -44,14 +43,15 @@ export default {
 			return;
 		}
 
-		const [ patternClientId ] = getBlockParentsByBlockName(
-			clientId,
-			// SPIKE: PHP-only pattern blocks in synced mode store overrides in
-			// their `content` attribute like `core/block` does. TODO: derive
-			// this from the block type providing the `pattern/overrides`
-			// context instead of a name list.
-			[ 'core/block', 'test/php-only-synced-block' ],
-			true
+		// Overrides live on the closest ancestor whose block type provides
+		// the `pattern/overrides` context; `core/block` is the canonical one.
+		// The context mapping names the attribute that stores them.
+		const { getBlockType } = select( blocksStore );
+		const patternClientId = getBlockParents( clientId, true ).find(
+			( parentId ) =>
+				getBlockType( getBlockName( parentId ) )?.providesContext?.[
+					'pattern/overrides'
+				]
 		);
 
 		// Extract the updated attributes from the source bindings.
@@ -80,11 +80,13 @@ export default {
 			syncBlocksWithSameName( getBlocks() );
 			return;
 		}
+		const contentAttribute = getBlockType( getBlockName( patternClientId ) )
+			.providesContext[ 'pattern/overrides' ];
 		const currentBindingValue =
-			getBlockAttributes( patternClientId )?.[ CONTENT ];
+			getBlockAttributes( patternClientId )?.[ contentAttribute ];
 
 		dispatch( blockEditorStore ).updateBlockAttributes( patternClientId, {
-			[ CONTENT ]: {
+			[ contentAttribute ]: {
 				...currentBindingValue,
 				[ blockName ]: {
 					...currentBindingValue?.[ blockName ],
