@@ -42,7 +42,7 @@
 	display: block;
 }
 
-/* stylelint-disable selector-class-pattern -- WordPress admin body classes use underscores by convention. */
+// stylelint-disable selector-class-pattern -- WordPress admin body classes use underscores by convention.
 body.js #wpbody {
 	padding-top: 0;
 }
@@ -65,7 +65,7 @@ body.js.site-editor-php {
 		}
 	}
 }
-/* stylelint-enable selector-class-pattern */
+// stylelint-enable selector-class-pattern
 
 .edit-site {
 	@include reset;
