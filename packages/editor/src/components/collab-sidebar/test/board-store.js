@@ -144,6 +144,43 @@ describe( 'createBoardStore', () => {
 			} );
 		} );
 
+		it( 'anchors a marker split into several runs to its first run', () => {
+			const store = createBoardStore();
+			const blockEl = document.createElement( 'p' );
+			/*
+			 * Overlapping notes split a marker into several runs sharing the
+			 * same data-id (see applyNoteFormat): the overlapped stretch nests
+			 * inside the other note's marker. Each note anchors to its first
+			 * run in document order.
+			 */
+			blockEl.innerHTML =
+				'One <mark class="wp-note" data-id="12">first run</mark>' +
+				'<mark class="wp-note" data-id="34">' +
+				'<mark class="wp-note" data-id="12">overlap</mark>' +
+				' tail</mark> text';
+			const [ firstRun, outer, nestedRun ] =
+				blockEl.querySelectorAll( 'mark' );
+			mockRect( blockEl, 100 );
+			mockRect( firstRun, 140 );
+			mockRect( outer, 170 );
+			mockRect( nestedRun, 200 );
+
+			store.registerThread(
+				12,
+				blockEl,
+				document.createElement( 'div' )
+			);
+			store.registerThread(
+				34,
+				blockEl,
+				document.createElement( 'div' )
+			);
+
+			const rects = store.getBlockRects();
+			expect( rects[ 12 ].top ).toBe( 140 );
+			expect( rects[ 34 ].top ).toBe( 170 );
+		} );
+
 		it( 'anchors each note to its own marker within the same block', () => {
 			const store = createBoardStore();
 			const blockEl = document.createElement( 'p' );
