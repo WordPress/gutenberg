@@ -7,9 +7,9 @@ Client-side media processing is a capability shipping in WordPress 7.1 that hand
 Key benefits include:
 
 -   **Reduced server load**: Image processing is offloaded to the user's device, freeing server resources.
--   **No PHP memory limits**: Server-side image processing is often constrained by PHP's memory limit, causing failures with large images. Browser-based processing avoids these limits entirely.
+-   **No PHP memory limits**: Server-side image processing is often constrained by PHP's memory limit, causing failures with large images. Browser-based processing avoids server limits entirely (although client limits apply).
 -   **Consistent processing**: All users get the same high-quality image processing powered by [libvips](https://www.libvips.org/) via WebAssembly, regardless of which PHP image editor (GD or Imagick) is available on the server.
--   **Faster downloads**: libvips produces better-compressed output than GD/Imagick, so the generated images visitors receive are smaller and load faster.
+-   **Faster downloads**: libvips generally produces better-compressed JPEGs than GD/Imagick and supports all modern formats, so the generated images visitors receive are smaller and load faster.
 
 When client-side processing is not available (unsupported browser, insufficient device resources, or explicitly disabled), WordPress transparently falls back to traditional server-side processing with no user intervention required.
 
@@ -105,9 +105,9 @@ The `uploadItem()` operation uploads the (optionally transcoded) image to the se
 
 After the upload completes, the server responds with `missing_image_sizes` — a list of thumbnail sizes that still need to be generated. The `generateThumbnails()` operation creates sideload items for each missing size.
 
-Sizes are deduplicated by their effective output dimensions before processing. When a theme registers an image size with the same width/height/crop as a built-in size (for example, Twenty Eleven's `large` matches WordPress core's `medium_large` at 768×1024), the client generates one physical file and tells the server to register it under both names by passing an array to the sideload route's `image_size` parameter. This matches how the server-side path handles duplicate dimensions and avoids producing extra files with `-1` suffixes.
+Sizes are deduplicated by their effective output dimensions before processing. When a theme registers an image size with the same width/height/crop as a built-in size (for example, Twenty Eleven's `large` matches WordPress core's `medium_large` at 768×1024), the client generates one physical file and tells the server to register it under both names by passing an array to the sideload route's `image_size` parameter. This matches how the server-side path handles duplicate dimensions and avoids producing extra files.
 
-For images that exceed the `big_image_size_threshold` (default: 2560px), a scaled version is also generated and sideloaded. The unscaled original is what gets uploaded first (step 3); sub-size filenames derive from that original basename, and only the scaled full-size copy carries the `-scaled` suffix. This matches WordPress core's `wp_create_image_subsizes()` naming and avoids propagating `-scaled` into every thumbnail filename.
+For images that exceed the `big_image_size_threshold` (default: 2560px), a scaled version is also generated and sideloaded. The unscaled original is what gets uploaded first (step 3); sub-size filenames derive from that original basename, and only the scaled full-size copy carries the `-scaled` suffix. This matches WordPress core's `wp_create_image_subsizes()` naming.
 
 If the original image requires EXIF rotation (orientation ≠ 1), a rotated version is generated and sideloaded as well.
 
@@ -121,7 +121,7 @@ To prevent race conditions, sideload uploads to the same post are serialized —
 
 After all sideloads for an item complete, the `finalizeItem()` operation calls `POST /wp/v2/media/{id}/finalize`. This endpoint applies the `wp_generate_attachment_metadata` filter with context `'update'` so server-side plugins (watermarking, CDN sync, custom metadata processing, etc.) can post-process the attachment after all sub-sizes are written.
 
-The filter was already fired once with context `'create'` during the initial upload, so plugins see two passes per client-side upload. This double-fire pattern matches how WordPress handles big-image uploads on the server, where sub-size generation is deferred and triggers a second `'update'` pass — plugins that already work with big-image uploads accommodate it without modification, but they should be written idempotently.
+The filter was already fired once with context `'create'` during the initial upload, so plugins see two passes per client-side upload. This double-fire pattern matches how WordPress handles big-image uploads on the server, where sub-size generation is deferred and triggers a second `'update'` pass.
 
 The finalize step uses a gate: if any child sideloads are still pending, the operation waits. Once the last sideload completes, it triggers the parent item's pending Finalize operation.
 
@@ -129,7 +129,7 @@ If the finalize request fails, the error is logged but the upload is still consi
 
 ## Image quality resolution
 
-Client-side encoding honors the same PHP filters that govern server-side image quality: [`wp_editor_set_quality`](https://developer.wordpress.org/reference/hooks/wp_editor_set_quality/) and, for JPEG output, [`jpeg_quality`](https://developer.wordpress.org/reference/hooks/jpeg_quality/). There is no separate JavaScript quality filter.
+Client-side encoding honors the same PHP filters that govern server-side image quality: [`wp_editor_set_quality`](https://developer.wordpress.org/reference/hooks/wp_editor_set_quality/) and, for still supported for JPEG output, [`jpeg_quality`](https://developer.wordpress.org/reference/hooks/jpeg_quality/). 
 
 When an upload completes, the attachment REST response carries a size-aware `image_quality` field. The server resolves the output MIME type the same way `WP_Image_Editor::set_quality()` does (after `image_editor_output_format`), then applies the filters with the full image dimensions for `default` and each registered sub-size's dimensions, reporting a size under `sizes` only when its filtered value diverges from `default`:
 
@@ -171,7 +171,7 @@ WordPress sends the `Document-Isolation-Policy` (DIP) header on block editor scr
 Document-Isolation-Policy: isolate-and-credentialless
 ```
 
-This header provides per-document cross-origin isolation without affecting other iframes on the page, avoiding the breakage that the older `Cross-Origin-Embedder-Policy` / `Cross-Origin-Opener-Policy` headers caused for third-party plugins and embeds.
+This header provides per-document cross-origin isolation without affecting other iframes on the page, avoiding the breakage for third-party plugins and embeds.
 
 The header is set via `gutenberg_start_cross_origin_isolation_output_buffer()` (in `lib/media/load.php`), which uses PHP output buffering on `load-post.php`, `load-post-new.php`, `load-site-editor.php`, and `load-widgets.php` screens. DIP is skipped on admin pages with an `action` parameter other than `edit` to avoid conflicts with page builders that rely on same-origin iframe access.
 
