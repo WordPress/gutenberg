@@ -324,11 +324,24 @@ export default function RichTextControl( {
 		[ isSelected ]
 	);
 
+	// The shell exposes no focus management of its own (form controls leave
+	// that to the surrounding region); focus the field on mount here when the
+	// form opts in.
+	const focusOnMountRef = useRefEffect< HTMLElement >(
+		( element ) => {
+			if ( focusOnMount ) {
+				element.focus();
+			}
+		},
+		[ focusOnMount ]
+	);
+
 	const editableRef = useMergeRefs( [
 		richTextRef,
 		anchorRef as MutableRefObject< HTMLElement | undefined >,
 		eventListenersRef,
 		enterRef,
+		focusOnMountRef,
 	] );
 
 	return (
@@ -338,8 +351,7 @@ export default function RichTextControl( {
 			className={ className }
 			hideLabelFromVision={ hideLabelFromVision }
 			disableLineBreaks={ disableLineBreaks }
-			focusOnMount={ focusOnMount }
-			editableRef={ editableRef }
+			ref={ editableRef }
 			onSelectedChange={ setIsSelected }
 		>
 			{ isSelected && (

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import type { FocusEvent } from 'react';
+import type { FocusEvent, ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
@@ -10,6 +10,7 @@ import type { FocusEvent } from 'react';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import {
 	createPortal,
+	forwardRef,
 	useEffect,
 	useInsertionEffect,
 	useRef,
@@ -40,8 +41,8 @@ const OWNED_POPOVER_SELECTOR =
  * is intended for standalone form fields (DataForms, sidebar inputs, etc.).
  * It is deliberately **presentational only** and has no `@wordpress/rich-text`
  * dependency: the editable behavior (value, formatting, keyboard shortcuts) is
- * injected by the consumer through `editableRef` and `children`. The consumer
- * owns the `useRichText` wiring; this component owns the chrome
+ * injected by the consumer through the forwarded ref and `children`. The
+ * consumer owns the `useRichText` wiring; this component owns the chrome
  * (`BaseControl` + label, the editable element, and the popover slot).
  *
  * @example
@@ -49,7 +50,7 @@ const OWNED_POPOVER_SELECTOR =
  * // The rich-text "assembly" lives in the consumer.
  * <RichTextControl
  *     label="Caption"
- *     editableRef={ mergedRef }
+ *     ref={ mergedRef }
  *     onSelectedChange={ setIsSelected }
  * >
  *     { isSelected && (
@@ -60,20 +61,21 @@ const OWNED_POPOVER_SELECTOR =
  * </RichTextControl>
  * ```
  */
-function RichTextControl( {
-	label,
-	editableRef,
-	onSelectedChange,
-	children,
-	id,
-	className,
-	hideLabelFromVision,
-	disableLineBreaks,
-	focusOnMount,
-	onFocus,
-	onBlur,
-	...additionalProps
-}: WordPressComponentProps< RichTextControlProps, 'div', false > ) {
+function UnforwardedRichTextControl(
+	{
+		label,
+		onSelectedChange,
+		children,
+		id,
+		className,
+		hideLabelFromVision,
+		disableLineBreaks,
+		onFocus,
+		onBlur,
+		...additionalProps
+	}: WordPressComponentProps< RichTextControlProps, 'div', false >,
+	forwardedRef: ForwardedRef< HTMLDivElement >
+) {
 	// Format types open their UI (e.g. the inline link popover via Cmd+K) in
 	// portaled popovers. We host them in a private `SlotFillProvider` paired
 	// with our own `Popover.Slot` (rendered below), wrapped in a marker
@@ -149,15 +151,6 @@ function RichTextControl( {
 		};
 	}
 
-	const focusOnMountRef = useRefEffect< HTMLDivElement >(
-		( element ) => {
-			if ( focusOnMount ) {
-				element.focus();
-			}
-		},
-		[ focusOnMount ]
-	);
-
 	const { baseControlProps, controlProps } = useBaseControlProps( {
 		id,
 		hideLabelFromVision,
@@ -183,9 +176,8 @@ function RichTextControl( {
 					aria-multiline={ ! disableLineBreaks }
 					aria-label={ label }
 					ref={ useMergeRefs( [
-						editableRef ?? null,
+						forwardedRef,
 						editableWrapperRef,
-						focusOnMountRef,
 						popoverSlotContainerRef,
 					] ) }
 					onFocus={ ( event: FocusEvent< HTMLDivElement > ) => {
@@ -233,5 +225,8 @@ function RichTextControl( {
 		</>
 	);
 }
+
+export const RichTextControl = forwardRef( UnforwardedRichTextControl );
+RichTextControl.displayName = 'RichTextControl';
 
 export default RichTextControl;

@@ -15,8 +15,8 @@ function getTextbox( container: HTMLElement ) {
 }
 
 // The presentational shell is deliberately decoupled from `@wordpress/rich-text`:
-// the editable behavior is injected by the consumer through `editableRef` and
-// `children`. These tests exercise only the chrome the shell owns -- the label,
+// the editable behavior is injected by the consumer through the forwarded ref
+// and `children`. These tests exercise only the chrome the shell owns -- the label,
 // the `contentEditable` element, and the controlled focus/blur selection
 // heuristic -- with no rich-text wiring at all.
 describe( 'RichTextControl (presentational shell)', () => {
@@ -97,25 +97,15 @@ describe( 'RichTextControl (presentational shell)', () => {
 		expect( textbox ).toHaveAttribute( 'data-testid', 'my-textbox' );
 	} );
 
-	it( 'attaches the injected editableRef to the contenteditable element', () => {
-		const editableRef = jest.fn();
+	it( 'forwards its ref to the contenteditable element', () => {
+		// The rich-text wiring (the `useRichText` ref, event-listener refs,
+		// an anchor ref, …) is injected through this forwarded ref.
+		const ref = jest.fn();
 		const { container } = render(
-			<RichTextControl label="Note" editableRef={ editableRef } />
+			<RichTextControl label="Note" ref={ ref } />
 		);
 
-		expect( editableRef ).toHaveBeenCalledWith( getTextbox( container ) );
-	} );
-
-	it( 'does not take focus on mount by default', () => {
-		const { container } = render( <RichTextControl label="Note" /> );
-		expect( getTextbox( container ) ).not.toHaveFocus();
-	} );
-
-	it( 'takes focus on mount when `focusOnMount` is set', () => {
-		const { container } = render(
-			<RichTextControl label="Note" focusOnMount />
-		);
-		expect( getTextbox( container ) ).toHaveFocus();
+		expect( ref ).toHaveBeenCalledWith( getTextbox( container ) );
 	} );
 
 	describe( 'controlled selection', () => {
